@@ -936,22 +936,22 @@ sap.ui.define([
 		},
 
 		/**
-		 * Checks if the filter info bar contains all the filtered columns.
+		 * Checks if the filter info bar contains property labels.
 		 *
 		 * @param {sap.ui.core.Control|string} vControl control instance or control ID
-		 * @param {string[]} aFilteredColumns array of column names that should be visible
+		 * @param {string[]} aPropertyLabels Labels of filtered properties that should be visible in the filter info bar text
 		 * @returns {Promise} OPA waitFor
 		 */
-		iShouldSeeInfoFilterBarWithFilters: function(vControl, aFilteredColumns) {
+		iShouldSeeFilterInfoBarWithFilters: function(vControl, aPropertyLabels) {
 			const sTableId = typeof vControl === "string" ? vControl : vControl.getId();
 
 			return this.waitFor({
 				id: sTableId + "-filterInfoBar",
-				controlType: "sap.m.OverflowToolbar",
+				controlType: "sap.ui.mdc.table.utils.FilterInfoBar",
 				success: function(oToolbar) {
-					aFilteredColumns.forEach(function(sFilteredColumns) {
-						Opa5.assert.ok(oToolbar.getContent()[0].getText().includes(sFilteredColumns),
-							"Info filterbar is visible and contains expected columns.");
+					aPropertyLabels.forEach(function(sPropertyLabel) {
+						Opa5.assert.ok(oToolbar.getInfoText().includes(sPropertyLabel),
+							"Filter info bar is visible and contains expected property labels.");
 					});
 				}
 			});
@@ -963,15 +963,15 @@ sap.ui.define([
 		 * @param {sap.ui.core.Control|string} vControl control instance or control ID
 		 * @returns {Promise} OPA waitFor
 		 */
-		iShouldNotSeeInfoFilterBar: function(vControl) {
+		iShouldNotSeeFilterInfoBar: function(vControl) {
 			const sTableId = typeof vControl === "string" ? vControl : vControl.getId();
 
 			return this.waitFor({
 				id: sTableId + "-filterInfoBar",
-				controlType: "sap.m.OverflowToolbar",
+				controlType: "sap.ui.mdc.table.utils.FilterInfoBar",
 				visible: false,
 				success: function(oFilterBar) {
-					Opa5.assert.notOk(oFilterBar.getVisible(), "Info Filterbar is not visible");
+					Opa5.assert.notOk(oFilterBar.getVisible(), "Filter info bar is not visible");
 				}
 			});
 		},

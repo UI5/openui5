@@ -1,0 +1,36 @@
+/* ================================= */
+/* CSS for control sap.m/TableTitle  */
+/* Base theme                        */
+/* ================================= */
+
+.sapMTableTitle {
+	display: inline-flex;
+	gap: 0.5rem;
+
+	&:has(> .sapMTitleStyleAuto) { --_sapMTableTitle-title-font-size: var(--sapGroup_Title_FontSize); }
+	&:has(> .sapMTitleStyleH1) { --_sapMTableTitle-title-font-size: var(--sapFontHeader1Size); }
+	&:has(> .sapMTitleStyleH2) { --_sapMTableTitle-title-font-size: var(--sapFontHeader2Size); }
+	&:has(> .sapMTitleStyleH3) { --_sapMTableTitle-title-font-size: var(--sapFontHeader3Size); }
+	&:has(> .sapMTitleStyleH4) { --_sapMTableTitle-title-font-size: var(--sapFontHeader4Size); }
+	&:has(> .sapMTitleStyleH5) { --_sapMTableTitle-title-font-size: var(--sapFontHeader5Size); }
+	&:has(> .sapMTitleStyleH6) { --_sapMTableTitle-title-font-size: var(--sapFontHeader6Size); }
+}
+
+.sapMTableTitleText {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	flex-shrink: 9999999; /* ensure that the count text shrinks before the title text */
+	font-family: var(--sapFontHeaderFamily);
+
+	&.sapMTableTitleTotalCount {
+		font-size: var(--_sapMTableTitle-title-font-size);
+	}
+
+	&.sapMTableTitleSelectedCount {
+		font-size: var(--_sapMTableTitle-title-font-size);
+	}
+
+	&.sapMTableTitleSelectedRowCount {
+		font-size: ~"min(var(--_sapMTableTitle-title-font-size),max(14px, calc(var(--_sapMTableTitle-title-font-size) - 2px)))";
+	}
+}

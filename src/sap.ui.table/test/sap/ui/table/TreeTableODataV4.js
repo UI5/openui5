@@ -6,16 +6,17 @@ sap.ui.define([
 	"sap/ui/model/odata/v4/ODataModel",
 	"sap/ui/table/TreeTable",
 	"sap/ui/table/Column",
-	"sap/m/HBox",
-	"sap/ui/core/Icon",
-	"sap/m/Text",
 	"sap/m/OverflowToolbar",
+	"sap/m/Toolbar",
+	"sap/ui/table/rowmodes/Auto",
+	"sap/m/HBox",
+	"sap/m/Text",
+	"sap/ui/core/Icon",
 	"sap/m/Title",
 	"sap/m/Input",
-	"sap/m/Toolbar",
 	"sap/m/VBox",
 	"sap/m/FlexItemData"
-], function(Element, ODataV4MultiSelection, ODataModel, TreeTable, Column, HBox, Icon, Text, OverflowToolbar, Title, Input, Toolbar, VBox, FlexItemData) {
+], function(Element, ODataV4MultiSelection, ODataModel, TreeTable, Column, OverflowToolbar, Toolbar, Auto, HBox, Text, Icon, Title, Input, VBox, FlexItemData) {
 	"use strict";
 	/*global TABLESETTINGS */
 	const oTable = new TreeTable({
@@ -76,7 +77,7 @@ sap.ui.define([
 				enableNotification: true
 			})
 		],
-		visibleRowCountMode: "Auto"
+		rowMode: "Auto"
 	});
 	oTable._oProxy._bEnableV4 = true;
 	window.oTable = oTable;

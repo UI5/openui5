@@ -19,8 +19,9 @@ sap.ui.define([
 	"sap/m/VBox",
 	"sap/m/HBox",
 	"sap/m/Label",
-	"sap/ui/core/Control"
-], function (Controller, UploadSetwithTable, MessageBox, Fragment, MockServer, MessageToast, Dialog, Button, mobileLibrary, Text, coreLibrary, CoreItem, Filter, FilterOperator, Element, ProgressIndicator ,ColumnListItem, VBox, HBox, Label, Control) {
+	"sap/ui/core/Control",
+	"sap/base/security/URLListValidator"
+], function (Controller, UploadSetwithTable, MessageBox, Fragment, MockServer, MessageToast, Dialog, Button, mobileLibrary, Text, coreLibrary, CoreItem, Filter, FilterOperator, Element, ProgressIndicator ,ColumnListItem, VBox, HBox, Label, Control, URLListValidator) {
 	"use strict";
 
 	return Controller.extend("responsiveProgressindicator.table.sample.controller.Page", {
@@ -28,7 +29,9 @@ sap.ui.define([
 			this.documentTypes = this.getFileCategories();
 			this.oMockServer = new MockServer();
 			this.oMockServer.oModel = this.byId("table-uploadSet").getModel("documents");
-			this.aProgressItems = [];
+		// initialise URLListValidator and add blob to the valid URL schemes
+		URLListValidator.add("blob");
+		this.aProgressItems = [];
 		},
 		onBeforeUploadStarts: function(oEvent) {
 			// Turning of mockserver to wtach upload progress indicator.

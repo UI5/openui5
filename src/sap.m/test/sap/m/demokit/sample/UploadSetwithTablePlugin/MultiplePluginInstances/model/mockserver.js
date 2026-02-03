@@ -30,20 +30,21 @@ sap.ui.define([
 							"fileSize": oResponse.fileSize,
 							"lastModifiedBy": "Jane Burns",
 							"lastmodified": "10/03/21, 10:03:00 PM",
-							"documentType": oResponse && oResponse.documentType ? oResponse.documentType : "Invoice"
-						}
-					);
-					break;
-
-				case "update":
-					if (oExistingModelDataToUpdate) {
-						oExistingModelDataToUpdate.fileName = oFile && oFile.name ? oFile.name : "";
-						oExistingModelDataToUpdate.url = sUrl;
-						oExistingModelDataToUpdate.fileSize = oFile && oFile.size ? oFile.size : 0;
-						oExistingModelDataToUpdate.mediaType = oFile && oFile.type ? oFile.type : "";
-						this.oModel.setData(oData);
+						"documentType": oResponse && oResponse.documentType ? oResponse.documentType : "Invoice",
+						"trustedSource": true
 					}
-					break;
+				);
+				break;
+
+			case "update":
+				if (oExistingModelDataToUpdate) {
+					oExistingModelDataToUpdate.fileName = oFile && oFile.name ? oFile.name : "";
+					oExistingModelDataToUpdate.url = sUrl;
+					oExistingModelDataToUpdate.fileSize = oFile && oFile.size ? oFile.size : 0;
+					oExistingModelDataToUpdate.mediaType = oFile && oFile.type ? oFile.type : "";
+					this.oModel.setData(oData);
+				}
+				break;
 
 				default:
 					break;

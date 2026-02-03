@@ -123,9 +123,9 @@ sap.ui.define([
 
 		TableUtils.Hook.register(oTable, Hook.Table.RowsUnbound, this._onTableRowsUnbound, this);
 		TableUtils.Hook.register(oTable, Hook.Table.UpdateRows, this._onTableUpdateRows, this);
-		TableUtils.Hook.register(oTable, Hook.TableRenderer.RenderTableStyles, this.applyTableStyles, this);
+		TableUtils.Hook.register(oTable, Hook.TableRenderer.RenderTableStyles, this.renderTableStyles, this);
 		TableUtils.Hook.register(oTable, Hook.TableRenderer.RenderInTableBottomArea, this.renderInTableBottomArea, this);
-		TableUtils.Hook.register(oTable, Hook.TableRenderer.RenderRowContainerStyles, this.applyRowContainerStyles, this);
+		TableUtils.Hook.register(oTable, Hook.TableRenderer.RenderRowContainerStyles, this.renderRowContainerStyles, this);
 		TableUtils.Hook.register(oTable, Hook.TableRenderer.RenderRowStyles, this.renderRowStyles, this);
 		TableUtils.Hook.register(oTable, Hook.TableRenderer.RenderCellContentStyles, this.renderCellContentStyles, this);
 	};
@@ -141,9 +141,9 @@ sap.ui.define([
 
 		TableUtils.Hook.deregister(oTable, Hook.Table.RowsUnbound, this._onTableRowsUnbound, this);
 		TableUtils.Hook.deregister(oTable, Hook.Table.UpdateRows, this._onTableUpdateRows, this);
-		TableUtils.Hook.deregister(oTable, Hook.TableRenderer.RenderTableStyles, this.applyTableStyles, this);
+		TableUtils.Hook.deregister(oTable, Hook.TableRenderer.RenderTableStyles, this.renderTableStyles, this);
 		TableUtils.Hook.deregister(oTable, Hook.TableRenderer.RenderInTableBottomArea, this.renderInTableBottomArea, this);
-		TableUtils.Hook.deregister(oTable, Hook.TableRenderer.RenderRowContainerStyles, this.applyRowContainerStyles, this);
+		TableUtils.Hook.deregister(oTable, Hook.TableRenderer.RenderRowContainerStyles, this.renderRowContainerStyles, this);
 		TableUtils.Hook.deregister(oTable, Hook.TableRenderer.RenderRowStyles, this.renderRowStyles, this);
 		TableUtils.Hook.deregister(oTable, Hook.TableRenderer.RenderCellContentStyles, this.renderCellContentStyles, this);
 	};
@@ -328,47 +328,11 @@ sap.ui.define([
 	 * @param {sap.ui.core.RenderManager} [oRM] The render manager.
 	 * @private
 	 */
-	RowMode.prototype.applyTableStyles = function(oRM) {
+	RowMode.prototype.renderTableStyles = function(oRM) {
 		const mTableStyles = this.getTableStyles();
-
-		if (oRM) {
-			oRM.style("height", mTableStyles.height);
-			oRM.style("min-height", mTableStyles.minHeight);
-			oRM.style("max-height", mTableStyles.maxHeight);
-			return;
-		}
-
-		const oTable = this.getTable();
-		const oTableDomRef = oTable ? oTable.getDomRef() : null;
-
-		if (oTableDomRef) {
-			oTableDomRef.style.height = mTableStyles.height;
-			oTableDomRef.style.minHeight = mTableStyles.minHeight;
-			oTableDomRef.style.maxHeight = mTableStyles.maxHeight;
-		}
-	};
-
-	/**
-	 * Applies the CSS styles to the table's bottom placeholder DOM element. If a render manager is provided, the styles will be written to the
-	 * rendering output. Otherwise, direct DOM updates will be performed.
-	 *
-	 * @param {sap.ui.core.RenderManager} [oRM] The render manager.
-	 * @private
-	 */
-	RowMode.prototype.applyTableBottomPlaceholderStyles = function(oRM) {
-		const mPlaceholderStyles = this.getTableBottomPlaceholderStyles();
-
-		if (oRM) {
-			oRM.style("height", mPlaceholderStyles.height);
-			return;
-		}
-
-		const oTable = this.getTable();
-		const oPlaceholder = oTable ? oTable.getDomRef("placeholder-bottom") : null;
-
-		if (oPlaceholder) {
-			oPlaceholder.style.height = mPlaceholderStyles.height;
-		}
+		oRM.style("height", mTableStyles.height);
+		oRM.style("min-height", mTableStyles.minHeight);
+		oRM.style("max-height", mTableStyles.maxHeight);
 	};
 
 	/**
@@ -378,24 +342,11 @@ sap.ui.define([
 	 * @param {sap.ui.core.RenderManager} [oRM] The render manager.
 	 * @private
 	 */
-	RowMode.prototype.applyRowContainerStyles = function(oRM) {
+	RowMode.prototype.renderRowContainerStyles = function(oRM) {
 		const mRowContainerStyles = this.getRowContainerStyles();
-
-		if (oRM) {
-			oRM.style("height", mRowContainerStyles.height);
-			oRM.style("min-height", mRowContainerStyles.minHeight);
-			oRM.style("max-height", mRowContainerStyles.maxHeight);
-			return;
-		}
-
-		const oTable = this.getTable();
-		const oRowContainer = oTable ? oTable.getDomRef("tableCCnt") : null;
-
-		if (oRowContainer) {
-			oRowContainer.style.height = mRowContainerStyles.height;
-			oRowContainer.style.minHeight = mRowContainerStyles.minHeight;
-			oRowContainer.style.maxHeight = mRowContainerStyles.maxHeight;
-		}
+		oRM.style("height", mRowContainerStyles.height);
+		oRM.style("min-height", mRowContainerStyles.minHeight);
+		oRM.style("max-height", mRowContainerStyles.maxHeight);
 	};
 
 	/**
@@ -501,15 +452,15 @@ sap.ui.define([
 	 * @private
 	 */
 	RowMode.prototype.renderInTableBottomArea = function(oRM) {
-		const mPlaceholderHeight = this.getTableBottomPlaceholderStyles();
+		const mPlaceholderStyles = this.getTableBottomPlaceholderStyles();
 
-		if (mPlaceholderHeight === undefined) {
+		if (mPlaceholderStyles === undefined) {
 			return;
 		}
 
 		oRM.openStart("div", this.getTable().getId() + "-placeholder-bottom");
 		oRM.class("sapUiTablePlaceholder");
-		this.applyTableBottomPlaceholderStyles(oRM);
+		oRM.style("height", mPlaceholderStyles.height);
 		oRM.openEnd();
 		oRM.close("div");
 	};

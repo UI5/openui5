@@ -56,6 +56,17 @@ sap.ui.define([
 				enableReorder: {
 					type: "boolean",
 					defaultValue: true
+				},
+				/**
+				 * Whether to use the new UI (true) or legacy UI (false)
+				 * Passed from AdaptationFilterBar via GroupContainer
+				 * @experimental
+				 * @private
+				 * @ui5-restricted sap.comp, sap.ui.mdc
+				 */
+				useNewUI: {
+					type: "boolean",
+					defaultValue: true
 				}
 			},
 			events: {
@@ -75,15 +86,70 @@ sap.ui.define([
 	AdaptFiltersPanel.prototype.P13N_MODEL = "$p13n";
 
 	/**
-	 * Interface function for <code>sap.m.p13n.Popup</code> to determine that the <code>AdaptFiltersPanel</code> provides its own scrolling capabilites.
-	 *
-	 * @returns {boolean} The enablement of the vertical scrolling
+	 * Setter for useNewUI property.
+	 * When property is set, check if it differs from what was created in applySettings.
+	 * If so, destroy everything and recreate with correct UI mode.
+	 * @param {boolean} bUseNewUI Whether to use new UI
+	 * @returns {this} Reference to this for chaining
 	 */
-	AdaptFiltersPanel.prototype.getVerticalScrolling = function() {
-		return true;
+	AdaptFiltersPanel.prototype.setUseNewUI = function(bUseNewUI) {
+		// Set the property
+		this.setProperty("useNewUI", bUseNewUI);
+
+		// Check if views were created with different UI mode
+		if (this._bCreatedWithNewUI !== undefined && this._bCreatedWithNewUI !== bUseNewUI) {
+			// UI mode changed - destroy and recreate everything
+			this._destroyViews();
+			this._createViews();
+
+			// After recreating views, switch to the current/default view
+			// to ensure the container is in a consistent state
+			const sCurrentViewKey = this.getCurrentViewKey() || this.getDefaultView();
+			if (sCurrentViewKey) {
+				this.switchView(sCurrentViewKey);
+			}
+		}
+
+		return this;
 	};
 
-	AdaptFiltersPanel.prototype.applySettings = function(mSettings) {
+	/**
+	 * Destroys all views and header
+	 * @private
+	 */
+	AdaptFiltersPanel.prototype._destroyViews = function() {
+		// Destroy all views
+		this.removeAllViews().forEach((oView) => {
+			oView.destroy();
+		});
+
+		// Clear header and subHeader aggregations (this destroys the controls)
+		this.setHeader(null);
+		this.setSubHeader(null);
+
+		// Clear all cached header control references
+		// These are either destroyed by aggregations above or will be recreated
+		this._oHeader = null;
+		this._oViewSwitch = null;
+		this._oShowHideBtn = null;
+		this._oGroupModeSelect = null;
+		this._oSearchField = null;
+
+		// Reset cached values
+		delete this._bCreatedWithNewUI;
+		delete this._bUseNewUI;
+	};
+
+	/**
+	 * Creates views based on current useNewUI property
+	 * @private
+	 */
+	AdaptFiltersPanel.prototype._createViews = function() {
+		const bUseNewUI = this.getUseNewUI();
+
+		// Remember what UI mode we created with
+		this._bCreatedWithNewUI = bUseNewUI;
+
 		const fnChangeFactory = (sPath) => {
 			return function(oEvt) {
 				if (this._checkIsNewUI()) {
@@ -96,7 +162,7 @@ sap.ui.define([
 		};
 
 		let oListContent, oGroupContent;
-		if (this._checkIsNewUI()) {
+		if (bUseNewUI) {
 			oListContent = new AdaptFiltersPanelContent(this.getId() + "-listView", {
 				change: fnChangeFactory("/items")
 			});
@@ -106,7 +172,7 @@ sap.ui.define([
 				change: fnChangeFactory("/items")
 			});
 		} else {
-			// TODO: Remove legacy support
+			// Legacy support
 			oListContent = new SelectionPanel(this.getId() + "-listView", {
 				activeColumn: this._getResourceText("p13nDialog.LIST_VIEW_ACTIVE"),
 				change: fnChangeFactory("/items")
@@ -127,10 +193,35 @@ sap.ui.define([
 			content: oGroupContent
 		}));
 
-		AbstractContainer.prototype.applySettings.apply(this, arguments);
-
 		this.getView(this.LIST_KEY).getContent().setEnableReorder(this.getEnableReorder());
 		this._createHeader();
+
+		// Reapply item factory if it was already set
+		// This is needed when views are recreated due to UI mode change
+		const fnItemFactory = this.getItemFactory();
+		if (fnItemFactory) {
+			this.getViews().forEach((oView) => {
+				const oPanel = oView.getContent();
+				oPanel.setItemFactory(fnItemFactory);
+			});
+		}
+	};
+
+	/**
+	 * Interface function for <code>sap.m.p13n.Popup</code> to determine that the <code>AdaptFiltersPanel</code> provides its own scrolling capabilites.
+	 *
+	 * @returns {boolean} The enablement of the vertical scrolling
+	 */
+	AdaptFiltersPanel.prototype.getVerticalScrolling = function() {
+		return true;
+	};
+
+	AdaptFiltersPanel.prototype.applySettings = function(mSettings) {
+		// Create views with default useNewUI (true)
+		// If different value is set via property, setUseNewUI() will recreate them
+		this._createViews();
+
+		AbstractContainer.prototype.applySettings.apply(this, arguments);
 
 		this.addStyleClass("sapUiMDCAdaptFiltersPanel");
 	};
@@ -445,6 +536,7 @@ sap.ui.define([
 			oSubHeader.setDesign(BarDesign.SubHeader);
 			this.setSubHeader(oSubHeader);
 			this.setHeader(this._oHeader);
+			this.oLayout.setShowHeader(true);
 		}
 		return this._oHeader;
 	};
@@ -653,7 +745,16 @@ sap.ui.define([
 
 	AdaptFiltersPanel.prototype._checkIsNewUI = function() {
 		if (this._bUseNewUI === undefined) {
-			this._bUseNewUI = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters") === "true";
+			// URL parameter takes precedence (for testing/development)
+			const sUrlParam = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters");
+			if (sUrlParam === "true") {
+				this._bUseNewUI = true;
+			} else if (sUrlParam === "false") {
+				this._bUseNewUI = false;
+			} else {
+				// Use the property value
+				this._bUseNewUI = this.getUseNewUI();
+			}
 		}
 		return this._bUseNewUI;
 	};

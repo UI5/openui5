@@ -8,6 +8,8 @@ sap.ui.define([
   "sap/m/Toolbar",
   "sap/m/TimePicker",
   "sap/m/Text",
+  "sap/m/FormattedText",
+  "sap/m/Link",
   "sap/ui/model/json/JSONModel",
   "sap/m/Page",
   "sap/m/HBox",
@@ -26,6 +28,8 @@ sap.ui.define([
   Toolbar,
   TimePicker,
   Text,
+  FormattedText,
+  Link,
   JSONModel,
   Page,
   HBox,
@@ -137,6 +141,10 @@ sap.ui.define([
 		  valueStateText: "Error Message"
 	  },
 	  {
+		  id: "TP15a",
+		  valueState: "Warning"
+	  },
+	  {
 		  id: "TP16",
 		  value: {
 			  path: "/timeValue",
@@ -205,6 +213,21 @@ sap.ui.define([
 			  });
 		  } else {
 			  oTp = new TimePicker(options[i]);
+
+			  if (options[i].id === "TP15a") {
+				  oTp.setFormattedValueStateText(new FormattedText({
+					  htmlText: "Value state with a clickable %%0 - clicking the link should work!",
+					  controls: [new Link({
+						  text: "link",
+						  href: "https://www.sap.com",
+						  target: "_blank",
+						  press: function() {
+							  alert("Link was clicked!");
+						  }
+					  })]
+				  }));
+			  }
+
 			  sInfo =  JSON.stringify(options[i]).split("\"").join("").replace("{", "").replace(",", " ").replace("}", "") + ", id: " + oTp.getId();
 			  oBar = new Toolbar(options[i].id + "-toolbar", {
 				  content: [

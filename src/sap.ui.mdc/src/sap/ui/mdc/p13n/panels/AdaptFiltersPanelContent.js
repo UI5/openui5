@@ -288,11 +288,21 @@ sap.ui.define([
 
 		aItems.forEach((oItem) => {
 			if (oItem.isA("sap.m.CustomListItem")) {
+				const [oControl] = oItem.getContent()[0].getContent()[1].getItems();
+
 				if (sMode === "sort") {
-					oItem.getContent()[0].getContent()[1].getItems()[0].setEditMode("Disabled");
+					if (oControl.isA("sap.ui.mdc.FilterField")) {
+						oControl.setEditMode("Disabled");
+					} else {
+						oControl.setEnabled?.(false);
+					}
 				}
 				if (sMode === "edit") {
-					oItem.getContent()[0].getContent()[1].getItems()[0].setEditMode("Editable");
+					if (oControl.isA("sap.ui.mdc.FilterField")) {
+						oControl.setEditMode("Editable");
+					} else {
+						oControl.setEnabled?.(true);
+					}
 				}
 			}
 		});
@@ -678,9 +688,10 @@ sap.ui.define([
 	AdaptFiltersPanelContent.prototype._createVisibilityAction = function(oContext) {
 		const oFilterField = this._getFilterFieldFromItem(oContext);
 		const oItem = oContext.getObject();
+		const bHasConditions = oFilterField?.isA("sap.ui.mdc.FilterField") ? oFilterField.getConditions().length != 0 : oFilterField?._bHasConditions;
 
 		const oAction = new ToggleButton({
-			enabled: oItem.required ? oFilterField.getConditions().length != 0 : true,
+			enabled: oItem.required ? bHasConditions : true,
 			pressed: oItem.visible,
 			icon: {
 				path: `${this.P13N_MODEL}>${this.PRESENCE_ATTRIBUTE}`,

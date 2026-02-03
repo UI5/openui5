@@ -48,27 +48,39 @@ sap.ui.define([
 
 	QUnit.module("Filter info bar");
 
-	opaTest("Filter and open filter info bar", function(Given, When, Then) {
-		// Filter 'Category' column
+	opaTest("Open filter dialog via filter info bar", function(Given, When, Then) {
+		// Add a filter
 		When.onTheMDCTable.iPersonalizeFilter(sTableId, [{key: "Category", values: ["*Notebooks*"], inputControl: sTableId + "--filter--Category"}]);
 
-		// Check if Info Filter Bar is visible
-		Then.onTheAppMDCTable.iShouldSeeInfoFilterBarWithFilters(sTableId, ["Category"]);
+		// Check if filter info bar is visible
+		Then.onTheAppMDCTable.iShouldSeeFilterInfoBarWithFilters(sTableId, ["Category"]);
 
-		// Press Info Filter Bar and check if filter is set
+		// Press filter info bar and check if filter dialog is opened with correct filters
 		When.onTheAppMDCTable.iPressFilterInfoBar(sTableId);
 		Then.P13nAssertions.iShouldSeeTheFilterDialog();
 		Then.onTheAppMDCTable.iShouldSeeValuesInFilterDialog("Category", "Notebooks");
 
-		// Check Focus Handling when closing the dialog
+		// Focus should return to filter info bar after closing the dialog
 		When.P13nActions.iPressDialogOk();
+		Then.onTheAppMDCTable.iShouldSeeFocusOnControl(sTableId + "-filterInfoBar");
+
+		// Open the dialog again and clear all filters
+		When.onTheAppMDCTable.iPressFilterInfoBar(sTableId);
+		Then.P13nAssertions.iShouldSeeTheFilterDialog();
+		Then.P13nActions.iRemoveFiltersInFilterDialog();
+
+		// Filter info bar will be hidden. Focus must not leave the table.
+		When.P13nActions.iPressDialogOk();
+		Then.onTheAppMDCTable.iShouldNotSeeFilterInfoBar(sTableId);
 		Then.onTheAppMDCTable.iShouldSeeFocusOnControl(sTableId);
 	});
 
-	opaTest("Remove all filter via info filterbar", function(Given, When, Then) {
-		Then.onTheAppMDCTable.iShouldSeeInfoFilterBarWithFilters(sTableId, ["Category"]);
-		When.onTheAppMDCTable.iRemoveAllFiltersViaInfoFilterBar(sTableId);
-		Then.onTheAppMDCTable.iShouldNotSeeInfoFilterBar(sTableId);
+	opaTest("Remove all filters via filter info bar", function(Given, When, Then) {
+		When.onTheMDCTable.iPersonalizeFilter(sTableId, [{key: "Category", values: ["*Notebooks*"], inputControl: sTableId + "--filter--Category"}]);
+		Then.onTheAppMDCTable.iShouldSeeFilterInfoBarWithFilters(sTableId, ["Category"]);
+		When.onTheAppMDCTable.iPressRemoveAllFiltersOnFilterInfoBar(sTableId);
+		Then.onTheAppMDCTable.iShouldNotSeeFilterInfoBar(sTableId);
+		Then.onTheAppMDCTable.iShouldSeeFocusOnControl(sTableId);
 	});
 
 	QUnit.module("Column menu");

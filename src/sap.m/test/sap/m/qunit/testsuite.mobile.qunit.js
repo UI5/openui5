@@ -1708,6 +1708,10 @@ sap.ui.define([
 				}
 			},
 
+			TableTitle: {
+				title: "QUnit Page for sap.m.TableTitle"
+			},
+
 			"table.ColumnWidthController": {
 				title: "Test Page for sap.m.table.ColumnWidthController",
 				module: "test-resources/sap/m/qunit/table/ColumnWidthController.qunit",

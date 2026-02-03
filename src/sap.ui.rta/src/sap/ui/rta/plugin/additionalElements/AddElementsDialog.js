@@ -226,6 +226,8 @@ sap.ui.define([
 			extensibilityMenuButtonTooltip: "",
 			extensibilityOptions: []
 		});
+		// Increase the default size limit (100) to allow for large numbers of elements. More than 1000 causes performance issues.
+		this._oDialogModel.setSizeLimit(1000);
 
 		this._bDescendingSortOrder = false;
 		this.oRTAResourceModel = new ResourceModel({ bundleName: "sap.ui.rta.messagebundle" });
@@ -262,6 +264,7 @@ sap.ui.define([
 			// retrieve List to set the sorting for the 'items' aggregation, since sap.ui.model.Sorter
 			// does not support binding to a model property...
 			this._oList = Element.getElementById(`${this.getId()}--rta_addElementsDialogList`);
+
 			this._openDialog();
 		}.bind(this));
 	};
@@ -316,6 +319,9 @@ sap.ui.define([
 	};
 
 	AddElementsDialog.prototype.setElements = function(aElements) {
+		if (aElements.length > 1000) {
+			throw new Error("AddElementsDialog: displaying more than 1000 elements is not supported.");
+		}
 		this._oDialogModel.setProperty("/elements", aElements);
 		// Reset filter when new elements are set (e.g., when dialog is reopened)
 		this._sCurrentFilterValue = "";

@@ -19,13 +19,6 @@ sap.ui.define([
 		}
 	});
 
-	function checkIsNewAdaptFiltersUI() {
-		const oFrame = Opa5.getWindow();
-		if (oFrame && oFrame.location) {
-			const appFrameHasParam = new URLSearchParams(oFrame.location.search).get("sap-ui-xx-new-adapt-filters") === "true";
-			return appFrameHasParam;
-		}
-	}
 
 	const aCustomControls = {
 		"sap.m.Slider": {
@@ -164,9 +157,16 @@ sap.ui.define([
 	});
 	opaTest(`Changes in "Show Values" are correctly reflected`, function (Given, When, Then) {
 		When.onTheMDCFilterBar.iPressOnTheAdaptFiltersButton();
-		if (!checkIsNewAdaptFiltersUI() ) {
-			When.onTheMDCFilterBar.iPressTheAdaptFiltersShowValuesButton();
-		}
+		Then.waitFor({
+			controlType: "sap.ui.mdc.p13n.panels.AdaptFiltersPanel",
+			success: function(aAdaptFiltersPanel) {
+				const oAdaptFiltersPanel = aAdaptFiltersPanel[0];
+				const bIsNewUI = oAdaptFiltersPanel.getUseNewUI();
+				if (!bIsNewUI) {
+					When.onTheMDCFilterBar.iPressTheAdaptFiltersShowValuesButton();
+				}
+			}
+		});
 		When.onTheApp.iChangeTheSliderValueInTheField(50000, true);
 		When.onTheApp.iChangeTheSegementedButtonValueInTheFilterField("Planning", true);
 

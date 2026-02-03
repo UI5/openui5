@@ -360,7 +360,105 @@ sap.ui.define([
 		}
 	});
 
-	// To add a test case where the table does not need to adjust the row count to the avialable space after rendering.
+	QUnit.module("Table bottom placeholder styles", {
+		beforeEach: function() {
+			this.oTable = TableQUnitUtils.createTable({
+				rowMode: new AutoRowMode({
+					maxRowCount: 10
+				}),
+				columns: [
+					new Column({template: new HeightTestControl({height: "1px"})}),
+					new Column({template: new HeightTestControl({height: "1px"})})
+				],
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(3)
+			});
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("getTableBottomPlaceholderStyles - hideEmptyRows=false", async function(assert) {
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.strictEqual(this.oTable.getRowMode().getTableBottomPlaceholderStyles(), undefined);
+	});
+
+	QUnit.test("getTableBottomPlaceholderStyles - hideEmptyRows=true, before rendering", function(assert) {
+		const oRowMode = this.oTable.getRowMode();
+
+		oRowMode.setHideEmptyRows(true);
+		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
+			height: 5 * oRowMode.getBaseRowHeightOfTable() + "px"
+		});
+	});
+
+	QUnit.test("getTableBottomPlaceholderStyles - hideEmptyRows=true, with less data than min rows", async function(assert) {
+		const oRowMode = this.oTable.getRowMode();
+
+		oRowMode.setHideEmptyRows(true);
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
+			height: 7 * oRowMode.getBaseRowHeightOfTable() + "px"
+		});
+	});
+
+	QUnit.test("getTableBottomPlaceholderStyles - hideEmptyRows=true, with more data than min rows", async function(assert) {
+		const oRowMode = this.oTable.getRowMode();
+
+		oRowMode.setHideEmptyRows(true);
+		this.oTable.setModel(TableQUnitUtils.createJSONModelWithEmptyRows(6));
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
+			height: 4 * oRowMode.getBaseRowHeightOfTable() + "px"
+		});
+	});
+
+	QUnit.test("Adding a row when empty rows are hidden", async function(assert) {
+		const oRowMode = this.oTable.getRowMode();
+
+		oRowMode.setHideEmptyRows(true);
+
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.strictEqual(oRowMode.getComputedRowCounts().count, 3, "Initial computed row count");
+		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
+			height: 7 * oRowMode.getBaseRowHeightOfTable() + "px"
+		}, "Initial bottom placeholder styles");
+
+		const oInvalidate = sinon.spy(oRowMode, "invalidate");
+		this.oTable.setModel(TableQUnitUtils.createJSONModelWithEmptyRows(4));
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.strictEqual(oRowMode.getComputedRowCounts().count, 4, "Added one data row: new computed row count");
+		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
+			height: 6 * oRowMode.getBaseRowHeightOfTable() + "px"
+		}, "Added one data row: Bottom placeholder styles");
+		assert.ok(oInvalidate.notCalled, "Added one data row: Row mode was not invalidated");
+		oInvalidate.restore();
+	});
+
+	QUnit.test("Resize the table reducing the placeholder height", async function(assert) {
+		const oRowMode = this.oTable.getRowMode();
+
+		oRowMode.setHideEmptyRows(true);
+
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.strictEqual(oRowMode.getComputedRowCounts().count, 3, "Initial computed row count");
+		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
+			height: 7 * oRowMode.getBaseRowHeightOfTable() + "px"
+		}, "Initial bottom placeholder styles");
+
+		const oInvalidate = sinon.spy(oRowMode, "invalidate");
+		await this.oTable.qunit.resize({height: "550px"});
+		assert.strictEqual(oRowMode.getComputedRowCounts().count, 3, "After resize: computed row count");
+		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
+			height: 6 * oRowMode.getBaseRowHeightOfTable() + "px"
+		}, "After resize: bottom placeholder styles");
+		assert.ok(oInvalidate.called, "After resize: Row mode was invalidated");
+		oInvalidate.restore();
+
+		await this.oTable.qunit.resetSize();
+	});
+
+	// To add a test case where the table does not need to adjust the row count to the available space after rendering.
 	function testWithStableRowCount(fnTest) {
 		return fnTest().then(() => {
 			const oRowMode = TableQUnitUtils.getDefaultSettings().rowMode;

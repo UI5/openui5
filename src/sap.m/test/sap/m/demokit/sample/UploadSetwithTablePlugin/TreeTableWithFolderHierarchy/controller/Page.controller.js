@@ -16,8 +16,9 @@ sap.ui.define([
     "sap/ui/model/FilterOperator",
     "sap/ui/core/Element",
     "sap/ui/model/json/JSONModel",
-    "sap/base/util/uid"
-], function (Controller, UploadSetwithTable, MessageBox, Fragment, MockServer, MessageToast, Dialog, Button, Input, mobileLibrary, Text, coreLibrary, CoreItem, Filter, FilterOperator, Element, JSONModel, uid) {
+    "sap/base/util/uid",
+    "sap/base/security/URLListValidator"
+], function (Controller, UploadSetwithTable, MessageBox, Fragment, MockServer, MessageToast, Dialog, Button, Input, mobileLibrary, Text, coreLibrary, CoreItem, Filter, FilterOperator, Element, JSONModel, uid, URLListValidator) {
     "use strict";
 
     return Controller.extend("sap.m.sample.UploadSetwithTablePlugin.TreeTableWithFolderHierarchy.controller.Page", {
@@ -36,6 +37,8 @@ sap.ui.define([
 
             this.oMockServer = new MockServer();
             this.oMockServer.oModel = this.oModel;
+            // initialise URLListValidator and add blob to the valid URL schemes
+            URLListValidator.add("blob");
         },
 
         onBeforeUploadStarts: function () {

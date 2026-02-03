@@ -3207,6 +3207,15 @@ sap.ui.define([
 		},
 		createTable: async function(mSettings) {
 			this.oTable = new Table({
+				propertyInfo: [{
+					key: "name",
+					label: "NameLabel",
+					dataType: "String"
+				}, {
+					key: "age",
+					label: "AgeLabel",
+					dataType: "String"
+				}],
 				delegate: {
 					name: sDelegatePath,
 					payload: {
@@ -3219,60 +3228,48 @@ sap.ui.define([
 							key: "age",
 							label: "AgeLabel",
 							dataType: "String"
-						}, {
-							key: "gender",
-							label: "GenderLabel",
-							dataType: "String"
 						}]
 					}
 				},
 				...mSettings
 			});
+			this.oInsertFilterInfoBar = this.spy(this.oTable._getType(), "insertFilterInfoBar");
 			await this.oTable.initialized();
-			this.oTable.placeAt("qunit-fixture");
-			await nextUIUpdate();
 		},
 		getFilterInfoBar: function() {
-			let oFilterInfoBar;
+			return this.oTable._oTable.findAggregatedObjects(false, (oElement) => oElement.isA("sap.ui.mdc.table.utils.FilterInfoBar"))[0];
+		},
+		assertFilterInfoBarExists: function(bExists, sTestTitle) {
+			const sTestMessage = sTestTitle + ": " + (bExists ? "Filter info bar exists" : "Filter info bar does not exist");
+			QUnit.assert.ok(!!this.getFilterInfoBar() === bExists, sTestMessage);
+		},
+		assertFilterInfoBarText: function(aLabels, sTestTitle) {
+			const sFilterInfoBarText = this.getFilterInfoBar().getInfoText();
+			const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
+			const sTestMessage = sTestTitle + ": Filter info text";
 
-			if (this.oTable._isOfType(TableType.ResponsiveTable)) {
-				oFilterInfoBar = this.oTable._oTable.getInfoToolbar();
+			if (!aLabels || aLabels.length === 0) {
+				QUnit.assert.equal(sFilterInfoBarText, "", sTestMessage);
+			} else if (aLabels.length === 1) {
+				QUnit.assert.equal(sFilterInfoBarText, oResourceBundle.getText("table.ONE_FILTER_ACTIVE", aLabels), sTestMessage);
 			} else {
-				oFilterInfoBar = this.oTable._oTable.getExtension()[1];
+				QUnit.assert.equal(
+					sFilterInfoBarText,
+					oResourceBundle.getText("table.MULTIPLE_FILTERS_ACTIVE", [
+						aLabels.length,
+						ListFormat.getInstance().format(aLabels)
+					]),
+					sTestMessage
+				);
 			}
-
-			if (oFilterInfoBar && oFilterInfoBar.isA("sap.m.OverflowToolbar")) {
-				return oFilterInfoBar;
-			} else {
-				return null;
-			}
 		},
-		getFilterInfoText: function() {
-			const oFilterInfoBar = this.getFilterInfoBar();
-			return oFilterInfoBar ? oFilterInfoBar.getContent()[0] : null;
-		},
-		hasFilterInfoBar: function() {
-			return this.getFilterInfoBar() !== null;
-		},
-		filterInfoBarRendered: async function() {
-			await new Promise((resolve) => {
-				const oFilterInfoBar = this.getFilterInfoBar();
-
-				if (!oFilterInfoBar.getDomRef()) {
-					oFilterInfoBar.addEventDelegate({
-						onAfterRendering: function() {
-							oFilterInfoBar.removeEventDelegate(this);
-							resolve();
-						}
-					});
-				} else {
-					resolve();
-				}
-			});
+		assertAriaLabelledBy: function() {
+			QUnit.assert.equal(this.oTable._oTable.getAriaLabelledBy().filter((sId) => sId === this.getFilterInfoBar().getACCTextId()).length, 1,
+				"ariaLabelledBy of the inner table contains the filter info text id");
 		}
 	});
 
-	QUnit.test("Filtering disabled", async function(assert) {
+	QUnit.test("Filtering disabled initially", async function(assert) {
 		await this.createTable({
 			filterConditions: {
 				name: [{
@@ -3283,9 +3280,10 @@ sap.ui.define([
 				}]
 			}
 		});
+		this.assertFilterInfoBarExists(false, "After initialization");
+		assert.ok(this.oInsertFilterInfoBar.notCalled, "After initialization: #insertFilterInfoBar not called on table type");
 
-		assert.ok(!this.hasFilterInfoBar(), "Filter info bar does not exist");
-
+		this.oInsertFilterInfoBar.resetHistory();
 		this.oTable.setFilterConditions({
 			age: [{
 				isEmpty: null,
@@ -3294,153 +3292,114 @@ sap.ui.define([
 				values: ["test"]
 			}]
 		});
-
-		await wait(50);
-		assert.ok(!this.hasFilterInfoBar(), "Change filter conditions: Filter info bar does not exist");
-
-		this.oTable.setP13nMode(["Filter"]);
-		assert.ok(this.hasFilterInfoBar(), "Filtering enabled: Filter info bar exists");
-		assert.ok(!this.getFilterInfoBar().getVisible(), "Filtering enabled: Filter info bar is invisible");
+		this.assertFilterInfoBarExists(false, "Filter conditions changed");
+		assert.ok(this.oInsertFilterInfoBar.notCalled, "Filter conditions changed: #insertFilterInfoBar not called on table type");
 	});
 
-	aTestedTypes.forEach(function(sTableType) {
-		QUnit.test("Filtering enabled; Table type = " + sTableType, async function(assert) {
-			const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
-			const oListFormat = ListFormat.getInstance();
-			let oFilterInfoBar;
-
-			await this.createTable({
-				type: sTableType,
-				p13nMode: ["Filter"]
-			});
-
-			assert.ok(this.hasFilterInfoBar(), "No initial filter conditions: Filter info bar exists");
-			assert.ok(!this.getFilterInfoBar().getVisible(), "No initial filter conditions: Filter info bar is invisible");
-			assert.equal(this.oTable._oTable.getAriaLabelledBy().filter((sId) => sId === this.oTable._oFilterInfoBarInvisibleText.getId()).length, 1,
-				"ariaLabelledBy of the inner table contains a reference to the invisible text");
-			assert.equal(this.oTable._oFilterInfoBarInvisibleText.getText(), "", "The associated invisible text is empty");
-
-			this.oTable.destroy();
-			await this.createTable({
-				type: sTableType,
-				p13nMode: ["Filter"],
-				filterConditions: {
-					name: [{
-						isEmpty: null,
-						operator: OperatorName.EQ,
-						validated: ConditionValidated.NotValidated,
-						values: ["test"]
-					}]
-				},
-				columns: [
-					new Column({
-						template: new Text(),
-						propertyKey: "name",
-						header: "NameLabelColumnHeader"
-					}),
-					new Column({
-						template: new Text(),
-						propertyKey: "age",
-						header: "AgeLabelColumnHeader"
-					})
-				]
-			});
-
-			assert.ok(this.hasFilterInfoBar(), "Initial filter conditions: Filter info bar exists");
-			assert.ok(this.getFilterInfoBar().getVisible(), "Initial filter conditions: Filter info bar is visible");
-			assert.strictEqual(this.getFilterInfoText().getText(),
-				oResourceBundle.getText("table.ONE_FILTER_ACTIVE", [oListFormat.format(["NameLabel"])]),
-				"Initial filter conditions: The filter info bar text is correct (1 filter)");
-			assert.equal(
-				this.oTable._oFilterInfoBarInvisibleText.getText(), oResourceBundle.getText("table.ONE_FILTER_ACTIVE",
-				[oListFormat.format(["NameLabel"])]),
-				"The associated invisible text is correct"
-			);
-			assert.strictEqual(this.getFilterInfoBar().getAriaLabelledBy()[0], this.getFilterInfoText().getId(),
-				"Filter info bar is labelled with the contained text.");
-
-			this.oTable.setFilterConditions({
+	QUnit.test("Filtering disabled after initialization", async function(assert) {
+		await this.createTable({
+			p13nMode: ["Filter"],
+			filterConditions: {
 				name: [{
 					isEmpty: null,
 					operator: OperatorName.EQ,
 					validated: ConditionValidated.NotValidated,
 					values: ["test"]
-				}],
-				age: [{
-					isEmpty: null,
-					operator: OperatorName.EQ,
-					validated: ConditionValidated.NotValidated,
-					values: ["test"]
 				}]
-			});
-
-			await this.filterInfoBarRendered();
-			oFilterInfoBar = this.getFilterInfoBar();
-
-			assert.strictEqual(this.getFilterInfoText().getText(),
-				oResourceBundle.getText("table.MULTIPLE_FILTERS_ACTIVE", [2, oListFormat.format(["NameLabel", "AgeLabel"])]),
-				"Change filter conditions: The filter info bar text is correct (2 filters)");
-
-			oFilterInfoBar.focus();
-			assert.strictEqual(document.activeElement, oFilterInfoBar.getFocusDomRef(), "The filter info bar is focused");
-
-			this.oTable.setFilterConditions({
-				name: []
-			});
-			assert.ok(this.hasFilterInfoBar(), "Filter conditions removed: Filter info bar exists");
-			assert.ok(!this.getFilterInfoBar().getVisible(), "Filter conditions removed: Filter info bar is invisible");
-			assert.equal(this.oTable._oFilterInfoBarInvisibleText.getText(), "", "The associated invisible text is empty");
-			assert.ok(this.oTable.getDomRef().contains(document.activeElement), "The table has the focus");
-
-			this.oTable.setFilterConditions({
-				name: [{
-					isEmpty: null,
-					operator: OperatorName.EQ,
-					validated: ConditionValidated.NotValidated,
-					values: ["test"]
-				}],
-				age: [{
-					isEmpty: null,
-					operator: OperatorName.EQ,
-					validated: ConditionValidated.NotValidated,
-					values: ["test"]
-				}],
-				gender: [{
-					isEmpty: null,
-					operator: OperatorName.EQ,
-					validated: ConditionValidated.NotValidated,
-					values: ["test"]
-				}]
-			});
-
-			await wait(0);
-			assert.ok(this.getFilterInfoBar().getVisible(), "Set filter conditions: Filter info bar is visible");
-			assert.strictEqual(this.getFilterInfoText().getText(),
-				oResourceBundle.getText("table.MULTIPLE_FILTERS_ACTIVE", [3, oListFormat.format(["NameLabel", "AgeLabel", "GenderLabel"])]),
-				"Set filter conditions: The filter info bar text is correct (3 filters)");
-			assert.equal(this.oTable._oFilterInfoBarInvisibleText.getText(),
-				oResourceBundle.getText("table.MULTIPLE_FILTERS_ACTIVE", [3, oListFormat.format(["NameLabel", "AgeLabel", "GenderLabel"])]),
-				"The associated invisible text is correct");
-
-			await this.filterInfoBarRendered();
-			oFilterInfoBar = this.getFilterInfoBar();
-
-			this.oTable.setP13nMode();
-
-			oFilterInfoBar.focus();
-			assert.strictEqual(document.activeElement, oFilterInfoBar.getFocusDomRef(), "The filter info bar is focused");
-
-			this.oTable.setP13nMode(["Column", "Sort"]);
-			assert.ok(this.hasFilterInfoBar(), "Filter disabled: Filter info bar exists");
-			assert.ok(!oFilterInfoBar.getVisible(), "Filter disabled: Filter info bar is invisible");
-			assert.equal(this.oTable._oFilterInfoBarInvisibleText.getText(), "", "The associated invisible text is empty");
-			await nextUIUpdate();
-			assert.ok(this.oTable.getDomRef().contains(document.activeElement), "The table has the focus");
-
-			this.oTable.destroy();
-			assert.ok(oFilterInfoBar.bIsDestroyed, "Filter info bar is destroyed when the table is destroyed");
-			assert.equal(this.oTable._oFilterInfoBarInvisibleText, null, "The invisible text is set to null");
+			}
 		});
+		this.oTable.setP13nMode();
+		this.assertFilterInfoBarExists(true, "Filtering disabled");
+		this.assertFilterInfoBarText(null, "Filtering disabled");
+	});
+
+	QUnit.test("Filtering enabled initially", async function(assert) {
+		await this.createTable({
+			p13nMode: ["Filter"]
+		});
+		this.assertFilterInfoBarExists(false, "After initialization without filter conditions");
+		assert.ok(this.oInsertFilterInfoBar.notCalled, "Filter conditions changed: #insertFilterInfoBar not called on table type");
+
+		this.oTable.destroy();
+		await this.createTable({
+			p13nMode: ["Filter"],
+			filterConditions: {
+				name: [{
+					isEmpty: null,
+					operator: OperatorName.EQ,
+					validated: ConditionValidated.NotValidated,
+					values: ["test"]
+				}]
+			}
+		});
+		this.assertFilterInfoBarExists(true, "After initialization with filter conditions");
+		this.assertFilterInfoBarText(["NameLabel"], "After initialization with filter conditions");
+		assert.ok(this.oInsertFilterInfoBar.calledOnceWithExactly(this.getFilterInfoBar()),
+			"Initialization with filter conditions: #insertFilterInfoBar called once on table type with correct parameters");
+	});
+
+	QUnit.test("Filtering enabled after initialization", async function(assert) {
+		await this.createTable({
+			filterConditions: {
+				name: [{
+					isEmpty: null,
+					operator: OperatorName.EQ,
+					validated: ConditionValidated.NotValidated,
+					values: ["test"]
+				}]
+			}
+		});
+		this.oTable.setP13nMode(["Filter"]);
+		this.assertFilterInfoBarExists(true, "Filtering enabled");
+		this.assertFilterInfoBarText(["NameLabel"], "Filtering enabled");
+		assert.ok(this.oInsertFilterInfoBar.calledOnceWithExactly(this.getFilterInfoBar()),
+			"#insertFilterInfoBar called once on table type with correct parameters");
+	});
+
+	QUnit.test("Add/Remove filter conditions", async function(assert) {
+		await this.createTable({
+			p13nMode: ["Filter"]
+		});
+
+		this.oTable.setFilterConditions({
+			name: [{
+				isEmpty: null,
+				operator: OperatorName.EQ,
+				validated: ConditionValidated.NotValidated,
+				values: ["test"]
+			}]
+		});
+		this.assertFilterInfoBarText(["NameLabel"], "1 filter condition");
+
+		this.oTable.setFilterConditions({
+			name: [{
+				isEmpty: null,
+				operator: OperatorName.EQ,
+				validated: ConditionValidated.NotValidated,
+				values: ["test"]
+			}],
+			age: [{
+				isEmpty: null,
+				operator: OperatorName.EQ,
+				validated: ConditionValidated.NotValidated,
+				values: ["test"]
+			}]
+		});
+		this.assertFilterInfoBarText(["NameLabel", "AgeLabel"], "2 filter conditions");
+
+		this.oTable.setFilterConditions();
+		this.assertFilterInfoBarText(null, "Filter conditions removed");
+
+		this.oTable.setFilterConditions({
+			name: [{
+				isEmpty: null,
+				operator: OperatorName.EQ,
+				validated: ConditionValidated.NotValidated,
+				values: ["test"]
+			}]
+		});
+		this.oTable.setFilterConditions();
+		this.assertFilterInfoBarText(null, "Filter condition added and directly removed");
 	});
 
 	QUnit.test("Changing table type", async function(assert) {
@@ -3456,17 +3415,15 @@ sap.ui.define([
 			}
 		});
 
-		this.oTable.setType(TableType.ResponsiveTable);
+		const oOldFilterInfoBar = this.getFilterInfoBar();
+		const oNewTableType = new GridTableType();
+		this.spy(oNewTableType, "insertFilterInfoBar");
+		this.oTable.setType(oNewTableType);
 		await this.oTable.initialized();
-		assert.ok(this.hasFilterInfoBar(), "Changed from \"Table\" to \"ResponsiveTable\": Filter info bar exists");
-		assert.equal(this.oTable._oTable.getAriaLabelledBy().filter((sId) => sId === this.oTable._oFilterInfoBarInvisibleText.getId()).length, 1,
-			"Changed from \"Table\" to \"ResponsiveTable\": The filter info bar text is in the \"ariaLabelledBy\" association of the table");
-
-		this.oTable.setType(TableType.Table);
-		await this.oTable.initialized();
-		assert.ok(this.hasFilterInfoBar(), "Changed from \"ResponsiveTable\" to \"Table\": Filter info bar exists");
-		assert.equal(this.oTable._oTable.getAriaLabelledBy().filter((sId) => sId === this.oTable._oFilterInfoBarInvisibleText.getId()).length, 1,
-			"Changed from \"ResponsiveTable\" to \"Table\": The filter info bar text is in the \"ariaLabelledBy\" association of the table");
+		assert.ok(oNewTableType.insertFilterInfoBar.calledOnceWithExactly(this.getFilterInfoBar()),
+			"#insertFilterInfoBar called once on table type with correct parameters");
+		assert.ok(this.getFilterInfoBar() !== oOldFilterInfoBar,
+			"Destroying the old type destroyed the filter info bar. A new one has been created");
 	});
 
 	QUnit.test("Open filter dialog", async function(assert) {
@@ -3485,7 +3442,6 @@ sap.ui.define([
 				propertyKey: "name"
 			})
 		});
-		await this.filterInfoBarRendered();
 
 		this.stub(PersonalizationUtils, "openFilterDialog").resolves();
 		this.getFilterInfoBar().firePress();
@@ -3493,38 +3449,6 @@ sap.ui.define([
 			"Pressing the filter info bar calls utils.Personalization.openFilterDialog with the correct arguments");
 
 		PersonalizationUtils.openFilterDialog.restore();
-	});
-
-	QUnit.test("Open filter dialog; Focus handling (TODO: SHOULD BE AN OPA TEST!)", async function(assert) {
-		await this.createTable({
-			p13nMode: ["Filter"],
-			filterConditions: {
-				name: [{
-					isEmpty: null,
-					operator: OperatorName.EQ,
-					validated: ConditionValidated.NotValidated,
-					values: ["test"]
-				}]
-			},
-			columns: new Column({
-				template: new Text(),
-				propertyKey: "name"
-			})
-		});
-		await this.filterInfoBarRendered();
-
-		const oFilterInfoBar = this.getFilterInfoBar();
-
-		// Simulate setting the focus when the filter dialog is closed and all filters have been removed.
-		// The filter info bar will be hidden in this case. The focus should still be somewhere in the table and not on the document body.
-		oFilterInfoBar.focus();
-		oFilterInfoBar.firePress(); // Opens the filter dialog
-		await TableQUnitUtils.waitForP13nPopup(this.oTable);
-		await TableQUnitUtils.closeP13nPopup(this.oTable);
-		this.oTable.setFilterConditions({name: []}); // Hides the filter info bar
-		await nextUIUpdate();
-		assert.ok(this.oTable.getDomRef().contains(document.activeElement),
-			"After removing all filters in the dialog and closing it, the focus is in the table");
 	});
 
 	QUnit.test("Clear filters button", async function(assert) {
@@ -3543,24 +3467,11 @@ sap.ui.define([
 				propertyKey: "name"
 			})
 		});
-		await this.filterInfoBarRendered();
-
-		const oFilterInfoBarContent = this.getFilterInfoBar().getContent();
-		const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
-
-		assert.ok(oFilterInfoBarContent[1].isA("sap.m.ToolbarSpacer"), "The second content element is a toolbar spacer");
-		assert.ok(oFilterInfoBarContent[2].isA("sap.m.Button"), "The third content element is a (Clear Filters) button");
-		assert.equal(oFilterInfoBarContent[2].getTooltip(), oResourceBundle.getText("infobar.REMOVEALLFILTERS"), "Clear Filters button tooltip");
-		assert.equal(oFilterInfoBarContent[2].getIcon(), "sap-icon://decline", "Clear Filters button icon");
-		assert.equal(oFilterInfoBarContent[2].getType(), "Transparent", "Clear Filters button type");
 
 		this.spy(PersonalizationUtils, "createClearFiltersChange");
-		oFilterInfoBarContent[2].firePress();
+		this.getFilterInfoBar().getContent()[2].firePress();
 		assert.ok(PersonalizationUtils.createClearFiltersChange.calledOnceWithExactly(this.oTable),
-			"Pressing the Clear Filters button calls utils.Personalization.createClearFiltersChange with the correct arguments");
-
-		await nextUIUpdate();
-		assert.ok(this.oTable.getDomRef().contains(document.activeElement), "The focus is in the table");
+			"Pressing the button to remove all filters calls utils.Personalization.createClearFiltersChange with the correct arguments");
 
 		PersonalizationUtils.createClearFiltersChange.restore();
 	});

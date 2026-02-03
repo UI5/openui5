@@ -201,8 +201,13 @@ sap.ui.define([
 	TableTypeBase.prototype.getRowBinding = function() {};
 	TableTypeBase.prototype.bindRows = function(oBindingInfo) {};
 	TableTypeBase.prototype.isTableBound = function() {};
-	TableTypeBase.prototype.createRowTemplate = function(sId) {};
-	TableTypeBase.prototype.insertFilterInfoBar = function(oFilterInfoBar, sAriaLabelId) {};
+	TableTypeBase.prototype.createRowTemplate = function(sId) { };
+	/**
+	 * Inserts the given filter info bar into the inner table.
+	 *
+	 * @param {sap.ui.mdc.util.InfoBar} oFilterInfoBar
+	 */
+	TableTypeBase.prototype.insertFilterInfoBar = function(oFilterInfoBar) { };
 	TableTypeBase.prototype.enableColumnResize = function() {};
 	TableTypeBase.prototype.disableColumnResize = function() {};
 	TableTypeBase.prototype.createColumnResizeMenuItem = function() {};

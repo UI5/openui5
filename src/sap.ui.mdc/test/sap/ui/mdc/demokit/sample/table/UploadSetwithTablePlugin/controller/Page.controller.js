@@ -16,8 +16,9 @@ sap.ui.define([
 	"sap/ui/model/type/Integer",
 	"sap/ui/model/type/String",
 	"sap/ui/model/type/Float",
-	"sap/ui/model/type/Boolean"
-], function (Controller, UploadSetwithTable, MessageBox, Fragment, MockServer, MessageToast, Dialog, Button, mobileLibrary, Text, coreLibrary, CoreItem, Element, Helper, Integer, String, Float, Boolean) {
+	"sap/ui/model/type/Boolean",
+	"sap/base/security/URLListValidator"
+], function (Controller, UploadSetwithTable, MessageBox, Fragment, MockServer, MessageToast, Dialog, Button, mobileLibrary, Text, coreLibrary, CoreItem, Element, Helper, Integer, String, Float, Boolean, URLListValidator) {
 	"use strict";
 
 	return Controller.extend("mdc.sample.controller.Page", {
@@ -33,6 +34,8 @@ sap.ui.define([
 			 * This is only for demonstration purpose. Please adapt the code as per the application requirements.
 			*/
 			Helper.UploadSetwithTableControllerInstance = this;
+			// initialise URLListValidator and add blob to the valid URL schemes
+			URLListValidator.add("blob");
 		},
 		onBeforeUploadStarts: function () {
 			// This code block is only for demonstration purpose to simulate XHR requests, hence starting the mockserver.

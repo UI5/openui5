@@ -30,7 +30,8 @@ sap.ui.define([
 							"lastModifiedBy": "Jane Burns",
 							"lastmodified": "10/03/21, 10:03:00 PM",
 							//"documentType": oResponse && oResponse.documentType ? oResponse.documentType : "Invoice",
-							"isDirectory": false
+							"isDirectory": false,
+							"trustedSource": true
 						}
 					);
 					break;

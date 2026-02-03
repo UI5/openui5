@@ -67,6 +67,9 @@ sap.ui.define([
 			this.oAdaptationFilterBar = new AdaptationFilterBar({
 				adaptationControl: this.oTestTable
 			});
+
+			sinon.stub(this.oAdaptationFilterBar, "_checkIsNewUI").returns(false);
+
 			if (FlexUtil.handleChanges.restore){
 				FlexUtil.handleChanges.restore();
 			}
@@ -74,6 +77,9 @@ sap.ui.define([
 		},
 
 		afterEach: function () {
+			if (this.oAdaptationFilterBar._checkIsNewUI.restore) {
+				this.oAdaptationFilterBar._checkIsNewUI.restore();
+			}
 			this.oAdaptationFilterBar.destroy();
 			this.oAdaptationFilterBar = undefined;
 			this.oTestTable.destroy();
@@ -308,6 +314,8 @@ sap.ui.define([
 				adaptationControl: this.oParent
 			});
 
+			sinon.stub(oAdaptationFilterBar, "_checkIsNewUI").returns(false);
+
 			//AdaptatationFilterBar expects 'filterConditions' property
 			this.oParent.getFilterConditions = function() {
 				return {};
@@ -369,6 +377,9 @@ sap.ui.define([
 			AggregationBaseDelegate.fetchProperties.restore();
 			delete AggregationBaseDelegate.getFilterDelegate;
 			AggregationBaseDelegate.addItem.restore();
+			if (oAdaptationFilterBar && oAdaptationFilterBar._checkIsNewUI && oAdaptationFilterBar._checkIsNewUI.restore) {
+				oAdaptationFilterBar._checkIsNewUI.restore();
+			}
 			oAdaptationFilterBar.destroy();
 			this.oParent = null;
 			this.aMockProperties = null;
@@ -954,6 +965,7 @@ sap.ui.define([
 		])
 		.then(function(){
 
+
 			oAdaptationFilterBar.createFilterFields().then(function(oAdaptationFilterBar){
 
 				assert.ok(oAdaptationFilterBar, "Promise resolved");
@@ -1063,15 +1075,22 @@ sap.ui.define([
 					}));
 				});
 
-				return this.oParent.retrieveInbuiltFilter();
+			return this.oParent.retrieveInbuiltFilter().then(function(oInbuiltFilter) {
+				sinon.stub(oInbuiltFilter, "_checkIsNewUI").returns(false);
+				return oInbuiltFilter;
+			});
 			}.bind(this));
 
-		},
-		afterEach: function(assert) {
-			FBTestDelegate.addItem.restore();
-			this.oParent.destroy();
-		}
-	});
+			},
+			afterEach: function(assert) {
+				FBTestDelegate.addItem.restore();
+				const oInbuiltFilter = this.oParent.getInbuiltFilter();
+				if (oInbuiltFilter && oInbuiltFilter._checkIsNewUI && oInbuiltFilter._checkIsNewUI.restore) {
+					oInbuiltFilter._checkIsNewUI.restore();
+				}
+				this.oParent.destroy();
+			}
+			});
 
 	QUnit.test("Use bound label property for p13n", function(assert){
 		const done = assert.async();
@@ -1086,8 +1105,6 @@ sap.ui.define([
 				}
 			]
 		});
-
-		sinon.stub();
 
 		Promise.all([
 			//1) Init Parent (Delegate + PropertyHelper)

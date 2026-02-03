@@ -45,13 +45,6 @@ sap.ui.define([
 
 	var oMBundle = Library.getResourceBundleFor("sap.m");
 
-	function checkIsNewUI() {
-		const oFrame = Opa5.getWindow();
-		if (oFrame && oFrame.location) {
-			const appFrameHasParam = new URLSearchParams(oFrame.location.search).get("sap-ui-xx-new-adapt-filters") === "true";
-			return appFrameHasParam;
-		}
-	}
 
 	var iOpenThePersonalizationDialog = function(oControl, oSettings) {
 		var sControlId = typeof oControl === "string" ? oControl : oControl.getId();
@@ -943,179 +936,186 @@ sap.ui.define([
 			mSettings = mSettings ? mSettings : {};
 
 				const fSuccess = function(oP13nDialog) {
-				const bIsNewUI = checkIsNewUI();
-				if (bIsNewUI) {
-					return this.waitFor({
-						controlType: "sap.m.IconTabFilter",
-							matchers: new PropertyStrictEquals({
-								name: "text",
-								value: "Group"
-							}),
-							success: (aIconTabFilters) => {
-								const oIconTabFilter = aIconTabFilters[0];
-								new Press().executeOn(oIconTabFilter);
-								return this.waitFor({
-									controlType: "sap.m.CustomListItem",
-									success: (aCustomListItems) => {
-										const oSettings = mSettings;
-										const aProcessedItems = [];
+				this.waitFor({
+					controlType: "sap.ui.mdc.p13n.panels.AdaptFiltersPanel",
+					success: function(aAdaptFiltersPanel) {
+						const oAdaptFiltersPanel = aAdaptFiltersPanel[0];
+						const bIsNewUI = oAdaptFiltersPanel.getUseNewUI();
+							if (bIsNewUI) {
+							return this.waitFor({
+									controlType: "sap.m.IconTabFilter",
+										matchers: new PropertyStrictEquals({
+											name: "text",
+											value: "Group"
+										}),
+										success: (aIconTabFilters) => {
+											const oIconTabFilter = aIconTabFilters[0];
+											new Press().executeOn(oIconTabFilter);
+											return this.waitFor({
+												controlType: "sap.m.CustomListItem",
+												success: (aCustomListItems) => {
+													const oSettings = mSettings;
+													const aProcessedItems = [];
 
-										aCustomListItems.forEach((oCustomListItem) => {
-											const oContext = oCustomListItem.getBindingContext("$p13n");
-											if (oContext) {
-												const oData = oContext.getObject();
-												aProcessedItems.push({
-													group: oData.groupLabel,
-													label: oData.label,
-													listItem: oCustomListItem
-												});
-											}
-										});
-
-										const processItems = (items, index = 0) => {
-											if (index >= items.length) {
-												const aItemsToAdd = [];
-												Object.keys(oSettings).forEach((sGroupName) => {
-													const aGroupItems = oSettings[sGroupName];
-													aGroupItems.forEach((sItemLabel) => {
-														const bItemAlreadyVisible = aProcessedItems.some((oProcessedItem) => {
-															return oProcessedItem.group === sGroupName && oProcessedItem.label === sItemLabel;
-														});
-														if (!bItemAlreadyVisible) {
-															aItemsToAdd.push({
-																group: sGroupName,
-																label: sItemLabel
+													aCustomListItems.forEach((oCustomListItem) => {
+														const oContext = oCustomListItem.getBindingContext("$p13n");
+														if (oContext) {
+															const oData = oContext.getObject();
+															aProcessedItems.push({
+																group: oData.groupLabel,
+																label: oData.label,
+																listItem: oCustomListItem
 															});
 														}
 													});
-												});
 
-												if (aItemsToAdd.length > 0) {
-													const processItemsToAdd = (itemsToAdd, addIndex = 0) => {
-														const oItemToAdd = itemsToAdd[addIndex];
-														this.waitFor({
-															controlType: "sap.m.ComboBox",
-															matchers: (oComboBox) => {
-																return !oComboBox.getSelectedItem();
-															},
-															success: (aComboBoxes) => {
-																iChangeComboBoxSelection.call(this, aComboBoxes[0], oItemToAdd.label, {
-																	success: () => {
-																		Opa5.assert.ok(true, `Item '${oItemToAdd.label}' in group '${oItemToAdd.group}' is selected`);
-																		if (addIndex + 1 >= itemsToAdd.length) {
-																			iPressTheOKButtonOnTheDialog.call(this, oP13nDialog);
-																			return;
-																		}
-																		processItemsToAdd.call(this, itemsToAdd, addIndex + 1);
+													const processItems = (items, index = 0) => {
+														if (index >= items.length) {
+															const aItemsToAdd = [];
+															Object.keys(oSettings).forEach((sGroupName) => {
+																const aGroupItems = oSettings[sGroupName];
+																aGroupItems.forEach((sItemLabel) => {
+																	const bItemAlreadyVisible = aProcessedItems.some((oProcessedItem) => {
+																		return oProcessedItem.group === sGroupName && oProcessedItem.label === sItemLabel;
+																	});
+																	if (!bItemAlreadyVisible) {
+																		aItemsToAdd.push({
+																			group: sGroupName,
+																			label: sItemLabel
+																		});
 																	}
 																});
-															}
-														});
-													};
-													processItemsToAdd.call(this, aItemsToAdd);
-												} else {
-													iPressTheOKButtonOnTheDialog.call(this, oP13nDialog);
-												}
-												return;
-										}
+															});
 
-										const oItem = items[index];
-										const sGroupName = oItem.group;
-										const sItemLabel = oItem.label;
-										const oCustomListItem = oItem.listItem;
-
-										let bShouldBeVisible = false;
-										Object.keys(oSettings).forEach((sGroup) => {
-											if (oSettings[sGroup].includes(sItemLabel)) {
-												bShouldBeVisible = true;
-											}
-										});
-										// use not waitFor due to problems with found toggleButton which is deactivated
-										const aAllControls = oCustomListItem.findAggregatedObjects(true);
-										const aToggleButtons = aAllControls.filter((oControl) => {
-											return oControl.isA && oControl.isA("sap.m.ToggleButton");
-										});
-
-										if (aToggleButtons.length === 0) {
-											if (bShouldBeVisible) {
-												Opa5.assert.ok(true, `Item '${sItemLabel}' in group '${sGroupName}' is visible (no toggle button)`);
-											}
-											processItems.call(this, items, index + 1);
-											return;
-										}
-
-										const oToggleButton = aToggleButtons[0];
-										const bIsCurrentlySelected = oToggleButton.getPressed();
-										const bIsEnabled = oToggleButton.getEnabled();
-
-
-										if (bShouldBeVisible && !bIsCurrentlySelected && bIsEnabled) {
-											new Press().executeOn(oToggleButton);
-											Opa5.assert.ok(true, `Item '${sItemLabel}' in group '${sGroupName}' is selected`);
-										} else if (bShouldBeVisible && bIsCurrentlySelected) {
-											Opa5.assert.ok(true, `Item '${sItemLabel}' in group '${sGroupName}' is visible`);
-										} else if (bShouldBeVisible && !bIsEnabled) {
-											Opa5.assert.ok(true, `Item '${sItemLabel}' in group '${sGroupName}' is visible (disabled/required)`);
-										} else if (!bShouldBeVisible && bIsCurrentlySelected && bIsEnabled) {
-											new Press().executeOn(oToggleButton);
-											Opa5.assert.ok(true, `Item '${sItemLabel}' in group '${sGroupName}' deselected`);
-										}
-
-										processItems.call(this, items, index + 1);
-									};
-										processItems.call(this, aProcessedItems);
-									}
-								});
-							}
-					});
-				} else {
-					var sIcon = Util.icons.group;
-						return this.waitFor({
-							controlType: "sap.m.Button",
-							matchers: [
-								new Ancestor(oP13nDialog, false),
-								new PropertyStrictEquals({
-									name: "icon",
-									value: sIcon
-								})
-							],
-							actions: new Press(),
-							success: function() {
-								this.waitFor({
-									controlType: "sap.ui.mdc.p13n.panels.GroupView",
-									matchers: new Ancestor(oP13nDialog, false),
-									success: function(aGroupViews) {
-										var oGroupView = aGroupViews[0];
-										this.waitFor({
-											controlType: "sap.m.VBox",
-											matchers: new Ancestor(oGroupView, true),
-											success: function(aVBoxes) {
-												var oVBox = aVBoxes[0];
-												this.waitFor({
-													controlType: "sap.m.List",
-													matchers: new Ancestor(oVBox, true),
-													success: function(aLists) {
-														var oList = aLists[0];
-														this.waitFor({
-															controlType: "sap.m.CustomListItem",
-															matchers: new Ancestor(oList, true),
-															actions: function(oGroupViewItem) {
-																iPersonalizeGroupViewItem.call(this, oGroupViewItem, mSettings);
-															}.bind(this),
-															success: function() {
+															if (aItemsToAdd.length > 0) {
+																const processItemsToAdd = (itemsToAdd, addIndex = 0) => {
+																	const oItemToAdd = itemsToAdd[addIndex];
+																	this.waitFor({
+																		controlType: "sap.m.ComboBox",
+																		matchers: (oComboBox) => {
+																			return !oComboBox.getSelectedItem();
+																		},
+																		success: (aComboBoxes) => {
+																			iChangeComboBoxSelection.call(this, aComboBoxes[0], oItemToAdd.label, {
+																				success: () => {
+																					Opa5.assert.ok(true, `Item '${oItemToAdd.label}' in group '${oItemToAdd.group}' is selected`);
+																					if (addIndex + 1 >= itemsToAdd.length) {
+																						iPressTheOKButtonOnTheDialog.call(this, oP13nDialog);
+																						return;
+																					}
+																					processItemsToAdd.call(this, itemsToAdd, addIndex + 1);
+																				}
+																			});
+																		}
+																	});
+																};
+																processItemsToAdd.call(this, aItemsToAdd);
+															} else {
 																iPressTheOKButtonOnTheDialog.call(this, oP13nDialog);
 															}
-														});
+															return;
 													}
-												});
-											}
-										});
-									}
+
+													const oItem = items[index];
+													const sGroupName = oItem.group;
+													const sItemLabel = oItem.label;
+													const oCustomListItem = oItem.listItem;
+
+													let bShouldBeVisible = false;
+													Object.keys(oSettings).forEach((sGroup) => {
+														if (oSettings[sGroup].includes(sItemLabel)) {
+															bShouldBeVisible = true;
+														}
+													});
+													// use not waitFor due to problems with found toggleButton which is deactivated
+													const aAllControls = oCustomListItem.findAggregatedObjects(true);
+													const aToggleButtons = aAllControls.filter((oControl) => {
+														return oControl.isA && oControl.isA("sap.m.ToggleButton");
+													});
+
+													if (aToggleButtons.length === 0) {
+														if (bShouldBeVisible) {
+															Opa5.assert.ok(true, `Item '${sItemLabel}' in group '${sGroupName}' is visible (no toggle button)`);
+														}
+														processItems.call(this, items, index + 1);
+														return;
+													}
+
+													const oToggleButton = aToggleButtons[0];
+													const bIsCurrentlySelected = oToggleButton.getPressed();
+													const bIsEnabled = oToggleButton.getEnabled();
+
+
+													if (bShouldBeVisible && !bIsCurrentlySelected && bIsEnabled) {
+														new Press().executeOn(oToggleButton);
+														Opa5.assert.ok(true, `Item '${sItemLabel}' in group '${sGroupName}' is selected`);
+													} else if (bShouldBeVisible && bIsCurrentlySelected) {
+														Opa5.assert.ok(true, `Item '${sItemLabel}' in group '${sGroupName}' is visible`);
+													} else if (bShouldBeVisible && !bIsEnabled) {
+														Opa5.assert.ok(true, `Item '${sItemLabel}' in group '${sGroupName}' is visible (disabled/required)`);
+													} else if (!bShouldBeVisible && bIsCurrentlySelected && bIsEnabled) {
+														new Press().executeOn(oToggleButton);
+														Opa5.assert.ok(true, `Item '${sItemLabel}' in group '${sGroupName}' deselected`);
+													}
+
+													processItems.call(this, items, index + 1);
+												};
+													processItems.call(this, aProcessedItems);
+												}
+											});
+										}
 								});
-							},
-							errorMessage: "No button with icon '" + sIcon + "' found on P13nDialog"
-						});
+							} else {
+								var sIcon = Util.icons.group;
+									return this.waitFor({
+										controlType: "sap.m.Button",
+										matchers: [
+											new Ancestor(oP13nDialog, false),
+											new PropertyStrictEquals({
+												name: "icon",
+												value: sIcon
+											})
+										],
+										actions: new Press(),
+										success: function() {
+											this.waitFor({
+												controlType: "sap.ui.mdc.p13n.panels.GroupView",
+												matchers: new Ancestor(oP13nDialog, false),
+												success: function(aGroupViews) {
+													var oGroupView = aGroupViews[0];
+													this.waitFor({
+														controlType: "sap.m.VBox",
+														matchers: new Ancestor(oGroupView, true),
+														success: function(aVBoxes) {
+															var oVBox = aVBoxes[0];
+															this.waitFor({
+																controlType: "sap.m.List",
+																matchers: new Ancestor(oVBox, true),
+																success: function(aLists) {
+																	var oList = aLists[0];
+																	this.waitFor({
+																		controlType: "sap.m.CustomListItem",
+																		matchers: new Ancestor(oList, true),
+																		actions: function(oGroupViewItem) {
+																			iPersonalizeGroupViewItem.call(this, oGroupViewItem, mSettings);
+																		}.bind(this),
+																		success: function() {
+																			iPressTheOKButtonOnTheDialog.call(this, oP13nDialog);
+																		}
+																	});
+																}
+															});
+														}
+													});
+												}
+											});
+										},
+										errorMessage: "No button with icon '" + sIcon + "' found on P13nDialog"
+									});
+							}
 					}
+				});
+
 				};
 
 			return fnOpenThePersonalizationDialog.call(this, oControl, {

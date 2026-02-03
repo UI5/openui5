@@ -139,12 +139,10 @@ sap.ui.define([
 		this.oInnerSelectionPlugin = createInnerSelectionPlugin(oTable);
 		this.oInnerSelectionPlugin.setSelectionMode(this.getSelectionMode());
 		this.oInnerSelectionPlugin.attachSelectionChange(this._onSelectionChange, this);
-		attachToBinding(this, oTable.getBinding());
 		oTable.addAggregation("_hiddenDependents", this.oInnerSelectionPlugin);
 		oTable.setProperty("selectionMode", this.getSelectionMode());
 		updateHeaderSelector(this);
-		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.RowsBound, onTableRowsBound, this);
-		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.RowsUnbound, onTableRowsUnbound, this);
+		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.TotalRowCountChanged, onTotalRowCountChanged, this);
 	};
 
 	function createInnerSelectionPlugin(oTable) {
@@ -161,11 +159,9 @@ sap.ui.define([
 	MultiSelectionPlugin.prototype.onDeactivate = function(oTable) {
 		SelectionPlugin.prototype.onDeactivate.apply(this, arguments);
 		oTable.setProperty("selectionMode", library.SelectionMode.None);
-		detachFromBinding(this, oTable.getBinding());
 		this.oInnerSelectionPlugin?.destroy();
 		delete this.oInnerSelectionPlugin;
-		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.RowsBound, onTableRowsBound, this);
-		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.RowsUnbound, onTableRowsUnbound, this);
+		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.TotalRowCountChanged, onTotalRowCountChanged, this);
 	};
 
 	MultiSelectionPlugin.prototype.setSelected = function(oRow, bSelected, mConfig) {
@@ -698,24 +694,7 @@ sap.ui.define([
 		return 0;
 	};
 
-	function onTableRowsBound(oBinding) {
-		attachToBinding(this, oBinding);
-		updateHeaderSelector(this);
-	}
-
-	function onTableRowsUnbound() {
-		updateHeaderSelector(this);
-	}
-
-	function attachToBinding(oPlugin, oBinding) {
-		oBinding?.attachChange(onBindingChange, oPlugin);
-	}
-
-	function detachFromBinding(oPlugin, oBinding) {
-		oBinding?.detachChange(onBindingChange, oPlugin);
-	}
-
-	function onBindingChange(oEvent) {
+	function onTotalRowCountChanged() {
 		updateHeaderSelector(this);
 	}
 

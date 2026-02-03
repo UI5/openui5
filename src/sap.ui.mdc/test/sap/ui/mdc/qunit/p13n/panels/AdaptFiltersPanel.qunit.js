@@ -62,7 +62,7 @@ sap.ui.define([
 		}
 	];
 
-	const sMode = ["Legacy", "Modern"];
+	const sMode = ["Modern", "Legacy"];
 
 sMode.forEach(function(sModeName) {
 	// Required Fields in new design are always visible
@@ -128,10 +128,19 @@ sMode.forEach(function(sModeName) {
 
 			this.sDefaultGroup = "BASIC";
 			this.aMockInfo = aInfoData;
-			this.oAFPanel = new AdaptFiltersPanel({
+			if (sModeName === "Legacy") {
+				this.oAFPanel = new AdaptFiltersPanel({
 				defaultView: "group",
-				footer: new Toolbar("ID_TB1",{})
+				footer: new Toolbar("ID_TB1",{}),
+				useNewUI: false
+
 			});
+			} else {
+				this.oAFPanel = new AdaptFiltersPanel({
+					defaultView: "group",
+					footer: new Toolbar("ID_TB1",{})
+				});
+			}
 
 		this.oAFPanel.setItemFactory(function(){
 			let oControl = new VBox();

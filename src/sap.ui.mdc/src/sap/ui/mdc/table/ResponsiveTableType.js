@@ -713,14 +713,16 @@ sap.ui.define([
 		}
 	};
 
-	ResponsiveTableType.prototype.insertFilterInfoBar = function(oFilterInfoBar, sAriaLabelId) {
+	ResponsiveTableType.prototype.insertFilterInfoBar = function(oFilterInfoBar) {
 		const oResponsiveTable = this.getInnerTable();
 
 		if (oResponsiveTable) {
+			const sFilterInfoBarAccTextId = oFilterInfoBar.getACCTextId();
+
 			oResponsiveTable.setInfoToolbar(oFilterInfoBar);
 
-			if (!oResponsiveTable.getAriaLabelledBy().includes(sAriaLabelId)) {
-				oResponsiveTable.addAriaLabelledBy(sAriaLabelId);
+			if (!oResponsiveTable.getAriaLabelledBy().includes(sFilterInfoBarAccTextId)) {
+				oResponsiveTable.addAriaLabelledBy(sFilterInfoBarAccTextId);
 			}
 		}
 	};

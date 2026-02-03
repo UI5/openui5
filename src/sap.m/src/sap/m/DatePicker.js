@@ -451,7 +451,12 @@ sap.ui.define([
 	DatePicker.prototype.toggleOpen = function (bOpened) {
 		if (this.getEditable() && this.getEnabled()) {
 			if (bOpened) {
-				_cancel.call(this);
+				var oSelectedDate = this._getCalendar() && this._getSelectedDate();
+				if (oSelectedDate) {
+					this._selectDate();
+				} else {
+					_cancel.call(this);
+				}
 			} else {
 				_open.call(this);
 			}
@@ -607,13 +612,54 @@ sap.ui.define([
 	};
 
 	DatePicker.prototype.onsapshow = function(oEvent) {
+		const bIsF4 = oEvent.key === "F4";
 
-		this.toggleOpen(this.isOpen());
-		oEvent.preventDefault(); // otherwise IE opens the address bar history
+		if (bIsF4) {
+			if (!this.isOpen()) {
+				this.toggleOpen(false);
+			}
+		} else {
+			this.toggleOpen(this.isOpen());
+		}
+
+		oEvent.preventDefault();
 	};
 
 	// ALT-UP and ALT-DOWN should behave the same
-	DatePicker.prototype.onsaphide = DatePicker.prototype.onsapshow;
+	DatePicker.prototype.onsaphide = function(oEvent) {
+		this.toggleOpen(this.isOpen());
+
+		oEvent.preventDefault();
+	};
+
+	/**
+	 * Handles Alt+Up/Down and F4 keyboard events when focus is on the calendar inside the popup.
+	 * Alt+Up/Down closes the picker and takes over the selected value.
+	 * F4 switches to month view.
+	 *
+	 * @param {jQuery.Event} oEvent The event object.
+	 * @private
+	 */
+	DatePicker.prototype._handleShowHideOnCalendar = function(oEvent) {
+		if (this.isOpen()) {
+			const bIsF4 = oEvent.key === "F4";
+
+			if (bIsF4) {
+				const oCalendar = this._getCalendar();
+				if (oCalendar && oCalendar._switchToMonthView) {
+					oCalendar._switchToMonthView();
+				}
+			} else {
+				const oSelectedDate = this._getSelectedDate();
+				if (oSelectedDate) {
+					this._selectDate();
+				} else {
+					_cancel.call(this);
+				}
+			}
+			oEvent.preventDefault();
+		}
+	};
 
 	/**
 	 * Handle when escape is pressed. Escaping unsaved input will restore
@@ -1445,6 +1491,17 @@ sap.ui.define([
 			this._getCalendar().addSelectedDate(this._oDateRange);
 			this._getCalendar()._setSpecialDatesControlOrigin(this);
 			this._getCalendar().attachCancel(_cancel, this);
+
+			// Handle Alt+Up/Down to close the picker when focus is on the calendar
+			this._getCalendar().addDelegate({
+				onsapshow: function(oEvent) {
+					this._handleShowHideOnCalendar(oEvent);
+				}.bind(this),
+				onsaphide: function(oEvent) {
+					this._handleShowHideOnCalendar(oEvent);
+				}.bind(this)
+			});
+
 			if (this.getDomRef()?.closest(".sapUiSizeCompact")) {
 				this._getCalendar().addStyleClass("sapUiSizeCompact");
 			}

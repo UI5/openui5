@@ -63,6 +63,13 @@ sap.ui.define([
 				source: 'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/appUnderTestTable/TableOpaApp.html',
 				autoWait: true
 			});
+			Then.waitFor({
+				controlType: "sap.ui.mdc.FilterBar",
+				success: function (aFilterBar) {
+					const oFilterBar = aFilterBar[0];
+					oFilterBar.setEnableLegacyUI(true);
+				}
+			});
 			When.iLookAtTheScreen();
 
 			//check buttons
@@ -123,6 +130,13 @@ sap.ui.define([
 			Given.iStartMyAppInAFrame({
 				source: 'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/appUnderTestTable/TableOpaApp.html',
 				autoWait: true
+			});
+			Then.waitFor({
+				controlType: "sap.ui.mdc.FilterBar",
+				success: function (aFilterBar) {
+					const oFilterBar = aFilterBar[0];
+					oFilterBar.setEnableLegacyUI(true);
+				}
 			});
 			When.iLookAtTheScreen();
 

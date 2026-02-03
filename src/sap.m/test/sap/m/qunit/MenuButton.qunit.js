@@ -1148,6 +1148,76 @@ sap.ui.define([
 		assert.strictEqual(jQuery('.sapMMenuBtnSplit').length, 1, 'Split button rendered');
 	});
 
+	QUnit.test("Menu closes on Alt+Arrow Up/Down and F4 when opened by MenuButton", function(assert) {
+		// Test data: key combinations that should close the menu
+		var aTestCases = [
+			{ keyCode: KeyCodes.ARROW_UP, altKey: true, description: "Alt+Arrow Up" },
+			{ keyCode: KeyCodes.ARROW_DOWN, altKey: true, description: "Alt+Arrow Down" },
+			{ keyCode: KeyCodes.F4, altKey: false, description: "F4" }
+		];
+
+		var oMenuWrapper = this.sut.getMenu()._getMenuWrapper();
+
+		aTestCases.forEach(function(oTestCase) {
+			// Arrange - Open menu
+			this.sut.openMenuByKeyboard();
+			assert.strictEqual(this.sut._bPopupOpen, true, "Menu is opened for " + oTestCase.description + " test");
+
+			// Act - Trigger the key event
+			var oEvent = new jQuery.Event("keydown", {
+				keyCode: oTestCase.keyCode,
+				altKey: oTestCase.altKey
+			});
+
+			oMenuWrapper.onkeydown(oEvent.originalEvent || oEvent);
+
+			// Assert - Menu should be closed
+			assert.strictEqual(this.sut._bPopupOpen, false, "Menu is closed after " + oTestCase.description);
+		}.bind(this));
+	});
+
+	QUnit.test("Menu does not close on Alt+Arrow Up/Down or F4 when opened programmatically", function(assert) {
+		// Test data: same key combinations as the positive test
+		var aTestCases = [
+			{ keyCode: KeyCodes.ARROW_UP, altKey: true, description: "Alt+Arrow Up" },
+			{ keyCode: KeyCodes.ARROW_DOWN, altKey: true, description: "Alt+Arrow Down" },
+			{ keyCode: KeyCodes.F4, altKey: false, description: "F4" }
+		];
+
+		// Create a regular Menu (not opened by MenuButton)
+		var oMenu = new Menu();
+		var oMenuItem = new MenuItem({text: "Test Item"});
+		oMenu.addItem(oMenuItem);
+		oMenu.placeAt("content");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Open menu programmatically (not via MenuButton)
+		oMenu.openBy(document.body);
+
+		// Verify menu is open
+		var bMenuOpen = oMenu._getPopover().isOpen();
+		assert.strictEqual(bMenuOpen, true, "Menu is opened programmatically");
+
+		var oMenuWrapper = oMenu._getMenuWrapper();
+
+		aTestCases.forEach(function(oTestCase) {
+			// Act - Trigger the key event
+			var oEvent = new jQuery.Event("keydown", {
+				keyCode: oTestCase.keyCode,
+				altKey: oTestCase.altKey
+			});
+			oMenuWrapper.onkeydown(oEvent.originalEvent || oEvent);
+
+			// Assert - Should still be open since not opened by MenuButton
+			bMenuOpen = oMenu._getPopover().isOpen();
+			assert.strictEqual(bMenuOpen, true, "Menu remains open after " + oTestCase.description + " when not opened by MenuButton");
+		});
+
+		// Cleanup
+		oMenu.close();
+		oMenu.destroy();
+	});
+
 	QUnit.module("SplitButton integration", {
 		beforeEach: function () {
 			this.sut = new MenuButton({

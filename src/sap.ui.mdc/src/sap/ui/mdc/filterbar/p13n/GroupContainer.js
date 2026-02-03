@@ -22,7 +22,19 @@ sap.ui.define([
 	 */
 	const GroupContainer = IFilterContainer.extend("sap.ui.mdc.filterbar.p13n.GroupContainer", {
 		metadata: {
-			library: "sap.ui.mdc"
+			library: "sap.ui.mdc",
+			properties: {
+				/**
+				 * Whether to use the new UI for AdaptFiltersPanel
+				 * @experimental
+				 * @private
+				 * @ui5-restricted sap.ui.mdc
+				 */
+				useNewUI: {
+					type: "boolean",
+					defaultValue: true
+				}
+			}
 		}
 	});
 
@@ -32,6 +44,8 @@ sap.ui.define([
 
 		this.mFilterItems = {};
 
+		// Create AdaptFiltersPanel with default UI mode
+		// When setUseNewUI is called later, it will recreate if needed
 		this.oLayout = new AdaptFiltersPanel();
 
 		this.oLayout.setItemFactory((oBindingContext) => {
@@ -39,6 +53,23 @@ sap.ui.define([
 			const oFilterItem = this.mFilterItems[sKey];
 			return oFilterItem;
 		});
+	};
+
+	/**
+	 * Setter for useNewUI property.
+	 * Forwards the value to AdaptFiltersPanel.
+	 * @param {boolean} bUseNewUI Whether to use new UI
+	 * @returns {this} Reference to this for chaining
+	 */
+	GroupContainer.prototype.setUseNewUI = function(bUseNewUI) {
+		this.setProperty("useNewUI", bUseNewUI);
+
+		// Forward to AdaptFiltersPanel
+		if (this.oLayout) {
+			this.oLayout.setUseNewUI(bUseNewUI);
+		}
+
+		return this;
 	};
 
 	GroupContainer.prototype.setMessageStrip = function(oStrip) {

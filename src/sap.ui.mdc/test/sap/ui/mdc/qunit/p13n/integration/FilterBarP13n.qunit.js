@@ -57,7 +57,8 @@ sap.ui.define([
 						conditions: "{$filters>/conditions/item2}",
 						propertyKey: "item2"
 					})
-				]
+				],
+				enableLegacyUI: true
 			});
 			MDCQUnitUtils.stubPropertyInfos(this.oFilterBar, aPropertyInfos);
 

@@ -613,6 +613,58 @@ sap.ui.define([
 			});
 			this.oAddElementsDialog.open();
 		});
+
+		function createManyElements(count) {
+			const aElements = [];
+			for (let i = 0; i < count; i++) {
+				// Use zero-padded numbers to ensure consistent alphabetical sorting
+				const sPaddedIndex = String(i).padStart(3, "0");
+				aElements.push({
+					selected: false,
+					label: `element${sPaddedIndex}`,
+					tooltip: `tooltip${sPaddedIndex}`,
+					name: `field${sPaddedIndex}`,
+					type: "odata"
+				});
+			}
+			return aElements;
+		}
+
+		QUnit.test("when AddElementsDialog has more than 100 elements, all elements are displayed", function(assert) {
+			const done = assert.async();
+			const iElementCount = 1000;
+			const aElements = createManyElements(iElementCount);
+
+			const oLargeDialog = new AddElementsDialog({ title: "Large Dialog" });
+			oLargeDialog.setElements(aElements);
+
+			oLargeDialog.attachOpened(function() {
+				assert.equal(this.getElements().length, iElementCount, `then ${iElementCount} elements are stored in the model`);
+				assert.equal(this._oList.getItems().length, iElementCount, `then all ${iElementCount} elements are displayed in the list`);
+				assert.equal(getItemLabelText(this._oList.getItems()[0]), "element000", "then the first element is displayed correctly");
+				assert.equal(
+					getItemLabelText(this._oList.getItems()[iElementCount - 1]),
+					`element${String(iElementCount - 1)}`,
+					"then the last element is displayed correctly"
+				);
+				oLargeDialog.destroy();
+				done();
+			});
+			oLargeDialog.open();
+		});
+
+		QUnit.test("when AddElementsDialog is initialized with more than 1000 elements, an error is thrown", function(assert) {
+			const aElements = createManyElements(1001);
+			const oOversizedDialog = new AddElementsDialog({ title: "Oversized Dialog" });
+			assert.throws(
+				function() {
+					oOversizedDialog.setElements(aElements);
+				},
+				new Error("AddElementsDialog: displaying more than 1000 elements is not supported."),
+				"then an error is thrown"
+			);
+			oOversizedDialog.destroy();
+		});
 	});
 
 	QUnit.module("Given that a AddElementsDialog with entityTypeDisplayName grouping is available...", {
