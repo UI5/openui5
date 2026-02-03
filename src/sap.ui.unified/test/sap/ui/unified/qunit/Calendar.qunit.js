@@ -3464,6 +3464,7 @@ sap.ui.define([
 	QUnit.test("Dummy cell above week numbers is rendered only when necessary", function(assert) {
 		// prepare
 		var oCalM = new Calendar("CalM", {
+				initialFocusedDate: UI5Date.getInstance(2026, 0, 1),
 				showWeekNumbers: false,
 				primaryCalendarType: CalendarType.Gregorian
 			}),
