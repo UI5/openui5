@@ -141,11 +141,14 @@ sap.ui.define([
 			sorted: "ascending",
 
 			type: "Transparent",
-			ariaHasPopup: AriaHasPopup.Dialog,
-			layoutData: new OverflowToolbarLayoutData({
-				closeOverflowOnInteraction: false
-			})
+			ariaHasPopup: AriaHasPopup.Dialog
 		}, mSettings);
+
+		if (!mSettings.layoutData){
+			mSettings.layoutData = new OverflowToolbarLayoutData({
+				closeOverflowOnInteraction: false
+			});
+		}
 
 		const oDrillDownBtn = new SelectionButton(sId + "-drillDown", mSettings);
 		return oDrillDownBtn;
@@ -158,7 +161,6 @@ sap.ui.define([
 			tooltip: MDCRb.getText("chart.LEGENDBTN_TOOLTIP"),
 			icon: "sap-icon://legend"
 		}, mSettings);
-
 		const oLegendBtn = new OverflowToggleButton(sId + "btnLegend", mSettings);
 		return oLegendBtn;
 	};
@@ -167,11 +169,14 @@ sap.ui.define([
 		mSettings = merge({
 			icon: "sap-icon://zoom-in",
 			tooltip: MDCRb.getText("chart.TOOLBAR_ZOOM_IN"),
-			text: MDCRb.getText("chart.TOOLBAR_ZOOM_IN"),
-			layoutData: new OverflowToolbarLayoutData({
-				closeOverflowOnInteraction: false
-			})
+			text: MDCRb.getText("chart.TOOLBAR_ZOOM_IN")
 		}, mSettings);
+
+		if (!mSettings.layoutData){
+			mSettings.layoutData = new OverflowToolbarLayoutData({
+				closeOverflowOnInteraction: false
+			});
+		}
 
 		const oZoomInButton = new OverflowButton(sId + "btnZoomIn", mSettings);
 		return oZoomInButton;
@@ -181,11 +186,14 @@ sap.ui.define([
 		mSettings = merge({
 			icon: "sap-icon://zoom-out",
 			tooltip: MDCRb.getText("chart.TOOLBAR_ZOOM_OUT"),
-			text: MDCRb.getText("chart.TOOLBAR_ZOOM_OUT"),
-			layoutData: new OverflowToolbarLayoutData({
-				closeOverflowOnInteraction: false
-			})
+			text: MDCRb.getText("chart.TOOLBAR_ZOOM_OUT")
 		}, mSettings);
+
+		if (!mSettings.layoutData){
+			mSettings.layoutData = new OverflowToolbarLayoutData({
+				closeOverflowOnInteraction: false
+			});
+		}
 
 		const oZoomOutButton = new OverflowButton(sId + "btnZoomOut", mSettings);
 		return oZoomOutButton;
@@ -220,11 +228,14 @@ sap.ui.define([
 			sortEnabled: false,
 
 			type: "Transparent",
-			ariaHasPopup: AriaHasPopup.ListBox,
-			layoutData: new OverflowToolbarLayoutData({
-				closeOverflowOnInteraction: false
-			})
+			ariaHasPopup: AriaHasPopup.ListBox
 		}, mSettings);
+
+		if (!mSettings.layoutData){
+			mSettings.layoutData = new OverflowToolbarLayoutData({
+				closeOverflowOnInteraction: false
+			});
+		}
 
 		const oChartTypeBtn = new SelectionButton(sId + "-btnChartType", mSettings);
 		return oChartTypeBtn;

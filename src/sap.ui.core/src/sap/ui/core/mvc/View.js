@@ -840,13 +840,13 @@ sap.ui.define([
 	 * @param {string} sViewType
 	 * 		type of the calling view, e.g. <code>XML</code>
 	 * @param {boolean} bSyncSupport
-	 * 		declares if the vPreprocessor ensures safe sync processing. This means the preprocessor will be executed
+	 *		Deprecated as of version 1.145, because this parameter is only applicable to sync views and is no longer used.
+	 * 		Declares if the vPreprocessor ensures safe sync processing. This means the preprocessor will be executed
 	 * 		also for sync views. Please be aware that any kind of async processing (like Promises, XHR, etc) may
 	 * 		break the view initialization and lead to unexpected results.
 	 * @param {boolean} [bOnDemand]
 	 * 		on-demand preprocessor which enables developers to quickly activate the preprocessor for a view,
-	 * 		by setting <code>preprocessors : { xml }</code>, for example. This should be false except for very special
-	 * 		cases. There can only be one on-demand preprocessor per content type.
+	 * 		by setting <code>preprocessors : { xml }</code>, for example. There can only be one on-demand preprocessor per content type.
 	 * @param {object} [mSettings]
 	 * 		optional configuration for preprocessor
 	 */

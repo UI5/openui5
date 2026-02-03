@@ -34,7 +34,8 @@
 				},
 				"info": {
 					"value": "{= ${departmentBudget}  > ${departmentBudgetThreshold} ? 'Exceeded' : 'In Range' }",
-					"state": "{= ${departmentBudget}  > ${departmentBudgetThreshold} ? 'Error' : 'Success' }"
+					"state": "{= ${departmentBudget}  > ${departmentBudgetThreshold} ? 'Error' : 'Success' }",
+					"inverted": true
 				},
 				"actions": [
 					{

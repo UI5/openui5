@@ -2280,6 +2280,17 @@
             }
           ]
         },
+        "inverted": {
+          "description": "Specifies whether the background color reflects the set \"state\" instead of the control's text",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
         "url": {
           "description": "[Deprecated] Defines the URL string",
           "deprecated": true,

@@ -664,38 +664,45 @@
 								{
 									"name": "Error",
 									"state": "Error",
-									"showStateIcon": true
+									"showStateIcon": true,
+									"inverted": true
 								},
 								{
 									"name": "Warning - very very very very very very long status that should stay on the same line with the icon",
 									"state": "Warning",
-									"showStateIcon": true
+									"showStateIcon": true,
+									"inverted": true
 								},
 								{
 									"name": "Success (Interactive)",
 									"state": "Success",
-									"showStateIcon": true
+									"showStateIcon": true,
+									"inverted": true
 								},
 								{
 									"name": "Success (Custom Icon)",
 									"state": "Success",
 									"showStateIcon": true,
-									"customStateIcon": "sap-icon://activity-2"
+									"customStateIcon": "sap-icon://activity-2",
+									"inverted": true
 								},
 								{
 									"name": "Information",
 									"state": "Information",
-									"showStateIcon": true
+									"showStateIcon": true,
+									"inverted": true
 								},
 								{
 									"name": "Attribute 3",
 									"state": "None",
-									"showStateIcon": true
+									"showStateIcon": true,
+									"inverted": true
 								},
 								{
 									"name": "Info 3",
 									"state": "None",
-									"showStateIcon": true
+									"showStateIcon": true,
+									"inverted": true
 								}
 							]
 						},
@@ -706,27 +713,33 @@
 							"attributes": [
 								{
 									"name": "Attribute 1 Attribute 1 Attribute 1 Attribute 1 Attribute 1",
-									"state": "Error"
+									"state": "Error",
+									"inverted": true
 								},
 								{
 									"name": "Info 1 Info 1 Info 1 Info 1 Info 1 Info 1 Info 1 Info 1 Info 1 Info 1 Info 1 Info 1",
-									"state": "Error"
+									"state": "Error",
+									"inverted": true
 								},
 								{
 									"name": "Attribute 2 Attribute 2 Attribute 2 Attribute 2 Attribute 2 Attribute 2 Attribute 2 Attribute 2",
-									"state": "Success"
+									"state": "Success",
+									"inverted": true
 								},
 								{
 									"name": "Info 2",
-									"state": "Success"
+									"state": "Success",
+									"inverted": true
 								},
 								{
 									"name": "Attribute 3",
-									"state": "None"
+									"state": "None",
+									"inverted": true
 								},
 								{
 									"name": "Info 3 Info 3 Info 3 Info 3 Info 3 Info 3 Info 3 Info 3 Info 3 Info 3 Info 3 Info 3",
-									"state": "None"
+									"state": "None",
+									"inverted": true
 								}
 							]
 						},
@@ -739,15 +752,18 @@
 							"attributes": [
 								{
 									"name": "Attribute 1 Attribute 1 Attribute 1 Attribute 1",
-									"state": "Error"
+									"state": "Error",
+									"inverted": true
 								},
 								{
 									"name": "Attribute 2 Attribute 2 Attribute 2 Attribute 2",
-									"state": "Success"
+									"state": "Success",
+									"inverted": true
 								},
 								{
 									"name": "Attribute 3",
-									"state": "None"
+									"state": "None",
+									"inverted": true
 								}
 							]
 						}
@@ -763,24 +779,28 @@
 					},
 					"info": {
 						"value": "{infoState}",
-						"state": "{infoState}"
+						"state": "{infoState}",
+						"inverted": true
 					},
 					"attributesLayoutType": "{attributesLayoutType}",
 					"attributes": [
 						{
 							"value": "{attributes/0/name}",
 							"state": "{attributes/0/state}",
-							"showStateIcon": "{attributes/0/showStateIcon}"
+							"showStateIcon": "{attributes/0/showStateIcon}",
+							"inverted": "{attributes/0/inverted}"
 						},
 						{
 							"value": "{attributes/1/name}",
 							"state": "{attributes/1/state}",
-							"showStateIcon": "{attributes/1/showStateIcon}"
+							"showStateIcon": "{attributes/1/showStateIcon}",
+							"inverted": "{attributes/1/inverted}"
 						},
 						{
 							"value": "{attributes/2/name}",
 							"state": "{attributes/2/state}",
 							"showStateIcon": "{attributes/2/showStateIcon}",
+							"inverted": "{attributes/2/inverted}",
 							"actions": [
 								{
 									"type": "Navigation",
@@ -794,22 +814,26 @@
 							"value": "{attributes/3/name}",
 							"state": "{attributes/3/state}",
 							"showStateIcon": "{attributes/3/showStateIcon}",
-							"customStateIcon": "{attributes/3/customStateIcon}"
+							"customStateIcon": "{attributes/3/customStateIcon}",
+							"inverted": "{attributes/3/inverted}"
 						},
 						{
 							"value": "{attributes/4/name}",
 							"state": "{attributes/4/state}",
-							"showStateIcon": "{attributes/4/showStateIcon}"
+							"showStateIcon": "{attributes/4/showStateIcon}",
+							"inverted": "{attributes/4/inverted}"
 						},
 						{
 							"value": "{attributes/5/name}",
 							"state": "{attributes/5/state}",
-							"showStateIcon": "{attributes/5/showStateIcon}"
+							"showStateIcon": "{attributes/5/showStateIcon}",
+							"inverted": "{attributes/5/inverted}"
 						},
 						{
 							"value": "{attributes/6/name}",
 							"state": "{attributes/6/state}",
-							"showStateIcon": "{attributes/6/showStateIcon}"
+							"showStateIcon": "{attributes/6/showStateIcon}",
+							"inverted": "{attributes/6/inverted}"
 						}
 					]
 				}

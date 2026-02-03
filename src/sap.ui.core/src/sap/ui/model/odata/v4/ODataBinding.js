@@ -1090,8 +1090,10 @@ sap.ui.define([
 	 * @returns {boolean}
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.Binding#isInitial
 	ODataBinding.prototype.isInitial = function () {

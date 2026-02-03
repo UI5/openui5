@@ -41,7 +41,7 @@
 @_sap_tnt_NavigationList_GroupIconWidth: @_sap_tnt_NavigationList_CollapsedWidth;
 @_sap_tnt_NavigationList_GroupIconWidthExpanded: @_sap_tnt_NavigationList_CollapsedWidth;
 @_sap_tnt_NavigationList_GroupIconMarginLeft: 0;
-@_sap_tnt_NavigationList_GroupIconMarginRight: 0;
+@_sap_tnt_NavigationList_GroupIconMarginRight: 0px;
 @_sap_tnt_NavigationList_GroupTextWeight: unset;
 @_sap_tnt_NavigationList_ParentItemBottomMarginInPopup: 0;
 @_sap_tnt_NavigationList_Padding: 0;
@@ -230,6 +230,10 @@
 	&::before {
 		border: @_sap_tnt_NavigationList_SelectedAndFocusedBorderStyleColor;
 	}
+}
+
+.sapTntNLISecondLevel .sapMText {
+	padding-inline-start: ~"calc(@{_sap_tnt_NavigationList_GroupIconWidth} + @{_sap_tnt_NavigationList_GroupIconMarginRight})";
 }
 
 .sapTntNLISecondLevel::before {
@@ -611,11 +615,6 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 
 	.sapTntNLIFirstLevel .sapMText {
 		padding-left: @_sap_tnt_NavigationList_NoIconsGroupPadding;
-	}
-
-	/* nested items */
-	.sapTntNLISecondLevel .sapMText {
-		padding-left: @_sap_tnt_NavigationList_NoIconsNestedItemPadding;
 	}
 }
 

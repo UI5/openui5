@@ -2250,7 +2250,9 @@ sap.ui.define([
 		const sResourcePath = this.sResourcePath
 			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, false, true);
 
-		return this.oRequestor.request("GET", sResourcePath, oGroupLock.getUnlockedCopy())
+		return this.oRequestor.request("GET", sResourcePath, oGroupLock.getUnlockedCopy(),
+				undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+				{/*mMergeableQueryOptions*/})
 			.then((oResult) => {
 				_Helper.updateExisting(this.mChangeListeners, "()",
 					this.aElements.$byPredicate["()"], oResult.value[0]);

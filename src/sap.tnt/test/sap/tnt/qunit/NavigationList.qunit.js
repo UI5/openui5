@@ -101,7 +101,8 @@ sap.ui.define([
 							text: 'Child 1',
 							key: 'child1',
 							href: '#/child1',
-							target: '_self'
+							target: '_self',
+							icon: 'sap-icon://employee'
 						}),
 						new NavigationListItem({
 							text: 'Disabled Child',
@@ -505,6 +506,11 @@ sap.ui.define([
 		// Clean up
 		oNL.destroy();
 		await clearPendingUIUpdates();
+	});
+
+	QUnit.test("rendered", function (assert) {
+		var iItemContent = Element.getElementById("groupItem1").getItems()[0].getDomRef().querySelector("a").children.length;
+		assert.strictEqual(iItemContent, 1, "only the text is rendered for the child item even when 'icon' property is set");
 	});
 
 	QUnit.module("Lifecycle");
@@ -1429,7 +1435,7 @@ sap.ui.define([
 
 		// on second level item
 		// Arrange
-		var sExternalLinkWithTarget2 = Element.getElementById("groupItem1").getItems()[3].getDomRef().querySelector("a").children[2].classList.contains("sapTntNLIExternalLinkIcon");
+		var sExternalLinkWithTarget2 = Element.getElementById("groupItem1").getItems()[3].getDomRef().querySelector("a").children[1].classList.contains("sapTntNLIExternalLinkIcon");
 
 		// Assert
 		assert.ok(sExternalLinkWithTarget2, "External link icon is rendered when href is set and 'target=_blank'");

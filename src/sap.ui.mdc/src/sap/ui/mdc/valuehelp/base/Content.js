@@ -266,6 +266,13 @@ sap.ui.define([
 				 */
 				visualFocusSet: {
 				}
+			},
+			associations: {
+				/**
+				 * Association to controls / IDs that label this control (see WAI-ARIA attribute aria-labelledby).
+				 * @since 1.145.0
+				 */
+				ariaLabelledBy: { type: "sap.ui.core.Control", multiple: true, singularName: "ariaLabelledBy" }
 			}
 		}
 	});

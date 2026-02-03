@@ -866,6 +866,25 @@ sap.ui.define([
 				oNextContent.setCollectiveSearchSelect(oGroupSelectPromise ? this._oGroupSelect : undefined);
 			}
 
+			// Set-up AriaLabelledBy for ConditionPanel if available
+			if (oNextContent) {
+				const oDialog = this.getAggregation("_container");
+				if (oDialog) {
+					// Check if content implements ariaLabelledBy association
+					const oCurrentContent = this.getSelectedContent();
+
+					// We need to check if the content has a ariaLabelledBy association defined
+					if (oCurrentContent.getMetadata().getAllAssociations().ariaLabelledBy) {
+						const oTitleIds = oDialog._getTitles(oDialog._getAnyHeader());
+						if (oTitleIds && oTitleIds.length > 0) {
+							const sDialogTitleId = oTitleIds[0].getId();
+
+							oCurrentContent?.removeAllAriaLabelledBy();
+							oCurrentContent?.addAriaLabelledBy(sDialogTitleId);
+						}
+					}
+				}
+			}
 			if (fnBeforeShow) {
 				fnBeforeShow();
 			}

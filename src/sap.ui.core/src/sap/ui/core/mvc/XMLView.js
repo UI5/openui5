@@ -637,7 +637,8 @@ sap.ui.define([
 		 *      Since 1.89, added for signature compatibility with {@link sap.ui.core.mvc.View#registerPreprocessor
 		 *      View#registerPreprocessor}. Only supported value is "XML".
 		 * @param {boolean} bSyncSupport
-		 *      declares if the vPreprocessor ensures safe sync processing. This means the preprocessor will be executed
+		 *		Deprecated as of version 1.145, because this parameter is only applicable to sync views and is no longer used.
+		 * 		Declares if the vPreprocessor ensures safe sync processing. This means the preprocessor will be executed
 		 *      also for sync views. Please be aware that any kind of async processing (like Promises, XHR, etc) may
 		 *      break the view initialization and lead to unexpected results.
 		 * @param {boolean} [bOnDemand]

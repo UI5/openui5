@@ -28,7 +28,9 @@ sap.ui.define([
 	"sap/ui/mdc/chart/SelectionButtonItem",
 	"sap/ui/core/InvisibleMessage",
 	"sap/m/library",
-	"sap/ui/core/theming/Parameters"
+	"sap/ui/core/theming/Parameters",
+	"sap/ui/mdc/enums/ChartActionPosition",
+	"sap/ui/mdc/chart/ActionLayoutData"
 ],
 	(
 		Library,
@@ -56,7 +58,9 @@ sap.ui.define([
 		SelectionButtonItem,
 		InvisibleMessage,
 		MLibrary,
-		ThemeParameters
+		ThemeParameters,
+		ChartActionPosition,
+		ActionLayoutData
 	) => {
 		"use strict";
 
@@ -358,6 +362,24 @@ sap.ui.define([
 						}
 					},
 					/**
+					 * Additional chart-related actions that are positioned together with other chart-generated actions, based on the
+					 * {@link sap.ui.mdc.chart.ActionLayoutData ActionLayoutData} provided.
+					 *
+					 * <b>Note:</b> All actions should use layout data of the {@link sap.ui.mdc.chart.ActionLayoutData ActionLayoutData} type to ensure
+					 * correct ordering. Actions that do not use this layout data will be placed after the chart-generated actions.<br>
+					 * <b>Note:</b> As with other chart-generated actions, these actions are excluded from the UI adaptation.
+					 *
+					 * @since 1.145
+					 */
+					chartActions: {
+						type: "sap.ui.core.Control",
+						multiple: true,
+						forwarding: {
+							getter: "_getToolbar",
+							aggregation: "controlActions"
+						}
+					},
+					/**
 					 * Feeds details popover actions for data point selection in the chart.<br>
 					 * For more information, see {@link sap.ui.mdc.chart.SelectionDetailsActions SelectionDetailsActions}.
 					 */
@@ -503,7 +525,7 @@ sap.ui.define([
 		};
 
 		Chart.prototype.setP13nMode = function(aModes) {
-			let aSortedKeys = null;
+			let aSortedKeys;
 			if (aModes && aModes.length >= 1) {
 				aSortedKeys = [];
 				const mKeys = aModes.reduce((mMap, sKey, iIndex) => {
@@ -834,33 +856,70 @@ sap.ui.define([
 			}
 
 			if (bShowDrillDown) {
-				this._oDrillDownBtn = ToolbarControlFactory.createDrillDownBtn(sId, { beforeOpen: beforeOpenDrillDown, itemSelected: itemSelectedDrillDown });
+				this._oDrillDownBtn = ToolbarControlFactory.createDrillDownBtn(sId, {
+					beforeOpen: beforeOpenDrillDown,
+					itemSelected: itemSelectedDrillDown,
+					layoutData: new ActionLayoutData({
+						position: ChartActionPosition.PersonalizationActionsDrillDown,
+						closeOverflowOnInteraction: false
+					})
+				});
 				// this._oDrillDownBtn.attachBeforeOpen(beforeOpenDrillDown);
 				// this._oDrillDownBtn.attachItemSelected(itemSelectedDrillDown);
 				oToolbar.addEnd(this._oDrillDownBtn);
 			}
 
 			if (bShowLegend) {
-				this._oLegendBtn = ToolbarControlFactory.createLegendBtn(sId, { pressed: "{$mdcChart>/legendVisible}" });
+				this._oLegendBtn = ToolbarControlFactory.createLegendBtn(sId, {
+					pressed: "{$mdcChart>/legendVisible}",
+					layoutData: new ActionLayoutData({
+						position: ChartActionPosition.PersonalizationActionsLegend
+					})
+				});
 				// this._oLegendBtn.bindProperty("pressed", {path: "$mdcChart>/legendVisible"});
 				oToolbar.addEnd(this._oLegendBtn);
 			}
 
 			if (bShowZoom) {
-				this._oZoomInBtn = ToolbarControlFactory.createZoomInBtn(sId, { press: this.zoomIn.bind(this) });
+				this._oZoomInBtn = ToolbarControlFactory.createZoomInBtn(sId, {
+					press: this.zoomIn.bind(this),
+					layoutData: new ActionLayoutData({
+						position: ChartActionPosition.PersonalizationActionsZoomIn,
+						closeOverflowOnInteraction: false
+					})
+				});
 				oToolbar.addEnd(this._oZoomInBtn);
 
-				this._oZoomOutBtn = ToolbarControlFactory.createZoomOutBtn(sId, { press: this.zoomOut.bind(this) });
+				this._oZoomOutBtn = ToolbarControlFactory.createZoomOutBtn(sId, {
+					press: this.zoomOut.bind(this),
+					layoutData: new ActionLayoutData({
+						position: ChartActionPosition.PersonalizationActionsZoomOut,
+						closeOverflowOnInteraction: false
+					})
+				});
 				oToolbar.addEnd(this._oZoomOutBtn);
 			}
 
 			if (bShowSettings) {
-				this._oSettingsBtn = ToolbarControlFactory.createSettingsBtn(sId, { press: pressSettings });
+				this._oSettingsBtn = ToolbarControlFactory.createSettingsBtn(sId, {
+					press: pressSettings,
+					layoutData: new ActionLayoutData({
+						position: ChartActionPosition.PersonalizationActionsSettings
+					})
+				});
 				oToolbar.addEnd(this._oSettingsBtn);
 			}
 
 			if (bShowChartType) {
-				this._oChartTypeBtn = ToolbarControlFactory.createChartTypeBtn(sId, { selectedItemKey: chartType, beforeOpen: beforeOpenChartType, itemSelected: itemSelectedChartType });
+				this._oChartTypeBtn = ToolbarControlFactory.createChartTypeBtn(sId, {
+					selectedItemKey: chartType,
+					beforeOpen: beforeOpenChartType,
+					itemSelected: itemSelectedChartType,
+					layoutData: new ActionLayoutData({
+						position: ChartActionPosition.ViewActionsChartType,
+						closeOverflowOnInteraction: false
+					})
+				});
 				oToolbar.addEnd(this._oChartTypeBtn);
 			}
 
@@ -897,7 +956,10 @@ sap.ui.define([
 				},
 				fetchFieldInfosCallback: (oSelectionDetails, oBindingContext) => {
 					return this.getControlDelegate().fetchFieldInfos(this, oSelectionDetails, oBindingContext);
-				}
+				},
+				layoutData: new ActionLayoutData({
+					position: ChartActionPosition.PersonalizationActionsSelectionDetails
+				})
 			});
 
 			return oSelectionDetailsBtn;

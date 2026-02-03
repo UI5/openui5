@@ -82,6 +82,30 @@ sap.ui.define([
 	Conditions.prototype.init = function() {
 		Content.prototype.init.apply(this, arguments);
 		this._oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
+
+		// We need a observer for the ariaLabelledBy association to propagate it to the DefineConditionPanel
+		this._oObserver.observe(this, {
+			associations: ["ariaLabelledBy"]
+		});
+	};
+
+	Conditions.prototype.observeChanges = function(oChanges) {
+		// Call parent's observeChanges first
+		Content.prototype.observeChanges.apply(this, arguments);
+
+		// Handle ariaLabelledBy association changes
+		if (oChanges.name === "ariaLabelledBy") {
+			this._updateDefineConditionPanelAriaLabelledBy();
+		}
+	};
+
+	Conditions.prototype._updateDefineConditionPanelAriaLabelledBy = function() {
+		if (this._oDefineConditionPanel) {
+			this._oDefineConditionPanel.removeAllAriaLabelledBy();
+			this.getAriaLabelledBy().forEach((sId) => {
+				this._oDefineConditionPanel.addAriaLabelledBy(sId);
+			});
+		}
 	};
 
 	Conditions.prototype.exit = function() {

@@ -16,7 +16,9 @@ sap.ui.define([
 	"sap/ui/mdc/chart/DrillBreadcrumbs",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/core/Theming",
-	"sap/base/util/Deferred"
+	"sap/base/util/Deferred",
+	"sap/ui/mdc/chart/ActionLayoutData",
+	"sap/ui/mdc/enums/ChartActionPosition"
 ],
 	function (
 		Chart,
@@ -34,7 +36,9 @@ sap.ui.define([
 		Breadcrumbs,
 		nextUIUpdate,
 		Theming,
-		Deferred
+		Deferred,
+		ActionLayoutData,
+		ChartActionPosition
 	) {
 		"use strict";
 
@@ -1330,4 +1334,386 @@ sap.ui.define([
 				assert.deepEqual(this.oMDCChart._getToolbar().getDesign(), sExpectedDesigntype, "design property");
 			});
 		}
+
+		QUnit.module("sap.ui.mdc.Chart: ActionLayoutData and chartActions", {
+
+			beforeEach: async function () {
+				const TestComponent = UIComponent.extend("test", {
+					metadata: {
+						manifest: {
+							"_version": "2.0.0",
+
+							"sap.app": {
+								"id": "",
+								"type": "application"
+							}
+						}
+					},
+					createContent: function () {
+						return new Chart({
+							delegate: {
+								name: sDelegatePath,
+								payload: {
+									collectionPath: "/testPath"
+								}
+							},
+							propertyInfo: [{ name: "name1", label: "name1", dataType: "String" }, { name: "name2", label: "name2", dataType: "String" }]
+						});
+					}
+				});
+				this.oUiComponent = new TestComponent();
+				this.oUiComponentContainer = new ComponentContainer({
+					component: this.oUiComponent,
+					async: false
+				});
+				this.oMDCChart = this.oUiComponent.getRootControl();
+
+				this.oUiComponentContainer.placeAt("qunit-fixture");
+				await nextUIUpdate();
+			},
+			afterEach: function () {
+				this.oUiComponentContainer.destroy();
+				this.oUiComponent.destroy();
+			}
+
+		});
+
+		QUnit.test("chartActions aggregation forwards to toolbar controlActions", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oButton = new Button({ text: "Custom Action" });
+
+				this.oMDCChart.addChartAction(oButton);
+
+				const oToolbar = this.oMDCChart._getToolbar();
+				assert.ok(oToolbar.getControlActions().includes(oButton), "Chart action is forwarded to toolbar controlActions");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("chartActions with ActionLayoutData maintains position", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oLayoutData = new ActionLayoutData({
+					position: ChartActionPosition.PersonalizationActionsZoomIn
+				});
+				const oButton = new Button({
+					text: "Custom Action",
+					layoutData: oLayoutData
+				});
+
+				this.oMDCChart.addChartAction(oButton);
+
+				const oToolbar = this.oMDCChart._getToolbar();
+				const oAddedAction = oToolbar.getControlActions().find(function (action) {
+					return action === oButton;
+				});
+
+				assert.ok(oAddedAction, "Action was added");
+				assert.strictEqual(oAddedAction.getLayoutData(), oLayoutData, "ActionLayoutData is preserved");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("chartAction without ActionLayoutData is still added", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oButton = new Button({ text: "No Layout Data" });
+
+				this.oMDCChart.addChartAction(oButton);
+
+				const oToolbar = this.oMDCChart._getToolbar();
+				assert.ok(oToolbar.getControlActions().includes(oButton), "Action without layoutData is added to toolbar");
+				assert.notOk(oButton.getLayoutData(), "Button has no layoutData");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("getChartActions returns all added actions", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oButton1 = new Button({ text: "Action 1" });
+				const oButton2 = new Button({ text: "Action 2" });
+
+				this.oMDCChart.addChartAction(oButton1);
+				this.oMDCChart.addChartAction(oButton2);
+
+				const aActions = this.oMDCChart.getChartActions();
+				assert.strictEqual(aActions.length, 2, "getChartActions returns correct number of actions");
+				assert.ok(aActions.includes(oButton1), "First action is included");
+				assert.ok(aActions.includes(oButton2), "Second action is included");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("insertChartAction adds at correct position", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oButton1 = new Button({ text: "First" });
+				const oButton2 = new Button({ text: "Second" });
+				const oButton3 = new Button({ text: "Inserted" });
+
+				this.oMDCChart.addChartAction(oButton1);
+				this.oMDCChart.addChartAction(oButton2);
+				this.oMDCChart.insertChartAction(oButton3, 1);
+
+				const aActions = this.oMDCChart.getChartActions();
+				assert.strictEqual(aActions[0], oButton1, "First action is at index 0");
+				assert.strictEqual(aActions[1], oButton3, "Inserted action is at index 1");
+				assert.strictEqual(aActions[2], oButton2, "Second action moved to index 2");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("removeChartAction removes from toolbar", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oButton = new Button({ text: "Test" });
+
+				this.oMDCChart.addChartAction(oButton);
+				this.oMDCChart.removeChartAction(oButton);
+
+				const oToolbar = this.oMDCChart._getToolbar();
+				assert.notOk(oToolbar.getControlActions().includes(oButton), "Action was removed from toolbar");
+				assert.strictEqual(this.oMDCChart.getChartActions().length, 0, "getChartActions returns empty array");
+
+				oButton.destroy();
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("destroyChartActions removes all actions", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oButton1 = new Button({ text: "Action 1" });
+				const oButton2 = new Button({ text: "Action 2" });
+
+				this.oMDCChart.addChartAction(oButton1);
+				this.oMDCChart.addChartAction(oButton2);
+
+				assert.strictEqual(this.oMDCChart.getChartActions().length, 2, "Two actions added");
+
+				this.oMDCChart.destroyChartActions();
+
+				assert.strictEqual(this.oMDCChart.getChartActions().length, 0, "All actions removed after destroy");
+
+				const oToolbar = this.oMDCChart._getToolbar();
+				assert.strictEqual(oToolbar.getControlActions().length, 0, "Toolbar controlActions is empty");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("removeAllChartActions removes all actions without destroying", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oButton1 = new Button({ text: "Action 1" });
+				const oButton2 = new Button({ text: "Action 2" });
+
+				this.oMDCChart.addChartAction(oButton1);
+				this.oMDCChart.addChartAction(oButton2);
+
+				const aRemovedActions = this.oMDCChart.removeAllChartActions();
+
+				assert.strictEqual(aRemovedActions.length, 2, "removeAllChartActions returns removed actions");
+				assert.strictEqual(this.oMDCChart.getChartActions().length, 0, "All actions removed");
+				assert.ok(!oButton1.bIsDestroyed, "First button is not destroyed");
+				assert.ok(!oButton2.bIsDestroyed, "Second button is not destroyed");
+
+				oButton1.destroy();
+				oButton2.destroy();
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("Legend button has correct ActionLayoutData", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oLegendBtn = this.oMDCChart._oLegendBtn;
+
+				assert.ok(oLegendBtn, "Legend button exists");
+
+				const oLayoutData = oLegendBtn.getLayoutData();
+				assert.ok(oLayoutData instanceof ActionLayoutData, "Legend button has ActionLayoutData");
+				assert.strictEqual(oLayoutData.getPosition(), ChartActionPosition.PersonalizationActionsLegend, "Position is PersonalizationActionsLegend");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("ZoomIn button has correct ActionLayoutData", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oZoomInBtn = this.oMDCChart._oZoomInBtn;
+
+				assert.ok(oZoomInBtn, "ZoomIn button exists");
+
+				const oLayoutData = oZoomInBtn.getLayoutData();
+				assert.ok(oLayoutData instanceof ActionLayoutData, "ZoomIn button has ActionLayoutData");
+				assert.strictEqual(oLayoutData.getPosition(), ChartActionPosition.PersonalizationActionsZoomIn, "Position is PersonalizationActionsZoomIn");
+				assert.strictEqual(oLayoutData.getCloseOverflowOnInteraction(), false, "closeOverflowOnInteraction is false");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("ZoomOut button has correct ActionLayoutData", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oZoomOutBtn = this.oMDCChart._oZoomOutBtn;
+
+				assert.ok(oZoomOutBtn, "ZoomOut button exists");
+
+				const oLayoutData = oZoomOutBtn.getLayoutData();
+				assert.ok(oLayoutData instanceof ActionLayoutData, "ZoomOut button has ActionLayoutData");
+				assert.strictEqual(oLayoutData.getPosition(), ChartActionPosition.PersonalizationActionsZoomOut, "Position is PersonalizationActionsZoomOut");
+				assert.strictEqual(oLayoutData.getCloseOverflowOnInteraction(), false, "closeOverflowOnInteraction is false");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("SelectionDetails button has correct ActionLayoutData", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oSelectionDetailsBtn = this.oMDCChart._oSelectionDetailsBtn;
+
+				assert.ok(oSelectionDetailsBtn, "SelectionDetails button exists");
+
+				const oLayoutData = oSelectionDetailsBtn.getLayoutData();
+				assert.ok(oLayoutData instanceof ActionLayoutData, "SelectionDetails button has ActionLayoutData");
+				assert.strictEqual(oLayoutData.getPosition(), ChartActionPosition.PersonalizationActionsSelectionDetails, "Position is PersonalizationActionsSelectionDetails");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("_createSelectionDetails creates button with ActionLayoutData", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oSelectionDetails = this.oMDCChart._createSelectionDetails("testId");
+
+				assert.ok(oSelectionDetails, "SelectionDetails button created");
+
+				const oLayoutData = oSelectionDetails.getLayoutData();
+				assert.ok(oLayoutData, "LayoutData exists");
+				assert.ok(oLayoutData instanceof ActionLayoutData, "LayoutData is ActionLayoutData");
+				assert.strictEqual(oLayoutData.getPosition(), ChartActionPosition.PersonalizationActionsSelectionDetails, "Correct position set");
+
+				oSelectionDetails.destroy();
+				done();
+			}.bind(this));
+		});
+
+		QUnit.module("sap.ui.mdc.Chart: ActionLayoutData with p13nMode", {
+
+			beforeEach: async function () {
+				const TestComponent = UIComponent.extend("test", {
+					metadata: {
+						manifest: {
+							"_version": "2.0.0",
+
+							"sap.app": {
+								"id": "",
+								"type": "application"
+							}
+						}
+					},
+					createContent: function () {
+						return new Chart({
+							p13nMode: ["Item", "Sort", "Filter", "Type"],
+							delegate: {
+								name: sDelegatePath,
+								payload: {
+									collectionPath: "/testPath"
+								}
+							},
+							propertyInfo: [{ name: "name1", label: "name1", dataType: "String" }, { name: "name2", label: "name2", dataType: "String" }]
+						});
+					}
+				});
+				this.oUiComponent = new TestComponent();
+				this.oUiComponentContainer = new ComponentContainer({
+					component: this.oUiComponent,
+					async: false
+				});
+				this.oMDCChart = this.oUiComponent.getRootControl();
+
+				this.oUiComponentContainer.placeAt("qunit-fixture");
+				await nextUIUpdate();
+			},
+			afterEach: function () {
+				this.oUiComponentContainer.destroy();
+				this.oUiComponent.destroy();
+			}
+
+		});
+
+		QUnit.test("DrillDown button has correct ActionLayoutData", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oDrillDownBtn = this.oMDCChart._oDrillDownBtn;
+
+				assert.ok(oDrillDownBtn, "DrillDown button exists");
+
+				const oLayoutData = oDrillDownBtn.getLayoutData();
+				assert.ok(oLayoutData instanceof ActionLayoutData, "DrillDown button has ActionLayoutData");
+				assert.strictEqual(oLayoutData.getPosition(), ChartActionPosition.PersonalizationActionsDrillDown, "Position is PersonalizationActionsDrillDown");
+				assert.strictEqual(oLayoutData.getCloseOverflowOnInteraction(), false, "closeOverflowOnInteraction is false");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("Settings button has correct ActionLayoutData", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oSettingsBtn = this.oMDCChart._oSettingsBtn;
+
+				assert.ok(oSettingsBtn, "Settings button exists");
+
+				const oLayoutData = oSettingsBtn.getLayoutData();
+				assert.ok(oLayoutData instanceof ActionLayoutData, "Settings button has ActionLayoutData");
+				assert.strictEqual(oLayoutData.getPosition(), ChartActionPosition.PersonalizationActionsSettings, "Position is PersonalizationActionsSettings");
+
+				done();
+			}.bind(this));
+		});
+
+		QUnit.test("ChartType button has correct ActionLayoutData", function (assert) {
+			const done = assert.async();
+
+			this.oMDCChart.initialized().then(function () {
+				const oChartTypeBtn = this.oMDCChart._oChartTypeBtn;
+
+				assert.ok(oChartTypeBtn, "ChartType button exists");
+
+				const oLayoutData = oChartTypeBtn.getLayoutData();
+				assert.ok(oLayoutData instanceof ActionLayoutData, "ChartType button has ActionLayoutData");
+				assert.strictEqual(oLayoutData.getPosition(), ChartActionPosition.ViewActionsChartType, "Position is ViewActionsChartType");
+				assert.strictEqual(oLayoutData.getCloseOverflowOnInteraction(), false, "closeOverflowOnInteraction is false");
+
+				done();
+			}.bind(this));
+		});
 	});

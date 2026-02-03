@@ -36,7 +36,6 @@ sap.ui.define([
 	'sap/ui/layout/GridData',
 	'sap/m/library',
 	'sap/m/Button',
-	'sap/m/Panel',
 	'sap/m/OverflowToolbar',
 	'sap/m/OverflowToolbarLayoutData',
 	'sap/m/ToolbarSpacer',
@@ -80,7 +79,6 @@ sap.ui.define([
 	GridData,
 	mLibrary,
 	Button,
-	Panel,
 	OverflowToolbar,
 	OverflowToolbarLayoutData,
 	ToolbarSpacer,
@@ -104,7 +102,6 @@ sap.ui.define([
 	const { ValueState } = coreLibrary;
 	const { InvisibleMessageMode } = coreLibrary;
 	const { TextAlign } = coreLibrary;
-	const { BackgroundDesign } = mLibrary;
 	const { ToolbarDesign } = mLibrary;
 	const { OverflowToolbarPriority } = mLibrary;
 
@@ -227,6 +224,23 @@ sap.ui.define([
 					type: "sap.ui.core.Control",
 					multiple: false,
 					visibility: "hidden"
+				},
+				/**
+				 * Internal toolbar that is rendered.
+				 */
+				_toolbar: {
+					type: "sap.ui.core.Control",
+					multiple: false,
+					visibility: "hidden"
+				},
+				/**
+				 * Invsible texts for accessibility
+				 */
+				_invisibleTexts: {
+					type: "sap.ui.core.InvisibleText",
+					multiple: true,
+					singularName: "invisibleText",
+					visibility: "hidden"
 				}
 			},
 			associations: {
@@ -242,7 +256,13 @@ sap.ui.define([
 				valueHelp: {
 					type: "sap.ui.mdc.ValueHelp",
 					multiple: false
-				}
+				},
+
+				/**
+				 * Association to controls / IDs that label this control (see WAI-ARIA attribute aria-labelledby).
+				 * @since 1.145.0
+				 */
+				ariaLabelledBy: { type: "sap.ui.core.Control", multiple: true, singularName: "ariaLabelledBy" }
 			},
 			events: {
 				/**
@@ -258,8 +278,20 @@ sap.ui.define([
 			apiVersion: 2,
 			render: function(oRm, oControl) {
 				oRm.openStart("section", oControl);
+				// add role form
 				oRm.class("sapUiMdcDefineConditionPanel");
+
+				// Add aria-labelledby attribute
+				oRm.accessibilityState(oControl, {
+					role: "form"
+				});
 				oRm.openEnd();
+
+				// Add invisible text for operator label. This is used by all operator fields.
+				oControl.getAggregation("_invisibleTexts").forEach((oInvisibleText) => {
+					oRm.renderControl(oInvisibleText);
+				});
+				oRm.renderControl(oControl.getAggregation("_toolbar"));
 				oRm.renderControl(oControl.getAggregation("_content"));
 				oRm.close("section");
 			}
@@ -729,13 +761,13 @@ sap.ui.define([
 		 * @ui5-restricted sap.ui.mdc
 		 */
 		getInitialFocusedControl: function() {
-			const oGrid = this.getAggregation("_content").getContent()[1];
+			const oGrid = this.byId("conditions");
 			const oCtrl = oGrid.getContent()[0]; // 0=Operator Field, 2=first Value Field which might not exist
 			return oCtrl;
 		},
 
 		getFocusControlAfterTokenRemoval: function () {
-			const oGrid = this.getAggregation("_content").getContent()[1];
+			const oGrid = this.byId("conditions");
 			const aContent = oGrid.getContent();
 			const oCtrl = aContent[2] ? aContent[2] : aContent[0]; // If value field exist take it, otherwise operator
 			return oCtrl;
@@ -1272,12 +1304,20 @@ sap.ui.define([
 	}
 
 	function _createInnerControls() {
-		const oInvisibleOperatorText = new InvisibleText(this.getId() + "--ivtOperator", { text: "{$i18n>valuehelp.DEFINECONDITIONS_OPERATORLABEL}" });
-		const oTitle = new Title(this.getId() + "-title", { text: { path: "$this>/label" } });
+		const oConditionsAmountTitle = new Title(this.getId() + "--conditionsAmountTitle", {
+			text: {
+				parts: [{ path: "$this>/conditions" }],
+				formatter: function (aConditions) {
+					const iConditions = aConditions ? aConditions.length : 0;
+
+					return oMessageBundle.getText("valuehelp.DEFINECONDITIONS_CONDITION_AMOUNT", [iConditions]);
+				}
+			}
+
+		});
 		const oButtonPrev = new Button(this.getId() + "--prev", {
 			icon: IconPool.getIconURI("navigation-left-arrow"),
 			tooltip: oMessageBundleM.getText("PAGINGBUTTON_PREVIOUS"),
-			visible: { path: "$this>/_pagination" },
 			enabled: "{= ${$this>/inputOK} && ${$this>/_prevButtonActive}}",
 			layoutData: new OverflowToolbarLayoutData({
 				priority: OverflowToolbarPriority.NeverOverflow
@@ -1287,7 +1327,6 @@ sap.ui.define([
 		const oButtonNext = new Button(this.getId() + "--next", {
 			icon: IconPool.getIconURI("navigation-right-arrow"),
 			tooltip: oMessageBundleM.getText("PAGINGBUTTON_NEXT"),
-			visible: { path: "$this>/_pagination" },
 			enabled: "{= ${$this>/inputOK} && ${$this>/_nextButtonActive}}",
 			layoutData: new OverflowToolbarLayoutData({
 				priority: OverflowToolbarPriority.NeverOverflow
@@ -1296,7 +1335,6 @@ sap.ui.define([
 		});
 		const oButtonRemoveAll = new Button(this.getId() + "--removeAll", {
 			text: oMessageBundleM.getText("CONDITIONPANEL_REMOVE_ALL"),
-			visible: { path: "$this>/_pagination" },
 			layoutData: new OverflowToolbarLayoutData({
 				priority: OverflowToolbarPriority.Low
 			}),
@@ -1304,7 +1342,6 @@ sap.ui.define([
 		});
 		const oButtonInsert = new Button(this.getId() + "--insert", {
 			text: "{$i18n>valuehelp.DEFINECONDITIONS_ADDCONDITION}",
-			visible: { path: "$this>/_pagination" },
 			enabled: { path: "$this>/inputOK" },
 			layoutData: new OverflowToolbarLayoutData({
 				priority: OverflowToolbarPriority.Low
@@ -1315,32 +1352,44 @@ sap.ui.define([
 			text: _getPageText.call(this),
 			wrapping: false,
 			textAlign: TextAlign.Center,
-			visible: { path: "$this>/_pagination" },
 			layoutData: new OverflowToolbarLayoutData({
 				priority: OverflowToolbarPriority.NeverOverflow
 			})
 		});
+
 		const oToolbar = new OverflowToolbar(this.getId() + "--toolbar", {
-			width: "100%",
 			design: ToolbarDesign.Transparent,
-			content: [oTitle,
+			content: [
+				oConditionsAmountTitle,
 				new ToolbarSpacer(),
 				oButtonPrev,
 				oPageCount,
 				oButtonNext,
 				oButtonRemoveAll,
 				oButtonInsert
-			]
+			],
+			// We need to remove the headerToolbar if pagination is not needed to save space
+			visible: {
+				parts: [{ path: "$this>/_pagination" }],
+				formatter: function (bPagination) {
+					return bPagination;
+				}
+			}
 		});
+		oToolbar.addStyleClass("sapUiTinyMarginTop");
 
-		const oPanel = new Panel(this.getId() + "--panel", {
-			headerToolbar: oToolbar,
-			expanded: true,
-			height: "100%",
-			backgroundDesign: BackgroundDesign.Transparent
-		}).addStyleClass("sapMdcDefineconditionPanel");
+		const oGrid = new Grid(this.getId() + "--conditions", {
+			width: "100%",
+			hSpacing: 0,
+			vSpacing: 0,
+			containerQuery: true
+		}).addStyleClass("sapUiMdcDefineConditionGrid");
 
-		oPanel.addDependent(
+		oGrid.addDelegate({
+			onAfterRendering: _setFocusOnGrid
+		}, false, this);
+
+		oGrid.addDependent(
 			new ValueHelp(this._sOperatorHelpId, {
 				typeahead: new Popover(this._sOperatorHelpId + "-pop", {
 					content: [new FixedList(this._sOperatorHelpId + "-pop-fl", {
@@ -1351,20 +1400,7 @@ sap.ui.define([
 			})
 		);
 
-		const oGrid = new Grid(this.getId() + "--conditions", {
-			width: "100%",
-			hSpacing: 0,
-			vSpacing: 0,
-			containerQuery: true
-		}).addStyleClass("sapUiMdcDefineConditionGrid");
-		oGrid.addDelegate({
-			onAfterRendering: _setFocusOnGrid
-		}, false, this);
-
 		_createRow.call(this, undefined, oGrid, 0, null, 0); // create dummy row
-
-		oPanel.addContent(oInvisibleOperatorText);
-		oPanel.addContent(oGrid);
 
 		const oAddBtn = new Button(this.getId() + "--addBtn", {
 			press: this.addCondition.bind(this),
@@ -1380,13 +1416,15 @@ sap.ui.define([
 				visibleXL: { parts: [{ path: "$this>/conditions" }, { path: "$this>/config" }], formatter: _getAddButtonVisible.bind(this) }
 			})
 		});
-
 		oGrid.addContent(oAddBtn);
 
 		oGrid.attachValidateFieldGroup(_validateFieldGroup, this); // to validate conditions with more than one field
 
-		this.setAggregation("_content", oPanel);
+		const oInvisibleOperatorText = new InvisibleText(this.getId() + "--ivtOperator", { text: "{$i18n>valuehelp.DEFINECONDITIONS_OPERATORLABEL}" });
 
+		this.addAggregation("_invisibleTexts", oInvisibleOperatorText);
+		this.setAggregation("_toolbar", oToolbar);
+		this.setAggregation("_content", oGrid);
 	}
 
 	function _getAddButtonVisible(aConditions, oConfig) {
@@ -1461,7 +1499,21 @@ sap.ui.define([
 		this.setProperty("_nextButtonActive", iRow >= iShownConditions); // there is at least one more row than conditions are shown
 		this.setProperty("_pagination", iDefineConditions >= iShownConditions);
 
+		 _setGridMargin.call(this, oGrid, this.getProperty("_pagination"));
+
 		this._bGridUpdated = true;
+	}
+
+	function _setGridMargin(oGrid, _pagination) {
+		// If no pagination, the toolbar is not visible, the Grid should have a top margin
+		oGrid.removeStyleClass("sapUiSmallMarginTop");
+		oGrid.removeStyleClass("sapUiTinyMarginBottom");
+		if (!(_pagination)) {
+			oGrid.addStyleClass("sapUiSmallMarginTop");
+			oGrid.addStyleClass("sapUiTinyMarginBottom");
+		} else {
+			oGrid.addStyleClass("sapUiTinyMarginBottom");
+		}
 	}
 
 	function _setFocusOnGrid() {

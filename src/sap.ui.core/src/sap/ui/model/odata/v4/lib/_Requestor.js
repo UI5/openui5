@@ -1911,8 +1911,9 @@ sap.ui.define([
 	 * @param {object} [mQueryOptions]
 	 *   Query options if it is allowed to merge this request with another request having the same
 	 *   sResourcePath (only allowed for GET requests); the resulting resource path is the path from
-	 *   sResourcePath plus the merged query options; must contain $select (even if empty), may also
-	 *   contain $expand
+	 *   sResourcePath plus the merged query options; may only contain $select, $expand, and
+	 *   $$sortIfMerged; if $$sortIfMerged is set, the system query options are sorted
+	 *   alphabetically when merging this requests
 	 * @param {any} [vOwner]
 	 *   An additional precondition for the merging of GET requests: the owner must be identical.
 	 *   This is probably relevant when using parameter <code>fnMergeRequests</code> to ensure both

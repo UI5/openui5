@@ -2151,31 +2151,32 @@ sap.ui.define([
 	 * response), using the given group ID for batch control and the given edit URL to send a PATCH
 	 * request.
 	 *
-	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
-	 *   A lock for the group ID
 	 * @param {string} sPropertyPath
 	 *   Path of the property to update, relative to the entity
 	 * @param {any} vValue
 	 *   The new value
-	 * @param {function} [fnErrorCallback]
+	 * @param {object} oParameters - A parameter object
+	 * @param {string} oParameters.sEditUrl
+	 *   The edit URL for the entity which is updated via PATCH
+	 * @param {string} [oParameters.sEntityPath=""]
+	 *   Path of the entity, relative to the cache (as used by change listeners)
+	 * @param {function} [oParameters.fnErrorCallback]
 	 *   A function which is called with an Error object each time a PATCH request fails; if it is
 	 *   missing, the PATCH is not retried, but this method's returned promise is rejected
-	 * @param {string} sEditUrl
-	 *   The edit URL for the entity which is updated via PATCH
-	 * @param {string} [sEntityPath]
-	 *   Path of the entity, relative to the cache (as used by change listeners)
-	 * @param {string} [sUnitOrCurrencyPath]
-	 *   Path of the unit or currency for the property, relative to the (entity or complex) type
-	 *   which contains the property to update
-	 * @param {boolean} [bPatchWithoutSideEffects]
-	 *   Whether the PATCH response is ignored, except for a new ETag
-	 * @param {function} fnPatchSent
+	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oParameters.oGroupLock
+	 *   A lock for the group ID
+	 * @param {function} oParameters.fnIsKeepAlive
+	 *   A function to tell whether the entity is kept alive
+	 * @param {function} oParameters.fnPatchSent
 	 *   The function is called just before a back-end request is sent for the first time.
 	 *   If no back-end request is needed, the function is not called.
-	 * @param {function} fnIsKeepAlive
-	 *   A function to tell whether the entity is kept alive
-	 * @param {function} fnSetUpsertPromise
+	 * @param {boolean} [oParameters.bPatchWithoutSideEffects]
+	 *   Whether the PATCH response is ignored, except for a new ETag
+	 * @param {function} [oParameters.fnSetUpsertPromise]
 	 *   A function to (re)set a sync promise for the "upsert" use case
+	 * @param {string} [oParameters.sUnitOrCurrencyPath]
+	 *   Path of the optional unit or currency for the property, relative to the (entity or complex)
+	 *   type which contains the property to update
 	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise for the PATCH request (resolves with <code>undefined</code>); rejected in case of
 	 *   cancellation or if no <code>fnErrorCallback</code> is given
@@ -2183,9 +2184,9 @@ sap.ui.define([
 	 *
 	 * @public
 	 */
-	_Cache.prototype.update = function (oGroupLock, sPropertyPath, vValue, fnErrorCallback,
-			sEditUrl, sEntityPath, sUnitOrCurrencyPath, bPatchWithoutSideEffects, fnPatchSent,
-			fnIsKeepAlive, fnSetUpsertPromise) {
+	_Cache.prototype.update = function (sPropertyPath, vValue, {sEditUrl, sEntityPath = "",
+			fnErrorCallback, oGroupLock, fnIsKeepAlive, fnPatchSent, bPatchWithoutSideEffects,
+			fnSetUpsertPromise, sUnitOrCurrencyPath}) {
 		var oFetchPromise,
 			aPropertyPath = sPropertyPath.split("/"),
 			bUpsert,

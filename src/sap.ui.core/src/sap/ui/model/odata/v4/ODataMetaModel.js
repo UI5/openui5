@@ -1045,21 +1045,17 @@ sap.ui.define([
 	/**
 	 * Method not supported
 	 *
-	 * @param {string} _sPath
-	 * @param {sap.ui.model.Context} [_oContext]
-	 * @param {sap.ui.model.Filter[]} [_aFilters]
-	 * @param {object} [_mParameters]
-	 * @param {sap.ui.model.Sorter[]} [_aSorters]
 	 * @returns {sap.ui.model.TreeBinding}
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @see sap.ui.model.Model#bindTree
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.Model#bindTree
-	ODataMetaModel.prototype.bindTree = function (_sPath, _oContext, _aFilters, _mParameters,
-			_aSorters) {
+	ODataMetaModel.prototype.bindTree = function () {
 		throw new Error("Unsupported operation: v4.ODataMetaModel#bindTree");
 	};
 
@@ -2607,8 +2603,10 @@ sap.ui.define([
 	 *
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.Model#getOriginalProperty
 	ODataMetaModel.prototype.getOriginalProperty = function () {
@@ -2756,9 +2754,11 @@ sap.ui.define([
 	 *
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @see sap.ui.model.Model#refresh
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.Model#refresh
 	ODataMetaModel.prototype.refresh = function () {
@@ -3693,8 +3693,10 @@ sap.ui.define([
 	 *
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.Model#setLegacySyntax
 	ODataMetaModel.prototype.setLegacySyntax = function () {

@@ -1116,21 +1116,17 @@ sap.ui.define([
 	 * Method not supported, use {@link #bindList} with <code>mParameters.$$aggregation</code>
 	 * instead.
 	 *
-	 * @param {string} _sPath
-	 * @param {sap.ui.model.Context} [_oContext]
-	 * @param {sap.ui.model.Filter[]} [_aFilters]
-	 * @param {object} [_mParameters]
-	 * @param {sap.ui.model.Sorter[]} [_aSorters]
 	 * @returns {sap.ui.model.TreeBinding}
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @see sap.ui.model.Model#bindTree
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.Model#bindTree
-	ODataModel.prototype.bindTree = function (_sPath, _oContext, _aFilters, _mParameters,
-			_aSorters) {
+	ODataModel.prototype.bindTree = function () {
 		throw new Error("Unsupported operation: v4.ODataModel#bindTree");
 	};
 
@@ -1655,8 +1651,10 @@ sap.ui.define([
 	 *
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.Model#destroyBindingContext
 	ODataModel.prototype.destroyBindingContext = function () {
@@ -2058,8 +2056,10 @@ sap.ui.define([
 	 *
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.Model#getObject
 	ODataModel.prototype.getObject = function () {
@@ -2129,8 +2129,10 @@ sap.ui.define([
 	 *
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.Model#getOriginalProperty
 	ODataModel.prototype.getOriginalProperty = function () {
@@ -2142,9 +2144,11 @@ sap.ui.define([
 	 *
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @see sap.ui.model.Model#getProperty
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	ODataModel.prototype.getProperty = function () {
 		throw new Error("Unsupported operation: v4.ODataModel#getProperty");
@@ -2903,8 +2907,10 @@ sap.ui.define([
 	 *
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.Model#setLegacySyntax
 	ODataModel.prototype.setLegacySyntax = function () {

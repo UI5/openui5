@@ -35,6 +35,18 @@
 					   height="100%"
 					   width="100%"
 					   ignoreToolbarActions= "DrillDownUp">
+<!--				<mdc:chartActions>-->
+<!--					<SegmentedButton selectedKey="chart">-->
+<!--						<items>-->
+<!--							<SegmentedButtonItem icon="sap-icon://chart-table-view" key="chart-table"/>-->
+<!--							<SegmentedButtonItem icon="sap-icon://bar-chart" key="chart"/>-->
+<!--							<SegmentedButtonItem icon="sap-icon://table-view" key="table"/>-->
+<!--						</items>-->
+<!--						<layoutData>-->
+<!--							<mdcc:ActionLayoutData position="PersonalizationActionsDrillDown"/>-->
+<!--						</layoutData>-->
+<!--					</SegmentedButton>-->
+<!--				</mdc:chartActions>-->
 				<mdc:variant>
 					<variants:VariantManagement id="IDVariantManagementOfChart" for="chart"/>
 				</mdc:variant>

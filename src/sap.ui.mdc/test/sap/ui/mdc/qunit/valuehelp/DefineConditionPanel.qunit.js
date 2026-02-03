@@ -1590,20 +1590,16 @@ sap.ui.define([
 
 	QUnit.test("paging", async (assert) => {
 
-		const oPanel = oDefineConditionPanel.getAggregation("_content");
-		const oToolbar = oPanel?.getHeaderToolbar();
+		const oGrid = oDefineConditionPanel.getAggregation("_content");
+		const oToolbar = oDefineConditionPanel.getAggregation("_toolbar");
+		// These contents from the toolbar are based on the current implementation of the toolbar their index depends on the aggregation order of the toolbar in DefineConditionPanel.js
 		const oButtonPrev = oToolbar?.getContent()[2];
 		const oPageCount = oToolbar?.getContent()[3];
 		const oButtonNext = oToolbar?.getContent()[4];
 		const oButtonRemoveAll = oToolbar?.getContent()[5];
 		const oButtonInsert = oToolbar?.getContent()[6];
-		const oGrid = Element.getElementById("DCP1--conditions");
 
-		assert.notOk(oButtonPrev?.getVisible(), "Previous-Button hidden");
-		assert.notOk(oPageCount?.getVisible(), "Page-count hidden");
-		assert.notOk(oButtonNext?.getVisible(), "Next-Button hidden");
-		assert.notOk(oButtonRemoveAll?.getVisible(), "Remove-All-Button hidden");
-		assert.notOk(oButtonInsert?.getVisible(), "Insert-Button hidden");
+		assert.notOk(oToolbar?.getVisible(), "Toolbar hidden");
 
 		const fnAddConditions = (iCount) => {
 			let aConditions = oDefineConditionPanel.getConditions();
@@ -1618,11 +1614,7 @@ sap.ui.define([
 		};
 
 		const fnTest = (assert, bVisible, bPrevEnabled, bNextEnabled, sPageCount, iContentLength, sFirstValue, iConditionCount, iAllConditionCount) => {
-			assert.equal(oButtonPrev?.getVisible(), bVisible, "Previous-Button visible");
-			assert.equal(oPageCount?.getVisible(), bVisible, "Page-count visible");
-			assert.equal(oButtonNext?.getVisible(), bVisible, "Next-Button visible");
-			assert.equal(oButtonRemoveAll?.getVisible(), bVisible, "Remove-All-Button visible");
-			assert.equal(oButtonInsert?.getVisible(), bVisible, "Insert-Button visible");
+			assert.equal(oToolbar?.getVisible(), bVisible, "Toolbar visible");
 
 			if (bVisible) {
 				assert.equal(oButtonPrev?.getEnabled(), bPrevEnabled, "Previous-Button enabled");
@@ -1642,11 +1634,7 @@ sap.ui.define([
 		setTimeout(() => { // to wait for retemplating
 			setTimeout(async () => { // to for internal Conditions update in DefineConditionPanel (is async)
 				fnTest(assert, false, undefined, undefined, undefined, 51, "1", 10, 10);
-				assert.notOk(oButtonPrev?.getVisible(), "Previous-Button hidden");
-				assert.notOk(oPageCount?.getVisible(), "Page-count hidden");
-				assert.notOk(oButtonNext?.getVisible(), "Next-Button hidden");
-				assert.notOk(oButtonRemoveAll?.getVisible(), "Remove-All-Button hidden");
-				assert.notOk(oButtonInsert?.getVisible(), "Insert-Button hidden");
+				assert.notOk(oToolbar?.getVisible(), "Toolbar hidden");
 
 				fnAddConditions(11);
 				await nextUIUpdate();
@@ -1914,4 +1902,40 @@ sap.ui.define([
 
 	});
 
+	QUnit.module("Accessibility", {
+		beforeEach: async () => {
+			await _init();
+		},
+		afterEach: _teardown
+	});
+
+	QUnit.test("Check aria labelled by attributes", (assert) => {
+
+		const fnDone = assert.async();
+		setTimeout(async() => { // to wait for retemplating
+			// Check if oDefineConditionPanel has functionality getAriaLabelledBy
+			assert.ok(oDefineConditionPanel.getAriaLabelledBy, "DefineConditionPanel has method getAriaLabelledBy");
+			assert.ok(oDefineConditionPanel.addAriaLabelledBy, "DefineConditionPanel has method addAriaLabelledBy");
+
+			// Add mock labels to oDefineConditionPanel
+			const oLabelledById = "mockLabelId1";
+			oDefineConditionPanel.addAriaLabelledBy(oLabelledById);
+
+			await nextUIUpdate();
+
+			// Check if oDefineConditionPanel's getAriaLabelledBy returns the correct IDs
+			const aAriaLabelledByIds = oDefineConditionPanel.getAriaLabelledBy();
+			assert.ok(Array.isArray(aAriaLabelledByIds), "getAriaLabelledBy returns an array");
+			assert.ok(aAriaLabelledByIds.length > 0, "getAriaLabelledBy returns non-empty array");
+
+			// Check if oDefineCondtionPanel's main content has the correct aria-labelledby attribute
+			const oDefineConditionPanelSection = Element.getElementById(oDefineConditionPanel.getId());
+			const sAriaLabelledByAttr = oDefineConditionPanelSection.getDomRef().getAttribute("aria-labelledby");
+			assert.ok(sAriaLabelledByAttr, "DefineConditionPanel section has aria-labelledby attribute");
+
+			// Check that the aria-labelledby attribute contains the IDs added earlier
+			assert.ok(sAriaLabelledByAttr.indexOf(oLabelledById) !== -1, "aria-labelledby attribute contains the IDs added via addAriaLabelledBy");
+			fnDone();
+		}, 0);
+	});
 });

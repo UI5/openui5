@@ -4463,7 +4463,8 @@ sap.ui.define([
 		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
 			.returns("~oUnlockedGroupLock~");
 		this.mock(this.oRequestor).expects("request")
-			.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~")
+			.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~", undefined, undefined,
+				undefined, undefined, undefined, undefined, undefined, {/*mMergeableQueryOptions*/})
 			.resolves({value : ["~newGrandTotal~"]});
 		oCache.aElements.$byPredicate["()"] = "~oldGrandTotal~";
 		this.mock(_Helper).expects("updateExisting")
@@ -4502,7 +4503,8 @@ sap.ui.define([
 			.returns("~oUnlockedGroupLock~");
 		const oError = new Error("Intentionally failed");
 		this.mock(this.oRequestor).expects("request")
-			.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~")
+			.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~", undefined, undefined,
+				undefined, undefined, undefined, undefined, undefined, {/*mMergeableQueryOptions*/})
 			.rejects(oError);
 		this.mock(_Helper).expects("updateExisting").never();
 
