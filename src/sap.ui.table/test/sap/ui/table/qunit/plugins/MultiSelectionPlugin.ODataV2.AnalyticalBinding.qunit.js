@@ -27,7 +27,16 @@ sap.ui.define([
 		baseURI: sServiceURI
 	});
 
-	function createResponseData(iSkip, iTop, iCount) {
+	/**
+	 * Creates response data for given settings.
+	 *
+	 * @param {object} mSettings Settings for response data creation
+	 * @param {number} mSettings.skip Number of records to skip
+	 * @param {number} mSettings.top Number of records to take
+	 * @param {number} [mSettings.count] Total count of records
+	 * @returns
+	 */
+	function createResponseData(mSettings) {
 		const sRecordTemplate = "{\"__metadata\":{\"uri\":\"http://o4aFakeService:8080/ActualPlannedCostsResults('{index}')\","
 							  + "\"type\":\"tmp.u012345.cca.CCA.ActualPlannedCostsResultsType\"},"
 							  + "\"CostCenter\":\"CostCenter-{index}\""
@@ -35,18 +44,28 @@ sap.ui.define([
 							  + ",\"Currency\":\"EUR\""
 							  + "}";
 		const aRecords = [];
-		const sCount = iCount != null ? ",\"__count\":\"" + iCount + "\"" : "";
+		const sCount = mSettings.count != null ? ",\"__count\":\"" + mSettings.count + "\"" : "";
 
-		for (let i = iSkip, iLastIndex = iSkip + iTop; i < iLastIndex; i++) {
+		for (let i = mSettings.skip, iLastIndex = mSettings.skip + mSettings.top; i < iLastIndex; i++) {
 			aRecords.push(sRecordTemplate.replace(/({index})/g, i));
 		}
 
 		return "{\"d\":{\"results\":[" + aRecords.join(",") + "]" + sCount + "}}";
 	}
 
-	function createResponse(iSkip, iTop, iCount, bGrandTotal) {
+	/**
+	 *
+	 * @param {object} mSettings Settings for response creation
+	 * @param {number} mSettings.skip Number of records to skip
+	 * @param {number} mSettings.top Number of records to take
+	 * @param {number} [mSettings.count] Total count of records
+	 * @param {number} [mSettings.includeCountResponse] Whether to include count response
+	 * @param {boolean} [mSettings.includeGrandTotalResponse] Whether to include grand total response
+	 * @returns
+	 */
+	function createResponse(mSettings) {
 		const sGrandTotalResponse =
-			bGrandTotal
+			mSettings.includeGrandTotalResponse
 				? "--AAD136757C5CF75E21C04F59B8682CEA0\r\n" +
 				  "Content-Type: application/http\r\n" +
 				  "Content-Length: 356\r\n" +
@@ -63,7 +82,7 @@ sap.ui.define([
 				: "";
 
 		const sCountResponse =
-			iCount != null
+			mSettings.includeCountResponse
 				? "--AAD136757C5CF75E21C04F59B8682CEA0\r\n" +
 				  "Content-Type: application/http\r\n" +
 				  "Content-Length: 131\r\n" +
@@ -74,7 +93,7 @@ sap.ui.define([
 				  "content-language: en-US\r\n" +
 				  "Content-Length: 35\r\n" +
 				  "\r\n" +
-				  "{\"d\":{\"results\":[],\"__count\":\"" + iCount + "\"}}\r\n"
+				"{\"d\":{\"results\":[],\"__count\":\"" + mSettings.count + "\"}}\r\n"
 				: "";
 
 		return sGrandTotalResponse +
@@ -89,7 +108,7 @@ sap.ui.define([
 			   "content-language: en-US\r\n" +
 			   "Content-Length: 3015\r\n" +
 			   "\r\n" +
-			   createResponseData(iSkip, iTop, iCount) + "\r\n" +
+			createResponseData({skip: mSettings.skip, top: mSettings.top, count: mSettings.count}) + "\r\n" +
 			   "--AAD136757C5CF75E21C04F59B8682CEA0--\r\n" +
 			   "";
 	}
@@ -103,7 +122,7 @@ sap.ui.define([
 			+ "/Results?$select=CostCenter&$top=110&$inlinecount=allpages"
 		],
 		header: o4aFakeService.headers.BATCH,
-		content: createResponse(0, 110, 200)
+		content: createResponse({skip: 0, top: 110, count: 200, includeCountResponse: true})
 	});
 
 	o4aFakeService.addResponse({
@@ -113,7 +132,7 @@ sap.ui.define([
 			+ "/Results?$select=CostCenter&$skip=110&$top=90"
 		],
 		header: o4aFakeService.headers.BATCH,
-		content: createResponse(110, 90)
+		content: createResponse({skip: 110, top: 90})
 	});
 
 	o4aFakeService.addResponse({
@@ -123,7 +142,7 @@ sap.ui.define([
 			+ "/Results?$select=CostCenter&$skip=110&$top=80"
 		],
 		header: o4aFakeService.headers.BATCH,
-		content: createResponse(110, 80)
+		content: createResponse({skip: 110, top: 80})
 	});
 
 	o4aFakeService.addResponse({
@@ -135,7 +154,7 @@ sap.ui.define([
 			+ "/Results?$select=CostCenter&$top=110&$inlinecount=allpages"
 		],
 		header: o4aFakeService.headers.BATCH,
-		content: createResponse(0, 110, 200)
+		content: createResponse({skip: 0, top: 110, count: 200, includeCountResponse: true, includeGrandTotalResponse: true})
 	});
 
 	o4aFakeService.addResponse({
@@ -149,7 +168,7 @@ sap.ui.define([
 			+ "/Results?$select=CostCenter,PlannedCosts,Currency&$top=110&$inlinecount=allpages"
 		],
 		header: o4aFakeService.headers.BATCH,
-		content: createResponse(0, 110, 200, true)
+		content: createResponse({skip: 0, top: 110, count: 200, includeCountResponse: true, includeGrandTotalResponse: true})
 	});
 
 	o4aFakeService.addResponse({
@@ -159,7 +178,17 @@ sap.ui.define([
 			+ "/Results?$select=CostCenter,PlannedCosts,Currency&$skip=110&$top=90"
 		],
 		header: o4aFakeService.headers.BATCH,
-		content: createResponse(110, 90)
+		content: createResponse({skip: 110, top: 90})
+	});
+
+	o4aFakeService.addResponse({
+		batch: true,
+		uri: [
+			"ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')"
+			+ "/Results?$select=CostCenter&$orderby=CostCenter%20asc&$top=110&$inlinecount=allpages"
+		],
+		header: o4aFakeService.headers.BATCH,
+		content: createResponse({skip: 0, top: 110, count: 200})
 	});
 
 	TableQUnitUtils.setDefaultSettings({
@@ -235,5 +264,41 @@ sap.ui.define([
 		const aContexts = this.oTable.getBinding().getContexts(0, 200, 0);
 		assert.equal(aContexts.length, 200, "All binding contexts are available");
 		assert.ok(!aContexts.includes(undefined), "There are no undefined contexts");
+	});
+
+	QUnit.module("HeaderSelector", {
+		beforeEach: function() {
+			this.oTable = TableQUnitUtils.createTable(AnalyticalTable, {
+				columns: [
+					new AnalyticalColumn({
+						leadingProperty: "CostCenter",
+						template: new TableQUnitUtils.TestControl({text: {path: "CostCenter"}})
+					})
+				]
+			});
+			this.oTable.bindRows({path: "/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results"});
+			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
+			return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("Initialization", function(assert) {
+		const oHeaderSelector = this.oTable._getHeaderSelector();
+
+		assert.strictEqual(oHeaderSelector.getEnabled(), true, "HeaderSelector is enabled");
+		assert.strictEqual(oHeaderSelector.getVisible(), true, "HeaderSelector is visible");
+	});
+
+	QUnit.test("Sort", async function(assert) {
+		const oHeaderSelector = this.oTable._getHeaderSelector();
+
+		this.oTable.sort(this.oTable.getColumns()[0]);
+		await this.oTable.qunit.whenBindingChange();
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.strictEqual(oHeaderSelector.getEnabled(), true, "HeaderSelector is enabled");
+		assert.strictEqual(oHeaderSelector.getVisible(), true, "HeaderSelector is visible");
 	});
 });

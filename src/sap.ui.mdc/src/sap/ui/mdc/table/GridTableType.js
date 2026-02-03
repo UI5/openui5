@@ -576,14 +576,16 @@ sap.ui.define([
 		return oGridTable ? oGridTable.isBound("rows") : false;
 	};
 
-	GridTableType.prototype.insertFilterInfoBar = function(oFilterInfoBar, sAriaLabelId) {
+	GridTableType.prototype.insertFilterInfoBar = function(oFilterInfoBar) {
 		const oGridTable = this.getInnerTable();
 
 		if (oGridTable) {
+			const sFilterInfoBarAccTextId = oFilterInfoBar.getACCTextId();
+
 			oGridTable.insertExtension(oFilterInfoBar, 1);
 
-			if (!oGridTable.getAriaLabelledBy().includes(sAriaLabelId)) {
-				oGridTable.addAriaLabelledBy(sAriaLabelId);
+			if (!oGridTable.getAriaLabelledBy().includes(sFilterInfoBarAccTextId)) {
+				oGridTable.addAriaLabelledBy(sFilterInfoBarAccTextId);
 			}
 		}
 	};

@@ -511,7 +511,10 @@ sap.ui.define([
 		this.setAssociation("adaptationControl", oControl, bSuppressInvalidate);
 
 		this._cLayoutItem = FilterGroupLayout;
-		this._oFilterBarLayout = this._checkAdvancedParent(oControl) ? new GroupContainer() : new TableContainer();
+
+		// Determine UI mode and pass to container
+		const bUseNewUI = this._checkIsNewUI();
+		this._oFilterBarLayout = this._checkAdvancedParent(oControl) ? new GroupContainer({ useNewUI: bUseNewUI }) : new TableContainer();
 
 		this._oFilterBarLayout.getInner().setParent(this);
 		this.setAggregation("layout", this._oFilterBarLayout, true);
@@ -649,7 +652,22 @@ sap.ui.define([
 
 	AdaptationFilterBar.prototype._checkIsNewUI = function() {
 		if (this._bUseNewUI === undefined) {
-			this._bUseNewUI = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters") === "true";
+			// URL parameter takes precedence (for testing/development)
+			const sUrlParam = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters");
+			if (sUrlParam === "true") {
+				this._bUseNewUI = true;
+			} else if (sUrlParam === "false") {
+				this._bUseNewUI = false;
+			} else {
+				// Check the FilterBar's enableLegacyUI property
+				const oFilterBar = this._getAdaptationControlInstance();
+				if (oFilterBar?.isA?.("sap.ui.mdc.FilterBar") && oFilterBar.getEnableLegacyUI) {
+					this._bUseNewUI = !oFilterBar.getEnableLegacyUI();
+				} else {
+					// Default to new UI
+					this._bUseNewUI = true;
+				}
+			}
 		}
 		return this._bUseNewUI;
 	};

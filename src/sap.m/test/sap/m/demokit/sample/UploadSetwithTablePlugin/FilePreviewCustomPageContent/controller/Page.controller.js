@@ -15,8 +15,9 @@ sap.ui.define([
 	"sap/ui/model/FilterOperator",
 	"sap/ui/core/Element",
 	"sap/ui/core/HTML",
-	"sap/ui/codeeditor/CodeEditor"
-], function (Controller, UploadSetwithTable, MessageBox, Fragment, MockServer, MessageToast, Dialog, Button, mobileLibrary, Text, coreLibrary, CoreItem, Filter, FilterOperator, Element, HTML, CodeEditor) {
+	"sap/ui/codeeditor/CodeEditor",
+	"sap/base/security/URLListValidator"
+], function (Controller, UploadSetwithTable, MessageBox, Fragment, MockServer, MessageToast, Dialog, Button, mobileLibrary, Text, coreLibrary, CoreItem, Filter, FilterOperator, Element, HTML, CodeEditor, URLListValidator) {
 	"use strict";
 
 	return Controller.extend("responsiveFilePreviewCustomPageContent.table.sample.controller.Page", {
@@ -24,6 +25,8 @@ sap.ui.define([
 			this.documentTypes = this.getFileCategories();
 			this.oMockServer = new MockServer();
 			this.oMockServer.oModel = this.byId("table-uploadSet").getModel("documents");
+			// initialise URLListValidator and add blob to the valid URL schemes
+			URLListValidator.add("blob");
 		},
 		onBeforeUploadStarts: function() {
 			// This code block is only for demonstration purpose to simulate XHR requests, hence starting the mockserver.

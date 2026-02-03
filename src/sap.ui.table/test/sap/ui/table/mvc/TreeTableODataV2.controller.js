@@ -187,7 +187,6 @@ sap.ui.define([
 			Measurement.start("createTable");
 
 			oTable = oView.byId("tableOData") || new TreeTable({
-				rootLevel: iRootLevel,
 				threshold: iTableThreshold
 			});
 
@@ -235,6 +234,7 @@ sap.ui.define([
 				filters: oApplicationFilter,
 				parameters: {
 					select: sSelectProperties || "",
+					rootLevel: iRootLevel,
 					threshold: iBindingThreshold,
 					countMode: sCountMode,
 					operationMode: sOperationMode,

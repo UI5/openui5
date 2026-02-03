@@ -88,8 +88,10 @@ sap.ui.define([
 					defaultValue: false
 				},
 				/**
-				 * Determines whether the old or the new Adapt Filters UI is enabled.
-				 * Do nothing at the moment, property is reserved for further use.
+				 * Enables the legacy (old) Adapt Filters UI design as an opt-out from the new default design.
+				 * When set to <code>true</code>, the old UI with SegmentedButton and SelectionPanel will be shown.
+				 * When set to <code>false</code> (default), the new UI with IconTabBar and AdaptFiltersPanelContent will be shown.
+				 * The URL parameter <code>sap-ui-xx-new-adapt-filters</code> takes precedence over this property.
 				 * @experimental
 				 * @private
 				 * @ui5-restricted sap.fe

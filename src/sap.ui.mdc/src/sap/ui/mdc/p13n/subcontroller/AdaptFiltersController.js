@@ -56,7 +56,20 @@ sap.ui.define([
 	};
 
 	AdaptFiltersController.prototype.enhancePopup = function(oPopup) {
-		const bIsNewAdaptFiltersUI = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters") === "true";
+		// Check if new UI is enabled
+		const oFilterBar = this.getAdaptationControl();
+		let bIsNewAdaptFiltersUI = true; // default
+
+		// Check URL parameter first
+		const sUrlParam = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters");
+		if (sUrlParam === "true") {
+			bIsNewAdaptFiltersUI = true;
+		} else if (sUrlParam === "false") {
+			bIsNewAdaptFiltersUI = false;
+		} else if (oFilterBar?.isA?.("sap.ui.mdc.FilterBar") && oFilterBar.getEnableLegacyUI) {
+			bIsNewAdaptFiltersUI = !oFilterBar.getEnableLegacyUI();
+		}
+
 		if (bIsNewAdaptFiltersUI) {
 			const oFilter = new Button({
 				text: "Filter",

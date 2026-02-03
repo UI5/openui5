@@ -31,6 +31,8 @@ sap.ui.define([
 	"sap/ui/core/date/UI5Date",
 	"sap/ui/core/Element",
 	"sap/ui/test/utils/nextUIUpdate",
+	"sap/m/Link",
+	"sap/m/FormattedText",
 	// provides jQuery.fn.cursorPos
 	"sap/ui/dom/jquery/cursorPos"
 ], function(
@@ -64,7 +66,9 @@ sap.ui.define([
 	KeyCodes,
 	UI5Date,
 	Element,
-	nextUIUpdate
+	nextUIUpdate,
+	Link,
+	FormattedText
 ) {
 	"use strict";
 
@@ -3077,6 +3081,23 @@ sap.ui.define([
 		// cleanup
 		oInputBaseFocusOutSpy.restore();
 		oGetMaskModeStub.restore();
+	});
+
+	QUnit.test("onfocusout event should not close value state message when click is on value state link", function (assert) {
+		// prepare
+		const oCloseValueStateMessageSpy = this.spy(this.oTp, "closeValueStateMessage"),
+			oClickOnValueStateLinkStub = this.stub(this.oTp, "_bClickOnValueStateLink").returns(true);
+
+		// act
+		this.oTp.onfocusout({});
+
+		// assert
+		assert.ok(oClickOnValueStateLinkStub.calledOnce, "_bClickOnValueStateLink was called");
+		assert.equal(oCloseValueStateMessageSpy.callCount, 0, "closeValueStateMessage should not be called when clicking on value state link");
+
+		// cleanup
+		oCloseValueStateMessageSpy.restore();
+		oClickOnValueStateLinkStub.restore();
 	});
 
 	QUnit.test("oninput event should call _applyMask and _positionCaret if maskMode is 'Enforce'", function (assert) {

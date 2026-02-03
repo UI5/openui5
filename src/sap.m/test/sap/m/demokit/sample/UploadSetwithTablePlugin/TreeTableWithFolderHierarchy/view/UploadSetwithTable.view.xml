@@ -87,6 +87,7 @@
                             fileSizePath="size"
                             isDirectoryPath="isDirectory"
                             previewablePath="previewable"
+                            isTrustedSourcePath="trustedSource"
                         />
                     </m:plugins.UploadSetwithTable>
                 </dependents>

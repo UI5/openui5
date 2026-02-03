@@ -903,32 +903,32 @@ sap.ui.define([
 			const sTableId = typeof vControl === "string" ? vControl : vControl.getId();
 			return this.waitFor({
 				id: sTableId + "-filterInfoBar",
-				controlType: "sap.m.OverflowToolbar",
+				controlType: "sap.ui.mdc.table.utils.FilterInfoBar",
 				actions: new Press(),
-				errorMessage: "Filter Info Bar could not be found"
+				errorMessage: "Could not find filter info bar"
 			});
 		},
 
-		iRemoveAllFiltersViaInfoFilterBar: function(oControl) {
+		iPressRemoveAllFiltersOnFilterInfoBar: function(oControl) {
 			const sTableId = typeof oControl === "string" ? oControl : oControl.getId();
 
 			return this.waitFor({
 				id: sTableId + "-filterInfoBar",
-				controlType: "sap.m.OverflowToolbar",
-				success: function(oFilterBar) {
+				controlType: "sap.ui.mdc.table.utils.FilterInfoBar",
+				success: function(oFilterInfoBar) {
 					this.waitFor({
 						controlType: "sap.m.Button",
-						matchers: [
-							new PropertyStrictEquals({
-								name: "icon",
-								value: "sap-icon://decline"
+						matchers: [{
+							ancestor: oFilterInfoBar,
+							properties: {
+								icon: "sap-icon://decline"
 							}
-						)],
+						}],
 						actions: new Press(),
-						errorMessage: "Could not find 'Remove All Filters' Button in info toolbar"
+						errorMessage: "Could not find 'Remove All Filters' button in filter info bar"
 					});
 				},
-				errorMessage: "No visible filter bar was found"
+				errorMessage: "Could not find filter info bar"
 			});
 		},
 

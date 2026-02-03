@@ -7,7 +7,6 @@ sap.ui.define([
 	"sap/m/InstanceManager",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/core/Component",
-	"sap/ui/core/Popup",
 	"sap/ui/dt/util/ZIndexManager",
 	"sap/ui/dt/Overlay",
 	"sap/ui/dt/OverlayRegistry",
@@ -17,7 +16,6 @@ sap.ui.define([
 	InstanceManager,
 	ManagedObject,
 	Component,
-	Popup,
 	ZIndexManager,
 	Overlay,
 	OverlayRegistry,
@@ -117,7 +115,6 @@ sap.ui.define([
 	PopupManager.prototype.init = function() {
 		// create map for modal states
 		this._oModalState = new Map();
-		this._oOriginalWithinAreaValue = Popup.getWithinArea();
 		this._aPopupFilters = [this._isSupportedPopup.bind(this), this._isPopupAdaptable.bind(this)];
 		this._aPopupFilters.forEach(function(fnFilter) {
 			ZIndexManager.addPopupFilter(fnFilter);
@@ -282,15 +279,9 @@ sap.ui.define([
 			}
 		};
 
-		// Ensure that the toolbar is visible in navigation mode
-		// the Element passed to the Popup.setWithinArea should have the size
-		// of the screen below the toolbar
 		if (sNewMode === "navigation") {
-			const oRootElement = this.getRta().getRootControlInstance();
-			Popup.setWithinArea(oRootElement.getRootControl?.() ? oRootElement.getRootControl() : oRootElement);
 			this._applyPatchesToOpenPopups(_curry(fnApplyFocusAndSetModal)(sNewMode));
 		} else {
-			Popup.setWithinArea(this._oOriginalWithinAreaValue);
 			this._removePatchesToOpenPopups(_curry(fnApplyFocusAndSetModal)(sNewMode));
 		}
 	};

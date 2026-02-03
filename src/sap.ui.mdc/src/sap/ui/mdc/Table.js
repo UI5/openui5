@@ -11,13 +11,9 @@ sap.ui.define([
 	"./table/ResponsiveTableType",
 	"./table/PropertyHelper",
 	"./table/utils/Personalization",
-	"./table/ActionLayoutData",
+	"./table/utils/FilterInfoBar",
 	"./mixin/FilterIntegrationMixin",
-	"sap/m/Text",
-	"sap/m/ToolbarSpacer",
-	"sap/m/Button",
 	"sap/m/Title",
-	"sap/m/OverflowToolbar",
 	"sap/m/library",
 	"sap/m/table/Util",
 	"sap/m/table/columnmenu/Menu",
@@ -64,13 +60,9 @@ sap.ui.define([
 	ResponsiveTableType,
 	PropertyHelper,
 	PersonalizationUtils,
-	ActionLayoutData,
+	FilterInfoBar,
 	FilterIntegrationMixin,
-	Text,
-	ToolbarSpacer,
-	Button,
 	Title,
-	OverflowToolbar,
 	MLibrary,
 	MTableUtil,
 	ColumnMenu,
@@ -1554,150 +1546,55 @@ sap.ui.define([
 			}
 		}
 
-		if (oTable.isFilteringEnabled()) {
-			insertFilterInfoBar(oTable);
-		}
-
 		updateFilterInfoBar(oTable);
 	}
 
 	Table.prototype.setFilterConditions = function(mConditions) {
 		this.setProperty("filterConditions", mConditions, true);
 		this.getInbuiltFilter()?.setFilterConditions(mConditions);
-
 		updateFilterInfoBar(this);
-
 		return this;
 	};
 
 	function updateFilterInfoBar(oTable) {
-		const oFilterInfoBar = getFilterInfoBar(oTable);
-		const oFilterInfoBarText = getFilterInfoBarText(oTable);
-		const aFilteredProperties = getInternallyFilteredProperties(oTable);
+		let {oFilterInfoBar} = internal(oTable);
+		const sFilterInfoText = getFilterInfoText(oTable);
 
-		if (!oFilterInfoBar) {
-			return;
+		if (oFilterInfoBar?.isDestroyed()) {
+			oFilterInfoBar = null;
 		}
 
-		if (aFilteredProperties.length === 0) {
-			const oFilterInfoBarDomRef = oFilterInfoBar.getDomRef();
-
-			if (oFilterInfoBarDomRef && oFilterInfoBarDomRef.contains(document.activeElement)) {
-				oTable.focus();
-			}
-
-			oFilterInfoBar.setVisible(false);
-			getFilterInfoBarInvisibleText(oTable).setText("");
-
-			return;
-		}
-
-		oTable._fullyInitialized().then(() => {
-			const oPropertyHelper = oTable.getPropertyHelper();
-			const aPropertyLabels = aFilteredProperties.map((sPropertyName) => {
-				return oPropertyHelper.hasProperty(sPropertyName) ? oPropertyHelper.getProperty(sPropertyName).label : "";
+		if (oFilterInfoBar) {
+			oFilterInfoBar.setInfoText(sFilterInfoText);
+		} else if (sFilterInfoText) {
+			oFilterInfoBar = new FilterInfoBar({
+				id: oTable.getId() + "-filterInfoBar",
+				infoText: sFilterInfoText,
+				table: oTable
 			});
-			const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
-			const oListFormat = ListFormat.getInstance();
-
-			let sFilterText;
-			if (aPropertyLabels.length > 1) {
-				sFilterText = oResourceBundle.getText("table.MULTIPLE_FILTERS_ACTIVE", [aPropertyLabels.length, oListFormat.format(aPropertyLabels)]);
-			} else {
-				sFilterText = oResourceBundle.getText("table.ONE_FILTER_ACTIVE", aPropertyLabels);
-			}
-
-			if (!oFilterInfoBar.getVisible()) {
-				oFilterInfoBar.setVisible(true);
-			}
-
-			oFilterInfoBarText.setText(sFilterText);
-			getFilterInfoBarInvisibleText(oTable).setText(sFilterText);
-		});
+			internal(oTable).oFilterInfoBar = oFilterInfoBar;
+			oTable._getType().insertFilterInfoBar(oFilterInfoBar);
+		}
 	}
 
-	function insertFilterInfoBar(oTable) {
-		if (!oTable._oTable) {
-			return;
+	function getFilterInfoText(oTable) {
+		if (!oTable.isFilteringEnabled() || !oTable.getPropertyHelper()) {
+			return "";
 		}
 
-		let oFilterInfoBar = getFilterInfoBar(oTable);
-		const oInvisibleText = getFilterInfoBarInvisibleText(oTable);
+		const aFilterLabels = oTable._getLabelsFromFilterConditions(); // FilterIntegrationMixin
+		const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
 
-		if (!oFilterInfoBar) {
-			oFilterInfoBar = createFilterInfoBar(oTable);
+		if (aFilterLabels.length === 0) {
+			return "";
+		} else if (aFilterLabels.length === 1) {
+			return oResourceBundle.getText("table.ONE_FILTER_ACTIVE", aFilterLabels);
+		} else {
+			return oResourceBundle.getText("table.MULTIPLE_FILTERS_ACTIVE", [
+				aFilterLabels.length,
+				ListFormat.getInstance().format(aFilterLabels)
+			]);
 		}
-
-		oTable._getType().insertFilterInfoBar(oFilterInfoBar, oInvisibleText.getId());
-	}
-
-	function getFilterInfoBarInvisibleText(oTable) {
-		if (!oTable._oFilterInfoBarInvisibleText) {
-			oTable._oFilterInfoBarInvisibleText = new InvisibleText().toStatic();
-		}
-		return oTable._oFilterInfoBarInvisibleText;
-	}
-
-	function createFilterInfoBar(oTable) {
-		const sToolbarId = oTable.getId() + "-filterInfoBar";
-		let oFilterInfoToolbar = internal(oTable).oFilterInfoBar;
-		const oRb = Library.getResourceBundleFor("sap.ui.mdc");
-
-		if (oFilterInfoToolbar && !oFilterInfoToolbar.isDestroyed()) {
-			oFilterInfoToolbar.destroy();
-		}
-
-		oFilterInfoToolbar = new OverflowToolbar({
-			id: sToolbarId,
-			active: true,
-			design: ToolbarDesign.Info,
-			visible: false,
-			ariaLabelledBy: sToolbarId + "-text",
-			content: [
-				new Text({
-					id: sToolbarId + "-text",
-					wrapping: false
-				}), new ToolbarSpacer(), new Button({
-					type: MLibrary.ButtonType.Transparent,
-					tooltip: oRb.getText("infobar.REMOVEALLFILTERS"),
-					icon: "sap-icon://decline",
-					press: function() {
-						PersonalizationUtils.createClearFiltersChange(oTable);
-						oTable.focus();
-					}
-				})
-			],
-			press: function() {
-				PersonalizationUtils.openFilterDialog(oTable, () => {
-					// Because the filter info bar was pressed, it must have had the focus when opening the dialog. When removing all filters in
-					// the dialog and confirming, the filter info bar will be hidden, and the dialog tries to restore the focus on the hidden filter
-					// info bar. To avoid a focus loss, the table gets the focus.
-					if (getInternallyFilteredProperties(oTable).length === 0) {
-						oTable.focus();
-					}
-				});
-			}
-		});
-
-		internal(oTable).oFilterInfoBar = oFilterInfoToolbar;
-		updateFilterInfoBar(oTable);
-
-		return oFilterInfoToolbar;
-	}
-
-	function getFilterInfoBar(oTable) {
-		const {oFilterInfoBar} = internal(oTable);
-
-		if (oFilterInfoBar?.isDestroyStarted()) {
-			return null;
-		}
-
-		return oFilterInfoBar;
-	}
-
-	function getFilterInfoBarText(oTable) {
-		const oFilterInfoBar = getFilterInfoBar(oTable);
-		return oFilterInfoBar ? oFilterInfoBar.getContent()[0] : null;
 	}
 
 	Table.prototype.setThreshold = function(iThreshold) {
@@ -1831,6 +1728,7 @@ sap.ui.define([
 		const oType = this._getType();
 		const aInitPromises = [
 			this.awaitControlDelegate(),
+			this.awaitPropertyHelper(),
 			oType.loadModules()
 		];
 
@@ -2112,27 +2010,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets the keys of properties that are filtered internally via the inbuilt filtering ({@link sap.ui.mdc.filterbar.p13n.AdaptationFilterBar}).
-	 *
-	 * @param {sap.ui.mdc.Table} oTable Instance of the table.
-	 * @returns {string[]} The keys of the filtered properties.
-	 */
-	function getInternallyFilteredProperties(oTable) {
-		return oTable.isFilteringEnabled() ? getFilteredProperties(oTable.getFilterConditions()) : [];
-	}
-
-	/**
-	 * Gets the keys of properties that are filtered externally via the associated filter ({@link sap.ui.mdc.IFilter}).
-	 *
-	 * @param {sap.ui.mdc.Table} oTable Instance of the table.
-	 * @returns {string[]} The keys of the filtered properties.
-	 */
-	function getExternallyFilteredProperties(oTable) {
-		const oFilter = Element.getElementById(oTable.getFilter());
-		return oFilter ? getFilteredProperties(oFilter.getConditions()) : [];
-	}
-
-	/**
 	 * Whether the table is filtered internally via the inbuilt filtering ({@link sap.ui.mdc.filterbar.p13n.AdaptationFilterBar}), or externally via
 	 * the associated filter ({@link sap.ui.mdc.IFilter}).
 	 *
@@ -2141,9 +2018,9 @@ sap.ui.define([
 	 */
 	function isFiltered(oTable) {
 		const oFilter = Element.getElementById(oTable.getFilter());
-		return getInternallyFilteredProperties(oTable).length > 0 ||
-			getExternallyFilteredProperties(oTable).length > 0 ||
-			oFilter && oFilter.getSearch() !== "";
+		const aInternallyFilteredProperties = oTable.isFilteringEnabled() ? getFilteredProperties(oTable.getFilterConditions()) : [];
+		const aExternallyFilteredProperties = getFilteredProperties(oFilter?.getConditions());
+		return aInternallyFilteredProperties.length > 0 || aExternallyFilteredProperties.length > 0 || oFilter?.getSearch();
 	}
 
 	function getFilteredProperties(mConditions) {
@@ -2804,10 +2681,7 @@ sap.ui.define([
 			this.setContextMenu(this.getContextMenu());
 		}
 
-		if (this.isFilteringEnabled()) {
-			insertFilterInfoBar(this);
-		}
-
+		updateFilterInfoBar(this);
 		updateColumnMenu(this);
 
 		this._updateInvisibleTitle();

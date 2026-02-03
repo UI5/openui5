@@ -221,10 +221,10 @@ sap.ui.define([
 			return;
 		}
 
-		if (oEvent.keyCode === KeyCodes.ARROW_DOWN) {
+		if (!oEvent.altKey && oEvent.keyCode === KeyCodes.ARROW_DOWN) {
 			// Go to the next selectable item
 			this._setHoveredItem(this._getNextFocusableItem(iIdx, 1), true);
-		} else if (oEvent.keyCode === KeyCodes.ARROW_UP) {
+		} else if (!oEvent.altKey && oEvent.keyCode === KeyCodes.ARROW_UP) {
 			// Go to the previous selectable item
 			this._setHoveredItem(this._getPrevFocusableItem(iIdx, 1), true);
 		} else if (oEvent.keyCode === iLeftArrow) {
@@ -244,6 +244,9 @@ sap.ui.define([
 				this._handleEndContentNavigation(oEvent, aEndContent);
 			}
 		} else if (oEvent.keyCode === KeyCodes.ESCAPE) {
+			this.fireClosePopover();
+		} else if (this._bOpenedByMenuButton && (oEvent.keyCode === KeyCodes.F4 || (oEvent.altKey && (oEvent.keyCode === KeyCodes.ARROW_UP || oEvent.keyCode === KeyCodes.ARROW_DOWN)))) {
+			// Close menu on F4 or Alt+Arrow Up/Down when opened by MenuButton
 			this.fireClosePopover();
 		} else if (oEvent.keyCode === KeyCodes.HOME) {
 			// Go to the first selectable item

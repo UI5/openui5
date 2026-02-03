@@ -200,8 +200,7 @@
 					<table:TreeTable
 						id="tableOData"
 						selectionMode="MultiToggle"
-						threshold="{/tableThreshold}"
-						rootLevel="{/rootLevel}">
+						threshold="{/tableThreshold}">
 						<table:extension>
 							<Toolbar>
 								<Label text="Table-Tools" />

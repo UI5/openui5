@@ -493,13 +493,14 @@ sap.ui.define([
 		}
 
 		const iNewHeight = this.determineAvailableSpace();
+		const iOldConfiguredRowCount = this.getConfiguredRowCount();
 		const iNewRowCount = Math.floor(iNewHeight / getRowHeight(this));
 		const iOldComputedRowCount = this.getComputedRowCounts().count;
 
 		_private(this).rowCount = iNewRowCount;
 		const iNewComputedRowCount = this.getComputedRowCounts().count;
 
-		if (iOldComputedRowCount !== iNewComputedRowCount) {
+		if (iOldComputedRowCount !== iNewComputedRowCount || this.getHideEmptyRows() && iOldConfiguredRowCount !== this.getConfiguredRowCount()) {
 			this.invalidate();
 		}
 

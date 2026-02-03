@@ -29,7 +29,8 @@ sap.ui.define([
                             "uploadedDate": new Date().toLocaleDateString(),
                             "uploadedBy": "Current User",
                             "isDirectory": false,
-                            "uploadState": "Complete"
+                            "uploadState": "Complete",
+                            "trustedSource": true
                         };
 
                         // Insert file after all folders

@@ -29,7 +29,8 @@ sap.ui.define([
 							"fileSize": oResponse.fileSize,
 							"lastModifiedBy": "Jane Burns",
 							"lastmodified": "10/03/21, 10:03:00 PM",
-							"documentType": oResponse && oResponse.documentType ? oResponse.documentType : "Invoice"
+							"documentType": oResponse && oResponse.documentType ? oResponse.documentType : "Invoice",
+							"trustedSource": true
 						}
 					);
 					break;

@@ -20,7 +20,7 @@ sap.ui.define([
 				},
 				method: "GET",
 				headers: {
-					"X-CSRF-Token": "{{csrfTokens.token1}}"
+					"X-CSRF-Token": "{csrfTokens>/token1/value}"
 				}
 			})
 			.then(function (oRes) {

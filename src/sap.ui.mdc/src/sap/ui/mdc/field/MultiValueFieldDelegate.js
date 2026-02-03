@@ -3,13 +3,9 @@
  */
 
 sap.ui.define([
-	'sap/ui/mdc/field/FieldBaseDelegate',
-	'sap/ui/mdc/enums/ConditionValidated',
-	'sap/base/util/merge'
+	'sap/ui/mdc/field/FieldBaseDelegate'
 ], (
-	FieldBaseDelegate,
-	ConditionValidated,
-	merge
+	FieldBaseDelegate
 ) => {
 	"use strict";
 
@@ -58,19 +54,6 @@ sap.ui.define([
 		 *  @deprecated As of version 1.142
 		 */
 		this.updateItems.apply(this, [oMultiValueField.getPayload(), aConditions, oMultiValueField]);
-	};
-
-
-	MultiValueFieldDelegate.indexOfCondition = function(oMultiValueField, oValueHelp, oCondition, aConditions) {
-
-		// as all conditions belongs to items and therefore get state "Validated" compare conditions from manual user input with validated conditions
-		if (oCondition.validated !== ConditionValidated.Validated) {
-			oCondition = merge({}, oCondition);
-			oCondition.validated = ConditionValidated.Validated;
-		}
-
-		return FieldBaseDelegate.indexOfCondition.call(this, oMultiValueField, oValueHelp, oCondition, aConditions);
-
 	};
 
 	return MultiValueFieldDelegate;
