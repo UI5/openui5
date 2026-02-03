@@ -740,6 +740,25 @@ sap.ui.define([
 		oButton.destroy();
 	});
 
+	QUnit.test("Space event should not fire press on keyup if there was no keydown on the button", async function(assert) {
+		// System under Test
+		var pressSpy = this.spy(),
+			oButton = new Button({
+				press: pressSpy
+			}).placeAt("qunit-fixture");
+
+		await nextUIUpdate(this.clock);
+
+		// Action
+		qutils.triggerKeyup(oButton.getDomRef(), KeyCodes.SPACE);
+
+		// Assert
+		assert.equal(pressSpy.callCount, 0, "Press event should not be fired");
+
+		// Cleanup
+		oButton.destroy();
+	});
+
 	QUnit.test("Space event should fire press on keyup", async function(assert) {
 		// System under Test
 		var pressSpy = this.spy(),
@@ -750,6 +769,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Action
+		qutils.triggerKeydown(oButton.getDomRef(), KeyCodes.SPACE); // first trigger keydown event on the button
 		qutils.triggerKeyup(oButton.getDomRef(), KeyCodes.SPACE);
 
 		// Assert
