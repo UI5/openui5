@@ -556,6 +556,15 @@ sap.ui.define([
 		this._updateColumns(bSuppressRefresh, bForceChange);
 	};
 
+	/**
+	 * Returns the Columns of the AnalyticalTable.
+	 *
+	 * @returns {sap.ui.table.AnalyticalColumn[]}
+	 * @public
+	 * @function
+	 * @name sap.ui.table.AnalyticalTable#getColumns
+	 */
+
 	AnalyticalTable.prototype.addColumn = function(vColumn, bSuppressInvalidate) {
 		//@TODO: Implement addColumn(Column[] || oColumn)
 		const oColumn = this._getColumn(vColumn);
