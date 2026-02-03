@@ -334,7 +334,7 @@ sap.ui.define([
 	 * properties.
 	 *
 	 * @param {object} mQueryOptions
-	 *   The cache query options; the options of oModel.mUriParameters are added
+	 *   The cache query options; the options of oModel.mURLParameters are added
 	 * @param {string} sResourcePath
 	 *   The resource path
 	 * @param {sap.ui.model.Context} [oContext]
@@ -355,7 +355,7 @@ sap.ui.define([
 			sGroupId, bSideEffectsRefresh, oOldCache) {
 		var oCache, sDeepResourcePath, iGeneration;
 
-		this.mCacheQueryOptions = Object.assign({}, this.oModel.mUriParameters, mQueryOptions);
+		this.mCacheQueryOptions = Object.assign({}, this.oModel.mURLParameters, mQueryOptions);
 		if (this.bRelative) { // quasi-absolute or relative binding
 			// mCacheByResourcePath has to be reset if parameters are changing
 			oCache = this.mCacheByResourcePath && this.mCacheByResourcePath[sResourcePath];

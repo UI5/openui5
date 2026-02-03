@@ -47,7 +47,7 @@ sap.ui.define([
 		 * unnecessary calls to setTimeout which may disturb the addPrerenderingTask tests. Tests
 		 * that need addPrerenderingTask must explicitely request it.
 		 *
-		 * @param {string} [sQuery] URI query parameters starting with '?'
+		 * @param {string} [sQuery] URL query parameters starting with '?'
 		 * @param {object} [mParameters] additional model parameters
 		 * @param {boolean} [bAllowPrerenderingTasks] avoids that addPrerenderingTasks is blocked
 		 * @returns {sap.ui.model.odata.v4.ODataModel} the model
@@ -102,9 +102,9 @@ sap.ui.define([
 				oModel;
 
 			this.mock(_Helper).expects("getUrlParameters").withExactArgs(undefined)
-				.returns("~mUriParameters~");
+				.returns("~mURLParameters~");
 			this.mock(ODataModel.prototype).expects("buildQueryOptions")
-				.withExactArgs("~mUriParameters~", false, true).returns({"sap-client" : "279"});
+				.withExactArgs("~mURLParameters~", false, true).returns({"sap-client" : "279"});
 			this.mock(Supportability).expects("isStatisticsEnabled")
 				.withExactArgs().returns(bStatistics);
 			const oExpectation = this.mock(_MetadataRequestor).expects("create")
@@ -122,7 +122,7 @@ sap.ui.define([
 
 			assert.strictEqual(oModel.sServiceUrl, sServiceUrl);
 			assert.strictEqual(oModel.toString(), sClassName + ": " + sServiceUrl);
-			assert.deepEqual(oModel.mUriParameters, {"sap-client" : "279"});
+			assert.deepEqual(oModel.mURLParameters, {"sap-client" : "279"});
 			assert.strictEqual(oModel.getDefaultBindingMode(), BindingMode.TwoWay);
 			assert.strictEqual(oModel.isBindingModeSupported(BindingMode.OneTime), true);
 			assert.strictEqual(oModel.isBindingModeSupported(BindingMode.OneWay), true);
@@ -150,15 +150,15 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("ignoreAnnotationsFromMetadata, metadataUrlParams", function (assert) {
 		var oModel,
-			mUriParameters = {
+			mURLParameters = {
 				"sap-client" : "279",
 				"sap-context-token" : "n/a"
 			};
 
 		this.mock(_Helper).expects("getUrlParameters").withExactArgs(undefined)
-			.returns("~mUriParameters~");
+			.returns("~mURLParameters~");
 		this.mock(ODataModel.prototype).expects("buildQueryOptions")
-			.withExactArgs("~mUriParameters~", false, true).returns(mUriParameters);
+			.withExactArgs("~mURLParameters~", false, true).returns(mURLParameters);
 		this.mock(_MetadataRequestor).expects("create")
 			.withExactArgs({"Accept-Language" : "ab-CD"}, "4.0", true, {
 				"sap-client" : "279",
@@ -256,19 +256,19 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("with serviceUrl params", function (assert) {
 		var oModel,
-			mUriParameters = {};
+			mURLParameters = {};
 
 		this.mock(_Helper).expects("getUrlParameters").withExactArgs("sap-client=111")
-			.returns("~mUriParameters~");
+			.returns("~mURLParameters~");
 		this.mock(ODataModel.prototype).expects("buildQueryOptions")
-			.withExactArgs("~mUriParameters~", false, true)
-			.returns(mUriParameters);
+			.withExactArgs("~mURLParameters~", false, true)
+			.returns(mURLParameters);
 
 		// code under test
 		oModel = this.createModel("?sap-client=111");
 
 		assert.strictEqual(oModel.sServiceUrl, sServiceUrl);
-		assert.strictEqual(oModel.mUriParameters, mUriParameters);
+		assert.strictEqual(oModel.mURLParameters, mURLParameters);
 	});
 
 	//*********************************************************************************************
@@ -3478,7 +3478,7 @@ sap.ui.define([
 				.withExactArgs().returns("group");
 			this.mock(oModel).expects("isApiGroup").withExactArgs("group").returns(false);
 			this.mock(_Helper).expects("buildQuery")
-				.withExactArgs(sinon.match.same(oModel.mUriParameters))
+				.withExactArgs(sinon.match.same(oModel.mURLParameters))
 				.returns("?~");
 			this.mock(oModel).expects("lockGroup")
 				.withExactArgs("group", sinon.match.same(oModel), true, true)

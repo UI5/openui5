@@ -28,23 +28,23 @@ sap.ui.define([
 		},
 
 		createContent : function () {
-			var sMockServerBaseUri
+			var sMockServerBaseURL
 					= "test-resources/sap/ui/core/demokit/sample/ViewTemplate/valuelist/data/",
 				oModel,
-				sServiceUri = "/sap/opu/odata/sap/FAR_CUSTOMER_LINE_ITEMS/",
-				oUriParameters = new URLSearchParams(window.location.search),
-				sClient = oUriParameters.get("sap-client"),
-				sValueList = oUriParameters.get("sap-value-list");
+				sServiceURL = "/sap/opu/odata/sap/FAR_CUSTOMER_LINE_ITEMS/",
+				oURLSearchParams = new URLSearchParams(window.location.search),
+				sClient = oURLSearchParams.get("sap-client"),
+				sValueList = oURLSearchParams.get("sap-value-list");
 
 			if (TestUtils.isRealOData()) {
 				if (sClient) {
-					sServiceUri += "?sap-client=" + sClient;
+					sServiceURL += "?sap-client=" + sClient;
 				}
 			} else {
-				this.aMockServers.push(new MockServer({rootUri : sServiceUri}));
-				this.aMockServers[0].simulate(sMockServerBaseUri + (sValueList === "none"
+				this.aMockServers.push(new MockServer({rootUri : sServiceURL}));
+				this.aMockServers[0].simulate(sMockServerBaseURL + (sValueList === "none"
 						? "metadata_none.xml" : "metadata.xml"), {
-					sMockdataBaseUrl : sMockServerBaseUri,
+					sMockdataBaseUrl : sMockServerBaseURL,
 					bGenerateMissingMockData : false
 				});
 				// mock server only simulates $metadata request without query parameters
@@ -76,12 +76,12 @@ sap.ui.define([
 						return {
 							method : "GET",
 							path : new RegExp(MockServer.prototype
-								._escapeStringForRegExp(sServiceUri + "$metadata?sap-value-list="
+								._escapeStringForRegExp(sServiceURL + "$metadata?sap-value-list="
 									+ oMockData.valueList)),
 							response : function (oXHR) {
 								Log.debug("Mocked response sent:" + oXHR.url, null,
 									"sap.ui.core.sample.ViewTemplate.valuelist.Component");
-								oXHR.respondFile(200, {}, sMockServerBaseUri + oMockData.response);
+								oXHR.respondFile(200, {}, sMockServerBaseURL + oMockData.response);
 							}
 						};
 					})
@@ -119,12 +119,12 @@ sap.ui.define([
 							return {
 								method : "GET",
 								path : new RegExp(MockServer.prototype
-									._escapeStringForRegExp(sServiceUri + oMockData.param)),
+									._escapeStringForRegExp(sServiceURL + oMockData.param)),
 								response : function (oXHR) {
 									Log.debug("Mocked response sent:" + oXHR.url, null,
 										"sap.ui.core.sample.ViewTemplate.valuelist.Component");
 									if (oMockData.response) {
-										oXHR.respondFile(200, {}, sMockServerBaseUri
+										oXHR.respondFile(200, {}, sMockServerBaseURL
 											+ oMockData.response);
 									} else {
 										oXHR.respond(204, {}, "100");
@@ -136,7 +136,7 @@ sap.ui.define([
 					this.aMockServers[2].start();
 				}
 			}
-			oModel = new ODataModel(sServiceUri, {
+			oModel = new ODataModel(sServiceURL, {
 				metadataUrlParams : sValueList ? {"sap-value-list" : sValueList} : undefined,
 				useBatch : false // make network trace easier to read
 			});

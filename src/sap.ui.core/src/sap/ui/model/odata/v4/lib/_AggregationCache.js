@@ -2216,6 +2216,48 @@ sap.ui.define([
 	};
 
 	/**
+	 * Reads and updates the grand total row.
+	 *
+	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
+	 *   A lock for the group to associate the requests with
+	 * @returns {Promise<void>|undefined}
+	 *   A promise which is resolved without a defined result when the read is finished, or
+	 *   rejected in case of an error; <code>undefined</code> in case no grand total is used
+	 * @throws {Error}
+	 *   If "grandTotal like 1.84" is used, or leaves are aggregated
+	 *
+	 * @private
+	 */
+	_AggregationCache.prototype.readGrandTotal = function (oGroupLock) {
+		if (!_AggregationHelper.hasGrandTotal(this.oAggregation.aggregate)) {
+			return;
+		}
+		if (this.oAggregation["grandTotal like 1.84"]) {
+			throw new Error('"grandTotal like 1.84" not supported');
+		}
+		if (this.oAggregation.$leafLevelAggregated) {
+			throw new Error("Leaves must not be aggregated");
+		}
+
+		let mQueryOptions = {...this.mQueryOptions};
+		// drop not needed system query options; $expand, $filter, $search, and $select must not be
+		// used with grand totals; all filters are contained in $$filterBeforeAggregate
+		delete mQueryOptions.$apply;
+		delete mQueryOptions.$count;
+		delete mQueryOptions.$orderby;
+
+		mQueryOptions = _AggregationHelper.buildApply(this.oAggregation, mQueryOptions, -1);
+		const sResourcePath = this.sResourcePath
+			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, false, true);
+
+		return this.oRequestor.request("GET", sResourcePath, oGroupLock.getUnlockedCopy())
+			.then((oResult) => {
+				_Helper.updateExisting(this.mChangeListeners, "()",
+					this.aElements.$byPredicate["()"], oResult.value[0]);
+			});
+	};
+
+	/**
 	 * @override
 	 * @see sap.ui.model.odata.v4.lib._CollectionCache#refreshKeptElements
 	 */
@@ -2225,6 +2267,21 @@ sap.ui.define([
 		const fnSuper = this.oFirstLevel.refreshKeptElements;
 		return fnSuper.call(this, oGroupLock, fnOnRemove, bIgnorePendingChanges,
 			/*bDropApply*/true);
+	};
+
+	/**
+	 * @override
+	 * @see sap.ui.model.odata.v4.lib._CollectionCache#refreshSingle
+	 */
+	// Additionally the grand total row is refreshed. The resulting promise resolves with the
+	// refreshed entity after the entity and the grand total are updated in the cache, and rejects
+	// with an error when no key predicate is known or the grand total could not be refreshed.
+	_AggregationCache.prototype.refreshSingle = function (oGroupLock/*, sPath, iIndex, sPredicate,
+			bKeepAlive, bWithMessages, fnDataRequested*/) {
+		return SyncPromise.all([
+			_Cache.prototype.refreshSingle.apply(this, arguments),
+			this.readGrandTotal(oGroupLock)
+		]).then(([oResult]) => oResult);
 	};
 
 	/**

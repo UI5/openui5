@@ -983,7 +983,7 @@ sap.ui.define([
 						oCache = that.createAndSetCache(that.mAggregatedQueryOptions,
 							oCache.getResourcePath(), oContext);
 					} else {
-						oCache.setQueryOptions(_Helper.merge({}, that.oModel.mUriParameters,
+						oCache.setQueryOptions(_Helper.merge({}, that.oModel.mURLParameters,
 							that.mAggregatedQueryOptions));
 					}
 				}

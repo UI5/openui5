@@ -10072,7 +10072,7 @@ sap.ui.define([
 		assert.strictEqual(oBinding.fetchDownloadUrl(), oPromise);
 
 		this.mock(oCache).expects("getDownloadUrl")
-			.withExactArgs("~path~", sinon.match.same(this.oModel.mUriParameters),
+			.withExactArgs("~path~", sinon.match.same(this.oModel.mURLParameters),
 				{foo : "~fooSelect~", bar : "~barSelect~"})
 			.returns("~url~");
 

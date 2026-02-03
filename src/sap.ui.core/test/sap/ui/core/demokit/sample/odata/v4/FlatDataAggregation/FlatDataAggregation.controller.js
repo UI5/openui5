@@ -40,8 +40,8 @@ sap.ui.define([
 					}
 					// Note: leaf level is aggregation across TravelID, BookingDate, BookingID
 				};
-				const oUriParameters = new URLSearchParams(window.location.search);
-				const sGrandTotalAtBottomOnly = oUriParameters.get("grandTotalAtBottomOnly");
+				const oURLSearchParams = new URLSearchParams(window.location.search);
+				const sGrandTotalAtBottomOnly = oURLSearchParams.get("grandTotalAtBottomOnly");
 				if (sGrandTotalAtBottomOnly === "off") {
 					oTable.getRowMode().setFixedTopRowCount(0);
 					this._oAggregation.aggregate.FlightPrice.grandTotal = false;
@@ -54,7 +54,7 @@ sap.ui.define([
 				}
 				oRowsBinding.setAggregation(this._oAggregation);
 
-				const sFilter = oUriParameters.get("filter");
+				const sFilter = oURLSearchParams.get("filter");
 				if (sFilter) { // e.g. "status EQ B,Distance BT 1000 5000"
 					oRowsBinding.filter(sFilter.split(",").map(function (sSingleFilter) {
 						var aPieces = sSingleFilter.split(" ");
@@ -67,7 +67,7 @@ sap.ui.define([
 						});
 					}));
 				}
-				const sOrderby = oUriParameters.get("$orderby");
+				const sOrderby = oURLSearchParams.get("$orderby");
 				if (sOrderby) {
 					oRowsBinding.changeParameters({$orderby : sOrderby});
 				}

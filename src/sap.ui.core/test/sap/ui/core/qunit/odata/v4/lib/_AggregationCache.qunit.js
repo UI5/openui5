@@ -4378,6 +4378,144 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("readGrandTotal: no grand total", function (assert) {
+		const oCache = {
+			oAggregation : {aggregate : "~aggregate~"}
+		};
+		this.mock(_AggregationHelper).expects("hasGrandTotal")
+			.withExactArgs("~aggregate~")
+			.returns(false);
+
+		// code under test
+		assert.strictEqual(
+			_AggregationCache.prototype.readGrandTotal.call(oCache, "~oGroupLock~"),
+			undefined);
+	});
+
+	//*********************************************************************************************
+	QUnit.test('readGrandTotal: "grandTotal like 1.84" not supported', function (assert) {
+		const oCache = {
+			oAggregation : {
+				aggregate : "~aggregate~",
+				"grandTotal like 1.84" : true
+			}
+		};
+		this.mock(_AggregationHelper).expects("hasGrandTotal")
+			.withExactArgs("~aggregate~")
+			.returns(true);
+
+		assert.throws(() => {
+			// code under test
+			_AggregationCache.prototype.readGrandTotal.call(oCache);
+		}, new Error('"grandTotal like 1.84" not supported'));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("readGrandTotal: leaves must not be aggregated", function (assert) {
+		const oCache = {
+			oAggregation : {
+				$leafLevelAggregated : true,
+				aggregate : "~aggregate~"
+			}
+		};
+		this.mock(_AggregationHelper).expects("hasGrandTotal")
+			.withExactArgs("~aggregate~")
+			.returns(true);
+
+		assert.throws(() => {
+			// code under test
+			_AggregationCache.prototype.readGrandTotal.call(oCache);
+		}, new Error("Leaves must not be aggregated"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("readGrandTotal: success", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {
+			// $expand, $filter, $search, and $select must not be used with grand totals
+			$$filterBeforeAggregate : "~$$filterBeforeAggregate~",
+			$apply : "~apply~",
+			$count : true,
+			$orderby : "~orderby~",
+			custom : "~custom~"
+		}, {
+			$leafLevelAggregated : false,
+			aggregate : {
+				bar : {
+					grandTotal : true
+				}
+			}
+		});
+		this.mock(_AggregationHelper).expects("hasGrandTotal")
+			.withExactArgs(sinon.match.same(oCache.oAggregation.aggregate))
+			.returns(true);
+		this.mock(_AggregationHelper).expects("buildApply")
+			.withExactArgs(sinon.match.same(oCache.oAggregation), {
+				$$filterBeforeAggregate : "~$$filterBeforeAggregate~",
+				custom : "~custom~"
+			}, -1)
+			.returns("~mQueryOptions~");
+		this.mock(this.oRequestor).expects("buildQueryString")
+			.withExactArgs("/Foo", "~mQueryOptions~", false, false, true)
+			.returns("~sQueryString~");
+		const oGroupLock = {
+			getUnlockedCopy : mustBeMocked
+		};
+		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
+			.returns("~oUnlockedGroupLock~");
+		this.mock(this.oRequestor).expects("request")
+			.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~")
+			.resolves({value : ["~newGrandTotal~"]});
+		oCache.aElements.$byPredicate["()"] = "~oldGrandTotal~";
+		this.mock(_Helper).expects("updateExisting")
+			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "()", "~oldGrandTotal~",
+				"~newGrandTotal~");
+
+		// code under test
+		return oCache.readGrandTotal(oGroupLock).then((oResult) => {
+			assert.strictEqual(oResult, undefined);
+		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("readGrandTotal: request failed", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			$leafLevelAggregated : false, // see ODataListBinding#fetchFilter
+			aggregate : {
+				bar : {
+					grandTotal : true
+				}
+			}
+		});
+		this.mock(_AggregationHelper).expects("hasGrandTotal")
+			.withExactArgs(sinon.match.same(oCache.oAggregation.aggregate))
+			.returns(true);
+		this.mock(_AggregationHelper).expects("buildApply")
+			.withExactArgs(sinon.match.same(oCache.oAggregation), {}, -1)
+			.returns("~mQueryOptions~");
+		this.mock(this.oRequestor).expects("buildQueryString")
+			.withExactArgs("/Foo", "~mQueryOptions~", false, false, true)
+			.returns("~sQueryString~");
+		const oGroupLock = {
+			getUnlockedCopy : mustBeMocked
+		};
+		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
+			.returns("~oUnlockedGroupLock~");
+		const oError = new Error("Intentionally failed");
+		this.mock(this.oRequestor).expects("request")
+			.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~")
+			.rejects(oError);
+		this.mock(_Helper).expects("updateExisting").never();
+
+		// code under test
+		return oCache.readGrandTotal(oGroupLock).then(() => {
+			assert.ok(false, "unexpected success");
+		}, (oError0) => {
+			// no error handling in _AggregationCache#readGrandTotal
+			assert.strictEqual(oError0, oError);
+		});
+	});
+
+	//*********************************************************************************************
 	[false, true].forEach((bDataAggregation) => {
 		QUnit.test("refreshKeptElements: data aggregation = " + bDataAggregation, function (assert) {
 			var oAggregation = bDataAggregation
@@ -4399,6 +4537,57 @@ sap.ui.define([
 				oCache.refreshKeptElements("~oGroupLock~", "~fnOnRemove~", "~bIgnorePendingChanges~",
 					"~bDropApply~"),
 				"~result~");
+		});
+	});
+
+	//*********************************************************************************************
+	[
+		["~oGroupLock~"],
+		["~oGroupLock~", "~foo~", "~bar~"]
+	].forEach((aArguments, i) => {
+		QUnit.test("refreshSingle: #" + i, async function (assert) {
+			const oCache = {
+				readGrandTotal : mustBeMocked
+			};
+			this.mock(_Cache.prototype).expects("refreshSingle").withExactArgs(...aArguments)
+				.on(oCache)
+				.returns("~oRefreshPromise~");
+			this.mock(oCache).expects("readGrandTotal")
+				.withExactArgs("~oGroupLock~")
+				.returns("~oReadPromise~");
+			this.mock(SyncPromise).expects("all").withExactArgs(["~oRefreshPromise~", "~oReadPromise~"])
+				.returns(SyncPromise.resolve(
+					Promise.all(["~refreshSingle result~", "~readGrandTotal result~"])));
+
+			// code under test
+			const oResultPromise = _AggregationCache.prototype.refreshSingle.apply(oCache, aArguments);
+
+			assert.ok(oResultPromise.isPending());
+			assert.strictEqual(await oResultPromise, "~refreshSingle result~");
+		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("refreshSingle: rejects", function (assert) {
+		const oCache = {
+			readGrandTotal : mustBeMocked
+		};
+		this.mock(_Cache.prototype).expects("refreshSingle").withExactArgs("~oGroupLock~")
+			.on(oCache)
+			.returns("~oRefreshPromise~");
+		this.mock(oCache).expects("readGrandTotal")
+			.withExactArgs("~oGroupLock~")
+			.returns("~oReadPromise~");
+		const oError = new Error("Intentionally failed");
+		this.mock(SyncPromise).expects("all").withExactArgs(["~oRefreshPromise~", "~oReadPromise~"])
+			.rejects(oError);
+
+		// code under test
+		return _AggregationCache.prototype.refreshSingle.call(oCache, "~oGroupLock~").then(() => {
+			assert.ok(false, "unexpected success");
+		}, (oError0) => {
+			// no error handling in _AggregationCache#refreshSingle
+			assert.strictEqual(oError0, oError);
 		});
 	});
 

@@ -245,8 +245,10 @@ sap.ui.define([
 		 *   The value for a "$top" system query option; it is removed from the returned map and
 		 *   turned into a "top()" transformation
 		 * @param {number} [iLevel=0]
-		 *   The current level; use <code>0</code> to bypass group levels
-		 * @param {boolean} [bFollowUp]
+		 *   The current level; use <code>0</code> to bypass group levels; use <code>-1</code> and
+		 *   only the query option "$$filterBeforeAggregate" (all others have to be omitted) to
+		 *   build the apply expression for grand totals only
+		 * @param {boolean} [bFollowUp=false]
 		 *   Tells whether this method is called for a follow-up request, not for the first one; in
 		 *   this case, neither the count nor grand totals or minimum or maximum values are
 		 *   requested again and <code>mAlias2MeasureAndMethod</code> is ignored
@@ -262,8 +264,8 @@ sap.ui.define([
 		 *
 		 * @public
 		 */
-		buildApply : function (oAggregation, mQueryOptions, iLevel, bFollowUp,
-				mAlias2MeasureAndMethod) {
+		buildApply : function (oAggregation, mQueryOptions, iLevel = 0, bFollowUp = false,
+				mAlias2MeasureAndMethod = undefined) {
 			var aAliases,
 				sApply = "",
 				aGrandTotalAggregate = [], // concat(aggregate(???),.) content for grand totals
@@ -313,12 +315,12 @@ sap.ui.define([
 			oAggregation.groupLevels.forEach(function (sGroup) {
 				oAggregation.group[sGroup] ??= {};
 			});
-			aSortedGroups = Object.keys(oAggregation.group).sort();
+			aSortedGroups = iLevel < 0 ? [] : Object.keys(oAggregation.group).sort();
 			if (aSortedGroups.length === oAggregation.groupLevels.length) {
 				// no other groups than those in groupLevels
 				oAggregation.groupLevels.pop();
 			}
-			bIsLeafLevel = !iLevel || iLevel > oAggregation.groupLevels.length;
+			bIsLeafLevel = iLevel <= 0 || iLevel > oAggregation.groupLevels.length;
 			aGroupBy = bIsLeafLevel
 				? aSortedGroups.filter(function (sGroup) {
 					return !oAggregation.groupLevels.includes(sGroup);

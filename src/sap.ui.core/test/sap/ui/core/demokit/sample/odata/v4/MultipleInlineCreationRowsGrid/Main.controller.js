@@ -16,8 +16,8 @@ sap.ui.define([
 		SubmitMode, TestUtils) {
 	"use strict";
 
-	var oSearchParams = new URLSearchParams(window.location.search),
-		iEmptyRowCount = parseInt(oSearchParams.get("emptyRows") || "2"),
+	var oURLSearchParams = new URLSearchParams(window.location.search),
+		iEmptyRowCount = parseInt(oURLSearchParams.get("emptyRows") || "2"),
 		LayoutType = library.LayoutType;
 
 	return Controller.extend("sap.ui.core.sample.odata.v4.MultipleInlineCreationRowsGrid.Main", {
@@ -153,8 +153,8 @@ sap.ui.define([
 		},
 
 		onChangeRowCount : function (oEvent) {
-			oSearchParams.set("emptyRows", oEvent.getParameter("selectedItem").getKey());
-			window.location.search = oSearchParams.toString();
+			oURLSearchParams.set("emptyRows", oEvent.getParameter("selectedItem").getKey());
+			window.location.search = oURLSearchParams.toString();
 		},
 
 		onDelete : function (oEvent) {
@@ -207,7 +207,7 @@ sap.ui.define([
 
 				this.bLegacy = TestUtils.retrieveData( // controlled by OPA
 						"sap.ui.core.sample.odata.v4.MultipleInlineCreationRowsGrid.legacy")
-					|| oSearchParams.get("legacy");
+					|| oURLSearchParams.get("legacy");
 
 				this.mCreateActivateMessages = [];
 				this.initMessagePopover("showMessages");

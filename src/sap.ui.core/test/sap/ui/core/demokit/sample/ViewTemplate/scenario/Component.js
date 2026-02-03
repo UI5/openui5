@@ -69,25 +69,25 @@ sap.ui.define([
 		},
 
 		createContent : function () {
-			var sAnnotationUri,
-				sAnnotationUri2,
-				sMockServerBaseUri
+			var sAnnotationURL,
+				sAnnotationURL2,
+				sMockServerBaseURL
 					= "test-resources/sap/ui/core/demokit/sample/ViewTemplate/scenario/data/",
 				oModel,
-				sServiceUri,
-				oUriParameters = new URLSearchParams(window.location.search),
-				bRealOData = oUriParameters.get("realOData") === "true";
+				sServiceURL,
+				oURLSearchParams = new URLSearchParams(window.location.search),
+				bRealOData = oURLSearchParams.get("realOData") === "true";
 
 			// GWSAMPLE_BASIC with external annotations
-			sAnnotationUri = "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2"
+			sAnnotationURL = "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2"
 				+ "/Annotations(TechnicalName='ZANNO4SAMPLE_ANNO_MDL',Version='0001')/$value";
-			sAnnotationUri2 = "/sap(====)/bc/bsp/sap/zanno_gwsample/annotations.xml";
-			sServiceUri = "/sap/opu/odata/IWBEP/GWSAMPLE_BASIC/";
+			sAnnotationURL2 = "/sap(====)/bc/bsp/sap/zanno_gwsample/annotations.xml";
+			sServiceURL = "/sap/opu/odata/IWBEP/GWSAMPLE_BASIC/";
 
 			if (!bRealOData) {
-				this.aMockServers.push(new MockServer({rootUri : sServiceUri}));
-				this.aMockServers[0].simulate(sMockServerBaseUri + "metadata.xml", {
-					sMockdataBaseUrl : sMockServerBaseUri,
+				this.aMockServers.push(new MockServer({rootUri : sServiceURL}));
+				this.aMockServers[0].simulate(sMockServerBaseURL + "metadata.xml", {
+					sMockdataBaseUrl : sMockServerBaseURL,
 					bGenerateMissingMockData : true
 				});
 				this.aMockServers[0].start();
@@ -97,22 +97,22 @@ sap.ui.define([
 			this.aMockServers.push(new MockServer({
 				requests : [{
 					method : "GET",
-					path : new RegExp(MockServer.prototype._escapeStringForRegExp(sAnnotationUri)),
+					path : new RegExp(MockServer.prototype._escapeStringForRegExp(sAnnotationURL)),
 					response : function (oXHR) {
-						oXHR.respondFile(200, {}, sMockServerBaseUri + "annotations.xml");
+						oXHR.respondFile(200, {}, sMockServerBaseURL + "annotations.xml");
 					}
 				}, {
 					method : "GET",
-					path : new RegExp(MockServer.prototype._escapeStringForRegExp(sAnnotationUri2)),
+					path : new RegExp(MockServer.prototype._escapeStringForRegExp(sAnnotationURL2)),
 					response : function (oXHR) {
-						oXHR.respondFile(200, {}, sMockServerBaseUri + "annotations2.xml");
+						oXHR.respondFile(200, {}, sMockServerBaseURL + "annotations2.xml");
 					}
 				}]
 			}));
 			this.aMockServers[this.aMockServers.length - 1].start();
 
-			oModel = new ODataModel(sServiceUri, {
-				annotationURI : [sAnnotationUri, sAnnotationUri2],
+			oModel = new ODataModel(sServiceURL, {
+				annotationURI : [sAnnotationURL, sAnnotationURL2],
 				json : true,
 				loadMetadataAsync : true,
 				skipMetadataAnnotationParsing : true

@@ -19425,7 +19425,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
-	// Scenario: list/detail with V2 adapter where the detail URI must be adjusted for V2
+	// Scenario: list/detail with V2 adapter where the detail URL must be adjusted for V2
 	// Additionally properties of a contained complex type are used with auto-$expand/$select
 	QUnit.test("V2 adapter: list/detail", function (assert) {
 		var oModel = this.createModelForV2FlightService({autoExpandSelect : true}),
@@ -24500,34 +24500,49 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Refreshing a single entity without bAllowRemoval is allowed if there is no visual grouping.
 	// JIRA: CPOUI5ODATAV4-3257
+	//
+	// Update grand total when single entity is refreshed; ensure that filter, search, and custom
+	// query options are considered when requesting the grand total again. All filters are applied
+	// before aggregation, because the leaves are not aggregated.
+	// JIRA: CPOUI5ODATAV4-3300
 	QUnit.test("Data Aggregation: leaves' key predicates", function (assert) {
 		var oBinding,
-			oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
+			oModel = this.createSalesOrdersModel123({autoExpandSelect : true}),
 			oTable,
-			sView = '\
-<Table id="table" items="{path : \'/SalesOrderList\',\
-		parameters : {\
-			$$aggregation : {\
-				aggregate : {\
-					GrossAmount : {grandTotal : true}\
-				},\
-				group : {\
-					LifecycleStatus : {},\
-					SalesOrderID : {}\
-				}\
-			}\
-		}}">\
-	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>\
-	<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>\
-	<Text id="level" text="{= %{@$ui5.node.level} }"/>\
-	<Text id="lifecycleStatus" text="{LifecycleStatus}"/>\
-	<Text id="grossAmount" text="{= %{GrossAmount}}"/>\
-	<Text id="salesOrderID" text="{SalesOrderID}"/>\
-</Table>',
+			sView = `
+<Table id="table" items="{path : '/SalesOrderList',
+		filters : [{path : 'LifecycleStatus', operator : 'GT', value1 : 'P'},
+			{path : 'GrossAmount', operator : 'LT', value1 : '100'}],
+		parameters : {
+			$$aggregation : {
+				aggregate : {
+					GrossAmount : {grandTotal : true}
+				},
+				group : {
+					LifecycleStatus : {},
+					SalesOrderID : {}
+				},
+				search : 'covfefe'
+			},
+			$count : true,
+			$orderby : 'LifecycleStatus desc',
+			custom : 'foo'
+		},
+		templateShareable : true}">
+	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>
+	<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>
+	<Text id="level" text="{= %{@$ui5.node.level} }"/>
+	<Text id="lifecycleStatus" text="{LifecycleStatus}"/>
+	<Text id="grossAmount" text="{= %{GrossAmount}}"/>
+	<Text id="salesOrderID" text="{SalesOrderID}"/>
+</Table>`,
 			that = this;
 
-		this.expectRequest("SalesOrderList?$apply=concat(aggregate(GrossAmount)"
+		this.expectRequest("SalesOrderList?sap-client=123&custom=foo&$apply="
+				+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
+				+ "/concat(aggregate(GrossAmount)"
 				+ ",groupby((LifecycleStatus,SalesOrderID),aggregate(GrossAmount))"
+				+ "/orderby(LifecycleStatus desc)"
 				+ "/concat(aggregate($count as UI5__count),top(99)))", {
 				value : [
 					{GrossAmount : "12345"},
@@ -24578,10 +24593,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}, new Error("Unsupported: bAllowRemoval && $$aggregation"));
 
 			that.expectChange("lifecycleStatus", [, "Z*"])
-				.expectRequest("PATCH SalesOrderList('26')", {
+				.expectRequest("PATCH SalesOrderList('26')?sap-client=123&custom=foo", {
 					payload : {LifecycleStatus : "Z*"}
 				}, {GrossAmount : "1", LifecycleStatus : "*Z*", SalesOrderID : "26"})
-				.expectRequest("SalesOrderList('26')?$select=Note", {Note : "Late"})
+				.expectRequest("SalesOrderList('26')?sap-client=123&custom=foo&$select=Note",
+					{Note : "Late"})
 				.expectChange("lifecycleStatus", [, "*Z*"]);
 
 			that.oLogMock.expects("error")
@@ -24622,19 +24638,23 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function () {
 			assert.strictEqual(oBinding.getCount(), 1);
 
-			that.expectRequest("SalesOrderList('25')"
-					+ "?$select=GrossAmount,LifecycleStatus,Note,SalesOrderID",
+			that.expectRequest("#4 SalesOrderList('25')?sap-client=123&custom=foo"
+					+ "&$select=GrossAmount,LifecycleStatus,Note,SalesOrderID",
 					{GrossAmount : "3", LifecycleStatus : "Y", Note : "Late", SalesOrderID : "25"})
-				.expectChange("grossAmount", [, "3"]);
+				.expectRequest("#4 SalesOrderList?sap-client=123&custom=foo&$apply="
+					+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)/"
+					+ "aggregate(GrossAmount)",
+					{value : [{GrossAmount : "54321"}]})
+				.expectChange("grossAmount", ["54321", "3"]);
 
 			return Promise.all([
-				// code under test (JIRA: CPOUI5ODATAV4-3257)
+				// code under test (JIRA: CPOUI5ODATAV4-3257, CPOUI5ODATAV4-3300)
 				oBinding.getCurrentContexts()[1].requestRefresh(),
 				that.waitForChanges(assert, "requestRefresh")
 			]);
 		}).then(function () {
-			that.expectRequest("SalesOrderList?$apply=groupby((LifecycleStatus))&$count=true"
-					+ "&$skip=0&$top=100", {
+			that.expectRequest("SalesOrderList?sap-client=123&$apply=groupby((LifecycleStatus))"
+					+ "&$count=true&$skip=0&$top=100", {
 					"@odata.count" : "2",
 					value : [
 						{LifecycleStatus : "Z"},
@@ -24642,18 +24662,25 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					]
 				})
 				.expectChange("isExpanded", [false, false])
-				.expectChange("isTotal", [false])
-				.expectChange("level", [1])
-				.expectChange("lifecycleStatus", ["Z"])
+				.expectChange("isTotal", [false, false])
+				.expectChange("level", [1, 1])
+				.expectChange("lifecycleStatus", ["Z", "Y"])
 				.expectChange("grossAmount", [undefined, undefined])
-				.expectChange("salesOrderID", [, null]);
+				.expectChange("salesOrderID", [null, null]);
 
-			oBinding.setAggregation({
-				aggregate : {
-					GrossAmount : {}
+			oTable.bindItems({
+				path : "/SalesOrderList",
+				parameters : {
+					$$aggregation : {
+						aggregate : {
+							GrossAmount : {}
+						},
+						groupLevels : ["LifecycleStatus", "SalesOrderID"]
+					}
 				},
-				groupLevels : ["LifecycleStatus", "SalesOrderID"]
+				template : oTable.getBindingInfo("items").template
 			});
+			oBinding = oTable.getBinding("items");
 
 			return that.waitForChanges(assert, "show collapsed group headers");
 		}).then(function () {

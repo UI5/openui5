@@ -92,7 +92,7 @@ sap.ui.define([
 			this.getView().attachEventOnce("modelContextChange", function () {
 				var oTreeTable = this.byId("table"),
 					oRowsBinding = oTreeTable.getBinding("rows"),
-					oUriParameters = new URLSearchParams(window.location.search),
+					oURLSearchParams = new URLSearchParams(window.location.search),
 					oView = this.getView();
 
 				oView.setModel(new JSONModel({
@@ -101,12 +101,12 @@ sap.ui.define([
 				}), "ui");
 				this.bDescending = undefined;
 
-				const sVisibleRowCount = oUriParameters.get("visibleRowCount");
+				const sVisibleRowCount = oURLSearchParams.get("visibleRowCount");
 				if (sVisibleRowCount) {
 					oTreeTable.getRowMode().setRowCount(parseInt(sVisibleRowCount));
 				}
 
-				const sExpandTo = oUriParameters.get("expandTo");
+				const sExpandTo = oURLSearchParams.get("expandTo");
 				this._oAggregation = {
 					expandTo : sExpandTo === "*"
 						? Number.MAX_SAFE_INTEGER

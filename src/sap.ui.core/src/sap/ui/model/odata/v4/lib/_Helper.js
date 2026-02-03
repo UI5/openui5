@@ -1831,13 +1831,13 @@ sap.ui.define([
 		 * @returns {object} - A map of URL parameters
 		 */
 		getUrlParameters : function (sQuery) {
-			const mUrlParameters = {};
-			const oUrlParams = new URLSearchParams(sQuery);
-			for (const sKey of oUrlParams.keys()) {
-				const aValues = oUrlParams.getAll(sKey);
-				mUrlParameters[sKey] = aValues.length > 1 ? aValues : aValues[0];
+			const mURLParameters = {};
+			const oURLSearchParams = new URLSearchParams(sQuery);
+			for (const sKey of oURLSearchParams.keys()) {
+				const aValues = oURLSearchParams.getAll(sKey);
+				mURLParameters[sKey] = aValues.length > 1 ? aValues : aValues[0];
 			}
-			return mUrlParameters;
+			return mURLParameters;
 		},
 
 		/**
@@ -2295,13 +2295,13 @@ sap.ui.define([
 		 * @public
 		 */
 		makeAbsolute : function (sUrl, sBase, bServiceUrl) {
-			const oUrl = new URL(sUrl, new URL(sBase, document.baseURI));
+			const oURL = new URL(sUrl, new URL(sBase, document.baseURI));
 			if (bServiceUrl) {
-				oUrl.pathname = oUrl.pathname.slice(0, oUrl.pathname.lastIndexOf("/") + 1);
+				oURL.pathname = oURL.pathname.slice(0, oURL.pathname.lastIndexOf("/") + 1);
 			}
-			return oUrl.origin === new URL(document.baseURI).origin
-				? oUrl.toString().slice(oUrl.origin.length)
-				: oUrl.toString();
+			return oURL.origin === new URL(document.baseURI).origin
+				? oURL.toString().slice(oURL.origin.length)
+				: oURL.toString();
 		},
 
 		/**
