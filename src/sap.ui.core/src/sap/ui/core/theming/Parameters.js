@@ -97,8 +97,7 @@ sap.ui.define([
 	 * @param {string} libInfo.id The library identifier (e.g., 'sap.ui.core')
 	 * @param {string} libInfo.linkId The ID of the CSS link element
 	 * @param {boolean} libInfo.finishedLoading Indicates whether the library CSS has finished loading
-	 * @returns {boolean} `true` if parameters were successfully parsed (sync mode) or if the CSS
-	 *   is loaded (async mode); `false` otherwise
+	 * @returns {boolean} `true` if the corresponding library.css is loaded; `false` otherwise
 	 * @private
 	 */
 	function parseParameters(libInfo) {
@@ -107,6 +106,7 @@ sap.ui.define([
 		// In some browsers (e.g. Safari) it might happen that after switching the theme or adopting the <link>'s href,
 		// the parameters from the previous stylesheet are taken. This can be prevented by checking whether the theme is applied.
 		if (libInfo.finishedLoading) {
+			parsedLibraries.add(libInfo.id);
 			const oLink = document.getElementById(libInfo.linkId);
 			const sDataUri = window.getComputedStyle(oLink).getPropertyValue("background-image");
 			const aParams = /\(["']?data:text\/plain;utf-8,(.*?)['"]?\)$/i.exec(sDataUri);
@@ -125,17 +125,12 @@ sap.ui.define([
 				try {
 					const oParams = JSON.parse(sParams);
 					mergeParameters(oParams, oUrl.themeBaseUrl);
-					parsedLibraries.add(libInfo.id);
-					return true; // parameters successfully parsed
 				} catch (ex) {
 					throw new Error("Could not parse theme parameters from " + oUrl.styleSheetUrl + ".", {
 						cause: ex
 					});
 				}
 			}
-			// async: always return bThemeApplied. Issues during parsing are not relevant for further processing because
-			//        there is no fallback as in the sync case
-			parsedLibraries.add(libInfo.id);
 			return true;
 		}
 
@@ -162,7 +157,7 @@ sap.ui.define([
 	}
 
 	/**
-	 * Returns parameter value from given map and handles legacy parameter names
+	 * Returns requested parameter value and handles legacy parameter names
 	 *
 	 * @param {string} sParameterName Parameter name / key
 	 * @returns {string|undefined} parameter value or undefined
@@ -196,34 +191,18 @@ sap.ui.define([
 	 */
 
 	/**
-	 * <p>
 	 * Returns the current value for one or more theming parameters, depending on the given arguments.
-	 * The synchronous usage of this API has been deprecated and only the asynchronous usage should still be used
-	 * (see the 4th bullet point and the code examples below).
-	 * </p>
 	 *
-	 * <p>
 	 * The theming parameters are immutable and cannot be changed at runtime.
 	 * Multiple <code>Parameters.get()</code> API calls for the same parameter name will always result in the same parameter value.
-	 * </p>
+	 * The returned key-value maps are a copy so changing values in the map does not have any effect.
 	 *
-	 * <p>
-	 * The following API variants are available (see also the below examples):
-	 * <ul>
-	 * <li> <b>(deprecated since 1.92)</b> If no parameter is given a key-value map containing all parameters is returned</li>
-	 * <li> <b>(deprecated since 1.94)</b> If a <code>string</code> is given as first parameter the value is returned as a <code>string</code></li>
-	 * <li> <b>(deprecated since 1.94)</b> If an <code>array</code> is given as first parameter a key-value map containing all parameters from the <code>array</code> is returned</li>
-	 * <li>If an <code>object</code> is given as first parameter the result is returned immediately in case all parameters are loaded and available or within the callback in case not all CSS files are already loaded.
-	 * This is the <b>only asynchronous</b> API variant. This variant is the preferred way to retrieve theming parameters.
-	 * The structure of the return value is the same as listed above depending on the type of the name property within the <code>object</code>.</li>
-	 * </ul>
-	 * </p>
+	 * For a single parameter, the result is a string. For multiple parameters, it is an object with parameter names and values as key-value pairs.
+	 * The result is returned immediately in case all parameters are loaded and available. Otherwise, if a callback function is given,
+	 * <code>undefined</code> is returned and the parameters are delivered asynchronously via the given callback, once all CSS files have been loaded.
+	 * If no callback is given, the incomplete result is also returned immediately.
 	 *
-	 * <p>The returned key-value maps are a copy so changing values in the map does not have any effect</p>
-	 *
-	 * <p>
-	 * Please see the examples below for a detailed guide on how to use the <b>asynchronous variant</b> of the API.
-	 * </p>
+	 * Please see the examples below for a detailed guide on how to use the API.
 	 *
 	 * @example <caption>Scenario 1: Parameters are already available</caption>
 	 *  // "sapUiParam1", "sapUiParam2", "sapUiParam3" are already available
@@ -264,11 +243,10 @@ sap.ui.define([
 	 *     }
 	 *  }));
 	 *
-	 * @param {string | string[] | object} vName the (array with) CSS parameter name(s) or an object containing the (array with) CSS parameter name(s),
-	 *     and a callback for async retrieval of parameters.
+	 * @param {object} vName an object containing the (array with) CSS parameter name(s) and a callback for async retrieval of parameters.
 	 * @param {string | string[]} vName.name the (array with) CSS parameter name(s)
 	 * @param {function(sap.ui.core.theming.Parameters.Value)} [vName.callback] If given, the callback is only executed in case there are still parameters pending and one or more of the requested parameters is missing.
-	 * @returns {sap.ui.core.theming.Parameters.Value} the CSS parameter value(s) or <code>undefined</code> if the parameters could not be retrieved.
+	 * @returns {sap.ui.core.theming.Parameters.Value} the CSS parameter value(s) or <code>undefined</code> if not all parameters could be retrieved synchronously.
 	 *
 	 * @public
 	 */
@@ -291,7 +269,6 @@ sap.ui.define([
 		}
 
 		if (vName instanceof Object && !Array.isArray(vName)) {
-			// async variant of Parameters.get
 			if (!vName.name) {
 				throw new Error("sap.ui.core.theming.Parameters: Get was called with an object argument without one or more parameter names.");
 			}
