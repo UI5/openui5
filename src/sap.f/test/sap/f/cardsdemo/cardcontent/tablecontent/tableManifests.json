@@ -133,7 +133,8 @@
 							"value": "{status}",
 							"state": "{statusState}",
 							"showStateIcon": "{showStateIcon}",
-							"customStateIcon": "{customStateIcon}"
+							"customStateIcon": "{customStateIcon}",
+							"inverted": true
 						},
 						{
 							"title": "Status",

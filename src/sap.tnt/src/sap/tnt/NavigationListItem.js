@@ -70,6 +70,8 @@ sap.ui.define([
 			properties: {
 				/**
 				 * Specifies the icon for the item.
+				 *
+				 * <b>Note:</b> By design, icons on second-level (child) navigation items are not rendered.
 				 */
 				icon: { type: "sap.ui.core.URI", group: "Misc", defaultValue: "" },
 
@@ -125,7 +127,7 @@ sap.ui.define([
 
 				/**
 				 * Specifies if the item has a special design.
-				 * NOTE: If <code>design</code> is not <code>NavigationListItemDesign.Default</code> sub-items can't be added.
+				 * <b>Note:</b> If the <code>design</code> property is not set to <code>NavigationListItemDesign.Default</code>, sub-items cannot be added.
 				 * @since 1.133.0
 				 * @experimental Behavior might change.
 				 */
@@ -638,8 +640,6 @@ sap.ui.define([
 			selected: bSelected
 		};
 		this._renderStartLink(oRM, oLinkAriaProps, bDisabled);
-
-		this._renderIcon(oRM);
 
 		this._renderText(oRM);
 

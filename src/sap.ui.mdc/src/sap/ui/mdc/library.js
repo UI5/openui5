@@ -73,6 +73,7 @@ sap.ui.define([
 	  "sap.ui.mdc.table.ResponsiveTableType",
 	  "sap.ui.mdc.table.RowSettings",
 	  "sap.ui.mdc.table.ActionLayoutData",
+	  "sap.ui.mdc.chart.ActionLayoutData",
 	  "sap.ui.mdc.chart.Item",
 	  "sap.ui.mdc.chart.ChartSelectionDetails",
 	  "sap.ui.mdc.chart.SelectionButton",

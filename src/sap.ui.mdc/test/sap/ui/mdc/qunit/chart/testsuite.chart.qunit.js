@@ -71,6 +71,9 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+			"ToolbarControlFactory": {
+				module: "./ToolbarControlFactory.qunit"
+			},
 			"ChartImplementationContainer": {
 				module: "./ChartImplementationContainer.qunit",
 				sinon: {

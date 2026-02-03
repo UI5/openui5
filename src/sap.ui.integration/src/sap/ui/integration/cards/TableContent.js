@@ -426,7 +426,8 @@ sap.ui.define([
 				text: oColumn.value,
 				state: oColumn.state,
 				showStateIcon: oColumn.showStateIcon,
-				customIcon: oColumn.customStateIcon
+				customIcon: oColumn.customStateIcon,
+				inverted: oColumn.inverted
 			});
 
 			this._oActions.attach({

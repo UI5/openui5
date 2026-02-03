@@ -12,6 +12,8 @@
 	padding-left: 1rem;
 }
 
-.sapMListModeDelete > .sapMCLI {
+.sapMListModeDelete > .sapMCLI,
+.sapMCLI:has(>.sapMLIBActions:last-child),
+.sapMCLI:has(>.sapMLIBActions + .sapMLIBNavigated) {
 	padding-right: 1rem;
 }

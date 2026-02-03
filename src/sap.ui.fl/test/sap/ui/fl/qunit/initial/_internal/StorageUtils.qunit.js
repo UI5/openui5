@@ -257,6 +257,24 @@ sap.ui.define([
 		QUnit.test("when isStorageResponseFilled is called without flex data", function(assert) {
 			assert.notOk(Utils.isStorageResponseFilled(), "then the response is considered not filled");
 		});
+
+		function testIsStorageResponseFilledForNamespace(sNamespace) {
+			QUnit.test(`when isStorageResponseFilled is called with data in '${sNamespace}'`, function(assert) {
+				const oFlexData = Utils.getEmptyFlexDataResponse();
+				const aPathParts = sNamespace.split(".");
+				if (aPathParts.length === 1) {
+					oFlexData[aPathParts[0]].push({/* some flex object */});
+				} else {
+					oFlexData[aPathParts[0]][aPathParts[1]].push({/* some flex object */});
+				}
+				assert.ok(Utils.isStorageResponseFilled(oFlexData), "then the response is considered filled");
+			});
+		}
+
+		["appDescriptorChanges", "annotationChanges", "changes",
+			"comp.changes", "comp.variants", "comp.defaultVariants", "comp.standardVariants",
+			"variants", "variantChanges", "variantDependentControlChanges", "variantManagementChanges"
+		].forEach(testIsStorageResponseFilledForNamespace);
 	});
 
 	QUnit.module("Given a KeyUserConnector and PersonalizationConnector is configured", {

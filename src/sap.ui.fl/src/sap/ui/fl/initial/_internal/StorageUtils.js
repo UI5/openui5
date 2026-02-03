@@ -358,7 +358,7 @@ sap.ui.define([
 	StorageUtils.getAllFlexObjectNamespaces = function() {
 		return [
 			"appDescriptorChanges", "annotationChanges", "changes",
-			"comp.changes", "comp.changes", "comp.defaultVariants", "comp.standardVariants",
+			"comp.changes", "comp.variants", "comp.defaultVariants", "comp.standardVariants",
 			"variants", "variantChanges", "variantDependentControlChanges", "variantManagementChanges"
 		];
 	};

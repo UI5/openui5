@@ -1624,9 +1624,9 @@ sap.ui.define([
 		let oToolbar;
 		const bUshellAvailable = !!FlexUtils.getUshellContainer();
 		if (bUshellAvailable) {
-			const oUshellRtaApi = await requireAsync("sap/ushell/api/RTA");
-			oProperties.ushellApi = oUshellRtaApi;
 			if (Utils.isOriginalFioriToolbarAccessible()) {
+				const oUshellRtaApi = await requireAsync("sap/ushell/api/RTA");
+				oProperties.ushellApi = oUshellRtaApi;
 				oToolbar = new FioriToolbar(oProperties);
 			} else {
 				oToolbar = new FioriLikeToolbar(oProperties);

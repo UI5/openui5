@@ -33,72 +33,63 @@
 					"salesOrder": "5000010050",
 					"netAmount": "2K USD",
 					"status": "Delivered",
-					"statusState": "Success",
-					"deliveryProgress": 100
+					"statusState": "Success"
 				},
 				{
 					"product": "Astro Laptop 1516",
 					"salesOrder": "5000010051",
 					"netAmount": "127k USD",
 					"status": "Canceled",
-					"statusState": "Error",
-					"deliveryProgress": 0
+					"statusState": "Error"
 				},
 				{
 					"product": "Astro Phone 6",
 					"salesOrder": "5000010052",
 					"netAmount": "8K USD",
 					"status": "In Progress",
-					"statusState": "Warning",
-					"deliveryProgress": 33
+					"statusState": "Warning"
 				},
 				{
 					"product": "Beam Breaker B-1",
 					"salesOrder": "5000010053",
 					"netAmount": "25K USD",
 					"status": "Delivered",
-					"statusState": "Success",
-					"deliveryProgress": 100
+					"statusState": "Success"
 				},
 				{
 					"product": "Beam Breaker B-2",
 					"salesOrder": "5000010054",
 					"netAmount": "7K USD",
 					"status": "Delivered",
-					"statusState": "Success",
-					"deliveryProgress": 100
+					"statusState": "Success"
 				},
 				{
 					"product": "Beam Breaker B-3",
 					"salesOrder": "5000010050",
 					"netAmount": "2K USD",
 					"status": "Delivered",
-					"statusState": "Success",
-					"deliveryProgress": 100
+					"statusState": "Success"
 				},
 				{
 					"product": "Benda Laptop 1408",
 					"salesOrder": "5000010051",
 					"netAmount": "127k USD",
 					"status": "Canceled",
-					"statusState": "Error",
-					"deliveryProgress": 0
+					"statusState": "Error"
 				},
 				{
 					"product": "Bending Screen 21HD",
 					"salesOrder": "5000010052",
 					"netAmount": "8K USD",
 					"status": "In Progress",
-					"statusState": "Warning",
-					"deliveryProgress": 27
+					"statusState": "Warning"
 				},
 				{
 					"product": "Blaster Extreme",
 					"salesOrder": "5000010052",
 					"netAmount": "8K USD",
 					"status": "In Progress",
-					"statusState": "Warning",
-					"deliveryProgress": 51
+					"statusState": "Warning"
 				}
 			]
 		},
@@ -123,15 +114,9 @@
 					{
 						"title": "Status",
 						"value": "{status}",
-						"state": "{statusState}"
-					},
-					{
-						"title": "Delivery Progress",
-						"progressIndicator": {
-							"percent": "{deliveryProgress}",
-							"text": "{= format.percent(${deliveryProgress} / 100)}",
-							"state": "{statusState}"
-						}
+						"state": "{statusState}",
+						"showStateIcon": true,
+						"inverted": true
 					}
 				]
 			}

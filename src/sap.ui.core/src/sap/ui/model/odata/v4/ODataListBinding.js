@@ -3043,16 +3043,17 @@ sap.ui.define([
 	/**
 	 * Method not supported
 	 *
-	 * @param {string} [_sPath]
 	 * @returns {Array}
 	 * @throws {Error}
 	 *
+	 * @deprecated As of version 1.37.0, calling this method is not supported
 	 * @public
 	 * @see sap.ui.model.ListBinding#getDistinctValues
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 	// @override sap.ui.model.ListBinding#getDistinctValues
-	ODataListBinding.prototype.getDistinctValues = function (_sPath) {
+	ODataListBinding.prototype.getDistinctValues = function () {
 		throw new Error("Unsupported operation: v4.ODataListBinding#getDistinctValues");
 	};
 

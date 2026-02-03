@@ -623,17 +623,23 @@ sap.ui.define([
 						: oResult.editUrl;
 					const fnSetUpsertPromise = _Helper.hasPathSuffix(that.sPath, sEntityPath)
 						? that.setCreated.bind(that)
-						: null;
+						: undefined;
 
 					// if request is canceled fnPatchSent and fnErrorCallback are not called and
 					// returned Promise is rejected -> no patch events
-					return oCache.update(oGroupLock, oResult.propertyPath, vValue,
-						bSkipRetry ? undefined : errorCallback, sEditUrl, sEntityPath,
+					return oCache.update(oResult.propertyPath, vValue, {
+						sEditUrl : sEditUrl,
+						sEntityPath : sEntityPath,
+						fnErrorCallback : bSkipRetry ? undefined : errorCallback,
+						oGroupLock : oGroupLock,
+						fnIsKeepAlive : that.isEffectivelyKeptAlive.bind(that),
+						fnPatchSent : patchSent,
+						bPatchWithoutSideEffects : oBinding.isPatchWithoutSideEffects(),
+						fnSetUpsertPromise : fnSetUpsertPromise,
 						// Note: use that.oModel intentionally, fails if already destroyed!
-						oMetaModel.getUnitOrCurrencyPath(that.oModel.resolve(sPath, that)),
-						oBinding.isPatchWithoutSideEffects(), patchSent,
-						that.isEffectivelyKeptAlive.bind(that), fnSetUpsertPromise
-					).then(function () {
+						sUnitOrCurrencyPath : oMetaModel.getUnitOrCurrencyPath(
+							that.oModel.resolve(sPath, that))
+					}).then(function () {
 						firePatchCompleted(true);
 					}, function (oError) {
 						firePatchCompleted(false);

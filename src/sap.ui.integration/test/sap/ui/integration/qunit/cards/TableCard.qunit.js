@@ -1336,4 +1336,294 @@ sap.ui.define([
 		assert.strictEqual(oTable.getWidth(), "auto", "Table width is set to 'auto' in dialog");
 		assert.strictEqual(oTable.getFixedLayout(), false, "Table fixedLayout is set to false in dialog");
 	});
+
+	QUnit.module("Object Status", {
+		beforeEach: function () {
+			this.oCard = new Card({
+				width: "800px"
+			});
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+		},
+		afterEach: function () {
+			this.oCard.destroy();
+			this.oCard = null;
+		}
+	});
+
+	QUnit.test("ObjectStatus is rendered with correct properties", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.cards.table.objectstatus"
+			},
+			"sap.card": {
+				"type": "Table",
+				"header": {
+					"title": "ObjectStatus Test"
+				},
+				"content": {
+					"data": {
+						"json": [
+							{
+								"status": "Delivered",
+								"statusState": "Success"
+							},
+							{
+								"status": "Canceled",
+								"statusState": "Error"
+							},
+							{
+								"status": "In Progress",
+								"statusState": "Warning"
+							}
+						]
+					},
+					"row": {
+						"columns": [
+							{
+								"title": "Status",
+								"value": "{status}",
+								"state": "{statusState}"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		// Act
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oTable = this.oCard.getCardContent().getAggregation("_content");
+		const aRows = oTable.getItems();
+		const oFirstStatusCell = aRows[0].getCells()[0];
+		const oSecondStatusCell = aRows[1].getCells()[0];
+		const oThirdStatusCell = aRows[2].getCells()[0];
+
+		// Assert
+		assert.ok(oFirstStatusCell.isA("sap.ui.integration.controls.ObjectStatus"), "Status cell should be of type ObjectStatus");
+		assert.strictEqual(oFirstStatusCell.getText(), "Delivered", "First status should have correct text");
+		assert.strictEqual(oFirstStatusCell.getState(), "Success", "First status should have correct state");
+
+		assert.ok(oSecondStatusCell.isA("sap.ui.integration.controls.ObjectStatus"), "Second status cell should be of type ObjectStatus");
+		assert.strictEqual(oSecondStatusCell.getText(), "Canceled", "Second status should have correct text");
+		assert.strictEqual(oSecondStatusCell.getState(), "Error", "Second status should have correct state");
+
+		assert.ok(oThirdStatusCell.isA("sap.ui.integration.controls.ObjectStatus"), "Third status cell should be of type ObjectStatus");
+		assert.strictEqual(oThirdStatusCell.getText(), "In Progress", "Third status should have correct text");
+		assert.strictEqual(oThirdStatusCell.getState(), "Warning", "Third status should have correct state");
+	});
+
+	QUnit.test("ObjectStatus with showStateIcon property", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.cards.table.objectstatus.icon"
+			},
+			"sap.card": {
+				"type": "Table",
+				"header": {
+					"title": "ObjectStatus with State Icon"
+				},
+				"content": {
+					"data": {
+						"json": [
+							{
+								"status": "Delivered",
+								"statusState": "Success",
+								"showIcon": true
+							},
+							{
+								"status": "Canceled",
+								"statusState": "Error",
+								"showIcon": false
+							}
+						]
+					},
+					"row": {
+						"columns": [
+							{
+								"title": "Status",
+								"value": "{status}",
+								"state": "{statusState}",
+								"showStateIcon": "{showIcon}"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		// Act
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oTable = this.oCard.getCardContent().getAggregation("_content");
+		const aRows = oTable.getItems();
+		const oFirstStatusCell = aRows[0].getCells()[0];
+		const oSecondStatusCell = aRows[1].getCells()[0];
+
+		// Assert
+		assert.ok(oFirstStatusCell.getShowStateIcon(), "First status should show state icon");
+		assert.notOk(oSecondStatusCell.getShowStateIcon(), "Second status should not show state icon");
+	});
+
+	QUnit.test("ObjectStatus with custom state icon", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.cards.table.objectstatus.customicon"
+			},
+			"sap.card": {
+				"type": "Table",
+				"header": {
+					"title": "ObjectStatus with Custom Icon"
+				},
+				"content": {
+					"data": {
+						"json": [
+							{
+								"status": "Active",
+								"statusState": "Success",
+								"customIcon": "sap-icon://bbyd-active-sales"
+							}
+						]
+					},
+					"row": {
+						"columns": [
+							{
+								"title": "Status",
+								"value": "{status}",
+								"state": "{statusState}",
+								"customStateIcon": "{customIcon}"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		// Act
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oTable = this.oCard.getCardContent().getAggregation("_content");
+		const aRows = oTable.getItems();
+		const oStatusCell = aRows[0].getCells()[0];
+
+		// Assert
+		assert.strictEqual(oStatusCell.getCustomIcon(), "sap-icon://bbyd-active-sales", "Status should have correct custom icon");
+	});
+
+	QUnit.test("ObjectStatus with inverted property", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.cards.table.objectstatus.inverted"
+			},
+			"sap.card": {
+				"type": "Table",
+				"header": {
+					"title": "ObjectStatus Inverted"
+				},
+				"content": {
+					"data": {
+						"json": [
+							{
+								"status": "Critical",
+								"statusState": "Warning",
+								"isInverted": true
+							},
+							{
+								"status": "Success",
+								"statusState": "Success",
+								"isInverted": false
+							}
+						]
+					},
+					"row": {
+						"columns": [
+							{
+								"title": "Status",
+								"value": "{status}",
+								"state": "{statusState}",
+								"inverted": "{isInverted}"
+							},
+							{
+								"title": "Status",
+								"value": "{status}",
+								"state": "{statusState}",
+								"inverted": "{isInverted}"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		// Act
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oTable = this.oCard.getCardContent().getAggregation("_content");
+		const aRows = oTable.getItems();
+		const oFirstStatusCell = aRows[0].getCells()[0];
+		const oSecondStatusCell = aRows[1].getCells()[0];
+
+		// Assert
+		assert.ok(oFirstStatusCell.getInverted(), "First status should be inverted");
+		assert.notOk(oSecondStatusCell.getInverted(), "Second status should not be inverted");
+	});
+
+	QUnit.test("ObjectStatus is rendered in DOM", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.cards.table.objectstatus.rendered"
+			},
+			"sap.card": {
+				"type": "Table",
+				"header": {
+					"title": "ObjectStatus Rendering"
+				},
+				"content": {
+					"data": {
+						"json": [
+							{
+								"status": "Delivered",
+								"statusState": "Success"
+							}
+						]
+					},
+					"row": {
+						"columns": [
+							{
+								"title": "Status",
+								"value": "{status}",
+								"state": "{statusState}"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		// Act
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oTable = this.oCard.getCardContent().getAggregation("_content");
+		const aRows = oTable.getItems();
+		const oStatusCell = aRows[0].getCells()[0];
+
+		// Assert
+		assert.ok(oStatusCell.getDomRef(), "ObjectStatus should be rendered in the DOM");
+		assert.ok(oStatusCell.getDomRef().textContent.includes("Delivered"), "Rendered ObjectStatus should contain the status text");
+	});
 });

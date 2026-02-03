@@ -3836,20 +3836,25 @@ sap.ui.define([
 				that.mock(oContext).expects("isEffectivelyKeptAlive").withExactArgs().on(oContext)
 					.exactly(i === 1 ? 1 : 0).returns("~bKeepAlive~");
 				that.mock(oCache).expects("update")
-					.withExactArgs(sinon.match.same(oGroupLock), "property/path", "new value",
-						/*fnErrorCallback*/bSkipRetry ? undefined : sinon.match.func, "edit/url",
-						"helper/path", "unit/or/currency/path",
-						sinon.match.same(bPatchWithoutSideEffects), /*fnPatchSent*/sinon.match.func,
-						/*fnIsKeepAlive*/sinon.match.func,
-						/*fnSetUpsertPromise*/bSuffix ? "~setCreated~" : null)
-					.callsFake(function () {
+					.withExactArgs("property/path", "new value", {
+						sEditUrl : "edit/url",
+						sEntityPath : "helper/path",
+						fnErrorCallback : bSkipRetry ? undefined : sinon.match.func,
+						oGroupLock : sinon.match.same(oGroupLock),
+						fnIsKeepAlive : sinon.match.func,
+						bPatchWithoutSideEffects : sinon.match.same(bPatchWithoutSideEffects),
+						fnPatchSent : sinon.match.func,
+						fnSetUpsertPromise : bSuffix ? "~setCreated~" : undefined,
+						sUnitOrCurrencyPath : "unit/or/currency/path"
+					})
+					.callsFake(function (_sPropertyPath, _vValue, mParameters) {
 						assert.strictEqual(oContext.bFiringCreateActivate, bFiringCreateActivate);
 						assert.strictEqual(oContext.isInactive(),
 							bFiringCreateActivate || bInactive);
 						return SyncPromise.resolve(
 							fnScenario(assert, that.mock(oModel), oBinding, oBindingMock,
-								/*fnErrorCallback*/arguments[3], /*fnPatchSent*/arguments[8],
-								/*fnIsKeepAlive*/arguments[9], oError, oContext));
+								mParameters.fnErrorCallback, mParameters.fnPatchSent,
+								mParameters.fnIsKeepAlive, oError, oContext));
 					});
 
 				// code under test
@@ -3957,11 +3962,17 @@ sap.ui.define([
 					.returns("unit/or/currency/path");
 
 				that.mock(oCache).expects("update")
-					.withExactArgs(sinon.match.same(oGroupLock), "property/path", "new value",
-						/*fnErrorCallback*/sinon.match.func, "edit/url", "helper/path",
-						"unit/or/currency/path", sinon.match.same(bPatchWithoutSideEffects),
-						/*fnPatchSent*/sinon.match.func, /*fnIsKeepAlive*/sinon.match.func,
-						/*fnSetUpsertPromise*/null)
+					.withExactArgs("property/path", "new value", {
+						sEditUrl : "edit/url",
+						sEntityPath : "helper/path",
+						fnErrorCallback : sinon.match.func,
+						oGroupLock : sinon.match.same(oGroupLock),
+						fnIsKeepAlive : sinon.match.func,
+						fnPatchSent : sinon.match.func,
+						bPatchWithoutSideEffects : sinon.match.same(bPatchWithoutSideEffects),
+						fnSetUpsertPromise : undefined,
+						sUnitOrCurrencyPath : "unit/or/currency/path"
+					})
 					.resolves();
 
 				return fnProcessor(oCache, "some/relative/path", oBinding);
@@ -4042,11 +4053,17 @@ sap.ui.define([
 					.returns("unit/or/currency/path");
 
 				that.mock(oCache).expects("update")
-					.withExactArgs(sinon.match.same(oGroupLock), "property/path", "new value",
-						/*fnErrorCallback*/sinon.match.func, "edit/url", "helper/path",
-						"unit/or/currency/path", sinon.match.same(bPatchWithoutSideEffects),
-						/*fnPatchSent*/sinon.match.func, /*fnIsKeepAlive*/sinon.match.func,
-						/*fnSetUpsertPromise*/null)
+					.withExactArgs("property/path", "new value", {
+						sEditUrl : "edit/url",
+						sEntityPath : "helper/path",
+						fnErrorCallback : sinon.match.func,
+						oGroupLock : sinon.match.same(oGroupLock),
+						fnIsKeepAlive : sinon.match.func,
+						fnPatchSent : sinon.match.func,
+						bPatchWithoutSideEffects : sinon.match.same(bPatchWithoutSideEffects),
+						fnSetUpsertPromise : undefined,
+						sUnitOrCurrencyPath : "unit/or/currency/path"
+					})
 					.resolves();
 
 				return fnProcessor(oCache, "/reduced/path", oBinding);
@@ -4193,12 +4210,17 @@ sap.ui.define([
 					that.mock(oMetaModel).expects("isAddressViaNavigationPath").withExactArgs()
 						.returns(bAddressViaNavigationPath);
 					that.mock(oCache).expects("update")
-						.withExactArgs(sinon.match.same(oGroupLock), "property/path", "new value",
-							/*fnErrorCallback*/bSkipRetry ? undefined : sinon.match.func,
-							bAddressViaNavigationPath ? "entity/path" : "edit/url", "helper/path",
-							"unit/or/currency/path", sinon.match.same(bPatchWithoutSideEffects),
-							/*fnPatchSent*/sinon.match.func, /*fnIsKeepAlive*/sinon.match.func,
-							/*fnSetUpsertPromise*/null)
+						.withExactArgs("property/path", "new value", {
+							sEditUrl : bAddressViaNavigationPath ? "entity/path" : "edit/url",
+							sEntityPath : "helper/path",
+							fnErrorCallback : bSkipRetry ? undefined : sinon.match.func,
+							oGroupLock : sinon.match.same(oGroupLock),
+							fnIsKeepAlive : sinon.match.func,
+							fnPatchSent : sinon.match.func,
+							bPatchWithoutSideEffects : sinon.match.same(bPatchWithoutSideEffects),
+							fnSetUpsertPromise : undefined,
+							sUnitOrCurrencyPath : "unit/or/currency/path"
+						})
 						.resolves();
 				}
 
