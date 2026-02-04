@@ -589,6 +589,30 @@ SPDX-License-Identifier = "MIT"
 SPDX-FileComment = "these files belong to: @cfworker/json-schema"
 
 
+# Library: sap.ui.mdc:
+
+[[annotations]]
+path = "src/sap.ui.mdc/test/sap/ui/mdc/demokit/sample/Chart/ChartJS/control/ChartJS.js"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025 Chart.js Contributors"
+SPDX-License-Identifier = "MIT"
+SPDX-FileComment = "these files belong to: Chart.js"
+
+[[annotations]]
+path = "src/sap.ui.mdc/test/sap/ui/mdc/demokit/sample/Chart/ChartJS/control/chartjs-plugin-zoom.js"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2016-2021 chartjs-plugin-zoom Contributors"
+SPDX-License-Identifier = "MIT"
+SPDX-FileComment = "these files belong to: chartjs-plugin-zoom"
+
+[[annotations]]
+path = "src/sap.ui.mdc/test/sap/ui/mdc/demokit/sample/Chart/ChartJS/control/hammerjs.js"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2011-2017 by Jorik Tangelder (Eight Media)"
+SPDX-License-Identifier = "MIT"
+SPDX-FileComment = "these files belong to: hammer.js"
+
+
 # Library: sap.ui.webc.common:
 
 [[annotations]]

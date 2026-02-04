@@ -425,6 +425,27 @@ License Text: https://github.com/UI5/openui5/blob/master/LICENSES/MIT.txt
 Contained in: src/sap.ui.integration/test/sap/ui/integration/demokit/cardExplorer/webapp/thirdparty/CfWorkerJsonSchemaValidator.js
 
 
+Library: sap.ui.mdc:
+
+Component: Chart.js, version: 4.5.0
+Copyright: 2025 Chart.js Contributors
+License: MIT
+License Text: https://github.com/UI5/openui5/blob/master/LICENSES/MIT.txt
+Contained in: src/sap.ui.mdc/test/sap/ui/mdc/demokit/sample/Chart/ChartJS/control/ChartJS.js
+
+Component: chartjs-plugin-zoom, version: 1.0.1
+Copyright: 2016-2021 chartjs-plugin-zoom Contributors
+License: MIT
+License Text: https://github.com/UI5/openui5/blob/master/LICENSES/MIT.txt
+Contained in: src/sap.ui.mdc/test/sap/ui/mdc/demokit/sample/Chart/ChartJS/control/chartjs-plugin-zoom.js
+
+Component: hammer.js, version: 2.0.7
+Copyright: 2011-2017 by Jorik Tangelder (Eight Media)
+License: MIT
+License Text: https://github.com/UI5/openui5/blob/master/LICENSES/MIT.txt
+Contained in: src/sap.ui.mdc/test/sap/ui/mdc/demokit/sample/Chart/ChartJS/control/hammerjs.js
+
+
 Library: sap.ui.webc.common:
 
 Component: UI5 Web Components, version: 1.18.0
