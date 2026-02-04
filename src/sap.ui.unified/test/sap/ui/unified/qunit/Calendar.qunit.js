@@ -2774,6 +2774,7 @@ sap.ui.define([
 			}),
 			dummyCellSpy = this.spy(MonthRenderer, "renderDummyCell");
 
+		oCalM.focusDate(new Date(2026, 0, 1));
 		//arrange
 		oCalM.placeAt("content");
 		sap.ui.getCore().applyChanges();
