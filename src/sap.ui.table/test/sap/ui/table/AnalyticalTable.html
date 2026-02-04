@@ -15,22 +15,34 @@
 <script src="Settings.js"></script>
 <script>
 sap.ui.require([
-	"sap/ui/core/message/MessageType"
-], function(MessageType) {
+	"sap/ui/core/message/MessageType",
+	"sap/ui/table/library",
+	"sap/m/Button",
+	"sap/ui/table/AnalyticalTable",
+	"sap/ui/table/AnalyticalColumn",
+	"sap/ui/unified/Currency",
+	"sap/ui/model/type/String",
+	"sap/m/Text",
+	"sap/m/Label",
+	"sap/ui/model/odata/v2/ODataModel",
+	"sap/ui/table/RowSettings"
+], function(MessageType, TableLibrary, Button, AnalyticalTable, AnalyticalColumn, Currency, StringType, Text, Label, ODataModel, RowSettings) {
 	"use strict";
 
+	const SelectionMode = TableLibrary.SelectionMode;
+
 	/*global TABLESETTINGS */
-	(new sap.m.Button({
+	(new Button({
 		text: "Just a Button before"
 	})).placeAt("content");
 
-	const oTable = new sap.ui.table.AnalyticalTable({
+	const oTable = new AnalyticalTable({
 		title: "Title of the Table",
 		footer: "Footer of the Table",
-		selectionMode: sap.ui.table.SelectionMode.MultiToggle
+		selectionMode: SelectionMode.MultiToggle
 	});
 	oTable.placeAt("content");
-	(new sap.m.Button({text: "Just a Button after"})).placeAt("content");
+	(new Button({text: "Just a Button after"})).placeAt("content");
 
 	TABLESETTINGS.addServiceSettings(oTable, "AnalyticalTableServiceSettings", updateModel);
 
@@ -38,7 +50,7 @@ sap.ui.require([
 	const aColumns = ["CostCenter", "CostCenterText", "CostElement", "CostElementText", "ActualCosts", "Currency", "PlannedCosts", "ValueType", "CurrencyType"];
 
 	for (let i = 0; i < aColumns.length; i++) {
-		oTable.addColumn(new sap.ui.table.AnalyticalColumn({
+		oTable.addColumn(new AnalyticalColumn({
 			label: aColumns[i],
 			template: getTemplate(aColumns[i]),
 			sortProperty: aColumns[i],
@@ -52,13 +64,13 @@ sap.ui.require([
 	function getTemplate(sField) {
 		switch (sField) {
 			case "PlannedCosts":
-				return new sap.ui.unified.Currency({value: {path: sField, type: new sap.ui.model.type.String()}});
+				return new Currency({value: {path: sField, type: new StringType()}});
 			case "Currency":
-				//return new sap.m.Text({text: "{" + sField + "}", wrapping: false});
+				//return new Text({text: "{" + sField + "}", wrapping: false});
 				//return new sap.m.Link({text: "{" + sField + "}"});
-				return new sap.m.Label({text: "{" + sField + "}"});
+				return new Label({text: "{" + sField + "}"});
 			default:
-				return new sap.m.Text({text: "{" + sField + "}", wrapping: false});
+				return new Text({text: "{" + sField + "}", wrapping: false});
 		}
 	}
 
@@ -69,7 +81,7 @@ sap.ui.require([
 	let bSumOnTop = false;
 
 	function updateModel(mServiceSettings) {
-		oModel = new sap.ui.model.odata.v2.ODataModel(mServiceSettings.defaultProxyUrl, true);
+		oModel = new ODataModel(mServiceSettings.defaultProxyUrl, true);
 		oModel.setDefaultCountMode("Inline");
 		oTable.setModel(oModel);
 		oTable.bindRows({
@@ -138,11 +150,11 @@ sap.ui.require([
 				HIGHLIGHTS: {
 					action: function(oTable, bValue) {
 						if (bValue) {
-							oTable.setRowSettingsTemplate(new sap.ui.table.RowSettings({
+							oTable.setRowSettingsTemplate(new RowSettings({
 								highlight: MessageType.Success
 							}));
 						} else {
-							oTable.setRowSettingsTemplate(new sap.ui.table.RowSettings({
+							oTable.setRowSettingsTemplate(new RowSettings({
 								highlight: MessageType.None
 							}));
 						}

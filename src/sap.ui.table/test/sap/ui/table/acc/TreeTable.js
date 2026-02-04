@@ -1,5 +1,4 @@
 sap.ui.define([
-	"sap/base/util/deepExtend",
 	"sap/m/Button",
 	"sap/m/Toolbar",
 	"sap/ui/model/json/JSONModel",
@@ -8,7 +7,7 @@ sap.ui.define([
 	"sap/ui/table/TreeTable",
 	"sap/m/Text",
 	"sap/m/Label"
-], function(deepExtend, Button, Toolbar, JSONModel, Column, tableLibrary, TreeTable, Text, Label) {
+], function(Button, Toolbar, JSONModel, Column, tableLibrary, TreeTable, Text, Label) {
 	"use strict";
 
 	const SelectionMode = tableLibrary.SelectionMode;
@@ -164,7 +163,6 @@ sap.ui.define([
 
 	// create table with supported sap.m controls
 	const oTable = new TreeTable({
-		expandFirstLevel: true,
 		columns: [
 			new Column({
 				label: new Label({text: "Alfa"}),
