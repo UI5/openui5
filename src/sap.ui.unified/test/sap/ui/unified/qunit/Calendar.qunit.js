@@ -2927,6 +2927,7 @@ sap.ui.define([
 		onAfterRendering = this.spy(oCalM.getAggregation("month")[0], "onAfterRendering"),
 		dummyCellSpy = this.spy(MonthRenderer, "renderDummyCell");
 
+		oCalM.focusDate(new Date(2026, 0, 1));
 		//arrange
 		oCalM.placeAt("qunit-fixture");
 		oCore.applyChanges();
