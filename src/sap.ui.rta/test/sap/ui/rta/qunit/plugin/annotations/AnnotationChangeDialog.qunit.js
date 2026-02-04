@@ -421,9 +421,47 @@ sap.ui.define([
 				oSearchField.fireLiveChange({ newValue: "" });
 				assert.strictEqual(oList.getFormElements().length, 3, "then the filter can be removed by the user");
 
-				oSearchField.setValue("first");
-				oSearchField.fireLiveChange({ newValue: "first" });
+				oSearchField.setValue("Special");
+				oSearchField.fireLiveChange({ newValue: "Special" });
 				assert.strictEqual(oList.getFormElements().length, 1, "then a different filter value can be set by the user");
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("When filtering by value in the search field", async function(assert) {
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate
+			};
+			const fnAfterOpen = () => {
+				const oList = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList");
+				const oSearchField = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertiesFilter");
+
+				assert.strictEqual(oList.getFormElements().length, 4, "then all properties are initially displayed");
+
+				oSearchField.setValue("Hello");
+				oSearchField.fireLiveChange({ newValue: "Hello" });
+				assert.strictEqual(oList.getFormElements().length, 1, "then filtering by value 'Hello' shows one result");
+				assert.strictEqual(
+					oList.getFormElements()[0].getBindingContext().getObject().currentValue,
+					"Hello",
+					"then the correct property is displayed"
+				);
+
+				oSearchField.setValue("Other");
+				oSearchField.fireLiveChange({ newValue: "Other" });
+				assert.strictEqual(
+					oList.getFormElements().length, 2, "then filtering by 'Other' shows two results (label and value match)"
+				);
+
+				oSearchField.setValue("");
+				oSearchField.fireLiveChange({ newValue: "" });
+				assert.strictEqual(oList.getFormElements().length, 4, "then clearing the filter shows all properties again");
 
 				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
 				oCancelButton.firePress();

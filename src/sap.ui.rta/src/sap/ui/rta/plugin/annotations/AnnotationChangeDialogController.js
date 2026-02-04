@@ -50,8 +50,14 @@ sap.ui.define([
 	AnnotationChangeDialogController.prototype.filterProperties = function(sQuery, bEquals) {
 		const aFilters = [];
 		if (sQuery && sQuery.length > 0) {
-			const filter = new Filter("label", bEquals ? FilterOperator.EQ : FilterOperator.Contains, sQuery);
-			aFilters.push(filter);
+			const sOperator = bEquals ? FilterOperator.EQ : FilterOperator.Contains;
+			const oLabelFilter = new Filter("label", sOperator, sQuery);
+			const oValueFilter = new Filter("currentValue", sOperator, sQuery);
+			const oCombinedFilter = new Filter({
+				filters: [oLabelFilter, oValueFilter],
+				and: false
+			});
+			aFilters.push(oCombinedFilter);
 		}
 
 		const oList = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList");

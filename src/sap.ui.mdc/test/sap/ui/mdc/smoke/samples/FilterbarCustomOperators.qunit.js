@@ -21,8 +21,8 @@ sap.ui.define([
 
 	const sSampleResource = "test-resources/sap/ui/mdc/demokit/sample/FilterbarCustomOperators/index.html";
 	const aFilterFields = [
-		{label: "Rank (Custom operator)"},
-		{label: "First ascent (Custom operator)"}
+		{label: "Rank"},
+		{label: "First Ascent"}
 	];
 
 	const iValueMyNextDays = 100;
@@ -100,8 +100,8 @@ sap.ui.define([
 		When.onTheMDCFilterField.iEnterTextOnTheFilterField(oCurrentFilterField, "70+-2");
 		When.iPressKeyOnTheFilterField(oCurrentFilterField, KeyCodes.ENTER);
 		Then.iShouldSeeConditons("sap.ui.mdc.FilterBar", oCondition1);
-		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oCondition1, "\t", 4), "__editor0");
-		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oPretty1, "\t", 4), "__editor1");
+		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oCondition1, "\t", 4), "container-mdc.sample---sample--conditionsCodeEditor");
+		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oPretty1, "\t", 4), "container-mdc.sample---sample--filterCodeEditor");
 	});
 
 	opaTest(`"first_ascent" FilterField works`, function (Given, When, Then) {
@@ -110,8 +110,8 @@ sap.ui.define([
 		When.onTheMDCFilterField.iEnterTextOnTheFilterField(oCurrentFilterField, "n100");
 		When.iPressKeyOnTheFilterField(oCurrentFilterField, KeyCodes.ENTER);
 		Then.iShouldSeeConditons("sap.ui.mdc.FilterBar", {...oCondition1, ...oCondition2});
-		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify({...oCondition1, ...oCondition2}, "\t", 4), "__editor0");
-		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oPretty2, "\t", 4), "__editor1");
+		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify({...oCondition1, ...oCondition2}, "\t", 4), "container-mdc.sample---sample--conditionsCodeEditor");
+		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oPretty2, "\t", 4), "container-mdc.sample---sample--filterCodeEditor");
 		Then.iTeardownMyApp();
 	});
 });

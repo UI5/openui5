@@ -10,7 +10,6 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/resource/ResourceModel",
 	"sap/ui/rta/plugin/annotations/AnnotationChangeDialogController",
-	"sap/ui/rta/plugin/annotations/AnnotationTypes",
 	"sap/ui/rta/plugin/annotations/DocumentedAnnotationChanges",
 	"sap/ui/rta/Utils"
 ], function(
@@ -21,7 +20,6 @@ sap.ui.define([
 	JSONModel,
 	ResourceModel,
 	AnnotationChangeDialogController,
-	AnnotationTypes,
 	DocumentedAnnotationChanges,
 	RtaUtils
 ) {
@@ -213,7 +211,9 @@ sap.ui.define([
 		}
 
 		// Once a change gets passed to the model during initialization, the property _appliedOnModel is set to true
-		replaceValuesWithValuesFromPendingChanges(aExistingChanges.filter((oChange) => !oChange._appliedOnModel), aProperties, bObjectAsKey);
+		replaceValuesWithValuesFromPendingChanges(
+			aExistingChanges.filter((oChange) => !oChange._appliedOnModel), aProperties, bObjectAsKey
+		);
 
 		this.oChangeAnnotationModel.setData({
 			objectAsKey: bObjectAsKey,

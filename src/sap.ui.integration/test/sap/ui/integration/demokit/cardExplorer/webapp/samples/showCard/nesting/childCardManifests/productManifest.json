@@ -1,0 +1,98 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.attributes.list.card",
+		"type": "card",
+		"title": "Sample of a List with Attributes",
+		"subTitle": "Sample of a List with Attributes",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"List",
+				"Attributes",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://list"
+		}
+	},
+	"sap.card": {
+		"configuration": {
+			"useMainDestinations": true,
+			"parameters": {
+				"productId": {
+					"value": null
+				}
+			},
+			"childCards": {
+				"orderCard": {
+					"manifest": "./orderManifest.json"
+				}
+			}
+		},
+		"type": "List",
+		"header": {
+			"title": "Orders",
+			"subTitle": "Select an order to view details"
+		},
+		"content": {
+			"data": {
+				"request": {
+					"url": "{{mainDestinations.northwind}}/Order_Details",
+					"parameters": {
+						"$filter": "ProductID eq {parameters>/productId/value}",
+						"$expand": "Order",
+						"$top": 3
+					}
+				},
+				"path": "/value"
+			},
+			"item": {
+				"title": "{Order/ShipName}",
+				"info": {
+					"value": "Shipped on {Order/ShippedDate}",
+					"state": "Success"
+				},
+				"attributesLayoutType": "TwoColumns",
+				"attributes": [
+					{
+						"value": "Order #{Order/OrderID}"
+					},
+					{
+						"value": "Shipping Method: {Order/ShipVia}"
+					},
+					{
+						"value": "Required by {Order/RequiredDate}",
+						"state": "Warning"
+					},
+					{
+						"value": "Address: {Order/ShipAddress}",
+						"state": "Information",
+						"showStateIcon": true
+					}
+				],
+				"actions": [
+					{
+						"type": "ShowCard",
+						"parameters": {
+							"childCardKey": "orderCard",
+							"parameters": {
+								"orderId": "{Order/OrderID}"
+							}
+						}
+					}
+				]
+			}
+		}
+	}
+}

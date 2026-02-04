@@ -134,6 +134,12 @@ sap.ui.define([
 			oRm.attr("role", "row");
 			oRm.openEnd();
 
+			for (j = 0; j < iColumns; j++) {
+				iCellIndex = i * iColumns + j;
+				oDay = aCells[iCellIndex];
+				this.renderDay(oRm, oControl, oDay, iCellIndex, iWeekNumber);
+			}
+
 			oRm.openStart("div");
 			oRm.attr("role", "gridcell" );
 			oRm.openEnd();
@@ -159,11 +165,6 @@ sap.ui.define([
 			oRm.close("div"); // end appointments
 			oRm.close("div");
 
-			for (j = 0; j < iColumns; j++) {
-				iCellIndex = i * iColumns + j;
-				oDay = aCells[iCellIndex];
-				this.renderDay(oRm, oControl, oDay, iCellIndex, iWeekNumber);
-			}
 			oRm.close("div"); // end cells
 			oRm.close("div"); // end grid
 		}

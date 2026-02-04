@@ -1,0 +1,96 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.table.card",
+		"type": "card",
+		"title": "Sample of a Table Card",
+		"subTitle": "Sample of a Table Card",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Table",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://table-view"
+		}
+	},
+	"sap.card": {
+		"configuration": {
+			"destinations": {
+				"northwind": {
+					"name": "Northwind_V4",
+					"defaultUrl": "https://services.odata.org/V4/Northwind/Northwind.svc"
+				}
+			},
+			"childCards": {
+				"childCardManifest": {
+					"manifest": "./supplierManifest.json"
+				}
+			}
+		},
+		"type": "Table",
+		"data": {
+			"request": {
+				"url": "{{destinations.northwind}}/Suppliers",
+				"parameters": {
+					"$select": "SupplierID, CompanyName, ContactName, ContactTitle, Fax, HomePage"
+				}
+			},
+			"path": "/value"
+		},
+		"header": {
+			"title": "Supplier contact overview",
+			"subtitle": "Select a row to view more details",
+			"status": {
+				"text": "Grouped by contact role"
+			}
+		},
+		"content": {
+			"maxItems": 8,
+			"row": {
+				"columns": [
+					{
+						"title": "Contact Name",
+						"value": "{ContactName}"
+					},
+					{
+						"title": "Company Name",
+						"value": "{CompanyName}"
+					},
+					{
+						"title": "Contact Title",
+						"value": "{ContactTitle}"
+					}
+				],
+				"actions": [
+					{
+						"type": "ShowCard",
+						"parameters": {
+							"childCardKey": "childCardManifest",
+							"parameters": {
+								"supplierId": "{SupplierID}"
+							}
+						}
+					}
+				]
+			},
+			"group": {
+				"title": "{= ${ContactTitle}.includes('Manager') ? ${ContactTitle} : 'Others' }",
+				"order": {
+					"path": "ContactTitle"
+				}
+			}
+		}
+	}
+}

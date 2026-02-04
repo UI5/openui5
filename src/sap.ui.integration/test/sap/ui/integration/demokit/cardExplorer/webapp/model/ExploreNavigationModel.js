@@ -642,6 +642,27 @@ sap.ui.define([
 								]
 							},
 							{
+								title: 'Actions Per Row',
+								key: 'tableCardWithActions',
+								settings: {
+									columns: 6
+								},
+								files: [
+									{
+										url: '/samples/table/actionsPerRow/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/table/actionsPerRow/supplierManifest.json',
+										name: 'supplierManifest.json',
+										key: 'supplierManifest.json',
+										editable: false
+									}
+								]
+							},
+							{
 								title: 'Visible Columns',
 								key: 'visibleColumns',
 								settings: {
@@ -2040,117 +2061,6 @@ sap.ui.define([
 				expanded: true,
 				items: [
 					{
-						key: 'cardActions',
-						target: 'exploreSamples',
-						title: 'Card Actions',
-						subSamples: [
-							{
-								title: 'Navigation',
-								key: 'navigation',
-								target: 'exploreSamples',
-								settings: {
-									columns: 3
-								},
-								files: [
-									{
-										url: '/samples/actions/navigation/manifest.json',
-										name: 'manifest.json',
-										key: 'manifest.json',
-										editable: true
-									}
-								]
-							},
-							{
-								title: 'Intent-Based Navigation',
-								key: 'ibn',
-								target: 'exploreSamples',
-								experimental: true,
-								settings: {
-									columns: 3
-								},
-								files: [
-									{
-										url: '/samples/actions/ibn/manifest.json',
-										name: 'manifest.json',
-										key: 'manifest.json',
-										editable: true
-									}
-								]
-							},
-							{
-								title: 'Show/Hide Card',
-								key: 'showHideCard',
-								target: 'exploreSamples',
-								experimental: true,
-								settings: {
-									columns: 3
-								},
-								files: [
-									{
-										url: '/samples/actions/showHide/manifest.json',
-										name: 'manifest.json',
-										key: 'manifest.json',
-										editable: true
-									},
-									{
-										url: '/samples/actions/showHide/detailsManifest.json',
-										name: 'detailsManifest.json',
-										key: 'detailsManifest.json'
-									}
-								]
-							},
-							{
-								title: 'Whole Card Interaction',
-								key: 'wholeCardInteraction',
-								target: 'exploreSamples',
-								experimental: true,
-								additionalInfo: "The whole card is interactive when the property “actions” is set in the “sap.card” section.",
-								settings: {
-									columns: 3
-								},
-								files: [
-									{
-										url: '/samples/actions/wholeCardInteraction/manifest.json',
-										name: 'manifest.json',
-										key: 'manifest.json',
-										editable: true
-									},
-									{
-										url: '/samples/actions/wholeCardInteraction/detailsManifest.json',
-										name: 'detailsManifest.json',
-										key: 'detailsManifest.json'
-									}
-								]
-							},
-							{
-								title: 'Approve/Deny with popup',
-								key: 'approve',
-								target: 'exploreSamples',
-								experimental: true,
-								settings: {
-									columns: 3
-								},
-								files: [{
-										url: '/samples/actions/approve/manifest.json',
-										name: 'manifest.json',
-										key: 'manifest.json',
-										editable: true
-									},
-									{
-										url: '/samples/actions/approve/detailsManifest.json',
-										name: 'detailsManifest.json',
-										key: 'detailsManifest.json'
-									},
-									{
-										url: '/samples/actions/approve/ApproveCardExtension.js',
-										name: 'ApproveCardExtension.js',
-										key: 'ApproveCardExtension.js'
-									}
-								]
-							}
-						]
-					},
-					{
 						key: 'cache',
 						target: 'exploreSamples',
 						title: 'Cache',
@@ -2964,6 +2874,351 @@ sap.ui.define([
 								url: '/samples/translation/i18n/i18n_en.properties',
 								name: 'i18n/i18n_en.properties',
 								key: 'i18n/i18n_en.properties'
+							}
+						]
+					}
+				]
+			},
+			{
+				title: 'Card Actions',
+				key: 'actionCards',
+				target: 'exploreOverview',
+				icon: 'sap-icon://action',
+				expanded: true,
+				items: [
+					{
+						key: 'navigationCardActions',
+						target: 'exploreSamples',
+						title: 'Navigation',
+						subSamples: [
+							{
+								title: 'Navigation',
+								key: 'navigation',
+								target: 'exploreSamples',
+								settings: {
+									columns: 3
+								},
+								files: [
+									{
+										url: '/samples/actions/navigation/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							},
+							{
+								title: 'Intent-Based Navigation',
+								key: 'ibn',
+								target: 'exploreSamples',
+								experimental: true,
+								settings: {
+									columns: 3
+								},
+								files: [
+									{
+										url: '/samples/actions/ibn/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							}
+						]
+					},
+					{
+						key: 'submitCardActions',
+						target: 'exploreSamples',
+						title: 'Submit',
+						subSamples: [
+							{
+								title: 'Submit Action',
+								key: 'submitAction',
+								experimental: true,
+								settings: {
+									columns: 5
+								},
+								files: [
+									{
+										url: '/samples/object/form/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							},
+							{
+								title: 'Submit with Validation',
+								key: 'submitWithValidation',
+								experimental: true,
+								settings: {
+									columns: 5
+								},
+								files: [
+									{
+										url: '/samples/object/formWithValidation/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/object/formWithValidation/i18n/i18n.properties',
+										name: 'i18n/i18n.properties',
+										key: 'i18n/i18n.properties'
+									}
+								]
+							},
+							{
+								title: 'Submit with Extension',
+								key: 'submitWithExtension',
+								experimental: true,
+								settings: {
+									columns: 5
+								},
+								files: [
+									{
+										url: '/samples/object/formWithExtension/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/object/formWithExtension/SampleExtension.js',
+										name: 'SampleExtension.js',
+										key: 'SampleExtension.js'
+									},
+									{
+										url: '/samples/object/formWithExtension/i18n/i18n.properties',
+										name: 'i18n/i18n.properties',
+										key: 'i18n/i18n.properties'
+									}
+								]
+							},
+							{
+								title: 'Adaptive Card Submit',
+								key: 'adaptive-action-submit-custom-payload',
+								files: [
+									{
+										url: '/samples/adaptive/action-submit-custom-payload.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							}
+						]
+					},
+					{
+						key: 'customCardActions',
+						target: 'exploreSamples',
+						title: 'Custom',
+						experimental: true,
+						subSamples: [
+							{
+								title: 'Actions Labels',
+								key: 'actionsLabels',
+								experimental: true,
+								files: [{
+										url: '/samples/list/actionsLabels/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							},
+							{
+								title: 'Actions Strip',
+								key: 'actionsStrip',
+								files: [
+									{
+										url: '/samples/list/actionsStrip/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/list/actionsStrip/Extension.js',
+										name: 'Extension.js',
+										key: 'Extension.js'
+									}
+								]
+							}
+						]
+					},
+					{
+						key: 'showCard',
+						target: 'exploreSamples',
+						title: 'Show/Hide Card',
+						experimental: true,
+						subSamples: [
+							{
+								title: 'Show/Hide Card',
+								key: 'showHideCard',
+								target: 'exploreSamples',
+								experimental: true,
+								settings: {
+									columns: 3
+								},
+								files: [
+									{
+										url: '/samples/actions/showHide/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/actions/showHide/detailsManifest.json',
+										name: 'detailsManifest.json',
+										key: 'detailsManifest.json'
+									}
+								]
+							},
+							{
+								title: 'Whole Card Interaction',
+								key: 'wholeCardInteraction',
+								target: 'exploreSamples',
+								experimental: true,
+								additionalInfo: "The whole card is interactive when the property “actions” is set in the “sap.card” section.",
+								settings: {
+									columns: 3
+								},
+								files: [
+									{
+										url: '/samples/actions/wholeCardInteraction/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/actions/wholeCardInteraction/detailsManifest.json',
+										name: 'detailsManifest.json',
+										key: 'detailsManifest.json'
+									}
+								]
+							},
+							{
+								title: 'Approve/Deny with popup',
+								key: 'approve',
+								target: 'exploreSamples',
+								experimental: true,
+								settings: {
+									columns: 3
+								},
+								files: [
+									{
+										url: '/samples/actions/approve/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/actions/approve/detailsManifest.json',
+										name: 'detailsManifest.json',
+										key: 'detailsManifest.json'
+									},
+									{
+										url: '/samples/actions/approve/ApproveCardExtension.js',
+										name: 'ApproveCardExtension.js',
+										key: 'ApproveCardExtension.js'
+									}
+								]
+							},
+							{
+								title: 'Actions Per Row',
+								key: 'tableCardWithActions',
+								settings: {
+									columns: 6
+								},
+								files: [
+									{
+										url: '/samples/table/actionsPerRow/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/table/actionsPerRow/supplierManifest.json',
+										name: 'supplierManifest.json',
+										key: 'supplierManifest.json',
+										editable: false
+									}
+								]
+							},
+							{
+								title: 'Two levels of nesting',
+								key: "nesting",
+								settings: {
+									columns: 4
+								},
+								files: [
+									{
+										url: '/samples/showCard/nesting/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/showCard/nesting/childCardManifests/productManifest.json',
+										name: 'productManifest.json',
+										key: 'productManifest.json',
+										editable: false
+									},
+									{
+										url: '/samples/showCard/nesting/childCardManifests/orderManifest.json',
+										name: 'orderManifest.json',
+										key: 'orderManifest.json',
+										editable: false
+									}
+								]
+							},
+							{
+								title: 'Edit inside child card',
+								mockServer: true,
+								key: "editing",
+								files: [
+									{
+										url: '/samples/showCard/editing/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/showCard/editing/childCardManifests/employeeManifest.json',
+										name: 'employeeManifest.json',
+										key: 'employeeManifest.json',
+										editable: false
+									},
+									{
+										url: '/samples/showCard/editing/EditEmployeeExtension.js',
+										name: 'EditEmployeeExtension.js',
+										key: 'EditEmployeeExtension.js',
+										editable: false
+									}
+								]
+							},
+							{
+								title: 'More Detail Info Card',
+								key: "infoCard",
+								files: [
+									{
+										url: '/samples/showCard/infoCard/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									},
+									{
+										url: '/samples/showCard/infoCard/childCards/infoObjectCard.json',
+										name: 'infoObjectCard.json',
+										key: 'infoObjectCard.json',
+										editable: false
+									},
+									{
+										url: '/samples/showCard/infoCard/data.json',
+										name: 'data.json',
+										key: 'data.json',
+										editable: true
+									}
+								]
 							}
 						]
 					}

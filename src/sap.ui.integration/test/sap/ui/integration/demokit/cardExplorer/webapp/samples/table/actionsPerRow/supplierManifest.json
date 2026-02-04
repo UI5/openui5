@@ -1,0 +1,97 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.object.card",
+		"type": "card",
+		"title": "Sample of an Object Card",
+		"subTitle": "Sample of an Object Card",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Object",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://switch-classes"
+		}
+	},
+	"sap.card": {
+		"configuration": {
+    		"useMainDestinations": true,
+			"parameters": {
+				"supplierId": {
+					"value": null
+				}
+			}
+		},
+		"type": "Object",
+		"data": {
+			"request": {
+				"url": "{{mainDestinations.northwind}}/Suppliers({parameters>/supplierId/value})"
+			}
+		},
+		"header": {
+			"title": "{CompanyName}",
+			"subtitle": "Supplier ID: {SupplierID}",
+			"icon": {
+				"src": "sap-icon://supplier"
+			}
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Contact Information",
+					"items": [
+						{
+							"label": "Contact Name",
+							"value": "{ContactName}"
+						},
+						{
+							"label": "Role",
+							"value": "{ContactTitle}"
+						},
+						{
+							"label": "Phone",
+							"value": "{Phone}"
+						},
+						{
+							"label": "Fax",
+							"value": "{= ${Fax} ? ${Fax} : 'Not available' }"
+						}
+					]
+				},
+				{
+					"title": "Address",
+					"items": [
+						{
+							"label": "Street",
+							"value": "{Address}"
+						},
+						{
+							"label": "City",
+							"value": "{City}"
+						},
+						{
+							"label": "Postal Code",
+							"value": "{PostalCode}"
+						},
+						{
+							"label": "Country",
+							"value": "{Country}"
+						}
+					]
+				}
+			]
+		}
+	}
+}

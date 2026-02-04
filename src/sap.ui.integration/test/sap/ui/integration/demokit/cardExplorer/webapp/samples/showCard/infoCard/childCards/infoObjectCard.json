@@ -1,0 +1,62 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.campaign.object.card",
+		"type": "card",
+		"title": "Campaign Details",
+		"subTitle": "Full Campaign Information",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5"
+	},
+	"sap.card": {
+		"type": "Object",
+		"header": {
+			"data": {
+				"path": "campaign>/"
+			},
+			"icon": {
+				"src": "sap-icon://lightbulb"
+			},
+			"title": "{campaign>CampaignName}",
+			"subTitle": "Campaign Information"
+		},
+		"content": {
+			"data": {
+				"path": "campaign>/"
+			},
+			"details": "{campaign>IdeaDescription}",
+			"groups": [
+				{
+					"title": "Idea",
+					"items": [
+						{
+							"type": "Image",
+							"src": "{campaign>img}",
+							"size": "M"
+						},
+						{
+							"label": "Description",
+							"value": "{campaign>IdeaDescription}"
+						},
+						{
+							"type": "Status",
+							"label": "Status",
+							"value": "{= ${campaign>DaysTillBegin} > 0 ? 'Not Started' : (${campaign>DaysSinceEnd} > 0 ? 'Expired' : 'Ongoing') }",
+							"state": "{= ${campaign>DaysTillBegin} > 0 ? 'None' : (${campaign>DaysSinceEnd} > 0 ? 'Warning' : 'Success') }"
+						},
+						{
+							"type": "Status",
+							"label": "Time Remaining",
+							"value": "{= ${campaign>DaysTillBegin} > 0 ? ${campaign>DaysTillBegin} + ' days until start' : ( ${campaign>DaysSinceEnd} > 0 ? ${campaign>DaysSinceEnd} + ' days since expiry' : ${campaign>RemainingDays} + ' days left' ) }",
+							"state": "{= ${campaign>DaysTillBegin} === 0 && ${campaign>DaysSinceEnd} === 0 ? ( ${campaign>RemainingDays}/${campaign>DurationDays} >= 0.5 ? 'Success' : ( ${campaign>RemainingDays}/${campaign>DurationDays} < 0.25 ? 'Error' : 'Warning' ) ) : 'None'}"
+						}
+					]
+				}
+			]
+		}
+	}
+}

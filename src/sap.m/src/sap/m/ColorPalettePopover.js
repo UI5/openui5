@@ -82,7 +82,6 @@ sap.ui.define([
 					/**
 					 * The last selected color in the ColorPalette.
 					 * @since 1.122
-					 * @experimental Since 1.122, this property is in a beta state.
 					 */
 					selectedColor: { type: "sap.ui.core.CSSColor", defaultValue: null },
 

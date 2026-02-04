@@ -1,0 +1,92 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.actionslabels.list.card",
+		"type": "card",
+		"title": "Sample of a List with Action Labels",
+		"subTitle": "Sample of a List with Action Labels",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"List",
+				"Label",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://list"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"header": {
+			"title": "Supplier Product Overview",
+			"subtitle": "Select a product to view orders",
+			"icon": {
+				"src": "sap-icon://product"
+			},
+			"status": {
+				"text": "4 of 20"
+			}
+		},
+		"configuration": {
+			"destinations": {
+				"northwind": {
+					"name": "Northwind_V4",
+					"defaultUrl": "https://services.odata.org/V4/Northwind/Northwind.svc"
+				}
+			},
+			"childCards": {
+				"productCard": {
+					"manifest": "./childCardManifests/productManifest.json"
+				}
+			}
+		},
+		"content": {
+			"data": {
+				"request": {
+					"url": "{{destinations.northwind}}/Products",
+					"parameters": {
+						"$select": "ProductName, QuantityPerUnit, UnitPrice, UnitsInStock, ReorderLevel, ProductID"
+					}
+				},
+				"path": "/value"
+			},
+			"maxItems": "4",
+			"item": {
+				"title": "{ProductName}",
+				"description": "{QuantityPerUnit}",
+				"highlight": "{= ${UnitsInStock} === 0 ? 'Error' : (${UnitsInStock} < ${ReorderLevel} ? 'Warning' : 'Success') }",
+				"info": {
+				    "value": "Unit Price: {= ${UnitPrice} ? '$' + ${UnitPrice} : 'N/A' }"
+				},
+				"actionsStrip": [
+					{
+						"buttonType": "Transparent",
+						"text": "View Orders",
+						"actions": [
+							{
+								"type": "ShowCard",
+								"parameters": {
+									"childCardKey": "productCard",
+									"parameters": {
+										"productId": "{ProductID}"
+									}
+								}
+							}
+						]
+					}
+				]
+			}
+		}
+	}
+}

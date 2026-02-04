@@ -4,46 +4,50 @@ sap.ui.define([
 	"mdc/sample/model/metadata/JSONPropertyInfo",
 	"sap/ui/mdc/FilterField",
 	"sap/ui/mdc/field/ConditionsType",
+	"sap/ui/mdc/field/ConditionType",
 	"sap/m/Slider",
 	"sap/m/Token",
 	"sap/m/SegmentedButtonItem",
 	"../controls/CustomSegmentedButton",
-	"../controls/CustomMultiInput"
-], function (FilterBarDelegate, JSONPropertyInfo, FilterField, ConditionsType, Slider, Token, SegmentedButtonItem, CustomSegmentedButton, CustomMultiInput) {
+	"../controls/CustomMultiInput",
+	"sap/ui/core/mvc/View"
+], function (FilterBarDelegate, JSONPropertyInfo, FilterField, ConditionsType, ConditionType, Slider, Token, SegmentedButtonItem, CustomSegmentedButton, CustomMultiInput, View) {
 	"use strict";
 
 	const JSONFilterBarDelegate = Object.assign({}, FilterBarDelegate);
 
 	JSONFilterBarDelegate.fetchProperties = async () => JSONPropertyInfo;
 
-	const _createFilterField = async (sId, oProperty, oFilterBar) => {
-		const sPropertyName = oProperty.key;
+	const _createFilterField = (sId, oProperty, oFilterBar) => {
+		const sPropertyKey = oProperty.key;
 		let oContentEdit;
+		let sValueHelpId;
 
-		if (sId.includes("numberWords")) {
-			oContentEdit = new Slider({
+		if (sPropertyKey === "numberWords") {
+			oContentEdit = new Slider(sId + "-S", {
 				value: {path: '$field>/conditions', type: new ConditionsType()},
 				min: 0,
 				max: 100000
 			});
-		} else if (sId.includes("descr")) {
-			oContentEdit = new CustomMultiInput({
+		} else if (sPropertyKey === "descr") {
+			oContentEdit = new CustomMultiInput(sId + "-CMI", {
 				value: {path: '$field>/conditions', type: new ConditionsType()},
 				tokens: {
 					path: '$field>/conditions',
 					template: new Token({
-						text: {path: '$field>', type: new ConditionsType()},
-						key: {path: '$field>', type: new ConditionsType()}
+						text: {path: '$field>', type: new ConditionType()},
+						key: {path: '$field>', type: new ConditionType()}
 					})
 				}
 			});
+			const oView = getViewForControl(oFilterBar);
+			sValueHelpId = oView.createId("VH-Conditions");
+		} else if (sPropertyKey === "status") {
+			const oPlanningButton = new SegmentedButtonItem(sId + "-SB-planning", { text: "Planning", key: "planning" });
+			const oInProcessButton = new SegmentedButtonItem(sId + "-SB-inProcess", { text: "In Process", key: "inProcess" });
+			const oDoneButton = new SegmentedButtonItem(sId + "-SB-done", { text: "Done", key: "done" });
 
-		} else if (sId.includes("status")) {
-			const oPlanningButton = new SegmentedButtonItem({ text: "Planning", key: "planning" });
-			const oInProcessButton = new SegmentedButtonItem({ text: "In Process", key: "inProcess" });
-			const oDoneButton = new SegmentedButtonItem({ text: "Done", key: "done" });
-
-			oContentEdit = new CustomSegmentedButton({
+			oContentEdit = new CustomSegmentedButton(sId + "-SB", {
 				conditions: "{path: '$field>/conditions'}",
 				items: [
 					oPlanningButton,
@@ -54,18 +58,11 @@ sap.ui.define([
 		}
 
 		const oFilterField = new FilterField(sId, {
-			dataType: oProperty.dataType,
-			conditions: "{$filters>/conditions/" + sPropertyName + '}',
-			propertyKey: sPropertyName,
-			required: oProperty.required,
-			label: oProperty.label,
-			maxConditions: oProperty.maxConditions,
+			propertyKey: sPropertyKey,
+			contentEdit: oContentEdit,
+			valueHelp: sValueHelpId,
 			delegate: { name: "sap/ui/mdc/field/FieldBaseDelegate", payload: {} }
 		});
-
-		if (oContentEdit) {
-			oFilterField.setContentEdit(oContentEdit);
-		}
 
 		return oFilterField;
 	};
@@ -73,8 +70,19 @@ sap.ui.define([
 	JSONFilterBarDelegate.addItem = async (oFilterBar, sPropertyName) => {
 		const oProperty = JSONPropertyInfo.find((oPI) => oPI.key === sPropertyName);
 		const sId = oFilterBar.getId() + "--filter--" + sPropertyName;
-		return await _createFilterField(sId, oProperty, oFilterBar);
+		return Promise.resolve(_createFilterField(sId, oProperty, oFilterBar));
 	};
+
+	function getViewForControl(oControl) {
+		if (oControl instanceof View) {
+			return oControl;
+		}
+		if (oControl && typeof oControl.getParent === "function") {
+			oControl = oControl.getParent();
+			return getViewForControl(oControl);
+		}
+		return undefined;
+	}
 
 	return JSONFilterBarDelegate;
 });

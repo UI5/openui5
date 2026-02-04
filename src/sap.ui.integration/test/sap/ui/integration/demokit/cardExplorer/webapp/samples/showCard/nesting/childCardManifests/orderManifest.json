@@ -1,0 +1,95 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.object.card",
+		"type": "card",
+		"title": "Sample of an Object Card",
+		"subTitle": "Sample of an Object Card",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Object",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://order-status"
+		}
+	},
+	"sap.card": {
+		"configuration": {
+			"useMainDestinations": true,
+			"parameters": {
+				"orderId": {
+					"value": null
+				}
+			}
+		},
+		"type": "Object",
+		"data": {
+			"request": {
+				"url": "{{mainDestinations.northwind}}/Orders({parameters>/orderId/value})"
+			},
+			"path": "/"
+		},
+		"header": {
+			"icon": {
+				"src": "sap-icon://order-status",
+				"shape": "Square"
+			},
+			"title": "Shipment for {ShipName}",
+			"subtitle": "Order fulfillment and shipping overview"
+		},
+		"content": {
+			"groups": [
+				{
+					"alignment": "Stretch",
+					"items": [
+						{
+							"value": "Delivered on time",
+							"type": "Status",
+							"state": "Success",
+							"showStateIcon": true
+						},
+						{
+							"value": "Freight charge of USD {Freight} was invoiced after shipment on {= ${ShippedDate} ? ${ShippedDate} : 'N/A' }."
+						}
+					]
+				},
+				{
+					"items": [
+						{
+							"label": "Order ID",
+							"value": "{OrderID}"
+						},
+						{
+							"label": "Customer",
+							"value": "{ShipName} ({ShipCountry})"
+						}
+					]
+				},
+				{
+					"items": [
+						{
+							"label": "Shipping Address",
+							"value": "{ShipAddress}, {ShipPostalCode} {ShipCity}"
+						},
+						{
+							"label": "Shipping Method",
+							"value": "Carrier {ShipVia}"
+						}
+					]
+				}
+			]
+		}
+	}
+}
