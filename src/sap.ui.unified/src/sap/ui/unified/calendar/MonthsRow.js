@@ -136,7 +136,14 @@ sap.ui.define([
 			 * @private
 			 * @since 1.139.0
 			 */
-			selectableAccessibilitySemantics : {type : "boolean", group : "Behavior", defaultValue : true, visibility: "hidden"}
+			selectableAccessibilitySemantics : {type : "boolean", group : "Behavior", defaultValue : true, visibility: "hidden"},
+
+			/**
+			 * Determines if the week numbers are displayed.
+			 *
+			 * @since 1.145.0
+			 */
+			showWeekNumbers : {type : "boolean", group : "Appearance", defaultValue : false}
 		},
 		aggregations : {
 

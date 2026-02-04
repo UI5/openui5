@@ -99,6 +99,10 @@ sap.ui.define([
 					]
 				};
 			}
+		},
+		name: {
+			singular: "CTX_VM_NAME_SINGULAR",
+			plural: "CTX_VM_NAME_PLURAL"
 		}
 	};
 });

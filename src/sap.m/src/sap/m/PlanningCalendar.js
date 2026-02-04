@@ -18,6 +18,7 @@ sap.ui.define([
 	'sap/ui/unified/calendar/OneMonthDatesRow',
 	'sap/ui/unified/calendar/MonthsRow',
 	'sap/ui/unified/calendar/TimesRow',
+	'sap/ui/unified/calendar/WeeksRow',
 	'sap/ui/unified/DateRange',
 	'sap/ui/unified/DateTypeRange',
 	'sap/ui/unified/CalendarAppointment',
@@ -70,6 +71,7 @@ sap.ui.define([
 	OneMonthDatesRow,
 	MonthsRow,
 	TimesRow,
+	WeeksRow,
 	DateRange,
 	DateTypeRange,
 	CalendarAppointment,
@@ -725,12 +727,17 @@ sap.ui.define([
 		"sap.ui.unified.calendar.TimesRow",
 		"sap.ui.unified.calendar.DatesRow",
 		"sap.ui.unified.calendar.MonthsRow",
-		"sap.ui.unified.calendar.OneMonthDatesRow"
+		"sap.ui.unified.calendar.OneMonthDatesRow",
+		"sap.ui.unified.calendar.WeeksRow"
 	];
 
 	var CalendarHeader = Control.extend("sap.m._PlanningCalendarInternalHeader", {
 
 		metadata : {
+			properties : {
+				showWeekNumbers : {type : "boolean", group : "Appearance", defaultValue : false}
+			},
+
 			aggregations: {
 				"toolbar"   : {type: "sap.m.Toolbar", multiple: false},
 				"allCheckBox" : {type: "sap.m.CheckBox", multiple: false}
@@ -800,6 +807,8 @@ sap.ui.define([
 			content: [this._oCalendarHeader, this._oTimesRow],
 			ariaLabelledBy: InvisibleText.getStaticId("sap.m", "PC_INTERVAL_TOOLBAR")
 		});
+
+		this._oInfoToolbar.addStyleClass("sapMPlanCalInfoToolbar");
 
 		var oTable = new Table(sId + "-Table", {
 			sticky: [], // set sticky property to an empty array this correspondents to PlanningCalendar stickyHeader = false
@@ -912,6 +921,11 @@ sap.ui.define([
 		if (this._rowHeaderPressEventKeyboard) {
 			this._rowHeaderPressEventKeyboard.off();
 			this._rowHeaderPressEventKeyboard = null;
+		}
+
+		if (this._oCalendarWeeks) {
+			this._oCalendarWeeks.destroy();
+			this._oCalendarWeeks = null;
 		}
 	};
 
@@ -1548,6 +1562,7 @@ sap.ui.define([
 		this._dateNav.setStart(oStartDate);
 		this._dateNav.setCurrent(oStartDate);
 		this._getHeader().setStartDate(oStartDate);
+		this._oCalendarWeeks?.setStartDate(oStartDate);
 
 		INTERVAL_CTR_REFERENCES.forEach(function (sControlRef) {
 			if (this[sControlRef]) {
@@ -1607,6 +1622,9 @@ sap.ui.define([
 	   }
 	   if (this._oOneMonthsRow) {
 		   this._oOneMonthsRow.setPrimaryCalendarType(sPrimaryCalendarType);
+	   }
+	   if (this._oCalendarWeeks) {
+		   this._oCalendarWeeks.setPrimaryCalendarType(sPrimaryCalendarType);
 	   }
    };
 
@@ -1842,6 +1860,8 @@ sap.ui.define([
 		for (key in INTERVAL_METADATA) {
 			this[INTERVAL_METADATA[key].sInstanceName] && this[INTERVAL_METADATA[key].sInstanceName].setCalendarWeekNumbering(sCalendarWeekNumbering);
 		}
+
+		this._oCalendarWeeks?.setCalendarWeekNumbering(sCalendarWeekNumbering);
 	};
 
 	PlanningCalendar.prototype.removeIntervalInstanceFromInfoToolbar = function () {
@@ -2013,6 +2033,26 @@ sap.ui.define([
 						oHeader.setAssociation("currentPicker", oAssociation);
 						oAssociation.addDelegate(MONTH_DELEGATE, oAssociation);
 					}
+
+					if (sKey === CalendarIntervalType.Day) {
+						if (!this._oCalendarWeeks) {
+								this._oCalendarWeeks = new WeeksRow(this.getId() + "-CalendarWeeksRow", {
+								startDate: this.getStartDate(),
+								primaryCalendarType: this.getPrimaryCalendarType(),
+								interval: iIntervals,
+								viewKey: CalendarIntervalType.Day,
+								showWeekNumbers: this.getShowWeekNumbers(),
+								calendarWeekNumbering: this.getCalendarWeekNumbering()
+							});
+						} else {
+							this._oCalendarWeeks.setInterval(iIntervals);
+							this._oCalendarWeeks.setShowWeekNumbers(this.getShowWeekNumbers());
+							this._oCalendarWeeks.setPrimaryCalendarType(this.getPrimaryCalendarType());
+							this._oCalendarWeeks.setStartDate(this.getStartDate());
+							this._oCalendarWeeks.setViewKey(CalendarIntervalType.Day);
+						}
+						this._oInfoToolbar.addContent(this._oCalendarWeeks);
+					}
 					break;
 
 				case CalendarIntervalType.Month:
@@ -2020,7 +2060,8 @@ sap.ui.define([
 						this._oMonthsRow = new MonthsRow(this.getId() + "-MonthsRow", {
 							startDate: UI5Date.getInstance(oStartDate.getTime()), // use new date object
 							months: iIntervals,
-							legend: this.getLegend()
+							legend: this.getLegend(),
+							showWeekNumbers: this.getShowWeekNumbers()
 						});
 						this._oMonthsRow.setProperty("primaryCalendarType", this._getPrimaryCalendarType());
 						if (sSecondaryCalendarType) {
@@ -2045,6 +2086,24 @@ sap.ui.define([
 					oAssociation = oHeader.getAggregation("_yearPicker") ? oHeader.getAggregation("_yearPicker") : oHeader._oPopup.getContent()[0];
 					oHeader.setAssociation("currentPicker", oAssociation);
 					oAssociation.addDelegate(YEAR_PICKER_DELEGATE, oAssociation);
+
+					if (!this._oCalendarWeeks) {
+						this._oCalendarWeeks = new WeeksRow(this.getId() + "-CalendarWeeksRow", {
+							startDate: this.getStartDate(),
+							primaryCalendarType: this.getPrimaryCalendarType(),
+							interval: iIntervals,
+							viewKey: CalendarIntervalType.Month,
+							showWeekNumbers: this.getShowWeekNumbers(),
+							calendarWeekNumbering: this.getCalendarWeekNumbering()
+						});
+					} else {
+						this._oCalendarWeeks.setInterval(iIntervals);
+						this._oCalendarWeeks.setShowWeekNumbers(this.getShowWeekNumbers());
+						this._oCalendarWeeks.setPrimaryCalendarType(this.getPrimaryCalendarType());
+						this._oCalendarWeeks.setStartDate(this.getStartDate());
+						this._oCalendarWeeks.setViewKey(CalendarIntervalType.Month);
+					}
+					this._oInfoToolbar.addContent(this._oCalendarWeeks);
 					break;
 
 				default:
@@ -2433,6 +2492,14 @@ sap.ui.define([
 				adaptCalHeaderForWeekNumbers.call(this, bShowWeekNumbers, bViewAllowsWeekNumbers);
 			}
 		}, this);
+
+		if (this._oCalendarWeeks) {
+			this._oCalendarWeeks.setShowWeekNumbers(bShowWeekNumbers);
+		}
+
+		if (this._oMonthsRow) {
+			this._oMonthsRow.setShowWeekNumbers(bShowWeekNumbers);
+		}
 	};
 
 	PlanningCalendar.prototype._setShowRowHeaders = function(){
@@ -3341,6 +3408,9 @@ sap.ui.define([
 						this._oDatesRow.setDays(iIntervals);
 						this._dateNav.setStep(iIntervals * iIntervalSize);
 					}
+					if (this._oCalendarWeeks && this._oCalendarWeeks.getInterval() != iIntervals) {
+						this._oCalendarWeeks.setInterval(iIntervals);
+					}
 					break;
 
 				case CalendarIntervalType.Month:
@@ -3348,6 +3418,10 @@ sap.ui.define([
 						this._oMonthsRow.setMonths(iIntervals);
 						this._dateNav.setStep(iIntervals * iIntervalSize);
 					}
+					if (this._oCalendarWeeks && this._oCalendarWeeks.getInterval() != iIntervals) {
+						this._oCalendarWeeks.setInterval(iIntervals);
+					}
+
 					break;
 
 				case CalendarIntervalType.Week:

@@ -281,6 +281,16 @@ sap.ui.define(function() {
 				}
 			},
 
+			"WeeksRow":{
+				group: "Calendar",
+				qunit: {
+					reorder: false
+				},
+				coverage: {
+					only: ["sap/ui/unified/calendar/WeeksRow"]
+				}
+			},
+
 			"YearPicker": {
 				group: "Calendar",
 				qunit: {

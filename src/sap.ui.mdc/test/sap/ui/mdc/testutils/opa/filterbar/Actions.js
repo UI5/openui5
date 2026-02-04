@@ -598,37 +598,38 @@ sap.ui.define([
 					const bIsNewUI = oAdaptFiltersPanel.getUseNewUI();
 					if (bIsNewUI) {
 						return this.waitFor({
-							controlType: "sap.ui.mdc.p13n.panels.AdaptFiltersPanel",
-							success: function (aAdaptFiltersPanel) {
-								Opa5.assert.ok(true, "Adapt Filters Panel found");
-								return this.waitFor({
-									controlType: "sap.m.CustomListItem",
-									matchers: {
-										ancestor: {
-											controlType: "sap.m.Panel",
-											visible: true
-										}
-									},
-									success: function (aItems) {
-										let bFound = false;
-										let oItemToSelect;
-										aItems.forEach(function (oItem) {
-											if (oItem.getContent()[0].getItems()[0].getText() === sName) {
-												bFound = true;
-												oItemToSelect = oItem;
-											}
-										});
-										if (bFound) {
-											//here we only select/deselect the Checkbox - not testing the CheckBox in the item
-											oItemToSelect.setSelected(bSelect);
-											Opa5.assert.ok(bFound, "FilterField " + sName + " selected");
-										} else {
-											Opa5.assert.notOk(!bFound, "No FilterField with label" + sName + " found");
-										}
+							controlType: "sap.m.CustomListItem",
+							success: function (aItems) {
+								let bFound = false;
+								aItems.forEach(function (oItem) {
+									if (oItem.getContent()[0].getContent()[0].getText() === sName) {
+										bFound = true;
 									}
 								});
-							},
-							errorMessage: "No Adapt Filters Panel found"
+								if (bFound) {
+									return this.waitFor({
+										controlType: "sap.m.Button",
+										matchers: [
+											new PropertyStrictEquals({
+												name: "icon",
+												value: bSelect ? "sap-icon://show" : "sap-icon://hide"
+											}),
+											function (oButton) {
+												const oCustomListItem = oButton.getParent().getParent().getParent();
+												const sTitle = oCustomListItem.getContent()[0].getContent()[0].getText();
+												return sTitle === sName;
+											}
+										],
+										actions: new Press(),
+										success: function () {
+											Opa5.assert.ok(bFound, "FilterField " + sName + (bSelect ? " selected" : " deselected"));
+										}
+									});
+
+								} else {
+									Opa5.assert.notOk(!bFound, "No FilterField with label" + sName + " found");
+								}
+							}
 						});
 					} else {
 						return this.waitFor({

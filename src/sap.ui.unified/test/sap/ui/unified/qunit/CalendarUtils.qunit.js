@@ -443,7 +443,6 @@ sap.ui.define([
 		assert.equal(CalendarUtils._getFirstDateOfMonth(new CalendarDate(2016, 2, 29)).getMonth(), 2, "the month is the same in a leap year");
 		assert.equal(CalendarUtils._getFirstDateOfMonth(new CalendarDate(2016, 2, 29)).getDate(), 1, "the date is the same in a leap year");
 
-
 	});
 
 	QUnit.test("_minDate", function(assert) {
