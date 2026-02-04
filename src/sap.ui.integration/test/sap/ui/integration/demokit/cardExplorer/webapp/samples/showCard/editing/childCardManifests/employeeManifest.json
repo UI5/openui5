@@ -1,0 +1,112 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.list.editing.employee1",
+		"type": "card"
+	},
+	"sap.card": {
+		"configuration": {
+			"parameters": {
+				"employeeId": {
+					"value": null
+				}
+			}
+		},
+		"type": "Object",
+		"data": { 
+			"request": {
+				"url": "/employees/{parameters>/employeeId/value}"
+			},
+			"path": "/employee"
+		},
+		"extension": "../EditEmployeeExtension",
+		"header": {
+			"title": "Edit Employee",
+			"subTitle": "Update employee information",
+			"icon": {
+				"src": "sap-icon://edit"
+			}
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Personal Information",
+					"items": [
+						{
+							"id": "Name",
+							"type": "Input",
+							"label": "Name",
+							"value": "{Name}",
+							"placeholder": "Enter employee name"
+						},
+						{
+							"id": "Email",
+							"type": "Input",
+							"label": "Email",
+							"value": "{Email}",
+							"placeholder": "Enter email address"
+						},
+						{
+							"id": "Phone",
+							"type": "Input",
+							"label": "Phone",
+							"value": "{Phone}",
+							"placeholder": "Enter phone number"
+						}
+					]
+				},
+				{
+					"title": "Job Information",
+					"items": [
+						{
+							"id": "Title",
+							"type": "Input",
+							"label": "Title",
+							"value": "{Title}",
+							"placeholder": "Enter job title"
+						},
+						{
+							"id": "Department",
+							"type": "Input",
+							"label": "Department",
+							"value": "{Department}",
+							"placeholder": "Enter department"
+						},
+						{
+							"id": "Location",
+							"type": "Input",
+							"label": "Location",
+							"value": "{Location}",
+							"placeholder": "Enter location"
+						}
+					]
+				}
+			]
+		},
+		"footer": {
+			"actionsStrip": [
+				{
+					"buttonType": "Emphasized",
+					"text": "Save Changes",
+					"actions": [
+						{
+							"type": "Submit"
+						}
+					]
+				},
+				{
+					"buttonType": "Transparent",
+					"text": "Close",
+					"actions": [
+						{
+							"type": "HideCard"
+						}
+					]
+				}
+			],
+			"closeButton": {
+				"visible": false
+			}
+		}
+	}
+}

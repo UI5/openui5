@@ -1,0 +1,75 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.list.editing",
+		"type": "card",
+		"title": "Editable List Card",
+		"subTitle": "List with Editable Child Cards",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"description": "An interactive list card that lets each item to be edited through a child card interface."
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://list"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"header": {
+			"title": "Employee Directory",
+			"subtitle": "Click to edit employee details",
+			"icon": {
+				"src": "sap-icon://employee"
+			},
+			"status": {
+				"text": "3 of 5"
+			}
+		},
+		"configuration": {
+			"childCards": {
+				"detailsCard": {
+					"manifest": "./childCardManifests/employeeManifest.json"
+				}
+			}
+		},
+		"extension": "./EditEmployeeExtension",
+		"content": {
+			"data": {
+				"request": {
+					"url": "/employees"
+				},
+				"path": "/employees"
+			},
+			"maxItems": 3,
+			"item": {
+				"title": "{Name}",
+				"description": "{Title}",
+				"highlight": "{= ${Status} === 'Active' ? 'Success' : 'Warning' }",
+				"info": {
+					"value": "{Department}",
+					"state": "{= ${Status} === 'Active' ? 'Success' : 'Warning' }"
+				},
+				"actionsStrip": [
+					{
+						"buttonType": "Transparent",
+						"text": "Edit Details",
+						"actions": [
+							{
+								"type": "ShowCard",
+								"parameters": {
+									"childCardKey": "detailsCard",
+									"parameters": {
+										"employeeId": "{EmployeeID}"
+									}
+								}
+							}
+						]
+					}
+				]
+			}
+		}
+	}
+}

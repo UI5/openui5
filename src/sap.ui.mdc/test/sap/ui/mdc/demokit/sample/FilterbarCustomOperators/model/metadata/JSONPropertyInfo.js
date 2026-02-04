@@ -20,7 +20,9 @@ sap.ui.define([
 		label: "Rank",
 		visible: true,
 		path: "rank",
-		dataType: "sap.ui.model.type.Integer"
+		dataType: "sap.ui.model.type.Integer",
+		formatOptions:{emptyString: 0},
+		constraints:{minimum: 0}
 	},{
 		key: "name",
 		label: "Name",
@@ -32,13 +34,15 @@ sap.ui.define([
 		label: "Height",
 		visible: true,
 		path: "height",
-		dataType: "sap.ui.model.type.Integer"
+		dataType: "sap.ui.model.type.Integer",
+		formatOptions:{emptyString: null}
 	},{
 		key: "prominence",
 		label: "Prominence",
 		visible: true,
 		path: "prominence",
-		dataType: "sap.ui.model.type.Float"
+		dataType: "sap.ui.model.type.Float",
+		formatOptions:{emptyString: null}
 	},{
 		key: "range",
 		label: "Range",
@@ -56,13 +60,16 @@ sap.ui.define([
 		label: "Parent Mountain",
 		visible: true,
 		path: "parent_mountain",
+		maxConditions: 1,
 		dataType: "sap.ui.model.type.Boolean"
 	},{
 		key: "first_ascent",
 		label: "First Ascent",
 		visible: true,
 		path: "first_ascent",
-		dataType: "sap.ui.model.type.Date"
+		maxConditions: 1,
+		dataType: "sap.ui.model.type.Date",
+		formatOptions: {"style": "long"}
 	},{
 		key: "countries",
 		label: "Countries",

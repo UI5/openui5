@@ -3935,6 +3935,10 @@ sap.ui.define([
 				assert.equal(this.oGenericTile.getTileIcon(), "sap-icon://key", "Tile Icon is present.");
 				assert.equal(this.oGenericTile._oBadgeColors["backgroundColor"], "#d23a0a", "Default background color is restored");
 				assert.ok(this.oGenericTile._oIcon.isA("sap.ui.core.Icon"), "Icon Created");
+				// Check that overflow is not hidden for TwoByHalf IconMode header content
+				var oHdrContent = this.oGenericTile.getDomRef().querySelector(".sapMGTHdrContent");
+				var sOverflow = window.getComputedStyle(oHdrContent).overflow;
+				assert.notEqual(sOverflow, "hidden", "Overflow is not set to hidden for TwoByHalf IconMode header content");
 				assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTHdrContent").length, 1, "Header Created.");
 				assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTHdrTxt").length, 1, "Header Text Created.");
 				assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTSubHdrTxt").length, 0, "No SubHeader Text Created.");
@@ -3983,6 +3987,34 @@ sap.ui.define([
 				}.bind(this), 100);
 			}.bind(this), 100);
 		}.bind(this), 100);
+	});
+
+	QUnit.test("TwoByHalf IconMode - overflow check without TileContent", async function(assert){
+		// Arrange
+		this.oGenericTile.setMode(GenericTileMode.IconMode);
+		this.oGenericTile.setFrameType(FrameType.TwoByHalf);
+		this.oGenericTile.setHeader("Boîte de réception");
+		this.oGenericTile.setSubheader("Cómo estás hoy");
+		this.oGenericTile.setTileIcon("sap-icon://account");
+		// Ensure no TileContent is added
+		this.oGenericTile.removeAllTileContent();
+
+		// Act
+		await nextUIUpdate();
+
+		// Assert
+		assert.equal(this.oGenericTile.getMode(), GenericTileMode.IconMode, "Tile is in IconMode");
+		assert.equal(this.oGenericTile.getFrameType(), FrameType.TwoByHalf, "Tile is in TwoByHalf frame type");
+		assert.equal(this.oGenericTile.getTileContent().length, 0, "No TileContent is present");
+
+		var oHdrContent = this.oGenericTile.getDomRef().querySelector(".sapMGTHdrContent");
+		assert.ok(oHdrContent, "Header content element exists");
+
+		var sOverflow = window.getComputedStyle(oHdrContent).overflow;
+		assert.notEqual(sOverflow, "hidden", "Overflow is not set to hidden for TwoByHalf IconMode header content without TileContent");
+
+		assert.ok(this.oGenericTile.getDomRef().classList.contains("sapMGTIconMode"), "Tile has IconMode CSS class");
+		assert.ok(this.oGenericTile.getDomRef().classList.contains("sapMGTTwoByHalf"), "Tile has TwoByHalf CSS class");
 	});
 
 	QUnit.module("Article Mode Tests", {

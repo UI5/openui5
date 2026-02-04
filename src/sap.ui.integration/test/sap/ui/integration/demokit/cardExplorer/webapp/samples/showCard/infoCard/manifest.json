@@ -1,0 +1,100 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.icon.list.card",
+		"type": "card",
+		"title": "Sample of a List With Icon",
+		"subTitle": "Sample of a List With Icon",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"List",
+				"Icon",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://lightbulb"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"configuration": {
+			"childCards": {
+				"detailsCard": {
+					"manifest": "./childCards/infoObjectCard.json"
+				}
+			}
+		},
+		"header": {
+			"title": "My Campaigns",
+			"subtitle": "For Submitters of Ideas",
+			"status": {
+				"text": "4 of 4"
+			}
+		},
+		"content": {
+			"data": {
+				"request": {
+					"url": "./data.json"
+				},
+				"path": "/campaign"
+			},
+			"maxItems": 4,
+			"item": {
+				"title": "{CampaignName}",
+				"info": {
+					"value": "{Phase}",
+					"state": "None",
+					"inverted": true
+				},
+				"description": "{IdeaDescription}",
+				"attributesLayoutType": "OneColumn",
+				"attributes": [
+					{
+						"value": "{= ${DaysTillBegin} > 0 ? ${DaysTillBegin} + ' days until start' : ( ${DaysSinceEnd} > 0 ? ${DaysSinceEnd} + ' days since expiry' : ${RemainingDays} + ' days left' ) }",
+						"state": "{= ${DaysTillBegin} === 0 && ${DaysSinceEnd} === 0 ? ( ${RemainingDays}/${DurationDays} >= 0.5 ? 'Success' : ( ${RemainingDays}/${DurationDays} < 0.25 ? 'Error' : 'Warning' ) ) : 'None'}"
+					}
+				],
+				"actionsStrip": [
+					{
+						"buttonType": "Transparent",
+						"text": "View Details",
+						"actions": [
+							{
+								"type": "ShowCard",
+								"parameters": {
+									"childCardKey": "detailsCard",
+									"data": {
+										"campaign": "{}"
+									}
+								}
+							}
+						]
+					}
+				]
+			},
+			"group": {
+				"title": "{= ${DaysTillBegin} > 0 ? 'Not Started' : (${DaysSinceEnd} > 0 ? 'Expired' : 'Ongoing') }",
+				"order": {
+					"path": "groupIndex",
+					"dir": "ASC"
+				}
+			}
+		},
+		"footer": {
+			"paginator": {
+				"pageSize": 4
+			}
+		}
+	}
+}

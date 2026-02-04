@@ -1,0 +1,54 @@
+{
+	"employees": [
+		{
+			"EmployeeID": "0",
+			"Name": "Charlie Brown",
+			"Title": "QA Lead",
+			"Department": "Quality Assurance",
+			"Status": "Active",
+			"Email": "charlie.brown@company.com",
+			"Phone": "+1 555-0105",
+			"Location": "Boston"
+		},
+		{
+			"EmployeeID": "1",
+			"Name": "John Doe",
+			"Title": "Senior Developer",
+			"Department": "Engineering",
+			"Status": "Active",
+			"Email": "john.doe@company.com",
+			"Phone": "+1 555-0101",
+			"Location": "New York"
+		},
+		{
+			"EmployeeID": "2",
+			"Name": "Jane Smith",
+			"Title": "Product Manager",
+			"Department": "Product",
+			"Status": "Inactive",
+			"Email": "jane.smith@company.com",
+			"Phone": "+1 555-0102",
+			"Location": "San Francisco"
+		},
+		{
+			"EmployeeID": "3",
+			"Name": "Bob Johnson",
+			"Title": "UX Designer",
+			"Department": "Design",
+			"Status": "Active",
+			"Email": "bob.johnson@company.com",
+			"Phone": "+1 555-0103",
+			"Location": "Austin"
+		},
+		{
+			"EmployeeID": "4",
+			"Name": "Alice Williams",
+			"Title": "DevOps Engineer",
+			"Department": "Engineering",
+			"Status": "On Leave",
+			"Email": "alice.williams@company.com",
+			"Phone": "+1 555-0104",
+			"Location": "Seattle"
+		}
+	]
+}

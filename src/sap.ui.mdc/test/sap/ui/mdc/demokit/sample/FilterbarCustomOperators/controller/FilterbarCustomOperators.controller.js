@@ -1,13 +1,13 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/mdc/condition/FilterConverter",
+	"sap/ui/mdc/util/FilterUtil",
 	"../Operators",
 	"../model/formatter"
 ], function(
 	Controller,
 	JSONModel,
-	FilterConverter,
+	FilterUtil,
 	Operators,
 	formatter
 ) {
@@ -40,13 +40,14 @@ sap.ui.define([
 				return;
 			}
 
-			const oConditionTypes = FilterConverter.createConditionTypesMapFromFilterBar(oConditions, oFilterbar);
-			const oModelFilter = FilterConverter.createFilters(oConditions, oConditionTypes);
+			Promise.all([oFilterbar.awaitControlDelegate(), oFilterbar.awaitPropertyHelper()]).then(() => {
+				const oModelFilter = FilterUtil.getFilterInfo(oFilterbar.getTypeMap(), oConditions, oFilterbar.getPropertyHelper().getProperties());
+				const sModelFilter = this.stringifyModelFilter(oModelFilter?.filters);
+				oModel.setProperty("/modelFilterText", sModelFilter);
+			});
 
 			const sConditions = JSON.stringify(oConditions, "\t", 4);
-			const sModelFilter = this.stringifyModelFilter(oModelFilter);
 			oModel.setProperty("/conditionsText", sConditions);
-			oModel.setProperty("/modelFilterText", sModelFilter);
 		},
 		stringifyModelFilter: function(oModelFilter) {
 			if (!oModelFilter) {

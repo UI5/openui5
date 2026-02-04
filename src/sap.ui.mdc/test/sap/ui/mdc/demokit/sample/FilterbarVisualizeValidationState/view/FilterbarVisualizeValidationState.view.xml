@@ -10,45 +10,40 @@
 	>
 
 	<f:DynamicPage id="page" headerExpanded="{/headerExpanded}">
-	<f:title>
-			<f:DynamicPageTitle stateChange="onStateChanged">
+		<f:title>
+			<f:DynamicPageTitle id="pageTitle" stateChange="onStateChanged">
 				<f:actions>
 				</f:actions>
 				<f:snappedContent>
-					<HBox justifyContent="End" width="100%">
-						<Button type="Emphasized" text="Validate collapsed filterbar" press=".handleValidateCollapsedFilterBarPress"/>
+					<HBox id="snappedContentHBox" justifyContent="End" width="100%">
+						<Button id="validateButton" type="Emphasized" text="Validate collapsed filterbar" press=".handleValidateCollapsedFilterBarPress"/>
 					</HBox>
 				</f:snappedContent>
 				<f:expandedContent>
-					<HBox>
+					<HBox id="expandedContentHBox">
 					</HBox>
 				</f:expandedContent>
 			</f:DynamicPageTitle>
 		</f:title>
 		<f:header>
-			<f:DynamicPageHeader pinnable="true">
+			<f:DynamicPageHeader id="pageHeader" pinnable="true">
 				<mdc:FilterBar
 					id="mountainsFilterbar"
 					delegate="{ name: 'mdc/sample/delegate/JSONFilterBarDelegate', payload: {}}"
 					p13nMode = "Item,Value"
-					filtersChanged="handleFiltersChanged"
-					showAdaptFiltersButton="false">
+					propertyInfo='[\{"name": "first_ascent", "label": "First Ascent", "path": "first_ascent", "dataType":"sap.ui.model.type.Date", "formatOptions": \{"style": "long"\}, "maxConditions": 1, "visible": true, "required": true\},
+								   \{"name": "rank", "label": "Rank", "path": "rank", "dataType":"sap.ui.model.type.Integer", "formatOptions": \{"emptyString": 0\}, "constraints": \{"minimum": 0\}, "visible": true, "required": true\}]'
+					showAdaptFiltersButton="false"
+					filtersChanged="handleFiltersChanged">
 					<mdc:filterItems>
-						<!-- Rank - Custom operator -->
 						<mdc:FilterField
-							id="field-rank"
-							label="Rank"
-							required="true"
+							id="mountainsFilterbar--filter--rank"
 							propertyKey="rank"
-							dataType="sap.ui.model.type.Integer"
 							delegate="{name: 'sap/ui/mdc/field/FieldBaseDelegate'}"
 						/>
 						<mdc:FilterField
-							id="field-first-ascent"
-							label="First ascent"
-							required="true"
+							id="mountainsFilterbar--filter--first_ascent"
 							propertyKey="first_ascent"
-							dataType="sap.ui.model.type.Date"
 							delegate="{name: 'sap/ui/mdc/field/FieldBaseDelegate'}"
 						/>
 					</mdc:filterItems>
@@ -56,10 +51,10 @@
 			</f:DynamicPageHeader>
 		</f:header>
 		<f:content>
-			<VBox width="100%">
+			<VBox id="ConditionsLayout" width="100%">
 				<VBox>
-					<Title text="Conditions"/>
-					<Label text="Editor height (px)" labelFor="inputText" />
+					<Title id="conditionsTitle" text="Conditions"/>
+					<Label id="inputTextLabel" text="Editor height (px)" labelFor="inputText" />
 					<Slider
 						id="inputText"
 						value="{/editorHeight}"
@@ -69,10 +64,11 @@
 						step="50"
 						class="sapUiMediumMarginBottom"/>
 				</VBox>
-				<HBox width="100%">
-					<VBox width="50%">
-						<Text text="The following JSON is the output of the conditions of the FilterBar." class="sapUiSmallMarginBottom" />
+				<HBox id="codeEditorsLayout" width="100%">
+					<VBox id="conditionsEditorLayout" width="50%">
+						<Text id="coditionsEditorText" text="The following JSON is the output of the conditions of the FilterBar." class="sapUiSmallMarginBottom" />
 						<ce:CodeEditor
+							id="conditionsEditor"
 							type="json"
 							value="{/conditionsText}"
 							editable="false"
@@ -82,9 +78,10 @@
 								formatter: '.formatter.formatHeight'
 							}" />
 					</VBox>
-					<VBox width="50%">
-						<Text text="The following text is the output of the model filter of the FilterBar." class="sapUiSmallMarginBottom" />
+					<VBox id="FilterEditorLayout" width="50%">
+						<Text id="FilterEditorText" text="The following text is the output of the model filter of the FilterBar." class="sapUiSmallMarginBottom" />
 						<ce:CodeEditor
+							id="filterEditor"
 							type="text"
 							value="{/modelFilterText}"
 							editable="false"

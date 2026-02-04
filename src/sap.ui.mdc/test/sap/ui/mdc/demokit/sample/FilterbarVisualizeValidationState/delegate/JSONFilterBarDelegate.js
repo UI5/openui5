@@ -15,15 +15,10 @@ sap.ui.define([
 
 	JSONFilterBarDelegate.fetchProperties = async () => JSONPropertyInfo;
 
-	const _createFilterField = async (sId, oProperty, oFilterBar) => {
-		const sPropertyName = oProperty.key;
+	const _createFilterField = (sId, oProperty, oFilterBar) => {
+		const sPropertyKey = oProperty.key;
 		const oFilterField = new FilterField(sId, {
-			dataType: oProperty.dataType,
-			conditions: "{$filters>/conditions/" + sPropertyName + '}',
-			propertyKey: sPropertyName,
-			required: oProperty.required,
-			label: oProperty.label,
-			maxConditions: oProperty.maxConditions,
+			propertyKey: sPropertyKey,
 			delegate: {name: "sap/ui/mdc/field/FieldBaseDelegate", payload: {}}
 		});
 		return oFilterField;
@@ -32,7 +27,7 @@ sap.ui.define([
 	JSONFilterBarDelegate.addItem = async (oFilterBar, sPropertyName) => {
 		const oProperty = JSONPropertyInfo.find((oPI) => oPI.key === sPropertyName);
 		const sId = oFilterBar.getId() + "--filter--" + sPropertyName;
-		return Element.getElementById(sId) ?? (await _createFilterField(sId, oProperty, oFilterBar));
+		return Promise.resolve(Element.getElementById(sId) ?? _createFilterField(sId, oProperty, oFilterBar));
 	};
 
 	JSONFilterBarDelegate.visualizeValidationState = function(oFilterBar, mValidation) {

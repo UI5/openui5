@@ -1,0 +1,56 @@
+{
+	"campaign": [
+		{
+			"id": 0,
+			"CampaignName": "Strategic Extraction of Natural Resources for Long-Term Industrial Growth",
+			"DurationDays": 30,
+			"RemainingDays": 5,
+			"DaysTillBegin": 0,
+			"DaysSinceEnd": 0,
+			"groupIndex": 10,
+			"Phase": "Idea Selection",
+			"Idea": "43",
+			"IdeaDescription": "Focuses on identifying sustainable and profitable methods to extract key resources while minimizing environmental impact.",
+			"img": "../images/example4.jpg"
+		},
+		{
+			"id": 1,
+			"CampaignName": "My Fantastic Campaign for Exploring Innovative Concepts and Future Opportunities",
+			"DurationDays": 24,
+			"RemainingDays": 24,
+			"DaysTillBegin": 30,
+			"DaysSinceEnd": 0,
+			"groupIndex": 20,
+			"Phase": "Preparing",
+			"Idea": "0",
+			"IdeaDescription": "An open-ended campaign aimed at brainstorming and refining creative ideas that could lead to new business initiatives.",
+			"img": "../images/example3.jpg"
+		},
+		{
+			"id": 2,
+			"CampaignName": "Comprehensive Campaign to Increase Milk Production and Improve Supply Chain Efficiency",
+			"DurationDays": 100,
+			"RemainingDays": 70,
+			"DaysTillBegin": 0,
+			"DaysSinceEnd": 0,
+			"groupIndex": 10,
+			"Phase": "Collecting",
+			"Idea": "3",
+			"IdeaDescription": "Targets higher milk output by supporting farmers, optimizing logistics, and improving overall dairy production processes.",
+			"img": "../images/example2.jpg"
+		},
+		{
+			"id": 3,
+			"CampaignName": "Digital Expansion Initiative for Enhancing Online Presence and Customer Engagement",
+			"DurationDays": 60,
+			"RemainingDays": 12,
+			"DaysTillBegin": 3,
+			"DaysSinceEnd": 0,
+			"groupIndex": 20,
+			"Phase": "Evaluation",
+			"Idea": "0",
+			"IdeaDescription": "Aims to expand digital tools and platforms to reach a wider audience and improve interaction with customers.",
+			"img": "../images/natureAndChildren.jpg"
+		}
+	]
+}

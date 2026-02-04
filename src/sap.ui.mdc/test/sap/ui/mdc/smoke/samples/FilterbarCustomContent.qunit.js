@@ -136,7 +136,7 @@ sap.ui.define([
 
 		When.onTheApp.iChangeTheSliderValueInTheField(1000, true);
 		Then.iShouldSeeConditons("sap.ui.mdc.FilterBar", oCondition);
-		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oCondition, "\t", 4), "__editor0");
+		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oCondition, "\t", 4), "container-mdc.sample---sample--conditionsCodeEditor");
 	});
 
 	opaTest(`MultiInput FilterField works`, function (Given, When, Then) {
@@ -145,7 +145,7 @@ sap.ui.define([
 		When.onTheApp.iEnterTextOnTheMultiInputFilterField("sample text");
 		When.onTheApp.iPressKeyOnTheMultiInputFilterField(KeyCodes.ENTER);
 		Then.iShouldSeeConditons("sap.ui.mdc.FilterBar", oCondition);
-		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oCondition, "\t", 4), "__editor0");
+		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oCondition, "\t", 4), "container-mdc.sample---sample--conditionsCodeEditor");
 	});
 
 	opaTest(`SegmentedButton FilterField works`, function (Given, When, Then) {
@@ -153,7 +153,7 @@ sap.ui.define([
 
 		When.onTheApp.iChangeTheSegementedButtonValueInTheFilterField("Done");
 		Then.iShouldSeeConditons("sap.ui.mdc.FilterBar", oCondition);
-		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oCondition, "\t", 4), "__editor0");
+		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oCondition, "\t", 4), "container-mdc.sample---sample--conditionsCodeEditor");
 	});
 	opaTest(`Changes in "Show Values" are correctly reflected`, function (Given, When, Then) {
 		When.onTheMDCFilterBar.iPressOnTheAdaptFiltersButton();
@@ -175,7 +175,7 @@ sap.ui.define([
 
 		When.onTheMDCFilterBar.iCloseTheAdaptFiltersDialogWithOk();
 		Then.iShouldSeeConditons("sap.ui.mdc.FilterBar", oConditionShowValues);
-		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oConditionShowValues, "\t", 4), "__editor0");
+		Then.onTheApp.iShouldSeeACodeEditorWithContent(JSON.stringify(oConditionShowValues, "\t", 4), "container-mdc.sample---sample--conditionsCodeEditor");
 	});
 
 	opaTest("App teardown successful", function (Given, When, Then) {
