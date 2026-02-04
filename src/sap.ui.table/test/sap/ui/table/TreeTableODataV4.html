@@ -35,18 +35,29 @@
 	sap.ui.require([
 		"sap/ui/table/plugins/ODataV4Selection",
 		"sap/ui/model/odata/v4/ODataModel",
-		"sap/ui/core/Core"
-	], function(ODataV4Selection, ODataModel, Core) {
+		"sap/ui/core/Core",
+		"sap/ui/table/TreeTable",
+		"sap/ui/table/Column",
+		"sap/m/HBox",
+		"sap/ui/core/Icon",
+		"sap/m/Text",
+		"sap/m/OverflowToolbar",
+		"sap/m/Title",
+		"sap/m/Input",
+		"sap/m/Toolbar",
+		"sap/m/VBox",
+		"sap/m/FlexItemData"
+	], function(ODataV4Selection, ODataModel, Core, TreeTable, Column, HBox, Icon, Text, OverflowToolbar, Title, Input, Toolbar, VBox, FlexItemData) {
 		/*global TABLESETTINGS */
-		const oTable = new sap.ui.table.TreeTable({
+		const oTable = new TreeTable({
 			columns: [
-				new sap.ui.table.Column({
+				new Column({
 					label: "Name",
 					sortProperty: "Name",
 					filterProperty: "Name",
-					template: new sap.m.HBox({
+					template: new HBox({
 						items: [
-							new sap.ui.core.Icon({
+							new Icon({
 								src: {
 									path: "FileType",
 									formatter: function(sFileType) {
@@ -55,39 +66,39 @@
 								},
 								size: "0.8rem"
 							}).addStyleClass("sapUiTinyMarginEnd"),
-							new sap.m.Text({text: "{Name}", wrapping: false})
+							new Text({text: "{Name}", wrapping: false})
 						]
 					})
 				}),
-				new sap.ui.table.Column({
+				new Column({
 					label: "File Type",
 					sortProperty: "FileType",
 					filterProperty: "FileType",
-					template: new sap.m.Text({text: "{FileType}", wrapping: false})
+					template: new Text({text: "{FileType}", wrapping: false})
 				}),
-				new sap.ui.table.Column({
+				new Column({
 					label: "File Size",
 					sortProperty: "FileSize",
 					filterProperty: "FileSize",
-					template: new sap.m.Text({text: "{FileSize}", wrapping: false})
+					template: new Text({text: "{FileSize}", wrapping: false})
 				}),
-				new sap.ui.table.Column({
+				new Column({
 					label: "Created At",
 					sortProperty: "createdAt",
 					filterProperty: "createdAt",
-					template: new sap.m.Text({text: "{createdAt}", wrapping: false})
+					template: new Text({text: "{createdAt}", wrapping: false})
 				}),
-				new sap.ui.table.Column({
+				new Column({
 					label: "Changed At",
 					sortProperty: "changedAt",
 					filterProperty: "changedAt",
-					template: new sap.m.Text({text: "{changedAt}", wrapping: false})
+					template: new Text({text: "{changedAt}", wrapping: false})
 				})
 			],
 			extension: [
-				new sap.m.OverflowToolbar({
+				new OverflowToolbar({
 					content: [
-						new sap.m.Title({text: "Title of the Table ({headerContext>$count})"})
+						new Title({text: "Title of the Table ({headerContext>$count})"})
 					]
 				})
 			],
@@ -125,12 +136,12 @@
 			oTable.setModel(oTable.getModel(), "headerContext");
 			oTable.getExtension()[0].setBindingContext(oTable.getBinding().getHeaderContext(), "headerContext");
 		}, function(oToolbar, mServiceSettings) {
-			oToolbar.addContent(new sap.m.Input("TableSettings_HierarchyQualifier", {
+			oToolbar.addContent(new Input("TableSettings_HierarchyQualifier", {
 				value: mServiceSettings.hierarchyQualifier,
 				tooltip: "Hierarchy Qualifier",
 				placeholder: "Enter Hierarchy Qualifier"
 			}));
-			oToolbar.addContent(new sap.m.Input("TableSettings_ExpandToLevel", {
+			oToolbar.addContent(new Input("TableSettings_ExpandToLevel", {
 				value: mServiceSettings.expandToLevel || 1,
 				tooltip: "Expand To Level",
 				placeholder: "Enter Level To Expand To"
@@ -141,7 +152,7 @@
 			let oToolbar = oTable.getExtension()[0];
 
 			if (!oToolbar) {
-				oToolbar = new sap.m.Toolbar();
+				oToolbar = new Toolbar();
 				oTable.addExtension(oToolbar);
 			}
 
@@ -150,10 +161,10 @@
 
 		const oBindingInfo = oTable.getBindingInfo("rows");
 
-		new sap.m.VBox({
+		new VBox({
 			width: "100%",
 			items: [
-				oTable.setLayoutData(new sap.m.FlexItemData({growFactor: 1}))
+				oTable.setLayoutData(new FlexItemData({growFactor: 1}))
 			]
 		}).placeAt("content");
 	});
