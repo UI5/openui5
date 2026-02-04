@@ -264,6 +264,23 @@ sap.ui.define([
 	};
 
 	/**
+	 * Gets the final day of a specified month.
+	 * This function processes date values in UTC to produce timezone agnostic results.
+	 *
+	 * @param {Date|module:sap/ui/core/date/UI5Date} oDate date instance
+	 * @returns {Date|module:sap/ui/core/date/UI5Date} date instance corresponding to the last date of the month
+	 * @public
+	 */
+	CalendarUtils.getLastDateOfMonth = function(oDate) {
+		const oNewDate = new UniversalDate(oDate.getTime());
+		oNewDate.setDate(1);
+		oNewDate.setMonth(oNewDate.getMonth() + 1);
+		oNewDate.setDate(oNewDate.getDate() - 1);
+
+		return oNewDate;
+	};
+
+	/**
 	 * Calculates the number of weeks for a given year using the current locale settings
 	 * @param {int} iYear The target year of interest in format (YYYY)
 	 * @returns {int} The number of weeks for the given year

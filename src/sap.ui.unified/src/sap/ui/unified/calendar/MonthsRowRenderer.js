@@ -34,6 +34,10 @@ MonthsRowRenderer.render = function(oRm, oMonthsRow){
 	oRm.class("sapUiCalMonthsRow");
 	oRm.class("sapUiCalRow");
 
+	if (oMonthsRow.getShowWeekNumbers()) {
+		oRm.class("sapUiCalRowWithWeekNumbers");
+	}
+
 	if (sTooltip) {
 		oRm.attr("title", sTooltip);
 	}
@@ -164,7 +168,6 @@ MonthsRowRenderer.renderMonths = function(oRm, oMonthsRow, oDate){
 		this.renderMonth(oRm, oMonthsRow, oMonthDate, oHelper, sWidth);
 		oMonthDate.setMonth(oMonthDate.getMonth() + 1);
 	}
-
 };
 
 /**

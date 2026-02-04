@@ -37,7 +37,8 @@ sap.ui.define([
 	"sap/ui/core/Locale",
 	"sap/ui/core/date/UI5Date",
 	// load all required calendars in advance
-	"sap/ui/core/date/Islamic"
+	"sap/ui/core/date/Islamic",
+	"sap/base/i18n/date/CalendarType"
 ], function(
 	Formatting,
 	LanguageTag,
@@ -75,7 +76,8 @@ sap.ui.define([
 	KeyCodes,
 	Locale,
 	UI5Date,
-	Islamic
+	Islamic,
+	CalendarType
 ) {
 	"use strict";
 
@@ -1407,14 +1409,15 @@ sap.ui.define([
 	QUnit.module("Setters", {
 		beforeEach: function() {
 			this.oPC = createPlanningCalendar("SelectionMode", new SearchField(), new Button());
-			// TimesRow, DatesRow, MonthsRow represent all 5 existing intervals.
+			// TimesRow, DatesRow, MonthsRow represent all 6 existing intervals.
 			// That is because the two left intervals (OneMonthsRow and WeeksRow)
 			// inherit DatesRow one.
 			this.aIntervalRepresentatives = [
 				"sap.ui.unified.calendar.TimesRow",
 				"sap.ui.unified.calendar.DatesRow",
 				"sap.ui.unified.calendar.MonthsRow",
-				"sap.ui.unified.calendar.OneMonthDatesRow"
+				"sap.ui.unified.calendar.OneMonthDatesRow",
+				"sap.ui.unified.calendar.WeeksRow"
 			];
 		},
 		afterEach: async function() {
@@ -4856,5 +4859,85 @@ sap.ui.define([
 		// Assert
 		assert.strictEqual(sSecondaryButtonText, "17 Jumada I 1442 AH - 30 Jumada I 1442 AH", "button shuld have additional text '17 Jumada I 1442 AH - 30 Jumada I 1442 AH'");
 
+	});
+
+	QUnit.module("Week numbers", {
+		beforeEach: async function () {
+			this.oPC = new PlanningCalendar({
+				showWeekNumbers: true
+			});
+			this.oPC.placeAt("bigUiArea");
+			await nextUIUpdate();
+		},
+		afterEach: async function () {
+			this.oPC.destroy();
+			await nextUIUpdate();
+		}
+	});
+
+	QUnit.test("WeeksRow is rendered and shows week numbers in month view", async function(assert) {
+		this.oPC.setViewKey(CalendarIntervalType.Month);
+		await nextUIUpdate();
+		const oWeeksRow = document.querySelector('.sapUiCalWeeksRow');
+		assert.ok(oWeeksRow, "WeeksRow is rendered in month view");
+		const oWeekNumbers = oWeeksRow.querySelectorAll('.sapUiCalRowWeekNumber');
+		assert.ok(oWeekNumbers, "Week numbers are rendered");
+		oWeekNumbers.forEach(function(el) {
+			assert.ok(/\d+\s*-\s*\d+/.test(el.textContent), "Week number format is correct: " + el.textContent);
+		});
+	});
+
+	QUnit.test("WeeksRow is rendered and shows week numbers in day view", async function(assert) {
+		this.oPC.setViewKey(CalendarIntervalType.Day);
+		await nextUIUpdate();
+		const oWeeksRow = document.querySelector('.sapUiCalWeeksRow');
+		assert.ok(oWeeksRow, "WeeksRow is rendered in day view");
+		const oWeekNumbers = oWeeksRow.querySelectorAll('.sapUiCalRowWeekNumber');
+		assert.ok(oWeekNumbers, "Week numbers are rendered");
+		oWeekNumbers.forEach(function(el) {
+			assert.ok(/^Week\s*\d+$/.test(el.textContent), "Week number format is correct: " + el.textContent);
+		});
+	});
+
+	QUnit.test("WeeksRow is NOT rendered in views other than Month and Day", async function(assert) {
+		const aOtherViews = [CalendarIntervalType.Hour, CalendarIntervalType.Week, CalendarIntervalType.OneMonth]; // Add any other custom or built-in view keys as needed
+		for (let i = 0; i < aOtherViews.length; i++) {
+			this.oPC.setViewKey(aOtherViews[i]);
+			await nextUIUpdate();
+			const oWeeksRow = document.querySelector('.sapUiCalWeeksRow');
+			assert.strictEqual(oWeeksRow, null, "WeeksRow is NOT rendered for viewKey: " + aOtherViews[i]);
+		}
+	});
+
+	QUnit.test("WeeksRow is NOT rendered for non-Gregorian primaryCalendarTypes (Month view)", async function(assert) {
+		var aNonGregorianTypes = [
+			CalendarType.Islamic,
+			CalendarType.Japanese,
+			CalendarType.Buddhist,
+			CalendarType.Persian
+		];
+		for (let i = 0; i < aNonGregorianTypes.length; i++) {
+			this.oPC.setPrimaryCalendarType(aNonGregorianTypes[i]);
+			this.oPC.setViewKey(CalendarIntervalType.Month);
+			await nextUIUpdate();
+			const oWeeksRow = document.querySelector('.sapUiCalWeeksRow');
+			assert.strictEqual(oWeeksRow, null, "WeeksRow is NOT rendered for primaryCalendarType: " + aNonGregorianTypes[i]);
+		}
+	});
+
+	QUnit.test("WeeksRow is NOT rendered for non-Gregorian primaryCalendarTypes (Day view)", async function(assert) {
+		var aNonGregorianTypes = [
+			CalendarType.Islamic,
+			CalendarType.Japanese,
+			CalendarType.Buddhist,
+			CalendarType.Persian
+		];
+		for (let i = 0; i < aNonGregorianTypes.length; i++) {
+			this.oPC.setPrimaryCalendarType(aNonGregorianTypes[i]);
+			this.oPC.setViewKey(CalendarIntervalType.Day);
+			await nextUIUpdate();
+			const oWeeksRow = document.querySelector('.sapUiCalWeeksRow');
+			assert.strictEqual(oWeeksRow, null, "WeeksRow is NOT rendered for primaryCalendarType: " + aNonGregorianTypes[i]);
+		}
 	});
 });
