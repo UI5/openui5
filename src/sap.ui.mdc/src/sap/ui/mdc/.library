@@ -41,5 +41,26 @@
 				</modules>
 			</component>
 		</ownership>
+		<!-- Thirdparty references -->
+		<thirdparty xmlns="http://www.sap.com/ui5/buildext/thirdparty" >
+			<lib name="chartjs" displayName="Chart.js" npmName="chart.js" version="4.5.0" hash="0524034abfaf32750fd4759e0450f2e5" homepage="https://www.chartjs.org/" id="73554900106100411468">
+				<license url="https://github.com/chartjs/Chart.js/blob/master/LICENSE.md" type="MIT" />
+				<copyright>2025 Chart.js Contributors</copyright>
+				<pattern>../test/sap/ui/mdc/demokit/sample/Chart/ChartJS/control/ChartJS.js</pattern>
+			</lib>
+
+			<lib name="chartjs-plugin-zoom" displayName="chartjs-plugin-zoom" npmName="chartjs-plugin-zoom" version="1.0.1" hash="92b10b9de2ff64f6d413888b550fa1ea" homepage="https://www.chartjs.org/chartjs-plugin-zoom/latest/" id="73555000106100323609">
+				<license url="https://github.com/chartjs/chartjs-plugin-zoom/blob/master/LICENSE.md" type="MIT" />
+				<copyright>2016-2021 chartjs-plugin-zoom Contributors</copyright>
+				<pattern>../test/sap/ui/mdc/demokit/sample/Chart/ChartJS/control/chartjs-plugin-zoom.js</pattern>
+			</lib>
+
+			<lib name="hammerjs" displayName="hammer.js" npmName="hammerjs" version="2.0.7" hash="280760c4360f8ab4b97c114b98c95482" homepage="https://hammerjs.github.io/" id="73554900106100493143">
+				<license url="https://github.com/hammerjs/hammer.js/blob/master/LICENSE.md" type="MIT" />
+				<copyright>2011-2017 by Jorik Tangelder (Eight Media)</copyright>
+				<pattern>../test/sap/ui/mdc/demokit/sample/Chart/ChartJS/control/hammerjs.js</pattern>
+			</lib>
+		</thirdparty>
+
 	</appData>
 </library>
