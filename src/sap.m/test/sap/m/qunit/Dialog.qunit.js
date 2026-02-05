@@ -2664,6 +2664,7 @@ sap.ui.define([
 		// act
 		this.oDialog.open();
 		this.clock.tick(500);
+		qutils.triggerKeydown(this.oCloseButton.getDomRef(), KeyCodes.SPACE);
 		qutils.triggerKeyup(this.oCloseButton.getDomRef(), KeyCodes.SPACE);
 		this.clock.tick(500);
 
