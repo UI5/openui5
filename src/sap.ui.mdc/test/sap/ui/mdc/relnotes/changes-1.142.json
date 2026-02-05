@@ -43,5 +43,15 @@
         "text": " VariantManagement: \"expanded\" not announced"
       }
     ]
+  },
+  "1.142.4": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "b3d562c577d006e0465406ad88f315ed395e9c88",
+        "type": "FIX",
+        "text": " MultiValueField: duplicate values not recognized"
+      }
+    ]
   }
 }

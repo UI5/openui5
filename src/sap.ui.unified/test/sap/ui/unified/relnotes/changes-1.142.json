@@ -8,5 +8,15 @@
         "text": " sap.ui.uniifed.calendar.DatesRow: adjust day names describedby references"
       }
     ]
+  },
+  "1.142.4": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "851cd4d807c829d943add38d4ef9894a29ccf4e1",
+        "type": "FIX",
+        "text": " sap.ui.unified.Calendar: fix unstable test"
+      }
+    ]
   }
 }

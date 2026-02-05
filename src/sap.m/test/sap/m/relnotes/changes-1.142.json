@@ -288,5 +288,20 @@
         "text": " sap.m.Dialog: Screen reader and focus handling are improved"
       }
     ]
+  },
+  "1.142.4": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "ea90ede8ccaf7a2c5d67e87bbb9456761209f085",
+        "type": "FIX",
+        "text": " We've now removed redundant CSS attributes from the GenericTile header content to avoid the truncation of text in certain languages"
+      },
+      {
+        "id": "c122620b738a3c2b8fc126a02be88d82cb6637c6",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendarHeader: Correct reserved slot calculation"
+      }
+    ]
   }
 }
