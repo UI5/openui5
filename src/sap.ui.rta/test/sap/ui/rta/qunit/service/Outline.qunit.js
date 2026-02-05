@@ -673,13 +673,14 @@ sap.ui.define([
 		});
 	}
 
-	function beforeEachExtensionPoint(sXmlView, oController) {
+	function beforeEachExtensionPoint(sXmlView, oData) {
 		sandbox.stub(DesignTimeConfig, "isDesignModeEnabled").returns(true);
 		sandbox.stub(DesignTimeConfig, "isControllerCodeDeactivationSuppressed").returns(true);
 		this.oComponent = _createComponent();
-		return _createAsyncView("myView", sXmlView, this.oComponent, oController)
+		return _createAsyncView("myView", sXmlView, this.oComponent)
 		.then(async function(oXmlView) {
 			this.oXmlView = oXmlView;
+			this.oXmlView.setModel(new JSONModel(oData));
 			oXmlView.placeAt("qunit-fixture");
 			await nextUIUpdate();
 			return new RuntimeAuthoring({
@@ -838,19 +839,55 @@ sap.ui.define([
 		});
 	});
 
-	function createController(sController, oData) {
-		const sControllerModule = `${sController.replace(/\./g, "/")}.controller`;
-		sap.ui.define(sControllerModule, function() {
-			return Controller.extend(sController, {
-				onInit() {
-					var oModel = new JSONModel(oData);
-					this.getView().setModel(oModel);
-				}
-			});
+	const sXmlNestedAggregation =
+		'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
+			'<Table items="{/ProductCollection}" id="TBL">' +
+				"<items>" +
+					'<ColumnListItem id="CLI">' + // AggregationBindingTemplate for Table items binding
+						'<Text text="{text}" />' +
+						'<core:ExtensionPoint name="NestedEP">' + // EP is part of the cells aggregation of the CLI (no binding)
+							'<Text text="NestedEP Default" />' +
+						"</core:ExtensionPoint>" +
+					"</ColumnListItem>" +
+				"</items>" +
+			"</Table>" +
+		"</mvc:View>";
+
+	QUnit.module("Given an aggregation inside an aggregationBindingTemplate", {
+		afterEach() {
+			return afterEachExtensionPoint.call(this);
+		}
+	}, function() {
+		QUnit.test("when there are no binding instances", async function(assert) {
+			// Empty data used for table binding -> No instances
+			const oData = { ProductCollection: [] };
+			await beforeEachExtensionPoint.call(this, sXmlNestedAggregation, oData);
+
+			const aOutline = await this.oOutline.get();
+			assert.strictEqual(aOutline[0].elements[0].name, "NestedEP", "then the nested EP is displayed directly on the view");
 		});
 
-		return Controller.create({name: sController});
-	}
+		QUnit.test("when there are binding instances", async function(assert) {
+			const oData = { ProductCollection: [{ text: "First item" }] };
+			await beforeEachExtensionPoint.call(this, sXmlNestedAggregation, oData);
+
+			const aOutline = await this.oOutline.get();
+			assert.strictEqual(aOutline[0].elements[0].name, "NestedEP", "then the nested EP is still displayed directly on the view");
+			const oTableItemsAggregation = aOutline[0].elements[1].elements[0].elements[1];
+			assert.strictEqual(oTableItemsAggregation.type, "aggregation");
+			const oColumnListItemCells = oTableItemsAggregation.elements[0].elements[0];
+			assert.strictEqual(
+				oColumnListItemCells.elements[0].instanceName,
+				"First item",
+				"Then the aggregation instance is part of the outline"
+			);
+			assert.strictEqual(
+				oColumnListItemCells.elements[1].instanceName,
+				"NestedEP Default",
+				"Then the EP default content is part of the outline"
+			);
+		});
+	});
 
 	QUnit.module("Given that xmlView with table and extensionPoint (RuntimeAuthoring and outline service are started) - Template case", {
 		afterEach() {
@@ -859,7 +896,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("for four products in the collection, when get() is called", function(assert) {
 			var oXmlTable =
-			'<mvc:View controllerName="myController" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
+			'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
 				'<List id="ShortProductList" headerText="Products" items="{path: \'/ProductCollection\'}">' +
 					"<items>" +
 						'<StandardListItem title="{Name}" />' +
@@ -875,10 +912,7 @@ sap.ui.define([
 					{ ProductId: "HT-1010", Category: "Memory" }
 				]
 			};
-			return createController("myController01", oData)
-			.then(function(oController) {
-				return beforeEachExtensionPoint.call(this, oXmlTable, oController);
-			}.bind(this))
+			return beforeEachExtensionPoint.call(this, oXmlTable, oData)
 			.then(function() {
 				return this.oOutline.get();
 			}.bind(this))
@@ -927,7 +961,7 @@ sap.ui.define([
 
 		QUnit.test("when an aggregation contains a template with a nested aggregation", function(assert) {
 			var oXmlTable =
-			'<mvc:View controllerName="myController" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
+			'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
 				'<VBox id="ShortProductList" items="{path: \'/ProductCollection\'}">' +
 					"<items>" +
 						'<VBox id="vb2">' +
@@ -947,10 +981,7 @@ sap.ui.define([
 					{ ProductId: "HT-1010", Category: "Memory" }
 				]
 			};
-			return createController("myController02", oData)
-			.then(function(oController) {
-				return beforeEachExtensionPoint.call(this, oXmlTable, oController);
-			}.bind(this))
+			return beforeEachExtensionPoint.call(this, oXmlTable, oData)
 			.then(function() {
 				return this.oOutline.get();
 			}.bind(this))
@@ -978,7 +1009,7 @@ sap.ui.define([
 
 		QUnit.test("when an aggregation contains a template with a nested template", function(assert) {
 			var oXmlTable =
-			'<mvc:View controllerName="myController" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
+			'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
 				'<VBox id="ShortProductList" items="{path: \'/ProductCollection\', templateShareable: false}">' +
 					"<items>" +
 						'<VBox id="vb2NoTemplate">' +
@@ -1002,10 +1033,7 @@ sap.ui.define([
 					{ ProductId: "HT-1010", Category: "Memory" }
 				]
 			};
-			return createController("myController03", oData)
-			.then(function(oController) {
-				return beforeEachExtensionPoint.call(this, oXmlTable, oController);
-			}.bind(this))
+			return beforeEachExtensionPoint.call(this, oXmlTable, oData)
 			.then(function() {
 				return this.oOutline.get();
 			}.bind(this))
@@ -1046,7 +1074,7 @@ sap.ui.define([
 
 		QUnit.test("for empty product collection, when get() is called", function(assert) {
 			var oXmlTable =
-			'<mvc:View controllerName="myController" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
+			'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
 				'<List id="ShortProductList" headerText="Products" items="{path: \'/ProductCollection\'}">' +
 					"<items>" +
 						'<StandardListItem title="{Name}" />' +
@@ -1057,10 +1085,7 @@ sap.ui.define([
 			var oData = {
 				ProductCollection: []
 			};
-			return createController("myController04", oData)
-			.then(function(oController) {
-				return beforeEachExtensionPoint.call(this, oXmlTable, oController);
-			}.bind(this))
+			return beforeEachExtensionPoint.call(this, oXmlTable, oData)
 			.then(function() {
 				return this.oOutline.get();
 			}.bind(this))
@@ -1084,7 +1109,7 @@ sap.ui.define([
 
 		QUnit.test("for two lists, when get() is called", function(assert) {
 			var oXmlTable =
-			'<mvc:View controllerName="myController" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
+			'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
 				'<List id="ShortProductList" headerText="Products" items="{path: \'/ProductCollection\'}">' +
 					"<items>" +
 						'<StandardListItem title="{Name}" />' +
@@ -1106,10 +1131,7 @@ sap.ui.define([
 					{ PotatoId: "French Fries", Category: "Fried" }
 				]
 			};
-			return createController("myController05", oData)
-			.then(function(oController) {
-				return beforeEachExtensionPoint.call(this, oXmlTable, oController);
-			}.bind(this))
+			return beforeEachExtensionPoint.call(this, oXmlTable, oData)
 			.then(function() {
 				return this.oOutline.get();
 			}.bind(this))
