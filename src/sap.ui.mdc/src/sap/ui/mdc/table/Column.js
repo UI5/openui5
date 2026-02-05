@@ -282,14 +282,7 @@ sap.ui.define([
 	};
 
 	Column.prototype.setHeader = function(sHeader) {
-		this.setProperty("header", sHeader, true);
-
-		const oLabelElement = this.getDomRef();
-		if (oLabelElement) {
-			oLabelElement.textContent = this.getHeader();
-		}
-
-		return this;
+		return this.setProperty("header", sHeader, true);
 	};
 
 	//Temporary fallback for compatibility until the dataProperty can be removed

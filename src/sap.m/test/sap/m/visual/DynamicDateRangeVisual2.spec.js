@@ -25,11 +25,22 @@ describe("sap.m.DynamicDateRangeVisual2", function() {
 	}, iDefaultTimeout);
 
 	it("DDR popup is resized", function() {
-		var oValueHelp = element(by.id("DDRLessOptions-input-vhi"));
+		var oValueHelp = element(by.id("DDRLessOptions-input-vhi"))		,
+			aListItems;
 
 		oValueHelp.click();
 
+		aListItems = element.all(by.css("#DDRLessOptions-RP-popover .sapMListItems .sapMSLI"));
 		expect(takeScreenshot()).toLookAs("ddr_popup_resized");
+
+		aListItems.get(0).click();
+		expect(takeScreenshot()).toLookAs("ddr_popup_second_page_resized");
+
+		var shiftTab = protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.TAB);
+		browser.actions().sendKeys(shiftTab).perform();
+		browser.actions().sendKeys(protractor.Key.ENTER).perform();
+
+		expect(takeScreenshot()).toLookAs("ddr_popup_resized2");
 	}, iDefaultTimeout);
 
 	it("DateTime option", function() {

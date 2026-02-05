@@ -4,7 +4,14 @@
 /* ======================================================= */
 
 .sapFCardObjectContent {
-	padding: 1rem;
+	&:not(.sapUiIntCardContentWithBlockingMessage) {
+		padding: 1rem;
+	}
+
+	&.sapUiIntCardContentWithBlockingMessage {
+		/* when we have blocking message we don't need the 1 rem padding, but need bigger min-height than the default (inline) one of 3rem */
+		min-height: 5rem !important;
+	}
 
 	&.sapFCardObjectContentWithOverlay {
 

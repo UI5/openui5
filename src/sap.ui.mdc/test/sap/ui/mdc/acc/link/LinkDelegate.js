@@ -14,7 +14,22 @@ sap.ui.define([
 
     var SampleLinkDelegate = Object.assign({}, LinkDelegate);
 
-    SampleLinkDelegate.fetchLinkItems = function() {
+    SampleLinkDelegate.fetchLinkItems = function(oLink) {
+		const oPayload = oLink.getPayload();
+		// For direct navigation, return only one link item
+		if (oPayload?.directNavigation) {
+			var aLinkItems = [
+				new LinkItem({
+					key: "IDLinkItem_DirectNav",
+					text: "Direct Navigation",
+					description: "Navigate directly without popup",
+					href: "?testsuite_mdc_acc_link_DirectNavigation#link"
+				})
+			];
+			return Promise.resolve(aLinkItems);
+		}
+
+		// Default behavior with multiple links
         var aLinkItems = [
 			new LinkItem({
 				key: "IDLinkItem00",
@@ -67,7 +82,12 @@ sap.ui.define([
         return Promise.resolve(aLinkItems);
 	};
 
-	SampleLinkDelegate.fetchAdditionalContent = function() {
+	SampleLinkDelegate.fetchAdditionalContent = function(oLink) {
+		const oPayload = oLink.getPayload();
+		if (oPayload?.directNavigation) {
+			return Promise.resolve([]);
+		}
+
 		var aAdditionalContent = [
 			new ContactDetails({
 				items: new ContactDetailsItem({

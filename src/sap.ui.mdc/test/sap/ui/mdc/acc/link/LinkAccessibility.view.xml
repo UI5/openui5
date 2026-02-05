@@ -7,9 +7,16 @@
 				<l:content>
 					<mdc:Field id="IDField_MNACI" value="{Name}" editMode="Display">
 						<mdc:fieldInfo>
-							<mdc:Link 
+							<mdc:Link
 								sourceControl="IDField_MNACI"
 								delegate='\{ "name": "sap/ui/mdc/acc/link/LinkDelegate", "payload": \{\} \}'/>
+						</mdc:fieldInfo>
+					</mdc:Field>
+					<mdc:Field id="IDField_DirectNav" value="{Category}" editMode="Display">
+						<mdc:fieldInfo>
+							<mdc:Link
+								sourceControl="IDField_DirectNav"
+								delegate='\{ "name": "sap/ui/mdc/acc/link/LinkDelegate", "payload": \{ "directNavigation": true \} \}'/>
 						</mdc:fieldInfo>
 					</mdc:Field>
 				</l:content>
