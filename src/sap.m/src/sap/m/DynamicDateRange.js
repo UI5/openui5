@@ -1496,6 +1496,7 @@ sap.ui.define([
 
 				oSecondPage.setFooter(oToolbar);
 				oSecondPage.setTitle(oOption.getText(this));
+				this._oPopup.setContentHeight(POPUP_MAX_HEIGHT + "px");
 
 				this._setFooterVisibility(true);
 				this._updateInternalControls(oOption);
@@ -1815,6 +1816,8 @@ sap.ui.define([
 					}
 				}, this);
 			} else if (oToPage === oOptionsListPage) {
+				// set height to available options list height
+				this._oPopup.setContentHeight(this._getPopupHeight());
 				// Remove the invisible label from popover when navigating back to options list
 				this._removeInvisibleLabelFromPopover();
 			}

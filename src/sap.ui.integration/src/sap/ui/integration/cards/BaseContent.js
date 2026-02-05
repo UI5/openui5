@@ -519,10 +519,12 @@ sap.ui.define([
 		this.destroyAggregation("_blockingMessage");
 		this.setAggregation("_blockingMessage", BlockingMessage.create(mSettings, this.getCardInstance()));
 		this._forceCompleteAwaitedEvents();
+		this.addStyleClass("sapUiIntCardContentWithBlockingMessage");
 	};
 
 	BaseContent.prototype.hideBlockingMessage = function () {
 		this.destroyAggregation("_blockingMessage");
+		this.removeStyleClass("sapUiIntCardContentWithBlockingMessage");
 	};
 
 	BaseContent.prototype.getBlockingMessage = function () {
