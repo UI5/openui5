@@ -282,9 +282,9 @@ sap.ui.define([
 			if (oChanges.current.aria?.activedescendant !== oChanges.old.aria?.activedescendant) {
 				const oDomRef = this.getFocusDomRef();
 				if (!oChanges.current.aria?.activedescendant) {
-					oDomRef.removeAttribute("aria-activedescendant");
+					oDomRef?.removeAttribute("aria-activedescendant");
 				} else {
-					oDomRef.setAttribute("aria-activedescendant", oChanges.current.aria.activedescendant);
+					oDomRef?.setAttribute("aria-activedescendant", oChanges.current.aria.activedescendant);
 				}
 			}
 		}
