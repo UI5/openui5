@@ -407,10 +407,13 @@ sap.ui.define([
 					});
 
 					var fnLoadSettings = function(eMessage) {
+						if (!this._isMessageFromSampleIframe(eMessage)) {
+							return;
+						}
 						fnCallback(eMessage);
 						window.removeEventListener("message", fnLoadSettings);
 						resolve();
-					};
+					}.bind(this);
 
 					window.addEventListener("message", fnLoadSettings);
 
@@ -678,6 +681,11 @@ sap.ui.define([
 				return this.byId("page");
 			},
 
+			_isMessageFromSampleIframe: function(eMessage) {
+				return eMessage.origin === this.getOwnerComponent()._sSampleIframeOrigin &&
+					eMessage.source === this._oHtmlControl.getDomRef().contentWindow;
+			},
+
 			onMessage: function(eMessage) {
 				var oModelData = this.oModel.getData();
 
@@ -685,10 +693,7 @@ sap.ui.define([
 					return;
 				}
 
-				if (eMessage.origin !== this.getOwnerComponent()._sSampleIframeOrigin) {
-					return;
-				}
-				if (eMessage.source !== this._oHtmlControl.getDomRef().contentWindow) {
+				if (!this._isMessageFromSampleIframe(eMessage)) {
 					return;
 				}
 

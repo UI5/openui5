@@ -126,6 +126,8 @@ sap.ui.define([
 		this.setProperty("steps", oTourContent.steps);
 		this.setProperty("initialStateSelectors", oTourContent.initialStateSelectors);
 		const oRTAResourceModel = new ResourceModel({ bundleName: "sap.ui.rta.messagebundle" });
+		// The popover has default animations for opening and closing. These animations ensure that the application completes all pending
+		// processes before you proceed. Removing the animations can cause timing issues, for example, when switching to visualization.
 		this._oPopover = await Fragment.load({
 			id: "guidedTourMarker",
 			name: "sap.ui.rta.util.guidedTour.TourMarker",

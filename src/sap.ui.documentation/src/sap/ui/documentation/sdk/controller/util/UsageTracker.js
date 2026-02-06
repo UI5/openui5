@@ -67,6 +67,7 @@ sap.ui.define(
             "sap.ui.documentation.sdk.controller.util.UsageTracker",
             {
                 constructor: function (oComponent) {
+                    BaseObject.call(this);
                     this._oComponent = oComponent;
                     this._oRouter = oComponent.getRouter();
                     this._oConfig = oComponent.getConfig();

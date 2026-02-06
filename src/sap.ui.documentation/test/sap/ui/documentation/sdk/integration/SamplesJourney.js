@@ -3,7 +3,8 @@
  */
 sap.ui.define([
 	'sap/ui/test/Opa5',
-	'sap/ui/test/opaQunit'
+	'sap/ui/test/opaQunit',
+	'./NavigationJourney' // to ensure that the NavigationJourney is executed first
 ], function (Opa5, opaTest) {
 	"use strict";
 
@@ -51,6 +52,7 @@ sap.ui.define([
 		// Assertions
 		When.onTheControlsMasterPage.iPressOnTheEntity("Generic Tag");
 		When.onTheEntityPage.iPressOnTheSample("Generic Tag with Different Configurations");
+		When.onTheSamplePage.iClearTheServiceWorkerCache();
 		When.onTheSamplePage.iPressOnShowCode();
 		Then.onTheCodePage.iShouldBeAbleToSwitchFiles("manifest.json");
 	});

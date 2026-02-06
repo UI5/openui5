@@ -4,36 +4,24 @@ sap.ui.define([
 	"sap/ui/mdc/FilterBarDelegate",
 	"../model/metadata/JSONPropertyInfo",
 	"sap/ui/mdc/FilterField",
-	"sap/ui/mdc/odata/v4/TypeMap", // as for Date the V4 type is used
 	"sap/ui/core/Fragment",
 	"sap/ui/core/mvc/View"
-], function (Element, FilterBarDelegate, JSONPropertyInfo, FilterField, ODataV4TypeMap, Fragment, View) {
+], function (Element, FilterBarDelegate, JSONPropertyInfo, FilterField, Fragment, View) {
 	"use strict";
 
 	const JSONFilterBarDelegate = Object.assign({}, FilterBarDelegate);
-
-	JSONFilterBarDelegate.getTypeMap = function (oPayload) {
-		return ODataV4TypeMap;
-	};
 
 	JSONFilterBarDelegate.fetchProperties = async (oFilterBar) => {
 		return JSONPropertyInfo.mountains;
 	};
 
-	const _createFilterField = async (sId, oProperty, oFilterBar) => {
+	const _createFilterField = (sId, oProperty, oFilterBar) => {
 		const sPropertyKey = oProperty.key;
 		const oFilterField = new FilterField(sId, {
-			dataType: oProperty.dataType,
-			dataTypeFormatOptions: oProperty.formatOptions,
-			dataTypeConstraints: oProperty.constraints,
-			conditions: "{$filters>/conditions/" + sPropertyKey + '}',
 			propertyKey: sPropertyKey,
-			required: oProperty.required,
-			label: oProperty.label,
-			maxConditions: oProperty.maxConditions,
-			delegate: oProperty.dataType?.startsWith("sap.ui.model.odata") ? {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}} : {name: "sap/ui/mdc/field/FieldBaseDelegate", payload: {}}
+			delegate: {name: "sap/ui/mdc/field/FieldBaseDelegate", payload: {}}
 		});
-		if (oProperty.dataType?.startsWith("sap.ui.model.odata")) {
+		if (sPropertyKey === "first_ascent") {
 			oFilterField.setOperators(["EQ", "BT", "TODAY", "YESTERDAY", "TOMORROW", "TODAYFROMTO", "LASTDAYS", "NEXTDAYS"]);
 		} else if (sPropertyKey === "rank") {
 			oFilterField.setOperators(["EQ"]);
@@ -53,7 +41,7 @@ sap.ui.define([
 	JSONFilterBarDelegate.addItem = async (oFilterBar, sPropertyName) => {
 		const oProperty = JSONPropertyInfo.mountains.find((oPI) => oPI.key === sPropertyName);
 		const sId = oFilterBar.getId() + "--filter--" + sPropertyName;
-		return Element.getElementById(sId) ?? (await _createFilterField(sId, oProperty, oFilterBar));
+		return Promise.resolve(Element.getElementById(sId) ?? (await _createFilterField(sId, oProperty, oFilterBar)));
 	};
 
 	JSONFilterBarDelegate.removeItem = async (oFilterBar, oFilterField) => {

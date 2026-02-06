@@ -79,7 +79,58 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 				module: "test-resources/sap/ui/mdc/integration/twfb/OpaStarter.qunit",
 				sinon: false
 			},
-			"TestJourney": {
+			"TwfbLinkJourney": {
+				group: "TWFB",
+				loader: {
+					paths: {
+						"mdc/qunit/util": "test-resources/sap/ui/mdc/qunit/util",
+						"sap/ui/mdc/integration": "test-resources/sap/ui/mdc/integration",
+						"sap/ui/v4demo": "test-resources/sap/ui/mdc/internal/TableWithFilterBar",
+						"local": "test-resources/sap/ui/mdc/integration/twfb"
+					}
+				},
+				qunit: {
+					reorder: false
+				},
+				autostart: false, // tests are added asynchronously because the V4 server needs to be found first
+				module: "test-resources/sap/ui/mdc/integration/twfb/OpaStarter.qunit",
+				sinon: false
+			},
+			"TwfbValueHelpJourney": {
+				group: "TWFB",
+				loader: {
+					paths: {
+						"mdc/qunit/util": "test-resources/sap/ui/mdc/qunit/util",
+						"sap/ui/mdc/integration": "test-resources/sap/ui/mdc/integration",
+						"sap/ui/v4demo": "test-resources/sap/ui/mdc/internal/TableWithFilterBar",
+						"local": "test-resources/sap/ui/mdc/integration/twfb"
+					}
+				},
+				qunit: {
+					reorder: false
+				},
+				autostart: false, // tests are added asynchronously because the V4 server needs to be found first
+				module: "test-resources/sap/ui/mdc/integration/twfb/OpaStarter.qunit",
+				sinon: false
+			},
+			"TwfbPersonalizationJourney": {
+				group: "TWFB",
+				loader: {
+					paths: {
+						"mdc/qunit/util": "test-resources/sap/ui/mdc/qunit/util",
+						"sap/ui/mdc/integration": "test-resources/sap/ui/mdc/integration",
+						"sap/ui/v4demo": "test-resources/sap/ui/mdc/internal/TableWithFilterBar",
+						"local": "test-resources/sap/ui/mdc/integration/twfb"
+					}
+				},
+				qunit: {
+					reorder: false
+				},
+				autostart: false, // tests are added asynchronously because the V4 server needs to be found first
+				module: "test-resources/sap/ui/mdc/integration/twfb/OpaStarter.qunit",
+				sinon: false
+			},
+			"TwfbFilterBarJourney": {
 				group: "TWFB",
 				loader: {
 					paths: {

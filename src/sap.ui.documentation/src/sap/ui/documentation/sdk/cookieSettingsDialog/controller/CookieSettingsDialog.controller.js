@@ -14,6 +14,7 @@ sap.ui.define([
 		return Controller.extend("sap.ui.documentation.sdk.cookieSettingsDialog.controller.CookieSettingsDialog", {
 
 			constructor: function() {
+				Controller.call(this);
 				this._oCookiesUtil = null;
 				this._oRootView = null;
 				this._oInitOptions = null;

@@ -69,12 +69,9 @@ sap.ui.define([
 				label: "First Ascent",
 				visible: true,
 				path: "first_ascent",
-				dataType: "sap.ui.model.odata.type.Date",
+				dataType: "sap.ui.model.type.Date",
 				formatOptions:{
 					style: "long"
-				},
-				constraints: {
-					V4: true
 				},
 				maxConditions: 1
 			},{
@@ -82,7 +79,10 @@ sap.ui.define([
 				label: "Countries",
 				visible: true,
 				path: "countries",
-				dataType: "sap.ui.model.type.String"
+				dataType: "sap.ui.model.type.String",
+				constraints: {
+					maxLength: 2
+				}
 			},{
 				key: "$search",
 				label: "Search",

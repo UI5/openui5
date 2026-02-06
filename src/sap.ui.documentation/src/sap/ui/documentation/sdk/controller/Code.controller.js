@@ -33,6 +33,7 @@ sap.ui.define(
 
 		return SampleController.extend("sap.ui.documentation.sdk.controller.Code", {
 			constructor: function () {
+				SampleController.apply(this, arguments);
 				this.onFileEditorFileChangeDebounced = _debounce(this.onFileEditorFileChangeDebounced, 500);
 			},
 

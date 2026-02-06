@@ -72,6 +72,7 @@ sap.ui.define(
             "sap.ui.documentation.sdk.controller.util.DefaultConsentManager",
             {
                 constructor: function (oComponent, oConfig) {
+                    BaseObject.call(this);
                     this._oCmponent = oComponent;
                     this._oConfigUtil = oComponent.getConfigUtil();
                     this._sConsentDialogComponentId = oConfig.defaultConsentDialogComponentId;
