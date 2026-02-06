@@ -5738,7 +5738,7 @@ sap.ui.define([
 		const aContent = oField.getAggregation("_content");
 		const oContent = aContent?.length > 0 && aContent[0];
 		const oVHIcon = oContent?.getAggregation("_endIcon", [])[1];
-		const $FocusDomRef = jQuery(oField.getFocusDomRef());
+		let $FocusDomRef = jQuery(oField.getFocusDomRef());
 		const oResourceBundle = Library.getResourceBundleFor("sap.m");
 		const sText = oResourceBundle.getText("MULTIINPUT_ARIA_ROLE_DESCRIPTION");
 		const sValueHelpEnabledID = InvisibleText.getStaticId("sap.m", "INPUT_VALUEHELP");
@@ -5793,6 +5793,13 @@ sap.ui.define([
 		assert.equal($FocusDomRef.attr("aria-activedescendant"), "ItemId", "Navigation: aria-activedescendant set");
 
 		oValueHelp.close();
+		jQuery(oField.getDomRef()).remove(); // test re-rendering while update -> closed event normally is async
+		oField.invalidate();
+		oField.placeAt("content");
+		oValueHelp.fireClosed();
+		await nextUIUpdate();
+		$FocusDomRef = jQuery(oField.getFocusDomRef());
+		assert.notOk($FocusDomRef.attr("aria-activedescendant"), "no Help: aria-activedescendant not set");
 
 		oField.setValueHelp();
 		await nextUIUpdate();
@@ -5816,7 +5823,7 @@ sap.ui.define([
 		const aContent = oField.getAggregation("_content");
 		const oContent = aContent?.length > 0 && aContent[0];
 		const oVHIcon = oContent?.getAggregation("_endIcon", [])[0];
-		const $FocusDomRef = jQuery(oField.getFocusDomRef());
+		let $FocusDomRef = jQuery(oField.getFocusDomRef());
 		const sValueHelpEnabledID = InvisibleText.getStaticId("sap.m", "INPUT_VALUEHELP");
 
 		oField.focus(); // as ValueHelp is connected with focus
@@ -5868,6 +5875,13 @@ sap.ui.define([
 		assert.equal($FocusDomRef.attr("aria-activedescendant"), "ItemId", "Navigation: aria-activedescendant set");
 
 		oValueHelp.close();
+		jQuery(oField.getDomRef()).remove(); // test re-rendering while update -> closed event normally is async
+		oField.invalidate();
+		oField.placeAt("content");
+		oValueHelp.fireClosed();
+		await nextUIUpdate();
+		$FocusDomRef = jQuery(oField.getFocusDomRef());
+		assert.notOk($FocusDomRef.attr("aria-activedescendant"), "no Help: aria-activedescendant not set");
 
 		oField.setValueHelp();
 		await nextUIUpdate();
