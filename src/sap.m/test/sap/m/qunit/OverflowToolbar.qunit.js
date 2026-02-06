@@ -3391,6 +3391,24 @@ sap.ui.define([
 		}, 200);
 	});
 
+	QUnit.test("onfocusfail does not throw error when oDomRef is null", function (assert) {
+		// Arrange - create OverflowToolbar but don't render it, so oDomRef is null
+		var oOverflowToolbar = new OverflowToolbar({
+			content: [
+				new Button({ text: "Button 1" }),
+				new Button({ text: "Button 2" })
+			]
+		});
+
+		// Act & Assert - calling onfocusfail should not throw an error when oDomRef is null
+		assert.strictEqual(oOverflowToolbar.getDomRef(), null, "OverflowToolbar has no DOM reference");
+		oOverflowToolbar.onfocusfail({ srcControl: oOverflowToolbar.getContent()[0] });
+		assert.ok(true, "No error is thrown when oDomRef is null");
+
+		// Cleanup
+		oOverflowToolbar.destroy();
+	});
+
 	QUnit.test("onsapfocusfail will restore the focus to the Overflow Button when Dialog is closed or to next Button, if Button gets invisible", function (assert) {
 		var oOverflowToolbar = new OverflowToolbar({
 			width: "400px",
