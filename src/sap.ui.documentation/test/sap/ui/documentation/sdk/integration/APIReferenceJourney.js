@@ -3,7 +3,8 @@
  */
 sap.ui.define([
 	'sap/ui/test/Opa5',
-	'sap/ui/test/opaQunit'
+	'sap/ui/test/opaQunit',
+	'./NavigationJourney' // to ensure that the NavigationJourney is executed first
 ], function (Opa5, opaTest) {
 	"use strict";
 

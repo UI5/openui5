@@ -32,6 +32,7 @@ sap.ui.define([
 		},
 
 		constructor : function (oComponent) {
+			BaseObject.call(this);
 			this._oComponent = oComponent;
 		},
 

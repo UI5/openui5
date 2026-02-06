@@ -18,6 +18,7 @@ sap.ui.define([
 			 * @alias sap.ui.documentation.sdk.controller.ErrorHandler
 			 */
 			constructor : function (oComponent) {
+				UI5Object.call(this);
 				this._oComponent = oComponent;
 				this._oModel = oComponent.getModel();
 				this._bMessageOpen = false;

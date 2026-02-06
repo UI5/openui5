@@ -105,7 +105,7 @@ sap.ui.define([
 	 * });
 	 * </pre>
 	 *
-	 * Note that when setting string values, any curly braces in those values need to be escaped, so they are not
+	 * Note that when setting string values, any curly braces and backslashes in those values need to be escaped, so they are not
 	 * interpreted as binding expressions. Use {@link #escapeSettingsValue} to do so.
 	 *
 	 * <b>Note:</b>
@@ -1333,11 +1333,42 @@ sap.ui.define([
 
 	/**
 	 * Escapes the given value so it can be used in the constructor's settings object.
-	 * Should be used when property values are initialized with static string values which could contain binding characters (curly braces).
+	 *
+	 * Use this method when passing static string values that might contain binding syntax characters.
+	 * Without escaping, curly braces in strings would be misinterpreted as data binding expressions.
+	 *
+	 * <b>Characters that are escaped:</b>
+	 * <ul>
+	 * <li><code>{</code> (opening curly brace) - binding expression start</li>
+	 * <li><code>}</code> (closing curly brace) - binding expression end</li>
+	 * <li><code>\</code> (backslash) - escape character itself</li>
+	 * </ul>
+	 *
+	 * Each of the above characters is prefixed with a backslash, e.g. <code>{foo}</code> becomes <code>\{foo\}</code>.
+	 *
+	 * <b>When to use:</b>
+	 * <ul>
+	 * <li>Static string values containing curly braces that should be displayed literally</li>
+	 * <li>Rendering escaped backslashes (e.g. expecting <code>\\\\</code> to result in <code>\\</code>)</li>
+	 * <li>User input or external data used as property values in constructors</li>
+	 * <li>JSON content that should not be parsed as bindings</li>
+	 * </ul>
+	 *
+	 * Example usage:
+	 * <pre>
+	 * new MyControl({
+	 *    // Without escaping: "{info}" would be interpreted as a binding to the path "info"
+	 *    // With escaping: displays the literal text "{info}"
+	 *    text: ManagedObject.escapeSettingsValue("{info}")
+	 * });
+	 * </pre>
+	 *
+	 * <b>Note:</b> This is only needed when setting values via the constructor or {@link #applySettings}.
+	 * Setter method calls, e.g. <code>setText("{info}")</code> do not interpret binding syntax and thus do not require escaping.
 	 *
 	 * @since 1.52
-	 * @param {any} vValue Value to escape; only needs to be done for string values, but the call will work for all types
-	 * @return {any} The given value, escaped for usage as static property value in the constructor's settings object (or unchanged, if not of type string)
+	 * @param {any} vValue Value to escape; only strings are escaped, other types (e.g. objects) are returned through unchanged. Strings nested in objects must be escaped individually.
+	 * @return {any} The escaped string value, or the original value if not a string
 	 * @static
 	 * @public
 	 */

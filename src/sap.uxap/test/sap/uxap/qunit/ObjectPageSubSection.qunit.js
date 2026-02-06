@@ -2353,6 +2353,72 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		this.oObjectPage.destroy();
 	});
 
+	QUnit.test("Subsection _setInternalTitleVisible is called when toggling useIconTabBar (DINC0702145)", function(assert) {
+		// Arrange: Create layout with multiple subsections having titles
+		var oSubSection1 = new ObjectPageSubSectionClass({
+				title: "SubSection 1",
+				blocks: [new Text({text: "content 1"})]
+			}),
+			oSubSection2 = new ObjectPageSubSectionClass({
+				title: "SubSection 2",
+				blocks: [new Text({text: "content 2"})]
+			}),
+			oObjectPage = new ObjectPageLayout({
+				sections: [
+					new ObjectPageSection({
+						title: "Section 1",
+						subSections: [oSubSection1, oSubSection2]
+					})
+				]
+			}),
+			oSpy1,
+			oSpy2,
+			done = assert.async();
+
+		assert.expect(4);
+
+		oObjectPage.placeAt('qunit-fixture');
+
+		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+			// Create spies after initial rendering
+			oSpy1 = sinon.spy(oSubSection1, "_setInternalTitleVisible");
+			oSpy2 = sinon.spy(oSubSection2, "_setInternalTitleVisible");
+
+			// Act: Toggle useIconTabBar on - this triggers _adjustLayoutAndUxRules internally
+			oObjectPage.setUseIconTabBar(true);
+			oObjectPage._adjustLayoutAndUxRules();
+
+			// Assert: Verify _setInternalTitleVisible was called on subsections
+			// This would fail if line 1774 (oTitleVisibilityInfo[oSubSection.getId()] = true;) is deleted
+			// because subsections wouldn't be registered in oTitleVisibilityInfo and wouldn't be processed
+			assert.ok(oSpy1.called,
+				"SubSection 1 _setInternalTitleVisible was called after toggling to IconTabBar mode");
+			assert.ok(oSpy2.called,
+				"SubSection 2 _setInternalTitleVisible was called after toggling to IconTabBar mode");
+
+			// Reset spies
+			oSpy1.resetHistory();
+			oSpy2.resetHistory();
+
+			// Act: Toggle useIconTabBar off and adjust UX rules again
+			oObjectPage.setUseIconTabBar(false);
+			oObjectPage._adjustLayoutAndUxRules();
+
+			// Assert: Verify _setInternalTitleVisible was called again after toggling back
+			assert.ok(oSpy1.called,
+				"SubSection 1 _setInternalTitleVisible was called after toggling back from IconTabBar mode");
+			assert.ok(oSpy2.called,
+				"SubSection 2 _setInternalTitleVisible was called after toggling back from IconTabBar mode");
+
+			// Cleanup
+			oSpy1.restore();
+			oSpy2.restore();
+			oObjectPage.destroy();
+
+			done();
+		});
+	});
+
 	QUnit.module("SubSection internalTitle");
 
 	QUnit.test("Subsection _setInternalTitleLevel should invalidate control", async function(assert) {

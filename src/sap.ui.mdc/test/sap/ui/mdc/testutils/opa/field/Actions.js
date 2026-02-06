@@ -9,7 +9,8 @@ sap.ui.define([
 	"../Utils",
 	"sap/ui/events/KeyCodes",
 	"../actions/TriggerEvent",
-	'sap/ui/test/actions/Press'
+	'sap/ui/test/actions/Press',
+	"sap/ui/mdc/enums/BaseType"
 ], function(
 	Opa5,
 	EnterText,
@@ -17,7 +18,8 @@ sap.ui.define([
 	Utils,
 	KeyCodes,
 	TriggerEvent,
-	Press
+	Press,
+	BaseType
 ) {
 	"use strict";
 
@@ -48,7 +50,7 @@ sap.ui.define([
 		iOpenTheValueHelpForField: function (vIdentifier) {
 			return waitForField.call(this, Utils.enhanceWaitFor(vIdentifier, {
 				success: function(oField) {
-					return oActions.iPressKeyOnTheField.call(this, vIdentifier, KeyCodes.F4, oField.getBaseType() === "Unit");
+					return oActions.iPressKeyOnTheField.call(this, vIdentifier, KeyCodes.F4, oField.getBaseType() === BaseType.Unit);
 				}
 			}));
 		},

@@ -1192,21 +1192,14 @@ sap.ui.define([
 	Editor.prototype._initResourceBundlesForMultiTranslation = function () {
 		var vI18n = this._oManifest.get("/sap.app/i18n");
 		var sResourceBundleURL;
-		var aSupportedLocales;
 		if (typeof vI18n === "string") {
 			sResourceBundleURL = this.getBaseUrl() + vI18n;
-		} else if (typeof vI18n === "object") {
-			if (vI18n.bundleUrl) {
-				sResourceBundleURL = this.getBaseUrl() + vI18n.bundleUrl;
-			}
-			if (vI18n.supportedLocales) {
-				aSupportedLocales = vI18n.supportedLocales;
-			}
+		} else if (typeof vI18n === "object" && vI18n.bundleUrl) {
+			sResourceBundleURL = this.getBaseUrl() + vI18n.bundleUrl;
 		}
 		this._oEditorResourceBundles = new EditorResourceBundles({
 			url: sResourceBundleURL,
-			languages: Editor._oLanguages,
-			supportedLocales: aSupportedLocales
+			languages: Editor._oLanguages
 		});
 		this._oEditorResourceBundles.loadResourceBundles();
 	};
@@ -3323,7 +3316,7 @@ sap.ui.define([
 			if (vI18n.bundleUrl) {
 				sResourceBundleURL = this.getBaseUrl() + vI18n.bundleUrl;
 			}
-			if (vI18n.supportedLocales && Array.isArray(vI18n.supportedLocales)) {
+			if (Array.isArray(vI18n.supportedLocales)) {
 				aSupportedLocales = vI18n.supportedLocales;
 				for (var i = 0; i < aSupportedLocales.length; i++) {
 					aSupportedLocales[i] = aSupportedLocales[i].replaceAll('_', '-');

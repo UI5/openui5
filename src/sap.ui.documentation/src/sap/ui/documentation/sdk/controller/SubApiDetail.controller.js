@@ -21,10 +21,14 @@ sap.ui.define([
 		"sap/m/CustomListItem",
 		"sap/m/List",
 		"sap/ui/dom/includeStylesheet",
-		"sap/ui/dom/includeScript"
+		"sap/ui/dom/includeScript",
+		"sap/uxap/ObjectPageSection",
+		"sap/ui/documentation/ObjectPageSubSection",
+		"sap/ui/core/HTML"
 	], function (jQuery, Fragment, BaseController, ToggleFullScreenHandler,
 			formatter, Image, Label, Link, Text, HBox, ObjectAttribute, ObjectStatus, Popover,
-			library, coreLibrary, CustomListItem, List, includeStylesheet, includeScript) {
+			library, coreLibrary, CustomListItem, List, includeStylesheet, includeScript,
+			ObjectPageSection, ObjectPageSubSection, HTML) {
 		"use strict";
 
 		// shortcut for sap.m.FlexWrap
@@ -120,21 +124,40 @@ sap.ui.define([
 					this._oModel.setProperty("/ui5-metadata/associations", bHasSelfAssoc ? this._selfAssociations : this._allAssociations);
 				}
 
-				if (this._oModel.getProperty("/hasFAQ")) {
-					var sLibName = this._oEntityData.lib,
-						sLibPath = sLibName.replace(/\./g, '/'),
-						sFile = this._oEntityData.name.replace(sLibName, "").replace(/^[.]/, "").replace(/\./g, '/') + ".html";
-					jQuery.ajax({
-						type: "GET",
-						url: './docs/api/' + sLibPath +
-						'/demokit/faq/' + sFile,
-						success: function (data) {
-							this._oModel.setProperty("/faqContent", data);
-						}.bind(this)
+				var sLibName = this._oEntityData.lib,
+					sLibPath = sLibName.replace(/\./g, '/'),
+					sComponentPath = this._oEntityData.name.replace(sLibName, "").replace(/^[.]/, "").replace(/\./g, '/'),
+					aSectionTypes = (this._oControlData.customSections || []).map(function(sectionType) {
+						return {
+							type: sectionType,
+							property: sectionType + "Content",
+							displayTitle: sectionType.charAt(0).toUpperCase() + sectionType.slice(1),
+							sectionId: sectionType.replace(/[$#/]/g, ".") + "_section"
+						};
 					});
-				}
 
-				// Attach the model to the view
+				Promise.all(aSectionTypes.map(function(oSection) {
+					var sUrl = './docs/api/' + sLibPath + '/demokit/sections/' + sComponentPath + '/' + oSection.type + '.html';
+					return new Promise(function(resolve) {
+						jQuery.ajax({
+							url: sUrl,
+							success: function(data) {
+								this._oModel.setProperty("/" + oSection.property, data);
+								resolve(oSection);
+							}.bind(this),
+							error: function() {
+								resolve(null);
+							}
+						});
+						}.bind(this));
+						}.bind(this))).then(function(results) {
+								results.forEach(function(oSection) {
+						if (oSection) {
+							this._createAndAddSection(oSection);
+						}
+					}.bind(this));
+				}.bind(this));
+
 				this.setModel(this._oModel);
 
 				// Build needed resources and pre-process data
@@ -725,6 +748,25 @@ sap.ui.define([
 				}, this);
 			},
 
+			/**
+			 * Creates and adds a dynamic section to the ObjectPageLayout
+			 * @param {object} oSectionConfig Section configuration object
+			 * @private
+			 */
+			_createAndAddSection: function(oSectionConfig) {
+				var oHTMLControl = new HTML({content: "{/" + oSectionConfig.property + "}"});
+				oHTMLControl.setModel(this._oModel);
+
+			var oPageSection = new ObjectPageSection({
+					id: this.createId(oSectionConfig.sectionId),
+					title: oSectionConfig.displayTitle,
+				titleUppercase: false,
+				subSections: [new ObjectPageSubSection({blocks: [oHTMLControl]})]
+			});
+			oPageSection.addStyleClass("sectionContent");
+
+			this._objectPage.addSection(oPageSection);
+			},
 			onAnnotationsLinkPress: function () {
 				this.scrollToEntity("annotations", "Summary");
 			},

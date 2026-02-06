@@ -25,22 +25,12 @@
 								forceBind="true">
 								<mdcvc:filterBar>
 									<mdcvh:FilterBar id="VHRange-Dialog-mdctable1-FB" liveMode="false"
+										propertyInfo='[\{"key": "countries", "label": "Countries", "visible": true, "path": "countries", "dataType": "sap.ui.model.type.String", "constraints":\{"maxLength": 2\}\}]'
 										delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONFilterBarDelegate", "payload": \{\}\}'>
-										<mdcvh:basicSearchField>
-											<mdc:FilterField
-												id="VHRange-Dialog-mdctable1-FB-search"
-												delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
-												conditions="{$filters>/conditions/$search}"
-												propertyKey="$search"
-												width="50%"
-												maxConditions="1"
-												placeholder="Search" />
-										</mdcvh:basicSearchField>
 										<mdcvh:filterItems>
 											<mdc:FilterField
 												id="VHRange-Dialog-mdctable1-FB-countries"
 												delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
-												label="Countries" conditions="{$filters>/conditions/countries}"
 												propertyKey="countries"
 												operators="EQ,NE,Empty,NotEmpty" />
 											<mdc:FilterField
@@ -287,12 +277,12 @@
 				id="mountainsFilterbar"
 				delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONFilterBarDelegate", "payload": \{\}\}'
 				propertyInfo='[\{"key": "name",	"label": "Name", "visible": true, "path": "name", "dataType": "sap.ui.model.type.String"\},
-							   \{"key": "countries", "label": "Countries", "visible": true, "path": "countries", "dataType": "sap.ui.model.type.String"\},
+							   \{"key": "countries", "label": "Countries", "visible": true, "path": "countries", "dataType": "sap.ui.model.type.String", "constraints":\{"maxLength": 2\}\},
 							   \{"key": "range", "label": "Range", "visible": true, "path": "range", "dataType": "sap.ui.model.type.String"\},
 							   \{"key": "height", "label": "Height", "visible": true, "path": "height", "dataType": "sap.ui.model.type.Integer", "formatOptions":\{"emptyString": null\}\},
 							   \{"key": "prominence", "label": "Prominence", "visible": true, "path": "prominence", "dataType": "sap.ui.model.type.Float", "formatOptions":\{"emptyString": null\}\},
 							   \{"key": "parent_mountain", "label": "Has parent mountain", "visible": true, "path": "parent_mountain", "dataType": "sap.ui.model.type.Boolean", "maxConditions": 1\},
-							   \{"key": "first_ascent",	"label": "First Ascent", "visible": true, "path": "first_ascent", "dataType": "sap.ui.model.odata.type.Date", "formatOptions":\{"style": "long"\}, "constraints": \{"V4": true\},"maxConditions": 1\},
+							   \{"key": "first_ascent",	"label": "First Ascent", "visible": true, "path": "first_ascent", "dataType": "sap.ui.model.type.Date", "formatOptions":\{"style": "long"\}, "maxConditions": 1\},
 							   \{"key": "rank", "label": "Rank", "visible": true, "path": "rank", "dataType": "sap.ui.model.type.Integer", "formatOptions":\{"emptyString": 0\}, "constraints":\{"minimum": 0\}\}]'
 				p13nMode = "Item,Value"
 				filtersChanged=".onFiltersChanged">
@@ -300,82 +290,54 @@
 					<!-- Title - String -->
 					<mdc:FilterField
 						id="mountainsFilterbar--filter--name"
-						label="Name"
 						propertyKey="name"
-						dataType="sap.ui.model.type.String"
-						conditions="{$filters>/conditions/name}"
 						valueHelp="VHName"
 						operators="EQ"
-						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}'>
+						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'>
 					</mdc:FilterField>
 
 					<!-- Countries - String -->
 					<mdc:FilterField
 						id="mountainsFilterbar--filter--countries"
-						label="Countries"
 						propertyKey="countries"
-						dataType="sap.ui.model.type.String"
-						conditions="{$filters>/conditions/countries}"
-						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}' 
+						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
 						valueHelp="VHCountries">
 					</mdc:FilterField>
 
 					<!-- Range - String -->
 					<mdc:FilterField
 						id="mountainsFilterbar--filter--range"
-						label="Range"
 						propertyKey="range"
-						dataType="sap.ui.model.type.String"
-						conditions="{$filters>/conditions/range}"
-						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}' 
+						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
 						valueHelp="VHRange">
 					</mdc:FilterField>
 
 					<!-- Height - Integer -->
 					<mdc:FilterField
 						id="mountainsFilterbar--filter--height"
-						label="Height"
 						propertyKey="height"
-						dataType="sap.ui.model.type.Integer"
-						dataTypeFormatOptions='\{"emptyString": null\}'
-						conditions="{$filters>/conditions/height}"
-						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}' >
+						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}' >
 					</mdc:FilterField>
 
 					<!-- Prominence - Float -->
 					<mdc:FilterField
 						id="mountainsFilterbar--filter--prominence"
-						label="Prominence"
 						propertyKey="prominence"
-						dataType="sap.ui.model.type.Float"
-						dataTypeFormatOptions='\{"emptyString": null\}'
-						conditions="{$filters>/conditions/prominence}"
-						maxConditions="-1"
-						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}'>
+						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'>
 					</mdc:FilterField>
 
 					<!-- Parent Mountain - Boolean -->
 					<mdc:FilterField
 						id="mountainsFilterbar--filter--parent_mountain"
-						label="Has parent mountain"
 						propertyKey="parent_mountain"
-						dataType="sap.ui.model.type.Boolean"
-						conditions="{$filters>/conditions/parent_mountain}"
-						maxConditions="1"
 						operators="EQ"
-						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}'>
+						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'>
 					</mdc:FilterField>
 
 					<!-- First Ascent - Date -->
 					<mdc:FilterField
 						id="mountainsFilterbar--filter--first_ascent"
-						label="First Ascent"
 						propertyKey="first_ascent"
-						dataType="sap.ui.model.odata.type.Date"
-						dataTypeFormatOptions='\{"style": "long"\}'
-						dataTypeConstraints='\{"V4": true\}'
-						conditions="{$filters>/conditions/first_ascent}"
-						maxConditions="1"
 						operators="EQ,BT,TODAY,YESTERDAY,TOMORROW,TODAYFROMTO,LASTDAYS,NEXTDAYS"
 						delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' >
 					</mdc:FilterField>
@@ -383,13 +345,8 @@
 					<!-- Rank (formatOptions and constraints) -->
 					<mdc:FilterField
 						id="mountainsFilterbar--filter--rank"
-						label="Rank"
 						propertyKey="rank"
-						dataType="sap.ui.model.type.Integer"
-						dataTypeFormatOptions='\{"emptyString": 0\}'
-						dataTypeConstraints='\{"minimum": 0\}'
-						conditions="{$filters>/conditions/rank}"
-						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}'
+						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
 						operators="EQ">
 					</mdc:FilterField>
 

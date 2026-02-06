@@ -29,9 +29,6 @@ sap.ui.define([
 				},
 				languages: {
 					type: "object"
-				},
-				supportedLocales: {
-					type: "array"
 				}
 			},
 			events: {
@@ -43,7 +40,6 @@ sap.ui.define([
 	EditorResourceBundles.prototype.loadResourceBundles = function () {
 		var that = this;
 		var sUrl = that.getUrl();
-		var aSupportedLocales = that.getSupportedLocales();
 		var aLanguages = that.getLanguages();
 		that._ready = false;
 		that._aResourceBundles = [];
@@ -51,41 +47,24 @@ sap.ui.define([
 		// according to the language list, load each resource bundle
 		Object.keys(aLanguages).forEach(function (language) {
 			if (sUrl) {
-				var aFallbacks = [language];
-				if (language.indexOf("-") > -1) {
-					aFallbacks.push(language.substring(0, language.indexOf("-")));
-				}
-				// add en into fallbacks
-				if (!aFallbacks.includes("en")) {
-					aFallbacks.push("en");
-				}
 				that._aResourceBundles[language] = "";
 				var oResourceBundleReadyPromie = ResourceBundle.create({
 					url: sUrl,
 					async: true,
-					locale: language,
-					supportedLocales: aFallbacks
+					locale: language
 				}).then(function (oResourceBundle) {
 					var oResourceBundleObject = {
 						"language": aLanguages[language],
-						"resourceBundle": oResourceBundle,
-						"isSupportedLocale": true
+						"resourceBundle": oResourceBundle
 					};
-					if (Array.isArray(aSupportedLocales) && !aSupportedLocales.includes(language) && !aSupportedLocales.includes(language.replace('-', '_'))) {
-						oResourceBundleObject.isSupportedLocale = false;
-					}
 					that._aResourceBundles[language] = oResourceBundleObject;
 				});
 				that._aResourceBundleReadyPromise.push(oResourceBundleReadyPromie);
 			} else {
 				// i18n not defined in card manifest
 				var oResourceBundleObject = {
-					"language": aLanguages[language],
-					"isSupportedLocale": true
+					"language": aLanguages[language]
 				};
-				if (Array.isArray(aSupportedLocales) && !aSupportedLocales.includes(language) && !aSupportedLocales.includes(language.replace('-', '_'))) {
-					oResourceBundleObject.isSupportedLocale = false;
-				}
 				that._aResourceBundles[language] = oResourceBundleObject;
 			}
 		});
@@ -95,12 +74,8 @@ sap.ui.define([
 					// add missing languages
 					if (that._aResourceBundles[language] == "") {
 						var oResourceBundleObject = {
-							"language": aLanguages[language],
-							"isSupportedLocale": true
+							"language": aLanguages[language]
 						};
-						if (Array.isArray(aSupportedLocales) && !aSupportedLocales.includes(language) && !aSupportedLocales.includes(language.replace('-', '_'))) {
-							oResourceBundleObject.isSupportedLocale = false;
-						}
 						that._aResourceBundles[language] = oResourceBundleObject;
 					}
 				});
