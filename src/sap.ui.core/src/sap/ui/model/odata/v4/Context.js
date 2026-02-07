@@ -2347,7 +2347,7 @@ sap.ui.define([
 	 *   <li> is refreshed when {@link #requestSideEffects}) is called on its list binding's header
 	 *     context.
 	 * </ul>
-	   Other APIs are not supported.
+	 * Other APIs are not supported.
 	 *
 	 * @param {boolean} bKeepAlive
 	 *   Whether to keep the context alive

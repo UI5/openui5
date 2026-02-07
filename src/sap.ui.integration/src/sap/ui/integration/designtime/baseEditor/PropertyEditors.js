@@ -69,7 +69,6 @@ sap.ui.define([
 	 * @since 1.73.0
 	 * @version ${version}
 	 * @private
-	 * @experimental since 1.73.0
 	 * @ui5-restricted
 	 */
 	var PropertyEditors = Control.extend("sap.ui.integration.designtime.baseEditor.PropertyEditors", {

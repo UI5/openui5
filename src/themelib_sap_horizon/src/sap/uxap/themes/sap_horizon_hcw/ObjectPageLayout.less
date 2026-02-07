@@ -4,7 +4,7 @@
 /* ========================================== */
 
 .sapUxAPObjectPageNavigation {
-	background: @sapUiObjectHeaderBackground;
+	background: var(--sapObjectHeader_Background);
 
 	&.sapUxAPObjectPageNavigationTransparent {
 		background: transparent;
@@ -16,17 +16,21 @@
 }
 
 .sapUxAPObjectPageHeaderDetails {
+
 	.sapMOHTitle .sapMText {
-		color: @sapUiContentLabelColor;
+		color: var(--sapContent_LabelColor);
 	}
+
 	.sapMLabel {
-		color: @sapUiContentLabelColor;
+		color: var(--sapContent_LabelColor);
 	}
 }
+
 .sapUiSizeCompact .sapUxAPObjectPageNavigation,
 .sapUxAPObjectPageNavigation {
+
 	.sapUxAPObjectChildPage {
-		height: @sapUiElementLineHeight;
+		height: var(--sapElement_LineHeight);
 	}
 }
 
@@ -38,37 +42,39 @@
 	height: 1.9375rem;
 }
 
-/* ======================================== */
-/* Title and Toggle Header Visual Indicator */
-/* ======================================== */
+/* ========================================= */
+/* Title and Toggle Header Visual Indicator  */
+/* ========================================= */
+
 .sapUxAPObjectPageLayout {
-  &.sapUxAPObjectPageLayoutTitleClickEnabled {
 
-    &.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitle {
-      .title-hover(@sapUiObjectHeaderHoverBackground);
-	}
+	&.sapUxAPObjectPageLayoutTitleClickEnabled {
 
-	&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitleTranslucent {
-		.title-hover(lighten(@sapUiObjectHeaderBackground, 10));
-	}
+		&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitle {
+			.title-hover(@sapUiObjectHeaderHoverBackground);
+		}
 
-	&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitleTransparent {
-		.title-hover(transparent);
+		&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitleTranslucent {
+			.title-hover(lighten(@sapUiObjectHeaderBackground, 10));
+		}
+
+		&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitleTransparent {
+			.title-hover(transparent);
+		}
 	}
-  }
 }
 
 .sapUxAPObjectPageLayout:not(.sapUxAPObjectPageLayoutNoAnchorBar) > .sapUxAPObjectPageHeaderStickied > .sapFDynamicPageTitle {
-		box-shadow: none;
+	box-shadow: none;
 }
 
-// footer
+/* footer */
 .sapUxAPObjectPageLayout .sapUxAPObjectPageFooter .sapUxAPObjectPageFloatingFooter {
-	background: @sapUiPageFooterBackground;
-	color: @sapUiPageFooterTextColor;
+	background: var(--sapPageFooter_Background);
+	color: var(--sapPageFooter_TextColor);
 	box-shadow: @sapUiShadowLevel1;
 	border: none;
-	border-radius: @sapUiElementBorderCornerRadius;
+	border-radius: var(--sapElement_BorderCornerRadius);
 }
 
 .title-hover(@backgroundColor) {

@@ -2525,14 +2525,20 @@ function(
 		}
 
 		// Enter / F2: focus from container to the content
-		if ((oEvent.code == "Enter" || oEvent.code == "F2") && $Target.hasClass("sapMTblCellFocusable")) {
+		if (!oEvent.shiftKey && (oEvent.code == "Enter" || oEvent.code == "F2") && $Target.hasClass("sapMTblCellFocusable")) {
 			$Target.find(":sapTabbable").first().trigger("focus");
 			return preventDefault();
 		}
 
 		// F2 / F7: focus from item to the first interactive element
-		if ((oEvent.code == "F2" && bItemEvent) || (oEvent.code == "F7" && bItemEvent && this._iFocusIndexOfItem == undefined)) {
+		if (!oEvent.shiftKey && bItemEvent && (oEvent.code == "F2" || (oEvent.code == "F7" && this._iFocusIndexOfItem == undefined))) {
 			$FocusableItem.find(":sapTabbable").first().trigger("focus");
+			return preventDefault();
+		}
+
+		// Shift + F2 / F7: focus from nested item to the parent item
+		if (oEvent.shiftKey && bItemEvent && (oEvent.code == "F7" || oEvent.code == "F2")) {
+			$FocusableItem.parents(".sapMLIBFocusable,.sapMTblCellFocusable").first().trigger("focus");
 			return preventDefault();
 		}
 
@@ -2595,6 +2601,10 @@ function(
 			return;
 		}
 
+		if (this.getNavigationRoot()?.contains(oEvent.target)) {
+			this.$("after").attr("tabindex", "-1");
+		}
+
 		// check whether item navigation should be reapplied from scratch
 		if (this._bItemNavigationInvalidated) {
 			this._startItemNavigation();
@@ -2639,6 +2649,10 @@ function(
 	};
 
 	ListBase.prototype.onsapfocusleave = function(oEvent) {
+		const oNavigationRoot = this.getNavigationRoot();
+		if (oNavigationRoot && !oNavigationRoot.contains(document.activeElement)) {
+			this.$("after").attr("tabindex", "0");
+		}
 		if (this._oItemNavigation &&
 			!this.bAnnounceDetails &&
 			!this.getNavigationRoot().contains(document.activeElement)) {
@@ -2648,7 +2662,7 @@ function(
 
 	// this gets called when items up arrow key is pressed for the edit keyboard mode
 	ListBase.prototype.onItemArrowUpDown = function(oListItem, oEvent) {
-		if (oEvent.target instanceof HTMLTextAreaElement) {
+		if (oEvent.isMarked() || oEvent.target instanceof HTMLTextAreaElement) {
 			return;
 		}
 
@@ -2662,6 +2676,7 @@ function(
 		}
 
 		if (!oItem) {
+			oEvent.setMarked();
 			return;
 		}
 

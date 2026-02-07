@@ -10,8 +10,8 @@ sap.ui.define([
 	"sap/ui/dt/DOMUtil",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/events/KeyCodes",
-	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/write/_internal/Versions",
 	"sap/ui/fl/write/api/BusinessNetworkAPI",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
@@ -39,8 +39,8 @@ sap.ui.define([
 	DOMUtil,
 	OverlayRegistry,
 	KeyCodes,
-	Loader,
 	FlexRuntimeInfoAPI,
+	Loader,
 	Versions,
 	BusinessNetworkAPI,
 	ChangesWriteAPI,
@@ -768,7 +768,12 @@ sap.ui.define([
 			});
 			await this.oRta.start();
 
+			const oRemoveEventListenerSpy = sandbox.spy(document, "removeEventListener");
 			await this.oRta.stop();
+			assert.ok(
+				oRemoveEventListenerSpy.calledWith("keydown", this.oRta.fnKeyDown),
+				"then the keydown event listener is removed on stop"
+			);
 
 			await this.oRta.start();
 

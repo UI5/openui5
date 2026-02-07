@@ -57,7 +57,6 @@ sap.ui.define([
 	 * @version ${version}
 	 * @private
 	 * @ui5-restricted
-	 * @experimental since 1.83.0
 	 */
 	var BaseField = Control.extend("sap.ui.integration.editor.fields.BaseField", {
 		metadata: {

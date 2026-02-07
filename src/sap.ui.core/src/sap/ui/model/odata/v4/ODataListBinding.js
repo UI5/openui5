@@ -218,6 +218,28 @@ sap.ui.define([
 	};
 
 	/**
+	 * Converts the view index of a context to the model index in case there are contexts created at
+	 * the end.
+	 *
+	 * @param {number} iViewIndex - The view index (see {@link #getContexts})
+	 * @returns {number} The corresponding model index inside <code>this.aContexts</code>
+	 *
+	 * @private
+	 */
+	ODataListBinding.prototype._getModelIndex = function (iViewIndex) {
+		if (!this.bFirstCreateAtEnd) {
+			return iViewIndex;
+		}
+		if (!this.bLengthFinal) { // created at end, but the read is pending and $count unknown yet
+			return this.aContexts.length - iViewIndex - 1;
+		}
+		return iViewIndex < this.getLength() - this.iCreatedContexts
+			? iViewIndex + this.iCreatedContexts
+			// Note: the created rows are mirrored at the end
+			: this.getLength() - iViewIndex - 1;
+	};
+
+	/**
 	 * Adjusts the paths of all contexts of this binding by replacing the given transient predicate
 	 * with the given predicate. Recursively adjusts all child bindings. Creates a cache and copies
 	 * the created entities from the parent cache if necessary.
@@ -2921,7 +2943,7 @@ sap.ui.define([
 			aContexts = [];
 			iCount = Math.min(iLength, this.getLength() - iStart);
 			for (i = 0; i < iCount; i += 1) {
-				aContexts[i] = this.aContexts[this.getModelIndex(iStart + i)];
+				aContexts[i] = this.aContexts[this._getModelIndex(iStart + i)];
 			}
 		} else {
 			aContexts = this.aContexts.slice(iStart, iStart + iLength);
@@ -3311,28 +3333,6 @@ sap.ui.define([
 			return this.iMaxLength + this.iCreatedContexts;
 		}
 		return this.aContexts.length ? this.aContexts.length + 10 : 0;
-	};
-
-	/**
-	 * Converts the view index of a context to the model index in case there are contexts created at
-	 * the end.
-	 *
-	 * @param {number} iViewIndex The view index
-	 * @returns {number} The model index
-	 *
-	 * @private
-	 */
-	ODataListBinding.prototype.getModelIndex = function (iViewIndex) {
-		if (!this.bFirstCreateAtEnd) {
-			return iViewIndex;
-		}
-		if (!this.bLengthFinal) { // created at end, but the read is pending and $count unknown yet
-			return this.aContexts.length - iViewIndex - 1;
-		}
-		return iViewIndex < this.getLength() - this.iCreatedContexts
-			? iViewIndex + this.iCreatedContexts
-			// Note: the created rows are mirrored at the end
-			: this.getLength() - iViewIndex - 1;
 	};
 
 	/**

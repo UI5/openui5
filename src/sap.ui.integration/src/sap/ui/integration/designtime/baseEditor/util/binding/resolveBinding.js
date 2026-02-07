@@ -18,7 +18,6 @@ sap.ui.define([
 	 * @returns {object} - JSON with resolved bindings (only for available models)
 	 *
 	 * @function
-	 * @experimental
 	 * @since 1.75
 	 * @private
 	 */

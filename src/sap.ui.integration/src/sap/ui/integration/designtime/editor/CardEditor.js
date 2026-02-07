@@ -56,7 +56,6 @@ sap.ui.define([
 	 * @see {@link topic:5b46b03f024542ba802d99d67bc1a3f4 Cards}
 	 * @since 1.83
 	 * @private
-	 * @experimental since 1.83.0
 	 * @alias sap.ui.integration.designtime.editor.CardEditor
 	 */
 	var CardEditor = Editor.extend("sap.ui.integration.designtime.editor.CardEditor", /** @lends sap.ui.integration.designtime.editor.CardEditor.prototype */ {

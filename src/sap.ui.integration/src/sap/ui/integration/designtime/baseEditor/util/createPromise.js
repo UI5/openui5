@@ -12,7 +12,6 @@ sap.ui.define(function () {
 	* @return {object}
 	* @return {object.promise} — native Promise object
 	* @return {object.cancel} — cancellation function
-	* @experimental
 	* @private
 	*/
 	return function (fn) {

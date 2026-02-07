@@ -556,6 +556,7 @@ sap.ui.define([
 			if (vError.message === "Reload triggered") {
 				// destroy rta when reload is triggered - otherwise the consumer needs to take care of this
 				this.destroy();
+				document.removeEventListener("keydown", this.fnKeyDown);
 			} else {
 				this._sStatus = FAILED;
 				this.fireFailed({ vError: vError.message });
@@ -662,6 +663,7 @@ sap.ui.define([
 				ReloadManager.handleReloadOnExit(oReloadInfo);
 			}
 			VersionsAPI.clearInstances();
+			document.removeEventListener("keydown", this.fnKeyDown);
 		} catch (vError) {
 			bExitFailed = true;
 			if (!bUserCancelled) {

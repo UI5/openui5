@@ -44,7 +44,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.97
 	 * @ui5-restricted
 	 */
 	var FiltersEditor = ComplexMapEditor.extend("sap.ui.integration.designtime.cardEditor.propertyEditor.filtersEditor.FiltersEditor", {

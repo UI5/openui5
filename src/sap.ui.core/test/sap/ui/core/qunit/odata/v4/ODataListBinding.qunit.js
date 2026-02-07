@@ -2455,9 +2455,9 @@ sap.ui.define([
 		// assuming 3 created entities (with index 0, 1 and 2)
 		// view order 3 4 5 2 1 0
 		oBindingMock.expects("getLength").withExactArgs().returns(6);
-		oBindingMock.expects("getModelIndex").withExactArgs(3).returns(0);
-		oBindingMock.expects("getModelIndex").withExactArgs(4).returns(1);
-		oBindingMock.expects("getModelIndex").withExactArgs(5).returns(2);
+		oBindingMock.expects("_getModelIndex").withExactArgs(3).returns(0);
+		oBindingMock.expects("_getModelIndex").withExactArgs(4).returns(1);
+		oBindingMock.expects("_getModelIndex").withExactArgs(5).returns(2);
 
 		oBinding.bFirstCreateAtEnd = true;
 		oBinding.aContexts = [{}, {}, {}, {}, {}, {}];
@@ -2471,8 +2471,8 @@ sap.ui.define([
 		assert.strictEqual(aResults[2], oBinding.aContexts[2]);
 
 		oBindingMock.expects("getLength").withExactArgs().returns(6);
-		oBindingMock.expects("getModelIndex").withExactArgs(1).returns(4);
-		oBindingMock.expects("getModelIndex").withExactArgs(2).returns(3);
+		oBindingMock.expects("_getModelIndex").withExactArgs(1).returns(4);
+		oBindingMock.expects("_getModelIndex").withExactArgs(2).returns(3);
 
 		// code under test
 		aResults = oBinding.getContextsInViewOrder(1, 2);
@@ -5972,9 +5972,9 @@ sap.ui.define([
 		oContext1 = oBinding.create(undefined, true, true);
 		oContext2 = oBinding.create(undefined, true, true);
 
-		assert.strictEqual(oBinding.getModelIndex(0), 2);
-		assert.strictEqual(oBinding.getModelIndex(1), 1);
-		assert.strictEqual(oBinding.getModelIndex(2), 0);
+		assert.strictEqual(oBinding._getModelIndex(0), 2);
+		assert.strictEqual(oBinding._getModelIndex(1), 1);
+		assert.strictEqual(oBinding._getModelIndex(2), 0);
 
 		return Promise.all([
 			oContext0.created(),
@@ -9764,42 +9764,42 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("getModelIndex", function (assert) {
+	QUnit.test("_getModelIndex", function (assert) {
 		var oBinding = this.bindList("/Set"),
 			oBindingMock = this.mock(oBinding);
 
 		oBindingMock.expects("getLength").atLeast(0).withExactArgs().returns(10);
 
 		// code under test
-		assert.strictEqual(oBinding.getModelIndex(5), 5);
-		assert.strictEqual(oBinding.getModelIndex(42), 42);
+		assert.strictEqual(oBinding._getModelIndex(5), 5);
+		assert.strictEqual(oBinding._getModelIndex(42), 42);
 
 		oBinding.bLengthFinal = true;
 		oBinding.iCreatedContexts = 1;
 
 		// code under test
-		assert.strictEqual(oBinding.getModelIndex(5), 5);
-		assert.strictEqual(oBinding.getModelIndex(42), 42);
+		assert.strictEqual(oBinding._getModelIndex(5), 5);
+		assert.strictEqual(oBinding._getModelIndex(42), 42);
 
 		oBinding.bFirstCreateAtEnd = true;
 
 		// code under test
-		assert.strictEqual(oBinding.getModelIndex(2), 3);
-		assert.strictEqual(oBinding.getModelIndex(5), 6);
-		assert.strictEqual(oBinding.getModelIndex(9), 0);
+		assert.strictEqual(oBinding._getModelIndex(2), 3);
+		assert.strictEqual(oBinding._getModelIndex(5), 6);
+		assert.strictEqual(oBinding._getModelIndex(9), 0);
 
 		oBinding.iCreatedContexts = 2;
 
 		// code under test
-		assert.strictEqual(oBinding.getModelIndex(2), 4);
-		assert.strictEqual(oBinding.getModelIndex(5), 7);
-		assert.strictEqual(oBinding.getModelIndex(8), 1);
-		assert.strictEqual(oBinding.getModelIndex(9), 0);
+		assert.strictEqual(oBinding._getModelIndex(2), 4);
+		assert.strictEqual(oBinding._getModelIndex(5), 7);
+		assert.strictEqual(oBinding._getModelIndex(8), 1);
+		assert.strictEqual(oBinding._getModelIndex(9), 0);
 
 		oBinding.iCreatedContexts = 0;
 
 		// code under test
-		assert.strictEqual(oBinding.getModelIndex(0), 0);
+		assert.strictEqual(oBinding._getModelIndex(0), 0);
 	});
 
 	//*********************************************************************************************

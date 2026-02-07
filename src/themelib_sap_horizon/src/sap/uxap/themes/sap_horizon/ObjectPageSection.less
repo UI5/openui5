@@ -1,7 +1,8 @@
 /* =========================================== */
 /* CSS for control sap.uxap/ObjectPageSection  */
-/* Horizon theme                               */
+/* Morning Horizon theme                       */
 /* =========================================== */
+
 .sapUxAPObjectPageSection:not(.sapUxAPObjectPageSectionFirstVisible) {
 	padding-top: 1.5rem;
 }
@@ -32,6 +33,7 @@
 
 .sapUxAPObjectPageLayout-Std-Desktop,
 .sapUxAPObjectPageLayout-Std-Tablet {
+
 	.sapUxAPObjectPageSectionHeader,
 	html .sapUiContainer-Medium .sapUxAPObjectPageSectionHeader,
 	.sapUxAPObjectPageSubSectionWithSeeMore .sapUxAPSubSectionSeeMoreContainer {
@@ -41,37 +43,39 @@
 }
 
 .sapUxAPObjectPageLayout-Std-Phone {
+
 	.sapUxAPObjectPageSectionHeader,
 	html .sapUiContainer-Narrow .sapUxAPObjectPageSectionHeader,
 	.sapUxAPObjectPageSubSectionWithSeeMore .sapUxAPSubSectionSeeMoreContainer {
 		padding-right: 1rem;
 	}
+
 	.sapUxAPObjectPageSection .sapUxAPObjectPageSectionContainer .sapUxAPObjectPageSubSection .sapUxAPBlockContainer {
 		margin-left: 1rem;
 		margin-right: 1rem;
 	}
 }
 
-// =====================================
-// =====================================
-// Delta Styles for Horizon
-// =====================================
+/* ========================= */
+/* Delta Styles for Horizon  */
+/* ========================= */
 
-// =====================================
-// Object Page section container style
-// =====================================
+/* ==================================== */
+/* Object Page section container style  */
+/* ==================================== */
+
 .sapUxAPObjectPageSection .sapUxAPObjectPageSectionContainer .sapUxAPObjectPageSubSection .sapUxAPBlockContainer {
-    padding-bottom:0.5rem;
-    padding-top: 0.5rem;
-    padding-left: 0;
-    padding-right: 0;
-    background: @sapUiGroupContentBackground;
-    margin-left: 2rem;
-    margin-right: 2rem;
-    border-radius: @sapUiElementBorderCornerRadius;
+	padding-bottom:0.5rem;
+	padding-top: 0.5rem;
+	padding-left: 0;
+	padding-right: 0;
+	background: var(--sapGroup_ContentBackground);
+	margin-left: 2rem;
+	margin-right: 2rem;
+	border-radius: var(--sapElement_BorderCornerRadius);
 }
 
-// Page Section Focus
+/* Page Section Focus */
 .sapUxAPObjectPageSection:focus::before {
 	content: '';
 	position: absolute;
@@ -80,12 +84,12 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	border: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
+	border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	z-index: 6;
 	pointer-events: none;
 }
 
-// Styles suporting Table inside ObjectPageSubSection scenario
+/* Styles suporting Table inside ObjectPageSubSection scenario */
 .sapUiTableOnObjectPageAdjustmentsForSection.sapUxAPObjectPageSection .sapUxAPObjectPageSectionContainer .sapUxAPObjectPageSubSection:not(.sapUiAdjustedSectionSubsectionWithoutTable) .sapUxAPBlockContainer {
 	background: transparent;
 }

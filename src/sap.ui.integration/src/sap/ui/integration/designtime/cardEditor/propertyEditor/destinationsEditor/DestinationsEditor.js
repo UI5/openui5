@@ -42,7 +42,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.77
 	 * @ui5-restricted
 	 */
 	var DestinationsEditor = ComplexMapEditor.extend("sap.ui.integration.designtime.cardEditor.propertyEditor.destinationsEditor.DestinationsEditor", {

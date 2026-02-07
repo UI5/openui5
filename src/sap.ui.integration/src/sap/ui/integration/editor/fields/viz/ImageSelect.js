@@ -16,7 +16,6 @@ sap.ui.define([
 	 * @since 1.119.0
 	 * @version ${version}
 	 * @private
-	 * @experimental since 1.119.0
 	 * @ui5-restricted
 	 */
 	var ImageSelect = IconSelect.extend("sap.ui.integration.editor.fields.viz.ImageSelect", {

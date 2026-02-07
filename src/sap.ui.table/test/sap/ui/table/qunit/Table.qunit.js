@@ -5019,6 +5019,24 @@ sap.ui.define([
 		assert.strictEqual(this.oTable.getFirstVisibleRow(), 12, "firstVisibleRow is 12 after scrolling to index 10000");
 	});
 
+	QUnit.test("Scroll to index equal to iFirstVisibleRow + iRowCount", async function(assert) {
+		this.createTable({
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(17),
+			rowMode: new FixedRowMode({
+				rowCount: 3
+			}),
+			columns: [
+				TableQUnitUtils.createTextColumn()
+			],
+			rows: "{/}"
+		});
+		assert.strictEqual(this.oTable.getRowMode().getRowCount(), 3, "rowCount is 3");
+		assert.strictEqual(this.oTable.getBinding().getLength(), 17, "binding length is 17");
+
+		await this.oTable._scrollToIndex(3);
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 3, "firstVisibleRow is 3 after scrolling to index 3");
+	});
+
 	QUnit.test("Scroll with fixed top row", async function(assert) {
 		const mSettings = {
 			rowMode: new FixedRowMode({

@@ -142,11 +142,11 @@ sap.ui.define([
 		}
 
 		if (oProperty.unit) {
-			return Promise.resolve(new Currency({
+			return new Currency({
 				useSymbol: false,
 				value: {path: this.getColumnTemplateBindingPath(oTable, oProperty.path)},
 				currency: {path: this.getColumnTemplateBindingPath(oTable, oPropertyHelper.getProperty(oProperty.unit).path)}
-			}));
+			});
 		}
 
 		if (oProperty.text) {

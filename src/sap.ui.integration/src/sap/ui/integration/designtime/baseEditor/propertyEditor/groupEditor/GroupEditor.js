@@ -46,7 +46,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.85
 	 * @ui5-restricted
 	 */
 	var GroupEditor = BasePropertyEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.groupEditor.GroupEditor", {

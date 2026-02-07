@@ -1100,8 +1100,6 @@ sap.ui.define([
 				items: [
 					new ActionItem({
 						label: "Columns",
-						content: oList,
-						showResetButton: false,
 						press: function(oEvent) {
 							var oDialog = oEvent.getSource().getDependents()[0];
 							if (!oDialog) {

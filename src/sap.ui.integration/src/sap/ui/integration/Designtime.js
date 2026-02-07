@@ -22,7 +22,6 @@ sap.ui.define([
 	 *
 	 * @constructor
 	 * @public
-	 * @experimental Since 1.75
 	 * @since 1.75
 	 * @alias sap.ui.integration.Designtime
 	 */

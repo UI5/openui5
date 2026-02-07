@@ -46,7 +46,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.98
 	 * @ui5-restricted
 	 */
 	var MultiSelectEditor = BasePropertyEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.multiSelectEditor.MultiSelectEditor", {
