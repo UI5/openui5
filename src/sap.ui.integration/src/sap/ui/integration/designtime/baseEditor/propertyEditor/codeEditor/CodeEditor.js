@@ -62,7 +62,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.106
 	 * @ui5-restricted
 	 */
 	var CodeEditor = BasePropertyEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.codeEditor.CodeEditor", {

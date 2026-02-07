@@ -2,6 +2,7 @@
 /* CSS for control sap.uxap/ObjectPageSection  */
 /* Horizon High Contrast Black theme           */
 /* =========================================== */
+
 .sapUxAPObjectPageSection:not(.sapUxAPObjectPageSectionFirstVisible) {
 	padding-top: 1.5rem;
 }
@@ -20,7 +21,7 @@
 }
 
 .sapUxAPObjectPageSection {
-	border-top: 0.0625rem solid @sapUiGroupTitleBorderColor;
+	border-top: 0.0625rem solid var(--sapGroup_TitleBorderColor);
 }
 
 .sapUiSizeCompact .sapUxAPObjectPageSectionHeader,
@@ -39,7 +40,7 @@
 	line-height: 2.25rem;
 }
 
-// Page Section Focus
+/* Page Section Focus */
 .sapUxAPObjectPageSection:focus::before {
 	content: '';
 	position: absolute;
@@ -48,7 +49,7 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	border: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
+	border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	z-index: 6;
 	pointer-events: none;
 }
@@ -60,6 +61,7 @@
 
 .sapUxAPObjectPageLayout-Std-Desktop,
 .sapUxAPObjectPageLayout-Std-Tablet {
+
 	.sapUxAPObjectPageSectionHeader,
 	html .sapUiContainer-Medium .sapUxAPObjectPageSectionHeader,
 	.sapUxAPObjectPageSubSectionWithSeeMore .sapUxAPSubSectionSeeMoreContainer {
@@ -69,6 +71,7 @@
 }
 
 .sapUxAPObjectPageLayout-Std-Phone {
+
 	.sapUxAPObjectPageSectionHeader,
 	html .sapUiContainer-Narrow .sapUxAPObjectPageSectionHeader,
 	.sapUxAPObjectPageSubSectionWithSeeMore .sapUxAPSubSectionSeeMoreContainer {
@@ -76,7 +79,7 @@
 	}
 }
 
-// Styles suporting Table inside ObjectPageSubSection scenario
+/* Styles suporting Table inside ObjectPageSubSection scenario */
 .sapUiTableOnObjectPageAdjustmentsForSection.sapUxAPObjectPageSection .sapUxAPObjectPageSectionContainer .sapUxAPObjectPageSubSection .sapUxAPBlockContainer {
 	background: transparent;
 }

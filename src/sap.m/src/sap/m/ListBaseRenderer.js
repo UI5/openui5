@@ -354,9 +354,13 @@ ListBaseRenderer.renderNoDataArea = function (rm, oControl) {
 	}
 };
 
-ListBaseRenderer.renderDummyArea = function(rm, oControl, sAreaId, iTabIndex) {
-	rm.openStart("div", oControl.getId(sAreaId)).attr("role", "none").attr("tabindex", iTabIndex); // role = none because focusable elements must have a role
+ListBaseRenderer.renderDummyArea = function(rm, oControl, sAreaId, sTabIndex) {
+	rm.openStart("div", oControl.getId(sAreaId)).attr("role", "none"); // role = none because focusable elements must have a role
+	if (sTabIndex == "0" && oControl.getNavigationRoot()?.contains(document.activeElement)) {
+		sTabIndex = "-1";
+	}
 
+	rm.attr("tabindex", sTabIndex);
 	if (Device.system.desktop) {
 		rm.class("sapMListDummyArea");
 		if (sAreaId == "after") {

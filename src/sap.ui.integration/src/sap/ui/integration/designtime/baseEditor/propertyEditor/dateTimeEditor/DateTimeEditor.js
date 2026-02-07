@@ -25,7 +25,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.76
 	 * @ui5-restricted
 	 */
 	var DateTimeEditor = DateEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.dateTimeEditor.DateTimeEditor", {

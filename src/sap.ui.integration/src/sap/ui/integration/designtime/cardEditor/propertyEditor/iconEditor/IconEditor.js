@@ -45,7 +45,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.81
 	 * @ui5-restricted
 	 */
 	var IconEditor = BasePropertyEditor.extend("sap.ui.integration.designtime.cardEditor.propertyEditor.iconEditor.IconEditor", {

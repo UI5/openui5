@@ -20,7 +20,6 @@ sap.ui.define([
 	 * @static
 	 * @since 1.81
 	 * @public
-	 * @experimental 1.81
 	 */
 	return {
 		async: false,

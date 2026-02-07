@@ -19,7 +19,6 @@ sap.ui.define([
 	 * @since 1.83.0
 	 * @version ${version}
 	 * @private
-	 * @experimental since 1.83.0
 	 * @ui5-restricted
 	 */
 	var DateTimeField = BaseField.extend("sap.ui.integration.editor.fields.DateTimeField", {

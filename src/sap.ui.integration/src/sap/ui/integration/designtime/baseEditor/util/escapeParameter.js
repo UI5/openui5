@@ -17,7 +17,6 @@ sap.ui.define([
 	*                                   When <code>true</code> is returned, then object will be escaped.
 	* @returns {Array} Array of arguments with escaped object literals
 	* @function
-	* @experimental
 	* @private
 	*/
 	return function (oArguments, fnValidator) {

@@ -272,7 +272,7 @@ sap.ui.define([
 		 * Override the function to avoid creating facade for this instance to expose the settings properties that are
 		 * given through {@link #enhanceSettings}.
 		 *
-		 * @return {this} The Lib instance itself
+		 * @return {this} The Library instance itself
 		 * @override
 		 */
 		getInterface: function() {
@@ -970,7 +970,8 @@ sap.ui.define([
 	 * loaded the resulting stylesheet.</li>
 	 *
 	 * <li>If a list of library <code>dependencies</code> is specified in the info object, those libraries will be
-	 * loaded synchronously if they haven't been loaded yet.
+	 * loaded synchronously if they haven't been loaded yet.</li>
+	 * </ul>
 	 *
 	 * <b>Note:</b> Dependencies between libraries have to be modeled consistently in several places:
 	 * <ul>
@@ -1007,7 +1008,60 @@ sap.ui.define([
 	 * <h3>Library API-Version 2</h3>
 	 *
 	 * The Library API Version 2 has been introduced to avoid access to the global namespace when retrieving enum types.
-	 * With Library API Version 2 a library must declare its enum types via {@link module:sap/ui/base/DataType.registerEnum DataType.registerEnum}.
+	 * With Library API Version 2 a library must declare its enum types via {@link sap.ui.base.DataType.registerEnum} as described in the "Defining Enums" section below.
+	 *
+	 * Library API version 2 is defined as a number (int) in the library's <code>init()</code> call:
+	 * <pre>
+	 * var thisLib = Library.init({
+	 *     apiVersion: 2,
+	 *     name: "my.library",
+	 *     ...
+	 * });
+	 * </pre>
+	 *
+	 * <b>Important:</b> The object returned by <code>Library.init()</code> should be used as the return value
+	 * of the <code>library.js</code> module.
+	 *
+	 * <b>Defining Enums</b>
+	 *
+	 * Enums that are exposed through a library (not as separate modules) should be defined as properties on the
+	 * object returned by <code>Library.init()</code>. Each enum must be registered via {@link sap.ui.base.DataType.registerEnum}
+	 * to make it available to the framework.
+	 *
+	 * Example for a simple enum definition:
+	 * <pre>
+	 * // The return value "thisLib" will be used to expose enums
+	 * var thisLib = Library.init({
+	 *     apiVersion: 2,
+	 *     name: "my.library",
+	 *     ...
+	 * });
+	 *
+	 * // Note that enum keys and values must match
+	 * thisLib.MyEnumType = {
+	 *     Small: "Small",
+	 *     Medium: "Medium",
+	 *     Large: "Large"
+	 * };
+	 *
+	 * // make sure to register the enum and make it know to the framework for later type checks
+	 * DataType.registerEnum("my.library.MyEnumType", thisLib.MyEnumType);
+	 * </pre>
+	 *
+	 * <b>Special case: enums in nested namespaces</b>
+	 *
+	 * Ensure to create the namespace first and then define the enum:
+	 *
+	 * <pre>
+	 * thisLib.cards = thisLib.cards || {};
+	 *
+	 * thisLib.cards.HeaderPosition = {
+	 *     Top: "Top",
+	 *     Bottom: "Bottom"
+	 * };
+	 *
+	 * DataType.registerEnum("my.library.cards.HeaderPosition", thisLib.cards.HeaderPosition);
+	 * </pre>
 	 *
 	 * @param {object} mSettings Info object for the library
 	 * @param {string} mSettings.name Name of the library; It must match the name by which the library has been loaded
@@ -1027,7 +1081,8 @@ sap.ui.define([
 	 *  When set to true, no library.css will be loaded for this library
 	 * @param {object} [mSettings.extensions] Potential extensions of the library metadata; structure not defined by the
 	 *  UI5 core framework.
-	 * @returns {object} Returns the library namespace, based on the given library name.
+	 * @returns {object} Returns an object with the exports of the library (enums, helpers, ...). This object should be used
+	 *  as the return value of the <code>library.js</code> module from which <code>Library.init</code> is called.
 	 * @public
 	 */
 	Library.init = function(mSettings) {

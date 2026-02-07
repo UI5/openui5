@@ -18,7 +18,6 @@ sap.ui.define([
 	 * @since 1.105.0
 	 * @version ${version}
 	 * @private
-	 * @experimental since 1.105.0
 	 * @ui5-restricted
 	 */
 	var Controller = FragmentController.extend("sap.ui.integration.editor.fields.fragment.Controller", {});

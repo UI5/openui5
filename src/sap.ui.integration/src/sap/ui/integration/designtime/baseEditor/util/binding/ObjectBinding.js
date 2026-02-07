@@ -29,7 +29,6 @@ sap.ui.define([
 	 * @since 1.70.0
 	 * @version ${version}
 	 * @private
-	 * @experimental since 1.70.0
 	 */
 	var ObjectBinding = ManagedObject.extend("sap.ui.integration.designtime.baseEditor.util.ObjectBinding", {
 		metadata: {

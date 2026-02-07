@@ -1814,16 +1814,23 @@ sap.ui.define([
 		oList.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		assert.strictEqual(oList.getDomRef("after").getAttribute("tabindex"), "0", "After dummy element is at the tab chain");
+
 		oList.focus();
 
 		assert.strictEqual(oList.getDomRef("before").getAttribute("tabindex"), "-1", "Before dummy element is not at the tab chain");
 		assert.strictEqual(oList.getNavigationRoot().getAttribute("tabindex"), "0", "Navigation root is at the tab chain");
-		assert.strictEqual(oList.getDomRef("after").getAttribute("tabindex"), "0", "After dummy element is at the tab chain");
+		assert.strictEqual(oList.getDomRef("after").getAttribute("tabindex"), "-1", "After dummy element is not at the tab chain");
 		assert.strictEqual(oList.getDomRef("after").getAttribute("role"), "none", "After dummy element has role=none");
 
 		if (!document.hasFocus()) {
 			return;
 		}
+
+		oList.invalidate();
+		await nextUIUpdate();
+
+		assert.strictEqual(oList.getDomRef("after").getAttribute("tabindex"), "-1", "Right after rendering the after dummy element is still not at the tab chain");
 
 		assert.strictEqual(document.activeElement, oListItem1.getFocusDomRef(), "Initial focus is at the first list item");
 
@@ -2216,7 +2223,52 @@ sap.ui.define([
 			assert.strictEqual(fnItemPressSpy.callCount, 0, "Item press event is not called");
 			assert.strictEqual(fnPressSpy.callCount, 0, "Press event is not called");
 
+			const oInnerList1 = oList.clone().setMode("None");
+			const oInnerList1Item1 = oInnerList1.getItems()[0];
+			const oInnerList1Item1Input = oInnerList1Item1.getContent()[0];
+			const oInnerList2 = oList.clone().setMode("None");
+			const oInnerList2Item1 = oInnerList2.getItems()[0];
+			const oInnerList2Item1Input = oInnerList2Item1.getContent()[0];
+			const oOuterList =  new List({
+				items: [
+					new CustomListItem("OuterListItem1", {
+						content: oInnerList1
+					}),
+					new CustomListItem("OuterListItem2", {
+						content: oInnerList2
+					})
+				]
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+			oOuterList.focus();
+
+			assert.equal(document.activeElement.id, "OuterListItem1", "Focus is on the first outer list item");
+			qutils.triggerEvent("keydown", document.activeElement, {code: "F2"});
+			assert.equal(document.activeElement, oInnerList1Item1.getDomRef(), "Focus is moved to the first inner list item");
+			qutils.triggerEvent("keydown", document.activeElement, {code: "F2"});
+			assert.equal(document.activeElement, oInnerList1Item1Input.getFocusDomRef(), "Focus is moved to the first inner list item input");
+			qutils.triggerEvent("keydown", document.activeElement, {code: "F2", shiftKey: true});
+			assert.equal(document.activeElement, oInnerList1Item1.getDomRef(), "Focus is moved back to the first inner list item");
+			qutils.triggerEvent("keydown", document.activeElement, {code: "F2", shiftKey: true});
+			assert.equal(document.activeElement.id, "OuterListItem1", "Focus is moved back to the first outer list item");
+
+			qutils.triggerKeydown(document.activeElement, "ARROW_DOWN");
+			assert.equal(document.activeElement.id, "OuterListItem2", "Focus is on the second outer list item");
+			qutils.triggerEvent("keydown", document.activeElement, {code: "F7"});
+			assert.equal(document.activeElement, oInnerList2Item1.getDomRef(), "Focus is moved to the first inner list item");
+			qutils.triggerEvent("keydown", document.activeElement, {code: "F7"});
+			assert.equal(document.activeElement, oInnerList2Item1Input.getFocusDomRef(), "Focus is moved to the first inner list item input");
+			qutils.triggerKeydown(document.activeElement, "ARROW_UP", false, false, true /* CTRL */);
+			assert.equal(document.activeElement, oInnerList2Item1Input.getFocusDomRef(), "Focus is not changed");
+			qutils.triggerEvent("keydown", document.activeElement, {code: "F7", shiftKey: true});
+			assert.equal(document.activeElement, oInnerList2Item1.getDomRef(), "Focus is moved back to the first inner list item");
+			qutils.triggerEvent("keydown", document.activeElement, {code: "F7", shiftKey: true});
+			assert.equal(document.activeElement.id, "OuterListItem2", "Focus is moved back to the first outer list item");
+
+
+
 			oContainer.destroy();
+			oOuterList.destroy();
 		});
 	}
 
@@ -3760,6 +3812,9 @@ sap.ui.define([
 			return {
 				querySelector: function() {
 					return oHeaderDomRef;
+				},
+				contains: function() {
+					return false;
 				}
 			};
 		});

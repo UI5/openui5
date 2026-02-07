@@ -16,7 +16,6 @@ sap.ui.define(function () {
 	 * to be outside of the aggregation that the checked <code>oControl</code> is part of, i.e. a control embedding
 	 * a fragment containing <code>oControl</code>
 	 * @return {boolean} <code>true</code> if the given control is a template
-	 * @experimental
 	 * @private
 	 */
 

@@ -143,7 +143,6 @@ sap.ui.define([
 	 * @constructor
 	 * @since 1.94
 	 * @private
-	 * @experimental since 1.94.0
 	 * @alias sap.ui.integration.editor.Editor
 	 */
 	var Editor = Control.extend("sap.ui.integration.editor.Editor", /** @lends sap.ui.integration.editor.Editor.prototype */ {
@@ -990,7 +989,6 @@ sap.ui.define([
 		 * Facade of the {@link sap.ui.integration.editor.Editor} control.
 		 * @interface
 		 * @name sap.ui.integration.editor.EditorFacade
-		 * @experimental since 1.94
 		 * @public
 		 * @author SAP SE
 		 * @version ${version}
@@ -1278,7 +1276,6 @@ sap.ui.define([
 	 * Performs an HTTP request using the given configuration.
 	 *
 	 * @public
-	 * @experimental since 1.94
 	 * @param {object} oConfiguration The configuration of the request.
 	 * @param {string} oConfiguration.URL The URL of the resource.
 	 * @param {string} [oConfiguration.mode="cors"] The mode of the request. Possible values are "cors", "no-cors", "same-origin".
@@ -1395,7 +1392,6 @@ sap.ui.define([
 	 * Gets the instance of the <code>host</code> association.
 	 *
 	 * @public
-	 * @experimental Since 1.77
 	 * @returns {sap.ui.integration.Host} The host object associated with this editor.
 	 */
 	Editor.prototype.getHostInstance = function () {

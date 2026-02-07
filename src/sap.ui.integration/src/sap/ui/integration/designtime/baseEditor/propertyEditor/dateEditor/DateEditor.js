@@ -23,7 +23,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.76
 	 * @ui5-restricted
 	 */
 	var DateEditor = BasePropertyEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.dateEditor.DateEditor", {

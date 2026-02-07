@@ -544,9 +544,11 @@ sap.ui.define([
 	/**
 	 * The 'parseError' event is not supported by this model.
 	 *
+	 * @deprecated As of version 1.37.0, this event is not supported
 	 * @event sap.ui.model.odata.v4.ODataModel#parseError
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 
 	/**
@@ -585,25 +587,31 @@ sap.ui.define([
 	/**
 	 * The 'requestCompleted' event is not supported by this model.
 	 *
+	 * @deprecated As of version 1.37.0, this event is not supported
 	 * @event sap.ui.model.odata.v4.ODataModel#requestCompleted
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 
 	/**
 	 * The 'requestFailed' event is not supported by this model.
 	 *
+	 * @deprecated As of version 1.37.0, this event is not supported
 	 * @event sap.ui.model.odata.v4.ODataModel#requestFailed
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 
 	/**
 	 * The 'requestSent' event is not supported by this model.
 	 *
+	 * @deprecated As of version 1.37.0, this event is not supported
 	 * @event sap.ui.model.odata.v4.ODataModel#requestSent
 	 * @public
 	 * @since 1.37.0
+	 * @ui5-not-supported
 	 */
 
 	/**

@@ -4,23 +4,24 @@
 /* ========================================== */
 
 .sapUxAPObjectPageHeader {
+
 	.sapMBar {
-		background-color: @sapUiObjectHeaderBackground;
+		background-color: var(--sapObjectHeader_Background);
 		text-shadow: none;
 		box-shadow: none;
 	}
 
 	.sapUxAPObjectPageHeaderChangesBtn .sapMBtnTransparent:not(.sapMBtnActive) > .sapMBtnIcon,
 	.sapUxAPObjectPageHeaderLockBtn .sapMBtnTransparent:not(.sapMBtnActive) > .sapMBtnIcon {
-		color:  @sapUiContentMarkerIconColor;
+		color: var(--sapContent_MarkerIconColor);
 	}
 }
 
 .sapUxAPObjectPageHeaderIdentifierTitle {
-	font-family: @sapUiFontHeaderFamily;
-	font-size: @sapMFontHeader3Size;
+	font-family: var(--sapFontHeaderFamily);
+	font-size: var(--sapFontHeader3Size);
 	font-weight: @sapUiFontHeaderWeight;
-	color: @sapUiGroupTitleTextColor;
+	color: var(--sapGroup_TitleTextColor);
 }
 
 .sapUxAPObjectPageHeaderIdentifierTitle.sapUxAPObjectPageHeaderIdentifierTitleForce {
@@ -28,16 +29,18 @@
 }
 
 .sapUxAPObjectPageHeaderIdentifierDescription {
-	font-family: @sapUiFontFamily;
+	font-family: var(--sapFontFamily);
 	font-size: @sapMFontMediumSize;
-	color: @sapUiContentLabelColor;
+	color: var(--sapContent_LabelColor);
 	vertical-align: baseline;
 }
 
 .sapUiSizeCompact .sapUxAPObjectPageHeaderIdentifier,
 .sapUxAPObjectPageHeaderIdentifier {
 	overflow: hidden;
+
 	.sapUxAPObjectPageHeaderIdentifierActions {
+
 		&.sapUxAPObjectPageHeaderIdentifierActionsForce,
 		.sapUxAPObjectPageHeaderStickied & {
 			position: relative;
@@ -58,7 +61,7 @@
 	line-height:  1.25rem;
 }
 
-.sapUxAPObjectPageHeaderIdentifier .sapUxAPObjectPageHeaderIdentifierContainer  {
+.sapUxAPObjectPageHeaderIdentifier .sapUxAPObjectPageHeaderIdentifierContainer {
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -91,7 +94,7 @@ html .sapUiContainer-Narrow .sapUiSizeCompact.sapUxAPObjectPageHeaderLockBtn .sa
 }
 
 .sapUxAPObjectPageHeaderObjectImageContainer .sapUiIcon {
-	color: @sapUiContentContrastTextColor;
+	color: var(--sapContent_ContrastTextColor);
 }
 
 .sapUxAPObjectPageHeaderTitle.sapUxAPObjectPageHeaderSnappedTitleOnMobile > .sapFDynamicPageTitle {
@@ -100,17 +103,17 @@ html .sapUiContainer-Narrow .sapUiSizeCompact.sapUxAPObjectPageHeaderLockBtn .sa
 
 /* Phone Size */
 .sapUxAPObjectPageLayout-Std-Phone .sapUxAPObjectPageHeaderTitle.sapUxAPObjectPageHeaderSnappedTitleOnMobile > .sapFDynamicPageTitle {
-		padding: 0 0.875rem 0 1rem;
-	}
+	padding: 0 0.875rem 0 1rem;
+}
 
 /* Tablet Size */
-// Needed because on some high-end phones in landscape mode,
-// the width of the viewport is bigger than 600 (Tablet breakpoint).
+/* Needed because on some high-end phones in landscape mode,
+the width of the viewport is bigger than 600 (Tablet breakpoint). */
 .sapUxAPObjectPageLayout-Std-Tablet .sapUxAPObjectPageHeaderTitle.sapUxAPObjectPageHeaderSnappedTitleOnMobile > .sapFDynamicPageTitle {
-		padding: 0 0.375rem 0 2rem;
-	}
+	padding: 0 0.375rem 0 2rem;
+}
 
 /*** styles for responsive object header ***/
 .sapMOHRTitle h1 {
-	font-size: @sapMFontHeader3Size;
+	font-size: var(--sapFontHeader3Size);
 }

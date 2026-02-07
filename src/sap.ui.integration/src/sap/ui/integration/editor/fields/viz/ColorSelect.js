@@ -21,7 +21,6 @@ sap.ui.define([
 	 * @since 1.84.0
 	 * @version ${version}
 	 * @private
-	 * @experimental since 1.84.0
 	 * @ui5-restricted
 	 */
 	var ColorSelect = VizBase.extend("sap.ui.integration.editor.fields.viz.ColorSelect", {

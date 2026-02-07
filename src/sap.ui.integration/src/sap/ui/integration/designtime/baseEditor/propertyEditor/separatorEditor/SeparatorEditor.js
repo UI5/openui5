@@ -46,7 +46,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.91
 	 * @ui5-restricted
 	 */
 	var SeparatorEditor = BasePropertyEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.separatorEditor.SeparatorEditor", {

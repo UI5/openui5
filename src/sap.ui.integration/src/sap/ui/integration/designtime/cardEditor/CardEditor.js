@@ -37,7 +37,6 @@ sap.ui.define([
 	/**
 	 * @constructor
 	 * @private
-	 * @experimental
 	 */
 	var CardEditor = BaseEditor.extend("sap.ui.integration.designtime.cardEditor.CardEditor", {
 		metadata: {

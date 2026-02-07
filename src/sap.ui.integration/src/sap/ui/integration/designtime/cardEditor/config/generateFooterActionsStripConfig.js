@@ -18,7 +18,6 @@ sap.ui.define([
 	* @param {string|boolean} [oCustomConfig.visible] - Visibility condition expression
 	* @returns {object} Card footer configuration object
 	* @function
-	* @experimental
 	* @private
 	*/
 

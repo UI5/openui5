@@ -136,7 +136,6 @@ sap.ui.define([
 	 * @since 1.70.0
 	 * @version ${version}
 	 * @private
-	 * @experimental since 1.70.0
 	 * @ui5-restricted
 	 */
 	var BaseEditor = Control.extend("sap.ui.integration.designtime.baseEditor.BaseEditor", {

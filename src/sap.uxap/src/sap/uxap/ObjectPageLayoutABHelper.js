@@ -244,6 +244,7 @@ sap.ui.define([
 
 
 		this._getAnchorBar().setSelectedKey(sId);
+		this._setAnchorButtonsTabFocusValues(sId);
 	};
 
 	ABHelper.prototype._setAnchorButtonsTabFocusValues = function (sSelectedKey) {

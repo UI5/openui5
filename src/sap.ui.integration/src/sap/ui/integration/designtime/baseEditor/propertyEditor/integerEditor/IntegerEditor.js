@@ -25,7 +25,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.76
 	 * @ui5-restricted
 	 */
 	var IntegerEditor = NumberEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.integerEditor.IntegerEditor", {

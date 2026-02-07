@@ -52,7 +52,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.85
 	 * @ui5-restricted
 	 */
 	var TextAreaEditor = BasePropertyEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.textAreaEditor.TextAreaEditor", {

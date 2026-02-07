@@ -17,7 +17,6 @@ sap.ui.define([
 	* @param {number} [oCustomConfig.maxItems] - Maximum amount of actions
 	* @returns {object} Card action configuration object
 	* @function
-	* @experimental
 	* @private
 	*/
 

@@ -28,7 +28,6 @@ sap.ui.define([
 	 * @since 1.106.0
 	 * @version ${version}
 	 * @private
-	 * @experimental since 1.106.0
 	 * @ui5-restricted
 	 */
 	var GroupField = BaseField.extend("sap.ui.integration.editor.fields.GroupField", {

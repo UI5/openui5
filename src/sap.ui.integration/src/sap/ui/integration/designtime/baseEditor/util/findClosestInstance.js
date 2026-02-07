@@ -14,7 +14,6 @@ sap.ui.define(function () {
 	 * @returns {sap.ui.base.ManagedObject|undefined} - `undefined` if there is no control of a type in hierarchy
 	 *
 	 * @function
-	 * @experimental
 	 * @private
 	 */
 	return function (oControl, sClassName) {

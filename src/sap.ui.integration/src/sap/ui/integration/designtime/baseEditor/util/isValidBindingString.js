@@ -17,7 +17,6 @@ sap.ui.define([
 	 * @param {string} sInput - String to check
 	 * @param {boolean} bAllowPlainStrings - Whether to allow plain strings, default is <code>true</code>
 	 * @return {boolean} <code>true</code> if the given string is a valid binding string
-	 * @experimental
 	 * @private
 	 */
 

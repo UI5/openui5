@@ -2058,6 +2058,9 @@ sap.ui.define([
 		const fnGetDomRef = sut.getDomRef;
 		this.stub(sut, "getDomRef", function() {
 			return {
+				contains: function() {
+					return false;
+				},
 				firstChild: {
 					getBoundingClientRect : function() {
 						return {
@@ -2206,6 +2209,9 @@ sap.ui.define([
 			return {
 				querySelector: function() {
 					return oHeaderDomRef;
+				},
+				contains: function() {
+					return false;
 				}
 			};
 		});
@@ -2316,6 +2322,9 @@ sap.ui.define([
 							height: 48
 						};
 					}
+				},
+				contains: function() {
+					return false;
 				},
 				querySelector: function(sSelector) {
 					if (sSelector === ".sapMListHdr") {

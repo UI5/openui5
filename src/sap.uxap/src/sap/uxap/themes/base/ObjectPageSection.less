@@ -28,12 +28,12 @@
 	margin-left: 0.5rem;
 }
 
-.sapUxAPObjectPageSectionHeader .sapMIBar :not(.sapMBtnDisabled)>.sapMBtnInner.sapMBtnActive {
-	border-color: @sapUiButtonActiveBorderColor;
+.sapUxAPObjectPageSectionHeader .sapMIBar :not(.sapMBtnDisabled) > .sapMBtnInner.sapMBtnActive {
+	border-color: var(--sapButton_Active_BorderColor);
 }
 
-.sapUxAPObjectPageSectionHeader .sapMIBar.sapMBtn:hover>.sapMBtnHoverable {
-	background-color: @sapUiButtonHoverBackground;
+.sapUxAPObjectPageSectionHeader .sapMIBar.sapMBtn:hover > .sapMBtnHoverable {
+	background-color: var(--sapButton_Hover_Background);
 }
 
 .sapUxAPObjectPageSectionHeading {
@@ -83,7 +83,7 @@ html .sapUiContainer-Narrow .sapUxAPObjectPageSectionHeader {
 }
 
 .sapUxAPObjectPageSection .sapUxAPObjectPageSectionContainer > .sapUiRespGrid,
-.sapUxAPObjectPageSection .sapUxAPObjectPageSectionContainer > .sapUiRespGrid > .sapUiRespGridSpanXL12.sapUiRespGridSpanL12.sapUiRespGridSpanM12.sapUiRespGridSpanS12  {
+.sapUxAPObjectPageSection .sapUxAPObjectPageSectionContainer > .sapUiRespGrid > .sapUiRespGridSpanXL12.sapUiRespGridSpanL12.sapUiRespGridSpanM12.sapUiRespGridSpanS12 {
 	padding: 0;
 	margin: 0;
 	width: 100%;
@@ -108,18 +108,16 @@ html .sapUiContainer-Narrow .sapUxAPObjectPageSectionHeader {
 }
 
 .sapUxAPObjectPageSectionHeaderSticky {
-	background-color: @sapUiGlobalBackgroundColor;
+	background-color: var(--sapBackgroundColor);
 	position: sticky;
 	top: 0;
 	z-index: 5;
 }
 
-
-
-// Styles needed for wrapTitle property
+/* Styles needed for wrapTitle property */
 .sapUxAPObjectPageSection.sapUxAPObjectPageSectionWrapTitle
 .sapUxAPObjectPageSectionHeader
-.sapUxAPObjectPageSectionTitle  {
+.sapUxAPObjectPageSectionTitle {
 	height: auto;
 	word-break: break-word;
 	white-space: break-spaces;

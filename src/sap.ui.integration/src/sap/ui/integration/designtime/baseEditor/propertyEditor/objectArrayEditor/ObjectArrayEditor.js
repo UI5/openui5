@@ -52,7 +52,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.100
 	 * @ui5-restricted
 	 */
 	var ObjectArrayEditor = CodeEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.objectArrayEditor.ObjectArrayEditor", {

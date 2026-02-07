@@ -4,7 +4,7 @@
 /* ========================================== */
 
 .sapUxAPObjectPageNavigation {
-	background: @sapUiObjectHeaderBackground;
+	background: var(--sapObjectHeader_Background);
 
 	&.sapUxAPObjectPageNavigationTransparent {
 		background: transparent;
@@ -16,17 +16,21 @@
 }
 
 .sapUxAPObjectPageHeaderDetails {
+
 	.sapMOHTitle .sapMText {
-		color: @sapUiContentLabelColor;
+		color: var(--sapContent_LabelColor);
 	}
+
 	.sapMLabel {
-		color: @sapUiContentLabelColor;
+		color: var(--sapContent_LabelColor);
 	}
 }
+
 .sapUiSizeCompact .sapUxAPObjectPageNavigation,
 .sapUxAPObjectPageNavigation {
+
 	.sapUxAPObjectChildPage {
-		height: @sapElement_LineHeight;
+		height: var(--sapElement_LineHeight);
 	}
 }
 
@@ -38,34 +42,36 @@
 	height: 1.9375rem;
 }
 
-/* ======================================== */
-/* Title and Toggle Header Visual Indicator */
-/* ======================================== */
+/* ========================================= */
+/* Title and Toggle Header Visual Indicator  */
+/* ========================================= */
+
 .sapUxAPObjectPageLayout {
-  &.sapUxAPObjectPageLayoutTitleClickEnabled {
 
-    &.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitle {
-      .title-hover(@sapUiObjectHeaderBackground);
-	}
+	&.sapUxAPObjectPageLayoutTitleClickEnabled {
 
-	&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitleTranslucent {
-		.title-hover(lighten(@sapUiObjectHeaderBackground, 10));
-	}
+		&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitle {
+			.title-hover(@sapUiObjectHeaderBackground);
+		}
 
-	&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitleTransparent {
-		.title-hover(transparent);
-	}
+		&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitleTranslucent {
+			.title-hover(lighten(@sapUiObjectHeaderBackground, 10));
+		}
 
-	> .sapUxAPObjectPageHeaderStickied > .sapFDynamicPageTitle {
-		box-shadow: none;
+		&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitleTransparent {
+			.title-hover(transparent);
+		}
+
+		> .sapUxAPObjectPageHeaderStickied > .sapFDynamicPageTitle {
+			box-shadow: none;
+		}
 	}
-  }
 }
 
-// footer
+/* footer */
 .sapUxAPObjectPageLayout .sapUxAPObjectPageFooter .sapUxAPObjectPageFloatingFooter {
-	background: @sapUiPageFooterBackground;
-	color: @sapUiPageFooterTextColor;
+	background: var(--sapPageFooter_Background);
+	color: var(--sapPageFooter_TextColor);
 	box-shadow: @sapUiShadowLevel1;
 	border: none;
 }

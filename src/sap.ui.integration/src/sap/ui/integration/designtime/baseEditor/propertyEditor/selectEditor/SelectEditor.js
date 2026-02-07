@@ -46,7 +46,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental 1.81
 	 * @ui5-restricted
 	 */
 	var SelectEditor = BasePropertyEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.selectEditor.SelectEditor", {
