@@ -22,7 +22,10 @@
 			"bar": "/../bar"
 		},
 		"dependencies": {
-			"minUI5Version": "2.0.0"
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.ui.ux3": {}
+			}
 		}
 	}
 }
