@@ -53,5 +53,15 @@
         "text": " MultiValueField: duplicate values not recognized"
       }
     ]
+  },
+  "1.142.5": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "6f455f49b741a4af00ca39dbd1169a4f29339e11",
+        "type": "FIX",
+        "text": " Field: runtime error if DOM removed while update"
+      }
+    ]
   }
 }
