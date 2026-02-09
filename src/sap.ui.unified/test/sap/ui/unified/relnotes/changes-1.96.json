@@ -322,5 +322,15 @@
         "text": " sap.ui.unified.calendar.Month: Improve day re-rendering peformance"
       }
     ]
+  },
+  "1.96.44": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "5ddbe59e619f7ef243fe2200d42881755a25af29",
+        "type": "FIX",
+        "text": " sap.ui.unified.Calendar: fix unstable test"
+      }
+    ]
   }
 }

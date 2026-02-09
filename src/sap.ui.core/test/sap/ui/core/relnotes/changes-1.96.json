@@ -909,5 +909,15 @@
         "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
       }
     ]
+  },
+  "1.96.44": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "b9b8166113a384133fe2bfda445173c4286cd5d9",
+        "type": "FIX",
+        "text": " routing/History: avoid creating history entry when same hash is applied"
+      }
+    ]
   }
 }

@@ -158,5 +158,15 @@
         "text": " sap.uxap.BlockBase: Error with duplicate ID prevented"
       }
     ]
+  },
+  "1.96.44": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "bd3698ed943d7a890bcf004573cc2417023a4bfc",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Fix initial title rendering in FCL"
+      }
+    ]
   }
 }

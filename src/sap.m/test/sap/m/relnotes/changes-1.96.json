@@ -2141,5 +2141,25 @@
         "text": " We've now removed the iframe content check while loading a PDF to display it"
       }
     ]
+  },
+  "1.96.44": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "59982af8f939ca58d2372cfa091ec9c6671c257a",
+        "type": "FIX",
+        "text": " sap.m.MultiComboBox: Picker list is now always filtered by the input text even after an item is selected"
+      },
+      {
+        "id": "33f823b08dbb09e6d09b5ce02ca8b5c495a690f5",
+        "type": "FIX",
+        "text": " sap.m.Button: Default type is shown correctly in Info bar"
+      },
+      {
+        "id": "f21ed40f547f9bd81fa93caf8685cb5cfe2db244",
+        "type": "FIX",
+        "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
+      }
+    ]
   }
 }
