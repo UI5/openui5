@@ -32,6 +32,19 @@ sap.ui.define(['sap/ui/core/Renderer', './CalendarRenderer'],
 
 	};
 
+	CalendarDateIntervalRenderer.renderMonths = function(oRm, oCal, aMonths) {
+		// Call base implementation to render the months (days)
+		CalendarRenderer.renderMonths.call(this, oRm, oCal, aMonths);
+
+		// Render WeeksRow aggregation after the days if showWeekNumbers is enabled
+		if (oCal.getShowWeekNumbers()) {
+			const oWeeksRow = oCal.getAggregation("_weeksRow");
+			if (oWeeksRow) {
+				oRm.renderControl(oWeeksRow);
+			}
+		}
+	};
+
 	CalendarDateIntervalRenderer.addAttributes = function(oRm, oCal) {
 
 		oRm.class("sapUiCalInt");

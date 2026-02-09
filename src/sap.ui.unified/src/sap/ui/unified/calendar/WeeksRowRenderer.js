@@ -65,7 +65,7 @@ sap.ui.define([
 		const aWeeks = oWeeksRow._getMonthsFirstAndLastWeekNumbers();
 		const sWidth = ( 100 / iInterval ) + "%";
 
-		oRm.openStart("div", oWeeksRow.getId() + "-weeks");
+		oRm.openStart("div");
 		oRm.class("sapUiCalRowWeekNumbers");
 		oRm.openEnd();
 		for (var i = 0; i < iInterval; i++) {
@@ -89,7 +89,7 @@ sap.ui.define([
 		const aWeekNumbers = oWeeksRow._getWeekNumbers();
 		const oResourceBundle = coreLibrary.getResourceBundleFor("sap.ui.unified");
 
-		oRm.openStart("div", oWeeksRow.getId() + "-weeks");
+		oRm.openStart("div");
 		oRm.class("sapUiCalRowWeekNumbers");
 		oRm.openEnd();
 

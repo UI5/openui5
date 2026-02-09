@@ -14,12 +14,12 @@ sap.ui.define([
 	"sap/ui/unified/DateTypeRange",
 	"sap/ui/unified/calendar/CalendarDate",
 	"sap/ui/unified/CalendarWeekInterval",
-	"sap/ui/unified/calendar/DatesRow",
+	"sap/ui/unified/calendar/WeeksRow",
 	"sap/ui/Device",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/date/UI5Date",
 	"sap/ui/qunit/utils/nextUIUpdate"
-], function(Localization, Element, KeyCodes, qutils, CalendarDateInterval, CalendarType, Locale, LocaleData, DateFormat, DateRange, DateTypeRange, CalendarDate, CalendarWeekInterval, DatesRow, Device, jQuery, UI5Date, nextUIUpdate) {
+], function(Localization, Element, KeyCodes, qutils, CalendarDateInterval, CalendarType, Locale, LocaleData, DateFormat, DateRange, DateTypeRange, CalendarDate, CalendarWeekInterval, WeeksRow, Device, jQuery, UI5Date, nextUIUpdate) {
 	"use strict";
 
 	// set language to en-US, since we have specific language strings tested
@@ -1256,15 +1256,15 @@ sap.ui.define([
 
 	QUnit.module("WeekNumbers");
 
-	QUnit.test("DatesRow getWeekNumbers", function(assert) {
+	QUnit.test("WeeksRow _getWeekNumbers", function(assert) {
 		//arrange
-		var oDatesRow = new DatesRow({
+		var oWeeksRow = new WeeksRow({
 			startDate: UI5Date.getInstance(2016, 11, 26),
-			days: 14
+			interval: 14
 		});
 
 		//act
-		var aWeekNumbers = oDatesRow.getWeekNumbers();
+		var aWeekNumbers = oWeeksRow._getWeekNumbers();
 
 		//assert
 		assert.equal(aWeekNumbers.length, 3, "we get week info for 3 weeks");
@@ -1278,19 +1278,19 @@ sap.ui.define([
 		assert.equal(aWeekNumbers[2].number, 2, "last week number is correct");
 
 		//clean
-		oDatesRow.destroy();
+		oWeeksRow.destroy();
 	});
 
-	QUnit.test("DatesRow getWeekNumbers in ISO_8601", function(assert) {
+	QUnit.test("WeeksRow _getWeekNumbers in ISO_8601", function(assert) {
 		//arrange
-		var oDatesRow = new DatesRow({
+		var oWeeksRow = new WeeksRow({
 			startDate: UI5Date.getInstance(2016, 0, 1),
-			days: 14,
+			interval: 14,
 			calendarWeekNumbering: "ISO_8601"
 		});
 
 		//act
-		var aWeekNumbers = oDatesRow.getWeekNumbers();
+		var aWeekNumbers = oWeeksRow._getWeekNumbers();
 
 		//assert
 		assert.equal(aWeekNumbers.length, 3, "we get week info for 3 weeks");
@@ -1304,19 +1304,19 @@ sap.ui.define([
 		assert.equal(aWeekNumbers[2].number, 2, "last week number is correct");
 
 		//clean
-		oDatesRow.destroy();
+		oWeeksRow.destroy();
 	});
 
-	QUnit.test("DatesRow getWeekNumbers in MiddleEastern", function(assert) {
+	QUnit.test("WeeksRow _getWeekNumbers in MiddleEastern", function(assert) {
 		//arrange
-		var oDatesRow = new DatesRow({
+		var oWeeksRow = new WeeksRow({
 			startDate: UI5Date.getInstance(2016, 0, 1),
-			days: 14,
+			interval: 14,
 			calendarWeekNumbering: "MiddleEastern"
 		});
 
 		//act
-		var aWeekNumbers = oDatesRow.getWeekNumbers();
+		var aWeekNumbers = oWeeksRow._getWeekNumbers();
 
 		//assert
 		assert.equal(aWeekNumbers.length, 3, "we get week info for 3 weeks");
@@ -1330,19 +1330,19 @@ sap.ui.define([
 		assert.equal(aWeekNumbers[2].number, 3, "last week number is correct");
 
 		//clean
-		oDatesRow.destroy();
+		oWeeksRow.destroy();
 	});
 
-	QUnit.test("DatesRow getWeekNumbers in WesternTraditional", function(assert) {
+	QUnit.test("WeeksRow _getWeekNumbers in WesternTraditional", function(assert) {
 		//arrange
-		var oDatesRow = new DatesRow({
+		var oWeeksRow = new WeeksRow({
 			startDate: UI5Date.getInstance(2016, 0, 1),
-			days: 14,
+			interval: 14,
 			calendarWeekNumbering: "WesternTraditional"
 		});
 
 		//act
-		var aWeekNumbers = oDatesRow.getWeekNumbers();
+		var aWeekNumbers = oWeeksRow._getWeekNumbers();
 
 		//assert
 		assert.equal(aWeekNumbers.length, 3, "we get week info for 3 weeks");
@@ -1356,7 +1356,7 @@ sap.ui.define([
 		assert.equal(aWeekNumbers[2].number, 3, "last week number is correct");
 
 		//clean
-		oDatesRow.destroy();
+		oWeeksRow.destroy();
 	});
 
 	QUnit.module("Other");
