@@ -568,6 +568,40 @@ sap.ui.define([
 		oTokenizer.destroy();
 	});
 
+	QUnit.test("Next token is not focused until deleted token is actually removed", function(assert) {
+		this.clock = sinon.useFakeTimers();
+		var oTokenizer = new Tokenizer({
+			width: "300px"
+		}).placeAt("content");
+
+		var oToken1, oToken2;
+
+		oTokenizer.addToken(oToken1 = new Token({ text: "Token 1", key: "0001"}));
+		oTokenizer.addToken(oToken2 = new Token({ text: "Token 2", key: "0002"}));
+		oTokenizer.addToken(new Token({ text: "Token 3", key: "0003"}));
+
+		oTokenizer.placeAt("content");
+		Core.applyChanges();
+
+		oToken1.getDomRef().focus();
+		this.clock.tick(200);
+		qutils.triggerKeydown( oToken1.getDomRef(), KeyCodes.DELETE);
+
+		this.clock.tick(100);
+
+		assert.strictEqual(oTokenizer.getTokens().length, 3, "Tokens are not removed yet.");
+		assert.strictEqual(document.activeElement, oToken1.getDomRef(), "The focus is still on the deleted token.");
+
+		oTokenizer.removeToken(oToken1);
+		this.clock.tick(100);
+
+		assert.strictEqual(oTokenizer.getTokens().length, 2, "Token is removed.");
+		assert.strictEqual(document.activeElement, oToken2.getDomRef(), "The focus is moved to the adjacent token.");
+
+		this.clock.restore();
+		oTokenizer.destroy();
+	});
+
 	QUnit.module("Setters", {
 		beforeEach : function() {
 			this.tokenizer = new Tokenizer();

@@ -5541,33 +5541,23 @@ sap.ui.define([
 		Core.applyChanges();
 		this.clock.tick(10);
 
-		oMCB.open();
-		Core.applyChanges();
-		this.clock.tick(300);
+		oMCB.focus();
+
+		// we focus the last token with BACKSPACE
+		qutils.triggerKeydown(oMCB.getDomRef(), KeyCodes.BACKSPACE);
+
+		this.clock.tick(200);
 
 		var triggerBackspaceOnLastToken = function () {
 			var aTokens = oMCB.getAggregation("tokenizer").getTokens();
+			const iLastTokenIndex = aTokens.length - 1;
 
-			aTokens[aTokens.length - 1].focus();
-			Core.applyChanges();
-			this.clock.tick(10);
-
-			qutils.triggerKeydown(aTokens[aTokens.length - 1].getDomRef(), KeyCodes.BACKSPACE);
-			Core.applyChanges();
-			this.clock.tick(10);
+			qutils.triggerKeydown(aTokens[iLastTokenIndex].getDomRef(), KeyCodes.BACKSPACE);
+			this.clock.tick(200);
 		}.bind(this);
 
 		triggerBackspaceOnLastToken();
-		Core.applyChanges();
-
-		// arrange
-		oMCB._iFocusedIndex = 1;
-
 		triggerBackspaceOnLastToken();
-		Core.applyChanges();
-
-		// arrange
-		oMCB._iFocusedIndex = 0;
 
 		assert.strictEqual(document.activeElement, oMCB.getAggregation("tokenizer").getTokens()[0].getDomRef(), "First token is focused");
 
