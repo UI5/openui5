@@ -23,7 +23,7 @@ sap.ui.define([
   // list
   htmlText += '<ul>\n';
   htmlText += '<li class="https://sdk.openui5.org">&lt;ul&gt; - &lt;li&gt;</li>\n';
-  htmlText += '<li>Span <span class="foo">span class="foo"</span> &bull; <strong>strong</strong> &bull; <em>em</em> &bull; <u>u</u></li>\n';
+  htmlText += '<li>Span <span class="foo">span class="foo"</span> &bull; <strong>strong</strong> &bull; <em>em</em> &bull; <u>u</u>; &bull; <s>s</s></li>\n';
   htmlText += '<li style="background-color: rgb(255, 255, 255);">white background</li>\n';
   htmlText += '</ul>\n';
   // pre

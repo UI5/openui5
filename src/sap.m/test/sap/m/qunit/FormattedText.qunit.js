@@ -53,6 +53,8 @@ sap.ui.define([
 		assert.strictEqual(oFT.$().find("li").length, 3, "There are 3 li elements");
 		setText("<span><bdi>123 456</bdi></span>");
 		assert.strictEqual(oFT.$().find("bdi").length, 1, "There is 1 bdi element");
+		setText("<s>" + sFT + "</s>");
+		assert.strictEqual(oFT.$().find("s").text(), sFT, "The text of the s element is correct");
 	});
 
 	QUnit.test("attributes", function(assert) {

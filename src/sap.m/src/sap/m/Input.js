@@ -1600,7 +1600,7 @@ function(
 	 * @private
 	 */
 	Input.prototype.updateSelectionFromList = function (oSelectedItem) {
-		if (this._hasTabularSuggestions() && (this.getSelectedRow() !== oSelectedItem)) {
+		if (this._hasTabularSuggestions() && (this.getSelectedRow() !== oSelectedItem?.getId())) {
 			this.setSelectionRow(oSelectedItem, true);
 		} else {
 			var oNewItem = ListHelpers.getItemByListItem(this.getSuggestionItems(), oSelectedItem);
@@ -3043,6 +3043,7 @@ function(
 
 			oItemToBeSelected = this._hasTabularSuggestions() ? mTypeAheadInfo.selectedItem : ListHelpers.getListItem(mTypeAheadInfo.selectedItem);
 			oItemToBeSelected.setSelected(true);
+			this.setAssociation("selectedRow", oItemToBeSelected, true);
 		}, this);
 
 		if (this.isMobileDevice()) {

@@ -12,20 +12,20 @@ sap.ui.define([
 			Then.onTheMainPage.checkTable(sComment, sExpected);
 		}
 
-		function refreshKeepingTreeState(sComment) {
-			When.onTheMainPage.refreshKeepingTreeState(sComment);
+		function refreshKeepingTreeState() {
+			When.onTheMainPage.refreshKeepingTreeState();
 		}
 
-		function toggleExpand(sId, sComment) {
-			When.onTheMainPage.toggleExpand(sId, sComment);
+		function toggleExpand(sId) {
+			When.onTheMainPage.toggleExpand(sId);
 		}
 
-		function expandAll(sId, sComment) {
-			When.onTheMainPage.expandAll(sId, sComment);
+		function expandAll(sId) {
+			When.onTheMainPage.expandAll(sId);
 		}
 
-		function scrollToRow(iRow, sComment) {
-			When.onTheMainPage.scrollToRow(iRow, sComment);
+		function scrollToRow(iRow) {
+			When.onTheMainPage.scrollToRow(iRow);
 		}
 
 		Given.iStartMyUIComponent({
@@ -44,91 +44,91 @@ sap.ui.define([
 		+ 1.2
 	* 2`);
 
-		toggleExpand("0", "Collapse 0 (Alpha)");
-		checkTable("After Collapse 0 (Alpha)", `
+		toggleExpand("0");
+		checkTable("After Collapse '0'", `
 + 0`);
 
-		expandAll("0", "Expand all 0 (Alpha)");
-		checkTable("After expand all 0 (Alpha)", `
+		expandAll("0");
+		checkTable("After expand all '0'", `
 - 0
 	- 1
 		- 1.1
 			* 1.1.1
 			* 1.1.2`);
 
-		scrollToRow(5, "Scroll to 1.2 (Zeta)");
-		checkTable("After scroll to 1.2 (Zeta)", `
+		scrollToRow(5);
+		checkTable("After scroll to '1.2'", `
 		- 1.2
 			* 1.2.1
 			* 1.2.2
 			* 1.2.3
 	* 2`);
 
-		toggleExpand("1.2", "Collapse 1.2 (Zeta)");
-		checkTable("After collapse 1.2 (Zeta)", `
+		toggleExpand("1.2");
+		checkTable("After collapse '1.2'", `
 		+ 1.2
 	* 2
 	* 3
 	- 4
 		* 4.1`);
 
-		scrollToRow(11, "Scroll to 5.1 (Omicron)");
-		checkTable("After scroll to 5.1 (Omicron)", `
+		scrollToRow(11);
+		checkTable("After scroll to '5.1'", `
 		- 5.1
 			* 5.1.1
 			* 5.1.2
 			* 5.1.3
 			* 5.1.4`);
 
-		toggleExpand("5.1", "Collapse 5.1 (Omicron)");
-		checkTable("After collapse 5.1 (Omicron)", `
+		toggleExpand("5.1");
+		checkTable("After collapse '5.1'", `
 	* 3
 	- 4
 		* 4.1
 	- 5
 		+ 5.1`);
 
-		toggleExpand("5", "Collapse 5 (Xi)");
-		checkTable("After collapse 5 (Xi)", `
+		toggleExpand("5");
+		checkTable("After collapse '5'", `
 	* 2
 	* 3
 	- 4
 		* 4.1
 	+ 5`);
 
-		scrollToRow(1, "Scroll to 1 (Beta)");
-		checkTable("After scroll to 1 (Beta)", `
+		scrollToRow(1);
+		checkTable("After scroll to '1'", `
 	- 1
 		- 1.1
 			* 1.1.1
 			* 1.1.2
 		+ 1.2`);
 
-		toggleExpand("1.1", "Collapse 1.1 (Gamma)");
-		checkTable("After collapse 1.1 (Gamma)", `
+		toggleExpand("1.1");
+		checkTable("After collapse '1.1'", `
 	- 1
 		+ 1.1
 		+ 1.2
 	* 2
 	* 3`);
 
-		toggleExpand("1", "Collapse 1 (Beta)");
-		checkTable("After collapse 1 (Beta)", `
+		toggleExpand("1");
+		checkTable("After collapse '1'", `
 	+ 1
 	* 2
 	* 3
 	- 4
 		* 4.1`);
 
-		scrollToRow(2, "Scroll to 2 (Kappa)");
-		checkTable("After scroll to 2 (Kappa)", `
+		scrollToRow(2);
+		checkTable("After scroll to '2'", `
 	* 2
 	* 3
 	- 4
 		* 4.1
 	+ 5`);
 
-		refreshKeepingTreeState("Side effects refresh");
+		refreshKeepingTreeState();
 		checkTable("After side effects refresh", `
 	* 2
 	* 3
@@ -136,24 +136,24 @@ sap.ui.define([
 		* 4.1
 	+ 5`);
 
-		scrollToRow(1, "Scroll to 1 (Beta)");
-		checkTable("After scroll to 1 (Beta)", `
+		scrollToRow(1);
+		checkTable("After scroll to '1'", `
 	+ 1
 	* 2
 	* 3
 	- 4
 		* 4.1`);
 
-		expandAll("1", "Expand all 1 (Beta)");
-		checkTable("After expand all 1 (Beta)", `
+		expandAll("1");
+		checkTable("After expand all '1'", `
 	- 1
 		- 1.1
 			* 1.1.1
 			* 1.1.2
 		- 1.2`);
 
-		scrollToRow(9, "Scroll to 2 (Kappa)");
-		checkTable("After scroll to 2 (Kappa)", `
+		scrollToRow(9);
+		checkTable("After scroll to '2'", `
 	* 2
 	* 3
 	- 4

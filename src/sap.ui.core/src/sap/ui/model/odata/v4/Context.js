@@ -1000,6 +1000,7 @@ sap.ui.define([
 	 * @public
 	 * @since 1.39.0
 	 */
+	// DO NOT call this function internally, use iIndex instead!
 	Context.prototype.getIndex = function () {
 		if (this.iIndex === undefined) {
 			return undefined;
