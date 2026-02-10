@@ -4,6 +4,7 @@ sap.ui.define([
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/createAndAppendDiv",
 	"sap/m/MultiComboBox",
+	"sap/m/Page",
 	"sap/ui/core/Item",
 	"sap/ui/core/Element",
 	"sap/ui/model/json/JSONModel",
@@ -41,6 +42,7 @@ sap.ui.define([
 	qutils,
 	createAndAppendDiv,
 	MultiComboBox,
+	Page,
 	Item,
 	Element,
 	JSONModel,
@@ -7343,6 +7345,48 @@ sap.ui.define([
 		// Cleanup
 		oMultiComboBox.destroy();
 		oTable.destroy();
+	});
+
+	QUnit.test("Data binding: MultiComboBox onAfterClose does not throw errors when method is called with null domRef", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+		// Prepare
+		var oModel = new JSONModel({
+			items: [
+				{ keys: [1], text: "One" },
+				{ keys: [2], text: "Two" },
+				{ keys: [3], text: "Three" }
+			]
+		});
+
+		var oMultiComboBox = new MultiComboBox({ items: { path: "/items", template: new Item({ key: "{keys}", text: "{text}" }) } });
+
+		var oPage = new Page("myPage");
+		oPage.addContent(oMultiComboBox);
+		oPage.setModel(oModel);
+		oPage.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// Act - Open the MultiComboBox
+		oMultiComboBox.open();
+		await nextUIUpdate(this.clock);
+		var oPicker = oMultiComboBox.getPicker();
+
+		// Assert picker is open
+		assert.ok(oPicker.isOpen(), "MultiComboBox picker is initially open");
+
+		try {
+			oPage.removeAllContent();
+			// This timer ensures that the oMultiComboBox.onAfterClose is called after the element is removed from the DOM and the domRef is null.
+			this.clock.tick(500);
+			oMultiComboBox.close();
+		} catch (e) {
+			assert.ok(false, "Error thrown: " + e.message);
+		}
+
+		// Cleanup
+		this.clock.restore();
+		oMultiComboBox.destroy();
+		oPage.destroy();
 	});
 
 	QUnit.test("Value state should reset when selectedKeys are updated via model binding", async function(assert) {

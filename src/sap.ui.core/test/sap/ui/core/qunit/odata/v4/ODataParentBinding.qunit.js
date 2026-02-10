@@ -1851,7 +1851,6 @@ sap.ui.define([
 				sPath : "path"
 			}),
 			oContext = {
-				getIndex : function () {},
 				getPath : function () { return "/foo/bar/path"; },
 				isAggregated : mustBeMocked
 			};
@@ -1892,7 +1891,6 @@ sap.ui.define([
 				sPath : "path"
 			}),
 			oContext = {
-				getIndex : function () {},
 				getPath : function () { return "/Foo/operation(...)/Bar/path"; }
 				// NO isAggregated
 			},
@@ -2133,7 +2131,6 @@ sap.ui.define([
 				sPath : "/TEAMS"
 			}),
 			oContext = {
-				getIndex : function () {},
 				getPath : function () { return "/TEAMS"; }
 				// NO isAggregated
 			},
@@ -2284,7 +2281,6 @@ sap.ui.define([
 				}
 			}),
 			oContext = {
-				getIndex : function () {},
 				getPath : function () { return "/TEAMS"; },
 				isAggregated : mustBeMocked
 			},
@@ -3575,11 +3571,10 @@ sap.ui.define([
 				hasPendingChangesForPath : function () {}
 			},
 			oContext = {
-				getIndex : function () { return undefined; },
 				isEffectivelyKeptAlive : function () { return false; }
 			},
 			oContextWithIndex = {
-				getIndex : function () { return 0; },
+				iIndex : 0,
 				isEffectivelyKeptAlive : function () { return false; }
 			},
 			oChild1 = new ODataParentBinding({
@@ -3825,15 +3820,14 @@ sap.ui.define([
 
 	QUnit.test(sTitle, function (assert) {
 		var oContext0 = {
-				getIndex : function () { return 1; },
+				iIndex : 0,
 				isEffectivelyKeptAlive : function () {}
 			},
 			oContext1 = {
-				getIndex : function () { return 1; },
+				iIndex : 1,
 				isEffectivelyKeptAlive : function () {}
 			},
 			oContext2 = {
-				getIndex : function () { return undefined; },
 				isEffectivelyKeptAlive : function () {}
 			},
 			oChild0 = new ODataParentBinding({
@@ -3858,7 +3852,9 @@ sap.ui.define([
 		if (bIgnoreKeptAlive) {
 			this.mock(oContext0).expects("isEffectivelyKeptAlive").withExactArgs().returns(false);
 			this.mock(oContext1).expects("isEffectivelyKeptAlive").withExactArgs().returns(true);
-			this.mock(oContext1).expects("getIndex").never();
+			Object.defineProperty(oContext1, "iIndex", {
+				get : mustBeMocked
+			});
 			this.mock(oContext2).expects("isEffectivelyKeptAlive").withExactArgs().returns(false);
 			this.mock(oChild1).expects("hasPendingChangesForPath").never();
 			this.mock(oChild2).expects("hasPendingChangesForPath").withExactArgs("").returns(true);

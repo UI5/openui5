@@ -765,7 +765,7 @@ sap.ui.define([
 		}
 		// fail when really resetting keep-alive on a non-deleted context which is not in the
 		// collection and there are pending changes
-		if (!bKeepAlive && oContext && oContext.getIndex() === undefined && oContext.isKeepAlive()
+		if (!bKeepAlive && oContext && oContext.iIndex === undefined && oContext.isKeepAlive()
 				&& !oContext.isDeleted() && oContext.hasPendingChanges()) {
 			throw new Error("Not allowed due to pending changes: " + oContext);
 		}

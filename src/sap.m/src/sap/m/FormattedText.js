@@ -79,6 +79,7 @@ function(
 					 *	<li><code>strong</code></li>
 					 *	<li><code>span</code></li>
 					 *	<li><code>u</code></li>
+					 *	<li><code>s</code></li>
 					 *	<li><code>dl</code></li>
 					 *	<li><code>dt</code></li>
 					 *	<li><code>dd</code></li>
@@ -197,6 +198,7 @@ function(
 				'strong': 1,
 				'span': 1,
 				'u' : 1,
+				's' : 1,
 
 				// List Module Tags
 				'dl': 1,

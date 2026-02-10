@@ -780,7 +780,7 @@ sap.ui.define([
 			oCanUseCachePromise,
 			// whether this binding is an operation or depends on one
 			bDependsOnOperation = oContext.getPath().includes("(...)"),
-			iIndex = oContext.getIndex(),
+			iIndex = oContext.iIndex,
 			bIsAdvertisement = sChildPath[0] === "#",
 			oMetaModel = this.oModel.getMetaModel(),
 			oParentContext = this.oContext, // Note: might disappear later on
@@ -1228,7 +1228,7 @@ sap.ui.define([
 				if (oDependent.oContext.isEffectivelyKeptAlive()) {
 					return false; // changes can be safely ignored here
 				}
-				if (oDependent.oContext.getIndex() !== undefined) {
+				if (oDependent.oContext.iIndex !== undefined) {
 					bIgnoreKeptAlive = false; // context of ODLB which is not kept alive: unsafe!
 				}
 			}

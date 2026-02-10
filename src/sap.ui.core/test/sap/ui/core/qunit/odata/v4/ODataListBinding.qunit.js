@@ -4076,7 +4076,6 @@ sap.ui.define([
 	QUnit.test("destroyPreviousContexts: cache & hidden context", function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oContext1 = {
-				iIndex : undefined,
 				destroy : function () {},
 				isEffectivelyKeptAlive : function () {},
 				isOutOfPlace : mustBeMocked,
@@ -4183,11 +4182,11 @@ sap.ui.define([
 		assert.strictEqual(oBinding.iActiveContexts, 2);
 		assert.strictEqual(oBinding.iCreatedContexts, 2);
 		assert.strictEqual(oBinding.aContexts[0], oContext3);
-		assert.strictEqual(oContext3.getIndex(), 0);
+		assert.strictEqual(oContext3.iIndex, -2);
 		assert.strictEqual(oBinding.aContexts[1], oContext0);
-		assert.strictEqual(oContext0.getIndex(), 1);
-		assert.strictEqual(oContext1.getIndex(), undefined);
-		assert.strictEqual(oContext2.getIndex(), undefined);
+		assert.strictEqual(oContext0.iIndex, -1);
+		assert.strictEqual(oContext1.iIndex, undefined);
+		assert.strictEqual(oContext2.iIndex, undefined);
 
 		return Promise.all([
 			oContext0.created(),
@@ -5021,7 +5020,6 @@ sap.ui.define([
 				},
 			oHelperMock = this.mock(_Helper),
 			oKeptAliveContext = {
-				iIndex : undefined,
 				created : function () { return undefined; },
 				doDelete : mustBeMocked,
 				getPath : function () { return "~contextPath~"; },
@@ -5154,7 +5152,6 @@ sap.ui.define([
 		assert.strictEqual(oBinding.iCreatedContexts, 1);
 		assert.strictEqual(oBinding.iActiveContexts, 1);
 		assert.strictEqual(oBinding.aContexts[0], oContext0);
-		assert.strictEqual(oContext0.getIndex(), 0);
 		assert.strictEqual(oContext0.iIndex, -1);
 
 		oBindingMock.expects("getUpdateGroupId").withExactArgs().returns("~update~");
@@ -5177,11 +5174,9 @@ sap.ui.define([
 		assert.strictEqual(oBinding.iCreatedContexts, 2);
 		assert.strictEqual(oBinding.iActiveContexts, 2);
 		assert.strictEqual(oBinding.aContexts[0], oContext1);
-		assert.strictEqual(oContext1.getIndex(), 0);
 		assert.strictEqual(oContext1.iIndex, -2);
 
 		assert.strictEqual(oBinding.aContexts[1], oContext0);
-		assert.strictEqual(oContext0.getIndex(), 1);
 		assert.strictEqual(oContext0.iIndex, -1);
 
 		oBindingMock.expects("fireEvent").on(oBinding)
@@ -5392,7 +5387,7 @@ sap.ui.define([
 				oBinding.create(null, false, false, oFixture.bInactive, oFixture.bTransient));
 
 			checkCreatedContext();
-			assert.strictEqual(aContexts[0].getIndex(), 1);
+			assert.strictEqual(aContexts[0].iIndex, -1);
 
 			return Promise.all([aContexts[0].created(), aContexts[1].created()]).then(function () {
 				assert.strictEqual(aContexts[0].isTransient(), false);
@@ -10284,7 +10279,6 @@ sap.ui.define([
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oContext = {
 				hasPendingChanges : function () {},
-				getIndex : function () {},
 				isAggregated : function () {},
 				isDeleted : function () {},
 				isKeepAlive : function () {},
@@ -10298,7 +10292,6 @@ sap.ui.define([
 			.returns(bAggregation);
 		oContextMock.expects("isAggregated").withExactArgs().exactly(bAggregation ? 1 : 0)
 			.returns(false);
-		oContextMock.expects("getIndex").withExactArgs().returns(undefined);
 		oContextMock.expects("isKeepAlive").withExactArgs().returns(true);
 		oContextMock.expects("isDeleted").withExactArgs().returns(false);
 		oContextMock.expects("hasPendingChanges").withExactArgs().returns(true);
@@ -10313,7 +10306,6 @@ sap.ui.define([
 			.returns(bAggregation);
 		oContextMock.expects("isAggregated").withExactArgs().exactly(bAggregation ? 1 : 0)
 			.returns(false);
-		oContextMock.expects("getIndex").withExactArgs().returns(undefined);
 		oContextMock.expects("isKeepAlive").withExactArgs().returns(true);
 		oContextMock.expects("isDeleted").withExactArgs().returns(true);
 
@@ -10325,7 +10317,6 @@ sap.ui.define([
 			.returns(bAggregation);
 		oContextMock.expects("isAggregated").withExactArgs().exactly(bAggregation ? 1 : 0)
 			.returns(false);
-		oContextMock.expects("getIndex").withExactArgs().returns(undefined);
 		oContextMock.expects("isKeepAlive").withExactArgs().returns(false);
 
 		// code under test
@@ -10336,7 +10327,7 @@ sap.ui.define([
 			.returns(bAggregation);
 		oContextMock.expects("isAggregated").withExactArgs().exactly(bAggregation ? 1 : 0)
 			.returns(false);
-		oContextMock.expects("getIndex").withExactArgs().returns(42);
+		oContext.iIndex = 42;
 
 		// code under test
 		oBinding.checkKeepAlive(oContext, false);

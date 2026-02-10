@@ -2073,7 +2073,6 @@ sap.ui.define([
 			oContext = Context.create({/*oModel*/}, oBinding, "/EMPLOYEES('42')", 0),
 			oOtherContext = {
 				oBinding : oBinding,
-				iIndex : undefined,
 				getValue : function () {},
 				isDeleted : function () {},
 				isKeepAlive : function () {}

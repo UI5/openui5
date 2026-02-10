@@ -26,26 +26,23 @@ sap.ui.define([
 		});
 	}
 
-	function copy(sId, sParentOrSibling, sComment, rButton, sButtonText) {
+	function copy(sId, sParentOrSibling, rButton) {
 		selectCopy.call(this);
-		pressButtonInRow.call(this, sId, rButton, sButtonText, sComment);
+		pressButtonInRow.call(this, sId, rButton);
 		findNode.call(this, sParentOrSibling);
-		pressButton.call(this, undefined, function (oControl) {
-				return oControl.getBindingContext().getProperty("ID")
-					=== sParentOrSibling;
-			}, `to select node with ID ${sParentOrSibling}`, "sap.m.StandardListItem");
+		selectItem.call(this, sParentOrSibling);
 	}
 
 	function findNode(sId) {
 		this.waitFor({
 			actions : new EnterText({clearTextFirst : true, text : sId}),
 			controlType : "sap.m.SearchField",
-			errorMessage : `Could not find node with ID ${sId}`,
+			errorMessage : `Could not find '${sId}'`,
 			matchers : function (oControl) {
 				return oControl.getId().includes("searchField");
 			},
 			success : function () {
-				Opa5.assert.ok(true, `Found node with ID ${sId}`);
+				Opa5.assert.ok(true, `Found '${sId}'`);
 			},
 			viewName : sViewName
 		});
@@ -85,24 +82,34 @@ sap.ui.define([
 		return sResult;
 	}
 
-	function pressButton(rButtonId, fnMatchers, sComment, sControlType = "sap.m.Button") {
+	function pressButton(rButtonId, fnMatchers) {
+		let sMessage;
 		this.waitFor({
-			actions : new Press(),
-			controlType : sControlType,
-			errorMessage : `Could not press button ${sComment}`,
+			actions : function (oControl) {
+				// tooltip may change after the press
+				sMessage = `Pressed '${oControl.getTooltip()}' button`;
+				// toolbar buttons don't have a binding context
+				const oNode = oControl.getBindingContext()?.getObject();
+				if (oNode) {
+					sMessage += ` on '${oNode.ID}' (${oNode.Name})`;
+				}
+				new Press().executeOn(oControl);
+			},
+			controlType : "sap.m.Button",
+			errorMessage : `Could not press button ${rButtonId}`,
 			id : rButtonId,
 			matchers : fnMatchers,
 			success : function () {
-				Opa5.assert.ok(true, `Pressed button ${sComment}`);
+				Opa5.assert.ok(true, sMessage);
 			},
 			viewName : sViewName
 		});
 	}
 
-	function pressButtonInRow(sId, rButtonId, sText, sComment) {
+	function pressButtonInRow(sId, rButtonId) {
 		pressButton.call(this, rButtonId, function (oControl) {
 				return oControl.getBindingContext().getProperty("ID") === sId;
-			}, `'${sText}' with ID ${sId}. ${sComment}`);
+			});
 	}
 
 	function selectCopy() {
@@ -120,105 +127,115 @@ sap.ui.define([
 		});
 	}
 
+	function selectItem(sId) {
+		this.waitFor({
+			actions : new Press(),
+			controlType : "sap.m.StandardListItem",
+			errorMessage : `Could not select '${sId}'`,
+			matchers : function (oControl) {
+				return oControl.getBindingContext().getProperty("ID") === sId;
+			},
+			success : function ([oListItem]) {
+				Opa5.assert.ok(true,
+					`Selected '${sId}' (${oListItem.getBindingContext().getProperty("Name")})`);
+			},
+			viewName : sViewName
+		});
+	}
+
 	Opa5.createPageObjects({
 		onTheMainPage : {
 			actions : {
-				copyAsLastChildOf : function (sId, sParent, sComment) {
-					copy.call(this, sId, sParent, sComment, /moveAsLastChildOf/,
-						"Move as last child of");
+				copyAsLastChildOf : function (sId, sParent) {
+					copy.call(this, sId, sParent, /moveAsLastChildOf/);
 				},
-				copyAsLastRoot : function (sId, sComment) {
+				copyAsLastRoot : function (sId) {
 					selectCopy.call(this);
-					pressButtonInRow.call(this, sId, /makeLastRoot/, "Make Last Root", sComment);
+					pressButtonInRow.call(this, sId, /makeLastRoot/);
 				},
-				copyJustBeforeSibling : function (sId, sParent, sComment) {
-					copy.call(this, sId, sParent, sComment, /moveJustBeforeSibling/,
-						"Move just before sibling");
+				copyJustBeforeSibling : function (sId, sParent) {
+					copy.call(this, sId, sParent, /moveJustBeforeSibling/);
 				},
-				copyToParent : function (sId, sParent, sComment) {
-					copy.call(this, sId, sParent, sComment, /moveToParent/, "Move to parent");
+				copyToParent : function (sId, sParent) {
+					copy.call(this, sId, sParent, /moveToParent/);
 				},
-				copyToRoot : function (sId, sComment) {
+				copyToRoot : function (sId) {
 					selectCopy.call(this);
-					pressButtonInRow.call(this, sId, /moveToRoot/, "Move to root", sComment);
+					pressButtonInRow.call(this, sId, /moveToRoot/);
 				},
-				createNewChild : function (sId, sComment) {
-					pressButtonInRow.call(this, sId, /create/, "Create new child below node",
-						sComment);
+				createNewChild : function (sId) {
+					pressButtonInRow.call(this, sId, /create/);
 				},
-				deleteNode : function (sId, sComment) {
-					pressButtonInRow.call(this, sId, /delete/, "Delete node", sComment);
+				deleteNode : function (sId) {
+					pressButtonInRow.call(this, sId, /delete/);
 				},
-				editName : function (sId, sName, sComment) {
+				editName : function (sId, sName) {
 					this.waitFor({
 						actions : new EnterText({clearTextFirst : true, text : sName}),
 						controlType : "sap.m.Input",
-						errorMessage : `Could not edit name of node with ID ${sId}`,
+						errorMessage : `Could not edit name of '${sId}'`,
 						id : /name/,
 						matchers : function (oControl) {
 							return oControl.getBindingContext().getProperty("ID") === sId;
 						},
 						success : function () {
-							Opa5.assert.ok(true,
-								`Entered name of node ${sId} as "${sName}". ${sComment}`);
+							Opa5.assert.ok(true, `Entered name of '${sId}' as "${sName}"`);
 						},
 						viewName : sViewName
 					});
 				},
-				scrollToRow : function (iRow, sComment) {
+				scrollToRow : function (iRow) {
 					this.waitFor({
 						actions : function (oTable) {
 							oTable.setFirstVisibleRow(iRow);
 						},
-						errorMessage : "Could not select row " + iRow,
+						errorMessage : "Could not scroll to row " + iRow,
 						id : rTableId,
 						success : function (aControls) {
 							const oTable = aControls[0];
 							Opa5.assert.strictEqual(oTable.getFirstVisibleRow(), iRow,
-								"Scrolled table to row " + iRow + ". " + sComment);
+								`Scrolled table to row ${iRow}`);
 						},
 						viewName : sViewName
 					});
 				},
-				synchronize : function (sComment) {
-					pressButton.call(this, /synchronize/, null, "Synchronize (" + sComment + ")");
+				synchronize : function () {
+					pressButton.call(this, /synchronize/);
 				},
-				refreshKeepingTreeState : function (sComment) {
-					pressButton.call(this, /sideEffectsRefresh/, null,
-						`'Refresh (keeping tree state)'. ${sComment}`);
+				refreshKeepingTreeState : function () {
+					pressButton.call(this, /sideEffectsRefresh/);
 				},
-				toggleExpand : function (sId, sComment) {
+				toggleExpand : function (sId) {
 					this.waitFor({
 						actions : (oTable) => {
 							if (oTable.getId().includes("treeTable")) {
-								const oRow = oTable.getRows().find(function (oControl) {
+								const oRowContext = oTable.getRows().find(function (oControl) {
 									return oControl.getBindingContext().getProperty("ID") === sId;
 								}).getBindingContext();
-
-								if (oRow.isExpanded()) {
-									oRow.collapse();
+								const bIsExpanded = oRowContext.isExpanded();
+								if (bIsExpanded) {
+									oRowContext.collapse();
 								} else {
-									oRow.expand();
+									oRowContext.expand();
 								}
+								Opa5.assert.ok(true,
+									`${bIsExpanded ? "Collapsed" : "Expanded"}`
+										+ ` '${sId}' (${oRowContext.getProperty("Name")})`);
 							} else { // Table
-								pressButtonInRow.call(this, sId, /expandToggle/, "Expand",
-									sComment);
+								pressButtonInRow.call(this, sId, /expandToggle/);
 							}
 						},
-						errorMessage : `Could not press button 'Expand' with ID ${sId}`,
+						errorMessage :
+							`Could not press button 'Collapse/Expand' on '${sId}'`,
 						id : rTableId,
-						success : function () {
-							Opa5.assert.ok(true,
-								`Pressed button 'Expand' with ID ${sId}. ${sComment}`);
-						},
 						viewName : sViewName
 					});
 				},
-				expandAll : function (sId, sComment) {
-					pressButtonInRow.call(this, sId, /expandAll/, "Expand Levels", sComment);
+				expandAll : function (sId) {
+					pressButtonInRow.call(this, sId, /expandAll/);
 				},
-				collapseAll : function (sId, sComment) {
-					pressButtonInRow.call(this, sId, /collapseAll/, "Collapse All", sComment);
+				collapseAll : function (sId) {
+					pressButtonInRow.call(this, sId, /collapseAll/);
 				}
 			},
 			assertions : {
@@ -232,7 +249,8 @@ sap.ui.define([
 							Opa5.assert.strictEqual(sResult, sExpected, sComment);
 							if (iExpectedFirstVisibleRow !== undefined) {
 								Opa5.assert.strictEqual(
-									oTable.getFirstVisibleRow(), iExpectedFirstVisibleRow);
+									oTable.getFirstVisibleRow(), iExpectedFirstVisibleRow,
+									`First visible row is ${iExpectedFirstVisibleRow} as expected`);
 							}
 							if (iExpectedCount !== undefined) {
 								checkCount.call(this, oTable, iExpectedCount);
