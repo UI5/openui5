@@ -507,6 +507,8 @@ sap.ui.define([
 			 * This function can be used for applying modification on the view or the container to make the rerendering occur
 			 * together with the later aggregation change.
 			 *
+			 * <b>Note:</b> This function was previously named <code>_beforePlacingViewIntoContainer</code> (with a leading underscore) and has been renamed to be protected instead of private.
+			 *
 			 * @protected
 			 * @param {object} mArguments the object containing the arguments
 			 * @param {sap.ui.core.Control} mArguments.container the container where the view will be added
@@ -514,7 +516,7 @@ sap.ui.define([
 			 * @param {object} [mArguments.data] the data passed from {@link sap.ui.core.routing.Target#display} method
 			 * @since 1.46.1
 			 */
-			_beforePlacingViewIntoContainer : function(mArguments) {},
+			beforePlacingViewIntoContainer : function(mArguments) {},
 
 			/**
 			 * Creates a view and puts it in an aggregation of a control that has been defined in the {@link #constructor}.
@@ -1068,7 +1070,7 @@ sap.ui.define([
 
 							// adapt the container before placing the view into it to make the rendering occur together with the next
 							// aggregation modification.
-							that._beforePlacingViewIntoContainer({
+							that.beforePlacingViewIntoContainer({
 								container: oContainerControl,
 								view: oObject,
 								data: vData

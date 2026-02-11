@@ -24,14 +24,14 @@ sap.ui.define(['sap/ui/core/routing/Target', 'sap/f/FlexibleColumnLayout'],
 				Target.prototype.constructor.apply(this, arguments);
 			},
 
-			_beforePlacingViewIntoContainer : function(mArguments) {
+			beforePlacingViewIntoContainer : function(mArguments) {
 				var oContainer = mArguments.container;
 				var oRouteConfig = mArguments.data && mArguments.data.routeConfig;
 				if (oContainer instanceof FCL && oRouteConfig && oRouteConfig.layout) {
 					// Apply the layout early, if it was specified explicitly for the route
 					oContainer.setLayout(oRouteConfig.layout);
 				}
-				Target.prototype._beforePlacingViewIntoContainer.apply(this, arguments);
+				Target.prototype.beforePlacingViewIntoContainer.apply(this, arguments);
 			},
 
 			/**

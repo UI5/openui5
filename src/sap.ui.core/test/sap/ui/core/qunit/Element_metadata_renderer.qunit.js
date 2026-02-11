@@ -89,6 +89,7 @@ sap.ui.define([
 			switch (sExtensionMethod) {
 				case "NoParent":
 					oRenderer = oResult.renderer = {
+						apiVersion: 2,
 						render: renderFunction
 					};
 					break;
@@ -158,7 +159,10 @@ sap.ui.define([
 	}
 
 	var Grandparent = Control.extend("Grandparent", {
-		renderer: function() {}
+		renderer: {
+			apiVersion: 2,
+			render: function() {}
+		}
 	});
 
 	// Create base classes
