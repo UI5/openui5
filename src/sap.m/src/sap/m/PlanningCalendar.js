@@ -2075,27 +2075,24 @@ sap.ui.define([
 						oHeader.setAssociation("currentPicker", oAssociation);
 						oAssociation.addDelegate(MONTH_DELEGATE, oAssociation);
 					}
-
-					if (sKey === CalendarIntervalType.Day) {
-						if (!this._oCalendarWeeks) {
-								this._oCalendarWeeks = new WeeksRow(this.getId() + "-CalendarWeeksRow", {
-								startDate: this.getStartDate(),
-								primaryCalendarType: this.getPrimaryCalendarType(),
-								interval: iIntervals,
-								viewKey: CalendarIntervalType.Day,
-								showWeekNumbers: this.getShowWeekNumbers(),
-								calendarWeekNumbering: this.getCalendarWeekNumbering()
-							});
-						} else {
-							this._oCalendarWeeks.setInterval(iIntervals);
-							this._oCalendarWeeks.setShowWeekNumbers(this.getShowWeekNumbers());
-							this._oCalendarWeeks.setPrimaryCalendarType(this.getPrimaryCalendarType());
-							this._oCalendarWeeks.setStartDate(this.getStartDate());
-							this._oCalendarWeeks.setViewKey(CalendarIntervalType.Day);
-						}
-						this._oInfoToolbar.addContent(this._oCalendarWeeks);
+					if (!this._oCalendarWeeks) {
+							this._oCalendarWeeks = new WeeksRow(this.getId() + "-CalendarWeeksRow", {
+							startDate: this.getStartDate(),
+							primaryCalendarType: this.getPrimaryCalendarType(),
+							interval: iIntervals,
+							viewKey: sKey,
+							showWeekNumbers: this.getShowWeekNumbers(),
+							calendarWeekNumbering: this.getCalendarWeekNumbering()
+						});
+					} else {
+						this._oCalendarWeeks.setInterval(iIntervals);
+						this._oCalendarWeeks.setShowWeekNumbers(this.getShowWeekNumbers());
+						this._oCalendarWeeks.setPrimaryCalendarType(this.getPrimaryCalendarType());
+						this._oCalendarWeeks.setStartDate(this.getStartDate());
+						this._oCalendarWeeks.setViewKey(sKey);
 					}
-					break;
+					this._oInfoToolbar.addContent(this._oCalendarWeeks);
+				break;
 
 				case CalendarIntervalType.Month:
 					if (!this._oMonthsRow) {
@@ -3450,9 +3447,7 @@ sap.ui.define([
 						this._oDatesRow.setDays(iIntervals);
 						this._dateNav.setStep(iIntervals * iIntervalSize);
 					}
-					if (this._oCalendarWeeks && this._oCalendarWeeks.getInterval() != iIntervals) {
-						this._oCalendarWeeks.setInterval(iIntervals);
-					}
+					this._oCalendarWeeks?.setInterval(iIntervals);
 					break;
 
 				case CalendarIntervalType.Month:
@@ -3460,10 +3455,7 @@ sap.ui.define([
 						this._oMonthsRow.setMonths(iIntervals);
 						this._dateNav.setStep(iIntervals * iIntervalSize);
 					}
-					if (this._oCalendarWeeks && this._oCalendarWeeks.getInterval() != iIntervals) {
-						this._oCalendarWeeks.setInterval(iIntervals);
-					}
-
+					this._oCalendarWeeks?.setInterval(iIntervals);
 					break;
 
 				case CalendarIntervalType.Week:
@@ -3471,6 +3463,7 @@ sap.ui.define([
 						this._oWeeksRow.setDays(iIntervals);
 						this._dateNav.setStep(iIntervals * iIntervalSize);
 					}
+					this._oCalendarWeeks?.setInterval(iIntervals);
 					break;
 
 				case CalendarIntervalType.OneMonth:
@@ -3483,6 +3476,7 @@ sap.ui.define([
 							this._setRowsStartDate(UI5Date.getInstance(this.getStartDate().getTime()));
 						}
 					}
+					this._oCalendarWeeks?.setInterval(iIntervals);
 					break;
 
 				default:
