@@ -989,13 +989,12 @@ sap.ui.define([
 	};
 
 	DateTimePicker.prototype._createPopup = function(){
-
-		var oResourceBundle, sOKButtonText, sCancelButtonText, oPopover;
+		const bPhone = Device.system.phone;
 
 		if (!this._oPopup) {
-			oResourceBundle = Library.getResourceBundleFor("sap.m");
-			sOKButtonText = oResourceBundle.getText("TIMEPICKER_SET");
-			sCancelButtonText = oResourceBundle.getText("TIMEPICKER_CANCEL");
+			const oResourceBundle = Library.getResourceBundleFor("sap.m");
+			const sOKButtonText = oResourceBundle.getText("TIMEPICKER_SET");
+			const sCancelButtonText = oResourceBundle.getText("TIMEPICKER_CANCEL");
 
 			this._oPopupContent = new PopupContent(this.getId() + "-PC");
 			this._oPopupContent._oDateTimePicker = this;
@@ -1005,40 +1004,40 @@ sap.ui.define([
 				type: ButtonType.Emphasized,
 				press: _handleOkPress.bind(this)
 			});
+			this._oCancelButton = new Button(this.getId() + "-Cancel", {
+				text: sCancelButtonText,
+				press: _handleCancelPress.bind(this)
+			});
 			var oHeader = this._getValueStateHeader();
 			this._oPopup = new ResponsivePopover(this.getId() + "-RP", {
 				showCloseButton: false,
-				showHeader: false,
+				showHeader: bPhone,
 				placement: PlacementType.VerticalPreferedBottom,
 				beginButton: this._oOKButton,
+				endButton: this._oCancelButton,
 				content: [
 					oHeader,
 					this._oPopupContent
 				],
 				ariaLabelledBy: this._getInvisibleLabelText().getId(),
+				beforeOpen: _handleBeforeOpen.bind(this),
 				afterOpen: _handleAfterOpen.bind(this),
 				afterClose: _handleAfterClose.bind(this)
 			});
 			oHeader.setPopup(this._oPopup._oControl);
 
 
-			if (Device.system.phone) {
+			if (bPhone) {
 				this._oPopup.setTitle(this._getLabelledText());
-				this._oPopup.setShowHeader(true);
-				this._oPopup.setShowCloseButton(true);
 			} else {
 				// We add time in miliseconds for opening and closing animations of the popup,
 				// so the opening and closing event handlers are properly ordered in the event queue
 				this._oPopup._getPopup().setDurations(0, 0);
-				this._oPopup.setEndButton(new Button(this.getId() + "-Cancel", {
-					text: sCancelButtonText,
-					press: _handleCancelPress.bind(this)
-				}));
 			}
 
 			this._oPopup.addStyleClass("sapMDateTimePopup");
 
-			oPopover = this._oPopup.getAggregation("_popup");
+			const oPopover = this._oPopup.getAggregation("_popup");
 			// hide arrow in case of popover as dialog does not have an arrow
 			if (oPopover.setShowArrow) {
 				oPopover.setShowArrow(false);
@@ -1247,6 +1246,12 @@ sap.ui.define([
 			oCalendar.$().css("display", "");
 		}
 	};
+
+	function _handleBeforeOpen(){
+		if (Device.system.phone) {
+			this._oPopup.setTitle(this._getLabelledText());
+		}
+	}
 
 	function _handleAfterOpen(oEvent){
 		this._oClocks._showFirstClock();

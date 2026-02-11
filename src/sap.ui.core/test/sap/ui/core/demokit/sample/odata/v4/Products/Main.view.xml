@@ -66,7 +66,7 @@
 						<Label text="Status"/>
 					</Column>
 					<template:repeat list="{lineItem>}" var="field">
-						<Column id="{= 'column' + ${field>Value/$Path}}">
+						<Column id="{= 'column' + ${field>Value/$Path} }">
 							<template:if test="{= ${field>Value/$Path} === 'Name' }">
 								<template:then>
 									<!-- Sorting by Name is not supported by the service -->

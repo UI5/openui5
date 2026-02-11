@@ -644,6 +644,11 @@ function(
 		 * @private
 		 */
 		StepInput.prototype._handleButtonPress = function (fMultiplier)	{
+			// Focus the input on mobile devices when button is pressed
+			if (Device.system.phone || Device.system.tablet) {
+				this.focus();
+			}
+
 			if (!this._bSpinStarted) {
 				// short click, just a single inc/dec button
 				this._bDelayedEventFire = false;

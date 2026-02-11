@@ -50,7 +50,7 @@ sap.ui.define([
 		if (oPayload) {
 			const {event} = oShouldShowTypeaheadSettings || {};
 			const oTypeahead = oValueHelp.getTypeahead();
-			const bContainerValid = oTypeahead.isA("sap.ui.mdc.valuehelp.Popover");
+			const bContainerValid = oTypeahead?.isA("sap.ui.mdc.valuehelp.Popover");
 			const sEventType = event?.getId?.() || event?.originalEvent?.type || event?.type;
 			const {shouldOpenOnFocus, shouldOpenOnClick} = oPayload;
 			if (sEventType === "focusin" && bContainerValid && shouldOpenOnFocus) {

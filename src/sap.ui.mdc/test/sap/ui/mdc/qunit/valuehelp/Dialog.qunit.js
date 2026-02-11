@@ -900,6 +900,41 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("are aria attributes given to content?", (assert) => {
+
+		oDialog.setTitle("Test");
+
+		const oPromise = oDialog.open(Promise.resolve());
+		if (oPromise) {
+			const fnDone = assert.async();
+			oPromise.then(() => {
+				setTimeout(() => {
+					const oSelectedContent = oDialog.getSelectedContent();
+					const oMetadata = oSelectedContent.getMetadata();
+					const oAriaLabelledBy = oMetadata.getAllAssociations().ariaLabelledBy;
+					assert.ok(oAriaLabelledBy, "aria-labelledby association exists");
+
+					// Assure that aria-labelledby exists and is an array
+					const aAriaLabelledBy = oSelectedContent.getAriaLabelledBy();
+					assert.ok(aAriaLabelledBy, "aria-labelledby association returned");
+					assert.ok(Array.isArray(aAriaLabelledBy), "aria-labelledby is an array");
+
+					// Now we check if the aria labelled by includes the title id of the dialog
+					const oContainer = oDialog.getAggregation("_container");
+					const sDialogTitleId = oContainer.getId() + "-title";
+					assert.ok(sDialogTitleId, "Dialog has a title id");
+
+					const bIncludesDialogTitleId = aAriaLabelledBy.includes(sDialogTitleId);
+					assert.ok(bIncludesDialogTitleId, "aria-labelledby includes the dialog title id");
+
+					oDialog.close();
+
+					fnDone();
+				}, iDialogDuration);
+			});
+		}
+	});
+
 	QUnit.test("isMultiSelect", (assert) => {
 
 		assert.ok(oDialog.isMultiSelect(), "isMultiSelect");
@@ -908,6 +943,7 @@ sap.ui.define([
 		assert.notOk(oDialog.isMultiSelect(), "isMultiSelect");
 
 	});
+
 
 	/**
 	 *  @deprecated As of version 1.137

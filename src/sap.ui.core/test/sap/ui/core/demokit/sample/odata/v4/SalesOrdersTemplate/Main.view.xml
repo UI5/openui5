@@ -105,7 +105,7 @@
 						<template:repeat list="{lineItem>}" var="field">
 							<Column>
 								<Label design="{:= ${field>@com.sap.vocabularies.UI.v1.Importance/$EnumMember}
-									=== 'com.sap.vocabularies.UI.v1.ImportanceType/High' ? 'Bold' : 'Standard'}"
+									=== 'com.sap.vocabularies.UI.v1.ImportanceType/High' ? 'Bold' : 'Standard' }"
 									text="{field>@@label}"/>
 							</Column>
 						</template:repeat>

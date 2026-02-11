@@ -27,7 +27,7 @@
 											id="searchField"
 											width="20%"
 											placeholder="{i18n>searchFieldPlaceholder}"
-											enabled="{= !${appView>/hasUIChanges}}"
+											enabled="{= !${appView>/hasUIChanges} }"
 											search=".onSearch"/>
 										<Button
 											id="addUserButton"
@@ -41,13 +41,13 @@
 										<Button
 											id="refreshUsersButton"
 											icon="sap-icon://refresh"
-											enabled="{= !${appView>/hasUIChanges}}"
+											enabled="{= !${appView>/hasUIChanges} }"
 											tooltip="{i18n>refreshButtonText}"
 											press=".onRefresh"/>
 										<Button
 											id="sortUsersButton"
 											icon="sap-icon://sort"
-											enabled="{= !${appView>/hasUIChanges}}"
+											enabled="{= !${appView>/hasUIChanges} }"
 											tooltip="{i18n>sortButtonText}"
 											press=".onSort"/>
 									</content>

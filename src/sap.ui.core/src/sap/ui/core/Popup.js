@@ -358,7 +358,15 @@ sap.ui.define([
 			},
 
 			events : {
+				/**
+				 * Fired when the popup has completely opened (after any animation).
+				 * @since 1.2
+				 */
 				"opened" : {},
+				/**
+				 * Fired when the popup has completely closed (after any animation).
+				 * @since 1.2
+				 */
 				"closed" : {}
 			}
 		}
@@ -400,90 +408,105 @@ sap.ui.define([
 	Popup.Dock = {
 
 		/**
+		 * Docks the popup at the begin of the reference element, at the top.
 		 * @public
 		 * @type {string}
 		 */
 		BeginTop      : "BeginTop",
 
 		/**
+		 * Docks the popup at the begin of the reference element, vertically centered.
 		 * @public
 		 * @type {string}
 		 */
 		BeginCenter   : "BeginCenter",
 
 		/**
+		 * Docks the popup at the begin of the reference element, at the bottom.
 		 * @public
 		 * @type {string}
 		 */
 		BeginBottom   : "BeginBottom",
 
 		/**
+		 * Docks the popup at the left side of the reference element, at the top.
 		 * @public
 		 * @type {string}
 		 */
 		LeftTop      : "LeftTop",
 
 		/**
+		 * Docks the popup at the left side of the reference element, vertically centered.
 		 * @public
 		 * @type {string}
 		 */
 		LeftCenter   : "LeftCenter",
 
 		/**
+		 * Docks the popup at the left side of the reference element, at the bottom.
 		 * @public
 		 * @type {string}
 		 */
 		LeftBottom   : "LeftBottom",
 
 		/**
+		 * Docks the popup horizontally centered to the reference element, at the top.
 		 * @public
 		 * @type {string}
 		 */
 		CenterTop    : "CenterTop",
 
 		/**
+		 * Docks the popup horizontally and vertically centered to the reference element.
 		 * @public
 		 * @type {string}
 		 */
 		CenterCenter : "CenterCenter",
 
 		/**
+		 * Docks the popup horizontally centered to the reference element, at the bottom.
 		 * @public
 		 * @type {string}
 		 */
 		CenterBottom : "CenterBottom",
 
 		/**
+		 * Docks the popup at the right side of the reference element, at the top.
 		 * @public
 		 * @type {string}
 		 */
 		RightTop     : "RightTop",
 
 		/**
+		 * Docks the popup at the right side of the reference element, vertically centered.
 		 * @public
 		 * @type {string}
 		 */
 		RightCenter  : "RightCenter",
 
 		/**
+		 * Docks the popup at the right side of the reference element, at the bottom.
 		 * @public
 		 * @type {string}
 		 */
 		RightBottom  : "RightBottom",
 
 		/**
+		 * Docks the popup at the end of the reference element, at the top.
 		 * @public
 		 * @type {string}
 		 */
 		EndTop     : "EndTop",
 
 		/**
+		 * Docks the popup at the end of the reference element, vertically centered.
 		 * @public
 		 * @type {string}
 		 */
 		EndCenter  : "EndCenter",
 
 		/**
+		 * Docks the popup at the end of the reference element, at the bottom.
 		 * @public
 		 * @type {string}
 		 */

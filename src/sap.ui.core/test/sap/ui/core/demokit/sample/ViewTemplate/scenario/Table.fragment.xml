@@ -49,7 +49,7 @@
 						<template:then>
 							<!-- IsActionCritical defaults to true -->
 							<Button text="{path: 'field>Label', formatter: 'AH.format'}"
-								icon="{= ${function>com.sap.vocabularies.Common.v1.IsActionCritical/Bool} !== 'false' ? 'sap-icon://notification' : ''}" />
+								icon="{= ${function>com.sap.vocabularies.Common.v1.IsActionCritical/Bool} !== 'false' ? 'sap-icon://notification' : '' }" />
 						</template:then>
 						<template:else>
 							<Button text="{path: 'field>Label', formatter: 'AH.format'}" />

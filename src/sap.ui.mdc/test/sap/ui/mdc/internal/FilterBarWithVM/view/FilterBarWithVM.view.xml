@@ -17,7 +17,7 @@
 
 	<f:DynamicPage id="page">
 		<f:title>
-			<f:DynamicPageTitle stateChange="onStateChanged">
+			<f:DynamicPageTitle id="pageTitle" stateChange="onStateChanged">
 				<f:actions>
 				</f:actions>
 				<f:heading>
@@ -26,13 +26,13 @@
 				</f:heading>
 
 				<f:snappedContent>
-					<HBox>
+					<HBox id="snappedContentLayout">
 						<Text id="statusTextCollapsed" />
 						<Text id="errorTextCollapsed" />
 					</HBox>
 				</f:snappedContent>
 				<f:expandedContent>
-					<HBox>
+					<HBox id="expandedContentLayout">
 						<Text id="statusTextExpanded" />
 						<Text id="errorTextExpanded" />
 					</HBox>
@@ -40,127 +40,113 @@
 			</f:DynamicPageTitle>
 		</f:title>
 		<f:header>
-			<f:DynamicPageHeader pinnable="true">
+			<f:DynamicPageHeader id="pageHeader" pinnable="true">
 				<mdc:FilterBar
 					id="mountainsFilterbar"
 					delegate='\{"name": "mdc/sample/delegate/JSONFilterBarDelegate", "payload": \{\}\}'
 					p13nMode = "Item,Value"
+					propertyInfo='[\{"name": "name", "label": "Name (String)", "path": "name", "dataType":"sap.ui.model.type.String", "visible": true\},
+									\{"name": "height", "label": "Height (Integer)", "path": "height", "dataType":"sap.ui.model.type.Integer", "formatOptions": \{"emptyString": null\}, "visible": true\},
+									\{"name": "prominence", "label": "Prominence (Float)", "path": "prominence", "dataType":"sap.ui.model.type.Float", "formatOptions": \{"emptyString": null\}, "visible": true\},
+									\{"name": "parent_mountain", "label": "Has parent mountain (Boolean)", "path": "parent_mountain", "dataType":"sap.ui.model.type.Boolean", "maxConditions": 1, "visible": true\},
+									\{"name": "first_ascent", "label": "First Ascent (Date)", "path": "first_ascent", "dataType":"sap.ui.model.type.Date", "formatOptions": \{"style": "long"\}, "maxConditions": 1, "visible": true\},
+									\{"name": "rank", "label": "Rank (Integer)", "path": "rank", "dataType":"sap.ui.model.type.Integer", "formatOptions": \{"emptyString": 0\}, "constraints": \{"minimum": 0\}, "visible": true\}]'
 					filtersChanged=".onFiltersChanged">
 					<mdc:filterItems>
 						<!-- Title - String -->
 						<mdc:FilterField
-							label="Name (String)"
+							id="mountainsFilterbar--filter--name"
 							propertyKey="name"
-							dataType="sap.ui.model.type.String"
-							conditions="{$filters>/conditions/name}"
 							valueHelp="VH1"
 							operators="EQ"
-							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}'>
-							<mdc:dependents>
-								<mdc:ValueHelp id="VH1" delegate='\{"name": "mdc/sample/delegate/JSONValueHelpDelegate", "payload": \{"searchKeys": ["name"]\}\}'>
-									<mdc:typeahead>
-										<mdcvh:Popover title="Select Mountain">
-											<mdcvc:MTable keyPath="name" descriptionPath="name">
-												<Table id="ddListMountains" items='{path : "mountains>/mountains" }' width="30rem">
-													<columns>
-														<Column visible="false">
-															<header>
-																<Text text="Rank" />
-															</header>
-														</Column>
-														<Column>
-															<header>
-																<Text text="Name" />
-															</header>
-														</Column>
-														<Column>
-															<header>
-																<Text text="Height" />
-															</header>
-														</Column>
-													</columns>
-													<items>
-														<ColumnListItem type="Active">
-															<cells>
-																<Text text="{mountains>rank}"/>
-																<Text text="{mountains>name}"/>
-																<Text text="{mountains>height}"/>
-															</cells>
-														</ColumnListItem>
-													</items>
-												</Table>
-											</mdcvc:MTable>
-										</mdcvh:Popover>
-									</mdc:typeahead>
-								</mdc:ValueHelp>
-							</mdc:dependents>
+							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'>
 						</mdc:FilterField>
 
 						<!-- Height - Integer -->
 						<mdc:FilterField
-							label="Height (Integer)"
+							id="mountainsFilterbar--filter--height"
 							propertyKey="height"
-							dataType="sap.ui.model.type.Integer"
-							conditions="{$filters>/conditions/height}"
-							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}' >
+							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}' >
 						</mdc:FilterField>
 
 						<!-- Prominence - Float -->
 						<mdc:FilterField
-							label="Prominence (Float)"
+							id="mountainsFilterbar--filter--prominence"
 							propertyKey="prominence"
-							dataType="sap.ui.model.type.Float"
-							conditions="{$filters>/conditions/prominence}"
-							maxConditions="-1"
-							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}'>
+							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'>
 						</mdc:FilterField>
 
 						<!-- Parent Mountain - Boolean -->
 						<mdc:FilterField
-							label="Has parent mountain (Boolean)"
+							id="mountainsFilterbar--filter--parent_mountain"
 							propertyKey="parent_mountain"
-							dataType="sap.ui.model.type.Boolean"
-							conditions="{$filters>/conditions/parent_mountain}"
-							maxConditions="1"
 							operators="EQ"
-							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}'>
+							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'>
 						</mdc:FilterField>
 
 						<!-- First Ascent - Date -->
 						<mdc:FilterField
-							label="First Ascent (Date)"
+							id="mountainsFilterbar--filter--first_ascent"
 							propertyKey="first_ascent"
-							dataType="sap.ui.model.odata.type.Date"
-							dataTypeFormatOptions='\{"style": "long"\}'
-							dataTypeConstraints='\{"V4": true\}'
-
-							conditions="{$filters>/conditions/first_ascent}"
-							maxConditions="1"
 							operators="EQ,BT,TODAY,YESTERDAY,TOMORROW,TODAYFROMTO,LASTDAYS,NEXTDAYS"
 							delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' >
 						</mdc:FilterField>
 
 						<!-- Rank (formatOptions and constraints) -->
 						<mdc:FilterField
-							label="Rank (Integer)"
+							id="mountainsFilterbar--filter--rank"
 							propertyKey="rank"
-							dataType="sap.ui.model.type.Integer"
-							dataTypeFormatOptions='\{"emptyString": 0\}'
-							dataTypeConstraints='\{"minimum": 0\}'
-							conditions="{$filters>/conditions/rank}"
-							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}'
+							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
 							operators="EQ">
 						</mdc:FilterField>
 
 					</mdc:filterItems>
+					<mdc:dependents>
+						<mdc:ValueHelp id="VH1" delegate='\{"name": "mdc/sample/delegate/JSONValueHelpDelegate", "payload": \{"searchKeys": ["name"]\}\}'>
+							<mdc:typeahead>
+								<mdcvh:Popover id="VH1-pop" title="Select Mountain">
+									<mdcvc:MTable id="VH1-pop-mTable" keyPath="name" descriptionPath="name">
+										<Table  id="VH1-pop-mTable-table" items='{path : "mountains>/mountains"}' width="30rem">
+											<columns>
+												<Column id="VH1-pop-mTable-table-column-rank" visible="false">
+													<header>
+														<Text id="VH1-pop-mTable-table-column-rank-label" text="Rank" />
+													</header>
+												</Column>
+												<Column id="VH1-pop-mTable-table-column-name">
+													<header>
+														<Text id="VH1-pop-mTable-table-column-name-label" text="Name" />
+													</header>
+												</Column>
+												<Column id="VH1-pop-mTable-table-column-height">
+													<header>
+														<Text id="VH1-pop-mTable-table-column-height-label" text="Height" />
+													</header>
+												</Column>
+											</columns>
+											<items>
+												<ColumnListItem id="VH1-pop-mTable-table-item" type="Active">
+													<cells>
+														<Text id="VH1-pop-mTable-table-item--rank" text="{mountains>rank}"/>
+														<Text id="VH1-pop-mTable-table-item--name" text="{mountains>name}"/>
+														<Text id="VH1-pop-mTable-table-item--height" text="{mountains>height}"/>
+													</cells>
+												</ColumnListItem>
+											</items>
+										</Table>
+									</mdcvc:MTable>
+								</mdcvh:Popover>
+							</mdc:typeahead>
+						</mdc:ValueHelp>
+					</mdc:dependents>
 				</mdc:FilterBar>
 			</f:DynamicPageHeader>
 		</f:header>
 		<f:content>
-			<VBox>
-				<Title text="Conditions"/>
-				<Text text="The following JSON is the output of the getConditions() function from the Filterbar." class="sapUiSmallMarginBottom" />
-				<Label text="Editor height (px)" labelFor="inputText" />
+			<VBox id="contentLayout">
+				<Title id="contentTitle" text="Conditions"/>
+				<Text id="contentDescription" text="The following JSON is the output of the getConditions() function from the Filterbar." class="sapUiSmallMarginBottom" />
+				<Label id="inputTextLabel" text="Editor height (px)" labelFor="inputText" />
 				<Slider
 					id="inputText"
 					value="{/editorHeight}"
@@ -170,6 +156,7 @@
 					step="50"
 					class="sapUiMediumMarginBottom"/>
 				<ce:CodeEditor
+					id="conditionsEditor"
 					type="json"
 					value="{/conditionsText}"
 					editable="false"

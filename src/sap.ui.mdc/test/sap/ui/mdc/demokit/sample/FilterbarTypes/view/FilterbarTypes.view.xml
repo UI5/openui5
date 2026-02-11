@@ -65,7 +65,7 @@
 							id="mountainsFilterbar--filter--first_ascent"
 							propertyKey="first_ascent"
 							operators="EQ,BT,TODAY,YESTERDAY,TOMORROW,TODAYFROMTO,LASTDAYS,NEXTDAYS"
-							delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' >
+							delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}' >
 						</mdc:FilterField>
 
 						<!-- Rank (formatOptions and constraints) -->
@@ -81,21 +81,21 @@
 							<mdc:typeahead>
 								<mdcvh:Popover id="VH1-pop" title="Select Mountain">
 									<mdcvc:MTable id="VH1-pop-mTable" keyPath="name" descriptionPath="name">
-										<Table id="VH1-pop-mTable-table" items='{path : "mountains>/mountains" }' width="30rem">
+										<Table id="VH1-pop-mTable-table" items='{path : "mountains>/mountains"}' width="30rem">
 											<columns>
 												<Column id="VH1-pop-mTable-table-column-rank" visible="false">
 													<header>
-														<Text text="Rank" />
+														<Text id="VH1-pop-mTable-table-column-rank-label" text="Rank" />
 													</header>
 												</Column>
 												<Column id="VH1-pop-mTable-table-column-name">
 													<header>
-														<Text text="Name" />
+														<Text id="VH1-pop-mTable-table-column-name-label" text="Name" />
 													</header>
 												</Column>
 												<Column id="VH1-pop-mTable-table-column-height">
 													<header>
-														<Text text="Height" />
+														<Text id="VH1-pop-mTable-table-column-height-label" text="Height" />
 													</header>
 												</Column>
 											</columns>

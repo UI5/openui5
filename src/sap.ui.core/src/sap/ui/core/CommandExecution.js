@@ -19,6 +19,7 @@ sap.ui.define([
 	/**
 	 * Creates and initializes a new CommandExecution.
 	 *
+	 * @class
 	 * The CommandExecution registers a shortcut when it is added to the dependent
 	 * aggregation of a control. The shortcut information is retrieved from the
 	 * owner components manifest (<code>/sap.ui5/commands/&lt;command&gt;</code>).
@@ -66,7 +67,6 @@ sap.ui.define([
 	 *  </li>
 	 * </ul>
 	 *
-	 * @class
 	 * @alias sap.ui.core.CommandExecution
 	 * @since 1.70
 	 *

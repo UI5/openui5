@@ -67,7 +67,7 @@ CalendarTimeIntervalRenderer.render = function(oRm, oCal){
 	oRm.class("sapUiCalContent");
 	oRm.openEnd();
 	oRm.renderControl(oCal.getAggregation(oCal.getProperty("_currentPicker")));
-
+	oRm.renderControl(oCal.getAggregation("weeksRow"));
 	oRm.close("div");
 
 	oRm.openStart("button", sId + "-cancel");

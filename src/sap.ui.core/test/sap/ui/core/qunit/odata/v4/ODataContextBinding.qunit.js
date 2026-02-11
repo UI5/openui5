@@ -701,7 +701,7 @@ sap.ui.define([
 			// no Error is logged because error has canceled flag
 		});
 
-		this.mock(oBinding).expects("createReadGroupLock").withExactArgs("group", true)
+		oBindingMock.expects("createReadGroupLock").withExactArgs("group", true)
 			.callsFake(function () {
 				oBinding.oReadGroupLock = oGroupLock2;
 			});
@@ -772,7 +772,7 @@ sap.ui.define([
 				oReadPromise = bSuccess ? SyncPromise.resolve("value") : SyncPromise.reject(oError);
 
 			oBinding.oReadGroupLock = oReadGroupLock;
-			this.mock(oBinding).expects("lockGroup").never();
+			oBindingMock.expects("lockGroup").never();
 			this.mock(this.oModel).expects("reportError").never();
 			oBindingMock.expects("fireDataRequested").never();
 			oBindingMock.expects("fireDataReceived").never();
@@ -780,7 +780,7 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(_GroupLock.$cached), "bar", sinon.match.func, null)
 				// no read required! .callsArg(2)
 				.returns(oReadPromise);
-			this.mock(oBinding).expects("resolveRefreshPromise")
+			oBindingMock.expects("resolveRefreshPromise")
 				.withExactArgs(sinon.match.same(oReadPromise))
 				.returns(oReadPromise);
 
@@ -1617,7 +1617,7 @@ sap.ui.define([
 				}
 
 				_Helper.setPrivateAnnotation(oResponseEntity, "predicate", "('77')");
-				this.mock(oBinding).expects("ready2Inherit").twice().withExactArgs()
+				oBindingMock.expects("ready2Inherit").twice().withExactArgs()
 					.returns(SyncPromise.resolve());
 				this.mock(this.oModel.getMetaModel()).expects("fetchObject").twice()
 					.withExactArgs("/EntitySet/navigation1/" + sOperation + "/@$ui5.overload")
@@ -1740,7 +1740,7 @@ sap.ui.define([
 				});
 			}
 
-			this.mock(oBinding).expects("ready2Inherit").thrice().withExactArgs()
+			oBindingMock.expects("ready2Inherit").thrice().withExactArgs()
 				.returns(SyncPromise.resolve());
 			oMetaModelMock.expects("fetchObject")
 				.withExactArgs("/TEAMS/name.space.Operation/@$ui5.overload")
@@ -3470,7 +3470,7 @@ sap.ui.define([
 					that = this;
 
 				oBinding.oReturnValueContext = oReturnValueContext;
-				this.mock(oBinding).expects("_findEmptyPathParentContext")
+				oBindingMock.expects("_findEmptyPathParentContext")
 					.withExactArgs(sinon.match.same(oBinding.oElementContext))
 					.returns(oBinding.oElementContext);
 				oBindingMock.expects("_fireChange").withExactArgs({reason : ChangeReason.Remove})
@@ -3508,16 +3508,8 @@ sap.ui.define([
 				).then(function () {
 					assert.ok(bSuccess);
 
-					that.mock(oBinding).expects("createRefreshPromise").never();
-					oBinding.attachChange(function (oEvent) {
-						var oElementContext0 = oBinding.getBoundContext();
-
-						assert.strictEqual(oEvent.getParameter("reason"), ChangeReason.Refresh);
-						assert.strictEqual(oElementContext0.getBinding(), oBinding);
-						assert.strictEqual(oElementContext0.getModelIndex(), undefined);
-						assert.strictEqual(oElementContext0.getModel(), this.oModel);
-						assert.strictEqual(oElementContext0.getPath(), "/EMPLOYEES('42')");
-					});
+					oBindingMock.expects("createRefreshPromise").never();
+					oBindingMock.expects("_fireChange").never(); // no further calls!
 
 					// code under test
 					return oBinding.refreshInternal("", undefined, true);
@@ -4042,7 +4034,7 @@ sap.ui.define([
 
 				assert.strictEqual(oEvent.getParameter("reason"), ChangeReason.Refresh);
 				assert.strictEqual(oElementContext.getBinding(), oBinding);
-				assert.strictEqual(oElementContext.getModelIndex(), undefined);
+				assert.strictEqual(oElementContext.iIndex, undefined);
 				assert.strictEqual(oElementContext.getModel(), this.oModel);
 				assert.strictEqual(oElementContext.getPath(), "/foo/relative");
 			});
@@ -4278,7 +4270,7 @@ sap.ui.define([
 			oBinding.oOperation.bAction = bAction;
 
 			oBindingMock.expects("fetchCache").never();
-			this.mock(oBinding).expects("getDependentBindings")
+			oBindingMock.expects("getDependentBindings")
 				.withExactArgs()
 				.returns([oDependent0, oDependent1]);
 			this.mock(oDependent0).expects("resumeInternal")

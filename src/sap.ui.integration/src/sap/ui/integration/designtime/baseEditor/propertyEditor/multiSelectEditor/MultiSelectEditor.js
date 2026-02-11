@@ -53,7 +53,7 @@ sap.ui.define([
 		metadata: {
 			library: "sap.ui.integration"
 		},
-		renderer: BasePropertyEditor.getMetadata().getRenderer().render
+		renderer: BasePropertyEditor.getMetadata().getRenderer()
 	});
 
 

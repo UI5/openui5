@@ -47,7 +47,7 @@ sap.ui.define([
 		assert.strictEqual(oContext.getModel(), oModel);
 		assert.strictEqual(oContext.getBinding(), oBinding);
 		assert.strictEqual(oContext.getPath(), sPath);
-		assert.strictEqual(oContext.getModelIndex(), 42);
+		assert.strictEqual(oContext.iIndex, 42);
 		assert.strictEqual(oContext.created(), undefined);
 		assert.strictEqual(oContext.isDeleted(), false);
 		assert.strictEqual(oContext.isInactive(), undefined);
@@ -191,29 +191,10 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("getModelIndex() adds number of created contexts", function (assert) {
-		var oBinding = {},
-			oContext;
-
-		oContext = Context.create(null/*oModel*/, oBinding, "/foo", 42);
-
-		assert.strictEqual(oContext.getModelIndex(), 42);
-
-		// simulate ODataListBinding#create (7x)
-		oBinding.iCreatedContexts = 7;
-
-		assert.strictEqual(oContext.getModelIndex(), 49);
-
-		// simulate setKeepAlive and removal from the collection
-		oContext.iIndex = undefined;
-
-		assert.strictEqual(oContext.getModelIndex(), undefined);
-	});
-
-	//*********************************************************************************************
 	QUnit.test("getIndex()", function (assert) {
 		var oBinding = {
-				isFirstCreateAtEnd : function () {}
+				getModelIndex : mustBeMocked,
+				isFirstCreateAtEnd : mustBeMocked
 			},
 			oBindingMock = this.mock(oBinding),
 			oContext0 = Context.create(null/*oModel*/, oBinding, "/foo", 42),
@@ -221,12 +202,11 @@ sap.ui.define([
 			iResult = {/*a number*/};
 
 		oBindingMock.expects("isFirstCreateAtEnd").withExactArgs().returns(undefined);
-		this.mock(oContext0).expects("getModelIndex").returns(iResult);
+		oBindingMock.expects("getModelIndex").withExactArgs(sinon.match.same(oContext0))
+			.returns(iResult);
 
 		// code under test
 		assert.strictEqual(oContext0.getIndex(), iResult);
-
-		this.mock(oContext1).expects("getModelIndex").never();
 
 		// code under test
 		assert.strictEqual(oContext1.getIndex(), undefined);
@@ -252,16 +232,6 @@ sap.ui.define([
 		// simulate a kept-alive context not in the collection
 		assert.strictEqual(Context.create(null/*oModel*/, oBinding, "/foo", undefined).getIndex(),
 			undefined);
-	});
-
-	//*********************************************************************************************
-	QUnit.test("getIndex/getModelIndex: return index after destroy", function (assert) {
-		const oContext = Context.create(undefined/*oModel*/, undefined/*oBinding*/, "/foo", 42);
-
-		// code under test
-		assert.strictEqual(oContext.getIndex(), 42);
-		// code under test
-		assert.strictEqual(oContext.getModelIndex(), 42);
 	});
 
 	//*********************************************************************************************
@@ -1930,6 +1900,7 @@ sap.ui.define([
 		assert.strictEqual(oContext.oBinding, undefined);
 		assert.strictEqual(oContext.oModel, undefined);
 		assert.strictEqual(oContext.sPath, "/EMPLOYEES/42");
+		assert.strictEqual(oContext.getIndex(), 42);
 		assert.strictEqual(oContext.iIndex, 42); // Note: sPath and iIndex mainly define #toString
 		assert.strictEqual(oContext.bKeepAlive, undefined);
 		assert.strictEqual(oContext.oDeletePromise, "~oDeletePromise~");

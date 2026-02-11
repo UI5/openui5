@@ -19149,10 +19149,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="name" text="{Name}"/>\
 	<Text id="adAction1"\
 		text="{= %{#com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsOccupied}\
-			? \'set to occupied\' : \'\'}"/>\
+			? \'set to occupied\' : \'\' }"/>\
 	<Text id="adAction2"\
 		text="{= %{#com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsAvailable}\
-			? \'set to available\' : \'\'}"/>\
+			? \'set to available\' : \'\' }"/>\
 </FlexBox>', {
 			["EMPLOYEES('2')?$select=AGE,ID,Name"
 					+ ",com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsAvailable"
@@ -24202,7 +24202,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="isTotal" text="{@$ui5.node.isTotal}"/>\
 	<Text id="level" text="{@$ui5.node.level}"/>\
 	<Text id="lifecycleStatus" text="{LifecycleStatus}"/>\
-	<Text id="grossAmount" text="{= %{GrossAmount}}"/>\
+	<Text id="grossAmount" text="{= %{GrossAmount} }"/>\
 </t:Table>',
 			that = this;
 
@@ -24390,7 +24390,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="level" text="{= %{@$ui5.node.level} }"/>\
 	<Text id="lifecycleStatus" text="{LifecycleStatus}"/>\
 	<Text id="lifecycleStatusDesc" text="{LifecycleStatusDesc}"/>\
-	<Text id="grossAmount" text="{= %{GrossAmount}}"/>\
+	<Text id="grossAmount" text="{= %{GrossAmount} }"/>\
 	<Text id="currencyCode" text="{CurrencyCode}"/>\
 </Table>',
 			that = this;
@@ -24534,7 +24534,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>
 	<Text id="level" text="{= %{@$ui5.node.level} }"/>
 	<Text id="lifecycleStatus" text="{LifecycleStatus}"/>
-	<Text id="grossAmount" text="{= %{GrossAmount}}"/>
+	<Text id="grossAmount" text="{= %{GrossAmount} }"/>
 	<Text id="salesOrderID" text="{SalesOrderID}"/>
 </Table>`,
 			that = this;
@@ -28293,7 +28293,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			},\
 			$count : ' + bCount + '\
 		}}" threshold="0" visibleRowCount="1">\
-	<Text id="grossAmount" text="{= %{GrossAmount}}"/>\
+	<Text id="grossAmount" text="{= %{GrossAmount} }"/>\
 </t:Table>',
 				that = this;
 
@@ -28506,7 +28506,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oModel = this.createSalesOrdersModel(),
 			sView = '\
 <Table id="table" items="{/SalesOrderList}">\
-	<Text id="grossAmount" text="{= %{GrossAmount}}"/>\
+	<Text id="grossAmount" text="{= %{GrossAmount} }"/>\
 </Table>',
 			that = this;
 
@@ -28952,7 +28952,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			sView = '\
 <Table id="table" items="{/SalesOrderList}">\
 	<Text id="lifecycleStatus" text="{LifecycleStatus}"/>\
-	<Text id="grossAmount" text="{= %{GrossAmount}}"/>\
+	<Text id="grossAmount" text="{= %{GrossAmount} }"/>\
 </Table>',
 			that = this;
 
@@ -29054,7 +29054,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}\
 		}}">\
 	<Text id="region" text="{Region}"/>\
-	<Text id="salesAmount" text="{= %{SalesAmount}}"/>\
+	<Text id="salesAmount" text="{= %{SalesAmount} }"/>\
 </Table>',
 			that = this;
 
@@ -68278,15 +68278,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		<Input id="Name0" value="{Name}"/>\
 		<Input id="Name1" value="{path : \'Name\', parameters : {$$ignoreMessages : false}}"/>\
 		<Input id="Name2" value="{path : \'Name\', parameters : {$$ignoreMessages : true}}"/>\
-		<Input id="Composite0" value="{= ${ID} + ${value : \' - \'} + ${path : \'Name\'}}"/>\
+		<Input id="Composite0" value="{= ${ID} + ${value : \' - \'} + ${path : \'Name\'} }"/>\
 		<Input id="Composite1" value="{= ${ID} + ${value : \' - \'} + ${\
 			path : \'Name\',\
 			parameters : {$$ignoreMessages : false}\
-		}}"/>\
+		} }"/>\
 		<Input id="Composite2" value="{= ${ID} + ${value : \' - \'} + ${\
 			path : \'Name\',\
 			parameters : {$$ignoreMessages : true}\
-		}}"/>\
+		} }"/>\
 		<Input id="Composite3" value="{parts : [\'ID\', {value : \'-\'}, {\
 			path : \'Name\',\
 			parameters : {$$ignoreMessages : false}\
@@ -75756,7 +75756,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				sView = '\
 <Text id="orderCount" text="{$count}"/>\
 <Table id="orders" items="{path : \'/SalesOrderList\', parameters : {$count : true}}">\
-	<Text id="isTransient" text="{= %{@$ui5.context.isTransient}}"/>\
+	<Text id="isTransient" text="{= %{@$ui5.context.isTransient} }"/>\
 	<Text id="order" text="{SalesOrderID}"/>\
 </Table>\
 <Text id="itemCount" text="{$count}"/>\
@@ -76958,7 +76958,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="id" text="{ID}"/>\
 </FlexBox>\
 <FlexBox id="form1" binding="{EMPLOYEE_2_TEAM}">\
-	<Text id="isTransient" text="{= %{@$ui5.context.isTransient}}"/>\
+	<Text id="isTransient" text="{= %{@$ui5.context.isTransient} }"/>\
 </FlexBox>',
 			that = this;
 
@@ -77076,7 +77076,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="name" text="{Name}"/>\
 </FlexBox>\
 <FlexBox id="subform" binding="{}">\
-	<Text id="contentType" text="{= %{Picture@odata.mediaContentType}}"/>\
+	<Text id="contentType" text="{= %{Picture@odata.mediaContentType} }"/>\
 	<Text id="url" text="{= %{Picture} }"/>\
 </FlexBox>',
 			that = this;

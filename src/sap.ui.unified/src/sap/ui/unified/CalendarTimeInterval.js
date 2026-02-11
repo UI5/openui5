@@ -16,6 +16,7 @@ sap.ui.define([
 	'./calendar/DatesRow',
 	'./calendar/MonthPicker',
 	'./calendar/YearPicker',
+	'./calendar/WeeksRow',
 	'sap/ui/core/date/UniversalDate',
 	'./library',
 	'sap/ui/core/format/DateFormat',
@@ -27,7 +28,8 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/unified/DateRange",
 	"sap/ui/core/date/UI5Date",
-	"sap/ui/unified/Calendar"
+	"sap/ui/unified/Calendar",
+	"sap/ui/unified/library"
 ], function(
 	Formatting,
 	Localization,
@@ -41,6 +43,7 @@ sap.ui.define([
 	DatesRow,
 	MonthPicker,
 	YearPicker,
+	WeeksRow,
 	UniversalDate,
 	library,
 	DateFormat,
@@ -52,9 +55,12 @@ sap.ui.define([
 	Log,
 	DateRange,
 	UI5Date,
-	Calendar
+	Calendar,
+	unifiedLibrary
 ) {
 	"use strict";
+
+	const CalendarIntervalType = unifiedLibrary.CalendarIntervalType;
 
 	/*
 	 * Inside the CalendarTimeInterval UniversalDate objects are used. But in the API JS dates are used.
@@ -176,7 +182,8 @@ sap.ui.define([
 			timesRow : {type : "sap.ui.unified.calendar.TimesRow", multiple : false, visibility : "hidden"},
 			datesRow : {type : "sap.ui.unified.calendar.Month", multiple : false, visibility : "hidden"},
 			monthPicker : {type : "sap.ui.unified.calendar.MonthPicker", multiple : false, visibility : "hidden"},
-			yearPicker : {type : "sap.ui.unified.calendar.YearPicker", multiple : false, visibility : "hidden"}
+			yearPicker : {type : "sap.ui.unified.calendar.YearPicker", multiple : false, visibility : "hidden"},
+			weeksRow : {type : "sap.ui.unified.calendar.WeeksRow", multiple : false, visibility : "hidden"}
 
 		},
 		associations: {
@@ -251,6 +258,8 @@ sap.ui.define([
 
 		this._initializeYearPicker();
 
+		this._initializeWeeksRow();
+
 		this.setPickerPopup(false); // to initialize DatesRow
 
 		this._iItemsHead = 15; // if more than this number of items, day information are displayed on top of items
@@ -291,6 +300,13 @@ sap.ui.define([
 		this.setAggregation("yearPicker", oYearPicker);
 
 		oYearPicker._setSelectedDatesControlOrigin(this);
+	};
+
+	CalendarTimeInterval.prototype._initializeWeeksRow = function() {
+		const oWeeksRow = new WeeksRow(this.getId() + "-WeeksRow", {
+			visible: false
+		});
+		this.setAggregation("weeksRow", oWeeksRow);
 	};
 
 	CalendarTimeInterval.prototype._createDatesRow = function() {
@@ -972,6 +988,10 @@ sap.ui.define([
 		Control.prototype.setProperty.apply(this, arguments);
 
 		if (sPropName === "_currentPicker") {
+			const oWeeksRow = this.getAggregation("weeksRow");
+			if (oWeeksRow) {
+				oWeeksRow.setVisible(false);
+			}
 			switch (sPropValue) {
 				case "timesRow": this._iMode = 0; break;
 				case "datesRow": this._iMode = 1; break;
@@ -1012,7 +1032,13 @@ sap.ui.define([
 				} else  {
 					oDate.setUTCDate(oDate.getUTCDate() - iDays);
 				}
+
 				_setDateInDatesRow.call(this, oDate);
+				const oWeeksRow = this.getAggregation("weeksRow");
+				if (oWeeksRow) {
+					oDate.setDate(oDate.getDate() - iDays + 1);
+					oWeeksRow.setStartDate(CalendarUtils._createLocalDate(oDate, false));
+				}
 			}
 			break;
 
@@ -1077,6 +1103,11 @@ sap.ui.define([
 					oDate.setUTCDate(oDate.getUTCDate() + iDays);
 				}
 				_setDateInDatesRow.call(this, oDate);
+				const oWeeksRow = this.getAggregation("weeksRow");
+				if (oWeeksRow) {
+					oDate.setDate(oDate.getDate() - iDays + 1);
+					oWeeksRow.setStartDate(CalendarUtils._createLocalDate(oDate, false));
+				}
 			}
 
 			break;
@@ -1254,6 +1285,26 @@ sap.ui.define([
 		this._getCalendar()._closePickers();
 	}
 
+	CalendarTimeInterval.prototype._showWeeksRow = function() {
+		const oWeeksRow = this.getAggregation("weeksRow");
+		if (!oWeeksRow) {
+			return;
+		}
+
+		const oDatesRow = this.getAggregation("datesRow");
+		if (oDatesRow) {
+			oWeeksRow.setInterval(oDatesRow.getDays());
+			oWeeksRow.setStartDate(oDatesRow.getStartDate());
+			oWeeksRow.setPrimaryCalendarType(oDatesRow.getPrimaryCalendarType());
+			oWeeksRow.setShowWeekNumbers(oDatesRow.getShowWeekNumbers());
+			oWeeksRow.setViewKey(CalendarIntervalType.Day);
+		}
+
+		oWeeksRow.setVisible(true);
+
+		return oWeeksRow;
+	};
+
 	/**
 	 * Shows an embedded day Picker.
 	 * This function assumes there is a "datesRow" aggregation.
@@ -1290,7 +1341,7 @@ sap.ui.define([
 		_setDateInDatesRow.call(this, oDate);
 
 		this._iMode = 1;
-
+		this._showWeeksRow();
 	}
 
 	/**
@@ -1589,7 +1640,10 @@ sap.ui.define([
 	}
 
 	function _handleButton0(oEvent){
-
+		var oWeeksRow = this.getAggregation("weeksRow");
+		if (oWeeksRow) {
+			oWeeksRow.setVisible(false);
+		}
 		if (this._iMode != 1) {
 			_showDayPicker.call(this);
 		} else {

@@ -562,6 +562,143 @@ sap.ui.define([
 		oCalendarTimeInt.destroy();
 	});
 
+	QUnit.module("WeeksRow", {
+		beforeEach: async function () {
+			this.oCal1 = new CalendarTimeInterval("Cal1",{
+				startDate: UI5Date.getInstance("2015", "2", "10", "10", "10", "00"),
+				select: handleSelect,
+				startDateChange: handleStartDateChange
+			}).placeAt("qunit-fixture");
+			this.oCal2 = new CalendarTimeInterval("Cal2",{
+				select: handleSelect,
+				startDateChange: handleStartDateChange,
+				width: "1500px",
+				startDate: UI5Date.getInstance("2015", "2", "10", "8", "57", "10"),
+				items: 24,
+				intervalMinutes: 120,
+				intervalSelection: true,
+				selectedDates: [new DateRange({startDate: UI5Date.getInstance("2015", "7", "13", "10", "25"), endDate: UI5Date.getInstance("2015", "7", "13", "15", "45")})],
+				specialDates: [new DateTypeRange({startDate: UI5Date.getInstance("2015", "7", "14"), type: CalendarDayType.Type01, tooltip: "Text"}),
+					new DateTypeRange({startDate: UI5Date.getInstance("2015", "7", "13", "15", "11"), endDate: UI5Date.getInstance("2015", "7", "13", "19", "15"), type: CalendarDayType.Type02, tooltip: "Text"})],
+				legend: oLegend
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oCal1.destroy();
+			this.oCal2.destroy();
+		}
+	});
+
+	QUnit.test("WeeksRow is initialized", function(assert) {
+		// Assert
+		assert.ok(this.oCal1.getAggregation("weeksRow"), "Calendar1: WeeksRow aggregation exists");
+		assert.ok(this.oCal2.getAggregation("weeksRow"), "Calendar2: WeeksRow aggregation exists");
+		assert.strictEqual(this.oCal1.getAggregation("weeksRow").getMetadata().getName(), "sap.ui.unified.calendar.WeeksRow",
+			"Calendar1: WeeksRow is of correct type");
+		assert.strictEqual(this.oCal2.getAggregation("weeksRow").getMetadata().getName(), "sap.ui.unified.calendar.WeeksRow",
+			"Calendar2: WeeksRow is of correct type");
+	});
+
+	QUnit.test("WeeksRow is not visible initially", function(assert) {
+		// Assert
+		assert.notOk(this.oCal1.getAggregation("weeksRow").getVisible(), "Calendar1: WeeksRow is not visible initially");
+		assert.notOk(this.oCal2.getAggregation("weeksRow").getVisible(), "Calendar2: WeeksRow is not visible initially");
+
+		var oCal1WeeksRow = document.querySelector("#Cal1-WeeksRow");
+		var oCal2WeeksRow = document.querySelector("#Cal2-WeeksRow");
+		assert.notOk(oCal1WeeksRow && window.getComputedStyle(oCal1WeeksRow).display !== "none", "Calendar1: WeeksRow is not rendered as visible");
+		assert.notOk(oCal2WeeksRow && window.getComputedStyle(oCal2WeeksRow).display !== "none", "Calendar2: WeeksRow is not rendered as visible");
+	});
+
+	QUnit.test("WeeksRow is visible when day picker is shown", async function(assert) {
+		// Act - open day picker
+		qutils.triggerEvent("click", "Cal1--Head-B0");
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(this.oCal1.getAggregation("weeksRow").getVisible(), "Calendar1: WeeksRow is visible when day picker is shown");
+
+		var oCal1WeeksRow = document.querySelector("#Cal1-WeeksRow");
+		assert.ok(oCal1WeeksRow && window.getComputedStyle(oCal1WeeksRow).display !== "none", "Calendar1: WeeksRow is rendered as visible");
+
+		// Act - open day picker for Cal2
+		qutils.triggerEvent("click", "Cal2--Head-B0");
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(this.oCal2.getAggregation("weeksRow").getVisible(), "Calendar2: WeeksRow is visible when day picker is shown");
+
+		var oCal2WeeksRow = document.querySelector("#Cal2-WeeksRow");
+		assert.ok(oCal2WeeksRow && window.getComputedStyle(oCal2WeeksRow).display !== "none", "Calendar2: WeeksRow is rendered as visible");
+	});
+
+	QUnit.test("WeeksRow is hidden when switching to month picker", async function(assert) {
+		// Arrange - open day picker first
+		qutils.triggerEvent("click", "Cal1--Head-B0");
+		await nextUIUpdate();
+		assert.ok(this.oCal1.getAggregation("weeksRow").getVisible(), "Calendar1: WeeksRow is visible with day picker");
+
+		// Act - switch to month picker
+		qutils.triggerEvent("click", "Cal1--Head-B1");
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(this.oCal1.getAggregation("weeksRow").getVisible(), "Calendar1: WeeksRow is hidden when month picker is shown");
+
+		var oCal1WeeksRow = document.querySelector("#Cal1-WeeksRow");
+		assert.notOk(oCal1WeeksRow && window.getComputedStyle(oCal1WeeksRow).display !== "none", "Calendar1: WeeksRow is not rendered as visible");
+	});
+
+	QUnit.test("WeeksRow is hidden when switching to year picker", async function(assert) {
+		// Arrange - open day picker first
+		qutils.triggerEvent("click", "Cal2--Head-B0");
+		await nextUIUpdate();
+		assert.ok(this.oCal2.getAggregation("weeksRow").getVisible(), "Calendar2: WeeksRow is visible with day picker");
+
+		// Act - switch to year picker
+		qutils.triggerEvent("click", "Cal2--Head-B2");
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(this.oCal2.getAggregation("weeksRow").getVisible(), "Calendar2: WeeksRow is hidden when year picker is shown");
+
+		var oCal2WeeksRow = document.querySelector("#Cal2-WeeksRow");
+		assert.notOk(oCal2WeeksRow && window.getComputedStyle(oCal2WeeksRow).display !== "none", "Calendar2: WeeksRow is not rendered as visible");
+	});
+
+	QUnit.test("WeeksRow is hidden when returning to time picker", async function(assert) {
+		// Arrange - open day picker first
+		qutils.triggerEvent("click", "Cal1--Head-B0");
+		await nextUIUpdate();
+		assert.ok(this.oCal1.getAggregation("weeksRow").getVisible(), "Calendar1: WeeksRow is visible with day picker");
+
+		// Act - click on day button again to return to time picker
+		qutils.triggerEvent("click", "Cal1--Head-B0");
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(this.oCal1.getAggregation("weeksRow").getVisible(), "Calendar1: WeeksRow is hidden when returning to time picker");
+
+		var oCal1WeeksRow = document.querySelector("#Cal1-WeeksRow");
+		assert.notOk(oCal1WeeksRow && window.getComputedStyle(oCal1WeeksRow).display !== "none", "Calendar1: WeeksRow is not rendered as visible");
+	});
+
+	QUnit.test("WeeksRow is rendered in DOM", async function(assert) {
+		// Act - open day picker
+		qutils.triggerEvent("click", "Cal1--Head-B0");
+		await nextUIUpdate();
+
+		// Assert
+		var oWeeksRowElement = document.querySelector("#Cal1-WeeksRow");
+		assert.ok(oWeeksRowElement, "Calendar1: WeeksRow element exists in DOM");
+		assert.ok(oWeeksRowElement.classList.contains("sapUiCalWeeksRow"), "Calendar1: WeeksRow has correct CSS class");
+
+		// Check that week numbers container is present
+		var oWeeksContainer = oWeeksRowElement.querySelector(".sapUiCalRowWeekNumbers");
+		assert.ok(oWeeksContainer, "Calendar1: Week numbers container exists");
+	});
+
 	QUnit.module("Month Picker", {
 		beforeEach: async function () {
 			this.oCal = new CalendarTimeInterval("Cal1",{
