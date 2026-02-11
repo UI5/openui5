@@ -9827,6 +9827,64 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("getViewIndex", function (assert) {
+		const oBinding = this.bindList("/Set");
+		let oContext = Context.create(null/*oModel*/, oBinding, "/foo", 42);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 42);
+
+		// simulate ODataListBinding#create (7x)
+		oBinding.iCreatedContexts = 7;
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 49);
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", -4);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 3);
+
+		// simulate ODataListBinding#create (4x at the end)
+		oBinding.iCreatedContexts = 4;
+		oBinding.bFirstCreateAtEnd = true;
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", -1);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 0);
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", -4);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 3);
+
+		// simulate a read
+		oBinding.bLengthFinal = true;
+		oBinding.iMaxLength = 6;
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", 0);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 0);
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", 5);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 5);
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", -1);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 6);
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", -4);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 9);
+	});
+
+	//*********************************************************************************************
 	QUnit.test("attachCreateActivate/detachCreateActivate", function (assert) {
 		var oBinding = this.bindList("/Set");
 

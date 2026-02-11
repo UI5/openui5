@@ -3344,7 +3344,7 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.model.odata.v4.Context} oContext - A context
 	 * @returns {number|undefined}
-	 *   The context's index within this binding's collection. The index is <code>undefined</code>
+	 *   The context's index within <code>this.aContexts</code>. The index is <code>undefined</code>
 	 *   if the context is {@link sap.ui.model.odata.v4.Context#isEffectivelyKeptAlive effectively
 	 *   kept alive}, but not in the collection currently.
 	 *
@@ -3449,6 +3449,29 @@ sap.ui.define([
 	 */
 	ODataListBinding.prototype.getSelectionCount = function () {
 		return this.getHeaderContext()?.getProperty("$selectionCount");
+	};
+
+	/**
+	 * Returns the view index, which is the context's index as visible through {@link #getContexts}
+	 * or {@link #requestContexts}. This differs from the {@link #getModelIndex model index} if
+	 * entities have been created at the end (internally such contexts still are kept at the start
+	 * of the collection). For this reason the return value changes if a new entity is created or
+	 * deleted again.
+	 *
+	 * @param {sap.ui.model.odata.v4.Context} oContext
+	 *   A context with an index that is not <code>undefined</code>
+	 * @returns {number}
+	 *   The context's view index as observed from the outside
+	 *
+	 * @private
+	 */
+	ODataListBinding.prototype.getViewIndex = function (oContext) {
+		if (this.bFirstCreateAtEnd) {
+			return oContext.iIndex < 0
+				? (this.bLengthFinal ? this.iMaxLength : 0) - oContext.iIndex - 1
+				: oContext.iIndex;
+		}
+		return oContext.iIndex + this.iCreatedContexts;
 	};
 
 	/**

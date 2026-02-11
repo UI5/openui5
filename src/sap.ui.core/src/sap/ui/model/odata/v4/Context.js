@@ -1002,18 +1002,9 @@ sap.ui.define([
 	 */
 	// DO NOT call this function internally, use iIndex instead!
 	Context.prototype.getIndex = function () {
-		if (this.iIndex === undefined) {
-			return undefined;
-		}
-		if (this.oBinding?.isFirstCreateAtEnd()) {
-			if (this.iIndex < 0) { // this does not include undefined for a kept-alive context
-				return this.oBinding.bLengthFinal
-					? this.oBinding.iMaxLength - this.iIndex - 1
-					: -this.iIndex - 1;
-			}
-			return this.iIndex;
-		}
-		return this.oBinding?.getModelIndex(this) ?? this.iIndex;
+		return this.iIndex !== undefined && this.oBinding
+			? this.oBinding.getViewIndex(this)
+			: this.iIndex;
 	};
 
 	/**

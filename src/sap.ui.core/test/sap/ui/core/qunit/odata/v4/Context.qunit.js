@@ -191,47 +191,24 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("getIndex()", function (assert) {
-		var oBinding = {
-				getModelIndex : mustBeMocked,
-				isFirstCreateAtEnd : mustBeMocked
-			},
-			oBindingMock = this.mock(oBinding),
-			oContext0 = Context.create(null/*oModel*/, oBinding, "/foo", 42),
-			oContext1 = Context.create(null/*oModel*/, {/*ODCB*/}, "/foo"),
-			iResult = {/*a number*/};
-
-		oBindingMock.expects("isFirstCreateAtEnd").withExactArgs().returns(undefined);
-		oBindingMock.expects("getModelIndex").withExactArgs(sinon.match.same(oContext0))
-			.returns(iResult);
+	QUnit.test("getIndex: undefined", function (assert) {
+		const oContext = Context.create({/*oModel*/}, {/*oBinding*/}, "/foo/bar");
 
 		// code under test
-		assert.strictEqual(oContext0.getIndex(), iResult);
+		assert.strictEqual(oContext.getIndex(), undefined);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getIndex: getViewIndex", function (assert) {
+		const oBinding = {
+			getViewIndex : mustBeMocked
+		};
+		const oContext = Context.create({/*oModel*/}, oBinding, "/foo/bar", 0);
+		this.mock(oBinding).expects("getViewIndex").withExactArgs(sinon.match.same(oContext))
+			.returns("~getViewIndex~");
 
 		// code under test
-		assert.strictEqual(oContext1.getIndex(), undefined);
-
-		oBindingMock.expects("isFirstCreateAtEnd").exactly(6).withExactArgs().returns(true);
-		// simulate ODataListBinding#create (4x at the end)
-		oBinding.bFirstCreateAtEnd = true;
-		oBinding.iCreatedContexts = 4;
-
-		// code under test
-		assert.strictEqual(Context.create(null/*oModel*/, oBinding, "/foo", -1).getIndex(), 0);
-		assert.strictEqual(Context.create(null/*oModel*/, oBinding, "/foo", -4).getIndex(), 3);
-
-		// simulate a read
-		oBinding.bLengthFinal = true;
-		oBinding.iMaxLength = 6;
-
-		// code under test
-		assert.strictEqual(Context.create(null/*oModel*/, oBinding, "/foo", 0).getIndex(), 0);
-		assert.strictEqual(Context.create(null/*oModel*/, oBinding, "/foo", 5).getIndex(), 5);
-		assert.strictEqual(Context.create(null/*oModel*/, oBinding, "/foo", -1).getIndex(), 6);
-		assert.strictEqual(Context.create(null/*oModel*/, oBinding, "/foo", -4).getIndex(), 9);
-		// simulate a kept-alive context not in the collection
-		assert.strictEqual(Context.create(null/*oModel*/, oBinding, "/foo", undefined).getIndex(),
-			undefined);
+		assert.strictEqual(oContext.getIndex(), "~getViewIndex~");
 	});
 
 	//*********************************************************************************************
