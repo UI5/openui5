@@ -19,7 +19,7 @@
 							<template:if test="{target>com.sap.vocabularies.Common.v1.Text}">
 								<template:then>
 									<!--  check that IsEmailAddress annotation is available and that it has value true -->
-									<template:if test="{= ${target>com.sap.vocabularies.Communication.v1.IsEmailAddress} &amp;&amp; ${target>com.sap.vocabularies.Communication.v1.IsEmailAddress}.Bool}">
+									<template:if test="{= ${target>com.sap.vocabularies.Communication.v1.IsEmailAddress} &amp;&amp; ${target>com.sap.vocabularies.Communication.v1.IsEmailAddress}.Bool }">
 										<template:then>
 											<ObjectStatus id="{parts: [{path: 'field>'}, {path: 'fieldGroup>'}], formatter: '.id'}"
 												icon="sap-icon://email"
@@ -29,15 +29,15 @@
 										<template:else>
 											<!--  check only the availability of the annotation IsPhoneNumber -->
 											<ObjectStatus id="{parts: [{path: 'field>'}, {path: 'fieldGroup>'}], formatter: '.id'}"
-												icon="{= ${target>com.sap.vocabularies.Communication.v1.IsPhoneNumber} ? 'sap-icon://phone' : ''}"
+												icon="{= ${target>com.sap.vocabularies.Communication.v1.IsPhoneNumber} ? 'sap-icon://phone' : '' }"
 												text="{path: 'target>com.sap.vocabularies.Common.v1.Text', formatter: 'AH.format'}"
-												tooltip="{= ${target>com.sap.vocabularies.Communication.v1.IsPhoneNumber} ? 'Phone' : ''}" />
+												tooltip="{= ${target>com.sap.vocabularies.Communication.v1.IsPhoneNumber} ? 'Phone' : '' }" />
 										</template:else>
 									</template:if>
 								</template:then>
 								<template:else>
 									<!--  check that IsEmailAddress annotation is available and that it has value true -->
-									<template:if test="{= ${target>com.sap.vocabularies.Communication.v1.IsEmailAddress} &amp;&amp; ${target>com.sap.vocabularies.Communication.v1.IsEmailAddress}.Bool}">
+									<template:if test="{= ${target>com.sap.vocabularies.Communication.v1.IsEmailAddress} &amp;&amp; ${target>com.sap.vocabularies.Communication.v1.IsEmailAddress}.Bool }">
 										<template:then>
 											<ObjectStatus id="{parts: [{path: 'field>'}, {path: 'fieldGroup>'}], formatter: '.id'}"
 												icon="sap-icon://email"
@@ -47,9 +47,9 @@
 										<template:else>
 											<!--  check only the availability of the annotation IsPhoneNumber -->
 											<ObjectStatus id="{parts: [{path: 'field>'}, {path: 'fieldGroup>'}], formatter: '.id'}"
-												icon="{= ${target>com.sap.vocabularies.Communication.v1.IsPhoneNumber} ? 'sap-icon://phone' : ''}"
+												icon="{= ${target>com.sap.vocabularies.Communication.v1.IsPhoneNumber} ? 'sap-icon://phone' : '' }"
 												text="{path: 'field>Value', formatter: 'AH.format'}"
-												tooltip="{= ${target>com.sap.vocabularies.Communication.v1.IsPhoneNumber} ? 'Phone' : ''}" />
+												tooltip="{= ${target>com.sap.vocabularies.Communication.v1.IsPhoneNumber} ? 'Phone' : '' }" />
 										</template:else>
 									</template:if>
 								</template:else>

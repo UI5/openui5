@@ -37,7 +37,7 @@ sap.ui.define([
 			library: "sap.ui.integration"
 		},
 		invalidInputError: "BASE_EDITOR.NUMBER.INVALID_BINDING_OR_NUMBER",
-		renderer: BasePropertyEditor.getMetadata().getRenderer().render
+		renderer: BasePropertyEditor.getMetadata().getRenderer()
 	});
 
 	NumberEditor.prototype.getDefaultValidators = function () {

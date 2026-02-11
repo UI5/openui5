@@ -406,8 +406,8 @@ sap.ui.define([
 		assert.ok(oRP.getBeginButton().getVisible(), "Begin button is visible");
 		assert.notOk(oRP.getBeginButton().getEnabled(), "Begin button is disabled");
 		assert.ok(oRP.getShowHeader(), "Header is visible");
-		assert.strictEqual(oRP.getTitle(), sLabelText, "Dialog title text is correct");
-		assert.notOk(oRP.getEndButton(), "End button is destroyed");
+		assert.ok(oRP.getEndButton().getVisible(), "End button is visible");
+		assert.ok(oRP.getEndButton().getEnabled(), "End button is enabled");
 
 		// Cleanup
 		oDP.destroy();
@@ -440,6 +440,57 @@ sap.ui.define([
 
 		// Cleanup
 		oDP.destroy();
+	});
+
+	QUnit.test("Mobile device dialog title with and without associated label", async function(assert) {
+		// Arrange
+		var oSystemStub = this.stub(Device, "system").value({phone: true}),
+			oDP1 = new DatePicker("DP_WithLabel", {
+				placeholder: "Enter date"
+			}),
+			oLabel = new Label({
+				text: "Birth Date",
+				labelFor: oDP1
+			}),
+			oDP2 = new DatePicker("DP_WithoutLabel", {
+				placeholder: "Select date"
+			}),
+			sDefaultTitle = Library.getResourceBundleFor("sap.m").getText("DATEPICKER_DEFAULT_TITLE");
+
+		oLabel.placeAt("qunit-fixture");
+		oDP1.placeAt("qunit-fixture");
+		oDP2.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act - Open DatePicker with associated label
+		oDP1.toggleOpen();
+		await nextUIUpdate();
+		var oPopup1 = oDP1._oPopup;
+		var sTitle1 = oPopup1.getTitle();
+
+		// Assert
+		assert.ok(oPopup1.getShowHeader(), "Header is visible on phone for DatePicker with label");
+		assert.strictEqual(sTitle1, "Birth Date", "Dialog title should match the associated label text");
+
+		// Cleanup first DatePicker
+		oDP1.toggleOpen();
+		await nextUIUpdate();
+
+		// Act - Open DatePicker without associated label
+		oDP2.toggleOpen();
+		await nextUIUpdate();
+		var oPopup2 = oDP2._oPopup;
+		var sTitle2 = oPopup2.getTitle();
+
+		// Assert
+		assert.ok(oPopup2.getShowHeader(), "Header is visible on phone for DatePicker without label");
+		assert.strictEqual(sTitle2, sDefaultTitle, "Dialog title should match the placeholder when no label is associated");
+
+		// Cleanup
+		oDP1.destroy();
+		oDP2.destroy();
+		oLabel.destroy();
+		oSystemStub.restore();
 	});
 
 
@@ -2710,10 +2761,9 @@ sap.ui.define([
 
 		// assert
 		assert.ok(oDialog.getShowHeader(), "Header is shown");
-		assert.ok(oDialog.getShowCloseButton(), "Close button in the header is set");
-		assert.strictEqual(oDialog.getTitle(), "DatePicker Label", "Title is set");
+		assert.notOk(oDialog.getShowCloseButton(), "Close button in the header is not set");
 		assert.strictEqual(oDialog.getBeginButton().getType(), "Emphasized", "OK button type is set");
-		assert.notOk(oDialog.getEndButton(), "Close button in the footer is not set");
+		assert.ok(oDialog.getEndButton(), "Close button in the footer is set");
 
 		// clean
 		oDeviceStub.restore();

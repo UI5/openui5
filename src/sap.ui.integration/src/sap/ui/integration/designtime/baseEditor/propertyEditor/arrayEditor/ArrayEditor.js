@@ -95,7 +95,7 @@ sap.ui.define([
 				}
 			}
 		},
-		renderer: BasePropertyEditor.getMetadata().getRenderer().render
+		renderer: BasePropertyEditor.getMetadata().getRenderer()
 	});
 
 	ArrayEditor.configMetadata = Object.assign({}, BasePropertyEditor.configMetadata, {

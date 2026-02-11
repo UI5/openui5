@@ -89,9 +89,9 @@
 					<m:Button enabled="{= %{@$ui5.node.isExpanded} !== false }"
 						icon="sap-icon://hide" press=".onCreate($event, true)"
 						tooltip="Create New Child (filtered out)"/>
-					<m:Button enabled="{= !%{ui>/bCopy}}" icon="sap-icon://up"
+					<m:Button enabled="{= !%{ui>/bCopy} }" icon="sap-icon://up"
 						press=".onMoveUp" tooltip="Move Up"/>
-					<m:Button enabled="{= !%{ui>/bCopy}}" icon="sap-icon://down"
+					<m:Button enabled="{= !%{ui>/bCopy} }" icon="sap-icon://down"
 						press=".onMoveDown" tooltip="Move Down"/>
 					<m:Button icon="sap-icon://move" press=".onMove($event, '')"
 						tooltip="Move To Parent..."/>

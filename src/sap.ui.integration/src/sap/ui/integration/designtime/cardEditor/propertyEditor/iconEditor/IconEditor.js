@@ -52,7 +52,7 @@ sap.ui.define([
 			library: "sap.ui.integration"
 		},
 		xmlFragment: "sap.ui.integration.designtime.cardEditor.propertyEditor.iconEditor.IconEditor",
-		renderer: BasePropertyEditor.getMetadata().getRenderer().render
+		renderer: BasePropertyEditor.getMetadata().getRenderer()
 	});
 
 	IconEditor.configMetadata = Object.assign(

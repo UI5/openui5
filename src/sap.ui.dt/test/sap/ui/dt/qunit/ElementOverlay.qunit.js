@@ -1216,7 +1216,7 @@ sap.ui.define([
 						}
 					}
 				},
-				renderer: SimpleScrollControl.getMetadata().getRenderer().render
+				renderer: SimpleScrollControl.getMetadata().getRenderer()
 			});
 
 			var fnDone = assert.async();
@@ -1269,7 +1269,7 @@ sap.ui.define([
 						scrollContainers: null // not needed in this test
 					}
 				},
-				renderer: SimpleScrollControl.getMetadata().getRenderer().render
+				renderer: SimpleScrollControl.getMetadata().getRenderer()
 			});
 
 			var fnDone = assert.async();
@@ -1312,7 +1312,7 @@ sap.ui.define([
 						scrollContainers: null
 					}
 				},
-				renderer: SimpleScrollControl.getMetadata().getRenderer().render
+				renderer: SimpleScrollControl.getMetadata().getRenderer()
 			});
 
 			var fnDone = assert.async();
@@ -1379,7 +1379,7 @@ sap.ui.define([
 						scrollContainers: null
 					}
 				},
-				renderer: SimpleScrollControl.getMetadata().getRenderer().render
+				renderer: SimpleScrollControl.getMetadata().getRenderer()
 			});
 
 			var fnDone = assert.async();

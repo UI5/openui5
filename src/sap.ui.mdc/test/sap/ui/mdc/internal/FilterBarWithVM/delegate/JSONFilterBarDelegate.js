@@ -17,16 +17,20 @@ sap.ui.define([
 		const oModifier = modifier || JsControlTreeModifier;
 		const oAppComponent = appComponent || FlUtils.getAppComponentForControl(oFilterBar);
 		const oView = view || FlUtils.getViewForControl(oFilterBar);
-		const sPropertyName = oProperty.key;
-		const oFilterField = await oModifier.createControl("sap.ui.mdc.FilterField", oAppComponent, oView, sId, {
-			dataType: oProperty.dataType,
-			conditions: "{$filters>/conditions/" + sPropertyName + '}',
-			propertyKey: sPropertyName,
-			required: oProperty.required,
-			label: oProperty.label,
-			maxConditions: oProperty.maxConditions,
+		const sPropertyKey = oProperty.key;
+		const mFielterFieldSettings = {
+			propertyKey: sPropertyKey,
 			delegate: {name: "sap/ui/mdc/field/FieldBaseDelegate", payload: {}}
-		});
+		};
+		if (sPropertyKey === "first_ascent") {
+			mFielterFieldSettings.operators = ["EQ", "BT", "TODAY", "YESTERDAY", "TOMORROW", "TODAYFROMTO", "LASTDAYS", "NEXTDAYS"];
+		} else if (sPropertyKey === "rank") {
+			mFielterFieldSettings.operators = ["EQ"];
+		} else if (sPropertyKey === "name") {
+			mFielterFieldSettings.valueHelp = oView.createId("VH1");
+		}
+
+		const oFilterField = await oModifier.createControl("sap.ui.mdc.FilterField", oAppComponent, oView, sId, mFielterFieldSettings);
 		return oFilterField;
 	};
 

@@ -364,6 +364,24 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("aria attributes provided to conditions", (assert) => {
+
+		const oContentPromise = oConditions.getContent();
+		return oContentPromise.then((oContent) => {
+			const oDefineConditionPanel = oContent.getContent()[0];
+			const EXAMPLE_ID = "ExampleID";
+			oConditions.addAriaLabelledBy(EXAMPLE_ID);
+
+			// Check if oDefineConditionPanel has been provided with the aria attributes
+			const aAriaLabelledBy = oDefineConditionPanel.getAriaLabelledBy();
+			assert.ok(aAriaLabelledBy, "aria-labelledby returned from DefineConditionPanel");
+			assert.ok(Array.isArray(aAriaLabelledBy), "aria-labelledby is an array from DefineConditionPanel");
+			assert.equal(aAriaLabelledBy.length, 1, "aria-labelledby has 2 entries from DefineConditionPanel");
+			assert.equal(aAriaLabelledBy[0], EXAMPLE_ID, "aria-labelledby has correct entry from DefineConditionPanel");
+		});
+
+	});
+
 	QUnit.test("valueHelp", (assert) => {
 
 		let sValueHelp = oConditions.getValueHelp();

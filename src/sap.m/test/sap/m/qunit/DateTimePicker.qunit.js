@@ -419,6 +419,57 @@ sap.ui.define([
 	// 	oDTP8._handleWindowResize({name: "Tablet"});
 	// });
 
+	QUnit.test("Mobile device dialog title with and without associated label", async function(assert) {
+		// Arrange
+		var oSystemStub = this.stub(Device, "system").value({phone: true}),
+			oDTP1 = new DateTimePicker("DTP_WithLabel", {
+				placeholder: "Enter date and time"
+			}),
+			oLabel = new Label({
+				text: "Appointment Date",
+				labelFor: oDTP1
+			}),
+			oDTP2 = new DateTimePicker("DTP_WithoutLabel", {
+				placeholder: "Select date and time"
+			}),
+			sDefaultTitle = Library.getResourceBundleFor("sap.m").getText("DATEPICKER_DEFAULT_TITLE");
+
+		oLabel.placeAt("qunit-fixture");
+		oDTP1.placeAt("qunit-fixture");
+		oDTP2.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act - Open DateTimePicker with associated label
+		oDTP1.toggleOpen();
+		await nextUIUpdate();
+		var oPopup1 = oDTP1._oPopup;
+		var sTitle1 = oPopup1.getTitle();
+
+		// Assert
+		assert.ok(oPopup1.getShowHeader(), "Header is visible on phone for DateTimePicker with label");
+		assert.strictEqual(sTitle1, "Appointment Date", "Dialog title should match the associated label text");
+
+		// Cleanup first DateTimePicker
+		oDTP1.toggleOpen();
+		await nextUIUpdate();
+
+		// Act - Open DateTimePicker without associated label
+		oDTP2.toggleOpen();
+		await nextUIUpdate();
+		var oPopup2 = oDTP2._oPopup;
+		var sTitle2 = oPopup2.getTitle();
+
+		// Assert
+		assert.ok(oPopup2.getShowHeader(), "Header is visible on phone for DateTimePicker without label");
+		assert.strictEqual(sTitle2, sDefaultTitle, "Dialog title should match the placeholder when no label is associated");
+
+		// Cleanup
+		oDTP1.destroy();
+		oDTP2.destroy();
+		oLabel.destroy();
+		oSystemStub.restore();
+	});
+
 	QUnit.module("initialFocusedDate property", {
 		beforeEach: async function () {
 			this.oDTp = new DateTimePicker();
@@ -909,10 +960,10 @@ sap.ui.define([
 
 		// assert
 		assert.ok(oDialog.getShowHeader(), "Header is shown");
-		assert.ok(oDialog.getShowCloseButton(), "Close button in the header is set");
+		assert.notOk(oDialog.getShowCloseButton(), "Close button in the header is not set");
 		assert.strictEqual(oDialog.getTitle(), "DatePicker Label", "Title is set");
 		assert.strictEqual(oDialog.getBeginButton().getType(), "Emphasized", "OK button type is set");
-		assert.notOk(oDialog.getEndButton(), "Close button in the footer is not set");
+		assert.ok(oDialog.getEndButton(), "Close button in the footer is set");
 
 		// clean
 		oDeviceStub.restore();

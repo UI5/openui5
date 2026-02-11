@@ -20,8 +20,9 @@ sap.ui.define([
 	"sap/m/Popover",
 	"sap/base/Log",
 	"./DateRange",
-	"sap/ui/core/date/UI5Date"
-
+	"sap/ui/core/date/UI5Date",
+	"./calendar/WeeksRow",
+	"sap/ui/unified/library"
 ], function(
 	CalendarUtils,
 	Calendar,
@@ -39,9 +40,13 @@ sap.ui.define([
 	Popover,
 	Log,
 	DateRange,
-    UI5Date
+    UI5Date,
+	WeeksRow,
+	unifiedLibrary
 ) {
 	"use strict";
+
+	const CalendarIntervalType = unifiedLibrary.CalendarIntervalType;
 
 	/*
 	 * Inside the CalendarDateInterval CalendarDate objects are used. But in the API JS dates are used.
@@ -94,12 +99,24 @@ sap.ui.define([
 			pickerPopup : {type : "boolean", group : "Appearance", defaultValue : false}
 
 		},
+
+		aggregations: {
+			/**
+			 * For internal use only.
+			 * The week row which shows the week numbers.
+			 *
+			 * @since 1.146.0
+			 * @private
+			*/
+			_weeksRow : {type: "sap.ui.unified.calendar.WeeksRow", multiple: false, visibility: "hidden"}
+		},
 		designtime: "sap/ui/unified/designtime/CalendarDateInterval.designtime"
 	}, renderer: CalendarDateIntervalRenderer});
 
 	CalendarDateInterval.prototype.init = function(){
 
 		Calendar.prototype.init.apply(this, arguments);
+		this.setAggregation("_weeksRow", this._createWeekRow(`${this.getId()}-weeks`));
 
 		this._iDaysMonthHead = 35; // if more than this number of days, month names are displayed on top of days
 
@@ -412,6 +429,18 @@ sap.ui.define([
 
 	};
 
+	CalendarDateInterval.prototype._createWeekRow = function(sId){
+		const oWeekRow = new WeeksRow(sId, {
+			startDate: this.getStartDate() || UI5Date.getInstance(),
+			showWeekNumbers: this.getShowWeekNumbers(),
+			primaryCalendarType: this.getPrimaryCalendarType(),
+			interval: this.getDays(),
+			viewKey: CalendarIntervalType.Day
+		});
+
+		return oWeekRow;
+	};
+
 	/**
 	 * Set start date for the interval.
 	 *
@@ -427,21 +456,21 @@ sap.ui.define([
 			return this;
 		}
 
-		var iYear = oStartDate.getFullYear();
+		const iYear = oStartDate.getFullYear();
 		CalendarUtils._checkYearInValidRange(iYear);
 
-		var oCalStartDate = CalendarDate.fromLocalJSDate(oStartDate, this.getPrimaryCalendarType());
+		let oCalStartDate = CalendarDate.fromLocalJSDate(oStartDate, this.getPrimaryCalendarType());
 		if (CalendarUtils._isOutside(oCalStartDate, this._oMinDate, this._oMaxDate)) {
 			throw new Error("Date must be in valid range (minDate and maxDate); " + this);
 		}
 
-		var oMinDate = this.getMinDate();
+		const oMinDate = this.getMinDate();
 		if (oMinDate && oStartDate.getTime() < oMinDate.getTime()) {
 			Log.warning("startDate < minDate -> minDate as startDate set", this);
 			oStartDate = UI5Date.getInstance(oMinDate.getTime());
 		}
 
-		var oMaxDate = this.getMaxDate();
+		const oMaxDate = this.getMaxDate();
 		if (oMaxDate && oStartDate.getTime() > oMaxDate.getTime()) {
 			Log.warning("startDate > maxDate -> maxDate as startDate set", this);
 			oStartDate = UI5Date.getInstance(oMaxDate.getTime());
@@ -451,12 +480,15 @@ sap.ui.define([
 		oCalStartDate = CalendarDate.fromLocalJSDate(oStartDate, this.getPrimaryCalendarType());
 		this._oStartDate = oCalStartDate;
 
-		var oDatesRow = this.getAggregation("month")[0];
+		const oDatesRow = this.getAggregation("month")[0];
 		oDatesRow.setStartDate(oStartDate);
+
+		const oWeeksRow = this.getAggregation("_weeksRow");
+		oWeeksRow.setStartDate(oStartDate);
 
 		this._updateHeader(oCalStartDate);
 
-		var oDate = this._getFocusedDate(true).toLocalJSDate();
+		const oDate = this._getFocusedDate(true).toLocalJSDate();
 		if (!oDatesRow.checkDateFocusable(oDate)) {
 			//focused date not longer visible -> focus start date  (but don't set focus)
 			this._setFocusedDate(oCalStartDate);
@@ -483,14 +515,17 @@ sap.ui.define([
 
 	CalendarDateInterval.prototype.setDays = function(iDays){
 
-		var oYearRangePicker = this.getAggregation("yearRangePicker");
+		const oYearRangePicker = this.getAggregation("yearRangePicker");
 
 		this.setProperty("days", iDays, true);
 
 		iDays = this._getDays(); // to use phone limit
 
-		var oDatesRow = this.getAggregation("month")[0];
-		oDatesRow.setDays(iDays);
+		const oDatesRow = this.getAggregation("month")[0];
+		oDatesRow?.setDays(iDays);
+
+		const oWeeksRow = this.getAggregation("_weeksRow");
+		oWeeksRow?.setInterval(iDays);
 
 		if (!this.getPickerPopup()) {
 			var oMonthPicker = this._getMonthPicker();
@@ -626,6 +661,22 @@ sap.ui.define([
 			throw new Error("Property firstDayOfWeek not supported " + this);
 		}
 
+	};
+
+	CalendarDateInterval.prototype.setShowWeekNumbers = function(bShow) {
+		this.setProperty("showWeekNumbers", bShow);
+		const oWeeksRow = this.getAggregation("_weeksRow");
+		oWeeksRow.setShowWeekNumbers(bShow);
+
+		return this;
+	};
+
+	CalendarDateInterval.prototype.setPrimaryCalendarType = function(sType) {
+		Calendar.prototype.setPrimaryCalendarType.apply(this, arguments);
+		const oWeeksRow = this.getAggregation("_weeksRow");
+		oWeeksRow.setPrimaryCalendarType(sType);
+
+		return this;
 	};
 
 	/**
@@ -1137,6 +1188,10 @@ sap.ui.define([
 		var oDatesRow = this.getAggregation("month")[0];
 		oDatesRow.setStartDate(oLocaleDate);
 
+		const oWeeksRow = this.getAggregation("_weeksRow");
+		if (oWeeksRow) {
+			oWeeksRow.setStartDate(oLocaleDate);
+		}
 		this._updateHeader(oStartDate);
 
 		if (bSetFocusDate) {

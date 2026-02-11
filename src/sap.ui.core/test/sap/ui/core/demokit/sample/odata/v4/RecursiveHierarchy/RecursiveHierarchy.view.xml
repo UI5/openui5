@@ -111,23 +111,23 @@
 					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; %{@$ui5.node.isExpanded} !== false }"
 						icon="sap-icon://hide" press=".onCreate($event, true)"
 						tooltip="Create New Hidden Child"/>
-					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy}}"
+					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy} }"
 						icon="sap-icon://up" press=".onMoveUp" tooltip="Move Up"/>
-					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy}}"
+					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy} }"
 						icon="sap-icon://down" press=".onMoveDown" tooltip="Move Down"/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://move"
 						id="moveToParent" press=".onMove($event, false, '')"
 						tooltip="Move To Parent..."/>
-					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://map"
+					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://map"
 						id="moveJustBeforeSibling" press=".onMove($event, false, '?')"
 						tooltip="Move Just Before Sibling..."/>
-					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://arrow-bottom"
+					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://arrow-bottom"
 						id="moveAsLastChildOf" press=".onMove($event, false, null)"
 						tooltip="Move As Last Child Of..."/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; %{@$ui5.node.level} > 1 }"
 						icon="sap-icon://back-to-top" id="moveToRoot" press=".onMakeRoot"
 						tooltip="Make Root"/>
-					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://pull-down"
+					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://pull-down"
 						id="makeLastRoot" press=".onMakeRoot($event, true)"
 						tooltip="Make Last Root"/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://delete"
@@ -135,7 +135,7 @@
 					<m:Button enabled="{= %{@$ui5.node.isExpanded} !== undefined }"
 						icon="sap-icon://expand-group" id="expandAll" press=".onExpandAll"
 						tooltip="Expand All"/>
-					<m:Button enabled="{= %{@$ui5.node.isExpanded} === true}"
+					<m:Button enabled="{= %{@$ui5.node.isExpanded} === true }"
 						icon="sap-icon://collapse-group" id="collapseAll" press=".onCollapseAll"
 						tooltip="Collapse All"/>
 				</m:FlexBox>
@@ -238,23 +238,23 @@
 					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; %{@$ui5.node.isExpanded} !== false }"
 						icon="sap-icon://hide" press=".onCreate($event, true)"
 						tooltip="Create New Child (filtered out)"/>
-					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy}}"
+					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy} }"
 						icon="sap-icon://up" press=".onMoveUp" tooltip="Move Up"/>
-					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy}}"
+					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy} }"
 						icon="sap-icon://down" press=".onMoveDown" tooltip="Move Down"/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://move"
 						id="moveToParentTreeTable" press=".onMove($event, true)"
 						tooltip="Move To Parent..."/>
-					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://map"
+					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://map"
 						id="moveJustBeforeSiblingTreeTable" press=".onMove($event, true, '?')"
 						tooltip="Move Just Before Sibling..."/>
-					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://arrow-bottom"
+					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://arrow-bottom"
 						id="moveAsLastChildOfTreeTable" press=".onMove($event, true, null)"
 						tooltip="Move As Last Child Of..."/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; %{@$ui5.node.level} > 1 }"
 						icon="sap-icon://back-to-top" id="moveToRootTreeTable" press=".onMakeRoot"
 						tooltip="Make Root"/>
-					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://pull-down"
+					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://pull-down"
 						id="makeLastRootTreeTable" press=".onMakeRoot($event, true)"
 						tooltip="Make Last Root"/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://delete"

@@ -140,7 +140,7 @@ sap.ui.define([
 			this._oDialog.close();
 		},
 
-		renderer: BasePropertyEditor.getMetadata().getRenderer().render
+		renderer: BasePropertyEditor.getMetadata().getRenderer()
 	});
 
 	JsonEditor.configMetadata = Object.assign(

@@ -592,7 +592,7 @@ sap.ui.define([
 			apiVersion: 2,
 			render: function(oRm, oControl) {
 				const oContent = oControl.getAggregation("_content");
-				oRm.openStart("div", oControl);
+				oRm.openStart("div", oControl).openEnd();
 				if (oContent) {
 					oRm.renderControl(oContent);
 				}

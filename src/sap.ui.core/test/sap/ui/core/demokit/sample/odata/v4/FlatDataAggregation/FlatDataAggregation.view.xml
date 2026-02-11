@@ -35,7 +35,7 @@
 		<Column width="10em">
 			<m:Label text="Airline"/>
 			<template>
-				<m:Text text="{airline} - {airlineName}"  visible="{= !%{@$ui5.node.isTotal}}"
+				<m:Text text="{airline} - {airlineName}"  visible="{= !%{@$ui5.node.isTotal} }"
 					wrapping="false"/>
 			</template>
 		</Column>
@@ -48,14 +48,14 @@
 		<Column width="10em">
 			<m:Label text="Departure"/>
 			<template>
-				<m:Text text="{DepAirport} - {DepCity}"  visible="{= !%{@$ui5.node.isTotal}}"
+				<m:Text text="{DepAirport} - {DepCity}"  visible="{= !%{@$ui5.node.isTotal} }"
 					wrapping="false"/>
 			</template>
 		</Column>
 		<Column width="10em">
 			<m:Label text="Destination"/>
 			<template>
-				<m:Text text="{DestAirport} - {DestCity}"  visible="{= !%{@$ui5.node.isTotal}}"
+				<m:Text text="{DestAirport} - {DestCity}"  visible="{= !%{@$ui5.node.isTotal} }"
 					wrapping="false"/>
 			</template>
 		</Column>
@@ -87,7 +87,7 @@
 		<Column width="7em">
 			<m:Label text="Status"/>
 			<template>
-				<m:Text text="{status} - {statusName}" visible="{= !%{@$ui5.node.isTotal}}"
+				<m:Text text="{status} - {statusName}" visible="{= !%{@$ui5.node.isTotal} }"
 					wrapping="false"/>
 			</template>
 		</Column>

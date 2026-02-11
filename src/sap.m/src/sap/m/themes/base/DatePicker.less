@@ -15,6 +15,9 @@
 	&.sapMDialog {
 		padding-bottom: 0;
 	}
+	&.sapMDialog.sapMDialogStretched {
+		max-height: none !important; /* the !important is needed to override the inline set of the max-height by the Dialog */
+	}
 }
 
 html.sap-phone, html.sapUiMedia-Std-Phone {

@@ -383,6 +383,21 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("aria-labelledby attributes provided", (assert) => {
+
+		const aAriaLabelledBy = oContent.getAriaLabelledBy();
+		assert.ok(Array.isArray(aAriaLabelledBy), "aria-labelledby is an array");
+		assert.equal(aAriaLabelledBy.length, 0, "no aria-labelledby by default");
+
+       // Check functionality
+		oContent.addAriaLabelledBy("ID1");
+		oContent.addAriaLabelledBy("ID2");
+		const aAriaLabelledByUpdated = oContent.getAriaLabelledBy();
+		assert.equal(aAriaLabelledByUpdated.length, 2, "two aria-labelledby entries");
+		assert.equal(aAriaLabelledByUpdated[0], "ID1", "first entry");
+		assert.equal(aAriaLabelledByUpdated[1], "ID2", "second entry");
+	});
+
 	QUnit.test("isSingleSelect", (assert) => {
 		oContent.setConfig({maxConditions: -1});
 		assert.equal(oContent.isSingleSelect(), false, "multi-select correctly determined from maxConditions");

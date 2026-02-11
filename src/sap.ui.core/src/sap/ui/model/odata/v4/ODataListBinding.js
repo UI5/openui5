@@ -129,6 +129,7 @@ sap.ui.define([
 		this.sChangeReason = oModel.bAutoExpandSelect && !_Helper.isDataAggregation(mParameters)
 			? "AddVirtualContext"
 			: undefined;
+		// Note: this.aContexts[i].iIndex + this.iCreatedContexts === i
 		// BEWARE: #doReplaceWith can insert a context w/ negative index, but w/o #created promise
 		// into aContexts' area of "created contexts"! And via "keep alive" or selection, we may
 		// end up w/ #created promise outside that area!
@@ -805,7 +806,7 @@ sap.ui.define([
 
 		if (iCount > 0) {
 			const aContexts = this.aContexts;
-			const iModelIndex = oContext.getModelIndex();
+			const iModelIndex = this.getModelIndex(oContext);
 			aContexts.splice(iModelIndex + 1, iCount).forEach((oContext0) => {
 				if (!oContext0.created()) {
 					this.mPreviousContextsByPath[oContext0.getPath()] = oContext0;
@@ -1332,7 +1333,7 @@ sap.ui.define([
 		const sPath = oContext.iIndex === undefined
 			// context is not in aContexts -> use the predicate
 			? _Helper.getRelativePath(oContext.getPath(), this.oHeaderContext.getPath())
-			: String(oContext.getModelIndex());
+			: String(this.getModelIndex(oContext));
 
 		this.iDeletedContexts += 1;
 
@@ -1704,7 +1705,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataListBinding.prototype.doReplaceWith = function (oOldContext, oElement, sPredicate) {
-		var iModelIndex = oOldContext.getModelIndex(),
+		var iModelIndex = this.getModelIndex(oOldContext),
 			bNew,
 			fnOnBeforeDestroy = oOldContext.fnOnBeforeDestroy,
 			fnOnBeforeDestroyClone,
@@ -1809,7 +1810,7 @@ sap.ui.define([
 				return this.requestSideEffects(this.getGroupId(), [""]);
 			}
 			if (iCount) {
-				this.insertGap(oContext.getModelIndex(), iCount);
+				this.insertGap(this.getModelIndex(oContext), iCount);
 				if (!bSilent) {
 					this._fireChange({reason : ChangeReason.Change});
 				}
@@ -3336,6 +3337,26 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the model index, which is the context's index in this binding's collection. This
+	 * differs from the view index if entities have been created at the end. Internally such
+	 * contexts still are kept at the start of the collection. For this reason the return value
+	 * changes if a new entity is added via {@link #create} or deleted again.
+	 *
+	 * @param {sap.ui.model.odata.v4.Context} oContext - A context
+	 * @returns {number|undefined}
+	 *   The context's index within this binding's collection. The index is <code>undefined</code>
+	 *   if the context is {@link sap.ui.model.odata.v4.Context#isEffectivelyKeptAlive effectively
+	 *   kept alive}, but not in the collection currently.
+	 *
+	 * @private
+	 */
+	ODataListBinding.prototype.getModelIndex = function (oContext) {
+		return oContext.iIndex === undefined
+			? undefined
+			: oContext.iIndex + this.iCreatedContexts;
+	};
+
+	/**
 	 * Builds the value for the OData V4 '$orderby' system query option from the given sorters
 	 * and the optional static '$orderby' value which is appended to the sorters.
 	 *
@@ -3847,12 +3868,12 @@ sap.ui.define([
 
 		return oPromise.then(([iCount, iNewIndex, iCollapseCount]) => {
 			if (iCount > 1) { // Note: skip oChildContext which is treated below
-				this.insertGap(oParentContext.getModelIndex(), iCount - 1);
+				this.insertGap(this.getModelIndex(oParentContext), iCount - 1);
 			}
 			if (iCollapseCount) { // Note: _AC#collapse already done!
 				this.collapse(oChildContext, /*bAll*/false, /*bSilent*/true, iCollapseCount);
 			}
-			const iOldIndex = oChildContext.getModelIndex();
+			const iOldIndex = this.getModelIndex(oChildContext);
 			this.aContexts.splice(iOldIndex, 1);
 			// Note: no need to adjust iMaxLength
 			_Helper.insert(this.aContexts, iNewIndex, oChildContext);
@@ -4194,7 +4215,7 @@ sap.ui.define([
 		return this.withCache(function (oCache, sPath, oBinding) {
 			var bDataRequested = false,
 				bDestroyed = false,
-				iModelIndex = oContext.getModelIndex(),
+				iModelIndex = that.getModelIndex(oContext),
 				sPredicate = _Helper.getRelativePath(sContextPath, that.oHeaderContext.getPath()),
 				aPromises = [];
 
@@ -4223,7 +4244,7 @@ sap.ui.define([
 			 *   exists. In this case the context must not be destroyed.
 			 */
 			function onRemove(bStillAlive) {
-				var iIndex = oContext.getModelIndex(),
+				var iIndex = that.getModelIndex(oContext),
 					i;
 
 				if (oContext.iIndex < 0) {
@@ -4333,7 +4354,7 @@ sap.ui.define([
 				}
 			}
 		} else {
-			iIndex = oContext.getModelIndex(); // Note: MUST not be undefined, or we fail utterly!
+			iIndex = this.getModelIndex(oContext); // MUST not be undefined, or we fail utterly!
 			this.iCreatedContexts -= 1; // Note: affects #getModelIndex!
 			if (!this.iCreatedContexts) {
 				this.bFirstCreateAtEnd = undefined;

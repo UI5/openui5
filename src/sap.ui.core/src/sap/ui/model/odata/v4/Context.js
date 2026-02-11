@@ -1013,30 +1013,7 @@ sap.ui.define([
 			}
 			return this.iIndex;
 		}
-		return this.getModelIndex();
-	};
-
-	/**
-	 * Returns the model index, which is the context's index in the binding's collection. This
-	 * differs from the view index if entities have been created at the end. Internally such
-	 * contexts still are kept at the start of the collection. For this reason the return value
-	 * changes if a new entity is added via {@link sap.ui.model.odata.v4.ODataListBinding#create}
-	 * or deleted again.
-	 *
-	 * @returns {number}
-	 *   The context's index within the binding's collection. It is <code>undefined</code> if
-	 *   <ul>
-	 *     <li> it does not belong to a list binding,
-	 *     <li> it is {@link #isKeepAlive kept alive}, but not in the collection currently.
-	 *   </ul>
-	 *
-	 * @private
-	 */
-	Context.prototype.getModelIndex = function () {
-		if (this.iIndex !== undefined && this.oBinding?.iCreatedContexts) {
-			return this.iIndex + this.oBinding.iCreatedContexts;
-		}
-		return this.iIndex;
+		return this.oBinding?.getModelIndex(this) ?? this.iIndex;
 	};
 
 	/**

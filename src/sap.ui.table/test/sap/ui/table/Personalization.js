@@ -1,139 +1,136 @@
+// Note: the HTML page 'Personalization.html' loads this module via data-sap-ui-on-init
+
 sap.ui.define([
-  "sap/ui/table/Table",
-  "sap/ui/commons/Toolbar",
-  "sap/ui/commons/Button",
-  "sap/ui/commons/MessageBox",
-  "sap/ui/commons/ToggleButton",
-  "sap/ui/table/Column",
-  "sap/ui/commons/Label",
-  "sap/ui/core/CustomData",
-  "sap/ui/model/json/JSONModel",
-  "sap/ui/table/TablePersoController",
-  "sap/ui/thirdparty/jquery"
-], function(Table, Toolbar, Button, MessageBox, ToggleButton, Column, Label, CustomData, JSONModel, TablePersoController, jQuery) {
-  "use strict";
-  // Note: the HTML page 'Personalization.html' loads this module via data-sap-ui-on-init
+	"sap/ui/table/Table",
+	"sap/ui/table/Column",
+	"sap/m/Toolbar",
+	"sap/m/Button",
+	"sap/m/ToggleButton",
+	"sap/m/Label",
+	"sap/m/MessageBox",
+	"sap/ui/core/CustomData",
+	"sap/ui/model/json/JSONModel",
+	"sap/ui/thirdparty/jquery"
+], function(Table, Column, Toolbar, Button, ToggleButton, Label, MessageBox, CustomData, JSONModel, jQuery) {
+	"use strict";
 
-  jQuery(function() {
-	  const oData = {
-		  items: [
-			  {name: "Michelle", color: "orange", number: 3.14},
-			  {name: "Joseph", color: "blue", number: 1.618},
-			  {name: "David", color: "green", number: 0}
-		  ],
-		  cols: ["Name", "Color", "Number"]
-	  };
+	const oData = {
+		items: [
+			{name: "Michelle", color: "orange", number: 3.14},
+			{name: "Joseph", color: "blue", number: 1.618},
+			{name: "David", color: "green", number: 0}
+		],
+		cols: ["Name", "Color", "Number"]
+	};
 
-	  //make sure table id suffix is set (this is necessary for personalization)
-	  const oTable = new Table({
-		  toolbar: new Toolbar({
-			  items: [
-				  new Button({
-					  text: "Clear and Refresh",
-					  icon: "sap-icon://refresh",
-					  press: function(oEvent) {
-						  oPersoService.delPersData();
-						  oTPC.refresh().done(function() {
-							  MessageBox.show("Done!", "INFORMATION", "Refresh");
-						  });
-					  }
-				  }),
-				  new Button({
-					  text: "Save",
-					  icon: "sap-icon://save",
-					  press: function(oEvent) {
-						  oTPC.savePersonalizations().done(function() {
-							  MessageBox.show("Done!", "INFORMATION", "Save");
-						  });
-					  }
-				  })
-			  ],
-			  rightItems: [
-				  new ToggleButton({
-					  text: "AutoSave",
-					  icon: "sap-icon://save",
-					  pressed: true,
-					  press: function(oEvent) {
-						  oTPC.setAutoSave(this.getPressed());
-					  }
-				  })
-			  ]
-		  }),
+	//make sure table id suffix is set (this is necessary for personalization)
+	const oTable = new Table({
+		extension: [
+			new Toolbar({
+				content: [
+					new Button({
+						text: "Clear and Refresh",
+						icon: "sap-icon://refresh",
+						press: function(oEvent) {
+							oPersoService.delPersData();
+							oTPC.refresh().done(function() {
+								MessageBox.information("Done!", {title: "Refresh"});
+							});
+						}
+					}),
+					new Button({
+						text: "Save",
+						icon: "sap-icon://save",
+						press: function(oEvent) {
+							oTPC.savePersonalizations().done(function() {
+								MessageBox.information("Done!", {title: "Save"});
+							});
+						}
+					}),
+					new ToggleButton({
+						text: "AutoSave",
+						icon: "sap-icon://save",
+						pressed: true,
+						press: function(oEvent) {
+							oTPC.setAutoSave(this.getPressed());
+						}
+					})
+				]
+			})
+		],
 
-		  columns: jQuery.map(oData.cols, function(sColumn) {
-			  return new Column({
-				  label: new Label({text: sColumn}),
-				  visible: sColumn === "Color" ? false : true, // Color column should be invisible by default
-				  template: new Label({
-					  text: {
-						  path: sColumn.toLowerCase()
-					  }
-				  }),
-				  customData: [
-					  new CustomData({ // PersoService: customDataKey
-						  key: "persoKey",
-						  value: sColumn
-					  })
-				  ],
-				  sortProperty: sColumn.toLowerCase(),
-				  filterProperty: sColumn.toLowerCase()
-			  });
-		  }),
+		columns: jQuery.map(oData.cols, function(sColumn) {
+			return new Column({
+				label: new Label({text: sColumn}),
+				visible: sColumn === "Color" ? false : true, // Color column should be invisible by default
+				template: new Label({
+					text: {
+						path: sColumn.toLowerCase()
+					}
+				}),
+				customData: [
+					new CustomData({ // PersoService: customDataKey
+						key: "persoKey",
+						value: sColumn
+					})
+				],
+				sortProperty: sColumn.toLowerCase(),
+				filterProperty: sColumn.toLowerCase()
+			});
+		}),
 
-		  customData: [
-			  new CustomData({ // PersoService: customDataKey
-				  key: "persoKey",
-				  value: "PersoTable"
-			  })
-		  ]
-	  });
+		customData: [
+			new CustomData({ // PersoService: customDataKey
+				key: "persoKey",
+				value: "PersoTable"
+			})
+		]
+	});
 
-	  oTable.setModel(new JSONModel(oData));
-	  oTable.bindRows("/items");
+	oTable.setModel(new JSONModel(oData));
+	oTable.bindRows("/items");
 
-	  const printPersoData = function(sJSON) {
-		  jQuery("#perso-data").html(sJSON
-				  .replace(/\n/g, "<br>")
-				  .replace(/\s/g, "&nbsp;")
-				  .replace(/(true)/g, "<span style=\"color:green\">$1</span>")
-				  .replace(/(false)/g, "<span style=\"color:red\">$1</span>"));
-	  };
+	const printPersoData = function(sJSON) {
+		jQuery("#perso-data").html(sJSON
+				.replace(/\n/g, "<br>")
+				.replace(/\s/g, "&nbsp;")
+				.replace(/(true)/g, "<span style=\"color:green\">$1</span>")
+				.replace(/(false)/g, "<span style=\"color:red\">$1</span>"));
+	};
 
-	  const oPersoService = {
+	const oPersoService = {
 
-		  getPersData: function() {
-			  const oDeferred = jQuery.Deferred();
-			  const sJSON = window.localStorage.getItem("myTablePersonalization") || "{}";
-			  printPersoData(sJSON);
-			  const oBundle = JSON.parse(sJSON);
-			  oDeferred.resolve(oBundle);
-			  return oDeferred.promise();
-		  },
+		getPersData: function() {
+			const oDeferred = jQuery.Deferred();
+			const sJSON = window.localStorage.getItem("myTablePersonalization") || "{}";
+			printPersoData(sJSON);
+			const oBundle = JSON.parse(sJSON);
+			oDeferred.resolve(oBundle);
+			return oDeferred.promise();
+		},
 
-		  setPersData: function(oBundle) {
-			  const oDeferred = jQuery.Deferred();
-			  const sJSON = JSON.stringify(oBundle, null, 4);
-			  window.localStorage.setItem("myTablePersonalization", sJSON);
-			  printPersoData(sJSON);
-			  oDeferred.resolve();
-			  return oDeferred.promise();
-		  },
+		setPersData: function(oBundle) {
+			const oDeferred = jQuery.Deferred();
+			const sJSON = JSON.stringify(oBundle, null, 4);
+			window.localStorage.setItem("myTablePersonalization", sJSON);
+			printPersoData(sJSON);
+			oDeferred.resolve();
+			return oDeferred.promise();
+		},
 
-		  delPersData: function() {
-			  const oDeferred = jQuery.Deferred();
-			  window.localStorage.removeItem("myTablePersonalization");
-			  printPersoData("");
-			  oDeferred.resolve();
-			  return oDeferred.promise();
-		  }
+		delPersData: function() {
+			const oDeferred = jQuery.Deferred();
+			window.localStorage.removeItem("myTablePersonalization");
+			printPersoData("");
+			oDeferred.resolve();
+			return oDeferred.promise();
+		}
+	};
 
-	  };
+	const oTPC = new undefined/*TablePersoController*/({
+		table: oTable,
+		persoService: oPersoService
+	});
 
-	  const oTPC = new TablePersoController({
-		  table: oTable,
-		  persoService: oPersoService
-	  });
-
-	  oTable.placeAt("table-content");
-  });
+	oTable.placeAt("table-content");
 });

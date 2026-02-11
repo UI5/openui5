@@ -613,7 +613,7 @@ sap.ui.define([
 			return formatMessage(sAddText, [sItemLabel]);
 		},
 
-		renderer: BasePropertyEditor.getMetadata().getRenderer().render
+		renderer: BasePropertyEditor.getMetadata().getRenderer()
 	});
 
 	MapEditor.configMetadata = Object.assign({}, BasePropertyEditor.configMetadata, {

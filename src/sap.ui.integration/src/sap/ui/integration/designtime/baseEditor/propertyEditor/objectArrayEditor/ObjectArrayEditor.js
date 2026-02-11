@@ -59,7 +59,7 @@ sap.ui.define([
 		metadata: {
 			library: "sap.ui.integration"
 		},
-		renderer: CodeEditor.getMetadata().getRenderer().render
+		renderer: CodeEditor.getMetadata().getRenderer()
 	});
 
 	ObjectArrayEditor.configMetadata = Object.assign({}, CodeEditor.configMetadata, {

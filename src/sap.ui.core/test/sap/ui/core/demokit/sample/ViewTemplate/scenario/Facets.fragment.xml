@@ -5,7 +5,7 @@
 	xmlns:scenario="sap.ui.core.sample.ViewTemplate.scenario"
 	xmlns:template="http://schemas.sap.com/sapui5/extension/sap.ui.core.template/1">
 <template:repeat list="{facets>}" var="facet">
-		<template:if test="{= ${facet>RecordType} === 'com.sap.vocabularies.UI.v1.CollectionFacet'}">
+		<template:if test="{= ${facet>RecordType} === 'com.sap.vocabularies.UI.v1.CollectionFacet' }">
 			<template:then>
 				<Panel expandable="true" expanded="true" headerText="{path: 'facet>Label', formatter: 'AH.format'}">
 					<template:with path="facet>Facets" var="facets">
@@ -13,7 +13,7 @@
 					</template:with>
 				</Panel>
 			</template:then>
-			<template:elseif test="{= ${facet>RecordType} === 'com.sap.vocabularies.UI.v1.ReferenceFacet'}">
+			<template:elseif test="{= ${facet>RecordType} === 'com.sap.vocabularies.UI.v1.ReferenceFacet' }">
 				<core:Fragment fragmentName="{= ${path: 'facet>Target', formatter: 'AH.isMultiple'} === 'true'
 					? 'sap.ui.core.sample.ViewTemplate.scenario.TableFacet'
 					: 'sap.ui.core.sample.ViewTemplate.scenario.FormFacet' }" type="XML"/>

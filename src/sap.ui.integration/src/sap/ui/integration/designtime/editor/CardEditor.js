@@ -87,7 +87,7 @@ sap.ui.define([
 				}
 			}
 		},
-		renderer: Editor.getMetadata().getRenderer().render
+		renderer: Editor.getMetadata().getRenderer()
 	});
 
 	CardEditor.prototype.hasPreview = function() {

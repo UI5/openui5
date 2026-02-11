@@ -2262,7 +2262,7 @@ sap.ui.define([
 
 		var oRPO = oTokenizer.getTokensPopup();
 
-		assert.strictEqual(oRPO.getTitle(), Library1.getResourceBundleFor("sap.m").getText("COMBOBOX_PICKER_TITLE"), "Default title should be taken from Resource Bundle");
+		assert.strictEqual(oRPO.getTitle(), Library1.getResourceBundleFor("sap.m").getText("TOKENIZER_MOBILE_DIALOG_TITLE"), "Default title should be taken from Resource Bundle");
 
 		oTokenizer.destroy();
 	});
@@ -2276,7 +2276,7 @@ sap.ui.define([
 
 		const oRPO = oTokenizer.getTokensPopup();
 
-		assert.strictEqual(oRPO.getTitle(), Library1.getResourceBundleFor("sap.m").getText("COMBOBOX_PICKER_TITLE"), "Default title should be taken from Resource Bundle");
+		assert.strictEqual(oRPO.getTitle(), Library1.getResourceBundleFor("sap.m").getText("TOKENIZER_MOBILE_DIALOG_TITLE"), "Default title should be taken from Resource Bundle");
 		assert.strictEqual(oRPO.getBeginButton().getText(), Library1.getResourceBundleFor("sap.m").getText("SUGGESTIONSPOPOVER_CLOSE_BUTTON"), "OK button is rendered correctly");
 		assert.strictEqual(oRPO.getEndButton().getText(), Library1.getResourceBundleFor("sap.m").getText("TOKENIZER_CANCEL_BUTTON"), "Cancel button is rendered correctly");
 		oTokenizer.destroy();
