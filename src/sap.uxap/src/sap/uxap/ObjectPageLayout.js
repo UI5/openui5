@@ -1852,17 +1852,16 @@ sap.ui.define([
 
 		oAnchorBar = this.getAggregation("_anchorBar");
 		aAnchorBarItems = oAnchorBar?.getItems() || [];
-		for (var i = 0; i < aSections.length; i++) {
-			var oSection = aSections[i];
-			if (oSection._getInternalVisible()) {
-				if (aSections.length === 1) {
-					oSection._setAriaLabelledByAnchorButton(undefined);
-				} else {
-					oSection._setAriaLabelledByAnchorButton(aAnchorBarItems[i]);
-				}
-			}
-		}
 
+		if (iVisibleSection === 1 && this._oFirstVisibleSection) {
+			this._oFirstVisibleSection._setAriaLabelledByAnchorButton(undefined);
+		} else {
+			aAnchorBarItems.forEach(function(oAnchorBarItem) {
+				var sSectionId = oAnchorBarItem.getKey(),
+					oSection = Element.getElementById(sSectionId);
+					oSection?._setAriaLabelledByAnchorButton(oAnchorBarItem);
+			});
+		}
 
 		this._setInternalAnchorBarVisible(bVisibleAnchorBar, bInvalidate);
 		this._oFirstVisibleSection = oFirstVisibleSection;
