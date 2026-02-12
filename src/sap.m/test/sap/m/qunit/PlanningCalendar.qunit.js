@@ -4920,8 +4920,32 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("WeeksRow is NOT rendered in views other than Month and Day", async function(assert) {
-		const aOtherViews = [CalendarIntervalType.Hour, CalendarIntervalType.Week, CalendarIntervalType.OneMonth]; // Add any other custom or built-in view keys as needed
+	QUnit.test("WeeksRow is rendered and shows week numbers in week view", async function(assert) {
+		this.oPC.setViewKey(CalendarIntervalType.Week);
+		await nextUIUpdate();
+		const oWeeksRow = document.querySelector('.sapUiCalWeeksRow');
+		assert.ok(oWeeksRow, "WeeksRow is rendered in week view");
+		const oWeekNumbers = oWeeksRow.querySelectorAll('.sapUiCalRowWeekNumber');
+		assert.ok(oWeekNumbers, "Week numbers are rendered");
+		oWeekNumbers.forEach(function(el) {
+			assert.ok(/^Week\s*\d+$/.test(el.textContent), "Week number format is correct: " + el.textContent);
+		});
+	});
+
+	QUnit.test("WeeksRow is rendered and shows week numbers in one month view", async function(assert) {
+		this.oPC.setViewKey(CalendarIntervalType.OneMonth);
+		await nextUIUpdate();
+		const oWeeksRow = document.querySelector('.sapUiCalWeeksRow');
+		assert.ok(oWeeksRow, "WeeksRow is rendered in one month view");
+		const oWeekNumbers = oWeeksRow.querySelectorAll('.sapUiCalRowWeekNumber');
+		assert.ok(oWeekNumbers, "Week numbers are rendered");
+		oWeekNumbers.forEach(function(el) {
+			assert.ok(/^Week\s*\d+$/.test(el.textContent), "Week number format is correct: " + el.textContent);
+		});
+	});
+
+	QUnit.test("WeeksRow is NOT rendered in views which does not support this feature", async function(assert) {
+		const aOtherViews = [CalendarIntervalType.Hour]; // Add any other custom or built-in view keys as needed
 		for (let i = 0; i < aOtherViews.length; i++) {
 			this.oPC.setViewKey(aOtherViews[i]);
 			await nextUIUpdate();
