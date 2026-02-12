@@ -3,14 +3,6 @@
 /* Morning Horizon theme              */
 /* ================================== */
 
-.applyBorderColorAccent(@counter) when (@counter > 0) {
-	.applyBorderColorAccent(@counter - 1);
-
-	.sapFAvatar.sapFAvatarColorAccent@{counter} {
-		border: 0.0625rem solid~"@{sapUiAccent@{counter}}";
-	}
-}
-
 .sapFAvatarGroup {
 	padding: 0.125rem;
 
@@ -21,7 +13,10 @@
 	&:focus {
 		box-shadow: 0 0 0 0.125rem var(--sapContent_FocusColor);
 		outline: none;
-		border-radius: 0.35rem;
+	}
+
+	&.sapFAvatarGroupGroup:focus {
+		border-radius: 2rem;
 	}
 
 	&.sapFAvatarGroupIndividual {
@@ -29,7 +24,9 @@
 		.sapFAvatarGroupItem {
 
 			&:hover:not(:active):not(:focus) {
-				.applyBorderColorAccent(10)
+				.sapFAvatar {
+					border: 0.0625rem solid var(--sapAvatar_Hover_BorderColor);
+				}
 			}
 
 			&:active {
@@ -60,7 +57,21 @@
 		&:hover:not(:active) {
 
 			.sapFAvatarGroupItem {
-				.applyBorderColorAccent(10);
+				.sapFAvatar {
+					border: 0.0625rem solid var(--sapAvatar_Hover_BorderColor);
+				}
+			}
+
+			.sapFAvatarGroupMoreButton {
+
+				.sapMBtnInner {
+					background-color: var(--sapButton_Hover_Background);
+					border: 0.0625rem solid var(--sapButton_Hover_BorderColor);
+
+					.sapMBtnContent {
+						color: var(--sapButton_Hover_TextColor);
+					}
+				}
 			}
 		}
 

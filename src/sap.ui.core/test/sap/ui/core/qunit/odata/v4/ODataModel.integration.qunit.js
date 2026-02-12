@@ -3347,6 +3347,11 @@ sap.ui.define([
 			}).then(function () {
 				checkEvents(assert, bBubble);
 
+				assert.throws(function () {
+					// code under test (JIRA: CPOUI5ODATAV4-3361)
+					oBinding.getBoundContext().setKeepAlive(false);
+				}, new Error("Unsupported " + oBinding));
+
 				if (bSuccess && bBubble) {
 					that.expectRequest("EMPLOYEES('1')", {Name : "Frederic Fall"});
 
@@ -11687,6 +11692,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// check remaining contexts are still transient and reference the expected data. Read next
 	// elements from server.
 	// JIRA: CPOUI5UISERVICESV3-1759, CPOUI5UISERVICESV3-1784
+	//
+	// setKeepAlive(false) is ignored for a transient context (JIRA: CPOUI5ODATAV4-3361)
 	QUnit.test("Create multiple w/o refresh, with $count: (7)", function (assert) {
 		var oBinding,
 			oCreatedContext0,
@@ -11777,6 +11784,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.strictEqual(oCreatedContext0.isTransient(), true);
 			assert.strictEqual(oCreatedContext0.getProperty("Note"), "New 1");
 			assert.strictEqual(oCreatedContext0.getProperty("/SalesOrderList/-1/Note"), "New 1");
+
+			// code under test (JIRA: CPOUI5ODATAV4-3361)
+			oCreatedContext0.setKeepAlive(false);
+			oCreatedContext2.setKeepAlive(false);
 
 			that.expectChange("id", [,, "42", "43"])
 				.expectChange("note", [,, "First SalesOrder", "Second SalesOrder"]);
@@ -16275,7 +16286,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Enable autoExpandSelect mode for dependent ODataContextBindings. The inner
 	// ODataContextBinding *cannot* use its parent binding's cache due to conflicting query options
 	// => it creates an own cache and request.
-	QUnit.test("Auto-$expand/$select: Dependent ODCB with own request", function (assert) {
+	QUnit.test("Auto-$expand/$select: Dependent ODCB with own request", async function (assert) {
 		var sView = '\
 <FlexBox binding="{path : \'/EMPLOYEES(\\\'2\\\')\',\
 			parameters : {\
@@ -16328,7 +16339,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("name", "SAP NetWeaver Gateway Content")
 			.expectChange("age", "32");
 
-		return this.createView(assert, sView, this.createTeaBusiModel({autoExpandSelect : true}));
+		await this.createView(assert, sView, this.createTeaBusiModel({autoExpandSelect : true}));
+
+		const oBindingContext = this.oView.byId("name").getBindingContext();
+
+		assert.throws(function () {
+			// code under test (JIRA: CPOUI5ODATAV4-3361)
+			oBindingContext.setKeepAlive(false);
+		}, new Error("Not a list context path to an entity: " + oBindingContext));
 	});
 
 	//*********************************************************************************************
@@ -23484,6 +23502,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Entity list and detail page with empty-path ODCB. Deferred deletion on the ODCB
 	// which delegates to the ODLB.
 	// JIRA: CPOUI5ODATAV4-1926
+	//
+	// setKeepAlive(false) is ignored for a deleted context (JIRA: CPOUI5ODATAV4-3361)
 	[false, true].forEach(function (bReset) {
 		var sTitle = "CPOUI5ODATAV4-1926: deferred delete, delegate to ODLB, reset=" + bReset;
 
@@ -23540,6 +23560,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				assert.ok(oPageContext.isDeleted(), "the deletion is started here");
 				assert.ok(oRowContext.isDeleted(), "the deletion is performed here");
 				assert.notOk(oPageContext.getModel(), "destroyed, the page binding became unresolved");
+
+				// code under test (JIRA: CPOUI5ODATAV4-3361)
+				oPageContext.setKeepAlive(false);
+				oRowContext.setKeepAlive(false);
 
 				return that.waitForChanges(assert, "deferred delete");
 			}).then(function () {
@@ -24475,6 +24499,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				// code under test (JIRA: CPOUI5ODATAV4-3229)
 				oContext.delete();
 			}, new Error("Unsupported on aggregated data: " + oContext));
+			assert.throws(function () {
+				// code under test (JIRA: CPOUI5ODATAV4-3361)
+				oContext.setKeepAlive(false);
+			}, new Error("Unsupported on aggregated data: " + oContext));
 
 			that.oLogMock.expects("error")
 				.withArgs("Failed to drill-down into (LifecycleStatus='Z')/Note"
@@ -24768,6 +24796,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				assert.throws(function () {
 					// code under test (JIRA: CPOUI5ODATAV4-2768)
 					aContexts[0].getFilter();
+				}, new Error("Not a list context path to an entity: /SalesOrderList/0"));
+
+				aContexts[0].destroy(); // Note: MUST not make a difference below!
+
+				assert.throws(function () {
+					// code under test (JIRA: CPOUI5ODATAV4-3361)
+					aContexts[0].setKeepAlive(false);
 				}, new Error("Not a list context path to an entity: /SalesOrderList/0"));
 			});
 		});
@@ -65387,6 +65422,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			that.oView.byId("list2").requestItems();
 
 			return that.waitForChanges(assert);
+		}).then(function () {
+			const oContext = that.oView.byId("list1").getBinding("items").getCurrentContexts()[0];
+			assert.throws(function () {
+				// code under test (JIRA: CPOUI5ODATAV4-3361)
+				oContext.setKeepAlive(false);
+			}, new Error("Unsupported $$sharedRequest at " + oContext.getBinding()));
 		});
 	});
 
@@ -67324,7 +67365,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//*********************************************************************************************
 	// Scenario: relative ODLB w/o own cache; switch binding context via setContext with transient
 	// rows present. Switch back and expect that transient rows survived.
-	//
 	// JIRA: CPOUI5ODATAV4-1450
 	QUnit.test("ODLB w/o own cache: setContext with transient rows", function (assert) {
 		var oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
@@ -67356,6 +67396,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			assert.strictEqual(oListBinding.aContexts[0].isTransient(), true);
 			assert.strictEqual(oListBinding.aContexts.length, 2);
+
+			assert.throws(function () {
+				// code under test (JIRA: CPOUI5ODATAV4-3361)
+				oListBinding.aContexts[0].setKeepAlive(false);
+			}, new Error("Missing $$ownRequest at " + oListBinding));
 
 			return that.waitForChanges(assert);
 		}).then(function () {
@@ -67580,6 +67625,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.ok(oTableBinding.hasPendingChanges());
 
 			assert.throws(function () {
+				// code under test (JIRA: CPOUI5ODATAV4-3361)
 				oKeptContext.setKeepAlive(false); // BCP: 2380044672
 			}, new Error("Not allowed due to pending changes: " + oKeptContext));
 

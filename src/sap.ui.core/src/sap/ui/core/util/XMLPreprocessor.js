@@ -584,8 +584,6 @@ sap.ui.define([
 			 *   ID of the owning component (since 1.31; needed for extension point support)
 			 * @param {string} oViewInfo.name
 			 *   the view name (since 1.31; needed for extension point support)
-			 * @param {boolean} [oViewInfo.sync]
-			 *   whether the view is synchronous (since 1.57.0; needed for asynchronous XML templating)
 			 * @param {object} [mSettings={}]
 			 *   map/JSON-object with initial property values, etc.
 			 * @param {object} mSettings.bindingContexts
@@ -608,7 +606,7 @@ sap.ui.define([
 					mFragmentCache = {},
 					iNestingLevel = 0,
 					oScope = {}, // for BindingParser.complexParser()
-					/** @deprecated since 1.120.0 */
+					/** @deprecated As of version 1.120.0 */
 					fnSupportInfo = oViewInfo._supportInfo,
 					bWarning = Log.isLoggable(Log.Level.WARNING, sXMLPreprocessor);
 
@@ -1109,19 +1107,17 @@ sap.ui.define([
 						let vBindingInfo;
 						try {
 							vBindingInfo = BindingParser.complexParser(sValue, oScope, bMandatory, true,
-								true, true, null, /*bResolveTypesAsync*/!oViewInfo.sync);
+								true, true, null, true);
 						} catch (e) {
 							return SyncPromise.reject(e);
 						}
 
 						let oTypesPromise;
 						if (vBindingInfo) {
-							if (!oViewInfo.sync) {
-								if (vBindingInfo.wait) {
-									oTypesPromise = SyncPromise.resolve(vBindingInfo.resolved);
-								}
-								vBindingInfo = vBindingInfo.bindingInfo;
+							if (vBindingInfo.wait) {
+								oTypesPromise = SyncPromise.resolve(vBindingInfo.resolved);
 							}
+							vBindingInfo = vBindingInfo.bindingInfo;
 							if (typeof vBindingInfo === "string") {
 								fnCallIfConstant?.();
 								return SyncPromise.resolve(vBindingInfo);
@@ -1155,10 +1151,7 @@ sap.ui.define([
 
 						if (!oTypesPromise) {
 							const oPromise = getAny(oWithControl, vBindingInfo, mSettings, oScope,
-								!oViewInfo.sync);
-							if (oViewInfo.sync && oPromise.isPending()) {
-								error("Async formatter in sync view in " + sValue + " of ", oElement);
-							}
+								true);
 							return oPromise;
 						}
 
@@ -1193,9 +1186,7 @@ sap.ui.define([
 				 */
 				function insertFragment(sFragmentName, oElement, oWithControl) {
 					var oFragmentPromise,
-						fnLoad = oViewInfo.sync
-							? XMLTemplateProcessor.loadTemplate
-							: XMLTemplateProcessor.loadTemplatePromise,
+						fnLoad = XMLTemplateProcessor.loadTemplatePromise,
 						sPreviousName = sCurrentName;
 
 					// Note: It is perfectly valid to include the very same fragment again, as long as
@@ -1323,17 +1314,10 @@ sap.ui.define([
 
 					function asyncRequire() {
 						return new SyncPromise(function (resolve, reject) {
-							var aModules = aURNs.map(sap.ui.require);
-
-							if (aModules.every(Boolean)) {
-								// if all modules have been loaded already, resolve sync
-								// Note: we do not care about edge cases where a module value is falsy
-								resolve(aModules);
-							} else {
-								sap.ui.require(aURNs, function (/*oModule,...*/) {
-									resolve(arguments); // Note: not exactly an Array, but good enough
-								}, reject);
-							}
+							aURNs.map(sap.ui.require);
+							sap.ui.require(aURNs, function (/*oModule,...*/) {
+								resolve(arguments); // Note: not exactly an Array, but good enough
+							}, reject);
 						}).then(function (aModules) {
 							Object.keys(mAlias2URN).forEach(function (sAlias, i) {
 								oScope[sAlias] = aModules[i];
@@ -1358,9 +1342,7 @@ sap.ui.define([
 						aURNs = sModuleNames.split(" ").map(function (sModuleName) {
 							return sModuleName.replace(/\./g, "/");
 						});
-						if (!oViewInfo.sync) {
-							return asyncRequire();
-						}
+						return asyncRequire();
 					}
 					return oSyncPromiseResolved;
 				}
@@ -1620,7 +1602,7 @@ sap.ui.define([
 					oListBinding.enableExtendedChangeDetection();
 					aContexts = oListBinding.getContexts(oBindingInfo.startIndex,
 						oBindingInfo.length || /*no Model#iSizeLimit*/Infinity);
-					if (!oViewInfo.sync && aContexts.dataRequested) {
+					if (aContexts.dataRequested) {
 						oPromise = new SyncPromise(function (resolve) {
 							oListBinding.attachEventOnce("change", resolve);
 						}).then(function () {
@@ -1696,7 +1678,8 @@ sap.ui.define([
 					oBindingInfo = BindingParser.simpleParser("{" + sPath + "}");
 					sVar ??= oBindingInfo.model; // default variable is same model name
 
-					if (sHelper || sVar) { // create a "named context"
+					if (sHelper || sVar) {
+						// create a "named context"
 						oModel = oWithControl.getModel(oBindingInfo.model);
 						if (!oModel) {
 							error("Missing model '" + oBindingInfo.model + "' in ", oElement);
@@ -1715,9 +1698,6 @@ sap.ui.define([
 							vHelperResult = fnHelper(vHelperResult);
 						}
 						oPromise = SyncPromise.resolve(vHelperResult);
-						if (oViewInfo.sync && oPromise.isPending()) {
-							error("Async helper in sync view in ", oElement);
-						}
 						oPromise = oPromise.then(function (vHelperResult0) {
 							if (vHelperResult0 instanceof Context) {
 								oModel = vHelperResult0.getModel();
@@ -1775,7 +1755,7 @@ sap.ui.define([
 				 */
 				function visitAttribute(oElement, oAttribute, oWithControl) {
 					return resolveAttributeBinding(oElement, oAttribute, oWithControl)
-						/** @deprecated since 1.120.0 */
+						/** @deprecated As of version 1.120.0 */
 						.then(function () {
 							if (fnSupportInfo) {
 								fnSupportInfo({
@@ -1857,7 +1837,7 @@ sap.ui.define([
 						return visitAttributes(oNode, oWithControl).then(function () {
 							return visitChildNodes(oNode, oWithControl);
 						})
-						/** @deprecated since 1.120.0 */
+						/** @deprecated As of version 1.120.0 */
 						.then(function () {
 							if (fnSupportInfo) {
 								fnSupportInfo({context : oNode,

@@ -15,7 +15,7 @@ sap.ui.define([
 
 	return Controller.extend("sap.tnt.sample.SideNavigationOverlayMode.C", {
 		onToggleSideNav: async function (oEvent) {
-			var oButton = oEvent.getSource(),
+			var oButton = oEvent.getParameter("button"),
 				oView = this.getView();
 
 			if (!this._oPopover) {

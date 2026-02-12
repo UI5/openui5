@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/m/List",
 	"sap/m/ObjectAttribute",
+	"sap/m/Panel",
 	"sap/m/Select",
 	"sap/m/Text",
 	"sap/m/VBox",
@@ -42,6 +43,7 @@ sap.ui.define([
 	Label,
 	List,
 	ObjectAttribute,
+	Panel,
 	Select,
 	Text,
 	VBox,
@@ -971,6 +973,17 @@ sap.ui.define([
 				ElementUtil.getLabelForElement(this.oLabelControl),
 				"label",
 				"then it returns the dynamic page's title (getTitle().getHeading().getLabel().getText())"
+			);
+		});
+
+		QUnit.test("when getLabelForElement is called with a Panel that has headerText", function(assert) {
+			this.oLabelControl = new Panel("panelId", {
+				headerText: "Panel Header Text"
+			});
+			assert.equal(
+				ElementUtil.getLabelForElement(this.oLabelControl),
+				"Panel Header Text",
+				"then it returns the header text (getHeaderText())"
 			);
 		});
 

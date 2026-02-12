@@ -2452,9 +2452,19 @@ sap.ui.define([
 	 * Destroys (all) the managed object(s) in the aggregation named <code>sAggregationName</code> and empties the
 	 * aggregation. If the aggregation did contain any object, this ManagedObject is marked as changed.
 	 *
+	 * <b>Note:</b> Destroying an aggregation by calling this method (or indirectly via <code>destroy<i>XYZ</i></code>)
+	 * does not call the named aggregation mutators (<code>set<i>XYZ</i></code> for a 0..1 aggregation,
+	 * <code>remove<i>XYZ</i></code> for a 0..n aggregation) for the aggregated children.
+	 * Controls that implement side effects in those methods therefore must also implement similar
+	 * side effects in their <code>destroy<i>XYZ</i></code> method.
+	 *
+	 * While this is understood as inconvenient, it was decided (February 2026, after a thorough investigation),
+	 * not to change it. Too many existing controls depend on the current behavior, and, even worse, would have
+	 * severe problems with a changed behavior.
+	 *
 	 * <b>Note:</b> This method is a low-level API as described in <a href="#lowlevelapi">the class documentation</a>.
 	 * Applications or frameworks must not use this method to generically destroy all objects in an aggregation.
-	 * Use the concrete method destroy<i>XYZ</i> for aggregation 'XYZ' instead.
+	 * Use the concrete method <code>destroy<i>XYZ</i></code> for aggregation 'XYZ' instead.
 	 *
 	 * @param {string}
 	 *            sAggregationName the name of the aggregation
@@ -2476,20 +2486,17 @@ sap.ui.define([
 			return this;
 		}
 
-		// Deleting the aggregation here before destroying the children is a BUG:
+		// Deleting the aggregation here before destroying the children has implications:
 		//
 		// The destroy() method on the children calls _removeChild() on this instance
 		// to properly remove each child from the bookkeeping by executing the named
-		// removeXYZ() method. But as the aggregation is deleted here already,
+		// setXYZ() or removeXYZ() method. But as the aggregation is deleted here already,
 		// _removeChild() doesn't find the child in the bookkeeping and therefore
-		// refuses to work. As a result, side effects from removeXYZ() are missing.
+		// refuses to work. As a result, side effects from setXYZ()/removeXYZ() are missing.
 		//
-		// The lines below marked with 'FIXME DESTROY' sketch a potential fix, but
-		// that fix has proven to be incompatible for several controls that don't
-		// properly implement removeXYZ(). As this might affect custom controls
-		// as well, the fix has been abandoned.
-		//
-		delete this.mAggregations[sAggregationName]; //FIXME DESTROY: should be removed here
+		// See I7a0202de5c3c3b660c22ba2d4cd1a61f61ac0f49 for a comprehensive, but abandoned
+		// try to change the implementation accordingly.
+		delete this.mAggregations[sAggregationName];
 
 		// maybe there is no aggregation to destroy
 		if (Array.isArray(aChildren) && !aChildren.length) {
@@ -2502,11 +2509,9 @@ sap.ui.define([
 		}
 
 		if (aChildren instanceof ManagedObject) {
-			// FIXME DESTROY: this._removeChild(aChildren, sAggregationName, bSuppressInvalidate); // (optional, done by destroy())
 			aChildren.destroy(bSuppressInvalidate);
 
 			//fire aggregation lifecycle event on current parent as the control is removed, but not inserted to a new parent
-			// FIXME DESTROY: no more need to fire event here when destroy ever should be fixed
 			if (this._observer) {
 				this._observer.aggregationChange(this, sAggregationName, "remove", aChildren);
 			}
@@ -2514,7 +2519,6 @@ sap.ui.define([
 			for (i = aChildren.length - 1; i >= 0; i--) {
 				aChild = aChildren[i];
 				if (aChild) {
-					// FIXME DESTROY: this._removeChild(aChild, sAggregationName, bSuppressInvalidate); // (optional, done by destroy())
 					aChild.destroy(bSuppressInvalidate);
 
 					//fire aggregation lifecycle event on current parent as the control is removed, but not inserted to a new parent
@@ -2524,9 +2528,6 @@ sap.ui.define([
 				}
 			}
 		}
-
-		// FIXME DESTROY: // 'delete' aggregation only now so that _removeChild() can still do its cleanup
-		// FIXME DESTROY: delete this.mAggregations[sAggregationName];
 
 		if (!this.isInvalidateSuppressed()) {
 			this.invalidate();

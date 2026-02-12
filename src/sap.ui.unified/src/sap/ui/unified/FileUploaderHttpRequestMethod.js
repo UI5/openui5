@@ -20,11 +20,25 @@ sap.ui.define(["sap/ui/base/DataType"], function(DataType) {
 		 * HTTP request POST method.
 		 * @public
 		 */
+		POST : "POST",
+
+		/**
+		 * HTTP request PUT method.
+		 * @public
+		 */
+		PUT : "PUT",
+
+		/**
+		 * HTTP request POST method.
+		 * @public
+		 * @deprecated Since 1.145.0, use {@link sap.ui.unified.FileUploaderHttpRequestMethod.POST} instead
+		 */
 		Post : "POST",
 
 		/**
 		 * HTTP request PUT method.
 		 * @public
+		 * @deprecated Since 1.145.0, use {@link sap.ui.unified.FileUploaderHttpRequestMethod.PUT} instead
 		 */
 		Put : "PUT"
 

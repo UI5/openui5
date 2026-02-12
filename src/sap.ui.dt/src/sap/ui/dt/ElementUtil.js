@@ -377,6 +377,7 @@ sap.ui.define([
 				|| typeof oElement.getTitle === "function" && oElement.getTitle()
 				|| typeof oElement.getHeading === "function" && oElement.getHeading()
 				|| typeof oElement.getDataSourceLabel === "function" && oElement.getDataSourceLabel()
+				|| typeof oElement.getHeaderText === "function" && oElement.getHeaderText()
 			);
 
 			if (ElementUtil.isElementValid(vFieldLabel)) {

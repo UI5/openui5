@@ -523,15 +523,25 @@ sap.ui.define([
 
 			oRm.openEnd();
 
-			oAppointmentsByDate.oAppointmentsList.getIterator().forEach(function (oAppointmentNode) {
-				var iMaxLevel = oAppointmentsByDate.iMaxLevel,
-					iLevel = oAppointmentNode.level,
-					iWidth = oAppointmentNode.width,
-					oAppointment = oAppointmentNode.getData();
+			oAppointmentsByDate.oAppointmentsList
+				.sort((oAppA, oAppB) => {
+					const oAppointmentA = oAppA.getData();
+					const oAppointmentB = oAppB.getData();
 
-				that.renderAppointment(oRm, oControl, iMaxLevel, iLevel, iWidth, oAppointment, oColumnDate, iColumn, iIndex);
-				iIndex++;
-			});
+					return oAppointmentA.getStartDate().getTime() - oAppointmentB.getStartDate().getTime() ||
+					oAppointmentB.getEndDate().getTime() - oAppointmentA.getEndDate().getTime();
+				})
+				.getIterator()
+				.forEach(function (oAppointmentNode) {
+					var iMaxLevel = oAppointmentsByDate.iMaxLevel,
+						iLevel = oAppointmentNode.level,
+						iWidth = oAppointmentNode.width,
+						oAppointment = oAppointmentNode.getData();
+
+					that.renderAppointment(oRm, oControl, iMaxLevel, iLevel, iWidth, oAppointment, oColumnDate, iColumn, iIndex);
+					iIndex++;
+				});
+
 			oRm.close("div");
 			oRm.close("div");
 		}

@@ -2337,8 +2337,7 @@ sap.ui.define([
 	 *   <ul>
 	 *     <li> this context is not a list binding's context,
 	 *     <li> it is the header context,
-	 *     <li> it is transient,
-	 *     <li> it is deleted and <code>bKeepAlive</code> is <code>true</code>,
+	 *     <li> it is deleted or transient and <code>bKeepAlive</code> is <code>true</code>,
 	 *     <li> it is not part of the list binding's collection, has
 	 *       {@link #hasPendingChanges pending changes}, and shall not be kept alive anymore,
 	 *     <li> it does not point to an entity,
@@ -2362,10 +2361,14 @@ sap.ui.define([
 	Context.prototype.setKeepAlive = function (bKeepAlive, fnOnBeforeDestroy, bRequestMessages) {
 		var that = this;
 
-		if (this.isTransient() || bKeepAlive && this.isDeleted()) {
+		_Helper.getPredicateIndex(this.sPath);
+		if (!bKeepAlive && !this.oBinding) {
+			// Note: a deleted context may already be destroyed
+			return;
+		}
+		if (bKeepAlive && (this.isDeleted() || this.isTransient())) {
 			throw new Error("Unsupported context: " + this);
 		}
-		_Helper.getPredicateIndex(this.sPath);
 		this.oBinding.checkKeepAlive(this, bKeepAlive);
 
 		if (bKeepAlive && bRequestMessages) {

@@ -105,6 +105,8 @@ sap.ui.define([
 			oRm.attr("title", sTooltip);
 		}
 
+		this.enhanceRootTag(oRm, oFlexBox);
+
 		// Close opening tag
 		oRm.openEnd();
 
@@ -207,6 +209,21 @@ sap.ui.define([
 			oItem.addStyleClass(sClass);
 		}
 	};
+
+	/**
+	 * Enhances the root tag of the FlexBox control with additional attributes, styles, or classes.
+	 *
+	 * This method can be used by subclasses of FlexBoxRenderer to add custom attributes, inline styles,
+	 * or CSS classes to the root HTML element of the FlexBox control. It is called during the rendering
+	 * process after all standard FlexBox attributes, styles, and classes have been added to the root tag,
+	 * but before the opening tag is closed. This ensures that any custom enhancements are applied without
+	 * interfering with the core FlexBox styling and layout logic.
+	 *
+	 * @param {sap.ui.core.RenderManager} oRM The RenderManager instance.
+	 * @param {sap.m.FlexBox} oFlexBox The FlexBox control instance for which the root tag is being enhanced.
+	 * @protected
+	 */
+	FlexBoxRenderer.enhanceRootTag = function(oRM, oFlexBox) {};
 
 	return FlexBoxRenderer;
 
