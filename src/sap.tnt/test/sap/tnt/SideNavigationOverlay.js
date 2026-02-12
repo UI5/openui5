@@ -8,10 +8,12 @@ sap.ui.define([
 		"sap/m/Dialog",
 		"sap/m/ResponsivePopover",
 		"sap/m/Text",
+		"sap/f/ShellBar",
 		"sap/tnt/NavigationList",
 		"sap/tnt/NavigationListGroup",
 		"sap/tnt/NavigationListItem",
 		"sap/tnt/SideNavigation",
+		"sap/tnt/ToolPage",
 		"sap/ui/Device",
 		"sap/ui/core/InvisibleText",
 		"sap/ui/core/mvc/Controller"
@@ -20,10 +22,12 @@ sap.ui.define([
 		Dialog,
 		ResponsivePopover,
 		Text,
+		ShellBar,
 		NavigationList,
 		NavigationListGroup,
 		NavigationListItem,
 		SideNavigation,
+		ToolPage,
 		Device,
 		InvisibleText,
 		Controller
@@ -188,7 +192,7 @@ sap.ui.define([
 				if (this._oPopover.isOpen()) {
 					this._oPopover.close();
 				} else {
-					this._oPopover.openBy(oEvent.getSource());
+					this._oPopover.openBy(oEvent.getParameter("button"));
 				}
 			}
 		});
@@ -202,18 +206,18 @@ sap.ui.define([
 				xmlns:core="sap.ui.core"
 				xmlns:mvc="sap.ui.core.mvc"
 				xmlns="sap.m"
+				xmlns:f="sap.f"
 				xmlns:tnt="sap.tnt">
-				<App>
-					<Page id="myPage" title="Side Navigation Example"  enableScrolling="true" class="sapUiResponsivePadding--header">
-						<customHeader>
-							<Bar>
-								<contentLeft>
-									<Button icon="sap-icon://menu2" press="onToggleSideNav" />
-										<Title text="Title"/>
-								</contentLeft>
-							</Bar>
-						</customHeader>
-						<content>
+					<tnt:ToolPage id="myPage" class="sapUiResponsivePadding--header">
+						<tnt:header>
+							<f:ShellBar 
+								id="shellBar"
+								title="Title"
+								showMenuButton="true"
+								menuButtonPressed="onToggleSideNav">
+							</f:ShellBar>
+						</tnt:header>
+						<tnt:mainContents>
 							<HBox fitContainer="true" renderType="Bare">
 								<VBox renderType="Bare" class="sideNavContianer">
 								</VBox>
@@ -256,9 +260,8 @@ sap.ui.define([
 									</NavContainer>
 								</VBox>
 							</HBox>
-						</content>
-					</Page>
-				</App>
+						</tnt:mainContents>
+					</tnt:ToolPage>
 			</mvc:View>
 		`
 	});

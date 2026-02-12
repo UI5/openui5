@@ -131,17 +131,16 @@ sap.ui.define([
 	 *   the original view content as an XML document element
 	 * @param {object} [mSettings]
 	 *   a settings object for the preprocessor
-	 * @param {boolean} [bAsync]
+	 * @param {boolean} [bAsync=true]
 	 *   Whether the view should be async
 	 * @returns {Element|Promise}
 	 *   the processed view content as an XML document element, or a promise on it
 	 */
-	function process(oViewContent, mSettings, bAsync) {
+	function process(oViewContent, mSettings, bAsync = true) {
 		var oViewInfo = {
 			caller : `qux`,
 			componentId : `this._sOwnerId`,
-			name : `this.sViewName`,
-			sync : !bAsync
+			name : `this.sViewName`
 		};
 
 		return XMLPreprocessor.process(oViewContent, oViewInfo, mSettings);
@@ -348,11 +347,10 @@ sap.ui.define([
 			this.oLogMock.expects(`error`).never();
 			// do not flood the console ;-)
 			this.oDebugExpectation = this.oLogMock.expects(`debug`).atLeast(0);
-				//TODO .withExactArgs(sinon.match.string, sinon.match.any, sComponent);
+			//TODO .withExactArgs(sinon.match.string, sinon.match.any, sComponent);
 			//TODO this.oDebugExpectation.callThrough();
 
 			this.oXMLTemplateProcessorMock = this.mock(XMLTemplateProcessor);
-			this.oXMLTemplateProcessorMock.expects(`loadTemplate`).never();
 			this.oXMLTemplateProcessorMock.expects(`loadTemplatePromise`).never();
 
 			// ui5lint-disable-next-line no-globals
@@ -754,7 +752,7 @@ sap.ui.define([
 					`</mvc:View>`
 				], {
 					models : new JSONModel({flag : oFlag})
-				}, undefined, true);
+				});
 			}
 		);
 	});
@@ -938,7 +936,7 @@ sap.ui.define([
 		]
 	}].forEach(function (oFixture) {
 		[false, true].forEach(function (bWarn) {
-			[false, true].forEach(function (bAsync) {
+			[true].forEach(function (bAsync) {
 				var aViewContent = oFixture.aViewContent,
 					vExpected = oFixture.vExpected && oFixture.vExpected.slice();
 
@@ -1837,7 +1835,7 @@ sap.ui.define([
 				`</mvc:View>`
 			], {
 				models : oModel
-			}, /*vExpected*/undefined, true);
+			});
 		});
 	});
 
@@ -1919,7 +1917,7 @@ sap.ui.define([
 				`</mvc:View>`
 			], `Illegal helper result '` + vResult + `' in {0}`, {
 				models : new JSONModel()
-			}, undefined, true);
+			});
 		});
 	});
 
@@ -1949,21 +1947,6 @@ sap.ui.define([
 			bindingContexts : {
 				bar : oModel.createBindingContext(`/my/path`)
 			}
-		});
-	});
-
-	//*********************************************************************************************
-	QUnit.test(`template:with synchronously and helper returning Promise`, function (assert) {
-		return this.checkError(assert, [
-			mvcView(``, {
-				foo : function () {
-					return Promise.resolve();
-				}
-			}, this),
-			`<template:with path="/unused" helper="foo"/>`,
-			`</mvc:View>`
-		], `Async helper in sync view in {0}`, {
-			models : new JSONModel()
 		});
 	});
 
@@ -2276,7 +2259,7 @@ sap.ui.define([
 				}, [
 					`<Text template:require="" text="*true*"/>`,
 					`<In/>`
-				], true);
+				]);
 		});
 	});
 
@@ -2346,20 +2329,8 @@ sap.ui.define([
 				`<Text id="fourth" text="*true*"/>`,
 				`<In id="last"/>`,
 				`<In id="yetAnother"/>`
-			], true);
-		});
-	});
-
-	//*********************************************************************************************
-	QUnit.test(`dynamic fragment names`, function (assert) {
-		this.expectLoad(false, `dynamicFragmentName`, xml(assert, [`<In xmlns="sap.ui.core"/>`]));
-		return this.check(assert, [
-				mvcView(),
-				`<Fragment fragmentName="{= 'dynamicFragmentName' }" type="XML"/>`,
-				`</mvc:View>`
-			], {}, [
-				`<In />`
 			]);
+		});
 	});
 
 	//*********************************************************************************************
@@ -2383,37 +2354,39 @@ sap.ui.define([
 				}
 			}, [
 				`<In />`
-			], true);
+			]);
 	});
 
 	//*********************************************************************************************
-	QUnit.test(`fragment in repeat`, function (assert) {
-		// BEWARE: use fresh XML document for each call because liftChildNodes() makes it empty!
-		// load template is called only once, because it is cached
-		this.expectLoad(false, `myFragment`,
-			xml(assert, [`<In xmlns="sap.ui.core" src="{src}" />`]));
+	[true].forEach(function (bAsync) {
+		QUnit.test(`fragment in repeat, async = ` + bAsync, function (assert) {
+			// BEWARE: use fresh XML document for each call because liftChildNodes() makes it empty!
+			// load template is called only once, because it is cached
+			this.expectLoad(bAsync, `myFragment`,
+				xml(assert, [`<In xmlns="sap.ui.core" src="{src}" />`]));
 
-		return this.check(assert, [
-			mvcView(),
-			`<template:repeat list="{/items}">`,
-			`<Fragment fragmentName="myFragment" type="XML"/>`,
-			`</template:repeat>`,
-			`</mvc:View>`
-		], {
-			models : new JSONModel({
-				items : [{
-					src : `A`
-				}, {
-					src : `B`
-				}, {
-					src : `C`
-				}]
-			})
-		}, [
-			`<In src="A"/>`,
-			`<In src="B"/>`,
-			`<In src="C"/>`
-		]);
+			return this.check(assert, [
+				mvcView(),
+				`<template:repeat list="{/items}">`,
+				`<Fragment fragmentName="myFragment" type="XML"/>`,
+				`</template:repeat>`,
+				`</mvc:View>`
+			], {
+				models : new JSONModel({
+					items : [{
+						src : `A`
+					}, {
+						src : `B`
+					}, {
+						src : `C`
+					}]
+				})
+			}, [
+				`<In src="A"/>`,
+				`<In src="B"/>`,
+				`<In src="C"/>`
+			], bAsync);
+		});
 	});
 
 	//*********************************************************************************************
@@ -2428,146 +2401,156 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test(`error on fragment with simple cyclic reference`, function (assert) {
-		this.expectLoad(false, `cycle`,
-			xml(assert, [`<Fragment xmlns="sap.ui.core" fragmentName="cycle" type="XML"/>`]));
-		return this.checkError(assert, [
-				mvcView(),
-				`<Fragment fragmentName="cycle" type="XML"/>`,
-				`</mvc:View>`
-			], `Cyclic reference to fragment 'cycle' {0}`);
-	});
+	[true].forEach(function (bAsync) {
+		const sTitle = `error on fragment with simple cyclic reference, async = ` + bAsync;
 
-	//*********************************************************************************************
-	QUnit.test(`error on fragment with ping pong cyclic reference`, function (assert) {
-		var aFragmentContent = [
-				`<FragmentDefinition xmlns="sap.ui.core" xmlns:template`
-					+ `="http://schemas.sap.com/sapui5/extension/sap.ui.core.template/1">`,
-				`<template:with path="/foo" var="bar">`,
-				`<template:with path="/bar" var="foo">`,
-				`<Fragment xmlns="sap.ui.core" fragmentName="B" type="XML"/>`,
-				`</template:with>`,
-				`</template:with>`,
-				`</FragmentDefinition>`
-			];
-
-		warn(this.oLogMock, `[ 6] Set unchanged path: /foo`, aFragmentContent[1]);
-		warn(this.oLogMock, `[ 7] Set unchanged path: /bar`, aFragmentContent[2]);
-
-		this.expectLoad(false, `A`, xml(assert, aFragmentContent));
-		this.expectLoad(false, `B`,
-			xml(assert, [`<Fragment xmlns="sap.ui.core" fragmentName="A" type="XML"/>`]));
-
-		return this.checkError(assert, [
-				mvcView(),
-				`<Fragment fragmentName="A" type="XML"/>`,
-				`</mvc:View>`
-			], `Cyclic reference to fragment 'B' {0}`, {
-				models : new JSONModel()
-			}, aFragmentContent[3]);
-	});
-
-	//*********************************************************************************************
-	[false, true].forEach(function (bDebug) {
-		QUnit.test(`tracing, debug=` + bDebug, function (assert) {
-			var oBarModel = new JSONModel({
-					"com.sap.vocabularies.UI.v1.HeaderInfo" : {
-						Title : {
-							Label : {
-								String : `Customer`
-							},
-							Value : {
-								Path : `CustomerName`
-							}
-						}
-					},
-					"com.sap.vocabularies.UI.v1.Identification" : [{
-						Value : {Path : `A`}
-					}, {
-						Value : {Path : `B`}
-					}, {
-						Value : {Path : `C`}
-					}]
-				}),
-				oBazModel = new JSONModel({}),
-				aViewContent = [
-					mvcView(`t`),
-					`<t:with path="bar>Label" var="foo">`,
-					`<t:if test="false">`,
-					`<t:then>`,
-					`<Out />`,
-					`</t:then>`,
-					`<t:elseif test="{bar>Label}">`,
-					`<In />`,
-					`<Fragment fragmentName="myFragment" type="XML"/>`,
-					`</t:elseif>`,
-					`</t:if>`,
-					`</t:with>`,
-					`<t:repeat list="{bar>/com.sap.vocabularies.UI.v1.Identification}" var="foo">`,
-					`<In src="{foo>Value/Path}"/>`,
-					`</t:repeat>`,
-					`<t:if test="{bar>/com.sap.vocabularies.UI.v1.Identification}"/>`,
-					`<t:if test="{bar>/qux}"/>`,
-					`<ExtensionPoint name="staticName"/>`,
-					`<ExtensionPoint name="{:= 'dynamicName' }"/>`,
-					`<ExtensionPoint name="{foo>/some/path}"/>`,
+		QUnit.test(sTitle, function (assert) {
+			this.expectLoad(bAsync, `cycle`,
+				xml(assert, [`<Fragment xmlns="sap.ui.core" fragmentName="cycle" type="XML"/>`]));
+			return this.checkError(assert, [
+					mvcView(),
+					`<Fragment fragmentName="cycle" type="XML"/>`,
 					`</mvc:View>`
+				], `Cyclic reference to fragment 'cycle' {0}`, {}, 1, bAsync);
+		});
+	});
+
+	//*********************************************************************************************
+	[true].forEach(function (bAsync) {
+		const sTitle = `error on fragment with ping pong cyclic reference, async = ` + bAsync;
+
+		QUnit.test(sTitle, function (assert) {
+			var aFragmentContent = [
+					`<FragmentDefinition xmlns="sap.ui.core" xmlns:template`
+						+ `="http://schemas.sap.com/sapui5/extension/sap.ui.core.template/1">`,
+					`<template:with path="/foo" var="bar">`,
+					`<template:with path="/bar" var="foo">`,
+					`<Fragment xmlns="sap.ui.core" fragmentName="B" type="XML"/>`,
+					`</template:with>`,
+					`</template:with>`,
+					`</FragmentDefinition>`
 				];
 
-			if (!bDebug) {
-				warn(this.oLogMock, `Warning(s) during processing of qux`, null);
-			}
-			warn(this.oLogMock, `[ 0] Binding not ready`, aViewContent[19]);
-			this.expectLoad(false, `myFragment`, xml(assert, [
-				`<FragmentDefinition xmlns="sap.ui.core">`,
-				`<In src="fragment"/>`,
-				`</FragmentDefinition>`
-			]));
+			warn(this.oLogMock, `[ 6] Set unchanged path: /foo`, aFragmentContent[1]);
+			warn(this.oLogMock, `[ 7] Set unchanged path: /bar`, aFragmentContent[2]);
 
-			return this.checkTracing(assert, bDebug, [
-				{m : `[ 0] Start processing qux`},
-				{m : `[ 0] bar = /com.sap.vocabularies.UI.v1.HeaderInfo/Title`},
-				{m : `[ 0] baz = /`},
-				{m : `[ 1] foo = /com.sap.vocabularies.UI.v1.HeaderInfo/Title/Label`, d : 1},
-				{m : `[ 2] test == "false" --> false`, d : 2},
-				{m : `[ 2] test == [object Object] --> true`, d : 6},
-				{m : `[ 3] fragmentName = myFragment`, d : 8},
-				{m : `[ 3] Finished`, d : `</Fragment>`},
-				{m : `[ 2] Finished`, d : 10},
-				{m : `[ 1] Finished`, d : 11},
-				{m : `[ 1] Starting`, d : 12},
-				{m : `[ 1] foo = /com.sap.vocabularies.UI.v1.Identification/0`, d : 12},
-				{m : `[ 1] src = A`, d : 13},
-				{m : `[ 1] foo = /com.sap.vocabularies.UI.v1.Identification/1`, d : 12},
-				{m : `[ 1] src = B`, d : 13},
-				{m : `[ 1] foo = /com.sap.vocabularies.UI.v1.Identification/2`, d : 12},
-				{m : `[ 1] src = C`, d : 13},
-				{m : `[ 1] Finished`, d : 14},
-				{m : `[ 1] test == [object Array] --> true`, d : 15},
-				{m : `[ 1] Finished`, d : `</t:if>`},
-				{m : `[ 1] test == undefined --> false`, d : 16},
-				{m : `[ 1] Finished`, d : `</t:if>`},
-				{m : `[ 0] name = dynamicName`, d : 18},
-				{m : `[ 0] Binding not ready for attribute name`, d : 19},
-				{m : `[ 0] Finished processing qux`}
-			], aViewContent, {
-				models : {bar : oBarModel, baz : oBazModel},
-				bindingContexts : {
-					bar : oBarModel.createBindingContext(
-							`/com.sap.vocabularies.UI.v1.HeaderInfo/Title`),
-					baz : oBazModel.createBindingContext(`/`)
+			this.expectLoad(bAsync, `A`, xml(assert, aFragmentContent));
+			this.expectLoad(bAsync, `B`,
+				xml(assert, [`<Fragment xmlns="sap.ui.core" fragmentName="A" type="XML"/>`]));
+
+			return this.checkError(assert, [
+					mvcView(),
+					`<Fragment fragmentName="A" type="XML"/>`,
+					`</mvc:View>`
+				], `Cyclic reference to fragment 'B' {0}`, {
+					models : new JSONModel()
+				}, aFragmentContent[3], bAsync);
+		});
+	});
+
+	//*********************************************************************************************
+	[true].forEach(function (bAsync) {
+		[false, true].forEach(function (bDebug) {
+			QUnit.test(`tracing, async = ` + bAsync + `, debug = ` + bDebug, function (assert) {
+				var oBarModel = new JSONModel({
+						"com.sap.vocabularies.UI.v1.HeaderInfo" : {
+							Title : {
+								Label : {
+									String : `Customer`
+								},
+								Value : {
+									Path : `CustomerName`
+								}
+							}
+						},
+						"com.sap.vocabularies.UI.v1.Identification" : [{
+							Value : {Path : `A`}
+						}, {
+							Value : {Path : `B`}
+						}, {
+							Value : {Path : `C`}
+						}]
+					}),
+					oBazModel = new JSONModel({}),
+					aViewContent = [
+						mvcView(`t`),
+						`<t:with path="bar>Label" var="foo">`,
+						`<t:if test="false">`,
+						`<t:then>`,
+						`<Out />`,
+						`</t:then>`,
+						`<t:elseif test="{bar>Label}">`,
+						`<In />`,
+						`<Fragment fragmentName="myFragment" type="XML"/>`,
+						`</t:elseif>`,
+						`</t:if>`,
+						`</t:with>`,
+						`<t:repeat list="{bar>/com.sap.vocabularies.UI.v1.Identification}" var="foo">`,
+						`<In src="{foo>Value/Path}"/>`,
+						`</t:repeat>`,
+						`<t:if test="{bar>/com.sap.vocabularies.UI.v1.Identification}"/>`,
+						`<t:if test="{bar>/qux}"/>`,
+						`<ExtensionPoint name="staticName"/>`,
+						`<ExtensionPoint name="{:= 'dynamicName' }"/>`,
+						`<ExtensionPoint name="{foo>/some/path}"/>`,
+						`</mvc:View>`
+					];
+
+				if (!bDebug) {
+					warn(this.oLogMock, `Warning(s) during processing of qux`, null);
 				}
-			}, [
-				`<In />`,
-				`<In src="fragment"/>`,
-				`<In src="A"/>`,
-				`<In src="B"/>`,
-				`<In src="C"/>`,
-				`<ExtensionPoint name="staticName"/>`,
-				`<ExtensionPoint name="{:= 'dynamicName' }"/>`,
-				// Note: XML serializer outputs &gt; encoding...
-				`<ExtensionPoint name="{foo&gt;/some/path}"/>`
-			]);
+				warn(this.oLogMock, `[ 0] Binding not ready`, aViewContent[19]);
+				this.expectLoad(bAsync, `myFragment`, xml(assert, [
+					`<FragmentDefinition xmlns="sap.ui.core">`,
+					`<In src="fragment"/>`,
+					`</FragmentDefinition>`
+				]));
+
+				return this.checkTracing(assert, bDebug, [
+					{m : `[ 0] Start processing qux`},
+					{m : `[ 0] bar = /com.sap.vocabularies.UI.v1.HeaderInfo/Title`},
+					{m : `[ 0] baz = /`},
+					{m : `[ 1] foo = /com.sap.vocabularies.UI.v1.HeaderInfo/Title/Label`, d : 1},
+					{m : `[ 2] test == "false" --> false`, d : 2},
+					{m : `[ 2] test == [object Object] --> true`, d : 6},
+					{m : `[ 3] fragmentName = myFragment`, d : 8},
+					{m : `[ 3] Finished`, d : `</Fragment>`},
+					{m : `[ 2] Finished`, d : 10},
+					{m : `[ 1] Finished`, d : 11},
+					{m : `[ 1] Starting`, d : 12},
+					{m : `[ 1] foo = /com.sap.vocabularies.UI.v1.Identification/0`, d : 12},
+					{m : `[ 1] src = A`, d : 13},
+					{m : `[ 1] foo = /com.sap.vocabularies.UI.v1.Identification/1`, d : 12},
+					{m : `[ 1] src = B`, d : 13},
+					{m : `[ 1] foo = /com.sap.vocabularies.UI.v1.Identification/2`, d : 12},
+					{m : `[ 1] src = C`, d : 13},
+					{m : `[ 1] Finished`, d : 14},
+					{m : `[ 1] test == [object Array] --> true`, d : 15},
+					{m : `[ 1] Finished`, d : `</t:if>`},
+					{m : `[ 1] test == undefined --> false`, d : 16},
+					{m : `[ 1] Finished`, d : `</t:if>`},
+					{m : `[ 0] name = dynamicName`, d : 18},
+					{m : `[ 0] Binding not ready for attribute name`, d : 19},
+					{m : `[ 0] Finished processing qux`}
+				], aViewContent, {
+					models : {bar : oBarModel, baz : oBazModel},
+					bindingContexts : {
+						bar : oBarModel.createBindingContext(
+								`/com.sap.vocabularies.UI.v1.HeaderInfo/Title`),
+						baz : oBazModel.createBindingContext(`/`)
+					}
+				}, [
+					`<In />`,
+					`<In src="fragment"/>`,
+					`<In src="A"/>`,
+					`<In src="B"/>`,
+					`<In src="C"/>`,
+					`<ExtensionPoint name="staticName"/>`,
+					`<ExtensionPoint name="{:= 'dynamicName' }"/>`,
+					// Note: XML serializer outputs &gt; encoding...
+					`<ExtensionPoint name="{foo&gt;/some/path}"/>`
+				], bAsync);
+			});
 		});
 	});
 
@@ -2603,133 +2586,102 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	[`outerExtensionPoint`, `{:= 'outerExtensionPoint' }`].forEach(function (sName) {
-		QUnit.test(`<ExtensionPoint name='` + sName + `'>: XML fragment configured`,
-			function (assert) {
-				var oComponentMock = this.mock(Component),
-					aOuterReplacement = [
-						`<template:if test="true" xmlns="sap.ui.core" xmlns:template=`
-							+ `"http://schemas.sap.com/sapui5/extension/sap.ui.core.template/1"`
-							+ ` template:require="foo.Helper bar.Helper">`,
-						`<ExtensionPoint name="outerReplacement"/>`,
-						`</template:if>`
-					];
+	[true].forEach(function (bAsync) {
+		[`outerExtensionPoint`, `{:= 'outerExtensionPoint' }`].forEach(function (sName) {
+			const sTitle = `<ExtensionPoint name='` + sName + `'>: XML fragment configured, async = `
+				+ bAsync;
 
-				// <ExtensionPoint name="outerExtensionPoint">
-				oComponentMock.expects(`getCustomizing`)
-					.withExactArgs(`this._sOwnerId`, {
-						extensionName : `outerExtensionPoint`,
-						name : `this.sViewName`,
-						type : `sap.ui.viewExtensions`
-					})
-					.returns({
-						className : `sap.ui.core.Fragment`,
-						fragmentName : `acme.OuterReplacement`,
-						type : `XML`
-					});
-				this.expectLoad(false, `acme.OuterReplacement`, xml(assert, aOuterReplacement));
-				// Note: mock result of loadTemplate() is not analyzed by check() method, of course
-				warn(this.oLogMock, `[ 2] Constant test condition`, aOuterReplacement[0]);
-				this.expectRequire(false, [`foo/Helper`, `bar/Helper`]);
+		QUnit.test(sTitle, function (assert) {
+			var oComponentMock = this.mock(Component),
+				aOuterReplacement = [
+					`<template:if test="true" xmlns="sap.ui.core" xmlns:template=`
+						+ `"http://schemas.sap.com/sapui5/extension/sap.ui.core.template/1"`
+						+ ` template:require="foo.Helper bar.Helper">`,
+					`<ExtensionPoint name="outerReplacement"/>`,
+					`</template:if>`
+				];
 
-				// <ExtensionPoint name="outerReplacement">
-				// --> nothing configured, just check that it is processed
-				oComponentMock.expects(`getCustomizing`)
-					.withExactArgs(`this._sOwnerId`, {
-						extensionName : `outerReplacement`,
-						name : `acme.OuterReplacement`,
-						type : `sap.ui.viewExtensions`
-					});
+			// <ExtensionPoint name="outerExtensionPoint">
+			oComponentMock.expects(`getCustomizing`)
+				.withExactArgs(`this._sOwnerId`, {
+					extensionName : `outerExtensionPoint`,
+					name : `this.sViewName`,
+					type : `sap.ui.viewExtensions`
+				})
+				.returns({
+					className : `sap.ui.core.Fragment`,
+					fragmentName : `acme.OuterReplacement`,
+					type : `XML`
+				});
+			this.expectLoad(bAsync, `acme.OuterReplacement`, xml(assert, aOuterReplacement));
+			// Note: mock result of loadTemplate() is not analyzed by check() method, of course
+			warn(this.oLogMock, `[ 2] Constant test condition`, aOuterReplacement[0]);
+			this.expectRequire(bAsync, [`foo/Helper`, `bar/Helper`]);
 
-				// <Fragment fragmentName="myFragment" type="XML"/>
-				this.expectLoad(false, `myFragment`, xml(assert, [
-					`<ExtensionPoint name="innerExtensionPoint" xmlns="sap.ui.core"/>`
-				]));
+			// <ExtensionPoint name="outerReplacement">
+			// --> nothing configured, just check that it is processed
+			oComponentMock.expects(`getCustomizing`)
+				.withExactArgs(`this._sOwnerId`, {
+					extensionName : `outerReplacement`,
+					name : `acme.OuterReplacement`,
+					type : `sap.ui.viewExtensions`
+				});
 
-				// <ExtensionPoint name="innerExtensionPoint"/>
-				// --> fragment name is used here!
-				oComponentMock.expects(`getCustomizing`)
-					.withExactArgs(`this._sOwnerId`, {
-						extensionName : `innerExtensionPoint`,
-						name : `myFragment`,
-						type : `sap.ui.viewExtensions`
-					})
-					.returns({
-						className : `sap.ui.core.Fragment`,
-						fragmentName : `acme.InnerReplacement`,
-						type : `XML`
-					});
-				this.expectLoad(false, `acme.InnerReplacement`, xml(assert, [
-					`<ExtensionPoint name="innerReplacement" xmlns="sap.ui.core"/>`
-				]));
+			// <Fragment fragmentName="myFragment" type="XML"/>
+			this.expectLoad(bAsync, `myFragment`, xml(assert, [
+				`<ExtensionPoint name="innerExtensionPoint" xmlns="sap.ui.core"/>`
+			]));
 
-				// <ExtensionPoint name="innerReplacement">
-				// --> nothing configured, just check that it is processed
-				oComponentMock.expects(`getCustomizing`)
-					.withExactArgs(`this._sOwnerId`, {
-						extensionName : `innerReplacement`,
-						name : `acme.InnerReplacement`,
-						type : `sap.ui.viewExtensions`
-					});
+			// <ExtensionPoint name="innerExtensionPoint"/>
+			// --> fragment name is used here!
+			oComponentMock.expects(`getCustomizing`)
+				.withExactArgs(`this._sOwnerId`, {
+					extensionName : `innerExtensionPoint`,
+					name : `myFragment`,
+					type : `sap.ui.viewExtensions`
+				})
+				.returns({
+					className : `sap.ui.core.Fragment`,
+					fragmentName : `acme.InnerReplacement`,
+					type : `XML`
+				});
+			this.expectLoad(bAsync, `acme.InnerReplacement`, xml(assert, [
+				`<ExtensionPoint name="innerReplacement" xmlns="sap.ui.core"/>`
+			]));
 
-				// <ExtensionPoint name="lastExtensionPoint">
-				// --> nothing configured, just check that view name is used again
-				oComponentMock.expects(`getCustomizing`)
-					.withExactArgs(`this._sOwnerId`, {
-						extensionName : `lastExtensionPoint`,
-						name : `this.sViewName`,
-						type : `sap.ui.viewExtensions`
-					});
+			// <ExtensionPoint name="innerReplacement">
+			// --> nothing configured, just check that it is processed
+			oComponentMock.expects(`getCustomizing`)
+				.withExactArgs(`this._sOwnerId`, {
+					extensionName : `innerReplacement`,
+					name : `acme.InnerReplacement`,
+					type : `sap.ui.viewExtensions`
+				});
 
-				return this.check(assert, [
-						mvcView(),
-						`<ExtensionPoint name="` + sName + `">`,
-						`<template:error />`, // this must not be processed!
-						`</ExtensionPoint>`,
-						`<Fragment fragmentName="myFragment" type="XML"/>`,
-						`<ExtensionPoint name="lastExtensionPoint"/>`,
-						`</mvc:View>`
-					], {}, [
-						`<ExtensionPoint name="outerReplacement"/>`,
-						`<ExtensionPoint name="innerReplacement"/>`,
-						`<ExtensionPoint name="lastExtensionPoint"/>`
-					]);
-			}
-		);
-	});
+			// <ExtensionPoint name="lastExtensionPoint">
+			// --> nothing configured, just check that view name is used again
+			oComponentMock.expects(`getCustomizing`)
+				.withExactArgs(`this._sOwnerId`, {
+					extensionName : `lastExtensionPoint`,
+					name : `this.sViewName`,
+					type : `sap.ui.viewExtensions`
+				});
 
-	//*********************************************************************************************
-	QUnit.test(`template:require - single module`, function (assert) {
-		var oRootElement = xml(assert, [
-				mvcView().replace(`>`,
-					` template:require="sap.ui.core.sample.ViewTemplate.scenario.Helper">`),
-				`</mvc:View>`
-			]);
-
-		this.expectRequire(false, [`sap/ui/core/sample/ViewTemplate/scenario/Helper`]);
-
-		process(oRootElement);
-	});
-
-	//*********************************************************************************************
-	QUnit.test(`template:require - multiple modules`, function (assert) {
-		var aModuleNames = [
-				`foo.Helper`,
-				`sap.ui.core.sample.ViewTemplate.scenario.Helper`,
-				`sap.ui.model.odata.AnnotationHelper`
-			],
-			oRootElement = xml(assert, [
-				mvcView().replace(`>`, ` template:require="` + aModuleNames.join(` `) + `">`),
-				`</mvc:View>`
-			]);
-
-		this.expectRequire(false, [
-			`foo/Helper`,
-			`sap/ui/core/sample/ViewTemplate/scenario/Helper`,
-			`sap/ui/model/odata/AnnotationHelper`
-		]);
-
-		process(oRootElement);
+			return this.check(assert, [
+					mvcView(),
+					`<ExtensionPoint name="` + sName + `">`,
+					`<template:error />`, // this must not be processed!
+					`</ExtensionPoint>`,
+					`<Fragment fragmentName="myFragment" type="XML"/>`,
+					`<ExtensionPoint name="lastExtensionPoint"/>`,
+					`</mvc:View>`
+				], {}, [
+					`<ExtensionPoint name="outerReplacement"/>`,
+					`<ExtensionPoint name="innerReplacement"/>`,
+					`<ExtensionPoint name="lastExtensionPoint"/>`
+				], bAsync);
+		});
+		});
 	});
 
 	//*********************************************************************************************
@@ -2883,37 +2835,40 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test(`Performance measurement points`, function (assert) {
-		var aContent = [
-				mvcView(),
-				`<Fragment fragmentName="myFragment" type="XML"/>`,
-				`<Text text="{CustomerName}"/>`,
-				`</mvc:View>`
-			],
-			oAverageSpy = this.spy(Measurement, `average`),
-			oEndSpy = this.spy(Measurement, `end`)
-				.withArgs(`sap.ui.core.util.XMLPreprocessor.process`),
-			oCountSpy = oAverageSpy.withArgs(`sap.ui.core.util.XMLPreprocessor.process`, ``,
-				[`sap.ui.core.util.XMLPreprocessor`]),
-			oCountEndSpy = oEndSpy.withArgs(`sap.ui.core.util.XMLPreprocessor.process`),
-			oInsertSpy = oAverageSpy.withArgs(`sap.ui.core.util.XMLPreprocessor/insertFragment`,
-				``, [`sap.ui.core.util.XMLPreprocessor`]),
-			oInsertEndSpy = oEndSpy.withArgs(`sap.ui.core.util.XMLPreprocessor/insertFragment`),
-			oResolvedSpy = oAverageSpy.withArgs(
-				`sap.ui.core.util.XMLPreprocessor/getResolvedBinding`,
-				``, [`sap.ui.core.util.XMLPreprocessor`]),
-			oResolvedEndSpy = oEndSpy.withArgs(
-				`sap.ui.core.util.XMLPreprocessor/getResolvedBinding`);
+	[true].forEach(function (bAsync) {
+		QUnit.test(`Performance measurement points, async = ` + bAsync, function (assert) {
+			var aContent = [
+					mvcView(),
+					`<Fragment fragmentName="myFragment" type="XML"/>`,
+					`<Text text="{CustomerName}"/>`,
+					`</mvc:View>`
+				],
+				oAverageSpy = this.spy(Measurement, `average`),
+				oEndSpy = this.spy(Measurement, `end`)
+					.withArgs(`sap.ui.core.util.XMLPreprocessor.process`),
+				oCountSpy = oAverageSpy.withArgs(`sap.ui.core.util.XMLPreprocessor.process`, ``,
+					[`sap.ui.core.util.XMLPreprocessor`]),
+				oCountEndSpy = oEndSpy.withArgs(`sap.ui.core.util.XMLPreprocessor.process`),
+				oInsertSpy = oAverageSpy.withArgs(`sap.ui.core.util.XMLPreprocessor/insertFragment`,
+					``, [`sap.ui.core.util.XMLPreprocessor`]),
+				oInsertEndSpy = oEndSpy.withArgs(`sap.ui.core.util.XMLPreprocessor/insertFragment`),
+				oResolvedSpy = oAverageSpy.withArgs(
+					`sap.ui.core.util.XMLPreprocessor/getResolvedBinding`,
+					``, [`sap.ui.core.util.XMLPreprocessor`]),
+				oResolvedEndSpy = oEndSpy.withArgs(
+					`sap.ui.core.util.XMLPreprocessor/getResolvedBinding`);
 
-		this.expectLoad(false, `myFragment`, xml(assert, [`<In xmlns="sap.ui.core"/>`]));
+			this.expectLoad(bAsync, `myFragment`, xml(assert, [`<In xmlns="sap.ui.core"/>`]));
 
-		process(xml(assert, aContent));
-		assert.strictEqual(oCountSpy.callCount, 1, `process`);
-		assert.strictEqual(oInsertSpy.callCount, 1, `insertFragment`);
-		assert.strictEqual(oResolvedSpy.callCount, 6, `getResolvedBinding`);
-		assert.strictEqual(oCountEndSpy.callCount, 1, `process end`);
-		assert.strictEqual(oInsertEndSpy.callCount, 1, `insertFragment end`);
-		assert.strictEqual(oResolvedEndSpy.callCount, 6, `getResolvedBinding end`);
+			return SyncPromise.resolve(process(xml(assert, aContent), {}, bAsync)).then(function () {
+				assert.strictEqual(oCountSpy.callCount, 1, `process`);
+				assert.strictEqual(oInsertSpy.callCount, 1, `insertFragment`);
+				assert.strictEqual(oResolvedSpy.callCount, 6, `getResolvedBinding`);
+				assert.strictEqual(oCountEndSpy.callCount, 1, `process end`);
+				assert.strictEqual(oInsertEndSpy.callCount, 1, `insertFragment end`);
+				assert.strictEqual(oResolvedEndSpy.callCount, 6, `getResolvedBinding end`);
+			});
+		});
 	});
 
 	//*********************************************************************************************
@@ -3011,7 +2966,7 @@ sap.ui.define([
 				// must not override other visitors
 				XMLPreprocessor.plugIn(fnVisitor, `foo`, `Invalid`);
 
-				await process(oXml, {models : new JSONModel()}, /*bAsync*/true);
+				await process(oXml, {models : new JSONModel()});
 			} finally {
 				// remove old visitors
 				// Q: should we delete from mVisitors? A: No, we cannot observe it anyway...
@@ -3224,7 +3179,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	[false, true].forEach(function (bAsync) {
+	[true].forEach(function (bAsync) {
 		QUnit.test(`plugIn, visitAttribute; async = ` + bAsync, function (assert) {
 			var oModel = bAsync
 				? asyncModel({answer : 42})
@@ -3253,7 +3208,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	[false, true].forEach(function (bAsync) {
+	[true].forEach(function (bAsync) {
 		QUnit.test(`plugIn, visitAttributes; async = ` + bAsync, function (assert) {
 			var oModel = bAsync
 				? asyncModel({answer : 42})
@@ -3282,7 +3237,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	[false, true].forEach(function (bAsync) {
+	[true].forEach(function (bAsync) {
 		QUnit.test(`plugIn, visitChildNodes; async = ` + bAsync, function (assert) {
 			var oModel = bAsync
 				? asyncModel({answer : 42})
@@ -3311,7 +3266,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	[false, true].forEach(function (bAsync) {
+	[true].forEach(function (bAsync) {
 		QUnit.test(`plugIn, visitNode; async = ` + bAsync, function (assert) {
 			var oModel = bAsync
 				? asyncModel({answer : 42, pi : 3.14})
@@ -3350,7 +3305,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	[false, true].forEach(function (bAsync) {
+	[true].forEach(function (bAsync) {
 		QUnit.test(`plugIn, visitNodeWrapper; async = ` + bAsync, function (assert) {
 			var oModel = bAsync
 				? asyncModel({answer : 42, pi : 3.14})
@@ -3381,7 +3336,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	[false, true].forEach(function (bAsync) {
+	[true].forEach(function (bAsync) {
 		QUnit.test(`plugIn, insertFragment; async = ` + bAsync, function (assert) {
 			this.expectLoad(bAsync, `fragmentName`, xml(assert, [`<In xmlns="sap.ui.core"/>`]));
 
@@ -3676,7 +3631,7 @@ sap.ui.define([
 			// Note: XML serializer outputs &gt; encoding...
 			aViewContent[10].replace(`>`, `&gt;`),
 			aViewContent[11]
-		], true);
+		]);
 	});
 
 	//*********************************************************************************************
@@ -3750,7 +3705,7 @@ sap.ui.define([
 			`<Text text="*sync*sap.ui.core.util._with"/>`,
 			`<Text text="world,/sync=sync,/flag=true"/>`,
 			`<Text text="hello, *world*sap.ui.model.json.JSONPropertyBinding"/>`
-		], true);
+		]);
 	});
 
 	//*********************************************************************************************
@@ -3778,7 +3733,7 @@ sap.ui.define([
 			models : oModel
 		}, [
 			`<Text text="bar"/>`
-		], true);
+		]);
 	});
 
 	//*********************************************************************************************
@@ -3796,7 +3751,7 @@ sap.ui.define([
 			`</mvc:View>`
 		], {
 			models : asyncModel({hello : `world`})
-		}, undefined, true);
+		});
 	});
 
 	//*********************************************************************************************
@@ -3817,7 +3772,7 @@ sap.ui.define([
 			models : new JSONModel({flag : true})
 		}, [
 			`<Text text="*true*"/>`
-		], true);
+		]);
 	});
 
 	//*********************************************************************************************
@@ -3862,7 +3817,7 @@ sap.ui.define([
 		}, [
 			`<Text text="%true%"/>`,
 			`<Text text="*true*"/>`
-		], true);
+		]);
 	});
 
 	//*********************************************************************************************
@@ -3873,7 +3828,7 @@ sap.ui.define([
 		], [
 			mvcView().replace(`>`, ` template:require="">`),
 			`</mvc:View>`
-		], {}, [], true);
+		], {}, []);
 	});
 
 	//*********************************************************************************************
@@ -3914,7 +3869,7 @@ sap.ui.define([
 		}, [
 			`<Text text="bar"/>`,
 			`<Text text="true"/>`
-		], true);
+		]);
 	});
 
 	//*********************************************************************************************
@@ -3950,28 +3905,7 @@ sap.ui.define([
 			`<In src="A"/>`,
 			`<In src="B"/>`,
 			`<In src="C"/>`
-		], true);
-	});
-
-	//*********************************************************************************************
-	QUnit.test(`async template:repeat in sync view`, function (assert) {
-		return this.check(assert, [
-			mvcView(),
-			`<template:repeat list="{/items}">`,
-			`<In src="{src}"/>`,
-			`</template:repeat>`,
-			`</mvc:View>`
-		], {
-			models : asyncModel({
-				items : [{
-					src : `A`
-				}, {
-					src : `B`
-				}, {
-					src : `C`
-				}]
-			})
-		}, []);
+		]);
 	});
 
 	//*********************************************************************************************
@@ -4042,7 +3976,7 @@ sap.ui.define([
 			aViewContent[11].replace(`>`, `&gt;`), // <ExtensionPoint .../>
 			`<Label text="Hello, world!"/>`,
 			`<Label text="5"/>`
-		], /*bAsync*/true)
+		])
 		.finally(function () {
 			// Note: each attribute of <mvc:View> or <In> is also counted here...
 			assert.strictEqual(oAverageSpy.callCount, oEndSpy.callCount);
@@ -4069,7 +4003,7 @@ sap.ui.define([
 			{m : sinon.match(/\[ 1\] test == "?false"? --> false/), d : 1},
 			{m : `[ 1] Finished`, d : 3},
 			{m : `[ 0] Finished processing qux`}
-		], aViewContent, {/*Look Ma, no models!*/}, [/*no output*/], /*bAsync*/true);
+		], aViewContent, {/*Look Ma, no models!*/}, [/*no output*/]);
 	});
 
 	//*********************************************************************************************
@@ -4104,7 +4038,7 @@ sap.ui.define([
 			`<Text text="{missing&gt;/flag}"/>`,
 			`<Text text="{path: 'missing&gt;/flag', type: 'sap.ui.model.type.Boolean'}"/>`,
 			`<Text/>`
-		], /*bAsync*/true);
+		]);
 	});
 });
 //TODO we have completely missed support for unique IDs in fragments via the "id" property!

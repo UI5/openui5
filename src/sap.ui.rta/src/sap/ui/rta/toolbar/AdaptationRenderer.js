@@ -9,15 +9,13 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var AdaptationRenderer = BaseRenderer.extend("sap.ui.rta.toolbar.AdaptationRenderer");
-
-	AdaptationRenderer.apiVersion = 1; // @todo-semantic-rendering out of order .class() call before openStart
-
-	AdaptationRenderer.render = function(oRM, oControl) {
-		oRM.class("sapUiRtaToolbarAdaptation");
-
-		BaseRenderer.render(oRM, oControl);
-	};
+	const AdaptationRenderer = BaseRenderer.extend("sap.ui.rta.toolbar.AdaptationRenderer", {
+		apiVersion: 2,
+		enhanceRootTag(oRM, oControl) {
+			oRM.class("sapUiRtaToolbarAdaptation");
+			BaseRenderer.enhanceRootTag(oRM, oControl);
+		}
+	});
 
 	return AdaptationRenderer;
 });

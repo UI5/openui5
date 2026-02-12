@@ -172,6 +172,32 @@ sap.ui.define([], function() {
 		}
 	};
 
+	AppointmentsList.prototype.sort = function(fnComparator) {
+		if (this.getSize() <= 1) {
+			return this;
+		}
+
+		var aNodes = [];
+		this.getIterator().forEach(function(oNode) {
+			aNodes.push(oNode);
+		});
+
+		aNodes.sort(fnComparator);
+
+		this.head = aNodes[0];
+		this.tail = aNodes[aNodes.length - 1];
+		this.size = aNodes.length;
+
+		for (var i = 0; i < aNodes.length; i++) {
+			aNodes[i].prev = (i > 0) ? aNodes[i - 1] : null;
+			aNodes[i].next = (i < aNodes.length - 1) ? aNodes[i + 1] : null;
+		}
+
+		this.iterator = new AppointmentsIterator(this);
+
+		return this;
+	};
+
 	// AppointmentsList Iterator
 	function AppointmentsIterator (oList) {
 		this.list = oList;

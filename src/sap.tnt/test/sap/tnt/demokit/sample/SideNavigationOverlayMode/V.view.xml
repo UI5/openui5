@@ -6,20 +6,23 @@
 	xmlns:f="sap.f"
 	height="100%">
 	<App>
-		<Page id="myPage" title="Side Navigation Example" enableScrolling="true">
-			<customHeader>
-				<OverflowToolbar>
-					<Button icon="sap-icon://menu2" press=".onToggleSideNav" />
-					<Image src="./resources/sap/ui/documentation/sdk/images/logo_sap.png" height="30px" />
-					<Title text="Product Name" level="H2" />
-					<ToolbarSpacer />
-					<Button icon="sap-icon://search"/>
-					<Button icon="sap-icon://bell"/>
-					<Avatar initials="SN" displaySize="XS" />
-				</OverflowToolbar>
-			</customHeader>
-
-			<content>
+		<tnt:ToolPage id="myPage" class="sapUiResponsivePadding--header">
+						<tnt:header>
+							<f:ShellBar 
+								id="shellBar"
+								title="Product Name"
+								homeIcon="./resources/sap/ui/documentation/sdk/images/logo_sap.png"
+								showMenuButton="true"
+								showSearch="true"
+								showNotifications="true"
+								notificationsNumber="2"
+								menuButtonPressed="onToggleSideNav">
+								<f:profile>
+									<Avatar initials="SN"/>
+								</f:profile>
+							</f:ShellBar>
+						</tnt:header>
+						<tnt:mainContents>
 				<NavContainer id="pageContainer" initialPage="home" height="100%">
 					<pages>
 						<ScrollContainer
@@ -156,7 +159,7 @@
 						</ScrollContainer>
 					</pages>
 				</NavContainer>
-			</content>
-		</Page>
+			</tnt:mainContents>
+		</tnt:ToolPage>
 	</App>
 </mvc:View>

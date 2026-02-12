@@ -441,7 +441,7 @@ sap.ui.define([
 		var oFileUploader = new FileUploader();
 
 		//Act
-		oFileUploader.setHttpRequestMethod(FileUploaderHttpRequestMethod.Put);
+		oFileUploader.setHttpRequestMethod(FileUploaderHttpRequestMethod.PUT);
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -469,7 +469,7 @@ sap.ui.define([
 			},
 			oXMLHttpRequestOpenSpy = this.spy(window.XMLHttpRequest.prototype, "open");
 
-		oFileUploader.setHttpRequestMethod(FileUploaderHttpRequestMethod.Put);
+		oFileUploader.setHttpRequestMethod(FileUploaderHttpRequestMethod.PUT);
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -477,7 +477,7 @@ sap.ui.define([
 		oFileUploader._sendFilesWithXHR(aFiles);
 
 		//Assert
-		assert.ok(oXMLHttpRequestOpenSpy.calledWith(FileUploaderHttpRequestMethod.Put), "XHL Http put request is made");
+		assert.ok(oXMLHttpRequestOpenSpy.calledWith(FileUploaderHttpRequestMethod.PUT), "XHL Http put request is made");
 
 		//Clean
 		oFileUploader.destroy();

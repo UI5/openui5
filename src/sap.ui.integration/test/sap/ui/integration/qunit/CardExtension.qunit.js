@@ -776,6 +776,7 @@ sap.ui.define([
 		});
 
 		this.oCard.placeAt(DOM_RENDER_LOCATION);
+		this.oCard.attachAction((oEvent) => oEvent.preventDefault()); // prevent default action handling to avoid side effects in tests
 		await nextCardReadyEvent(this.oCard);
 
 		const oExtension = this.oCard.getAggregation("_extension");

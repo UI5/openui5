@@ -190,7 +190,7 @@ sap.ui.define([
 			 * @since 1.81.0
 			 *
 			 */
-			httpRequestMethod : {type: "sap.ui.unified.FileUploaderHttpRequestMethod", group : "Behavior", defaultValue : HttpRequestMethod.Post},
+			httpRequestMethod : {type: "sap.ui.unified.FileUploaderHttpRequestMethod", group : "Behavior", defaultValue : HttpRequestMethod.POST},
 
 			/**
 			 * Placeholder for the text field.

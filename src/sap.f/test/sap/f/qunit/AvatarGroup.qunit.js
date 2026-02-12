@@ -285,6 +285,17 @@ function (
 		this.oAvatarGroup.onkeyup(oEventCalled);
 	});
 
+	QUnit.test("Focus does not loop - Individual mode", async function (assert) {
+		// Arrange
+		this.oAvatarGroup.setGroupType("Individual");
+		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(this.oAvatarGroup._oItemNavigation.bCycling, false,
+			"ItemNavigation cycling is disabled - focus should not loop");
+	});
+
 	QUnit.module("Private API", {
 		beforeEach: setupFunction,
 		afterEach: teardownFunction
@@ -418,6 +429,33 @@ function (
 		assert.equal(this.oAvatarGroup._bShowMoreButton, false, "Show more button should not be shown");
 		assert.strictEqual(this.oAvatarGroup._bAutoWidth, true, "Auto width is true");
 		assert.strictEqual(this.oAvatarGroup._oShowMoreButton.getText(), "", "Show more button should not have text");
+	});
+
+	QUnit.test("_onResize sets width auto with and without ShowMoreButton", async function (assert) {
+		// Arrange
+		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Act - trigger resize with overflow button
+		this.stub(this.oAvatarGroup, "_getWidth").returns(120);
+		this.oAvatarGroup._onResize();
+
+		// Assert - width auto should be set even with overflow button
+		assert.strictEqual(this.oAvatarGroup.getDomRef().style.width, "auto",
+			"Width auto is set when overflow button is shown");
+		assert.strictEqual(this.oAvatarGroup._bShowMoreButton, true,
+			"Show more button should be shown");
+
+		// Act - trigger resize without overflow button
+		this.oAvatarGroup._getWidth.restore();
+		this.stub(this.oAvatarGroup, "_getWidth").returns(1000);
+		this.oAvatarGroup._onResize();
+
+		// Assert - width auto should remain set without overflow button
+		assert.strictEqual(this.oAvatarGroup.getDomRef().style.width, "auto",
+			"Width auto is set when overflow button is not shown");
+		assert.strictEqual(this.oAvatarGroup._bShowMoreButton, false,
+			"Show more button should not be shown");
 	});
 
 	QUnit.test("_onResize does not invalidates infinitely when control is not visible", async function (assert) {
