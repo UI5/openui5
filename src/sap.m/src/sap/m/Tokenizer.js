@@ -332,7 +332,7 @@ sap.ui.define([
 		this._oIndicator = null;
 		this._bInForm = false;
 		this._bShouldRenderTabIndex = null;
-		this._oTokenToFocusAfterDelete = null;
+		this._iPopoverIndexToFocusAfterDelete = null;
 		this._oScroller = new ScrollEnablement(this, this.getId() + "-scrollContainer", {
 			horizontal : true,
 			vertical : false,
@@ -355,12 +355,21 @@ sap.ui.define([
 		this.attachEvent("delete", function(oEvent) {
 			var oToken = oEvent.getSource();
 			var aSelectedTokens = this.getSelectedTokens();
-			this._oTokenToFocusAfterDelete = this._getTokenToFocusAfterDelete(oToken, true);
+			var aTokens = this._getVisibleTokens();
+			var iTokenIndex = aTokens.indexOf(oToken);
+
+			// Mark that we're in a deletion operation
+			this._bDeletionInProgress = true;
+
+			// Prevent _bFocusFirstToken from interfering with deletion focus
+			this._bFocusFirstToken = false;
 
 			this._fireCompatibilityEvents(oToken, aSelectedTokens);
 			this.fireEvent("tokenDelete", {
 				tokens: [oToken]
 			});
+
+			this._applyFocusAfterDeletion(iTokenIndex, aTokens.length, "click");
 
 			oEvent.cancelBubble();
 		}, this);
@@ -375,6 +384,81 @@ sap.ui.define([
 		Theming.attachApplied(this._handleThemeApplied);
 
 		this._observeTokens();
+	};
+
+	/**
+	 * Calculates the proper index for focusing after deletion.
+	 * For backspace: focus goes to previous token.
+	 * For delete and click: focus goes to next token (or previous if at the end).
+	 *
+	 * @private
+	 * @param {number} iDeletedIndex Index of the deleted item
+	 * @param {number} iTotalLength Total length of items
+	 * @param {string} sDeletionType Type of deletion: "click", "backspace", or "delete"
+	 * @returns {number} Index to focus after deletion
+	 */
+	Tokenizer.prototype._calculateFocusIndexAfterDeletion = function(iDeletedIndex, iTotalLength, sDeletionType) {
+		// For Backspace: focus goes to previous token
+		if (sDeletionType === "backspace") {
+			return iDeletedIndex > 0 ? iDeletedIndex - 1 : 0;
+		}
+
+		// For Delete and Click: focus goes to next token (or previous if at the end)
+		if (iDeletedIndex < iTotalLength - 1) {
+			return iDeletedIndex; // Focus next item at same position
+		}
+
+		return iDeletedIndex - 1; // At the end - focus previous item
+	};
+
+	/**
+	 * Ensures the focus index is within valid bounds of the items array.
+	 *
+	 * @private
+	 * @param {number} iIndex The calculated index
+	 * @param {array} aItems The array of tokens (sap.m.Token) or list items (sap.m.StandardListItem)
+	 * @returns {object|null} The token or list item to focus, or null if array is empty
+	 */
+	Tokenizer.prototype._getItemToFocusWithinBounds = function(iIndex, aItems) {
+		if (aItems.length === 0) {
+			return null;
+		}
+
+		var iIndexToFocus = iIndex;
+
+		// Ensure index is within bounds
+		if (iIndexToFocus < 0) {
+			iIndexToFocus = 0;
+		} else if (iIndexToFocus >= aItems.length) {
+			iIndexToFocus = aItems.length - 1;
+		}
+
+		return aItems[iIndexToFocus];
+	};
+
+	/**
+	 * Calculates and applies focus to the correct token after deletion.
+	 * Uses setTimeout to ensure DOM is updated before focusing.
+	 *
+	 * @private
+	 * @param {number} iDeletedIndex Index of the deleted token
+	 * @param {number} iTotalLength Total number of tokens before deletion
+	 * @param {string} sDeletionType Type of deletion: "click", "backspace", or "delete"
+	 */
+	Tokenizer.prototype._applyFocusAfterDeletion = function(iDeletedIndex, iTotalLength, sDeletionType) {
+		setTimeout(function() {
+			// Calculate the focus index
+			var iCalculatedIndex = this._calculateFocusIndexAfterDeletion(iDeletedIndex, iTotalLength, sDeletionType);
+			var aRemainingTokens = this._getVisibleTokens();
+			var oTokenToFocus = this._getItemToFocusWithinBounds(iCalculatedIndex, aRemainingTokens);
+
+			if (oTokenToFocus && oTokenToFocus.getDomRef()) {
+				oTokenToFocus.focus();
+			}
+
+			// Clear the deletion flag
+			this._bDeletionInProgress = false;
+		}.bind(this), 0);
 	};
 
 	/**
@@ -502,6 +586,14 @@ sap.ui.define([
 	 * @private
 	 */
 	Tokenizer.prototype._fillTokensList = function (oList, fnFilter) {
+		var iIndexToFocus = this._iPopoverIndexToFocusAfterDelete;
+		var bShouldRestoreFocus = iIndexToFocus !== undefined && iIndexToFocus !== null && this.getTokensPopup().isOpen();
+
+		// Clear the stored index before rebuilding
+		if (bShouldRestoreFocus) {
+			this._iPopoverIndexToFocusAfterDelete = null;
+		}
+
 		oList.destroyItems();
 
 		fnFilter = fnFilter ? fnFilter : function () { return true; };
@@ -511,6 +603,33 @@ sap.ui.define([
 			.forEach(function (oToken) {
 				oList.addItem(this._mapTokenToListItem(oToken));
 			}, this);
+
+		// Restore focus to the appropriate list item after deletion
+		if (bShouldRestoreFocus) {
+			var fnRestoreFocus = function() {
+				oList.removeEventDelegate(this._oFocusRestoreDelegate);
+				delete this._oFocusRestoreDelegate;
+
+				var aListItems = oList.getItems();
+				var oItemToFocus = this._getItemToFocusWithinBounds(iIndexToFocus, aListItems);
+
+				if (oItemToFocus && oItemToFocus.getDomRef()) {
+					oItemToFocus.focus();
+				}
+			}.bind(this);
+
+			// Remove any existing delegate
+			if (this._oFocusRestoreDelegate) {
+				oList.removeEventDelegate(this._oFocusRestoreDelegate);
+			}
+
+			// Use event delegate to hook into the List's rendering cycle
+			this._oFocusRestoreDelegate = {
+				onAfterRendering: fnRestoreFocus
+			};
+
+			oList.addEventDelegate(this._oFocusRestoreDelegate);
+		}
 	};
 
 	/**
@@ -523,12 +642,18 @@ sap.ui.define([
 		var oListItem = oEvent.getParameter("listItem");
 		var sSelectedId = oListItem && oListItem.data("tokenId");
 		var oTokenToDelete;
+		var oTokensList = this._getTokensList();
+		var aListItems = oTokensList.getItems();
+		var iDeletedIndex = aListItems.indexOf(oListItem);
 
 		oTokenToDelete = this.getTokens().filter(function(oToken){
 			return (oToken.getId() === sSelectedId) && oToken.getEditable();
 		})[0];
 
 		if (oTokenToDelete) {
+			// Calculate focus index using helper function
+			this._iPopoverIndexToFocusAfterDelete = this._calculateFocusIndexAfterDeletion(iDeletedIndex, aListItems.length, "click");
+
 			this.fireTokenUpdate({
 				addedTokens: [],
 				removedTokens: [oTokenToDelete],
@@ -1102,7 +1227,6 @@ sap.ui.define([
 	 */
 	Tokenizer.prototype.onAfterRendering = function() {
 		var sRenderMode = this.getRenderMode();
-		var oFocusableToken = this._getTokenToFocus();
 
 		this._oIndicator = this.$().find(".sapMTokenizerIndicator");
 
@@ -1123,19 +1247,14 @@ sap.ui.define([
 			});
 		}
 
+		var oFocusableToken = this._getTokenToFocus();
 		if (oFocusableToken && oFocusableToken.getDomRef() && this.getEffectiveTabIndex()) {
 			oFocusableToken.getDomRef().setAttribute("tabindex", "0");
 		}
 
-		if (this._oTokenToFocusAfterDelete) {
-			this._oTokenToFocusAfterDelete.focus();
-			this._oTokenToFocusAfterDelete = null;
-		}
-
-		if (this._bFocusFirstToken) {
+		if (this._bFocusFirstToken && !this._bDeletionInProgress) {
 			this.scrollToStart();
 			this._bFocusFirstToken = false;
-
 			return;
 		}
 
@@ -1179,25 +1298,6 @@ sap.ui.define([
 		return aVisibleTokens.find((oToken) => oToken.getSelected()) || aVisibleTokens[0];
 	};
 
-	Tokenizer.prototype._getTokenToFocusAfterDelete = function (oFocusedToken, bFromClick) {
-		var aTokens = this._getVisibleTokens();
-
-		if (aTokens.length === 1) {
-			return null;
-		}
-
-		var aSelectedTokens = this.getSelectedTokens();
-
-		if (bFromClick && aSelectedTokens.length > 1) {
-			return aSelectedTokens[aSelectedTokens.indexOf(oFocusedToken) + 1] || aSelectedTokens[aSelectedTokens.indexOf(oFocusedToken) - 1];
-		} else {
-			// all selected tokens should be deleted so we have to move the focus to the next/previous non-selected token closest to the focused one
-			var iFocusedTokenIndex = aTokens.indexOf(oFocusedToken);
-			return aTokens.find(( oToken, oIndex ) => { return oIndex > iFocusedTokenIndex && !aSelectedTokens.includes( oToken ); }) ||
-				aTokens.slice().reverse().find(( oToken, oIndex ) => { return (aTokens.length - 1 - oIndex) < iFocusedTokenIndex && !aSelectedTokens.includes( oToken ); });
-		}
-	};
-
 	/**
 	 * Handles the setting of collapsed state.
 	 *
@@ -1234,7 +1334,7 @@ sap.ui.define([
 			this._oSelectionOrigin = null;
 		}
 
-		if (!this.checkFocus()) {
+		if (!this.checkFocus() && !this._bDeletionInProgress) {
 			this._bFocusFirstToken = true;
 			this.setRenderMode(RenderMode.Narrow);
 			this.fireRenderModeChange({
@@ -1243,22 +1343,53 @@ sap.ui.define([
 		}
 	};
 
-	Tokenizer.prototype.onsapbackspace = function (oEvent) {
+	/**
+	 * Handles keyboard deletion with unified focus calculation.
+	 *
+	 * @private
+	 * @param {jQuery.Event} oEvent The keyboard event
+	 * @param {string} sDeletionType Type of deletion: "backspace" or "delete"
+	 */
+	Tokenizer.prototype._handleKeyboardDeletion = function(oEvent, sDeletionType) {
 		var oFocusedToken = this.getTokens().filter(function (oToken) {
 			return oToken.getFocusDomRef() === document.activeElement;
 		})[0];
+
+		if (!oFocusedToken) {
+			return;
+		}
+
 		var aDeletingTokens = this.getSelectedTokens().length ? this.getSelectedTokens() : [oFocusedToken];
-		this._oTokenToFocusAfterDelete = this._getTokenToFocusAfterDelete(oFocusedToken, false);
+		var aTokens = this._getVisibleTokens();
+
+		// This ensures focus goes to the correct position
+		var iDeletingIndex = Math.min.apply(null, aDeletingTokens.map(function(oToken) {
+			return aTokens.indexOf(oToken);
+		}));
+
+		// Mark that we're in a deletion operation
+		this._bDeletionInProgress = true;
+
+		// Prevent _bFocusFirstToken from interfering with deletion focus
+		this._bFocusFirstToken = false;
 
 		oEvent.preventDefault();
 
-		return this.fireTokenDelete({
+		this.fireTokenDelete({
 			tokens: aDeletingTokens,
 			keyCode: oEvent.which
 		});
+
+		this._applyFocusAfterDeletion(iDeletingIndex, aTokens.length, sDeletionType);
 	};
 
-	Tokenizer.prototype.onsapdelete = Tokenizer.prototype.onsapbackspace;
+	Tokenizer.prototype.onsapbackspace = function (oEvent) {
+		return this._handleKeyboardDeletion(oEvent, "backspace");
+	};
+
+	Tokenizer.prototype.onsapdelete = function (oEvent) {
+		return this._handleKeyboardDeletion(oEvent, "delete");
+	};
 
 	/**
 	 * Handle the key down event for Ctrl+ a , Ctrl+ c and Ctrl+ x.
@@ -1566,7 +1697,10 @@ sap.ui.define([
 		});
 
 		const oFirstToken = this.getTokens()[0];
-		this._bFocusFirstToken = oEvent.srcControl === oFirstToken;
+		// Don't set _bFocusFirstToken if we're handling a deletion
+		if (!this._bDeletionInProgress) {
+			this._bFocusFirstToken = oEvent.srcControl === oFirstToken;
+		}
 
 		if (!this._bFocusFirstToken && !this._bTokenToBeDeleted) {
 			this._ensureTokenVisible(oEvent.srcControl);
@@ -1584,6 +1718,11 @@ sap.ui.define([
 			bDeleteToken = oEvent.getMark("tokenDeletePress"),
 			aTokens = this._getVisibleTokens(),
 			oFocusedToken, iFocusIndex, iIndex, iMinIndex, iMaxIndex;
+
+		// Close popover if it's open and user clicks on a token in tokenizer
+		if (oTargetToken && this._oPopup && this._oPopup.isOpen()) {
+			this._oPopup.close();
+		}
 
 		if (bDeleteToken || !oTargetToken || (!bShiftKey && bCtrlKey)) { // Ctrl
 			this._oSelectionOrigin = null;

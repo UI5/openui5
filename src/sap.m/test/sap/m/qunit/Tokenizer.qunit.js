@@ -1031,13 +1031,12 @@ sap.ui.define([
 		this.clock.tick(200);
 		qutils.triggerKeydown( oToken1.getDomRef(), KeyCodes.DELETE);
 
-		this.clock.tick(100);
-
 		assert.strictEqual(oTokenizer.getTokens().length, 3, "Tokens are not removed yet.");
 		assert.strictEqual(document.activeElement, oToken1.getDomRef(), "The focus is still on the deleted token.");
 
 		oTokenizer.removeToken(oToken1);
-		this.clock.tick(100);
+		await nextUIUpdate(this.clock);
+		this.clock.tick(1);
 
 		assert.strictEqual(oTokenizer.getTokens().length, 2, "Token is removed.");
 		assert.strictEqual(document.activeElement, oToken2.getDomRef(), "The focus is moved to the adjacent token.");
@@ -1274,14 +1273,16 @@ sap.ui.define([
 
 	QUnit.test("delete with editable=true", function(assert) {
 		var oSpy = this.spy(this.tokenizer, "fireTokenDelete");
+		var token1 = Element.getElementById("t1");
 
 		// act
-		qutils.triggerKeydown("t", KeyCodes.DELETE);
+		token1.focus();
+		qutils.triggerKeydown("t1", KeyCodes.DELETE);
 
 		var oCall = oSpy.getCalls()[0];
 
 		// assert
-		assert.equal(oCall.args[0].tokens.length, 2, "Two tokens were removed");
+		assert.equal(oCall.args[0].tokens.length, 2, "Token was removed");
 	});
 
 	QUnit.test("tab", function(assert) {
@@ -2446,5 +2447,247 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		assert.ok(oToggleSpy.calledOnce, "_togglePopup called once");
+	});
+
+	QUnit.module("Focus Management After Deletion", {
+		beforeEach: async function () {
+			this.oTokenizer = new Tokenizer({
+				width: "500px",
+				tokens: [
+					new Token({ text: "Token 1" }),
+					new Token({ text: "Token 2" }),
+					new Token({ text: "Token 3" }),
+					new Token({ text: "Token 4" }),
+					new Token({ text: "Token 5" })
+				]
+			});
+			this.oTokenizer.placeAt("content");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oTokenizer.destroy();
+		}
+	});
+
+	QUnit.test("Delete key should focus next token", function (assert) {
+		const done = assert.async();
+		const oSecondToken = this.oTokenizer.getTokens()[1];
+		const oThirdToken = this.oTokenizer.getTokens()[2];
+
+		// Setup tokenDelete handler to actually remove the token
+		this.oTokenizer.attachTokenDelete(function(oEvent) {
+			oEvent.getParameter("tokens").forEach(function(oToken) {
+				this.oTokenizer.removeToken(oToken);
+			}.bind(this));
+
+			// Wait for setTimeout(0) in implementation to complete
+			setTimeout(function() {
+				// Assert after removal and re-render
+				assert.strictEqual(document.activeElement, oThirdToken.getDomRef(), "The next token (third) should be focused after Delete");
+				done();
+			}, 10);
+		}.bind(this));
+
+		// Act
+		oSecondToken.focus();
+		qutils.triggerKeydown(oSecondToken.getDomRef(), KeyCodes.DELETE);
+	});
+
+	QUnit.test("Backspace key should focus previous token", function (assert) {
+		const done = assert.async();
+		const oSecondToken = this.oTokenizer.getTokens()[1];
+		const oFirstToken = this.oTokenizer.getTokens()[0];
+
+		// Setup tokenDelete handler to actually remove the token
+		this.oTokenizer.attachTokenDelete(function(oEvent) {
+			oEvent.getParameter("tokens").forEach(function(oToken) {
+				this.oTokenizer.removeToken(oToken);
+			}.bind(this));
+
+			// Wait for setTimeout(0) in implementation to complete
+			setTimeout(function() {
+				// Assert after removal and re-render
+				assert.strictEqual(document.activeElement, oFirstToken.getDomRef(), "The previous token (first) should be focused after Backspace");
+				done();
+			}, 10);
+		}.bind(this));
+
+		// Act
+		oSecondToken.focus();
+		qutils.triggerKeydown(oSecondToken.getDomRef(), KeyCodes.BACKSPACE);
+	});
+
+	QUnit.test("Delete on last token should focus previous token", function (assert) {
+		const done = assert.async();
+		const oLastToken = this.oTokenizer.getTokens()[4];
+		const oFourthToken = this.oTokenizer.getTokens()[3];
+
+		// Setup tokenDelete handler to actually remove the token
+		this.oTokenizer.attachTokenDelete(function(oEvent) {
+			oEvent.getParameter("tokens").forEach(function(oToken) {
+				this.oTokenizer.removeToken(oToken);
+			}.bind(this));
+
+			// Wait for setTimeout(0) in implementation to complete
+			setTimeout(function() {
+				// Assert after removal and re-render
+				assert.strictEqual(document.activeElement, oFourthToken.getDomRef(), "The previous token should be focused when deleting last token");
+				done();
+			}, 10);
+		}.bind(this));
+
+		// Act
+		oLastToken.focus();
+		qutils.triggerKeydown(oLastToken.getDomRef(), KeyCodes.DELETE);
+	});
+
+	QUnit.test("Backspace on first token should focus next token", function (assert) {
+		const done = assert.async();
+		const oFirstToken = this.oTokenizer.getTokens()[0];
+		const oSecondToken = this.oTokenizer.getTokens()[1];
+
+		// Setup tokenDelete handler to actually remove the token
+		this.oTokenizer.attachTokenDelete(function(oEvent) {
+			oEvent.getParameter("tokens").forEach(function(oToken) {
+				this.oTokenizer.removeToken(oToken);
+			}.bind(this));
+
+			// Wait for setTimeout(0) in implementation to complete
+			setTimeout(function() {
+				// Assert after removal and re-render
+				assert.strictEqual(document.activeElement, oSecondToken.getDomRef(), "The next token should be focused when backspace on first token");
+				done();
+			}, 10);
+		}.bind(this));
+
+		// Act
+		oFirstToken.focus();
+		qutils.triggerKeydown(oFirstToken.getDomRef(), KeyCodes.BACKSPACE);
+	});
+
+	QUnit.test("X button should focus next token", function (assert) {
+		const done = assert.async();
+		const oSecondToken = this.oTokenizer.getTokens()[1];
+		const oThirdToken = this.oTokenizer.getTokens()[2];
+
+		// Setup tokenDelete handler to actually remove the token
+		this.oTokenizer.attachTokenDelete(function(oEvent) {
+			oEvent.getParameter("tokens").forEach(function(oToken) {
+				this.oTokenizer.removeToken(oToken);
+			}.bind(this));
+
+			// Wait for setTimeout(0) in implementation to complete
+			setTimeout(function() {
+				// Assert after removal and re-render
+				assert.strictEqual(document.activeElement, oThirdToken.getDomRef(), "The next token should be focused after X button click");
+				done();
+			}, 10);
+		}.bind(this));
+
+		// Act
+		oSecondToken.focus();
+		oSecondToken.getAggregation("deleteIcon").firePress();
+	});
+
+	QUnit.test("X button on last token should focus previous token", function (assert) {
+		const done = assert.async();
+		const oLastToken = this.oTokenizer.getTokens()[4];
+		const oFourthToken = this.oTokenizer.getTokens()[3];
+
+		// Setup tokenDelete handler to actually remove the token
+		this.oTokenizer.attachTokenDelete(function(oEvent) {
+			oEvent.getParameter("tokens").forEach(function(oToken) {
+				this.oTokenizer.removeToken(oToken);
+			}.bind(this));
+
+			// Wait for setTimeout(0) in implementation to complete
+			setTimeout(function() {
+				// Assert after removal and re-render
+				assert.strictEqual(document.activeElement, oFourthToken.getDomRef(), "The previous token should be focused when X button on last token");
+				done();
+			}, 10);
+		}.bind(this));
+
+		// Act
+		oLastToken.focus();
+		oLastToken.getAggregation("deleteIcon").firePress();
+	});
+
+	QUnit.module("Popover Interaction", {
+		beforeEach: async function () {
+			this.clock = sinon.useFakeTimers();
+			this.oTokenizer = new Tokenizer({
+				width: "200px",
+				tokens: [
+					new Token({ text: "Token 1" }),
+					new Token({ text: "Token 2" }),
+					new Token({ text: "Token 3" }),
+					new Token({ text: "Token 4" }),
+					new Token({ text: "Token 5" })
+				]
+			});
+			this.oTokenizer.placeAt("content");
+			await nextUIUpdate(this.clock);
+		},
+		afterEach: function () {
+			this.clock.restore();
+			this.oTokenizer.destroy();
+		}
+	});
+
+	QUnit.test("Clicking token in tokenizer should close popover", function (assert) {
+		// Arrange - Open the popover
+		this.oTokenizer._handleNMoreIndicatorPress();
+		this.clock.tick(500);
+		const oPopover = this.oTokenizer.getTokensPopup();
+
+		// Assert popover is open
+		assert.ok(oPopover.isOpen(), "Popover should be open");
+
+		// Act - Click a token in the tokenizer
+		const oFirstToken = this.oTokenizer.getTokens()[0];
+		qutils.triggerEvent("tap", oFirstToken.getDomRef(), { target: oFirstToken.getDomRef() });
+		this.clock.tick(500);
+
+		// Assert popover is closed
+		assert.notOk(oPopover.isOpen(), "Popover should be closed after clicking token in tokenizer");
+	});
+
+	QUnit.test("Popover X button should keep popover open and focus next item", function (assert) {
+		// Arrange - Open the popover
+		this.oTokenizer._handleNMoreIndicatorPress();
+		this.clock.tick(500);
+		const oPopover = this.oTokenizer.getTokensPopup();
+		const oList = this.oTokenizer._getTokensList();
+		const aListItems = oList.getItems();
+
+		// Assert popover is open
+		assert.ok(oPopover.isOpen(), "Popover should be open");
+
+		// Act - Delete first item via X button
+		oList.fireDelete({ listItem: aListItems[0] });
+		this.clock.tick(100);
+
+		// Assert popover stays open and focus is managed
+		assert.ok(oPopover.isOpen(), "Popover should remain open after X button deletion");
+		assert.strictEqual(this.oTokenizer._iPopoverIndexToFocusAfterDelete, 0, "Focus index should be stored for next item");
+	});
+
+	QUnit.test("Popover X button on last item should focus previous item", function (assert) {
+		// Arrange - Open the popover
+		this.oTokenizer._handleNMoreIndicatorPress();
+		this.clock.tick(500);
+		const oPopover = this.oTokenizer.getTokensPopup();
+		const oList = this.oTokenizer._getTokensList();
+		const aListItems = oList.getItems();
+		const iLastIndex = aListItems.length - 1;
+
+		// Act - Delete last item via X button
+		oList.fireDelete({ listItem: aListItems[iLastIndex] });
+		this.clock.tick(100);
+
+		// Assert
+		assert.ok(oPopover.isOpen(), "Popover should remain open");
+		assert.strictEqual(this.oTokenizer._iPopoverIndexToFocusAfterDelete, iLastIndex - 1, "Focus index should be stored for previous item");
 	});
 });
