@@ -224,14 +224,13 @@ sap.ui.define([
 		// the FlexInfoSession is used to adjust the parameters of the request
 		const sVersion = oFlexInfoSession.version;
 		const sAdaptationId = oFlexInfoSession.displayedAdaptationId;
-		const bAllContextsProvided = oFlexInfoSession.allContextsProvided;
 
 		const bRequiresNewLoadRequest =
 			mPropertyBag.reInitialize
 			|| !_mCachedFlexData[sReference]
 			|| _mCachedFlexData[sReference].parameters.emptyState
 			|| _mCachedFlexData[sReference].parameters.version !== sVersion
-			|| _mCachedFlexData[sReference].parameters.allContextsProvided !== bAllContextsProvided
+			|| _mCachedFlexData[sReference].parameters.allContextsProvided !== oFlexInfoSession.allContextsProvided
 			|| _mCachedFlexData[sReference].parameters.adaptationId !== sAdaptationId;
 
 		const bRequiresOnlyCompletion =
@@ -294,21 +293,26 @@ sap.ui.define([
 			authors: oAuthors
 		};
 
+		// We need to synch. the information from the flex/data response with the FlexInfoSession and the Loader cache at this point.
+		// This is necessary because when we call clear the FlexInfoSession with needToDeleteFlexInfoSession at the beginning,
+		// parameters like version or allContextsProvided might be stale and lead to unecessary second flex/data requests,
+		// due to out-of sync information in the cache and the FlexInfoSession.
+		if (oFormattedFlexData.changes.info !== undefined) {
+			oFlexInfoSession = { ...oFlexInfoSession, ...oFormattedFlexData.changes.info };
+		}
+
 		_mCachedFlexData[sReference] = {
 			data: oFormattedFlexData,
 			parameters: {
 				bundleNotLoaded: !!mPropertyBag.skipLoadBundle,
-				version: sVersion,
-				allContextsProvided: bAllContextsProvided,
-				adaptationId: sAdaptationId,
+				version: oFlexInfoSession.version,
+				allContextsProvided: oFlexInfoSession.allContextsProvided,
+				adaptationId: oFlexInfoSession.displayedAdaptationId,
 				loaderCacheKey: oFlexDataCopy.cacheKey || uid(),
 				previouslyFilledData: bPreviouslyFilledData
 			}
 		};
 
-		if (oFormattedFlexData.changes.info !== undefined) {
-			oFlexInfoSession = { ...oFlexInfoSession, ...oFormattedFlexData.changes.info };
-		}
 		FlexInfoSession.setByReference(oFlexInfoSession, sReference);
 		oNewInitPromise.resolve();
 		return _mCachedFlexData[sReference];
