@@ -1659,6 +1659,7 @@
                 "Duration",
                 "DateRange",
                 "RatingIndicator",
+                "RadioButtonGroup",
                 "phone",
                 "email",
                 "link",
@@ -1807,8 +1808,19 @@
           "type": "string"
         },
         "selectedKey": {
-          "description": "Defines the initially selected key from the given options for combo box",
+          "description": "Defines the initially selected key from the given options for combo box or radio button group",
           "type": "string"
+        },
+        "selectedIndex": {
+          "description": "Defines the initially selected index for radio button group",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
         },
         "placeholder": {
           "description": "Placeholder for items of type 'Input', 'TextArea', 'ComboBox', 'Duration' and 'DateRange'",
@@ -1820,14 +1832,21 @@
         },
         "item": {
           "type": "object",
-          "description": "Binding info for combo box items",
+          "description": "Binding info for combo box or radio button group items",
           "required": [
             "template"
           ],
           "additionalProperties": false,
           "properties": {
             "template": {
-              "$ref": "#/$defs/ContentType.Object.Item.ComboBoxItemTemplate"
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/ContentType.Object.Item.ComboBoxItemTemplate"
+                },
+                {
+                  "$ref": "#/$defs/ContentType.Object.Item.RadioButtonItemTemplate"
+                }
+              ]
             },
             "path": {
               "description": "Defines the path to the structure holding the data about the items",
@@ -2074,6 +2093,36 @@
         "key": {
           "description": "The unique key of the option. Mapped to the input's value",
           "type": "string"
+        }
+      }
+    },
+    "ContentType.Object.Item.RadioButtonItemTemplate": {
+      "description": "Template for radio button group items",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled"
+      ],
+      "properties": {
+        "title": {
+          "description": "The title of the radio button option",
+          "type": "string"
+        },
+        "key": {
+          "description": "The unique key of the radio button option",
+          "type": "string"
+        },
+        "enabled": {
+          "description": "Whether the radio button option is enabled",
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": true
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
         }
       }
     },

@@ -149,6 +149,7 @@ sap.ui.define([
 
 	async function _requireConnectorsByConfiguration(sNameSpace, bLoadConnectors, mConnectorNamespaces) {
 		var aConnectors = _getConnectorConfigurations(sNameSpace, bLoadConnectors, mConnectorNamespaces);
+		// The following line is used by the Flex Support Tool to set breakpoints - please adjust the tool if you change it!
 		const aConnectorModules = await StorageUtils.requireConnectors(aConnectors, bLoadConnectors, mConnectorNamespaces);
 		aConnectorModules.forEach(function(oConnector, iIndex) {
 			if (!mConnectorNamespaces[iIndex].layers) {
