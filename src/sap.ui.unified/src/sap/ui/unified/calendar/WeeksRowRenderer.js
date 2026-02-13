@@ -34,7 +34,7 @@ sap.ui.define([
 
 		oRm.openStart("div", oWeeksRow);
 		oRm.class("sapUiCalWeeksRow");
-		oRm.class(`sapMPlanWeeksRow${sViewKey}View`);
+		oRm.class(`sapMPlanWeeksRow${sViewKey.split(" ").join("")}View`);
 		oRm.openEnd();
 		oRm.openStart("div");
 		oRm.class("sapMPlanWeeksLabelRow");
@@ -51,10 +51,12 @@ sap.ui.define([
 		oRm.openStart("div");
 		oRm.class("sapMPlanWeeksDataRow");
 		oRm.openEnd();
-		if (sViewKey === CalendarIntervalType.Month) {
-			this.renderMonthsWeeks(oRm, oWeeksRow);
-		} else if (sViewKey === CalendarIntervalType.Day) {
+		if (sViewKey === CalendarIntervalType.Day || sViewKey === CalendarIntervalType.Week ||
+				sViewKey === CalendarIntervalType.OneMonth || sViewKey === CalendarIntervalType.OneWeek ||
+				sViewKey === "OneMonth") {
 			this.renderDaysWeeks(oRm, oWeeksRow);
+		} else if (sViewKey === CalendarIntervalType.Month) {
+			this.renderMonthsWeeks(oRm, oWeeksRow);
 		}
 		oRm.close("div");
 		oRm.close("div");
