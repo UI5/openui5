@@ -30,7 +30,7 @@
 }
 
 .sapMToken.sapMTokenReadOnly {
-	padding: 0 0.375rem;
+	padding: 0 0.3125rem;
 	color: var(--sapContent_ForegroundTextColor);
 	border-color: var(--sapField_ReadOnly_BorderColor);
 	background: var(--sapButton_ReadOnly_TokenBackground);
@@ -113,16 +113,15 @@ html.sap-desktop .sapMToken.sapMTokenSelected:not(.sapMTokenReadOnly):hover {
 	border: var(--sapButton_BorderWidth) solid var(--sapButton_Selected_BorderColor);
 }
 
-.sapMTokenSelected,
-.sapMToken.sapMTokenReadOnly.sapMTokenSelected {
+.sapMTokenSelected {
 	color: var(--sapButton_Selected_TextColor);
 	background: var(--sapButton_Selected_Background);
 	border: var(--sapButton_BorderWidth) solid var(--sapButton_Selected_BorderColor);
-}
 
-.sapMTokenSelected .sapMTokenIcon,
-.sapMTokenSelected .sapMTokenText {
-	color: var(--sapButton_Selected_TextColor);
+	.sapMTokenIcon,
+	.sapMTokenText {
+		color: var(--sapButton_Selected_TextColor);
+	}
 }
 
 .sapUiSizeCompact .sapMListTbl .sapMToken .sapUiIcon:not(.sapMLIBImgNav) {

@@ -32,6 +32,7 @@
 					"manifest.json",
 					"controller/Page.controller.js",
 					"view/fragment/AddViaUrl.fragment.xml",
+					"view/fragment/FileUpload.fragment.xml",
 					"model/mockserver.js"
 				]
 			}

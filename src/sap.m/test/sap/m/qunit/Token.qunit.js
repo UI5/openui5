@@ -84,6 +84,35 @@ sap.ui.define([
 		assert.strictEqual(aUniqueTextIds.length, aAriaDescibedByTextIds.length, "Only unique text ids were added");
 	});
 
+	QUnit.test("setter / getter enabledParent", async function(assert) {
+		var bEnabledParent = true,
+			aAriaDescibedByTextIds, aUniqueTextIds;
+
+		function fnDistinct(value, index, array) {
+			return array.indexOf(value) === index;
+		}
+
+		// Assert
+		aAriaDescibedByTextIds = this.token1.getDomRef().attributes["aria-describedby"].value.split(" ");
+		aUniqueTextIds = aAriaDescibedByTextIds.filter(fnDistinct);
+		assert.strictEqual(this.token1.getProperty("enabledParent"), bEnabledParent, "Token's parent is enabled");
+		assert.strictEqual(aUniqueTextIds.length, aAriaDescibedByTextIds.length, "Only unique text ids were added");
+		assert.ok(aAriaDescibedByTextIds.length >= 1, "Token has at least the deletable text id when enabled");
+
+		// Act
+		bEnabledParent = false;
+		this.token1.setProperty("enabledParent", bEnabledParent);
+		await nextUIUpdate();
+
+		// Assert
+		aAriaDescibedByTextIds = this.token1.getDomRef().attributes["aria-describedby"].value.split(" ");
+		aUniqueTextIds = aAriaDescibedByTextIds.filter(fnDistinct);
+		assert.strictEqual(this.token1.getProperty("enabledParent"), bEnabledParent, "Token's parent is disabled");
+		assert.strictEqual(aUniqueTextIds.length, aAriaDescibedByTextIds.length, "Only unique text ids were added");
+		assert.ok(aAriaDescibedByTextIds.indexOf(InvisibleText.getStaticId("sap.m", "TOKEN_ARIA_DELETABLE")) === -1,
+			"Deletable text id removed when parent disabled");
+	});
+
 	QUnit.test("setter / getter isSelected", function(assert) {
 		var isSelected = false;
 		assert.equal(this.token1.getSelected(), isSelected, "Token is not selected");
@@ -289,6 +318,18 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		assert.ok(this.token1.$().attr("aria-describedby").split(" ").indexOf(sId) === -1, "Token has the invisible text ID removed from aria-describedby attribute");
+	});
+
+	QUnit.test("ARIA enabledParent (deletable) text", async function(assert) {
+		var sId = InvisibleText.getStaticId("sap.m", "TOKEN_ARIA_DELETABLE");
+
+		assert.ok(this.token1.$().attr("aria-describedby").split(" ").indexOf(sId) > -1, "Token is deletable when parent is enabled");
+
+		this.token1.setProperty("enabledParent", false);
+		this.token1.invalidate(); // simulate parent invalidation
+		await nextUIUpdate();
+
+		assert.strictEqual(this.token1.$().attr("aria-describedby").split(" ").indexOf(sId), -1, "Token is not deletable when parent is disabled");
 	});
 
 	QUnit.module("Truncated Token", {

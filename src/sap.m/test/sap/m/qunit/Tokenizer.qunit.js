@@ -1027,6 +1027,20 @@ sap.ui.define([
 		assert.strictEqual(oToken.getProperty("editableParent"), false, "The editableParent property of the Token was correctly set");
 	});
 
+	QUnit.test("setEnabled", async function (assert) {
+		this.tokenizer.addToken(new Token({text: "Token 1", key: "0001"}));
+
+		const oToken = this.tokenizer.getTokens()[0];
+
+		assert.ok(oToken.getProperty("enabledParent"), "Token's parent is enabled");
+
+		this.tokenizer.setEnabled(false);
+		await nextUIUpdate();
+
+		assert.strictEqual(this.tokenizer.getEnabled(), false, "The property of the Tokenizer was set.");
+		assert.strictEqual(oToken.getProperty("enabledParent"), false, "The enabledParent property of the Token was correctly set");
+	});
+
 	QUnit.test("setWidth and setPixelWidth", async function(assert) {
 		var WIDTH = 300,
 			S_WIDTH = "200px";

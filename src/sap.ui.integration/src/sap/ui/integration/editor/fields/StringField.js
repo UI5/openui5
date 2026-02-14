@@ -65,7 +65,6 @@ sap.ui.define([
 			events: {
 				/**
 				 * Fired when translation popover opened.
-				 * Disclaimer: this event is in a beta state - incompatible API changes may be done before its official public release. Use at your own discretion.
 				 */
 				translationPopoverOpened: {}
 			}

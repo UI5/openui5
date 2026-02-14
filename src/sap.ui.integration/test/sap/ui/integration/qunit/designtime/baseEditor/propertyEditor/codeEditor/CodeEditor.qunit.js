@@ -212,12 +212,14 @@ sap.ui.define([
 			this.oCodeEditorElement.attachValueHelpRequest(function () {
 				this.oCodeEditor._openCodeEditor.returnValues[0].then(function (oDialog) {
 					var oCodeEditor = oDialog.getContent()[0];
-					setCodeEditorValue(oCodeEditor, "{\"msg\": Hello World}");
-					EditorQunitUtils.wait().then(function () {
-						assert.strictEqual(oDialog.getBeginButton().getEnabled(), false, "Then the changes cannot be saved");
-						fnDone();
+					this.oCodeEditor.attachChangeAnnotation(function (oEvent) {
+						EditorQunitUtils.wait().then(function () {
+							assert.strictEqual(oDialog.getBeginButton().getEnabled(), false, "Then the changes cannot be saved");
+							fnDone();
+						});
 					});
-				});
+					setCodeEditorValue(oCodeEditor, "{\"msg\": Hello World}");
+				}.bind(this));
 			}.bind(this));
 
 			QUnitUtils.triggerEvent("click", this.oCodeEditorElement.$("vhi"));
@@ -228,13 +230,15 @@ sap.ui.define([
 
 			this.oCodeEditorElement.attachValueHelpRequest(function () {
 				this.oCodeEditor._openCodeEditor.returnValues[0].then(function (oDialog) {
+					this.oCodeEditor.attachChangeAnnotation(function (oEvent) {
+						EditorQunitUtils.wait().then(function () {
+							QUnitUtils.triggerEvent("tap", oDialog.getBeginButton().getDomRef());
+						});
+					});
 					setCodeEditorValue(oDialog.getContent()[0], JSON.stringify({
 						msg: "Hello World"
 					}));
-					EditorQunitUtils.wait().then(function () {
-						QUnitUtils.triggerEvent("tap", oDialog.getBeginButton().getDomRef());
-					});
-				});
+				}.bind(this));
 			}.bind(this));
 
 			this.oCodeEditor.attachValueChange(function (oEvent) {

@@ -88,6 +88,10 @@ sap.ui.define([
 	DateRangeFilter.prototype.writeValueToConfiguration = function (oConfiguration) {
 		const oValueForModel = this.getValueForModel();
 
+		if (!oValueForModel.value) {
+			return;
+		}
+
 		oConfiguration.value.option = oValueForModel.value.option;
 		oConfiguration.value.values = oValueForModel.value.values;
 	};

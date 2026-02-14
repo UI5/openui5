@@ -62,6 +62,29 @@ sap.ui.define([
 		oDRF.destroy();
 	});
 
+	QUnit.test("writeValueToConfiguration with no value", function (assert) {
+		// Arrange
+		const oDRF = new DateRangeFilter();
+		const oConfiguration = {
+			value: {}
+		};
+
+		// Act
+		oDRF.writeValueToConfiguration(oConfiguration);
+
+		// Assert
+		assert.deepEqual(
+			oConfiguration,
+			{
+				value: {}
+			},
+			"Configuration should remain unchanged when there is no value and should not throw error"
+		);
+
+		// Clean up
+		oDRF.destroy();
+	});
+
 	QUnit.module("DateRangeFilter Generic", {
 		beforeEach: function () {
 			this.oCard = new Card({

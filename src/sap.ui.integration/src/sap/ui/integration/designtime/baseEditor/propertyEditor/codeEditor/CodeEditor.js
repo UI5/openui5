@@ -67,7 +67,13 @@ sap.ui.define([
 	var CodeEditor = BasePropertyEditor.extend("sap.ui.integration.designtime.baseEditor.propertyEditor.codeEditor.CodeEditor", {
 		xmlFragment: "sap.ui.integration.designtime.baseEditor.propertyEditor.codeEditor.CodeEditor",
 		metadata: {
-			library: "sap.ui.integration"
+			library: "sap.ui.integration",
+			events: {
+				/**
+				 * Fired after function onChangeAnnotation invoked by sap.ui.codeeditor.CodeEditor.
+				 */
+				"changeAnnotation": {}
+			}
 		},
 		renderer: BasePropertyEditor.getMetadata().getRenderer()
 	});
@@ -191,6 +197,7 @@ sap.ui.define([
 			}
 			this._oDialog.getBeginButton().setEnabled(true);
 		}
+		this.fireChangeAnnotation();
 	};
 
 	CodeEditor.prototype.onSave = function () {

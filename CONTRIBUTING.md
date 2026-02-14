@@ -36,8 +36,6 @@ Issue report checklist:
  * Good summary
  * Well-documented
  * Minimal example
- * Use the [template](ISSUE_TEMPLATE.md)
-
 
 ### Requirements for a bug report
 
@@ -66,7 +64,7 @@ These eight requirements are the mandatory base of a good bug report:
    * this may not always be possible and sometimes be overkill, but it always helps analyzing a bug
 8. Only one bug per report: open different tickets for different issues
 
-You are encouraged to use [this template](.github/ISSUE_TEMPLATE/bug-report.md).
+You are encouraged to use [this template](.github/ISSUE_TEMPLATE/1-bug-report.yml).
 
 Please report bugs in English, so all users can understand them.
 
@@ -74,7 +72,7 @@ If the bug appears to be a regression introduced in a new version of UI5, try to
 
 ## Request Features
 
-You have an idea for enhancing existing OpenUI5 functionality? Then we'd suggest you create a feature request. As you might guess, OpenUI5 receives many feature requests each year, far more than the OpenUI5 team could possibly tackle. Only create a feature request if you think that the missing feature is critical or an easy-to-do enhancement. Please be considerate and don't mistake the issue tracker for a wishlist.
+You have an idea for enhancing existing OpenUI5 functionality? Then we'd suggest you create a feature request. As you might guess, OpenUI5 receives many feature requests each year, far more than the OpenUI5 team could possibly tackle. Only create a feature request if you think that the missing feature is critical or an easy-to-do enhancement. Please be considerate and don't mistake the issue tracker for a wishlist. You are encouraged to use [this template](.github/ISSUE_TEMPLATE/2-feature-request.yml).
 
 ## Report Security Issues
 

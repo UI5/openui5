@@ -974,7 +974,8 @@ sap.ui.define([
 			}
 
 			aTokens.forEach(function(oToken, iIndex) {
-				oToken.setProperty("editableParent", this.getEditable() && this.getEnabled());
+				oToken.setProperty("editableParent", this.getEditable());
+				oToken.setProperty("enabledParent", this.getEnabled());
 				oToken.setProperty("posinset", iIndex + 1);
 				oToken.setProperty("setsize", aTokens.length);
 			}, this);
