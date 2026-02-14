@@ -4923,10 +4923,10 @@ sap.ui.define([
 	 *   </ul>
 	 * @param {boolean} [oAggregation.createInPlace]
 	 *   Whether created nodes are shown in place at the position specified by the service
-	 *   (since 1.130.0); only the value <code>true</code> is allowed.
-	 *   Otherwise, created nodes are displayed out of place as the first children of their parent
-	 *   or as the first roots, but not in their usual position as defined by the service and the
-	 *   current sort order.
+	 *   (since 1.130.0), supported only if a <code>hierarchyQualifier</code> is given; only the
+	 *   value <code>true</code> is allowed. Otherwise, created nodes are displayed out of place as
+	 *   the first children of their parent or as the first roots, but not in their usual position
+	 *   as defined by the service and the current sort order.
 	 * @param {number} [oAggregation.expandTo=1]
 	 *   The number (as a positive integer) of different levels initially available without calling
 	 *   {@link sap.ui.model.odata.v4.Context#expand} (since 1.117.0), supported only if a

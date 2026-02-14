@@ -29,8 +29,19 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
-	var { ValueState } = coreLibrary;
-	var _oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
+	const { ValueState } = coreLibrary;
+	const _oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
+
+	const _aAdvancedSettings = [
+		{ key: "allowForms", label: "allow-forms" },
+		{ key: "allowScripts", label: "allow-scripts" },
+		{ key: "allowSameOrigin", label: "allow-same-origin" },
+		{ key: "allowPopups", label: "allow-popups" },
+		{ key: "allowModals", label: "allow-modals" },
+		{ key: "allowTopNavigation", label: "allow-top-navigation" },
+		{ key: "allowDownloads", label: "allow-downloads" },
+		{ key: "additionalSandboxParameters", isMultiInput: true }
+	];
 
 	function createJSONModel(bSetUpdateTitle, bAsContainer, sFrameWidthValue, sFrameHeightValue, oAdvancedSettings) {
 		var sSelectAdditionalTextPercent = bAsContainer
@@ -122,6 +133,7 @@ sap.ui.define([
 					...oAdvancedSettings
 				}
 			},
+			advancedSettingsConfig: _aAdvancedSettings,
 			settingsUpdate: {
 				value: false
 			},

@@ -4,7 +4,12 @@
 sap.ui.define([
 	"sap/base/util/Deferred",
 	"sap/base/Log",
+	"sap/m/HBox",
+	"sap/m/Label",
+	"sap/m/MultiInput",
+	"sap/m/Switch",
 	"sap/m/Token",
+	"sap/m/VBox",
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
@@ -17,7 +22,12 @@ sap.ui.define([
 ], function(
 	Deferred,
 	Log,
+	HBox,
+	Label,
+	MultiInput,
+	Switch,
 	Token,
+	VBox,
 	Controller,
 	Element,
 	Lib,
@@ -31,13 +41,14 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
-	var { ValueState } = coreLibrary;
+	const { ValueState } = coreLibrary;
 
 	const _oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
 
-	var _aTextInputFields = ["frameUrl", "title"];
-	var _aNumericInputFields = ["frameWidth", "frameHeight"];
-	var _aOtherInputFields = ["frameWidthUnit", "frameHeightUnit", "advancedSettings"];
+	const _aTextInputFields = ["frameUrl", "title"];
+	const _aNumericInputFields = ["frameWidth", "frameHeight"];
+	const _aUnitInputFields = ["frameWidthUnit", "frameHeightUnit"];
+	const _aAllConfigFields = _aTextInputFields.concat(_aNumericInputFields, _aUnitInputFields, ["advancedSettings"]);
 
 	function isValidUrl(sUrl) {
 		if (
@@ -65,6 +76,17 @@ sap.ui.define([
 		oIFramePreview.setProperty(sIFramePropertyName, sValue + sUnit);
 	}
 
+	function setURLErrorMessage(sError) {
+		const sErrorKey = {
+			[IFrame.VALIDATION_ERROR.UNSAFE_PROTOCOL]: "IFRAME_ADDIFRAME_ERROR_UNSAFE_PROTOCOL",
+			[IFrame.VALIDATION_ERROR.MIXED_CONTENT]: "IFRAME_ADDIFRAME_ERROR_MIXED_CONTENT",
+			[IFrame.VALIDATION_ERROR.FORBIDDEN_URL]: "IFRAME_ADDIFRAME_ERROR_FORBIDDEN_URL",
+			[IFrame.VALIDATION_ERROR.INVALID_URL]: "IFRAME_ADDIFRAME_ERROR_INVALID_URL"
+		}[sError];
+		const sErrorText = _oTextResources.getText(sErrorKey);
+		this._oJSONModel.setProperty("/frameUrlError/value", sErrorText);
+	}
+
 	return Controller.extend("sap.ui.rta.plugin.iframe.AddIFrameDialogController", {
 		constructor: function(oJSONModel, mSettings) {
 			this._oJSONModel = oJSONModel;
@@ -73,15 +95,82 @@ sap.ui.define([
 
 		onBeforeOpen() {
 			this._oJSONModel.setProperty("/initialFrameUrl/value", this._oJSONModel.getProperty("/frameUrl/value"));
+			this._storeInitialConfiguration();
 			// Configure the MultiInput field
 			// This syntax is the suggested way by the UI5 documentation to trigger a submit on the input field on focus loss
 			const oMultiInput = Element.getElementById("sapUiRtaAddIFrameDialog_AddAdditionalParametersInput");
 			oMultiInput.addValidator(multiInputValidator);
 		},
 
+		/**
+		 * Factory function to create controls for advanced settings Grid content
+		 * @param {string} sId - Generated ID for the control
+		 * @param {sap.ui.model.Context} oContext - Binding context
+		 * @returns {sap.ui.core.Control} Control (HBox with Switch or VBox with MultiInput)
+		 */
+		createAdvancedSettingsControl(sId, oContext) {
+			const oSetting = oContext.getObject();
+
+			// MultiInput for additional sandbox parameters
+			if (oSetting.isMultiInput) {
+				const oLabel = new Label("sapUiRtaAddIFrameDialog_AddAdditionalParametersLabel", {
+					text: "{i18n>IFRAME_ADDIFRAME_ADD_ADDITIONAL_SANDBOX_PARAMETERS_LABEL}",
+					labelFor: "sapUiRtaAddIFrameDialog_AddAdditionalParametersInput"
+				});
+
+				const oMultiInput = new MultiInput("sapUiRtaAddIFrameDialog_AddAdditionalParametersInput", {
+					placeholder: "{i18n>IFRAME_ADDIFRAME_ADD_ADDITIONAL_SANDBOX_PARAMETERS_PLACEHOLDER}",
+					showValueHelp: false,
+					tokenUpdate: this.onTokenUpdate.bind(this)
+				});
+
+				// Set up token binding programmatically
+				oMultiInput.bindAggregation("tokens", {
+					path: "dialogInfo>/advancedSettings/value/additionalSandboxParameters",
+					template: new Token({
+						text: "{dialogInfo>}",
+						key: "{dialogInfo>}"
+					}),
+					templateShareable: false
+				});
+
+				return new VBox(sId, {
+					items: [oLabel, oMultiInput]
+				});
+			}
+
+			// Switch for boolean settings
+			const oSwitch = new Switch(`sapUiRtaAddIFrameDialog_${oSetting.key}Switch`, {
+				state: `{dialogInfo>/advancedSettings/value/${oSetting.key}}`,
+				customTextOn: " ",
+				customTextOff: " ",
+				change: this.onSwitchChange.bind(this)
+			});
+
+			const oLabel = new Label({
+				text: oSetting.label
+			});
+
+			return new HBox(sId, {
+				alignItems: "Center",
+				items: [oSwitch, oLabel]
+			});
+		},
+
 		onSwitchChange() {
-			this._checkIfAllFieldsValid(true);
+			this._checkIfSaveIsEnabled(true);
 			this._oJSONModel.setProperty("/settingsUpdate/value", true);
+		},
+
+		/**
+		 * Event handler for URL live change
+		 * Enables the Save button immediately when content is typed
+		 */
+		onUrlLiveChange() {
+			// Clear any previous URL error to make typing user friendly
+			this._oJSONModel.setProperty("/frameUrlError/value", "");
+			// Check if save should be enabled based on changes (without full URL validation)
+			this._checkIfSaveIsEnabled(true);
 		},
 
 		/**
@@ -92,20 +181,18 @@ sap.ui.define([
 			let aSandboxParameters = this._oJSONModel.getProperty("/advancedSettings/value/additionalSandboxParameters");
 
 			if (oEvent.getParameter("type") === "added") {
-				oEvent.getParameter("addedTokens").forEach(function(oToken) {
+				oEvent.getParameter("addedTokens").forEach((oToken) => {
 					aSandboxParameters = [...aSandboxParameters, oToken.getText()];
 				});
 			} else if (oEvent.getParameter("type") === "removed") {
-				oEvent.getParameter("removedTokens").forEach(function(oToken) {
-					aSandboxParameters = aSandboxParameters.filter(function(sText) {
-						return sText !== oToken.getText();
-					});
+				oEvent.getParameter("removedTokens").forEach((oToken) => {
+					aSandboxParameters = aSandboxParameters.filter((sText) => sText !== oToken.getText());
 				});
 			}
 
 			this._oJSONModel.setProperty("/advancedSettings/value/additionalSandboxParameters", aSandboxParameters);
 			this._oJSONModel.setProperty("/settingsUpdate/value", true);
-			this._checkIfAllFieldsValid(true);
+			this._checkIfSaveIsEnabled(true);
 		},
 
 		/**
@@ -114,7 +201,7 @@ sap.ui.define([
 		 */
 		onValidationSuccess(oEvent) {
 			oEvent.getSource().setValueState(ValueState.None);
-			this._checkIfAllFieldsValid(true);
+			this._checkIfSaveIsEnabled(true);
 		},
 
 		/**
@@ -123,16 +210,25 @@ sap.ui.define([
 		 */
 		onValidationError(oEvent) {
 			oEvent.getSource().setValueState(ValueState.Error);
-			this._checkIfAllFieldsValid(false);
+			this._checkIfSaveIsEnabled(false);
 			this._setFocusOnInvalidInput();
 		},
 
 		/**
 		 * Event handler for save button
+		 * Validates the URL before saving - if invalid, shows error and disables Save button
 		 */
 		async onSavePress() {
 			const sUrl = await this._buildPreviewURL();
-			if (isValidUrl(sUrl).result && this._areAllTextFieldsValid() && this._areAllValueStateNones()) {
+			const { result: bResult, error: sError } = isValidUrl(sUrl);
+
+			if (!bResult) {
+				setURLErrorMessage.call(this, sError);
+				this._checkIfSaveIsEnabled(false);
+				return;
+			}
+
+			if (this._areAllTextFieldsValid() && this._areAllValueStateNones()) {
 				this._close(this._buildReturnedSettings());
 			} else {
 				this._setFocusOnInvalidInput();
@@ -189,8 +285,8 @@ sap.ui.define([
 		 * @param {sap.ui.base.Event} oEvent - Event
 		 */
 		onLiveChange(oEvent) {
-			var oFilter = new Filter("label", FilterOperator.Contains, oEvent.getParameter("newValue"));
-			var oBinding = Element.getElementById("sapUiRtaAddIFrameDialog_ParameterTable").getBinding("items");
+			const oFilter = new Filter("label", FilterOperator.Contains, oEvent.getParameter("newValue"));
+			const oBinding = Element.getElementById("sapUiRtaAddIFrameDialog_ParameterTable").getBinding("items");
 			oBinding.filter([oFilter]);
 		},
 
@@ -206,7 +302,7 @@ sap.ui.define([
 			// Extract "/frameWidth" or "/frameHeight" from the binding path (e.g. /frameWidth/value)
 			const sPropertyName = sPropertyPath.replace(/\/value$/, "");
 			setNewPreviewSize.call(this, sPropertyName);
-			this._checkIfAllFieldsValid(true);
+			this._checkIfSaveIsEnabled(true);
 		},
 
 		/**
@@ -221,7 +317,7 @@ sap.ui.define([
 			// Extract "/frameWidth" or "/frameHeight" from the binding path (e.g. /frameWidthUnit/value)
 			const sPropertyName = sPropertyPath.replace(/Unit\/value$/, "");
 			setNewPreviewSize.call(this, sPropertyName);
-			this._checkIfAllFieldsValid(true);
+			this._checkIfSaveIsEnabled(true);
 		},
 
 		/**
@@ -298,19 +394,101 @@ sap.ui.define([
 		},
 
 		/**
-		 * Triggers the validation of all fields and updates the "areAllFieldsValid" property in the model
-		 * This property is also used to enable/disable the Save button, hence the check must be called after every update on the dialog
+		 * Stores the initial configuration values when the dialog opens.
+		 * This is used to detect if any changes were made.
+		 *
+		 * @private
+		 */
+		_storeInitialConfiguration() {
+			this._mInitialConfiguration = {};
+			const aAdvancedSettingsConfig = this._oJSONModel.getProperty("/advancedSettingsConfig");
+			_aAllConfigFields.forEach((sFieldName) => {
+				const vValue = this._oJSONModel.getProperty(`/${sFieldName}/value`);
+				// For advancedSettings, store each property individually to avoid reference issues
+				if (sFieldName === "advancedSettings") {
+					const mStoredSettings = {};
+					// Use explicit false for undefined boolean values since switches default to false
+					aAdvancedSettingsConfig.forEach((oSetting) => {
+						mStoredSettings[oSetting.key] = vValue[oSetting.key] ?? false;
+					});
+					mStoredSettings.additionalSandboxParameters = vValue.additionalSandboxParameters
+						? [...vValue.additionalSandboxParameters]
+						: [];
+					this._mInitialConfiguration.advancedSettings = mStoredSettings;
+				} else if (vValue !== null && typeof vValue === "object") {
+					// Deep copy for other objects using JSON parse/stringify
+					this._mInitialConfiguration[sFieldName] = JSON.parse(JSON.stringify(vValue));
+				} else {
+					this._mInitialConfiguration[sFieldName] = vValue;
+				}
+			});
+		},
+
+		/**
+		 * Checks if any configuration field has been modified compared to the initial state.
+		 *
+		 * @returns {boolean} True if any configuration was modified
+		 * @private
+		 */
+		_hasConfigurationChanged() {
+			if (!this._mInitialConfiguration) {
+				return true; // No initial config stored (e.g. new iframe)
+			}
+
+			const aAdvancedSettingsConfig = this._oJSONModel.getProperty("/advancedSettingsConfig");
+			return _aAllConfigFields.some((sFieldName) => {
+				const vCurrentValue = this._oJSONModel.getProperty(`/${sFieldName}/value`);
+				const vInitialValue = this._mInitialConfiguration[sFieldName];
+
+				// Handle advancedSettings by comparing each property individually
+				if (sFieldName === "advancedSettings") {
+					// Compare boolean switches using nullish coalescing to handle undefined values
+					const bSwitchChanged = aAdvancedSettingsConfig.some((oSetting) => {
+						if (oSetting.key === "additionalSandboxParameters") {
+							return false; // Array comparison is handled below
+						}
+						return (vCurrentValue[oSetting.key] ?? false) !== vInitialValue[oSetting.key];
+					});
+					if (bSwitchChanged) {
+						return true;
+					}
+					// Compare additionalSandboxParameters array
+					const aCurrentParams = vCurrentValue.additionalSandboxParameters || [];
+					const aInitialParams = vInitialValue.additionalSandboxParameters || [];
+					if (aCurrentParams.length !== aInitialParams.length) {
+						return true;
+					}
+					return aCurrentParams.some((vParam, iCounter) => vParam !== aInitialParams[iCounter]);
+				}
+
+				// Handle other objects by comparing JSON strings
+				if (vCurrentValue !== null && typeof vCurrentValue === "object") {
+					return JSON.stringify(vCurrentValue) !== JSON.stringify(vInitialValue);
+				}
+
+				return vCurrentValue !== vInitialValue;
+			});
+		},
+
+		/**
+		 * Triggers the validation of all fields and updates the "saveEnabled" property in the model
+		 * This property is used to enable/disable the Save button
+		 * The Save button is only enabled if:
+		 * 1. All validation checks pass
+		 * 2. At least one configuration field was modified
 		 *
 		 * @param {boolean} bExternalValidationSuccess - Whether external validation was successful
 		 */
-		_checkIfAllFieldsValid(bExternalValidationSuccess) {
-			const bAllFieldsValid = (
+		_checkIfSaveIsEnabled(bExternalValidationSuccess) {
+			const bAllValidationsPass = (
 				bExternalValidationSuccess
 				&& !this._oJSONModel.getProperty("/frameUrlError/value")
 				&& this._areAllTextFieldsValid()
 				&& this._areAllValueStateNones()
 			);
-			this._oJSONModel.setProperty("/areAllFieldsValid", bAllFieldsValid);
+			const bHasChanges = this._hasConfigurationChanged();
+			const bSaveEnabled = bAllValidationsPass && bHasChanges;
+			this._oJSONModel.setProperty("/saveEnabled", bSaveEnabled);
 		},
 
 		async onValidateUrl() {
@@ -319,16 +497,9 @@ sap.ui.define([
 			if (bResult) {
 				this._oJSONModel.setProperty("/frameUrlError/value", "");
 			} else {
-				const sErrorKey = {
-					[IFrame.VALIDATION_ERROR.UNSAFE_PROTOCOL]: "IFRAME_ADDIFRAME_ERROR_UNSAFE_PROTOCOL",
-					[IFrame.VALIDATION_ERROR.MIXED_CONTENT]: "IFRAME_ADDIFRAME_ERROR_MIXED_CONTENT",
-					[IFrame.VALIDATION_ERROR.FORBIDDEN_URL]: "IFRAME_ADDIFRAME_ERROR_FORBIDDEN_URL",
-					[IFrame.VALIDATION_ERROR.INVALID_URL]: "IFRAME_ADDIFRAME_ERROR_INVALID_URL"
-				}[sError];
-				const sErrorText = _oTextResources.getText(sErrorKey);
-				this._oJSONModel.setProperty("/frameUrlError/value", sErrorText);
+				setURLErrorMessage.call(this, sError);
 			}
-			this._checkIfAllFieldsValid(bResult);
+			this._checkIfSaveIsEnabled(bResult);
 		},
 
 		/**
@@ -339,28 +510,25 @@ sap.ui.define([
 		},
 
 		onContainerTitleChange(oEvent) {
-			var oInput = oEvent.getSource();
-			var sValueState = "None";
-			var bValidationError = false;
-			var sValue = oInput.getValue();
+			const oInput = oEvent.getSource();
+			const sValue = oInput.getValue();
+			let sValueState = ValueState.None;
 
 			if (sValue.trim() === "") {
-				sValueState = "Error";
-				oInput.setValueState(sValueState);
-				this._oJSONModel.setProperty("/areAllFieldsValid", false);
+				oInput.setValueState(ValueState.Error);
+				this._oJSONModel.setProperty("/saveEnabled", false);
 				return true;
 			}
 
 			try {
 				validateText(sValue);
 			} catch (oException) {
-				sValueState = "Error";
-				bValidationError = true;
+				sValueState = ValueState.Error;
 			}
 
-			this._checkIfAllFieldsValid(!bValidationError);
 			oInput.setValueState(sValueState);
-			return bValidationError;
+			this._checkIfSaveIsEnabled(sValueState === ValueState.None);
+			return sValueState === ValueState.Error;
 		},
 
 		/**
@@ -370,7 +538,7 @@ sap.ui.define([
 		 * @private
 		 */
 		_close(mSettings) {
-			var oAddIFrameDialog = Element.getElementById("sapUiRtaAddIFrameDialog");
+			const oAddIFrameDialog = Element.getElementById("sapUiRtaAddIFrameDialog");
 			this._mSettings = mSettings;
 			oAddIFrameDialog.close();
 		},
@@ -386,37 +554,33 @@ sap.ui.define([
 		},
 
 		_areAllValueStateNones() {
-			var oData = this._oJSONModel.getData();
-			return _aTextInputFields.concat(_aNumericInputFields).every(function(sFieldName) {
+			const oData = this._oJSONModel.getData();
+			return _aTextInputFields.concat(_aNumericInputFields).every((sFieldName) => {
 				return oData[sFieldName].valueState === ValueState.None;
-			}, this);
+			});
 		},
 
 		_areAllTextFieldsValid() {
-			var oJSONModel = this._oJSONModel;
-			var bAsContainer = this._oJSONModel.getProperty("asContainer/value");
-			return _aTextInputFields.reduce(function(bAllValid, sFieldName) {
+			const bAsContainer = this._oJSONModel.getProperty("asContainer/value");
+			return _aTextInputFields.every((sFieldName) => {
 				// The title field is only available on add as Section
 				if (sFieldName === "title" && !bAsContainer) {
 					return true;
 				}
-				var sValuePath = `/${sFieldName}/value`;
-				var sValueState;
-				if (oJSONModel.getProperty(sValuePath).trim() === "") {
-					sValueState = ValueState.Error;
-				} else {
-					sValueState = ValueState.None;
-				}
-				oJSONModel.setProperty(`${sValuePath}State`, sValueState);
-				return bAllValid && sValueState === ValueState.None;
-			}, true);
+				const sValuePath = `/${sFieldName}/value`;
+				const sValueState = this._oJSONModel.getProperty(sValuePath).trim() === ""
+					? ValueState.Error
+					: ValueState.None;
+				this._oJSONModel.setProperty(`${sValuePath}State`, sValueState);
+				return sValueState === ValueState.None;
+			});
 		},
 
 		_buildReturnedSettings() {
-			var mSettings = {};
-			var oData = this._oJSONModel.getData();
-			_aTextInputFields.concat(_aNumericInputFields, _aOtherInputFields).forEach(function(sFieldName) {
-				var sValue = oData[sFieldName].value;
+			const mSettings = {};
+			const oData = this._oJSONModel.getData();
+			_aAllConfigFields.forEach((sFieldName) => {
+				let sValue = oData[sFieldName].value;
 				if (sFieldName === "frameUrl") {
 					sValue = urlCleaner(sValue);
 				}
@@ -432,29 +596,30 @@ sap.ui.define([
 		 * @private
 		 */
 		_importSettings(mSettings) {
-			if (mSettings) {
-				Object.keys(mSettings).forEach(function(sFieldName) {
-					if (sFieldName === "frameWidth" || sFieldName === "frameHeight") {
-						this._importIFrameSize(sFieldName, mSettings[sFieldName]);
-					// legacy iframes do not have advancedSettings properties so we need to skip the setProperty
-					// on the json model to not overwrite the default values with undefined
-					} else if (sFieldName === "advancedSettings" && !mSettings[sFieldName]) {
-						return;
-					} else {
-						this._oJSONModel.setProperty(`/${sFieldName}/value`, mSettings[sFieldName]);
-					}
-				}, this);
+			if (!mSettings) {
+				return;
 			}
+			Object.keys(mSettings).forEach((sFieldName) => {
+				if (sFieldName === "frameWidth" || sFieldName === "frameHeight") {
+					this._importIFrameSize(sFieldName, mSettings[sFieldName]);
+				// Legacy iframes do not have advancedSettings properties so we need to skip the setProperty
+				// on the json model to not overwrite the default values with undefined
+				} else if (sFieldName === "advancedSettings" && !mSettings[sFieldName]) {
+					return;
+				} else {
+					this._oJSONModel.setProperty(`/${sFieldName}/value`, mSettings[sFieldName]);
+				}
+			});
 		},
 
 		/**
 		 * Import IFrame size
 		 *
-		 * @param  {string} sFieldName - Field name
-		 * @param  {string} sSize - Size to import
+		 * @param {string} sFieldName - Field name
+		 * @param {string} sSize - Size to import
 		 */
 		_importIFrameSize(sFieldName, sSize) {
-			var aResults = sSize.split(/(px|rem|%|vh)/);
+			const aResults = sSize.split(/(px|rem|%|vh)/);
 			if (aResults.length >= 2) {
 				this._oJSONModel.setProperty(`/${sFieldName}/value`, parseFloat(aResults[0]));
 				this._oJSONModel.setProperty(`/${sFieldName}Unit/value`, aResults[1]);
@@ -466,18 +631,17 @@ sap.ui.define([
 		 * Processed on saving the dialog
 		 * Only numerical values are checked
 		 * An empty URL field disables the Save button and does not need to be checked
-		 *
 		 */
 		_setFocusOnInvalidInput() {
-			var oData = this._oJSONModel.getData();
-			_aNumericInputFields.some(function(sFieldName) {
+			const oData = this._oJSONModel.getData();
+			_aNumericInputFields.some((sFieldName) => {
 				if (oData[sFieldName].valueState === ValueState.Error) {
-					var oElement = Element.getElementById(oData[sFieldName].id);
+					const oElement = Element.getElementById(oData[sFieldName].id);
 					oElement.focus();
 					return true;
 				}
 				return false;
-			}, this);
+			});
 		}
 	});
 });

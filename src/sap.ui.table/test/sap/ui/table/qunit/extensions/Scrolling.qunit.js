@@ -9,7 +9,6 @@ sap.ui.define([
 	"sap/ui/table/rowmodes/Fixed",
 	"sap/ui/table/rowmodes/Auto",
 	"sap/ui/table/utils/TableUtils",
-	"sap/ui/table/TableRenderer",
 	"sap/ui/table/library",
 	"sap/m/TextArea",
 	"sap/ui/Device",
@@ -26,7 +25,6 @@ sap.ui.define([
 	FixedRowMode,
 	AutoRowMode,
 	TableUtils,
-	TableRenderer,
 	library,
 	TextArea,
 	Device,
@@ -165,7 +163,6 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const oScrollExtension = oTable._getScrollExtension();
 		let oVSb = oScrollExtension.getVerticalScrollbar();
-		const iOriginalApiVersion = TableRenderer.apiVersion;
 
 		assert.ok(oVSb.offsetWidth > 0 && oVSb.offsetHeight > 0, "Table content does not fit height -> Vertical scrollbar is visible");
 
@@ -174,26 +171,6 @@ sap.ui.define([
 		return oTable.qunit.whenRenderingFinished().then(function() {
 			oVSb = oScrollExtension.getVerticalScrollbar();
 			assert.ok(oVSb.offsetWidth === 0 && oVSb.offsetHeight === 0, "Table content fits height -> Vertical scrollbar is not visible");
-
-		}).then(function() {
-			// BCP: 1970484410
-			TableRenderer.apiVersion = 1;
-			oTable.setModel(TableQUnitUtils.createJSONModelWithEmptyRows(7), "other");
-			oTable.bindRows({
-				path: "/",
-				model: "other"
-			});
-			oTable.invalidate();
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oVSb = oScrollExtension.getVerticalScrollbar();
-
-			assert.notEqual(oVSb, null, "Table is re-rendered without being invalidated -> Vertical scrollbar exists");
-
-			if (oVSb) {
-				assert.ok(oVSb.offsetWidth > 0 && oVSb.offsetHeight > 0, "Table content does not fit height -> Vertical scrollbar is visible");
-			}
-		}).finally(function() {
-			TableRenderer.apiVersion = iOriginalApiVersion;
 		});
 	});
 

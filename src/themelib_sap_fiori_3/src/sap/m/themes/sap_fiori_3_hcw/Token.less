@@ -25,12 +25,17 @@ html.sap-desktop .sapMToken.sapMTokenSelected:not(.sapMTokenReadOnly):hover {
 html.sap-desktop .sapMToken {
 
 	&.sapMTokenReadOnly,
-	&.sapMTokenReadOnly:hover,
-	&.sapMTokenReadOnly.sapMTokenSelected,
-	&.sapMTokenReadOnly.sapMTokenSelected:hover {
+	&.sapMTokenReadOnly:hover {
 		color: var(--sapContent_LabelColor);
 		background: var(--sapField_ReadOnly_Background);
 		border: var(--sapButton_BorderWidth) solid var(--sapField_ReadOnly_BorderColor);
+	}
+
+	&.sapMTokenReadOnly.sapMTokenSelected,
+	&.sapMTokenReadOnly.sapMTokenSelected:hover {
+		color: var(--sapButton_Selected_TextColor);
+		background: var(--sapButton_Selected_Background);
+		border: var(--sapButton_BorderWidth) solid var(--sapButton_Selected_BorderColor);
 	}
 }
 

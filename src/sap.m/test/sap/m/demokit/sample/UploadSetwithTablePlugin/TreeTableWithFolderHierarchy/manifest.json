@@ -36,6 +36,7 @@
 					"model/documents.json",
 					"model/mockserver.js",
 					"view/fragment/AddViaUrl.fragment.xml",
+					"view/fragment/CreateFolderDialog.fragment.xml",
 					"manifest.json"
 				]
 			}

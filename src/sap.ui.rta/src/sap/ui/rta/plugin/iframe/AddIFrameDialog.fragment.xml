@@ -73,6 +73,7 @@
 							valueState="{= !!${dialogInfo>/frameUrlError/value} ? 'Error' : 'None'}"
 							valueStateText="{dialogInfo>/frameUrlError/value}"
 							validateFieldGroup="onValidateUrl"
+							liveChange="onUrlLiveChange"
 							rows="{= !!${dialogInfo>/showParameters/value} ? 8 : 1 }"
 							growingMaxLines="8"
 							width="100%"
@@ -195,7 +196,7 @@
 							press="onPreviewPress"
 							enabled="{= !${dialogInfo>/frameUrlError/value} &amp;&amp; ${dialogInfo>/frameUrl/value} !== '' &amp;&amp; (${dialogInfo>/previousFrameUrl/value} !== ${dialogInfo>/frameUrl/value} || ${dialogInfo>/settingsUpdate/value})}"
 							icon="{=${dialogInfo>/previousFrameUrl/value} ? 'sap-icon://refresh' : null }"
-							type="{= !${dialogInfo>/frameUrlError/value} &amp;&amp; (${dialogInfo>/previousFrameUrl/value} !== ${dialogInfo>/frameUrl/value} || ${dialogInfo>/settingsUpdate/value}) ? 'Emphasized' : 'Default' }"
+							type="{= !${dialogInfo>/frameUrlError/value} &amp;&amp; ${dialogInfo>/frameUrl/value} !== '' &amp;&amp; (${dialogInfo>/previousFrameUrl/value} !== ${dialogInfo>/frameUrl/value} || ${dialogInfo>/settingsUpdate/value}) ? 'Emphasized' : 'Default' }"
 							/>
 					</HBox>
 					<VBox id="sapUiRtaAddIFrameDialog_PreviewLinkVBox" class="sapUiRtaAddIFrameDialogContainer sapUiTinyMarginTop" renderType="Bare">
@@ -374,95 +375,15 @@
 										href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#sandbox"/>
 								</link>
 							</MessageStrip>
-							<form:Form editable="true">
-								<form:layout>
-									<form:ResponsiveGridLayout
-										id="sapUiRtaAddIFrameDialog_SandboxPropertiesForm"
-										adjustLabelSpan="false" singleContainerFullSize="false"
-										labelSpanXL="6" labelSpanL="6" labelSpanM="6" labelSpanS="12"
-										columnsXL="2" columnsL="2" columnsM="2"/>
-									</form:layout>
-										<form:FormContainer>
-											<form:FormElement label="allow-forms">
-												<Switch
-													change="onSwitchChange"
-													id="sapUiRtaAddIFrameDialog_allowFormsSwitch"
-													customTextOn=" "
-													customTextOff=" "
-													state="{dialogInfo>/advancedSettings/value/allowForms}" />
-											</form:FormElement>
-											<form:FormElement label="allow-scripts">
-												<Switch
-													change="onSwitchChange"
-													id="sapUiRtaAddIFrameDialog_allowScriptsSwitch"
-													customTextOn=" "
-													customTextOff=" "
-													state="{dialogInfo>/advancedSettings/value/allowScripts}" />
-											</form:FormElement>
-											<form:FormElement label="allow-same-origin">
-												<Switch
-													change="onSwitchChange"
-													id="sapUiRtaAddIFrameDialog_allowSameOriginSwitch"
-													customTextOn=" "
-													customTextOff=" "
-													state="{dialogInfo>/advancedSettings/value/allowSameOrigin}" />
-											</form:FormElement>
-											<form:FormElement label="allow-popups">
-												<Switch
-													change="onSwitchChange"
-													id="sapUiRtaAddIFrameDialog_allowPopupsSwitch"
-													customTextOn=" "
-													customTextOff=" "
-													state="{dialogInfo>/advancedSettings/value/allowPopups}" />
-											</form:FormElement>
-											<form:FormElement label="allow-modals">
-												<Switch
-													change="onSwitchChange"
-													id="sapUiRtaAddIFrameDialog_allowModalsSwitch"
-													customTextOn=" "
-													customTextOff=" "
-													state="{dialogInfo>/advancedSettings/value/allowModals}" />
-											</form:FormElement>
-										</form:FormContainer>
-										<form:FormContainer>
-											<form:FormElement label="allow-top-navigation">
-												<Switch
-													change="onSwitchChange"
-													id="sapUiRtaAddIFrameDialog_allowTopNavigationSwitch"
-													customTextOn=" "
-													customTextOff=" "
-													state="{dialogInfo>/advancedSettings/value/allowTopNavigation}" />
-											</form:FormElement>
-											<form:FormElement label="allow-downloads">
-												<Switch
-													change="onSwitchChange"
-													id="sapUiRtaAddIFrameDialog_allowDownloadsSwitch"
-													customTextOn=" "
-													customTextOff=" "
-													state="{dialogInfo>/advancedSettings/value/allowDownloads}" />
-											</form:FormElement>
-											<form:FormElement>
-												<Label
-													id="sapUiRtaAddIFrameDialog_AddAdditionalParametersLabel"
-													class="sapUiSmallMarginTop"
-													text="{i18n>IFRAME_ADDIFRAME_ADD_ADDITIONAL_SANDBOX_PARAMETERS_LABEL}"
-													labelFor="sapUiRtaAddIFrameDialog_AddAdditionalParametersInput" />
-											</form:FormElement>
-											<form:FormElement>
-												<MultiInput
-													id="sapUiRtaAddIFrameDialog_AddAdditionalParametersInput"
-													placeholder="{i18n>IFRAME_ADDIFRAME_ADD_ADDITIONAL_SANDBOX_PARAMETERS_PLACEHOLDER}"
-													showValueHelp="false"
-													tokenUpdate="onTokenUpdate"
-													tokens="{dialogInfo>/advancedSettings/value/additionalSandboxParameters}"
-													ariaLabelledBy="sapUiRtaAddIFrameDialog_AddAdditionalParametersLabel">
-													<tokens>
-														<Token text="{dialogInfo>}" key="{dialogInfo>}"/>
-													</tokens>
-												</MultiInput>
-									</form:FormElement>
-								</form:FormContainer>
-							</form:Form>
+							<layout:Grid
+								id="sapUiRtaAddIFrameDialog_SandboxPropertiesGrid"
+								defaultSpan="XL6 L6 M6 S12"
+								hSpacing="1"
+								vSpacing="1"
+								content="{
+									path: 'dialogInfo>/advancedSettingsConfig',
+									factory: '.createAdvancedSettingsControl'
+								}"/>
 						</content>
 					</Panel>
 				</layout:Grid>
@@ -480,7 +401,7 @@
 				type="Emphasized"
 				text="{i18n>IFRAME_ADDIFRAME_DIALOG_BUTTON_SAVE}"
 				press="onSavePress"
-				enabled="{= !!${dialogInfo>/areAllFieldsValid} }"
+				enabled="{= !!${dialogInfo>/saveEnabled} }"
 			/>
 		</beginButton>
 		<endButton>
