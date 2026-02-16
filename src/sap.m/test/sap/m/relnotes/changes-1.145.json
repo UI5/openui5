@@ -3,6 +3,11 @@
     "date": "February 2026",
     "notes": [
       {
+        "id": "a3eb7610019ec199f8210748d349974bfa9af5af",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendar: week numbering in Week and OneMonth view are shown again."
+      },
+      {
         "id": "cd3b482c82c7330ec337e9b08a24b649547b7741",
         "type": "FIX",
         "text": " We've now removed redundant CSS attributes from the GenericTile header content to avoid the truncation of text in certain languages"

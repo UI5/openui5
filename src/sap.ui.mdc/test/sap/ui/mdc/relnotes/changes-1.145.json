@@ -3,6 +3,11 @@
     "date": "February 2026",
     "notes": [
       {
+        "id": "d64540e1a51a0ff00875dce76454d3814654f207",
+        "type": "FIX",
+        "text": " Field: runtime error if DOM removed while update"
+      },
+      {
         "id": "c76ed03118496ed68a071eb0f5ad395d57ce0eba",
         "type": "FEATURE",
         "text": " sap.ui.mdc.valueHelp: Remove duplicate label from DefineConditionsPanel"

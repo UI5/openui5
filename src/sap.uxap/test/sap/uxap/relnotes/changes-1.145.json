@@ -3,6 +3,11 @@
     "date": "February 2026",
     "notes": [
       {
+        "id": "c4aee852e71199a2829de6884b6b6e62fe657b0d",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Ensure subsection visibility is tracked correctly"
+      },
+      {
         "id": "ca63008a090a3f77e129abe0c1a72c9ab1eb5854",
         "type": "FIX",
         "text": " sap.uxap.ObjectPageLayout: Scrolling issue fixed"

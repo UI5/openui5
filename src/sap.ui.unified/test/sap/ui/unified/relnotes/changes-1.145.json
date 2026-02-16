@@ -3,6 +3,16 @@
     "date": "February 2026",
     "notes": [
       {
+        "id": "a3eb7610019ec199f8210748d349974bfa9af5af",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendar: week numbering in Week and OneMonth view are shown again."
+      },
+      {
+        "id": "66dd4a78e8256694ce49e444c1a6a4a63b1209cf",
+        "type": "FIX",
+        "text": " sap.ui.unified.CalendarDateInterval sap.ui.unified.CalendarTimeInterval: week numbers display in calendar interval controls is visible again"
+      },
+      {
         "id": "b28bcd6a9030581625ab88f404caa982e702e279",
         "type": "FEATURE",
         "text": " PlanningCalendar: Week numbers display is now enabled in the months view"

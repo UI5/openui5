@@ -3,6 +3,11 @@
     "date": "February 2026",
     "notes": [
       {
+        "id": "a3eb7610019ec199f8210748d349974bfa9af5af",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendar: week numbering in Week and OneMonth view are shown again."
+      },
+      {
         "id": "b28bcd6a9030581625ab88f404caa982e702e279",
         "type": "FEATURE",
         "text": " PlanningCalendar: Week numbers display is now enabled in the months view"
