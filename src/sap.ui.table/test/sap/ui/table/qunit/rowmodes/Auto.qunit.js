@@ -10,7 +10,9 @@ sap.ui.define([
 	"sap/ui/table/Column",
 	"sap/ui/table/CreationRow",
 	"sap/ui/table/utils/TableUtils",
-	"sap/ui/Device"
+	"sap/ui/core/Control",
+	"sap/ui/Device",
+	"sap/ui/test/utils/nextUIUpdate"
 ], function(
 	TableQUnitUtils,
 	FixedRowHeightTest,
@@ -21,7 +23,9 @@ sap.ui.define([
 	Column,
 	CreationRow,
 	TableUtils,
-	Device
+	Control,
+	Device,
+	nextUIUpdate
 ) {
 	"use strict";
 
@@ -55,6 +59,63 @@ sap.ui.define([
 
 	QUnit.test("After rendering", function(assert) {
 		assert.equal(this.oTable.getRows().length, 13, "Row count");
+	});
+
+	QUnit.test("Change visibility of the table", async function(assert) {
+		const oTableContainer = document.getElementById("qunit-fixture");
+		const sOriginalContainerHeight = oTableContainer.style.height;
+
+		this.oTable.setVisible(false);
+		await nextUIUpdate();
+		oTableContainer.setAttribute("style", "height: 765px");
+		this.oTable.setVisible(true);
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.equal(this.oTable.getRows().length, 9, "Row count after showing the table");
+
+		oTableContainer.setAttribute("style", `height: ${sOriginalContainerHeight}`);
+		await this.oTable.qunit.whenNextRenderingFinished();
+		assert.equal(this.oTable.getRows().length, 13, "Row count after resize");
+	});
+
+	QUnit.test("Change visibility of the table parent", async function(assert) {
+		const TableContainer = Control.extend("sap.ui.table.test.TableContainer", {
+			metadata: {
+				aggregations: {
+					table: {type: "sap.ui.table.Table", multiple: false}
+				},
+				properties: {
+					height: {type: "sap.ui.core.CSSSize", defaultValue: "1000px"}
+				}
+			},
+			renderer: {
+				apiVersion: 2,
+				render: function(oRm, oControl) {
+					oRm.openStart("div", oControl);
+					oRm.style("height", oControl.getHeight());
+					oRm.openEnd();
+					oRm.renderControl(oControl.getTable());
+					oRm.close("div");
+				}
+			}
+		});
+		const oTableContainer = new TableContainer({
+			table: this.oTable
+		});
+
+		oTableContainer.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		oTableContainer.setVisible(false);
+		await nextUIUpdate();
+		oTableContainer.setHeight("765px");
+		oTableContainer.setVisible(true);
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 9);
+		assert.equal(this.oTable.getRows().length, 9, "Row count after showing the parent");
+
+		oTableContainer.setHeight();
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 13);
+		assert.equal(this.oTable.getRows().length, 13, "Row count after resize");
+
+		oTableContainer.destroy();
 	});
 
 	QUnit.test("Resize", function(assert) {

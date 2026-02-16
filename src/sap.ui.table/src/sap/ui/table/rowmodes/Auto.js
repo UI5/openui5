@@ -564,11 +564,17 @@ sap.ui.define([
 		return _private(this).iLastAvailableSpace;
 	};
 
+	TableDelegate.onBeforeRendering = function() {
+		if (!this.getParent().getDomRef()) {
+			this.stopAutoRowMode();
+		}
+	};
+
 	/**
 	 * @param {sap.ui.base.Event} oEvent The event object of the <code>afterRendering</code> event
 	 * @this sap.ui.table.rowmodes.Auto
 	 */
-	TableDelegate.onAfterRendering = function(oEvent) {
+	TableDelegate.onAfterRendering = function() {
 		this.startAutoRowMode();
 	};
 
