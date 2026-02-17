@@ -47,7 +47,8 @@ sap.ui.define([
 				},
 				aggregations: {
 					link: { type: "sap.m.Link", group: "Misc", multiple: false },
-					linkAriaDescribedBy: {type: "sap.ui.core.Control", group: "Misc", multiple: false}
+					linkAriaDescribedBy: {type: "sap.ui.core.Control", group: "Misc", multiple: false},
+					valueStateAriaDescribedBy: {type: "sap.ui.core.InvisibleText", group: "Misc", multiple: false}
 				},
 				events: {
 					activeTitlePress: {}
@@ -59,7 +60,7 @@ sap.ui.define([
 
 		MessageListItem.prototype.onBeforeRendering = function () {
 			StandardListItem.prototype.onBeforeRendering.apply(this, arguments);
-			var oLink = this.getLink(), oDescribedByText;
+			var oLink = this.getLink(), oDescribedByText, oValueStateText;
 
 			if (!oLink && this.getActiveTitle()) {
 				oLink = new Link({
@@ -78,6 +79,12 @@ sap.ui.define([
 				oLink.addAriaDescribedBy(oDescribedByText.getId());
 				this.setLinkAriaDescribedBy(oDescribedByText);
 			}
+
+			// Create InvisibleText for valueState to help screen readers announce it
+			if (!this.getValueStateAriaDescribedBy()) {
+				oValueStateText = this._getValueStateAriaDescribedBy();
+				this.setValueStateAriaDescribedBy(oValueStateText);
+			}
 		};
 
 		MessageListItem.prototype._getLinkAriaDescribedBy = function () {
@@ -85,6 +92,21 @@ sap.ui.define([
 
 			return new InvisibleText(this.getId() + "-link", {
 				text: sAccessibilityText
+			});
+		};
+
+		/**
+		 * Returns an InvisibleText for the valueState information
+		 * @returns {sap.ui.core.InvisibleText} InvisibleText with valueState information
+		 * @private
+		 */
+		MessageListItem.prototype._getValueStateAriaDescribedBy = function () {
+			var sMessageType = this.getMessageType().toUpperCase(),
+				oResourceBundle = Library.getResourceBundleFor("sap.m"),
+				sValueStateText = oResourceBundle.getText("LIST_ITEM_STATE_" + sMessageType);
+
+			return new InvisibleText(this.getId() + "-valueState", {
+				text: sValueStateText
 			});
 		};
 

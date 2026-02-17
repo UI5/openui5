@@ -34,7 +34,7 @@
 				<m:SearchField id="search" placeholder="Search for anything..." search=".onSearch"
 					value="{ui>/sSearch}" width="40%"/>
 				<m:Button icon="sap-icon://download" press=".onDownload" tooltip="Download"/>
-				<m:Button icon="sap-icon://refresh" press=".onRefresh" tooltip="Refresh"/>
+				<m:Button icon="sap-icon://response" press=".onRefresh" tooltip="Refresh"/>
 				<m:Button id="showMessages" icon="sap-icon://message-popup" tooltip="Show messages"
 					press=".onToggleMessagePopover" text="{ui>/iMessages}"
 					type="{= ${ui>/iMessages} ? 'Emphasized' : 'Default' }"/>
@@ -152,8 +152,12 @@
 				<m:Toolbar>
 					<m:Title text="Booking Details"/>
 					<m:ToolbarSpacer/>
-					<m:Button icon="sap-icon://refresh" tooltip="Refresh"
+					<m:Button icon="sap-icon://response" tooltip="Refresh"
 						press=".onRefreshBooking"/>
+					<m:Button icon="sap-icon://refresh" tooltip="Side-Effects Refresh"
+						press=".onRefreshBookingViaSideEffects"/>
+					<m:Button icon="sap-icon://synchronize" tooltip="Side Effect for Flight Date"
+						press=".onRefreshFlightDate"/>
 				</m:Toolbar>
 			</form:toolbar>
 			<m:Label text="Booking"/>
@@ -171,8 +175,8 @@
 					}],
 					type : 'Unit'
 				}"/>
-			<m:Label text="Plane Type"/>
-			<m:Text text="{PlaneType}"/>
+			<m:Label text="Flight Date"/>
+			<m:Text text="{FlightDate}"/>
 		</form:SimpleForm>
 		<form:SimpleForm binding="{to_Travel}" columnsL="3" layout="ColumnLayout"
 				title="Travel Details">

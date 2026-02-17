@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/createAndAppendDiv",
+	"sap/m/Title",
 	"sap/f/SidePanel",
 	"sap/f/SidePanelItem",
 	"sap/ui/events/KeyCodes",
@@ -16,6 +17,7 @@ sap.ui.define([
 	Library,
 	qutils,
 	createAndAppendDiv,
+	Title,
 	SidePanel,
 	SidePanelItem,
 	KeyCodes,
@@ -238,6 +240,52 @@ sap.ui.define([
 
 		// assert
 		assert.notOk(this.oSP.getSelectedItem(), "The disabled action item is not selected, there is no selected item");
+	});
+
+	QUnit.test("setSelectedItem with Title control", async function (assert) {
+		var	oSelectedItem = this.oSP.getItems()[1], // action item with index '1' will be selected later
+			oTitle = new Title("myCustomTitle", { text: "Custom Title", level: "H4" }),
+			sSideContentHeaderId = oTitle.getId();
+
+		// Prepare - set custom title to the action item
+		oSelectedItem.setTitle(oTitle);
+
+		// assert
+		assert.notOk(this.oSP.getSelectedItem(), "There is no selected action item");
+		assert.notOk(this.oSP._getSideContentExpanded(), "The side content is not expanded");
+		assert.notOk(document.getElementById(sSideContentHeaderId), "Side content title doesn't exists");
+
+		// act - select action item
+		this.oSP.setSelectedItem(oSelectedItem.getId());
+		await nextUIUpdate();
+
+		// assert
+		assert.strictEqual(this.oSP.getSelectedItem(), oSelectedItem.getId(), "Proper action item is selected");
+		assert.ok(this.oSP._getSideContentExpanded(), "The side content is expanded");
+		assert.ok(document.getElementById(sSideContentHeaderId), "Side content custom title exists");
+		assert.ok(oSelectedItem.getTitle().getLevel(), "H4", "Custom title has proper level");
+		assert.strictEqual(document.getElementById(sSideContentHeaderId).querySelector(".sapMTitle > span").innerText, oTitle.getText(), "Proper custom title is placed in the header side content");
+
+		// act - deselect action item
+		this.oSP.setSelectedItem();
+		await nextUIUpdate();
+
+		// assert
+		assert.notOk(this.oSP.getSelectedItem(), "There is no selected action item");
+		assert.notOk(this.oSP._getSideContentExpanded(), "The side content is not expanded");
+		assert.notOk(document.getElementById(sSideContentHeaderId), "Side content title doesn't exists");
+
+		// act
+		oSelectedItem.removeAggregation("title");
+		this.oSP.setSelectedItem(oSelectedItem.getId());
+		sSideContentHeaderId = this.oSP.getId() + "-header";
+		await nextUIUpdate();
+
+		// assert - after removing the custom title, default title should be rendered in the side content header
+		assert.strictEqual(this.oSP.getSelectedItem(), oSelectedItem.getId(), "Proper action item is selected");
+		assert.ok(this.oSP._getSideContentExpanded(), "The side content is expanded");
+		assert.ok(document.getElementById(sSideContentHeaderId), "Side content default title exists");
+		assert.strictEqual(document.getElementById(sSideContentHeaderId).querySelector(".sapMTitle > span").innerText, oTitle.getText(), "Proper default title is placed in the header side content");
 	});
 
 	QUnit.test("_toggleItemSelection", function (assert) {

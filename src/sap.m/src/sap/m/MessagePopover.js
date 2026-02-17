@@ -347,7 +347,7 @@ function(
 			this._oMessageView = this._initMessageView();
 
 			this._oMessageView.attachEvent("onClose", function (oEvent) {
-					this.close();
+				this.close();
 			}, this);
 
 			this._oMessageView.addEventDelegate({
@@ -385,7 +385,7 @@ function(
 					that._oMessageView._navContainer.removeAllPages().forEach(function(oPage) {
 						that._oMessageView._navContainer.addPage(oPage);
 					});
-
+					that._oMessageView._bNavigatedBackToList = false;
 					that.fireAfterClose({openBy: oEvent.getParameter("openBy")});
 				},
 				beforeOpen: function (oEvent) {

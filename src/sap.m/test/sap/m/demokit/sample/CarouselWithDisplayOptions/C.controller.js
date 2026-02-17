@@ -113,18 +113,57 @@ sap.ui.define([
 		},
 
 		onNumberOfPages: function(oEvent) {
-				const sVisiblePageCount = oEvent.getParameter("value");
+			const sVisiblePageCount = oEvent.getParameter("value");
+			const oCarousel = this.byId("carouselSample");
 
-				this.byId("carouselSample").getCustomLayout()?.setVisiblePagesCount(Number(sVisiblePageCount));
+			if (oCarousel.getCustomLayout()) {
+				oCarousel.getCustomLayout().setVisiblePagesCount(Number(sVisiblePageCount));
+			} else {
+				oCarousel.setCustomLayout(new mobileLibrary.CarouselLayout({
+					visiblePagesCount: Number(sVisiblePageCount)
+				}));
+			}
 		},
 
 		OnScrollModeChange: function(oEvent) {
 			const CarouselScrollMode = mobileLibrary.CarouselScrollMode,
-					bViewMode = oEvent.getParameter("state"),
-					sScrollMode = bViewMode ?  CarouselScrollMode.VisiblePages : CarouselScrollMode.SinglePage;
+			bViewMode = oEvent.getParameter("state"),
+			sScrollMode = bViewMode ?  CarouselScrollMode.VisiblePages : CarouselScrollMode.SinglePage;
+			const oCarousel = this.byId("carouselSample");
 
-					this.byId("carouselSample").getCustomLayout()?.setScrollMode(sScrollMode);
+			if (oCarousel.getCustomLayout()) {
+				oCarousel.getCustomLayout().setScrollMode(sScrollMode);
+			} else {
+				oCarousel.setCustomLayout(new mobileLibrary.CarouselLayout({
+					scrollMode: sScrollMode
+				}));
+			}
+		},
+
+		onResponsiveChange: function(oEvent) {
+			const bResponsive = oEvent.getParameter("state");
+			const oCarousel = this.byId("carouselSample");
+
+			if (oCarousel.getCustomLayout()) {
+				oCarousel.getCustomLayout().setResponsive(bResponsive);
+			} else {
+				oCarousel.setCustomLayout(new mobileLibrary.CarouselLayout({
+					responsive: bResponsive
+				}));
+			}
+		},
+
+		onMinPageWidthChange: function(oEvent) {
+			const iMinPageWidth = Number(oEvent.getParameter("value"));
+			const oCarousel = this.byId("carouselSample");
+
+			if (oCarousel.getCustomLayout()) {
+				oCarousel.getCustomLayout().setMinPageWidth(iMinPageWidth);
+			} else {
+				oCarousel.setCustomLayout(new mobileLibrary.CarouselLayout({
+					minPageWidth: iMinPageWidth
+				}));
+			}
 		}
-
 	});
 });

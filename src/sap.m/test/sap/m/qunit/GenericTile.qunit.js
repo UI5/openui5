@@ -5594,6 +5594,34 @@ sap.ui.define([
 
 	QUnit.module("GenericTile width tests (TwoByOne / TwoByHalf)", {
         beforeEach: async function() {
+            // Store original theme
+            this.sStartTheme = Theming.getTheme();
+            this.sRequiredTheme = null;
+
+            var fnAttachApplied = (oEvent) => {
+                Theming.detachApplied(fnAttachApplied);
+                if (Theming.getTheme() === this.sRequiredTheme) {
+                    if (typeof this.fnCallback === "function") {
+                        this.fnCallback.bind(this)();
+                        this.fnCallback = undefined;
+                    }
+                }
+            };
+
+            this.applyTheme = function(sTheme, fnCallback) {
+                this.fnCallback = fnCallback;
+                this.sRequiredTheme = sTheme;
+                if (Theming.getTheme() === this.sRequiredTheme) {
+                    if (typeof fnCallback === "function") {
+                        fnCallback.bind(this)();
+                        fnCallback = undefined;
+                    }
+                } else {
+                    Theming.setTheme(sTheme);
+                    Theming.attachApplied(fnAttachApplied.bind(this));
+                }
+            };
+
             // TwoByOne Tile
             var oTileContent1 = new TileContent({
                 content: new NewsContent({ contentText: "TwoByOne tile content" })
@@ -5615,40 +5643,52 @@ sap.ui.define([
                 frameType: "TwoByHalf",
                 tileContent: [oTileContent2]
             });
-            this.oParent = document.createElement("div");
+	    this.oParent = document.createElement("div");
             this.oParent.id = "genericTileParent";
             document.body.appendChild(this.oParent);
-            this.oTileTwoByOne.placeAt("genericTileParent");
-            this.oTileTwoByHalf.placeAt("genericTileParent");
+	    this.oTileTwoByOne.placeAt("genericTileParent");
+	    this.oTileTwoByHalf.placeAt("genericTileParent");
             // Wait for rendering
             await nextUIUpdate();
         },
-        afterEach: function() {
-          this.oTileTwoByOne.destroy();
-          this.oTileTwoByHalf.destroy();
-          document.body.removeChild(this.oParent);
+        afterEach: function(assert) {
+	    this.oTileTwoByOne.destroy();
+	    this.oTileTwoByHalf.destroy();
+            document.body.removeChild(this.oParent);
+            // Restore original theme
+            var done = assert.async();
+            this.applyTheme(this.sStartTheme, done);
         }
     });
 
-	QUnit.test("TwoByOne and TwoByHalf widths", async function(assert) {
-        this.oParent.classList.add("sapUshellSection");
-        await nextUIUpdate();
+	// Test themes array
+	var aThemes = ["sap_horizon_dark", "sap_horizon", "sap_horizon_hcb", "sap_horizon_hcw"];
 
-        // Function to get numeric width of a GenericTile by ID
-        function getTileWidth(sTileId) {
-            var oElement = document.getElementById(sTileId);
-            return oElement ? oElement.getBoundingClientRect().width : null;
-        }
+	aThemes.forEach(function(sTheme) {
+        QUnit.test("TwoByOne and TwoByHalf widths - " + sTheme, function(assert) {
+            var done = assert.async();
+            this.applyTheme(sTheme, async function() {
+                this.oParent.classList.add("sapUshellSection");
+                await nextUIUpdate();
 
-        // Compute rem in pixels for comparison
-        var fPixels = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-        var fExpectedWidth = 23 * fPixels;
+                // Function to get numeric width of a GenericTile by ID
+                function getTileWidth(sTileId) {
+                    var element = document.getElementById(sTileId);
+                    return element ? element.getBoundingClientRect().width : null;
+                }
 
-        var fTwoByOne = getTileWidth("tile-twobyone");
-        var fTwoByHalf = getTileWidth("tile-twobyhalf");
+                // Compute rem in pixels for comparison
+                var fPixels = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+                var fexpectedWidth = 23 * fPixels;
 
-        assert.equal(fTwoByOne, fExpectedWidth, "Correct width applied for two by one");
-        assert.equal(fTwoByHalf, fExpectedWidth, "Correct width applied for two by half");
+                var wTwoByOne = getTileWidth("tile-twobyone");
+                var wTwoByHalf = getTileWidth("tile-twobyhalf");
+
+                assert.equal(wTwoByOne, fexpectedWidth, "Correct width applied for two by one in theme " + sTheme);
+                assert.equal(wTwoByHalf, fexpectedWidth, "Correct width applied for two by half in theme " + sTheme);
+                done();
+            }.bind(this));
+        });
     });
 
 	QUnit.module("GenericTile when linkTileContent is used", {

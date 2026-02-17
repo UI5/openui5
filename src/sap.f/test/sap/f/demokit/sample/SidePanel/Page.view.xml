@@ -36,6 +36,9 @@
 				</f:mainContent>
 				<f:items>
 					<f:SidePanelItem icon="sap-icon://physical-activity" text="Run">
+						<f:title>
+							<Title text="Run" level="H2"  />
+						</f:title>
 						<VBox>
 							<Text text="Static Content" class="sapUiSmallMarginBottom" />
 							<Text text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." />

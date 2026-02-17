@@ -2700,18 +2700,18 @@ sap.ui.define([
 	/**
 	 * Requests side effects for the given paths on all affected root bindings.
 	 *
-	 * @param {string} sGroupId
-	 *   The effective group ID
 	 * @param {string[]} aAbsolutePaths
 	 *   The absolute paths to request side effects for; each path must not start with the fully
 	 *   qualified container name.
+	 * @param {string} sGroupId
+	 *   The effective group ID
 	 * @returns {sap.ui.base.SyncPromise<void>|undefined}
 	 *   A promise which is resolved without a defined result, or rejected with an error if loading
 	 *   of side effects fails, or <code>undefined</code> if there is nothing to do
 	 *
 	 * @private
 	 */
-	ODataModel.prototype.requestSideEffects = function (sGroupId, aAbsolutePaths) {
+	ODataModel.prototype.requestSideEffects = function (aAbsolutePaths, sGroupId) {
 		if (!aAbsolutePaths.length) {
 			return undefined; // nothing to do
 		}

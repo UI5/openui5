@@ -4654,7 +4654,15 @@ sap.ui.define([
 
 		if (_Helper.isDataAggregation(this.mParameters)) {
 			if (bSingle) {
-				throw new Error("Must not request side effects when using data aggregation");
+				if (this.mParameters.$$aggregation.groupLevels.length) {
+					throw new Error("Unsupported for data aggregation with groupLevels: " + this);
+				}
+				if (oContext.isAggregated()) {
+					throw new Error("Unsupported on aggregated data: " + oContext);
+				}
+
+				return this.refreshSingle(oContext, sGroupId, /*bLocked*/false,
+					/*bAllowRemoval*/false, /*bKeepCacheOnError*/true, /*bWithMessages*/false);
 			}
 
 			if (_AggregationHelper.isAffected(this.mParameters.$$aggregation,

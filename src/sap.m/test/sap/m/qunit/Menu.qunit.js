@@ -335,6 +335,23 @@ sap.ui.define([
 		fnFireItemSelectedSpy.restore();
 	});
 
+	QUnit.test('open event', function (assert) {
+		var fnFireOpenSpy = sinon.spy(this.sut, "fireOpen"),
+			done = assert.async();
+
+		this.sut.attachOpen(function() {
+			// Assert
+			assert.strictEqual(fnFireOpenSpy.calledOnce, true, "open event is fired when menu is opened");
+			assert.strictEqual(this.sut.isOpen(), true, "Menu is open when the event is fired");
+
+			fnFireOpenSpy.restore();
+			done();
+		}.bind(this));
+
+		// Act
+		this.sut.openBy();
+	});
+
 	QUnit.test('beforeClose event (non-phone)', function (assert) {
 		var fnFireBeforeCloseSpy = sinon.spy(this.sut, "fireBeforeClose"),
 			fnFireClosedSpy = sinon.spy(this.sut, "fireClosed");

@@ -30,7 +30,7 @@
 		"url": "https://github.com/UI5/openui5.git"
 	},
 	"engines": {
-		"node": "^20.11.0 || >=22.0.0",
+		"node": "^20.17.0 || >=22.9.0",
 		"npm": ">= 8"
 	},
 	"devDependencies": {
@@ -56,10 +56,10 @@
 		"http-proxy": "^1.18.1",
 		"lit-html": "2.2.2",
 		"moment": "^2.30.1",
-		"pacote": "^20.0.0",
+		"pacote": "^21.2.0",
 		"rimraf": "^6.1.0",
 		"semver": "^7.7.3",
-		"set-cookie-parser": "^2.7.2",
+		"set-cookie-parser": "^3.0.1",
 		"wsrun": "^5.2.4"
 	},
 	"overrides": {

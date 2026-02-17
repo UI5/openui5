@@ -2818,7 +2818,7 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(aFilteredPaths), sGroupId)
 				.returns(SyncPromise.resolve({}));
 			that.mock(oModel).expects("requestSideEffects")
-				.withExactArgs(sGroupId, aAbsolutePaths)
+				.withExactArgs(aAbsolutePaths, sGroupId)
 				.returns(SyncPromise.resolve({}));
 		}
 
@@ -2983,7 +2983,7 @@ sap.ui.define([
 			.withExactArgs(["/base/TEAM_ID"], "update")
 			.returns(bAbsolute ? SyncPromise.resolve() : SyncPromise.reject(oError));
 		this.mock(oModel).expects("requestSideEffects")
-			.withExactArgs("update", ["/EMPLOYEES"])
+			.withExactArgs(["/EMPLOYEES"], "update")
 			.returns(bAbsolute ? SyncPromise.reject(oError) : SyncPromise.resolve());
 
 		// code under test

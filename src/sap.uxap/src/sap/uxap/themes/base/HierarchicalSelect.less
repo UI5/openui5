@@ -66,9 +66,9 @@
 }
 
 .sapMSltPicker .sapUxAPHierarchicalSelect.sapMSltBar::after {
-	font-family: "SAP-icons";
+	font-family: var(--sapContent_IconFontFamily);
 	speak: none;
-	content: "\e03e";
+	content: '\e03e';
 }
 
 .sapUiSizeCompact .sapMSltPicker .sapUxAPHierarchicalSelect.sapMSltBar::after {
@@ -122,7 +122,8 @@
 
 	.sapUxAPHierarchicalSelect {
 		display: flex;
-		 .sapMSltLabel {
+
+		.sapMSltLabel {
 			position: relative;
 			padding-left: 0;
 			display: inline-block;
@@ -132,6 +133,7 @@
 			padding-right: 0;
 			overflow: visible;
 		 	min-width: 0;
+
 			.sapMSelectListItemText {
 				display: inline-block;
 				width: 100%;
@@ -157,6 +159,7 @@
 
 .sap-phone .sapUiSizeCompact,
 .sapUiSizeCompact .sapUxAPObjectPageLayout-Std-Phone {
+
 	.sapUxAPHierarchicalSelect .sapMSltLabel {
 		padding-bottom: 0.3rem;
 	}
@@ -165,4 +168,3 @@
 		height: 2rem;
 	}
 }
-

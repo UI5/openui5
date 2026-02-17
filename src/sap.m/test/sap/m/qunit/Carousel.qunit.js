@@ -440,7 +440,7 @@ sap.ui.define([
 
 	QUnit.test("#_setWidthOfPages(6)", function (assert) {
 		// Set up
-		this.oCarousel.setWidth("700px");
+		this.oCarousel.setWidth("688px");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// Act
@@ -2292,5 +2292,481 @@ sap.ui.define([
 		}
 
 		carousel.destroy();
+	});
+
+	QUnit.module("Responsive Layout", {
+		beforeEach: function () {
+			this.oCarousel = createCarouselWithContent("");
+			this.oCarousel.placeAt(DOM_RENDER_LOCATION);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+		},
+		afterEach: function () {
+			this.oCarousel.destroy();
+		}
+	});
+
+	QUnit.test("#_getNumberOfItemsToShow() with responsive CarouselLayout - default minPageWidth", function (assert) {
+		// Set up
+		var oCarouselLayout = new CarouselLayout({
+			responsive: true
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// Assert
+		// With default minPageWidth (148), minWidth should be 164 (148 + 16)
+		// 500 / 164 = 3.04, so Math.floor should give 3
+		assert.strictEqual(iActualResult, 3, "Should show 3 pages when carousel width is 500px and minPageWidth is default (148)");
+	});
+
+	QUnit.test("#_getNumberOfItemsToShow() with responsive CarouselLayout - custom minPageWidth", function (assert) {
+		// Set up
+		var oCarouselLayout = new CarouselLayout({
+			responsive: true,
+			minPageWidth: 200
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// Assert
+		// With minPageWidth 200, minWidth should be 216 (200 + 16)
+		// 500 / 216 = 2.31, so Math.floor should give 2
+		assert.strictEqual(iActualResult, 2, "Should show 2 pages when carousel width is 500px and minPageWidth is 200");
+	});
+
+	QUnit.test("#_getNumberOfItemsToShow() with responsive CarouselLayout - minPageWidth higher than available width", function (assert) {
+		// Set up
+		var oCarouselLayout = new CarouselLayout({
+			responsive: true,
+			minPageWidth: 600
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// Assert
+		// When minPageWidth (600) > carousel width (500), should return 1
+		assert.strictEqual(iActualResult, 1, "Should show 1 page when minPageWidth is higher than available width");
+	});
+
+	QUnit.test("#_getNumberOfItemsToShow() with responsive CarouselLayout and visiblePagesCount", function (assert) {
+		// Set up
+		var oCarouselLayout = new CarouselLayout({
+			responsive: true,
+			visiblePagesCount: 5
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// Assert
+		// With default minPageWidth (148), minWidth should be 164 (148 + 16)
+		// 500 / 164 = 3.04, so Math.floor should give 3
+		assert.strictEqual(iActualResult, 3, "Should show 3 pages when carousel width is 500px and minPageWidth is default (148) and ignore the visiblePagesCount");
+	});
+
+	QUnit.test("#_getNumberOfItemsToShow() with responsive CarouselLayout - calculated pages exceed total pages", function (assert) {
+		// Set up
+		var oCarouselLayout = new CarouselLayout({
+			responsive: true,
+			minPageWidth: 50
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+
+		this.oCarousel.$().width("1000px");
+
+		// Act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// Assert
+		// With minPageWidth 50, minWidth should be 66 (50 + 16)
+		// 1000 / 66 = 15.15, so Math.floor would give 15
+		// But we only have 6 pages, so should return 6
+		assert.strictEqual(iActualResult, this.oCarousel.getPages().length,
+			"Should show all available pages when calculated pages exceed total pages");
+	});
+
+	QUnit.test("#_getNumberOfItemsToShow() with responsive CarouselLayout - minPageWidth less than 148", function (assert) {
+		// Set up
+		// Clear existing pages and add only one page
+		this.oCarousel.destroyPages();
+		this.oCarousel.addPage(new Page("keyTestPage20"));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		var oCarouselLayout = new CarouselLayout({
+			responsive: true
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// Assert
+		// 500 / 164 = 3.04, so Math.floor should give 3
+		// But we only have 1 page, so should return 1
+		assert.strictEqual(iActualResult, 1, "Should show 1 page when there is only 1 page available");
+	});
+
+	QUnit.test("#_getNumberOfItemsToShow() with non-responsive CarouselLayout - visiblePagesCount", function (assert) {
+		// Set up
+		var oCarouselLayout = new CarouselLayout({
+			responsive: false,
+			visiblePagesCount: 3
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+
+		// Act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// Assert
+		assert.strictEqual(iActualResult, 3, "Should return visiblePagesCount when responsive is false");
+	});
+
+	QUnit.test("#_getNumberOfItemsToShow() with non-responsive CarouselLayout - calculated pages exceed total pages", function (assert) {
+		// Set up
+		var oCarouselLayout = new CarouselLayout({
+			visiblePagesCount: 20
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+
+		this.oCarousel.$().width("1000px");
+
+		// Act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// Assert
+		// VisiblePagesCount is 20, but we only have 6 pages, so should return 6
+		assert.strictEqual(iActualResult, this.oCarousel.getPages().length,
+			"Should show all available pages when visiblePagesCount exceed total pages");
+	});
+
+	QUnit.module("Responsive Layout - Edge Cases", {
+		beforeEach: function () {
+			this.oCarousel = new Carousel({
+				pages: [
+					new Page("edgePage1"),
+					new Page("edgePage2"),
+					new Page("edgePage3"),
+					new Page("edgePage4"),
+					new Page("edgePage5"),
+					new Page("edgePage6")
+				]
+			});
+			this.oCarousel.placeAt(DOM_RENDER_LOCATION);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+		},
+		afterEach: function () {
+			this.oCarousel.destroy();
+		}
+	});
+
+	QUnit.test("minPageWidth with 0 should be clamped to MIN_PAGE_WIDTH (16)", function (assert) {
+		// arrange
+		var oCarouselLayout = new CarouselLayout({
+			responsive: true,
+			minPageWidth: 0
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// assert
+		// With minPageWidth clamped to 16, minWidth should be 32 (16 + 16 margin)
+		// 500 / 32 = 15.625, so Math.floor should give 15, but we only have 6 pages
+		assert.strictEqual(iActualResult, this.oCarousel.getPages().length,
+			"Should show all 6 pages when minPageWidth is 0 (clamped to 16) and calculated pages exceed total");
+	});
+
+	QUnit.test("minPageWidth with negative value should be clamped to MIN_PAGE_WIDTH (16)", function (assert) {
+		// arrange
+		var oCarouselLayout = new CarouselLayout({
+			responsive: true,
+			minPageWidth: -50
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// assert
+		// With minPageWidth clamped to 16, same calculation as above
+		assert.strictEqual(iActualResult, this.oCarousel.getPages().length,
+			"Should show all pages when minPageWidth is negative (clamped to 16)");
+	});
+
+	QUnit.test("minPageWidth with very large number should show only 1 page", function (assert) {
+		// arrange
+		var oCarouselLayout = new CarouselLayout({
+			responsive: true,
+			minPageWidth: 10000
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// assert
+		// With minPageWidth 10000, minWidth should be 10016 (10000 + 16)
+		// 500 / 10016 < 1, so should return 1
+		assert.strictEqual(iActualResult, 1,
+			"Should show only 1 page when minPageWidth is very large (10000) and exceeds available width");
+	});
+
+	QUnit.test("minPageWidth with extremely large number (overflow scenario)", function (assert) {
+		// arrange
+		var oCarouselLayout = new CarouselLayout({
+			responsive: true,
+			minPageWidth: Number.MAX_SAFE_INTEGER
+		});
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// assert
+		assert.strictEqual(iActualResult, 1,
+			"Should show only 1 page when minPageWidth is extremely large (MAX_SAFE_INTEGER)");
+	});
+
+	QUnit.test("CarouselLayout responsive and minWidth works with binding", function (assert) {
+		// arrange
+		var oModel = new JSONModel({
+			layoutConfig: {
+				responsive: true,
+				minPageWidth: 100
+			}
+		});
+
+		var oCarouselLayout = new CarouselLayout({
+			responsive: "{/layoutConfig/responsive}",
+			minPageWidth: "{/layoutConfig/minPageWidth}"
+		});
+
+		this.oCarousel.setModel(oModel);
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// assert
+		// With minPageWidth 100, minWidth should be 116 (100 + 16)
+		// 500 / 116 = 4.31, so Math.floor should give 4
+		assert.strictEqual(iActualResult, 4,
+			"Should show 4 pages when responsive and minPageWidth are bound with values true and 100");
+
+		// act - change binding values
+		oModel.setProperty("/layoutConfig/minPageWidth", 200);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// assert
+		// With minPageWidth 200, minWidth should be 216 (200 + 16)
+		// 500 / 216 = 2.31, so Math.floor should give 2
+		assert.strictEqual(iActualResult, 2,
+			"Should show 2 pages after minPageWidth binding is updated to 200");
+
+		// act - disable responsive mode via binding
+		oModel.setProperty("/layoutConfig/responsive", false);
+		oModel.setProperty("/layoutConfig/minPageWidth", 50);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// With responsive false, it should fall back to default behavior (1 page when no visiblePagesCount is set)
+		iActualResult = this.oCarousel._getNumberOfItemsToShow();
+		assert.strictEqual(iActualResult, 1,
+			"Should show 1 page when responsive is set to false via binding and no visiblePagesCount is set");
+	});
+
+	QUnit.test("CarouselLayout responsive and minWidth with visiblePagesCount binding", function (assert) {
+		// arrange
+		var oModel = new JSONModel({
+			layoutConfig: {
+				responsive: false,
+				minPageWidth: 100,
+				visiblePagesCount: 3
+			}
+		});
+
+		var oCarouselLayout = new CarouselLayout({
+			responsive: "{/layoutConfig/responsive}",
+			minPageWidth: "{/layoutConfig/minPageWidth}",
+			visiblePagesCount: "{/layoutConfig/visiblePagesCount}"
+		});
+
+		this.oCarousel.setModel(oModel);
+		this.oCarousel.setCustomLayout(oCarouselLayout);
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act
+		var iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// assert
+		assert.strictEqual(iActualResult, 3,
+			"Should show 3 pages based on visiblePagesCount when responsive is false");
+
+		// act - enable responsive mode via binding
+		oModel.setProperty("/layoutConfig/responsive", true);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		iActualResult = this.oCarousel._getNumberOfItemsToShow();
+
+		// assert
+		// With minPageWidth 100 and responsive true, minWidth should be 116 (100 + 16)
+		// 500 / 116 = 4.31, so Math.floor should give 4
+		assert.strictEqual(iActualResult, 4,
+			"Should show 4 pages based on minPageWidth calculation when responsive is enabled via binding (visiblePagesCount ignored)");
+	});
+
+	QUnit.test("responsive property in combination with loop - keyboard navigation", function (assert) {
+		// arrange
+		this.oCarousel.setLoop(true);
+		this.oCarousel.setCustomLayout(new CarouselLayout({
+			responsive: true,
+			minPageWidth: 150
+		}));
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var iNumberOfItemsToShow = this.oCarousel._getNumberOfItemsToShow();
+		var oFirstPage = this.oCarousel.getPages()[0];
+		var oLastPageGroup = this.oCarousel.getPages()[this.oCarousel.getPages().length - iNumberOfItemsToShow];
+
+		this.oCarousel.setActivePage(oFirstPage);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert initial state
+		assert.ok(iNumberOfItemsToShow > 1, "Multiple pages should be visible");
+		assert.strictEqual(this.oCarousel.getActivePage(), oFirstPage.getId(), "First page should be active initially");
+
+		// act - try to go to previous page (should NOT loop when multiple pages are shown)
+		this.oCarousel.onsapleft({
+			target: this.oCarousel.getDomRef(this.oCarousel.getActivePage() + "-slide"),
+			preventDefault: function () {}
+		});
+
+		// assert
+		assert.strictEqual(this.oCarousel.getActivePage(), oFirstPage.getId(),
+			"Active page should still be first page - loop should NOT occur with responsive layout showing multiple pages");
+
+		// act - move to last visible group
+		this.oCarousel.setActivePage(oLastPageGroup);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act - try to go to next page (should NOT loop when multiple pages are shown)
+		this.oCarousel.onsapright({
+			target: this.oCarousel.getDomRef(this.oCarousel.getActivePage() + "-slide"),
+			preventDefault: function () {}
+		});
+
+		// assert
+		assert.strictEqual(this.oCarousel.getActivePage(), oLastPageGroup.getId(),
+			"Active page should still be last group - loop should NOT occur with responsive layout showing multiple pages");
+	});
+
+	QUnit.test("responsive property in combination with loop - mouse navigation", function (assert) {
+		// arrange
+		this.oCarousel.setLoop(true);
+		this.oCarousel.setCustomLayout(new CarouselLayout({
+			responsive: true,
+			minPageWidth: 150
+		}));
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var iNumberOfItemsToShow = this.oCarousel._getNumberOfItemsToShow();
+		var oFirstPage = this.oCarousel.getPages()[0];
+		var oLastPageGroup = this.oCarousel.getPages()[this.oCarousel.getPages().length - iNumberOfItemsToShow];
+
+		this.oCarousel.setActivePage(oFirstPage);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert initial state
+		assert.ok(iNumberOfItemsToShow > 1, "Multiple pages should be visible");
+
+		// act - try to press previous arrow (should NOT loop)
+		pressArrowPrev(this.oCarousel);
+
+		// assert
+		assert.strictEqual(this.oCarousel.getActivePage(), oFirstPage.getId(),
+			"Active page should still be first page - loop should NOT occur via arrow press with responsive layout");
+
+		// act - move to last visible group
+		this.oCarousel.setActivePage(oLastPageGroup);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act - try to press next arrow (should NOT loop)
+		pressArrowNext(this.oCarousel);
+
+		// assert
+		assert.strictEqual(this.oCarousel.getActivePage(), oLastPageGroup.getId(),
+			"Active page should still be last group - loop should NOT occur via arrow press with responsive layout");
+	});
+
+	QUnit.test("responsive property with loop=true works correctly when only 1 page fits", function (assert) {
+		// arrange - set up responsive layout where only 1 page will fit
+		this.oCarousel.setLoop(true);
+		this.oCarousel.setCustomLayout(new CarouselLayout({
+			responsive: true,
+			minPageWidth: 450 // Large minPageWidth so only 1 page fits in 500px width
+		}));
+		this.oCarousel.setWidth("500px");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var iNumberOfItemsToShow = this.oCarousel._getNumberOfItemsToShow();
+		var oFirstPage = this.oCarousel.getPages()[0];
+		var oLastPage = this.oCarousel.getPages()[this.oCarousel.getPages().length - 1];
+
+		this.oCarousel.setActivePage(oFirstPage);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.strictEqual(iNumberOfItemsToShow, 1, "Only 1 page should be visible");
+
+		// act - try to go to previous page (SHOULD loop since only 1 page is shown)
+		this.oCarousel.onsapleft({
+			target: this.oCarousel.getDomRef(this.oCarousel.getActivePage() + "-slide"),
+			preventDefault: function () {}
+		});
+
+		// assert
+		assert.strictEqual(this.oCarousel.getActivePage(), oLastPage.getId(),
+			"Active page should be last page - loop SHOULD occur when responsive layout shows only 1 page");
+
+		// act - go to next page (SHOULD loop back to first)
+		this.oCarousel.onsapright({
+			target: this.oCarousel.getDomRef(this.oCarousel.getActivePage() + "-slide"),
+			preventDefault: function () {}
+		});
+
+		// assert
+		assert.strictEqual(this.oCarousel.getActivePage(), oFirstPage.getId(),
+			"Active page should loop back to first page when responsive layout shows only 1 page");
 	});
 });

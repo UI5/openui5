@@ -22,6 +22,7 @@
 					text="{i18n>RENAME_DIALOG_LABEL}"
 					labelFor="sapUiRtaRenameDialog_input"
 					wrapping="true"
+					showColon="true"
 				>
 					<layoutData>
 						<FlexItemData maxWidth="10rem" />

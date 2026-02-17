@@ -203,6 +203,28 @@ sap.ui.define([
 		oCheckBox.destroy();
 	});
 
+	/* ----------------------------------------------------------- */
+	/* Test: 'editable=false' and 'enabled=false'                   */
+	/* ----------------------------------------------------------- */
+
+	QUnit.test("'editable=false' and 'enabled=false'", async function(assert) {
+		// system under test
+		var oCheckBox = new CheckBox({ editable: false, enabled: false });
+
+		// arrange
+		oCheckBox.placeAt("content");
+		await nextUIUpdate();
+
+		// assertions
+		assert.ok(oCheckBox.$().hasClass("sapMCbBgDis"), "Checkbox is disabled");
+		assert.ok(!oCheckBox.$().hasClass("sapMCbRo"), "Read-only styling is not applied when disabled");
+		assert.strictEqual(oCheckBox.$("CB").attr("readonly"), undefined, "Readonly attribute is not rendered when disabled");
+		assert.strictEqual(oCheckBox.$().attr("aria-readonly"), undefined, "aria-readonly is not set when disabled");
+
+		// cleanup
+		oCheckBox.destroy();
+	});
+
 	/* ----------------------------------------------- */
 	/* Test: 'displayOnly=true'                        */
 	/* ----------------------------------------------- */

@@ -224,4 +224,18 @@ describe("sap.m.Carousel", function() {
 
 		expect(takeScreenshot(myCarousel)).toLookAs("14_pi_border_none");
 	});
+
+	it("should change items per page to 3", function() {
+		browser.executeScript("document.getElementById('input-pages-number-inner').scrollIntoView()");
+		element(by.id('input-pages-number-inner')).clear().sendKeys('3');
+		_moveToCarousel();
+		expect(takeScreenshot(myCarousel)).toLookAs('15_3_items_per_page');
+	});
+
+	it("Responsive items per page", function() {
+		browser.executeScript("document.getElementById('responsive').scrollIntoView()");
+		element(by.id('responsive')).click();
+		_moveToCarousel();
+		expect(takeScreenshot(myCarousel)).toLookAs('16_responsive_items_per_page');
+	});
 });

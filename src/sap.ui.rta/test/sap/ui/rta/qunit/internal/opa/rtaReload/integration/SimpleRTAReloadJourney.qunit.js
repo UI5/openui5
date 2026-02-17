@@ -94,6 +94,7 @@ sap.ui.define([
 					const oFrameStorage = oFrameWindow.sap.ui.require("sap/ui/fl/initial/_internal/Storage");
 					this.oLoadFlexDataStub = sandbox.stub(oFrameStorage, "loadFlexData");
 					this.oLoadFlexDataStub.resolves(oFlexDataResponses || oFlexDataObjectWithRoleSpecificReloadReason);
+					this.getContext().oLoadFlexDataStub = this.oLoadFlexDataStub;
 					if (bClearStorages) {
 						oFrameWindow.sessionStorage.clear();
 						oFrameWindow.localStorage.clear();
@@ -112,8 +113,9 @@ sap.ui.define([
 	QUnit.module("RTAReloadJourney");
 	opaTest("I open the App, start RTA with reload reason and check that the session storage is correctly filled", (Given, When, Then) => {
 		Given.iStartMyApp(oFlexDataObjectWithRoleSpecificReloadReason, true);
-		Then.onTheTestApp.iShouldSeeTheAdaptUIButton();
-		Then.onTheTestApp.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.endUser.roleSpecificReloadReason);
+		Then.onTheTestApp.iShouldSeeTheAdaptUIButton()
+		.and.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.endUser.roleSpecificReloadReason)
+		.and.iExpectFlexDataRequestCallCount(1);
 
 		When.onTheTestApp.iClickOnTheAdaptUIButton();
 		Then.onTheTestApp.iShouldSeeTheDialogWithReloadReason(sRoleSpecificReloadReason);
@@ -121,7 +123,8 @@ sap.ui.define([
 
 		Then.onTheRTAToolbar.iShouldSeeTheToolbar();
 		Then.onTheTestApp.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.keyUser.roleSpecificReloadReason)
-		.and.aReloadShouldHaveHappened();
+		.and.aReloadShouldHaveHappened()
+		.and.iExpectFlexDataRequestCallCount(2);
 	});
 
 	opaTest("I reload the app and check that session storage is correctly filled", (Given, _, Then) => {
@@ -131,37 +134,43 @@ sap.ui.define([
 		Given.iStartMyApp(oFlexDataObjectWithRoleSpecificReloadReason);
 
 		Then.onTheTestApp.iShouldSeeThePageTitle()
-		.and.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.endUser.roleSpecificReloadReason);
+		.and.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.endUser.roleSpecificReloadReason)
+		.and.iExpectFlexDataRequestCallCount(1);
 		Given.iTeardownMyApp();
 	});
 
 	opaTest("I start RTA without reload reason, leave RTA via the exit button and then check that " +
 		"session storage is correctly filled", (Given, When, Then) => {
 		Given.iStartMyApp(oFlexDataObjectWithoutReloadReason, true);
-		Then.onTheTestApp.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.endUser.noReloadReason);
+		Then.onTheTestApp.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.endUser.noReloadReason)
+		.and.iExpectFlexDataRequestCallCount(1);
 
 		When.onTheTestApp.iClickOnTheAdaptUIButton();
 		Then.onTheTestApp.iShouldNotSeeTheDialogWithReloadReason()
 		.and.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.keyUser.noReloadReason)
-		.and.noReloadShouldHaveHappened();
+		.and.noReloadShouldHaveHappened()
+		.and.iExpectFlexDataRequestCallCount(1);
 		Then.onTheRTAToolbar.iShouldSeeTheToolbar();
 
 		When.onTheRTAToolbar.iClickOnTheExitButton();
 		Then.onTheTestApp.iShouldNotSeeTheRTAToolbar()
 		.and.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.endUser.empty)
-		.and.noReloadShouldHaveHappened();
+		.and.noReloadShouldHaveHappened()
+		.and.iExpectFlexDataRequestCallCount(1);
 		Given.iTeardownMyApp();
 	});
 
 	opaTest("I start RTA without reload reason, create a draft, leave RTA via the exit button and check " +
 		"that session storage is correctly filled", (Given, When, Then) => {
 		Given.iStartMyApp(oFlexDataObjectWithoutReloadReason, true);
-		Then.onTheTestApp.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.endUser.noReloadReason);
+		Then.onTheTestApp.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.endUser.noReloadReason)
+		.and.iExpectFlexDataRequestCallCount(1);
 
 		When.onTheTestApp.iClickOnTheAdaptUIButton();
 		Then.onTheTestApp.iShouldNotSeeTheDialogWithReloadReason()
 		.and.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.keyUser.noReloadReason)
-		.and.noReloadShouldHaveHappened();
+		.and.noReloadShouldHaveHappened()
+		.and.iExpectFlexDataRequestCallCount(1);
 		Then.onTheRTAToolbar.iShouldSeeTheToolbar();
 
 		When.onTheRTAToolbar.iClickOnAnElementOverlay(sContainedVMControlId);
@@ -177,13 +186,15 @@ sap.ui.define([
 		When.onTheTestApp.iClickOnTheOKButton();
 		Then.onTheTestApp.iShouldSeeTheAdaptUIButton();
 		Then.onTheTestApp.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.endUser.draftReloadReason)
+		.and.iExpectFlexDataRequestCallCount(3)
 		.and.aReloadShouldHaveHappened();
 
 		When.onTheTestApp.iClickOnTheAdaptUIButton();
 		Then.onTheTestApp.iShouldSeeTheDialogWithReloadReason(sDraftChangesAvailableReloadReason);
 		When.onTheTestApp.iClickOnTheOKButton();
 		Then.onTheRTAToolbar.iShouldSeeTheToolbar();
-		Then.onTheTestApp.aReloadShouldHaveHappened();
+		Then.onTheTestApp.aReloadShouldHaveHappened()
+		.and.iExpectFlexDataRequestCallCount(4);
 
 		Given.iTeardownMyApp();
 	});

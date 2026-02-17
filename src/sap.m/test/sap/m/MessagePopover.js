@@ -2,10 +2,10 @@
 
 sap.ui.define([
 	"sap/base/Log",
+	"sap/m/Button",
+	"sap/m/MessageItem",
 	"sap/m/MessagePopover",
 	"sap/ui/model/json/JSONModel",
-	"sap/m/MessageItem",
-	"sap/m/Button",
 	"sap/ui/core/IconPool",
 	"sap/m/library",
 	"sap/ui/core/Item",
@@ -25,7 +25,7 @@ sap.ui.define([
 	"sap/m/CheckBox",
 	"sap/m/App",
 	"sap/ui/thirdparty/jquery"
-], function(Log, MessagePopover, JSONModel, MessageItem, Button, IconPool, mobileLibrary, Item, SimpleForm, layoutLibrary, Title, Label, Input, TextArea, Select, LayoutData, Element, Page, MTitle, ToolbarSpacer, Toolbar, CheckBox, App, jQuery) {
+], function(Log, Button, MessageItem, MessagePopover, JSONModel, IconPool, mobileLibrary, Item, SimpleForm, layoutLibrary, Title, Label, Input, TextArea, Select, LayoutData, Element, Page, MTitle, ToolbarSpacer, Toolbar, CheckBox, App, jQuery) {
 	"use strict";
 
 	// shortcut for sap.m.InputType
@@ -226,6 +226,15 @@ sap.ui.define([
 		initiallyExpanded: false
 	});
 
+	const oMessagePopoverSingle = new MessagePopover("mPopoverSingle", {
+		items: [new MessageItem({
+			type: "Error",
+			title: "This is the message title",
+			description: "This is a long message description. It provides more details about the message and can span multiple lines to ensure that all necessary information is conveyed to the user effectively.",
+			subtitle: "Subtitle of the message",
+		})]
+	});
+
 	oMessagePopover.setModel(oModel);
 	oMessagePopoverWithGrouping.setModel(oModel);
 	oMessagePopoverCollapsed.setModel(oModel);
@@ -255,6 +264,15 @@ sap.ui.define([
 		press: function () {
 			oMessagePopoverCollapsed.toggle(this);
 		}
+	});
+
+	const oSingleMessagePopoverButton = new Button("btnSingle",
+	 {
+		text: "1",
+		type: ButtonType.Emphasized,
+		press: function () {
+			oMessagePopoverSingle.toggle(this);
+	 	}
 	});
 
 	var getAddPositionItems = function () {
@@ -417,6 +435,8 @@ sap.ui.define([
 				oMessagePopoverWithGroupingButton,
 				new ToolbarSpacer(),
 				oMessagePopoverCButton,
+				new ToolbarSpacer(),
+				oSingleMessagePopoverButton,
 				new CheckBox("compactMode", {
 					selected: false,
 					text: "Compact mode",

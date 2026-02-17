@@ -117,6 +117,12 @@ sap.ui.define([
 					closed: {},
 
 					/**
+					 * Fired when the menu is opened.
+					 * @since 1.146
+					 */
+					open: {},
+
+					/**
 					 * Fired before the menu is closed.
 					 * This event can be prevented which effectively prevents the menu from closing.
 					 * @since 1.131
@@ -152,6 +158,7 @@ sap.ui.define([
 			oMenuWrapper.attachCloseItemSubmenu(this._collectSubmenusToClose, this);
 			oMenuWrapper.attachItemSelected(this._handleItemSelected, this);
 			oPopover.attachAfterClose(this._menuClosed, this);
+			oPopover.attachAfterOpen(this._menuOpened, this);
 
 			this._aSubmenusToClose = [];
 			this._openDuration = Device.system.phone ? null : 0;
@@ -238,6 +245,7 @@ sap.ui.define([
 			oMenuWrapper.detachCloseItemSubmenu(this._collectSubmenusToClose, this);
 			oMenuWrapper.detachItemSelected(this._handleItemSelected, this);
 			oPopover.detachAfterClose(this._menuClosed, this);
+			oPopover.detachAfterOpen(this._menuOpened, this);
 
 			oMenuWrapper.destroy();
 			oPopover.destroy();
@@ -577,6 +585,10 @@ sap.ui.define([
 		 */
 		Menu.prototype._setCustomEnhanceAccStateFunction = function(fn) {
 			this._fnEnhanceUnifiedMenuAccState = fn;
+		};
+
+		Menu.prototype._menuOpened = function() {
+			this.fireOpen();
 		};
 
 		Menu.prototype._menuClosed = function(oEvent) {

@@ -1081,6 +1081,10 @@ sap.ui.define([
 	SidePanel.prototype._getSideContentHeaderTitle = function() {
 		var oSelectedItem = this._getSelectedItem();
 
+		if (oSelectedItem.getTitle()) {
+			return oSelectedItem.getTitle();
+		}
+
 		if (!this._contentHeaderTitle) {
 			this._contentHeaderTitle = new Title();
 		}

@@ -24534,6 +24534,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// before aggregation, because the leaves are not aggregated. If there are multiple refreshes,
 	// only a single grand total request is sent.
 	// JIRA: CPOUI5ODATAV4-3300
+	//
+	// Support Context#requestSideEffects for single entities if there is no visual grouping. It
+	// always refreshes the complete entity and the grand total. Messages are not yet requested.
+	// JIRA: CPOUI5ODATAV4-3258
 	QUnit.test("Data Aggregation: leaves' key predicates", function (assert) {
 		var oBinding,
 			oModel = this.createSalesOrdersModel123({autoExpandSelect : true}),
@@ -24623,6 +24627,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				aCurrentContexts[1].requestRefresh(undefined, true);
 			}, new Error("Unsupported: bAllowRemoval && $$aggregation"));
 
+			// code under test (JIRA: CPOUI5ODATAV4-3258)
+			return aCurrentContexts[0].requestSideEffects([""]).then(mustFail(assert),
+				function (oError) {
+					assert.strictEqual(oError.message,
+						"Unsupported on aggregated data: " + aCurrentContexts[0]);
+				});
+		}).then(function () {
 			that.expectChange("lifecycleStatus", [, "Z*"])
 				.expectRequest("PATCH SalesOrderList('26')?sap-client=123&custom=foo", {
 					payload : {LifecycleStatus : "Z*"}
@@ -24631,6 +24642,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					{Note : "Late"})
 				.expectChange("lifecycleStatus", [, "*Z*"]);
 
+			const aCurrentContexts = oBinding.getCurrentContexts();
 			that.oLogMock.expects("error")
 				.withArgs("Failed to drill-down into ()/Note, invalid segment: Note");
 			assert.strictEqual(aCurrentContexts[0].isAggregated(), true,
@@ -24666,28 +24678,50 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oBinding.getCurrentContexts()[1].delete(),
 				that.waitForChanges(assert, "delete")
 			]);
-		}).then(function () {
+		}).then(async function () {
 			assert.strictEqual(oBinding.getCount(), 2);
 
-			that.expectRequest("#4 SalesOrderList('25')?sap-client=123&custom=foo"
-					+ "&$select=GrossAmount,LifecycleStatus,Note,SalesOrderID",
-					{GrossAmount : "3", LifecycleStatus : "Y", Note : "n/a", SalesOrderID : "25"})
-				.expectRequest("#4 SalesOrderList?sap-client=123&custom=foo&$apply="
-					+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)/"
-					+ "aggregate(GrossAmount)",
-					{value : [{GrossAmount : "7"}]})
-				.expectRequest("#4 SalesOrderList('24')?sap-client=123&custom=foo"
-					+ "&$select=GrossAmount,LifecycleStatus,Note,SalesOrderID",
-					{GrossAmount : "4", LifecycleStatus : "X", Note : "n/a", SalesOrderID : "24"})
-				.expectChange("grossAmount", ["7", "3", "4"]);
+			function expect() {
+				const iBatchNo = that.iBatchNo + 1; // don't care about exact no.
+				that.expectRequest(`#${iBatchNo} SalesOrderList('25')?sap-client=123&custom=foo`
+						+ "&$select=GrossAmount,LifecycleStatus,Note,SalesOrderID", {
+						GrossAmount : `${iBatchNo}`,
+						LifecycleStatus : "Y",
+						Note : "n/a",
+						SalesOrderID : "25"
+					})
+					.expectRequest(`#${iBatchNo} SalesOrderList?sap-client=123&custom=foo`
+						+ "&$apply=filter(LifecycleStatus gt 'P' and GrossAmount lt 100)"
+						+ "/search(covfefe)/aggregate(GrossAmount)", {
+						value : [{GrossAmount : `${2 * iBatchNo}`}]
+					})
+					.expectRequest(`#${iBatchNo} SalesOrderList('24')?sap-client=123&custom=foo`
+						+ "&$select=GrossAmount,LifecycleStatus,Note,SalesOrderID", {
+						GrossAmount : `${iBatchNo}`,
+						LifecycleStatus : "X",
+						Note : "n/a",
+						SalesOrderID : "24"
+					})
+					.expectChange("grossAmount", [`${2 * iBatchNo}`, `${iBatchNo}`, `${iBatchNo}`]);
+			}
 
 			const [, oContext25, oContext24] = oBinding.getCurrentContexts();
-			return Promise.all([
+			expect();
+			await Promise.all([
 				// code under test (JIRA: CPOUI5ODATAV4-3257, CPOUI5ODATAV4-3300)
 				oContext25.requestRefresh(),
 				// code under test - grand total is requested only once
 				oContext24.requestRefresh(),
 				that.waitForChanges(assert, "requestRefresh")
+			]);
+
+			expect();
+			await Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3258)
+				oContext25.requestSideEffects([""]),
+				// code under test (JIRA: CPOUI5ODATAV4-3258)
+				oContext24.requestSideEffects(["LifecycleStatus"]),
+				that.waitForChanges(assert, "requestSideEffects")
 			]);
 		}).then(function () {
 			that.expectRequest("SalesOrderList?sap-client=123&$apply=groupby((LifecycleStatus))"
@@ -27703,6 +27737,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Context#refresh of a single entity is still not allowed if visual grouping is used.
 	// JIRA: CPOUI5ODATAV4-3257
+	//
+	// Context#requestSideEffects for a single entity is still not allowed if visual grouping is
+	// used.
+	// JIRA: CPOUI5ODATAV4-3258
 	QUnit.test("Data Aggregation: keep alive single entity", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -27937,11 +27975,18 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert, "expand Country 'A' again")
 		]);
 
+		const sErrorMessage = "Unsupported for data aggregation with groupLevels: " + sODLB
+			+ ": /BusinessPartners";
 		assert.throws(() => {
-			// code under test
+			// code under test (JIRA: CPOUI5ODATAV4-3257)
 			oContext26.refresh();
-		}, new Error("Unsupported for data aggregation with groupLevels: " + sODLB
-			+ ": /BusinessPartners"));
+		}, new Error(sErrorMessage));
+
+		// code under test (JIRA: CPOUI5ODATAV4-3258)
+		await oContext26.requestSideEffects([""]).then(mustFail(assert),
+			function (oError) {
+				assert.strictEqual(oError.message, sErrorMessage);
+			});
 	});
 
 	//*********************************************************************************************
@@ -29207,13 +29252,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oHeaderContext.requestSideEffects([{$PropertyPath : "myMessages/*"}]),
 				that.waitForChanges(assert, "myMessages/* (filter)")
 			]);
-		}).then(function () {
-			return that.oView.byId("table").getItems()[0].getBindingContext()
-				.requestSideEffects([{$PropertyPath : "Country"}])
-				.then(mustFail(assert), function (oError) {
-					assert.strictEqual(oError.message,
-						"Must not request side effects when using data aggregation");
-				});
 		});
 	});
 

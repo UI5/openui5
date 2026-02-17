@@ -9304,19 +9304,63 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("requestSideEffects with $$aggregation and row context", function (assert) {
-		var oBinding = this.bindList("/Set");
-
+	QUnit.test("requestSideEffects: data aggregation with groupLevels", function (assert) {
+		const oBinding = this.bindList("/Set");
+		oBinding.mParameters.$$aggregation = {groupLevels : ["Foo"]};
 		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
 			.returns(true);
+		const oContext = Context.create({/*oModel*/}, oBinding, "/Set('42')");
+		this.mock(oContext).expects("isAggregated").never();
+		this.mock(oBinding).expects("refreshSingle").never();
 		this.mock(oBinding.oCache).expects("requestSideEffects").never();
 		this.mock(oBinding).expects("refreshInternal").never();
 		this.mock(_AggregationHelper).expects("isAffected").never();
 
 		assert.throws(function () {
 			// code under test
-			oBinding.requestSideEffects("group", [/*aPaths*/], {/*oContext*/});
-		}, new Error("Must not request side effects when using data aggregation"));
+			oBinding.requestSideEffects("group", [/*aPaths*/], oContext);
+		}, new Error("Unsupported for data aggregation with groupLevels: " + oBinding));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("requestSideEffects: on aggregated data", function (assert) {
+		const oBinding = this.bindList("/Set");
+		oBinding.mParameters.$$aggregation = {groupLevels : []};
+		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+			.returns(true);
+		const oContext = Context.create({/*oModel*/}, oBinding, "/Set('42')");
+		this.mock(oContext).expects("isAggregated").withExactArgs().returns(true);
+		this.mock(oBinding).expects("refreshSingle").never();
+		this.mock(oBinding.oCache).expects("requestSideEffects").never();
+		this.mock(oBinding).expects("refreshInternal").never();
+		this.mock(_AggregationHelper).expects("isAffected").never();
+
+		assert.throws(function () {
+			// code under test
+			oBinding.requestSideEffects("group", [/*aPaths*/], oContext);
+		}, new Error("Unsupported on aggregated data: " + oContext));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("requestSideEffects: data aggregation, single entity", function (assert) {
+		const oBinding = this.bindList("/Set");
+		oBinding.mParameters.$$aggregation = {groupLevels : [/*empty*/]};
+		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+			.returns(true);
+		const oContext = Context.create({/*oModel*/}, oBinding, "/Set('42')");
+		this.mock(oContext).expects("isAggregated").withExactArgs().returns(false);
+		this.mock(oBinding).expects("refreshSingle")
+			.withExactArgs(sinon.match.same(oContext), "group", false, false, true, false)
+			.returns("~refreshSingleResult~");
+		this.mock(oBinding.oCache).expects("requestSideEffects").never();
+		this.mock(oBinding).expects("refreshInternal").never();
+		this.mock(_AggregationHelper).expects("isAffected").never();
+
+		assert.strictEqual(
+			// code under test
+			oBinding.requestSideEffects("group", [/*aPaths*/], oContext),
+			"~refreshSingleResult~"
+		);
 	});
 
 	//*********************************************************************************************
