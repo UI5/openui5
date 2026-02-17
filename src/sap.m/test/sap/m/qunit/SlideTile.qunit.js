@@ -708,6 +708,66 @@ sap.ui.define([
 		assert.ok(this.oSlideTile.hasStyleClass("sapMSTDarkBackground"), "The more icon color is adapted to NewsContent");
 	});
 
+	QUnit.module("TileIndicator in RTL Mode", {
+		beforeEach: async function () {
+			this.oSlideTile = new SlideTile({
+				width: "810px",
+				alignItems: "Start",
+				tiles: [
+					new GenericTile({
+						frameType: "Stretch",
+						tileContent: [
+							new TileContent({
+								footer: "August 21, 2016",
+								content: new NewsContent({
+									contentText: "SAP Unveils Powerful New Player Comparision Tool Exclusively on NFL.com",
+									subheader: "Today, SAP News"
+								})
+							})
+						]
+					}),
+					new GenericTile({
+						frameType: "Stretch",
+						tileContent: [
+							new TileContent({
+								footer: "August 21, 2016",
+								content: new NewsContent({
+									contentText: "Wind Map: Monitoring Real-Time and Forecasted Wind Conditions across the Globe",
+									subheader: "Today, SAP News"
+								})
+							})
+						]
+					})
+				]
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oSlideTile.destroy();
+			this.oSlideTile = null;
+		}
+	});
+
+	QUnit.test("Tile Indicator should be visible in RTL mode for large screen", async function (assert) {
+		//Arrange
+		var iltrTileIndicatorRight = document.querySelector(".sapMSTBulleted").getBoundingClientRect().right;
+		var iltrParentRight = document.querySelector(".sapMSTBulleted").parentElement.getBoundingClientRect().right;
+		Localization.setRTL(true);
+
+		//Act
+		await nextUIUpdate();
+
+		var irtlTileIndicatorLeft = document.querySelector(".sapMSTBulleted").getBoundingClientRect().left;
+		var irtlParentLeft = document.querySelector(".sapMSTBulleted").parentElement.getBoundingClientRect().left;
+
+		//Assert
+		assert.ok(iltrTileIndicatorRight <= iltrParentRight && irtlTileIndicatorLeft >= irtlParentLeft, "Tile indicator is visible in RTL mode");
+
+		//Cleanup
+		Localization.setRTL(false);
+		await nextUIUpdate();
+	});
+
 	QUnit.module("Rendering - EmptyTile", {
 		beforeEach : async function() {
 
