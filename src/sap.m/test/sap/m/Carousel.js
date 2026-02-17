@@ -665,9 +665,14 @@ sap.ui.define([
 				}
 
 				var oCarousel = Element.getElementById("myCarousel");
-				oCarousel.setCustomLayout(new CarouselLayout({
-					visiblePagesCount: iNumberOfPages
-				}));
+
+				if (oCarousel.getCustomLayout()) {
+					oCarousel.getCustomLayout().setVisiblePagesCount(iNumberOfPages);
+				} else {
+					oCarousel.setCustomLayout(new CarouselLayout({
+						visiblePagesCount: iNumberOfPages
+					}));
+				}
 			}
 		});
 
@@ -677,22 +682,78 @@ sap.ui.define([
 		});
 
 		var oScrollModeLabel = new Label({
-			text: "Scroll mode - visible pages:",
+			text: "Scroll mode - visible pages",
 			labelFor: oScrollModeSwitch
 		});
 
 		var oScrollModeSwitch = new Switch("scrollMode",{
 			state: false,
-			tooltip: "Toggles the scrollMode property of the carousel",
+			tooltip: "Toggles the scrollMode property of the Carousel",
 			change: (oEvent) => {
 				const bScrollMode = oEvent.getParameter("state"),
 				 sScrollMode = bScrollMode ? "VisiblePages" : "SinglePage";
-				 Element.getElementById("myCarousel").getCustomLayout()?.setScrollMode(sScrollMode);
+
+				 if (Element.getElementById("myCarousel").getCustomLayout()) {
+					Element.getElementById("myCarousel").getCustomLayout().setScrollMode(sScrollMode);
+				} else {
+					Element.getElementById("myCarousel").setCustomLayout(new CarouselLayout({
+						scrollMode: sScrollMode
+					}));
+				}
 			}
 		});
 
-		// Slider with 5 values, used to shrink the container of the carousel
+		var oResponsiveSwitch = new Switch("responsive",{
+			state: false,
+			tooltip: "Toggles the responsive property of the CarouselLayout",
+			change: (oEvent) => {
+				const bResponsive = oEvent.getParameter("state");
 
+				if (Element.getElementById("myCarousel").getCustomLayout()) {
+					Element.getElementById("myCarousel").getCustomLayout().setResponsive(bResponsive);
+				} else {
+					Element.getElementById("myCarousel").setCustomLayout(new CarouselLayout({
+						responsive: bResponsive
+					}));
+				}
+
+				Element.getElementById("myCarousel").invalidate();
+			}
+		});
+
+		var oResponsiveLabel = new Label({
+			text: "carousel layout - responsive",
+			labelFor: oResponsiveSwitch
+		});
+
+
+		var oMinPageWidthInput = new Input("input-pages-min-width", {
+			type: "Number",
+			value: "148",
+			width: "320px",
+			liveChange: function (oEvent) {
+				var iMinWOfPages = Number(oEvent.getSource().getValue());
+
+				var oCarousel = Element.getElementById("myCarousel");
+
+				if (oCarousel.getCustomLayout()) {
+					oCarousel.getCustomLayout().setMinPageWidth(iMinWOfPages);
+				} else {
+					oCarousel.setCustomLayout(new CarouselLayout({
+						minPageWidth: iMinWOfPages
+					}));
+				}
+
+				oCarousel.invalidate();
+			}
+		});
+
+		var oMinPageWidthLabel = new Label({
+			text: "minPageWidth for the responsive layout (px)",
+			labelFor: oMinPageWidthInput
+		});
+
+		// Slider with 5 values, used to shrink the container of the carousel
 		var oScreenSizes = [
 			"35%",
 			"45%",
@@ -775,7 +836,11 @@ sap.ui.define([
 				oNumberOfIPagesToBeShownLabel,
 				oNumberOfPagesToBeShownInput,
 				oScrollModeLabel,
-				oScrollModeSwitch
+				oScrollModeSwitch,
+				oResponsiveLabel,
+				oResponsiveSwitch,
+				oMinPageWidthLabel,
+				oMinPageWidthInput
 			]
 		});
 

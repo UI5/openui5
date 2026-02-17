@@ -282,20 +282,20 @@ sap.ui.define([
 
 			/**
 			 * Allows users to upload all files from a given directory and its corresponding subdirectories.
-			 * @since 1.105.0
 			 *
 			 * <b>Note:</b> This feature is supported on all WebKit-based browsers as well as Microsoft Edge and Firefox after version 50.
 			 * <b>Note:</b> Multiple directory selection is not supported.
+			 * @since 1.105.0
 			 */
 			directory : {type : "boolean", group : "Behavior", defaultValue : false},
 
 			/**
 			 * Indicates whether the file uploader is required.
-			 * @since 1.144
 			 *
 			 * <b>Note:</b> The control can be marked as required either by setting this property to <code>true</code>
 			 * or by using the legacy approach of setting the <code>required</code> property to <code>true</code>
 			 * on a <code>sap.m.Label</code> that has its <code>labelFor</code> property pointing to this control.
+			 * @since 1.144
 			 */
 			required : {type : "boolean", group : "Behavior", defaultValue : false}
 		},

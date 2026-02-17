@@ -832,6 +832,85 @@ function(Element, nextUIUpdate, XMLView, library, ObjectPageLayout, ObjectPageSu
 
 	});
 
+	QUnit.test("aria-labelledby is correctly set when there is a Section with visible=false", async function(assert) {
+		// Arrange
+		// This test verifies that the aria-labelledby mapping uses the anchor bar item's key
+		// property to find the corresponding section, rather than relying on array index matching.
+		// The old implementation looped through all sections by index and matched them with
+		// anchor bar items by the same index, which caused mismatches when invisible sections
+		// were present (since invisible sections don't have anchor bar items).
+		var oObjectPageLayout = new ObjectPageLayout({
+			sections: [
+					new ObjectPageSection("invisibleSection", {
+					title: "Invisible Section",
+					visible: false, // This section is invisible
+					subSections: [
+						new ObjectPageSubSection({
+							title: "SubSection Invisible",
+							blocks: [new Text({text: "Invisible Content"})]
+						})
+					]
+				}),
+				new ObjectPageSection("visibleSection1", {
+					title: "Visible Section 1",
+					showTitle: false, // Section title is hidden, so it should be labelled by the anchor bar item
+					subSections: [
+						new ObjectPageSubSection({
+							blocks: [new Text({text: "Content 1"})]
+						})
+					]
+				}),
+				new ObjectPageSection("visibleSection2", {
+					title: "Visible Section 2",
+					showTitle: false, // Section title is hidden, so it should be labelled by the anchor bar item
+					subSections: [
+						new ObjectPageSubSection({
+							blocks: [new Text({text: "Content 2"})]
+						})
+					]
+				})
+			]
+		});
+
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// Get references
+		var oVisibleSection1 = Element.getElementById("visibleSection1"),
+			oVisibleSection2 = Element.getElementById("visibleSection2"),
+			oAnchorBar = oObjectPageLayout.getAggregation("_anchorBar"),
+			aAnchorBarItems = oAnchorBar.getItems();
+
+		// Assert - verify anchor bar has only 2 items (for the 2 visible sections)
+		assert.strictEqual(aAnchorBarItems.length, 2, "Anchor bar has 2 items for 2 visible sections");
+
+		// Assert - verify anchor bar items have correct keys matching section IDs
+		assert.strictEqual(aAnchorBarItems[0].getKey(), "visibleSection1",
+			"First anchor bar item key matches first visible section ID");
+		assert.strictEqual(aAnchorBarItems[1].getKey(), "visibleSection2",
+			"Second anchor bar item key matches second visible section ID");
+
+		// Assert - verify aria-labelledby is correctly set on each visible section
+		// The aria-labelledby should reference the corresponding anchor bar button
+		var sSection1AriaLabelledBy = oVisibleSection1.$().attr("aria-labelledby"),
+			sSection2AriaLabelledBy = oVisibleSection2.$().attr("aria-labelledby");
+
+		// Get the anchor bar button IDs
+		var sAnchorBarItem1Id = aAnchorBarItems[0].getId(),
+			sAnchorBarItem2Id = aAnchorBarItems[1].getId();
+
+		// Assert - verify the aria-labelledby references point to the correct anchor bar buttons
+		// This is the key assertion: visibleSection2 should be labelled by anchor bar item 2,
+		// NOT by anchor bar item 1 (which would happen with the old index-based logic)
+		assert.strictEqual(sSection1AriaLabelledBy, sAnchorBarItem1Id,
+			"Visible Section 1 aria-labelledby correctly references first anchor bar button");
+		assert.strictEqual(sSection2AriaLabelledBy, sAnchorBarItem2Id,
+			"Visible Section 2 aria-labelledby correctly references second anchor bar button (not mismatched due to invisible section)");
+
+		// Clean up
+		oObjectPageLayout.destroy();
+	});
+
 	QUnit.module("Invalidation", {
 		beforeEach: async function() {
 			this.oObjectPageLayout = new ObjectPageLayout("page", {

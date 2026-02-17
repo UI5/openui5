@@ -98,6 +98,18 @@
 			<Switch state="false"
 				tooltip="Toggles the scrollMode property of the carousel"
 				change=".OnScrollModeChange" />
+			<Label text="Responsive number of pages" />
+			<Switch state="false"
+				tooltip="Toggles the responsive property of the carousel"
+				change=".onResponsiveChange" />
+
+			<Label text="minPageWidth for the responsive layout (px)" />
+			<Input
+				type="Number"
+				value="148"
+				liveChange=".onMinPageWidthChange"
+				width="320px" />
+
 		</f:SimpleForm>
 	</Page>
 </mvc:View>

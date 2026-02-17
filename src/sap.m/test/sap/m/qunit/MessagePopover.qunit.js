@@ -1305,6 +1305,37 @@ sap.ui.define([
 		spySetShowArrow.restore();
 	});
 
+	QUnit.test("Resizing the popover should not return to details view once we navigate to the list view", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+		var oMessagePopover = new MessagePopover(),
+			oMessageItem = new MessageItem({ title: "Test", description: "Test description", type: "Error" }),
+			oButton = new Button(),
+			oToolbar = new Toolbar({ content: oButton });
+
+		oMessagePopover.addItem(oMessageItem);
+
+		oToolbar.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		oMessagePopover.openBy(oButton);
+		this.clock.tick(500);
+
+		assert.notOk(oMessagePopover._oMessageView._isListPage(), "The details page is shown at first");
+
+		// go back to list view and resize
+		oMessagePopover.navigateBack();
+		this.clock.tick(500);
+
+		oMessagePopover._oPopover.setContentWidth("800px");
+		this.clock.tick(500);
+
+		assert.ok(oMessagePopover._oMessageView._isListPage(), "The list page is shown after resize");
+
+		runAllTimersAndRestore(this.clock, true);
+		oMessagePopover.destroy();
+		oButton.destroy();
+	});
+
 	QUnit.module("Binding", {
 		beforeEach: async function () {
 			this.oButton2 = new Button({text: "Press me"});

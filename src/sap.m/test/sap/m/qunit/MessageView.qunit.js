@@ -1533,6 +1533,75 @@ sap.ui.define([
 		oMessageView = null;
 	});
 
+	QUnit.module("Accessibility - ValueState", {
+		beforeEach: async function () {
+			this.oMessageView = new MessageView({
+				items: [
+					new MessageItem({
+						type: "Error",
+						title: "Error message"
+					}),
+					new MessageItem({
+						type: "Warning",
+						title: "Warning message"
+					}),
+					new MessageItem({
+						type: "Success",
+						title: "Success message"
+					}),
+					new MessageItem({
+						type: "Information",
+						title: "Information message"
+					})
+				]
+			});
+
+			this.oMessageView.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oMessageView.destroy();
+		}
+	});
+
+	QUnit.test("MessageListItem should have aria-describedby with valueState text", function (assert) {
+		var aListItems = this.oMessageView._oLists.all.getItems();
+		var oBundle = Library.getResourceBundleFor("sap.m");
+
+		// Test Error item
+		var oErrorItem = aListItems[0];
+		var sErrorAriaDescribedBy = oErrorItem.getDomRef().getAttribute("aria-describedby");
+		var oErrorValueStateText = oErrorItem.getValueStateAriaDescribedBy();
+
+		assert.ok(oErrorValueStateText, "Error item should have valueStateAriaDescribedBy");
+		assert.ok(sErrorAriaDescribedBy.indexOf(oErrorValueStateText.getId()) > -1, "Error item aria-describedby should reference valueStateAriaDescribedBy");
+		assert.strictEqual(oErrorValueStateText.getText(), oBundle.getText("LIST_ITEM_STATE_ERROR"), "Error valueStateText should be correct");
+
+		// Test Warning item
+		var oWarningItem = aListItems[1];
+		var oWarningValueStateText = oWarningItem.getValueStateAriaDescribedBy();
+		assert.strictEqual(oWarningValueStateText.getText(), oBundle.getText("LIST_ITEM_STATE_WARNING"), "Warning valueStateText should be correct");
+
+		// Test Success item
+		var oSuccessItem = aListItems[2];
+		var oSuccessValueStateText = oSuccessItem.getValueStateAriaDescribedBy();
+		assert.strictEqual(oSuccessValueStateText.getText(), oBundle.getText("LIST_ITEM_STATE_SUCCESS"), "Success valueStateText should be correct");
+
+		// Test Information item
+		var oInfoItem = aListItems[3];
+		var oInfoValueStateText = oInfoItem.getValueStateAriaDescribedBy();
+		assert.strictEqual(oInfoValueStateText.getText(), oBundle.getText("LIST_ITEM_STATE_INFORMATION"), "Information valueStateText should be correct");
+	});
+
+	QUnit.test("ValueStateAriaDescribedBy should be rendered as InvisibleText in DOM", function (assert) {
+		var oListItem = this.oMessageView._oLists.all.getItems()[0];
+		var oValueStateText = oListItem.getValueStateAriaDescribedBy();
+		var oValueStateTextDom = document.getElementById(oValueStateText.getId());
+
+		assert.ok(oValueStateTextDom, "ValueStateAriaDescribedBy should be in DOM");
+		assert.ok(oValueStateTextDom.classList.contains("sapUiInvisibleText"), "Should have sapUiInvisibleText class");
+	});
+
 	QUnit.module("Filtering");
 
 	QUnit.test("Filter message & model change integration", async function (assert) {

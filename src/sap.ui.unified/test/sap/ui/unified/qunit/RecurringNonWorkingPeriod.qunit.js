@@ -99,4 +99,37 @@ sap.ui.define([
 		assert.notOk(hasOccurrenceOnDate(oExpectedDate), "hasOccurrenceOnDate for a date outside the time frame of recurrences is correct.");
 
 	});
+
+	QUnit.test("hasOccurrenceOnDate from RecurrenceUtils DST", function (assert) {
+		// Prepare
+		const oRecurringNonWorkingPeriod = new RecurringNonWorkingPeriod({
+			recurrenceType: RecurrenceType.Daily,
+			recurrenceEndDate: UI5Date.getInstance(2026, 4, 1),
+			recurrencePattern: 7,
+			date: UI5Date.getInstance(2026, 2, 20),
+			timeRange: new TimeRange({start: "12:55", end: "13:15", valueFormat: "HH:mm"})
+		});
+
+		const oExpectedDate = UI5Date.getInstance(2026, 2, 13, 0, 0);
+		const hasOccurrenceOnDate = RecurrenceUtils.hasOccurrenceOnDate.bind(oRecurringNonWorkingPeriod);
+
+		// Assert
+		assert.notOk(hasOccurrenceOnDate(oExpectedDate), "hasOccurrenceOnDate for a date outside the time frame of recurrences is correct.");
+
+		for (let i = 0; i < 7; i++) {
+			//Act
+			oExpectedDate.setDate(oExpectedDate.getDate() + 7);
+
+			// Assert
+			assert.ok(hasOccurrenceOnDate(oExpectedDate), "hasOccurrenceOnDate for 7 weeks is correct");
+		}
+
+		//Act
+		oExpectedDate.setDate(oExpectedDate.getDate() + 7);
+
+		// Assert
+		assert.notOk(hasOccurrenceOnDate(oExpectedDate), "hasOccurrenceOnDate for a date outside the time frame of recurrences is correct.");
+
+	});
+
 });

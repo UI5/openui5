@@ -253,7 +253,7 @@ sap.ui.define([
 	 * example due to a filter), and the group ID must not have
 	 * {@link sap.ui.model.odata.v4.SubmitMode.API}. Such a deletion is not a pending change.
 	 *
-	 * When using data aggregation without group levels, single entities can be deleted
+	 * When using data aggregation without <code>groupLevels</code>, single entities can be deleted
 	 * (@experimental as of version 1.144.0, see {@link #isAggregated}). The same restrictions as
 	 * for a recursive hierarchy apply.
 	 *
@@ -1927,6 +1927,14 @@ sap.ui.define([
 	 *     <code>oPromise.then(function () {...}, function () {...})</code>).
 	 * </ul>
 	 *
+	 * Since 1.109.0, this context can also represent a node in a recursive hierarchy (see
+	 * {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}).
+	 *
+	 * When using data aggregation but no recursive hierarchy, and without <code>groupLevels</code>
+	 * or <code>"grandTotal like 1.84"</code> (see
+	 * {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}), this context can also
+	 * represent a single entity (see {@link #isAggregated}, @experimental as of version 1.146.0).
+	 *
 	 * @param {Array<sap.ui.model.odata.v4.ts.NavigationPropertyPathExpression|sap.ui.model.odata.v4.ts.PropertyPathExpression|string>} aPathExpressions
 	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 	 *   "14.4.1.6 Expression edm:PropertyPath" objects describing which properties need to be
@@ -1987,10 +1995,9 @@ sap.ui.define([
 	 *     <li> a <code>$PropertyPath</code> has been requested which contains a navigation
 	 *       property that was changed on the server and now targets a different entity
 	 *       (since 1.79.0)
-	 *     <li> the binding of this context has "$$aggregation" (see
-	 *       {@link sap.ui.model.odata.v4.ODataModel#bindList}), the context is not the header
-	 *       context, and (since 1.109.0) no <code>hierarchyQualifier</code> is given (see
-	 *       {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation})
+	 *     <li> this is the row context of a list binding with data aggregation which has
+	 *       <code>groupLevels</code> or <code>"grandTotal like 1.84"</code>
+	 *     <li> this context does not represent a single entity
 	 *   </ul>
 	 * @public
 	 * @see sap.ui.model.odata.v4.ODataContextBinding#getBoundContext
@@ -2094,7 +2101,7 @@ sap.ui.define([
 						})
 			).then(function () {
 				return SyncPromise.all([
-					that.oModel.requestSideEffects(sGroupId, aPathsForModel),
+					that.oModel.requestSideEffects(aPathsForModel, sGroupId),
 					// ensure that this is called synchronously when there are no running change
 					// requests (otherwise bubbling up might fail due to temporarily missing caches)
 					that.requestSideEffectsInternal(aPathsForBinding, sGroupId)

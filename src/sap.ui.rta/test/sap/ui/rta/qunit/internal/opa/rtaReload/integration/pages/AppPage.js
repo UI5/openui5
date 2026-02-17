@@ -94,7 +94,8 @@ sap.ui.define([
 				iShouldNotSeeTheRTAToolbar() {
 					return this.waitFor({
 						success() {
-							var bExists = (Opa5.getJQuery()(".sapUIRta_toolbar").length > 0);
+							const oFrameWindow = Opa5.getWindow();
+							const bExists = !!oFrameWindow.document.getElementById("sapUIRta_toolbar");
 							Opa5.assert.ok(!bExists, "The RTA Toolbar does not exist");
 						}
 					});
@@ -104,6 +105,14 @@ sap.ui.define([
 						success() {
 							const sessionStorage = FlexInfoSession.getByReference(sAppId);
 							Opa5.assert.deepEqual(sessionStorage, oExpectedFlexInfoSessionStorage, "The session storage is as expected");
+						}
+					});
+				},
+				iExpectFlexDataRequestCallCount(iExpectedCount) {
+					return this.waitFor({
+						success() {
+							const iFlexDataCallCount = this.getContext().oLoadFlexDataStub.callCount;
+							Opa5.assert.strictEqual(iFlexDataCallCount, iExpectedCount, `loadFlexData was called ${iExpectedCount} times`);
 						}
 					});
 				},

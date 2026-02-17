@@ -161,6 +161,14 @@ sap.ui.define([
 			this.byId("details").getBindingContext().refresh();
 		},
 
+		onRefreshBookingViaSideEffects : function () {
+			this.byId("details").getBindingContext().requestSideEffects([""]);
+		},
+
+		onRefreshFlightDate : function () {
+			this.byId("details").getBindingContext().requestSideEffects(["FlightDate"]);
+		},
+
 		onSearch : function () {
 			this._oAggregation.search
 				= this.getView().getModel("ui").getProperty("/sSearch");

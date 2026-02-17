@@ -6,20 +6,21 @@
 .sapMBreadcrumbs {
 
 	.sapMBreadcrumbsCurrentLocation:focus {
-		outline: 0.125rem dotted @sapUiHcStandardForeground;
+		outline: 0.125rem dotted @sapHC_StandardForeground;
 		outline-offset: -0.125rem;
 	}
 
-	.sapMBreadcrumbsItem.sapMBreadcrumbsSelectItem > 
+	.sapMBreadcrumbsItem.sapMBreadcrumbsSelectItem >
 	.sapMSlt.sapMSltIconOnly.sapMSltWithIcon.sapMSltHoverable.sapMSltWithArrow {
 
-		.sapMSltIcon:before {
-			border-bottom: 0.0625rem solid @sapUiLink;
+		.sapMSltIcon::before {
+			border-bottom: 0.0625rem solid var(--sapLinkColor);
 		}
 
 		&:focus,
 		&:hover {
-			.sapMSltIcon:before {
+
+			.sapMSltIcon::before {
 				border-bottom: none;
 			}
 		}

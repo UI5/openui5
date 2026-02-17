@@ -45,6 +45,12 @@ sap.ui.define([
 			defaultAggregation: "content",
 			aggregations: {
 				/**
+				 * The title of the action item. If not set, the title of the parent side panel will be used.
+				 *
+				 * @since 1.146
+				 */
+				title: {type: "sap.m.Title", multiple: false},
+				/**
 				 * The list of controls for side content of the action item.
 				 */
 				content: { type: "sap.ui.core.Control", multiple: true }

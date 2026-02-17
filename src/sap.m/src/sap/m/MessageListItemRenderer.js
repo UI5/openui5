@@ -21,6 +21,40 @@ sap.ui.define(["./StandardListItemRenderer", "sap/ui/core/Renderer"], function (
 		}
 	};
 
+	/**
+	 * Overrides the base method to add aria-describedby for valueState
+	 * @param {sap.ui.core.RenderManager} oRm The RenderManager
+	 * @param {sap.m.MessageListItem} oLI The list item
+	 * @returns {string|undefined} The aria-describedby IDs
+	 * @protected
+	 */
+	MessageListItemRenderer.getAriaDescribedBy = function(oLI) {
+		var sAriaDescribedBy = StandardListItemRenderer.getAriaDescribedBy.apply(this, arguments);
+		var oValueStateText = oLI.getValueStateAriaDescribedBy();
+
+		if (oValueStateText) {
+			sAriaDescribedBy = sAriaDescribedBy ? sAriaDescribedBy + " " + oValueStateText.getId() : oValueStateText.getId();
+		}
+
+		return sAriaDescribedBy;
+	};
+
+	/**
+	 * Renders the valueState InvisibleText
+	 * @param {sap.ui.core.RenderManager} oRm The RenderManager
+	 * @param {sap.m.MessageListItem} oLI The list item
+	 * @protected
+	 */
+	MessageListItemRenderer.renderLIContent = function(oRm, oLI) {
+		StandardListItemRenderer.renderLIContent.apply(this, arguments);
+
+		// Render the valueStateAriaDescribedBy InvisibleText
+		var oValueStateText = oLI.getValueStateAriaDescribedBy();
+		if (oValueStateText) {
+			oRm.renderControl(oValueStateText);
+		}
+	};
+
 	MessageListItemRenderer.renderTitleWrapper = function(rm, oLI) {
 
 		var	sTitle = oLI.getTitle(),
