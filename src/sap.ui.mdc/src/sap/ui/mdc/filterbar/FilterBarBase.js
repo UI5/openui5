@@ -1055,6 +1055,10 @@ sap.ui.define([
 			}
 
 			this.getFilterItems().some((oFilterField) => {
+				if (oFilterField && oFilterField.isInvalidInput && oFilterField.isInvalidInput()) {
+					vRetErrorState = FilterBarValidationStatus.FieldInErrorState;
+				}
+
 				if (oFilterField && (oFilterField.getValueState() !== ValueState.None)) {
 					if (oFilterField.getValueStateText() !== this._getRequiredFilterFieldValueText(oFilterField)) {
 						vRetErrorState = FilterBarValidationStatus.FieldInErrorState;
@@ -1103,6 +1107,7 @@ sap.ui.define([
 			}
 
 			const oFilterField = oEvent.oSource;
+
 			if (oFilterField.getRequired() && (oFilterField.getValueState() === ValueState.Error) && oEvent.getParameter("valid")) {
 				oFilterField.setValueState(ValueState.None);
 				return;
@@ -1121,7 +1126,43 @@ sap.ui.define([
 				return false;
 			});
 
-			this._aFIChanges.push({ name: sFilterName, promise: oEvent.getParameter("promise") });
+			const oFieldChange = { name: sFilterName, promise: oEvent.getParameter("promise") };
+			this._aFIChanges.push(oFieldChange);
+
+			const oPromise = oEvent.getParameter("promise");
+			const bValid = oEvent.getParameter("valid");
+			if (oPromise) {
+				oPromise.then((aConditions) => {
+					// Remove this change from the pending changes array
+					const nIndex = this._aFIChanges ? this._aFIChanges.indexOf(oFieldChange) : -1;
+					if (nIndex >= 0) {
+						this._aFIChanges.splice(nIndex, 1);
+					}
+
+					// Clear error state if the field is now valid
+					// Check if field has valid input based on conditions: empty array means cleared field
+					if (oFilterField.getValueState() === ValueState.Error) {
+						if (bValid || (aConditions && aConditions.length === 0)) {
+							oFilterField.setValueState(ValueState.None);
+							oFilterField.setValueStateText("");
+						}
+					}
+
+					// After successful change, re-validate to update lock state
+					this._updateLockStateFromValidation();
+				}).catch(() => {
+					// Remove this change from the pending changes array
+					const nIndex = this._aFIChanges ? this._aFIChanges.indexOf(oFieldChange) : -1;
+					if (nIndex >= 0) {
+						this._aFIChanges.splice(nIndex, 1);
+					}
+					// After failed change (error state), re-validate to update lock state
+					this._updateLockStateFromValidation();
+				});
+			} else {
+				// Synchronous change, immediately update lock state
+				this._updateLockStateFromValidation();
+			}
 		};
 
 		/**
@@ -1307,6 +1348,7 @@ sap.ui.define([
 			}
 
 			this._visualizeValidationState(vRetErrorState);
+
 			fnCleanup();
 		};
 
@@ -1642,20 +1684,21 @@ sap.ui.define([
 			let oFilterField;
 
 			if (oChanges.type === "aggregation") {
-
+				let oFilterField = oChanges.child;
 				if (oChanges.name === "filterItems") {
 					switch (oChanges.mutation) {
 						case "insert":
-							oFilterField = oChanges.child;
 							oFilterField = this._enhanceFilterField(oFilterField);
 							oFilterField.attachChange(this._handleFilterItemChanges, this);
 							oFilterField.attachSubmit(this._handleFilterItemSubmit, this);
+
 							this._filterItemInserted(oFilterField);
 							break;
 						case "remove":
-							oChanges.child.detachChange(this._handleFilterItemChanges, this);
-							oChanges.child.detachSubmit(this._handleFilterItemSubmit, this);
-							this._filterItemRemoved(oChanges.child);
+							oFilterField.detachChange(this._handleFilterItemChanges, this);
+							oFilterField.detachSubmit(this._handleFilterItemSubmit, this);
+
+							this._filterItemRemoved(oFilterField);
 							break;
 						default:
 							Log.error("operation " + oChanges.mutation + " not yet implemented");
@@ -1663,12 +1706,14 @@ sap.ui.define([
 				} else if (oChanges.name === "basicSearchField") {
 					switch (oChanges.mutation) {
 						case "insert":
-							oChanges.child.attachSubmit(this._handleFilterItemSubmit, this);
-							this._insertFilterFieldtoContent(oChanges.child, 0);
+							oFilterField.attachSubmit(this._handleFilterItemSubmit, this);
+
+							this._insertFilterFieldtoContent(oFilterField, 0);
 							break;
 						case "remove":
-							oChanges.child.detachSubmit(this._handleFilterItemSubmit, this);
-							this._removeFilterFieldFromContent(oChanges.child);
+							oFilterField.detachSubmit(this._handleFilterItemSubmit, this);
+
+							this._removeFilterFieldFromContent(oFilterField);
 							break;
 						default:
 							Log.error("operation " + oChanges.mutation + " not yet implemented");
@@ -1690,6 +1735,7 @@ sap.ui.define([
 				}
 			}
 		};
+
 
 		FilterBarBase.prototype._getFilterItemLayout = function(oFilterField) {
 			return this._getFilterItemLayoutByName(oFilterField.getPropertyKey());
@@ -2186,6 +2232,40 @@ sap.ui.define([
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 		 */
+
+		/**
+		 * Triggers lock by firing filtersChanged event to inform connected components.
+		 * @private
+		 */
+		FilterBarBase.prototype._triggerLock = function() {
+			const mTexts = this._getAssignedFiltersText();
+			this.fireFiltersChanged({
+				conditionsBased: true,
+				filtersText: mTexts.filtersText,
+				filtersTextExpanded: mTexts.filtersTextExpanded
+			});
+		};
+
+		/**
+		 * Updates lock state based on current validation state of all fields.
+		 * Checks all fields for errors and locks/unlocks the table accordingly.
+		 * @private
+		 */
+		FilterBarBase.prototype._updateLockStateFromValidation = function() {
+			// Check current validation state
+			const vValidationStatus = this._checkFieldsInErrorState();
+			const bHasErrors = vValidationStatus === FilterBarValidationStatus.FieldInErrorState;
+
+			if (bHasErrors) {
+				this._triggerLock();
+			}
+
+			// Update lock state
+
+			if (!bHasErrors && this.getLiveMode()) {
+				this.triggerSearch();
+			}
+		};
 
 		return FilterBarBase;
 
