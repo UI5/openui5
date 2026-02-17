@@ -300,6 +300,7 @@ sap.ui.define([
 				// do nothing if _$Container is not a (grand)parent of oElement
 				if (!this._$Container[0].contains(oElement) ||
 					oElement.style.display === "none" ||
+					!oElement.offsetParent ||
 					oElement.offsetParent.nodeName.toUpperCase() === "HTML") {
 						return this;
 				}

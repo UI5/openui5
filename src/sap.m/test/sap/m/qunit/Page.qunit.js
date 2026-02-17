@@ -584,6 +584,44 @@ sap.ui.define([
 			oPage5.destroy();
 		});
 
+		QUnit.test("ScrollToElement with fixed positioned element", async function(assert) {
+			// Setup
+			var oButton = new Button("fixedButton"),
+				oPage = new Page("myPageFixed",{
+					content:[
+						new HTML({
+							content : "<div style='height: 1200px;'>1200px height div</div>"
+						}),
+						oButton,
+						new HTML({
+							content : "<div style='height: 2000px;'>2000px height div</div>"
+						})
+					]
+				});
+
+			oPage.placeAt("content");
+			await nextUIUpdate();
+
+			// Make the button fixed positioned (offsetParent will be null)
+			oButton.getDomRef().style.position = "fixed";
+			oButton.getDomRef().style.top = "100px";
+
+			// Act - scrollToElement should handle null offsetParent gracefully
+			var oScrollDelegate = oPage.getScrollDelegate();
+			var oResult = oScrollDelegate.scrollToElement(oButton.getDomRef(), 0);
+
+			// Assert
+			assert.ok(oResult, "scrollToElement should return the delegate instance even when offsetParent is null");
+			assert.strictEqual(oResult, oScrollDelegate, "scrollToElement should return 'this' for chaining");
+
+			// Verify no scrolling occurred (element with fixed position shouldn't be scrolled to)
+			var scrollPos = getScrollPos("myPageFixed");
+			assert.strictEqual(scrollPos, 0, "Page should remain at scroll position 0 when element has position:fixed");
+
+			// Cleanup
+			oPage.destroy();
+		});
+
 		QUnit.test("Restoring scrolling state after rendering", async function(assert) {
 			assert.expect(1); // event should not be fired after rerendering
 			this.oPage2.invalidate();
