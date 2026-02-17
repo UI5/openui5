@@ -80,11 +80,18 @@ sap.ui.define([
 	QUnit.module("Focus Handling");
 
 	QUnit.test("Return focus to the control when Block Layer has focus before it's removed", async function (assert) {
+		assert.expect(2);
 		var oButton = new Button({
 			text: "Press"
 		}).placeAt("content");
 
 		await nextUIUpdate();
+
+		const oButtonDomRef = oButton.getDomRef();
+		const fnAssert = function() {
+			assert.ok(true, "Button should receive focusin");
+		};
+		oButtonDomRef.addEventListener("focusin", fnAssert);
 
 		oButton.setBusyIndicatorDelay(0);
 		oButton.setBusy(true);
@@ -93,7 +100,9 @@ sap.ui.define([
 		oBlockLayerDOM.focus();
 
 		oButton.setBusy(false);
-		assert.ok(oButton.getDomRef().contains(document.activeElement));
+		assert.ok(oButtonDomRef.contains(document.activeElement));
+
+		oButtonDomRef.removeEventListener("focusin", fnAssert);
 
 		oButton.destroy();
 	});
