@@ -15,7 +15,8 @@ sap.ui.define([
 	// journeys
 	"./NavigationJourney",
 	"./APIReferenceJourney",
-	"./SamplesJourney"
+	"./SamplesJourney",
+	"./SearchJourney"
 ], function () {
 	"use strict";
 });

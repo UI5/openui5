@@ -144,6 +144,30 @@
 	border-bottom: solid 1px #e5e5e5;
 	border-left: solid 1px #e5e5e5;
 	border-right: solid 1px #e5e5e5;
+
+	&.subrow,
+	&.expanded {
+		background-color: #f5f5f5;
+	}
+
+	/* Expandable rows - display icon and ParamText inline */
+	&.collapsed,
+	&.expanded {
+		> .cell:first-child {
+			display: flex;
+			align-items: flex-start;
+
+			.sapUiDocTypedefExpandIcon {
+				margin-top: 0.25rem;
+				flex-shrink: 0;
+				color: var(--sapButton_Lite_TextColor);
+			}
+
+			.sapUiParamText {
+				flex: 1;
+			}
+		}
+	}
 }
 
 .sapUiTheme-sap_belize_hcb .sapUiDocLightTable .head,
@@ -182,6 +206,11 @@
 	.sapUiDocLightTable .row {
 		background-color: @sapBaseColor;
 		border-bottom: solid 1px @sapPageHeader_BorderColor;
+
+		&.subrow,
+		&.expanded {
+			background-color: #282c34;
+		}
 	}
 
 	.sapUiDocLightTable .head,

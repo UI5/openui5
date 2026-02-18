@@ -28,7 +28,7 @@ sap.ui.define([
 		{ id: "container-mdc.sample---sample--ffLocation", label: "Location", value: "Adelaide" }
 	];
 	const oPopover = {
-		id: "__popover0",
+		id: "container-mdc.sample---sample--vhSelectBuilding-pop",
 		value: "BRQ02-Spielberk Brno"
 	};
 

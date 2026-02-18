@@ -32,6 +32,21 @@ sap.ui.define([
 		return !!oValueHelp.getPayload()?.searchKeys;
 	};
 
+	JSONValueHelpDelegate.retrieveContent = function (oValueHelp, oContainer, sContentId) {
+
+		if (oContainer.isTypeahead()) {
+			const oField = oValueHelp.getControl();
+			if (oField) {
+				const oDomRef = oField.getDomRef();
+				const oContent = oContainer.getContent()[0];
+				const oTable = oContent.getTable();
+				oTable.setWidth(oDomRef.clientWidth + "px");
+			}
+		}
+
+		return ValueHelpDelegate.retrieveContent.apply(this, arguments);
+	};
+
 	return JSONValueHelpDelegate;
 
 }

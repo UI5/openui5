@@ -5305,8 +5305,6 @@ sap.ui.define([
 					iCurrentCreateNo = iCreateNo;
 
 				oBindingMock.expects("checkSuspended").withExactArgs();
-				oHelperMock.expects("isDataAggregation")
-					.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 				oBindingMock.expects("getGroupId")
 					.returns(oFixture.sGroupId || "$auto");
 				oModelMock.expects("isApiGroup")
@@ -5498,8 +5496,6 @@ sap.ui.define([
 				.withExactArgs()
 				.returns(oCreatePathPromise);
 			oBindingMock.expects("checkSuspended").withExactArgs().twice();
-			oHelperMock.expects("isDataAggregation")
-				.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 			oBindingMock.expects("getUpdateGroupId").withExactArgs().returns("~update~");
 			oBindingMock.expects("lockGroup")
 				.withExactArgs("~update~", true, true, sinon.match.func)
@@ -5583,7 +5579,6 @@ sap.ui.define([
 			oError = new Error("suspended");
 
 		this.mock(oBinding).expects("checkSuspended").withExactArgs().throws(oError);
-		this.mock(_Helper).expects("isDataAggregation").never();
 
 		// code under test
 		assert.throws(function () {
@@ -5626,16 +5621,49 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("create: $$aggregation", function (assert) {
-		var oBinding = this.bindList("/EMPLOYEES");
-
-		this.mock(_Helper).expects("isDataAggregation")
-			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(true);
+	QUnit.test('create: "grandTotal like 1.84"', function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		// internal data structure, not valid for #setAggregation!
+		oBinding.mParameters.$$aggregation = {
+			"grandTotal like 1.84" : true,
+			groupLevels : ["LifecycleStatus"],
+			$leafLevelAggregated : true
+		};
 
 		assert.throws(function () {
 			// code under test
 			oBinding.create();
-		}, new Error("Cannot create in " + oBinding + " when using data aggregation"));
+		}, new Error('"grandTotal like 1.84" not supported: ' + oBinding));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("create: groupLevels", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		// internal data structure, not valid for #setAggregation!
+		oBinding.mParameters.$$aggregation = {
+			groupLevels : ["LifecycleStatus"],
+			$leafLevelAggregated : true
+		};
+
+		assert.throws(function () {
+			// code under test
+			oBinding.create();
+		}, new Error("Unsupported for data aggregation with groupLevels: " + oBinding));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("create: $leafLevelAggregated", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		// internal data structure, not valid for #setAggregation!
+		oBinding.mParameters.$$aggregation = {
+			groupLevels : [],
+			$leafLevelAggregated : true
+		};
+
+		assert.throws(function () {
+			// code under test
+			oBinding.create();
+		}, new Error("Unsupported on aggregated data: " + oBinding));
 	});
 
 	//*********************************************************************************************
@@ -6037,8 +6065,6 @@ sap.ui.define([
 			.returns("~sResolvedPath~");
 		this.mock(_Helper).expects("uid").withExactArgs().returns("id-1-23");
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
-		this.mock(_Helper).expects("isDataAggregation")
-			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 		this.mock(oBinding).expects("isTransient").twice().withExactArgs().returns(false);
 		this.mock(oBinding).expects("checkDeepCreate").never();
 		this.mock(oBinding).expects("isRelative").never();
@@ -6092,11 +6118,21 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [undefined, {"@$ui5.node.parent" : null}].forEach(function (oInitialData, i) {
-	QUnit.test("create: recursive hierarchy, root #" + i, function (assert) {
+	[false, true].forEach((bRecursiveHierarchy) => {
+		const sTitle = "create: "
+			+ (bRecursiveHierarchy ? "recursive hierarchy" : "data aggregation") + ", root #" + i;
+
+		if (oInitialData && !bRecursiveHierarchy) {
+			return; //TODO
+		}
+
+	QUnit.test(sTitle, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
 		// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that leads
 		// too far :-(
-		oBinding.mParameters.$$aggregation = {expandTo : 2, hierarchyQualifier : "X"};
+		oBinding.mParameters.$$aggregation = bRecursiveHierarchy
+			? {expandTo : 2, hierarchyQualifier : "X"}
+			: {groupLevels : [] /* data aggregation always has groupLevels */};
 		this.mock(oBinding).expects("fetchResourcePath").withExactArgs()
 			.returns("~oCreatePathPromise~");
 		this.mock(oBinding).expects("getUpdateGroupId").withExactArgs()
@@ -6105,8 +6141,6 @@ sap.ui.define([
 			.returns("~sResolvedPath~");
 		this.mock(_Helper).expects("uid").withExactArgs().returns("id-1-23");
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
-		this.mock(_Helper).expects("isDataAggregation")
-			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 		this.mock(oBinding).expects("isTransient").twice().withExactArgs().returns(false);
 		this.mock(oBinding).expects("checkDeepCreate").never();
 		this.mock(oBinding).expects("isRelative").never();
@@ -6133,12 +6167,20 @@ sap.ui.define([
 		this.mock(oBinding).expects("insertContext")
 			.withExactArgs(sinon.match.same(oContext), 0, false);
 
-		// code under test
-		assert.strictEqual(oBinding.create(oInitialData, true), oContext);
+		if (bRecursiveHierarchy) {
+			// code under test
+			assert.strictEqual(oBinding.create(oInitialData, true), oContext);
+		} else {
+			assert.strictEqual(
+				// code under test (Note: arguments.length > 2)
+				oBinding.create(oInitialData, true, /*bAtEnd*/false),
+				oContext);
+		}
 
 		assert.strictEqual(oBinding.iActiveContexts, 0, "unchanged");
 		assert.strictEqual(oBinding.iCreatedContexts, 0, "unchanged");
 		assert.strictEqual(oBinding.bFirstCreateAtEnd, false);
+	});
 	});
 });
 
@@ -6163,8 +6205,6 @@ sap.ui.define([
 		const oHelperMock = this.mock(_Helper);
 		oHelperMock.expects("uid").withExactArgs().returns("id-1-23");
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
-		oHelperMock.expects("isDataAggregation")
-			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 		this.mock(oBinding).expects("isTransient").twice().withExactArgs().returns(false);
 		this.mock(oBinding).expects("checkDeepCreate").never();
 		this.mock(oBinding).expects("isRelative").never();

@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/m/Text",
 	"sap/ui/Device",
+	"sap/ui/base/BoundFilter", // import to avoid issues w/ lazy loading in Bound Filter tests
 	"sap/ui/base/BindingInfo",
 	"sap/ui/base/ManagedObjectObserver",
 	"sap/ui/base/SyncPromise",
@@ -46,11 +47,11 @@ sap.ui.define([
 	"sap/ui/util/XMLHelper"
 	// load Table resources upfront to avoid loading times > 1 second for the first test using Table
 	// "sap/ui/table/Table"
-], function (Log, Localization, merge, uid, FlexBox, Input, Label, Text, Device, BindingInfo, ManagedObjectObserver,
-		SyncPromise, Element, Library, Messaging, UI5Date, FieldHelp, FieldHelpUtil, Message, MessageType, Controller,
-		View, Rendering, BindingMode, Filter, FilterOperator, FilterType, Model, Sorter, JSONModel, MessageModel,
-		CountMode, MessageScope, ODataMetaModel, UpdateMethod, Decimal, Context, ODataModel, XMLModel, TestUtils,
-		datajs, XMLHelper) {
+], function (Log, Localization, merge, uid, FlexBox, Input, Label, Text, Device, _BoundFilter, BindingInfo,
+		ManagedObjectObserver, SyncPromise, Element, Library, Messaging, UI5Date, FieldHelp, FieldHelpUtil, Message,
+		MessageType, Controller, View, Rendering, BindingMode, Filter, FilterOperator,
+		FilterType, Model, Sorter, JSONModel, MessageModel, CountMode, MessageScope, ODataMetaModel, UpdateMethod,
+		Decimal, Context, ODataModel, XMLModel, TestUtils, datajs, XMLHelper) {
 	/*global QUnit, sinon*/
 	/*eslint max-nested-callbacks: 0, no-warning-comments: 0, quote-props: 0*/
 	"use strict";
@@ -1124,6 +1125,7 @@ sap.ui.define([
 				delete oActualRequest["contentID"];
 				delete oActualRequest["sideEffects"];
 				delete oActualRequest["fnRequest"];
+				delete oActualRequest["_aborted"];
 				that.iRequestNo += 1;
 				if (oExpectedRequest) {
 					if (oExpectedRequest.abortId) {
@@ -27178,5 +27180,265 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		oInput.setValue("1.24e+5");
 
 		await this.waitForChanges(assert, "valid entry");
+	});
+
+	//*********************************************************************************************
+	// Scenario: Bound Filter used for filtered list in a table.
+	// JIRA: CPOUI5MODELS-1998
+	QUnit.test("Bound Filter: filtered list in a table", async function (assert) {
+		const oJSONModel = new JSONModel({
+			customers: [
+				{name: "TechCorp Solutions", region: "Americas"},
+				{name: "Global Industries Ltd", region: "EMEA"},
+				{name: "Asia Pacific Ventures", region: "APJ"}
+			],
+			accountManagers: [
+				{firstName: "John", region: "Americas"},
+				{firstName: "Sarah", region: "Americas"},
+				{firstName: "Emma", region: "EMEA"},
+				{firstName: "Lucas", region: "EMEA"},
+				{firstName: "Yuki", region: "APJ"}
+			]
+		});
+		const sView = `
+<t:Table id="myTable" rows="{/customers}" visibleRowCount="3">
+	<Text id="name" text="{name}"/>
+	<Text id="region" text="{region}"/>
+	<Select id="select" items="{path: '/accountManagers', templateShareable: false,
+			boundFilters: [{
+				path: 'region',
+				operator: 'EQ',
+				value1: '{region}'
+			}]}">
+		<core:Item text="{firstName}" />
+	</Select>
+</t:Table>`;
+
+		this.expectValue("region", ["Americas", "EMEA", "APJ"]);
+
+		await this.createView(assert, sView, oJSONModel);
+
+		const aRows = this.oView.byId("myTable").getRows();
+		const aExpectedRegions = [
+			{region: "Americas", managers: ["John", "Sarah"]},
+			{region: "EMEA", managers: ["Emma", "Lucas"]},
+			{region: "APJ", managers: ["Yuki"]}
+		];
+		aExpectedRegions.forEach((oExpectedRegion, i) => {
+			const oSelect = aRows[i].getCells()[2];
+			const aItems = oSelect.getItems();
+			assert.strictEqual(aItems.length, oExpectedRegion.managers.length);
+			oExpectedRegion.managers.forEach((sExpectedManager, j) => {
+				assert.strictEqual(aItems[j].getText(), sExpectedManager);
+			});
+		});
+	});
+
+	//*********************************************************************************************
+	// Scenario: Bound Filter used for instant filtering with a JSON model.
+	// JIRA: CPOUI5MODELS-1998
+	QUnit.test("Bound Filter: instant filter with JSON model", async function (assert) {
+		const oJSONModel = new JSONModel({
+			department: "Dev",
+			lastNamePrefix: undefined,
+			teamMembers: [
+				{lastName: "Johnson", department: "Mgmt"},
+				{lastName: "Smith", department: "Dev"},
+				{lastName: "Jones", department: "Dev"},
+				{lastName: "Davis", department: "Dev"},
+				{lastName: "Miller", department: "Cons"},
+				{lastName: "Wilson", department: "Cons"}
+			]
+		});
+		const sView = `
+<t:Table id="myTable"
+		rows="{path: '/teamMembers',
+			boundFilters: [
+				{path: 'lastName', operator: 'StartsWith', value1: '{/lastNamePrefix}'},
+				{path: 'department', operator: 'EQ', value1: '{/department}'}
+			]
+		}"
+		visibleRowCount="6">
+	<Text id="lastName" text="{lastName}"/>
+</t:Table>`;
+
+		this.expectValue("lastName", ["Johnson", "Smith", "Jones", "Davis", "Miller", "Wilson"])
+			.expectValue("lastName", ["Smith", "Jones", "Davis", "", "", ""]);
+
+		await this.createView(assert, sView, oJSONModel);
+
+		this.expectValue("lastName", ["Jones", "", ""]);
+
+		// code under test - set additional last name prefix filter
+		oJSONModel.setProperty("/lastNamePrefix", "J");
+
+		await this.waitForChanges(assert, "set last name prefix filter");
+
+		this.expectValue("lastName", ["Johnson", "Jones"]);
+
+		// code under test - remove department filter
+		oJSONModel.setProperty("/department", null);
+
+		await this.waitForChanges(assert, "remove department filter");
+
+		this.expectValue("lastName", ["Smith", "Jones", "Davis", "Miller", "Wilson"], 1);
+
+		// code under test - remove last name prefix filter
+		oJSONModel.setProperty("/lastNamePrefix", undefined);
+
+		await this.waitForChanges(assert, "remove last name prefix filter");
+
+		const oTable = this.oView.byId("myTable");
+		assert.strictEqual(oTable.getDependents().length, 2);
+
+		// code under test - bound filters are removed
+		oTable.unbindRows();
+
+		assert.strictEqual(oTable.getDependents().length, 0);
+	});
+
+	//*********************************************************************************************
+	// Scenario: Bound Filter used for instant filtering with OData V2 model.
+	// JIRA: CPOUI5MODELS-1998
+	QUnit.test("Bound Filter: instant filter with OData V2 model", async function (assert) {
+		const oModel = createSalesOrdersModel();
+		const oFilterModel = new JSONModel({
+			namePrefix : "Lap",
+			weightMin : undefined,
+			weightMax : undefined
+		});
+		const sView = `
+<Table id="table" items="{
+		path : '/ProductSet',
+		boundFilters : [{
+			path: 'Name',
+			operator: 'StartsWith',
+			value1: '{filter>/namePrefix}'
+		}, {
+			path: 'WeightMeasure',
+			operator: 'BT',
+			value1: '{filter>/weightMin}',
+			value2: '{filter>/weightMax}'
+		}, {
+			path: 'WeightUnit',
+			operator: 'EQ',
+			value1: 'KG'
+		}]
+	}">
+	<Text id="name" text="{Name}" />
+	<Text id="weightMeasure" text="{WeightMeasure}"/>
+	<Text id="weightUnit" text="{WeightUnit}"/>
+</Table>`;
+
+		let sRequestUrl = "ProductSet?$skip=0&$top=100&"
+			+ "$filter=startswith(Name,%27Lap%27)%20and%20WeightUnit%20eq%20%27KG%27";
+		this.expectHeadRequest()
+			.expectRequest({requestUri: sRequestUrl, encodeRequestUri: false}, {
+				results: [
+					{ProductID : "HT-1000", Name : "Lap0", WeightMeasure : "2.5", WeightUnit : "KG"},
+					{ProductID : "HT-1001", Name : "Lap1", WeightMeasure : "3.5", WeightUnit : "KG"}
+				]
+			})
+			.expectValue("name", ["Lap0", "Lap1"])
+			.expectValue("weightMeasure", ["2.5", "3.5"])
+			.expectValue("weightUnit", ["KG", "KG"]);
+
+		await this.createView(assert, sView, {undefined: oModel, "filter": oFilterModel});
+
+		sRequestUrl = "ProductSet?$skip=0&$top=100&"
+			+ "$filter=startswith(Name,%27Lap%27)%20and%20"
+			+ "(WeightMeasure%20ge%203.0m%20and%20WeightMeasure%20le%204.0m)%20and%20WeightUnit%20eq%20%27KG%27";
+		this.expectRequest({requestUri: sRequestUrl, encodeRequestUri: false}, {
+			results: [
+				{ProductID : "HT-1001", Name : "Lap1", WeightMeasure : "3.5", WeightUnit : "KG"}
+			]
+		})
+			.expectValue("name", ["Lap1"])
+			.expectValue("weightMeasure", ["3.5"]);
+
+		// code under test - set BT filter values
+		oFilterModel.setProperty("/weightMin", "3.0");
+		oFilterModel.setProperty("/weightMax", "4.0");
+
+		await this.waitForChanges(assert, "set BT filter values");
+
+		this.expectRequest("ProductSet?$skip=0&$top=100&$filter=WeightUnit eq 'KG'", {
+			results: [
+				{ProductID : "HT-0001", Name : "Mob0", WeightMeasure : "0.5", WeightUnit : "KG"},
+				{ProductID : "HT-1000", Name : "Lap0", WeightMeasure : "2.5", WeightUnit : "KG"},
+				{ProductID : "HT-1001", Name : "Lap1", WeightMeasure : "3.5", WeightUnit : "KG"}
+			]})
+			.expectValue("name", ["Mob0", "Lap0", "Lap1"])
+			.expectValue("weightMeasure", ["0.5", "2.5", "3.5"])
+			.expectValue("weightUnit", "KG", 1)
+			.expectValue("weightUnit", "KG", 2);
+
+		// code under test - reset all bound filter values
+		oFilterModel.setProperty("/namePrefix", undefined);
+		oFilterModel.setProperty("/weightMin", undefined);
+		oFilterModel.setProperty("/weightMax", undefined);
+
+		await this.waitForChanges(assert, "reset all bound filter values");
+	});
+
+	//*********************************************************************************************
+	// Scenario: Bound Filter with unresolved filter value bindings.
+	// JIRA: CPOUI5MODELS-1998
+	QUnit.test("Bound Filter: unresolved filter value bindings", async function (assert) {
+		const oJSONModel = new JSONModel({
+			department: "Dev",
+			namePrefix: {
+				lastName: "D"
+			},
+			teamMembers: [
+				{lastName: "Johnson", department: "Mgmt"},
+				{lastName: "Smith", department: "Dev"},
+				{lastName: "Jones", department: "Dev"},
+				{lastName: "Davis", department: "Dev"},
+				{lastName: "Miller", department: "Cons"},
+				{lastName: "Wilson", department: "Cons"}
+			]
+		});
+
+		const sView = `
+<t:Table id="myTable"
+		rows="{path: '/teamMembers',
+			boundFilters: [
+				{path: 'lastName', operator: 'StartsWith', value1: '{lastName}'},
+				{path: 'department', operator: 'EQ', value1: '{/department}'}
+			]
+		}"
+		visibleRowCount="6">
+	<Text id="lastName" text="{lastName}"/>
+</t:Table>`;
+
+		this.expectValue("lastName", ["Johnson", "Smith", "Jones", "Davis", "Miller", "Wilson"])
+			.expectValue("lastName", ["Smith", "Jones", "Davis", "", "", ""]);
+
+		// code under test - unresolved filters are neutral
+		await this.createView(assert, sView, oJSONModel);
+
+		const oContext = this.oModel.createBindingContext("/namePrefix");
+		const oTable = this.oView.byId("myTable");
+		this.expectValue("lastName", ["Davis", "", ""]);
+
+		// code under test - resolve filter value binding
+		oTable.setBindingContext(oContext);
+
+		await this.waitForChanges(assert, "resolve filter value binding");
+
+		this.expectValue("lastName", "Jones", 0);
+
+		// code under test - change filter value for relative binding
+		oJSONModel.setProperty("/namePrefix/lastName", "J");
+
+		await this.waitForChanges(assert, "change filter value for relative binding");
+
+		this.expectValue("lastName", ["Smith", "Jones", "Davis"]);
+
+		// code under test - unresolve filter value binding -> neutral filter
+		oTable.setBindingContext(null);
+
+		await this.waitForChanges(assert, "resolve filter value binding again");
 	});
 });

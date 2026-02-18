@@ -10,7 +10,10 @@ sap.ui.define([
 	"./pageobjects/SubApiDetail",
 	"./pageobjects/Entity",
 	"./pageobjects/Sample",
-	"./pageobjects/Code"
+	"./pageobjects/Code",
+	"./pageobjects/SearchPage",
+	"./pageobjects/SearchControl",
+	"./pageobjects/SearchPicker"
 ], function (Opa5) {
 	"use strict";
 
@@ -27,4 +30,3 @@ sap.ui.define([
 		}
 	});
 });
-

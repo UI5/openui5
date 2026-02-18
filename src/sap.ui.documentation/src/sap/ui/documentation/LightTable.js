@@ -35,68 +35,42 @@ sap.ui.define(['sap/ui/core/Control'],
 				}
 			},
 			renderer: {
-			apiVersion: 2,
+				apiVersion: 2,
 
-			render: function(oRm, oControl) {
-				var aRows = oControl.getRows(),
-					aControls,
+				render: function(oRm, oControl) {
+					var aRows = oControl.getRows(),
 					aColumnTitles = oControl.getColumnTitles(),
-					aLen,
-					a,
 					iLen,
 					i;
 
-				oRm.openStart("div", oControl);
-				oRm.class("sapUiDocLightTable");
-				oRm.class("columns-" + oControl.getColumnCount());
-				oRm.openEnd();
+					oRm.openStart("div", oControl);
+					oRm.class("sapUiDocLightTable");
+					oRm.class("columns-" + oControl.getColumnCount());
+					oRm.openEnd();
 
-				// Column titles
-				oRm.openStart("div")
-					.class("head")
-					.openEnd();
-
-				for (i = 0, iLen = aColumnTitles.length; i < iLen; i++) {
+					// Column titles
 					oRm.openStart("div")
-						.class("cell")
+						.class("head")
 						.openEnd();
 
-					oRm.text(aColumnTitles[i])
-						.close("div");
-				}
-
-				oRm.close("div");
-
-				// Rows
-				for (i = 0, iLen = aRows.length; i < iLen; i++) {
-					oRm.openStart("div")
-						.class("row")
-						.openEnd();
-
-					aControls = aRows[i].getContent();
-					for (a = 0, aLen = aControls.length; a < aLen; a++) {
+					for (i = 0, iLen = aColumnTitles.length; i < iLen; i++) {
 						oRm.openStart("div")
 							.class("cell")
 							.openEnd();
 
-						// Handle inline title
-						if (a > 0) {
-							oRm.openStart("div")
-								.class("inTitle")
-								.openEnd()
-								.text(aColumnTitles[a] + ":")
-								.close("div");
-						}
+						oRm.text(aColumnTitles[i])
+							.close("div");
+					}
 
-						oRm.renderControl(aControls[a]);
-						oRm.close("div");
+					oRm.close("div");
+
+					// Render rows (each row handles its own rendering including subRows)
+					for (i = 0, iLen = aRows.length; i < iLen; i++) {
+						oRm.renderControl(aRows[i]);
 					}
 
 					oRm.close("div");
 				}
-
-				oRm.close("div");
 			}
-		}});
-
-	});
+		});
+});

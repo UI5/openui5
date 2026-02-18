@@ -1372,6 +1372,13 @@ sap.ui.define([
 				return oToken.getText();
 			}).join("\r\n");
 
+
+			// Async clipboard API (works in secure contexts - HTTPS/localhost)
+			if (navigator.clipboard?.writeText && window.isSecureContext) {
+				navigator.clipboard.writeText(sTokensTexts);
+				return;
+			}
+
 			/* fill clipboard with tokens' texts so parent can handle creation */
 			var cutToClipboard = function(oEvent) {
 				if (oEvent.clipboardData) {

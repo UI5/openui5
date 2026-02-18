@@ -176,6 +176,7 @@ sap.ui.define([
 			})
 		}),
 		oSubtitledDialog = new Dialog({
+			title: "Lorem ipsum",
 			subHeader: new Bar({
 				contentMiddle: [
 					new Title({
@@ -185,12 +186,92 @@ sap.ui.define([
 			}),
 			contentWidth: "40rem",
 			contentHeight: "250px",
+			content: new HTML({
+				content: '<div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci animi assumenda autem corporis cupiditate.</div>'
+			}),
 			beginButton: new Button({
 				text: "Close",
 				press: function () {
 					oSubtitledDialog.close();
 				}
 			})
+		}),
+		oResizableDialog = new Dialog({
+			title: "Hello World",
+			resizable: true,
+			content: new HTML({
+				content: '<div id="resizableDialogText">Lorem ipsum ..</div>'
+			}),
+			contentWidth: "30rem",
+			contentHeight: "15rem",
+			beginButton: new Button({
+				text: "Close",
+				press: function () {
+					oResizableDialog.close();
+				}
+			}),
+			ariaLabelledBy: ["resizableDialogText"]
+		}),
+		oDraggableDialog = new Dialog({
+			title: "Hello World",
+			draggable: true,
+			content: new MText({ text: "Lorem ipsum ..", id: "draggableDialogText" }),
+			contentWidth: "30rem",
+			beginButton: new Button({
+				text: "Close",
+				press: function () {
+					oDraggableDialog.close();
+				}
+			}),
+			ariaLabelledBy: ["draggableDialogText"]
+		}),
+		oResizableDraggableDialog = new Dialog({
+			title: "Hello world",
+			resizable: true,
+			draggable: true,
+			content: new HTML({
+				content: '<div id="resizableDraggableDialogText">Lorem ipsum ..</div>'
+			}),
+			contentWidth: "30rem",
+			contentHeight: "15rem",
+			beginButton: new Button({
+				text: "Close",
+				press: function () {
+					oResizableDraggableDialog.close();
+				}
+			}),
+			ariaLabelledBy: ["resizableDraggableDialogText"]
+		}),
+		oResizableDraggableCustomHeaderDialog = new Dialog({
+			resizable: true,
+			draggable: true,
+			customHeader: new Bar({
+				contentLeft: [
+					new Button({
+						icon: "sap-icon://nav-back",
+						press: function () {
+							oResizableDraggableCustomHeaderDialog.close();
+						}
+					})
+				],
+				contentMiddle: [
+					new Title({
+						text: "Hello World"
+					})
+				]
+			}),
+			content: new HTML({
+				content: '<div id="customHeaderResizableDraggableText">Lorem ipsum ..</div>'
+			}),
+			contentWidth: "35rem",
+			contentHeight: "15rem",
+			endButton: new Button({
+				text: "Close",
+				press: function () {
+					oResizableDraggableCustomHeaderDialog.close();
+				}
+			}),
+			ariaLabelledBy: ["customHeaderResizableDraggableText"]
 		});
 
 	var page = new Page("page", {
@@ -257,6 +338,38 @@ sap.ui.define([
 				width: _buttonWidth,
 				press: function () {
 					oSubtitledDialog.open();
+				}
+			}),
+			new HTML({content: "<br>"}),
+			new Button('resizableDialogButton', {
+				text: "Resizable Dialog",
+				width: _buttonWidth,
+				press: function () {
+					oResizableDialog.open();
+				}
+			}),
+			new HTML({content: "<br>"}),
+			new Button('draggableDialogButton', {
+				text: "Draggable Dialog",
+				width: _buttonWidth,
+				press: function () {
+					oDraggableDialog.open();
+				}
+			}),
+			new HTML({content: "<br>"}),
+			new Button('resizableDraggableDialogButton', {
+				text: "Resizable & Draggable Dialog",
+				width: _buttonWidth,
+				press: function () {
+					oResizableDraggableDialog.open();
+				}
+			}),
+			new HTML({content: "<br>"}),
+			new Button('resizableDraggableCustomHeaderDialogButton', {
+				text: "Resizable & Draggable with Custom Header",
+				width: _buttonWidth,
+				press: function () {
+					oResizableDraggableCustomHeaderDialog.open();
 				}
 			})
 		]

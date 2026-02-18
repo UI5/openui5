@@ -248,6 +248,26 @@ sap.ui.define([
 		assert.notOk(fnGetFilterFunction("dollars"), "does not endswith '\u0073\u0323\u0307'");
 	});
 
+	QUnit.test("getFilterFunction tags test function", function(assert) {
+		let oFilter = new Filter({path: "path", operator: FilterOperator.EQ, value1: 42});
+		assert.strictEqual(oFilter.fnTest, undefined);
+
+		// code under test
+		FilterProcessor.getFilterFunction(oFilter);
+
+		assert.strictEqual(typeof oFilter.fnTest, "function");
+		assert.strictEqual(oFilter.fnTest[Filter.generated], true);
+
+		const fnTest = () => true;
+		oFilter = new Filter({path: "path", operator: FilterOperator.EQ, value1: 42, test: fnTest});
+
+		// code under test
+		FilterProcessor.getFilterFunction(oFilter);
+
+		assert.strictEqual(oFilter.fnTest, fnTest);
+		assert.strictEqual(oFilter.fnTest[Filter.generated], undefined);
+	});
+
 	QUnit.test("Contains w/ caseSensitive = undefined", function(assert) {
 		var oFilter = new Filter({
 			path: 'to/glory',
@@ -423,10 +443,13 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("combineFilters: groupFilter throws error", function (assert) {
-		const aApplicationFilters = "~ApplicationFilters";
+		const oApplicationFilter = new Filter({path: "~path", operator: FilterOperator.EQ, value1: "foo"});
+		const aApplicationFilters = [oApplicationFilter];
 		const oError = new Error("~Filter.NONE error");
-		const aFilters = "~Filters";
+		const aFilters = [new Filter({path: "~path", operator: FilterOperator.EQ, value1: "bar"})];
 		const oFilterProcessorMock = this.mock(FilterProcessor);
+
+		this.mock(oApplicationFilter).expects("removeAllNeutrals").twice().withExactArgs().returns(oApplicationFilter);
 
 		oFilterProcessorMock.expects("groupFilters").withExactArgs(aFilters).throws(oError);
 
@@ -446,24 +469,53 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("combineFilters: no Error if control or application filter is Filter.NONE", function (assert) {
+		const oApplicationFilter = new Filter({path: "~path", operator: FilterOperator.EQ, value1: "foo"});
+		const aApplicationFilters = [oApplicationFilter];
+		this.mock(oApplicationFilter).expects("removeAllNeutrals").thrice().withExactArgs().returns(oApplicationFilter);
+
 		const oFilterProcessorMock = this.mock(FilterProcessor);
 		oFilterProcessorMock.expects("groupFilters").withExactArgs("~Filters").returns(Filter.NONE);
-		oFilterProcessorMock.expects("groupFilters").withExactArgs("~ApplicationFilters").returns("~someGroupedFilter");
+		oFilterProcessorMock.expects("groupFilters").withExactArgs(aApplicationFilters).returns("~someGroupedFilter");
 
 		// code under test
-		assert.strictEqual(FilterProcessor.combineFilters("~Filters", "~ApplicationFilters"), Filter.NONE);
+		assert.strictEqual(FilterProcessor.combineFilters("~Filters", aApplicationFilters), Filter.NONE);
 
 		oFilterProcessorMock.expects("groupFilters").withExactArgs("~Filters").returns("~someGroupedFilter");
-		oFilterProcessorMock.expects("groupFilters").withExactArgs("~ApplicationFilters").returns(Filter.NONE);
+		oFilterProcessorMock.expects("groupFilters").withExactArgs(aApplicationFilters).returns(Filter.NONE);
 
 		// code under test
-		assert.strictEqual(FilterProcessor.combineFilters("~Filters", "~ApplicationFilters"), Filter.NONE);
+		assert.strictEqual(FilterProcessor.combineFilters("~Filters", aApplicationFilters), Filter.NONE);
 
 		oFilterProcessorMock.expects("groupFilters").withExactArgs("~Filters").returns(Filter.NONE);
-		oFilterProcessorMock.expects("groupFilters").withExactArgs("~ApplicationFilters").returns(Filter.NONE);
+		oFilterProcessorMock.expects("groupFilters").withExactArgs(aApplicationFilters).returns(Filter.NONE);
 
 		// code under test
-		assert.strictEqual(FilterProcessor.combineFilters("~Filters", "~ApplicationFilters"), Filter.NONE);
+		assert.strictEqual(FilterProcessor.combineFilters("~Filters",aApplicationFilters), Filter.NONE);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("combineFilters: remove neutral bound filters", function (assert) {
+		const oBoundFilter0 = new Filter({path: "path", operator: FilterOperator.EQ, value1: "foo"});
+		const oBoundFilter1 = new Filter({path: "path", operator: FilterOperator.EQ, value1: "bar"});
+		const oBoundFilter2 = new Filter({path: "path", operator: FilterOperator.EQ, value1: null});
+		const aApplicationFilters = [oBoundFilter0, oBoundFilter1, oBoundFilter2];
+
+		this.mock(oBoundFilter0).expects("removeAllNeutrals").withExactArgs().returns("~nonNeutral0~");
+		this.mock(oBoundFilter1).expects("removeAllNeutrals").withExactArgs().returns("~nonNeutral1~");
+		this.mock(oBoundFilter2).expects("removeAllNeutrals").withExactArgs().returns(undefined);
+
+		const oFilterProcessorMock = this.mock(FilterProcessor);
+		oFilterProcessorMock.expects("groupFilters").withExactArgs([]).returns(undefined);
+		oFilterProcessorMock.expects("groupFilters").withExactArgs(["~nonNeutral0~", "~nonNeutral1~"])
+			.returns("~groupedApplicationFilters~");
+
+		// code under test
+		assert.strictEqual(FilterProcessor.combineFilters([], aApplicationFilters), "~groupedApplicationFilters~");
+
+		oFilterProcessorMock.expects("groupFilters").twice().withExactArgs(undefined).returns(undefined);
+
+		// code under test
+		assert.strictEqual(FilterProcessor.combineFilters(), undefined);
 	});
 
 	//*********************************************************************************************

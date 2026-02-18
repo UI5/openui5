@@ -43,6 +43,7 @@ sap.ui.define([
           path: "countryId",
           label: "Country",
           dataType: "sap.ui.model.type.String",
+          constraints: {maxLength: 2},
           sortable: false
         },
         {

@@ -41,6 +41,10 @@ sap.ui.define(function() {
 				}
 			},
 
+			BoundFilter : {
+				title: "sap.ui.base.BoundFilter - QUnit Tests"
+			},
+
 			CalculatedFields: {
 				title: "Calculated Fields - QUnit Tests",
 				ui5: {

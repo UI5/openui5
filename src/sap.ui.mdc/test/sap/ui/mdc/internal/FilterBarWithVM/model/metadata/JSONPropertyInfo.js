@@ -79,6 +79,12 @@ sap.ui.define([
 		path: "countries",
 		dataType: "sap.ui.model.type.String"
 	},{
+		key: "country",
+		label: "Country",
+		visible: true,
+		path: "country",
+		dataType: "sap.ui.model.type.String"
+	},{
 		key: "$search",
 		label: "Search",
 		visible: true,

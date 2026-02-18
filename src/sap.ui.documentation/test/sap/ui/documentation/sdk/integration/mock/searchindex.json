@@ -1,0 +1,325 @@
+{
+	"button": {
+		"success": true,
+		"totalHits": 3,
+		"matches": {
+			"data": [
+				{
+					"title": "sap.m.Button (class)",
+					"path": "api/sap.m.Button",
+					"summary": "Enables users to trigger actions",
+					"score": 100,
+					"modified": "2024/01/15, 10:00",
+					"category": "API Reference"
+				},
+				{
+					"title": "Button Control",
+					"path": "topic/button",
+					"summary": "Documentation about the Button control",
+					"score": 90,
+					"modified": "2024/01/15, 10:00",
+					"category": "Documentation",
+					"external": false
+				},
+				{
+					"title": "Button Sample (samples)",
+					"path": "entity/sap.m.Button",
+					"summary": "Sample showing button usage",
+					"score": 80,
+					"modified": "2024/01/15, 10:00",
+					"category": "Samples"
+				}
+			],
+			"aDataAPI": [
+				{
+					"title": "sap.m.Button (class)",
+					"path": "api/sap.m.Button",
+					"summary": "Enables users to trigger actions",
+					"score": 100,
+					"modified": "2024/01/15, 10:00",
+					"category": "API Reference"
+				}
+			],
+			"aDataDoc": [
+				{
+					"title": "Button Control",
+					"path": "topic/button",
+					"summary": "Documentation about the Button control",
+					"score": 90,
+					"modified": "2024/01/15, 10:00",
+					"category": "Documentation",
+					"external": false
+				}
+			],
+			"aDataExplored": [
+				{
+					"title": "Button Sample (samples)",
+					"path": "entity/sap.m.Button",
+					"summary": "Sample showing button usage",
+					"score": 80,
+					"modified": "2024/01/15, 10:00",
+					"category": "Samples"
+				}
+			],
+			"aDataExternal": [],
+			"filteredData": [
+				{
+					"title": "sap.m.Button (class)",
+					"path": "api/sap.m.Button",
+					"summary": "Enables users to trigger actions",
+					"score": 100,
+					"modified": "2024/01/15, 10:00",
+					"category": "API Reference"
+				},
+				{
+					"title": "Button Control",
+					"path": "topic/button",
+					"summary": "Documentation about the Button control",
+					"score": 90,
+					"modified": "2024/01/15, 10:00",
+					"category": "Documentation",
+					"external": false
+				},
+				{
+					"title": "Button Sample (samples)",
+					"path": "entity/sap.m.Button",
+					"summary": "Sample showing button usage",
+					"score": 80,
+					"modified": "2024/01/15, 10:00",
+					"category": "Samples"
+				}
+			],
+			"AllLength": 3,
+			"APILength": 1,
+			"DocLength": 1,
+			"ExploredLength": 1,
+			"ExternalLength": 0
+		}
+	},
+	"table": {
+		"success": true,
+		"totalHits": 3,
+		"matches": {
+			"data": [
+				{
+					"title": "sap.m.Table (class)",
+					"path": "api/sap.m.Table",
+					"summary": "Provides a comprehensive table component",
+					"score": 100,
+					"modified": "2024/01/15, 10:00",
+					"category": "API Reference"
+				},
+				{
+					"title": "Table Control",
+					"path": "topic/table",
+					"summary": "Documentation about the Table control",
+					"score": 90,
+					"modified": "2024/01/15, 10:00",
+					"category": "Documentation",
+					"external": false
+				},
+				{
+					"title": "Table Sample (samples)",
+					"path": "entity/sap.m.Table",
+					"summary": "Sample showing table usage",
+					"score": 80,
+					"modified": "2024/01/15, 10:00",
+					"category": "Samples"
+				}
+			],
+			"aDataAPI": [
+				{
+					"title": "sap.m.Table (class)",
+					"path": "api/sap.m.Table",
+					"summary": "Provides a comprehensive table component",
+					"score": 100,
+					"modified": "2024/01/15, 10:00",
+					"category": "API Reference"
+				}
+			],
+			"aDataDoc": [
+				{
+					"title": "Table Control",
+					"path": "topic/table",
+					"summary": "Documentation about the Table control",
+					"score": 90,
+					"modified": "2024/01/15, 10:00",
+					"category": "Documentation",
+					"external": false
+				}
+			],
+			"aDataExplored": [
+				{
+					"title": "Table Sample (samples)",
+					"path": "entity/sap.m.Table",
+					"summary": "Sample showing table usage",
+					"score": 80,
+					"modified": "2024/01/15, 10:00",
+					"category": "Samples"
+				}
+			],
+			"aDataExternal": [],
+			"filteredData": [
+				{
+					"title": "sap.m.Table (class)",
+					"path": "api/sap.m.Table",
+					"summary": "Provides a comprehensive table component",
+					"score": 100,
+					"modified": "2024/01/15, 10:00",
+					"category": "API Reference"
+				},
+				{
+					"title": "Table Control",
+					"path": "topic/table",
+					"summary": "Documentation about the Table control",
+					"score": 90,
+					"modified": "2024/01/15, 10:00",
+					"category": "Documentation",
+					"external": false
+				},
+				{
+					"title": "Table Sample (samples)",
+					"path": "entity/sap.m.Table",
+					"summary": "Sample showing table usage",
+					"score": 80,
+					"modified": "2024/01/15, 10:00",
+					"category": "Samples"
+				}
+			],
+			"AllLength": 3,
+			"APILength": 1,
+			"DocLength": 1,
+			"ExploredLength": 1,
+			"ExternalLength": 0
+		}
+	},
+	"xyzabc123notfound": {
+		"success": false,
+		"totalHits": 0,
+		"matches": {
+			"data": [],
+			"aDataAPI": [],
+			"aDataDoc": [],
+			"aDataExplored": [],
+			"aDataExternal": [],
+			"filteredData": [],
+			"AllLength": 0,
+			"APILength": 0,
+			"DocLength": 0,
+			"ExploredLength": 0,
+			"ExternalLength": 0
+		}
+	},
+	"<script>alert('xss')</script>": {
+		"success": false,
+		"totalHits": 0,
+		"matches": {
+			"data": [],
+			"aDataAPI": [],
+			"aDataDoc": [],
+			"aDataExplored": [],
+			"aDataExternal": [],
+			"filteredData": [],
+			"AllLength": 0,
+			"APILength": 0,
+			"DocLength": 0,
+			"ExploredLength": 0,
+			"ExternalLength": 0
+		}
+	},
+	"test&param=value": {
+		"success": false,
+		"totalHits": 0,
+		"matches": {
+			"data": [],
+			"aDataAPI": [],
+			"aDataDoc": [],
+			"aDataExplored": [],
+			"aDataExternal": [],
+			"filteredData": [],
+			"AllLength": 0,
+			"APILength": 0,
+			"DocLength": 0,
+			"ExploredLength": 0,
+			"ExternalLength": 0
+		}
+	},
+	"a": {
+		"success": true,
+		"totalHits": 1,
+		"matches": {
+			"data": [
+				{
+					"title": "sap.m.App (class)",
+					"path": "api/sap.m.App",
+					"summary": "Root component for mobile applications",
+					"score": 50,
+					"modified": "2024/01/15, 10:00",
+					"category": "API Reference"
+				}
+			],
+			"aDataAPI": [
+				{
+					"title": "sap.m.App (class)",
+					"path": "api/sap.m.App",
+					"summary": "Root component for mobile applications",
+					"score": 50,
+					"modified": "2024/01/15, 10:00",
+					"category": "API Reference"
+				}
+			],
+			"aDataDoc": [],
+			"aDataExplored": [],
+			"aDataExternal": [],
+			"filteredData": [
+				{
+					"title": "sap.m.App (class)",
+					"path": "api/sap.m.App",
+					"summary": "Root component for mobile applications",
+					"score": 50,
+					"modified": "2024/01/15, 10:00",
+					"category": "API Reference"
+				}
+			],
+			"AllLength": 1,
+			"APILength": 1,
+			"DocLength": 0,
+			"ExploredLength": 0,
+			"ExternalLength": 0
+		}
+	},
+	"   ": {
+		"success": false,
+		"totalHits": 0,
+		"matches": {
+			"data": [],
+			"aDataAPI": [],
+			"aDataDoc": [],
+			"aDataExplored": [],
+			"aDataExternal": [],
+			"filteredData": [],
+			"AllLength": 0,
+			"APILength": 0,
+			"DocLength": 0,
+			"ExploredLength": 0,
+			"ExternalLength": 0
+		}
+	},
+	"\"quotes\" and 'apostrophes'": {
+		"success": false,
+		"totalHits": 0,
+		"matches": {
+			"data": [],
+			"aDataAPI": [],
+			"aDataDoc": [],
+			"aDataExplored": [],
+			"aDataExternal": [],
+			"filteredData": [],
+			"AllLength": 0,
+			"APILength": 0,
+			"DocLength": 0,
+			"ExploredLength": 0,
+			"ExternalLength": 0
+		}
+	}
+}

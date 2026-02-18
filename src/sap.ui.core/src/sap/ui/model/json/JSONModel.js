@@ -334,17 +334,37 @@ sap.ui.define([
 		return oBinding;
 	};
 
-	/*
-	 * @see sap.ui.model.Model.prototype.bindTree
+	/**
+	 * Creates a new {@link sap.ui.model.json.JSONTreeBinding}.
+	 * The bound data can contain JSON objects and arrays.
+	 * Both are used to build the tree structure.
 	 *
+	 * @param {string} sPath
+	 *   The path pointing to the tree or array that is bound
+	 * @param {sap.ui.model.Context} [oContext]
+	 *   The context for the binding. This is mandatory when a relative binding path is given.
+	 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter} [aFilters=[]]
+	 *   The filters initially used with type {@link sap.ui.model.FilterType.Application}.
+	 *   To replace them, call {@link sap.ui.model.TreeBinding#filter}.
 	 * @param {object} [mParameters]
-	 *   Additional model specific parameters; if the mParameter <code>arrayNames</code> is
-	 *   specified with an array of string names these names will be checked against the tree data
-	 *   structure and the found data in this array is included in the tree, but only if the parent
-	 *   array is also included; if this parameter is not specified then all found arrays in the
-	 *   data structure are bound; if the tree data structure doesn't contain an array, this
-	 *   parameter doesn't need to be specified
+	 *   Additional model-specific parameters
+	 * @param {string[]} [mParameters.arrayNames]
+	 *   Keys of arrays to be used for building the tree structure. If not specified, all arrays and objects in the
+	 *   bound data are used.
+	 *   Note: For arrays nested within other arrays with different names, add both array names to
+	 *   <code>arrayNames</code>. To include a nested array in the hierarchy, you must list the names of all containing
+	 *   arrays. If an array name is missing from the list, its child arrays are also excluded from the hierarchy, even
+	 *   if you add them to <code>arrayNames</code>.
+	 *   If this parameter is set, all other objects and arrays in the bound data are ignored.
+	 * @param {sap.ui.model.Sorter[]|sap.ui.model.Sorter} [aSorters=[]]
+	 *   The sorters used initially. To replace them, call {@link sap.ui.model.TreeBinding#sort}.
+	 * @returns {sap.ui.model.json.JSONTreeBinding}
+	 *   The newly created JSONTreeBinding
+	 * @throws {Error}
+	 *   If the <code>aFilters</code> array contains the {@link sap.ui.model.Filter.NONE} filter instance together with
+	 *   other filters
 	 *
+	 * @public
 	 */
 	JSONModel.prototype.bindTree = function(sPath, oContext, aFilters, mParameters, aSorters) {
 		var oBinding = new JSONTreeBinding(this, sPath, oContext, aFilters, mParameters, aSorters);

@@ -5,7 +5,7 @@ sap.ui.define([
 	"sap/ui/model/FilterOperator",
 	"sap/ui/mdc/condition/Condition",
 	"sap/ui/mdc/enums/ConditionValidated"
-], function (
+], function(
 	ValueHelpDelegate,
 	StateUtil,
 	Filter,
@@ -35,6 +35,21 @@ sap.ui.define([
 		}
 
 		return aFilters;
+	};
+
+	SearchValueHelpDelegate.retrieveContent = function (oValueHelp, oContainer, sContentId) {
+
+		if (oContainer.isTypeahead()) {
+			const oField = oValueHelp.getControl();
+			if (oField) {
+				const oDomRef = oField.getDomRef();
+				const oContent = oContainer.getContent()[0];
+				const oTable = oContent.getTable();
+				oTable.setWidth(oDomRef.clientWidth + "px");
+			}
+		}
+
+		return ValueHelpDelegate.retrieveContent.apply(this, arguments);
 	};
 
 	return SearchValueHelpDelegate;

@@ -929,6 +929,11 @@ sap.ui.define([
 	 *     {@link #getKeepAliveContext}.
 	 * </ul>
 	 *
+	 * When using data aggregation without <code>groupLevels</code> and without
+	 * <code>"grandTotal like 1.84"</code> (see {@link #setAggregation}), single entities can be
+	 * created (@experimental as of version 1.146.0, see
+	 * {@link sap.ui.model.odata.v4.Context#isAggregated}).
+	 *
 	 * @param {Object<any>} [oInitialData={}]
 	 *   The initial data for the created entity
 	 * @param {boolean} [bSkipRefresh]
@@ -961,7 +966,9 @@ sap.ui.define([
 	 *   <ul>
 	 *     <li> the binding's root binding is suspended,
 	 *     <li> a relative binding is unresolved,
-	 *     <li> data aggregation is used (see {@link #setAggregation}),
+	 *     <li> data aggregation is used with <code>groupLevels</code>, with
+	 *       <code>"grandTotal like 1.84"</code>, or when aggregated data instead of a single entity
+	 *       instance is about to be created,
 	 *     <li> entities are created first at the end and then at the start,
 	 *     <li> <code>bAtEnd</code> is <code>true</code> and the binding does not know the final
 	 *       length,
@@ -1008,8 +1015,14 @@ sap.ui.define([
 			throw new Error("Binding is unresolved: " + this);
 		}
 		this.checkSuspended();
-		if (_Helper.isDataAggregation(this.mParameters)) {
-			throw new Error("Cannot create in " + this + " when using data aggregation");
+		if (oAggregation?.["grandTotal like 1.84"]) {
+			throw new Error('"grandTotal like 1.84" not supported: ' + this);
+		}
+		if (oAggregation?.groupLevels?.length) {
+			throw new Error("Unsupported for data aggregation with groupLevels: " + this);
+		}
+		if (oAggregation?.$leafLevelAggregated) {
+			throw new Error("Unsupported on aggregated data: " + this);
 		}
 		if (this.isTransient()) {
 			this.checkDeepCreate();
@@ -1046,7 +1059,7 @@ sap.ui.define([
 			if (!bSkipRefresh) {
 				throw new Error("Missing bSkipRefresh");
 			}
-			if (arguments.length > 2) {
+			if (arguments.length > 2 && oAggregation.hierarchyQualifier) {
 				throw new Error("Only the parameters oInitialData and bSkipRefresh are supported");
 			}
 			const oParentContext = oInitialData?.["@$ui5.node.parent"];

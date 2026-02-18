@@ -520,5 +520,35 @@ sap.ui.define(['./Binding', './Filter', './FilterType', './Sorter', 'sap/base/ut
 				&& (!this.isLengthFinal() || iStart + aContexts.length < this.getLength());
 		};
 
+		/**
+		 * Updates the given single filter in the list binding's application filters with the given values.
+		 *
+		 * @param {sap.ui.model.Filter} oFilter
+		 *   The single filter to update; must be contained in the list binding's application filters
+		 * @param {any} vValue1 The new <code>value1</code> for the filter
+		 * @param {any} vValue2 The new <code>value2</code> for the filter
+		 * @returns {sap.ui.model.Filter} The new single filter which has the given values
+		 * @throws {Error} If the given filter is not contained in the list binding's application filters
+		 *
+		 * @private
+		 */
+		ListBinding.prototype._updateFilter = function (oFilter, vValue1, vValue2) {
+			const oFilterClone = oFilter.cloneWithValues(vValue1, vValue2);
+			let bFilterFound = false;
+			const aNewApplicationFilters = this.aApplicationFilters.map((oApplicationFilter) => {
+				const oClonedApplicationFilter = oApplicationFilter.cloneIfContained(oFilter, oFilterClone);
+				bFilterFound ||= oClonedApplicationFilter !== oApplicationFilter;
+
+				return oClonedApplicationFilter;
+			});
+			if (!bFilterFound) {
+				throw new Error("Filter cannot be updated: Not found in binding's application filters");
+			}
+
+			this.filter(aNewApplicationFilters, FilterType.Application);
+
+			return oFilterClone;
+		};
+
 		return ListBinding;
 	});

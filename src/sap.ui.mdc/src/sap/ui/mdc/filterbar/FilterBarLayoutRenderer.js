@@ -25,11 +25,14 @@ sap.ui.define([], () => {
 		this.renderToolbar(oRm, oFilterBar);
 		this.renderItems(oRm, oFilterBar);
 
+		this.renderInvisibleTexts(oRm, oFilterBar);
 		this.renderHintText(oRm, oFilterBar);
 		oRm.close("div");
 	};
 
 	FilterBarLayoutRenderer.addRootDivClasses = function (oRm, oFilterBar) {};
+
+	FilterBarLayoutRenderer.renderInvisibleTexts = function (oRm, oFilterBar) {};
 
 	FilterBarLayoutRenderer.renderToolbar = function (oRm, oFilterBar) {};
 

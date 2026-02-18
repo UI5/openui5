@@ -87,6 +87,10 @@ sap.ui.define(['./Filter', 'sap/base/Log'],
 	FilterProcessor.combineFilters = function(aFilters, aApplicationFilters) {
 		var oGroupedFilter, oGroupedApplicationFilter, oFilter, aCombinedFilters = [];
 
+		aApplicationFilters = aApplicationFilters
+			?.map((oFilter) => oFilter.removeAllNeutrals())
+			.filter(Boolean);
+
 		oGroupedFilter = FilterProcessor.groupFilters(aFilters);
 		oGroupedApplicationFilter = FilterProcessor.groupFilters(aApplicationFilters);
 
@@ -365,6 +369,7 @@ sap.ui.define(['./Filter', 'sap/base/Log'],
 				Log.error("The filter operator \"" + oFilter.sOperator + "\" is unknown, filter will be ignored.");
 				oFilter.fnTest = function(value) { return true; };
 		}
+		oFilter.fnTest[Filter.generated] = true;
 		return oFilter.fnTest;
 	};
 

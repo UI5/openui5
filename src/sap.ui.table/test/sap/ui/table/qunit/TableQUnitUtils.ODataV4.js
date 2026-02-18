@@ -68,7 +68,7 @@ sap.ui.define([
 				source: "metadata_tea_busi_product.xml"
 			}
 		}, {
-			regExp: /^GET \/MyService(WithPaging)?\/Products\?(\$count=true&)?\$skip=(\d+)\&\$top=(\d+)$/,
+			regExp: /^GET \/MyService(WithPaging)?\/Products(?:2)?\?(\$count=true&)?\$skip=(\d+)\&\$top=(\d+)$/,
 			response: {
 				buildResponse: function(aMatches, oResponse) {
 					const iPageSize = aMatches[1] ? 50 : 0;
@@ -81,7 +81,7 @@ sap.ui.define([
 				}
 			}
 		}, {
-			regExp: /^GET \/MyService\/Products\?(\$count=true&)?\$filter=Name%20eq%20'DoesNotExist'/,
+			regExp: /^GET \/MyService\/Products(?:2)?\?(\$count=true&)?\$filter=Name%20eq%20'DoesNotExist'/,
 			response: {
 				buildResponse: function(aMatches, oResponse) {
 					const bWithCount = !!aMatches[1];
@@ -91,7 +91,7 @@ sap.ui.define([
 				}
 			}
 		}, {
-			regExp: /^GET \/MyService\/Products\?(\$count=true&)?\$filter=Name%20eq%20'Test%20Product%20\(1\)'/,
+			regExp: /^GET \/MyService\/Products(?:2)?\?(\$count=true&)?\$filter=Name%20eq%20'Test%20Product%20\(1\)'/,
 			response: {
 				buildResponse: function(aMatches, oResponse) {
 					const bWithCount = !!aMatches[1];

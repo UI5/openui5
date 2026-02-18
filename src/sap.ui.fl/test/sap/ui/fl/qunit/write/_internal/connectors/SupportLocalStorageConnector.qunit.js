@@ -1,9 +1,9 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/ui/fl/write/_internal/connectors/SupportFakeConnector"
+	"sap/ui/fl/write/_internal/connectors/SupportLocalStorageConnector"
 ], function(
-	SupportFakeConnector
+	SupportLocalStorageConnector
 ) {
 	"use strict";
 
@@ -428,7 +428,7 @@ sap.ui.define([
 		window.localStorage.removeItem("UI5.Flexibility.Support.appliedData");
 	}
 
-	QUnit.module("Given SupportFakeConnector", {
+	QUnit.module("Given SupportLocalStorageConnector", {
 		beforeEach() {
 			saveDataToLocalStorage();
 		},
@@ -437,34 +437,34 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when loadFeatures is triggered", function(assert) {
-			return SupportFakeConnector.loadFeatures().then(function(oResponse) {
+			return SupportLocalStorageConnector.loadFeatures().then(function(oResponse) {
 				assert.deepEqual(oFlexFeaturesResponse, oResponse, "loadFeatures response is correct");
 			});
 		});
 
 		QUnit.test("when loadFlexData is triggered", function(assert) {
-			return SupportFakeConnector.loadFlexData().then(function(oResponse) {
+			return SupportLocalStorageConnector.loadFlexData().then(function(oResponse) {
 				assert.deepEqual(oFlexDataResponse, oResponse, "then the correct response is received");
 			});
 		});
 
 		QUnit.test("when condense is triggered", function(assert) {
-			const oExpectedResponse = "Condensing not supported for SupportFakeConnector. No action taken.";
-			return SupportFakeConnector.condense().then(function(oResponse) {
+			const oExpectedResponse = "Condensing not supported for SupportLocalStorageConnector. No action taken.";
+			return SupportLocalStorageConnector.condense().then(function(oResponse) {
 				assert.equal(oResponse, oExpectedResponse, "then the correct response is received");
 			});
 		});
 
 		QUnit.test("when versions.load is triggered", function(assert) {
 			const oExpectedResponse = [];
-			return SupportFakeConnector.versions.load().then(function(oResponse) {
+			return SupportLocalStorageConnector.versions.load().then(function(oResponse) {
 				assert.deepEqual(oResponse, oExpectedResponse, "then the correct response is received");
 			});
 		});
 
 		QUnit.test("when versions.activate is triggered", function(assert) {
-			const oExpectedResponse = "Activating not supported for SupportFakeConnector. No action taken.";
-			return SupportFakeConnector.versions.activate().then(function(oResponse) {
+			const oExpectedResponse = "Activating not supported for SupportLocalStorageConnector. No action taken.";
+			return SupportLocalStorageConnector.versions.activate().then(function(oResponse) {
 				assert.equal(oResponse, oExpectedResponse, "then the correct response is received");
 			});
 		});

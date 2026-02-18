@@ -14,175 +14,169 @@
     <VBox class="sapUiSmallMargin">
         <f:SimpleForm id="result" editable="true" layout="ColumnLayout" title="Office Location" columnsXL="2" columnsL="2" columnsM="2">
             <f:content>
-                    <core:Title text="Search" />
-                    <Label text="Value Help" labelFor="fieldSelectBuilding"/>
-                    <mdc:Field
-                        id="fieldSelectBuilding"
-                        value="{path: 'id', type: 'sap.ui.model.type.String', mode: 'OneWay'}"
-                        valueHelp="vhSelectBuilding"
-                        display="Description"
-                        editMode="Editable"
-                        change=".onBuildingSelected">
-                        <mdc:dependents>
-                        <mdc:ValueHelp id="vhSelectBuilding" delegate="{name: 'mdc/sample/delegate/SearchValueHelpDelegate', payload: { searchKeys: ['name', 'city'] }}">
-                            <mdc:typeahead>
-                                <mdcvh:Popover title="Select Building">
-                                    <mdcvc:MTable keyPath="id" descriptionPath="name">
-                                        <Table id="ddListBuildings" items='{path : "facilities>/buildings" }' width="30rem">
-                                            <columns>
-                                                <Column visible="false">
-                                                    <Text text="ID" />
-                                                </Column>
-                                                <Column>
-                                                    <Text text="Name" />
-                                                </Column>
-                                                <Column>
-                                                    <Text text="Location ID" />
-                                                </Column>
-                                            </columns>
-                                            <items>
-                                                <ColumnListItem type="Active">
-                                                    <Text text="{facilities>id}"/>
-                                                    <Text text="{facilities>name}"/>
-                                                    <Text text="{facilities>locationId}"/>
-                                                </ColumnListItem>
-                                            </items>
-                                        </Table>
-                                    </mdcvc:MTable>
-                                </mdcvh:Popover>
-                            </mdc:typeahead>
-                            <mdc:dialog>
-                                <mdcvh:Dialog id="diaSelectBuilding" title="SAP Buildings">
-                                    <mdcvc:MDCTable keyPath="id" id="mdcvcTableBuildings" descriptionPath="name">
-                                        <mdcvc:filterBar>
-                                            <mdcvh:FilterBar
-                                                id="fbSelectBuildingDialog"
-                                                delegate="{name: 'mdc/sample/delegate/JSONFilterBarDelegate', payload: {}}">
-                                                <mdcvh:filterItems>
-                                                    <mdc:FilterField
-                                                        id="ffCountry"
-                                                        label="Country"
-                                                        dataType= "String"
-                                                        display="Description"
-                                                        propertyKey="buildingCountry"
-                                                        conditions= "{$filters>/conditions/buildingCountry}"
-                                                        valueHelp= "vhCountry">
-                                                        <mdc:dependents>
-                                                            <mdc:ValueHelp
-                                                                id="vhCountry"
-                                                                delegate="{name: 'sap/ui/mdc/ValueHelpDelegate', payload: {}}">
-                                                                <mdc:typeahead>
-                                                                    <mdcvh:Popover title="Country Selection">
-                                                                        <mdcvc:MTable id="countryTypeAhead" keyPath="id" descriptionPath="name">
-                                                                            <Table
-                                                                                id="ddListCountries"
-                                                                                items='{path : "facilities>/countries", sorter: { path: "name", ascending: "true" }  }'
-                                                                                width="20rem"
-                                                                                mode="MultiSelect">
-                                                                                <columns>
-                                                                                    <Column/>
-                                                                                </columns>
-                                                                                <items>
-                                                                                    <ColumnListItem type="Active">
-                                                                                        <Text text="{facilities>name}"/>
-                                                                                    </ColumnListItem>
-                                                                                </items>
-                                                                            </Table>
-                                                                        </mdcvc:MTable>
-                                                                    </mdcvh:Popover>
-                                                                </mdc:typeahead>
-                                                            </mdc:ValueHelp>
-                                                        </mdc:dependents>
-                                                    </mdc:FilterField>
-                                                    <mdc:FilterField
-                                                        id="ffLocation"
-                                                        label="Location"
-                                                        dataType= "String"
-                                                        display="Description"
-                                                        propertyKey="buildingLocation"
-                                                        conditions="{$filters>/conditions/buildingLocation}"
-                                                        valueHelp="vhLocation">
-                                                        <mdc:dependents>
-                                                            <mdc:ValueHelp
-                                                                id="vhLocation"
-                                                                delegate="{name: 'mdc/sample/delegate/JSONValueHelpDelegate', payload: {}}">
-                                                                <mdc:typeahead>
-                                                                    <mdcvh:Popover title="Location Selection">
-                                                                        <mdcvc:MTable
-                                                                            id="locationTypeAhead"
-                                                                            keyPath="id"
-                                                                            descriptionPath="name">
-                                                                            <Table
-                                                                                id="taTableLocation"
-                                                                                items='{path : "facilities>/locations", sorter: { path: "name", ascending: "true" }  }'
-                                                                                width="20rem"
-                                                                                mode="MultiSelect">
-                                                                                <columns>
-                                                                                    <Column/>
-                                                                                </columns>
-                                                                                <items>
-                                                                                    <ColumnListItem type="Active">
-                                                                                        <Text text="{facilities>name}"/>
-                                                                                    </ColumnListItem>
-                                                                                </items>
-                                                                            </Table>
-                                                                        </mdcvc:MTable>
-                                                                    </mdcvh:Popover>
-                                                                </mdc:typeahead>
-                                                            </mdc:ValueHelp>
-                                                        </mdc:dependents>
-                                                    </mdc:FilterField>
-                                                </mdcvh:filterItems>
-                                            </mdcvh:FilterBar>
-                                        </mdcvc:filterBar>
-                                        <mdc:Table id="mdcTableBuildings"
-                                            autoBindOnInit="true"
-                                            width="100%"
-                                            p13nMode="Sort"
-                                            selectionMode="SingleMaster"
-                                            delegate="{name: 'mdc/sample/delegate/JSONTableDelegate', payload: {collectionPath: 'facilities>/buildings', searchKeys: ['name', 'city'] }}"
-                                            threshold="50"
-                                            filter="fbSelectBuildingDialog"
-                                            enableAutoColumnWidth="true">
-                                            <mdc:columns>
-                                                <mdc:table.Column id="cnBuildingId" header="ID" propertyKey="buildingId" width="10%">
-                                                    <Text text="{facilities>id}"/>
-                                                </mdc:table.Column>
-                                                <mdc:table.Column id="cnBuildingName" header="Building Name" propertyKey="buildingName" width="40%">
-                                                    <Text text="{facilities>name}"/>
-                                                </mdc:table.Column>
-                                                <mdc:table.Column id="cnBuildingLocation" header="Location" propertyKey="buildingLocation" width="10%">
-                                                    <Text text="{path: 'facilities>locationId', formatter: '.onGetLocationName'}"/>
-                                                </mdc:table.Column>
-                                                <mdc:table.Column id="cnBuildingCountry" header="Country" propertyKey="buildingCountry" width="25%">
-                                                    <Text text="{path: 'facilities>countryId', formatter: '.onGetCountryName'}"/>
-                                                </mdc:table.Column>
-                                                <mdc:table.Column id="cnBuildingRegion" header="Region" propertyKey="buildingRegion" width="15%">
-                                                    <Text text="{facilities>regionId}"/>
-                                                </mdc:table.Column>
-                                            </mdc:columns>
-                                            <mdc:type>
-                                                <mdc:table.GridTableType rowCountMode="Auto"/>
-                                            </mdc:type>
-                                        </mdc:Table>
-                                    </mdcvc:MDCTable>
-                                </mdcvh:Dialog>
-                            </mdc:dialog>
-                        </mdc:ValueHelp>
-                    </mdc:dependents>
-                    </mdc:Field>
-                    <core:Title text="Office" />
-                    <Label text="ID" labelFor="inSelectedBuildingId" />
-                    <Input id="inSelectedBuildingId" value="{facilities>id}" editable="false"/>
-                    <Label text="Name" labelFor="inSelectedBuildingName" />
-                    <Input id="inSelectedBuildingName" value="{facilities>name}" editable="false"/>
-                    <Label text="Address" labelFor="selectedbuilding_address" />
-                    <Input id="selectedbuilding_address" value="{path: 'facilities>id', formatter: '.onGetAddress'}" editable="false"/>
-                    <Label text="Location" labelFor="inSelectedBuildingLocation" />
-                    <Input id="inSelectedBuildingLocation" value="{path: 'facilities>locationId', formatter: '.onGetLocationName'}" editable="false"/>
-                    <Label text="Country" labelFor="inSelectedBuildingCountry" />
-                    <Input id="inSelectedBuildingCountry" value="{path: 'facilities>countryId', formatter: '.onGetCountryName'}" editable="false"/>
-            </f:content>
+                <core:Title id="SearchGroupTitle" text="Search" />
+                <Label id="BuildingLabel" text="Building" labelFor="fieldSelectBuilding"/>
+                <mdc:Field
+                    id="fieldSelectBuilding"
+                    value="{path: 'id', type: 'sap.ui.model.type.String', mode: 'OneWay'}"
+                    valueHelp="vhSelectBuilding"
+                    display="Description"
+                    editMode="Editable"
+                    change=".onBuildingSelected">
+                </mdc:Field>
+                <core:Title id="OfficeGroupTitle" text="Office" />
+                <Label id="SelectedBuildingIdLabel" text="ID" labelFor="inSelectedBuildingId" />
+                <Input id="inSelectedBuildingId" value="{facilities>id}" editable="false"/>
+                <Label id="SelectedBuildingNameLabel" text="Name" labelFor="inSelectedBuildingName" />
+                <Input id="inSelectedBuildingName" value="{facilities>name}" editable="false"/>
+                <Label id="SelectedBuildingAddressLabel" text="Address" labelFor="selectedbuilding_address" />
+                <Input id="selectedbuilding_address" value="{path: 'facilities>id', formatter: '.onGetAddress'}" editable="false"/>
+                <Label id="SelectedBuildingLocationLabel" text="Location" labelFor="inSelectedBuildingLocation" />
+                <Input id="inSelectedBuildingLocation" value="{path: 'facilities>locationId', formatter: '.onGetLocationName'}" editable="false"/>
+                <Label id="SelectedBuildingCountryLabel" text="Country" labelFor="inSelectedBuildingCountry" />
+                <Input id="inSelectedBuildingCountry" value="{path: 'facilities>countryId', formatter: '.onGetCountryName'}" editable="false"/>
+        </f:content>
+            <f:dependents>
+                <mdc:ValueHelp id="vhSelectBuilding" delegate='\{"name": "mdc/sample/delegate/SearchValueHelpDelegate", "payload": \{ "searchKeys": ["name", "city"] \}\}'>
+                    <mdc:typeahead>
+                        <mdcvh:Popover id="vhSelectBuilding-pop" title="Select Building">
+                            <mdcvc:MTable id="vhSelectBuilding-pop-mTable" keyPath="id" descriptionPath="name">
+                                <Table id="ddListBuildings" items='{path : "facilities>/buildings", length: 10 }' width="30rem">
+                                    <columns>
+                                        <Column id="ddListBuildings-col0" visible="false">
+                                            <Text id="ddListBuildings-id-header" text="ID" />
+                                        </Column>
+                                        <Column id="ddListBuildings-col1">
+                                            <Text id="ddListBuildings-name-header" text="Name" />
+                                        </Column>
+                                        <Column id="ddListBuildings-col2" width="5rem">
+                                            <Text id="ddListBuildings-locationId-header" text="Location ID"/>
+                                        </Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem id="ddListBuildings-item" type="Active">
+                                            <Text id="ddListBuildings-id" text="{facilities>id}"/>
+                                            <Text id="ddListBuildings-name" text="{facilities>name}"/>
+                                            <Text id="ddListBuildings-locationId" text="{facilities>locationId}"/>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </mdcvc:MTable>
+                        </mdcvh:Popover>
+                    </mdc:typeahead>
+                    <mdc:dialog>
+                        <mdcvh:Dialog id="diaSelectBuilding" title="SAP Buildings">
+                            <mdcvc:MDCTable id="mdcvcTableBuildings" keyPath="id" descriptionPath="name">
+                                <mdcvc:filterBar>
+                                    <mdcvh:FilterBar
+                                        id="fbSelectBuildingDialog"
+										propertyInfo='[\{"key": "buildingCountry", "label": "Country", "visible": true, "path": "countryId", "dataType": "sap.ui.model.type.String", "constraints":\{"maxLength": 2\}\},
+                                                       \{"key": "buildingLocation", "label": "Location", "visible": true, "path": "locationId", "dataType": "sap.ui.model.type.String"\}]'
+                                        delegate='\{"name": "mdc/sample/delegate/JSONFilterBarDelegate", "payload": \{\}\}'>
+                                        <mdcvh:filterItems>
+                                            <mdc:FilterField
+                                                id="ffCountry"
+                                                propertyKey="buildingCountry"
+                                                display="Description"
+                                                valueHelp= "vhCountry">
+                                            </mdc:FilterField>
+                                            <mdc:FilterField
+                                                id="ffLocation"
+                                                propertyKey="buildingLocation"
+                                                display="Description"
+                                                valueHelp="vhLocation">
+                                            </mdc:FilterField>
+                                        </mdcvh:filterItems>
+                                        <mdcvh:dependents>
+                                            <mdc:ValueHelp
+                                                id="vhCountry"
+                                                delegate='\{"name": "mdc/sample/delegate/SearchValueHelpDelegate", "payload": \{ "searchKeys": ["id", "name"] \}\}'>
+                                                <mdc:typeahead>
+                                                    <mdcvh:Popover id="vhCountry-pop" title="Country Selection">
+                                                        <mdcvc:MTable id="countryTypeAhead" keyPath="id" descriptionPath="name">
+                                                            <Table
+                                                                id="ddListCountries"
+                                                                items='{path : "facilities>/countries", sorter: { path: "name", ascending: "true" }  }'
+                                                                width="20rem"
+                                                                mode="MultiSelect">
+                                                                <columns>
+                                                                    <Column id="ddListCountries-col0"/>
+                                                                </columns>
+                                                                <items>
+                                                                    <ColumnListItem id="ddListCountries-item" type="Active">
+                                                                        <Text id="ddListCountries-name" text="{facilities>name}"/>
+                                                                    </ColumnListItem>
+                                                                </items>
+                                                            </Table>
+                                                        </mdcvc:MTable>
+                                                    </mdcvh:Popover>
+                                                </mdc:typeahead>
+                                            </mdc:ValueHelp>
+                                            <mdc:ValueHelp
+                                                id="vhLocation"
+                                                delegate='\{"name": "mdc/sample/delegate/JSONValueHelpDelegate", "payload": \{ "searchKeys": ["id", "name"] \}\}'>
+                                                <mdc:typeahead>
+                                                    <mdcvh:Popover id="vhLocation-pop" title="Location Selection">
+                                                        <mdcvc:MTable
+                                                            id="locationTypeAhead"
+                                                            keyPath="id"
+                                                            descriptionPath="name">
+                                                            <Table
+                                                                id="taTableLocation"
+                                                                items='{path : "facilities>/locations", sorter: { path: "name", ascending: "true" }  }'
+                                                                width="20rem"
+                                                                mode="MultiSelect">
+                                                                <columns>
+                                                                    <Column id="ddListLocations-col0"/>
+                                                                </columns>
+                                                                <items>
+                                                                    <ColumnListItem id="ddListLocations-item" type="Active">
+                                                                        <Text id="ddListLocations-name" text="{facilities>name}"/>
+                                                                    </ColumnListItem>
+                                                                </items>
+                                                            </Table>
+                                                        </mdcvc:MTable>
+                                                    </mdcvh:Popover>
+                                                </mdc:typeahead>
+                                            </mdc:ValueHelp>
+                                        </mdcvh:dependents>
+                                    </mdcvh:FilterBar>
+                                </mdcvc:filterBar>
+                                <mdc:Table id="mdcTableBuildings"
+                                    autoBindOnInit="true"
+                                    width="100%"
+                                    p13nMode="Sort"
+                                    selectionMode="SingleMaster"
+                                    delegate='\{"name": "mdc/sample/delegate/JSONTableDelegate", "payload": \{ "collectionPath": "facilities>/buildings", "searchKeys": ["name", "city"] \}\}'
+                                    threshold="50"
+                                    filter="fbSelectBuildingDialog"
+                                    enableAutoColumnWidth="true">
+                                    <mdc:columns>
+                                        <mdc:table.Column id="cnBuildingId" header="ID" propertyKey="buildingId" width="10%">
+                                            <Text id="cnBuildingId-text" text="{facilities>id}"/>
+                                        </mdc:table.Column>
+                                        <mdc:table.Column id="cnBuildingName" header="Building Name" propertyKey="buildingName" width="40%">
+                                            <Text id="cnBuildingName-text" text="{facilities>name}"/>
+                                        </mdc:table.Column>
+                                        <mdc:table.Column id="cnBuildingLocation" header="Location" propertyKey="buildingLocation" width="10%">
+                                            <Text id="cnBuildingLocation-text" text="{path: 'facilities>locationId', formatter: '.onGetLocationName'}"/>
+                                        </mdc:table.Column>
+                                        <mdc:table.Column id="cnBuildingCountry" header="Country" propertyKey="buildingCountry" width="25%">
+                                            <Text id="cnBuildingCountry-text" text="{path: 'facilities>countryId', formatter: '.onGetCountryName'}"/>
+                                        </mdc:table.Column>
+                                        <mdc:table.Column id="cnBuildingRegion" header="Region" propertyKey="buildingRegion" width="15%">
+                                            <Text id="cnBuildingRegion-text" text="{facilities>regionId}"/>
+                                        </mdc:table.Column>
+                                    </mdc:columns>
+                                    <mdc:type>
+                                        <mdc:table.GridTableType rowCountMode="Auto"/>
+                                    </mdc:type>
+                                </mdc:Table>
+                            </mdcvc:MDCTable>
+                        </mdcvh:Dialog>
+                    </mdc:dialog>
+                </mdc:ValueHelp>
+            </f:dependents>
         </f:SimpleForm>
     </VBox>
 </mvc:View>

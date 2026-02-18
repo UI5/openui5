@@ -774,6 +774,68 @@ sap.ui.define([
 			}
 		},
 
+		/**
+		 * Creates a bound filter control for the given filter and the given binding.
+		 *
+		 * @param {sap.ui.model.Filter} oFilter The filter
+		 * @param {function} fnGetBinding The function returning the aggregation binding
+ 		 */
+		_createBoundFilter: function (oFilter, fnGetBinding) {
+			if (oFilter.isMultiFilter()) {
+				oFilter.aFilters.forEach((oFilter) => {
+					this._createBoundFilter(oFilter, fnGetBinding);
+				});
+				return;
+			}
+
+			const oValue1BindingInfo = BindingInfo.extract(oFilter.oValue1, /*oScope*/ undefined,
+				/*bDetectValue*/ true);
+			const oValue2BindingInfo = BindingInfo.extract(oFilter.oValue2, /*oScope*/ undefined,
+				/*bDetectValue*/ true);
+			if (!oValue1BindingInfo && !oValue2BindingInfo) {
+				return;
+			}
+
+			oFilter.setResolved(false);
+			sap.ui.require(["sap/ui/base/BoundFilter"], (BoundFilter) => {
+				const oBoundFilter = new BoundFilter({
+						value1: oFilter.oValue1,
+						value2: oFilter.oValue2
+					}, oFilter, fnGetBinding());
+				this.addDependent(oBoundFilter);
+			});
+		},
+
+		/**
+		 * Creates bound filter controls for the bound filters in the given binding info in the dependents
+		 * aggregation of this control to allow for resolution of binding expressions in these filters.
+		 *
+		 * @param {sap.ui.base.ManagedObject.AggregationBindingInfo} oBindingInfo The aggregation binding info
+		 * @param {function} fnGetBinding The function returning the aggregation binding
+		 * @param {boolean} [bIsTreeBinding] Whether the aggregation binding is a tree binding
+		 * @returns {sap.ui.model.Filter|sap.ui.model.Filter[]|undefined}
+		 *   The filters to be used when the binding is created
+		 */
+		_processFilters: function (oBindingInfo, fnGetBinding, bIsTreeBinding) {
+			// keep behavior before introduction of bound filters in case there are none
+			if (oBindingInfo.boundFilters === undefined || bIsTreeBinding) {
+				return oBindingInfo.filters;
+			}
+
+			const makeArray = (vFilter) => {
+				if (vFilter === undefined) {
+					return [];
+				}
+
+				return Array.isArray(vFilter) ? vFilter : [vFilter];
+			};
+
+			const aBoundFilters = makeArray(oBindingInfo.boundFilters);
+			aBoundFilters.forEach((oBoundFilter) => this._createBoundFilter(oBoundFilter, fnGetBinding));
+
+			return makeArray(oBindingInfo.filters).concat(aBoundFilters);
+		},
+
 		/*
 		 * Aggregation Binding
 		 */
@@ -800,11 +862,15 @@ sap.ui.define([
 					}
 				};
 
+				const getBinding = () => oBinding;
+				const bIsTreeBinding = this.isTreeBinding(sName);
+				const aFilters = this._processFilters(oBindingInfo, getBinding, bIsTreeBinding);
+
 				var oModel = this.getModel(oBindingInfo.model);
-				if (this.isTreeBinding(sName)) {
-					oBinding = oModel.bindTree(oBindingInfo.path, this.getBindingContext(oBindingInfo.model), oBindingInfo.filters, oBindingInfo.parameters, oBindingInfo.sorter);
+				if (bIsTreeBinding) {
+					oBinding = oModel.bindTree(oBindingInfo.path, this.getBindingContext(oBindingInfo.model), aFilters, oBindingInfo.parameters, oBindingInfo.sorter);
 				} else {
-					oBinding = oModel.bindList(oBindingInfo.path, this.getBindingContext(oBindingInfo.model), oBindingInfo.sorter, oBindingInfo.filters, oBindingInfo.parameters);
+					oBinding = oModel.bindList(oBindingInfo.path, this.getBindingContext(oBindingInfo.model), oBindingInfo.sorter, aFilters, oBindingInfo.parameters);
 					if (this.bUseExtendedChangeDetection) {
 						assert(!this.oExtendedChangeDetectionConfig || !this.oExtendedChangeDetectionConfig.symbol, "symbol function must not be set by controls");
 						oBinding.enableExtendedChangeDetection(!oBindingInfo.template, oBindingInfo.key, this.oExtendedChangeDetectionConfig);
@@ -837,10 +903,25 @@ sap.ui.define([
 			}
 		},
 
+		/**
+		 * Removes bound filters for the given binding from the dependents aggregation.
+		 *
+		 * @param {sap.ui.model.ListBinding|sap.ui.model.TreeBinding} oBinding The binding
+		 */
+		_removeBoundFilters: function (oBinding) {
+			this.getDependents?.().forEach((oDependent) => {
+				if (oDependent.isA("sap.ui.base.BoundFilter") && oDependent.getBinding() === oBinding) {
+					this.removeDependent(oDependent);
+					oDependent.destroy();
+				}
+			});
+		},
+
 		_unbindAggregation: function(oBindingInfo, sName){
 			if (oBindingInfo.binding) {
 				if (!this._bIsBeingDestroyed) {
 					this._detachAggregationBindingHandlers(sName);
+					this._removeBoundFilters(oBindingInfo.binding);
 				}
 				oBindingInfo.binding.destroy();
 			}

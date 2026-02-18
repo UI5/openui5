@@ -43,17 +43,17 @@
 							useAsValueHelp="false">
 							<Table id="VH-TypeAhead-Pop-Table" items="{path: 'data>/countries'}" width="13rem" mode="SingleSelectMaster">
 								<columns>
-									<Column width="3rem">
-										<Label text="ID"/>
+									<Column id="VH-TypeAhead-Pop-Table-col0" width="3rem">
+										<Label id="VH-TypeAhead-Pop-Table-col0-header" text="ID"/>
 									</Column>
-									<Column width="10rem">
-										<Label text="Name"/>
+									<Column id="VH-TypeAhead-Pop-Table-col1" width="10rem">
+										<Label id="VH-TypeAhead-Pop-Table-col1-header" text="Name"/>
 									</Column>
 								</columns>
 								<items>
-									<ColumnListItem type="Active">
-										<Text text="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}"/>
-										<Text text="{path: 'data>name', type:'sap.ui.model.type.String'}"/>
+									<ColumnListItem id="VH-TypeAhead-Pop-Table-item" type="Active">
+										<Text id="VH-TypeAhead-Pop-Table-item-key" text="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}"/>
+										<Text id="VH-TypeAhead-Pop-Table-item-name" text="{path: 'data>name', type:'sap.ui.model.type.String'}"/>
 									</ColumnListItem>
 								</items>
 							</Table>
@@ -67,7 +67,7 @@
 				<mdc:typeahead>
 					<mdcvh:Popover id="VH-TypeAheadDropdown-Pop">
 						<mdcValueHelpContent:FixedList id="H-TypeAheadDropdown-Pop-FixedList" items="{path: 'data>/countries'}" >
-							<mdcValueHelpContent:FixedListItem text="{path: 'data>name', type:'sap.ui.model.type.String'}" additionalText="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}" key="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}"/>
+							<mdcValueHelpContent:FixedListItem id="H-TypeAheadDropdown-Pop-FixedList-itemTemplate" text="{path: 'data>name', type:'sap.ui.model.type.String'}" additionalText="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}" key="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}"/>
 						</mdcValueHelpContent:FixedList>
 					</mdcvh:Popover>
 				</mdc:typeahead>
@@ -91,7 +91,7 @@
 				<mdc:typeahead>
 					<mdcvh:Popover id="VH-DropdownOnly-Pop">
 						<mdcValueHelpContent:FixedList id="H-DropdownOnly-Pop-FixedList" filterList="false" useFirstMatch="false" items="{path: 'data>/countries'}" >
-							<mdcValueHelpContent:FixedListItem text="{path: 'data>name', type:'sap.ui.model.type.String'}" additionalText="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}" key="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}"/>
+							<mdcValueHelpContent:FixedListItem id="H-DropdownOnly-Pop-FixedList-itemTemplate" text="{path: 'data>name', type:'sap.ui.model.type.String'}" additionalText="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}" key="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}"/>
 						</mdcValueHelpContent:FixedList>
 					</mdcvh:Popover>
 				</mdc:typeahead>

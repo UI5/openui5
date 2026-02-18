@@ -16,6 +16,7 @@
 			// sap.ui.base.* - tests are contained in testsuite.databinding.qunit.js
 			// ***************************************************************************************
 			"sap/ui/core/qunit/BindingParser.qunit",
+			"sap/ui/core/qunit/BoundFilter.qunit",
 			"sap/ui/core/qunit/ExpressionParser.qunit",
 
 			// ***************************************************************************************

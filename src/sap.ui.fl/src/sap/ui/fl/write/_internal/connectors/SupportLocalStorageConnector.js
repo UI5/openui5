@@ -16,16 +16,15 @@ sap.ui.define([
 	"use strict";
 
 	/**
-	 * Connector for saving data to the <code>window.localStorage</code>.
 	 * This connector is used by Flexibility Support Chrome extension. It replaces the default connector
 	 * and allows to apply changes from the JSON file which has been created by the Flexibility Data Export Tool
 	 *
-	 * @namespace sap.ui.fl.write._internal.connectors.SupportFakeConnector
+	 * @namespace sap.ui.fl.write._internal.connectors.SupportLocalStorageConnector
 	 * @since 1.146
 	 * @private
 	 * @ui5-restricted sap.ui.fl.write._internal.Connector
 	 */
-	var SupportFakeConnector = merge({}, BaseConnector, /** @lends sap.ui.fl.write._internal.connectors.SupportFakeConnector */ {
+	const SupportLocalStorageConnector = merge({}, BaseConnector, /** @lends sap.ui.fl.write._internal.connectors.SupportLocalStorageConnector */ {
 		storage: undefined,
 		layers: [
 			Layer.CUSTOMER,
@@ -38,7 +37,7 @@ sap.ui.define([
 				return Promise.resolve([]);
 			},
 			activate() {
-				return Promise.resolve("Activating not supported for SupportFakeConnector. No action taken.");
+				return Promise.resolve("Activating not supported for SupportLocalStorageConnector. No action taken.");
 			}
 		}
 	});
@@ -56,7 +55,7 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted sap.ui.fl.write._internal
 	 */
-	SupportFakeConnector.loadFeatures = function() {
+	SupportLocalStorageConnector.loadFeatures = function() {
 		const sImportedFlexData = window.localStorage.getItem("UI5.Flexibility.Support.appliedData");
 		const oImportedFlexData = sImportedFlexData ? JSON.parse(sImportedFlexData) : null;
 		if (oImportedFlexData) {
@@ -82,7 +81,7 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted sap.ui.fl.write._internal
 	 */
-	SupportFakeConnector.loadFlexData = function() {
+	SupportLocalStorageConnector.loadFlexData = function() {
 		const sImportedFlexData = window.localStorage.getItem("UI5.Flexibility.Support.appliedData");
 		const oImportedFlexData = sImportedFlexData ? JSON.parse(sImportedFlexData) : null;
 		if (oImportedFlexData) {
@@ -99,7 +98,7 @@ sap.ui.define([
 	 * Condenses flexibility changes.
 	 *
 	 * This method is a placeholder for the condense operation, which is not supported
-	 * by the SupportFakeConnector. It always resolves with a message indicating that
+	 * by the SupportLocalStorageConnector. It always resolves with a message indicating that
 	 * condensing is not supported and no action is taken.
 	 *
 	 * @returns {Promise<string>} Resolves with a message stating that condensing is not supported.
@@ -107,9 +106,9 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted sap.ui.fl.write._internal
 	 */
-	SupportFakeConnector.condense = function() {
-		return Promise.resolve("Condensing not supported for SupportFakeConnector. No action taken.");
+	SupportLocalStorageConnector.condense = function() {
+		return Promise.resolve("Condensing not supported for SupportLocalStorageConnector. No action taken.");
 	};
 
-	return SupportFakeConnector;
+	return SupportLocalStorageConnector;
 });

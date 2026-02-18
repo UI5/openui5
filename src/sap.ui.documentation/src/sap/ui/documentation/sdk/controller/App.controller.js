@@ -1473,7 +1473,7 @@ sap.ui.define([
 			// Handle the case when the user deletes the query and the search picker is open
 			// Only on desktop, because on mobile we don't want to close the picker
 			if (!sQuery && Device.system.desktop) {
-				if (this.oPicker.isOpen()) {
+				if (this.oPicker && this.oPicker.isOpen()) {
 					this.oPicker.close();
 				}
 

@@ -258,15 +258,19 @@ sap.ui.define([
 						+ " sap.ui.model.Filter");
 				}
 			} else if (!this.aFilters && this.sPath !== undefined
-					&& ((this.sOperator && this.oValue1 !== undefined) || this.fnTest)) {
+					&& ((this.sOperator && this.hasOwnProperty("oValue1")) || this.fnTest)) {
 				this._bMultiFilter = false;
 			} else {
 				Log.error("Wrong parameters defined for filter.");
 			}
 			this.sFractionalSeconds1 = undefined;
 			this.sFractionalSeconds2 = undefined;
+			// Whether a bound filter's binding expression is resolved (true/false) or undefined for constant filters
+			this.bResolved = undefined;
 		}
 	});
+
+	Filter.generated = Symbol("generated"); // used to mark test functions generated in FilterProcessor
 
 	/**
 	 * A filter instance that is never fulfilled. When used to filter a list, no back-end request is
@@ -341,6 +345,70 @@ sap.ui.define([
 	 */
 	Filter.prototype.appendFractionalSeconds2 = function (sFractionalSeconds) {
 		this.sFractionalSeconds2 = sFractionalSeconds;
+	};
+
+	/**
+	 * Clones this single filter and returns the clone; the condition of the original filter is not cloned.
+	 *
+	 * @param {any} vNewValue1 The new first value for the cloned filter; may be <code>undefined</code>
+	 * @param {any} vNewValue2 The new second value for the cloned filter; may be <code>undefined</code>
+	 * @returns {sap.ui.model.Filter} The cloned filter
+	 * @throws {Error} If this filter is a multi-filter
+	 *
+	 * @private
+	 */
+	Filter.prototype.cloneWithValues = function (vNewValue1, vNewValue2) {
+		if (this._bMultiFilter) {
+			throw new Error("Cannot clone multi-filter");
+		}
+
+		const oClone = new Filter({
+			path: this.sPath,
+			operator: this.sOperator,
+			value1: vNewValue1,
+			value2: vNewValue2,
+			variable: this.sVariable,
+			condition: this.oCondition,
+			and: this.bAnd,
+			test: this.fnTest?.[Filter.generated] ? undefined : this.fnTest,
+			comparator: this.fnCompare,
+			caseSensitive: this.bCaseSensitive
+		});
+		oClone.bResolved = this.bResolved;
+		if (oClone.bResolved === false) {
+			oClone.bResolved = true; // clone sets values on bound filter => cloned filter is resolved
+		}
+
+		return oClone;
+	};
+
+	/**
+	 * Searches the given <code>oFilter</code> recursively in this filter.
+	 * If found, returns a clone of this filter where <code>oFilter</code> is replaced by <code>oFilterClone</code>;
+	 * cloning and replacement is done recursively for nested multi-filters.
+	 * Otherwise, returns this filter.
+	 *
+	 * @param {sap.ui.model.Filter} oFilter The filter to search for
+	 * @param {sap.ui.model.Filter} oFilterClone The filter to replace <code>oFilter</code> with
+	 * @returns {sap.ui.model.Filter} Either this filter or a clone with <code>oFilter</code> replaced
+	 *
+	 * @private
+	 */
+	Filter.prototype.cloneIfContained = function (oFilter, oFilterClone) {
+		if (!this._bMultiFilter) {
+			return this === oFilter ? oFilterClone : this;
+		}
+
+		let bReplaced = false;
+		const aFilters = this.aFilters.map((oFilterElement) => {
+			const oClonedFilterElement = oFilterElement.cloneIfContained(oFilter, oFilterClone);
+			bReplaced ||= oClonedFilterElement !== oFilterElement;
+			return oClonedFilterElement;
+		});
+
+		return bReplaced
+			? new Filter({filters: aFilters, and: this.bAnd})
+			: this;
 	};
 
 	var Type = {
@@ -669,6 +737,101 @@ sap.ui.define([
 	 */
 	Filter.prototype.isCaseSensitive = function () {
 		return this.bCaseSensitive;
+	};
+
+	/**
+	 * Indicates whether this filter is a multi filter.
+	 *
+	 * @returns {boolean|undefined} <code>true</code> if this filter is a multi filter
+	 *
+	 * @private
+	 */
+	Filter.prototype.isMultiFilter = function () {
+		return this._bMultiFilter;
+	};
+
+	/**
+	 * Returns whether this single filter is neutral; throws an error for a multi-filter.
+	 *
+	 * @returns {boolean} Whether this filter is neutral.
+	 * @throws {Error} If this filter is a multi-filter
+	 *
+	 * @private
+	 */
+	Filter.prototype.isNeutral = function () {
+		if (this._bMultiFilter) {
+			throw new Error("Multi-filter unsupported");
+		}
+
+		if (this.bResolved === undefined) { // constant filter is never neutral
+			return false;
+		}
+
+		if (this.bResolved === false) { // unresolved bound filter is always neutral
+			return true;
+		}
+
+		const nullish = (oValue) => oValue === undefined || oValue === null;
+
+		return this.sOperator === FilterOperator.BT || this.sOperator === FilterOperator.NB
+			? nullish(this.oValue1) || nullish(this.oValue2)
+			: nullish(this.oValue1);
+	};
+
+	/**
+	 * Returns whether this filter is resolved, that is its <code>value1</code> and <code>value2</code> have no binding
+	 * or the bindings are resolved. For multi-filters, all contained filters must be resolved for the multi-filter to
+	 * be resolved.
+	 *
+	 * @returns {boolean} Whether this filter is resolved
+	 *
+	 * @private
+	 */
+	Filter.prototype.isResolved = function () {
+		return this._bMultiFilter
+			? this.aFilters.every((oFilter) => oFilter.isResolved())
+			: this.bResolved !== false;
+	};
+
+	/**
+	 * Returns a filter constructed from this filter where all contained filters being neutral are removed.
+	 * If there are no neutral filters, the filter itself is returned; if there are only neutral filters,
+	 * returns <code>undefined</code>.
+	 *
+	 * @returns {sap.ui.model.Filter|undefined} This filter with neutral filters removed
+	 *
+	 * @private
+	 */
+	Filter.prototype.removeAllNeutrals = function () {
+		if (!this._bMultiFilter) {
+			return this.isNeutral() ? undefined : this;
+		}
+
+		const aFilters = [];
+		this.aFilters.forEach((oFilter) => {
+			const oNewFilter = oFilter.removeAllNeutrals();
+			if (oNewFilter) {
+				aFilters.push(oNewFilter);
+			}
+		});
+		if (aFilters.length === this.aFilters.length) {
+			return this;
+		} else if (!aFilters.length) {
+			return undefined;
+		}
+		return new Filter({filters: aFilters, and: this.bAnd});
+	};
+
+	/**
+	 * Sets whether a bound filter is resolved, that is whether the bindings of the filter's <code>value1</code> and
+	 * <code>value2</code> are resolved.
+	 *
+	 * @param {boolean} bResolved The resolved state to set
+	 *
+	 * @private
+	 */
+	Filter.prototype.setResolved = function (bResolved) {
+		this.bResolved = !!bResolved;
 	};
 
 	/**

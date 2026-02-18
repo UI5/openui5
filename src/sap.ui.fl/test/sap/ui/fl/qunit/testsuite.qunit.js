@@ -1000,10 +1000,10 @@ sap.ui.define([
 				}
 			},
 
-			"write/_internal/connectors/SupportFakeConnector": {
+			"write/_internal/connectors/SupportLocalStorageConnector": {
 				group: "Write Internal",
 				coverage: {
-					only: ["sap/ui/fl/write/_internal/connectors/SupportFakeConnector"]
+					only: ["sap/ui/fl/write/_internal/connectors/SupportLocalStorageConnector"]
 				}
 			},
 

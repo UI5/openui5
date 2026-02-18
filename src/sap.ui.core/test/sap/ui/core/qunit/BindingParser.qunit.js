@@ -455,6 +455,40 @@ sap.ui.define([
 		assert.strictEqual(o.filters.aFilters[1].aFilters[1].sOperator, "EQ", "nested filter operator should be defined");
 	});
 
+	//*********************************************************************************************
+	QUnit.test("Bound filters together with filters, single filter", function (assert) {
+		const oBindingInfo = parse("{path:'something', "
+			+ "filters: { path: 'numberField', operator: 'EQ', value1: 42 },"
+			+ "boundFilters: { path: 'someField', operator: 'GE', value1: '{filter>lowerLimit}' }"
+			+ "}");
+		assert.strictEqual(typeof oBindingInfo, "object");
+		assert.ok(oBindingInfo.filters instanceof Filter);
+		assert.strictEqual(oBindingInfo.filters.sPath, "numberField");
+		assert.strictEqual(oBindingInfo.filters.sOperator, "EQ");
+		assert.strictEqual(oBindingInfo.filters.oValue1, 42);
+		assert.ok(oBindingInfo.boundFilters instanceof Filter);
+		assert.strictEqual(oBindingInfo.boundFilters.sPath, "someField");
+		assert.strictEqual(oBindingInfo.boundFilters.sOperator, "GE");
+		assert.strictEqual(oBindingInfo.boundFilters.oValue1, "{filter>lowerLimit}");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("Bound filters, filter array", function (assert) {
+		const oBindingInfo = parse("{path:'something', boundFilters: ["
+			+ "{path:'someField', operator:'GE', value1: '{filter>lowerLimit}'},"
+			+ "{path:'someField2', operator:'StartsWith', value1: '{filter>prefix}'}] }");
+		assert.strictEqual(typeof oBindingInfo, "object");
+		assert.ok(Array.isArray(oBindingInfo.boundFilters));
+		assert.ok(oBindingInfo.boundFilters[0] instanceof Filter);
+		assert.strictEqual(oBindingInfo.boundFilters[0].sPath, "someField");
+		assert.strictEqual(oBindingInfo.boundFilters[0].sOperator, "GE");
+		assert.strictEqual(oBindingInfo.boundFilters[0].oValue1, "{filter>lowerLimit}");
+		assert.ok(oBindingInfo.boundFilters[1] instanceof Filter);
+		assert.strictEqual(oBindingInfo.boundFilters[1].sPath, "someField2");
+		assert.strictEqual(oBindingInfo.boundFilters[1].sOperator, "StartsWith");
+		assert.strictEqual(oBindingInfo.boundFilters[1].oValue1, "{filter>prefix}");
+	});
+
 	QUnit.test("Single Binding with one sorter", function (assert) {
 		var o = parse("{path:'something', sorter: {path:'someSortPath', descending: false}}");
 		assert.strictEqual(typeof o, "object", "parse should return an object");
