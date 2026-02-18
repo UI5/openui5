@@ -60,6 +60,7 @@ sap.ui.define([
 	var sinonClockTickValue = 1000;
 
 	function checkSizeWithTolerance(iActualSize, iExpectedSize) {
+		iActualSize = Math.round(iActualSize);
 		return iActualSize === iExpectedSize
 			|| iActualSize === iExpectedSize - 1
 			|| iActualSize === iExpectedSize + 1;

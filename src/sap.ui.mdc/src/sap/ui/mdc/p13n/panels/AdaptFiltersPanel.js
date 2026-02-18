@@ -21,8 +21,9 @@ sap.ui.define([
 	"sap/m/SearchField",
 	"sap/ui/core/Item",
 	"sap/m/library",
-	"sap/ui/model/json/JSONModel"
-], (AbstractContainer, AbstractContainerItem, SelectionPanel, GroupView, AdaptFiltersPanelContent, Library, Filter, Button, Bar, IconTabBar, IconTabFilter, ToolbarSpacer, Select, SegmentedButton, SegmentedButtonItem, InvisibleText, SearchField, Item, mLibrary, JSONModel) => {
+	"sap/ui/model/json/JSONModel",
+	"sap/base/util/merge"
+], (AbstractContainer, AbstractContainerItem, SelectionPanel, GroupView, AdaptFiltersPanelContent, Library, Filter, Button, Bar, IconTabBar, IconTabFilter, ToolbarSpacer, Select, SegmentedButton, SegmentedButtonItem, InvisibleText, SearchField, Item, mLibrary, JSONModel, merge) => {
 	"use strict";
 
 	// shortcut for sap.m.BarDesign
@@ -257,7 +258,7 @@ sap.ui.define([
 			this.getCurrentViewContent()._bInactive = true;
 		}
 
-		if (this._checkIsNewUI() && sPreviousKey) {
+		if (this._checkIsNewUI() && sPreviousKey && !this._isCustomView()) {
 			const oCurrentView = this.getCurrentViewContent();
 			if (oCurrentView) {
 				const aCurrentP13nData = oCurrentView.getP13nData();
@@ -273,7 +274,7 @@ sap.ui.define([
 		if (this._checkIsNewUI()) {
 			this._getViewSwitch()?.setSelectedKey(this.getCurrentViewKey());
 
-			if (oCurrentViewContent && this.getP13nModel()) {
+			if (oCurrentViewContent && this.getP13nModel() && !this._isCustomView()) {
 				oCurrentViewContent.setP13nData(this.getP13nModel().getProperty("/items"));
 			}
 
@@ -321,7 +322,7 @@ sap.ui.define([
 	 * Adds custom content to the <code>sap.ui.mdc.p13n.panels.GroupPanelBase</code>
 	 *
 	 * @param {object} mViewSettings the setting for the cutom view
-	 * @param {sap.m.SegmentedButtonItem} mViewSettings.item the custom button used in the view switch
+	 * @param {sap.ui.core.Item} mViewSettings.item the item used in the view switch
 	 * @param {sap.ui.core.Control} mViewSettings.content the content displayed in the custom view
 	 * @param {function} [mViewSettings.filterSelect] callback triggered by the combobox in the header area - executed with the selected key as paramter
 	 * @param {function} [mViewSettings.search] callback triggered by search - executed with the string as parameter
@@ -332,12 +333,19 @@ sap.ui.define([
 		const oItem = mViewSettings.item;
 		const sKey = oItem.getKey();
 		const oContent = mViewSettings.content;
-		const fnOnSearch = mViewSettings.search;
+		let fnOnSearch = mViewSettings.search;
 		const fnSelectionChange = mViewSettings.selectionChange;
-		const fnDropDownChange = mViewSettings.filterSelect;
+		let fnDropDownChange = mViewSettings.filterSelect;
 
-		if (!sKey) {
-			throw new Error("Please provide an item of type sap.m.SegmentedButtonItem with a key");
+		if (!sKey && this._checkIsNewUI()) {
+			throw new Error("Please provide an item of type sap.ui.core.Item with a key to be used in the view switch");
+		} else if (!sKey) {
+			throw new Error("Please provide an item of type sap.m.SegmentedButtonItem with a key to be used in the view switch");
+		}
+
+		if (this._checkIsNewUI()) {
+			fnOnSearch = undefined;
+			fnDropDownChange = undefined;
 		}
 
 		const oViewSwitch = this._getViewSwitch();
@@ -384,11 +392,29 @@ sap.ui.define([
 		}));
 
 		if (this._checkIsNewUI()) {
-			oViewSwitch.addItem(new IconTabFilter({
-				key: sKey,
-				text: oItem.getText(),
-				icon: oItem.getIcon()
-			}));
+			let oIconTabFilter;
+			if (oItem.isA("sap.m.IconTabFilter")) {
+				oIconTabFilter = oItem;
+			} else {
+				oIconTabFilter = new IconTabFilter({
+					key: sKey,
+					text: oItem.getText()
+				});
+
+				// Clone the enabled property/binding from oItem to the new IconTabFilter
+				const fnPropertyIsInItem = (sProperty) => oItem && (oItem.getBindingInfo(sProperty) !== undefined || !oItem.isPropertyInitial?.(sProperty));
+				const fnExtractBinding = (sProperty) => oItem?.getBindingInfo(sProperty) ?? ({ value: oItem?.getProperty(sProperty) });
+
+				if (fnPropertyIsInItem("enabled")) {
+					let oBindingCopy = merge({}, fnExtractBinding("enabled"));
+					if (!oBindingCopy.parts) {
+						oBindingCopy = { parts: [merge({}, oBindingCopy)] };
+					}
+					oIconTabFilter.bindProperty("enabled", oBindingCopy);
+				}
+			}
+
+			oViewSwitch.addItem(oIconTabFilter);
 		} else {
 			oViewSwitch.addItem(oItem);
 		}

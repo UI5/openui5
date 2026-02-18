@@ -4,10 +4,16 @@
 
 sap.ui.define([
 		"sap/ui/thirdparty/jquery",
+		"sap/base/Log",
 		"sap/ui/core/Fragment",
+		"sap/ui/documentation/sdk/controller/util/APIInfo",
 		"sap/ui/documentation/sdk/controller/BaseController",
 		"sap/ui/documentation/sdk/util/ToggleFullScreenHandler",
 		"sap/ui/documentation/sdk/model/formatter",
+		"sap/ui/documentation/Row",
+		"sap/ui/documentation/ParamText",
+		"sap/ui/documentation/JSDocType",
+		"sap/ui/documentation/JSDocText",
 		"sap/m/Image",
 		"sap/m/Label",
 		"sap/m/Link",
@@ -25,8 +31,8 @@ sap.ui.define([
 		"sap/uxap/ObjectPageSection",
 		"sap/ui/documentation/ObjectPageSubSection",
 		"sap/ui/core/HTML"
-	], function (jQuery, Fragment, BaseController, ToggleFullScreenHandler,
-			formatter, Image, Label, Link, Text, HBox, ObjectAttribute, ObjectStatus, Popover,
+	], function (jQuery, Log, Fragment, APIInfo, BaseController, ToggleFullScreenHandler,
+			formatter, Row, ParamText, JSDocType, JSDocText, Image, Label, Link, Text, HBox, ObjectAttribute, ObjectStatus, Popover,
 			library, coreLibrary, CustomListItem, List, includeStylesheet, includeScript,
 			ObjectPageSection, ObjectPageSubSection, HTML) {
 		"use strict";
@@ -324,6 +330,40 @@ sap.ui.define([
 						window.hljs.highlightElement(block);
 					});
 				}
+			},
+
+			/**
+			 * Applies syntax highlighting to a LightTable after it is re-rendered.
+			 * Attaches an onAfterRendering delegate to the LightTable, applies highlighting,
+			 * and then removes the delegate.
+			 * @param {sap.ui.documentation.LightTable} oLightTable The LightTable control to apply highlighting to
+			 * @private
+			 */
+			_applyHljsToLightTable: function(oLightTable) {
+				if (!oLightTable || !window.hljs) {
+					return;
+				}
+
+				var oDelegate = {
+					onAfterRendering: function() {
+						// Find unprocessed pre elements within the LightTable's DOM
+						var oDomRef = oLightTable.getDomRef();
+						if (oDomRef) {
+							var aPreElements = oDomRef.querySelectorAll('pre:not(.hljs)');
+							if (aPreElements.length > 0) {
+								aPreElements.forEach(function(oElement) {
+									oElement.classList.add('hljs');
+									window.hljs.highlightElement(oElement);
+								});
+							}
+						}
+						// Remove the delegate after execution
+						oLightTable.removeEventDelegate(oDelegate);
+					}
+				};
+
+				// Attach the delegate to the LightTable
+				oLightTable.addEventDelegate(oDelegate);
 			},
 
 			scrollToEntity: function (sSectionId, sEntityId) {
@@ -676,6 +716,237 @@ sap.ui.define([
 				}
 
 				return this._oPopover;
+			},
+
+			/**
+			 * Handles the typedef toggle event
+			 * @param {sap.ui.base.Event} oEvent The event object
+			 */
+			onTypedefToggle: function(oEvent) {
+				var oRow = oEvent.getSource(),
+					oLightTable = this._findParentLightTable(oRow),
+					sTypedefName = oRow?.getTypedefName();
+
+				if (!sTypedefName || !oLightTable) {
+					return;
+				}
+
+				if (oRow.getExpanded()) {
+					oRow.setExpanded(false);
+
+					oLightTable.invalidate();
+					this._applyHljsToLightTable(oLightTable);
+
+					return;
+				}
+
+				if (oRow.getSubRows().length > 0) {
+					// Already loaded typedef properties, just expand
+					oRow.setExpanded(true);
+
+					oLightTable.invalidate();
+					this._applyHljsToLightTable(oLightTable);
+
+					return;
+				}
+
+				// Find the typedef entity in the API index first
+				var oTypedefInfo = this._findTypedefInApiIndex(sTypedefName);
+
+				if (oTypedefInfo) {
+					// Fetch complete typedef data from API.json
+					this._loadCompleteTypedefData(oTypedefInfo)
+						.then(function(oFullTypedefData) {
+							// Extract properties from the typedef entity
+							var aTypedefProperties = this._extractTypedefProperties(oFullTypedefData);
+
+							// Add Row controls to the LightTable for each typedef property
+							if (aTypedefProperties && aTypedefProperties.length > 0) {
+								this._addTypedefSubRows(oRow, aTypedefProperties);
+
+								oRow.setExpanded(true);
+								oLightTable.invalidate();
+								this._applyHljsToLightTable(oLightTable);
+							}
+						}.bind(this))
+						.catch(function(oError) {
+							// Handle error silently
+							Log.error("Error loading typedef data: " + oError);
+						});
+				}
+			},
+
+			/**
+			 * Extracts properties from typedef data
+			 * @param {object} oTypedefData The typedef data
+			 * @returns {array} Array of typedef properties
+			 * @private
+			 */
+			_extractTypedefProperties: function(oTypedefData) {
+				var aProperties = [];
+
+				if (oTypedefData && oTypedefData.properties) {
+					aProperties = oTypedefData.properties.map(function(oProperty) {
+						// Clone the property to avoid modifying the original
+						var oClone = jQuery.extend(true, {}, oProperty);
+						// Add depth property
+						oClone.depth = 1;
+						return oClone;
+					});
+				}
+
+				return aProperties;
+			},
+
+			/**
+			 * Adds Row controls to the LightTable for typedef properties
+			 * @param {sap.ui.documentation.Row} oParentRow The parent row being expanded
+			 * @param {array} aTypedefProperties Array of typedef properties to add as rows
+			 * @private
+			 */
+			_addTypedefSubRows: function(oParentRow, aTypedefProperties) {
+				// Create sub-row controls for typedef properties
+				var aSubRows = aTypedefProperties.map(function(oProperty) {
+					return new Row({
+						content: [
+							new ParamText({
+								text: oProperty.name,
+								phoneText: oProperty.phoneName,
+								depth: oProperty.depth || 1,
+								optional: oProperty.optional
+							}),
+							new JSDocType({
+								typeInfo: oProperty.typeInfo
+							}),
+							new Text({
+								text: oProperty.defaultValue || "",
+								wrapping: false
+							}),
+							new JSDocText({
+								sanitizeContent: false,
+								text: this.formatter.escapeSettingsValue(oProperty.description)
+							})
+						]
+					}).addStyleClass("subrow");
+				}.bind(this));
+
+				// Add sub-rows to the parent row
+				aSubRows.forEach(function(oSubRow) {
+					oParentRow.addSubRow(oSubRow);
+				});
+			},
+
+			/**
+			 * Finds the parent LightTable control of a given control
+			 * @param {sap.ui.core.Control} oControl - The control to find the parent LightTable for
+			 * @returns {sap.ui.documentation.LightTable|null} The parent LightTable control or null if not found
+			 * @private
+			 */
+			_findParentLightTable: function(oControl) {
+				var oParent = oControl?.getParent();
+
+				while (oParent) {
+					if (oParent.isA("sap.ui.documentation.LightTable")) {
+						return oParent;
+					}
+					oParent = oParent.getParent();
+				}
+
+				return null;
+			},
+
+			/**
+			 * Finds a typedef entity in the API index
+			 * @param {string} sTypedefName The name of the typedef to find
+			 * @returns {object} The typedef entity data or null if not found
+			 * @private
+			 */
+			_findTypedefInApiIndex: function(sTypedefName) {
+				var oTypedefData = null;
+
+				// Recursive function to find the typedef in the API index
+				function findSymbol(aNodes) {
+					if (!aNodes) {
+						return false;
+					}
+
+					return aNodes.some(function(oNode) {
+						var bFound = oNode.name === sTypedefName;
+						if (bFound) {
+							oTypedefData = oNode;
+							return true;
+						} else if (oNode.nodes && sTypedefName.startsWith(oNode.name + ".")) {
+							return findSymbol(oNode.nodes);
+						}
+						return false;
+					});
+				}
+
+				// Search in the API index
+				if (this._aApiIndex) {
+					findSymbol(this._aApiIndex);
+				}
+
+				return oTypedefData;
+			},
+
+			/**
+			 * Loads complete typedef data from API.json files
+			 * @param {object} oTypedefInfo Initial typedef info from API index
+			 * @returns {Promise} Promise that resolves with the complete typedef data
+			 * @private
+			 */
+			_loadCompleteTypedefData: function(oTypedefInfo) {
+				// Get the library name from the typedef info
+				var sLibName = oTypedefInfo.lib;
+
+				if (!sLibName) {
+					return Promise.reject("Library name not found for typedef");
+				}
+
+				// Use APIInfo to load the library's API.json data
+				return APIInfo.getLibraryElementsJSONPromise(sLibName)
+					.then(function(aLibData) {
+						try {
+							// Find the complete typedef data in the library elements
+							var oTypedefData = this._findEntityInLibraryData(aLibData, oTypedefInfo.name);
+
+							if (oTypedefData) {
+								return oTypedefData;
+							} else {
+								return Promise.reject("Typedef not found in library data");
+							}
+						} catch (oProcessError) {
+							return Promise.reject("Error processing typedef data: " + oProcessError);
+						}
+					}.bind(this))
+					.catch(function(oError) {
+						return Promise.reject("Error loading library data: " + oError);
+					});
+			},
+
+			/**
+			 * Finds an entity in library data loaded from API.json
+			 * @param {array} aLibraryData Array of library elements from API.json
+			 * @param {string} sEntityName Name of the entity to find
+			 * @returns {object} The entity data or null if not found
+			 * @private
+			 */
+			_findEntityInLibraryData: function(aLibraryData, sEntityName) {
+				// Find entity in loaded libs data
+				for (var i = 0, iLen = aLibraryData.length; i < iLen; i++) {
+					var oLibItem = aLibraryData[i];
+					if (oLibItem.name === sEntityName) {
+						// Check if we are allowed to display the requested symbol
+						// BCP: 1870269087 item may not have visibility info at all. In this case we show the item
+						if (oLibItem.visibility === undefined || this._aAllowedMembers.indexOf(oLibItem.visibility) >= 0) {
+							return oLibItem;
+						} else {
+							return null;
+						}
+					}
+				}
+				return null;
 			},
 
 			/**

@@ -6588,6 +6588,22 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("requestNodeProperty: not applicable", async function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			hierarchyQualifier : "X",
+			$NodeProperty : undefined
+		});
+		this.mock(_Helper).expects("drillDown").never();
+		this.mock(oCache).expects("requestProperties").never();
+		this.mock(_Helper).expects("inheritPathValue").never();
+
+		assert.strictEqual(
+			// code under test
+			await oCache.requestNodeProperty("~oElement~", "~oGroupLock~", "n/a"),
+			undefined, "without a defined result");
+	});
+
+	//*********************************************************************************************
 	[
 		{firstLevel : true},
 		{firstLevel : false, parentLeaf : false},

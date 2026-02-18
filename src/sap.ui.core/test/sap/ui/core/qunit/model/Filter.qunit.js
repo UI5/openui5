@@ -122,12 +122,14 @@ sap.ui.define([
 		this.oLogMock.expects("error").withExactArgs("Wrong parameters defined for filter.");
 
 		// code under test: missing path
-		new Filter("EQ", 1);
+		// eslint-disable-next-line no-new
+		new Filter({operator: "EQ", value1: 1});
 
 		this.oLogMock.expects("error").withExactArgs("Filter in aggregation of multi filter has to "
 			+ "be instance of sap.ui.model.Filter");
 
 		// code under test: every multifilter has to be an instance of Filter
+		// eslint-disable-next-line no-new
 		new Filter({filters : [new Filter("path", FilterOperator.EQ, 42), {/*no Filter*/}]});
 	});
 
@@ -917,5 +919,352 @@ sap.ui.define([
 		oFilter.appendFractionalSeconds2("~f2");
 
 		assert.strictEqual(oFilter.sFractionalSeconds2, "~f2");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isMultiFilter", function (assert) {
+		let oFilter = new Filter({path : "~path", operator : "~operator", value1 : "~value1"});
+
+		// code under test
+		assert.strictEqual(oFilter.isMultiFilter(), false);
+
+		oFilter = new Filter({filters : [
+			new Filter({path : "~path1", operator : "~operator", value1 : "~value1"}),
+			new Filter({path : "~path2", operator : "~operator", value1 : "~value2"})
+		]});
+
+		// code under test
+		assert.strictEqual(oFilter.isMultiFilter(), true);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("bResolved property, setResolved", function (assert) {
+		const oFilter = new Filter({path : "~path", operator : "~operator", value1 : "~value1"});
+
+		// code under test
+		assert.strictEqual(oFilter.bResolved, undefined, "bResolved initially undefined");
+		assert.ok(oFilter.hasOwnProperty("bResolved"));
+
+		// code under test
+		oFilter.setResolved("~bResolved");
+
+		assert.strictEqual(oFilter.bResolved, true, "bResolved set correctly (truthy)");
+
+		// code under test
+		oFilter.setResolved(null);
+
+		assert.strictEqual(oFilter.bResolved, false, "bResolved set correctly (falsy)");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isResolved, single filter", function (assert) {
+		const oSingleFilter = new Filter({path : "~path", operator : "~operator", value1 : "~value1"});
+
+		// code under test
+		assert.strictEqual(oSingleFilter.isResolved(), true, "constant single filter");
+
+		oSingleFilter.setResolved(false);
+
+		// code under test
+		assert.strictEqual(oSingleFilter.isResolved(), false, "non-resolved single filter");
+
+		oSingleFilter.setResolved(true);
+
+		// code under test
+		assert.strictEqual(oSingleFilter.isResolved(), true, "resolved single filter");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isResolved, multi-filter", function (assert) {
+		const oSingleFilter1 = new Filter({path : "~path", operator : "~operator", value1 : "~value1.1"});
+		const oSingleFilter2 = new Filter({path : "~path2", operator : "~operator", value1 : "~value1.2"});
+		const oMultiFilter = new Filter({filters : [oSingleFilter1, oSingleFilter2]});
+
+		// code under test
+		assert.strictEqual(oMultiFilter.isResolved(), true, "multi-filter with constant single filters");
+
+		oSingleFilter1.setResolved(false);
+		oSingleFilter2.setResolved(false);
+
+		// code under test
+		assert.strictEqual(oMultiFilter.isResolved(), false, "(1) multi-filter with unresolved single filters");
+
+		oSingleFilter1.setResolved(true);
+
+		// code under test
+		assert.strictEqual(oMultiFilter.isResolved(), false, "(2) multi-filter with unresolved single filters");
+
+		oSingleFilter2.setResolved(true);
+
+		// code under test
+		assert.strictEqual(oMultiFilter.isResolved(), true, "multi-filter with resolved single filters");
+	});
+
+	//*********************************************************************************************
+[undefined, true, "noGeneratedTestFunction"].forEach((vGenerated) => {
+	QUnit.test("cloneWithValues, vGenerated: " + vGenerated, function (assert) {
+		const fnComparator = () => {};
+		const fnTest = () => {};
+		const oFilter = new Filter({
+			path: "~path~",
+			operator: "~operator~",
+			value1: "~value1~",
+			value2: "~value2~",
+			variable: "~variable~",
+			condition: new Filter("~conditionPath~", "~conditionOperator~", "~conditionValue1~"),
+			and: "~and~",
+			test: fnTest,
+			comparator: fnComparator,
+			caseSensitive: "~caseSensitive~"
+		});
+		if (vGenerated === "noGeneratedTestFunction") {
+			delete oFilter.fnTest;
+		} else {
+			oFilter.fnTest[Filter.generated] = vGenerated;
+		}
+
+		// code under test
+		const oClone = oFilter.cloneWithValues("~newValue1~", "~newValue2~");
+
+		assert.ok(oClone.isA("sap.ui.model.Filter"));
+		assert.notStrictEqual(oClone, oFilter);
+		assert.strictEqual(oClone.getPath(), oFilter.getPath());
+		assert.strictEqual(oClone.getOperator(), oFilter.getOperator());
+		assert.strictEqual(oClone.getValue1(), "~newValue1~");
+		assert.strictEqual(oClone.getValue2(), "~newValue2~");
+		assert.strictEqual(oClone.getVariable(), oFilter.getVariable());
+		assert.strictEqual(oClone.getCondition(), oFilter.getCondition(), "condition filter not cloned");
+		assert.strictEqual(oClone.isAnd(), oFilter.isAnd());
+		assert.strictEqual(oClone.getTest(), vGenerated ? undefined : fnTest);
+		assert.strictEqual(oClone.getComparator(), oFilter.getComparator());
+		assert.strictEqual(oClone.isCaseSensitive(), oFilter.isCaseSensitive());
+		assert.strictEqual(oClone._bMultiFilter, false);
+	});
+});
+
+	//*********************************************************************************************
+[[undefined, undefined], [false, true], [true, true]].forEach(([bResolved, expectedResolved], i) => {
+	QUnit.test("cloneWithValues, bResolved, " + i, function (assert) {
+		const oFilter = new Filter({
+			path: "~path~",
+			operator: "~operator~",
+			value1: "~value1~"
+		});
+		oFilter.bResolved = bResolved;
+
+		// code under test
+		const oClone = oFilter.cloneWithValues(undefined, undefined);
+
+		assert.ok(oClone.isA("sap.ui.model.Filter"));
+		assert.notStrictEqual(oClone, oFilter);
+		assert.strictEqual(oClone.getPath(), oFilter.getPath());
+		assert.strictEqual(oClone.getOperator(), oFilter.getOperator());
+		assert.strictEqual(oClone.getValue1(), undefined);
+		assert.strictEqual(oClone.getValue2(), undefined);
+		assert.strictEqual(oClone.bResolved, expectedResolved);
+	});
+});
+
+	//*********************************************************************************************
+	QUnit.test("cloneWithValues, error on multi-filter", function (assert) {
+		const oSingleFilter1 = new Filter({path : "~path", operator : "~operator", value1 : "~value1.1"});
+		const oSingleFilter2 = new Filter({path : "~path2", operator : "~operator", value1 : "~value1.2"});
+		const oMultiFilter = new Filter({filters : [oSingleFilter1, oSingleFilter2]});
+
+		// code under test
+		assert.throws(() => { oMultiFilter.cloneWithValues("v1", "v2"); }, new Error("Cannot clone multi-filter"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("cloneIfContained on single filter", function (assert) {
+		const oSingleFilter = new Filter({path : "~path~", operator : "~operator~", value1 : "~value1~"});
+		const oSingleFilterClone = new Filter({path : "~path~", operator : "~operator~", value1 : "~newValue1~"});
+
+		// code under test
+		let oFilterClone = oSingleFilter.cloneIfContained(oSingleFilter, oSingleFilterClone);
+
+		assert.strictEqual(oFilterClone, oSingleFilterClone);
+
+		const oSingleFilter2 = new Filter({path : "~path~", operator : "~operator~", value1 : "~value1~"});
+
+		// code under test
+		oFilterClone = oSingleFilter2.cloneIfContained(oSingleFilter, oSingleFilterClone);
+
+		assert.strictEqual(oFilterClone, oSingleFilter2);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("cloneIfContained on multi-filter", function (assert) {
+		const oSingleFilter1 = new Filter({path : "~path", operator : "~operator", value1 : "~value1.1"});
+		const oSingleFilter2 = new Filter({path : "~path2", operator : "~operator", value1 : "~value1.2"});
+		const oSingleFilter3 = new Filter({path : "~path3", operator : "~operator", value1 : "~value1.3"});
+		const oMultiFilter = new Filter({filters : [oSingleFilter1, oSingleFilter2, oSingleFilter1]});
+		oMultiFilter.bAnd = "~and~";
+		const oSingleFilterClone = new Filter({path : "~path~", operator : "~operator~", value1 : "~newValue1~"});
+
+		// code under test - single filter is found
+		let oFilterClone = oMultiFilter.cloneIfContained(oSingleFilter1, oSingleFilterClone);
+
+		assert.notStrictEqual(oFilterClone, oMultiFilter);
+		assert.ok(oFilterClone._bMultiFilter);
+		assert.strictEqual(oFilterClone.bAnd, "~and~");
+		let aFilters = oFilterClone.aFilters;
+		assert.notStrictEqual(aFilters, oMultiFilter.aFilters);
+		assert.strictEqual(aFilters.length, 3);
+		assert.strictEqual(aFilters[0], oSingleFilterClone);
+		assert.strictEqual(aFilters[1], oSingleFilter2);
+		assert.strictEqual(aFilters[2], oSingleFilterClone);
+
+		// code under test - single filter is not found
+		oFilterClone = oMultiFilter.cloneIfContained(oSingleFilter3, oSingleFilterClone);
+
+		assert.strictEqual(oFilterClone, oMultiFilter);
+
+		const oMultiFilter2 = new Filter({filters : [oSingleFilter2, oMultiFilter, oSingleFilter3]});
+		oMultiFilter.bAnd = "~and_1~";
+		oMultiFilter2.bAnd = "~and_2~";
+
+		// code under test - nested multi-filter, single filter is found only in nested multi-filter
+		oFilterClone = oMultiFilter2.cloneIfContained(oSingleFilter1, oSingleFilterClone);
+
+		assert.notStrictEqual(oFilterClone, oMultiFilter2);
+		assert.ok(oFilterClone._bMultiFilter);
+		assert.strictEqual(oFilterClone.bAnd, "~and_2~");
+		aFilters = oFilterClone.aFilters;
+		assert.notStrictEqual(aFilters, oMultiFilter2.aFilters);
+		assert.strictEqual(aFilters.length, 3);
+		assert.strictEqual(aFilters[0], oSingleFilter2);
+		assert.strictEqual(aFilters[2], oSingleFilter3);
+		// check nested multi-filter
+		assert.ok(aFilters[1]._bMultiFilter);
+		assert.notStrictEqual(aFilters[1], oMultiFilter);
+		assert.strictEqual(aFilters[1].bAnd, "~and_1~");
+		let aInnerFilters = aFilters[1].aFilters;
+		assert.notStrictEqual(aInnerFilters, oMultiFilter.aFilters);
+		assert.strictEqual(aInnerFilters.length, 3);
+		assert.strictEqual(aInnerFilters[0], oSingleFilterClone);
+		assert.strictEqual(aInnerFilters[1], oSingleFilter2);
+		assert.strictEqual(aInnerFilters[2], oSingleFilterClone);
+
+		const oMultiFilter3 = new Filter({filters : [oSingleFilter1, oMultiFilter, oSingleFilter2]});
+		oMultiFilter.bAnd = "~and_1.1~";
+		oMultiFilter3.bAnd = "~and_3~";
+
+		// code under test - nested multi-filter, single filter is found
+		oFilterClone = oMultiFilter3.cloneIfContained(oSingleFilter1, oSingleFilterClone);
+
+		assert.notStrictEqual(oFilterClone, oMultiFilter3);
+		assert.ok(oFilterClone._bMultiFilter);
+		assert.strictEqual(oFilterClone.bAnd, "~and_3~");
+		aFilters = oFilterClone.aFilters;
+		assert.notStrictEqual(aFilters, oMultiFilter3.aFilters);
+		assert.strictEqual(aFilters.length, 3);
+		assert.strictEqual(aFilters[0], oSingleFilterClone);
+		assert.strictEqual(aFilters[2], oSingleFilter2);
+		// check nested multi-filter
+		assert.ok(aFilters[1]._bMultiFilter);
+		assert.strictEqual(aFilters[1].bAnd, "~and_1.1~");
+		aInnerFilters = aFilters[1].aFilters;
+		assert.notStrictEqual(aInnerFilters, oMultiFilter.aFilters);
+		assert.strictEqual(aInnerFilters.length, 3);
+		assert.strictEqual(aInnerFilters[0], oSingleFilterClone);
+		assert.strictEqual(aInnerFilters[1], oSingleFilter2);
+		assert.strictEqual(aInnerFilters[2], oSingleFilterClone);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("removeAllNeutrals: single filter", function (assert) {
+		let oFilter = new Filter({path: "~path", operator: "~operator", value1: "~value1"});
+		this.mock(oFilter).expects("isNeutral").withExactArgs().returns(true);
+
+		// code under test
+		assert.strictEqual(oFilter.removeAllNeutrals(), undefined);
+
+		oFilter = new Filter({path: "~path", operator: "~operator", value1: "~value1"});
+		this.mock(oFilter).expects("isNeutral").withExactArgs().returns(false);
+
+		// code under test
+		assert.strictEqual(oFilter.removeAllNeutrals(), oFilter);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("removeAllNeutrals: multi-filter", function (assert) {
+		const oFilter0 = new Filter({path: "~path", operator: "~operator", value1: "~value1"});
+		const oFilter1 = new Filter({path: "~path", operator: "~operator", value1: "~value1"});
+		const oMultiFilter = new Filter({filters: [oFilter0, oFilter1]});
+
+		const oFilter0Mock = this.mock(oFilter0);
+		const oFilter1Mock = this.mock(oFilter1);
+		oFilter0Mock.expects("removeAllNeutrals").withExactArgs().returns(oFilter0);
+		oFilter1Mock.expects("removeAllNeutrals").withExactArgs().returns(oFilter1);
+
+		// code under test
+		assert.strictEqual(oMultiFilter.removeAllNeutrals(), oMultiFilter);
+
+		oFilter0Mock.expects("removeAllNeutrals").withExactArgs().returns(undefined);
+		oFilter1Mock.expects("removeAllNeutrals").withExactArgs().returns(undefined);
+
+		// code under test
+		assert.strictEqual(oMultiFilter.removeAllNeutrals(), undefined);
+
+		oFilter0Mock.expects("removeAllNeutrals").withExactArgs().returns(undefined);
+		oFilter1Mock.expects("removeAllNeutrals").withExactArgs().returns(oFilter1);
+
+		// code under test
+		const oResultFilter = oMultiFilter.removeAllNeutrals();
+
+		assert.strictEqual(oResultFilter.aFilters.length, 1);
+		assert.strictEqual(oResultFilter.aFilters[0], oFilter1);
+		assert.deepEqual(oResultFilter.isAnd(), oMultiFilter.isAnd());
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isNeutral", function (assert) {
+		let oFilter = new Filter({path: "~path", operator: "~operator", value1: undefined});
+
+		// code under test - oFilter.bResolved = undefined
+		assert.strictEqual(oFilter.isNeutral(), false, "constant filter is always not neutral");
+
+		oFilter = new Filter({path: "~path", operator: "~operator", value1: undefined});
+		oFilter.bResolved = true;
+
+		// code under test
+		assert.strictEqual(oFilter.isNeutral(), true, "bound filter with undefined value");
+
+		oFilter = new Filter({path: "~path", operator: "~operator", value1: null});
+		oFilter.bResolved = true;
+
+		// code under test
+		assert.strictEqual(oFilter.isNeutral(), true, "bound filter with null value");
+
+		oFilter = new Filter({path: "~path", operator: "~operator", value1: "~value"});
+		oFilter.bResolved = true;
+
+		// code under test
+		assert.strictEqual(oFilter.isNeutral(), false, "bound filter with non-nullish value");
+
+		oFilter = new Filter({path: "~path", operator: "~operator", value1: "{/path}"});
+		oFilter.bResolved = false;
+
+		// code under test
+		assert.strictEqual(oFilter.isNeutral(), true, "unresolved bound filter");
+
+		oFilter = new Filter({path: "~path", operator: "BT", value1: "~value", value2: undefined});
+		oFilter.bResolved = true;
+
+		// code under test
+		assert.strictEqual(oFilter.isNeutral(), true, "BT and value2 undefined");
+
+		oFilter = new Filter({path: "~path", operator: "NB", value1: "~value", value2: null});
+		oFilter.bResolved = true;
+
+		// code under test
+		assert.strictEqual(oFilter.isNeutral(), true, "NB and value2 null");
+
+		oFilter = new Filter({filters: [new Filter({path: "~path", operator: "~operator", value1: undefined})]});
+		assert.throws(() => {
+			// code under test
+			oFilter.isNeutral();
+		}, new Error("Multi-filter unsupported"));
 	});
 });

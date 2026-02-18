@@ -80,6 +80,10 @@ sap.ui.define([
 			oRM.class("sapMDialogStretched");
 		}
 
+		if (oDialog.getResizable() && !bStretch) {
+			oRM.class("sapMDialogResizable");
+		}
+
 		oRM.class(DialogRenderer._mStateClasses[sState]);
 
 		// No Footer
@@ -104,7 +108,8 @@ sap.ui.define([
 
 		oRM.accessibilityState(oDialog, {
 			role: sRole.toLowerCase(),
-			modal: true
+			modal: true,
+			describedby: oDialog._oAriaDescribedbyText.getText() ? oDialog._oAriaDescribedbyText.getId() : undefined
 		});
 
 		if (oSubHeader && oSubHeader.getVisible()) {
@@ -149,6 +154,10 @@ sap.ui.define([
 
 		oRM.openEnd();
 
+		if (oDialog._oAriaDescribedbyText.getText()) {
+			oRM.renderControl(oDialog._oAriaDescribedbyText);
+		}
+
 		if (Device.system.desktop) {
 			if (oDialog.getResizable() && !bStretch) {
 				DialogRenderer.renderResizeHandle(oRM);
@@ -166,6 +175,30 @@ sap.ui.define([
 				.close("span");
 		}
 
+		if (oDialog._isDraggableOrResizable()) {
+			var oRb = Library.getResourceBundleFor("sap.m");
+			let sLabel;
+			if (oDialog.getResizable() && oDialog.getDraggable()) {
+				sLabel = oRb.getText("DIALOG_DRAG_AND_RESIZE_HANDLE_ARIA_LABEL");
+			} else if (oDialog.getDraggable()) {
+				sLabel = oRb.getText("DIALOG_DRAG_HANDLE_ARIA_LABEL");
+			} else if (oDialog.getResizable()) {
+				sLabel = oRb.getText("DIALOG_RESIZE_HANDLE_ARIA_LABEL");
+			}
+
+			oRM.openStart("span", sId + "-dragAndResizeHandler")
+				.class("sapMDialogDragAndResizeHandler")
+				.attr("tabindex", "0")
+				.attr("role", "img")
+				.attr("aria-roledescription", oRb.getText("DIALOG_HANDLE_ARIA_ROLEDESCRIPTION"))
+				.attr("aria-label", sLabel)
+				.attr("aria-describedby", oDialog._oDescribedbyDragAndResizeHandleText.getId())
+				.openEnd()
+				.close("span");
+
+			oRM.renderControl(oDialog._oDescribedbyDragAndResizeHandleText);
+		}
+
 		if (oHeader || oSubHeader) {
 			oRM.openStart("header")
 				.openEnd();
@@ -176,18 +209,9 @@ sap.ui.define([
 				oRM.openStart("div", sId + "-titleGroup")
 					.class("sapMDialogTitleGroup");
 
-				if (oDialog._isDraggableOrResizable()) {
-					oRM.attr("tabindex", 0)
-						.accessibilityState(oHeader, {
-							role: "group",
-							roledescription: Library.getResourceBundleFor("sap.m").getText("DIALOG_HEADER_ARIA_ROLE_DESCRIPTION"),
-							describedby: { value: oDialog.getId() + "-ariaDescribedbyText", append: true }
-						});
-				}
 
 				oRM.openEnd()
 					.renderControl(oHeader)
-					.renderControl(oDialog._oAriaDescribedbyText)
 					.close("div");
 			}
 
@@ -267,11 +291,13 @@ sap.ui.define([
 	};
 
 	DialogRenderer.renderResizeHandle = function(oRM) {
+		var oRb = Library.getResourceBundleFor("sap.m");
+
 		oRM.openStart("div")
 			.class("sapMDialogResizeHandle")
 			.openEnd();
 
-		oRM.icon("sap-icon://resize-corner", ["sapMDialogResizeHandleIcon"], { "title": null, "aria-label": null });
+		oRM.icon("sap-icon://resize-corner", ["sapMDialogResizeHandleIcon"], { "title": oRb.getText("DIALOG_RESIZE_HANDLE_TOOLTIP"), "aria-label": null });
 
 		oRM.close("div");
 	};

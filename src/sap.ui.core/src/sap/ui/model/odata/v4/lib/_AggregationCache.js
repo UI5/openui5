@@ -2367,8 +2367,9 @@ sap.ui.define([
 	 */
 	_AggregationCache.prototype.requestNodeProperty = async function (oElement, oGroupLock,
 			bDropFilter) {
-		if (_Helper.drillDown(oElement, this.oAggregation.$NodeProperty) !== undefined) {
-			return; // already available
+		if (!this.oAggregation.$NodeProperty
+			|| _Helper.drillDown(oElement, this.oAggregation.$NodeProperty) !== undefined) {
+			return; // not applicable or already available
 		}
 
 		await this.requestProperties(oElement, [this.oAggregation.$NodeProperty], oGroupLock, true,

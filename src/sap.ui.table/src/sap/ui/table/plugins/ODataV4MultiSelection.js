@@ -366,23 +366,41 @@ sap.ui.define([
 	}
 
 	function attachToBinding(oPlugin, oBinding) {
-		const oSelectionCountBinding = oBinding.getModel().bindProperty("$selectionCount", oBinding.getHeaderContext());
-
-		oSelectionCountBinding.attachChange(() => {
-			updateHeaderSelector(oPlugin);
-		});
-		oSelectionCountBinding.initialize();
-
-		_private(oPlugin).oSelectionCountBinding = oSelectionCountBinding;
-
-		oBinding?.attachEvent("selectionChanged", clearSelectionCache, oPlugin);
+		attachToHeaderContext(oPlugin, oBinding.getHeaderContext());
+		oBinding.attachChange(onBindingChange, oPlugin);
+		oBinding.attachSelectionChanged(clearSelectionCache, oPlugin);
 	}
 
 	function detachFromBinding(oPlugin, oBinding) {
 		_private(oPlugin).oSelectionCountBinding?.destroy();
 		delete _private(oPlugin).oSelectionCountBinding;
+		oBinding?.detachChange(onBindingChange, oPlugin);
+		oBinding?.detachSelectionChanged(clearSelectionCache, oPlugin);
+	}
 
-		oBinding?.detachEvent("selectionChanged", clearSelectionCache, oPlugin);
+	function onBindingChange(oEvent) {
+		const oBinding = oEvent.getSource();
+		const oHeaderContext = oBinding.getHeaderContext();
+
+		if (oEvent.getParameter("reason") === "context" && oHeaderContext) {
+			attachToHeaderContext(this, oHeaderContext);
+		}
+	}
+
+	function attachToHeaderContext(oPlugin, oHeaderContext) {
+		const mPrivate = _private(oPlugin);
+
+		mPrivate.oSelectionCountBinding?.destroy();
+
+		if (!oHeaderContext) {
+			return;
+		}
+
+		mPrivate.oSelectionCountBinding = oHeaderContext.getModel().bindProperty("$selectionCount", oHeaderContext);
+		mPrivate.oSelectionCountBinding.attachChange(() => {
+			updateHeaderSelector(oPlugin);
+		});
+		mPrivate.oSelectionCountBinding.initialize();
 	}
 
 	function clearSelectionCache() {

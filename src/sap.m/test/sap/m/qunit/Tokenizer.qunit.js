@@ -1713,8 +1713,11 @@ sap.ui.define([
 		assert.equal(aTextArray1[2], "3)\t(/&%$)", "text separated");
 	});
 
-	QUnit.test("Copy to clipboard", async function(assert) {
+	QUnit.test("Copy to clipboard (legacy execCommand)", async function(assert) {
 		assert.expect(6);
+		// Stub window.navigator to force fallback to legacy execCommand approach (clipboard undefined)
+		var oNavigatorStub = this.stub(window, "navigator").value({clipboard: undefined});
+
 		var oAddListenerSpy = this.spy(document, "addEventListener"),
 			oExecCommandSpy = this.spy(document, "execCommand"),
 			fnCopyToClipboard = null,
@@ -1782,7 +1785,41 @@ sap.ui.define([
 		assert.strictEqual(oExecCommandSpy.getCall(0).args[0], "copy", "The command was copy");
 
 		// cleanup
-		document.removeEventListener("copy", oExecCommandSpy);
+		document.removeEventListener("copy", oNavigatorStub);
+	});
+
+	QUnit.test("Copy to clipboard (async Clipboard API)", async function(assert) {
+		// Arrange - stub window.navigator with clipboard.writeText
+		var oWriteTextStub = this.stub().resolves();
+		this.stub(window, "navigator").value({
+			clipboard: {
+				writeText: oWriteTextStub
+			}
+		});
+		this.stub(window, "isSecureContext").value(true);
+
+		var oExecCommandSpy = this.spy(document, "execCommand");
+
+		// Add tokens
+		for (var i = 0; i < 4; i++) {
+			this.tokenizer.addToken(new Token({text: "Token " + i, key: "000" + i}));
+		}
+		await nextUIUpdate();
+
+		this.tokenizer.focus();
+		this.tokenizer.selectAllTokens(true);
+
+		// Act
+		this.tokenizer._copy();
+
+		// Assert
+		assert.strictEqual(oWriteTextStub.callCount, 1, "navigator.clipboard.writeText was called once");
+		assert.strictEqual(
+			oWriteTextStub.firstCall.args[0],
+			"Token 0\r\nToken 1\r\nToken 2\r\nToken 3",
+			"Correct text was passed to writeText"
+		);
+		assert.strictEqual(oExecCommandSpy.callCount, 0, "document.execCommand was not called (async API was used instead)");
 	});
 
 	QUnit.module("useCollapsedMode", {

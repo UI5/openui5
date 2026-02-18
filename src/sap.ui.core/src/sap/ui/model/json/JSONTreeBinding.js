@@ -9,39 +9,8 @@ sap.ui.define(['sap/ui/model/ClientTreeBinding'],
 
 
 	/**
-	 * Creates a new JSONListBinding.
-	 *
-	 * This constructor should only be called by subclasses or model implementations, not by application or control code.
-	 * Such code should use {@link sap.ui.model.json.JSONModel#bindTree JSONModel#bindTree} on the corresponding model instance instead.
-	 *
-	 * @param {sap.ui.model.json.JSONModel}
-	 *         oModel Model instance that this binding is created for and that it belongs to
-	 * @param {string}
-	 *         sPath Path pointing to the tree or array that should be bound
-	 * @param {object}
-	 *         [oContext=null] Context object for this binding, mandatory when a relative binding path is given
-	 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter} [aFilters=[]]
-	 *   The filters to be used initially with type {@link sap.ui.model.FilterType.Application}; call {@link #filter} to
-	 *   replace them
-	 * @param {object}
-	 *         [mParameters=null] Additional model-specific parameters
-	 * @param {string[]} [mParameters.arrayNames]
-	 * 			Keys of arrays to be used for building the tree structure. If not specified, all arrays and objects in the bound data will be used.
-	 *			Note that for arrays nested inside differently named arrays, you need to add both to <code>arrayNames</code>. You always have to add the complete parent chain.
-	 *			If any array is ignored, its child arrays will be ignored as well even if they have been added to <code>arrayNames</code>.
-	 * @param {sap.ui.model.Sorter[]|sap.ui.model.Sorter} [aSorters=[]]
-	 *   The sorters used initially; call {@link #sort} to replace them
-	 * @throws {Error} If one of the filters uses an operator that is not supported by the underlying model
-	 *   implementation or if the {@link sap.ui.model.Filter.NONE} filter instance is contained in <code>aFilters</code>
-	 *   together with other filters
-	 *
-	 * @class
-	 * Tree binding implementation for JSON format.
-	 *
-	 * The bound data can contain JSON objects and arrays. Both will be used to build the tree structure.
-	 * You can optionally define a set of arrays to be used for the tree structure in the parameter <code>arrayNames</code>.
-	 * If this parameter is set, all other objects and arrays will be ignored.
-	 *
+	 * @class Tree binding implementation for JSON format. See {@link sap.ui.model.json.JSONModel#bindTree}
+	 * @hideconstructor
 	 * @protected
 	 * @alias sap.ui.model.json.JSONTreeBinding
 	 * @extends sap.ui.model.ClientTreeBinding

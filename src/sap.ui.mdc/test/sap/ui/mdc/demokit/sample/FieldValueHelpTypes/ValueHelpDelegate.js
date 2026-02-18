@@ -18,7 +18,16 @@ sap.ui.define([
 		const aContent = oContainer.getContent();
 		const oContent = aContent[0];
 
-		if (!oContent || !oContent.isA("sap.ui.mdc.valuehelp.content.MTable") || oContent.getTable()) {
+		if (!oContent?.isA("sap.ui.mdc.valuehelp.content.MTable") || oContent.getTable()) {
+			return Promise.resolve();
+		}
+
+		const oField = oValueHelp.getControl();
+		const oDomRef = oField?.getDomRef();
+		const oTable = oContent.getTable();
+
+		if (oTable && oDomRef) {
+			oTable.setWidth(oDomRef.clientWidth + "px");
 			return Promise.resolve();
 		}
 
@@ -26,24 +35,26 @@ sap.ui.define([
 			sap.ui.require(["sap/m/library", "sap/m/Table", "sap/m/Column", "sap/m/ColumnListItem", "sap/m/Label", "sap/m/Text", "sap/ui/model/type/String"], function() {
 				const [library, Table, Column, ColumnListItem, Label, Text, StringType] = Array.from(arguments);
 				const { ListMode } = library;
-				const oTable = new Table(oContainer.getId() + "-Table", {
-					width: oContainer.isTypeahead() ? "13rem" : "100%",
-					mode: oContainer.isTypeahead() ? ListMode.SingleSelectMaster : ListMode.SingleSelectLeft,
+				const bTypeahead = oContainer.isTypeahead();
+				const sId = oContainer.getId() + "-Table";
+				const oTable = new Table(sId, {
+					width: bTypeahead ? oDomRef.clientWidth + "px" : "100%",
+					mode: ListMode.SingleSelectMaster,
 					columns: [
-						new Column({
+						new Column( sId + "-col0", {
 							width: "3rem",
-							header: new Label({text: "ID"})
+							header: new Label(sId + "-col0-header", {text: "ID"})
 						}),
-						new Column({
+						new Column( sId + "-col1", {
 							width: "10rem",
-							header: new Label({text: "Name"})
+							header: new Label(sId + "-col1-header", {text: "Name"})
 						})
 					],
-					items: {path: "data>/countries", template: new ColumnListItem({
+					items: {path: "data>/countries", template: new ColumnListItem(sId + "-item", {
 						type: "Active",
 						cells: [
-							new Text({text: {path: 'data>key', type: new StringType({}, {maxLength: 2})}}),
-							new Text({text: {path: 'data>name', type: new StringType()}})
+							new Text(sId + "-item-key", {text: {path: 'data>key', type: new StringType({}, {maxLength: 2})}}),
+							new Text(sId + "-item-name", {text: {path: 'data>name', type: new StringType()}})
 						]
 					})}
 				});

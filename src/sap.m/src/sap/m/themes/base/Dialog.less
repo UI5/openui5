@@ -21,6 +21,8 @@
 @_sap_m_Dialog_HeaderFocusBorderTopOffset: 2px;
 @_sap_m_Dialog_HeaderFocusBorderLeftOffset: 2px;
 @_sap_m_Dialog_HeaderFocusBorderRightOffset: 2px;
+@_sap_m_Dialog_FocusOutlineOffset: 0.0625rem;
+@_sap_m_Dialog_ResizableBottomRightRadius: 1.75rem;
 
 .sapMDialog,
 .sapMMessageDialog .sapMDialogScrollCont,
@@ -375,19 +377,20 @@ html.sap-desktop .sapMDialog {
 		top: 0;
 	}
 
-	.sapMDialogTitleGroup:focus {
-		outline: none;
+	&:has(.sapMDialogDragAndResizeHandler:focus) {
 
-		&::after {
+		&::before {
 			content: '';
 			position: absolute;
-			left: @_sap_m_Dialog_HeaderFocusBorderLeftOffset;
-			bottom: @_sap_m_Dialog_HeaderFocusBorderBottomOffset;
-			right: @_sap_m_Dialog_HeaderFocusBorderRightOffset;
-			top: @_sap_m_Dialog_HeaderFocusBorderTopOffset;
+			inset: @_sap_m_Dialog_FocusOutlineOffset;
 			border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
-			border-radius: @_sap_m_Dialog_HeaderFocusBorderRadius @_sap_m_Dialog_HeaderFocusBorderRadius 0 0;
+			border-radius: var(--sapElement_BorderCornerRadius);
 			pointer-events: none;
+			z-index: 5; // CodeEditor is 4
+		}
+
+		&.sapMDialogResizable::before {
+			border-radius: var(--sapElement_BorderCornerRadius) var(--sapElement_BorderCornerRadius) @_sap_m_Dialog_ResizableBottomRightRadius var(--sapElement_BorderCornerRadius);
 		}
 	}
 

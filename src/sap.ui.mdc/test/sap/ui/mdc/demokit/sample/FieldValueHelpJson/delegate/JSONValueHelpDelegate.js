@@ -1,5 +1,5 @@
 sap.ui.define([
-	"sap/ui/mdc/ValueHelpDelegate",
+	"./SearchValueHelpDelegate",
 	"sap/ui/mdc/p13n/StateUtil",
 	"sap/ui/mdc/condition/Condition",
 	"sap/ui/mdc/enums/ConditionValidated"
@@ -18,7 +18,7 @@ sap.ui.define([
 		const oConditionPayload = {};
 		oConditionPayload[sIdentifier] = [];
 
-		if (oContent.sId.endsWith("locationTypeAhead")) {
+		if (oContent.getId().endsWith("locationTypeAhead")) {
 			if (oContext) {
 				oConditionPayload[sIdentifier].push({
 					countryId: oContext.getProperty("countryId")
@@ -34,7 +34,7 @@ sap.ui.define([
 			return;
 		}
 
-		const oFilterField = oValueHelp.getParent();
+		const oFilterField = oValueHelp.getControl();
 		const oFilterBar = oFilterField.getParent();
 
 		// find all conditions carrying country information
@@ -71,6 +71,18 @@ sap.ui.define([
 				}
 			});
 		}
+	};
+
+	JSONValueHelpDelegate.getFilterConditions = function (oValueHelp, oContent, oConfig) {
+		const oFilterBar = oValueHelp.getControl().getParent();
+		const oConditions = oFilterBar.getConditions();
+		const oFilterConditions = {};
+
+		if (oConditions["buildingCountry"]) {
+			oFilterConditions["countryId"] = oConditions["buildingCountry"];
+		}
+
+		return oFilterConditions;
 	};
 
 	return JSONValueHelpDelegate;

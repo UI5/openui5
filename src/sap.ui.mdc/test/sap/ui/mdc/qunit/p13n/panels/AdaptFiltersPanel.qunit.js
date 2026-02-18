@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/ui/base/Event",
 	"sap/m/Text",
 	"sap/m/List",
+	"sap/ui/core/Item",
 	"sap/m/SegmentedButtonItem",
 	"sap/ui/mdc/util/PropertyHelper",
 	"sap/m/VBox",
@@ -16,7 +17,7 @@ sap.ui.define([
 	"sap/m/Input",
 	"sap/ui/mdc/FilterField",
 	"sap/ui/mdc/filterbar/p13n/FilterGroupLayout"
-], function(AdaptFiltersPanel, P13nBuilder, JSONModel, CustomListItem, Toolbar, Event, Text, List, SegmentedButtonItem, PropertyHelper, VBox, nextUIUpdate, Filter, Input, FilterField, FilterGroupLayout) {
+], function(AdaptFiltersPanel, P13nBuilder, JSONModel, CustomListItem, Toolbar, Event, Text, List, Item, SegmentedButtonItem, PropertyHelper, VBox, nextUIUpdate, Filter, Input, FilterField, FilterGroupLayout) {
 	"use strict";
 
 	const aInfoData = [
@@ -118,6 +119,15 @@ sMode.forEach(function(sModeName) {
 			return oCustomListItem.getContent()[0].getContent()[1];
 		}
 		return oCustomListItem.getContent()[1];
+	}
+
+	// Helper function to create view items based on mode
+	// Modern mode uses sap.ui.core.Item, Legacy mode uses sap.m.SegmentedButtonItem
+	function createViewItem(mSettings) {
+		if (sModeName === "Modern") {
+			return new Item(mSettings);
+		}
+		return new SegmentedButtonItem(mSettings);
 	}
 
 	QUnit.module(`${sModeName} - API Tests`, {
@@ -348,90 +358,285 @@ sMode.forEach(function(sModeName) {
 
 	});
 
-	QUnit.test("Check 'addCustomView'", function(assert){
+	QUnit.module(`${sModeName} - addCustomView Tests`, {
+		beforeEach: async function() {
+			if (sModeName === "Modern") {
+				this.fnNewUIStub = sinon.stub(AdaptFiltersPanel.prototype, "_checkIsNewUI").returns(true);
+			}
 
-		//add a custom view
-		this.oAFPanel.addCustomView({
-			item: new SegmentedButtonItem({
-				key: "test",
-				icon: "sap-icon://bar-chart"
-			}),
-			content: new List("myCustomList1",{})
-		});
+			this.sDefaultGroup = "BASIC";
+			this.aMockInfo = aInfoData;
+			if (sModeName === "Legacy") {
+				this.oAFPanel = new AdaptFiltersPanel({
+					defaultView: "group",
+					footer: new Toolbar("ID_TB_CUSTOM", {}),
+					useNewUI: false
+				});
+			} else {
+				this.oAFPanel = new AdaptFiltersPanel({
+					defaultView: "group",
+					footer: new Toolbar("ID_TB_CUSTOM", {})
+				});
+			}
 
-		//Check that the UI has been enhanced
-		assert.equal(this.oAFPanel.getViews().length, 3, "A custom view has been added");
-		assert.equal(this.oAFPanel._getViewSwitch().getItems().length, 3, "The item has been set on the view switch control");
+			this.oAFPanel.setItemFactory(function() {
+				let oControl = new VBox();
+				if (sModeName === "Modern") {
+					const oFilterField = new FilterField();
+					if (!oFilterField.getConditions) {
+						oFilterField.getConditions = function() {
+							return [];
+						};
+					}
+					const oFilterGroupLayout = new FilterGroupLayout();
+					oFilterGroupLayout.setFilterField(oFilterField);
+					oControl = oFilterGroupLayout;
+				}
+				return oControl;
+			});
+
+			this.fnEnhancer = function(mItem, oProperty) {
+				if (oProperty.name == "key2") {
+					mItem.active = true;
+				}
+				if (oProperty.name == "key5") {
+					mItem.required = true;
+				}
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.name) > -1;
+				return true;
+			};
+
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			if (sModeName === "Modern") {
+				this.fnNewUIStub.restore();
+			}
+			this.sDefaultGroup = null;
+			this.oP13nData = null;
+			this.aMockInfo = null;
+			this.oAFPanel.destroy();
+		}
 	});
 
-	QUnit.test("Check 'addCustomView' can be used via 'switchView'", async function(assert){
-
-		//add a custom view
+	QUnit.test("addCustomView registers a new view correctly", function(assert) {
+		// Arrange & Act
 		this.oAFPanel.addCustomView({
-			item: new SegmentedButtonItem({
-				key: "test",
-				icon: "sap-icon://bar-chart"
+			item: createViewItem({
+				key: "customChart"
 			}),
-			content: new List("myCustomList2",{})
+			content: new List("myCustomList1", {})
+		});
+
+		// Assert
+		assert.equal(this.oAFPanel.getViews().length, 3, "A custom view has been added to the views aggregation");
+		assert.equal(this.oAFPanel._getViewSwitch().getItems().length, 3, "The item has been added to the view switch control");
+	});
+
+	QUnit.test("addCustomView registers multiple custom views", function(assert) {
+		// Arrange & Act
+		this.oAFPanel.addCustomView({
+			item: createViewItem({
+				key: "chart"
+			}),
+			content: new List("customChartList", {})
+		});
+
+		this.oAFPanel.addCustomView({
+			item: createViewItem({
+				key: "tree"
+			}),
+			content: new List("customTreeList", {})
+		});
+
+		// Assert
+		assert.equal(this.oAFPanel.getViews().length, 4, "Two custom views have been added");
+		assert.equal(this.oAFPanel._getViewSwitch().getItems().length, 4, "Both items have been added to the view switch control");
+	});
+
+	QUnit.test("addCustomView allows navigation via switchView", async function(assert) {
+		// Arrange
+		this.oAFPanel.addCustomView({
+			item: createViewItem({
+				key: "customView"
+			}),
+			content: new List("myCustomList2", {})
 		});
 		await nextUIUpdate();
 
-		this.oAFPanel.switchView("test");
+		// Act
+		this.oAFPanel.switchView("customView");
 
-		assert.equal(this.oAFPanel.getCurrentViewKey(), "test", "Correct view has been selected");
-
-		assert.equal(this.oAFPanel._getViewSwitch().getSelectedKey(), "test", "Correct item has been selected in the SegmentedButton");
+		// Assert
+		assert.equal(this.oAFPanel.getCurrentViewKey(), "customView", "The custom view has been selected");
+		assert.equal(this.oAFPanel._getViewSwitch().getSelectedKey(), "customView", "The view switch control reflects the selection");
 	});
 
-	QUnit.test("Check 'addCustomView' view switch callback execution", async function(assert){
+	QUnit.test("addCustomView executes selectionChange callback on view switch", async function(assert) {
+		// Arrange
 		const done = assert.async();
-		const oItem = new SegmentedButtonItem({
-			key: "test",
-			icon: "sap-icon://bar-chart"
+		const oItem = createViewItem({
+			key: "callbackView"
 		});
 
-		//add a custom view
 		this.oAFPanel.addCustomView({
 			item: oItem,
-			content: new List("myCustomList3",{}),
-			selectionChange: function(sKey){
-				assert.equal(sKey, "test", "Callback executed with key");
+			content: new List("myCustomList3", {}),
+			selectionChange: function(sKey) {
+				// Assert
+				assert.equal(sKey, "callbackView", "selectionChange callback received the correct key");
 				done();
 			}
 		});
 		await nextUIUpdate();
 
+		// Act
 		const sSelectionChangeEvent = sModeName === "Modern" ? "select" : "selectionChange";
 		this.oAFPanel._getViewSwitch().fireEvent(sSelectionChangeEvent, {
 			item: oItem
 		});
-
 	});
 
-
-	QUnit.test("Check 'addCustomView' error if no key is provided", function(assert){
+	QUnit.test("addCustomView throws error when no key is provided", function(assert) {
+		// Arrange & Act & Assert
+		const sExpectedErrorMessage = sModeName === "Modern"
+			? "Please provide an item of type sap.ui.core.Item with a key to be used in the view switch"
+			: "Please provide an item of type sap.m.SegmentedButtonItem with a key to be used in the view switch";
 
 		assert.throws(
-			function () {
+			function() {
 				this.oAFPanel.addCustomView({
-					item: new SegmentedButtonItem({
-						icon: "sap-icon://bar-chart"
-					}),
+					item: createViewItem({}),
 					content: new List({}),
-					selectionChange: function(sKey){
-					}
+					selectionChange: function() {}
 				});
-			},
-			function (oError) {
+			}.bind(this),
+			function(oError) {
 				return (
 					oError instanceof Error &&
-					oError.message ===
-						"Please provide an item of type sap.m.SegmentedButtonItem with a key"
+					oError.message === sExpectedErrorMessage
 				);
 			},
-			"An error should be thrown if no item is provided or if the key is missing"
+			"Error is thrown when Item has no key"
 		);
+	});
 
+	QUnit.test("addCustomView applies styling to content", function(assert) {
+		// Arrange
+		const oContent = new List("styledCustomList", {});
+
+		// Act
+		this.oAFPanel.addCustomView({
+			item: createViewItem({
+				key: "styledView"
+			}),
+			content: oContent
+		});
+
+		// Assert
+		assert.ok(oContent.hasStyleClass("sapUiMDCPanelPadding"), "The content has the correct style class applied");
+	});
+
+	QUnit.test("addCustomView content is displayed when view is selected", async function(assert) {
+		// Arrange
+		const oCustomContent = new List("visibleCustomList", {});
+
+		this.oAFPanel.addCustomView({
+			item: createViewItem({
+				key: "visibleView"
+			}),
+			content: oCustomContent
+		});
+		await nextUIUpdate();
+
+		// Act
+		this.oAFPanel.switchView("visibleView");
+		await nextUIUpdate();
+
+		// Assert
+		const oCurrentContent = this.oAFPanel.getCurrentViewContent();
+		assert.strictEqual(oCurrentContent, oCustomContent, "The custom content is the current view content");
+	});
+
+	QUnit.test("addCustomView preserves enabled state from Item", async function(assert) {
+		// Arrange
+		const oItem = createViewItem({
+			key: "disabledView",
+			enabled: false
+		});
+
+		// Act
+		this.oAFPanel.addCustomView({
+			item: oItem,
+			content: new List("disabledViewList", {})
+		});
+		await nextUIUpdate();
+
+		// Assert
+		const oViewSwitch = this.oAFPanel._getViewSwitch();
+		const oAddedItem = oViewSwitch.getItems().find((item) => item.getKey() === "disabledView");
+		assert.ok(oAddedItem, "The item was added to the view switch");
+		assert.strictEqual(oAddedItem.getEnabled(), false, "The enabled state is preserved");
+	});
+
+	QUnit.test("addCustomView with text property", async function(assert) {
+		// Arrange
+		const oItem = createViewItem({
+			key: "textView",
+			text: "Custom Text"
+		});
+
+		// Act
+		this.oAFPanel.addCustomView({
+			item: oItem,
+			content: new List("textViewList", {})
+		});
+		await nextUIUpdate();
+
+		// Assert
+		const oViewSwitch = this.oAFPanel._getViewSwitch();
+		const oAddedItem = oViewSwitch.getItems().find((item) => item.getKey() === "textView");
+		assert.ok(oAddedItem, "The item was added to the view switch");
+
+		if (sModeName === "Modern") {
+			assert.strictEqual(oAddedItem.getText(), "Custom Text", "The text is preserved in IconTabFilter");
+		} else {
+			assert.strictEqual(oAddedItem.getText(), "Custom Text", "The text is preserved in Item");
+		}
+	});
+
+	QUnit.test("addCustomView switching back to default views works", async function(assert) {
+		// Arrange
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.addCustomView({
+			item: createViewItem({
+				key: "customView"
+			}),
+			content: new List("switchBackList", {})
+		});
+		await nextUIUpdate();
+
+		// Act - switch to custom view
+		this.oAFPanel.switchView("customView");
+		await nextUIUpdate();
+		assert.equal(this.oAFPanel.getCurrentViewKey(), "customView", "Custom view is selected");
+
+		// Act - switch back to group view
+		this.oAFPanel.switchView("group");
+		await nextUIUpdate();
+
+		// Assert
+		assert.equal(this.oAFPanel.getCurrentViewKey(), "group", "Can switch back to group view");
+
+		// Act - switch to list view
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		// Assert
+		assert.equal(this.oAFPanel.getCurrentViewKey(), "list", "Can switch to list view");
 	});
 
 	QUnit.test("Check 'restoreDefaults' to reset to initial values", async function(assert){
@@ -805,89 +1010,232 @@ if (sModeName === "Legacy") {
 
 	});
 
-	// Search field is not part of the "global" content anymore, specific to the view
-	QUnit.test("Check 'addCustomView' search callback execution", function(assert){
+	QUnit.module(`${sModeName} - Legacy addCustomView Callbacks`, {
+		beforeEach: async function() {
+			this.sDefaultGroup = "BASIC";
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel({
+				defaultView: "group",
+				footer: new Toolbar("ID_TB_LEGACY_CB", {}),
+				useNewUI: false
+			});
+
+			this.oAFPanel.setItemFactory(function() {
+				return new VBox();
+			});
+
+			this.fnEnhancer = function(mItem, oProperty) {
+				if (oProperty.name == "key2") {
+					mItem.active = true;
+				}
+				if (oProperty.name == "key5") {
+					mItem.required = true;
+				}
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.name) > -1;
+				return true;
+			};
+
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.sDefaultGroup = null;
+			this.oP13nData = null;
+			this.aMockInfo = null;
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("addCustomView search callback is executed on liveChange", function(assert) {
+		// Arrange
 		const done = assert.async();
 
-		//add a custom view
 		this.oAFPanel.addCustomView({
-			item: new SegmentedButtonItem({
-				key: "test",
-				icon: "sap-icon://bar-chart"
+			item: createViewItem({
+				key: "searchView"
 			}),
-			content: new List("myCustomList",{}),
-			search: function(sValue){
-				assert.equal(sValue, "Test", "Callback executed with searched String");
+			content: new List("searchCallbackList", {}),
+			search: function(sValue) {
+				// Assert
+				assert.equal(sValue, "SearchValue", "Search callback received the correct search string");
 				done();
 			}
 		});
 
-		this.oAFPanel.switchView("test");
-
-		this.oAFPanel._getSearchField().setValue("Test");
+		// Act
+		this.oAFPanel.switchView("searchView");
+		this.oAFPanel._getSearchField().setValue("SearchValue");
 		this.oAFPanel._getSearchField().fireLiveChange();
 	});
 
-	// Quick Filter option does not exist anymore
-	QUnit.test("Check 'addCustomView' filterChange callback execution", async function(assert){
-		const done = assert.async(2);
+	QUnit.test("addCustomView search callback only fires when custom view is active", async function(assert) {
+		// Arrange
+		let iSearchCallCount = 0;
 
-		let iCount = 0;
-
-		//add a custom view
 		this.oAFPanel.addCustomView({
-			item: new SegmentedButtonItem({
-				key: "test",
-				icon: "sap-icon://bar-chart"
+			item: createViewItem({
+				key: "conditionalSearchView"
 			}),
-			content: new List("myCustomList",{}),
-			filterSelect: function(sValue){
-				if (iCount == 1) {
-					assert.equal(sValue, "all", "Callback executed with 'all' key");
-				}
-				if (iCount == 2) {
-					assert.equal(sValue, "visible", "Callback executed with 'visible' key");
-				}
-				iCount++;
+			content: new List("conditionalSearchList", {}),
+			search: function() {
+				iSearchCallCount++;
+			}
+		});
+		await nextUIUpdate();
+
+		// Act - search while on default view (not custom view)
+		this.oAFPanel._getSearchField().setValue("Test");
+		this.oAFPanel._getSearchField().fireLiveChange();
+
+		// Assert
+		assert.equal(iSearchCallCount, 0, "Search callback is not executed when custom view is not active");
+
+		// Act - switch to custom view and search
+		this.oAFPanel.switchView("conditionalSearchView");
+		this.oAFPanel._getSearchField().fireLiveChange();
+
+		// Assert
+		assert.equal(iSearchCallCount, 1, "Search callback is executed when custom view is active");
+	});
+
+	QUnit.test("addCustomView filterSelect callback is executed on QuickFilter change", async function(assert) {
+		// Arrange
+		const done = assert.async();
+
+		this.oAFPanel.addCustomView({
+			item: createViewItem({
+				key: "filterView"
+			}),
+			content: new List("filterSelectList", {}),
+			filterSelect: function(sValue) {
+				// Assert
+				assert.ok(sValue, "filterSelect callback received a value");
 				done();
 			}
 		});
-
 		await nextUIUpdate();
 
-		//Switch to custom view
-		this.oAFPanel.switchView("test");
-
-		//Trigger a Select event (with 'all')
-		this.oAFPanel._getQuickFilter().fireChange({
-			selectedItem: this.oAFPanel._getQuickFilter().getItems()[0]
-		});
-
-		//Trigger a Select event (with 'visible')
+		// Act
+		this.oAFPanel.switchView("filterView");
 		this.oAFPanel._getQuickFilter().fireChange({
 			selectedItem: this.oAFPanel._getQuickFilter().getItems()[0]
 		});
 	});
 
-	QUnit.test("Check 'addCustomView' searchcallback on view switch execution", function (assert) {
-		const done = assert.async();
-		const oItem = new SegmentedButtonItem({
-			key: "test",
-			icon: "sap-icon://bar-chart"
+	QUnit.test("addCustomView filterSelect callback only fires when custom view is active", async function(assert) {
+		// Arrange
+		let iFilterSelectCallCount = 0;
+
+		this.oAFPanel.addCustomView({
+			item: createViewItem({
+				key: "conditionalFilterView"
+			}),
+			content: new List("conditionalFilterList", {}),
+			filterSelect: function() {
+				iFilterSelectCallCount++;
+			}
 		});
-		//add a custom view
+		await nextUIUpdate();
+
+		// Act - change filter while on default view
+		this.oAFPanel._getQuickFilter().fireChange({
+			selectedItem: this.oAFPanel._getQuickFilter().getItems()[0]
+		});
+
+		// Assert
+		assert.equal(iFilterSelectCallCount, 0, "filterSelect callback is not executed when custom view is not active");
+
+		// Act - switch to custom view and change filter
+		this.oAFPanel.switchView("conditionalFilterView");
+		this.oAFPanel._getQuickFilter().fireChange({
+			selectedItem: this.oAFPanel._getQuickFilter().getItems()[0]
+		});
+
+		// Assert
+		assert.equal(iFilterSelectCallCount, 1, "filterSelect callback is executed when custom view is active");
+	});
+
+	QUnit.test("addCustomView search callback is executed on view switch with existing search value", function(assert) {
+		// Arrange
+		const done = assert.async();
+		const oItem = createViewItem({
+			key: "switchSearchView"
+		});
+
 		this.oAFPanel.addCustomView({
 			item: oItem,
-			content: new List("myCustomList4", {}),
-			search: function (sSearch) {
-				assert.equal(sSearch, "Test", "Callback executed with key");
+			content: new List("switchSearchList", {}),
+			search: function(sSearch) {
+				// Assert
+				assert.equal(sSearch, "ExistingSearch", "Search callback received the existing search value on view switch");
 				done();
 			}
 		});
-		this.oAFPanel._getSearchField().setValue("Test");
+
+		// Act - set search value before switching
+		this.oAFPanel._getSearchField().setValue("ExistingSearch");
 		this.oAFPanel._getViewSwitch().fireSelectionChange({
 			item: oItem
 		});
+	});
+
+	QUnit.test("addCustomView filterSelect callback is executed on view switch", async function(assert) {
+		// Arrange
+		const done = assert.async();
+		const oItem = createViewItem({
+			key: "switchFilterView"
+		});
+
+		this.oAFPanel.addCustomView({
+			item: oItem,
+			content: new List("switchFilterList", {}),
+			filterSelect: function(sValue) {
+				// Assert
+				assert.ok(sValue, "filterSelect callback received a value on view switch");
+				done();
+			}
+		});
+		await nextUIUpdate();
+
+		// Act
+		this.oAFPanel._getViewSwitch().fireSelectionChange({
+			item: oItem
+		});
+	});
+
+	QUnit.test("addCustomView with all callbacks combined", async function(assert) {
+		// Arrange
+		const aCallbacksCalled = [];
+		const oItem = createViewItem({
+			key: "allCallbacksView"
+		});
+
+		this.oAFPanel.addCustomView({
+			item: oItem,
+			content: new List("allCallbacksList", {}),
+			selectionChange: function(sKey) {
+				aCallbacksCalled.push("selectionChange:" + sKey);
+			},
+			search: function(sValue) {
+				aCallbacksCalled.push("search:" + sValue);
+			},
+			filterSelect: function(sValue) {
+				aCallbacksCalled.push("filterSelect:" + sValue);
+			}
+		});
+		await nextUIUpdate();
+
+		// Act - trigger view switch
+		this.oAFPanel._getViewSwitch().fireSelectionChange({
+			item: oItem
+		});
+
+		// Assert
+		assert.ok(aCallbacksCalled.includes("selectionChange:allCallbacksView"), "selectionChange callback was executed");
+		assert.ok(aCallbacksCalled.some((s) => s.startsWith("search:")), "search callback was executed on view switch");
+		assert.ok(aCallbacksCalled.some((s) => s.startsWith("filterSelect:")), "filterSelect callback was executed on view switch");
 	});
 
 	QUnit.test("Check filter field visibility when switching views", async function(assert) {
@@ -1225,6 +1573,156 @@ if (sModeName === "Modern") {
 		// Assert:
 		assert.ok(aEnhancedData, "Enhanced data is returned");
 		assert.equal(aEnhancedData.length, 2, "All items are present");
+	});
+
+	QUnit.module(`${sModeName} - Modern addCustomView Specific Tests`, {
+		beforeEach: async function() {
+			this.fnNewUIStub = sinon.stub(AdaptFiltersPanel.prototype, "_checkIsNewUI").returns(true);
+
+			this.sDefaultGroup = "BASIC";
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel({
+				defaultView: "group",
+				footer: new Toolbar("ID_TB_MODERN_CUSTOM", {})
+			});
+
+			this.oAFPanel.setItemFactory(function() {
+				const oFilterField = new FilterField();
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout();
+				oFilterGroupLayout.setFilterField(oFilterField);
+				return oFilterGroupLayout;
+			});
+
+			this.fnEnhancer = function(mItem, oProperty) {
+				if (oProperty.name == "key2") {
+					mItem.active = true;
+				}
+				if (oProperty.name == "key5") {
+					mItem.required = true;
+				}
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.name) > -1;
+				return true;
+			};
+
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.fnNewUIStub.restore();
+			this.sDefaultGroup = null;
+			this.oP13nData = null;
+			this.aMockInfo = null;
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("addCustomView creates IconTabFilter instead of Item", async function(assert) {
+		// Arrange & Act
+		this.oAFPanel.addCustomView({
+			item: new Item({
+				key: "iconTabView",
+				text: "Chart"
+			}),
+			content: new List("iconTabViewList", {})
+		});
+		await nextUIUpdate();
+
+		// Assert
+		const oViewSwitch = this.oAFPanel._getViewSwitch();
+		assert.ok(oViewSwitch.isA("sap.m.IconTabBar"), "View switch is an IconTabBar in Modern mode");
+
+		const oAddedItem = oViewSwitch.getItems().find((item) => item.getKey() === "iconTabView");
+		assert.ok(oAddedItem, "The custom view item was added");
+		assert.ok(oAddedItem.isA("sap.m.IconTabFilter"), "The item is an IconTabFilter");
+		assert.equal(oAddedItem.getText(), "Chart", "The text property is preserved");
+	});
+
+	QUnit.test("addCustomView search and filterSelect callbacks are ignored in Modern mode", async function(assert) {
+		// Arrange
+		let bSearchCalled = false;
+		let bFilterSelectCalled = false;
+
+		this.oAFPanel.addCustomView({
+			item: new Item({
+				key: "ignoredCallbacks"
+			}),
+			content: new List("ignoredCallbacksList", {}),
+			search: function() {
+				bSearchCalled = true;
+			},
+			filterSelect: function() {
+				bFilterSelectCalled = true;
+			}
+		});
+		await nextUIUpdate();
+
+		// Act - switch to custom view
+		this.oAFPanel.switchView("ignoredCallbacks");
+		await nextUIUpdate();
+
+		// Assert - search and filterSelect should not have hooks in Modern mode
+		// The implementation sets them to undefined, so they won't be attached
+		assert.notOk(bSearchCalled, "Search callback was not called (not supported in Modern mode)");
+		assert.notOk(bFilterSelectCalled, "filterSelect callback was not called (not supported in Modern mode)");
+	});
+
+	QUnit.test("addCustomView selectionChange callback works in Modern mode", async function(assert) {
+		// Arrange
+		const done = assert.async();
+		const oItem = new Item({
+			key: "modernCallback"
+		});
+
+		this.oAFPanel.addCustomView({
+			item: oItem,
+			content: new List("modernCallbackList", {}),
+			selectionChange: function(sKey) {
+				// Assert
+				assert.equal(sKey, "modernCallback", "selectionChange callback receives correct key in Modern mode");
+				done();
+			}
+		});
+		await nextUIUpdate();
+
+		// Act - use 'select' event for Modern mode
+		const oViewSwitch = this.oAFPanel._getViewSwitch();
+		const oIconTabItem = oViewSwitch.getItems().find((item) => item.getKey() === "modernCallback");
+		oViewSwitch.fireEvent("select", {
+			item: oIconTabItem
+		});
+	});
+
+	QUnit.test("addCustomView enabled binding is cloned to IconTabFilter", async function(assert) {
+		// Arrange
+		const oModel = new JSONModel({ isEnabled: false });
+		const oItem = new Item({
+			key: "boundEnabledView"
+		});
+		oItem.setModel(oModel);
+		oItem.bindProperty("enabled", { path: "/isEnabled" });
+
+		// Act
+		this.oAFPanel.addCustomView({
+			item: oItem,
+			content: new List("boundEnabledList", {})
+		});
+		await nextUIUpdate();
+
+		// Assert
+		const oViewSwitch = this.oAFPanel._getViewSwitch();
+		const oIconTabItem = oViewSwitch.getItems().find((item) => item.getKey() === "boundEnabledView");
+		assert.ok(oIconTabItem, "The IconTabFilter was created");
+
+		// The binding info should be cloned
+		const oBindingInfo = oIconTabItem.getBindingInfo("enabled");
+		assert.ok(oBindingInfo, "The enabled binding was cloned to IconTabFilter");
 	});
 }
 

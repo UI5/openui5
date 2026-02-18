@@ -5,7 +5,6 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/model/json/JSONModel",
 	"sap/m/p13n/QueryPanel",
-	"sap/m/IconTabFilter",
 	"sap/ui/core/Icon",
 	"sap/ui/model/Sorter",
 	"sap/m/OverflowToolbar",
@@ -13,7 +12,6 @@ sap.ui.define([
 	"sap/m/Title",
 	"sap/m/Label",
 	"sap/m/HBox",
-	"sap/m/VBox",
 	"sap/ui/model/Filter",
 	"sap/ui/core/ListItem",
 	"sap/m/ComboBox",
@@ -26,13 +24,12 @@ sap.ui.define([
 	"sap/m/SegmentedButtonItem",
 	"sap/ui/core/library",
 	"sap/m/table/Util",
-	"sap/ui/core/CustomData",
 	"sap/m/Button",
 	"sap/m/ToggleButton",
 	"sap/ui/core/InvisibleText",
 	"sap/ui/Device",
 	"sap/ui/layout/VerticalLayout"
-], (Library, JSONModel, QueryPanel, IconTabFilter, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, VBox, Filter, Item, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, CustomData, Button, ToggleButton, InvisibleText, Device, VerticalLayout) => {
+], (Library, JSONModel, QueryPanel, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, Filter, Item, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, Button, ToggleButton, InvisibleText, Device, VerticalLayout) => {
 	"use strict";
 
 	const { ValueState } = coreLib;
@@ -103,40 +100,6 @@ sap.ui.define([
 
 	AdaptFiltersPanelContent.prototype.getP13nModel = function() {
 		return this.getModel(this.P13N_MODEL);
-	};
-
-	/**
-	 * Adds custom content to the <code>sap.ui.mdc.p13n.panels.GroupPanelBase</code>
-	 *
-	 * @param {object} mViewSettings the setting for the cutom view
-	 * @param {sap.m.SegmentedButtonItem} mViewSettings.item the custom button used in the view switch
-	 * @param {sap.ui.core.Control} mViewSettings.content the content displayed in the custom view
-	 * @param {function} [mViewSettings.filterSelect] callback triggered by the combobox in the header area - executed with the selected key as paramter
-	 * @param {function} [mViewSettings.search] callback triggered by search - executed with the string as parameter
-	 * @param {function} [mViewSettings.selectionChange] callback triggered by selecting a view - executed with the key as parameter
-	 *
-	 */
-	AdaptFiltersPanelContent.prototype.addCustomView = function(mViewSettings) {
-		const { item: oItem } = mViewSettings;
-		const sKey = oItem.getKey();
-
-		if (!sKey) {
-			throw new Error("Please provide an item of type sap.m.SegmentedButtonItem with a key");
-		}
-
-		this._oPanelHeader.addItem(new IconTabFilter({
-			key: sKey,
-			text: oItem.getText()
-		}));
-
-		this.getAggregation("_content").addItem(new VBox({
-			items: [mViewSettings.content],
-			visible: false,
-			customData: new CustomData({
-				key: "customView",
-				value: sKey
-			})
-		}));
 	};
 
 	AdaptFiltersPanelContent.prototype.getSelectedFields = function() {
@@ -1119,12 +1082,10 @@ sap.ui.define([
 		QueryPanel.prototype.exit.apply(this, arguments);
 		this._oViewModel?.destroy();
 		this._oListControl?.destroy();
-		this._oPanelHeader?.destroy();
 		this._oAddFilterSelect?.destroy();
 
 		this._oViewModel = null;
 		this._oListControl = null;
-		this._oPanelHeader = null;
 		this._oAddFilterSelect = null;
 	};
 

@@ -248,7 +248,7 @@
 														columnTitles="Param,Type,Default Value,Description"
 														columnCount="4"
 														class="sapUiDocumentationParamsTable">
-													<custom:Row>
+													<custom:Row expandable="{= ${typeInfo/refersToTypedef} === true}" typedefName="{= ${typeInfo/UI5Types} ? ${typeInfo/UI5Types/0} : ${typeInfo/type} }" expandToggle="onTypedefToggle">
 														<custom:ParamText text="{name}" phoneText="{phoneName}" depth="{depth}" optional="{optional}"/>
 														<custom:JSDocType typeInfo="{parts: ['typeInfo', 'types', 'type', 'linkEnabled'], formatter: '.formatter.formatJSDocType'}"/>
 														<m:Text text="{defaultValue}" wrapping="false"/>
@@ -544,7 +544,7 @@
 												<template:if test="{= !!${event>parameters} &amp;&amp; ${event>parameters}.length > 0}">
 													<custom:LightTable columnTitles="Param,Type,Description" columnCount="3">
 														<template:repeat list="{event>parameters}" var="parameter">
-															<custom:Row>
+															<custom:Row expandable="{= ${parameter>typeInfo/refersToTypedef} === true}" typedefName="{= ${parameter>typeInfo/UI5Types} ? ${parameter>typeInfo/UI5Types/0} : ${parameter>typeInfo/type} }" expandToggle="onTypedefToggle">
 																<custom:ParamText text="{parameter>name}" phoneText="{parameter>phoneName}" depth="{parameter>depth}" optional="{parameter>optional}"/>
 																<custom:JSDocType typeInfo="{parts: ['parameter>typeInfo', 'parameter>types', 'parameter>type', 'parameter>linkEnabled'], formatter: '.formatter.stringifyJSDocType'}"/>
 																<layout:VerticalLayout>
@@ -668,7 +668,7 @@
 																columnTitles="Param,Type,Default Value,Description"
 																class="sapUiDocumentationParamsTable">
 															<template:repeat list="{method>parameters}" var="parameter">
-																<custom:Row>
+																<custom:Row expandable="{= ${parameter>typeInfo/refersToTypedef} === true}" typedefName="{= ${parameter>typeInfo/UI5Types} ? ${parameter>typeInfo/UI5Types/0} : ${parameter>typeInfo/type} }" expandToggle="onTypedefToggle">
 																	<custom:ParamText text="{parameter>name}" phoneText="{parameter>phoneName}" depth="{parameter>depth}" optional="{parameter>optional}"/>
 																	<custom:JSDocType typeInfo="{parts: ['parameter>typeInfo','parameter>types'], formatter: '.formatter.stringifyJSDocType'}"/>
 																	<m:Text text="{parameter>defaultValue}" wrapping="false"/>

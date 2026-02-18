@@ -9,16 +9,16 @@
 		xmlns:form="sap.ui.layout.form"
 		controllerName="mdc.sample.controller.MultiValueField">
 
-	<form:SimpleForm layout="ColumnLayout" editable="{path: 'view>/editMode'}">
+	<form:SimpleForm id="myForm" layout="ColumnLayout" editable="{path: 'view>/editMode'}">
 		<form:toolbar>
-			<OverflowToolbar>
-				<Title text="MultiValueFields"/>
-				<ToolbarSpacer/>
-				<ToggleButton text="Edit" type="Emphasized" pressed="{path: 'view>/editMode'}"/>
+			<OverflowToolbar id="myToolbar">
+				<Title id="myToolbar-Title" text="MultiValueFields"/>
+				<ToolbarSpacer  id="myToolbar-Spacer"/>
+				<ToggleButton id="myToolbar-Edit" text="Edit" type="Emphasized" pressed="{path: 'view>/editMode'}"/>
 			</OverflowToolbar>
 		</form:toolbar>
 
-		<Label text="MultiValueField with ValueHelp"/>
+		<Label id="F-VH-label" text="MultiValueField with ValueHelp"/>
 		<mdc:MultiValueField id="F-VH"
 			items="{path: 'data>/items'}"
 			delegate='\{"name": "mdc/sample/delegate/MultiValueFieldDelegate", "payload": \{\}\}'
@@ -26,16 +26,16 @@
 			editMode="{= ${view>/editMode} ? 'Editable' : 'Display'}"
 			showEmptyIndicator="true"
 			valueHelp="VH-Countries">
-			<mdcField:MultiValueFieldItem key="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}" description="{path: 'data>description', type:'sap.ui.model.type.String'}" />
+			<mdcField:MultiValueFieldItem id="F-VH-item" key="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}" description="{path: 'data>description', type:'sap.ui.model.type.String'}" />
 		</mdc:MultiValueField>
 
-		<Label text="date Field"/>
+		<Label id="F4-date-label" text="date Field"/>
 		<mdc:MultiValueField id="F4-date"
 			items="{path: 'data>/dates'}"
 			display="Value"
 			editMode="{= ${view>/editMode} ? 'Editable' : 'Display'}"
 			showEmptyIndicator="true">
-			<mdcField:MultiValueFieldItem key="{path: 'data>date', type:'sap.ui.model.type.Date', formatOptions: {style: 'short'}}" />
+			<mdcField:MultiValueFieldItem id="F4-date-item" key="{path: 'data>date', type:'sap.ui.model.type.Date', formatOptions: {style: 'short'}}" />
 		</mdc:MultiValueField>
 
 		<form:dependents>
@@ -48,19 +48,19 @@
 							descriptionPath="name"
 							caseSensitive="true"
 							useAsValueHelp="false">
-							<Table id="VH-Countries-Pop-Table" items="{path: 'data>/countries'}" width="15rem" mode="SingleSelectMaster">
+							<Table id="VH-Countries-Pop-Table" items="{path: 'data>/countries', length: 10}" width="15rem" mode="SingleSelectMaster">
 								<columns>
-									<Column width="2rem">
-										<Label text="ID"/>
+									<Column id="VH-Countries-Pop-Table-col0" width="2rem">
+										<Label id="VH-Countries-Pop-Table-col0-header" text="ID"/>
 									</Column>
-									<Column width="10rem">
-										<Label text="Name"/>
+									<Column id="VH-Countries-Pop-Table-col1" width="10rem">
+										<Label id="VH-Countries-Pop-Table-col1-header" text="Name"/>
 									</Column>
 								</columns>
 								<items>
-									<ColumnListItem type="Active">
-										<Text text="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}"/>
-										<Text text="{path: 'data>name', type:'sap.ui.model.type.String'}"/>
+									<ColumnListItem id="VH-Countries-Pop-Table-item" type="Active">
+										<Text id="VH-Countries-Pop-Table-item-key" text="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}"/>
+										<Text id="VH-Countries-Pop-Table-item-name" text="{path: 'data>name', type:'sap.ui.model.type.String'}"/>
 									</ColumnListItem>
 								</items>
 							</Table>
@@ -75,17 +75,17 @@
 							caseSensitive="true">
 							<Table id="VH-Countries-Dialog-Table" items="{path: 'data>/countries'}" mode="MultiSelect">
 								<columns>
-									<Column width="2rem">
-										<Label text="ID"/>
+									<Column id="VH-Countries-Dialog-Table-col0" width="2rem">
+										<Label id="VH-Countries-Dialog-Table-col0-header" text="ID"/>
 									</Column>
-									<Column width="10rem">
-										<Label text="Name"/>
+									<Column id="VH-Countries-Dialog-Table-col1" width="10rem">
+										<Label id="VH-Countries-Dialog-Table-col1-header" text="Name"/>
 									</Column>
 								</columns>
 								<items>
-									<ColumnListItem type="Active">
-										<Text text="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}"/>
-										<Text text="{path: 'data>name', type:'sap.ui.model.type.String'}"/>
+									<ColumnListItem id="VH-Countries-Dialog-Table-item" type="Active">
+										<Text id="VH-Countries-Dialog-Table-item-key" text="{path: 'data>key', type:'sap.ui.model.type.String', constraints: {maxLength: 2}}"/>
+										<Text id="VH-Countries-Dialog-Table-item-name" text="{path: 'data>name', type:'sap.ui.model.type.String'}"/>
 									</ColumnListItem>
 								</items>
 							</Table>

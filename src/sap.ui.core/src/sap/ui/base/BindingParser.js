@@ -408,6 +408,7 @@ sap.ui.define([
 			}
 			resolveType(oBindingInfo);
 			resolveFilters(oBindingInfo,'filters');
+			resolveFilters(oBindingInfo,'boundFilters');
 			resolveSorters(oBindingInfo,'sorter');
 			resolveEvents(oBindingInfo.events);
 			resolveRef(oBindingInfo,'formatter');

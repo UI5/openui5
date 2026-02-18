@@ -30,7 +30,6 @@
 			<m:Toolbar design="Transparent" class="sapMTBHeader-CTX">
 				<m:Title id="title" level="H1"
 					text="{header>$count} Flight Bookings ({header>$selectionCount} selected)"/>
-				<m:ToolbarSpacer/>
 				<m:SearchField id="search" placeholder="Search for anything..." search=".onSearch"
 					value="{ui>/sSearch}" width="40%"/>
 				<m:Button icon="sap-icon://download" press=".onDownload" tooltip="Download"/>
@@ -47,6 +46,15 @@
 					<core:Item key="true" text="Grand Total At Bottom"/>
 					<core:Item key="off" text="No Grand Total"/>
 				</m:Select>
+				<m:Label design="Bold" showColon="true" text="Create"/>
+				<m:Button icon="sap-icon://arrow-top" press=".onCreate($event, false, false)"
+					tooltip="Create At Top"/>
+				<m:Button icon="sap-icon://arrow-bottom" press=".onCreate($event, true, false)"
+					tooltip="Create At Bottom"/>
+				<m:Button icon="sap-icon://slim-arrow-up" press=".onCreate($event, false, true)"
+					tooltip="Create Inactive At Top"/>
+				<m:Button icon="sap-icon://slim-arrow-down" press=".onCreate($event, true, true)"
+					tooltip="Create Inactive At Bottom"/>
 			</m:Toolbar>
 		</extension>
 		<rowActionTemplate>

@@ -558,6 +558,8 @@ function(
 		this._initResponsivePaddingsEnablement();
 
 		this._oAriaDescribedbyText = new InvisibleText({id: this.getId() + "-ariaDescribedbyText"});
+
+		this._oDescribedbyDragAndResizeHandleText = new InvisibleText({id: this.getId() + "-describedbyDragAndResizeHandleText"});
 	};
 
 	Dialog.prototype.onBeforeRendering = function () {
@@ -615,6 +617,7 @@ function(
 		});
 
 		this._oAriaDescribedbyText.setText(this._getAriaDescribedByText());
+		this._oDescribedbyDragAndResizeHandleText.setText(this._getDescribedByDragAndResizeHandleText());
 	};
 
 	Dialog.prototype.onAfterRendering = function () {
@@ -671,6 +674,11 @@ function(
 		if (this._oAriaDescribedbyText) {
 			this._oAriaDescribedbyText.destroy();
 			this._oAriaDescribedbyText = null;
+		}
+
+		if (this._oDescribedbyDragAndResizeHandleText) {
+			this._oDescribedbyDragAndResizeHandleText.destroy();
+			this._oDescribedbyDragAndResizeHandleText = null;
 		}
 
 		PreventKeyboardEvents.restore(this.getDomRef());
@@ -905,24 +913,28 @@ function(
 					includeSelf: true,
 					includeScroller: true
 				}) ||
-				(this.getSubHeader() && this.getSubHeader().$().firstFocusableDomRef()) ||
-				(this._getAnyHeader() && this._getAnyHeader().$().lastFocusableDomRef());
+				this.getSubHeader()?.$().firstFocusableDomRef() ||
+				this._getAnyHeader()?.$().lastFocusableDomRef();
 
 			if (oLastFocusableDomRef) {
 				oLastFocusableDomRef.focus();
 			}
-		} else if (oSourceDomRef.id === this.getId() + "-lastfe") {
+
+			return;
+		}
+
+		if (oSourceDomRef.id === this.getId() + "-lastfe") {
 			//Check if the invisible LAST focusable element (suffix '-lastfe') has gained focus
 			//First check if header content is available
-			var oFirstFocusableDomRef =
-				this._getFocusableHeader() ||
-				(this._getAnyHeader() && this._getAnyHeader().$().firstFocusableDomRef()) ||
-				(this.getSubHeader() && this.getSubHeader().$().firstFocusableDomRef()) ||
+			var oFirstFocusableDomRef = this.getDomRef("dragAndResizeHandler") ||
+				this._getAnyHeader()?.$().firstFocusableDomRef() ||
+				this.getSubHeader()?.$().firstFocusableDomRef() ||
 				this.$("cont").firstFocusableDomRef({
 					includeSelf: true,
 					includeScroller: true
 				}) ||
 				this.$("footer").firstFocusableDomRef();
+
 			if (oFirstFocusableDomRef) {
 				oFirstFocusableDomRef.focus();
 			}
@@ -1071,8 +1083,7 @@ function(
 	 * @private
 	 */
 	Dialog.prototype._handleKeyboardDragResize = function (oEvent) {
-
-		if (oEvent.target !== this._getFocusableHeader() ||
+		if (oEvent.target !== this.getDomRef("dragAndResizeHandler") ||
 			[KeyCodes.ARROW_LEFT,
 				KeyCodes.ARROW_RIGHT,
 				KeyCodes.ARROW_UP,
@@ -1541,10 +1552,11 @@ function(
 			return document.getElementById(sInitialFocusId);
 		}
 
-		return this._getFocusableHeader()
-			|| this._getFirstFocusableContentSubHeader()
+		return this._getFirstFocusableHeaderElement()
+			||  this._getFirstFocusableContentSubHeader()
 			|| this._getFirstFocusableContentElement()
 			|| this._getFirstVisibleButtonDomRef()
+			|| this.getDomRef("dragAndResizeHandler")
 			|| this.getDomRef();
 	};
 
@@ -1576,17 +1588,12 @@ function(
 	};
 
 	/**
-	 * Returns the focusable header if any
-	 * @returns {HTMLElement}
+	 * Gets the first focusable element in the header.
+	 * @returns {object} First focusable element in the header
 	 * @private
 	 */
-	Dialog.prototype._getFocusableHeader = function () {
-
-		if (!this._isDraggableOrResizable()) {
-			return null;
-		}
-
-		return this.$().find('header .sapMDialogTitleGroup')[0];
+	Dialog.prototype._getFirstFocusableHeaderElement = function () {
+		return this._getAnyHeader()?.$().firstFocusableDomRef();
 	};
 
 	/**
@@ -1951,6 +1958,33 @@ function(
 	 * @private
 	 */
 	Dialog.prototype._getAriaDescribedByText = function () {
+		if (this.getStretch()) {
+			return "";
+		}
+
+		var oRb = Library.getResourceBundleFor("sap.m");
+
+		if (this.getResizable() && this.getDraggable()) {
+			return oRb.getText("DIALOG_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE");
+		}
+		if (this.getDraggable()) {
+			return oRb.getText("DIALOG_ARIA_DESCRIBEDBY_DRAGGABLE");
+		}
+		if (this.getResizable()) {
+			return oRb.getText("DIALOG_ARIA_DESCRIBEDBY_RESIZABLE");
+		}
+		return "";
+	};
+
+	/**
+	 * Returns the correct message to be read by the aria-describedby attribute for drag and resize handle
+	 * @private
+	 * @returns {string} The text for aria-describedby attribute for drag and resize handle
+	 */
+	Dialog.prototype._getDescribedByDragAndResizeHandleText = function () {
+		if (this.getStretch()) {
+			return "";
+		}
 		var oRb = Library.getResourceBundleFor("sap.m");
 		if (this.getResizable() && this.getDraggable()) {
 			return oRb.getText("DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE");
@@ -1961,9 +1995,9 @@ function(
 		if (this.getResizable()) {
 			return oRb.getText("DIALOG_HEADER_ARIA_DESCRIBEDBY_RESIZABLE");
 		}
+
 		return "";
 	};
-
 	/**
 	 * Returns the value of the Vertical Margin from the CSS parameter
 	 * @private
