@@ -48,6 +48,7 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	'sap/base/Log',
 	"sap/ui/core/library",
+	'sap/base/util/merge',
 	"sap/m/library"
 ], function(
 	IllustratedMessageSize,
@@ -94,6 +95,7 @@ sap.ui.define([
 	KeyCodes,
 	Log,
 	coreLibrary,
+	merge,
 	mobileLibrary
 ) {
 	"use strict";
@@ -2298,7 +2300,7 @@ sap.ui.define([
 		}
 	};
 
-	VariantManagement.prototype._templateFactoryManagementDialog = function(sId, oContext) {
+	VariantManagement.prototype._templateFactoryManagementDialog = function(oItemsTemplate, sId, oContext) {
 		const sTooltip = null;
 		let oNameControl;
 		let oExecuteOnSelectCtrl;
@@ -2313,6 +2315,22 @@ sap.ui.define([
 			Log.error("couldn't obtain item position for '" + oContext.getPath() + "'");
 			return undefined;
 		}
+
+		const fnPropertyIsInTemplate = (sProperty) => oItemsTemplate && (oItemsTemplate.getBindingInfo(sProperty) !== undefined || !oItemsTemplate.isPropertyInitial?.(sProperty));
+
+		const fnTemplateExtractBinding = (sProperty) => oItemsTemplate?.getBindingInfo(sProperty) ?? ({value: oItemsTemplate?.getProperty(sProperty)});
+
+		const fnCreateBinding = (sProperty) => {
+			if (fnPropertyIsInTemplate(sProperty)) {
+				let oBindingCopy = merge({}, fnTemplateExtractBinding(sProperty));
+				if (!oBindingCopy.parts) {
+					oBindingCopy = {parts: [merge({}, oBindingCopy)]};
+				}
+				return oBindingCopy;
+			} else {
+				return {parts: [{path: sProperty, model: this._sModelName}]};
+			}
+		};
 
 		const sIdPrefix = this.getId() + "-manage";
 		const sModelName = this._sModelName;
@@ -2358,7 +2376,7 @@ sap.ui.define([
 			oNameControl = new Input(sIdPrefix + "-input-" + nPos, {
 				liveChange: fLiveChange,
 				change: fChange,
-				value: '{' + sModelName + ">title}"
+				value: fnCreateBinding("title")
 			});
 
 			if (oItem.getTitle() !== oItem._getOriginalTitle()) {
@@ -2368,7 +2386,7 @@ sap.ui.define([
 
 		} else {
 			oNameControl = new ObjectIdentifier(sIdPrefix + "-text-" + nPos, {
-				title: '{' + sModelName + ">title}"
+				title: fnCreateBinding("title")
 			});
 			if (sTooltip) {
 				oNameControl.setTooltip(sTooltip);
@@ -2384,19 +2402,20 @@ sap.ui.define([
 			visible: oItem.getRemove()
 		});
 
+		const oFavoriteBinding = fnCreateBinding("favorite");
 		const oFavoriteIcon = new Icon(sIdPrefix + "-fav-" + nPos, {
 			src: {
-				path: "favorite",
-				model: sModelName,
+				path: oFavoriteBinding.parts?.[0]?.path ?? "favorite",
+				model: oFavoriteBinding.parts?.[0]?.model ?? "$mVariants",
 				formatter: function(bFlagged) {
-					return bFlagged ? "sap-icon://favorite" : "sap-icon://unfavorite";
+					return bFlagged || bFlagged == null ? "sap-icon://favorite" : "sap-icon://unfavorite";
 				}
 			},
 			tooltip: {
-				path: 'favorite',
-				model: sModelName,
+				path: oFavoriteBinding.parts?.[0]?.path ?? "favorite",
+				model: oFavoriteBinding.parts?.[0]?.model ?? "$mVariants",
 				formatter: function(bFlagged) {
-					return this._oRb.getText(bFlagged ? "VARIANT_MANAGEMENT_FAV_DEL_TOOLTIP" : "VARIANT_MANAGEMENT_FAV_ADD_TOOLTIP");
+					return this._oRb.getText(bFlagged || bFlagged == null ? "VARIANT_MANAGEMENT_FAV_DEL_TOOLTIP" : "VARIANT_MANAGEMENT_FAV_ADD_TOOLTIP");
 				}.bind(this)
 			},
 			press: fSelectFav,
@@ -2413,13 +2432,13 @@ sap.ui.define([
 			oExecuteOnSelectCtrl = new CheckBox(sIdPrefix + "-exe-" + nPos, {
 				wrapping: true,
 				text: "{$mVariants>/_displayTextForExecuteOnSelectionForStandardVariant}",
-				selected: '{' + sModelName + ">executeOnSelect}",
+				selected: fnCreateBinding("executeOnSelect"),
 				select: fEnableApply
 			});
 		} else {
 			oExecuteOnSelectCtrl = new CheckBox(sIdPrefix + "-exe-" + nPos, {
 				text: "",
-				selected: '{' + sModelName + ">executeOnSelect}",
+				selected: fnCreateBinding("executeOnSelect"),
 				select: fEnableApply
 			});
 		}
@@ -2464,16 +2483,20 @@ sap.ui.define([
 				oExecuteOnSelectCtrl,
 				oRolesCell,
 				new Text(sIdPrefix + "-author-" + nPos, {
-					text: '{' + sModelName + ">author}",
+					text:  fnCreateBinding("author"),
 					textAlign: "Begin",
 				    wrappingType: "Hyphenated"
 				}),
 				oDeleteButton,
 				new Text({
-					text: '{' + sModelName + ">key}"
+					text: fnCreateBinding("key")
 				})
 			]
 		});
+
+		if (fnPropertyIsInTemplate("visible")) {
+			oListItem.bindProperty("visible", fnCreateBinding("visible"));
+		}
 
 		if (this._isItemDeleted(oItem)) {
 			oListItem.setVisible(false);
@@ -3138,10 +3161,11 @@ sap.ui.define([
    };
 
 	VariantManagement.prototype._rebindVMTable = function(bForceRebind) {
+		const bHasExternalBinding = !!this.getBindingInfo("items");
 		const oItemsBindingInfos = this.getBindingInfo("items") ?? {
 			path: "/items",
 			model: "$mVariants",
-			factory: this._templateFactoryManagementDialog.bind(this),
+			factory: this._templateFactoryManagementDialog.bind(this, null),
 			filters: this._getVisibleFilter()
 		};
 
@@ -3151,13 +3175,18 @@ sap.ui.define([
 				model: oItemsBindingInfos.model,
 				parameters: oItemsBindingInfos.parameters
 			}, {
-				factory: this._templateFactoryManagementDialog.bind(this),
+				factory: this._templateFactoryManagementDialog.bind(this, oItemsBindingInfos.template),
 				filters: this._getVisibleFilter()
 			});
 
+			if (bHasExternalBinding) {
+				// If an items binding is provided, then visibility should be handled there.
+				delete oBindingInfo.filters;
+			}
+
 			this._sModelName = oBindingInfo.model;
 			this.oManagementTable.bindAggregation("items", oBindingInfo);
-		} else {
+		} else if (!bHasExternalBinding) {
 			this.oManagementTable.getBinding("items").filter(this._getVisibleFilter());
 		}
 
@@ -3169,7 +3198,10 @@ sap.ui.define([
 		if (vObject.isA?.("sap.m.VariantItem")) {
 			return vObject;
 		}
-		return this.getItems().find((oVariantItem) => oVariantItem.getKey() === vObject.key);
+
+		const sKeyProperty = this.getBindingInfo("items")?.template?.getBindingPath("key") ?? "key";
+
+		return this.getItems().find((oVariantItem) => oVariantItem.getKey() === vObject[sKeyProperty]);
 	};
 
 	VariantManagement.prototype._createRolesCell = function (oItem, oContext, sIdPrefix = `${this.getId()}-manage`) {

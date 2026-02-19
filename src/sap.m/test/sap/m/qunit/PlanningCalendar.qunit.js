@@ -1753,6 +1753,56 @@ sap.ui.define([
 			"If showRowHeaders is set to true, appointments column has minScreenWidth set to sap.m.ScreenSize.Desktop");
 	});
 
+	QUnit.test("Popin column header excluded from keyboard navigation", async function(assert) {
+		// Arrange
+		var oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2015, 0, 1),
+			viewKey: PlanningCalendarBuiltInView.Hour,
+			rows: [
+				new PlanningCalendarRow({
+					title: "Row 1"
+				}),
+				new PlanningCalendarRow({
+					title: "Row 2"
+				})
+			]
+		});
+
+		oPC.placeAt("bigUiArea");
+		await nextUIUpdate();
+
+		var oTable = oPC.getAggregation("table");
+		var oAppointmentsColumn = oTable.getColumns()[1];
+
+		// Force popin mode on appointments column (simulates narrow screen)
+		oAppointmentsColumn.setDemandPopin(true);
+		oAppointmentsColumn.setMinScreenWidth("48000px"); // Force popin by setting unreachable screen width
+		await nextUIUpdate();
+
+		// Verify popin is rendered - sapMTblItemNav element should exist in DOM
+		var oPopinColumnHeader = oTable.$().find(".sapMTblItemNav")[0];
+		assert.ok(oPopinColumnHeader, "Popin column header (sapMTblItemNav) should be rendered in DOM");
+
+		// Act - focus table to trigger ItemNavigation initialization
+		oTable.focus();
+		await nextUIUpdate();
+
+		// Get item navigation and verify sapMTblItemNav is excluded
+		var oItemNavigation = oTable._oItemNavigation;
+		assert.ok(oItemNavigation, "ItemNavigation should be initialized after focus");
+
+		var aItemDomRefs = oItemNavigation.getItemDomRefs();
+		var bHasPopinColumnHeader = aItemDomRefs.some(function(oDomRef) {
+			return oDomRef && oDomRef.classList && oDomRef.classList.contains("sapMTblItemNav");
+		});
+
+		assert.notOk(bHasPopinColumnHeader,
+			"Popin column header (sapMTblItemNav) should be excluded from keyboard navigation items");
+
+		// Cleanup
+		oPC.destroy();
+	});
+
 	QUnit.test("noData: Illistrated Message", async function(assert) {
 		var oTable = Element.getElementById("PC1-Table"),
 			oIMNoData = new IllustratedMessage({

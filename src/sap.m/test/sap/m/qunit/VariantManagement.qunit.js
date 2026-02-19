@@ -1595,6 +1595,151 @@ sap.ui.define([
 		this.oVM._openManagementDialog();
 	}
 
+	QUnit.test("check binding on items is propagated into dialog", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", author: "A", favorite: true, visible: true},
+			{variantKey: "2", variantTitlePart1: "Two", variantTitlePart2: " and Two", favorite: false, visible: false}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem({
+				key: "{variantKey}",
+				title: {parts: [{path: 'variantTitlePart1'}, {path: 'variantTitlePart2'}], formatter: (part1, part2) => `Title: ${part1}${part2}`},
+				author: "Constant Author",
+				visible: "{visible}"
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			assert.ok(this.oVM.oManagementTable, "management table exists");
+
+			const aItems = this.oVM.oManagementTable.getItems();
+			assert.ok(aItems, "items in the management table exists");
+			assert.equal(aItems.length, 2,  "expected count of items in the management table exists");
+
+			let aCells = aItems[0].getCells();
+			assert.ok(aCells, "expected cells found");
+			assert.equal(aCells[0].getSrc(), "sap-icon://favorite", "expected favorite icon found");
+			assert.ok(aCells[0].hasStyleClass("sapMVarMngmtFavNonInteractiveColor"), "should be inactive");
+
+			assert.ok(aCells[1].isA("sap.m.Input"),  "expected controltype found");
+			assert.equal(aCells[1].getValue(), "Title: One and One", "expected title found");
+
+			assert.equal(aCells[2].getText(), "Public", "expected sharing info found");
+			assert.ok(aCells[3].getSelected(), "expected default info found");
+			assert.ok(!aCells[4].getSelected(), "expected apply automatically info found");
+			assert.equal(aCells[6].getText(), "Constant Author", "expected author found");
+			assert.ok(aItems[0].getVisible(), "expected visibility found");
+
+			aCells = aItems[1].getCells();
+			assert.ok(aCells, "expected cells found");
+			assert.equal(aCells[0].getSrc(), "sap-icon://favorite", "expected favorite icon found");
+
+			assert.ok(aCells[1].isA("sap.m.Input"),  "expected controltype found");
+			assert.equal(aCells[1].getValue(), "Title: Two and Two", "expected title found");
+
+			assert.equal(aCells[2].getText(), "Public", "expected sharing info found");
+			assert.ok(!aCells[3].getSelected(), "expected default info found");
+			assert.ok(!aCells[4].getSelected(), "expected apply automatically info found");
+			assert.equal(aCells[6].getText(), "Constant Author", "expected author found");
+			assert.notOk(aItems[1].getVisible(), "expected visibility found");
+
+			done();
+
+		}.bind(this));
+
+		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("Fall back to Managed Object Model for favorite binding, in case it's given as constant", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", author: "A", favorite: true, visible: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem({
+				key: "{variantKey}",
+				title: {parts: [{path: 'variantTitlePart1'}, {path: 'variantTitlePart2'}], formatter: (part1, part2) => `Title: ${part1}${part2}`},
+				author: "Constant Author",
+				favorite: true
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			assert.ok(this.oVM.oManagementTable, "management table exists");
+
+			const aItems = this.oVM.oManagementTable.getItems();
+			assert.ok(aItems, "items in the management table exists");
+			assert.equal(aItems.length, 1,  "expected count of items in the management table exists");
+
+			const aCells = aItems[0].getCells();
+			assert.ok(aCells, "expected cells found");
+			assert.equal(aCells[0].getSrc(), "sap-icon://favorite", "expected favorite icon found");
+			assert.ok(aCells[0].hasStyleClass("sapMVarMngmtFavNonInteractiveColor"), "should be inactive");
+
+			const favoriteModel = aCells[0].getBinding("src").getModel();
+			assert.ok(favoriteModel.isA("sap.ui.model.base.ManagedObjectModel"), "expected Managed Object Model found");
+
+			done();
+
+		}.bind(this));
+
+		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
 
 	QUnit.module("VariantManagement _findNextFocusTargetAfterDelete", {
 		beforeEach: async function() {

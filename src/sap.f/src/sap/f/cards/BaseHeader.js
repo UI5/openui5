@@ -33,7 +33,7 @@ sap.ui.define([
 	/**
 	 * @const int The refresh interval for dataTimestamp in ms.
 	 */
-	const DATA_TIMESTAMP_REFRESH_INTERVAL = 60000;
+	const DATA_TIMESTAMP_REFRESH_INTERVAL = 15000;
 
 	const oResourceBundle = Library.getResourceBundleFor("sap.f");
 
@@ -409,27 +409,41 @@ sap.ui.define([
 	 */
 	BaseHeader.prototype._updateDataTimestamp = function () {
 		var oDataTimestamp = this._createDataTimestamp(),
-			sDataTimestamp = this.getDataTimestamp(),
-			oDateFormat,
-			oUniversalDate,
-			sFormattedText;
+			sDataTimestamp = this.getDataTimestamp();
 
 		if (!sDataTimestamp) {
 			oDataTimestamp.setText("");
 			return;
 		}
 
-		oDateFormat = DateFormat.getDateTimeInstance({relative: true});
-		oUniversalDate = new UniversalDate(sDataTimestamp);
-		sFormattedText = oDateFormat.format(oUniversalDate);
-
-		// no less than "1 minute ago" should be shown, "30 seconds ago" should not be shown
-		if (oUniversalDate.getTime() + 59000 > Date.now()) {
-			sFormattedText = oResourceBundle.getText("CARD_HEADER_DATETIMESTAMP_NOW");
-		}
+		const sFormattedText = this._formatDataTimestamp(sDataTimestamp);
 
 		oDataTimestamp.setText(sFormattedText);
 		oDataTimestamp.removeStyleClass("sapFCardDataTimestampUpdating");
+	};
+
+	/**
+	 * Formats the data timestamp to a relative time string.
+	 * @private
+	 * @param {string} sDataTimestamp The data timestamp in ISO 8601 format.
+	 * @returns {string} The formatted data timestamp.
+	 */
+	BaseHeader.prototype._formatDataTimestamp = function (sDataTimestamp) {
+		const oDateFormat = DateFormat.getDateTimeInstance({relative: true});
+		const oUniversalDate = new UniversalDate(sDataTimestamp);
+
+		const iDiffMs = Date.now() - oUniversalDate.getTime();
+		const iTotalSeconds = Math.floor(iDiffMs / 1000);
+
+		const iRoundedMinutes = Math.floor((iTotalSeconds - 44) / 60) + 1;
+
+		const oRoundedDate = new UniversalDate(Date.now() - iRoundedMinutes * 60000);
+
+		if (iTotalSeconds <= 44) {
+			return oResourceBundle.getText("CARD_HEADER_DATETIMESTAMP_NOW");
+		}
+
+		return oDateFormat.format(oRoundedDate);
 	};
 
 	/**

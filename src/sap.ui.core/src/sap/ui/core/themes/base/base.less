@@ -1,11 +1,11 @@
 // /**
-// * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company. All rights reserved.
-// * Theming Engine 16.0.25
-// * data:{"sModified":"2025-08-27T14:01:23Z"}
+// * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company and Theming Base Content contributors. Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
+// * Theming Engine 17.0.0
+// * data:{"sModified":"2026-02-10T08:50:44Z"}
 // */
 
 
-/******************* FILE /Base/baseLib/baseTheme/base.less (Version 11.32.2-20250827135846+79bb30d311678435d61b21db26ecbe07d6b05079) *******************/
+/******************* FILE /Base/baseLib/baseTheme/base.less (Version 11.34.0) *******************/
 
 
 // [Label "Brand Color"]
@@ -34,7 +34,7 @@
 
 // [Label "Shell Header Color"]
 // [Description "The background color of the shell header bar."]
-// [Tags "Quick", "Base", "Shell", "Color", "Mobile", "Protected"]
+// [Tags "Quick", "Base", "Shell", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Shell"]
 // [Type "color"]
@@ -58,7 +58,7 @@
 
 // [Label "Font Size"]
 // [Description "The preferred font size."]
-// [Tags "Quick", "Base", "Content", "Dimension", "Font", "Protected"]
+// [Tags "Quick", "Base", "Content", "Dimension", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "fontSizes"]
@@ -66,7 +66,7 @@
 
 // [Label "Text Color"]
 // [Description "The preferred text color."]
-// [Tags "Quick", "Base", "Content", "Color", "Font", "Mobile", "Protected"]
+// [Tags "Quick", "Base", "Content", "Color", "Mobile", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "color"]
@@ -74,7 +74,7 @@
 
 // [Label "Link Color"]
 // [Description "The color of the link text."]
-// [Tags "Quick", "Base", "Content", "Color", "Font", "Link", "Protected"]
+// [Tags "Quick", "Base", "Content", "Color", "Link", "Protected"]
 // [Protected "true"]
 // [Category "Link"]
 // [Type "color"]
@@ -144,17 +144,9 @@
 // [Type "color"]
 @sapActiveColor: @sapDefault_Color;
 
-// [Label "Highlight Text Color"]
-// [Description "The text color of highlighted screen elements."]
-// [Tags "Quick", "Base", "Content", "Color", "Font", "Protected"]
-// [Protected "true"]
-// [Category "Resource"]
-// [Type "color"]
-@sapHighlightTextColor: @sapDefault_Color;
-
 // [Label "Title Text Color"]
 // [Description "The text color of the application title."]
-// [Tags "Quick", "Base", "Color", "Font", "Protected"]
+// [Tags "Quick", "Base", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "color"]
@@ -242,7 +234,7 @@
 
 // [Label "Negative Text Color"]
 // [Description "The color for text showing negative or error state."]
-// [Tags "Base", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Semantic", "Text"]
 // [Type "color"]
@@ -250,7 +242,7 @@
 
 // [Label "Critical Text Color"]
 // [Description "The color for text showing critical or warning state."]
-// [Tags "Base", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Semantic", "Text"]
 // [Type "color"]
@@ -258,7 +250,7 @@
 
 // [Label "Positive Text Color"]
 // [Description "The color for text showing positive or success state."]
-// [Tags "Base", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Semantic", "Text"]
 // [Type "color"]
@@ -266,7 +258,7 @@
 
 // [Label "Informative Text Color"]
 // [Description "The color for text showing an informative or information state."]
-// [Tags "Base", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Semantic", "Text"]
 // [Type "color"]
@@ -274,7 +266,7 @@
 
 // [Label "Neutral Text Color"]
 // [Description "The color for text showing neutral state."]
-// [Tags "Base", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Semantic", "Text"]
 // [Type "color"]
@@ -474,7 +466,7 @@
 
 // [Label "Icon Color"]
 // [Description "The color of icons."]
-// [Tags "Base", "Content", "Color", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected", "Icon"]
 // [Protected "true"]
 // [Category "Icon"]
 // [Type "color"]
@@ -482,7 +474,7 @@
 
 // [Label "Icon Contrast Color"]
 // [Description "The alternative icon color switched to by a threshold to keep contrast for icons."]
-// [Tags "Base", "Content", "Color", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected", "Icon"]
 // [Protected "true"]
 // [Category "Icon"]
 // [Type "color"]
@@ -491,7 +483,7 @@
 // [Label "Icon Non-interactive Color"]
 // [Description "The color of non-interactive icons."]
 // [TranslationKey "sapContent_NoIntactvIcoClr"]
-// [Tags "Base", "Content", "Color", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected", "Icon"]
 // [Protected "true"]
 // [Category "Icon"]
 // [Type "color"]
@@ -499,7 +491,7 @@
 
 // [Label "Marker Icon Color"]
 // [Description "The color of marker icons."]
-// [Tags "Base", "Content", "Color", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected", "Icon"]
 // [Protected "true"]
 // [Category "Icon"]
 // [Type "color"]
@@ -507,7 +499,7 @@
 
 // [Label "Marker Text Color"]
 // [Description "The color of marker texts."]
-// [Tags "Base", "Content", "Color", "Font", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "color"]
@@ -569,7 +561,7 @@
 
 // [Label "Rated Color"]
 // [Description "Color for rated content items."]
-// [Tags "Base", "Content", "Color", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected", "Icon"]
 // [Protected "true"]
 // [Category "Icon"]
 // [Type "color"]
@@ -577,7 +569,7 @@
 
 // [Label "Unrated Color"]
 // [Description "Color for unrated content items."]
-// [Tags "Base", "Content", "Color", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected", "Icon"]
 // [Protected "true"]
 // [Category "Icon"]
 // [Type "color"]
@@ -673,7 +665,7 @@
 
 // [Label "Text Shadow"]
 // [Description "The standard text shadow."]
-// [Tags "Base", "Content", "Font", "Protected"]
+// [Tags "Base", "Content", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "boxShadow"]
@@ -681,7 +673,7 @@
 
 // [Label "Text Contrast Shadow"]
 // [Description "The alternative text shadow."]
-// [Tags "Base", "Content", "Font", "Protected"]
+// [Tags "Base", "Content", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "boxShadow"]
@@ -769,7 +761,7 @@
 
 // [Label "Label Color"]
 // [Description "The color of labels in the content area."]
-// [Tags "Base", "Content", "Color", "Font", "Mobile", "Protected"]
+// [Tags "Base", "Content", "Color", "Mobile", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "color"]
@@ -794,7 +786,7 @@
 
 // [Label "Icon Font Family"]
 // [Description "A prioritized list of preferred font family names for SAP-icons."]
-// [Tags "Base", "Content", "Font", "Protected"]
+// [Tags "Base", "Content", "Font", "Protected", "Icon"]
 // [Protected "true"]
 // [Category "Icon"]
 // [Type "fontFamilies"]
@@ -802,7 +794,7 @@
 
 // [Label "Disabled Text Color"]
 // [Description "The color of texts on disabled screen elements in the content area."]
-// [Tags "Base", "Content", "Color", "Font", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "color"]
@@ -819,7 +811,7 @@
 // [Label "Text Contrast Threshold"]
 // [Description "The threshold to switch to alternative text color to keep contrast for texts."]
 // [TranslationKey "sapContent_ContrastTxtThreshold"]
-// [Tags "Base", "Content", "Font", "Protected"]
+// [Tags "Base", "Content", "Protected"]
 // [Protected "true"]
 // [Category "Resource"]
 // [Type "number"]
@@ -827,7 +819,7 @@
 
 // [Label "Text Contrast Color"]
 // [Description "The alternative text color switched to by a threshold to keep contrast for texts."]
-// [Tags "Base", "Content", "Color", "Font", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "color"]
@@ -852,7 +844,7 @@
 
 // [Label "Foreground Text Color"]
 // [Description "The foreground color of texts in the content area."]
-// [Tags "Base", "Content", "Color", "Font", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "color"]
@@ -868,7 +860,7 @@
 
 // [Label "Badge Text Color"]
 // [Description "The text color of badges (e.g. Shell Notifications)."]
-// [Tags "Base", "Content", "Color", "Font", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Badge"]
 // [Type "color"]
@@ -893,7 +885,7 @@
 
 // [Label "Selected Text Color"]
 // [Description "The color of selected (toggled) text."]
-// [Tags "Base", "Content", "Color", "Font", "Protected"]
+// [Tags "Base", "Content", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Interaction"]
 // [Type "color"]
@@ -1359,7 +1351,7 @@
 
 // [Label "Success Header Shadow"]
 // [Description "The success header shadow styling."]
-// [Tags "Base", "Content", "Dimension", "Semantic", "Protected"]
+// [Tags "Base", "Content", "Semantic", "Protected"]
 // [Protected "true"]
 // [Category "Shadow"]
 // [Type "boxShadow"]
@@ -1367,7 +1359,7 @@
 
 // [Label "Warning Header Shadow"]
 // [Description "The warning header shadow styling."]
-// [Tags "Base", "Content", "Dimension", "Semantic", "Protected"]
+// [Tags "Base", "Content", "Semantic", "Protected"]
 // [Protected "true"]
 // [Category "Shadow"]
 // [Type "boxShadow"]
@@ -1375,7 +1367,7 @@
 
 // [Label "Error Header Shadow"]
 // [Description "The error header shadow styling."]
-// [Tags "Base", "Content", "Dimension", "Semantic", "Protected"]
+// [Tags "Base", "Content", "Semantic", "Protected"]
 // [Protected "true"]
 // [Category "Shadow"]
 // [Type "boxShadow"]
@@ -1383,7 +1375,7 @@
 
 // [Label "Information Header Shadow"]
 // [Description "The information header shadow styling."]
-// [Tags "Base", "Content", "Dimension", "Semantic", "Protected"]
+// [Tags "Base", "Content", "Semantic", "Protected"]
 // [Protected "true"]
 // [Category "Shadow"]
 // [Type "boxShadow"]
@@ -1440,7 +1432,7 @@
 
 // [Label "Small Font Size"]
 // [Description "The font size for small texts."]
-// [Tags "Base", "Content", "Dimension", "Font", "Protected"]
+// [Tags "Base", "Content", "Dimension", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "fontSizes"]
@@ -1448,7 +1440,7 @@
 
 // [Label "Large Font Size"]
 // [Description "The font size for large texts."]
-// [Tags "Base", "Content", "Dimension", "Font", "Protected"]
+// [Tags "Base", "Content", "Dimension", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "fontSizes"]
@@ -1456,7 +1448,7 @@
 
 // [Label "Level 1 Header Font Size"]
 // [Description "A font size for headers."]
-// [Tags "Base", "Content", "Dimension", "Font", "Protected"]
+// [Tags "Base", "Content", "Dimension", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "fontSizes"]
@@ -1464,7 +1456,7 @@
 
 // [Label "Level 2 Header Font Size"]
 // [Description "A font size for headers."]
-// [Tags "Base", "Content", "Dimension", "Font", "Protected"]
+// [Tags "Base", "Content", "Dimension", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "fontSizes"]
@@ -1472,7 +1464,7 @@
 
 // [Label "Level 3 Header Font Size"]
 // [Description "A font size for headers."]
-// [Tags "Base", "Content", "Dimension", "Font", "Protected"]
+// [Tags "Base", "Content", "Dimension", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "fontSizes"]
@@ -1480,7 +1472,7 @@
 
 // [Label "Level 4 Header Font Size"]
 // [Description "A font size for headers."]
-// [Tags "Base", "Content", "Dimension", "Font", "Protected"]
+// [Tags "Base", "Content", "Dimension", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "fontSizes"]
@@ -1488,7 +1480,7 @@
 
 // [Label "Level 5 Header Font Size"]
 // [Description "A font size for headers."]
-// [Tags "Base", "Content", "Dimension", "Font", "Protected"]
+// [Tags "Base", "Content", "Dimension", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "fontSizes"]
@@ -1496,7 +1488,7 @@
 
 // [Label "Level 6 Header Font Size"]
 // [Description "A font size for headers."]
-// [Tags "Base", "Content", "Dimension", "Font", "Protected"]
+// [Tags "Base", "Content", "Dimension", "Protected"]
 // [Protected "true"]
 // [Category "Text"]
 // [Type "fontSizes"]
@@ -1504,7 +1496,7 @@
 
 // [Label "Link Text Decoration"]
 // [Description "The text decoration of links."]
-// [Tags "Base", "Content", "Font", "Link", "Protected"]
+// [Tags "Base", "Content", "Link", "Protected"]
 // [Protected "true"]
 // [Category "Link"]
 // [Type "textDecoration"]
@@ -1512,7 +1504,7 @@
 
 // [Label "Link Hover Color"]
 // [Description "The hover state color of links."]
-// [Tags "Base", "Content", "Color", "Font", "Link", "Protected"]
+// [Tags "Base", "Content", "Color", "Link", "Protected"]
 // [Protected "true"]
 // [Category "Link"]
 // [Type "color"]
@@ -1520,7 +1512,7 @@
 
 // [Label "Link Hover Text Decoration"]
 // [Description "The hover state text decoration of links."]
-// [Tags "Base", "Content", "Font", "Link", "Protected"]
+// [Tags "Base", "Content", "Link", "Protected"]
 // [Protected "true"]
 // [Category "Link"]
 // [Type "textDecoration"]
@@ -1528,7 +1520,7 @@
 
 // [Label "Link Active Color"]
 // [Description "The active state color of links."]
-// [Tags "Base", "Content", "Color", "Font", "Link", "Protected"]
+// [Tags "Base", "Content", "Color", "Link", "Protected"]
 // [Protected "true"]
 // [Category "Link"]
 // [Type "color"]
@@ -1536,7 +1528,7 @@
 
 // [Label "Link Active Text Decoration"]
 // [Description "The active state text decoration of links."]
-// [Tags "Base", "Content", "Font", "Link", "Protected"]
+// [Tags "Base", "Content", "Link", "Protected"]
 // [Protected "true"]
 // [Category "Link"]
 // [Type "textDecoration"]
@@ -1544,7 +1536,7 @@
 
 // [Label "Link Visited Color"]
 // [Description "The color for visited links."]
-// [Tags "Base", "Content", "Color", "Font", "Link", "Protected"]
+// [Tags "Base", "Content", "Color", "Link", "Protected"]
 // [Protected "true"]
 // [Category "Link"]
 // [Type "color"]
@@ -1552,7 +1544,7 @@
 
 // [Label "Inverted Link Color"]
 // [Description "The inverted color for links."]
-// [Tags "Base", "Content", "Color", "Font", "Link", "Protected"]
+// [Tags "Base", "Content", "Color", "Link", "Protected"]
 // [Protected "true"]
 // [Category "Link"]
 // [Type "color"]
@@ -1560,7 +1552,7 @@
 
 // [Label "Subtle Link Color"]
 // [Description "The text color of less prominent (subtle) links."]
-// [Tags "Base", "Content", "Color", "Font", "Link", "Protected"]
+// [Tags "Base", "Content", "Color", "Link", "Protected"]
 // [Protected "true"]
 // [Category "Link"]
 // [Type "color"]
@@ -1608,7 +1600,7 @@
 
 // [Label "Shell Text Color"]
 // [Description "The color of texts in the shell."]
-// [Tags "Base", "Shell", "Color", "Font", "Mobile", "Protected"]
+// [Tags "Base", "Shell", "Color", "Mobile", "Protected"]
 // [Protected "true"]
 // [Category "Shell"]
 // [Type "color"]
@@ -1624,7 +1616,7 @@
 
 // [Label "Shell Interactive Text Color"]
 // [Description "The color of texts of interactive areas in the shell."]
-// [Tags "Base", "Shell", "Color", "Font", "Protected"]
+// [Tags "Base", "Shell", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Shell"]
 // [Type "color"]
@@ -1640,7 +1632,7 @@
 
 // [Label "Shell Group Title Text Color"]
 // [Description "The text color for shell group titles."]
-// [Tags "Base", "Shell", "Color", "Font", "Protected"]
+// [Tags "Base", "Shell", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Shell"]
 // [Type "color"]
@@ -1649,7 +1641,7 @@
 // [Label "Shell Group Title Text Shadow"]
 // [Description "Text shadow of shell group title."]
 // [TranslationKey "sapShell_Group_Title_TxtShadow"]
-// [Tags "Base", "Shell", "Color", "Font", "Protected"]
+// [Tags "Base", "Shell", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Shell"]
 // [Type "boxShadow"]
@@ -1673,7 +1665,7 @@
 
 // [Label "Shell Active Text Color"]
 // [Description "The text color for active shell content."]
-// [Tags "Base", "Shell", "Color", "Font", "Protected"]
+// [Tags "Base", "Shell", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Shell"]
 // [Type "color"]
@@ -1689,7 +1681,7 @@
 
 // [Label "Shell Selected Text Color"]
 // [Description "The text color for selected shell content."]
-// [Tags "Base", "Shell", "Color", "Font", "Protected"]
+// [Tags "Base", "Shell", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Shell"]
 // [Type "color"]
@@ -1741,7 +1733,7 @@
 // [Label "Shell Navigation Selected Text Color"]
 // [Description "The color of selected text in the shell."]
 // [TranslationKey "sapShell_Navigation_Sel_TxtClr"]
-// [Tags "Base", "Shell", "Color", "Font", "Protected"]
+// [Tags "Base", "Shell", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Shell", "Navigation"]
 // [Type "color"]
@@ -1749,7 +1741,7 @@
 
 // [Label "Shell Navigation Text Color"]
 // [Description "The standard color of text in the shell."]
-// [Tags "Base", "Shell", "Color", "Font", "Protected"]
+// [Tags "Base", "Shell", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Shell", "Navigation"]
 // [Type "color"]
@@ -1758,7 +1750,7 @@
 // [Label "Shell Navigation Active Text Color"]
 // [Description "The active (down) state text color of shell navigation area content."]
 // [TranslationKey "sapShell_Navigation_Act_TxtClr"]
-// [Tags "Base", "Shell", "Color", "Font", "Protected"]
+// [Tags "Base", "Shell", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Shell", "Navigation"]
 // [Type "color"]
@@ -1837,7 +1829,7 @@
 
 // [Label "Shell Sub Brand Text Color"]
 // [Description "The text color of brand text (such as a product name) in the Shell."]
-// [Tags "Base", "Shell", "Color", "Font", "Protected"]
+// [Tags "Base", "Shell", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Shell"]
 // [Type "color"]
@@ -3007,7 +2999,7 @@
 
 // [Label "Button Text Color"]
 // [Description "The color of texts on buttons."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Standard"]
 // [Type "color"]
@@ -3039,7 +3031,7 @@
 
 // [Label "Button Hover Text Color"]
 // [Description "The color of texts and icons on buttons on hover."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Standard"]
 // [Type "color"]
@@ -3071,7 +3063,7 @@
 
 // [Label "Button Active Text Color"]
 // [Description "The active (down) state text and icon color of buttons."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Standard"]
 // [Type "color"]
@@ -3105,7 +3097,7 @@
 
 // [Label "Emphasized Button Text Color"]
 // [Description "The color of texts and icons on emphasized buttons."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Emphasized"]
 // [Type "color"]
@@ -3140,7 +3132,7 @@
 // [Label "Emphasized Button Hover Text Color"]
 // [Description "The hover state text and icon color of emphasized buttons."]
 // [TranslationKey "sapButton_Emphasized_Hvr_TxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Emphasized"]
 // [Type "color"]
@@ -3167,7 +3159,7 @@
 // [Label "Emphasized Button Active Text Color"]
 // [Description "The active (down) state text color of emphasized buttons."]
 // [TranslationKey "sapButton_EmpActTxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Emphasized"]
 // [Type "color"]
@@ -3175,19 +3167,11 @@
 
 // [Label "Emphasized Button Text Shadow"]
 // [Description "The text and icon shadow color for emphasized buttons."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Emphasized"]
 // [Type "color"]
 @sapButton_Emphasized_TextShadow: @sapDefault_Color;
-
-// [Label "Emphasized Button Hover Font Weight"]
-// [Description "The hover state font weight of emphasized buttons."]
-// [Tags "Base", "Button", "Font", "Protected"]
-// [Protected "true"]
-// [Category "Button", "Emphasized"]
-// [Type "fontWeights"]
-@sapButton_Emphasized_FontWeight: @sapDefault_FontWeight;
 
 // [Label "Reject Button Background Color"]
 // [Description "The background color of \"Reject\" buttons."]
@@ -3207,7 +3191,7 @@
 
 // [Label "Reject Button Text Color"]
 // [Description "The text and icon color of \"Reject\" buttons."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Reject"]
 // [Type "color"]
@@ -3234,7 +3218,7 @@
 // [Label "Reject Button Hover Text Color"]
 // [Description "The hover state text and icon color of \"Reject\" buttons."]
 // [TranslationKey "sapButton_Reject_Hvr_TxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Reject"]
 // [Type "color"]
@@ -3261,7 +3245,7 @@
 // [Label "Reject Button Active Text Color"]
 // [Description "The active (down) state text color of \"Reject\" buttons."]
 // [TranslationKey "sapButton_RjctActTxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Reject"]
 // [Type "color"]
@@ -3288,7 +3272,7 @@
 // [Label "Reject Button Selected Text Color"]
 // [Description "The text and icon color of selected (toggled) \"Reject\" buttons."]
 // [TranslationKey "sapButton_RjctSelTxtCol"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Reject"]
 // [Type "color"]
@@ -3330,7 +3314,7 @@
 
 // [Label "Accept Button Text Color"]
 // [Description "The text and icon color of \"Accept\" buttons."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Accept"]
 // [Type "color"]
@@ -3357,7 +3341,7 @@
 // [Label "Accept Button Hover Text Color"]
 // [Description "The hover state text and icon color of \"Accept\" buttons."]
 // [TranslationKey "sapButton_Accept_Hvr_TxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Accept"]
 // [Type "color"]
@@ -3384,7 +3368,7 @@
 // [Label "Accept Button Active Text Color"]
 // [Description "The active (down) state text color of \"Accept\" buttons."]
 // [TranslationKey "sapButton_AcptActTxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Accept"]
 // [Type "color"]
@@ -3411,7 +3395,7 @@
 // [Label "Accept Button Selected Text Color"]
 // [Description "The text and icon color of selected (toggled) \"Accept\" buttons."]
 // [TranslationKey "sapButton_AcptSelTxtCol"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Accept"]
 // [Type "color"]
@@ -3453,7 +3437,7 @@
 
 // [Label "Lite Button Text Color"]
 // [Description "The text and icon color of transparent (lite) buttons."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Lite"]
 // [Type "color"]
@@ -3479,7 +3463,7 @@
 // [Label "Lite Button Hover Text Color"]
 // [Description "The hover state text and icon color of transparent (lite) buttons."]
 // [TranslationKey "sapButton_Lite_Hvr_TxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Lite"]
 // [Type "color"]
@@ -3521,7 +3505,7 @@
 
 // [Label "Selected Button Text Color"]
 // [Description "The selected (toggled) state text and icon color of buttons."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Standard"]
 // [Type "color"]
@@ -3563,7 +3547,7 @@
 
 // [Label "Attention Button Text Color"]
 // [Description "The text and icon color of attention buttons."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Attention"]
 // [Type "color"]
@@ -3590,7 +3574,7 @@
 // [Label "Attention Button Hover Text Color"]
 // [Description "The hover state text and icon color of attention buttons."]
 // [TranslationKey "sapButton_AttHvrTxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Attention"]
 // [Type "color"]
@@ -3617,7 +3601,7 @@
 // [Label "Attention Button Active Text Color"]
 // [Description "The active (down) state text color of attention buttons."]
 // [TranslationKey "sapButton_AttActTxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Attention"]
 // [Type "color"]
@@ -3644,7 +3628,7 @@
 // [Label "Attention Button Selected Text Color"]
 // [Description "The text and icon color of selected (toggled) attention buttons."]
 // [TranslationKey "sapButton_AttSelTxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Attention"]
 // [Type "color"]
@@ -3689,7 +3673,7 @@
 // [Label "Negative Button Text Color"]
 // [Description "The text and icon color of negative buttons."]
 // [TranslationKey "sapButton_NegTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Negative"]
 // [Type "color"]
@@ -3716,7 +3700,7 @@
 // [Label "Negative Button Hover Text Color"]
 // [Description "The hover state text and icon color of negative buttons."]
 // [TranslationKey "sapButton_NegHvrTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Negative"]
 // [Type "color"]
@@ -3743,7 +3727,7 @@
 // [Label "Negative Button Active Text Color"]
 // [Description "The active (down) state text color of negative buttons."]
 // [TranslationKey "sapButton_NegActTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Negative"]
 // [Type "color"]
@@ -3767,7 +3751,7 @@
 
 // [Label "Critical Button Text Color"]
 // [Description "The text and icon color of critical buttons."]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Critical"]
 // [Type "color"]
@@ -3794,7 +3778,7 @@
 // [Label "Critical Button Hover Text Color"]
 // [Description "The hover state text and icon color of critical buttons."]
 // [TranslationKey "sapButton_CritHvrTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Critical"]
 // [Type "color"]
@@ -3821,7 +3805,7 @@
 // [Label "Critical Button Active Text Color"]
 // [Description "The active (down) state text color of critical buttons."]
 // [TranslationKey "sapButton_CritActTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Critical"]
 // [Type "color"]
@@ -3845,7 +3829,7 @@
 
 // [Label "Success Button Text Color"]
 // [Description "The text and icon color of success buttons."]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Success"]
 // [Type "color"]
@@ -3872,7 +3856,7 @@
 // [Label "Success Button Hover Text Color"]
 // [Description "The hover state text and icon color of success buttons."]
 // [TranslationKey "sapButton_SuccHvrTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Success"]
 // [Type "color"]
@@ -3899,7 +3883,7 @@
 // [Label "Success Button Active Text Color"]
 // [Description "The active (down) state text color of success buttons."]
 // [TranslationKey "sapButton_SuccActTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Success"]
 // [Type "color"]
@@ -3926,7 +3910,7 @@
 // [Label "Information Button Text Color"]
 // [Description "The text and icon color of information buttons."]
 // [TranslationKey "sapButton_InfTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Information"]
 // [Type "color"]
@@ -3953,7 +3937,7 @@
 // [Label "Information Button Hover Text Color"]
 // [Description "The hover state text and icon color of information buttons."]
 // [TranslationKey "sapButton_InfHvrTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Information"]
 // [Type "color"]
@@ -4004,7 +3988,7 @@
 
 // [Label "Neutral Button Text Color"]
 // [Description "The text and icon color of neutral buttons."]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Neutral"]
 // [Type "color"]
@@ -4031,7 +4015,7 @@
 // [Label "Neutral Button Hover Text Color"]
 // [Description "The hover state text and icon color of neutral buttons."]
 // [TranslationKey "sapButton_NeutHvrTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Neutral"]
 // [Type "color"]
@@ -4058,7 +4042,7 @@
 // [Label "Neutral Button Active Text Color"]
 // [Description "The active (down) state text color of neutral buttons."]
 // [TranslationKey "sapButton_NeutActTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Neutral"]
 // [Type "color"]
@@ -4082,7 +4066,7 @@
 
 // [Label "Switch Button Track Text Color"]
 // [Description "The text and icon color for the track of button controls such as the switch."]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Switch"]
 // [Type "color"]
@@ -4127,7 +4111,7 @@
 // [Label "Switch Button Selected Track Text Color"]
 // [Description "The text and icon color for the selected track of button controls such as the switch."]
 // [TranslationKey "sapButton_TrackSelTxtClr"]
-// [Tags "Base", "Button", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Switch"]
 // [Type "color"]
@@ -4259,7 +4243,7 @@
 // [Label "Negative Switch Button Track Text Color"]
 // [Description "The text and icon color for the track of negative button controls such as the switch."]
 // [TranslationKey "sapButton_TrackNegTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Switch"]
 // [Type "color"]
@@ -4349,7 +4333,7 @@
 // [Label "Positive Switch Button Track Text Color"]
 // [Description "The text and icon color for the track of positive button controls such as the switch."]
 // [TranslationKey "sapButton_TrackPosTxtClr"]
-// [Tags "Base", "Button", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Button", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Switch"]
 // [Type "color"]
@@ -4443,8 +4427,8 @@
 // [TranslationKey "sapButton_TokenBrdRd"]
 @sapButton_TokenBorderCornerRadius: @sapDefault_BorderStyle;
 
-// [Label "Token Border Border Thickness"]
-// [Description "Defines the thickness of the border of a token."]
+// [Label "Selected Token Bottom Border Thickness"]
+// [Description "Defines the additional thickness of the bottom border of selected tokens."]
 // [Tags "Base", "Button", "Protected"]
 // [Protected "true"]
 // [Category "Button", "Token"]
@@ -4488,7 +4472,7 @@
 
 // [Label "Field Text Color"]
 // [Description "The text color of input fields."]
-// [Tags "Base", "Field", "Color", "Font", "Protected"]
+// [Tags "Base", "Field", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Input", "Standard"]
 // [Type "color"]
@@ -4496,7 +4480,7 @@
 
 // [Label "Field Placeholder Text Color"]
 // [Description "The text color of prompt text (placeholder) within input controls."]
-// [Tags "Base", "Field", "Color", "Font", "Protected"]
+// [Tags "Base", "Field", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Input", "Standard"]
 // [Type "color"]
@@ -5043,7 +5027,7 @@
 
 // [Label "Group Title Text Color"]
 // [Description "The text color of the group title."]
-// [Tags "Base", "Group", "Color", "Font", "Protected"]
+// [Tags "Base", "Group", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Container"]
 // [Type "color"]
@@ -5051,7 +5035,7 @@
 
 // [Label "Group Title Font Size"]
 // [Description "The font size of the group title."]
-// [Tags "Base", "Group", "Dimension", "Font", "Protected"]
+// [Tags "Base", "Group", "Dimension", "Protected"]
 // [Protected "true"]
 // [Category "Container"]
 // [Type "fontSizes"]
@@ -5131,7 +5115,7 @@
 
 // [Label "List Column Header Text Color"]
 // [Description "The color of texts on the list column header area."]
-// [Tags "Base", "List", "Color", "Font", "Protected"]
+// [Tags "Base", "List", "Color", "Protected"]
 // [Protected "true"]
 // [Category "List"]
 // [Type "color"]
@@ -5155,7 +5139,7 @@
 
 // [Label "List Text Color"]
 // [Description "The main text color for lists and tables."]
-// [Tags "Base", "List", "Color", "Font", "Protected"]
+// [Tags "Base", "List", "Color", "Protected"]
 // [Protected "true"]
 // [Category "List"]
 // [Type "color"]
@@ -5163,7 +5147,7 @@
 
 // [Label "List Active Text Color"]
 // [Description "The text color for active list and table items."]
-// [Tags "Base", "List", "Color", "Font", "Protected"]
+// [Tags "Base", "List", "Color", "Protected"]
 // [Protected "true"]
 // [Category "List"]
 // [Type "color"]
@@ -5245,7 +5229,7 @@
 
 // [Label "List Group Header Text Color"]
 // [Description "The text color of list group headers."]
-// [Tags "Base", "List", "Color", "Font", "Protected"]
+// [Tags "Base", "List", "Color", "Protected"]
 // [Protected "true"]
 // [Category "List"]
 // [Type "color"]
@@ -5272,7 +5256,7 @@
 // [Label "Table Group Header Text Color"]
 // [Description "The text color of table group headers."]
 // [TranslationKey "sapList_TblGrpHdrTextColor"]
-// [Tags "Base", "List", "Color", "Font", "Protected"]
+// [Tags "Base", "List", "Color", "Protected"]
 // [Protected "true"]
 // [Category "List"]
 // [Type "color"]
@@ -5288,7 +5272,7 @@
 
 // [Label "List Footer Text Color"]
 // [Description "The text color of list footers."]
-// [Tags "Base", "List", "Color", "Font", "Protected"]
+// [Tags "Base", "List", "Color", "Protected"]
 // [Protected "true"]
 // [Category "List"]
 // [Type "color"]
@@ -5843,7 +5827,7 @@
 
 // [Label "Page Header Text Color"]
 // [Description "The color of texts on page headers."]
-// [Tags "Base", "Page", "Color", "Font", "Protected"]
+// [Tags "Base", "Page", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Application"]
 // [Type "color"]
@@ -5867,7 +5851,7 @@
 
 // [Label "Page Footer Text Color"]
 // [Description "The color of texts on page footers."]
-// [Tags "Base", "Page", "Color", "Font", "Protected"]
+// [Tags "Base", "Page", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Application"]
 // [Type "color"]
@@ -5908,7 +5892,7 @@
 
 // [Label "Info Bar Text Color"]
 // [Description "The text color of the interactive info bar."]
-// [Tags "Base", "Toolbar", "Color", "Font", "Protected"]
+// [Tags "Base", "Toolbar", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Toolbar"]
 // [Type "color"]
@@ -6309,16 +6293,16 @@
 @sapTile_BorderCornerRadius: @sapDefault_Dimension;
 
 // [Label "Tile Title Text Color"]
-// [Description "The color of title texts on tiles and cards."]
-// [Tags "Base", "Tile", "Color", "Font", "Protected"]
+// [Description "The color of titles in tile and card headers."]
+// [Tags "Base", "Tile", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Tile"]
 // [Type "color"]
 @sapTile_TitleTextColor: @sapDefault_Color;
 
 // [Label "Tile Text Color"]
-// [Description "The color of texts on tiles and cards."]
-// [Tags "Base", "Tile", "Color", "Font", "Protected"]
+// [Description "The color of text on tile and card headers."]
+// [Tags "Base", "Tile", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Tile"]
 // [Type "color"]
@@ -6333,7 +6317,7 @@
 @sapTile_IconColor: @sapDefault_Color;
 
 // [Label "Tile Separator Border Color"]
-// [Description "The border or divider color of tile and card headers."]
+// [Description "The color of the visual divider between card header elements."]
 // [Tags "Base", "Tile", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Tile"]
@@ -6569,7 +6553,7 @@
 
 // [Label "Indication Color 1 Text Color"]
 // [Description "The text and icon color for elements showing indication 1."]
-// [Tags "Base", "Color", "Font", "Indication", "Protected"]
+// [Tags "Base", "Color", "Indication", "Protected"]
 // [Protected "true"]
 // [Category "Indication"]
 // [Type "color"]
@@ -6711,7 +6695,7 @@
 
 // [Label "Indication Color 2 Text Color"]
 // [Description "The text and icon color for elements showing indication 2."]
-// [Tags "Base", "Color", "Font", "Indication", "Protected"]
+// [Tags "Base", "Color", "Indication", "Protected"]
 // [Protected "true"]
 // [Category "Indication"]
 // [Type "color"]
@@ -6853,7 +6837,7 @@
 
 // [Label "Indication Color 3 Text Color"]
 // [Description "The text and icon color for elements showing indication 3."]
-// [Tags "Base", "Color", "Font", "Indication", "Protected"]
+// [Tags "Base", "Color", "Indication", "Protected"]
 // [Protected "true"]
 // [Category "Indication"]
 // [Type "color"]
@@ -6995,7 +6979,7 @@
 
 // [Label "Indication Color 4 Text Color"]
 // [Description "The text and icon color for elements showing indication 4."]
-// [Tags "Base", "Color", "Font", "Indication", "Protected"]
+// [Tags "Base", "Color", "Indication", "Protected"]
 // [Protected "true"]
 // [Category "Indication"]
 // [Type "color"]
@@ -7137,7 +7121,7 @@
 
 // [Label "Indication Color 5 Text Color"]
 // [Description "The text and icon color for elements showing indication 5."]
-// [Tags "Base", "Color", "Font", "Indication", "Protected"]
+// [Tags "Base", "Color", "Indication", "Protected"]
 // [Protected "true"]
 // [Category "Indication"]
 // [Type "color"]
@@ -7279,7 +7263,7 @@
 
 // [Label "Indication Color 6 Text Color"]
 // [Description "The text and icon color for elements showing indication 6."]
-// [Tags "Base", "Color", "Font", "Indication", "Protected"]
+// [Tags "Base", "Color", "Indication", "Protected"]
 // [Protected "true"]
 // [Category "Indication"]
 // [Type "color"]
@@ -7421,7 +7405,7 @@
 
 // [Label "Indication Color 7 Text Color"]
 // [Description "The text and icon color for elements showing indication 7."]
-// [Tags "Base", "Color", "Font", "Indication", "Protected"]
+// [Tags "Base", "Color", "Indication", "Protected"]
 // [Protected "true"]
 // [Category "Indication"]
 // [Type "color"]
@@ -7563,7 +7547,7 @@
 
 // [Label "Indication Color 8 Text Color"]
 // [Description "The text and icon color for elements showing indication 8."]
-// [Tags "Base", "Color", "Font", "Indication", "Protected"]
+// [Tags "Base", "Color", "Indication", "Protected"]
 // [Protected "true"]
 // [Category "Indication"]
 // [Type "color"]
@@ -7705,7 +7689,7 @@
 
 // [Label "Indication Color 9 Text Color"]
 // [Description "The text and icon color for elements showing indication 9."]
-// [Tags "Base", "Color", "Font", "Indication", "Protected"]
+// [Tags "Base", "Color", "Indication", "Protected"]
 // [Protected "true"]
 // [Category "Indication"]
 // [Type "color"]
@@ -7847,7 +7831,7 @@
 
 // [Label "Indication Color 10 Text Color"]
 // [Description "The text and icon color for elements showing indication 10."]
-// [Tags "Base", "Color", "Font", "Indication", "Protected"]
+// [Tags "Base", "Color", "Indication", "Protected"]
 // [Protected "true"]
 // [Category "Indication"]
 // [Type "color"]
@@ -8389,7 +8373,7 @@
 
 // [Label "Text Color for Cart Data"]
 // [Description "The text color used for general chart text labels. Also used inside contrast statements for all the sequence text colors."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Data"]
 // [Type "color"]
@@ -8397,7 +8381,7 @@
 
 // [Label "Contrast Text Color for Cart Data"]
 // [Description "Used inside contrast statements for all the sequence text colors."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Data"]
 // [Type "color"]
@@ -8589,7 +8573,7 @@
 
 // [Label "Chart Text Color Sequence 1 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 1."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8615,7 +8599,7 @@
 
 // [Label "Chart Text Color Sequence 1 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 1."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8641,7 +8625,7 @@
 
 // [Label "Chart Text Color Sequence 1 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 1."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8667,7 +8651,7 @@
 
 // [Label "Chart Text Color Sequence 1"]
 // [Description "This text color matches the base chart color of the sequence 1."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8699,7 +8683,7 @@
 
 // [Label "Chart Text Color Sequence 1 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 1."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8725,7 +8709,7 @@
 
 // [Label "Chart Text Color Sequence 1 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 1."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8751,7 +8735,7 @@
 
 // [Label "Chart Text Color Sequence 1 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 1."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8777,7 +8761,7 @@
 
 // [Label "Chart Text Color Sequence 1 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 1."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8803,7 +8787,7 @@
 
 // [Label "Chart Text Color Sequence 1 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 1."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8829,7 +8813,7 @@
 
 // [Label "Chart Text Color Sequence 2 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 2."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8855,7 +8839,7 @@
 
 // [Label "Chart Text Color Sequence 2 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 2."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8881,7 +8865,7 @@
 
 // [Label "Chart Text Color Sequence 2 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 2."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8907,7 +8891,7 @@
 
 // [Label "Chart Text Color Sequence 2"]
 // [Description "This text color matches the base chart color of the sequence 2."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8939,7 +8923,7 @@
 
 // [Label "Chart Text Color Sequence 2 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 2."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8965,7 +8949,7 @@
 
 // [Label "Chart Text Color Sequence 2 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 2."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -8991,7 +8975,7 @@
 
 // [Label "Chart Text Color Sequence 2 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 2."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9017,7 +9001,7 @@
 
 // [Label "Chart Text Color Sequence 2 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 2."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9043,7 +9027,7 @@
 
 // [Label "Chart Text Color Sequence 2 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 2."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9069,7 +9053,7 @@
 
 // [Label "Chart Text Color Sequence 3 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 3."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9095,7 +9079,7 @@
 
 // [Label "Chart Text Color Sequence 3 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 3."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9121,7 +9105,7 @@
 
 // [Label "Chart Text Color Sequence 3 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 3."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9147,7 +9131,7 @@
 
 // [Label "Chart Text Color Sequence 3"]
 // [Description "This text color matches the base chart color of the sequence 3."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9179,7 +9163,7 @@
 
 // [Label "Chart Text Color Sequence 3 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 3."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9205,7 +9189,7 @@
 
 // [Label "Chart Text Color Sequence 3 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 3."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9231,7 +9215,7 @@
 
 // [Label "Chart Text Color Sequence 3 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 3."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9257,7 +9241,7 @@
 
 // [Label "Chart Text Color Sequence 3 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 3."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9283,7 +9267,7 @@
 
 // [Label "Chart Text Color Sequence 3 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 3."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9309,7 +9293,7 @@
 
 // [Label "Chart Text Color Sequence 4 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 4."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9335,7 +9319,7 @@
 
 // [Label "Chart Text Color Sequence 4 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 4."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9361,7 +9345,7 @@
 
 // [Label "Chart Text Color Sequence 4 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 4."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9387,7 +9371,7 @@
 
 // [Label "Chart Text Color Sequence 4"]
 // [Description "This text color matches the base chart color of the sequence 4."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9419,7 +9403,7 @@
 
 // [Label "Chart Text Color Sequence 4 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 4."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9445,7 +9429,7 @@
 
 // [Label "Chart Text Color Sequence 4 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 4."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9471,7 +9455,7 @@
 
 // [Label "Chart Text Color Sequence 4 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 4."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9497,7 +9481,7 @@
 
 // [Label "Chart Text Color Sequence 4 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 4."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9523,7 +9507,7 @@
 
 // [Label "Chart Text Color Sequence 4 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 4."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9549,7 +9533,7 @@
 
 // [Label "Chart Text Color Sequence 5 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 5."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9575,7 +9559,7 @@
 
 // [Label "Chart Text Color Sequence 5 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 5."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9601,7 +9585,7 @@
 
 // [Label "Chart Text Color Sequence 5 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 5."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9627,7 +9611,7 @@
 
 // [Label "Chart Text Color Sequence 5"]
 // [Description "This text color matches the base chart color of the sequence 5."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9659,7 +9643,7 @@
 
 // [Label "Chart Text Color Sequence 5 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 5."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9685,7 +9669,7 @@
 
 // [Label "Chart Text Color Sequence 5 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 5."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9711,7 +9695,7 @@
 
 // [Label "Chart Text Color Sequence 5 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 5."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9737,7 +9721,7 @@
 
 // [Label "Chart Text Color Sequence 5 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 5."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9763,7 +9747,7 @@
 
 // [Label "Chart Text Color Sequence 5 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 5."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9789,7 +9773,7 @@
 
 // [Label "Chart Text Color Sequence 6 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 6."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9815,7 +9799,7 @@
 
 // [Label "Chart Text Color Sequence 6 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 6."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9841,7 +9825,7 @@
 
 // [Label "Chart Text Color Sequence 6 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 6."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9867,7 +9851,7 @@
 
 // [Label "Chart Text Color Sequence 6"]
 // [Description "This text color matches the base chart color of the sequence 6."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9899,7 +9883,7 @@
 
 // [Label "Chart Text Color Sequence 6 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 6."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9925,7 +9909,7 @@
 
 // [Label "Chart Text Color Sequence 6 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 6."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9951,7 +9935,7 @@
 
 // [Label "Chart Text Color Sequence 6 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 6."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -9977,7 +9961,7 @@
 
 // [Label "Chart Text Color Sequence 6 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 6."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10003,7 +9987,7 @@
 
 // [Label "Chart Text Color Sequence 6 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 6."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10029,7 +10013,7 @@
 
 // [Label "Chart Text Color Sequence 7 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 7."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10055,7 +10039,7 @@
 
 // [Label "Chart Text Color Sequence 7 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 7."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10081,7 +10065,7 @@
 
 // [Label "Chart Text Color Sequence 7 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 7."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10107,7 +10091,7 @@
 
 // [Label "Chart Text Color Sequence 7"]
 // [Description "This text color matches the base chart color of the sequence 7."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10139,7 +10123,7 @@
 
 // [Label "Chart Text Color Sequence 7 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 7."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10165,7 +10149,7 @@
 
 // [Label "Chart Text Color Sequence 7 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 7."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10191,7 +10175,7 @@
 
 // [Label "Chart Text Color Sequence 7 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 7."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10217,7 +10201,7 @@
 
 // [Label "Chart Text Color Sequence 7 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 7."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10243,7 +10227,7 @@
 
 // [Label "Chart Text Color Sequence 7 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 7."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10269,7 +10253,7 @@
 
 // [Label "Chart Text Color Sequence 8 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 8."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10295,7 +10279,7 @@
 
 // [Label "Chart Text Color Sequence 8 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 8."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10321,7 +10305,7 @@
 
 // [Label "Chart Text Color Sequence 8 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 8."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10347,7 +10331,7 @@
 
 // [Label "Chart Text Color Sequence 8"]
 // [Description "This text color matches the base chart color of the sequence 8."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10379,7 +10363,7 @@
 
 // [Label "Chart Text Color Sequence 8 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 8."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10405,7 +10389,7 @@
 
 // [Label "Chart Text Color Sequence 8 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 8."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10431,7 +10415,7 @@
 
 // [Label "Chart Text Color Sequence 8 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 8."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10457,7 +10441,7 @@
 
 // [Label "Chart Text Color Sequence 8 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 8."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10483,7 +10467,7 @@
 
 // [Label "Chart Text Color Sequence 8 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 8."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10509,7 +10493,7 @@
 
 // [Label "Chart Text Color Sequence 9 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 9."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10535,7 +10519,7 @@
 
 // [Label "Chart Text Color Sequence 9 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 9."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10561,7 +10545,7 @@
 
 // [Label "Chart Text Color Sequence 9 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 9."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10587,7 +10571,7 @@
 
 // [Label "Chart Text Color Sequence 9"]
 // [Description "This text color matches the base chart color of the sequence 9."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10619,7 +10603,7 @@
 
 // [Label "Chart Text Color Sequence 9 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 9."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10645,7 +10629,7 @@
 
 // [Label "Chart Text Color Sequence 9 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 9."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10671,7 +10655,7 @@
 
 // [Label "Chart Text Color Sequence 9 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 9."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10697,7 +10681,7 @@
 
 // [Label "Chart Text Color Sequence 9 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 9."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10723,7 +10707,7 @@
 
 // [Label "Chart Text Color Sequence 9 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 9."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10749,7 +10733,7 @@
 
 // [Label "Chart Text Color Sequence 10 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 10."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10775,7 +10759,7 @@
 
 // [Label "Chart Text Color Sequence 10 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 10."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10801,7 +10785,7 @@
 
 // [Label "Chart Text Color Sequence 10 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 10."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10827,7 +10811,7 @@
 
 // [Label "Chart Text Color Sequence 10"]
 // [Description "This text color matches the base chart color of the sequence 10."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10860,7 +10844,7 @@
 
 // [Label "Chart Text Color Sequence 10 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 10."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10886,7 +10870,7 @@
 
 // [Label "Chart Text Color Sequence 10 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 10."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10912,7 +10896,7 @@
 
 // [Label "Chart Text Color Sequence 10 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 10."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10938,7 +10922,7 @@
 
 // [Label "Chart Text Color Sequence 10 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 10."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10964,7 +10948,7 @@
 
 // [Label "Chart Text Color Sequence 10 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 10."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -10990,7 +10974,7 @@
 
 // [Label "Chart Text Color Sequence 11 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 11."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11016,7 +11000,7 @@
 
 // [Label "Chart Text Color Sequence 11 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 11."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11042,7 +11026,7 @@
 
 // [Label "Chart Text Color Sequence 11 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 11."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11068,7 +11052,7 @@
 
 // [Label "Chart Text Color Sequence 11"]
 // [Description "This text color matches the base chart color of the sequence 11."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11101,7 +11085,7 @@
 
 // [Label "Chart Text Color Sequence 11 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 11."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11127,7 +11111,7 @@
 
 // [Label "Chart Text Color Sequence 11 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 11."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11153,7 +11137,7 @@
 
 // [Label "Chart Text Color Sequence 11 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 11."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11179,7 +11163,7 @@
 
 // [Label "Chart Text Color Sequence 11 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 11."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11205,7 +11189,7 @@
 
 // [Label "Chart Text Color Sequence 11 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 11."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11231,7 +11215,7 @@
 
 // [Label "Chart Text Color Sequence 12 Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 12."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11257,7 +11241,7 @@
 
 // [Label "Chart Text Color Sequence 12 Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 12."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11283,7 +11267,7 @@
 
 // [Label "Chart Text Color Sequence 12 Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 12."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11309,7 +11293,7 @@
 
 // [Label "Chart Text Color Sequence 12"]
 // [Description "This text color matches the base chart color of the sequence 12."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11342,7 +11326,7 @@
 
 // [Label "Chart Text Color Sequence 12 Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 12."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11368,7 +11352,7 @@
 
 // [Label "Chart Text Color Sequence 12 Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 12."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11394,7 +11378,7 @@
 
 // [Label "Chart Text Color Sequence 12 Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 12."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11420,7 +11404,7 @@
 
 // [Label "Chart Text Color Sequence 12 Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 12."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11446,7 +11430,7 @@
 
 // [Label "Chart Text Color Sequence 12 Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 12."]
-// [Tags "Base", "Chart", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11472,7 +11456,7 @@
 
 // [Label "Chart Text Color Sequence 'Bad' Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 'Bad'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11498,7 +11482,7 @@
 
 // [Label "Chart Text Color Sequence 'Bad' Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 'Bad'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11524,7 +11508,7 @@
 
 // [Label "Chart Text Color Sequence 'Bad' Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 'Bad'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11550,7 +11534,7 @@
 
 // [Label "Chart Text Color Sequence 'Bad'"]
 // [Description "This text color matches the base chart color of the sequence 'Bad'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11584,7 +11568,7 @@
 
 // [Label "Chart Text Color Sequence 'Bad' Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 'Bad'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11610,7 +11594,7 @@
 
 // [Label "Chart Text Color Sequence 'Bad' Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 'Bad'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11636,7 +11620,7 @@
 
 // [Label "Chart Text Color Sequence 'Bad' Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 'Bad'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11662,7 +11646,7 @@
 
 // [Label "Chart Text Color Sequence 'Bad' Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 'Bad'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11688,7 +11672,7 @@
 
 // [Label "Chart Text Color Sequence 'Bad' Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 'Bad'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11715,7 +11699,7 @@
 
 // [Label "Chart Text Color Sequence 'Critical' Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 'Critical'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11742,7 +11726,7 @@
 
 // [Label "Chart Text Color Sequence 'Critical' Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 'Critical'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11769,7 +11753,7 @@
 
 // [Label "Chart Text Color Sequence 'Critical' Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 'Critical'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11795,7 +11779,7 @@
 
 // [Label "Chart Text Color Sequence 'Critical'"]
 // [Description "This text color matches the base chart color of the sequence 'Critical'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11831,7 +11815,7 @@
 
 // [Label "Chart Text Color Sequence 'Critical' Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 'Critical'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11858,7 +11842,7 @@
 
 // [Label "Chart Text Color Sequence 'Critical' Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 'Critical'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11885,7 +11869,7 @@
 
 // [Label "Chart Text Color Sequence 'Critical' Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 'Critical'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11912,7 +11896,7 @@
 
 // [Label "Chart Text Color Sequence 'Critical' Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 'Critical'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11939,7 +11923,7 @@
 
 // [Label "Chart Text Color Sequence 'Critical' Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 'Critical'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11965,7 +11949,7 @@
 
 // [Label "Chart Text Color Sequence 'Good' Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 'Good'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -11991,7 +11975,7 @@
 
 // [Label "Chart Text Color Sequence 'Good' Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 'Good'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12017,7 +12001,7 @@
 
 // [Label "Chart Text Color Sequence 'Good' Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 'Good'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12043,7 +12027,7 @@
 
 // [Label "Chart Text Color Sequence 'Good'"]
 // [Description "This text color matches the base chart color of the sequence 'Good'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12078,7 +12062,7 @@
 
 // [Label "Chart Text Color Sequence 'Good' Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 'Good'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12104,7 +12088,7 @@
 
 // [Label "Chart Text Color Sequence 'Good' Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 'Good'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12130,7 +12114,7 @@
 
 // [Label "Chart Text Color Sequence 'Good' Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 'Good'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12156,7 +12140,7 @@
 
 // [Label "Chart Text Color Sequence 'Good' Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 'Good'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12182,7 +12166,7 @@
 
 // [Label "Chart Text Color Sequence 'Good' Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 'Good'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12208,7 +12192,7 @@
 
 // [Label "Chart Text Color Sequence Neutral Plus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 'Neutral'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12234,7 +12218,7 @@
 
 // [Label "Chart Text Color Sequence Neutral Plus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 'Neutral'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12260,7 +12244,7 @@
 
 // [Label "Chart Text Color Sequence Neutral Plus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 'Neutral'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12286,7 +12270,7 @@
 
 // [Label "Chart Text Color Sequence Neutral"]
 // [Description "This text color matches the base chart color of the sequence 'Neutral'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12322,7 +12306,7 @@
 
 // [Label "Chart Text Color Sequence Neutral Minus 1"]
 // [Description "This text color matches a 1 level less intensive chart color of the sequence 'Neutral'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12349,7 +12333,7 @@
 
 // [Label "Chart Text Color Sequence Neutral Minus 2"]
 // [Description "This text color matches a 2 levels less intensive chart color of the sequence 'Neutral'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12376,7 +12360,7 @@
 
 // [Label "Chart Text Color Sequence Neutral Minus 3"]
 // [Description "This text color matches a 3 levels less intensive chart color of the sequence 'Neutral'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12403,7 +12387,7 @@
 
 // [Label "Chart Text Color Sequence Neutral Minus 4"]
 // [Description "This text color matches a 4 levels less intensive chart color of the sequence 'Neutral'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12430,7 +12414,7 @@
 
 // [Label "Chart Text Color Sequence Neutral Minus 5"]
 // [Description "This text color matches a 5 levels less intensive chart color of the sequence 'Neutral'."]
-// [Tags "Base", "Chart", "Semantic", "Color", "Font", "Protected"]
+// [Tags "Base", "Chart", "Semantic", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Chart", "Sequence"]
 // [Type "color"]
@@ -12446,365 +12430,379 @@
 // [TranslationKey "sapChart_Seq_Neut_M5_TxtShadow"]
 @sapChart_Sequence_Neutral_Minus5_TextShadow: @sapDefault_Shadow;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Label "Breakpoint S Minimum"]
+// [Description "Minimal width of small devices."]
+// [Tags "Base", "Protected"]
+// [Protected "true"]
+// [Category "Internal"]
+// [Type "sizing"]
+@sapBreakpoint_S_Min: @sapDefault_Dimension;
+
+// [Label "Breakpoint M Minimum"]
+// [Description "Minimal width of medium devices."]
+// [Tags "Base", "Protected"]
+// [Protected "true"]
+// [Category "Internal"]
+// [Type "sizing"]
+@sapBreakpoint_M_Min: @sapDefault_Dimension;
+
+// [Label "Breakpoint L Minimum"]
+// [Description "Minimal width of large devices."]
+// [Tags "Base", "Protected"]
+// [Protected "true"]
+// [Category "Internal"]
+// [Type "sizing"]
+@sapBreakpoint_L_Min: @sapDefault_Dimension;
+
+// [Label "Breakpoint XL Minimum"]
+// [Description "Minimal width of extra large devices."]
+// [Tags "Base", "Protected"]
+// [Protected "true"]
+// [Category "Internal"]
+// [Type "sizing"]
+@sapBreakpoint_XL_Min: @sapDefault_Dimension;
+
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_SAP-icons_ttf: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_SAP-icons_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_SAP-icons_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_SAP-icons-TNT_ttf: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_SAP-icons-TNT_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_SAP-icons-TNT_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_SAP-icons-Business-Suite_ttf: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_SAP-icons-Business-Suite_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_SAP-icons-Business-Suite_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Regular_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Regular_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Regular_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Regular_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Bold_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Bold_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Bold_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Bold_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Semibold_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Semibold_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Semibold_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Semibold_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_SemiboldDuplex_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_SemiboldDuplex_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_SemiboldDuplex_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_SemiboldDuplex_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Light_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Light_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Light_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Light_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Black_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Black_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Black_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Black_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_BoldItalic_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_BoldItalic_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_BoldItalic_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_BoldItalic_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Condensed_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Condensed_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Condensed_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Condensed_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_CondensedBold_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_CondensedBold_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_CondensedBold_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_CondensedBold_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Italic_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Italic_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Italic_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72_Italic_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72Mono_Regular_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72Mono_Regular_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72Mono_Regular_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72Mono_Regular_full_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72Mono_Bold_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72Mono_Bold_woff: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72Mono_Bold_full_woff2: none;
 
-// [Tags "SapInternal", "Base", "URI", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "URI", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "asset"]
 @sapFontUrl_72Mono_Bold_full_woff: none;
-
-// [Tags "SapInternal", "Base", "URI", "Protected"]
-// [Protected "true"]
-// [Category "Internal"]
-// [Type "asset"]
-@sapSvgLib_SAP-icons: none;
-
-// [Tags "SapInternal", "Base", "URI", "Protected"]
-// [Protected "true"]
-// [Category "Internal"]
-// [Type "asset"]
-@sapSvgLib_SAPGUI-icons: none;
-
-// [Tags "SapInternal", "Base", "URI", "Protected"]
-// [Protected "true"]
-// [Category "Internal"]
-// [Type "asset"]
-@sapSvgLib_SAPWeb-icons: none;
 
 // [Label "SAP Theme Id"]
 // [Description "Technical identifier of the SAP-provided theme or of the SAP-provided theme a custom theme is based on."]
@@ -12813,6 +12811,15 @@
 // [Category "Internal"]
 // [Type "string"]
 @sapSapThemeId: baseTheme;
+
+// [Label "deprecated - Highlight Text Color"]
+// [Description "The text color of highlighted screen elements (deprecated: not used anymore since Belize theme)."]
+// [Tags "Quick", "Base", "Content", "Color", "Protected", "Deprecated"]
+// [Deprecated "true"]
+// [Protected "true"]
+// [Category "Resource"]
+// [Type "color"]
+@sapHighlightTextColor: @sapDefault_Color;
 
 // [Label "Default Background Color"]
 // [Description "The default background color of this theme."]
@@ -12852,12 +12859,21 @@
 
 // [Label "deprecated - Disabled Button Text Color"]
 // [Description "The color of texts and icons on disabled buttons (deprecated: use @sapContent_DisabledOpacity instead)."]
-// [Tags "Base", "Button", "Color", "Font", "Protected", "Deprecated"]
+// [Tags "Base", "Button", "Color", "Protected", "Deprecated"]
 // [Deprecated "true"]
 // [Protected "true"]
 // [Category "Button", "Standard"]
 // [Type "color"]
 @sapButton_Disabled_TextColor: @sapDeprecated_Color;
+
+// [Label "deprecated - Emphasized Button Font Weight"]
+// [Description "The font weight of emphasized buttons (deprecated: use @sapButton_Emphasized_FontFamily instead)."]
+// [Tags "Base", "Button", "Protected", "Deprecated"]
+// [Protected "true"]
+// [Deprecated "true"]
+// [Category "Button", "Emphasized"]
+// [Type "fontWeights"]
+@sapButton_Emphasized_FontWeight: unset;
 
 // [Label "deprecated - Disabled Field Background Color"]
 // [Description "The background color of disabled input fields (deprecated: use @sapContent_DisabledOpacity instead)."]
@@ -12870,7 +12886,7 @@
 
 // [Label "deprecated - Disabled Field Text Color"]
 // [Description "The text color of disabled input fields (deprecated: use @sapContent_DisabledOpacity instead)."]
-// [Tags "Base", "Field", "Color", "Font", "Protected", "Deprecated"]
+// [Tags "Base", "Field", "Color", "Protected", "Deprecated"]
 // [Deprecated "true"]
 // [Protected "true"]
 // [Category "Input", "Disabled"]
@@ -12923,6 +12939,31 @@
 // [Type "image"]
 @sapShell_BackgroundGradient: @sapShell_BackgroundImage;
 
+// [Tags "SapInternal", "Base", "URI", "Protected", "Deprecated"]
+// [Protected "true"]
+// [Deprecated "true"]
+// [Category "Internal"]
+// [Type "asset"]
+@sapSvgLib_SAP-icons: none;
+
+// [Tags "SapInternal", "Base", "URI", "Protected", "Deprecated"]
+// [Protected "true"]
+// [Deprecated "true"]
+// [Category "Internal"]
+// [Type "asset"]
+@sapSvgLib_SAPGUI-icons: none;
+
+// [Tags "SapInternal", "Base", "URI", "Protected", "Deprecated"]
+// [Protected "true"]
+// [Deprecated "true"]
+// [Category "Internal"]
+// [Type "asset"]
+@sapSvgLib_SAPWeb-icons: none;
+@sapCss_SvgIconBase: false;
+@sapCss_SvgIconCritical: false;
+@sapCss_SvgIconPositive: false;
+@sapCss_SvgIconNegative: false;
+
 // [Tags "SapInternal", "Base", "Color", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
@@ -12959,7 +13000,7 @@
 // [Type "fontFamilies"]
 @sapDefault_Font: "111";
 
-// [Tags "SapInternal", "Base", "Font", "Protected"]
+// [Tags "SapInternal", "Base", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
 // [Type "fontWeights"]
@@ -12995,37 +13036,11 @@
 // [Type "string"]
 @sapToBeDefined: ~"To Be Defined";
 
-// [Label "Breakpoint S Minimum"]
-// [Description "Minimal width of small devices."]
-// [Tags "Base", "Protected"]
+// [Tags "SapInternal", "Base", "Protected"]
 // [Protected "true"]
 // [Category "Internal"]
-// [Type "sizing"]
-@sapBreakpoint_S_Min: @sapDefault_Dimension;
-
-// [Label "Breakpoint M Minimum"]
-// [Description "Minimal width of medium devices."]
-// [Tags "Base", "Protected"]
-// [Protected "true"]
-// [Category "Internal"]
-// [Type "sizing"]
-@sapBreakpoint_M_Min: @sapDefault_Dimension;
-
-// [Label "Breakpoint L Minimum"]
-// [Description "Minimal width of large devices."]
-// [Tags "Base", "Protected"]
-// [Protected "true"]
-// [Category "Internal"]
-// [Type "sizing"]
-@sapBreakpoint_L_Min: @sapDefault_Dimension;
-
-// [Label "Breakpoint XL Minimum"]
-// [Description "Minimal width of extra large devices."]
-// [Tags "Base", "Protected"]
-// [Protected "true"]
-// [Category "Internal"]
-// [Type "sizing"]
-@sapBreakpoint_XL_Min: @sapDefault_Dimension;
+// [Type "string"]
+@sapAt: ~"@";
 @sapCss_SAP-icons: false;
 @sapCss_SAP-icons-TNT: false;
 @sapCss_SAP-icons-Business-Suite: false;
@@ -13053,10 +13068,6 @@
 @sapCss_72Monofull: @sapCss_72Mono;
 @sapCss_72MonoBold: @sapCss_72Mono;
 @sapCss_72MonoBoldfull: @sapCss_72MonoBold;
-@sapCss_SvgIconBase: false;
-@sapCss_SvgIconCritical: @sapCss_SvgIconBase;
-@sapCss_SvgIconPositive: @sapCss_SvgIconBase;
-@sapCss_SvgIconNegative: @sapCss_SvgIconBase;
 /*!SAP_POSTPROCESS_REDUCE_START*/
 /*<SAP_FREETEXT_LESS>*/
 .sapCss_SAP-icons() when (@sapCss_SAP-icons) {
@@ -13363,39 +13374,15 @@ src: @sapFontUrl_72Mono_Bold_full_woff2 format('woff2'), @sapFontUrl_72Mono_Bold
 }
 }
 .sapCss_72MonoBoldfull();
-.sapCss_SvgIconNegative() when (@sapCss_SvgIconNegative) {
-.sapSvgIconNegative {
-fill: @sapNegativeElementColor !important;
-}
-}
-.sapCss_SvgIconNegative();
-.sapCss_SvgIconCritical() when (@sapCss_SvgIconCritical) {
-.sapSvgIconCritical {
-fill: @sapCriticalElementColor !important;
-}
-}
-.sapCss_SvgIconCritical();
-.sapCss_SvgIconPositive() when (@sapCss_SvgIconPositive) {
-.sapSvgIconPositive {
-fill: @sapPositiveElementColor !important;
-}
-}
-.sapCss_SvgIconPositive();
-.sapCss_SvgIconBase() when (@sapCss_SvgIconBase) {
-.sapSvgIconBase {
-fill: @sapBaseColor !important;
-}
-}
-.sapCss_SvgIconBase();
 /*</SAP_FREETEXT_LESS>*//*!SAP_POSTPROCESS_REDUCE_END*/
 // /**
-// * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company. All rights reserved.
-// * Theming Engine 16.0.25
-// * data:{"sModified":"2025-08-27T14:01:23Z"}
+// * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company and Theming Base Content contributors. Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
+// * Theming Engine 17.0.0
+// * data:{"sModified":"2026-02-10T08:50:44Z"}
 // */
 
 
-/******************* FILE /Base/baseLib/sap_belize_hcw/base.less (Version 11.32.2-20250827135846+79bb30d311678435d61b21db26ecbe07d6b05079) *******************/
+/******************* FILE /Base/baseLib/sap_belize_hcw/base.less (Version 11.34.0) *******************/
 
 
 // [Tags "SapInternal", "Base", "Dimension", "Protected"]
@@ -13574,10 +13561,6 @@ fill: @sapBaseColor !important;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
-@sapHighlightTextColor: contrast(@sapHighlightColor, @sapTextColor, @sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
-
-// [Tags "!Protected"]
-// [Protected "!true"]
 @sapTitleColor: @sapTextColor;
 
 // [Tags "!Protected"]
@@ -13731,9 +13714,6 @@ fill: @sapBaseColor !important;
 // [Tags "!Protected"]
 // [Protected "!true"]
 @sapContent_LineHeight: 1.4;
-
-// [Tags "!Protected"]
-// [Protected "!true"]
 @sapContent_IconHeight: @sapContent_GridSize;
 
 // [Tags "!Protected"]
@@ -14803,10 +14783,6 @@ fill: @sapBaseColor !important;
 // [Tags "!Protected"]
 // [Protected "!true"]
 @sapButton_Emphasized_TextShadow: transparent;
-
-// [Tags "!Protected"]
-// [Protected "!true"]
-@sapButton_Emphasized_FontWeight: bold;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
@@ -17504,12 +17480,11 @@ fill: @sapBaseColor !important;
 @sapFontUrl_72Mono_Bold_woff: url(./../baseTheme/fonts/72Mono-Bold.woff);
 @sapFontUrl_72Mono_Bold_full_woff2: url(./../baseTheme/fonts/72Mono-Bold-full.woff2);
 @sapFontUrl_72Mono_Bold_full_woff: url(./../baseTheme/fonts/72Mono-Bold-full.woff);
-@sapSvgLib_SAP-icons: none;
-@sapSvgLib_SAPGUI-icons: url(./../sap_belize/svg/libs/SAPGUI-icons.svg);
-@sapSvgLib_SAPWeb-icons: url(./../sap_belize/svg/libs/SAPWeb-icons.svg);
 @sapSapThemeId: sap_belize_hcw;
+@sapHighlightTextColor: contrast(@sapHighlightColor, @sapTextColor, @sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
 @sapBackgroundColorDefault: @sapBackgroundColor;
 @sapList_HighlightColor: @sapHighlightColor;
+@sapButton_Emphasized_FontWeight: bold;
 @sapContent_ElementHeight: 1.37em;
 @sapContent_ElementHeight_PX: 22px;
 @sapBreakpoint_S_Min: 0;

@@ -25,10 +25,22 @@ sap.ui.define([
 				key: "developingCards"
 			},
 			{
+				title: "AI Generation",
+				icon: "sap-icon://ai",
+				target: "overview",
+				key: "aiGeneration"
+			},
+			{
 				title: "Supported Platforms",
 				icon: "sap-icon://desktop-mobile",
 				target: "overview",
 				key: "supportedPlatforms"
+			},
+			{
+				title: 'Security Policy',
+				icon: 'sap-icon://shield',
+				target: "overview",
+				key: "security"
 			},
 			{
 				title: "References",
