@@ -133,35 +133,51 @@ sap.ui.define([
 				var sLibName = this._oEntityData.lib,
 					sLibPath = sLibName.replace(/\./g, '/'),
 					sComponentPath = this._oEntityData.name.replace(sLibName, "").replace(/^[.]/, "").replace(/\./g, '/'),
-					aSectionTypes = (this._oControlData.customSections || []).map(function(sectionType) {
+					aSectionTypes = (this._oControlData.customSections || []).map(function(section) {
+						var sType = typeof section === 'string' ? section : section.name;
 						return {
-							type: sectionType,
-							property: sectionType + "Content",
-							displayTitle: sectionType.charAt(0).toUpperCase() + sectionType.slice(1),
-							sectionId: sectionType.replace(/[$#/]/g, ".") + "_section"
+							type: sType,
+							property: sType + "Content",
+							displayTitle: sType.charAt(0).toUpperCase() + sType.slice(1),
+							sectionId: sType.toLowerCase(),
+							hasSubsections: section.hasSubsections || false,
+							subsections: section.subsections || null
 						};
 					});
 
-				Promise.all(aSectionTypes.map(function(oSection) {
-					var sUrl = './docs/api/' + sLibPath + '/demokit/sections/' + sComponentPath + '/' + oSection.type + '.html';
+				var fnLoadContent = function(sUrl, sProperty) {
 					return new Promise(function(resolve) {
 						jQuery.ajax({
 							url: sUrl,
 							success: function(data) {
-								this._oModel.setProperty("/" + oSection.property, data);
-								resolve(oSection);
+								this._oModel.setProperty("/" + sProperty, data);
+								resolve(true);
 							}.bind(this),
-							error: function() {
-								resolve(null);
-							}
+							error: function() { resolve(false); }
 						});
-						}.bind(this));
-						}.bind(this))).then(function(results) {
-								results.forEach(function(oSection) {
-						if (oSection) {
-							this._createAndAddSection(oSection);
-						}
 					}.bind(this));
+				}.bind(this);
+
+				var aContentPromises = aSectionTypes.map(function(oSection) {
+					var aPromises = [];
+					var sBaseUrl = './docs/api/' + sLibPath + '/demokit/sections/' + sComponentPath + '/';
+
+					if (oSection.hasSubsections) {
+						// Load main + subsections
+						aPromises.push(fnLoadContent(sBaseUrl + oSection.type + '.html', oSection.type + "_mainContent"));
+						oSection.subsections.forEach(function(sub) {
+							aPromises.push(fnLoadContent(sBaseUrl + oSection.type + '/' + sub + '.html', oSection.type + "_" + sub + "Content"));
+						});
+					} else {
+						// Load single section
+						aPromises.push(fnLoadContent(sBaseUrl + oSection.type + '.html', oSection.property));
+					}
+
+					return Promise.all(aPromises).then(function() { return oSection; });
+			});
+
+			Promise.all(aContentPromises).then(function(aSections) {
+					aSections.forEach(this._createAndAddSection, this);
 				}.bind(this));
 
 				this.setModel(this._oModel);
@@ -1025,18 +1041,30 @@ sap.ui.define([
 			 * @private
 			 */
 			_createAndAddSection: function(oSectionConfig) {
-				var oHTMLControl = new HTML({content: "{/" + oSectionConfig.property + "}"});
-				oHTMLControl.setModel(this._oModel);
+				var fnCreateSubSection = function(sProperty, sTitle) {
+					var oHTML = new HTML({content: "{/" + sProperty + "}"});
+					oHTML.setModel(this._oModel);
+					return new ObjectPageSubSection(sTitle ? {title: sTitle, blocks: [oHTML]} : {blocks: [oHTML]});
+				}.bind(this);
 
-			var oPageSection = new ObjectPageSection({
+				var aSubSections = [];
+				if (oSectionConfig.hasSubsections) {
+					aSubSections.push(fnCreateSubSection(oSectionConfig.type + "_mainContent", "Overview"));
+					oSectionConfig.subsections.forEach(function(sub) {
+						aSubSections.push(fnCreateSubSection(oSectionConfig.type + "_" + sub + "Content", sub));
+					});
+				} else {
+					aSubSections.push(fnCreateSubSection(oSectionConfig.property));
+				}
+
+				var oPageSection = new ObjectPageSection({
 					id: this.createId(oSectionConfig.sectionId),
 					title: oSectionConfig.displayTitle,
-				titleUppercase: false,
-				subSections: [new ObjectPageSubSection({blocks: [oHTMLControl]})]
-			});
-			oPageSection.addStyleClass("sectionContent");
-
-			this._objectPage.addSection(oPageSection);
+					titleUppercase: false,
+					subSections: aSubSections
+				});
+				oPageSection.addStyleClass("sectionContent");
+				this._objectPage.addSection(oPageSection);
 			},
 			onAnnotationsLinkPress: function () {
 				this.scrollToEntity("annotations", "Summary");

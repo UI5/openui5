@@ -158,6 +158,28 @@
 			</ul>
 			<b>Note:</b> Each card can have only one extension.
 
+			<h2 id="limitations">
+				Extensions on Mobile Native Platforms
+			</h2>
+			<p>
+				JavaScript extensions are generally supported on <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native platforms</a>,
+				but with specific constraints:
+				</p><ul>
+					<li>Extensions must be carefully designed to work across both web and mobile native environments.</li>
+					<li>Extensions must rely only on the <a data-demokit-href="#/api/sap.ui.integration.Extension" target="_blank">Extension API</a> and <a data-demokit-href="#/api/sap.ui.integration.widgets.CardFacade" target="_blank">Card facade API</a>. Follow the best practices from the <a href="../../../index.html#/explore/extension" target="_parent">samples.</a></li>
+					<li><a data-demokit-href="#/api/sap.ui.integration" target="_blank">sap.ui.integration</a> modules are available, but other modules are not guaranteed to work.</li>
+					<li><b>Important:</b> Extensions must be tested explicitly on mobile native before productive usage.</li>
+				</ul>
+			<p></p>
+
+			<h2 id="security">
+				Security Considerations
+			</h2>
+			<p>
+				When developing extensions, consider security implications. 
+				Learn more about security best practices in the <a href="../../../index.html#/overview/security" target="_parent">Security Policies</a> section.
+			</p>
+
 			<h2 id="sharing">
 				Using a Shared Extension
 			</h2>

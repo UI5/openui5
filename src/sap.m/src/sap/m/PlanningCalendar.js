@@ -865,6 +865,19 @@ sap.ui.define([
 			}
 		}, false, this);
 		oTable.getStickyFocusOffset = getStickyFocusOffset.bind(this);
+
+		// Override setNavigationItems to exclude the popin column header (.sapMTblItemNav) from keyboard navigation
+		// In PlanningCalendar context, this element serves no interactive purpose and creates a confusing "ghost" tab stop
+		var fnOriginalSetNavigationItems = oTable.setNavigationItems.bind(oTable);
+		oTable.setNavigationItems = function(oItemNavigation) {
+			fnOriginalSetNavigationItems(oItemNavigation);
+			// Remove .sapMTblItemNav elements from item navigation as they are not meaningful in PlanningCalendar
+			var aItemDomRefs = oItemNavigation.getItemDomRefs().filter(function(oDomRef) {
+				return !oDomRef.classList.contains("sapMTblItemNav");
+			});
+			oItemNavigation.setItemDomRefs(aItemDomRefs);
+		};
+
 		this.setAggregation("table", oTable, true);
 
 		this.setStartDate(UI5Date.getInstance());

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><meta charset="utf-8">
+	<title>AI Generated Cards</title>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="../../scripts/boot.js"></script>
+</head>
+
+<body class="sapUiBody topicBody">
+	<div class="topic">
+		<div class="content">
+
+			<h1 id="aiGeneration">AI Generation</h1>
+
+			<h2 id="llms">AI Generated Cards</h2>
+			<p>
+				UI Integration Cards are declarative which enables Large Language Models (LLMs) to generate them based on the best practices and recommended patterns.
+			</p>
+
+			<h2 id="mcp-server">UI5 MCP Server</h2>
+			<p>
+				The <a href="https://github.com/UI5/mcp-server" target="_blank">UI5 MCP Server</a> significantly improves
+				the generation of UI Integration Cards. It provides specialized tools designed to assist
+				LLMs in creating new cards from scratch or editing existing ones, while following best
+				practices for card development.
+			</p>
+
+			<h3 id="benefits">Benefits of using the UI5 MCP Server</h3>
+			<p>
+				Using the UI5 MCP Server to develop UI Integration Cards offers several key advantages:
+			</p>
+			<ul>
+				<li>
+					<strong>Up-to-date Best Practices:</strong> LLMs gain access to the latest recommended APIs and development
+					patterns for UI Integration Cards, ensuring your cards follow current standards.
+				</li>
+				<li>
+					<strong>Version Compatibility:</strong> Prevents the use of deprecated properties or APIs that are not available
+					in your project's version, reducing errors and technical debt.
+				</li>
+				<li>
+					<strong>Efficient Scaffolding:</strong> Helps AI agents start new projects faster with established patterns,
+					saving development time and token costs.
+				</li>
+				<li>
+					<strong>Card-Type Specific Knowledge:</strong> Provides specialized knowledge for each card type. For example,
+					it can suggest the best-fitting chart types for an Analytical card.
+				</li>
+				<li>
+					<strong>Cross-Platform Compatibility:</strong> Encourages the use of Declarative card types to ensure compatibility
+					with both web and <a href="../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native platforms</a>.
+				</li>
+			</ul>
+
+			<h3 id="supportedTools">MCP Server Tools</h3>
+			<p>
+				The MCP server provides the following tools for UI Integration Cards development:
+			</p>
+			<ul>
+				<li>
+					<strong>get_integration_cards_guidelines:</strong> Provides dedicated guidelines for the development of
+					UI Integration Cards.
+				</li>
+				<li>
+					<strong>create_integration_card:</strong> Creates new UI Integration Cards based on specified parameters.
+				</li>
+				<li>
+					<strong>run_manifest_validation:</strong> Validates the manifest.json file for UI Integration Cards,
+					as well as regular UI5 applications and libraries.
+				</li>
+			</ul>
+
+			<h3 id="gettingStarted">Getting Started</h3>
+			<p>
+				To start using the UI5 MCP Server for generating Integration Cards:
+			</p>
+			<ol>
+				<li>Set up the UI5 MCP Server by following the <a href="https://github.com/UI5/mcp-server#setup" target="_blank">installation instructions</a>.</li>
+				<li>Configure your AI assistant to use the MCP server tools.</li>
+				<li>Use the available tools to create or enhance your UI Integration Cards.</li>
+			</ol>
+
+			<p>For more information about AI-generated cards and detailed examples, see the
+				<a href="https://community.sap.com/t5/technology-blog-posts-by-sap/ui5-mcp-server-got-extended-for-ui-integration-cards-generation/ba-p/14312670" target="_blank">SAP Community Blog Post</a>.
+			</p>
+
+			<h2 id="alternatives">How it works</h2>
+			<ul>
+				<li>An essential part of LLM-driven card generation is presented with the context setting guidelines in the
+					<a href="https://github.com/UI5/mcp-server/blob/main/resources/integration_cards_guidelines.md" target="_blank">UI Integration Cards Development Guidelines file</a>.
+					They can be reused in other AI tools.</li>
+				<li>A <a href="https://github.com/UI5/mcp-server/tree/main/resources/template-card" target="_blank">card template</a> helps LLMs to have a good starting point.</li>
+				<li>The <a href="https://github.com/UI5/manifest" target="_blank">UI5 Manifest schema</a> helps validate the results and correct mistakes.</li>
+			</ul>
+		</div>
+	</div>
+</body>
+
+</html>

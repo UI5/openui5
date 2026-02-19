@@ -41,6 +41,15 @@ sap.ui.define([
 
 	const sLongText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum congue libero ut blandit faucibus. Phasellus sed urna id tortor consequat accumsan eget at leo. Cras quis arcu magna.";
 
+	const clock = sinon.useFakeTimers();
+	const oDateFormat = DateFormat.getDateTimeInstance({relative: true});
+	const oNowUniversalDate = new UniversalDate(UI5Date.getInstance());
+	clock.tick(60000);
+	const TEXT_1_MIN_AGO = oDateFormat.format(oNowUniversalDate);
+	clock.tick(60000);
+	const TEXT_2_MIN_AGO = oDateFormat.format(oNowUniversalDate);
+	clock.restore();
+
 	QUnit.module("Headers");
 
 	QUnit.test("NumericHeader renderer", async function (assert) {
@@ -187,8 +196,6 @@ sap.ui.define([
 		// Arrange
 		this.clock = sinon.useFakeTimers();
 		const oNow = UI5Date.getInstance(),
-			oNowUniversalDate = new UniversalDate(oNow),
-			oDateFormat = DateFormat.getDateTimeInstance({relative: true}),
 			sTextNow = Library.getResourceBundleFor("sap.f").getText("CARD_HEADER_DATETIMESTAMP_NOW"),
 			oHeader = new CardHeader({
 				dataTimestamp: oNow.toISOString()
@@ -209,11 +216,9 @@ sap.ui.define([
 		// Act - wait 1 minute
 		this.clock.tick(60100);
 
-		const sText1Minute = oDateFormat.format(oNowUniversalDate);
-
 		// Assert
-		assert.strictEqual(oHeader.getAggregation("_dataTimestamp").getText(), sText1Minute, "DataTimestamp is updated after 1m for Header");
-		assert.strictEqual(oNumericHeader.getAggregation("_dataTimestamp").getText(), sText1Minute, "DataTimestamp is updated after 1m for NumericHeader");
+		assert.strictEqual(oHeader.getAggregation("_dataTimestamp").getText(), TEXT_1_MIN_AGO, "DataTimestamp is updated after 1m for Header");
+		assert.strictEqual(oNumericHeader.getAggregation("_dataTimestamp").getText(), TEXT_1_MIN_AGO, "DataTimestamp is updated after 1m for NumericHeader");
 
 		// Act - set empty timestamp
 		oHeader.setDataTimestamp(null);
@@ -225,6 +230,66 @@ sap.ui.define([
 
 		// Clean up
 		oHeader.destroy();
+		oNumericHeader.destroy();
+		this.clock.restore();
+		await nextUIUpdate(this.clock);
+	});
+
+	QUnit.test("CardHeader dataTimestamp rounds and updates at minute boundaries", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+		const oNow = UI5Date.getInstance(),
+			sTextNow = Library.getResourceBundleFor("sap.f").getText("CARD_HEADER_DATETIMESTAMP_NOW"),
+			oHeader = new CardHeader({
+				dataTimestamp: oNow.toISOString()
+			});
+
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(oHeader.getAggregation("_dataTimestamp").getText(), sTextNow, "DataTimestamp for 'now' is correct for Header");
+
+		this.clock.tick(44900);
+		assert.strictEqual(oHeader.getAggregation("_dataTimestamp").getText(), sTextNow, "DataTimestamp is not changed after 44s for Header");
+
+		this.clock.tick(200);
+		assert.strictEqual(oHeader.getAggregation("_dataTimestamp").getText(), TEXT_1_MIN_AGO, "DataTimestamp is updated after 45s for Header");
+
+		this.clock.tick(59000);
+		assert.strictEqual(oHeader.getAggregation("_dataTimestamp").getText(), TEXT_1_MIN_AGO, "DataTimestamp is \"1 minute ago\" after 104s for Header");
+
+		this.clock.tick(1000);
+		assert.strictEqual(oHeader.getAggregation("_dataTimestamp").getText(), TEXT_2_MIN_AGO, "DataTimestamp is updated after 105s for Header");
+
+		oHeader.destroy();
+		this.clock.restore();
+		await nextUIUpdate(this.clock);
+	});
+
+	QUnit.test("CardNumericHeader dataTimestamp rounds and updates at minute boundaries", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+		const oNow = UI5Date.getInstance(),
+			sTextNow = Library.getResourceBundleFor("sap.f").getText("CARD_HEADER_DATETIMESTAMP_NOW"),
+			oNumericHeader = new CardNumericHeader({
+				dataTimestamp: oNow.toISOString()
+			});
+
+		oNumericHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(oNumericHeader.getAggregation("_dataTimestamp").getText(), sTextNow, "DataTimestamp for 'now' is correct for Numeric Header");
+
+		this.clock.tick(44900);
+		assert.strictEqual(oNumericHeader.getAggregation("_dataTimestamp").getText(), sTextNow, "DataTimestamp is not changed after 44s for Numeric Header");
+
+		this.clock.tick(200);
+		assert.strictEqual(oNumericHeader.getAggregation("_dataTimestamp").getText(), TEXT_1_MIN_AGO, "DataTimestamp is updated after 45s for Numeric Header");
+
+		this.clock.tick(59000);
+		assert.strictEqual(oNumericHeader.getAggregation("_dataTimestamp").getText(), TEXT_1_MIN_AGO, "DataTimestamp is \"1 minute ago\" after 104s for Numeric Header");
+
+		this.clock.tick(1000);
+		assert.strictEqual(oNumericHeader.getAggregation("_dataTimestamp").getText(), TEXT_2_MIN_AGO, "DataTimestamp is updated after 105s for Numeric Header");
+
 		oNumericHeader.destroy();
 		this.clock.restore();
 		await nextUIUpdate(this.clock);

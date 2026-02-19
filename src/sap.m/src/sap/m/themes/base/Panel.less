@@ -156,12 +156,24 @@ html.sap-desktop .sapUiFioriObjectPage > section > .sapMPanel {
 
 .sapMPanelExpandable .sapMPanelWrappingDiv {
 
-	&:focus {
+	&:hover {
+		cursor: pointer;
+	}
+
+	/* Keyboard focus (TAB) should show outline on all devices */
+	&:focus-visible {
 		outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 		outline-offset: -0.1875rem;
 	}
 
-	&:hover {
-		cursor: pointer;
+	/* Remove outline for non-keyboard focus (tap/click) on mobile/tablet */
+	&:focus:not(:focus-visible) {
+		outline: none;
 	}
+}
+
+/* On desktop, always show focus outline regardless of input method */
+html.sap-desktop .sapMPanelExpandable .sapMPanelWrappingDiv:focus {
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+	outline-offset: -0.1875rem;
 }
