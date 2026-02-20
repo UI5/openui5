@@ -3797,26 +3797,32 @@ sap.ui
 			 */
 			MockServer.HTTPMETHOD = {
 				/**
+				 * HTTP GET method.
 				 * @public
 				 */
 				GET: "GET",
 				/**
+				 * HTTP POST method.
 				 * @public
 				 */
 				POST: "POST",
 				/**
+				 * HTTP DELETE method.
 				 * @public
 				 */
 				DELETE: "DELETE",
 				/**
+				 * HTTP PUT method.
 				 * @public
 				 */
 				PUT: "PUT",
 				/**
+				 * HTTP MERGE method.
 				 * @public
 				 */
 				MERGE: "MERGE",
 				/**
+				 * HTTP PATCH method.
 				 * @public
 				 */
 				PATCH: "PATCH"

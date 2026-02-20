@@ -451,6 +451,11 @@ sap.ui.define([
 				manageCancel: {},
 
 				/**
+				 * This event is fired when users opens the <i>Manage Views</i> dialog.
+				 */
+				manageOpen: {},
+
+				/**
 				 * This event is fired when users apply changes variant information in the <i>Manage Views</i> dialog.
 				 * Some of the parameters may be ommitted, depending on user selection.
 				 */
@@ -2505,21 +2510,24 @@ sap.ui.define([
 		return oListItem;
 	};
 
-
-	VariantManagement.prototype._openManagementDialog = function() {
+	VariantManagement.prototype._openManagementDialog = function () {
 		this._clearDeletedItems();
 		this._clearRenamedItems();
 		this._createManagementDialog();
+
+		//Open dialog before re-binding the table to avoid any delays on the UI
+		this.oManagementDialog.open();
+		this.fireManageOpen();
 
 		if (this.oVariantPopOver) {
 			this.oVariantPopOver.close();
 		}
 
+		this.oManagementTable.setBusy(true);
 		this._suspendManagementTableBinding();
 
 		this._sDefaultKey = this.getDefaultKey();
 		this._sOriginalDefaultKey = this._sDefaultKey;
-
 
 		this._oSearchFieldOnMgmtDialog.setValue("");
 
@@ -2532,11 +2540,11 @@ sap.ui.define([
 			this._rebindVMTable();
 		}
 
-        if (this.oManagementTable.getItems().length < 1) {
+		if (this.oManagementTable.getItems().length < 1) {
 			this.oManagementTable.setNoData(this._oNoDataIllustratedMessage);
 		}
 
-		this.oManagementDialog.open();
+		this.oManagementTable.setBusy(false);
 	};
 
 	VariantManagement.prototype._toggleIconActivityState = function(oIcon, oItem, bToInActive) {

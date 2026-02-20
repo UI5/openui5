@@ -160,21 +160,21 @@ sap.ui.define([
 		 * </pre>
 		 *
 		 * If parts of the theme are at different locations (e.g. because you provide a standard theme
-		 * like "sap_belize" for a custom control library and this self-made part of the standard theme is at a
+		 * like "sap_horizon" for a custom control library and this self-made part of the standard theme is at a
 		 * different location than the UI5 resources), you can also specify for which control libraries the setting
 		 * should be used, by giving an array with the names of the respective control libraries as second parameter:
 		 * <pre>
-		 *   Theming.setThemeRoot("sap_belize", ["my.own.library"], "https://mythemeserver.com/allThemes");
+		 *   Theming.setThemeRoot("sap_horizon", ["my.own.library"], "https://mythemeserver.com/allThemes");
 		 * </pre>
 		 *
-		 * This will cause the Belize theme to be loaded from the UI5 location for all standard libraries.
+		 * This will cause the Horizon theme to be loaded from the UI5 location for all standard libraries.
 		 * Resources for styling the <code>my.own.library</code> controls will be loaded from the configured
 		 * location:
 		 * <pre>
-		 *   https://openui5.hana.ondemand.com/resources/sap/ui/core/themes/sap_belize/library.css
-		 *   https://openui5.hana.ondemand.com/resources/sap/ui/layout/themes/sap_belize/library.css
-		 *   https://openui5.hana.ondemand.com/resources/sap/m/themes/sap_belize/library.css
-		 *   https://mythemeserver.com/allThemes/my/own/library/themes/sap_belize/library.css
+		 *   https://openui5.hana.ondemand.com/resources/sap/ui/core/themes/sap_horizon/library.css
+		 *   https://openui5.hana.ondemand.com/resources/sap/ui/layout/themes/sap_horizon/library.css
+		 *   https://openui5.hana.ondemand.com/resources/sap/m/themes/sap_horizon/library.css
+		 *   https://mythemeserver.com/allThemes/my/own/library/themes/sap_horizon/library.css
 		 * </pre>
 		 *
 		 * If the custom theme should be loaded initially (via bootstrap attribute), the <code>themeRoots</code>

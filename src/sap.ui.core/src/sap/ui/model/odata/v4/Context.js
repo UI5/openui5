@@ -825,7 +825,8 @@ sap.ui.define([
 							$selectionCount : iSelectionCount
 						};
 					});
-			} else if (sPath === "@$ui5.context.isSelected") {
+			}
+			if (sPath === "@$ui5.context.isSelected") {
 				// @$ui5.context.isSelected is a virtual property for header contexts and not part
 				// of the cache (in contrast to row contexts, where it is saved in the cache).
 				// Therefore, change listeners are saved and fired via the header context
@@ -833,12 +834,14 @@ sap.ui.define([
 				_Helper.registerChangeListener(this, sPath, oListener);
 
 				return SyncPromise.resolve(this.bSelected);
-			} else if (sPath === "$selectionCount") {
+			}
+			if (sPath === "$selectionCount") {
 				this.mChangeListeners ??= {};
 				_Helper.registerChangeListener(this, sPath, oListener);
 
 				return SyncPromise.resolve(iSelectionCount);
-			} else if (sPath !== "$count") {
+			}
+			if (sPath !== "$count") {
 				throw new Error("Invalid header path: " + sPath);
 			}
 		}
@@ -2055,7 +2058,8 @@ sap.ui.define([
 		aPathExpressions.map(function (vPath) {
 			if (vPath === null) {
 				return "";
-			} else if (typeof vPath === "object") {
+			}
+			if (typeof vPath === "object") {
 				if (vPath.$Null === null) {
 					return "";
 				}

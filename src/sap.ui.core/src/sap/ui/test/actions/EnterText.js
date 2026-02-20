@@ -54,7 +54,7 @@ sap.ui.define([
 					type: "boolean",
 					defaultValue: true
 				},
-				/*
+				/**
 				 * If it is set to <code>true</code>, the input will remain focused after text is entered.
 				 * Use this for inputs with a suggestion list that you want to keep open.
 				 * @since 1.67
@@ -63,7 +63,7 @@ sap.ui.define([
 					type: "boolean",
 					defaultValue: false
 				},
-				/*
+				/**
 				 * If it is set to <code>true</code>, an ENTER key will be entered after the text.
 				 * Use this for inputs that shouldn't lose the focus after a text is entered.
 				 * (e.g. inputs in a sap.m.Popover shouldn't be focused out, as this will make the popover close in FF and IE11)

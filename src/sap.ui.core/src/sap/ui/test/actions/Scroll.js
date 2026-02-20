@@ -29,10 +29,18 @@ sap.ui.define([
 
 		metadata : {
 			properties: {
+				/**
+				 * The x scroll position.
+				 * @public
+				 */
 				x: {
 					type: "int",
 					defaultValue: 0
 				},
+				/**
+				 * The y scroll position.
+				 * @public
+				 */
 				y: {
 					type: "int",
 					defaultValue: 0

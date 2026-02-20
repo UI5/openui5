@@ -985,4 +985,205 @@ function(Press,
 
 	})();
 
+	QUnit.module("Keyboard Events - keyUp and keyDown", {
+		beforeEach: function() {
+			this.oButton = new Button({id: "_keyboardButton"});
+			this.oButton.placeAt("qunit-fixture");
+			return nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oButton.destroy();
+		}
+	});
+
+	QUnit.test("Should dispatch keydown event when keyDown property is true", function(assert) {
+		var done = assert.async();
+		var oButton = this.oButton;
+
+		// Arrange - add keydown event listener
+		oButton.getDomRef().addEventListener("keydown", function(oEvent) {
+			assert.ok(true, "keydown event was dispatched");
+			assert.strictEqual(oEvent.type, "keydown", "Event type is keydown");
+			done();
+		});
+
+		// Act
+		var oPressAction = new Press({keyDown: true});
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should dispatch keyup event when keyUp property is true", function(assert) {
+		var done = assert.async();
+		var oButton = this.oButton;
+
+		// Arrange - add keyup event listener
+		oButton.getDomRef().addEventListener("keyup", function(oEvent) {
+			assert.ok(true, "keyup event was dispatched");
+			assert.strictEqual(oEvent.type, "keyup", "Event type is keyup");
+			done();
+		});
+
+		// Act
+		var oPressAction = new Press({keyUp: true});
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should dispatch keydown event with shiftKey", function(assert) {
+		var done = assert.async();
+		var oButton = this.oButton;
+
+		// Arrange - add keydown event listener
+		oButton.getDomRef().addEventListener("keydown", function(oEvent) {
+			assert.ok(true, "keydown event was dispatched");
+			assert.ok(oEvent.shiftKey, "Shift key modifier is set");
+			assert.strictEqual(oEvent.key, "Shift", "Event key is 'Shift'");
+			assert.strictEqual(oEvent.code, "ShiftLeft", "Event code is 'ShiftLeft'");
+			assert.strictEqual(oEvent.keyCode, 16, "Event keyCode is 16");
+			done();
+		});
+
+		// Act
+		var oPressAction = new Press({keyDown: true, shiftKey: true});
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should dispatch keydown event with ctrlKey", function(assert) {
+		var done = assert.async();
+		var oButton = this.oButton;
+
+		// Arrange - add keydown event listener
+		oButton.getDomRef().addEventListener("keydown", function(oEvent) {
+			assert.ok(true, "keydown event was dispatched");
+			assert.ok(oEvent.ctrlKey, "Ctrl key modifier is set");
+			assert.strictEqual(oEvent.key, "Control", "Event key is 'Control'");
+			assert.strictEqual(oEvent.code, "ControlLeft", "Event code is 'ControlLeft'");
+			assert.strictEqual(oEvent.keyCode, 17, "Event keyCode is 17");
+			done();
+		});
+
+		// Act
+		var oPressAction = new Press({keyDown: true, ctrlKey: true});
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should dispatch keydown event with altKey", function(assert) {
+		var done = assert.async();
+		var oButton = this.oButton;
+
+		// Arrange - add keydown event listener
+		oButton.getDomRef().addEventListener("keydown", function(oEvent) {
+			assert.ok(true, "keydown event was dispatched");
+			assert.ok(oEvent.altKey, "Alt key modifier is set");
+			assert.strictEqual(oEvent.key, "Alt", "Event key is 'Alt'");
+			assert.strictEqual(oEvent.code, "AltLeft", "Event code is 'AltLeft'");
+			assert.strictEqual(oEvent.keyCode, 18, "Event keyCode is 18");
+			done();
+		});
+
+		// Act
+		var oPressAction = new Press({keyDown: true, altKey: true});
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should dispatch keydown event with multiple modifiers - shiftKey takes priority for key/code", function(assert) {
+		var done = assert.async();
+		var oButton = this.oButton;
+
+		// Arrange - add keydown event listener
+		oButton.getDomRef().addEventListener("keydown", function(oEvent) {
+			assert.ok(true, "keydown event was dispatched");
+			assert.ok(oEvent.shiftKey, "Shift key modifier is set");
+			assert.ok(oEvent.altKey, "Alt key modifier is set");
+			assert.ok(oEvent.ctrlKey, "Ctrl key modifier is set");
+			// When multiple modifiers are set, shiftKey takes priority for key/code
+			assert.strictEqual(oEvent.key, "Shift", "Event key is 'Shift' (shiftKey takes priority)");
+			assert.strictEqual(oEvent.code, "ShiftLeft", "Event code is 'ShiftLeft'");
+			assert.strictEqual(oEvent.keyCode, 16, "Event keyCode is 16");
+			done();
+		});
+
+		// Act
+		var oPressAction = new Press({keyDown: true, shiftKey: true, altKey: true, ctrlKey: true});
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should dispatch keyup event with modifiers", function(assert) {
+		var done = assert.async();
+		var oButton = this.oButton;
+
+		// Arrange - add keyup event listener
+		oButton.getDomRef().addEventListener("keyup", function(oEvent) {
+			assert.ok(true, "keyup event was dispatched");
+			assert.ok(oEvent.shiftKey, "Shift key modifier is set");
+			assert.ok(oEvent.altKey, "Alt key modifier is set");
+			assert.ok(oEvent.ctrlKey, "Ctrl key modifier is set");
+			done();
+		});
+
+		// Act
+		var oPressAction = new Press({keyUp: true, shiftKey: true, altKey: true, ctrlKey: true});
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should NOT dispatch mouse events when keyDown is true", function(assert) {
+		var done = assert.async();
+		var oButton = this.oButton;
+		var bMouseEventFired = false;
+		var bKeydownFired = false;
+
+		// Arrange - add event listeners
+		oButton.getDomRef().addEventListener("mousedown", function(oEvent) {
+			bMouseEventFired = true;
+		});
+
+		oButton.getDomRef().addEventListener("click", function(oEvent) {
+			bMouseEventFired = true;
+		});
+
+		oButton.getDomRef().addEventListener("keydown", function(oEvent) {
+			bKeydownFired = true;
+		});
+
+		// Act
+		var oPressAction = new Press({keyDown: true});
+		oPressAction.executeOn(oButton);
+
+		// Assert after a short delay
+		setTimeout(function() {
+			assert.ok(bKeydownFired, "keydown event was dispatched");
+			assert.notOk(bMouseEventFired, "Mouse events were NOT dispatched");
+			done();
+		}, 50);
+	});
+
+	QUnit.test("Should NOT dispatch mouse events when keyUp is true", function(assert) {
+		var done = assert.async();
+		var oButton = this.oButton;
+		var bMouseEventFired = false;
+		var bKeyupFired = false;
+
+		// Arrange - add event listeners
+		oButton.getDomRef().addEventListener("mousedown", function(oEvent) {
+			bMouseEventFired = true;
+		});
+
+		oButton.getDomRef().addEventListener("click", function(oEvent) {
+			bMouseEventFired = true;
+		});
+
+		oButton.getDomRef().addEventListener("keyup", function(oEvent) {
+			bKeyupFired = true;
+		});
+
+		// Act
+		var oPressAction = new Press({keyUp: true});
+		oPressAction.executeOn(oButton);
+
+		// Assert after a short delay
+		setTimeout(function() {
+			assert.ok(bKeyupFired, "keyup event was dispatched");
+			assert.notOk(bMouseEventFired, "Mouse events were NOT dispatched");
+			done();
+		}, 50);
+	});
 });

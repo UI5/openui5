@@ -676,7 +676,8 @@ sap.ui.define([
 
 				if (oSyncPromise.isFulfilled()) {
 					return oSyncPromise.getResult();
-				} else if (bThrow) {
+				}
+				if (bThrow) {
 					if (oSyncPromise.isRejected()) {
 						oSyncPromise.caught();
 						throw oSyncPromise.getResult();

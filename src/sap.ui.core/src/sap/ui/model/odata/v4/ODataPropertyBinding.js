@@ -323,7 +323,8 @@ sap.ui.define([
 							|| that.sPath[that.sPath.lastIndexOf("/") + 1] === "#"))) {
 					if (bIsMeta) {
 						return vValue0;
-					} else if (that.bRelative) {
+					}
+					if (that.bRelative) {
 						return _Helper.publicClone(vValue0);
 					}
 				}

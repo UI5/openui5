@@ -116,16 +116,17 @@
 								text="{i18n>ToggleButtonQuickText}"
 								ariaLabelledBy="textFilter"
 								tooltip="{i18n>TooltipQuick}"/>
-							<ToolbarSeparator
-								visible="{= ${device>/system/desktop} }"/>
-							<ToggleButton
-								type="Transparent"
-								id="tbLessParam"
-								press=".onPressLessParam"
-								icon="sap-icon://vds-file"
-								text="{i18n>ToggleButtonLessParamText}"
-								ariaLabelledBy="textFilter"
-								tooltip="{i18n>TooltipLessParam}"/>
+								<ToolbarSeparator
+									visible="{= ${device>/system/desktop} }"/>
+								<ToggleButton
+									type="Transparent"
+									id="tbLessParam"
+									press=".onPressLessParam"
+									icon="sap-icon://vds-file"
+									text="{i18n>ToggleButtonLessParamText}"
+									ariaLabelledBy="textFilter"
+									tooltip="{i18n>TooltipLessParam}"/>
+
 					</OverflowToolbar>
 				</headerToolbar>
 			</Panel>

@@ -77,6 +77,24 @@ sap.ui.define([
 				 */
 				yPercentage: {
 					type: "float"
+				},
+				/**
+				 * If it is set to <code>true</code>, a <code>keydown</code> keyboard event will be dispatched
+				 * instead of mouse events. The modifier keys (shiftKey, altKey, ctrlKey) will be applied
+				 * to the keyboard event if set.
+				 * @since 1.146
+				 */
+				keyDown: {
+					type: "boolean"
+				},
+				/**
+				 * If it is set to <code>true</code>, a <code>keyup</code> keyboard event will be dispatched
+				 * instead of mouse events. The modifier keys (shiftKey, altKey, ctrlKey) will be applied
+				 * to the keyboard event if set.
+				 * @since 1.146
+				 */
+				keyUp: {
+					type: "boolean"
 				}
 			}
 		},
@@ -89,6 +107,8 @@ sap.ui.define([
 		/**
 		 * Sets focus on given control and triggers a 'tap' event on it (which is
 		 * internally translated into a 'press' event).
+		 * If <code>keyDown</code> or <code>keyUp</code> is set to <code>true</code>,
+		 * dispatches the corresponding keyboard event instead of mouse events.
 		 * Logs an error if control is not visible (i.e. has no dom representation)
 		 *
 		 * @param {sap.ui.core.Control} oControl the control on which the 'press' event is triggered
@@ -103,6 +123,8 @@ sap.ui.define([
 			var bAltKey = this.getAltKey();
 			var bCtrlKey = this.getCtrlKey();
 			var bShiftKey = this.getShiftKey();
+			var bKeyDown = this.getKeyDown();
+			var bKeyUp = this.getKeyUp();
 
 			var iXPercentage = this.getXPercentage();
 			var iYPercentage = this.getYPercentage();
@@ -141,13 +163,44 @@ sap.ui.define([
 
 				this._tryOrSimulateFocusin($ActionDomRef, oControl);
 
-				// the missing events like saptouchstart and tap will be fired by the event simulation
-				this._createAndDispatchMouseEvent("mousedown", oActionDomRef, null, null, null, iClientX, iClientY);
-				this.getUtils().triggerEvent("selectstart", oActionDomRef);
-				this._createAndDispatchMouseEvent("mouseup", oActionDomRef, null, null, null, iClientX, iClientY);
-				this._createAndDispatchMouseEvent("click", oActionDomRef, bShiftKey, bAltKey, bCtrlKey);
-				//Focusout simulation removed in order to fix Press action behavior
-				//since in real scenario manual press action does not fire focusout event
+				// If keyDown or keyUp is set, dispatch keyboard events instead of mouse events
+				if (bKeyDown || bKeyUp) {
+					// Determine which key to simulate based on the modifier flags
+					// Priority: Shift > Ctrl > Alt (if multiple are set, use the first one for key/code)
+					var oKeyInfo = null;
+
+					if (bShiftKey) {
+						oKeyInfo = Press.KEYS.SHIFT;
+					} else if (bCtrlKey) {
+						oKeyInfo = Press.KEYS.CTRL;
+					} else if (bAltKey) {
+						oKeyInfo = Press.KEYS.ALT;
+					}
+
+					var oKeyboardOptions = {
+						key: oKeyInfo?.key || "",
+						code: oKeyInfo?.code || "",
+						keyCode: oKeyInfo?.keyCode || 0,
+						shiftKey: bShiftKey,
+						altKey: bAltKey,
+						ctrlKey: bCtrlKey
+					};
+
+					if (bKeyDown) {
+						this._createAndDispatchKeyboardEvent("keydown", oActionDomRef, oKeyboardOptions);
+					}
+					if (bKeyUp) {
+						this._createAndDispatchKeyboardEvent("keyup", oActionDomRef, oKeyboardOptions);
+					}
+				} else {
+					// the missing events like saptouchstart and tap will be fired by the event simulation
+					this._createAndDispatchMouseEvent("mousedown", oActionDomRef, null, null, null, iClientX, iClientY);
+					this.getUtils().triggerEvent("selectstart", oActionDomRef);
+					this._createAndDispatchMouseEvent("mouseup", oActionDomRef, null, null, null, iClientX, iClientY);
+					this._createAndDispatchMouseEvent("click", oActionDomRef, bShiftKey, bAltKey, bCtrlKey);
+					//Focusout simulation removed in order to fix Press action behavior
+					//since in real scenario manual press action does not fire focusout event
+				}
 			}
 		}
 	});
@@ -245,6 +298,31 @@ sap.ui.define([
 			return "text";
 		} else {
 			return null; // focusDomRef: <div> -- root
+		}
+	};
+
+	/**
+	 * A map of keyboard modifier key definitions containing key name, code, and keyCode values.
+	 * Used when dispatching keyboard events with modifier keys.
+	 *
+	 * @private
+	 * @static
+	 */
+	Press.KEYS = {
+		SHIFT: {
+			key: "Shift",
+			code: "ShiftLeft",
+			keyCode: 16
+		},
+		CTRL: {
+			key: "Control",
+			code: "ControlLeft",
+			keyCode: 17
+		},
+		ALT: {
+			key: "Alt",
+			code: "AltLeft",
+			keyCode: 18
 		}
 	};
 

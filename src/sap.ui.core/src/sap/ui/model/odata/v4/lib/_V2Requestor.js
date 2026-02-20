@@ -583,14 +583,16 @@ sap.ui.define([
 				if (oCandidate === null) {
 					// no conversion needed
 					return {value : null};
-				} else if (typeof oCandidate !== "object") {
+				}
+				if (typeof oCandidate !== "object") {
 					// treat as candidate for "entityPropertyInJson"
 					return {
 						value : this.convertPrimitive(oCandidate,
 							this.oModelInterface.fetchMetadata(sMetaPath).getResult(),
 							sMetaPath, aKeys[0])
 					};
-				} else if (oCandidate.__metadata) {
+				}
+				if (oCandidate.__metadata) {
 					// drill down into candidate for "entityComplexProperty"
 					oResponsePayload = oCandidate;
 				}
