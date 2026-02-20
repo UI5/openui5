@@ -2172,6 +2172,189 @@ sap.ui.define([
 		this.oVM.onclick();
 	});
 
+	QUnit.module("VariantManagement Manage dialog busy state", {
+		beforeEach: async function() {
+			this.oVM = new VariantManagement();
+			this.oVM.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oVM.destroy();
+		}
+	});
+
+	QUnit.test("check table busy state is set and cleared during management dialog opening", function(assert) {
+		var done = assert.async();
+
+		this.oVM.addItem(new VariantItem({key: "1", title: "One", author: "A"}));
+		this.oVM.addItem(new VariantItem({key: "2", title: "Two", author: "B"}));
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		var oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			// Verify setBusy was called with true and then false
+			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called");
+			assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called");
+
+			// Verify the order: setBusy(true) should be called before setBusy(false)
+			var bTrueCalledFirst = false;
+			for (var i = 0; i < oSetBusySpy.callCount; i++) {
+				if (oSetBusySpy.getCall(i).args[0] === true) {
+					bTrueCalledFirst = true;
+				}
+				if (oSetBusySpy.getCall(i).args[0] === false && bTrueCalledFirst) {
+					assert.ok(true, "setBusy(true) was called before setBusy(false)");
+					break;
+				}
+			}
+
+			// Verify final state is not busy
+			assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy after dialog opens");
+
+			oSetBusySpy.restore();
+			this.oVM.oManagementDialog.close();
+			done();
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check table binding is suspended during busy state", function(assert) {
+		var done = assert.async();
+
+		this.oVM.addItem(new VariantItem({key: "1", title: "One", author: "A"}));
+		this.oVM.addItem(new VariantItem({key: "2", title: "Two", author: "B"}));
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		var oSuspendSpy = sinon.spy(this.oVM, "_suspendManagementTableBinding");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			// Verify _suspendManagementTableBinding was called
+			assert.ok(oSuspendSpy.calledOnce, "_suspendManagementTableBinding should have been called once");
+
+			oSuspendSpy.restore();
+			this.oVM.oManagementDialog.close();
+			done();
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check busy state with rebind required", function(assert) {
+		var done = assert.async();
+
+		this.oVM.addItem(new VariantItem({key: "1", title: "One", author: "A"}));
+		this.oVM.addItem(new VariantItem({key: "2", title: "Two", author: "B"}));
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		// Force rebind to be required
+		this.oVM._bRebindRequired = true;
+
+		var oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+		var oRebindSpy = sinon.spy(this.oVM, "_rebindVMTable");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			// Verify setBusy was called with true and then false
+			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called");
+			assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called");
+
+			// Verify rebind was called
+			assert.ok(oRebindSpy.called, "_rebindVMTable should have been called when _bRebindRequired is true");
+
+			// Verify final state is not busy
+			assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy after dialog opens");
+
+			oSetBusySpy.restore();
+			oRebindSpy.restore();
+			this.oVM.oManagementDialog.close();
+			done();
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check busy state clears correctly when no items exist", function(assert) {
+		var done = assert.async();
+
+		// No items added - empty table scenario
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		var oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+		var oSetNoDataSpy = sinon.spy(this.oVM.oManagementTable, "setNoData");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			// Verify setBusy was called with true and then false
+			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called");
+			assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called");
+
+			// Verify setNoData was called since there are no items
+			assert.ok(oSetNoDataSpy.called, "setNoData should have been called when no items exist");
+
+			// Verify final state is not busy
+			assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy after dialog opens");
+
+			oSetBusySpy.restore();
+			oSetNoDataSpy.restore();
+			this.oVM.oManagementDialog.close();
+			done();
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check busy state sequence with multiple dialog openings", function(assert) {
+		var done = assert.async();
+
+		this.oVM.addItem(new VariantItem({key: "1", title: "One", author: "A"}));
+		this.oVM.addItem(new VariantItem({key: "2", title: "Two", author: "B"}));
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		var nOpenCount = 0;
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			nOpenCount++;
+
+			// Verify final state is not busy on each open
+			assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy after dialog opens (open #" + nOpenCount + ")");
+
+			if (nOpenCount === 1) {
+				// Close and reopen the dialog
+				this.oVM.oManagementDialog.attachEventOnce("afterClose", function() {
+					this.oVM._openManagementDialog();
+				}.bind(this));
+				this.oVM.oManagementDialog.close();
+			} else {
+				// Second opening - test complete
+				this.oVM.oManagementDialog.close();
+				done();
+			}
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check table is not busy before dialog is opened", function(assert) {
+		this.oVM.addItem(new VariantItem({key: "1", title: "One", author: "A"}));
+		this.oVM.addItem(new VariantItem({key: "2", title: "Two", author: "B"}));
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		// Before opening the dialog, table should not be busy
+		assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy before dialog is opened");
+	});
+
 	QUnit.module("VariantManagement Roles handling", {
 		beforeEach: async function() {
 			this.oVM = new VariantManagement();

@@ -51,7 +51,15 @@ sap.ui.define([
 	 * @public
 	 */
 	RecordReplay.InteractionType = {
+		/**
+		 * "Press" Interaction type.
+		 * @public
+		 */
 		Press: "PRESS",
+		/**
+		 * "EnterText" interaction type.
+		 * @public
+		 */
 		EnterText: "ENTER_TEXT"
 	};
 

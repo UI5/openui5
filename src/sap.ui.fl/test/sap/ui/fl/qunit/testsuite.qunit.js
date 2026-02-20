@@ -1604,6 +1604,13 @@ sap.ui.define([
 				}
 			},
 
+			"apply/_internal/changes/descriptor/platform/SetUI5VersionNumber": {
+				group: "Apply Internal - Descriptor Change Merger",
+				coverage: {
+					only: ["sap/ui/fl/apply/_internal/changes/descriptor/platform/SetUI5VersionNumber"]
+				}
+			},
+
 			"Generic Testsuite": {
 				page: "test-resources/sap/ui/fl/qunit/testsuite.generic.qunit.html"
 			}

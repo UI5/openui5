@@ -54,30 +54,6 @@ sap.ui.define([
 		},
 		"sap_fiori_3_hcw": {
 			"text": "Quartz High Contrast White"
-		},
-		"sap_belize": {
-			"text": "Belize",
-			"deprecated": true
-		},
-		"sap_belize_plus": {
-			"text": "Belize Deep",
-			"deprecated": true
-		},
-		"sap_belize_hcb": {
-			"text": "Belize High Contrast Black",
-			"deprecated": true
-		},
-		"sap_belize_hcw": {
-			"text": "Belize High Contrast White",
-			"deprecated": true
-		},
-		"sap_bluecrystal": {
-			"text": "Blue Crystal",
-			"deprecated": true
-		},
-		"sap_hcb": {
-			"text": "High Contrast Black",
-			"deprecated": true
 		}
 	};
 
@@ -663,32 +639,14 @@ sap.ui.define([
 			this.onAction();
 			Theming.setTheme(theme);
 			this.byId("title").setText(`Details for ''${themeName}''`);
-			var isDeprecated = mThemes[theme].deprecated;
-			if (isDeprecated) {
-				this.byId("tbLessParam").setPressed();
-				this.byId("tbLessParam").setEnabled(false);
-				this.byId("colCP").setVisible(false);
-				this.byId("colTP").setVisible(true);
-				this._oTableFilterState.aCPFilter = [];
-			} else {
-				this.byId("tbLessParam").setEnabled(true);
-				this.byId("colCP").setVisible(true);
-				this.byId("colTP").setVisible(false);
-				this._oTableFilterState.aCPFilter = [
-					new Filter("cp", FilterOperator.EQ, true)
-				];
-			}
-			this._applyFilterSearch();
 		},
 		// Event handler for pressing the copy to clipboard button
-		// Copies the UI5 parameter to the clipboard
+		// Copies the CSS Custom Property to the clipboard
 		onCopyCodeToClipboard: function (oEvt) {
-			var sTheme = Theming.getTheme(),
-				isDeprecated = mThemes[sTheme].deprecated,
-				sString = oEvt.getSource().getParent().getCells()[isDeprecated ? 3 : 2].getText(),
+			var sString = oEvt.getSource().getParent().getCells()[2].getText(),
 				$temp = jQuery("<input>");
 			if (!sString) {
-				MessageToast.show("No UI5 Parameter to copy to clipboard");
+				MessageToast.show("No CSS Custom Property to copy to clipboard");
 				return;
 			}
 			try {
@@ -696,9 +654,9 @@ sap.ui.define([
 				$temp.val(sString).trigger("select");
 				document.execCommand("copy");
 				$temp.remove();
-				MessageToast.show("UI5 Parameter " + sString + " copied to clipboard");
+				MessageToast.show("CSS Custom Property " + sString + " copied to clipboard");
 			} catch (oException) {
-				MessageToast.show("UI5 Parameter " + sString + " not copied to clipboard");
+				MessageToast.show("CSS Custom Property " + sString + " not copied to clipboard");
 			}
 		},
 
@@ -706,11 +664,8 @@ sap.ui.define([
 		onSearch: function (oEvt) {
 			var sQuery = oEvt.getSource().getValue();
 			if (sQuery && sQuery.length > 0) {
-				var sTheme = Theming.getTheme(),
-					isDeprecated = mThemes[sTheme].deprecated;
 				this._oTableFilterState.aFilter = [
-					new Filter(isDeprecated ? "nameTP" : "nameCP", FilterOperator.Contains, sQuery)
-					//new Filter("nameTP", FilterOperator.Contains, sQuery) // TODO: support filter of Custom Prop and Theme Param
+					new Filter("nameCP", FilterOperator.Contains, sQuery)
 				];
 			} else {
 				this._oTableFilterState.aFilter = [];

@@ -87,7 +87,8 @@ sap.ui.define([
 			});
 
 			return;
-		} else if (iLevels > 1) {
+		}
+		if (iLevels > 1) {
 			// $apply=filter(status ne '')/....MultiLevelExpand(...)/skip(119)/top(110)
 			oResponse.message = JSON.stringify({
 				// "@odata.context" : "$metadata#Bookings(@SAP__core.AnyStructure)", ...

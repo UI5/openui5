@@ -28,6 +28,7 @@ sap.ui.define([
 		appdescr_ui5_addComponentUsages: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/ui5/AddComponentUsages"),
 		appdescr_ui5_changeModel: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/ui5/ChangeModel"),
 		appdescr_ui5_setMinUI5Version: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/ui5/SetMinUI5Version"),
+		appdescr_platform_cf_setUI5VersionNumber: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/platform/SetUI5VersionNumber"),
 		appdescr_fiori_setRegistrationIds: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/fiori/SetRegistrationIds"),
 		appdescr_ui5_setFlexExtensionPointEnabled: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/ui5/SetFlexExtensionPointEnabled"),
 		appdescr_ui5_addNewModel: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/ui5/AddNewModel"),

@@ -359,6 +359,40 @@ function (ManagedObject, QUnitUtils, Opa5, Device, jQuery, _OpaLogger, _FocusLis
 			var bDocumentHasFocus = !document.hasFocus || document.hasFocus();
 			var bIsElemInBody = !!(oDomRef.type || oDomRef.href || ~oDomRef.tabIndex);
 			return bIsActiveElement && bDocumentHasFocus && bIsElemInBody;
+		},
+
+		/**
+		 * Creates and dispatches a keyboard event on the given DOM element.
+		 *
+		 * @param {string} sName Name of the keyboard event (e.g., "keydown", "keyup")
+		 * @param {Element} oDomRef DOM element on which the event is going to be triggered
+		 * @param {object} [oOptions] Options for the keyboard event
+		 * @param {string} [oOptions.key] The key value of the key pressed (e.g., "Enter", "ArrowUp", "ArrowDown")
+		 * @param {number} [oOptions.keyCode] The keyCode of the key pressed
+		 * @param {boolean} [oOptions.shiftKey] Indicates whether the shift key is down in addition
+		 * @param {boolean} [oOptions.altKey] Indicates whether the alt key is down in addition
+		 * @param {boolean} [oOptions.ctrlKey] Indicates whether the ctrl key is down in addition
+		 * @private
+		 */
+		_createAndDispatchKeyboardEvent: function (sName, oDomRef, oOptions) {
+			oOptions = oOptions || {};
+			var oKeyboardEvent = new KeyboardEvent(sName, {
+				bubbles: true,
+				cancelable: true,
+				key: oOptions.key || "",
+				code: oOptions.code || "",
+				keyCode: oOptions.keyCode || 0,
+				which: oOptions.keyCode || 0,
+				shiftKey: !!oOptions.shiftKey,
+				altKey: !!oOptions.altKey,
+				ctrlKey: !!oOptions.ctrlKey,
+				metaKey: !!oOptions.metaKey,
+				type: sName,
+				target: oDomRef
+			});
+
+			oDomRef.dispatchEvent(oKeyboardEvent);
+			this.oLogger.info("Dispatched keyboard event: '" + sName + "'" + (oOptions.key ? " with key '" + oOptions.key + "'" : ""));
 		}
 	});
 

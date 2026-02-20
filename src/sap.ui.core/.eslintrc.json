@@ -63,7 +63,7 @@
 				"max-classes-per-file": "error",
 				"new-cap": "error", // override "warn"
 				"no-await-in-loop": "error",
-				"no-else-return": "error",
+				"no-else-return": ["error", {"allowElseIf": false}],
 				"no-lonely-if": "error", // override "warn"
 				"no-multiple-empty-lines": ["error", {"max": 1}],
 				"no-multi-spaces": "error",

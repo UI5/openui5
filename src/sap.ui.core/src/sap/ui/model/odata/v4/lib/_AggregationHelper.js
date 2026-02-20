@@ -1063,7 +1063,8 @@ sap.ui.define([
 			const vValue = oFilter.getValue1();
 			if (typeof vValue === "number" || vValue === null) { // null: type is irrelevant
 				return {$Type : "Edm.Decimal"};
-			} else if (typeof vValue === "boolean") {
+			}
+			if (typeof vValue === "boolean") {
 				return {$Type : "Edm.Boolean"};
 			}
 			const sPath = sResolvedPath.slice(0, -sAlias.length) + sOriginalPropertyName;
