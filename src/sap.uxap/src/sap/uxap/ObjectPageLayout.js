@@ -713,6 +713,10 @@ sap.ui.define([
 		this._oHeaderContentDelegate = {
 			onBeforeRendering: this._setSectionInfoIsDirty.bind(this, true)
 		};
+
+		// Store bound function reference to prevent creating new functions on each call
+		// and to avoid endless loop in ResizeHandler when callbacks are registered during suspension
+		this._adjustTitlePositioningBound = this._adjustTitlePositioning.bind(this);
 	};
 
 	/**
@@ -3174,7 +3178,7 @@ sap.ui.define([
 			return;
 		}
 
-		if (ResizeHandler.isSuspended(this._$titleArea.get(0), this._adjustTitlePositioning.bind(this))) {
+		if (ResizeHandler.isSuspended(this._$titleArea.get(0), this._adjustTitlePositioningBound)) {
 			return;
 		}
 
