@@ -197,7 +197,7 @@ sap.ui.define([
 		 *   >"4 Resource Path"</a> in specification "OData Version 4.01. Part 2: URL Conventions"
 		 *   is a valid data binding path within this model if a leading slash is added; for example
 		 *   "/" + "SalesOrderList('A%2FB%26C')" to access an entity instance with key "A/B&C". Note
-		 *   that appropriate URI encoding is necessary, see the example of
+		 *   that appropriate URL encoding is necessary, see the example of
 		 *   {@link sap.ui.model.odata.v4.ODataUtils.formatLiteral}. "4.5.1 Addressing Actions"
 		 *   needs an operation binding, see {@link sap.ui.model.odata.v4.ODataContextBinding}.
 		 *
@@ -1720,7 +1720,7 @@ sap.ui.define([
 	 * @param {object} oEntity
 	 *   The entity instance with the key property values
 	 * @returns {sap.ui.base.SyncPromise<string|undefined>}
-	 *   A promise that gets resolved with the proper URI encoded key predicate, for example
+	 *   A promise that gets resolved with the proper URL encoded key predicate, for example
 	 *   "(Sector='A%2FB%26C',ID='42')" or "('42')", or <code>undefined</code>, if at least one key
 	 *   property is undefined. It gets rejected if the metadata cannot be fetched or in case the
 	 *   entity has no key properties according to metadata.
@@ -2011,7 +2011,7 @@ sap.ui.define([
 	 * @param {object} oEntity
 	 *   The entity instance with the key property values
 	 * @returns {string|undefined}
-	 *   The proper URI-encoded key predicate, for example "(Sector='A%2FB%26C',ID='42')" or
+	 *   The proper URL-encoded key predicate, for example "(Sector='A%2FB%26C',ID='42')" or
 	 *   "('42')", or <code>undefined</code> if at least one key property is undefined.
 	 * @throws {Error}
 	 *   If the key predicate cannot be determined synchronously
@@ -2375,7 +2375,7 @@ sap.ui.define([
 
 	/**
 	 * Normalizes the key predicates of a message's target using the sort order from the metadata,
-	 * including proper URI encoding, e.g. "(Sector='A%2FB%26C',ID='42')" or "('42')".
+	 * including proper URL encoding, e.g. "(Sector='A%2FB%26C',ID='42')" or "('42')".
 	 *
 	 * @param {string} sTarget
 	 *   The message target
@@ -2693,7 +2693,7 @@ sap.ui.define([
 	 * @param {object} oEntity
 	 *   The entity instance with the key property values
 	 * @returns {Promise<string|undefined>}
-	 *   A promise that gets resolved with the proper URI-encoded key predicate, for example
+	 *   A promise that gets resolved with the proper URL-encoded key predicate, for example
 	 *   "(Sector='A%2FB%26C',ID='42')" or "('42')", or <code>undefined</code> if at least one key
 	 *   property is undefined. It gets rejected if the metadata cannot be fetched, or in case the
 	 *   entity has no key properties according to the metadata.

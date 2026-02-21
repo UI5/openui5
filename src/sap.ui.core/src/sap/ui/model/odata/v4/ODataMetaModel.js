@@ -177,7 +177,7 @@ sap.ui.define([
 		 *   The metadata requestor
 		 * @param {string} sUrl
 		 *   The URL to the $metadata document of the service
-		 * @param {string|string[]} [vAnnotationUri]
+		 * @param {string|string[]} [vAnnotationURL]
 		 *   The URL (or an array of URLs) from which the annotation metadata are loaded
 		 *   Supported since 1.41.0
 		 * @param {sap.ui.model.odata.v4.ODataModel} oModel
@@ -559,7 +559,7 @@ sap.ui.define([
 	 *   The metadata requestor
 	 * @param {string} sUrl
 	 *   The URL to the $metadata document of the service
-	 * @param {string|string[]} [vAnnotationUri]
+	 * @param {string|string[]} [vAnnotationURL]
 	 *   The URL (or an array of URLs) from which the annotation metadata are loaded
 	 *   Supported since 1.41.0
 	 * @param {sap.ui.model.odata.v4.ODataModel} oModel
@@ -571,10 +571,10 @@ sap.ui.define([
 	 * @param {string} [sLanguage]
 	 *   The "sap-language" URL parameter
 	 */
-	function constructor(oRequestor, sUrl, vAnnotationUri, oModel, bSupportReferences, sLanguage) {
+	function constructor(oRequestor, sUrl, vAnnotationURL, oModel, bSupportReferences, sLanguage) {
 		MetaModel.call(this);
-		this.aAnnotationUris = vAnnotationUri && !Array.isArray(vAnnotationUri)
-			? [vAnnotationUri] : vAnnotationUri;
+		this.aAnnotationURLs = vAnnotationURL && !Array.isArray(vAnnotationURL)
+			? [vAnnotationURL] : vAnnotationURL;
 		this.sDefaultBindingMode = BindingMode.OneTime;
 		this.mETags = {};
 		this.sForbiddenSchema = undefined; // data service's schema in case of a value help service
@@ -616,35 +616,35 @@ sap.ui.define([
 	ODataMetaModel.prototype.$$valueAsPromise = true;
 
 	/**
-	 * Adds the given reference URI to the map of reference URIs for schemas.
+	 * Adds the given reference URL to the map of reference URLs for schemas.
 	 *
 	 * @param {string} sSchema
 	 *   A namespace of a schema, for example "foo.bar."
-	 * @param {string} sReferenceUri
-	 *   A URI to the metadata document for the given schema
-	 * @param {string} [sDocumentUri]
-	 *   The URI to the metadata document containing the given reference to the given schema
+	 * @param {string} sReferenceURL
+	 *   A URL to the metadata document for the given schema
+	 * @param {string} [sDocumentURL]
+	 *   The URL to the metadata document containing the given reference to the given schema
 	 * @throws {Error}
-	 *   If the schema has already been loaded from a different URI
+	 *   If the schema has already been loaded from a different URL
 	 *
 	 * @private
 	 */
-	ODataMetaModel.prototype._addUrlForSchema = function (sSchema, sReferenceUri, sDocumentUri) {
+	ODataMetaModel.prototype._addUrlForSchema = function (sSchema, sReferenceURL, sDocumentURL) {
 		var sUrl0,
 			mUrls = this.mSchema2MetadataUrl[sSchema];
 
 		if (!mUrls) {
 			mUrls = this.mSchema2MetadataUrl[sSchema] = {};
-			mUrls[sReferenceUri] = false;
-		} else if (!(sReferenceUri in mUrls)) {
+			mUrls[sReferenceURL] = false;
+		} else if (!(sReferenceURL in mUrls)) {
 			sUrl0 = Object.keys(mUrls)[0];
 			if (mUrls[sUrl0]) {
 				// document already processed, no different URLs allowed
 				this._reportAndThrowError("A schema cannot span more than one document: "
-					+ sSchema + " - expected reference URI " + sUrl0 + " but instead saw "
-					+ sReferenceUri, sDocumentUri);
+					+ sSchema + " - expected reference URL " + sUrl0 + " but instead saw "
+					+ sReferenceURL, sDocumentURL);
 			}
-			mUrls[sReferenceUri] = false;
+			mUrls[sReferenceURL] = false;
 		}
 	};
 
@@ -697,7 +697,7 @@ sap.ui.define([
 	 * @see #_getAnnotationsForSchema
 	 */
 	ODataMetaModel.prototype._copyAnnotations = function (oMetaModel) {
-		if (this.aAnnotationUris) {
+		if (this.aAnnotationURLs) {
 			throw new Error("Must not copy annotations when there are local annotation files");
 		}
 
@@ -788,7 +788,7 @@ sap.ui.define([
 	 *   The schema, or a promise which is resolved without details or rejected with an error, or
 	 *   <code>undefined</code>.
 	 * @throws {Error}
-	 *   If the schema has already been loaded and read from a different URI
+	 *   If the schema has already been loaded and read from a different URL
 	 *
 	 * @private
 	 */
@@ -866,7 +866,7 @@ sap.ui.define([
 	 * @param {object[]} aAnnotationFiles
 	 *   The metadata "JSON" of the additional annotation files
 	 * @throws {Error}
-	 *   If metadata cannot be merged or if the schema has already been loaded from a different URI
+	 *   If metadata cannot be merged or if the schema has already been loaded from a different URL
 	 *
 	 * @private
 	 */
@@ -889,17 +889,17 @@ sap.ui.define([
 			var oElement,
 				sQualifiedName;
 
-			that.validate(that.aAnnotationUris[i], mAnnotationScope);
+			that.validate(that.aAnnotationURLs[i], mAnnotationScope);
 			for (sQualifiedName in mAnnotationScope) {
 				if (sQualifiedName[0] !== "$") {
 					if (sQualifiedName in mScope) {
 						that._reportAndThrowError("A schema cannot span more than one document: "
-							+ sQualifiedName, that.aAnnotationUris[i]);
+							+ sQualifiedName, that.aAnnotationURLs[i]);
 					}
 					oElement = mAnnotationScope[sQualifiedName];
 					mScope[sQualifiedName] = oElement;
 					if (oElement.$kind === "Schema") {
-						that._addUrlForSchema(sQualifiedName, that.aAnnotationUris[i]);
+						that._addUrlForSchema(sQualifiedName, that.aAnnotationURLs[i]);
 						that._doMergeAnnotations(oElement, mScope.$Annotations, true);
 					}
 				}
@@ -1139,10 +1139,10 @@ sap.ui.define([
 			aPromises
 				= [SyncPromise.resolve(this.oRequestor.read(this.sUrl, false, bPrefetch))];
 
-			if (this.aAnnotationUris) {
-				this.aAnnotationUris.forEach(function (sAnnotationUri) {
+			if (this.aAnnotationURLs) {
+				this.aAnnotationURLs.forEach(function (sAnnotationURL) {
 					aPromises.push(SyncPromise.resolve(
-						that.oRequestor.read(sAnnotationUri, true, bPrefetch)));
+						that.oRequestor.read(sAnnotationURL, true, bPrefetch)));
 				});
 			}
 			if (!bPrefetch) {
@@ -3729,21 +3729,21 @@ sap.ui.define([
 	 * @returns {object}
 	 *   <code>mScope</code> to allow "chaining"
 	 * @throws {Error}
-	 *   If validation fails or if the schema has already been loaded from a different URI
+	 *   If validation fails or if the schema has already been loaded from a different URL
 	 *
 	 * @private
 	 */
 	ODataMetaModel.prototype.validate = function (sUrl, mScope) {
-		var oDate, oLastModified, sSchema, oReference, sReferenceUri, i;
+		var oDate, oLastModified, sSchema, oReference, sReferenceURL, i;
 
 		if (!this.bSupportReferences) {
 			return mScope;
 		}
 
-		for (sReferenceUri in mScope.$Reference) {
-			oReference = mScope.$Reference[sReferenceUri];
-			// interpret reference URI relative to metadata URL
-			sReferenceUri = _Helper.makeAbsolute(sReferenceUri, this.sUrl);
+		for (sReferenceURL in mScope.$Reference) {
+			oReference = mScope.$Reference[sReferenceURL];
+			// interpret reference URL relative to metadata URL
+			sReferenceURL = _Helper.makeAbsolute(sReferenceURL, this.sUrl);
 
 			if ("$IncludeAnnotations" in oReference) {
 				this._reportAndThrowError("Unsupported IncludeAnnotations", sUrl);
@@ -3755,7 +3755,7 @@ sap.ui.define([
 						+ sSchema + " - is both included and defined",
 						sUrl);
 				}
-				this._addUrlForSchema(sSchema, sReferenceUri, sUrl);
+				this._addUrlForSchema(sSchema, sReferenceURL, sUrl);
 			}
 		}
 

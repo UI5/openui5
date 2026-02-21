@@ -1652,7 +1652,7 @@ sap.ui.define([
 
 		// code under test
 		return oCache.read(0, 10, 0, "~oGroupLock~").then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oResult) {
 			assert.strictEqual(oResult, oError);
 		});
@@ -1713,7 +1713,7 @@ sap.ui.define([
 
 			// code under test
 			return oCache.readCount(oGroupLock).then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oResult) {
 				assert.strictEqual(oResult, oError);
 				if (bRetryIfFailed && bOtherRequestFailed) {
@@ -3483,7 +3483,7 @@ sap.ui.define([
 		return oCache.expand(
 			"~oGroupLock~", "~path~", "~iLevels~", Object.freeze({}), "~fnDataRequested~"
 		).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oResult) {
 			assert.strictEqual(oResult, oError);
 		});
@@ -3520,7 +3520,7 @@ sap.ui.define([
 		return oCache.expand(
 			"~oGroupLock~", oGroupNode, "~iLevels~", Object.freeze({}), "~fnDataRequested~"
 		).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError.message, "Unexpected structural change: groupLevelCount");
 		});
@@ -4510,7 +4510,7 @@ sap.ui.define([
 
 		// code under test
 		return oCache.readGrandTotal(oGroupLock).then(() => {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, (oError0) => {
 			// no error handling in _AggregationCache#readGrandTotal
 			assert.strictEqual(oError0, oError);
@@ -4586,7 +4586,7 @@ sap.ui.define([
 
 		// code under test
 		return _AggregationCache.prototype.refreshSingle.call(oCache, "~oGroupLock~").then(() => {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, (oError0) => {
 			// no error handling in _AggregationCache#refreshSingle
 			assert.strictEqual(oError0, oError);
@@ -5317,7 +5317,7 @@ sap.ui.define([
 		oRequestExpectation.args[0][6]();
 
 		return oSyncPromise.then(function () {
-				assert.ok(false, "unexpected success");
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});
@@ -6759,7 +6759,7 @@ sap.ui.define([
 		assert.ok(oDeletePromise.isPending(), "a SyncPromise");
 
 		return oDeletePromise.then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError, "~error~");
 			assert.strictEqual(fnCallback.callCount, 0);

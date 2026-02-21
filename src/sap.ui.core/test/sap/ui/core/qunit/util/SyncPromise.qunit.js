@@ -46,7 +46,7 @@ sap.ui.define([
 				assert.strictEqual(vReason, vExpectedReason);
 			});
 			oSyncPromise.then(function () {
-				assert.ok(false, "unexpected success");
+				assert.ok(false, "Unexpected success");
 			}, function (vReason) {
 				assert.strictEqual(vReason, vExpectedReason);
 			});
@@ -258,7 +258,7 @@ sap.ui.define([
 		assertPending(assert, oSyncPromise);
 
 		oNewPromise = oSyncPromise.then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (vReason) {
 			assert.strictEqual(vReason, oReason);
 		});
@@ -285,7 +285,7 @@ sap.ui.define([
 				.then(/* then w/o callbacks does not change result */)
 				.then(null, "If onRejected is not a function, it must be ignored")
 				.then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (vReason) {
 					assertRejected(assert, oSyncPromise, oReason);
 					assert.strictEqual(vReason, oReason);
@@ -555,7 +555,7 @@ sap.ui.define([
 			.then(/* then w/o callbacks does not change result */)
 			.then(null, "If onRejected is not a function, it must be ignored")
 			.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (vReason) {
 				assertRejected(assert, oSyncPromise, oReason);
 				assert.strictEqual(vReason, oReason);
@@ -960,7 +960,7 @@ sap.ui.define([
 		assertPending(assert, oFinallyPromise);
 
 		return oFinallyPromise.then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (vReason) {
 			assert.strictEqual(vReason, oOldReason);
 		});
@@ -984,7 +984,7 @@ sap.ui.define([
 			assertPending(assert, oFinallyPromise);
 
 			return oFinallyPromise.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (vReason) {
 				assert.strictEqual(vReason, oNewReason);
 			});

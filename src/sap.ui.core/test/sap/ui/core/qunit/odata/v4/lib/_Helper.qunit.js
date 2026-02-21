@@ -2331,7 +2331,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("makeAbsolute: document.baseURI", function (assert) {
-		// if the origins of the given URL and the document's base URI are equal, we don't care
+		// if the origins of the given URL and the document's baseURI are equal, we don't care
 		// about it and remove the origin from the resulting URL, because it is equivalent to a root
 		// relative URL
 

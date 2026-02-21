@@ -91,6 +91,10 @@ sap.ui.define([
 						idSuffix: sIDSuffix
 					};
 				}
+				if (typeof oControl.getEnabled === "function" && oControl.getEnabled() === false) {
+					oSelector.enabled = false; // make the disabled control discoverable, as defined in <code>sap.ui.test.Opa5.BaseParameters</code>
+					oLogger.debug("Control " + oControl.getId() + " is disabled, adding enabled=false to the selector");
+				}
 				resolve(oSelector);
 			}).catch(function (oError) {
 				reject(new Error("No control selector found for DOM element " + oOptions.domElement.id + ". Error: " + oError));

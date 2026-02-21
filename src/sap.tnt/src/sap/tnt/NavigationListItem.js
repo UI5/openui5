@@ -97,8 +97,6 @@ sap.ui.define([
 				 * </ul>
 				 *
 				 * @since 1.116
-				 * @experimental Since 1.116. Disclaimer: this property is in a beta state
-				 * - incompatible API changes may be done before its official public release.
 				 */
 				selectable: { type: "boolean", group: "Behavior", defaultValue: true },
 
@@ -129,7 +127,6 @@ sap.ui.define([
 				 * Specifies if the item has a special design.
 				 * <b>Note:</b> If the <code>design</code> property is not set to <code>NavigationListItemDesign.Default</code>, sub-items cannot be added.
 				 * @since 1.133.0
-				 * @experimental Behavior might change.
 				 */
 				design: { type: "sap.tnt.NavigationListItemDesign", group: "Behavior", defaultValue: NavigationListItemDesign.Default },
 

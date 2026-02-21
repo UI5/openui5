@@ -695,7 +695,7 @@ sap.ui.define([
 
 		// invoke read before refresh
 		oPromise = oBinding.fetchValue("/EMPLOYEES(ID='1')/ID").then(function () {
-			assert.ok(false, "First read has to be canceled");
+			assert.ok(false, "Unexpected success"); // first read has to be canceled
 		}, function (oError1) {
 			assert.strictEqual(oError1.canceled, true);
 			// no Error is logged because error has canceled flag
@@ -825,12 +825,12 @@ sap.ui.define([
 			"Failed to read path /absolute", sClassName, sinon.match.same(oExpectedError));
 
 		oBinding.fetchValue("/absolute/foo").then(function () {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError, oExpectedError);
 		});
 		return oBinding.fetchValue("/absolute/bar").then(function () {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError, oExpectedError);
 		});
@@ -873,7 +873,7 @@ sap.ui.define([
 			"Failed to read path ~", sClassName, sinon.match.same(oError));
 
 		return oBinding.fetchValue("/Base/relative/foo").then(function () {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, function (oResult) {
 			assert.strictEqual(oResult, oError);
 		});
@@ -1468,7 +1468,7 @@ sap.ui.define([
 
 			return oBinding._invoke(oGroupLock) // code under test
 				.then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError) {
 					assert.strictEqual(oError.message, oFixture.error);
 				});
@@ -1809,7 +1809,7 @@ sap.ui.define([
 				// code under test
 				return oBinding._invoke(oGroupLock, "~mParameters~", "~bIgnoreETag~")
 				.then(function () {
-					assert.ok(false, "unexpected success");
+					assert.ok(false, "Unexpected success");
 				}, function (oError0) {
 					assert.strictEqual(oError0, oError);
 				});
@@ -1919,7 +1919,7 @@ sap.ui.define([
 		return oBinding._invoke(oGroupLock, "~mParameters~", "~bIgnoreETag~",
 			"~fnOnStrictHandlingFailed~", /*bReplaceWithRVC*/true)
 		.then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError0, oError);
 			assert.strictEqual(oReportErrorExpectation.args[0][2], oError);
@@ -1964,7 +1964,7 @@ sap.ui.define([
 
 		// code under test
 		return oBinding._invoke(oGroupLock, "~mParameters~", "~bIgnoreETag~").then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError0, oError);
 			assert.strictEqual(bDependentsRefreshed, true);
@@ -2000,7 +2000,7 @@ sap.ui.define([
 
 		// code under test
 		return oBinding._invoke(oGroupLock, "~mParameters~", "~bIgnoreETag~").then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError0, oError);
 		});
@@ -2058,7 +2058,7 @@ sap.ui.define([
 
 			// code under test
 			return oBinding._invoke(oGroupLock, "~mParameters~", "~bIgnoreETag~").then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});
@@ -2113,7 +2113,7 @@ sap.ui.define([
 
 			// code under test
 			return oBinding._invoke(oGroupLock, "~mParameters~", "~bIgnoreETag~").then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});
@@ -3739,7 +3739,7 @@ sap.ui.define([
 			// code under test
 			return oBinding.refreshInternal("path", "myGroup", false, bKeepCacheOnError)
 				.then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oReturnedError) {
 					assert.strictEqual(oReturnedError, oError);
 					if (bKeepCacheOnError) {
@@ -3807,13 +3807,13 @@ sap.ui.define([
 			// code under test
 			oRefreshPromise1 = oBinding.refreshInternal("path", "myGroup", true, bKeepCacheOnError)
 				.then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oReturnedError) {
 					assert.strictEqual(oReturnedError, oError);
 				});
 			oRefreshPromise2 = oBinding.refreshInternal("path", "myGroup", true, bKeepCacheOnError)
 				.then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oReturnedError) {
 					assert.strictEqual(oReturnedError, oError);
 				});
@@ -3885,7 +3885,7 @@ sap.ui.define([
 
 			// code under test
 			return oBinding.refreshInternal("path", "myGroup", false, true).then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oReturnedError) {
 					assert.strictEqual(oReturnedError,
 						bFetchResourcePathFails ? oYetAnotherError : oError);
@@ -3942,7 +3942,7 @@ sap.ui.define([
 
 		// code under test
 		return oBinding.refreshInternal("path", "myGroup", true, true).then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oReturnedError) {
 				assert.strictEqual(oReturnedError, oYetAnotherError);
 				assert.strictEqual(oBinding.oCache, oOldCache);
@@ -4806,7 +4806,7 @@ sap.ui.define([
 			// code under test
 			return oBinding.refreshReturnValueContext(oReturnValueContext, "group", bKeepCacheOnError)
 				.then(function () {
-					assert.ok(false, "unexpected success");
+					assert.ok(false, "Unexpected success");
 				}, function (oError0) {
 					assert.strictEqual(oError0,
 						bKeepCacheOnError && bCheckFails ? oCheckError : oError);
@@ -4958,7 +4958,7 @@ sap.ui.define([
 
 		// code under test
 		return oBinding.requestSideEffects(sGroupId, aPaths, oContext).then(function () {
-				assert.ok(false, "unexpected success");
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});

@@ -1298,8 +1298,8 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("basics", function (assert) {
-		var sAnnotationUri = "my/annotation.xml",
-			aAnnotationUris = [sAnnotationUri, "uri2.xml"],
+		var sAnnotationURL = "my/annotation.xml",
+			aAnnotationURLs = [sAnnotationURL, "url2.xml"],
 			oModel = {},
 			oMetadataRequestor = this.oMetaModel.oRequestor,
 			sUrl = "/~/$metadata",
@@ -1312,8 +1312,8 @@ sap.ui.define([
 		oMetaModel = new ODataMetaModel(oMetadataRequestor, sUrl);
 
 		assert.ok(oMetaModel instanceof MetaModel);
-		assert.strictEqual(oMetaModel.aAnnotationUris, undefined);
-		assert.ok(oMetaModel.hasOwnProperty("aAnnotationUris"), "own property aAnnotationUris");
+		assert.strictEqual(oMetaModel.aAnnotationURLs, undefined);
+		assert.ok(oMetaModel.hasOwnProperty("aAnnotationURLs"), "own property aAnnotationURLs");
 		assert.strictEqual(oMetaModel.sForbiddenSchema, undefined);
 		assert.ok(oMetaModel.hasOwnProperty("sForbiddenSchema"), "own property sForbiddenSchema");
 		assert.strictEqual(oMetaModel.oMetaModelForAnnotations, null);
@@ -1380,14 +1380,14 @@ sap.ui.define([
 			"ClientModel/ClientListBinding doesn't support \"NotAll\"");
 
 		// code under test
-		oMetaModel = new ODataMetaModel(oMetadataRequestor, sUrl, aAnnotationUris);
+		oMetaModel = new ODataMetaModel(oMetadataRequestor, sUrl, aAnnotationURLs);
 
-		assert.strictEqual(oMetaModel.aAnnotationUris, aAnnotationUris, "arrays are passed");
+		assert.strictEqual(oMetaModel.aAnnotationURLs, aAnnotationURLs, "arrays are passed");
 
 		// code under test
-		oMetaModel = new ODataMetaModel(oMetadataRequestor, sUrl, sAnnotationUri);
+		oMetaModel = new ODataMetaModel(oMetadataRequestor, sUrl, sAnnotationURL);
 
-		assert.deepEqual(oMetaModel.aAnnotationUris, [sAnnotationUri],
+		assert.deepEqual(oMetaModel.aAnnotationURLs, [sAnnotationURL],
 			"single annotation is wrapped");
 
 		// code under test
@@ -1461,8 +1461,8 @@ sap.ui.define([
 		undefined,
 		["/my/annotation.xml"],
 		["/my/annotation.xml", "/another/annotation.xml"]
-	].forEach(function (aAnnotationURI) {
-		var title = "fetchEntityContainer - " + JSON.stringify(aAnnotationURI);
+	].forEach(function (aAnnotationURL) {
+		var title = "fetchEntityContainer - " + JSON.stringify(aAnnotationURL);
 
 		QUnit.test(title, function (assert) {
 			var oRequestorMock = this.mock(this.oMetaModel.oRequestor),
@@ -1476,7 +1476,7 @@ sap.ui.define([
 					.withExactArgs(that.oMetaModel.sUrl, false, bPrefetch)
 					.resolves(mRootScope);
 				aReadResults = [];
-				(aAnnotationURI || []).forEach(function (sAnnotationUrl) {
+				(aAnnotationURL || []).forEach(function (sAnnotationUrl) {
 					var oAnnotationResult = {};
 
 					aReadResults.push(oAnnotationResult);
@@ -1486,7 +1486,7 @@ sap.ui.define([
 				});
 			}
 
-			this.oMetaModel.aAnnotationUris = aAnnotationURI;
+			this.oMetaModel.aAnnotationURLs = aAnnotationURL;
 			this.oMetaModelMock.expects("_mergeAnnotations").never();
 			this.oMetaModelMock.expects("_changeAnnotations").never();
 			expectReads(true);
@@ -1602,7 +1602,7 @@ sap.ui.define([
 		this.oMetaModelMock.expects("_mergeAnnotations").throws(oError);
 
 		return this.oMetaModel.fetchEntityContainer().then(function () {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError0, oError);
 		});
@@ -1724,7 +1724,7 @@ sap.ui.define([
 		"/T€AMS/$NavigationPropertyBinding/TEAM_2_EMPLOYEES/" : oWorkerData,
 		"/T€AMS/$NavigationPropertyBinding/TEAM_2_EMPLOYEES/$Type" : "tea_busi.Worker",
 		"/T€AMS/$NavigationPropertyBinding/TEAM_2_EMPLOYEES/AGE" : oWorkerData.AGE,
-		// URI encoding for slashes inside key - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// URL encoding for slashes inside key - - - - - - - - - - - - - - - - - - - - - - - - - -
 		"/TEAMS/$NavigationPropertyBinding/TEAM_2_CONTAINED_S%2FS_2_EMPLOYEE/AGE" : oWorkerData.AGE,
 		"/TEAMS/$NavigationPropertyBinding/TEAM_2_CONTAINED_S%2FS_2_C%2FC_2_S%2FS_2_EMPLOYEE/AGE"
 			: oWorkerData.AGE,
@@ -2917,9 +2917,9 @@ sap.ui.define([
 			return Promise.all(aPromises);
 		});
 	});
-	//TODO Decision: It is an error if a namespace is referenced multiple times with different URIs.
+	//TODO Decision: It is an error if a namespace is referenced multiple times with different URLs.
 	//     This should be checked even when load-on-demand is used.
-	//     (It should not even be included multiple times with the same URI!)
+	//     (It should not even be included multiple times with the same URL!)
 	//TODO Check that no namespace is included which is already present!
 	//TODO API to load "transitive closure"
 	//TODO support for sync. XML Templating
@@ -3104,14 +3104,14 @@ sap.ui.define([
 			.throws(oError);
 
 		return this.oMetaModel.fetchObject("/tea_busi_product.v0001.Product").then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});
 	});
 
 	//*********************************************************************************************
-	QUnit.test("fetchObject: cross-service reference - document loaded from different URI",
+	QUnit.test("fetchObject: cross-service reference - document loaded from different URL",
 			function (assert) {
 		var sMessage = "A schema cannot span more than one document: schema is referenced by"
 				+ " following URLs: /a/default/iwbep/tea_busi_product/0001/$metadata,"
@@ -3129,7 +3129,7 @@ sap.ui.define([
 
 		// code under test
 		return this.oMetaModel.fetchObject("/tea_busi_product.v0001.Product").then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0.message, sSchema + ": " + sMessage);
 			});
@@ -3203,7 +3203,7 @@ sap.ui.define([
 			});
 	});
 	//TODO Implement consistency checks that the same namespace is always included from the same
-	//     reference URI, no matter which referencing document.
+	//     reference URL, no matter which referencing document.
 
 	//*********************************************************************************************
 	[undefined, false, true].forEach(function (bSupportReferences) {
@@ -4102,7 +4102,7 @@ sap.ui.define([
 
 		// code under test
 		return this.oMetaModel.fetchUpdateData(sPath, oContext).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError, oExpectedError);
 		});
@@ -4225,7 +4225,7 @@ sap.ui.define([
 
 		// code under test
 		return this.oMetaModel.fetchCanonicalPath(oContext).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError.message, "Context " + oContext.getPath()
 				+ " does not point to an entity. It should be " + "/TEAMS('4711')");
@@ -4243,7 +4243,7 @@ sap.ui.define([
 
 		// code under test
 		return this.oMetaModel.fetchCanonicalPath(oContext).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError, oExpectedError);
 		});
@@ -4262,7 +4262,7 @@ sap.ui.define([
 
 		// code under test
 		return this.oMetaModel.fetchCanonicalPath(oContext).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError.message,
 				"/T€AMS/-1/EMPLOYEES: No canonical path for transient entity");
@@ -5006,12 +5006,12 @@ sap.ui.define([
 
 		assert.deepEqual(this.oMetaModel.mSchema2MetadataUrl, {});
 
-		// simulate a previous reference to a schema with the _same_ reference URI --> allowed!
+		// simulate a previous reference to a schema with the _same_ reference URL --> allowed!
 		this.oMetaModel.mSchema2MetadataUrl["A."] = {"/A/$metadata" : false};
-		// simulate a previous reference to a schema with the _different_ reference URI
+		// simulate a previous reference to a schema with the _different_ reference URL
 		// --> allowed as long as the document is not yet read (and will never be read)
 		this.oMetaModel.mSchema2MetadataUrl["B.B."] = {"/B/V2/$metadata" : false};
-		// simulate a previous reference to a schema with the _same_ reference URI, already loaded
+		// simulate a previous reference to a schema with the _same_ reference URL, already loaded
 		this.oMetaModel.mSchema2MetadataUrl["C."] = {"/C/$metadata" : true};
 
 		const oHelperMock = this.mock(_Helper);
@@ -5124,7 +5124,7 @@ sap.ui.define([
 		}
 	}, {
 		message : "A schema cannot span more than one document: existing."
-			+ " - expected reference URI /B/v1/$metadata but instead saw /B/v2/$metadata",
+			+ " - expected reference URL /B/v1/$metadata but instead saw /B/v2/$metadata",
 		scope : {
 			$Version : "4.0",
 			$Reference : {
@@ -5216,7 +5216,7 @@ sap.ui.define([
 				}
 			};
 
-			this.oMetaModel.aAnnotationUris = ["/URI/1", "/URI/2"];
+			this.oMetaModel.aAnnotationURLs = ["/URL/1", "/URL/2"];
 
 			const aMergeExpectations = [];
 			this.oMetaModelMock.expects("validate")
@@ -5227,9 +5227,9 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(mScope0["B."]), sinon.match.object));
 			if (bAnnotationFiles) {
 				this.oMetaModelMock.expects("validate")
-					.withExactArgs("/URI/1", sinon.match.same(mAnnotationScope1));
+					.withExactArgs("/URL/1", sinon.match.same(mAnnotationScope1));
 				this.oMetaModelMock.expects("validate")
-					.withExactArgs("/URI/2", sinon.match.same(mAnnotationScope2));
+					.withExactArgs("/URL/2", sinon.match.same(mAnnotationScope2));
 				aMergeExpectations.push(this.oMetaModelMock.expects("_doMergeAnnotations")
 					.withExactArgs(sinon.match.same(mAnnotationScope1["foo."]), sinon.match.object,
 						true));
@@ -5250,8 +5250,8 @@ sap.ui.define([
 			assert.deepEqual(this.oMetaModel.mSchema2MetadataUrl, bAnnotationFiles ? {
 				"A." : {"/a/b/c/d/e/$metadata" : false},
 				"B." : {"/a/b/c/d/e/$metadata" : false},
-				"bar." : {"/URI/2" : false},
-				"foo." : {"/URI/1" : false}
+				"bar." : {"/URL/2" : false},
+				"foo." : {"/URL/1" : false}
 			} : {
 				"A." : {"/a/b/c/d/e/$metadata" : false},
 				"B." : {"/a/b/c/d/e/$metadata" : false}
@@ -5281,7 +5281,7 @@ sap.ui.define([
 			mAnnotationScope1 = {},
 			mAnnotationScope2 = {};
 
-		this.oMetaModel.aAnnotationUris = ["n/a", "/my/annotation.xml"];
+		this.oMetaModel.aAnnotationURLs = ["n/a", "/my/annotation.xml"];
 		this.oMetaModelMock.expects("validate")
 			.withExactArgs(this.oMetaModel.sUrl, mScope0);
 		this.oMetaModelMock.expects("validate")
@@ -5324,7 +5324,7 @@ sap.ui.define([
 
 		// the examples are unrealistic and only need to work in 'legacy mode'
 		this.oMetaModel.bSupportReferences = false;
-		this.oMetaModel.aAnnotationUris = ["n/a"];
+		this.oMetaModel.aAnnotationURLs = ["n/a"];
 		this.oMetaModelMock.expects("validate")
 			.withExactArgs(this.oMetaModel.sUrl, oMetadata);
 		this.oMetaModelMock.expects("validate")
@@ -5529,13 +5529,13 @@ sap.ui.define([
 				}
 			};
 
-		this.oMetaModel.aAnnotationUris = ["/URI/1", "/URI/2"];
+		this.oMetaModel.aAnnotationURLs = ["/URL/1", "/URL/2"];
 		this.oMetaModelMock.expects("validate")
 			.withExactArgs(this.oMetaModel.sUrl, mScope0);
 		this.oMetaModelMock.expects("validate")
-			.withExactArgs("/URI/1", mAnnotationScope1);
+			.withExactArgs("/URL/1", mAnnotationScope1);
 		this.oMetaModelMock.expects("validate")
-			.withExactArgs("/URI/2", mAnnotationScope2);
+			.withExactArgs("/URL/2", mAnnotationScope2);
 		assert.deepEqual(this.oMetaModel.mSchema2MetadataUrl, {});
 
 		// code under test
@@ -5546,8 +5546,8 @@ sap.ui.define([
 		assert.strictEqual(mAnnotationScope1["foo."].$Annotations, undefined);
 		assert.strictEqual(mAnnotationScope2["bar."].$Annotations, undefined);
 		assert.deepEqual(this.oMetaModel.mSchema2MetadataUrl, {
-			"bar." : {"/URI/2" : false},
-			"foo." : {"/URI/1" : false},
+			"bar." : {"/URL/2" : false},
+			"foo." : {"/URL/1" : false},
 			"tea_busi." : {"/a/b/c/d/e/$metadata" : false}
 		});
 
@@ -5594,7 +5594,7 @@ sap.ui.define([
 				}
 			};
 
-		this.oMetaModel.aAnnotationUris = ["n/a", "/my/annotation.xml"];
+		this.oMetaModel.aAnnotationURLs = ["n/a", "/my/annotation.xml"];
 		// legacy behavior: $Version is not checked, tea_busi.NewType2 is allowed
 		this.oMetaModel.bSupportReferences = false;
 		this.oMetaModelMock.expects("validate")
@@ -5633,7 +5633,7 @@ sap.ui.define([
 					}
 				};
 
-			this.oMetaModel.aAnnotationUris = ["n/a", "/my/annotation.xml"];
+			this.oMetaModel.aAnnotationURLs = ["n/a", "/my/annotation.xml"];
 			this.mock(this.oMetaModel).expects("_doMergeAnnotations")
 				.withExactArgs(sinon.match.same(oMetadata["tea_busi."]), {});
 			this.mock(this.oMetaModel.oModel).expects("reportError")
@@ -6004,7 +6004,7 @@ sap.ui.define([
 
 		// code under test
 		return this.oMetaModel.fetchValueListType(sPath).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.ok(oError.message, "No metadata for " + sPath);
 		});
@@ -6292,7 +6292,7 @@ sap.ui.define([
 			return this.oMetaModel.fetchValueListMappings(oValueListModel, "name.space.Action",
 				{$Name : "Category"}, aOverloads
 			).then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError) {
 				assert.strictEqual(oError.message,
 					"Expected a single overload, but found " + aOverloads.length);
@@ -6371,7 +6371,7 @@ sap.ui.define([
 			return oMetaModel
 				.fetchValueListMappings(oValueListModel, "zui5_epm_sample.Product", oProperty)
 				.then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError) {
 					assert.strictEqual(oError.message, oFixture.error);
 				});
@@ -6439,7 +6439,7 @@ sap.ui.define([
 			// code under test
 			return oModel.getMetaModel().requestValueListInfo(oFixture.sPropertyPath)
 				.then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError) {
 					assert.strictEqual(oError.message,
 						oFixture.sExpectedError + " for " + oFixture.sPropertyPath);
@@ -6964,7 +6964,7 @@ sap.ui.define([
 
 			// code under test
 			return oModel.getMetaModel().requestValueListInfo(sPropertyPath).then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError) {
 				assert.strictEqual(oError.message,
 					"Annotations 'com.sap.vocabularies.Common.v1.ValueList' with identical "
@@ -7505,14 +7505,14 @@ sap.ui.define([
 			// code under test
 			return this.oMetaModel.requestCodeList("T€RM")
 				.then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError) {
 					assert.strictEqual(oError.message, oFixture.sErrorMessage);
 
 					// code under test
 					return that.oMetaModel.requestCodeList("T€RM")
 						.then(function () {
-							assert.ok(false);
+							assert.ok(false, "Unexpected success");
 						}, function (oError1) {
 							assert.strictEqual(oError1, oError);
 						});
@@ -7562,14 +7562,14 @@ sap.ui.define([
 			// code under test
 			return this.oMetaModel.requestCodeList("T€RM")
 				.then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError0) {
 					assert.strictEqual(oError0.message, "Single key expected: /UnitsOfMeasure/");
 
 					// code under test
 					return that.oMetaModel.requestCodeList("T€RM")
 						.then(function () {
-							assert.ok(false);
+							assert.ok(false, "Unexpected success");
 						}, function (oError1) {
 							assert.strictEqual(oError1, oError0);
 						});
@@ -7632,7 +7632,7 @@ sap.ui.define([
 		// code under test
 		return this.oMetaModel.requestCodeList("T€RM", undefined, {/*context : oContext*/})
 			.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});
@@ -7672,7 +7672,7 @@ sap.ui.define([
 		// code under test
 		return this.oMetaModel.requestCodeList("T€RM")
 			.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});
@@ -7760,22 +7760,22 @@ sap.ui.define([
 			return Promise.all([
 				// code under test
 				this.oMetaModel.requestCodeList("A").then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError) {
 					assert.strictEqual(oError.name, "~oErrorA~");
 				}),
 				this.oMetaModel.requestCodeList("B").then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError) {
 					assert.strictEqual(oError.name, "~oErrorB~");
 				}),
 				this.oMetaModel.requestCodeList("C").then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError) {
 					assert.strictEqual(oError.name, "~oErrorC~");
 				}),
 				this.oMetaModel.requestCodeList("D").then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError) {
 					assert.strictEqual(oError.name, "~oErrorD~");
 				})
@@ -7846,7 +7846,7 @@ sap.ui.define([
 		// code under test
 		return this.oMetaModel.requestCodeList("T€RM")
 			.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});
@@ -7913,7 +7913,7 @@ sap.ui.define([
 		// code under test
 		return this.oMetaModel.requestCodeList("T€RM")
 			.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});
@@ -8350,7 +8350,7 @@ sap.ui.define([
 	QUnit.test("_copyAnnotations: annotation files", function (assert) {
 		const oModel = new ODataModel({
 			serviceUrl : sSampleServiceUrl,
-			annotationURI : "~sAnnotationUri~"
+			annotationURI : "~sAnnotationURL~"
 		});
 
 		assert.throws(function () {

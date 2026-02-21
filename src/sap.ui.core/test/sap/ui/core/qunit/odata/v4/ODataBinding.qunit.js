@@ -350,7 +350,7 @@ sap.ui.define([
 
 		// code under test
 		return oBinding.requestRefresh("groupId").then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oResultingError) {
 			assert.strictEqual(oResultingError, oError);
 		});
@@ -785,7 +785,7 @@ sap.ui.define([
 
 		// code under test
 		oBinding.fetchOrGetQueryOptionsForOwnCache(oContext).then(function () {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError0, oError);
 		});
@@ -1567,7 +1567,7 @@ sap.ui.define([
 
 		return oBinding.oCachePromise.then(
 			function () {
-				assert.ok(false, "unexpected success");
+				assert.ok(false, "Unexpected success");
 			},
 			function (oError0) {
 				assert.strictEqual(oError0, oError);
@@ -3189,7 +3189,7 @@ sap.ui.define([
 
 		try {
 			oBinding.checkSameCache(oCache);
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		} catch (oError) {
 			assert.strictEqual(oError.message,
 				oBinding + " is ignoring response from inactive cache: unexpected");
@@ -3198,7 +3198,7 @@ sap.ui.define([
 
 		try {
 			oBinding.checkSameCache(oBinding.oCache, 23);
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		} catch (oError) {
 			assert.strictEqual(oError.message,
 				oBinding + " is ignoring response from inactive cache: actual");

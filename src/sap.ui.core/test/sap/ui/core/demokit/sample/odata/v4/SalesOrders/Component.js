@@ -91,7 +91,6 @@ sap.ui.define([
 					"sap.ui.core.sample.odata.v4.SalesOrders.Component");
 
 				this.oUiModel = new JSONModel({
-					bCreateItemPending : false,
 					filterProductID : "",
 					filterValue : "",
 					itemFilter : aItemFilter,

@@ -1093,7 +1093,7 @@ sap.ui.define([
 		try {
 			// code under test
 			await TestUtils.requestAllSources(oFixture);
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		} catch (oError0) {
 			assert.strictEqual(oError0, oError);
 		}

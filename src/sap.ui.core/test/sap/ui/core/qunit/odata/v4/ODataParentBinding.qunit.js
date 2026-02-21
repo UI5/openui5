@@ -3134,7 +3134,7 @@ sap.ui.define([
 		fnReject(oError);
 
 		return oResult.then(function () {
-				assert.notOk(true);
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});
@@ -4394,7 +4394,7 @@ sap.ui.define([
 		assert.strictEqual(oPromise.isPending(), true);
 
 		return oPromise.then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError.message,
 				"Invalid (navigation) property 'invalid' in $select of"

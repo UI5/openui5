@@ -3364,7 +3364,7 @@ sap.ui.define([
 		oRequestCall.args[0][5](); // call onSubmit
 
 		return oCacheUpdatePromise.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oResult) {
 				sinon.assert.calledOnceWithExactly(fnError, oError);
 				assert.strictEqual(oResult, oError);
@@ -3429,7 +3429,7 @@ sap.ui.define([
 			fnPatchSent : mustBeMocked,
 			fnSetUpsertPromise : mustBeMocked
 		}).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oResult) {
 			assert.strictEqual(oResult, oError);
 		});
@@ -3456,7 +3456,7 @@ sap.ui.define([
 			fnPatchSent : mustBeMocked,
 			fnSetUpsertPromise : mustBeMocked
 		}).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError.message,
 				"Cannot update 'foo': 'path/to/entity' does not exist");
@@ -5084,7 +5084,7 @@ sap.ui.define([
 		return oCache.refreshSingleWithRemove(oGroupLock, "EMPLOYEE_2_EQUIPMENTS", 3, "~", false,
 				fnDataRequested)
 			.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError) {
 				assert.strictEqual(oError.message,
 					"Unexpected server response, more than one entity returned.");
@@ -5633,7 +5633,7 @@ sap.ui.define([
 		// Code under test
 		return oCache.fetchLateProperty(oGroupLock, oEntity, "", "property")
 			.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oResult) {
 				assert.strictEqual(oResult, oError);
 				assert.deepEqual(oCache.mPropertyRequestByPath, {});
@@ -5712,7 +5712,7 @@ sap.ui.define([
 		// Code under test
 		return oCache.fetchLateProperty(oGroupLock, oCacheData, "", "property")
 			.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError) {
 				assert.strictEqual(oError.message, oErrorMessage);
 				assert.deepEqual(oCache.mPropertyRequestByPath, {});
@@ -6064,7 +6064,7 @@ sap.ui.define([
 
 		// code under test
 		return oCache.requestCount(oGroupLock).then(function () {
-			assert.ok(false, "unexpected");
+			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError0, oError);
 		});
@@ -6893,7 +6893,7 @@ sap.ui.define([
 
 			return oReadPromise;
 		}).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function () {
 			assert.deepEqual(oCache.aElements, [
 				{key : "a", "@$ui5._" : {predicate : "('a')"}},
@@ -8501,7 +8501,7 @@ sap.ui.define([
 		return oCache.requestElements(5, 10, "~oGroupLock~", 0, "~fnDataRequested~",
 				"~fnSeparateReceived~")
 			.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError) {
 				assert.strictEqual(oError, "~oError~");
 			});
@@ -8535,7 +8535,7 @@ sap.ui.define([
 		assert.deepEqual(oCache.aReadRequests, [{iStart : 5, iEnd : 10, bObsolete : false}]);
 
 		return oPromise.then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError, oError0);
 			assert.deepEqual(oCache.aReadRequests, []);
@@ -9790,7 +9790,7 @@ sap.ui.define([
 		sinon.assert.calledOnceWithExactly(_Helper.removeByPath,
 			sinon.match.same(oCache.mPostRequests), sPathInCache, sinon.match.same(oEntityData));
 		return oCreatePromise.then(function () {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError.canceled, true);
 			assert.strictEqual(oCache.iActiveElements, 0);
@@ -9906,7 +9906,7 @@ sap.ui.define([
 		sinon.assert.calledOnceWithExactly(fnErrorCallback, sinon.match.same(oError));
 
 		return oCreatePromise.then(function () {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError0, oError);
 		});
@@ -10155,7 +10155,7 @@ sap.ui.define([
 		return Promise.all([
 			oPatchPromise1.then(), // check that update returned a promise
 			oPatchPromise2.then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError) {
 				assert.strictEqual(oError.message, "The entity will be created via group "
 					+ "'updateGroup'. Cannot patch via group 'anotherGroup'");
@@ -10214,7 +10214,7 @@ sap.ui.define([
 				fnPatchSent : mustBeMocked,
 				fnSetUpsertPromise : mustBeMocked
 			}).then(function () {
-				assert.ok(false, "unexpected success - update");
+				assert.ok(false, "Unexpected success - update");
 			}, function (oError) {
 				assert.strictEqual(oError.message,
 					"No 'update' allowed while waiting for server response",
@@ -10222,7 +10222,7 @@ sap.ui.define([
 			});
 			oCache._delete(oDeleteGroupLock, "n/a", /*TODO sTransientPredicate*/"0")
 				.then(function () {
-					assert.ok(false, "unexpected success - _delete");
+					assert.ok(false, "Unexpected success - _delete");
 				}, function (oError) {
 					assert.strictEqual(oError.message,
 						"No 'delete' allowed while waiting for server response",
@@ -11539,19 +11539,19 @@ sap.ui.define([
 
 		for (let i = 0; i < 5_000; i += 1) {
 			if (oCache.aElements[i] !== i) {
-				assert.ok(false);
+				assert.ok(false, "Unexpected element at index " + i);
 				break;
 			}
 		}
 		for (let i = 0; i < 990_000; i += 1) {
 			if (oCache.aElements[10_000 + i] !== 5_000 + i) {
-				assert.ok(false);
+				assert.ok(false, "Unexpected element at index " + (10_000 + i));
 				break;
 			}
 		}
 		for (let i = 0; i < 5_000; i += 1) {
 			if (oCache.aElements[5_000 + i] !== 995_000 + i) {
-				assert.ok(false);
+				assert.ok(false, "Unexpected element at index " + (5_000 + i));
 				break;
 			}
 		}
@@ -11561,7 +11561,7 @@ sap.ui.define([
 
 		for (let i = 0; i < 1_000_000; i += 1) {
 			if (oCache.aElements[i] !== i) {
-				assert.ok(false);
+				assert.ok(false, "Unexpected element at index " + i);
 				break;
 			}
 		}
@@ -11717,7 +11717,7 @@ sap.ui.define([
 					return oCache
 						.requestSideEffects(oGroupLock, aPaths, ["('c')"])
 						.then(function () {
-							assert.ok(false);
+							assert.ok(false, "Unexpected success");
 						}, function (oError) {
 							assert.strictEqual(oError.message,
 								"Expected 1 row(s), but instead saw " + aData.length);
@@ -12670,7 +12670,7 @@ sap.ui.define([
 
 		// code under test
 		oPromise = oCache.post(oGroupLock, oPostData).then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			var oGroupLock1 = {};
 
@@ -12683,7 +12683,7 @@ sap.ui.define([
 
 			// code under test
 			return oCache.post(oGroupLock1, oPostData).then(function () {
-				assert.ok(false);
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0.message, sMessage);
 			});
@@ -12890,7 +12890,7 @@ sap.ui.define([
 					fnPatchSent : function () {},
 					fnSetUpsertPromise : mustBeMocked
 				}).then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError0) {
 					assert.strictEqual(oError0, oError);
 				})
@@ -12926,7 +12926,7 @@ sap.ui.define([
 			that = this;
 
 		function unexpected() {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}
 
 		function rejected(oError0) {
@@ -13091,7 +13091,7 @@ sap.ui.define([
 				that.mock(oGroupLock).expects("unlock").withExactArgs();
 
 				oCache.fetchValue(oGroupLock).then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError0) {
 					assert.strictEqual(oError0.message, "Cannot read a deleted entity");
 				});
@@ -13415,7 +13415,7 @@ sap.ui.define([
 		// code under test
 		oPromise = oCache.requestSideEffects(oGroupLock, aPaths)
 			.then(function () {
-				assert.ok(false, "unexpected success");
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});
@@ -14373,7 +14373,7 @@ sap.ui.define([
 			assert.strictEqual(await oBarRangePromise, undefined); // resolved with no value
 		} else {
 			await oBarRangePromise.then(function () {
-				assert.ok(false, "unexpected success");
+				assert.ok(false, "Unexpected success");
 			}, function (oError) {
 				assert.strictEqual(oError.canceled, true);
 				assert.strictEqual(oError.message, "$$separate: canceled bar");
@@ -14412,7 +14412,7 @@ sap.ui.define([
 		} else {
 			sinon.assert.callCount(fnSeparateReceived, 0);
 			await oFooRangePromise.then(function () {
-				assert.ok(false, "unexpected success");
+				assert.ok(false, "Unexpected success");
 			}, function (oError) {
 				assert.strictEqual(oError.canceled, true);
 				assert.strictEqual(oError.message, "$$separate: canceled foo");
@@ -14569,7 +14569,7 @@ sap.ui.define([
 		sinon.assert.calledWithExactly(fnSeparateReceived, "foo", 3, 5, "~fooError~");
 		fnSeparateReceived.resetHistory();
 		await oFooRangePromise.then(function () {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError.canceled, true);
 			assert.strictEqual(oError.message, "$$separate: canceled foo");
@@ -14587,7 +14587,7 @@ sap.ui.define([
 		sinon.assert.callCount(fnSeparateReceived, 1);
 		sinon.assert.calledWithExactly(fnSeparateReceived, "bar", 3, 5, "~barError~");
 		await oBarRangePromise.then(function () {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError.canceled, true);
 			assert.strictEqual(oError.message, "$$separate: canceled bar");
@@ -14628,7 +14628,7 @@ sap.ui.define([
 		await oSeparatePromise;
 
 		await oRange.promise.then(function () {
-			assert.ok(false, "unexpected success");
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError.canceled, true);
 			assert.strictEqual(oError.message, "$$separate: canceled separate");

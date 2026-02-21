@@ -129,8 +129,7 @@
 						dataRequested : '.onDataEvents'
 					}
 				}"
-			mode="{= ${ui>/bCreateItemPending} ? 'None' : 'SingleSelectMaster' }"
-			selectionChange=".onSalesOrdersSelect">
+			mode="SingleSelectMaster" selectionChange=".onSalesOrdersSelect">
 			<dependents>
 				<plugins:DataStateIndicator/>
 			</dependents>
@@ -142,8 +141,7 @@
 							<ToolbarLayoutData shrinkable="false"/>
 						</layoutData>
 					</Title>
-					<Button enabled="{!${ui>/bCreateItemPending}"
-						icon="sap-icon://add" id="createSalesOrder" press=".onCreateSalesOrder"
+					<Button icon="sap-icon://add" id="createSalesOrder" press=".onCreateSalesOrder"
 						tooltip="Create sales order"/>
 					<Button
 						enabled="{= ${ui>/bSalesOrderSelected} }"
@@ -152,15 +150,13 @@
 						tooltip="Delete selected sales order"/>
 					<Button
 						enabled="{= ${ui>/bSalesOrderSelected}
-							&amp;&amp; !${ui>/bSelectedSalesOrderTransient}
-							&amp;&amp; !${ui>/bCreateItemPending} }"
+							&amp;&amp; !${ui>/bSelectedSalesOrderTransient} }"
 						icon="sap-icon://synchronize"
 						id="refreshSelectedSalesOrder" press=".onRefreshSelectedSalesOrder"
 						tooltip="Refresh selected sales order"/>
 					<Button
 						enabled="{= ${ui>/bSalesOrderSelected}
-							&amp;&amp; !${ui>/bSelectedSalesOrderTransient}
-							&amp;&amp; !${ui>/bCreateItemPending} }"
+							&amp;&amp; !${ui>/bSelectedSalesOrderTransient} }"
 						id="confirmSalesOrder"
 						icon="sap-icon://accept"
 						press=".onConfirmSalesOrder" tooltip="Confirm selected sales order"/>
@@ -172,8 +168,7 @@
 						tooltip="Reset changes for selected sales order"/>
 					<Button
 							enabled="{= ${ui>/bSalesOrderSelected}
-								&amp;&amp; !${ui>/bSelectedSalesOrderTransient}
-								&amp;&amp; !${ui>/bCreateItemPending} }"
+								&amp;&amp; !${ui>/bSelectedSalesOrderTransient} }"
 							id="openSimulateDiscountDialog"
 							icon="sap-icon://simulate"
 							press=".onOpenSimulateDiscountDialog"

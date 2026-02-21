@@ -86,7 +86,6 @@ sap.ui.define([
 	 * @public
 	 * @enum {string}
 	 * @since 1.133.0
-	 * @experimental Behavior might change.
 	 */
 	thisLib.NavigationListItemDesign = {
 
@@ -108,7 +107,6 @@ sap.ui.define([
 	 * @public
 	 * @enum {string}
 	 * @since 1.134.0
-	 * @experimental Behavior might change.
 	 */
 	thisLib.SideNavigationDesign = {
 

@@ -13,6 +13,7 @@ sap.ui.define([
 	"./pageobjects/Sample",
 	"./pageobjects/Code",
 	// journeys
+	"./CookiePreferencesJourney",
 	"./NavigationJourney",
 	"./APIReferenceJourney",
 	"./SamplesJourney",
