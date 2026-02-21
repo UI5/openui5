@@ -2,7 +2,7 @@
  * ${copyright}
  */
 /**
- * See {@link https://lodash.com/docs/4.17.21#min}
+ * See {@link https://lodash.com/docs/4.17.23#min}
  *
  * @function
  * @alias module:sap/base/util/restricted/_min
