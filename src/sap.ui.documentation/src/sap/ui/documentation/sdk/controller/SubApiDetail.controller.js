@@ -770,12 +770,9 @@ sap.ui.define([
 				var oTypedefInfo = this._findTypedefInApiIndex(sTypedefName);
 
 				if (oTypedefInfo) {
-					// Fetch complete typedef data from API.json
-					this._loadCompleteTypedefData(oTypedefInfo)
-						.then(function(oFullTypedefData) {
-							// Extract properties from the typedef entity
-							var aTypedefProperties = this._extractTypedefProperties(oFullTypedefData);
-
+					// Fetch complete typedef data from API.json including inherited properties
+					this._collectTypedefPropertiesWithInheritance(oTypedefInfo)
+						.then(function(aTypedefProperties) {
 							// Add Row controls to the LightTable for each typedef property
 							if (aTypedefProperties && aTypedefProperties.length > 0) {
 								this._addTypedefSubRows(oRow, aTypedefProperties);
@@ -793,25 +790,157 @@ sap.ui.define([
 			},
 
 			/**
-			 * Extracts properties from typedef data
-			 * @param {object} oTypedefData The typedef data
-			 * @returns {array} Array of typedef properties
+			 * Collects typedef properties including inherited properties from base typedefs.
+			 * Traverses the inheritance chain and concatenates all properties.
+			 * @param {object} oTypedefInfo Initial typedef info from API index
+			 * @returns {Promise} Promise that resolves with array of all typedef properties (own + inherited)
 			 * @private
 			 */
-			_extractTypedefProperties: function(oTypedefData) {
-				var aProperties = [];
+			_collectTypedefPropertiesWithInheritance: function(oTypedefInfo) {
+				var aInheritanceChain = [],
+					aRequiredLibs = [];
 
-				if (oTypedefData && oTypedefData.properties) {
-					aProperties = oTypedefData.properties.map(function(oProperty) {
-						// Clone the property to avoid modifying the original
-						var oClone = jQuery.extend(true, {}, oProperty);
-						// Add depth property
-						oClone.depth = 1;
-						return oClone;
+				// Build the inheritance chain by traversing the extends property
+				// Also collect all required libraries for loading
+				return this._buildTypedefInheritanceChain(oTypedefInfo)
+					.then(function(oChainResult) {
+						aInheritanceChain = oChainResult.chain;
+						aRequiredLibs = oChainResult.libs;
+
+						// Generate promises for all required libraries
+						var aPromises = aRequiredLibs.map(function(sLibName) {
+							return APIInfo.getLibraryElementsJSONPromise(sLibName);
+						});
+
+						return Promise.all(aPromises);
+					})
+					.then(function(aLibResults) {
+						// Combine all library elements into one array
+						var aAllLibraryElements = [];
+						aLibResults.forEach(function(aSingleLibraryElements) {
+							aAllLibraryElements = aAllLibraryElements.concat(aSingleLibraryElements);
+						});
+
+						// Collect properties from all typedefs in the inheritance chain
+						var aAllProperties = [],
+							aPropertyNames = []; // Track property names to handle overrides
+
+						// Process inheritance chain in order (current typedef first, then base typedefs)
+						aInheritanceChain.forEach(function(sTypedefName, iIndex) {
+							var oTypedefData = this._findEntityInLibraryData(aAllLibraryElements, sTypedefName);
+
+							if (oTypedefData?.properties) {
+								oTypedefData.properties.forEach(function(oProperty) {
+									// Only add property if it's not already defined (handle overrides)
+									if (aPropertyNames.indexOf(oProperty.name) === -1) {
+										// Clone the property to avoid modifying the original
+										var oClone = jQuery.extend(true, {}, oProperty);
+										oClone.depth = 1;
+
+										// Mark inherited properties (not from the first typedef in chain)
+										if (iIndex > 0) {
+											oClone.borrowedFrom = sTypedefName;
+										}
+
+										aAllProperties.push(oClone);
+										aPropertyNames.push(oProperty.name);
+									}
+								});
+							}
+						}.bind(this));
+
+						return aAllProperties;
+					}.bind(this));
+			},
+
+			/**
+			 * Builds the inheritance chain for a typedef by following the extends property.
+			 * @param {object} oTypedefInfo Initial typedef info from API index
+			 * @returns {Promise} Promise that resolves with object containing chain array and libs array
+			 * @private
+			 */
+			_buildTypedefInheritanceChain: function(oTypedefInfo) {
+				var aInheritanceChain = [oTypedefInfo.name],
+					aRequiredLibs = [];
+
+				// Add the initial library
+				if (oTypedefInfo.lib && aRequiredLibs.indexOf(oTypedefInfo.lib) === -1) {
+					aRequiredLibs.push(oTypedefInfo.lib);
+				}
+
+				// Load the initial typedef to get its extends property
+				return this._loadCompleteTypedefData(oTypedefInfo)
+					.then(function(oFullTypedefData) {
+						// Check if typedef has a base typedef (extends property)
+						if (!oFullTypedefData.extends) {
+							return {
+								chain: aInheritanceChain,
+								libs: aRequiredLibs
+							};
+						}
+
+						// Build the rest of the inheritance chain
+						return this._traverseTypedefInheritanceChain(
+							oFullTypedefData.extends,
+							aInheritanceChain,
+							aRequiredLibs
+						);
+					}.bind(this));
+			},
+
+			/**
+			 * Recursively traverses the typedef inheritance chain.
+			 * @param {string} sBaseTypedefName Name of the base typedef to process
+			 * @param {array} aInheritanceChain Current inheritance chain array
+			 * @param {array} aRequiredLibs Current required libraries array
+			 * @returns {Promise} Promise that resolves with object containing chain and libs arrays
+			 * @private
+			 */
+			_traverseTypedefInheritanceChain: function(sBaseTypedefName, aInheritanceChain, aRequiredLibs) {
+				// Find the base typedef in the API index
+				var oBaseTypedefInfo = this._findTypedefInApiIndex(sBaseTypedefName);
+
+				// If base typedef not found, stop traversal
+				if (!oBaseTypedefInfo) {
+					return Promise.resolve({
+						chain: aInheritanceChain,
+						libs: aRequiredLibs
 					});
 				}
 
-				return aProperties;
+				// Add to inheritance chain
+				aInheritanceChain.push(sBaseTypedefName);
+
+				// Add library if not already included
+				if (oBaseTypedefInfo.lib && aRequiredLibs.indexOf(oBaseTypedefInfo.lib) === -1) {
+					aRequiredLibs.push(oBaseTypedefInfo.lib);
+				}
+
+				// Load the base typedef to check if it also has a parent
+				return this._loadCompleteTypedefData(oBaseTypedefInfo)
+					.then(function(oBaseTypedefData) {
+						// If this typedef also extends another, continue traversal
+						if (oBaseTypedefData.extends) {
+							return this._traverseTypedefInheritanceChain(
+								oBaseTypedefData.extends,
+								aInheritanceChain,
+								aRequiredLibs
+							);
+						}
+
+						// No more parents, return the complete chain
+						return {
+							chain: aInheritanceChain,
+							libs: aRequiredLibs
+						};
+					}.bind(this))
+					.catch(function() {
+						// If loading fails, return what we have so far
+						return {
+							chain: aInheritanceChain,
+							libs: aRequiredLibs
+						};
+					});
 			},
 
 			/**

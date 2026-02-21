@@ -138,7 +138,7 @@ sap.ui.define([
 			assert.ok(oMetaModel instanceof ODataMetaModel);
 			assert.strictEqual(oMetaModel.oRequestor, oMetadataRequestor);
 			assert.strictEqual(oMetaModel.sUrl, sServiceUrl + "$metadata");
-			assert.deepEqual(oMetaModel.aAnnotationUris, ["my/annotations.xml"]);
+			assert.deepEqual(oMetaModel.aAnnotationURLs, ["my/annotations.xml"]);
 			assert.deepEqual(oModel.mPath2DataRequestedCount, {});
 			assert.deepEqual(oModel.mPath2DataReceivedError, {});
 			assert.strictEqual(oModel.fnRetryAfter, null);

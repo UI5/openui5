@@ -219,7 +219,7 @@ sap.ui.define([
 
 		// code under test
 		return oMetadataRequestor.read("n/a").then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError, "~oError~");
 		});
@@ -403,7 +403,7 @@ sap.ui.define([
 				"sap.ui.model.odata.v4.lib._MetadataRequestor");
 
 		return oMetadataRequestor.read("/foo/$metadata").then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError, oExpectedError);
 		});

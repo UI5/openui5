@@ -21,8 +21,6 @@ sap.ui.define([
 		sServiceNamespace = "com.sap.gateway.default.zui5_epm_sample.v0002.";
 
 	return Controller.extend("sap.ui.core.sample.odata.v4.SalesOrders.Main", {
-		iTransientItems : 0,
-
 		formatAddress : function (oAddress) {
 			return oAddress
 			? `${oAddress.Street} ${oAddress.Building}`
@@ -189,7 +187,7 @@ sap.ui.define([
 			oTable.getItems()[0].focus();
 
 			// Note: this promise fails only if the transient entity is delete or canceled
-			this.oSalesOrderLineItemCreated = oContext.created().then(function () {
+			oContext.created().then(function () {
 				var oItem = oTable.getSelectedItem();
 
 				MessageBox.success("Line item created: " + oContext.getProperty("ItemPosition"));

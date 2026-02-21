@@ -827,7 +827,7 @@ sap.ui.define([
 
 			// code under test
 			return oBinding.checkUpdateInternal(false).then(function () {
-				assert.ok(false, "unexpected success");
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 				assert.strictEqual(oBinding.getValue(), undefined,
@@ -853,7 +853,7 @@ sap.ui.define([
 
 			// code under test
 			return oBinding.checkUpdateInternal(true).then(function () {
-				assert.ok(false, "unexpected success");
+				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
 			});

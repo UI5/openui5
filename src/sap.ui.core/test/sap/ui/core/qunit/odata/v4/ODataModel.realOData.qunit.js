@@ -583,7 +583,7 @@ sap.ui.define([
 				// Note: API call for GET intentionally before POST
 				oSalesOrder1.requestSideEffects(["*"]),
 				oModel.bindContext(sInvoiceCreated, oSalesOrder1).invoke("$auto").then(function () {
-					assert.ok(false);
+					assert.ok(false, "Unexpected success");
 				}, function (oError0) { // Note: it's OK that this fails
 					assert.strictEqual(oError0.message,
 						"Error occurred while processing the request");
@@ -634,7 +634,7 @@ sap.ui.define([
 				oConfirm2.invoke("$auto", false, function () {
 					assert.ok(false, "must not be called");
 				}).then(function () {
-					assert.ok(false, "unexpected success");
+					assert.ok(false, "Unexpected success");
 				}, function (oError) {
 					assert.strictEqual(oError.message, sErrorMessage);
 				}),
@@ -1363,7 +1363,7 @@ sap.ui.define([
 		});
 
 		oRequestor.request("GET", "fail", this.createGroupLock()).then(function (oResult) {
-			assert.ok(false, oResult);
+			assert.ok(false, "Unexpected success - " + oResult);
 		}, function (oError) {
 			assert.ok(oError instanceof Error);
 			assert.strictEqual(typeof oError.error, "object");

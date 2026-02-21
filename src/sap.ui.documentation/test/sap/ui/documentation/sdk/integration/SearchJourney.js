@@ -3,31 +3,24 @@
  */
 sap.ui.define([
 	'sap/ui/test/opaQunit',
-	'sap/ui/test/Opa5'
+	'sap/ui/test/Opa5',
+	'./CookiePreferencesJourney' // to ensure that the CookiePreferencesJourney is executed first
 ], function (opaTest, Opa5) {
 	"use strict";
 
 	QUnit.module("Search Journey");
 
-	opaTest("Should start the app and see the cookie preferences blackbar", function (Given, When, Then) {
-		// Arrangements
-		Given.iClearAllData();
-		Given.iStartMyApp("sap-ui-xx-tracking=true");
-		Given.iSetupSearchMock();
-
-		// Assertions
-		Then.onTheAppPage.iShouldSeeTheCookiePreferencesBlackbar();
-	});
-
-	opaTest("Should accept all cookies and see the search field", function (Given, When, Then) {
+	opaTest("Should see the search field", function (Given, When, Then) {
 		// Actions
-		When.onTheAppPage.iPressTheAcceptAllCookiesButton();
+		Given.iStartMyApp();
 
 		// Assertions
 		Then.onTheSearchControl.iShouldSeeTheSearchField();
 	});
 
 	opaTest("Should enter search query and see the search picker", function (Given, When, Then) {
+		Given.iSetupSearchMock();
+
 		// Actions
 		When.onTheSearchControl.iEnterTextInTheSearchField("button");
 

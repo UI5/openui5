@@ -522,7 +522,7 @@ sap.ui.define([
 		}
 
 		return oResult.then(function () {
-			assert.ok(false);
+			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError0, oError);
 		});

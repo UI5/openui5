@@ -135,7 +135,7 @@ sap.ui.define([
 				}
 			});
 	});
-	// TODO look at xml:base if the Uri in Reference is relative
+	// TODO look at xml:base if the URL in Reference is relative
 
 	//*********************************************************************************************
 	QUnit.test("convertXMLMetadata: aliases in types", function (assert) {

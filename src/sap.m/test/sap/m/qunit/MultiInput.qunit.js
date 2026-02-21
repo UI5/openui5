@@ -1136,33 +1136,6 @@ sap.ui.define([
 		assert.equal(token3.getSelected(), true, "Token3 got selected using ctrl+a");
 	});
 
-	QUnit.test("keyboard - ctrl + A with text", function(assert) {
-		this.clock = sinon.useFakeTimers();
-		var token1 = new Token();
-		var token2 = new Token();
-		var token3 = new Token();
-		this.multiInput1.setTokens([token1, token2, token3]);
-
-		this.multiInput1.updateDomValue("123");
-		qutils.triggerEvent("input", this.multiInput1.getFocusDomRef());
-
-		this.multiInput1.focus();
-		this.multiInput1.selectText(0, this.multiInput1.getValue().length);
-		assert.equal(this.multiInput1._$input.getSelectedText(), "123", "only texts are selected");
-
-		qutils.triggerKeydown(this.multiInput1.getDomRef(), KeyCodes.A, false, false, true); // trigger Control key + A
-		assert.equal(token1.getSelected(), true, "Token1 is selected");
-		assert.equal(token2.getSelected(), true, "Token2 is selected");
-		assert.equal(token3.getSelected(), true, "Token3 is selected");
-
-		qutils.triggerEvent("tap", this.multiInput1.getDomRef());
-		this.clock.tick(1);
-
-		assert.equal(token1.getSelected(), false, "Token1 is unselected");
-		assert.equal(token2.getSelected(), false, "Token2 is unselected");
-		assert.equal(token3.getSelected(), false, "Token3 is unselected");
-		this.clock.restore();
-	});
 	QUnit.test("esc key", function(assert) {
 
 		this.multiInput1.setValue("123");

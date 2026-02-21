@@ -29,6 +29,7 @@ sap.ui.define([
 					'    <Page id="page1">' +
 					'      <SearchField id="mySearch" placeholder="Test"/>' +
 					'      <SearchField placeholder="Placeholder"/>' +
+					'      <SearchField id="myDisabledSearch" enabled="false"/>' +
 					'    </Page>' +
 					'  </App>' +
 					'</mvc:View>'
@@ -61,6 +62,16 @@ sap.ui.define([
 		}).then(function (mSelector) {
 			assert.strictEqual(mSelector.id, "myView--mySearch", "Should generate a selector");
 			assert.strictEqual(mSelector.interaction.idSuffix, "reset", "Should generate a selector with interaction DOM ID suffix");
+		}).finally(fnDone);
+	});
+
+	QUnit.test("Should include enabled:false in selector when control is disabled", function (assert) {
+		var fnDone = assert.async();
+		RecordReplay.findControlSelectorByDOMElement({
+			domElement: $("#myView--myDisabledSearch")[0]
+		}).then(function (mSelector) {
+			assert.strictEqual(mSelector.id, "myView--myDisabledSearch", "Should generate a selector");
+			assert.strictEqual(mSelector.enabled, false, "Should include enabled:false in selector");
 		}).finally(fnDone);
 	});
 

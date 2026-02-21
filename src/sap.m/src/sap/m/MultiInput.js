@@ -821,14 +821,9 @@ function(
 		if (!this.getEnabled()) {
 			return;
 		}
+
 		if (oEvent.which === KeyCodes.TAB) {
 			oTokenizer.selectAllTokens(false);
-		}
-
-		if ((oEvent.ctrlKey || oEvent.metaKey) && oEvent.which === KeyCodes.A && oTokenizer.getTokens().length > 0) {
-			oTokenizer.focus();
-			oTokenizer.selectAllTokens(true);
-			oEvent.preventDefault();
 		}
 
 		// ctrl/meta + I -> Open suggestions
