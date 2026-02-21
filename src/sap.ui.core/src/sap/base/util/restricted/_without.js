@@ -2,7 +2,7 @@
  * ${copyright}
  */
 /**
- * See {@link https://lodash.com/docs/4.17.21#without}
+ * See {@link https://lodash.com/docs/4.17.23#without}
  *
  * @function
  * @alias module:sap/base/util/restricted/_without
