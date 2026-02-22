@@ -974,16 +974,15 @@ sap.ui.define([
 	PlanningCalendar.prototype._setProperties = function() {
 		//overriden setters
 		const bMultiSelect = this.getMultipleAppointmentsSelection(),
-			sIconShape = this.getIconShape(),
-			oStartDate = this.getStartDate(),
-			sAppointmentHeight = this.getAppointmentHeight(),
-			sAppointmentRoundWidth = this.getAppointmentRoundWidth(),
-			bShowIntervalHeaders = this.getShowIntervalHeaders(),
-			bShowEmptyIntervalHeaders = this.getShowEmptyIntervalHeaders(),
-			sAppointmentsVisualization = this.getAppointmentsVisualization(),
-			oGroupAppointmentsMode = this.getGroupAppointmentsMode(),
-			bAppointmentsReducedHeight = false,
-			vLegend = this.getLegend();
+			  sIconShape = this.getIconShape(),
+			  oStartDate = this.getStartDate(),
+			  sAppointmentHeight = this.getAppointmentHeight(),
+			  sAppointmentRoundWidth = this.getAppointmentRoundWidth(),
+			  bShowIntervalHeaders = this.getShowIntervalHeaders(),
+			  bShowEmptyIntervalHeaders = this.getShowEmptyIntervalHeaders(),
+			  sAppointmentsVisualization = this.getAppointmentsVisualization(),
+			  oGroupAppointmentsMode = this.getGroupAppointmentsMode(),
+			  vLegend = this.getLegend();
 		this.getRows().forEach(function (oRow) {
 			const oCurrentRowHeader = getRowHeader(oRow),
 				oRowTimeline = getRowTimeline(oRow);
@@ -998,7 +997,6 @@ sap.ui.define([
 			oRowTimeline.setShowEmptyIntervalHeaders(bShowEmptyIntervalHeaders);
 			oRowTimeline.setAppointmentsVisualization(sAppointmentsVisualization);
 			oRowTimeline.setGroupAppointmentsMode(oGroupAppointmentsMode);
-			oRowTimeline.setAppointmentsReducedHeight(bAppointmentsReducedHeight);
 			oRowTimeline.setLegend(vLegend);
 		});
 

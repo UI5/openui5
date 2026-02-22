@@ -178,6 +178,11 @@
 	}
 }
 
+/* Fix for tile buttons hidden in RTL */
+html[dir=rtl] .sapMST.Stretch.sapMSTLargeScreen .sapMSTBulleted {
+	transform: translateX(50%);
+}
+
 .sapMST.Stretch {
 	.sapMGT.Stretch.sapMGTArticleMode.sapMGTBackgroundImage {
 		.sapMGTContent {
