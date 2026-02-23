@@ -553,5 +553,75 @@
         "text": " sap.m.ComboBoxBase: Value state popup is now hidden when the picker is opened"
       }
     ]
+  },
+  "1.136.13": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "7b84db45299cca92b72c70d6efa8be9714c0ed7e",
+        "type": "FIX",
+        "text": " sap.m.Input: resolve iPad Safari rendering issue"
+      },
+      {
+        "id": "27ef6eb8774668bed5f2e1bc951cd1434482838a",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendar: fixed focus on Planning Calendar Row"
+      },
+      {
+        "id": "5bf26ac0634faad261f219730cd429256334ad38",
+        "type": "FIX",
+        "text": " sap.m.Button: Press event is fired correctly on pressing SPACE"
+      },
+      {
+        "id": "8d570956bccdc054712868dbd39f3a90aa6096a9",
+        "type": "FIX",
+        "text": " sap.m.Page: headerContent controls are now selectable in UI Adapt mode"
+      },
+      {
+        "id": "6d46b85103a9fd1da1a8b0345807fff2eee9b929",
+        "type": "FIX",
+        "text": " sap.m.StepInput: format value when the front number is removed (e.g .50 -> 0.50) also, allow start typing a number with the decimal separator"
+      },
+      {
+        "id": "057fd247857d1ae9b65f78894f2563c0bdc57e7c",
+        "type": "FIX",
+        "text": " sap.m.DynamicDate: uses its own text for min and max validation"
+      },
+      {
+        "id": "71568379562face4a0d765aee4859792fbd02392",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendarHeader: Correct reserved slot calculation"
+      },
+      {
+        "id": "e1f5ffbe6f33a820d8cdd6b068307f454ab925e0",
+        "type": "FIX",
+        "text": "sap.m.MultiInput: Token addition is now reset on focusin"
+      },
+      {
+        "id": "6c4577430bf0a9c41542ca94cbdc37ec1d18a5a6",
+        "type": "FIX",
+        "text": " sap.m.Tokenizer: The aria-labelledby attribute is now correctly set"
+      },
+      {
+        "id": "3f2bd8873398bfa0627c618e56ea5d6cdf71cba1",
+        "type": "FIX",
+        "text": " sap.m.MultiComboBox: After deletion next focused token is announced with correct position"
+      },
+      {
+        "id": "2dec0d2cd8ef51d79c108712600dce4b11543974",
+        "type": "FIX",
+        "text": " sap.m.ObjectNumber: labelledby properly applied"
+      },
+      {
+        "id": "1c0ef54c54d39474cbdeeee389c59b521131526c",
+        "type": "FIX",
+        "text": " sap.m Tokenizer: Ensure role \"listbox\" is applied to the correct container"
+      },
+      {
+        "id": "e2da0e18c0a2a47118ee56f62af66f36f9e70e41",
+        "type": "FIX",
+        "text": " sap.m.Button: Default type is shown correctly in Info bar"
+      }
+    ]
   }
 }

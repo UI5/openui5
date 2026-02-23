@@ -123,5 +123,15 @@
         "text": " sap.uxap.ObjectPageSubSection: fix wrapping titles"
       }
     ]
+  },
+  "1.136.13": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "27ef6eb8774668bed5f2e1bc951cd1434482838a",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendar: fixed focus on Planning Calendar Row"
+      }
+    ]
   }
 }

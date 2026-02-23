@@ -148,5 +148,25 @@
         "text": " sap.uxap.ObjectPageSubsection: No role for promoted subsection"
       }
     ]
+  },
+  "1.136.13": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "be9ed4652955840d307e933f6b11436737f8b911",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Ensure subsection visibility is tracked correctly"
+      },
+      {
+        "id": "5bf26ac0634faad261f219730cd429256334ad38",
+        "type": "FIX",
+        "text": " sap.m.Button: Press event is fired correctly on pressing SPACE"
+      },
+      {
+        "id": "4deecd8c476884262b6d72ae3dca5125c28297b8",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Fix initial title rendering in FCL"
+      }
+    ]
   }
 }

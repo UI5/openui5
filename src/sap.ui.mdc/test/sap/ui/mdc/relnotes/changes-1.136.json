@@ -123,5 +123,20 @@
         "text": " VariantManagement: \"expanded\" not announced"
       }
     ]
+  },
+  "1.136.13": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "c0c21f32f6765cf2707cc2c8dba47fc57e3817bc",
+        "type": "FIX",
+        "text": " Field: runtime error if DOM removed while update"
+      },
+      {
+        "id": "8c4ee62dbde52fd38cde882044c3be6ed1ae2e2a",
+        "type": "FIX",
+        "text": " MultiValueField: duplicate values not recognized"
+      }
+    ]
   }
 }

@@ -28,5 +28,20 @@
         "text": " sap.ui.unified.Month: removed redundant \"selected\" announce"
       }
     ]
+  },
+  "1.136.13": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "b8adadc841a39490caaa978ea194382a824be9f8",
+        "type": "FIX",
+        "text": " sap.ui.unified.RecurrenceUtils: Comparison of UTC dates."
+      },
+      {
+        "id": "49881e5a79651e7472be923ba02ac4d250d01eaa",
+        "type": "FIX",
+        "text": " sap.ui.unified.Calendar: fix unstable test"
+      }
+    ]
   }
 }

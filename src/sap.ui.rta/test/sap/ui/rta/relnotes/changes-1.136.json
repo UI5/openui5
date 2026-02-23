@@ -8,5 +8,15 @@
         "text": " sap.uxap.ObjectPageLayout: Action buttons in OverflowToolbar"
       }
     ]
+  },
+  "1.136.13": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "8d570956bccdc054712868dbd39f3a90aa6096a9",
+        "type": "FIX",
+        "text": " sap.m.Page: headerContent controls are now selectable in UI Adapt mode"
+      }
+    ]
   }
 }

@@ -373,5 +373,15 @@
         "text": " sap/base/security/sanitizeHTML: Add support for modern CSS display values"
       }
     ]
+  },
+  "1.136.13": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "fc14d0535651b066315b79c6cf74f6a93dabb88c",
+        "type": "FIX",
+        "text": " test/sap/ui/core/qunit/i18n/UI5Date.qunit.js: Fix failing test for JS Date API \"toTemporalInstant\""
+      }
+    ]
   }
 }
