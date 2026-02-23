@@ -42,12 +42,15 @@ sap.ui.define([
 
 			const oStartDate = UI5Date.getInstance(this.getStartDate());
 			const oCurrentDate = UI5Date.getInstance(oDate);
+			const oStartDateUTC = Date.UTC(oStartDate.getFullYear(), oStartDate.getMonth(), oStartDate.getDate());
+			const oCurrentDateUTC = Date.UTC(oCurrentDate.getFullYear(), oCurrentDate.getMonth(), oCurrentDate.getDate());
 			oStartDate.setHours(0,0,0,0);
 			oCurrentDate.setHours(0,0,0,0);
 
 			const iDayInMilliseconds = 24 * 60 * 60 * 1000;
 			const isDateInRange = oCurrentDate >= oStartDate && oCurrentDate <= this.getRecurrenceEndDate();
-			const isWithCorrectPattern = Math.floor((oCurrentDate.getTime() - oStartDate.getTime()) / iDayInMilliseconds) % this.getRecurrencePattern() === 0;
+
+			const isWithCorrectPattern = Math.floor((oCurrentDateUTC - oStartDateUTC) / iDayInMilliseconds) % this.getRecurrencePattern() === 0;
 
 			return  isDateInRange && isWithCorrectPattern;
 		};
