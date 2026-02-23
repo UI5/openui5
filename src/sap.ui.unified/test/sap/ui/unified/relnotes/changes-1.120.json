@@ -199,5 +199,15 @@
         "text": " sap.ui.unified.CalendarLegend: Add correct type for translation key"
       }
     ]
+  },
+  "1.120.42": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "ef9e34d93b5278b840b772104c25758eecfb25e2",
+        "type": "FIX",
+        "text": " sap.ui.unified.Calendar: fix unstable test"
+      }
+    ]
   }
 }

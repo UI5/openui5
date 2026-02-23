@@ -1456,5 +1456,25 @@
         "text": "sap.m.MultiInput: Token addition is now reset on focusin"
       }
     ]
+  },
+  "1.120.42": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "b191de0ed5361709260dcb6fd60b6c5077b71931",
+        "type": "FIX",
+        "text": " sap.m.MultiComboBox: After deletion next focused token is announced with correct position"
+      },
+      {
+        "id": "9e318e295e3777529c1b91653e03a22a704ca528",
+        "type": "FIX",
+        "text": " sap.m.Button: Press event is fired correctly on pressing SPACE"
+      },
+      {
+        "id": "4d18aed4190dcb38714a248bfff3fca417f8ab27",
+        "type": "FIX",
+        "text": " sap.m.StepInput: format value when the front number is removed (e.g .50 -> 0.50) also, allow start typing a number with the decimal separator"
+      }
+    ]
   }
 }

@@ -255,5 +255,25 @@
         "text": " VariantManagement: \"expanded\" not announced"
       }
     ]
+  },
+  "1.120.42": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "0841ba47b6ec4c144bd6591aed9416586e5a4ce1",
+        "type": "FIX",
+        "text": " Field: runtime error if DOM removed while update"
+      },
+      {
+        "id": "a7679e1e7cca1370f1e88a8d886f7f35d8f869b1",
+        "type": "FIX",
+        "text": " MultiValueField: duplicate values not recognized"
+      },
+      {
+        "id": "fded3c722d303ab966c5d7ec867f40a1f0eeaec0",
+        "type": "FIX",
+        "text": " sap.ui.mdc.Table: Ensure rebind before render on change appliance"
+      }
+    ]
   }
 }

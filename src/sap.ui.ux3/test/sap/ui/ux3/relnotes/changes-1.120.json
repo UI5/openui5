@@ -14,5 +14,15 @@
         ]
       }
     ]
+  },
+  "1.120.42": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "543a3cc98fcdff518d8ff45dfbe2abd7e01e3230",
+        "type": "FIX",
+        "text": " sap.ui.ux3.ThingInspector: Stabilize tests"
+      }
+    ]
   }
 }

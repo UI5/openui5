@@ -182,5 +182,15 @@
         "text": " sap.uxap.ObjectPageLayout: Fix initial title rendering in FCL"
       }
     ]
+  },
+  "1.120.42": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "9e318e295e3777529c1b91653e03a22a704ca528",
+        "type": "FIX",
+        "text": " sap.m.Button: Press event is fired correctly on pressing SPACE"
+      }
+    ]
   }
 }
