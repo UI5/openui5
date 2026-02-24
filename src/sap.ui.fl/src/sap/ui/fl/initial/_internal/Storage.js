@@ -48,14 +48,11 @@ sap.ui.define([
 				)
 			) {
 				delete oConnectorSpecificPropertyBag.version;
-			} else {
-				// a sign that we are in the RTA mode and allContexts query parameter should be set for flex/data request
-				if (oFlexInfoSession.initialAllContexts) {
-					oConnectorSpecificPropertyBag.allContexts = true;
-				}
-				if (!oConnectorSpecificPropertyBag.version && oFlexInfoSession.version) {
-					oConnectorSpecificPropertyBag.version = oFlexInfoSession.version;
-				}
+			}
+			// a sign that we are either loading RTA mode or are already in the RTA mode
+			// and allContexts query parameter should be set for flex/data request
+			if (oFlexInfoSession.adaptationMode || window.sessionStorage.getItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`)) {
+				oConnectorSpecificPropertyBag.allContexts = true;
 			}
 			// Disable cacheKey when request data for a specific version
 			if (oConnectorSpecificPropertyBag.version) {

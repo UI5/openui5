@@ -21,7 +21,7 @@
 <a name="onTheMDCTable"></a>
 
 ## onTheMDCTable : <code>object</code>
-**Kind**: global namespace  
+**Kind**: global namespace
 
 * [onTheMDCTable](#onTheMDCTable) : <code>object</code>
     * [.iPersonalizeFilter(oControl, aSettings, fnOpen, bCancel)](#onTheMDCTable.iPersonalizeFilter) ⇒ <code>Promise</code>
@@ -40,9 +40,9 @@ OPA5 test action
 2. Executes the given <code>FilterPersonalizationConfiguration</code>.
 3. Closes the personalization dialog.
 
-**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)  
-**Returns**: <code>Promise</code> - OPA waitFor  
-**Access**: public  
+**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)
+**Returns**: <code>Promise</code> - OPA waitFor
+**Access**: public
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -59,9 +59,9 @@ Opa5 test action:
 2. Executes the given <code>GroupPersonalizationConfiguration</code>.
 3. Closes the personalization dialog.
 
-**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)  
-**Returns**: <code>Promise</code> - Opa waitFor  
-**Access**: public  
+**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)
+**Returns**: <code>Promise</code> - Opa waitFor
+**Access**: public
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -77,9 +77,9 @@ OPA5 test action
 2. Selects all columns determined by the given labels. Also deselects all other columns that are selected but not included in the given labels.
 3. Closes the personalization dialog.
 
-**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)  
-**Returns**: <code>Promise</code> - Opa waitFor  
-**Access**: public  
+**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)
+**Returns**: <code>Promise</code> - Opa waitFor
+**Access**: public
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -95,9 +95,9 @@ OPA5 test action
 2. Executes the given <code>SortPersonalizationConfiguration</code>.
 3. Closes the personalization dialog.
 
-**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)  
-**Returns**: <code>Promise</code> - OPA waitFor  
-**Access**: public  
+**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)
+**Returns**: <code>Promise</code> - OPA waitFor
+**Access**: public
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -114,9 +114,9 @@ Opa5 test action
 3. Confirms the Reset dialog.
 4. Closes the personalization dialog.
 
-**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)  
-**Returns**: <code>Promise</code> - OPA waitFor  
-**Access**: public  
+**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)
+**Returns**: <code>Promise</code> - OPA waitFor
+**Access**: public
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -131,8 +131,8 @@ OPA5 test assertion
 2. Executes the given <code>FilterPersonalizationConfiguration</code>.
 3. Closes the personalization dialog.
 
-**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)  
-**Returns**: <code>Promise</code> - OPA waitFor  
+**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)
+**Returns**: <code>Promise</code> - OPA waitFor
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -148,8 +148,8 @@ OPA5 test assertion
 2. Checks the availability of the provided filter texts (by opening and comparing the available items in the ComboBox)
 3. Closes the personalization dialog.
 
-**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)  
-**Returns**: <code>Promise</code> - OPA waitFor  
+**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)
+**Returns**: <code>Promise</code> - OPA waitFor
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -159,7 +159,7 @@ OPA5 test assertion
 <a name="FilterPersonalizationConfiguration"></a>
 
 ## FilterPersonalizationConfiguration : <code>object</code>
-**Kind**: global typedef  
+**Kind**: global typedef
 **Properties**
 
 | Name | Type | Description |
@@ -172,7 +172,7 @@ OPA5 test assertion
 <a name="GroupPersonalizationConfiguration"></a>
 
 ## GroupPersonalizationConfiguration : <code>object</code>
-**Kind**: global typedef  
+**Kind**: global typedef
 **Properties**
 
 | Name | Type | Description |
@@ -183,7 +183,7 @@ OPA5 test assertion
 <a name="SortPersonalizationConfiguration"></a>
 
 ## SortPersonalizationConfiguration : <code>object</code>
-**Kind**: global typedef  
+**Kind**: global typedef
 **Properties**
 
 | Name | Type | Description |
@@ -194,7 +194,7 @@ OPA5 test assertion
 <a name="FilterPersonalizationConfiguration"></a>
 
 ## FilterPersonalizationConfiguration : <code>object</code>
-**Kind**: global typedef  
+**Kind**: global typedef
 **Properties**
 
 | Name | Type | Description |
@@ -204,3 +204,20 @@ OPA5 test assertion
 | values | <code>Array.&lt;string&gt;</code> | Filter values for the given operator |
 | inputControl | <code>string</code> | <code>Control</code> that is used as input for the value |
 
+<a name="onTheMDCTable.iCheckHeaderText"></a>
+
+### onTheMDCTable.iCheckHeaderText(sId, sHeaderText, iTotalCount, [iSelectedCount]) ⇒ <code>Promise</code>
+Assertion to check whether the table header with the given text is provided on the <code>sap.ui.mdc.Table</code>,
+and optionally verifies the total row count and selection count if provided.
+ - The check succeeds only if <code>headerVisible</code> is <code>true</code>, and <code>hideToolbar</code> is <code>false</code>.
+ - The verification of optional counts succeeds only if <code>showRowCount</code> is <code>true</code>.
+
+**Kind**: static method of [<code>onTheMDCTable</code>](#onTheMDCTable)
+**Returns**: <code>Promise</code> - OPA waitFor
+
+| Param | Type | Description |
+| --- | --- | --- |
+| oControl | <code>sap.ui.core.Control</code> \| <code>string</code> | Instance / ID of the <code>sap.ui.mdc.Table</code> |
+| sHeaderText | <code>string</code> | The expected header text of the table |
+| iTotalCount | <code>number</code> | (Optional) The expected total row count displayed in the header. Pass 0 to verify that no rows are available, or -1 to verify that the total count is unknown|
+| iSelectedCount | <code>number</code> | (Optional) The expected selected row count displayed in the header. Pass 0 to verify that no rows are selected, or -1 to verify that the selected count is unknown|

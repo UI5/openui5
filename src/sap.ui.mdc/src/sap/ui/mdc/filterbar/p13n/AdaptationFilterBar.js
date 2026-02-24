@@ -100,6 +100,7 @@ sap.ui.define([
 		this._oAdaptationControlPromise = new Promise((resolve, reject) => {
 			this._fnResolveAdaptationControlPromise = resolve;
 		});
+		this._bInitialValidationDone = false;
 	};
 
 	/**
@@ -409,6 +410,14 @@ sap.ui.define([
 				this._oFilterBarLayout.setP13nData(oP13nData);
 				this._bFilterFieldsCreated = true;
 
+				// Perform initial validation only on first open and only for AdaptFiltersPanel
+				if (!this._bInitialValidationDone) {
+					if (this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")) {
+						this._validateAdaptationState();
+					}
+					this._bInitialValidationDone = true;
+				}
+
 				return this;
 			});
 
@@ -598,6 +607,17 @@ sap.ui.define([
 		});
 	};
 
+	AdaptationFilterBar.prototype._checkInitialValidation = function(oFilterField, oItem, bValueSet) {
+		if (!this._bInitialValidationDone) {
+			if (!oItem.visible && bValueSet) {
+				oFilterField.setValueState(ValueState.Information);
+				oFilterField.setValueStateText(this._oRb.getText("adaptFiltersPanel.INFO_INVISIBLE_WITH_VALUE"));
+			}
+			return true;
+		}
+		return false;
+	};
+
 	AdaptationFilterBar.prototype._checkFilterState = function(oItem) {
 		const oFilterField = this.mFilterFields?.[oItem.name];
 		if (!oFilterField) {
@@ -605,18 +625,22 @@ sap.ui.define([
 		}
 
 		const bValueSet = oFilterField.getConditions().length > 0;
+		if (this._checkInitialValidation(oFilterField, oItem, bValueSet)) {
+			return;
+		}
+
 		if (oItem.required && !oItem.visible && !bValueSet) {
 			// Case 1: Mandatory Filter: Invisible with no Value: Warning Message 1
 			oFilterField.setValueState(ValueState.Warning);
-			oFilterField.setValueStateText("Hiding required filters makes it difficult to filter data.");
+			oFilterField.setValueStateText(this._oRb.getText("adaptFiltersPanel.WARNING_HIDING_REQUIRED"));
 		} else if (!oItem.required && !oItem.visible && !bValueSet) {
 			// Case 2: Non-mandatory Filter: Invisible with no Value: Warning Message 2
 			oFilterField.setValueState(ValueState.Warning);
-			oFilterField.setValueStateText("If invisible and empty, this filter will be removed.");
+			oFilterField.setValueStateText(this._oRb.getText("adaptFiltersPanel.WARNING_INVISIBLE_EMPTY_REMOVE"));
 		} else if (!oItem.visible && bValueSet) {
 			// Case 3: Invisible with value: Information Message
 			oFilterField.setValueState(ValueState.Information);
-			oFilterField.setValueStateText("The filter will not show on the filter bar.");
+			oFilterField.setValueStateText(this._oRb.getText("adaptFiltersPanel.INFO_INVISIBLE_WITH_VALUE"));
 		} else {
 			oFilterField.setValueState(ValueState.None);
 			oFilterField.setValueStateText();
@@ -630,20 +654,18 @@ sap.ui.define([
 		}
 
 		const bValueSet = oFilterField.getConditions().length > 0;
-		if (oItem.required && !bValueSet) {
-			// Case 1: Mandatory - Visible + No Value - Warning Message 3
-			// Case 2: Mandatory - Invisible + No Value - Warning Message 3
-			oFilterField.setValueState(ValueState.Warning);
-			oFilterField.setValueStateText(`${oItem.label} is a required filter.`);
-		} else if (!oItem.visible && !oItem.required && !bValueSet) {
+		if (this._checkInitialValidation(oFilterField, oItem, bValueSet)) {
+			return;
+		}
+		if (!oItem.visible && !oItem.required && !bValueSet) {
 			// Case 3: Non-mandatory - Invisible + No Value - Warning Message 2
 			oFilterField.setValueState(ValueState.Warning);
-			oFilterField.setValueStateText("If invisible and empty, this filter will be removed.");
+			oFilterField.setValueStateText(this._oRb.getText("adaptFiltersPanel.WARNING_INVISIBLE_EMPTY_REMOVE"));
 		} else if (!oItem.visible && bValueSet) {
 			// Case 4: Mandatory - Invisible + Value - Information
 			// Case 5: Non-manadatory - Invisible + Value - Information
 			oFilterField.setValueState(ValueState.Information);
-			oFilterField.setValueStateText("The filter will not show on the filter bar.");
+			oFilterField.setValueStateText(this._oRb.getText("adaptFiltersPanel.INFO_INVISIBLE_WITH_VALUE"));
 		} else {
 			oFilterField.setValueState(ValueState.None);
 			oFilterField.setValueStateText();
@@ -706,6 +728,8 @@ sap.ui.define([
 		this.mFilterFields = null;
 		this._fnResolveAdaptationControlPromise = null;
 		this._oAdaptationControlPromise = null;
+		this._bDialogJustOpened = false;
+		this._bInitialValidationDone = false;
 	};
 
 	return AdaptationFilterBar;

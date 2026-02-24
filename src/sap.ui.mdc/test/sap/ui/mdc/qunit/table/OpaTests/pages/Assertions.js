@@ -114,69 +114,6 @@ sap.ui.define([
 		},
 
 		/**
-		 * Checks if the table header with the give text is visible on the MDCTable.
-		 * Succeeds only if {@link sap.ui.mdc.Table#headerVisible} is set to <code>true</code>.
-		 *
-		 * @function
-		 * @name iShouldSeeTheHeaderText
-		 * @param {String|sap.ui.mdc.Table} oControl Id or control instance of the MDCTable
-		 * @param {String} sHeaderText The text that the MDCTable header should contains
-		 * @returns {Promise} OPA waitFor
-		 * @private
-		 */
-		iShouldSeeTheHeaderText: function(oControl, sHeaderText) {
-			const sTableId = typeof oControl === "string" ? oControl : oControl.getId();
-
-			return waitForTable.call(this, oControl, {
-				success: function(oTable) {
-					return this.waitFor({
-						id: sTableId + "-title",
-						controlType: "sap.m.Title",
-						check: function(oTitle) {
-							return oTable.getHeaderVisible() && oTitle.getText().indexOf(sHeaderText) !== -1;
-						},
-						success: function() {
-							Opa5.assert.ok(true, "Table header with text '" + sHeaderText + "' is visible");
-						},
-						errorMessage: "No table header found"
-					});
-				}
-			});
-		},
-
-		/**
-		 * Checks if the table count is visible on the MDCTable as part of the header text.
-		 * Succeeds only if {@link sap.ui.mdc.Table#headerVisible} and {@link sap.ui.mdc.Table#showRowCount}
-		 * are set to <code>true</code>.
-		 *
-		 * @function
-		 * @name iShouldSeeTheCount
-		 * @param {String|sap.ui.mdc.Table} oControl Id or control instance of the MDCTable
-		 * @returns {Promise} OPA waitFor
-		 * @private
-		 */
-		iShouldSeeTheCount: function(oControl) {
-			const sTableId = typeof oControl === "string" ? oControl : oControl.getId();
-
-			return waitForTable.call(this, oControl, {
-				success: function(oTable) {
-					return this.waitFor({
-						id: sTableId + "-title",
-						controlType: "sap.m.Title",
-						check: function() {
-							return oTable.getHeaderVisible() && oTable.getShowRowCount();
-						},
-						success: function(oTitle) {
-							const aMatches = oTitle.getText().match(/.*\([0-9]*\)/);
-							Opa5.assert.ok(aMatches.length === 1, "Table title contains item count");
-						},
-						errorMessage: "No table item count found"
-					});
-				}
-			});
-		},
-
-		/**
 		 * Checks if the variant management is visible on the MDCTable.
 		 *
 		 * @function

@@ -13,9 +13,10 @@ sap.ui.define([
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/mdc/util/FilterUtil",
-	"sap/ui/mdc/p13n/StateUtil",
 	"sap/m/Text",
 	"sap/m/plugins/PluginBase",
+	"sap/m/plugins/TitleProvider",
+	"sap/ui/table/plugins/SelectionPlugin",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/core/Lib",
 	"sap/ui/core/message/MessageType",
@@ -38,9 +39,10 @@ sap.ui.define([
 	ConditionValidated,
 	OperatorName,
 	FilterUtil,
-	StateUtil,
 	Text,
 	PluginBase,
+	TitleProvider,
+	SelectionPlugin,
 	nextUIUpdate,
 	Library,
 	MessageType,
@@ -609,6 +611,79 @@ sap.ui.define([
 			await nextBindingChange();
 			testSelection();
 		}
+	});
+
+	QUnit.module("TitleProvider", {
+		afterEach: function() {
+			this.oTable?.destroy();
+		},
+		initTable: async function(mSettings) {
+			this.oTable = new Table({
+				...mSettings,
+				delegate: {
+					name: "sap/ui/mdc/TableDelegate"
+				}
+			});
+
+			await this.oTable._fullyInitialized();
+		},
+		assertTitleProviderSettings: function(assert) {
+			const oTitleProvider = PluginBase.getPlugin(this.oTable._oTable, "sap.m.plugins.TitleProvider");
+			assert.ok(oTitleProvider, "TitleProvider plugin added to the inner table");
+			assert.equal(oTitleProvider.getId(), this.oTable.getId() + "-titleProvider", "TitleProvider id is correct");
+			assert.equal(oTitleProvider.getTitle(), this.oTable.getId() + "-tableTitle", "TitleProvider title is correct");
+
+			[
+				{headerVisible: true, showRowCount: true, hideToolbar: false, expected: true},
+				{headerVisible: false, showRowCount: true, hideToolbar: false, expected: false},
+				{headerVisible: true, showRowCount: false, hideToolbar: false, expected: false},
+				{headerVisible: true, showRowCount: true, hideToolbar: true, expected: false}
+			].forEach((mCase) => {
+				this.oTable.setHeaderVisible(mCase.headerVisible);
+				this.oTable.setShowRowCount(mCase.showRowCount);
+				this.oTable.setHideToolbar(mCase.hideToolbar);
+				assert.strictEqual(
+					oTitleProvider.getEnabled(), mCase.expected,
+					`Enabled case: headerVisible=${mCase.headerVisible}, showRowCount=${mCase.showRowCount}, hideToolbar=${mCase.hideToolbar}`
+				);
+			});
+
+			Object.values(SelectionMode).forEach((sSelectionMode) => {
+				this.oTable.setSelectionMode(sSelectionMode);
+				assert.strictEqual(
+					oTitleProvider.getManageSelectedCount(), sSelectionMode === SelectionMode.Multi,
+					`ManageSelectedCount case: selectionMode=${sSelectionMode}`
+				);
+			});
+		}
+	});
+
+	QUnit.test("GridTable Type", async function(assert) {
+		const oTitleProviderOnActivateSpy = sinon.spy(TitleProvider.prototype, "onActivate");
+		const oSelectionPluginOnActivateSpy = sinon.spy(SelectionPlugin.prototype, "onActivate");
+
+		await this.initTable();
+		this.assertTitleProviderSettings(assert);
+		assert.ok(oTitleProviderOnActivateSpy.calledAfter(oSelectionPluginOnActivateSpy), "TitleProvider is activated after SelectionPlugin");
+
+		oSelectionPluginOnActivateSpy.restore();
+		oTitleProviderOnActivateSpy.restore();
+	});
+
+	QUnit.test("TreeTable Type", async function(assert) {
+		const oTitleProviderInitSpy = sinon.spy(TitleProvider.prototype, "init");
+
+		await this.initTable({type: TableType.TreeTable});
+		const oTitleProvider = PluginBase.getPlugin(this.oTable._oTable, "sap.m.plugins.TitleProvider");
+		assert.notOk(oTitleProvider, "TitleProvider plugin not added to the inner table");
+		assert.ok(oTitleProviderInitSpy.notCalled, "TitleProvider is not instantiated");
+
+		oTitleProviderInitSpy.restore();
+	});
+
+	QUnit.test("ResponsiveTable Type", async function(assert) {
+		await this.initTable({type: TableType.ResponsiveTable});
+		this.assertTitleProviderSettings(assert);
 	});
 
 	QUnit.module("Rebind with invalid state", {

@@ -209,9 +209,10 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("and started without ATO in prod system", async function(assert) {
+		QUnit.test("and started without Versioning", async function(assert) {
 			disableVersioning();
 			await this.oRta.start();
+			assert.strictEqual(FlexInfoSession.getByReference(sReference).adaptationMode, true, "then the adaptationMode is set");
 			await RtaQunitUtils.showActionsMenu(this.oRta.getToolbar());
 			assert.equal(this.oRta.getToolbar().getControl("restore").getVisible(), true, "then the Reset Button is still visible");
 		});

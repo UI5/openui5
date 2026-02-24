@@ -5,7 +5,8 @@ sap.ui.define([
 	"test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Action",
 	"test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Assertion",
 	"test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Arrangement",
-	"test-resources/sap/ui/mdc/testutils/opa/table/waitForTable"
+	"test-resources/sap/ui/mdc/testutils/opa/table/waitForTable",
+	"test-resources/sap/ui/mdc/testutils/opa/table/Assertions"
 ], function(
 	/** @type sap.ui.test.Opa5 */ Opa5,
 	/** @type sap.ui.test.Opa5 */ AppActions,
@@ -13,7 +14,8 @@ sap.ui.define([
 	/** @type sap.ui.test.Opa5 */ P13nAction,
 	/** @type sap.ui.test.Opa5 */ P13nAssertion,
 	/** @type sap.ui.test.Opa5 */ P13nArrangement,
-	waitForTable
+	waitForTable,
+	TableAssertions
 ) {
 	"use strict";
 
@@ -39,7 +41,7 @@ sap.ui.define([
 		},
 		onTheAppMDCTable: {
 			actions: AppActions,
-			assertions: AppAssertions
+			assertions: {...AppAssertions, ...TableAssertions}
 		},
 		P13nActions: {
 			baseClass: P13nAction,

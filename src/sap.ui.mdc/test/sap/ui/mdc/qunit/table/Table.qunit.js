@@ -17,11 +17,11 @@ sap.ui.define([
 	"sap/ui/mdc/table/menus/GroupHeaderRowContextMenu",
 	"sap/ui/mdc/table/utils/Personalization",
 	"sap/ui/mdc/FilterBar",
+	"sap/m/Table",
 	"sap/m/Text",
 	"sap/m/Button",
 	"sap/m/Link",
 	"sap/m/MessageBox",
-	"sap/ui/model/odata/v4/ODataListBinding",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/type/Boolean",
 	"sap/ui/base/Event",
@@ -59,7 +59,8 @@ sap.ui.define([
 	"sap/ui/mdc/enums/TableActionPosition",
 	"sap/m/Menu",
 	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/table/rowmodes/Fixed"
+	"sap/ui/table/rowmodes/Fixed",
+	"sap/m/plugins/TitleProvider"
 ], function(
 	TableQUnitUtils,
 	Element,
@@ -77,11 +78,11 @@ sap.ui.define([
 	GroupHeaderRowContextMenu,
 	PersonalizationUtils,
 	FilterBar,
+	TableM,
 	Text,
 	Button,
 	Link,
 	MessageBox,
-	ODataListBinding,
 	JSONModel,
 	BooleanType,
 	UI5Event,
@@ -572,6 +573,9 @@ sap.ui.define([
 		assert.equal(oDomRef.style.width, "200px", "Table has a custom width");
 
 		const TestTableType = TableTypeBase.extend("sap.ui.mdc.test.TestTableType", {
+			createTable: function() {
+				return new TableM();
+			},
 			loadModules: function() {
 				return Promise.resolve();
 			},
@@ -1009,11 +1013,13 @@ sap.ui.define([
 		const done = assert.async();
 		this.oTable.initialized().then(function() {
 			const oTitle = this.oTable._oTitle;
+			const oTableTitle = this.oTable._oTableTitle;
 			assert.ok(oTitle, "Title is available");
-			assert.ok(!oTitle.getWidth(), "Title is shown");
+			assert.ok(oTableTitle, "TableTitle is available");
+			assert.ok(oTableTitle.getVisible(), "Title is shown");
 			assert.equal(this.oTable._oTitle.getTitleStyle(), "H5", "Title style Property added");
 			this.oTable.setHeaderVisible(false);
-			assert.equal(oTitle.getWidth(), "0px", "Title is hidden due to width");
+			assert.notOk(oTableTitle.getVisible(), "TableTitle is hidden due to headerVisible=false");
 
 			assert.equal(this.oTable._oTable.getAriaLabelledBy().length, 1, "ARIA labelling available for inner table");
 			assert.equal(this.oTable._oTable.getAriaLabelledBy()[0], oTitle.getId(), "ARIA labelling for inner table points to title");
@@ -1175,7 +1181,10 @@ sap.ui.define([
 
 		function selectRow(oRow, bUser, bNoRowSelector) {
 			return new Promise(function(resolve) {
-				oSelectionPlugin.attachEventOnce("selectionChange", resolve);
+				oSelectionPlugin.attachEventOnce("selectionChange", async () => {
+					await wait(0);
+					resolve();
+				});
 
 				if (bUser) {
 					if (bNoRowSelector) {
@@ -1214,11 +1223,13 @@ sap.ui.define([
 		await this.oTable.initialized();
 		await TableQUnitUtils.nextEvent("rowsUpdated", this.oTable._oTable);
 
+		const oTableTitle = this.oTable._oTableTitle;
 		oSelectionPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.SelectionPlugin");
 
 		assert.equal(this.oTable.getSelectionMode(), "None", "Selection Mode None");
 		assert.ok(oSelectionPlugin.isA("sap.ui.table.plugins.MultiSelectionPlugin"), "Plugin is a MultiSelectionPlugin");
 		assert.ok(!oSelectionPlugin.getEnabled(), "MultiSelectionPlugin disabled");
+		assert.equal(oTableTitle.getSelectedCount(), 0, "TableTitle selected count is 0");
 
 		this.oTable.setSelectionMode("Single");
 		assert.equal(this.oTable.getSelectionMode(), "Single", "Selection Mode Single - MDCTable");
@@ -1230,10 +1241,12 @@ sap.ui.define([
 		await selectRow(this.oTable._oTable.getRows()[0], true);
 		assert.equal(this.oTable.getSelectedContexts().length, 1, "Item selected");
 		assert.equal(oSelectionChange.callCount, 1, "Selection change event");
+		assert.equal(oTableTitle.getSelectedCount(), 0, "No selection count is shown for the Single selection mode");
 
 		oSelectionChange.resetHistory();
 		await selectRow(this.oTable._oTable.getRows()[1], true);
 		assert.equal(oSelectionChange.callCount, 1, "Selection change event");
+		assert.equal(oTableTitle.getSelectedCount(), 0, "Still no selection count is shown for the Single selection mode");
 
 		oSelectionChange.resetHistory();
 		this.oTable.clearSelection();
@@ -1251,11 +1264,13 @@ sap.ui.define([
 		await selectRow(this.oTable._oTable.getRows()[0], true, true);
 		assert.equal(this.oTable.getSelectedContexts().length, 1, "Item selected");
 		assert.equal(oSelectionChange.callCount, 1, "Selection change event");
+		assert.equal(oTableTitle.getSelectedCount(), 0, "No selection count is shown for the SingleMaster mode");
 
 		oSelectionChange.resetHistory();
 		await selectRow(this.oTable._oTable.getRows()[1], true, true);
 		assert.equal(oSelectionChange.callCount, 1, "Selection change event");
 		assert.ok(!bRowPressFired, "rowPress event not fired");
+		assert.equal(oTableTitle.getSelectedCount(), 0, "Still no selection count is shown for the SingleMaster mode");
 
 		oSelectionChange.resetHistory();
 		this.oTable.clearSelection();
@@ -1273,30 +1288,38 @@ sap.ui.define([
 		await selectRow(this.oTable._oTable.getRows()[0], true);
 		assert.equal(this.oTable.getSelectedContexts().length, 1, "Item selected");
 		assert.equal(oSelectionChange.callCount, 1, "Selection change event");
+		assert.equal(oTableTitle.getSelectedCount(), 1, "TableTitle selected count is 1");
 
 		oSelectionChange.resetHistory();
 		await selectRow(this.oTable._oTable.getRows()[1], true);
 		assert.equal(oSelectionChange.callCount, 1, "Selection change event");
+		assert.equal(oTableTitle.getSelectedCount(), 2, "TableTitle selected count is 2");
 
 		oSelectionChange.resetHistory();
 		await selectRow(this.oTable._oTable.getRows()[2], true);
 		assert.equal(oSelectionChange.callCount, 1, "Selection change event");
+		assert.equal(oTableTitle.getSelectedCount(), 3, "TableTitle selected count is 3");
 
 		oSelectionChange.resetHistory();
 		this.oTable.clearSelection();
+		await wait(0);
 		assert.equal(this.oTable.getSelectedContexts().length, 0, "No rows selected");
 		assert.equal(oSelectionChange.callCount, 1, "Selection change event");
+		assert.equal(oTableTitle.getSelectedCount(), 0, "TableTitle selected count is 0");
 
 		// Simulate enable notification scenario via selection over limit
 		oSelectionChange.resetHistory();
 		this.oTable.setSelectionMode("Multi");
 		this.oTable.getType().setSelectionLimit(3);
 		assert.ok(oSelectionPlugin.getEnableNotification(), true);
+		await nextUIUpdate();
 
 		await new Promise((resolve) => {
-			oSelectionPlugin.attachEventOnce("selectionChange", () => {
+			oSelectionPlugin.attachEventOnce("selectionChange", async () => {
+				await wait(0);
 				assert.equal(this.oTable.getSelectedContexts().length, 3, "Rows selected");
 				assert.equal(oSelectionChange.callCount, 1, "Selection change event");
+				assert.equal(oTableTitle.getSelectedCount(), 3, "TableTitle selected count is 3");
 				resolve();
 			});
 			// select all existing rows
@@ -1324,9 +1347,10 @@ sap.ui.define([
 			if (bUser) {
 				oItem.setSelected(true);
 				oItem.informList("Select", true);
-				return;
+			} else {
+				oItem.getParent().setSelectedItem(oItem, true);
 			}
-			oItem.getParent().setSelectedItem(oItem, true);
+			return wait(0);
 		}
 
 		this.oTable.destroy();
@@ -1345,9 +1369,10 @@ sap.ui.define([
 				header: "test",
 				template: new Text()
 			})
-		});
+		}).placeAt("qunit-fixture");
 
-		return TableQUnitUtils.waitForBinding(this.oTable).then(async function() {
+		return TableQUnitUtils.waitForBinding(this.oTable).then(nextUIUpdate).then(async function() {
+			const oTableTitle = this.oTable._oTableTitle;
 			assert.equal(this.oTable._oTable.getItems().length, 20, "Items available");
 
 			let iSelectionCount = -1;
@@ -1363,29 +1388,35 @@ sap.ui.define([
 			assert.equal(this.oTable._oTable.getMode(), "MultiSelect", "Selection Mode Multi - Inner Table");
 			await nextUIUpdate();
 			checkSelectionMethods(this.oTable);
-			selectItem(this.oTable._oTable.getItems()[0], false);
+			await selectItem(this.oTable._oTable.getItems()[0], false);
 			assert.equal(this.oTable.getSelectedContexts().length, 1, "Item selected");
 			assert.equal(iSelectionCount, -1, "No selection change event");
-			selectItem(this.oTable._oTable.getItems()[1], true);
+			assert.equal(oTableTitle.getSelectedCount(), 1, "TableTitle selected count is 1");
+			await selectItem(this.oTable._oTable.getItems()[1], true);
 			assert.equal(iSelectionCount, 2, "Selection change event");
-			selectItem(this.oTable._oTable.getItems()[2], true);
+			assert.equal(oTableTitle.getSelectedCount(), 2, "TableTitle selected count is 2");
+			await selectItem(this.oTable._oTable.getItems()[2], true);
 			assert.equal(iSelectionCount, 3, "Selection change event");
+			assert.equal(oTableTitle.getSelectedCount(), 3, "TableTitle selected count is 3");
 
 			iSelectionCount = -1;
 			this.oTable.clearSelection();
+			await wait(0);
 			assert.equal(iSelectionCount, -1, "No selection change event");
 			assert.equal(this.oTable.getSelectedContexts().length, 0, "No Items selected");
+			assert.equal(oTableTitle.getSelectedCount(), 0, "TableTitle selected count is 0");
 
 			this.oTable.setSelectionMode("Single");
 			assert.equal(this.oTable.getSelectionMode(), "Single", "Selection Mode Single - MDCTable");
 			assert.equal(this.oTable._oTable.getMode(), "SingleSelectLeft", "Selection Mode Single - Inner Table");
 			await nextUIUpdate();
 			checkSelectionMethods(this.oTable);
-			selectItem(this.oTable._oTable.getItems()[0], false);
+			await selectItem(this.oTable._oTable.getItems()[0], false);
 			assert.equal(this.oTable.getSelectedContexts().length, 1, "Item selected");
 			assert.equal(iSelectionCount, -1, "No selection change event");
-			selectItem(this.oTable._oTable.getItems()[1], true);
+			await selectItem(this.oTable._oTable.getItems()[1], true);
 			assert.equal(iSelectionCount, 1, "Selection change event");
+			assert.equal(oTableTitle.getSelectedCount(), 0, "No selection count is shown for the Single selection mode");
 
 			iSelectionCount = -1;
 			this.oTable.clearSelection();
@@ -1397,16 +1428,19 @@ sap.ui.define([
 			assert.equal(this.oTable._oTable.getMode(), "SingleSelectMaster", "Selection Mode SingleSelectMaster - Inner Table");
 			await nextUIUpdate();
 			checkSelectionMethods(this.oTable);
-			selectItem(this.oTable._oTable.getItems()[0], false);
+			await selectItem(this.oTable._oTable.getItems()[0], false);
 			assert.equal(this.oTable.getSelectedContexts().length, 1, "Item selected");
 			assert.equal(iSelectionCount, -1, "No selection change event");
-			selectItem(this.oTable._oTable.getItems()[1], true);
+			await selectItem(this.oTable._oTable.getItems()[1], true);
 			assert.equal(iSelectionCount, 1, "Selection change event");
+			assert.equal(oTableTitle.getSelectedCount(), 0, "No selection count is shown for the SingleMaster mode");
 
 			iSelectionCount = -1;
 			this.oTable.clearSelection();
+			await wait(0);
 			assert.equal(iSelectionCount, -1, "No selection change event");
 			assert.equal(this.oTable.getSelectedContexts().length, 0, "No Items selected");
+			assert.equal(oTableTitle.getSelectedCount(), 0, "TableTitle selected count is 0");
 
 			return new Promise(function(resolve) {
 				let bRowPressFired = false;
@@ -1426,15 +1460,18 @@ sap.ui.define([
 					// Simulate message scenario via SelectAll
 					sap.ui.require([
 						"sap/m/MessageToast"
-					], function(MessageToast) {
+					], async function(MessageToast) {
 						const fMessageSpy = sinon.stub(MessageToast, "show");
 						assert.ok(fMessageSpy.notCalled);
 
 						this.oTable.setSelectionMode("Multi");
+						await nextUIUpdate();
 						this.oTable._oTable.selectAll(true);
+						await wait(0);
 
 						assert.equal(iSelectionCount, 20, "Selection change event");
 						assert.equal(this.oTable.getSelectedContexts().length, 20, "Items selected");
+						assert.equal(oTableTitle.getSelectedCount(), 20, "TableTitle selected count is 20");
 						// message is shown delayed due to a require
 						fMessageSpy.callsFake(function() {
 							assert.ok(fMessageSpy.calledOnce);
@@ -2599,13 +2636,20 @@ sap.ui.define([
 	QUnit.test("Toolbar is hidden when the table's property hideToolbar is true", function(assert) {
 
 		return this.oTable.initialized().then(() => {
+			const oTitleProvider = PluginBase.getPlugin(this.oTable._oTable, "sap.m.plugins.TitleProvider");
 			assert.ok(this.oTable._oToolbar.getVisible(), "Toolbar is visible.");
 			assert.notOk(this.oTable.getHideToolbar(), "Property hideToolbar is false.");
 			assert.notOk(this.oTable._oTable.getAriaLabelledBy().includes(this.oTable.getId() + "-invisibleTitle"),
 				"Header is not referenced by ariaLabelledBy.");
 			assert.ok(this.oTable._oToolbar.getVisible(), "Toolbar is visible.");
+			assert.ok(oTitleProvider.getEnabled(), "TitleProvider plugin is enabled.");
+			assert.ok(this.oTable._oTableTitle.getVisible(), "TableTitle is visible.");
+			assert.notOk(this.oTable._oTableTitle.getShowExtendedView(), "TableTitle is in condensed view, type=Table");
 
 			this.oTable.setHideToolbar(true);
+			assert.notOk(oTitleProvider.getEnabled(), "TitleProvider plugin is disabled, hideToolbar=true");
+			assert.ok(this.oTable._oTableTitle.getVisible(), "TableTitle visible property not changed, hideToolbar=true");
+
 			this.oTable.setHeaderVisible(false);
 			assert.ok(this.oTable.getHideToolbar(), "Property hideToolbar is true.");
 			assert.notOk(this.oTable.getHeaderVisible(), "Property headerVisible is false.");
@@ -2621,23 +2665,35 @@ sap.ui.define([
 			assert.notOk(this.oTable._oToolbar.getVisible(), "Toolbar is not visible.");
 
 			this.oTable.setHideToolbar(false);
+			assert.ok(oTitleProvider.getEnabled(), "TitleProvider plugin is enabled again.");
+			assert.ok(this.oTable._oTableTitle.getVisible(), "TableTitle is visible again.");
+
 			this.oTable.setHeaderVisible(false);
 			assert.notOk(this.oTable.getHideToolbar(), "Property hideToolbar is false.");
 			assert.notOk(this.oTable.getHeaderVisible(), "Property headerVisible is false.");
 			assert.notOk(this.oTable._oTable.getAriaLabelledBy().includes(this.oTable.getId() + "-invisibleTitle"),
 				"Header is not referenced by ariaLabelledBy.");
 			assert.ok(this.oTable._oToolbar.getVisible(), "Toolbar is visible.");
+			assert.notOk(oTitleProvider.getEnabled(), "TitleProvider plugin is disabled, headerVisible=false");
+			assert.notOk(this.oTable._oTableTitle.getVisible(), "TableTitle is invisible, headerVisible=false");
 
 			this.oTable.setHideToolbar(true);
 			assert.equal(this.oTable.getType(), null, "Table type is null");
 
+			assert.notOk(this.oTable._oTableTitle.getShowExtendedView(), "getShowExtendedView is false, type=Table");
+
 			return this.oTable.setType(TableType.ResponsiveTable).initialized().then(() => {
+				const oTitleProvider2 = PluginBase.getPlugin(this.oTable._oTable, "sap.m.plugins.TitleProvider");
+				assert.notEqual(oTitleProvider, oTitleProvider2, "A new TitleProvider plugin instance is created");
 				assert.equal(this.oTable.getType(), TableType.ResponsiveTable, "Table type is ResponsiveTable");
 				assert.ok(this.oTable.getHideToolbar(), "Property hideToolbar is true.");
 				assert.notOk(this.oTable.getHeaderVisible(), "Property headerVisible is false.");
 				assert.ok(this.oTable._oTable.getAriaLabelledBy().includes(this.oTable.getId() + "-invisibleTitle"),
 					"Header is referenced by ariaLabelledBy.");
 				assert.notOk(this.oTable._oToolbar.getVisible(), "Toolbar is not visible.");
+				assert.notOk(oTitleProvider2.getEnabled(), "TitleProvider plugin is disabled, hideToolbar=true");
+				assert.notOk(this.oTable._oTableTitle.getVisible(), "TableTitle is invisible, hideToolbar=true");
+				assert.ok(this.oTable._oTableTitle.getShowExtendedView(), "getShowExtendedView is true, type=ResponsiveTable");
 			});
 		});
 	});
@@ -2761,25 +2817,32 @@ sap.ui.define([
 
 	QUnit.test("Initial header text", function(assert) {
 		const oTitle = this.oTable._oTitle;
-		assert.equal(oTitle.getText(), "MyTestHeader (10)", "Header text contains row count");
+		const oTableTitle = oTitle.getParent();
+		assert.equal(oTitle.getText(), "MyTestHeader", "Header text available");
+		assert.equal(oTableTitle.getTotalCount(), 10, "Row count is set correctly in the TableTitle");
+
 	});
 
-	QUnit.test("Update on binding event 'dataReceived'", function(assert) {
+	QUnit.test("Update on binding event 'dataReceived'", async function(assert) {
 		const oBinding = this.oTable.getRowBinding();
 		const oTitle = this.oTable._oTitle;
+		const oTableTitle = oTitle.getParent();
 
 		this.stub(oBinding, "getCount").returns(0);
-		oBinding.fireEvent("dataReceived");
-		assert.equal(oTitle.getText(), "MyTestHeader", "Binding#getCount returns 0");
+		oBinding.fireEvent("change").fireEvent("dataReceived");
+		await wait(0);
+		assert.equal(oTableTitle.getTotalCount(), 0, "Binding#getCount returns 0");
 
 		oBinding.getCount.returns(10);
-		oBinding.fireEvent("dataReceived");
-		assert.equal(oTitle.getText(), "MyTestHeader (10)", "Binding#getCount returns 10");
+		oBinding.fireEvent("change").fireEvent("dataReceived");
+		await wait(0);
+		assert.equal(oTableTitle.getTotalCount(), 10, "Binding#getCount returns 10");
 	});
 
 	QUnit.test("Update on binding event 'dataReceived' with application-defined listener", async function(assert) {
 		const oDataReceivedStub = this.stub();
 		const oTitle = this.oTable._oTitle;
+		const oTableTitle = oTitle.getParent();
 
 		this.stub(this.oTable.getControlDelegate(), "updateBindingInfo").callsFake(function(oTable, oBindingInfo) {
 			this.updateBindingInfo.wrappedMethod.apply(this, arguments);
@@ -2792,40 +2855,50 @@ sap.ui.define([
 		const oBinding = this.oTable.getRowBinding();
 
 		this.stub(oBinding, "getCount").returns(undefined);
-		oBinding.fireEvent("dataReceived");
-		assert.equal(oTitle.getText(), "MyTestHeader", "Binding#getCount returns undefined");
+		oBinding.fireEvent("change").fireEvent("dataReceived");
+		await wait(0);
+		assert.equal(oTableTitle.getTotalCount(), -1, "Binding#getCount returns undefined");
 		assert.ok(oDataReceivedStub.called, "Application-defined listener called");
 
 		oDataReceivedStub.resetHistory();
 		oBinding.getCount.returns(10);
-		oBinding.fireEvent("dataReceived");
-		assert.equal(oTitle.getText(), "MyTestHeader (10)", "Binding#getCount returns 10");
+		oBinding.fireEvent("change").fireEvent("dataReceived");
+		await wait(0);
+		assert.equal(oTableTitle.getTotalCount(), 10, "Binding#getCount returns 10");
 		assert.ok(oDataReceivedStub.called, "Application-defined listener called");
 	});
 
-	QUnit.test("Update on binding event 'change'", function(assert) {
+	QUnit.test("Update on binding event 'change'", async function(assert) {
 		const oBinding = this.oTable.getRowBinding();
 		const oTitle = this.oTable._oTitle;
+		const oTableTitle = oTitle.getParent();
 
 		this.stub(oBinding, "getCount").returns(0);
 		oBinding.fireEvent("change");
+		await wait(0);
+		assert.equal(oTableTitle.getTotalCount(), 0, "Binding#getCount returns 0");
 		assert.equal(oTitle.getText(), "MyTestHeader", "Binding#getCount returns 0");
 
 		oBinding.getCount.returns(10);
 		oBinding.fireEvent("change");
-		assert.equal(oTitle.getText(), "MyTestHeader (10)", "Binding#getCount returns 10");
+		await wait(0);
+		assert.equal(oTableTitle.getTotalCount(), 10, "Binding#getCount returns 10");
 
 		oBinding.getCount.returns(undefined);
 		oBinding.fireEvent("change");
-		assert.equal(this.oTable._oTitle.getText(), "MyTestHeader", "Binding#getCount returns undefined");
+		await wait(0);
+		assert.equal(oTableTitle.getTotalCount(), -1, "Binding#getCount returns undefined");
 	});
 
-	QUnit.test("Change 'showRowCount' property", function(assert) {
+	QUnit.test("Change 'showRowCount' property", async function(assert) {
+		const oTableTitle = this.oTable._oTitle.getParent();
 		this.oTable.setShowRowCount(false);
-		assert.equal(this.oTable._oTitle.getText(), "MyTestHeader", "showRowCount set to false");
+		await wait(0);
+		assert.equal(oTableTitle.getTotalCount(), 0, "showRowCount set to false");
 
 		this.oTable.setShowRowCount(true);
-		assert.equal(this.oTable._oTitle.getText(), "MyTestHeader (10)", "showRowCount set to true");
+		await wait(0);
+		assert.equal(oTableTitle.getTotalCount(), 10, "showRowCount set to true");
 	});
 
 	QUnit.module("Bind/Rebind", {
@@ -3057,6 +3130,7 @@ sap.ui.define([
 			autoBindOnInit: false
 		});
 
+		await this.oTable.initialized();
 		await this.oTable.finalizePropertyHelper();
 
 		sinon.stub(this.oTable, "finalizePropertyHelper").resolves();
@@ -4098,7 +4172,7 @@ sap.ui.define([
 		this.oTable.setHeader("Test Table");
 
 		this.oTable.initialized().then(function() {
-			assert.strictEqual(this.oTable._oTable.getHeaderToolbar().getContent()[0].getLevel(), "H2", "Header level changed");
+			assert.strictEqual(this.oTable._oTable.getHeaderToolbar().getContent()[0].getTitle().getLevel(), "H2", "Header level changed");
 			done();
 		}.bind(this));
 	});
@@ -4108,12 +4182,13 @@ sap.ui.define([
 		this.oTable.setType(TableType.ResponsiveTable);
 
 		this.oTable.initialized().then(function() {
-			assert.strictEqual(this.oTable._oTable.getHeaderToolbar().getContent()[0].getTitleStyle(), "H5", "Header style set to the header");
+			const oTitle = this.oTable._oTable.getHeaderToolbar().getContent()[0].getTitle();
+			assert.strictEqual(oTitle.getTitleStyle(), "H5", "Header style set to the header");
 			this.oTable.setHeaderStyle("H2");
 			this.oTable.setHeader("Test Table");
-			assert.strictEqual(this.oTable._oTable.getHeaderToolbar().getContent()[0].getTitleStyle(), "H2", "Header style changed");
+			assert.strictEqual(oTitle.getTitleStyle(), "H2", "Header style changed");
 			this.oTable.setHeaderStyle(null);
-			assert.strictEqual(this.oTable._oTable.getHeaderToolbar().getContent()[0].getTitleStyle(), "H5", "Header style set to the header");
+			assert.strictEqual(oTitle.getTitleStyle(), "H5", "Header style set to the header");
 			done();
 		}.bind(this));
 	});

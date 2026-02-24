@@ -4,8 +4,9 @@ sap.ui.define([
 	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Util',
 	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Action',
 	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Assertion',
-	'sap/ui/Device'
-], function (Opa5, Arrangement, TestUtil, Action, Assertion, Device) {
+	'sap/ui/Device',
+	'sap/ui/core/Lib'
+], function (Opa5, Arrangement, TestUtil, Action, Assertion, Device, Library) {
 	'use strict';
 
 	return function (opaTestOrSkip) {
@@ -22,10 +23,10 @@ sap.ui.define([
 			autoWait: true
 		});
 
+		const oRb = Library.getResourceBundleFor("sap.ui.mdc");
 		const oErrorAndWarningTexts = {
-			Info: "The filter will not show on the filter bar.",
-			Warning1: "If invisible and empty, this filter will be removed.",
-			Error1: "{fieldName} is a required field."
+			Info: oRb.getText("adaptFiltersPanel.INFO_INVISIBLE_WITH_VALUE"),
+			Warning1: oRb.getText("adaptFiltersPanel.WARNING_INVISIBLE_EMPTY_REMOVE")
 		};
 
 		const oFilterItems = {
@@ -385,8 +386,6 @@ sap.ui.define([
 			Then.iShouldSeeValueStateInAdaptFiltersPanel("Breakout Year", "None", "");
 
 			// test required field in unit test because of issue when setting required in delegate
-			// When.iPressButtonWithText("Filter");
-			// Then.iShouldSeeValueStateInAdaptFiltersPanel("Title", "Error", oErrorAndWarningTexts.Error1.replace("{fieldName}", "Title"));
 
 			Then.iTeardownMyAppFrame();
 		});

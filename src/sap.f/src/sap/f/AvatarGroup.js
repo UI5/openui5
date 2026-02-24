@@ -585,6 +585,9 @@ sap.ui.define([
 
 		this._iAvatarsToShow = this._getAvatarsToShow(iWidth, iAvatarWidth, iAvatarNetWidth);
 
+		// Set CSS variable for button inner height (avatar size)
+		this.getDomRef().style.setProperty("--sapUiAvatarGroupButtonInnerHeight", iAvatarWidth + "rem");
+
 		if (sAvatarDisplaySize === AvatarSize.Custom) {
 			this.getDomRef().style.setProperty("--sapUiAvatarGroupCustomMarginRight", (iAvatarWidth * -0.4) + "rem");
 		}

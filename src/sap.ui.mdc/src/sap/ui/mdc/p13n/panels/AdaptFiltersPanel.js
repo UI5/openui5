@@ -22,8 +22,11 @@ sap.ui.define([
 	"sap/ui/core/Item",
 	"sap/m/library",
 	"sap/ui/model/json/JSONModel",
-	"sap/base/util/merge"
-], (AbstractContainer, AbstractContainerItem, SelectionPanel, GroupView, AdaptFiltersPanelContent, Library, Filter, Button, Bar, IconTabBar, IconTabFilter, ToolbarSpacer, Select, SegmentedButton, SegmentedButtonItem, InvisibleText, SearchField, Item, mLibrary, JSONModel, merge) => {
+	"sap/base/util/merge",
+	"sap/m/OverflowToolbar",
+	"sap/m/Title",
+	"sap/m/OverflowToolbarLayoutData"
+], (AbstractContainer, AbstractContainerItem, SelectionPanel, GroupView, AdaptFiltersPanelContent, Library, Filter, Button, Bar, IconTabBar, IconTabFilter, ToolbarSpacer, Select, SegmentedButton, SegmentedButtonItem, InvisibleText, SearchField, Item, mLibrary, JSONModel, merge, OverflowToolbar, Title, OverflowToolbarLayoutData) => {
 	"use strict";
 
 	// shortcut for sap.m.BarDesign
@@ -135,6 +138,8 @@ sap.ui.define([
 		this._oShowHideBtn = null;
 		this._oGroupModeSelect = null;
 		this._oSearchField = null;
+		this._oCustomViewToolbar = null;
+		this._oCustomViewSearchField = null;
 
 		// Reset cached values
 		delete this._bCreatedWithNewUI;
@@ -278,16 +283,39 @@ sap.ui.define([
 				oCurrentViewContent.setP13nData(this.getP13nModel().getProperty("/items"));
 			}
 
-			if (oCurrentViewContent._getSearchField) {
-				let sSearch;
-				if (sPreviousKey) {
-					sSearch = this.getView(sPreviousKey).getContent()._getSearchField?.().getValue();
+			let sSearch = "";
+			if (sPreviousKey) {
+				if (this._isCustomView(sPreviousKey)) {
+					sSearch = this._getCustomViewSearchField().getValue();
+				} else {
+					sSearch = this.getView(sPreviousKey).getContent()._getSearchField?.()?.getValue() ?? "";
 				}
+			}
+
+			if (this._isCustomView()) {
+				this._getCustomViewSearchField().setValue(sSearch);
+			} else if (oCurrentViewContent._getSearchField) {
 				oCurrentViewContent._getSearchField?.().setValue(sSearch);
 			}
 
 			this._filterByModeAndSearch();
 			this.oLayout.insertContent(this._oHeader, 0);
+
+			if (this._isCustomView()) {
+				const oCustomViewToolbar = this._getCustomViewToolbar();
+				if (this.oLayout.indexOfContent(oCustomViewToolbar) === -1) {
+					this.oLayout.insertContent(oCustomViewToolbar, 1);
+				}
+				oCustomViewToolbar.setVisible(true);
+
+				const [oTitle] = this._oCustomViewToolbar.getContent();
+				if (oTitle) {
+					const sViewName = this._mCustomViewTitles?.[sKey] ?? "";
+					oTitle.setText(sViewName);
+				}
+			} else if (this._oCustomViewToolbar) {
+				this._oCustomViewToolbar.setVisible(false);
+			}
 
 			if (sKey === this.GROUP_KEY) {
 				if (oCurrentViewContent._updateFilterFieldsEditMode) {
@@ -324,18 +352,23 @@ sap.ui.define([
 	 * @param {object} mViewSettings the setting for the cutom view
 	 * @param {sap.ui.core.Item} mViewSettings.item the item used in the view switch
 	 * @param {sap.ui.core.Control} mViewSettings.content the content displayed in the custom view
-	 * @param {function} [mViewSettings.filterSelect] callback triggered by the combobox in the header area - executed with the selected key as paramter
+	 * @param {string} [mViewSettings.title] Title to be displayed in the overflow toolbar for the custom view
+	 * @param {function} [mViewSettings.filterSelect] callback triggered by the combobox in the header area - executed with the selected key as paramter, with new UI not any more needed
 	 * @param {function} [mViewSettings.search] callback triggered by search - executed with the string as parameter
 	 * @param {function} [mViewSettings.selectionChange] callback triggered by selecting a view - executed with the key as parameter
+	 * @param {function} [mViewSettings.reset] callback triggered when restoreDefaults is called - allows custom views to reset their state
 	 *
+	 * @private
+	 * @ui5-restricted sap.ui.comp
 	 */
 	AdaptFiltersPanel.prototype.addCustomView = function(mViewSettings) {
 		const oItem = mViewSettings.item;
 		const sKey = oItem.getKey();
 		const oContent = mViewSettings.content;
-		let fnOnSearch = mViewSettings.search;
+		const fnOnSearch = mViewSettings.search;
 		const fnSelectionChange = mViewSettings.selectionChange;
-		let fnDropDownChange = mViewSettings.filterSelect;
+		const fnDropDownChange = this._checkIsNewUI() ? undefined : mViewSettings.filterSelect;
+		const fnReset = mViewSettings.reset;
 
 		if (!sKey && this._checkIsNewUI()) {
 			throw new Error("Please provide an item of type sap.ui.core.Item with a key to be used in the view switch");
@@ -343,10 +376,6 @@ sap.ui.define([
 			throw new Error("Please provide an item of type sap.m.SegmentedButtonItem with a key to be used in the view switch");
 		}
 
-		if (this._checkIsNewUI()) {
-			fnOnSearch = undefined;
-			fnDropDownChange = undefined;
-		}
 
 		const oViewSwitch = this._getViewSwitch();
 		if (oViewSwitch) {
@@ -369,10 +398,10 @@ sap.ui.define([
 		}
 
 		if (fnOnSearch instanceof Function) {
-			this._getSearchField().attachLiveChange((oEvt) => {
+			const oSearchField = this._checkIsNewUI() ? this._getCustomViewSearchField() : this._getSearchField();
+			oSearchField.attachLiveChange((oEvt) => {
 				if (this._isCustomView()) {
-					//Fire search only while on the custom view
-					fnOnSearch(this._getSearchField().getValue());
+					fnOnSearch(oEvt.getParameter("newValue"));
 				}
 			});
 		}
@@ -380,7 +409,6 @@ sap.ui.define([
 		if (fnDropDownChange instanceof Function) {
 			this._getQuickFilter().attachChange((oEvt) => {
 				if (this._isCustomView()) {
-					//Fire selection change only when on custom view
 					fnDropDownChange(this._getQuickFilter().getSelectedKey());
 				}
 			});
@@ -390,6 +418,16 @@ sap.ui.define([
 			key: sKey,
 			content: oContent.addStyleClass("sapUiMDCPanelPadding")
 		}));
+
+		if (fnReset instanceof Function) {
+			this._mCustomViewResetCallbacks = this._mCustomViewResetCallbacks || {};
+			this._mCustomViewResetCallbacks[sKey] = fnReset;
+		}
+
+		if (mViewSettings.title) {
+			this._mCustomViewTitles = this._mCustomViewTitles || {};
+			this._mCustomViewTitles[sKey] = mViewSettings.title;
+		}
 
 		if (this._checkIsNewUI()) {
 			let oIconTabFilter;
@@ -490,6 +528,16 @@ sap.ui.define([
 		if (this._checkIsNewUI()) {
 			this.switchView(this.LIST_KEY);
 			this.getView(this.getCurrentViewKey()).getContent().restoreDefaults();
+
+			if (this._oCustomViewSearchField) {
+				this._oCustomViewSearchField.setValue("");
+			}
+
+			if (this._mCustomViewResetCallbacks) {
+				Object.values(this._mCustomViewResetCallbacks).forEach((fnReset) => {
+					fnReset();
+				});
+			}
 			return;
 		}
 
@@ -497,8 +545,6 @@ sap.ui.define([
 		this._getQuickFilter().setSelectedKey(this._sModeKey);
 		this._getSearchField().setValue("");
 
-		//Note: this will need to be threated as incompatible change
-		//this.switchView(this.getDefaultView());
 		this._filterByModeAndSearch();
 
 		if (this.getCurrentViewKey() === this.LIST_KEY) {
@@ -627,6 +673,9 @@ sap.ui.define([
 
 	AdaptFiltersPanel.prototype._getSearchField = function() {
 		if (this._checkIsNewUI()) {
+			if (this._isCustomView()) {
+				return this._getCustomViewSearchField();
+			}
 			return this.getCurrentViewContent()._getSearchField?.();
 		}
 
@@ -638,6 +687,64 @@ sap.ui.define([
 			this._oSearchField.setPlaceholder(this._getResourceText("p13nDialog.ADAPT_FILTER_SEARCH"));
 		}
 		return this._oSearchField;
+	};
+
+	/**
+	 * Creates and returns the SearchField for custom views in the new UI.
+	 * @returns {sap.m.SearchField} The search field for custom views
+	 * @private
+	 */
+	AdaptFiltersPanel.prototype._getCustomViewSearchField = function() {
+		if (!this._oCustomViewSearchField) {
+			this._oCustomViewSearchField = new SearchField(this.getId() + "-customViewSearchField", {
+				width: "20rem",
+				placeholder: this._getResourceText("p13nDialog.ADAPT_FILTER_SEARCH")
+			});
+		}
+		return this._oCustomViewSearchField;
+	};
+
+	/**
+	 * Creates and returns the OverflowToolbar for custom views in the new UI.
+	 * This toolbar contains a Title and SearchField, similar to the standard views.
+	 * @returns {sap.m.OverflowToolbar} The toolbar for custom views
+	 * @private
+	 */
+	AdaptFiltersPanel.prototype._getCustomViewToolbar = function() {
+		if (!this._oCustomViewToolbar) {
+			const oSearchField = this._getCustomViewSearchField();
+			oSearchField.setLayoutData(new OverflowToolbarLayoutData({
+				priority: "NeverOverflow"
+			}));
+
+			let sViewName = this._getResourceText("adaptFiltersPanel.TOOLBAR_TITLE");
+			const sCurrentViewKey = this.getCurrentViewKey();
+			if (sCurrentViewKey && this._isCustomView(sCurrentViewKey)) {
+				const oViewSwitch = this._getViewSwitch();
+				if (oViewSwitch) {
+					const aItems = oViewSwitch.getItems();
+					const oSelectedItem = aItems.find((oItem) => oItem.getKey() === sCurrentViewKey);
+					if (oSelectedItem) {
+						sViewName = oSelectedItem.getText();
+					}
+				}
+			}
+
+			this._oCustomViewToolbar = new OverflowToolbar(this.getId() + "-customViewToolbar", {
+				content: [
+					new Title(this.getId() + "-customViewTitle", {
+						text: sViewName,
+						layoutData: new OverflowToolbarLayoutData({
+							priority: "NeverOverflow"
+						})
+					}).addStyleClass("sapUiTinyMarginBegin"),
+					new ToolbarSpacer(),
+					oSearchField
+				]
+			});
+			this._oCustomViewToolbar.addStyleClass("sapUiMDCAdaptFiltersPanelCustomViewToolbar");
+		}
+		return this._oCustomViewToolbar;
 	};
 
 	AdaptFiltersPanel.prototype.getInitialFocusedControl = function() {
@@ -686,8 +793,9 @@ sap.ui.define([
 		return this._oViewSwitch;
 	};
 
-	AdaptFiltersPanel.prototype._isCustomView = function() {
-		return this._sCurrentView != this.GROUP_KEY && this._sCurrentView != this.LIST_KEY;
+	AdaptFiltersPanel.prototype._isCustomView = function(sKey) {
+		const sViewKey = sKey ?? this._sCurrentView;
+		return sViewKey != this.GROUP_KEY && sViewKey != this.LIST_KEY;
 	};
 
 	AdaptFiltersPanel.prototype._filterByModeAndSearch = function() {

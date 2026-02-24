@@ -158,6 +158,55 @@ sap.ui.define([
 					QUnit.assert.equal(oTable.$().find(".sapUiOverlay").length, 0, "No overlay was found on MDC Table");
 				}
 			});
+		},
+
+		/**
+		 * Checks whether the table header with the given text is provided on the MDCTable,
+		 * and optionally verifies the total row count and selection count if provided.
+		 *
+		 * The check succeeds only if {@link sap.ui.mdc.Table#headerVisible} is <code>true</code>,
+		 * and {@link sap.ui.mdc.Table#hideToolbar} is <code>false</code>.
+		 * The verification of optional counts succeeds only if {@link sap.ui.mdc.Table#showRowCount} is <code>true</code>.
+		 *
+		 * @function
+		 * @name iShouldSeeHeaderText
+		 * @param {string|sap.ui.mdc.Table} oControl Id or control instance of the MDCTable
+		 * @param {string} sHeaderText The text that is displayed in the header
+		 * @param {int} [iTotalCount] The total number of rows that is displayed in the header; pass 0 to verify that no rows are available, or -1 to verify that the total count is unknown
+		 * @param {int} [iSelectedCount] The number of selected rows that is displayed in the header; pass 0 to verify that no rows are selected, or -1 to verify that the selected count is unknown
+		 * @returns {Promise} OPA waitFor
+		 * @public
+		 * @since 1.146
+		 */
+		iShouldSeeHeaderText: function(oControl, sHeaderText, iTotalCount, iSelectedCount) {
+			const sTableId = typeof oControl === "string" ? oControl : oControl.getId();
+			const sAssertedCounts = [
+				iTotalCount !== undefined ? "rows: " + iTotalCount : "",
+				iSelectedCount !== undefined ? "selected: " + iSelectedCount : ""
+			].filter(Boolean).join(", ");
+			const sAssertedHeaderText = sHeaderText + (sAssertedCounts ? " (" + sAssertedCounts + ")" : "");
+
+			return waitForTable.call(this, oControl, {
+				success: function(oTable) {
+					return this.waitFor({
+						id: sTableId + "-title",
+						controlType: "sap.m.Title",
+						check: function(oTitle) {
+							return !oTable.getHideToolbar()
+								&& oTable.getHeaderVisible()
+								&& oTitle.getText() === sHeaderText
+								&& (iTotalCount === undefined || (oTable.getShowRowCount() && oTitle.getParent().getTotalCount() === iTotalCount))
+								&& (iSelectedCount === undefined || (oTable.getShowRowCount() && oTitle.getParent().getSelectedCount() === iSelectedCount));
+						},
+						success: function() {
+							QUnit.assert.ok(true,
+								"Table header '" + sAssertedHeaderText + "' is visible."
+							);
+						},
+						errorMessage: "Table header '" + sAssertedHeaderText + "' not found."
+					});
+				}
+			});
 		}
 	};
 });

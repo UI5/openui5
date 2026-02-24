@@ -55,7 +55,22 @@ sap.ui.define([
 
 				oPanel.addCustomView({
 					item: oCustomViewItem,
+					title: "Custom View Title",
 					content: oCustomContent,
+					search: (sSearchValue) => {
+						const aItems = oCustomContent.getItems();
+						aItems.forEach((oItem) => {
+							if (oItem.isA("sap.m.Label")) {
+								const sText = oItem.getText().toLowerCase();
+								const bVisible = !sSearchValue || sText.includes(sSearchValue.toLowerCase());
+								oItem.setVisible(bVisible);
+							} else if (oItem.isA("sap.ui.mdc.FilterField")) {
+								const sLabel = oItem.getLabel()?.toLowerCase() ?? "";
+								const bVisible = !sSearchValue || sLabel.includes(sSearchValue.toLowerCase());
+								oItem.setVisible(bVisible);
+							}
+						});
+					},
 					selectionChange: (sKey) => {
 						if (sKey === "customView" && oCustomContent.getItems().length === 0) {
 							const sConditionModelName = oAdaptationFilterBar.getConditionModelName();

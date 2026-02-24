@@ -1067,7 +1067,7 @@ if (sModeName === "Legacy") {
 		// Act
 		this.oAFPanel.switchView("searchView");
 		this.oAFPanel._getSearchField().setValue("SearchValue");
-		this.oAFPanel._getSearchField().fireLiveChange();
+		this.oAFPanel._getSearchField().fireLiveChange({ newValue: "SearchValue" });
 	});
 
 	QUnit.test("addCustomView search callback only fires when custom view is active", async function(assert) {

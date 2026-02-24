@@ -47,14 +47,14 @@ sap.ui.define([
 				..._oBaseFlexInfoSession,
 				adaptationLayer: "CUSTOMER",
 				allContextsProvided: true,
-				initialAllContexts: false,
+				adaptationMode: true,
 				isEndUserAdaptation: true
 			},
 			roleSpecificReloadReason: {
 				..._oBaseFlexInfoSession,
 				adaptationLayer: "CUSTOMER",
 				allContextsProvided: false,
-				initialAllContexts: true,
+				adaptationMode: true,
 				isEndUserAdaptation: true
 			}
 		},

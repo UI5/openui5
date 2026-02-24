@@ -5,7 +5,7 @@ sap.ui.define([
     "sap/ui/core/Lib",
     "sap/ui/core/format/NumberFormat",
 	"sap/base/i18n/Localization",
-    "sap/m/TableTitle",
+    "sap/m/table/Title",
     "sap/ui/test/utils/nextUIUpdate"
 ], function (Title, coreLibrary, Library, NumberFormat, Localization, TableTitle, nextUIUpdate) {
     "use strict";

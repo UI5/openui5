@@ -548,6 +548,9 @@ sap.ui.define([
 
 			this._sStatus = STARTED;
 			RuntimeAuthoring.disableRestart(this.getLayer());
+			ReloadInfoAPI.addParametersToInfoSessionStorage(this.getRootControlInstance(), [
+				{ key: "adaptationMode", value: true }
+			]);
 			this.fireStart({
 				editablePluginsCount: this.getPluginManager().getEditableOverlaysCount()
 			});

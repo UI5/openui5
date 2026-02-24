@@ -214,12 +214,12 @@ sap.ui.define([
 			this.oMessageBoxStub = sandbox.stub(Utils, "showMessageBox").resolves();
 			this.oGetReloadReasonsStub = sandbox.stub(ReloadInfoAPI, "getReloadReasonsForStart");
 			this.oReloadStub = sandbox.stub(ReloadManager, "triggerReload");
-			this.oAutoStartStub = sandbox.stub(ReloadManager, "enableAutomaticStart");
-			this.oLoadVersionStubFinished = false;
+			this.oAutoStartStub = sandbox.spy(ReloadManager, "enableAutomaticStart");
+			this.bLoadVersionStubFinished = false;
 			var fnSlowCall = function() {
 				return new Promise(function(resolve) {
 					setTimeout(function() {
-						this.oLoadVersionStubFinished = true;
+						this.bLoadVersionStubFinished = true;
 						resolve();
 					}.bind(this), 0);
 				}.bind(this));
@@ -229,87 +229,94 @@ sap.ui.define([
 			ReloadManager.setUShellServices({ Navigation: "bar" });
 		},
 		afterEach() {
+			ReloadManager.disableAutomaticStart(Layer.CUSTOMER);
+			ReloadManager.disableAutomaticStart(Layer.VENDOR);
+			ReloadManager.disableAutomaticStart(Layer.USER);
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("with no reload reason", function(assert) {
+		QUnit.test("with no reload reason", async function(assert) {
 			this.oGetReloadReasonsStub.resolves({});
-			return ReloadManager.handleReloadOnStart({ foo: "bar" }).then(function(bResult) {
-				var oExpectedProperties = {
-					ignoreMaxLayerParameter: false,
-					includeCtrlVariants: true,
-					foo: "bar"
-				};
-				assert.deepEqual(this.oGetReloadReasonsStub.lastCall.args[0], oExpectedProperties, "the properties were enhanced");
-				assert.strictEqual(bResult, undefined, "the function returns undefined");
-				assert.strictEqual(this.oReloadStub.callCount, 0, "no reload was triggered");
-			}.bind(this));
+			const bResult = await ReloadManager.handleReloadOnStart({ foo: "bar", layer: Layer.CUSTOMER });
+			const oExpectedProperties = {
+				ignoreMaxLayerParameter: false,
+				includeCtrlVariants: true,
+				foo: "bar",
+				layer: Layer.CUSTOMER
+			};
+			assert.deepEqual(this.oGetReloadReasonsStub.lastCall.args[0], oExpectedProperties, "the properties were enhanced");
+			assert.strictEqual(bResult, undefined, "the function returns undefined");
+			assert.strictEqual(this.oReloadStub.callCount, 0, "no reload was triggered");
 		});
 
-		QUnit.test("in the developer mode with a reload reason", function(assert) {
+		QUnit.test("in the developer mode with a reload reason", async function(assert) {
 			this.oGetReloadReasonsStub.resolves({ hasHigherLayerChanges: true });
-			return ReloadManager.handleReloadOnStart({ developerMode: true }).then(function(bResult) {
-				assert.strictEqual(bResult, true, "the function returns true");
-				assert.strictEqual(this.oAutoStartStub.callCount, 1, "auto start was set");
-				assert.strictEqual(this.oReloadStub.callCount, 1, "reload was triggered");
-				assert.strictEqual(this.oReloadStub.lastCall.args[0].onStart, true, "the onStart flag was added");
-				assert.strictEqual(this.oMessageBoxStub.callCount, 0, "the message box is not opened");
-			}.bind(this));
+			const bResult = await ReloadManager.handleReloadOnStart({ developerMode: true, layer: Layer.VENDOR });
+			assert.strictEqual(bResult, true, "the function returns true");
+			assert.strictEqual(this.oAutoStartStub.callCount, 1, "auto start was set");
+			assert.strictEqual(this.oReloadStub.callCount, 1, "reload was triggered");
+			assert.strictEqual(this.oReloadStub.lastCall.args[0].onStart, true, "the onStart flag was added");
+			assert.strictEqual(this.oMessageBoxStub.callCount, 0, "the message box is not opened");
 		});
 
-		QUnit.test("with versioning and with a reload reason", function(assert) {
+		QUnit.test("with versioning and with a reload reason", async function(assert) {
+			assert.expect(5);
+			sandbox.stub(FlexRuntimeInfoAPI, "getFlexReference").returns("myReference");
 			this.oGetReloadReasonsStub.resolves({ hasHigherLayerChanges: true });
-			this.oReloadStub.callsFake(function() {
-				assert.ok(this.oLoadVersionStubFinished, "then calls are properly chained");
+			this.oReloadStub.callsFake(() => {
+				assert.ok(this.bLoadVersionStubFinished, "then calls are properly chained");
 				return Promise.resolve();
-			}.bind(this));
-			return ReloadManager.handleReloadOnStart({ versioningEnabled: true }).then(function() {
-				assert.strictEqual(this.oLoadDraftStub.callCount, 0, "the draft was not loaded");
-				assert.strictEqual(this.oLoadVersionStub.callCount, 1, "the version was loaded");
-			}.bind(this));
+			});
+
+			await ReloadManager.handleReloadOnStart({ versioningEnabled: true, layer: Layer.CUSTOMER });
+			assert.strictEqual(this.oLoadDraftStub.callCount, 0, "the draft was not loaded");
+			assert.strictEqual(this.oLoadVersionStub.callCount, 1, "the version was loaded");
+			assert.strictEqual(this.oGetReloadReasonsStub.callCount, 1, "the ReloadInfoAPI was called once");
+
+			// simulate RTA being started
+			ReloadManager.enableAutomaticStart(Layer.CUSTOMER, {});
+			await ReloadManager.handleReloadOnStart({ versioningEnabled: true, layer: Layer.CUSTOMER });
+			assert.strictEqual(this.oGetReloadReasonsStub.callCount, 1, "the ReloadInfoAPI wasn't called again");
 		});
 
-		QUnit.test("with versioning and a draft and with a reload reason", function(assert) {
+		QUnit.test("with versioning and a draft and with a reload reason", async function(assert) {
+			assert.expect(3);
 			this.oGetReloadReasonsStub.resolves({ isDraftAvailable: true });
-			this.oReloadStub.callsFake(function() {
-				assert.ok(this.oLoadVersionStubFinished, "then calls are properly chained");
+			this.oReloadStub.callsFake(() => {
+				assert.ok(this.bLoadVersionStubFinished, "then calls are properly chained");
 				return Promise.resolve();
-			}.bind(this));
-			return ReloadManager.handleReloadOnStart({ versioningEnabled: true }).then(function() {
-				assert.strictEqual(this.oLoadDraftStub.callCount, 1, "the draft was loaded");
-				assert.strictEqual(this.oLoadVersionStub.callCount, 0, "the version was not loaded");
-			}.bind(this));
+			});
+			await ReloadManager.handleReloadOnStart({ versioningEnabled: true, layer: Layer.CUSTOMER });
+			assert.strictEqual(this.oLoadDraftStub.callCount, 1, "the draft was loaded");
+			assert.strictEqual(this.oLoadVersionStub.callCount, 0, "the version was not loaded");
 		});
 
-		QUnit.test("with versioning and a draft and all context not provided and with a reload reason", function(assert) {
+		QUnit.test("with versioning and a draft and all context not provided and with a reload reason", async function(assert) {
 			this.oGetReloadReasonsStub.resolves({ isDraftAvailable: true, allContexts: true });
-			return ReloadManager.handleReloadOnStart({ versioningEnabled: true }).then(function() {
-				assert.strictEqual(this.oLoadDraftStub.callCount, 1, "the draft was loaded");
-				assert.strictEqual(this.oLoadDraftStub.getCall(0).args[0].allContexts, true, "with allContext=true parameter");
-				assert.strictEqual(this.oLoadVersionStub.callCount, 0, "the version was not loaded");
-			}.bind(this));
+			await ReloadManager.handleReloadOnStart({ versioningEnabled: true, layer: Layer.CUSTOMER });
+			assert.strictEqual(this.oLoadDraftStub.callCount, 1, "the draft was loaded");
+			assert.strictEqual(this.oLoadDraftStub.getCall(0).args[0].allContexts, true, "with allContext=true parameter");
+			assert.strictEqual(this.oLoadVersionStub.callCount, 0, "the version was not loaded");
 		});
 
-		QUnit.test("with versioning and a draft and all context and adaptationId and with a reload reason", function(assert) {
+		QUnit.test("with versioning and a draft and all context and adaptationId and with a reload reason", async function(assert) {
 			this.oGetReloadReasonsStub.resolves({ isDraftAvailable: true, allContexts: true, adaptationId: "id_1234" });
-			return ReloadManager.handleReloadOnStart({ versioningEnabled: true }).then(function() {
-				assert.strictEqual(this.oLoadDraftStub.callCount, 1, "the draft was loaded");
-				var oLoadDraftPropertyBag = this.oLoadDraftStub.getCall(0).args[0];
-				assert.strictEqual(oLoadDraftPropertyBag.allContexts, true, "with allContext=true parameter");
-				assert.strictEqual(oLoadDraftPropertyBag.adaptationId, "id_1234", "with adaptationId  parameter");
-				assert.strictEqual(this.oLoadVersionStub.callCount, 0, "the version was not loaded");
-			}.bind(this));
+			await ReloadManager.handleReloadOnStart({ versioningEnabled: true, layer: Layer.CUSTOMER });
+			assert.strictEqual(this.oLoadDraftStub.callCount, 1, "the draft was loaded");
+			const oLoadDraftPropertyBag = this.oLoadDraftStub.getCall(0).args[0];
+			assert.strictEqual(oLoadDraftPropertyBag.allContexts, true, "with allContext=true parameter");
+			assert.strictEqual(oLoadDraftPropertyBag.adaptationId, "id_1234", "with adaptationId  parameter");
+			assert.strictEqual(this.oLoadVersionStub.callCount, 0, "the version was not loaded");
 		});
 
-		QUnit.test("with versioning and all context and adaptationId and with a reload reason", function(assert) {
+		QUnit.test("with versioning and all context and adaptationId and with a reload reason", async function(assert) {
 			this.oGetReloadReasonsStub.resolves({ hasHigherLayerChanges: true, allContexts: true, adaptationId: "id_1234" });
-			return ReloadManager.handleReloadOnStart({ versioningEnabled: true }).then(function() {
-				assert.strictEqual(this.oLoadDraftStub.callCount, 0, "the draft was loaded");
-				assert.strictEqual(this.oLoadVersionStub.callCount, 1, "the version was not loaded");
-				var oLoadVersionPropertyBag = this.oLoadVersionStub.getCall(0).args[0];
-				assert.strictEqual(oLoadVersionPropertyBag.allContexts, true, "with allContext=true parameter");
-				assert.strictEqual(oLoadVersionPropertyBag.adaptationId, "id_1234", "with adaptationId  parameter");
-			}.bind(this));
+			await ReloadManager.handleReloadOnStart({ versioningEnabled: true, layer: Layer.CUSTOMER });
+			assert.strictEqual(this.oLoadDraftStub.callCount, 0, "the draft was loaded");
+			assert.strictEqual(this.oLoadVersionStub.callCount, 1, "the version was not loaded");
+			const oLoadVersionPropertyBag = this.oLoadVersionStub.getCall(0).args[0];
+			assert.strictEqual(oLoadVersionPropertyBag.allContexts, true, "with allContext=true parameter");
+			assert.strictEqual(oLoadVersionPropertyBag.adaptationId, "id_1234", "with adaptationId  parameter");
 		});
 
 		[
@@ -351,6 +358,7 @@ sap.ui.define([
 				oReloadInfo: {
 					isDraftAvailable: true
 				},
+				layer: Layer.CUSTOMER,
 				testName: "only draft",
 				expectedMessageKey: "MSG_DRAFT_EXISTS"
 			},
@@ -358,6 +366,7 @@ sap.ui.define([
 				oReloadInfo: {
 					allContexts: true
 				},
+				layer: Layer.CUSTOMER,
 				testName: "only all contexts",
 				expectedMessageKey: "MSG_RESTRICTED_CONTEXT_EXIST"
 			},
@@ -366,21 +375,21 @@ sap.ui.define([
 					hasHigherLayerChanges: true,
 					allContexts: true
 				},
+				layer: Layer.CUSTOMER,
 				testName: "higher layer changes and allContexts",
 				expectedMessageKey: "MSG_RESTRICTED_CONTEXT_EXIST_AND_PERSONALIZATION"
 			}
 		].forEach(function(oTestInfo) {
-			QUnit.test(oTestInfo.testName, function(assert) {
+			QUnit.test(oTestInfo.testName, async function(assert) {
 				this.oGetReloadReasonsStub.resolves(oTestInfo.oReloadInfo);
-				return ReloadManager.handleReloadOnStart({ layer: oTestInfo.layer }).then(function(bResult) {
-					assert.strictEqual(bResult, true, "the function returns true");
-					assert.strictEqual(this.oAutoStartStub.callCount, 1, "auto start was set");
-					assert.strictEqual(this.oReloadStub.callCount, 1, "reload was triggered");
-					assert.strictEqual(this.oReloadStub.lastCall.args[0].onStart, true, "the onStart flag was added");
-					assert.strictEqual(this.oMessageBoxStub.callCount, 1, "the message box is opened");
-					assert.strictEqual(this.oMessageBoxStub.lastCall.args[0], "information", "the type is correct");
-					assert.strictEqual(this.oMessageBoxStub.lastCall.args[1], oTestInfo.expectedMessageKey, "the type is correct");
-				}.bind(this));
+				const bResult = await ReloadManager.handleReloadOnStart({ layer: oTestInfo.layer });
+				assert.strictEqual(bResult, true, "the function returns true");
+				assert.strictEqual(this.oAutoStartStub.callCount, 1, "auto start was set");
+				assert.strictEqual(this.oReloadStub.callCount, 1, "reload was triggered");
+				assert.strictEqual(this.oReloadStub.lastCall.args[0].onStart, true, "the onStart flag was added");
+				assert.strictEqual(this.oMessageBoxStub.callCount, 1, "the message box is opened");
+				assert.strictEqual(this.oMessageBoxStub.lastCall.args[0], "information", "the type is correct");
+				assert.strictEqual(this.oMessageBoxStub.lastCall.args[1], oTestInfo.expectedMessageKey, "the type is correct");
 			});
 		});
 	});
@@ -461,10 +470,10 @@ sap.ui.define([
 	QUnit.module("automatic start", {
 		beforeEach() {
 			sandbox.stub(FlexRuntimeInfoAPI, "getFlexReference").returns("ABC");
-			ReloadManager.disableAutomaticStart(Layer.USER);
-			ReloadManager.disableAutomaticStart(Layer.CUSTOMER);
 		},
 		afterEach() {
+			ReloadManager.disableAutomaticStart(Layer.USER);
+			ReloadManager.disableAutomaticStart(Layer.CUSTOMER);
 			sandbox.restore();
 		}
 	}, function() {

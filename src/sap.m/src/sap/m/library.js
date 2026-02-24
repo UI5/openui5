@@ -400,7 +400,8 @@ sap.ui.define([
 		  "sap.m.p13n.SelectionPanel",
 		  "sap.m.p13n.SortPanel",
 		  "sap.m.p13n.Popup",
-		  "sap.m.table.columnmenu.Menu"
+		  "sap.m.table.columnmenu.Menu",
+		  "sap.m.table.Title"
 		 ],
 		 elements: [
 		  "sap.m.BadgeCustomData",
@@ -454,6 +455,7 @@ sap.ui.define([
 		  "sap.m.plugins.DataStateIndicator",
 		  "sap.m.plugins.PasteProvider",
 		  "sap.m.plugins.PluginBase",
+		  "sap.m.plugins.TitleProvider",
 		  "sap.m.p13n.AbstractContainerItem",
 		  "sap.m.semantic.AddAction",
 		  "sap.m.semantic.CancelAction",

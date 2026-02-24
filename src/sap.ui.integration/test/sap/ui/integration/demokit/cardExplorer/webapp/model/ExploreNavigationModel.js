@@ -14,7 +14,6 @@ sap.ui.define([
 				key: 'cardHeader',
 				target: 'exploreOverview',
 				hasExpander: false,
-				hidden: !isDevelopmentBuild(),
 				items: [
 					{
 						title: 'Default',

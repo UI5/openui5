@@ -216,6 +216,24 @@ sap.ui.define([
 				 */
 				iCheckColumnsInOrder: function(vTable, aColumnHeaders) {
 					return TableAssertions.iShouldSeeGivenColumnsWithHeader.call(this, vTable, aColumnHeaders);
+				},
+				/**
+				 * OPA5 test assertion
+				 * 1. Checks the availability of a table with the provided ID or control.
+				 * 2. Checks the <code>headerVisible</code> and <code>hideToolbar</code> are set so the header is visible.
+				 * 3. Checks whether the header text and optional row/selected counts match.
+				 * @memberof onTheMDCTable
+				 * @method iCheckHeaderText
+				 * @param {string|sap.ui.mdc.Table} oControl Id or control instance of the MDCTable
+				 * @param {string} sHeaderText The text that is displayed in the header
+				 * @param {int} [iTotalCount] The total number of rows displayed; pass 0 to verify that no rows are available, or -1 to verify that the total count is unknown
+				 * @param {int} [iSelectedCount] The number of selected rows displayed; pass 0 to verify that no rows are selected, or -1 to verify that the selected count is unknown
+				 * @returns {Promise} OPA waitFor
+				 * @public
+				 * @since 1.146
+				 */
+				iCheckHeaderText: function(oControl, sHeaderText, iTotalCount, iSelectedCount) {
+					return TableAssertions.iShouldSeeHeaderText.call(this, oControl, sHeaderText, iTotalCount, iSelectedCount);
 				}
 			}
 		}

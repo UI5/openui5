@@ -18,7 +18,9 @@ sap.ui.define([
 			content: [
 				new VBox({
 					items: [
-						new AvatarGroup({
+												new AvatarGroup({
+																				avatarDisplaySize: "XS",
+
 							items: [
 								new AvatarGroupItem({ initials: "AG" }),
 								new AvatarGroupItem({ initials: "AG" }),
@@ -33,7 +35,6 @@ sap.ui.define([
 							]
 						}),
 						new AvatarGroup({
-							groupType: AvatarGroupType.Individual,
 							items: [
 								new AvatarGroupItem({ initials: "AG" }),
 								new AvatarGroupItem({ initials: "AG" }),
@@ -46,13 +47,41 @@ sap.ui.define([
 								new AvatarGroupItem({ initials: "AG" }),
 								new AvatarGroupItem({ initials: "AG" })
 							]
-						})
-					]
-				}).addStyleClass("sapUiLargeMargin"),
-				new VBox({
-					width: "200px",
-					items: [
-						new AvatarGroup({
+						}),
+												new AvatarGroup({
+														avatarDisplaySize: "M",
+
+							items: [
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" })
+							]
+						}),
+												new AvatarGroup({
+											avatarDisplaySize: "L",
+
+							items: [
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" })
+							]
+						}),
+												new AvatarGroup({
+											avatarDisplaySize: "XL",
 							items: [
 								new AvatarGroupItem({ initials: "AG" }),
 								new AvatarGroupItem({ initials: "AG" }),
@@ -97,6 +126,104 @@ sap.ui.define([
 								new AvatarGroupItem({ initials: "AG" }),
 								new AvatarGroupItem({ initials: "AG" }),
 								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" })
+							]
+						}),
+						new AvatarGroup({
+							groupType: AvatarGroupType.Individual,
+							avatarDisplaySize: "XS",
+							items: [
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" })
+							]
+						}),
+						new AvatarGroup({
+							groupType: AvatarGroupType.Individual,
+							items: [
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" })
+							]
+						}),
+						new AvatarGroup({
+							groupType: AvatarGroupType.Individual,
+							avatarDisplaySize: "M",
+							items: [
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" })
+							]
+						}),
+						new AvatarGroup({
+							groupType: AvatarGroupType.Individual,
+							avatarDisplaySize: "L",
+							items: [
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" })
+							]
+						}),
+						new AvatarGroup({
+							groupType: AvatarGroupType.Individual,
+							avatarDisplaySize: "XL",
+							items: [
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" })
+							]
+						})
+					]
+				}).addStyleClass("sapUiLargeMargin"),
+				new VBox({
+					width: "300px",
+					items: [
+						new AvatarGroup({
+							items: [
+								new AvatarGroupItem({ initials: "do" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
+								new AvatarGroupItem({ initials: "AG" }),
 								new AvatarGroupItem({ initials: "AG" }),
 								new AvatarGroupItem({ initials: "AG" }),
 								new AvatarGroupItem({ initials: "AG" }),
@@ -104,6 +231,7 @@ sap.ui.define([
 								new AvatarGroupItem({ initials: "AG" }),
 								new AvatarGroupItem({ initials: "AG" })
 							],
+							groupType: AvatarGroupType.Group,
 							avatarDisplaySize: "Custom",
 							avatarCustomDisplaySize: "40px",
 							avatarCustomFontSize: "18px"
