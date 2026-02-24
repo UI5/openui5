@@ -66,6 +66,11 @@ sap.ui.define(["sap/base/assert"], function(assert) {
 	 * @public
 	 */
 	var fnFormatMessage = function(sPattern, aValues) {
+		if (sPattern == null) {
+			// Binding formatter case: arguments might be nullish while data is still being populated
+			// Return an empty string in those cases
+			return "";
+		}
 		assert(typeof sPattern === "string" || sPattern instanceof String, "pattern must be string");
 		if (arguments.length > 2 || (aValues != null && !Array.isArray(aValues))) {
 			aValues = Array.prototype.slice.call(arguments, 1);
