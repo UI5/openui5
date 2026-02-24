@@ -40,8 +40,15 @@ sap.ui.define(["sap/base/strings/formatMessage"], function(formatMessage) {
 		assert.equal(formatMessage("Say '{0}'", "Hello"), "Say {0}", "quoted placeholder should be ignored");
 	});
 
+	QUnit.test("nullish pattern", function(assert) {
+		assert.equal(formatMessage(undefined, ["Hello"]), "", "should return empty string");
+		assert.equal(formatMessage(undefined, 0), "", "should return empty string");
+		assert.equal(formatMessage(null, ["Hello"]), "", "should return empty string");
+		assert.equal(formatMessage(null, 0), "", "should return empty string");
+	});
+
 	QUnit.test("pattern syntax errors", function(assert) {
-		assert.expect(5);
+		assert.expect(6);
 		try {
 			formatMessage("Say }", [12.4]);
 		} catch (e) {
@@ -66,6 +73,11 @@ sap.ui.define(["sap/base/strings/formatMessage"], function(formatMessage) {
 			formatMessage("There {0,choice,0#are no files|1#is one file|1<are {0,number,integer} files}.", [5]);
 		} catch (e) {
 			assert.ok(true, "nested placeholders raise an error");
+		}
+		try {
+			formatMessage(false, [5]);
+		} catch (e) {
+			assert.ok(true, "boolean instead of string raise an error");
 		}
 	});
 });
