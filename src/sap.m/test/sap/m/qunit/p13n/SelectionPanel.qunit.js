@@ -522,6 +522,7 @@ sap.ui.define([
 
 		//not yet any item selected
 		assert.notOk(this.oSelectionPanel._oSelectedItem, "Item is not selected");
+		assert.notOk(this.oSelectionPanel._oHoveredItem, "Hovered item is not set");
 
 		//Select the first item
 		this.oSelectionPanel._oListControl.fireSelectionChange({
@@ -533,9 +534,14 @@ sap.ui.define([
 		//check that an item is selected & move buttons are provided
 		assert.ok(this.oSelectionPanel._oSelectedItem, "Item is selected");
 
+		//Simulate hover on an item
+		this.oSelectionPanel._oHoveredItem = this.oSelectionPanel._oListControl.getItems()[0];
+		assert.ok(this.oSelectionPanel._oHoveredItem, "Hovered item is set");
+
 		//trigger update the personalization data (mock updates such as 'Reset')
 		this.oSelectionPanel.setP13nData(this.getTestData());
 		assert.notOk(this.oSelectionPanel._oSelectedItem, "Item is not selected");
+		assert.notOk(this.oSelectionPanel._oHoveredItem, "Hovered item is correctly reset to null");
 
 	});
 

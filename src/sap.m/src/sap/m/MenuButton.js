@@ -745,7 +745,7 @@ sap.ui.define([
 
 			// create anchor according to menuPosition
 			var sDock = this.getMenuPosition();
-			if (sDock && oPopover) {
+			if (sDock && oPopover && !Device.system.phone) {
 				this._createMenuPositionAnchor(sDock, oPopover);
 			}
 

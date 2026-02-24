@@ -2,16 +2,16 @@
  * ${copyright}
  */
 
-// Provides control sap.m.TableTitle.
+// Provides control sap.m.table.Title.
 sap.ui.define([
 	"sap/ui/core/Control",
-	"./TableTitleRenderer"
+	"./TitleRenderer"
 ],
-	function(Control, TableTitleRenderer) {
+	function(Control, TitleRenderer) {
 	"use strict";
 
 	/**
-	 * Constructor for a new TableTitle.
+	 * Constructor for a new <code>sap.m.table.Title</code>.
 	 *
 	 * @param {string} [sId] ID for the new control, generated automatically if no ID is given
 	 * @param {object} [mSettings] Initial settings for the new control
@@ -21,21 +21,22 @@ sap.ui.define([
 	 * total and selected row counts.
 	 *
 	 * <h3>Overview</h3>
-	 * The <code>TableTitle</code> control renders the provided <code>sap.m.Title</code> control and optionally
+	 * The <code>sap.m.table.Title</code> control renders the provided <code>sap.m.Title</code> control and optionally
 	 * displays the table's total row count, the selected row count, or both independently.
 	 *
 	 * @extends sap.ui.core.Control
 	 * @implements sap.ui.core.ITitle
+	 * @implements sap.ui.core.IShrinkable
 	 *
 	 * @author SAP SE
 	 * @version ${version}
-	 * @since 1.145.0
+	 * @since 1.146
 	 *
 	 * @constructor
 	 * @private
-	 * @alias sap.m.TableTitle
+	 * @alias sap.m.table.Title
 	 */
-	const TableTitle = Control.extend("sap.m.TableTitle", /** @lends sap.m.TableTitle.prototype */ {
+	const Title = Control.extend("sap.m.table.Title", /** @lends sap.m.table.Title.prototype */ {
 		metadata : {
 
 			library : "sap.m",
@@ -51,27 +52,32 @@ sap.ui.define([
 				 *
 				 * <b>Note:</b> A value of 0 represents an empty table, while a negative value
 				 * indicates that the total count is unknown. Although both cases are not displayed
-				 * to the user, they are handled differently for accessibility features.
+				 * to the user, they are handled differently for accessibility reasons.
 				 */
 				totalCount : {type : "int", group : "Appearance", defaultValue : 0},
 
 				/**
 				 * Defines the value that is displayed as the selected row count.
+				 *
+				 * <b>Note:</b> A value of 0 indicates that no rows are selected, while a negative value
+				 * indicates that the selected count is unknown. Although these cases are not displayed
+				 * to the user, they are handled differently for accessibility reasons.
 				 */
 				selectedCount : {type : "int", group : "Appearance", defaultValue : 0},
 
 				/**
-				 * Toggles between compact and extended mode for
+				 * Toggles between compact and extended display modes for the
 				 * <code>selectedCount</code> and <code>totalCount</code>.
 				 *
-				 * <b>Compact mode</b>: Displays counts in a condensed format
-				 * <br>
-				 * <b>Extended mode</b>: Displays counts with separate descriptive labels
+				 * <ul>
+				 *   <li><b>Compact mode (<code>false</code>)</b>: Displays counts in a condensed format.</li>
+				 *   <li><b>Extended mode (<code>true</code>)</b>: Displays counts with separate descriptive labels.</li>
+				 * </ul>
 				 */
 				showExtendedView : {type : "boolean", group : "Appearance", defaultValue : false},
 
 				/**
-				 * Determines whether the <code>TableTitle</code> is visible.
+				 * Determines whether the control is visible.
 				 */
 				visible : {type : "boolean", group : "Appearance", defaultValue : true}
 
@@ -81,16 +87,16 @@ sap.ui.define([
 				/**
 				 * Sets the title control, which is displayed in the toolbar as usual.
 				 *
-				 * <b>Note:</b> You must set a <code>title</code> to use the <code>TableTitle</code>.
+				 * <b>Note:</b> You must set a <code>title</code> to use this control.
 				 */
 				title : {type : "sap.m.Title", multiple : false}
 			}
 
 		},
 
-		renderer: TableTitleRenderer
+		renderer: TitleRenderer
 	});
 
-	return TableTitle;
+	return Title;
 
 });

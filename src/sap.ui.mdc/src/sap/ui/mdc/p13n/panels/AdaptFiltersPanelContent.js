@@ -54,6 +54,7 @@ sap.ui.define([
 
 	AdaptFiltersPanelContent.prototype.GROUP_KEY = "group";
 	AdaptFiltersPanelContent.prototype.CHANGE_REASON_FILTER = "Filter";
+	AdaptFiltersPanelContent.prototype.CHANGE_REASON_REORDER = "Reorder";
 	AdaptFiltersPanelContent.prototype.CHANGE_REASON_SHOW = "Show";
 	AdaptFiltersPanelContent.prototype.CHANGE_REASON_HIDE = "Hide";
 	AdaptFiltersPanelContent.prototype.LIST_KEY = "list";
@@ -164,7 +165,8 @@ sap.ui.define([
 			width: "100%",
 			content: [
 				this._oListControl,
-				this._getAddFilterSection()
+				this._getAddFilterSection(),
+				this._oInvText
 			]
 		});
 		this.setAggregation("_content", oVBox);
@@ -190,6 +192,7 @@ sap.ui.define([
 			headerToolbar: this._getToolbar(),
 			selectionChange: this._onSelectionChange.bind(this)
 		});
+
 
 		return oList;
 	};
@@ -337,7 +340,8 @@ sap.ui.define([
 			path: `${this.P13N_MODEL}>/items`,
 			filters: [
 				new Filter(this.PRESENCE_ATTRIBUTE, "EQ", false),
-				new Filter("required", "NE", true)  // Exclude required items
+				new Filter("required", "NE", true),
+				new Filter("isFiltered", "EQ", false)
 			],
 			template: new Item({
 				key: { path: `${this.P13N_MODEL}>name` },
@@ -349,7 +353,8 @@ sap.ui.define([
 			oBindingInfo.sorter = new Sorter({
 				path: "group",
 				descending: false,
-				group: this._getGroup.bind(this)
+				group: this._getGroup.bind(this),
+				comparator: this._groupComparator.bind(this)
 			});
 		} else {
 			// Always sort alphabetically by label when not grouped
@@ -374,7 +379,8 @@ sap.ui.define([
 			oBindingInfo.sorter = new Sorter({
 				path: "group",
 				descending: false,
-				group: this._getGroup.bind(this)
+				group: this._getGroup.bind(this),
+				comparator: this._groupComparator.bind(this)
 			});
 			oBindingInfo.groupHeaderFactory = this._groupHeaderFactory.bind(this);
 		} else {
@@ -405,6 +411,27 @@ sap.ui.define([
 			key: oContext.getProperty("group"),
 			text: oContext.getProperty("groupLabel") || this._getResourceText("adaptFiltersPanel.GROUP_DEFAULT")
 		};
+	};
+
+	/**
+	 * Comparator function for group sorting.
+	 * Ensures "Basic" group is always first, other groups are sorted alphabetically.
+	 * @param {string} sGroup1 First group key
+	 * @param {string} sGroup2 Second group key
+	 * @returns {int} Comparison result (-1, 0, or 1)
+	 * @private
+	 */
+	AdaptFiltersPanelContent.prototype._groupComparator = function(sGroup1, sGroup2) {
+		const sBasicGroup = "Basic";
+
+		if (sGroup1 === sBasicGroup && sGroup2 !== sBasicGroup) {
+			return -1;
+		}
+		if (sGroup2 === sBasicGroup && sGroup1 !== sBasicGroup) {
+			return 1;
+		}
+
+		return (sGroup1 || "").localeCompare(sGroup2 || "");
 	};
 
 	AdaptFiltersPanelContent.prototype._groupHeaderFactory = function(oGroup) {
@@ -467,7 +494,69 @@ sap.ui.define([
 		});
 		oRow.addAriaLabelledBy(oInvisibleTextReordering);
 		oRow.addContent(oInvisibleTextReordering);
+		const oEventDelegate = {
+			onsaptop: function(oEvent) {
+				this._handleReorder(oEvent, true);
+			},
+			onsapbottom: function(oEvent) {
+				this._handleReorder(oEvent, false);
+			}
+		};
+
+		oRow.addEventDelegate(oEventDelegate, this);
 		return oRow;
+	};
+
+	/**
+	 * Handles reordering of a list item to the top or bottom of the list.
+	 *
+	 * @param {sap.ui.base.Event} oEvent The keyboard event
+	 * @param {boolean} bToTop If true, move to top; if false, move to bottom
+	 * @private
+	 */
+	AdaptFiltersPanelContent.prototype._handleReorder = function(oEvent, bToTop) {
+		const bEditable = this._oViewModel.getProperty("/editable");
+		const bGrouped = this._oViewModel.getProperty("/grouped");
+
+		if (bEditable || bGrouped) {
+			return;
+		}
+
+		const oFocusedElement = document.activeElement;
+		let oListItem = null;
+
+		const aItems = this._oListControl.getItems();
+		for (let i = 0; i < aItems.length; i++) {
+			if (aItems[i].getDomRef() && aItems[i].getDomRef().contains(oFocusedElement)) {
+				oListItem = aItems[i];
+				break;
+			}
+		}
+
+		if (!oListItem || oListItem.isA("sap.m.GroupHeaderListItem") || !oListItem.getVisible()) {
+			return;
+		}
+
+		oEvent.preventDefault();
+		oEvent.stopPropagation();
+
+		const oModelEntry = this._getModelEntry(oListItem);
+		if (!oModelEntry || oModelEntry.position === -1) {
+			return;
+		}
+
+		const aVisibleItems = aItems.filter((oItem) => {
+			return oItem.getVisible() &&
+				!oItem.isA("sap.m.GroupHeaderListItem") &&
+				this._getModelEntry(oItem)?.visibleInDialog >= 0;
+		});
+
+		if (aVisibleItems.length <= 1) {
+			return;
+		}
+
+		const iNewIndex = bToTop ? 1 : aVisibleItems.length;
+		this._moveListItem(oListItem, iNewIndex);
 	};
 
 	/**
@@ -563,8 +652,10 @@ sap.ui.define([
 		const oLabel = this._createFilterLabel(oItem);
 		const oFilterControl = this._createFilterControl(oContext);
 
-		oFilterControl.addAriaLabelledBy?.(oLabel);
-		oLabel.setLabelFor(oFilterControl);
+		if (oFilterControl) {
+			oFilterControl.addAriaLabelledBy?.(oLabel);
+			oLabel.setLabelFor(oFilterControl);
+		}
 
 		const oDeleteButton = this._createDeleteAction();
 		const oSortButton = this._createSortAction();
@@ -580,18 +671,24 @@ sap.ui.define([
 		}));
 
 		oLabel.setLayoutData(new GridData({
-			span: "XL2 L2 M2 S12"
+			span: "XL4 L4 M4 S3"
 		}));
-		oFilterControl.setLayoutData(new GridData({
-			span: "XL8 L8 M8 S8",
-			linebreakS: true
-		}));
+
+		const aContent = [oLabel];
+		if (oFilterControl) {
+			oFilterControl.setLayoutData(new GridData({
+				span: "XL8 L6 M6 S8",
+				linebreakS: true
+			}));
+			aContent.push(oFilterControl);
+		}
+		aContent.push(oActionContainer);
 
 		return new Grid({
 			containerQuery: true,
 			hSpacing: 0.5,
 			defaultSpan: "XL3 L3 M3 S12",
-			content: [oLabel, oFilterControl, oActionContainer]
+			content: aContent
 		});
 	};
 
@@ -738,8 +835,9 @@ sap.ui.define([
 		const oDraggedItem = oEvent.getParameter("draggedControl");
 		const oDroppedItem = oEvent.getParameter("droppedControl");
 		const sDropPosition = oEvent.getParameter("dropPosition");
-		const iDraggedIndex = this._getModelEntry(oDraggedItem).position;
-		const iDroppedIndex = this._getModelEntry(oDroppedItem).position;
+		const aVisibleItems = this._oListControl.getItems().filter((oItem) => oItem.getVisible());
+		const iDraggedIndex = aVisibleItems.indexOf(oDraggedItem);
+		const iDroppedIndex = aVisibleItems.indexOf(oDroppedItem);
 		const iActualDroppedIndex = iDroppedIndex + (sDropPosition == "Before" ? 0 : 1) + (iDraggedIndex < iDroppedIndex ? 0 : 1);
 
 		this._moveListItem(oDraggedItem, iActualDroppedIndex);
@@ -785,10 +883,26 @@ sap.ui.define([
 		const iIndex = this._oListControl.getItems().filter((oItem) => oItem.getVisible()).indexOf(oRow);
 		const fnUpdateFocusPosition = () => {
 			const oItems = this._oListControl.getItems().filter((oItem) => oItem.getVisible());
+
+			const fnIsRequired = (oItem) => {
+				const oModelEntry = this._getModelEntry(oItem);
+				return oModelEntry.required;
+			};
+
 			if (iIndex >= 0 && iIndex < oItems.length) {
-				oItems[iIndex].focus();
+				//if required, focus next item, this should prevent focusing a required item with a error state because this is done on other placee
+				//TODO; clarify with UX if the focus should always go to the last item also when there e.g. 2 fields with error.
+				// At the moment focus goes then if no other item is there to the first item with error state
+				if (!fnIsRequired(oItems[iIndex])) {
+					oItems[iIndex].focus();
+				}
+			} else if (oItems.length > 0) {
+				if (!fnIsRequired(oItems[oItems.length - 1])) {
+					oItems[oItems.length - 1].focus();
+				}
 			} else {
-				oItems[oItems.length - 1].focus();
+				//if no item is left, focus the add filter ComboBox
+				this._getAddFilterSection().getContent()[1].focus();
 			}
 		};
 		this._oListControl.attachEventOnce("updateFinished", fnUpdateFocusPosition);

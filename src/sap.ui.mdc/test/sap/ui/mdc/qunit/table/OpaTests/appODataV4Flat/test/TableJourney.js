@@ -19,12 +19,8 @@ sap.ui.define([
 
 	QUnit.module("Toolbar content");
 
-	opaTest("Title should be visible", function(Given, When, Then) {
-		Then.onTheAppMDCTable.iShouldSeeTheHeaderText(sTableId, "Products");
-	});
-
-	opaTest("Row count should be visible", function(Given, When, Then) {
-		Then.onTheAppMDCTable.iShouldSeeTheCount(sTableId);
+	opaTest("Title and Row count should be visible", function(Given, When, Then) {
+		Then.onTheAppMDCTable.iShouldSeeHeaderText(sTableId, "Products", 201);
 	});
 
 	opaTest("Variant management should be visible", function(Given, When, Then) {

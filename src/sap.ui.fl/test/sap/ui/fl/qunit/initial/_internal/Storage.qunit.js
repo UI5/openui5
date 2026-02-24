@@ -733,7 +733,14 @@ sap.ui.define([
 
 	QUnit.module("Given all connector stubs", {
 		beforeEach() {
-			this.oGetStaticFileConnectorSpy = sandbox.spy(StorageUtils, "getStaticFileConnector");
+			this.oLoadFlexDataStub = sandbox.stub().resolves(StorageUtils.getEmptyFlexDataResponse());
+			sandbox.stub(StorageUtils, "getLoadConnectors").resolves([
+				{
+					loadConnectorModule: {
+						loadFlexData: this.oLoadFlexDataStub
+					}
+				}
+			]);
 		},
 		afterEach() {
 			cleanUp();
@@ -756,20 +763,29 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when save change and activate version do not trigger a reload", function(assert) {
+		QUnit.test("when loadFlexData is called with rta starting up, but not started yet", async function(assert) {
+			window.sessionStorage.setItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`, true);
+			await Storage.loadFlexData({
+				reference: sFlexReference,
+				version: Version.Number.Draft
+			});
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].allContexts, true, "the allContexts parameters was added");
+		});
+
+		QUnit.test("when loadFlexData is called with adaptationMode set in the FlexInfoSession", async function(assert) {
 			FlexInfoSession.setByReference({
 				version: Version.Number.Draft,
 				maxLayer: Layer.CUSTOMER,
-				initialAllContexts: true,
+				adaptationMode: true,
 				saveChangeKeepSession: false
 			}, sFlexReference);
 
-			return Storage.loadFlexData({
+			await Storage.loadFlexData({
 				reference: sFlexReference,
 				version: Version.Number.Draft
-			}).then(function() {
-				assert.notDeepEqual(FlexInfoSession.getByReference(sFlexReference), {}, "then the flex info session is not cleared");
 			});
+			assert.notDeepEqual(FlexInfoSession.getByReference(sFlexReference), {}, "then the flex info session is not cleared");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].allContexts, true, "the allContexts parameters was added");
 		});
 	});
 
@@ -890,25 +906,38 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("Given two connectors are provided and one is in charge of all layers and a draft layer is set", function(assert) {
+		QUnit.test("Given two connectors are provided and one is in charge of all layers and a draft layer is set", async function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
 				{ connector: "JsObjectConnector", layers: [] },
 				{ connector: "LrepConnector", layers: ["ALL"] }
 			]);
-			FlexInfoSession.setByReference({ version: Version.Number.Draft, initialAllContexts: true, maxLayer: Layer.CUSTOMER, saveChangeKeepSession: false }, sFlexReference);
+			FlexInfoSession.setByReference({
+				version: Version.Number.Draft,
+				adaptationMode: true,
+				maxLayer: Layer.CUSTOMER,
+				saveChangeKeepSession: false
+			}, sFlexReference);
 
 			const oStaticFileConnectorStub = sandbox.stub(StaticFileConnector, "loadFlexData").resolves();
 			const oLrepConnectorStub = sandbox.stub(LrepConnector, "loadFlexData").resolves();
 			const oJsObjectConnectorStub = sandbox.stub(JsObjectConnector, "loadFlexData").resolves();
 
-			return Storage.loadFlexData({
+			await Storage.loadFlexData({
 				reference: sFlexReference,
 				version: Version.Number.Draft
-			}).then(function() {
-				assert.equal(oStaticFileConnectorStub.getCall(0).args[0].version, undefined, "the StaticFileConnector has the version property NOT set");
-				assert.equal(oJsObjectConnectorStub.getCall(0).args[0].version, undefined, "the connector NOT in charge for draft layer has the version property NOT set");
-				assert.equal(oLrepConnectorStub.getCall(0).args[0].version, Version.Number.Draft, "the connector for draft layer has the version property set");
 			});
+			assert.equal(
+				oStaticFileConnectorStub.getCall(0).args[0].version, undefined,
+				"the StaticFileConnector has the version property NOT set"
+			);
+			assert.equal(
+				oJsObjectConnectorStub.getCall(0).args[0].version, undefined,
+				"the connector NOT in charge for draft layer has the version property NOT set"
+			);
+			assert.equal(
+				oLrepConnectorStub.getCall(0).args[0].version, Version.Number.Draft,
+				"the connector for draft layer has the version property set"
+			);
 		});
 
 		QUnit.test("Given a maxLayer set for VENDOR", async function(assert) {
@@ -923,29 +952,7 @@ sap.ui.define([
 			assert.equal(oSetInfoSessionSpy.callCount, 0, "then the FlexInfoSession is not updated");
 		});
 
-		QUnit.test("Given two connectors are provided and one is in charge of a draft layer provided by flex info session", function(assert) {
-			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER] },
-				{ connector: "JsObjectConnector", layers: [Layer.USER] }
-			]);
-
-			const oStaticFileConnectorStub = sandbox.stub(StaticFileConnector, "loadFlexData").resolves();
-			const oKeyUserConnectorStub = sandbox.stub(KeyUserConnector, "loadFlexData").resolves();
-			const oJsObjectConnectorStub = sandbox.stub(JsObjectConnector, "loadFlexData").resolves();
-
-			FlexInfoSession.setByReference({ version: Version.Number.Draft }, sFlexReference);
-			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", true);
-
-			return Storage.loadFlexData({
-				reference: sFlexReference
-			}).then(function() {
-				assert.equal(oStaticFileConnectorStub.getCall(0).args[0].version, undefined, "the StaticFileConnector has the version property NOT set");
-				assert.equal(oKeyUserConnectorStub.getCall(0).args[0].version, Version.Number.Draft, "the connector for draft layer has the version number set");
-				assert.equal(oJsObjectConnectorStub.getCall(0).args[0].version, undefined, "the connector NOT in charge for draft layer has the version property NOT set");
-			});
-		});
-
-		QUnit.test("Given two connectors are provided and one is in charge of all layers and a draft layer provided by flex info session", function(assert) {
+		QUnit.test("Given two connectors are provided and one is in charge of all layers and a draft layer provided by flex info session", async function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
 				{ connector: "JsObjectConnector", layers: [] },
 				{ connector: "LrepConnector", layers: ["ALL"] }
@@ -958,13 +965,22 @@ sap.ui.define([
 			FlexInfoSession.setByReference({ version: Version.Number.Draft }, sFlexReference);
 			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", true);
 
-			return Storage.loadFlexData({
-				reference: sFlexReference
-			}).then(function() {
-				assert.equal(oStaticFileConnectorStub.getCall(0).args[0].version, undefined, "the StaticFileConnector has the version property NOT set");
-				assert.equal(oJsObjectConnectorStub.getCall(0).args[0].version, undefined, "the connector NOT in charge for draft layer has the version property NOT set");
-				assert.equal(oLrepConnectorStub.getCall(0).args[0].version, Version.Number.Draft, "the connector for draft layer has the version property set");
+			await Storage.loadFlexData({
+				reference: sFlexReference,
+				version: Version.Number.Draft
 			});
+			assert.equal(
+				oStaticFileConnectorStub.getCall(0).args[0].version, undefined,
+				"the StaticFileConnector has the version property NOT set"
+			);
+			assert.equal(
+				oJsObjectConnectorStub.getCall(0).args[0].version, undefined,
+				"the connector NOT in charge for draft layer has the version property NOT set"
+			);
+			assert.equal(
+				oLrepConnectorStub.getCall(0).args[0].version, Version.Number.Draft,
+				"the connector for draft layer has the version property set"
+			);
 		});
 
 		QUnit.test("Given one connector are provided version parameter are not set in flex info session and saveChangeKeepSession is set", function(assert) {

@@ -19,7 +19,8 @@ sap.ui.define([
 	"sap/m/Popover",
 	"sap/m/Button",
 	"sap/m/Label",
-	"sap/ui/events/KeyCodes"
+	"sap/ui/events/KeyCodes",
+	"sap/ui/Device"
 ], function(
 	Element,
 	Library,
@@ -40,7 +41,8 @@ sap.ui.define([
 	Popover,
 	Button,
 	Label,
-	KeyCodes
+	KeyCodes,
+	Device
 ) {
 	"use strict";
 
@@ -1647,5 +1649,72 @@ sap.ui.define([
 
 		// Clenaup
 		oCMB.destroy();
+	});
+
+	QUnit.test("_createMenuPositionAnchor is not called on mobile device", function(assert) {
+		// Arrange
+		var bOriginalPhone = Device.system.phone,
+			oMenuButton,
+			oSpyCreateAnchor;
+
+		// Test 1: Phone mode - _createMenuPositionAnchor should NOT be called
+		// Set phone mode BEFORE creating Menu (Menu creates ResponsivePopover in init based on Device.system.phone)
+		Device.system.phone = true;
+
+		oMenuButton = new MenuButton({
+			menu: new Menu({
+				items: [
+					new MenuItem({ text: "Item 1" }),
+					new MenuItem({ text: "Item 2" })
+				]
+			})
+		});
+		oMenuButton.placeAt("content");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		oSpyCreateAnchor = sinon.spy(oMenuButton, "_createMenuPositionAnchor");
+
+		oMenuButton._handleButtonPress({
+			getParameter: function() {
+				return false;
+			}
+		});
+
+		// Assert
+		assert.ok(!oSpyCreateAnchor.called, "_createMenuPositionAnchor is not called on phone");
+
+		// Cleanup first MenuButton
+		oMenuButton.getMenu().close();
+		oMenuButton.destroy();
+
+		// Test 2: Non-phone mode - _createMenuPositionAnchor SHOULD be called
+		Device.system.phone = false;
+
+		oMenuButton = new MenuButton({
+			menu: new Menu({
+				items: [
+					new MenuItem({ text: "Item 1" }),
+					new MenuItem({ text: "Item 2" })
+				]
+			})
+		});
+		oMenuButton.placeAt("content");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		oSpyCreateAnchor = sinon.spy(oMenuButton, "_createMenuPositionAnchor");
+
+		oMenuButton._handleButtonPress({
+			getParameter: function() {
+				return false;
+			}
+		});
+
+		// Assert
+		assert.ok(oSpyCreateAnchor.calledOnce, "_createMenuPositionAnchor is called on non-phone");
+
+		// Cleanup
+		Device.system.phone = bOriginalPhone;
+		oMenuButton.getMenu().close();
+		oMenuButton.destroy();
 	});
 });

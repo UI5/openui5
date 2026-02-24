@@ -72,7 +72,7 @@ sap.ui.define([
 
 		if (bIsNewAdaptFiltersUI) {
 			const oFilter = new Button({
-				text: "Filter",
+				text: Library.getResourceBundleFor("sap.ui.mdc").getText("adaptFiltersPanel.FILTER_BUTTON"),
 				press: () => {
 					const oAdaptationFilter =  this.getAdaptationControl().getInbuiltFilter();
 					if (!oAdaptationFilter) {

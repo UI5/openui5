@@ -14,13 +14,13 @@ sap.ui.define([
 	"./table/utils/FilterInfoBar",
 	"./mixin/FilterIntegrationMixin",
 	"sap/m/Title",
+	"sap/m/table/Title",
 	"sap/m/library",
 	"sap/m/table/Util",
 	"sap/m/table/columnmenu/Menu",
 	"sap/m/MessageBox",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
-	"sap/ui/core/format/NumberFormat",
 	"sap/ui/core/format/ListFormat",
 	"sap/ui/core/library",
 	"sap/ui/events/KeyCodes",
@@ -28,7 +28,6 @@ sap.ui.define([
 	"sap/ui/model/BindingMode",
 	"sap/base/strings/capitalize",
 	"sap/base/util/deepEqual",
-	"sap/base/util/Deferred",
 	"sap/ui/core/InvisibleText",
 	"sap/ui/mdc/p13n/subcontroller/ColumnController",
 	"sap/ui/mdc/p13n/subcontroller/SortController",
@@ -63,13 +62,13 @@ sap.ui.define([
 	FilterInfoBar,
 	FilterIntegrationMixin,
 	Title,
+	TableTitle,
 	MLibrary,
 	MTableUtil,
 	ColumnMenu,
 	MessageBox,
 	Element,
 	Library,
-	NumberFormat,
 	ListFormat,
 	coreLibrary,
 	KeyCodes,
@@ -77,7 +76,6 @@ sap.ui.define([
 	BindingMode,
 	capitalize,
 	deepEqual,
-	Deferred,
 	InvisibleText,
 	ColumnController,
 	SortController,
@@ -970,8 +968,7 @@ sap.ui.define([
 
 		this._oManagedObjectModel = new ManagedObjectModel(this, {
 			hasGrandTotal: false,
-			activeP13nModes: createActiveP13nModesMap(this),
-			rowCount: undefined
+			activeP13nModes: createActiveP13nModesMap(this)
 		});
 		this._oManagedObjectModel.setDefaultBindingMode(BindingMode.OneWay);
 		this.setModel(this._oManagedObjectModel, "$sap.ui.mdc.Table");
@@ -1761,8 +1758,8 @@ sap.ui.define([
 	};
 
 	Table.prototype._createInitPromises = function() {
-		this._oTableReady = new Deferred();
-		this._oFullInitialize = new Deferred();
+		this._oTableReady = Promise.withResolvers();
+		this._oFullInitialize = Promise.withResolvers();
 		this._oFullInitialize.promise.catch(() => { }); // Avoid uncaught error
 	};
 
@@ -1921,35 +1918,20 @@ sap.ui.define([
 
 		if (!this._oToolbar) {
 			this._oTitle = new Title(this.getId() + "-title", {
-				text: {
-					parts: [
-						{path: "$sap.ui.mdc.Table>/header"},
-						{path: "$sap.ui.mdc.Table>/showRowCount"},
-						{path: "$sap.ui.mdc.Table>/@custom/rowCount"}
-					],
-					formatter: (sHeader, bShowRowCount, iRowCount) => {
-						if (this._bAnnounceTableUpdate && !this._bSkipAnnounceTableUpdate) {
-							this._bAnnounceTableUpdate = false;
-							MTableUtil.announceTableUpdate(sHeader, bShowRowCount ? iRowCount : undefined);
-						}
+                text: "{$sap.ui.mdc.Table>/header}",
+                level: "{$sap.ui.mdc.Table>/headerLevel}",
+                titleStyle: this.getHeaderStyle() || TitleLevel[ThemeParameters.get({name: "_sap_ui_mdc_Table_HeaderStyle"})]
+            });
 
-						if (bShowRowCount && iRowCount > 0) {
-							this._oNumberFormatInstance ??= NumberFormat.getIntegerInstance({groupingEnabled: true});
-							sHeader += ` (${this._oNumberFormatInstance.format(iRowCount)})`;
-						}
+            this._oTableTitle = new TableTitle(this.getId() + "-tableTitle", {
+                title: this._oTitle,
+                visible: "{$sap.ui.mdc.Table>/headerVisible}"
+            });
 
-						return sHeader;
-					}
-				},
-				width: "{= ${$sap.ui.mdc.Table>/headerVisible} ? undefined : '0px' }",
-				level: "{$sap.ui.mdc.Table>/headerLevel}",
-				titleStyle: this.getHeaderStyle() || TitleLevel[ThemeParameters.get({name: "_sap_ui_mdc_Table_HeaderStyle"})]
-			});
-			// Create Toolbar
 			this._oToolbar = new ActionToolbar(this.getId() + "-toolbar", {
 				design: ToolbarDesign[ThemeParameters.get({name: "_sap_ui_mdc_Table_ToolbarDesign"})],
 				begin: [
-					this._oTitle
+					this._oTableTitle
 				],
 				end: [
 					this._getCopyButton(), this._getPasteButton(), this._getP13nButton()
@@ -1960,7 +1942,9 @@ sap.ui.define([
 			this._updateInvisibleTitle();
 		}
 
-		this._oToolbar.setStyle(this._isOfType(TableType.ResponsiveTable) ? ToolbarStyle.Standard : ToolbarStyle.Clear);
+		const bResponsiveTable = this._isOfType(TableType.ResponsiveTable);
+		this._oToolbar.setStyle(bResponsiveTable ? ToolbarStyle.Standard : ToolbarStyle.Clear);
+		this._oTableTitle.setShowExtendedView(bResponsiveTable);
 
 		return this._oToolbar;
 	};
@@ -2981,7 +2965,10 @@ sap.ui.define([
 	};
 
 	Table.prototype._updateRowCountForHeader = function() {
-		this._oManagedObjectModel.setProperty("/@custom/rowCount", this.getRowBinding().getCount());
+		if (this._bAnnounceTableUpdate && !this._bSkipAnnounceTableUpdate) {
+			this._bAnnounceTableUpdate = false;
+			MTableUtil.announceTableUpdate(this.getHeader(), this.getShowRowCount() ? this.getRowBinding().getCount() : undefined);
+		}
 	};
 
 	Table.prototype._updateColumnsBeforeBinding = function() {
@@ -3106,9 +3093,9 @@ sap.ui.define([
 		[
 			"_oTable",
 			"_oTitle",
+			"_oTableTitle",
 			"_vNoData",
 			"_oContextMenu",
-			"_oNumberFormatInstance",
 			"_oTableReady",
 			"_oFullInitialize",
 			"_oPasteButton",

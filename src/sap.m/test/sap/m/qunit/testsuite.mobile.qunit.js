@@ -1708,8 +1708,12 @@ sap.ui.define([
 				}
 			},
 
-			TableTitle: {
-				title: "QUnit Page for sap.m.TableTitle"
+			"table.Title": {
+				title: "QUnit Page for sap.m.table.Title",
+				module: "test-resources/sap/m/qunit/table/Title.qunit",
+				paths: {
+					resourceroot: "test-resources/sap/m/qunit/table/"
+				}
 			},
 
 			"table.ColumnWidthController": {
@@ -2553,6 +2557,19 @@ sap.ui.define([
 				module: [
 					"./plugins/UploadSetwithTable/UploadSetwithTable.qunit"
 				]
+			},
+
+			"plugins/TitleProvider": {
+				title: "Test Page for sap.m.plugins.TitleProvider",
+				sinon: {
+					version: "edge"
+				},
+				ui5: {
+					libs: ["sap.m", "sap.ui.table", "sap.ui.mdc"]
+				},
+				coverage: {
+					only: ["sap/m/plugins/TitleProvider"]
+				}
 			},
 
 			"routing/async/Router": {

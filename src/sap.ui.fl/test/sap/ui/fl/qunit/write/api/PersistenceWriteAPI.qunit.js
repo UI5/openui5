@@ -168,7 +168,7 @@ sap.ui.define([
 			const oExpectedFlexInfo = {
 				adaptationId: "adaptation1",
 				allContextsProvided: true,
-				initialAllContexts: true,
+				adaptationMode: true,
 				isEndUserAdaptation: true,
 				isResetEnabled: true,
 				version: "version1"
@@ -177,7 +177,7 @@ sap.ui.define([
 				isResetEnabled: false,
 				adaptationId: "adaptation1",
 				isEndUserAdaptation: true,
-				initialAllContexts: true,
+				adaptationMode: true,
 				saveChangeKeepSession: true
 			}, sReference);
 			const oFlexObjectManagerSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves();
@@ -244,8 +244,7 @@ sap.ui.define([
 			assert.deepEqual(
 				oExpectedFlexInfo,
 				FlexInfoSession.getByReference(sReference),
-				"session flex info is updated with isResetEnabled but adaptationId "
-					+ "and isEndUserAdaptation and initialAllContexts are kept"
+				"session flex info is updated with isResetEnabled but adaptationId, isEndUserAdaptation, and adaptationMode are kept"
 			);
 			assert.equal(
 				FlexInfoSession.getByReference(sReference).saveChangeKeepSession,

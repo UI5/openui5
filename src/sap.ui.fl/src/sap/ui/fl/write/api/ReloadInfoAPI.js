@@ -3,7 +3,6 @@
  */
 
 sap.ui.define([
-	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
@@ -17,7 +16,6 @@ sap.ui.define([
 	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/write/_internal/init"
 ], function(
-	FlexState,
 	FlexInfoSession,
 	Loader,
 	ManifestUtils,
@@ -79,14 +77,11 @@ sap.ui.define([
 	 * @param {object} oReloadInfo - Information needed for the reload
 	 * @param {sap.ui.core.Control} oReloadInfo.selector - Root control instance
 	 * @param {string} sReference - Flex reference of the app
-	 * @return {boolean} true if allContextsProvided false and RTA wasn't started yet, otherwise false.
+	 * @return {boolean} true if allContextsProvided is false.
 	 */
 	async function needContextSpecificReload(oReloadInfo, sReference) {
 		// TODO: could be disabled when ContextBasedAdaptationAPI is enabled
 		let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
-		if (oFlexInfoSession.initialAllContexts) {
-			return false; // if we are already in RTA mode, no reload needed again
-		}
 		if (oFlexInfoSession.allContextsProvided === undefined) {
 			const mPropertyBag = {
 				selector: oReloadInfo.selector,
@@ -98,7 +93,6 @@ sap.ui.define([
 		} else {
 			Loader.setAllContextsProvided(sReference, oFlexInfoSession.allContextsProvided);
 		}
-		oFlexInfoSession.initialAllContexts = !oFlexInfoSession.allContextsProvided;
 		FlexInfoSession.setByReference(oFlexInfoSession, sReference);
 		return !oFlexInfoSession.allContextsProvided;
 	}
@@ -179,6 +173,15 @@ sap.ui.define([
 		removeInfoSessionStorage(oControl) {
 			const sReference = ManifestUtils.getFlexReferenceForControl(oControl);
 			FlexInfoSession.removeByReference(sReference);
+		},
+
+		addParametersToInfoSessionStorage(oControl, aParameters) {
+			const sReference = ManifestUtils.getFlexReferenceForControl(oControl);
+			const oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			aParameters.forEach((oParameterInfo) => {
+				oFlexInfoSession[oParameterInfo.key] = oParameterInfo.value;
+			});
+			FlexInfoSession.setByReference(oFlexInfoSession, sReference);
 		},
 
 		/**

@@ -16,14 +16,17 @@
 	}
 
 	&.sapFAvatarGroupGroup:focus {
-		border-radius: 2rem;
+		border-radius: ~"calc(var(--sapUiAvatarGroupButtonInnerHeight) / 2)";
 	}
 
 	&.sapFAvatarGroupIndividual {
+		overflow: visible;
 
 		.sapFAvatarGroupItem {
+			padding: 0.125rem;
+			margin: 0.125rem;
 
-			&:hover:not(:active):not(:focus) {
+			&:hover:not(:active) {
 				.sapFAvatar {
 					border: 0.0625rem solid var(--sapAvatar_Hover_BorderColor);
 				}
@@ -32,6 +35,7 @@
 			&:active {
 
 				.sapFAvatar {
+					border: 0.0625rem solid var(--sapButton_Active_BorderColor);
 					background-color: var(--sapButton_Active_Background);
 
 					.sapFAvatarInitialsHolder,
@@ -43,10 +47,24 @@
 
 			&:focus {
 				outline: none;
+				box-shadow: 0 0 0 0.125rem var(--sapContent_FocusColor);
+				border-radius: 50%;
+			}
+		}
 
-				.sapFAvatar {
-					outline: none;
-					box-shadow: 0 0 0 0.125rem var(--sapContent_FocusColor);
+		.sapFAvatarGroupMoreButton {
+			--button-padding: 0.125rem;
+			padding: var(--button-padding);
+			margin: 0.125rem;
+			height: ~"calc(var(--sapUiAvatarGroupButtonInnerHeight) + 2 * var(--button-padding))";
+
+			&:focus {
+				outline: none;
+				box-shadow: 0 0 0 0.125rem var(--sapContent_FocusColor);
+				border-radius: 50%;
+
+				> .sapMFocusable:not(.sapMBadgeIndicator)::before {
+					display: none;
 				}
 			}
 		}

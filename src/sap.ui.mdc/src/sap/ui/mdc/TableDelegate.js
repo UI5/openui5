@@ -453,8 +453,9 @@ sap.ui.define([
 	 * @returns {Promise} A <code>Promise</code> that resolves after the content has been initialized
 	 * @private
 	 */
-	TableDelegate.initializeContent = function(oTable) {
-		return this.initializeSelection(oTable);
+	TableDelegate.initializeContent = async function(oTable) {
+		await this.initializeSelection(oTable);
+		return initializeTitleProvider(oTable);
 	};
 
 	/**
@@ -482,9 +483,7 @@ sap.ui.define([
 			Multi: "MultiToggle"
 		};
 
-		return loadModules("sap/ui/table/plugins/MultiSelectionPlugin").then((aModules) => {
-			const MultiSelectionPlugin = aModules[0];
-
+		return loadModules("sap/ui/table/plugins/MultiSelectionPlugin").then(([MultiSelectionPlugin]) => {
 			if (oTable.isDestroyed()) {
 				return Promise.reject("Destroyed");
 			}
@@ -512,6 +511,8 @@ sap.ui.define([
 					});
 				}
 			}));
+
+			return Promise.resolve();
 		});
 	}
 
@@ -547,6 +548,29 @@ sap.ui.define([
 		});
 
 		return Promise.resolve();
+	}
+
+	function initializeTitleProvider(oTable) {
+		if (oTable._isOfType(TableType.TreeTable)) {
+			// The number of selectable rows cannot be determined very well for the TreeTable
+			// Binding#getCount does not include nodes that do not match the filter criteria
+			return Promise.resolve();
+		}
+
+		return loadModules("sap/m/plugins/TitleProvider").then(([TitleProvider]) => {
+			if (oTable.isDestroyed()) {
+				return Promise.reject("Destroyed");
+			}
+
+			const oTitleProvider = new TitleProvider({
+				id: `${oTable.getId()}-titleProvider`,
+				title: `${oTable.getId()}-tableTitle`,
+				enabled: "{= ${$sap.ui.mdc.Table>/headerVisible} && ${$sap.ui.mdc.Table>/showRowCount} && !${$sap.ui.mdc.Table>/hideToolbar} }",
+				manageSelectedCount: "{= ${$sap.ui.mdc.Table>/selectionMode} === 'Multi' }"
+			});
+			oTable._oTable.addDependent(oTitleProvider);
+			return Promise.resolve();
+		});
 	}
 
 	/**

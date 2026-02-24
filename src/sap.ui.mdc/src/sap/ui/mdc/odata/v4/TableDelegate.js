@@ -332,21 +332,6 @@ sap.ui.define([
 		}
 	};
 
-	/**
-	 * @inheritDoc
-	 */
-	Delegate.rebind = function(oTable, oBindingInfo) {
-		Table._addBindingListener(oBindingInfo, "createActivate", () => {
-			Promise.resolve().then(() => { // The count is updated after the event is fired
-				oTable._updateRowCountForHeader();
-			});
-		});
-		Table._addBindingListener(oBindingInfo, "createCompleted", () => {
-			oTable._updateRowCountForHeader();
-		});
-		TableDelegate.rebind.apply(this, arguments);
-	};
-
 	Delegate.fetchExpandAndCollapseConfiguration = function(oTable) {
 		if (!oTable._isOfType(TableType.TreeTable)) {
 			return Promise.resolve({});
@@ -552,6 +537,7 @@ sap.ui.define([
 		await TableDelegate.initializeContent.apply(this, arguments);
 
 		if (oTable._isOfType(TableType.Table)) {
+			oTable._oTableTitle.setShowExtendedView(true);
 			await configureGridTable(oTable);
 		}
 	};

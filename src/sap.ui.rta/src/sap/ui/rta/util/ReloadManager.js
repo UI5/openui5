@@ -223,17 +223,20 @@ sap.ui.define([
 	 * @return {Promise<boolean>} Resolving to <code>false</code> means that reload is not necessary
 	 */
 	ReloadManager.handleReloadOnStart = async function(mProperties) {
-		merge(mProperties, {
-			ignoreMaxLayerParameter: false,
-			includeCtrlVariants: true
-		});
-		const oReloadInfo = await ReloadInfoAPI.getReloadReasonsForStart(mProperties);
-		if (
-			oReloadInfo.hasHigherLayerChanges
-			|| oReloadInfo.isDraftAvailable
-			|| oReloadInfo.allContexts
-		) {
-			return triggerReloadOnStart(merge(mProperties, oReloadInfo));
+		// if RTA is already starting after a reload, all checks have already been done
+		if (!ReloadManager.needsAutomaticStart(mProperties.layer)) {
+			merge(mProperties, {
+				ignoreMaxLayerParameter: false,
+				includeCtrlVariants: true
+			});
+			const oReloadInfo = await ReloadInfoAPI.getReloadReasonsForStart(mProperties);
+			if (
+				oReloadInfo.hasHigherLayerChanges
+				|| oReloadInfo.isDraftAvailable
+				|| oReloadInfo.allContexts
+			) {
+				return triggerReloadOnStart(merge(mProperties, oReloadInfo));
+			}
 		}
 		return undefined;
 	};

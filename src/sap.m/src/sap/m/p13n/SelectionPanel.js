@@ -598,6 +598,7 @@ sap.ui.define([
 		//remove the reorder buttons from their current location and hence reset the hover logic
 		this._removeMoveButtons();
 		this._oSelectedItem = null;
+		this._oHoveredItem = null;
 
 		// this is needed for updating the header toolbar of the table
 		this.setShowHeader(this.getShowHeader());

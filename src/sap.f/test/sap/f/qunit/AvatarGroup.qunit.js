@@ -481,6 +481,51 @@ function (
 		this.oPage.destroy();
 	});
 
+	QUnit.test("_onResize sets CSS variable for button inner height", async function (assert) {
+		// Arrange
+		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Act
+		this.oAvatarGroup._onResize();
+
+		// Assert
+		var sCssVarValue = this.oAvatarGroup.getDomRef().style.getPropertyValue("--sapUiAvatarGroupButtonInnerHeight");
+		assert.ok(sCssVarValue, "CSS variable --sapUiAvatarGroupButtonInnerHeight is set");
+		assert.ok(sCssVarValue.endsWith("rem"), "CSS variable value has correct unit (rem)");
+		assert.ok(parseFloat(sCssVarValue) > 0, "CSS variable value is a positive number");
+	});
+
+	QUnit.test("_onResize sets CSS variable for custom display size", async function (assert) {
+		// Arrange
+		this.oAvatarGroup.setAvatarDisplaySize("Custom");
+		this.oAvatarGroup.setAvatarCustomDisplaySize("5rem");
+		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Act
+		this.oAvatarGroup._onResize();
+
+		// Assert
+		var sCssVarValue = this.oAvatarGroup.getDomRef().style.getPropertyValue("--sapUiAvatarGroupButtonInnerHeight");
+		assert.strictEqual(sCssVarValue, "5rem", "CSS variable matches custom display size");
+	});
+
+	QUnit.test("_onResize sets CSS variable for Group type border-radius calculation", async function (assert) {
+		// Arrange
+		this.oAvatarGroup.setGroupType("Group");
+		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Act
+		this.oAvatarGroup._onResize();
+
+		// Assert
+		var sCssVarValue = this.oAvatarGroup.getDomRef().style.getPropertyValue("--sapUiAvatarGroupButtonInnerHeight");
+		assert.ok(sCssVarValue, "CSS variable is set for Group type (used for border-radius calculation)");
+		assert.ok(parseFloat(sCssVarValue) > 0, "CSS variable value is a positive number");
+	});
+
 	QUnit.test("non-interactive AvatarGroup - using _interactive property", async function (assert) {
 		//Arrange
 		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);

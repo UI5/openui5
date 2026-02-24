@@ -186,6 +186,7 @@ sap.ui.define([
 	QUnit.test("GridTable", function(assert) {
 		return this.initTable().then(function(oTable) {
 			assert.ok(PluginBase.getPlugin(oTable._oTable, "sap.ui.table.plugins.ODataV4Aggregation"), "ODataV4Aggregation plugin in inner table");
+			assert.ok(oTable._oTableTitle.getShowExtendedView(), "getShowExtendedView of TableTitle is true");
 			this.assertFetchPropertyCalls(assert, 1);
 		}.bind(this));
 	});
@@ -195,6 +196,7 @@ sap.ui.define([
 			type: TableType.TreeTable
 		}).then(function(oTable) {
 			assert.notOk(PluginBase.getPlugin(oTable._oTable, "sap.ui.table.plugins.ODataV4Aggregation"), "ODataV4Aggregation plugin in inner table");
+			assert.notOk(oTable._oTableTitle.getShowExtendedView(), "getShowExtendedView of TableTitle is false");
 			this.assertFetchPropertyCalls(assert, 1);
 		}.bind(this));
 	});
@@ -204,6 +206,7 @@ sap.ui.define([
 			type: TableType.ResponsiveTable
 		}).then(function(oTable) {
 			assert.notOk(PluginBase.getPlugin(oTable._oTable, "sap.ui.table.plugins.ODataV4Aggregation"), "ODataV4Aggregation plugin in inner table");
+			assert.ok(oTable._oTableTitle.getShowExtendedView(), "getShowExtendedView of TableTitle is true");
 			this.assertFetchPropertyCalls(assert, 1);
 		}.bind(this));
 	});
@@ -3202,64 +3205,5 @@ sap.ui.define([
 			assert.ok(true, "Rebind did not fail");
 			assert.ok(this.oTable.getRowBinding(), "Table has a row binding");
 		});
-	});
-
-	QUnit.module("Row count in header text", {
-		beforeEach: async function() {
-			this.oTable = new Table({
-				header: "MyTestHeader",
-				delegate: {
-					name: "odata.v4.TestDelegate",
-					payload: {
-						collectionPath: "/Products"
-					}
-				},
-				models: new ODataModel({
-					serviceUrl: "serviceUrl/",
-					operationMode: "Server"
-				})
-			});
-			await TableQUnitUtils.waitForBinding(this.oTable);
-			this.oBinding = this.oTable.getRowBinding();
-			this.oTitle = this.oTable._oTitle;
-		},
-		afterEach: function() {
-			this.oTable.destroy();
-		}
-	});
-
-	QUnit.test("Update on binding event 'createActivate'", async function(assert) {
-		this.stub(this.oBinding, "getCount").returns(10);
-		this.oBinding.fireEvent("createActivate");
-		// Make sure to not update the title with an incorrect/outdated count information. For example to avoid table update announcement.
-		assert.equal(this.oTitle.getText(), "MyTestHeader", "Binding#getCount returns 10; Synchronous check after event");
-		await Promise.resolve();
-		assert.equal(this.oTitle.getText(), "MyTestHeader (10)", "Binding#getCount returns 10; Asynchronous check after event");
-
-		this.oBinding.getCount.returns(11);
-		this.oBinding.fireEvent("createActivate");
-		assert.equal(this.oTitle.getText(), "MyTestHeader (10)", "Binding#getCount returns 11; Synchronous check after event");
-		await Promise.resolve();
-		assert.equal(this.oTitle.getText(), "MyTestHeader (11)", "Binding#getCount returns 11; Asynchronous check after event");
-
-		this.oBinding.getCount.returns(0);
-		this.oBinding.fireEvent("createActivate");
-		assert.equal(this.oTitle.getText(), "MyTestHeader (11)", "Binding#getCount returns 0; Synchronous check after event");
-		await Promise.resolve();
-		assert.equal(this.oTitle.getText(), "MyTestHeader", "Binding#getCount returns 0; Asynchronous check after event");
-	});
-
-	QUnit.test("Update on binding event 'createCompleted'", function(assert) {
-		this.stub(this.oBinding, "getCount").returns(10);
-		this.oBinding.fireEvent("createCompleted");
-		assert.equal(this.oTitle.getText(), "MyTestHeader (10)", "Binding#getCount returns 10");
-
-		this.oBinding.getCount.returns(11);
-		this.oBinding.fireEvent("createCompleted");
-		assert.equal(this.oTitle.getText(), "MyTestHeader (11)", "Binding#getCount returns 11");
-
-		this.oBinding.getCount.returns(0);
-		this.oBinding.fireEvent("createCompleted");
-		assert.equal(this.oTitle.getText(), "MyTestHeader", "Binding#getCount returns 0");
 	});
 });
