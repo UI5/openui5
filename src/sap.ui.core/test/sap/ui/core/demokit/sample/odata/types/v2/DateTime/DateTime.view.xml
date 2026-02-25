@@ -24,7 +24,22 @@
 				</Toolbar>
 			</form:toolbar>
 			<form:content>
-				<Label text="sap.m.Text" />
+				<Label text="sap.m.Text only binding" />
+				<Text text="{
+						path: '/Date'
+					}" />
+				<Label text="sap.m.Text with type 'DateTimeType'" />
+				<Text text="{
+						path: '/Date',
+						type: 'DateTimeType'
+					}" />
+				<Label text="sap.m.Text with constraints 'DateTime'" />
+				<Text text="{
+						constraints: {displayFormat: 'DateTime'},
+						path: '/Date',
+						type: 'DateTimeType'
+					}" />
+				<Label text="sap.m.Text with constraints 'Date'" />
 				<Text text="{
 						constraints: {displayFormat: 'Date'},
 						path: '/Date',
