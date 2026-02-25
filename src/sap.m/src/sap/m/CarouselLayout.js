@@ -51,7 +51,7 @@ sap.ui.define(["sap/ui/base/ManagedObject", "./library"], function (ManagedObjec
 
 				/**
 				 * Activates the responsive layout mode, where the number of visible carousel pages automatically
-				 * adjusts based on the available viewport width and the specified page width.
+				 * adjusts based on the available width and the specified page width.
 				 *
 				 * When this option is enabled, the carousel dynamically calculates and displays as many items as can
 				 * fit within the viewport while adhering to the <code>minPageWidth</code> constraint.

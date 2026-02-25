@@ -3473,6 +3473,31 @@ sap.ui.define([
 		assert.ok(oIndicator.hasClass("sapUiHidden"), "The n-more label is hidden on focusin.");
 	});
 
+	QUnit.test("onfocusin tokenizer is scrolled to the end", async function(assert) {
+
+		var oTokenizerSpy = this.spy(Tokenizer.prototype, "scrollToEnd");
+
+		this.multiInput.setWidth("200px");
+		this.multiInput.setTokens([
+			new Token({text: "XXXXXXXXXXXXXX"}),
+			new Token({text: "XXXXXXXXXXXXXX"}),
+			new Token({text: "XXXXXXXXXXXXXX"}),
+			new Token({text: "XXXXXXXXXXXXXX"}),
+			new Token({text: "XXXXXXXXXXXXXX"}),
+			new Token({text: "XXXXXXXXXXXXXX"}),
+			new Token({text: "XXXXXXXXXXXXXX"})
+		]);
+
+		await nextUIUpdate();
+
+		this.multiInput.getFocusDomRef().focus();
+
+		// assert
+		assert.ok(oTokenizerSpy.called, "Tokenizer's scrollToEnd is called");
+		// cleanup
+		oTokenizerSpy.restore();
+	});
+
 	QUnit.test("'bTokenIsAdded' and '_sProposedItemText' should be reset, popover should close on focus out", async function(assert) {
 		var	oEventMock = {
 			target : this.multiInput.getDomRef("inner")

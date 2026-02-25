@@ -130,6 +130,8 @@ sap.ui.define([
 	 * <li>On touch devices, navigation is performed with swipe gestures (swipe right or swipe left) or with the navigation arrows.</li>
 	 * <li>On desktop, navigation is done with the navigation arrows.</li>
 	 * <li>The paging indicator (when activated) is visible on each form factor.</li>
+	 * <li>When using {@link sap.m.CarouselLayout CarouselLayout} with the <code>responsive</code> property set to <code>true</code>,
+	 * the number of visible pages adjusts automatically based on the available width and the specified <code>minPageWidth</code>.</li>
 	 * </ul>
 	 * @extends sap.ui.core.Control
 	 *

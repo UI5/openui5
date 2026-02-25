@@ -931,11 +931,22 @@ sap.ui.define([
 		 * @private
 		 */
 		DateRangeSelection.prototype.onsapescape = function(oEvent) {
-			var sLastValue = this.getLastValue(),
-				aDates = this._parseValue(this._getInputValue(), true),
-				sValueFormatInputDate = this._formatValue(aDates[0], aDates[1], true);
+			const sLastValue = this.getLastValue();
+			const sInputValue = this._getInputValue();
 
-			if (sValueFormatInputDate !== sLastValue) {
+			if (!sInputValue) {
+				return;
+			}
+
+			const aDates = this._parseValue(sInputValue, true);
+			const sValueFormatInputDate = this._formatValue(aDates[0], aDates[1], true) || "";
+
+			// If nothing changed in the input (raw or formatted), allow default action.
+			if (sInputValue === sLastValue || sValueFormatInputDate === sLastValue) {
+				return;
+			}
+
+			if (sLastValue.trim() !== "" && sValueFormatInputDate !== sLastValue) {
 				oEvent.setMarked();
 				oEvent.preventDefault();
 

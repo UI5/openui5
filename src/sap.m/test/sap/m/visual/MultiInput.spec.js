@@ -23,6 +23,22 @@ describe('sap.m.MultiInput', function() {
 		browser.actions().sendKeys(protractor.Key.BACK_SPACE).perform();
 	});
 
+	// MultiInput - nMore pressed and input field focused after that
+	it("Should visualize MultiInput on focus with tokenizer scrolled to end", function () {
+		browser.executeScript("document.getElementById('minWidthMI').scrollIntoView()").then(function() {
+			// Click on n-more link
+			browser.executeScript("document.querySelector('#minWidthMI .sapMTokenizerIndicator').click()");
+
+			//wait until popover opens
+			browser.sleep(1000);
+
+			element(by.id("minWidthMI-inner")).click();
+			expect(takeScreenshot()).toLookAs("mi_tokenizer_scrolled_to_end");
+
+			browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
+		});
+	});
+
 	// MultiInput invalidated
 	it("should invalidate the MultiInput, so all MI elements are there", function () {
 		browser.executeScript('document.getElementById("dataBoundMultiInput").scrollIntoView()').then(function() {

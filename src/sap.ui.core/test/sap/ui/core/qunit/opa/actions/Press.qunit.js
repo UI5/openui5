@@ -745,7 +745,7 @@ function(Press,
 		var oOpenPickerDomRef = $(oPicker.getDomRef());
 		assert.ok(oPicker.isOpen(), "ComboBox's Popover is open");
 		assert.equal(oOpenPickerDomRef.css("visibility"), "visible", "Checking Popover's visibility css property");
-		assert.equal(oOpenPickerDomRef.css("display"), "block", "Checking Popover's display css property");
+		assert.equal(oOpenPickerDomRef.css("display"), "flex", "Checking Popover's display css property");
 
 		var oPressItem = new Press();
 		oPressItem.executeOn(ListHelpers.getListItem(this.oComboBox.getItems()[1]));

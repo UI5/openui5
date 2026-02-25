@@ -765,7 +765,7 @@ sap.ui.define([
 		$Ref.addClass("sapUiPopupInitial");
 		$Ref.css({
 			"position" : "absolute",
-			"display": "block",
+			"display": this._getCSSDisplayType(),
 			"visibility": "visible",
 			"opacity": "" // reset the opacity style
 		});
@@ -824,6 +824,10 @@ sap.ui.define([
 		} else { // otherwise play the default animation
 			$Ref.fadeTo(iRealDuration, 1, this._opened.bind(this));
 		}
+	};
+
+	Popup.prototype._getCSSDisplayType = function () {
+		return this.oContent?._getCSSDisplayType?.() || "block";
 	};
 
 	Popup.prototype._getDomRefToFocus = function() {
@@ -1575,7 +1579,7 @@ sap.ui.define([
 			var oDomRef = $Ref.get(0);
 
 			if (typeof (oAt) === "string") {
-				oDomRef.style.display = "block";
+				oDomRef.style.display = this._getCSSDisplayType();
 
 				// reset the 'left' and 'right' position CSS to avoid changing the DOM size by setting both 'left' and 'right'.
 				oDomRef.style.left = "";
