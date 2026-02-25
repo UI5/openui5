@@ -115,8 +115,6 @@ sap.ui.define([
 
 				/**
 				 * Enables alternating table row colors.
-				 * <b>Note:</b> This property can only be used with the Belize and Belize Deep themes.
-				 * Alternate row coloring is not available for the High Contrast Black/White themes.
 				 * @since 1.52
 				 */
 				alternateRowColors : {type : "boolean", group : "Appearance", defaultValue : false},

@@ -72,7 +72,11 @@ sap.ui.define([
 				/**
 				 * Fired after function onChangeAnnotation invoked by sap.ui.codeeditor.CodeEditor.
 				 */
-				"changeAnnotation": {}
+				"changeAnnotation": {},
+				/**
+				 * Fired after enabled status of begin button changed.
+				 */
+				"changeEnabledOfBeginButton": {}
 			}
 		},
 		renderer: BasePropertyEditor.getMetadata().getRenderer()
@@ -177,6 +181,7 @@ sap.ui.define([
 		});
 		if (oErrors.length > 0) {
 			this._oDialog.getBeginButton().setEnabled(false);
+			this.fireChangeEnabledOfBeginButton();
 		} else {
 			var sValue = this._oEditor.getAceEditor().getValue();
 			if (sValue && sValue !== "") {
@@ -188,6 +193,7 @@ sap.ui.define([
 						eval("(" + sValue + ")");
 					} catch (vError) {
 						this._oDialog.getBeginButton().setEnabled(false);
+						this.fireChangeEnabledOfBeginButton();
 						return;
 					}
 				}*/
@@ -196,6 +202,7 @@ sap.ui.define([
 				this._oCode = undefined;
 			}
 			this._oDialog.getBeginButton().setEnabled(true);
+			this.fireChangeEnabledOfBeginButton();
 		}
 		this.fireChangeAnnotation();
 	};
@@ -214,6 +221,7 @@ sap.ui.define([
 				} catch (vError) {
 					MessageToast.show(vError);
 					this._oDialog.getBeginButton().setEnabled(false);
+					this.fireChangeEnabledOfBeginButton();
 					return;
 				}
 			}

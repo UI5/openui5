@@ -1,8 +1,6 @@
 sap.ui.define([
   "sap/ui/core/Element",
   "sap/m/App",
-  "sap/m/Switch",
-  "sap/m/OverflowToolbarLayoutData",
   "sap/m/Label",
   "sap/m/Bar",
   "sap/m/Button",
@@ -17,8 +15,6 @@ sap.ui.define([
 ], function(
   Element,
   App,
-  Switch,
-  OverflowToolbarLayoutData,
   Label,
   Bar,
   Button,
@@ -40,23 +36,6 @@ sap.ui.define([
 
   var app = new App("myApp");
   var UI5Date = sap.ui.require("sap/ui/core/date/UI5Date");
-  var oButtonSwitchReducedHeight = new Switch("reduced_height",{
-	  state: false,
-	  change: function (oEvent) {
-		  oEvent.getParameter("state");
-	  },
-	  layoutData: new OverflowToolbarLayoutData({
-		  group: 1
-	  })
-  });
-
-  var oLegendLabelHeight = new Label({
-	  text: "Activate Reduced Height",
-	  labelFor: oButtonSwitchReducedHeight.getId(),
-	  layoutData: new OverflowToolbarLayoutData({
-		  group: 1
-	  })
-  });
 
   var oEventLabel = new Label({text: "Events log"});
   function createFooter(){
@@ -68,8 +47,6 @@ sap.ui.define([
 			  }
 		  })],
 		  contentRight: [
-			  oLegendLabelHeight,
-			  oButtonSwitchReducedHeight,
 			  oEventLabel,
 			  new Select('select_height', {
 				  items: [

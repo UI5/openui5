@@ -1828,13 +1828,13 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		const oEvent = new jQuery.Event();
-		oEvent.theme = "sap_fiori_3";
+		oEvent.theme = "sap_horizon";
 		oStdLI.onThemeChanged(oEvent);
 		await nextUIUpdate();
 		assert.ok(oStdLI._initialRender, "prevent info text calculation on initial rendering as this is done by the renderer");
 
 		const fnMeasureInfoTextWidth = sinon.spy(oStdLI, "_measureInfoTextWidth");
-		oEvent.theme = "sap_belize";
+		oEvent.theme = "sap_fiori_3";
 		oStdLI.onThemeChanged(oEvent);
 		await nextUIUpdate();
 		assert.ok(fnMeasureInfoTextWidth.calledWith(true), "info text width is recalculated onThemeChanged");

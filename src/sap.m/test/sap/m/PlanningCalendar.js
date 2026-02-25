@@ -593,18 +593,6 @@ sap.ui.define([
 		press: handleLegend
 	});
 
-	var oButtonReducedHeight = new ToggleButton("B_ReducedHeight", {
-		icon: "sap-icon://resize-vertical",
-		type: ButtonType.Transparent,
-		pressed: false,
-		tooltip: "Toggle appointmentsReducedHeight property",
-		press: function (oEvent) {
-			var oPC = Element.getElementById("PC1");
-			var bPressed = oEvent.getParameter("pressed");
-			oPC.setAppointmentsReducedHeight(bPressed);
-		}
-	});
-
 	var oButtonToggleAlternatingRowColor = new ToggleButton({
 		icon: "sap-icon://paging",
 		tooltip: "Toggle Alternating Row Color",
@@ -1426,7 +1414,6 @@ sap.ui.define([
 			oLegendLabel,
 			oButtonSwitchLegendAssociation,
 			new ToolbarSeparator(),
-			oButtonReducedHeight,
 			oButtonToggleAlternatingRowColor,
 			oButtonToggleSpecNoWork,
 			oButtonMinMax,

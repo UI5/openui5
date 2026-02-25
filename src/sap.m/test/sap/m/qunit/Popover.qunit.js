@@ -231,6 +231,23 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("Open, render and then close", function (assert){
+		this.oButton.firePress();
+		this.clock.tick(500);
+		assert.ok(this.oPopover.isOpen(), "Popover is open");
+
+		let oDomRef = this.oPopover.getDomRef();
+
+		assert.ok(oDomRef, "Popover is rendered after it's opened.");
+		assert.strictEqual(window.getComputedStyle(oDomRef).display, "flex", "Display style of the popover is 'flex'");
+
+		this.oPopover.close();
+		this.clock.tick(500);
+
+		oDomRef = this.oPopover.getDomRef();
+		assert.strictEqual(window.getComputedStyle(oDomRef).display, "none", "Display style of the popover is 'none'");
+	});
+
 	QUnit.test("Open with placement: Bottom, and then close", function (assert){
 		this.oPopover.setPlacement(PlacementType.Bottom);
 

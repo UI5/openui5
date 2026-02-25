@@ -38,6 +38,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/Element",
 	"sap/ui/core/date/UI5Date",
+	"sap/m/Dialog",
 	// load all required calendars in advance
 	"sap/ui/core/date/Buddhist",
 	"sap/ui/core/date/Gregorian",
@@ -82,7 +83,8 @@ sap.ui.define([
 	deepEqual,
 	jQuery,
 	Element,
-	UI5Date
+	UI5Date,
+	Dialog
 ) {
 	"use strict";
 
@@ -2424,6 +2426,48 @@ sap.ui.define([
 
 		// Assert
 		assert.notOk(oBeginButton.getEnabled(), "Begin button is disabled");
+	});
+
+	QUnit.test("onsapescape: closes dialog containing DatePicker", async function(assert) {
+		// Arrange
+		var oEvent = {
+			preventDefault: this.spy(),
+			setMarked: function() {}
+		},
+		model = new JSONModel({
+			"date": ""
+		}),
+		oDP = new DatePicker({value: "{ type: 'DateInterval',parts: [{path: '/date'}]}"}),
+		oDialog = new Dialog({
+			content: [ oDP ]
+		}),
+		oButton = new Button({
+			text: "Open Dialog",
+			press: function () {
+				oDialog.open();
+			}
+		});
+		oDialog.setModel(model);
+		oButton.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// open the dialog
+		qutils.triggerKeydown(oButton.getFocusDomRef(), KeyCodes.ENTER);
+		oDP._$input.focus();
+
+		// Act - press Escape
+		qutils.triggerKeydown(oDP._$input, KeyCodes.ESCAPE);
+		oDP.onsapescape(oEvent);
+
+		await nextUIUpdate();
+
+		// Assert
+		assert.equal(oEvent.preventDefault.callCount, 0, "PreventDefault is not called");
+
+		// Cleanup
+		oDP.destroy();
+		oButton.destroy();
+		oDialog.destroy();
 	});
 
 	QUnit.test("navigate", function (assert) {

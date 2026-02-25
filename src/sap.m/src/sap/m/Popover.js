@@ -1159,6 +1159,14 @@ sap.ui.define([
 		};
 
 		/**
+		 * @private
+		 * @ui5-restricted sap.ui.core.Popup
+		 */
+		Popover.prototype._getCSSDisplayType = function () {
+			return "flex";
+		};
+
+		/**
 		 * Event handler for the focusin event.
 		 * If it occurs on the focus handler elements at the beginning of the dialog, the focus is set to the end, and vice versa.
 		 *

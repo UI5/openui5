@@ -670,17 +670,33 @@ sap.ui.define([
 	 * @private
 	 */
 	DatePicker.prototype.onsapescape = function(oEvent) {
-		var sLastValue = this.getLastValue(),
-			oDate = this._parseValue(this._getInputValue(), true),
-			sValueFormatInputDate = this._formatValue(oDate, true);
+		const sLastValue = this.getLastValue();
+		const sInputValue = this._getInputValue();
 
-		if (sValueFormatInputDate !== sLastValue) {
-			oEvent.setMarked();
-			oEvent.preventDefault();
-
-			this.updateDomValue(sLastValue);
-			this.onValueRevertedByEscape(sLastValue, sValueFormatInputDate);
+		if (!sInputValue) {
+			return;
 		}
+
+		const oDate = this._parseValue(sInputValue, true);
+		const sValueFormatInputDate = this._formatValue(oDate, true);
+
+		// Normalize last value into the same format for a reliable comparison.
+		let sLastValueNormalized = sLastValue;
+		const oLastDate = this._parseValue(sLastValue, true);
+		if (oLastDate) {
+			sLastValueNormalized = this._formatValue(oLastDate, true);
+		}
+
+		// If normalized values match, nothing to revert.
+		if (sValueFormatInputDate === sLastValueNormalized) {
+			return;
+		}
+
+		oEvent.setMarked();
+		oEvent.preventDefault();
+
+		this.updateDomValue(sLastValue);
+		this.onValueRevertedByEscape(sLastValue, sValueFormatInputDate);
 	};
 
 	DatePicker.prototype.onsappageup = function(oEvent){

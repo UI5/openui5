@@ -972,7 +972,6 @@ sap.ui.define([
 	};
 
 	PlanningCalendar.prototype._setProperties = function() {
-		//overriden setters
 		const bMultiSelect = this.getMultipleAppointmentsSelection(),
 			  sIconShape = this.getIconShape(),
 			  oStartDate = this.getStartDate(),

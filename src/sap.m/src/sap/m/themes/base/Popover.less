@@ -30,7 +30,7 @@
 	border-radius: inherit;
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	min-height: 0;
 }
 
 .sapMPopover .sapMIBar.sapMFooter-CTX ,
@@ -69,6 +69,7 @@
 
 .sapMPopover {
 	position: absolute;
+	flex-direction: column;
 	color: var(--sapContent_ForegroundTextColor);
 	min-width: 6.25rem;
 	box-sizing: border-box;
@@ -100,6 +101,7 @@
 	/* set margin to every side */
 	margin: 0.4375em;
 	background-color: var(--sapGroup_ContentBackground);
+	min-height: 0;
 }
 
 .sapMPopover .sapMPopoverScroll {
