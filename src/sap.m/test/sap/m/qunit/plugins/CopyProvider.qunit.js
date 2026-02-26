@@ -759,39 +759,39 @@ sap.ui.define([
 
 		const oTable = new MDCTable(mSettings);
 		MDCQUnitUtils.stubPropertyInfos(oTable, [{
-				name: "id",
+				key: "id",
 				path: "id",
 				label: "ID",
 				dataType: "Integer"
 			}, {
-				name: "name",
+				key: "name",
 				path: "name",
 				label: "Name",
 				dataType: "String"
 			}, {
-				name: "color",
+				key: "color",
 				path: "color",
 				label: "Color",
 				dataType: "String"
 			}, {
-				name: "nocopy",
+				key: "nocopy",
 				path: "id",
 				label: "NoCopy",
 				dataType: "String",
 				clipboardSettings: null
 			}, {
-				name: "name-id",
+				key: "name-id",
 				label: "Name-ID",
 				propertyInfos: ["id", "name"],
 				clipboardSettings: {
 					template: "{1} ({0})"
 				}
 			}, {
-				name: "id-name-color",
+				key: "id-name-color",
 				label: "ID-Name-Color",
 				propertyInfos: ["id", "name", "color"]
 			}, {
-				name: "id-in-parentheses",
+				key: "id-in-parentheses",
 				label: "ID-In-Parentheses",
 				path: "id",
 				dataType: "String",

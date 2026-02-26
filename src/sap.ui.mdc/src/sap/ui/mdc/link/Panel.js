@@ -550,7 +550,7 @@ sap.ui.define([
 				const aItems = [];
 				aAllLinkItems.forEach((oItem) => {
 					aItems.push({
-						name: oItem.id,
+						key: oItem.id,
 						getName: function() {
 							return oItem.id;
 						},

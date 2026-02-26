@@ -4884,9 +4884,10 @@ sap.ui.define([
 	// Create a list binding on contacts with a dependent context binding on a business partner
 	// and a context binding on a sales order with a dependent list binding on the line items. The
 	// dependent bindings have their own caches, because this is the most interesting case.
-	// 1. Request side effects on the business partner for the company name with relative path and
-	//    the web address with absolute path (they should be merged to one request), and for the
-	//    note of sales order line items with absolute path.
+	// 1. Request side effects on the business partner context for the company name with relative
+	//    path. Request side effects for the web address of the business partner and the note of
+	//    sales order line items with absolute paths via the model (JIRA: CPOUI5ODATAV4-3325). The
+	//    requests for the company name and the web address are merged to one request.
 	// 2. Request side effects on the business partner for sales orders with absolute path and
 	//    expect refreshes for orders and items.
 	// 3. Request side effects on a sales order line item for the gross amount and the quantity for
@@ -4978,6 +4979,11 @@ sap.ui.define([
 			}, new Error("Not a list context path to an entity:"
 				+ " /ContactList(fa163e7a-d4f1-1ee8-84ac-11f9c591d177)/CONTACT_2_BP"));
 
+			assert.throws(function () {
+				// code under test (JIRA: CPOUI5ODATAV4-3325)
+				oModel.requestSideEffects(["N/A"], "$groupId");
+			}, new Error("Invalid group ID: $groupId"));
+
 			return that.waitForChanges(assert, "get business partner");
 		}).then(function () {
 			that.expectRequest("ContactList(fa163e7a-d4f1-1ee8-84ac-11f9c591d177)/CONTACT_2_BP"
@@ -5005,11 +5011,14 @@ sap.ui.define([
 				.expectChange("note", ["Note 0010*", "Note 0020*"]);
 
 			return Promise.all([
-				// code under test
+				// code under test (JIRA: CPOUI5ODATAV4-3325)
+				oModel.requestSideEffects([
+					"/ContactList/CONTACT_2_BP/WebAddress",
+					"/SalesOrderList/SO_2_SOITEM/Note"
+				]),
+				// code under test (JIRA: CPOUI5ODATAV4-398)
 				oBusinessPartnerContext.requestSideEffects([
-					{$PropertyPath : "CompanyName"},
-					{$PropertyPath : sEntityContainer + "/ContactList/CONTACT_2_BP/WebAddress"},
-					{$PropertyPath : sEntityContainer + "/SalesOrderList/SO_2_SOITEM/Note"}
+					{$PropertyPath : "CompanyName"}
 				]),
 				that.waitForChanges(assert, "(1)")
 			]);

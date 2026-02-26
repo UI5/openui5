@@ -84,7 +84,7 @@ sap.ui.define([
 		const bLengthMatch = aCurrentProperties.length === aExpectedProperties.length;
 		const bNoMissingProperty = !!aExpectedProperties.find(function (oExpected) {
 			return !!aCurrentProperties.find(function (oCurrent) {
-				return oExpected.name === oCurrent.name;
+				return oExpected.key === oCurrent.key;
 			});
 		});
 		return bLengthMatch && bNoMissingProperty;
@@ -284,12 +284,12 @@ sap.ui.define([
 
 		fnCreateTestClass(true);
 
-		const oSomeInstance = fnCreateInstance({propertyInfo: [{name: "a", label: "a", dataType: "String"}]});
+		const oSomeInstance = fnCreateInstance({propertyInfo: [{key: "a", label: "a", dataType: "String"}]});
 		sinon.stub(AggregationBaseDelegate, "fetchProperties").returns(
 			Promise.resolve([
-				{name : "a", label: "a", dataType: "String"},
-				{name : "b", label: "b", dataType: "String"},
-				{name : "c", label: "b", dataType: "String"}
+				{key: "a", label: "a", dataType: "String"},
+				{key: "b", label: "b", dataType: "String"},
+				{key: "c", label: "b", dataType: "String"}
 			])
 		);
 
@@ -299,10 +299,10 @@ sap.ui.define([
 
             assert.ok(aProperties, "property helper field available");
 			assert.equal(aProperties.length, 1," expected 1 property");
-            assert.ok(aProperties[0].name === "a", "properties contain expected fields");
+            assert.ok(aProperties[0].key === "a", "properties contain expected fields");
             assert.notOk(oSomeInstance.isPropertyHelperFinal(), "property helper is not yet marked as final");
 
-			oSomeInstance.setPropertyInfo([{name : "a", label: "a", dataType: "String"}, {name : "b", label: "b", dataType: "String"}]);
+			oSomeInstance.setPropertyInfo([{key: "a", label: "a", dataType: "String"}, {key: "b", label: "b", dataType: "String"}]);
 
 			assert.notOk(oSomeInstance.isPropertyHelperFinal(), "property helper is not yet marked as final");
 
@@ -327,14 +327,14 @@ sap.ui.define([
 
 	QUnit.test("Automatic PropertyHelper initialization and updates", function(assert) {
 		fnCreateTestClass(true);
-		const aInitialProperties = [{name: "A", label: "A", dataType: "String"}];
-		const aUpdatedProperties = [...aInitialProperties, {name: "B", label: "B", dataType: "String"}, {name: "C", label: "C", dataType: "String"}];
+		const aInitialProperties = [{key: "A", label: "A", dataType: "String"}];
+		const aUpdatedProperties = [...aInitialProperties, {key: "B", label: "B", dataType: "String"}, {key: "C", label: "C", dataType: "String"}];
 		const aFinalProperties = [...aUpdatedProperties,
-			{name : "D", label: "D", dataType: "String"},
-			{name : "E", label: "E", dataType: "String"},
-			{name : "F", label: "F", dataType: "String"}
+			{key: "D", label: "D", dataType: "String"},
+			{key: "E", label: "E", dataType: "String"},
+			{key: "F", label: "F", dataType: "String"}
 		];
-		const aIgnoredProperties = [...aUpdatedProperties, {name: "X", label: "X", dataType: "String"}, {name: "Y", label: "Y", dataType: "String"}];
+		const aIgnoredProperties = [...aUpdatedProperties, {key: "X", label: "X", dataType: "String"}, {key: "Y", label: "Y", dataType: "String"}];
 
 		sinon.stub(AggregationBaseDelegate, "fetchProperties").returns(
 			Promise.resolve(aFinalProperties)

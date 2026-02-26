@@ -164,13 +164,7 @@ sap.ui.define([
 		"sap_fiori_3": "Quartz Light",
 		"sap_fiori_3_dark": "Quartz Dark",
 		"sap_fiori_3_hcb": "Quartz High Contrast Black",
-		"sap_fiori_3_hcw": "Quartz High Contrast White",
-		"sap_belize": "Belize",
-		"sap_belize_plus": "Belize Deep",
-		"sap_belize_hcb": "Belize High Contrast Black",
-		"sap_belize_hcw": "Belize High Contrast White",
-		"sap_bluecrystal": "SAP BlueCrystal",
-		"sap_hcb": "SAP HCB"
+		"sap_fiori_3_hcw": "Quartz High Contrast White"
 	};
 
 	var sOriginalTitle = document.title = byId("title").textContent;

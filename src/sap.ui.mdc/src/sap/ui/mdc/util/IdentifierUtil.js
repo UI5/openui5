@@ -56,7 +56,15 @@ sap.ui.define(['sap/ui/base/DataType'], (DataType) => {
 		 * @protected
 		 */
 		getPropertyKey: function(oProperty) {
-			return oProperty.key || oProperty.name;
+
+			/**
+			 * @deprecated As of version 1.121
+	 		 */
+			if (!oProperty.key && ("name" in oProperty)) {
+				return oProperty.name;
+			}
+
+			return oProperty.key;
 		},
 
 		getPropertyPath: function(oProperty) {

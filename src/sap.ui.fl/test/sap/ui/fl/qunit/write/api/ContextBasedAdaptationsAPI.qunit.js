@@ -1149,6 +1149,14 @@ sap.ui.define([
 		});
 
 		QUnit.test("when a control and a layer were provided and a draft exists and no changes exist", function(assert) {
+			// this test needs a spy for Storage.write, so restore sandbox and set all beforeEach stubs again (except Storage.write)
+			sandbox.restore();
+			stubSettings(sandbox);
+			sandbox.stub(Utils, "getAppComponentForControl").returns(this.oAppComponent);
+			this.oOnAllChangesSavedStub = sandbox.stub(Versions, "onAllChangesSaved");
+
+			var oWriteSpy = sandbox.spy(Storage, "write");
+
 			sandbox.stub(Versions, "getVersionsModel").returns({
 				getProperty() {
 					return Version.Number.Draft;
@@ -1167,22 +1175,31 @@ sap.ui.define([
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedVersions);
 			var oCreateStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({ status: 201 });
 
-			return ContextBasedAdaptationsAPI.create(this.mPropertyBag).then(function(sResult) {
+			return ContextBasedAdaptationsAPI.create(this.mPropertyBag).then(function(oResult) {
 				var [oArgs] = oCreateStub.getCall(0).args;
 				assert.strictEqual(oArgs.layer, Layer.CUSTOMER, "then the correct layer is used");
 				assert.strictEqual(oArgs.parentVersion, Version.Number.Draft, "then the correct version is used");
 				assert.strictEqual(oArgs.appId, "com.sap.test.app", "then the correct reference is used");
-				assert.strictEqual(sResult, "Success", "the context-based adaptation is created");
+				assert.deepEqual(oResult.response, [], "the context-based adaptation is created");
 
 				assert.strictEqual(this.oOnAllChangesSavedStub.callCount, 1, "Versions.OnAllChangesSaved is called");
 				[oArgs] = this.oOnAllChangesSavedStub.getCall(0).args;
 				assert.strictEqual(oArgs.reference, "com.sap.test.app", "then the correct reference is used");
 				assert.strictEqual(oArgs.layer, Layer.CUSTOMER, "then the correct layer");
 				assert.strictEqual(oArgs.contextBasedAdaptation, true, "then the correct contextBasedAdaptation flag is set");
+				assert.deepEqual(oWriteSpy.getCall(0).args[0].flexObjects, [], "Storage.write is called with an empty array");
 			}.bind(this));
 		});
 
 		QUnit.test("when a control and a layer were provided and a draft does not exists and no changes exist", function(assert) {
+			// this test needs a spy for Storage.write, so restore sandbox and set all beforeEach stubs again (except Storage.write)
+			sandbox.restore();
+			stubSettings(sandbox);
+			sandbox.stub(Utils, "getAppComponentForControl").returns(this.oAppComponent);
+			this.oOnAllChangesSavedStub = sandbox.stub(Versions, "onAllChangesSaved");
+
+			var oWriteSpy = sandbox.spy(Storage, "write");
+
 			sandbox.stub(Versions, "getVersionsModel").returns({
 				getProperty() {
 					return 1;
@@ -1200,18 +1217,19 @@ sap.ui.define([
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedVersions);
 			var oStorageCreateStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({ status: 201 });
 
-			return ContextBasedAdaptationsAPI.create(this.mPropertyBag).then(function(sResult) {
+			return ContextBasedAdaptationsAPI.create(this.mPropertyBag).then(function(oResult) {
 				var oArgs = oStorageCreateStub.getCall(0).args[0];
 				assert.strictEqual(oArgs.layer, Layer.CUSTOMER, "then the correct layer is used");
 				assert.strictEqual(oArgs.parentVersion, 1, "then the correct version is used");
 				assert.strictEqual(oArgs.appId, "com.sap.test.app", "then the correct reference is used");
-				assert.strictEqual(sResult, "Success", "the context-based adaptation is created");
+				assert.deepEqual(oResult.response, [], "the context-based adaptation is created");
 
 				assert.strictEqual(this.oOnAllChangesSavedStub.callCount, 1, "Versions.OnAllChangesSaved is called");
 				[oArgs] = this.oOnAllChangesSavedStub.getCall(0).args;
 				assert.strictEqual(oArgs.reference, "com.sap.test.app", "then the correct reference is used");
 				assert.strictEqual(oArgs.layer, Layer.CUSTOMER, "then the correct layer");
 				assert.strictEqual(oArgs.contextBasedAdaptation, true, "then the correct contextBasedAdaptation flag is set");
+				assert.deepEqual(oWriteSpy.getCall(0).args[0].flexObjects, [], "Storage.write is called with an empty array");
 			}.bind(this));
 		});
 	});

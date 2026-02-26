@@ -75,7 +75,7 @@ sap.ui.define([
 
 		const oP13nData = this.prepareAdaptationData(oPropertyHelper, (mItem, oProperty) => {
 
-			const oExistingSorter = mExistingSorters[oProperty.name];
+			const oExistingSorter = mExistingSorters[oProperty.key];
 
 			mItem.sorted = oExistingSorter ? true : false;
 			mItem.sortPosition = oExistingSorter ? oExistingSorter.position : -1;

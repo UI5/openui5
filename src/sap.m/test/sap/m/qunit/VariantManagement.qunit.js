@@ -8,8 +8,9 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/m/library",
-	"sap/ui/events/KeyCodes"
-], function(VariantItem, VariantManagement, Element, ContextSharingAPI, QUnitUtils, JSONModel, nextUIUpdate, mobileLibrary, KeyCodes) {
+	"sap/ui/events/KeyCodes",
+	"sap/ui/model/BindingMode"
+], function(VariantItem, VariantManagement, Element, ContextSharingAPI, QUnitUtils, JSONModel, nextUIUpdate, mobileLibrary, KeyCodes, BindingMode) {
 	"use strict";
 
 	// shortcut for sap.m.Sticky
@@ -59,14 +60,19 @@ sap.ui.define([
 		await nextUIUpdate();
 	};
 
-	var fChangeTitle = async function(oManagementTable, iRow, vValue) {
+	var fChangeTitle = async function(oManagementTable, iRow, vValue, bFocusOut) {
 		var aItems = oManagementTable.getItems();
 		var aCells = aItems[iRow].getCells();
 
 		var oInput = aCells[1];
 		oInput.focus();
-		oInput.setValue(vValue);
-		QUnitUtils.triggerEvent("input", oInput.getFocusDomRef());
+		oInput.$("inner").val(vValue);
+		if (bFocusOut) {
+			aCells[7].focus(); // delete button
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); // wait for the async setting of title
+		} else {
+			QUnitUtils.triggerKeydown(oInput.getFocusDomRef(), KeyCodes.ENTER);
+		}
 		await nextUIUpdate();
 	};
 
@@ -1269,7 +1275,7 @@ sap.ui.define([
 			await fChangeFavorite(this.oVM.oManagementTable, 3);
 
 			// 3nd row
-			await fChangeTitle(this.oVM.oManagementTable, 2, "newName2");
+			await fChangeTitle(this.oVM.oManagementTable, 2, "newName2", true);
 			await fChangeDelete(this.oVM.oManagementTable, 2);
 
 			aItems = this.oVM.oManagementTable.getItems();
@@ -1634,6 +1640,9 @@ sap.ui.define([
 			assert.ok(aCells, "expected cells found");
 			assert.equal(aCells[0].getSrc(), "sap-icon://favorite", "expected favorite icon found");
 			assert.ok(aCells[0].hasStyleClass("sapMVarMngmtFavNonInteractiveColor"), "should be inactive");
+			let oBinding = aCells[0].getBinding("src");
+			assert.ok(oBinding.getModel().isA("sap.ui.model.base.ManagedObjectModel"), "Icon bound to Managed Object Model");
+			assert.equal(oBinding.getBindingMode(), BindingMode.OneWay, "OneWay binding expected");
 
 			assert.ok(aCells[1].isA("sap.m.Input"),  "expected controltype found");
 			assert.equal(aCells[1].getValue(), "Title: One and One", "expected title found");
@@ -1643,6 +1652,11 @@ sap.ui.define([
 			assert.ok(!aCells[4].getSelected(), "expected apply automatically info found");
 			assert.equal(aCells[6].getText(), "Constant Author", "expected author found");
 			assert.ok(aItems[0].getVisible(), "expected visibility found");
+
+			oBinding = aCells[8].getBinding("text");
+			assert.equal(oBinding.getPath(), "variantKey", "Text bound to outer model");
+			assert.equal(oBinding.getModel(), oVariantsModel, "Text bound to outer model");
+			assert.equal(oBinding.getBindingMode(), BindingMode.OneWay, "OneWay binding expected");
 
 			aCells = aItems[1].getCells();
 			assert.ok(aCells, "expected cells found");
@@ -1717,8 +1731,10 @@ sap.ui.define([
 			assert.equal(aCells[0].getSrc(), "sap-icon://favorite", "expected favorite icon found");
 			assert.ok(aCells[0].hasStyleClass("sapMVarMngmtFavNonInteractiveColor"), "should be inactive");
 
-			const favoriteModel = aCells[0].getBinding("src").getModel();
+			const oBinding = aCells[0].getBinding("src");
+			const favoriteModel = oBinding.getModel();
 			assert.ok(favoriteModel.isA("sap.ui.model.base.ManagedObjectModel"), "expected Managed Object Model found");
+			assert.equal(oBinding.getBindingMode(), BindingMode.OneWay, "OneWay binding expected");
 
 			done();
 

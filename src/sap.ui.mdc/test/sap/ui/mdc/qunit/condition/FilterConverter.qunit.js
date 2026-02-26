@@ -317,7 +317,7 @@ sap.ui.define([
 				_getPropertyByName: (sFieldPath) => {
 					if (sFieldPath === "fieldPath1") {
 						return {
-							name: "fieldPath1",
+							key: "fieldPath1",
 							typeConfig: {typeInstance: oStringType}
 						};
 					}

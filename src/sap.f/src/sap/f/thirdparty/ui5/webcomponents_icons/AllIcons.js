@@ -1,26 +1,2 @@
-sap.ui.define(['require', 'exports', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/Theme'], (function (require, exports, Icons, Theme) { 'use strict';
-
-    const loadIconsBundle = async (collection) => {
-        let iconData;
-        if (collection === "SAP-icons-v5") {
-            iconData = (await new Promise(function (resolve, reject) { require([/* webpackChunkName: "ui5-webcomponents-sap-icons-v5" */ 'sap/f/thirdparty/_dynamics/SAP-icons'], resolve, reject); })).default;
-        }
-        else {
-            iconData = (await new Promise(function (resolve, reject) { require([/* webpackChunkName: "ui5-webcomponents-sap-icons-v4" */ 'sap/f/thirdparty/_dynamics/SAP-icons2'], resolve, reject); })).default;
-        }
-        if (typeof iconData === "string" && iconData.endsWith(".json")) {
-            throw new Error("[icons] Invalid bundling detected - dynamic JSON imports bundled as URLs. Switch to inlining JSON files from the build. Check the \"Assets\" documentation for more information.");
-        }
-        return iconData;
-    };
-    const registerLoaders = () => {
-        Icons.C("SAP-icons-v4", loadIconsBundle);
-        Icons.C("SAP-icons-v5", loadIconsBundle);
-    };
-    registerLoaders();
-
-    const __esModule = true ;
-
-    exports.__esModule = __esModule;
-
-}));
+sap.ui.define(["require","exports","sap/f/thirdparty/Icons","sap/f/thirdparty/Theme"],function(i,n,t,e){"use strict";const s=async n=>{let t;if(n==="SAP-icons-v5"){t=(await new Promise(function(n,t){i(["sap/f/thirdparty/_dynamics/SAP-icons"],n,t)})).default}else{t=(await new Promise(function(n,t){i(["sap/f/thirdparty/_dynamics/SAP-icons2"],n,t)})).default}if(typeof t==="string"&&t.endsWith(".json")){throw new Error('[icons] Invalid bundling detected - dynamic JSON imports bundled as URLs. Switch to inlining JSON files from the build. Check the "Assets" documentation for more information.')}return t};const o=()=>{t.C("SAP-icons-v4",s);t.C("SAP-icons-v5",s)};o();const r=true;n.__esModule=r});
+//# sourceMappingURL=AllIcons.js.map

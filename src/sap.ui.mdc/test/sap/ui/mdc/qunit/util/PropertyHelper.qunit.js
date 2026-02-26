@@ -167,7 +167,7 @@ sap.ui.define([
 
 		assert.throws(function() {
 			new PropertyHelper([{
-				name: undefined,
+				key: undefined,
 				label: "foo",
 				dataType: "String"
 			}]);
@@ -178,7 +178,7 @@ sap.ui.define([
 
 		assert.throws(function() {
 			new PropertyHelper([{
-				name: null,
+				key: null,
 				label: "foo",
 				dataType: "String"
 			}]);
@@ -224,11 +224,11 @@ sap.ui.define([
 	QUnit.test("Invalid values", function(assert) {
 		assert.throws(function() {
 			new PropertyHelper([{
-				name: true,
+				key: true,
 				dataType: "String",
 				label: "label"
 			}]);
-		}, new Error("Invalid property definition for property with key 'true': The value of 'name' is invalid."));
+		}, new Error("Invalid property definition for property with key 'true': The value of 'key' is invalid."));
 
 		assert.throws(function() {
 			new PropertyHelper([{
@@ -291,7 +291,7 @@ sap.ui.define([
 	QUnit.test("Invalid values for mandatory attributes", function(assert) {
 		assert.throws(function() {
 			new PropertyHelper([{
-				name: undefined,
+				key: undefined,
 				label: "bar",
 				dataType: "String"
 			}]);
@@ -302,7 +302,7 @@ sap.ui.define([
 
 		assert.throws(function() {
 			new PropertyHelper([{
-				name: null,
+				key: null,
 				label: "bar",
 				dataType: "String"
 			}]);
@@ -692,6 +692,9 @@ sap.ui.define([
 		}, new Error("Invalid property definition for property with key 'propB': Complex property contains invalid attribute 'foo.bar.propB'."));
 	});
 
+	/**
+	 * @deprecated As of version 1.121
+	 */
 	QUnit.test("legacyAlias for key attribute", function (assert) {
 		let oPropertyHelper = new PropertyHelper([{
 			key: "propA",
@@ -926,16 +929,18 @@ sap.ui.define([
 				tooltip: "",
 				exportSettings: {}
 			};
-			const aExpectedWithDefaults = aExpected.map(function(oProperty) {
-				// Consider legacyAlias for key
-				const oPropertyWithLegacyKey = {...oProperty, name: oProperty.name || oProperty.key};
-
+			let aExpectedWithDefaults = aExpected.map(function(oProperty) {
 				if ("propertyInfos" in oProperty) {
-					return Object.assign({}, mComplexDefaults, oPropertyWithLegacyKey);
+					return Object.assign({}, mComplexDefaults, oProperty);
 				}
 
-				return Object.assign({}, mSimpleDefaults, oPropertyWithLegacyKey);
+				return Object.assign({}, mSimpleDefaults, oProperty);
 			});
+
+			/**
+			 * @deprecated As of version 1.121
+			 */
+			aExpectedWithDefaults = aExpectedWithDefaults.map((oProperty) => ({...oProperty, name: oProperty.key || oProperty.key}));
 
 			assert.deepEqual(oPropertyHelper.getProperties(), aExpectedWithDefaults, sMessage || "Properties");
 		}
@@ -2114,12 +2119,10 @@ sap.ui.define([
 		const oPreparePropertySpy = sinon.spy();
 		const aProperties = [{
 			key: "prop",
-			name: "prop",
 			label: "Property",
 			dataType: "String"
 		}, {
 			key: "complexProp",
-			name: "complexProp",
 			label: "Complex property",
 			propertyInfos: ["prop"]
 		}];
@@ -2139,8 +2142,23 @@ sap.ui.define([
 		const oProperty = oMyPropertyHelper.getProperties()[0];
 
 		assert.equal(oPreparePropertySpy.callCount, 2, "#prepareProperty called twice");
-		assert.ok(oPreparePropertySpy.firstCall.calledWithExactly({...aProperties[0], name: aProperties[0].key}, {prop: aProperties[0], complexProp: aProperties[1]}), "Arguments of first #prepareProperty call");
-		assert.ok(oPreparePropertySpy.secondCall.calledWithExactly({...aProperties[1], name: aProperties[1].key}, {prop: oProperty, complexProp: aProperties[1]}), "Arguments of second #prepareProperty call");
+
+		const aExpectedFirstCallResult = [aProperties[0], {prop: aProperties[0], complexProp: aProperties[1]}];
+		const aExpectedSecondCallResult = [aProperties[1], {prop: oProperty, complexProp: aProperties[1]}];
+
+		/**
+		 * @deprecated As of version 1.121
+		 */
+		[aExpectedFirstCallResult, aExpectedSecondCallResult].forEach(function(aArgs) {
+			aArgs.forEach(function(oExpectedResult, index) {
+				if (oExpectedResult.key) {
+					oExpectedResult.name = oExpectedResult.key;
+				}
+			});
+		});
+
+		assert.ok(oPreparePropertySpy.firstCall.calledWithExactly.apply(oPreparePropertySpy, aExpectedFirstCallResult), "Arguments of first #prepareProperty call");
+		assert.ok(oPreparePropertySpy.secondCall.calledWithExactly.apply(oPreparePropertySpy, aExpectedSecondCallResult), "Arguments of second #prepareProperty call");
 		assert.deepEqual(oProperty.myAttribute, oCustomPropertyAttribute, "Attributes can be added");
 		assert.ok(Object.isFrozen(oProperty.myAttribute), "Added attributes are frozen");
 		assert.deepEqual(oProperty.myMethod(), "MyMethod", "Methods can be added");

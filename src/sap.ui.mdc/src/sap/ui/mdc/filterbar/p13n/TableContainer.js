@@ -69,7 +69,14 @@ sap.ui.define([
 		const oFilterBar = oControl._oFilterField.getParent();
 		const oProperty = oFilterBar._getPropertyByName(oControl._getFieldPath());
 		if (oProperty) {
-			this.mFilterItems[oProperty.name] = oControl;
+			/**
+			 * @deprecated As of version 1.121
+			 */
+			if ("name" in oProperty) {
+				this.mFilterItems[oProperty.name] = oControl;
+				return;
+			}
+			this.mFilterItems[oProperty.key] = oControl;
 		}
 	};
 

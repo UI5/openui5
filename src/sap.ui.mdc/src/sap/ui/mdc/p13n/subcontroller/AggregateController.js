@@ -78,7 +78,7 @@ sap.ui.define([
 		const mExistingAggregations = this.getCurrentState();
 
 		const oP13nData = this.prepareAdaptationData(oPropertyHelper, (mItem, oProperty) => {
-			const oExisting = mExistingAggregations[oProperty.name];
+			const oExisting = mExistingAggregations[oProperty.key];
 			mItem.aggregated = !!oExisting;
 			return oProperty.aggregatable;
 		});

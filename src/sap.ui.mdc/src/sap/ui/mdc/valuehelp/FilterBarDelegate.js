@@ -31,7 +31,7 @@ sap.ui.define([
 		}
 
 		return Promise.resolve([{
-			name: sSearchPath,
+			key: sSearchPath,
 			label: mdcMessageBundle.getText("filterbar.SEARCH"),
 			dataType: "sap.ui.model.type.String"
 		}]);

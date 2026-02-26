@@ -50,7 +50,7 @@ sap.ui.define([
 
         sinon.stub(this.oFilterBarBase, "_applyFilterConditionsChanges").returns(Promise.resolve());
         this.oFilterBarBase.initialized().then(function(){
-            sinon.stub(this.oFilterBarBase, "_getPropertyByName").returns({name: "key1", typeConfig: this.oFilterBarBase.getTypeMap().getTypeConfig("sap.ui.model.type.String")});
+            sinon.stub(this.oFilterBarBase, "_getPropertyByName").returns({key: "key1", typeConfig: this.oFilterBarBase.getTypeMap().getTypeConfig("sap.ui.model.type.String")});
 
             let oCurrentState = this.oFilterBarBase.getCurrentState();
 
@@ -82,7 +82,7 @@ sap.ui.define([
 
         this.oFilterBarBase.initialized().then(function(){
 
-            sinon.stub(this.oFilterBarBase, "_getPropertyByName").returns({name: "key1", typeConfig: this.oFilterBarBase.getTypeMap().getTypeConfig("sap.ui.model.type.String")});
+            sinon.stub(this.oFilterBarBase, "_getPropertyByName").returns({key: "key1", typeConfig: this.oFilterBarBase.getTypeMap().getTypeConfig("sap.ui.model.type.String")});
 
             this.oFilterBarBase._setXConditions(oDummyCondition)
             .then(function(){
@@ -547,7 +547,7 @@ sap.ui.define([
 
         const done = assert.async();
 
-        sinon.stub(this.oFilterBarBase, "_getPropertyByName").returns({name: "key1", typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String")});
+        sinon.stub(this.oFilterBarBase, "_getPropertyByName").returns({key: "key1", typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String")});
 
 		this.oFilterBarBase.initialized().then(function () {
             // --> this would happen during runtime through a change
@@ -625,7 +625,7 @@ sap.ui.define([
     });
 
     QUnit.test("Check sync of ConditionModel with filterConditions after change appliance", function(assert){
-        sinon.stub(this.oFilterBarBase, "_getPropertyByName").returns({name: "key1", typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String")});
+        sinon.stub(this.oFilterBarBase, "_getPropertyByName").returns({key: "key1", typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String")});
 
 		return this.oFilterBarBase.initialized().then(function () {
 
@@ -657,7 +657,7 @@ sap.ui.define([
 		//mock the missing typeConfig information
 		sinon.stub(this.oFilterBarBase, "_getPropertyByName").callsFake(function(sKey){
 			return {
-				name: sKey,
+				key: sKey,
 				typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String")
 			};
 		});
@@ -710,7 +710,7 @@ sap.ui.define([
 		//mock the missing typeConfig information
 		sinon.stub(this.oFilterBarBase, "_getPropertyByName").callsFake(function(sKey){
 			return {
-				name: sKey,
+				key: sKey,
 				typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String")
 			};
 		});
@@ -773,8 +773,8 @@ sap.ui.define([
         const done = assert.async();
 
 		const oStub = sinon.stub(this.oFilterBarBase, "_getPropertyByName");
-		oStub.withArgs("key1").returns({name: "key1", required: true, typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String"), constraints: {maxLength: 4}});
-		oStub.withArgs("key2").returns({name: "key2", required: true, typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String")});
+		oStub.withArgs("key1").returns({key: "key1", required: true, typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String"), constraints: {maxLength: 4}});
+		oStub.withArgs("key2").returns({key: "key2", required: true, typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String")});
 
 		sinon.stub(this.oFilterBarBase, "_getRequiredPropertyNames").returns(["key1", "key2"]);
 
@@ -986,7 +986,7 @@ sap.ui.define([
 
             sinon.stub(this.oFilterBarBase, "_getPropertyByName").callsFake(function(sPropertyName){
 				if (sPropertyName === "key1") {
-					return {name: "key1", typeConfig: this.oFilterBarBase.getTypeMap().getTypeConfig("sap.ui.model.type.String")};
+					return {key: "key1", typeConfig: this.oFilterBarBase.getTypeMap().getTypeConfig("sap.ui.model.type.String")};
 				} else {
 					return null;
 				}

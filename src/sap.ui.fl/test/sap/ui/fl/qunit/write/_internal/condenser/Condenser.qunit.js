@@ -1318,23 +1318,23 @@ sap.ui.define([
 			// to avoid a timing issue this has to be stubbed before the Table is loaded
 			sandbox.stub(TableDelegate, "fetchProperties").resolves([
 				{
-					name: "column0",
+					key: "column0",
 					label: "Column 0",
 					dataType: "String"
 				}, {
-					name: "column1",
+					key: "column1",
 					label: "Column 1",
 					dataType: "String"
 				}, {
-					name: "column2",
+					key: "column2",
 					label: "Column 2",
 					dataType: "String"
 				}, {
-					name: "column3",
+					key: "column3",
 					label: "Column 3",
 					dataType: "String"
 				}, {
-					name: "column4",
+					key: "column4",
 					label: "Column 4",
 					dataType: "String"
 				}

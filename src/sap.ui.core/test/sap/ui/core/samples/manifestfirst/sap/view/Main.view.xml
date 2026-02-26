@@ -1,6 +1,0 @@
-<mvc:View
-	xmlns="sap.m"
-	xmlns:mvc="sap.ui.core.mvc"
-	controllerName="samples.manifestfirst.sap.view.Main">
-	<Text id="text"></Text>
-</mvc:View>

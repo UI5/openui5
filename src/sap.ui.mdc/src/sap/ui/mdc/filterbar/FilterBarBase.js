@@ -442,19 +442,7 @@ sap.ui.define([
 			this._applySettings(mSettings, oScope);
 			Promise.all([this.awaitPropertyHelper()]).then(() => {
 				if (!this._bIsBeingDestroyed) {
-					if (PropertyInfoValidator._isValidationFeatureFlagEnabled) {
-						this._applyInitialFilterConditions().then(() => {
-							this.getFilterItems().forEach((oFilterField) => {
-								this._enhanceFilterField(oFilterField);
-							});
-
-							const oBasicSearchField = this.getBasicSearchField();
-							if (oBasicSearchField) {
-								this._enhanceBasicSearchField(oBasicSearchField);
-							}
-						});
-					} else {
-						this._applyInitialFilterConditions();
+					this._applyInitialFilterConditions().then(() => {
 						this.getFilterItems().forEach((oFilterField) => {
 							this._enhanceFilterField(oFilterField);
 						});
@@ -463,7 +451,7 @@ sap.ui.define([
 						if (oBasicSearchField) {
 							this._enhanceBasicSearchField(oBasicSearchField);
 						}
-					}
+					});
 				}
 			});
 		};
@@ -476,14 +464,12 @@ sap.ui.define([
 					/**
 					 * @deprecated As of version 1.121
 					 */
-					if (oPropertyInfo.name === sPropertyKey) {
-						return true;
+					if ("name" in oPropertyInfo) {
+						return oPropertyInfo.name === sPropertyKey;
 					}
-
 					return oPropertyInfo.key === sPropertyKey;
 				};
-				//if (sPropertyKey) {
-				if (sPropertyKey && (PropertyInfoValidator._isValidationFeatureFlagEnabled || aPropertyInfos.some(fnIsPropertyInfo))) {
+				if (sPropertyKey) {
 					const oPropertyInfo = aPropertyInfos.find(fnIsPropertyInfo);
 					PropertyInfoValidator.comparePropertyInfoWithControl(oFilterItem, oPropertyInfo);
 				}
@@ -1819,16 +1805,13 @@ sap.ui.define([
 
 				const oFilterFieldPropertyInfo = this._getPropertyByName(sPropertyKey, true);
 
-				if (PropertyInfoValidator._isValidationFeatureFlagEnabled) {
-					if (this._bHasMetadataPropertiesOnFilterFields && !PropertyInfoValidator.hasPropertiesOnControl(oFilterField)) {
-						// If any FilterField has explicitly set properties, this should be the case on all FilterFields
-						Log.warning("Filter field with the id = '" + oFilterField.getId() + "' has no metadata properties although another FilterField has.");
-					}
+				if (this._bHasMetadataPropertiesOnFilterFields && !PropertyInfoValidator.hasPropertiesOnControl(oFilterField)) {
+					// If any FilterField has explicitly set properties, this should be the case on all FilterFields
+					Log.warning("Filter field with the id = '" + oFilterField.getId() + "' has no metadata properties although another FilterField has.");
 				}
 
 				if (!oFilterFieldPropertyInfo) {
-					//if (!this.isA("sap.ui.mdc.valuehelp.FilterBar") && this._bHasMetadataPropertiesOnFilterFields && sPropertyKey !== "$search") { // vh.FB does not support 'propertyInfo'...
-					if (!this.isA("sap.ui.mdc.valuehelp.FilterBar") && (!PropertyInfoValidator._isValidationFeatureFlagEnabled || (this._bHasMetadataPropertiesOnFilterFields && sPropertyKey !== "$search"))) { // vh.FB does not support 'propertyInfo'...
+					if (!this.isA("sap.ui.mdc.valuehelp.FilterBar") && this._bHasMetadataPropertiesOnFilterFields && sPropertyKey !== "$search") { // vh.FB does not support 'propertyInfo'...
 						Log.warning("Property '" + sPropertyKey + "' does not exist for filter field with the id = '" + oFilterField.getId() + "' on filter bar='" + this.getId() + "'");
 					}
 					PropertyInfoValidator.checkMandatoryProperties(oFilterField);

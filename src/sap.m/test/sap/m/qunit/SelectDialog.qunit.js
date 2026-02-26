@@ -1491,7 +1491,9 @@ sap.ui.define([
 			};
 
 			this.stub(Device, "system").value(oSystem);
-			bindItems(this.oSelectDialog, {oData: this.mockupData, path: "/items", template: createTemplateListItem()});
+			this.oSelectDialog.addItem(new StandardListItem({title: "Item 1"}));
+			this.oSelectDialog.addItem(new StandardListItem({title: "Item 2"}));
+			this.oSelectDialog.addItem(new StandardListItem({title: "Item 3"}));
 
 			// Act
 			this.oSelectDialog.open();
@@ -1499,6 +1501,29 @@ sap.ui.define([
 
 			// Assert
 			assert.ok(this.oSelectDialog.getItems()[0].$().is(':focus'), 'The first item of the list should be focused');
+
+			// Clean up
+			this.oSelectDialog._oDialog.close();
+			this.clock.tick(350);
+		});
+
+		QUnit.test("Initial focus when there are items and selected item in the SelectDialog's list", function (assert) {
+			// Arrange
+			var oSystem = {
+				desktop: true,
+				phone: false,
+				tablet: false
+			};
+
+			this.stub(Device, "system").value(oSystem);
+			bindItems(this.oSelectDialog, {oData: this.mockupData, path: "/items", template: createTemplateListItem()});
+
+			// Act
+			this.oSelectDialog.open();
+			this.clock.tick(500);
+
+			// Assert
+			assert.ok(this.oSelectDialog.getItems()[7].$().is(':focus'), 'The selected item of the list should be focused');
 
 			// Clean up
 			this.oSelectDialog._oDialog.close();

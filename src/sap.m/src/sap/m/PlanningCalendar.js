@@ -2094,7 +2094,7 @@ sap.ui.define([
 						oAssociation.addDelegate(MONTH_DELEGATE, oAssociation);
 					}
 					if (!this._oCalendarWeeks) {
-							this._oCalendarWeeks = new WeeksRow(this.getId() + "-CalendarWeeksRow", {
+							this._oCalendarWeeks = new WeeksRow(this.getId() + "-WeekNumbersRow", {
 							startDate: this.getStartDate(),
 							primaryCalendarType: this.getPrimaryCalendarType(),
 							interval: iIntervals,
@@ -2145,7 +2145,7 @@ sap.ui.define([
 					oAssociation.addDelegate(YEAR_PICKER_DELEGATE, oAssociation);
 
 					if (!this._oCalendarWeeks) {
-						this._oCalendarWeeks = new WeeksRow(this.getId() + "-CalendarWeeksRow", {
+						this._oCalendarWeeks = new WeeksRow(this.getId() + "-WeekNumbersRow", {
 							startDate: this.getStartDate(),
 							primaryCalendarType: this.getPrimaryCalendarType(),
 							interval: iIntervals,

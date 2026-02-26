@@ -6,12 +6,14 @@
 sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
-	'sap/ui/core/ShortcutHintsMixin',
+	"sap/ui/core/ShortcutHintsMixin",
+	"sap/ui/dom/containsOrEquals",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/base/ManagedObjectModel",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	'sap/ui/base/ManagedObjectObserver',
+	"sap/ui/model/BindingMode",
+	"sap/ui/base/ManagedObjectObserver",
 	"sap/ui/Device",
 	"sap/ui/core/InvisibleText",
 	"sap/ui/core/Control",
@@ -41,21 +43,23 @@ sap.ui.define([
 	"sap/m/OverflowToolbar",
 	"sap/m/OverflowToolbarLayoutData",
 	"sap/m/VBox",
-	'sap/m/HBox',
+	"sap/m/HBox",
 	"sap/m/IllustratedMessage",
 	"sap/ui/events/KeyCodes",
-	'sap/base/Log',
+	"sap/base/Log",
 	"sap/ui/core/library",
-	'sap/base/util/merge',
+	"sap/base/util/merge",
 	"sap/m/library"
 ], function(
 	Element,
 	Library,
 	ShortcutHintsMixin,
+	containsOrEquals,
 	JSONModel,
 	ManagedObjectModel,
 	Filter,
 	FilterOperator,
+	BindingMode,
 	ManagedObjectObserver,
 	Device,
 	InvisibleText,
@@ -2325,14 +2329,18 @@ sap.ui.define([
 		const fnTemplateExtractBinding = (sProperty) => oItemsTemplate?.getBindingInfo(sProperty) ?? ({value: oItemsTemplate?.getProperty(sProperty)});
 
 		const fnCreateBinding = (sProperty) => {
+			// use OneWay Binding to not update text and flags via Model but using the explicit event handlers. (fl-VariantModel is alwqays OneWay per default)
 			if (fnPropertyIsInTemplate(sProperty)) {
 				let oBindingCopy = merge({}, fnTemplateExtractBinding(sProperty));
 				if (!oBindingCopy.parts) {
 					oBindingCopy = {parts: [merge({}, oBindingCopy)]};
 				}
+				oBindingCopy.parts.forEach((oPart) => {
+					oPart.mode = BindingMode.OneWay;
+				});
 				return oBindingCopy;
 			} else {
-				return {parts: [{path: sProperty, model: this._sModelName}]};
+				return {parts: [{path: sProperty, model: this._sModelName, mode: BindingMode.OneWay}]};
 			}
 		};
 
@@ -2345,10 +2353,23 @@ sap.ui.define([
 		}.bind(this);
 
 		const fChange = function(oEvent) {
-			const oContext = oEvent.oSource.getBindingContext(sModelName);
+			const oInput = oEvent.getSource();
+			const oContext = oInput.getBindingContext(sModelName);
 			const oItem = this._findVariantItem(oContext);
-			oItem.setTitle(oEvent.oSource.getValue());
-			this._handleManageTitleChange(oEvent.oSource, oItem);
+			const oRow = oInput.getParent();
+
+			if (sModelName === "$mVariants" && Element.getActiveElement() !== oInput && containsOrEquals(oRow.getDomRef(), document.activeElement)) {
+				// if ManagedObjectModel used, all Bindings are updated on changing title of an item.
+				// set it async to allow to finish the triggering browser event (e.g. Click on delete button) if anoter control of the row is focussed
+				setTimeout(() => {
+					oItem.setTitle(oInput.getValue());
+					this._handleManageTitleChange(oInput, oItem);
+				}, 100); // 100 beacuse otherwise tab-event on delete button will be later
+			} else {
+				oItem.setTitle(oInput.getValue());
+				this._handleManageTitleChange(oInput, oItem);
+			}
+
 		}.bind(this);
 
 		const fSelectRB = function(oEvent) {

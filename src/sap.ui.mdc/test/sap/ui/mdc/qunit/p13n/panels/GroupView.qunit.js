@@ -13,32 +13,32 @@ sap.ui.define([
 
 	const aInfoData = [
 		{
-			name: "key1",
+			key: "key1",
 			label: "Field 1",
 			group: "G1"
 		},
 		{
-			name: "key2",
+			key: "key2",
 			label: "Field 2",
 			group: "G1"
 		},
 		{
-			name: "key3",
+			key: "key3",
 			label: "Field 3",
 			group: "G1"
 		},
 		{
-			name: "key4",
+			key: "key4",
 			label: "Field 4",
 			group: "G2"
 		},
 		{
-			name: "key5",
+			key: "key5",
 			label: "Field 5",
 			group: "G2"
 		},
 		{
-			name: "key6",
+			key: "key6",
 			label: "Field 6",
 			group: "G2",
 			tooltip: "Some Tooltip"
@@ -55,10 +55,10 @@ sap.ui.define([
 			});
 
 			const fnEnhancer = function(mItem, oProperty) {
-				if (oProperty.name == "key2") {
+				if (oProperty.key == "key2") {
 					mItem.active = true;
 				}
-				mItem.visible = aVisible.indexOf(oProperty.name) > -1;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
 				return true;
 			};
 			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, fnEnhancer, true);

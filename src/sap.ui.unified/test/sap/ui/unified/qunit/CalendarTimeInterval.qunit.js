@@ -619,7 +619,7 @@ sap.ui.define([
 		// Assert
 		assert.ok(this.oCal1.getAggregation("weeksRow").getVisible(), "Calendar1: WeeksRow is visible when day picker is shown");
 
-		var oCal1WeeksRow = document.querySelector("#Cal1-WeeksRow");
+		var oCal1WeeksRow = document.querySelector("#Cal1-WeekNumbersRow");
 		assert.ok(oCal1WeeksRow && window.getComputedStyle(oCal1WeeksRow).display !== "none", "Calendar1: WeeksRow is rendered as visible");
 
 		// Act - open day picker for Cal2
@@ -629,7 +629,7 @@ sap.ui.define([
 		// Assert
 		assert.ok(this.oCal2.getAggregation("weeksRow").getVisible(), "Calendar2: WeeksRow is visible when day picker is shown");
 
-		var oCal2WeeksRow = document.querySelector("#Cal2-WeeksRow");
+		var oCal2WeeksRow = document.querySelector("#Cal2-WeekNumbersRow");
 		assert.ok(oCal2WeeksRow && window.getComputedStyle(oCal2WeeksRow).display !== "none", "Calendar2: WeeksRow is rendered as visible");
 	});
 
@@ -646,7 +646,7 @@ sap.ui.define([
 		// Assert
 		assert.notOk(this.oCal1.getAggregation("weeksRow").getVisible(), "Calendar1: WeeksRow is hidden when month picker is shown");
 
-		var oCal1WeeksRow = document.querySelector("#Cal1-WeeksRow");
+		var oCal1WeeksRow = document.querySelector("#Cal1-WeekNumbersRow");
 		assert.notOk(oCal1WeeksRow && window.getComputedStyle(oCal1WeeksRow).display !== "none", "Calendar1: WeeksRow is not rendered as visible");
 	});
 
@@ -663,7 +663,7 @@ sap.ui.define([
 		// Assert
 		assert.notOk(this.oCal2.getAggregation("weeksRow").getVisible(), "Calendar2: WeeksRow is hidden when year picker is shown");
 
-		var oCal2WeeksRow = document.querySelector("#Cal2-WeeksRow");
+		var oCal2WeeksRow = document.querySelector("#Cal2-WeekNumbersRow");
 		assert.notOk(oCal2WeeksRow && window.getComputedStyle(oCal2WeeksRow).display !== "none", "Calendar2: WeeksRow is not rendered as visible");
 	});
 
@@ -680,7 +680,7 @@ sap.ui.define([
 		// Assert
 		assert.notOk(this.oCal1.getAggregation("weeksRow").getVisible(), "Calendar1: WeeksRow is hidden when returning to time picker");
 
-		var oCal1WeeksRow = document.querySelector("#Cal1-WeeksRow");
+		var oCal1WeeksRow = document.querySelector("#Cal1-WeekNumbersRow");
 		assert.notOk(oCal1WeeksRow && window.getComputedStyle(oCal1WeeksRow).display !== "none", "Calendar1: WeeksRow is not rendered as visible");
 	});
 
@@ -690,13 +690,72 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// Assert
-		var oWeeksRowElement = document.querySelector("#Cal1-WeeksRow");
-		assert.ok(oWeeksRowElement, "Calendar1: WeeksRow element exists in DOM");
-		assert.ok(oWeeksRowElement.classList.contains("sapUiCalWeeksRow"), "Calendar1: WeeksRow has correct CSS class");
+		var oWeeksRowElement = document.querySelector("#Cal1-WeekNumbersRow");
+		assert.ok(oWeeksRowElement, "Calendar1: WeekNumbersRow element exists in DOM");
+		assert.ok(oWeeksRowElement.classList.contains("sapUiCalWeeksRow"), "Calendar1: WeekNumbersRow has correct CSS class");
 
 		// Check that week numbers container is present
 		var oWeeksContainer = oWeeksRowElement.querySelector(".sapUiCalRowWeekNumbers");
 		assert.ok(oWeeksContainer, "Calendar1: Week numbers container exists");
+	});
+
+	QUnit.test("Time cells have correct aria-describedby with week numbers", async function(assert) {
+		// Prepare - CalendarTimeInterval with week numbers enabled
+		const oCal = new CalendarTimeInterval("CalTimeWithWeeks", {
+			startDate: UI5Date.getInstance(2015, 0, 1, 8, 0, 0), // Thursday, Jan 1, 2015, 8:00 AM
+			items: 12,
+			intervalMinutes: 60,
+			showWeekNumbers: true
+		});
+		oCal.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// First, we need to open the day picker to activate week numbers
+		qutils.triggerEvent("click", "CalTimeWithWeeks--Head-B0");
+		await nextUIUpdate();
+
+		// Act - get all day cells and collect all week-related aria-describedby IDs
+		const $Calendar = Element.getElementById("CalTimeWithWeeks").getDomRef();
+		const aDays = $Calendar.querySelectorAll(".sapUiCalItem");
+		const aAllWeekNumberIds = new Set();
+
+		// Assert
+		assert.ok(aDays.length > 0, "Days are rendered in calendar picker");
+
+		// Iterate through all day cells to collect week number references
+		for (let i = 0; i < aDays.length; i++) {
+			const sAriaDescribedBy = aDays[i].getAttribute("aria-describedby");
+
+			if (sAriaDescribedBy) {
+				const aDescribedByIds = sAriaDescribedBy.split(" ");
+
+				for (let j = 0; j < aDescribedByIds.length; j++) {
+					const sId = aDescribedByIds[j];
+					// Check if this ID references a week number element
+					if (sId.includes("CalTimeWithWeeks-WeekNumbersRow-week-") && sId.includes("-text")) {
+						aAllWeekNumberIds.add(sId);
+					}
+				}
+			}
+		}
+		// Verify we found week number references
+		assert.ok(aAllWeekNumberIds.size > 0, "Week number IDs were found in aria-describedby attributes (found " + aAllWeekNumberIds.size + " unique week(s))");
+
+		// Verify each referenced week number element exists in the DOM
+		const aWeekNumberIdsArray = Array.from(aAllWeekNumberIds);
+		for (let k = 0; k < aWeekNumberIdsArray.length; k++) {
+			const sWeekId = aWeekNumberIdsArray[k];
+			const oElement = document.getElementById(sWeekId);
+			assert.ok(oElement, "Week number element with ID '" + sWeekId + "' exists in the DOM");
+
+			// Additionally verify it has the expected content
+			if (oElement) {
+				assert.ok(oElement.textContent.length > 0, "Week number element '" + sWeekId + "' has text content: '" + oElement.textContent + "'");
+			}
+		}
+
+		// Clean up
+		oCal.destroy();
 	});
 
 	QUnit.module("Month Picker", {

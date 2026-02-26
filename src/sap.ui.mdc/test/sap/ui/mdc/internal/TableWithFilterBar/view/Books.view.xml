@@ -48,13 +48,13 @@
 					<mdc:FilterBar id="booksFilterBar" variantBackreference="IDVariantManagementOfTable"
 						filtersChanged="onFiltersChanged" search="onSearch"
 						filterConditions='\{"stock" : [\{"operator":"BT","values":[100,50000]}]\}'
-						propertyInfo='[\{"name": "stock", "dataType":"Edm.Int32", "maxConditions": 1, "required": false, "label": "Stock range", "group": "CatalogService.Books", "groupLabel": "Books"\},
-						               \{"name": "author_ID", "dataType":"Edm.Int32", "required":false, "label":"Author ID", "formatOptions":\{"groupingEnabled":false\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
-									   \{"name": "title", "dataType":"Edm.String", "required":false, "label":"Title", "constraints": \{"maxLength": 1111\}, "caseSensitive": false, "group": "CatalogService.Books", "groupLabel": "Books"\},
-									   \{"name": "published", "dataType":"Edm.Date", "maxConditions": -1, "required":false, "label":"Published", "group": "CatalogService.Books", "groupLabel": "Books"\},
-									   \{"name": "language_code", "dataType":"Edm.String", "maxConditions": 1, "required":false, "label":"Language", "constraints": \{"nullable": false, "maxLength": 3\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
-									   \{"name": "genre_code", "dataType":"Edm.String", "maxConditions": -1, "required":false, "label":"Genre", "constraints": \{"maxLength": 1111\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
-									   \{"name": "subgenre_code", "dataType":"Edm.String", "maxConditions": -1, "required":false, "label":"Sub Genre", "constraints": \{"maxLength": 1111\}, "group": "CatalogService.Books", "groupLabel": "Books"\}
+						propertyInfo='[\{"key": "stock", "dataType":"Edm.Int32", "maxConditions": 1, "required": false, "label": "Stock range", "group": "CatalogService.Books", "groupLabel": "Books"\},
+						               \{"key": "author_ID", "dataType":"Edm.Int32", "required":false, "label":"Author ID", "formatOptions":\{"groupingEnabled":false\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
+									   \{"key": "title", "dataType":"Edm.String", "required":false, "label":"Title", "constraints": \{"maxLength": 1111\}, "caseSensitive": false, "group": "CatalogService.Books", "groupLabel": "Books"\},
+									   \{"key": "published", "dataType":"Edm.Date", "maxConditions": -1, "required":false, "label":"Published", "group": "CatalogService.Books", "groupLabel": "Books"\},
+									   \{"key": "language_code", "dataType":"Edm.String", "maxConditions": 1, "required":false, "label":"Language", "constraints": \{"nullable": false, "maxLength": 3\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
+									   \{"key": "genre_code", "dataType":"Edm.String", "maxConditions": -1, "required":false, "label":"Genre", "constraints": \{"maxLength": 1111\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
+									   \{"key": "subgenre_code", "dataType":"Edm.String", "maxConditions": -1, "required":false, "label":"Sub Genre", "constraints": \{"maxLength": 1111\}, "group": "CatalogService.Books", "groupLabel": "Books"\}
 									]'
 						liveMode="false"
 						delegate='\{"name": "sap/ui/v4demo/delegate/Books.FB.delegate", "payload": \{"collectionName": "Books"\}\}'
@@ -887,7 +887,7 @@
 						\{ "key": "averagemetricsWords", "label": "Words (average)", "dataType": "Edm.Int32", "role": "axis1", "path": "metricsWords", "groupable": false, "aggregatable": true \}
 					]'
 				>
-					<!-- sortConditions="{sorters: [{key: 'author_ID', name: 'author_ID', descending: false}]}"
+					<!-- sortConditions="{sorters: [{key: 'author_ID', descending: false}]}"
 					filterConditions='\{"author_ID" : [\{"operator":"EQ","values":[101]}]\}' -->
 					<mdc:selectionDetailsActions>
 						<mdcc:SelectionDetailsActions>

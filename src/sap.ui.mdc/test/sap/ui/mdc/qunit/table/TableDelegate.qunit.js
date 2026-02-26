@@ -79,19 +79,19 @@ sap.ui.define([
 					payload: {
 						collectionPath: "/foo",
 						propertyInfo: [{
-							name: "Name",
+							key: "Name",
 							path: "Name_Path",
 							label: "Name_Label",
 							sortable: true,
 							dataType: "String"
 						}, {
-							name: "FirstName",
+							key: "FirstName",
 							path: "FirstName_Path",
 							label: "FirstName_Label",
 							sortable: true,
 							dataType: "String"
 						}, {
-							name: "ID",
+							key: "ID",
 							path: "ID_Path",
 							label: "ID_Label",
 							sortable: true,
@@ -299,7 +299,7 @@ sap.ui.define([
 					payload: {
 						collectionPath: "/",
 						propertyInfo: [{
-							name: "Name",
+							key: "Name",
 							path: "Name_Path",
 							label: "Name_Label",
 							dataType: "String"
@@ -698,7 +698,7 @@ sap.ui.define([
 					payload: {
 						collectionPath: "/foo",
 						propertyInfo: [{
-							name: "Name",
+							key: "Name",
 							path: "Name_Path",
 							label: "Name_Label",
 							dataType: "String"

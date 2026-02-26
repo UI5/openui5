@@ -66,7 +66,7 @@ sap.ui.define([
 
 			this.aPropertyInfo = [
 				{
-					name: "test"
+					key: "test"
 				}
 			];
 

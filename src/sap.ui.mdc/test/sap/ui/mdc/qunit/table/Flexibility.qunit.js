@@ -46,19 +46,19 @@ sap.ui.define([
 
 	TestTableDelegate.fetchProperties = function() {
 		return Promise.resolve([{
-			name: "column0",
+			key: "column0",
 			label: "column0",
 			dataType: "String"
 		}, {
-			name: "column1",
+			key: "column1",
 			label: "column1",
 			dataType: "String"
 		}, {
-			name: "column2",
+			key: "column2",
 			label: "column2",
 			dataType: "String"
 		}, {
-			name: "column3",
+			key: "column3",
 			label: "column3",
 			dataType: "String"
 		}]);

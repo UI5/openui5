@@ -370,7 +370,7 @@ sap.ui.define([
 			}
 		});
 
-		sinon.stub(oFB, "_getPropertyByName").returns({ name: "fieldPath1", typeConfig: ODataTypeMap.getTypeConfig("sap.ui.model.type.String") });
+		sinon.stub(oFB, "_getPropertyByName").returns({ key: "fieldPath1", typeConfig: ODataTypeMap.getTypeConfig("sap.ui.model.type.String") });
 		sinon.spy(oFB, "_applyInitialFilterConditions");
 		sinon.stub(oFB, "awaitPropertyHelper").returns(Promise.resolve());
 
@@ -471,19 +471,19 @@ sap.ui.define([
 		Localization.setLanguage("EN");
 
 		const oProperty = {
-			name: "fieldPath1",
+			key: "fieldPath1",
 			label: "Field Path",
 			dataType: "sap.ui.model.type.String",
 			visible: true
 		};
 		const oProperty2 = {
-			name: "fieldPath2",
+			key: "fieldPath2",
 			label: "Field Path2",
 			dataType: "sap.ui.model.type.String",
 			visible: true
 		};
 		const oProperty3 = {
-			name: "$search",
+			key: "$search",
 			label: "",
 			dataType: "sap.ui.model.type.String",
 			visible: true
@@ -525,7 +525,7 @@ sap.ui.define([
 			assert.ok(oFilterBar.getControlDelegate());
 			sinon.stub(oFilterBar.getControlDelegate(), "fetchProperties").returns(Promise.resolve([oProperty, oProperty2, oProperty3]));
 
-			const oPromise = oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty2.name);
+			const oPromise = oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty2.key);
 
 			oPromise.then(function(oFilterField) {
 
@@ -601,14 +601,14 @@ sap.ui.define([
 
 	QUnit.test("check _getNonHiddenPropertyByName ", function(assert) {
 		const oProperty1 = {
-			name: "key1",
+			key: "key1",
 			label: "Key1",
 			dataType: "Edm.String",
 			visible: true
 		};
 
 		const oProperty2 = {
-			name: "key2",
+			key: "key2",
 			label: "Key2",
 			hiddenFilter: true,
 			visible: true
@@ -651,7 +651,7 @@ sap.ui.define([
 		this.destroyTestObjects();
 
 		const aPropertyInfo = [{
-			name: "key",
+			key: "key",
 			typeConfig: ODataTypeMap.getTypeConfig("sap.ui.model.type.String"),
 			visible: true
 		}];
@@ -708,12 +708,12 @@ sap.ui.define([
 		const done = assert.async();
 
 		const aPropertyInfo = [{
-			name: "key",
+			key: "key",
 			maxConditions: 1,
 			visible: true,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}, {
-			name: "in",
+			key: "in",
 			visible: true,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}];
@@ -759,7 +759,7 @@ sap.ui.define([
 	QUnit.test("create multi valued change", function(assert) {
 
 		const aPropertyInfo = [{
-			name: "key",
+			key: "key",
 			maxConditions: -1,
 			visible: true,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
@@ -825,7 +825,7 @@ sap.ui.define([
 		const done = assert.async();
 
 		const aPropertyInfo = [{
-			name: "key",
+			key: "key",
 			maxConditions: -11,
 			visible: true,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
@@ -881,16 +881,16 @@ sap.ui.define([
 	QUnit.test("create multi valued change with inParameters", function(assert) {
 
 		const aPropertyInfo = [{
-			name: "key",
+			key: "key",
 			maxConditions: -1,
 			visible: true,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}, {
-			name: "in1",
+			key: "in1",
 			visible: true,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}, {
-			name: "in2",
+			key: "in2",
 			visible: true,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}];
@@ -959,14 +959,14 @@ sap.ui.define([
 	QUnit.test("check filterItems observer", function(assert) {
 
 		const oProperty1 = {
-			name: "key1",
+			key: "key1",
 			label: "label 1",
 			dataType: "Edm.String",
 			constraints: { maxLength: 40 },
 			visible: true
 		};
 		const oProperty2 = {
-			name: "key2",
+			key: "key2",
 			label: "label 2",
 			dataType: "Edm.String",
 			constraints: { maxLength: 40 },
@@ -987,8 +987,8 @@ sap.ui.define([
 			assert.ok(oFilterBar.getControlDelegate());
 			sinon.stub(oFilterBar.getControlDelegate(), "fetchProperties").returns(Promise.resolve([oProperty1, oProperty2]));
 
-			aPromise.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty1.name));
-			aPromise.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty2.name));
+			aPromise.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty1.key));
+			aPromise.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty2.key));
 
 			Promise.all(aPromise).then(function(aFilterFields) {
 
@@ -1015,14 +1015,14 @@ sap.ui.define([
 	QUnit.test("check filterItems observer with simulated adapation filterbar", function(assert) {
 
 		const oProperty1 = {
-			name: "key1",
+			key: "key1",
 			label: "label 1",
 			dataType: "Edm.String",
 			constraints: { maxLength: 40 },
 			visible: true
 		};
 		const oProperty2 = {
-			name: "key2",
+			key: "key2",
 			label: "label 2",
 			dataType: "Edm.String",
 			constraints: { maxLength: 40 },
@@ -1046,8 +1046,8 @@ sap.ui.define([
 			oFilterBar._aAddedFilterFields = [];
 			oFilterBar._aRemovedFilterFields = [];
 
-			aPromise.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty1.name));
-			aPromise.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty2.name));
+			aPromise.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty1.key));
+			aPromise.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty2.key));
 
 			Promise.all(aPromise).then(function(aFilterFields) {
 
@@ -1107,13 +1107,13 @@ sap.ui.define([
 
 	QUnit.test("check properties based on filterItems", function(assert) {
 		const oProperty1 = {
-			name: "key1",
+			key: "key1",
 			label: "Key1",
 			dataType: "Edm.String",
 			constraints: { maxLength: 40 }
 		};
 		const oProperty2 = {
-			name: "key3",
+			key: "key3",
 			label: "label",
 			dataType: "Edm.String"
 		};
@@ -1141,7 +1141,7 @@ sap.ui.define([
 			assert.ok(aProperties);
 			assert.equal(aProperties.length, 2);
 			assert.deepEqual(aProperties[0]?.constraints, { maxLength: 40 }, "given Property used"); // to check given properties are used, nor defaluts of test-delegate
-			assert.deepEqual(aProperties[1]?.name, "key3", "given Property used");
+			assert.deepEqual(aProperties[1]?.key, "key3", "given Property used");
 
 			oFB.destroy();
 			FBTestDelegate.fetchProperties.restore();
@@ -1218,18 +1218,18 @@ sap.ui.define([
 		const done = assert.async();
 
 		const oProperty1 = {
-			name: "field1",
+			key: "field1",
 			label: "A",
 			dataType: "Edm.String",
 			constraints: { maxLength: 40 }
 		};
 		const oProperty2 = {
-			name: "field2",
+			key: "field2",
 			label: "B",
 			dataType: "Edm.String"
 		};
 		const oProperty3 = {
-			name: "field3",
+			key: "field3",
 			label: "C",
 			dataType: "Edm.String"
 		};
@@ -1250,11 +1250,11 @@ sap.ui.define([
 					const oAdaptFiltersPanel = oP13nContainer.getPanels()[0];
 					const aPanelItems = oAdaptFiltersPanel.getP13nData().items;
 					assert.equal(aPanelItems.length, 3, "correct amount of p13n items has been created by FilterBar");
-					assert.equal(aPanelItems[0].name, "field1", "correct field created in panel");
+					assert.equal(aPanelItems[0].key, "field1", "correct field created in panel");
 					assert.equal(aPanelItems[0].label, "A", "correct label for field created in panel");
-					assert.equal(aPanelItems[1].name, "field2", "correct field created in panel");
+					assert.equal(aPanelItems[1].key, "field2", "correct field created in panel");
 					assert.equal(aPanelItems[1].label, "B", "correct label for field created in panel");
-					assert.equal(aPanelItems[2].name, "field3", "correct field created in panel");
+					assert.equal(aPanelItems[2].key, "field3", "correct field created in panel");
 					assert.equal(aPanelItems[2].label, "C", "correct label for field created in panel");
 
 					oFilterBar.getControlDelegate().fetchProperties.restore();
@@ -1269,14 +1269,14 @@ sap.ui.define([
 	QUnit.test("check filter operators", function(assert) {
 
 		const oProperty1 = {
-			name: "key1",
+			key: "key1",
 			label: "Key1",
 			dataType: "sap.ui.model.odata.type.String",
 			filterOperators: [OperatorName.EQ, OperatorName.StartsWith],
 			visible: true
 		};
 		const oProperty2 = {
-			name: "key2",
+			key: "key2",
 			label: "Key2",
 			dataType: "sap.ui.model.odata.type.String",
 			visible: true
@@ -1292,8 +1292,8 @@ sap.ui.define([
 			assert.ok(oFilterBar.getControlDelegate());
 			sinon.stub(oFilterBar.getControlDelegate(), "fetchProperties").returns(Promise.resolve([oProperty1, oProperty2]));
 
-			aPromises.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty1.name));
-			aPromises.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty2.name));
+			aPromises.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty1.key));
+			aPromises.push(oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty2.key));
 
 			Promise.all(aPromises).then(function(aFilterFields) {
 
@@ -1317,31 +1317,31 @@ sap.ui.define([
 	QUnit.test("check getAssignedFilterNames", function(assert) {
 
 		const oProperty1 = {
-			name: "key1",
+			key: "key1",
 			visible: true
 		};
 		const oProperty2 = {
-			name: "key2",
+			key: "key2",
 			visible: true
 		};
 		const oProperty3 = {
-			name: "key3",
+			key: "key3",
 			visible: true
 		};
 		const oProperty4 = {
-			name: "key4",
+			key: "key4",
 			visible: true
 		};
 		const oProperty5 = {
-			name: "key5",
+			key: "key5",
 			visible: true
 		};
 		const oProperty6 = {
-			name: "key6",
+			key: "key6",
 			visible: true
 		};
 		const oProperty7 = {
-			name: "key7",
+			key: "key7",
 			visible: true,
 			hiddenFilter: true
 		};
@@ -1361,9 +1361,9 @@ sap.ui.define([
 		let aNames = oFilterBar.getAssignedFilterNames();
 		assert.ok(aNames);
 		assert.equal(aNames.length, 3);
-		assert.equal(aNames[0], oProperty1.name);
-		assert.equal(aNames[1], oProperty2.name);
-		assert.equal(aNames[2], oProperty6.name);
+		assert.equal(aNames[0], oProperty1.key);
+		assert.equal(aNames[1], oProperty2.key);
+		assert.equal(aNames[2], oProperty6.key);
 
 		oFilterBar.getPropertyInfoSet.restore();
 		sinon.stub(oFilterBar, "getPropertyInfoSet").returns([oProperty7, oProperty6, oProperty5, oProperty4, oProperty3, oProperty2, oProperty1]);
@@ -1372,9 +1372,9 @@ sap.ui.define([
 		assert.ok(aNames);
 		assert.equal(aNames.length, 4);
 		assert.equal(aNames[0], "Search Terms");
-		assert.equal(aNames[1], oProperty6.name);
-		assert.equal(aNames[2], oProperty2.name);
-		assert.equal(aNames[3], oProperty1.name);
+		assert.equal(aNames[1], oProperty6.key);
+		assert.equal(aNames[2], oProperty2.key);
+		assert.equal(aNames[3], oProperty1.key);
 
 		Localization.setLanguage(sLanguage);
 	});
@@ -1421,7 +1421,7 @@ sap.ui.define([
 	QUnit.test("PropertyInfo with display property", function(assert) {
 
 		const oProperty = {
-			name: "key",
+			key: "key",
 			dataType: "Edm.String",
 			display: "Description"
 		};
@@ -1443,7 +1443,7 @@ sap.ui.define([
 			assert.ok(oFilterBar.getControlDelegate());
 			sinon.stub(oFilterBar.getControlDelegate(), "fetchProperties").returns(Promise.resolve([oProperty]));
 
-			const oPromise = oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty.name);
+			const oPromise = oFilterBar.getControlDelegate().addItem(oFilterBar, oProperty.key);
 
 			oPromise.then(function(oFilterField) {
 				assert.ok(oFilterField.getDisplay(), oProperty.display);
@@ -1595,7 +1595,7 @@ sap.ui.define([
 
 	QUnit.test("check _stringifyConditions", function(assert) {
 		const oProperty = {
-			name: "test",
+			key: "test",
 			typeConfig: ODataTypeMap.getTypeConfig("sap.ui.model.type.String")
 		};
 		sinon.stub(oFilterBar, "getTypeMap").returns(ODataTypeMap);
@@ -1677,8 +1677,6 @@ sap.ui.define([
 			this.oErrorSpy = sinon.spy(Log, "error");
 			this.oWarningSpy = sinon.spy(Log, "warning");
 			this.oApplySettingsSpy = sinon.spy(FilterBar.prototype, "applySettings");
-
-			PropertyInfoValidator._isValidationFeatureFlagEnabled = true;
 
 			this.oFB = null;
 

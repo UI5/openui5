@@ -2,32 +2,34 @@
 
 sap.ui.define([
 	"qunit/RtaQunitUtils",
+	"sap/base/Log",
 	"sap/ui/core/Element",
-	"sap/ui/Device",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/LayerUtils",
-	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/command/Stack",
 	"sap/ui/rta/RuntimeAuthoring",
-	"sap/ui/thirdparty/sinon-4"
+	"sap/ui/thirdparty/sinon-4",
+	"sap/ui/Device"
 ], function(
 	RtaQunitUtils,
+	Log,
 	Element,
-	Device,
 	OverlayRegistry,
 	KeyCodes,
 	Layer,
 	LayerUtils,
-	QUnitUtils,
 	nextUIUpdate,
+	QUnitUtils,
 	CommandFactory,
 	Stack,
 	RuntimeAuthoring,
-	sinon
+	sinon,
+	Device
 ) {
 	"use strict";
 
@@ -51,7 +53,7 @@ sap.ui.define([
 		before() {
 			return oComponentPromise;
 		},
-		beforeEach() {
+		beforeEach(assert) {
 			this.oField = Element.getElementById("Comp1---idMain1--GeneralLedgerDocument.CompanyCode");
 			this.oGroup = Element.getElementById("Comp1---idMain1--Dates");
 			this.oForm = Element.getElementById("Comp1---idMain1--MainForm");
@@ -65,6 +67,11 @@ sap.ui.define([
 
 			return RtaQunitUtils.clear()
 			.then(this.oRta.start.bind(this.oRta)).then(function() {
+				// Track test instability issues - RTA Status
+				assert.strictEqual(this.oRta._sStatus, "STARTED", "then RTA is started");
+				Object.keys(this.oRta._mStartStatus).forEach(function(sKey) {
+					assert.strictEqual(this.oRta._mStartStatus[sKey], true, `then ${sKey} is true`);
+				}.bind(this));
 				this.oFieldOverlay = OverlayRegistry.getOverlay(this.oField);
 				this.oGroupOverlay = OverlayRegistry.getOverlay(this.oGroup);
 			}.bind(this));
@@ -85,6 +92,26 @@ sap.ui.define([
 			assert.strictEqual(this.oRta.canUndo(), false, "initially no undo is possible");
 			assert.strictEqual(this.oRta.canRedo(), false, "initially no redo is possible");
 
+			// Track test instability issues - "getDesignTimeMetadata of undefined" error
+			assert.ok(this.oGroupOverlay, "then the overlay for the group element is available");
+			if (!this.oGroupOverlay) {
+				// Track test instability issues - RTA Status
+				assert.strictEqual(this.oRta._sStatus, "STARTED", "then RTA is started");
+				Object.keys(this.oRta._mStartStatus).forEach(function(sKey) {
+					assert.strictEqual(this.oRta._mStartStatus[sKey], true, `then ${sKey} is true`);
+				}.bind(this));
+				this.oDesignTime = this.oRta._oDesignTime;
+				this.oDesignTime.attachEventOnce("synced", () => {
+					this.oGroupOverlay = OverlayRegistry.getOverlay(this.oGroup);
+					if (this.oGroupOverlay) {
+						Log.info("Overlay for the group is now available after unexpected DesignTime sync");
+					}
+				});
+				Log.info("Overlay for the group is not available");
+				assert.ok(false, "Test failed because necessary elements are not available");
+				return Promise.reject(new Error("Overlay for the group is not available"));
+			}
+
 			return new CommandFactory().getCommandFor(this.oGroup, "Remove", {
 				removedElement: this.oGroup
 			}, this.oGroupOverlay.getDesignTimeMetadata())
@@ -95,6 +122,11 @@ sap.ui.define([
 
 			.then(async function() {
 				await nextUIUpdate();
+				// Track test instability issues - RTA Status
+				assert.strictEqual(this.oRta._sStatus, "STARTED", "then RTA is started");
+				Object.keys(this.oRta._mStartStatus).forEach(function(sKey) {
+					assert.strictEqual(this.oRta._mStartStatus[sKey], true, `then ${sKey} is true`);
+				}.bind(this));
 				assert.strictEqual(this.oGroup.getVisible(), false, "then group is hidden...");
 				assert.strictEqual(this.oRta.canUndo(), true, "after any change undo is possible");
 				assert.strictEqual(this.oRta.canRedo(), false, "after any change no redo is possible");
@@ -105,6 +137,11 @@ sap.ui.define([
 
 			.then(async function() {
 				await nextUIUpdate();
+				// Track test instability issues - RTA Status
+				assert.strictEqual(this.oRta._sStatus, "STARTED", "then RTA is started");
+				Object.keys(this.oRta._mStartStatus).forEach(function(sKey) {
+					assert.strictEqual(this.oRta._mStartStatus[sKey], true, `then ${sKey} is true`);
+				}.bind(this));
 				assert.strictEqual(this.oGroup.getVisible(), true, "when the undo is called, then the group is visible again");
 				assert.strictEqual(this.oRta.canUndo(), false, "after reverting a change undo is not possible");
 				assert.strictEqual(this.oRta.canRedo(), true, "after reverting a change redo is possible");
@@ -114,6 +151,11 @@ sap.ui.define([
 
 			.then(async function() {
 				await nextUIUpdate();
+				// Track test instability issues - RTA Status
+				assert.strictEqual(this.oRta._sStatus, "STARTED", "then RTA is started");
+				Object.keys(this.oRta._mStartStatus).forEach(function(sKey) {
+					assert.strictEqual(this.oRta._mStartStatus[sKey], true, `then ${sKey} is true`);
+				}.bind(this));
 				assert.strictEqual(this.oGroup.getVisible(), false, "when the redo is called, then the group is not visible again");
 				assert.strictEqual(iFiredCounter, 3, "undoRedoStackModified event of RTA is fired 3 times");
 			}.bind(this))
@@ -169,7 +211,7 @@ sap.ui.define([
 		before() {
 			return oComponentPromise;
 		},
-		beforeEach() {
+		beforeEach(assert) {
 			this.bMacintoshOriginal = Device.os.macintosh;
 			Device.os.macintosh = false;
 
@@ -187,11 +229,14 @@ sap.ui.define([
 
 			return RtaQunitUtils.clear()
 			.then(this.oRta.start.bind(this.oRta)).then(function() {
+				// Track test instability issues - RTA Status
+				assert.strictEqual(this.oRta._sStatus, "STARTED", "then RTA is started");
+				Object.keys(this.oRta._mStartStatus).forEach(function(sKey) {
+					assert.strictEqual(this.oRta._mStartStatus[sKey], true, `then ${sKey} is true`);
+				}.bind(this));
 				this.oRootControlOverlay = OverlayRegistry.getOverlay(oRootControl);
-				const oGroupElement = Element.getElementById("Comp1---idMain1--GeneralLedgerDocument.CompanyCode");
-				const oButton = Element.getElementById("Comp1---idMain1--lb1");
-				this.oElementOverlay = OverlayRegistry.getOverlay(oGroupElement);
-				this.oButtonOverlay = OverlayRegistry.getOverlay(oButton);
+				this.oGroupElement = Element.getElementById("Comp1---idMain1--GeneralLedgerDocument.CompanyCode");
+				this.oElementOverlay = OverlayRegistry.getOverlay(this.oGroupElement);
 			}.bind(this));
 		},
 		afterEach() {
@@ -202,6 +247,31 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("with focus on an overlay", function(assert) {
+			// Track test instability issues - "getDomRef of undefined" error
+			assert.ok(this.oGroupElement, "then the group element is available");
+			assert.ok(this.oElementOverlay, "then the overlay for the group element is available");
+			if (!this.oGroupElement || !this.oElementOverlay) {
+				// Track test instability issues - RTA Status
+				assert.strictEqual(this.oRta._sStatus, "STARTED", "then RTA is started");
+				Object.keys(this.oRta._mStartStatus).forEach(function(sKey) {
+					assert.strictEqual(this.oRta._mStartStatus[sKey], true, `then ${sKey} is true`);
+				}.bind(this));
+				this.oDesignTime = this.oRta._oDesignTime;
+				this.oDesignTime.attachEventOnce("synced", () => {
+					this.oElementOverlay = OverlayRegistry.getOverlay(this.oGroupElement);
+					if (this.oElementOverlay) {
+						Log.info("Overlay for the group element is now available after unexpected DesignTime sync");
+					}
+				});
+				assert.ok(false, "Test failed because necessary elements are not available");
+				Log.info(`Overlay Registry: ${JSON.stringify(OverlayRegistry.getAllOverlays().map((oOverlay) => {
+					return {
+						id: oOverlay.getId(),
+						associatedElementId: oOverlay.getElement() ? oOverlay.getElement().getId() : null
+					};
+				}))}`);
+				return;
+			}
 			this.oElementOverlay.getDomRef().focus();
 
 			triggerKeyDownEvent(document, KeyCodes.Z);
@@ -227,16 +297,54 @@ sap.ui.define([
 			this.oElementOverlay.setSelected(true);
 
 			return RtaQunitUtils.openContextMenuWithKeyboard.call(this, this.oElementOverlay, sinon).then(async function() {
-				const clock = sinon.useFakeTimers();
+				// Track test instability issues - RTA Status
+				assert.strictEqual(this.oRta._sStatus, "STARTED", "then RTA is started");
+				Object.keys(this.oRta._mStartStatus).forEach(function(sKey) {
+					assert.strictEqual(this.oRta._mStartStatus[sKey], true, `then ${sKey} is true`);
+				}.bind(this));
 				const oMenu = this.oRta.getPlugins().contextMenu.oContextMenuControl;
-				oMenu.getItems().find((oItem) => oItem.getKey() === "CTX_ADD_ELEMENTS_AS_SIBLING").setEnabled(true);
+				// Track test instability issues - "setEnabled of undefined" error
+				const oAddSiblingItem = oMenu.getItems().find((oItem) => oItem.getKey() === "CTX_ADD_ELEMENTS_AS_SIBLING");
+				assert.ok(oAddSiblingItem, "then the 'Add Sibling' context menu item is available");
+				if (!oAddSiblingItem) {
+					Log.info(oMenu.getItems().map((oItem) => oItem.getKey()).join(", "), "Context Menu Items");
+					assert.ok(false, "Test failed because 'Add Sibling' context menu item is not available");
+					done();
+					return;
+				}
+				oAddSiblingItem.setEnabled(true);
 				QUnitUtils.triggerEvent("click", oMenu.getItems().find((oItem) => oItem.getIcon() === "sap-icon://add").getDomRef());
-				clock.tick(1000);
-				await nextUIUpdate();
-				clock.restore();
 
-				const oDialog = this.oRta.getPlugins().additionalElements.getDialog();
+				function waitForDialog() {
+					return new Promise(async function(resolve) {
+						let oDialog = this.oRta.getPlugins().additionalElements.getDialog();
+						let iDialogTimeoutCounter = 0;
+						while (!oDialog) {
+							// Wait until the dialog is available
+							await nextUIUpdate();
+							oDialog = this.oRta.getPlugins().additionalElements.getDialog();
+							iDialogTimeoutCounter++;
+							if (iDialogTimeoutCounter > 10) {
+								assert.ok(false, "Dialog did not appear within expected time");
+								resolve(null);
+								return;
+							}
+						}
+						resolve(oDialog);
+					}.bind(this));
+				}
+
+				const oDialog = await waitForDialog.call(this);
+				if (!oDialog) {
+					done();
+					return;
+				}
 				oDialog.attachOpened(async function() {
+					// Track test instability issues - RTA Status
+					assert.strictEqual(this.oRta._sStatus, "STARTED", "then RTA is started");
+					Object.keys(this.oRta._mStartStatus).forEach(function(sKey) {
+						assert.strictEqual(this.oRta._mStartStatus[sKey], true, `then ${sKey} is true`);
+					}.bind(this));
 					triggerKeyDownEvent(document, KeyCodes.Z);
 					assert.equal(this.fnUndoSpy.callCount, 0, "then _onUndo was not called");
 					triggerKeyDownEvent(document, KeyCodes.Y);

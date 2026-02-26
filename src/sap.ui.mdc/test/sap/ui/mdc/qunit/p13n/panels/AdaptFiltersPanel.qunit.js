@@ -22,39 +22,39 @@ sap.ui.define([
 
 	const aInfoData = [
 		{
-			name: "key1",
+			key: "key1",
 			label: "Field 1",
 			group: "G1",
 			dataType: "String"
 		},
 		{
-			name: "key2",
+			key: "key2",
 			label: "Field 2",
 			group: "G1",
 			dataType: "String"
 		},
 		{
-			name: "key3",
+			key: "key3",
 			label: "Field 3",
 			group: "G1",
 			dataType: "String"
 		},
 		{
-			name: "key4",
+			key: "key4",
 			label: "Field 4",
 			group: "G2",
 			groupLabel: "Group 2",
 			dataType: "String"
 		},
 		{
-			name: "key5",
+			key: "key5",
 			label: "Field 5",
 			group: "G2",
 			groupLabel: "Group 2",
 			dataType: "String"
 		},
 		{
-			name: "key6",
+			key: "key6",
 			label: "Field 6",
 			group: "G2",
 			groupLabel: "Group 2",
@@ -171,17 +171,17 @@ sMode.forEach(function(sModeName) {
 		});			this.fnEnhancer = function(mItem, oProperty) {
 
 				//Add (mock) an 'active' field
-				if (oProperty.name == "key2") {
+				if (oProperty.key == "key2") {
 					mItem.active = true;
 				}
 
 				//Add (mock) a 'mandatory' field
-				if (oProperty.name == "key5") {
+				if (oProperty.key == "key5") {
 					mItem.required = true;
 				}
 
 				mItem.visibleInDialog = true;
-				mItem.visible = aVisible.indexOf(oProperty.name) > -1;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
 				return true;
 			};
 
@@ -259,7 +259,7 @@ sMode.forEach(function(sModeName) {
 	QUnit.test("Check additional filter implementation (visibleInDialog)", async function(assert){
 
 		const oP13nData = this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, function(oItem, oProp) {
-			if (oProp.name == "key2") {
+			if (oProp.key == "key2") {
 				oItem.visibleInDialog = false;
 			} else {
 				oItem.visibleInDialog = true;
@@ -396,14 +396,14 @@ sMode.forEach(function(sModeName) {
 			});
 
 			this.fnEnhancer = function(mItem, oProperty) {
-				if (oProperty.name == "key2") {
+				if (oProperty.key == "key2") {
 					mItem.active = true;
 				}
-				if (oProperty.name == "key5") {
+				if (oProperty.key == "key5") {
 					mItem.required = true;
 				}
 				mItem.visibleInDialog = true;
-				mItem.visible = aVisible.indexOf(oProperty.name) > -1;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
 				return true;
 			};
 
@@ -874,6 +874,47 @@ if (sModeName === "Legacy") {
 		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since items are available");
 	});
 
+	QUnit.test("Check that groups are initially only displayed if necessary", function(assert){
+
+		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+
+		assert.equal(this.oAFPanel.getCurrentViewContent()._oListControl.getVisibleItems().length, 2, "All groups visible");
+
+		oP13nData.itemsGrouped[0].items.forEach(function(oItem){
+			oItem.visibleInDialog = false;
+		});
+
+		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+		assert.equal(this.oAFPanel.getCurrentViewContent()._oListControl.getVisibleItems().length, 1, "Only necessary groups visible");
+
+	});
+
+	QUnit.test("Check additional filter implementation (visibleInDialog)", function(assert){
+
+		const oP13nData = this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, function(oItem, oProp) {
+			if (oProp.key == "key2") {
+				oItem.visibleInDialog = false;
+			} else {
+				oItem.visibleInDialog = true;
+			}
+			return oItem;
+		}, true);
+
+		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+
+		const aGroupPanels = this.oAFPanel.getCurrentViewContent().getPanels();
+
+		//Check in GroupView
+		assert.equal(aGroupPanels[0].getContent()[0].getVisibleItems().length, 2, "There are 3 items in the model, but one should be hidden for the user");
+
+		//Check in ListView
+		this.oAFPanel.switchView("list");
+		const aItems = this.oAFPanel.getCurrentViewContent()._oListControl.getItems();
+		assert.equal(aItems.length, 5, "There are 6 items in the model, but one should be hidden for the user");
+
+	});
+
 	// not relevant for new mode, as groups are always loaded expanded (as they are just items in a list)
 	QUnit.test("Check 'itemFactory' execution for only necessary groups", async function(assert){
 
@@ -1025,14 +1066,14 @@ if (sModeName === "Legacy") {
 			});
 
 			this.fnEnhancer = function(mItem, oProperty) {
-				if (oProperty.name == "key2") {
+				if (oProperty.key == "key2") {
 					mItem.active = true;
 				}
-				if (oProperty.name == "key5") {
+				if (oProperty.key == "key5") {
 					mItem.required = true;
 				}
 				mItem.visibleInDialog = true;
-				mItem.visible = aVisible.indexOf(oProperty.name) > -1;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
 				return true;
 			};
 
@@ -1388,7 +1429,7 @@ if (sModeName === "Modern") {
 			} else {
 				oItem.visibleInDialog = true;
 			}
-			oItem.visible = aVisible.indexOf(oProp.name) > -1;
+			oItem.visible = aVisible.indexOf(oProp.key) > -1;
 			return true;
 		}, true);
 
@@ -1599,14 +1640,14 @@ if (sModeName === "Modern") {
 			});
 
 			this.fnEnhancer = function(mItem, oProperty) {
-				if (oProperty.name == "key2") {
+				if (oProperty.key == "key2") {
 					mItem.active = true;
 				}
-				if (oProperty.name == "key5") {
+				if (oProperty.key == "key5") {
 					mItem.required = true;
 				}
 				mItem.visibleInDialog = true;
-				mItem.visible = aVisible.indexOf(oProperty.name) > -1;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
 				return true;
 			};
 
@@ -1747,11 +1788,11 @@ if (sModeName === "Modern") {
 
 			this.oPropertyHelper = new PropertyHelper(this.aMockInfo);
 			this.oP13nData = P13nBuilder.prepareAdaptationData(aInfoData, function(mItem, oProperty) {
-				if (oProperty.name == "key2") {
+				if (oProperty.key == "key2") {
 					mItem.active = true;
 				}
 				mItem.visibleInDialog = true;
-				mItem.visible = aVisible.indexOf(oProperty.name) > -1;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
 				return true;
 			}, true);
 

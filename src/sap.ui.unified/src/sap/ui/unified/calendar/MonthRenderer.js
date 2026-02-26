@@ -293,7 +293,6 @@ sap.ui.define([
 				oRm.openEnd();
 
 				if (bWeekNum) {
-					this.renderWeekNumbers = true;
 					this._renderWeekNumber(oRm, aDays[i], oHelper, oMonth);
 				}
 			}
@@ -505,19 +504,31 @@ sap.ui.define([
 			mAccProps["describedby"] = `${mAccProps["describedby"]} ${sEndDateText}`.trim();
 		}
 
-		if (this.renderWeekNumbers && oMonth.getShowWeekNumbers() && oMonth._oDate) {
-			// This path is for controls that render week numbers inline (e.g., Month, OneMonthDatesRow)
-			// TODO: We could replace the following lines with a sap.ui.unified.calendar.CalendarUtils.calculateWeekNumber usage
-			// once the same method starts to respect the sap/base/i18n/date/CalendarWeekNumbering types.
-			const oWeekConfig = CalendarDateUtils.getWeekConfigurationValues(oMonth.getCalendarWeekNumbering(), new Locale(oMonth._getLocale()));
-			oWeekConfig.firstDayOfWeek = oMonth._getFirstDayOfWeek();
-			const oFirstDateOfWeek = CalendarDate.fromLocalJSDate(CalendarUtils.getFirstDateOfWeek(oDay.toLocalJSDate(), oWeekConfig), oMonth.getPrimaryCalendarType());
-			mAccProps["describedby"] = mAccProps["describedby"] + " " + oMonth.getId() + "-week-" + oMonth._calculateWeekNumber(oFirstDateOfWeek) + "-text";
-		} else if (oMonth.getShowWeekNumbers() && oMonth._oDate) {
+		const oParent = oMonth.getParent();
+		const bShowWeekNumbers = oMonth.getShowWeekNumbers();
+		const bHasDate = !!oMonth._oDate;
+		const bSeparateWeekNumbers = bShowWeekNumbers && bHasDate && oParent &&
+			(oParent.isA("sap.m.PlanningCalendar") ||
+			 oParent.isA("sap.ui.unified.CalendarDateInterval") ||
+			 oParent.isA("sap.ui.unified.CalendarTimeInterval") ||
+			 oParent.isA("sap.m.Toolbar"));
+
+		if (bSeparateWeekNumbers) {
 			// This path is for controls that render week numbers separately (e.g., CalendarDateInterval with WeeksRow)
-			const sParentId = oMonth.getParent() ? oMonth.getParent().getId() : oMonth.getId();
+			let sParentId = oParent.getId();
+
+			// For Toolbar, we need to find the PlanningCalendar (Toolbar -> Table -> PlanningCalendar hierarchy)
+			const bIsToolbar = oParent.isA("sap.m.Toolbar");
+			const oGrandParent = bIsToolbar ? oParent.getParent() : null;
+			const oGreatGrandParent = oGrandParent ? oGrandParent.getParent() : null;
+			const bHasPlanningCalendar = oGreatGrandParent && oGreatGrandParent.isA("sap.m.PlanningCalendar");
+
+			if (bIsToolbar) {
+				sParentId = bHasPlanningCalendar ? oGreatGrandParent.getId() : oMonth.getId();
+			}
+
 			const iWeekNumber = oMonth._calculateWeekNumber(oDay);
-			mAccProps["describedby"] = mAccProps["describedby"] + " " + sParentId + "-WeeksRow" + "-week-" + iWeekNumber + "-text";
+			mAccProps["describedby"] = mAccProps["describedby"] + " " + sParentId + "-WeekNumbersRow-week-" + iWeekNumber + "-text";
 		}
 
 		if (bNonWorking) {

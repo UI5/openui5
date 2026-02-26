@@ -42,11 +42,11 @@ sap.ui.define(['sap/ui/mdc/util/IdentifierUtil',
 		const FilterUtil = {
 
 			/**
-			 * Returns a specific <code>PropertyInfo</code> object by a given name.<br>
+			 * Returns a specific <code>PropertyInfo</code> object by a given key.<br>
 			 *
 			 * @param {array} aPropertiesMetadata - array with all the property metadata
-			 * @param {string} sKey - name of the property
-			 * @returns {object}  PropertyInfo object for a given name, or <code>null</code>
+			 * @param {string} sKey - key of the property
+			 * @returns {object}  PropertyInfo object for a given key, or <code>null</code>
 			 * @public
 			 */
 			getPropertyByKey: function(aPropertiesMetadata, sKey) {
@@ -144,7 +144,7 @@ sap.ui.define(['sap/ui/mdc/util/IdentifierUtil',
 				if (aPropertiesMetadata && aPropertiesMetadata.length > 0) {
 					Object.keys(mConditionsPerKey).forEach((sConditionKey) => {
 						const oAffectedProperty = aPropertiesMetadata.find((oProperty) => {
-							return oProperty.name === sConditionKey;
+							return IdentifierUtil.getPropertyKey(oProperty) === sConditionKey;
 						});
 						const sConditionPath = oAffectedProperty && oAffectedProperty.path ? oAffectedProperty.path : sConditionKey;
 						mConditionsPerPath[sConditionPath] = mConditionsPerKey[sConditionKey];

@@ -142,7 +142,7 @@ sap.ui.define([
 			}
 
 			for (let i = oItem.oldPosition; i < aP13nData.length; i++) {
-				if (aP13nData[i].name == oItem.name) {
+				if (aP13nData[i].name === oItem.name) {
 					aP13nData[i].position = oItem.oldPosition;
 					continue;
 				}
@@ -770,7 +770,8 @@ sap.ui.define([
 			press: (oEvent) => {
 				const oButton = oEvent.getSource();
 				const oListItem = this._getListItemFromControl(oButton);
-				const sKey = oListItem.getBindingContext(this.P13N_MODEL).getProperty("name");
+				const oContext = oListItem.getBindingContext(this.P13N_MODEL);
+				const sKey = _getKeyFromContext(oContext);
 				const oItem = this.getP13nData().find((oItem) => oItem.name === sKey);
 				oItem.visible = !oListItem.getBindingContext(this.P13N_MODEL).getProperty(this.PRESENCE_ATTRIBUTE);
 
@@ -860,8 +861,9 @@ sap.ui.define([
 	};
 
 	AdaptFiltersPanelContent.prototype._onRemoveRow = function(oRow) {
-		const sKey = oRow.getBindingContext(this.P13N_MODEL).getProperty("name");
 		const oContext = oRow.getBindingContext(this.P13N_MODEL);
+		const sKey = _getKeyFromContext(oContext);
+
 		this._updateFocus(oRow);
 		this._removeFilteredState(sKey, oContext);
 		this._updatePresence(sKey, false);
@@ -990,10 +992,10 @@ sap.ui.define([
 
 			if (oBinding.getFilters("Control").length > 0) {
 				oBinding.filter(
-				new Filter([
-				...oBinding.getFilters("Control"),
-				new Filter("name", "EQ", oItem.name)
-				], false)
+					new Filter([
+						...oBinding.getFilters("Control"),
+						new Filter("key", "EQ", oItem.name)
+					], false)
 				);
 			}
 			setTimeout(() => setTimeout(() => {
@@ -1202,6 +1204,16 @@ sap.ui.define([
 		this._oListControl = null;
 		this._oAddFilterSelect = null;
 	};
+
+	function _getKeyFromContext(oContext) {
+		/**
+		 * @deprecated As of version 1.121
+		 */
+		if (oContext.getProperty("name") && !oContext.getProperty("key")) {
+			return oContext.getProperty("name");
+		}
+		return oContext.getProperty("key");
+	}
 
 	return AdaptFiltersPanelContent;
 });

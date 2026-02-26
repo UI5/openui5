@@ -74,7 +74,7 @@ sap.ui.define([
 				return Promise.resolve();
 			}
 			var nIdx = aPropertyInfo.findIndex(function(oEntry) {
-				return oEntry.name === sPropertyName;
+				return oEntry.key === sPropertyName;
 			});
 
 			if (nIdx < 0) {
@@ -98,7 +98,7 @@ sap.ui.define([
 
 		if (aFetchedProperties) {
 			var nIdx = aFetchedProperties.findIndex(function(oEntry) {
-				return oEntry.name === sPropertyName;
+				return oEntry.key === sPropertyName;
 			});
 
 			if (nIdx >= 0) {

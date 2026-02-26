@@ -17,6 +17,8 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/m/InputBase",
 	"sap/m/DatePicker",
+	"sap/m/Button",
+	"sap/m/Dialog",
 	"sap/ui/Device",
 	"sap/ui/core/LocaleData",
 	"sap/ui/core/mvc/XMLView",
@@ -47,6 +49,8 @@ sap.ui.define([
 	Label,
 	InputBase,
 	DatePicker,
+	Button,
+	Dialog,
 	Device,
 	LocaleData,
 	XMLView,
@@ -1082,14 +1086,22 @@ sap.ui.define([
 			setMarked: function() {}
 		},
 		model = new JSONModel({
-			"startDate": "",
-			"endDate": ""
+			startDate: "",
+			endDate: ""
 		}),
-		oDRS = new DateRangeSelection({value: "{ type: 'DateInterval',parts: [{path: '/startDate'},{path: '/endDate'}]}"}),
-		oDialog = new sap.m.Dialog({
+		oDRS = new DateRangeSelection({
+			value: {
+				type: new DateInterval({format: "yMEd"}),
+				parts: [
+					{ path: "/startDate" },
+					{ path: "/endDate" }
+				]
+			}
+		}),
+		oDialog = new Dialog({
 			content: [ oDRS ]
 		}),
-		oButton = new sap.m.Button({
+		oButton = new Button({
 			text: "Open Dialog",
 			press: function () {
 				oDialog.open();

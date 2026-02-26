@@ -303,7 +303,7 @@ sap.ui.define([
 	};
 
 	CalendarTimeInterval.prototype._initializeWeeksRow = function() {
-		const oWeeksRow = new WeeksRow(this.getId() + "-WeeksRow", {
+		const oWeeksRow = new WeeksRow(this.getId() + "-WeekNumbersRow", {
 			visible: false
 		});
 		this.setAggregation("weeksRow", oWeeksRow);

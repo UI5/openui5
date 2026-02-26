@@ -1,26 +1,2 @@
-sap.ui.define(['require', 'exports', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/Theme'], (function (require, exports, Icons, Theme) { 'use strict';
-
-    const loadIconsBundle = async (collection) => {
-        let iconData;
-        if (collection === "business-suite-v1") {
-            iconData = (await new Promise(function (resolve, reject) { require([/* webpackChunkName: "ui5-webcomponents-sap-icons-business-suite-v1" */ 'sap/f/thirdparty/_dynamics/SAP-icons-business-suite'], resolve, reject); })).default;
-        }
-        else {
-            iconData = (await new Promise(function (resolve, reject) { require([/* webpackChunkName: "ui5-webcomponents-sap-icons-business-suite-v2" */ 'sap/f/thirdparty/_dynamics/SAP-icons-business-suite2'], resolve, reject); })).default;
-        }
-        if (typeof iconData === "string" && iconData.endsWith(".json")) {
-            throw new Error("[icons-business-suite] Invalid bundling detected - dynamic JSON imports bundled as URLs. Switch to inlining JSON files from the build. Check the \"Assets\" documentation for more information.");
-        }
-        return iconData;
-    };
-    const registerLoaders = () => {
-        Icons.C("business-suite-v1", loadIconsBundle);
-        Icons.C("business-suite-v2", loadIconsBundle);
-    };
-    registerLoaders();
-
-    const __esModule = true ;
-
-    exports.__esModule = __esModule;
-
-}));
+sap.ui.define(["require","exports","sap/f/thirdparty/Icons","sap/f/thirdparty/Theme"],function(s,i,e,t){"use strict";const n=async i=>{let e;if(i==="business-suite-v1"){e=(await new Promise(function(i,e){s(["sap/f/thirdparty/_dynamics/SAP-icons-business-suite"],i,e)})).default}else{e=(await new Promise(function(i,e){s(["sap/f/thirdparty/_dynamics/SAP-icons-business-suite2"],i,e)})).default}if(typeof e==="string"&&e.endsWith(".json")){throw new Error('[icons-business-suite] Invalid bundling detected - dynamic JSON imports bundled as URLs. Switch to inlining JSON files from the build. Check the "Assets" documentation for more information.')}return e};const o=()=>{e.C("business-suite-v1",n);e.C("business-suite-v2",n)};o();const r=true;i.__esModule=r});
+//# sourceMappingURL=AllIcons.js.map

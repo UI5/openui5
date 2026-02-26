@@ -10,10 +10,10 @@ sap.ui.define([
 			//mock delegate data
 			const aPropertyInfos = [
 				{
-					"name": "item1",
+					"key": "item1",
 					"label": "Item 1"
 				}, {
-					"name": "item2",
+					"key": "item2",
 					"label": "Item 2"
 				}
 			];

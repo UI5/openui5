@@ -132,15 +132,16 @@ sap.ui.define([
 
 		const oP13nData = this.prepareAdaptationData(oPropertyHelper, (oItem, oProperty) => {
 
-			const oExistingProperty = mExistingProperties[oProperty.name];
-			const aExistingFilters = mExistingFilters[oProperty.name];
+			const sPropertyKey = oProperty.key;
+			const oExistingProperty = mExistingProperties[sPropertyKey];
+			const aExistingFilters = mExistingFilters[sPropertyKey];
 			oItem.visible = oExistingProperty ? true : false;
 			oItem.visibleInDialog = true;
 			oItem.position = oExistingProperty ? oExistingProperty.position : -1;
 			oItem.isFiltered = aExistingFilters && aExistingFilters.length > 0 ? true : false;
 			oItem.required = oProperty.required;
 
-			return !(oProperty.hiddenFilter === true || oProperty.name == "$search");
+			return !(oProperty.hiddenFilter === true || sPropertyKey == "$search");
 		}, true);
 
 		this.sortP13nData({

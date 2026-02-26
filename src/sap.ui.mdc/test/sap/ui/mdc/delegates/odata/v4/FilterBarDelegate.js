@@ -34,7 +34,7 @@ sap.ui.define([
 			["display", "fieldHelp", "valueHelp"].forEach((sKey) => {
 				if (oProp[sKey]) {
 					oSettings = oSettings || {};
-					oSettings[oProp.name] = {[sKey === "fieldHelp" ? "valueHelp" : sKey]: oProp[sKey]};
+					oSettings[oProp.key] = {[sKey === "fieldHelp" ? "valueHelp" : sKey]: oProp[sKey]};
 					delete oProp[sKey];
 				}
 			});
@@ -99,7 +99,7 @@ sap.ui.define([
 						getDelegate: function() {
 							return {
 								payload : {
-									modelName : sModelName,
+									modelName: sModelName,
 									collectionName: sCollectionName
 								}
 							};
@@ -191,7 +191,7 @@ sap.ui.define([
 		var oAppComponent = mPropertyBag ? mPropertyBag.appComponent : FlUtils.getAppComponentForControl(oFilterBar);
 		var oView = (mPropertyBag && mPropertyBag.view ) ? mPropertyBag.view : FlUtils.getViewForControl(oFilterBar);
 		var sViewId = mPropertyBag ? mPropertyBag.viewId : null;
-		var sName = oProperty.name;
+		var sKey = oProperty.key;
 		var oSelector = {};
 
 		if (oFilterBar.getId) {
@@ -202,7 +202,7 @@ sap.ui.define([
 
 		var sSelectorId = oModifier.getControlIdBySelector(oSelector, oAppComponent);
 
-		var sId = sSelectorId +  "--filter--" + IdentifierUtil.replace(sName);
+		var sId = sSelectorId +  "--filter--" + IdentifierUtil.replace(sKey);
 
 		var oExistingFilterField = Element.getElementById(sId);
 
@@ -212,13 +212,13 @@ sap.ui.define([
 
 		const {operators, ...oConstructorSettings} = DelegateCache.merge({
 			//dataType: oProperty.dataType,
-			//conditions: "{$filters>/conditions/" + sName + '}',
-			propertyKey: sName,
+			//conditions: "{$filters>/conditions/" + sKey + '}',
+			propertyKey: sKey,
 			//required: oProperty.required,
-			//label: oProperty.label || oProperty.name,
+			//label: oProperty.label || oProperty.key,
 			//maxConditions: oProperty.maxConditions,
 			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
-		}, DelegateCache.get(oFilterBar, oProperty.name, "$Filters"));
+		}, DelegateCache.get(oFilterBar, oProperty.key, "$Filters"));
 
 		return Promise.resolve()
 			.then(oModifier.createControl.bind(oModifier, "sap.ui.mdc.FilterField", oAppComponent, oView, sId, oConstructorSettings)).then(function(oFilterField) {
@@ -243,17 +243,6 @@ sap.ui.define([
 
 				if (oProperty.tooltip) {
 					oModifier.setProperty(oFilterField, "tooltip", oProperty.tooltip);
-				}
-
-				if (!PropertyInfoValidator._isValidationFeatureFlagEnabled) {
-					if (oProperty.constraints) {
-						oModifier.setProperty(oFilterField, "dataTypeConstraints", oProperty.constraints);
-					}
-
-					if (oProperty.formatOptions) {
-						oModifier.setProperty(oFilterField, "dataTypeFormatOptions", oProperty.formatOptions);
-					}
-
 				}
 
 				return oFilterField;
@@ -291,16 +280,16 @@ sap.ui.define([
 		InstanceCache.set(sId, oCacheEntry);
 	};
 
-	ODataFilterBarDelegate._addPropertyInfoEntry = function(oControl, sPropertyName, aPropertyInfo, aFetchedProperties, oModifier) {
+	ODataFilterBarDelegate._addPropertyInfoEntry = function(oControl, sPropertyKey, aPropertyInfo, aFetchedProperties, oModifier) {
 
 		if (aFetchedProperties) {
 			var nIdx = aFetchedProperties.findIndex(function(oEntry) {
-				return oEntry.name === sPropertyName;
+				return oEntry.key === sPropertyKey;
 			});
 
 			if (nIdx >= 0) {
 				aPropertyInfo.push({
-					name: sPropertyName,
+					key: sPropertyKey,
 					dataType: aFetchedProperties[nIdx].dataType,
 					maxConditions: aFetchedProperties[nIdx].maxConditions,
 					constraints: aFetchedProperties[nIdx].constraints,
@@ -314,13 +303,13 @@ sap.ui.define([
 				});
 				oModifier.setProperty(oControl, "propertyInfo", aPropertyInfo);
 			} else {
-				Log.error("ConditionFlex-ChangeHandler: no type info for property '" + sPropertyName + "'");
+				Log.error("ConditionFlex-ChangeHandler: no type info for property '" + sPropertyKey + "'");
 			}
 		}
 	};
 
 
-	ODataFilterBarDelegate._updatePropertyInfo = function(sPropertyName, oFilterBar, mPropertyBag) {
+	ODataFilterBarDelegate._updatePropertyInfo = function(sPropertyKey, oFilterBar, mPropertyBag) {
 
 		if (oFilterBar.isA && oFilterBar.isA("sap.ui.mdc.FilterBar")) {
 			return Promise.resolve();
@@ -337,20 +326,20 @@ sap.ui.define([
 				return Promise.resolve();
 			}
 			var nIdx = aPropertyInfo.findIndex(function(oEntry) {
-				return oEntry.name === sPropertyName;
+				return oEntry.kex === sPropertyKey;
 			});
 
 			if (nIdx < 0) {
 
 				var aFetchedProperties = this._getInstanceCacheEntry(oFilterBar, "fetchedProperties");
 				if (aFetchedProperties) {
-					this._addPropertyInfoEntry(oFilterBar, sPropertyName, aPropertyInfo, aFetchedProperties, oModifier);
+					this._addPropertyInfoEntry(oFilterBar, sPropertyKey, aPropertyInfo, aFetchedProperties, oModifier);
 				} else {
 					//fetch
 					return this.fetchProperties(oFilterBar, mPropertyBag)
 					.then((aProperties) => {
 						this._setInstanceCacheEntry(oFilterBar, "fetchedProperties", aProperties);
-						this._addPropertyInfoEntry(oFilterBar, sPropertyName, aPropertyInfo, aProperties, oModifier);
+						this._addPropertyInfoEntry(oFilterBar, sPropertyKey, aPropertyInfo, aProperties, oModifier);
 					});
 				}
 			}
@@ -483,7 +472,7 @@ sap.ui.define([
 		}
 
 		var oProperty = {
-				name: sKey,
+				key: sKey,
 				label: sLabel,
 				tooltip: sTooltip || '',
 				hiddenFilter: bHiddenFilter,
@@ -513,7 +502,7 @@ sap.ui.define([
 		//Currently the FilterBar will use 'name' as key for the identification between existing
 		//FilterFields - currently there is no connection such as 'dataProperties' between existing Fields
 		//and PropertyInfo, the usage of a complex 'name' (e.g. containing '/') might be reconsidered.
-		oProperty.name = sNavigationPropertyName ? sNavigationPropertyName + "/" + sKey : sKey;
+		oProperty.key = sNavigationPropertyName ? sNavigationPropertyName + "/" + sKey : sKey;
 
 		oProperty.dataType = oObj.$Type;
 
@@ -637,7 +626,7 @@ sap.ui.define([
 
 							if (bIsParameterType && oParameterInfo && (oParameterInfo.parameters.indexOf(sKey) > -1)) {
 								oPropertyInfo.path = null;
-								oPropertyInfo.name = sKey;
+								oPropertyInfo.key = sKey;
 								oPropertyInfo.required = true;
 								oParameterInfo.parameterTypes[sKey] = oObj.$Type;
 								aFetchedProperties.push(oPropertyInfo);
@@ -741,8 +730,8 @@ sap.ui.define([
 
 								//parameters are initially at the top of the result
 								aProperties.sort(function(p1, p2) {
-									var p1Key = p1.path || p1.name;
-									var p2Key = p2.path || p2.name;
+									var p1Key = p1.path || p1.key;
+									var p2Key = p2.path || p2.key;
 									if ((!(oParamInfo.parameters.indexOf(p1Key) > -1) && !(oParamInfo.parameters.indexOf(p2Key) > -1)) ||
 										( (oParamInfo.parameters.indexOf(p1Key) > -1) &&  (oParamInfo.parameters.indexOf(p2Key) > -1))     ) {
 										return 0;
@@ -757,7 +746,7 @@ sap.ui.define([
 							}
 
 							var mProperties = aProperties.reduce(function(mMap, oProp){
-								mMap[oProp.name] = oProp;
+								mMap[oProp.key] = oProp;
 								return mMap;
 							}, {});
 

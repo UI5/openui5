@@ -34,43 +34,43 @@ sap.ui.define([
 					delete oPropertyInfo.display;
 				}
 
-				if (oPropertyInfo.name.indexOf("/") >= 0) {
+				if (oPropertyInfo.key.indexOf("/") >= 0) {
 					oPropertyInfo.hiddenFilter = true;
 				}
 
-				if (oPropertyInfo.name === "$search") {
+				if (oPropertyInfo.key === "$search") {
 					bSearchExists = true;
 					oPropertyInfo.label = "";
-				} else if (oPropertyInfo.name === "ID") {
+				} else if (oPropertyInfo.key === "ID") {
 					oPropertyInfo.formatOptions = {groupingEnabled: false};
-				} else if (oPropertyInfo.name === "author_ID") {
+				} else if (oPropertyInfo.key === "author_ID") {
 					oPropertyInfo.formatOptions = {groupingEnabled: false};
-				} else if (oPropertyInfo.name === "title") {
+				} else if (oPropertyInfo.key === "title") {
 					oPropertyInfo.caseSensitive = false;
-				} else if (oPropertyInfo.name === "language_code") {
+				} else if (oPropertyInfo.key === "language_code") {
 					oPropertyInfo.maxConditions = 1;
 					oPropertyInfo.constraints = {nullable: false, maxLength: 3}; // to test not nullable
-				} else if (oPropertyInfo.name === "stock") {
+				} else if (oPropertyInfo.key === "stock") {
 					oPropertyInfo.label = "Stock range";
 					oPropertyInfo.maxConditions = 1;
-				} else if (oPropertyInfo.name === "subgenre_code") {
+				} else if (oPropertyInfo.key === "subgenre_code") {
 					oPropertyInfo.label = "Sub Genre";
-				} else if (oPropertyInfo.name === "detailgenre_code") {
+				} else if (oPropertyInfo.key === "detailgenre_code") {
 					oPropertyInfo.label = "Detail Genre";
-				} else if (oPropertyInfo.name === "author/dateOfBirth") {
+				} else if (oPropertyInfo.key === "author/dateOfBirth") {
 					oPropertyInfo.maxConditions = 1;
-				} else if (oPropertyInfo.name === "author/dateOfDeath") {
+				} else if (oPropertyInfo.key === "author/dateOfDeath") {
 					oPropertyInfo.maxConditions = 1;
-				} else if (oPropertyInfo.name === "currency_code") {
+				} else if (oPropertyInfo.key === "currency_code") {
 					oPropertyInfo.maxConditions = 1; // normally only one currency should be used, otherwise it makes no sense related to price
-				} else if (oPropertyInfo.name === "createdAt") {
+				} else if (oPropertyInfo.key === "createdAt") {
 					oPropertyInfo.maxConditions = 1; // to use DynamicDateRange
 				}
 			});
 
 			if (!bSearchExists) {
 				aProperties.push({
-					  name: "$search",
+					  key: "$search",
 					  dataType: "Edm.String",
 					  label: ""
 				});
@@ -103,7 +103,7 @@ sap.ui.define([
 		};
 
 		var oModifier = mPropertyBag.modifier;
-		var sName = oProperty.path || oProperty.name;
+		var sName = oProperty.path || oProperty.key;
 		var oFilterFieldPromise = FilterBarDelegate._createFilterField.apply(this, arguments);
 
 		return oFilterFieldPromise.then(function (oFilterField) {

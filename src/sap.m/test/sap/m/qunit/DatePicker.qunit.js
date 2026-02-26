@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/m/InstanceManager",
 	"sap/m/Label",
 	"sap/m/Button",
+	"sap/m/Dialog",
 	"sap/ui/model/type/Date",
 	"sap/ui/model/odata/type/DateTime",
 	"sap/ui/model/odata/v2/ODataModel",
@@ -61,6 +62,7 @@ sap.ui.define([
 	InstanceManager,
 	Label,
 	Button,
+	Dialog,
 	TypeDate,
 	DateTime,
 	ODataModel,
@@ -2433,13 +2435,20 @@ sap.ui.define([
 			setMarked: function() {}
 		},
 		model = new JSONModel({
-			"date": ""
+			date: ""
 		}),
-		oDP = new DatePicker({value: "{ type: 'DateInterval',parts: [{path: '/date'}]}"}),
-		oDialog = new sap.m.Dialog({
+		oDP = new DatePicker({
+			value: {
+				type: new Date({format: "yMEd"}),
+				parts: [
+					{ path: "/date" }
+				]
+			}
+		}),
+		oDialog = new Dialog({
 			content: [ oDP ]
 		}),
-		oButton = new sap.m.Button({
+		oButton = new Button({
 			text: "Open Dialog",
 			press: function () {
 				oDialog.open();

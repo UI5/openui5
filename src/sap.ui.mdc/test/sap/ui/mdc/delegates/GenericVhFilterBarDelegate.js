@@ -43,10 +43,10 @@ sap.ui.define([
 				addFilterField.call(this, oFF, oFilterBar.__aProperties);
 			}.bind(this));
 
-			var bSearchExists = !!oFilterBar.__aProperties.find(function(oProperty){return oProperty.name === "$search";});
+			var bSearchExists = !!oFilterBar.__aProperties.find(function(oProperty){return oProperty.key === "$search";});
 			if (!bSearchExists) {
 				oFilterBar.__aProperties.push({
-					name: "$search",
+					key: "$search",
 					label: "Search",
 					dataType: "Edm.String"
 				});
@@ -65,7 +65,7 @@ sap.ui.define([
 		var sFieldPath = aPathParts[aPathParts.length - 1];
 
 		aProperties.push({
-			name: sFieldPath,
+			key: sFieldPath,
 			label: oFF.getLabel() || sFieldPath,
 			dataType: oFF.getDataType(),
 			formatOptions: oFF.getDataTypeFormatOptions(),
@@ -87,7 +87,7 @@ sap.ui.define([
 		function _getProperty(sName) {
 			var oNamedProperty = null;
 			aProperties.some(function(oProperty) {
-				if (oProperty.name === sName) {
+				if (oProperty.key === sName) {
 					oNamedProperty = oProperty;
 				}
 				return oNamedProperty !== null;
@@ -99,7 +99,7 @@ sap.ui.define([
 		function _removeProperty(sName) {
 			var nIdx = -1;
 			aProperties.some(function(oProperty, index) {
-				if (oProperty.name === sName) {
+				if (oProperty.key === sName) {
 					nIdx = index;
 				}
 				return nIdx !== -1;
@@ -124,7 +124,7 @@ sap.ui.define([
 	function _observeChanges(oChanges) {
 		var oFilterBar, aProperties;
 
-		if (oChanges.name === "filterItems") {
+		if (oChanges.key === "filterItems") {
 			if (oChanges.mutation === "insert") {
 				var oNewFF = oChanges.child;
 				oFilterBar = oNewFF.getParent();

@@ -3156,7 +3156,7 @@ sap.ui.define([
 					payload: {
 						collectionPath: "/Products",
 						propertyInfo: [{
-							name: "Name",
+							key: "Name",
 							path: "Name_Path",
 							label: "Name_Label",
 							dataType: "String"

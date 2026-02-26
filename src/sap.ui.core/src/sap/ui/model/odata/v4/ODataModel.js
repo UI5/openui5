@@ -2749,31 +2749,38 @@ sap.ui.define([
 	ODataModel.prototype.requestKeyPredicate = _Helper.createRequestMethod("fetchKeyPredicate");
 
 	/**
-	 * Requests side effects for the given paths on all affected root bindings.
+	 * Loads side effects for the given absolute paths on all affected bindings. For more
+	 * information about side effects in general, see
+	 * {@link sap.ui.model.odata.v4.Context#requestSideEffects}.
 	 *
 	 * @param {string[]} aAbsolutePaths
-	 *   The absolute paths to request side effects for; each path must not start with the fully
-	 *   qualified container name.
-	 * @param {string} sGroupId
-	 *   The effective group ID
-	 * @returns {sap.ui.base.SyncPromise<void>|undefined}
-	 *   A promise which is resolved without a defined result, or rejected with an error if loading
-	 *   of side effects fails, or <code>undefined</code> if there is nothing to do
+	 *   The absolute paths for which to request side effects, for example
+	 *   "/SalesOrderList/SO_2_SOITEM/Note".
+	 * @param {string} [sGroupId]
+	 *   The group ID to be used. If not specified, the {@link #getUpdateGroupId update group ID} is
+	 *   used.
+	 * @returns {Promise<void>}
+	 *   A promise which is resolved without a defined result, or rejected with an error if the side
+	 *   effects fail to load.
+	 * @throws {Error}
+	 *   If the given group ID is invalid
 	 *
-	 * @private
+	 * @public
+	 * @since 1.146.0
 	 */
-	ODataModel.prototype.requestSideEffects = function (aAbsolutePaths, sGroupId) {
-		if (!aAbsolutePaths.length) {
-			return undefined; // nothing to do
-		}
+	ODataModel.prototype.requestSideEffects = function (aAbsolutePaths,
+			sGroupId = this.getUpdateGroupId()) {
+		_Helper.checkGroupId(sGroupId);
 
-		return SyncPromise.all(
+		return Promise.all(
 			this.aAllBindings.filter(function (oBinding) {
 				return oBinding.isRoot();
 			}).map(function (oRootBinding) {
 				return oRootBinding.requestAbsoluteSideEffects(sGroupId, aAbsolutePaths);
 			})
-		);
+		).then(function () {
+			// return undefined;
+		});
 	};
 
 	/**

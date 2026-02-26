@@ -218,6 +218,9 @@ sap.ui.define([
 		}
 	};
 
+	/**
+	 * @deprecated As of version 1.121
+	 */
 	const mLegacyAlias = {
 		key: "name"
 	};
@@ -313,7 +316,7 @@ sap.ui.define([
 			const sPropertyKeys = vProperty.map((oProp) => `'${Object.keys(oProp)[0]}'`).join(",");
 			sError = `Invalid property definition for properties with keys ${sPropertyKeys}: ${sMessage}`;
 		} else {
-			const sPropertyKey = vProperty.key ?? vProperty.name;
+			const sPropertyKey = getPropertyKey(vProperty);
 			sError = `Invalid property definition for property with key '${sPropertyKey}': ${sMessage}`;
 		}
 		return sError;
@@ -531,6 +534,9 @@ sap.ui.define([
 
 		oPropertyHelper.validateProperties(aClonedProperties, mPrivate.aPreviousRawProperties);
 
+		/**
+		 * @ui5-transform-hint replace-local aClonedProperties
+		 */
 		const aClonedPropertiesWithAliases = addAttributeAliases(aClonedProperties);
 		const mNextPropertyMap = createPropertyMap(aClonedPropertiesWithAliases);
 		enrichProperties(oPropertyHelper, aClonedPropertiesWithAliases);
@@ -543,6 +549,12 @@ sap.ui.define([
 		mPrivate.aPreviousRawProperties = merge([], aProperties);
 	}
 
+	/**
+	 * @param {sap.ui.mdc.util.PropertyInfo[]} aProperties The properties to which the attribute aliases should be added
+	 * @returns {sap.ui.mdc.util.PropertyInfo[]} Properties enriched with attribute aliases
+	 * @private
+	 * @deprecated As of version 1.121
+	 */
 	function addAttributeAliases(aProperties) {
 		const aAliasAttributeEntries = Object.entries(mLegacyAlias);
 
@@ -564,7 +576,13 @@ sap.ui.define([
 	}
 
 	function getPropertyKey (oProperty) {
-		return oProperty.key || (mLegacyAlias['key'] && oProperty[mLegacyAlias['key']]);
+		/**
+		 * @deprecated As of version 1.121
+		 */
+		if (mLegacyAlias['key'] && mLegacyAlias['key'] in oProperty) {
+			return oProperty.key || oProperty[mLegacyAlias['key']];
+		}
+		return oProperty.key;
 	}
 
 	/**
@@ -674,7 +692,9 @@ sap.ui.define([
 			const aAllInconsistencies = [];
 			for (const oPreviousProperty of aPreviousProperties) {
 				const sPreviousPropertyKey = getPropertyKey(oPreviousProperty);
-				const oNewProperty = aProperties.find((oProperty) => getPropertyKey(oProperty) === sPreviousPropertyKey);
+				const oNewProperty = aProperties.find((oProperty) => {
+					return getPropertyKey(oProperty) === sPreviousPropertyKey;
+				});
 				if (!oNewProperty) { // Property is missing in new set
 					aAllInconsistencies.push({[sPreviousPropertyKey]: "PROPERTY_MISSING"});
 				} else {
@@ -726,19 +746,35 @@ sap.ui.define([
 
 		mPrivate.aMandatoryAttributes.forEach((sMandatoryAttribute) => {
 			const mAttributeMetadata = mPrivate.mAttributeMetadata[sMandatoryAttribute];
-			const bAllowedinComplexProperty = mAttributeMetadata.inComplexProperty.allowed;
-			const sAlias = mLegacyAlias[sMandatoryAttribute];
-			const bContainsAlias = sAlias && sAlias in oProperty;
-			const bAttrIsNull = bContainsAlias ? oProperty[sAlias] == null : oProperty[sMandatoryAttribute] == null;
+			const bMandatoryAttrIsNull = oProperty[sMandatoryAttribute] == null;
 
-			if (bAttrIsNull && PropertyHelper.isPropertyComplex(oProperty) && !bAllowedinComplexProperty) {
-				// Don't throw an error if a complex property does not contain a mandatory attribute that is not allowed in complex properties.
+			/**
+			 * @deprecated As of version 1.121
+			 */
+			if (mLegacyAlias[sMandatoryAttribute]) {
+				const sAlias = mLegacyAlias[sMandatoryAttribute];
+				const bContainsAlias = sAlias && sAlias in oProperty;
+				const bAttrIsNull = bContainsAlias ? oProperty[sAlias] == null : bMandatoryAttrIsNull;
+
+				if (bAttrIsNull && PropertyHelper.isPropertyComplex(oProperty) && !mAttributeMetadata.inComplexProperty.allowed) { // Don't throw an error if a complex property does not contain a mandatory attribute that is not allowed in complex properties.
+					return;
+				}
+
+				if (!(sMandatoryAttribute in oProperty || bContainsAlias)) {
+					reportInvalidProperty("Property does not contain mandatory attribute '" + sMandatoryAttribute + "'.", oProperty);
+				} else if (bAttrIsNull) {
+					throwInvalidPropertyError("Property does not contain mandatory attribute '" + sMandatoryAttribute + "'.", oProperty);
+				}
 				return;
 			}
 
-			if (!(sMandatoryAttribute in oProperty || bContainsAlias)) {
+			if (bMandatoryAttrIsNull && PropertyHelper.isPropertyComplex(oProperty) && !mAttributeMetadata.inComplexProperty.allowed) { // Don't throw an error if a complex property does not contain a mandatory attribute that is not allowed in complex properties.
+				return;
+			}
+
+			if (!(sMandatoryAttribute in oProperty)) {
 				reportInvalidProperty("Property does not contain mandatory attribute '" + sMandatoryAttribute + "'.", oProperty);
-			} else if (bAttrIsNull) {
+			} else if (bMandatoryAttrIsNull) {
 				throwInvalidPropertyError("Property does not contain mandatory attribute '" + sMandatoryAttribute + "'.", oProperty);
 			}
 		});
@@ -757,7 +793,9 @@ sap.ui.define([
 			const sAttributePath = bTopLevel ? sAttribute : sPath + "." + sAttribute;
 			const vValue = oPropertySection[sAttribute];
 
-			// Consider legacy alias
+			/**
+			 * @deprecated As of version 1.121
+			 */
 			if (!mAttribute) {
 				mAttribute = mAttributeSection[Object.entries(mLegacyAlias).find((aEntry) => aEntry[1] === sAttribute)?.[0]];
 			}
@@ -794,11 +832,12 @@ sap.ui.define([
 		}
 
 		for (let i = 0; i < aProperties.length; i++) {
-			if (oUniquePropertiesSet.has(getPropertyKey(aProperties[i]))) {
+			const sPropertyKey = getPropertyKey(aProperties[i]);
+			if (oUniquePropertiesSet.has(sPropertyKey)) {
 				if (PropertyHelper.isPropertyComplex(aProperties[i])) {
 					throwInvalidPropertyError("Property references complex properties in the '" + sPath + "' attribute.", oProperty);
 				}
-				oUniquePropertiesSet.delete(getPropertyKey(aProperties[i]));
+				oUniquePropertiesSet.delete(sPropertyKey);
 			}
 		}
 

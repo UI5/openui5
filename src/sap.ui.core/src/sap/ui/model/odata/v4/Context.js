@@ -1953,9 +1953,12 @@ sap.ui.define([
 	 *   Since 1.82.0, absolute paths are supported. Absolute paths must start with the entity
 	 *   container (example "/com.sap.gateway.default.iwbep.tea_busi.v0001.Container/TEAMS") of the
 	 *   service. All (navigation) properties in the complete model matching such an absolute path
-	 *   are updated. Since 1.85.0, "14.3.11 Expression edm:String" is accepted as well. Since
-	 *   1.145.0, you can use <code>null</code> values (and <code>{$Null : null}</code>) as synonyms
-	 *   for empty navigation property paths.
+	 *   are updated. Since 1.146.0, {@link sap.ui.model.odata.v4.ODataModel#requestSideEffects} can
+	 *   be used as well.
+	 *
+	 *   Since 1.85.0, "14.3.11 Expression edm:String" is accepted as well. Since 1.145.0, you can
+	 *   use <code>null</code> values (and <code>{$Null : null}</code>) as synonyms for empty
+	 *   navigation property paths.
 	 *
 	 *   Since 1.108.8, a property path matching the "com.sap.vocabularies.Common.v1.Messages"
 	 *   annotation of a list binding's entity type is treated specially for a row context of a list
@@ -1963,14 +1966,14 @@ sap.ui.define([
 	 *   exactly the messages for a single row can be updated. Same for a "*" segment or an empty
 	 *   navigation property path.
 	 * @param {string} [sGroupId]
-	 *   The group ID to be used (since 1.69.0); if not specified, the update group ID for the
-	 *   context's binding is used, see {@link #getUpdateGroupId}. If a different group ID is
-	 *   specified, make sure that {@link #requestSideEffects} is called after the corresponding
-	 *   updates have been successfully processed by the server and that there are no pending
-	 *   changes for the affected properties.
+	 *   The group ID to be used (since 1.69.0). If not specified, the
+	 *   {@link #getUpdateGroupId update group ID} for the context's binding is used. If a different
+	 *   group ID is specified, make sure that {@link #requestSideEffects} is called after the
+	 *   corresponding updates have been successfully processed by the server and that there are no
+	 *   pending changes for the affected properties.
 	 * @returns {Promise<void>}
-	 *   A promise which is resolved without a defined result, or rejected with an error if
-	 *   loading of side effects fails. Use it to set fields affected by side effects to read-only
+	 *   A promise which is resolved without a defined result, or rejected with an error if the
+	 *   side effects fail to load. Use it to set fields affected by side effects to read-only
 	 *   before {@link #requestSideEffects} and make them editable again when the promise resolves;
 	 *   in the error handler, you can repeat the loading of side effects.
 	 *   <br>
@@ -2105,7 +2108,8 @@ sap.ui.define([
 						})
 			).then(function () {
 				return SyncPromise.all([
-					that.oModel.requestSideEffects(aPathsForModel, sGroupId),
+					aPathsForModel.length
+						&& that.oModel.requestSideEffects(aPathsForModel, sGroupId),
 					// ensure that this is called synchronously when there are no running change
 					// requests (otherwise bubbling up might fail due to temporarily missing caches)
 					that.requestSideEffectsInternal(aPathsForBinding, sGroupId)

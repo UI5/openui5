@@ -57,10 +57,10 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("and no is layer provided", function(assert) {
+		QUnit.test("and no layer is provided", function(assert) {
 			var mPropertyBag = {
 				reference: "reference",
-				flexObjects: []
+				flexObjects: [{}]
 			};
 
 			return Storage.write(mPropertyBag).catch(function(oError) {
@@ -123,6 +123,27 @@ sap.ui.define([
 				var oWriteCallArgs = oWriteStub.getCall(0).args[0];
 				assert.strictEqual(oWriteCallArgs.url, sUrl, "the url was added to the property bag");
 				assert.strictEqual(oWriteCallArgs.flexObjects, aFlexObjects, "the flexObjects were passed in the property bag");
+			});
+		});
+
+		QUnit.test("then it does not call write of the connector in case of empty flexObjects array", function(assert) {
+			var aFlexObjects = [];
+
+			var mPropertyBag = {
+				layer: Layer.VENDOR,
+				flexObjects: aFlexObjects
+			};
+			var sUrl = "/some/url";
+			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
+				{ connector: "LrepConnector", url: sUrl }
+			]);
+
+			var oWriteSpy = sandbox.spy(WriteLrepConnector, "write");
+
+			return Storage.write(mPropertyBag).then(function(oResult) {
+				assert.ok(oWriteSpy.notCalled, "the write to the backend is not called");
+				assert.deepEqual(oResult.response, aFlexObjects, "the empty array is returned");
+				assert.strictEqual(oResult.status, 200, "the correct status is returned");
 			});
 		});
 
