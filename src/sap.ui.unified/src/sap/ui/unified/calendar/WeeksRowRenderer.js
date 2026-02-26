@@ -72,7 +72,7 @@ sap.ui.define([
 		oRm.openEnd();
 		for (var i = 0; i < iInterval; i++) {
 			const oWeekInfo = aWeeks[i];
-			oRm.openStart("div", i + "-week");
+			oRm.openStart("div",   `${oWeeksRow.getId()}-week-interval-${oWeekInfo.first}-${oWeekInfo.last}-text`);
 			oRm.class("sapUiCalRowWeekNumber");
 			if (sWidth) {
 				oRm.style("width", sWidth);

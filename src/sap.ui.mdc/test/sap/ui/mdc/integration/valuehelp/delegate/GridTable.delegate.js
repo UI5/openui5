@@ -104,7 +104,7 @@ sap.ui.define([
 					const oPropertyAnnotations = oMetaModel.getObject(sEntitySetPath + "/" + sKey + "@");
 
 					aProperties.push({
-						name: sKey,
+						key: sKey,
 						path: sKey,
 						label: oPropertyAnnotations["@com.sap.vocabularies.Common.v1.Label"] || sKey,
 						sortable: oSortRestrictionsInfo[sKey] ? oSortRestrictionsInfo[sKey].sortable : true,
@@ -215,7 +215,7 @@ sap.ui.define([
 				const oColumnInfo = this._getColumnInfo(oPropertyInfo, oTable);
 				oColumnInfo.template = oTemplate;
 				oColumnInfo.propertyKey = sPropertyName;
-				return new Column(oTable.getId() + "--" + oPropertyInfo.name, oColumnInfo);
+				return new Column(oTable.getId() + "--" + oPropertyInfo.key, oColumnInfo);
 			}.bind(this));
 		}.bind(this));
 	};
@@ -245,7 +245,7 @@ sap.ui.define([
 	ODataTableDelegate._getColumnTemplateInfo = function(oPropertyInfo, oTable) {
 		return {
 			text: {
-				path: oPropertyInfo.path || oPropertyInfo.name
+				path: oPropertyInfo.path || oPropertyInfo.key
 			}
 		};
 	};

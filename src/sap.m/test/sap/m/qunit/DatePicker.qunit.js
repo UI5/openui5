@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/m/InstanceManager",
 	"sap/m/Label",
 	"sap/m/Button",
+	"sap/m/Dialog",
 	"sap/ui/model/type/Date",
 	"sap/ui/model/odata/type/DateTime",
 	"sap/ui/model/odata/v2/ODataModel",
@@ -38,7 +39,6 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/Element",
 	"sap/ui/core/date/UI5Date",
-	"sap/m/Dialog",
 	// load all required calendars in advance
 	"sap/ui/core/date/Buddhist",
 	"sap/ui/core/date/Gregorian",
@@ -62,6 +62,7 @@ sap.ui.define([
 	InstanceManager,
 	Label,
 	Button,
+	Dialog,
 	TypeDate,
 	DateTime,
 	ODataModel,
@@ -83,8 +84,7 @@ sap.ui.define([
 	deepEqual,
 	jQuery,
 	Element,
-	UI5Date,
-	Dialog
+	UI5Date
 ) {
 	"use strict";
 
@@ -2435,9 +2435,16 @@ sap.ui.define([
 			setMarked: function() {}
 		},
 		model = new JSONModel({
-			"date": ""
+			date: ""
 		}),
-		oDP = new DatePicker({value: "{ type: 'DateInterval',parts: [{path: '/date'}]}"}),
+		oDP = new DatePicker({
+			value: {
+				type: new Date({format: "yMEd"}),
+				parts: [
+					{ path: "/date" }
+				]
+			}
+		}),
 		oDialog = new Dialog({
 			content: [ oDP ]
 		}),

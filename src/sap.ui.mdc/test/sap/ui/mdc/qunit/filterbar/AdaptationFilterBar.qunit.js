@@ -52,11 +52,11 @@ sap.ui.define([
 					payload: {
 						propertyInfo: [{
 							label: "Key 1",
-							name: "key1",
+							key: "key1",
 							dataType: "sap.ui.model.type.String"
 						},{
 							label: "Key 2",
-							name: "key2",
+							key: "key2",
 							dataType: "sap.ui.model.type.String"
 						}]
 					}
@@ -328,19 +328,19 @@ sap.ui.define([
 			//Mock propertyinfo
 			this.aMockProperties = [
 				{
-					name: "key1",
+					key: "key1",
 					path: "key1",
 					label: "Key 1",
 					dataType: "sap.ui.model.type.String"
 				},
 				{
-					name: "key2",
+					key: "key2",
 					path: "key2",
 					label: "Key 2",
 					dataType: "sap.ui.model.odata.type.DateTimeOffset"
 				},
 				{
-					name: "key3",
+					key: "key3",
 					path: "key3",
 					label: "Key 3",
 					dataType: "sap.ui.model.type.String"
@@ -1054,7 +1054,7 @@ sap.ui.define([
 						collectionName: "test"
 					}
 				},
-				propertyInfo: [{name: "key1", label: "Some custom label", dataType: "sap.ui.model.type.String"}],
+				propertyInfo: [{key: "key1", label: "Some custom label", dataType: "sap.ui.model.type.String"}],
 				filterItems: {
 					path: "$custom>/data",
 					template: new FilterField({

@@ -2818,6 +2818,7 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(aFilteredPaths), sGroupId)
 				.returns(SyncPromise.resolve({}));
 			that.mock(oModel).expects("requestSideEffects")
+				.exactly(oFixture.absolute ? 1 : 0)
 				.withExactArgs(aAbsolutePaths, sGroupId)
 				.returns(SyncPromise.resolve({}));
 		}

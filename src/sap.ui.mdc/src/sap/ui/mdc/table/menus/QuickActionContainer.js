@@ -61,14 +61,14 @@ sap.ui.define([
 					items: aSortableProperties.map((oProperty) => {
 						let sSortOrder = CoreLibrary.SortOrder.None;
 						const mSortCondition = aSortedProperties.find((oSortedProperty) => {
-							return oSortedProperty.name === oProperty.name;
+							return oSortedProperty.key === oProperty.key;
 						});
 
 						if (mSortCondition) {
 							sSortOrder = mSortCondition.descending ? CoreLibrary.SortOrder.Descending : CoreLibrary.SortOrder.Ascending;
 						}
 						return new QuickSortItem({
-							key: oProperty.name,
+							key: oProperty.key,
 							label: oProperty.label,
 							sortOrder: sSortOrder
 						});
@@ -92,11 +92,11 @@ sap.ui.define([
 				this.addQuickAction(new QuickGroup({
 					items: aGroupableProperties.map((oProperty) => {
 						const bGrouped = aGroupedProperties.some((oGroupedProperty) => {
-							return oGroupedProperty.name === oProperty.name;
+							return oGroupedProperty.name === oProperty.key;
 						});
 
 						return new QuickGroupItem({
-							key: oProperty.name,
+							key: oProperty.key,
 							label: oProperty.label,
 							grouped: bGrouped
 						});
@@ -118,9 +118,9 @@ sap.ui.define([
 				this.addQuickAction(new QuickTotal({
 					items: aPropertiesThatCanBeTotaled.map((oProperty) => {
 						return new QuickTotalItem({
-							key: oProperty.name,
+							key: oProperty.key,
 							label: oProperty.label,
-							totaled: mAggregatedProperties.hasOwnProperty(oProperty.name)
+							totaled: mAggregatedProperties.hasOwnProperty(oProperty.key)
 						});
 					}),
 					change: function(oEvent) {
@@ -148,7 +148,7 @@ sap.ui.define([
 			if ((!aKeys || aKeys.includes("Sort")) && oQuickAction.isA("sap.m.table.columnmenu.QuickSort")) {
 				oQuickAction.getItems().forEach((oItem) => {
 					const mSortCondition = aSortedProperties.find((oSortedProperty) => {
-						return oSortedProperty.name === oItem.getProperty("key");
+						return oSortedProperty.key === oItem.getProperty("key");
 					});
 					if (mSortCondition) {
 						oItem.setSortOrder(mSortCondition.descending ? CoreLibrary.SortOrder.Descending : CoreLibrary.SortOrder.Ascending);
@@ -159,7 +159,7 @@ sap.ui.define([
 			} else if ((!aKeys || aKeys.includes("Group")) && oQuickAction.isA("sap.m.table.columnmenu.QuickGroup")) {
 				oQuickAction.getItems().forEach((oItem) => {
 					const bGrouped = aGroupedProperties.some((oGroupedProperty) => {
-						return oGroupedProperty.name === oItem.getProperty("key");
+						return oGroupedProperty.key === oItem.getProperty("key");
 					});
 					oItem.setGrouped(bGrouped);
 				});

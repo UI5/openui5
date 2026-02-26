@@ -195,8 +195,8 @@ sap.ui.define([
 					assert.ok(oChangeContent.name);
 					assert.ok(!oChangeContent.hasOwnProperty("descending"));
 					const oPropertyHelper = Engine.getInstance()._getRegistryEntry(this.oTable).helper;
-					assert.equal(oChangeContent.name, oPropertyHelper.getProperties()[1].name,
-						"The stored key should be equal to the 'name' in property info (NOT PATH!)");
+					assert.equal(oChangeContent.name, oPropertyHelper.getProperties()[1].key,
+						"The stored key should be equal to the 'key' in property info (NOT PATH!)");
 					Engine.getInstance()._setModificationHandler(this.oTable, FlexModificationHandler.getInstance());
 					done();
 					oColumnController.getP13nData.restore();
@@ -240,14 +240,14 @@ sap.ui.define([
 
 		const aPropertyInfos = [
 			{
-				"name": "col1",
+				"key": "col1",
 				"path": "nav/col1",
 				"label": "col1",
 				"dataType": "String",
 				"sortable": false,
 				"filterable": true
 			}, {
-				"name": "col2",
+				"key": "col2",
 				"path": "nav/col2",
 				"label": "col2",
 				"dataType": "String",
@@ -285,7 +285,7 @@ sap.ui.define([
 
 		const aPropertyInfos = [
 			{
-				"name": "col1",
+				"key": "col1",
 				"path": "nav/col1",
 				"label": "col1",
 				"dataType": "String",
@@ -293,7 +293,7 @@ sap.ui.define([
 				"filterable": true,
 				"visible": true
 			}, {
-				"name": "col2",
+				"key": "col2",
 				"path": "nav/col2",
 				"label": "col2",
 				"dataType": "String",
@@ -331,14 +331,14 @@ sap.ui.define([
 
 		const aPropertyInfos = [
 			{
-				"name": "col1",
+				"key": "col1",
 				"path": "nav/col1",
 				"label": "col1",
 				"dataType": "String",
 				"sortable": false,
 				"filterable": true
 			}, {
-				"name": "col2",
+				"key": "col2",
 				"path": "nav/col2",
 				"label": "col2",
 				"dataType": "String",

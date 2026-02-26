@@ -459,7 +459,7 @@ sap.ui.define([
 			const vEnabled = this._getEnabledFromDesignTime(oDesignTime);
 
 			return {
-				name: oAction.getId(),
+				key: oAction.getId(),
 				alignment: oAction.getLayoutInformation().alignment,
 				label: oAction.getLabel(),
 				visible: true,

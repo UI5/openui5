@@ -11,7 +11,7 @@ sap.ui.define([
 	CustomTableDelegate.fetchProperties = function(oTable) {
 		return TableDelegate.fetchProperties.apply(this, arguments).then(function(aProperties) {
 			const oProductIdName = {
-				name: "ProductID_Name",
+				key: "ProductID_Name",
 				label: "Product Name & Id",
 				propertyInfos: ["ProductID", "Name"],
 				exportSettings: {
@@ -20,7 +20,7 @@ sap.ui.define([
 			};
 
 			const oNoDataCol1 = {
-				name: "NoDataCol1",
+				key: "NoDataCol1",
 				label: "NoDataColumn1",
 				dataType: "String",
 				sortable: false,
@@ -28,7 +28,7 @@ sap.ui.define([
 			};
 
 			const oNoDataCol2 = {
-				name: "NoDataCol2",
+				key: "NoDataCol2",
 				label: "NoDataColumn2",
 				dataType: "String",
 				sortable: false,
@@ -59,7 +59,7 @@ sap.ui.define([
 			}
 
 			return this._createComplexColumnTemplate(oPropertyInfo).then(function(oTemplate) {
-				const sPropertyName = oPropertyInfo.name;
+				const sPropertyName = oPropertyInfo.key;
 				const oColumnInfo = {
 					header: oPropertyInfo.label,
 					tooltip: oPropertyInfo.label,

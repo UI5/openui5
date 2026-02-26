@@ -608,7 +608,7 @@
 								"collectionName": "Books"
 							\}
 						\}' chartType="column" header="Remake Chart with cached properties and VM" height="400px" width="100%" propertyInfo='[\{
-                    "name": "language_code",
+                    "key": "language_code",
                     "path": "language_code",
                     "label": "Language",
                     "sortable": true,
@@ -626,7 +626,7 @@
 					"type": "Edm.String"
             \},
             \{
-                "name": "averagemetricsWords",
+                "key": "averagemetricsWords",
                 "path": "metricsWords",
                 "label": "Words (average)",
                 "sortable": true,

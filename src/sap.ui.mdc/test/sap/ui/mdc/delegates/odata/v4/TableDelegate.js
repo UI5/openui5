@@ -191,7 +191,6 @@ sap.ui.define([
 					const bIsKey = oEntityType.$Key.indexOf(sKey) > -1;
 					var oPropertyInfo = {
 						key: sKey,
-						name: sKey, // legacy support
 						path: sKey,
 						label: oPropertyAnnotations["@com.sap.vocabularies.Common.v1.Label"] || sKey,
 						sortable: oSortRestrictionsInfo[sKey] ? oSortRestrictionsInfo[sKey].sortable : true,
@@ -232,7 +231,6 @@ sap.ui.define([
 						};
 						aProperties.push({
 							key: sKey + "_" + oPropertyInfo.unit + "_ComplexWithUnit",
-							name: sKey + "_" + oPropertyInfo.unit + "_ComplexWithUnit", // legacy support
 							label: oPropertyInfo.label + " + Unit",
 							propertyInfos: [sKey, oPropertyInfo.unit],
 							exportSettings: {
@@ -258,7 +256,6 @@ sap.ui.define([
 
 						aProperties.push({
 							key: sKey + "_ComplexWithText",
-							name: sKey + "_ComplexWithText", // legacy support
 							label: oPropertyInfo.label + " + Text",
 							propertyInfos: [sKey, oPropertyInfo.text],
 							exportSettings: {

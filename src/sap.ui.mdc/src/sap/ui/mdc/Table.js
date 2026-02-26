@@ -968,7 +968,8 @@ sap.ui.define([
 
 		this._oManagedObjectModel = new ManagedObjectModel(this, {
 			hasGrandTotal: false,
-			activeP13nModes: createActiveP13nModesMap(this)
+			activeP13nModes: createActiveP13nModesMap(this),
+			toolbarButtonType: TableSettings.getToolbarButtonType()
 		});
 		this._oManagedObjectModel.setDefaultBindingMode(BindingMode.OneWay);
 		this.setModel(this._oManagedObjectModel, "$sap.ui.mdc.Table");
@@ -1418,9 +1419,9 @@ sap.ui.define([
 	async function validateStateAgainstPropertyInfo(oTable) {
 		const oXConfig = oTable._getXConfig();
 		const mState = {
-			Sort: oTable._getSortedProperties().map((oSortCondition) => oSortCondition.name),
+			Sort: oTable._getSortedProperties().map((oSortCondition) => oSortCondition.key),
 			Filter: getFilteredProperties(oTable.getFilterConditions()),
-			"Group level": oTable._getGroupedProperties().map((oGroupCondition) => oGroupCondition.name),
+			"Group level": oTable._getGroupedProperties().map((oGroupCondition) => oGroupCondition.key),
 			Aggregation: Object.keys(oTable._getAggregatedProperties()),
 			"Column width": Object.keys(oXConfig?.aggregations?.columns || {}).filter((sKey) => oXConfig.aggregations.columns[sKey].width)
 		};
@@ -2977,8 +2978,8 @@ sap.ui.define([
 
 		aColumns.forEach(function(oColumn) {
 			const oProperty = oPropertyHelper.getProperty(oColumn.getPropertyKey());
-			const aSortableProperties = oProperty?.getSortableProperties().map((oProperty) => oProperty.name) ?? [];
-			const oSortCondition = this._getSortedProperties().find((oSortCondition) => aSortableProperties.includes(oSortCondition.name));
+			const aSortableProperties = oProperty?.getSortableProperties().map((oProperty) => oProperty.key) ?? [];
+			const oSortCondition = this._getSortedProperties().find((oSortCondition) => aSortableProperties.includes(oSortCondition.key));
 			let sSortOrder = SortOrder.None;
 
 			if (oSortCondition) {
@@ -3129,10 +3130,7 @@ sap.ui.define([
 	 * Handler for theme changes
 	 */
 	Table.prototype.onThemeChanged = function() {
-		if (this._oExportButton) {
-			const sButtonType = MLibrary.ButtonType[ThemeParameters.get({name: "_sap_ui_mdc_Table_ExportButtonType"})];
-			this._oExportButton.setType(sButtonType);
-		}
+		this._oManagedObjectModel.setProperty("/@custom/toolbarButtonType", TableSettings.getToolbarButtonType());
 
 		if (this._oToolbar) {
 			const sToolBarDesign = ToolbarDesign[ThemeParameters.get({name: "_sap_ui_mdc_Table_ToolbarDesign"})];

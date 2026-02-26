@@ -69,7 +69,7 @@ sap.ui.define([
 		const oFilterBar = oControl._oFilterField.getParent();
 		const oProperty = oFilterBar._getPropertyByName(oControl._getFieldPath());
 		if (oProperty) {
-			this.mFilterItems[oProperty.name] = oControl;
+			this.mFilterItems[oProperty.key] = oControl;
 		}
 	};
 

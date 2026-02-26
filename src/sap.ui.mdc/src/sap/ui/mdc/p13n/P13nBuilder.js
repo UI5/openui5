@@ -211,9 +211,9 @@ sap.ui.define([
 			const bEnhance = fnEnhace instanceof Function;
 
 			oPropertyHelper.getProperties().forEach((oProperty) => {
-
 				const mItem = {};
-				mItem.name = oProperty.name;
+
+				mItem.name = oProperty.key;
 
 				if (bEnhance) {
 					const bIsValid = fnEnhace(mItem, oProperty);
@@ -222,7 +222,7 @@ sap.ui.define([
 					}
 				}
 
-				mItem.label = oProperty.label || oProperty.name;
+				mItem.label = oProperty.label || mItem.name;
 				mItem.tooltip = oProperty.tooltip;
 
 				if (mItemsGrouped) {
@@ -233,7 +233,6 @@ sap.ui.define([
 				}
 
 				aItems.push(mItem);
-
 			});
 
 			const oAdaptationData = {

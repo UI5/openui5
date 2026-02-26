@@ -21,33 +21,33 @@ sap.ui.define([
 			chartType: "column",
 			properties: [
 				{
-					name: "SalesNumber",
+					key: "SalesNumber",
 					path: "SalesNumber",
 					dataType: "Edm.Int32",
 					label: "Sales Number",
 					aggregatable: true
 				}, {
-					name: "agSalesAmount",
+					key: "agSalesAmount",
 					path: "SalesAmount",
 					dataType: "Edm.String",
 					label: "Sales Amount",
 					groupable: true
 				}, {
-					name: "Name",
+					key: "Name",
 					path: "Name",
 					dataType: "Edm.String",
 					label: "Name",
 					groupable: true
 				}, {
-					name: "Industry",
+					key: "Industry",
 					dataType: "Edm.String",
 					label: "Industry"
 				}, {
-					name: "Country",
+					key: "Country",
 					dataType: "Edm.String",
 					label: "Country"
 				}, {
-					name: "SomePropertyName",
+					key: "SomePropertyName",
 					dataType: "Edm.String",
 					label: "SomeProperty",
 					groupable: true

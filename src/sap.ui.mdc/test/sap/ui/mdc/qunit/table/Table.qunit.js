@@ -3175,7 +3175,7 @@ sap.ui.define([
 			],
 			sortConditions: {
 				sorters: [
-					{name: "name", descending: true}
+					{key: "name", descending: true}
 				]
 			},
 			autoBindOnInit: false
@@ -3209,8 +3209,8 @@ sap.ui.define([
 		oUpdateSortIndicator.resetHistory();
 		this.oTable.setSortConditions({
 			sorters: [
-				{name: "firstName", descending: false},
-				{name: "age", descending: true}
+				{key: "firstName", descending: false},
+				{key: "age", descending: true}
 			]
 		});
 		await this.oTable.rebind();
@@ -4450,13 +4450,13 @@ sap.ui.define([
 	QUnit.test("State validation against property infos", async function(assert) {
 		await this.createTable({
 			sortConditions: {
-				sorters: [{name: "DoesNotExist"}]
+				sorters: [{key: "DoesNotExist"}]
 			},
 			filterConditions: {
 				DoesNotExist: [{operator: "EQ", values: [30]}]
 			},
 			groupConditions: {
-				groupLevels: [{name: "DoesNotExist"}]
+				groupLevels: [{key: "DoesNotExist"}]
 			},
 			aggregateConditions: {
 				DoesNotExist: {}
@@ -6086,6 +6086,8 @@ sap.ui.define([
 			this.sDefaultTheme = Theming.getTheme();
 		},
 		beforeEach: async function() {
+			this.oClipboardStub = sinon.stub(window, "navigator").value({clipboard: {}});
+			this.oSecureContextStub = sinon.stub(window, "isSecureContext").value(true);
 			this.oTable = new Table({
 				delegate: {
 					name: sDelegatePath,
@@ -6093,12 +6095,21 @@ sap.ui.define([
 						collectionPath: "/testPath"
 					}
 				},
-				enableExport: true
+				enableExport: true,
+				showPasteButton: true,
+				enablePaste: true,
+				copyProvider: new CopyProvider()
 			});
 			await this.oTable.initialized();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
+			if (this.oClipboardStub) {
+				this.oClipboardStub.restore();
+			}
+			if (this.oSecureContextStub) {
+				this.oSecureContextStub.restore();
+			}
 		},
 		after: async function() {
 			await this.applyTheme(this.sDefaultTheme);
@@ -6117,44 +6128,15 @@ sap.ui.define([
 		}
 	});
 
+	const aHorizonThemes = ["sap_horizon", "sap_horizon_dark", "sap_horizon_hcb", "sap_horizon_hcw"];
+	const isHorizonTheme = (sTheme) => aHorizonThemes.includes(sTheme);
+
 	for (const sTheme of [
-		"sap_horizon",
-		"sap_horizon_dark",
-		"sap_horizon_hcb",
-		"sap_horizon_hcw",
+		...aHorizonThemes,
 		"sap_fiori_3"
 	]) {
-		QUnit.test(sTheme + "; Export button", async function(assert) {
-			let sExpectedButtontype;
-
-			switch (sTheme) {
-				case "sap_horizon":
-				case "sap_horizon_dark":
-				case "sap_horizon_hcw":
-				case "sap_horizon_hcb":
-					sExpectedButtontype = ButtonType.Transparent;
-					break;
-				default:
-					sExpectedButtontype = ButtonType.Ghost;
-			}
-
-			await this.applyTheme(sTheme);
-			assert.deepEqual(this.oTable._oExportButton.getType(), sExpectedButtontype, "buttonType property");
-		});
-
 		QUnit.test(sTheme + "; Toolbar", async function(assert) {
-			let sExpectedDesigntype;
-
-			switch (sTheme) {
-				case "sap_horizon":
-				case "sap_horizon_dark":
-				case "sap_horizon_hcw":
-				case "sap_horizon_hcb":
-					sExpectedDesigntype = ToolbarDesign.Solid;
-					break;
-				default:
-					sExpectedDesigntype = ToolbarDesign.Transparent;
-			}
+			const sExpectedDesigntype = isHorizonTheme(sTheme) ? ToolbarDesign.Solid : ToolbarDesign.Transparent;
 
 			await this.applyTheme(sTheme);
 			assert.deepEqual(this.oTable._oToolbar.getDesign(), sExpectedDesigntype, "design property");
@@ -6164,21 +6146,37 @@ sap.ui.define([
 			const oVariantManagement = new VariantManagement();
 			this.oTable.setVariant(oVariantManagement);
 
-			let sExpectedTitleLevel;
+			const sExpectedTitleLevel = isHorizonTheme(sTheme) ? TitleLevel.H5 : TitleLevel.H4;
 
-			switch (sTheme) {
-				case "sap_horizon":
-				case "sap_horizon_dark":
-				case "sap_horizon_hcw":
-				case "sap_horizon_hcb":
-					sExpectedTitleLevel = TitleLevel.H5;
-					break;
-				default:
-					sExpectedTitleLevel = TitleLevel.H4;
-			}
 			await this.applyTheme(sTheme);
 			assert.deepEqual(this.oTable._oTitle.getTitleStyle(), sExpectedTitleLevel, "titleStyle property");
 			assert.deepEqual(this.oTable.getVariant().getTitleStyle(), sExpectedTitleLevel, "variant titleStyle property");
+		});
+
+		QUnit.test(sTheme + "; Common overflow button type applied uniformly", async function(assert) {
+			const sExpectedButtontype = isHorizonTheme(sTheme) ? ButtonType.Transparent : ButtonType.Ghost;
+
+			await this.applyTheme(sTheme);
+			await nextUIUpdate();
+			const oCopyButton = Element.getElementById(this.oTable.getId() + "-copy");
+
+			assert.ok(this.oTable._oExportButton, "Export button exists");
+			assert.ok(this.oTable._oP13nButton, "Settings button exists");
+			assert.ok(this.oTable._oPasteButton, "Paste button exists");
+			assert.ok(oCopyButton, "Copy button exists");
+			assert.equal(this.oTable.getModel("$sap.ui.mdc.Table").getProperty("/@custom/toolbarButtonType"),
+				sExpectedButtontype, "Model provides the common overflow type");
+
+			const types = [
+				this.oTable._oExportButton.getType(),
+				this.oTable._oP13nButton.getType(),
+				this.oTable._oPasteButton.getType(),
+				oCopyButton.getType()
+			];
+
+			for (const t of types) {
+				assert.deepEqual(t, sExpectedButtontype, "All buttons reflect common overflow type");
+			}
 		});
 	}
 

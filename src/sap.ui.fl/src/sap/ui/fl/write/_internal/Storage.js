@@ -218,6 +218,9 @@ sap.ui.define([
 	 * @returns {Promise} Promise resolving as soon as the writing was completed or rejects in case of an error
 	 */
 	Storage.write = async function(mPropertyBag) {
+		if (mPropertyBag.flexObjects.length === 0) {
+			return { response: [], status: 200 };
+		}
 		await addVersionToFlexObjects(mPropertyBag.flexObjects);
 		return _executeActionByName("write", mPropertyBag);
 	};

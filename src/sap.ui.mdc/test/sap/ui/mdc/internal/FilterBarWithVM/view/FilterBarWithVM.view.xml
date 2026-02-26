@@ -45,13 +45,13 @@
 					id="mountainsFilterbar"
 					delegate='\{"name": "mdc/sample/delegate/JSONFilterBarDelegate", "payload": \{\}\}'
 					p13nMode = "Item,Value"
-					propertyInfo='[\{"name": "name", "label": "Name (String)", "path": "name", "dataType":"sap.ui.model.type.String", "visible": true\},
-									\{"name": "height", "label": "Height (Integer)", "path": "height", "dataType":"sap.ui.model.type.Integer", "formatOptions": \{"emptyString": null\}, "visible": true\},
-									\{"name": "prominence", "label": "Prominence (Float)", "path": "prominence", "dataType":"sap.ui.model.type.Float", "formatOptions": \{"emptyString": null\}, "visible": true\},
-									\{"name": "parent_mountain", "label": "Has parent mountain (Boolean)", "path": "parent_mountain", "dataType":"sap.ui.model.type.Boolean", "maxConditions": 1, "visible": true\},
-									\{"name": "first_ascent", "label": "First Ascent (Date)", "path": "first_ascent", "dataType":"sap.ui.model.type.Date", "formatOptions": \{"style": "long"\}, "maxConditions": 1, "visible": true\},
-									\{"name": "rank", "label": "Rank (Integer)", "path": "rank", "dataType":"sap.ui.model.type.Integer", "formatOptions": \{"emptyString": 0\}, "constraints": \{"minimum": 0\}, "visible": true\},
-									\{"name": "country", "label": "Country", "path": "country", "dataType":"sap.ui.model.type.String", "visible": true\}]'
+					propertyInfo='[\{"key": "name", "label": "Name (String)", "path": "name", "dataType":"sap.ui.model.type.String", "visible": true\},
+									\{"key": "height", "label": "Height (Integer)", "path": "height", "dataType":"sap.ui.model.type.Integer", "formatOptions": \{"emptyString": null\}, "visible": true\},
+									\{"key": "prominence", "label": "Prominence (Float)", "path": "prominence", "dataType":"sap.ui.model.type.Float", "formatOptions": \{"emptyString": null\}, "visible": true\},
+									\{"key": "parent_mountain", "label": "Has parent mountain (Boolean)", "path": "parent_mountain", "dataType":"sap.ui.model.type.Boolean", "maxConditions": 1, "visible": true\},
+									\{"key": "first_ascent", "label": "First Ascent (Date)", "path": "first_ascent", "dataType":"sap.ui.model.type.Date", "formatOptions": \{"style": "long"\}, "maxConditions": 1, "visible": true\},
+									\{"key": "rank", "label": "Rank (Integer)", "path": "rank", "dataType":"sap.ui.model.type.Integer", "formatOptions": \{"emptyString": 0\}, "constraints": \{"minimum": 0\}, "visible": true\},
+									\{"key": "country", "label": "Country", "path": "country", "dataType":"sap.ui.model.type.String", "visible": true\}]'
 					filtersChanged=".onFiltersChanged">
 					<mdc:filterItems>
 						<!-- Title - String -->

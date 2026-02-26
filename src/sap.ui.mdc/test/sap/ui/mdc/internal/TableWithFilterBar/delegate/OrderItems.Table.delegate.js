@@ -31,7 +31,7 @@ sap.ui.define([
 			// Provide the ValueHelp for some of the properties. Without ValueHelp the filter panel will not provide the expected VH.
 			// TODO ValueHelp is not a supported property of the table propertyHelper and we will get warning logn in the console.
 			aProperties.forEach(function(oPropertyInfo){
-				if (oPropertyInfo.name === "book_ID") {
+				if (oPropertyInfo.key === "book_ID") {
 					oPropertyInfo.dataType = "Edm.Int32";
 					// oPropertyInfo.typeConfig.typeInstance = new Int32Type({groupingEnabled: false}, {nullable: false}); // needed for Field in table
 					oPropertyInfo.formatOptions = {groupingEnabled: false}; // needed for FilterField on settings-FilterBar
@@ -69,13 +69,13 @@ sap.ui.define([
 	OrderItemssTableDelegate._createColumnTemplate = function (oTable, oProperty) {
 
 		var oCtrlProperties = DelegateCache.merge({
-			id: getFullId(oTable, "F_" + oProperty.name),
-			value: {path: oProperty.path || oProperty.name, type: oProperty.typeConfig.typeInstance},
+			id: getFullId(oTable, "F_" + oProperty.key),
+			value: {path: oProperty.path || oProperty.key, type: oProperty.typeConfig.typeInstance},
 			editMode: FieldEditMode.Display,
 			width:"100%",
 			multipleLines: false,
 			delegate: {name: 'delegates/odata/v4/FieldBaseDelegate', payload: {}}
-		}, DelegateCache.get(oTable, oProperty.name, "$Columns"));
+		}, DelegateCache.get(oTable, oProperty.key, "$Columns"));
 
 		return new Field(oCtrlProperties);
 

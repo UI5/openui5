@@ -36,6 +36,10 @@ sap.ui.define([
 	const {HasPopup} = CoreLibrary.aria;
 	let oRb;
 
+	function getToolbarButtonType() {
+		return ThemeParameters.get({name: "_sap_ui_mdc_Table_OverflowButtonType"}) || "Ghost";
+	}
+
 	/**
 	 * P13n/Settings helper class for sap.ui.mdc.Table.
 	 *
@@ -45,6 +49,7 @@ sap.ui.define([
 	 * @alias sap.ui.mdc.table.TableSettings
 	 */
 	const TableSettings = {
+		getToolbarButtonType,
 		createSettingsButton: function(sIdPrefix, aEventInfo) {
 			if (!oRb) {
 				this._loadResourceBundle();
@@ -72,6 +77,7 @@ sap.ui.define([
 		},
 		createCopyButton: function(sIdPrefix, oCopyProvider) {
 			return oCopyProvider.getCopyButton({
+				...this._getButtonSettings(),
 				id: sIdPrefix + "-copy",
 				layoutData: new ActionLayoutData({
 					position: TableActionPosition.ModificationActionsCopy
@@ -99,12 +105,10 @@ sap.ui.define([
 			if (!oRb) {
 				this._loadResourceBundle();
 			}
-			const sButtonType = ThemeParameters.get({name: "_sap_ui_mdc_Table_ExportButtonType"});
-			const oMenuButton = new OverflowToolbarMenuButton(sIdPrefix + "-export", {
+			const oMenuButton = this._createMenuButton(sIdPrefix + "-export", {
 				icon: "sap-icon://excel-attachment",
 				text: oRb.getText("table.QUICK_EXPORT"),
 				tooltip: oRb.getText("table.EXPORT_BUTTON_TEXT"),
-				type: MLibrary.ButtonType[sButtonType],
 				buttonMode: MLibrary.MenuButtonMode.Split,
 				useDefaultActionOnly: true,
 				defaultAction: mEventInfo.default,
@@ -168,7 +172,7 @@ sap.ui.define([
 			const sTree = bIsExpand ? oRb.getText("table.EXPAND_TREE") : oRb.getText("table.COLLAPSE_TREE");
 			const sNode = bIsExpand ? oRb.getText("table.EXPAND_NODE") : oRb.getText("table.COLLAPSE_NODE");
 			const sText = bIsExpand ? oRb.getText("table.EXPAND_MENU_BUTTON_TEXT") : oRb.getText("table.COLLAPSE_MENU_BUTTON_TEXT");
-			const oMenuButton = new OverflowToolbarMenuButton(sId, {
+			const oMenuButton = this._createMenuButton(sId, {
 				icon: bIsExpand ? "sap-icon://expand-all" : "sap-icon://collapse-all",
 				tooltip: sText,
 				menu: new Menu({
@@ -184,7 +188,19 @@ sap.ui.define([
 			return oMenuButton;
 		},
 		_createButton: function(sId, mSettings) {
-			return new OverflowToolbarButton(sId, mSettings);
+			return new OverflowToolbarButton(sId, {
+				...this._getButtonSettings(),
+				...mSettings
+			});
+		},
+		_createMenuButton: function(sId, mSettings) {
+			return new OverflowToolbarMenuButton(sId, {
+				...this._getButtonSettings(),
+				...mSettings
+			});
+		},
+		_getButtonSettings: function() {
+			return {type: "{$sap.ui.mdc.Table>/@custom/toolbarButtonType}"};
 		},
 		_loadResourceBundle: function() {
 			oRb = Library.getResourceBundleFor("sap.ui.mdc");

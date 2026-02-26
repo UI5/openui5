@@ -2586,51 +2586,53 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("requestSideEffects", function (assert) {
-		var oBinding1 = {
-				isRoot : function () { return true; },
-				requestAbsoluteSideEffects : function () {}
-			},
-			oBinding2 = {
-				isRoot : function () { return false; },
-				requestAbsoluteSideEffects : function () {}
-			},
-			oBinding3 = {
-				isRoot : function () { return true; },
-				requestAbsoluteSideEffects : function () {}
-			},
-			oModel = this.createModel(),
-			aPaths = ["/foo", "/bar/baz"],
-			oPromise;
+	["group", undefined].forEach(function (sGroupId) {
+		QUnit.test("requestSideEffects, groupId=" + sGroupId, function (assert) {
+			var oBinding1 = {
+					isRoot : function () { return true; },
+					requestAbsoluteSideEffects : function () {}
+				},
+				oBinding2 = {
+					isRoot : function () { return false; },
+					requestAbsoluteSideEffects : function () {}
+				},
+				oBinding3 = {
+					isRoot : function () { return true; },
+					requestAbsoluteSideEffects : function () {}
+				},
+				oSideEffectsPromise1 = SyncPromise.resolve(new Promise(function (resolve) {
+					setTimeout(function () { resolve("~1~"); });
+				})),
+				oSideEffectsPromise3 = SyncPromise.resolve(new Promise(function (resolve) {
+					setTimeout(function () { resolve("~3~"); });
+				})),
+				sEffectiveGroupId = sGroupId || "$auto",
+				oModel = this.createModel(),
+				aPaths = ["/foo", "/bar/baz"];
 
-		oModel.aAllBindings = [oBinding1, oBinding2, oBinding3];
-		this.mock(oBinding1).expects("requestAbsoluteSideEffects")
-			.withExactArgs("group", sinon.match.same(aPaths)).resolves("~1");
-		this.mock(oBinding2).expects("requestAbsoluteSideEffects").never();
-		this.mock(oBinding3).expects("requestAbsoluteSideEffects")
-			.withExactArgs("group", sinon.match.same(aPaths)).resolves("~3");
+			oModel.aAllBindings = [oBinding1, oBinding2, oBinding3];
+			this.mock(oModel).expects("getUpdateGroupId").exactly(sGroupId ? 0 : 1).withExactArgs()
+				.returns(sEffectiveGroupId);
+			this.mock(_Helper).expects("checkGroupId").withExactArgs(sEffectiveGroupId);
+			this.mock(oBinding1).expects("requestAbsoluteSideEffects")
+				.withExactArgs(sEffectiveGroupId, sinon.match.same(aPaths))
+				.returns(oSideEffectsPromise1);
+			this.mock(oBinding2).expects("requestAbsoluteSideEffects").never();
+			this.mock(oBinding3).expects("requestAbsoluteSideEffects")
+				.withExactArgs(sEffectiveGroupId, sinon.match.same(aPaths))
+				.returns(oSideEffectsPromise3);
 
-		// code under test
-		oPromise = oModel.requestSideEffects(aPaths, "group");
+			// code under test
+			const oPromise = oModel.requestSideEffects(aPaths, sGroupId);
 
-		assert.notOk(oPromise.isFulfilled());
-		return oPromise.then(function (aResults) {
-			assert.deepEqual(aResults, ["~1", "~3"]);
+			assert.ok(oPromise instanceof Promise, "native promise to be used by API");
+
+			return oPromise.then(function (oResult) {
+				assert.ok(oSideEffectsPromise1.isFulfilled(), "side effects promise 1 fulfilled");
+				assert.ok(oSideEffectsPromise3.isFulfilled(), "side effects promise 3 fulfilled");
+				assert.strictEqual(oResult, undefined, "without a defined result");
+			});
 		});
-	});
-
-	//*********************************************************************************************
-	QUnit.test("requestSideEffects: nothing to do", function (assert) {
-		var oBinding = {
-				isRoot : function () { return true; },
-				requestAbsoluteSideEffects : function () {}
-			},
-			oModel = this.createModel();
-
-		oModel.aAllBindings = [oBinding];
-		this.mock(oBinding).expects("requestAbsoluteSideEffects").never();
-
-		assert.strictEqual(oModel.requestSideEffects([], "group"), undefined);
 	});
 
 	//*********************************************************************************************

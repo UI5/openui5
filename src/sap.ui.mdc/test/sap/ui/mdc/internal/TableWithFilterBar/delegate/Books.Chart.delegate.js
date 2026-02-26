@@ -64,7 +64,7 @@ sap.ui.define([
 
 		if (aFetchedProperties) {
 			var nIdx = aFetchedProperties.findIndex(function(oEntry) {
-				return oEntry.name === sPropertyName;
+				return oEntry.key === sPropertyName;
 			});
 
 			if (nIdx >= 0) {
@@ -76,10 +76,10 @@ sap.ui.define([
 		}
 	};
 
-	SampleChartDelegate.getMDCItemPrePos = function(sPropertyName, oChart, sRole, aProps, mPropertyBag) {
+	SampleChartDelegate.getMDCItemPrePos = function(sPropertyKey, oChart, sRole, aProps, mPropertyBag) {
 		var oModifier = mPropertyBag.modifier;
 		var oPropertyInfo = aProps.find(function(oEntry) {
-			return oEntry.name === sPropertyName;
+			return oEntry.key === sPropertyKey;
 		});
 
 		if (!oPropertyInfo) {
@@ -89,8 +89,8 @@ sap.ui.define([
 		return oModifier.getProperty(oChart, "id").then(function(sId) {
 			if (oPropertyInfo.groupable) {
 
-				return oModifier.createControl("sap.ui.mdc.chart.Item", mPropertyBag.appComponent, mPropertyBag.view, sId + "--GroupableItem--" + sPropertyName, {
-					propertyKey: oPropertyInfo.name,
+				return oModifier.createControl("sap.ui.mdc.chart.Item", mPropertyBag.appComponent, mPropertyBag.view, sId + "--GroupableItem--" + sPropertyKey, {
+					propertyKey: oPropertyInfo.key,
 					label: oPropertyInfo.label,
 					type: "groupable",
 					role: sRole ? sRole : "category"
@@ -99,8 +99,8 @@ sap.ui.define([
 
 			if (oPropertyInfo.aggregatable) {
 
-				return oModifier.createControl("sap.ui.mdc.chart.Item", mPropertyBag.appComponent, mPropertyBag.view, sId + "--AggregatableItem--" + sPropertyName, {
-					propertyKey: oPropertyInfo.name,
+				return oModifier.createControl("sap.ui.mdc.chart.Item", mPropertyBag.appComponent, mPropertyBag.view, sId + "--AggregatableItem--" + sPropertyKey, {
+					propertyKey: oPropertyInfo.key,
 					label: oPropertyInfo.label,
 					type: "aggregatable",
 					role: sRole ? sRole : "axis1"
@@ -117,7 +117,7 @@ sap.ui.define([
 		return oModifier.getProperty(oControl, "propertyInfo")
 			.then(function(aPropertyInfo) {
 				var nIdx = aPropertyInfo.findIndex(function(oEntry) {
-					return oEntry.name === sPropertyName;
+					return oEntry.key === sPropertyName;
 				});
 
 				if (nIdx < 0) {

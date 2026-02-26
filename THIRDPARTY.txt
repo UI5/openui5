@@ -6,31 +6,31 @@ The full text of all referenced licenses is appended at the end of this file.
 
 Library: sap.f:
 
-Component: UI5 Web Components, version: 2.15.0
+Component: UI5 Web Components, version: 2.19.2
 Copyright: SAP
 License: Apache-2.0
 License Text: https://github.com/UI5/openui5/blob/master/LICENSES/Apache-2.0.txt
 Contained in: src/sap.f/src/sap/f/thirdparty/**
 
-Component: UI5 Web Components Fiori, version: 2.15.0
+Component: UI5 Web Components Fiori, version: 2.19.2
 Copyright: SAP
 License: Apache-2.0
 License Text: https://github.com/UI5/openui5/blob/master/LICENSES/Apache-2.0.txt
 Contained in: src/sap.f/src/sap/f/thirdparty/**
 
-Component: UI5 Web Components Icons, version: 2.15.0
+Component: UI5 Web Components Icons, version: 2.19.2
 Copyright: SAP
 License: Apache-2.0
 License Text: https://github.com/UI5/openui5/blob/master/LICENSES/Apache-2.0.txt
 Contained in: src/sap.f/src/sap/f/thirdparty/**
 
-Component: UI5 Web Components Icons Business Suite, version: 2.15.0
+Component: UI5 Web Components Icons Business Suite, version: 2.19.2
 Copyright: SAP
 License: Apache-2.0
 License Text: https://github.com/UI5/openui5/blob/master/LICENSES/Apache-2.0.txt
 Contained in: src/sap.f/src/sap/f/thirdparty/**
 
-Component: UI5 Web Components Icons TNT, version: 2.15.0
+Component: UI5 Web Components Icons TNT, version: 2.19.2
 Copyright: SAP
 License: Apache-2.0
 License Text: https://github.com/UI5/openui5/blob/master/LICENSES/Apache-2.0.txt

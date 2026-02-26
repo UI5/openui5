@@ -344,7 +344,7 @@ sap.ui.define([
 
 		return TableQUnitUtils.openColumnMenu(oTable, 0).then(function() {
 			oTable._getSortedProperties = function() {
-				return [{name: "test", Descending: false}];
+				return [{key: "test", Descending: false}];
 			};
 			oTable._getGroupedProperties = function() {
 				return [];
@@ -355,7 +355,7 @@ sap.ui.define([
 				return [];
 			};
 			oTable._getGroupedProperties = function() {
-				return [{name: "test"}];
+				return [{key: "test"}];
 			};
 			testUpdateQuickActions("None", true);
 		});

@@ -35,34 +35,34 @@ sap.ui.define([
 			// Provide the ValueHelp for some of the properties. Without ValueHelp the filter panel will not provide the expected VH.
 			// TODO ValueHelp is not a supported property of the table propertyHelper and we will get warning logn in the console.
 			aProperties.forEach(function(oProperty) {
-				if (oProperty.name === "title") {
+				if (oProperty.key === "title") {
 					oProperty.caseSensitive = false;
 				}
-				if (oProperty.name === "subgenre_code") {
+				if (oProperty.key === "subgenre_code") {
 					oProperty.label = "Sub Genre";
 					oProperty.visualSettings = {widthCalculation: {maxWidth: 10}}; // as Text is normally short
 				}
-				if (oProperty.name === "genre_code") {
+				if (oProperty.key === "genre_code") {
 					oProperty.visualSettings = {widthCalculation: {maxWidth: 10}}; // as Text is normally short
 				}
 
-				if (oProperty.name === "ID" || oProperty.name === "author_ID") {
+				if (oProperty.key === "ID" || oProperty.key === "author_ID") {
 					oProperty.dataType = "Edm.Int32";
 					oProperty.constraints = {nullable: false};
 					oProperty.formatOptions = {groupingEnabled: false}; // needed for FilterField on settings-FilterBar
 					oProperty.visualSettings = {widthCalculation: {minWidth: 15}}; // as the Name is shown too
-				} else if (oProperty.name === "descr") {
+				} else if (oProperty.key === "descr") {
 					oProperty.visualSettings = {widthCalculation: {minWidth: 40}};
 				}
 
 
 				if (hideDescriptionsParam) {
 					// relevant for showing the hideDescription feature of the SelectionPanel
-					if (oProperty.name === "subgenre_code") {
+					if (oProperty.key === "subgenre_code") {
 						oProperty.visible = true;
 					}
 					// relevant for showing the hideDescription feature of the SelectionPanel
-					if (oProperty.name === "genre_code") {
+					if (oProperty.key === "genre_code") {
 						oProperty.text = "subgenre_code";
 					}
 				}
@@ -70,12 +70,12 @@ sap.ui.define([
 			});
 
 			aProperties.push(...[{
-				name: "author/name",
+				key: "author/name",
 				path: "author/name",
 				label: "Name",
 				dataType: "Edm.String"
 			}, {
-				name: "author_ID_ComplexWithText",
+				key: "author_ID_ComplexWithText",
 				label: "Author ID + Text",
 				propertyInfos: ["author_ID", "author/name"],
 				exportSettings: {
@@ -158,9 +158,9 @@ sap.ui.define([
 
 	BooksTableDelegate._createColumnTemplate = function (oTable, oProperty) {
 
-		if (oProperty.name === "currency_code") { // Just use text to test rendering Text vs Field
-			return new Text(getFullId(oTable, "T_" + oProperty.name), {
-				text: {path: oProperty.path || oProperty.name, type: oProperty.typeConfig.typeInstance},
+		if (oProperty.key === "currency_code") { // Just use text to test rendering Text vs Field
+			return new Text(getFullId(oTable, "T_" + oProperty.key), {
+				text: {path: oProperty.path || oProperty.key, type: oProperty.typeConfig.typeInstance},
 				width:"100%"
 			});
 		}
@@ -169,17 +169,17 @@ sap.ui.define([
 		let oAdditionalValueBindingInfo;
 		let sDisplay = FieldDisplay.Value;
 
-		if (oProperty.name.endsWith("_ComplexWithText")) {
+		if (oProperty.key.endsWith("_ComplexWithText")) {
 			// get single properties
 			const aProperties = oProperty.getSimpleProperties();
 			const oKeyProperty = aProperties[0];
 			const oDescriptionProperty = aProperties[1];
 
 			if (oKeyProperty) {
-				oValueBindingInfo = {path: oKeyProperty.path || oKeyProperty.name, type: oKeyProperty.typeConfig.typeInstance};
+				oValueBindingInfo = {path: oKeyProperty.path || oKeyProperty.key, type: oKeyProperty.typeConfig.typeInstance};
 			}
 			if (oDescriptionProperty) {
-				oAdditionalValueBindingInfo = {path: oDescriptionProperty.path || oDescriptionProperty.name, type: oDescriptionProperty.typeConfig.typeInstance};
+				oAdditionalValueBindingInfo = {path: oDescriptionProperty.path || oDescriptionProperty.key, type: oDescriptionProperty.typeConfig.typeInstance};
 			}
 
 			if (oProperty.exportSettings.template === "{0} ({1})") {
@@ -190,11 +190,11 @@ sap.ui.define([
 				sDisplay = FieldDisplay.Description;
 			}
 		} else {
-			oValueBindingInfo = {path: oProperty.path || oProperty.name, type: oProperty.typeConfig.typeInstance};
+			oValueBindingInfo = {path: oProperty.path || oProperty.key, type: oProperty.typeConfig.typeInstance};
 		}
 
 		var oCtrlProperties = DelegateCache.merge({
-			id: getFullId(oTable, "F_" + oProperty.name),
+			id: getFullId(oTable, "F_" + oProperty.key),
 			value: oValueBindingInfo,
 			additionalValue: oAdditionalValueBindingInfo,
 			editMode: FieldEditMode.Display,
@@ -202,9 +202,9 @@ sap.ui.define([
 			multipleLines: false, // set always to have property not initial
 			display: sDisplay,
 			delegate: {name: 'delegates/odata/v4/FieldBaseDelegate', payload: {}}
-		}, DelegateCache.get(oTable, oProperty.name, "$Columns"));
+		}, DelegateCache.get(oTable, oProperty.key, "$Columns"));
 
-		if (oProperty.name === "price") {
+		if (oProperty.key === "price") {
 			oCtrlProperties.value = {
 				parts: [
 					{path:'price', type: new DecimalType(undefined, {precision: 9, scale: 2})},
@@ -214,7 +214,7 @@ sap.ui.define([
 				type: new CurrencyType(),
 				mode:'TwoWay'
 			};
-		}  else if (oProperty.name === "title") {
+		}  else if (oProperty.key === "title") {
 			oCtrlProperties.fieldInfo = new Link({
 					sourceControl:"tFieldLinkTitle",
 					delegate: {
@@ -225,7 +225,7 @@ sap.ui.define([
 						}
 					}
 				});
-		} else if (oProperty.name === "author_ID_ComplexWithText") {
+		} else if (oProperty.key === "author_ID_ComplexWithText") {
 			oCtrlProperties.fieldInfo = new Link({
 				delegate: { name: "sap/ui/v4demo/delegate/Books.Link.delegate" }
 			});
@@ -244,7 +244,7 @@ sap.ui.define([
 			if (oColumn) { // in XML templating there is no column
 				var oProperty = oTable.getPropertyHelper().getProperty(sPropertyName);
 
-				if (!oProperty.name.endsWith("_ComplexWithUnit")) {
+				if (!oProperty.key.endsWith("_ComplexWithUnit")) {
 					var oTemplate = BooksTableDelegate._createColumnTemplate(oTable, oProperty);
 					oColumn.setTemplate(oTemplate);
 				}

@@ -10,7 +10,7 @@ sap.ui.define([
     };
 
 	UnitTestFilterBarDelegate.fetchProperties = function (oFilterBar) {
-		return Promise.resolve([{name: "key1", label:"key1", dataType:"Edm.String"}, {name: "key2", label:"Key2",dataType:"Edm.String"}]);
+		return Promise.resolve([{key: "key1", label:"key1", dataType:"Edm.String"}, {key: "key2", label:"Key2",dataType:"Edm.String"}]);
 	};
 
 	UnitTestFilterBarDelegate._createFilterField = function(oProperty, oFilterBar) {
@@ -59,10 +59,10 @@ sap.ui.define([
 		return oFilterField;
 	};
 
-	UnitTestFilterBarDelegate._createFilter = function(sPropertyName, oFilterBar, mPropertyBag) {
+	UnitTestFilterBarDelegate._createFilter = function(sPropertyKey, oFilterBar, mPropertyBag) {
 		return this.fetchProperties(oFilterBar).then(function(aProperties) {
 			const oPropertyInfo = aProperties.find(function(oCurrentProperty) {
-				return ((oCurrentProperty.path === sPropertyName) || (oCurrentProperty.name === sPropertyName));
+				return ((oCurrentProperty.path === sPropertyKey) || (oCurrentProperty.key === sPropertyKey));
 			});
 			if (!oPropertyInfo) {
 				return null;
@@ -71,8 +71,8 @@ sap.ui.define([
 		}.bind(this));
 	};
 
-	UnitTestFilterBarDelegate.addItem = function(oFilterBar, sPropertyName, mPropertyBag) {
-		return Promise.resolve(this._createFilter(sPropertyName, oFilterBar, mPropertyBag));
+	UnitTestFilterBarDelegate.addItem = function(oFilterBar, sPropertyKey, mPropertyBag) {
+		return Promise.resolve(this._createFilter(sPropertyKey, oFilterBar, mPropertyBag));
 	};
 
 	return UnitTestFilterBarDelegate;

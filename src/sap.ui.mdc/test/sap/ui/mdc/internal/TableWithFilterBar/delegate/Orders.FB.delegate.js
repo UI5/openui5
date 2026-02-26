@@ -22,33 +22,33 @@ sap.ui.define([
 		return oFetchPropertiesPromise.then(function (aProperties) {
 			aProperties.forEach(function(oPropertyInfo){
 
-				if (oPropertyInfo.name.indexOf("/") >= 0 && oPropertyInfo.name !== "Items*/book_ID" && oPropertyInfo.name !== "Items+/book_ID") {
+				if (oPropertyInfo.key.indexOf("/") >= 0 && oPropertyInfo.key !== "Items*/book_ID" && oPropertyInfo.key !== "Items+/book_ID") {
 					oPropertyInfo.hiddenFilter = true;
 				}
 
-				if (oPropertyInfo.name === "$search") {
+				if (oPropertyInfo.key === "$search") {
 					bSearchExists = true;
-				} else if (oPropertyInfo.name === "OrderNo") {
+				} else if (oPropertyInfo.key === "OrderNo") {
 					oPropertyInfo.label = "Order Number";
-				} else if (oPropertyInfo.name === "orderTime") {
+				} else if (oPropertyInfo.key === "orderTime") {
 					oPropertyInfo.label = "Order Time";
-				} else if (oPropertyInfo.name === "currency_code") {
+				} else if (oPropertyInfo.key === "currency_code") {
 					oPropertyInfo.maxConditions = 1; // normally only one currency should be used, otherwise it makes no sense related to price
 				}
 			});
 
-			if (!aProperties.find(function(aItem) { return aItem.name === "Items*/book_ID"; } ) ) {
+			if (!aProperties.find(function(aItem) { return aItem.key === "Items*/book_ID"; } ) ) {
 				aProperties.push({
-					name: "Items*/book_ID",
+					key: "Items*/book_ID",
 					label: "Order w. one Item for Book (Any)",
 					groupLabel: "none",
 					dataType: "Edm.Int32"
 				});
 			}
 
-			if (!aProperties.find(function(aItem) { return aItem.name === "Items+/book_ID"; } ) ) {
+			if (!aProperties.find(function(aItem) { return aItem.key === "Items+/book_ID"; } ) ) {
 				aProperties.push({
-					name: "Items+/book_ID",
+					key: "Items+/book_ID",
 					label: "Order w. all Items for Book (All)",
 					groupLabel: "none",
 					dataType: "Edm.Int32"
@@ -57,7 +57,7 @@ sap.ui.define([
 
 			if (!bSearchExists) {
 				aProperties.push({
-					  name: "$search",
+					  key: "$search",
 					  label: "",
 					  dataType: "Edm.String"
 				});

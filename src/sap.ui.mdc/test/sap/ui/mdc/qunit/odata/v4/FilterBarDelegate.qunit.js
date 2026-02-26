@@ -115,7 +115,7 @@ sap.ui.define([
 		createDataModel().then(function (oModel) {
 			this._oFilterBar.setModel(oModel, "sample");
 			FilterBarDelegate.fetchProperties(this._oFilterBar).then(function(aProperties) {
-				assert.equal(aProperties.filter(function(oProperty) { return oProperty.name === "Complex"; }), 0);
+				assert.equal(aProperties.filter(function(oProperty) { return oProperty.key === "Complex"; }), 0);
 
 				done();
 			});

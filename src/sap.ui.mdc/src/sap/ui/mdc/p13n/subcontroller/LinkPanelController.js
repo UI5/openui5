@@ -110,7 +110,7 @@ sap.ui.define([
 
 		const oP13nData = this.prepareAdaptationData(oPropertyHelper, (mItem, oProperty) => {
 
-			const oExistingLinkItem = mExistingLinkItems[oProperty.name];
+			const oExistingLinkItem = mExistingLinkItems[oProperty.key];
 			mItem.visible = oExistingLinkItem ? true : false;
 			mItem.position = oExistingLinkItem ? oExistingLinkItem.position : -1;
 			mItem.href = oProperty.href;
