@@ -44,8 +44,6 @@ sap.ui.define([
 	 */
 	const PropertyInfoValidator = {};
 
-	PropertyInfoValidator._isValidationFeatureFlagEnabled = new URLSearchParams(window.location.search).get("sap-ui-xx-enableNewPropertyInfoValidation") == "true";
-
 	PropertyInfoValidator._getPropertyInfoPropertyName = function(sPropertyName) {
 		return MANDATORY_PROPERTIES[sPropertyName] ?? sPropertyName;
 	};
@@ -121,19 +119,16 @@ sap.ui.define([
 	 * @returns {void}
 	 */
 	PropertyInfoValidator.comparePropertyInfoWithControl = (oControl, oPropertyInfo) => {
-		//if (!oControl) {
-		if (!oControl || (!PropertyInfoValidator._isValidationFeatureFlagEnabled && !oPropertyInfo)) {
+		if (!oControl) {
 			return;
 		}
 
-		if (PropertyInfoValidator._isValidationFeatureFlagEnabled) {
-			if (!oPropertyInfo) {
-				if (!PropertyInfoValidator.checkMandatoryProperties(oControl)) {
-					Log.error(`sap.ui.mdc.util.PropertyInfoValidator: No PropertyInfo given for Control '${oControl.getId()}'!`);
-				}
-
-				return;
+		if (!oPropertyInfo) {
+			if (!PropertyInfoValidator.checkMandatoryProperties(oControl)) {
+				Log.error(`sap.ui.mdc.util.PropertyInfoValidator: No PropertyInfo given for Control '${oControl.getId()}'!`);
 			}
+
+			return;
 		}
 
 		const aPropertiesOnControl = Object.keys(oControl.getMetadata().getAllProperties())

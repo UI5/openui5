@@ -1276,7 +1276,7 @@ function(
             assert.ok(true, "Loaded completed");
 
             const oMockProps = {
-                name: "test1",
+                key: "test1",
                 aggregatable: true,
                 label: "Label1",
                 textFormatter: "abc"
@@ -1298,7 +1298,7 @@ function(
             assert.ok(true, "Loaded completed");
 
             let oMockProps = {
-                name: "test1",
+                key: "test1",
                 groupable: true,
                 label: "Label1",
                 role: "category",
@@ -1314,7 +1314,7 @@ function(
 
 
             oMockProps = {
-                name: "test2",
+                key: "test2",
                 groupable: true,
                 label: "Label1",
                 role: "category",

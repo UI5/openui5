@@ -28,7 +28,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("check getPropertyByKey method", function(assert) {
-		const aPropertyMetadata = [{name: "Property0"}, {name: "Property1"}, {name: "Property2"}];
+		const aPropertyMetadata = [{key: "Property0"}, {key: "Property1"}, {key: "Property2"}];
 		let oProperty = FilterUtil.getPropertyByKey(aPropertyMetadata, "Property1");
 		assert.ok(oProperty);
 
@@ -121,7 +121,7 @@ sap.ui.define([
 				}]
 			};
 			const aProperties = [
-				{name: "myProperty", path: "myProperty", typeConfig: oControl.getTypeMap(oControl).getTypeConfig("String", null, null)}
+				{key: "myProperty", path: "myProperty", typeConfig: oControl.getTypeMap(oControl).getTypeConfig("String", null, null)}
 			];
 
 			const oFilterInfo = FilterUtil.getFilterInfo(oControl, oConditions, aProperties);
@@ -154,7 +154,7 @@ sap.ui.define([
 				}]
 			};
 			const aProperties = [
-				{name: "keyMyProperty", path: "path/to/property", typeConfig: oControl.getTypeMap(oControl).getTypeConfig("String", null, null)}
+				{key: "keyMyProperty", path: "path/to/property", typeConfig: oControl.getTypeMap(oControl).getTypeConfig("String", null, null)}
 			];
 
 			const oFilterInfo = FilterUtil.getFilterInfo(oControl, oConditions, aProperties);

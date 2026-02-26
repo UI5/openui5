@@ -26,7 +26,7 @@ sap.ui.define([
 		const aProperties = [];
 
 		aProperties.push({
-			name: "prop1",
+			key: "prop1",
 			label: "Boolean",
 			required: false,
 			dataType : 'sap.ui.model.type.Boolean',
@@ -34,7 +34,7 @@ sap.ui.define([
 		});
 
 		aProperties.push({
-			name: "prop2",
+			key: "prop2",
 			label: "String single",
 			required: true,
 			dataType : 'sap.ui.model.type.String',
@@ -43,7 +43,7 @@ sap.ui.define([
 		});
 
 		aProperties.push({
-			name: "prop3",
+			key: "prop3",
 			label: "String multi",
 			required: false,
 			dataType : 'sap.ui.model.type.String',
@@ -51,35 +51,35 @@ sap.ui.define([
 		});
 
 		aProperties.push({
-			name: "prop4",
+			key: "prop4",
 			label: "Integer",
 			required: false,
 			dataType : 'sap.ui.model.type.Integer'
 		});
 
 		aProperties.push({
-			name: "prop5",
+			key: "prop5",
 			label: "Date",
 			required: false,
 			dataType : 'sap.ui.model.type.Date'
 		});
 
 		aProperties.push({
-			name: "prop6",
+			key: "prop6",
 			label: "DateTime",
 			required: false,
 			dataType : 'sap.ui.model.type.DateTime'
 		});
 
 		aProperties.push({
-			name: "prop7",
+			key: "prop7",
 			label: "Time",
 			required: false,
 			dataType : 'sap.ui.model.type.Time'
 		});
 
 		aProperties.push({
-			name: "prop8",
+			key: "prop8",
 			label: "Float",
 			required: false,
 			dataType : 'sap.ui.model.type.Float'

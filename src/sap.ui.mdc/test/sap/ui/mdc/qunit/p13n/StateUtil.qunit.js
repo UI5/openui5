@@ -38,37 +38,37 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	function createFilterItem(oFilterBar, sPropertyName, mPropertyBag) {
+	function createFilterItem(oFilterBar, sPropertyKey, mPropertyBag) {
 		return new Promise(function(resolve, reject){
 			resolve(new FilterField({
 				delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}},
-				conditions: "{$filters>/conditions/" + sPropertyName + "}",
-				propertyKey: sPropertyName
+				conditions: "{$filters>/conditions/" + sPropertyKey + "}",
+				propertyKey: sPropertyKey
 			}));
 		});
 	}
 
 	function fetchProperties() {
 		const mProperties = {
-			String: {label: "String",name:"String",dataType:"sap.ui.model.odata.type.String", groupable: true},
-			Boolean: {label: "Boolean",name:"Boolean",dataType:"sap.ui.model.odata.type.Boolean"},
-			Int16: {label: "Int16",name:"Int16",dataType:"sap.ui.model.odata.type.Int16"},
-			Int32: {label: "Int32",name:"Int32",dataType:"sap.ui.model.odata.type.Int32"},
-			Int64: {label: "Int64",name:"Int64",dataType:"sap.ui.model.odata.type.Int64"},
-			SByte: {label: "SByte",name:"SByte",dataType:"sap.ui.model.odata.type.SByte"},
-			Decimal: {label: "Decimal",name:"Decimal",dataType:"sap.ui.model.odata.type.Decimal"},
-			Single: {label: "Single",name:"Single",dataType:"sap.ui.model.odata.type.String"},
-			Double: {label: "Double",name:"Double",dataType:"sap.ui.model.odata.type.Double"},
-			Date: {label: "Date",name:"Date",dataType:"sap.ui.model.odata.type.Date"},
-			TimeOfDay: {label: "TimeOfDay",name:"TimeOfDay",dataType:"sap.ui.model.odata.type.TimeOfDay"},
-			DateTimeOffset: {label: "DateTimeOffset",name:"DateTimeOffset",dataType:"sap.ui.model.odata.type.DateTimeOffset"},
-			Guid: {label: "Guid",name:"Guid",dataType:"sap.ui.model.odata.type.Guid"}
+			String: {label: "String",key:"String",dataType:"sap.ui.model.odata.type.String", groupable: true},
+			Boolean: {label: "Boolean",key:"Boolean",dataType:"sap.ui.model.odata.type.Boolean"},
+			Int16: {label: "Int16",key:"Int16",dataType:"sap.ui.model.odata.type.Int16"},
+			Int32: {label: "Int32",key:"Int32",dataType:"sap.ui.model.odata.type.Int32"},
+			Int64: {label: "Int64",key:"Int64",dataType:"sap.ui.model.odata.type.Int64"},
+			SByte: {label: "SByte",key:"SByte",dataType:"sap.ui.model.odata.type.SByte"},
+			Decimal: {label: "Decimal",key:"Decimal",dataType:"sap.ui.model.odata.type.Decimal"},
+			Single: {label: "Single",key:"Single",dataType:"sap.ui.model.odata.type.String"},
+			Double: {label: "Double",key:"Double",dataType:"sap.ui.model.odata.type.Double"},
+			Date: {label: "Date",key:"Date",dataType:"sap.ui.model.odata.type.Date"},
+			TimeOfDay: {label: "TimeOfDay",key:"TimeOfDay",dataType:"sap.ui.model.odata.type.TimeOfDay"},
+			DateTimeOffset: {label: "DateTimeOffset",key:"DateTimeOffset",dataType:"sap.ui.model.odata.type.DateTimeOffset"},
+			Guid: {label: "Guid",key:"Guid",dataType:"sap.ui.model.odata.type.Guid"}
 		};
 
 		const aProperties = [];
 		for (const sProperty in mProperties) {
 			aProperties.push({
-				name: mProperties[sProperty].name,
+				key: mProperties[sProperty].key,
 				label: mProperties[sProperty].label,
 				dataType: mProperties[sProperty].dataType
 				//filterable: mProperties[sProperty].filterable
@@ -1346,19 +1346,19 @@ sap.ui.define([
 
         const aMetadata = [
             {
-                name: "CategoryName",
+                key: "CategoryName",
                 dataType: "String",
                 label: "Category",
                 groupable: true
             },
             {
-                name: "SalesNumber",
+                key: "SalesNumber",
                 path: "SalesNumber",
                 dataType: "sap.ui.model.odata.type.Int32",
                 aggregatable: true,
                 label: "Sales Number"
             }, {
-                name: "agSalesAmount",
+                key: "agSalesAmount",
                 path: "SalesAmount",
                 dataType: "String",
                 label: "Sales Amount",
@@ -1366,23 +1366,23 @@ sap.ui.define([
                 //defaultAggregation: "sum",
                 //supportedAggregations: ["sum", "min", "max", "average"]
             }, {
-                name: "Name",
+                key: "Name",
                 path: "Name",
                 dataType: "String",
                 label: "Name",
                 groupable: true
             }, {
-                name: "Industry",
+                key: "Industry",
                 dataType: "String",
                 label: "Industry",
                 groupable: true
             }, {
-                name: "Country",
+                key: "Country",
                 dataType: "String",
                 label: "Country",
                 groupable: true
             }, {
-                name: "SomePropertyName",
+                key: "SomePropertyName",
                 dataType: "String",
                 label: "SomeProperty",
                 groupable: true

@@ -1359,6 +1359,71 @@ sap.ui.define([
 		oWeeksRow.destroy();
 	});
 
+	QUnit.test("Day cells have correct aria-describedby with week numbers", async function(assert) {
+		// Prepare
+		const oCal = new CalendarDateInterval("CalWithWeeks", {
+			startDate: UI5Date.getInstance(2015, 0, 1), // Thursday, Jan 1, 2015
+			days: 7,
+			showWeekNumbers: true,
+			primaryCalendarType: CalendarType.Gregorian
+		});
+		oCal.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act - get the first day cell and its aria-describedby attribute
+		const $DatesRow = Element.getElementById("CalWithWeeks").getAggregation("month")[0].$();
+		const aDays = $DatesRow.find(".sapUiCalItem");
+		const sAriaDescribedBy = jQuery(aDays[0]).attr("aria-describedby");
+
+		// Assert
+		assert.ok(aDays.length > 0, "Days are rendered");
+		assert.ok(sAriaDescribedBy, "First day has aria-describedby attribute");
+		assert.ok(sAriaDescribedBy.includes("CalWithWeeks-WeekNumbersRow-week"),
+			"aria-describedby references the WeekNumbersRow (found: " + sAriaDescribedBy + ")");
+
+		// Verify that the referenced element exists
+		const aDescribedByIds = sAriaDescribedBy.split(" ");
+		let bWeekNumberIdFound = false;
+		for (let i = 0; i < aDescribedByIds.length; i++) {
+			if (aDescribedByIds[i].includes("CalWithWeeks-WeekNumbersRow-week")) {
+				bWeekNumberIdFound = true;
+				const sWeekId = aDescribedByIds[i];
+				const oElement = document.getElementById(sWeekId);
+				assert.ok(oElement, "Week number element with id '" + sWeekId + "' exists in DOM");
+				break;
+			}
+		}
+		assert.ok(bWeekNumberIdFound, "Week number ID was found in aria-describedby");
+
+		// Clean up
+		oCal.destroy();
+	});
+
+	QUnit.test("Day cells have correct aria-describedby without week numbers", async function(assert) {
+		// Prepare
+		var oCal = new CalendarDateInterval("CalWithoutWeeks", {
+			startDate: UI5Date.getInstance(2015, 0, 1),
+			days: 7,
+			showWeekNumbers: false,
+			primaryCalendarType: CalendarType.Gregorian
+		});
+		oCal.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act - get the first day cell and its aria-describedby attribute
+		var $DatesRow = Element.getElementById("CalWithoutWeeks").getAggregation("month")[0].$();
+		var aDays = $DatesRow.find(".sapUiCalItem");
+		var sAriaDescribedBy = jQuery(aDays[0]).attr("aria-describedby") || "";
+
+		// Assert
+		assert.ok(aDays.length > 0, "Days are rendered");
+		assert.ok(sAriaDescribedBy.indexOf("CalWithoutWeeks-WeekNumbersRow") === -1,
+			"aria-describedby does not reference WeekNumbersRow when showWeekNumbers is false (found: " + sAriaDescribedBy + ")");
+
+		// Clean up
+		oCal.destroy();
+	});
+
 	QUnit.module("Other");
 
 	QUnit.test("CalendarDateInterval year range picker interaction sets proper start date", async function(assert) {

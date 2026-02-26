@@ -100,26 +100,26 @@ sap.ui.define([
 
 	function fetchProperties(oControl, mPropertyBag) {
 		const aProperties = [{
-				name: "Category",
+				key: "Category",
 				label: "",
 				dataType: "String"
 			}, {
-				name: "Name",
+				key: "Name",
 				label: "",
 				dataType: "String"
 			}, {
-				name: "ProductID",
+				key: "ProductID",
 				label: "",
 				dataType: "String"
 			}, {
-				name: "CurrencyCode",
+				key: "CurrencyCode",
 				label: "",
 				dataType: "String"
 			}];
 
 		if (mPropertyBag) {
 			aProperties.push(			{
-				name: "to_nav/field1",
+				key: "to_nav/field1",
 				typeConfig: {
 					className: "String"
 				}
@@ -136,19 +136,19 @@ sap.ui.define([
 		return oModifier.getProperty(oFilterBar, "propertyInfo")
 		.then(function(aPropertyInfo) {
 			const nIdx = aPropertyInfo.findIndex(function(oEntry) {
-				return oEntry.name === sPropertyName;
+				return oEntry.key === sPropertyName;
 			});
 
 			if (nIdx < 0) {
 				FilterBarDelegate.fetchProperties(oFilterBar, oFilterBar.isA ? null : mPropertyBag).then( function(aFetchedProperties) {
 					if (aFetchedProperties) {
 						const nIdx = aFetchedProperties.findIndex(function(oEntry) {
-							return oEntry.name === sPropertyName;
+							return oEntry.key === sPropertyName;
 						});
 
 						if (nIdx >= 0) {
 							aPropertyInfo.push({
-								name: sPropertyName,
+								key: sPropertyName,
 								dataType: aFetchedProperties[nIdx].typeConfig.className,
 								maxConditions: aFetchedProperties[nIdx].maxConditions,
 								constraints: aFetchedProperties[nIdx].constraints,
@@ -316,11 +316,11 @@ sap.ui.define([
 		const oContent = createAddConditionChangeDefinitionOldFormat();
 
 		const aPropertyInfo = [{
-			name: "to_nav/field1",
+			key: "to_nav/field1",
 			maxConditions: 1,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}, {
-			name: "Category",
+			key: "Category",
 			maxConditions: 1,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}];
@@ -365,11 +365,11 @@ sap.ui.define([
 		const oContent = createAddConditionChangeDefinitionNewFormat();
 
 		const aPropertyInfo = [{
-			name: "to_nav/field1",
+			key: "to_nav/field1",
 			maxConditions: 1,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}, {
-			name: "Category",
+			key: "Category",
 			maxConditions: 1,
 			typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}];
@@ -509,7 +509,7 @@ sap.ui.define([
 
 				const sPropertyInfo = oXMLFilterBar.getAttribute("propertyInfo").replace(/\\/g, '');
 				const aPropertyInfo = JSON.parse(sPropertyInfo);
-				assert.deepEqual(aPropertyInfo, [ {"name":"to_nav/field1", "dataType":"String"} ], "propertyInfo has been applied on XML node");
+				assert.deepEqual(aPropertyInfo, [ {"key":"to_nav/field1", "dataType":"String"} ], "propertyInfo has been applied on XML node");
 
 				done();
 			});
@@ -742,13 +742,13 @@ sap.ui.define([
 		};
 
 		const aProperties = [{
-			name: "title", label: "Title", dataType: "Edm.String", maxConditions: 1,typeConfig: ODataTypeMap.getTypeConfig("Edm.String") },{
-			name: "createdAt", label: "Created At", dataType: "Edm.DateTimeOffset", maxConditions: -1, typeConfig: ODataTypeMap.getTypeConfig("Edm.DateTimeOffset") },{
-			name: "category", label: "Category", dataType: "Edm.String", maxConditions: 1, typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
+			key: "title", label: "Title", dataType: "Edm.String", maxConditions: 1,typeConfig: ODataTypeMap.getTypeConfig("Edm.String") },{
+			key: "createdAt", label: "Created At", dataType: "Edm.DateTimeOffset", maxConditions: -1, typeConfig: ODataTypeMap.getTypeConfig("Edm.DateTimeOffset") },{
+			key: "category", label: "Category", dataType: "Edm.String", maxConditions: 1, typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}];
 
 		const oPropertyHelper = {
-			getProperty: function(s) { return aProperties.find((oEntry) => oEntry.name === s); }
+			getProperty: function(s) { return aProperties.find((oEntry) => oEntry.key === s); }
 		};
 
 		sinon.stub(this.oFilterBar, "getPropertyHelper").returns(oPropertyHelper);
@@ -837,15 +837,15 @@ sap.ui.define([
 		};
 
 		const aProperties = [{
-			name: "title", label: "Title", dataType: "Edm.String", maxConditions: 1, typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
+			key: "title", label: "Title", dataType: "Edm.String", maxConditions: 1, typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}, {
-			name: "createdAt", label: "Created At", dataType: "Edm.DateTimeOffset", maxConditions: -1, typeConfig: ODataTypeMap.getTypeConfig("Edm.DateTimeOffset")
+			key: "createdAt", label: "Created At", dataType: "Edm.DateTimeOffset", maxConditions: -1, typeConfig: ODataTypeMap.getTypeConfig("Edm.DateTimeOffset")
 		}, {
-			name: "category", label: "Category", dataType: "Edm.String", maxConditions: 1, typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
+			key: "category", label: "Category", dataType: "Edm.String", maxConditions: 1, typeConfig: ODataTypeMap.getTypeConfig("Edm.String")
 		}];
 
 		const oPropertyHelper = {
-			getProperty: function(s) { return aProperties.find((oEntry) => oEntry.name === s); },
+			getProperty: function(s) { return aProperties.find((oEntry) => oEntry.key === s); },
 			getProperties: function() { return aProperties; }
 		};
 

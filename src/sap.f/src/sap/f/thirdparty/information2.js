@@ -1,13 +1,2 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/information'], (function (exports, Theme, information$1) { 'use strict';
-
-	var error = "error";
-
-	var alert = "alert";
-
-	var information = "information";
-
-	exports.alert = alert;
-	exports.error = error;
-	exports.information = information;
-
-}));
+sap.ui.define(["exports","sap/f/thirdparty/Theme","sap/f/thirdparty/information"],function(r,a,t){"use strict";var i="error";var e="alert";var o="information";r.alert=e;r.error=i;r.information=o});
+//# sourceMappingURL=information2.js.map

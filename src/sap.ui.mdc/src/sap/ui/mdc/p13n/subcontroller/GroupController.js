@@ -73,10 +73,10 @@ sap.ui.define([
 		const oAggregations = oController.getAggregateConditions ? oController.getAggregateConditions() || {} : {};
 
 		const oP13nData = this.prepareAdaptationData(oPropertyHelper, (mItem, oProperty) => {
-			const oExisting = mItemState[oProperty.name];
+			const oExisting = mItemState[oProperty.key];
 			mItem.grouped = !!oExisting;
 			mItem.position = oExisting ? oExisting.position : -1;
-			return !(oProperty.groupable === false || oAggregations[oProperty.name]);
+			return !(oProperty.groupable === false || oAggregations[oProperty.key]);
 		});
 
 		P13nBuilder.sortP13nData({

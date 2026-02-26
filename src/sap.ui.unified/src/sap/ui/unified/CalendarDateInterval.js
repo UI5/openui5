@@ -116,7 +116,7 @@ sap.ui.define([
 	CalendarDateInterval.prototype.init = function(){
 
 		Calendar.prototype.init.apply(this, arguments);
-		this.setAggregation("_weeksRow", this._createWeekRow(`${this.getId()}-weeks`));
+		this.setAggregation("_weeksRow", this._createWeekRow(`${this.getId()}-WeekNumbersRow`), true);
 
 		this._iDaysMonthHead = 35; // if more than this number of days, month names are displayed on top of days
 

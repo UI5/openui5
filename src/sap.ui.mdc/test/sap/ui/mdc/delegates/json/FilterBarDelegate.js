@@ -31,7 +31,7 @@ sap.ui.define([
 		var oAppComponent = mPropertyBag ? mPropertyBag.appComponent : FlUtils.getAppComponentForControl(oFilterBar);
 		var oView = (mPropertyBag && mPropertyBag.view ) ? mPropertyBag.view : FlUtils.getViewForControl(oFilterBar);
 		var sViewId = mPropertyBag ? mPropertyBag.viewId : null;
-		var sName = oProperty.path || oProperty.name;
+		var sName = oProperty.path || oProperty.key;
 		var oSelector = {};
 
 		if (oFilterBar.getId) {

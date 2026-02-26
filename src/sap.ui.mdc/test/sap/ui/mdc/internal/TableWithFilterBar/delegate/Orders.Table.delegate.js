@@ -35,9 +35,9 @@ sap.ui.define([
 			// Provide the ValueHelp for some of the properties. Without ValueHelp the filter panel will not provide the expected VH.
 			// TODO ValueHelp is not a supported property of the table propertyHelper and we will get warning logn in the console.
 			aProperties.forEach(function(oPropertyInfo){
-				if (oPropertyInfo.name === "customer_ID") {
+				if (oPropertyInfo.key === "customer_ID") {
 					oPropertyInfo.visualSettings = {widthCalculation: {minWidth: 15}}; // as the Name is shown
-				} else if (oPropertyInfo.name === "total") {
+				} else if (oPropertyInfo.key === "total") {
 					oPropertyInfo.visualSettings = {widthCalculation: {minWidth: 8}}; // as currency is shown too
 				}
 			});
@@ -75,23 +75,23 @@ sap.ui.define([
 
 	OrdersTableDelegate._createColumnTemplate = function (oTable, oProperty) {
 
-		if (oProperty.name === "currency_code") { // Just use text to test rendering Text vs Field
+		if (oProperty.key === "currency_code") { // Just use text to test rendering Text vs Field
 			return new Text({
-				text: {path: oProperty.path || oProperty.name, type: oProperty.typeConfig.typeInstance},
+				text: {path: oProperty.path || oProperty.key, type: oProperty.typeConfig.typeInstance},
 				width:"100%"
 			});
 		}
 
 		var oCtrlProperties = DelegateCache.merge({
-			id: getFullId(oTable, "F_" + oProperty.name),
-			value: {path: oProperty.path || oProperty.name, type: oProperty.typeConfig && oProperty.typeConfig.typeInstance},
+			id: getFullId(oTable, "F_" + oProperty.key),
+			value: {path: oProperty.path || oProperty.key, type: oProperty.typeConfig && oProperty.typeConfig.typeInstance},
 			editMode: FieldEditMode.Display,
 			width:"100%",
 			multipleLines: false,
 			delegate: {name: 'delegates/odata/v4/FieldBaseDelegate', payload: {}}
-		}, DelegateCache.get(oTable, oProperty.name, "$Columns"));
+		}, DelegateCache.get(oTable, oProperty.key, "$Columns"));
 
-		if (oProperty.name === "total") {
+		if (oProperty.key === "total") {
 			oCtrlProperties.value = {
 				parts: [
 					{path:'total', type: new DecimalType(undefined, {precision: 9, scale: 2})},
@@ -111,7 +111,7 @@ sap.ui.define([
 		return ODataTableDelegate.addItem.apply(this, arguments).then(function (oColumn) {
 			var oProperty = oTable.getPropertyHelper().getProperty(sPropertyName);
 
-			if (!oProperty.name.endsWith("_ComplexWithUnit")) {
+			if (!oProperty.key.endsWith("_ComplexWithUnit")) {
 				var oTemplate = OrdersTableDelegate._createColumnTemplate(oTable, oProperty);
 				oColumn.setTemplate(oTemplate);
 			}

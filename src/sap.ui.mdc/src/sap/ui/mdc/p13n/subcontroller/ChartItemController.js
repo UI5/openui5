@@ -39,7 +39,7 @@ sap.ui.define([
 		const mItemState = this.arrayToMap(aItemState);
 
 		const oP13nData = this.prepareAdaptationData(oPropertyHelper, (mItem, oProperty) => {
-			const oExisting = mItemState[oProperty.name];
+			const oExisting = mItemState[oProperty.key];
 			mItem.visible = !!oExisting;
 			mItem.position = oExisting ? oExisting.position : -1;
 			mItem.role = oExisting ? oExisting.role : oProperty.role;

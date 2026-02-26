@@ -70,7 +70,7 @@ sap.ui.define([
 									collectionPath: "/testPath"
 								}
 							},
-							propertyInfo: [{ name: "name1", label: "name1", dataType: "String" }, { name: "name2", label: "name2", dataType: "String" }]
+							propertyInfo: [{ key: "name1", label: "name1", dataType: "String" }, { key: "name2", label: "name2", dataType: "String" }]
 						});
 					}
 				});
@@ -148,7 +148,7 @@ sap.ui.define([
 									collectionPath: "/testPath"
 								}
 							},
-							propertyInfo: [{ name: "name1", label: "name1", dataType: "String" }, { name: "name2", label: "name2", dataType: "String" }]
+							propertyInfo: [{ key: "name1", label: "name1", dataType: "String" }, { key: "name2", label: "name2", dataType: "String" }]
 						});
 					}
 				});
@@ -643,7 +643,7 @@ sap.ui.define([
 
 			this.oMDCChart.initialized().then(function () {
 
-				const mSettings = {propertyInfo: [{ name: "name1", label: "name1", dataType: "String" }, { name: "name2", label: "name2", dataType: "String" }]};
+				const mSettings = {propertyInfo: [{ key: "name1", label: "name1", dataType: "String" }, { key: "name2", label: "name2", dataType: "String" }]};
 				const oScope = {};
 
 				function isPromise(p) {
@@ -1278,7 +1278,7 @@ sap.ui.define([
 									collectionPath: "/testPath"
 								}
 							},
-							propertyInfo: [{ name: "name1", label: "name1", dataType: "String" }, { name: "name2", label: "name2", dataType: "String" }]
+							propertyInfo: [{ key: "name1", label: "name1", dataType: "String" }, { key: "name2", label: "name2", dataType: "String" }]
 						});
 					}
 				});

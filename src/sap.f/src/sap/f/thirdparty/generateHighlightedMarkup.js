@@ -1,9 +1,2 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/encodeXML'], (function (exports, encodeXML) { 'use strict';
-
-	const r=e=>e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
-
-	function a(r$1,e,s,i){return r$1.replaceAll(new RegExp(r(e),`${i?"i":""}g`),s)}function f(r,e){if(!r||!e)return r;const s=n=>{const[g,l]=n.split("");for(;r.indexOf(n)>=0||e.indexOf(n)>=0;)n=`${g}${n}${l}`;return n},i=s("12"),t=s("34");let o=encodeXML.fnEncodeXML(a(r,e,n=>`${i}${n}${t}`,true));return [[i,"<b>"],[t,"</b>"]].forEach(([n,g])=>{o=a(o,n,g,false);}),o}
-
-	exports.f = f;
-
-}));
+sap.ui.define(["exports","sap/f/thirdparty/encodeXML"],function(e,n){"use strict";const t=e=>e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");function r(e,n,r,f){return e.replaceAll(new RegExp(t(n),`${f?"i":""}g`),r)}function f(e,t){if(!e||!t)return e;const f=n=>{const[r,f]=n.split("");for(;e.indexOf(n)>=0||t.indexOf(n)>=0;)n=`${r}${n}${f}`;return n},c=f("12"),i=f("34");let o=n.fnEncodeXML(r(e,t,e=>`${c}${e}${i}`,true));return[[c,"<b>"],[i,"</b>"]].forEach(([e,n])=>{o=r(o,e,n,false)}),o}e.f=f});
+//# sourceMappingURL=generateHighlightedMarkup.js.map

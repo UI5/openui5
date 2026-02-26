@@ -317,7 +317,7 @@ sap.ui.define([], function() {
 	 * @param oSortRestrictionInfo the SortInformation restrictions
 	 */
 	util.addSortInfoForProperty = function(oProperty, oSortRestrictionInfo) {
-		var oPropertyInfo = oSortRestrictionInfo[oProperty.name];
+		var oPropertyInfo = oSortRestrictionInfo[oProperty.key];
 		oProperty.sortable = oSortRestrictionInfo.sortable && oPropertyInfo ? oPropertyInfo.sortable : true;
 
 		if (oProperty.sortable) {
@@ -397,7 +397,7 @@ sap.ui.define([], function() {
 	 * @param oFilterRestrictionInfo the filter restrictions
 	 */
 	util.addFilterInfoForProperty = function(oProperty, oFilterRestrictionInfo) {
-		var oPropertyInfo = oFilterRestrictionInfo[oProperty.name];
+		var oPropertyInfo = oFilterRestrictionInfo[oProperty.key];
 		oProperty.filterable = oFilterRestrictionInfo.filterable && oPropertyInfo ? oPropertyInfo.filterable : true;
 
 		if (oProperty.filterable) {

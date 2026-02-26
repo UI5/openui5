@@ -26,7 +26,7 @@ sap.ui.define([
 				caseSensitive: false,
 				label: sProp,
 				maxConditions: -1,
-				name: sProp,
+				key: sProp,
 				path: sProp,
 				dataType: "String"
 			};

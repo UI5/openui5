@@ -25,9 +25,9 @@ sap.ui.define([
 		};
 
 		return oODataProps.then(function (aProperties) {
-			if (!aProperties.find(function(oProperty) { return oProperty.name === "genres"; } ) ) {
+			if (!aProperties.find(function(oProperty) { return oProperty.key === "genres"; } ) ) {
 				aProperties.push({
-					name: "genres",
+					key: "genres",
 					label: "Genres",
 					groupLabel: "none",
 					dataType: "Edm.String",
@@ -41,32 +41,32 @@ sap.ui.define([
 			// Provide the ValueHelp for some of the properties. Without ValueHelp the filter panel will not provide the expected VH.
 			// TODO ValueHelp is not a supported property of the table propertyHelper and we will get warning logn in the console.
 			aProperties.forEach(function(oProperty) {
-				if (oProperty.name === "ID") {
+				if (oProperty.key === "ID") {
 					// oProperty.dataType = new Int32Type({groupingEnabled: false}, {nullable: false});
 					oProperty.formatOptions = {groupingEnabled: false};
 					oProperty.constraints.nullable = false;
-				} else if (oProperty.name === "countryOfOrigin/name") {
+				} else if (oProperty.key === "countryOfOrigin/name") {
 					oProperty.path = "countryOfOrigin/descr";
-				} else if (oProperty.name === "countryOfOrigin_code") {
+				} else if (oProperty.key === "countryOfOrigin_code") {
 					oProperty.visible = false;
-				} else if (oProperty.name === "regionOfOrigin_code") {
+				} else if (oProperty.key === "regionOfOrigin_code") {
 					oProperty.visible = false;
-				} else if (oProperty.name === "cityOfOrigin_city") {
+				} else if (oProperty.key === "cityOfOrigin_city") {
 					oProperty.visible = false;
-				} else if (oProperty.name === "countryOfOrigin_code_ComplexWithText") {
+				} else if (oProperty.key === "countryOfOrigin_code_ComplexWithText") {
 					oProperty.label = oProperty.label.split(" + ")[0];
-				} else if (oProperty.name === "regionOfOrigin_code_ComplexWithText") {
+				} else if (oProperty.key === "regionOfOrigin_code_ComplexWithText") {
 					oProperty.label = oProperty.label.split(" + ")[0];
-				} else if (oProperty.name === "cityOfOrigin_city_ComplexWithText") {
+				} else if (oProperty.key === "cityOfOrigin_city_ComplexWithText") {
 					oProperty.label = oProperty.label.split(" + ")[0];
-				} else if (oProperty.name === "createdAt") {
+				} else if (oProperty.key === "createdAt") {
 					oProperty.maxConditions = 1;
 				}
 
 				if (oProperty.maxConditions === -1 ) {
-					const oCurrentSettings = DelegateCache.get(oTable, oProperty.name) || oFilterSettings[oProperty.name] || {};
+					const oCurrentSettings = DelegateCache.get(oTable, oProperty.key) || oFilterSettings[oProperty.key] || {};
 					if (!oCurrentSettings.valueHelp) {
-						oFilterSettings[oProperty.name] = {...oCurrentSettings, valueHelp: "FVH_Generic_Multi"};
+						oFilterSettings[oProperty.key] = {...oCurrentSettings, valueHelp: "FVH_Generic_Multi"};
 					}
 				}
 			});
@@ -109,17 +109,17 @@ sap.ui.define([
 		let oAdditionalValueBindingInfo;
 		let sDisplay = FieldDisplay.Value;
 
-		if (oProperty.name.endsWith("_ComplexWithText")) {
+		if (oProperty.key.endsWith("_ComplexWithText")) {
 			// get single properties
 			const aProperties = oProperty.getSimpleProperties();
 			const oKeyProperty = aProperties[0];
 			const oDescriptionProperty = aProperties[1];
 
 			if (oKeyProperty) {
-				oValueBindingInfo = {path: oKeyProperty.path || oKeyProperty.name, type: oKeyProperty.typeConfig.typeInstance};
+				oValueBindingInfo = {path: oKeyProperty.path || oKeyProperty.key, type: oKeyProperty.typeConfig.typeInstance};
 			}
 			if (oDescriptionProperty) {
-				oAdditionalValueBindingInfo = {path: oDescriptionProperty.path || oDescriptionProperty.name, type: oDescriptionProperty.typeConfig.typeInstance};
+				oAdditionalValueBindingInfo = {path: oDescriptionProperty.path || oDescriptionProperty.key, type: oDescriptionProperty.typeConfig.typeInstance};
 			}
 
 			if (oProperty.exportSettings.template === "{0} ({1})") {
@@ -129,26 +129,26 @@ sap.ui.define([
 			} else if (oProperty.exportSettings.template === "{1}") {
 				sDisplay = FieldDisplay.Description;
 			}
-		} else if (oProperty.name === "genres") {
-			const oItem = new MultiValueFieldItem("F_" + oProperty.name + "_item", {
+		} else if (oProperty.key === "genres") {
+			const oItem = new MultiValueFieldItem("F_" + oProperty.key + "_item", {
 				key: {path: "genre/code", type: oProperty.typeConfig.typeInstance}
 			});
 			const oCtrlProperties = DelegateCache.merge({
-				id: "F_" + oProperty.name,
-				items: {path: oProperty.path || oProperty.name, template: oItem, templateShareable: false},
+				id: "F_" + oProperty.key,
+				items: {path: oProperty.path || oProperty.key, template: oItem, templateShareable: false},
 				editMode: FieldEditMode.Display,
 				width:"100%",
 				multipleLines: false, // set always to have property not initial,
 				display: sDisplay,
 				delegate: {name: 'delegates/odata/v4/MultiValueFieldDelegate', payload: {}}
-			}, DelegateCache.get(oTable, oProperty.name, "$Columns"));
+			}, DelegateCache.get(oTable, oProperty.key, "$Columns"));
 			return new MultiValueField(oCtrlProperties);
 		} else {
-			oValueBindingInfo = {path: oProperty.path || oProperty.name, type: oProperty.typeConfig.typeInstance};
+			oValueBindingInfo = {path: oProperty.path || oProperty.key, type: oProperty.typeConfig.typeInstance};
 		}
 
 		const oCtrlProperties = DelegateCache.merge({
-			id: "F_" + oProperty.name,
+			id: "F_" + oProperty.key,
 			value: oValueBindingInfo,
 			additionalValue: oAdditionalValueBindingInfo,
 			editMode: FieldEditMode.Display,
@@ -156,7 +156,7 @@ sap.ui.define([
 			multipleLines: false, // set always to have property not initial,
 			display: sDisplay,
 			delegate: {name: 'delegates/odata/v4/FieldBaseDelegate', payload: {}}
-		}, DelegateCache.get(oTable, oProperty.name, "$Columns"));
+		}, DelegateCache.get(oTable, oProperty.key, "$Columns"));
 
 		return new Field(oCtrlProperties);
 	};
@@ -172,7 +172,7 @@ sap.ui.define([
 				// 	delete oColumn._oTemplateClone;
 				// }
 
-				if (!oProperty.name.endsWith("_ComplexWithUnit")) {
+				if (!oProperty.key.endsWith("_ComplexWithUnit")) {
 					const oTemplate = AuthorsTableDelegate._createColumnTemplate(oTable, oProperty);
 					oColumn.setTemplate(oTemplate);
 				}

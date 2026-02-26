@@ -517,7 +517,6 @@ sap.ui.define([
 		beforeEach: function() {
 			this.oSimplePropertyDefaults = {
 				key: "prop",
-				name: "prop",
 				label: "Property",
 				dataType: "String",
 				tooltip: "",
@@ -561,7 +560,6 @@ sap.ui.define([
 
 			this.oComplexPropertyDefaults = {
 				key: "complexProp",
-				name: "complexProp",
 				label: "Complex Property",
 				tooltip: "",
 				exportSettings: {},

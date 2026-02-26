@@ -46,7 +46,7 @@ sap.ui.define([
 									collectionPath: "/testPath"
 								}
 							},
-							propertyInfo: [{ name: "name1", label: "name1", dataType: "String" }, { name: "name2", label: "name2", dataType: "String" }]
+							propertyInfo: [{ key: "name1", label: "name1", dataType: "String" }, { key: "name2", label: "name2", dataType: "String" }]
 						});
 					}
 				});
@@ -143,7 +143,7 @@ sap.ui.define([
 									collectionPath: "/testPath"
 								}
 							},
-							propertyInfo: [{ name: "name1", label: "name1", dataType: "String" }, { name: "name2", label: "name2", dataType: "String" }]
+							propertyInfo: [{ key: "name1", label: "name1", dataType: "String" }, { key: "name2", label: "name2", dataType: "String" }]
 						});
 					}
 				});

@@ -11,8 +11,6 @@ sap.ui.define([
 
 	QUnit.module("checkMandatoryProperty");
 
-	PropertyInfoValidator._isValidationFeatureFlagEnabled = true;
-
 	const sCheckMandatoryPropertWarningText = "sap.ui.mdc.util.PropertyInfoValidator:checkMandatoryProperty either Control or property name are not defined.";
 
 	QUnit.test("should return false when oControl is not set", function (assert) {

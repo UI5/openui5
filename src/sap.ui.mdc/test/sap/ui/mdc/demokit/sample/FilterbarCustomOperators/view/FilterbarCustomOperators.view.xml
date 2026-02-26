@@ -16,8 +16,8 @@
 					id="mountainsFilterbar"
 					delegate="{ name: 'mdc/sample/delegate/JSONFilterBarDelegate', payload: {}}"
 					p13nMode = "Item,Value"
-					propertyInfo='[\{"name": "first_ascent", "label": "First Ascent", "path": "first_ascent", "dataType":"sap.ui.model.type.Date", "formatOptions": \{"style": "long"\}, "maxConditions": 1, "visible": true\},
-								   \{"name": "rank", "label": "Rank", "path": "rank", "dataType":"sap.ui.model.type.Integer", "formatOptions": \{"emptyString": 0\}, "constraints": \{"minimum": 0\}, "visible": true\}]'
+					propertyInfo='[\{"key": "first_ascent", "label": "First Ascent", "path": "first_ascent", "dataType":"sap.ui.model.type.Date", "formatOptions": \{"style": "long"\}, "maxConditions": 1, "visible": true\},
+								   \{"key": "rank", "label": "Rank", "path": "rank", "dataType":"sap.ui.model.type.Integer", "formatOptions": \{"emptyString": 0\}, "constraints": \{"minimum": 0\}, "visible": true\}]'
 					showAdaptFiltersButton="false"
 					filtersChanged="handleFiltersChanged">
 					<mdc:filterItems>

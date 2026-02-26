@@ -68,7 +68,7 @@ sap.ui.define([
 			} else {
 				const aFilterableProperties = oTable.getPropertyHelper().getProperty(oColumn.getPropertyKey()).getFilterableProperties();
 				const aPropertyNames = aFilterableProperties.map((oProperty) => {
-					return oProperty.name;
+					return oProperty.key;
 				});
 				oInbuiltFilter.setVisibleFields(aPropertyNames);
 			}

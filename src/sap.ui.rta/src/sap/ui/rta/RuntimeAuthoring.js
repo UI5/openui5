@@ -432,9 +432,13 @@ sap.ui.define([
 		}
 
 		try {
+			this._mStartStatus = {};
 			await this._loadUShellServicesPromise;
+			this._mStartStatus.uShellServicesLoaded = true;
 			await initVersioning.call(this);
+			this._mStartStatus.versioningInitialized = true;
 			await initContextBasedAdaptations.call(this, RuntimeAuthoring.needsRestart(this.getLayer()));
+			this._mStartStatus.contextBasedAdaptationsInitialized = true;
 
 			// Check if the application has personalized changes and reload without them;
 			// Also Check if the application has an available draft and if yes, reload with those changes.
@@ -483,6 +487,7 @@ sap.ui.define([
 				);
 				await createToolsMenu.call(this, mButtonsAvailability);
 			}
+			this._mStartStatus.toolBarCreated = true;
 			// this is needed to initially check if undo is available, e.g. when the stack gets initialized with changes
 			await onStackModified.call(this);
 
@@ -504,8 +509,10 @@ sap.ui.define([
 			setBlockedOnRootElements.call(this, true);
 
 			const aSeenFeatureIds = await FeaturesAPI.getSeenFeatureIds({ layer: this.getLayer() });
+			this._mStartStatus.seenFeatureIdsLoaded = true;
 
 			const bGuidedTourAutostart = await shouldAutoStartGuidedTour(this.getRootControlInstance(), this.getLayer(), aSeenFeatureIds);
+			this._mStartStatus.guidedTourAutostartDetermined = true;
 
 			// The What's new should only be shown once per session
 			const sWhatsNewReloadFlag = "sap.ui.rta.dontShowWhatsNewAfterReload";
@@ -536,6 +543,7 @@ sap.ui.define([
 				// the show() method of the toolbar relies on this RTA instance being set on the PopupManager
 				await this.getToolbar().show();
 			}
+			this._mStartStatus.toolbarShown = true;
 
 			this.fnKeyDown = onKeyDown.bind(this);
 			document.addEventListener("keydown", this.fnKeyDown);

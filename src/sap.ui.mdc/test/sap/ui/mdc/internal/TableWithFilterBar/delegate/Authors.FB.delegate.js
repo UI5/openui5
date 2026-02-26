@@ -20,7 +20,7 @@ sap.ui.define([
 	FilterBarAuthorsSampleDelegate._getProperty = function(aProperties, sName) {
 		var oNamedProperty = null;
 		aProperties.some(function(oProperty) {
-			if (oProperty.name === sName) {
+			if (oProperty.key === sName) {
 				oNamedProperty = oProperty;
 			}
 			return oNamedProperty !== null;
@@ -37,9 +37,9 @@ sap.ui.define([
 
 			FilterBarDelegate.fetchProperties(oFilterBar, mPropertyBag).then(function(aProperties) {
 
-				if (!aProperties.find(function(oProperty) { return oProperty.name === "genres*/genre/code"; } ) ) {
+				if (!aProperties.find(function(oProperty) { return oProperty.key === "genres*/genre/code"; } ) ) {
 					aProperties.push({
-						name: "genres*/genre/code",
+						key: "genres*/genre/code",
 						label: "Genre (Any)",
 						groupLabel: "none",
 						dataType: "Edm.String",
@@ -58,22 +58,22 @@ sap.ui.define([
 
 				aProperties.forEach(function(oProperty) {
 
-					if (oProperty.name.indexOf("/") >= 0 && oProperty.name !== "genres*/genre/code") {
+					if (oProperty.key.indexOf("/") >= 0 && oProperty.key !== "genres*/genre/code") {
 						oProperty.hiddenFilter = true;
 					}
 
-					if (oProperty.name === "$search") {
+					if (oProperty.key === "$search") {
 						bSearchExists = true;
-					} else if (oProperty.name === "ID") {
+					} else if (oProperty.key === "ID") {
 						oProperty.formatOptions = {groupingEnabled: false};
-					} else if (oProperty.name === "dateOfDeath") {
+					} else if (oProperty.key === "dateOfDeath") {
 						oProperty.maxConditions = 1;
 					}
 
 					if (oProperty.maxConditions === -1 ) {
-						const oCurrentSettings = DelegateCache.get(oFilterBar, oProperty.name) || oCacheSettings[oProperty.name] || {};
+						const oCurrentSettings = DelegateCache.get(oFilterBar, oProperty.key) || oCacheSettings[oProperty.key] || {};
 						if (!oCurrentSettings.valueHelp) {
-							oCacheSettings[oProperty.name] = {...oCurrentSettings, valueHelp: "FVH_Generic_Multi"};
+							oCacheSettings[oProperty.key] = {...oCurrentSettings, valueHelp: "FVH_Generic_Multi"};
 						}
 					}
 				});
@@ -81,7 +81,7 @@ sap.ui.define([
 				if (!bSearchExists) {
 					aProperties.push({
 						  label: "foo", // label is a required propertyInfo porerty
-						  name: "$search",
+						  key: "$search",
 						  dataType: "Edm.String"
 					});
 				}

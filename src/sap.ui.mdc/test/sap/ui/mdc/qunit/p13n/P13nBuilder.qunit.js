@@ -45,10 +45,10 @@ sap.ui.define([
 
 	QUnit.module("API Tests", {
 		fnEnhancer: function(mItem, oProperty) {
-			if (oProperty.name == "key2") {
+			if (oProperty.key == "key2") {
 				mItem.isFiltered = true;
 			}
-			mItem.visible = aVisible.indexOf(oProperty.name) > -1;
+			mItem.visible = aVisible.indexOf(oProperty.key) > -1;
 			return true;
 		},
 		before: async function(){

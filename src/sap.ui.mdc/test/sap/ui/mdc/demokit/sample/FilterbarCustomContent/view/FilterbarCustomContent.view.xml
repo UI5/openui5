@@ -19,9 +19,9 @@
 					id="customFilterbar"
 					delegate="{ name: 'mdc/sample/delegate/FilterBarDelegate', payload: {}}"
 					p13nMode="Item,Value"
-					propertyInfo='[\{"name": "descr", "label": "Description (multi-value)", "path": "descr", "dataType":"sap.ui.model.type.String", "visible": true\},
-								   \{"name": "status", "label": "Status (single-value)", "path": "status", "dataType":"sap.ui.model.type.String", "maxConditions": 1, "visible": true\},
-								   \{"name": "numberWords", "label": "Number of words (single-value)", "path": "numberWords", "dataType":"sap.ui.model.type.Integer", "maxConditions": 1, "visible": true\}]'
+					propertyInfo='[\{"key": "descr", "label": "Description (multi-value)", "path": "descr", "dataType":"sap.ui.model.type.String", "visible": true\},
+								   \{"key": "status", "label": "Status (single-value)", "path": "status", "dataType":"sap.ui.model.type.String", "maxConditions": 1, "visible": true\},
+								   \{"key": "numberWords", "label": "Number of words (single-value)", "path": "numberWords", "dataType":"sap.ui.model.type.Integer", "maxConditions": 1, "visible": true\}]'
 					filtersChanged="handleFiltersChanged">
 					<mdc:filterItems>
 						<!-- Slider (single-value) -->

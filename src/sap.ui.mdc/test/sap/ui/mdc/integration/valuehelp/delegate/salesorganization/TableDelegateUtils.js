@@ -54,7 +54,7 @@ sap.ui.define([
 				oColumnInfo.hAlign = "Right";
 			}
 
-			return new Column(oTable.getId() + "--" + oProperty.name, oColumnInfo);
+			return new Column(oTable.getId() + "--" + oProperty.key, oColumnInfo);
 		}.bind(this));
 	};
 

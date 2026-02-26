@@ -17,6 +17,8 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/m/InputBase",
 	"sap/m/DatePicker",
+	"sap/m/Button",
+	"sap/m/Dialog",
 	"sap/ui/Device",
 	"sap/ui/core/LocaleData",
 	"sap/ui/core/mvc/XMLView",
@@ -28,8 +30,6 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/date/UI5Date",
 	"sap/ui/model/type/DateInterval",
-	"sap/m/Dialog",
-	"sap/m/Button",
 	"sap/ui/dom/jquery/cursorPos"
 ], function(
 	Formatting,
@@ -49,6 +49,8 @@ sap.ui.define([
 	Label,
 	InputBase,
 	DatePicker,
+	Button,
+	Dialog,
 	Device,
 	LocaleData,
 	XMLView,
@@ -59,9 +61,7 @@ sap.ui.define([
 	jQuery,
 	Element,
 	UI5Date,
-	DateInterval,
-	Dialog,
-	Button
+	DateInterval
 ) {
 	"use strict";
 
@@ -1086,10 +1086,18 @@ sap.ui.define([
 			setMarked: function() {}
 		},
 		model = new JSONModel({
-			"startDate": "",
-			"endDate": ""
+			startDate: "",
+			endDate: ""
 		}),
-		oDRS = new DateRangeSelection({value: "{ type: 'DateInterval',parts: [{path: '/startDate'},{path: '/endDate'}]}"}),
+		oDRS = new DateRangeSelection({
+			value: {
+				type: new DateInterval({format: "yMEd"}),
+				parts: [
+					{ path: "/startDate" },
+					{ path: "/endDate" }
+				]
+			}
+		}),
 		oDialog = new Dialog({
 			content: [ oDRS ]
 		}),

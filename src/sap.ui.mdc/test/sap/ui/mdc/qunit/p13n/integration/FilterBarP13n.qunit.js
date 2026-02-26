@@ -14,24 +14,24 @@ sap.ui.define([
 		beforeEach: function () {
 			this.aPropertyInfos = [
 				{
-					"name": "item1",
+					"key": "item1",
 					"label": "item1",
 					"dataType": "String"
 				}, {
-					"name": "item2",
+					"key": "item2",
 					"label": "item2",
 					"dataType": "String"
 				}, {
-					"name": "item3",
+					"key": "item3",
 					"label": "item3",
 					"dataType": "String",
 					"required": true
 				}, {
-					"name": "$search",
+					"key": "$search",
 					"label": "",
 					"dataType": "String"
 				},{
-					"name": "someHiddenProperty",
+					"key": "someHiddenProperty",
 					"label": "",
 					"dataType": "String",
 					"hiddenFilter": true
