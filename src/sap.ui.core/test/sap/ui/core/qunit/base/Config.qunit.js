@@ -18,10 +18,8 @@ globalThis.fnInit = () => {
 		camelize,
 		sinon
 	) => {
-		var oLog = Log.getLogger("test", 6);
-		var oLogErrorSpy = sinon.spy(oLog, "error");
-		var oLogWarningSpy = sinon.spy(oLog, "warning");
-		sap.ui.loader._.logger = oLog;
+		var oLogErrorSpy = sinon.spy(Log, "error");
+		sap.ui.loader._.logger = Log;
 
 		QUnit.module("Base Configuration");
 
@@ -146,7 +144,7 @@ globalThis.fnInit = () => {
 					type: BaseConfiguration.Type.String,
 					external: false
 				}), "test", "BaseConfiguration.get for param 'sapUiMissSpelled' returns correct value 'test'");
-				assert.ok(oLogWarningSpy.calledWith("Deprecated configuration option 'sap-ui-missspelled' given in global configuration. Please use 'sap-ui-miss-spelled' instead."), "Logged deprecated configuration spelling 'sap-ui-missspelled'");
+				assert.ok(oLogErrorSpy.calledWith("[FUTURE FATAL] Deprecated configuration option 'sap-ui-missspelled' given in global configuration. Please use 'sap-ui-miss-spelled' instead."), "Logged deprecated configuration spelling 'sap-ui-missspelled'");
 			}
 		});
 

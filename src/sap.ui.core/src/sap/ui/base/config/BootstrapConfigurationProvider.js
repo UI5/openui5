@@ -2,8 +2,12 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/base/config/camelize"
-], (camelize) => {
+	"sap/base/config/camelize",
+	"sap/base/future"
+], (
+	camelize,
+	future
+) => {
 	"use strict";
 	const oConfig = Object.create(null);
 	const rAlias = /^(sapUiXx|sapUi|sap)((?:[A-Z0-9][a-z]*)+)$/; //for getter
@@ -73,7 +77,7 @@ sap.ui.define([
 			if (sLowerCaseAlias) {
 				vValue = oConfig[sLowerCaseAlias];
 				if (vValue) {
-					sap.ui.loader._.logger.warning(`Deprecated configuration option '${sLowerCaseAlias.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' given in bootstrap configuration. Please use '${sKey.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' instead.`);
+					future.errorThrows(`Deprecated configuration option '${sLowerCaseAlias.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' given in bootstrap configuration. Please use '${sKey.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' instead.`);
 				}
 			}
 		}

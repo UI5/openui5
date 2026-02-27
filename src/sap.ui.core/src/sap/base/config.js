@@ -3,11 +3,9 @@
 */
 sap.ui.define([
 	"sap/base/Eventing",
-	"sap/base/config/GlobalConfigurationProvider",
 	"sap/base/config/MemoryConfigurationProvider"
 ], (
 	Eventing,
-	GlobalConfigurationProvider,
 	MemoryConfigurationProvider
 ) => {
 	"use strict";
@@ -412,8 +410,6 @@ sap.ui.define([
 			attachInvalidated: attachInvalidated
 		}
 	};
-
-	Configuration.registerProvider(GlobalConfigurationProvider);
 
 	return Configuration;
 });

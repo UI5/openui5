@@ -3,17 +3,21 @@
  */
 sap.ui.define([
 	"sap/base/config",
+	"sap/base/config/GlobalConfigurationProvider",
 	"sap/base/util/Deferred",
 	"sap/ui/Global",
 	"sap/ui/VersionInfo",
+	"sap/ui/base/config/BootstrapConfigurationProvider",
 	"sap/ui/core/Lib",
 	"sap/ui/core/boot/loadBootManifest",
 	"sap/ui/core/boot/Splash"
 ], (
 	config,
+	GlobalConfigurationProvider,
 	Deferred,
 	Global,
 	VersionInfo,
+	BootstrapConfigurationProvider,
 	Lib,
 	loadBootManifest,
 	Splash
@@ -87,6 +91,9 @@ sap.ui.define([
 
 	const aBeforeReady = [];
 	let pContentLoaded;
+
+	config.registerProvider(GlobalConfigurationProvider);
+	config.registerProvider(BootstrapConfigurationProvider);
 
 	//Helper for loading tasks from manifest
 	function loadTasks(aTasks) {

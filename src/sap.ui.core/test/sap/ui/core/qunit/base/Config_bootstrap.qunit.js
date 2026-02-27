@@ -16,10 +16,8 @@ globalThis.fnInit = () => {
 		Log,
 		sinon
 	) {
-		var oLog = Log.getLogger("test", 6);
-		var oLogErrorSpy = sinon.spy(oLog, "error");
-		var oLogWarningSpy = sinon.spy(oLog, "warning");
-		sap.ui.loader._.logger = oLog;
+		var oLogErrorSpy = sinon.spy(Log, "error");
+		sap.ui.loader._.logger = Log;
 
 		QUnit.module("Base Configuration");
 
@@ -43,7 +41,7 @@ globalThis.fnInit = () => {
 				name: "sapUiHubelDubel",
 				type: BaseConfiguration.Type.String
 			}), "value1", "BaseConfiguration.get for param 'sapUiHubelDubel' returns value 'value1'");
-			assert.ok(oLogWarningSpy.calledWith("Deprecated configuration option 'sap-ui-hubeldubel' given in bootstrap configuration. Please use 'sap-ui-hubel-dubel' instead."), "Logged warning for deprecated configuration spelling 'sap-ui-hubeldubel'");
+			assert.ok(oLogErrorSpy.calledWith("[FUTURE FATAL] Deprecated configuration option 'sap-ui-hubeldubel' given in bootstrap configuration. Please use 'sap-ui-hubel-dubel' instead."), "Logged warning for deprecated configuration spelling 'sap-ui-hubeldubel'");
 			assert.strictEqual(BaseConfiguration.get({
 				name: "sapUiHubeldubel",
 				type: BaseConfiguration.Type.String
@@ -68,7 +66,7 @@ globalThis.fnInit = () => {
 				name: "sapUi5ooBar",
 				type: BaseConfiguration.Type.String
 			}), "value7", "BaseConfiguration.get for param 'sapUi5ooBar' returns correct value 'value7'");
-			assert.ok(oLogWarningSpy.calledWith("Deprecated configuration option 'sap-ui5oobar' given in bootstrap configuration. Please use 'sap-ui5oo-bar' instead."), "Logged deprecated configuration spelling 'sap-ui5oobar'");
+			assert.ok(oLogErrorSpy.calledWith("[FUTURE FATAL] Deprecated configuration option 'sap-ui5oobar' given in bootstrap configuration. Please use 'sap-ui5oo-bar' instead."), "Logged deprecated configuration spelling 'sap-ui5oobar'");
 			assert.throws(function () {
 				BaseConfiguration.get({
 					name: "sapUi-5ooBar",
@@ -85,7 +83,7 @@ globalThis.fnInit = () => {
 				name: "sapUiSapUiFooBar",
 				type: BaseConfiguration.Type.String
 			}), "value9", "BaseConfiguration.get for param 'sapUiSapUiFooBar' returns correct value 'value9'");
-			assert.ok(oLogWarningSpy.calledWith("Deprecated configuration option 'sap-ui-sapuifoobar' given in bootstrap configuration. Please use 'sap-ui-sap-ui-foo-bar' instead."), "Logged deprecated configuration spelling 'sap-ui-sapui5foobar'");
+			assert.ok(oLogErrorSpy.calledWith("[FUTURE FATAL] Deprecated configuration option 'sap-ui-sapuifoobar' given in bootstrap configuration. Please use 'sap-ui-sap-ui-foo-bar' instead."), "Logged deprecated configuration spelling 'sap-ui-sapui5foobar'");
 			assert.throws(function () {
 				BaseConfiguration.get({
 					name: "sapUiSap.foo.bar",
@@ -121,7 +119,7 @@ globalThis.fnInit = () => {
 				type: BaseConfiguration.Type.String,
 				external: false
 			}), "test", "BaseConfiguration.get for param 'sapUiMissSpelled' returns correct value 'test'");
-			assert.ok(oLogWarningSpy.calledWith("Deprecated configuration option 'sap-ui-missspelled' given in bootstrap configuration. Please use 'sap-ui-miss-spelled' instead."), "Logged deprecated configuration spelling 'sap-ui-missspelled'");
+			assert.ok(oLogErrorSpy.calledWith("[FUTURE FATAL] Deprecated configuration option 'sap-ui-missspelled' given in bootstrap configuration. Please use 'sap-ui-miss-spelled' instead."), "Logged deprecated configuration spelling 'sap-ui-missspelled'");
 		});
 
 		QUnit.start();

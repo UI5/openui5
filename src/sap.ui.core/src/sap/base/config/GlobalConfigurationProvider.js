@@ -3,8 +3,12 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/base/config/camelize"
-], (camelize) => {
+	"sap/base/config/camelize",
+	"sap/base/future"
+], (
+	camelize,
+	future
+) => {
 	"use strict";
 
 	let oConfig;
@@ -62,7 +66,7 @@ sap.ui.define([
 			if (sLowerCaseAlias) {
 				vValue = oWriteableConfig[sLowerCaseAlias] || oConfig[sLowerCaseAlias];
 				if (vValue) {
-					sap.ui.loader._.logger.warning(`Deprecated configuration option '${sLowerCaseAlias.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' given in global configuration. Please use '${sKey.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' instead.`);
+					future.errorThrows(`Deprecated configuration option '${sLowerCaseAlias.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' given in global configuration. Please use '${sKey.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' instead.`);
 				}
 			}
 		}
