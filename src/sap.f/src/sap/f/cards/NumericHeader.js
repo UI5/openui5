@@ -166,7 +166,7 @@ sap.ui.define([
 				number: { "type": "string", group : "Data" },
 
 				/**
-				 * The size of the of the main indicator. Possible values are "S" and "L".
+				 * The size of the main indicator. Possible values are "S" and "L".
 				 */
 				numberSize: { "type": "string", group : "Appearance", defaultValue: "L" },
 

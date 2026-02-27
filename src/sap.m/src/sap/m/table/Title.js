@@ -78,6 +78,8 @@ sap.ui.define([
 
 				/**
 				 * Determines whether the control is visible.
+				 *
+				 * <b>Note:</b> If set to <code>false</code>, the control is hidden but still rendered for accessibility reasons.
 				 */
 				visible : {type : "boolean", group : "Appearance", defaultValue : true}
 

@@ -7,8 +7,6 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/Locale", "sap/ui/integ
 	 * Starts the process of fetching a resource from the network, returning a promise that is fulfilled once the response is available.
 	 * Use this method to override the default behavior when fetching network resources.
 	 * Mimics the browser native Fetch API.
-	 * @public
-	 * @experimental Since 1.113. The API might change.
 	 * @param {string} sResource This defines the resource that you wish to fetch.
 	 * @param {object} mOptions An object containing any custom settings that you want to apply to the request.
 	 * @param {object} mRequestSettings The map of request settings defined in the card manifest. Use this only for reading, they can not be modified.

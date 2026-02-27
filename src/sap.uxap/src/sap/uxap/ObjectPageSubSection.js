@@ -1378,7 +1378,7 @@ sap.ui.define([
 
 	ObjectPageSubSection.prototype.getAggregation = function (sAggregationName) {
 		if (this.hasProxy(sAggregationName)) {
-			return this._getAggregation(sAggregationName);
+			return this._getAggregation(sAggregationName).slice();
 		}
 
 		return ObjectPageSectionBase.prototype.getAggregation.apply(this, arguments);

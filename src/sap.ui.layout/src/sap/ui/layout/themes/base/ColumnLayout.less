@@ -170,10 +170,10 @@ html.sap-phone .sapUiFormCL > .sapUiFormCLContent > .sapUiFormCLContainer:not(:l
 
 .createColumnRules(@counter, @size, @name)  when (@counter > 0) {
 	.createColumnRules((@counter - 1), @size, @name);
-	.sapUiFormCL@{size}Columns .sapUiFormCLElement > .sapUiFormCLCells@{name}@{counter}{
+	.sapUiFormCL.sapUiFormCL@{size}Columns .sapUiFormCLElement > .sapUiFormCLCells@{name}@{counter}{
 		width: @_sap_ui_layout_ColumnLayout_formColumnElementOneCol * @counter;
 	}
-	.sapUiFormCL@{size}Columns .sapUiFormCLElement > .sapUiFormCLCell@{name}Space@{counter}{
+	.sapUiFormCL.sapUiFormCL@{size}Columns .sapUiFormCLElement > .sapUiFormCLCell@{name}Space@{counter}{
 		margin-left: @_sap_ui_layout_ColumnLayout_formColumnElementOneCol * @counter;
 	}
 }

@@ -261,41 +261,41 @@ sap.ui.define([
 			new FormContainer("C1",{
 				title: "contact data",
 				formElements: [
-					new FormElement({
-						label: new Label({text:"Name"}),
-						fields: [new Input({value: "Mustermann", required: true})]
+					new FormElement("C1E1", {
+						label: new Label("C1E1-Label", {text:"Name"}),
+						fields: [new Input("C1E1-Field1", {value: "Mustermann", required: true})]
 					}),
-					new FormElement({
-						label: new Label({text:"First Name"}),
-						fields: [new Input({value: "Max", required: true})]
+					new FormElement("C1E2", {
+						label: new Label("C1E2-Label", {text:"First Name"}),
+						fields: [new Input("C1E2-Field1", {value: "Max", required: true})]
 					}),
-					new SemanticFormElement({
+					new SemanticFormElement("C1E3", {
 						label: "Street / Number",
-						fields: [new Input({value: "Musterstraße"}),
-										 new Input({value: "1", layoutData: new ColumnElementData({cellsSmall: 2, cellsLarge: 1})})]
+						fields: [new Input("C1E3-Field1", {value: "Musterstraße"}),
+								 new Input("C1E3-Field2", {value: "1", layoutData: new ColumnElementData({cellsSmall: 2, cellsLarge: 1})})]
 					}),
-					new SemanticFormElement({
-						label: new Label({text: "Post code / City"}),
-						fields: [new Input({value: "12345", layoutData: new ColumnElementData({cellsSmall: 3, cellsLarge: 2})}),
-										 new Input({value: "Musterstadt"})]
+					new SemanticFormElement("C1E4", {
+						label: new Label("C1E4-Label", {text: "Post code / City"}),
+						fields: [new Input("C1E4-Field1", {value: "12345", layoutData: new ColumnElementData({cellsSmall: 3, cellsLarge: 2})}),
+								 new Input("C1E4-Field2", {value: "Musterstadt"})]
 					}),
-					new FormElement({
+					new FormElement("C1E5", {
 						label: "Country",
-						fields: [new Select({selectedKey: "DE",
-							items: [new ListItem({key: "GB", text: "England"}),
-											new ListItem({key: "US", text: "USA"}),
-											new ListItem({key: "DE", text: "Germany"})]
+						fields: [new Select("C1E5-Field1", {selectedKey: "DE",
+							items: [new ListItem("C1E5-Field1-Item1", {key: "GB", text: "England"}),
+									new ListItem("C1E5-Field1-Item2", {key: "US", text: "USA"}),
+									new ListItem("C1E5-Field1-Item3", {key: "DE", text: "Germany"})]
 						})]
 					}),
-					new FormElement({
+					new FormElement("C1E6", {
 						label: "Date of birth",
-						fields: [new DatePicker({dateValue: new Date(2018, 0, 10), layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 3})})]
+						fields: [new DatePicker("C1E6-Field1", {dateValue: new Date(2018, 0, 10), layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 3})})]
 					}),
-					new FormElement({
+					new FormElement("C1E7", {
 						label: "Gender",
-						fields: [new RadioButtonGroup({
-							buttons: [new RadioButton({text: "male"}),
-							          new RadioButton({text: "female"})]
+						fields: [new RadioButtonGroup("C1E7-Field1", {
+							buttons: [new RadioButton("C1E7-Field1-RB1", {text: "male"}),
+							          new RadioButton("C1E7-Field1-RB2", {text: "female"})]
 						})]
 					})
 				]
@@ -313,74 +313,74 @@ sap.ui.define([
 			new FormContainer("C2",{
 				title: "Container 1",
 				formElements: [
-					new FormElement({
-						label: new Label({text: "Text Area"}),
-						fields: [new TextArea({rows: 3})]
+					new FormElement("C2E1", {
+						label: new Label("C2E1-Label", {text: "Text Area"}),
+						fields: [new TextArea("C2E1-Field1", {rows: 3})]
 					}),
-					new FormElement({
+					new FormElement("C2E2", {
 						label: "Label 2",
-						fields: [new Link({text: "Link", href: "http://www.sap.com"}),
-										 new Input()]
+						fields: [new Link("C2E2-Field1", {text: "Link", href: "http://www.sap.com"}),
+								 new Input("C2E2-Field2")]
 					}),
-					new FormElement({
+					new FormElement("C2E3", {
 						label: "Label 3",
-						fields: [new Input(),
-										 new Input()]
+						fields: [new Input("C2E3-Field1"),
+								 new Input("C2E3-Field2")]
 					})
 				]
 			}),
 			new FormContainer("C3",{
 				toolbar: new Toolbar("C3-TB", {
 					content: [new mTitle("C3-Title", {text: "Container 2", level: CoreLib.TitleLevel.H5, titleStyle: CoreLib.TitleLevel.H6, tooltip: "Title tooltip"}),
-					          new ToolbarSpacer(),
-					          new ToggleButton({text: "LayoutData", press: toggleLayoutData2})
+					          new ToolbarSpacer("C3-TB-Spacer"),
+					          new ToggleButton("C3-TB-ToggleLayoutData", {text: "LayoutData", press: toggleLayoutData2})
 					          ]
 				}),
 				ariaLabelledBy: "C3-Title",
 				formElements: [
-					new FormElement({
-						label: new Label({text:"Label 1"}),
-						fields: [new Input({value: "1", type: MLib.InputType.Number}),
-						         new Input({value: "2", type: MLib.InputType.Number}),
-						         new Input({value: "3", type: MLib.InputType.Number})]
+					new FormElement("C3E1",{
+						label: new Label("C3E1-Label", {text:"Label 1"}),
+						fields: [new Input("C3E1-Field1", {value: "1", type: MLib.InputType.Number}),
+						         new Input("C3E1-Field2", {value: "2", type: MLib.InputType.Number}),
+						         new Input("C3E1-Field3", {value: "3", type: MLib.InputType.Number})]
 					}),
-					new FormElement({
+					new FormElement("C3E2",{
 						label: "Label 2",
-						fields: [new Input({value: "1", type: MLib.InputType.Number}),
-						         new Input({value: "2", type: MLib.InputType.Number}),
-						         new Input({value: "3", type: MLib.InputType.Number}),
-						         new Input({value: "4", type: MLib.InputType.Number})]
+						fields: [new Input("C3E2-Field1", {value: "1", type: MLib.InputType.Number}),
+						         new Input("C3E2-Field2", {value: "2", type: MLib.InputType.Number}),
+						         new Input("C3E2-Field3", {value: "3", type: MLib.InputType.Number}),
+						         new Input("C3E2-Field4", {value: "4", type: MLib.InputType.Number})]
 					}),
-					new FormElement({
-						label: new Label({text: "Label 3"}),
-						fields: [new Input({value: "1", type: MLib.InputType.Number}),
-						         new Input({value: "2", type: MLib.InputType.Number}),
-						         new Input({value: "3", type: MLib.InputType.Number}),
-						         new Input({value: "4", type: MLib.InputType.Number}),
-						         new Input({value: "5", type: MLib.InputType.Number}),
-						         new Input({value: "6", type: MLib.InputType.Number}),
-						         new Input({value: "7", type: MLib.InputType.Number}),
-						         new Input({value: "8", type: MLib.InputType.Number}),
-						         new Input({value: "9", type: MLib.InputType.Number}),
-						         new Input({value: "10", type: MLib.InputType.Number})]
+					new FormElement("C3E3",{
+						label: new Label("C3E3-Label", {text: "Label 3"}),
+						fields: [new Input("C3E3-Field1", {value: "1", type: MLib.InputType.Number}),
+						         new Input("C3E3-Field2", {value: "2", type: MLib.InputType.Number}),
+						         new Input("C3E3-Field3", {value: "3", type: MLib.InputType.Number}),
+						         new Input("C3E3-Field4", {value: "4", type: MLib.InputType.Number}),
+						         new Input("C3E3-Field5", {value: "5", type: MLib.InputType.Number}),
+						         new Input("C3E3-Field6", {value: "6", type: MLib.InputType.Number}),
+						         new Input("C3E3-Field7", {value: "7", type: MLib.InputType.Number}),
+						         new Input("C3E3-Field8", {value: "8", type: MLib.InputType.Number}),
+						         new Input("C3E3-Field9", {value: "9", type: MLib.InputType.Number}),
+						         new Input("C3E3-Field10", {value: "10", type: MLib.InputType.Number})]
 					}),
-					new FormElement({
+					new FormElement("C3E4",{
 						label: "Label 4",
-						fields: [new Input({value: "1", type: MLib.InputType.Number}),
-										 new Input({value: "2", type: MLib.InputType.Number}),
-						         new Input({value: "3", type: MLib.InputType.Number}),
-						         new Input({value: "4", type: MLib.InputType.Number}),
-						         new Input({value: "5", type: MLib.InputType.Number}),
-						         new Input({value: "6", type: MLib.InputType.Number}),
-						         new Input({value: "7", type: MLib.InputType.Number}),
-						         new Input({value: "8", type: MLib.InputType.Number}),
-						         new Input({value: "9", type: MLib.InputType.Number}),
-						         new Input({value: "10", type: MLib.InputType.Number}),
-						         new Input({value: "11", type: MLib.InputType.Number}),
-						         new Input({value: "12", type: MLib.InputType.Number}),
-										 new Input({value: "13", type: MLib.InputType.Number}),
-										 new Input({value: "14", type: MLib.InputType.Number}),
-										 new Input({value: "15", type: MLib.InputType.Number})]
+						fields: [new Input("C3E4-Field1", {value: "1", type: MLib.InputType.Number}),
+								 new Input("C3E4-Field2", {value: "2", type: MLib.InputType.Number}),
+						         new Input("C3E4-Field3", {value: "3", type: MLib.InputType.Number}),
+						         new Input("C3E4-Field4", {value: "4", type: MLib.InputType.Number}),
+						         new Input("C3E4-Field5", {value: "5", type: MLib.InputType.Number}),
+						         new Input("C3E4-Field6", {value: "6", type: MLib.InputType.Number}),
+						         new Input("C3E4-Field7", {value: "7", type: MLib.InputType.Number}),
+						         new Input("C3E4-Field8", {value: "8", type: MLib.InputType.Number}),
+						         new Input("C3E4-Field9", {value: "9", type: MLib.InputType.Number}),
+						         new Input("C3E4-Field10", {value: "10", type: MLib.InputType.Number}),
+						         new Input("C3E4-Field11", {value: "11", type: MLib.InputType.Number}),
+						         new Input("C3E4-Field12", {value: "12", type: MLib.InputType.Number}),
+								 new Input("C3E4-Field13", {value: "13", type: MLib.InputType.Number}),
+								 new Input("C3E4-Field14", {value: "14", type: MLib.InputType.Number}),
+								 new Input("C3E4-Field15", {value: "15", type: MLib.InputType.Number})]
 					})
 				]
 			})
@@ -397,62 +397,62 @@ sap.ui.define([
 			new FormContainer("C4",{
 				title: "Container 1",
 				formElements: [
-					new FormElement({
+					new FormElement("C4E1", {
 						label: "Label 1",
-						fields: [new Input({required: true})]
+						fields: [new Input("C4E1-Field1", {required: true})]
 					}),
-					new FormElement({
+					new FormElement("C4E2", {
 						label: "Label 2",
-						fields: [new Input()]
+						fields: [new Input("C4E2-Field1")]
 					}),
-					new FormElement({
+					new FormElement("C4E3", {
 						label: "Label 3",
-						fields: [new Input()]
+						fields: [new Input("C4E3-Field1")]
 					}),
-					new FormElement({
+					new FormElement("C4E4", {
 						label: "Label 4",
-						fields: [new Input()]
+						fields: [new Input("C4E4-Field1")]
 					}),
-					new FormElement({
+					new FormElement("C4E5", {
 						label: "Text Area",
-						fields: [new TextArea({required: true})]
+						fields: [new TextArea("C4E5-Field1", {required: true})]
 					}),
-					new FormElement({
+					new FormElement("C4E6", {
 						label: "Image",
-						fields: [new Image({src: sap.ui.require.toUrl("sap/ui/core/mimes/logo/sap_73x36.gif"), width: "73px", densityAware: false})]
+						fields: [new Image("C4E6-Field1", {src: sap.ui.require.toUrl("sap/ui/core/mimes/logo/sap_73x36.gif"), width: "73px", densityAware: false})]
 					})
 				]
 			}),
 			new FormContainer("C5",{
 				toolbar: new Toolbar("C5-TB", {
 					content: [new mTitle("C5-Title", {text: "Container 2", level: CoreLib.TitleLevel.H5, titleStyle: CoreLib.TitleLevel.H6, tooltip: "Title tooltip"}),
-					          new ToolbarSpacer(),
-					          new ToggleButton({icon: "sap-icon://sap-ui5", tooltip: "SAPUI5"})
+					          new ToolbarSpacer("C5-TB-Spacer"),
+					          new ToggleButton("C5-TB-Toggle", {icon: "sap-icon://sap-ui5", tooltip: "SAPUI5"})
 					          ]
 				}),
 				formElements: [
-					new FormElement({
+					new FormElement("C5E1", {
 						label: "Label 1",
-						fields: [new Input({required: true})]
+						fields: [new Input("C5E1-Field1", {required: true})]
 					}),
-					new FormElement({
+					new FormElement("C5E2", {
 						label: "Label 2",
-						fields: [new Input()]
+						fields: [new Input("C5E2-Field1")]
 					}),
-					new FormElement({
+					new FormElement("C5E3", {
 						label: "Label 3",
-						fields: [new Input()]
+						fields: [new Input("C5E3-Field1")]
 					}),
-					new FormElement({
+					new FormElement("C5E4", {
 						label: "Label 4",
-						fields: [new Input()]
+						fields: [new Input("C5E4-Field1")]
 					}),
-					new FormElement({
+					new FormElement("C5E5", {
 						label: "Label 5",
 						fields: [new Select("Sel_C5",{selectedKey: "DE",
-							items: [new ListItem({key: "GB", text: "England"}),
-											new ListItem({key: "US", text: "USA"}),
-											new ListItem({key: "DE", text: "Germany"})]
+							items: [new ListItem("Sel_C5-Item1",{key: "GB", text: "England"}),
+									new ListItem("Sel_C5-Item2",{key: "US", text: "USA"}),
+									new ListItem("Sel_C5-Item3",{key: "DE", text: "Germany"})]
 						})]
 					})
 				]
@@ -462,18 +462,18 @@ sap.ui.define([
 				tooltip: "This container is expandable",
 				expandable: true,
 				formElements: [
-					new FormElement({
-						fields: [new CheckBox({text: 'Kindergarden'}),
-								new CheckBox({text: 'primary school'})]
+					new FormElement("C6E1",{
+						fields: [new CheckBox("C6E1-Field1",{text: 'Kindergarden'}),
+								new CheckBox("C6E1-Field2",{text: 'primary school'})]
 					}),
-					new FormElement({
-						fields: [new CheckBox({text: 'high school'})]
+					new FormElement("C6E2",{
+						fields: [new CheckBox("C6E2-Field1",{text: 'high school'})]
 					}),
-					new FormElement({
-						fields: [new CheckBox({text: 'college'})]
+					new FormElement("C6E3",{
+						fields: [new CheckBox("C6E3-Field1",{text: 'college'})]
 					}),
-					new FormElement({
-						fields: [new CheckBox({text: 'university'})]
+					new FormElement("C6E4",{
+						fields: [new CheckBox("C6E4-Field1",{text: 'university'})]
 					})
 				]
 			})
@@ -490,68 +490,72 @@ sap.ui.define([
 			new FormContainer("C7",{
 				title: "Container 1",
 				formElements: [
-					new FormElement({
+					new FormElement("C7E1",{
 						label: "Label 1",
-						fields: [new Text({text: "Text 1"})]
+						fields: [new Text("C7E1-Field1",{text: "Text 1"})]
 					}),
-					new FormElement({
+					new FormElement("C7E2",{
 						label: "Label 2",
-						fields: [new Text({text: "Text 2"})]
+						fields: [new Text("C7E2-Field1",{text: "Text 2"})]
 					}),
-					new FormElement({
+					new FormElement("C7E3",{
 						label: "Label 3",
-						fields: [new Text({text: "Text 3"})]
+						fields: [new Text("C7E3-Field1",{text: "Text 3"})]
 					}),
-					new FormElement({
+					new FormElement("C7E4",{
 						label: "Label 4",
-						fields: [new Text({text: "Text 4"})]
+						fields: [new Text("C7E4-Field1",{text: "Text 4"})]
 					})
 				]
 			}),
 			new FormContainer("C8",{
 				title: "Container 2",
 				formElements: [
-					new SemanticFormElement({
+					new SemanticFormElement("C8E1",{
 						label: "Label 1",
-						fields: [new Text({text: "Text 1"})]
+						fields: [new Text("C8E1-Field1",{text: "Text 1"})]
 					}),
-					new SemanticFormElement({
+					new SemanticFormElement("C8E2",{
 						label: "Label 2",
-						fields: [new Text({text: "Text 2"}), new Text({text: "Text 2a"})]
+						fields: [new Text("C8E2-Field1",{text: "Text 2"}), new Text("C8E2-Field2",{text: "Text 2a"})]
 					}),
-					new SemanticFormElement({
+					new SemanticFormElement("C8E3",{
 						label: "Label 3",
-						fields: [new Text({text: "Text 3"}), new Text({text: "Text 3a"}), new Text({text: "Text 3b"})]
+						fields: [new Text("C8E3-Field1",{text: "Text 3"}), new Text("C8E3-Field2",{text: "Text 3a"}), new Text("C8E3-Field3",{text: "Text 3b"})]
 					}),
-					new SemanticFormElement({
+					new SemanticFormElement("C8E4",{
 						label: "Label 4",
-						fields: [new Text({text: "Text 4"}), new Text({text: "Text 4a"}), new Text({text: "Text 4b"}), new Text({text: "Text 4c"})]
+						fields: [new Text("C8E4-Field1",{text: "Text 4"}), new Text("C8E4-Field2",{text: "Text 4a"}), new Text("C8E4-Field3",{text: "Text 4b"}),
+								 new Text("C8E4-Field4",{text: "Text 4c"}), new Text("C8E4-Field5",{text: "Text 4d"}), new Text("C8E4-Field6",{text: "Text 4e"}),
+								 new Text("C8E4-Field7",{text: "Text 4f"}), new Text("C8E4-Field8",{text: "Text 4g"}), new Text("C8E4-Field9",{text: "Text 4h"}),
+								 new Text("C8E4-Field10",{text: "Text 4i"}), new Text("C8E4-Field11",{text: "Text 4j"}), new Text("C8E4-Field12",{text: "Text 4k"})
+								]
 					})
 				]
 			}),
 			new FormContainer("C9",{
 				toolbar: new Toolbar("C9-TB", {
 					content: [new mTitle("C9-Title", {text: "Container 3", level: CoreLib.TitleLevel.H5, titleStyle: CoreLib.TitleLevel.H6, tooltip: "Title tooltip"}),
-					          new ToolbarSpacer(),
-					          new ToggleButton({icon: "sap-icon://sap-ui5", tooltip: "SAPUI5"})
+					          new ToolbarSpacer("C9-TB-Spacer"),
+					          new ToggleButton("C9-TB-Toggle",{icon: "sap-icon://sap-ui5", tooltip: "SAPUI5"})
 					          ]
 				}),
 				formElements: [
-					new FormElement({
+					new FormElement("C9E1",{
 						label: "Label 1",
-						fields: [new Text({text: "Text 1"}), new Text({text: "another Text 1"})]
+						fields: [new Text("C9E1-Field1",{text: "Text 1"}), new Text("C9E1-Field2",{text: "another Text 1"})]
 					}),
-					new FormElement({
+					new FormElement("C9E2",{
 						label: "Label 2",
-						fields: [new Text({text: "Text 2"}), new Text({text: "another Text 2"})]
+						fields: [new Text("C9E2-Field1",{text: "Text 2"}), new Text("C9E2-Field2",{text: "another Text 2"})]
 					}),
-					new FormElement({
+					new FormElement("C9E3",{
 						label: "Label 3",
-						fields: [new Text({text: "Text 3"}), new Text({text: "another Text 3"})]
+						fields: [new Text("C9E3-Field1",{text: "Text 3"}), new Text("C9E3-Field2",{text: "another Text 3"})]
 					}),
-					new FormElement({
+					new FormElement("C9E4",{
 						label: "Label 4",
-						fields: [new Text({text: "Text 4"}), new Text({text: "another Text 4"})]
+						fields: [new Text("C9E4-Field1",{text: "Text 4"}), new Text("C9E4-Field2",{text: "another Text 4"})]
 					})
 				]
 			}),
@@ -559,21 +563,25 @@ sap.ui.define([
 				title: "Container 4",
 				expandable: true,
 				formElements: [
-					new FormElement({
+					new FormElement("C10E1",{
 						label: "Label 1",
-						fields: [new Text({text: "Text 1"})]
+						fields: [new Text("C10E1-Field1",{text: "Text 1"})]
 					}),
-					new FormElement({
+					new FormElement("C10E2",{
 						label: "Label 2",
-						fields: [new Text({text: "Text 2"})]
+						fields: [new Text("C10E2-Field1",{text: "Text 2"}), new Text("C10E2-Field2",{text: "Text 2a"})]
 					}),
-					new FormElement({
+					new FormElement("C10E3",{
 						label: "Label 3",
-						fields: [new Text({text: "Text 3"})]
+						fields: [new Text("C10E3-Field1",{text: "Text 3"}), new Text("C10E3-Field2",{text: "Text 3a"}), new Text("C10E3-Field3",{text: "Text 3b"})]
 					}),
-					new FormElement({
+					new FormElement("C10E4",{
 						label: "Label 4",
-						fields: [new Text({text: "Text 4"})]
+						fields: [new Text("C10E4-Field1",{text: "Text 4"}), new Text("C10E4-Field2",{text: "Text 4a"}), new Text("C10E4-Field3",{text: "Text 4b"}),
+								 new Text("C10E4-Field4",{text: "Text 4c"}), new Text("C10E4-Field5",{text: "Text 4d"}), new Text("C10E4-Field6",{text: "Text 4e"}),
+								 new Text("C10E4-Field7",{text: "Text 4f"}), new Text("C10E4-Field8",{text: "Text 4g"}), new Text("C10E4-Field9",{text: "Text 4h"}),
+								 new Text("C10E4-Field10",{text: "Text 4i"}), new Text("C10E4-Field11",{text: "Text 4j"}), new Text("C10E4-Field12",{text: "Text 4k"})
+								]
 					})
 				]
 			})
@@ -590,134 +598,134 @@ sap.ui.define([
 			new FormContainer("C11",{
 				title: "Container 1",
 				formElements: [
-					new FormElement({
+					new FormElement("C11E1",{
 						label: "Label 1",
-						fields: [new Input({value: "Container 1", required: true})]
+						fields: [new Input("C11E1-Field1",{value: "Container 1", required: true})]
 					}),
-					new FormElement({
+					new FormElement("C11E2",{
 						label: "Label 2",
-						fields: [new Input({value: "Container 1"})]
+						fields: [new Input("C11E2-Field1",{value: "Container 1"})]
 					}),
-					new FormElement({
+					new FormElement("C11E3",{
 						label: "Label 3",
-						fields: [new Input({value: "Container 1"})]
+						fields: [new Input("C11E3-Field1",{value: "Container 1"})]
 					}),
-					new FormElement({
+					new FormElement("C11E4",{
 						label: "Label 4",
-						fields: [new Input({value: "Container 1"})]
+						fields: [new Input("C11E4-Field1",{value: "Container 1"})]
 					})
 				]
 			}),
 			new FormContainer("C12",{
 				title: "Container 2",
 				formElements: [
-					new FormElement({
+					new FormElement("C12E1",{
 						label: "Label 1",
-						fields: [new Input({value: "Container 2", valueState: "Warning", required: true})]
+						fields: [new Input("C12E1-Field1",{value: "Container 2", valueState: "Warning", required: true})]
 					}),
-					new FormElement({
+					new FormElement("C12E2",{
 						label: "Label 2",
-						fields: [new Input({value: "Container 2", valueState: "Warning"})]
+						fields: [new Input("C12E2-Field1",{value: "Container 2", valueState: "Warning"})]
 					}),
-					new FormElement({
+					new FormElement("C12E3",{
 						label: "Label 3",
-						fields: [new Input({value: "Container 2", valueState: "Warning"})]
+						fields: [new Input("C12E3-Field1",{value: "Container 2", valueState: "Warning"})]
 					}),
-					new FormElement({
+					new FormElement("C12E4",{
 						label: "Label 4",
-						fields: [new Input({value: "Container 2", valueState: "Warning"})]
+						fields: [new Input("C12E4-Field1",{value: "Container 2", valueState: "Warning"})]
 					})
 				]
 			}),
 			new FormContainer("C13",{
 				title: "Container 3",
 				formElements: [
-					new FormElement({
+					new FormElement("C13E1",{
 						label: "Label 1",
-						fields: [new Input({value: "Container 3", valueState: "Error", required: true})]
+						fields: [new Input("C13E1-Field1",{value: "Container 3", valueState: "Error", required: true})]
 					}),
-					new FormElement({
+					new FormElement("C13E2",{
 						label: "Label 2",
-						fields: [new Input({value: "Container 3", valueState: "Error"})]
+						fields: [new Input("C13E2-Field1",{value: "Container 3", valueState: "Error"})]
 					}),
-					new FormElement({
+					new FormElement("C13E3",{
 						label: "Label 3",
-						fields: [new Input({value: "Container 3", valueState: "Error"})]
+						fields: [new Input("C13E3-Field1",{value: "Container 3", valueState: "Error"})]
 					}),
-					new FormElement({
+					new FormElement("C13E4",{
 						label: "Label 4",
-						fields: [new Input({value: "Container 3", valueState: "Error"})]
+						fields: [new Input("C13E4-Field1",{value: "Container 3", valueState: "Error"})]
 					})
 				]
 			}),
 			new FormContainer("C14",{
 				title: "Container 4",
 				formElements: [
-					new FormElement({
-						label: new Label("C14-L1", {text:"Label 1"}),
-						fields: [new Input("C14-I1", {value: "Container 4", valueState: "Success", required: true})]
+					new FormElement("C14E1",{
+						label: new Label("C14E1-Label", {text:"Label 1"}),
+						fields: [new Input("C14E1-Field1", {value: "Container 4", valueState: "Success", required: true})]
 					}),
-					new FormElement({
-						label: new Label("C14-L2", {text:"Label 2"}),
-						fields: [new Input("C14-I2", {value: "Container 4", valueState: "Success"})]
+					new FormElement("C14E2",{
+						label: new Label("C14E2-Label", {text:"Label 2"}),
+						fields: [new Input("C14E2-Field1", {value: "Container 4", valueState: "Success"})]
 					}),
-					new FormElement({
-						label: new Label("C14-L3", {text:"Label 3"}),
-						fields: [new Input("C14-I3", {value: "Container 4", valueState: "Success"})]
+					new FormElement("C14E3",{
+						label: new Label("C14E3-Label", {text:"Label 3"}),
+						fields: [new Input("C14E3-Field1", {value: "Container 4", valueState: "Success"})]
 					}),
-					new FormElement({
-						label: new Label("C14-L4", {text:"Label 4"}),
-						fields: [new Input("C14-I4", {value: "Container 4", valueState: "Success"})]
+					new FormElement("C14E4",{
+						label: new Label("C14E4-Label", {text:"Label 4"}),
+						fields: [new Input("C14E4-Field1", {value: "Container 4", valueState: "Success"})]
 					})
 				]
 			}),
 			new FormContainer("C15",{
 				formElements: [
-					new FormElement({
-						fields: [new ToggleButton({text: 'Field LayoutData',
-															press: toggleLayoutData,
-															layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
-										 new Button("B1", {text: 'Change LayoutData',
-															press: changeLayoutData,
-															enabled: false,
-															layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
-										 new ToggleButton({text: "special columns",
-															press: specialColumns,
-															layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
-										 new ToggleButton({text: "move Container",
-															press: moveContainer,
-															layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
-										 new ToggleButton({text: "visibility Container",
-															press: visibilityContainer,
-															layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
-										 new ToggleButton({text: "new Container",
-															press: newContainer,
-															layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
-										 new ToggleButton({text: "Label size",
-															press: toggleLabelSize,
-															layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
-										 new ToggleButton({text: "emty cells",
-															press: toggleEmptyCells,
-															layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
-										 new ToggleButton({text: "Default container size",
-															pressed: true,
-															press: toggleContainerData,
-															layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
-										new SegmentedButton({
-															width: "100%",
-															selectedKey: "2",
-															tooltip: "XL columns",
-															items: [
-																new SegmentedButtonItem({key: "2", text: "2"}),
-																new SegmentedButtonItem({key: "4", text: "4"}),
-																new SegmentedButtonItem({key: "6", text: "6"})
-															],
-															selectionChange: toggleXLColumns,
-															layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})})]
-					}),
-					new FormElement({
-						fields: [new Button({text: 'OK', type: MLib.ButtonType.Accept}),
-										 new Button({text: 'Cancel', type: MLib.ButtonType.Reject})]
+					new FormElement("C15E1",{
+						fields: [new ToggleButton("C15E1-Field1",{text: 'Field LayoutData',
+																press: toggleLayoutData,
+																layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
+								new Button("C15E1-Field2", {text: 'Change LayoutData',
+																press: changeLayoutData,
+																enabled: false,
+																layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
+								new ToggleButton("C15E1-Field3",{text: "special columns",
+																press: specialColumns,
+																layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
+								new ToggleButton("C15E1-Field4",{text: "move Container",
+																press: moveContainer,
+																layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
+								new ToggleButton("C15E1-Field5",{text: "visibility Container",
+																press: visibilityContainer,
+																layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
+								new ToggleButton("C15E1-Field6",{text: "new Container",
+																press: newContainer,
+																layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
+								new ToggleButton("C15E1-Field7",{text: "Label size",
+																press: toggleLabelSize,
+																layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
+								new ToggleButton("C15E1-Field8",{text: "emty cells",
+																press: toggleEmptyCells,
+																layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
+								new ToggleButton("C15E1-Field9",{text: "Default container size",
+																pressed: true,
+																press: toggleContainerData,
+																layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})}),
+								new SegmentedButton("C15E1-Field10",{
+																width: "100%",
+																selectedKey: "2",
+																tooltip: "XL columns",
+																items: [
+																	new SegmentedButtonItem("C15E1-Field10-Item1",{key: "2", text: "2"}),
+																	new SegmentedButtonItem("C15E1-Field10-Item2",{key: "4", text: "4"}),
+																	new SegmentedButtonItem("C15E1-Field10-Item3",{key: "6", text: "6"})
+																],
+																selectionChange: toggleXLColumns,
+																layoutData: new ColumnElementData({cellsSmall: 6, cellsLarge: 4})})]
+						}),
+					new FormElement("C15E2",{
+						fields: [new Button("C15E2-Field1",{text: 'OK', type: MLib.ButtonType.Accept}),
+								 new Button("C15E2-Field2",{text: 'Cancel', type: MLib.ButtonType.Reject})]
 					})
 				]
 			})
@@ -729,11 +737,11 @@ sap.ui.define([
 	var oNewContainer = new FormContainer("CX",{
 			title: oTitle,
 			formElements: [
-					new FormElement({
-						label: new Label({text:"Label1"}),
-						fields: [new Input({value: "Text1", required: true}),
-						         new Input({value: "Text2"}),
-						         new Input({value: "Text3"})]
+					new FormElement("CXE1",{
+						label: new Label("CXE1-Label", {text:"Label1"}),
+						fields: [new Input("CXE1-Field1", {value: "Text1", required: true}),
+						         new Input("CXE1-Field2", {value: "Text2"}),
+						         new Input("CXE1-Field3", {value: "Text3"})]
 					})
 			]
 	});
@@ -743,16 +751,16 @@ sap.ui.define([
 		toolbar: new Toolbar("F6-TB", {
 			content: [
 				new mTitle("F6-Title", {text: "column test", level: CoreLib.TitleLevel.H5, titleStyle: CoreLib.TitleLevel.H6, tooltip: "Title tooltip"}),
-				new ToolbarSpacer(),
-				new SegmentedButton({
+				new ToolbarSpacer("F6-TB-Spacer"),
+				new SegmentedButton("F6-TB-SwitchLayout", {
 					width: "auto",
 					selectedKey: "C2",
 					items: [
-						new SegmentedButtonItem({key: "C1", text: "1 1 1 1"}),
-						new SegmentedButtonItem({key: "C2", text: "1 2 2 2"}),
-						new SegmentedButtonItem({key: "C3", text: "1 2 3 3"}),
-						new SegmentedButtonItem({key: "C4", text: "1 2 3 4"}),
-						new SegmentedButtonItem({key: "C5", text: "1 3 4 6"})
+						new SegmentedButtonItem("F6-TB-SwitchLayout-Item1", {key: "C1", text: "1 1 1 1"}),
+						new SegmentedButtonItem("F6-TB-SwitchLayout-Item2", {key: "C2", text: "1 2 2 2"}),
+						new SegmentedButtonItem("F6-TB-SwitchLayout-Item3", {key: "C3", text: "1 2 3 3"}),
+						new SegmentedButtonItem("F6-TB-SwitchLayout-Item4", {key: "C4", text: "1 2 3 4"}),
+						new SegmentedButtonItem("F6-TB-SwitchLayout-Item5", {key: "C5", text: "1 3 4 6"})
 					],
 					selectionChange: function(oEvent) {
 						var oItem = oEvent.getParameter("item");
@@ -777,13 +785,13 @@ sap.ui.define([
 						}
 					}
 				}),
-				new Button({text: "add field",
+				new Button("F6-TB-AddField",{text: "add field",
 					press: function(oEvent) {
 						var oFormContainer = Element.getElementById("C16");
 						var iElements = oFormContainer.getFormElements().length +  1;
-						var oFormElement = new FormElement({
+						var oFormElement = new FormElement("C16E" + iElements, {
 							label: "Label" + iElements,
-							fields: [new Input({value: iElements})]
+							fields: [new Input("C16E" + iElements + "-Field1", {value: iElements})]
 						});
 						oFormContainer.addFormElement(oFormElement);
 					}})
@@ -795,10 +803,10 @@ sap.ui.define([
 		formContainers: [
 			new FormContainer("C16",{
 				formElements: [
-					new FormElement({
-						label: "Label 1",
-						fields: [new Input({value: "1"})]
-						})
+					new FormElement("C16E1",{
+						label: new Label("C16E1-Label", {text: "Label 1"}),
+						fields: [new Input("C16E1-Field1", {value: "1"})]
+					})
 					]
 			})
 		]

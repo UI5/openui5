@@ -7,7 +7,6 @@ sap.ui.define(['./Service'], function (Service) {
 	/**
 	 * @class sap.ui.integration.Data
 	 * Provides an interface for a simple DataService
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.ushell
 	 * @extends sap.ui.integration.Service

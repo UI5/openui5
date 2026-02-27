@@ -34,7 +34,10 @@ TileContentRenderer.render = function(oRm, oControl) {
 	var sFrameTypeClass = encodeCSS("sapMFrameType" + oControl.getFrameType());
 
 	oRm.openStart("div", oControl);
-	oRm.class(oControl.getState() == "Disabled" ? "sapMTileCnt sapMTileCntDisabled" : "sapMTileCnt");
+	oRm.class("sapMTileCnt");
+	if (oControl.getState() == "Disabled") {
+		oRm.class("sapMTileCntDisabled");
+	}
 	oRm.class(sContentTypeClass);
 	oRm.class(sFrameTypeClass);
 	if (sPriority === Priority.None){

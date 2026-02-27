@@ -24,7 +24,6 @@ sap.ui.define([
 	 * Util class for preprocessing of card manifests.
 	 * @namespace sap.ui.integration.util.ManifestResolver
 	 * @since 1.97
-	 * @experimental 1.97
 	 * @private
 	 * @ui5-restricted Mobile SDK
 	 */
