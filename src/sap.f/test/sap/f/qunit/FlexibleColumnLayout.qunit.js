@@ -1059,6 +1059,40 @@ function(
 		});
 	});
 
+	QUnit.test("Suspended columns are resumed when animation mode changes from 'full' to 'none'", function (assert) {
+		// arrange
+		var fnDone = assert.async(),
+			sOriginalAnimationMode = ControlBehavior.getAnimationMode(),
+			oBeginColumnDomRef = this.oFCL._$columns["begin"].get(0),
+			oMidColumnDomRef = this.oFCL._$columns["mid"].get(0),
+			oResumeSpy = this.spy(ResizeHandler, "resume");
+
+		// act: change layout with animations enabled (columns get suspended)
+		this.oFCL.setLayout(LT.TwoColumnsMidExpanded);
+
+		this.oFCL._attachAfterAllColumnsResizedOnce(function () {
+			setTimeout(function () {
+				oResumeSpy.resetHistory();
+
+				// act: switch animation mode to 'none'
+				ControlBehavior.setAnimationMode("none");
+
+				// act: change layout again - this should resume any suspended columns
+				this.oFCL.setLayout(LT.TwoColumnsBeginExpanded);
+
+				// assert: resume is called for visible columns even though animations are disabled
+				assert.ok(oResumeSpy.calledWith(oBeginColumnDomRef),
+					"ResizeHandler.resume called for begin column when animation mode is 'none'");
+				assert.ok(oResumeSpy.calledWith(oMidColumnDomRef),
+					"ResizeHandler.resume called for mid column when animation mode is 'none'");
+
+				// cleanup
+				ControlBehavior.setAnimationMode(sOriginalAnimationMode);
+				fnDone();
+			}.bind(this), 0);
+		}.bind(this));
+	});
+
 	QUnit.test("_getPreviousLayout", function (assert) {
 		var sLayoutBeforeUpdate = this.oFCL.getLayout();
 		this.oFCL.setLayout(LT.TwoColumnsMidExpanded);
