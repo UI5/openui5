@@ -1105,7 +1105,7 @@ function(
 			aButtons = this.removeAllAggregation("buttons"),
 			oClone = Control.prototype.clone.apply(this, arguments);
 
-		const iSelectedItemIndex = aItems.findIndex(function(item) {
+		const iSelectedItemIndex = aItems?.findIndex(function(item) {
 				return item.getId() === sSelectedItemId;
 			});
 

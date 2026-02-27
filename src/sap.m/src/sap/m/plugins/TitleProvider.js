@@ -11,7 +11,7 @@ sap.ui.define(["./PluginBase",  "sap/ui/core/Element", "sap/ui/base/ManagedObjec
 	 * @param {object} [mSettings] Initial settings for the <code>TitleProvider</code>
 	 *
 	 * @class
-	 * This plugin displays the total and selected rows counts of its host control on the associated {@link sap.m.table.Title title} control.
+	 * This plugin displays the total and selected row counts of its host control on the associated {@link sap.m.table.Title title} control.
 	 *
 	 * <b>Notes:</b>
 	 * <ul>
@@ -27,7 +27,7 @@ sap.ui.define(["./PluginBase",  "sap/ui/core/Element", "sap/ui/base/ManagedObjec
 	 *     If the selection plugin is replaced at runtime, the <code>TitleProvider</code> plugin must be registered again.
 	 *   </li>
 	 *   <li>
-	 *     If the selected count can exceed the total row count (for example, when {@link sap.m.ListBase#getRememberSelection remember selection} is enabled and
+	 *     If the selected count might exceed the total row count (for example, if {@link sap.m.ListBase#getRememberSelection remember selection} is enabled and
 	 *     the current filter hides previously selected rows), it is recommended to set the {@link sap.m.table.Title#getShowExtendedView showExtendedView} property
 	 *     of the associated title control to <code>true</code>.
 	 *     The plugin does not manage the <code>showExtendedView</code> property and leaves this to the application.

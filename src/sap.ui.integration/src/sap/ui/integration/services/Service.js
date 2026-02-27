@@ -11,7 +11,6 @@ sap.ui.define([], function () {
 	 * @alias sap.ui.integration.services.Service
 	 * @private
 	 * @ui5-restricted sap.ushell
-	 * @experimental
 	 */
 	var Service = function () {
 	};

@@ -201,7 +201,6 @@ sap.ui.define([
 	 * @param {sap.ui.integration.util.DataProvider} oDataProvider The data provider to be removed
 	 * @private
 	 * @ui5-restricted sap.ui.integration, shell-toolkit
-	 * @experimental
 	 */
 	DataProviderFactory.prototype.remove = function (oDataProvider) {
 		var iProviderIndex = this._aDataProviders.indexOf(oDataProvider);

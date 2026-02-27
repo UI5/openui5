@@ -29,10 +29,16 @@
 	height: @mdctoken-large-line-height;
 }
 
-.sapUiSizeCozy .sapUiMdcTokenizerDisplay.sapMTokenizer.sapMTokenizerReadonly .sapMToken {
-	/* right margin and padding of the token (space for the delimiter) */
-	padding-right: 0.5rem;
-	margin-right: 0.5rem;
+.sapUiSizeCozy {
+	.sapUiMdcTokenizerDisplay.sapMTokenizer.sapMTokenizerReadonly .sapMToken {
+		/* right margin and padding of the token (space for the delimiter) */
+		padding-right: 0.5rem;
+		margin-right: 0.5rem;
+	}
+
+	.sapUiForm:not(.sapUiFormEdit) .sapUiMdcTokenizerDisplay.sapMTokenizer.sapMTokenizerReadonly .sapMToken {
+		padding-top: 0;
+	}
 }
 
 /* delimiters between tokens */
@@ -48,12 +54,14 @@
 	line-height: @mdctoken-small-line-height;
 }
 
-.sapUiSizeCozy .sapUiMdcTokenizerDisplay .sapMToken::after {
-	margin-left: 0.4rem; /* space between tokens. the left side margin of the token */
-}
+.sapUiSizeCozy {
+	.sapUiMdcTokenizerDisplay .sapMToken::after {
+		margin-left: 0.4rem; /* space between tokens. the left side margin of the token */
+	}
 
-.sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMToken::after {
-	line-height: @mdctoken-large-line-height;
+	.sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMToken::after {
+		padding-top: 0.125rem;
+	}
 }
 
 /* no delimiter after the last token */

@@ -87,7 +87,6 @@ sap.ui.define([
 			properties: {
 				/**
 				 * Defines the design of the content.
-				 * @experimental Since 1.109
 				 * @since 1.109
 				 */
 				design: {

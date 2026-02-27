@@ -37,7 +37,7 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @constructor
-	 * @experimental
+	 * @private
 	 * @since 1.90
 	 * @alias sap.ui.integration.cards.WebPageContent
 	 */
@@ -94,7 +94,6 @@ sap.ui.define([
 				/**
 				 * If set to <code>true</code>, the <code>sandbox</code> attribute will not be added
 				 * Note: Omitting the <code>sandbox</code> attribute opens a security vulnerability and must be done with great caution and only if the content of the iframe page is fully trusted.
-				 * @experimental
 				 */
 				omitSandbox: {
 					type: "boolean",

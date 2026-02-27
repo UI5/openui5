@@ -27,7 +27,6 @@ sap.ui.define([
 	 *
 	 * @constructor
 	 * @private
-	 * @experimental 1.98
 	 * @since 1.98
 	 * @alias sap.f.cards.NumericIndicators
 	 */

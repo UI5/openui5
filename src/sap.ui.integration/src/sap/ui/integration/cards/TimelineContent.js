@@ -41,7 +41,7 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @constructor
-	 * @experimental
+	 * @private
 	 * @since 1.61
 	 * @see {@link TODO Card}
 	 * @alias sap.ui.integration.cards.TimelineContent

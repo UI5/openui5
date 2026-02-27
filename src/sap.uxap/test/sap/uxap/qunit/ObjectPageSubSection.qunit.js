@@ -22,9 +22,10 @@ sap.ui.define([
 	"sap/m/Panel",
 	"sap/m/Text",
 	"sap/m/Title",
-	"sap/ui/core/HTML"
+	"sap/ui/core/HTML",
+	"sap/ui/model/json/JSONModel"
 ],
-function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler, KeyCodes, Log, ObjectPageDynamicHeaderTitle, ObjectPageSection, ObjectPageSectionBase, ObjectPageSubSectionClass, BlockBase, ObjectPageLayout, library, App, Button, Label, Panel, Text, Title, HTML) {
+function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler, KeyCodes, Log, ObjectPageDynamicHeaderTitle, ObjectPageSection, ObjectPageSectionBase, ObjectPageSubSectionClass, BlockBase, ObjectPageLayout, library, App, Button, Label, Panel, Text, Title, HTML, JSONModel) {
 	"use strict";
 
 	var TitleLevel = coreLibrary.TitleLevel;
@@ -1230,6 +1231,58 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 		new App({pages: [opl]}).placeAt("qunit-fixture");
 		await nextUIUpdate();
+	});
+
+	QUnit.test("No duplicate ID error when bound blocks aggregation shrinks then grows", async function(assert) {
+		// Setup: Create ObjectPageSubSection with template and model binding
+		var oModel = new JSONModel({
+			blocks: Array(8).fill({})  // Start with 8 items
+		});
+
+		var oSubSection = new ObjectPageSubSectionClass({
+			id: "testSubSection",
+			blocks: {
+				path: 'testModel>/blocks',
+				template: new Text({text: "Block content"})
+			}
+		});
+		oSubSection.setModel(oModel, "testModel");
+
+		var oObjectPageLayout = new ObjectPageLayout({
+			sections: new ObjectPageSection({
+				subSections: [oSubSection]
+			})
+		});
+
+		// Render to trigger binding initialization
+		oObjectPageLayout.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Assert initial state
+		assert.strictEqual(oSubSection.getBlocks().length, 8, "Initially 8 blocks created");
+
+		// Act: Shrink to 4 items (this is where incomplete removal would happen without the fix)
+		try {
+			oModel.setProperty("/blocks", Array(4).fill({}));
+			await nextUIUpdate();
+			assert.ok(true, "Successfully updated to 4 items without error");
+			assert.strictEqual(oSubSection.getBlocks().length, 4, "4 blocks remain after shrinking");
+		} catch (e) {
+			assert.ok(false, "Error during shrink operation: " + e.message);
+		}
+
+		// Act: Grow to 10 items (this would throw duplicate ID error without the fix)
+		try {
+			oModel.setProperty("/blocks", Array(10).fill({}));
+			await nextUIUpdate();
+			assert.ok(true, "Successfully updated to 10 items without duplicate ID error");
+			assert.strictEqual(oSubSection.getBlocks().length, 10, "10 blocks created after growing");
+		} catch (e) {
+			assert.ok(false, "Duplicate ID error occurred: " + e.message);
+		}
+
+		// Cleanup
+		oObjectPageLayout.destroy();
 	});
 
 	QUnit.module("Object Page SubSection - moreBlocks aggregation");

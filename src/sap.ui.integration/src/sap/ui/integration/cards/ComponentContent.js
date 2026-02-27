@@ -39,7 +39,6 @@ sap.ui.define([
 	 * @author SAP SE
 	 * @version ${version}
 	 *
-	 * @experimental
 	 * @constructor
 	 * @private
 	 * @alias sap.ui.integration.cards.ComponentContent

@@ -12,7 +12,7 @@
 	<m:App id="MyApp" defaultTransitionName="show">
 		<m:Page id="P0" title="MultiValueField" titleLevel="H1">
 			<m:headerContent>
-				<m:ToggleButton press="onEditPress" text="Edit" />
+				<m:ToggleButton pressed="true" press="onEditPress" text="Edit" />
 				<m:ToggleButton press="onSizePress" text="Size" />
 			</m:headerContent>
 			<form:SimpleForm id="form" layout="ColumnLayout" editable="true"

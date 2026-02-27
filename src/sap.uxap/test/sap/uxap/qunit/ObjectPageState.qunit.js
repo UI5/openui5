@@ -460,6 +460,54 @@ function(
 		await nextUIUpdate();
 	});
 
+	QUnit.test("_adjustTitlePositioning uses stable bound function to prevent endless loop in ResizeHandler", async function(assert) {
+		//setup
+		var oPage = this.oObjectPage,
+			done = assert.async();
+
+		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+			var oDomRef = oPage.getDomRef(),
+				aRegisteredCallbacks = [],
+				oIsSuspendedStub;
+
+			// Stub isSuspended to capture callbacks being registered
+			oIsSuspendedStub = sinon.stub(ResizeHandler, "isSuspended").callsFake(function(oDomRef, fnCallback) {
+				if (fnCallback) {
+					aRegisteredCallbacks.push(fnCallback);
+				}
+				// Return true to simulate suspended state
+				return true;
+			});
+
+			// Suspend and call _adjustTitlePositioning multiple times
+			// (simulating multiple resize events while suspended)
+			ResizeHandler.suspend(oDomRef);
+
+			oPage._adjustTitlePositioning();
+			oPage._adjustTitlePositioning();
+			oPage._adjustTitlePositioning();
+
+			// All callbacks should be the SAME function reference
+			assert.equal(aRegisteredCallbacks.length, 3, "isSuspended called 3 times with callbacks");
+			assert.strictEqual(aRegisteredCallbacks[0], aRegisteredCallbacks[1],
+				"First and second callbacks are identical (same function reference)");
+			assert.strictEqual(aRegisteredCallbacks[1], aRegisteredCallbacks[2],
+				"Second and third callbacks are identical (same function reference)");
+
+			// Verify it's the bound function from init
+			assert.strictEqual(aRegisteredCallbacks[0], oPage._adjustTitlePositioningBound,
+				"Registered callback is the stable bound function from init");
+
+			// Cleanup
+			oIsSuspendedStub.restore();
+			ResizeHandler.resume(oDomRef);
+			done();
+		});
+
+		oPage.placeAt("qunit-fixture");
+		await nextUIUpdate();
+	});
+
 	QUnit.test("updates the title positioning in first onAfterRendering", async function(assert) {
 		//setup
 		var oPage = this.oObjectPage,
