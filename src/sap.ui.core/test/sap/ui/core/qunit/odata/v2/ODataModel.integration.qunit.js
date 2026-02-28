@@ -365,11 +365,12 @@ sap.ui.define([
 	/**
 	 * Extracts the content of the visible cells of the given table.
 	 *
-	 * @param {sap.ui.table.Table} oTable The table
+	 * @param {sap.ui.table.Table|sap.m.Table} oTable The table
 	 * @returns {(string[])[]} A 2 dimensional array of the visible table content
 	 */
 	function getTableContent(oTable) {
-		return oTable.getRows().map(function(oRow) {
+		const aRows = oTable.getRows ? oTable.getRows() : oTable.getItems();
+		return aRows.map(function(oRow) {
 			return oRow.getCells().map(function (oCell) {
 				return oCell.getText ? oCell.getText() : oCell.getValue();
 			});
@@ -27241,13 +27242,14 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		const oJSONModel = new JSONModel({
 			department: "Dev",
 			lastNamePrefix: undefined,
+			firstNamePrefix: "C",
 			teamMembers: [
-				{lastName: "Johnson", department: "Mgmt"},
-				{lastName: "Smith", department: "Dev"},
-				{lastName: "Jones", department: "Dev"},
-				{lastName: "Davis", department: "Dev"},
-				{lastName: "Miller", department: "Cons"},
-				{lastName: "Wilson", department: "Cons"}
+				{firstName: "Alice", lastName: "Johnson", department: "Mgmt"},
+				{firstName: "Bob", lastName: "Smith", department: "Dev"},
+				{firstName: "Charlie", lastName: "Jones", department: "Dev"},
+				{firstName: "John", lastName: "Davis", department: "Dev"},
+				{firstName: "Christine", lastName: "Miller", department: "Cons"},
+				{firstName: "Frank", lastName: "Wilson", department: "Cons"}
 			]
 		});
 		const sView = `
@@ -27269,30 +27271,56 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 
 		this.expectValue("lastName", ["Jones", "", ""]);
 
-		// code under test - set additional last name prefix filter
+		// code under test
 		oJSONModel.setProperty("/lastNamePrefix", "J");
 
 		await this.waitForChanges(assert, "set last name prefix filter");
 
 		this.expectValue("lastName", ["Johnson", "Jones"]);
 
-		// code under test - remove department filter
+		// code under test
 		oJSONModel.setProperty("/department", null);
 
 		await this.waitForChanges(assert, "remove department filter");
 
 		this.expectValue("lastName", ["Smith", "Jones", "Davis", "Miller", "Wilson"], 1);
 
-		// code under test - remove last name prefix filter
+		// code under test
 		oJSONModel.setProperty("/lastNamePrefix", undefined);
 
 		await this.waitForChanges(assert, "remove last name prefix filter");
 
-		const oTable = this.oView.byId("myTable");
-		assert.strictEqual(oTable.getDependents().length, 2);
+		this.expectValue("lastName", ["Jones", "Miller", "", "", "", ""]);
 
-		// code under test - bound filters are removed
-		oTable.unbindRows();
+		const oListBinding = this.oView.byId("myTable").getBinding("rows");
+		const oBoundFilter = new Filter({
+			path : "firstName",
+			operator : FilterOperator.StartsWith,
+			value1 : "{/firstNamePrefix}"}
+		);
+
+		// code under test
+		oListBinding.filter(oBoundFilter, FilterType.ApplicationBound);
+
+		await this.waitForChanges(assert, "set bound application filter via API");
+
+		this.expectValue("lastName", ["Miller", ""]);
+
+		const oConstantFilter = new Filter({
+			path : "department",
+			operator : FilterOperator.EQ,
+			value1 : "Cons"});
+
+		// code under test
+		oListBinding.filter(oConstantFilter, FilterType.Application);
+
+		await this.waitForChanges(assert, "set unbound application filter via API");
+
+		this.expectValue("lastName", "Wilson", 1);
+		const oTable = this.oView.byId("myTable");
+
+		// code under test - remove all bound filters
+		oListBinding.filter(undefined, FilterType.ApplicationBound);
 
 		assert.strictEqual(oTable.getDependents().length, 0);
 	});
@@ -27304,6 +27332,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		const oModel = createSalesOrdersModel();
 		const oFilterModel = new JSONModel({
 			namePrefix : "Lap",
+			nameSuffix : "1",
 			weightMin : undefined,
 			weightMax : undefined
 		});
@@ -27356,7 +27385,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 			.expectValue("name", ["Lap1"])
 			.expectValue("weightMeasure", ["3.5"]);
 
-		// code under test - set BT filter values
+		// code under test
 		oFilterModel.setProperty("/weightMin", "3.0");
 		oFilterModel.setProperty("/weightMax", "4.0");
 
@@ -27373,12 +27402,72 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 			.expectValue("weightUnit", "KG", 1)
 			.expectValue("weightUnit", "KG", 2);
 
-		// code under test - reset all bound filter values
+		// code under test
 		oFilterModel.setProperty("/namePrefix", undefined);
 		oFilterModel.setProperty("/weightMin", undefined);
 		oFilterModel.setProperty("/weightMax", undefined);
 
 		await this.waitForChanges(assert, "reset all bound filter values");
+
+		const oTable = this.oView.byId("table");
+		const oListBinding = oTable.getBinding("items");
+		sRequestUrl = "ProductSet?$skip=0&$top=100&$filter=endswith(Name,%271%27)";
+		this.expectRequest({requestUri: sRequestUrl, encodeRequestUri: false}, {
+			results: [
+				{ProductID : "HT-1001", Name : "Lap1", WeightMeasure : "3.5", WeightUnit : "KG"}
+			]})
+			// due to E.C.D., "Lap1" is temporarily in item 1 before item 1 disappears => also check table after changes
+			.expectValue("name", "Lap1", 1).expectValue("name", "Lap1", 0)
+			.expectValue("weightMeasure", "3.5", 1).expectValue("weightMeasure", "3.5", 0);
+		const oBoundFilter = new Filter({path : "Name", operator : FilterOperator.EndsWith,
+			value1 : "{filter>/nameSuffix}"});
+
+		// code under test
+		oListBinding.filter(oBoundFilter, FilterType.ApplicationBound);
+
+		await this.waitForChanges(assert, "set new bound filter via API");
+		assert.deepEqual(getTableContent(oTable), [ ["Lap1", "3.5", "KG"] ]);
+
+		sRequestUrl = "ProductSet?$skip=0&$top=100&$filter=endswith(Name,%270%27)";
+		this.expectRequest({requestUri: sRequestUrl, encodeRequestUri: false}, {
+				results : [
+					{Name : "Mob0", ProductID : "id2", WeightMeasure : "0.5", WeightUnit : "KG"},
+					{Name : "Lap0", ProductID : "id0", WeightMeasure : "2.5", WeightUnit : "KG"}
+				]
+			})
+			.expectValue("name", ["Mob0", "Lap0"])
+			.expectValue("weightMeasure", ["0.5", "2.5"])
+			.expectValue("weightUnit", "KG", 1);
+
+		// code under test
+		oFilterModel.setProperty("/nameSuffix", "0"); // value for new filter: is applied
+		oFilterModel.setProperty("/namePrefix", "Lap"); // value for previous filter: has no effect
+
+		await this.waitForChanges(assert, "set values for new and previous bound filter");
+
+		sRequestUrl = "ProductSet?$skip=0&$top=100"
+			+ "&$filter=WeightMeasure%20ge%202m%20and%20WeightUnit%20eq%20%27KG%27%20and%20endswith(Name,%270%27)";
+		this.expectRequest({requestUri: sRequestUrl, encodeRequestUri: false}, {
+				results : [
+					{Name : "Lap0", ProductID : "id0", WeightMeasure : "2.5", WeightUnit : "KG"}
+				]
+			})
+			.expectValue("name", ["Lap0"])
+			.expectValue("weightMeasure", ["2.5"]);
+		const oConstantFilter0 = new Filter({path : "WeightMeasure", operator : FilterOperator.GE,
+			value1 : "2"});
+		const oConstantFilter1 = new Filter({path : "WeightUnit", operator : FilterOperator.EQ,
+			value1 : "KG"});
+
+		// code under test
+		oListBinding.filter([oConstantFilter0, oConstantFilter1], FilterType.Application);
+
+		await this.waitForChanges(assert, "new constant filters combined w/ existing bound filter");
+
+		// code under test - unbind removes BoundFilters from the table's dependents
+		oTable.unbindItems();
+
+		assert.strictEqual(oTable.getDependents().length, 0);
 	});
 
 	//*********************************************************************************************

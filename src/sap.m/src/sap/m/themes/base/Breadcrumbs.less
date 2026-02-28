@@ -138,3 +138,18 @@
 .sapMOverflowToolbarMenu-CTX .sapMBreadcrumbs {
 	max-width: 90vw;
 }
+
+/* Breadcrumbs picker with text wrapping */
+.sapMBreadcrumbsPicker-CTX.sapMPickerWrappedItems,
+.sapMBreadcrumbsPicker.sapMPickerWrappedItems {
+	.sapMSelectList.sapMSelectListWrappedItems {
+		max-width: 600px;
+		width: auto;
+
+		.sapMSelectListItem {
+			white-space: normal;
+			height: auto;
+			line-height: 1rem;
+		}
+	}
+}

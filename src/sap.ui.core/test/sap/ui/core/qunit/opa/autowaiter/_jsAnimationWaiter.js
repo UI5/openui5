@@ -2,6 +2,7 @@
 sap.ui.define([
 	"sap/ui/test/_LogCollector",
 	"sap/ui/test/autowaiter/_autoWaiter",
+	"sap/ui/test/autowaiter/_jsAnimationWaiter",
 	"sap/ui/test/autowaiter/_timeoutWaiter",
 	"sap/ui/test/autowaiter/_XHRWaiter",
 	"sap/ui/test/autowaiter/_promiseWaiter",
@@ -9,7 +10,7 @@ sap.ui.define([
 	"sap/m/Panel",
 	"sap/ui/core/ControlBehavior",
 	"sap/ui/test/utils/nextUIUpdate"
-], function (_LogCollector, _autoWaiter, _timeoutWaiter, _XHRWaiter, _promiseWaiter,
+], function (_LogCollector, _autoWaiter, _jsAnimationWaiter, _timeoutWaiter, _XHRWaiter, _promiseWaiter,
 	ScrollContainer, Panel, ControlBehavior, nextUIUpdate) {
 	"use strict";
 
@@ -54,13 +55,13 @@ sap.ui.define([
 		oScrollContainer.scrollTo(0, 300, iAnimationDuration);
 
 		function onStart() {
-			bInitialResultBeforeAnimationEnd = _autoWaiter.hasToWait();
-			bSecondResultBeforeAnimationEnd = _autoWaiter.hasToWait();
-			assert.strictEqual(oLogCollector.getAndClearLog().match(oJsAnimationLogRegExp).length, 2);
+			bInitialResultBeforeAnimationEnd = _jsAnimationWaiter.hasPending();
+			bSecondResultBeforeAnimationEnd = _jsAnimationWaiter.hasPending();
+			assert.strictEqual((oLogCollector.getAndClearLog().match(oJsAnimationLogRegExp)).length, 2);
 
 			function onEnd() {
-				bInitialResultAfterAnimationEnd = _autoWaiter.hasToWait();
-				bSecondResultAfterAnimationEnd = _autoWaiter.hasToWait();
+				bInitialResultAfterAnimationEnd = _jsAnimationWaiter.hasPending();
+				bSecondResultAfterAnimationEnd = _jsAnimationWaiter.hasPending();
 
 				assert.ok(bInitialResultBeforeAnimationEnd, "animation is in progress");
 				assert.ok(bSecondResultBeforeAnimationEnd, "animation is in progress");
@@ -137,13 +138,13 @@ sap.ui.define([
 		this.oAnimation.start(iAnimationDuration);
 
 		function onStart() {
-			bFirstCheckBefore = _autoWaiter.hasToWait();
-			bSecondCheckBefore = _autoWaiter.hasToWait();
-			assert.strictEqual(oLogCollector.getAndClearLog().match(oJsAnimationLogRegExp).length, 2);
+			bFirstCheckBefore = _jsAnimationWaiter.hasPending();
+			bSecondCheckBefore = _jsAnimationWaiter.hasPending();
+			assert.strictEqual((oLogCollector.getAndClearLog().match(oJsAnimationLogRegExp)).length, 2);
 
 			function onEnd() {
-				bFirstCheckAfter = _autoWaiter.hasToWait();
-				bSecondCheckAfter = _autoWaiter.hasToWait();
+				bFirstCheckAfter = _jsAnimationWaiter.hasPending();
+				bSecondCheckAfter = _jsAnimationWaiter.hasPending();
 
 				assert.ok(bFirstCheckBefore, "animation is in progress");
 				assert.ok(bSecondCheckBefore, "animation is in progress");

@@ -1,6 +1,7 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/i18n/Localization",
 	"sap/m/Button",
 	"sap/m/MessageBox",
 	"sap/m/Popover",
@@ -25,6 +26,7 @@ sap.ui.define([
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	Localization,
 	Button,
 	MessageBox,
 	Popover,
@@ -1384,6 +1386,212 @@ sap.ui.define([
 				fnCheckText.call(this);
 				document.getElementById("qunit-fixture").style.width = "600px";
 			}.bind(this));
+		});
+	});
+
+	function createMockNavigationAPI(aEntries, iCurrentIndex) {
+		const oCurrentEntry = aEntries[iCurrentIndex];
+		return {
+			currentEntry: oCurrentEntry,
+			entries() {
+				return aEntries;
+			},
+			addEventListener: sandbox.stub(),
+			removeEventListener: sandbox.stub()
+		};
+	}
+
+	function createNavigationEntry(sKey) {
+		return { key: sKey };
+	}
+
+	QUnit.module("Navigate Back", {
+		beforeEach() {
+			this.oToolbar = new Adaptation({
+				textResources: Lib.getResourceBundleFor("sap.ui.rta")
+			});
+			this.oToolbarControlsModel = RtaQunitUtils.createToolbarControlsModel();
+			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
+			this.oToolbar.setModel(new JSONModel({}), "versions");
+			return this.oToolbar._pFragmentLoaded;
+		},
+		afterEach() {
+			this.oToolbar.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when navigateBack is called, it calls history.back", function(assert) {
+			const oHistoryBackStub = sandbox.stub(window.history, "back");
+
+			this.oToolbar.navigateBack();
+
+			assert.strictEqual(oHistoryBackStub.callCount, 1, "then window.history.back was called");
+		});
+
+		QUnit.test("when formatBackButtonIcon is called in LTR mode", function(assert) {
+			sandbox.stub(Localization, "getRTL").returns(false);
+			const sIcon = this.oToolbar.formatBackButtonIcon();
+			assert.ok(sIcon.includes("nav-back"), "then the nav-back icon is returned");
+		});
+
+		QUnit.test("when formatBackButtonIcon is called in RTL mode", function(assert) {
+			sandbox.stub(Localization, "getRTL").returns(true);
+			const sIcon = this.oToolbar.formatBackButtonIcon();
+			assert.ok(sIcon.includes("feeder-arrow"), "then the feeder-arrow icon is returned");
+		});
+	});
+
+	QUnit.module("Navigation Tracking", {
+		beforeEach() {
+			this.oOriginalNavigation = window.navigation;
+			this.aNavigationEntries = [
+				createNavigationEntry("entry-0"),
+				createNavigationEntry("entry-1"),
+				createNavigationEntry("entry-2")
+			];
+			this.oMockNavigation = createMockNavigationAPI(this.aNavigationEntries, 1);
+			window.navigation = this.oMockNavigation;
+
+			this.oToolbar = new Adaptation({
+				textResources: Lib.getResourceBundleFor("sap.ui.rta")
+			});
+			this.oToolbarControlsModel = RtaQunitUtils.createToolbarControlsModel();
+			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
+			this.oToolbar.setModel(new JSONModel({}), "versions");
+			return this.oToolbar._pFragmentLoaded;
+		},
+		afterEach() {
+			this.oToolbar.destroy();
+			window.navigation = this.oOriginalNavigation;
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when the toolbar is initialized, setupNavigationTracking is called", function(assert) {
+			// The toolbar is already created in beforeEach, so setupNavigationTracking was already called
+			// We verify by checking that the starting entry was stored
+			assert.strictEqual(
+				this.oToolbar._oStartingNavigationEntry,
+				this.aNavigationEntries[1],
+				"then setupNavigationTracking was called during init and the starting entry was stored"
+			);
+			assert.ok(
+				this.oMockNavigation.addEventListener.calledWith("currententrychange"),
+				"then addEventListener was called with 'currententrychange'"
+			);
+		});
+
+		QUnit.test("when the toolbar is destroyed, cleanupNavigationTracking is called", function(assert) {
+			const fnHandler = this.oToolbar._fnNavigationHandler;
+
+			this.oToolbar.destroy();
+
+			assert.ok(
+				this.oMockNavigation.removeEventListener.calledWith("currententrychange", fnHandler),
+				"then cleanupNavigationTracking was called during exit and removeEventListener was called"
+			);
+		});
+
+		QUnit.test("when setupNavigationTracking is called, the starting entry is stored and listener is added", function(assert) {
+			this.oToolbar.setupNavigationTracking();
+
+			assert.strictEqual(
+				this.oToolbar._oStartingNavigationEntry,
+				this.aNavigationEntries[1],
+				"then the starting navigation entry is stored"
+			);
+			assert.ok(
+				this.oMockNavigation.addEventListener.calledWith("currententrychange"),
+				"then addEventListener was called with 'currententrychange'"
+			);
+			assert.ok(this.oToolbar._fnNavigationHandler, "then the navigation handler is stored");
+		});
+
+		QUnit.test("when navigation occurs and current entry is at start position, back button is disabled", function(assert) {
+			this.oToolbar.setupNavigationTracking();
+
+			const [, oStartEntry] = this.aNavigationEntries;
+			this.oMockNavigation.currentEntry = oStartEntry;
+			this.oToolbar._fnNavigationHandler();
+
+			assert.strictEqual(
+				this.oToolbarControlsModel.getProperty("/backButton/enabled"),
+				false,
+				"then the back button is disabled"
+			);
+		});
+
+		QUnit.test("when navigation occurs and current entry is ahead of start position, back button is enabled", function(assert) {
+			this.oToolbar.setupNavigationTracking();
+
+			const [,, oForwardEntry] = this.aNavigationEntries;
+			this.oMockNavigation.currentEntry = oForwardEntry;
+			this.oToolbar._fnNavigationHandler();
+
+			assert.strictEqual(
+				this.oToolbarControlsModel.getProperty("/backButton/enabled"),
+				true,
+				"then the back button is enabled"
+			);
+		});
+
+		QUnit.test("when navigation occurs and current entry is behind start position, back button is disabled", function(assert) {
+			this.oToolbar.setupNavigationTracking();
+
+			const [oBackwardEntry] = this.aNavigationEntries;
+			this.oMockNavigation.currentEntry = oBackwardEntry;
+			this.oToolbar._fnNavigationHandler();
+
+			assert.strictEqual(
+				this.oToolbarControlsModel.getProperty("/backButton/enabled"),
+				false,
+				"then the back button is disabled"
+			);
+		});
+
+		QUnit.test("when cleanupNavigationTracking is called, event listener is removed", function(assert) {
+			this.oToolbar.setupNavigationTracking();
+			const fnHandler = this.oToolbar._fnNavigationHandler;
+
+			this.oToolbar.cleanupNavigationTracking();
+
+			assert.ok(
+				this.oMockNavigation.removeEventListener.calledWith("currententrychange", fnHandler),
+				"then removeEventListener was called with the handler"
+			);
+			assert.strictEqual(this.oToolbar._fnNavigationHandler, null, "then the handler is cleared");
+			assert.strictEqual(this.oToolbar._oStartingNavigationEntry, null, "then the starting entry is cleared");
+		});
+	});
+
+	QUnit.module("Navigation Tracking - without Navigation API", {
+		beforeEach() {
+			this.oOriginalNavigation = window.navigation;
+			delete window.navigation;
+
+			this.oToolbar = new Adaptation({
+				textResources: Lib.getResourceBundleFor("sap.ui.rta")
+			});
+			this.oToolbarControlsModel = RtaQunitUtils.createToolbarControlsModel();
+			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
+			this.oToolbar.setModel(new JSONModel({}), "versions");
+			return this.oToolbar._pFragmentLoaded;
+		},
+		afterEach() {
+			this.oToolbar.destroy();
+			window.navigation = this.oOriginalNavigation;
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when setupNavigationTracking is called without Navigation API, no error is thrown", function(assert) {
+			this.oToolbar.setupNavigationTracking();
+
+			assert.strictEqual(this.oToolbar._oStartingNavigationEntry, undefined, "then no starting entry is stored");
+			assert.strictEqual(this.oToolbar._fnNavigationHandler, undefined, "then no handler is stored");
+		});
+
+		QUnit.test("when cleanupNavigationTracking is called without Navigation API, no error is thrown", function(assert) {
+			this.oToolbar.cleanupNavigationTracking();
+			assert.ok(true, "cleanup completed without error");
 		});
 	});
 

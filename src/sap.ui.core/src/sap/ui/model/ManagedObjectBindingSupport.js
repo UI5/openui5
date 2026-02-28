@@ -8,6 +8,7 @@ sap.ui.define([
 	"./BindingMode",
 	"./StaticBinding",
 	"./CompositeBinding",
+	"./FilterType",
 	"./FormatException",
 	"./ParseException",
 	"./ValidateException",
@@ -23,6 +24,7 @@ sap.ui.define([
 	BindingMode,
 	StaticBinding,
 	CompositeBinding,
+	FilterType,
 	FormatException,
 	ParseException,
 	ValidateException,
@@ -36,6 +38,14 @@ sap.ui.define([
 	ManagedObjectMetadata
 ) {
 	"use strict";
+
+	const makeArray = (vFilter) => {
+		if (vFilter === undefined) {
+			return [];
+		}
+
+		return Array.isArray(vFilter) ? vFilter : [vFilter];
+	};
 
 	/**
 	 * Mixin for data binding support on the ManagedObject class.
@@ -781,6 +791,7 @@ sap.ui.define([
 		 * @param {function} fnGetBinding The function returning the aggregation binding
  		 */
 		_createBoundFilter: function (oFilter, fnGetBinding) {
+			oFilter.setBound();
 			if (oFilter.isMultiFilter()) {
 				oFilter.aFilters.forEach((oFilter) => {
 					this._createBoundFilter(oFilter, fnGetBinding);
@@ -810,30 +821,59 @@ sap.ui.define([
 		 * Creates bound filter controls for the bound filters in the given binding info in the dependents
 		 * aggregation of this control to allow for resolution of binding expressions in these filters.
 		 *
-		 * @param {sap.ui.base.ManagedObject.AggregationBindingInfo} oBindingInfo The aggregation binding info
+		 * @param {object} oFilters The filters as defined for sap.ui.base.ManagedObject.AggregationBindingInfo
+		 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter|undefined} oFilters.boundFilters The bound filters
+		 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter|undefined} oFilters.filters The constant filters
 		 * @param {function} fnGetBinding The function returning the aggregation binding
 		 * @param {boolean} [bIsTreeBinding] Whether the aggregation binding is a tree binding
-		 * @returns {sap.ui.model.Filter|sap.ui.model.Filter[]|undefined}
+		 * @returns {sap.ui.model.Filter[]|sap.ui.model.Filter|undefined}
 		 *   The filters to be used when the binding is created
 		 */
-		_processFilters: function (oBindingInfo, fnGetBinding, bIsTreeBinding) {
+		_processFilters: function (oFilters, fnGetBinding, bIsTreeBinding) {
 			// keep behavior before introduction of bound filters in case there are none
-			if (oBindingInfo.boundFilters === undefined || bIsTreeBinding) {
-				return oBindingInfo.filters;
+			if (oFilters.boundFilters === undefined || bIsTreeBinding) {
+				return oFilters.filters;
 			}
 
-			const makeArray = (vFilter) => {
-				if (vFilter === undefined) {
-					return [];
-				}
-
-				return Array.isArray(vFilter) ? vFilter : [vFilter];
-			};
-
-			const aBoundFilters = makeArray(oBindingInfo.boundFilters);
+			const aBoundFilters = makeArray(oFilters.boundFilters);
 			aBoundFilters.forEach((oBoundFilter) => this._createBoundFilter(oBoundFilter, fnGetBinding));
 
-			return makeArray(oBindingInfo.filters).concat(aBoundFilters);
+			return makeArray(oFilters.filters).concat(aBoundFilters);
+		},
+
+		/**
+		 * Computes the given list binding's application filters by replacing application filters of the given type
+		 * with the given filters, see {@link ListBinding#computeApplicationFilters}.
+		 *
+		 * @param {sap.ui.model.ListBinding} oBinding The list binding
+		 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter} [vFilters] The filters to be applied
+		 * @param {sap.ui.model.FilterType} [sFilterType=sap.ui.model.FilterType.Application] The type of the filters
+		 * @returns {sap.ui.model.Filter[]|sap.ui.model.Filter|undefined} The filters to be used for the binding after
+		 *   the update
+		 * @throws {Error} For filter type <code>sap.ui.model.FilterType.Control</code>
+		 */
+		computeApplicationFilters: function (oBinding, vFilters, sFilterType) {
+			if (sFilterType === FilterType.Control) {
+				throw new Error("Must not use filter type Control");
+			}
+
+			if (oBinding._isBoundFilterUpdate()) {
+				return vFilters;
+			}
+
+			if (sFilterType === FilterType.ApplicationBound) {
+				this._removeBoundFilters(oBinding);
+				const aConstantFilters = oBinding.aApplicationFilters.filter((oFilter) => !oFilter.isBound());
+				return this._processFilters({boundFilters: vFilters, filters: aConstantFilters}, () => oBinding,
+					/*bIsTreeBinding*/ false);
+			}
+
+			const aBoundFilters = oBinding.aApplicationFilters.filter((oFilter) => oFilter.isBound());
+			if (aBoundFilters.length === 0) {
+				return vFilters;
+			}
+
+			return makeArray(vFilters).concat(aBoundFilters);
 		},
 
 		/*
@@ -871,6 +911,7 @@ sap.ui.define([
 					oBinding = oModel.bindTree(oBindingInfo.path, this.getBindingContext(oBindingInfo.model), aFilters, oBindingInfo.parameters, oBindingInfo.sorter);
 				} else {
 					oBinding = oModel.bindList(oBindingInfo.path, this.getBindingContext(oBindingInfo.model), oBindingInfo.sorter, aFilters, oBindingInfo.parameters);
+					oBinding.computeApplicationFilters = this.computeApplicationFilters.bind(this, oBinding);
 					if (this.bUseExtendedChangeDetection) {
 						assert(!this.oExtendedChangeDetectionConfig || !this.oExtendedChangeDetectionConfig.symbol, "symbol function must not be set by controls");
 						oBinding.enableExtendedChangeDetection(!oBindingInfo.template, oBindingInfo.key, this.oExtendedChangeDetectionConfig);

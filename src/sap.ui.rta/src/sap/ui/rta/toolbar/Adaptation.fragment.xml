@@ -15,6 +15,13 @@
 						width="0%"
 						visible="true" />
 				<Button
+						id="sapUiRta_backButton"
+						icon="{parts: [{path: 'controls>/backButton/enabled'}], formatter: '.formatBackButtonIcon'}"
+						enabled="{controls>/backButton/enabled}"
+						visible="{= ${controls>/backButton/visible} &amp;&amp; ${controls>/modeSwitcher} === 'navigation'}"
+						tooltip="{i18n>BTN_BACK}"
+						press=".navigateBack" />
+				<Button
 						id="sapUiRta_versionButton"
 						type="Transparent"
 						class="sapUiRtaVersionButton"
@@ -35,8 +42,7 @@
 					text="{i18n>SAVE_AND_RELOAD}"
 					iconFirst="true"
 					icon="sap-icon://refresh"
-					press=".saveAndReloadApp"
-				/>
+					press=".saveAndReloadApp" />
 				<Button
 					id="sapUiRta_hardReloadInfoButton"
 					type="Attention"
@@ -44,8 +50,7 @@
 					press=".showHardReloadInfoPopover"
 					icon="sap-icon://question-mark"
 					class="sapUiNoMarginBeginEnd sapUiRtaHardReloadInfoButton"
-					tooltip="{i18n>TOL_SHOW_HARD_RELOAD_INFO}"
-				/>
+					tooltip="{i18n>TOL_SHOW_HARD_RELOAD_INFO}" />
 				<toolbar:OverflowToolbarButton
 						id="sapUiRta_activate"
 						icon="sap-icon://activate"

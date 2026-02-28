@@ -166,5 +166,9 @@ function(
 		Adaptation.prototype.destroy.apply(this, aArgs);
 	};
 
+	Fiori.prototype.navigateBack = function() {
+		this.getUshellApi().navigateBack();
+	};
+
 	return Fiori;
 });

@@ -1712,6 +1712,10 @@ sap.ui.define([
 			},
 			feedbackButton: {
 				visible: bFeedbackButtonVisible
+			},
+			backButton: {
+				visible: !!window.navigation,
+				enabled: false
 			}
 		});
 

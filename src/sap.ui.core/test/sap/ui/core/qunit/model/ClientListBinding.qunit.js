@@ -4,8 +4,9 @@
 sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/model/ClientListBinding",
-	"sap/ui/model/FilterProcessor"
-], function (Log, ClientListBinding, FilterProcessor) {
+	"sap/ui/model/FilterProcessor",
+	"sap/ui/model/FilterType"
+], function (Log, ClientListBinding, FilterProcessor, FilterType) {
 	/*global QUnit, sinon*/
 	"use strict";
 
@@ -333,4 +334,41 @@ sap.ui.define([
 		assert.strictEqual(oBinding.iLastLength, "~iLastLength");
 		assert.strictEqual(oBinding.iLastStartIndex, "~iLastStartIndex");
 	});
+
+	//*********************************************************************************************
+[FilterType.Application, FilterType.ApplicationBound].forEach(function (sFilterType) {
+	["~aComputedFilters", undefined].forEach(function (vComputedFilters, i) {
+	QUnit.test("filter: filter type = " + sFilterType + ", " + i, function (assert) {
+		const oModel = { checkFilter() {} };
+		const oModelMock = this.mock(oModel);
+		oModelMock.expects("checkFilter").withExactArgs([]);
+		const oBinding = new MyClientListBinding(oModel, "/path");
+		oModelMock.expects("checkFilter").withExactArgs("~aNewFilters");
+		this.mock(oBinding).expects("updateIndices").withExactArgs();
+		this.mock(oBinding).expects("computeApplicationFilters")
+			.withExactArgs("~aNewFilters", sFilterType)
+			.returns(vComputedFilters);
+		this.mock(FilterProcessor).expects("combineFilters")
+			.withExactArgs([], vComputedFilters ? vComputedFilters : [])
+			.returns("~oCombinedFilter");
+		this.mock(oBinding).expects("_getLength").exactly(vComputedFilters ? 0 : 1).withExactArgs().returns("~iLength");
+		this.mock(oBinding).expects("applyFilter").exactly(vComputedFilters ? 1 : 0).withExactArgs();
+		this.mock(oBinding).expects("applySort").withExactArgs();
+		this.mock(oBinding).expects("_fireChange").withExactArgs(sinon.match.object);
+		this.mock(oBinding).expects("_fireFilter").withExactArgs(sinon.match((oEventParam) => {
+			return oEventParam.filters === vComputedFilters ? vComputedFilters : [];
+		}));
+
+		// code under test
+		assert.strictEqual(oBinding.filter("~aNewFilters", sFilterType), oBinding);
+
+		if (vComputedFilters) {
+			assert.strictEqual(oBinding.aApplicationFilters, vComputedFilters);
+		} else {
+			assert.deepEqual(oBinding.aApplicationFilters, []);
+			assert.strictEqual(oBinding.iLength, "~iLength");
+		}
+	});
+	});
+});
 });

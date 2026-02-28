@@ -3561,10 +3561,12 @@ sap.ui.define([
 	 * @property {sap.ui.model.Sorter|sap.ui.model.Sorter[]} [sorter]
 	 *   The initial sort order
 	 * @property {sap.ui.model.Filter|sap.ui.model.Filter[]} [filters]
-	 *   The predefined filters for this aggregation where filter values are constants.
+	 *   The predefined {@link sap.ui.model.FilterType.Application application filters} for this aggregation where
+	 *   filter values are constants.
 	 * @property {sap.ui.model.Filter|sap.ui.model.Filter[]} [boundFilters]
-	 *   The predefined bound filters for this aggregation. Filter values support binding expressions. The aggregation
-	 *   updates its filters whenever a filter value changes through data binding. Supported since 1.146.
+	 *   The predefined {@link sap.ui.model.FilterType.ApplicationBound bound application filters} for this aggregation.
+	 *   Filter values support binding expressions. The aggregation updates its filters whenever a filter value changes
+	 *   through data binding. Supported since 1.146.0.
 	 * @property {string|function(sap.ui.model.Context):string} [key]
 	 *   Name of the key property or a function getting the context as only parameter to calculate a key
 	 *   for entries. This can be used to improve update behaviour in models, where a key is not already

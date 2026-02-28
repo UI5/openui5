@@ -248,6 +248,34 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("Navigate Back", {
+		beforeEach(assert) {
+			this.oToolbarControlsModel = RtaQunitUtils.createToolbarControlsModel();
+			stubFioriRenderer.call(this, assert);
+		},
+		afterEach() {
+			this.oImage.destroy();
+			this.oToolbar.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when navigateBack is called, it calls ushell API", async function(assert) {
+			const oNavigateBackStub = sandbox.stub();
+			this.oUshellApi.navigateBack = oNavigateBackStub;
+
+			this.oToolbar = new Fiori({
+				ushellApi: this.oUshellApi,
+				textResources: Lib.getResourceBundleFor("sap.ui.rta")
+			});
+			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
+
+			await this.oToolbar.onFragmentLoaded();
+			this.oToolbar.navigateBack();
+
+			assert.strictEqual(oNavigateBackStub.callCount, 1, "then ushellApi.navigateBack was called");
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});

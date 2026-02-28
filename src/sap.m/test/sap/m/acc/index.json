@@ -11,6 +11,11 @@
 			}
 		},
 		{
+			"control": "sap.m.ActionTile",
+			"url": "ActionTile.html",
+			"appComponent": "CA-UI5-SC"
+		},
+		{
 			"control": "sap.m.App",
 			"url": "../App.html",
 			"appComponent": "CA-UI5-CTR-PIR"
@@ -152,17 +157,17 @@
 		},
 		{
 			"control": "sap.m.FeedContent",
-			"url": "../FeedContent.html",
+			"url": "FeedContent.html",
 			"appComponent": "CA-UI5-SC"
 		},
 		{
 			"control": "sap.m.FeedInput",
-			"url": "../FeedInput.html",
+			"url": "FeedInput.html",
 			"appComponent": "CA-UI5-SC"
 		},
 		{
 			"control": "sap.m.FeedListItem",
-			"url": "../FeedListItem.html",
+			"url": "FeedListItem.html",
 			"appComponent": "CA-UI5-SC"
 		},
 		{
@@ -177,12 +182,12 @@
 		},
 		{
 			"control": "sap.m.GenericTile",
-			"url": "../GenericTile.html",
+			"url": "GenericTile.html",
 			"appComponent": "CA-UI5-SC"
 		},
 		{
 			"control": "sap.m.HeaderContainer",
-			"url": "../HeaderContainer.html",
+			"url": "HeaderContainer.html",
 			"appComponent": "CA-UI5-SC"
 		},
 		{
@@ -199,6 +204,11 @@
 			"control": "sap.m.Image",
 			"url": "Image.html",
 			"appComponent": "CA-UI5-CTR-PIR"
+		},
+		{
+			"control": "sap.m.ImageContent",
+			"url": "ImageContent.html",
+			"appComponent": "CA-UI5-SC"
 		},
 		{
 			"control": "sap.m.IllustratedMessage",
@@ -338,7 +348,7 @@
 		},
 		{
 			"control": "sap.m.NewsContent",
-			"url": "../NewsContent.html",
+			"url": "NewsContent.html",
 			"appComponent": "CA-UI5-SC"
 		},
 		{
@@ -353,7 +363,7 @@
 		},
 		{
 			"control": "sap.m.NumericContent",
-			"url": "../NumericContent.html",
+			"url": "NumericContent.html",
 			"appComponent": "CA-UI5-SC"
 		},
 		{
@@ -542,6 +552,11 @@
 			"appComponent": "CA-UI5-CTR-PIR"
 		},
 		{
+			"control": "sap.m.SelectionDetails",
+			"url": "SelectionDetails.html",
+			"appComponent": "CA-UI5-SC"
+		},
+		{
 			"control": "sap.m.SinglePlanningCalendar",
 			"url": "./SinglePlanningCalendar.html",
 			"appComponent": "CA-UI5-CTR-BAL",
@@ -558,7 +573,7 @@
 		},
 		{
 			"control": "sap.m.SlideTile",
-			"url": "../SlideTile.html",
+			"url": "SlideTile.html",
 			"appComponent": "CA-UI5-SC"
 		},
 		{
@@ -654,7 +669,7 @@
 		},
 		{
 			"control": "sap.m.TileContent",
-			"url": "../TileContent.html",
+			"url": "TileContent.html",
 			"appComponent": "CA-UI5-SC"
 		},
 		{
@@ -685,6 +700,11 @@
 		{
 			"control": "sap.m.UploadCollectionForPendingUpload",
 			"url": "../UploadCollectionForPendingUpload.html",
+			"appComponent": "CA-UI5-SC"
+		},
+		{
+			"control": "sap.m.UploadSetWithTablePlugin",
+			"url": "UploadSetWithTablePlugin.html",
 			"appComponent": "CA-UI5-SC"
 		},
 		{

@@ -133,6 +133,13 @@ sap.ui.define([
 		GenericTile.prototype.onAfterRendering.apply(this, arguments);
 	};
 
+	ActionTile.prototype.ontap = function(event) {
+		if (this._shouldRenderLink()) {
+			event.preventDefault();
+		}
+		GenericTile.prototype.ontap.apply(this, arguments);
+	};
+
 	/**
 	* Removes the style classes inherited from the parent control
 	* @private

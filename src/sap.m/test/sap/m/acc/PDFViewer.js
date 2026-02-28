@@ -19,7 +19,7 @@ sap.ui.define([
 		items: [
 			new PDFViewer({
 				source: "../qunit/pdfviewer/sample-file.pdf",
-				title: "PDF Viewer",
+				isTrustedSource: true,
 				height: "50%",
 				layoutData: new FlexItemData({
 					growFactor: 1

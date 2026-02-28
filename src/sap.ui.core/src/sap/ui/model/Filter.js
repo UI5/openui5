@@ -265,6 +265,7 @@ sap.ui.define([
 			}
 			this.sFractionalSeconds1 = undefined;
 			this.sFractionalSeconds2 = undefined;
+			this.bBound = undefined; // Whether this filter is used as a bound filter
 			// Whether a bound filter's binding expression is resolved (true/false) or undefined for constant filters
 			this.bResolved = undefined;
 		}
@@ -375,6 +376,7 @@ sap.ui.define([
 			caseSensitive: this.bCaseSensitive
 		});
 		oClone.bResolved = this.bResolved;
+		oClone.bBound = this.bBound;
 		if (oClone.bResolved === false) {
 			oClone.bResolved = true; // clone sets values on bound filter => cloned filter is resolved
 		}
@@ -728,6 +730,17 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns whether this filter is used as a bound filter.
+	 *
+	 * @returns {boolean} Whether this filter is used as a bound filter
+	 *
+	 * @private
+	 */
+	Filter.prototype.isBound = function () {
+		return !!this.bBound;
+	};
+
+	/**
 	 * Indicates whether a string value should be compared case sensitive, see
 	 * {@link sap.ui.model.Filter#constructor}, parameter <code>vFilterInfo.caseSensitive</code>.
 	 *
@@ -820,6 +833,15 @@ sap.ui.define([
 			return undefined;
 		}
 		return new Filter({filters: aFilters, and: this.bAnd});
+	};
+
+	/**
+	 * Marks this filter as bound filter.
+	 *
+	 * @private
+	 */
+	Filter.prototype.setBound = function () {
+		this.bBound = true;
 	};
 
 	/**

@@ -1723,8 +1723,8 @@ sap.ui.define([
 		// check filter integrity
 		this.oModel.checkFilter(aFilters);
 
-		if (sFilterType === FilterType.Application) {
-			this.aApplicationFilters = aFilters;
+		if (sFilterType === FilterType.Application || sFilterType === FilterType.ApplicationBound) {
+			this.aApplicationFilters = this.computeApplicationFilters(aFilters, sFilterType);
 		} else {
 			this.aFilters = aFilters;
 		}

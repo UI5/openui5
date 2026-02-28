@@ -1017,6 +1017,7 @@ sap.ui.define([
 			comparator: fnComparator,
 			caseSensitive: "~caseSensitive~"
 		});
+		oFilter.bBound = "~bound~";
 		if (vGenerated === "noGeneratedTestFunction") {
 			delete oFilter.fnTest;
 		} else {
@@ -1039,6 +1040,7 @@ sap.ui.define([
 		assert.strictEqual(oClone.getComparator(), oFilter.getComparator());
 		assert.strictEqual(oClone.isCaseSensitive(), oFilter.isCaseSensitive());
 		assert.strictEqual(oClone._bMultiFilter, false);
+		assert.strictEqual(oClone.bBound, "~bound~");
 	});
 });
 
@@ -1266,5 +1268,26 @@ sap.ui.define([
 			// code under test
 			oFilter.isNeutral();
 		}, new Error("Multi-filter unsupported"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("bBound property, setBound / isBound", function (assert) {
+		const oFilter = new Filter({path : "~path", operator : "~operator", value1 : "~value1"});
+
+		// code under test - initialize with *undefined*
+		assert.strictEqual(oFilter.bBound, undefined, "bBound initially falsy");
+
+		// code under test
+		oFilter.setBound();
+
+		assert.strictEqual(oFilter.bBound, true);
+
+		// code under test
+		assert.strictEqual(oFilter.isBound(), true);
+
+		const oFilter2 = new Filter({path : "~path2", operator : "~operator", value1 : "~value1.2"});
+
+		// code under test
+		assert.strictEqual(oFilter2.isBound(), false);
 	});
 });

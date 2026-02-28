@@ -1,4 +1,4 @@
-sap.ui.require(["sap/ui/core/Element", 'sap/ui/core/mvc/Controller', 'sap/ui/core/hyphenation/Hyphenation'],
+sap.ui.define(["sap/ui/core/Element", 'sap/ui/core/mvc/Controller', 'sap/ui/core/hyphenation/Hyphenation'],
 	function(Element, Controller, HyphenationDelegate) {
 	"use strict";
 
