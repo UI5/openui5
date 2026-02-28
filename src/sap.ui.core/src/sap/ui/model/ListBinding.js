@@ -59,6 +59,8 @@ sap.ui.define(['./Binding', './Filter', './FilterType', './Sorter', 'sap/base/ut
 				this.bDetectUpdates = true;
 				// the configuration for extended change detection, cf. #enableExtendedChangeDetection
 				this.oExtendedChangeDetectionConfig = undefined;
+				// whether the current call to this binding's filter method is invoked by data binding for a bound filter
+				this.bBoundFilterUpdate = false;
 			},
 
 			metadata : {
@@ -155,7 +157,9 @@ sap.ui.define(['./Binding', './Filter', './FilterType', './Sorter', 'sap/base/ut
 		 *   in {@link sap.ui.model.Model#bindList}; a falsy value is treated as an empty array and thus removes all filters
 		 *   of the specified type
 		 * @param {sap.ui.model.FilterType} [sFilterType]
-		 *   The type of the filter to replace; if no type is given, the behavior depends on the model implementation
+		 *   The type of filter to replace. If no type is specified, the behavior depends on the model implementation.
+		 *   Since 1.146.0, you can use <code>sap.ui.model.FilterType.ApplicationBound</code> to replace bound application
+		 *   filters if the model implementation supports it.
 		 * @return {this}
 		 *   Returns <code>this</code> to facilitate method chaining
 		 *
@@ -502,6 +506,17 @@ sap.ui.define(['./Binding', './Filter', './FilterType', './Sorter', 'sap/base/ut
 		 */
 
 		/**
+		 * Returns whether the current call to this binding's filter method is invoked by data binding for a bound filter.
+		 *
+		 * @returns {boolean} Whether the current filter method call is invoked by data binding for a bound filter
+		 *
+		 * @private
+		 */
+		ListBinding.prototype._isBoundFilterUpdate = function () {
+			return this.bBoundFilterUpdate;
+		};
+
+		/**
 		 * Returns whether more contexts for the given range can be expected than those in <code>aContexts</code>.
 		 *
 		 * @param {sap.ui.model.Context[]} aContexts - The context list
@@ -545,9 +560,45 @@ sap.ui.define(['./Binding', './Filter', './FilterType', './Sorter', 'sap/base/ut
 				throw new Error("Filter cannot be updated: Not found in binding's application filters");
 			}
 
+			this.bBoundFilterUpdate = true;
 			this.filter(aNewApplicationFilters, FilterType.Application);
+			this.bBoundFilterUpdate = false;
 
 			return oFilterClone;
+		};
+
+		/**
+		 * Computes the list binding's application filters by replacing application filters of the given type with the
+		 * given new filters. List binding subclasses call this method from their filter method implementation.
+		 *
+		 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter} [vFilter]
+		 *   The new filters for the given filter type
+		 * @param {sap.ui.model.FilterType.Application|sap.ui.model.FilterType.ApplicationBound} [sFilterType=sap.ui.model.FilterType.Application]
+		 *   The type of the application filters to replace
+		 * @returns {sap.ui.model.Filter[]|sap.ui.model.Filter|undefined}
+		 *   The new application filters
+		 * @throws {Error}
+		 * If
+		 * <ul>
+		 * <li> The filter type is <code>sap.ui.model.FilterType.Control</code>. </li>
+		 * <li> The binding wasn't created for an aggregation of a control when the filter type is
+		 *     <code>sap.ui.model.FilterType.ApplicationBound</code>. </li>
+		 * </ul>
+		 *
+		 * @protected
+		 * @since 1.146.0
+		 */
+		ListBinding.prototype.computeApplicationFilters = function (vFilter, sFilterType) {
+			if (sFilterType === FilterType.ApplicationBound) {
+				throw new Error("Binding has not been created for an aggregation of a control: Must not use filter type "
+					+ "ApplicationBound");
+			}
+
+			if (sFilterType === FilterType.Control) {
+				throw new Error("Must not use filter type Control");
+			}
+
+			return vFilter;
 		};
 
 		return ListBinding;

@@ -341,7 +341,7 @@
             <copyright>2018 Michael Mclaughlin</copyright>
             <pattern>sap/ui/thirdparty/bignumber.js</pattern>
         </lib>
-        <lib name="lodash" displayName="lodash" npmName="lodash" version="4.17.21" hash="5ad8f4060a27fe02e24d21567ca45ea5" homepage="https://github.com/lodash/lodash" id="73555000106100057925">
+        <lib name="lodash" displayName="lodash" npmName="lodash" version="4.17.23" hash="e76adafe0aa16289ce9a5851447e7214" homepage="https://github.com/lodash/lodash" id="73554900106100421072">
             <license url="https://github.com/lodash/lodash/blob/master/LICENSE" type="MIT" />
             <copyright>OpenJS Foundation and other contributors</copyright>
             <pattern>sap/base/util/restricted/_/lodash.custom.js</pattern>

@@ -465,6 +465,7 @@ sap.ui.define([
 
 		var firstToken = this.multiInput1.getTokens()[0];
 		firstToken.setSelected(true);
+		firstToken.focus();
 
 		await nextUIUpdate();
 
@@ -1348,7 +1349,7 @@ sap.ui.define([
 		var oMultiInput =  new MultiInput(),
 			token1 = new Token({text: "Token 1", selected: true}),
 			token2 = new Token({text: "Token 2", selected: true}),
-			token3 = new Token({text: "Token 3"});
+			token3 = new Token({text: "Token 3", selected: true});
 
 		oMultiInput.placeAt("content");
 		await nextUIUpdate();
@@ -1356,10 +1357,11 @@ sap.ui.define([
 		oMultiInput.setTokens([token1, token2, token3]);
 		await nextUIUpdate();
 
+		token3.focus();
 		qutils.triggerKeydown(token3.getDomRef(), KeyCodes.DELETE);
 
 		// assert
-		assert.strictEqual(document.activeElement, token3.getDomRef(),
+		assert.strictEqual(document.activeElement, oMultiInput.getFocusDomRef(),
 			"The focus is forwarded to the input field.");
 
 		oMultiInput.destroy();
@@ -1389,11 +1391,13 @@ sap.ui.define([
 		this.multiInput1.setTokens([token1, token2, token3]);
 		await nextUIUpdate();
 
-		qutils.triggerKeydown(this.multiInput1.getAggregation("tokenizer").getDomRef(), KeyCodes.BACKSPACE);
+		token2.focus();
+		qutils.triggerKeydown(document.activeElement, KeyCodes.BACKSPACE);
+		await nextUIUpdate();
 
 		// assert
 		assert.strictEqual(document.activeElement, token1.getDomRef(),
-			"The focus is forwarded to the input field.");
+			"The focus is forwarded to the first non-selected token.");
 	});
 
 	QUnit.test("onsapbackspace with selected tokens and no focusable tokens", async function(assert) {

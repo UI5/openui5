@@ -40,6 +40,9 @@ sap.ui.define([
 	 * <li>This control is specialized for administrative applications. For other types of applications use: {@link sap.m.Shell}</li>
 	 * <li>If an app implements side navigation in addition to the tool header menu, the menu icon must be the first item on the left-hand side of the tool header.</li>
 	 * <li>The app menu and the side navigation must not have any dependencies and must work independently.</li>
+	 * <li>Not recommended: In accordance with the UX Consistency initiative, it is recommended to use the seamlessly integrated UI5 Web Components' ui5-shellbar, as demonstrated in this
+	 * <a href="https://sap-samples.github.io/uxc-integration/?sap-ui-theme=sap_horizon">UXC integration sample app</a> with
+	 * <a href="https://github.com/SAP-samples/uxc-integration">UXC integration sample source code.</a></li>
 	 * </ul>
 	 * <h4>Horizon theme specifics</h4>
 	 * Only the following controls are supported: sap.m.Button, sap.m.Image, sap.m.Title, sap.m.Text, sap.m.SearchField, sap.m.Avatar.

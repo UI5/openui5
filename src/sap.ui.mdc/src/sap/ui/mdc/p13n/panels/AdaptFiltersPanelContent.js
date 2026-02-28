@@ -351,7 +351,7 @@ sap.ui.define([
 
 		if (bIsGrouped) {
 			oBindingInfo.sorter = new Sorter({
-				path: "group",
+				path: "",
 				descending: false,
 				group: this._getGroup.bind(this),
 				comparator: this._groupComparator.bind(this)
@@ -377,7 +377,7 @@ sap.ui.define([
 		const bIsGrouped = this._oViewModel.getProperty("/grouped");
 		if (bIsGrouped) {
 			oBindingInfo.sorter = new Sorter({
-				path: "group",
+				path: "",
 				descending: false,
 				group: this._getGroup.bind(this),
 				comparator: this._groupComparator.bind(this)
@@ -415,23 +415,32 @@ sap.ui.define([
 
 	/**
 	 * Comparator function for group sorting.
-	 * Ensures "Basic" group is always first, other groups are sorted alphabetically.
-	 * @param {string} sGroup1 First group key
-	 * @param {string} sGroup2 Second group key
+	 * Receives the full item binding objects and ensures items with key "basic"
+	 * are always in the first group, other groups are sorted alphabetically by their group property.
+	 * @param {object} oItem1 First item object from the binding
+	 * @param {object} oItem2 Second item object from the binding
 	 * @returns {int} Comparison result (-1, 0, or 1)
 	 * @private
 	 */
-	AdaptFiltersPanelContent.prototype._groupComparator = function(sGroup1, sGroup2) {
-		const sBasicGroup = "Basic";
+	AdaptFiltersPanelContent.prototype._groupComparator = function(oItem1, oItem2) {
+		const sBasicKey = "basic";
 
-		if (sGroup1 === sBasicGroup && sGroup2 !== sBasicGroup) {
+		// Get the key property from items
+		const sKey1 = (oItem1.group || "");
+		const sKey2 = (oItem2.group || "");
+		const sGroup1 = oItem1.groupLabel || "";
+		const sGroup2 = oItem2.groupLabel || "";
+
+		// Items with key "basic" should always be in the first group
+		if (sKey1 === sBasicKey && sKey2 !== sBasicKey) {
 			return -1;
 		}
-		if (sGroup2 === sBasicGroup && sGroup1 !== sBasicGroup) {
+		if (sKey2 === sBasicKey && sKey1 !== sBasicKey) {
 			return 1;
 		}
 
-		return (sGroup1 || "").localeCompare(sGroup2 || "");
+		// Sort remaining groups alphabetically by group property
+		return sGroup1.localeCompare(sGroup2);
 	};
 
 	AdaptFiltersPanelContent.prototype._groupHeaderFactory = function(oGroup) {

@@ -48,7 +48,7 @@ GenericTileRenderer.render = function(oRm, oControl) {
 	var oBadge = oControl.getBadge();
 
 	// Render a link when URL is provided, not in action scope and the state is enabled
-	var bRenderLink = oControl.getUrl() && (!oControl._isInActionScope() || oControl.getMode() === GenericTileMode.IconMode) && sState !== LoadState.Disabled && !oControl._isNavigateActionEnabled();
+	var bRenderLink = oControl._shouldRenderLink();
 
 	if (oControl._isInActionScope()) {
 		sScopeClass = encodeCSS("sapMGTScopeActions");

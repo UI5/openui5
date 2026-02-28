@@ -3747,11 +3747,15 @@ sap.ui.define([
 				oBindingMock.expects("checkTransient").withExactArgs();
 				this.mock(Filter).expects("checkFilterNone")
 					.withExactArgs(sinon.match.same(aFilters));
+				oBindingMock.expects("computeApplicationFilters")
+					.exactly(sFilterType === FilterType.Control ? 0 : 1)
+					.withExactArgs(sinon.match.same(aFilters), sFilterType)
+					.returns("~updatedApplicationFilters~");
 				oHelperMock.expects("deepEqual").exactly(sFilterType === FilterType.Control ? 1 : 0)
 					.withExactArgs(sinon.match.same(aFilters), sinon.match.same(oBinding.aFilters))
 					.returns(false);
 				oHelperMock.expects("deepEqual").exactly(sFilterType === FilterType.Control ? 0 : 1)
-					.withExactArgs(sinon.match.same(aFilters),
+					.withExactArgs("~updatedApplicationFilters~",
 						sinon.match.same(oBinding.aApplicationFilters))
 					.returns(false);
 				oBindingMock.expects("hasPendingChanges").withExactArgs(true).returns(false);
@@ -3788,7 +3792,7 @@ sap.ui.define([
 					assert.strictEqual(oBinding.aFilters, aFilters);
 					assert.deepEqual(oBinding.aApplicationFilters, []);
 				} else {
-					assert.strictEqual(oBinding.aApplicationFilters, aFilters);
+					assert.strictEqual(oBinding.aApplicationFilters, "~updatedApplicationFilters~");
 					assert.deepEqual(oBinding.aFilters, []);
 				}
 			});

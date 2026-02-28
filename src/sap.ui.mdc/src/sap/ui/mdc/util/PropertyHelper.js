@@ -32,7 +32,7 @@ sap.ui.define([
 	 * @property {boolean} [visible=true]
 	 *   Whether the property is or can be visible to a user
 	 * @property {string} [group]
-	 *   Key of the group in which the property is located. Used to visually group properties in personalization dialogs.
+	 *   Key of the group in which the property is located. Used to visually group properties in personalization dialogs. The group with the <code>basic</code> key is always shown as the first group.
 	 * @property {string} [groupLabel]
 	 *   Translatable text of the group.
 	 *

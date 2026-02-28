@@ -191,12 +191,17 @@ sap.ui.define([
 		this.mock(oFilter2).expects("cloneIfContained").withExactArgs(sinon.match.same(oFilter), "~clonedFilter~")
 			.returns(oFilter2);
 		this.mock(oBinding).expects("filter")
-			.withExactArgs(["~clonedFilterElement~", oFilter2], FilterType.Application);
+			.withExactArgs(["~clonedFilterElement~", oFilter2], FilterType.Application).callsFake(() => {
+				assert.strictEqual(oBinding.bBoundFilterUpdate, true);
+			});
+
+		assert.strictEqual(oBinding.bBoundFilterUpdate, false);
 
 		// code under test
 		const oUpdatedFilter = oBinding._updateFilter(oFilter, "~v1New", "~v2New");
 
 		assert.strictEqual(oUpdatedFilter, "~clonedFilter~");
+		assert.strictEqual(oBinding.bBoundFilterUpdate, false);
 	});
 
 	//*********************************************************************************************
@@ -215,5 +220,33 @@ sap.ui.define([
 		assert.throws(() => {
 			oBinding._updateFilter(oFilter, "~v1New", "~v2New");
 		}, new Error("Filter cannot be updated: Not found in binding's application filters"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("_isBoundFilterUpdate", function (assert) {
+		const oBinding = new ListBinding("~model~", "~path~"/* other parameters do not matter for this test */);
+		oBinding.bBoundFilterUpdate = "~bBoundFilterUpdate~";
+
+		// code under test
+		assert.strictEqual(oBinding._isBoundFilterUpdate(), "~bBoundFilterUpdate~");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("computeApplicationFilters", function (assert) {
+		const oBinding = new ListBinding("~model~", "~path~"/* other parameters do not matter for this test */);
+
+		// code under test
+		assert.strictEqual(oBinding.computeApplicationFilters("~filters~", FilterType.Application), "~filters~");
+
+		// code under test
+		assert.throws(() => {
+			oBinding.computeApplicationFilters("~filter~", FilterType.ApplicationBound);
+		}, new Error("Binding has not been created for an aggregation of a control: Must not use filter type "
+			+ "ApplicationBound"));
+
+		// code under test
+		assert.throws(() => {
+			oBinding.computeApplicationFilters("~filter~", FilterType.Control);
+		}, new Error("Must not use filter type Control"));
 	});
 });

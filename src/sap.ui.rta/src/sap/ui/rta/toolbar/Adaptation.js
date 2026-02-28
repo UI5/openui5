@@ -3,10 +3,12 @@
  */
 
 sap.ui.define([
+	"sap/base/i18n/Localization",
 	"sap/base/Log",
 	"sap/m/MessageBox",
 	"sap/m/MessageStrip",
 	"sap/m/Popover",
+	"sap/ui/core/IconPool",
 	"sap/ui/core/message/MessageType",
 	"sap/ui/core/BusyIndicator",
 	"sap/ui/core/Element",
@@ -30,10 +32,12 @@ sap.ui.define([
 	"sap/ui/rta/util/whatsNew/WhatsNewOverview",
 	"sap/ui/rta/Utils"
 ], function(
+	Localization,
 	Log,
 	MessageBox,
 	MessageStrip,
 	Popover,
+	IconPool,
 	MessageType,
 	BusyIndicator,
 	Element,
@@ -117,6 +121,7 @@ sap.ui.define([
 			this._onResize = this._onResize.bind(this);
 			window.addEventListener("resize", this._onResize);
 			this._aIntersectionObservers = [];
+			this.setupNavigationTracking();
 		}.bind(this));
 	};
 
@@ -126,6 +131,7 @@ sap.ui.define([
 	};
 
 	Adaptation.prototype.exit = function(...aArgs) {
+		this.cleanupNavigationTracking();
 		window.removeEventListener("resize", this._onResize);
 		(this._aIntersectionObservers || []).forEach(function(oIntersectionObserver) {
 			oIntersectionObserver.disconnect();
@@ -245,6 +251,10 @@ sap.ui.define([
 		return this.getExtension("versioning", Versioning).formatVersionButtonText(aVersions, sDisplayedVersion);
 	};
 
+	Adaptation.prototype.formatBackButtonIcon = function() {
+		return Localization.getRTL() ? IconPool.getIconURI("feeder-arrow") : IconPool.getIconURI("nav-back");
+	};
+
 	Adaptation.prototype.showVersionHistory = function(oEvent) {
 		return this.getExtension("versioning", Versioning).showVersionHistory(oEvent);
 	};
@@ -339,6 +349,7 @@ sap.ui.define([
 			controller: {
 				activate: this._openVersionTitleDialog.bind(this),
 				discardDraft: this.eventHandler.bind(this, "DiscardDraft"),
+				formatBackButtonIcon: this.formatBackButtonIcon.bind(this),
 				formatDiscardDraftVisible: this.formatDiscardDraftVisible.bind(this),
 				formatPublishVersionVisibility: this.formatPublishVersionVisibility.bind(this),
 				modeChange: this.eventHandler.bind(this, "ModeChange"),
@@ -359,7 +370,8 @@ sap.ui.define([
 				showActionsMenu: this.showActionsMenu.bind(this),
 				showFeedbackForm: this.showFeedbackForm.bind(this),
 				showHardReloadInfoPopover: this.showHardReloadInfoPopover.bind(this),
-				saveAndReloadApp: this.eventHandler.bind(this, "SaveAndReload")
+				saveAndReloadApp: this.eventHandler.bind(this, "SaveAndReload"),
+				navigateBack: this.navigateBack.bind(this)
 			}
 		});
 	};
@@ -585,6 +597,46 @@ sap.ui.define([
 			this._oFeedbackDialog.close();
 			this._oFeedbackDialog.destroy();
 		}
+	};
+
+	Adaptation.prototype.setupNavigationTracking = function() {
+		if (!window.navigation) {
+			return;
+		}
+
+		this._oStartingNavigationEntry = window.navigation.currentEntry;
+
+		this._fnNavigationHandler = () => {
+			this._updateBackButtonState();
+		};
+
+		window.navigation.addEventListener("currententrychange", this._fnNavigationHandler);
+	};
+
+	Adaptation.prototype.cleanupNavigationTracking = function() {
+		if (this._fnNavigationHandler && window.navigation) {
+			window.navigation.removeEventListener("currententrychange", this._fnNavigationHandler);
+			this._fnNavigationHandler = null;
+			this._oStartingNavigationEntry = null;
+		}
+	};
+
+	Adaptation.prototype._updateBackButtonState = function() {
+		if (!window.navigation || !this._oStartingNavigationEntry) {
+			return;
+		}
+		const oControlsModel = this.getModel("controls");
+		const aEntries = window.navigation.entries();
+		const iCurrentIndex = aEntries.indexOf(window.navigation.currentEntry);
+		const iStartIndex = aEntries.findIndex((oEntry) => oEntry.key === this._oStartingNavigationEntry.key);
+
+		const bCanNavigateBack = iCurrentIndex > iStartIndex;
+		oControlsModel.setProperty("/backButton/enabled", bCanNavigateBack);
+	};
+
+	// Non-FLP case
+	Adaptation.prototype.navigateBack = function() {
+		window.history.back();
 	};
 
 	return Adaptation;

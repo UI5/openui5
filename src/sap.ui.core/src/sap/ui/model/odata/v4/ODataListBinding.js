@@ -2452,7 +2452,8 @@ sap.ui.define([
 	 *   </ul>
 	 *
 	 * @param {sap.ui.model.FilterType} [sFilterType=sap.ui.model.FilterType.Application]
-	 *   The filter type to be used
+	 *   The filter type to be used. Since 1.146.0, you may use
+	 *   {@link sap.ui.model.FilterType.ApplicationBound} to replace bound application filters.
 	 * @returns {this}
 	 *   <code>this</code> to facilitate method chaining
 	 * @throws {Error} If
@@ -2493,6 +2494,9 @@ sap.ui.define([
 			throw new Error("Operation mode has to be sap.ui.model.odata.OperationMode.Server");
 		}
 
+		if (sFilterType !== FilterType.Control) {
+			aFilters = this.computeApplicationFilters(aFilters, sFilterType);
+		}
 		if (sFilterType === FilterType.Control
 				? _Helper.deepEqual(aFilters, this.aFilters)
 				: _Helper.deepEqual(aFilters, this.aApplicationFilters)) {

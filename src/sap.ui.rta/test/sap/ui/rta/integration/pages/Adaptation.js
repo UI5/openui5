@@ -92,6 +92,18 @@ sap.ui.define([
 						errorMessage: "Did not find UI-Adaptation-Button"
 					});
 				},
+				iSwitchToNavigationMode() {
+					const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+					const sButtonText = oRtaResourceBundle.getText("BTN_NAVIGATION");
+					return this.waitFor({
+						controlType: "sap.m.Button",
+						matchers(oButton) {
+							return oButton.getText() === sButtonText;
+						},
+						actions: new Press(),
+						errorMessage: "Did not find Navigation-Button"
+					});
+				},
 				iDragAndDropAnElement(sElementDragId, sElementDropId) {
 					this.waitFor({
 						controlType: "sap.ui.dt.ElementOverlay",
@@ -418,9 +430,18 @@ sap.ui.define([
 						},
 						errorMessage: "Did not find the Element Overlay"
 					});
+				},
+				iClickOnRTABackButton() {
+					return this.waitFor({
+						controlType: "sap.m.Button",
+						matchers(oButton) {
+							return oButton.getId().includes("sapUiRta_backButton");
+						},
+						actions: new Press(),
+						errorMessage: "Did not find the RTA Back button"
+					});
 				}
 			},
-
 			assertions: {
 				iShouldSeeTheToolbar() {
 					return this.waitFor({

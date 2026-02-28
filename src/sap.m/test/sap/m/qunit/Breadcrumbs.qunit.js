@@ -262,6 +262,23 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.ok(oStandardBreadCrumbsControl._getSelectWidth() === 0, "Select is not rendered");
 	});
 
+	QUnit.test("Select enables text wrapping in overflow", function (assert) {
+		// arrange
+		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		helpers.setSmallScreenSize();
+		helpers.renderObject(oStandardBreadCrumbsControl);
+
+		// act
+		var oSelect = oStandardBreadCrumbsControl._getSelect();
+		var oPicker = oSelect.getPicker();
+
+		// assert
+		assert.strictEqual(oSelect.getWrapItemsText(), true, "Select has wrapItemsText enabled");
+		assert.ok(oPicker.hasStyleClass("sapMBreadcrumbsPicker"), "Picker has sapMBreadcrumbsPicker style class");
+
+		helpers.resetScreenSize();
+	});
+
 	var testSeparatorStyleSymbols = function (oControl, sStyle, assert) {
 		//arrange
 		var sAppliedSymbol,

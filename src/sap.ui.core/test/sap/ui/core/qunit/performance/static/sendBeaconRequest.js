@@ -1,4 +1,4 @@
-sap.ui.require(["sap/ui/performance/BeaconRequest"], function(BeaconRequest) {
+sap.ui.define(["sap/ui/performance/BeaconRequest"], function(BeaconRequest) {
 	"use strict";
 
 	var beaconRequest = new BeaconRequest({

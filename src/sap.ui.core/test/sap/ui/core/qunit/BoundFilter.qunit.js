@@ -2,9 +2,9 @@
 sap.ui.define([
 	"sap/ui/base/BindingInfo",
 	"sap/ui/base/BoundFilter",
+	"sap/ui/model/FilterType",
 	"sap/ui/model/ManagedObjectBindingSupport"
-
-], function(BindingInfo, BoundFilter, ManagedObjectBindingSupport) {
+], function(BindingInfo, BoundFilter, FilterType, ManagedObjectBindingSupport) {
 	"use strict";
 
 	QUnit.module("sap.ui.base.BoundFilter");
@@ -142,8 +142,10 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("ManagedObjectBindingSupport#_createBoundFilter: no binding expressions", function () {
-		const oFilter = {isMultiFilter() {}, setResolved() {}, oValue1: "constantValue1", oValue2: "constantValue2"};
+		const oFilter = {isMultiFilter() {}, setBound() {}, setResolved() {}, oValue1: "constantValue1",
+			oValue2: "constantValue2"};
 
+		this.mock(oFilter).expects("setBound").withExactArgs();
 		this.mock(oFilter).expects("isMultiFilter").withExactArgs().returns(false);
 		this.mock(oFilter).expects("setResolved").never();
 		const oBindingInfoMock = this.mock(BindingInfo);
@@ -161,10 +163,11 @@ sap.ui.define([
 	{value1: "bar", bindingInfo1: undefined, value2: "{filter>/p2}", bindingInfo2: "bindingInfo2"}
 ].forEach(({value1, bindingInfo1, value2, bindingInfo2}, i) => {
 	QUnit.test("ManagedObjectBindingSupport#_createBoundFilter: w/ binding expressions, " + i, function (assert) {
-		const oFilter = {isMultiFilter() {}, setResolved() {}, oValue1: value1, oValue2: value2};
+		const oFilter = {isMultiFilter() {}, setBound() {}, setResolved() {}, oValue1: value1, oValue2: value2};
 		const oManagedObject = {addDependent() {}};
 		Object.assign(oManagedObject, ManagedObjectBindingSupport); // simulate mixin, cf. Model#mixinBindingSupport
 
+		this.mock(oFilter).expects("setBound").withExactArgs();
 		this.mock(oFilter).expects("isMultiFilter").withExactArgs().returns(false);
 		const oBindingInfoMock = this.mock(BindingInfo);
 		oBindingInfoMock.expects("extract").withExactArgs(value1, undefined, true).returns(bindingInfo1);
@@ -216,18 +219,23 @@ sap.ui.define([
 	QUnit.test("ManagedObjectBindingSupport#_createBoundFilter: w/ multi-filter", function (assert) {
 		const oFilter = {
 			isMultiFilter() {},
+			setBound() {},
 			aFilters: [
-				{isMultiFilter() {}, oValue1 : "v1.1", oValue2 : "v2.1"},
-				{isMultiFilter() {}, oValue1 : "v1.2", oValue2 : "v2.2"}
+				{isMultiFilter() {}, setBound() {}, oValue1 : "v1.1", oValue2 : "v2.1"},
+				{isMultiFilter() {}, setBound() {}, oValue1 : "v1.2", oValue2 : "v2.2"}
 			]
 		};
 
 		const oManagedObject = {};
 		Object.assign(oManagedObject, ManagedObjectBindingSupport); // simulate mixin, cf. Model#mixinBindingSupport
-		const oFilterMock = this.mock(oFilter);
-		oFilterMock.expects("isMultiFilter").withExactArgs().returns(true); // outer multi-filter
-		this.mock(oFilter.aFilters[0]).expects("isMultiFilter").withExactArgs().returns(false); // inner single filters
-		this.mock(oFilter.aFilters[1]).expects("isMultiFilter").withExactArgs().returns(false); // inner single filters
+		// outer multi-filter
+		this.mock(oFilter).expects("setBound").withExactArgs();
+		this.mock(oFilter).expects("isMultiFilter").withExactArgs().returns(true);
+		// inner single filters
+		this.mock(oFilter.aFilters[0]).expects("setBound").withExactArgs();
+		this.mock(oFilter.aFilters[0]).expects("isMultiFilter").withExactArgs().returns(false);
+		this.mock(oFilter.aFilters[1]).expects("setBound").withExactArgs();
+		this.mock(oFilter.aFilters[1]).expects("isMultiFilter").withExactArgs().returns(false);
 
 		const oBindingInfoMock = this.mock(BindingInfo);
 		oBindingInfoMock.expects("extract").withExactArgs("v1.1", undefined, true).returns(undefined);
@@ -273,6 +281,10 @@ sap.ui.define([
 			this.mock(oModel).expects("bindList")
 				.withExactArgs("path", "~context~", "~sorter~", "~aFilters~", "~parameters~")
 				.returns(oBinding);
+			this.mock(oManagedObject.computeApplicationFilters)
+				.expects("bind")
+				.withExactArgs(sinon.match.same(oManagedObject), sinon.match.same(oBinding))
+				.returns("~fnComputeAF~");
 		}
 		this.mock(oBinding).expects("attachChange").withExactArgs(sinon.match.func);
 		this.mock(oBinding).expects("attachRefresh").withExactArgs(sinon.match.func);
@@ -281,6 +293,8 @@ sap.ui.define([
 
 		// code under test
 		oManagedObject._bindAggregation("items", oBindingInfo);
+
+		assert.strictEqual(oBinding.computeApplicationFilters, bIsTreeBinding ? undefined : "~fnComputeAF~");
 
 		const fnGetBinding = oProcessFiltersCall.getCall(0).args[1];
 
@@ -337,5 +351,111 @@ sap.ui.define([
 
 		// code under test - managed object is not an Element => has no dependents aggregation
 		oManagedObject2._removeBoundFilters(oBinding);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("ManagedObjectBindingSupport#computeApplicationFilters, type ApplicationBound", function (assert) {
+		const oManagedObject = {};
+		Object.assign(oManagedObject, ManagedObjectBindingSupport); // simulate mixin
+		const oFilter0 = {isBound() {}};
+		const oFilter1 = {isBound() {}};
+		const oBinding = {aApplicationFilters: [oFilter0, oFilter1], _isBoundFilterUpdate() {}};
+		const oBindingMock = this.mock(oBinding);
+
+		oBindingMock.expects("_isBoundFilterUpdate").withExactArgs().returns(true);
+
+		// code under test
+		let aFilters = oManagedObject.computeApplicationFilters(oBinding, "~vFilters~");
+
+		assert.strictEqual(aFilters, "~vFilters~", "Just return filters in case of bound filter update");
+
+		oBindingMock.expects("_isBoundFilterUpdate").withExactArgs().returns(false);
+		this.mock(oManagedObject).expects("_removeBoundFilters").withExactArgs(sinon.match.same(oBinding));
+		this.mock(oFilter0).expects("isBound").withExactArgs().returns(false);
+		this.mock(oFilter1).expects("isBound").withExactArgs().returns(true);
+		const oProcessFiltersCall = this.mock(oManagedObject).expects("_processFilters")
+			.withExactArgs(sinon.match((oFilters) => {
+					const aConstantFilters = oFilters.filters;
+					return aConstantFilters.length === 1 && aConstantFilters[0] === oFilter0
+						&& oFilters.boundFilters === "~vFilters~";
+				}),
+				sinon.match.func, false)
+			.returns("~processedFilters~");
+
+		// code under test
+		aFilters = oManagedObject.computeApplicationFilters(oBinding,"~vFilters~", FilterType.ApplicationBound);
+
+		assert.strictEqual(aFilters, "~processedFilters~");
+
+		// code under test - call getBinding callback
+		assert.strictEqual(oProcessFiltersCall.getCall(0).args[1](), oBinding);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("ManagedObjectBindingSupport#computeApplicationFilters, type Application", function (assert) {
+		const oManagedObject = {};
+		Object.assign(oManagedObject, ManagedObjectBindingSupport); // simulate mixin
+		const oFilter0 = {isBound() {}};
+		const oFilter1 = {isBound() {}};
+		const aPreviousFilters = [oFilter0, oFilter1];
+		const oBinding = {aApplicationFilters: aPreviousFilters, _isBoundFilterUpdate() {}};
+		const oBindingMock = this.mock(oBinding);
+
+		oBindingMock.expects("_isBoundFilterUpdate").withExactArgs().returns(false);
+		this.mock(oManagedObject).expects("_removeBoundFilters").never();
+		this.mock(oManagedObject).expects("_processFilters").never();
+		const oFilter0Mock = this.mock(oFilter0);
+		const oFilter1Mock = this.mock(oFilter1);
+		oFilter0Mock.expects("isBound").withExactArgs().returns(false);
+		oFilter1Mock.expects("isBound").withExactArgs().returns(false);
+		const aFilters = ["~newFilter~"];
+
+		// code under test - only unbound application filters
+		let aResult = oManagedObject.computeApplicationFilters(oBinding, aFilters, FilterType.Application);
+
+		assert.strictEqual(aResult, aFilters);
+
+		oBindingMock.expects("_isBoundFilterUpdate").withExactArgs().returns(false);
+		oFilter0Mock.expects("isBound").withExactArgs().returns(false);
+		oFilter1Mock.expects("isBound").withExactArgs().returns(true);
+
+		// code under test - with bound application filters, array of filters case
+		aResult = oManagedObject.computeApplicationFilters(oBinding, aFilters, FilterType.Application);
+
+		assert.strictEqual(aResult.length, 2);
+		assert.strictEqual(aResult[0], "~newFilter~");
+		assert.strictEqual(aResult[1], oFilter1);
+
+		oBindingMock.expects("_isBoundFilterUpdate").withExactArgs().returns(false);
+		oFilter0Mock.expects("isBound").withExactArgs().returns(true);
+		oFilter1Mock.expects("isBound").withExactArgs().returns(false);
+
+		// code under test - with bound application filters, single filter case
+		aResult = oManagedObject.computeApplicationFilters(oBinding, "~singleFilter~", FilterType.Application);
+
+		assert.strictEqual(aResult.length, 2);
+		assert.strictEqual(aResult[0], "~singleFilter~");
+		assert.strictEqual(aResult[1], oFilter0);
+
+		oBindingMock.expects("_isBoundFilterUpdate").withExactArgs().returns(false);
+		oFilter0Mock.expects("isBound").withExactArgs().returns(true);
+		oFilter1Mock.expects("isBound").withExactArgs().returns(false);
+
+		// code under test - with bound application filters, undefined filter case
+		aResult = oManagedObject.computeApplicationFilters(oBinding, undefined, FilterType.Application);
+
+		assert.strictEqual(aResult.length, 1);
+		assert.strictEqual(aResult[0], oFilter0);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("ManagedObjectBindingSupport#computeApplicationFilters, error for type Control", function (assert) {
+		const oManagedObject = {};
+		Object.assign(oManagedObject, ManagedObjectBindingSupport); // simulate mixin
+
+		// code under test
+		assert.throws(() => {
+			oManagedObject.computeApplicationFilters("~oBinding~", "~vFilters~", FilterType.Control);
+		}, new Error("Must not use filter type Control"));
 	});
 });

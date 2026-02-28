@@ -282,8 +282,11 @@ html.sap-tablet:not(.sap-desktop) .sapMHrdrBottomPadding .sapMHdrCntrCntr.Vertic
 }
 
 html.sap-desktop .sapMHrdrCntrInner:focus {
-	outline: none;
-	border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+  outline: none;
+}
+html.sap-desktop .sapMHrdrCntrInner:focus-visible {
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+	outline-offset: -2px;
 }
 
 @media (min-width:320px) and (max-width:599px) {
