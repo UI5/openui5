@@ -11,7 +11,8 @@ sap.ui.define([
 	"qunit/designtime/EditorQunitUtils",
 	"sap/ui/integration/formatters/IconFormatter",
 	"sap/ui/qunit/QUnitUtils",
-	"sap/ui/events/KeyCodes"
+	"sap/ui/events/KeyCodes",
+	"sap/ui/test/utils/nextUIUpdate"
 ], function (
 	x,
 	Editor,
@@ -24,7 +25,8 @@ sap.ui.define([
 	EditorQunitUtils,
 	IconFormatter,
 	QUnitUtils,
-	KeyCodes
+	KeyCodes,
+	nextUIUpdate
 ) {
 	"use strict";
 
@@ -630,15 +632,15 @@ sap.ui.define([
 						assert.ok(oDeleteButton.getEnabled(), "SimpleForm: Delete button is enabled");
 						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1"}), "Field 1: DT Value updated");
 
-						oFormLabel = oContents[2];
-						oFormField = oContents[3];
-						assert.equal(oFormLabel.getText(), "Icon1", "SimpleForm label 2: Has label text");
-						assert.ok(oFormLabel.getVisible(), "SimpleForm label 2: Visible");
-						assert.ok(oFormField.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "SimpleForm Field 2: Icon Select Viz Field");
-						assert.ok(oFormField.getVisible(), "SimpleForm Field 2: Visible");
-						assert.ok(oFormField.getEditable(), "SimpleForm Field 2: Editable");
-						assert.equal(oFormField.getValue(), "", "SimpleForm field 2: Has No value");
-						var oSelect = oFormField.getAggregation("_control");
+						var oFormLabel1 = oContents[2];
+						var oFormField1 = oContents[3];
+						assert.equal(oFormLabel1.getText(), "Icon1", "SimpleForm label 2: Has label text");
+						assert.ok(oFormLabel1.getVisible(), "SimpleForm label 2: Visible");
+						assert.ok(oFormField1.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "SimpleForm Field 2: Icon Select Viz Field");
+						assert.ok(oFormField1.getVisible(), "SimpleForm Field 2: Visible");
+						assert.ok(oFormField1.getEditable(), "SimpleForm Field 2: Editable");
+						assert.equal(oFormField1.getValue(), "", "SimpleForm field 2: Has No value");
+						var oSelect = oFormField1.getAggregation("_control");
 						assert.ok(oSelect.getItemByKey(IconFormatter.SRC_FOR_HIDDEN_ICON).getEnabled(), "Icon 1: item none is enabled");
 						assert.ok(oSelect.getItemByKey("file").getEnabled(), "Icon 1: item file is enabled");
 						assert.ok(!oSelect.getItemByKey("selected").getEnabled(), "Icon 1: item selected is disabled");
@@ -647,65 +649,90 @@ sap.ui.define([
 						oSelect.fireChange({ selectedItem: oSelect.getItems()[10] });
 						oSelect.focus();
 						oSelect.open();
-						EditorQunitUtils.wait().then(function () {
+						EditorQunitUtils.wait().then(async function () {
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for 3 < index < 14");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 1");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 0");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 39, "Field: Page DOWN navigation correct for index = 0");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Page Up navigation correct for index = 39");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Down navigation correct for index = 0");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Down navigation correct for index = 1");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Down navigation correct for index = 3");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Arrow Right navigation correct for index = 15");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 76, "Field: Page DOWN navigation correct for index = 16");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Page Up navigation correct for index = 76");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Left navigation correct for index = 16");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Left navigation correct for index = 15");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Right navigation correct for index = 14");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Arrow Right navigation correct for index = 15");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 17, "Field: Arrow Right navigation correct for index = 16");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 29, "Field: Arrow Down navigation correct for index = 17");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 30, "Field: Arrow Right navigation correct for index = 29");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 31, "Field: Arrow Right navigation correct for index = 30");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 43, "Field: Arrow Down navigation correct for index = 31");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 31, "Field: Arrow Up navigation correct for index = 43");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 19, "Field: Arrow Up navigation correct for index = 31");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 7, "Field: Arrow Up navigation correct for index = 19");
 							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
 							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 7");
 
-							oFormLabel = oContents[4];
-							oFormField = oContents[5];
-							assert.equal(oFormLabel.getText(), "Icon2", "SimpleForm label 3: Has label text");
-							assert.ok(oFormLabel.getVisible(), "SimpleForm label 3: Visible");
-							assert.ok(oFormField.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "SimpleForm Field 3: Icon Select Viz Field");
-							assert.ok(oFormField.getVisible(), "SimpleForm Field 3: Visible");
-							assert.ok(oFormField.getEditable(), "SimpleForm Field 3: Editable");
-							assert.equal(oFormField.getValue(), "", "SimpleForm field 3: Has No value");
-							oSelect = oFormField.getAggregation("_control");
+							var oFormLabel2 = oContents[4];
+							var oFormField2 = oContents[5];
+							assert.equal(oFormLabel2.getText(), "Icon2", "SimpleForm label 3: Has label text");
+							assert.ok(oFormLabel2.getVisible(), "SimpleForm label 3: Visible");
+							assert.ok(oFormField2.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "SimpleForm Field 3: Icon Select Viz Field");
+							assert.ok(oFormField2.getVisible(), "SimpleForm Field 3: Visible");
+							assert.ok(oFormField2.getEditable(), "SimpleForm Field 3: Editable");
+							assert.equal(oFormField2.getValue(), "", "SimpleForm field 3: Has No value");
+							oSelect = null;
+							oSelect = oFormField2.getAggregation("_control");
 							assert.ok(!oSelect.getItemByKey(IconFormatter.SRC_FOR_HIDDEN_ICON).getEnabled(), "Icon 2: item none is disabled");
 							assert.ok(oSelect.getItemByKey("file").getEnabled(), "Icon 2: item file is enabled");
 							assert.ok(!oSelect.getItemByKey("selected").getEnabled(), "Icon 2: item selected is disabled");
@@ -714,57 +741,78 @@ sap.ui.define([
 							oSelect.fireChange({ selectedItem: oSelect.getItems()[10] });
 							oSelect.focus();
 							oSelect.open();
-							EditorQunitUtils.wait().then(function () {
+							EditorQunitUtils.wait().then(async function () {
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for 3 < index < 14");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 1");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 1");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Down navigation correct for index = 1");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Down navigation correct for index = 3");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Left navigation correct for index = 15");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 13, "Field: Arrow Left navigation correct for index = 14");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 12, "Field: Arrow Left navigation correct for index = 13");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 11, "Field: Arrow Left navigation correct for index = 12");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 12, "Field: Arrow Right navigation correct for index = 11");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 13, "Field: Arrow Right navigation correct for index = 12");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Right navigation correct for index = 13");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 26, "Field: Arrow Down navigation correct for index = 14");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 27, "Field: Arrow Right navigation correct for index = 26");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 28, "Field: Arrow Right navigation correct for index = 27");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 40, "Field: Arrow Down navigation correct for index = 28");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 28, "Field: Arrow Up navigation correct for index = 40");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 16, "Field: Arrow Up navigation correct for index = 28");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 4, "Field: Arrow Up navigation correct for index = 16");
 								QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+								await nextUIUpdate();
 								assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 4");
 
-								oFormLabel = oContents[6];
-								oFormField = oContents[7];
-								assert.equal(oFormLabel.getText(), "Icon3", "SimpleForm label 4: Has label text");
-								assert.ok(oFormLabel.getVisible(), "SimpleForm label 4: Visible");
-								assert.ok(oFormField.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "SimpleForm Field 4: Icon Select Viz Field");
-								assert.ok(oFormField.getVisible(), "SimpleForm Field 4: Visible");
-								assert.ok(oFormField.getEditable(), "SimpleForm Field 4: Editable");
-								assert.equal(oFormField.getValue(), "", "SimpleForm field 4: Has No value");
-								oSelect = oFormField.getAggregation("_control");
+								var oFormLabel3 = oContents[6];
+								var oFormField3 = oContents[7];
+								assert.equal(oFormLabel3.getText(), "Icon3", "SimpleForm label 4: Has label text");
+								assert.ok(oFormLabel3.getVisible(), "SimpleForm label 4: Visible");
+								assert.ok(oFormField3.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "SimpleForm Field 4: Icon Select Viz Field");
+								assert.ok(oFormField3.getVisible(), "SimpleForm Field 4: Visible");
+								assert.ok(oFormField3.getEditable(), "SimpleForm Field 4: Editable");
+								assert.equal(oFormField3.getValue(), "", "SimpleForm field 4: Has No value");
+								oSelect = null;
+								oSelect = oFormField3.getAggregation("_control");
 								assert.ok(oSelect.getItemByKey(IconFormatter.SRC_FOR_HIDDEN_ICON).getEnabled(), "Icon 3: item none is enabled");
 								assert.ok(!oSelect.getItemByKey("file").getEnabled(), "Icon 3: item file is disabled");
 								assert.ok(!oSelect.getItemByKey("selected").getEnabled(), "Icon 3: item selected is disabled");
@@ -773,42 +821,60 @@ sap.ui.define([
 								oSelect.fireChange({ selectedItem: oSelect.getItems()[10] });
 								oSelect.focus();
 								oSelect.open();
-								EditorQunitUtils.wait().then(function () {
+								EditorQunitUtils.wait().then(async function () {
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for 3 < index < 14");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 0");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Down navigation correct for index = 0");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Down navigation correct for index = 3");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Left navigation correct for index = 15");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 13, "Field: Arrow Left navigation correct for index = 14");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 12, "Field: Arrow Left navigation correct for index = 13");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 13, "Field: Arrow Right navigation correct for index = 12");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Right navigation correct for index = 13");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Right navigation correct for index = 14");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 27, "Field: Arrow Down navigation correct for index = 15");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 28, "Field: Arrow Right navigation correct for index = 27");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 29, "Field: Arrow Right navigation correct for index = 28");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 41, "Field: Arrow Down navigation correct for index = 29");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 29, "Field: Arrow Up navigation correct for index = 41");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 17, "Field: Arrow Up navigation correct for index = 29");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 5, "Field: Arrow Up navigation correct for index = 17");
 									QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+									await nextUIUpdate();
 									assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 5");
 									resolve();
 								});
