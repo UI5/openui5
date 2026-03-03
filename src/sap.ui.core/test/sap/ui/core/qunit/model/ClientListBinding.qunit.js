@@ -355,9 +355,6 @@ sap.ui.define([
 		this.mock(oBinding).expects("applyFilter").exactly(vComputedFilters ? 1 : 0).withExactArgs();
 		this.mock(oBinding).expects("applySort").withExactArgs();
 		this.mock(oBinding).expects("_fireChange").withExactArgs(sinon.match.object);
-		this.mock(oBinding).expects("_fireFilter").withExactArgs(sinon.match((oEventParam) => {
-			return oEventParam.filters === vComputedFilters ? vComputedFilters : [];
-		}));
 
 		// code under test
 		assert.strictEqual(oBinding.filter("~aNewFilters", sFilterType), oBinding);

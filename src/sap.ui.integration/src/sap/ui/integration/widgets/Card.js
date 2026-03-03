@@ -218,7 +218,7 @@ sap.ui.define([
 				 * Overrides the default values of the parameters, which are defined in the manifest.
 				 * The value is an object containing parameters in format <code>{parameterKey: parameterValue}</code>.
 				 *
-				 * @experimental Since 1.65. This property might be changed in future.
+				 * @ui5-experimental-since 1.65
 				 */
 				parameters: {
 					type: "object",
@@ -227,8 +227,7 @@ sap.ui.define([
 
 				/**
 				 * Defines the state of the <code>Card</code>. When set to <code>Inactive</code>, the <code>Card</code> doesn't make requests.
-				 * @experimental Since 1.65
-				 * @since 1.65
+				 * @ui5-experimental-since 1.65
 				 */
 				dataMode: {
 					type: "sap.ui.integration.CardDataMode",
@@ -240,8 +239,7 @@ sap.ui.define([
 				 * Defines the base URL of the card manifest. It should be used when manifest property is an object instead of a URL.
 				 * If both manifest URL and base URL are defined - the base URL will be used for loading dependencies.
 				 * If both manifest URL and base URL are not defined - relative resources might not be loaded correctly.
-				 * @experimental Since 1.70
-				 * @since 1.70
+				 * @ui5-experimental-since 1.70
 				 */
 				baseUrl: {
 					type: "sap.ui.core.URI",
@@ -282,8 +280,9 @@ sap.ui.define([
 				 * ]
 				 * </pre>
 				 *
-				 * @experimental Since 1.76 This API might be removed when a permanent solution for flexibility changes is implemented.
-				 * @since 1.76
+				 * Disclaimer: this API might be removed when a permanent solution for flexibility changes is implemented.
+				 *
+				 * @ui5-experimental-since 1.76
 				 */
 				manifestChanges: {
 					type: "object[]",
@@ -292,8 +291,7 @@ sap.ui.define([
 
 				/**
 				 * Defines the design of the <code>Card</code>.
-				 * @experimental Since 1.109
-				 * @since 1.109
+				 * @ui5-experimental-since 1.109
 				 */
 				design: {
 					type: "sap.ui.integration.CardDesign",
@@ -303,8 +301,8 @@ sap.ui.define([
 
 				/**
 				 * Defines the display variant for card rendering and behavior.
-				 * @experimental Since 1.118. For usage only by Work Zone.
-				 * @since 1.118
+				 * @ui5-experimental-since 1.118
+				 * @ui5-restricted Work Zone
 				 */
 				displayVariant: {
 					type: "sap.ui.integration.CardDisplayVariant",
@@ -320,8 +318,7 @@ sap.ui.define([
 				 * <li>When set to "Abstract", the card shows abstract placeholder without loading data.</li>
 				 * <li>When set to "Off", the card displays real data.</li>
 				 * </ul>
-				 * @experimental Since 1.112
-				 * @since 1.112
+				 * @ui5-experimental-since 1.112
 				 */
 				previewMode: {
 					type: "sap.ui.integration.CardPreviewMode",
@@ -332,8 +329,7 @@ sap.ui.define([
 				/**
 				 * If the card should change depending on its size.
 				 * This property is temporary. Should be used to enable the feature for cards where it is needed.
-				 * @experimental Since 1.127
-				 * @since 1.127
+				 * @ui5-experimental-since 1.127
 				 */
 				useProgressiveDisclosure: {
 					type: "boolean",
@@ -346,8 +342,7 @@ sap.ui.define([
 				 *
 				 * <b>Note</b>: If the "Default" option is used, the card must be allowed to grow in height as much as it needs to avoid overflowing. Use a layout which allows this.
 				 *
-				 * @experimental Since 1.133
-				 * @since 1.133
+				 * @ui5-experimental-since 1.133
 				 */
 				overflow: {
 					type: "sap.ui.integration.CardOverflow",
@@ -389,8 +384,7 @@ sap.ui.define([
 				/**
 				 * Actions definitions from which actions in the header menu of the card are created.
 				 * <b>Note</b>: This aggregation is destroyed when the property <code>manifest</code> changes.
-				 * @experimental Since 1.85. Disclaimer: this aggregation is in a beta state - incompatible API changes may be done before its official public release. Use at your own discretion.
-				 * @since 1.85
+				 * @ui5-experimental-since 1.85
 				 */
 				actionDefinitions: {
 					type: "sap.ui.integration.ActionDefinition",
@@ -463,8 +457,7 @@ sap.ui.define([
 				 * When an action is triggered in the card it can be handled on several places by "action" event handlers. In consecutive order those places are: <code>Extension</code>, <code>Card</code>, <code>Host</code>.
 				 * Each of them can prevent the next one to handle the action by calling <code>oEvent.preventDefault()</code>.
 				 *
-				 * @experimental since 1.64
-				 * Disclaimer: this event is in a beta state - incompatible API changes may be done before its official public release. Use at your own discretion.
+				 * @ui5-experimental-since 1.64
 				 */
 				action: {
 					allowPreventDefault: true,
@@ -508,7 +501,7 @@ sap.ui.define([
 				/**
 				 * Fired when some configuration settings are changed as a result of user interaction.
 				 * For example - filter value is changed.
-				 * @experimental since 1.96
+				 * @ui5-experimental-since 1.96
 				 */
 				configurationChange: {
 					parameters: {
@@ -531,7 +524,7 @@ sap.ui.define([
 
 				/**
 				 * Fired when the manifest is loaded.
-				 * @experimental since 1.72
+				 * @ui5-experimental-since 1.72
 				 */
 				manifestReady: {},
 
@@ -547,7 +540,7 @@ sap.ui.define([
 				/**
 				 * Fired when the state of the card is changed.
 				 * For example - the card is ready, new page is selected, a filter is changed or data is refreshed.
-				 * @experimental since 1.107
+				 * @ui5-experimental-since 1.107
 				 */
 				stateChanged: {}
 			},
@@ -1106,11 +1099,11 @@ sap.ui.define([
 	};
 
 	/**
-	 * Causes all of the controls within the Card
+	 * Causes all the controls within the Card
 	 * that support validation to validate their data.
 	 * @public
-	 * @experimental
-	 * @returns {boolean} if all of the controls validated successfully; otherwise, false
+	 * @ui5-experimental-since 1.106
+	 * @returns {boolean} if all the controls validated successfully; otherwise, false
 	 */
 	Card.prototype.validateControls = function () {
 		this._validateContentControls(true);
@@ -1246,7 +1239,7 @@ sap.ui.define([
 
 	/**
 	 * @public
-	 * @experimental Since 1.65. The API might change.
+	 * @ui5-experimental-since 1.65
 	 * @returns {boolean} If the card is ready or not.
 	 */
 	Card.prototype.isReady = function () {
@@ -1257,7 +1250,7 @@ sap.ui.define([
 	 * Refreshes the card by re-applying the manifest settings and triggering all data requests.
 	 *
 	 * @public
-	 * @experimental Since 1.65. The API might change.
+	 * @ui5-experimental-since 1.65
 	 */
 	Card.prototype.refresh = function () {
 		if (this._getActualDataMode() === CardDataMode.Active) {
@@ -1553,7 +1546,7 @@ sap.ui.define([
 	 * - Use when developing a Component card.
 	 *
 	 * @public
-	 * @experimental Since 1.77
+	 * @ui5-experimental-since 1.77
 	 * @returns {map} Object containing parameters in format <code>{parameterKey: parameterValue}</code>.
 	 */
 	Card.prototype.getCombinedParameters = function () {
@@ -1579,7 +1572,7 @@ sap.ui.define([
 	 * <b>Note</b> Use this method when the manifest is ready. Check <code>manifestReady</code> event.
 	 *
 	 * @public
-	 * @experimental Since 1.77
+	 * @ui5-experimental-since 1.77
 	 * @param {string} sPath The path to return a value for.
 	 * @returns {any} The value at the specified path.
 	 */
@@ -1660,7 +1653,7 @@ sap.ui.define([
 	 * Can be used only after the <code>manifestApplied</code> event is fired.
 	 *
 	 * @public
-	 * @experimental As of version 1.81
+	 * @ui5-experimental-since 1.81
 	 * @param {string} sMessage The message.
 	 * @param {sap.ui.integration.CardMessageType} sType Type of the message.
 	 * @param {boolean} bAutoClose Close the message automatically. Default is <code>false</code> for most message types.
@@ -1687,7 +1680,7 @@ sap.ui.define([
 	 * Hides the message previously shown by showMessage.
 	 *
 	 * @public
-	 * @experimental As of version 1.117
+	 * @ui5-experimental-since 1.117
 	 */
 	Card.prototype.hideMessage = function () {
 		var oContent = this.getCardContent();
@@ -1714,7 +1707,7 @@ sap.ui.define([
 	 * @property {Response} [httpResponse] Response object in case of a network error
 	 * @property {array} [additionalContent] A list of buttons placed below the description as additional content. Experimental since 1.121
 	 * @public
-	 * @experimental As of version 1.114
+	 * @ui5-experimental-since 1.114
 	 */
 
 	/**
@@ -1722,7 +1715,7 @@ sap.ui.define([
 	 * Should be used after the <code>manifestApplied</code> event or after the <code>cardReady</code> lifecycle hook in Component cards and Extensions.
 	 *
 	 * @public
-	 * @experimental As of version 1.114
+	 * @ui5-experimental-since 1.114
 	 * @param {sap.ui.integration.BlockingMessageSettings} oSettings Blocking message settings
 	 */
 	Card.prototype.showBlockingMessage = function (oSettings) {
@@ -1738,7 +1731,7 @@ sap.ui.define([
 	 * Get information about the blocking message in the card.
 	 *
 	 * @public
-	 * @experimental As of version 1.114
+	 * @ui5-experimental-since 1.114
 	 * @returns {sap.ui.integration.BlockingMessageSettings|null} Information about the message or <code>null</code>, if such isn't shown.
 	 */
 	Card.prototype.getBlockingMessage = function () {
@@ -1764,7 +1757,7 @@ sap.ui.define([
 	 * Hide the blocking message that is shown in the card by <code>showBlockingMessage</code> call.
 	 *
 	 * @public
-	 * @experimental As of version 1.114
+	 * @ui5-experimental-since 1.114
 	 */
 	Card.prototype.hideBlockingMessage = function () {
 		var oContent = this.getCardContent();
@@ -2307,7 +2300,7 @@ sap.ui.define([
 	 * Gets the instance of the <code>host</code> association.
 	 *
 	 * @public
-	 * @experimental Since 1.77
+	 * @ui5-experimental-since 1.77
 	 * @returns {sap.ui.integration.Host} The host object associated with this card.
 	 */
 	Card.prototype.getHostInstance = function () {
@@ -2658,11 +2651,10 @@ sap.ui.define([
 	/**
 	 * Sets a new value for the <code>dataMode</code> property.
 	 *
-	 * @experimental Since 1.65. API might change.
+	 * @ui5-experimental-since 1.65
 	 * @param {sap.ui.integration.CardDataMode} sMode The mode to set to the Card.
 	 * @returns {this} Pointer to the control instance to allow method chaining.
 	 * @public
-	 * @since 1.65
 	 */
 	Card.prototype.setDataMode = function (sMode) {
 
@@ -2699,7 +2691,7 @@ sap.ui.define([
 	 * }
 	 *
 	 * @public
-	 * @experimental Since 1.73
+	 * @ui5-experimental-since 1.73
 	 * @returns {Promise<object>} Promise resolves after the designtime configuration is loaded.
 	 */
 	Card.prototype.loadDesigntime = function () {
@@ -2888,7 +2880,7 @@ sap.ui.define([
 	 * @property {object} response The response object
 	 * @property {string} responseText The response text
 	 * @public
-	 * @experimental As of version 1.139
+	 * @ui5-experimental-since 1.139
 	 */
 
 	/**
@@ -2989,7 +2981,7 @@ sap.ui.define([
 	 * </pre>
 	 *
 	 * @public
-	 * @experimental since 1.84
+	 * @ui5-experimental-since 1.84
 	 * @param {object} oAction The settings of the action.
 	 * @param {sap.ui.integration.CardActionType} oAction.type The type of the action.
 	 * @param {object} [oAction.parameters] Additional parameters which will be used by the action handler to perform the action.

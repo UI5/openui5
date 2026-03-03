@@ -1461,7 +1461,13 @@ sap.ui.define([
 			bResizeColumnWithAnimation = this._canResizeColumnWithAnimation(sColumn, oColumnConfig),
 			bSuspendResizeHandler = bAnimationsEnabled,
 			fnAfterResizeCallback = this._afterColumnResize.bind(this, sColumn, merge(oColumnConfig, {
-				resumeResizeHandler: bSuspendResizeHandler && !bHidden // toggle back after resize
+				// Always resume visible columns to clear any leftover suspension state.
+				// This handles the case when animation mode changes from "full" to "none"
+				// mid-session - without this, columns suspended during animations would
+				// stay suspended forever since bSuspendResizeHandler becomes false.
+				// Calling ResizeHandler.resume() on a non-suspended element is safe and
+				// simply returns false without any side effects.
+				resumeResizeHandler: !bHidden
 			})),
 			fnResizeErrorCallback = function() {
 				ResizeHandler.resume(oColumnDomRef);

@@ -37,7 +37,10 @@ sap.ui.define([
 					]
 				},
 				ui5: {
-					flexibilityServices: '[{"connector": "StaticFileConnector", "layers": []}]'
+					flexibilityServices: '[{"connector": "StaticFileConnector", "layers": []}]',
+					resourceroots: {
+						"sap.ui.fl.testResources": "test-resources/sap/ui/fl/qunit/testResources/"
+					}
 				}
 			},
 

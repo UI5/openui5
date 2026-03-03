@@ -256,7 +256,7 @@ sap.ui.define([
 					componentId: this.oConfig.id,
 					reference: sReference,
 					componentData: this.oConfig.componentData,
-					rawManifest: oManifest
+					manifest: oManifest
 				});
 			}.bind(this))
 			.then(function() {

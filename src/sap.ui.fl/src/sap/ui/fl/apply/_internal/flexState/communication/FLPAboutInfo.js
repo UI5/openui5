@@ -4,13 +4,11 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
-	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/Utils"
 ], function(
 	Lib,
-	FlexInfoSession,
 	Loader,
 	ManifestUtils,
 	FlexUtils
@@ -55,9 +53,9 @@ sap.ui.define([
 				componentData: oCurrentApplicationComponent.getComponentData(),
 				asyncHints: oCurrentApplicationComponent._componentConfig.asyncHints
 			};
-			// this function ensures that the necessary information is loaded from the backend and stored in the FlexInfoSession
-			await Loader.getFlexData(mPropertyBag);
-			const sAdaptationId = FlexInfoSession.getByReference(sReference)?.adaptationId;
+			// this function ensures that the necessary information is loaded from the backend
+			const oFlexData = await Loader.getFlexData(mPropertyBag);
+			const sAdaptationId = oFlexData.data.changes.info?.adaptationId;
 			/**
 			 * In case the adaptationId is "DEFAULT" or undefined, which is the case, if
 			 * 	1. no context based adaptation has been created yet or
@@ -67,7 +65,7 @@ sap.ui.define([
 			if (sAdaptationId === "DEFAULT" || !sAdaptationId) {
 				return;
 			}
-			const sAdaptationTitle = FlexInfoSession.getByReference(sReference)?.adaptationTitle;
+			const sAdaptationTitle = oFlexData?.data?.changes?.info?.adaptationTitle;
 			const sLabel = Lib.getResourceBundleFor("sap.ui.fl").getText("CBA_ABOUT_INFO_DIALOG_LABEL");
 			const sValue = `${sAdaptationTitle} (${sAdaptationId})`;
 			setAppInfoCustomProperties(oAppLifeCycleService, sLabel, sValue, "ui5.flex.adaptation");

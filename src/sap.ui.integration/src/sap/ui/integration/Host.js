@@ -41,8 +41,7 @@ sap.ui.define([
 			properties: {
 				/**
 				 * The actions configuration.
-				 * @experimental since 1.75
-				 * Disclaimer: this property is in a beta state - incompatible API changes may be done before its official public release. Use at your own discretion.
+				 * @ui5-experimental-since 1.75
 				 */
 				actions: {
 					type: "sap.ui.integration.CardMenuAction[]"
@@ -83,8 +82,7 @@ sap.ui.define([
 				 * When an action is triggered in the card it can be handled on several places by "action" event handlers. In consecutive order those places are: <code>Extension</code>, <code>Card</code>, <code>Host</code>.
 				 * Each of them can prevent the next one to handle the action by calling <code>oEvent.preventDefault()</code>.
 				 *
-				 * @experimental since 1.75
-				 * Disclaimer: this event is in a beta state - incompatible API changes may be done before its official public release. Use at your own discretion.
+				 * @ui5-experimental-since 1.75
 				 */
 				action: {
 
@@ -139,7 +137,7 @@ sap.ui.define([
 				/**
 				 * Fired when some card configuration settings are changed as a result of user interaction.
 				 * For example - filter value is changed.
-				 * @experimental since 1.96
+				 * @ui5-experimental-since 1.96
 				 */
 				cardConfigurationChange: {
 					parameters: {
@@ -167,7 +165,7 @@ sap.ui.define([
 				/**
 				 * Fired when the state of a card is changed.
 				 * For example - the card is ready, new page is selected inside the card, a filter is changed or data is refreshed.
-				 * @experimental since 1.107
+				 * @ui5-experimental-since 1.107
 				 */
 				cardStateChanged: {
 					parameters: {
@@ -181,7 +179,7 @@ sap.ui.define([
 				/**
 				 * Fired when the card is initially ready for the first time.
 				 * Will not be fired for consecutive refreshes or data changes.
-				 * @experimental since 1.116
+				 * @ui5-experimental-since 1.116
 				 */
 				cardInitialized: {
 					parameters: {
@@ -194,7 +192,7 @@ sap.ui.define([
 
 				/**
 				 * Fired when a message from channels like navigator.serviceWorker is received.
-				 * @experimental since 1.91
+				 * @ui5-experimental-since 1.91
 				 */
 				message: {
 					parameters: {
@@ -304,8 +302,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sPath The path to a context
 	 * @returns {Promise<null>} A promise which resolves with the value of this context.
-	 * @since 1.83
-	 * @experimental since 1.143
+	 * @ui5-experimental-since 1.143
 	 * @abstract
 	 * @public
 	 */
@@ -351,8 +348,7 @@ sap.ui.define([
 	 * The context information and texts should be translated as they appear in the design-time UI of the Card Editor.
 	 *
 	 * @returns {Promise<object>} A promise which contains the context structure.
-	 * @since 1.83
-	 * @experimental since 1.143
+	 * @ui5-experimental-since 1.143
 	 * @abstract
 	 * @public
 	 */
@@ -364,7 +360,7 @@ sap.ui.define([
 	 * Call this method if you want to use the experimental caching for all cards.
 	 * @private
 	 * @ui5-restricted
-	 * @experimental Since 1.91. The API might change.
+	 * @since 1.91
 	 */
 	Host.prototype.useExperimentalCaching = function () {
 		this.bUseExperimentalCaching = true;
@@ -375,7 +371,7 @@ sap.ui.define([
 	 * Stops the usage of the experimental caching for all cards.
 	 * @private
 	 * @ui5-restricted
-	 * @experimental Since 1.91. The API might change.
+	 * @since 1.91
 	 */
 	Host.prototype.stopUsingExperimentalCaching = function () {
 		this.bUseExperimentalCaching = false;
@@ -388,7 +384,7 @@ sap.ui.define([
 	 * Mimics the browser native Fetch API.
 	 * @private
 	 * @ui5-restricted
-	 * @experimental Since 1.113. The API might change.
+	 * @since 1.113
 	 * @param {string} sResource This defines the resource that you wish to fetch.
 	 * @param {object} mOptions An object containing any custom settings that you want to apply to the request.
 	 * @param {object} mRequestSettings The map of request settings defined in the card manifest. Use this only for reading, they can not be modified.
@@ -411,7 +407,7 @@ sap.ui.define([
 	 * Override this method to change the source for the analytics cloud widget script.
 	 * @private
 	 * @ui5-restricted
-	 * @experimental Since 1.125. The API might change.
+	 * @since 1.125
 	 */
 	Host.prototype.getAnalyticsCloudWidgetSrc = function () { };
 

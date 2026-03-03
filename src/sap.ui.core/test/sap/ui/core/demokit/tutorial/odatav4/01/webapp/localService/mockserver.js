@@ -234,8 +234,8 @@ sap.ui.define([
 			aMatches = oXhr.url.match(/\$skip=(\d+)&\$top=(\d+)/);
 
 		if (Array.isArray(aMatches) && aMatches.length >= 3) {
-			iSkip = aMatches[1];
-			iTop = aMatches[2];
+			iSkip = parseInt(aMatches[1]);
+			iTop = parseInt(aMatches[2]);
 			return aResultSet.slice(iSkip, iSkip + iTop);
 		}
 
@@ -290,23 +290,50 @@ sap.ui.define([
 	 * @returns {Array} the filtered result set.
 	 */
 	function applyFilter(oXhr, aResultSet) {
-		var sFieldName,
-			sQuery,
-			aFilteredUsers = [].concat(aResultSet), // work with a copy
-			aMatches = oXhr.url.match(/\$filter=.*\((.*),'(.*)'\)/);
-
-		// If the request contains a filter command, apply the filter
-		if (Array.isArray(aMatches) && aMatches.length >= 3) {
-			sFieldName = aMatches[1];
-			sQuery = aMatches[2];
-
-			if (sFieldName !== "LastName") {
-				throw new Error("Filters on field " + sFieldName + " are not supported.");
-			}
-
-			aFilteredUsers = aUsers.filter(function (oUser) {
-				return oUser.LastName.indexOf(sQuery) !== -1;
+		const sFilter = new URL(oXhr.url).searchParams.get("$filter");
+		let aFilteredUsers = aResultSet.slice(); // work with a copy
+		if (!sFilter) {
+			return aFilteredUsers;
+		}
+		// support filters like:
+		// - "contains(LastName,'e')"
+		// - "(contains(LastName,'e')) and not (UserName eq 'a' or UserName eq 'b')"
+		// - "not (UserName eq 'a' or UserName eq 'b')"
+		// - "UserName eq 'foo'"
+		let sRemainingFilter = sFilter.startsWith("(") ? sFilter.slice(1) : sFilter;
+		if (sRemainingFilter.startsWith("contains(LastName,'")) { // from search field
+			sRemainingFilter = sRemainingFilter.slice(19); // remove "contains(LastName,'"
+			const sValue = sRemainingFilter.split("')")[0];
+			aFilteredUsers = aFilteredUsers.filter(function (oUser) {
+				return oUser.LastName.includes(sValue);
 			});
+			// remove the rest of "contains" from the filter and the optional following ") and "
+			sRemainingFilter = sRemainingFilter.slice(sValue.length + 2);
+			if (sRemainingFilter.startsWith(") and ")) {
+				sRemainingFilter = sRemainingFilter.slice(6);
+			}
+		}
+		if (sRemainingFilter.startsWith("not (UserName eq ")) { // exclusive filter
+			const iEnd = sRemainingFilter.indexOf(")");
+			const aExcludedUsers = sRemainingFilter.slice(17, iEnd) // remove "not (UserName eq "
+				.split(" or UserName eq ")
+				// after splitting each entry contains the username in single quotes, e.g. "'me'"
+				.map((sFilterPart) => sFilterPart.slice(1, -1));
+			aFilteredUsers = aFilteredUsers.filter(function (oUser) {
+				return !aExcludedUsers.includes(oUser.UserName);
+			});
+			sRemainingFilter = sRemainingFilter.slice(iEnd + 1);
+		}
+		if (sRemainingFilter.startsWith("UserName eq '")) { // refresh of selected user
+			const iEnd = sRemainingFilter.indexOf("'", 13);
+			const sValue = sRemainingFilter.slice(13, iEnd); // remove "UserName eq '"
+			aFilteredUsers = aFilteredUsers.filter(function (oUser) {
+				return oUser.LastName.includes(sValue);
+			});
+			sRemainingFilter = sRemainingFilter.slice(iEnd + 1);
+		}
+		if (sRemainingFilter) {
+			throw new Error(`"${sRemainingFilter}" of filter "${sFilter}" is not supported`);
 		}
 
 		return aFilteredUsers;
@@ -425,7 +452,6 @@ sap.ui.define([
 		});
 
 		sResponseBody = JSON.stringify(oResponse);
-
 		return getSuccessResponse(sResponseBody);
 	}
 
@@ -603,6 +629,12 @@ sap.ui.define([
 
 		// Check if that user already exists
 		if (isUnique(oUser.UserName)) {
+			oUser = {
+				HomeAddress : null, // prevents drillDown errors
+				LastName : "",
+				FirstName : "",
+				...oUser
+			};
 			aUsers.push(oUser);
 
 			sResponseBody = '{"@odata.context": "' + getBaseUrl(oXhr.url)
@@ -800,8 +832,7 @@ sap.ui.define([
 			"Mockserver: Received " + oXhr.method + " request to URL " + oXhr.url,
 			(oXhr.requestBody ? "Request body is:\n" + oXhr.requestBody : "No request body.")
 			+ "\n",
-			sLogComponent
-		);
+			sLogComponent);
 
 		if (oXhr.method === "POST" && /\$batch/.test(oXhr.url)) {
 			aResponse = handleBatchRequest(oXhr);
@@ -816,7 +847,6 @@ sap.ui.define([
 			"Mockserver: Sent response with return code " + aResponse[0],
 			("Response headers: " + JSON.stringify(aResponse[1]) + "\n\nResponse body:\n"
 				+ aResponse[2]) + "\n",
-			sLogComponent
-		);
+			sLogComponent);
 	}
 });

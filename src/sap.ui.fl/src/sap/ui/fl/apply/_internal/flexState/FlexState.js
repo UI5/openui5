@@ -139,7 +139,7 @@ sap.ui.define([
 	function enhancePropertyBag(mPropertyBag) {
 		var oComponent = Component.getComponentById(mPropertyBag.componentId);
 		mPropertyBag.componentData ||= (oComponent && oComponent.getComponentData()) || {};
-		mPropertyBag.manifest ||= mPropertyBag.rawManifest || (oComponent && oComponent.getManifestObject()) || {};
+		mPropertyBag.manifest ||= oComponent?.getManifestObject() || {};
 		mPropertyBag.reference ||= ManifestUtils.getFlexReference(mPropertyBag);
 	}
 
@@ -402,8 +402,7 @@ sap.ui.define([
 	 * @param {object} mPropertyBag - Contains additional data needed for reading and storing changes
 	 * @param {string} mPropertyBag.componentId - ID of the component
 	 * @param {string} [mPropertyBag.reference] - Flex reference of the app
-	 * @param {object} [mPropertyBag.manifest] - Manifest that belongs to current component
-	 * @param {object} [mPropertyBag.rawManifest] - Raw JSON manifest that belongs to current component
+	 * @param {object} [mPropertyBag.manifest] - Manifest object or raw manifest that belongs to current component
 	 * @param {string} [mPropertyBag.componentData] - Component data of the current component
 	 * @param {object} [mPropertyBag.asyncHints] - Async hints passed from the app index to the component processing
 	 * @param {boolean} [mPropertyBag.skipLoadBundle=false] - If true state is initialized partially and does not include flex bundles

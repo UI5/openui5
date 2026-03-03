@@ -76,8 +76,7 @@ sap.ui.define([
 	 * Enumeration of possible card action types.
 	 *
 	 * @enum {string}
-	 * @experimental since 1.64
-	 * Disclaimer: this property is in a beta state - incompatible API changes may be done before its official public release. Use at your own discretion.
+	 * @ui5-experimental-since 1.64
 	 * @public
 	 */
 	thisLib.CardActionType = {
@@ -96,35 +95,35 @@ sap.ui.define([
 		/**
 		 * Used for custom actions.
 		 * @public
-		 * @experimental Since 1.76
+		 * @ui5-experimental-since 1.76
 		 */
 		Custom: "Custom",
 
 		/**
 		 * Date selection. Available only for Calendar cards.
 		 * @public
-		 * @experimental Since 1.87
+		 * @ui5-experimental-since 1.87
 		 */
 		DateChange: "DateChange",
 
 		/**
 		 * Month selection. Available only for Calendar cards.
 		 * @public
-		 * @experimental Since 1.87
+		 * @ui5-experimental-since 1.87
 		 */
 		MonthChange: "MonthChange",
 
 		/**
 		 * Used for showing more details about the card.
 		 * @public
-		 * @experimental Since 1.100
+		 * @ui5-experimental-since 1.100
 		 */
 		ShowCard: "ShowCard",
 
 		/**
 		 * Used for hiding the appeared details about the card.
 		 * @public
-		 * @experimental Since 1.100
+		 * @ui5-experimental-since 1.100
 		 */
 		HideCard: "HideCard"
 	};
@@ -133,9 +132,8 @@ sap.ui.define([
 	 * Possible data modes for <code>{@link sap.ui.integration.widgets.Card}</code>.
 	 *
 	 * @enum {string}
-	 * @experimental since 1.65
+	 * @ui5-experimental-since 1.65
 	 * @public
-	 * @since 1.65
 	 */
 	thisLib.CardDataMode = {
 		/**
@@ -159,9 +157,8 @@ sap.ui.define([
 	 * Possible designs for <code>{@link sap.ui.integration.widgets.Card}</code>.
 	 *
 	 * @enum {string}
-	 * @experimental since 1.109
+	 * @ui5-experimental-since 1.109
 	 * @public
-	 * @since 1.109
 	 */
 	thisLib.CardDesign = {
 		/**
@@ -181,8 +178,8 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @experimental Since 1.118. For usage only by Work Zone.
-	 * @since 1.118
+	 * @ui5-experimental-since 1.118
+	 * @ui5-restricted Work Zone
 	 */
 	thisLib.CardDisplayVariant = {
 		/**
@@ -257,7 +254,7 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @experimental since 1.128
+	 * @ui5-experimental-since 1.128
 	 */
 	thisLib.CardMessageType = {
 		/**
@@ -311,7 +308,7 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @experimental since 1.114
+	 * @ui5-experimental-since 1.114
 	 */
 	thisLib.CardBlockingMessageType = {
 		/**
@@ -363,8 +360,7 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @experimental since 1.112
-	 * @since 1.112
+	 * @ui5-experimental-since 1.112
 	 */
 	thisLib.CardPreviewMode = {
 		/**
@@ -391,8 +387,7 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @experimental Since 1.133
-	 * @since 1.133
+	 * @ui5-experimental-since 1.133
 	 */
 	thisLib.CardOverflow = {
 		/**
@@ -439,7 +434,7 @@ sap.ui.define([
 	 * An object type that represents card menu action properties.
 	 * @typedef {object}
 	 * @public
-	 * @experimental since 1.79
+	 * @ui5-experimental-since 1.79
 	 * @property {sap.ui.integration.CardActionType} type The type of the action.
 	 * @property {string} text The text of the action button.
 	 * @property {sap.ui.core.URI} icon The icon of the action button.

@@ -167,7 +167,8 @@ sap.ui.define([
 				appDescriptor: this.oRawManifest,
 				version: Version.Number.Draft,
 				adaptationId: "id_1234",
-				skipLoadBundle: true
+				skipLoadBundle: true,
+				legacyBundleHandling: true
 			};
 
 			const oResult = await Loader.getFlexData({
@@ -185,6 +186,11 @@ sap.ui.define([
 			assert.strictEqual(this.oCompleteFlexDataStub.callCount, 0, "the Storage.completeFlexData was not called");
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].siteId, "siteId", "the siteId was retrieved from the Utils");
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].skipLoadBundle, true, "the bundle loading was skipped");
+			assert.strictEqual(
+				this.oLoadFlexDataStub.getCall(0).args[0].legacyBundleHandling,
+				true,
+				"the legacyBundleHandling parameter is true"
+			);
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].componentName, "baseName", "the name was retrieved via the Utils");
 			assert.strictEqual(this.oGetCacheKeyStub.callCount, 1, "the cache key was retrieved from the Utils");
 			assert.strictEqual(this.oLoadVariantsAuthorsStub.callCount, 1, "the loadVariantsAuthors was called");
@@ -372,6 +378,11 @@ sap.ui.define([
 			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was not called again");
 			assert.strictEqual(this.oCompleteFlexDataStub.callCount, 1, "the Storage.completeFlexData was called once");
 			assert.strictEqual(this.oLoadVariantsAuthorsStub.callCount, 1, "the loadVariantsAuthors was called once");
+			assert.strictEqual(
+				this.oCompleteFlexDataStub.firstCall.args[0].legacyBundleHandling,
+				true,
+				"the legacyBundleHandling parameter is passed with value 'true' to completeFlexData"
+			);
 		});
 
 		QUnit.test("when getFlexData is first called without skipLoadBundle, then with", async function(assert) {
@@ -529,7 +540,8 @@ sap.ui.define([
 				componentName: "baseName",
 				version: undefined,
 				adaptationId: undefined,
-				skipLoadBundle: undefined
+				skipLoadBundle: undefined,
+				legacyBundleHandling: true
 			};
 
 			const oResult = await Loader.getFlexData({
@@ -853,6 +865,67 @@ sap.ui.define([
 			});
 			assert.deepEqual(oFlexData2.data.changes, this.oExpectedCompleteFlexDataResponse, "the Loader loads data");
 			assert.ok(oFlexData2.parameters.previouslyFilledData, "the previouslyFilledData parameter is true");
+		});
+
+		QUnit.test("when getFlexData is called twice with flexBundle 'true' in the manifest", async function(assert) {
+			sandbox.stub(ManifestUtils, "getFlexBundleEntry").returns(true);
+			let oResult = await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData,
+				skipLoadBundle: true
+			});
+			assert.deepEqual(oResult.data.changes, this.oExpectedCompleteFlexDataResponse, "the Loader loads data");
+			assert.strictEqual(
+				this.oLoadFlexDataStub.firstCall.args[0].skipLoadBundle,
+				false,
+				"the skipLoadBundle parameter is passed to loadFlexData and is adjusted as flex bundle is 'true' in the manifest"
+			);
+			assert.strictEqual(
+				this.oLoadFlexDataStub.firstCall.args[0].legacyBundleHandling,
+				false,
+				"the legacyBundleHandling parameter is passed to loadFlexData"
+			);
+
+			oResult = await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+			assert.deepEqual(oResult.data.changes, this.oExpectedCompleteFlexDataResponse, "the Loader loads data");
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData wasn't called second time");
+			assert.strictEqual(this.oCompleteFlexDataStub.callCount, 0, "the Storage.completeFlexData wasn't called");
+		});
+
+		QUnit.test("When getFlexData is called twice with flexBundle 'false' in the manifest", async function(assert) {
+			sandbox.stub(ManifestUtils, "getFlexBundleEntry").returns(false);
+			let oResult = await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData,
+				skipLoadBundle: true
+			});
+			assert.deepEqual(oResult.data.changes, this.oExpectedFlexDataResponse, "the Loader loads data");
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was called once");
+			assert.strictEqual(
+				this.oLoadFlexDataStub.firstCall.args[0].skipLoadBundle,
+				true,
+				"the skipLoadBundle parameter is passed to loadFlexData and is adjusted as flex bundle is 'false' in the manifest"
+			);
+			assert.strictEqual(
+				this.oLoadFlexDataStub.firstCall.args[0].legacyBundleHandling,
+				false,
+				"the legacyBundleHandling parameter is passed to loadFlexData"
+			);
+
+			oResult = await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+			assert.deepEqual(oResult.data.changes, this.oExpectedFlexDataResponse, "the Loader loads data");
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData wasn't called second time");
+			assert.strictEqual(this.oCompleteFlexDataStub.callCount, 0, "the Storage.completeFlexData wasn't called");
 		});
 	});
 

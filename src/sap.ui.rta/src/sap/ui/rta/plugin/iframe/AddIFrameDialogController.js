@@ -366,13 +366,17 @@ sap.ui.define([
 		_addURLParameter(oObject) {
 			const sParameterKey = oObject.key;
 			let sParameterString;
-			// If the type is available, this is an OData V4 Model and the target type must be set to 'any' when adding the parameter
-			// to the URL to prevent it from being resolved to a localized value.
-			// E.g. boolean is resolved to "yes/no" in a system with English locale - but we need to add "true/false" to the URL
-			// The only type that does not require this special handling is Edm.String
+			const [, sParameter] = sParameterKey.match(/\{(.+?)\}/);
 			if (oObject.type && oObject.type !== "Edm.String") {
-				const [, sParameter] = sParameterKey.match(/\{(.+?)\}/);
+				// If the type is available, this is an OData V4 Model and the target type must be set to 'any' when adding the parameter
+				// to the URL to prevent it from being resolved to a localized value.
+				// E.g. boolean is resolved to "yes/no" in a system with English locale - but we need to add "true/false" to the URL
+				// The only type that does not require this special handling is Edm.String
 				sParameterString = `{path:'${sParameter}',targetType:'any'}`;
+			} else if (sParameter.startsWith("@")) {
+				// Parameters starting with "@" (e.g. @odata.context) need special handling
+				// to avoid issues with the binding syntax
+				sParameterString = `{=%{${sParameter}}}`;
 			} else {
 				sParameterString = sParameterKey;
 			}

@@ -26,8 +26,7 @@ sap.ui.define([
 	 *
 	 * @constructor
 	 * @public
-	 * @experimental Since 1.85. Disclaimer: this class is in a beta state - incompatible API changes may be done before its official public release. Use at your own discretion.
-	 * @since 1.85
+	 * @ui5-experimental-since 1.85
 	 * @alias sap.ui.integration.ActionDefinition
 	 */
 	var ActionDefinition = Element.extend("sap.ui.integration.ActionDefinition", {
