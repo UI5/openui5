@@ -19,8 +19,11 @@ sap.ui.define([
 	"sap/ui/core/Core",
 	"sap/m/Panel",
 	"sap/m/GenericTile",
-	"sap/ui/qunit/utils/nextUIUpdate"
-], function(Localization, Element, jQuery, HeaderContainer, FlexBox, Label, VerticalLayout, Button, Device, Icon, coreLibrary, PseudoEvents, Mobile, mobileLibrary, Log, Text, oCore, Panel, GenericTile, nextUIUpdate) {
+	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/qunit/QUnitUtils",
+	"sap/ui/events/KeyCodes",
+	"sap/ui/core/theming/Parameters"
+], function(Localization, Element, jQuery, HeaderContainer, FlexBox, Label, VerticalLayout, Button, Device, Icon, coreLibrary, PseudoEvents, Mobile, mobileLibrary, Log, Text, oCore, Panel, GenericTile, nextUIUpdate, qutils, KeyCodes, Parameters) {
 	"use strict";
 
 	// shortcut for sap.m.BackgroundDesign
@@ -31,6 +34,23 @@ sap.ui.define([
 
 	// shortcut for sap.m.ScreenSizes
 	var ScreenSizes = mobileLibrary.ScreenSizes;
+
+	function remToPx(remValue) {
+		const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+		return parseFloat(remValue) * fontSize + "px";
+	}
+	function hexToRgb(hex) {
+		var result = /^#?([a-f\d]{1,2})([a-f\d]{1,2})([a-f\d]{1,2})$/i.exec(hex);
+		var clr = result ? {
+			r: parseInt(result[1].length === 1 ? result[1] + result[1] : result[1], 16),
+			g: parseInt(result[2].length === 1 ? result[2] + result[2] : result[2], 16),
+			b: parseInt(result[3].length === 1 ? result[3] + result[3] : result[3], 16)
+		} : null;
+		if (clr) {
+			return "rgb(" + clr.r + ", " + clr.g + ", " + clr.b + ")";
+		}
+		return hex;
+	}
 
 	Mobile.init();
 
@@ -613,6 +633,78 @@ sap.ui.define([
 			assert.equal(this.oHeaderContainer._oItemNavigation.getItemDomRefs()[0].style["border-color"], "transparent", "Headercontainer border is transparent.");
 		});
 
+		QUnit.module("HeaderContainer :focus-visible outline", {
+			beforeEach: async function () {
+				document.documentElement.classList.add("sap-desktop");
+				this.oHeaderContainer = new HeaderContainer({
+					content: [
+						new VerticalLayout(),
+						new VerticalLayout(),
+						new VerticalLayout()
+					]
+				});
+				this.oHeaderContainer.placeAt("qunit-fixture");
+				await nextUIUpdate();
+			},
+			afterEach: function () {
+				document.documentElement.classList.remove("sap-desktop");
+				this.oHeaderContainer.destroy();
+				this.oHeaderContainer = null;
+			}
+		});
+
+		QUnit.test("Checks Outline width, style, color and offset are correct", async function (assert) {
+			const oInnerDomRef = this.oHeaderContainer.$()
+				.find(".sapMHrdrCntrInner")[0];
+			assert.ok(oInnerDomRef, "Inner container exists");
+
+			// Helper to get Parameters asynchronously
+			function getParameterAsync(key, oElement) {
+				return new Promise((resolve) => {
+					const value = Parameters.get({
+						name: key,
+						scopeElement: oElement,
+						callback: resolve
+					});
+					if (value !== undefined) {
+						resolve(value);
+					}
+				});
+			}
+
+			// Trigger keyboard mode and focus the element
+			qutils.triggerKeydown(document, KeyCodes.TAB);
+			oInnerDomRef.focus();
+			await nextUIUpdate();
+
+			// Fetch all theme parameters asynchronously
+			const expectedWidth = remToPx(await getParameterAsync("sapContent_FocusWidth", oInnerDomRef));
+			const expectedStyle = await getParameterAsync("sapContent_FocusStyle", oInnerDomRef);
+			const expectedColor = hexToRgb(await getParameterAsync("sapContent_FocusColor", oInnerDomRef));
+
+			const computedStyle = window.getComputedStyle(oInnerDomRef);
+
+			assert.strictEqual(
+				computedStyle.outlineWidth,
+				expectedWidth,
+				`Outline width matches theme parameter (expected: ${expectedWidth}, actual: ${computedStyle.outlineWidth})`
+			);
+			assert.strictEqual(
+				computedStyle.outlineStyle,
+				expectedStyle,
+				`Outline style matches theme parameter (expected: ${expectedStyle}, actual: ${computedStyle.outlineStyle})`
+			);
+			assert.strictEqual(
+				computedStyle.outlineColor,
+				expectedColor,
+				`Outline color matches theme parameter (expected: ${expectedColor}, actual: ${computedStyle.outlineColor})`
+			);
+			assert.strictEqual(
+				computedStyle.outlineOffset,
+				"-2px",
+				`Outline offset is -2px (expected: -2px, actual: ${computedStyle.outlineOffset})`
+			);
+		});
 	} //End of Device.system.desktop
 
 	QUnit.module("Padding removed when scrolling to begin and end", {
