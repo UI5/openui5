@@ -204,13 +204,13 @@
 			<kbd>Alt + ArrowUp</kbd>
 			<kbd>Alt + ArrowDown</kbd>
 			<description>
-				<p>Opens the view management.</p>
+				<p>Opens the My Views dialog.</p>
 			</description> 
 		</interaction>
 		<interaction>
 			<kbd>PageUp</kbd>
 			<description>
-				<p>Closes the error popover of the view management</p>
+				<p>Closes the error popover of the My Views dialog</p>
 			</description>
 		</interaction>
 		<interaction>

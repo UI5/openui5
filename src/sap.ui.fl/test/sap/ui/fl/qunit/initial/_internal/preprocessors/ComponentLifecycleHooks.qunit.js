@@ -1138,7 +1138,7 @@ sap.ui.define([
 			assert.strictEqual(this.oFlexStateSpy.callCount, 1, "FlexState was initialized once");
 			assert.deepEqual(this.oFlexStateSpy.getCall(0).args[0], {
 				...this.oConfig,
-				rawManifest: oManifest,
+				manifest: oManifest,
 				componentId: "componentId",
 				reference: "sap.app.descriptor.test",
 				skipLoadBundle: true

@@ -6,8 +6,8 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
-	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/apply/_internal/flexState/compVariants/applyChangesOnVariant",
 	"sap/ui/fl/apply/_internal/flexState/compVariants/CompVariantManagementState",
 	"sap/ui/fl/write/_internal/flexState/compVariants/CompVariantManager",
@@ -25,8 +25,8 @@ sap.ui.define([
 	Lib,
 	FlexObjectFactory,
 	VariantManagementState,
+	Loader,
 	ManifestUtils,
-	FlexInfoSession,
 	applyChangesOnVariant,
 	CompVariantManagementState,
 	CompVariantManager,
@@ -111,13 +111,13 @@ sap.ui.define([
 		if (!mPropertyBag.control) {
 			return Promise.reject(new Error("No control was provided"));
 		}
-		var sReference = getFlexReferenceForControl(mPropertyBag.control);
+		const sReference = getFlexReferenceForControl(mPropertyBag.control);
 		mPropertyBag.reference = sReference;
-		var sLayer = mPropertyBag.layer;
+		const sLayer = mPropertyBag.layer;
 		if (_mInstances && _mInstances[sReference] && _mInstances[sReference][sLayer]) {
 			return Promise.resolve(_mInstances[sReference][sLayer]);
 		}
-		var bContextBasedAdaptationsEnabled;
+		let bContextBasedAdaptationsEnabled;
 		return FeaturesAPI.isContextBasedAdaptationAvailable(sLayer)
 		.then(function(bContextBasedAdaptationsEnabledResponse) {
 			bContextBasedAdaptationsEnabled = bContextBasedAdaptationsEnabledResponse;
@@ -125,13 +125,13 @@ sap.ui.define([
 		})
 		.then(function(oAdaptations) {
 			// Determine displayed adaptation
-			// Flex Info Session returns currently shown one based on Flex Data response
+			// Cached flex data information from Loader returns currently to be shown adaptation based on flex/data response
 			// If no longer available switch to highest ranked one
-			var oFlexInfoSession = FlexInfoSession.getByReference(mPropertyBag.reference);
-			var oDisplayedAdaptation = oAdaptations.adaptations[0];
-			if (oFlexInfoSession.adaptationId) {
+			const sAdaptationId = Loader.getCachedFlexData(mPropertyBag.reference).data?.changes?.info?.adaptationId;
+			let oDisplayedAdaptation = oAdaptations.adaptations[0];
+			if (sAdaptationId) {
 				oDisplayedAdaptation = oAdaptations.adaptations.find(function(oAdaptation) {
-					return oAdaptation.id === oFlexInfoSession.adaptationId;
+					return oAdaptation.id === sAdaptationId;
 				}) || oDisplayedAdaptation;
 			}
 

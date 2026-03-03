@@ -2,7 +2,7 @@
 	"@odata.context": "https://services.odata.org/TripPinRESTierService/(S(id))/$metadata#People(Age,FirstName,LastName,UserName,Friends,BestFriend,HomeAddress)",
 	"value": [
 		{
-			"Age": 23,
+			"Age": "23",
 			"FirstName": "Angel",
 			"LastName": "Huffman",
 			"UserName": "angelhuffman",
@@ -22,7 +22,7 @@
 			}
 		},
 		{
-			"Age": 44,
+			"Age": "44",
 			"FirstName": "Clyde",
 			"LastName": "Guess",
 			"UserName": "clydeguess",
@@ -42,7 +42,7 @@
 			}
 		},
 		{
-			"Age": 19,
+			"Age": "19",
 			"FirstName": "Elaine",
 			"LastName": "Stewart",
 			"UserName": "elainestewart",
@@ -62,7 +62,7 @@
 			}
 		},
 		{
-			"Age": 37,
+			"Age": "37",
 			"FirstName": "Genevieve",
 			"LastName": "Reeves",
 			"UserName": "genevievereeves",
@@ -82,7 +82,7 @@
 			}
 		},
 		{
-			"Age": 25,
+			"Age": "25",
 			"FirstName": "Georgina",
 			"LastName": "Barlow",
 			"UserName": "georginabarlow",
@@ -101,7 +101,7 @@
 			}
 		},
 		{
-			"Age": 19,
+			"Age": "19",
 			"FirstName": "Javier",
 			"LastName": "Alfred",
 			"UserName": "javieralfred",
@@ -120,7 +120,7 @@
 			}
 		},
 		{
-			"Age": 26,
+			"Age": "26",
 			"FirstName": "Joni",
 			"LastName": "Rosales",
 			"UserName": "jonirosales",
@@ -140,7 +140,7 @@
 			}
 		},
 		{
-			"Age": 41,
+			"Age": "41",
 			"FirstName": "Keith",
 			"LastName": "Pinckney",
 			"UserName": "keithpinckney",
@@ -160,7 +160,7 @@
 			}
 		},
 		{
-			"Age": 30,
+			"Age": "30",
 			"FirstName": "Krista",
 			"LastName": "Kemp",
 			"UserName": "kristakemp",
@@ -180,7 +180,7 @@
 			}
 		},
 		{
-			"Age": 29,
+			"Age": "29",
 			"FirstName": "Laurel",
 			"LastName": "Osborn",
 			"UserName": "laurelosborn",
@@ -200,7 +200,7 @@
 			}
 		},
 		{
-			"Age": 53,
+			"Age": "53",
 			"FirstName": "Marshall",
 			"LastName": "Garay",
 			"UserName": "marshallgaray",
@@ -219,7 +219,7 @@
 			}
 		},
 		{
-			"Age": 66,
+			"Age": "66",
 			"FirstName": "Ronald",
 			"LastName": "Mundy",
 			"UserName": "ronaldmundy",
@@ -238,7 +238,7 @@
 			}
 		},
 		{
-			"Age": 51,
+			"Age": "51",
 			"FirstName": "Russell",
 			"LastName": "Whyte",
 			"UserName": "russellwhyte",
@@ -258,7 +258,7 @@
 			}
 		},
 		{
-			"Age": 57,
+			"Age": "57",
 			"FirstName": "Ryan",
 			"LastName": "Theriault",
 			"UserName": "ryantheriault",
@@ -278,7 +278,7 @@
 			}
 		},
 		{
-			"Age": 34,
+			"Age": "34",
 			"FirstName": "Sallie",
 			"LastName": "Sampson",
 			"UserName": "salliesampson",
@@ -298,7 +298,7 @@
 			}
 		},
 		{
-			"Age": 18,
+			"Age": "18",
 			"FirstName": "Sandy",
 			"LastName": "Osborn",
 			"UserName": "sandyosborn",
@@ -318,7 +318,7 @@
 			}
 		},
 		{
-			"Age": 24,
+			"Age": "24",
 			"FirstName": "Scott",
 			"LastName": "Ketchum",
 			"UserName": "scottketchum",
@@ -337,7 +337,7 @@
 			}
 		},
 		{
-			"Age": 31,
+			"Age": "31",
 			"FirstName": "Ursula",
 			"LastName": "Bright",
 			"UserName": "ursulabright",
@@ -356,7 +356,7 @@
 			}
 		},
 		{
-			"Age": 40,
+			"Age": "40",
 			"FirstName": "Vincent",
 			"LastName": "Calabrese",
 			"UserName": "vincentcalabrese",
@@ -376,7 +376,7 @@
 			}
 		},
 		{
-			"Age": 45,
+			"Age": "45",
 			"FirstName": "Willie",
 			"LastName": "Ashmore",
 			"UserName": "willieashmore",

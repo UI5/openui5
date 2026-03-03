@@ -46,7 +46,7 @@ sap.ui.define([
 		onCreate : function (_oEvent, bAtEnd, bInactive) {
 			const oListBinding = this.byId("table").getBinding("rows");
 			oListBinding.create({
-				CurrencyCode_code : "USD",
+				CurrencyCode_code : "USD", // needed by ABAP
 				FlightPrice : "" + oListBinding.getLength() // Edm.Decimal
 			}, /*bSkipRefresh*/true, bAtEnd, bInactive);
 		},

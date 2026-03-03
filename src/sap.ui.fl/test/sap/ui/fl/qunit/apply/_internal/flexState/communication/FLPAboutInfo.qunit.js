@@ -4,7 +4,7 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/flexState/communication/FLPAboutInfo",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/initial/_internal/FlexInfoSession",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4",
@@ -13,7 +13,7 @@ sap.ui.define([
 	Lib,
 	FLPAboutInfo,
 	FlexState,
-	FlexInfoSession,
+	Loader,
 	ManifestUtils,
 	FlexUtils,
 	sinon,
@@ -75,13 +75,16 @@ sap.ui.define([
 	 * @param {boolean} oTestSetup.isUI5Application - Indicates if it is a UI5 application.
 	 */
 	function setIsContextBasedAdaptationEnabledSettingsStub(oTestSetup) {
-		FlexInfoSession.setByReference(
-			{
-				adaptationId: oTestSetup.adaptationId,
-				adaptationTitle: sAdaptationTitle
-			},
-			sReference
-		);
+		sandbox.stub(Loader, "getFlexData").returns({
+			data: {
+				changes: {
+					info: {
+						adaptationId: oTestSetup.adaptationId,
+						adaptationTitle: sAdaptationTitle
+					}
+				}
+			}
+		});
 	}
 
 	/**
@@ -182,7 +185,6 @@ sap.ui.define([
 			sandbox.stub(ManifestUtils, "getFlexReference").returns(sReference);
 		},
 		afterEach() {
-			FlexInfoSession.removeByReference(sReference);
 			sandbox.restore();
 		}
 	}, function() {

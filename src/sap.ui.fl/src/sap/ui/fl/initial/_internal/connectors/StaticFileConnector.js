@@ -3,7 +3,6 @@
  */
 
 sap.ui.define([
-	"sap/base/strings/hash",
 	"sap/base/util/LoaderExtensions",
 	"sap/base/util/merge",
 	"sap/base/util/ObjectPath",
@@ -14,7 +13,6 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/interfaces/BaseLoadConnector"
 ], function(
-	hash,
 	LoaderExtensions,
 	merge,
 	ObjectPath,
@@ -27,9 +25,9 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	function getBundle(sReference, sBundleName) {
+	function getBundle(sReference, bLegacyBundleHandling, sBundleName) {
 		var sBundleResourcePath = `${sReference.replace(/\./g, "/")}/changes/${sBundleName}.json`;
-		var bBundleLoaded = !!sap.ui.loader._.getModuleState(sBundleResourcePath);
+		const bBundleLoaded = !bLegacyBundleHandling || !!sap.ui.loader._.getModuleState(sBundleResourcePath);
 		// the bundle is usually part of the component-preload
 		// if the preload is suppressed, we send a potentially failing request
 		if (bBundleLoaded || Supportability.isDebugModeEnabled() || Component.getComponentPreloadMode() === "off") {
@@ -43,6 +41,7 @@ sap.ui.define([
 				Log.warning(`flexibility did not find a ${sBundleName}.json for the application: ${sReference}`);
 			}
 		}
+		return undefined;
 	}
 
 	/**
@@ -63,24 +62,24 @@ sap.ui.define([
 		 * @param {string} [mPropertyBag.componentName] Component name of the current application which may differ in case of an app variant
 		 * @returns {Promise<Object>} Resolving with an object containing a data contained in the bundle
 		 */
-		loadFlexData(mPropertyBag) {
+		async loadFlexData(mPropertyBag) {
 			// fallback in case the loadFlexData was called without passing the component name
 			const sComponentName = mPropertyBag.componentName || mPropertyBag.reference.replace(/.Component/g, "");
 
 			let oFlexData;
-			const oFlexBundle = getBundle(sComponentName, "flexibility-bundle");
+			const oFlexBundle = await getBundle(sComponentName, mPropertyBag.legacyBundleHandling, "flexibility-bundle");
 			if (oFlexBundle) {
 				// TODO: remove as soon as the client also does the separation of compVariants and changes
 				oFlexBundle.changes = oFlexBundle.changes.concat(oFlexBundle.compVariants);
 				delete oFlexBundle.compVariants;
 				oFlexData = oFlexBundle;
-			}
-
-			const oChangesBundle = getBundle(sComponentName, "changes-bundle");
-			if (oChangesBundle) {
-				oFlexData = {
-					changes: oChangesBundle
-				};
+			} else {
+				const oChangesBundle = getBundle(sComponentName, true, "changes-bundle");
+				if (oChangesBundle) {
+					oFlexData = {
+						changes: oChangesBundle
+					};
+				}
 			}
 
 			if (StorageUtils.isStorageResponseFilled(oFlexData)) {

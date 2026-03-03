@@ -75,13 +75,13 @@ sap.ui.define([
 				 *
 				 * Will be shown as a relative time like "5 minutes ago".
 				 *
-				 * @experimental Since 1.89 this feature is experimental and the API may change.
+				 * @ui5-experimental-since 1.89
 				 */
 				dataTimestamp: { type: "string", defaultValue: ""},
 
 				/**
 				 * Defines the status text visibility.
-				 * @experimental Since 1.116 this feature is experimental and the API may change.
+				 * @ui5-experimental-since 1.116
 				 */
 				statusVisible: { type: "boolean", defaultValue: true },
 
@@ -115,8 +115,7 @@ sap.ui.define([
 
 				/**
 				 * Defines the type of text wrapping to be used inside the header. This applies to title, subtitle and details texts of the header.
-				 * @public
-				 * @experimental Since 1.122 this feature is experimental and the API may change.
+				 * @ui5-experimental-since 1.122
 				 */
 				wrappingType : {type: "sap.m.WrappingType", group : "Appearance", defaultValue : WrappingType.Normal},
 
@@ -129,14 +128,16 @@ sap.ui.define([
 				/**
 				 * Defines the href which the header should open. If set - the header will act and render as a link.
 				 *
-				 * @experimental Since 1.122. Do not use this feature outside of sap.ui.integration.widgets.Card.
+				 * @ui5-experimental-since 1.122
+				 * @ui5-restricted sap.ui.integration.widgets.Card
 				 */
 				href: { type: "string" },
 
 				/**
 				 * Defines the target for the case when <code>href</code> is given.
 				 *
-				 * @experimental Since 1.122. Do not use this feature outside of sap.ui.integration.widgets.Card.
+				 * @ui5-experimental-since 1.122
+				 * @ui5-restricted sap.ui.integration.widgets.Card
 				 */
 				target: { type: "string" }
 			},
@@ -144,8 +145,7 @@ sap.ui.define([
 
 				/**
 				 * Info sections to be displayed in the header.
-				 * @experimental Since 1.136
-				 * @since 1.136
+				 * @ui5-experimental-since 1.136
 				 */
 				infoSection: {type: "sap.ui.core.Control", multiple: true, singularName: "infoSection"},
 
@@ -156,8 +156,7 @@ sap.ui.define([
 
 				/**
 				 * Defines the toolbar.
-				 * @experimental Since 1.86
-				 * @since 1.86
+				 * @ui5-experimental-since 1.86
 				 */
 				toolbar: { type: "sap.ui.core.Control", multiple: false },
 
@@ -168,8 +167,8 @@ sap.ui.define([
 
 				/**
 				 * Show as a banner in the header area. Use for example for system info and application shortcut.
-				 * @experimental Since 1.118. For usage only by Work Zone.
-				 * @since 1.118
+				 * @ui5-experimental-since 1.118
+				 * @ui5-restricted Work Zone
 				 */
 				bannerLines: { type: "sap.m.Text", group: "Appearance", multiple: true  }
 			},

@@ -32,6 +32,15 @@ sap.ui.define([
 					});
 				},
 
+				iPressOnRefresh : function () {
+					return this.waitFor({
+						id : "refreshUsersButton",
+						viewName : sViewName,
+						actions : new Press(),
+						errorMessage : "Could not find the 'Refresh' button"
+					});
+				},
+
 				iPressOnSort : function () {
 					return this.waitFor({
 						id : "sortUsersButton",
@@ -229,7 +238,22 @@ sap.ui.define([
 						success : function () {
 							Opa5.assert.ok(true, "The table is sorted correctly");
 						},
-						errorMessage : "Table not found or it is not sorted correctl."
+						errorMessage : "Table not found or it is not sorted correctly."
+					});
+				},
+
+				theTableShouldEndWith : function (sLastName) {
+					return this.waitFor({
+						id : sTableId,
+						viewName : sViewName,
+						matchers : function (oTable) {
+							return getListBinding(oTable).getCurrentContexts().pop()
+								?.getProperty("LastName") === sLastName;
+						},
+						success : function () {
+							Opa5.assert.ok(true, "The table ends with " + sLastName);
+						},
+						errorMessage : "Table not found or it is not sorted correctly."
 					});
 				},
 

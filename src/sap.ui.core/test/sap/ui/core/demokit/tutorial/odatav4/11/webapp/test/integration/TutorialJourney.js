@@ -10,44 +10,34 @@ sap.ui.define([
 	QUnit.module("Posts");
 
 	opaTest("Should see the paginated table with all users", function (Given, _When, Then) {
-		// Arrangements
 		Given.iStartMyApp();
-		// Assertions
 		Then.onTheTutorialPage.theTableShouldHavePagination()
 			.and.theTableShouldShowUsers(iGrowingBy)
 			.and.theTableShouldShowTotalUsers(iTotalUsers);
 	});
 
 	opaTest("Should be able to load more users", function (_Given, When, Then) {
-		//Actions
 		When.onTheTutorialPage.iPressOnMoreData();
-		// Assertions
 		Then.onTheTutorialPage.theTableShouldShowUsers(iGrowingBy * 2);
 	});
 
 	opaTest("Should be able to sort users", function (_Given, When, Then) {
-		//Actions
 		When.onTheTutorialPage.iPressOnSort();
-		// Assertions
 		Then.onTheTutorialPage.theTableShouldStartWith("Alfred");
 	});
 
 	opaTest("Should be able to start adding users", function (_Given, When, Then) {
-		//Actions
 		When.onTheTutorialPage.iPressOnAdd()
 			.and.iEnterSomeData("a");
 		When.onTheTutorialPage.iPressOnAdd()
 			.and.iEnterSomeData("b");
-		// Assertions
 		Then.onTheTutorialPage.thePageFooterShouldBeVisible(true)
 			.and.theTableToolbarItemsShouldBeEnabled(false)
 			.and.theTableShouldShowTotalUsers(iTotalUsers + 2);
 	});
 
 	opaTest("Should be able to save the new users", function (_Given, When, Then) {
-		//Actions
 		When.onTheTutorialPage.iPressOnSave();
-		// Assertions
 		Then.onTheTutorialPage.theTableShouldStartWith("b")
 			.and.theTableShouldShowTotalUsers(iTotalUsers + 2)
 			.and.theTableToolbarItemsShouldBeEnabled(true)
@@ -82,25 +72,19 @@ sap.ui.define([
 	});
 
 	opaTest("Should be able to search for users", function (_Given, When, Then) {
-		//Actions
 		When.onTheTutorialPage.iSearchFor("Mundy");
-		// Assertions
 		Then.onTheTutorialPage.theTableShouldShowUsers(1);
 	});
 
 	opaTest("Should be able to reset the search", function (_Given, When, Then) {
-		//Actions
 		When.onTheTutorialPage.iSearchFor("");
-		// Assertions
 		Then.onTheTutorialPage.theTableShouldShowUsers(10);
 	});
 
 	opaTest("Should see an error when trying to change a user name to an existing one",
 		function (_Given, When, Then) {
-			//Actions
 			When.onTheTutorialPage.iChangeAUserKey("javieralfred", "willieashmore")
 				.and.iPressOnSave();
-			// Assertions
 			Then.onTheTutorialPage.iShouldSeeAServiceError()
 				.and.theTableToolbarItemsShouldBeEnabled(false)
 				.and.thePageFooterShouldBeVisible(true);
@@ -109,34 +93,26 @@ sap.ui.define([
 
 	opaTest("Should be able to close the error and cancel the change",
 		function (_Given, When, Then) {
-			//Actions
 			When.onTheTutorialPage.iCloseTheServiceError()
 				.and.iPressOnCancel();
-			// Assertions
 			Then.onTheTutorialPage.theTableToolbarItemsShouldBeEnabled(true)
 				.and.thePageFooterShouldBeVisible(false);
 		}
 	);
 
 	opaTest("Should be able to see the detail area", function (_Given, When, Then) {
-		//Actions
 		When.onTheTutorialPage.iSelectUser("javieralfred").and.iPressUser();
-		//Assertions
 		Then.onTheTutorialPage.theDetailAreaShouldBeVisible(true);
 	});
 
 	opaTest("Should be able to toggle detail area when user is deleted/undeleted",
 		function (_Given, When, Then) {
-			//Actions
 			When.onTheTutorialPage.iSelectUser("javieralfred")
 				.and.iPressUser()
 				.and.iPressOnDelete();
-			//Assertion
 			Then.onTheTutorialPage.theDetailAreaShouldBeVisible(false)
-				.and.theTableShouldShowUsers(iGrowingBy - 1);
-			//Action
+				.and.theTableShouldShowUsers(iGrowingBy);
 			When.onTheTutorialPage.iPressOnCancel();
-			//Assertion
 			Then.onTheTutorialPage.theDetailAreaShouldBeVisible(true)
 				.and.theMessageToastShouldShow("deletionRestoredMessage", "javieralfred")
 				.and.theTableShouldShowUsers(iGrowingBy);
@@ -144,4 +120,50 @@ sap.ui.define([
 			Then.iTeardownMyApp();
 		}
 	);
+
+	opaTest("Select a user, refresh the list, and delete the user", function (Given, When, Then) {
+		Given.iStartMyApp();
+		Then.onTheTutorialPage.theTableShouldHavePagination()
+			.and.theTableShouldShowUsers(iGrowingBy)
+			.and.theTableShouldShowTotalUsers(iTotalUsers)
+			.and.theTableShouldStartWith("Huffman")
+			.and.theTableShouldEndWith("Osborn");
+		When.onTheTutorialPage.iSelectUser("angelhuffman")
+			.and.iPressOnRefresh();
+		When.onTheTutorialPage.iPressOnDelete();
+		Then.onTheTutorialPage.theTableShouldShowUsers(iGrowingBy)
+			.and.theTableShouldShowTotalUsers(iTotalUsers - 1)
+			.and.theTableShouldStartWith("Guess")
+			.and.theTableShouldEndWith("Garay");
+		Then.iTeardownMyApp();
+	});
+
+	opaTest("Search, create, save and press more", function (Given, When, Then) {
+		Given.iStartMyApp();
+		Then.onTheTutorialPage.theTableShouldHavePagination()
+			.and.theTableShouldShowUsers(iGrowingBy)
+			.and.theTableShouldShowTotalUsers(iTotalUsers)
+			.and.theTableShouldStartWith("Huffman")
+			.and.theTableShouldEndWith("Osborn");
+		When.onTheTutorialPage.iSearchFor("e");
+		Then.onTheTutorialPage.theTableShouldShowUsers(10)
+			.and.theTableShouldShowTotalUsers(12)
+			.and.theTableShouldStartWith("Guess")
+			.and.theTableShouldEndWith("Ketchum");
+		When.onTheTutorialPage.iPressOnAdd()
+			.and.iEnterSomeData("a");
+		When.onTheTutorialPage.iPressOnAdd()
+			.and.iEnterSomeData("b");
+		When.onTheTutorialPage.iPressOnSave();
+		Then.onTheTutorialPage.theTableShouldShowUsers(iGrowingBy)
+			.and.theTableShouldShowTotalUsers(14)
+			.and.theTableShouldStartWith("b")
+			.and.theTableShouldEndWith("Whyte");
+		When.onTheTutorialPage.iPressOnMoreData();
+		Then.onTheTutorialPage.theTableShouldShowUsers(14)
+			.and.theTableShouldShowTotalUsers(14)
+			.and.theTableShouldStartWith("b")
+			.and.theTableShouldEndWith("Ashmore");
+		Then.iTeardownMyApp();
+	});
 });

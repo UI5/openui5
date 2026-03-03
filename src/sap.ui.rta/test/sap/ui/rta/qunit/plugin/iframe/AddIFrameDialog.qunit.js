@@ -73,7 +73,8 @@ sap.ui.define([
 		Month: "July",
 		ProductCategory: "Ice Cream",
 		CampaignName: "Langnese Brand",
-		BrandName: "Langnese"
+		BrandName: "Langnese",
+		"@odata.context": "metadataIceCream"
 	};
 	const oDefaultModel = new JSONModel(oDefaultModelData);
 	const oReferenceControl = new Button();
@@ -354,6 +355,27 @@ sap.ui.define([
 			return this.oAddIFrameDialog.open(this.oDialogSettings, oReferenceControl);
 		});
 
+		QUnit.test("When a parameter starting with '@' is added then the frame URL uses expression binding syntax", function(assert) {
+			this.oAddIFrameDialog.attachOpened(async () => {
+				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "https://myhappyurl/");
+
+				const sUrl = this.oAddIFrameDialog._oController._addURLParameter({ key: "{@odata.context}" });
+				this.oAddIFrameDialog._oJSONModel.setProperty("/frameUrl/value", sUrl);
+				assert.strictEqual(sUrl, "https://myhappyurl/{=%{@odata.context}}", "URL parameter uses expression binding syntax");
+
+				const oPreviewLink = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewLink");
+				await this.oAddIFrameDialog._oController.onPreviewPress();
+				assert.strictEqual(
+					oPreviewLink.getText(),
+					"https://myhappyurl/metadataIceCream",
+					"Resolved URL contains @odata.context value"
+				);
+
+				clickOnCancel();
+			});
+			return this.oAddIFrameDialog.open(this.oDialogSettings, oReferenceControl);
+		});
+
 		QUnit.test("When a parameter is added while there is a text selection in the edit field", function(assert) {
 			this.oAddIFrameDialog.attachOpened(async () => {
 				const oUrlTextArea = Element.getElementById("sapUiRtaAddIFrameDialog_EditUrlTA");
@@ -413,7 +435,7 @@ sap.ui.define([
 				);
 				assert.strictEqual(
 					sUrl,
-					"someUrlguid13423412342314Germany2020JulyIce CreamLangnese BrandLangnese",
+					"someUrlguid13423412342314Germany2020JulyIce CreamLangnese BrandLangnesemetadataIceCream",
 					"Preview URL is correct"
 				);
 				clickOnCancel();

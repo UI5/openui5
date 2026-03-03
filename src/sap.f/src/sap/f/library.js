@@ -497,9 +497,8 @@ sap.ui.define([
 	 * Different options for the semantic role in controls that implement the {@link sap.f.ICard} interface.
 	 *
 	 * @enum {string}
-	 * @experimental
+	 * @ui5-experimental-since 1.131
 	 * @public
-	 * @since 1.131
 	 */
 	 thisLib.cards.SemanticRole = {
 		/**

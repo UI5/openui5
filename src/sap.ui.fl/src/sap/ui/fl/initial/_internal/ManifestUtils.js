@@ -138,6 +138,16 @@ function(
 			return oManifest.getEntry ? oManifest.getEntry("sap.ovp") : oManifest["sap.ovp"];
 		},
 
+		/**
+		 * Returns the flex bundle entry from the manifest.
+		 *
+		 * @param {object|sap.ui.core.Manifest} oManifest - Manifest of the component
+		 * @returns {object} Flex bundle entry if available, otherwise undefined
+		 */
+		getFlexBundleEntry(oManifest) {
+			return oManifest.getEntry ? oManifest.getEntry("sap.ui5")?.flexBundle : oManifest["sap.ui5"]?.flexBundle;
+		},
+
 		getCacheKeyFromAsyncHints(sReference, oAsyncHints) {
 			const oFlAsyncHint = getFlAsyncHintRequest(oAsyncHints, sReference);
 			if (oFlAsyncHint) {

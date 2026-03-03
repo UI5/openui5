@@ -57,7 +57,7 @@ sap.ui.define([
 	 * 			version: <version>,
 	 * 			allContextsProvided: <boolean>,
 	 * 			adaptationId: <adaptationId>,
-	 * 			bundleNotLoaded: <boolean>,
+	 * 			bundleStillNeedsToBeLoaded: <boolean>,
 	 * 			// unique key per loader initialization. This is needed because the Loader has multiple consumers
 	 * 			// and each consumer needs to be able to identify changes in the loader data independently
 	 * 			loaderCacheKey: <uid()>
@@ -221,6 +221,14 @@ sap.ui.define([
 			FlexInfoSession.removeByReference(sReference);
 			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
 		}
+
+		// Projects that are built with a ui5/builder version of 4.1.1 or higher will have the flag "sap.ui5/flexBundle" in their manifest.
+		// This flag will always be set, either true if there is a bundle, of false if there is no bundle.
+		// Projects without this flag will be considered as legacy with regards to bundle handling.
+		// If the flag is set to true, the bundle can be loaded on demand, and does not have to be taken from the component preload.
+		const bFlexBundleAvailable = ManifestUtils.getFlexBundleEntry(mPropertyBag.manifest);
+		const bLegacyBundleHandling = bFlexBundleAvailable === undefined;
+
 		// the FlexInfoSession is used to adjust the parameters of the request
 		const sVersion = oFlexInfoSession.version;
 		const sAdaptationId = oFlexInfoSession.displayedAdaptationId;
@@ -236,13 +244,8 @@ sap.ui.define([
 		const bRequiresOnlyCompletion =
 			_mCachedFlexData[sReference]
 			&& !_mCachedFlexData[sReference].parameters.emptyState
-			&& _mCachedFlexData[sReference].parameters.bundleNotLoaded
+			&& _mCachedFlexData[sReference].parameters.bundleStillNeedsToBeLoaded
 			&& !mPropertyBag.skipLoadBundle;
-
-		if (!bRequiresNewLoadRequest && !bRequiresOnlyCompletion) {
-			oNewInitPromise.resolve();
-			return _mCachedFlexData[sReference];
-		}
 
 		let oFlexData;
 		let oAuthors;
@@ -268,18 +271,23 @@ sap.ui.define([
 				appDescriptor: mPropertyBag.manifest.getRawJson ? mPropertyBag.manifest.getRawJson() : mPropertyBag.manifest,
 				version: sVersion,
 				adaptationId: sAdaptationId,
-				skipLoadBundle: mPropertyBag.skipLoadBundle
+				skipLoadBundle: bLegacyBundleHandling ? mPropertyBag.skipLoadBundle : !bFlexBundleAvailable,
+				legacyBundleHandling: bLegacyBundleHandling
 			});
 			const oSettings = await Settings.getInstance();
 			oAuthors = oSettings.getIsVariantAuthorNameAvailable() ? await Storage.loadVariantsAuthors(sReference) : {};
-		} else {
+		} else if (bRequiresOnlyCompletion) {
 			bPreviouslyFilledData = _mCachedFlexData[sReference].parameters.previouslyFilledData;
 			oFlexData = await Storage.completeFlexData({
 				reference: sReference,
 				componentName: sComponentName,
+				legacyBundleHandling: bLegacyBundleHandling,
 				partialFlexData: _mCachedFlexData[sReference].data.changes
 			});
 			oAuthors = _mCachedFlexData[sReference].data.authors;
+		} else {
+			oNewInitPromise.resolve();
+			return _mCachedFlexData[sReference];
 		}
 
 		// The next line is used by the Flex Support Tool to set breakpoints - please adjust the tool if you change it!
@@ -295,7 +303,7 @@ sap.ui.define([
 
 		// We need to synch. the information from the flex/data response with the FlexInfoSession and the Loader cache at this point.
 		// This is necessary because when we call clear the FlexInfoSession with needToDeleteFlexInfoSession at the beginning,
-		// parameters like version or allContextsProvided might be stale and lead to unecessary second flex/data requests,
+		// parameters like version or allContextsProvided might be stale and lead to unnecessary second flex/data requests,
 		// due to out-of sync information in the cache and the FlexInfoSession.
 		if (oFormattedFlexData.changes.info !== undefined) {
 			oFlexInfoSession = { ...oFlexInfoSession, ...oFormattedFlexData.changes.info };
@@ -304,7 +312,7 @@ sap.ui.define([
 		_mCachedFlexData[sReference] = {
 			data: oFormattedFlexData,
 			parameters: {
-				bundleNotLoaded: !!mPropertyBag.skipLoadBundle,
+				bundleStillNeedsToBeLoaded: bLegacyBundleHandling ? !!mPropertyBag.skipLoadBundle : false,
 				version: oFlexInfoSession.version,
 				allContextsProvided: oFlexInfoSession.allContextsProvided,
 				adaptationId: oFlexInfoSession.displayedAdaptationId,
@@ -329,7 +337,7 @@ sap.ui.define([
 		_mCachedFlexData[sReference] = {
 			data: oInitialFlexData,
 			parameters: {
-				bundleNotLoaded: true,
+				bundleStillNeedsToBeLoaded: true,
 				emptyState: true,
 				loaderCacheKey: uid()
 			}

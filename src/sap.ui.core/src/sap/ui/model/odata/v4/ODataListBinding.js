@@ -966,9 +966,9 @@ sap.ui.define([
 	 *   <ul>
 	 *     <li> the binding's root binding is suspended,
 	 *     <li> a relative binding is unresolved,
-	 *     <li> data aggregation is used with <code>groupLevels</code>, with
-	 *       <code>"grandTotal like 1.84"</code>, or when aggregated data instead of a single entity
-	 *       instance is about to be created,
+	 *     <li> data aggregation is used with <code>groupLevels</code> or with
+	 *       <code>"grandTotal like 1.84"</code>,
+	 *     <li> aggregated data instead of a single entity instance is about to be created,
 	 *     <li> entities are created first at the end and then at the start,
 	 *     <li> <code>bAtEnd</code> is <code>true</code> and the binding does not know the final
 	 *       length,

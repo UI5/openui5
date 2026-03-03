@@ -14,8 +14,9 @@ sap.ui.define([
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/Util",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
-	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/api/Version",
+	"sap/ui/fl/initial/_internal/FlexInfoSession",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/ui/fl/write/api/ControlPersonalizationWriteAPI",
@@ -49,8 +50,9 @@ sap.ui.define([
 	DesignTime,
 	DtUtil,
 	FlexRuntimeInfoAPI,
-	FlexInfoSession,
 	Version,
+	FlexInfoSession,
+	Loader,
 	ChangesWriteAPI,
 	ContextBasedAdaptationsAPI,
 	ControlPersonalizationWriteAPI,
@@ -774,8 +776,15 @@ sap.ui.define([
 
 		QUnit.test("when RTA is started a 2nd time, context based adaptation feature is available and data has changed on the backend and another adaptation has been shown by end user", async function(assert) {
 			stubCBA.call(this);
-
-			FlexInfoSession.setByReference({ adaptationId: "67890" }, sReference);
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				data: {
+					changes: {
+						info: {
+							adaptationId: "67890"
+						}
+					}
+				}
+			});
 			await ContextBasedAdaptationsAPI.initialize({ control: oComp, layer: "CUSTOMER" });
 			this.oContextBasedAdaptationsAPILoadStub.resolves({ adaptations: [{ id: "12345" }, { id: "67890" }, DEFAULT_ADAPTATION] });
 
@@ -787,8 +796,15 @@ sap.ui.define([
 
 		QUnit.test("when RTA is doing a restart during switch, context based adaptation feature is available", async function(assert) {
 			stubCBA.call(this);
-
-			FlexInfoSession.setByReference({ adaptationId: "67890" }, sReference);
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				data: {
+					changes: {
+						info: {
+							adaptationId: "67890"
+						}
+					}
+				}
+			});
 			await ContextBasedAdaptationsAPI.initialize({ control: oComp, layer: "CUSTOMER" });
 			this.oContextBasedAdaptationsAPILoadStub.resolves({ adaptations: [{ id: "12345" }, { id: "67890" }, DEFAULT_ADAPTATION] });
 			sandbox.stub(ReloadManager, "needsAutomaticStart").resolves(true);

@@ -373,7 +373,7 @@ sap.ui.define([
 		if (isInitializeRelevant(oFlexData)) {
 			await checkForChangesAndInitializeFlexState({
 				...oConfig,
-				rawManifest: oManifest,
+				manifest: oManifest,
 				componentId: oConfig.id,
 				reference: sReference,
 				skipLoadBundle: true
