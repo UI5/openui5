@@ -3,8 +3,8 @@
  */
 /*eslint-disable max-len */
 // Provides an abstraction for tree bindings
-sap.ui.define(['./Binding', './Filter', './Sorter'],
-	function(Binding, Filter, Sorter) {
+sap.ui.define(['./AggregationBinding', './Binding', './Filter', './Sorter'],
+	function(asAggregationBinding, Binding, Filter, Sorter) {
 		"use strict";
 
 
@@ -38,11 +38,15 @@ sap.ui.define(['./Binding', './Filter', './Sorter'],
 		 * @public
 		 * @alias sap.ui.model.TreeBinding
 		 * @extends sap.ui.model.Binding
+		 * @mixes sap.ui.model.AggregationBinding
+		 * @borrows sap.ui.model.AggregationBinding#computeApplicationFilters as #computeApplicationFilters
 		 */
 		var TreeBinding = Binding.extend("sap.ui.model.TreeBinding", /** @lends sap.ui.model.TreeBinding.prototype */ {
 
 			constructor : function(oModel, sPath, oContext, aFilters, mParameters, aSorters){
 				Binding.call(this, oModel, sPath, oContext, mParameters);
+				asAggregationBinding.call(this); // initialize mixin members
+
 				this.aFilters = [];
 
 				this.aSorters = makeArray(aSorters, Sorter);
@@ -58,6 +62,8 @@ sap.ui.define(['./Binding', './Filter', './Sorter'],
 			}
 
 		});
+
+		asAggregationBinding(TreeBinding.prototype); // add mixin methods
 
 		function makeArray(a, FNClass) {
 			if ( Array.isArray(a) ) {

@@ -103,14 +103,6 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("ManagedObjectBindingSupport#_processFilters: tree binding", function (assert) {
-		const oBindingInfo = {filters: "~filters~", boundFilters: "~boundFilters~"};
-
-		// code under test
-		assert.strictEqual(ManagedObjectBindingSupport._processFilters(oBindingInfo, () => "unused", true), "~filters~");
-	});
-
-	//*********************************************************************************************
 [{
 	boundFilters: "~boundFilter~", result: ["~boundFilter~"]
 }, {
@@ -269,23 +261,22 @@ sap.ui.define([
 
 		this.mock(oManagedObject).expects("isTreeBinding").withExactArgs("items").returns(bIsTreeBinding);
 		const oProcessFiltersCall = this.mock(oManagedObject).expects("_processFilters")
-			.withExactArgs(sinon.match.same(oBindingInfo), sinon.match.func, bIsTreeBinding).returns("~aFilters~");
+			.withExactArgs(sinon.match.same(oBindingInfo), sinon.match.func).returns("~aFilters~");
 
 		this.mock(oManagedObject).expects("getModel").withExactArgs("model").returns(oModel);
 		this.mock(oManagedObject).expects("getBindingContext").withExactArgs("model").returns("~context~");
-		if (bIsTreeBinding) {
-			this.mock(oModel).expects("bindTree")
-				.withExactArgs("path", "~context~", "~aFilters~", "~parameters~", "~sorter~")
-				.returns(oBinding);
-		} else {
-			this.mock(oModel).expects("bindList")
-				.withExactArgs("path", "~context~", "~sorter~", "~aFilters~", "~parameters~")
-				.returns(oBinding);
-			this.mock(oManagedObject.computeApplicationFilters)
-				.expects("bind")
-				.withExactArgs(sinon.match.same(oManagedObject), sinon.match.same(oBinding))
-				.returns("~fnComputeAF~");
-		}
+		this.mock(oModel).expects("bindTree")
+			.exactly(bIsTreeBinding ? 1 : 0)
+			.withExactArgs("path", "~context~", "~aFilters~", "~parameters~", "~sorter~")
+			.returns(oBinding);
+		this.mock(oModel).expects("bindList")
+			.exactly(bIsTreeBinding ? 0 : 1)
+			.withExactArgs("path", "~context~", "~sorter~", "~aFilters~", "~parameters~")
+			.returns(oBinding);
+		this.mock(oManagedObject.computeApplicationFilters)
+			.expects("bind")
+			.withExactArgs(sinon.match.same(oManagedObject), sinon.match.same(oBinding))
+			.returns("~fnComputeAF~");
 		this.mock(oBinding).expects("attachChange").withExactArgs(sinon.match.func);
 		this.mock(oBinding).expects("attachRefresh").withExactArgs(sinon.match.func);
 		this.mock(oBinding).expects("attachEvents").withExactArgs("~events~");
@@ -294,7 +285,7 @@ sap.ui.define([
 		// code under test
 		oManagedObject._bindAggregation("items", oBindingInfo);
 
-		assert.strictEqual(oBinding.computeApplicationFilters, bIsTreeBinding ? undefined : "~fnComputeAF~");
+		assert.strictEqual(oBinding.computeApplicationFilters, "~fnComputeAF~");
 
 		const fnGetBinding = oProcessFiltersCall.getCall(0).args[1];
 

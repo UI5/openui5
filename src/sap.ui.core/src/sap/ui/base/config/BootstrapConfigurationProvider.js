@@ -72,6 +72,9 @@ sap.ui.define([
 			const sLowerCaseAlias = vMatch ? vMatch[1] + vMatch[2][0] + vMatch[2].slice(1).toLowerCase() : undefined;
 			if (sLowerCaseAlias) {
 				vValue = oConfig[sLowerCaseAlias];
+				if (vValue) {
+					sap.ui.loader._.logger.warning(`Deprecated configuration option '${sLowerCaseAlias.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' given in bootstrap configuration. Please use '${sKey.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' instead.`);
+				}
 			}
 		}
 		return vValue;

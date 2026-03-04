@@ -15,30 +15,11 @@ sap.ui.define([
 	"use strict";
 
 	/**
-	 * Creates a new JSONListBinding.
-	 *
-	 * This constructor should only be called by subclasses or model implementations, not by application or control code.
-	 * Such code should use {@link sap.ui.model.json.JSONModel#bindList JSONModel#bindList} on the corresponding model instance instead.
-	 *
-	 * @param {sap.ui.model.json.JSONModel} oModel Model instance that this binding is created for and that it belongs to
-	 * @param {string} sPath Binding path to be used for this binding
-	 * @param {sap.ui.model.Context} oContext Binding context relative to which a relative binding path will be resolved
-	 * @param {sap.ui.model.Sorter[]|sap.ui.model.Sorter} [aSorters=[]]
-	 *   The sorters used initially; call {@link #sort} to replace them
-	 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter} [aFilters=[]]
-	 *   The filters to be used initially with type {@link sap.ui.model.FilterType.Application}; call {@link #filter} to
-	 *   replace them
-	 * @param {object} [mParameters] Map of optional parameters as defined by subclasses; this class does not introduce any own parameters
-	 * @throws {Error} If one of the filters uses an operator that is not supported by the underlying model
-	 *   implementation or if the {@link sap.ui.model.Filter.NONE} filter instance is contained in <code>aFilters</code>
-	 *   together with other filters
-	 *
-	 * @class
-	 * List binding implementation for JSON format.
-	 *
+	 * @class List binding implementation for JSON model.
+	 * @hideconstructor
+	 * @protected
 	 * @alias sap.ui.model.json.JSONListBinding
 	 * @extends sap.ui.model.ClientListBinding
-	 * @protected
 	 */
 	var JSONListBinding = ClientListBinding.extend("sap.ui.model.json.JSONListBinding");
 

@@ -1044,7 +1044,7 @@ sap.ui.define([
 				throw new Error("Missing $$ownRequest at " + this);
 			}
 			sGroupId = "$inactive." + sGroupId;
-		} else if (!oAggregation) {
+		} else if (!oAggregation?.hierarchyQualifier) {
 			this.iActiveContexts += 1;
 		}
 
@@ -1055,11 +1055,11 @@ sap.ui.define([
 		// clone data to avoid modifications outside the cache
 		// remove any property starting with "@$ui5."
 		oEntityData = _Helper.publicClone(oInitialData, true) || {};
-		if (oAggregation) {
+		if (oAggregation?.hierarchyQualifier) {
 			if (!bSkipRefresh) {
 				throw new Error("Missing bSkipRefresh");
 			}
-			if (arguments.length > 2 && oAggregation.hierarchyQualifier) {
+			if (arguments.length > 2) {
 				throw new Error("Only the parameters oInitialData and bSkipRefresh are supported");
 			}
 			const oParentContext = oInitialData?.["@$ui5.node.parent"];

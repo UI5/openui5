@@ -6107,7 +6107,7 @@ sap.ui.define([
 			.withExactArgs().returns("~selected~");
 		this.mock(oContext).expects("doSetSelected").withExactArgs("~selected~");
 		this.mock(oContext).expects("fetchValue").withExactArgs()
-			.returns(SyncPromise.resolve()); //TODO
+			.returns(SyncPromise.resolve());
 		this.mock(oBinding).expects("insertContext")
 			.withExactArgs(sinon.match.same(oContext), 3, false);
 
@@ -6123,20 +6123,26 @@ sap.ui.define([
 	//*********************************************************************************************
 [undefined, {"@$ui5.node.parent" : null}].forEach(function (oInitialData, i) {
 	[false, true].forEach((bRecursiveHierarchy) => {
-		const sTitle = "create: "
-			+ (bRecursiveHierarchy ? "recursive hierarchy" : "data aggregation") + ", root #" + i;
+		[false, true].forEach((bAtEnd) => {
+			[false, true].forEach((bSkipRefresh) => {
+	const sTitle = "create: " + (bRecursiveHierarchy
+		? "recursive hierarchy, root #" + i
+		: "data aggregation, bAtEnd=" + bAtEnd + ", bSkipRefresh=" + bSkipRefresh);
 
-		if (oInitialData && !bRecursiveHierarchy) {
-			return; //TODO
-		}
+	if (bRecursiveHierarchy ? bAtEnd || !bSkipRefresh : oInitialData) {
+		return;
+	}
 
 	QUnit.test(sTitle, function (assert) {
-		const oBinding = this.bindList("/EMPLOYEES");
+		const oBinding = this.bindList("/EMPLOYEES", null, [], [], {$count : true});
 		// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that leads
 		// too far :-(
 		oBinding.mParameters.$$aggregation = bRecursiveHierarchy
 			? {expandTo : 2, hierarchyQualifier : "X"}
 			: {groupLevels : [] /* data aggregation always has groupLevels */};
+		if (bAtEnd) {
+			oBinding.bFirstCreateAtEnd = false;
+		}
 		this.mock(oBinding).expects("fetchResourcePath").withExactArgs()
 			.returns("~oCreatePathPromise~");
 		this.mock(oBinding).expects("getUpdateGroupId").withExactArgs()
@@ -6154,22 +6160,30 @@ sap.ui.define([
 			.withExactArgs("~sGroupId~", true, true, sinon.match.func).returns("~oGroupLock~");
 		this.mock(oBinding).expects("createInCache")
 			.withExactArgs("~oGroupLock~", "~oCreatePathPromise~", "~sResolvedPath~",
-				sinon.match(rTransientPredicate), "~oEntityData~",
-				false, sinon.match.func, sinon.match.func)
+				sinon.match(rTransientPredicate), "~oEntityData~", bAtEnd, sinon.match.func,
+				sinon.match.func)
 			.returns(SyncPromise.resolve(Promise.resolve("~oCreatedEntity~")));
-		const oContext = {fetchValue : mustBeMocked, doSetSelected : mustBeMocked};
+		const oContext = {
+			fetchValue : mustBeMocked,
+			doSetSelected : mustBeMocked,
+			updateAfterCreate : mustBeMocked
+		};
 		this.mock(Context).expects("create")
 			.withExactArgs(sinon.match.same(this.oModel), sinon.match.same(oBinding),
-				"~sResolvedPath~($uid=id-1-23)", /*iChildIndex*/0,
+				"~sResolvedPath~($uid=id-1-23)", bRecursiveHierarchy ? 0 : -1,
 				sinon.match.instanceOf(SyncPromise), undefined)
 			.returns(oContext);
 		this.mock(oBinding.oHeaderContext).expects("isSelected")
 			.withExactArgs().returns("~selected~");
 		this.mock(oContext).expects("doSetSelected").withExactArgs("~selected~");
 		this.mock(oContext).expects("fetchValue").withExactArgs()
-			.returns(SyncPromise.resolve()); //TODO
+			.returns(SyncPromise.resolve());
 		this.mock(oBinding).expects("insertContext")
-			.withExactArgs(sinon.match.same(oContext), 0, false);
+			.withExactArgs(sinon.match.same(oContext), bRecursiveHierarchy ? 0 : undefined, bAtEnd);
+		this.mock(oContext).expects("updateAfterCreate").exactly(bSkipRefresh ? 1 : 0)
+			.withExactArgs(true, "$auto");
+		this.mock(oBinding).expects("refreshSingle").exactly(bSkipRefresh ? 0 : 1)
+			.withExactArgs(sinon.match.same(oContext), "$auto");
 
 		if (bRecursiveHierarchy) {
 			// code under test
@@ -6177,14 +6191,16 @@ sap.ui.define([
 		} else {
 			assert.strictEqual(
 				// code under test (Note: arguments.length > 2)
-				oBinding.create(oInitialData, true, /*bAtEnd*/false),
+				oBinding.create(oInitialData, bSkipRefresh, bAtEnd),
 				oContext);
 		}
 
-		assert.strictEqual(oBinding.iActiveContexts, 0, "unchanged");
-		assert.strictEqual(oBinding.iCreatedContexts, 0, "unchanged");
+		assert.strictEqual(oBinding.iActiveContexts, bRecursiveHierarchy ? 0 : 1);
+		assert.strictEqual(oBinding.iCreatedContexts, bRecursiveHierarchy ? 0 : 1);
 		assert.strictEqual(oBinding.bFirstCreateAtEnd, false);
 	});
+			});
+		});
 	});
 });
 

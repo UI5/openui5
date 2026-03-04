@@ -248,6 +248,10 @@ sap.ui.define(function() {
 				title: "sap.ui.model._Helper"
 			},
 
+			"model/AggregationBinding": {
+				title: "sap.ui.model.AggregationBinding"
+			},
+
 			"model/Binding": {
 				title: "sap.ui.model.Binding"
 			},

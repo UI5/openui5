@@ -132,7 +132,7 @@ sap.ui.define([
 
 	FilterBar.prototype._createInnerLayout = function() {
 		this._cLayoutItem = FilterItemLayout;
-		this._oFilterBarLayout = new FilterContainer();
+		this._oFilterBarLayout = new FilterContainer(this.getId() + "-container");
 		this.setAggregation("layout", this._oFilterBarLayout, true);
 		this._addButtons();
 	};
@@ -239,7 +239,7 @@ sap.ui.define([
 	};
 
 	FilterBar.prototype._getButtons = function () {
-		return this._oFilterBarLayout.getButtons();
+		return this._oFilterBarLayout?.getInner?.()?.getButtons?.();
 	};
 
 	FilterBar.prototype.onClear = function() {

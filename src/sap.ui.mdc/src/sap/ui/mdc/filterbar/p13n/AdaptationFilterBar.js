@@ -521,9 +521,13 @@ sap.ui.define([
 
 		this._cLayoutItem = FilterGroupLayout;
 
+		if (this._oFilterBarLayout) {
+			this.destroyAggregation("layout", true);
+		}
+
 		// Determine UI mode and pass to container
 		const bUseNewUI = this._checkIsNewUI();
-		this._oFilterBarLayout = this._checkAdvancedParent(oControl) ? new GroupContainer({ useNewUI: bUseNewUI }) : new TableContainer();
+		this._oFilterBarLayout = this._checkAdvancedParent(oControl) ? new GroupContainer(this.getId() + "-groupContainer", { useNewUI: bUseNewUI }) : new TableContainer(this.getId() + "-tableContainer");
 
 		this._oFilterBarLayout.getInner().setParent(this);
 		this.setAggregation("layout", this._oFilterBarLayout, true);

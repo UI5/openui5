@@ -37,7 +37,7 @@ sap.ui.define(['sap/m/ColumnListItem', 'sap/m/ColumnListItemRenderer', 'sap/m/La
 	FilterColumnLayout.prototype.getCells = function() {
 		const aContent = [];
 
-		const oLabel = new Label({
+		const oLabel = new Label(this._oFilterField.getId() + "-label", {
 			text: this._sLabel
 		});
 

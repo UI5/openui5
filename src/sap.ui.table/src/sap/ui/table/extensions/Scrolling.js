@@ -1940,13 +1940,29 @@ sap.ui.define([
 				const oVSb = oScrollExtension.getVerticalScrollbar();
 				const oTouchObject = oEvent.touches ? oEvent.touches[0] : oEvent;
 
+				// Cancel any active momentum animation
+				const mExistingTouchSessionData = _private(this).mTouchSessionData;
+				if (mExistingTouchSessionData) {
+					if (mExistingTouchSessionData.momentumAnimationFrame) {
+						window.cancelAnimationFrame(mExistingTouchSessionData.momentumAnimationFrame);
+					}
+					mExistingTouchSessionData.isMomentumActive = false;
+				}
+
 				_private(this).mTouchSessionData = {
 					initialPageX: oTouchObject.pageX,
 					initialPageY: oTouchObject.pageY,
 					initialScrollTop: oVSb ? oVSb.scrollTop : 0,
 					initialScrollLeft: oHSb ? oHSb.scrollLeft : 0,
 					initialScrolledToEnd: null,
-					touchMoveDirection: null
+					touchMoveDirection: null,
+					// Velocity tracking for momentum scrolling
+					lastPageX: oTouchObject.pageX,
+					lastPageY: oTouchObject.pageY,
+					lastTimestamp: Date.now(),
+					velocityHistory: [],
+					isMomentumActive: false,
+					momentumAnimationFrame: null
 				};
 			}
 		},
@@ -1973,6 +1989,37 @@ sap.ui.define([
 			const iTouchDistanceX = (oTouchObject.pageX - mTouchSessionData.initialPageX);
 			const iTouchDistanceY = (oTouchObject.pageY - mTouchSessionData.initialPageY);
 			let bScrollingPerformed = false;
+
+			// Track velocity for momentum scrolling
+			const iCurrentTime = Date.now();
+			const iTimeDelta = iCurrentTime - mTouchSessionData.lastTimestamp;
+
+			if (iTimeDelta > 0) {
+				const iDeltaX = oTouchObject.pageX - mTouchSessionData.lastPageX;
+				const iDeltaY = oTouchObject.pageY - mTouchSessionData.lastPageY;
+
+				// Velocity in pixels per millisecond
+				const fVelocityX = iDeltaX / iTimeDelta;
+				const fVelocityY = iDeltaY / iTimeDelta;
+
+				// Store in history (keep last 5 samples for smoothing)
+				mTouchSessionData.velocityHistory.push({
+					x: fVelocityX,
+					y: fVelocityY,
+					timestamp: iCurrentTime
+				});
+
+				// Keep only recent history (last 100ms or 5 samples, whichever is less)
+				const iMaxAge = 100; // milliseconds
+				mTouchSessionData.velocityHistory = mTouchSessionData.velocityHistory.filter(
+					function(entry) { return iCurrentTime - entry.timestamp < iMaxAge; }
+				).slice(-5);
+
+				// Update tracking variables
+				mTouchSessionData.lastPageX = oTouchObject.pageX;
+				mTouchSessionData.lastPageY = oTouchObject.pageY;
+				mTouchSessionData.lastTimestamp = iCurrentTime;
+			}
 
 			if (!mTouchSessionData.touchMoveDirection) {
 				if (iTouchDistanceX === 0 && iTouchDistanceY === 0) {
@@ -2036,6 +2083,202 @@ sap.ui.define([
 		},
 
 		/**
+		 * Handles touch end events and initiates momentum scrolling.
+		 *
+		 * @param {sap.ui.table.extensions.Scrolling.EventListenerOptions} mOptions The options.
+		 * @param {jQuery.Event} oEvent The touch or pointer event object.
+		 */
+		onTouchEnd: function(mOptions, oEvent) {
+			if (oEvent.type !== "touchend" && oEvent.type !== "touchcancel" &&
+				oEvent.type !== "pointerup" && oEvent.type !== "pointercancel") {
+				return;
+			}
+
+			if (oEvent.type === "pointerup" || oEvent.type === "pointercancel") {
+				if (oEvent.pointerType !== "touch") {
+					return;
+				}
+			}
+
+			const mTouchSessionData = _private(this).mTouchSessionData;
+
+			if (!mTouchSessionData || !mTouchSessionData.touchMoveDirection) {
+				// Clean up session data if it exists
+				if (mTouchSessionData) {
+					delete _private(this).mTouchSessionData;
+				}
+				return;
+			}
+
+			// Don't apply momentum if started at scroll boundary
+			if (mTouchSessionData.initialScrolledToEnd) {
+				delete _private(this).mTouchSessionData;
+				return;
+			}
+
+			// Calculate final velocity from history (weighted average, recent samples weighted more)
+			let fFinalVelocityX = 0;
+			let fFinalVelocityY = 0;
+
+			if (mTouchSessionData.velocityHistory.length > 0) {
+				let fTotalWeight = 0;
+				mTouchSessionData.velocityHistory.forEach(function(entry, index) {
+					// Linear weighting: more recent = higher weight
+					const fWeight = index + 1;
+					fFinalVelocityX += entry.x * fWeight;
+					fFinalVelocityY += entry.y * fWeight;
+					fTotalWeight += fWeight;
+				});
+
+				fFinalVelocityX /= fTotalWeight;
+				fFinalVelocityY /= fTotalWeight;
+			}
+
+			// Apply momentum threshold - only trigger if velocity is significant
+			const fMomentumThreshold = 0.1; // pixels per millisecond
+			const fVelocityMagnitude = Math.sqrt(fFinalVelocityX * fFinalVelocityX + fFinalVelocityY * fFinalVelocityY);
+
+			if (fVelocityMagnitude < fMomentumThreshold) {
+				delete _private(this).mTouchSessionData;
+				return;
+			}
+
+			// Store final velocity and initiate momentum
+			mTouchSessionData.velocityX = fFinalVelocityX;
+			mTouchSessionData.velocityY = fFinalVelocityY;
+
+			// Start momentum animation
+			ScrollingHelper._startMomentumAnimation.call(this, mOptions, mTouchSessionData);
+		},
+
+		/**
+		 * Starts and manages the momentum scrolling animation.
+		 *
+		 * @param {sap.ui.table.extensions.Scrolling.EventListenerOptions} mOptions The options.
+		 * @param {object} mTouchSessionData The touch session data containing velocity information.
+		 * @private
+		 */
+		_startMomentumAnimation: function(mOptions, mTouchSessionData) {
+			// Prevent multiple momentum animations
+			if (mTouchSessionData.isMomentumActive) {
+				return;
+			}
+
+			mTouchSessionData.isMomentumActive = true;
+
+			const oScrollExtension = this._getScrollExtension();
+			const oHSb = oScrollExtension.getHorizontalScrollbar();
+			const oVSb = oScrollExtension.getVerticalScrollbar();
+
+			// Deceleration parameters
+			const fDeceleration = 0.95; // Exponential decay factor (0-1, lower = faster stop)
+			const fMinVelocity = 0.01; // Stop when velocity drops below this threshold
+
+			let fCurrentVelocityX = mTouchSessionData.velocityX;
+			let fCurrentVelocityY = mTouchSessionData.velocityY;
+			let iLastFrameTime = Date.now();
+
+			const oTable = this;
+			const fnAnimationStep = function() {
+				// Check if animation should stop
+				if (!mTouchSessionData.isMomentumActive) {
+					delete _private(oTable).mTouchSessionData;
+					return;
+				}
+
+				const iCurrentTime = Date.now();
+				const iTimeDelta = iCurrentTime - iLastFrameTime;
+				iLastFrameTime = iCurrentTime;
+
+				// Apply exponential decay to velocity
+				fCurrentVelocityX *= fDeceleration;
+				fCurrentVelocityY *= fDeceleration;
+
+				// Calculate velocity magnitude to check if we should stop
+				const fVelocityMagnitude = Math.sqrt(
+					fCurrentVelocityX * fCurrentVelocityX +
+					fCurrentVelocityY * fCurrentVelocityY
+				);
+
+				// Stop condition: velocity too low
+				if (fVelocityMagnitude < fMinVelocity) {
+					delete _private(oTable).mTouchSessionData;
+					delete oScrollExtension._bTouchScroll;
+					return;
+				}
+
+				// Calculate scroll delta for this frame
+				const fDeltaX = fCurrentVelocityX * iTimeDelta;
+				const fDeltaY = fCurrentVelocityY * iTimeDelta;
+
+				let bDidScroll = false;
+
+				// Apply momentum scrolling based on the original direction
+				switch (mTouchSessionData.touchMoveDirection) {
+					case "horizontal":
+						if (oHSb && (mOptions.scrollDirection === ScrollDirection.HORIZONAL
+							|| mOptions.scrollDirection === ScrollDirection.BOTH)) {
+
+							const fNewScrollLeft = oHSb.scrollLeft - fDeltaX;
+							const fMaxScrollLeft = oHSb.scrollWidth - oHSb.offsetWidth;
+
+							// Boundary check - stop at edges
+							if (fNewScrollLeft < 0) {
+								oHSb.scrollLeft = 0;
+								delete _private(oTable).mTouchSessionData;
+								return;
+							} else if (fNewScrollLeft > fMaxScrollLeft) {
+								oHSb.scrollLeft = fMaxScrollLeft;
+								delete _private(oTable).mTouchSessionData;
+								return;
+							} else {
+								oHSb.scrollLeft = fNewScrollLeft;
+								bDidScroll = true;
+							}
+						}
+						break;
+
+					case "vertical":
+						if (oVSb && (mOptions.scrollDirection === ScrollDirection.VERTICAL
+							|| mOptions.scrollDirection === ScrollDirection.BOTH)) {
+
+							const fNewScrollTop = oVSb.scrollTop - fDeltaY;
+							const fMaxScrollTop = oVSb.scrollHeight - oVSb.clientHeight;
+
+							// Boundary check - stop at edges
+							if (fNewScrollTop < 0) {
+								oVSb.scrollTop = 0;
+								delete _private(oTable).mTouchSessionData;
+								delete oScrollExtension._bTouchScroll;
+								return;
+							} else if (fNewScrollTop > fMaxScrollTop) {
+								oVSb.scrollTop = fMaxScrollTop;
+								delete _private(oTable).mTouchSessionData;
+								delete oScrollExtension._bTouchScroll;
+								return;
+							} else {
+								oVSb.scrollTop = fNewScrollTop;
+								oScrollExtension._bTouchScroll = true;
+								bDidScroll = true;
+							}
+						}
+						break;
+				}
+
+				// Continue animation if scrolling occurred
+				if (bDidScroll) {
+					mTouchSessionData.momentumAnimationFrame = window.requestAnimationFrame(fnAnimationStep);
+				} else {
+					delete _private(oTable).mTouchSessionData;
+					delete oScrollExtension._bTouchScroll;
+				}
+			};
+
+			// Start the animation loop
+			mTouchSessionData.momentumAnimationFrame = window.requestAnimationFrame(fnAnimationStep);
+		},
+
+		/**
 		 * Adds mouse wheel and touch event listeners.
 		 *
 		 * @param {sap.ui.table.Table} oTable Instance of the table.
@@ -2084,6 +2327,7 @@ sap.ui.define([
 		addTouchEventListener: function(aEventListenerTargets, oTable, mOptions) {
 			const fnOnTouchStartEventHandler = ScrollingHelper.onTouchStart.bind(oTable, mOptions);
 			const fnOnTouchMoveEventHandler = ScrollingHelper.onTouchMoveScrolling.bind(oTable, mOptions);
+			const fnOnTouchEndEventHandler = ScrollingHelper.onTouchEnd.bind(oTable, mOptions);
 			let mListeners = {};
 
 			for (let i = 0; i < aEventListenerTargets.length; i++) {
@@ -2094,16 +2338,30 @@ sap.ui.define([
 					aEventListenerTargets[i].addEventListener("pointerdown", fnOnTouchStartEventHandler);
 					aEventListenerTargets[i].addEventListener("pointermove", fnOnTouchMoveEventHandler,
 						Device.browser.chrome ? {passive: true} : false);
+					aEventListenerTargets[i].addEventListener("pointerup", fnOnTouchEndEventHandler);
+					aEventListenerTargets[i].addEventListener("pointercancel", fnOnTouchEndEventHandler);
 				} else if (Device.support.touch) {
 					aEventListenerTargets[i].addEventListener("touchstart", fnOnTouchStartEventHandler);
 					aEventListenerTargets[i].addEventListener("touchmove", fnOnTouchMoveEventHandler);
+					aEventListenerTargets[i].addEventListener("touchend", fnOnTouchEndEventHandler);
+					aEventListenerTargets[i].addEventListener("touchcancel", fnOnTouchEndEventHandler);
 				}
 			}
 
 			if (Device.support.pointer && Device.system.desktop) {
-				mListeners = {pointerdown: fnOnTouchStartEventHandler, pointermove: fnOnTouchMoveEventHandler};
+				mListeners = {
+					pointerdown: fnOnTouchStartEventHandler,
+					pointermove: fnOnTouchMoveEventHandler,
+					pointerup: fnOnTouchEndEventHandler,
+					pointercancel: fnOnTouchEndEventHandler
+				};
 			} else if (Device.support.touch) {
-				mListeners = {touchstart: fnOnTouchStartEventHandler, touchmove: fnOnTouchMoveEventHandler};
+				mListeners = {
+					touchstart: fnOnTouchStartEventHandler,
+					touchmove: fnOnTouchMoveEventHandler,
+					touchend: fnOnTouchEndEventHandler,
+					touchcancel: fnOnTouchEndEventHandler
+				};
 			}
 
 			return mListeners;
@@ -2386,6 +2644,15 @@ sap.ui.define([
 					_private(oTable).pVerticalScrollUpdateProcess.cancel();
 					_private(oTable).pVerticalScrollUpdateProcess = null;
 				}
+
+				// Cancel any active momentum animation
+				const mTouchSessionData = _private(oTable).mTouchSessionData;
+				if (mTouchSessionData && mTouchSessionData.momentumAnimationFrame) {
+					Log.debug("###cancel animation frame in destroy");
+					window.cancelAnimationFrame(mTouchSessionData.momentumAnimationFrame);
+					mTouchSessionData.isMomentumActive = false;
+				}
+				delete _private(oTable).mTouchSessionData;
 			}
 
 			ExtensionBase.prototype.destroy.apply(this, arguments);

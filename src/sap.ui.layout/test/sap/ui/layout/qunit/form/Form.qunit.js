@@ -21,7 +21,10 @@ sap.ui.define([
 	"sap/m/Title",
 	"sap/m/Label",
 	"sap/m/Input",
-	"sap/ui/test/utils/nextUIUpdate"
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/uxap/ObjectPageLayout",
+	"sap/uxap/ObjectPageSection",
+	"sap/uxap/ObjectPageSubSection"
 ],
 	function(
 		Element,
@@ -44,7 +47,10 @@ sap.ui.define([
 		mTitle,
 		Label,
 		Input,
-		nextUIUpdate
+		nextUIUpdate,
+		ObjectPageLayout,
+		ObjectPageSection,
+		ObjectPageSubSection
 	) {
 	"use strict";
 
@@ -241,6 +247,16 @@ sap.ui.define([
 		oForm.addAriaLabelledBy("X");
 		await nextUIUpdate();
 		assert.equal(jQuery("#F1").attr("aria-labelledby"), "X T1", "aria-labelledby points to AriaLabel and Title");
+	});
+
+	QUnit.test("_suggestTitleId with role: region", async function(assert) {
+		// Setup: Form without title, receives suggested title with role "region" from parent
+		oForm._suggestTitleId({ id: "parentTitle", role: "region" });
+		await nextUIUpdate();
+
+		assert.equal(jQuery("#F1").attr("aria-labelledby"), "parentTitle", "aria-labelledby points to parent title");
+
+		assert.notEqual(jQuery("#F1").attr("role"), "region", "Form does not render role='region' when parent has region role");
 	});
 
 	QUnit.module("FormContainer", {
@@ -801,6 +817,53 @@ sap.ui.define([
 
 	QUnit.test("renderControlsForSemanticElement", function(assert) {
 		assert.notOk(oFormLayout.renderControlsForSemanticElement(), "no control rendering supported");
+	});
+
+	QUnit.module("Form in ObjectPageSubSection", {
+		beforeEach: async function() {
+			oFormLayout = new FormLayout("FL1");
+			// Create a FormContainer with a title so Form would render role="region"
+			const oFormContainer = new FormContainer("FC1", {
+				title: new Title("FCT1", { text: "Container Title" })
+			});
+			oForm = new Form("F1", {
+				layout: oFormLayout,
+				formContainers: [oFormContainer]
+			});
+			this.oObjectPage = new ObjectPageLayout("OP1", {
+				sections: [new ObjectPageSection("OPS1", {
+					title: "Section Title",
+					subSections: [new ObjectPageSubSection("OPSS1", {
+						title: "SubSection Title",
+						blocks: [oForm]
+					})]
+				})]
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oObjectPage.destroy();
+			oForm.destroy();
+			oFormLayout.destroy();
+			oForm = undefined;
+			oFormLayout = undefined;
+		}
+	});
+
+	QUnit.test("Form with labelled container does not render duplicate region role", function(assert) {
+		assert.ok(oFormLayout.hasLabelledContainers(oForm), "Form has labelled containers");
+
+		const sFormRole = jQuery("#F1").attr("role");
+		assert.notEqual(sFormRole, "region", "Form does not have role='region' when inside ObjectPageSubSection");
+	});
+
+	QUnit.test("Form with own title still renders region role", async function(assert) {
+		const oTitle = new Title("FT1", { text: "Form Title" });
+		oForm.setTitle(oTitle);
+		await nextUIUpdate();
+
+		const sFormRole = jQuery("#F1").attr("role");
+		assert.equal(sFormRole, "region", "Form has role='region' when it has its own title");
 	});
 
 });

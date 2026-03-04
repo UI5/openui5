@@ -3785,7 +3785,7 @@ sap.ui.define([
 		let $noDataText = sut.$().find("#" + sut.getId() + "-nodata-text");
 		assert.strictEqual($noDataText.attr("colspan"), "2", "nodata cell covers 2 header cells(Higlight and Navigated) rendered");
 		assert.strictEqual($noDataText.text(), oBundle.getText("TABLE_NO_COLUMNS"), "Table's no columns nodata-text contains correct string");
-		assert.strictEqual(oInvisibleMessage.getText(), oBundle.getText("TABLE_NO_COLUMNS"), "Invisible Message is set correct.");
+		assert.strictEqual(oInvisibleMessage.getText(), oBundle.getText("TABLE_NO_COLUMNS"), "Invisible Message text is correct.");
 		await timeout();
 
 		sut.setNoData();
@@ -3793,7 +3793,7 @@ sap.ui.define([
 
 		$noDataText = sut.$().find("#" + sut.getId() + "-nodata-text");
 		assert.strictEqual($noDataText.text(), oBundle.getText("TABLE_NO_COLUMNS"), "Table's no columns nodata-text contains correct string");
-		assert.strictEqual(oInvisibleMessage.getText(), oBundle.getText("TABLE_NO_COLUMNS"), "Invisible Message is set correct.");
+		assert.strictEqual(oInvisibleMessage.getText(), oBundle.getText("TABLE_NO_COLUMNS"), "Invisible Message text is correct.");
 		assert.ok($noDataCell.hasClass("sapMListTblCellNoIllustratedMessage"), "sapMListTblCellNoData contains sapMListTblCellNoIllustratedMessage");
 
 		sut.setNoData(new IllustratedMessage());
@@ -3805,7 +3805,7 @@ sap.ui.define([
 		$noData.trigger("focus");
 		const oNoColumnsMessage = sut.getAggregation("_noColumnsMessage");
 		assert.strictEqual($noDataText.children().get(0), oNoColumnsMessage.getDomRef(), "Table's nodata-text contains figure's DOM element");
-		assert.strictEqual(oInvisibleMessage.getText(), oBundle.getText("TABLE_NO_COLUMNS"), "Invisible Message is set correct.");
+		assert.strictEqual(oInvisibleMessage.getText(), oBundle.getText("TABLE_NO_COLUMNS"), "Invisible Message text is correct.");
 		assert.ok($noDataCell.hasClass("sapMListTblCellNoIllustratedMessage"), "sapMListTblCellNoData contains sapMListTblCellNoIllustratedMessage");
 
 		sut.destroy();

@@ -20,7 +20,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental Since 1.75
 	 * @since 1.75
 	 * @alias sap.ui.table.plugins.PluginBase
 	 */

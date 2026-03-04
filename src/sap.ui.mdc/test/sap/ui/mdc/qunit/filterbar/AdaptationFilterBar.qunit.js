@@ -46,7 +46,7 @@ sap.ui.define([
 	let oAdaptationFilterBar;
 	QUnit.module("AdaptationFilterBar - MDC Control specific tests", {
 		beforeEach: async function () {
-			this.oTestTable = new Table({
+			this.oTestTable = new Table("T1", {
 				delegate: {
 					name: "test-resources/sap/ui/mdc/delegates/TableDelegate",
 					payload: {
@@ -64,7 +64,7 @@ sap.ui.define([
 				p13nMode: ["Filter", "Column", "Sort"]
 			});
 
-			this.oAdaptationFilterBar = new AdaptationFilterBar({
+			this.oAdaptationFilterBar = new AdaptationFilterBar("AFB1", {
 				adaptationControl: this.oTestTable
 			});
 
@@ -310,7 +310,7 @@ sap.ui.define([
 				}
 			});
 
-			oAdaptationFilterBar = new AdaptationFilterBar({
+			oAdaptationFilterBar = new AdaptationFilterBar("AFB1", {
 				adaptationControl: this.oParent
 			});
 
@@ -1046,7 +1046,7 @@ sap.ui.define([
 				]
 			});
 
-			this.oParent = new FilterBar({
+			this.oParent = new FilterBar("FB1", {
 				delegate: {
 					name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate",
 					payload: {
@@ -1057,7 +1057,7 @@ sap.ui.define([
 				propertyInfo: [{key: "key1", label: "Some custom label", dataType: "sap.ui.model.type.String"}],
 				filterItems: {
 					path: "$custom>/data",
-					template: new FilterField({
+					template: new FilterField("FF", {
 						conditions: "{$filters>/conditions/key1}",
 						propertyKey: "key1",
 						label: "{$custom>label}"

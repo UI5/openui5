@@ -3,9 +3,10 @@
  */
 sap.ui.define([
 	"sap/base/Log",
+	"sap/ui/model/AggregationBinding",
 	"sap/ui/model/Filter",
 	"sap/ui/model/TreeBinding"
-], function (Log, Filter, TreeBinding) {
+], function (Log, asAggregationBinding, Filter, TreeBinding) {
 	"use strict";
 	/*global QUnit, sinon */
 
@@ -62,4 +63,22 @@ sap.ui.define([
 			oBinding = new TreeBinding("~oModel", "~sPath", "~oContext", "~invalidFilter");
 		}, oError);
 	});
+
+	//*********************************************************************************************
+	QUnit.test("mixin", function (assert) {
+		this.mock(Filter).expects("checkFilterNone").withExactArgs(undefined);
+
+		// code under test
+		const oBinding = new TreeBinding("~oModel", "~sPath");
+
+		const oMixin = {};
+		asAggregationBinding.call(oMixin);
+		asAggregationBinding(oMixin);
+		Object.keys(oMixin).forEach((sKey) => {
+			assert.strictEqual(oBinding[sKey], oMixin[sKey]);
+		});
+		assert.strictEqual(oBinding.bBoundFilterUpdate, oMixin.bBoundFilterUpdate);
+	});
+
+
 });

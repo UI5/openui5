@@ -488,14 +488,14 @@ sap.ui.define([
 	 *   A promise which is resolved with the created entity when the POST request has been
 	 *   successfully sent and the entity has been marked as non-transient
 	 * @throws {Error}
-	 *   If <code>bAtEndOfCreated</code> is set or the parent is collapsed
+	 *   If <code>bAtEndOfCreated</code> is set for a recursive hierarchy or the parent is collapsed
 	 *
 	 * @public
 	 */
 	// @override sap.ui.model.odata.v4.lib._Cache#create
 	_AggregationCache.prototype.create = function (oGroupLock, oPostPathPromise, sPath,
 			sTransientPredicate, oEntityData, bAtEndOfCreated, fnErrorCallback, fnSubmitCallback) {
-		if (bAtEndOfCreated) {
+		if (bAtEndOfCreated && this.oAggregation.hierarchyQualifier) {
 			throw new Error("Unsupported bAtEndOfCreated");
 		}
 
@@ -564,7 +564,9 @@ sap.ui.define([
 				_Helper.updateAll(this.mChangeListeners, sParentPredicate, oParentNode,
 					{"@$ui5.node.isExpanded" : true}); // not a leaf anymore
 			}
-			oEntityData["@$ui5.node.level"] = iLevel; // do not send via POST!
+			_AggregationHelper.setAnnotations(oEntityData, /*bIsExpanded*/undefined,
+				/*bIsTotal*/this.oAggregation.hierarchyQualifier ? undefined : false,
+				iLevel); // do not send via POST!
 			aElements.splice(iIndex0, 0, null); // create a gap
 			this.addElements(oEntityData, iIndex0, oCache, iRank);
 			aElements.$count += 1;

@@ -1368,8 +1368,6 @@ sap.ui.define([
 	 * Is called by the row whenever the selection state is changed and updates the corresponding ARIA attributes and tooltips.
 	 *
 	 * @param {sap.ui.table.Row} oRow Instance of the row.
-	 * @param {jQuery} $Ref The jQuery references to the DOM areas of the row.
-	 * @param {boolean} bIsSelected Whether the row is selected.
 	 * @public
 	 */
 	AccExtension.prototype.updateSelectionStateOfRow = function(oRow) {

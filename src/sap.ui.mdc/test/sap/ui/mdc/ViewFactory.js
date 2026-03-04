@@ -27,7 +27,7 @@ sap.ui.define([
 			}, oViewSettings.preprocessors);
 			oViewSettings.type = "XML";
 			var oViewPromise;
-			oComp.runAsOwner(function(){
+			oComp.runAsOwner(function() {
 				oViewPromise = View.create(oViewSettings);
 				oViewPromise.then(function(oView){
 					oComp._addContent(oView);

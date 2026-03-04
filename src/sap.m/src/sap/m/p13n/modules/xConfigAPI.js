@@ -3,8 +3,9 @@
  */
 sap.ui.define([
 	"sap/base/util/merge",
+	"sap/base/util/deepEqual",
 	"sap/ui/core/util/reflection/JsControlTreeModifier"
-], (merge, JsControlTreeModifier) => {
+], (merge, deepEqual, JsControlTreeModifier) => {
 	"use strict";
 
 	/**
@@ -449,6 +450,16 @@ sap.ui.define([
 		const sOperation = oModificationPayload.operation;
 
 		const oItem = oConfig.properties[sAffectedProperty].find((oEntry) => {
+			// DINC0728376 / DINC0490163: Property-type specific comparison
+			// For filterConditions: multiple conditions can exist for the same key,
+			// so we need to compare the condition content to find the correct one.
+			// For sortConditions/groupConditions: key is unique, so key comparison is sufficient.
+			// We cannot use deepEqual on the entire entry because the index in the payload
+			// (restore position) differs from the stored index (original position).
+			if (sAffectedProperty === "filterConditions") {
+				return oEntry.key === oModificationPayload.key &&
+					deepEqual(oEntry.condition, oModificationPayload.value.condition);
+			}
 			return oEntry.key === oModificationPayload.key;
 		});
 

@@ -19,20 +19,22 @@ globalThis.fnInit = () => {
 		sinon
 	) => {
 		var oLog = Log.getLogger("test", 6);
-		var oLogSpy = sinon.spy(oLog, "error");
+		var oLogErrorSpy = sinon.spy(oLog, "error");
+		var oLogWarningSpy = sinon.spy(oLog, "warning");
 		sap.ui.loader._.logger = oLog;
 
 		QUnit.module("Base Configuration");
 
 		QUnit.test("Basic: Check getter on provider level", function(assert) {
-			assert.expect(20);
-
 			// sContext is derived via URL parameter to handle provider specific behavior
 			var sContext = BaseConfiguration.get({
 				name: "sapUiContext",
 				type: BaseConfiguration.Type.String,
 				external: true
 			});
+
+			const iExpectedAssertions = sContext.startsWith("global") ? 22 : 20;
+			assert.expect(iExpectedAssertions); // adjust expected assertions based on the context
 
 			[
 				{ duplicateParam: "sap-ui-FooBar", origParam: "sap-ui-fooBar", type: BaseConfiguration.Type.String},
@@ -48,12 +50,12 @@ globalThis.fnInit = () => {
 					type: oParams.type,
 					external: true
 				});
-				assert.ok(oLogSpy.calledWith("Configuration option '" + sOrigKey + "' was set multiple times. Value '" + value + "' will be used"), "Logged invalid configuration option '" + sDuplicateKey + "'");
+				assert.ok(oLogErrorSpy.calledWith("Configuration option '" + sOrigKey + "' was set multiple times. Value '" + value + "' will be used"), "Logged invalid configuration option '" + sDuplicateKey + "'");
 			});
 
 			["sap-ui-sap/foo/bar"].forEach(function (sInvalidKey) {
 				sInvalidKey = sContext.startsWith("global") ? sInvalidKey.replace("sap-ui-", "") : sInvalidKey;
-				assert.ok(oLogSpy.calledWith("Invalid configuration option '" + sInvalidKey + "' in " + sContext + "!"), "Logged invalid configuration option '" + sInvalidKey + "'");
+				assert.ok(oLogErrorSpy.calledWith("Invalid configuration option '" + sInvalidKey + "' in " + sContext + "!"), "Logged invalid configuration option '" + sInvalidKey + "'");
 			});
 
 			assert.strictEqual(BaseConfiguration.get({
@@ -137,6 +139,15 @@ globalThis.fnInit = () => {
 				type: BaseConfiguration.Type.Boolean,
 				external: true
 			}), false, "BaseConfiguration.get for param 'sapUiInitialFalsyValue' returns correct value 'false'");
+			// lowercase check and warning is only logged for global and bootstrap provider
+			if (sContext.startsWith("global")) {
+				assert.strictEqual(BaseConfiguration.get({
+					name: "sapUiMissSpelled",
+					type: BaseConfiguration.Type.String,
+					external: false
+				}), "test", "BaseConfiguration.get for param 'sapUiMissSpelled' returns correct value 'test'");
+				assert.ok(oLogWarningSpy.calledWith("Deprecated configuration option 'sap-ui-missspelled' given in global configuration. Please use 'sap-ui-miss-spelled' instead."), "Logged deprecated configuration spelling 'sap-ui-missspelled'");
+			}
 		});
 
 		QUnit.start();

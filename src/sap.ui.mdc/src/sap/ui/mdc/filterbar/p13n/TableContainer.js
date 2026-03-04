@@ -95,6 +95,10 @@ sap.ui.define([
 
 	TableContainer.prototype.exit = function() {
 		this._oTable = null;
+		Object.keys(this.mFilterItems).forEach((sKey) => {
+			this.mFilterItems[sKey].destroy();
+		});
+		this.mFilterItems = null;
 	};
 
 	TableContainer.prototype.getInitialFocusedControl = function() {

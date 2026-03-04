@@ -4,9 +4,8 @@ sap.ui.define("sap/ui/table/sample/TableExampleUtils", [
 	"sap/m/Popover",
 	"sap/m/List",
 	"sap/m/Button",
-	"sap/m/FeedListItem",
-	"sap/ui/thirdparty/jquery"
-], function(syncStyleClass, JSONModel, Popover, List, Button, FeedListItem, jQuery) {
+	"sap/m/FeedListItem"
+], function(syncStyleClass, JSONModel, Popover, List, Button, FeedListItem) {
 	"use strict";
 
 	function showInfo(aItems, oBy) {
@@ -41,12 +40,19 @@ sap.ui.define("sap/ui/table/sample/TableExampleUtils", [
 
 	Utils.showInfo = function(aItems, oBy) {
 		if (typeof (aItems) === "string") {
-			jQuery.ajax(aItems, {
-				dataType: "json",
-				success: function(oData) {
+			fetch(aItems)
+				.then(function(response) {
+					if (!response.ok) {
+						throw new Error("HTTP error " + response.status);
+					}
+					return response.json();
+				})
+				.then(function(oData) {
 					showInfo(oData, oBy);
-				}
-			});
+				})
+				.catch(function() {
+					// Error loading info.json
+				});
 		} else {
 			showInfo(aItems, oBy);
 		}

@@ -3,11 +3,12 @@
  */
 sap.ui.define([
 	"sap/base/Log",
+	"sap/ui/model/AggregationBinding",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterType",
 	"sap/ui/model/ListBinding",
 	"sap/ui/model/Sorter"
-], function (Log, Filter, FilterType, ListBinding, Sorter) {
+], function (Log, asAggregationBinding, Filter, FilterType, ListBinding, Sorter) {
 	/*global QUnit, sinon*/
 	/*eslint no-sparse-arrays: 0 */
 	"use strict";
@@ -40,6 +41,15 @@ sap.ui.define([
 		assert.strictEqual(oBinding.bDetectUpdates, true);
 		assert.ok(oBinding.hasOwnProperty("oExtendedChangeDetectionConfig"));
 		assert.strictEqual(oBinding.oExtendedChangeDetectionConfig, undefined);
+
+		// test AggregationBinding mixin is applied
+		const oMixin = {};
+		asAggregationBinding.call(oMixin);
+		asAggregationBinding(oMixin);
+		Object.keys(oMixin).forEach((sKey) => {
+			assert.strictEqual(oBinding[sKey], oMixin[sKey]);
+		});
+		assert.strictEqual(oBinding.bBoundFilterUpdate, oMixin.bBoundFilterUpdate);
 	});
 
 	//*********************************************************************************************
@@ -176,77 +186,5 @@ sap.ui.define([
 		// code under test
 		assert.strictEqual(oBinding._isExpectingMoreContexts(["a", "b"], 10, 3), true,
 			"too short and final, but collection length not reached yet");
-	});
-
-	//*********************************************************************************************
-	QUnit.test("_updateFilter", function (assert) {
-		const oFilter = new Filter("~sPath", "EQ", "~v1");
-		const oFilter2 = new Filter("~sPath2", "EQ", "~v2");
-		const oBinding = new ListBinding("~model~", "~path~"/* other parameters do not matter for this test */);
-		oBinding.filter = () => {};
-		oBinding.aApplicationFilters = [oFilter, oFilter2];
-		this.mock(oFilter).expects("cloneWithValues").withExactArgs("~v1New", "~v2New").returns("~clonedFilter~");
-		this.mock(oFilter).expects("cloneIfContained").withExactArgs(sinon.match.same(oFilter), "~clonedFilter~")
-			.returns("~clonedFilterElement~");
-		this.mock(oFilter2).expects("cloneIfContained").withExactArgs(sinon.match.same(oFilter), "~clonedFilter~")
-			.returns(oFilter2);
-		this.mock(oBinding).expects("filter")
-			.withExactArgs(["~clonedFilterElement~", oFilter2], FilterType.Application).callsFake(() => {
-				assert.strictEqual(oBinding.bBoundFilterUpdate, true);
-			});
-
-		assert.strictEqual(oBinding.bBoundFilterUpdate, false);
-
-		// code under test
-		const oUpdatedFilter = oBinding._updateFilter(oFilter, "~v1New", "~v2New");
-
-		assert.strictEqual(oUpdatedFilter, "~clonedFilter~");
-		assert.strictEqual(oBinding.bBoundFilterUpdate, false);
-	});
-
-	//*********************************************************************************************
-	QUnit.test("_updateFilter, error if filter not found", function (assert) {
-		const oFilter = new Filter("~sPath", "EQ", "~v1");
-		const oFilter2 = new Filter("~sPath2", "EQ", "~v2");
-		const oBinding = new ListBinding("~model~", "~path~"/* other parameters do not matter for this test */);
-		oBinding.filter = () => {};
-		oBinding.aApplicationFilters = [oFilter2];
-		this.mock(oFilter).expects("cloneWithValues").withExactArgs("~v1New", "~v2New").returns("~clonedFilter~");
-		this.mock(oFilter2).expects("cloneIfContained").withExactArgs(sinon.match.same(oFilter), "~clonedFilter~")
-			.returns(oFilter2);
-		this.mock(oBinding).expects("filter").never();
-
-		// code under test
-		assert.throws(() => {
-			oBinding._updateFilter(oFilter, "~v1New", "~v2New");
-		}, new Error("Filter cannot be updated: Not found in binding's application filters"));
-	});
-
-	//*********************************************************************************************
-	QUnit.test("_isBoundFilterUpdate", function (assert) {
-		const oBinding = new ListBinding("~model~", "~path~"/* other parameters do not matter for this test */);
-		oBinding.bBoundFilterUpdate = "~bBoundFilterUpdate~";
-
-		// code under test
-		assert.strictEqual(oBinding._isBoundFilterUpdate(), "~bBoundFilterUpdate~");
-	});
-
-	//*********************************************************************************************
-	QUnit.test("computeApplicationFilters", function (assert) {
-		const oBinding = new ListBinding("~model~", "~path~"/* other parameters do not matter for this test */);
-
-		// code under test
-		assert.strictEqual(oBinding.computeApplicationFilters("~filters~", FilterType.Application), "~filters~");
-
-		// code under test
-		assert.throws(() => {
-			oBinding.computeApplicationFilters("~filter~", FilterType.ApplicationBound);
-		}, new Error("Binding has not been created for an aggregation of a control: Must not use filter type "
-			+ "ApplicationBound"));
-
-		// code under test
-		assert.throws(() => {
-			oBinding.computeApplicationFilters("~filter~", FilterType.Control);
-		}, new Error("Must not use filter type Control"));
 	});
 });

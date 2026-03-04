@@ -12,10 +12,9 @@ sap.ui.define([
 	"sap/m/table/columnmenu/Menu",
 	"sap/m/table/columnmenu/ActionItem",
 	"sap/m/ToolbarSpacer",
-	"sap/ui/thirdparty/jquery",
 	"sap/ui/Device",
 	"sap/ui/core/date/UI5Date"
-], function(Log, Controller, JSONModel, Menu, MenuItem, MessageToast, DateFormat, Popup, MenuM, MenuItemM, ColumnMenu, ActionItem, ToolbarSpacer, jQuery, Device, UI5Date) {
+], function(Log, Controller, JSONModel, Menu, MenuItem, MessageToast, DateFormat, Popup, MenuM, MenuItemM, ColumnMenu, ActionItem, ToolbarSpacer, Device, UI5Date) {
 	"use strict";
 
 	return Controller.extend("sap.ui.table.sample.Menus.Controller", {
@@ -47,9 +46,14 @@ sap.ui.define([
 
 			const oDateFormat = DateFormat.getDateInstance({source: {pattern: "timestamp"}, pattern: "dd/MM/yyyy"});
 
-			jQuery.ajax(sap.ui.require.toUrl("sap/ui/demo/mock/products.json"), {
-				dataType: "json",
-				success: function(oData) {
+			fetch(sap.ui.require.toUrl("sap/ui/demo/mock/products.json"))
+				.then(function(response) {
+					if (!response.ok) {
+						throw new Error("HTTP error " + response.status);
+					}
+					return response.json();
+				})
+				.then(function(oData) {
 					const aTemp1 = [];
 					const aTemp2 = [];
 					const aSuppliersData = [];
@@ -74,11 +78,10 @@ sap.ui.define([
 					oData.Categories = aCategoryData;
 
 					oModel.setData(oData);
-				},
-				error: function() {
+				})
+				.catch(function() {
 					Log.error("failed to load json");
-				}
-			});
+				});
 
 			return oModel;
 		},
