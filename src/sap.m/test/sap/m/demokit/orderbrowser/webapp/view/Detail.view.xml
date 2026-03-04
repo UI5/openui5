@@ -11,7 +11,8 @@
 		busyIndicatorDelay="{detailView>/delay}"
 		core:require="{
 			formatMessage: 'sap/base/strings/formatMessage',
-			DateType: 'sap/ui/model/type/Date'
+			DateType: 'sap/ui/model/type/Date',
+			CurrencyType: 'sap/ui/model/type/Currency'
 		}">
 		<semantic:titleHeading>
 			<Title
@@ -54,7 +55,7 @@
 								{path:'detailView>/totalOrderAmount'},
 								{path:'detailView>/currency'}
 							],
-							type: 'sap.ui.model.type.Currency',
+							type: 'CurrencyType',
 							formatOptions: {
 								showMeasure: false
 							}
@@ -167,13 +168,13 @@
 			<semantic:FullScreenAction
 				id="enterFullScreen"
 				visible="{= !${device>/system/phone} &amp;&amp; !${appView>/actionButtonsInfo/midColumn/fullScreen}}"
-				press="toggleFullScreen"/>
+				press=".toggleFullScreen"/>
 		</semantic:fullScreenAction>
 		<semantic:exitFullScreenAction>
 			<semantic:ExitFullScreenAction
 				id="exitFullScreen"
 				visible="{= !${device>/system/phone} &amp;&amp; ${appView>/actionButtonsInfo/midColumn/fullScreen}}"
-				press="toggleFullScreen"/>
+				press=".toggleFullScreen"/>
 		</semantic:exitFullScreenAction>
 	</semantic:SemanticPage>
 </mvc:View>
