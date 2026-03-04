@@ -46,7 +46,7 @@ sap.ui.define([
 
 		// Create AdaptFiltersPanel with default UI mode
 		// When setUseNewUI is called later, it will recreate if needed
-		this.oLayout = new AdaptFiltersPanel();
+		this.oLayout = new AdaptFiltersPanel(this.getId() + "-panel");
 
 		this.oLayout.setItemFactory((oBindingContext) => {
 			const sKey = oBindingContext.getProperty(oBindingContext.sPath).name;
@@ -103,6 +103,9 @@ sap.ui.define([
 	};
 
 	GroupContainer.prototype.exit = function() {
+		Object.keys(this.mFilterItems).forEach((sKey) => {
+			this.mFilterItems[sKey].destroy();
+		});
 		this.mFilterItems = null;
 		this.mFilterFields = null;
 		IFilterContainer.prototype.exit.apply(this, arguments);

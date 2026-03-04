@@ -5792,18 +5792,20 @@ sap.ui.define([
 				[false, true].forEach(function (bCreateRoot) {
 					[undefined, "~iRank~"].forEach(function (iRank) {
 						[undefined, "~oldCountPromise"].forEach(function (oCountPromise) {
-							var sTitle = "create: already has group level cache: " + bHasGroupLevelCache
-								+ ", expandTo: " + iExpandTo
-								+ ", parent's @$ui5.node.isExpanded: " + bParentExpanded
-								+ ", create root node: " + bCreateRoot
-								+ ", rank: " + iRank
-								+ ", old count promise: " + oCountPromise;
+							[false, true].forEach(function (bAtEndOfCreated) {
+		const sTitle = "create: already has group level cache: " + bHasGroupLevelCache
+			+ ", expandTo: " + iExpandTo
+			+ ", parent's @$ui5.node.isExpanded: " + bParentExpanded
+			+ ", create root node: " + bCreateRoot
+			+ ", rank: " + iRank
+			+ ", old count promise: " + oCountPromise
+			+ ", at end of created: " + bAtEndOfCreated;
+		const bInFirstLevel = bCreateRoot || iExpandTo > 24;
 
-							const bInFirstLevel = bCreateRoot || iExpandTo > 24;
-							if (bHasGroupLevelCache && bInFirstLevel || bParentExpanded && bCreateRoot
-									|| !bInFirstLevel && !iRank) {
-								return;
-							}
+		if (bHasGroupLevelCache && bInFirstLevel || bParentExpanded && bCreateRoot
+				|| !bInFirstLevel && !iRank || bAtEndOfCreated && !bCreateRoot) {
+			return;
+		}
 
 		QUnit.test(sTitle, function (assert) {
 			var fnCancelCallback,
@@ -5830,6 +5832,9 @@ sap.ui.define([
 			oCache.aElements = ["0", "1", oParentNode, "3", "4"];
 			oCache.aElements.$byPredicate = {"('42')" : oParentNode};
 			oCache.aElements.$count = 5;
+			if (bAtEndOfCreated) {
+				delete oCache.oAggregation.hierarchyQualifier;
+			}
 			const oCacheMock = this.mock(oCache);
 			oCacheMock.expects("createGroupLevelCache")
 				.exactly(bHasGroupLevelCache || bInFirstLevel ? 0 : 1)
@@ -5850,6 +5855,9 @@ sap.ui.define([
 					bar : "~bar~",
 					foo : "~foo~"
 				};
+			this.mock(_AggregationHelper).expects("setAnnotations")
+				.withExactArgs(sinon.match.same(oEntityData), undefined,
+				bAtEndOfCreated ? false : undefined, bCreateRoot ? 1 : 24);
 			oHelperMock.expects("addByPath")
 				.withExactArgs(sinon.match.same(oCache.mPostRequests), "~sTransientPredicate~",
 					sinon.match.same(oEntityData));
@@ -5866,8 +5874,8 @@ sap.ui.define([
 			let fnNewSubmitCallback;
 			this.mock(oCollectionCache).expects("create")
 				.withExactArgs("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
-					"~sTransientPredicate~", {bar : "~bar~", foo : "~foo~"}, false, "~fnErrorCallback~",
-					sinon.match.func, sinon.match.func)
+					"~sTransientPredicate~", {bar : "~bar~", foo : "~foo~"}, bAtEndOfCreated,
+					"~fnErrorCallback~", sinon.match.func, sinon.match.func)
 				.callsFake(function () {
 					fnNewSubmitCallback = arguments[7];
 					fnCancelCallback = arguments[8];
@@ -5957,13 +5965,12 @@ sap.ui.define([
 
 			// code under test
 			const oResult = oCache.create("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
-				"~sTransientPredicate~", oEntityData, /*bAtEndOfCreated*/false, "~fnErrorCallback~",
+				"~sTransientPredicate~", oEntityData, bAtEndOfCreated, "~fnErrorCallback~",
 				fnSubmitCallback);
 
 			assert.deepEqual(oPostBody, bCreateRoot ? {} : {"myParent@odata.bind" : "~relativeUrl~"});
 			assert.deepEqual(oEntityData, {
 				"@$ui5._" : {postBody : oPostBody},
-				"@$ui5.node.level" : bCreateRoot ? 1 : 24,
 				bar : "~bar~",
 				foo : "~foo~"
 			});
@@ -6044,6 +6051,7 @@ sap.ui.define([
 				}
 			});
 		});
+							});
 						});
 					});
 				});
@@ -6089,12 +6097,16 @@ sap.ui.define([
 				bar : "~bar~",
 				foo : "~foo~"
 			};
+			const bExpandTreeState = !bParentExpanded && !bCreateRoot && iExpandTo < 23;
+			this.mock(_AggregationHelper).expects("setAnnotations")
+				.exactly(!bExpandTreeState && iRank ? 1 : 0)
+				.withExactArgs(sinon.match.same(oEntityData), undefined, undefined,
+					bCreateRoot ? 1 : 24);
 			const oHelperMock = this.mock(_Helper);
 			oHelperMock.expects("addByPath")
 				.withExactArgs(sinon.match.same(oCache.mPostRequests), "~sTransientPredicate~",
 					sinon.match.same(oEntityData));
 			const oPostBody = {};
-			const bExpandTreeState = !bParentExpanded && !bCreateRoot && iExpandTo < 23;
 			let fnCancelCallback;
 			this.mock(oCache.oFirstLevel).expects("create")
 				.withExactArgs("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
@@ -6177,11 +6189,8 @@ sap.ui.define([
 				assert.strictEqual(oEntityData0, oEntityData);
 
 				oExpectedEntity["@$ui5._"].predicate = "('ABC')";
-				if (bExpandTreeState) {
+				if (bExpandTreeState || iRank) {
 					oExpectedEntity["@$ui5._"].rank = iRank;
-				} else if (iRank) {
-					oExpectedEntity["@$ui5._"].rank = iRank;
-					oExpectedEntity["@$ui5.node.level"] = bCreateRoot ? 1 : 24;
 				}
 				assert.deepEqual(oEntityData, oExpectedEntity);
 				const iExpectedCount = iRank && !bExpandTreeState ? 4 : 3;

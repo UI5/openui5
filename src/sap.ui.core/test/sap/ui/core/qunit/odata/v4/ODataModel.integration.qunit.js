@@ -28249,19 +28249,22 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// there is no data aggregation on leaf level.
 	// JIRA: CPOUI5ODATAV4-2745
 	//
-	// Check that create is supported (JIRA: CPOUI5ODATAV4-3350)
+	// Check that create at start is supported (JIRA: CPOUI5ODATAV4-3350)
+	// Check that create at end of start is supported (JIRA: CPOUI5ODATAV4-3351)
 	QUnit.test("Data Aggregation: filter w/o aggregation on leaves", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
-
-		await this.createView(assert, "", oModel);
-
-		const oListBinding = oModel.bindList("/BusinessPartners", null, null, [
-				new Filter("Currency", FilterOperator.EQ, "USD"),
-				new Filter("SalesAmount", FilterOperator.GT, "0")
-			], {
+		const sView = `
+<Text id="count" text="{headerContext>$count}"/>
+<t:Table id="table" rows="{
+			filters : [
+				{path : 'Currency', operator : 'NE', value1 : 'USD'},
+				{path : 'SalesAmount', operator : 'GT', value1 : '0'}
+			],
+			path : '/BusinessPartners',
+			parameters : {
 				$$aggregation : {
 					aggregate : {
-						SalesAmount : {grandTotal : true}
+						SalesAmount : {grandTotal : true, unit : 'Currency'}
 					},
 					grandTotalAtBottomOnly : true,
 					group : {
@@ -28269,60 +28272,96 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						Id : {},
 						Region : {}
 					},
-					search : "covfefe"
+					search : 'covfefe'
 				},
-				$orderby : "Region asc,SalesAmount desc"
-			});
+				$orderby : 'Region asc,SalesAmount desc'
+			}
+		}" threshold="0" visibleRowCount="4">
+	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>
+	<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>
+	<Text id="level" text="{= %{@$ui5.node.level} }"/>
+	<Text id="id" text="{Id}"/>
+	<Text id="region" text="{Region}"/>
+	<Text id="salesAmount" text="{SalesAmount}"/>
+	<Text id="currency" text="{Currency}"/>
+</t:Table>`;
 
-		this.expectRequest("BusinessPartners?$apply=filter(Currency eq 'USD' and SalesAmount gt 0)"
-				+ "/search(covfefe)/concat(aggregate(SalesAmount)"
+		this.expectChange("count")
+			.expectRequest("BusinessPartners?$apply=filter(Currency ne 'USD' and SalesAmount gt 0)"
+				+ "/search(covfefe)/concat(aggregate(SalesAmount,Currency)"
 					+ ",groupby((Currency,Id,Region),aggregate(SalesAmount))"
 				+ "/orderby(Region asc,SalesAmount desc)"
 				// Note: $count is requested automatically
-				+ "/concat(aggregate($count as UI5__count),top(100)))", {
+				+ "/concat(aggregate($count as UI5__count),top(4)))", {
 				value : [
-					{SalesAmount : "n/a", "SalesAmount@odata.type" : "#Decimal"},
+					{
+						Currency : "EUR",
+						SalesAmount : "999",
+						"SalesAmount@odata.type" : "#Decimal"
+					},
 					{UI5__count : "1", "UI5__count@odata.type" : "#Decimal"},
 					{
-						Currency : "n/a",
+						Currency : "DEM",
 						Id : 42, // Edm.Int16
-						Region : "n/a",
-						SalesAmount : "n/a"
+						Region : "Old",
+						SalesAmount : "1.95583"
 					}
 				]
-			});
+			})
+			.expectChange("isExpanded", [undefined, true])
+			.expectChange("isTotal", [false, true])
+			.expectChange("level", [1, 0])
+			.expectChange("id", ["42", null])
+			.expectChange("region", ["Old", null])
+			.expectChange("salesAmount", ["1.95583", "999"])
+			.expectChange("currency", ["DEM", "EUR"]);
 
-		const [aContexts] = await Promise.all([
-			oListBinding.requestContexts(),
-			this.waitForChanges(assert)
-		]);
+		await this.createView(assert, sView, oModel);
 
+		const oListBinding = this.oView.byId("table").getBinding("rows");
 		assert.strictEqual(oListBinding.getHeaderContext().isAggregated(), false,
 			"JIRA: CPOUI5ODATAV4-2760");
+		assert.strictEqual(oListBinding.getCount(), 1, "old count");
+		assert.strictEqual(oListBinding.getLength(), 2, "old length");
 
+		this.expectChange("count", "1");
+
+		// code under test
+		this.oView.setModel(oModel, "headerContext")
+			.setBindingContext(oListBinding.getHeaderContext(), "headerContext");
+
+		await this.waitForChanges(assert, "headerContext>$count");
+
+		const aContexts = oListBinding.getCurrentContexts();
 		assert.strictEqual(aContexts[0].getPath(), "/BusinessPartners(42)");
 		assert.strictEqual(aContexts[0].isExpanded(), undefined, "leaf");
-		assert.strictEqual(aContexts[0].getProperty("@$ui5.node.isTotal"), false);
 		// code under test
 		assert.strictEqual(aContexts[0].isAggregated(), false, "JIRA: CPOUI5ODATAV4-2760");
 
 		assert.strictEqual(aContexts[1].getPath(), "/BusinessPartners()");
 		assert.strictEqual(aContexts[1].isExpanded(), true);
-		assert.strictEqual(aContexts[1].getProperty("@$ui5.node.isTotal"), true, "grand total");
 		// code under test
 		assert.strictEqual(aContexts[1].isAggregated(), true, "JIRA: CPOUI5ODATAV4-2760");
 
-		assert.strictEqual(oListBinding.getCount(), 1, "old count");
-		assert.strictEqual(oListBinding.getLength(), 2, "old length");
-
-		this.expectRequest("POST BusinessPartners", {
+		this.expectChange("count", "2")
+			.expectChange("isExpanded", [/*undefined*/, undefined, true])
+			.expectChange("isTotal", [/*false*/, false, true])
+			.expectChange("level", [/*1*/, 1, 0])
+			.expectChange("id", [null, "42", null])
+			.expectChange("region", ["New", "Old", null])
+			.expectChange("salesAmount", [null, "1.95583", "999"])
+			.expectChange("currency", ["", "DEM", "EUR"])
+			.expectRequest("POST BusinessPartners", {
 				payload : {Region : "New"}
 			}, {
 				Currency : "EUR",
 				Id : 1, // Edm.Int16
 				Region : "New",
 				SalesAmount : "123"
-			});
+			})
+			.expectChange("id", ["1"])
+			.expectChange("salesAmount", ["123"])
+			.expectChange("currency", ["EUR"]);
 
 		// code under test (JIRA: CPOUI5ODATAV4-3350)
 		const oCreatedContext = oListBinding.create({Region : "New"}, /*bSkipRefresh*/true,
@@ -28330,23 +28369,23 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		assert.deepEqual(oCreatedContext.getObject(), {
 			"@$ui5.context.isTransient" : true,
+			"@$ui5.node.isTotal" : false,
 			"@$ui5.node.level" : 1,
 			Region : "New"
 		}, "transient");
 		assert.strictEqual(oCreatedContext.isTransient(), true);
 		assert.strictEqual(oListBinding.getCount(), 2, "new count");
 		assert.strictEqual(oListBinding.getLength(), 3, "new length");
-		// Note: ODLB#getCurrentContexts requires a UI on top!
-		assert.deepEqual(oListBinding._getAllExistingContexts().map(getNormalizedPath), [
+		assert.deepEqual(oListBinding.getCurrentContexts().map(getNormalizedPath), [
 			"/BusinessPartners($uid=...)",
 			"/BusinessPartners(42)",
 			"/BusinessPartners()"
 		], "transient");
-		assert.strictEqual(oListBinding._getAllExistingContexts()[0], oCreatedContext);
+		assert.strictEqual(oListBinding.getCurrentContexts()[0], oCreatedContext);
 
 		await Promise.all([
 			oCreatedContext.created(),
-			this.waitForChanges(assert, "created")
+			this.waitForChanges(assert, "created at start")
 		]);
 
 		assert.deepEqual(oCreatedContext.getObject(), {
@@ -28361,12 +28400,80 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oCreatedContext.isTransient(), false);
 		assert.strictEqual(oListBinding.getCount(), 2, "unchanged");
 		assert.strictEqual(oListBinding.getLength(), 3, "unchanged");
-		assert.deepEqual(oListBinding._getAllExistingContexts().map(getPath), [
+		assert.deepEqual(oListBinding.getCurrentContexts().map(getPath), [
 			"/BusinessPartners(1)",
 			"/BusinessPartners(42)",
 			"/BusinessPartners()"
 		], "persisted");
-		assert.strictEqual(oListBinding._getAllExistingContexts()[0], oCreatedContext);
+		assert.strictEqual(oListBinding.getCurrentContexts()[0], oCreatedContext);
+
+		this.expectChange("count", "3")
+			.expectChange("isExpanded", [, /*undefined*/, undefined, true])
+			.expectChange("isTotal", [, /*false*/, false, true])
+			.expectChange("level", [, /*1*/, 1, 0])
+			.expectChange("id", [, null, "42", null])
+			.expectChange("region", [, "End Of Start", "Old", null])
+			.expectChange("salesAmount", [, null, "1.95583", "999"])
+			.expectChange("currency", [, "", "DEM", "EUR"])
+			.expectRequest("POST BusinessPartners", {
+				payload : {Region : "End Of Start"}
+			}, {
+				Currency : "EUR",
+				Id : 2, // Edm.Int16
+				Region : "End Of Start",
+				SalesAmount : "234"
+			})
+			.expectChange("id", [, "2"])
+			.expectChange("salesAmount", [, "234"])
+			.expectChange("currency", [, "EUR"]);
+
+		// code under test (JIRA: CPOUI5ODATAV4-3351)
+		const oEndOfStartContext = oListBinding.create({Region : "End Of Start"},
+			/*bSkipRefresh*/true, /*bAtEnd*/true, /*bInactive*/false);
+
+		assert.deepEqual(oEndOfStartContext.getObject(), {
+			"@$ui5.context.isTransient" : true,
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 1,
+			Region : "End Of Start"
+		}, "transient");
+		assert.strictEqual(oEndOfStartContext.isTransient(), true);
+		assert.strictEqual(oListBinding.getCount(), 3, "new count");
+		assert.strictEqual(oListBinding.getLength(), 4, "new length");
+		assert.deepEqual(oListBinding.getCurrentContexts().map(getNormalizedPath), [
+			"/BusinessPartners(1)",
+			"/BusinessPartners($uid=...)",
+			"/BusinessPartners(42)",
+			"/BusinessPartners()"
+		], "transient");
+		assert.strictEqual(oListBinding.getCurrentContexts()[0], oCreatedContext);
+		assert.strictEqual(oListBinding.getCurrentContexts()[1], oEndOfStartContext);
+
+		await Promise.all([
+			oEndOfStartContext.created(),
+			this.waitForChanges(assert, "created at end of start")
+		]);
+
+		assert.deepEqual(oEndOfStartContext.getObject(), {
+			"@$ui5.context.isTransient" : false,
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 1,
+			Currency : "EUR",
+			Id : 2,
+			Region : "End Of Start",
+			SalesAmount : "234"
+		}, "persisted");
+		assert.strictEqual(oEndOfStartContext.isTransient(), false);
+		assert.strictEqual(oListBinding.getCount(), 3, "unchanged");
+		assert.strictEqual(oListBinding.getLength(), 4, "unchanged");
+		assert.deepEqual(oListBinding.getCurrentContexts().map(getPath), [
+			"/BusinessPartners(1)",
+			"/BusinessPartners(2)",
+			"/BusinessPartners(42)",
+			"/BusinessPartners()"
+		], "persisted");
+		assert.strictEqual(oListBinding.getCurrentContexts()[0], oCreatedContext);
+		assert.strictEqual(oListBinding.getCurrentContexts()[1], oEndOfStartContext);
 	});
 
 	//*********************************************************************************************

@@ -825,13 +825,12 @@ sap.ui.define([
 		 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter|undefined} oFilters.boundFilters The bound filters
 		 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter|undefined} oFilters.filters The constant filters
 		 * @param {function} fnGetBinding The function returning the aggregation binding
-		 * @param {boolean} [bIsTreeBinding] Whether the aggregation binding is a tree binding
 		 * @returns {sap.ui.model.Filter[]|sap.ui.model.Filter|undefined}
 		 *   The filters to be used when the binding is created
 		 */
-		_processFilters: function (oFilters, fnGetBinding, bIsTreeBinding) {
+		_processFilters: function (oFilters, fnGetBinding) {
 			// keep behavior before introduction of bound filters in case there are none
-			if (oFilters.boundFilters === undefined || bIsTreeBinding) {
+			if (oFilters.boundFilters === undefined) {
 				return oFilters.filters;
 			}
 
@@ -902,21 +901,20 @@ sap.ui.define([
 					}
 				};
 
-				const getBinding = () => oBinding;
-				const bIsTreeBinding = this.isTreeBinding(sName);
-				const aFilters = this._processFilters(oBindingInfo, getBinding, bIsTreeBinding);
+			const getBinding = () => oBinding;
+			const aFilters = this._processFilters(oBindingInfo, getBinding);
 
-				var oModel = this.getModel(oBindingInfo.model);
-				if (bIsTreeBinding) {
-					oBinding = oModel.bindTree(oBindingInfo.path, this.getBindingContext(oBindingInfo.model), aFilters, oBindingInfo.parameters, oBindingInfo.sorter);
-				} else {
-					oBinding = oModel.bindList(oBindingInfo.path, this.getBindingContext(oBindingInfo.model), oBindingInfo.sorter, aFilters, oBindingInfo.parameters);
-					oBinding.computeApplicationFilters = this.computeApplicationFilters.bind(this, oBinding);
-					if (this.bUseExtendedChangeDetection) {
-						assert(!this.oExtendedChangeDetectionConfig || !this.oExtendedChangeDetectionConfig.symbol, "symbol function must not be set by controls");
-						oBinding.enableExtendedChangeDetection(!oBindingInfo.template, oBindingInfo.key, this.oExtendedChangeDetectionConfig);
-					}
+			var oModel = this.getModel(oBindingInfo.model);
+			if (this.isTreeBinding(sName)) {
+				oBinding = oModel.bindTree(oBindingInfo.path, this.getBindingContext(oBindingInfo.model), aFilters, oBindingInfo.parameters, oBindingInfo.sorter);
+			} else {
+				oBinding = oModel.bindList(oBindingInfo.path, this.getBindingContext(oBindingInfo.model), oBindingInfo.sorter, aFilters, oBindingInfo.parameters);
+				if (this.bUseExtendedChangeDetection) {
+					assert(!this.oExtendedChangeDetectionConfig || !this.oExtendedChangeDetectionConfig.symbol, "symbol function must not be set by controls");
+					oBinding.enableExtendedChangeDetection(!oBindingInfo.template, oBindingInfo.key, this.oExtendedChangeDetectionConfig);
 				}
+			}
+			oBinding.computeApplicationFilters = this.computeApplicationFilters.bind(this, oBinding);
 
 			if (oBindingInfo.suspended) {
 				oBinding.suspend(true);

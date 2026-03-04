@@ -47,8 +47,8 @@ sap.ui.define(
 		);
 
 		FilterContainer.prototype.init = function() {
-			this.oLayout = new FilterBarBaseLayout();
-			this.oLayout._oToolbar = new Toolbar(this.getId() + "-tbr", { content: [new ToolbarSpacer()] });
+			this.oLayout = new FilterBarBaseLayout(this.getId() + "-layout");
+			this.oLayout._oToolbar = new Toolbar(this.getId() + "-tbr", { content: [new ToolbarSpacer(this.getId() + "-tbr-spacer")] });
 
 			this.aLayoutItems = [];
 			this.addAggregation("_layout", this.oLayout._oToolbar, true);

@@ -520,4 +520,134 @@ sap.ui.define([
 		});
 	});
 
+	// DINC0728376: Test that sort conditions can be removed even when payload index differs from stored index
+	// This test verifies that sort removal works correctly - it should pass with key-only comparison
+	// but would fail if we used deepEqual (because index differs)
+	QUnit.test("Check that sort condition is removed correctly when payload index differs from stored index (DINC0728376)", function(assert) {
+		// Step 1: Add a sort condition at index 0
+		const oAddPayload = {
+			key: "sort_field_1",
+			property: "sortConditions",
+			operation: "add",
+			value: {
+				key: "sort_field_1",
+				descending: false,
+				index: 0
+			}
+		};
+
+		return xConfigAPI.enhanceConfig(this.oControl, oAddPayload)
+		.then(() => {
+			const oCustomData = this.oControl.getCustomData()[0];
+			const oConfig = JSON.parse(oCustomData.getValue().replace(/\\/g, ''));
+
+			assert.deepEqual(oConfig, {
+				"properties": {
+					"sortConditions": [
+						{
+							"key": "sort_field_1",
+							"descending": false,
+							"index": 0
+						}
+					]
+				}
+			}, "Sort condition was added correctly");
+
+			// Step 2: Remove the sort condition with a DIFFERENT index in payload
+			// This simulates what happens during revert - the payload index is the "restore to" position,
+			// not the current position in the array
+			const oRemovePayload = {
+				key: "sort_field_1",
+				property: "sortConditions",
+				operation: "remove",
+				value: {
+					key: "sort_field_1",
+					descending: false,
+					index: 5  // Different index than stored (0) - this is the revert scenario
+				}
+			};
+
+			return xConfigAPI.enhanceConfig(this.oControl, oRemovePayload);
+		})
+		.then(() => {
+			const oCustomData = this.oControl.getCustomData()[0];
+			const oConfig = JSON.parse(oCustomData.getValue().replace(/\\/g, ''));
+
+			// The sort condition should be removed, leaving an empty array
+			assert.deepEqual(oConfig, {
+				"properties": {
+					"sortConditions": []
+				}
+			}, "Sort condition was removed correctly even though payload index differed from stored index");
+		});
+	});
+
+	// DINC0728376: Test that the correct filter condition is removed when multiple exist for same key
+	QUnit.test("Check that correct filter condition is removed when multiple conditions exist for same key (DINC0490163)", function(assert) {
+		// Step 1: Add first filter condition
+		const oAddPayload1 = {
+			key: "filter_field",
+			property: "filterConditions",
+			operation: "add",
+			value: {
+				key: "filter_field",
+				condition: {
+					operator: "EQ",
+					values: ["Maria"]
+				}
+			}
+		};
+
+		return xConfigAPI.enhanceConfig(this.oControl, oAddPayload1)
+		.then(() => {
+			// Step 2: Add second filter condition for same key
+			const oAddPayload2 = {
+				key: "filter_field",
+				property: "filterConditions",
+				operation: "add",
+				value: {
+					key: "filter_field",
+					condition: {
+						operator: "EQ",
+						values: ["John"]
+					}
+				}
+			};
+			return xConfigAPI.enhanceConfig(this.oControl, oAddPayload2);
+		})
+		.then(() => {
+			const oCustomData = this.oControl.getCustomData()[0];
+			const oConfig = JSON.parse(oCustomData.getValue().replace(/\\/g, ''));
+
+			assert.equal(oConfig.properties.filterConditions.length, 2, "Two filter conditions exist");
+
+			// Step 3: Remove the "Maria" condition specifically
+			const oRemovePayload = {
+				key: "filter_field",
+				property: "filterConditions",
+				operation: "remove",
+				value: {
+					key: "filter_field",
+					condition: {
+						operator: "EQ",
+						values: ["Maria"]
+					}
+				}
+			};
+
+			return xConfigAPI.enhanceConfig(this.oControl, oRemovePayload);
+		})
+		.then(() => {
+			const oCustomData = this.oControl.getCustomData()[0];
+			const oConfig = JSON.parse(oCustomData.getValue().replace(/\\/g, ''));
+
+			// Only "John" should remain
+			assert.equal(oConfig.properties.filterConditions.length, 1, "One filter condition remains");
+			assert.deepEqual(oConfig.properties.filterConditions[0].condition, {
+				operator: "EQ",
+				values: ["John"]
+			}, "The correct filter condition (John) remains - Maria was removed");
+		});
+	});
+
 });

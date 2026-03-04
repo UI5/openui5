@@ -646,7 +646,8 @@ sap.ui.define([
 				 */
 				creationRow: {
 					type: "sap.ui.mdc.table.CreationRow",
-					multiple: false
+					multiple: false,
+					deprecated: true
 				},
 
 				/**
@@ -1671,20 +1672,22 @@ sap.ui.define([
 
 		const oRb = Library.getResourceBundleFor("sap.ui.mdc");
 		if (!this.isTableBound()) {
-			vNoData.setDescription(" ");
 			if (this.getFilter()) {
-				vNoData.setTitle(oRb.getText("table.NO_DATA_WITH_FILTERBAR"));
+				vNoData.setTitle(oRb.getText("table.NO_DATA_WITH_FILTERBAR_TITLE"));
+				vNoData.setDescription(oRb.getText("table.NO_DATA_WITH_FILTERBAR_DESCRIPTION"));
 				vNoData.setIllustrationType(IllustratedMessageType.BeforeSearch);
 			} else {
 				vNoData.setIllustrationType(IllustratedMessageType.NoEntries);
-				vNoData.setTitle(oRb.getText("table.NO_DATA"));
+				vNoData.setTitle(oRb.getText("table.NO_DATA_TITLE"));
+				vNoData.setDescription(oRb.getText("table.NO_DATA_DESCRIPTION"));
 			}
 		} else if (isFiltered(this)) {
 			vNoData.setTitle(oRb.getText("table.NO_RESULTS_TITLE"));
 			vNoData.setDescription(oRb.getText("table.NO_RESULTS_DESCRIPTION"));
 			vNoData.setIllustrationType(IllustratedMessageType.NoFilterResults);
 		} else {
-			vNoData.setTitle(oRb.getText("table.NO_DATA")).setDescription(" ");
+			vNoData.setTitle(oRb.getText("table.NO_DATA_TITLE"));
+			vNoData.setDescription(oRb.getText("table.NO_DATA_DESCRIPTION"));
 			vNoData.setIllustrationType(IllustratedMessageType.NoEntries);
 		}
 		this._sLastNoDataTitle = vNoData.getTitle();
@@ -1704,7 +1707,7 @@ sap.ui.define([
 
 		const oRb = Library.getResourceBundleFor("sap.ui.mdc");
 		if (!this.isTableBound()) {
-			return oRb.getText(this.getFilter() ? "table.NO_DATA_WITH_FILTERBAR" : "table.NO_DATA");
+			return this.getFilter() ? oRb.getText("table.NO_DATA_WITH_FILTERBAR") : oRb.getText("table.NO_DATA");
 		}
 
 		// Table is bound, but does not show any data.

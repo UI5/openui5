@@ -431,11 +431,11 @@ sap.ui.define([
 		const sGroup1 = oItem1.groupLabel || "";
 		const sGroup2 = oItem2.groupLabel || "";
 
-		// Items with key "basic" should always be in the first group
-		if (sKey1 === sBasicKey && sKey2 !== sBasicKey) {
+		// Items with key "basic" or "__$INTERNAL$" should always be in the first group
+		if ((sKey1 === sBasicKey || sKey1 === "__$INTERNAL$") && sKey2 !== sBasicKey && sKey2 !== "__$INTERNAL$") {
 			return -1;
 		}
-		if (sKey2 === sBasicKey && sKey1 !== sBasicKey) {
+		if ((sKey2 === sBasicKey || sKey2 === "__$INTERNAL$") && sKey1 !== sBasicKey && sKey1 !== "__$INTERNAL$") {
 			return 1;
 		}
 

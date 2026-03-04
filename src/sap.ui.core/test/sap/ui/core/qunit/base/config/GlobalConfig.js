@@ -2,6 +2,7 @@
 (function () {
     "use strict";
     globalThis["sap-ui-config"] = {
+        "missspelled": "test",
         "hubelDubel": "value1", // valid
         "hubeldubel": "value2", // valid
         "fooBar": "value3", // valid

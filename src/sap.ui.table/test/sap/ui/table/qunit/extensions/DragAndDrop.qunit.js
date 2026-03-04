@@ -8,8 +8,7 @@ sap.ui.define([
 	"sap/ui/core/dnd/DragDropInfo",
 	"sap/ui/core/library",
 	"sap/ui/core/Control",
-	"sap/ui/Device",
-	"sap/ui/thirdparty/jquery"
+	"sap/ui/Device"
 ], function(
 	TableQUnitUtils,
 	nextUIUpdate,
@@ -18,8 +17,7 @@ sap.ui.define([
 	DragDropInfo,
 	CoreLibrary,
 	Control,
-	Device,
-	jQuery
+	Device
 ) {
 	"use strict";
 
@@ -173,7 +171,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("Scrolling & Indicator size - dragover", async function(assert) {
-		const oFakeIndicator = jQuery("<div></div>").attr("style", "width: 0; height: 0; left: 0; right: 0");
+		const oFakeIndicator = document.createElement("div");
+		oFakeIndicator.style.cssText = "width: 0; height: 0; left: 0; right: 0";
+
 		const oFakeEvent = {
 			dragSession: {
 				mData: {},
@@ -185,7 +185,7 @@ sap.ui.define([
 					return this.mData[sId];
 				},
 				getIndicator: function() {
-					return oFakeIndicator[0];
+					return oFakeIndicator;
 				},
 				getDropControl: function() {
 					return this.dropControl;
@@ -193,7 +193,9 @@ sap.ui.define([
 				setIndicatorConfig: function(mConfig) {
 					this.mConfig = mConfig || {};
 					if (this.dropControl) {
-						oFakeIndicator.css(this.mConfig);
+						Object.keys(this.mConfig).forEach((sKey) => {
+							oFakeIndicator.style[sKey] = this.mConfig[sKey] + (typeof this.mConfig[sKey] === "number" ? "px" : "");
+						});
 					}
 				},
 				getIndicatorConfig: function(mConfig) {

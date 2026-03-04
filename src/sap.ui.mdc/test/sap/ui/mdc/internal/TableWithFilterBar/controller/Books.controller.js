@@ -1,9 +1,6 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/core/UIComponent",
-	"sap/ui/mdc/FilterField",
-	"sap/m/Column",
-	"sap/m/ColumnListItem",
 	"sap/m/MessageToast",
 	"sap/m/Table",
 	"sap/m/Text",
@@ -13,7 +10,7 @@ sap.ui.define([
 	"sap/m/ExpandableText", // to have it loaded before rendering starts
 	"sap/ui/mdc/enums/FilterBarValidationStatus",
 	'sap/base/Log'
-], function (Controller, UIComponent, FilterField, Column, ColumnListItem, MessageToast, Table, Text, FieldBaseDelegate, FieldMultiInput, Token, ExpandableText, FilterBarValidationStatus, Log) {
+], function (Controller, UIComponent, MessageToast, Table, Text, FieldBaseDelegate, FieldMultiInput, Token, ExpandableText, FilterBarValidationStatus, Log) {
 
 	"use strict";
 

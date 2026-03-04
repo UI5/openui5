@@ -9,7 +9,7 @@ sap.ui.define(['sap/ui/model/ClientTreeBinding'],
 
 
 	/**
-	 * @class Tree binding implementation for JSON format. See {@link sap.ui.model.json.JSONModel#bindTree}
+	 * @class Tree binding implementation for JSON model. See {@link sap.ui.model.json.JSONModel#bindTree}
 	 * @hideconstructor
 	 * @protected
 	 * @alias sap.ui.model.json.JSONTreeBinding

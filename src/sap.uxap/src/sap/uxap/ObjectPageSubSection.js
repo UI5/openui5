@@ -196,7 +196,11 @@ sap.ui.define([
 
 	// Add Title Propagation Support
 	TitlePropagationSupport.call(ObjectPageSubSection.prototype, "blocks", function () {
-		return this._getTitleDomId();
+		var sTitleDomId = this._getTitleDomId();
+		if (!sTitleDomId) {
+			return false;
+		}
+		return { id: sTitleDomId, role: "region" };
 	});
 
 

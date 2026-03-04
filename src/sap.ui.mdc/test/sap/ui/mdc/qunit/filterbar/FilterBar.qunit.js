@@ -59,7 +59,7 @@ sap.ui.define([
 
 	QUnit.module("FilterBar", {
 		beforeEach: function() {
-			oFilterBar = new FilterBar({
+			oFilterBar = new FilterBar("FB1", {
 				delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } }
 			});
 
@@ -133,7 +133,7 @@ sap.ui.define([
 	QUnit.test("modifiable Adapt Filters button", function(assert) {
 		const sText = "All Filters";
 
-		const oCustomFilterBar = new FilterBar({
+		const oCustomFilterBar = new FilterBar("FB2", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			adaptFiltersText: sText,
 			adaptFiltersTextNonZero: `${sText} (\\{0\\})`,
@@ -164,7 +164,7 @@ sap.ui.define([
 		const sText = oRB.getText("filterbar.ADAPT");
 		const sTextNonZero = oRB.getText("filterbar.ADAPT_NONZERO", [1]);
 
-		const oCustomFilterBar = new FilterBar({
+		const oCustomFilterBar = new FilterBar("FB2", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			p13nMode: ["Item", "Value"]
 		});
@@ -193,7 +193,7 @@ sap.ui.define([
 		const sText = oRB.getText("filterbar.ADAPT");
 		const sTextNonZero = oRB.getText("filterbar.ADAPT_NONZERO", [1]);
 
-		const oCustomFilterBar = new FilterBar({
+		const oCustomFilterBar = new FilterBar("FB2", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			adaptFiltersText: "All Filters",
 			p13nMode: ["Item", "Value"]
@@ -223,7 +223,7 @@ sap.ui.define([
 		const sText = oRB.getText("filterbar.ADAPT");
 		const sTextNonZero = oRB.getText("filterbar.ADAPT_NONZERO", [1]);
 
-		const oCustomFilterBar = new FilterBar({
+		const oCustomFilterBar = new FilterBar("FB2", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			adaptFiltersTextNonZero: "All Filters",
 			p13nMode: ["Item", "Value"]
@@ -316,7 +316,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("add Filter", function(assert) {
-		const oFilterField = new FilterField({ conditions: "{cm>/conditions/filter}" });
+		const oFilterField = new FilterField("FF", { conditions: "{cm>/conditions/filter}" });
 
 		assert.equal(oFilterBar.getFilterItems().length, 0);
 		assert.equal(oFilterBar.getAggregation("layout").getFilterFields().length, 0);
@@ -329,7 +329,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("remove Filter", function(assert) {
-		const oFilterField = new FilterField();
+		const oFilterField = new FilterField("FF");
 		oFilterBar.addFilterItem(oFilterField);
 
 		assert.equal(oFilterBar.getFilterItems().length, 1);
@@ -358,7 +358,7 @@ sap.ui.define([
 
 	QUnit.test("check condition model with prefilled conditions", function(assert) {
 
-		const oFB = new FilterBar({
+		const oFB = new FilterBar("FB2", {
 			delegate: {
 				name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate"
 			},
@@ -387,9 +387,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("check api setFocusOnFirstErroneousField", function(assert) {
-		const oFilterField0 = new FilterField({ conditions: "{cm>/conditions/filter0}" });
-		const oFilterField1 = new FilterField({ conditions: "{cm>/conditions/filter1}" });
-		const oFilterField2 = new FilterField({ conditions: "{cm>/conditions/filter2}" });
+		const oFilterField0 = new FilterField("FF0", { conditions: "{cm>/conditions/filter0}" });
+		const oFilterField1 = new FilterField("FF1", { conditions: "{cm>/conditions/filter1}" });
+		const oFilterField2 = new FilterField("FF2", { conditions: "{cm>/conditions/filter2}" });
 
 		oFilterBar.addFilterItem(oFilterField0);
 		oFilterBar.addFilterItem(oFilterField1);
@@ -426,7 +426,7 @@ sap.ui.define([
 				aPropertyInfo = [];
 			}
 
-			oFilterBar = new FilterBar({
+			oFilterBar = new FilterBar("FB1", {
 				delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } }
 			});
 
@@ -509,7 +509,7 @@ sap.ui.define([
 			const oCM = oFilterBar._getConditionModel();
 			oCM.addCondition("fieldPath1", Condition.createCondition(OperatorName.EQ, ["foo"]));
 
-			oFilterBar.setBasicSearchField(new FilterField({
+			oFilterBar.setBasicSearchField(new FilterField("FF", {
 				conditions: "{$filters>/conditions/$search}",
 				propertyKey: "$search",
 				maxConditions: 1,
@@ -623,7 +623,7 @@ sap.ui.define([
 
 	QUnit.test("check setBasicSearchField", function(assert) {
 
-		const oBasicSearchField = new FilterField({ conditions: "{cm>/conditions/$search}", propertyKey: "$search" });
+		const oBasicSearchField = new FilterField("FF", { conditions: "{cm>/conditions/$search}", propertyKey: "$search" });
 		oFilterBar.setBasicSearchField(oBasicSearchField);
 		assert.equal(oFilterBar.getFilterItems().length, 0);
 		assert.equal(oFilterBar.getAggregation("layout").getFilterFields().length, 1);
@@ -636,7 +636,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("check _getFilterItemLayout", function(assert) {
-		const oFilterField = new FilterField();
+		const oFilterField = new FilterField("FF");
 		oFilterBar.addFilterItem(oFilterField);
 
 		const oFilterItemLayout = oFilterBar._getFilterItemLayout(oFilterField);
@@ -1006,6 +1006,7 @@ sap.ui.define([
 				assert.ok(oFilterBar._applyFilterItemRemoved.calledOnce);
 
 				oFilterBar.getControlDelegate().fetchProperties.restore();
+				aFilterFields[0].destroy();
 
 				done();
 			});
@@ -1067,6 +1068,7 @@ sap.ui.define([
 				assert.ok(oFilterBar._applyFilterItemRemoved.calledOnce);
 
 				oFilterBar.getControlDelegate().fetchProperties.restore();
+				aFilterFields[0].destroy();
 
 				done();
 			});
@@ -1122,7 +1124,7 @@ sap.ui.define([
 
 		const oMyModel = new JSONModel();
 
-		const oFB = new FilterBar({
+		const oFB = new FilterBar("FB2", {
 			delegate: {
 				name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate",
 				payload: {
@@ -1654,11 +1656,11 @@ sap.ui.define([
 	QUnit.test("check required property on Label of FilterField", async function(assert) {
 		const done = assert.async();
 
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			required: true,
 			propertyKey: "field1"
 		});
-		const oFilterField2 = new FilterField({
+		const oFilterField2 = new FilterField("FF2", {
 			propertyKey: "field2"
 		});
 		oFilterBar.addFilterItem(oFilterField1);
@@ -1706,10 +1708,10 @@ sap.ui.define([
 	const makeReducedMockPropertyInfo = (name) => ({key: name, label: "label"});
 
 	QUnit.test("Should not log anything, if PropertyInfo is set and FilterFields only set propertyKey", function(assert) {
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1"
 		});
-		const oFilterField2 = new FilterField({
+		const oFilterField2 = new FilterField("FF2", {
 			propertyKey: "field2"
 		});
 
@@ -1718,7 +1720,7 @@ sap.ui.define([
 			makeMockPropertyInfo("field2")
 		];
 
-		this.oFB = new FilterBar({
+		this.oFB = new FilterBar("FB1", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			propertyInfo: oPropertyInfo,
 			filterItems: [oFilterField1, oFilterField2]
@@ -1730,10 +1732,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should not log anything, if PropertyInfo is set for a small selection of properties only and FilterFields only set propertyKey", function(assert) {
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1"
 		});
-		const oFilterField2 = new FilterField({
+		const oFilterField2 = new FilterField("FF2", {
 			propertyKey: "field2"
 		});
 
@@ -1742,7 +1744,7 @@ sap.ui.define([
 			makeReducedMockPropertyInfo("field2")
 		];
 
-		this.oFB = new FilterBar({
+		this.oFB = new FilterBar("FB1", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			propertyInfo: oPropertyInfo,
 			filterItems: [oFilterField1, oFilterField2]
@@ -1754,10 +1756,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should set FilterField label from PropertyInfo, if only propertyKey is set on FilterField", async function(assert) {
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1"
 		});
-		const oFilterField2 = new FilterField({
+		const oFilterField2 = new FilterField("FF2", {
 			propertyKey: "field2"
 		});
 
@@ -1766,7 +1768,7 @@ sap.ui.define([
 			makeMockPropertyInfo("field2")
 		];
 
-		this.oFB = new FilterBar({
+		this.oFB = new FilterBar("FB1", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			propertyInfo: oPropertyInfo,
 			filterItems: [oFilterField1, oFilterField2]
@@ -1779,10 +1781,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should log warning, if FilterField sets metadata property that is not contained in matching PropertyInfo", function(assert) {
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1"
 		});
-		const oFilterField2 = new FilterField({
+		const oFilterField2 = new FilterField("FF2", {
 			propertyKey: "field2",
 			maxConditions: 1
 		});
@@ -1792,7 +1794,7 @@ sap.ui.define([
 			makeReducedMockPropertyInfo("field2")
 		];
 
-		this.oFB = new FilterBar({
+		this.oFB = new FilterBar("FB1", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			propertyInfo: oPropertyInfo,
 			filterItems: [oFilterField1, oFilterField2]
@@ -1804,7 +1806,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should log error, if FilterField sets metadata property, and value in PropertyInfo does not match", function(assert) {
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1",
 			label: "Field 1"
 		});
@@ -1813,7 +1815,7 @@ sap.ui.define([
 			makeMockPropertyInfo("field1")
 		];
 
-		this.oFB = new FilterBar({
+		this.oFB = new FilterBar("FB1", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			propertyInfo: oPropertyInfo,
 			filterItems: [oFilterField1]
@@ -1825,10 +1827,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should log error, if FilterField has no metadata, and PropertyInfo does not contain metadata either", function(assert) {
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1"
 		});
-		const oFilterField2 = new FilterField({
+		const oFilterField2 = new FilterField("FF2", {
 			propertyKey: "field2"
 		});
 
@@ -1836,7 +1838,7 @@ sap.ui.define([
 			makeMockPropertyInfo("field1")
 		];
 
-		this.oFB = new FilterBar({
+		this.oFB = new FilterBar("FB1", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			propertyInfo: oPropertyInfo,
 			filterItems: [oFilterField1, oFilterField2]
@@ -1848,7 +1850,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should not log, if FilterField sets metadata properties, and values in PropertyInfo match", function(assert) {
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1",
 			label: "label",
 			dataType: "Edm.String",
@@ -1860,7 +1862,7 @@ sap.ui.define([
 			makeMockPropertyInfo("field1")
 		];
 
-		this.oFB = new FilterBar({
+		this.oFB = new FilterBar("FB1", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			propertyInfo: oPropertyInfo,
 			filterItems: [oFilterField1]
@@ -1872,14 +1874,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should log warning, if FilterField sets metadata properties, values in PropertyInfo match, but another FilterField does not set metadata explicitly", function(assert) {
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1",
 			label: "label",
 			dataType: "Edm.String",
 			maxConditions: 1,
 			required: false
 		});
-		const oFilterField2 = new FilterField({
+		const oFilterField2 = new FilterField("FF2", {
 			propertyKey: "field2"
 		});
 
@@ -1888,7 +1890,7 @@ sap.ui.define([
 			makeMockPropertyInfo("field2")
 		];
 
-		this.oFB = new FilterBar({
+		this.oFB = new FilterBar("FB1", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			propertyInfo: oPropertyInfo,
 			filterItems: [oFilterField1, oFilterField2]
@@ -1900,7 +1902,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should log warning, if PropertyInfo not set, but FilterField sets all metadata required for initial rendering", function(assert) {
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1",
 			label: "label",
 			dataType: "Edm.String",
@@ -1913,7 +1915,7 @@ sap.ui.define([
 		const oPropertyInfo = [
 		];
 
-		this.oFB = new FilterBar({
+		this.oFB = new FilterBar("FB1", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			propertyInfo: oPropertyInfo,
 			filterItems: [oFilterField1]
@@ -1925,11 +1927,11 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should not log, if PropertyInfo not set, and no FilterField has metadata", function(assert) {
-		const oFilterField1 = new FilterField({
+		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1"
 		});
 
-		this.oFB = new FilterBar({
+		this.oFB = new FilterBar("FB1", {
 			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
 			filterItems: [oFilterField1]
 		});

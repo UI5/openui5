@@ -1179,6 +1179,16 @@ sap.ui.define([
 			assert.strictEqual(this.oTable.getDomRef("tableCCnt").scrollTop, iInnerScrollPosition,
 				sTitle + "Viewport position");
 		},
+		assertPositionWithMomentumScroll: function(assert, iFirstVisibleRowIndex, iScrollPosition, iInnerScrollPosition, sTitle) {
+			sTitle = sTitle == null ? "" : sTitle + ": ";
+
+			assert.ok(this.oTable.getFirstVisibleRow() >= iFirstVisibleRowIndex,
+				sTitle + "First visible row index");
+			assert.ok(this.oTable._getScrollExtension().getVerticalScrollbar().scrollTop >= iScrollPosition,
+				sTitle + "Scrollbar position");
+			assert.ok(this.oTable.getDomRef("tableCCnt").scrollTop >= iInnerScrollPosition,
+				sTitle + "Viewport position");
+		},
 		testRestoration: function(assert, sTitle) {
 			sTitle = sTitle == null ? "" : sTitle + "; ";
 
@@ -3408,7 +3418,7 @@ sap.ui.define([
 				TableQUnitUtils.endTouchScrolling();
 				oStopPropagationSpy = sinon.spy(oTouchMoveEvent, "stopPropagation");
 			}).then(oTable.qunit.whenVSbScrolled).then(function() {
-				that.assertPosition(assert, 0, 20, 0, "Touch - " + mConfig.name + ": Scrolled");
+				that.assertPositionWithMomentumScroll(assert, 0, 20, 0, "Touch - " + mConfig.name + ": Scrolled");
 				assert.ok(oTouchMoveEvent.defaultPrevented, "Touch - " + mConfig.name + ": Default action was prevented");
 				assert.ok(oStopPropagationSpy.notCalled, "Touch - " + mConfig.name + ": Propagation was not stopped");
 			});
@@ -5825,5 +5835,178 @@ sap.ui.define([
 				assert.strictEqual(document.activeElement, oCellContent, "Cell content has focus");
 			});
 		});
+	});
+
+	QUnit.module("Momentum scrolling", {
+		beforeEach: function() {
+			this.oTable = TableQUnitUtils.createTable({
+				visibleRowCount: 5,
+				rows: {path: "/"},
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+				columns: [
+					TableQUnitUtils.createTextColumn().setWidth("400px"),
+					TableQUnitUtils.createTextColumn().setWidth("400px"),
+					TableQUnitUtils.createTextColumn().setWidth("400px"),
+					TableQUnitUtils.createTextColumn().setWidth("400px")
+				]
+			});
+
+			// Store original device support
+			this.bOriginalPointerSupport = Device.support.pointer;
+			this.bOriginalTouchSupport = Device.support.touch;
+
+			return this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			// Restore original device support
+			Device.support.pointer = this.bOriginalPointerSupport;
+			Device.support.touch = this.bOriginalTouchSupport;
+			this.oTable.destroy();
+		},
+		/**
+		 * Waits for momentum scrolling to complete by checking if scroll position stabilizes.
+		 * @param {Element} oScrollbar - The scrollbar element to monitor
+		 * @param {number} [iTimeout=2000] - Maximum wait time in ms
+		 * @returns {Promise} Resolves when scrolling stops or timeout is reached
+		 */
+		waitForMomentumEnd: function(oScrollbar, iTimeout) {
+			iTimeout = iTimeout || 2000;
+			return new Promise(function(resolve) {
+				let iLastScrollPosition = oScrollbar.scrollTop || oScrollbar.scrollLeft;
+				let iStableCount = 0;
+				const iStartTime = Date.now();
+
+				function checkScrollComplete() {
+					const iCurrentPosition = oScrollbar.scrollTop || oScrollbar.scrollLeft;
+
+					if (iCurrentPosition === iLastScrollPosition) {
+						iStableCount++;
+						// Consider stable after 3 consecutive checks (~50ms of no movement)
+						if (iStableCount >= 3) {
+							resolve();
+							return;
+						}
+					} else {
+						iStableCount = 0;
+						iLastScrollPosition = iCurrentPosition;
+					}
+
+					if (Date.now() - iStartTime >= iTimeout) {
+						resolve(); // Timeout fallback
+						return;
+					}
+
+					setTimeout(checkScrollComplete, 16); // Check every frame (~60fps)
+				}
+
+				// Start checking after a small delay to allow animation to begin
+				setTimeout(checkScrollComplete, 50);
+			});
+		}
+	});
+
+	QUnit.test("Momentum animation triggered after fast swipe", async function(assert) {
+		const oTable = this.oTable;
+		const oVSb = oTable._getScrollExtension().getVerticalScrollbar();
+		const iInitialScrollTop = oVSb.scrollTop;
+		const that = this;
+
+		Device.support.pointer = false;
+		Device.support.touch = true;
+		oTable.invalidate();
+
+		await oTable.qunit.whenRenderingFinished();
+		const oTargetElement = oTable.qunit.getDataCell(0, 0);
+		TableQUnitUtils.startTouchScrolling(oTargetElement);
+
+		// Simulate a fast swipe with minimal delays to ensure high velocity
+		TableQUnitUtils.doTouchScrolling(0, 40);
+		await TableQUnitUtils.wait(10);
+		TableQUnitUtils.doTouchScrolling(0, 40);
+		await TableQUnitUtils.wait(10);
+		TableQUnitUtils.doTouchScrolling(0, 40);
+
+		// End touch - this should trigger momentum
+		TableQUnitUtils.endTouchScrolling();
+
+		// Wait for momentum animation to complete
+		await that.waitForMomentumEnd(oVSb);
+
+		const iScrollTopAfterMomentum = oVSb.scrollTop;
+		// Momentum should scroll beyond the initial touch distance (240px total touch movement)
+		assert.ok(iScrollTopAfterMomentum > iInitialScrollTop + 240,
+			"Momentum scrolling continued after touch end (scrolled more than touch distance). " +
+			"Initial: " + iInitialScrollTop + ", After: " + iScrollTopAfterMomentum);
+	});
+
+	QUnit.test("New touch cancels active momentum animation", async function(assert) {
+		const oTable = this.oTable;
+		const oVSb = oTable._getScrollExtension().getVerticalScrollbar();
+
+		Device.support.pointer = false;
+		Device.support.touch = true;
+		oTable.invalidate();
+
+		await oTable.qunit.whenRenderingFinished();
+		let oTargetElement = oTable.qunit.getDataCell(0, 0);
+
+		// First swipe to start momentum
+		TableQUnitUtils.startTouchScrolling(oTargetElement);
+		TableQUnitUtils.doTouchScrolling(0, 40);
+		await TableQUnitUtils.wait(10);
+		TableQUnitUtils.doTouchScrolling(0, 40);
+		TableQUnitUtils.endTouchScrolling();
+
+		// Wait briefly for momentum to start
+		await TableQUnitUtils.wait(30);
+
+		oTargetElement = oTable.qunit.getDataCell(0, 0);
+
+		// Start a new touch (should cancel momentum)
+		TableQUnitUtils.startTouchScrolling(oTargetElement);
+
+		// Record position immediately after new touch
+		const iScrollAfterNewTouchStart = oVSb.scrollTop;
+
+		// Wait to verify no further momentum scrolling occurs
+		await TableQUnitUtils.wait(200);
+
+		const iScrollAfterWait = oVSb.scrollTop;
+
+		// Scroll should not have changed significantly after the new touch started
+		assert.ok(Math.abs(iScrollAfterWait - iScrollAfterNewTouchStart) < 5,
+			"New touch cancelled momentum animation. " +
+			"Position at new touch: " + iScrollAfterNewTouchStart + ", After wait: " + iScrollAfterWait);
+
+		TableQUnitUtils.endTouchScrolling();
+	});
+
+	QUnit.test("Horizontal momentum scrolling", async function(assert) {
+		const oTable = this.oTable;
+		const oHSb = oTable._getScrollExtension().getHorizontalScrollbar();
+		const iInitialScrollLeft = oHSb.scrollLeft;
+		const that = this;
+
+		Device.support.pointer = false;
+		Device.support.touch = true;
+		oTable.invalidate();
+
+		await oTable.qunit.whenRenderingFinished();
+		const oTargetElement = oTable.qunit.getDataCell(0, 0);
+		TableQUnitUtils.startTouchScrolling(oTargetElement);
+
+		// Horizontal swipe with minimal delays for high velocity
+		TableQUnitUtils.doTouchScrolling(80, 0);
+		await TableQUnitUtils.wait(10);
+		TableQUnitUtils.doTouchScrolling(80, 0);
+		TableQUnitUtils.endTouchScrolling();
+
+		// Wait for momentum to complete
+		await that.waitForMomentumEnd(oHSb);
+
+		const iScrollLeftAfterMomentum = oHSb.scrollLeft;
+		assert.ok(iScrollLeftAfterMomentum > iInitialScrollLeft + 160,
+			"Horizontal momentum scrolling works. " +
+			"Initial: " + iInitialScrollLeft + ", After: " + iScrollLeftAfterMomentum);
 	});
 });

@@ -40,7 +40,7 @@ sap.ui.define([
 	});
 
 	FilterContainer.prototype.init = function() {
-		this.oLayout = new FilterBarBaseLayout();
+		this.oLayout = new FilterBarBaseLayout(this.getId() + "-layout");
 		this.setAggregation("_layout", this.oLayout, true);
 	};
 

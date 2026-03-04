@@ -113,8 +113,8 @@ sap.ui.define([
 			if (!bNegative) {
 				assert.strictEqual(oSuggestSpy.callCount, 1,
 						"Suggest method is called once for control of type " + sType);
-				assert.ok(oSuggestSpy.calledWith(sTitleID),
-						"Suggest method on " + sType + " is called with the expected title ID: " +
+				assert.ok(oSuggestSpy.calledWithMatch({id: sTitleID}),
+						"Suggest method on " + sType + " is called with object containing the expected title ID: " +
 						sTitleID);
 			} else {
 				assert.strictEqual(oSuggestSpy.callCount, 0,

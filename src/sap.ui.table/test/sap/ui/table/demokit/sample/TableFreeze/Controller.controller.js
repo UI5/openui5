@@ -4,9 +4,8 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageToast",
 	"sap/ui/core/format/DateFormat",
-	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/date/UI5Date"
-], function(Log, Controller, JSONModel, MessageToast, DateFormat, jQuery, UI5Date) {
+], function(Log, Controller, JSONModel, MessageToast, DateFormat, UI5Date) {
 	"use strict";
 
 	return Controller.extend("sap.ui.table.sample.TableFreeze.Controller", {
@@ -22,9 +21,14 @@ sap.ui.define([
 
 			const oDateFormat = DateFormat.getDateInstance({source: {pattern: "timestamp"}, pattern: "dd/MM/yyyy"});
 
-			jQuery.ajax(sap.ui.require.toUrl("sap/ui/demo/mock/products.json"), {
-				dataType: "json",
-				success: function(oData) {
+			fetch(sap.ui.require.toUrl("sap/ui/demo/mock/products.json"))
+				.then(function(response) {
+					if (!response.ok) {
+						throw new Error("HTTP error " + response.status);
+					}
+					return response.json();
+				})
+				.then(function(oData) {
 					const aTemp1 = [];
 					const aTemp2 = [];
 					const aSuppliersData = [];
@@ -49,11 +53,10 @@ sap.ui.define([
 					oData.Categories = aCategoryData;
 
 					oModel.setData(oData);
-				},
-				error: function() {
+				})
+				.catch(function() {
 					Log.error("failed to load json");
-				}
-			});
+				});
 
 			return oModel;
 		},

@@ -140,7 +140,8 @@ sap.ui.define([
 				 */
 				creationTemplate: {
 					type: "sap.ui.core.Control",
-					multiple: false
+					multiple: false,
+					deprecated: true
 				},
 				/**
 				 * Defines type-specific column settings based on the used {@link sap.ui.mdc.table.TableTypeBase}.

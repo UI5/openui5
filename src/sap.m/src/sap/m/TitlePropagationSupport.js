@@ -52,13 +52,15 @@ sap.ui.define(["sap/ui/core/ControlBehavior"],
 		 * @version ${version}
 		 *
 		 * @param {string} sAggregationName the name of the aggregation which should be affected
-		 * @param {object} fnGetTitleID function that would return the ID of the title
+		 * @param {function} fnGetTitleInfo function that returns the title ID as a string,
+		 *   or an object <code>{ id: string, role?: string }</code> containing the title ID and optionally the ARIA role
+		 *   of the title's container
 		 *
 		 * @private
 		 * @alias sap.m.TitlePropagationSupport
 		 * @function
 		 */
-		return function (sAggregationName, fnGetTitleID) {
+		return function (sAggregationName, fnGetTitleInfo) {
 			// "this" is the prototype now when called with call()
 
 			// Ensure only Elements are enhanced
@@ -76,13 +78,23 @@ sap.ui.define(["sap/ui/core/ControlBehavior"],
 
 				var oAggregation = this.getMetadata().getAggregation(sAggregationName),
 					aContent = oAggregation && oAggregation.get(this),
-					sTitleID = fnGetTitleID && fnGetTitleID.call(this),
+					vTitleInfo = fnGetTitleInfo && fnGetTitleInfo.call(this),
+					oTitleData,
 					oItem;
 
 				// Note: in case accessibility mode is off we don't need the propagation
-				if (!ControlBehavior.isAccessibilityEnabled() || !sTitleID || !aContent
+				if (!ControlBehavior.isAccessibilityEnabled() || !vTitleInfo || !aContent
 					|| aContent.length === 0) {
 						return false;
+				}
+
+				// Normalize: string -> { id: string }, object stays as-is
+				if (typeof vTitleInfo === "string") {
+					oTitleData = { id: vTitleInfo };
+				} else if (vTitleInfo.id) {
+					oTitleData = vTitleInfo;
+				} else {
+					return false;
 				}
 
 				// Propagate title ID only to first control in the content
@@ -91,7 +103,7 @@ sap.ui.define(["sap/ui/core/ControlBehavior"],
 					"sap.ui.layout.form.SimpleForm",
 					"sap.ui.layout.form.Form",
 					"sap.ui.comp.smartform.SmartForm"])) {
-						oItem._suggestTitleId(sTitleID);
+						oItem._suggestTitleId(oTitleData);
 						return true;
 				}
 				return false;

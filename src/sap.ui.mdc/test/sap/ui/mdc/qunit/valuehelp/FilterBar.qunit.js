@@ -294,7 +294,7 @@ sap.ui.define([
 		const vhModelMock = new JSONModel({title: "Title"});
 		oFilterBar.setModel(vhModelMock, "$help");
 
-		const oBasicSearchField = new FilterField({ conditions: "{cm>/conditions/$search}", propertyKey: "$search" });
+		const oBasicSearchField = new FilterField("BS1", { conditions: "{cm>/conditions/$search}", propertyKey: "$search" });
 		oFilterBar.setBasicSearchField(oBasicSearchField);
 
 

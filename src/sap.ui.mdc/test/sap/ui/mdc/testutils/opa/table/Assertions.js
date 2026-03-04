@@ -7,7 +7,6 @@
 sap.ui.define([
 	"sap/ui/test/matchers/Ancestor",
 	"sap/ui/test/matchers/Properties",
-	"sap/ui/test/matchers/AggregationContainsPropertyEqual",
 	"./Util",
 	"./waitForTable",
 	"./waitForColumnHeader",
@@ -16,7 +15,6 @@ sap.ui.define([
 ], function(
 	Ancestor,
 	Properties,
-	AggregationContainsPropertyEqual,
 	TableUtil,
 	waitForTable,
 	waitForColumnHeader,

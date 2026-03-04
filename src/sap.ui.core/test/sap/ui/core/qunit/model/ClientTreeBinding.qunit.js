@@ -389,4 +389,36 @@ sap.ui.define([
 		assert.deepEqual(oBinding.cloneData(false), false);
 		assert.deepEqual(oBinding.cloneData(null), null);
 	});
+
+	//*********************************************************************************************
+[FilterType.Application, FilterType.ApplicationBound].forEach(function (sFilterType) {
+	["~aComputedFilters", undefined].forEach(function (vComputedFilters, i) {
+	QUnit.test("filter: filter type = " + sFilterType + ", " + i, function (assert) {
+		const oModel = { checkFilter() {}, _getObject() {} };
+		const oModelMock = this.mock(oModel);
+		oModelMock.expects("_getObject").withExactArgs("/path", "~oContext~").returns("~data");
+		this.mock(ClientTreeBinding.prototype).expects("cloneData").withExactArgs("~data").returns("~clonedData");
+		const oBinding = new ClientTreeBinding(oModel, "/path", "~oContext~");
+
+		oModelMock.expects("checkFilter").withExactArgs(["~aNewFilters"]);
+		this.mock(oBinding).expects("computeApplicationFilters")
+			.withExactArgs(["~aNewFilters"], sFilterType)
+			.returns(vComputedFilters);
+		this.mock(FilterProcessor).expects("combineFilters")
+			.withExactArgs([], vComputedFilters ? vComputedFilters : [])
+			.returns("~oCombinedFilter");
+		this.mock(oBinding).expects("applyFilter").withExactArgs();
+		this.mock(oBinding).expects("_fireChange").withExactArgs(sinon.match.object);
+
+		// code under test
+		assert.strictEqual(oBinding.filter("~aNewFilters", sFilterType), oBinding);
+
+		if (vComputedFilters) {
+			assert.strictEqual(oBinding.aApplicationFilters, vComputedFilters);
+		} else {
+			assert.deepEqual(oBinding.aApplicationFilters, []);
+		}
+	});
+	});
+});
 });

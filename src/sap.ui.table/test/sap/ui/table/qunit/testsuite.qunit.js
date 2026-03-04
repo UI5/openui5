@@ -301,11 +301,6 @@ sap.ui.define([
 				module: "./rowmodes/Auto.ODataV2.qunit"
 			},
 
-			"Variable": {
-				group: "Row Mode",
-				module: "./rowmodes/{name}.qunit"
-			},
-
 			// Plugins
 			"PluginBase": {
 				group: "Plugins",

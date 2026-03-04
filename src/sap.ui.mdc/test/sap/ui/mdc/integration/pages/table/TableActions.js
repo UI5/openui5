@@ -1,18 +1,9 @@
 /*** List Report Actions ***/
 sap.ui.define(
-	["sap/ui/test/matchers/PropertyStrictEquals",
-		"sap/ui/test/matchers/AggregationFilled",
-		"sap/ui/test/actions/Press",
-		"sap/ui/test/matchers/AggregationLengthEquals",
-		"sap/ui/test/matchers/Properties",
-		"sap/ui/test/actions/EnterText",
-		"sap/m/Token"],
-
-	function (PropertyStrictEquals, AggregationFilled, Press, AggregationLengthEquals, Properties, EnterText, Token) {
+	[], function () {
 		"use strict";
 
 		return function () {
-
 			return {
 				iClickListItemInViewSettings: function (sColumn) {
 					let sortItem = null;

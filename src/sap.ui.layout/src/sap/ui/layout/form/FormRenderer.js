@@ -38,6 +38,14 @@ sap.ui.define([
 		const oLayout = oForm.getLayout();
 		const mAriaProps = {role: oLayout && oLayout.hasLabelledContainers(oForm) ? "region" : "form"};
 
+		const sTitleID = oLayout?.getRenderer().getTitleId(oForm) || oForm._sSuggestedTitleId;
+		const bUsingSuggestedTitle = !oLayout?.getRenderer().getTitleId(oForm) && oForm._sSuggestedTitleId;
+
+		if (bUsingSuggestedTitle && oForm._sSuggestedTitleAriaRole === "region" && mAriaProps.role === "region") {
+			// Do not render a role, if the title already defines a region and the form would do the same
+			delete mAriaProps.role;
+		}
+
 		// write only a DIV for the form and let the layout render the rest
 		rm.openStart("div", oForm)
 			.class("sapUiForm")
@@ -63,7 +71,6 @@ sap.ui.define([
 			rm.attr('title', oForm.getTooltip_AsString());
 		}
 
-		const sTitleID = oLayout?.getRenderer().getTitleId(oForm) || oForm._sSuggestedTitleId;
 		if (sTitleID) {
 			mAriaProps["labelledby"] = {value: sTitleID, append: true};
 		}

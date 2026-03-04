@@ -27530,4 +27530,70 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 
 		await this.waitForChanges(assert, "resolve filter value binding again");
 	});
+
+	//*********************************************************************************************
+	// Scenario: Bound Filter with JSON tree binding for hierarchical data.
+	// JIRA: CPOUI5MODELS-1998
+	QUnit.test("Bound Filter: JSON tree binding", async function (assert) {
+		const oJSONModel = new JSONModel({
+			departmentPrefix: "Eng",
+			locationPrefix: "Los",
+			organization: [
+				{
+					name: "Thompson", department: "Executive", location: "New York",
+					children: [
+						{name: "Chen", department: "Engineering", location: "San Francisco"},
+						{name: "Williams", department: "Sales", location: "New York"},
+						{name: "Martinez", department: "Marketing", location: "Los Angeles"},
+						{name: "Kim", department: "Engineering", location: "New York"}
+					]
+				}
+			]
+		});
+
+		const sView = `
+<t:TreeTable id="myTreeTable"
+		rows="{path: '/organization',
+			parameters: {numberOfExpandedLevels: 1},
+			boundFilters: [
+				{path: 'department', operator: 'StartsWith', value1: '{/departmentPrefix}'}
+			]
+		}"
+		visibleRowCount="5">
+	<Text id="name" text="{name}"/>
+</t:TreeTable>`;
+
+		this.expectValue("name", ["Thompson", "Chen", "Williams", "Martinez", "Kim"])
+			.expectValue("name", ["Kim", "", ""], 2); // filter is only applied late to the tree table
+
+		// code under test
+		await this.createView(assert, sView, oJSONModel);
+
+		this.expectValue("name", ["Williams", "Martinez", "Kim"], 2);
+
+		// code under test
+		oJSONModel.setProperty("/departmentPrefix", null);
+
+		await this.waitForChanges(assert, "neutralize department filter");
+
+		const oTreeBinding = this.oView.byId("myTreeTable").getBinding("rows");
+		const oBoundFilter = new Filter({
+			path : "location",
+			operator : FilterOperator.StartsWith,
+			value1 : "{/locationPrefix}"}
+		);
+		this.expectValue("name", ["Martinez", "", "", ""], 1);
+
+		// code under test
+		oTreeBinding.filter(oBoundFilter, FilterType.ApplicationBound);
+
+		await this.waitForChanges(assert, "set bound filter via filter API");
+
+		this.expectValue("name", ["Williams", "Kim"], 1);
+
+		// code under test
+		oJSONModel.setProperty("/locationPrefix", "New");
+
+		await this.waitForChanges(assert, "set filter value for new bound filter");
+	});
 });

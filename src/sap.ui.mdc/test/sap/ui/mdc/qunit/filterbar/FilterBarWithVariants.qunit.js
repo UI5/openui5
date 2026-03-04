@@ -41,8 +41,8 @@ sap.ui.define([
 			return oLoadFlexPromise;
 		});
 
-		const oVM = new VariantManagement();
-		const oFB = new FilterBar({
+		const oVM = new VariantManagement("VM1");
+		const oFB = new FilterBar("FB1", {
 			variantBackreference: oVM.getId()
 		});
 
@@ -81,11 +81,11 @@ sap.ui.define([
 			return oLoadFlexPromise;
 		});
 
-		const oFB = new FilterBar();
+		const oFB = new FilterBar("FB1");
 
 		assert.ok(!oFB._hasAssignedVariantManagement());
 
-		const oVM = new VariantManagement();
+		const oVM = new VariantManagement("VM1");
 		oFB.setVariantBackreference(oVM);
 
 		return oLoadFlexPromise.then(function() {
@@ -123,8 +123,8 @@ sap.ui.define([
 			return oLoadFlexPromise;
 		});
 
-		const oVM = new VariantManagement();
-		const oFB = new FilterBar({
+		const oVM = new VariantManagement("VM1");
+		const oFB = new FilterBar("FB1", {
 			variantBackreference: oVM.getId()
 		});
 
@@ -132,7 +132,7 @@ sap.ui.define([
 
 			assert.ok(oFB._hasAssignedVariantManagement());
 
-			const oVM2 = new VariantManagement();
+			const oVM2 = new VariantManagement("VM2");
 
 			sinon.stub(Log, "error");
 
