@@ -24,7 +24,7 @@
 				<Label text="{i18n>detailProcessorJobTitle}" />
 				<Text text="{Employee/Title}" />
 				<Label text="{i18n>detailProcessorPhone}" />
-				<Link text="{Employee/HomePhone}" press="_onHandleTelephonePress" />
+				<Link text="{Employee/HomePhone}" press="._onHandleTelephonePress" />
 				<core:Title text="{i18n>photoProcessorTitle}" />
 				<Image src="{path:'Employee/Photo', formatter: '.formatter.handleBinaryContent'}" width="50%" height="50%" />
 			</f:content>

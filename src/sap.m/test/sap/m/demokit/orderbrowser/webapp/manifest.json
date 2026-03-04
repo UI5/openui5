@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "2.5.0",
 	"sap.app": {
 		"id": "sap.ui.demo.orderbrowser",
 		"type": "application",
@@ -46,10 +46,11 @@
 	"sap.ui5": {
 		"rootView": {
 			"viewName": "sap.ui.demo.orderbrowser.view.App",
+			"type": "XML",
 			"id": "app"
 		},
 		"dependencies": {
-			"minUI5Version": "2.0.0",
+			"minUI5Version": "1.145.0",
 			"libs": {
 				"sap.f": {},
 				"sap.m": {},

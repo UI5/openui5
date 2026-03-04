@@ -321,36 +321,54 @@ sap.ui.define([
 		//#################################################################################################
 
 		function assertValidName(sName, sField) {
-			assert(sName && typeof sName == "string" && /^[a-z_][a-zA-Z0-9_\-]*$/.test(sName), "The " + sField + " name provided '" + sName + "' is not valid; it must contain alphanumeric characters, hyphens or underscores");
+			if (!(sName && typeof sName == "string" && /^[a-z_][a-zA-Z0-9_\-]*$/.test(sName))) {
+				throw new Error(
+					"The " + sField + " name provided '" + sName + "' is not valid; it must contain alphanumeric characters, hyphens or underscores"
+				);
+			}
 		}
 
 		function assertOpenTagHasStarted(sMethod) {
-			assert(sOpenTag, "There is no open tag; '" + sMethod + "' must not be called without an open tag");
+			if (!sOpenTag) {
+				throw new Error("There is no open tag; '" + sMethod + "' must not be called without an open tag");
+			}
 		}
 
 		function assertOpenTagHasEnded(bCustomAssertion) {
 			var bAssertion = (bCustomAssertion === undefined) ? !sOpenTag : bCustomAssertion;
-			assert(bAssertion, "There is an open tag; '" + sOpenTag + "' tag has not yet ended with '" + (bVoidOpen ? "voidEnd" : "openEnd") + "'");
+
+			if (!bAssertion) {
+				throw new Error("There is an open tag; '" + sOpenTag + "' tag has not yet ended with '" + (bVoidOpen ? "voidEnd" : "openEnd") + "'");
+			}
 		}
 
 		function assertValidAttr(sAttr) {
 			assertValidName(sAttr, "attr");
-			assert((sAttr != "class" || sLastClassMethod != "class" && (sLastClassMethod = "attr"))
-				&& (sAttr != "style" || sLastStyleMethod != "style" && (sLastStyleMethod = "attr")),
-				"Attributes 'class' and 'style' must not be written when the methods with the same name"
+
+			if (!((sAttr != "class" || sLastClassMethod != "class" && (sLastClassMethod = "attr")) && (sAttr != "style" || sLastStyleMethod != "style" && (sLastStyleMethod = "attr")))) {
+				throw new Error("Attributes 'class' and 'style' must not be written when the methods with the same name"
 				+ " have been called for the same element already");
+			}
 		}
 
 		function assertValidClass(sClass) {
-			assert(sLastClassMethod != "attr" && (sLastClassMethod = "class"),
-				"Method class() must not be called after the 'class' attribute has been written for the same element");
-			assert(typeof sClass == "string" && !/\s/.test(sClass) && arguments.length === 1, "Method 'class' must be called with exactly one class name");
+			if (!(sLastClassMethod != "attr" && (sLastClassMethod = "class"))) {
+				throw new Error("Method class() must not be called after the 'class' attribute has been written for the same element");
+			}
+
+			if (!(typeof sClass == "string" && !/\s/.test(sClass) && arguments.length === 1)) {
+				throw new Error("Method 'class' must be called with exactly one class name");
+			}
 		}
 
 		function assertValidStyle(sStyle) {
-			assert(sLastStyleMethod != "attr" && (sLastStyleMethod = "style"),
-				"Method style() must not be called after the 'style' attribute has been written for the same element");
-			assert(sStyle && typeof sStyle == "string" && !/\s/.test(sStyle), "Method 'style' must be called with a non-empty string name");
+			if (!(sLastStyleMethod != "attr" && (sLastStyleMethod = "style"))) {
+				throw new Error("Method style() must not be called after the 'style' attribute has been written for the same element");
+			}
+
+			if (!(sStyle && typeof sStyle == "string" && !/\s/.test(sStyle))) {
+				throw new Error("Method 'style' must be called with a non-empty string name");
+			}
 		}
 
 		//#################################################################################################
@@ -389,7 +407,9 @@ sap.ui.define([
 				if (typeof vControlOrId == "string") {
 					this.attr("id", vControlOrId);
 				} else {
-					assert(vControlOrId && BaseObject.isObjectA(vControlOrId, 'sap.ui.core.Element'), "vControlOrId must be an sap.ui.core.Element");
+					if (!(vControlOrId && BaseObject.isObjectA(vControlOrId, 'sap.ui.core.Element'))) {
+						throw new Error("vControlOrId must be an sap.ui.core.Element");
+					}
 
 					this.attr("id", vControlOrId.getId());
 					renderElementData(this, vControlOrId);
@@ -411,7 +431,11 @@ sap.ui.define([
 		this.openEnd = function(bExludeStyleClasses /* private */) {
 			assertOpenTagHasStarted("openEnd");
 			assertOpenTagHasEnded(!bVoidOpen);
-			assert(bExludeStyleClasses === undefined || bExludeStyleClasses === true, "The private parameter bExludeStyleClasses must be true or omitted!");
+
+			if (!(bExludeStyleClasses === undefined || bExludeStyleClasses === true)) {
+				throw new Error("The private parameter bExludeStyleClasses must be true or omitted!");
+			}
+
 			sOpenTag = "";
 
 			writeClasses(bExludeStyleClasses === true ? false : undefined);
@@ -600,7 +624,10 @@ sap.ui.define([
 			assertValidStyle(sName);
 
 			if (vValue != null && vValue != "") {
-				assert((typeof vValue === "string" || typeof vValue === "number"), "value must be a string or number");
+				if (!(typeof vValue === "string" || typeof vValue === "number")) {
+					throw new Error("value must be a string or number");
+				}
+
 				var oStyle = aStyleStack[aStyleStack.length - 1];
 				if (!oStyle.aStyle) {
 					oStyle.aStyle = [];
@@ -685,7 +712,11 @@ sap.ui.define([
 
 			assertOpenTagHasStarted("openEnd");
 			assertOpenTagHasEnded(!bVoidOpen);
-			assert(bExludeStyleClasses === undefined || bExludeStyleClasses === true, "The private parameter bExludeStyleClasses must be true or omitted!");
+
+			if (!(bExludeStyleClasses === undefined || bExludeStyleClasses === true)) {
+				throw new Error("The private parameter bExludeStyleClasses must be true or omitted!");
+			}
+
 			sOpenTag = "";
 
 			oPatcher.openEnd();
@@ -819,7 +850,10 @@ sap.ui.define([
 		 * @since 1.22.9
 		 */
 		this.cleanupControlWithoutRendering = function(oControl) {
-			assert(!oControl || BaseObject.isObjectA(oControl, 'sap.ui.core.Control'), "oControl must be an sap.ui.core.Control or empty");
+			if (!(!oControl || BaseObject.isObjectA(oControl, 'sap.ui.core.Control'))) {
+				throw new Error("oControl must be an sap.ui.core.Control or empty");
+			}
+
 			if (!oControl) {
 				return;
 			}
@@ -959,7 +993,10 @@ sap.ui.define([
 		 * @public
 		 */
 		this.renderControl = function(oControl) {
-			assert(!oControl || BaseObject.isObjectA(oControl, 'sap.ui.core.Control'), "oControl must be an sap.ui.core.Control or empty");
+			if (!(!oControl || BaseObject.isObjectA(oControl, 'sap.ui.core.Control'))) {
+				throw new Error("oControl must be an sap.ui.core.Control or empty");
+			}
+
 			if (!oControl) {
 				return this;
 			}
@@ -1069,8 +1106,9 @@ sap.ui.define([
 
 		//Does everything needed after the rendering (restore focus, calling "onAfterRendering", initialize event binding)
 		function finalizeRendering(oStoredFocusInfo){
-
-			assert(!iOpenTagCount, "RenderManager: Mismatched opening and closing tags. Verify renderers!");
+			if (iOpenTagCount) {
+				throw new Error("RenderManager: Mismatched opening and closing tags. Verify renderers!");
+			}
 
 			var i, size = aRenderedControls.length;
 
@@ -1247,7 +1285,9 @@ sap.ui.define([
 		 * @public
 		 */
 		this.flush = function(oTargetDomNode, bDoNotPreserve, vInsert) {
-			assert((typeof oTargetDomNode === "object") && (oTargetDomNode.ownerDocument == document), "oTargetDomNode must be a DOM element");
+			if (!(typeof oTargetDomNode === "object" && oTargetDomNode.ownerDocument == document)) {
+				throw new Error("oTargetDomNode must be a DOM element");
+			}
 
 			var fnDone = Interaction.notifyAsyncStep();
 
@@ -1290,7 +1330,6 @@ sap.ui.define([
 				}
 
 			}, fnDone, oTargetDomNode);
-
 		};
 
 		/**
@@ -1307,8 +1346,14 @@ sap.ui.define([
 		 * @public
 		 */
 		this.render = function(oControl, oTargetDomNode) {
-			assert(oControl && BaseObject.isObjectA(oControl, 'sap.ui.core.Control'), "oControl must be a control");
-			assert(typeof oTargetDomNode === "object" && oTargetDomNode.ownerDocument == document, "oTargetDomNode must be a DOM element");
+			if (!(oControl && BaseObject.isObjectA(oControl, 'sap.ui.core.Control'))) {
+				throw new Error("oControl must be a control");
+			}
+
+			if (!(typeof oTargetDomNode === "object" && oTargetDomNode.ownerDocument == document)) {
+				throw new Error("oTargetDomNode must be a DOM element");
+			}
+
 			if ( bLocked ) {
 				Log.error("Render must not be called within Before or After Rendering Phase. Call ignored.", null, this);
 				return;
@@ -1764,7 +1809,10 @@ sap.ui.define([
 	 * @public
 	 */
 	RenderManager.prototype.getRenderer = function(oControl) {
-		assert(oControl && BaseObject.isObjectA(oControl, 'sap.ui.core.Control'), "oControl must be an sap.ui.core.Control");
+		if (!(oControl && BaseObject.isObjectA(oControl, 'sap.ui.core.Control'))) {
+			throw new Error("oControl must be an sap.ui.core.Control");
+		}
+
 		return RenderManager.getRenderer(oControl);
 	};
 
@@ -1820,7 +1868,9 @@ sap.ui.define([
 	 * @public
 	 */
 	RenderManager.getRenderer = function(oControl) {
-		assert(oControl && BaseObject.isObjectA(oControl, 'sap.ui.core.Control'), "oControl must be an sap.ui.core.Control");
+		if (!(oControl && BaseObject.isObjectA(oControl, 'sap.ui.core.Control'))) {
+			throw new Error("oControl must be an sap.ui.core.Control");
+		}
 
 		return oControl.getMetadata().getRenderer();
 	};
@@ -1950,7 +2000,9 @@ sap.ui.define([
 	 * @static
 	 */
 	RenderManager.preserveContent = function(oRootNode, bPreserveRoot, bPreserveNodesWithId, oControlBeforeRerender /* private */) {
-		assert(typeof oRootNode === "object" && oRootNode.ownerDocument == document, "oRootNode must be a DOM element");
+		if (!(typeof oRootNode === "object" && oRootNode.ownerDocument == document)) {
+			throw new Error("oRootNode must be a DOM element");
+		}
 
 		Element = Element ? Element : sap.ui.require("sap/ui/core/Element");
 
@@ -2080,7 +2132,10 @@ sap.ui.define([
 	 * @static
 	 */
 	RenderManager.findPreservedContent = function(sId) {
-		assert(typeof sId === "string", "sId must be a string");
+		if (typeof sId !== "string") {
+			throw new Error("sId must be a string");
+		}
+
 		var $preserve = getPreserveArea(),
 			$content = $preserve.children("[" + ATTR_PRESERVE_MARKER + "='" + sId.replace(/(:|\.)/g,'\\$1') + "']");
 		return $content;

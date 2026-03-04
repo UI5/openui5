@@ -79,7 +79,7 @@ sap.ui.define([
 
 	QUnit.module("VariantManagement tests", {
 		beforeEach:  function() {
-			this.oVM = new VariantManagement();
+			this.oVM = new VariantManagement("VM1");
 			this.oVM.placeAt("qunit-fixture");
 		},
 		afterEach: function() {
@@ -103,14 +103,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("VariantManagement with two VariantItems", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		assert.equal(this.oVM.getItems().length, 2, "with two items");
 	});
 
 	QUnit.test("VariantManagement with selected key", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 
 		var oTitle = Element.getElementById(this.oVM.getId() + "-text");
 		assert.ok(oTitle);
@@ -125,8 +125,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("VariantManagement check title", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 
 		this.oVM.setSelectedKey("2");
 
@@ -160,18 +160,20 @@ sap.ui.define([
 	});
 
 	QUnit.test("VariantManagement check _IsItemDeleted", function(assert) {
-		var oVMI1 = new VariantItem({key: "1", title:"One"});
-		var oVMI2 = new VariantItem({key: "2", title:"Two"});
+		var oVMI1 = new VariantItem("VMI1", {key: "1", title:"One"});
+		var oVMI2 = new VariantItem("VMI2", {key: "2", title:"Two"});
 
 		this.oVM._clearDeletedItems();
 		this.oVM._addDeletedItem(oVMI1);
 
 		assert.ok(this.oVM._isItemDeleted(oVMI1), "item is deleted.");
 		assert.ok(!this.oVM._isItemDeleted(oVMI2), "item is not deleted.");
+		oVMI1.destroy();
+		oVMI2.destroy();
 	});
 
 	QUnit.test("VariantManagement check aria-expanded initial state", async function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
 		this.oVM.setSelectedKey("1");
 
 		await nextUIUpdate();
@@ -184,8 +186,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("VariantManagement check aria-expanded attribute", async function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("1");
 
 		await nextUIUpdate();
@@ -229,7 +231,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("VariantManagement check aria-expanded attribute in error state", async function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
 		this.oVM.setSelectedKey("1");
 		this.oVM.setInErrorState(true);
 
@@ -275,7 +277,7 @@ sap.ui.define([
 
 	QUnit.module("VariantManagement variantlist", {
 		beforeEach: async function() {
-			this.oVM = new VariantManagement();
+			this.oVM = new VariantManagement("VM1");
 			this.oVM .placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
@@ -285,8 +287,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check items", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 
 		this.oVM.setPopoverTitle("My List");
@@ -326,10 +328,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("check items with some favorite = false", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
-		this.oVM.addItem(new VariantItem({key: "3", title:"Three", favorite: false}));
-		this.oVM.addItem(new VariantItem({key: "4", title:"Four", favorite: false}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI3", {key: "3", title:"Three", favorite: false}));
+		this.oVM.addItem(new VariantItem("VMI4", {key: "4", title:"Four", favorite: false}));
 		this.oVM.setSelectedKey("2");
 
 		var done = assert.async();
@@ -353,8 +355,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check setCurrentVariantKey", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 
 		var bSelectCalled = false;
@@ -379,8 +381,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check event 'select'", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 
 		var done = assert.async();
@@ -399,8 +401,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check event 'save'", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title: "One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title: "Two", changeable: true}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", changeable: true}));
 
 		this.oVM.setSelectedKey("2");
 		this.oVM.setModified(true);
@@ -438,8 +440,8 @@ sap.ui.define([
 
 
 	QUnit.test("check title", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 
 		this.oVM.setPopoverTitle("My List");
@@ -465,8 +467,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check with showFooter = false", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 		this.oVM.setShowFooter(false);
 
@@ -487,8 +489,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check buttons with modified=false", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title: "One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title: "Two", changeable: true}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", changeable: true}));
 		this.oVM.setSelectedKey("2");
 
 		var done = assert.async();
@@ -517,8 +519,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check buttons with modified = true", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title: "One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title: "Two", changeable: true}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", changeable: true}));
 		this.oVM.setSelectedKey("2");
 		this.oVM.setModified(true);
 
@@ -546,8 +548,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check buttons with showSaveAs=true", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 		this.oVM.setShowSaveAs(false);
 
@@ -575,8 +577,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check buttons with creation not allowed", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 		this.oVM.setCreationAllowed(false);
 
@@ -604,8 +606,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check buttons with  creation not allowed and modified = true", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 		this.oVM.setCreationAllowed(false);
 		this.oVM.setModified(true);
@@ -636,7 +638,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("check opening the variant list display in simulated designmode", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
 
 		sinon.stub(this.oVM, "_openVariantList");
 
@@ -655,7 +657,7 @@ sap.ui.define([
 		assert.ok(this.oVM.oNodataTextLayout.getVisible(), "no data text is visible");
 		assert.equal(this.oVM.oNodataTextLayout.getItems()[0], this.oVM._oNoDataIllustratedMessage, "expected illustrated message found");
 
-		this.oVM.addItem(new VariantItem({key: "1", title:"View1"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"View1"}));
 
 		this.oVM.onclick();
 		await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until opened
@@ -667,15 +669,15 @@ sap.ui.define([
 			getParameters: function() { return {newValue: sSearchText};}
 		};
 
-		this.oVM.addItem(new VariantItem({key: "2", title:"View2"}));
-		this.oVM.addItem(new VariantItem({key: "3", title:"View3"}));
-		this.oVM.addItem(new VariantItem({key: "4", title:"View4"}));
-		this.oVM.addItem(new VariantItem({key: "5", title:"View5"}));
-		this.oVM.addItem(new VariantItem({key: "6", title:"View6"}));
-		this.oVM.addItem(new VariantItem({key: "7", title:"View7"}));
-		this.oVM.addItem(new VariantItem({key: "8", title:"View8"}));
-		this.oVM.addItem(new VariantItem({key: "9", title:"View9"}));
-		this.oVM.addItem(new VariantItem({key: "10", title:"View10"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"View2"}));
+		this.oVM.addItem(new VariantItem("VMI3", {key: "3", title:"View3"}));
+		this.oVM.addItem(new VariantItem("VMI4", {key: "4", title:"View4"}));
+		this.oVM.addItem(new VariantItem("VMI5", {key: "5", title:"View5"}));
+		this.oVM.addItem(new VariantItem("VMI6", {key: "6", title:"View6"}));
+		this.oVM.addItem(new VariantItem("VMI7", {key: "7", title:"View7"}));
+		this.oVM.addItem(new VariantItem("VMI8", {key: "8", title:"View8"}));
+		this.oVM.addItem(new VariantItem("VMI9", {key: "9", title:"View9"}));
+		this.oVM.addItem(new VariantItem("VMI10", {key: "10", title:"View10"}));
 
 		this.oVM._triggerSearch(oEvent, this.oVM.oVariantList);
 		assert.ok(!this.oVM.oVariantList.getVisible(), "list is invisible");
@@ -687,7 +689,7 @@ sap.ui.define([
 		assert.ok(this.oVM.oVariantList.getVisible(), "list is visible");
 		assert.ok(!this.oVM.oNodataTextLayout.getVisible(), "no data text is invisible");
 
-		this.oVM.removeAllItems();
+		this.oVM.destroyItems();
 		this.oVM.onclick();
 		assert.ok(!this.oVM.oVariantList.getVisible(), "list is invisible");
 		assert.ok(this.oVM.oNodataTextLayout.getVisible(), "no data text is visible");
@@ -696,7 +698,7 @@ sap.ui.define([
 
 	QUnit.module("VariantManagement SaveAs dialog", {
 		beforeEach: async function() {
-			this.oVM = new VariantManagement();
+			this.oVM = new VariantManagement("VM1");
 			this.oVM.placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
@@ -706,8 +708,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check opens", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 
 		this.oVM.setSelectedKey("2");
 
@@ -755,8 +757,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check opens with supportPublic & supportDefault & supportApplyAutomatically set to false", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 
 		this.oVM.setSupportPublic(false);
@@ -804,8 +806,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check opens with show Tile", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 
 		this.oVM.setSelectedKey("2");
 		this.oVM._setShowCreateTile(true);
@@ -895,8 +897,8 @@ sap.ui.define([
 	 */
 	function _createSaveAsDialog(assert) {
 		// Add variant items
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 
 
 		this.oVM.attachSave(function(oEvent) {
@@ -971,7 +973,7 @@ sap.ui.define([
 
 	QUnit.module("VariantManagement Manage dialog", {
 		beforeEach: async function() {
-			this.oVM = new VariantManagement();
+			this.oVM = new VariantManagement("VM1");
 			this.oVM.placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
@@ -1076,10 +1078,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("check opens check items", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
-		this.oVM.addItem(new VariantItem({key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI3", {key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI4", {key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
 
 		this.oVM.setDefaultKey("3");
 
@@ -1203,10 +1205,10 @@ sap.ui.define([
 	QUnit.test("check opens check event 'cancel'", async function(assert) {
 		var done = assert.async();
 
-		this.oVM.addItem(new VariantItem({key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
-		this.oVM.addItem(new VariantItem({key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI3", {key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI4", {key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
 		this.oVM.setDefaultKey("3");
 
 		await nextUIUpdate();
@@ -1361,10 +1363,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("check opens check event 'manage'", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
-		this.oVM.addItem(new VariantItem({key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI3", {key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI4", {key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
 
 		this.oVM.setDefaultKey("3");
 
@@ -1476,10 +1478,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("check manage dialog with dublicate entries", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
-		this.oVM.addItem(new VariantItem({key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI3", {key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI4", {key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
 
 		this.oVM.setDefaultKey("3");
 
@@ -1591,10 +1593,10 @@ sap.ui.define([
 	});
 
 	function _createMockVariantManagementDialog() {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
-		this.oVM.addItem(new VariantItem({key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI3", {key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI4", {key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
 
 		this.oVM.setDefaultKey("3");
 
@@ -1611,7 +1613,7 @@ sap.ui.define([
 
 		this.oVM.bindAggregation("items", {
 			path: "/variants",
-			template: new VariantItem({
+			template: new VariantItem("VMI", {
 				key: "{variantKey}",
 				title: {parts: [{path: 'variantTitlePart1'}, {path: 'variantTitlePart2'}], formatter: (part1, part2) => `Title: ${part1}${part2}`},
 				author: "Constant Author",
@@ -1701,7 +1703,7 @@ sap.ui.define([
 
 		this.oVM.bindAggregation("items", {
 			path: "/variants",
-			template: new VariantItem({
+			template: new VariantItem("VMI", {
 				key: "{variantKey}",
 				title: {parts: [{path: 'variantTitlePart1'}, {path: 'variantTitlePart2'}], formatter: (part1, part2) => `Title: ${part1}${part2}`},
 				author: "Constant Author",
@@ -1759,26 +1761,26 @@ sap.ui.define([
 
 	QUnit.module("VariantManagement _findNextFocusTargetAfterDelete", {
 		beforeEach: async function() {
-			this.oVM = new VariantManagement();
-			this.oVM.addItem(new VariantItem({
+			this.oVM = new VariantManagement("VM1");
+			this.oVM.addItem(new VariantItem("VMI1", {
 				key: "1",
 				title: "Standard",
 				favorite: true,
 				remove: false
 			}));
-			this.oVM.addItem(new VariantItem({
+			this.oVM.addItem(new VariantItem("VMI2", {
 				key: "2",
 				title: "Item 2",
 				favorite: true,
 				remove: true
 			}));
-			this.oVM.addItem(new VariantItem({
+			this.oVM.addItem(new VariantItem("VMI3", {
 				key: "3",
 				title: "Item 3",
 				favorite: false,
 				remove: true
 			}));
-			this.oVM.addItem(new VariantItem({
+			this.oVM.addItem(new VariantItem("VMI4", {
 				key: "4",
 				title: "Item 4",
 				favorite: true,
@@ -1996,9 +1998,9 @@ sap.ui.define([
 		var done = assert.async();
 
 		// Remove all items except one to test the edge case
-		this.oVM.removeItem(this.oVM.getItemByKey("2"));
-		this.oVM.removeItem(this.oVM.getItemByKey("3"));
-		this.oVM.removeItem(this.oVM.getItemByKey("4"));
+		this.oVM.removeItem(this.oVM.getItemByKey("2")).destroy();
+		this.oVM.removeItem(this.oVM.getItemByKey("3")).destroy();
+		this.oVM.removeItem(this.oVM.getItemByKey("4")).destroy();
 
 		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
@@ -2190,7 +2192,7 @@ sap.ui.define([
 
 	QUnit.module("VariantManagement Manage dialog busy state", {
 		beforeEach: async function() {
-			this.oVM = new VariantManagement();
+			this.oVM = new VariantManagement("VM1");
 			this.oVM.placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
@@ -2202,8 +2204,8 @@ sap.ui.define([
 	QUnit.test("check table busy state is set and cleared during management dialog opening", function(assert) {
 		var done = assert.async();
 
-		this.oVM.addItem(new VariantItem({key: "1", title: "One", author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title: "Two", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
 
 		this.oVM._createManagementDialog();
 		assert.ok(this.oVM.oManagementTable, "management table should exist");
@@ -2241,8 +2243,8 @@ sap.ui.define([
 	QUnit.test("check table binding is suspended during busy state", function(assert) {
 		var done = assert.async();
 
-		this.oVM.addItem(new VariantItem({key: "1", title: "One", author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title: "Two", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
 
 		this.oVM._createManagementDialog();
 		assert.ok(this.oVM.oManagementTable, "management table should exist");
@@ -2264,8 +2266,8 @@ sap.ui.define([
 	QUnit.test("check busy state with rebind required", function(assert) {
 		var done = assert.async();
 
-		this.oVM.addItem(new VariantItem({key: "1", title: "One", author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title: "Two", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
 
 		this.oVM._createManagementDialog();
 		assert.ok(this.oVM.oManagementTable, "management table should exist");
@@ -2330,8 +2332,8 @@ sap.ui.define([
 	QUnit.test("check busy state sequence with multiple dialog openings", function(assert) {
 		var done = assert.async();
 
-		this.oVM.addItem(new VariantItem({key: "1", title: "One", author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title: "Two", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
 
 		this.oVM._createManagementDialog();
 		assert.ok(this.oVM.oManagementTable, "management table should exist");
@@ -2361,8 +2363,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check table is not busy before dialog is opened", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title: "One", author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title: "Two", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
 
 		this.oVM._createManagementDialog();
 		assert.ok(this.oVM.oManagementTable, "management table should exist");
@@ -2373,7 +2375,7 @@ sap.ui.define([
 
 	QUnit.module("VariantManagement Roles handling", {
 		beforeEach: async function() {
-			this.oVM = new VariantManagement();
+			this.oVM = new VariantManagement("VM1");
 			this.oVM.placeAt("qunit-fixture");
 			await nextUIUpdate();
 
@@ -2395,10 +2397,10 @@ sap.ui.define([
 	QUnit.test("check roles inside managed views", async function (assert) {
 		var done = assert.async();
 
-		this.oVM.addItem(new VariantItem({key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two", contexts: {role: ["test"]}, remove: true, sharing: "Private", author: "B"}));
-		this.oVM.addItem(new VariantItem({key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, oauthor: "A"}));
-		this.oVM.addItem(new VariantItem({key: "4", title:"Four", contexts: {role: []}, favorite: false, rename: false, sharing: "Public", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two", contexts: {role: ["test"]}, remove: true, sharing: "Private", author: "B"}));
+		this.oVM.addItem(new VariantItem("VMI3", {key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem("VMI4", {key: "4", title:"Four", contexts: {role: []}, favorite: false, rename: false, sharing: "Public", author: "B"}));
 
 		this.oVM.setDefaultKey("3");
 
@@ -2517,8 +2519,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("check roles inside SaveAs dialog", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 
 		this.oVM.setSelectedKey("2");
 
@@ -2591,7 +2593,7 @@ sap.ui.define([
 
 		this.oVM.bindAggregation("items", {
 			path: "/items",
-			template: new VariantItem({
+			template: new VariantItem("VMI", {
 				key: "{key}",
 				title: "{title}",
 				contexts: "{contexts}",

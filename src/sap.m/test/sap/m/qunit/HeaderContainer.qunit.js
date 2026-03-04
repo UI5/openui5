@@ -652,29 +652,38 @@ sap.ui.define([
 				this.oHeaderContainer = null;
 			}
 		});
+
 		QUnit.test("Checks Outline width, style, color and offset are correct", async function (assert) {
 			const oInnerDomRef = this.oHeaderContainer.$()
 				.find(".sapMHrdrCntrInner")[0];
-				assert.ok(oInnerDomRef, "Inner container exists");
-			// Wait until theme parameters are available
-			await new Promise((resolve) => {
-				const interval = setInterval(() => {
-					if (Parameters.get("sapContent_FocusColor")) {
-						clearInterval(interval);
-						resolve();
+			assert.ok(oInnerDomRef, "Inner container exists");
+
+			// Helper to get Parameters asynchronously
+			function getParameterAsync(key, oElement) {
+				return new Promise((resolve) => {
+					const value = Parameters.get({
+						name: key,
+						scopeElement: oElement,
+						callback: resolve
+					});
+					if (value !== undefined) {
+						resolve(value);
 					}
-				}, 10);
-			});
-			// Trigger keyboard mode
+				});
+			}
+
+			// Trigger keyboard mode and focus the element
 			qutils.triggerKeydown(document, KeyCodes.TAB);
-			// Focus the element
 			oInnerDomRef.focus();
 			await nextUIUpdate();
+
+			// Fetch all theme parameters asynchronously
+			const expectedWidth = remToPx(await getParameterAsync("sapContent_FocusWidth", oInnerDomRef));
+			const expectedStyle = await getParameterAsync("sapContent_FocusStyle", oInnerDomRef);
+			const expectedColor = hexToRgb(await getParameterAsync("sapContent_FocusColor", oInnerDomRef));
+
 			const computedStyle = window.getComputedStyle(oInnerDomRef);
-			// Convert theme parameters
-			const expectedWidth = remToPx(Parameters.get("sapContent_FocusWidth"));
-			const expectedStyle = Parameters.get("sapContent_FocusStyle");
-			const expectedColor = hexToRgb(Parameters.get("sapContent_FocusColor"));
+
 			assert.strictEqual(
 				computedStyle.outlineWidth,
 				expectedWidth,

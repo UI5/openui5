@@ -745,7 +745,7 @@ sap.ui.define([
 			return;
 		}
 
-		this.oVariantInvisibleText = new InvisibleText();
+		this.oVariantInvisibleText = new InvisibleText(this.getId() + "-invText");
 
 		this.oVariantText = this._createVariantTextControl();
 
@@ -786,7 +786,7 @@ sap.ui.define([
 		this.oVariantPopoverTrigger.addAriaLabelledBy(this.oVariantInvisibleText);
 		this.oVariantPopoverTrigger.addStyleClass("sapMVarMngmtClickable");
 
-		this.oVariantLayout = new HorizontalLayout({
+		this.oVariantLayout = new HorizontalLayout(this.getId() + "-content", {
 			content: [
 				this.oVariantText, oVariantModifiedText, this.oVariantPopoverTrigger
 			]
@@ -1107,18 +1107,18 @@ sap.ui.define([
 		var oVBox;
 
 		if (!this.oErrorVariantPopOver) {
-			oVBox = new VBox({
+			oVBox = new VBox(this.getId() + "-errorContent", {
 				fitContainer: true,
 				alignItems: FlexAlignItems.Center,
 				items: [
-					new Icon({
+					new Icon(this.getId() + "-errorIcon", {
 						size: "4rem",
 						color: "lightgray",
 						src: "sap-icon://message-error"
-					}), new Title({
+					}), new Title(this.getId() + "-errorTitle", {
 						titleStyle: TitleLevel.H2,
 						text: this._oRb.getText("VARIANT_MANAGEMENT_ERROR_TEXT1")
-					}), new Text({
+					}), new Text(this.getId() + "-errorText", {
 						textAlign: TextAlign.Center,
 						text: this._oRb.getText("VARIANT_MANAGEMENT_ERROR_TEXT2")
 					})
@@ -1177,7 +1177,7 @@ sap.ui.define([
 	VariantManagement.prototype._createIllustratedMessages = function() {
 
 		if (!this._oNoDataIllustratedMessage || this._oNoDataIllustratedMessage.bIsDestroyed) {
-			this._oNoDataIllustratedMessage = new IllustratedMessage({
+			this._oNoDataIllustratedMessage = new IllustratedMessage(this.getId() + "-noData", {
 				title: this._oRb.getText("VARIANT_MANAGEMENT_NODATA"),
 				description: this._oRb.getText("VARIANT_MANAGEMENT_NODATA_DESCR"),
 				enableVerticalResponsiveness: true,
@@ -1186,7 +1186,7 @@ sap.ui.define([
 			});
 		}
 		if (!this._oNoDataFoundIllustratedMessage || this._oNoDataFoundIllustratedMessage.bIsDestroyed) {
-			this._oNoDataFoundIllustratedMessage = new IllustratedMessage({
+			this._oNoDataFoundIllustratedMessage = new IllustratedMessage(this.getId() + "-noDataFound", {
 				title: this._oRb.getText("VARIANT_MANAGEMENT_NODATA_FOUND"),
 				description: this._oRb.getText("VARIANT_MANAGEMENT_NODATA_FOUND_DESCR"),
 				enableVerticalResponsiveness: true,
@@ -1211,7 +1211,7 @@ sap.ui.define([
 			press: function() {
 				this._openManagementDialog();
 			}.bind(this),
-			layoutData: new OverflowToolbarLayoutData({
+			layoutData: new OverflowToolbarLayoutData(this.getId() + "-manage-layoutData", {
 				priority: OverflowToolbarPriority.Low
 			})
 		});
@@ -1240,7 +1240,7 @@ sap.ui.define([
 				}.bind(this)
 			},
 			type: ButtonType.Emphasized,
-			layoutData: new OverflowToolbarLayoutData({
+			layoutData: new OverflowToolbarLayoutData(this.getId() + "-mainsave-layoutData", {
 				priority: OverflowToolbarPriority.Low
 			})
 		});
@@ -1254,7 +1254,7 @@ sap.ui.define([
 			press: function() {
 				this._openSaveAsDialog();
 			}.bind(this),
-			layoutData: new OverflowToolbarLayoutData({
+			layoutData: new OverflowToolbarLayoutData(this.getId() + "-saveas-layoutData", {
 				priority: OverflowToolbarPriority.Low
 			}),
 			visible: {
@@ -1297,7 +1297,7 @@ sap.ui.define([
 			}.bind(this)
 		});
 
-		this.oVariantListInvisibleText = new InvisibleText({
+		this.oVariantListInvisibleText = new InvisibleText(this.getId() + "-listInvisibleText", {
 			text: this._oRb.getText("VARIANT_MANAGEMENT_VIEW_LIST")
 		});
 
@@ -1313,7 +1313,7 @@ sap.ui.define([
 			items: [this._oNoDataFoundIllustratedMessage]
 		});
 
-		var oItemTemplate = new Item({
+		var oItemTemplate = new Item(this.getId() + "-list-item", {
 			key: "{$mVariants>key}",
 			text: "{$mVariants>title}"
 		});
@@ -1330,7 +1330,7 @@ sap.ui.define([
 		}.bind(this));
 
 		this.oVariantSelectionPage = new Page(this.getId() + "-selpage", {
-			subHeader: new Toolbar({
+			subHeader: new Toolbar(this.getId() + "-selpage-header", {
 				content: [
 					this._oSearchField
 				]
@@ -1338,9 +1338,9 @@ sap.ui.define([
 			content: [
 				this.oVariantList, this.oNodataTextLayout
 			],
-			footer: new OverflowToolbar({
+			footer: new OverflowToolbar(this.getId() + "-selpage-footer", {
 				content: [
-					new ToolbarSpacer(this.getId() + "-spacer"), this.oVariantSaveBtn, this.oVariantSaveAsBtn, this.oVariantManageBtn
+					new ToolbarSpacer(this.getId() + "-selpage-footer-spacer"), this.oVariantSaveBtn, this.oVariantSaveAsBtn, this.oVariantManageBtn
 				]
 			}),
 			showNavButton: false,
@@ -1609,7 +1609,7 @@ sap.ui.define([
 				message: this._getSaveTooltipText("SAVE")
 			}, this);
 
-			var oSaveAsDialogOptionsGrid = new Grid({
+			var oSaveAsDialogOptionsGrid = new Grid(this.getId() + "-savedialog-options", {
 				defaultSpan: "L12 M12 S12"
 			});
 
@@ -2095,8 +2095,8 @@ sap.ui.define([
 				keyboardMode: ListKeyboardMode.Navigation,
 				sticky: [ Sticky.ColumnHeaders ],
 				columns: [
-					new Column({
-						header: new InvisibleText({
+					new Column(this.getId() + "-managementTable-col-favorite", {
+						header: new InvisibleText(this.getId() + "-managementTable-col-favorite-invText", {
 									text: this._oRb.getText("VARIANT_MANAGEMENT_FAVORITE_COLUMN")
 								}),
 						width: "3rem",
@@ -2104,13 +2104,13 @@ sap.ui.define([
 							path: "/supportFavorites",
 							model: "$mVariants"
 						}
-					}), new Column({
-						header: new Text({
+					}), new Column(this.getId() + "-managementTable-col-name", {
+						header: new Text(this.getId() + "-managementTable-col-name-text", {
 							text: this._oRb.getText("VARIANT_MANAGEMENT_NAME")
 						}),
 						width: "16rem"
-					}), new Column({
-						header: new Text({
+					}), new Column(this.getId() + "-managementTable-col-variantType", {
+						header: new Text(this.getId() + "-managementTable-col-variantType-text", {
 							text: this._oRb.getText("VARIANT_MANAGEMENT_VARIANTTYPE"),
 							wrappingType: "Hyphenated"
 						}),
@@ -2121,8 +2121,8 @@ sap.ui.define([
 						demandPopin: true,
 						popinDisplay: PopinDisplay.Inline,
 						minScreenWidth: ScreenSize.Tablet
-					}), new Column({
-						header: new Text({
+					}), new Column(this.getId() + "-managementTable-col-default", {
+						header: new Text(this.getId() + "-managementTable-col-default-text", {
 							text: this._oRb.getText("VARIANT_MANAGEMENT_DEFAULT"),
 							wrappingType: "Hyphenated"
 						}),
@@ -2134,8 +2134,8 @@ sap.ui.define([
 							path: "/supportDefault",
 							model: "$mVariants"
 						}
-					}), new Column({
-						header: new Text({
+					}), new Column(this.getId() + "-managementTable-col-executeOnSelect", {
+						header: new Text(this.getId() + "-managementTable-col-executeOnSelect-text", {
 							text: this._oRb.getText("VARIANT_MANAGEMENT_EXECUTEONSELECT"),
 							wrappingType: "Hyphenated"
 						}),
@@ -2147,8 +2147,8 @@ sap.ui.define([
 							path: "/supportApplyAutomatically",
 							model: "$mVariants"
 						}
-					}), new Column({
-						header: new Text({
+					}), new Column(this.getId() + "-managementTable-col-visibility", {
+						header: new Text(this.getId() + "-managementTable-col-visibility-text", {
 							text: this._oRb.getText("VARIANT_MANAGEMENT_VISIBILITY"),
 							wrappingType: "Hyphenated"
 						}),
@@ -2160,20 +2160,20 @@ sap.ui.define([
 							path: "/supportContexts",
 							model: "$mVariants"
 						}
-					}), new Column({
-						header: new Text({
+					}), new Column(this.getId() + "-managementTable-col-author", {
+						header: new Text(this.getId() + "-managementTable-col-author-text", {
 							text: this._oRb.getText("VARIANT_MANAGEMENT_AUTHOR"),
 							wrappingType: "Hyphenated"
 						}),
 						demandPopin: true,
 						popinDisplay: PopinDisplay.Block,
 						minScreenWidth: ScreenSize.Tablet
-					}), new Column({
-						header: new InvisibleText({
+					}), new Column(this.getId() + "-managementTable-col-action", {
+						header: new InvisibleText(this.getId() + "-managementTable-col-action-invText", {
 									text: this._oRb.getText("VARIANT_MANAGEMENT_ACTION_COLUMN")
 								}),
 						hAlign: TextAlign.Center
-					}), new Column({
+					}), new Column(this.getId() + "-managementTable-col-last", {
 						visible: false
 					})
 				]
@@ -2232,7 +2232,7 @@ sap.ui.define([
 				return false;
 			};
 
-			this._oSearchFieldOnMgmtDialog = new SearchField();
+			this._oSearchFieldOnMgmtDialog = new SearchField(this.getId() + "-managementdialog-search");
 
 			this._oSearchFieldOnMgmtDialog.attachLiveChange(function(oEvent) {
 				this._triggerSearchInManageDialog(oEvent, this.oManagementTable);
@@ -2491,7 +2491,7 @@ sap.ui.define([
 			}
 		}
 
-		const oListItem = new ColumnListItem({
+		const oListItem = new ColumnListItem(sIdPrefix + "-item-" + nPos, {
 			cells: [
 				oFavoriteIcon,
 				oNameControl,
@@ -2514,7 +2514,7 @@ sap.ui.define([
 				    wrappingType: "Hyphenated"
 				}),
 				oDeleteButton,
-				new Text({
+				new Text(sIdPrefix + "-key-" + nPos, {
 					text: fnCreateBinding("key")
 				})
 			]
@@ -3240,11 +3240,11 @@ sap.ui.define([
 			this._openRolesDialog(oItem, oEvent.oSource.getParent().getItems()[0]);
 		}.bind(this);
 
+		const nPos = this._determineIndex(oContext.getPath());
 		if (this._sStyleClass && this.getSupportContexts() && (oItem.getKey() !== this.getStandardVariantKey())) {
-			const nPos = this._determineIndex(oContext.getPath());
-			const oText = new Text({ wrapping: false });
+			const oText = new Text(sIdPrefix + "-role-" + nPos + "-text", { wrapping: false });
 			this._determineRolesSpecificText(oItem, oText);
-			var oIcon = new Icon({
+			var oIcon = new Icon(sIdPrefix + "-role-" + nPos + "-icon", {
 				src: "sap-icon://edit",
 				press: fRolesPressed
 			});
@@ -3255,7 +3255,7 @@ sap.ui.define([
 			});
 
 		} else {
-			return new Text();
+			return new Text(sIdPrefix + "-role-" + nPos + "-text");
 		}
 	};
 
