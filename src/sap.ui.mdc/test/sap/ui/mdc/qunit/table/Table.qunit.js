@@ -3888,6 +3888,11 @@ sap.ui.define([
 			name: "test",
 			descending: true
 		}];
+		const aSortConditionsResult = [{
+			name: "test",
+			key: "test",
+			descending: true
+		}];
 		const oFilterConditions = {
 			name: [{
 				isEmpty: null,
@@ -3922,20 +3927,20 @@ sap.ui.define([
 		});
 		assert.deepEqual(this.oTable.getCurrentState(), {
 			items: [{key: "test", name: "test"}],
-			sorters: aSortConditions
+			sorters: aSortConditionsResult
 		}, "Set sort conditions");
 
 		this.oTable.setP13nMode(["Column", "Sort", "Filter"]);
 		assert.deepEqual(this.oTable.getCurrentState(), {
 			items: [{key: "test", name: "test"}],
-			sorters: aSortConditions,
+			sorters: aSortConditionsResult,
 			filter: {}
 		}, "Activate 'Filter'");
 
 		this.oTable.setFilterConditions(oFilterConditions);
 		assert.deepEqual(this.oTable.getCurrentState(), {
 			items: [{key: "test", name: "test"}],
-			sorters: aSortConditions,
+			sorters: aSortConditionsResult,
 			filter: oFilterConditions
 		}, "Set filter conditions");
 
@@ -4453,13 +4458,13 @@ sap.ui.define([
 	QUnit.test("State validation against property infos", async function(assert) {
 		await this.createTable({
 			sortConditions: {
-				sorters: [{key: "DoesNotExist"}]
+				sorters: [{name: "DoesNotExist"}]
 			},
 			filterConditions: {
 				DoesNotExist: [{operator: "EQ", values: [30]}]
 			},
 			groupConditions: {
-				groupLevels: [{key: "DoesNotExist"}]
+				groupLevels: [{name: "DoesNotExist"}]
 			},
 			aggregateConditions: {
 				DoesNotExist: {}

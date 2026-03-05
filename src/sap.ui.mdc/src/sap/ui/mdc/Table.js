@@ -49,7 +49,8 @@ sap.ui.define([
 	// load for availability
 	"sap/ui/mdc/enums/TableGrowingMode",
 	// load for availability
-	"sap/ui/mdc/enums/TableRowCountMode"
+	"sap/ui/mdc/enums/TableRowCountMode",
+	"sap/ui/mdc/flexibility/helpers/addKeyOrName"
 ], (
 	Control,
 	ActionToolbar,
@@ -93,7 +94,10 @@ sap.ui.define([
 	TableMultiSelectMode,
 	TableSelectionMode,
 	TableP13nMode,
-	TableType
+	TableType,
+	TableGrowingMode,
+	TableRowCountMode,
+	addKeyOrName
 ) => {
 	"use strict";
 
@@ -1987,11 +1991,19 @@ sap.ui.define([
 	};
 
 	Table.prototype._getSortedProperties = function() {
-		return this.getSortConditions() ? this.getSortConditions().sorters : [];
+		const aSortConditions = this.getSortConditions() ? this.getSortConditions().sorters : [];
+		aSortConditions.forEach((oSortCondition) => {
+			addKeyOrName(oSortCondition);
+		});
+		return aSortConditions;
 	};
 
 	Table.prototype._getGroupedProperties = function() {
-		return this.getGroupConditions() ? this.getGroupConditions().groupLevels : [];
+		const aGroupConditions = this.getGroupConditions() ? this.getGroupConditions().groupLevels : [];
+		aGroupConditions.forEach((oGroupCondition) => {
+			addKeyOrName(oGroupCondition);
+		});
+		return aGroupConditions;
 	};
 
 	Table.prototype._getAggregatedProperties = function() {
