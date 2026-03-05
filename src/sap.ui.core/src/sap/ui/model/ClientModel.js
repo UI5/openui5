@@ -155,8 +155,17 @@ sap.ui.define([
 	ClientModel.prototype.destroyBindingContext = function(oContext) {
 	};
 
-	/*
-	 * @see sap.ui.model.Model.prototype.bindContext
+
+
+	/**
+	 * Creates a <code>sap.ui.model.ClientContextBinding</code>.
+	 *
+	 * @param {string} sPath The path pointing to the property that should be bound
+	 * @param {sap.ui.model.Context} [oContext] The context object for this databinding
+	 * @param {object} [mParameters] Additional model-specific parameters
+	 *
+	 * @return {sap.ui.model.ClientContextBinding} The newly created <code>ClientContextBinding</code>
+	 * @public
 	 */
 	ClientModel.prototype.bindContext = function(sPath, oContext, mParameters) {
 		var oBinding = new ClientContextBinding(this, sPath, oContext, mParameters);
