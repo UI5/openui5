@@ -2716,7 +2716,6 @@ sap.ui.define([
 		 * <b>Note:</b> Please, be aware that this feature works under the Browser's Cross-Origin Resource Sharing (CORS) policy.
 		 * This means that a web application using those APIs can only request resources from the same origin the application was loaded from unless the response from other origins includes the right CORS headers.
 		 * @public
-		 * @experimental since 1.106
 		 */
 		 InlineSvg: "InlineSvg"
 
