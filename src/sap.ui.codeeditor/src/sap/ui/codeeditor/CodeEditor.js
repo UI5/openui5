@@ -143,7 +143,11 @@ sap.ui.define([
 				/**
 				 * Sets whether to show syntax hints in the editor. Those hints are visualized as value state icons in the line numbers area.
 				 * The hint text is shown in tooltip of those icons.
+				 *
 				 * <b>Note:</b> This flag is only available if line numbers are shown.
+				 *
+				 * <b>Note:</b> Syntax hints highly depend on the underlying third-party ACE editor. Comprehensive hints may not be available for all editor types, and some types may not display any hints.
+				 * Currently, syntax hints are supported for the following types: javascript, json, css, html, xml, php, coffee, lua, xquery, yaml.
 				 */
 				syntaxHints: { type: "boolean", group: "Behavior", defaultValue: true }
 			},

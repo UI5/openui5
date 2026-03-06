@@ -3357,6 +3357,37 @@ sap.ui.define([
 		oDP.destroy();
 	});
 
+	QUnit.test("Value is formatted when out ot min and max range if possible and keeps the user input (doesn't return to the old valid value)", async function(assert) {
+		// Prepare
+		var oDP = new DatePicker("oDP", {
+			dateValue: UI5Date.getInstance(2021, 10, 1),
+			minDate: UI5Date.getInstance(2021, 10, 1),
+			maxDate: UI5Date.getInstance(2021, 11, 1),
+			displayFormat: "MM-dd-yyyy",
+			valueFormat: "MM/dd/yyyy"
+		}).placeAt("qunit-fixture");
+
+		// Act
+		await nextUIUpdate();
+
+		// Act
+		oDP.setValue("9/1/2021");
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(jQuery("#oDP").find("input").val(), "09-01-2021", "Input value is correct when it is before min value.");
+
+		// Act
+		oDP.setValue("10-2-2026aaa");
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(jQuery("#oDP").find("input").val(), "10-2-2026aaa", "Input value is not modified");
+
+		// Clean up
+		oDP.destroy();
+	});
+
 	QUnit.test("Placeholder behaviour for the non binded values of the date picker", async function(assert) {
 			// Prepare
 			var sOriginalLanguage = Localization.getLanguage();

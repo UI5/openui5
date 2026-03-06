@@ -2,8 +2,8 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/FlVariant",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/write/api/ContextSharingAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
@@ -14,8 +14,8 @@ sap.ui.define([
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	FlVariant,
+	ControlVariantWriteAPI,
 	VariantManagement,
-	VariantManager,
 	ContextSharingAPI,
 	PersistenceWriteAPI,
 	Layer,
@@ -32,7 +32,7 @@ sap.ui.define([
 
 	QUnit.module("FlVariant Save as", {
 		beforeEach() {
-			this.oHandleSaveStub = sandbox.stub(VariantManager, "handleSaveEvent");
+			this.oHandleSaveStub = sandbox.stub(ControlVariantWriteAPI, "handleSaveEvent");
 			this.oVariantManagement = new VariantManagement("variantMgmtId1");
 			sandbox.spy(this.oVariantManagement, "detachCancel");
 			sandbox.spy(this.oVariantManagement, "detachSave");
@@ -93,11 +93,11 @@ sap.ui.define([
 				})
 			];
 			aExistingChanges[0].setSavedToVariant(true);
-			sandbox.stub(VariantManager, "getControlChangesForVariant")
+			sandbox.stub(ControlVariantWriteAPI, "getControlChangesForVariant")
 			.withArgs("Dummy", "variantMgmtId1", "mySourceReference")
 			.returns(aExistingChanges);
-			const oRemoveStub = sandbox.stub(VariantManager, "removeVariant").resolves();
-			const oApplyChangeStub = sandbox.stub(VariantManager, "addAndApplyChangesOnVariant");
+			const oRemoveStub = sandbox.stub(ControlVariantWriteAPI, "removeVariant").resolves();
+			const oApplyChangeStub = sandbox.stub(ControlVariantWriteAPI, "addAndApplyControlChangesOnVariant");
 			const oPersistencyStub = sandbox.stub(PersistenceWriteAPI, "remove").resolves();
 
 			const oSaveAsCommand = await CommandFactory.getCommandFor(this.oVariantManagement, "saveAs", {

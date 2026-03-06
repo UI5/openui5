@@ -696,7 +696,7 @@ sap.ui.define([
 					oChange.setFlexObjectMetadata(oFlexObjectMetadata);
 				});
 
-				return PersistenceWriteAPI.save({ selector: oMockedAppComponent, skipUpdateCache: true });
+				return PersistenceWriteAPI.save({ selector: oMockedAppComponent });
 			})
 
 			.then(function() {
@@ -743,7 +743,7 @@ sap.ui.define([
 					oChange.setFlexObjectMetadata(oFlexObjectMetadata);
 				});
 
-				return PersistenceWriteAPI.save({ selector: oMockedAppComponent, skipUpdateCache: true });
+				return PersistenceWriteAPI.save({ selector: oMockedAppComponent });
 			})
 
 			.then(function() {

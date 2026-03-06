@@ -3,14 +3,14 @@
 sap.ui.define([
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/fl/variants/VariantManager",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	ControlVariantApplyAPI,
 	VariantManagement,
-	VariantManager,
+	ControlVariantWriteAPI,
 	CommandFactory,
 	sinon,
 	RtaQunitUtils
@@ -81,8 +81,8 @@ sap.ui.define([
 				})
 			];
 
-			const oAddAndApplyChangesStub = sandbox.stub(VariantManager, "addAndApplyChangesOnVariant").resolves();
-			sandbox.stub(VariantManager, "eraseDirtyChangesOnVariant").resolves(aDirtyChanges);
+			const oAddAndApplyChangesStub = sandbox.stub(ControlVariantWriteAPI, "addAndApplyControlChangesOnVariant").resolves();
+			sandbox.stub(ControlVariantWriteAPI, "eraseDirtyChangesOnVariant").resolves(aDirtyChanges);
 
 			const oSwitchCommand = await CommandFactory.getCommandFor(this.oVariantManagement, "switch", oSwitchCommandData);
 			await oSwitchCommand.execute();

@@ -237,7 +237,7 @@ sap.ui.define([
 				oValueListMapping.Parameters.forEach(function (oParameter) {
 					var sParameterPath = oParameter.ValueListProperty;
 
-					// TODO label from the property
+					//TODO: label from the property
 					oTable.addColumn(new Column({
 						header : new Text({
 							text : sParameterPath,

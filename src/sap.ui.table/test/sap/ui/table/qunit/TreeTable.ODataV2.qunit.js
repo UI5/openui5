@@ -598,15 +598,15 @@ sap.ui.define([
 		const done = assert.async();
 		const that = this;
 
-		assert.expect(25);
-
 		TableQUnitUtils.createTable(TreeTable, {
 			enableBusyIndicator: true,
 			busyStateChanged: function(oEvent) {
 				if (oEvent.getParameter("busy")) {
 					that.assertState(assert, "On 'busyStateChanged' - State changed to true", {pendingRequests: true, busy: true});
+					assert.step("busy true");
 				} else {
 					that.assertState(assert, "On 'busyStateChanged' - State changed to false", {pendingRequests: false, busy: false});
+					assert.step("busy false");
 					done();
 				}
 			},
@@ -615,9 +615,12 @@ sap.ui.define([
 				events: {
 					dataRequested: function() {
 						that.assertState(assert, "On 'dataRequested'", {pendingRequests: true, busy: true});
+						assert.step("dataRequested");
 					},
 					dataReceived: function() {
 						that.assertState(assert, "On 'dataReceived'", {pendingRequests: false, busy: true});
+						assert.step("dataReceived");
+						assert.verifySteps(["init", "busy true", "dataRequested", "dataRequested", "dataReceived"], "Sequence of events is correct");
 					}
 				},
 				parameters: {
@@ -629,6 +632,7 @@ sap.ui.define([
 
 		// the underlying TreeBinding adapter is loaded async and therefore no requests are pending initially
 		this.assertState(assert, "After initialization", {pendingRequests: false, busy: false});
+		assert.step("init");
 	});
 
 	QUnit.module("NoData", {

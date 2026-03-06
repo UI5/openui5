@@ -60,7 +60,7 @@ sap.ui.define([
 		checkTable("After collapse '0'", `
 + 0`);
 
-		// expandLevels(0, 4); // TODO should be the same
+		// expandLevels(0, 4); //TODO: should be the same
 		expandAll("0");
 		checkTable("After expand all below '0'", `
 - 0

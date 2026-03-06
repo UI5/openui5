@@ -14082,7 +14082,6 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 			// clean all expected messages
 			that.expectMessages([])
 				// The PropertyBinding is updated synchronously, the ListBinding asynchronously
-				.expectValue("note", "", 1)
 				.expectValue("id", ["43", "42", ""], 1)
 				.expectValue("note", ["New 1", "First SalesOrder", ""], 1);
 
@@ -14330,7 +14329,6 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 					type : "Error"
 				}])
 				// The PropertyBinding is updated synchronously, the ListBinding asynchronously
-				.expectValue("note", "", 1)
 				.expectValue("id", ["42", ""], 2)
 				.expectValue("note", ["New 1", "First SalesOrder", ""], 1);
 
@@ -14469,8 +14467,6 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 					}]
 				})
 				// The PropertyBinding is updated synchronously, the ListBinding asynchronously
-				.expectValue("id", "", 1)
-				.expectValue("note", "", 1)
 				.expectValue("id", ["43", "42", ""], 1)
 				.expectValue("note", ["New 1", "First SalesOrder", ""], 1);
 
@@ -14593,7 +14589,6 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 				})
 				// The PropertyBinding is updated synchronously, the ListBinding asynchronously
 				.expectValue("id", "", 2)
-				.expectValue("note", "", 2)
 				.expectValue("note", ["New 3", ""], 2);
 
 			oModel.remove("", {
@@ -14777,8 +14772,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 			return that.waitForChanges(assert);
 		}).then(function () {
 			// The PropertyBinding is updated synchronously, the ListBinding asynchronously
-			that.expectValue("note", "", 2)
-				.expectValue("note", ["New 3", ""], 2)
+			that.expectValue("note", ["New 3", ""], 2)
 				.expectMessages([]);
 
 			// code under test
@@ -14915,8 +14909,6 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 					}]
 				})
 				// The PropertyBinding is updated synchronously, the ListBinding asynchronously
-				.expectValue("id", "", 2)
-				.expectValue("note", "", 2)
 				.expectValue("id", ["45", ""], 2)
 				.expectValue("note", ["New 3", ""], 2);
 
@@ -15258,7 +15250,6 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 				})
 				// The PropertyBinding is updated synchronously, the ListBinding asynchronously
 				.expectValue("id", "", 1)
-				.expectValue("note", "", 1)
 				.expectValue("id", ["42", ""], 2)
 				.expectValue("note", ["New 3", "First SalesOrder", ""], 1);
 
@@ -16513,8 +16504,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 			return that.waitForChanges(assert);
 		}).then(function () {
 			oContext = oTable.getRows()[0].getBindingContext();
-			that.expectValue("note", "", 0)
-				.expectValue("note", ["SO inactive/transient", "SO1", ""]);
+				that.expectValue("note", ["SO inactive/transient", "SO1", ""]);
 
 			sContextPath = oContext.getPath();
 
@@ -16525,8 +16515,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 			]);
 		}).then(function () {
 			oContext = oTable.getRows()[0].getBindingContext();
-			that.expectValue("note", "", 0)
-				.expectValue("note", ["SO1", ""]);
+			that.expectValue("note", ["SO1", ""]);
 			assert.strictEqual(oModel.getObject(sContextPath), undefined,
 				"data of active/transient context removed");
 
@@ -17417,8 +17406,10 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 				}]
 			})
 			.expectValue("businessPartnerID", "42")
-			.expectValue("salesOrderID", ["1", "", "", "", ""])
-			.expectValue("note", ["Sales Order 1", "", "", "", ""]);
+			.expectValue("salesOrderID", ["", "", "", "", ""])
+			.expectValue("note", ["", "", "", "", ""])
+			.expectValue("salesOrderID", ["1"])
+			.expectValue("note", ["Sales Order 1"]);
 
 		return this.createView(assert, sView, oModel).then(function () {
 			oTable = that.oView.byId("table");
@@ -17629,8 +17620,6 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 						}
 					}
 				})
-				.expectValue("salesOrderID", "", 0)
-				.expectValue("note", ["", "Sales Order 1 - SideEffect"])
 				.expectValue("salesOrderID", ["1", ""])
 				.expectValue("note", ["Sales Order 1 - SideEffect", ""])
 				.expectMessages([]);
@@ -17806,8 +17795,6 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 						}]
 					}
 				})
-				.expectValue("salesOrderID", "", 0)
-				.expectValue("note", "", 0)
 				.expectValue("salesOrderID", "3", 0)
 				.expectValue("note", "Sales Order 3 - SideEffect", 0);
 
@@ -18208,8 +18195,10 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 						Note : "Sales Order 1"
 					}]
 				})
-				.expectValue("salesOrderID", ["1", "", "", "", ""])
-				.expectValue("note", ["Sales Order 1", "", "", "", ""]);
+				.expectValue("salesOrderID", ["", "", "", "", ""])
+				.expectValue("note", ["", "", "", "", ""])
+				.expectValue("salesOrderID", ["1"])
+				.expectValue("note", ["Sales Order 1"]);
 
 			return this.createView(assert, sView, oModel).then(function () {
 				oBinding = that.oView.byId("table").getBinding("rows");
@@ -18284,8 +18273,6 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 							}]
 						}
 					})
-					.expectValue("note", "Sales Order New: created persisted - SideEffect", 0)
-					.expectValue("note", "Sales Order 1 - SideEffect", 2)
 					.expectRequest({
 						batchNo : 3,
 						requestNo : (aOrderedFunctions.indexOf("refresh") + 1),
@@ -24262,7 +24249,8 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		}).then(() => {
 			oTable.setFirstVisibleRow(0);
 
-			return this.waitForChanges(assert, "Scroll back up and see correct values");
+			// wait for table to show new values
+			return new Promise((resolve) => {setTimeout(resolve, 0);});
 		}).then(() => {
 			assert.deepEqual(getTableContent(oTable), [["16.00\u00a0EUR"], ["29\u00a0JPY"]]);
 		});

@@ -863,6 +863,6 @@ sap.ui.define([
 		});
 	});
 });
-// TODO unicode character classes not supported by ECMAscript 5
+//TODO: unicode character classes not supported by ECMAscript 5
 //   rWord = /[\p{L}\p{Nl}_][\p{L}\p{Nl}\p{Nd}\p{Mn}\p{Mc}\p{Pc}\p{Cf}]*/
 //   for this reason we accept ALL non-ascii characters in identifiers

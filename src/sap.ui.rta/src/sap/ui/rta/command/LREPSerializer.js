@@ -102,7 +102,6 @@ sap.ui.define([
 			}
 			await PersistenceWriteAPI.save({
 				selector: oRootControl,
-				skipUpdateCache: false,
 				draft: !!mPropertyBag.saveAsDraft,
 				layer: mPropertyBag.layer,
 				removeOtherLayerChanges: !!mPropertyBag.removeOtherLayerChanges,

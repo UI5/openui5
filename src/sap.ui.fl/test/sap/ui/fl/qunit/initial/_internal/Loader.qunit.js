@@ -336,6 +336,7 @@ sap.ui.define([
 			assert.strictEqual(this.oLoadFlexDataStub.secondCall.args[0].componentName, "secondCall", "the order of calls is correct");
 			assert.strictEqual(this.oLoadFlexDataStub.thirdCall.args[0].componentName, "thirdCall", "the order of calls is correct");
 			assert.strictEqual(this.oLoadVariantsAuthorsStub.callCount, 3, "the loadVariantsAuthors was called three times");
+			assert.strictEqual(this.oGetCacheKeyStub.callCount, 1, "the cache key is only fetched once");
 		});
 
 		QUnit.test("when getFlexData is called with different versions and skipLoadBundle", async function(assert) {
@@ -926,6 +927,34 @@ sap.ui.define([
 			assert.deepEqual(oResult.data.changes, this.oExpectedFlexDataResponse, "the Loader loads data");
 			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData wasn't called second time");
 			assert.strictEqual(this.oCompleteFlexDataStub.callCount, 0, "the Storage.completeFlexData wasn't called");
+		});
+
+		QUnit.test("When getFlexData is called twice with updateCachedResponse in between", async function(assert) {
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+			const sFirstCacheKey = this.oLoadFlexDataStub.firstCall.args[0].cacheKey;
+			assert.strictEqual(this.oGetCacheKeyStub.callCount, 1, "the cache key is retrieved once");
+
+			Loader.updateCachedResponse(sReference, []);
+
+			// trigger a new load of flex data by changing the version in the FlexInfoSession
+			FlexInfoSession.setByReference({
+				version: Version.Number.Draft
+			}, sReference);
+
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+			assert.strictEqual(this.oGetCacheKeyStub.callCount, 1, "the cache key is not retrieved again");
+			assert.notEqual(
+				this.oLoadFlexDataStub.getCall(1).args[0].cacheKey, sFirstCacheKey,
+				"the cache key is different after the cached response is updated"
+			);
 		});
 	});
 

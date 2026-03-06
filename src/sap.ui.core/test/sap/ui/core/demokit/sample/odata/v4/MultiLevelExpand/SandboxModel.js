@@ -192,7 +192,7 @@ sap.ui.define([
 				LimitedDescendantCount : String(iLimitedDescendantCount) // Edm.Int64
 			};
 			if (vSubtotalsAtBottom === true) {
-				const oSubtotal = _Helper.clone(oParent); //TODO avoid deep clone?
+				const oSubtotal = _Helper.clone(oParent); //TODO: avoid deep clone?
 				oSubtotal["@com.sap.vocabularies.Analytics.v1.LevelInformation"].DrillState
 					= "subtotal";
 				aChildren.push(oSubtotal);
@@ -202,7 +202,7 @@ sap.ui.define([
 		}
 
 		if (vSubtotalsAtBottom === "off") {
-			aRows.forEach((oParent) => { //TODO MUST not be done on leaf level!
+			aRows.forEach((oParent) => { //TODO: MUST not be done on leaf level!
 				delete oParent.CurrencyCode_code;
 				delete oParent.FlightPrice;
 			});

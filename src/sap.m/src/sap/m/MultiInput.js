@@ -1162,7 +1162,11 @@ function(
 
 		//deselect everything
 		this.getAggregation("tokenizer").selectAllTokens(false);
-		this.selectText(0, 0);
+
+		// Only clear text selection if there actually is one
+		if (this.getFocusDomRef().selectionStart !== this.getFocusDomRef().selectionEnd) {
+			this.selectText(0, 0);
+		}
 
 		if (oPopup.isOpen()) {
 			oTokenizer._togglePopup();

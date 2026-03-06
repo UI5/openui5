@@ -16,15 +16,11 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/descriptorRelated/api/DescriptorChangeFactory",
 	"sap/ui/fl/write/_internal/appVariant/AppVariantInlineChangeFactory",
-	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
-	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
-	"sap/ui/fl/write/api/VersionsAPI",
 	"sap/ui/fl/Utils",
 	"sap/ui/fl/write/_internal/init"
 ], function(
@@ -41,15 +37,11 @@ sap.ui.define([
 	ChangesUtils,
 	FlexObjectFactory,
 	States,
-	VariantManagementState,
 	FlexObjectState,
 	ManifestUtils,
 	DescriptorChangeFactory,
 	AppVariantInlineChangeFactory,
-	ControlVariantWriteUtils,
-	FlexObjectManager,
 	ContextBasedAdaptationsAPI,
-	VersionsAPI,
 	Utils
 ) {
 	"use strict";
@@ -345,75 +337,6 @@ sap.ui.define([
 			appDescriptorChange: mPropertyBag.appDescriptorChange,
 			annotationChange: mPropertyBag.annotationChange
 		});
-	};
-
-	/**
-	 * Deletes the variants and their related FlexObjects. By default, only variants that are in the draft
-	 * or dirty state can be deleted, as they have no dependencies on them.
-	 * The Business Network scenario can delete any variants (forceDelete=true).
-	 * Returns all FlexObjects that were deleted in the process.
-	 *
-	 * @param {object} mPropertyBag - Object with parameters as properties
-	 * @param {sap.ui.core.Control} mPropertyBag.variantManagementControl - Variant management control
-	 * @param {string[]} mPropertyBag.variants - Variant IDs to be deleted
-	 * @param {string} mPropertyBag.layer - Layer that the variants belong to
-	 * @param {boolean} [mPropertyBag.forceDelete=false] - If set to true, the deletion will not check for draft or dirty state of the variants
-	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} Array of deleted Flex Objects
-	 * @private
-	 * @ui5-restricted sap.ui.fl, sap.ui.rta, similar tools
-	 */
-	ChangesWriteAPI.deleteVariantsAndRelatedObjects = function(mPropertyBag) {
-		if (!(mPropertyBag.variantManagementControl?.isA("sap.ui.fl.variants.VariantManagement"))) {
-			throw new Error("Please provide a valid Variant Management control");
-		}
-		const oVariantManagementControl = mPropertyBag.variantManagementControl;
-		const oAppComponent = Utils.getAppComponentForControl(oVariantManagementControl);
-		const sVariantManagementReference = JsControlTreeModifier.getSelector(oVariantManagementControl, oAppComponent).id;
-		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
-		// Filter out passed variants from other layers
-		let aVariantsToBeDeleted = mPropertyBag.variants.filter((sVariantId) => {
-			const oVariant = VariantManagementState.getVariant({
-				vmReference: sVariantManagementReference,
-				reference: sFlexReference,
-				vReference: sVariantId
-			});
-			if (!oVariant) {
-				Log.warning(`Variant with ID '${sVariantId}' does not exist in the Variant Management control.`);
-				return false;
-			}
-			return oVariant.layer === mPropertyBag.layer;
-		});
-		if (!mPropertyBag.forceDelete) {
-			const aDraftFilenames = VersionsAPI.getDraftFilenames({
-				control: oVariantManagementControl,
-				layer: mPropertyBag.layer
-			});
-			const aDirtyFlexObjectIds = FlexObjectState.getDirtyFlexObjects(sFlexReference).map((oFlexObject) => (
-				oFlexObject.getId()
-			));
-			aVariantsToBeDeleted = aVariantsToBeDeleted.filter((sVariantID) => (
-				aDraftFilenames.includes(sVariantID) || aDirtyFlexObjectIds.includes(sVariantID)
-			));
-		}
-		return aVariantsToBeDeleted
-		.map((sVariantId) => (ControlVariantWriteUtils.deleteVariant(sFlexReference, oAppComponent.getId(), sVariantManagementReference, sVariantId)))
-		.flat();
-	};
-
-	/**
-	 * Restores previously deleted FlexObjects. Objects are restored to the state they were in before deletion.
-	 * If the flex object was not persisted, it is added as a dirty object again.
-	 * Once the deletion is persisted, changes will not be restored.
-	 *
-	 * @param {object} mPropertyBag - Object with parameters as properties
-	 * @param {string} mPropertyBag.reference - Flex reference of the application
-	 * @param {string} mPropertyBag.componentId - Id of the application instance
-	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.flexObjects - FlexObjects to be restored
-	 * @private
-	 * @ui5-restricted sap.ui.fl, sap.ui.rta, similar tools
-	 */
-	ChangesWriteAPI.restoreDeletedFlexObjects = function(mPropertyBag) {
-		FlexObjectManager.restoreDeletedFlexObjects(mPropertyBag);
 	};
 
 	return ChangesWriteAPI;

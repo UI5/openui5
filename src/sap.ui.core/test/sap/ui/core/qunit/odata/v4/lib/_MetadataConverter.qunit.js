@@ -30,7 +30,7 @@ sap.ui.define([
 		assert.strictEqual(oDocument.parseError.errorCode, 0, "XML parsed correctly");
 		return oDocument;
 	}
-	// TODO how to avoid duplication of this test method?
+	//TODO: how to avoid duplication of this test method?
 
 	/**
 	 * Tests the conversion of the given XML snippet of a constant/dynamic expression below an
@@ -528,7 +528,7 @@ sap.ui.define([
 		testExpression(assert, "<UrlRef><Path>/Url</Path></UrlRef>",
 			{$UrlRef : {$Path : "/Url"}});
 	});
-	// TODO look at xml:base if the URL in UrlRef is static and relative
+	//TODO: look at xml:base if the URL in UrlRef is static and relative
 
 	//*********************************************************************************************
 	QUnit.test("annotated expressions", function (assert) {

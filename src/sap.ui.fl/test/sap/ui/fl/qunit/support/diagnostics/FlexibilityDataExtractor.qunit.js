@@ -91,8 +91,8 @@ sap.ui.define([
 			const oMockChangeDependencies = {
 				aAppliedChanges: ["change1", "change2"],
 				mChangesEntries: {
-					change1: { changeId: "change1", dependencies: ["change2"], user: "JohnDoesEmail" },
-					change2: { changeId: "change2", dependencies: [], user: "JaneSmithsEmail" }
+					change1: { changeId: "change1", dependencies: ["change2"], user: "JohnDoesEmail", content: [] },
+					change2: { changeId: "change2", dependencies: [], user: "JaneSmithsEmail", content: { a: "bc" } }
 				}
 			};
 
@@ -161,6 +161,18 @@ sap.ui.define([
 				oResult.flexObjectInfos[3].mProperties.supportInformation.user,
 				"USER_4",
 				"Different user in flex object infos gets different anonymized value"
+			);
+
+			// Verify structure stays intact
+			assert.deepEqual(
+				oResult.changeDependencies.mChangesEntries.change1.content,
+				[],
+				"then empty arrays retain their shape"
+			);
+			assert.deepEqual(
+				oResult.changeDependencies.mChangesEntries.change2.content,
+				{ a: "bc" },
+				"then object structures with nested primitives retain their shape"
 			);
 		});
 

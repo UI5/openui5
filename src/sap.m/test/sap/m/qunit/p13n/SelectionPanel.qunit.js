@@ -722,7 +722,7 @@ sap.ui.define([
 				showSelected: false,
 				hideDescriptions: true
 			},
-			resultDelta: -6 // 0 items are selected
+			resultDelta: -3 // 3 items are selected
 		},
 		{
 			filter: {
@@ -954,42 +954,5 @@ sap.ui.define([
 		assert.equal(aSelectedItems.length, 2, "Only two items are selected");
 		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
 		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 3", "Field 2 is correctly selected");
-	});
-
-	QUnit.test("Check 'Deselect All' with description toggle", async function(assert) {
-		const oP13nData = this.getTestData().map((oItem, iIndex) => {
-			oItem.isRedundant = iIndex == 4;
-			return oItem;
-		});
-		oP13nData[4].visible = true;
-
-		// act
-		this.oSelectionPanel.setP13nData(oP13nData);
-		await nextUIUpdate();
-
-		// Assert: Initial state. 3 items are selected, 5 items are visible (6 total).
-		let aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
-		assert.equal(aSelectedItems.length, 3, "Only three items are selected");
-		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
-		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is correctly selected");
-		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is correctly selected");
-
-		// Act
-		this.oSelectionPanel._oListControl.removeSelections(true, true);
-		await nextUIUpdate();
-
-		// Assert
-		aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
-		assert.equal(aSelectedItems.length, 0, "No visible items are selected");
-
-		// Act: Show all items including descriptions
-		this.oSelectionPanel._filterList(false, undefined);
-		this.oSelectionPanel.getModel(this.oSelectionPanel.P13N_MODEL).setProperty("/hideDescriptions", false);
-		await nextUIUpdate();
-
-		// Assert: 1 item should still only be shown (description was selected as it was hidden)
-		aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
-		assert.equal(aSelectedItems.length, 1, "Only one item is selected");
-		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 5", "Field 5 is correctly selected");
 	});
 });

@@ -210,4 +210,34 @@ sap.ui.define([
 		await this.oTable.qunit.whenRenderingFinished();
 		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, true, "Disable");
 	});
+
+	QUnit.test("Lazy row creation", async function(assert) {
+		this.oTable.destroy();
+
+		this.oTable = TableQUnitUtils.createTable({
+			rowMode: new RowModeSubclass(),
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(1)
+		}, function(oTable) {
+			assert.strictEqual(oTable.getRows().length, 0, "Before rendering without binding: The table has no rows");
+		});
+
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.strictEqual(this.oTable.getRows().length, 0, "After rendering without binding: The table has no rows");
+
+		this.oTable.bindRows({path: "/"});
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.strictEqual(this.oTable.getRows().length, 1, "After asynchronous row update: The table has the correct number of rows");
+		this.oTable.destroy();
+
+		this.oTable = TableQUnitUtils.createTable({
+			rowMode: new RowModeSubclass(),
+			rows: {path: "/"},
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(1)
+		}, function(oTable) {
+			// updateTable is called synchronously, so the table already has rows at this point
+			assert.strictEqual(oTable.getRows().length, 1, "Before rendering with binding: The table has rows");
+		});
+	});
+
 });

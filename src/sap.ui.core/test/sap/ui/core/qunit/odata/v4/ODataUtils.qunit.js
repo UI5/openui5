@@ -274,7 +274,7 @@ sap.ui.define([
 		}, oError);
 	});
 });
-//TODO from https://www.w3.org/TR/xmlschema11-2/#vp-dt-timezone:
+//TODO: from https://www.w3.org/TR/xmlschema11-2/#vp-dt-timezone:
 // "Values from any one date/time datatype using the seven-component model (all except duration)
 // are ordered the same as their ·timeOnTimeline· values, except that if one value's
 // ·timezoneOffset· is absent and the other's is not, and using maximum and minimum ·timezoneOffset·

@@ -401,7 +401,7 @@
 				<Annotation Qualifier="OrgChart" Term="Org.OData.Aggregation.V1.RecursiveHierarchy">
 					<Record>
 						<PropertyValue Property="NodeProperty" PropertyPath="ID"/>
-						<!-- TODO "Its type MUST be the entity type annotated with this term"
+						<!--TODO: "Its type MUST be the entity type annotated with this term"
 							=> Manager should derive from Worker
 						-->
 						<PropertyValue Property="ParentNavigationProperty" NavigationPropertyPath="EMPLOYEE_2_MANAGER"/>

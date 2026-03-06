@@ -2532,7 +2532,7 @@ sap.ui.define([
 			assert.strictEqual(sMetaPath, oFixture.metaPath);
 		});
 	});
-	//TODO $all, $count, $crossjoin, $ref, $value
+	//TODO: $all, $count, $crossjoin, $ref, $value
 	// Q: Do we need to keep signatures to resolve overloads?
 	// A: Most probably not. The spec says "All bound functions with the same function name and
 	//    binding parameter type within a namespace MUST specify the same return type."
@@ -3446,7 +3446,7 @@ sap.ui.define([
 			"/Me/toG/" : {$select : ["g"]}
 		}
 /* eslint-disable no-tabs */
-//	}, { //TODO who would need this?
+//	}, { //TODO: who would need this?
 //		aPaths : ["E"],
 //		mResult : {
 //			$select : ["E/toF"],
@@ -4346,7 +4346,7 @@ sap.ui.define([
 		// code under test
 		assert.strictEqual(_Helper.hasPathSuffix("/some(42)/path", "(42)/path"), true);
 	});
-	//TODO offer _Helper.getBasePath as well?
+	//TODO: offer _Helper.getBasePath as well?
 
 	//*********************************************************************************************
 	QUnit.test("aggregateExpandSelect: recursion", function () {

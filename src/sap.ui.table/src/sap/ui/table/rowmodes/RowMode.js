@@ -228,7 +228,6 @@ sap.ui.define([
 			return;
 		}
 
-		_private(this).updateTableAsync.cancel(); // Update will be performed right now.
 		this.updateTableRows(); // Update the rows aggregation and the binding contexts of rows.
 
 		const aRows = oTable.getRows();
@@ -301,6 +300,7 @@ sap.ui.define([
 	 */
 	RowMode.prototype._onTableRowsUnbound = function() {
 		clearTimeout(this.getTable()._mTimeouts.refreshRowsCreateRows);
+		_private(this).updateTableAsync.cancel();
 		this.updateTable(TableUtils.RowsUpdateReason.Unbind);
 	};
 
@@ -314,7 +314,12 @@ sap.ui.define([
 		const oTable = this.getTable();
 
 		clearTimeout(oTable._mTimeouts.refreshRowsCreateRows);
-		_private(this).updateTableAsync(sReason);
+		if (sReason === TableUtils.RowsUpdateReason.VerticalScroll || sReason === TableUtils.RowsUpdateReason.FirstVisibleRowChange) {
+			_private(this).updateTableAsync(sReason);
+		} else {
+			_private(this).updateTableAsync.cancel();
+			this.updateTable(sReason);
+		}
 	};
 
 	/**
@@ -692,6 +697,7 @@ sap.ui.define([
 	 * @this sap.ui.table.rowmodes.RowMode
 	 */
 	TableDelegate.onBeforeRendering = function(oEvent) {
+		_private(this).updateTableAsync.cancel();
 		this.updateTable(TableUtils.RowsUpdateReason.Render);
 	};
 

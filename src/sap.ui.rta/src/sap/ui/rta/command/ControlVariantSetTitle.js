@@ -2,12 +2,12 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/ui/fl/variants/VariantManager",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/command/BaseCommand",
 	"sap/ui/rta/library"
 ], function(
-	VariantManager,
+	ControlVariantWriteAPI,
 	flUtils,
 	BaseCommand,
 	rtaLibrary
@@ -61,9 +61,8 @@ sap.ui.define([
 	/**
 	 * Template Method to implement execute logic, with ensure precondition Element is available.
 	 * @public
-	 * @returns {Promise} Returns resolve after execution
 	 */
-	ControlVariantSetTitle.prototype.execute = async function() {
+	ControlVariantSetTitle.prototype.execute = function() {
 		const oVariantManagementControl = this.getElement();
 
 		this.oAppComponent = flUtils.getAppComponentForControl(oVariantManagementControl);
@@ -73,24 +72,24 @@ sap.ui.define([
 		const sCurrentTitle = oVariantManagementControl.getVariantByKey(this.sCurrentVariantKey).getTitle();
 		this.setOldText(sCurrentTitle);
 
-		const mPropertyBag = {
+		[this._oVariantChange] = ControlVariantWriteAPI.addVariantChanges({
+			variantManagementReference: this.sVariantManagementReference,
 			appComponent: this.oAppComponent,
-			variantReference: this.sCurrentVariantKey,
-			changeType: "setTitle",
-			title: this.getNewText(),
-			layer: this.sLayer,
-			generator: rtaLibrary.GENERATOR_NAME
-		};
-
-		this._oVariantChange = await VariantManager.addVariantChange(this.sVariantManagementReference, mPropertyBag);
+			changeContents: [{
+				variantReference: this.sCurrentVariantKey,
+				changeType: "setTitle",
+				title: this.getNewText(),
+				layer: this.sLayer
+			}],
+			generatorName: rtaLibrary.GENERATOR_NAME
+		});
 	};
 
 	/**
 	 * Template Method to implement undo logic.
 	 * @public
-	 * @returns {Promise} Returns resolve after undo
 	 */
-	ControlVariantSetTitle.prototype.undo = async function() {
+	ControlVariantSetTitle.prototype.undo = function() {
 		const mPropertyBag = {
 			variantReference: this.sCurrentVariantKey,
 			changeType: "setTitle",
@@ -98,7 +97,7 @@ sap.ui.define([
 			appComponent: this.oAppComponent
 		};
 
-		await VariantManager.deleteVariantChange(this.sVariantManagementReference, mPropertyBag, this._oVariantChange);
+		ControlVariantWriteAPI.deleteVariantChange(this.sVariantManagementReference, mPropertyBag, this._oVariantChange);
 		this._oVariantChange = null;
 	};
 

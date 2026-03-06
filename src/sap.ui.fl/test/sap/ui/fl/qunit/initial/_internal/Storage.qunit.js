@@ -311,15 +311,6 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("Given LrepConnector when loading data with cacheKey and version together", function(assert) {
-			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
-			const oLrepStub = sandbox.stub(LrepConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
-
-			return Storage.loadFlexData({ reference: sFlexReference, cacheKey: "cache", version: "version" }).then(function() {
-				assert.notOk(oLrepStub.lastCall.args[0].cacheKey, "the cache key was removed");
-			});
-		});
-
 		QUnit.test("Given some connector provides multiple layers", function(assert) {
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 			const sVariant1 = "variant1";
@@ -767,9 +758,11 @@ sap.ui.define([
 			window.sessionStorage.setItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`, true);
 			await Storage.loadFlexData({
 				reference: sFlexReference,
-				version: Version.Number.Draft
+				version: Version.Number.Draft,
+				cacheKey: "cache"
 			});
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].allContexts, true, "the allContexts parameters was added");
+			assert.notOk(this.oLoadFlexDataStub.getCall(0).args[0].cacheKey, "the cacheKey parameter was removed");
 		});
 
 		QUnit.test("when loadFlexData is called with adaptationMode set in the FlexInfoSession", async function(assert) {
@@ -782,10 +775,12 @@ sap.ui.define([
 
 			await Storage.loadFlexData({
 				reference: sFlexReference,
-				version: Version.Number.Draft
+				version: Version.Number.Draft,
+				cacheKey: "cache"
 			});
 			assert.notDeepEqual(FlexInfoSession.getByReference(sFlexReference), {}, "then the flex info session is not cleared");
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].allContexts, true, "the allContexts parameters was added");
+			assert.notOk(this.oLoadFlexDataStub.getCall(0).args[0].cacheKey, "the cacheKey parameter was removed");
 		});
 	});
 

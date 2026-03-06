@@ -282,7 +282,7 @@ sap.ui.define([
 			return oResult;
 		});
 	}
-	//TODO test with exception during bindAggregation, e.g. via sorter
+	//TODO: test with exception during bindAggregation, e.g. via sorter
 
 	/*
 	 * Call the given code under test, making sure that properties are bound and unbound in
@@ -347,8 +347,8 @@ sap.ui.define([
 			this.oLogMock.expects(`error`).never();
 			// do not flood the console ;-)
 			this.oDebugExpectation = this.oLogMock.expects(`debug`).atLeast(0);
-			//TODO .withExactArgs(sinon.match.string, sinon.match.any, sComponent);
-			//TODO this.oDebugExpectation.callThrough();
+			//TODO: .withExactArgs(sinon.match.string, sinon.match.any, sComponent);
+			//TODO: this.oDebugExpectation.callThrough();
 
 			this.oXMLTemplateProcessorMock = this.mock(XMLTemplateProcessor);
 			this.oXMLTemplateProcessorMock.expects(`loadTemplatePromise`).never();
@@ -1374,7 +1374,7 @@ sap.ui.define([
 
 				assert.strictEqual(oInterface.getModel(), oModel);
 				assert.strictEqual(oInterface.getPath(), sExpectedPath);
-				//TODO getPath("foo/bar")? Note: getPath("/absolute/path") does not make sense!
+				//TODO: getPath("foo/bar")? Note: getPath("/absolute/path") does not make sense!
 
 				assert.strictEqual(oInterface.getSetting(`bindTexts`), true, `settings`);
 				assert.throws(function () {
@@ -1732,7 +1732,7 @@ sap.ui.define([
 			models : oDataModel
 		});
 	});
-	//TODO createBindingContext should also be used w/o var
+	//TODO: createBindingContext should also be used w/o var
 
 	//*********************************************************************************************
 	[false, true].forEach(function (bHasHelper) {
@@ -2108,7 +2108,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test(`template:repeat list="{/unsupported/path}"`, function (assert) {
-		//TODO is this the expected behavior? the loop has no iterations and that's it?
+		//TODO: is this the expected behavior? the loop has no iterations and that's it?
 		// Note: the same happens with a relative path if there is no binding context for the model
 		return this.check(assert, [
 			mvcView(),
@@ -3168,7 +3168,7 @@ sap.ui.define([
 			// assert.strictEqual(mSettings.models.getProperty("/answer"), 42, "deep copy");
 
 			assert.deepEqual(oMyViewInfo, oViewInfo);
-			//TODO If we cannot win for mSettings, is it worth trying for oViewInfo?
+			//TODO: If we cannot win for mSettings, is it worth trying for oViewInfo?
 			oMyViewInfo.nestedObject.foo = `hacked`;
 			assert.strictEqual(oViewInfo.nestedObject.foo, `bar`, `deep copy`);
 
@@ -3471,7 +3471,7 @@ sap.ui.define([
 			}
 		});
 	});
-	//TODO safety check for invalidated ICallback instances in each visit*() etc. call?
+	//TODO: safety check for invalidated ICallback instances in each visit*() etc. call?
 	//     !bReplace && !oWithControl.getParent()
 
 	//*********************************************************************************************
@@ -4041,5 +4041,5 @@ sap.ui.define([
 		]);
 	});
 });
-//TODO we have completely missed support for unique IDs in fragments via the "id" property!
-//TODO somehow trace ex.stack, but do not duplicate ex.message
+//TODO: we have completely missed support for unique IDs in fragments via the "id" property!
+//TODO: somehow trace ex.stack, but do not duplicate ex.message

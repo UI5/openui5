@@ -454,7 +454,7 @@ sap.ui.define([
 	function buildGetSingleResponse(aMatches, oResponse) {
 		// EMPLOYEES('B')?$select=AGE,DescendantCount,DistanceFromRoot,DrillState,ID,MANAGER_ID,Name
 		const aSelect = getQueryOptions(aMatches[2]).$select.split(",");
-		const select = (oNode) => { //TODO share w/ selectCountSkipTop?
+		const select = (oNode) => { //TODO: share w/ selectCountSkipTop?
 			const oResult = {};
 			for (const sSelect of aSelect) {
 				oResult[sSelect] = oNode[sSelect];

@@ -100,6 +100,8 @@ sap.ui.define([
 			assert.strictEqual(fnLeaves.callCount, 1);
 			assert.ok(fnLeaves.calledWith(sinon.match.same(oLeavesRow)));
 		}
+		assert.strictEqual(fnCount.callCount, 1);
+		assert.ok(fnCount.calledWith(sinon.match.same(oCountRow)));
 		if (fnGrandTotal) {
 			assert.strictEqual(fnGrandTotal.callCount, 1);
 			assert.ok(fnGrandTotal.calledWith(sinon.match.same(oGrandTotalRow)));

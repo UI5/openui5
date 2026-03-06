@@ -89,7 +89,7 @@ sap.ui.define([
 			Then.onTheMainPage.checkPriceValueState("Error"); // ISO-Code EUR does not exist
 
 			When.onTheMainPage.changePrice("42", 1);
-			//TODO the value should be kept as is, "42"; sap.ui.model.type.Currency#formatValue
+			//TODO: the value should be kept as is, "42"; sap.ui.model.type.Currency#formatValue
 			// however returns "42.00"; adapt as soon as this is fixed.
 			Then.onTheMainPage.checkPrice("42.00", 1); // no currency yet for entry, no error
 			Then.onTheMainPage.checkPriceValueState("None", 1);

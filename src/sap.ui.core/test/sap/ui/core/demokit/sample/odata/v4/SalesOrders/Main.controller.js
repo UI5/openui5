@@ -706,7 +706,7 @@ sap.ui.define([
 			if (!oSalesOrderContext) {
 				oSalesOrdersTable.removeSelections();
 			} else if (oSalesOrderContext.isTransient()) {
-				// TODO: eliminate this workaround:
+				//TODO: eliminate this workaround:
 				// to ensure that no dependent data for the newly created SO is fetched
 				// unless it is persisted in the back end
 				oSalesOrderContext = undefined;

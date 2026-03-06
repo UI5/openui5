@@ -68,7 +68,7 @@
 					<form:SimpleForm ariaLabelledBy="createSalesOrderDialog" editable="true"
 						layout="ResponsiveGridLayout">
 						<Label text="Buyer ID"/>
-						<!-- TODO Q: derive maxLength from type's constraints?! A: SmartField?! -->
+						<!--TODO: Q: derive maxLength from type's constraints?! A: SmartField?! -->
 						<Input id="BuyerID::new"
 							maxLength="10"
 							placeholder="Enter buyer ID starting with '0'..."

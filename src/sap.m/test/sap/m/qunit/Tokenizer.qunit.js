@@ -767,6 +767,55 @@ sap.ui.define([
 		oTokenizer.destroy();
 	});
 
+	QUnit.test("Tab key should not be blocked by delegate in tokens popup", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+
+		const oTokenizer = new Tokenizer({
+			width: "300px"
+		}).placeAt("content");
+
+		oTokenizer.addToken(new Token({text: "Token 1", key: "0001"}));
+		oTokenizer.addToken(new Token({text: "Token 2", key: "0002"}));
+		oTokenizer.addToken(new Token({text: "Token 3", key: "0003"}));
+
+		await nextUIUpdate(this.clock);
+
+		const oToken = oTokenizer.getTokens()[0];
+		oToken.focus();
+
+		qutils.triggerKeydown(oToken.getDomRef(), KeyCodes.F4);
+		this.clock.tick(300);
+
+		const oTokenPopover = oTokenizer.getTokensPopup();
+		assert.ok(oTokenPopover.isOpen(), "Tokens popup should be open");
+
+		const oList = oTokenizer._getTokensList();
+		const oFirstItem = oList.getItems()[0];
+
+		assert.strictEqual(document.activeElement, oFirstItem.getDomRef(), "First list item should be focused");
+
+		const oKeyEvent = jQuery.Event("keydown", {
+			which: KeyCodes.TAB,
+			keyCode: KeyCodes.TAB
+		});
+
+		const preventDefaultSpy = sinon.spy(oKeyEvent, "preventDefault");
+
+		jQuery(oFirstItem.getDomRef()).trigger(oKeyEvent);
+
+		assert.strictEqual(preventDefaultSpy.callCount, 0, "preventDefault should NOT be called for Tab key");
+
+		assert.notOk(oKeyEvent.isDefaultPrevented(), "Tab key default action should NOT be prevented");
+
+		preventDefaultSpy.restore();
+
+		qutils.triggerKeydown(document.activeElement, KeyCodes.ESCAPE);
+		this.clock.tick(600);
+
+		this.clock.restore();
+		oTokenizer.destroy();
+	});
+
 	QUnit.test("Should reset focus on the nMore tokens popover after re-open", async function (assert) {
 		this.clock = sinon.useFakeTimers();
 

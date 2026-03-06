@@ -259,9 +259,9 @@ sap.ui.define([
 				mFixture[sPath], sPath);
 		}
 	});
-	//TODO later: if details are missing, loop back via oContext
-	//TODO error handling? if path is wrong in annotation, a warning might be helpful --> later!
-	//TODO multi-valued structural or navigation property "in between" are not recognized; maybe
+	//TODO: later: if details are missing, loop back via oContext
+	//TODO: error handling? if path is wrong in annotation, a warning might be helpful --> later!
+	//TODO: multi-valued structural or navigation property "in between" are not recognized; maybe
 	// add such checks only in case warnings would be logged?
 
 	//*********************************************************************************************
@@ -1619,7 +1619,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	[{
-	//TODO Unknown child ID of tea_busi.DefaultContainer at...
+	//TODO: Unknown child ID of tea_busi.DefaultContainer at...
 	//... /tea_busi.DefaultContainer/EMPLOYEES@Common.Text
 	//  sInput : "/tea_busi.DefaultContainer/EMPLOYEES@Common.Text/$Path@Common.Label",
 	//  sOutput : "/tea_busi.DefaultContainer/EMPLOYEES/ID@Common.Label"

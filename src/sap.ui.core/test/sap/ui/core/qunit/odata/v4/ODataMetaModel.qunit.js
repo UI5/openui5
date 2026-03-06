@@ -758,7 +758,7 @@ sap.ui.define([
 				}
 			},
 			// "NewAction" is overloaded by collection of type, returning instance of type
-			//TODO There can be one overload with "$isCollection" : true and another w/o, for the
+			//TODO: There can be one overload with "$isCollection" : true and another w/o, for the
 			// same binding parameter $Type! How to tell these apart?
 			"tea_busi.NewAction" : [{
 				$kind : "Action",
@@ -1431,7 +1431,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("forbidden", function (assert) {
-		assert.throws(function () { //TODO implement
+		assert.throws(function () { //TODO: implement
 			this.oMetaModel.bindTree();
 		}, new Error("Unsupported operation: v4.ODataMetaModel#bindTree"));
 
@@ -1439,7 +1439,7 @@ sap.ui.define([
 			this.oMetaModel.getOriginalProperty();
 		}, new Error("Unsupported operation: v4.ODataMetaModel#getOriginalProperty"));
 
-		assert.throws(function () { //TODO implement
+		assert.throws(function () { //TODO: implement
 			this.oMetaModel.isList();
 		}, new Error("Unsupported operation: v4.ODataMetaModel#isList"));
 
@@ -1589,7 +1589,7 @@ sap.ui.define([
 			});
 		});
 	});
-	//TODO later support "$Extends" : "<13.1.2 EntityContainer Extends>"
+	//TODO: later support "$Extends" : "<13.1.2 EntityContainer Extends>"
 
 	//*********************************************************************************************
 	QUnit.test("fetchEntityContainer: _mergeAnnotations fails", function (assert) {
@@ -1672,7 +1672,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMetaModel.resolve(sMetaPath, oContext), sResolvedPath);
 		});
 	});
-	//TODO make sure that Context objects are only created for absolute paths?!
+	//TODO: make sure that Context objects are only created for absolute paths?!
 
 	//*********************************************************************************************
 	[".bar", ".@bar", ".$kind"].forEach(function (sPath) {
@@ -1693,7 +1693,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	//TODO better map meta model path to pure JSON path (look up inside JsonModel)?
+	//TODO: better map meta model path to pure JSON path (look up inside JsonModel)?
 	// what about @sapui.name then, which requires a literal as expected result?
 	// --> we could distinguish "/<path>" from "<literal>"
 	forEach({
@@ -1753,7 +1753,7 @@ sap.ui.define([
 		"/OverloadedAction" : oContainerData["OverloadedAction"],
 		"/OverloadedAction/$Action" : "name.space.OverloadedAction",
 		"/ChangeManagerOfTeam/" : oTeamData,
-		//TODO mScope[mScope["..."][0].$ReturnType.$Type] is where the next OData simple identifier
+		//TODO: mScope[mScope["..."][0].$ReturnType.$Type] is where the next OData simple identifier
 		//     would live in case of entity/complex type, but we would like to avoid warnings for
 		//     primitive types - how to tell the difference?
 		// "/GetEmployeeMaxAge/" : "Edm.Int16",
@@ -1767,8 +1767,8 @@ sap.ui.define([
 		"/GetEmployeeMaxAge/value/$Type" : "Edm.Int16", // path may continue!
 		"/tea_busi.FuGetEmployeeMaxAge/value"
 			: mScope["tea_busi.FuGetEmployeeMaxAge"][0].$ReturnType,
+		//TODO: merge facets of return type and type definition?!
 		"/name.space.DerivedPrimitiveFunction/value"
-			//TODO merge facets of return type and type definition?!
 			: mScope["name.space.DerivedPrimitiveFunction"][0].$ReturnType,
 		"/ChangeManagerOfTeam/value" : oTeamData.value,
 		"/ChangeManagerOfTeam/$kind" : "ActionImport",
@@ -1823,7 +1823,7 @@ sap.ui.define([
 			: sinon.match.array.deepEquals([aOverloadedBoundFunction[2]]),
 		"/OverloadedFunctionImport/@$ui5.overload/0" : aOverloadedBoundFunction[2],
 		"/OverloadedFunctionImport/" : mScope["tea_busi.ComplexType_Salary"],
-		//TODO this is the only case where we filter overloads twice - still it could be avoided!
+		//TODO: this is the only case where we filter overloads twice - still it could be avoided!
 		"/OverloadedFunctionImport/@$ui5.overload/AMOUNT"
 			: mScope["tea_busi.ComplexType_Salary"].AMOUNT,
 		"/OverloadedFunctionImport/AMOUNT" : mScope["tea_busi.ComplexType_Salary"].AMOUNT,
@@ -1965,7 +1965,7 @@ sap.ui.define([
 			: mScope.$Annotations["tea_busi.NewAction/$ReturnType"]["@Common.Label"],
 		"/T€AMS/tea_busi.NewAction/$ReturnType@Common.Label" : mScope.$Annotations
 			["tea_busi.NewAction(Collection(tea_busi.TEAM))/$ReturnType"]["@Common.Label"],
-		//TODO "/GetEmployees/$ReturnType@Common.Label"
+		//TODO: "/GetEmployees/$ReturnType@Common.Label"
 		// : "Return type's label across all overloads of function import",
 		// annotations at properties of return type - - - - - - - - - - - - - - - - - - - - - - - -
 		"/T€AMS/tea_busi.NewAction/Name@" : mScope.$Annotations["tea_busi.TEAM/Name"],
@@ -2092,10 +2092,10 @@ sap.ui.define([
 			assert.notStrictEqual(vResult, undefined, "use this test for defined results only!");
 		});
 	});
-	//TODO special cases where inline and external targeting annotations need to be merged!
-	//TODO support also external targeting from a different schema!
-	//TODO MySchema.MyFunction/MyParameter --> requires search in array?!
-	//TODO "For annotations targeting a property of an entity type or complex type, the path
+	//TODO: special cases where inline and external targeting annotations need to be merged!
+	//TODO: support also external targeting from a different schema!
+	//TODO: MySchema.MyFunction/MyParameter --> requires search in array?!
+	//TODO: "For annotations targeting a property of an entity type or complex type, the path
 	// expression is evaluated starting at the outermost entity type or complex type named in the
 	// Target of the enclosing edm:Annotations element, i.e. an empty path resolves to the
 	// outermost type, and the first segment of a non-empty path MUST be a property or navigation
@@ -2244,7 +2244,7 @@ sap.ui.define([
 		assert.strictEqual(oSyncPromise.isFulfilled(), true);
 		assert.strictEqual(oSyncPromise.getResult(), undefined);
 	});
-	//TODO if no annotations exist for an external target, avoid {} internally unless "@" is used?
+	//TODO: if no annotations exist for an external target, avoid {} internally unless "@" is used?
 
 	//*********************************************************************************************
 	[false, true].forEach(function (bWarn) {
@@ -2288,7 +2288,7 @@ sap.ui.define([
 			"/name.space.BrokenFunction/" : "Unknown qualified name not.Found"
 				+ " at /name.space.BrokenFunction/0/$ReturnType/$Type",
 
-			//TODO align with "/GetEmployeeMaxAge/" : "Edm.Int16"
+			//TODO: align with "/GetEmployeeMaxAge/" : "Edm.Int16"
 			"/GetEmployeeMaxAge/@sapui.name" : "Unknown qualified name Edm.Int16"
 				+ " at /tea_busi.FuGetEmployeeMaxAge/0/$ReturnType/$Type",
 
@@ -2566,7 +2566,7 @@ sap.ui.define([
 				"/T€AMS/name.space.OverloadedAction/_it@Common.Label" : aOverloadedAction[1],
 				"/T€AMS/name.space.OverloadedAction/parameter1@Common.Text" : aOverloadedAction[1],
 				"/T€AMS/name.space.OverloadedAction/parameter1@Common.Text/" : aOverloadedAction[1]
-//TODO check if "/T€AMS/name.space.OverloadedAction/parameter1" : aOverloadedAction[1] should also
+//TODO: check if "/T€AMS/name.space.OverloadedAction/parameter1" : aOverloadedAction[1] should also
 // be expected for parameters and not only for annotations
 			},
 			mPathPrefix2SchemaChildName = {
@@ -2917,12 +2917,12 @@ sap.ui.define([
 			return Promise.all(aPromises);
 		});
 	});
-	//TODO Decision: It is an error if a namespace is referenced multiple times with different URLs.
-	//     This should be checked even when load-on-demand is used.
-	//     (It should not even be included multiple times with the same URL!)
-	//TODO Check that no namespace is included which is already present!
-	//TODO API to load "transitive closure"
-	//TODO support for sync. XML Templating
+	//TODO: Decision: It is an error if a namespace is referenced multiple times with different
+	// URLs. This should be checked even when load-on-demand is used. (It should not even be
+	// included multiple times with the same URL!)
+	//TODO: Check that no namespace is included which is already present!
+	//TODO: API to load "transitive closure"
+	//TODO: support for sync. XML Templating
 
 	//*********************************************************************************************
 	[false, true].forEach(function (bWarn) {
@@ -3202,7 +3202,7 @@ sap.ui.define([
 					});
 			});
 	});
-	//TODO Implement consistency checks that the same namespace is always included from the same
+	//TODO: Implement consistency checks that the same namespace is always included from the same
 	//     reference URL, no matter which referencing document.
 
 	//*********************************************************************************************
@@ -3363,7 +3363,7 @@ sap.ui.define([
 			});
 		});
 	});
-	//TODO later: support for facet DefaultValue?
+	//TODO: later: support for facet DefaultValue?
 
 	//*********************************************************************************************
 	[{
@@ -3547,7 +3547,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	//TODO make Edm.Duration work with OData V4
+	//TODO: make Edm.Duration work with OData V4
 	["acme.Type", "Edm.Duration", "Edm.GeographyPoint"].forEach(function (sQualifiedName) {
 		QUnit.test("fetchUI5Type: unsupported type " + sQualifiedName, function (assert) {
 			var sPath = "/EMPLOYEES/0/foo",
@@ -4058,11 +4058,11 @@ sap.ui.define([
 			});
 		});
 	});
-	//TODO support collection properties (-> path containing index not leading to predicate)
-	//TODO prefer instance annotation at payload for "odata.editLink"?!
-	//TODO target URLs like
+	//TODO: support collection properties (-> path containing index not leading to predicate)
+	//TODO: prefer instance annotation at payload for "odata.editLink"?!
+	//TODO: target URLs like
 	// "com.sap.gateway.default.iwbep.tea_busi_product.v0001.Container/Products(...)"?
-	//TODO type casts, operations?
+	//TODO: type casts, operations?
 
 	//*********************************************************************************************
 	QUnit.test("fetchUpdateData: bNoEditUrl", function (assert) {
@@ -4793,7 +4793,7 @@ sap.ui.define([
 		// <template:repeat list="{entitySet>}" ...>
 		// Iterate all OData path segments, i.e. (navigation) properties.
 		// Implicit $Type insertion happens here!
-		//TODO support for $BaseType
+		//TODO: support for $BaseType
 		contextPath : "/EMPLOYEES",
 		metaPath : "",
 		result : [
@@ -4949,8 +4949,8 @@ sap.ui.define([
 			}), ["/foo/bar", "/foo/baz"]);
 		});
 	});
-	//TODO iterate mix of inline and external targeting annotations
-	//TODO iterate annotations like "foo@..." for our special cases, e.g. annotations of annotation
+	//TODO: iterate mix of inline and external targeting annotations
+	//TODO: iterate annotations like "foo@..." for our special cases, e.g. annotations of annotation
 
 	//*********************************************************************************************
 	QUnit.test("events", function (assert) {
@@ -5362,7 +5362,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	// TODO This test is only kept for the last c.u.t. which tests #_getOrFetchSchema. It should
+	//TODO: This test is only kept for the last c.u.t. which tests #_getOrFetchSchema. It should
 	//      be removed once #_getOrFetchSchema is tested in a more appropriate way.
 	QUnit.test("_mergeAnnotations: with annotation files", function (assert) {
 		var mScope0 = {
@@ -6663,7 +6663,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	//TODO Unknown qualified name some.other.Type at /name.space.Action/0/$ReturnType/$Type,
+	//TODO: Unknown qualified name some.other.Type at /name.space.Action/0/$ReturnType/$Type,
 	//     /ActionImport/@sapui.name
 	// --> need to identify action import before we Promise.all([this.requestObject()])
 	QUnit.skip("requestValueListInfo: action import parameter", function (assert) {
@@ -8378,4 +8378,4 @@ sap.ui.define([
 		});
 	});
 });
-//TODO getContext vs. createBindingContext; map of "singletons" vs. memory leak
+//TODO: getContext vs. createBindingContext; map of "singletons" vs. memory leak

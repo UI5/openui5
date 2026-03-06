@@ -2,7 +2,7 @@
 
 sap.ui.define([
 	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/fl/variants/VariantManager",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/library",
@@ -10,7 +10,7 @@ sap.ui.define([
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	VariantManagement,
-	VariantManager,
+	ControlVariantWriteAPI,
 	Layer,
 	CommandFactory,
 	rtaLibrary,
@@ -32,8 +32,8 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("execute and undo", async function(assert) {
 			const sNewText = "Test";
-			const oAddChangeStub = sandbox.stub(VariantManager, "addVariantChange").resolves("setTitleChange");
-			const oDeleteStub = sandbox.stub(VariantManager, "deleteVariantChange").resolves();
+			const oAddChangeStub = sandbox.stub(ControlVariantWriteAPI, "addVariantChanges").returns(["setTitleChange"]);
+			const oDeleteStub = sandbox.stub(ControlVariantWriteAPI, "deleteVariantChange").returns();
 			sandbox.stub(this.oVariantManagement, "getCurrentVariantReference").returns("variant0");
 			sandbox.stub(this.oVariantManagement, "getVariantByKey").returns({
 				getTitle() { return "variant A"; }
@@ -45,24 +45,22 @@ sap.ui.define([
 
 			await oSetTitleCommand.execute();
 			assert.strictEqual(oSetTitleCommand.getOldText(), "variant A", "the old text was set in the command");
-			const mExpectedParams = {
+			const mExpectedParams = [{
+				variantManagementReference: "variantMgmtId1",
 				appComponent: oMockedAppComponent,
-				variantReference: "variant0",
-				changeType: "setTitle",
-				title: sNewText,
-				layer: Layer.CUSTOMER,
-				generator: rtaLibrary.GENERATOR_NAME
-			};
+				changeContents: [{
+					variantReference: "variant0",
+					changeType: "setTitle",
+					title: sNewText,
+					layer: Layer.CUSTOMER
+				}],
+				generatorName: rtaLibrary.GENERATOR_NAME
+			}];
 			assert.strictEqual(oAddChangeStub.callCount, 1, "the add function was called once");
 			assert.deepEqual(
-				oAddChangeStub.firstCall.args[0],
-				"variantMgmtId1",
-				"the first parameter is the variantManagement reference"
-			);
-			assert.deepEqual(
-				oAddChangeStub.firstCall.args[1],
+				oAddChangeStub.firstCall.args,
 				mExpectedParams,
-				"the second parameter is the correct property bag"
+				"the first parameter is the variantManagement reference"
 			);
 
 			await oSetTitleCommand.undo();

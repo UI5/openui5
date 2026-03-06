@@ -3421,6 +3421,8 @@ sap.ui.define([
 				that.assertPositionWithMomentumScroll(assert, 0, 20, 0, "Touch - " + mConfig.name + ": Scrolled");
 				assert.ok(oTouchMoveEvent.defaultPrevented, "Touch - " + mConfig.name + ": Default action was prevented");
 				assert.ok(oStopPropagationSpy.notCalled, "Touch - " + mConfig.name + ": Propagation was not stopped");
+				TableQUnitUtils.startTouchScrolling(mConfig.element);
+				TableQUnitUtils.endTouchScrolling();
 			});
 		}
 

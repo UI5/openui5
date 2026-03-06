@@ -7,22 +7,13 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/fl/variants/VariantManager",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/LayerUtils",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/rta/qunit/RtaQunitUtils",
-	"sap/ui/dt/ElementDesignTimeMetadata",
-	"sap/ui/dt/OverlayRegistry",
-	"sap/ui/dt/ElementOverlay",
-	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
-	"sap/ui/fl/write/api/PersistenceWriteAPI",
-	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/rta/qunit/RtaQunitUtils",
-	"sap/ui/rta/plugin/ControlVariant"
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	ElementDesignTimeMetadata,
 	ElementOverlay,
@@ -30,7 +21,7 @@ sap.ui.define([
 	VariantManagementState,
 	FlexObjectState,
 	VariantManagement,
-	VariantManager,
+	ControlVariantWriteAPI,
 	PersistenceWriteAPI,
 	Layer,
 	FlLayerUtils,
@@ -106,10 +97,10 @@ sap.ui.define([
 			sandbox.stub(OverlayRegistry, "getOverlay").returns(oOverlay);
 			sandbox.stub(oOverlay, "getVariantManagement").returns("idMain1--variantManagementOrdersTable");
 			sandbox.stub(this.oVariantManagement, "getCurrentVariantReference").returns("variant00");
-			sandbox.stub(VariantManager, "getControlChangesForVariant")
+			sandbox.stub(ControlVariantWriteAPI, "getControlChangesForVariant")
 			.withArgs("Dummy", "variantMgmtId1", "variant00")
 			.returns([this.oChange1, this.oChange2]);
-			const oInvalidationStub = sandbox.stub(VariantManager, "updateVariantManagementMap").withArgs("Dummy");
+			const oInvalidationStub = sandbox.stub(VariantManagementState.getVariantManagementMap(), "checkUpdate");
 
 			const oDesignTimeMetadata = new ElementDesignTimeMetadata({ data: {} });
 			const mFlexSettings = { layer: Layer.CUSTOMER };

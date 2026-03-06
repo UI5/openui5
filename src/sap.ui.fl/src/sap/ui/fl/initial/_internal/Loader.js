@@ -68,6 +68,12 @@ sap.ui.define([
 	const _mCachedFlexData = {};
 	const _mInitPromises = {};
 
+	// The token from the async hints is added to the backend request as cache buster token. This token only changes after a hard reload
+	// of the application, which is never performed when adapting the UI in FLP. As soon as the cache is updated, a new token is generated
+	// and saved here. Once a hard reload happens, this module is reloaded and the token from the async hints will be used again.
+	// This token is currently not used during adaptation mode, but after activation the token must also be invalidated
+	const _mAsyncHintsCacheBusterTokens = {};
+
 	/**
 	 * Class for loading Flex Data from the backend via the Connectors.
 	 *
@@ -256,17 +262,13 @@ sap.ui.define([
 			// e.g. when discarding a draft that contained all existing changes
 			bPreviouslyFilledData = _mCachedFlexData[sReference]
 				&& StorageUtils.isStorageResponseFilled(_mCachedFlexData[sReference].data.changes);
-
-			// the cache key cannot be used in case of a reinitialization
-			const sCacheKey = mPropertyBag.reInitialize
-				? undefined
-				: ManifestUtils.getCacheKeyFromAsyncHints(sReference, mPropertyBag.asyncHints);
+			_mAsyncHintsCacheBusterTokens[sReference] ||= ManifestUtils.getCacheKeyFromAsyncHints(sReference, mPropertyBag.asyncHints);
 
 			oFlexData = await Storage.loadFlexData({
 				preview: ManifestUtils.getPreviewSectionFromAsyncHints(mPropertyBag.asyncHints),
 				reference: sReference,
 				componentName: sComponentName,
-				cacheKey: sCacheKey,
+				cacheKey: mPropertyBag.reInitialize ? undefined : _mAsyncHintsCacheBusterTokens[sReference],
 				siteId: getSideId(mPropertyBag.componentData),
 				appDescriptor: mPropertyBag.manifest.getRawJson ? mPropertyBag.manifest.getRawJson() : mPropertyBag.manifest,
 				version: sVersion,
@@ -355,10 +357,12 @@ sap.ui.define([
 		if (sReference) {
 			delete _mCachedFlexData[sReference];
 			delete _mInitPromises[sReference];
+			delete _mAsyncHintsCacheBusterTokens[sReference];
 		} else {
 			Object.keys(_mCachedFlexData).forEach((sReference) => {
 				delete _mCachedFlexData[sReference];
 				delete _mInitPromises[sReference];
+				delete _mAsyncHintsCacheBusterTokens[sReference];
 			});
 		}
 	};
@@ -379,7 +383,7 @@ sap.ui.define([
 		Object.entries(oNewData).forEach(([sKey, vValue]) => {
 			_mCachedFlexData[mPropertyBag.reference].data.changes[sKey].push(...vValue);
 		});
-		_mCachedFlexData[mPropertyBag.reference].parameters.loaderCacheKey = uid();
+		_mCachedFlexData[mPropertyBag.reference].parameters.loaderCacheKey = _mAsyncHintsCacheBusterTokens[mPropertyBag.reference] = uid();
 		return {
 			newData: oNewData,
 			completeLoaderData: _mCachedFlexData[mPropertyBag.reference]
@@ -395,7 +399,7 @@ sap.ui.define([
 	 */
 	Loader.updateCachedResponse = function(sReference, aUpdates) {
 		StorageUtils.updateStorageResponse(_mCachedFlexData[sReference].data, aUpdates);
-		_mCachedFlexData[sReference].parameters.loaderCacheKey = uid();
+		_mCachedFlexData[sReference].parameters.loaderCacheKey = _mAsyncHintsCacheBusterTokens[sReference] = uid();
 		return _mCachedFlexData[sReference].parameters.loaderCacheKey;
 	};
 

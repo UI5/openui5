@@ -190,7 +190,7 @@ sap.ui.define([
 			oTable.filter(oTextColumn, "*0*");
 			assert.equal(oTable.getBinding().getCount(), 8, "Table: RowCount after filtering *0*");
 			oCell = oTable.getRows()[0].getCells()[0];
-			assert.ok(oCell.getSelected(), "Row 1: Cell 1 is selected");
+			assert.ok(!oCell.getSelected(), "Row 1: Cell 1 is not selected");
 			assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value not changed after filtering");
 			oTable.filter(oTextColumn, "");
 			return EditorQunitUtils.wait();

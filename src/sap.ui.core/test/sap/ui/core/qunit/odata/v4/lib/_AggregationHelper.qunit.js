@@ -1747,7 +1747,7 @@ sap.ui.define([
 			_AggregationHelper.checkTypeof({invalid : "n/a"}, {}, "some/path");
 		}, new Error("Unsupported property: 'some/path/invalid'"));
 	});
-	//TODO Allow for alternative types, e.g. @param {string|string[]}? --> ["string", ["string"]]
+	//TODO: Allow for alternative types, e.g. @param {string|string[]}? --> ["string", ["string"]]
 	// Idea: Any array with more than one entry would be a list of alternatives.
 	// --> [["string", ["string"]]] means @param {Array<(string|Array<string>)>} ;-)
 
@@ -2394,7 +2394,7 @@ sap.ui.define([
 				undefined);
 		});
 	});
-	//TODO Also support orderbyItems that start with a type cast?
+	//TODO: Also support orderbyItems that start with a type cast?
 	// See "11.2.5.2 System Query Option $orderby":
 	// "A special case of such an expression is a property path terminating on a primitive property.
 	// A type cast using the qualified entity type name is required to order by a property defined

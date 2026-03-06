@@ -793,6 +793,17 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns whether the carousel is in VisiblePages scroll mode
+	 * @private
+	 * @returns {boolean} true if the carousel is in VisiblePages scroll mode, false otherwise
+	 */
+	Carousel.prototype._isVisiblePagesScrollMode = function () {
+		const oCarouselLayout = this.getCustomLayout();
+
+		return oCarouselLayout && oCarouselLayout.getScrollMode() === CarouselScrollMode.VisiblePages;
+	};
+
+	/**
 	 * Returns the index of the slide that should be shown
 	 * @private
 	 * @param {int} iCurrentSlideIndex Current slide index
@@ -800,10 +811,9 @@ sap.ui.define([
 	 * @returns {int} Index of the slide
 	 */
 	Carousel.prototype._calculateSlideIndex = function (iCurrentSlideIndex, iDefaultIndexStep) {
-		const oCarouselLayout = this.getCustomLayout();
 		let iSlideIndex;
 
-		if (oCarouselLayout && oCarouselLayout.getScrollMode() === CarouselScrollMode.VisiblePages) {
+		if (this._isVisiblePagesScrollMode()) {
 			const iNumberOfItemsOnPage =  this._getNumberOfItemsToShow();
 			iSlideIndex = iDefaultIndexStep > 0 ? iCurrentSlideIndex + iNumberOfItemsOnPage : Math.max(0, iCurrentSlideIndex - iNumberOfItemsOnPage);
 		} else {
@@ -823,7 +833,10 @@ sap.ui.define([
 		const iSlideIndex = this._calculateSlideIndex(this._iCurrSlideIndex, -1);
 		let iFocusPageIndex = this._iFocusedPageIndex;
 
-		if (this._aAllActivePagesIndexes.at(-1) === this._iFocusedPageIndex) {
+		if (this._isVisiblePagesScrollMode()) {
+			// In VisiblePages mode, focus should go to the last page of the new visible set.
+			iFocusPageIndex = iSlideIndex + this._getNumberOfItemsToShow() - 1;
+		} else if (this._aAllActivePagesIndexes.at(-1) === this._iFocusedPageIndex) {
 			iFocusPageIndex = this._iFocusedPageIndex - 1;
 		}
 
@@ -842,7 +855,10 @@ sap.ui.define([
 		const iSlideIndex = this._calculateSlideIndex(this._iCurrSlideIndex, 1);
 		let iFocusPageIndex = this._iFocusedPageIndex;
 
-		if (this._aAllActivePagesIndexes[0] === this._iFocusedPageIndex) {
+		if (this._isVisiblePagesScrollMode()) {
+			// In VisiblePages mode, focus should go to the first page of the new visible set.
+			iFocusPageIndex = iSlideIndex;
+		} else if (this._aAllActivePagesIndexes[0] === this._iFocusedPageIndex) {
 			iFocusPageIndex = this._iFocusedPageIndex + 1;
 		}
 
