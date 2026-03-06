@@ -43,7 +43,9 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable(TreeTable);
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.whenRenderingFinished(() => {
+				return this.oTable._getTotalRowCount() === 197;
+			});
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -66,7 +68,6 @@ sap.ui.define([
 	QUnit.test("Select range", function(assert) {
 		return this.oMultiSelectionPlugin.setSelectionInterval(0, 189).then(function() {
 			const aContexts = this.oTable.getBinding().getContexts(0, 190, 0);
-
 			assert.equal(aContexts.length, 190, "Binding contexts in selected range are available");
 			assert.ok(!aContexts.includes(undefined), "There are no undefined contexts");
 		}.bind(this));

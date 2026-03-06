@@ -2982,7 +2982,7 @@ sap.ui.define([
 				}, function (oReturnedError) {
 					assert.strictEqual(oReturnedError, oError);
 				}));
-		if (bAsync) { //TODO in the sync case, the wrong cache would be restored :-(
+		if (bAsync) { //TODO: in the sync case, the wrong cache would be restored :-(
 			aPromises.push(
 				// code under test
 				oBinding.refreshInternal("", "myGroup", false, bKeepCacheOnError, "~bSync~")
@@ -3377,7 +3377,7 @@ sap.ui.define([
 		assert.strictEqual(oBinding.fetchValue(sPath, oListener, bCached).getResult(), oResult);
 	});
 });
-	//TODO provide iStart, iLength parameter to fetchValue to support paging on nested list
+	//TODO: provide iStart, iLength parameter to fetchValue to support paging on nested list
 
 	//*********************************************************************************************
 	QUnit.test("fetchValue: relative binding, unresolved", function (assert) {
@@ -3495,7 +3495,7 @@ sap.ui.define([
 				+ " iMaximumPrefetchSize and bKeepCurrent"));
 
 		oBinding.enableExtendedChangeDetection();
-		assert.throws(function () { //TODO implement?
+		assert.throws(function () { //TODO: implement?
 			oBinding.getContexts(0, 42, 0);
 		}, new Error("Unsupported operation: v4.ODataListBinding#getContexts, iMaximumPrefetchSize"
 				+ " must not be set if extended change detection is enabled"));
@@ -3510,7 +3510,7 @@ sap.ui.define([
 		}, new Error("Unsupported operation: v4.ODataListBinding#getContexts, must not use"
 			+ " bKeepCurrent if extended change detection is enabled"));
 	});
-	//TODO errors on _fireFilter(mArguments) and below in Wiki
+	//TODO: errors on _fireFilter(mArguments) and below in Wiki
 
 	//*********************************************************************************************
 	QUnit.test("events", function (assert) {
@@ -4439,7 +4439,7 @@ sap.ui.define([
 			assert.strictEqual(oBinding.iMaxLength, bCreateOnly ? Infinity : 37);
 
 			// code under test: reset upper boundary
-//TODO cannot happen with our _Cache; _Cache doesn't read more than final length elements
+//TODO: cannot happen with our _Cache; _Cache doesn't read more than final length elements
 			assert.strictEqual(
 				oBinding.createContexts(20 + iCreatedContexts, result(30), bCreateOnly),
 				true);
@@ -4458,9 +4458,9 @@ sap.ui.define([
 			assert.strictEqual(oBinding.getLength(), 60 + iCreatedContexts);
 			assert.strictEqual(oBinding.aContexts.length, 50 + iCreatedContexts);
 			assert.strictEqual(oBinding.iMaxLength, bCreateOnly ? Infinity : 10000);
-//TODO iMaxLength must be set if iResultLength > 0 || iResultLength === 0 && oRange.start === 0;
+//TODO: iMaxLength must be set if iResultLength > 0 || iResultLength === 0 && oRange.start === 0;
 // or oRange.start is just after the last known good;
-//TODO it can only shrink if iResultLength === 0
+//TODO: it can only shrink if iResultLength === 0
 
 			// code under test: no data for *next* page is a change (bLengthFinal changes)
 			assert.strictEqual(
@@ -4976,7 +4976,7 @@ sap.ui.define([
 		});
 	});
 });
-	//TODO check the row of a pending update with higher index
+	//TODO: check the row of a pending update with higher index
 
 	//*********************************************************************************************
 	QUnit.test("delete: deleted context", function (assert) {
@@ -7125,7 +7125,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.skip("fetchFilter: filter with encoded path", function (assert) {
-		//TODO encode in the filter or not?
+		//TODO: encode in the filter or not?
 		var oBinding = this.bindList("/Set"),
 			oPropertyMetadata = {$Type : "Edm.Decimal"},
 			oPromise = Promise.resolve(oPropertyMetadata);
@@ -7841,7 +7841,7 @@ sap.ui.define([
 		// code under test
 		assert.strictEqual(oBinding.getHeaderContext(), null);
 	});
-	//TODO How do dependent bindings learn of the changed context?
+	//TODO: How do dependent bindings learn of the changed context?
 
 	//*********************************************************************************************
 	QUnit.test("getHeaderContext: setContext", function (assert) {
@@ -8271,7 +8271,8 @@ sap.ui.define([
 						oBindingMock.expects("getModelIndex")
 							.withExactArgs(sinon.match.same(oContext)).callThrough();
 						oResetKeepAliveExpectation = oContextMock.expects("resetKeepAlive")
-							.exactly(bCreated && !bStillAlive ? 1 : 0).withExactArgs(); //TODO order
+							.exactly(bCreated && !bStillAlive ? 1 : 0)
+							.withExactArgs(); //TODO: order
 						oRemoveCreatedExpectation = that.mock(oBinding).expects("removeCreated")
 							.exactly(bCreated ? 1 : 0).withExactArgs(sinon.match.same(oContext));
 						oContextMock.expects("doSetSelected")
@@ -8724,7 +8725,7 @@ sap.ui.define([
 				oHeaderContextCheckUpdateExpectation);
 		});
 	});
-	//TODO This is very similar to ODCB#resumeInternal; both should be refactored to
+	//TODO: This is very similar to ODCB#resumeInternal; both should be refactored to
 	//  ODParentBinding#resumeInternal. Differences
 	// (a) bCheckUpdate parameter: dependent bindings of a list binding must not call checkUpdate on
 	//     dependent bindings while context bindings have to; analogous to #refreshInternal.
@@ -13950,7 +13951,7 @@ sap.ui.define([
 	});
 });
 
-//TODO integration: 2 entity sets with same $expand, but different $select
-//TODO extended change detection:
+//TODO: integration: 2 entity sets with same $expand, but different $select
+//TODO: extended change detection:
 //     Wir sollten auch dafür sorgen, dass die Antwort auf diesen "change"-Event dann keinen Diff
 //     enthält. So macht es v2, und das haben wir letzte Woche erst richtig verstanden.

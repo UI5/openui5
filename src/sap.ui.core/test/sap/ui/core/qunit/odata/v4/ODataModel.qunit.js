@@ -841,7 +841,7 @@ sap.ui.define([
 		// code under test
 		oModel.resetChanges("groupId");
 	});
-	// TODO reset the POST requests in this group
+	//TODO: reset the POST requests in this group
 
 	//*********************************************************************************************
 	QUnit.test("resetChanges with $auto group", function () {
@@ -903,7 +903,7 @@ sap.ui.define([
 	QUnit.test("forbidden", function (assert) {
 		var oModel = this.createModel();
 
-		assert.throws(function () { //TODO implement
+		assert.throws(function () { //TODO: implement
 			oModel.bindTree();
 		}, new Error("Unsupported operation: v4.ODataModel#bindTree"));
 
@@ -919,7 +919,7 @@ sap.ui.define([
 			oModel.getObject();
 		}, new Error("Unsupported operation: v4.ODataModel#getObject"));
 
-		assert.throws(function () { //TODO implement
+		assert.throws(function () { //TODO: implement
 			oModel.getOriginalProperty();
 		}, new Error("Unsupported operation: v4.ODataModel#getOriginalProperty"));
 
@@ -927,7 +927,7 @@ sap.ui.define([
 			oModel.getProperty();
 		}, new Error("Unsupported operation: v4.ODataModel#getProperty"));
 
-		assert.throws(function () { //TODO implement
+		assert.throws(function () { //TODO: implement
 			oModel.isList();
 		}, new Error("Unsupported operation: v4.ODataModel#isList"));
 	});
@@ -1429,7 +1429,7 @@ sap.ui.define([
 		}, new Error("Unsupported type: oContext must be of type sap.ui.model.Context, but was "
 				+ "sap.ui.model.odata.v4.Context"), "sap.ui.model.odata.v4.Context not allowed");
 	});
-	// TODO allow v4.Context and return v4.Context
+	//TODO: allow v4.Context and return v4.Context
 
 	//*********************************************************************************************
 	QUnit.test("checkBatchGroupId: success", function () {
@@ -1549,7 +1549,7 @@ sap.ui.define([
 				TEAM_2_EMPLOYEES : null,
 				FOO1 : 42,
 				FOO2 : false,
-//TODO undefined values are removed by _Helper.clone, but should also be normalized to {}
+//TODO: undefined values are removed by _Helper.clone, but should also be normalized to {}
 				//"FOO3" : undefined
 				FOO4 : {
 					$count : false
@@ -2001,7 +2001,7 @@ sap.ui.define([
 	QUnit.test("reportStateMessages: remove old messages w/o key predicates", function (assert) {
 		var mMessages = {
 				"/FOO('1')" : [{}, {}],
-				// TODO use Message.getPersistent() instead of Message.persistent?
+				//TODO: use Message.getPersistent() instead of Message.persistent?
 				"/FOO('1')/bar" : [{persistent : true}, {}, {persistent : true}, {}],
 				"/FOO('2')" : [{}],
 				"/FOO('3')/NavSingle" : [{}],
@@ -2474,14 +2474,14 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("addPrerenderingTask: rendering before 1st setTimeout", function (assert) {
 		var oAddTaskMock,
-			fnFirstTask = this.spy(),
-			fnLastTask = this.spy(),
+			fnFirstTask = sinon.spy(),
+			fnLastTask = sinon.spy(),
 			oModel = this.createModel("", {}, true),
-			fnPrerenderingTask0 = this.spy(function () {
+			fnPrerenderingTask0 = sinon.spy(function () {
 				assert.notStrictEqual(oModel.aPrerenderingTasks, null);
 				oModel.addPrerenderingTask(fnFirstTask, /*bFirst*/true);
 			}),
-			fnPrerenderingTask1 = this.spy(function () {
+			fnPrerenderingTask1 = sinon.spy(function () {
 				oModel.addPrerenderingTask(fnLastTask);
 			});
 
@@ -2521,7 +2521,7 @@ sap.ui.define([
 		var oAddTaskExpectation,
 			oModel = this.createModel("", {}, true),
 			oSetTimeoutExpectation,
-			fnTask = this.spy(),
+			fnTask = sinon.spy(),
 			oWindowMock = this.mock(window);
 
 		oAddTaskExpectation = this.mock(Rendering).expects("addPrerenderingTask")
@@ -2553,7 +2553,7 @@ sap.ui.define([
 		var oAddTaskExpectation,
 			oModel = this.createModel("", {}, true),
 			oSetTimeoutExpectation,
-			fnTask1 = this.spy(),
+			fnTask1 = sinon.spy(),
 			fnTask2 = "~task~2~";
 
 		oAddTaskExpectation = this.mock(Rendering).expects("addPrerenderingTask").twice()
@@ -3704,23 +3704,23 @@ sap.ui.define([
 		assert.notOk(ODataModel.extend);
 	});
 });
-//TODO constructor: test that the service root URL is absolute?
-//TODO read: support the mParameters context, urlParameters, filters, sorters, batchGroupId
-//TODO read etc.: provide access to "abort" functionality
+//TODO: constructor: test that the service root URL is absolute?
+//TODO: read: support the mParameters context, urlParameters, filters, sorters, batchGroupId
+//TODO: read etc.: provide access to "abort" functionality
 
 // oResponse.headers look like this:
 // Content-Type:application/json; odata.metadata=minimal;charset=utf-8
 // etag:W/"20150915102433.7994750"
 // location:.../sap/opu/odata4/IWBEP/TEA/default/IWBEP/TEA_BUSI/0001/EMPLOYEES('7')
-//TODO can we make use of "location" header? relation to canonical URL?
+//TODO: can we make use of "location" header? relation to canonical URL?
 // oData looks like this:
 // {
 //   "@odata.context" : "$metadata#EMPLOYEES",
 //   "@odata.etag" : "W/\"20150915102433.7994750\"",
 // }
-//TODO can we make use of @odata.context in response data?
-//TODO etag handling
-//TODO use standard APIs like URL/URLSearchParams for URL handling?
+//TODO: can we make use of @odata.context in response data?
+//TODO: etag handling
+//TODO: use standard APIs like URL/URLSearchParams for URL handling?
 
-//TODO support "/#" syntax, e.g. "/EMPLOYEES(ID='1')/ENTRYDATE/#Type/QualifiedName"
+//TODO: support "/#" syntax, e.g. "/EMPLOYEES(ID='1')/ENTRYDATE/#Type/QualifiedName"
 //     do it for bindings, not as a JS API (getMetaModel().getMetaContext() etc. is already there)

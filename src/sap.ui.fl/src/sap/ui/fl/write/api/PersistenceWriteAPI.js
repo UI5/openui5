@@ -132,7 +132,6 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {sap.ui.fl.Selector} mPropertyBag.selector - Retrieves the associated flex persistence
-	 * @param {boolean} [mPropertyBag.skipUpdateCache] - Indicates if cache update should be skipped
 	 * @param {string} [mPropertyBag.transport] - Transport request for the app variant - Smart Business must pass the transport in onPremise system
 	 * @param {string} [mPropertyBag.layer=CUSTOMER] - Proposed layer (might be overwritten by the backend) when creating a new app variant - Smart Business must pass the layer
 	 * @param {boolean} [mPropertyBag.draft=false] - Indicates if changes should be written as a draft
@@ -149,7 +148,8 @@ sap.ui.define([
 		let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
 		oFlexInfoSession.saveChangeKeepSession = true;
 		FlexInfoSession.setByReference(oFlexInfoSession, sReference);
-		await FlexObjectManager.saveFlexObjects(mPropertyBag);
+		// the cache should always be updated when saving, to make sure that the flex state is up to date for the current session
+		await FlexObjectManager.saveFlexObjects(_omit(mPropertyBag, ["skipUpdateCache"]));
 
 		// When activating a new version or saving a new draft the request has to be made with the new version as parameter
 		oFlexInfoSession.version = mPropertyBag.version;
@@ -157,7 +157,7 @@ sap.ui.define([
 
 		// This is needed as long the save requests does not return the necessary information to update the FlexState without a new request
 		const aFlexObjects = await FlexObjectManager.getFlexObjects({
-			..._omit(mPropertyBag, ["skipUpdateCache", "layer", "version"]),
+			..._omit(mPropertyBag, ["layer", "version"]),
 			invalidateCache: true,
 			currentLayer: mPropertyBag.layer,
 			includeCtrlVariants: true

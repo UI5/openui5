@@ -7,7 +7,7 @@
 					<Collection>
 						<Record Type="com.sap.vocabularies.UI.v1.DataField">
 							<PropertyValue Property="Value" Path="Team_Id" />
-							<!-- TODO name vs. (number) value for enums -->
+							<!--TODO: name vs. (number) value for enums -->
 							<Annotation Term="com.sap.vocabularies.UI.v1.Importance"
 								EnumMember="com.sap.vocabularies.UI.v1.ImportanceType/High"/>
 						</Record>
@@ -46,13 +46,13 @@
 					<Collection>
 						<Record Type="com.sap.vocabularies.UI.v1.DataField">
 							<PropertyValue Property="Value" Path="Category" />
-							<!-- TODO name vs. (number) value for enums -->
+							<!--TODO: name vs. (number) value for enums -->
 							<Annotation Term="com.sap.vocabularies.UI.v1.Importance"
 								EnumMember="com.sap.vocabularies.UI.v1.ImportanceType/High"/>
 						</Record>
 						<Record Type="com.sap.vocabularies.UI.v1.DataField">
 							<PropertyValue Property="Value" Path="ID" />
-							<!-- TODO name vs. (number) value for enums -->
+							<!--TODO: name vs. (number) value for enums -->
 							<Annotation Term="com.sap.vocabularies.UI.v1.Importance"
 								EnumMember="com.sap.vocabularies.UI.v1.ImportanceType/High"/>
 						</Record>
@@ -80,7 +80,7 @@
 							<PropertyValue Property="Value" Path="EQUIPMENT_2_PRODUCT/PRODUCT_2_SUPPLIER/Supplier_Name" />
 						</Record>
 						<!-- Record Type="com.sap.vocabularies.UI.v1.DataField">
-							<!- - TODO how to follow 1:* nav. prop. PRODUCT_2_CATEGORY? - ->
+							<!- -TODO: how to follow 1:* nav. prop. PRODUCT_2_CATEGORY? - ->
 							<PropertyValue Property="Value" Path="EQUIPMENT_2_PRODUCT/PRODUCT_2_CATEGORY/CategoryName" />
 						</Record -->
 					</Collection>

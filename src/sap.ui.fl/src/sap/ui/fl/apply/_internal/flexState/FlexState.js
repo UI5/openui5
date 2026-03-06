@@ -579,6 +579,12 @@ sap.ui.define([
 		}
 	};
 
+	/**
+	 * Clears the state for a specific reference or for all references if no reference is provided.
+	 * Should only be used in tests.
+	 *
+	 * @param {string} [sReference] - The flex reference for which to clear the state.
+	 */
 	FlexState.clearState = function(sReference) {
 		Loader.clearCache(sReference);
 		if (sReference) {

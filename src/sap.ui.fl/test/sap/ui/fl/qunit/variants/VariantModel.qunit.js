@@ -23,6 +23,7 @@ sap.ui.define([
 	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/Utils",
@@ -53,6 +54,7 @@ sap.ui.define([
 	VariantModel,
 	FlexObjectManager,
 	ContextBasedAdaptationsAPI,
+	ControlVariantWriteAPI,
 	Layer,
 	LayerUtils,
 	Utils,
@@ -698,7 +700,7 @@ sap.ui.define([
 				fileType: "ctrl_variant_management_change"
 			}
 		].forEach(function(oTestParams) {
-			QUnit.test(`when calling 'addVariantChange' for ${oTestParams.inputParams.changeType} to add a change`, function(assert) {
+			QUnit.test(`when calling 'addVariantChanges' for ${oTestParams.inputParams.changeType} to add a change`, function(assert) {
 				oTestParams.inputParams.appComponent = this.oComponent;
 				const oAddDirtyFlexObjectsStub = sandbox.stub(FlexObjectManager, "addDirtyFlexObjects");
 				if (!oTestParams.inputParams.adaptationId) {
@@ -708,7 +710,12 @@ sap.ui.define([
 				var oVariantInstance = createVariant(this.oModel.oData[sVMReference].variants[2]);
 				sandbox.stub(this.oModel, "getVariant").returns({ instance: oVariantInstance });
 
-				var oChange = VariantManager.addVariantChange(sVMReference, oTestParams.inputParams);
+				const oChange = VariantManager.addVariantChanges({
+					variantManagementReference: sVMReference,
+					appComponent: this.oComponent,
+					changeContents: [oTestParams.inputParams],
+					generatorName: RtaQunitUtils.GENERATOR_NAME
+				})[0];
 				if (oTestParams.textKey) {
 					assert.strictEqual(
 						oChange.getText(oTestParams.textKey),
@@ -755,9 +762,11 @@ sap.ui.define([
 			const mPropertyBag = { appComponent: this.oComponent };
 			const oDeleteFlexObjectsStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			const oSetPropertiesStub = sandbox.stub(this.oModel, "setVariantProperties");
-			VariantManager.deleteVariantChange(sVMReference, mPropertyBag, fnChangeStub());
+			ControlVariantWriteAPI.deleteVariantChange(sVMReference, mPropertyBag, fnChangeStub());
 			assert.ok(oDeleteFlexObjectsStub.calledWith({
-				reference: sReference, componentId: sReference, flexObjects: [fnChangeStub()]
+				reference: sReference,
+				flexObjects: [fnChangeStub()],
+				componentId: "MyComponent"
 			}), "then deleteFlexObjects called with the passed change");
 			assert.ok(oSetPropertiesStub.calledWith(sVMReference, mPropertyBag), "the correct properties were passed");
 		});

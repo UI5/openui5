@@ -11,8 +11,8 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:rm="sap.ui.table.rowmodes">
 
-	<!-- TODO: enable sorting in table -->
-	<!-- TODO: enhance auto type detection for @$ui5.node.*? -->
+	<!--TODO: enable sorting in table -->
+	<!--TODO: enhance auto type detection for @$ui5.node.*? -->
 	<!-- Note: for $$aggregation, see controller's onInit! -->
 	<Table id="table" ariaLabelledBy="title"
 		rows="{path : '/BusinessPartners', parameters : {

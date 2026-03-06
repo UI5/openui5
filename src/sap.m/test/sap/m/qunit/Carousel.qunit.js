@@ -2770,4 +2770,64 @@ sap.ui.define([
 		assert.strictEqual(this.oCarousel.getActivePage(), oFirstPage.getId(),
 			"Active page should loop back to first page when responsive layout shows only 1 page");
 	});
+
+	QUnit.module("Focus management with VisiblePages scrollMode", {
+		beforeEach: function () {
+			this.oCarousel = new Carousel("focusTestCrsl", {
+				customLayout: new CarouselLayout({
+					visiblePagesCount: 3,
+					scrollMode: "VisiblePages"
+				}),
+				pages: [
+					new Page("focusPage1"),
+					new Page("focusPage2"),
+					new Page("focusPage3"),
+					new Page("focusPage4"),
+					new Page("focusPage5"),
+					new Page("focusPage6"),
+					new Page("focusPage7"),
+					new Page("focusPage8"),
+					new Page("focusPage9"),
+					new Page("focusPage10")
+				]
+			});
+			this.oCarousel.placeAt(DOM_RENDER_LOCATION);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+		},
+		afterEach: function () {
+			this.oCarousel.destroy();
+		}
+	});
+
+	QUnit.test("Focus is preserved after clicking next arrow with VisiblePages scrollMode", function (assert) {
+		// arrange
+		const oFirstPage = this.oCarousel.getPages()[0];
+		this.oCarousel.setActivePage(oFirstPage);
+		this.oCarousel.getFocusDomRef().focus();
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act - click next arrow (should scroll by 3 pages in VisiblePages mode)
+		pressArrowNext(this.oCarousel);
+
+		// assert
+		assert.strictEqual(this.oCarousel.getActivePage(), "focusPage4", "Active page should be focusPage4 after scrolling");
+		assert.ok(this.oCarousel.getDomRef().contains(document.activeElement), "Focus should still be inside the carousel");
+		assert.strictEqual(this.oCarousel._iFocusedPageIndex, 3, "Focused page index should be 3 (first of new visible set)");
+	});
+
+	QUnit.test("Focus is preserved after clicking previous arrow with VisiblePages scrollMode", function (assert) {
+		// arrange - start from page 7 (showing pages 7, 8, 9)
+		const oPage7 = this.oCarousel.getPages()[6];
+		this.oCarousel.setActivePage(oPage7);
+		this.oCarousel.getFocusDomRef().focus();
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act - click previous arrow (should scroll back by 3 pages in VisiblePages mode)
+		pressArrowPrev(this.oCarousel);
+
+		// assert
+		assert.strictEqual(this.oCarousel.getActivePage(), "focusPage4", "Active page should be focusPage4 after scrolling back");
+		assert.ok(this.oCarousel.getDomRef().contains(document.activeElement), "Focus should still be inside the carousel");
+		assert.strictEqual(this.oCarousel._iFocusedPageIndex, 5, "Focused page index should be 5 (last of new visible set)");
+	});
 });

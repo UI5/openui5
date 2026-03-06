@@ -135,9 +135,9 @@ sap.ui.define([
 		onSave : function () {
 			var oModel = this.getView().getModel();
 
-			// TODO this should be the default for submitBatch
+			//TODO: this should be the default for submitBatch
 			oModel.submitBatch(oModel.getUpdateGroupId()).then(function () {
-				// TODO the success handler could get all errors of failed parts
+				//TODO: the success handler could get all errors of failed parts
 				MessageBox.success("Changes have been saved");
 			}, function (oError) {
 				MessageBox.error(oError.message);

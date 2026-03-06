@@ -65,7 +65,7 @@ sap.ui.define([
 	// recursive function to anonymize all user-related data in a plain Flex Object
 	function anonymizeObject(vObject) {
 		const oReturnObject = {};
-		if (isValidObject) {
+		if (isValidObject(vObject)) {
 			for (const sKey in vObject) {
 				if (Object.hasOwn(vObject, sKey)) {
 					const vValue = vObject[sKey];

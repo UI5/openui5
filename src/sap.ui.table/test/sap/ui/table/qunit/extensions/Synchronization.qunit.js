@@ -180,6 +180,8 @@ sap.ui.define([
 
 		}).then(function() {
 			oTable.bindRows({path: "/"});
+		}).then(oTable.qunit.whenRenderingFinished).then(function() {
+			oSyncInterface.rowSelection.resetHistory();
 			oTable.setSelectedIndex(0);
 
 		}).then(oTable.qunit.whenRenderingFinished).then(function() {

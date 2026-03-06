@@ -36,7 +36,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	[//TODO $Binary, $EnumMember
+	[//TODO: $Binary, $EnumMember
 		{constant : undefined, type : "Edm.Boolean",
 			values : [false, true]},
 
@@ -54,7 +54,7 @@ sap.ui.define([
 		{constant : "$Float", type : "Edm.Double",
 			values : ["INF", "-INF", "NaN"]},
 
-		//TODO {"$Duration" : "P11D23H59M59.999999999999S"}
+		//TODO: {"$Duration" : "P11D23H59M59.999999999999S"}
 
 		{constant : "$Guid", type : "Edm.Guid", expectType : "string",
 			values : ["12345678-ABCD-EFab-cdef-123456789012"]},
@@ -695,7 +695,7 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	//TODO $AnnotationPath, $NavigationPropertyPath
+	//TODO: $AnnotationPath, $NavigationPropertyPath
 ["$Name", "$Path", "$PropertyPath"].forEach(function (sProperty) {
 	var oRawValue = {};
 
@@ -886,8 +886,8 @@ sap.ui.define([
 
 		assertRejected(assert, Expression.expression(oPathValue), oError);
 	});
-	//TODO $Cast, $IsOf, $LabeledElement, $LabeledElementReference, $UrlRef
-	//TODO "14.4.6 Expression edm:Collection", "14.4.12 Expression edm:Record"
+	//TODO: $Cast, $IsOf, $LabeledElement, $LabeledElementReference, $UrlRef
+	//TODO: "14.4.6 Expression edm:Collection", "14.4.12 Expression edm:Record"
 
 	//*********************************************************************************************
 	QUnit.test("String constants {@i18n>...} turned into a binding", function (assert) {
@@ -982,7 +982,7 @@ sap.ui.define([
 			value : "odata.uriEncode(%{path},'Edm.String')"
 		});
 	});
-	//TODO Edm.Binary, Edm.Duration
+	//TODO: Edm.Binary, Edm.Duration
 
 	//*********************************************************************************************
 	QUnit.test("uriEncode: not Edm.String", function (assert) {
@@ -1328,8 +1328,8 @@ sap.ui.define([
 			value : "odata.fillUriTemplate('template',{})"
 		});
 	});
-	//TODO "The odata.fillUriTemplate standard client-side function takes two or more expressions as
-	// arguments and returns a value of type Edm.String." --> we could drop this test?!
+	//TODO: "The odata.fillUriTemplate standard client-side function takes two or more expressions
+	// as arguments and returns a value of type Edm.String." --> we could drop this test?!
 
 	//*********************************************************************************************
 	QUnit.test("fillUriTemplate: template with one parameter", function (assert) {
@@ -1714,7 +1714,7 @@ sap.ui.define([
 			assert.strictEqual(oParameter1.category, oFixture.category);
 		});
 	});
-	//TODO how to compare edm:Null to any other value?
+	//TODO: how to compare edm:Null to any other value?
 
 	//*********************************************************************************************
 	QUnit.test("operator: mixed types", function (assert) {
@@ -1784,7 +1784,7 @@ sap.ui.define([
 
 	compareWithNull("Edm.String", "edm:Null", "p0", "null");
 	compareWithNull("edm:Null", "Edm.String", "null", "p1");
-	// TODO learn about operator precedence and avoid unnecessary "()" around expressions
+	//TODO: learn about operator precedence and avoid unnecessary "()" around expressions
 
 	//*********************************************************************************************
 	QUnit.test("parameter: w/o type expectation", function (assert) {

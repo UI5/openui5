@@ -436,7 +436,7 @@ sap.ui.define([
 			const done = assert.async();
 			const aChanges = ["change1", "change2"];
 			this.oControlVariantPlugin.registerElementOverlay(this.oVariantManagementOverlay);
-			sandbox.stub(VariantManager, "manageVariants").resolves({ changes: aChanges, variantsToBeDeleted: [] });
+			sandbox.stub(VariantManager, "openManageVariantsDialog").resolves({ changes: aChanges, variantsToBeDeleted: [] });
 			sandbox.stub(VersionsAPI, "getDraftFilenames").returns([]);
 			const oCreateComponentSpy = sandbox.spy(ContextSharingAPI, "createComponent");
 
@@ -459,7 +459,7 @@ sap.ui.define([
 			const done = assert.async();
 			const aChanges = [];
 			this.oControlVariantPlugin.registerElementOverlay(this.oVariantManagementOverlay);
-			sandbox.stub(VariantManager, "manageVariants").resolves({ changes: aChanges, variantsToBeDeleted: [] });
+			sandbox.stub(VariantManager, "openManageVariantsDialog").resolves({ changes: aChanges, variantsToBeDeleted: [] });
 			sandbox.stub(VersionsAPI, "getDraftFilenames").returns([]);
 			const oFireElementModifiedSpy = sandbox.spy(this.oControlVariantPlugin, "fireElementModified");
 
@@ -474,7 +474,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			const aChanges = ["change1", "change2"];
 			this.oControlVariantPlugin.registerElementOverlay(this.oVariantManagementOverlay);
-			sandbox.stub(VariantManager, "manageVariants").resolves({ changes: aChanges, variantsToBeDeleted: ["dummyVariant"] });
+			sandbox.stub(VariantManager, "openManageVariantsDialog").resolves({ changes: aChanges, variantsToBeDeleted: ["dummyVariant"] });
 
 			this.oControlVariantPlugin.attachElementModified(function(oEvent) {
 				assert.ok(oEvent, "then fireElementModified is called once");
@@ -516,7 +516,7 @@ sap.ui.define([
 
 			const aChanges = [oSetTitleVariantChange, oVMDependentChange];
 			this.oControlVariantPlugin.registerElementOverlay(this.oVariantManagementOverlay);
-			sandbox.stub(VariantManager, "manageVariants").resolves({ changes: aChanges, variantsToBeDeleted: [oVariant.getId()] });
+			sandbox.stub(VariantManager, "openManageVariantsDialog").resolves({ changes: aChanges, variantsToBeDeleted: [oVariant.getId()] });
 			sandbox.stub(VersionsAPI, "getDraftFilenames").returns([]);
 
 			this.oControlVariantPlugin.attachElementModified(function(oEvent) {
@@ -549,7 +549,7 @@ sap.ui.define([
 			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns([oVariant]);
 
 			this.oControlVariantPlugin.registerElementOverlay(this.oVariantManagementOverlay);
-			sandbox.stub(VariantManager, "manageVariants")
+			sandbox.stub(VariantManager, "openManageVariantsDialog")
 			.resolves({ changes: ["SetVisibleFalse"], variantsToBeDeleted: [oVariant.getId(), oVariant2.getId()] });
 			sandbox.stub(VersionsAPI, "getDraftFilenames").returns([oVariant2.getId()]);
 

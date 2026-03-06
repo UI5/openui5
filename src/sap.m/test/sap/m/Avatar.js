@@ -52,7 +52,7 @@ sap.ui.define([
 						initials: "YY",
 						src: "images/cannotfind_Woman_avatar_01.png",
 						displaySize: "XL",
-						tooltip: "XL size Avatar with image and initials"
+						tooltip: "XL size Avatar with initials"
 					}),
 					new Avatar("imageXLSquareCover", {
 						ariaLabelledBy: 'avatar_label',

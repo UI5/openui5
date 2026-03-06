@@ -2096,6 +2096,46 @@ sap.ui.define([
 		oMI.destroy();
 	});
 
+	QUnit.test("Pressing ESC twice should not move caret when value is already restored", async function(assert) {
+		const oMultiInput = new MultiInput({
+			value: "Hello"
+		});
+		oMultiInput.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		oMultiInput.focus();
+		await nextUIUpdate();
+
+		qutils.triggerKeydown(oMultiInput.getDomRef(), KeyCodes.TAB);
+		await nextUIUpdate();
+
+		oMultiInput.focus();
+		await nextUIUpdate();
+
+		const oFocusDomRef = oMultiInput.getFocusDomRef();
+		oFocusDomRef.value = "World";
+		qutils.triggerEvent("input", oFocusDomRef);
+		await nextUIUpdate();
+
+		oFocusDomRef.setSelectionRange(5, 5);
+
+		qutils.triggerKeydown(oMultiInput.getDomRef(), KeyCodes.ESCAPE);
+		await nextUIUpdate();
+
+		assert.strictEqual(oMultiInput.getValue(), "Hello", "Value is restored to 'Hello' after first ESC");
+
+		const iCaretPosAfterFirstEsc = oFocusDomRef.selectionStart;
+
+		qutils.triggerKeydown(oMultiInput.getDomRef(), KeyCodes.ESCAPE);
+		await nextUIUpdate();
+
+		assert.strictEqual(oMultiInput.getValue(), "Hello", "Value remains 'Hello' after second ESC");
+		assert.strictEqual(oFocusDomRef.selectionStart, iCaretPosAfterFirstEsc, "Caret position should not change after second ESC");
+		assert.strictEqual(oFocusDomRef.selectionEnd, iCaretPosAfterFirstEsc, "Selection end should not change after second ESC");
+
+		oMultiInput.destroy();
+	});
+
 	QUnit.module("Mobile: Dialog and Interactions", {
 		beforeEach: async function() {
 			this.clock = sinon.useFakeTimers();

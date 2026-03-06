@@ -294,7 +294,7 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.changeType - Change type due to which properties are being set
 	 * @param {string} mPropertyBag.layer - Current layer
 	 * @param {string} mPropertyBag.appComponent - App component instance
-	 * @param {string} [mPropertyBag.title] - New app title value for <code>setTitle</code> change type
+	 * @param {string} [mPropertyBag.title] - New variant title value for <code>setTitle</code> change type
 	 * @param {boolean} [mPropertyBag.visible] - New visible value for <code>setVisible</code> change type
 	 * @param {object} [mPropertyBag.contexts] - New contexts object (e.g. roles) for <code>setContexts</code> change type
 	 * @param {boolean} [mPropertyBag.favorite] - New favorite value for <code>setFavorite</code> change type

@@ -4,16 +4,14 @@
 sap.ui.define([
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
-	"sap/ui/fl/variants/VariantManager",
-	"sap/ui/fl/write/api/ChangesWriteAPI",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/command/BaseCommand",
 	"sap/ui/rta/library"
 ], function(
 	ControlVariantApplyAPI,
 	FlexRuntimeInfoAPI,
-	VariantManager,
-	ChangesWriteAPI,
+	ControlVariantWriteAPI,
 	FlUtils,
 	BaseCommand,
 	rtaLibrary
@@ -75,53 +73,33 @@ sap.ui.define([
 		const oVariantManagementControl = this.getControl();
 		this.oAppComponent = FlUtils.getAppComponentForControl(oVariantManagementControl);
 		this.sVariantManagementReference = oVariantManagementControl.getVariantManagementReference();
+		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oVariantManagementControl });
+		const sNewDefaultVariantReferenceParameter = ControlVariantWriteAPI.getVariantManagementReferenceForVariant(
+			sFlexReference,
+			this.sVariantManagementReference
+		);
 
 		this._aPreparedChanges = [];
-		if (this.getChanges().some((oChange) => {
-			if (
-				oChange.visible === false
-				&& oChange.variantReference === oVariantManagementControl.getCurrentVariantReference()
-			) {
-				this._sOldVReference = oChange.variantReference;
-				return true;
-			}
-			return false;
-		})) {
-			await ControlVariantApplyAPI.activateVariant({
-				element: oVariantManagementControl,
-				variantReference: this.sVariantManagementReference
-			});
-		}
 
-		this.getChanges().forEach(function(mChangeProperties) {
-			mChangeProperties.appComponent = this.oAppComponent;
-			mChangeProperties.generator = rtaLibrary.GENERATOR_NAME;
-			this._aPreparedChanges.push(VariantManager.addVariantChange(this.sVariantManagementReference, mChangeProperties));
-		}.bind(this));
-
-		this._aDeletedFlexObjects = ChangesWriteAPI.deleteVariantsAndRelatedObjects({
-			variantManagementControl: oVariantManagementControl,
-			layer: this.sLayer,
-			variants: this.getDeletedVariants()
+		[
+			this._aPreparedChanges,
+			this._aDeletedFlexObjects,
+			this._sOldVReference
+		] = await ControlVariantWriteAPI.handleManageViewDialogExecution({
+			vmReference: this.sVariantManagementReference,
+			appComponent: this.oAppComponent,
+			changeContents: this.getChanges(),
+			vmControl: oVariantManagementControl,
+			newDefaultVariantReferenceParameter: sNewDefaultVariantReferenceParameter,
+			generatorName: rtaLibrary.GENERATOR_NAME,
+			variantsToBeDeleted: this.getDeletedVariants(),
+			layer: this.sLayer
 		});
 
 		return Promise.resolve();
 	};
 
-	/**
-	 * Undo logic for the execution.
-	 * @public
-	 * @returns {Promise} Returns resolve after undo
-	 */
-	ControlVariantConfigure.prototype.undo = async function() {
-		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: this.getControl() });
-		ChangesWriteAPI.restoreDeletedFlexObjects({
-			reference: sFlexReference,
-			componentId: this.oAppComponent.getId(),
-			flexObjects: this._aDeletedFlexObjects
-		});
-		delete this._aDeletedFlexObjects;
-
+	function removeVariantChanges() {
 		this.getChanges().forEach((mChangeProperties, index) => {
 			const mPropertyBag = {
 				appComponent: this.oAppComponent
@@ -138,10 +116,12 @@ sap.ui.define([
 				}
 			});
 			const oChange = this._aPreparedChanges[index];
-			VariantManager.deleteVariantChange(this.sVariantManagementReference, mPropertyBag, oChange);
+			ControlVariantWriteAPI.deleteVariantChange(this.sVariantManagementReference, mPropertyBag, oChange);
 		});
-
 		this._aPreparedChanges = null;
+	}
+
+	async function reactivateOldVariantReference() {
 		if (this._sOldVReference) {
 			await ControlVariantApplyAPI.activateVariant({
 				element: this.getControl(),
@@ -149,6 +129,26 @@ sap.ui.define([
 			});
 			delete this._sOldVReference;
 		}
+	}
+
+	/**
+	 * Undo logic for the execution.
+	 * @public
+	 * @returns {Promise} Returns resolve after undo
+	 */
+	ControlVariantConfigure.prototype.undo = async function() {
+		// Restore deleted variants
+		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: this.getControl() });
+		ControlVariantWriteAPI.restoreDeletedFlexObjects({
+			reference: sFlexReference,
+			flexObjects: this._aDeletedFlexObjects,
+			componentId: this.oAppComponent.getId()
+		});
+		delete this._aDeletedFlexObjects;
+
+		removeVariantChanges.call(this);
+
+		await reactivateOldVariantReference.call(this);
 	};
 
 	return ControlVariantConfigure;

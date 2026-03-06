@@ -2,12 +2,12 @@
  * ${copyright}
  */
 sap.ui.define([
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
-	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/rta/command/BaseCommand"
 ], function(
+	ControlVariantWriteAPI,
 	FlexRuntimeInfoAPI,
-	VariantManager,
 	BaseCommand
 ) {
 	"use strict";
@@ -40,18 +40,13 @@ sap.ui.define([
 	ControlVariantSave.prototype.execute = function() {
 		const oVMControl = this.getElement();
 		this.sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oVMControl });
-		this._aControlChanges = VariantManager.getControlChangesForVariant(
+		this._aControlChanges = ControlVariantWriteAPI.getControlChangesForVariant(
 			this.sFlexReference,
 			oVMControl.getVariantManagementReference(),
 			oVMControl.getCurrentVariantReference()
 		);
-		this._aDirtyChanges = VariantManager.getDirtyChangesFromVariantChanges(this._aControlChanges, this.sFlexReference);
-		this._aDirtyChanges.forEach((oChange) => {
-			if (oChange.getFileType() === "change") {
-				oChange.setSavedToVariant(true);
-			}
-		});
-		VariantManager.updateVariantManagementMap(this.sFlexReference);
+		this._aDirtyChanges = ControlVariantWriteAPI.getDirtyControlChangesFromVariant(this._aControlChanges, this.sFlexReference);
+		ControlVariantWriteAPI.setSavedToVariant(this.sFlexReference, this._aDirtyChanges, true);
 		return Promise.resolve();
 	};
 
@@ -61,12 +56,7 @@ sap.ui.define([
 	 * @returns {Promise} Returns resolve after undo
 	 */
 	ControlVariantSave.prototype.undo = function() {
-		this._aDirtyChanges.forEach(function(oChange) {
-			if (oChange.getFileType() === "change") {
-				oChange.setSavedToVariant(false);
-			}
-		});
-		VariantManager.updateVariantManagementMap(this.sFlexReference);
+		ControlVariantWriteAPI.setSavedToVariant(this.sFlexReference, this._aDirtyChanges, false);
 		return Promise.resolve();
 	};
 

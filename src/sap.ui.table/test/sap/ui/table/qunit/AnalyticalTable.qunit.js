@@ -1608,8 +1608,8 @@ sap.ui.define([
 		assert.deepEqual(this.oTable._getContexts(), [], "Called on invisible table and suspended binding: Return value");
 		assert.ok(this.fnBindingNodesSpy.notCalled, "Called on invisible table and suspended binding: Binding#getNodes not called");
 
-		this.fnBindingNodesSpy.resetHistory();
 		oBinding.resume();
+		this.fnBindingNodesSpy.resetHistory();
 		this.oTable._getContexts(1, 2, 3);
 		assert.ok(this.fnBindingNodesSpy.calledOnceWithExactly(1, 2, 3),
 			"Called on invisible table and not suspended binding: Binding#getNodes call");

@@ -18,7 +18,7 @@
 						<Record Type="com.sap.vocabularies.UI.v1.DataField">
 							<PropertyValue Property="Label" String="ID" />
 							<PropertyValue Property="Value" Path="BusinessPartnerID" />
-							<!-- TODO name vs. (number) value for enums -->
+							<!--TODO: name vs. (number) value for enums -->
 							<Annotation Term="com.sap.vocabularies.UI.v1.Importance"
 								EnumMember="com.sap.vocabularies.UI.v1.ImportanceType/High"/>
 						</Record>

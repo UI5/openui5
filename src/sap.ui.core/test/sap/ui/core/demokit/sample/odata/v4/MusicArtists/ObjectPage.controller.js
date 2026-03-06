@@ -203,7 +203,7 @@ sap.ui.define([
 		onValidateFieldGroup : function () {
 			if (this.bSideEffectFieldChanged) {
 				this.bSideEffectFieldChanged = false;
-				//TODO lock fields affected by side effects
+				//TODO: lock fields affected by side effects
 				this.byId("objectPageForm").getBindingContext().requestSideEffects([{
 						$PropertyPath : "CountryOfOrigin_Text"
 					}, {

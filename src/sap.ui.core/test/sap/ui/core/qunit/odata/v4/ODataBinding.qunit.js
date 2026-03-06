@@ -293,7 +293,7 @@ sap.ui.define([
 	QUnit.test("forbidden", function (assert) {
 		var oBinding = new ODataBinding();
 
-		assert.throws(function () { //TODO implement
+		assert.throws(function () { //TODO: implement
 			oBinding.isInitial();
 		}, new Error("Unsupported operation: isInitial"));
 	});
@@ -1359,7 +1359,7 @@ sap.ui.define([
 			}
 		);
 	});
-//TODO May dependent bindings be created asynchronously e.g. in case of async views?
+//TODO: May dependent bindings be created asynchronously e.g. in case of async views?
 
 	//*********************************************************************************************
 	QUnit.test("fetchCache: prepareDeepCreate prevents cache", function (assert) {

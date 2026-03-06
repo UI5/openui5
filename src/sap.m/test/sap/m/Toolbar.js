@@ -22,6 +22,7 @@ sap.ui.define([
 	"sap/m/Dialog",
 	"sap/m/List",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/Text",
 	"sap/m/Title",
 	"sap/ui/core/library",
@@ -51,6 +52,7 @@ sap.ui.define([
 	Dialog,
 	List,
 	Page,
+	PageAccessibleLandmarkInfo,
 	MText,
 	Title,
 	coreLibrary,
@@ -67,6 +69,9 @@ sap.ui.define([
 
 	// shortcut for sap.m.SelectType
 	var SelectType = mobileLibrary.SelectType;
+
+	// shortcut for sap.ui.core.AccessibleLandmarkRole
+	var AccessibleLandmarkRole = coreLibrary.AccessibleLandmarkRole;
 
 	var oApp = new App();
 	var sAddIconURI = IconPool.getIconURI("add");
@@ -243,6 +248,10 @@ sap.ui.define([
 
 	// add toolbars to the page
 	var oPage = new Page("toolbar-page", {
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: AccessibleLandmarkRole.Main,
+			contentRole: AccessibleLandmarkRole.Region
+		}),
 		customHeader : TBHeader,
 		subHeader : TBSubHeader,
 		footer : TBFooter,

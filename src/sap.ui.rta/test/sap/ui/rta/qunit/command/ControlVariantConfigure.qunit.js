@@ -4,38 +4,36 @@ sap.ui.define([
 	"sap/base/util/restricted/_omit",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/fl/variants/VariantManager",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/library",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/fl/api/FlexTestAPI",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	_omit,
 	ControlVariantApplyAPI,
 	VariantManagement,
-	VariantManager,
+	ControlVariantWriteAPI,
 	ChangesWriteAPI,
 	Layer,
 	CommandFactory,
 	rtaLibrary,
 	sinon,
-	FlexTestAPI,
 	RtaQunitUtils
 ) {
 	"use strict";
 
 	const sandbox = sinon.createSandbox();
-	const oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon, "Dummy");
+	const sReference = "myFlexReference";
+	const oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon, sReference);
 
 	QUnit.module("ControlVariantConfigure, when calling command factory for configure and undo", {
 		beforeEach() {
 			this.oVariantManagement = new VariantManagement("variantMgmtId1");
 			sandbox.stub(this.oVariantManagement, "getCurrentVariantReference").returns("variant1");
-			this.oAddVariantChangeStub = sandbox.stub(VariantManager, "addVariantChange").returnsArg(1);
-			this.oDeleteVariantChangeStub = sandbox.stub(VariantManager, "deleteVariantChange");
+			this.oDeleteVariantChangeStub = sandbox.stub(ControlVariantWriteAPI, "deleteVariantChange");
 			this.oActivateVariantStub = sandbox.stub(ControlVariantApplyAPI, "activateVariant").resolves();
 		},
 		afterEach() {
@@ -49,7 +47,8 @@ sap.ui.define([
 				layer: Layer.CUSTOMER,
 				originalTitle: "variant A",
 				title: "test",
-				variantReference: "variant0"
+				variantReference: "variant0",
+				generator: rtaLibrary.GENERATOR_NAME
 			};
 			const oTitleUndoChange = {
 				...oTitleChange,
@@ -62,7 +61,8 @@ sap.ui.define([
 				favorite: false,
 				layer: Layer.CUSTOMER,
 				originalFavorite: true,
-				variantReference: "variant0"
+				variantReference: "variant0",
+				generator: rtaLibrary.GENERATOR_NAME
 			};
 			const oFavoriteUndoChange = {
 				...oFavoriteChange,
@@ -74,7 +74,8 @@ sap.ui.define([
 				changeType: "setVisible",
 				layer: Layer.CUSTOMER,
 				variantReference: "variant0",
-				visible: false
+				visible: false,
+				generator: rtaLibrary.GENERATOR_NAME
 			};
 			const oVisibleUndoChange = { ...oVisibleChange, generator: rtaLibrary.GENERATOR_NAME, visible: true };
 			const oContextsChange = {
@@ -82,7 +83,8 @@ sap.ui.define([
 				layer: Layer.CUSTOMER,
 				variantReference: "variant0",
 				contexts: { role: ["ROLE1", "ROLE2"], country: ["DE", "IT"] },
-				originalContexts: { role: ["OGROLE1", "OGROLE2"], country: ["OR"] }
+				originalContexts: { role: ["OGROLE1", "OGROLE2"], country: ["OR"] },
+				generator: rtaLibrary.GENERATOR_NAME
 			};
 			const oContextsUndoChange = {
 				...oContextsChange,
@@ -95,7 +97,8 @@ sap.ui.define([
 				defaultVariant: "variantMgmtId1",
 				layer: Layer.CUSTOMER,
 				originalDefaultVariant: "variant0",
-				variantManagementReference: "variantMgmtId1"
+				variantManagementReference: "variantMgmtId1",
+				generator: rtaLibrary.GENERATOR_NAME
 			};
 			const oDefaultUndoChange = {
 				...oDefaultChange,
@@ -107,15 +110,12 @@ sap.ui.define([
 
 			const aDummyDeletedFlexObjects = ["deletedFlexObject1", "deletedFlexObject2"];
 			const aDeletedVariants = ["variant0"];
-			sandbox.stub(ChangesWriteAPI, "deleteVariantsAndRelatedObjects")
-			.withArgs({
-				variantManagementControl: this.oVariantManagement,
-				layer: Layer.CUSTOMER,
-				variants: aDeletedVariants
-			})
-			.returns(aDummyDeletedFlexObjects);
+			this.oHandleVariantConfigExecuteStub = sandbox.stub(ControlVariantWriteAPI, "handleManageViewDialogExecution")
+			.resolves([
+				aChanges, aDummyDeletedFlexObjects, null
+			]);
 
-			const oRestoreDeletedFlexObjectsStub = sandbox.stub(ChangesWriteAPI, "restoreDeletedFlexObjects");
+			const oRestoreDeletedFlexObjectsStub = sandbox.stub(ControlVariantWriteAPI, "restoreDeletedFlexObjects");
 
 			const oConfigureCommand = await CommandFactory.getCommandFor(this.oVariantManagement, "configure", {
 				control: this.oVariantManagement,
@@ -125,13 +125,24 @@ sap.ui.define([
 
 			await oConfigureCommand.execute();
 
-			assert.strictEqual(this.oAddVariantChangeStub.callCount, 5, "5 changes got added");
+			assert.strictEqual(this.oHandleVariantConfigExecuteStub.callCount, 1, "handleManageViewDialogExecution got called once");
 			const aPreparedChanges = oConfigureCommand.getPreparedChange();
 			assert.deepEqual(aPreparedChanges, aChanges, "all changes are saved in the command");
-			aPreparedChanges.forEach(function(oChange) {
-				assert.equal(oChange.generator, rtaLibrary.GENERATOR_NAME, "the generator was correctly set");
-			});
-			assert.strictEqual(this.oActivateVariantStub.callCount, 0, "the variant was not switched");
+			assert.strictEqual(
+				this.oHandleVariantConfigExecuteStub.calledWith({
+					vmReference: "variantMgmtId1",
+					appComponent: oMockedAppComponent,
+					changeContents: aChanges,
+					vmControl: this.oVariantManagement,
+					newDefaultVariantReferenceParameter: undefined,
+					generatorName: rtaLibrary.GENERATOR_NAME,
+					variantsToBeDeleted: aDeletedVariants,
+					layer: Layer.CUSTOMER
+				}),
+				true,
+				"handleManageViewDialogExecution was called with correct parameters"
+			);
+
 			assert.deepEqual(
 				oConfigureCommand._aDeletedFlexObjects,
 				aDummyDeletedFlexObjects,
@@ -140,7 +151,11 @@ sap.ui.define([
 
 			await oConfigureCommand.undo();
 			assert.ok(
-				oRestoreDeletedFlexObjectsStub.calledWith({ reference: "Dummy", componentId: "Dummy", flexObjects: aDummyDeletedFlexObjects }),
+				oRestoreDeletedFlexObjectsStub.calledWith({
+					reference: sReference,
+					componentId: "myFlexReference",
+					flexObjects: aDummyDeletedFlexObjects
+				}),
 				"the flex objects got restored"
 			);
 			assert.strictEqual(this.oDeleteVariantChangeStub.callCount, 5, "all changes got removed");
@@ -176,27 +191,39 @@ sap.ui.define([
 				visible: false
 			};
 
+			this.oHandleVariantConfigExecuteStub = sandbox.stub(ControlVariantWriteAPI, "handleManageViewDialogExecution")
+			.resolves([
+				oVisibleChange, ["variant1"], "variant1"
+			]);
+
 			const oConfigureCommand = await CommandFactory.getCommandFor(this.oVariantManagement, "configure", {
 				control: this.oVariantManagement,
 				changes: [oVisibleChange],
 				deletedVariants: ["variant1"]
 			}, {}, { layer: Layer.CUSTOMER });
 
-			sandbox.stub(ChangesWriteAPI, "restoreDeletedFlexObjects");
-			sandbox.stub(ChangesWriteAPI, "deleteVariantsAndRelatedObjects");
+			sandbox.stub(ControlVariantWriteAPI, "restoreDeletedFlexObjects");
 			await oConfigureCommand.execute();
 
-			assert.strictEqual(this.oAddVariantChangeStub.callCount, 1, "1 change got added");
-			assert.strictEqual(this.oActivateVariantStub.callCount, 1, "the variant was switched");
-			assert.deepEqual(this.oActivateVariantStub.lastCall.args[0], {
-				element: this.oVariantManagement,
-				variantReference: "variantMgmtId1"
-			}, "the correct variant was switched to");
+			assert.strictEqual(
+				this.oHandleVariantConfigExecuteStub.calledWith({
+					vmReference: "variantMgmtId1",
+					appComponent: oMockedAppComponent,
+					changeContents: [oVisibleChange],
+					vmControl: this.oVariantManagement,
+					newDefaultVariantReferenceParameter: undefined,
+					generatorName: rtaLibrary.GENERATOR_NAME,
+					variantsToBeDeleted: ["variant1"],
+					layer: Layer.CUSTOMER
+				}),
+				true,
+				"handleManageViewDialogExecution was called with correct parameters"
+			);
 
 			await oConfigureCommand.undo();
 
 			assert.strictEqual(this.oDeleteVariantChangeStub.callCount, 1, "all changes got removed");
-			assert.strictEqual(this.oActivateVariantStub.callCount, 2, "the variant was switched again");
+			assert.strictEqual(this.oActivateVariantStub.callCount, 1, "the variant was switched after undo");
 			assert.deepEqual(this.oActivateVariantStub.lastCall.args[0], {
 				element: this.oVariantManagement,
 				variantReference: "variant1"

@@ -184,7 +184,7 @@
 				<Label text="meta>/Equipments/@com.sap.vocabularies.UI.v1.Facets/1/Target/$AnnotationPath/@@format"/>
 				<Text text="{path : 'meta>/Equipments/@com.sap.vocabularies.UI.v1.Facets/1/Target/$AnnotationPath/@@format', formatter : 'stringify'}"/>
 
-				<!-- TODO repeat over $* properties! -->
+				<!--TODO: repeat over $* properties! -->
 			</VBox>
 		</Panel>
 		<template:with path="data>#/" var="entityType">

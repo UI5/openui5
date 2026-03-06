@@ -135,7 +135,7 @@ sap.ui.define([
 				}
 			});
 	});
-	// TODO look at xml:base if the URL in Reference is relative
+	//TODO: look at xml:base if the URL in Reference is relative
 
 	//*********************************************************************************************
 	QUnit.test("convertXMLMetadata: aliases in types", function (assert) {
@@ -789,7 +789,7 @@ sap.ui.define([
 				}
 			});
 	});
-	// TODO look at xml:base if the UrlRef is static and relative
+	//TODO: look at xml:base if the UrlRef is static and relative
 
 	//*********************************************************************************************
 	QUnit.test("inline annotations: Schema, EntityType, ComplexType", function (assert) {

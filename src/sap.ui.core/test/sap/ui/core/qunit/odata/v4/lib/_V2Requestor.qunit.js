@@ -114,7 +114,7 @@ sap.ui.define([
 				String : "foo"
 			}
 		},
-		//TODO "__metadata" : {} is actually unexpected here, in real life
+		//TODO: "__metadata" : {} is actually unexpected here, in real life
 		oExpectedResult : {__metadata : {}, String : "foo"}
 	}, {
 		bIsCollection : false,
@@ -283,7 +283,7 @@ sap.ui.define([
 			oRequestor.doConvertResponse(oResponsePayload, sMetaPath),
 			{value : [sOutput0, sOutput1]});
 	});
-	//TODO test with __count/__next?
+	//TODO: test with __count/__next?
 
 	//*********************************************************************************************
 	QUnit.test("doConvertResponse, 2.2.7.5 empty collection", function (assert) {
@@ -857,7 +857,7 @@ sap.ui.define([
 		 */
 		function invokeTest(sCurrentTitle, aExpectedResultHandlerCalls, bSorted) {
 			QUnit.test(sCurrentTitle, function (assert) {
-				var fnResultHandlerSpy = this.spy(),
+				var fnResultHandlerSpy = sinon.spy(),
 					oRequestor = {};
 
 				asV2Requestor(oRequestor);
@@ -963,7 +963,7 @@ sap.ui.define([
 	QUnit.test("doConvertSystemQueryOptions: $filter", function () {
 		var sFilter = "foo eq 'bar'",
 			oRequestor = {},
-			fnResultHandlerSpy = this.spy();
+			fnResultHandlerSpy = sinon.spy();
 
 		asV2Requestor(oRequestor);
 
@@ -1134,7 +1134,7 @@ sap.ui.define([
 				v2type : "Edm.DateTime", result : "datetime'2015-05-23T13:47:26'"},
 			{value : "13:47:26", type : "Edm.TimeOfDay", v2type : "Edm.Time",
 				result : "time'PT13H47M26S'"}
-			// TODO V2 literal formatting does not support milliseconds
+			//TODO: V2 literal formatting does not support milliseconds
 			// {value : "13:47:26.123", type : "Edm.TimeOfDay", v2type: "Edm.Time",
 			//     result : "time'PT13H47M26.123S'"},
 		].forEach(function (oFixture) {
@@ -1225,7 +1225,7 @@ sap.ui.define([
 				oFixture.result || sFilter);
 		});
 	});
-	// TODO milliseconds in DateTimeOffset and TimeOfDay
+	//TODO: milliseconds in DateTimeOffset and TimeOfDay
 
 	//*********************************************************************************************
 	[{
@@ -1421,7 +1421,7 @@ sap.ui.define([
 	}].forEach(function (oFixture, i) {
 		QUnit.test("doCheckVersionHeader, success cases - " + i, function (assert) {
 			var oRequestor = _Requestor.create("/", {}, {}, {}, "2.0"),
-				fnGetHeader = this.spy(function (sHeaderKey) {
+				fnGetHeader = sinon.spy(function (sHeaderKey) {
 					return oFixture.mHeaders[sHeaderKey];
 				});
 
@@ -1453,7 +1453,7 @@ sap.ui.define([
 	}].forEach(function (oFixture, i) {
 		QUnit.test("doCheckVersionHeader, error cases - " + i, function (assert) {
 			var oRequestor = _Requestor.create("/", {}, {}, {}, "2.0"),
-				fnGetHeader = this.spy(function (sHeaderKey) {
+				fnGetHeader = sinon.spy(function (sHeaderKey) {
 					return oFixture.mHeaders[sHeaderKey];
 				});
 
@@ -1730,7 +1730,7 @@ sap.ui.define([
 
 	//*****************************************************************************************
 	QUnit.test("reportTransitionMessages does not call model", function (assert) {
-		var fnreportTransitionMessages = this.spy(),
+		var fnreportTransitionMessages = sinon.spy(),
 			oModelInterface = {reportTransitionMessages : fnreportTransitionMessages},
 			oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "2.0");
 
@@ -1742,7 +1742,7 @@ sap.ui.define([
 
 	//*****************************************************************************************
 	QUnit.test("reportStateMessages does not call model", function (assert) {
-		var fnreportStateMessages = this.spy(),
+		var fnreportStateMessages = sinon.spy(),
 			oModelInterface = {reportStateMessages : fnreportStateMessages},
 			oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "2.0");
 

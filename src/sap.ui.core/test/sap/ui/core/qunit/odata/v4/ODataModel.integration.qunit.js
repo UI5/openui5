@@ -4193,7 +4193,7 @@ sap.ui.define([
 	// Scenario: Immediately after invoke the parameter is changed again. See that the request uses
 	// the old value. Even refresh must still use it.
 	// BCP: 2070180785
-	// TODO What about changing the context for the binding parameter?
+	//TODO: What about changing the context for the binding parameter?
 	QUnit.test("BCP: 2070180785", function (assert) {
 		var oBinding,
 			that = this;
@@ -9263,7 +9263,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				fnSpy = this.spy(ODataMetaModel.prototype, "fetchUI5Type"),
 				oText,
 				sView = '\
-<Text id="name" text="{Name}"/>', //TODO binding="{}"
+<Text id="name" text="{Name}"/>', //TODO: binding="{}"
 				that = this;
 
 			this.expectChange("name");
@@ -14556,7 +14556,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Note : "Changed Note From Server - 2"
 				})
 				.expectChange("note", "Changed Note while $batch is running")
-				// TODO as long as there are PATCHes in the queue, don't overwrite user input
+				//TODO: as long as there are PATCHes in the queue, don't overwrite user input
 				.expectChange("note", "Changed Note From Server")
 				.expectChange("note", "Changed Note From Server - 2");
 
@@ -14912,7 +14912,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return that.waitForChanges(assert);
 		}).then(function () {
-			//TODO suppress change event for outdated value "42Changed Note From Server"
+			//TODO: suppress change event for outdated value "42Changed Note From Server"
 			that.expectChange("note42", "42Changed Note From Server")
 				.expectRequest("#.1 PATCH SalesOrderList('42')", {
 					headers : {"If-Match" : "42ETag1"},
@@ -16113,7 +16113,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Invoke a bound action for an entity in a list binding and afterwards call refresh
 	// with bAllowRemoval=true for the context the entity is pointing to. If the entity is gone from
 	// the list binding no error should happen because of the just deleted context.
-	// TODO Test with a created binding parameter, too. This failed in an OPA test previously.
+	//TODO: Test with a created binding parameter, too. This failed in an OPA test previously.
 	//
 	// A context binding is created with an absolute path to an entity. Create an operation binding
 	// and bind its context to a form. Ensure that at least one parameter is bound to a property of
@@ -16256,7 +16256,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		this.expectChange("name", null);
 		return this.createView(assert, sView, oModel).then(function () {
-			//TODO the query options for the function import are not enhanced
+			//TODO: the query options for the function import are not enhanced
 			// that.expectRequest("GetEmployeeByID(EmployeeID='1')?$select=ID,Name", {
 			that.expectRequest("GetEmployeeByID(EmployeeID='1')", {
 					ID : "1",
@@ -17028,7 +17028,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//*********************************************************************************************
 	// Scenario: Change a property in a dependent binding below a list binding with an own cache and
 	// change the list binding's row (-> the dependent binding's context)
-	// TODO hasPendingChanges does work properly with changes in hidden caches if dependency between
+	//TODO: hasPendingChanges does work properly with changes in hidden caches if dependency between
 	// bindings get lost e.g. if context of a dependent binding is reset (set to null or undefined).
 	QUnit.test("Pending change in hidden cache", function (assert) {
 		var oListBinding,
@@ -17526,7 +17526,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// (3) Again, no URL in response (calculated by model)
 	// (4) Switch back to URL read via "@odata.mediaReadLink" annotation
 	// (5) New URL read via "@odata.mediaReadLink" annotation
-	// (6) TODO: @*
+	//TODO: (6) @*
 	//
 	// JIRA: CPOUI5ODATAV4-1628
 	QUnit.test("CPOUI5ODATAV4-1628: re-read Edm.Stream URL & readLink", function (assert) {
@@ -18734,7 +18734,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="count" text="{TEAM_2_EMPLOYEES/$count}"/>
 </Table>`;
 
-		//TODO $expand=TEAM_2_EMPLOYEES/$count
+		//TODO: $expand=TEAM_2_EMPLOYEES/$count
 		this.expectRequest("TEAMS?$select=Team_Id&$expand=TEAM_2_EMPLOYEES($count=true;$top=0)"
 				+ "&$skip=0&$top=100", {
 				value : [{
@@ -18863,7 +18863,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 	//*********************************************************************************************
 	// Scenario: infinite prefetch alone must not make _CollectionCache#read async
-	// TODO: We have to skip this test because of 2 BCP incidents (2280024694 && 2180279839).
+	//TODO: We have to skip this test because of 2 BCP incidents (2280024694 && 2180279839).
 	// At current state, we are not able to handle this in a synchronous way!
 	QUnit.skip("infinite prefetch", function (assert) {
 		var oListBinding,
@@ -19233,8 +19233,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// bound action
 	// JIRA: CPOUI5UISERVICESV3-905, CPOUI5UISERVICESV3-1714
 	//
-	// TODO automatic type determination cannot handle #com...AcSetIsAvailable/title
-	// TODO neither can autoExpandSelect
+	//TODO: automatic type determination cannot handle #com...AcSetIsAvailable/title
+	//TODO: neither can autoExpandSelect
 	QUnit.test("Advertised actions: title updates", function (assert) {
 		var oModel = this.createTeaBusiModel(),
 			sView = '\
@@ -19602,7 +19602,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			]);
 		});
 	});
-	//TODO support also "version 2.0 JSON representation of a property"?
+	//TODO: support also "version 2.0 JSON representation of a property"?
 
 	//*********************************************************************************************
 	// Scenario: <FunctionImport m:HttpMethod="GET" ReturnType="Collection(Edm.DateTime)"> in V2
@@ -19698,7 +19698,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//*********************************************************************************************
 	// Scenario: <FunctionImport m:HttpMethod="GET" sap:action-for="..."> in V2 Adapter
 	// Usage of service: /sap/opu/odata/IWFND/RMTSAMPLEFLIGHT/
-	//TODO $metadata of <FunctionImport> is broken, key properties and parameters do not match!
+	//TODO: $metadata of <FunctionImport> is broken, key properties and parameters do not match!
 	// --> server expects GetFlightDetails?airlineid='AA'&connectionid='0017'&fldate=datetime'...'
 	QUnit.test("V2 Adapter: bound function", function (assert) {
 		var oModel = this.createModelForV2FlightService(),
@@ -19863,10 +19863,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			that = this;
 
 		return this.createView(assert, "", oModel).then(function () {
-			//TODO In the V2 adapter case a function import is used instead of a bound action. So we
-			// need the key predicates which sometimes cannot be parsed from the URL. Invoke this
+			//TODO: In the V2 adapter case a function import is used instead of a bound action. So
+			// we need the key predicates which sometimes cannot be parsed from the URL. Invoke this
 			// request and wait for the result before calling the function import.
-			//TODO What about the ETag which might be got from this fresh request? Really use it?
+			//TODO: What about the ETag which might be got from this fresh request? Really use it?
 			that.expectRequest("SalesOrderLineItemSet(\'0815\',\'10\')/ToHeader", {
 					d : {
 						__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
@@ -19892,7 +19892,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//*********************************************************************************************
 	// Scenario: <FunctionImport m:HttpMethod="PUT" sap:action-for="..."> in V2 Adapter
 	// Usage of service: /sap/opu/odata/IWFND/RMTSAMPLEFLIGHT/
-	//TODO $metadata of <FunctionImport> is broken, key properties and parameters do not match!
+	//TODO: $metadata of <FunctionImport> is broken, key properties and parameters do not match!
 	// --> server expects UpdateAgencyPhoneNo?agency_id='...'
 	QUnit.test("V2 Adapter: bound action w/ PUT", function (assert) {
 		var oModel = this.createModelForV2FlightService(),
@@ -21068,7 +21068,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			that.expectEvents(assert, oBinding, [
 					[, "change", {detailedReason : "AddVirtualContext", reason : "filter"}],
-					[, "change", {reason : "add"}], //TODO does this really work as expected?
+					[, "change", {reason : "add"}], //TODO: does this really work as expected?
 					[, "dataRequested"],
 					[, "change", {detailedReason : "RemoveVirtualContext", reason : "change"}],
 					[, "refresh", {reason : "refresh"}],
@@ -24070,7 +24070,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Two issues have to be solved: the lock for the filter must win over the one for refresh and
 	// the lock must not be removed again before the table becomes active.
 	//
-	//TODO enable this test again once the following issue is fixed: table calls ODLB#getContexts
+	//TODO: enable this test again once the following issue is fixed: table calls ODLB#getContexts
 	// while binding is still suspended, which is currently forbidden
 	//ODataListBinding.getContexts (ODataListBinding.js?eval:1004)
 	//Table._getContexts (Table.js?eval:2154)
@@ -25658,7 +25658,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return that.waitForChanges(assert);
 		}).then(function () {
-			///TODO could we omit Currency here because it was non-null at parent?
+			///TODO: could we omit Currency here because it was non-null at parent?
 			that.expectRequest("BusinessPartners?$apply=filter(Country eq 'X')/groupby((Region)"
 					+ ",aggregate(AmountPerSale,Currency,SalesAmount,SalesAmountLocalCurrency"
 					+ ",LocalCurrency,SalesNumber))/orderby(Region,Currency asc,LocalCurrency desc)"
@@ -25942,7 +25942,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						SalesAmountLocalCurrency : "10"
 					}]
 				})
-				.expectChange("level", [0, 1, 0]); //TODO needed to make test stable, but why?
+				.expectChange("level", [0, 1, 0]); //TODO: needed to make test stable, but why?
 
 			return this.createView(assert, sView, oModel).then(function () {
 				oTable = that.oView.byId("table");
@@ -27507,7 +27507,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				value : [{
 					Currency : "EUR",
 					SalesAmountSum : "351",
-					//TODO this should be used by auto type detection
+					//TODO: this should be used by auto type detection
 					"SalesAmountSum@odata.type" : "#Decimal"
 				}, {
 					UI5__count : "26",
@@ -31097,7 +31097,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-1849
 	//
 	// With RAP, NodeID is not available for side effects (BCP: 2380047659).
-	[ //TODO "DescendantCount"
+	[ //TODO: "DescendantCount"
 		undefined, "ArtistID", "DistanceFromRoot", "DrillState", "IsActiveEntity", "NodeID", "order"
 	].forEach(function (sStructuralChange) {
 		var sTitle = "Recursive Hierarchy: beforeOverwritePlaceholder; Unexpected structural change: "
@@ -32421,7 +32421,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			]);
 			oBeta = oListBinding.getCurrentContexts()[2];
 
-			//TODO w/ JIRA: CPOUI5ODATAV4-2644, we expect a #requestRank here
+			//TODO: w/ JIRA: CPOUI5ODATAV4-2644, we expect a #requestRank here
 			const oDelta = await this.createEmployee(assert, oListBinding, oBeta, "1.1", "Delta");
 
 			assert.strictEqual(oDelta.getSibling(-1), null, "cannot move up");
@@ -32601,7 +32601,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						}
 					}, "merged");
 
-				//TODO what a stupid request :-(
+				//TODO: what a stupid request :-(
 				that.expectRequest("EMPLOYEES('4')?$select=ID", {
 						ID : "4"
 					});
@@ -33271,7 +33271,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.strictEqual(oBeta.getBinding(), undefined, "destroyed");
 			oBeta = null;
 
-			//TODO must not drop "context" from Gimel's data once refresh supported
+			//TODO: must not drop "context" from Gimel's data once refresh supported
 			assert.throws(function () {
 				// code under test (JIRA: CPOUI5ODATAV4-2515)
 				oNewChild.requestRefresh();
@@ -34914,7 +34914,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectRequest("#6 EMPLOYEES/$count", 1)
 				.expectRequest("#6 EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels"
 					+ "(HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart',NodeProperty='ID'"
-					// TODO: ExpandLevels not needed, see JIRA: CPOUI5ODATAV4-2550
+					//TODO: ExpandLevels not needed, see JIRA: CPOUI5ODATAV4-2550
 					+ ",Levels=1,ExpandLevels=" + JSON.stringify([{NodeID : "0", Levels : 1}]) + ")"
 					+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,MANAGER_ID,Name"
 					+ "&$count=true&$skip=0&$top=100", {
@@ -36609,7 +36609,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						value : [{
 							"@odata.etag" : "n/a",
 							_ : {
-								Limited_Rank : "1" //TODO should be canceled as well?
+								Limited_Rank : "1" //TODO: should be canceled as well?
 							}
 						}]
 					});
@@ -38133,7 +38133,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('1.2')" // selected
 			], [
 				[true, 1, "9", "", "Omega", 69],
-				[true, 2, "0", ""/*TODO "9"*/, "Alpha", 60],
+				[true, 2, "0", ""/*TODO: "9"*/, "Alpha", 60],
 				[false, 3, "1", "0", "Beta", 55],
 				[undefined, 3, "2", "0", "Kappa", 56],
 				[undefined, 3, "3", "0", "Lambda", 57]
@@ -38219,10 +38219,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('3')"
 			], [
 				[true, 1, "9", "", "Omega", 69],
-				[true, 2, "0", ""/*TODO "9"*/, "Alpha", 60],
+				[true, 2, "0", ""/*TODO: "9"*/, "Alpha", 60],
 				[true, 3, "1", "0", "Beta", 55],
 				[undefined, 4, "1.1", "1", "Gamma", 41],
-				[undefined, 4, "2", "0"/*TODO "1"*/, "Kappa", 56],
+				[undefined, 4, "2", "0"/*TODO: "1"*/, "Kappa", 56],
 				[undefined, 4, "1.2", "1", "Zeta", 42],
 				[undefined, 3, "3", "0", "Lambda", 57]
 			]);
@@ -38285,10 +38285,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('3')"
 			], [
 				[true, 1, "9", "", "Omega", 69],
-				[true, 2, "0", ""/*TODO "9"*/, "Alpha", 60],
+				[true, 2, "0", ""/*TODO: "9"*/, "Alpha", 60],
 				[true, 3, "1", "0", "Beta", 55],
 				[undefined, 4, "1.1", "1", "Gamma", 41],
-				[undefined, 4, "2", "0"/*TODO "1"*/, "Kappa", 56],
+				[undefined, 4, "2", "0"/*TODO: "1"*/, "Kappa", 56],
 				[undefined, 4, "1.2", "1", "Zeta", 42],
 				[undefined, 3, "3", "0", "Lambda", 57]
 			]);
@@ -38997,7 +38997,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			checkSiblingOrder(assert, /*in place*/[], /*out of place*/[oEpsilon, oEta]);
 			checkSiblingOrder(assert, /*in place*/[], /*out of place*/[oZeta]);
 
-			//TODO this MUST not cause issues w.r.t. "created" state!
+			//TODO: this MUST not cause issues w.r.t. "created" state!
 			// oDelta.setKeepAlive(true);
 			// oEpsilon.setKeepAlive(true);
 			// oEta.setKeepAlive(true);
@@ -46079,7 +46079,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		// simulate rerendering after #requestSideEffects to ensure that Alpha (Eta's parent) will
 		// be destroyed because it is not visible anymore
-		// simulateRerendering(oBinding); // TODO: table.Table does not react fast enough on event
+		// simulateRerendering(oBinding); //TODO: table.Table does not react fast enough on event
 		oBinding.destroyPreviousContextsLater(Object.keys(oBinding.mPreviousContextsByPath));
 
 		await this.waitForChanges(assert, "prerendering task must be finished");
@@ -46975,7 +46975,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		// code under test
 		assert.strictEqual(oDelta.getSibling(-1), oBeta, "CPOUI5ODATAV4-2558");
 
-		//TODO what a stupid request :-(
+		//TODO: what a stupid request :-(
 		this.expectRequest(sFriend.slice(1) + "(ArtistID='6',IsActiveEntity=false)"
 				+ "?custom=foo&$select=ArtistID,IsActiveEntity", {
 					ArtistID : "6",
@@ -48489,9 +48489,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			 * @param {number} iRow - The first visible row
 			 * @param {number} [iSkip] - $skip for the request; no request if undefined
 			 * @param {number} [iTop] - $top for the request
-			 * @param {boolean} [bNoChangeEvents] - Whether no change events are to be expected
 			 */
-			const expect = (iRow, iSkip, iTop, bNoChangeEvents) => {
+			const expect = (iRow, iSkip, iTop) => {
 				if (iSkip !== undefined) {
 					const aElements = [];
 					for (let i = 0; i < iTop; i += 1) {
@@ -48507,10 +48506,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							})
 						);
 				}
-				if (!bNoChangeEvents) {
-					for (let i = 0; i < 3; i += 1) {
-						this.expectChange("id", `E${iRow + i}`, iRow + i);
-					}
+				for (let i = 0; i < 3; i += 1) {
+					this.expectChange("id", `E${iRow + i}`, iRow + i);
 				}
 			};
 
@@ -48523,7 +48520,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			 * @param {boolean} [bNoWait] - Whether to wait for request and changes
 			 */
 			const scroll = async (iRow, iSkip, iTop, bNoWait) => {
-				expect(iRow, iSkip, iTop, bNoWait);
+				expect(iRow, iSkip, iTop);
 				oTable.setFirstVisibleRow(iRow);
 
 				if (!bNoWait) {
@@ -48544,7 +48541,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			await scroll(34);
 			await scroll(35);
 			scroll(37, 43, 5, true); // 5 after
-			await Promise.resolve();
+			// to avoid instable tests, wait at least 50ms (due to the throttling mechanism of the
+			// table) to ensure that the request is sent and the change events are fired;
+			// await Promise.resolve() cannot be used as it sometimes resolves in less than 50ms and
+			// sometimes it needs longer
+			await resolveLater(null, 50);
 			// this scroll happens before the response arrived, because we did not wait for the changes
 			await scroll(38);
 			// backward
@@ -48682,15 +48683,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oGamma.getProperty("@$ui5.context.isTransient"), undefined, "not now");
 		assert.strictEqual(oGamma.created(), oGammaCreated);
 
-		// Note: due to threshold="4", Beta and Gamma are read now
-		this.expectRequest("EMPLOYEES('0.0')?$select=DrillState,ID,Name",
+		this.expectChange("name", [,,,, "Epsilon*", "Zeta*"])
+			// Note: due to threshold="4", Beta and Gamma are read now
+			.expectRequest("EMPLOYEES('0.0')?$select=DrillState,ID,Name",
 				{DrillState : "leaf", ID : "0.0", Name : "Beta*"})
 			.expectRequest("EMPLOYEES('0.1')?$select=DrillState,ID,Name",
 				{DrillState : "leaf", ID : "0.1", Name : "Gamma*"})
 			.expectChange("name", [,,, "Delta*", "Epsilon*"]);
 
 		oTable.setFirstVisibleRow(4);
-		await Promise.resolve();
+		// to avoid instable tests, wait at least 50ms (due to the throttling mechanism of the
+		// table) to ensure that the request is sent and the change events are fired;
+		// await Promise.resolve() cannot be used as it sometimes resolves in less than 50ms and
+		// sometimes it needs longer
+		await resolveLater(null, 50);
 		oTable.setFirstVisibleRow(3);
 
 		await this.waitForChanges(assert, "(7) quickly scroll to 4 and 3");
@@ -48729,7 +48735,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Beta again. Request a side effects refresh and see that the request does not contain
 	// unnecessary ExpandLevels.
 	// JIRA: CPOUI5ODATAV4-2026
-	//TODO Test is skipped because iLevels between 1 and Number.MAX_SAFE_INTEGER is not supported
+	//TODO: Test is skipped because iLevels between 1 and Number.MAX_SAFE_INTEGER is not supported
 	QUnit.skip("Recursive Hierarchy: expand by given number of levels", async function (assert) {
 		const sUrl = "EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
 				+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart'"
@@ -50150,7 +50156,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		oAlpha.collapse(/*bAll*/true);
 		oTable.getRowMode().setRowCount(4);
 
-		await this.waitForChanges(assert, "collapse all"); //TODO should work w/o this?
+		await this.waitForChanges(assert, "collapse all"); //TODO: should work w/o this?
 
 		checkTable("after collapse all", assert, oTable, [
 			"/Artists(ArtistID='1',IsActiveEntity=false)",
@@ -50158,8 +50164,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		], [
 			[false, 1, "1", "Alpha*"],
 			[undefined, 1, "9", "Omega*"],
-			[undefined, undefined, "1.1.1", "Gamma"], //TODO Why is Gamma still there
-			[undefined, undefined, "1.1.1.1", "Delta"] //TODO Why is Delta still there
+			[undefined, undefined, "1.1.1", "Gamma"], //TODO: Why is Gamma still there
+			[undefined, undefined, "1.1.1.1", "Delta"] //TODO: Why is Delta still there
 		]);
 
 		this.expectRequest(sCountRequestUrl, 5)
@@ -50222,7 +50228,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[true, 1, "1", "Alpha*"],
 			[false, 2, "1.1", "Beta*"],
 			[undefined, 1, "9", "Omega*"],
-			[undefined, undefined, "1.1.1.1", "Delta"] //TODO Why is Delta still there
+			[undefined, undefined, "1.1.1.1", "Delta"] //TODO: Why is Delta still there
 		]);
 	});
 
@@ -51697,7 +51703,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// #updateAnalyticalInfo; initial $skip > 0!
 	// JIRA: CPOUI5UISERVICESV3-1151
 	//
-	//TODO this should work the same for an initially suspended binding where #updateAnalyticalInfo
+	//TODO: this should work the same for an initially suspended binding where #updateAnalyticalInfo
 	// is called before #resume, see JIRA: CPOUI5UISERVICESV3-1754 (PS2 of the change contains that
 	// test); currently sap.ui.table.Table interferes with suspend/resume, see skipped test
 	// "ODLB: resume/refresh/filter w/ submitBatch on a t:Table"
@@ -52451,7 +52457,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			 */
 			function action(sAction, sId, sName) {
 				var bIsActive = sAction === "ActivationAction", // The resulting artist's bIsActive
-					// TODO The object page's parent context may be the return value context of the
+					//TODO: The object page's parent context may be the return value context of the
 					//   previous operation. By using it as parent for the new operation we build a long
 					//   chain of bindings that we never release as long as we switch between draft and
 					//   active entity. -> JIRA: CPOUI5UISERVICESV3-1746
@@ -53322,7 +53328,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				that.oLogMock.expects("error")
 					.withArgs("Failed to drill-down into ('42-0')/CurrencyCode"
-						+ ", invalid segment: CurrencyCode"); //TODO we'd better avoid this :-(
+						+ ", invalid segment: CurrencyCode"); //TODO: we'd better avoid this :-(
 				that.expectRequest("PATCH Artists(ArtistID='42',IsActiveEntity=false)"
 						+ "/_Publication('42-0')", {
 						payload : {Price : "8.88"}
@@ -53509,8 +53515,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Read side effects which include navigation properties while there are pending changes.
 	// JIRA: CPOUI5UISERVICESV3-1193
 	QUnit.test("bound operation: $$inheritExpandSelect", function (assert) {
-		var fnDataReceived = this.spy(),
-			fnDataRequested = this.spy(),
+		var fnDataReceived = sinon.spy(),
+			fnDataRequested = sinon.spy(),
 			oJustAMessage = {
 				code : "23",
 				message : "Just A Message",
@@ -54457,7 +54463,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				that.waitForChanges(assert)
 			]);
 		}).then(function ([oReturnValueContext]) {
-			// TODO return value context not supported here
+			//TODO: return value context not supported here
 			// assert.strictEqual(aResults[0].getPath(),
 			//     "Artists(ArtistID='2',IsActiveEntity=false)");
 			assert.strictEqual(oReturnValueContext, undefined);
@@ -55204,7 +55210,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"Warning", "Message0");
 			}).then(function () {
 				// select the same sales order again in the binding hierarchy, new request is sent;
-				//TODO if Binding.refresh considers unbound bindings this request is expected.
+				//TODO: if Binding.refresh considers unbound bindings this request is expected.
 				// Will be fixed with JIRA: CPOUI5UISERVICESV3-1701
 				/* eslint-disable no-tabs */
 				// that.expectRequest("SalesOrderList('0500000347')/SO_2_SOITEM"
@@ -56513,7 +56519,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return Promise.all([
 				// code under test
-				// TODO this should fail because SO_2_BP becomes null
+				//TODO: this should fail because SO_2_BP becomes null
 				that.oView.byId("form").getBindingContext().requestSideEffects([{
 					$PropertyPath : "SO_2_BP/CompanyName"
 				}]),
@@ -56663,7 +56669,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			})
 			.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)"
 				+ "?$select=ArtistID,IsActiveEntity"
-				//TODO JIRA: CPOUI5UISERVICESV3-1677: Avoid unnecessary $expand
+				//TODO: JIRA: CPOUI5UISERVICESV3-1677: Avoid unnecessary $expand
 				+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity"
 					+ ";$expand=BestFriend($select=ArtistID,IsActiveEntity))", {
 				ArtistID : "42",
@@ -56692,7 +56698,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//*********************************************************************************************
 	// Scenario: read side effects which affect dependent bindings; add some unnecessary context
 	// bindings
-	//TODO Enable autoExpandSelect once JIRA: CPOUI5UISERVICESV3-1677 has been solved!
+	//TODO: Enable autoExpandSelect once JIRA: CPOUI5UISERVICESV3-1677 has been solved!
 	QUnit.test("requestSideEffects: dependent bindings #3", function (assert) {
 		var sDraftAdministrativeData = "Artists(ArtistID='42',IsActiveEntity=true)"
 				+ "/BestFriend/_Friend(ArtistID='42',IsActiveEntity=true)/DraftAdministrativeData",
@@ -56842,7 +56848,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		this.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)"
 				+ "?sap-client=123&$select=ArtistID,IsActiveEntity"
-				//TODO JIRA: CPOUI5UISERVICESV3-1677: Avoid unnecessary $expand
+				//TODO: JIRA: CPOUI5UISERVICESV3-1677: Avoid unnecessary $expand
 				+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity)", {
 				ArtistID : "42",
 				IsActiveEntity : true
@@ -57068,7 +57074,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			})
 			.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)"
 				+ "?$select=ArtistID,IsActiveEntity"
-				//TODO JIRA: CPOUI5UISERVICESV3-1677: Avoid unnecessary $expand
+				//TODO: JIRA: CPOUI5UISERVICESV3-1677: Avoid unnecessary $expand
 				+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity)", {
 				ArtistID : "42",
 				IsActiveEntity : true
@@ -57194,9 +57200,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("price", [, "123"])
 				.expectChange("currency", [, "JPY"]);
 
-			//TODO @see JIRA: CPOUI5UISERVICESV3-1832: open issue with autoExpandSelect, detailTable
-			// would not send own request anymore because list table's oCachePromise becomes
-			// pending again (see PS1 of POC #4122940); workaround by removing binding context
+			//TODO: @see JIRA: CPOUI5UISERVICESV3-1832: open issue with autoExpandSelect,
+			// detailTable would not send own request anymore because list table's oCachePromise
+			// becomes pending again (see PS1 of POC #4122940); workaround by removing binding
+			// context
 			that.oView.byId("detailTable").setBindingContext(null);
 
 			return Promise.all([
@@ -59088,7 +59095,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	</FlexBox>\
 </FlexBox>';
 
-		//TODO avoid the following $expand
+		//TODO: avoid the following $expand
 		// + "&$expand=BestFriend($select=ArtistID,IsActiveEntity"
 		// + ";$expand=_Friend($select=ArtistID,IsActiveEntity))"
 		this.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)"
@@ -59113,11 +59120,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	</FlexBox>\
 </FlexBox>';
 
-		//TODO Failed to drill-down into _Friend(ArtistID='23',IsActiveEntity=true)/ArtistID
+		//TODO: Failed to drill-down into _Friend(ArtistID='23',IsActiveEntity=true)/ArtistID
 		// --> "friend" binding would need to send its own request!
 		this.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)"
 				+ "?$select=ArtistID,IsActiveEntity"
-				//TODO JIRA: CPOUI5UISERVICESV3-1677: Avoid unnecessary $expand
+				//TODO: JIRA: CPOUI5UISERVICESV3-1677: Avoid unnecessary $expand
 				+ "&$expand=_Friend($select=ArtistID,IsActiveEntity)", {
 				ArtistID : "42",
 				IsActiveEntity : true
@@ -59546,7 +59553,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			// remove model messages again
 			oModel.reportStateMessages("ProductList", {});
 		}).then(function () {
-			//TODO get rid of first change event which is due to using setRawValue([...]) on the
+			//TODO: get rid of first change event which is due to using setRawValue([...]) on the
 			//  composite binding. Solution idea: change integration test framework to not use
 			//  formatters but overwrite formatValue on the binding's type if ever possible. Without
 			//  formatters, one can then set the value on the control.
@@ -59602,7 +59609,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			return that.checkValueState(assert, oControl, "Error", "EnterInt");
 		});
 	});
-	//TODO With updateGroupId $direct, changing *both* parts of a composite binding (amount and
+	//TODO: With updateGroupId $direct, changing *both* parts of a composite binding (amount and
 	//  currency) in one step invokes *two* PATCH requests:
 	//  The first request contains the new amount and also the old currency as PATCHes for amounts
 	//  are always sent with currency.
@@ -60081,7 +60088,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.strictEqual(oBinding.getLength(), 2, "length of the table");
 
 			that.expectRequest("#2.2 BusinessPartnerList?$count=true&$select=BusinessPartnerID"
-					+ "&$filter=not (BusinessPartnerID eq '4710')" //TODO this is missing!
+					+ "&$filter=not (BusinessPartnerID eq '4710')" //TODO: this is missing!
 					+ "&$skip=2&$top=1", {
 					"@odata.count" : "3",
 					value : [{BusinessPartnerID : "4713"}]
@@ -60090,7 +60097,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			that.oView.byId("table").requestItems();
 
 			that.expectChange("count", "4")
-				//TODO maybe this "reordering" is wrong (here)?
+				//TODO: maybe this "reordering" is wrong (here)?
 				.expectRequest("#2.1 POST BusinessPartnerList", {BusinessPartnerID : "4710"})
 				.expectChange("id", ["4710",,, "4713"]);
 			oContext = oBinding.create({}, true);
@@ -61001,7 +61008,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		return this.createView(assert, sView, oModel).then(function () {
 			that.oLogMock.expects("error")
 				.withArgs("Failed to drill-down into ('P1')/CurrencyCode"
-					+ ", invalid segment: CurrencyCode"); //TODO we'd better avoid this :-(
+					+ ", invalid segment: CurrencyCode"); //TODO: we'd better avoid this :-(
 			that.expectChange("name", "The Beatles (changed)")
 				.expectChange("price", ["12.99"]);
 
@@ -61776,7 +61783,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			that.expectRequest("POST SalesOrderList('1')"
 					+ "/SO_2_SOITEM(SalesOrderID='1',ItemPosition='10')/SOITEM_2_SO/"
-					+ sAction, {// TODO reduce operation path
+					+ sAction, {//TODO: reduce operation path
 					headers : {"If-Match" : "ETag"}
 				}, {
 					LifecycleStatus : "C",
@@ -62507,7 +62514,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("note", "Side", -1)
 				.expectChange("note", "Unrealistic", -2)
 				.expectChange("note", [,, "Effect"]);
-				//TODO .expectChange("note", ["Unrealistic", "Side", "Effect"]);
+				//TODO: .expectChange("note", ["Unrealistic", "Side", "Effect"]);
 		},
 		text : "Repeated POST succeeds"
 	}, {
@@ -63946,7 +63953,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Server-driven paging with requestContexts iterates @odata.nextLink until the
 	// originally requested number of entities has been read.
 	// JIRA: CPOUI5UISERVICESV3-1908
-	//TODO Enhance test to cover the following cases distinguished regarding number of entities
+	//TODO: Enhance test to cover the following cases distinguished regarding number of entities
 	// requested by requestContexts
 	// 1. server has less entities
 	// 2. server has more entities
@@ -64514,7 +64521,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oSideEffectsPromise = oListBinding.getHeaderContext()
 				.requestSideEffects([{$NavigationPropertyPath : ""}], "$direct");
 
-			//TODO fix Context#getIndex to not return -1; [...]
+			//TODO: fix Context#getIndex to not return -1; [...]
 			// assert.strictEqual(oNewContext.getIndex(), 0);
 
 			return Promise.all([
@@ -64742,7 +64749,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				})
 				.expectChange("city", "Walldorf")
 				.expectChange("name", "Minute Frustrated")
-				//TODO avoid this useless GET for key properties only!
+				//TODO: avoid this useless GET for key properties only!
 				.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)"
 					+ "?$select=ArtistID,IsActiveEntity", {
 					ArtistID : "42",
@@ -64773,7 +64780,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					technical : true,
 					type : "Error"
 				}])
-				//TODO avoid this useless GET for key properties only? no changes allowed anyway!
+				//TODO: avoid this useless GET for key properties only? no changes allowed anyway!
 				.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)"
 					+ "?$select=BestFriend&$expand=BestFriend($select=ArtistID,IsActiveEntity)", {
 					BestFriend : {
@@ -65290,7 +65297,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							}]
 						})
 						.expectChange("status",
-							/*TODO bDifferentContentIDs ? ["N0", "N1", "N2"] :*/ ["C0", "C1", "C2"]);
+							/*TODO: bDifferentContentIDs ? ["N0", "N1", "N2"] :*/ ["C0", "C1", "C2"]);
 
 					// code under test (DINC0614013) - repeat side effects in separate change set
 					aPromises = [
@@ -66070,7 +66077,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	</List>\
 	<Text id="name" text="{Name}"/>\
 </Table>';
-			//TODO <Text id="age" text="{AGE}"/> should not be needed for auto-$expand/$select here!
+			//TODO: <Text id="age" text="{AGE}"/> should not be needed for auto-$expand/$select here!
 
 			function checkItems(aItems, aExpectedMetadataNames, aExpectedContent) {
 				assert.deepEqual(aItems.map(function (oItem) {
@@ -66129,7 +66136,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"sap.m.ColumnListItem"
 				], ["23", "23,F1,Frederic Fall", "42", "42,J1,Jonathan Smith", "42,P1,Peter Burke"]);
 
-				//TODO how could changes to a property affect the list's grouping?
+				//TODO: how could changes to a property affect the list's grouping?
 				// @see v2.ODataListBinding#checkUpdate
 				// oItemsBinding.getCurrentContexts()[0].setProperty("AGE", 42, null);
 
@@ -68320,7 +68327,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			// code under test
 			oText.bindText("Name");
 
-			//TODO is this the right expectation?
+			//TODO: is this the right expectation?
 			// #checkUpdateInternal says "an unresolved binding only fires if it had a value before"
 			// --> no event :-(
 			oText.getBinding("text").attachEventOnce("change", function () {
@@ -68494,7 +68501,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		</FlexBox>
 	</FlexBox>`;
 
-			//TODO why is all of AtoCs expanded here?
+			//TODO: why is all of AtoCs expanded here?
 			this.expectRequest("As(0)?$select=AID,AValue&$expand=AtoCs($select=CID,CValue)", {
 					AID : 0,
 					AValue : iValue,
@@ -72317,7 +72324,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				assert.strictEqual(aResults[2], 789);
 
 				that.expectRequest("SalesOrderList/$count", 1234)
-					//TODO quasi-absolute bindings not affected?!
+					//TODO: quasi-absolute bindings not affected?!
 					.expectRequest("SalesOrderList/$count?$apply=A.P.P.L.E.&$filter=GrossAmount gt 123"
 						+ "&$search=covfefe", 101)
 					.expectChange("count", "1,234");
@@ -73655,7 +73662,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Team_Id : "???"
 				});
 
-				if (bSingle === false) { // TODO: requestRefresh failed to fire a change event
+				if (bSingle === false) { //TODO: requestRefresh failed to fire a change event
 					that.expectChange("id", ["???"])
 						.expectChange("memberCount", [null]);
 				}
@@ -73816,7 +73823,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.strictEqual(oBinding.getLength(), 15);
 			assert.notOk(oBinding.isLengthFinal());
 
-			that.expectChange("id", ["TEAM_C", "TEAM_B", "TEAM_A", "TEAM_01", "TEAM_02"])
+			// #setProperty overtakes #create
+			that.expectChange("name", ["New Team A"])
+				.expectChange("name", ["New Team B"])
+				.expectChange("id", ["TEAM_C", "TEAM_B", "TEAM_A", "TEAM_01", "TEAM_02"])
 				.expectChange("name",
 					["New Team C", "New Team B", "New Team A", "Team #1", "Team #2"]);
 
@@ -73867,7 +73877,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("id", ["TEAM_B", "TEAM_A", "TEAM_01", "TEAM_02", "TEAM_C"])
 				.expectChange("name",
 					["New 'B' Team", "New 'A' Team", "'#1' Team", "'#2' Team", "New 'C' Team"])
-				//TODO how to avoid this artefact?
+				//TODO: how to avoid this artefact?
 				// _CollectionCache#read computes iCreatedPersisted = 2 because oBackup has not
 				// yet been deleted (because oRefreshPromise not yet resolved); this extends
 				// the prefetch unnecessarily here :-(
@@ -74126,6 +74136,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						// {Name : "Team 'B'", Team_Id : "TEAM_B"} // deleted on server
 					]
 				})
+				// refresh is ongoing, so created contexts start at index 0
+				.expectChange("name", ["Team 'A'"])
 				// prefetch compensates for exclusive filter (JIRA: CPOUI5ODATAV4-1521)
 				.expectRequest("#5 TEAMS?$count=true&$select=Name,Team_Id"
 					+ "&$filter=not (Team_Id eq 'TEAM_A' or Team_Id eq 'TEAM_B')&$skip=5&$top=9", {
@@ -74347,7 +74359,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		return this.createView(assert, sView,
 			this.createSalesOrdersModel({autoExpandSelect : true}));
 	});
-	//TODO w/ the following inside the FlexBox, there is a timing issue here with destroyed ODCB
+	//TODO: w/ the following inside the FlexBox, there is a timing issue here with destroyed ODCB
 	// (SOITEM_2_SO) trying to delegate ODPaB#fetchIfChildCanUseCache up...
 	// <List items="{SO_2_SOITEM}">\
 	//    <CustomListItem binding="{path : \'SOITEM_2_SO\', parameters : {$select : \'*\'}}">\
@@ -75294,7 +75306,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			} else {
 				// Error("Failed to enhance query options for auto-$expand/$select as the path "
 				// + sPublicationPath + "/@$ui5.context.isTransient does not point to a property")
-				//TODO .expectChange("isTransient");
+				//TODO: .expectChange("isTransient");
 			}
 
 			await this.createView(assert, bIntermediate ? sViewWithIntermediate : sView, oModel);
@@ -82517,7 +82529,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				ID : "1",
 				Name : "Frederic Fall"
 			})
-			// TODO: Avoid this request. The navigation property EMPLOYEE_2_TEAM was already loaded
+			//TODO: Avoid this request. The navigation property EMPLOYEE_2_TEAM was already loaded
 			// and therefore the cache requests the missing properties based on this navigation
 			// property. Depending on which data was already loaded, there could be multiple GET
 			// requests which could be combined into one request.

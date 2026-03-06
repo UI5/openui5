@@ -22,11 +22,29 @@ const MAX_INPUT_VALUE_LENGTH = 512;
 DatePickerRenderer.writeInnerValue = function(oRm, oDP) {
 	if (oDP._inPreferredUserInteraction()) {
 		oRm.attr("value", oDP._$input.val());
-	} else if (oDP._bValid || oDP._isValueOutOfRange()) {
-		oRm.attr("value", oDP._formatValue(oDP.getDateValue()));
-	} else {
-		oRm.attr("value", oDP.getValue());
+		return;
 	}
+
+	if (oDP._bValid) {
+		oRm.attr("value", oDP._formatValue(oDP.getDateValue()));
+		return;
+	}
+
+	// Out of range: prefer to show what the user typed, but if it can be parsed
+	// show that parsed date using the display format.
+	if (oDP._isValueOutOfRange()) {
+		var sInput = oDP._$input && oDP._$input.val();
+		var oParsedDate = (typeof oDP._parseValue === "function") ? oDP._parseValue(sInput, true) : null;
+		if (oParsedDate) {
+			// Format the parsed date using display format instead of reverting to the old dateValue.
+			oRm.attr("value", oDP._formatValue(oParsedDate));
+			return;
+		} else if (!sInput) {
+			oRm.attr("value", oDP._formatValue(oDP.getDateValue()));
+			return;
+		}
+	}
+	oRm.attr("value", oDP.getValue());
 };
 
 /**

@@ -391,7 +391,7 @@ sap.ui.define([
 			oBinding.setContext(oTargetContext);
 		});
 	});
-	//TODO cache promise is NOT always fulfilled
+	//TODO: cache promise is NOT always fulfilled
 
 	//*********************************************************************************************
 	QUnit.test("doSetType", function () {
@@ -1290,7 +1290,7 @@ sap.ui.define([
 	[
 		{}, // complex structural property
 		[] // collection
-		//TODO Geo types, see 7.1 Primitive Value,
+		//TODO: Geo types, see 7.1 Primitive Value,
 		// e.g. {"type" : "point", "coordinates" : [142.1, 64.1]}
 	].forEach(function (oValue) {
 		QUnit.test("bindProperty with non-primitive " + JSON.stringify(oValue), function (assert) {
@@ -1525,7 +1525,7 @@ sap.ui.define([
 					oBinding.attachChange(done);
 					setTimeout(function () {
 						oBinding.checkUpdateInternal(bForceUpdate);
-						//TODO return promise from above?!
+						//TODO: return promise from above?!
 					}, 0);
 				}
 
@@ -1885,7 +1885,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	//TODO enable this test again and restore the productive code from #1539070/1
+	//TODO: enable this test again and restore the productive code from #1539070/1
 	QUnit.skip("setValue (absolute binding) via control or API", function (assert) {
 		var oControl,
 			oModel = new ODataModel({serviceUrl : "/"}),
@@ -1928,17 +1928,17 @@ sap.ui.define([
 
 		assert.strictEqual(oControl.getText(), "bar");
 	});
-	//TODO "DataRequested" event? probably not ("GET" only), not done by v2 AFAIK
-	//TODO {"If-Match" : sEtag} - a request for a single property does not return an "@odata.etag"
+	//TODO: "DataRequested" event? probably not ("GET" only), not done by v2 AFAIK
+	//TODO: {"If-Match" : sEtag} - a request for a single property does not return an "@odata.etag"
 	//     annotation, but an "etag(?)" header which is not supported by _Cache so far
-	//TODO for PATCH we need the edit URL (for single property we can't determine the canonical URL
+	//TODO: for PATCH we need the edit URL (for single property we can't determine the canonical URL
 	//     because the path need not contain the key properties e.g.
 	//     /EMPLOYEES('2')/EMPLOYEE_2_MANAGER/TEAM_ID) --> accept restriction for now
-	//TODO if the back end returns a different value we should take care
-	//TODO PUT of primitive property versus PATCH of entity (with select *), what is better?
+	//TODO: if the back end returns a different value we should take care
+	//TODO: PUT of primitive property versus PATCH of entity (with select *), what is better?
 	//     --> PATCH with header "Prefer: return=minimal" followed by
 	//         GET with appropriate $expand/$select
-	//TODO error handling, both technical HTTP errors as well as business logic errors
+	//TODO: error handling, both technical HTTP errors as well as business logic errors
 
 	//*********************************************************************************************
 	[{}, Function].forEach(function (vValue) {
@@ -1968,7 +1968,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	//TODO enable this test again and restore the productive code from #1539070/1
+	//TODO: enable this test again and restore the productive code from #1539070/1
 	QUnit.skip("setValue (absolute binding): error handling", function (assert) {
 		var sMessage = "This call intentionally failed",
 			oError = new Error(sMessage),
@@ -2389,7 +2389,7 @@ sap.ui.define([
 		assert.strictEqual(oBinding.doCreateCache("EMPLOYEES('1')/Name", mCacheQueryOptions),
 			oCache);
 	});
-	//TODO discuss change in behavior for relative bindings:
+	//TODO: discuss change in behavior for relative bindings:
 	//   $$groupId, custom query option now leads to own
 	//   cache for property binding
 	//   -> adapt jsdoc for ODPB ctor, ODModel#bindProperty (remove Note: ...)
@@ -2542,4 +2542,4 @@ sap.ui.define([
 		assert.strictEqual(oBinding.updateAfterCreate(), "~oPromise~");
 	});
 });
-// TODO read in initialize and refresh? This forces checkUpdate to use getProperty.
+//TODO: read in initialize and refresh? This forces checkUpdate to use getProperty.

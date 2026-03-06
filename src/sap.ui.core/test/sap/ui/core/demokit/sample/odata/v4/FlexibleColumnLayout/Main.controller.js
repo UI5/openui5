@@ -193,7 +193,7 @@ sap.ui.define([
 				);
 				this.getView().setModel(this.oUIModel, "ui");
 				this.getView().setModel(this.getView().getModel(), "headerContext");
-				// TODO initMessagePopover should expose its "messages" model to the complete view
+				//TODO: initMessagePopover should expose its "messages" model to the complete view
 				this.getView().setModel(Messaging.getMessageModel(), "messages");
 				this.byId("salesOrderListTitle").setBindingContext(
 					this.byId("SalesOrderList").getBinding("items").getHeaderContext(),

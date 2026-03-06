@@ -76,7 +76,7 @@ sap.ui.define([
 						+ "@com.sap.vocabularies.Common.v1.Label",
 					value : "ID of Supplier" // original: "Supplier ID"
 				});
-				//TODO enhance Main.view.xml to support s.th. like AH.getNavigationPath;
+				//TODO: enhance Main.view.xml to support s.th. like AH.getNavigationPath;
 				//     w/o that, Supplier_Name is relative to /Equipments :-(
 				// aAnnotationChanges.push({
 				//    path : "/Equipments/EQUIPMENT_2_PRODUCT/PRODUCT_2_SUPPLIER/SUPPLIER_ID"

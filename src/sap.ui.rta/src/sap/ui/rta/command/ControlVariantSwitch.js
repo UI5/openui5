@@ -3,13 +3,11 @@
  */
 sap.ui.define([
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
-	"sap/ui/fl/variants/VariantManager",
-	"sap/ui/fl/Utils",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/rta/command/BaseCommand"
 ], function(
 	ControlVariantApplyAPI,
-	VariantManager,
-	flUtils,
+	ControlVariantWriteAPI,
 	BaseCommand
 ) {
 	"use strict";
@@ -56,11 +54,11 @@ sap.ui.define([
 	});
 
 	async function discardVariantContent(sVReference) {
-		const aDirtyChanges = await VariantManager.eraseDirtyChangesOnVariant(
-			this.sVariantManagementReference,
-			sVReference,
-			this.getElement()
-		);
+		const aDirtyChanges = await ControlVariantWriteAPI.eraseDirtyChangesOnVariant({
+			variantManagementReference: this.sVariantManagementReference,
+			variantReference: sVReference,
+			control: this.getElement()
+		});
 		this.setDiscardedChanges(aDirtyChanges);
 	}
 
@@ -92,7 +90,7 @@ sap.ui.define([
 		await this._updateVariant(sSourceVariantReference);
 		// When discarding, dirty changes on source variant need to be applied AFTER the switch
 		if (this.getDiscardVariantContent()) {
-			await VariantManager.addAndApplyChangesOnVariant(this.getDiscardedChanges(), this.getElement());
+			await ControlVariantWriteAPI.addAndApplyControlChangesOnVariant(this.getDiscardedChanges(), this.getElement());
 			this.setDiscardedChanges([]);
 		}
 	};

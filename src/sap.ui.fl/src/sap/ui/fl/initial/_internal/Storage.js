@@ -51,11 +51,9 @@ sap.ui.define([
 			}
 			// a sign that we are either loading RTA mode or are already in the RTA mode
 			// and allContexts query parameter should be set for flex/data request
+			// and the cacheKey should be removed to disable browser caching
 			if (oFlexInfoSession.adaptationMode || window.sessionStorage.getItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`)) {
 				oConnectorSpecificPropertyBag.allContexts = true;
-			}
-			// Disable cacheKey when request data for a specific version
-			if (oConnectorSpecificPropertyBag.version) {
 				delete oConnectorSpecificPropertyBag.cacheKey;
 			}
 			return oConnectorConfig.loadConnectorModule.loadFlexData(oConnectorSpecificPropertyBag)

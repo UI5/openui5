@@ -834,7 +834,7 @@ sap.ui.define([
 		}, function (oError) {
 			assert.strictEqual(oError, oExpectedError);
 		});
-		// TODO should we destroy oElementContext in this case?
+		//TODO: should we destroy oElementContext in this case?
 	});
 
 	//*********************************************************************************************
@@ -1573,8 +1573,8 @@ sap.ui.define([
 			});
 		});
 	});
-	// TODO function returning collection
-	// TODO function overloads
+	//TODO: function returning collection
+	//TODO: function overloads
 
 	//*********************************************************************************************
 	[false, true].forEach(function (bBaseContext) {
@@ -1656,7 +1656,7 @@ sap.ui.define([
 
 					assert.strictEqual(oReturnValueContext, undefined);
 					if (oExpectation) {
-						//TODO avoid to invoke a request via getObject, which does not wait for
+						//TODO: avoid to invoke a request via getObject, which does not wait for
 						// results anyway!
 						assert.strictEqual(oExpectation.args[0][4](), oEntity);
 					}
@@ -2802,7 +2802,7 @@ sap.ui.define([
 					oDestroyExpectation,
 					oEntity = bNoDataRead ? undefined : {},
 					oExpectation,
-					fnGetEntity = this.spy(function () {
+					fnGetEntity = sinon.spy(function () {
 						return oEntity;
 					}),
 					fnGetOriginalResourcePath,
@@ -4029,7 +4029,7 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("refreshInternal: deleted relative binding", function (assert) {
 		var oBinding = this.bindContext("relative", Context.create(this.oModel, {}, "/foo")),
-			fnOnRefresh = this.spy(function (oEvent) {
+			fnOnRefresh = sinon.spy(function (oEvent) {
 				var oElementContext = oBinding.getBoundContext();
 
 				assert.strictEqual(oEvent.getParameter("reason"), ChangeReason.Refresh);
@@ -5533,8 +5533,8 @@ sap.ui.define([
 				oFetchPromise2 = Promise.reject("~oError2~"),
 				oHelperMock = this.mock(_Helper),
 				oModelMock = this.mock(this.oModel),
-				fnReporter1 = this.spy(),
-				fnReporter2 = this.spy();
+				fnReporter1 = sinon.spy(),
+				fnReporter2 = sinon.spy();
 
 			this.oModel.bAutoExpandSelect = true;
 			oBinding.oContext = oContext;

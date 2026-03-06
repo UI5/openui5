@@ -784,7 +784,11 @@ sap.ui.define([
 			oListItem.setTitle(oToken.getText());
 			oListItem.addDelegate({
 				onkeydown: function (oEvent) {
-					oEvent.preventDefault();
+					// Don't preventDefault for Tab key - let List handle it properly
+					// Resolves issue with focus going to a list dummy area item
+					if (oEvent.which !== KeyCodes.TAB) {
+						oEvent.preventDefault();
+					}
 
 					if (!((oEvent.ctrlKey || oEvent.metaKey) && oEvent.which === KeyCodes.I) && oEvent.which !== KeyCodes.ESCAPE) {
 						return;

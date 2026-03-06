@@ -93,7 +93,7 @@
 					</template:repeat>
 					<Text text="ValueListType: {property>@@getValueListType}"/>
 				</template:repeat>
-				<!-- TODO repeat over $* properties! -->
+				<!--TODO: repeat over $* properties! -->
 			</VBox>
 		</Panel>
 		<template:with path="data>#/" var="entityType">

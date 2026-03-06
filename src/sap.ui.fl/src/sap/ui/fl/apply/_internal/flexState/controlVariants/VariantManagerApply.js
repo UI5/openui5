@@ -185,7 +185,12 @@ sap.ui.define([
 		if (bOldVariantWasModified) {
 			const VariantManager = await requireAsync("sap/ui/fl/variants/VariantManager");
 			// Only revert if the variant is not switched, otherwise the revert will happen on switch
-			await VariantManager.eraseDirtyChangesOnVariant(sVMReference, sSourceVReference, oVMControl, /* bRevert = */!bVariantSwitch);
+			await VariantManager.eraseDirtyChangesOnVariant({
+				variantManagementReference: sVMReference,
+				variantReference: sSourceVReference,
+				control: oVMControl,
+				revert: !bVariantSwitch
+			});
 		}
 	};
 

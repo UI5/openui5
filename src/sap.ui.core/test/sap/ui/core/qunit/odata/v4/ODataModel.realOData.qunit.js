@@ -656,7 +656,7 @@ sap.ui.define([
 		} finally {
 			Messaging.removeAllMessages();
 
-			//TODO State of the resource (entity) was changed (If-Match)
+			//TODO: State of the resource (entity) was changed (If-Match)
 			oSalesOrder1.setProperty("@odata.etag", "*", null);
 			oSalesOrder2.setProperty("@odata.etag", "*", null);
 			await Promise.all([
@@ -719,10 +719,9 @@ sap.ui.define([
 				Accept : "application/json",
 				"Content-Type" : "application/json;charset=UTF-8"
 			},
-			// TODO:
-			// Nowadays for POST we have to provide all properties, hence we need a new employee
-			// with initial values for all properties as gateway strictly checks now that all
-			// properties are available
+			//TODO: Nowadays for POST we have to provide all properties, hence we need a new
+			// employee with initial values for all properties as gateway strictly checks now that
+			// all properties are available
 			// -> we may reduce properties again if the back end provides defaulting
 			body : {
 				ID : "7",
@@ -1163,7 +1162,7 @@ sap.ui.define([
 	// --------------------------------------------
 	{
 		testTitle : "changeset with Content-ID reference",
-		// TODO: remove skip as soon as gateway supports Content-ID references
+		//TODO: remove skip as soon as gateway supports Content-ID references
 		skip : true,
 		batchRequests : [
 			[{

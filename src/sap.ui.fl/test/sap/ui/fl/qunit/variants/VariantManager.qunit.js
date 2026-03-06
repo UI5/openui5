@@ -2,6 +2,7 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/base/Event",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Control",
@@ -14,6 +15,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/variants/VariantManager",
@@ -21,12 +23,15 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
 	"sap/ui/fl/write/_internal/flexState/changes/UIChangeManager",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
+	"sap/ui/fl/write/api/FeaturesAPI",
+	"sap/ui/fl/write/api/VersionsAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
+	Log,
 	BaseEvent,
 	JsControlTreeModifier,
 	Control,
@@ -39,6 +44,7 @@ sap.ui.define([
 	FlexObjectState,
 	FlexState,
 	ControlVariantApplyAPI,
+	ManifestUtils,
 	Settings,
 	VariantManagement,
 	VariantManager,
@@ -46,6 +52,8 @@ sap.ui.define([
 	ControlVariantWriteUtils,
 	UIChangeManager,
 	FlexObjectManager,
+	FeaturesAPI,
+	VersionsAPI,
 	Layer,
 	Utils,
 	sinon,
@@ -221,13 +229,17 @@ sap.ui.define([
 			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(aDummyChanges);
 			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 
-			const aChanges = await VariantManager.eraseDirtyChangesOnVariant("vm1", "v1", oComponent);
+			const aChanges = await VariantManager.eraseDirtyChangesOnVariant({
+				variantManagementReference: "vm1",
+				variantReference: "v1",
+				control: oComponent
+			});
 			assert.deepEqual(aChanges, aDummyChanges, "then the correct changes are returned");
 			assert.ok(oRevertMultipleChangesStub.calledOnce, "then the changes were reverted");
 			assert.ok(oGetControlChangesForVariantStub.calledOnce, "then are changes are retrieved for the variant");
 		});
 
-		QUnit.test("When addAndApplyChangesOnVariant is called", async function(assert) {
+		QUnit.test("When addAndApplyControlChangesOnVariant is called", async function(assert) {
 			const oControl = new Control("control");
 			var aDummyChanges = [
 				{
@@ -243,7 +255,7 @@ sap.ui.define([
 			var oApplyChangeStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({ success: true });
 			sandbox.stub(JsControlTreeModifier, "getControlIdBySelector");
 
-			await VariantManager.addAndApplyChangesOnVariant(aDummyChanges, oComponent);
+			await VariantManager.addAndApplyControlChangesOnVariant(aDummyChanges, oComponent);
 			assert.strictEqual(oAddChangesStub.lastCall.args[1].length, 2, "then every change in the array was added");
 			assert.ok(oApplyChangeStub.calledTwice, "then every change in the array was applied");
 			oControl.destroy();
@@ -422,8 +434,8 @@ sap.ui.define([
 
 			const oUpdateVariantSpy = sandbox.spy(VariantManagerApply, "updateCurrentVariant");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects");
-			const oAddVariantChangesSpy = sandbox.stub(VariantManager, "handleManageEvent").callsFake(async (...aArgs) => {
-				await oAddVariantChangesSpy.wrappedMethod.apply(this, aArgs);
+			const oHandleManageEventStub = sandbox.stub(VariantManager, "handleManageEvent").callsFake(async (...aArgs) => {
+				await oHandleManageEventStub.wrappedMethod.apply(this, aArgs);
 
 				assert.strictEqual(oUpdateVariantSpy.callCount, 0, "the variant was not switched");
 				const oPassedPropertyBag = oSaveStub.lastCall.args[0];
@@ -461,7 +473,7 @@ sap.ui.define([
 					vmControl: this.oVMControl
 				}, "the correct variant was switched to");
 				assert.strictEqual(oPropertyBag.selector, oComponent, "the app component was passed");
-				assert.strictEqual(oAddVariantChangesSpy.lastCall.args[1].length, 1, "1 change was added");
+				assert.strictEqual(oAddVariantChangesSpy.lastCall.args[0].changeContents.length, 1, "1 change was added");
 				assert.strictEqual(oPropertyBag.flexObjects.length, 1, "an array with 1 change was passed");
 				fnDone();
 			});
@@ -717,7 +729,7 @@ sap.ui.define([
 			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 			const oDeleteFlexObjectsSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
-			const oAddVariantChangeSpy = sandbox.spy(VariantManager, "addVariantChange");
+			const oAddVariantChangesSpy = sandbox.spy(VariantManager, "addVariantChanges");
 			const oCreateDefaultFileNameSpy = sandbox.spy(Utils, "createDefaultFileName");
 
 			await VariantManager.handleSaveEvent(this.oVMControl, oParameters, this.oModel);
@@ -727,7 +739,7 @@ sap.ui.define([
 				"then the file type was passed to sap.ui.fl.Utils.createDefaultFileName"
 			);
 
-			assert.ok(oAddVariantChangeSpy.notCalled, "then no new changes were created");
+			assert.ok(oAddVariantChangesSpy.notCalled, "then no new changes were created");
 			assert.strictEqual(oSaveStub.callCount, 1, "then dirty changes were saved");
 			assert.strictEqual(
 				oSaveStub.getCall(0).args[0].flexObjects.length,
@@ -811,7 +823,7 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("getDirtyChangesFromVariantChanges", function(assert) {
+		QUnit.test("getDirtyControlChangesFromVariant", function(assert) {
 			const aControlChanges = [
 				FlexObjectFactory.createUIChange({
 					id: "dirtyChange",
@@ -828,7 +840,7 @@ sap.ui.define([
 			];
 			aControlChanges[2].setSavedToVariant(true);
 			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").withArgs("DummyReference").returns([aControlChanges[0]]);
-			const aDirtyChanges = VariantManager.getDirtyChangesFromVariantChanges(aControlChanges, "DummyReference");
+			const aDirtyChanges = VariantManager.getDirtyControlChangesFromVariant(aControlChanges, "DummyReference");
 			assert.strictEqual(aDirtyChanges.length, 1, "then one dirty change is returned");
 			assert.strictEqual(aDirtyChanges[0].getId(), "dirtyChange", "then the dirty change is returned");
 		});
@@ -846,19 +858,7 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("getControlChangesForVariant", function(assert) {
-			const aControlChanges = ["change1", "change2"];
-			sandbox.stub(VariantManagementState, "getVariant")
-			.withArgs({
-				reference: "fakeVMReference",
-				vmReference: "variantMgmt1",
-				vReference: "variant1"
-			}).returns({ controlChanges: aControlChanges });
-			const aChanges = VariantManager.getControlChangesForVariant("fakeVMReference", "variantMgmt1", "variant1");
-			assert.strictEqual(aChanges, aControlChanges, "then the changes are returned");
-		});
-
-		QUnit.test("when calling 'manageVariants' in Adaptation mode with changes", function(assert) {
+		QUnit.test("when calling 'openManageVariantsDialog' in Adaptation mode with changes", function(assert) {
 			const sLayer = Layer.CUSTOMER;
 			const sDummyClass = "DummyClass";
 			const oFakeComponentContainerPromise = { property: "fake" };
@@ -892,7 +892,12 @@ sap.ui.define([
 
 			this.oModel.setModelPropertiesForControl(sVMReference, true, this.oVMControl);
 
-			return VariantManager.manageVariants(this.oVMControl, sLayer, sDummyClass, oFakeComponentContainerPromise)
+			return VariantManager.openManageVariantsDialog({
+				variantManagementControl: this.oVMControl,
+				layer: sLayer,
+				styleClass: sDummyClass,
+				contextSharingComponentPromise: oFakeComponentContainerPromise
+			})
 			.then(function({ changes: aChanges, variantsToBeDeleted: aVariantsToBeDeleted }) {
 				assert.strictEqual(aChanges.length, 6, "then 6 changes were returned since changes were made in the manage dialog");
 				assert.deepEqual(aChanges[0], {
@@ -1215,6 +1220,174 @@ sap.ui.define([
 			);
 			assert.strictEqual(aChanges[2].getVariantReference(), "newVariant", "the variantReference of the control change is correct");
 			assert.strictEqual(aChanges[2].getLayer(), Layer.PUBLIC, "the layer of the control change is correct");
+		});
+	});
+
+	QUnit.module("deleteVariantsAndRelatedObjects", {
+		beforeEach() {
+			this.aObjectsToDestroy = [];
+		},
+		afterEach() {
+			sandbox.restore();
+			this.aObjectsToDestroy.forEach((oObject) => { oObject.destroy(); });
+		}
+	}, function() {
+		function createDeleteVariantStub() {
+			return sandbox.stub(ControlVariantWriteUtils, "deleteVariant")
+			.withArgs(sReference, oComponent.getId(), "vmReference", "draftVariant")
+			.returns(["DraftObject1", "DraftObject2"])
+			.withArgs(sReference, oComponent.getId(), "vmReference", "dirtyVariant")
+			.returns(["DirtyObject1", "DirtyObject2"])
+			.withArgs(sReference, oComponent.getId(), "vmReference", "anotherVariant")
+			.returns(["AnotherObject1", "AnotherObject2"]);
+		}
+
+		QUnit.test("when deleteVariantsAndRelatedObjects is called without a Variant Management control", function(assert) {
+			try {
+				VariantManager.deleteVariantsAndRelatedObjects({});
+			} catch (oError) {
+				assert.strictEqual(oError.message, "Please provide a valid Variant Management control", "the function throws an error");
+			}
+		});
+
+		QUnit.test("when deleteVariantsAndRelatedObjects is called", function(assert) {
+			const oVariantManagement = new VariantManagement("vmId");
+			this.aObjectsToDestroy.push(oVariantManagement);
+			sandbox.stub(FeaturesAPI, "isVersioningEnabled").resolves(true);
+			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: "vmReference" });
+			sandbox.stub(VariantManagementState, "getVariant").returns({
+				layer: Layer.CUSTOMER
+			});
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
+			sandbox.stub(VersionsAPI, "getDraftFilenames").withArgs({
+				control: oVariantManagement,
+				layer: Layer.CUSTOMER
+			}).returns(["draftVariant"]);
+			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").withArgs(sReference).returns([{
+				getId: () => "dirtyVariant"
+			}]);
+			const oDeleteVariantStub = createDeleteVariantStub();
+			const aDeletedObjects = VariantManager.deleteVariantsAndRelatedObjects({
+				variantManagementControl: oVariantManagement,
+				layer: Layer.CUSTOMER,
+				variants: ["draftVariant", "dirtyVariant", "anotherVariant"]
+			});
+			assert.notOk(
+				oDeleteVariantStub.calledWith(sReference, "vmReference", "anotherVariant"),
+				"then the delete function is not called for the variant that is neither dirty nor draft"
+			);
+			assert.deepEqual(
+				aDeletedObjects,
+				["DraftObject1", "DraftObject2", "DirtyObject1", "DirtyObject2"],
+				"then all relevant objects are deleted"
+			);
+		});
+
+		QUnit.test("when deleteVariantsAndRelatedObjects is called with 'forceDelete=true'", function(assert) {
+			const oVariantManagement = new VariantManagement("vmId");
+			this.aObjectsToDestroy.push(oVariantManagement);
+			sandbox.stub(FeaturesAPI, "isVersioningEnabled").resolves(true);
+			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: "vmReference" });
+			sandbox.stub(VariantManagementState, "getVariant").returns({
+				layer: Layer.CUSTOMER
+			});
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
+			sandbox.stub(VersionsAPI, "getDraftFilenames").withArgs({
+				control: oVariantManagement,
+				layer: Layer.CUSTOMER
+			}).returns(["draftVariant"]);
+			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").withArgs(sReference).returns([{
+				getId: () => "dirtyVariant"
+			}]);
+			const oDeleteVariantStub = createDeleteVariantStub();
+			const aDeletedObjects = VariantManager.deleteVariantsAndRelatedObjects({
+				variantManagementControl: oVariantManagement,
+				layer: Layer.CUSTOMER,
+				variants: ["draftVariant", "dirtyVariant", "anotherVariant"],
+				forceDelete: true
+			});
+			assert.ok(
+				oDeleteVariantStub.calledWith(sReference, oComponent.getId(), "vmReference", "anotherVariant"),
+				"then the delete function is called for the variant that is neither dirty nor draft"
+			);
+			assert.deepEqual(
+				aDeletedObjects,
+				["DraftObject1", "DraftObject2", "DirtyObject1", "DirtyObject2", "AnotherObject1", "AnotherObject2"],
+				"then all relevant objects are deleted"
+			);
+		});
+
+		QUnit.test("when deleteVariantsAndRelatedObjects is called with a variant in another layer", function(assert) {
+			const oVariantManagement = new VariantManagement("vmId");
+			this.aObjectsToDestroy.push(oVariantManagement);
+			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: "vmReference" });
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
+			sandbox.stub(VariantManagementState, "getVariant").returns({
+				layer: Layer.CUSTOMER
+			})
+			.withArgs({
+				vmReference: "vmReference",
+				reference: sReference,
+				vReference: "variantInAnotherLayer"
+			}).returns({
+				layer: Layer.USER
+			});
+			sandbox.stub(VersionsAPI, "getDraftFilenames").withArgs({
+				control: oVariantManagement,
+				layer: Layer.CUSTOMER
+			}).returns(["draftVariant"]);
+			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").withArgs(sReference).returns([{
+				getId: () => "dirtyVariant"
+			}]);
+			const oDeleteVariantStub = createDeleteVariantStub();
+			const aDeletedObjects = VariantManager.deleteVariantsAndRelatedObjects({
+				variantManagementControl: oVariantManagement,
+				layer: Layer.CUSTOMER,
+				variants: ["draftVariant", "dirtyVariant", "anotherVariant", "variantInAnotherLayer"]
+			});
+			assert.notOk(
+				oDeleteVariantStub.calledWith(sReference, "vmReference", "variantInAnotherLayer"),
+				"then the delete function is not called for the variant in another layer"
+			);
+			assert.deepEqual(
+				aDeletedObjects,
+				["DraftObject1", "DraftObject2", "DirtyObject1", "DirtyObject2"],
+				"then all relevant objects are deleted"
+			);
+		});
+
+		QUnit.test("when deleteVariantsAndRelatedObjects is called with an invalid variant", function(assert) {
+			const oVariantManagement = new VariantManagement("vmId");
+			this.aObjectsToDestroy.push(oVariantManagement);
+			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: "vmReference" });
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
+			sandbox.stub(VariantManagementState, "getVariant").returns({
+				layer: Layer.CUSTOMER
+			})
+			.withArgs({
+				vmReference: "vmReference",
+				reference: sReference,
+				vReference: "invalidVariant"
+			}).returns(undefined);
+			const oWarningSpy = sandbox.spy(Log, "warning");
+			sandbox.stub(VersionsAPI, "getDraftFilenames").withArgs({
+				control: oVariantManagement,
+				layer: Layer.CUSTOMER
+			}).returns(["draftVariant"]);
+			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns([]);
+			sandbox.stub(FeaturesAPI, "isVersioningEnabled").resolves(false);
+			const oDeleteVariantStub = createDeleteVariantStub();
+			const aDeletedObjects = VariantManager.deleteVariantsAndRelatedObjects({
+				variantManagementControl: oVariantManagement,
+				layer: Layer.CUSTOMER,
+				variants: ["draftVariant", "invalidVariant"]
+			});
+			assert.notOk(
+				oDeleteVariantStub.calledWith(sReference, "vmReference", "invalidVariant"),
+				"then the delete function is not called for the invalid variant"
+			);
+			assert.deepEqual(aDeletedObjects, ["DraftObject1", "DraftObject2"], "then all relevant objects are deleted");
+			assert.ok(oWarningSpy.called, "then a warning is logged");
 		});
 	});
 

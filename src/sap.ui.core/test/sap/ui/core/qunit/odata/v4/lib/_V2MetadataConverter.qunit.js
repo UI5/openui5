@@ -172,7 +172,7 @@ sap.ui.define([
 				}
 			});
 	});
-	// TODO look at xml:base if the URL in Reference is relative
+	//TODO: look at xml:base if the URL in Reference is relative
 
 	//*********************************************************************************************
 	QUnit.test("convertXMLMetadata: aliases in types", function (assert) {
@@ -577,8 +577,8 @@ sap.ui.define([
 				}
 			});
 	});
-	// TODO multiple containers in a schema
-	// TODO AssociationSets between two containers
+	//TODO: multiple containers in a schema
+	//TODO: AssociationSets between two containers
 
 	//*********************************************************************************************
 	["DELETE", "GET", "MERGE", "PATCH", "POST", "PUT"].forEach(function (sHttpMethod) {
@@ -1841,7 +1841,7 @@ sap.ui.define([
 				}]
 			});
 	});
-	// TODO InsertRestrictions, DeleteRestrictions or UpdateRestrictions define two properties
+	//TODO: InsertRestrictions, DeleteRestrictions or UpdateRestrictions define two properties
 	// Xable and NonXableNavigationProperties (e.g. Insertable and
 	// NonInsertableNavigationProperties); take care that both can contain values and do not
 	// overwrite the others
@@ -2124,8 +2124,8 @@ sap.ui.define([
 				sClassName);
 		testConversion(assert, sXML, oExpectedResult, /*bSubset*/true);
 	});
-	//TODO schema GWSAMPLE_BASIC.0000. with "forward reference" to EntityType processed later
-	//TODO such annotations @ (Navigation)Property @ ComplexType are not supported
+	//TODO: schema GWSAMPLE_BASIC.0000. with "forward reference" to EntityType processed later
+	//TODO: such annotations @ (Navigation)Property @ ComplexType are not supported
 
 	//*********************************************************************************************
 	QUnit.test("sap:updatable and sap:creatable at Property", function (assert) {

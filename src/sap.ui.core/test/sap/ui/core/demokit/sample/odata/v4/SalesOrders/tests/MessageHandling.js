@@ -202,7 +202,7 @@ sap.ui.define([
 				component : "sap.ui.model.odata.v4.Context",
 				level : Log.Level.ERROR,
 				message : "Failed to update path /SalesOrderList('0500000003')/Note",
-				// TODO: This detail is wrong/misleading. It should be something like
+				//TODO: This detail is wrong/misleading. It should be something like
 				// "HTTP request was not processed because the previous request failed"
 				// and will be solved with CPOUI5ODATAV4-810
 				details : "Property `Note` value `RAISE_ERROR` not allowed!"
@@ -324,7 +324,7 @@ sap.ui.define([
 				message : "Failed to read path /SalesOrderList('0500000002')/"
 					+ "com.sap.gateway.default.zui5_epm_sample.v0002."
 					+ "SalesOrderSimulateDiscount(...)/value",
-				// TODO: Addressed with CPOUI5ODATAV4-810 (same as above)
+				//TODO: Addressed with CPOUI5ODATAV4-810 (same as above)
 				details : sDiscountFailure
 			});
 			Then.onTheSimulateDiscountDialog.checkDiscountValueState(ValueState.Error,

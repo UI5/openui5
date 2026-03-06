@@ -63,7 +63,7 @@ sap.ui.define([
 				details : sRaiseErrorMessage
 			});
 			if (sGroupId.includes("irect")) { // Note: better check group submit mode, but how?
-				//TODO avoid duplicate reporting in case PATCH is not retried
+				//TODO: avoid duplicate reporting in case PATCH is not retried
 				aExpectedLogs.push({
 					component : "sap.ui.model.odata.v4.ODataPropertyBinding",
 					level : Log.Level.ERROR,

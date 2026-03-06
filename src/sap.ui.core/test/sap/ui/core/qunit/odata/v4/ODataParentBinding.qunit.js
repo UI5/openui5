@@ -165,9 +165,9 @@ sap.ui.define([
 		// code under test
 		assert.strictEqual(oBinding.getQueryOptionsForPath(sPath), mResultingQueryOptions);
 	});
-	//TODO getQueryOptionsForPath: find inherited query options based on metadata to support
+	//TODO: getQueryOptionsForPath: find inherited query options based on metadata to support
 	// structural properties within path
-	//TODO handle encoding in getQueryOptionsForPath
+	//TODO: handle encoding in getQueryOptionsForPath
 
 	//*********************************************************************************************
 	// Note: We decided not to analyze $expand for embedded $filter/$orderby and to treat $apply
@@ -2534,7 +2534,7 @@ sap.ui.define([
 			});
 		});
 	});
-	//TODO fire change event only if the binding's length changed, i.e. if getContexts will provide
+	//TODO: fire change event only if the binding's length changed, i.e. if getContexts will provide
 	//  a different result compared to the previous call
 
 	//*********************************************************************************************
@@ -3982,7 +3982,7 @@ sap.ui.define([
 		QUnit.test("visitSideEffects, " + i, function (assert) {
 			var oBinding = new ODataParentBinding(),
 				oChild0 = {
-					oCache : {}, //TODO what if this is still pending?
+					oCache : {}, //TODO: what if this is still pending?
 					getPath : function () { return "foo(0)"; },
 					requestSideEffects : function () {}
 				},
@@ -4647,14 +4647,14 @@ sap.ui.define([
 		return oPromise;
 	});
 });
-//TODO Fix issue with ODataModel.integration.qunit
+//TODO: Fix issue with ODataModel.integration.qunit
 //  "suspend/resume: list binding with nested context binding, only context binding is adapted"
-//TODO ODLB#resumeInternal: checkUpdate on dependent bindings of header context after change
+//TODO: ODLB#resumeInternal: checkUpdate on dependent bindings of header context after change
 //  event (see ODLB#reset)
-//TODO check: resumeInternal has no effect for operations
-//TODO check/update jsdoc change-event for ODParentBinding#resume
-//TODO error handling for write APIs, refresh
+//TODO: check: resumeInternal has no effect for operations
+//TODO: check/update jsdoc change-event for ODParentBinding#resume
+//TODO: error handling for write APIs, refresh
 //   (change only in resume is probably not sufficient)
-//TODO Performance: Compare previous aggregated query options with current state and
+//TODO: Performance: Compare previous aggregated query options with current state and
 // do not recreate cache if there is no diff (e.g no UI change applied, UI change
 // does not affect current $expand/$select)

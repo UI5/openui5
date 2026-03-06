@@ -2,18 +2,20 @@
  * ${copyright}
  */
 sap.ui.define([
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
-	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/write/api/ContextSharingAPI",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/command/BaseCommand",
 	"sap/ui/rta/library",
 	"sap/ui/rta/Utils"
 ], function(
+	ControlVariantApplyAPI,
 	FlexRuntimeInfoAPI,
-	VariantManager,
 	ContextSharingAPI,
+	ControlVariantWriteAPI,
 	PersistenceWriteAPI,
 	FlUtils,
 	BaseCommand,
@@ -103,25 +105,24 @@ sap.ui.define([
 	 */
 	ControlVariantSaveAs.prototype.execute = async function() {
 		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: this.oVariantManagementControl });
-		this._aControlChangesWithoutVariant = VariantManager.getControlChangesForVariant(
+		this._aControlChangesWithoutVariant = ControlVariantWriteAPI.getControlChangesForVariant(
 			sFlexReference,
 			this.sVariantManagementReference,
 			this.getSourceVariantReference()
-		).filter((oFlexObject) => !oFlexObject.getSavedToVariant());
+		).filter(
+			(oFlexObject) => !oFlexObject.getSavedToVariant()
+		);
+
 		const mParams = this.getNewVariantParameters();
 		mParams.layer = this.sLayer;
 		mParams.newVariantReference = this.sNewVariantReference;
 		mParams.generator = rtaLibrary.GENERATOR_NAME;
-		const aDirtyChanges = await VariantManager.handleSaveEvent(this.oVariantManagementControl, mParams);
+		const aDirtyChanges = await ControlVariantWriteAPI.handleSaveEvent(this.oVariantManagementControl, mParams);
+
 		this._aPreparedChanges = aDirtyChanges;
 		[this._oVariantChange] = aDirtyChanges;
 		this.sNewVariantReference = this._oVariantChange.getId();
-		this._aPreparedChanges.forEach(function(oChange) {
-			if (oChange.getFileType() === "change") {
-				oChange.setSavedToVariant(true);
-			}
-		});
-		VariantManager.updateVariantManagementMap(sFlexReference);
+		ControlVariantWriteAPI.setSavedToVariant(sFlexReference, this._aPreparedChanges, true);
 	};
 
 	/**
@@ -150,8 +151,8 @@ sap.ui.define([
 				appComponent: this.oAppComponent
 			};
 
-			await VariantManager.removeVariant(mPropertyBag, true);
-			await VariantManager.addAndApplyChangesOnVariant(this._aControlChangesWithoutVariant, this.oAppComponent);
+			await ControlVariantWriteAPI.removeVariant(mPropertyBag, true);
+			await ControlVariantWriteAPI.addAndApplyControlChangesOnVariant(this._aControlChangesWithoutVariant, this.oAppComponent);
 			this._aPreparedChanges = null;
 			this._oVariantChange = null;
 		}

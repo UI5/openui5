@@ -495,16 +495,26 @@ sap.ui.define([
 			await VariantManagerApply.handleSelectVariant(oEvent, this.oVMControl);
 
 			assert.deepEqual(
-				oEraseDirtyChangesOnVariantStub.getCall(0).args,
-				[sVMReference, sVMReference, this.oVMControl, false],
+				oEraseDirtyChangesOnVariantStub.getCall(0).args[0],
+				{
+					variantManagementReference: sVMReference,
+					variantReference: sVMReference,
+					control: this.oVMControl,
+					revert: false
+				},
 				"differente variant: dirty changes were erased before switching the variant, no revert needed"
 			);
 
 			await VariantManagerApply.handleSelectVariant(oEvent, this.oVMControl);
 
 			assert.deepEqual(
-				oEraseDirtyChangesOnVariantStub.getCall(1).args,
-				[sVMReference, sNewVariantKey, this.oVMControl, true],
+				oEraseDirtyChangesOnVariantStub.getCall(1).args[0],
+				{
+					variantManagementReference: sVMReference,
+					variantReference: sNewVariantKey,
+					control: this.oVMControl,
+					revert: true
+				},
 				"same variant: dirty changes were erased before switching the variant, revert needed"
 			);
 		});

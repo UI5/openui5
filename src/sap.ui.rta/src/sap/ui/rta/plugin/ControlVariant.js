@@ -13,8 +13,8 @@ sap.ui.define([
 	"sap/ui/dt/OverlayUtil",
 	"sap/ui/dt/Util",
 	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/write/api/ContextSharingAPI",
+	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/plugin/rename/RenameDialog",
@@ -31,8 +31,8 @@ sap.ui.define([
 	OverlayUtil,
 	DtUtil,
 	VariantManagement,
-	VariantManager,
 	ContextSharingAPI,
+	ControlVariantWriteAPI,
 	Layer,
 	flUtils,
 	RenameDialog,
@@ -524,12 +524,12 @@ sap.ui.define([
 		const mComponentPropertyBag = mFlexSettings;
 		mComponentPropertyBag.variantManagementControl = oVariantManagementControl;
 
-		return VariantManager.manageVariants(
-			oVariantManagementControl,
-			mFlexSettings.layer,
-			Utils.getRtaStyleClassName(),
-			ContextSharingAPI.createComponent(mComponentPropertyBag)
-		)
+		return ControlVariantWriteAPI.openManageVariantsDialog({
+			variantManagementControl: oVariantManagementControl,
+			layer: mFlexSettings.layer,
+			styleClass: Utils.getRtaStyleClassName(),
+			contextSharingComponentPromise: ContextSharingAPI.createComponent(mComponentPropertyBag)
+		})
 		.then(function(oModelChanges) {
 			if (oModelChanges.changes.length > 0) {
 				return this.getCommandFactory().getCommandFor(
