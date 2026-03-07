@@ -76,8 +76,7 @@ function(
 	};
 
 	NumericInput.prototype.onkeydown = function(oEvent) {
-		var sTypedValue,
-			iCursorPos,
+		let sTypedValue,
 			fParsedValue;
 
 		Input.prototype.onkeydown.apply(this, arguments);
@@ -89,7 +88,7 @@ function(
 			return;
 		}
 
-		iCursorPos = this._$input.cursorPos();
+		const iCursorPos = this._$input.cursorPos();
 
 		// a special key that is meant to be a decimal separator, always
 		// so replace in the input if needed
@@ -105,15 +104,17 @@ function(
 			return;
 		}
 
-		var sDecimalSeparator = this._getNumberFormat().oFormatOptions.decimalSeparator;
+		const sDecimalSeparator = this._getNumberFormat().oFormatOptions.decimalSeparator;
 		if (oEvent.originalEvent.key === sDecimalSeparator && iCursorPos === 0) {
 			oEvent.preventDefault();
 			this.setDOMValue(sDecimalSeparator);
 			return;
 		}
 
-		var oIsMinusSignAtZeroPosition =  iCursorPos === 0 && (oEvent.which === KeyCodes.SLASH || oEvent.which === KeyCodes.NUMPAD_MINUS);
+		const sGroupSeparator = this._getNumberFormat().oFormatOptions.groupingSeparator;
+		const oIsMinusSignAtZeroPosition =  iCursorPos === 0 && (oEvent.which === KeyCodes.SLASH || oEvent.which === KeyCodes.NUMPAD_MINUS);
 		sTypedValue = this.getValue().substring(0, iCursorPos) + oEvent.originalEvent.key + this.getValue().substring(iCursorPos);
+		sTypedValue = sTypedValue.replaceAll(sGroupSeparator, "");
 		fParsedValue = this._getNumberFormat().parse(sTypedValue);
 		if (!isKeyAllowed(oEvent.which) || (!fParsedValue && fParsedValue !== 0 && !oIsMinusSignAtZeroPosition)) {
 			oEvent.preventDefault();

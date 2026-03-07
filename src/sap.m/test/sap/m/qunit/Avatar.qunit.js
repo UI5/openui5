@@ -404,6 +404,38 @@ sap.ui.define([
 		assert.ok(this.oAvatar.getDomRef().className.includes("sapFAvatarInitials"), sPreAvatarType + "Initials");
 	});
 
+	QUnit.test("No warning is logged when initials are empty", function (assert) {
+		this.stub(Log, "warning");
+
+		this.oAvatar.setInitials("");
+
+		assert.ok(Log.warning.notCalled, "No warning is logged for empty initials");
+	});
+
+	QUnit.test("No warning is logged when no initials are set", function (assert) {
+		this.stub(Log, "warning");
+
+		this.oAvatar.setInitials(null);
+
+		assert.ok(Log.warning.notCalled, "No warning is logged when initials are null");
+	});
+
+	QUnit.test("Warning is logged when initials are invalid (too long)", function (assert) {
+		this.stub(Log, "warning");
+
+		this.oAvatar.setInitials("ABCD");
+
+		assert.ok(Log.warning.calledOnce, "Warning is logged once for too long initials");
+	});
+
+	QUnit.test("Warning is logged when initials contain non-latin characters", function (assert) {
+		this.stub(Log, "warning");
+
+		this.oAvatar.setInitials("ЯЪ");
+
+		assert.ok(Log.warning.calledOnce, "Warning is logged once for non-latin initials");
+	});
+
 	QUnit.module("Rendering different fit types", {
 		beforeEach: setupFunction,
 		afterEach: teardownFunction

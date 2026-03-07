@@ -770,9 +770,10 @@ if (sModeName === "Legacy") {
 		assert.equal(aSelectedItems.length, 2, "Only 2 items are selected after removing filter");
 	});
 
-	QUnit.test("Check Search implementation in combination with 'group mode' Select for 'active'", function(assert){
+	QUnit.test("Check Search implementation in combination with 'group mode' Select for 'active'", async function(assert){
 
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		await nextUIUpdate();
 
 		this.oAFPanel._sModeKey = "active";
 		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
@@ -796,9 +797,10 @@ if (sModeName === "Legacy") {
 		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since items are available");
 	});
 
-	QUnit.test("Check Search implementation in combination with 'group mode' Select for 'mandatory'", function(assert){
+	QUnit.test("Check Search implementation in combination with 'group mode' Select for 'mandatory'", async function(assert){
 
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		await nextUIUpdate();
 
 		this.oAFPanel._sModeKey = "mandatory";
 		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
@@ -816,9 +818,10 @@ if (sModeName === "Legacy") {
 		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since items are available");
 	});
 
-	QUnit.test("Check Search implementation in combination with 'group mode' Select for 'visibleactive'", function(assert){
+	QUnit.test("Check Search implementation in combination with 'group mode' Select for 'visibleactive'", async function(assert){
 
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		await nextUIUpdate();
 
 		this.oAFPanel._sModeKey = "visibleactive";
 		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
@@ -854,9 +857,10 @@ if (sModeName === "Legacy") {
 		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since items are available");
 	});
 
-	QUnit.test("Check Search implementation in combination with 'group mode' Select", function(assert){
+	QUnit.test("Check Search implementation in combination with 'group mode' Select", async function(assert){
 
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		await nextUIUpdate();
 
 		this.oAFPanel._getSearchField().setValue("Some Tooltip");
 		this.oAFPanel._sModeKey = "visible";
@@ -874,10 +878,11 @@ if (sModeName === "Legacy") {
 		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since items are available");
 	});
 
-	QUnit.test("Check that groups are initially only displayed if necessary", function(assert){
+	QUnit.test("Check that groups are initially only displayed if necessary", async function(assert){
 
 		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
 		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+		await nextUIUpdate();
 
 		assert.equal(this.oAFPanel.getCurrentViewContent()._oListControl.getVisibleItems().length, 2, "All groups visible");
 
@@ -886,11 +891,13 @@ if (sModeName === "Legacy") {
 		});
 
 		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+		await nextUIUpdate();
+
 		assert.equal(this.oAFPanel.getCurrentViewContent()._oListControl.getVisibleItems().length, 1, "Only necessary groups visible");
 
 	});
 
-	QUnit.test("Check additional filter implementation (visibleInDialog)", function(assert){
+	QUnit.test("Check additional filter implementation (visibleInDialog)", async function(assert){
 
 		const oP13nData = this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, function(oItem, oProp) {
 			if (oProp.key == "key2") {
@@ -902,6 +909,7 @@ if (sModeName === "Legacy") {
 		}, true);
 
 		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+		await nextUIUpdate();
 
 		const aGroupPanels = this.oAFPanel.getCurrentViewContent().getPanels();
 
@@ -910,6 +918,8 @@ if (sModeName === "Legacy") {
 
 		//Check in ListView
 		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
 		const aItems = this.oAFPanel.getCurrentViewContent()._oListControl.getItems();
 		assert.equal(aItems.length, 5, "There are 6 items in the model, but one should be hidden for the user");
 
@@ -940,7 +950,7 @@ if (sModeName === "Legacy") {
 
 	});
 
-	QUnit.test("Check 'itemFactory' execution for expanded groups", function(assert){
+	QUnit.test("Check 'itemFactory' execution for expanded groups", async function(assert){
 
 		//6 items in 2 groups --> 6x callback excuted after expanding --> +3x for initial filtering
 		const done = assert.async(9);
@@ -957,10 +967,11 @@ if (sModeName === "Legacy") {
 		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
 
 		this.oAFPanel.setGroupExpanded("G2");
+		await nextUIUpdate();
 
 	});
 
-	QUnit.test("Check 'itemFactory' execution for expanded groups by checking created controls", function(assert){
+	QUnit.test("Check 'itemFactory' execution for expanded groups by checking created controls", async function(assert){
 
 		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
 
@@ -972,6 +983,7 @@ if (sModeName === "Legacy") {
 		this.oAFPanel.setItemFactory(fnItemFactoryCallback);
 
 		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+		await nextUIUpdate();
 
 		this.oAFPanel.setGroupExpanded("G2");
 
@@ -984,9 +996,10 @@ if (sModeName === "Legacy") {
 
 	});
 
-	QUnit.test("Check 'itemFactory' execution combined with filtering - panel not expaned while searching", function(assert){
+	QUnit.test("Check 'itemFactory' execution combined with filtering - panel not expaned while searching", async function(assert){
 
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		await nextUIUpdate();
 
 		this.oAFPanel._getSearchField().setValue("Field 5");
 		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
@@ -1004,9 +1017,10 @@ if (sModeName === "Legacy") {
 		}.bind(this));
 	});
 
-	QUnit.test("Check 'itemFactory' execution combined with filtering - panel is expaned while searching", function(assert){
+	QUnit.test("Check 'itemFactory' execution combined with filtering - panel is expaned while searching", async function(assert){
 
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		await nextUIUpdate();
 
 		this.oAFPanel._getSearchField().setValue("Field 5");
 		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
@@ -1019,9 +1033,10 @@ if (sModeName === "Legacy") {
 
 	});
 
-	QUnit.test("Check method 'setGroupExpanded' ", function(assert){
+	QUnit.test("Check method 'setGroupExpanded' ", async function(assert){
 
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		await nextUIUpdate();
 
 		const oSecondPanel = this.oAFPanel.getCurrentViewContent()._oListControl.getItems()[1].getContent()[0];
 		assert.ok(!oSecondPanel.getExpanded(), "Panel is initially collapsed");
@@ -1293,9 +1308,10 @@ if (sModeName === "Legacy") {
 		await nextUIUpdate();
 
 		this.oAFPanel.setDefaultView("list");
-		this.oAFPanel.getView("list").getContent().showFactory(true); //Show the factory
 		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
 
+		this.oAFPanel.getView("list").getContent().showFactory(true);
 		await nextUIUpdate();
 
 		// Check if items are visible and have the correct parent

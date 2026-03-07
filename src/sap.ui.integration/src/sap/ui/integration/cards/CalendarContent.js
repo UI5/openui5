@@ -353,28 +353,30 @@ sap.ui.define([
 
 		CalendarContent.prototype._getStaticConfigurationLegendItems = function (aLegendItems, aLegendAppointmentItems, oConfiguration, oLegend) {
 			var aResolvedLegendItems = [];
-			aLegendItems.forEach(function (oItem, i) {
+			aLegendItems.forEach(function (oItem) {
 				var aTemplateKeys = Object.keys(oConfiguration.legendItem.template),
-					singleAssembledItem = {};
+					oSingleAssembledItem = {},
+					sBindingContextPath = oItem.getBindingContext().getPath();
 
 				aTemplateKeys.forEach(function(sKey) {
-					var oBindingInfo = BindingHelper.prependRelativePaths(oConfiguration.legendItem.template[sKey], oLegend.getBindingPath("items") + "/" + i);
+					var oBindingInfo = BindingHelper.prependRelativePaths(oConfiguration.legendItem.template[sKey], sBindingContextPath);
 
-					singleAssembledItem[sKey] = BindingResolver.resolveValue(oBindingInfo, this);
+					oSingleAssembledItem[sKey] = BindingResolver.resolveValue(oBindingInfo, this);
 				}.bind(this));
-				aResolvedLegendItems.push(singleAssembledItem);
+				aResolvedLegendItems.push(oSingleAssembledItem);
 			}.bind(this));
 
-			aLegendAppointmentItems.forEach(function (oItem, i) {
+			aLegendAppointmentItems.forEach(function (oItem) {
 				var aTemplateKeys  = Object.keys(oConfiguration.legendItem.template),
-					singleAssembledItem = {};
+					oSingleAssembledItem = {},
+					sBindingContextPath = oItem.getBindingContext().getPath();
 
 				aTemplateKeys.forEach(function(sKey) {
-					var oBindingInfo = BindingHelper.prependRelativePaths(oConfiguration.legendItem.template[sKey], oLegend.getBindingPath("items") + "/" + i);
+					var oBindingInfo = BindingHelper.prependRelativePaths(oConfiguration.legendItem.template[sKey], sBindingContextPath);
 
-					singleAssembledItem[sKey] = BindingResolver.resolveValue(oBindingInfo, this);
+					oSingleAssembledItem[sKey] = BindingResolver.resolveValue(oBindingInfo, this);
 				}.bind(this));
-				aResolvedLegendItems.push(singleAssembledItem);
+				aResolvedLegendItems.push(oSingleAssembledItem);
 			}.bind(this));
 
 			return aResolvedLegendItems;

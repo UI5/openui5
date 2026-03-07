@@ -64,7 +64,6 @@ sap.ui.define([
 				/**
 				 * Whether to use the new UI (true) or legacy UI (false)
 				 * Passed from AdaptationFilterBar via GroupContainer
-				 * @experimental
 				 * @private
 				 * @ui5-restricted sap.comp, sap.ui.mdc
 				 */
@@ -144,6 +143,8 @@ sap.ui.define([
 		// Reset cached values
 		delete this._bCreatedWithNewUI;
 		delete this._bUseNewUI;
+		delete this._bGroupViewInitialized;
+		delete this._bListViewInitialized;
 	};
 
 	/**
@@ -163,7 +164,7 @@ sap.ui.define([
 				} else {
 					this.fireChange();
 				}
-				this.getP13nModel().setProperty(sPath, oEvt.getSource().getP13nData());
+				this.getP13nModel().setProperty(sPath, oEvt.getSource().getP13nData(), null, true);
 			}.bind(this);
 		};
 
@@ -268,7 +269,7 @@ sap.ui.define([
 			if (oCurrentView) {
 				const aCurrentP13nData = oCurrentView.getP13nData();
 				if (aCurrentP13nData && this.getP13nModel()) {
-					this.getP13nModel().setProperty("/items", aCurrentP13nData);
+					this.getP13nModel().setProperty("/items", aCurrentP13nData, null, true);
 				}
 			}
 		}
@@ -281,6 +282,11 @@ sap.ui.define([
 
 			if (oCurrentViewContent && this.getP13nModel() && !this._isCustomView()) {
 				oCurrentViewContent.setP13nData(this.getP13nModel().getProperty("/items"));
+				if (sKey === this.GROUP_KEY) {
+					this._bGroupViewInitialized = true;
+				} else if (sKey === this.LIST_KEY) {
+					this._bListViewInitialized = true;
+				}
 			}
 
 			let sSearch = "";
@@ -333,6 +339,17 @@ sap.ui.define([
 			this._getShowHideBtn().setVisible(!this._isCustomView());
 
 			this._getViewSwitch().setSelectedKey(this.getCurrentViewKey());
+
+			// Lazy initialization for legacy UI
+			if (sKey === this.GROUP_KEY && !this._bGroupViewInitialized && this.getP13nModel()) {
+				const sGroupPath = "/itemsGrouped";
+				oCurrentViewContent.setP13nData(this.getP13nModel().getProperty(sGroupPath));
+				this._bGroupViewInitialized = true;
+			} else if (sKey === this.LIST_KEY && !this._bListViewInitialized && this.getP13nModel()) {
+				const sListPath = "/items";
+				oCurrentViewContent.setP13nData(this.getP13nModel().getProperty(sListPath));
+				this._bListViewInitialized = true;
+			}
 
 			//Factory logic should only be executed for non custom panels
 			if (!this._isCustomView(sKey)) {
@@ -494,13 +511,20 @@ sap.ui.define([
 		this.setModel(oModel, this.P13N_MODEL);
 
 		const sListPath = "/items";
-		let sGroupPath = "/itemsGrouped";
-		if (this._checkIsNewUI()) {
-			sGroupPath = "/items";
-		}
+		const sCurrentView = this.getCurrentViewKey() || this.LIST_KEY;
 
-		this.getView(this.LIST_KEY).getContent().setP13nData(oModel.getProperty(sListPath));
-		this.getView(this.GROUP_KEY).getContent().setP13nData(oModel.getProperty(sGroupPath));
+		// Only initialize the default view, the other view will be initialized lazily when switching to it
+		if (sCurrentView === this.GROUP_KEY) {
+			// For legacy UI, GroupView uses "/itemsGrouped", for new UI it uses "/items"
+			const sGroupPath = this._checkIsNewUI() ? "/items" : "/itemsGrouped";
+			this.getView(this.GROUP_KEY).getContent().setP13nData(oModel.getProperty(sGroupPath));
+			this._bGroupViewInitialized = true;
+			this._bListViewInitialized = false;
+		} else {
+			this.getView(this.LIST_KEY).getContent().setP13nData(oModel.getProperty(sListPath));
+			this._bListViewInitialized = true;
+			this._bGroupViewInitialized = false;
+		}
 		this._filterByModeAndSearch();
 	};
 
@@ -516,8 +540,14 @@ sap.ui.define([
 			}
 
 			oP13nModel.setData(oP13nData);
-			this.getView(this.LIST_KEY).getContent().setP13nData(oP13nModel.getProperty(sListPath));
-			this.getView(this.GROUP_KEY).getContent().setP13nData(oP13nModel.getProperty(sGroupPath));
+
+			// Only update views if they were already initialized (lazy loading)
+			if (this._bListViewInitialized) {
+				this.getView(this.LIST_KEY).getContent().setP13nData(oP13nModel.getProperty(sListPath));
+			}
+			if (this._bGroupViewInitialized) {
+				this.getView(this.GROUP_KEY).getContent().setP13nData(oP13nModel.getProperty(sGroupPath));
+			}
 		}
 	};
 

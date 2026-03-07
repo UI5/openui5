@@ -528,6 +528,28 @@ function(nextUIUpdate, jQuery, Element, IconPool, ObjectPageLayout, ObjectPageHe
 		assert.strictEqual($overflowButton.css("display"), "none", "OverflowButton is hidden when not needed");
 	});
 
+	QUnit.test("_getActionsWidth returns a valid number when an action has visible=false", async function(assert) {
+		// Arrange
+		var oHeader = this.myView.byId("applicationHeader");
+
+		oHeader.removeAllActions();
+		oHeader.addAction(new Button({text: "Visible Button"}));
+		oHeader.addAction(new Button({text: "Hidden Button", visible: false}));
+		await nextUIUpdate();
+
+		// Simulate the behavior of newer jQuery versions, where outerWidth() returns
+		// undefined (instead of null) for elements not rendered in the DOM.
+		// Without the fix, iWidthSum += undefined results in NaN.
+		this.stub(jQuery.fn, "outerWidth").returns(undefined);
+
+		// Act
+		var iWidth = oHeader._getActionsWidth();
+
+		// Assert
+		assert.ok(!isNaN(iWidth), "_getActionsWidth does not return NaN when outerWidth returns undefined");
+		assert.strictEqual(typeof iWidth, "number", "_getActionsWidth returns a number");
+	});
+
 	QUnit.test("_resizeIdentifierLineContainer is called when the action visibility is change", function (assert) {
 		assert.expect(1);
 

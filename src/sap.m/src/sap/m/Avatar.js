@@ -613,7 +613,11 @@ sap.ui.define([
 	Avatar.prototype._areInitialsValid = function (sInitials) {
 	   var validInitials = /^[a-zA-Z\xc0-\xd6\xd8-\xdc\xe0-\xf6\xf8-\xfc]{1,3}$/;
 	   if (!validInitials.test(sInitials)) {
-		   Log.warning("Initials should consist of only 1,2 or 3 latin letters", this);
+		   // Only log a warning when initials are explicitly provided but invalid
+		   // Don't warn when initials are empty/null (valid use case for fallback to icon)
+		   if (sInitials) {
+			   Log.warning("Initials should consist of only 1,2 or 3 latin letters", this);
+		   }
 		   // if there is no actual type or the actual type is initials but they are not valid, set the actual type to icon
 		   return false;
 	   }
@@ -686,7 +690,8 @@ sap.ui.define([
 		} else if (sInitials && this._getInitialsValid()) {
 			this._sActualType = AvatarType.Initials;
 		} else {
-			Log.warning("No src and initials were provided or initials are provided, but are not valid", this);
+			// Fallback to Icon when no src and no valid initials
+			// Warning is logged in _areInitialsValid when initials are explicitly provided but invalid
 			this._sActualType = AvatarType.Icon;
 		}
 
