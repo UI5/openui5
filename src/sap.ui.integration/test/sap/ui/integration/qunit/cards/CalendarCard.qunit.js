@@ -1311,6 +1311,106 @@ sap.ui.define([
 			}
 		};
 
+		var oManifest_MultipleLegendItems = {
+			"_version": "1.14.0",
+			"sap.app": {
+				"id": "card.explorer.highlight.list.card",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Calendar",
+				"data": {
+					"json": {
+						"date": "2019-09-01T09:00",
+						"maxItems": 7,
+						"maxLegendItems": 10,
+						"item": [
+							{
+								"start": "2019-09-01T09:00",
+								"end": "2019-09-01T10:00",
+								"title": "Appointment",
+								"text": "working",
+								"type": "Type05"
+							}
+						],
+						"specialDate": [
+							{
+								"start": "2019-09-01T09:00",
+								"end": "2019-09-01T10:00",
+								"type": "Type13"
+							}
+						],
+						"legendItem": [
+							{
+								"category": "calendar",
+								"text": "Calendar Legend 1",
+								"type": "Type08"
+							},
+							{
+								"category": "calendar",
+								"text": "Calendar Legend 2",
+								"type": "Type13"
+							},
+							{
+								"category": "appointment",
+								"text": "Appointment Legend 1",
+								"type": "Type06"
+							},
+							{
+								"category": "appointment",
+								"text": "Appointment Legend 2",
+								"type": "Type07"
+							},
+							{
+								"category": "appointment",
+								"text": "Appointment Legend 3",
+								"type": "Type03"
+							},
+							{
+								"category": "appointment",
+								"text": "Appointment Legend 4",
+								"type": "Type05"
+							}
+						]
+					}
+				},
+				"header": {
+					"title": "My Calendar"
+				},
+				"content": {
+					"date": "{date}",
+					"maxItems": "{maxItems}",
+					"maxLegendItems": "{maxLegendItems}",
+					"item": {
+						"template": {
+							"startDate": "{start}",
+							"endDate": "{end}",
+							"title": "{title}",
+							"text": "{text}",
+							"type": "{type}"
+						},
+						"path": "/item"
+					},
+					"specialDate": {
+						"template": {
+							"startDate": "{start}",
+							"endDate": "{end}",
+							"type": "{type}"
+						},
+						"path": "/specialDate"
+					},
+					"legendItem": {
+						"template": {
+							"category": "{category}",
+							"text": "{text}",
+							"type": "{type}"
+						},
+						"path": "/legendItem"
+					}
+				}
+			}
+		};
+
 		QUnit.module("Initialization", {
 			beforeEach: function () {
 				this.oCard = new Card({
@@ -1434,6 +1534,38 @@ sap.ui.define([
 			assert.equal(aSpecialDates.length, 1, "Should have 1 special date.");
 			assert.equal(aSpecialDates[0].startDate, oManifest_Simple["sap.card"].data.json.specialDate[0].start + ":00.000Z", "Special date start date correct");
 			assert.equal(aSpecialDates[0].endDate, oManifest_Simple["sap.card"].data.json.specialDate[0].end + ":00.000Z", "Special date end date correct");
+		});
+
+		QUnit.test("getStaticConfiguration - multiple legend items with filtered categories", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(oManifest_MultipleLegendItems);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oCalendarContent = this.oCard.getAggregation("_content");
+			const oStaticConfiguration = oCalendarContent.getStaticConfiguration();
+			const oManifestData = oManifest_MultipleLegendItems["sap.card"].data.json;
+
+			// Legend items - verify all 6 items are resolved correctly
+			const aLegendItems = oStaticConfiguration.legendItems;
+			assert.equal(aLegendItems.length, 6, "Should have 6 legend items in total.");
+
+			// Verify calendar legend items (first 2 in the manifest, filtered by category "calendar")
+			assert.equal(aLegendItems[0].text, oManifestData.legendItem[0].text, "First calendar legend item text is correct");
+			assert.equal(aLegendItems[0].type, oManifestData.legendItem[0].type, "First calendar legend item type is correct");
+			assert.equal(aLegendItems[1].text, oManifestData.legendItem[1].text, "Second calendar legend item text is correct");
+			assert.equal(aLegendItems[1].type, oManifestData.legendItem[1].type, "Second calendar legend item type is correct");
+
+			// Verify appointment legend items (indices 2-5 in manifest, filtered by category "appointment")
+			assert.equal(aLegendItems[2].text, oManifestData.legendItem[2].text, "First appointment legend item text is correct");
+			assert.equal(aLegendItems[2].type, oManifestData.legendItem[2].type, "First appointment legend item type is correct");
+			assert.equal(aLegendItems[3].text, oManifestData.legendItem[3].text, "Second appointment legend item text is correct");
+			assert.equal(aLegendItems[3].type, oManifestData.legendItem[3].type, "Second appointment legend item type is correct");
+			assert.equal(aLegendItems[4].text, oManifestData.legendItem[4].text, "Third appointment legend item text is correct");
+			assert.equal(aLegendItems[4].type, oManifestData.legendItem[4].type, "Third appointment legend item type is correct");
+			assert.equal(aLegendItems[5].text, oManifestData.legendItem[5].text, "Fourth appointment legend item text is correct");
+			assert.equal(aLegendItems[5].type, oManifestData.legendItem[5].type, "Fourth appointment legend item type is correct");
 		});
 
 		QUnit.module("Parameters", {

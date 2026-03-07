@@ -35,8 +35,8 @@
 	},
 	"devDependencies": {
 		"@ui5/builder": "^4.1.4",
-		"@ui5/cli": "^4.0.46",
-		"@ui5/project": "^4.0.11",
+		"@ui5/cli": "^4.0.47",
+		"@ui5/project": "^4.0.12",
 		"@ui5/server": "^4.0.13",
 		"@ui5/tooling-webc": "^0.2.14",
 		"@ui5/webcomponents": "1.18.0",

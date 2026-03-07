@@ -92,7 +92,6 @@ sap.ui.define([
 				 * When set to <code>true</code>, the old UI with SegmentedButton and SelectionPanel will be shown.
 				 * When set to <code>false</code> (default), the new UI with IconTabBar and AdaptFiltersPanelContent will be shown.
 				 * The URL parameter <code>sap-ui-xx-new-adapt-filters</code> takes precedence over this property.
-				 * @experimental
 				 * @private
 				 * @ui5-restricted sap.fe
 				 */

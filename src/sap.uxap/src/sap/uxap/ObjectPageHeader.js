@@ -1000,7 +1000,7 @@ sap.ui.define([
 					oAction.$().css("visibility", "hidden");
 				}
 
-				iWidthSum += oAction.$().outerWidth(true);
+				iWidthSum += oAction.$().outerWidth(true) || 0;
 			}
 		});
 

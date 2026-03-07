@@ -1084,6 +1084,31 @@ sap.ui.define([
 		this.stepInput.detachChange(oChangeSpy);
 	});
 
+	QUnit.test("Formating with group separator", function (assert) {
+		// arrange
+		var oInput = this.stepInput._getInput();
+		var oChangeSpy = sinon.spy();
+		this.stepInput.attachChange(oChangeSpy);
+		this.stepInput.setMax(1000000);
+		this.stepInput.setValue(1000);
+		this.stepInput.setDisplayValuePrecision(0);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val("1,0000").trigger("input");
+		oInput.fireChange({ value: "1,0000" });
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.strictEqual(oChangeSpy.callCount, 1, "Change event fired once for '1,0000'");
+		assert.strictEqual(oInput.getValue(), "10,000", "Input is formatted to '10,000'");
+		assert.strictEqual(this.stepInput.getValue(), 10000, "StepInput numeric value is 10000");
+
+		// cleanup
+		this.stepInput.detachChange(oChangeSpy);
+	});
+
 	QUnit.test("entering a dot('.') as a separator does not clear the entry value", function (assert) {
 		// Prepare
 		var oEvent = {

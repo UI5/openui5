@@ -652,7 +652,7 @@ function(
 			if (!this._bSpinStarted) {
 				// short click, just a single inc/dec button
 				this._bDelayedEventFire = false;
-				this._changeValueWithStep(fMultiplier);
+				this._changeValueWithStep(fMultiplier, true);
 				this._btndown = false;
 				this._changeValue();
 			} else {
@@ -668,13 +668,21 @@ function(
 		 *
 		 * @param {float} fMultiplier Indicates the direction - increment (positive value)
 		 * or decrement (negative value), and multiplier for modifying the value
+		 * @param {boolean} bFromButton Indicates if the change is triggered by button press
 		 * @returns {this} Reference to the control instance for chaining
 		 * @private
 		 */
-		StepInput.prototype._changeValueWithStep = function (fMultiplier) {
+		StepInput.prototype._changeValueWithStep = function (fMultiplier, bFromButton) {
 			var iMultiplier,
 				fNewValue,
 				fDelta;
+
+			// Clear _sTempValue when button is pressed to avoid precision check issues
+			if (bFromButton) {
+				this._sTempValue = undefined;
+			} else {
+				this._sTempValue = this._getInput().getValue();
+			}
 
 			// calculate precision multiplier
 			if (isNaN(this._iValuePrecision)) {
@@ -693,9 +701,12 @@ function(
 			// calculate new value
 			fNewValue = fMultiplier !== 0 ? this._calculateNewValue(fMultiplier) : this._fTempValue;
 
-			// fix value precision
+			// fix value precision (but not when typing with displayValuePrecision=0)
 			if (fMultiplier === 0) {
-				fNewValue = Math.round(fNewValue * iMultiplier) / iMultiplier;
+				// Skip rounding when displayValuePrecision=0 and not from button press (i.e., during typing)
+				if (!(this.getDisplayValuePrecision() === 0 && !bFromButton)) {
+					fNewValue = Math.round(fNewValue * iMultiplier) / iMultiplier;
+				}
 			}
 
 			// save new temp value
@@ -960,24 +971,29 @@ function(
 		 * @private
 		 */
 		StepInput.prototype._checkInputValue = function () {
-			var sInputValue = this._getInput().getValue(),
-				fDelta = 0;
+			let sInputValue = this._getInput().getValue();
+			let	fDelta = 0;
 
 			// check for empty input value, and if so - return the last saved value
 			if (sInputValue === "") {
 				sInputValue = this._getDefaultValue(sInputValue, this._getMax(), this._getMin()).toString();
 			}
 
-			// fix the entered value if the precision is 0; and filter 'e/E' meanwhile
-			if (this.getDisplayValuePrecision() === 0) {
-				sInputValue = Math.round(this._parseNumber(sInputValue.toLowerCase().split('e')[0])).toString();
-			}
+			const sGroupSeparator = this._getNumberFormatter().oFormatOptions.groupingSeparator;
+			sInputValue = sInputValue.replaceAll(sGroupSeparator, "");
 
 			// calculates delta (difference) between input value and real control value
 			if (this._getFormattedValue(this._fTempValue) !== this._getFormattedValue(sInputValue)) {
 				fDelta = this._parseNumber(sInputValue) - this._fTempValue;
 			}
 			return fDelta;
+		};
+
+		StepInput.prototype._verifyValueIfNeeded = function () {
+			if (this._bNeedsVerification) {
+				this._verifyValue();
+				this._bNeedsVerification = false;
+			}
 		};
 
 		/**
@@ -993,7 +1009,8 @@ function(
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
-				this._changeValueWithStep(this.getLargerStep());
+				this._changeValueWithStep(this.getLargerStep(), true);
+				this._verifyValueIfNeeded();
 			}
 		};
 
@@ -1008,7 +1025,8 @@ function(
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
-				this._changeValueWithStep(-this.getLargerStep());
+				this._changeValueWithStep(-this.getLargerStep(), true);
+				this._verifyValueIfNeeded();
 			}
 		};
 
@@ -1021,7 +1039,8 @@ function(
 			if (this.getEditable() && this._isNumericLike(this._getMax()) && !(oEvent.ctrlKey || oEvent.metaKey || oEvent.altKey) && oEvent.shiftKey) {
 				this._bDelayedEventFire = true;
 				this._fTempValue = this._parseNumber(this._getInput().getValue());
-				this._changeValueWithStep(this._getMax() - this._fTempValue);
+				this._changeValueWithStep(this._getMax() - this._fTempValue, true);
+				this._verifyValueIfNeeded();
 			}
 		};
 
@@ -1034,7 +1053,8 @@ function(
 			if (this.getEditable() && this._isNumericLike(this._getMin()) && !(oEvent.ctrlKey || oEvent.metaKey || oEvent.altKey) && oEvent.shiftKey) {
 				this._bDelayedEventFire = true;
 				this._fTempValue = this._parseNumber(this._getInput().getValue());
-				this._changeValueWithStep(-(this._fTempValue - this._getMin()));
+				this._changeValueWithStep(-(this._fTempValue - this._getMin()), true);
+				this._verifyValueIfNeeded();
 			}
 		};
 
@@ -1048,7 +1068,8 @@ function(
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
-				this._changeValueWithStep(1);
+				this._changeValueWithStep(1, true);
+				this._verifyValueIfNeeded();
 				oEvent.setMarked();
 			}
 		};
@@ -1063,7 +1084,8 @@ function(
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
-				this._changeValueWithStep(-1);
+				this._changeValueWithStep(-1, true);
+				this._verifyValueIfNeeded();
 				oEvent.setMarked();
 			}
 		};
@@ -1075,7 +1097,8 @@ function(
 				var oOriginalEvent = oEvent.originalEvent,
 					bDirectionPositive = oOriginalEvent.detail ? (-oOriginalEvent.detail > 0) : (oOriginalEvent.wheelDelta > 0);
 				this._bDelayedEventFire = true;
-				this._changeValueWithStep((bDirectionPositive ? 1 : -1));
+				this._changeValueWithStep((bDirectionPositive ? 1 : -1), true);
+				this._verifyValueIfNeeded();
 			}
 		};
 
@@ -1492,7 +1515,7 @@ function(
 				if (this._btndown) {
 					this._bSpinStarted = true;
 					this._bDelayedEventFire = true;
-					this._changeValueWithStep(bIncrementButton ? 1 : -1);
+					this._changeValueWithStep(bIncrementButton ? 1 : -1, true);
 					this._disableButtons(this._parseNumber(this._getInput().getValue()), this._getMax(), this._getMin());
 					if ((this._getIncrementButton().getEnabled() && bIncrementButton) || (this._getDecrementButton().getEnabled() && !bIncrementButton)) {
 						this._spinValues(bIncrementButton);
@@ -1608,7 +1631,7 @@ function(
 		StepInput.prototype.onfocusout = function ( oEvent ) {
 			if (!this._btndown) {
 				this._changeValueWithStep(0);
-				if (this._bDelayedEventFire && (this._fTempValue) !== this._fOldValue) {
+				if (this._bDelayedEventFire && (this._fTempValue !== this._fOldValue)) {
 					this._bDelayedEventFire = undefined;
 					this._changeValue();
 				}

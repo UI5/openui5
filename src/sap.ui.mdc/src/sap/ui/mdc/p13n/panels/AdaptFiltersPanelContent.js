@@ -75,7 +75,7 @@ sap.ui.define([
 
 	AdaptFiltersPanelContent.prototype.setP13nData = function(aP13nData) {
 		aP13nData = this._enhanceP13nData(aP13nData);
-		this._getP13nModel().setProperty("/items", aP13nData);
+		this._getP13nModel().setProperty("/items", aP13nData, null, true);
 		this._bindList();
 		this._updateAddFilterVisibility();
 		return this;
@@ -886,8 +886,8 @@ sap.ui.define([
 
 		const aItems = this._getP13nModel().getProperty("/items");
 		this._sortItems(aItems);
-		this._getP13nModel().setProperty("/items", aItems);
-		this._getP13nModel().checkUpdate(true);
+		this._getP13nModel().setProperty("/items", aItems, null, true);
+		this._getP13nModel().checkUpdate(true, true);
 	};
 
 	AdaptFiltersPanelContent.prototype._updateFocus = function(oRow) {
@@ -943,8 +943,8 @@ sap.ui.define([
 			oItem.position = iIndex;
 		});
 
-		this._getP13nModel().setProperty("/items", aItems);
-		this._getP13nModel().checkUpdate(true);
+		this._getP13nModel().setProperty("/items", aItems, null, true);
+		this._getP13nModel().checkUpdate(true, true);
 		this.fireChange({
 			reason: this.CHANGE_REASON_REORDER,
 			item: oItem
@@ -988,8 +988,8 @@ sap.ui.define([
 			aItems.splice(iLastIndex + 1, 0, oNewItem);
 			this._updateAddFilterVisibility();
 
-			this._getP13nModel().setProperty("/items", aItems);
-			this._getP13nModel().checkUpdate(true);
+			this._getP13nModel().setProperty("/items", aItems, null, true);
+			this._getP13nModel().checkUpdate(true, true);
 			this.fireChange({
 				reason: this.CHANGE_REASON_ADD,
 				item: this.getP13nData().find((oItem) => oItem.name === sNewKey)
@@ -1031,7 +1031,7 @@ sap.ui.define([
 		}
 
 		aData[iIndex][this.PRESENCE_ATTRIBUTE] = bAdd;
-		this._getP13nModel().setProperty("/items", aData);
+		this._getP13nModel().setProperty("/items", aData, null, true);
 	};
 
 	AdaptFiltersPanelContent.prototype._updatePosition = function(sKey, bVisible) {
@@ -1048,7 +1048,7 @@ sap.ui.define([
 		}
 
 		oItem.position = iPosition;
-		this._getP13nModel().setProperty("/items", aData);
+		this._getP13nModel().setProperty("/items", aData, null, true);
 	};
 
 	AdaptFiltersPanelContent.prototype._updateVisibleInDialog = function(sKey, bVisible) {
@@ -1059,7 +1059,7 @@ sap.ui.define([
 		}
 
 		aData[iIndex].visibleInDialog = bVisible;
-		this._getP13nModel().setProperty("/items", aData);
+		this._getP13nModel().setProperty("/items", aData, null, true);
 	};
 
 	AdaptFiltersPanelContent.prototype._updateFilteredState = function(sKey, bIsFiltered) {
@@ -1070,7 +1070,7 @@ sap.ui.define([
 		}
 
 		oItem.isFiltered = bIsFiltered;
-		this._getP13nModel().setProperty("/items", aData);
+		this._getP13nModel().setProperty("/items", aData, null, true);
 	};
 
 	AdaptFiltersPanelContent.prototype._removeFilteredState = function(sKey, oContext) {
@@ -1080,8 +1080,7 @@ sap.ui.define([
 			return;
 		}
 		aData[iIndex].isFiltered = false;
-
-		this._getP13nModel().setProperty("/items", aData);
+		this._getP13nModel().setProperty("/items", aData, null, true);
 
 		if (oContext) {
 			const oFilterField = this._getFilterFieldFromItem(oContext);

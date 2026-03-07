@@ -26,7 +26,6 @@ sap.ui.define([
 			properties: {
 				/**
 				 * Whether to use the new UI for AdaptFiltersPanel
-				 * @experimental
 				 * @private
 				 * @ui5-restricted sap.ui.mdc
 				 */
