@@ -23,5 +23,15 @@
         "text": " sap.uxap.ObjectPageSubSection: fix wrapping titles"
       }
     ]
+  },
+  "1.142.6": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "23ab8506c6eaa8fbe53a22f32d12b1af17172cca",
+        "type": "FIX",
+        "text": " sap.uxap.AnchorBar: Enable upperCaseAnchorBar property for Horizon theme"
+      }
+    ]
   }
 }

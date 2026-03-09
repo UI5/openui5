@@ -18,5 +18,15 @@
         "text": " sap.ui.unified.Calendar: fix unstable test"
       }
     ]
+  },
+  "1.142.6": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "68fd89b1ddc0f9d037532a038a2d507f02f40824",
+        "type": "FIX",
+        "text": " sap.ui.unified.RecurrenceUtils: Comparison of UTC dates."
+      }
+    ]
   }
 }

@@ -303,5 +303,25 @@
         "text": " sap.m.PlanningCalendarHeader: Correct reserved slot calculation"
       }
     ]
+  },
+  "1.142.6": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "3999eba2fdac0b8c6505ebe67b3babc05b4993ea",
+        "type": "FIX",
+        "text": " We've now fixed a jump issue in the header container by using an outline instead of a border"
+      },
+      {
+        "id": "3a7ef55b95e544b37f85a4373250ca5ff1fa1b87",
+        "type": "FIX",
+        "text": " sap.m.Input: resolve iPad Safari rendering issue"
+      },
+      {
+        "id": "5873c8fe1a5a274224489d75a39b908c569c0626",
+        "type": "FIX",
+        "text": " core/Control: Improve focus restoration for busy indicator"
+      }
+    ]
   }
 }

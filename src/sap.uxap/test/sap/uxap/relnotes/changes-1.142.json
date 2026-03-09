@@ -68,5 +68,25 @@
         "text": " sap.uxap.ObjectPageSubSection: Form layout corruption on phone size fixed"
       }
     ]
+  },
+  "1.142.6": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "5ffcdb999c0f33767cb0d0cd5441ec8c4919899f",
+        "type": "FIX",
+        "text": " ObjectPageLayout: prevent endless loop in ResizeHandler callbacks"
+      },
+      {
+        "id": "73c42e65609e57b18aa19ed4ef7c071d4b081487",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: fix wrong aria-labelledBy id references"
+      },
+      {
+        "id": "b481be928e64ab5f2fc042fdd434d0c3d4aaa950",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Ensure subsection visibility is tracked correctly"
+      }
+    ]
   }
 }

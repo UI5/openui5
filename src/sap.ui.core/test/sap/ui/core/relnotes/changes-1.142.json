@@ -143,5 +143,20 @@
         "text": " Make the experimental new bootstrap the productive one"
       }
     ]
+  },
+  "1.142.6": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "c446ad9ad6bb2d56c79815cd11288bc6fab55d65",
+        "type": "FIX",
+        "text": " OPA: Fix _promiseWaiter handling of null executors"
+      },
+      {
+        "id": "5873c8fe1a5a274224489d75a39b908c569c0626",
+        "type": "FIX",
+        "text": " core/Control: Improve focus restoration for busy indicator"
+      }
+    ]
   }
 }
