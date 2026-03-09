@@ -74,13 +74,13 @@ sap.ui.define([
 				oFlexBundle.changes = oFlexBundle.changes.concat(oFlexBundle.compVariants);
 				delete oFlexBundle.compVariants;
 				oFlexData = oFlexBundle;
-			}
-
-			const oChangesBundle = getBundle(sComponentName, "changes-bundle");
-			if (oChangesBundle) {
-				oFlexData = {
-					changes: oChangesBundle
-				};
+			} else {
+				const oChangesBundle = getBundle(sComponentName, "changes-bundle");
+				if (oChangesBundle) {
+					oFlexData = {
+						changes: oChangesBundle
+					};
+				}
 			}
 
 			if (StorageUtils.isStorageResponseFilled(oFlexData)) {

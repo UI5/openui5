@@ -95,6 +95,19 @@ sap.ui.define([
 			});
 		});
 
+		QUnit.test("given a flexibility-bundle and a changes-bundle", async function(assert) {
+			sap.ui.require.preload({
+				"test/app4/changes/flexibility-bundle.json": '{"changes":[{"bundle":"flex"}],"compVariants":[]}'
+			});
+			sap.ui.require.preload({
+				"test/app4/changes/changes-bundle.json": '[{"bundle":"changes"}]'
+			});
+
+			const oResult = await StaticFileConnector.loadFlexData({ reference: "test.app4" });
+			assert.strictEqual(oResult.changes.length, 1, "one change was loaded");
+			assert.strictEqual(oResult.changes[0].bundle, "flex", "the flexibility-bundle is correctly loaded");
+		});
+
 		QUnit.test("given debug is enabled", function(assert) {
 			sandbox.stub(Supportability, "isDebugModeEnabled").returns(true);
 			var loadResourceStub = sandbox.stub(LoaderExtensions, "loadResource");
