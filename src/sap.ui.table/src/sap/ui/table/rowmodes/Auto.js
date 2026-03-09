@@ -122,30 +122,17 @@ sap.ui.define([
 	AutoRowMode.prototype.init = function() {
 		RowMode.prototype.init.apply(this, arguments);
 
-		_private(this).iPendingStartTableUpdateSignals = 0;
-		_private(this).bRowCountAutoAdjustmentActive = false;
+		_private(this).iRowCountAdjustmentIntervalId = null;
 		_private(this).iLastAvailableSpace = 0;
 		_private(this).rowCount = -1;
 
 		/*
-		 * Flag indicating whether the table is a CSS flex item.
-		 *   - The parent of the table has the style "display: flex"
-		 *
-		 * Do not use for rendering! It is set/updated asynchronously after rendering.
+		 * Flag indicating whether the table is a CSS flex item. It is a flex item if the parent of the table has the style "display: flex".
+		 * The value is initialized and updated asynchronously after rendering.
 		 *
 		 * @type {boolean}
 		 */
 		_private(this).bTableIsFlexItem = false;
-
-		/**
-		 * Asynchronously calculates and applies the row count based on the available vertical space.
-		 *
-		 * @param {sap.ui.table.utils.TableUtils.RowsUpdateReason} sReason The reason for updating the rows.
-		 * @param {boolean} [bStartAutomaticAdjustment=false] Whether to start automatic row count adjustment by attaching a resize handler after
-		 * adjusting the row count.
-		 * @private
-		 */
-		_private(this).adjustRowCountToAvailableSpaceAsync = TableUtils.throttleFrameWise(this.adjustRowCountToAvailableSpace.bind(this));
 	};
 
 	AutoRowMode.prototype.attachEvents = function() {
@@ -160,19 +147,19 @@ sap.ui.define([
 
 	AutoRowMode.prototype.cancelAsyncOperations = function() {
 		RowMode.prototype.cancelAsyncOperations.apply(this, arguments);
-		this.stopAutoRowMode();
+		clearInterval(_private(this).iRowCountAdjustmentIntervalId);
+		_private(this).iRowCountAdjustmentIntervalId = null;
+		this.adjustRowCountToAvailableSpace.cancel();
 	};
 
 	AutoRowMode.prototype.registerHooks = function() {
 		RowMode.prototype.registerHooks.apply(this, arguments);
 		TableUtils.Hook.register(this.getTable(), TableUtils.Hook.Keys.Table.RefreshRows, this._onTableRefreshRows, this);
-		TableUtils.Hook.register(this.getTable(), TableUtils.Hook.Keys.Table.UpdateSizes, this._onUpdateTableSizes, this);
 	};
 
 	AutoRowMode.prototype.deregisterHooks = function() {
 		RowMode.prototype.deregisterHooks.apply(this, arguments);
 		TableUtils.Hook.deregister(this.getTable(), TableUtils.Hook.Keys.Table.RefreshRows, this._onTableRefreshRows, this);
-		TableUtils.Hook.deregister(this.getTable(), TableUtils.Hook.Keys.Table.UpdateSizes, this._onUpdateTableSizes, this);
 	};
 
 	AutoRowMode.prototype.getFixedTopRowCount = function() {
@@ -406,128 +393,15 @@ sap.ui.define([
 	};
 
 	/**
-	 * Starts the automatic row count adjustment if not already running. An initial row count adjustment is done when started. Afterwards, the row
-	 * count is adjusted on resize.
-	 * The row count is calculated based on the available vertical space.
-	 *
-	 * @private
-	 */
-	AutoRowMode.prototype.startAutoRowMode = function() {
-		if (!_private(this).bRowCountAutoAdjustmentActive) {
-			_private(this).adjustRowCountToAvailableSpaceAsync(TableUtils.RowsUpdateReason.Render, true);
-		}
-	};
-
-	/**
-	 * Stops the automatic row count adjustment.
-	 *
-	 * @private
-	 */
-	AutoRowMode.prototype.stopAutoRowMode = function() {
-		this.deregisterResizeHandler();
-		_private(this).adjustRowCountToAvailableSpaceAsync.cancel();
-		_private(this).bRowCountAutoAdjustmentActive = false;
-		signalEndTableUpdate(this);
-	};
-
-	/**
-	 * Registers a resize handler on the table or the DOM parent of the table.
-	 *
-	 * @param {boolean} [bOnTableParent=false] Whether to register the resize handler on the DOM parent of the table.
-	 * @private
-	 */
-	AutoRowMode.prototype.registerResizeHandler = function(bOnTableParent) {
-		const oTable = this.getTable();
-
-		if (oTable) {
-			TableUtils.registerResizeHandler(oTable, "AutoRowMode", this.onResize.bind(this), null, bOnTableParent === true);
-			TableUtils.registerResizeHandler(oTable, "AutoRowMode-BeforeTable", this.onResize.bind(this), "before");
-			TableUtils.registerResizeHandler(oTable, "AutoRowMode-AfterTable", this.onResize.bind(this), "after");
-			TableUtils.registerResizeHandler(oTable, "AutoRowMode-CreationRowContainer", this.onResize.bind(this), "creationRowContainer");
-		}
-	};
-
-	/**
-	 * Deregisters the resize handler.
-	 *
-	 * @private
-	 */
-	AutoRowMode.prototype.deregisterResizeHandler = function() {
-		const oTable = this.getTable();
-
-		if (oTable) {
-			TableUtils.deregisterResizeHandler(oTable, [
-				"AutoRowMode",
-				"AutoRowMode-BeforeTable",
-				"AutoRowMode-AfterTable",
-				"AutoRowMode-CreationRowContainer"
-			]);
-		}
-	};
-
-	/**
-	 * Resize handler.
-	 *
-	 * @param {jQuery.Event} oEvent The event object.
-	 * @private
-	 */
-	AutoRowMode.prototype.onResize = function(oEvent) {
-		const iOldHeight = oEvent.oldSize.height;
-		const iNewHeight = oEvent.size.height;
-
-		if (iOldHeight !== iNewHeight) {
-			signalStartTableUpdate(this);
-			_private(this).adjustRowCountToAvailableSpaceAsync(TableUtils.RowsUpdateReason.Resize);
-		}
-	};
-
-	/**
-	 * This hook is called when the table layout is updated, for example when resizing.
-	 *
-	 * @param {sap.ui.table.utils.TableUtils.RowsUpdateReason} sReason The reason for updating the table sizes.
-	 * @private
-	 */
-	AutoRowMode.prototype._onUpdateTableSizes = function(sReason) {
-		// Resize and render are handled elsewhere.
-		if (sReason === TableUtils.RowsUpdateReason.Resize || sReason === TableUtils.RowsUpdateReason.Render) {
-			return;
-		}
-
-		if (_private(this).bRowCountAutoAdjustmentActive) {
-			signalStartTableUpdate(this);
-			_private(this).adjustRowCountToAvailableSpaceAsync(sReason);
-		}
-	};
-
-	/**
 	 * Calculates and applies the row count based on the available vertical space.
 	 *
-	 * @param {sap.ui.table.utils.TableUtils.RowsUpdateReason} sReason The reason for updating the rows.
-	 * @param {boolean} [bStartAutomaticAdjustment=false] Whether to start automatic row count adjustment by attaching a resize handler after
-	 * adjusting the row count.
 	 * @private
 	 */
-	AutoRowMode.prototype.adjustRowCountToAvailableSpace = function(sReason, bStartAutomaticAdjustment) {
-		bStartAutomaticAdjustment = bStartAutomaticAdjustment === true;
-
+	AutoRowMode.prototype.adjustRowCountToAvailableSpace = TableUtils.throttleFrameWise(function() {
 		const oTable = this.getTable();
-		const oTableDomRef = oTable ? oTable.getDomRef() : null;
+		const oTableDomRef = oTable.getDomRef();
 
-		if (!oTable || !oTableDomRef || !TableUtils.isThemeApplied()) {
-			signalEndTableUpdate(this);
-			return;
-		}
-
-		_private(this).bTableIsFlexItem = window.getComputedStyle(oTableDomRef.parentNode).display === "flex";
-
-		// If the table is invisible, it might get visible without re-rendering, which is basically the same as a resize.
-		// We need to react on that, but not adjust the row count now.
-		if (oTableDomRef.scrollHeight === 0) {
-			if (bStartAutomaticAdjustment) {
-				this.registerResizeHandler(!_private(this).bTableIsFlexItem);
-				_private(this).bRowCountAutoAdjustmentActive = true;
-			}
-			signalEndTableUpdate(this);
+		if (!oTableDomRef || oTableDomRef.scrollHeight === 0 || !TableUtils.isThemeApplied()) {
 			return;
 		}
 
@@ -536,7 +410,9 @@ sap.ui.define([
 		const iNewRowCount = Math.floor(iNewHeight / getRowHeight(this));
 		const iOldComputedRowCount = this.getComputedRowCounts().count;
 
+		_private(this).bTableIsFlexItem = window.getComputedStyle(oTableDomRef.parentNode).display === "flex";
 		_private(this).rowCount = iNewRowCount;
+
 		const iNewComputedRowCount = this.getComputedRowCounts().count;
 
 		/**
@@ -549,14 +425,7 @@ sap.ui.define([
 		if (iOldComputedRowCount !== iNewComputedRowCount || this.getHideEmptyRows() && iOldConfiguredRowCount !== this.getConfiguredRowCount()) {
 			this.invalidate();
 		}
-
-		if (bStartAutomaticAdjustment) {
-			this.registerResizeHandler(!_private(this).bTableIsFlexItem);
-			_private(this).bRowCountAutoAdjustmentActive = true;
-		}
-
-		signalEndTableUpdate(this);
-	};
+	});
 
 	/**
 	 * Determines the vertical space available for the rows.
@@ -612,7 +481,7 @@ sap.ui.define([
 
 	TableDelegate.onBeforeRendering = function() {
 		if (!this.getParent().getDomRef()) {
-			this.stopAutoRowMode();
+			this.adjustRowCountToAvailableSpace(); // Adjustment is done in an rAF callback
 		}
 	};
 
@@ -621,20 +490,10 @@ sap.ui.define([
 	 * @this sap.ui.table.rowmodes.Auto
 	 */
 	TableDelegate.onAfterRendering = function() {
-		this.startAutoRowMode();
+		_private(this).iRowCountAdjustmentIntervalId ??= setInterval(() => {
+			this.adjustRowCountToAvailableSpace();
+		}, 200);
 	};
-
-	function signalStartTableUpdate(oRowMode) {
-		_private(oRowMode).iPendingStartTableUpdateSignals++;
-		TableUtils.Hook.call(oRowMode.getTable(), TableUtils.Hook.Keys.Signal, "StartTableUpdate");
-	}
-
-	function signalEndTableUpdate(oRowMode) {
-		for (let i = 0; i < _private(oRowMode).iPendingStartTableUpdateSignals; i++) {
-			TableUtils.Hook.call(oRowMode.getTable(), TableUtils.Hook.Keys.Signal, "EndTableUpdate");
-		}
-		_private(oRowMode).iPendingStartTableUpdateSignals = 0;
-	}
 
 	function isRowCountInitial(oRowMode) {
 		return _private(oRowMode).rowCount === -1;

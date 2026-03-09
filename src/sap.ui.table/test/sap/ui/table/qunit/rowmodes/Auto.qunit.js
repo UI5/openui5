@@ -228,6 +228,48 @@ sap.ui.define([
 		assert.equal(this.oTable.getRows().length, 13, "Row count");
 	});
 
+	/** @deprecated As of version 1.120 */
+	QUnit.test("Parent with rerender API version 1", async function(assert) {
+		const ApiVersion1Container = Control.extend("sap.ui.table.test.ApiVersion1Container", {
+			metadata: {
+				aggregations: {
+					table: {type: "sap.ui.table.Table", multiple: false}
+				},
+				properties: {
+					height: {type: "sap.ui.core.CSSSize", defaultValue: "1000px"}
+				}
+			},
+			renderer: {
+				apiVersion: 1,
+				render: function(oRm, oControl) {
+					oRm.write("<div");
+					oRm.writeControlData(oControl);
+					oRm.addStyle("height", oControl.getHeight());
+					oRm.writeStyles();
+					oRm.write(">");
+					oRm.renderControl(oControl.getTable());
+					oRm.write("</div>");
+				}
+			}
+		});
+		const oContainer = new ApiVersion1Container({
+			table: this.oTable
+		});
+
+		oContainer.placeAt("qunit-fixture");
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 13);
+		assert.equal(this.oTable.getRows().length, 13, "Initial rendering");
+
+		oContainer.invalidate();
+		await nextUIUpdate();
+
+		oContainer.setHeight("765px");
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 9);
+		assert.equal(this.oTable.getRows().length, 9, "Resize after rendering new elemnents: Row count is adjusted");
+
+		oContainer.destroy();
+	});
+
 	QUnit.test("Change visibility of the table", async function(assert) {
 		const oTableContainer = document.getElementById("qunit-fixture");
 		const sOriginalContainerHeight = oTableContainer.style.height;
@@ -745,7 +787,14 @@ sap.ui.define([
 			this.resetRowsUpdatedSpy();
 			this.oTable.getRowMode().setRowContentHeight(this.oTable._getDefaultRowHeight() + 20); // The table will show less rows.
 			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
+				TableUtils.RowsUpdateReason.Render, // Invalidation on propery change
+				TableUtils.RowsUpdateReason.Render // Row count adjustment
+			]);
+		}).then(() => {
+			this.resetRowsUpdatedSpy();
+			this.oTable.getRowMode().setRowContentHeight(this.oTable._getDefaultRowHeight() + 21); // Does not change number of rows.
+			return this.checkRowsUpdated(assert, [
+				TableUtils.RowsUpdateReason.Render // Invalidation on propery change
 			]);
 		});
 	}
