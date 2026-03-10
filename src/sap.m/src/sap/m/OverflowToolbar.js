@@ -347,6 +347,10 @@ sap.ui.define([
 		const oOverflowButton = this._getOverflowButton();
 		const oDomRef = this.getDomRef();
 
+		if (!oDomRef) {
+			return;
+		}
+
 		if (!oDomRef.contains(oFocusLostCtrl.getDomRef())) {
 			oOverflowButton?.focus();
 			this._bControlWasFocused = false;
