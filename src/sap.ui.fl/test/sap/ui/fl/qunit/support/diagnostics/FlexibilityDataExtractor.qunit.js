@@ -53,10 +53,12 @@ sap.ui.define([
 				{ changeId: "change2", dependencies: [], user: "JaneSmithsEmail" }
 			];
 
-			const aMockFlexObjectInfos = [
-				{ id: "object1", type: "variant", user: "myEmail1" },
-				{ id: "object2", type: "change", user: "myEmail2" }
-			];
+			const aMockFlexObjectInfos = {
+				allFlexObjects: [
+					FlexObjectFactory.createFlVariant({ id: "object1", user: "myEmail1" }),
+					FlexObjectFactory.createUIChange({ id: "object2", user: "myEmail2" })
+				]
+			};
 
 			oSandbox.stub(SupportAPI, "getChangeDependencies").resolves(aMockChangeDependencies);
 			oSandbox.stub(SupportAPI, "getFlexObjectInfos").resolves(aMockFlexObjectInfos);
@@ -71,7 +73,27 @@ sap.ui.define([
 			assert.strictEqual(oResult.appACH, "CA-UI5-FL", "App ACH is extracted correctly");
 			assert.deepEqual(oResult.flexSettings, this.oMockFlexSettings, "Flex settings are extracted correctly");
 			assert.deepEqual(oResult.changeDependencies, aMockChangeDependencies, "Change dependencies are extracted correctly");
-			assert.deepEqual(oResult.flexObjectInfos, aMockFlexObjectInfos, "Flex object infos are extracted correctly");
+			assert.strictEqual(
+				oResult.flexObjectInfos.allFlexObjects[0].mProperties.supportInformation.user,
+				"myEmail1",
+				"User in flex object infos is not anonymized consistently and data is set correctly in file content"
+			);
+			assert.strictEqual(
+				oResult.flexObjectInfos.allFlexObjects[0].mProperties.author,
+				"myEmail1",
+				"Author in flex object infos is not anonymized consistently and data is set correctly in file content"
+			);
+			assert.strictEqual(
+				oResult.flexObjectInfos.allFlexObjects[1].mProperties.supportInformation.user,
+				"myEmail2",
+				"User in flex object infos is not anonymized consistently and data is set correctly in file content"
+			);
+			// Verify Information needed for supportChromeExtension is included in file content
+			assert.strictEqual(
+				oResult.flexObjectInfos.allFlexObjects.length,
+				oResult.flexObjectInfos.allFlexObjectFileContents.length,
+				"All flex objects have corresponding file content entries"
+			);
 
 			// Verify extraction timestamp
 			assert.ok(oResult.extractionTimeStamp, "Extraction timestamp is set");
@@ -96,12 +118,14 @@ sap.ui.define([
 				}
 			};
 
-			const aMockFlexObjectInfos = [
-				FlexObjectFactory.createFlVariant({ id: "object1", user: "JohnDoesEmail" }),
-				FlexObjectFactory.createFlVariant({ id: "object2", user: "JohnDoesEmail" }),
-				FlexObjectFactory.createFlVariant({ id: "object3", user: "OtherUser" }),
-				FlexObjectFactory.createUIChange({ id: "object2", user: "TestersEmail" })
-			];
+			const aMockFlexObjectInfos = {
+				allFlexObjects: [
+					FlexObjectFactory.createFlVariant({ id: "object1", user: "JohnDoesEmail" }),
+					FlexObjectFactory.createFlVariant({ id: "object2", user: "JohnDoesEmail" }),
+					FlexObjectFactory.createFlVariant({ id: "object3", user: "OtherUser" }),
+					FlexObjectFactory.createUIChange({ id: "object2", user: "TestersEmail" })
+				]
+			};
 
 			oSandbox.stub(SupportAPI, "getChangeDependencies").resolves(oMockChangeDependencies);
 			oSandbox.stub(SupportAPI, "getFlexObjectInfos").resolves(aMockFlexObjectInfos);
@@ -124,42 +148,42 @@ sap.ui.define([
 			);
 			assert.strictEqual(
 				oResult.changeDependencies.mChangesEntries.change2.user,
-				"USER_2",
+				"USER_4",
 				"Different user gets different anonymized value"
 			);
 			assert.strictEqual(
-				oResult.flexObjectInfos[0].mProperties.supportInformation.user,
+				oResult.flexObjectInfos.allFlexObjects[0].mProperties.supportInformation.user,
 				"USER_1",
 				"User in flex object infos is anonymized consistently"
 			);
 			assert.strictEqual(
-				oResult.flexObjectInfos[0].mProperties.author,
+				oResult.flexObjectInfos.allFlexObjects[0].mProperties.author,
 				"USER_1",
 				"Author in flex object infos is anonymized consistently"
 			);
 			assert.strictEqual(
-				oResult.flexObjectInfos[1].mProperties.supportInformation.user,
+				oResult.flexObjectInfos.allFlexObjects[1].mProperties.supportInformation.user,
 				"USER_1",
 				"User in flex object infos is anonymized consistently"
 			);
 			assert.strictEqual(
-				oResult.flexObjectInfos[1].mProperties.author,
+				oResult.flexObjectInfos.allFlexObjects[1].mProperties.author,
 				"USER_1",
 				"Author in flex object infos is anonymized consistently"
 			);
 			assert.strictEqual(
-				oResult.flexObjectInfos[2].mProperties.supportInformation.user,
-				"USER_3",
+				oResult.flexObjectInfos.allFlexObjects[2].mProperties.supportInformation.user,
+				"USER_2",
 				"Different user in flex object infos gets different anonymized value"
 			);
 			assert.strictEqual(
-				oResult.flexObjectInfos[2].mProperties.author,
-				"USER_3",
+				oResult.flexObjectInfos.allFlexObjects[2].mProperties.author,
+				"USER_2",
 				"Author in flex object infos is anonymized consistently"
 			);
 			assert.strictEqual(
-				oResult.flexObjectInfos[3].mProperties.supportInformation.user,
-				"USER_4",
+				oResult.flexObjectInfos.allFlexObjects[3].mProperties.supportInformation.user,
+				"USER_3",
 				"Different user in flex object infos gets different anonymized value"
 			);
 
@@ -184,9 +208,11 @@ sap.ui.define([
 					change1: oChange1.convertToFileContent()
 				}
 			};
-			const aMockFlexObjectInfos = [
-				oChange1
-			];
+			const aMockFlexObjectInfos = {
+				allFlexObjects: [
+					oChange1
+				]
+			};
 
 			// Change dependencies and flex object infos share same object reference
 			// Anonymization must not touch the same object reference twice
@@ -200,7 +226,7 @@ sap.ui.define([
 				"User in dependencies is anonymized consistently"
 			);
 			assert.strictEqual(
-				oResult.flexObjectInfos[0].mProperties.supportInformation.user,
+				oResult.flexObjectInfos.allFlexObjects[0].mProperties.supportInformation.user,
 				"USER_1",
 				"User in flex object infos is anonymized consistently"
 			);

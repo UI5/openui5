@@ -69,7 +69,7 @@ sap.ui.define([
 
 			ShortcutHintsMixin.addConfig(oBtn, {
 					addAccessibilityLabel: true,
-					messageBundleKey: Device.os.macintosh ? "mdc.PERSONALIZATION_SHORTCUT_MAC" : "mdc.PERSONALIZATION_SHORTCUT" // Cmd+, or Ctrl+,
+					shortcut: "Ctrl+,"
 				}, aEventInfo[1] // we need the table instance, otherwise the messageBundleKey does not find the resource bundle
 			);
 
@@ -136,8 +136,7 @@ sap.ui.define([
 
 			ShortcutHintsMixin.addConfig(oMenuButton._getButtonControl(), {
 				addAccessibilityLabel: true,
-				// Cmd+Shift+E or Ctrl+Shift+E
-				messageBundleKey: Device.os.macintosh ? "table.SHORTCUT_EXPORT_TO_EXCEL_MAC" : "table.SHORTCUT_EXPORT_TO_EXCEL"
+				shortcut: "Ctrl+Shift+E"
 			}, mEventInfo.exportAs[1]); // we need the table instance, otherwise the messageBundleKey does not find the resource bundle
 
 			return oMenuButton;

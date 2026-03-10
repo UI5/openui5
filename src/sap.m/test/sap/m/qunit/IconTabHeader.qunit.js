@@ -1484,4 +1484,59 @@ sap.ui.define([
 
 		oScrollContainer.destroy();
 	});
+
+	QUnit.test("Overflow button remains focusable after switching from start to end", async function(assert) {
+		const oITH = new IconTabHeader({
+			tabsOverflowMode: TabsOverflowMode.StartAndEnd,
+			items: [
+				new IconTabFilter({ text: "Section1", key: "section1" }),
+				new IconTabFilter({ text: "Section2", key: "section2" }),
+				new IconTabFilter({ text: "Section3", key: "section3" }),
+				new IconTabFilter({ text: "Section4", key: "section4" }),
+				new IconTabFilter({ text: "Section5", key: "section5" }),
+				new IconTabFilter({ text: "Section6", key: "section6" }),
+				new IconTabFilter({ text: "Section7", key: "section7" }),
+				new IconTabFilter({ text: "Section8", key: "section8" }),
+				new IconTabFilter({ text: "Section9", key: "section9" }),
+				new IconTabFilter({ text: "Section10", key: "section10" })
+			]
+		});
+
+		const oScrollContainer = new ScrollContainer({
+			width: "400px",
+			content: oITH
+		});
+
+		oScrollContainer.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		const oLastTab = oITH.getItems()[9];
+		oITH.setSelectedItem(oLastTab);
+		await nextUIUpdate();
+
+		assert.ok(oITH._getStartOverflow().$().hasClass("sapMITHOverflowVisible"), "start overflow button (+X on left) is visible after selecting last section");
+		assert.notOk(oITH._getOverflow().$().hasClass("sapMITHOverflowVisible"), "end overflow button is hidden");
+
+		oITH.setSelectedKey("section2");
+
+		assert.notOk(oITH._getStartOverflow().$().hasClass("sapMITHOverflowVisible"), "start overflow button is now hidden");
+		assert.ok(oITH._getOverflow().$().hasClass("sapMITHOverflowVisible"), "end overflow button (+X on right) is now visible");
+
+		const oEndOverflowDomRef = oITH._getOverflow().getFocusDomRef();
+		const aItemDomRefs = oITH._oItemNavigation.getItemDomRefs();
+
+		const iLastIndex = aItemDomRefs.length - 1;
+		const oLastItemDomRef = aItemDomRefs[iLastIndex];
+		assert.strictEqual(oLastItemDomRef, oEndOverflowDomRef, "end overflow button is the last item in ItemNavigation (reachable via right arrow key)");
+
+		oITH.getItems()[2].getDomRef().focus();
+		assert.strictEqual(document.activeElement, oITH.getItems()[2].getDomRef(), "first tab is focused");
+
+		QUnitUtils.triggerKeydown(document.activeElement, KeyCodes.ARROW_RIGHT);
+		await nextUIUpdate();
+
+		assert.strictEqual(document.activeElement, oEndOverflowDomRef, "end overflow button receives focus when navigating with arrow keys");
+
+		oScrollContainer.destroy();
+	});
 });

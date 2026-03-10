@@ -964,6 +964,35 @@ sap.ui.define([
 		oHeader = null;
 	});
 
+	QUnit.test("_setHeaderText when the days are 31", async function(assert) {
+		//arrange
+		var oCalendarDateInterval = 	new CalendarDateInterval("cal", {
+										width: '100%',
+										days: 31,
+										startDate: UI5Date.getInstance("2026", "0", "1"), // January 2026
+										pickerPopup: true,
+										showDayNamesLine: true,
+										showWeekNumbers: true,
+										primaryCalendarType: CalendarType.Gregorian
+									}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		//act
+		// got to December 2025
+		qutils.triggerEvent("click", "cal--Head-prev");
+		await nextUIUpdate();
+		// set (click) on 5 of December 2025
+		oCalendarDateInterval._setHeaderText(new CalendarDate(2025, 11, 5));
+		await nextUIUpdate();
+
+		//assert
+		assert.strictEqual(jQuery("#cal--Head-B1").text(), "December 2025", "button text is correct");
+
+		//clean
+		oCalendarDateInterval.destroy();
+		oCalendarDateInterval = null;
+	});
+
 	QUnit.test("special days", async function(assert) {
 		// Arrange
 		this.oCal.setStartDate(UI5Date.getInstance("2015", "0", "31"));

@@ -449,6 +449,26 @@ sap.ui.define([
 	};
 
 	/**
+	 * Pre-processes a <code>ObjectPageSubSection</code> block before inserting it in the internal grid.
+	 * The block would return the <code>ObjectPageSubSection</code> as its parent, rather than its real parent (the internal grid).
+	 * This way, it looks like the <code>ObjectPageSubSection</code> aggregates the blocks.
+	 * @param {sap.ui.core.Control} oBlock
+	 * @param {string} sParentAggregationName
+	 * @private
+	 */
+	ObjectPageSubSection.prototype._preProcessBlock = function (oBlock, sParentAggregationName) {
+		if (isFunction(oBlock._fnOriginalGetParent)) {
+			return;
+		}
+
+		oBlock._fnOriginalGetParent = oBlock.getParent;
+		oBlock.getParent = this._fnActionSubstituteParentFunction;
+
+		oBlock._sOriginalParentAggregationName = oBlock.sParentAggregationName;
+		oBlock.sParentAggregationName = sParentAggregationName;
+	};
+
+	/**
 	 * Post-processes a <code>ObjectPageSubSection</code> action before removing it from the aggregation, so it returns its real parent (the <code>OverflowToolbar</code>),
 	 * thus allowing proper processing by the framework.
 	 * @param {sap.ui.core.Control} oAction
@@ -469,6 +489,27 @@ sap.ui.define([
 
 		oAction.sParentAggregationName = oAction._sOriginalParentAggregationName;
 		oAction._sOriginalParentAggregationName = null;
+	};
+
+	/**
+	 * Post-processes a <code>ObjectPageSubSection</code> block before removing it from the internal grid, so it returns its real parent (the internal grid),
+	 * thus allowing proper processing by the framework.
+	 * @param {sap.ui.core.Control} oBlock
+	 * @private
+	 */
+	ObjectPageSubSection.prototype._postProcessBlock = function (oBlock) {
+		if (!isFunction(oBlock._fnOriginalGetParent)) {
+			return;
+		}
+
+		// The runtime adaptation tipically removes and then adds aggregations multiple times.
+		// That is why we need to make sure that the controls are in their previous state
+		// when preprocessed. Otherwise the wrong parent aggregation name is passed
+		oBlock.getParent = oBlock._fnOriginalGetParent;
+		oBlock._fnOriginalGetParent = null;
+
+		oBlock.sParentAggregationName = oBlock._sOriginalParentAggregationName;
+		oBlock._sOriginalParentAggregationName = null;
 	};
 
 	function isFunction(oObject) {
@@ -1277,7 +1318,7 @@ sap.ui.define([
 			properties: ["visible"]
 		});
 		if (this._shouldForwardAggregationToGrid(sAggregationName)) {
-			this._addBlockToGrid(oBlock, bSuppressInvalidate);
+			this._addBlockToGrid(oBlock, sAggregationName, bSuppressInvalidate);
 		}
 	};
 
@@ -1286,10 +1327,11 @@ sap.ui.define([
 			|| (sAggregationName === "moreBlocks" && this.getMode() === ObjectPageSubSectionMode.Expanded));
 	};
 
-	ObjectPageSubSection.prototype._addBlockToGrid = function (oBlock, bSuppressInvalidate) {
+	ObjectPageSubSection.prototype._addBlockToGrid = function (oBlock, sAggregationName, bSuppressInvalidate) {
 		var oGrid = this._getGrid();
 		if (oGrid?.indexOfContent(oBlock) < 0) { // add only if not already added (to preserve the ordering of the blocks)
 			oGrid?.addAggregation("content", oBlock, bSuppressInvalidate);
+			this._preProcessBlock(oBlock, sAggregationName);
 		}
 	};
 
@@ -1307,6 +1349,7 @@ sap.ui.define([
 		var oGrid = this._getGrid();
 		if (oGrid?.indexOfContent(oBlock) > -1) {
 			oGrid?.removeAggregation("content", oBlock, bSuppressInvalidate);
+			this._postProcessBlock(oBlock);
 		}
 	};
 
@@ -1391,8 +1434,9 @@ sap.ui.define([
 	ObjectPageSubSection.prototype.destroyAggregation = function (sAggregationName) {
 		if (this.hasProxy(sAggregationName)) {
 			this._getAggregation(sAggregationName).forEach(function (object) {
+				this._onRemoveBlock(object);
 				object.destroy();
-			});
+			}.bind(this));
 
 			this._setAggregation(sAggregationName, []);
 
@@ -1494,7 +1538,7 @@ sap.ui.define([
 			this._getSeeMoreButton().setVisible(false);
 			this._oCurrentlyVisibleSeeMoreLessButton = this._getSeeLessButton().setVisible(true);
 			this.getMoreBlocks().forEach(function(oBlock) {
-				this._addBlockToGrid(oBlock);
+				this._addBlockToGrid(oBlock, "moreBlocks");
 			}, this);
 		}
 	};
@@ -1554,6 +1598,20 @@ sap.ui.define([
 		});
 
 		return iVisibleBlocks;
+	};
+
+	/**
+	 * Handles LayoutDataChange events from blocks and delegates them to the internal Grid.
+	 * This is necessary because blocks report ObjectPageSubSection as their parent (via getParent override),
+	 * but the Grid is the actual layout container that needs to be notified of layout data changes.
+	 * @param {jQuery.Event} oEvent The LayoutDataChange event
+	 * @private
+	 */
+	ObjectPageSubSection.prototype.onLayoutDataChange = function(oEvent) {
+		var oGrid = this._getGrid();
+		if (oGrid && oGrid.onLayoutDataChange) {
+			oGrid.onLayoutDataChange(oEvent);
+		}
 	};
 
 	return ObjectPageSubSection;

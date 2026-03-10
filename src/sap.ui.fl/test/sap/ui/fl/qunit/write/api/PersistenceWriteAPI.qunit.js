@@ -15,6 +15,7 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/condenser/Condenser",
 	"sap/ui/fl/write/_internal/connectors/KeyUserConnector",
 	"sap/ui/fl/write/_internal/flexState/changes/UIChangeManager",
+	"sap/ui/fl/write/_internal/flexState/compVariants/CompVariantManager",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/api/FeaturesAPI",
@@ -38,6 +39,7 @@ sap.ui.define([
 	Condenser,
 	KeyUserConnector,
 	UIChangeManager,
+	CompVariantManager,
 	FlexObjectManager,
 	Storage,
 	FeaturesAPI,
@@ -138,7 +140,7 @@ sap.ui.define([
 				sandbox.stub(Utils, "getAppComponentForControl").returns(this.oAppComponent);
 
 				await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, { changes: testSetup.persistencyChanges });
-				const oVMSFilterStub = sandbox.stub(FlexObjectManager, "filterHiddenFlexObjects").callsFake((aFlexObjects) => {
+				const oVMSFilterStub = sandbox.stub(CompVariantManager, "filterHiddenFlexObjects").callsFake((aFlexObjects) => {
 					return testSetup.filterVariants ? [] : aFlexObjects;
 				});
 

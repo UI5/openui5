@@ -383,14 +383,13 @@ sap.ui.define([
 		const sText = coreLib.getResourceBundleFor("sap.m").getText("COPYPROVIDER_COPY");
 		const fnShortcutHintsMixinSpy = sinon.spy(ShortcutHintsMixin, "addConfig");
 		const oCopyButton = this.oCopyProvider.getCopyButton();
-		const oBundle = coreLib.getResourceBundleFor("sap.m");
 		assert.equal(oCopyButton.getTooltip(), sText, "Copy Button Tooltip");
 		assert.equal(oCopyButton.getText(), sText, "Copy Button Text");
 		setTimeout(() => {
 			assert.ok(ShortcutHintsMixin.isControlRegistered(oCopyButton.getId()), "ShortcutHintsMixin is registered for the Copy Button");
 			assert.ok(fnShortcutHintsMixinSpy.calledWithExactly(
 				this.oCopyProvider.getCopyButton(),
-				sinon.match({ message: oBundle.getText(Device.os.macintosh ? "COPYPROVIDER_SHORTCUT_MAC" : "COPYPROVIDER_SHORTCUT_WIN") }),
+				sinon.match({ shortcut: "Ctrl+C" }),
 				this.oCopyProvider.getParent()
 			), "ShortcutHintsMixin config of the Copy Button is correct");
 			fnShortcutHintsMixinSpy.restore();

@@ -282,7 +282,7 @@ sap.ui.define(["./PluginBase", "sap/base/Log", "sap/base/strings/formatMessage",
 			sap.ui.require(["sap/ui/core/ShortcutHintsMixin"], (ShortcutHintsMixin) => {
 				if (this._oCopyButton) { // Button might be destroyed in the meantime, esp. in tests
 					ShortcutHintsMixin.addConfig(this._oCopyButton, {
-						message: oBundle.getText(Device.os.macintosh ? "COPYPROVIDER_SHORTCUT_MAC" : "COPYPROVIDER_SHORTCUT_WIN")
+						shortcut: "Ctrl+C" // ShortcutHintMixin takes care of normalizing and localizing
 					}, this.getParent());
 				}
 			});

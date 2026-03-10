@@ -2768,4 +2768,362 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oSubSection.destroy();
 	});
 
+	QUnit.module("ObjectPageSubSection's aggregations - Parent-Child Relationship");
+
+	QUnit.test("Block controls return ObjectPageSubSection as parent, not internal Grid", async function (assert) {
+		// Arrange
+		var oBlock1 = oHelpers.getBlock(),
+			oBlock2 = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			});
+
+		oSubSection.addBlock(oBlock1);
+		oSubSection.addBlock(oBlock2);
+
+		// Act: render the ObjectPageLayout so blocks are added to internal Grid
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// Assert: blocks should return ObjectPageSubSection as parent, not the internal Grid
+		assert.strictEqual(oBlock1.getParent(), oSubSection, "Block 1 returns ObjectPageSubSection as parent");
+		assert.strictEqual(oBlock2.getParent(), oSubSection, "Block 2 returns ObjectPageSubSection as parent");
+
+		// Assert: blocks should have correct parent aggregation name
+		assert.strictEqual(oBlock1.sParentAggregationName, "blocks", "Block 1 has correct parent aggregation name");
+		assert.strictEqual(oBlock2.sParentAggregationName, "blocks", "Block 2 has correct parent aggregation name");
+
+		// Cleanup
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("MoreBlock controls return ObjectPageSubSection as parent, not internal Grid", async function (assert) {
+		// Arrange
+		var oMoreBlock1 = oHelpers.getBlock(),
+			oMoreBlock2 = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			});
+
+		oSubSection.addMoreBlock(oMoreBlock1);
+		oSubSection.addMoreBlock(oMoreBlock2);
+		oSubSection.setMode(library.ObjectPageSubSectionMode.Expanded);
+
+		// Act: render the ObjectPageLayout so moreBlocks are added to internal Grid
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// Assert: moreBlocks should return ObjectPageSubSection as parent, not the internal Grid
+		assert.strictEqual(oMoreBlock1.getParent(), oSubSection, "MoreBlock 1 returns ObjectPageSubSection as parent");
+		assert.strictEqual(oMoreBlock2.getParent(), oSubSection, "MoreBlock 2 returns ObjectPageSubSection as parent");
+
+		// Assert: moreBlocks should have correct parent aggregation name
+		assert.strictEqual(oMoreBlock1.sParentAggregationName, "moreBlocks", "MoreBlock 1 has correct parent aggregation name");
+		assert.strictEqual(oMoreBlock2.sParentAggregationName, "moreBlocks", "MoreBlock 2 has correct parent aggregation name");
+
+		// Cleanup
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("Block parent is correctly restored when removed from blocks aggregation", async function (assert) {
+		// Arrange
+		var oBlock = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			});
+
+		oSubSection.addBlock(oBlock);
+
+		// Act: render the ObjectPageLayout so block is added to internal Grid
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// Assert: block returns ObjectPageSubSection as parent
+		assert.strictEqual(oBlock.getParent(), oSubSection, "Block returns ObjectPageSubSection as parent after adding");
+
+		// Act: remove block
+		oSubSection.removeBlock(oBlock);
+
+		// Assert: block should no longer have the modified parent relationship
+		assert.ok(!oBlock._fnOriginalGetParent, "Block no longer has _fnOriginalGetParent after removal");
+		assert.ok(!oBlock._sOriginalParentAggregationName, "Block no longer has _sOriginalParentAggregationName after removal");
+
+		// Cleanup
+		oBlock.destroy();
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("Block parent is correctly restored when removed from moreBlocks aggregation", async function (assert) {
+		// Arrange
+		var oMoreBlock = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			});
+
+		oSubSection.setMode(library.ObjectPageSubSectionMode.Expanded);
+		oSubSection.addMoreBlock(oMoreBlock);
+
+		// Act: render the ObjectPageLayout so moreBlock is added to internal Grid
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// Assert: moreBlock returns ObjectPageSubSection as parent
+		assert.strictEqual(oMoreBlock.getParent(), oSubSection, "MoreBlock returns ObjectPageSubSection as parent after adding");
+
+		// Act: remove moreBlock
+		oSubSection.removeMoreBlock(oMoreBlock);
+
+		// Assert: moreBlock should no longer have the modified parent relationship
+		assert.ok(!oMoreBlock._fnOriginalGetParent, "MoreBlock no longer has _fnOriginalGetParent after removal");
+		assert.ok(!oMoreBlock._sOriginalParentAggregationName, "MoreBlock no longer has _sOriginalParentAggregationName after removal");
+
+		// Cleanup
+		oMoreBlock.destroy();
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("Block is removed from internal Grid when destroyBlocks is called", async function (assert) {
+		// Arrange
+		var oBlock1 = oHelpers.getBlock(),
+			oBlock2 = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			}),
+			oGrid;
+
+		oSubSection.addBlock(oBlock1);
+		oSubSection.addBlock(oBlock2);
+
+		// Act: render the ObjectPageLayout so blocks are added to internal Grid
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		oGrid = oSubSection._getGrid();
+
+		// Assert: blocks are in the internal Grid
+		assert.strictEqual(oGrid.getContent().length, 2, "Internal Grid has 2 controls");
+		assert.strictEqual(oGrid.indexOfContent(oBlock1), 0, "Block 1 is in the internal Grid");
+		assert.strictEqual(oGrid.indexOfContent(oBlock2), 1, "Block 2 is in the internal Grid");
+
+		// Act: destroy blocks aggregation
+		oSubSection.destroyBlocks();
+
+		// Assert: blocks are removed from internal Grid
+		assert.strictEqual(oGrid.getContent().length, 0, "Internal Grid has no controls after destroyBlocks");
+		assert.ok(oBlock1.isDestroyed(), "Block 1 is destroyed");
+		assert.ok(oBlock2.isDestroyed(), "Block 2 is destroyed");
+
+		// Cleanup
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("MoreBlock is removed from internal Grid when destroyMoreBlocks is called", async function (assert) {
+		// Arrange
+		var oBlock = oHelpers.getBlock(),
+			oMoreBlock1 = oHelpers.getBlock(),
+			oMoreBlock2 = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			}),
+			oGrid;
+
+		oSubSection.setMode(library.ObjectPageSubSectionMode.Expanded);
+		oSubSection.addBlock(oBlock);
+		oSubSection.addMoreBlock(oMoreBlock1);
+		oSubSection.addMoreBlock(oMoreBlock2);
+
+
+		// Render the ObjectPageLayout
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		oGrid = oSubSection._getGrid();
+
+		// Assert: all blocks are in the internal Grid
+		assert.strictEqual(oGrid.getContent().length, 3, "Internal Grid has 3 controls");
+		assert.ok(oGrid.indexOfContent(oBlock) >= 0, "Block is in the internal Grid");
+		assert.ok(oGrid.indexOfContent(oMoreBlock1) >= 0, "MoreBlock 1 is in the internal Grid");
+		assert.ok(oGrid.indexOfContent(oMoreBlock2) >= 0, "MoreBlock 2 is in the internal Grid");
+
+		// Act: destroy moreBlocks aggregation
+		oSubSection.destroyMoreBlocks();
+
+		// Assert: moreBlocks are removed from internal Grid but regular block remains
+		assert.strictEqual(oGrid.getContent().length, 1, "Internal Grid has 1 control after destroyMoreBlocks");
+		assert.ok(oGrid.indexOfContent(oBlock) >= 0, "Block is still in the internal Grid");
+		assert.ok(oMoreBlock1.isDestroyed(), "MoreBlock 1 is destroyed");
+		assert.ok(oMoreBlock2.isDestroyed(), "MoreBlock 2 is destroyed");
+
+		// Cleanup
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("Block is removed from internal Grid when removed from blocks aggregation", async function (assert) {
+		// Arrange
+		var oBlock1 = oHelpers.getBlock(),
+			oBlock2 = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			}),
+			oGrid;
+
+		oSubSection.addBlock(oBlock1);
+		oSubSection.addBlock(oBlock2);
+
+		// Act: render the ObjectPageLayout so blocks are added to internal Grid
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		oGrid = oSubSection._getGrid();
+
+		// Assert: blocks are in the internal Grid
+		assert.strictEqual(oGrid.getContent().length, 2, "Internal Grid has 2 controls");
+
+		// Act: remove one block
+		oSubSection.removeBlock(oBlock1);
+
+		// Assert: removed block is no longer in internal Grid
+		assert.strictEqual(oGrid.getContent().length, 1, "Internal Grid has 1 control after removing block");
+		assert.strictEqual(oGrid.indexOfContent(oBlock1), -1, "Block 1 is not in the internal Grid");
+		assert.strictEqual(oGrid.indexOfContent(oBlock2), 0, "Block 2 is still in the internal Grid");
+
+		// Cleanup
+		oBlock1.destroy();
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("MoreBlock is removed from internal Grid when removed from moreBlocks aggregation in Expanded mode", async function (assert) {
+		// Arrange
+		var oMoreBlock1 = oHelpers.getBlock(),
+			oMoreBlock2 = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			}),
+			oGrid;
+
+		oSubSection.setMode(library.ObjectPageSubSectionMode.Expanded);
+		oSubSection.addMoreBlock(oMoreBlock1);
+		oSubSection.addMoreBlock(oMoreBlock2);
+
+		// Render the ObjectPageLayout
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		oGrid = oSubSection._getGrid();
+
+		// Assert: moreBlocks are in the internal Grid (in Expanded mode)
+		assert.strictEqual(oGrid.getContent().length, 2, "Internal Grid has 2 controls");
+
+		// Act: remove one moreBlock
+		oSubSection.removeMoreBlock(oMoreBlock1);
+
+		// Assert: removed moreBlock is no longer in internal Grid
+		assert.strictEqual(oGrid.getContent().length, 1, "Internal Grid has 1 control after removing moreBlock");
+		assert.strictEqual(oGrid.indexOfContent(oMoreBlock1), -1, "MoreBlock 1 is not in the internal Grid");
+		assert.strictEqual(oGrid.indexOfContent(oMoreBlock2), 0, "MoreBlock 2 is still in the internal Grid");
+
+		// Cleanup
+		oMoreBlock1.destroy();
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("Blocks maintain correct parent relationship after multiple add/remove cycles", async function (assert) {
+		// Arrange
+		var oBlock = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			});
+
+		// Act & Assert: First cycle
+		oSubSection.addBlock(oBlock);
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		assert.strictEqual(oBlock.getParent(), oSubSection, "Block returns ObjectPageSubSection as parent after first add");
+
+		oSubSection.removeBlock(oBlock);
+		assert.ok(!oBlock._fnOriginalGetParent, "Block relationship cleaned after first remove");
+
+		// Act & Assert: Second cycle
+		oSubSection.addBlock(oBlock);
+		await nextUIUpdate();
+
+		assert.strictEqual(oBlock.getParent(), oSubSection, "Block returns ObjectPageSubSection as parent after second add");
+		assert.strictEqual(oBlock.sParentAggregationName, "blocks", "Block has correct parent aggregation name after second add");
+
+		oSubSection.removeBlock(oBlock);
+		assert.ok(!oBlock._fnOriginalGetParent, "Block relationship cleaned after second remove");
+
+		// Cleanup
+		oBlock.destroy();
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("LayoutDataChange event is delegated from SubSection to internal Grid when block visibility changes", async function (assert) {
+		// Arrange
+		var oBlock = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			}),
+			oGrid,
+			oSpy;
+
+		// Block is visible by default
+		oBlock.setVisible(true);
+		oSubSection.addBlock(oBlock);
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		oGrid = oSubSection._getGrid();
+
+		// Spy on Grid's onLayoutDataChange
+		oSpy = this.spy(oGrid, "onLayoutDataChange");
+
+		// Act - Change block visibility from true to false
+		// This triggers _onBlocksChange → _applyLayout → _resetLayoutData → destroyLayoutData()
+		oBlock.setVisible(false);
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(oSpy.called, "Grid's onLayoutDataChange was called when block visibility changed");
+		assert.strictEqual(oSpy.callCount, 2, "Grid's onLayoutDataChange was called twice - when layout data is destroyed and when it is created again");
+
+		var oEventArg = oSpy.getCall(0).args[0];
+		assert.ok(oEventArg, "Event object was passed to Grid's onLayoutDataChange");
+		assert.strictEqual(oEventArg.srcControl, oBlock, "Event srcControl is the block that changed visibility");
+
+		// Cleanup
+		oObjectPageLayout.destroy();
+	});
+
 });

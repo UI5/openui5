@@ -1,5 +1,6 @@
 /*global sinon, QUnit */
 sap.ui.define([
+	"sap/ui/Device",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/core/util/ShortcutHelper",
 	"sap/ui/core/Component",
@@ -8,6 +9,7 @@ sap.ui.define([
 	"sap/m/Panel",
 	"sap/ui/thirdparty/jquery"
 ], function(
+	Device,
 	QUtils,
 	ShortcutHelper,
 	Component,
@@ -18,9 +20,11 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var oPanel, oControl, oCE, oStub, oFakeCommand, oOwnerComponentFake;
+	var oPanel, oControl, oCE, oStub, oFakeCommand, oOwnerComponentFake, originalMacintosh;
 
 	function fnInitControlTree() {
+		originalMacintosh = Device.os.macintosh;
+		Device.os.macintosh = false; // Simulate Windows
 		oPanel = new Panel();
 		oControl = new Control({});
 		oCE = new CommandExecution({command:"Save"});
@@ -35,6 +39,7 @@ sap.ui.define([
 	}
 
 	function cleanup() {
+		Device.os.macintosh = originalMacintosh;
 		oCE.destroy();
 		oPanel.destroy();
 		oStub.restore();
@@ -43,6 +48,16 @@ sap.ui.define([
 	QUnit.module("ShourtcutHelper API", {
 		beforeEach: fnInitControlTree,
 		afterEach: cleanup
+	});
+
+	QUnit.test("normalizeShortcutText", function(assert) {
+		const aShortcuts = ["Ctrl+S+Shift", "ctrl+DEL+Alt", "alt+f4", "SPACE+Ctrl", "ctrl+PLUS"];
+		const aNormalizedShortcuts = ["Ctrl+Shift+S", "Ctrl+Alt+DEL", "Alt+f4", "Ctrl+SPACE", "Ctrl+PLUS"];
+
+		aShortcuts.forEach(function(sShortcut, index) {
+			const sNormalized = ShortcutHelper.normalizeShortcutText(sShortcut);
+			assert.strictEqual(sNormalized, aNormalizedShortcuts[index], "shortcut normalized correctly");
+		});
 	});
 
 	QUnit.test("findShortcut", function(assert) {

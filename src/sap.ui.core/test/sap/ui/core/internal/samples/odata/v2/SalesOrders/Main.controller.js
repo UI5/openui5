@@ -546,7 +546,7 @@ sap.ui.define([
 				oView.byId("itemFilter").setSelectedKey("Show all");
 			}
 
-			oView.byId("objectPage").bindElement(sContextPath, {createPreliminaryContext : true});
+			oView.byId("objectPage").bindElement({path : sContextPath, parameters : {createPreliminaryContext : true}});
 			this.readSalesOrder(); // ensure that messages get updated
 			oTable.clearSelection();
 			oView.byId("messagePopover").getBinding("items")

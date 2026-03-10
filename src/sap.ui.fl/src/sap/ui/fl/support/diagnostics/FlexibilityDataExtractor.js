@@ -142,6 +142,15 @@ sap.ui.define([
 		}, {});
 	}
 
+	function getAllFlexObjectsAsFileContents(oFlexObjectInfos, bAnonymizeUsers) {
+		// specific conversion and anonymization of Flex Objects upfront. After conversion in plain objects
+		// it is not possible anymore to identify Flex Objects in a generic way to anonymize them properly.
+		return oFlexObjectInfos.allFlexObjects.map((oFlexContext) => {
+			const oFileContent = oFlexContext.convertToFileContent();
+			return bAnonymizeUsers ? anonymizeObject(oFileContent) : oFileContent;
+		});
+	}
+
 	async function extractReducedFlexibilityData(bAnonymizeUsers) {
 		const oFlexData = {
 			flexObjectInfos: {}
@@ -149,12 +158,7 @@ sap.ui.define([
 
 		const oFlexObjectInfos = await SupportAPI.getFlexObjectInfos();
 
-		// specific convertation and anonymization of Flex Objects upfront. After convertation in plain objects
-		// it is not possible anymore to identify Flex Objects in a generic way to anonymize them properly.
-		oFlexData.flexObjectInfos.allFlexObjectFileContents = oFlexObjectInfos.allFlexObjects.map((oFlexContext) => {
-			const oFileContent = oFlexContext.convertToFileContent();
-			return bAnonymizeUsers ? anonymizeObject(oFileContent) : oFileContent;
-		});
+		oFlexData.flexObjectInfos.allFlexObjectFileContents = getAllFlexObjectsAsFileContents(oFlexObjectInfos, bAnonymizeUsers);
 		oFlexData.flexObjectInfos.liveDependencyMap = getReducedLiveDependencyMap(oFlexObjectInfos);
 		oFlexData.flexObjectInfos.applyStates = getApplyStates(oFlexObjectInfos);
 
@@ -170,6 +174,10 @@ sap.ui.define([
 			SupportAPI.getChangeDependencies(),
 			SupportAPI.getFlexObjectInfos()
 		]);
+
+		oFullFlexData.flexObjectInfos.allFlexObjectFileContents =
+			getAllFlexObjectsAsFileContents(oFullFlexData.flexObjectInfos, bAnonymizeUsers);
+		oFullFlexData.flexObjectInfos.applyStates = getApplyStates(oFullFlexData.flexObjectInfos);
 
 		if (bAnonymizeUsers) {
 			// mChangesEntries are plain objects representing Flex Objects. We need to anonymize them upfront as it is not

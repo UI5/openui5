@@ -15,7 +15,6 @@ sap.ui.define([
 	"sap/ui/core/InvisibleText",
 	"sap/m/OverflowToolbarLayoutData",
 	"sap/ui/core/library",
-	"sap/ui/Device",
 	"sap/ui/core/ShortcutHintsMixin",
 	"sap/base/util/merge"
 ],
@@ -32,7 +31,6 @@ sap.ui.define([
 	InvisibleText,
 	OverflowToolbarLayoutData,
 	coreLibrary,
-	Device,
 	ShortcutHintsMixin,
 	merge
 ) => {
@@ -210,7 +208,7 @@ sap.ui.define([
 
 		ShortcutHintsMixin.addConfig(oSettingsBtn, {
 			addAccessibilityLabel: true,
-			message: MDCRb.getText(Device.os.macintosh ? "mdc.PERSONALIZATION_SHORTCUT_MAC" : "mdc.PERSONALIZATION_SHORTCUT")
+			shortcut: "Ctrl+," // ShortcutHintsMixin takes care of normalizing and localizing
 		}, this);
 
 		return oSettingsBtn;

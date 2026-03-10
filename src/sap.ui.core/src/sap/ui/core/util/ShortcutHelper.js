@@ -4,9 +4,11 @@
 
 sap.ui.define([
 	'sap/ui/Device',
+	'sap/ui/core/Lib',
 	'sap/ui/events/jquery/EventExtension'
 ], function(
-		Device
+		Device,
+		Library
 		/*jQuery*/
 	) {
 	"use strict";
@@ -222,6 +224,74 @@ sap.ui.define([
 			sNormalizedShortcut += oNormalizedShortcutSpec.shiftKey ? "shift+" : "";
 			sNormalizedShortcut += oNormalizedShortcutSpec.key;
 			return sNormalizedShortcut;
+		},
+
+		/**
+		 * Normalizes a shortcut string by trimming spaces, converting single character keys to uppercase,
+		 * and adjusting modifier keys for the current platform (e.g., "Ctrl" to "Cmd" on Mac).
+		 *
+		 * @param {string} sShortcut The shortcut string to normalize, e.g., "ctrl+Alt+s" will be normalized to "Ctrl+Alt+S" on Windows and "Cmd+Option+S" on Mac.
+		 * @returns {string} Normalized shortcut string
+		 */
+		normalizeShortcutText: function(sShortcut) {
+			const allParts = sShortcut.split('+').map((p) => p.trim());
+
+			const modifiers = {
+				ctrl: false,
+				alt: false,
+				shift: false
+			};
+
+			let key = null;
+
+			for (const part of allParts) {
+				const lower = part.toLowerCase();
+				if (lower in modifiers) {
+					modifiers[lower] = true;
+				} else if (!key) {
+					if (part.length === 1) {
+						key = part.toUpperCase(); // Single character keys are transformed to uppercase
+					} else {
+						key = part;
+					}
+				}
+			}
+
+			const result = [];
+			if (modifiers.ctrl) {
+				result.push(Device.os.macintosh ? 'Cmd' : 'Ctrl');
+			}
+			if (modifiers.alt) {
+				result.push(Device.os.macintosh ? 'Option' : 'Alt');
+			}
+			if (modifiers.shift) {
+				result.push('Shift');
+			}
+			if (key) {
+				result.push(key);
+			}
+
+			return result.join('+');
+		},
+
+		/**
+		 * Translates a keyboard shortcut string by localizing each key segment.
+		 * The shortcut string is expected to use '+' as a delimiter (e.g., "Ctrl+Shift+S").
+		 * If a translation is not found, the original key is used.
+		 *
+		 * @param {string} sShortcut The shortcut string
+		 * @return {string} The translated shortcut string
+		 */
+		localizeKeys: (sShortcut) => {
+			const oResourceBundle = Library.getResourceBundleFor("sap.ui.core");
+			return sShortcut
+				.split("+")
+				.map((key) => {
+					const sKey = key.trim();
+					const sPropertiesKey = `Keyboard.Shortcut.${sKey}`;
+					const sText = sKey.length > 1 ? oResourceBundle.getText(sPropertiesKey) : sKey;
+					return sText === sPropertiesKey ? key.trim() : sText;
+				}).join("+");
 		},
 
 		/**

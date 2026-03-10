@@ -171,13 +171,13 @@ sap.ui.define([
 
 					/**
 					 * Defines whether tokens are displayed on multiple lines.
-					 * @experimental since 1.142
+					 * @ui5-experimental-since 1.142
 					 */
 					multiLine: {type: "boolean", group: "Misc", defaultValue: false},
 
 					/**
 					 * Defines whether "Clear All" button is present. Ensure `multiLine` is enabled, otherwise `showClearAll` will have no effect.
-					 * @experimental since 1.142
+					 * @ui5-experimental-since 1.142
 					 */
 					showClearAll: {type: "boolean", group: "Misc", defaultValue: false}
 
