@@ -24,7 +24,8 @@ sap.ui.define([
 	'sap/ui/core/IntervalTrigger',
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/events/KeyCodes",
-	"sap/ui/test/utils/nextUIUpdate"
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/f/library"
 ],
 function(
 	AnimationMode,
@@ -51,9 +52,13 @@ function(
 	IntervalTrigger,
 	QUnitUtils,
 	KeyCodes,
-	nextUIUpdate
+	nextUIUpdate,
+	fLibrary
 ) {
 	"use strict";
+
+	// shortcut for sap.f.DynamicPageMediaRange
+	const DynamicPageMediaRange = fLibrary.DynamicPageMediaRange;
 
 	var TESTS_DOM_CONTAINER = DynamicPageUtil.sTestsDomContainer,
 		oFactory = DynamicPageUtil.oFactory,
@@ -3780,5 +3785,85 @@ function(
 
 		// Assert
 		assert.strictEqual(this.oDynamicPage._getAriaRoleDescription(), sRoleDescription);
+	});
+
+	/* --------------------------- DynamicPage - BreakpointChanged Event -------------------------------------- */
+	QUnit.module("BreakpointChanged Event", {
+		beforeEach: function () {
+			this.oDynamicPage = new DynamicPage();
+		},
+		afterEach: function () {
+			this.oDynamicPage.destroy();
+			this.oDynamicPage = null;
+		}
+	});
+
+	QUnit.test("breakpointChanged event is fired on resize", function(assert) {
+		var oEventSpy = this.spy();
+
+		// Attach event handler
+		this.oDynamicPage.attachBreakpointChanged(oEventSpy);
+
+		// Set initial state to Desktop
+		this.oDynamicPage._sCurrentMediaRange = DynamicPageMediaRange.Desktop;
+
+		// Change to Phone range - should fire event
+		this.oDynamicPage._updateMedia(400);
+
+		// Assert event was fired
+		assert.ok(oEventSpy.called, "Event was called");
+		assert.strictEqual(oEventSpy.callCount, 1, "Event was fired exactly once");
+
+		// Verify event parameters
+		var oParams = oEventSpy.getCall(0).args[0].getParameters();
+		assert.strictEqual(oParams.currentRange, DynamicPageMediaRange.Phone, "currentRange is 'Phone'");
+		assert.strictEqual(oParams.currentWidth, 400, "currentWidth is 400px");
+	});
+
+	QUnit.test("breakpointChanged event provides correct range values", function(assert) {
+		var oEventSpy = this.spy();
+
+		this.oDynamicPage.attachBreakpointChanged(oEventSpy);
+
+		// Start from a known state
+		this.oDynamicPage._sCurrentMediaRange = DynamicPageMediaRange.DesktopExtraLarge;
+
+		// Test Phone range (< 600px)
+		this.oDynamicPage._updateMedia(500);
+		assert.strictEqual(oEventSpy.callCount, 1, "Event fired for DesktopExtraLarge->Phone");
+		assert.strictEqual(oEventSpy.getCall(0).args[0].getParameter("currentRange"), DynamicPageMediaRange.Phone, "Range is Phone for 500px");
+		assert.strictEqual(oEventSpy.getCall(0).args[0].getParameter("currentWidth"), 500, "Width is 500px");
+
+		// Test Tablet range (600-1024px)
+		this.oDynamicPage._updateMedia(800);
+		assert.strictEqual(oEventSpy.callCount, 2, "Event fired for Phone->Tablet");
+		assert.strictEqual(oEventSpy.getCall(1).args[0].getParameter("currentRange"), DynamicPageMediaRange.Tablet, "Range is Tablet for 800px");
+
+		// Test Desktop range (1024-1439px)
+		this.oDynamicPage._updateMedia(1200);
+		assert.strictEqual(oEventSpy.callCount, 3, "Event fired for Tablet->Desktop");
+		assert.strictEqual(oEventSpy.getCall(2).args[0].getParameter("currentRange"), DynamicPageMediaRange.Desktop, "Range is Desktop for 1200px");
+
+		// Test DesktopExtraLarge range (>= 1440px)
+		this.oDynamicPage._updateMedia(1600);
+		assert.strictEqual(oEventSpy.callCount, 4, "Event fired for Desktop->DesktopExtraLarge");
+		assert.strictEqual(oEventSpy.getCall(3).args[0].getParameter("currentRange"), DynamicPageMediaRange.DesktopExtraLarge, "Range is DesktopExtraLarge for 1600px");
+	});
+
+	QUnit.test("breakpointChanged event does not fire when range stays the same", function(assert) {
+		var oEventSpy = this.spy();
+
+		this.oDynamicPage.attachBreakpointChanged(oEventSpy);
+
+		// Set initial state to Desktop
+		this.oDynamicPage._sCurrentMediaRange = DynamicPageMediaRange.Desktop;
+
+		// Call with another Desktop width - should not fire event
+		this.oDynamicPage._updateMedia(1300);
+		assert.strictEqual(oEventSpy.callCount, 0, "Event was not fired when range stayed the same");
+
+		// Now change to different range - should fire event
+		this.oDynamicPage._updateMedia(500);
+		assert.strictEqual(oEventSpy.callCount, 1, "Event fired when range changed");
 	});
 });

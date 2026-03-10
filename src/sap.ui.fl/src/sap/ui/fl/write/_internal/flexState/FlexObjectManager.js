@@ -18,7 +18,6 @@ sap.ui.define([
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/write/_internal/condenser/Condenser",
 	"sap/ui/fl/apply/_internal/flexState/compVariants/CompVariantManagementState",
-	"sap/ui/fl/write/_internal/flexState/compVariants/CompVariantManager",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/_internal/Versions",
 	"sap/ui/fl/Layer",
@@ -40,7 +39,6 @@ sap.ui.define([
 	Version,
 	Condenser,
 	CompVariantManagementState,
-	CompVariantManager,
 	Storage,
 	Versions,
 	Layer,
@@ -329,18 +327,6 @@ sap.ui.define([
 			mPropertyBag.reference
 		);
 	}
-
-	/**
-	 * Takes an array of FlexObjects and filters out any hidden variant and changes on those hidden variants
-	 *
-	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aFlexObjects - FlexObjects to be filtered
-	 * @param {string} sReference - Flex reference of the application
-	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} Filtered list of FlexObjects
-	 */
-	FlexObjectManager.filterHiddenFlexObjects = function(aFlexObjects, sReference) {
-		const aFilteredFlexObjects = VariantManagementState.filterHiddenFlexObjects(aFlexObjects, sReference);
-		return CompVariantManager.filterHiddenFlexObjects(aFilteredFlexObjects, sReference);
-	};
 
 	/**
 	 * Collects changes from the different states within the <code>sap.ui.fl</code> library.

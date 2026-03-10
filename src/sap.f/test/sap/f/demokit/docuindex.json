@@ -30,6 +30,7 @@
 		  "samples": [
 			"sap.f.sample.DynamicPageFreeStyle",
 			"sap.f.sample.DynamicPageAnalyticalTable",
+			"sap.f.sample.DynamicPageResponsiveAvatar",
 			"sap.f.sample.DynamicPageWithStickySubheader",
 			"sap.f.sample.DynamicPageWithWizard"
 		  ]
@@ -166,6 +167,11 @@
 		  "id": "sap.f.sample.DynamicPageAnalyticalTable",
 		  "name": "Dynamic Page with Analytical Table",
 		  "description": "Dynamic Page containing an Analytical Table in the content area aligned with the SAP Fiori List Report floorplan."
+		},
+		{
+		  "id": "sap.f.sample.DynamicPageResponsiveAvatar",
+		  "name": "Dynamic Page with Responsive Avatar",
+		  "description": "Dynamic Page demonstrating the breakpointChanged event to adjust Avatar sizes responsively based on breakpoints."
 		},
 		{
 		  "id": "sap.f.sample.DynamicPageWithStickySubheader",

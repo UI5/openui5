@@ -54,6 +54,7 @@ sap.ui.define([
 		  "sap.f.cards.SemanticRole",
 		  "sap.f.cards.HeaderPosition",
 		  "sap.f.cards.NumericHeaderSideIndicatorsAlignment",
+		  "sap.f.DynamicPageMediaRange",
 		  "sap.f.DynamicPageTitleShrinkRatio",
 		  "sap.f.IllustratedMessageSize",
 		  "sap.f.IllustratedMessageType",
@@ -157,6 +158,44 @@ sap.ui.define([
 		 }
 
 	 }, DataType.getType('string'));
+
+	 /**
+	  * Defines the media breakpoints for DynamicPage.
+	  *
+	  * @author SAP SE
+	  * @enum {string}
+	  * @experimental Since 1.147 This enum is experimental and it might change significantly.
+	  * @public
+	  * @since 1.147
+	  */
+	 thisLib.DynamicPageMediaRange = {
+
+		 /**
+		  * Phone breakpoint (up to 600px).
+		  * @public
+		  */
+		 Phone: "Phone",
+
+		 /**
+		  * Tablet breakpoint (601px to 1024px).
+		  * @public
+		  */
+		 Tablet: "Tablet",
+
+		 /**
+		  * Desktop breakpoint (1025px to 1439px).
+		  * @public
+		  */
+		 Desktop: "Desktop",
+
+		 /**
+		  * Desktop Extra Large breakpoint (1440px and above).
+		  * @public
+		  */
+		 DesktopExtraLarge: "DesktopExtraLarge"
+	 };
+
+	 DataType.registerEnum("sap.f.DynamicPageMediaRange", thisLib.DynamicPageMediaRange);
 
 	 /**
 	  * Layouts, representing the number of columns to be displayed and their relative widths for a {@link sap.f.FlexibleColumnLayout} control.

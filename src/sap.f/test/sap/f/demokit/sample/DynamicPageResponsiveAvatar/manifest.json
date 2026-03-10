@@ -1,0 +1,39 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.f.sample.DynamicPageResponsiveAvatar",
+		"type": "application",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"title": "DynamicPage with Responsive Avatar"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"rootView": "sap.f.sample.DynamicPageResponsiveAvatar.view.DynamicPageResponsiveAvatar",
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.f": {},
+				"sap.m": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"stretch": true,
+				"files": [
+					"view/DynamicPageResponsiveAvatar.view.xml",
+					"controller/DynamicPageResponsiveAvatar.controller.js",
+					"manifest.json"
+				]
+			}
+		}
+	}
+}

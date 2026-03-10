@@ -42,7 +42,6 @@ sap.ui.define([
 
 	QUnit.test("Defaults", async function(assert) {
 		const fnShortcutHintsMixinSpy = sinon.spy(ShortcutHintsMixin, "addConfig");
-		const oBundle = Library.getResourceBundleFor("sap.m");
 		const oTable = new Table();
 		const oPlugin = new PasteProvider({
 			pasteFor: oTable.getId()
@@ -65,7 +64,7 @@ sap.ui.define([
 		assert.ok(ShortcutHintsMixin.isControlRegistered(oButton.getId()), "ShortcutHintsMixin is registered for the Button");
 		assert.ok(fnShortcutHintsMixinSpy.calledWithExactly(
 			oButton,
-			sinon.match({ message: oBundle.getText(Device.os.macintosh ? "PASTEPROVIDER_SHORTCUT_MAC" : "PASTEPROVIDER_SHORTCUT_WIN") }),
+			sinon.match({ shortcut: "Ctrl+V" }),
 			oTable
 		), "ShortcutHintsMixin config of the Button is correct");
 		fnShortcutHintsMixinSpy.restore();

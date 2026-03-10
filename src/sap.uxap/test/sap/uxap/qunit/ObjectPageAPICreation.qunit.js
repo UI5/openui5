@@ -59,6 +59,7 @@ function(
 	const makeVoid = (fn) => (...args) => void fn(...args);
 
 	var TitleLevel = coreLib.TitleLevel;
+	var ObjectPageLayoutMediaRange = lib.ObjectPageLayoutMediaRange;
 	var oFactory = {
 			getSection: function (iNumber, sTitleLevel, aSubSections, visibility) {
 				return new ObjectPageSection({
@@ -4225,6 +4226,68 @@ function(
 		this.oObjectPage._onAfterRenderingDomReady();
 		//Assert
 		assert.equal(this.oObjectPage._storeScrollLocation(), false, "We make sure we don`t store scroll location on hidden ObjectPage DOM reference");
+	});
+
+	QUnit.module("BreakpointChanged Event", {
+		beforeEach: function () {
+			this.oObjectPage = new ObjectPageLayout();
+		},
+		afterEach: function () {
+			this.oObjectPage.destroy();
+			this.oObjectPage = null;
+		}
+	});
+
+	QUnit.test("breakpointChanged event is fired on resize", function(assert) {
+		var oEventSpy = this.spy();
+
+		// Attach event handler
+		this.oObjectPage.attachBreakpointChanged(oEventSpy);
+
+		// Set initial state to Desktop
+		this.oObjectPage._sCurrentMediaRange = ObjectPageLayoutMediaRange.Desktop;
+
+		// Change to Phone range - should fire event
+		this.oObjectPage._updateMedia(400, ObjectPageLayout.MEDIA);
+
+		// Assert event was fired
+		assert.ok(oEventSpy.called, "Event was called");
+		assert.strictEqual(oEventSpy.callCount, 1, "Event was fired exactly once");
+
+		// Verify event parameters
+		var oParams = oEventSpy.getCall(0).args[0].getParameters();
+		assert.strictEqual(oParams.currentRange, ObjectPageLayoutMediaRange.Phone, "currentRange is 'Phone'");
+		assert.strictEqual(oParams.currentWidth, 400, "currentWidth is 400px");
+	});
+
+	QUnit.test("breakpointChanged event provides correct range values", function(assert) {
+		var oEventSpy = this.spy();
+
+		this.oObjectPage.attachBreakpointChanged(oEventSpy);
+
+		// Start from a known state
+		this.oObjectPage._sCurrentMediaRange = ObjectPageLayoutMediaRange.Desktop;
+
+		// Test Phone range (< 600px)
+		this.oObjectPage._updateMedia(500, ObjectPageLayout.MEDIA);
+		assert.strictEqual(oEventSpy.callCount, 1, "Event fired for Desktop->Phone");
+		assert.strictEqual(oEventSpy.getCall(0).args[0].getParameter("currentRange"), ObjectPageLayoutMediaRange.Phone, "Range is Phone for 500px");
+		assert.strictEqual(oEventSpy.getCall(0).args[0].getParameter("currentWidth"), 500, "Width is 500px");
+
+		// Test Tablet range (600-1024px)
+		this.oObjectPage._updateMedia(800, ObjectPageLayout.MEDIA);
+		assert.strictEqual(oEventSpy.callCount, 2, "Event fired for Phone->Tablet");
+		assert.strictEqual(oEventSpy.getCall(1).args[0].getParameter("currentRange"), ObjectPageLayoutMediaRange.Tablet, "Range is Tablet for 800px");
+
+		// Test Desktop range (1024-1439px)
+		this.oObjectPage._updateMedia(1200, ObjectPageLayout.MEDIA);
+		assert.strictEqual(oEventSpy.callCount, 3, "Event fired for Tablet->Desktop");
+		assert.strictEqual(oEventSpy.getCall(2).args[0].getParameter("currentRange"), ObjectPageLayoutMediaRange.Desktop, "Range is Desktop for 1200px");
+
+		// Test DesktopExtraLarge range (>= 1440px)
+		this.oObjectPage._updateMedia(1600, ObjectPageLayout.MEDIA);
+		assert.strictEqual(oEventSpy.callCount, 4, "Event fired for Desktop->DesktopExtraLarge");
+		assert.strictEqual(oEventSpy.getCall(3).args[0].getParameter("currentRange"), ObjectPageLayoutMediaRange.DesktopExtraLarge, "Range is DesktopExtraLarge for 1600px");
 	});
 
 	function checkObjectExists(sSelector) {

@@ -1,6 +1,8 @@
 /*global sinon, QUnit*/
 sap.ui.define([
+	"sap/base/i18n/Localization",
 	"sap/ui/core/Component",
+	"sap/ui/core/ShortcutHint",
 	"sap/ui/core/ShortcutHintsMixin",
 	"sap/ui/core/Fragment",
 	"sap/ui/Device",
@@ -8,7 +10,9 @@ sap.ui.define([
 	"my/hints/lib/MyControl",
 	"sap/ui/qunit/QUnitUtils"
 ], function(
+	Localization,
 	Component,
+	ShortcutHint,
 	ShortcutHintsMixin,
 	Fragment,
 	Device,
@@ -26,7 +30,15 @@ sap.ui.define([
 		});
 	}
 
-	QUnit.module("API");
+	QUnit.module("API", {
+		beforeEach: function() {
+			this.originalMac = Device.os.macintosh;
+			Device.os.macintosh = false; // Simulate Win device
+		},
+		afterEach: function() {
+			Device.os.macintosh = this.originalMac;
+		}
+	});
 
 	QUnit.test("add command then add config", function(assert) {
 		return waitForViewReady().then(function(oView) {
@@ -269,7 +281,15 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("config options");
+	QUnit.module("config options", {
+		beforeEach: function() {
+			this.originalMac = Device.os.macintosh;
+			Device.os.macintosh = false; // Simulate Win device
+		},
+		afterEach: function() {
+			Device.os.macintosh = this.originalMac;
+		}
+	});
 
 	QUnit.test("use id suffix", function(assert) {
 		return waitForViewReady().then(function(oView) {
@@ -315,7 +335,15 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("integration");
+	QUnit.module("integration", {
+		beforeEach: function() {
+			this.originalMac = Device.os.macintosh;
+			Device.os.macintosh = false; // Simulate Win device
+		},
+		afterEach: function() {
+			Device.os.macintosh = this.originalMac;
+		}
+	});
 
 	QUnit.test("sap.m.Button accessibility", function(assert) {
 		return waitForViewReady().then(async function(oView) {
@@ -398,4 +426,165 @@ sap.ui.define([
 			done();
 		});
 	});
+
+	QUnit.module("Device and Lanaguage dependent behavior", {
+		beforeEach: function() {
+			this.originalMac = Device.os.macintosh;
+			this.originalLanguage = Localization.getLanguage();
+			Device.os.macintosh = false; // Simulate Win device
+		},
+		afterEach: function() {
+			Device.os.macintosh = this.originalMac;
+			Localization.setLanguage(this.originalLanguage); // reset language to original after each test
+		}
+	});
+
+	QUnit.test("shortcut text on Windows", function(assert) {
+		return waitForViewReady().then(async function(oView) {
+			// testdata/shortcutHints/RootView.view.xml
+			oView.placeAt('qunit-fixture');
+			await nextUIUpdate();
+
+			const oButton1 = oView.byId("b1");
+
+			const oHint = new ShortcutHint(oButton1, { commandName: "Save" });
+			const sShortcutText = oHint._getShortcutText();
+
+			assert.equal(sShortcutText, "Ctrl+S", "the shortcut text 'Ctrl+S' is correct for Windows");
+		});
+	});
+
+	QUnit.test("shortcut text on Mac", function(assert) {
+		// Simulate Mac device
+		Device.os.macintosh = true;
+
+		return waitForViewReady().then(async function(oView) {
+			// testdata/shortcutHints/RootView.view.xml
+			oView.placeAt('qunit-fixture');
+			await nextUIUpdate();
+
+			const oButton1 = oView.byId("b1");
+
+			const oHint = new ShortcutHint(oButton1, { commandName: "Save" });
+			const sShortcutText = oHint._getShortcutText();
+
+			assert.equal(sShortcutText, "Cmd+S", "the shortcut text 'Cmd+S' is correct for Mac");
+		});
+	});
+
+	QUnit.test("shortcut text on Windows (German)", function(assert) {
+		Localization.setLanguage("de");
+
+		return waitForViewReady().then(async function(oView) {
+			// testdata/shortcutHints/RootView.view.xml
+			oView.placeAt('qunit-fixture');
+			await nextUIUpdate();
+
+			const oButton1 = oView.byId("b1");
+
+			const oHint = new ShortcutHint(oButton1, { commandName: "Save" });
+			const sShortcutText = oHint._getShortcutText();
+
+			assert.equal(sShortcutText, "Strg+S", "the shortcut text 'Strg+S' is correct for Windows (German)");
+		});
+	});
+
+	QUnit.test("shortcut text on Mac (German)", function(assert) {
+		// Simulate Mac device
+		Device.os.macintosh = true;
+
+		Localization.setLanguage("de");
+
+		return waitForViewReady().then(async function(oView) {
+			// testdata/shortcutHints/RootView.view.xml
+			oView.placeAt('qunit-fixture');
+			await nextUIUpdate();
+
+			const oButton1 = oView.byId("b1");
+
+			const oHint = new ShortcutHint(oButton1, { commandName: "Save" });
+			const sShortcutText = oHint._getShortcutText();
+
+			assert.equal(sShortcutText, "Cmd+S", "the shortcut text 'Cmd+S' is correct for Mac (German)");
+		});
+	});
+
+	QUnit.test("shortcut text with message config on Windows", function(assert) {
+		return waitForViewReady().then(async function(oView) {
+			// testdata/shortcutHints/RootView.view.xml
+			oView.placeAt('qunit-fixture');
+			await nextUIUpdate();
+
+			const oButton1 = oView.byId("b1");
+
+			let oHint = new ShortcutHint(oButton1, { message: "Ctrl+S" });
+			assert.equal(oHint._getShortcutText(), "Ctrl+S", "the shortcut text 'Ctrl+S' is correct for Windows");
+
+			oHint = new ShortcutHint(oButton1, { message: "Ctrl+Shift+S" });
+			assert.equal(oHint._getShortcutText(), "Ctrl+Shift+S", "the shortcut text 'Ctrl+Shift+S' is correct for Windows");
+		});
+	});
+
+	QUnit.test("shortcut text with message config on Mac", function(assert) {
+		// Simulate Mac device
+		Device.os.macintosh = true;
+
+		return waitForViewReady().then(async function(oView) {
+			// testdata/shortcutHints/RootView.view.xml
+			oView.placeAt('qunit-fixture');
+			await nextUIUpdate();
+
+			const oButton1 = oView.byId("b1");
+
+			let oHint = new ShortcutHint(oButton1, { message: "Ctrl+S" });
+			assert.equal(oHint._getShortcutText(), "Ctrl+S", "the shortcut text 'Ctrl+S' is correct, because message config is not normalized or localized");
+
+			oHint = new ShortcutHint(oButton1, { message: "Ctrl+Shift+S" });
+			assert.equal(oHint._getShortcutText(), "Ctrl+Shift+S", "the shortcut text 'Ctrl+Shift+S' is correct, because message config is not normalized or localized");
+		});
+	});
+
+	QUnit.test("shortcut text with shortcut config on Windows (German)", function(assert) {
+		Localization.setLanguage("de");
+
+		return waitForViewReady().then(async function(oView) {
+			// testdata/shortcutHints/RootView.view.xml
+			oView.placeAt('qunit-fixture');
+			await nextUIUpdate();
+
+			const oButton1 = oView.byId("b1");
+
+			let oHint = new ShortcutHint(oButton1, { shortcut: "Ctrl+S" });
+			assert.equal(oHint._getShortcutText(), "Strg+S", "the shortcut text 'Strg+S' is correct for Windows (German)");
+
+			oHint = new ShortcutHint(oButton1, { shortcut: "Ctrl+Shift+S" });
+			assert.equal(oHint._getShortcutText(), "Strg+Umschalt+S", "the shortcut text 'Strg+Umschalt+S' is correct for Windows (German)");
+
+			oHint = new ShortcutHint(oButton1, { shortcut: "Ctrl+Alt+S" });
+			assert.equal(oHint._getShortcutText(), "Strg+Alt+S", "the shortcut text 'Strg+Alt+S' is correct for Windows (German)");
+		});
+	});
+
+	QUnit.test("shortcut text with shortcut config on Mac (German)", function(assert) {
+		Device.os.macintosh = true; // Simulate Mac device
+		Localization.setLanguage("de");
+
+		return waitForViewReady().then(async function(oView) {
+			// testdata/shortcutHints/RootView.view.xml
+			oView.placeAt('qunit-fixture');
+			await nextUIUpdate();
+
+			const oButton1 = oView.byId("b1");
+
+			let oHint = new ShortcutHint(oButton1, { shortcut: "Ctrl+S" });
+			assert.equal(oHint._getShortcutText(), "Cmd+S", "the shortcut text 'Cmd+S' is correct for Mac (German)");
+
+			oHint = new ShortcutHint(oButton1, { shortcut: "Ctrl+Shift+S" });
+			assert.equal(oHint._getShortcutText(), "Cmd+Umschalt+S", "the shortcut text 'Cmd+Umschalt+S' is correct for Mac (German)");
+
+			oHint = new ShortcutHint(oButton1, { shortcut: "Ctrl+Alt+S" });
+			assert.equal(oHint._getShortcutText(), "Cmd+Option+S", "the shortcut text 'Cmd+Option+S' is correct for Mac (German)");
+		});
+	});
+
 });

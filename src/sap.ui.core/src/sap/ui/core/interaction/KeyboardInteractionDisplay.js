@@ -5,12 +5,12 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/base/i18n/LanguageFallback",
 	"sap/base/i18n/Localization",
-	"sap/ui/Device",
 	"sap/ui/core/Element",
 	"sap/ui/core/LabelEnablement",
 	"sap/ui/core/Lib",
+	"sap/ui/core/util/ShortcutHelper",
 	"sap/ui/util/XMLHelper"
-], function(Log, LanguageFallback, Localization, Device, Element, LabelEnablement, Library, XMLHelper) {
+], function(Log, LanguageFallback, Localization, Element, LabelEnablement, Library, ShortcutHelper, XMLHelper) {
 	"use strict";
 
 	// Endpoints for sending messages
@@ -28,77 +28,12 @@ sap.ui.define([
 	// Cache to store loaded XML documents
 	const oInteractionXMLCache = new Map();
 
-	const getNormalizedShortcutString = (input) => {
-		const allParts = input.split('+').map((p) => p.trim());
-
-		const modifiers = {
-			ctrl: false,
-			alt: false,
-			shift: false
-		};
-
-		let key = null;
-
-		for (const part of allParts) {
-			const lower = part.toLowerCase();
-			if (lower === 'ctrl') {
-				modifiers.ctrl = true;
-			} else if (lower === 'alt') {
-				modifiers.alt = true;
-			} else if (lower === 'shift') {
-				modifiers.shift = true;
-			} else if (!key) {
-				if (part.length === 1) {
-					key = part.toUpperCase(); // Single character keys are transformed to uppercase
-				} else {
-					key = part;
-				}
-			}
-		}
-
-		const result = [];
-		if (modifiers.ctrl) {
-			result.push(Device.os.macintosh ? 'Cmd' : 'Ctrl');
-		}
-		if (modifiers.alt) {
-			result.push('Alt');
-		}
-		if (modifiers.shift) {
-			result.push('Shift');
-		}
-		if (key) {
-			result.push(key);
-		}
-
-		return result.join('+');
-	};
-
-	/**
-	 * Translates a keyboard shortcut string by localizing each key segment.
-	 * The shortcut string is expected to use '+' as a delimiter (e.g., "Ctrl+Shift+S").
-	 * If a translation is not found, the original key is used.
-	 *
-	 * @param {string} sShortcut The shortcut string
-	 * @return {string} The translated shortcut string
-	 */
-	const localizeKeys = (sShortcut) => {
-		const oResourceBundle = Library.getResourceBundleFor("sap.ui.core");
-		return sShortcut
-			.split("+")
-			.map((key) => {
-				const sKey = key.trim();
-				const sPropertiesKey = `Keyboard.Shortcut.${sKey}`;
-				const sText = sKey.length > 1 ? oResourceBundle.getText(sPropertiesKey) : sKey;
-				return sText === sPropertiesKey ? key.trim() : sText;
-			}).join("+");
-	};
-
 	/**
 	 * Translates and annotates all <kbd> elements.
  	 *
  	 * For each <kbd> element:
  	 * - If it doesn't already have a `data-sap-ui-kbd-raw` attribute, it computes a normalized
- 	 *   version of its text content using `getNormalizedShortcutString()` and sets this attribute.
+ 	 *   version of its text content using `ShortcutHelper.normalizeShortcutText()` and sets this attribute.
 	 * - Replaces the <kbd> element's text content with the translated shortcut via `translateShortcut()`.
 	 *
 	 * @param {Array<Element>} kbds An array of <kbd> elements to be translated and annotated.
@@ -107,9 +42,9 @@ sap.ui.define([
 	const annotateAndTranslateKbdTags = (kbds) => {
 		kbds.forEach((kbd) => {
 			if (!kbd.hasAttribute("data-sap-ui-kbd-raw")) {
-				const sNormalized = getNormalizedShortcutString(kbd.textContent);
+				const sNormalized = ShortcutHelper.normalizeShortcutText(kbd.textContent);
 				kbd.setAttribute("data-sap-ui-kbd-raw", sNormalized);
-				kbd.textContent = localizeKeys(sNormalized);
+				kbd.textContent = ShortcutHelper.localizeKeys(sNormalized);
 			}
 		});
 
@@ -144,13 +79,13 @@ sap.ui.define([
 		for (const oDependent of aDependents) {
 			if (oDependent.isA("sap.ui.core.CommandExecution") && oDependent.getVisible()) {
 				const oCommandInfo = oDependent._getCommandInfo();
-				const sKbd = getNormalizedShortcutString(oCommandInfo.shortcut);
+				const sKbd = ShortcutHelper.normalizeShortcutText(oCommandInfo.shortcut);
 
 				aCommandInfos.push({
 					name: oDependent.getCommand(),
 					kbd: [{
 						raw: sKbd,
-						translated: localizeKeys(sKbd)
+						translated: ShortcutHelper.localizeKeys(sKbd)
 					}],
 					description: oCommandInfo.description
 				});
@@ -523,9 +458,7 @@ sap.ui.define([
 		 * @private
 		 */
 		_: {
-			getNormalizedShortcutString,
 			translateInteractionXML,
-			localizeKeys,
 			annotateAndTranslateKbdTags,
 			getInteractions,
 			getCommandInfosFor,

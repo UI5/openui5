@@ -87,6 +87,9 @@ sap.ui.define([
 	// shortcut for sap.uxap.ObjectPageSubSectionLayout
 	var ObjectPageSubSectionLayout = library.ObjectPageSubSectionLayout;
 
+	// shortcut for sap.uxap.ObjectPageLayoutMediaRange
+	var ObjectPageLayoutMediaRange = library.ObjectPageLayoutMediaRange;
+
 	var SNAP_EVENTS = ["toggleAnchorBar", "_moveHeader"];
 
 	/**
@@ -525,6 +528,27 @@ sap.ui.define([
 						 */
 						visibleSubSections: {type: "object"}
 					}
+				},
+
+				/**
+				 * Fired when the media range of the control changes, allowing the application
+				 * to adjust the UI accordingly (e.g., change Avatar sizes responsively).
+				 *
+	 			 * @experimental Since 1.147 This event is experimental and it might change significantly.
+				 * @since 1.147
+				 */
+				breakpointChanged: {
+					parameters: {
+						/**
+						 * The name of the current media range ("Phone", "Tablet", "Desktop", or "DesktopExtraLarge").
+						 */
+						currentRange: {type: "sap.uxap.ObjectPageLayoutMediaRange"},
+
+						/**
+						 * The current width of the control in pixels.
+						 */
+						currentWidth: {type: "int"}
+					}
 				}
 			},
 			dnd: { draggable: false, droppable: true },
@@ -700,13 +724,14 @@ sap.ui.define([
 
 		this._iResizeId = null;
 		this._iAfterRenderingDomReadyTimeout = null;
+		this._sCurrentMediaRange = null; // Track current media range for event firing
 
 		this._oABHelper = new ABHelper(this);
 
 		this._initializeScroller();
 		this._attachSnapListeners();
 		this._initRangeSet();
-		this._attachMediaContainerWidthChange(this._onMediaRangeChange,
+		this._attachMediaContainerWidthChange(this._onBreakpointChange,
 			this, ObjectPageLayout.MEDIA_RANGESET_NAME);
 		this._oHeaderContentDelegate = {
 			onBeforeRendering: this._setSectionInfoIsDirty.bind(this, true)
@@ -2607,16 +2632,31 @@ sap.ui.define([
 				this.toggleStyleClass(sCurrentMediaClass, bEnable);
 			}, this);
 		}.bind(this),
-		mBreakpoints = ObjectPageLayout.BREAK_POINTS;
+		mBreakpoints = ObjectPageLayout.BREAK_POINTS,
+		sCurrentRange;
 
 		if (iWidth <= mBreakpoints.PHONE) {
 			fnUpdateMediaStyleClass(oMedia.PHONE);
+			sCurrentRange = ObjectPageLayoutMediaRange.Phone;
 		} else if (iWidth <= mBreakpoints.TABLET) {
 			fnUpdateMediaStyleClass(oMedia.TABLET);
+			sCurrentRange = ObjectPageLayoutMediaRange.Tablet;
 		} else if (iWidth <= mBreakpoints.DESKTOP) {
 			fnUpdateMediaStyleClass(oMedia.DESKTOP);
+			sCurrentRange = ObjectPageLayoutMediaRange.Desktop;
 		} else {
 			fnUpdateMediaStyleClass(oMedia.DESKTOP_XL);
+			sCurrentRange = ObjectPageLayoutMediaRange.DesktopExtraLarge;
+		}
+
+		// Fire breakpointChanged event when using standard MEDIA (not DYNAMIC_HEADERS_MEDIA)
+		// and only if the range actually changed
+		if (oMedia === ObjectPageLayout.MEDIA && sCurrentRange !== this._sCurrentMediaRange) {
+			this._sCurrentMediaRange = sCurrentRange;
+			this.fireBreakpointChanged({
+				currentRange: sCurrentRange,
+				currentWidth: iWidth
+			});
 		}
 	};
 
@@ -3340,11 +3380,11 @@ sap.ui.define([
 			Device.media.initRangeSet(ObjectPageLayout.MEDIA_RANGESET_NAME,
 				[ObjectPageLayout.BREAK_POINTS.PHONE,
 				ObjectPageLayout.BREAK_POINTS.TABLET,
-				ObjectPageLayout.BREAK_POINTS.DESKTOP], "px", ["phone", "tablet", "desktop"]);
+				ObjectPageLayout.BREAK_POINTS.DESKTOP], "px", ["phone", "tablet", "desktop", "desktop_XL"]);
 		}
 	};
 
-	ObjectPageLayout.prototype._onMediaRangeChange = function () {
+	ObjectPageLayout.prototype._onBreakpointChange = function () {
 		var iCurrentWidth = this._getMediaContainerWidth();
 
 		if (!iCurrentWidth) {

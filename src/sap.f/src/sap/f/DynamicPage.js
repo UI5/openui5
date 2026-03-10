@@ -53,6 +53,9 @@ sap.ui.define([
 	// shortcut for sap.m.PageBackgroundDesign
 	var PageBackgroundDesign = mLibrary.PageBackgroundDesign;
 
+	// shortcut for sap.f.DynamicPageMediaRange
+	var DynamicPageMediaRange = library.DynamicPageMediaRange;
+
 	/**
 	 * Constructor for a new <code>DynamicPage</code>.
 	 *
@@ -300,6 +303,28 @@ sap.ui.define([
 						 */
 						pinned: {type: "boolean"}
 					}
+				},
+
+				/**
+				 * The event is fired when the media breakpoint changes.
+				 * Applications can use this event to adjust content based on the current screen size.
+				 *
+	 			 * @experimental Since 1.147 This event is experimental and it might change significantly.
+				 * @since 1.147
+				 */
+				breakpointChanged: {
+					parameters: {
+
+						/**
+						 * The current media range as defined by {@link sap.f.DynamicPageMediaRange}.
+						 */
+						currentRange: {type: "sap.f.DynamicPageMediaRange"},
+
+						/**
+						 * The current width of the control in pixels.
+						 */
+						currentWidth: {type: "int"}
+					}
 				}
 			},
 			dnd: { draggable: false, droppable: true },
@@ -411,6 +436,7 @@ sap.ui.define([
 		this._oStickySubheader = null;
 		this._bStickySubheaderInTitleArea = false;
 		this._bIsLastToggleUserInitiated = false;
+		this._sCurrentMediaRange = null;
 		this._oScrollHelper = new ScrollEnablement(this, this.getId() + "-content", {
 			horizontal: false,
 			vertical: true
@@ -426,7 +452,7 @@ sap.ui.define([
 
 		this._setAriaRoleDescription(Library.getResourceBundleFor("sap.f").getText(DynamicPage.ARIA_ROLE_DESCRIPTION));
 		this._initRangeSet();
-		this._attachMediaContainerWidthChange(this._onMediaRangeChange,
+		this._attachMediaContainerWidthChange(this._onBreakpointChange,
 			this, DynamicPage.MEDIA_RANGESET_NAME);
 	};
 
@@ -1464,7 +1490,7 @@ sap.ui.define([
 		}
 	};
 
-	DynamicPage.prototype._onMediaRangeChange = function () {
+	DynamicPage.prototype._onBreakpointChange = function () {
 		var iCurrentWidth = this._getMediaContainerWidth();
 		this._updateMedia(iCurrentWidth);
 	};
@@ -1477,19 +1503,35 @@ sap.ui.define([
 	 * @private
 	 */
 	DynamicPage.prototype._updateMedia = function (iWidth) {
-        if (!iWidth) {
-            // in case of rerendering or when the control does not exist at the moment, a zero is passed as iWidth and
-            // phone media styles are applied which is causing flickering when the actual size is passed
-            return;
-        }
+		var sCurrentRange;
+
+		if (!iWidth) {
+			// in case of rerendering or when the control does not exist at the moment, a zero is passed as iWidth and
+			// phone media styles are applied which is causing flickering when the actual size is passed
+			return;
+		}
+
 		if (iWidth <= DynamicPage.BREAK_POINTS.PHONE) {
 			this._updateMediaStyle(DynamicPage.MEDIA.PHONE);
+			sCurrentRange = DynamicPageMediaRange.Phone;
 		} else if (iWidth <= DynamicPage.BREAK_POINTS.TABLET) {
 			this._updateMediaStyle(DynamicPage.MEDIA.TABLET);
+			sCurrentRange = DynamicPageMediaRange.Tablet;
 		} else if (iWidth <= DynamicPage.BREAK_POINTS.DESKTOP) {
 			this._updateMediaStyle(DynamicPage.MEDIA.DESKTOP);
+			sCurrentRange = DynamicPageMediaRange.Desktop;
 		} else {
 			this._updateMediaStyle(DynamicPage.MEDIA.DESKTOP_XL);
+			sCurrentRange = DynamicPageMediaRange.DesktopExtraLarge;
+		}
+
+		// Fire breakpointChanged event only if the range actually changed
+		if (sCurrentRange !== this._sCurrentMediaRange) {
+			this._sCurrentMediaRange = sCurrentRange;
+			this.fireBreakpointChanged({
+				currentRange: sCurrentRange,
+				currentWidth: iWidth
+			});
 		}
 	};
 

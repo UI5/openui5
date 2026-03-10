@@ -3,15 +3,16 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/ui/core/Lib",
 	"sap/ui/util/XMLHelper",
+	"sap/ui/core/util/ShortcutHelper",
 	"sap/ui/core/interaction/KeyboardInteractionDisplay"
-], function (Device, Library, XMLHelper, KeyboardInteractionDisplay) {
+], function (Device, Library, XMLHelper, ShortcutHelper, KeyboardInteractionDisplay) {
 	"use strict";
 
 	const annotateAndTranslateKbdTags = KeyboardInteractionDisplay._.annotateAndTranslateKbdTags;
-	const getNormalizedShortcutString = KeyboardInteractionDisplay._.getNormalizedShortcutString;
 	const getInteractions = KeyboardInteractionDisplay._.getInteractions;
-	const localizeKeys = KeyboardInteractionDisplay._.localizeKeys;
 	const translateInteractionXML = KeyboardInteractionDisplay._.translateInteractionXML;
+	const getNormalizedShortcutString = ShortcutHelper.normalizeShortcutText;
+	const localizeKeys = ShortcutHelper.localizeKeys;
 
 	QUnit.module("KeyboardInteractionDisplay Utilities", {
 		beforeEach: function() {
@@ -72,20 +73,20 @@ sap.ui.define([
 		Device.os.macintosh = true;
 		assert.strictEqual(
 			getNormalizedShortcutString("Ctrl+Alt+S"),
-			"Cmd+Alt+S",
-			"'Ctrl+Alt+S' correctly normalized to 'Cmd+Alt+S' for Mac"
+			"Cmd+Option+S",
+			"'Ctrl+Alt+S' correctly normalized to 'Cmd+Option+S' for Mac"
 		);
 
 		assert.strictEqual(
 			getNormalizedShortcutString("ctrl+Alt+ s"),
-			"Cmd+Alt+S",
-			"'ctrl+Alt+ s' correctly normalized to 'Cmd+Alt+S' for Mac"
+			"Cmd+Option+S",
+			"'ctrl+Alt+ s' correctly normalized to 'Cmd+Option+S' for Mac"
 		);
 
 		assert.strictEqual(
 			getNormalizedShortcutString("Alt+ ctrl+ s"),
-			"Cmd+Alt+S",
-			"'Alt+ ctrl+ s' correctly normalized to 'Cmd+Alt+S' for Mac"
+			"Cmd+Option+S",
+			"'Alt+ ctrl+ s' correctly normalized to 'Cmd+Option+S' for Mac"
 		);
 
 		assert.strictEqual(

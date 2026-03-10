@@ -9,6 +9,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/appVariant/DescriptorChangeTypes",
 	"sap/ui/fl/apply/_internal/changes/FlexCustomData",
 	"sap/ui/fl/apply/_internal/flexObjects/UIChange",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
@@ -17,6 +18,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/condenser/Condenser",
 	"sap/ui/fl/write/_internal/flexState/changes/UIChangeManager",
+	"sap/ui/fl/write/_internal/flexState/compVariants/CompVariantManager",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/api/FeaturesAPI",
@@ -31,6 +33,7 @@ sap.ui.define([
 	DescriptorChangeTypes,
 	FlexCustomData,
 	UIChange,
+	VariantManagementState,
 	FlexState,
 	FlexRuntimeInfoAPI,
 	FlexInfoSession,
@@ -39,6 +42,7 @@ sap.ui.define([
 	Settings,
 	Condenser,
 	UIChangeManager,
+	CompVariantManager,
 	FlexObjectManager,
 	Storage,
 	FeaturesAPI,
@@ -116,15 +120,16 @@ sap.ui.define([
 		mPropertyBag.upToLayer ||= LayerUtils.getCurrentLayer();
 
 		const aFlexObjects = await FlexObjectManager.getFlexObjects(mPropertyBag);
-		const aFilteredFlexObjects = aFlexObjects.filter(
+		let aFilteredFlexObjects = aFlexObjects.filter(
 			(oFlexObject) => LayerUtils.isOverLayer(oFlexObject.getLayer(), mPropertyBag.upToLayer)
 		);
 		if (aFilteredFlexObjects.length === 0) {
 			return false;
 		}
 		// Hidden control variants and their related changes might be necessary for referenced variants, but are not relevant for this check
-		// Same apply for changes of deleted comp variants
-		return FlexObjectManager.filterHiddenFlexObjects(aFilteredFlexObjects, mPropertyBag.reference).length > 0;
+		// Same applies for changes of deleted comp variants
+		aFilteredFlexObjects = VariantManagementState.filterHiddenFlexObjects(aFilteredFlexObjects, mPropertyBag.reference);
+		return CompVariantManager.filterHiddenFlexObjects(aFilteredFlexObjects, mPropertyBag.reference).length > 0;
 	};
 
 	/**

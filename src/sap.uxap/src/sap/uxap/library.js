@@ -310,6 +310,44 @@ sap.ui.define([
 	DataType.registerEnum("sap.uxap.Importance", thisLib.Importance);
 
 	/**
+	 * Defines the media breakpoints for ObjectPageLayout.
+	 *
+	 * @author SAP SE
+	 * @enum {string}
+	 * @public
+	 * @experimental Since 1.147 This enumeration is experimental and it might change significantly.
+	 * @since 1.147
+	 */
+	thisLib.ObjectPageLayoutMediaRange = {
+
+		/**
+		 * Phone breakpoint (up to 600px).
+		 * @public
+		 */
+		Phone: "Phone",
+
+		/**
+		 * Tablet breakpoint (601px to 1024px).
+		 * @public
+		 */
+		Tablet: "Tablet",
+
+		/**
+		 * Desktop breakpoint (1025px to 1439px).
+		 * @public
+		 */
+		Desktop: "Desktop",
+
+		/**
+		 * Extra large desktop breakpoint (1440px and above).
+		 * @public
+		 */
+		DesktopExtraLarge: "DesktopExtraLarge"
+	};
+
+	DataType.registerEnum("sap.uxap.ObjectPageLayoutMediaRange", thisLib.ObjectPageLayoutMediaRange);
+
+	/**
 	 *
 	 * @type {{getClosestOPL: Function}}
 	 */
