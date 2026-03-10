@@ -306,6 +306,10 @@ sap.ui.define([
 				group: "Plugins",
 				module: "./plugins/BindingSelection.TreeBinding.qunit"
 			},
+			"BindingSelection (AnalyticalBinding)": {
+				group: "Plugins",
+				module: "./plugins/BindingSelection.AnalyticalBinding.qunit"
+			},
 			"MultiSelectionPlugin": {
 				group: "Plugins",
 				module: "./plugins/{name}.qunit",
