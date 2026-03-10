@@ -12,7 +12,8 @@ sap.ui.define([
 	"sap/m/library",
 	"sap/base/Log",
 	"sap/base/util/extend",
-	"sap/ui/core/InvisibleText"
+	"sap/ui/core/InvisibleText",
+	"sap/ui/qunit/utils/nextUIUpdate"
 ], function(
 	oCore,
 	coreLibrary,
@@ -26,7 +27,8 @@ sap.ui.define([
 	library,
 	Log,
 	extend,
-	InvisibleText
+	InvisibleText,
+	nextUIUpdate
 ) {
 	"use strict";
 
@@ -1055,6 +1057,29 @@ sap.ui.define([
 
 		//assert
 		assert.ok(oSpy.called, "Press event is fired onkeydown");
+	});
+
+	QUnit.test("Avatar with DetailBox stops event propagation on click", async function(assert) {
+		// Arrange
+		var oLightBox = new LightBox(),
+			oStopPropagationSpy = this.spy();
+
+		this.oAvatar.setDetailBox(oLightBox);
+		await nextUIUpdate();
+
+		// Create a mock event object with a spy for stopPropagation
+		var oMockEvent = {
+			stopPropagation: oStopPropagationSpy
+		};
+
+		// Act - Call ontap directly with the mock event
+		this.oAvatar.ontap(oMockEvent);
+
+		// Assert
+		assert.ok(oStopPropagationSpy.calledOnce, "stopPropagation should be called when Avatar with DetailBox is clicked");
+
+		// Cleanup
+		oLightBox.destroy();
 	});
 
 	function testPressInterupt (assert, oAvatar, oSpy, sKey) {
