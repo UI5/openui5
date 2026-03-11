@@ -245,6 +245,201 @@ function(Press,
 		oPressAction.executeOn(oButton);
 	});
 
+	QUnit.test("Should trigger contextmenu event on right-click", async function(assert) {
+		var done = assert.async();
+
+		// Arrange
+		var oButton = new Button({id: "_button2"});
+		oButton.placeAt("qunit-fixture");
+
+		aControlsToClean.push(oButton);
+
+		//Make sure that button is rendered
+		await nextUIUpdate();
+
+		// System under Test
+		var oPressAction = new Press({rightClick: true});
+
+		var bContextMenuFired = false;
+		var bClickFired = false;
+
+		// create contextmenu listener
+		$("#_button2").on("contextmenu", function(oEvent) {
+			bContextMenuFired = true;
+			assert.ok(true, "Contextmenu event has been triggered");
+			assert.strictEqual(oEvent.button, 2, "Mouse button is right (button 2)");
+		});
+
+		// create click listener to ensure it's NOT fired for right-click
+		$("#_button2").on("click", function() {
+			bClickFired = true;
+		});
+
+		// Give time for events to fire
+		setTimeout(function() {
+			assert.ok(bContextMenuFired, "Contextmenu event was fired");
+			assert.notOk(bClickFired, "Click event was not fired for right-click");
+			done();
+		}, 50);
+
+		// Act
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should trigger contextmenu event with key modifiers on right-click", async function(assert) {
+		var done = assert.async();
+
+		// Arrange
+		var oButton = new Button({id: "_button3"});
+		oButton.placeAt("qunit-fixture");
+
+		aControlsToClean.push(oButton);
+
+		//Make sure that button is rendered
+		await nextUIUpdate();
+
+		// System under Test
+		var oPressAction = new Press({rightClick: true, altKey: true, ctrlKey: true, shiftKey: true});
+
+		// create contextmenu listener
+		$("#_button3").on("contextmenu", function(oEvent) {
+			assert.ok(true, "Contextmenu event has been triggered");
+			assert.strictEqual(oEvent.button, 2, "Mouse button is right (button 2)");
+			assert.ok(oEvent.altKey, "Alt key modifier is pressed");
+			assert.ok(oEvent.ctrlKey, "Ctrl key modifier is pressed");
+			assert.ok(oEvent.shiftKey, "Shift key modifier is pressed");
+
+			//Call 'done' to resume qunit processing
+			done();
+		});
+
+		// Act
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should trigger correct mouse events for right-click", async function(assert) {
+		var done = assert.async();
+
+		// Arrange
+		var oButton = new Button({id: "_button4"});
+		oButton.placeAt("qunit-fixture");
+
+		aControlsToClean.push(oButton);
+
+		//Make sure that button is rendered
+		await nextUIUpdate();
+
+		// System under Test
+		var oPressAction = new Press({rightClick: true});
+
+		var aEventOrder = [];
+
+		// Track event order
+		$("#_button4").on("mousedown", function(oEvent) {
+			aEventOrder.push("mousedown");
+			assert.strictEqual(oEvent.button, 2, "Mousedown uses right button (button 2)");
+		});
+
+		$("#_button4").on("mouseup", function(oEvent) {
+			aEventOrder.push("mouseup");
+			assert.strictEqual(oEvent.button, 2, "Mouseup uses right button (button 2)");
+		});
+
+		$("#_button4").on("contextmenu", function() {
+			aEventOrder.push("contextmenu");
+		});
+
+		$("#_button4").on("click", function() {
+			aEventOrder.push("click");
+		});
+
+		// Verify event order after execution
+		setTimeout(function() {
+			assert.deepEqual(aEventOrder, ["mousedown", "mouseup", "contextmenu"], "Events fired in correct order without click");
+			done();
+		}, 50);
+
+		// Act
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should not trigger selectstart event on right-click", async function(assert) {
+		var done = assert.async();
+
+		// Arrange
+		var oButton = new Button({id: "_button5"});
+		oButton.placeAt("qunit-fixture");
+
+		aControlsToClean.push(oButton);
+
+		//Make sure that button is rendered
+		await nextUIUpdate();
+
+		// System under Test
+		var oPressAction = new Press({rightClick: true});
+
+		var bSelectStartFired = false;
+
+		// create selectstart listener
+		$("#_button5").on("selectstart", function() {
+			bSelectStartFired = true;
+		});
+
+		// Verify selectstart was not fired
+		setTimeout(function() {
+			assert.notOk(bSelectStartFired, "Selectstart event was not fired for right-click");
+			done();
+		}, 50);
+
+		// Act
+		oPressAction.executeOn(oButton);
+	});
+
+	QUnit.test("Should right-click on a list item", async function(assert) {
+		var done = assert.async();
+
+		// Arrange
+		var oListItem = new StandardListItem({
+				title: "List Item for Right-Click Test",
+				type: "Active"
+			}),
+			oList = new List({
+				headerText: "Right-Click Test",
+				items: [oListItem]
+			});
+		oList.placeAt("qunit-fixture");
+		aControlsToClean.push(oList);
+
+		//Make sure that list is rendered
+		await nextUIUpdate();
+
+		// System under Test
+		var oPressAction = new Press({rightClick: true});
+
+		var bContextMenuFired = false;
+		var bPressFired = false;
+
+		// Monitor contextmenu event
+		oListItem.$().on("contextmenu", function() {
+			bContextMenuFired = true;
+		});
+
+		// Monitor press event - should not fire for right-click
+		oListItem.attachPress(function() {
+			bPressFired = true;
+		});
+
+		// Verify after execution
+		setTimeout(function() {
+			assert.ok(bContextMenuFired, "Contextmenu event was fired on list item");
+			assert.notOk(bPressFired, "Press event was not fired for right-click on list item");
+			done();
+		}, 50);
+
+		// Act
+		oPressAction.executeOn(oListItem);
+	});
+
 	QUnit.test("Should use X percent for selecting slider value", async function(assert) {
 		var done = assert.async();
 

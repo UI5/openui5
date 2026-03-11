@@ -2392,7 +2392,11 @@ function(
 	 */
 	Input.prototype.onfocusout = function (oEvent) {
 		InputBase.prototype.onfocusout.apply(this, arguments);
-		this.removeStyleClass("sapMInputFocused");
+
+		// Keep the focused class if focus moves to an element within the Input (e.g., clear icon, value help icon)
+		if (!containsOrEquals(this.getDomRef(), oEvent.relatedTarget)) {
+			this.removeStyleClass("sapMInputFocused");
+		}
 	};
 
 	/**

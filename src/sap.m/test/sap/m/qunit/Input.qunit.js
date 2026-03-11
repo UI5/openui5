@@ -3603,7 +3603,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Set showSuggestions", async function (assert) {
-
 		// Arrange
 		var oInput = new Input({
 			startSuggestion: 0,
@@ -3612,6 +3611,9 @@ sap.ui.define([
 				new Item({ text: "test" })
 			]
 		});
+		var oMockEvent = {
+			relatedTarget: oInput.getFocusDomRef()
+		};
 		var fnTriggerSuggestSpy = sinon.spy(oInput, "_triggerSuggest");
 		oInput.placeAt("content");
 		await nextUIUpdate(this.clock);
@@ -3629,7 +3631,7 @@ sap.ui.define([
 
 		// Act
 		oInput._$input.val("");
-		oInput.onfocusout();
+		oInput.onfocusout(oMockEvent);
 		oInput.setShowSuggestion(false);
 		fnTriggerSuggestSpy.reset();
 		oInput.onfocusin();
@@ -3642,7 +3644,7 @@ sap.ui.define([
 
 		// Act
 		oInput._$input.val("");
-		oInput.onfocusout();
+		oInput.onfocusout(oMockEvent);
 		oInput.setShowSuggestion(true);
 		fnTriggerSuggestSpy.reset();
 		oInput.onfocusin();

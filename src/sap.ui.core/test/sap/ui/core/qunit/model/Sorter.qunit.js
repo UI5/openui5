@@ -60,4 +60,37 @@ sap.ui.define([
 		// code under test
 		assert.strictEqual(oSorter.isDescending(), "~descending");
 	});
+
+	//*********************************************************************************************
+	QUnit.test("group paths", function (assert) {
+		const aGroupPaths = ["~groupPaths"];
+
+		// code under test - constructor with object parameter and group paths
+		let oSorter = new Sorter({groupPaths: aGroupPaths, path: "~path"});
+
+		assert.deepEqual(oSorter.aGroupPaths, aGroupPaths);
+		assert.notStrictEqual(oSorter.aGroupPaths, aGroupPaths);
+
+		// code under test
+		const aGroupPathsResult = oSorter.getGroupPaths();
+
+		assert.deepEqual(aGroupPathsResult, aGroupPaths);
+		assert.notStrictEqual(aGroupPathsResult, oSorter.aGroupPaths);
+
+		// code under test - constructor with object parameter, no group paths
+		oSorter = new Sorter({path: "~path"});
+
+		assert.strictEqual(oSorter.aGroupPaths, undefined);
+
+		// code under test
+		assert.strictEqual(oSorter.getGroupPaths(), undefined);
+
+		// code under test - constructor with single parameters
+		oSorter = new Sorter("~path");
+
+		assert.strictEqual(oSorter.aGroupPaths, undefined);
+
+		// code under test
+		assert.strictEqual(oSorter.getGroupPaths(), undefined);
+	});
 });

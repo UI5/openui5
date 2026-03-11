@@ -1,0 +1,97 @@
+<mvc:View controllerName="appUnderTest.view.Main"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc">
+	<App id="myApp">
+		<Page id="multiSelectionPage" title="Multi-Selection with Shift Key">
+			<headerContent>
+				<Button id="navigationButton"
+						press="onNavToContextMenu"
+						text="Go to Context Menu Page"/>
+			</headerContent>
+			<content>
+				<VBox class="sapUiSmallMargin">
+					<Text text="This page demonstrates multi-selection in a table using Shift key. The OPA test uses keyDown and keyUp properties of the Press action to simulate Shift key behavior." class="sapUiSmallMarginBottom"/>
+					<Text text="Selected Items Count: {/selectedCount}" class="sapUiSmallMarginBottom"/>
+				</VBox>
+				<Table id="multiSelectTable"
+					   mode="MultiSelect"
+					   items="{/items}"
+					   selectionChange="onSelectionChange">
+					<headerToolbar>
+						<Toolbar>
+							<Title text="Table with Multi-Selection"/>
+						</Toolbar>
+					</headerToolbar>
+					<columns>
+						<Column>
+							<Text text="ID"/>
+						</Column>
+						<Column>
+							<Text text="Name"/>
+						</Column>
+						<Column>
+							<Text text="Category"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Text text="{id}"/>
+								<Text text="{name}"/>
+								<Text text="{category}"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</content>
+		</Page>
+		<Page id="contextMenuPage"
+			  title="Context Menu with Right-Click"
+			  showNavButton="true"
+			  navButtonPress="onBack">
+			<content>
+				<VBox class="sapUiSmallMargin">
+					<Text text="This page demonstrates right-click functionality on a table. The OPA test uses the rightClick property of the Press action to open the context menu." class="sapUiSmallMarginBottom"/>
+					<Text text="Context Menu Action: {/contextMenuAction}" class="sapUiSmallMarginBottom"/>
+				</VBox>
+				<Table id="contextMenuTable"
+					   items="{/items}">
+					<headerToolbar>
+						<Toolbar>
+							<Title text="Table with Context Menu"/>
+						</Toolbar>
+					</headerToolbar>
+					<columns>
+						<Column>
+							<Text text="ID"/>
+						</Column>
+						<Column>
+							<Text text="Name"/>
+						</Column>
+						<Column>
+							<Text text="Category"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Text text="{id}"/>
+								<Text text="{name}"/>
+								<Text text="{category}"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+					<contextMenu>
+						<Menu>
+							<items>
+								<MenuItem text="Edit Item" press="onContextMenuEdit"/>
+								<MenuItem text="Delete Item" press="onContextMenuDelete"/>
+								<MenuItem text="View Details" press="onContextMenuDetails"/>
+							</items>
+						</Menu>
+					</contextMenu>
+				</Table>
+			</content>
+		</Page>
+	</App>
+</mvc:View>
