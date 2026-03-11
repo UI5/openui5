@@ -254,13 +254,10 @@ sap.ui.define([
 		this.renderTabElement(rm, {className: "sapUiTableCtrlAfter", tabIndex: bHasFocusableContent ? "0" : "-1"});
 		this.renderTabElement(rm, {tabIndex: "-1", id: oTable.getId() + "-focusDummy"});
 
-		rm.openStart("div", oTable.getId() + "-creationRowContainer");
-		rm.openEnd();
 		const oCreationRow = oTable.getCreationRow();
 		if (oCreationRow && oCreationRow.getVisible()) {
 			rm.renderControl(oCreationRow);
 		}
-		rm.close("div");
 
 		this.renderHSbBackground(rm, oTable);
 		this.renderHSb(rm, oTable);

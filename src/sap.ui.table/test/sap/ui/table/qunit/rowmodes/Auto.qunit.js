@@ -10,7 +10,9 @@ sap.ui.define([
 	"sap/ui/table/Column",
 	"sap/ui/table/CreationRow",
 	"sap/ui/table/utils/TableUtils",
-	"sap/ui/Device"
+	"sap/ui/core/Control",
+	"sap/ui/Device",
+	"sap/ui/qunit/utils/nextUIUpdate"
 ], function(
 	TableQUnitUtils,
 	FixedRowHeightTest,
@@ -21,7 +23,9 @@ sap.ui.define([
 	Column,
 	CreationRow,
 	TableUtils,
-	Device
+	Control,
+	Device,
+	nextUIUpdate
 ) {
 	"use strict";
 
@@ -222,6 +226,105 @@ sap.ui.define([
 
 	QUnit.test("After rendering", function(assert) {
 		assert.equal(this.oTable.getRows().length, 13, "Row count");
+	});
+
+	/** @deprecated As of version 1.120 */
+	QUnit.test("Parent with rerender API version 1", async function(assert) {
+		const ApiVersion1Container = Control.extend("sap.ui.table.test.ApiVersion1Container", {
+			metadata: {
+				aggregations: {
+					table: {type: "sap.ui.table.Table", multiple: false}
+				},
+				properties: {
+					height: {type: "sap.ui.core.CSSSize", defaultValue: "1000px"}
+				}
+			},
+			renderer: {
+				apiVersion: 1,
+				render: function(oRm, oControl) {
+					oRm.write("<div");
+					oRm.writeControlData(oControl);
+					oRm.addStyle("height", oControl.getHeight());
+					oRm.writeStyles();
+					oRm.write(">");
+					oRm.renderControl(oControl.getTable());
+					oRm.write("</div>");
+				}
+			}
+		});
+		const oContainer = new ApiVersion1Container({
+			table: this.oTable
+		});
+
+		oContainer.placeAt("qunit-fixture");
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 13);
+		assert.equal(this.oTable.getRows().length, 13, "Initial rendering");
+
+		oContainer.invalidate();
+		await nextUIUpdate();
+
+		oContainer.setHeight("765px");
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 9);
+		assert.equal(this.oTable.getRows().length, 9, "Resize after rendering new elemnents: Row count is adjusted");
+
+		oContainer.destroy();
+	});
+
+	QUnit.test("Change visibility of the table", async function(assert) {
+		const oTableContainer = document.getElementById("qunit-fixture");
+		const sOriginalContainerHeight = oTableContainer.style.height;
+
+		this.oTable.setVisible(false);
+		await nextUIUpdate();
+		oTableContainer.setAttribute("style", "height: 765px");
+		this.oTable.setVisible(true);
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.equal(this.oTable.getRows().length, 9, "Row count after showing the table");
+
+		oTableContainer.setAttribute("style", `height: ${sOriginalContainerHeight}`);
+		await this.oTable.qunit.whenNextRenderingFinished();
+		assert.equal(this.oTable.getRows().length, 13, "Row count after resize");
+	});
+
+	QUnit.test("Change visibility of the table parent", async function(assert) {
+		const TableContainer = Control.extend("sap.ui.table.test.TableContainer", {
+			metadata: {
+				aggregations: {
+					table: {type: "sap.ui.table.Table", multiple: false}
+				},
+				properties: {
+					height: {type: "sap.ui.core.CSSSize", defaultValue: "1000px"}
+				}
+			},
+			renderer: {
+				apiVersion: 2,
+				render: function(oRm, oControl) {
+					oRm.openStart("div", oControl);
+					oRm.style("height", oControl.getHeight());
+					oRm.openEnd();
+					oRm.renderControl(oControl.getTable());
+					oRm.close("div");
+				}
+			}
+		});
+		const oTableContainer = new TableContainer({
+			table: this.oTable
+		});
+
+		oTableContainer.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		oTableContainer.setVisible(false);
+		await nextUIUpdate();
+		oTableContainer.setHeight("765px");
+		oTableContainer.setVisible(true);
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 9);
+		assert.equal(this.oTable.getRows().length, 9, "Row count after showing the parent");
+
+		oTableContainer.setHeight();
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 13);
+		assert.equal(this.oTable.getRows().length, 13, "Row count after resize");
+
+		oTableContainer.destroy();
 	});
 
 	QUnit.test("Resize", function(assert) {
@@ -684,7 +787,14 @@ sap.ui.define([
 			this.resetRowsUpdatedSpy();
 			this.oTable.getRowMode().setRowContentHeight(this.oTable._getDefaultRowHeight() + 20); // The table will show less rows.
 			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
+				TableUtils.RowsUpdateReason.Render, // Invalidation on propery change
+				TableUtils.RowsUpdateReason.Render // Row count adjustment
+			]);
+		}).then(() => {
+			this.resetRowsUpdatedSpy();
+			this.oTable.getRowMode().setRowContentHeight(this.oTable._getDefaultRowHeight() + 21); // Does not change number of rows.
+			return this.checkRowsUpdated(assert, [
+				TableUtils.RowsUpdateReason.Render // Invalidation on propery change
 			]);
 		});
 	}
