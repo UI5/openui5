@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Application under test</title>
+
+		<script id="sap-ui-bootstrap"
+				src="../../../../../../../../resources/sap-ui-core.js"
+				data-sap-ui-frame-options="trusted"
+				data-sap-ui-libs="sap.m"
+				data-sap-ui-on-init="module:sap/ui/core/ComponentSupport"
+				data-sap-ui-resource-roots='{
+					"appUnderTest" : "./"
+				}'
+		>
+		</script>
+
+	</head>
+
+	<body class="sapUiBody" id="content">
+		<div data-sap-ui-component data-name="appUnderTest" data-id="container" data-settings="{&quot;id&quot; : &quot;appUnderTest&quot;}"></div>
+	</body>
+
+</html>

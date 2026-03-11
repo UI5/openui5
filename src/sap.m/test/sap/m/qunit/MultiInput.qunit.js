@@ -4934,4 +4934,39 @@ sap.ui.define([
 		assert.notOk(oSuggestionPopover.isOpen(), "Suggestions should not be visible when editable is false and startSuggestion is 0.");
 		oMultiInput.destroy();
 	});
+
+	QUnit.test("sapMFocus class should not be removed when focus moves to clear icon or value help icon", async function (assert) {
+		var oMultiInput = new MultiInput({
+			showClearIcon: true,
+			showValueHelp: true,
+			value: "Test"
+		}).placeAt("content");
+
+		await nextUIUpdate();
+
+		oMultiInput._$input.trigger("focus");
+		await nextUIUpdate();
+
+		assert.ok(oMultiInput.hasStyleClass("sapMFocus"), "MultiInput should have sapMFocus class when focused");
+
+		oMultiInput.onfocusout({
+			relatedTarget: oMultiInput._oClearButton.getDomRef()
+		});
+
+		assert.ok(oMultiInput.hasStyleClass("sapMFocus"), "sapMFocus class should not be removed when focus moves to clear icon");
+
+		oMultiInput.onfocusout({
+			relatedTarget: oMultiInput._getValueHelpIcon().getDomRef()
+		});
+
+		assert.ok(oMultiInput.hasStyleClass("sapMFocus"), "sapMFocus class should not be removed when focus moves to value help icon");
+
+		oMultiInput.onfocusout({
+			relatedTarget: document.body
+		});
+
+		assert.notOk(oMultiInput.hasStyleClass("sapMFocus"), "sapMFocus class should be removed when focus moves outside the MultiInput");
+
+		oMultiInput.destroy();
+	});
 });

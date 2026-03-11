@@ -14,6 +14,10 @@ sap.ui.define([
 	 * control. Most controls are supported, for example buttons, links, list items,
 	 * tables, filters, and form controls.
 	 *
+	 * The <code>Press</code> action can also simulate right-click (context menu) interactions
+	 * by setting the <code>rightClick</code> property to true. This is useful for testing
+	 * controls with custom context menus, such as <code>sap.ui.table.Table</code> and <code>sap.m.Table</code>.
+	 *
 	 * The <code>Press</code> action targets a special DOM element representing the
 	 * control. This DOM element can be customized.
 	 *
@@ -95,6 +99,16 @@ sap.ui.define([
 				 */
 				keyUp: {
 					type: "boolean"
+				},
+				/**
+				 * If set to <code>true</code>, a right-click (context menu) event will be triggered instead of a left-click.
+				 * This simulates the native browser right-click behavior by dispatching <code>mousedown</code> and <code>mouseup</code> with <code>button: 2</code>, followed by a <code>contextmenu</code> event.
+				 * The <code>xPercentage</code> and <code>yPercentage</code> properties can be used to specify the position of the right-click event.
+				 * @since 1.147
+				 */
+				rightClick: {
+					type: "boolean",
+					defaultValue: false
 				}
 			}
 		},
@@ -109,6 +123,8 @@ sap.ui.define([
 		 * internally translated into a 'press' event).
 		 * If <code>keyDown</code> or <code>keyUp</code> is set to <code>true</code>,
 		 * dispatches the corresponding keyboard event instead of mouse events.
+		 * If <code>rightClick</code> property is set to <code>true</code>, triggers a <code>contextmenu</code> event instead,
+		 * along with appropriate <code>mousedown</code> and <code>mouseup</code> events.
 		 * Logs an error if control is not visible (i.e. has no dom representation)
 		 *
 		 * @param {sap.ui.core.Control} oControl the control on which the 'press' event is triggered
@@ -125,6 +141,7 @@ sap.ui.define([
 			var bShiftKey = this.getShiftKey();
 			var bKeyDown = this.getKeyDown();
 			var bKeyUp = this.getKeyUp();
+			var bRightClick = this.getRightClick();
 
 			var iXPercentage = this.getXPercentage();
 			var iYPercentage = this.getYPercentage();
@@ -159,7 +176,7 @@ sap.ui.define([
 
 			if ($ActionDomRef.length) {
 				this.oLogger.timestamp("opa.actions.press");
-				this.oLogger.debug("Pressed the control " + oControl);
+				this.oLogger.debug((bRightClick ? "Right-clicked" : "Pressed") + " the control " + oControl);
 
 				this._tryOrSimulateFocusin($ActionDomRef, oControl);
 
@@ -193,13 +210,19 @@ sap.ui.define([
 						this._createAndDispatchKeyboardEvent("keyup", oActionDomRef, oKeyboardOptions);
 					}
 				} else {
+					var iButton = bRightClick ? Press.MOUSE_BUTTONS.Right : Press.MOUSE_BUTTONS.Left,
+						sClickType = bRightClick ? "contextmenu" : "click";
+
 					// the missing events like saptouchstart and tap will be fired by the event simulation
-					this._createAndDispatchMouseEvent("mousedown", oActionDomRef, null, null, null, iClientX, iClientY);
-					this.getUtils().triggerEvent("selectstart", oActionDomRef);
-					this._createAndDispatchMouseEvent("mouseup", oActionDomRef, null, null, null, iClientX, iClientY);
-					this._createAndDispatchMouseEvent("click", oActionDomRef, bShiftKey, bAltKey, bCtrlKey);
-					//Focusout simulation removed in order to fix Press action behavior
-					//since in real scenario manual press action does not fire focusout event
+					this._createAndDispatchMouseEvent("mousedown", oActionDomRef, null, null, null, iClientX, iClientY, iButton);
+
+					if (!bRightClick) {
+						this.getUtils().triggerEvent("selectstart", oActionDomRef);
+					}
+
+					this._createAndDispatchMouseEvent("mouseup", oActionDomRef, null, null, null, iClientX, iClientY, iButton);
+					// contextmenu fired for right click, for left click we want to trigger click event
+					this._createAndDispatchMouseEvent(sClickType, oActionDomRef, bShiftKey, bAltKey, bCtrlKey, iClientX, iClientY, iButton);
 				}
 			}
 		}
@@ -324,6 +347,19 @@ sap.ui.define([
 			code: "AltLeft",
 			keyCode: 18
 		}
+	};
+
+	/**
+	 * A map of mouse button definitions for left, middle, and right buttons.
+	 * Used when dispatching mouse events to specify which button is being simulated.
+	 *
+	 * @private
+	 * @static
+	 */
+	Press.MOUSE_BUTTONS = {
+		Left: 0,
+		Middle: 1,
+		Right: 2
 	};
 
 	return Press;

@@ -28,6 +28,9 @@ sap.ui.define([
 	 *   See <code>bDescending</code> parameter
 	 * @param {boolean|function} [vSorterInfo.group]
 	 *   See <code>vGroup</code> parameter
+	 * @param {string[]} [vSorterInfo.groupPaths]
+	 *   An array of paths that are required for grouping. Supported since 1.147.0; consult the documentation of the
+	 *   specific model implementation whether it evaluates these paths.
 	 * @param {string} [vSorterInfo.path]
 	 *   The binding path for this sorter
 	 * @param {boolean} [bDescending=false]
@@ -65,6 +68,7 @@ sap.ui.define([
 				bDescending = vSorterInfo.descending;
 				vGroup = vSorterInfo.group;
 				fnComparator = vSorterInfo.comparator;
+				this.aGroupPaths = vSorterInfo.groupPaths?.slice();
 			}
 			this.sPath = sPath;
 
@@ -119,6 +123,19 @@ sap.ui.define([
 		 */
 		getGroupFunction : function() {
 			return this.fnGroup && this.fnGroup.bind(this);
+		},
+
+		/**
+		 * Returns the group paths.
+		 *
+		 * @returns {string[]|undefined} The array of group paths or <code>undefined</code> if this sorter has no
+		 *   group paths.
+		 *
+		 * @public
+		 * @since 1.147.0
+		 */
+		getGroupPaths() {
+			return this.aGroupPaths?.slice();
 		},
 
 		/**

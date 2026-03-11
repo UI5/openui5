@@ -703,7 +703,7 @@
 			"appComponent": "CA-UI5-SC"
 		},
 		{
-			"control": "sap.m.UploadSetWithTablePlugin",
+			"control": "sap.m.plugins.UploadSetwithTable",
 			"url": "UploadSetWithTablePlugin.html",
 			"appComponent": "CA-UI5-SC"
 		},

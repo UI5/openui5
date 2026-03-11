@@ -70,10 +70,6 @@ sap.ui.define([
 			library: "sap.ui.integration",
 			events: {
 				/**
-				 * Fired after function onChangeAnnotation invoked by sap.ui.codeeditor.CodeEditor.
-				 */
-				"changeAnnotation": {},
-				/**
 				 * Fired after enabled status of begin button changed.
 				 */
 				"changeEnabledOfBeginButton": {}
@@ -173,16 +169,19 @@ sap.ui.define([
 	};
 
 	CodeEditor.prototype.onChangeAnnotation = function () {
-		if (!this._oDialog.isOpen()) {
+		// if dialog is not open, no need to check the annotations.
+		// if code editor is not focused, it means the user is not editing the code, the error annotations will be removed by sap.ui.codeeditor.CodeEditor itself,
+		// then we can not use error annotations to determine whether the code is valid or not.
+		if (!this._oDialog.isOpen() || !this._oEditor.getAceEditor().isFocused()) {
 			return;
 		}
-		var oErrors = (this._oEditor.getAceEditor().getSession().getAnnotations() || []).filter(function (oError) {
+		var oErrors = this._oEditor.getAceEditor().getSession().getAnnotations().filter(function (oError) {
 			return oError.type === "error";
 		});
 		if (oErrors.length > 0) {
 			this._oDialog.getBeginButton().setEnabled(false);
-			this.fireChangeEnabledOfBeginButton();
 		} else {
+			this._oDialog.getBeginButton().setEnabled(true);
 			var sValue = this._oEditor.getAceEditor().getValue();
 			if (sValue && sValue !== "") {
 				//TODO: validate js format manually since the value maybe just as "aaa;" which will not be recognized as error by code editor itself
@@ -201,10 +200,8 @@ sap.ui.define([
 			} else {
 				this._oCode = undefined;
 			}
-			this._oDialog.getBeginButton().setEnabled(true);
-			this.fireChangeEnabledOfBeginButton();
 		}
-		this.fireChangeAnnotation();
+		this.fireChangeEnabledOfBeginButton();
 	};
 
 	CodeEditor.prototype.onSave = function () {

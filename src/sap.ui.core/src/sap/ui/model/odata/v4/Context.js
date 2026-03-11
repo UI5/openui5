@@ -2362,9 +2362,9 @@ sap.ui.define([
 	 *     <li> the list binding uses or inherits the <code>$$sharedRequest</code> parameter
 	 *       (see {@link sap.ui.model.odata.v4.ODataModel#bindList}),
 	 *     <li> the list binding uses data aggregation but no recursive hierarchy (see
-	 *       {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}), and either the
-	 *       context's root binding is suspended or this context does not represent a single entity
-	 *       (see {@link #isAggregated}),
+	 *       {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}), and the context's root
+	 *       binding is suspended or this context does not represent a single entity (see
+	 *       {@link #isAggregated}),
 	 *     <li> messages are requested, but the model does not use the <code>autoExpandSelect</code>
 	 *       parameter.
 	 *   </ul>

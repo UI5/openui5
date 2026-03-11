@@ -927,6 +927,19 @@ sap.ui.define([
 		]
 	});
 
+	// MultiInput with Clear Icon
+	var oMultiInputWithClearIcon = new MultiInput("mi-clear-icon", {
+		placeholder: "MultiInput with Clear Icon",
+		showClearIcon: true,
+		showValueHelp: true,
+		value: "Test Value",
+		width: "400px",
+		tokens: [
+			new Token({ text: "Token 1", key: "0001" }),
+			new Token({ text: "Token 2", key: "0002" })
+		]
+	});
+
 	//*******************************
 	var theCompactMode = new CheckBox("compactMode", {
 		selected: false,
@@ -1006,7 +1019,9 @@ sap.ui.define([
 			new Label("placeholderLabel", { text: "MultiInput with nMore and placeholder", width: "100%", labelFor: "mi-placeholder" }),
 			oPlaceholderMultiInput,
 			new Label("wrappingLabel", { text: "MultiInput with suggestions wrapping", width: "100%", labelFor: "mi-wrapping" }),
-			oMultiInputWrapping
+			oMultiInputWrapping,
+			new Label("clearIconLabel", { text: "MultiInput with Clear Icon", width: "100%", labelFor: "mi-clear-icon" }),
+			oMultiInputWithClearIcon
 		]
 	}).addStyleClass("sapUiContentPadding");
 

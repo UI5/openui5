@@ -1,0 +1,47 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.ui.core.sample.OpaTableAction",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"type": "application",
+		"title": "Application 'OpaTableAction'"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.ui.core": {},
+				"sap.m": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"iframe": "Test.qunit.html?testsuite=test-resources/appUnderTest/testsuite.qunit&test=Opa",
+				"stretch": true,
+				"files": [
+					"applicationUnderTest/view/Main.view.xml",
+					"applicationUnderTest/view/Main.controller.js",
+					"applicationUnderTest/Component.js",
+					"applicationUnderTest/manifest.json",
+					"applicationUnderTest/index.html",
+					"Component.js",
+					"Opa.qunit.js",
+					"Test.qunit.html",
+					"manifest.json",
+					"testsuite.qunit.html",
+					"testsuite.qunit.js"
+				]
+			}
+		}
+	}
+}
