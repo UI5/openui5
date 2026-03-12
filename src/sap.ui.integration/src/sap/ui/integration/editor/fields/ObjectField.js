@@ -2019,7 +2019,7 @@ sap.ui.define([
 		if (!that._oEditorResourceBundles.isReady()) {
 			// waiting for loading resource bundles
 			that._oEditorResourceBundles.attachEventOnce("ready", function() {
-				that.navToTranslationListPage(oEvent);
+				that.navToTranslationListPage(sProperty, oEvent);
 			});
 			return;
 		}

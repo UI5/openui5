@@ -3,9 +3,14 @@
  */
 
 sap.ui.define([
-	'./ItemBaseFlex', './Util', "sap/ui/fl/changeHandler/common/ChangeCategories", "sap/ui/mdc/chart/Util"
+	'./ItemBaseFlex',
+	'./Util',
+	"sap/ui/fl/changeHandler/common/ChangeCategories",
+	"sap/ui/fl/changeHandler/condenser/Classification",
+	"sap/ui/mdc/chart/Util",
+	"./helpers/getAffectedChartItem"
 
-], (ItemBaseFlex, Util, ChangeCategories, ChartUtil) => {
+], (ItemBaseFlex, Util, ChangeCategories, CondenserClassification, ChartUtil, getAffectedChartItem) => {
 	"use strict";
 
 	const oChartItemFlex = Object.assign({}, ItemBaseFlex);
@@ -87,9 +92,18 @@ sap.ui.define([
 		});
 	};
 
-	oChartItemFlex.addItem = oChartItemFlex.createAddChangeHandler();
-	oChartItemFlex.removeItem = oChartItemFlex.createRemoveChangeHandler();
-	oChartItemFlex.moveItem = oChartItemFlex.createMoveChangeHandler();
+	// DINC0709459: Ensure that the "role"-specific information is included in the affected control ID for add, remove, and move changes,
+	// so that the condenser can correctly identify and condense related changes.
+	const fnGetAffectedControl = (oChange) => ({ idIsLocal: false, id: getAffectedChartItem(oChange.getContent()) });
+	oChartItemFlex.addItem = oChartItemFlex.createAddChangeHandler({
+		getAffectedControl: fnGetAffectedControl
+	});
+	oChartItemFlex.removeItem = oChartItemFlex.createRemoveChangeHandler({
+		getAffectedControl: fnGetAffectedControl
+	});
+	oChartItemFlex.moveItem = oChartItemFlex.createMoveChangeHandler({
+		getAffectedControl: fnGetAffectedControl
+	});
 
 	return oChartItemFlex;
 

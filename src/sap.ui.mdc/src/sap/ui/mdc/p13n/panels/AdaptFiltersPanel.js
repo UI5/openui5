@@ -130,6 +130,11 @@ sap.ui.define([
 		this.setHeader(null);
 		this.setSubHeader(null);
 
+		// Destroy the header IconTabBar if it exists in new UI mode
+		if (this._oHeader) {
+			this._oHeader.destroy();
+		}
+
 		// Clear all cached header control references
 		// These are either destroyed by aggregations above or will be recreated
 		this._oHeader = null;
@@ -598,16 +603,16 @@ sap.ui.define([
 		}
 
 		if (this._checkIsNewUI()) {
-			this._oHeader = new IconTabBar({
+			this._oHeader = new IconTabBar(this.getId() + "-header", {
 				selectedKey: this.LIST_KEY,
 				applyContentPadding: false,
 				expandable: false,
 				items: [
-					new IconTabFilter({
+					new IconTabFilter(this.getId() + "-listTabFilter", {
 						key: this.LIST_KEY,
 						text: this._getResourceText("adaptFiltersPanel.LIST")
 					}),
-					new IconTabFilter({
+					new IconTabFilter(this.getId() + "-groupTabFilter", {
 						key: this.GROUP_KEY,
 						text: this._getResourceText("adaptFiltersPanel.GROUP")
 					})
@@ -625,12 +630,12 @@ sap.ui.define([
 			const oViewSwitch = this._getViewSwitch();
 			const oShowHideBtn = this._getShowHideBtn();
 
-			this._oHeader = new Bar({
+			this._oHeader = new Bar(this.getId() + "-legacyHeader", {
 				contentMiddle: [ oQuickFilter, new ToolbarSpacer(), oShowHideBtn, oViewSwitch ]
 			});
 			this._oHeader.setDesign(BarDesign.SubHeader);
 
-			const oSubHeader = new Bar({
+			const oSubHeader = new Bar(this.getId() + "-legacySubHeader", {
 				contentMiddle: [
 					this._getSearchField()
 				]
@@ -652,7 +657,7 @@ sap.ui.define([
 		const sHideText = this._getResourceText("filterbar.ADAPT_HIDE_VALUE");
 
 		if (!this._oShowHideBtn) {
-			this._oShowHideBtn = new Button({
+			this._oShowHideBtn = new Button(this.getId() + "-showHideBtn", {
 				press: function(oEvt) {
 					this.showFactory(!this.getCurrentViewContent()._getShowFactory());
 					const oBtn = oEvt.oSource;
@@ -669,25 +674,25 @@ sap.ui.define([
 	AdaptFiltersPanel.prototype._getQuickFilter = function() {
 
 		if (!this._oGroupModeSelect) {
-			this._oGroupModeSelect = new Select({
+			this._oGroupModeSelect = new Select(this.getId() + "-quickFilter", {
 				items: [
-					new Item({
+					new Item(this.getId() + "-quickFilter-all", {
 						key: "all",
 						text: this._getResourceText("p13nDialog.GROUPMODE_ALL")
 					}),
-					new Item({
+					new Item(this.getId() + "-quickFilter-visible", {
 						key: "visible",
 						text: this._getResourceText("p13nDialog.GROUPMODE_VISIBLE")
 					}),
-					new Item({
+					new Item(this.getId() + "-quickFilter-active", {
 						key: "active",
 						text: this._getResourceText("p13nDialog.GROUPMODE_ACTIVE")
 					}),
-					new Item({
+					new Item(this.getId() + "-quickFilter-visibleactive", {
 						key: "visibleactive",
 						text: this._getResourceText("p13nDialog.GROUPMODE_VISIBLE_ACTIVE")
 					}),
-					new Item({
+					new Item(this.getId() + "-quickFilter-mandatory", {
 						key: "mandatory",
 						text: this._getResourceText("p13nDialog.GROUPMODE_MANDATORY")
 					})
@@ -792,13 +797,13 @@ sap.ui.define([
 		}
 
 		if (!this._oViewSwitch) {
-			this._oViewSwitch = new SegmentedButton({
+			this._oViewSwitch = new SegmentedButton(this.getId() + "-viewSwitch", {
 				items: [
-					new SegmentedButtonItem({
+					new SegmentedButtonItem(this.getId() + "-listViewButton", {
 						tooltip: this._getResourceText("filterbar.ADAPT_LIST_VIEW"),
 						icon: "sap-icon://list",
 						key: this.LIST_KEY
-					}), new SegmentedButtonItem({
+					}), new SegmentedButtonItem(this.getId() + "-groupViewButton", {
 						tooltip: this._getResourceText("filterbar.ADAPT_GROUP_VIEW"),
 						icon: "sap-icon://group-2",
 						key: this.GROUP_KEY
@@ -813,7 +818,7 @@ sap.ui.define([
 				}.bind(this)
 			});
 
-			this._oInvText = new InvisibleText({
+			this._oInvText = new InvisibleText(this.getId() + "-viewSwitchLabel", {
 				text: this._getResourceText("p13nDialog.VIEW_SWITCH")
 			}).toStatic();
 

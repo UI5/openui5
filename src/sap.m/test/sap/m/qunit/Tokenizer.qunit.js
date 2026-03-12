@@ -26,7 +26,8 @@ sap.ui.define([
 
 
 	var oRb = Library1.getResourceBundleFor("sap.m"),
-		TokenizerRenderMode = Library.TokenizerRenderMode;
+		TokenizerRenderMode = Library.TokenizerRenderMode,
+		ListType = Library.ListType;
 
 
 	QUnit.module("Init", {
@@ -434,6 +435,16 @@ sap.ui.define([
 		this.tokenizer._mapTokenToListItem(oToken);
 
 		assert.ok(true, "No exception is thrown");
+	});
+
+	QUnit.test("_mapTokenToListItem should create list item with 'Inactive' type", function (assert) {
+		var oToken = new Token({ text: "Test Token" });
+		var oListItem = this.tokenizer._mapTokenToListItem(oToken);
+
+		assert.strictEqual(oListItem.getType(), ListType.Inactive, "The list item type should be 'Inactive'");
+
+		oListItem.destroy();
+		oToken.destroy();
 	});
 
 	QUnit.test("Handle mapping between List items and Tokens on Token deletion", async function (assert) {

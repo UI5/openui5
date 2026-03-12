@@ -114,6 +114,13 @@ sap.ui.define(function() {
 				}
 			},
 
+			"ExpressionParser.performance": {
+				skip: true, // test should not be executed in voters / nightly, only manually
+				module: [
+					"test-resources/sap/ui/core/qunit/internal/performance/ExpressionParser.performance.qunit"
+				]
+			},
+
 			ListBinding: {
 				title: "sap.ui.model.ListBinding - QUnit Tests"
 			},

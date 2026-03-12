@@ -1,5 +1,6 @@
 {
 	"_version": "2.0.0",
+
 	"sap.app": {
 		"id": "sap.ui.demo.masterdetail",
 		"type": "application",
@@ -12,8 +13,9 @@
 		},
 		"title": "{{appTitle}}",
 		"description": "{{appDescription}}",
+
 		"applicationVersion": {
-			"version": "1.0.0"
+		"version": "1.0.0"
 		},
 		"resources": "resources.json",
 		"dataSources": {
@@ -27,6 +29,7 @@
 			}
 		}
 	},
+
 	"sap.ui": {
 		"technology": "UI5",
 		"icons": {
@@ -43,23 +46,28 @@
 			"phone": true
 		}
 	},
+
 	"sap.ui5": {
 		"rootView": {
 			"viewName": "sap.ui.demo.masterdetail.view.App",
+			"type": "XML",
 			"id": "app"
 		},
+
 		"dependencies": {
-			"minUI5Version": "2.0.0",
+			"minUI5Version": "1.136.0",
 			"libs": {
 				"sap.f": {},
 				"sap.m": {},
 				"sap.ui.core": {}
 			}
 		},
+
 		"contentDensities": {
 			"compact": true,
 			"cozy": true
 		},
+
 		"models": {
 			"i18n": {
 				"type": "sap.ui.model.resource.ResourceModel",
@@ -76,6 +84,7 @@
 				"preload": true
 			}
 		},
+
 		"routing": {
 			"config": {
 				"routerClass": "sap.f.routing.Router",
@@ -88,6 +97,7 @@
 					"target": "notFound"
 				}
 			},
+
 			"routes": [
 				{
 					"pattern": "",
@@ -103,6 +113,7 @@
 					]
 				}
 			],
+
 			"targets": {
 				"master": {
 					"name": "Master",

@@ -309,14 +309,57 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("ManagedObjectBindingSupport#updateBindings: destroy bound filters", function () {
+		const oManagedObject = {getMetadata() {}, getModel() {}, _observer: null};
+		Object.assign(oManagedObject, ManagedObjectBindingSupport); // simulate mixin
+		oManagedObject._bIsBeingDestroyed = false;
+		oManagedObject.mBindingInfos = {};
+		oManagedObject.mObjectBindingInfos = {};
+
+		const oBinding = {
+			destroy() {},
+			detachChange() {},
+			detachEvents() {},
+			updateRequired() {}
+		};
+		const oBindingInfo = {
+			binding: oBinding,
+			model: "testModel",
+			modelChangeHandler: "~changeHandler~",
+			events: "~events~",
+			factory: "~factory~"
+		};
+		oManagedObject.mBindingInfos["items"] = oBindingInfo;
+
+		const oManagedObjectMock = this.mock(oManagedObject);
+		const oBindingMock = this.mock(oBinding);
+		oManagedObjectMock.expects("getModel").withExactArgs("testModel").returns("~modelInstance~");
+		oBindingMock.expects("updateRequired").withExactArgs("~modelInstance~").returns(false);
+		oBindingMock.expects("detachChange").withExactArgs("~changeHandler~");
+		oBindingMock.expects("detachEvents").withExactArgs("~events~");
+		oManagedObjectMock.expects("_removeBoundFilters").withExactArgs(sinon.match.same(oBinding));
+		oBindingMock.expects("destroy").withExactArgs();
+		this.mock(BindingInfo).expects("isReady")
+			.withExactArgs(sinon.match.same(oBindingInfo), sinon.match.same(oManagedObject))
+			.returns(false); // simplify test by skipping re-binding
+
+		// code under test
+		oManagedObject.updateBindings(/*bUpdateAll*/true, /*sModelName*/ "testModel");
+	});
+
+	//*********************************************************************************************
 	QUnit.test("ManagedObjectBindingSupport#_removeBoundFilters", function () {
 		const oManagedObject = {getDependents() {}, removeDependent() {}};
 		Object.assign(oManagedObject, ManagedObjectBindingSupport); // simulate mixin
-		const oBinding = {};
+		const oBinding = {isA() {}};
 		const oDependent0 = {destroy() {}, isA() {}, getBinding() {}};
 		const oDependent1 = {destroy() {}, isA() {}, getBinding() {}};
 		const oDependent2 = {destroy() {}, isA() {}, getBinding() {}};
 
+		const oBindingMock = this.mock(oBinding);
+		oBindingMock.expects("isA")
+			.withExactArgs(["sap.ui.model.ListBinding", "sap.ui.model.TreeBinding"])
+			.returns(true);
 		const oManagedObjectMock = this.mock(oManagedObject);
 		const oDependent0Mock = this.mock(oDependent0);
 		const oDependent1Mock = this.mock(oDependent1);
@@ -332,16 +375,39 @@ sap.ui.define([
 		oDependent1Mock.expects("destroy").never();
 		oDependent2Mock.expects("destroy").withExactArgs();
 
-		this.mock(oManagedObject).expects("getDependents").withExactArgs().returns([oDependent0, oDependent1, oDependent2]);
+		this.mock(oManagedObject).expects("getDependents")
+			.withExactArgs()
+			.returns([oDependent0, oDependent1, oDependent2]);
 
 		// code under test
 		oManagedObject._removeBoundFilters(oBinding);
+	});
 
-		const oManagedObject2 = {};
-		Object.assign(oManagedObject2, ManagedObjectBindingSupport); // simulate mixin
+	//*********************************************************************************************
+	QUnit.test("ManagedObjectBindingSupport#_removeBoundFilters: is not an Element", function () {
+		const oManagedObject = {};
+		Object.assign(oManagedObject, ManagedObjectBindingSupport); // simulate mixin
+		const oBinding = {isA() {}};
+		this.mock(oBinding).expects("isA")
+			.withExactArgs(["sap.ui.model.ListBinding", "sap.ui.model.TreeBinding"])
+			.returns(true);
 
 		// code under test - managed object is not an Element => has no dependents aggregation
-		oManagedObject2._removeBoundFilters(oBinding);
+		oManagedObject._removeBoundFilters(oBinding);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("ManagedObjectBindingSupport#_removeBoundFilters: not an aggregation binding", function () {
+		const oManagedObject = {getDependents() {}};
+		Object.assign(oManagedObject, ManagedObjectBindingSupport); // simulate mixin
+		const oBinding = {isA() {}};
+		this.mock(oBinding).expects("isA")
+			.withExactArgs(["sap.ui.model.ListBinding", "sap.ui.model.TreeBinding"])
+			.returns(false);
+		this.mock(oManagedObject).expects("getDependents").never(); // exit method before
+
+		// code under test
+		oManagedObject._removeBoundFilters(oBinding);
 	});
 
 	//*********************************************************************************************

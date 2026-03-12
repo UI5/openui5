@@ -384,6 +384,15 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 						"sap.ui.fl", "sap.ui.mdc"
 					]
 				}
+			},
+			"getAffectedChartItem": {
+				group: "changehandler tests",
+				module: "./flexibility/getAffectedChartItem.qunit",
+				ui5: {
+					libs: [
+						"sap.ui.fl", "sap.ui.mdc"
+					]
+				}
 			}
 		}
 	};

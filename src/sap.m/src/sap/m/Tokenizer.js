@@ -768,7 +768,7 @@ sap.ui.define([
 			var oListItem = new StandardListItem({
 				selected: true,
 				wrapping: true,
-				type: ListType.Active,
+				type: ListType.Inactive,
 				wrapCharLimit: 10000
 			}).data("tokenId", oToken.getId());
 

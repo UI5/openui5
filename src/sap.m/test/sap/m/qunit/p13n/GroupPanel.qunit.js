@@ -75,4 +75,24 @@ sap.ui.define([
 		assert.deepEqual(this.oGroupPanel.getP13nData(true), aNewGroupState, "Correct group state");
 
 	});
+
+	QUnit.test("Check 'showIfGrouped' toggle fires change event exactly once with correct reason", function(assert) {
+		var iChangeFiredCount = 0;
+		var sLastReason;
+
+		this.oGroupPanel.attachChange(function(oEvt) {
+			iChangeFiredCount++;
+			sLastReason = oEvt.getParameter("reason");
+		});
+
+		var oFirstGroupRow = this.oGroupPanel._oListControl.getItems()[0];
+		var oCheckBox = oFirstGroupRow.getContent()[0].getContent()[1].getItems()[0];
+
+		oCheckBox.fireSelect({ selected: false });
+
+		assert.equal(iChangeFiredCount, 1,
+			"change event is fired exactly once when the checkbox is toggled");
+		assert.equal(sLastReason, this.oGroupPanel.CHANGE_REASON_SHOWIFGROUPED,
+			"change event has reason 'showifgrouped'");
+	});
 });

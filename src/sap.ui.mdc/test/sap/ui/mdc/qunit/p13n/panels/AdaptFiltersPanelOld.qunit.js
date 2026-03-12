@@ -66,7 +66,7 @@ sap.ui.define([
 		beforeEach: async function(){
 			this.sDefaultGroup = "BASIC";
 			this.aMockInfo = aInfoData;
-			this.oAFPanel = new AdaptFiltersPanel({
+			this.oAFPanel = new AdaptFiltersPanel("AFP1", {
 				defaultView: "group"
 			});
 

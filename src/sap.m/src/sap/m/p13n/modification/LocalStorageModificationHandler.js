@@ -59,7 +59,7 @@ sap.ui.define([
 	};
 
 	LocalStorageModificationHandler.prototype.isModificationSupported = (mPropertyBag, oModificationPayload) => {
-		return false;
+		return Promise.resolve(false);
 	};
 
 	LocalStorageModificationHandler.getInstance = () => {

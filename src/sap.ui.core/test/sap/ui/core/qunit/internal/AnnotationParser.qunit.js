@@ -10,6 +10,7 @@ sap.ui.require([
 	"sap/ui/core/qunit/odata/v2/ODataAnnotationsV2.qunit"
 ], function () {
 	"use strict";
+	/* ui5lint-disable prefer-test-starter */
 
 	// Note: these tests MUST run last because their afterEach() cleans up the global XHR created by
 	// ODataAnnotationsFakeService.js

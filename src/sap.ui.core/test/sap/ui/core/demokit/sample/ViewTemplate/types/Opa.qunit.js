@@ -1,11 +1,8 @@
 /*!
  * ${copyright}
  */
-QUnit.config.autostart = false;
-
-sap.ui.require([
+sap.ui.define([
 	"sap/base/i18n/Localization",
-	"sap/ui/core/Core",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
 	"sap/ui/core/message/MessageType",
@@ -13,7 +10,7 @@ sap.ui.require([
 	"sap/ui/core/sample/ViewTemplate/types/pages/Main",
 	"sap/ui/test/opaQunit",
 	"sap/ui/test/TestUtils"
-], function (Localization, Core, Lib, library, MessageType, Any, Main, opaTest, TestUtils) {
+], function (Localization, Lib, library, MessageType, Any, Main, opaTest, TestUtils) {
 	"use strict";
 	const sDefaultLanguage = Localization.getLanguage();
 	const ValueState = library.ValueState;
@@ -574,10 +571,6 @@ sap.ui.require([
 
 		Then.onAnyPage.analyzeSupportAssistant();
 		Then.iTeardownMyUIComponent();
-	});
-
-	Core.ready().then(() => {
-		QUnit.start();
 	});
 });
 

@@ -32,19 +32,14 @@ sap.ui.define(function () {
 		},
 		tests : {
 			"OPA.SalesOrders" : {
-				autostart : false,
 				module : ["test-resources/sap/ui/core/internal/samples/odata/v2/SalesOrders/Opa.qunit"],
 				loader : {
 					paths : {
 						"sap/ui/core/sample" : "/test-resources/sap/ui/core/demokit/sample",
-						"sap/ui/core/internal/samples" : "/test-resources/sap/ui/core/internal/samples",
-						"sap/ui/core/internal/samples/odata/v2/SalesOrders" : "/test-resources/sap/ui/core/internal/samples/odata/v2/SalesOrders"
+						"sap/ui/core/internal/samples" : "/test-resources/sap/ui/core/internal/samples"
 					}
 				},
-				title : "OPA test sap.ui.core.internal.samples.odata.v2.SalesOrders",
-				ui5 : {
-					language : "en-US"
-				}
+				title : "OPA test sap.ui.core.internal.samples.odata.v2.SalesOrders"
 			}
 		}
 	};

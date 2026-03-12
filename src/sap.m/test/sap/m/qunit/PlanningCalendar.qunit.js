@@ -1753,6 +1753,25 @@ sap.ui.define([
 			"If showRowHeaders is set to true, appointments column has minScreenWidth set to sap.m.ScreenSize.Desktop");
 	});
 
+	QUnit.test("showRowHeaders should not add duplicate ariaLabelledBy", async function(assert) {
+		// Arrange
+		const oRow = new PlanningCalendarRow();
+		const oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2015, 0, 1),
+			rows: [ oRow ]
+		});
+		oPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Assert - no duplicate ariaLabelledBy entries after first render
+		var oRowTimeline = oPC.getAggregation("table").getItems()[0].getCells()[1];
+		var aAriaLabelledBy = oRowTimeline.getAriaLabelledBy();
+		assert.strictEqual(aAriaLabelledBy.length, new Set(aAriaLabelledBy).size, "ariaLabelledBy should have no duplicates");
+
+		// Cleanup
+		oPC.destroy();
+	});
+
 	QUnit.test("Popin column header excluded from keyboard navigation", async function(assert) {
 		// Arrange
 		var oPC = new PlanningCalendar({

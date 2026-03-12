@@ -429,14 +429,19 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("setAggregation: pending changes", function (assert) {
+[0, 1].forEach((iCreatedContexts) => {
+	const sTitle = "setAggregation: pending changes/iCreatedContexts=" + iCreatedContexts;
+
+	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES");
 
+		oBinding.iCreatedContexts = iCreatedContexts;
 		this.mock(oBinding).expects("checkTransient").withExactArgs();
 		this.mock(oBinding).expects("isUnchangedParameter")
 			.withExactArgs("$$aggregation", "~oAggregation~").returns(false);
 		this.mock(oBinding).expects("hasFilterNone").withExactArgs().returns(false);
-		this.mock(oBinding).expects("hasPendingChanges").withExactArgs().returns(true);
+		this.mock(oBinding).expects("hasPendingChanges").exactly(1 - iCreatedContexts)
+			.withExactArgs().returns(true);
 		this.mock(oBinding).expects("hasEffectivelyKeptAlive").never();
 		this.mock(oBinding).expects("applyParameters").never();
 
@@ -445,6 +450,7 @@ sap.ui.define([
 			oBinding.setAggregation("~oAggregation~");
 		}, new Error("Cannot set $$aggregation due to pending changes"));
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("setAggregation: Filter.NONE", function (assert) {
@@ -4158,8 +4164,10 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("removeCreated", function (assert) {
-		var oBinding = this.bindList("/EMPLOYEES"),
+[false, true].forEach((bAggregated) => {
+	QUnit.test("removeCreated: has $$aggregation = " + bAggregated, function (assert) {
+		var oBinding = this.bindList("/EMPLOYEES", undefined, undefined, undefined,
+				bAggregated ? {$$aggregation : {/* no hierarchyQualifier! */}} : {}),
 			oContext0 = Context.create(this.oModel, oBinding, "/EMPLOYEES($uid=id-1-23)", -1,
 				SyncPromise.resolve(Promise.resolve())),
 			oContext1 = Context.create(this.oModel, oBinding, "/EMPLOYEES($uid=id-1-24)", -2,
@@ -4199,17 +4207,20 @@ sap.ui.define([
 			oContext3.created()
 		]);
 	});
+});
 
 	//*********************************************************************************************
 [false, true].forEach(function (bIsEffectivelyKeptAlive) {
 	QUnit.test(`removeCreated: $$aggregation, ${bIsEffectivelyKeptAlive}`, function (assert) {
-		var oBinding = this.bindList("/EMPLOYEES", undefined, undefined, undefined,
-				{$$aggregation : {}}), // Note: no hierarchyQualifier!
+		var oBinding = this.bindList("/EMPLOYEES"),
 			oContext = {
 				// no isInactive
 				isEffectivelyKeptAlive : mustBeMocked
 			};
 
+		// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that leads
+		// too far :-(
+		oBinding.mParameters.$$aggregation = {hierarchyQualifier : "X"};
 		oBinding.iActiveContexts = "~iActiveContexts~";
 		oBinding.iCreatedContexts = "~iCreatedContexts~";
 		oBinding.bFirstCreateAtEnd = "~bFirstCreateAtEnd~";
@@ -4776,6 +4787,25 @@ sap.ui.define([
 				"@$ui5._" : {context : oForeignContext, predicate : "('1')"}
 			}]);
 		}, new Error("Cannot share created data between list bindings"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("createContexts: instanceof _AggregationCache", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES", null, [], [], {
+			$$aggregation : {aggregate : {foo : {grandTotal : true}}}
+		});
+		oBinding.iActiveContexts = "n/a";
+		oBinding.iCreatedContexts = 23;
+		oBinding.bLengthFinal = true;
+		assert.strictEqual(oBinding.iMaxLength, Infinity);
+		const aResults = []; // don't care: we only want to observe iMaxLength
+		aResults.$count = 42;
+		this.mock(oBinding).expects("destroyPreviousContextsLater").withExactArgs([]);
+
+		// code under test
+		assert.strictEqual(oBinding.createContexts(0, aResults), false);
+
+		assert.strictEqual(oBinding.iMaxLength, 42 - 23);
 	});
 
 	//*********************************************************************************************
@@ -5671,6 +5701,42 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("create: data aggregation w/o grand total", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		// internal data structure, not valid for #setAggregation!
+		oBinding.mParameters.$$aggregation = {
+			aggregate : "~aggregate~"
+		};
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(true);
+		this.mock(_AggregationHelper).expects("hasGrandTotal")
+			.withExactArgs("~aggregate~").returns(false);
+
+		assert.throws(function () {
+			// code under test
+			oBinding.create();
+		}, new Error("No use for data aggregation: " + oBinding));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("create: @$ui5.node.parent", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		// internal data structure, not valid for #setAggregation!
+		oBinding.mParameters.$$aggregation = {
+			aggregate : "~aggregate~"
+		};
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(true);
+		this.mock(_AggregationHelper).expects("hasGrandTotal")
+			.withExactArgs("~aggregate~").returns(true);
+
+		assert.throws(function () {
+			// code under test
+			oBinding.create({"@$ui5.node.parent" : undefined});
+		}, new Error('"@$ui5.node.parent" not supported: ' + oBinding));
+	});
+
+	//*********************************************************************************************
 	QUnit.test("create: failure", function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oBindingMock = this.mock(oBinding),
@@ -6139,7 +6205,12 @@ sap.ui.define([
 		// too far :-(
 		oBinding.mParameters.$$aggregation = bRecursiveHierarchy
 			? {expandTo : 2, hierarchyQualifier : "X"}
-			: {groupLevels : [] /* data aggregation always has groupLevels */};
+			: {
+				aggregate : {
+					foo : {grandTotal : true}
+				},
+				groupLevels : [] /* data aggregation always has groupLevels */
+			};
 		if (bAtEnd) {
 			oBinding.bFirstCreateAtEnd = false;
 		}
@@ -6149,6 +6220,11 @@ sap.ui.define([
 			.returns("~sGroupId~");
 		this.mock(oBinding).expects("getResolvedPath").withExactArgs()
 			.returns("~sResolvedPath~");
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(!bRecursiveHierarchy);
+		this.mock(_AggregationHelper).expects("hasGrandTotal").exactly(bRecursiveHierarchy ? 0 : 1)
+			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation.aggregate))
+			.returns(true);
 		this.mock(_Helper).expects("uid").withExactArgs().returns("id-1-23");
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
 		this.mock(oBinding).expects("isTransient").twice().withExactArgs().returns(false);

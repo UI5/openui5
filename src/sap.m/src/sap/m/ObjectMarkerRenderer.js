@@ -46,6 +46,7 @@ ObjectMarkerRenderer.render = function(oRm, oControl) {
 			oInnerIcon = oInnerControl._getIconAggregation();
 			if (bIsIconOnly && oInnerIcon && !oInnerIcon.hasListeners("press")) {
 				oInnerIcon.attachPress(oControl._firePress, oControl);
+				oInnerIcon.addStyleClass("sapMObjectMarkerActiveIconOnly");
 			}
 		}
 	}

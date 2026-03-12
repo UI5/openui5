@@ -234,7 +234,8 @@ sap.ui.define([
 		// if RangeSelect is performed using Shift+ArrowKeys
 		// and the focus is outside the table,
 		// resetting the _bShiftKeyPressed flag could not work correctly
-		document.addEventListener("keyup", this._keyupHandler.bind(this));
+		this._fnKeyupHandler = this._keyupHandler.bind(this);
+		document.addEventListener("keyup", this._fnKeyupHandler);
 	};
 
 	BasePanel.prototype.onAfterRendering = function() {
@@ -1007,7 +1008,8 @@ sap.ui.define([
 		this._oMoveBottomButton = null;
 		this._oSearchField = null;
 
-		document.removeEventListener("keyup", this._keyupHandler.bind(this));
+		document.removeEventListener("keyup", this._fnKeyupHandler);
+		this._fnKeyupHandler = null;
 	};
 
 	return BasePanel;

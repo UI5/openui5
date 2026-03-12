@@ -6769,7 +6769,8 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("CollectionCache#read: create & pending read", function (assert) {
-		var oCache = this.createCache("Employees"),
+		var fnAt = sinon.spy(),
+			oCache = this.createCache("Employees"),
 			oCacheMock = this.mock(oCache),
 			oCreateGroupLock = {getGroupId : function () {}},
 			oCreatePromise,
@@ -6804,7 +6805,9 @@ sap.ui.define([
 		// code under test
 		oReadPromise = this.mockRequestAndRead(oCache, 0, "Employees", 0, 3);
 		oCreatePromise = oCache.create(oCreateGroupLock, SyncPromise.resolve("Employees"), "",
-			"($uid=id-1-23)", {}, null, false, function fnSubmitCallback() {});
+			"($uid=id-1-23)", {}, false, null, function fnSubmitCallback() {}, null, fnAt);
+
+		sinon.assert.calledOnceWithExactly(fnAt, 0);
 
 		return Promise.all([oReadPromise, oCreatePromise]).then(function () {
 			assert.deepEqual(oCache.aElements, [
@@ -9336,7 +9339,8 @@ sap.ui.define([
 			+ ", bInactive=" + bInactive;
 
 	QUnit.test(sTitle, function (assert) {
-		var sResourcePath = "Employees",
+		var fnAt = sinon.spy(),
+			sResourcePath = "Employees",
 			oCache = this.createCache(sResourcePath),
 			oGroupLock = {
 				cancel : function () {},
@@ -9357,11 +9361,13 @@ sap.ui.define([
 					.callsArg(5) // fnSubmit
 					.resolves({});
 				return oCache.create(oGroupLock, SyncPromise.resolve("Employees"), "",
-					sTransientPredicate, {}, null, false, function fnSubmitCallback() {});
+					sTransientPredicate, {}, null, false, function fnSubmitCallback() {}, null,
+					fnAt);
 			})
 			.then(function () {
 				assert.strictEqual(oCache.aElements.length, 11);
 				assert.strictEqual(oCache.aElements.$created, 1);
+				sinon.assert.calledOnceWithExactly(fnAt, 0);
 
 				oCache.aElements[0]["@$ui5.context.isInactive"] = bInactive;
 
@@ -9523,7 +9529,8 @@ sap.ui.define([
 		}
 
 		QUnit.test(sTitle, function (assert) {
-			var oCache = new _Cache(this.oRequestor, "TEAMS", {/*mQueryOptions*/}),
+			var fnAt = sinon.spy(),
+				oCache = new _Cache(this.oRequestor, "TEAMS", {/*mQueryOptions*/}),
 				oCacheMock = this.mock(oCache),
 				oCancelNestedExpectation,
 				aCollection = [],
@@ -9640,8 +9647,10 @@ sap.ui.define([
 
 			// code under test
 			oCreatePromise = oCache.create(oGroupLock, SyncPromise.resolve(sPostPath), sPathInCache,
-				sTransientPredicate, oInitialData, null, false, function fnSubmitCallback() {});
+				sTransientPredicate, oInitialData, null, false, function fnSubmitCallback() {},
+				null, fnAt);
 
+			sinon.assert.calledOnceWithExactly(fnAt, 0);
 			// initial data is synchronously available
 			assert.strictEqual(aCollection[0], oInitialData);
 			assert.strictEqual(aCollection.$byPredicate[sTransientPredicate], oInitialData);
@@ -9709,7 +9718,8 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("_Cache#create: with given sPath and delete before submit", function (assert) {
-		var // real requestor to avoid reimplementing callback handling of _Requestor.request
+		var fnAt = sinon.spy(),
+			// real requestor to avoid reimplementing callback handling of _Requestor.request
 			oRequestor = _Requestor.create("/~/", {
 				getGroupProperty : defaultGetGroupProperty,
 				onCreateGroup : function () {}
@@ -9751,8 +9761,9 @@ sap.ui.define([
 
 		// code under test
 		oCreatePromise = oCache.create(oGroupLock, oPostPathPromise, sPathInCache,
-			sTransientPredicate, oEntity0);
+			sTransientPredicate, oEntity0, null, false, null, null, fnAt);
 
+		sinon.assert.calledOnceWithExactly(fnAt, 0);
 		assert.strictEqual(aCollection.$created, 1);
 		assert.strictEqual(oCache.iActiveElements, 0); // since we create in a nested collection
 		sinon.assert.calledOnceWithExactly(oRequestor.request, "POST",
@@ -9803,7 +9814,8 @@ sap.ui.define([
 	{first : false, atEnd : true}
 ].forEach(function (oFixture) {
 	QUnit.test("_Cache#create: nested create, " + JSON.stringify(oFixture), function (assert) {
-		var oCache = new _Cache(this.oRequestor, "TEAMS", {/*mQueryOptions*/}),
+		var fnAt = sinon.spy(),
+			oCache = new _Cache(this.oRequestor, "TEAMS", {/*mQueryOptions*/}),
 			oCacheMock = this.mock(oCache),
 			aCollection = oFixture.first ? [] : [{}],
 			iCount = aCollection.length,
@@ -9850,8 +9862,9 @@ sap.ui.define([
 		// code under test
 		oCreatePromise = oCache.create(oGroupLock, SyncPromise.resolve("EMPLOYEES"),
 			"($uid='0')/TEAM_2_EMPLOYEES", "($uid='1')", oInitialData, oFixture.atEnd, null,
-			function fnSubmitCallback() {});
+			function fnSubmitCallback() {}, null, fnAt);
 
+		sinon.assert.calledOnceWithExactly(fnAt, oFixture.atEnd ? 1 : 0);
 		assert.strictEqual(oCreatePromise, "~oDeepCreatePromise~");
 		assert.strictEqual(aCollection.length, iCount + 1);
 		assert.strictEqual(aCollection.$created, iCount + 1);
@@ -9865,7 +9878,8 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("_Cache#create: $metadata fails", function (assert) {
-		var oCache = new _Cache(this.oRequestor, "TEAMS"),
+		var fnAt = sinon.spy(),
+			oCache = new _Cache(this.oRequestor, "TEAMS"),
 			aCollection = [],
 			oCreatePromise,
 			oEntityData = {},
@@ -9891,8 +9905,9 @@ sap.ui.define([
 
 		// code under test
 		oCreatePromise = oCache.create(oGroupLock, oPostPathPromise, "('0')/TEAM_2_EMPLOYEES",
-			"($uid=id-1-23)", oEntityData, false, fnErrorCallback);
+			"($uid=id-1-23)", oEntityData, false, fnErrorCallback, null, null, fnAt);
 
+		sinon.assert.calledOnceWithExactly(fnAt, 0);
 		assert.deepEqual(aCollection, [{
 			"@$ui5._" : {
 				postBody : {},
@@ -10021,7 +10036,8 @@ sap.ui.define([
 	//*********************************************************************************************
 	//TODO: move to _Cache!
 	QUnit.test("CollectionCache: create entity and has pending changes", function (assert) {
-		var mQueryOptions = {},
+		var fnAt = sinon.spy(),
+			mQueryOptions = {},
 			oCache = this.createCache("Employees", mQueryOptions),
 			oCacheMock = this.mock(oCache),
 			oEntityData = {name : "John Doe"},
@@ -10080,9 +10096,10 @@ sap.ui.define([
 
 		// code under test
 		oPostPromise = oCache.create(oGroupLock, SyncPromise.resolve("Employees"), "",
-			sTransientPredicate, oEntityData, null, false, function fnSubmitCallback() {
-			});
+			sTransientPredicate, oEntityData, null, false, function fnSubmitCallback() {}, null,
+			fnAt);
 
+		sinon.assert.calledOnceWithExactly(fnAt, 0);
 		assert.strictEqual(oCache.hasPendingChangesForPath(""), true, "pending changes for root");
 		assert.strictEqual(oCache.hasPendingChangesForPath("foo"), false,
 			"pending changes for non-root");
@@ -10358,7 +10375,8 @@ sap.ui.define([
 		// parkedGroupId is used when parking the request (default is "$parked." + updategroupId)
 		QUnit.test("CollectionCache#create: relocate on failed POST for " + oFixture.createGroupId,
 				function (assert) {
-			var oCache = this.createCache("Employees"),
+			var fnAt = sinon.spy(),
+				oCache = this.createCache("Employees"),
 				oCreateGroupLock = {getGroupId : function () {}},
 				oFailedPostPromise = SyncPromise.reject(new Error()),
 				oFetchTypesPromise = SyncPromise.resolve({}),
@@ -10409,7 +10427,9 @@ sap.ui.define([
 			// code under test
 			oCache.create(oCreateGroupLock, SyncPromise.resolve("Employees"), "",
 				sTransientPredicate, {Name : null}, false, function fnErrorCallback() {},
-				function fnSubmitCallback() {});
+				function fnSubmitCallback() {}, null, fnAt);
+
+			sinon.assert.calledOnceWithExactly(fnAt, 0);
 
 			return oFailedPostPromise.then(undefined, function () {
 				var oGroupLock0 = {getGroupId : function () {}},
@@ -10484,7 +10504,8 @@ sap.ui.define([
 			+ bInactive + ", bAtEndOfCreated=" + bAtEndOfCreated;
 
 	QUnit.test(sTitle, function (assert) {
-		var oCache = _Cache.create(this.oRequestor, "Employees"),
+		var fnAt = sinon.spy(),
+			oCache = _Cache.create(this.oRequestor, "Employees"),
 			oCountChangeListener = {
 				onChange : function () {},
 				setDeregisterChangeListener : function () {}
@@ -10524,8 +10545,10 @@ sap.ui.define([
 
 		// code under test
 		oPromise = oCache.create(oCreateGroupLock, SyncPromise.resolve("Employees"), "",
-			sTransientPredicate, {}, bAtEndOfCreated, null, function fnSubmitCallback() {});
+			sTransientPredicate, {}, bAtEndOfCreated, null, function fnSubmitCallback() {}, null,
+			fnAt);
 
+		sinon.assert.calledOnceWithExactly(fnAt, bAtEndOfCreated ? 1 : 0);
 		if (bInactive) {
 			assert.deepEqual(oCache.aElements[bAtEndOfCreated ? 1 : 0], {
 				"@$ui5._" : {
@@ -10634,7 +10657,7 @@ sap.ui.define([
 			.rejects(oCanceledError);
 
 		// code under test
-		oCache.create(oCreateGroupLock, SyncPromise.resolve("Employees"), "",
+		return oCache.create(oCreateGroupLock, SyncPromise.resolve("Employees"), "",
 				sTransientPredicate, oInitialData)
 			.then(function () {
 				assert.ok(false, "Unexpected success");
@@ -12139,24 +12162,29 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [false, 1].forEach(function (bInactive) {
-	QUnit.test(`CollectionCache#setInactive(${bInactive})`, function (assert) {
+	[undefined, "~mChangeListeners~"].forEach(function (mChangeListeners) {
+		const sTitle = `CollectionCache#setInactive(${bInactive}, ${mChangeListeners})`;
+
+	QUnit.test(sTitle, function (assert) {
 		const iActivateCount = bInactive ? 0 : 1;
 		const oCache = this.createCache("Employees");
 		oCache.iActiveElements = 42;
 		this.mock(oCache).expects("getValue").withExactArgs("($uid=id-1-23)").returns("~oElement~");
 		this.mock(_Helper).expects("updateAll")
-			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "($uid=id-1-23)",
-				"~oElement~", {"@$ui5.context.isInactive" : bInactive});
+			.withExactArgs(sinon.match.same(mChangeListeners ?? oCache.mChangeListeners),
+				"($uid=id-1-23)", "~oElement~", {"@$ui5.context.isInactive" : bInactive});
 		this.mock(_Helper).expects("deletePrivateAnnotation").exactly(iActivateCount)
 			.withExactArgs("~oElement~", "initialData");
 		this.mock(_Helper).expects("addToCount").exactly(iActivateCount)
+			// Note: ignore "~mChangeListeners~" here!
 			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "",
 				sinon.match.same(oCache.aElements), 1);
 
 		// code under test
-		oCache.setInactive("($uid=id-1-23)", bInactive);
+		oCache.setInactive("($uid=id-1-23)", bInactive, mChangeListeners);
 
 		assert.strictEqual(oCache.iActiveElements, bInactive ? 42 : 43);
+	});
 	});
 });
 

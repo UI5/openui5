@@ -15,7 +15,7 @@
 					<f:heading>
 						<VBox>
 							<Breadcrumbs currentLocationText="{i18n>infoTitle}" separatorStyle="GreaterThan">
-								<Link press="onIconExplorerLinkPressed" text="{i18n>appTitle}"/>
+								<Link press=".onIconExplorerLinkPressed" text="{i18n>appTitle}"/>
 							</Breadcrumbs>
 							<Title text="{i18n>infoTitle}"/>
 						</VBox>
@@ -49,7 +49,7 @@
 								<Button class='sapUiSmallMargin'
 									text='{i18n>infoBTPIconography}'
 									width='calc(100% - 2rem)'
-									press="onInfoBTPIconographyPress"
+									press=".onInfoBTPIconographyPress"
 									visible="{= !${versionData>/isOpenUI5}}" />
 							</VBox>
 						</f:content>
@@ -179,15 +179,15 @@
 							<VBox class='sapUiSmallMargin' width="100%">
 								<HBox visible="{= !${versionData>/isOpenUI5}}" alignItems='Center' justifyContent="SpaceBetween">
 									<Text text='{i18n>infoSAPBusinessSuite}' />
-									<Button press="onDownloadBusinessSuiteIcons" type="Transparent" icon='sap-icon://download' />
+									<Button press=".onDownloadBusinessSuiteIcons" type="Transparent" icon='sap-icon://download' />
 								</HBox>
 								<HBox alignItems='Center' justifyContent="SpaceBetween">
 									<Text text='{i18n>infoSAPIcons}' />
-									<Button press="onDownloadSAPIcons" type="Transparent" icon='sap-icon://download' />
+									<Button press=".onDownloadSAPIcons" type="Transparent" icon='sap-icon://download' />
 								</HBox>
 								<HBox alignItems='Center' justifyContent="SpaceBetween">
 									<Text text='{i18n>infoSAPIconsTNT}' />
-									<Button press="onDownloadTNTIcons" type="Transparent" icon='sap-icon://download' />
+									<Button press=".onDownloadTNTIcons" type="Transparent" icon='sap-icon://download' />
 								</HBox>
 							</VBox>
 						</f:content>

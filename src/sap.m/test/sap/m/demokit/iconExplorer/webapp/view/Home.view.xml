@@ -30,9 +30,9 @@
 							textAlign="Center"/>
 						<HBox justifyContent="Center">
 							<RadioButtonGroup columns="3">
-								<RadioButton id="cbSAPIcons" text="{i18n>infoSAPIcons}" select="onCheckBoxSelect" selected="true"/>
-								<RadioButton id="cbSAPIconsTNT" text="{i18n>fontName_SAPIconsTNT}" select="onCheckBoxSelect"/>
-								<RadioButton id="cbInfoSAPBusinessSuite" visible="{= !${versionData>/isOpenUI5}}" text="{i18n>infoSAPBusinessSuite}" select="onCheckBoxSelect"/>
+								<RadioButton id="cbSAPIcons" text="{i18n>infoSAPIcons}" select=".onCheckBoxSelect" selected="true"/>
+								<RadioButton id="cbSAPIconsTNT" text="{i18n>fontName_SAPIconsTNT}" select=".onCheckBoxSelect"/>
+								<RadioButton id="cbInfoSAPBusinessSuite" visible="{= !${versionData>/isOpenUI5}}" text="{i18n>infoSAPBusinessSuite}" select=".onCheckBoxSelect"/>
 							</RadioButtonGroup>
 						</HBox>
 						<HBox justifyContent="Center">
