@@ -42,55 +42,55 @@ sap.ui.define([
 	"sap/m/Page",
 	"sap/m/Bar",
 	"sap/m/Switch"
-	],
-	function(
-		CoreLib,
-		Element,
-		LayoutLib,
-		MLib,
-		Form,
-		FormContainer,
-		FormElement,
-		FormLayout,
-		ResponsiveLayout,
-		ResponsiveGridLayout,
-		GridLayout,
-		ColumnLayout,
-		GridData,
-		ResponsiveFlowLayoutData,
-		GridElementData,
-		GridContainerData,
-		ColumnElementData,
-		ColumnContainerData,
-		VariantLayoutData,
-		Title,
-		Toolbar,
-		ToolbarSpacer,
-		mTitle,
-		Label,
-		Text,
-		Input,
-		Select,
-		ListItem,
-		DatePicker,
-		RadioButton,
-		TextArea,
-		Link,
-		ToggleButton,
-		Button,
-		Image,
-		CheckBox,
-		SegmentedButton,
-		SegmentedButtonItem,
-		Icon,
-		App,
-		Page,
-		Bar,
-		Switch
-		) {
+],
+(
+	CoreLib,
+	Element,
+	LayoutLib,
+	MLib,
+	Form,
+	FormContainer,
+	FormElement,
+	FormLayout,
+	ResponsiveLayout,
+	ResponsiveGridLayout,
+	GridLayout,
+	ColumnLayout,
+	GridData,
+	ResponsiveFlowLayoutData,
+	GridElementData,
+	GridContainerData,
+	ColumnElementData,
+	ColumnContainerData,
+	VariantLayoutData,
+	Title,
+	Toolbar,
+	ToolbarSpacer,
+	mTitle,
+	Label,
+	Text,
+	Input,
+	Select,
+	ListItem,
+	DatePicker,
+	RadioButton,
+	TextArea,
+	Link,
+	ToggleButton,
+	Button,
+	Image,
+	CheckBox,
+	SegmentedButton,
+	SegmentedButtonItem,
+	Icon,
+	App,
+	Page,
+	Bar,
+	Switch
+) => {
 	"use strict";
 
-	var oButtonLayout = new SegmentedButton("MyLayout", {
+	const oButtonLayout = new SegmentedButton("MyLayout", {
 		selectedKey: "L1",
 		items: [
 			new SegmentedButtonItem({key: "L1", text: "FormLayout"}),
@@ -102,12 +102,13 @@ sap.ui.define([
 			new SegmentedButtonItem({key: "L5", text: "ColumnLayout"})
 		],
 		selectionChange: function(oEvent) {
-			var oItem = oEvent.getParameter("item");
+			const oItem = oEvent.getParameter("item");
 			switch (oItem.getKey()) {
 			case "L1":
 				oForm1.setLayout(oLayout1);
 				oForm2.setLayout(oLayoutA);
 				oForm3.setLayout(oLayoutA3);
+				oForm4.setLayout(oLayoutA4);
 				break;
 
 			/** @deprecated */
@@ -115,6 +116,7 @@ sap.ui.define([
 				oForm1.setLayout(oLayout2);
 				oForm2.setLayout(oLayoutB);
 				oForm3.setLayout(oLayoutB3);
+				oForm4.setLayout(oLayoutB4);
 				break;
 
 			/** @deprecated */
@@ -122,18 +124,21 @@ sap.ui.define([
 				oForm1.setLayout(oLayout3);
 				oForm2.setLayout(oLayoutC);
 				oForm3.setLayout(oLayoutC3);
+				oForm4.setLayout(oLayoutC4);
 				break;
 
 			case "L4":
 				oForm1.setLayout(oLayout4);
 				oForm2.setLayout(oLayoutD);
 				oForm3.setLayout(oLayoutD3);
+				oForm4.setLayout(oLayoutD4);
 				break;
 
 			case "L5":
 				oForm1.setLayout(oLayout5);
 				oForm2.setLayout(oLayoutE);
 				oForm3.setLayout(oLayoutE3);
+				oForm4.setLayout(oLayoutE4);
 				break;
 
 			default:
@@ -142,22 +147,22 @@ sap.ui.define([
 		}
 	});
 
-	var oButtonCompact = new ToggleButton({text: 'compact',
+	const oButtonCompact = new ToggleButton({text: 'compact',
 		press: function(oEvent) {
-			var bPressed = oEvent.getParameter("pressed");
+			const bPressed = oEvent.getParameter("pressed");
 			document.body.classList.toggle("sapUiSizeCompact", bPressed);
 		}
 	});
 
-	var oLayout1 = new FormLayout("L1");
+	const oLayout1 = new FormLayout("L1");
 	/** @deprecated */
-	var oLayout2 = new ResponsiveLayout("L2");
+	const oLayout2 = new ResponsiveLayout("L2");
 	/** @deprecated */
-	var oLayout3 = new GridLayout("L3");
-	var oLayout4 = new ResponsiveGridLayout("L4");
-	var oLayout5 = new ColumnLayout("L5");
+	const oLayout3 = new GridLayout("L3");
+	const oLayout4 = new ResponsiveGridLayout("L4");
+	const oLayout5 = new ColumnLayout("L5");
 
-	var oForm1 = new Form("F1",{
+	const oForm1 = new Form("F1",{
 		title: new Title({text: "Form Title", icon: "sap-icon://sap-ui5", tooltip: "Title tooltip"}),
 		tooltip: "Form tooltip",
 		editable: true,
@@ -283,8 +288,8 @@ sap.ui.define([
 					new FormElement({
 						fields: [new ToggleButton({text: 'move container',
 													press: function(oEvent) {
-														var bPressed = oEvent.getParameter("pressed");
-														var oContainer = Element.getElementById("C1");
+														const bPressed = oEvent.getParameter("pressed");
+														const oContainer = Element.getElementById("C1");
 														oForm1.removeFormContainer(oContainer);
 														if (bPressed) {
 															oForm1.insertFormContainer(oContainer, 1);
@@ -301,9 +306,9 @@ sap.ui.define([
 											}),
 											new ToggleButton({text: 'move element',
 												press: function(oEvent) {
-													var bPressed = oEvent.getParameter("pressed");
-													var oContainer = Element.getElementById("C1");
-													var oElement = Element.getElementById("F1C1E1");
+													const bPressed = oEvent.getParameter("pressed");
+													const oContainer = Element.getElementById("C1");
+													const oElement = Element.getElementById("F1C1E1");
 													oContainer.removeFormElement(oElement);
 													if (bPressed) {
 														oContainer.insertFormElement(oElement, 1);
@@ -317,7 +322,7 @@ sap.ui.define([
 											}),
 											new ToggleButton({text: 'label conons',
 												press: function(oEvent) {
-													var bPressed = oEvent.getParameter("pressed");
+													const bPressed = oEvent.getParameter("pressed");
 													if (bPressed) {
 														oForm1.addStyleClass("sapUiFormLblColon");
 													} else {
@@ -356,8 +361,8 @@ sap.ui.define([
 							         new SegmentedButtonItem("Back3", {key: MLib.BackgroundDesign.Translucent, text: "Translucent"})
 							        ],
 							selectionChange: function(oEvent) {
-								var oItem = oEvent.getParameter("item");
-								var sBackground = oItem.getKey();
+								const oItem = oEvent.getParameter("item");
+								const sBackground = oItem.getKey();
 								oLayout1.setBackgroundDesign(sBackground);
 								/** @deprecated */
 								oLayout2.setBackgroundDesign(sBackground);
@@ -377,15 +382,15 @@ sap.ui.define([
 
 	//////////////// Form 2 ////////////////////////////////////////////////////////////////////////////////////////
 
-	var oLayoutA = new FormLayout("L_A");
+	const oLayoutA = new FormLayout("L_A");
 	/** @deprecated */
-	var oLayoutB = new ResponsiveLayout("L_B");
+	const oLayoutB = new ResponsiveLayout("L_B");
 	/** @deprecated */
-	var oLayoutC = new GridLayout("L_C");
-	var oLayoutD = new ResponsiveGridLayout("L_D");
-	var oLayoutE = new ColumnLayout("L_E", {columnsM: 2, columnsL: 3, columnsXL: 4});
+	const oLayoutC = new GridLayout("L_C");
+	const oLayoutD = new ResponsiveGridLayout("L_D");
+	const oLayoutE = new ColumnLayout("L_E", {columnsM: 2, columnsL: 3, columnsXL: 4});
 
-	var oForm2 = new Form("F2",{
+	const oForm2 = new Form("F2",{
 		toolbar: new Toolbar("TB1", {
 								content: [new Icon({src: "sap-icon://car-rental", size: "1rem"}),
 								          new mTitle("F2-Title", {text: "Car", level: CoreLib.TitleLevel.H4, titleStyle: CoreLib.TitleLevel.H5, tooltip: "Title tooltip"}),
@@ -442,7 +447,7 @@ sap.ui.define([
 					content: [
 						new Button({icon: "sap-icon://slim-arrow-down",
 							press: function(oEvent) {
-								var oContainer = Element.getElementById("F2C2");
+								const oContainer = Element.getElementById("F2C2");
 								if (oContainer.getExpanded()) {
 									oContainer.setExpanded(false);
 									oEvent.oSource.setIcon("sap-icon://slim-arrow-right");
@@ -478,15 +483,15 @@ sap.ui.define([
 
 	//////////////// Form 3 ////////////////////////////////////////////////////////////////////////////////////////
 
-	var oLayoutA3 = new FormLayout("L_A3");
+	const oLayoutA3 = new FormLayout("L_A3");
 	/** @deprecated */
-	var oLayoutB3 = new ResponsiveLayout("L_B3");
+	const oLayoutB3 = new ResponsiveLayout("L_B3");
 	/** @deprecated */
-	var oLayoutC3 = new GridLayout("L_C3");
-	var oLayoutD3 = new ResponsiveGridLayout("L_D3");
-	var oLayoutE3 = new ColumnLayout("L_E3");
+	const oLayoutC3 = new GridLayout("L_C3");
+	const oLayoutD3 = new ResponsiveGridLayout("L_D3");
+	const oLayoutE3 = new ColumnLayout("L_E3");
 
-	var oForm3 = new Form("F3",{
+	const oForm3 = new Form("F3",{
 		title: "only one container",
 		editable: true,
 		layout: oLayoutA3,
@@ -502,8 +507,8 @@ sap.ui.define([
 								text: "Title",
 								pressed: true,
 								press: function(oEvent) {
-									var bPressed = oEvent.getParameter("pressed");
-									var oContainer = Element.getElementById("F3C1");
+									const bPressed = oEvent.getParameter("pressed");
+									const oContainer = Element.getElementById("F3C1");
 									if (bPressed) {
 										oContainer.setTitle("Title");
 									} else {
@@ -518,13 +523,62 @@ sap.ui.define([
 		]
 	});
 
+	//////////////// Form 4 ////////////////////////////////////////////////////////////////////////////////////////
+
+	const oLayoutA4 = new FormLayout("L_A4");
+	/** @deprecated */
+	const oLayoutB4 = new ResponsiveLayout("L_B4");
+	/** @deprecated */
+	const oLayoutC4 = new GridLayout("L_C4");
+	const oLayoutD4 = new ResponsiveGridLayout("L_D4");
+	const oLayoutE4 = new ColumnLayout("L_E4");
+
+	const oForm4 = new Form("F4",{
+		toolbar: new Toolbar("TB4", {
+								content: [new mTitle("F4-Title", {text: "only one container (display mode)", level: CoreLib.TitleLevel.H4, titleStyle: CoreLib.TitleLevel.H5}),
+								          new ToolbarSpacer("TB4-Spacer"),
+								          new ToggleButton("F4C1-ToggleTitle", {
+											text: "Container-Title",
+											pressed: true,
+											press(oEvent) {
+													const bPressed = oEvent.getParameter("pressed");
+													const oContainer = Element.getElementById("F4C1");
+													if (bPressed) {
+														oContainer.setTitle("Title");
+													} else {
+														oContainer.setTitle();
+													}
+												}
+											})
+										]
+							}),
+		editable: false,
+		layout: oLayoutA4,
+		formContainers: [
+			new FormContainer("F4C1",{
+				title: "Title",
+				formElements: [
+					new FormElement("F4C1E1", {
+						label: "Label 1",
+						fields: [ new Text("F4C1E1F1", {text: "Text 1"})]
+					}),
+					new FormElement("F4C1E2", {
+						label: "Label 2",
+						fields: [ new Text("F4C1E2F1", {text: "Text 2"})]
+					})
+				]
+			})
+		]
+	});
+
 	new App("myApp", {
 		pages: new Page("page1", {
 			title: "Test Page for sap.ui.layout.form.Form",
 			content: [
 			          oForm1,
 			          oForm2,
-			          oForm3
+			          oForm3,
+					  oForm4
 			          ],
 			footer: new Bar({
 								contentMiddle: [oButtonLayout, oButtonCompact]
