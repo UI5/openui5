@@ -111,17 +111,8 @@ sap.ui.define([
 					wrapping: true,
 					selected: oItem.hasOwnProperty("showIfGrouped") ? oItem.showIfGrouped : true,
 					select: (oEvt) => {
-						const oPanel = oEvt.getSource().getParent().getParent().getParent().getParent().getParent().getParent();
-						const sKey = oEvt.oSource.getParent().getParent().getContent()[0].getSelectedItem().getKey();
+						const sKey = oEvt.getSource().getParent().getParent().getContent()[0].getSelectedItem().getKey();
 						this._changeShowIfGrouped(sKey, oEvt.getParameter("selected"));
-						oPanel.fireChange({
-							reason: "change",
-							item: {
-								name: sKey,
-								grouped: true,
-								showIfGrouped: oEvt.getParameter("selected")
-							}
-						});
 					},
 					text: this._getResourceText("p13n.GROUP_CHECKBOX")
 				})

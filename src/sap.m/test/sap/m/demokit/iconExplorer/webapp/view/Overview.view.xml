@@ -24,7 +24,7 @@
 			<f:DynamicPageTitle>
 				<f:heading>
 				<HBox alignItems="Center">
-					<Button icon="sap-icon://nav-back" type="Transparent" press="onBackButtonPress" class="sapUiTinyMarginEnd" />
+					<Button icon="sap-icon://nav-back" type="Transparent" press=".onBackButtonPress" class="sapUiTinyMarginEnd" />
 					<Title text="Icon Explorer"/>
 				</HBox>
 				</f:heading>

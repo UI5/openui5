@@ -5,6 +5,7 @@
 	"use strict";
 	/*global QUnit */
 	/* eslint-disable max-nested-callbacks */
+	/* ui5lint-disable prefer-test-starter */
 
 	QUnit.config.autostart = false;
 

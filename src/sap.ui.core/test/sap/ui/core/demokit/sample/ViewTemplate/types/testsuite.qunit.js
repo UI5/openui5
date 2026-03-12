@@ -31,17 +31,13 @@ sap.ui.define(function () {
 		},
 		tests : {
 			"OPA.ViewTemplate.Types" : {
-				autostart : false,
 				module : ["test-resources/sap/ui/core/demokit/sample/ViewTemplate/types/Opa.qunit"],
 				loader : {
 					paths : {
 						"sap/ui/core/sample" : "/test-resources/sap/ui/core/demokit/sample"
 					}
 				},
-				title : "OPA test sap.ui.core.sample.ViewTemplate.types",
-				ui5 : {
-					language : "en-US"
-				}
+				title : "OPA test sap.ui.core.sample.ViewTemplate.types"
 			}
 		}
 	};

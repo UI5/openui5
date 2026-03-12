@@ -31,7 +31,6 @@ sap.ui.define(function () {
 		},
 		tests : {
 			"OPA.TwoFields" : {
-				autostart : false,
 				module : ["test-resources/sap/ui/core/internal/samples/odata/twoFields/Opa.qunit"],
 				loader : {
 					paths : {
@@ -39,10 +38,7 @@ sap.ui.define(function () {
 						"sap/ui/core/internal/samples" : "/test-resources/sap/ui/core/internal/samples"
 					}
 				},
-				title : "OPA test sap.ui.core.internal.samples.odata.twoFields",
-				ui5 : {
-					language : "en-US"
-				}
+				title : "OPA test sap.ui.core.internal.samples.odata.twoFields"
 			}
 		}
 	};

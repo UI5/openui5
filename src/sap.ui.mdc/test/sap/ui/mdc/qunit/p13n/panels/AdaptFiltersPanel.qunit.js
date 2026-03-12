@@ -1638,13 +1638,13 @@ if (sModeName === "Modern") {
 
 			this.sDefaultGroup = "BASIC";
 			this.aMockInfo = aInfoData;
-			this.oAFPanel = new AdaptFiltersPanel({
+			this.oAFPanel = new AdaptFiltersPanel("AFP1", {
 				defaultView: "group",
 				footer: new Toolbar("ID_TB_MODERN_CUSTOM", {})
 			});
 
 			this.oAFPanel.setItemFactory(function() {
-				const oFilterField = new FilterField();
+				const oFilterField = new FilterField("FF1");
 				if (!oFilterField.getConditions) {
 					oFilterField.getConditions = function() {
 						return [];
@@ -1789,7 +1789,7 @@ if (sModeName === "Modern") {
 				this.fnNewUIStub = sinon.stub(AdaptFiltersPanel.prototype, "_checkIsNewUI").returns(true);
 			}
 
-			this.oAFPanel = new AdaptFiltersPanel();
+			this.oAFPanel = new AdaptFiltersPanel("AFP1");
 
 			this.oAFPanel.P13N_MODEL = "$My_very_own_model";
 

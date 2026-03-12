@@ -82,17 +82,6 @@ sap.ui.define([
 		return Promise.resolve(true);
 	};
 
-	/**
-	 * Called after the initial registration during the <code>Engine#register</code> process.
-	 *
-	 * @private
-	 * @param {sap.ui.core.Control} oControl The initialized control instance
-	 * @returns {Promise} Returns a <code>Promise</code> after initialization
-	 */
-	ModificationHandler.prototype.initialize = (oControl) => {
-		return Promise.resolve();
-	};
-
 	ModificationHandler.getInstance = () => {
 		if (!oModificationHandler) {
 			oModificationHandler = new ModificationHandler();

@@ -96,6 +96,7 @@ sap.ui.define([
 		this.iIndex = iIndex;
 		// this.iSelectionCount = 0; // on demand, for header contexts only
 		this.bKeepAlive = false;
+		// this.bOutdated = undefined; // on demand, for header contexts only; see #isOutdated
 		this.bOutOfPlace = false;
 		this.bSelected = false;
 		this.fnOnBeforeDestroy = undefined;
@@ -420,6 +421,7 @@ sap.ui.define([
 		this.oSyncCreatePromise = undefined;
 		this.bInactive = undefined;
 		this.bKeepAlive = undefined;
+		delete this.bOutdated;
 		this.bSelected = false;
 		// When removing oModel, ManagedObject#getBindingContext does not return the destroyed
 		// context although the control still refers to it
@@ -826,14 +828,16 @@ sap.ui.define([
 						};
 					});
 			}
-			if (sPath === "@$ui5.context.isSelected") {
-				// @$ui5.context.isSelected is a virtual property for header contexts and not part
-				// of the cache (in contrast to row contexts, where it is saved in the cache).
-				// Therefore, change listeners are saved and fired via the header context
+			if (sPath === "@$ui5.context.isSelected" || sPath === "@$ui5.context.isOutdated") {
+				// @$ui5.context.isSelected and @$ui5.context.isOutdated are virtual properties
+				// for header contexts and not part of the cache (in contrast to row contexts,
+				// where they are saved in the cache). Therefore, change listeners are saved and
+				// fired via the header context
 				this.mChangeListeners ??= {};
 				_Helper.registerChangeListener(this, sPath, oListener);
 
-				return SyncPromise.resolve(this.bSelected);
+				return SyncPromise.resolve(sPath === "@$ui5.context.isSelected"
+					? this.bSelected : this.bOutdated);
 			}
 			if (sPath === "$selectionCount") {
 				this.mChangeListeners ??= {};
@@ -1380,6 +1384,30 @@ sap.ui.define([
 	 */
 	Context.prototype.isKeepAlive = function () {
 		return this.bKeepAlive;
+	};
+
+	/**
+	 * Tells whether this context is outdated.
+	 *
+	 * For the header context of a list binding, the following states are supported:
+	 * <ul>
+	 *   <li><code>undefined</code>: The outdated state has not yet been determined
+	 *   <li><code>true</code>: The context is outdated
+	 *   <li><code>false</code>: The context is up-to-date
+	 * </ul>
+	 *
+	 * The outdated state can also be accessed via instance annotation "@$ui5.context.isOutdated"
+	 * at the header context.
+	 *
+	 * @returns {boolean|undefined}
+	 *   Whether this context is outdated, or <code>undefined</code> if the outdated state has not
+	 *   yet been determined
+	 *
+	 * @experimental As of version 1.147.0
+	 * @public
+	 */
+	Context.prototype.isOutdated = function () {
+		return this.bOutdated;
 	};
 
 	/**
@@ -2418,6 +2446,20 @@ sap.ui.define([
 	Context.prototype.setNewGeneration = function () {
 		iGenerationCounter += 1;
 		this.iGeneration = iGenerationCounter;
+	};
+
+	/**
+	 * Sets this context's outdated attribute. Fires a change event for "@$ui5.context.isOutdated"
+	 * to update bindings.
+	 *
+	 * @param {boolean} bOutdated - Whether this context is outdated
+	 *
+	 * @private
+	 * @see #isOutdated
+	 */
+	Context.prototype.setOutdated = function (bOutdated) {
+		this.bOutdated = bOutdated;
+		_Helper.fireChange(this.mChangeListeners, "@$ui5.context.isOutdated", bOutdated);
 	};
 
 	/**

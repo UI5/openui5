@@ -218,4 +218,41 @@ sap.ui.define([
 			assertAllContextsAvailable(assert, this.oTable);
 		}.bind(this));
 	});
+
+	QUnit.module("HeaderSelector", {
+		beforeEach: function() {
+			this.oTable = TableQUnitUtils.createTable({
+				models: new ODataModel("/MyService/")
+			});
+			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
+			return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		},
+		assertHeaderSelector: function(oHeaderSelector, mExpectedConfig, sTitle) {
+			if (mExpectedConfig.visible === false) {
+				QUnit.assert.strictEqual(oHeaderSelector.getVisible(), false, sTitle + "; HeaderSelector is not visible");
+			} else {
+				QUnit.assert.strictEqual(oHeaderSelector.getVisible(), mExpectedConfig.visible, sTitle + "; Visible: " + mExpectedConfig.visible);
+				QUnit.assert.strictEqual(oHeaderSelector.getType(), mExpectedConfig.type, sTitle + "; Type: " + mExpectedConfig.type);
+				QUnit.assert.strictEqual(oHeaderSelector.getEnabled(), mExpectedConfig.enabled, sTitle + "; Enabled: " + mExpectedConfig.enabled);
+				QUnit.assert.strictEqual(oHeaderSelector.getCheckBoxSelected(),
+					mExpectedConfig.selected, sTitle + "; CheckBoxSelected: " + mExpectedConfig.selected);
+			}
+		}
+	});
+
+	QUnit.test("clearSelection while refresh", async function(assert) {
+		await this.oMultiSelectionPlugin.setSelectionInterval(0, 1);
+		this.oTable.getBinding().refresh();
+		this.oMultiSelectionPlugin.clearSelection();
+		await this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+		this.assertHeaderSelector(this.oTable._getHeaderSelector(), {
+			visible: true,
+			type: "Icon",
+			enabled: true,
+			selected: false
+		});
+	});
 });

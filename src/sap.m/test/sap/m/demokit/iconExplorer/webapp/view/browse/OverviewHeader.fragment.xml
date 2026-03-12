@@ -26,7 +26,7 @@
 				<Label text="Theme:" labelFor="themePicker"/>
 				<Select
 					id="themePicker"
-					change="handleThemeSelection"
+					change=".handleThemeSelection"
 					selectedKey="{view>/SelectedTheme}">
 					<core:Item key="light" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HORIZON_LIGHT}" />
 					<core:Item key="dark" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HORIZON_DARK}" />

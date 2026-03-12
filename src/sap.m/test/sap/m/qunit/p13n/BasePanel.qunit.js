@@ -268,6 +268,23 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("keyup listener is properly removed from document on destroy", function(assert) {
+		var fnStoredHandler = this.oBasePanel._fnKeyupHandler;
+
+		assert.ok(typeof fnStoredHandler === "function",
+			"Panel stores a bound keyup handler reference after init");
+
+		var oRemoveSpy = sinon.spy(document, "removeEventListener");
+		this.oBasePanel.destroy();
+
+		assert.ok(
+			oRemoveSpy.calledWith("keyup", fnStoredHandler),
+			"document.removeEventListener was called with the same handler reference registered in init"
+		);
+
+		oRemoveSpy.restore();
+	});
+
 	QUnit.test("trigger button up/down/top/bottom via shortcuts", async function(assert){
 		var oPanel = this.oBasePanel;
 		oPanel.setEnableReorder(true);

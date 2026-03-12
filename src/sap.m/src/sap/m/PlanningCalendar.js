@@ -2531,10 +2531,12 @@ sap.ui.define([
 			oRowHeader = oListItem.getCells()[0];
 			oRowTimeline = oListItem.getCells()[1];
 
-			if (bShowRowHeaders) {
-				oRowTimeline.addAriaLabelledBy(oRowHeader.getId());
-			} else {
-				oRowTimeline.removeAriaLabelledBy(oRowHeader.getId());
+			const sRowHeaderId = oRowHeader.getId();
+
+			if (!bShowRowHeaders) {
+				oRowTimeline.removeAriaLabelledBy(sRowHeaderId);
+			} else if (!oRowTimeline.getAriaLabelledBy().includes(sRowHeaderId)) {
+				oRowTimeline.addAriaLabelledBy(sRowHeaderId);
 			}
 		});
 

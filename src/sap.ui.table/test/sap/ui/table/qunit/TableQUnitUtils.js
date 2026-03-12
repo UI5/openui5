@@ -786,7 +786,7 @@ sap.ui.define([
 			}
 
 			if ((mSizes.height != null && mSizes.height !== sOldHeight) || (mSizes.width != null && mSizes.width !== sOldWidth)) {
-				// Give the table time to react. Default interval of IntervalTrigger singleton that is used by the ResizeHandler is 200ms.
+				// Give the table time to react. The polling interval of the Auto row mode is 200ms.
 				return TableQUnitUtils.wait(250).then(oTable.qunit.whenRenderingFinished);
 			} else {
 				return Promise.resolve();

@@ -967,8 +967,9 @@ sap.ui.define([
 	 *     <li> the binding's root binding is suspended,
 	 *     <li> a relative binding is unresolved,
 	 *     <li> data aggregation is used with <code>groupLevels</code> or with
-	 *       <code>"grandTotal like 1.84"</code>,
+	 *       <code>"grandTotal like 1.84"</code> or without a grand total,
 	 *     <li> aggregated data instead of a single entity instance is about to be created,
+	 *     <li> "@$ui5.node.parent" is given without a recursive hierarchy,
 	 *     <li> entities are created first at the end and then at the start,
 	 *     <li> <code>bAtEnd</code> is <code>true</code> and the binding does not know the final
 	 *       length,
@@ -1023,6 +1024,14 @@ sap.ui.define([
 		}
 		if (oAggregation?.$leafLevelAggregated) {
 			throw new Error("Unsupported on aggregated data: " + this);
+		}
+		if (_Helper.isDataAggregation(this.mParameters)) {
+			if (!_AggregationHelper.hasGrandTotal(oAggregation.aggregate)) {
+				throw new Error("No use for data aggregation: " + this);
+			}
+			if (oInitialData && "@$ui5.node.parent" in oInitialData) {
+				throw new Error('"@$ui5.node.parent" not supported: ' + this);
+			}
 		}
 		if (this.isTransient()) {
 			this.checkDeepCreate();
@@ -1273,7 +1282,10 @@ sap.ui.define([
 		this.destroyPreviousContextsLater(Object.keys(this.mPreviousContextsByPath));
 		if (iCount !== undefined) { // server count is available or "non-empty short read"
 			this.bLengthFinal = true;
-			this.iMaxLength = iCount - this.iActiveContexts;
+			const iClientCount = this.oCache instanceof _AggregationCache
+				? this.iCreatedContexts // Note: _AC's $count includes inactive ones
+				: this.iActiveContexts;
+			this.iMaxLength = iCount - iClientCount;
 			shrinkContexts();
 		} else {
 			if (!aResults.length) { // "empty short read"
@@ -3217,14 +3229,16 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the header context which allows binding to <code>$count</code> or
-	 * <code>@$ui5.context.isSelected</code>.
+	 * Returns the header context which allows binding to <code>$count</code>,
+	 * <code>@$ui5.context.isOutdated</code>, or <code>@$ui5.context.isSelected</code>.
 	 *
 	 * @returns {sap.ui.model.odata.v4.Context|null}
 	 *   The header context or <code>null</code> if the binding is relative and has no context
 	 *
 	 * @public
 	 * @see #getCount
+	 * @see sap.ui.model.odata.v4.Context#isOutdated
+	 * @see sap.ui.model.odata.v4.Context#isSelected
 	 * @since 1.45.0
 	 */
 	ODataListBinding.prototype.getHeaderContext = function () {
@@ -4385,7 +4399,7 @@ sap.ui.define([
 	ODataListBinding.prototype.removeCreated = function (oContext) {
 		var iIndex, i;
 
-		if (this.mParameters.$$aggregation) {
+		if (this.mParameters.$$aggregation?.hierarchyQualifier) {
 			this.iMaxLength -= 1;
 			iIndex = this.aContexts.indexOf(oContext);
 			for (i = this.aContexts.length - 1; i > iIndex; i -= 1) {
@@ -5022,7 +5036,8 @@ sap.ui.define([
 	 *     <li> the binding has a {@link sap.ui.model.odata.v4.Context#isKeepAlive kept-alive}
 	 *       context when switching the use case of data aggregation (recursive hierarchy, pure data
 	 *       aggregation, or none at all),
-	 *     <li> there are pending changes (unless the aggregation is unchanged),
+	 *     <li> there are pending changes (unless the aggregation is unchanged), including created
+	 *       contexts (since 1.147.0),
 	 *     <li> a recursive hierarchy is requested, but the model does not use the
 	 *       <code>autoExpandSelect</code> parameter,
 	 *     <li> the binding is part of a {@link #create deep create} because it is relative to a
@@ -5076,7 +5091,7 @@ sap.ui.define([
 		if (this.hasFilterNone()) {
 			throw new Error("Cannot combine Filter.NONE with $$aggregation");
 		}
-		if (this.hasPendingChanges()) {
+		if (this.iCreatedContexts || this.hasPendingChanges()) {
 			throw new Error("Cannot set $$aggregation due to pending changes");
 		}
 		const bOldUseCase = useCase(this.mParameters.$$aggregation);

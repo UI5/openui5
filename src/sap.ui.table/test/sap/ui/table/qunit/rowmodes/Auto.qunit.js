@@ -578,7 +578,14 @@ sap.ui.define([
 			this.resetRowsUpdatedSpy();
 			this.oTable.getRowMode().setRowContentHeight(this.oTable._getDefaultRowHeight() + 20); // The table will show less rows.
 			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
+				TableUtils.RowsUpdateReason.Render, // Invalidation on propery change
+				TableUtils.RowsUpdateReason.Render // Row count adjustment
+			]);
+		}).then(() => {
+			this.resetRowsUpdatedSpy();
+			this.oTable.getRowMode().setRowContentHeight(this.oTable._getDefaultRowHeight() + 21); // Does not change number of rows.
+			return this.checkRowsUpdated(assert, [
+				TableUtils.RowsUpdateReason.Render // Invalidation on propery change
 			]);
 		});
 	}

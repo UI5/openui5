@@ -57,7 +57,6 @@ sap.ui.define(function () {
 			// OPA Test for 'Currency and unit amount in two fields'
 			// *************************************************************************
 			"OPA.TwoFields" : {
-				autostart : false,
 				loader : {
 					paths : {
 						"sap/ui/core/sample" : "test-resources/sap/ui/core/demokit/sample",
@@ -66,16 +65,12 @@ sap.ui.define(function () {
 					}
 				},
 				module : ["test-resources/sap/ui/core/internal/samples/odata/twoFields/Opa.qunit"],
-				title : "OPA test sap.ui.core.internal.samples.odata.twoFields",
-				ui5 : {
-					language : "en-US"
-				}
+				title : "OPA test sap.ui.core.internal.samples.odata.twoFields"
 			},
 			// *************************************************************************
 			// OPA Test for OData Types
 			// *************************************************************************
 			"OPA.ViewTemplate.Types" : {
-				autostart : false,
 				loader : {
 					paths : {
 						"sap/ui/core/sample" : "test-resources/sap/ui/core/demokit/sample"

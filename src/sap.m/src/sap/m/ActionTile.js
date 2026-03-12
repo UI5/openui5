@@ -133,11 +133,17 @@ sap.ui.define([
 		GenericTile.prototype.onAfterRendering.apply(this, arguments);
 	};
 
-	ActionTile.prototype.ontap = function(event) {
+	/**
+	 * Helper method to handle keyboard/pointer events with link prevention
+	 * @param {sap.ui.base.Event} oEvent - The event object
+	 * @param {string} sMethodName - The parent method name to call
+	 * @private
+	 */
+	ActionTile.prototype._handleInteractionEvent = function(oEvent) {
 		if (this._shouldRenderLink()) {
-			event.preventDefault();
+			oEvent.preventDefault();
 		}
-		GenericTile.prototype.ontap.apply(this, arguments);
+		GenericTile.prototype["on" + oEvent.type]?.apply(this, arguments);
 	};
 
 	/**
@@ -245,6 +251,20 @@ sap.ui.define([
 		if (this._oAvatar) {
 			this._oAvatar.destroy();
 		}
+	};
+
+	//Event handling for keyboard and pointer interactions
+
+	ActionTile.prototype.ontap = function(oEvent) {
+		this._handleInteractionEvent(oEvent);
+	};
+
+	ActionTile.prototype.onsapenter = function(oEvent) {
+		this._handleInteractionEvent(oEvent);
+	};
+
+	ActionTile.prototype.onsapspace = function(oEvent) {
+		this._handleInteractionEvent(oEvent);
 	};
 
 	return ActionTile;

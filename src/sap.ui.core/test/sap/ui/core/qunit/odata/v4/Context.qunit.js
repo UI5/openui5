@@ -52,6 +52,7 @@ sap.ui.define([
 		assert.strictEqual(oContext.isDeleted(), false);
 		assert.strictEqual(oContext.isInactive(), undefined);
 		assert.strictEqual(oContext.isKeepAlive(), false);
+		assert.strictEqual(oContext.isOutdated(), undefined);
 		assert.strictEqual(oContext.isOutOfPlace(), false);
 		assert.strictEqual(oContext.isSelected(), false);
 		assert.ok(oContext.hasOwnProperty("fnOnBeforeDestroy"));
@@ -435,7 +436,8 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [false, true].forEach(function (bAutoExpandSelect) {
-	["$count", "/foo/$count", "@$ui5.context.isSelected", "/foo/@$ui5.context.isSelected"]
+	["$count", "/foo/$count", "@$ui5.context.isSelected", "/foo/@$ui5.context.isSelected",
+			"@$ui5.context.isOutdated", "/foo/@$ui5.context.isOutdated"]
 			.forEach(function (sPath) {
 		var sTitle = "fetchValue: header context, autoExpandSelect=" + bAutoExpandSelect
 				+ ", path=" + sPath;
@@ -457,6 +459,7 @@ sap.ui.define([
 			oContext = Context.create(oModel, oBinding, "/foo");
 
 		oContext.bSelected = "~selected~";
+		oContext.bOutdated = "~outdated~";
 
 		this.mock(oBinding).expects("getHeaderContext").withExactArgs().returns(oContext);
 		if (sPath.includes("$count")) {
@@ -476,14 +479,27 @@ sap.ui.define([
 
 			this.mock(oBinding).expects("fetchValue").never();
 			this.mock(_Helper).expects("registerChangeListener")
-				.withExactArgs(sinon.match.same(oContext), "@$ui5.context.isSelected", "~listener~")
+				.withExactArgs(sinon.match.same(oContext),
+					sPath.includes("isOutdated")
+						? "@$ui5.context.isOutdated"
+						: "@$ui5.context.isSelected",
+					"~listener~")
 				.callsFake(() => {
 					assert.deepEqual(oContext.mChangeListeners, {});
 				});
 		}
 
 		return oContext.fetchValue(sPath, "~listener~", "bCached").then(function (vValue) {
-			assert.strictEqual(vValue, sPath.includes("$count") ? 42 : "~selected~");
+			var vExpectedValue;
+
+			if (sPath.includes("$count")) {
+				vExpectedValue = 42;
+			} else if (sPath.includes("isOutdated")) {
+				vExpectedValue = "~outdated~";
+			} else {
+				vExpectedValue = "~selected~";
+			}
+			assert.strictEqual(vValue, vExpectedValue);
 		});
 	});
 	});
@@ -1861,6 +1877,7 @@ sap.ui.define([
 		oContext.bKeepAlive = "~bKeepAlive~";
 		oContext.oDeletePromise = "~oDeletePromise~";
 		oContext.mChangeListeners = "~mChangeListeners~";
+		oContext.bOutdated = "~bOutdated~";
 		oContext.setNewGeneration();
 		iGeneration = oContext.getGeneration(true);
 
@@ -1887,6 +1904,7 @@ sap.ui.define([
 		assert.strictEqual(oContext.isTransient(), undefined);
 		assert.strictEqual(oContext.toString(), "/EMPLOYEES/42[42;destroyed]");
 		assert.notOk("mChangeListeners" in oContext);
+		assert.notOk("bOutdated" in oContext);
 
 		if (bfnOnBeforeDestroy) {
 			assert.ok(bCallbackCalled);
@@ -5630,6 +5648,36 @@ sap.ui.define([
 			// code under test
 			oContext.setOutOfPlace(true);
 		}, new Error("Not 'created persisted'"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("setOutdated, isOutdated", function (assert) {
+		const oContext = Context.create({/*oModel*/}, {/*oBinding*/}, "/path");
+		oContext.mChangeListeners = "~mChangeListeners~";
+
+		// code under test
+		assert.strictEqual(oContext.isOutdated(), undefined);
+
+		const oHelperMock = this.mock(_Helper);
+		oHelperMock.expects("fireChange")
+			.withExactArgs("~mChangeListeners~", "@$ui5.context.isOutdated", true)
+			.callsFake(() => {
+				// code under test
+				assert.strictEqual(oContext.isOutdated(), true);
+			});
+
+		// code under test
+		oContext.setOutdated(true);
+
+		oHelperMock.expects("fireChange")
+			.withExactArgs("~mChangeListeners~", "@$ui5.context.isOutdated", false)
+			.callsFake(() => {
+				// code under test
+				assert.strictEqual(oContext.isOutdated(), false);
+			});
+
+		// code under test
+		oContext.setOutdated(false);
 	});
 
 	//*********************************************************************************************

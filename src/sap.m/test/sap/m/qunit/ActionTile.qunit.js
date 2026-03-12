@@ -547,27 +547,33 @@ sap.ui.define([
 		qutils.triggerKeydown(oActionTileContent.getHeaderLink().getDomRef(),KeyCodes.SPACE);
         assert.ok(bEventNotTriggered, "TAB navigation is not disabled just after link is activated");
     });
-	QUnit.test("ontap should call preventDefault when tile has URL", function(assert) {
+	QUnit.test("Event handlers should call preventDefault when tile has URL", function(assert) {
 		// Arrange
-		var oEvent = jQuery.Event("tap");
-		oEvent.preventDefault = sinon.spy();
-		// Mock _shouldRenderLink to return true
-		sinon.stub(this.oActionTile, "_shouldRenderLink").returns(true);
-		const id = "123";
-		oEvent.target = {
-			id
-		};
-		oEvent.srcControl = {
-			getId: function() {
-				return id;
-			}
-		};
-		// Act
-		this.oActionTile.ontap(oEvent);
-		// Assert
-		assert.equal(oEvent.preventDefault.callCount,2, "preventDefault was called once");
-		// Cleanup
-		this.oActionTile._shouldRenderLink.restore();
+		var aEventTypes = ["tap", "sapenter", "sapspace"];
+		aEventTypes.forEach(function(sEventType) {
+			// Create event
+			var oEvent = jQuery.Event(sEventType);
+			oEvent.preventDefault = sinon.spy();
+			// Mock _shouldRenderLink to return true
+			sinon.stub(this.oActionTile, "_shouldRenderLink").returns(true);
+			var sId = "123";
+			oEvent.target = {
+				id: sId
+			};
+			oEvent.srcControl = {
+				getId: function() {
+					return sId;
+				}
+			};
+			// Act
+			this.oActionTile["on" + sEventType](oEvent);
+			// Assert
+			assert.ok(oEvent.preventDefault.callCount > 0 ,sEventType + ": preventDefault was called");
+			// Reset for next iteration
+			oEvent.preventDefault.resetHistory();
+			// Cleanup
+			this.oActionTile._shouldRenderLink.restore();
+		}.bind(this));
 	});
 
 });

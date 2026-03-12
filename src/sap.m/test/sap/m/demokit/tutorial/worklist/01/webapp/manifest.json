@@ -1,5 +1,6 @@
 {
 	"_version": "2.0.0",
+
 	"sap.app": {
 		"id": "mycompany.myapp.MyWorklistApp",
 		"type": "application",
@@ -27,6 +28,7 @@
 			}
 		}
 	},
+
 	"sap.ui": {
 		"technology": "UI5",
 		"icons": {
@@ -43,13 +45,15 @@
 			"phone": true
 		}
 	},
+
 	"sap.ui5": {
 		"rootView": {
 			"viewName": "mycompany.myapp.MyWorklistApp.view.App",
+			"type": "XML",
 			"id": "app"
 		},
 		"dependencies": {
-			"minUI5Version": "2.0.0",
+			"minUI5Version": "1.136.0",
 			"libs": {
 				"sap.f": {},
 				"sap.m": {},
@@ -85,25 +89,19 @@
 				"controlId": "app",
 				"controlAggregation": "pages",
 				"bypassed": {
-					"target": [
-						"notFound"
-					]
+					"target": ["notFound"]
 				}
 			},
 			"routes": [
 				{
 					"pattern": "",
 					"name": "worklist",
-					"target": [
-						"worklist"
-					]
+					"target": ["worklist"]
 				},
 				{
 					"pattern": "Products/{objectId}",
 					"name": "object",
-					"target": [
-						"object"
-					]
+					"target": ["object"]
 				}
 			],
 			"targets": {

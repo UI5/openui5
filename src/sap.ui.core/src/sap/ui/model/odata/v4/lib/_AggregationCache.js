@@ -237,7 +237,7 @@ sap.ui.define([
 
 			if (sTransientPredicate) { // created
 				iStart -= 1; // "shift" rank of non-created elements behind this one
-			} else {
+			} else if (iStart !== undefined) {
 				_Helper.setPrivateAnnotation(oElement, "rank", iStart + i);
 			}
 		}
@@ -460,9 +460,10 @@ sap.ui.define([
 	};
 
 	/**
-	 * Creates a transient node with the parent identified by "@$ui5.node.parent", inserts it into
-	 * the hierarchy at the appropriate position, and adds a POST request to the batch
-	 * group with the given ID. See {@link sap.ui.model.odata.v4.lib._Cache#create} for more.
+	 * Creates a transient node with the parent identified by "@$ui5.node.parent" (unsupported w/o
+	 * a recursive hierarchy!), inserts it into the hierarchy at the appropriate position, and adds
+	 * a POST request to the batch group with the given ID. See
+	 * {@link sap.ui.model.odata.v4.lib._Cache#create} for more.
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
 	 *   A lock for the group ID
@@ -521,7 +522,7 @@ sap.ui.define([
 		}
 
 		_Helper.addByPath(this.mPostRequests, sTransientPredicate, oEntityData);
-		const iIndex = aElements.indexOf(oParentNode) + 1; // 0 w/o oParentNode :-)
+		let iIndex = aElements.indexOf(oParentNode) + 1; // 0 w/o oParentNode :-)
 		if (this.oCountPromise) {
 			const fnOldSubmitCallback = fnSubmitCallback;
 			// create a new count promise early, that a synchronous call to
@@ -543,7 +544,11 @@ sap.ui.define([
 				}
 				aElements.$count -= 1;
 				delete aElements.$byPredicate[sTransientPredicate];
-				aElements.splice(iIndex, 1);
+				aElements.splice(aElements.indexOf(oEntityData), 1);
+			}, /*fnAt*/(iIndex0) => {
+				if (!this.oAggregation.hierarchyQualifier) {
+					iIndex = iIndex0;
+				}
 			});
 
 		if (sParentPath) { // add @odata.bind to POST body only
@@ -613,6 +618,10 @@ sap.ui.define([
 			_Helper.removeByPath(this.mPostRequests, sTransientPredicate, oEntityData);
 			aElements.$byPredicate[_Helper.getPrivateAnnotation(oEntityData, "predicate")]
 				= oEntityData;
+			if (!this.oAggregation.hierarchyQualifier) {
+				return oEntityData;
+			}
+
 			// Note: #calculateKeyPredicateRH doesn't know better :-(
 			oEntityData["@$ui5.node.level"] = iLevel;
 			// Note: key predicate required
@@ -2369,9 +2378,8 @@ sap.ui.define([
 	 */
 	_AggregationCache.prototype.requestNodeProperty = async function (oElement, oGroupLock,
 			bDropFilter) {
-		if (!this.oAggregation.$NodeProperty
-			|| _Helper.drillDown(oElement, this.oAggregation.$NodeProperty) !== undefined) {
-			return; // not applicable or already available
+		if (_Helper.drillDown(oElement, this.oAggregation.$NodeProperty) !== undefined) {
+			return; // already available
 		}
 
 		await this.requestProperties(oElement, [this.oAggregation.$NodeProperty], oGroupLock, true,
@@ -2624,6 +2632,14 @@ sap.ui.define([
 		// "super" call (like @borrows ...)
 		const fnSuper = this.oFirstLevel.restore;
 		fnSuper.call(this, bReally);
+	};
+
+	/**
+	 * @override
+	 * @see sap.ui.model.odata.v4.lib._CollectionCache#setInactive
+	 */
+	_AggregationCache.prototype.setInactive = function (sPath, bInactive) {
+		this.oFirstLevel.setInactive(sPath, bInactive, this.mChangeListeners);
 	};
 
 	/**

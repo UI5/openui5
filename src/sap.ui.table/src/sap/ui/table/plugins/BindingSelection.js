@@ -439,6 +439,8 @@ sap.ui.define([
 		if (sReason === "sort" || sReason === "filter") {
 			this.clearSelection();
 		}
+
+		updateHeaderSelector(this);
 	}
 
 	function onBindingSelectionChange(oEvent) {

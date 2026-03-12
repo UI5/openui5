@@ -476,6 +476,8 @@ sap.ui.define([
 	 *   A function which is called when the create has been canceled (after internal clean-up and
 	 *   just before {@link sap.ui.model.odata.v4.lib._GroupLock#cancel}), except if the entity is
 	 *   simply inactive
+	 * @param {function(number)} [fnAt]
+	 *   A function which is called with the insert position
 	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise which is resolved with the created entity when the POST request has been
 	 *   successfully sent and the entity has been marked as non-transient
@@ -484,7 +486,8 @@ sap.ui.define([
 	 * @public
 	 */
 	_Cache.prototype.create = function (oGroupLock, oPostPathPromise, sPath, sTransientPredicate,
-			oEntityData, bAtEndOfCreated, fnErrorCallback, fnSubmitCallback, fnCancelCallback) {
+			oEntityData, bAtEndOfCreated, fnErrorCallback, fnSubmitCallback, fnCancelCallback,
+			fnAt) {
 		var aCollection = this.getValue(sPath),
 			sGroupId = oGroupLock.getGroupId(),
 			sOriginalGroupId = sGroupId, // const :-)
@@ -655,8 +658,10 @@ sap.ui.define([
 		}
 
 		if (bAtEndOfCreated) {
+			fnAt?.(aCollection.$created);
 			aCollection.splice(aCollection.$created, 0, oEntityData);
 		} else {
+			fnAt?.(0);
 			aCollection.unshift(oEntityData);
 		}
 		aCollection.$created += 1;
@@ -4167,12 +4172,16 @@ sap.ui.define([
 	 * @param {boolean|number} bInactive
 	 *   The new value, either <code>false</code> to activate it, or <code>1</code> to mark it as
 	 *   inactive, but changed
+	 * @param {object} [mChangeListeners]
+	 *   A map of change listeners by path; used only for ""@$ui5.context.isInactive"", but not for
+	 *   "$count"!
 	 *
 	 * @public
 	 */
-	_CollectionCache.prototype.setInactive = function (sPath, bInactive) {
+	_CollectionCache.prototype.setInactive = function (sPath, bInactive,
+			mChangeListeners = this.mChangeListeners) {
 		const oElement = this.getValue(sPath);
-		_Helper.updateAll(this.mChangeListeners, sPath, oElement,
+		_Helper.updateAll(mChangeListeners, sPath, oElement,
 			{"@$ui5.context.isInactive" : bInactive});
 		if (!bInactive) { // activate
 			_Helper.deletePrivateAnnotation(oElement, "initialData");

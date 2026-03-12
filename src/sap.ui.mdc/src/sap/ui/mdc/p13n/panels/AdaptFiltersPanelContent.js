@@ -161,7 +161,7 @@ sap.ui.define([
 	};
 
 	AdaptFiltersPanelContent.prototype._setInnerLayout = function() {
-		const oVBox = new VerticalLayout({
+		const oVBox = new VerticalLayout(this.getId() + "-innerLayout", {
 			width: "100%",
 			content: [
 				this._oListControl,
@@ -199,7 +199,7 @@ sap.ui.define([
 
 	AdaptFiltersPanelContent.prototype._getToolbar = function() {
 		if (!this._oToolbar) {
-			this._oToolbar = new OverflowToolbar({
+			this._oToolbar = new OverflowToolbar(this.getId() + "-toolbar", {
 				content: [
 					new Title(this.getId() + "-title", { text: this._getResourceText("adaptFiltersPanel.TOOLBAR_TITLE") }),
 					new ToolbarSpacer(),
@@ -213,15 +213,15 @@ sap.ui.define([
 
 	AdaptFiltersPanelContent.prototype._getModeButton = function() {
 		if (!this._oModeButton) {
-			this._oModeButton = new SegmentedButton({
+			this._oModeButton = new SegmentedButton(this.getId() + "-modeButton", {
 				visible: `{=%{${this.CONTROL_MODEL}>/grouped} === false}`,
 				selectedKey: "edit",
 				items: [
-					new SegmentedButtonItem({
+					new SegmentedButtonItem(this.getId() + "-editModeButton", {
 						key: "edit",
 						text: this._getResourceText("adaptFiltersPanel.VIEW_MODE_EDIT")
 					}),
-					new SegmentedButtonItem({
+					new SegmentedButtonItem(this.getId() + "-sortModeButton", {
 						key: "sort",
 						text: this._getResourceText("adaptFiltersPanel.VIEW_MODE_SORT")
 					})
@@ -279,7 +279,7 @@ sap.ui.define([
 			this._oKeySelect = this._createKeySelect().setLayoutData(new GridData({
 				span: "XL5 L5 M5 S12"
 			}));
-			const oLabel = new Label({
+			const oLabel = new Label(this.getId() + "-addFilterLabel", {
 				text: this._getResourceText("adaptFiltersPanel.ADD_FILTER_LABEL"),
 				showColon: true,
 				labelFor: this._oKeySelect,
@@ -290,7 +290,7 @@ sap.ui.define([
 				span: "XL2 L2 M2 S12"
 			})).addStyleClass("sapUiMDCAdaptFiltersPanelFilterLabel");
 
-			this._oAddFilterSelect = new Grid({
+			this._oAddFilterSelect = new Grid(this.getId() + "-addFilterSection", {
 				containerQuery: true,
 				width: "100%",
 				hSpacing: 0.5,
@@ -301,7 +301,7 @@ sap.ui.define([
 	};
 
 	AdaptFiltersPanelContent.prototype._createKeySelect = function() {
-		const oComboBox = new ComboBox({
+		const oComboBox = new ComboBox(this.getId() + "-addFilterComboBox", {
 			width: "100%",
 			placeholder: this._getPlaceholderText(),
 			change: (oEvt) => {
