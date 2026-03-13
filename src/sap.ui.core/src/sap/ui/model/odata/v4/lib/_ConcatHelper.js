@@ -42,18 +42,18 @@ sap.ui.define([
 			 *
 			 * @param {number} iStart
 			 *   The start index of the range
-			 * @param {number} iEnd
-			 *   The index after the last element
+			 * @param {number} iLength
+			 *   The length of the range
 			 * @returns {string}
 			 *   The resource path including the query string
 			 */
 			// @override sap.ui.model.odata.v4.lib._CollectionCache#getResourcePathWithQuery
-			oCache.getResourcePathWithQuery = function (iStart, iEnd) {
+			oCache.getResourcePathWithQuery = function (iStart, iLength) {
 				// Note: ignore existing mQueryOptions.$apply, e.g. from ODLB#updateAnalyticalInfo
 				var mQueryOptionsWithApply = _AggregationHelper.buildApply(oAggregation,
 						Object.assign({}, this.mQueryOptions, {
 							$skip : iStart,
-							$top : iEnd - iStart
+							$top : iLength
 						}), 1, bFollowUp, mAlias2MeasureAndMethod);
 
 				bFollowUp = true; // next request is a follow-up

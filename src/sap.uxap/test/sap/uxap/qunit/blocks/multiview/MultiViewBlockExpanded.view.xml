@@ -19,7 +19,7 @@
 		<Text text="LVL B"></Text>
 		<Label text="Room"></Label>
 		<Text text="AppHaus"></Text>
-		<Link text="See Less" press="handlePress"/>
+		<Link text="See Less" press=".handlePress"/>
 	</forms:SimpleForm>
 
 

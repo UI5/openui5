@@ -18,7 +18,7 @@
 									reactiveAreaMode="Overlay"
 									title="HH-1000"
 									titleActive="true"
-									titlePress="onObjectIdentifierPress"
+									titlePress=".onObjectIdentifierPress"
 								/>
 							</l:VerticalLayout>
 						</CustomListItem>
@@ -29,7 +29,7 @@
 									reactiveAreaMode="Overlay"
 									title="HH-1001"
 									titleActive="true"
-									titlePress="onObjectIdentifierPress"
+									titlePress=".onObjectIdentifierPress"
 								/>
 							</l:VerticalLayout>
 						</CustomListItem>
@@ -40,7 +40,7 @@
 									reactiveAreaMode="Overlay"
 									title="HH-1002"
 									titleActive="true"
-									titlePress="onObjectIdentifierPress"
+									titlePress=".onObjectIdentifierPress"
 								/>
 							</l:VerticalLayout>
 						</CustomListItem>

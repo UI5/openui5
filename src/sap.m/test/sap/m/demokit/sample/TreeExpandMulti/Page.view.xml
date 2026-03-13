@@ -16,14 +16,14 @@
 					<Button
 						id="expandMulti"
 						text="expand selected nodes"
-						press="onExpandMultiPress"/>
+						press=".onExpandMultiPress"/>
 					<Button
 						id="collapseMulti"
 						text="collapse selected nodes"
-						press="onCollapseMultiPress"/>
+						press=".onCollapseMultiPress"/>
 					<MultiComboBox id="idSticky"
 						placeholder="Sticky options"
-						selectionFinish="onSelectionFinish"
+						selectionFinish=".onSelectionFinish"
 						width="15%">
 						<items>
 							<core:Item  text="Header Toolbar"
@@ -34,7 +34,7 @@
 					</MultiComboBox>
 					<ToggleButton id="toggleInfoToolbar"
 						text="Hide/Show InfoToolbar"
-						press="onToggleInfoToolbar" />
+						press=".onToggleInfoToolbar" />
 				</content>
 			</OverflowToolbar>
 		</headerToolbar>

@@ -1,6 +1,6 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:f="sap.f" xmlns:core="sap.ui.core">
 	<ResponsivePopover placement="Bottom" showHeader="false">
-		<f:ProductSwitch change="fnChange">
+		<f:ProductSwitch change=".fnChange">
 			<f:items>
 				<f:ProductSwitchItem
 					src="sap-icon://newspaper"

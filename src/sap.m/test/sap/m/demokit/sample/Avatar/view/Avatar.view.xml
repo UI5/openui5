@@ -23,7 +23,7 @@
 							displaySize="XL"
 							displayShape="Square"
 							showBorder="true"
-							press="onPress"/>
+							press=".onPress"/>
 					<Text
 							text="Avatar of a product with border"
 							class="sapUiSmallMarginTop"/>
@@ -33,7 +33,7 @@
 							src="{/Woman01}"
 							displaySize="XL"
 							showBorder="true"
-							press="onPress"/>
+							press=".onPress"/>
 					<Text
 							text="Avatar of a person with border"
 							class="sapUiSmallMarginTop"/>
@@ -43,7 +43,7 @@
 							initials="IS"
 							displaySize="XL"
 							displayShape="Square"
-							press="onPress"/>
+							press=".onPress"/>
 					<Text
 							text="Square with initials"
 							class="sapUiSmallMarginTop"/>
@@ -53,7 +53,7 @@
 							enabled="false"
 							initials="PI"
 							displaySize="XL"
-							press="onPress"/>
+							press=".onPress"/>
 					<Text
 							text="Disabled"
 							class="sapUiSmallMarginTop"/>
@@ -62,7 +62,7 @@
 					<Avatar
 							displaySize="XL"
 							backgroundColor="Transparent"
-							press="onPress"/>
+							press=".onPress"/>
 					<Text
 							text="Transparent background"
 							class="sapUiSmallMarginTop"/>
@@ -72,7 +72,7 @@
 							initials="IS"
 							displaySize="XL"
 							backgroundColor="TileIcon"
-							press="onPress"/>
+							press=".onPress"/>
 					<Text
 							text="TileIcon background"
 							class="sapUiSmallMarginTop"/>
@@ -82,7 +82,7 @@
 							displaySize="XL"
 							backgroundColor="Placeholder"
 							displayShape="Square"
-							press="onPress"/>
+							press=".onPress"/>
 					<Text
 							text="Placeholder background"
 							class="sapUiSmallMarginTop"/>
@@ -90,7 +90,7 @@
 				<VBox alignItems="Center">
 					<Avatar
 							displaySize="XL"
-							press="onPress"
+							press=".onPress"
 							initials="ABC"/>
 					<Text
 							text="Circular avatar with 3 letter initials"

@@ -9,7 +9,7 @@
 	controllerName="sap.uxap.sample.ObjectPageResetSelectedSection.controller.ObjectPageResetSelectedSection"
 	height="100%">
 	<m:NavContainer id="navigationContainer"
-		navigate="onNavigate">
+		navigate=".onNavigate">
 		<m:Page id="page1" title="Page 1">
 			<layout:VerticalLayout
 				class="sapUiContentPadding"
@@ -18,7 +18,7 @@
 					text="This example shows how to reset the selected section of the ObjectPage to the first visible and scroll to the top upon revisiting the page."/>
 				<m:List>
 					<m:StandardListItem
-						press="onListItemPress"
+						press=".onListItemPress"
 						title="To ObjectPage"
 						type="Navigation" />
 				</m:List>
@@ -27,7 +27,7 @@
 		</m:Page>
 		<m:Page id="page2" title="Page 2"
 			showNavButton="true"
-			navButtonPress="onBackButtonPress">
+			navButtonPress=".onBackButtonPress">
 			<ObjectPageLayout id="ObjectPageLayout"
 				enableLazyLoading="true"
 				showTitleInHeaderContent="true"

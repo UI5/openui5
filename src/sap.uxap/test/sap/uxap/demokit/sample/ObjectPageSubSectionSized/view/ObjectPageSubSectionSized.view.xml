@@ -11,8 +11,8 @@
 		<headerTitle>
 			<ObjectPageHeader objectTitle="Subsection with blocks using column layout">
 				<actions>
-					<m:ToggleButton text="Use Title on the Left" press="toggleTitle"/>
-					<m:ToggleButton text="Use Two Columns Mode" press="toggleUseTwoColumns"/>
+					<m:ToggleButton text="Use Title on the Left" press=".toggleTitle"/>
+					<m:ToggleButton text="Use Two Columns Mode" press=".toggleUseTwoColumns"/>
 				</actions>
 			</ObjectPageHeader>
 		</headerTitle>

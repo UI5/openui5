@@ -30,10 +30,10 @@ sap.ui.define([
 	 *
 	 * @author SAP SE
 	 * @version ${version}
-	 * @since 1.146
+	 * @since 1.147
 	 *
 	 * @constructor
-	 * @private
+	 * @public
 	 * @alias sap.m.table.Title
 	 */
 	const Title = Control.extend("sap.m.table.Title", /** @lends sap.m.table.Title.prototype */ {
@@ -84,7 +84,7 @@ sap.ui.define([
 				visible : {type : "boolean", group : "Appearance", defaultValue : true}
 
 			},
-
+			defaultAggregation : "title",
 			aggregations : {
 				/**
 				 * Sets the title control, which is displayed in the toolbar as usual.

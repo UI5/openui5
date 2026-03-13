@@ -6,7 +6,7 @@
 .sapMTableTitle {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.5rem;
+	gap: 0.25rem;
 
 	&:has(> .sapMTitleStyleAuto) { --_sapMTableTitle-title-font-size: var(--sapGroup_Title_FontSize); }
 	&:has(> .sapMTitleStyleH1) { --_sapMTableTitle-title-font-size: var(--sapFontHeader1Size); }
@@ -27,10 +27,7 @@
 		font-size: var(--_sapMTableTitle-title-font-size);
 	}
 
-	&.sapMTableTitleSelectedCount {
-		font-size: var(--_sapMTableTitle-title-font-size);
-	}
-
+	&.sapMTableTitleSelectedCount,
 	&.sapMTableTitleSelectedRowCount {
 		font-size: ~"min(var(--_sapMTableTitle-title-font-size),max(14px, calc(var(--_sapMTableTitle-title-font-size) - 2px)))";
 	}

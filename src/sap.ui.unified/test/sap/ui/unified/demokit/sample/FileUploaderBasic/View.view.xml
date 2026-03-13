@@ -11,9 +11,9 @@
 			name="myFileUpload"
 			uploadUrl="upload/"
 			tooltip="Upload your file to the local server"
-			uploadComplete="handleUploadComplete"/>
+			uploadComplete=".handleUploadComplete"/>
 		<Button
 			text="Upload File"
-			press="handleUploadPress"/>
+			press=".handleUploadPress"/>
 	</l:VerticalLayout>
 </mvc:View>

@@ -23,7 +23,7 @@
 							width="100%"
 							densityAware="false"
 							class="welcomeImage"
-							load="handleLandingImageLoad"
+							load=".handleLandingImageLoad"
 							visible="{device>/system/phone}"/>
 
 						<Image
@@ -31,7 +31,7 @@
 							width="100%"
 							densityAware="false"
 							class="welcomeImage"
-							load="handleLandingImageLoad"
+							load=".handleLandingImageLoad"
 							visible="{=!${device>/system/phone}}"/>
 
 						<l:VerticalLayout

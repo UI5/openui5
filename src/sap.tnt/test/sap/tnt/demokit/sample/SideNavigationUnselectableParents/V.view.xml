@@ -11,7 +11,7 @@
 			press=".onCollapseExpandPress" />
 
 		<tnt:SideNavigation id="sideNavigation" selectedKey="walked" expanded="false"
-			itemSelect="onItemSelect">
+			itemSelect=".onItemSelect">
 			<tnt:NavigationList>
 					<tnt:NavigationListItem text="Building" icon="sap-icon://building" selectable="false" >
 						<tnt:NavigationListItem text="Office 01" />

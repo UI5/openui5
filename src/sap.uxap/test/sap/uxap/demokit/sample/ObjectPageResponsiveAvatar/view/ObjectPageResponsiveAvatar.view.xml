@@ -7,14 +7,14 @@
 	<ObjectPageLayout id="ObjectPageLayout"
 		showTitleInHeaderContent="true"
 		showEditHeaderButton="true"
-		editHeaderButtonPress="handleEditBtnPress"
+		editHeaderButtonPress=".handleEditBtnPress"
 		upperCaseAnchorBar="false">
 		<headerTitle>
 			<ObjectPageDynamicHeaderTitle>
 				<breadcrumbs>
 					<m:Breadcrumbs currentLocationText="Responsive Avatar Demo">
-						<m:Link text="Home" press="handleLink1Press"/>
-						<m:Link text="Examples" press="handleLink2Press"/>
+						<m:Link text="Home" press=".handleLink1Press"/>
+						<m:Link text="Examples" press=".handleLink2Press"/>
 					</m:Breadcrumbs>
 				</breadcrumbs>
 
@@ -48,7 +48,7 @@
 							<m:OverflowToolbarLayoutData priority="NeverOverflow"/>
 						</m:layoutData>
 					</m:OverflowToolbarButton>
-					<m:Button text="Toggle Footer" press="toggleFooter"/>
+					<m:Button text="Toggle Footer" press=".toggleFooter"/>
 				</actions>
 			</ObjectPageDynamicHeaderTitle>
 		</headerTitle>
@@ -57,8 +57,7 @@
 			<m:FlexBox wrap="Wrap">
 				<m:Avatar id="headerAvatar"
 					class="sapUiSmallMarginEnd"
-					src="./test-resources/sap/uxap/images/imageID_275314.png"
-					press=".handleAvatarPress"/>
+					src="./test-resources/sap/uxap/images/imageID_275314.png"/>
 
 				<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
 					<m:Link text="+33 6 4512 5158"/>
@@ -73,13 +72,13 @@
 
 			<m:MessageStrip
 				text="The Avatar size changes automatically based on screen size: Phone (M), Tablet (L), Desktop/DesktopExtraLarge (XL). This is handled using the breakpointChanged event."
-			type="Information"
-			showIcon="true"
-			class="sapUiTinyMarginTopBottom"/>
-	</headerContent>
+				type="Information"
+				showIcon="true"
+				class="sapUiTinyMarginTopBottom"/>
+		</headerContent>
 
-	<sections>
-		<ObjectPageSection titleUppercase="false" title="About">
+		<sections>
+			<ObjectPageSection titleUppercase="false" title="About">
 				<subSections>
 					<ObjectPageSubSection>
 						<blocks>
@@ -89,10 +88,10 @@
 								<m:Text text="The ObjectPageLayout fires the breakpointChanged event whenever its width changes and crosses a breakpoint."/>
 								<m:Text text="The application can handle this event to adjust UI elements like Avatar sizes accordingly."/>
 								<m:Text class="sapUiSmallMarginTop" text="Breakpoints:"/>
-						<m:Text text="- Phone: &lt; 600px -&gt; Avatar size M (4rem)"/>
-						<m:Text text="- Tablet: 600px - 1024px -&gt; Avatar size L (5rem)"/>
-						<m:Text text="- Desktop: 1024px - 1439px -&gt; Avatar size XL (7rem)"/>
-						<m:Text text="- DesktopExtraLarge: &gt;= 1440px -&gt; Avatar size XL (7rem)"/>
+								<m:Text text="- Phone: &lt; 600px -&gt; Avatar size M (4rem)"/>
+								<m:Text text="- Tablet: 600px - 1024px -&gt; Avatar size L (5rem)"/>
+								<m:Text text="- Desktop: 1024px - 1439px -&gt; Avatar size XL (7rem)"/>
+								<m:Text text="- DesktopExtraLarge: &gt;= 1440px -&gt; Avatar size XL (7rem)"/>
 							</layout:VerticalLayout>
 						</blocks>
 					</ObjectPageSubSection>
@@ -106,12 +105,12 @@
 							<layout:VerticalLayout>
 								<m:Title text="How it Works" level="H3"/>
 								<m:Text text="1. Attach to the breakpointChanged event in the controller's onInit method"/>
-						<m:Text text="2. In the event handler, get the currentRange parameter (Phone/Tablet/Desktop/DesktopExtraLarge)"/>
-						<m:Text text="3. Map the range to appropriate Avatar sizes using a switch statement"/>
-						<m:Text text="4. Update the Avatar's displaySize property"/>
-						<m:Text class="sapUiSmallMarginTop" text="The event provides two parameters:"/>
-						<m:Text text="- currentRange: The media range name (Phone, Tablet, Desktop, or DesktopExtraLarge)"/>
-					<m:Text text="- currentWidth: The current width of the control in pixels"/>
+								<m:Text text="2. In the event handler, get the currentRange parameter (Phone/Tablet/Desktop/DesktopExtraLarge)"/>
+								<m:Text text="3. Map the range to appropriate Avatar sizes using a switch statement"/>
+								<m:Text text="4. Update the Avatar's displaySize property"/>
+								<m:Text class="sapUiSmallMarginTop" text="The event provides two parameters:"/>
+								<m:Text text="- currentRange: The media range name (Phone, Tablet, Desktop, or DesktopExtraLarge)"/>
+								<m:Text text="- currentWidth: The current width of the control in pixels"/>
 							</layout:VerticalLayout>
 						</blocks>
 					</ObjectPageSubSection>
@@ -124,10 +123,10 @@
 						<blocks>
 							<layout:VerticalLayout>
 								<m:Title text="Benefits" level="H3"/>
-						<m:Text text="- Full application control over responsive behavior"/>
-						<m:Text text="- Simple event-based API"/>
-						<m:Text text="- Can be used for any responsive UI adjustments, not just Avatars"/>
-						<m:Text text="- Works seamlessly with FlexibleColumnLayout and other container controls"/>
+								<m:Text text="- Full application control over responsive behavior"/>
+								<m:Text text="- Simple event-based API"/>
+								<m:Text text="- Can be used for any responsive UI adjustments, not just Avatars"/>
+								<m:Text text="- Works seamlessly with FlexibleColumnLayout and other container controls"/>
 							</layout:VerticalLayout>
 						</blocks>
 					</ObjectPageSubSection>

@@ -12,7 +12,7 @@
 	<App id="MyApp">
 		<Page>
 			<headerContent>
-				<Button icon="sap-icon://wrench" press="onPressRTA"/>
+				<Button icon="sap-icon://wrench" press=".onPressRTA"/>
 			</headerContent>
 			<content class="sapUiContentPadding">
 				<Table id="idTable" items="{path: '/ProductCollection'}">

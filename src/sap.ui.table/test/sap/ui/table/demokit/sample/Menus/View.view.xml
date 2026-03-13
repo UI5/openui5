@@ -16,7 +16,7 @@
 				rows="{/ProductCollection}"
 				enableColumnFreeze="{ui>/showFreezeMenuEntry}"
 				enableCellFilter="{ui>/enableCellFilter}"
-				beforeOpenContextMenu="onProductIdCellContextMenu"
+				beforeOpenContextMenu=".onProductIdCellContextMenu"
 				ariaLabelledBy="title">
 				<extension>
 					<m:OverflowToolbar style="Clear">
@@ -33,7 +33,7 @@
 						<m:ToggleButton
 							icon="sap-icon://menu"
 							tooltip="Enable / Disable Custom Context Menu"
-							press="onToggleContextMenu"/>
+							press=".onToggleContextMenu"/>
 					</m:OverflowToolbar>
 				</extension>
 				<columns>

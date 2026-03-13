@@ -4,7 +4,7 @@
 		<SlideTile class="sapUiTinyMarginBegin sapUiTinyMarginTop">
 			<GenericTile
 				backgroundImage="test-resources/sap/m/demokit/sample/SlideTile/images/NewsImage2.png"
-				frameType="TwoByOne" press="pressOnTileOne">
+				frameType="TwoByOne" press=".pressOnTileOne">
 				<TileContent footer="August 21, 2016">
 					<NewsContent
 						contentText="SAP Unveils Powerful New Player Comparision Tool Exclusively on NFL.com"
@@ -13,7 +13,7 @@
 			</GenericTile>
 			<GenericTile
 				backgroundImage="test-resources/sap/m/demokit/sample/SlideTile/images/NewsImage1.png"
-				frameType="TwoByOne" press="pressOnTileTwo">
+				frameType="TwoByOne" press=".pressOnTileTwo">
 				<TileContent footer="August 21, 2016">
 					<NewsContent
 						contentText="Wind Map: Monitoring Real-Time and Forecasted Wind Conditions across the Globe"
@@ -24,7 +24,7 @@
 		<SlideTile class="sapUiTinyMarginBegin sapUiTinyMarginTop" transitionTime="250" displayTime="2500">
 			<GenericTile
 				backgroundImage="test-resources/sap/m/demokit/sample/SlideTile/images/NewsImage1.png"
-				frameType="TwoByOne" press="pressOnTileOne">
+				frameType="TwoByOne" press=".pressOnTileOne">
 				<TileContent footer="August 21, 2016">
 					<NewsContent
 						contentText="Wind Map: Monitoring Real-Time and Forecasted Wind Conditions across the Globe"

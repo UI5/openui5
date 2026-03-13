@@ -55,7 +55,7 @@
 						<Button
 							text="Toggle Footer"
 							type="Transparent"
-							press="onToggleFooter" />
+							press=".onToggleFooter" />
 						<Button
 							icon="sap-icon://action"
 							type="Transparent" />
@@ -68,11 +68,11 @@
 				<f:DynamicPageHeader pinnable="true" id="dynamicPageHeaderId">
 					<f:content>
 						<VBox fitContainer="true">
-							<Button text="Solid Background Design" press="onSetSolidBackground" />
+							<Button text="Solid Background Design" press=".onSetSolidBackground" />
 							<Button text="Transparent Background Design"
-								press="onSetTransparentBackground" />
+								press=".onSetTransparentBackground" />
 							<Button text="Translucent Background Design"
-								press="onSetTranslucentBackground" />
+								press=".onSetTranslucentBackground" />
 						</VBox>
 					</f:content>
 				</f:DynamicPageHeader>

@@ -52,10 +52,10 @@
 			</f:content>
 		</f:SimpleForm>
 		<beginButton>
-			<Button id="cancel" text="Cancel" press="onExportCancelPress" />
+			<Button id="cancel" text="Cancel" press=".onExportCancelPress" />
 		</beginButton>
 		<endButton>
-			<Button id="exportBtn" text="Export" type="Emphasized" press="onExportFinalizePress" class="sapUiTinyMarginEnd" />
+			<Button id="exportBtn" text="Export" type="Emphasized" press=".onExportFinalizePress" class="sapUiTinyMarginEnd" />
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

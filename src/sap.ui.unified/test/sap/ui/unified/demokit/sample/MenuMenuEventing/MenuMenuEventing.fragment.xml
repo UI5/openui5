@@ -3,7 +3,7 @@
 	xmlns:core="sap.ui.core"
 	xmlns:u="sap.ui.unified">
 		<u:Menu
-			itemSelect="handleMenuItemPress">
+			itemSelect=".handleMenuItemPress">
 			<u:MenuItem
 				text="My 1st Item"
 				icon="sap-icon://save"/>

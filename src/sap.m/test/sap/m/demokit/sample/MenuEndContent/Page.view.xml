@@ -2,6 +2,6 @@
 		xmlns:mvc="sap.ui.core.mvc"
 		xmlns="sap.m">
 	<VBox class="sapUiSmallMargin">
-		<Button id="button1" text="Open Menu" press="onPress" ariaHasPopup="Menu"/>
+		<Button id="button1" text="Open Menu" press=".onPress" ariaHasPopup="Menu"/>
 	</VBox>
 </mvc:View>

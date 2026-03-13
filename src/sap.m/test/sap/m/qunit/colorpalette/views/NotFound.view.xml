@@ -9,7 +9,7 @@
 		illustrationType="sapIllus-PageNotFound"
 		id="notFoundPage">
 		<additionalContent>
-			<Link id="backToMainPage" text="{i18n>backToMainPage}" press="onLinkPressed" />
+			<Link id="backToMainPage" text="{i18n>backToMainPage}" press=".onLinkPressed" />
 		</additionalContent>
 	</IllustratedMessage>
 

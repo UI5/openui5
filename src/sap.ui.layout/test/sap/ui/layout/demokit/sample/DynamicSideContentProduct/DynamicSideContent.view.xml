@@ -16,7 +16,7 @@
 				class="sapUiDSCExplored sapUiContentPadding"
 				containerQuery="true"
 				sideContentFallDown="BelowM"
-				breakpointChanged="handleBreakpointChangeEvent">
+				breakpointChanged=".handleBreakpointChangeEvent">
 				<VBox>
 					<Title level="H1" text="Product" />
 					<Image src="{img>/products/pic1}" densityAware="false" width="10em" />
@@ -31,7 +31,7 @@
 					<Toolbar>
 						<Title text="Comments"/>
 						<ToolbarSpacer />
-						<Button text="Close" type="Transparent" press="handleSideContentHide" visible="{= !${media>/phone}}" />
+						<Button text="Close" type="Transparent" press=".handleSideContentHide" visible="{= !${media>/phone}}" />
 					</Toolbar>
 					<l:VerticalLayout
 							width="100%">
@@ -53,9 +53,9 @@
 		</Page>
 		<footer>
 			<Toolbar>
-				<Button text="Toggle" type="Accept" press="handleToggleClick" id="toggleButton" />
-				<Button text="Open Side Content" id="showSideContentButton" press="handleSideContentShow" visible="false" />
-				<Slider id='DSCWidthSlider' value="100" liveChange="handleSliderChange" visible="{= !${media>/phone}}" />
+				<Button text="Toggle" type="Accept" press=".handleToggleClick" id="toggleButton" />
+				<Button text="Open Side Content" id="showSideContentButton" press=".handleSideContentShow" visible="false" />
+				<Slider id='DSCWidthSlider' value="100" liveChange=".handleSliderChange" visible="{= !${media>/phone}}" />
 				<Text id='DSCWidthHintText' text="Best view in full screen" visible="{= !${media>/phone}}" />
 			</Toolbar>
 		</footer>

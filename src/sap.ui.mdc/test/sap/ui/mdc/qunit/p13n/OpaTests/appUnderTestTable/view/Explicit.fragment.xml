@@ -9,7 +9,7 @@
 	<m:OverflowToolbar id="idToolbar" class="sapUiSmallMargin">
 		<fl:VariantManagement id="IDVariantManagementOfInternalSampleApp_01" for="IDContainerForVariantManagement"/>
 		<m:ToolbarSpacer id="idTbs"/>
-		<m:Button id="rtaBtn" text="Start RTA" press="onPressRTA"/>
+		<m:Button id="rtaBtn" text="Start RTA" press=".onPressRTA"/>
 	</m:OverflowToolbar>
 
 	<m:VBox class="sapUiSmallMargin" id="IDContainerForVariantManagement">

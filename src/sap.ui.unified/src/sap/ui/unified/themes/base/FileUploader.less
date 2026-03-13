@@ -18,9 +18,9 @@
 
 		.sapMInputBaseContentWrapper {
 			box-shadow: none !important; /* cannot remove !important because of different DOM structure and impossibility to override the selector that originally introduces border-shadow */
- 			border: var(--sapField_BorderWidth) var(--sapField_BorderStyle) var(--sapField_BorderColor);
-			border-radius: --sapButton_BorderCornerRadius;
- 			background: transparent;
+			border: var(--sapField_BorderWidth) var(--sapField_BorderStyle) var(--sapField_BorderColor);
+			border-radius: var(--sapButton_BorderCornerRadius);
+			background: transparent;
 			padding: 0;
 			height: 100%;
 
@@ -407,4 +407,31 @@ html[data-sap-ui-browser^='cr'] .sapUiFupInputMask > input {
 			.icon-state-styles(var(--sapField_Hover_InformationShadow), var(--sapButton_Selected_TextColor), var(--sapField_InformationColor));
 		}
 	}
+}
+
+.sapUiFup .sapMInputBaseContentWrapper:has(.sapMBtnTransparent) {
+	border-color: var(--sapButton_Lite_BorderColor);
+}
+
+.sapUiFup .sapMInputBaseContentWrapper:has(.sapMBtnReject) {
+	border-color: var(--sapButton_Reject_BorderColor);
+}
+
+.sapUiFup .sapMInputBaseContentWrapper:has(.sapMBtnAccept) {
+	border-color: var(--sapButton_Accept_BorderColor);
+}
+
+.sapUiFup.sapUiFupButtonOnly.sapMInputBase:not(.sapMFocus) .sapMInputBaseContentWrapper:has(.sapMBtnReject):not(.sapMInputBaseReadonlyWrapper):not(.sapMInputBaseContentWrapperState):not(.sapMInputBaseDisabledWrapper):hover {
+	background-color: var(--sapButton_Reject_Hover_Background);
+	border-color: var(--sapButton_Reject_Hover_BorderColor);
+}
+
+.sapUiFup.sapUiFupButtonOnly.sapMInputBase:not(.sapMFocus) .sapMInputBaseContentWrapper:has(.sapMBtnAccept):not(.sapMInputBaseReadonlyWrapper):not(.sapMInputBaseContentWrapperState):not(.sapMInputBaseDisabledWrapper):hover {
+	background-color: var(--sapButton_Accept_Hover_Background);
+	border-color: var(--sapButton_Accept_Hover_BorderColor);
+}
+
+.sapUiFup.sapUiFupButtonOnly.sapMInputBase:not(.sapMFocus) .sapMInputBaseContentWrapper:has(.sapMBtnEmphasized):not(.sapMInputBaseReadonlyWrapper):not(.sapMInputBaseContentWrapperState):not(.sapMInputBaseDisabledWrapper):hover {
+	background-color: var(--sapButton_Emphasized_Hover_Background);
+	border-color: var(--sapButton_Emphasized_Hover_BorderColor);
 }

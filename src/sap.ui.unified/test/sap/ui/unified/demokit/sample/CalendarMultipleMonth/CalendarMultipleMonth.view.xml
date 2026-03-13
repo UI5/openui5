@@ -9,10 +9,10 @@
 		<u:Calendar
 			id="calendar"
 			months="2"
-			select="handleCalendarSelect" />
+			select=".handleCalendarSelect" />
 		<l:HorizontalLayout allowWrapping="true">
 			<Button
-				press="handleSelectToday"
+				press=".handleSelectToday"
 				text="Select Today"
 				class="sapUiSmallMarginEnd" />
 			<Label

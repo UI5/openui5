@@ -19,7 +19,7 @@
 				<content>
 					<Button
 						text="Show BusyIndicator"
-						press="show4000"
+						press=".show4000"
 					>
 					</Button>
 				</content>
@@ -31,7 +31,7 @@
 				<content>
 					<Button
 						text="Show BusyIndicator"
-						press="show4000_0"
+						press=".show4000_0"
 					>
 					</Button>
 				</content>
@@ -43,7 +43,7 @@
 				<content>
 					<Button
 						text="Show BusyIndicator"
-						press="show1000_2000"
+						press=".show1000_2000"
 					>
 					</Button>
 				</content>

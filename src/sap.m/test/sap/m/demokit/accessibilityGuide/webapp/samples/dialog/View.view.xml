@@ -5,5 +5,5 @@
 	<Button
 			text="Message Dialog"
 			width="300px"
-			press="onOpenMessageDialog" />
+			press=".onOpenMessageDialog" />
 </mvc:View>

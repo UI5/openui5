@@ -4,62 +4,62 @@
 	xmlns="sap.m">
 	<Label text="Without Icon" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
 	<FeedInput
-		post="onPost"
+		post=".onPost"
 		showIcon="false">
 	</FeedInput>
 
 	<Label text="With Icon Placeholder" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
 	<FeedInput
-		post="onPost"
+		post=".onPost"
 		showIcon="true" >
 	</FeedInput>
 
 	<Label text="With Icon" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
 	<FeedInput
-		post="onPost"
+		post=".onPost"
 		showIcon="true"
 		icon="test-resources/sap/m/images/george_washington.jpg">
 	</FeedInput>
 	<Label text="Disabled" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
 	<FeedInput
-		post="onPost"
+		post=".onPost"
 		enabled="false"
 		showIcon="true"
 		icon="test-resources/sap/m/images/george_washington.jpg" />
 
 	<Label text="Rows Set to 5" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
 	<FeedInput
-		post="onPost"
+		post=".onPost"
 		rows="5" />
 
 	<Label text="With Exceeded Text" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
 	<FeedInput
-		post="onPost"
+		post=".onPost"
 		maxLength="20"
 		showExceededText="true" />
 
 	<Label text="With Growing" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
 	<FeedInput
-		post="onPost"
+		post=".onPost"
 		growing="true" />
 
 	<Label text="Without Icon and an enabled Action Button" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
 	<FeedInput
-		post="onPost"
+		post=".onPost"
 		showIcon="false">
 		<actions>
 			<Button
-				icon="sap-icon://action" press="onActionButtonPress"/>
+				icon="sap-icon://action" press=".onActionButtonPress"/>
 		</actions>
 	</FeedInput>
 
 	<Label text="With an Icon Placeholder and an enabled Action Button" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
 	<FeedInput
-		post="onPost"
+		post=".onPost"
 		showIcon="true" >
 		<actions>
 			<Button
-				icon="sap-icon://action" press="onActionButtonPress"/>
+				icon="sap-icon://action" press=".onActionButtonPress"/>
 		</actions>
 	</FeedInput>
 

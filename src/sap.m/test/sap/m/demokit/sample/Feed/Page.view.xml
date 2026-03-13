@@ -3,7 +3,7 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m">
 	<FeedInput
-		post="onPost"
+		post=".onPost"
 		icon="test-resources/sap/m/images/dronning_victoria.jpg"
 		class="sapUiSmallMarginTopBottom" />
 	<List
@@ -12,8 +12,8 @@
 		<FeedListItem
 			sender="{Author}"
 			icon="{AuthorPicUrl}"
-			senderPress="onSenderPress"
-			iconPress="onIconPress"
+			senderPress=".onSenderPress"
+			iconPress=".onIconPress"
 			info="{Type}"
 			timestamp="{Date}"
 			text="{Text}"

@@ -9,7 +9,7 @@
 				id="pSwitchBtn"
 				icon="sap-icon://menu"
 				text="Open Product Switch"
-				press="fnOpen" />
+				press=".fnOpen" />
 			<Text text="Note: Redirection logic should be handled by the app developer." />
 			<Text text="You can use sap.m.URLHelper, as shown in the fnChange method of the ProductSwitchNavigation controller." />
 		</layout:VerticalLayout>

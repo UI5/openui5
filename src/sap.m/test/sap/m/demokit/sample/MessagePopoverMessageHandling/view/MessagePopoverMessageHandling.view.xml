@@ -23,7 +23,7 @@
 					<f:content>
 						<core:Title text="Information" />
 						<Label text="Name" />
-						<Input required="true" change="onChange" value="{
+						<Input required="true" change=".onChange" value="{
 							path : 'name',
 							type : 'sap.ui.model.type.String'
 						}"/>
@@ -91,7 +91,7 @@
 						<Input value="{payGrade}">
 						</Input>
 						<Label text="Standard Weekly Hours" />
-						<Input change="onChange" value="{
+						<Input change=".onChange" value="{
 							path: 'weeklyHours',
 							type: 'sap.ui.model.type.Integer',
 							constraints: {
@@ -122,7 +122,7 @@
 					press=".handleMessagePopoverPress"
 					ariaHasPopup="Dialog"/>
 				<ToolbarSpacer/>
-				<Button type="Emphasized" text="Save" press="generateInvalidUserInput" />
+				<Button type="Emphasized" text="Save" press=".generateInvalidUserInput" />
 				<Button text="Cancel" />
 			</OverflowToolbar>
 		</footer>

@@ -13,7 +13,7 @@
 		<Input id="numberOfCards" width="4rem" type="Number" value="10" />
 		<Label text="dataMode to 'Active'"/>
 		<CheckBox id="dataMode" selected="true"></CheckBox>
-		<Button text="Start loading" type="Emphasized" press="onFormSubmit"/>
+		<Button text="Start loading" type="Emphasized" press=".onFormSubmit"/>
 	</form:SimpleForm>
 
 	<f:GridContainer id="cardsContainer" class="sapUiSmallMargin">

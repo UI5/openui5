@@ -22,8 +22,8 @@
 					<dnd:DropInfo
 						targetAggregation="items"
 						groupName="sap"
-						drop="handleDrop"
-						dragEnter="handleDragEnter"
+						drop=".handleDrop"
+						dragEnter=".handleDragEnter"
 						dropPosition="On"
 						dropEffect="Copy"/>
 				</dragDropConfig>

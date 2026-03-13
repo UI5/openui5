@@ -9,8 +9,8 @@
 		class="sapUiContentPadding"
 		width="100%">
 		<MultiComboBox
-			selectionChange="handleSelectionChange"
-			selectionFinish="handleSelectionFinish"
+			selectionChange=".handleSelectionChange"
+			selectionFinish=".handleSelectionFinish"
 			showSelectAll="true"
 			width="350px"
 			items="{

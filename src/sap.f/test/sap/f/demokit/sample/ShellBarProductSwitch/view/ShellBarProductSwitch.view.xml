@@ -8,7 +8,7 @@
 	<ShellBar
 			homeIcon="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg.adapt.svg/1493030643828.svg"
 			showCopilot="true"
-			productSwitcherPressed="fnOpen"
+			productSwitcherPressed=".fnOpen"
 			showProductSwitcher="true">
 		<profile>
 			<m:Avatar initials="UI"/>

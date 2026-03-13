@@ -3050,8 +3050,8 @@ sap.ui.define([
 	 *
 	 * @param {number} iStart
 	 *   The start index of the range
-	 * @param {number} iEnd
-	 *   The index after the last element
+	 * @param {number} iLength
+	 *   The length of the range
 	 * @param {string} [sSeparateProperty]
 	 *   If set, only expand the given property; types must already be available (see #getTypes) to
 	 *   determine the origin's key properties
@@ -3062,12 +3062,11 @@ sap.ui.define([
 	 *
 	 * @private
 	 */
-	_CollectionCache.prototype.getResourcePathWithQuery = function (iStart, iEnd,
+	_CollectionCache.prototype.getResourcePathWithQuery = function (iStart, iLength,
 			sSeparateProperty) {
 		var iCreated = this.aElements.$created,
 			sQueryString = this.getQueryString(sSeparateProperty),
 			sDelimiter = sQueryString ? "&" : "?",
-			iExpectedLength = iEnd - iStart,
 			sResourcePath = this.sResourcePath + sQueryString;
 
 		if (iStart < iCreated) {
@@ -3075,11 +3074,11 @@ sap.ui.define([
 		}
 
 		iStart -= iCreated;
-		if (iStart > 0 || iExpectedLength < Infinity) {
+		if (iStart > 0 || iLength < Infinity) {
 			sResourcePath += sDelimiter + "$skip=" + iStart;
 		}
-		if (iExpectedLength < Infinity) {
-			sResourcePath += "&$top=" + iExpectedLength;
+		if (iLength < Infinity) {
+			sResourcePath += "&$top=" + iLength;
 		}
 		return sResourcePath;
 	};
@@ -3693,7 +3692,7 @@ sap.ui.define([
 					value : []
 				})
 				: this.oRequestor.request("GET",
-					this.getResourcePathWithQuery(iStart, iEnd),
+					this.getResourcePathWithQuery(iStart, iEnd - iStart),
 					oGroupLock, undefined, undefined, fnDataRequested),
 			this.fetchTypes()
 		]).then(function (aResult) {
@@ -3840,7 +3839,7 @@ sap.ui.define([
 			oReadRange.promise.catch(() => { /* avoid "Uncaught (in promise)" */ });
 			try {
 				this.mSeparateProperty2ReadRequests[sProperty].push(oReadRange);
-				const sReadUrl = this.getResourcePathWithQuery(iStart, iEnd, sProperty);
+				const sReadUrl = this.getResourcePathWithQuery(iStart, iEnd - iStart, sProperty);
 				const oResult = await this.oRequestor.request("GET", sReadUrl,
 					this.oRequestor.lockGroup("$single", this));
 

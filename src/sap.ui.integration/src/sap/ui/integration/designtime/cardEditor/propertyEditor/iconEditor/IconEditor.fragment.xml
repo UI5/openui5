@@ -8,8 +8,8 @@
 		<layout:VerticalLayout>
 			<PropertyEditor
 				renderLabel="false"
-				init="wrapperInit"
-				valueChange="_onTypeChange"
+				init=".wrapperInit"
+				valueChange="._onTypeChange"
 				config="{path: 'configs>/selectConfig'}"
 				value="{path: 'icon>/type'}"
 			/>
@@ -20,8 +20,8 @@
 		<layout:VerticalLayout width="calc(100% - 16px)" class="sapUiTinyMarginBeginEnd">
 			<PropertyEditor
 				renderLabel="false"
-				init="wrapperInit"
-				valueChange="_updateValue"
+				init=".wrapperInit"
+				valueChange="._updateValue"
 				config="{path: 'configs>/valueConfig/config'}"
 				value="{parts: ['configs>/valueConfig/key', 'icon>/'], formatter: '._prepareValue'}"
 			/>
@@ -32,7 +32,7 @@
 		<m:Button
 			icon="sap-icon://developer-settings"
 			tooltip="{i18n>BASE_EDITOR.ICON.BUTTON_SETTINGS}"
-			press="_handleSettings"
+			press="._handleSettings"
 		/>
 	</m:FlexBox>
 </core:FragmentDefinition>

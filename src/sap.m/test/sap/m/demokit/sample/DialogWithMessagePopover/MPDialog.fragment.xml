@@ -20,7 +20,7 @@
 					<f:content>
 						<core:Title text="Information" />
 						<Label text="Name" />
-						<Input required="true" change="onChange" value="{
+						<Input required="true" change=".onChange" value="{
 							path : 'name',
 							type : 'sap.ui.model.type.String'
 						}" />
@@ -92,7 +92,7 @@
 						<Label text="FTE" />
 						<Input value="{fte}"></Input>
 						<Label text="Standard Weekly Hours" />
-						<Input change="onChange" value="{
+						<Input change=".onChange" value="{
 							path: 'weeklyHours',
 							type: 'sap.ui.model.type.Integer',
 							constraints: {

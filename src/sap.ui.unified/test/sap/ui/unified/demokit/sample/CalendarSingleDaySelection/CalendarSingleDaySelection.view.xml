@@ -8,9 +8,9 @@
 	<l:VerticalLayout>
 		<u:Calendar
 				id="calendar"
-				select="handleCalendarSelect" />
+				select=".handleCalendarSelect" />
 		<Button
-				press="handleSelectToday"
+				press=".handleSelectToday"
 				text="Select Today" />
 		<l:HorizontalLayout>
 			<Label

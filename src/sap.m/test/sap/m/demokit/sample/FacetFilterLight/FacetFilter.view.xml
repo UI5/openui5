@@ -8,13 +8,13 @@
 			type="Light"
 			showPersonalization="true"
 			showReset="true"
-			reset="handleFacetFilterReset"
+			reset=".handleFacetFilterReset"
 			lists="{/ProductCollectionStats/Filters}">
 				<FacetFilterList
 					title="{type}"
 					key="{key}"
 					mode="MultiSelect"
-					listClose="handleListClose"
+					listClose=".handleListClose"
 					items="{path: 'values', templateShareable: true}" >
 						<FacetFilterItem
 							text="{text}"

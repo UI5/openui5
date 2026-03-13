@@ -5,14 +5,14 @@
 	controllerName="sap.ui.core.sample.RoutingMasterDetail.routingApp.controller.Master">
 	<Page
 		title="Orders List">
-		<List id="orders" 
+		<List id="orders"
 				items="{/orders}"
 				mode="SingleSelectMaster"
-				selectionChange="onSelectionChange">
+				selectionChange=".onSelectionChange">
 			<items>
-				<StandardListItem title="{orderName}" 
+				<StandardListItem title="{orderName}"
 					type="Active"
-					press="onSelectionChange"/>
+					press=".onSelectionChange"/>
 			</items>
 		</List>
 	</Page>

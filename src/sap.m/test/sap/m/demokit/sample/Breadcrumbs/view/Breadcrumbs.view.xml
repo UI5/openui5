@@ -6,12 +6,12 @@
 	<l:VerticalLayout class="sapUiContentPadding" width="100%">
 		<l:content>
 			<Breadcrumbs currentLocationText="Laptop" separatorStyle="{/selected}">
-				<Link press="onPress" text="Products"/>
-				<Link press="onPress" text="Suppliers"/>
-				<Link press="onPress" text="Titanium"/>
-				<Link press="onPress" text="Ultra portable"/>
-				<Link press="onPress" text="12 inch"/>
-				<Link press="onPress" text="Super portable deluxe"/>
+				<Link press=".onPress" text="Products"/>
+				<Link press=".onPress" text="Suppliers"/>
+				<Link press=".onPress" text="Titanium"/>
+				<Link press=".onPress" text="Ultra portable"/>
+				<Link press=".onPress" text="12 inch"/>
+				<Link press=".onPress" text="Super portable deluxe"/>
 			</Breadcrumbs>
 			<HBox alignItems="Center">
 				<items>
@@ -23,7 +23,7 @@
 							class="sapUiSmallMarginBegin"
 							id="separatorSelect"
 							selectedKey="{/selected}"
-							change="onChange"
+							change=".onChange"
 							items="{
 								path: '/items'
 							}">

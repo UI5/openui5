@@ -9,13 +9,13 @@
 
     <VBox class="sapUiSmallMargin">
 
-        <Button id="openBtn" text="Show p13n.Popup" press="onContainerOpen"/>
+        <Button id="openBtn" text="Show p13n.Popup" press=".onContainerOpen"/>
 
-        <p13n:Popup id="p13nPopup" title="My Custom View Settings" close="onClose" warningText="Are you sure?" reset=".reset">
+        <p13n:Popup id="p13nPopup" title="My Custom View Settings" close=".onClose" warningText="Are you sure?" reset=".reset">
             <p13n:panels>
-                <p13n:SelectionPanel id="columnsPanel" title="Columns" enableCount="true" showHeader="true" change="parseP13nState"/>
-                <p13n:SortPanel id="sortPanel" title="Sort" change="parseP13nState"/>
-                <p13n:GroupPanel id="groupPanel" title="Group" change="parseP13nState"/>
+                <p13n:SelectionPanel id="columnsPanel" title="Columns" enableCount="true" showHeader="true" change=".parseP13nState"/>
+                <p13n:SortPanel id="sortPanel" title="Sort" change=".parseP13nState"/>
+                <p13n:GroupPanel id="groupPanel" title="Group" change=".parseP13nState"/>
             </p13n:panels>
         </p13n:Popup>
 

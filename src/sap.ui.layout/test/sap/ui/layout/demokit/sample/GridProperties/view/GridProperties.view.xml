@@ -37,7 +37,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"
@@ -62,7 +62,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"
@@ -110,7 +110,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"
@@ -144,7 +144,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"
@@ -178,7 +178,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"
@@ -203,7 +203,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"
@@ -248,7 +248,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"
@@ -282,7 +282,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"
@@ -315,7 +315,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"
@@ -360,7 +360,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"
@@ -396,7 +396,7 @@
 				type="Information"
 				showIcon="true">
 		</MessageStrip>
-		<Slider value="100" liveChange="onSliderMoved" class="sapUiSmallMarginBottom"/>
+		<Slider value="100" liveChange=".onSliderMoved" class="sapUiSmallMarginBottom"/>
 
 		<l:VerticalLayout
 				width="100%"

@@ -17,7 +17,7 @@
 
 	<f:DynamicPage id="page">
 		<f:title>
-			<f:DynamicPageTitle id="pageTitle" stateChange="onStateChanged">
+			<f:DynamicPageTitle id="pageTitle">
 				<f:actions>
 				</f:actions>
 				<f:heading>

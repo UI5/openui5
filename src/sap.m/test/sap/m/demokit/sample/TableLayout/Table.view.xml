@@ -14,8 +14,8 @@
 			<OverflowToolbar>
 				<Title text="Products" level="H2"/>
 				<ToolbarSpacer/>
-				<CheckBox text="Fixed Layout" selected="true" select="onCheckBoxSelect"/>
-				<Button text="Open Dialog" press="onOpenPressed"/>
+				<CheckBox text="Fixed Layout" selected="true" select=".onCheckBoxSelect"/>
+				<Button text="Open Dialog" press=".onOpenPressed"/>
 			</OverflowToolbar>
 		</headerToolbar>
 		<columns>

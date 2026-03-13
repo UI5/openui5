@@ -123,7 +123,7 @@
 				showCloseButton="true"
 				close=".onItemClose">
 				<buttons>
-					<Button text="Accept All" press="onAcceptErrors" />
+					<Button text="Accept All" press=".onAcceptErrors" />
 					<Button text="Reject All" press=".onRejectPress" />
 				</buttons>
 

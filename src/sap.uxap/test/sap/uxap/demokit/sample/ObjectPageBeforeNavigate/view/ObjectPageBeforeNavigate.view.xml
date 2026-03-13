@@ -10,7 +10,7 @@
 		   height="100%">
 	<ObjectPageLayout id="ObjectPageLayout"
 		enableLazyLoading="true"
-		beforeNavigate="onBeforeNavigate"
+		beforeNavigate=".onBeforeNavigate"
 		useIconTabBar="true"
 		showTitleInHeaderContent="true"
 		upperCaseAnchorBar="false">
@@ -40,7 +40,7 @@
 				</snappedTitleOnMobile>
 
 				<actions>
-					<m:Button text="Edit" type="Emphasized" press="onEdit"/>
+					<m:Button text="Edit" type="Emphasized" press=".onEdit"/>
 					<m:Button type="Transparent" text="Delete"/>
 					<m:Button type="Transparent" text="Copy"/>
 					<m:OverflowToolbarButton icon="sap-icon://action" type="Transparent" text="Share" tooltip="action"/>

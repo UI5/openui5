@@ -11,7 +11,7 @@
 			<Text text="Expand to level "/>
 			<Select
 				selectedKey="1"
-				change="handleSelectChange">
+				change=".handleSelectChange">
 				<items>
 					<core:Item key="0" text="0" />
 					<core:Item key="1" text="1" />
@@ -20,7 +20,7 @@
 					<core:Item key="4" text="4" />
 				</items>
 			</Select>
-			<Button id="collapseAll" text="collapse all nodes" press="onCollapseAllPress"/>
+			<Button id="collapseAll" text="collapse all nodes" press=".onCollapseAllPress"/>
 		</content>
 	</OverflowToolbar>
 

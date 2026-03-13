@@ -24,7 +24,7 @@
 						<Button
 							icon="sap-icon://navigation-up-arrow"
 							tooltip="{i18n>BASE_EDITOR.MOVEUP}"
-							press="_moveUp"
+							press="._moveUp"
 							enabled="{= ${itemsModel>index} !== 0}"
 							visible="{config/allowSorting}"
 						>
@@ -38,7 +38,7 @@
 						<Button
 							icon="sap-icon://navigation-down-arrow"
 							tooltip="{i18n>BASE_EDITOR.MOVEDOWN}"
-							press="_moveDown"
+							press="._moveDown"
 							enabled="{= ${itemsModel>total} - 1 !== ${itemsModel>index}}"
 							visible="{config/allowSorting}"
 						>
@@ -52,15 +52,15 @@
 						<Button
 							icon="sap-icon://delete"
 							tooltip="{i18n>BASE_EDITOR.MAP.REMOVE}"
-							press="_onRemoveElement"
+							press="._onRemoveElement"
 							visible="{config/allowAddAndRemove}"
 						/>
 					</Toolbar>
 				</headerToolbar>
 				<content>
 					<baseEditor:PropertyEditors
-						init="wrapperInit"
-						propertyEditorsChange="_propertyEditorsChange"
+						init=".wrapperInit"
+						propertyEditorsChange="._propertyEditorsChange"
 						renderLabels="true"
 						config="{path: 'itemsModel>', formatter: '.formatItemConfig'}"
 					/>
@@ -75,7 +75,7 @@
 				],
 				formatter: '.formatAddItemText'
 			}"
-			press="_onAddElement"
+			press="._onAddElement"
 			visible="{config/allowAddAndRemove}"
 		/>
 	</VBox>

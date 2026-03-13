@@ -17,7 +17,7 @@
 					<l:HorizontalLayout>
 						<l:content>
 							<Label text="ColorSet:" class="sapUiSmallMarginEnd sapUiSmallMarginTop"/>
-							<Select id="colorSetSelect" class="sapUiMediumMarginEnd" change="onColorSetChange">
+							<Select id="colorSetSelect" class="sapUiMediumMarginEnd" change=".onColorSetChange">
 								<items>
 									<core:Item key="1" text="ColorSet 1"/>
 									<core:Item key="2" text="ColorSet 2"/>

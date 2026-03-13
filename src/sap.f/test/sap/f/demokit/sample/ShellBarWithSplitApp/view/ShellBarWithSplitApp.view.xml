@@ -12,7 +12,7 @@
 				homeIcon="./resources/sap/ui/documentation/sdk/images/logo_sap.png"
 				showCopilot="true"
 				showNotifications="true"
-				menuButtonPressed="onMenuButtonPress"
+				menuButtonPressed=".onMenuButtonPress"
 				notificationsNumber="2">
 				<f:menu>
 					<Menu>

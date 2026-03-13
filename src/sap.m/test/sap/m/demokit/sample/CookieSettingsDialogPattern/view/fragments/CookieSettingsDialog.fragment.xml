@@ -44,19 +44,19 @@
 			</custom:DivContainer>
 		</content>
 	<buttons>
-		<Button text="{i18n>COOKIE_SETTINGS_DIALOG_ACCEPT_ALL}" type="Emphasized" press="onAcceptAllCookies" visible="{=! ${cookieData>/showCookieDetails} }">
+		<Button text="{i18n>COOKIE_SETTINGS_DIALOG_ACCEPT_ALL}" type="Emphasized" press=".onAcceptAllCookies" visible="{=! ${cookieData>/showCookieDetails} }">
 			<layoutData>
 				<OverflowToolbarLayoutData priority="NeverOverflow"/>
 			</layoutData>
 		</Button>
-		<Button text="{i18n>COOKIE_SETTINGS_DIALOG_SET_PREFERENCES}" id="actionSetPreferences" type="Ghost" press="showCookieDetails" visible="{= !${cookieData>/showCookieDetails} }"></Button>
-		<Button text="{i18n>COOKIE_SETTINGS_DIALOG_REJECT_ALL}" press="onRejectAllCookies" visible="{=! ${cookieData>/showCookieDetails} }">
+		<Button text="{i18n>COOKIE_SETTINGS_DIALOG_SET_PREFERENCES}" id="actionSetPreferences" type="Ghost" press=".showCookieDetails" visible="{= !${cookieData>/showCookieDetails} }"></Button>
+		<Button text="{i18n>COOKIE_SETTINGS_DIALOG_REJECT_ALL}" press=".onRejectAllCookies" visible="{=! ${cookieData>/showCookieDetails} }">
 			<layoutData>
 				<OverflowToolbarLayoutData priority="NeverOverflow"/>
 			</layoutData>
 		</Button>
-		<Button text="{i18n>COOKIE_SETTINGS_DIALOG_SAVE_PREFERENCES}" id="actionSavePreferences" type="Emphasized" press="onSaveCookies" visible="{cookieData>/showCookieDetails}"></Button>
-		<Button text="{i18n>COOKIE_SETTINGS_DIALOG_CANCEL_BTN}" press="onCancelPress" visible="{= ${cookieData>/showCookieDetails} }"></Button>
+		<Button text="{i18n>COOKIE_SETTINGS_DIALOG_SAVE_PREFERENCES}" id="actionSavePreferences" type="Emphasized" press=".onSaveCookies" visible="{cookieData>/showCookieDetails}"></Button>
+		<Button text="{i18n>COOKIE_SETTINGS_DIALOG_CANCEL_BTN}" press=".onCancelPress" visible="{= ${cookieData>/showCookieDetails} }"></Button>
 	</buttons>
 	</Dialog>
 </core:FragmentDefinition>

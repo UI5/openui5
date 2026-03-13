@@ -5,9 +5,9 @@
 	<form:SimpleForm editable="true" width="40rem" layout="ResponsiveGridLayout">
 		<Label text="Loading time" />
 		<Input id="loadingMinSeconds" width="8rem" type="Number" description="seconds" value="-1"/>
-		<Button text="Start loading" type="Emphasized" press="onFormSubmit"/>
-	</form:SimpleForm>	
-	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Country-Specific Profit Margin" press="press"
+		<Button text="Start loading" type="Emphasized" press=".onFormSubmit"/>
+	</form:SimpleForm>
+	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Country-Specific Profit Margin" press=".press"
 		frameType="OneByHalf" subheader="Subtitle">
 		<TileContent>
 			<ImageContent src="test-resources/sap/m/demokit/sample/GenericTileAsLaunchTile/images/SAPLogoLargeTile_28px_height.png" />
@@ -15,64 +15,64 @@
 	</GenericTile>
 
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Sales Fulfillment Application Title"
-		subheader="Subtitle" press="press" frameType= "TwoByHalf">
+		subheader="Subtitle" press=".press" frameType="TwoByHalf">
 		<TileContent />
 	</GenericTile>
 
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Manage Activity Master Data Type"
-		subheader="Subtitle" press="press" frameType= "TwoByHalf">
+		subheader="Subtitle" press=".press" frameType="TwoByHalf">
 		<TileContent unit="EUR" footer="Current Quarter">
 			<ImageContent src="sap-icon://home-share" />
 		</TileContent>
 	</GenericTile>
 
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Right click to open in new tab"
-		subheader="Link tile" press="press" url="https://www.sap.com/">
+		subheader="Link tile" press=".press" url="https://www.sap.com/">
 		<TileContent>
 			<ImageContent src="test-resources/sap/m/demokit/sample/GenericTileAsLaunchTile/images/SAPLogoLargeTile_28px_height.png" />
 		</TileContent>
 	</GenericTile>
 
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Sales Fulfillment Application Title"
-		subheader="Subtitle" press="press">
+		subheader="Subtitle" press=".press">
 		<TileContent unit="EUR" footer="Current Quarter">
 			<ImageContent src="sap-icon://home-share" />
 		</TileContent>
 	</GenericTile>
 
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Manage Activity Master Data Type"
-		subheader="Subtitle" press="press">
+		subheader="Subtitle" press=".press">
 		<TileContent>
 			<ImageContent src="test-resources/sap/m/demokit/sample/GenericTileAsLaunchTile/images/SAPLogoLargeTile_28px_height.png" />
 		</TileContent>
 	</GenericTile>
 
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Manage Activity Master Data Type With a Long Title Without an Icon"
-		subheader="Subtitle Launch Tile" mode="HeaderMode" press="press">
+		subheader="Subtitle Launch Tile" mode="HeaderMode" press=".press">
 		<TileContent unit="EUR" footer="Current Quarter" />
 	</GenericTile>
 
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Jessica D. Prince Senior Consultant"
-		subheader="Department" press="press" appShortcut = "shortcut" systemInfo = "systeminfo">
+		subheader="Department" press=".press" appShortcut="shortcut" systemInfo="systeminfo">
 		<TileContent>
 			<ImageContent src="test-resources/sap/m/demokit/sample/GenericTileAsLaunchTile/images/ProfileImage_LargeGenTile.png" />
 		</TileContent>
 	</GenericTile>
 
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Sales Fulfillment Application Title"
-		press="press" frameType= "OneByHalf">
+		press=".press" frameType="OneByHalf">
 		<TileContent unit="EUR" footer="Current Quarter">
 		</TileContent>
 	</GenericTile>
 
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Sales Fulfillment Application Title"
-		press="press" frameType= "TwoByHalf">
+		press=".press" frameType="TwoByHalf">
 		<TileContent unit="EUR" footer="Current Quarter">
 		</TileContent>
 	</GenericTile>
 
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Jessica D. Prince Senior Consultant"
-		subheader="Department" press="press" frameType="TwoByHalf">
+		subheader="Department" press=".press" frameType="TwoByHalf">
 		<TileContent>
 			<ImageContent src="test-resources/sap/m/demokit/sample/GenericTileAsLaunchTile/images/ProfileImage_LargeGenTile.png" />
 		</TileContent>

@@ -21,7 +21,7 @@
 							id="topicDetailBackToSearch"
 							text="{i18n>TOPIC_DETAIL_BACK_BTN}"
 							type="Transparent"
-							press="backToSearch"
+							press=".backToSearch"
 							visible="false"/>
 					<m:Button
 							visible="{= !${versionData>/isURLVersioned}}"
@@ -29,13 +29,13 @@
 							type="Transparent"
 							text="{i18n>TOPIC_DETAIL_EDIT_GITHUB}"
 							tooltip="{i18n>TOPIC_DETAIL_EDIT_GITHUB_TOOLTIP}"
-							press="onEditGitHubPress"/>
+							press=".onEditGitHubPress"/>
 					<m:Button
 							visible="{device>/system/desktop}"
 							icon="sap-icon://full-screen"
 							type="Transparent"
 							tooltip="{i18n>TOPIC_DETAIL_FULLSCREEN_TOOLTIP}"
-							press="onToggleFullScreen"/>
+							press=".onToggleFullScreen"/>
 				</actions>
 			</DynamicPageTitle>
 		</title>

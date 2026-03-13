@@ -38,7 +38,7 @@
 				<form:formElements>
 					<form:FormElement label="{label}" visible="{config/visible}">
 						<form:fields>
-							<baseEditor:PropertyEditor init="wrapperInit" config="{config}" value="{value}" renderLabel="false" />
+							<baseEditor:PropertyEditor init=".wrapperInit" config="{config}" value="{value}" renderLabel="false" />
 						</form:fields>
 					</form:FormElement>
 				</form:formElements>

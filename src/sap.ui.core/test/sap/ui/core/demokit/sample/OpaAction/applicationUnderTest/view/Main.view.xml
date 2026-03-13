@@ -11,39 +11,39 @@
 				<Button id="navigationButton"
 						busy="true"
 						busyIndicatorDelay="0"
-						press="onNavButtonPress"
+						press=".onNavButtonPress"
 						text="I navigate to a secondPage"/>
 			</headerContent>
 			<content>
 				<OverflowToolbar id="toolbar-fit" width="600px">
-					<Button text="Always Visible" press="onToolbarButtonPress">
+					<Button text="Always Visible" press=".onToolbarButtonPress">
 						<layoutData>
 							<OverflowToolbarLayoutData priority="NeverOverflow"/>
 						</layoutData>
 					</Button>
-					<Button text="Mostly Visible" press="onToolbarButtonPress">
+					<Button text="Mostly Visible" press=".onToolbarButtonPress">
 						<layoutData>
 							<OverflowToolbarLayoutData priority="High"/>
 						</layoutData>
 					</Button>
-					<Button text="Should Overflow" press="onToolbarButtonPress">
+					<Button text="Should Overflow" press=".onToolbarButtonPress">
 						<layoutData>
 							<OverflowToolbarLayoutData priority="Low"/>
 						</layoutData>
 					</Button>
 				</OverflowToolbar>
 				<OverflowToolbar id="toolbar-overflow" width="300px">
-					<Button text="Always Visible" press="onToolbarButtonPress">
+					<Button text="Always Visible" press=".onToolbarButtonPress">
 						<layoutData>
 							<OverflowToolbarLayoutData priority="NeverOverflow"/>
 						</layoutData>
 					</Button>
-					<Button text="Mostly Visible" press="onToolbarButtonPress">
+					<Button text="Mostly Visible" press=".onToolbarButtonPress">
 						<layoutData>
 							<OverflowToolbarLayoutData priority="High"/>
 						</layoutData>
 					</Button>
-					<Button text="Overflowing" press="onToolbarButtonPress">
+					<Button text="Overflowing" press=".onToolbarButtonPress">
 						<layoutData>
 							<OverflowToolbarLayoutData priority="Low"/>
 						</layoutData>
@@ -56,7 +56,7 @@
 					id="productList"
 					items="{deleteModeListModel>/ProductCollection}"
 					mode="Delete"
-					delete="onDelete"
+					delete=".onDelete"
 					includeItemInSelection="true"
 					headerText="Product List - delete mode">
 					<StandardListItem
@@ -67,7 +67,7 @@
 		</Page>
 		<Page id="secondPage"
 			  showNavButton="true"
-			  navButtonPress="onBack">
+			  navButtonPress=".onBack">
 			<Text text="Some controls like the sap.m.Page will trigger their Press on a specific region. In this case the back button."/>
 			<form:SimpleForm
 					editable="true"
@@ -102,8 +102,8 @@
 			<Label text="MultiInput with tokens" labelFor="multiInput1"/>
 			<MultiInput id="multiInput1" width="100%" showValueHelp="false"/>
 			<Slider id="slider"/>
-			<Button text="Press here to trigger a press on the page" press="onPressPage"/>
-			<Button text="Press here to open a popover" press="onPressOpenPopover"/>
+			<Button text="Press here to trigger a press on the page" press=".onPressPage"/>
+			<Button text="Press here to open a popover" press=".onPressOpenPopover"/>
 			<List
 				id="productListReorder"
 				items="{orderedListModel>/ProductCollection}"
@@ -116,8 +116,8 @@
 						sourceAggregation="items"
 						targetAggregation="items"
 						dropPosition="Between"
-						dragStart="onDragStart"
-						drop="onDrop"/>
+						dragStart=".onDragStart"
+						drop=".onDrop"/>
 				</dragDropConfig>
 			</List>
 		</Page>

@@ -17,7 +17,7 @@
 		<Select
 			id="selectContent"
 			selectedKey="{listConfig>/content}"
-			change="onContentChange">
+			change=".onContentChange">
 			<items>
 				<core:Item key="Show Data" text="Show Data" />
 				<core:Item key="No Data" text="No Data" />

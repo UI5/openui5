@@ -18,7 +18,7 @@
 
 			<l:HorizontalLayout id="staticContentLayout">
 				<l:content>
-					<Button text="Redraw" press="onRedraw" />
+					<Button text="Redraw" press=".onRedraw" />
 				</l:content>
 			</l:HorizontalLayout>
 

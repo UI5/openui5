@@ -164,17 +164,17 @@
 						targetAggregation="rows"
 						dropEffect="Move"
 						dropPosition="Between"
-						dragStart="tableDragStart"
-						dragEnter="tableReorderDragEnter"
-						drop="tableReorderDrop"/>
+						dragStart=".tableDragStart"
+						dragEnter=".tableReorderDragEnter"
+						drop=".tableReorderDrop"/>
 					<dnd:DragDropInfo
 						sourceAggregation="rows"
 						targetAggregation="rows"
 						dropEffect="Copy"
 						dropPosition="On"
-						dragStart="tableDragStart"
-						dragEnter="tableToTreeTableDragEnter"
-						drop="tableToTreeTableDrop"
+						dragStart=".tableDragStart"
+						dragEnter=".tableToTreeTableDragEnter"
+						drop=".tableToTreeTableDrop"
 						targetElement="treetable"/>
 				</table:dragDropConfig>
 			</table:Table>
@@ -226,15 +226,15 @@
 						targetAggregation="rows"
 						dropEffect="Move"
 						dropPosition="OnOrBetween"
-						dragStart="treeTableDragStart"
-						dragEnter="treeTableReorderDragEnter"
-						drop="treeTableReorderDrop"/>
+						dragStart=".treeTableDragStart"
+						dragEnter=".treeTableReorderDragEnter"
+						drop=".treeTableReorderDrop"/>
 					<dnd:DragDropInfo
 						sourceAggregation="rows"
 						dropEffect="Copy"
-						dragStart="treeTableDragStart"
-						dragEnter="treeTableToTableDragEnter"
-						drop="treeTableToTableDrop"
+						dragStart=".treeTableDragStart"
+						dragEnter=".treeTableToTableDragEnter"
+						drop=".treeTableToTableDrop"
 						targetElement="table"/>
 				</table:dragDropConfig>
 			</table:TreeTable>

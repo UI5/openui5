@@ -7,9 +7,9 @@
 	<ToggleButton
 		id="revealGrid"
 		text="Reveal Grid"
-		press="onRevealGrid"
+		press=".onRevealGrid"
 		class="sapUiSmallMargin" />
-	<Slider value="100" liveChange="onSliderMoved" />
+	<Slider value="100" liveChange=".onSliderMoved" />
 	<Panel id="panelForGridList" backgroundDesign="Transparent">
 		<headerToolbar>
 			<Toolbar height="3rem">

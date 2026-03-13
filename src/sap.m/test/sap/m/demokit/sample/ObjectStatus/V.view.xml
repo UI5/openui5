@@ -44,7 +44,7 @@
 							text="Damaged"
 							active="true"
 							state="Error"
-							press="handleStatusPressed"
+							press=".handleStatusPressed"
 							icon="sap-icon://error" />
 						<ObjectStatus
 							class="sapUiSmallMarginBottom"

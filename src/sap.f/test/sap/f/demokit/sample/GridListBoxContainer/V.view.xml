@@ -4,7 +4,7 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:grid="sap.ui.layout.cssgrid"
 	xmlns:f="sap.f">
-	<Slider value="100" liveChange="onSliderMoved" />
+	<Slider value="100" liveChange=".onSliderMoved" />
 	<Panel id="panelForGridList" backgroundDesign="Transparent">
 		<headerToolbar>
 			<Toolbar height="3rem">

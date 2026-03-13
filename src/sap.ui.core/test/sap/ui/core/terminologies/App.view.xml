@@ -25,7 +25,7 @@
 										forceSelection="false"
 										selectedKey="{/selectedKeyApp}"
 										items="{/apps}"
-										change="onChangeApp">
+										change=".onChangeApp">
 									<core:Item key="{id}" text="{name}" />
 								</Select>
 
@@ -34,7 +34,7 @@
 										forceSelection="false"
 										selectedKey="{/selectedKey}"
 										items="{/terminologies}"
-										change="onChangeTerminology">
+										change=".onChangeTerminology">
 									<core:Item key="{id}" text="{name}" />
 								</Select>
 								<Label text="Language"></Label>
@@ -42,7 +42,7 @@
 										forceSelection="false"
 										selectedKey="{/selectedKeyLang}"
 										items="{/languages}"
-										change="onChangeLanguage">
+										change=".onChangeLanguage">
 									<core:Item key="{id}" text="{name}" />
 								</Select>
 

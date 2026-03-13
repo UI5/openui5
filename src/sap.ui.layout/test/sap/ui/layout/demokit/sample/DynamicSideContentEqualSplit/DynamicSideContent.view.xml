@@ -16,7 +16,7 @@
 				class="sapUiDSCExplored sapUiContentPadding"
 				containerQuery="true"
 				equalSplit="true"
-				breakpointChanged="handleBreakpointChanged">
+				breakpointChanged=".handleBreakpointChanged">
 				<VBox>
 					<Title level="H1" text="Main content" />
 					<Image src="{img>/products/pic1}" densityAware="false" width="10em" />
@@ -43,8 +43,8 @@
 		</Page>
 		<footer>
 			<Toolbar>
-				<Button text="Toggle" type="Accept" press="handleToggleClick" id="equalSplitToggleButton"/>
-				<Slider id='DSCWidthSlider' value="100" liveChange="handleSliderChange" />
+				<Button text="Toggle" type="Accept" press=".handleToggleClick" id="equalSplitToggleButton"/>
+				<Slider id='DSCWidthSlider' value="100" liveChange=".handleSliderChange" />
 			</Toolbar>
 		</footer>
 	</Page>

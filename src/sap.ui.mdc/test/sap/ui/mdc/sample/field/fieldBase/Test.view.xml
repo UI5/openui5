@@ -30,8 +30,8 @@
 								maxConditions="1"
 								placeholder="{/#Product/ProductId/@sap:label}"
 								tooltip="{/#Product/ProductId/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit"
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit"
 								valueHelp="VH1">
 								<mdcField:dependents>
 									<mdc:ValueHelp id="VH1" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate", "payload": \{"searchKeys":["ProductId","Name"]\}\}'>
@@ -125,8 +125,8 @@
 								display="ValueDescription"
 								placeholder="Placeholder"
 								valueHelp="VH1"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -135,8 +135,8 @@
 								conditions="{cm>/conditions/Description}"
 								maxConditions="1"
 								placeholder="{/#Product/Description/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit"
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit"
 								valueHelp="VH-Conditions">
 							</mdcField:FieldBase>
 						</form:FormElement>
@@ -147,8 +147,8 @@
 								maxConditions="1"
 								editMode="Display"
 								placeholder="Placeholder"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -157,8 +157,8 @@
 								conditions="{cm>/conditions/Name}"
 								maxConditions="5"
 								placeholder="{/#Product/Name/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit"
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit"
 								valueHelp="VH2">
 								<mdcField:dependents>
 									<mdc:ValueHelp id="VH2" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate", "payload": \{"searchKeys":["ProductId","Name"]\}\}'>
@@ -251,8 +251,8 @@
 								editMode="Display"
 								placeholder="Placeholder"
 								showEmptyIndicator="true"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -265,8 +265,8 @@
 								delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
 								maxConditions="1"
 								placeholder="{/#Product/Date/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -280,8 +280,8 @@
 								maxConditions="1"
 								editMode="Display"
 								placeholder="Placeholder"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -293,8 +293,8 @@
 								maxConditions="1"
 								placeholder="{/#Product/Quantity/@sap:label}"
 								tooltip="{/#Product/Quantity/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 								<m:Slider value="{path: '$field>/conditions', type: 'sap.ui.mdc.field.ConditionsType'}"/>
 								<mdcField:layoutData>
 									<form:ColumnElementData cellsLarge="12" />
@@ -307,8 +307,8 @@
 								maxConditions="1"
 								placeholder="{/#Product/Quantity/@sap:label}"
 								tooltip="{/#Product/Quantity/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 								<mdcField:contentEdit>
 									<m:Slider value="{path: '$field>/conditions', type: 'sap.ui.mdc.field.ConditionsType'}"/>
 								</mdcField:contentEdit>
@@ -324,8 +324,8 @@
 								dataType="Edm.Decimal"
 								delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
 								maxConditions="1"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 								<mdcField:contentEdit>
 									<m:Slider value="{path: '$field>/conditions', type: 'sap.ui.mdc.field.ConditionsType'}"/>
 								</mdcField:contentEdit>
@@ -338,8 +338,8 @@
 								dataType="Edm.Decimal"
 								delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
 								maxConditions="-1"
-								liveChange="handleLiveChange"
-								submit="handleSubmit"
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit"
 								valueHelp="CFH1">
 								<mdcField:contentDisplay>
 									<m:SegmentedButton items="{path: '$field>/conditions'}">
@@ -352,7 +352,7 @@
 									<form:ColumnElementData cellsLarge="12" />
 								</mdcField:layoutData>
 							</mdcField:FieldBase>
-							<m:Select id="FB9-mode" selectedKey="Editable" change="handleModeChange">
+							<m:Select id="FB9-mode" selectedKey="Editable" change=".handleModeChange">
 								<c:Item key="Editable" text="Editable"/>
 								<c:Item key="Display" text="Display"/>
 								<c:Item key="ReadOnly" text="ReadOnly"/>
@@ -368,9 +368,9 @@
 								conditions="{cm2>/conditions/Link}"
 								maxConditions="1"
 								editMode="Display"
-								liveChange="handleLiveChange"
-								submit="handleSubmit"
-								press="handlePress">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit"
+								press=".handlePress">
 								<mdcField:fieldInfo>
 									<mdcField:CustomFieldInfo id="F8-I" >
 										<form:SimpleForm layout="ColumnLayout" editable="false"
@@ -396,8 +396,8 @@
 								delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
 								maxConditions="-1"
 								placeholder="{/#Product/Quantity/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit"
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit"
 								valueHelp="VH3">
 								<mdcField:dependents>
 									<mdc:ValueHelp id="VH3" validateInput="false" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate"\}'>
@@ -417,8 +417,8 @@
 								maxConditions="-1"
 								editMode="Display"
 								placeholder="Placeholder"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -428,9 +428,9 @@
 								maxConditions="3"
 								display="DescriptionValue"
 								placeholder="{/#Product/Status/@sap:label}"
-								liveChange="handleLiveChange"
+								liveChange=".handleLiveChange"
 								valueHelp="VH-Status"
-								submit="handleSubmit">
+								submit=".handleSubmit">
 								<mdcField:dependents>
 									<mdc:ValueHelp id="VH-Status"
 										delegate='\{"name": "sap/ui/mdc/sample/field/fieldBase/ValueHelp-Status.delegate", "payload": \{"searchKeys":["StatusId","Name"]\}\}'>
@@ -457,8 +457,8 @@
 								editMode="Display"
 								display="DescriptionValue"
 								placeholder="Placeholder"
-								liveChange="handleLiveChange"
-								submit="handleSubmit"
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit"
 								valueHelp="VH-Status">
 							</mdcField:FieldBase>
 						</form:FormElement>
@@ -470,8 +470,8 @@
 								display="Value"
 								placeholder="Placeholder"
 								label="Label"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -484,8 +484,8 @@
 								maxConditions="1"
 								display="Value"
 								placeholder="{/#Product/Important/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 							<mdcField:FieldBase id="FB16b"
 								conditions="{cm>/conditions/Important}"
@@ -493,8 +493,8 @@
 								maxConditions="1"
 								display="Description"
 								placeholder="{/#Product/Important/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -507,8 +507,8 @@
 								display="Description"
 								editMode="Display"
 								placeholder="{/#Product/Important/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -521,8 +521,8 @@
 								display="Description"
 								editMode="Editable"
 								placeholder="{/#Product/WeightMeasure/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit"
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit"
 								valueHelp="VH-WeightUnit">
 								<mdcField:dependents>
 									<mdc:ValueHelp id="VH-WeightUnit" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate"\}'>
@@ -546,8 +546,8 @@
 								display="Value"
 								editMode="Display"
 								placeholder="{/#Product/WeightMeasure/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -556,8 +556,8 @@
 								conditions="{cm>/conditions/*Name,Description*}"
 								maxConditions="1"
 								placeholder="Search"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -567,8 +567,8 @@
 								maxConditions="1"
 								editMode="Display"
 								placeholder="Search"
-								liveChange="handleLiveChange"
-								submit="handleSubmit">
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit">
 							</mdcField:FieldBase>
 						</form:FormElement>
 
@@ -580,8 +580,8 @@
 								dataTypeConstraints='\{"maxLength": 3\}'
 								display="ValueDescription"
 								placeholder="{/#Product/CountryId/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit"
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit"
 								valueHelp="VH-Country">
 								<mdcField:dependents>
 									<mdc:ValueHelp id="VH-Country" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate", "payload": \{"searchKeys":["countryId","text"], "searchEnabledCheck": "CB-Search"\}\}'>
@@ -632,7 +632,7 @@
 							<m:CheckBox id="CB-Filterbar"
 								selected="true"
 								text="FilterBar"
-								select="toggleCountryFilterBar">
+								select=".toggleCountryFilterBar">
 								<m:layoutData>
 									<form:ColumnElementData cellsLarge="6" />
 								</m:layoutData>
@@ -640,7 +640,7 @@
 							<m:CheckBox id="CB-Search"
 								selected="false"
 								text="Search"
-								select="toggleCountrySearch">
+								select=".toggleCountrySearch">
 								<m:layoutData>
 									<form:ColumnElementData cellsLarge="6" />
 								</m:layoutData>
@@ -656,8 +656,8 @@
 								editMode="Editable"
 								display="ValueDescription"
 								placeholder="{/#Product/MatrId/@sap:label}"
-								liveChange="handleLiveChange"
-								submit="handleSubmit"
+								liveChange=".handleLiveChange"
+								submit=".handleSubmit"
 								valueHelp="VH-MatrId">
 								<mdcField:dependents>
 									<mdc:ValueHelp id="VH-MatrId" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate", "payload": \{"searchKeys":["MatrId","Text"]\}\}'>
@@ -727,7 +727,7 @@
 									</mdc:ValueHelp>
 								</mdcField:dependents>
 							</mdcField:FieldBase>
-							<m:ToggleButton id="B-MatrId" text="FixedList" pressed="false" press="toggleVH">
+							<m:ToggleButton id="B-MatrId" text="FixedList" pressed="false" press=".toggleVH">
 								<m:layoutData>
 									<form:ColumnElementData cellsLarge="3" cellsSmall="3"/>
 								</m:layoutData>
@@ -739,7 +739,7 @@
 					<form:FormContainer title="Condition Model">
 						<form:FormElement label="Conditions">
 							<m:TextArea id="Cond" editable="false" rows="15"></m:TextArea>
-							<m:Button id="clear" icon="sap-icon://clear-filter" press="clearFilters">
+							<m:Button id="clear" icon="sap-icon://clear-filter" press=".clearFilters">
 								<m:layoutData>
 									<form:ColumnElementData cellsLarge="1" cellsSmall="1"></form:ColumnElementData>
 								</m:layoutData>
@@ -827,7 +827,7 @@
 						<m:Text id="MyText" text="Event" width="400px" wrapping="false"></m:Text>
 					</m:contentLeft>
 					<m:contentMiddle>
-						<m:SegmentedButton selectedKey="P0" width="320px" selectionChange="handleButton">
+						<m:SegmentedButton selectedKey="P0" width="320px" selectionChange=".handleButton">
 							<m:items>
 								<m:SegmentedButtonItem key="P0" text="Simple"></m:SegmentedButtonItem>
 							</m:items>

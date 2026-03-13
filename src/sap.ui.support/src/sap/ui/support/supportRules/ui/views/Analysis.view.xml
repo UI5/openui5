@@ -22,7 +22,7 @@
 									<m:items>
 										<m:IconTabHeader
 												id="ruleSetsView"
-												select="onSelectedRuleSets"
+												select=".onSelectedRuleSets"
 												selectedKey="{/selectedSetPreviewKey}"
 												class="customIconTabHeader">
 											<m:layoutData>
@@ -34,8 +34,8 @@
 												<m:IconTabFilter key="additionalRulesets" text="Additional Rulesets" />
 											</m:items>
 										</m:IconTabHeader>
-										<m:Button class="supportAnalyzeButton" text="Analyze" press="onAnalyze" type="Emphasized"/>
-										<m:Button class="supportSettingsButton" icon="sap-icon://settings" press="onAnalyzeSettings" type="Emphasized"/>
+										<m:Button class="supportAnalyzeButton" text="Analyze" press=".onAnalyze" type="Emphasized"/>
+										<m:Button class="supportSettingsButton" icon="sap-icon://settings" press=".onAnalyzeSettings" type="Emphasized"/>
 									</m:items>
 								</m:HBox>
 							</m:contentMiddle>
@@ -80,7 +80,7 @@
 										text="Create Rule"
 										icon="sap-icon://add"
 										visible="{= !${/tempRulesDisabled}}"
-										press="createNewRulePress"/>
+										press=".createNewRulePress"/>
 								</m:contentRight>
 							</m:Bar>
 						</m:subHeader>
@@ -97,8 +97,8 @@
 								selectionBehavior="RowSelector"
 								rowActionCount="1"
 								visible="{= ${/selectedSetPreviewKey} === 'availableRules' }"
-								cellClick="onCellClick"
-								rowSelectionChange="onRowSelectionChange"
+								cellClick=".onCellClick"
+								rowSelectionChange=".onRowSelectionChange"
 								>
 							<t:columns>
 								<t:Column id="rulesColumn"
@@ -143,9 +143,9 @@
 							<t:rowActionTemplate>
 									<t:RowAction id="rowActionTemplate">
 										<t:items>
-											<t:RowActionItem icon="sap-icon://edit" text="Edit" press="editRule"  visible="{= ${ruleSets>libName} === 'temporary'}" />
-											<t:RowActionItem icon="sap-icon://delete" text="Delete" press="deleteTemporaryRule" visible="{= ${ruleSets>libName} === 'temporary'}" />
-											<t:RowActionItem icon="sap-icon://copy" text="Copy" press="duplicateRule" visible="{= !${/tempRulesDisabled} &amp;&amp; ${ruleSets>libName} !== 'temporary' &amp;&amp; ${ruleSets>type} !== 'lib'}" />
+											<t:RowActionItem icon="sap-icon://edit" text="Edit" press=".editRule"  visible="{= ${ruleSets>libName} === 'temporary'}" />
+											<t:RowActionItem icon="sap-icon://delete" text="Delete" press=".deleteTemporaryRule" visible="{= ${ruleSets>libName} === 'temporary'}" />
+											<t:RowActionItem icon="sap-icon://copy" text="Copy" press=".duplicateRule" visible="{= !${/tempRulesDisabled} &amp;&amp; ${ruleSets>libName} !== 'temporary' &amp;&amp; ${ruleSets>type} !== 'lib'}" />
 										</t:items>
 									</t:RowAction>
 							</t:rowActionTemplate>
@@ -164,7 +164,7 @@
 							<m:StandardListItem
 								title="{}"/>
 						</m:List>
-						<m:Button class="customMargin" text="Load" type="Emphasized" press="loadMarkedSupportLibraries" />
+						<m:Button class="customMargin" text="Load" type="Emphasized" press=".loadMarkedSupportLibraries" />
 					</l:VerticalLayout>
 				</m:Page>
 			</l:contentAreas>

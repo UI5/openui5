@@ -57,7 +57,9 @@ sap.ui.define([
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
 					changeType: "unhideSimpleFormField",
-					sUnhideId: this.oFormElement.getLabel().getId()
+					content: {
+						sUnhideId: this.oFormElement.getLabel().getId()
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent
@@ -140,7 +142,9 @@ sap.ui.define([
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
 					changeType: "unhideSimpleFormField",
-					revealedElementId: this.oFormElement.getId()
+					content: {
+						revealedElementId: this.oFormElement.getId()
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent
@@ -200,7 +204,7 @@ sap.ui.define([
 			function() {
 				UnhideSimpleForm.completeChangeContent({}, {}, this.mPropertyBag);
 			},
-			new Error("oSpecificChangeInfo.revealedElementId attribute required"),
+			new Error("oSpecificChangeInfo.content.revealedElementId attribute required"),
 			"the undefined value raises an error message"
 		);
 	});

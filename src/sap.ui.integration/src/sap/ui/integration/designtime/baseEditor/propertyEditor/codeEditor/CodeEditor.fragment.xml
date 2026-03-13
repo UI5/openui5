@@ -4,9 +4,9 @@
 >
 	<Input
 		value="{displayValue}"
-		liveChange="_onLiveChange"
+		liveChange="._onLiveChange"
 		showSuggestion="true"
 		showValueHelp="true"
-		valueHelpRequest="_openCodeEditor"
+		valueHelpRequest="._openCodeEditor"
 	/>
 </core:FragmentDefinition>

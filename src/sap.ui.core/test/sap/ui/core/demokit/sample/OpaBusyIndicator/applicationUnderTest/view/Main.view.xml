@@ -17,7 +17,7 @@
 		</List>
 			<Button
 				text="Toggle table busy indicator"
-				press="toggleBusyIndicator" />
+				press=".toggleBusyIndicator" />
 		</l:content>
 	</l:VerticalLayout>
 </mvc:View>

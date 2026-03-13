@@ -27,7 +27,7 @@
 					autoPopinMode="true"
 					hiddenInPopin="None"
 					items="{path: 'documents>/items', templateShareable: false}"
-					selectionChange="onSelectionChange">
+					selectionChange=".onSelectionChange">
 
 					<headerToolbar>
 						<OverflowToolbar>
@@ -39,7 +39,7 @@
 
 							<SearchField
 								width="20%"
-								liveChange="onSearch"
+								liveChange=".onSearch"
 							>
 								<layoutData>
 									<OverflowToolbarLayoutData
@@ -56,7 +56,7 @@
 								id="downloadSelectedButton"
 								text="Download"
 								enabled="false"
-								press="onDownloadFiles"
+								press=".onDownloadFiles"
 							/>
 							
 						</OverflowToolbar>
@@ -66,9 +66,9 @@
 						<plugins.UploadSetwithTable
 							uploadUrl="/uploadFiles"
 							multiple="true"
-							beforeUploadStarts="onBeforeUploadStarts"
-							uploadCompleted="onUploadCompleted"
-							onActivated="onPluginActivated"
+							beforeUploadStarts=".onBeforeUploadStarts"
+							uploadCompleted=".onUploadCompleted"
+							onActivated=".onPluginActivated"
 							cloudFilePickerEnabled="true"
 							actions="uploadButton"
 							>
@@ -146,7 +146,7 @@
 									>
 										<Link
 											text="{documents>fileName}"
-											press="openPreview"
+											press=".openPreview"
 											class="sapUiTinyMarginBottom"
 										/>
 										<Text text="{documents>documentType}" />
@@ -169,7 +169,7 @@
 									class="sapUiTinyMarginBegin"
 									type="Transparent"
 									icon="sap-icon://decline"
-									press="onRemoveHandler"
+									press=".onRemoveHandler"
 								/>
 							</cells>
 						</ColumnListItem>
@@ -189,7 +189,7 @@
 					autoPopinMode="true"
 					hiddenInPopin="None"
 					items="{path: 'documents>/items-instance2', templateShareable: false}"
-					selectionChange="onSelectionChange">
+					selectionChange=".onSelectionChange">
 
 					<headerToolbar>
 						<OverflowToolbar>
@@ -201,7 +201,7 @@
 
 							<SearchField
 								width="20%"
-								liveChange="onSearch"
+								liveChange=".onSearch"
 							>
 								<layoutData>
 									<OverflowToolbarLayoutData
@@ -218,7 +218,7 @@
 								id="downloadSelectedButton-instance2"
 								text="Download"
 								enabled="false"
-								press="onDownloadFiles"
+								press=".onDownloadFiles"
 							/>
 							
 						</OverflowToolbar>
@@ -228,9 +228,9 @@
 						<plugins.UploadSetwithTable
 							uploadUrl="/uploadFiles"
 							multiple="true"
-							beforeUploadStarts="onBeforeUploadStarts"
-							uploadCompleted="onUploadCompleted"
-							onActivated="onPluginActivated"
+							beforeUploadStarts=".onBeforeUploadStarts"
+							uploadCompleted=".onUploadCompleted"
+							onActivated=".onPluginActivated"
 							cloudFilePickerEnabled="true"
 							actions="uploadButtonInstance2"
 							>
@@ -308,7 +308,7 @@
 									>
 										<Link
 											text="{documents>fileName}"
-											press="openPreview"
+											press=".openPreview"
 											class="sapUiTinyMarginBottom"
 										/>
 										<Text text="{documents>documentType}" />
@@ -331,7 +331,7 @@
 									class="sapUiTinyMarginBegin"
 									type="Transparent"
 									icon="sap-icon://decline"
-									press="onRemoveHandler"
+									press=".onRemoveHandler"
 								/>
 							</cells>
 						</ColumnListItem>
@@ -352,7 +352,7 @@
 					autoPopinMode="true"
 					hiddenInPopin="None"
 					items="{path: 'documents>/items-instance3', templateShareable: false}"
-					selectionChange="onSelectionChange">
+					selectionChange=".onSelectionChange">
 
 					<headerToolbar>
 						<OverflowToolbar>
@@ -364,7 +364,7 @@
 
 							<SearchField
 								width="20%"
-								liveChange="onSearch"
+								liveChange=".onSearch"
 							>
 								<layoutData>
 									<OverflowToolbarLayoutData
@@ -381,7 +381,7 @@
 								id="downloadSelectedButton-instance3"
 								text="Download"
 								enabled="false"
-								press="onDownloadFiles"
+								press=".onDownloadFiles"
 							/>
 							
 						</OverflowToolbar>
@@ -391,9 +391,9 @@
 						<plugins.UploadSetwithTable
 							uploadUrl="/uploadFiles"
 							multiple="true"
-							beforeUploadStarts="onBeforeUploadStarts"
-							uploadCompleted="onUploadCompleted"
-							onActivated="onPluginActivated"
+							beforeUploadStarts=".onBeforeUploadStarts"
+							uploadCompleted=".onUploadCompleted"
+							onActivated=".onPluginActivated"
 							cloudFilePickerEnabled="true"
 							actions="uploadButtonInstance3"
 							>
@@ -471,7 +471,7 @@
 									>
 										<Link
 											text="{documents>fileName}"
-											press="openPreview"
+											press=".openPreview"
 											class="sapUiTinyMarginBottom"
 										/>
 										<Text text="{documents>documentType}" />
@@ -494,7 +494,7 @@
 									class="sapUiTinyMarginBegin"
 									type="Transparent"
 									icon="sap-icon://decline"
-									press="onRemoveHandler"
+									press=".onRemoveHandler"
 								/>
 							</cells>
 						</ColumnListItem>

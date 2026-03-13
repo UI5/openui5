@@ -14,12 +14,12 @@
 							class="sapUiTinyMarginBeginEnd"
 							titleActive="true"
 							title="HT-2001"
-							titlePress="onObjectIdentifierPress"
+							titlePress=".onObjectIdentifierPress"
 						/>
 						<Link
 							class="sapUiTinyMarginBeginEnd"
 							text="10 Portable DVD player"
-							press="onLinkPress"
+							press=".onLinkPress"
 						/>
 						<ObjectStatus
 							class="sapUiTinyMarginBeginEnd"
@@ -27,7 +27,7 @@
 							state="Success"
 							text="Product Shipped"
 							icon="sap-icon://sys-enter-2"
-							press="onObjectStatusPress"
+							press=".onObjectStatusPress"
 						/>
 						<ObjectNumber
 							class="sapUiTinyMarginBeginEnd"
@@ -35,7 +35,7 @@
 							number="150"
 							state="Success"
 							unit="EUR"
-							press="onObjectNumberPress"
+							press=".onObjectNumberPress"
 						/>
 					</OverflowToolbar>
 				</VBox>

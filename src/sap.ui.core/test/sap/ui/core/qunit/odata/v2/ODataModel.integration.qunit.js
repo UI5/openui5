@@ -734,7 +734,7 @@ sap.ui.define([
 				this.resolve();
 				this.resolve = null;
 			}
-			this.oListControlIds = null;
+			this.oListControlIds = new Set();
 		},
 
 		/**
@@ -23399,7 +23399,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 						},
 						filters: [new Filter("GrossAmount", FilterOperator.GT, 500)],
 						path: "/SalesOrderSet",
-						sorter: [new Sorter("CompanyCode", true)]
+						sorter: [new Sorter("CustomerID", true)]
 					});
 
 				return that.waitForChanges(assert);

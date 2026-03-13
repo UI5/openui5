@@ -31,7 +31,7 @@
 			</columns>
 			<items>
 				<ColumnListItem type="Navigation"
-					press="onPressListItem">
+					press=".onPressListItem">
 					<cells>
 						<Text text="{SupplierID}" />
 						<Text text="{CompanyName}" />

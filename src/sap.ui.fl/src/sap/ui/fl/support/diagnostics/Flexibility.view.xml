@@ -28,7 +28,7 @@
 		<Button
 			id="downloadButton"
 			text="Download Flexibility Data"
-			press="onDownloadPress"
+			press=".onDownloadPress"
 			class="sapUiSmallMarginBottom"/>
 	</l:VerticalLayout>
 </mvc:View>

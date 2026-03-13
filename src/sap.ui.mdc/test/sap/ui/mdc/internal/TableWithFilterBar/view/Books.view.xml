@@ -20,7 +20,7 @@
 	xmlns:demo="sap.ui.v4demo.controls" controllerName="sap.ui.v4demo.controller.Books">
 	<f2:DynamicPage id="dynamicPage">
 		<f2:title>
-			<f2:DynamicPageTitle stateChange="onStateChanged">
+			<f2:DynamicPageTitle stateChange=".onStateChanged">
 				<f2:actions>
 				</f2:actions>
 				<f2:heading>
@@ -46,7 +46,7 @@
 			<f2:DynamicPageHeader>
 				<f2:content>
 					<mdc:FilterBar id="booksFilterBar" variantBackreference="IDVariantManagementOfTable"
-						filtersChanged="onFiltersChanged" search="onSearch"
+						filtersChanged=".onFiltersChanged" search=".onSearch"
 						filterConditions='\{"stock" : [\{"operator":"BT","values":[100,50000]}]\}'
 						propertyInfo='[\{"key": "stock", "dataType":"Edm.Int32", "maxConditions": 1, "required": false, "label": "Stock range", "group": "CatalogService.Books", "groupLabel": "Books"\},
 						               \{"key": "author_ID", "dataType":"Edm.Int32", "required":false, "label":"Author ID", "formatOptions":\{"groupingEnabled":false\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
@@ -948,7 +948,7 @@
 							<Button type="Emphasized" text="Dummy Action" id="tableButton1" />
 						</mdcat:ActionToolbarAction>
 						<mdcat:ActionToolbarAction id="tableAction2">
-							<Button type="Emphasized" text="Add Book" press="onAddButtonPress" id="tableButton2" />
+							<Button type="Emphasized" text="Add Book" press=".onAddButtonPress" id="tableButton2" />
 						</mdcat:ActionToolbarAction>
 					</mdc:actions>
 					<mdc:columns>
@@ -1023,7 +1023,7 @@
 					<mdc:rowSettings>
 						<mdc:table.RowSettings>
 							<mdc:rowActions>
-								<mdc:table.RowActionItem type="Navigation" press="onRowPress" />
+								<mdc:table.RowActionItem type="Navigation" press=".onRowPress" />
 							</mdc:rowActions>
 						</mdc:table.RowSettings>
 					</mdc:rowSettings>

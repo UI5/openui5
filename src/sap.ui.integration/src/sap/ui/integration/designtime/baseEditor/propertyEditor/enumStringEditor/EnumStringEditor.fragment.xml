@@ -6,7 +6,7 @@
 		value="{value}"
 		selectedKey="{value}"
 		width="100%"
-		change="_onChange"
+		change="._onChange"
 		items="{config/enum}"
 	>
 		<items>

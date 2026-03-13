@@ -18,8 +18,10 @@ sap.ui.define([
 		removedElement: new Control("myFancyRemovedControlId")
 	}, {
 		changeType: "hideControl",
-		removedElement: {
-			id: "myFancyRemovedControlId"
+		content: {
+			removedElement: {
+				id: "myFancyRemovedControlId"
+			}
 		}
 	});
 
@@ -31,8 +33,10 @@ sap.ui.define([
 		changeType: "hideControl"
 	}, {
 		changeType: "hideControl",
-		removedElement: {
-			id: "myFancyControlId"
+		content: {
+			removedElement: {
+				id: "myFancyControlId"
+			}
 		}
 	});
 

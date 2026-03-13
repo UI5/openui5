@@ -7,7 +7,7 @@
 		id="idObjectHeader"
 		title="{Name}"
 		showTitleSelector="true"
-		titleSelectorPress="handleTitleSelectorPress"
+		titleSelectorPress=".handleTitleSelectorPress"
 		number="{
 			parts:[{path:'Price'},{path:'CurrencyCode'}],
 			type: 'sap.ui.model.type.Currency',

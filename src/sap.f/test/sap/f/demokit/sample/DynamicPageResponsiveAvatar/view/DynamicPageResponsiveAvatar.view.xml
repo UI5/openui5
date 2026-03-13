@@ -11,8 +11,8 @@
 			<f:DynamicPageTitle>
 				<f:breadcrumbs>
 					<Breadcrumbs currentLocationText="Responsive Avatar Demo">
-						<Link text="Home" press="handleLink1Press"/>
-						<Link text="Examples" press="handleLink2Press"/>
+						<Link text="Home" press=".handleLink1Press"/>
+						<Link text="Examples" press=".handleLink2Press"/>
 					</Breadcrumbs>
 				</f:breadcrumbs>
 
@@ -42,7 +42,7 @@
 							<OverflowToolbarLayoutData priority="NeverOverflow"/>
 						</layoutData>
 					</OverflowToolbarButton>
-					<Button text="Toggle Footer" press="toggleFooter"/>
+					<Button text="Toggle Footer" press=".toggleFooter"/>
 				</f:actions>
 			</f:DynamicPageTitle>
 		</f:title>
@@ -53,7 +53,7 @@
 					<Avatar id="headerAvatar"
 						class="sapUiSmallMarginEnd"
 						src="./test-resources/sap/uxap/images/imageID_275314.png"
-						press="handleAvatarPress"/>
+						press=".handleAvatarPress"/>
 
 					<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
 						<Link text="+33 6 4512 5158"/>

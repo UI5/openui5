@@ -220,21 +220,21 @@ sap.ui.define([
 	 * @public
 	 */
 	SplitMenuButton.completeChangeContent = function(oChange, oSpecificChangeInfo, mPropertyBag) {
-		var oModifier = mPropertyBag.modifier;
-		var oAppComponent = mPropertyBag.appComponent;
+		const oModifier = mPropertyBag.modifier;
+		const oAppComponent = mPropertyBag.appComponent;
 
-		if (!oSpecificChangeInfo.newElementIds) {
-			throw new Error("Split of MenuButton cannot be applied : oSpecificChangeInfo.newElementIds attribute required");
+		if (!oSpecificChangeInfo.content?.newElementIds) {
+			throw new Error("Split of MenuButton cannot be applied : oSpecificChangeInfo.content.newElementIds attribute required");
 		}
 
-		if (!oSpecificChangeInfo.sourceControlId) {
-			throw new Error("Split of MenuButton cannot be applied : oSpecificChangeInfo.sourceControlId attribute required");
+		if (!oSpecificChangeInfo.content.sourceControlId) {
+			throw new Error("Split of MenuButton cannot be applied : oSpecificChangeInfo.content.sourceControlId attribute required");
 		}
 
-		oChange.addDependentControl(oSpecificChangeInfo.sourceControlId, SOURCE_CONTROL, mPropertyBag);
-		var oContent = {};
-		oContent.sourceSelector = oModifier.getSelector(oSpecificChangeInfo.sourceControlId, oAppComponent);
-		oContent.newElementIds = oSpecificChangeInfo.newElementIds.map(function (sElementId) {
+		oChange.addDependentControl(oSpecificChangeInfo.content.sourceControlId, SOURCE_CONTROL, mPropertyBag);
+		const oContent = {};
+		oContent.sourceSelector = oModifier.getSelector(oSpecificChangeInfo.content.sourceControlId, oAppComponent);
+		oContent.newElementIds = oSpecificChangeInfo.content.newElementIds.map(function (sElementId) {
 			return oModifier.getSelector(sElementId, oAppComponent);
 		});
 		oChange.setContent(oContent);

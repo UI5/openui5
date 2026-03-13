@@ -19,9 +19,9 @@
 		</profile>
 		<searchManager>
 			<SearchManager id="searchField"
-				search="handlerSearchFieldSearch"
-				liveChange="handlerSearchFieldLiveEvent"
-				suggest="handlerSearchSuggestEvent"
+				search=".handlerSearchFieldSearch"
+				liveChange=".handlerSearchFieldLiveEvent"
+				suggest=".handlerSearchSuggestEvent"
 				enableSuggestions="true"
 				suggestionItems="{
 					path: '/ProductCollection',

@@ -52,22 +52,23 @@ function (
 			this.sandbox.restore();
 		}
 	}, function() {
-		QUnit.test('Add the same smart form container to Form two times', function (assert) {
+		QUnit.test('Add the same form container to Form two times', function (assert) {
 			var oPropertyBag = {
 				modifier : JsControlTreeModifier,
 				appComponent : this.oMockedAppComponent
 			};
 			var oLogErrorSpy = this.spy(Log, "error");
 
-			assert.equal(this.oForm.getFormContainers().length, 1,
-			"the form has only one form element in the beginning");
+			assert.equal(this.oForm.getFormContainers().length, 1, "the form has only one form element in the beginning");
 
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
-					"newControlId": "addedContainerId",
-					"newLabel": "addedContainerLabel",
-					"index" : 1,
-					"changeType" : "addGroup"
+					changeType : "addGroup",
+					content: {
+						newControlId: "addedContainerId",
+						newLabel: "addedContainerLabel",
+						index : 1
+					}
 				},
 				selector: this.oForm,
 				appComponent: this.oMockedAppComponent

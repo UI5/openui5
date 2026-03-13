@@ -46,7 +46,7 @@
 				enabled="true"
 				editable="true"
 				showValueHelp="true"
-				valueHelpRequest="handleValueHelp"
+				valueHelpRequest=".handleValueHelp"
 			/>
 
 		</l:content>

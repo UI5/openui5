@@ -11,8 +11,8 @@
 			startDate="{path: '/startDate'}"
 			rows="{path: '/people'}"
 			appointmentsVisualization="Filled"
-			appointmentSelect="handleAppointmentSelect"
-			intervalSelect="handleIntervalSelect">
+			appointmentSelect=".handleAppointmentSelect"
+			intervalSelect=".handleIntervalSelect">
 			<toolbarContent>
 				<Title text="Title" titleStyle="H4"/>
 			</toolbarContent>

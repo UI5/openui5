@@ -11,7 +11,7 @@
 		<f:title>
 			<f:DynamicPageTitle
 				id="dynamic-page"
-				stateChange="onStateChange"
+				stateChange=".onStateChange"
 				backgroundDesign="Transparent">
 				<f:heading>
 					<Title text="Second Page" />
@@ -21,7 +21,7 @@
 						height="auto"
 						class="sapUiSmallMarginBottom"
 						id="carousel-snapped"
-						pageChanged="onPageChanged"
+						pageChanged=".onPageChanged"
 						pageIndicatorPlacement="Top"
 						showPageIndicator="{= !${settings>/isDesktop} }"
 						pages="{
@@ -53,7 +53,7 @@
 					height="auto"
 					class="sapUiSmallMarginBottom"
 					id="carousel-expanded"
-					pageChanged="onPageChanged"
+					pageChanged=".onPageChanged"
 					pageIndicatorPlacement="Top"
 					showPageIndicator="{= !${settings>/isDesktop} }"
 					pages="{
@@ -140,7 +140,7 @@
 							expanded="false"
 							headerText="{products>key}"
 							height="2.75rem"
-							expand="onPanelExpanded">
+							expand=".onPanelExpanded">
 						</Panel>
 						<HBox class="sapUiTinyMarginTop"
 								alignItems="Start"

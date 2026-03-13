@@ -11,7 +11,6 @@
 							  markFavorite="true"
 							  markFlagged="true"
 							  markChanges="true"
-							  markChangesPress="handleMarkChangesPress"
 							  objectSubtitle="Senior Developer"
 							  objectImageURI="test-resources/sap/uxap/images/imageID_273624.png"
 							  objectImageShape="Circle"
@@ -21,16 +20,16 @@
 							  isActionAreaAlwaysVisible="true"
 							  showPlaceholder="true">
 				<actions>
-					<ObjectPageHeaderActionButton icon="sap-icon://full-screen" press="handleFullScreen" tooltip="Enter Full Screen Mode" visible="{= ${/actionButtonsInfo/endColumn/fullScreen} !== null }" />
-					<ObjectPageHeaderActionButton icon="sap-icon://exit-full-screen" press="handleExitFullScreen" tooltip="Exit Full Screen Mode" visible="{= ${/actionButtonsInfo/endColumn/exitFullScreen} !== null }" />
-					<ObjectPageHeaderActionButton icon="sap-icon://decline" press="handleClose" tooltip="Close column" visible="{= ${/actionButtonsInfo/endColumn/closeColumn} !== null }" />
+					<ObjectPageHeaderActionButton icon="sap-icon://full-screen" press=".handleFullScreen" tooltip="Enter Full Screen Mode" visible="{= ${/actionButtonsInfo/endColumn/fullScreen} !== null }" />
+					<ObjectPageHeaderActionButton icon="sap-icon://exit-full-screen" press=".handleExitFullScreen" tooltip="Exit Full Screen Mode" visible="{= ${/actionButtonsInfo/endColumn/exitFullScreen} !== null }" />
+					<ObjectPageHeaderActionButton icon="sap-icon://decline" press=".handleClose" tooltip="Close column" visible="{= ${/actionButtonsInfo/endColumn/closeColumn} !== null }" />
 				</actions>
 			</ObjectPageHeader>
 		</headerTitle>
 		<headerContent>
 			<layout:VerticalLayout>
 				<m:Link text="john-smith"/>
-				<m:Button text="To next page" press="handleDetailDetailPress" />
+				<m:Button text="To next page" press=".handleDetailDetailPress" />
 				<m:Link text="JohnSmith@sap.com"/>
 				<layout:HorizontalLayout>
 				</layout:HorizontalLayout>
@@ -51,7 +50,7 @@
 				<subSections>
 					<ObjectPageSubSection title=" ">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -61,19 +60,19 @@
 				<subSections>
 					<ObjectPageSubSection title="Connect">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
-							<m:Button text="To next page" press="handleDetailDetailPress" />
-							<m:Button text="To next page" press="handleDetailDetailPress" />
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 
 					<ObjectPageSubSection id="paymentSubSection" title="Payment information">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 						<moreBlocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</moreBlocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -83,12 +82,12 @@
 				<subSections>
 					<ObjectPageSubSection title="Subsection">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 					<ObjectPageSubSection title="Subsection2">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -98,12 +97,12 @@
 				<subSections>
 					<ObjectPageSubSection title="Subsection">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 					<ObjectPageSubSection title="Subsection2">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -113,12 +112,12 @@
 				<subSections>
 					<ObjectPageSubSection title="Subsection">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 					<ObjectPageSubSection title="Subsection2">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -128,12 +127,12 @@
 				<subSections>
 					<ObjectPageSubSection title="Subsection">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 					<ObjectPageSubSection title="Subsection2">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -143,12 +142,12 @@
 				<subSections>
 					<ObjectPageSubSection title="Subsection">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 					<ObjectPageSubSection title="Subsection2">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -158,12 +157,12 @@
 				<subSections>
 					<ObjectPageSubSection title="Subsection">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 					<ObjectPageSubSection title="Subsection2">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -173,12 +172,12 @@
 				<subSections>
 					<ObjectPageSubSection title="Subsection">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 					<ObjectPageSubSection title="Subsection2">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -188,12 +187,12 @@
 				<subSections>
 					<ObjectPageSubSection title="Subsection">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 					<ObjectPageSubSection title="Subsection2">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -203,12 +202,12 @@
 				<subSections>
 					<ObjectPageSubSection title="Subsection">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 					<ObjectPageSubSection title="Subsection2">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>
@@ -218,12 +217,12 @@
 				<subSections>
 					<ObjectPageSubSection title="Subsection">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 					<ObjectPageSubSection title="Subsection2">
 						<blocks>
-							<m:Button text="To next page" press="handleDetailDetailPress" />
+							<m:Button text="To next page" press=".handleDetailDetailPress" />
 						</blocks>
 					</ObjectPageSubSection>
 				</subSections>

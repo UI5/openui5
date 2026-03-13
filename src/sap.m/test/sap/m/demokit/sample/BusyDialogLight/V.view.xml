@@ -10,7 +10,7 @@
 		</l:dependents>
 		<Button
 			text="Show Light Busy Dialog"
-			press="handlePress"
+			press=".handlePress"
 			class="sapUiSmallMarginBottom" />
 	</l:VerticalLayout>
 </mvc:View>

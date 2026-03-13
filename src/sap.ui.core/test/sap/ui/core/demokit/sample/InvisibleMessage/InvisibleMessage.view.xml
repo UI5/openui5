@@ -10,28 +10,28 @@
 		<content>
 			<HBox>
 				<Button text="Infromation"
-						press="onPress">
+						press=".onPress">
 					<layoutData>
 						<FlexItemData growFactor="1" />
 					</layoutData>
 				</Button>
 				<Button type="Accept"
 						text="Success"
-						press="onPress">
+						press=".onPress">
 					<layoutData>
 						<FlexItemData growFactor="1" />
 					</layoutData>
 				</Button>
 				<Button type="Reject"
 						text="Error"
-						press="onPress">
+						press=".onPress">
 					<layoutData>
 						<FlexItemData growFactor="1" />
 					</layoutData>
 				</Button>
 				<Button type="Emphasized"
 						text="Emphasized"
-						press="onPress" />
+						press=".onPress" />
 			</HBox>
 			<HBox>
 			<Text id="statustext"

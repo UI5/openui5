@@ -19,7 +19,7 @@
                 p13nMode="Column,Sort,Filter{= !${data>/tableType} || ${data>/tableType} === 'GridTableType' ? '' : ',Group'}"
                 showPasteButton="true"
                 enableExport="true"
-                beforeExport="onBeforeExport"
+                beforeExport=".onBeforeExport"
                 selectionMode="Multi"
                 enableAutoColumnWidth="true"
                 propertyInfo='[\{

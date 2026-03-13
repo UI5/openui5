@@ -15,7 +15,7 @@
 					<core:Item key="ResponsiveTableType" text="ResponsiveTable"></core:Item>
 					<core:Item key="TreeTableType" text="TreeTable"></core:Item>
 				</m:Select>
-				<m:Button id="btnConfig" text="Table Configuration" press="openConfigurationDialog"></m:Button>
+				<m:Button id="btnConfig" text="Table Configuration" press=".openConfigurationDialog"></m:Button>
 			</m:headerContent>
 			<mdc:Table
 				id="mdcTable"

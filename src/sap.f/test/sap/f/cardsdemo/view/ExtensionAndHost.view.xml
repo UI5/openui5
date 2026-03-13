@@ -18,21 +18,21 @@
 		<VBox>
 			<Title text="General Extension and Host usage" class="sapUiSmallMargin"/>
 			<HBox>
-				<Button text="Set new actions" press="onSetNewActionsPress"/>
-				<Button text="Set new extension formatters" press="onSetNewFormattersPress"/>
+				<Button text="Set new actions" press=".onSetNewActionsPress"/>
+				<Button text="Set new extension formatters" press=".onSetNewFormattersPress"/>
 			</HBox>
 			<f:GridContainer >
-				<w:Card id="card1" manifest="{cardsPlayground>/playgroundBaseUrl}/bundles/cardWithExtension/manifest.json" action="onCardAction">
+				<w:Card id="card1" manifest="{cardsPlayground>/playgroundBaseUrl}/bundles/cardWithExtension/manifest.json" action=".onCardAction">
 					<w:layoutData>
 						<f:GridContainerItemLayoutData columns="4"/>
 					</w:layoutData>
 				</w:Card>
-				<w:Card id="card2" manifest="{cardsPlayground>/playgroundBaseUrl}/bundles/cardWithExtensionLegacyActions/manifest.json" action="onCardAction">
+				<w:Card id="card2" manifest="{cardsPlayground>/playgroundBaseUrl}/bundles/cardWithExtensionLegacyActions/manifest.json" action=".onCardAction">
 					<w:layoutData>
 						<f:GridContainerItemLayoutData columns="4"/>
 					</w:layoutData>
 				</w:Card>
-				<w:Card id="card21" manifest="{cardsPlayground>/playgroundBaseUrl}bundles/cardWithDestinations/manifest.json" action="onCardAction">
+				<w:Card id="card21" manifest="{cardsPlayground>/playgroundBaseUrl}bundles/cardWithDestinations/manifest.json" action=".onCardAction">
 					<w:layoutData>
 						<f:GridContainerItemLayoutData columns="4"/>
 					</w:layoutData>

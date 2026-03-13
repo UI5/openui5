@@ -11,7 +11,7 @@ sap.ui.define([
 
 	var ColorPickerMode = unifiedLibrary.ColorPickerMode;
 
-	return Controller.extend("sap.ui.unified.sample.ColorPicker.Controller", {
+	return Controller.extend("sap.ui.unified.sample.ColorPickerSimplified.Controller", {
 		openPopover: function(oEvent) {
 			var oRP = new ResponsivePopover({
 				title: "Color Picker",

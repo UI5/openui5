@@ -136,7 +136,7 @@ sap.ui.define([
 		}
 	];
 
-	var DynamicDateRangeController = Controller.extend("sap.m.sample.DynamicDateRange.DynamicDateRange", {
+	var DynamicDateRangeController = Controller.extend("sap.m.sample.DynamicDateRangeAndCalendarWeekNumbering.DynamicDateRangeAndCalendarWeekNumbering", {
 
 		onInit: function() {
 			var oModel = new JSONModel({

@@ -3,7 +3,7 @@ sap.ui.define([
 	], function(Controller) {
 	"use strict";
 
-	return Controller.extend("sap.m.sample.Panel.controller.PanelExpanded", {
+	return Controller.extend("sap.m.sample.PanelExpanded.controller.PanelExpanded", {
 		onOverflowToolbarPress : function () {
 			var oPanel = this.byId("expandablePanel");
 			oPanel.setExpanded(!oPanel.getExpanded());

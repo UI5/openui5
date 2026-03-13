@@ -10,7 +10,7 @@
 			text="select / deselect all"
 			selected="{= ${/child1} || ${/child2} || ${/child3} }"
 			partiallySelected="{= !(${/child1} &amp;&amp; ${/child2} &amp;&amp; ${/child3})}"
-			select="onParentClicked"
+			select=".onParentClicked"
 		/>
 		<c:HTML content="&lt;hr&gt;"/>
 		<CheckBox text="English" selected="{/child1}"/>

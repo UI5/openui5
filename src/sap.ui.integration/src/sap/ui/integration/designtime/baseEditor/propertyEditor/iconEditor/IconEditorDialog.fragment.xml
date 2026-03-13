@@ -5,10 +5,10 @@
 	<SelectDialog
 		noDataText="No Icons Found"
 		title="Select Icon"
-		liveChange="handleSearch"
-		search="handleSearch"
-		confirm="handleClose"
-		cancel="handleClose"
+		liveChange=".handleSearch"
+		search=".handleSearch"
+		confirm=".handleClose"
+		cancel=".handleClose"
 		items="{
 			path: '/'
 		}"

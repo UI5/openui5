@@ -8,7 +8,7 @@
 			<HBox>
 				<core:Icon size="2rem" src="sap-icon://attachment-photo" class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom" />
 				<VBox class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom" >
-					<Link text="{Name}" target="{ProductPicUrl}" press="handlePress"/>
+					<Link text="{Name}" target="{ProductPicUrl}" press=".handlePress"/>
 					<Label text="{ProductId}"/>
 				</VBox>
 			</HBox>

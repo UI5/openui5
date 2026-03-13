@@ -17,6 +17,6 @@
 			displaySize="L"
 			showBorder="true"
 			class="sapUiTinyMargin"
-			press="onPress"/>
+			press=".onPress"/>
 
 </mvc:View>

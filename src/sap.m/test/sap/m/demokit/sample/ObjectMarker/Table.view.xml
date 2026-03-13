@@ -26,7 +26,7 @@
 				<ObjectMarker
 					type="{type}"
 					additionalInfo="{additionalInfo}"
-					press="onPress"/>
+					press=".onPress"/>
 			</ColumnListItem>
 		</Table>
 </mvc:View>

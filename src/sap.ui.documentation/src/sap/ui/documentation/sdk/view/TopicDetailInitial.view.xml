@@ -27,7 +27,7 @@
 							width="100%"
 							densityAware="false"
 							class="landingImage"
-							load="handleLandingImageLoad"
+							load=".handleLandingImageLoad"
 							visible="{device>/system/phone}"/>
 
 						<Image
@@ -35,7 +35,7 @@
 							width="100%"
 							densityAware="false"
 							class="landingImage"
-							load="handleLandingImageLoad"
+							load=".handleLandingImageLoad"
 							visible="{=!${device>/system/phone}}"/>
 
 						<l:VerticalLayout
@@ -52,13 +52,13 @@
 										class="actionButton"
 										text="{i18n>TOPIC_DETAIL_INIT_DOWNLOAD_BTN}"
 										type="Emphasized"
-										press="onDownloadButtonPress"/>
+										press=".onDownloadButtonPress"/>
 								<Button
 										class="actionButton sapUiSmallMarginBegin"
 										visible="{= ${versionData>/isOpenUI5}}"
 										text="GitHub"
 										type="Emphasized"
-										press="onGitHubButtonPress"/>
+										press=".onGitHubButtonPress"/>
 							</l:HorizontalLayout>
 						</l:VerticalLayout>
 					</l:BlockLayoutCell>

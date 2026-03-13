@@ -10,17 +10,17 @@
 						class="sapUiSmallMarginBottom"
 						text="Set Saving Draft state"
 						width="200px"
-						press="handleSetSavingDraftPress" />
+						press=".handleSetSavingDraftPress" />
 				<Button id="setSavedDraft"
 						class="sapUiSmallMarginBottom"
 						text="Set Draft Saved state"
 						width="200px"
-						press="handleShowDraftSavedPress" />
+						press=".handleShowDraftSavedPress" />
 				<Button id="setClearDraft"
 						class="sapUiSmallMarginBottom"
 						text="Clear Draft state"
 						width="200px"
-						press="handleClearDraftStatePress" />
+						press=".handleClearDraftStatePress" />
 				<DraftIndicator id="draftIndi"/>
 			</l:content>
 		</l:VerticalLayout>

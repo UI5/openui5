@@ -5,7 +5,7 @@
 	<MultiComboBox
 		selectedKeys="{value}"
 		width="100%"
-		selectionFinish="_onSelectionFinish"
+		selectionFinish="._onSelectionFinish"
 		items="{config/items}"
 	>
 		<items>

@@ -14,7 +14,7 @@
 		<Input id="TFMore2" value="2 inch"></Input>
 		<Label id="More3" text="Package Quantity:"></Label>
 		<Input id="TFMore3" value="500"></Input>
-		<Link id="showMore" text="show details..." press="showMore"></Link>
-		<Link id="hideMore" text="hide details..." press="hideMore"></Link>
+		<Link id="showMore" text="show details..." press=".showMore"></Link>
+		<Link id="hideMore" text="hide details..." press=".hideMore"></Link>
 	</form:SimpleForm>
 </mvc:View>

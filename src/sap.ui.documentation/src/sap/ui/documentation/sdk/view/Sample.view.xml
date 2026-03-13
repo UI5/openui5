@@ -9,7 +9,7 @@
 			id="page"
 			showHeader="false"
 			showNavButton="true"
-			navButtonPress="onNavBack"
+			navButtonPress=".onNavBack"
 			busyIndicatorDelay="0"
 			class="sapUiDocumentationSamplePage">
 		<landmarkInfo>
@@ -19,17 +19,17 @@
 		<subHeader>
 			<Bar id="header" class="sapContrast sapContrastPlus">
 				<contentLeft>
-					<Button type="Back" press="onNavBack" tooltip="{i18n>SAMPLE_BACK_BTN_TOOLTIP}" enabled="{= ${/disableNavBack} === undefined }"/>
+					<Button type="Back" press=".onNavBack" tooltip="{i18n>SAMPLE_BACK_BTN_TOOLTIP}" enabled="{= ${/disableNavBack} === undefined }"/>
 				</contentLeft>
 				<contentMiddle>
 					<Title level="H1" text="{/title}" tooltip="{/title}"/>
 					<Button
 							id="warningSample"
-							icon="sap-icon://warning"	
+							icon="sap-icon://warning"
 							visible="{=${/showWarning}}"
 							tooltip="{i18n>SAMPLE_EDITED_TOOLTIP}"
 							class="sapUiExploredWarningIcon"
-							press="onWarningSample"/>
+							press=".onWarningSample"/>
 				</contentMiddle>
 				<contentRight>
 					<Button
@@ -37,23 +37,23 @@
 							visible="{=${/details} !== undefined || ${/description} !== undefined}"
 							icon="sap-icon://hint"
 							tooltip="{i18n>SAMPLE_INFO_TOOLTIP}"
-							press="onInfoSample"/>
+							press=".onInfoSample"/>
 
-					<Button id="apiRefButton" text="{i18n>SAMPLE_API_REFERENCE_BTN}" type="Emphasized" press="onAPIRefPress" visible="false"/>
+					<Button id="apiRefButton" text="{i18n>SAMPLE_API_REFERENCE_BTN}" type="Emphasized" press=".onAPIRefPress" visible="false"/>
 					<Button
 							id="prevSample"
 							icon="sap-icon://navigation-up-arrow"
 							class="sapUiHideOnPhone"
 							tooltip="{i18n>SAMPLE_PREV_BTN_TOOLTIP}"
 							enabled="{= ${/previousSampleId} !== undefined }"
-							press="onPreviousSample"/>
+							press=".onPreviousSample"/>
 					<Button
 							id="nextSample"
 							icon="sap-icon://navigation-down-arrow"
 							class="sapUiHideOnPhone"
 							tooltip="{i18n>SAMPLE_NEXT_BTN_TOOLTIP}"
 							enabled="{= ${/nextSampleId} !== undefined }"
-							press="onNextSample"/>
+							press=".onNextSample"/>
 					<Button
 							id="toggleFullScreenBtn"
 							icon="sap-icon://full-screen"
@@ -61,13 +61,13 @@
 										&#40; ${device>/system/tablet} &amp;&amp;
 										${device>/orientation/landscape} &#41; }"
 							tooltip="{i18n>SAMPLE_FULLSCREEN_BTN_TOOLTIP}"
-							press="onToggleFullScreen" />
+							press=".onToggleFullScreen" />
 					<Button
 							id="toggleRTA"
 							icon="sap-icon://wrench"
 							class="sapUiHideOnPhone"
 							tooltip="{i18n>SAMPLE_ADAPT_BTN_TOOLTIP}"
-							press="onToggleAdaptationMode"
+							press=".onToggleAdaptationMode"
 							visible="{= ${/rtaLoaded} &amp;&amp; !${/iframe} &amp;&amp; !${/external} }"
 							enabled="{= !${/rtaStarted}}"/>
 
@@ -75,25 +75,25 @@
 							id="code"
 							icon="sap-icon://source-code"
 							tooltip="{i18n>SAMPLE_CODE_BTN_TOOLTIP}"
-							press="onNavToCode" />
+							press=".onNavToCode" />
 					<Button visible="{/showNewTab}"
 							id="newTab"
 							tooltip="{i18n>SAMPLE_NEW_TAB_BTN_TOOLTIP}"
 							icon="sap-icon://inspect"
-							press="onNewTab" />
+							press=".onNewTab" />
 					<Button id="sampleSettings"
 							icon="sap-icon://action-settings"
-							press="handleSettings"
+							press=".handleSettings"
 							visible="{= !${/external} }" />
 					<Button
 							class="sapUiHideOnPhone"
 							text="{i18n>SAMPLE_DOWNLOAD_BTN_TOOLTIP}"
 							icon="sap-icon://download"
-							press="onDownload" />
+							press=".onDownload" />
 					<Button
 							class="sapUiVisibleOnlyOnPhone"
 							icon="sap-icon://download"
-							press="onDownload" />
+							press=".onDownload" />
 				</contentRight>
 			</Bar>
 		</subHeader>

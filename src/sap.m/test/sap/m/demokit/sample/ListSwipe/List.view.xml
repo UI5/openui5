@@ -6,7 +6,7 @@
 	<List
 		headerText="Products"
 		items="{/ProductCollection}"
-        swipe="handleSwipe">
+        swipe=".handleSwipe">
 		<StandardListItem
 			title="{Name}"
 			description="{ProductId}"
@@ -14,7 +14,7 @@
 			iconDensityAware="false"
 			iconInset="false" />
 		<swipeContent>
-			<Button press="handleReject" />
+			<Button press=".handleReject" />
 		</swipeContent>
 	</List>
 </mvc:View>

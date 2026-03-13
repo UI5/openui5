@@ -7,7 +7,7 @@
 	<App>
 		<Page title="Badges">
 			<headerContent>
-				<ToggleButton id="densityModeBox" text="sapUiSizeCompact" press="onToggleCompact" />
+				<ToggleButton id="densityModeBox" text="sapUiSizeCompact" press=".onToggleCompact" />
 			</headerContent>
 			<Button text="Add Badge To Visible Item" press=".addToVisible" />
 			<Button text="Add Badge To Sub Item" press=".addToSubItem" />

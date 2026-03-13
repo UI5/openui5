@@ -30,7 +30,7 @@
 						<core:Item key="GridTableType" text="GridTableType"></core:Item>
 						<core:Item key="ResponsiveTableType" text="ResponsiveTableType"></core:Item>
 					</Select>
-					<Button id="btnConfig" text="Show TableType Configuration" press="openConfigurationDialog"></Button>
+					<Button id="btnConfig" text="Show TableType Configuration" press=".openConfigurationDialog"></Button>
 				</mdc:actions>
 				<mdct:Column
 					propertyKey="name"

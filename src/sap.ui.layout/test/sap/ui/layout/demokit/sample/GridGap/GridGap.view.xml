@@ -36,7 +36,7 @@
 			<Label labelFor="grg" text="gridRowGap" />
 			<Input id="grg" width="60px" change=".onInputChanged"/>
 			<Label labelFor="gcg" text="gridColumnGap" />
-			<Input id="gcg" width="60px" change="onInputChanged"/>
+			<Input id="gcg" width="60px" change=".onInputChanged"/>
 		</form:SimpleForm>
 		<grid:CSSGrid
 			id="grid1"

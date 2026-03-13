@@ -84,19 +84,19 @@ sap.ui.define([
 	 */
 	UnhideForm.completeChangeContent = function(oChangeWrapper, oSpecificChangeInfo, mPropertyBag) {
 		//TODO remove sUnhideId when rta is switched to new logic to create reveal changes
-		var oContent = {};
-		if (oSpecificChangeInfo.sUnhideId) {
-			var oUnhideElement = Element.getElementById(oSpecificChangeInfo.sUnhideId);
+		const oContent = {};
+		if (oSpecificChangeInfo.content?.sUnhideId) {
+			const oUnhideElement = Element.getElementById(oSpecificChangeInfo.content.sUnhideId);
 			oContent.elementSelector = JsControlTreeModifier.getSelector(oUnhideElement, mPropertyBag.appComponent);
 			oChangeWrapper.addDependentControl(oUnhideElement, "elementSelector", mPropertyBag);
-		} else if (oSpecificChangeInfo.revealedElementId ) {
+		} else if (oSpecificChangeInfo.content?.revealedElementId ) {
 			//translate from FormElement (unstable id) to the label control (stable id and in public aggregation)
-			var oFormElement = Element.getElementById(oSpecificChangeInfo.revealedElementId || oSpecificChangeInfo.sUnhideId);
-			var oLabel = oFormElement.getLabel();
+			const oFormElement = Element.getElementById(oSpecificChangeInfo.content.revealedElementId || oSpecificChangeInfo.content.sUnhideId);
+			const oLabel = oFormElement.getLabel();
 			oContent.elementSelector = JsControlTreeModifier.getSelector(oLabel, mPropertyBag.appComponent);
 			oChangeWrapper.addDependentControl(oLabel, "elementSelector", mPropertyBag);
 		} else {
-			throw new Error("oSpecificChangeInfo.revealedElementId attribute required");
+			throw new Error("oSpecificChangeInfo.content.revealedElementId attribute required");
 		}
 		oChangeWrapper.setContent(oContent);
 	};

@@ -4,7 +4,7 @@
 >
 	<PropertyEditor
 		renderLabel="false"
-		init="wrapperInit"
+		init=".wrapperInit"
 		config="{nestedConfig}"
 		value="{nestedValue}"
 	/>

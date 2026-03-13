@@ -48,8 +48,8 @@
 					</f:GridContainer>
 				</IconTabFilter>
 				<IconTabFilter text="Sharing a Token" key="sharingToken">
-					<Button text="Mark shared token as expired" press="markSharedTokenAsExpired"></Button>
-					<Button text="Refresh All Cards" press="refreshAllCards"></Button>
+					<Button text="Mark shared token as expired" press=".markSharedTokenAsExpired"></Button>
+					<Button text="Refresh All Cards" press=".refreshAllCards"></Button>
 					<f:GridContainer >
 						<w:Card id="reusedTokenCard1" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/csrfTokens/sharingToken/cardManifest.json">
 							<w:layoutData>

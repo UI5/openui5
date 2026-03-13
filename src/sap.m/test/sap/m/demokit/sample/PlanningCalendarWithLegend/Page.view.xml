@@ -32,7 +32,7 @@
 					rows="{path: '/people'}"
 					appointmentsVisualization="Filled"
 					showEmptyIntervalHeaders="false"
-					viewChange="handleViewChange"
+					viewChange=".handleViewChange"
 					legend="PlanningCalendarLegend"
 					specialDates="{path: '/specialDates', templateShareable: false}">
 				<toolbarContent>

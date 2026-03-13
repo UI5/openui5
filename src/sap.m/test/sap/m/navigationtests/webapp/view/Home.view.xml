@@ -7,8 +7,8 @@
 		id="page"
 		title="Home">
 		<content>
-			<Button text="Open Info Message and Navigate" press="bntInfoMsgPress" />
-			<Button text="Open Error Message and Navigate" press="bntErrorMsgPress" />
+			<Button text="Open Info Message and Navigate" press=".bntInfoMsgPress" />
+			<Button text="Open Error Message and Navigate" press=".bntErrorMsgPress" />
 		</content>
 	</Page>
 </mvc:View>

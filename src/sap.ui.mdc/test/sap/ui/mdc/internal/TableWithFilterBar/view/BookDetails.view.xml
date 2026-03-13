@@ -27,10 +27,10 @@
 					</FlexBox>
 				</uxap:snappedHeading>
 				<uxap:actions>
-					<ToggleButton text="Edit" type="Emphasized" press="onEditButtonPress" visible="{=!${view>/editMode}}" />
-					<Button text="Delete" type="Transparent" press="onDeleteButtonPress" visible="{=!${view>/editMode}}" />
-					<Button id="save" text="Save" type="Emphasized" visible="{view>/editMode}" press="onSavePress" />
-					<Button id="cancel" text="Cancel" visible="{view>/editMode}" press="onCancelPress" />
+					<ToggleButton text="Edit" type="Emphasized" press=".onEditButtonPress" visible="{=!${view>/editMode}}" />
+					<Button text="Delete" type="Transparent" press=".onDeleteButtonPress" visible="{=!${view>/editMode}}" />
+					<Button id="save" text="Save" type="Emphasized" visible="{view>/editMode}" press=".onSavePress" />
+					<Button id="cancel" text="Cancel" visible="{view>/editMode}" press=".onCancelPress" />
 				</uxap:actions>
 			</uxap:ObjectPageDynamicHeaderTitle>
 		</uxap:headerTitle>

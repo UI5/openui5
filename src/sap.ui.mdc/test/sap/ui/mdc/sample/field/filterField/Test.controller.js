@@ -33,7 +33,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	return Controller.extend("sap.ui.mdc.base.sample.field.filterField.Test", {
+	return Controller.extend("sap.ui.mdc.sample.field.filterField.Test", {
 
 		onInit: function(oEvent) {
 			Formatting.setUnitMappings({

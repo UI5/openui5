@@ -17,8 +17,8 @@
 
 			<l:HorizontalLayout id="preserveContentLayout">
 				<l:content>
-					<CheckBox selected="false" text="prefer DOM" select="onCheckBoxSelected"/>
-					<Button text="Redraw" press="onRedraw" />
+					<CheckBox selected="false" text="prefer DOM" select=".onCheckBoxSelected"/>
+					<Button text="Redraw" press=".onRedraw" />
 				</l:content>
 			</l:HorizontalLayout>
 

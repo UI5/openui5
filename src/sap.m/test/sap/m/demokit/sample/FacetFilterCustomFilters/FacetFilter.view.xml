@@ -9,14 +9,14 @@
 			showPersonalization="true"
 			liveSearch="false"
 			showReset="true"
-			reset="handleFacetFilterReset"
-			confirm="handleConfirm"
+			reset=".handleFacetFilterReset"
+			confirm=".handleConfirm"
 			lists="{/ProductCollectionStats/Filters}">
 				<FacetFilterList
 					title="{type}"
 					key="{key}"
 					mode="MultiSelect"
-					search="handleSearch">
+					search=".handleSearch">
 				</FacetFilterList>
 		</FacetFilter>
 

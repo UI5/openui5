@@ -17,11 +17,11 @@
 						class="sapUiTinyMarginBottom"
 						icon="sap-icon://navigation-right-arrow"
 						tooltip="Move to selected"
-						press="moveToSelectedProductsTable"/>
+						press=".moveToSelectedProductsTable"/>
 					<Button
 						icon="sap-icon://navigation-left-arrow"
 						tooltip="Move to available"
-						press="moveToAvailableProductsTable"/>
+						press=".moveToAvailableProductsTable"/>
 				</VBox>
 				<mvc:XMLView id="selectedProducts" viewName="sap.m.sample.TableDnD.SelectedProducts" async="true"/>
 			</HBox>

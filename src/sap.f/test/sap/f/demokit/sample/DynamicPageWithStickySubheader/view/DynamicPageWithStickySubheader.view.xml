@@ -38,7 +38,7 @@
 						<OverflowToolbar>
 							<GenericTag text="SR"
 								status="Error"
-								press="onGenericTagPress"
+								press=".onGenericTagPress"
 								design="StatusIconHidden">
 								<ObjectNumber number="2"
 									unit="M"
@@ -51,7 +51,7 @@
 						<Button text="Edit" type="Emphasized"/>
 						<Button text="Delete" type="Transparent"/>
 						<Button text="Copy" type="Transparent"/>
-						<Button text="Toggle Footer" type="Transparent" press="onToggleFooter"/>
+						<Button text="Toggle Footer" type="Transparent" press=".onToggleFooter"/>
 						<Button icon="sap-icon://action" type="Transparent"/>
 					</f:actions>
 					<f:navigationActions>

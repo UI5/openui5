@@ -33,7 +33,7 @@ describe("sap.m.ComboBoxShowItems", function() {
 			comboFilterButton = element(by.id("__xmlview0--btnComboBox1Filter"));
 
 		comboFilterButton.click();
-		element.all(by.css('.sapMComboBoxBasePicker[style*="display: block"] li.sapMLIB')).get(1).click();
+		element.all(by.css('.sapMComboBoxBasePicker li.sapMLIB')).get(1).click();
 		comboFilterButton.click();
 		expect(takeScreenshot()).toLookAs("cb-recomendation-selected");
 
@@ -49,7 +49,7 @@ describe("sap.m.ComboBoxShowItems", function() {
 			comboButton = element(by.id("__xmlview0--btnComboBox1"));
 
 		comboButton.click();
-		element.all(by.css('.sapMComboBoxBasePicker[style*="display: block"] li.sapMLIB')).get(20).click();
+		element.all(by.css('.sapMComboBoxBasePicker li.sapMLIB')).get(20).click();
 		comboFilterButton.click();
 		expect(takeScreenshot()).toLookAs("cb-non-recomendation-selected");
 
@@ -81,7 +81,7 @@ describe("sap.m.ComboBoxShowItems", function() {
 			comboFilterButton = element(by.id("__xmlview0--btnComboBox3Filter"));
 
 		comboFilterButton.click();
-		element.all(by.css('.sapMComboBoxBasePicker[style*="display: block"] li.sapMLIB')).get(1).click();
+		element.all(by.css('.sapMComboBoxBasePicker li.sapMLIB')).get(1).click();
 		comboFilterButton.click();
 		expect(takeScreenshot()).toLookAs("cbg-recomendation-selected");
 
@@ -97,7 +97,7 @@ describe("sap.m.ComboBoxShowItems", function() {
 			comboButton = element(by.id("__xmlview0--btnComboBox3"));
 
 		comboButton.click();
-		element.all(by.css('.sapMComboBoxBasePicker[style*="display: block"] li.sapMLIB')).get(20).click();
+		element.all(by.css('.sapMComboBoxBasePicker li.sapMLIB')).get(20).click();
 		comboFilterButton.click();
 		expect(takeScreenshot()).toLookAs("cbg-non-recomendation-selected");
 
@@ -129,7 +129,7 @@ describe("sap.m.ComboBoxShowItems", function() {
 			comboFilterButton = element(by.id("__xmlview0--btnMultiComboBox1Filter"));
 
 		comboFilterButton.click();
-		element.all(by.css('.sapMComboBoxBasePicker[style*="display: block"] li.sapMLIB')).get(1).click();
+		element.all(by.css('.sapMComboBoxBasePicker li.sapMLIB')).get(1).click();
 		comboFilterButton.click();
 		expect(takeScreenshot()).toLookAs("mcb-recomendation-selected");
 
@@ -145,7 +145,7 @@ describe("sap.m.ComboBoxShowItems", function() {
 			comboButton = element(by.id("__xmlview0--btnMultiComboBox1"));
 
 		comboButton.click();
-		element.all(by.css('.sapMComboBoxBasePicker[style*="display: block"] li.sapMLIB')).get(20).click();
+		element.all(by.css('.sapMComboBoxBasePicker li.sapMLIB')).get(20).click();
 		comboFilterButton.click();
 		expect(takeScreenshot()).toLookAs("mcb-non-recomendation-selected");
 
@@ -179,7 +179,7 @@ describe("sap.m.ComboBoxShowItems", function() {
 			comboFilterButton = element(by.id("__xmlview0--btnMultiComboBox2Filter"));
 
 		comboFilterButton.click();
-		element.all(by.css('.sapMComboBoxBasePicker[style*="display: block"] li.sapMLIB')).get(1).click();
+		element.all(by.css('.sapMComboBoxBasePicker li.sapMLIB')).get(1).click();
 		comboFilterButton.click();
 		expect(takeScreenshot()).toLookAs("mcbg-recomendation-selected");
 
@@ -195,7 +195,7 @@ describe("sap.m.ComboBoxShowItems", function() {
 			comboButton = element(by.id("__xmlview0--btnMultiComboBox2"));
 
 		comboButton.click();
-		element.all(by.css('.sapMComboBoxBasePicker[style*="display: block"] li.sapMLIB')).get(7).click();
+		element.all(by.css('.sapMComboBoxBasePicker li.sapMLIB')).get(7).click();
 		comboFilterButton.click();
 		expect(takeScreenshot()).toLookAs("mcbg-non-recomendation-selected");
 

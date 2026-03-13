@@ -9,11 +9,11 @@
 		<content>
 			<form:SimpleForm editable="true" width="320px" layout="ColumnLayout">
 				<Label text="Design"/>
-				<Select change="onSelectDesign" items="{/designTypes}">
+				<Select change=".onSelectDesign" items="{/designTypes}">
 					<core:Item key="{key}" text="{key}"/>
 				</Select>
 				<Label text="Style"/>
-				<Select change="onSelectStyle" items="{/styleTypes}">
+				<Select change=".onSelectStyle" items="{/styleTypes}">
 					<core:Item key="{key}" text="{key}"/>
 				</Select>
 			</form:SimpleForm>

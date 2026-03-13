@@ -9,7 +9,7 @@
 		<l:content>
 			<Link
 				text="Open message box"
-				press="handleLinkPress" />
+				press=".handleLinkPress" />
 			<Link
 				text="Disabled link"
 				enabled="false" />
@@ -28,7 +28,7 @@
 			<Link
 				text="Show more information"
 				endIcon="sap-icon://inspect"
-				press="handleLinkPress" />
+				press=".handleLinkPress" />
 			<Link
 				text="Disabled link with icon"
 				icon="sap-icon://cart"

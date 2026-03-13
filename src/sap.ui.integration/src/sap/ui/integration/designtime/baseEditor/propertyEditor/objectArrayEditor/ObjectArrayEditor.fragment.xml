@@ -7,7 +7,7 @@
 		width="100%"
 		enabled="{config/enabled}"
 		placeholder="{config/placeholder}"
-		liveChange="_onLiveChange"
+		liveChange="._onLiveChange"
 		growing="true"
 		growingMaxLines="7"
 	/>

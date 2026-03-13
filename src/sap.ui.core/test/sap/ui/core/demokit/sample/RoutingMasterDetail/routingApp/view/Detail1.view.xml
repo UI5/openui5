@@ -5,16 +5,16 @@
 	controllerName="sap.ui.core.sample.RoutingMasterDetail.routingApp.controller.Detail1">
 	<Page
 		title="{orderName}"
-		navButtonPress="onNavBack"
+		navButtonPress=".onNavBack"
 		showNavButton="{device>/system/phone}">
 		<content>
-					<List id="products" 
+					<List id="products"
 						items="{products}"
 						headerText="Products">
 					<items>
-						<StandardListItem title="{productName}" 
+						<StandardListItem title="{productName}"
 							type="Active"
-							press="onSelectionChange"/>
+							press=".onSelectionChange"/>
 					</items>
 				</List>
 		</content>

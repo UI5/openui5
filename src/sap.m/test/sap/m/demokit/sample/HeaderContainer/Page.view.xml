@@ -6,7 +6,7 @@
 	xmlns:mvc="sap.ui.core.mvc">
 	<Toolbar>
 		<Label text="Scroll options" />
-		<Select selectedKey="1" change="scrollChanged">
+		<Select selectedKey="1" change=".scrollChanged">
 			<core:Item text="1 item" key="1"/>
 			<core:Item text="2 items" key="2"/>
 			<core:Item text="3 items" key="3"/>
@@ -19,20 +19,20 @@
 					 subheader="about 1 minute ago in Computer Market" />
 
 		<Input></Input>
-		<NumericContent scale="M" value="1.75" valueColor="Good" indicator="Up" press="press" />
-		<NumericContent scale="M" value="0.57" valueColor="Error" indicator="Down" press="press" />
+		<NumericContent scale="M" value="1.75" valueColor="Good" indicator="Up" press=".press" />
+		<NumericContent scale="M" value="0.57" valueColor="Error" indicator="Down" press=".press" />
 		<NumericContent value="1762" icon="sap-icon://line-charts"/>
 		<NumericContent value="1762" icon="sap-icon://area-chart"/>
-		<NumericContent scale="M" value="1.04" valueColor="Neutral" indicator="Up" press="press" />
-		<NumericContent scale="M" value="3.65" valueColor="Good" indicator="Up" press="press" />
+		<NumericContent scale="M" value="1.04" valueColor="Neutral" indicator="Up" press=".press" />
+		<NumericContent scale="M" value="3.65" valueColor="Good" indicator="Up" press=".press" />
 		<NumericContent value="1762" icon="sap-icon://bar-chart"/>
-		<NumericContent scale="M" value="0.73" valueColor="Error" indicator="Down" press="press" />
+		<NumericContent scale="M" value="0.73" valueColor="Error" indicator="Down" press=".press" />
 	</HeaderContainer>
 
 	<HeaderContainer id="container2" scrollStep="200">
 		<TileContent unit="EUR" footer="Current Quarter">
 			<content>
-				<NumericContent value="1.96" valueColor="Error" indicator="Down" press="press"/>
+				<NumericContent value="1.96" valueColor="Error" indicator="Down" press=".press"/>
 			</content>
 		</TileContent>
 		<TileContent footer="Leave Requests">

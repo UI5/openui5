@@ -10,7 +10,7 @@
 					id="detailsButtonSetting"
 					selectedKeys="{view>/respType/detailsButtonSetting}"
 					items="{view>/enums/priority}"
-					selectionFinish="onDetailsButtonChange">
+					selectionFinish=".onDetailsButtonChange">
 					<core:Item key="{view>value}" text="{view>value}" />
 				</MultiComboBox>
 

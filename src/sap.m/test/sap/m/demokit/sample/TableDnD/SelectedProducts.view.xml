@@ -11,7 +11,7 @@
 		mode="SingleSelectMaster"
 		growing="true"
 		growingThreshold="10"
-		beforeOpenContextMenu="onBeforeOpenContextMenu"
+		beforeOpenContextMenu=".onBeforeOpenContextMenu"
 		items="{
 			path: '/ProductCollection',
 			filters: {path: 'Rank', operator: 'GT', value1: '0'},
@@ -23,9 +23,9 @@
 		</dependents>
 		<contextMenu>
 			<Menu>
-				<MenuItem text="Move to Available Products" press="moveToAvailableProductsTable" />
-				<MenuItem text="Move up" press="moveUp" />
-				<MenuItem text="Move down" press="moveDown" />
+				<MenuItem text="Move to Available Products" press=".moveToAvailableProductsTable" />
+				<MenuItem text="Move up" press=".moveUp" />
+				<MenuItem text="Move down" press=".moveDown" />
 			</Menu>
 		</contextMenu>
 		<headerToolbar>
@@ -35,11 +35,11 @@
 				<Button
 					icon="sap-icon://navigation-up-arrow"
 					tooltip="Move up"
-					press="moveUp"/>
+					press=".moveUp"/>
 				<Button
 					icon="sap-icon://navigation-down-arrow"
 					tooltip="Move down"
-					press="moveDown"/>
+					press=".moveDown"/>
 			</OverflowToolbar>
 		</headerToolbar>
 		<columns>
@@ -63,12 +63,12 @@
 				groupName="available2selected"
 				targetAggregation="items"
 				dropPosition="Between"
-				drop="onDropSelectedProductsTable" />
+				drop=".onDropSelectedProductsTable" />
 			<dnd:DragDropInfo
 				sourceAggregation="items"
 				targetAggregation="items"
 				dropPosition="Between"
-				drop="onDropSelectedProductsTable"/>
+				drop=".onDropSelectedProductsTable"/>
 		</dragDropConfig>
 		<items>
 			<ColumnListItem>

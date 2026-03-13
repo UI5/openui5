@@ -22,9 +22,9 @@
 			</VBox>
 		</content>
 		<buttons>
-			<Button text="Reset" type="Transparent" press="handleAppSettings('reset')" class="sapUiTinyMarginRight"/>
-			<Button text="Apply" type="Emphasized" press="handleAppSettings('apply')" />
-			<Button text="Close" type="Default" press="handleAppSettings('close')" />
+			<Button text="Reset" type="Transparent" press=".handleAppSettings('reset')" class="sapUiTinyMarginRight"/>
+			<Button text="Apply" type="Emphasized" press=".handleAppSettings('apply')" />
+			<Button text="Close" type="Default" press=".handleAppSettings('close')" />
 		</buttons>
 	</Dialog>
 </core:FragmentDefinition>

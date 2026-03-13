@@ -19,7 +19,7 @@
 				<ToolbarSpacer />
 				<MultiComboBox id="idSticky"
 					placeholder="Sticky options"
-					selectionFinish="onSelectionFinish"
+					selectionFinish=".onSelectionFinish"
 					width="15%">
 					<items>
 						<core:Item  text="Header Toolbar"
@@ -30,22 +30,22 @@
 				</MultiComboBox>
 				<ToggleButton id="toggleInfoToolbar"
 					text="Hide/Show InfoToolbar"
-					press="onToggleInfoToolbar" />
+					press=".onToggleInfoToolbar" />
 				<Button
 					icon="sap-icon://settings"
-					press="handleButtonPress" />
+					press=".handleButtonPress" />
 				<Button
 					icon="sap-icon://person-placeholder"
-					press="handleButtonPress" />
+					press=".handleButtonPress" />
 				<Button
 					icon="sap-icon://drop-down-list"
-					press="handleButtonPress" />
+					press=".handleButtonPress" />
 			</OverflowToolbar>
 		</headerToolbar>
 		<infoToolbar>
 			<OverflowToolbar
 				active="true"
-				press="handleInfobarPress" >
+				press=".handleInfobarPress" >
 				<Label text="This is the info bar" />
 			</OverflowToolbar>
 		</infoToolbar>

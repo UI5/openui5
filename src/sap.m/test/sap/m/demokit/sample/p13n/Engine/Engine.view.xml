@@ -22,25 +22,25 @@
                     <ToolbarSeparator/>
                     <vm:VariantManagement id="p13nVm" for="persoTable"/>
                     <ToolbarSpacer/>
-                    <Button icon="sap-icon://action-settings" press="openPersoDialog" tooltip="Settings"/>
+                    <Button icon="sap-icon://action-settings" press=".openPersoDialog" tooltip="Settings"/>
                 </OverflowToolbar>
             </headerToolbar>
             <infoToolbar>
-                <OverflowToolbar id="filterInfo" visible="false" design="Info" active="true" press="onFilterInfoPress" >
+                <OverflowToolbar id="filterInfo" visible="false" design="Info" active="true" press=".onFilterInfoPress" >
                     <Text id="filterInfoText" wrapping="false" text="Table filter active" />
                     <ToolbarSpacer />
-                    <Button tooltip="Remove All Filters" icon="sap-icon://decline" type="Transparent" press="onClearFilterPress" />
+                    <Button tooltip="Remove All Filters" icon="sap-icon://decline" type="Transparent" press=".onClearFilterPress" />
                 </OverflowToolbar>
             </infoToolbar>
             <dependents>
-                <plugins:ColumnResizer columnResize="onColumnResize"/>
-                <columnmenu:Menu id="menu" beforeOpen="beforeOpenColumnMenu" showTableSettingsButton="true" tableSettingsPressed="openPersoDialog">
-                    <columnmenu:QuickSort change="onSort">
+                <plugins:ColumnResizer columnResize=".onColumnResize"/>
+                <columnmenu:Menu id="menu" beforeOpen=".beforeOpenColumnMenu" showTableSettingsButton="true" tableSettingsPressed=".openPersoDialog">
+                    <columnmenu:QuickSort change=".onSort">
                         <columnmenu:items>
                             <columnmenu:QuickSortItem></columnmenu:QuickSortItem>
                         </columnmenu:items>
                     </columnmenu:QuickSort>
-                    <columnmenu:QuickGroup change="onGroup">
+                    <columnmenu:QuickGroup change=".onGroup">
                         <columnmenu:items>
                             <columnmenu:QuickGroupItem></columnmenu:QuickGroupItem>
                         </columnmenu:items>
@@ -49,7 +49,7 @@
             </dependents>
 
             <dragDropConfig>
-                <dnd:DragDropInfo sourceAggregation="columns" targetAggregation="columns" dropPosition="Between" drop="onColumnMove"/>
+                <dnd:DragDropInfo sourceAggregation="columns" targetAggregation="columns" dropPosition="Between" drop=".onColumnMove"/>
             </dragDropConfig>
 
             <noData>

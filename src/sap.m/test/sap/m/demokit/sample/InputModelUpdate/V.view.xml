@@ -7,8 +7,8 @@
 		<Page title="Late binding of Input (oData v2)">
 			<VBox>
 				<Text class="sapUiSmallMarginBottom" text="For more details about this sample code and its intended use case, please refer to the description and comments provided within the code."/>
-				<Input id="inputArtistName" value="{initialData>/currentValue}" liveChange="handleLiveChange" />
-				<Button press="fnRebind" text="Bind Input in 3 seconds" />
+				<Input id="inputArtistName" value="{initialData>/currentValue}" liveChange=".handleLiveChange" />
+				<Button press=".fnRebind" text="Bind Input in 3 seconds" />
 			</VBox>
 		</Page>
 	</App>

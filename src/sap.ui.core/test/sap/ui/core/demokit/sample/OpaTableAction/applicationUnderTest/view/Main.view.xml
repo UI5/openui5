@@ -5,7 +5,7 @@
 		<Page id="multiSelectionPage" title="Multi-Selection with Shift Key">
 			<headerContent>
 				<Button id="navigationButton"
-						press="onNavToContextMenu"
+						press=".onNavToContextMenu"
 						text="Go to Context Menu Page"/>
 			</headerContent>
 			<content>
@@ -16,7 +16,7 @@
 				<Table id="multiSelectTable"
 					   mode="MultiSelect"
 					   items="{/items}"
-					   selectionChange="onSelectionChange">
+					   selectionChange=".onSelectionChange">
 					<headerToolbar>
 						<Toolbar>
 							<Title text="Table with Multi-Selection"/>
@@ -48,7 +48,7 @@
 		<Page id="contextMenuPage"
 			  title="Context Menu with Right-Click"
 			  showNavButton="true"
-			  navButtonPress="onBack">
+			  navButtonPress=".onBack">
 			<content>
 				<VBox class="sapUiSmallMargin">
 					<Text text="This page demonstrates right-click functionality on a table. The OPA test uses the rightClick property of the Press action to open the context menu." class="sapUiSmallMarginBottom"/>
@@ -84,9 +84,9 @@
 					<contextMenu>
 						<Menu>
 							<items>
-								<MenuItem text="Edit Item" press="onContextMenuEdit"/>
-								<MenuItem text="Delete Item" press="onContextMenuDelete"/>
-								<MenuItem text="View Details" press="onContextMenuDetails"/>
+								<MenuItem text="Edit Item" press=".onContextMenuEdit"/>
+								<MenuItem text="Delete Item" press=".onContextMenuDelete"/>
+								<MenuItem text="View Details" press=".onContextMenuDetails"/>
 							</items>
 						</Menu>
 					</contextMenu>

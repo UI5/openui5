@@ -165,7 +165,7 @@ sap.ui.define([
 				/**
 				 * Fires when the error state of the nested property editor changes
 				 */
-				 validationErrorChange: {
+				validationErrorChange: {
 					parameters: {
 						/**
 						 * Whether there is an error in the nested editor

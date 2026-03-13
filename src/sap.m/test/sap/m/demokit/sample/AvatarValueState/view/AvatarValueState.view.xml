@@ -20,7 +20,7 @@
 							displaySize="M"
 							imageFitType="Cover"
 							badgeValueState="Warning"
-							press="onPress"
+							press=".onPress"
 							badgeIcon="sap-icon://alert"
 							badgeTooltip= "Sabine Mayer"/>
 					<Text
@@ -33,7 +33,7 @@
 							displaySize="M"
 							displayShape="Circle"
 							badgeValueState="Information"
-							press="onPress"
+							press=".onPress"
 							src="{/LowShutterstock}"
 							badgeIcon="sap-icon://information"
 							badgeTooltip= "Julie Armstrong"/>
@@ -47,7 +47,7 @@
 							displaySize="M"
 							backgroundColor="Accent7"
 							initials="JD"
-							press="onPress"
+							press=".onPress"
 							badgeValueState="None"
 							badgeIcon="sap-icon://camera" />
 					<Text
@@ -60,7 +60,7 @@
 							displaySize="M"
 							backgroundColor="Accent3"
 							badgeValueState="Success"
-							press="onPress"
+							press=".onPress"
 							badgeIcon="sap-icon://message-success" />
 					<Text
 							textAlign="Center"
@@ -71,7 +71,7 @@
 					<Avatar
 							displaySize="M"
 							badgeValueState="Error"
-							press="onPress"
+							press=".onPress"
 							badgeIcon="sap-icon://message-error" />
 					<Text
 							textAlign="Center"

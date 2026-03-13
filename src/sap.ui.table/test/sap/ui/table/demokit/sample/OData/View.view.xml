@@ -33,7 +33,7 @@
 						<m:Button
 							icon="sap-icon://refresh"
 							tooltip="Reinitialize Model"
-							press="onModelRefresh"/>
+							press=".onModelRefresh"/>
 					</m:OverflowToolbar>
 				</extension>
 				<columns>
@@ -103,7 +103,7 @@
 						<m:Label text="OData Model Operation Mode:" labelFor="operationMode"/>
 						<m:SegmentedButton
 							id="operationMode"
-							selectionChange="onOperationModeChange"
+							selectionChange=".onOperationModeChange"
 							selectedKey="{ui>selectedOperationMode}"
 							items="{ui>/operationModes}">
 							<m:items>

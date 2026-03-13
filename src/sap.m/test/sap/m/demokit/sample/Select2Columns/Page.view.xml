@@ -10,15 +10,15 @@
 				<Title text="Basic configuration:" />
 				<HBox alignItems="Center">
 					<Label text="First column ratio:" class="sapUiTinyMarginEnd"/>
-					<Slider width="200px" id="firstSlider" value="3" change="fnFirstSliderChange"/>
+					<Slider width="200px" id="firstSlider" value="3" change=".fnFirstSliderChange"/>
 				</HBox>
 				<HBox alignItems="Center">
 					<Label text="Second column ratio:" class="sapUiTinyMarginEnd"/>
-					<Slider width="200px" id="secondSlider" value="2" change="fnSecondSliderChange"/>
+					<Slider width="200px" id="secondSlider" value="2" change=".fnSecondSliderChange"/>
 				</HBox>
 				<HBox alignItems="Center">
 					<Label text="Wrap items text:" class="sapUiTinyMarginEnd"/>
-					<Switch type="AcceptReject" change="fnSwitch"/>
+					<Switch type="AcceptReject" change=".fnSwitch"/>
 				</HBox>
 				<Title text="Result:" class="sapUiSmallMarginTop"/>
 				<HBox>
@@ -41,7 +41,7 @@
 				<Title text="Separator configuration:" />
 				<HBox alignItems="Center">
 					<Label text="Two column separator:" class="sapUiTinyMarginEnd"/>
-					<Select id="selectSeparator" change="fnTwoColumnSeparatorChange">
+					<Select id="selectSeparator" change=".fnTwoColumnSeparatorChange">
 						<core:ListItem key="Dash" text="Dash" />
 						<core:ListItem key="Bullet" text="Bullet" />
 						<core:ListItem key="VerticalLine" text="VerticalLine" />
@@ -49,7 +49,7 @@
 				</HBox>
 				<HBox alignItems="Center">
 					<Label text="Editable:" class="sapUiTinyMarginEnd"/>
-					<Switch id="switchEditable" change="fnSwitchEditableChange"/>
+					<Switch id="switchEditable" change=".fnSwitchEditableChange"/>
 				</HBox>
 				<Title text="Result:" class="sapUiSmallMarginTop"/>
 				<Select

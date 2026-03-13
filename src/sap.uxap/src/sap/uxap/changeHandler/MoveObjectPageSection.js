@@ -65,9 +65,9 @@ sap.ui.define([
 	 * @override
 	 */
 	MoveObjectPageSection.completeChangeContent = function (oChange, mSpecificChangeInfo, mPropertyBag) {
-		var oSourceControl = Element.getElementById(mSpecificChangeInfo.source.id),
-			oTargetControl = Element.getElementById(mSpecificChangeInfo.target.id);
-		var oPromise = Promise.resolve();
+		const oSourceControl = Element.getElementById(mSpecificChangeInfo.content.source.id);
+		const oTargetControl = Element.getElementById(mSpecificChangeInfo.content.target.id);
+		let oPromise = Promise.resolve();
 		if (oSourceControl.isA("sap.m.IconTabHeader")
 			&& oTargetControl.isA("sap.m.IconTabHeader")
 		) {
@@ -91,21 +91,21 @@ sap.ui.define([
 	MoveObjectPageSection._mapAnchorsToSections = function (mSpecificChangeInfo, mPropertyBag) {
 		return Promise.resolve()
 			.then(function() {
-				var oSection, oSectionParentInfo;
-				var oModifier = mPropertyBag.modifier;
-				var oLayout = oModifier.bySelector(mSpecificChangeInfo.selector, mPropertyBag.appComponent, mPropertyBag.view);
-				var aAnchoredSections = oLayout._getVisibleSections(); // sections that have anchors
+				let oSection, oSectionParentInfo;
+				const oModifier = mPropertyBag.modifier;
+				const oLayout = oModifier.bySelector(mSpecificChangeInfo.selector, mPropertyBag.appComponent, mPropertyBag.view);
+				const aAnchoredSections = oLayout._getVisibleSections(); // sections that have anchors
 
 				function getSectionForAnchor(sAnchorId) {
-					var oAnchor = Element.getElementById(sAnchorId),
+					const oAnchor = Element.getElementById(sAnchorId),
 						sSectionId = oAnchor.getKey();
 					return Element.getElementById(sSectionId);
 				}
-				var aPromiseArray = [];
-				mSpecificChangeInfo.movedElements.forEach(function(oElement) {
+				const aPromiseArray = [];
+				mSpecificChangeInfo.content.movedElements.forEach(function(oElement) {
 					// adjust target index as invisible sections are not part of the anchor bar;
-					var oSectionAtTargetIndex = aAnchoredSections[oElement.targetIndex];
-					var oPromise = Promise.resolve()
+					const oSectionAtTargetIndex = aAnchoredSections[oElement.targetIndex];
+					const oPromise = Promise.resolve()
 						.then(function(){
 							return oModifier.findIndexInParentAggregation(oSectionAtTargetIndex);
 						})
@@ -126,8 +126,8 @@ sap.ui.define([
 				});
 				return Promise.all(aPromiseArray)
 					.then(function(){
-						merge(mSpecificChangeInfo.source, oSectionParentInfo);
-						merge(mSpecificChangeInfo.target, oSectionParentInfo);
+						merge(mSpecificChangeInfo.content.source, oSectionParentInfo);
+						merge(mSpecificChangeInfo.content.target, oSectionParentInfo);
 					});
 			});
 	};

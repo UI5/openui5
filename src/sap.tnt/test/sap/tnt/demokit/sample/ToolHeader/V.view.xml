@@ -11,7 +11,7 @@
 					<OverflowToolbarLayoutData priority="NeverOverflow"/>
 				</layoutData>
 			</Button>
-			<Image src="test-resources/sap/tnt/images/SAP_Logo.png" decorative="false" press="onLogoPressed" tooltip="SAP Logo" width="60px" height="30px">
+			<Image src="test-resources/sap/tnt/images/SAP_Logo.png" decorative="false" press=".onLogoPressed" tooltip="SAP Logo" width="60px" height="30px">
 				<layoutData>
 					<OverflowToolbarLayoutData priority="NeverOverflow"/>
 				</layoutData>
@@ -64,7 +64,7 @@
 		</tnt:ToolHeader>
 
 		<tnt:ToolHeader id="shellLikeToolHeaderOnlyMandatoryControls" class="sapUiTinyMargin sapUiLargeMarginTop">
-			<Image src="test-resources/sap/tnt/images/SAP_Logo.png" decorative="false" press="onLogoPressed" tooltip="SAP Logo" width="60px" height="30px">
+			<Image src="test-resources/sap/tnt/images/SAP_Logo.png" decorative="false" press=".onLogoPressed" tooltip="SAP Logo" width="60px" height="30px">
 				<layoutData>
 					<OverflowToolbarLayoutData priority="NeverOverflow"/>
 				</layoutData>

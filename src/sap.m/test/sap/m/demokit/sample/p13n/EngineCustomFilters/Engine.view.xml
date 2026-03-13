@@ -22,7 +22,7 @@
 					<ToolbarSeparator/>
 					<vm:VariantManagement id="p13nVm" for="persoTable"/>
 					<ToolbarSpacer/>
-					<Button icon="sap-icon://action-settings" press="openPersoDialog" tooltip="Settings"/>
+					<Button icon="sap-icon://action-settings" press=".openPersoDialog" tooltip="Settings"/>
 				</OverflowToolbar>
 			</headerToolbar>
 

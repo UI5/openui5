@@ -126,6 +126,27 @@ sap.ui.define([
         iTableTitle2CountsFontSize = parseInt(window.getComputedStyle(oTableTitle2CountsDomRef).fontSize);
 
         assert.equal(iTableTitle2TitleFontSize, iTableTitle2CountsFontSize, "The font-size of the TableTitle content matches the Title font-size.");
+
+        this.oTableTitle2.setTotalCount(-1);
+        this.oTableTitle2.setSelectedCount(2);
+        await nextUIUpdate();
+
+        assert.equal(this.oTableTitle2.getTitle().getTitleStyle(), TitleLevel.H6, "Title has level H6");
+        iTableTitle2TitleFontSize = parseInt(window.getComputedStyle(oTableTitle2TitleDomRef).fontSize);
+        iTableTitle2CountsFontSize = parseInt(window.getComputedStyle(oTableTitle2CountsDomRef).fontSize);
+
+        assert.equal(iTableTitle2TitleFontSize, iTableTitle2CountsFontSize, "The font-size of the TableTitle content matches the Title font-size.");
+
+        this.oTableTitle2.setTotalCount(-1);
+        this.oTableTitle2.setSelectedCount(2);
+        this.oTableTitle2.getTitle().setTitleStyle(TitleLevel.H1);
+        await nextUIUpdate();
+
+        assert.equal(this.oTableTitle2.getTitle().getTitleStyle(), TitleLevel.H1, "Title has level H1");
+        iTableTitle2TitleFontSize = parseInt(window.getComputedStyle(oTableTitle2TitleDomRef).fontSize);
+        iTableTitle2CountsFontSize = parseInt(window.getComputedStyle(oTableTitle2CountsDomRef).fontSize);
+
+        assert.equal(iTableTitle2TitleFontSize, iTableTitle2CountsFontSize + 2, "The font-size of the TableTitle content is 2px less then of the Title.");
     });
 
     QUnit.test("TableTitle should display counts in compact or extended view", async function(assert){

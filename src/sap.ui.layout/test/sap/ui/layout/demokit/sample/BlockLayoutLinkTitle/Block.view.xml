@@ -10,7 +10,7 @@
 		backgroundDesign="Transparent"
 		layout="ResponsiveGridLayout">
 		<Label text="Parent width" />
-		<Slider id="widthSlider" value="100" liveChange="onSliderMoved" />
+		<Slider id="widthSlider" value="100" liveChange=".onSliderMoved" />
 		<Label id="backgroundLabel" text="Background" />
 		<SegmentedButton
 			selectedKey="{/selectedBackground}"

@@ -13,7 +13,7 @@
 		intro="{Description}"
 		title="{Name}"
 		titleActive="true"
-		titlePress="handleTitlePress"
+		titlePress=".handleTitlePress"
 		number="{
 			parts:[{path:'Price'},{path:'CurrencyCode'}],
 			type: 'sap.ui.model.type.Currency',
@@ -21,7 +21,7 @@
 		}"
 		numberUnit="{CurrencyCode}"
 		showTitleSelector="true"
-		titleSelectorPress="onPress"
+		titleSelectorPress=".onPress"
 		numberState="Success"
 		backgroundDesign="Translucent"
 		class="sapUiResponsivePadding--header" >

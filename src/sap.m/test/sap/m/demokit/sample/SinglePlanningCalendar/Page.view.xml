@@ -22,14 +22,14 @@
 			id="SPC1"
 			class="sapUiSmallMarginTop"
 			title= "My Calendar"
-			viewChange="handleViewChange"
-			appointmentSelect="handleAppointmentSelect"
-			headerDateSelect="handleHeaderDateSelect"
-			startDateChange="handleStartDateChange"
-			appointmentDrop="handleAppointmentDrop"
-			appointmentResize="handleAppointmentResize"
-			appointmentCreate="handleAppointmentCreateDnD"
-			moreLinkPress="handleMoreLinkPress"
+			viewChange=".handleViewChange"
+			appointmentSelect=".handleAppointmentSelect"
+			headerDateSelect=".handleHeaderDateSelect"
+			startDateChange=".handleStartDateChange"
+			appointmentDrop=".handleAppointmentDrop"
+			appointmentResize=".handleAppointmentResize"
+			appointmentCreate=".handleAppointmentCreateDnD"
+			moreLinkPress=".handleMoreLinkPress"
 			startDate="{path: '/startDate'}"
 			enableAppointmentsDragAndDrop="{settings>/enableAppointmentsDragAndDrop}"
 			enableAppointmentsResize="{settings>/enableAppointmentsResize}"
@@ -37,8 +37,8 @@
 			stickyMode="{settings>/stickyMode}"
 			appointments="{path: '/appointments'}">
 			<actions>
-				<Button id="addNewAppointment" text="Create" press="handleAppointmentCreate" tooltip="Add new appointment" />
-				<Button id="legendButton" icon="sap-icon://legend" press="handleOpenLegend" tooltip="Open SinglePlanningCalendar legend" ariaHasPopup="Dialog" />
+				<Button id="addNewAppointment" text="Create" press=".handleAppointmentCreate" tooltip="Add new appointment" />
+				<Button id="legendButton" icon="sap-icon://legend" press=".handleOpenLegend" tooltip="Open SinglePlanningCalendar legend" ariaHasPopup="Dialog" />
 			</actions>
 			<views>
 				<SinglePlanningCalendarDayView key="DayView" title="Day" />

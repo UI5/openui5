@@ -14,7 +14,7 @@
 				id="table"
 				selectionMode="MultiToggle"
 				rows="{/ProductCollection}"
-				columnResize="onColumnResize"
+				columnResize=".onColumnResize"
 				ariaLabelledBy="title">
 				<extension>
 					<m:OverflowToolbar style="Clear">
@@ -80,7 +80,7 @@
 						<m:SegmentedButton
 							id="columnWidths"
 							selectedKey="Static"
-							selectionChange="onColumnWidthsChange">
+							selectionChange=".onColumnWidthsChange">
 							<m:items>
 								<m:SegmentedButtonItem icon="sap-icon://color-fill" key="Static" tooltip="Static"/>
 								<m:SegmentedButtonItem icon="sap-icon://overlay" key="Flexible" tooltip="Flexible"/>

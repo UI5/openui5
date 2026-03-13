@@ -6,9 +6,6 @@ function(Controller, XMLView, jQuery) {
 	Controller.extend("myController", {
 		onInit: function () {
 			// Initialization code can go here
-		},
-		onActionPress: function () {
-			alert("Button Pressed!");
 		}
 	});
 

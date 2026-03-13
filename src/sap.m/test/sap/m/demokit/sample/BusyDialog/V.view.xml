@@ -6,7 +6,7 @@
 	<l:VerticalLayout class="sapUiContentPadding" width="100%">
 		<Button
 			text="Show Busy Dialog"
-			press="onOpenDialog"
+			press=".onOpenDialog"
 			class="sapUiSmallMarginBottom"/>
 	</l:VerticalLayout>
 </mvc:View>

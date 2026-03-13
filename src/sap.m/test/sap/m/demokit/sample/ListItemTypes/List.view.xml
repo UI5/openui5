@@ -17,7 +17,7 @@
 					<Select
 						id="state"
 						selectedKey="Inactive"
-						change="handleSelectChange">
+						change=".handleSelectChange">
 						<items>
 							<core:Item key="Inactive" text="Inactive" />
 							<core:Item key="Active" text="Active" />
@@ -35,7 +35,7 @@
 			icon="{ProductPicUrl}"
 			iconDensityAware="false"
 			iconInset="false"
-			press="handlePress"
-			detailPress="handleDetailPress" />
+			press=".handlePress"
+			detailPress=".handleDetailPress" />
 	</List>
 </mvc:View>

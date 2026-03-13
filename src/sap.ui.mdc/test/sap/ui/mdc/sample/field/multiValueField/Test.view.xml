@@ -12,8 +12,8 @@
 	<m:App id="MyApp" defaultTransitionName="show">
 		<m:Page id="P0" title="MultiValueField" titleLevel="H1">
 			<m:headerContent>
-				<m:ToggleButton pressed="true" press="onEditPress" text="Edit" />
-				<m:ToggleButton press="onSizePress" text="Size" />
+				<m:ToggleButton pressed="true" press=".onEditPress" text="Edit" />
+				<m:ToggleButton press=".onSizePress" text="Size" />
 			</m:headerContent>
 			<form:SimpleForm id="form" layout="ColumnLayout" editable="true"
 				columnsXL="2" columnsL="2" columnsM="2">
@@ -24,8 +24,8 @@
 					items="{path: 'view>/items'}"
 					display="Description"
 					placeholder="{/#Product/ProductId/@sap:label}"
-					change="handleChange"
-					liveChange="handleLiveChange"
+					change=".handleChange"
+					liveChange=".handleLiveChange"
 					valueHelp="VH1">
 					<mdcField:MultiValueFieldItem key="{path: 'view>ProductId', type:'sap.ui.model.type.String'}" description="{view>Name}" />
 					<mdc:dependents>
@@ -122,8 +122,8 @@
 					items="{path: 'view>/items'}"
 					display="Description"
 					placeholder="{/#Product/ProductId/@sap:label}"
-					change="handleChange"
-					liveChange="handleLiveChange"
+					change=".handleChange"
+					liveChange=".handleLiveChange"
 					valueHelp="VH2">
 					<mdcField:MultiValueFieldItem key="{path: 'view>ProductId', type:'sap.ui.model.type.String'}" description="{view>Name}" />
 					<mdc:dependents>
@@ -163,8 +163,8 @@
 					items="{path: 'view>/dateItems'}"
 					display="Value"
 					placeholder="{/#Product/ProductId/@sap:label}"
-					change="handleChange"
-					liveChange="handleLiveChange">
+					change=".handleChange"
+					liveChange=".handleLiveChange">
 					<mdcField:MultiValueFieldItem key="{path: 'view>date', type:'sap.ui.model.type.Date', formatOptions: {style: 'short'}}" />
 				</mdc:MultiValueField>
 
@@ -175,19 +175,19 @@
 					editMode="Display"
 					placeholder="Placeholder"
 					showEmptyIndicator="true"
-					change="handleChange"
-					liveChange="handleLiveChange">
+					change=".handleChange"
+					liveChange=".handleLiveChange">
 					<mdcField:MultiValueFieldItem key="{path: 'view>date', type:'sap.ui.model.type.Date', formatOptions: {style: 'long'}}" />
 				</mdc:MultiValueField>
 
 				<m:Label text="type date as description"/>
-				<mdc:MultiValueField 
+				<mdc:MultiValueField
 					id="F8"
 					items="{path: 'view>/items'}"
 					display="ValueDescription"
 					delegate='\{"name": "sap/ui/mdc/sample/field/multiValueField/MultiValueFieldODataV2.delegate"\}'
-					change="handleChange"
-					liveChange="handleLiveChange"
+					change=".handleChange"
+					liveChange=".handleLiveChange"
 					valueHelp="VH-F8">
 					<mdcField:MultiValueFieldItem key="{path: 'view>ProductId', type:'sap.ui.model.type.String', constraints: {maxLength: 20}}" description="{path: 'view>Date', type:'sap.ui.model.odata.type.DateTime', formatOptions: {style: 'long'}, constraints: {displayFormat: 'Date'}}" />
 					<mdc:dependents>
@@ -221,8 +221,8 @@
 					items="{path: '/StatusCollection'}"
 					display="Description"
 					placeholder="{/#Product/Status/@sap:label}"
-					change="handleChange"
-					liveChange="handleLiveChange">
+					change=".handleChange"
+					liveChange=".handleLiveChange">
 					<mdcField:MultiValueFieldItem key="{path: 'StatusId', type:'sap.ui.model.type.String'}" description="{Name}" />
 				</mdc:MultiValueField>
 
@@ -233,8 +233,8 @@
 					editMode="Display"
 					placeholder="Placeholder"
 					showEmptyIndicator="true"
-					change="handleChange"
-					liveChange="handleLiveChange">
+					change=".handleChange"
+					liveChange=".handleLiveChange">
 					<mdcField:MultiValueFieldItem key="{StatusId}" description="{Name}" />
 				</mdc:MultiValueField>
 			</form:SimpleForm>

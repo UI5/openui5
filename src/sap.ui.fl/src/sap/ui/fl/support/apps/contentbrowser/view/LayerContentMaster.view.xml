@@ -7,7 +7,7 @@
 			<Toolbar>
 				<SearchField
 					id="search"
-					liveChange="onSearch"
+					liveChange=".onSearch"
 					width="100%" />
 			</Toolbar>
 		</subHeader>
@@ -23,7 +23,7 @@
 						title="{content>name}"
 						description="{path: 'content>fileType'}"
 						type="Active"
-						press="onContentSelected"
+						press=".onContentSelected"
 						visible="{path: 'content>', formatter: '.oDataUtils.isNotExcluded'}"
 						icon="{= ${content>fileType} ? 'sap-icon://document' : 'sap-icon://folder-full'}">
 					</StandardListItem>

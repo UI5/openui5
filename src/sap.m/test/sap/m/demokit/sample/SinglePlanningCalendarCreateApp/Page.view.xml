@@ -7,13 +7,13 @@
 		<SinglePlanningCalendar
 			id="SPC1"
 			title= "My Calendar"
-			appointmentSelect="handleAppointmentSelect"
-			headerDateSelect="handleHeaderDateSelect"
-			startDateChange="handleStartDateChange"
+			appointmentSelect=".handleAppointmentSelect"
+			headerDateSelect=".handleHeaderDateSelect"
+			startDateChange=".handleStartDateChange"
 			startDate="{path: '/startDate'}"
 			appointments="{path: '/appointments'}">
 			<actions>
-				<Button id="addNewAppointment" text="Create" press="handleAppointmentCreate" tooltip="Add new appointment" />
+				<Button id="addNewAppointment" text="Create" press=".handleAppointmentCreate" tooltip="Add new appointment" />
 			</actions>
 			<views>
 				<SinglePlanningCalendarDayView key="DayView" title="Day" />

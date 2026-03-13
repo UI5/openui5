@@ -3,9 +3,9 @@
 	xmlns:core="sap.ui.core">
 	<ViewSettingsDialog
 		id="settingsDialog"
-		confirm="handleConfirm"
-		cancel="handleCancel"
-		resetFilters="handleResetFilters">
+		confirm=".handleConfirm"
+		cancel=".handleCancel"
+		resetFilters=".handleResetFilters">
 		<filterItems>
 			<ViewSettingsCustomItem
 				id="idCustomFilterItem"
@@ -14,7 +14,7 @@
 				<customControl>
 					<Slider
 						step="10"
-						change="handleSliderChange" />
+						change=".handleSliderChange" />
 				</customControl>
 			</ViewSettingsCustomItem>
 		</filterItems>

@@ -44,7 +44,7 @@ with various types of visual affordance"
 							src="{/GettyImages}"
 							displaySize="XL"
 							imageFitType="Cover"
-							press="onPress"
+							press=".onPress"
 							badgeIcon="sap-icon://camera"
 							badgeTooltip= "Sabine Mayer"/>
 					<Text
@@ -56,7 +56,7 @@ with various types of visual affordance"
 					<Avatar
 							displaySize="M"
 							displayShape="Circle"
-							press="onPress"
+							press=".onPress"
 							src="{/LowShutterstock}"
 							badgeIcon="sap-icon://edit"
 							badgeTooltip= "Julie Armstrong"/>
@@ -70,7 +70,7 @@ with various types of visual affordance"
 							displaySize="M"
 							backgroundColor="Accent7"
 							initials="JD"
-							press="onPress"
+							press=".onPress"
 							badgeIcon="sap-icon://camera" />
 					<Text
 							textAlign="Center"
@@ -87,7 +87,7 @@ with various types of visual affordance"
 					<Avatar
 							displaySize="M"
 							backgroundColor="Accent3"
-							press="onPress"
+							press=".onPress"
 							badgeIcon="sap-icon://edit" />
 					<Text
 							textAlign="Center"
@@ -98,7 +98,7 @@ with various types of visual affordance"
 					<Avatar
 							displaySize="XL"
 							displayShape="Square"
-							press="onPress"
+							press=".onPress"
 							src="{/Shutterstock}"
 							badgeIcon="sap-icon://edit" />
 					<Text
@@ -112,7 +112,7 @@ with various types of visual affordance"
 							backgroundColor="Accent5"
 							src= "sap-icon://soccer"
 							displayShape="Square"
-							press="onPress"
+							press=".onPress"
 							badgeIcon="sap-icon://edit" />
 					<Text
 							textAlign="Center"
@@ -124,7 +124,7 @@ with various types of visual affordance"
 							displaySize="XL"
 							backgroundColor="Accent3"
 							src= "sap-icon://customer"
-							press="onPress"
+							press=".onPress"
 							badgeIcon="sap-icon://add"
 							badgeTooltip="People"/>
 					<Text

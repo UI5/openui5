@@ -6,7 +6,7 @@
 	xmlns="sap.m">
 	<core:InvisibleText id="text1" text="Label text"/>
 
-	<CheckBox text="Enabled" selected="true" select="onCheckBoxSelect"/>
+	<CheckBox text="Enabled" selected="true" select=".onCheckBoxSelect"/>
 
 	<OverflowToolbar id="toolbar">
 		<Button text="Accept" type="Accept"/>

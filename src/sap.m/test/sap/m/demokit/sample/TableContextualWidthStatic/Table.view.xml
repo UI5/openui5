@@ -4,14 +4,14 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m">
 	<MessageStrip
-		text="Table is initially setting contexualWidth to 500px. Press button to change the ContextualWidth."
+		text="Table is initially setting contextualWidth to 500px. Press button to change the contextualWidth."
 		type="Success"
 		class="sapUiSmallMargin"
 		showIcon="true"/>
 			<OverflowToolbar>
 				<Button
-					text="change contexualWidth to 100px"
-					press="onPress"/>
+					text="change contextualWidth to 100px"
+					press=".onPress"/>
 			</OverflowToolbar>
 		<Table id="table"
 			contextualWidth="500px"

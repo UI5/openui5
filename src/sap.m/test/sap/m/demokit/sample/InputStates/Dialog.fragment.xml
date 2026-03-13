@@ -4,9 +4,9 @@
 	<SelectDialog
 		title="Products"
 		items="{/ProductCollection}"
-		search="_handleValueHelpSearch"
-		confirm="_handleValueHelpClose"
-		cancel="_handleValueHelpClose">
+		search="._handleValueHelpSearch"
+		confirm="._handleValueHelpClose"
+		cancel="._handleValueHelpClose">
 		<StandardListItem
 			icon="{ProductPicUrl}"
 			iconDensityAware="false"

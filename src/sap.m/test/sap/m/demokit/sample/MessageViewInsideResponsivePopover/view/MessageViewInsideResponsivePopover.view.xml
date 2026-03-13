@@ -7,7 +7,7 @@
 				id="mVBtn"
 				text="Messages"
 				class="sapUiLargeMarginTop sapUiLargeMarginBegin"
-				press="handlePopoverPress"
+				press=".handlePopoverPress"
 				ariaHasPopup="Dialog"/>
 		</content>
 	</Page>

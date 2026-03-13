@@ -6,12 +6,12 @@
 		<App id="app">
 			<Page id="intro">
 				<headerContent>
-					<Button id="navToOverview" press="onNavToOverview" text="Navigate to Overview"/>
+					<Button id="navToOverview" press=".onNavToOverview" text="Navigate to Overview"/>
 				</headerContent>
 			</Page>
 			<Page id="overview">
-				<Button id="navToPage1" press="onNavToPage1" text="Navigate to Page 1"/>
-				<Button id="navToPage2" press="onNavToPage2" text="Navigate to Page 2"/>
+				<Button id="navToPage1" press=".onNavToPage1" text="Navigate to Page 1"/>
+				<Button id="navToPage2" press=".onNavToPage2" text="Navigate to Page 2"/>
 			</Page>
 			<Page id="page1">
 				<L:VerticalLayout>

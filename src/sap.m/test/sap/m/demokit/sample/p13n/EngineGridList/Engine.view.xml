@@ -20,7 +20,7 @@
 			<ToolbarSeparator/>
 			<vm:VariantManagement id="p13nVm" for="persoList"/>
 			<ToolbarSpacer/>
-			<Button icon="sap-icon://action-settings" press="openPersoDialog"/>
+			<Button icon="sap-icon://action-settings" press=".openPersoDialog"/>
 			</content>
 		</Toolbar>
 

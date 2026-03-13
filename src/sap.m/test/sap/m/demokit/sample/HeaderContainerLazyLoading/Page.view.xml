@@ -30,8 +30,8 @@
 			<ObjectMarker type="Favorite"/>
 		</markers>
 		<headerContainer>
-			<HeaderContainer scrollStep="200" id="headerContainer" scroll="onScroll" content="{/ContentData/}">
-				<NumericContent scale="M" value="{value}" valueColor="{color}" indicator="{growth}" press="press" />
+			<HeaderContainer scrollStep="200" id="headerContainer" scroll=".onScroll" content="{/ContentData/}">
+				<NumericContent scale="M" value="{value}" valueColor="{color}" indicator="{growth}" press=".press" />
 			</HeaderContainer>
 		</headerContainer>
 	</ObjectHeader>

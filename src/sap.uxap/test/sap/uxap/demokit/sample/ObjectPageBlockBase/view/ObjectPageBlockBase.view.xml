@@ -9,7 +9,7 @@
 		<headerTitle>
 			<ObjectPageHeader objectTitle="ObjectPage BlockBase">
 				<actions>
-					<ObjectPageHeaderActionButton icon="sap-icon://synchronize" press="toggleTitle"
+					<ObjectPageHeaderActionButton icon="sap-icon://synchronize" press=".toggleTitle"
 												  text="toggle title" tooltip="synchronize"/>
 				</actions>
 			</ObjectPageHeader>

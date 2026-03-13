@@ -9,7 +9,7 @@
 				  showIcon="true"
 				  showCloseButton="true"
 				  class="sapUiMediumMarginBottom" />
-	<Slider id="widthSlider" value="100" liveChange="onSliderMoved" />
+	<Slider id="widthSlider" value="100" liveChange=".onSliderMoved" />
 	<Table id="idProductsTable" autoPopinMode="true" contextualWidth="Auto" popinChanged=".onPopinChanged" items="{
 			path: '/ProductCollection',
 			sorter: {
@@ -21,7 +21,7 @@
 				<Title text="Products" level="H2" />
 				<ToolbarSpacer />
 				<Label text="Hide columns with importance" labelFor="idMultiComboBox" />
-				<MultiComboBox id="idMultiComboBox" width="10rem" selectionFinish="onSelectionFinish">
+				<MultiComboBox id="idMultiComboBox" width="10rem" selectionFinish=".onSelectionFinish">
 					<items>
 						<core:Item key="None" text="None" />
 						<core:Item key="Low" text="Low" />

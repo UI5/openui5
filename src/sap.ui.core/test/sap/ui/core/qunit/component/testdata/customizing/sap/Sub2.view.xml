@@ -3,7 +3,7 @@
 
 	<core:ExtensionPoint name="extension1" />
 
-	<Button id="standardBtnWithStandardAction" text="This Button is in the standard View and triggers a Standard Action" press="originalSAPAction" />
+	<Button id="standardBtnWithStandardAction" text="This Button is in the standard View and triggers a Standard Action" press=".originalSAPAction" />
 
 	<Text text="SAP View 'Sub2' - this one is extended by the customer and there should be a button after this text"></Text>
 

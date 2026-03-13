@@ -15,7 +15,7 @@
 		<Text text="France"></Text>
 		<Label text="Subsidary"></Label>
 		<Text text="SAP France"></Text>
-		<Link text="See More" press="handlePress"/>
+		<Link text="See More" press=".handlePress"/>
 	</forms:SimpleForm>
 
 

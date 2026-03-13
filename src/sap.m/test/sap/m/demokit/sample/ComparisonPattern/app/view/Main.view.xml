@@ -6,7 +6,7 @@
 	<Page title="First Page">
 		<content>
 			<Table id="idProductsTable"
-				selectionChange="onSelection"
+				selectionChange=".onSelection"
 				mode="MultiSelect"
 				inset="false"
 				items="{
@@ -19,7 +19,7 @@
 					<Toolbar>
 						<Title text="Laptops" level="H2" />
 						<ToolbarSpacer />
-						<Button id="compareBtn" visible="false" press="onToNextPage" />
+						<Button id="compareBtn" visible="false" press=".onToNextPage" />
 					</Toolbar>
 				</headerToolbar>
 				<columns>

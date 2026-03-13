@@ -4,7 +4,7 @@
 	<Popover
 		id="myListPopover"
 		title="Products"
-		afterClose="handleAfterClose"
+		afterClose=".handleAfterClose"
 		placement="Left">
 		<List
 			id="list"

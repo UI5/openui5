@@ -8,10 +8,10 @@
 			class="sapUiResponsivePadding--header"
 			placement="Auto">
 		<beginButton>
-			<Button text="Edit" type="Emphasized" press="handleEditButton"/>
+			<Button text="Edit" type="Emphasized" press=".handleEditButton"/>
 		</beginButton>
 		<endButton>
-			<Button text="Delete" press="handlePopoverDeleteButton"/>
+			<Button text="Delete" press=".handlePopoverDeleteButton"/>
 		</endButton>
 		<f:SimpleForm
 				id="appointmentEditForm"

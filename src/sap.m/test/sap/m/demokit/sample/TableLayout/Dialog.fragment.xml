@@ -17,7 +17,7 @@
 					<Toolbar>
 						<Title text="Products" level="H2"/>
 						<ToolbarSpacer/>
-						<CheckBox text="Fixed Layout" selected="true" select="onCheckBoxSelect"/>
+						<CheckBox text="Fixed Layout" selected="true" select=".onCheckBoxSelect"/>
 					</Toolbar>
 				</headerToolbar>
 				<columns>
@@ -39,7 +39,7 @@
 			</Table>
 		</content>
 		<beginButton>
-			<Button text="Close" press="onClosePressed" />
+			<Button text="Close" press=".onClosePressed" />
 		</beginButton>
 	</Dialog>
 </core:FragmentDefinition>

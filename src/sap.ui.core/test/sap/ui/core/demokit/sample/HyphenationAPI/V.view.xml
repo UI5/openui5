@@ -14,7 +14,7 @@
 			labelSpanM="2"
 			labelSpanS="4">
 		<Label text="Container Width" />
-		<Slider id="widthSlider" value="100" liveChange="onSliderMoved" />
+		<Slider id="widthSlider" value="100" liveChange=".onSliderMoved" />
 	</f:SimpleForm>
 	<Panel id="containerLayout"
 		   headerText="Default language (English-US)"

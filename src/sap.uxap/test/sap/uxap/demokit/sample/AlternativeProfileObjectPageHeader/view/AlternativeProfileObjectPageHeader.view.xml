@@ -15,7 +15,7 @@
 							  markFavorite="true"
 							  markFlagged="true"
 							  markChanges="true"
-							  markChangesPress="handleMarkChangesPress"
+							  markChangesPress=".handleMarkChangesPress"
 							  objectSubtitle="Senior Developer"
 							  objectImageURI="test-resources/sap/uxap/images/imageID_273624.png"
 							  objectImageShape="Circle"
@@ -23,7 +23,7 @@
 							  isObjectSubtitleAlwaysVisible="false"
 							  showPlaceholder="true">
 				<actions>
-					<ObjectPageHeaderActionButton text="Public Profile" icon="sap-icon://edit" press="handlePress" tooltip="edit"/>
+					<ObjectPageHeaderActionButton text="Public Profile" icon="sap-icon://edit" press=".handlePress" tooltip="edit"/>
 					<ObjectPageHeaderActionButton text="Take Action" icon="sap-icon://action" tooltip="action"/>
 				</actions>
 			</ObjectPageHeader>

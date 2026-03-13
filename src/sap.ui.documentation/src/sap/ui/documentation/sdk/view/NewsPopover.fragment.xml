@@ -9,14 +9,14 @@
 				<Button
 					id="dismissAllNotifications"
 					text="{i18n>APP_NEWS_DISMISS_ALL_BTN}"
-					press="handleDismissAllPress"
+					press=".handleDismissAllPress"
 					enabled="{= %{news>/newsCount} > 0}" />
 			</beginButton>
 			<endButton>
 				<Button
-					id="showAllNotifications"
+					id=".showAllNotifications"
 					text="{i18n>APP_NEWS_SHOW_ALL_BTN}"
-					press="handleShowAllPress" />
+					press=".handleShowAllPress" />
 			</endButton>
 		<VBox>
 		<NotificationList
@@ -31,10 +31,10 @@
 				title="{news>title}"
 				description="{news>description}"
 				datetime="{news>updated}"
-				close="handleNewsItemClose"
+				close=".handleNewsItemClose"
 				class="sapUiDemokitCustomNLI">
 				<buttons>
-					<Button visible="{= %{news>link} !== ''}" text="{i18n>NEWS_BTN_VISIT_LINK}" press="handleVisitNewsLink">
+					<Button visible="{= %{news>link} !== ''}" text="{i18n>NEWS_BTN_VISIT_LINK}" press=".handleVisitNewsLink">
 						<customData>
 							<core:CustomData key="newsLink" value="{news>link}"/>
 						</customData>

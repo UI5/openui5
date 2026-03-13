@@ -9,7 +9,7 @@
 		<l:content>
 			<Button
 				text="Show Dialog with Search"
-				press="onOpenDialog"
+				press=".onOpenDialog"
 				class="sapUiSmallMarginBottom" />
 		</l:content>
 	</l:VerticalLayout>

@@ -37,7 +37,7 @@
 				</Column>
 			</columns>
 			<items>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -55,7 +55,7 @@
 								unit="EUR" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -73,25 +73,7 @@
 								unit="USD" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
-					<cells>
-						<ObjectIdentifier
-								title="Name"
-								text="ProductId"/>
-						<Text
-								text="SupplierName" />
-						<Text
-								text="Width x Depth x Height DimUnit" />
-						<ObjectNumber
-								number="123"
-								unit="WeightUnit"
-								state="Success" />
-						<ObjectNumber
-								number="445"
-								unit="USD" />
-					</cells>
-				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -109,7 +91,7 @@
 								unit="USD" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -127,7 +109,7 @@
 								unit="USD" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -145,7 +127,7 @@
 								unit="USD" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -163,7 +145,7 @@
 								unit="USD" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -181,7 +163,7 @@
 								unit="USD" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -199,7 +181,7 @@
 								unit="USD" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -217,7 +199,7 @@
 								unit="USD" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -235,7 +217,7 @@
 								unit="USD" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"
@@ -253,7 +235,25 @@
 								unit="USD" />
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
+					<cells>
+						<ObjectIdentifier
+								title="Name"
+								text="ProductId"/>
+						<Text
+								text="SupplierName" />
+						<Text
+								text="Width x Depth x Height DimUnit" />
+						<ObjectNumber
+								number="123"
+								unit="WeightUnit"
+								state="Success" />
+						<ObjectNumber
+								number="445"
+								unit="USD" />
+					</cells>
+				</ColumnListItem>
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<ObjectIdentifier
 								title="Name"

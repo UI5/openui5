@@ -11,14 +11,14 @@
 			viewKey="Day"
 			rows="{path: '/people'}"
 			appointmentsVisualization="Filled"
-			appointmentSelect="handleAppointmentSelect"
-			intervalSelect="handleIntervalSelect"
+			appointmentSelect=".handleAppointmentSelect"
+			intervalSelect=".handleIntervalSelect"
 			showEmptyIntervalHeaders="false">
 			<toolbarContent>
 				<Title text="Title" titleStyle="H4"/>
 				<ToggleButton icon="sap-icon://decrease-line-height"
 							  tooltip="Toggle Day Names Line"
-							  press="toggleDayNamesLine"/>
+							  press=".toggleDayNamesLine"/>
 			</toolbarContent>
 			<rows>
 				<PlanningCalendarRow

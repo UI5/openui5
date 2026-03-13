@@ -7,7 +7,7 @@
 		title="First Page">
 		<content>
 			<layout:VerticalLayout>
-				<Button text="To the second Page" press="onToPage2"/>
+				<Button text="To the second Page" press=".onToPage2"/>
 				<Link id="link" text="A link to the second Page"/>
 			</layout:VerticalLayout>
 		</content>

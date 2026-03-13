@@ -6,13 +6,13 @@
 		<l:HorizontalLayout class="sapUiMediumMargin">
 			<Button
 				text="Show Popover With Image"
-				press="handlePopoverPress"
+				press=".handlePopoverPress"
 				class="sapUiLargeMargin"
 				ariaHasPopup="Dialog" />
 			<VBox id="withinArea" backgroundDesign="Solid" height="30rem" width="60rem" alignItems="Center" justifyContent="Center">
 				<Button
 					text="Show Inside Popover"
-					press="handleInnerPopoverPress"
+					press=".handleInnerPopoverPress"
 					ariaHasPopup="Dialog" />
 				<layoutData>
 					<FlexItemData backgroundDesign="Solid" />
@@ -21,7 +21,7 @@
 			<FlexBox direction="Column" alignItems="End" justifyContent="End" height="30rem">
 				<Button
 					text="Show Popover with List"
-					press="handleListPopoverPress"
+					press=".handleListPopoverPress"
 					ariaHasPopup="Dialog"
 					class="sapUiLargeMargin" />
 			</FlexBox>

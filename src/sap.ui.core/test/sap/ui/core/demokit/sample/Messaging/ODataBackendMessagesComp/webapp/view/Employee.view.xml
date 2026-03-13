@@ -57,13 +57,13 @@
 					text="{=${message>/}.length}"
 					visible="{=${message>/}.length > 0}"
 					type="Emphasized"
-					press="onMessagePopoverPress"/>
+					press=".onMessagePopoverPress"/>
 
 				<ToolbarSpacer/>
 
-				<Button text="Save" type="Accept" press="onSave"/>
-				<Button text="Revert Changes" type="Reject" press="onRevertChanges"/>
-				<Button text="Has pending changes" press="onCheckHasPendingChanges"/>
+				<Button text="Save" type="Accept" press=".onSave"/>
+				<Button text="Revert Changes" type="Reject" press=".onRevertChanges"/>
+				<Button text="Has pending changes" press=".onCheckHasPendingChanges"/>
 
 			</OverflowToolbar>
 		</footer>

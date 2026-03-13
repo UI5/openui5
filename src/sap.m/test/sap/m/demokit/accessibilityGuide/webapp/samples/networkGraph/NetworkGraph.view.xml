@@ -40,12 +40,12 @@
 									<core:Item key="Both" text="Both"/>
 								</m:Select>
 								<m:Label text="Merge Edges:" labelFor="mergeEdges"></m:Label>
-								<m:Select id="mergeEdges" change="mergeChanged" selectedKey="0" autoAdjustWidth="true">
+								<m:Select id="mergeEdges" change=".mergeChanged" selectedKey="0" autoAdjustWidth="true">
 									<core:Item key="0" text="Split edges"/>
 									<core:Item key="1" text="Merged edges"/>
 								</m:Select>
 								<m:Label text="Node Spacing:" labelFor="nodeSpacing"></m:Label>
-								<m:Select id="nodeSpacing" selectedKey="55" change="spacingChanged" autoAdjustWidth="true">
+								<m:Select id="nodeSpacing" selectedKey="55" change=".spacingChanged" autoAdjustWidth="true">
 									<core:Item key="20" text="Node spacing (20)"/>
 									<core:Item key="40" text="Node spacing (40)"/>
 									<core:Item key="55" text="Node spacing (55)"/>

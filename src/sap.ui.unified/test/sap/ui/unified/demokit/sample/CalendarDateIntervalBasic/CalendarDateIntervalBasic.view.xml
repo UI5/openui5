@@ -9,10 +9,10 @@
 		<u:CalendarDateInterval
 				id="calendar"
 				width="320px"
-				select="handleCalendarSelect"/>
+				select=".handleCalendarSelect"/>
 		<l:VerticalLayout>
 			<Button
-					press="handleSelectToday"
+					press=".handleSelectToday"
 					text="Select Today"/>
 			<l:HorizontalLayout>
 				<Label

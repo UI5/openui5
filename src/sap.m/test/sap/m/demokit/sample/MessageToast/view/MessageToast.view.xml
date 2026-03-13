@@ -9,7 +9,7 @@
 		<l:content>
 			<Button
 				text="Show Message Toast"
-				press="handleMessageToastPress" />
+				press=".handleMessageToastPress" />
 		</l:content>
 	</l:VerticalLayout>
 </mvc:View>

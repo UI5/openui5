@@ -8,14 +8,14 @@
 		<tnt:ToolPage id="toolPage">
 			<tnt:header>
 				<tnt:ToolHeader>
-					<Button id="sideNavigationToggleButton" icon="sap-icon://menu2" type="Transparent" press="onSideNavButtonPress">
+					<Button id="sideNavigationToggleButton" icon="sap-icon://menu2" type="Transparent" press=".onSideNavButtonPress">
 						<layoutData>
 							<OverflowToolbarLayoutData priority="NeverOverflow" />
 						</layoutData>
 					</Button>
-					<Image width="2rem" height="2rem" src="{home>/logoSrc}" densityAware="false" press="navToHome"/>
+					<Image width="2rem" height="2rem" src="{home>/logoSrc}" densityAware="false" press=".navToHome"/>
 					<Title level="H1" text="UI Integration Cards" />
-					<IconTabHeader backgroundDesign="Transparent" id="iconTabHeader" select="onTabSelect">
+					<IconTabHeader backgroundDesign="Transparent" id="iconTabHeader" select=".onTabSelect">
 						<items>
 							<IconTabFilter key="overview" text="Overview" />
 							<IconTabFilter key="learnDetail" text="Learn" />
@@ -25,11 +25,11 @@
 
 						</items>
 					</IconTabHeader>
-					<Button icon="sap-icon://action-settings" type="Transparent" press="handleAppSettings('open')"/>
+					<Button icon="sap-icon://action-settings" type="Transparent" press=".handleAppSettings('open')"/>
 				</tnt:ToolHeader>
 			</tnt:header>
 			<tnt:sideContent>
-				<tnt:SideNavigation id="sideNavigation" selectedKey="{/selectedKey}" itemSelect="onSideNavigationItemSelect" width="17.5rem">
+				<tnt:SideNavigation id="sideNavigation" selectedKey="{/selectedKey}" itemSelect=".onSideNavigationItemSelect" width="17.5rem">
 					<tnt:NavigationList items="{path: '/navigation'}">
 						<tnt:NavigationListItem text="{title}{= ${experimental} ? ' (Experimental)' : ''}" icon="{icon}" enabled="{enabled}" visible="{= !${hidden}}" expanded="{expanded}" items="{path: 'items', templateShareable: false}" key="{key}" hasExpander="true">
 							<tnt:NavigationListItem text="{title}{= ${experimental} ? ' (Experimental)' : ''}" key="{key}" enabled="{enabled}" visible="{= !${hidden}}">

@@ -12,21 +12,21 @@
 		<footer>
 			<Toolbar>
 				<ToolbarSpacer/>
-				<Button text="Approve" press="onPress" type="Accept"/>
-				<Button text="Reject" press="onPress" type="Reject"/>
+				<Button text="Approve" press=".onPress" type="Accept"/>
+				<Button text="Reject" press=".onPress" type="Reject"/>
 
-				<Button text="Mark as Favorite" press="onPress" visible="{range>/isNoPhone}"/>
+				<Button text="Mark as Favorite" press=".onPress" visible="{range>/isNoPhone}"/>
 
-				<Button text="Send Email" press="onPress" visible="{range>/isNoPhone}"/>
+				<Button text="Send Email" press=".onPress" visible="{range>/isNoPhone}"/>
 
-				<Button text="Share" press="onPress" visible="{range>/isNoPhone}"/>
+				<Button text="Share" press=".onPress" visible="{range>/isNoPhone}"/>
 
-				<Button text="Print" press="onPress" visible="{range>/isNotPhoneOrTablet}"/>
-				<Button icon="sap-icon://print" press="onPress" visible="{range>/isTablet}"/>
+				<Button text="Print" press=".onPress" visible="{range>/isNotPhoneOrTablet}"/>
+				<Button icon="sap-icon://print" press=".onPress" visible="{range>/isTablet}"/>
 
-				<Button text="Export as Excel" press="onPress" visible="{range>/isNotPhoneOrTablet}"/>
+				<Button text="Export as Excel" press=".onPress" visible="{range>/isNotPhoneOrTablet}"/>
 
-				<Button icon="sap-icon://overflow" press="onOpen" visible="{range>/isPhoneOrTablet}"/>
+				<Button icon="sap-icon://overflow" press=".onOpen" visible="{range>/isPhoneOrTablet}"/>
 			</Toolbar>
 		</footer>
 	</Page>

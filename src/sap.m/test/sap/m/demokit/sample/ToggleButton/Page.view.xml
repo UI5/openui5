@@ -12,34 +12,34 @@
 					<Title level="H2" text="Title"/>
 				</contentMiddle>
 				<contentRight>
-					<ToggleButton icon="sap-icon://edit" press="onPress" />
+					<ToggleButton icon="sap-icon://edit" press=".onPress" />
 				</contentRight>
 			</Bar>
 		</customHeader>
 		<subHeader>
 			<Bar>
 				<contentLeft>
-					<ToggleButton text="Pressed" enabled="true" pressed="true" press="onPress" />
-					<ToggleButton text="Pressed &amp; Disabled" enabled="false" pressed="true" press="onPress" />
+					<ToggleButton text="Pressed" enabled="true" pressed="true" press=".onPress" />
+					<ToggleButton text="Pressed &amp; Disabled" enabled="false" pressed="true" press=".onPress" />
 				</contentLeft>
 				<contentRight>
-					<ToggleButton icon="sap-icon://action" press="onPress" />
-					<ToggleButton icon="sap-icon://home" enabled="false" press="onPress" />
+					<ToggleButton icon="sap-icon://action" press=".onPress" />
+					<ToggleButton icon="sap-icon://home" enabled="false" press=".onPress" />
 				</contentRight>
 			</Bar>
 		</subHeader>
 		<HBox>
-			<ToggleButton text="Disabled" enabled="false" press="onPress" >
+			<ToggleButton text="Disabled" enabled="false" press=".onPress" >
 				<layoutData>
 					<FlexItemData growFactor="1" />
 				</layoutData>
 			</ToggleButton>
-			<ToggleButton text="Pressed" enabled="true" pressed="true" press="onPress" >
+			<ToggleButton text="Pressed" enabled="true" pressed="true" press=".onPress" >
 				<layoutData>
 					<FlexItemData growFactor="1" />
 				</layoutData>
 			</ToggleButton>
-			<ToggleButton icon="sap-icon://action" enabled="true" press="onPress" >
+			<ToggleButton icon="sap-icon://action" enabled="true" press=".onPress" >
 				<layoutData>
 					<FlexItemData growFactor="1" />
 				</layoutData>
@@ -48,8 +48,8 @@
 		<footer>
 			<Bar>
 				<contentRight>
-					<ToggleButton text="Pressed &amp; Disabled" enabled="false" pressed="true"	press="onPress" />
-					<ToggleButton icon="sap-icon://action" press="onPress" />
+					<ToggleButton text="Pressed &amp; Disabled" enabled="false" pressed="true"	press=".onPress" />
+					<ToggleButton icon="sap-icon://action" press=".onPress" />
 				</contentRight>
 			</Bar>
 		</footer>

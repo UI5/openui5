@@ -17,13 +17,13 @@
 					id="entityHeader"
 					objectTitle="{/name}">
 				<actions>
-					<ObjectPageHeaderActionButton id="entityBackToSearch" text="{i18n>ENTITY_BACK_BTN}" hideIcon="true" hideText="false" press="backToSearch" visible="false"/>
+					<ObjectPageHeaderActionButton id="entityBackToSearch" text="{i18n>ENTITY_BACK_BTN}" hideIcon="true" hideText="false" press=".backToSearch" visible="false"/>
 					<ObjectPageHeaderActionButton
 							id="toggleFullScreenBtn"
 							visible="{device>/system/desktop}"
 							icon="sap-icon://full-screen"
 							tooltip="{i18n>ENTITY_FULLSCREEN_TOOLTIP}"
-							press="onToggleFullScreen" />
+							press=".onToggleFullScreen" />
 				</actions>
 			</ObjectPageHeader>
 		</headerTitle>
@@ -82,7 +82,7 @@
 									<m:Column minScreenWidth="Tablet"><m:Label text="{i18n>ENTITY_TABLE_DESCRIPTION}" /></m:Column>
 								</m:columns>
 								<m:items>
-									<m:ColumnListItem type="Navigation" press="onNavToSample" vAlign="Middle">
+									<m:ColumnListItem type="Navigation" press=".onNavToSample" vAlign="Middle">
 										<m:cells>
 											<m:Text text="{name}" class="entitySampleName" wrapping="false" />
 											<m:FormattedText htmlText="{= ${path: 'description'} ? ${path: 'description'} : ''}" />

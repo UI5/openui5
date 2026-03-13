@@ -14,13 +14,13 @@
 				<DatePicker
 					id="DP1"
 					placeholder="Enter Date"
-					change="handleChange"
+					change=".handleChange"
 					class="sapUiSmallMarginBottom"/>
 				<Label text="DatePicker with OK button in the footer and initialFocusedDateValue UI5Date.getInstance(2017, 5, 13)" labelFor="DP8"/>
 				<DatePicker
 					id="DP8"
 					placeholder="Enter Date"
-					change="handleChange"
+					change=".handleChange"
 					class="sapUiSmallMarginBottom"
 					showFooter="true"/>
 				<Label text="DatePicker with given Value and Formatter" labelFor="DP2"/>
@@ -33,7 +33,7 @@
 							'pattern': 'yyyy-MM-dd'
 						}
 					}"
-					change="handleChange"
+					change=".handleChange"
 					class="sapUiSmallMarginBottom"/>
 				<Label text="DatePicker with islamic date and secondray gregorian date in calendar" labelFor="DP5"/>
 				<DatePicker
@@ -47,12 +47,12 @@
 						}
 					}"
 					secondaryCalendarType="Gregorian"
-					change="handleChange"
+					change=".handleChange"
 					class="sapUiSmallMarginBottom"/>
 				<Label text="DatePicker with minDate=2016-01-01 and maxDate=2016-12-31" labelFor="DP6"/>
 				<DatePicker
 					id="DP6"
-					change="handleChange"
+					change=".handleChange"
 					class="sapUiSmallMarginBottom"
 					value="{
 						'path': '/valueDP6',
@@ -74,7 +74,7 @@
 						'type':'sap.ui.model.type.Date'
 					}"
 					showCurrentDateButton="true"
-					change="handleChange"
+					change=".handleChange"
 					class="sapUiSmallMarginBottom"/>
 				<Text id="textResult" text="Change event result" class="sapUiSmallMargin"/>
 			</Panel>
@@ -91,7 +91,7 @@
 							'pattern': 'MM-y'
 						}
 					}"
-					change="handleChange"
+					change=".handleChange"
 					class="sapUiSmallMarginBottom"/>
 				<Label text="DatePicker with display format for years" labelFor="DP11"/>
 				<DatePicker
@@ -103,7 +103,7 @@
 							'pattern': 'yyyy'
 						}
 					}"
-					change="handleChange"
+					change=".handleChange"
 					class="sapUiSmallMarginBottom"/>
 			</Panel>
 			<Panel
@@ -137,7 +137,7 @@
 					id="DP9" class="sapUiSmallMarginBottom"/>
 				<l:VerticalLayout>
 					<Label text="Enter value and press the button to check if it's valid." labelFor="btn1"/>
-					<Button text="Check value" press="handleBtnPress" />
+					<Button text="Check value" press=".handleBtnPress" />
 					<Text id="textResult2" text="" />
 				</l:VerticalLayout>
 			</Panel>

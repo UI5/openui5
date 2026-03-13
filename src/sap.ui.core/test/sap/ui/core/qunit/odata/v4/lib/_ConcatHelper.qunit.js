@@ -64,7 +64,7 @@ sap.ui.define([
 			.returns("?$apply=1st");
 
 		// code under test
-		sResourcePath = oFirstLevelCache.getResourcePathWithQuery(42, 99);
+		sResourcePath = oFirstLevelCache.getResourcePathWithQuery(42, 99 - 42);
 
 		assert.strictEqual(sResourcePath, "SalesOrderList?$apply=1st");
 		assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptionsJSON, "unmodified");
@@ -78,7 +78,7 @@ sap.ui.define([
 			.returns("?$apply=2nd");
 
 		// code under test
-		sResourcePath = oFirstLevelCache.getResourcePathWithQuery(42, 99);
+		sResourcePath = oFirstLevelCache.getResourcePathWithQuery(42, 99 - 42);
 
 		assert.strictEqual(sResourcePath, "SalesOrderList?$apply=2nd");
 		assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptionsJSON, "unmodified");

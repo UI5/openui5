@@ -5,6 +5,6 @@
 	<DatePicker
 		value="{displayValue}"
 		valueFormat="yyyy-MM-dd"
-		change="_onChange"
+		change="._onChange"
 	/>
 </core:FragmentDefinition>

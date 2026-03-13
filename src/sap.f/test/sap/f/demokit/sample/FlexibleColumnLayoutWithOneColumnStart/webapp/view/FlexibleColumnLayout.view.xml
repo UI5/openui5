@@ -2,8 +2,8 @@
 	<FlexibleColumnLayout
 		autoFocus="false"
 		id="fcl"
-		stateChange="onStateChanged"
-		columnsDistributionChange="onColumnsDistributionChange"
+		stateChange=".onStateChanged"
+		columnsDistributionChange=".onColumnsDistributionChange"
 		restoreFocusOnBackNavigation="true"
 		layout="{/layout}"
 		backgroundDesign="Translucent">

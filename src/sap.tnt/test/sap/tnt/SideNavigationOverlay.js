@@ -214,7 +214,7 @@ sap.ui.define([
 								id="shellBar"
 								title="Title"
 								showMenuButton="true"
-								menuButtonPressed="onToggleSideNav">
+								menuButtonPressed=".onToggleSideNav">
 							</f:ShellBar>
 						</tnt:header>
 						<tnt:mainContents>

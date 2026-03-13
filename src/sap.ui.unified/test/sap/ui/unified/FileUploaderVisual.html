@@ -19,12 +19,16 @@
 				<App>
 					<Page title="Fileuploader Example">
 						<OverflowToolbar>
-							<Button text="Action" />
-							<unified:FileUploader buttonOnly="true" uploadButtonText="Upload"/>
-							<unified:FileUploader buttonOnly="false" uploadButtonText="Upload"/>
+							<unified:FileUploader buttonOnly="true" />
+							<unified:FileUploader buttonOnly="false" />
+							<unified:FileUploader buttonOnly="true" style="Transparent" />
+							<unified:FileUploader buttonOnly="true" style="Reject" />
 						</OverflowToolbar>
-						<unified:FileUploader buttonOnly="true" uploadButtonText="Upload"/>
-						<unified:FileUploader buttonOnly="false" uploadButtonText="Upload"/>
+						<unified:FileUploader buttonOnly="true" />
+						<unified:FileUploader buttonOnly="false" />
+						<unified:FileUploader buttonOnly="true" style="Accept" />
+						<unified:FileUploader buttonOnly="true" style="Transparent" />
+						<unified:FileUploader buttonOnly="true" style="Emphasized"/>
 					</Page>
 				</App>
 			</mvc:View>

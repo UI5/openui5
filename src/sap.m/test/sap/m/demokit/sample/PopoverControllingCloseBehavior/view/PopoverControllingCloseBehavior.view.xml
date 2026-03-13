@@ -16,7 +16,7 @@
 								path: 'Name'
 							}
 						}"
-						itemPress="handleDrillDown">
+						itemPress=".handleDrillDown">
 						<headerToolbar>
 							<Toolbar>
 								<Title text="Table - click events are disabled while a popover is open" level="H2"/>
@@ -53,7 +53,7 @@
 									<ObjectIdentifier title="{Name}" />
 									<Link
 										text="{ProductId}"
-										press="handlePopoverPress"
+										press=".handlePopoverPress"
 										ariaHasPopup="Dialog"/>
 									<Input value="{Quantity}" type="{Text}" description="{UoM}" fieldWidth="{60%}"/>
 									<ObjectNumber

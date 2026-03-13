@@ -12,35 +12,35 @@
 				<content>
 					<List id="standardListItemList" headerText="List Overview">
 						<items>
-							<StandardListItem title="Standard List with Icon" type="Navigation" wrapping="true" press="onOverviewListItemPress">
+							<StandardListItem title="Standard List with Icon" type="Navigation" wrapping="true" press=".onOverviewListItemPress">
 								<customData>
 									<core:CustomData
 										key="target"
 										value="standardListPage" />
 								</customData>
 							</StandardListItem>
-							<StandardListItem title="Standard List with Avatar" type="Navigation" wrapping="true" press="onOverviewListItemPress">
+							<StandardListItem title="Standard List with Avatar" type="Navigation" wrapping="true" press=".onOverviewListItemPress">
 								<customData>
 									<core:CustomData
 										key="target"
 										value="standardListAvatarPage" />
 								</customData>
 							</StandardListItem>
-							<StandardListItem title="Grouped List" type="Navigation" wrapping="true" press="onOverviewListItemPress">
+							<StandardListItem title="Grouped List" type="Navigation" wrapping="true" press=".onOverviewListItemPress">
 								<customData>
 									<core:CustomData
 										key="target"
 										value="groupedListPage" />
 								</customData>
 							</StandardListItem>
-							<StandardListItem title="Display List" type="Navigation" wrapping="true" press="onOverviewListItemPress">
+							<StandardListItem title="Display List" type="Navigation" wrapping="true" press=".onOverviewListItemPress">
 								<customData>
 									<core:CustomData
 										key="target"
 										value="displayListPage" />
 								</customData>
 							</StandardListItem>
-							<StandardListItem title="Input List" type="Navigation" wrapping="true" press="onOverviewListItemPress">
+							<StandardListItem title="Input List" type="Navigation" wrapping="true" press=".onOverviewListItemPress">
 								<customData>
 									<core:CustomData
 										key="target"
@@ -55,7 +55,7 @@
 				id="standardListPage"
 				title="Standard List with Icon"
 				showNavButton="true"
-				navButtonPress="onNavBackButtonPress">
+				navButtonPress=".onNavBackButtonPress">
 				<content>
 					<core:Fragment id="sliConfigurationDialog" fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
 					<List
@@ -80,7 +80,7 @@
 								infoState="{names>highlight}"
 								infoStateInverted="true"
 								wrapping="true"
-								press="onStandardListIconItemPress">
+								press=".onStandardListIconItemPress">
 								<actions>
 									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
 								</actions>
@@ -93,7 +93,7 @@
 				id="standardListAvatarPage"
 				title="Standard List with Avatar"
 				showNavButton="true"
-				navButtonPress="onNavBackButtonPress">
+				navButtonPress=".onNavBackButtonPress">
 				<content>
 					<core:Fragment id="slaConfigurationDialog" fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
 					<List
@@ -117,7 +117,7 @@
 										imageFitType="Cover"
 										showBorder="true"
 										wrapping="true"
-										press="onAvatarPress"/>
+										press=".onAvatarPress"/>
 									</avatar>
 								<actions>
 									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
@@ -135,7 +135,7 @@
 										src="../../images/Donna_Moore.png"
 										displayShape="Square"
 										showBorder="true"
-										press="onAvatarPress"/>
+										press=".onAvatarPress"/>
 								</avatar>
 								<actions>
 									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
@@ -153,7 +153,7 @@
 										src="../../images/Elena_Petrova.png"
 										displayShape="Square"
 										showBorder="true"
-										press="onAvatarPress"/>
+										press=".onAvatarPress"/>
 								</avatar>
 								<actions>
 									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
@@ -186,7 +186,7 @@
 				id="groupedListPage"
 				title="Grouped List"
 				showNavButton="true"
-				navButtonPress="onNavBackButtonPress" >
+				navButtonPress=".onNavBackButtonPress" >
 				<content>
 					<core:Fragment id="glConfigurationDialog" fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
 					<List
@@ -219,7 +219,7 @@
 				id="displayListPage"
 				title="Display List"
 				showNavButton="true"
-				navButtonPress="onNavBackButtonPress" >
+				navButtonPress=".onNavBackButtonPress" >
 				<content>
 					<List
 						id="displayList"
@@ -236,12 +236,12 @@
 							label="City"
 							value="{supplier>ZIPCode} {supplier>City}"
 							type="Navigation"
-							press="onDisplayListItemPress"/>
+							press=".onDisplayListItemPress"/>
 						<DisplayListItem
 							label="Country"
 							value="{supplier>Country}"
 							type="Navigation"
-							press="onDisplayListItemPress"/>
+							press=".onDisplayListItemPress"/>
 					</List>
 				</content>
 			</Page>
@@ -249,7 +249,7 @@
 				id="inputListPage"
 				title="Input List"
 				showNavButton="true"
-				navButtonPress="onNavBackButtonPress" >
+				navButtonPress=".onNavBackButtonPress" >
 				<content>
 					<List
 						id="inputList"

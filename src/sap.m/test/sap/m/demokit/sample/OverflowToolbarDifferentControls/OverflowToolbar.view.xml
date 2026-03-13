@@ -11,7 +11,7 @@
 		showIcon="true">
 	</MessageStrip>
 
-	<Slider value="{/viewPortPercentWidth}" liveChange="onSliderMoved"/>
+	<Slider value="{/viewPortPercentWidth}" liveChange=".onSliderMoved"/>
 
 	<MessageStrip
 		class="sapUiTinyMargin"

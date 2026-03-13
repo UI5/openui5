@@ -2,6 +2,6 @@
 
 	<Text text="SAP View 'Sub6':"></Text>
 
-	<Button text="Sub6 Button" press="originalSAPAction"></Button>
+	<Button text="Sub6 Button" press=".originalSAPAction"></Button>
 
 </mvc:View>

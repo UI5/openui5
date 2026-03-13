@@ -14,12 +14,12 @@
 				<m:contentLeft>
 					<m:Button
 							icon="sap-icon://arrow-left"
-							press="goToRuleProperties"
+							press=".goToRuleProperties"
 							text="Back"/>
 				</m:contentLeft>
 				<m:contentMiddle>
 					<m:IconTabHeader
-							select="rulesToolbarEditITHSelect"
+							select=".rulesToolbarEditITHSelect"
 							selectedKey="{/selectedRuleEditKey}"
 							class="customIconTabHeader">
 						<m:items>
@@ -46,12 +46,12 @@
 							</f:FormElement>
 							<f:FormElement label="Async">
 								<f:fields>
-									<m:RadioButton groupName="asyncEditContext" text="true" selected="{= ${/editRule/async} === true }" select="onAsyncSwitch">
+									<m:RadioButton groupName="asyncEditContext" text="true" selected="{= ${/editRule/async} === true }" select=".onAsyncSwitch">
 										<m:customData>
 											<c:CustomData key="asyncEditContext" value="true" />
 										</m:customData>
 									</m:RadioButton>
-									<m:RadioButton groupName="asyncEditContext" text="false" selected="{= ${/editRule/async} !== true }" select="onAsyncSwitch">
+									<m:RadioButton groupName="asyncEditContext" text="false" selected="{= ${/editRule/async} !== true }" select=".onAsyncSwitch">
 										<m:customData>
 											<c:CustomData key="asyncEditContext" value="false" />
 										</m:customData>
@@ -110,7 +110,7 @@
 								<f:fields>
 									<m:Input placeholder="Text" value="{/tempLink/text}" />
 									<m:Input placeholder="Href" value="{/tempLink/href}" />
-									<m:Button text="Add Link" press="addLinkToRule" icon="sap-icon://add" />
+									<m:Button text="Add Link" press=".addLinkToRule" icon="sap-icon://add" />
 								</f:fields>
 							</f:FormElement>
 							<f:FormElement label="" fields="{/editRule/resolutionurls}">
@@ -154,7 +154,7 @@
 			<m:Bar>
 				<m:contentRight>
 					<m:Button
-							press="updateRule"
+							press=".updateRule"
 							text="Update"
 							type="Emphasized" />
 				</m:contentRight>
@@ -169,12 +169,12 @@
 				<m:contentLeft>
 					<m:Button
 							icon="sap-icon://arrow-left"
-							press="goToRuleProperties"
+							press=".goToRuleProperties"
 							text="Back"/>
 				</m:contentLeft>
 				<m:contentMiddle>
 					<m:IconTabHeader
-							select="rulesToolbarITHSelect"
+							select=".rulesToolbarITHSelect"
 							selectedKey="{/selectedRuleCreateKey}"
 							class="customIconTabHeader">
 						<m:items>
@@ -201,12 +201,12 @@
 							</f:FormElement>
 							<f:FormElement label="Async">
 								<f:fields>
-									<m:RadioButton groupName="asyncContext" text="true" selected="{= ${/newRule/async} === true }" select="onAsyncSwitch">
+									<m:RadioButton groupName="asyncContext" text="true" selected="{= ${/newRule/async} === true }" select=".onAsyncSwitch">
 										<m:customData>
 											<c:CustomData key="asyncContext" value="true" />
 										</m:customData>
 									</m:RadioButton>
-									<m:RadioButton groupName="asyncContext" text="false" selected="{= ${/newRule/async} !== true }" select="onAsyncSwitch">
+									<m:RadioButton groupName="asyncContext" text="false" selected="{= ${/newRule/async} !== true }" select=".onAsyncSwitch">
 										<m:customData>
 											<c:CustomData key="asyncContext" value="false" />
 										</m:customData>
@@ -265,7 +265,7 @@
 								<f:fields>
 									<m:Input placeholder="Text" value="{/tempLink/text}" />
 									<m:Input placeholder="Href" value="{/tempLink/href}" />
-									<m:Button text="Add" press="addLinkToRule" icon="sap-icon://add" />
+									<m:Button text="Add" press=".addLinkToRule" icon="sap-icon://add" />
 								</f:fields>
 							</f:FormElement>
 							<f:FormElement label="" fields="{/newRule/resolutionurls}">
@@ -310,7 +310,7 @@
 			<m:Bar>
 				<m:contentRight>
 					<m:Button
-							press="addNewRule"
+							press=".addNewRule"
 							text="Add Rule"
 							type="Emphasized" />
 				</m:contentRight>

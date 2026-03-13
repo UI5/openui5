@@ -55,20 +55,22 @@ sap.ui.define([
 				"id": "view--myTable",
 				"idIsLocal": true
 			},
-			"movedElements": [
-				{
-					"id": "comp---view--column0",
-					"sourceIndex": 0,
-					"targetIndex": 1
+			content: {
+				"movedElements": [
+					{
+						"id": "comp---view--column0",
+						"sourceIndex": 0,
+						"targetIndex": 1
+					}
+				],
+				source: {
+					aggregation: "columns",
+					id: "comp---view--myTable"
+				},
+				target: {
+					aggregation: "columns",
+					id: "comp---view--myTable"
 				}
-			],
-			source: {
-				aggregation: "columns",
-				id: "comp---view--myTable"
-			},
-			target: {
-				aggregation: "columns",
-				id: "comp---view--myTable"
 			}
 		}, mDefinition);
 	}

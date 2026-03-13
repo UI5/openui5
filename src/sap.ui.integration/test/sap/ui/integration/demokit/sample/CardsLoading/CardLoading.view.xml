@@ -9,7 +9,7 @@
 	<form:SimpleForm editable="true" width="40rem">
 		<Label text="Loading time" />
 		<Input id="loadingMinSeconds" width="8rem" type="Number" description="seconds" value="-1"/>
-		<Button text="Start loading" type="Emphasized" press="onFormSubmit"/>
+		<Button text="Start loading" type="Emphasized" press=".onFormSubmit"/>
 	</form:SimpleForm>
 
 	<f:GridContainer id="grd" class="sapUiSmallMargin">

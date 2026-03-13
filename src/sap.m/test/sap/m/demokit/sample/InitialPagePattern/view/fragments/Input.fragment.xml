@@ -5,15 +5,15 @@
 		class="sapUiTinyMarginBottom"
 		id="purchaseInput"
 		textFormatMode="KeyValue"
-		submit="handleInputSubmit"
+		submit=".handleInputSubmit"
 		placeholder="{i18n>EnterProduct}"
 		showSuggestion="true"
 		autocomplete="false"
 		showValueHelp="true"
-		change="handleInputChange"
-		valueHelpRequest="handleInputValueHelpOpen"
+		change=".handleInputChange"
+		valueHelpRequest=".handleInputValueHelpOpen"
 		suggestionItems="{/Purchases}"
-		suggestionItemSelected="handleInputSuggestionItemSelected">
+		suggestionItemSelected=".handleInputSuggestionItemSelected">
 		<suggestionItems>
 			<core:ListItem
 				key="{PurchaseID}"

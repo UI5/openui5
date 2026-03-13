@@ -17,7 +17,7 @@
 						<OverflowToolbarButton
 								type="Transparent"
 								icon="sap-icon://add"
-								press="handleNewItemAdd"/>
+								press=".handleNewItemAdd"/>
 					</OverflowToolbar>
 				</headerToolbar>
 
@@ -44,7 +44,7 @@
 					<ToolbarSpacer/>
 					<Button id="idOpenSelected"
 							text="Open selected item(s)"
-							press="openSelectedItems"
+							press=".openSelectedItems"
 							type="Emphasized"
 							visible="false"/>
 				</Toolbar>
@@ -60,16 +60,16 @@
 					<ToolbarSpacer/>
 					<Button id="idEditItem"
 							text="Edit"
-							press="handleTabContainerEditItem"
+							press=".handleTabContainerEditItem"
 							type="Default"/>
 					<Button id="idSaveItem"
 							text="Save"
-							press="handleTabContainerSaveItem"
+							press=".handleTabContainerSaveItem"
 							type="Emphasized"
 							visible="false"/>
 					<Button id="idCancel"
 							text="Cancel"
-							press="handleTabContainerCancelUpdate"
+							press=".handleTabContainerCancelUpdate"
 							type="Default"
 							visible="false"/>
 				</Toolbar>
@@ -81,10 +81,10 @@
 				<Toolbar>
 					<ToolbarSpacer/>
 					<Button text="Save"
-							press="handleNewItemSave"
+							press=".handleNewItemSave"
 							type="Emphasized"/>
 					<Button text="Cancel"
-							press="handleNewItemCancel"
+							press=".handleNewItemCancel"
 							type="Default"/>
 				</Toolbar>
 			</footer>

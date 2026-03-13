@@ -11,9 +11,9 @@
 			name="myFileUpload"
 			uploadUrl="upload/"
 			tooltip="Upload your file to the local server"
-			uploadComplete="handleUploadComplete"
-			change="handleValueChange"
-			typeMissmatch="handleTypeMissmatch"
+			uploadComplete=".handleUploadComplete"
+			change=".handleValueChange"
+			typeMissmatch=".handleTypeMissmatch"
 			style="Emphasized"
 			fileType="txt,jpg"
 			placeholder="Choose a file for Upload...">
@@ -31,6 +31,6 @@
 			</u:FileUploader>
 		<Button
 			text="Upload File"
-			press="handleUploadPress"/>
+			press=".handleUploadPress"/>
 	</l:VerticalLayout>
 </mvc:View>

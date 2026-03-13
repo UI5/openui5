@@ -6,7 +6,7 @@ xmlns:html="http://www.w3.org/1999/xhtml"
 controllerName="sap.uxap.sample.BlockBaseEventing.controller.EventingBlock">
         <html:div class="dummyContainer1">
             <html:div class="dummyContainer2">
-                <Button text="press me to fire an event" press="onInnerDummy"/>
+                <Button text="press me to fire an event" press=".onInnerDummy"/>
         </html:div>
     </html:div>
 </mvc:View>

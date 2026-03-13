@@ -19,7 +19,7 @@ controllerName="sap.ui.layout.cssgrid.gridplayground.controller.Main">
 				</Toolbar>
 			</headerToolbar>
 			<content>
-				<Slider value="100" app:mydata="grid1" liveChange="onSliderMoved" />
+				<Slider value="100" app:mydata="grid1" liveChange=".onSliderMoved" />
 				<grid:CSSGrid
 						id="grid1"
 						gridTemplateColumns="repeat(auto-fit, 8rem)"
@@ -47,7 +47,7 @@ controllerName="sap.ui.layout.cssgrid.gridplayground.controller.Main">
 				</Toolbar>
 			</headerToolbar>
 			<content>
-				<Slider value="100" app:mydata="grid2" liveChange="onSliderMoved" />
+				<Slider value="100" app:mydata="grid2" liveChange=".onSliderMoved" />
 				<grid:CSSGrid items="{ path: '/' }" id="grid2">
 					<VBox class="sapUiSmallMargin">
 						<layoutData>
@@ -67,7 +67,7 @@ controllerName="sap.ui.layout.cssgrid.gridplayground.controller.Main">
 				</Toolbar>
 			</headerToolbar>
 			<content>
-				<Slider value="100" app:mydata="grid3" liveChange="onSliderMoved" />
+				<Slider value="100" app:mydata="grid3" liveChange=".onSliderMoved" />
 				<grid:CSSGrid items="{ path: '/' }" id="grid3">
 					<grid:customLayout>
 						<grid:GridBasicLayout
@@ -92,7 +92,7 @@ controllerName="sap.ui.layout.cssgrid.gridplayground.controller.Main">
 				</Toolbar>
 			</headerToolbar>
 			<content>
-				<Slider value="100" app:mydata="grid4" liveChange="onSliderMoved" />
+				<Slider value="100" app:mydata="grid4" liveChange=".onSliderMoved" />
 				<grid:CSSGrid id="grid4">
 					<grid:customLayout>
 						<grid:GridBasicLayout
@@ -124,7 +124,7 @@ controllerName="sap.ui.layout.cssgrid.gridplayground.controller.Main">
 				</Toolbar>
 			</headerToolbar>
 			<content>
-				<Slider value="100" app:mydata="grid5" liveChange="onSliderMoved" />
+				<Slider value="100" app:mydata="grid5" liveChange=".onSliderMoved" />
 				<grid:CSSGrid id="grid5" class="sapUiSmallMarginTop">
 					<grid:customLayout>
 						<grid:GridBasicLayout

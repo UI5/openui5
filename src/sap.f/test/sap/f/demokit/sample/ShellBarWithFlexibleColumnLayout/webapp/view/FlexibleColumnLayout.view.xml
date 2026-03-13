@@ -14,7 +14,7 @@
 					  showNotifications="true"
 					  showNavButton="{= ${/layout} === 'EndColumnFullScreen'}"
 					  notificationsNumber="2"
-					  navButtonPressed="handleBackButtonPressed"
+					  navButtonPressed=".handleBackButtonPressed"
 			>
 				<menu>
 					<m:Menu>
@@ -27,6 +27,6 @@
 				</profile>
 			</ShellBar>
 		</m:customHeader>
-		<FlexibleColumnLayout id="fcl" stateChange="onStateChanged" layout="{/layout}" backgroundDesign="Solid"/>
+		<FlexibleColumnLayout id="fcl" stateChange=".onStateChanged" layout="{/layout}" backgroundDesign="Solid"/>
 	</m:Page>
 </mvc:View>

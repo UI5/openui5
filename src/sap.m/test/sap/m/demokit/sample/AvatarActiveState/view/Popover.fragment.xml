@@ -8,7 +8,7 @@
 		title="User Menu"
 		titleAlignment="Center"
 		placement="Bottom"
-		afterClose="onPopoverClose">
+		afterClose=".onPopoverClose">
 		<core:Fragment fragmentName="sap.m.sample.AvatarActiveState.view.UserMenu" type="XML"> </core:Fragment>
 	</Popover>
 </core:FragmentDefinition>

@@ -10,15 +10,15 @@
 	<ObjectPageLayout id="ObjectPageLayout"
 		showTitleInHeaderContent="true"
 		showEditHeaderButton="true"
-		editHeaderButtonPress="handleEditBtnPress"
+		editHeaderButtonPress=".handleEditBtnPress"
 		headerContentPinned="true"
 		upperCaseAnchorBar="false">
 		<headerTitle>
 			<ObjectPageDynamicHeaderTitle>
 				<breadcrumbs>
 					<m:Breadcrumbs id="breadcrumbsId" currentLocationText="Object Page Example" >
-						<m:Link text="Page 1 a very long link" press="handleLink1Press"/>
-						<m:Link text="Page 2 long link" press="handleLink2Press"/>
+						<m:Link text="Page 1 a very long link" press=".handleLink1Press"/>
+						<m:Link text="Page 2 long link" press=".handleLink2Press"/>
 					</m:Breadcrumbs>
 				</breadcrumbs>
 
@@ -56,7 +56,7 @@
 					</m:OverflowToolbarButton>
 					<m:OverflowToolbarButton icon="sap-icon://pull-down" text="show section" type="Emphasized" tooltip="pull-down"/>
 					<m:OverflowToolbarButton icon="sap-icon://show" text="show state" tooltip="show"/>
-					<m:Button text="Toggle Footer" press="toggleFooter"/>
+					<m:Button text="Toggle Footer" press=".toggleFooter"/>
 				</actions>
 			</ObjectPageDynamicHeaderTitle>
 		</headerTitle>

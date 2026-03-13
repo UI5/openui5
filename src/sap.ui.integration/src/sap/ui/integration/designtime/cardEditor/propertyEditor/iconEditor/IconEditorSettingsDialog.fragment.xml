@@ -46,7 +46,7 @@
 							value="{data>/backgroundColor}"
 							visible="{settings>/backgroundColorVisible}"
 							showValueHelp="true"
-							valueHelpRequest="_openColorPickerPopup"
+							valueHelpRequest="._openColorPickerPopup"
 						/>
 						<Label
 							text="{i18n>BASE_EDITOR.ICON.SETTINGS_DIALOG_COLOR_LABEL}"
@@ -58,7 +58,7 @@
 							value="{data>/color}"
 							visible="{settings>/colorVisible}"
 							showValueHelp="true"
-							valueHelpRequest="_openColorPickerPopup"
+							valueHelpRequest="._openColorPickerPopup"
 						/>
 					</form:content>
 				</form:SimpleForm>
@@ -68,7 +68,7 @@
 		<beginButton>
 			<Button
 				text="{i18n>BASE_EDITOR.JSON.SAVE}"
-				press="_onSettingsSave"
+				press="._onSettingsSave"
 				type="Emphasized"
 			/>
 		</beginButton>
@@ -76,7 +76,7 @@
 			<Button
 				text="{i18n>BASE_EDITOR.JSON.CANCEL}"
 				type="Transparent"
-				press="_onSettingsCancel"
+				press="._onSettingsCancel"
 			/>
 		</endButton>
 	</Dialog>

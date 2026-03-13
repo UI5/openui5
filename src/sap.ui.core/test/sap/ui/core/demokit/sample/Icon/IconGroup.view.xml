@@ -40,7 +40,7 @@
 			src="sap-icon://stethoscope"
 			class="size5"
 			color="#8875E7"
-			press="handleStethoscopePress" >
+			press=".handleStethoscopePress" >
 			<core:layoutData>
 				<FlexItemData growFactor="1" />
 			</core:layoutData>

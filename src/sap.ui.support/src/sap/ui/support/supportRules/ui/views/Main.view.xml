@@ -13,7 +13,7 @@
 				<Bar class="sapContrast" design="SubHeader" id="sapSTShowButtonBar">
 					<contentMiddle>
 						<Text text="{/constants/SUPPORT_ASSISTANT_NAME}" class="STCustomHeaderInfo" />
-						<c:Icon src="sap-icon://full-screen" press="toggleHide" class="STCustomHeaderInfo" />
+						<c:Icon src="sap-icon://full-screen" press=".toggleHide" class="STCustomHeaderInfo" />
 					</contentMiddle>
 				</Bar>
 
@@ -59,19 +59,19 @@
 					<contentRight>
 					<Toolbar
 							id="navToolbar">
-							<Button id="issuesBtn" text="Issues ({/issuesCount})" enabled="{= ${/analyzedFinish} === true}" press="goToIssues"/>
+							<Button id="issuesBtn" text="Issues ({/issuesCount})" enabled="{= ${/analyzedFinish} === true}" press=".goToIssues"/>
 
-							<Button id="analysisBtn" text="Rules ({/selectedRulesCount})" press="goToAnalysis" type="Emphasized"/>
+							<Button id="analysisBtn" text="Rules ({/selectedRulesCount})" press=".goToAnalysis" type="Emphasized"/>
 
-							<c:Icon id="settingsIcon" src="sap-icon://settings" press="onSettings" class="STCustomHeaderInfo STHelpIcon sapUiTinyMargin"/>
+							<c:Icon id="settingsIcon" src="sap-icon://settings" press=".onSettings" class="STCustomHeaderInfo STHelpIcon sapUiTinyMargin"/>
 
-							<c:Icon src="sap-icon://sys-help" press="goToWiki" class="STCustomHeaderInfo STHelpIcon sapUiTinyMargin" tooltip="Open Documentation" />
+							<c:Icon src="sap-icon://sys-help" press=".goToWiki" class="STCustomHeaderInfo STHelpIcon sapUiTinyMargin" tooltip="Open Documentation" />
 
-							<c:Icon src="sap-icon://minimize" press="toggleHide" class="STCustomHeaderInfo sapUiTinyMargin" visible="{/hasNoOpener}"/>
+							<c:Icon src="sap-icon://minimize" press=".toggleHide" class="STCustomHeaderInfo sapUiTinyMargin" visible="{/hasNoOpener}"/>
 
-							<Button icon="sap-icon://down" press="resizeDown"  visible="{/hasNoOpener}"/>
+							<Button icon="sap-icon://down" press=".resizeDown"  visible="{/hasNoOpener}"/>
 
-							<Button icon="sap-icon://up" press="resizeUp"  visible="{/hasNoOpener}"/>
+							<Button icon="sap-icon://up" press=".resizeUp"  visible="{/hasNoOpener}"/>
 						</Toolbar>
 					</contentRight>
 				</Bar>

@@ -7,10 +7,10 @@
 		class="sapUiContentPadding"
 		placement="Bottom" >
 		<beginButton>
-			<Button text="Action-A" press="handleCloseButton" />
+			<Button text="Action-A" press=".handleCloseButton" />
 		</beginButton>
 		<endButton>
-			<Button text="Action-B" press="handleCloseButton" />
+			<Button text="Action-B" press=".handleCloseButton" />
 		</endButton>
 		<content>
 			<Image src="{ProductPicUrl}" width="15em" />

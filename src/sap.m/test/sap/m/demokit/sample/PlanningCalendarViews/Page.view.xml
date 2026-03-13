@@ -11,14 +11,14 @@
 			viewKey="D"
 			rows="{path: '/people'}"
 			appointmentsVisualization="Filled"
-			appointmentSelect="handleAppointmentSelect"
-			intervalSelect="handleIntervalSelect"
+			appointmentSelect=".handleAppointmentSelect"
+			intervalSelect=".handleIntervalSelect"
 			showEmptyIntervalHeaders="false"
-			viewChange = "handleViewChange">
+			viewChange = ".handleViewChange">
 			<toolbarContent>
 				<Title text="Title" titleStyle="H4"/>
 				<Label id="label" text="Select a date from the interval to mark/unmark it as a non-working day."/>
-				<Select id="select" tooltip="Group appointments mode" change="handleGroupModeChange">
+				<Select id="select" tooltip="Group appointments mode" change=".handleGroupModeChange">
 					<core:Item key="Collapsed" text="Collapsed"/>
 					<core:Item key="Expanded" text="Expanded"/>
 				</Select>
@@ -94,7 +94,7 @@
 		</PlanningCalendar>
 		<Label text="Add available built-in views to the example:"/>
 		<MultiComboBox
-				selectionFinish="handleSelectionFinish"
+				selectionFinish=".handleSelectionFinish"
 				width="230px"
 				placeholder="Choose built-in views">
 			<core:Item key="Hour" text="Hour" />
@@ -104,6 +104,6 @@
 			<core:Item key="One Month" text="1 month" />
 		</MultiComboBox>
 		<Label text="Add or remove custom views:"/>
-		<ToggleButton text="Toggle custom views" press="onPress" />
+		<ToggleButton text="Toggle custom views" press=".onPress" />
 	</VBox>
 </mvc:View>

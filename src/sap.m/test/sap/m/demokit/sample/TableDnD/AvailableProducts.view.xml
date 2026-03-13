@@ -11,7 +11,7 @@
 		mode="SingleSelectMaster"
 		growing="true"
 		growingThreshold="10"
-		beforeOpenContextMenu="onBeforeOpenContextMenu"
+		beforeOpenContextMenu=".onBeforeOpenContextMenu"
 		items="{
 			path: '/ProductCollection',
 			filters: {path: 'Rank', operator: 'EQ', value1: '0'}
@@ -21,7 +21,7 @@
 		</dependents>
 		<contextMenu>
 			<Menu>
-				<MenuItem text="Move to Selected Products" press="moveToSelectedProductsTable" />
+				<MenuItem text="Move to Selected Products" press=".moveToSelectedProductsTable" />
 			</Menu>
 		</contextMenu>
 		<headerToolbar>
@@ -48,7 +48,7 @@
 				sourceAggregation="items" />
 			<dnd:DropInfo
 				groupName="selected2available"
-				drop="onDropAvailableProductsTable" />
+				drop=".onDropAvailableProductsTable" />
 		</dragDropConfig>
 		<items>
 			<ColumnListItem>

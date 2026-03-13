@@ -4,7 +4,7 @@
 	<App id="myApp">
 		<Page busyIndicatorDelay="0" id="myPage" title="Loading...">
 			<headerContent>
-				<Button id="loadButton" press="onButtonPress" text="Load title..."/>
+				<Button id="loadButton" press=".onButtonPress" text="Load title..."/>
 			</headerContent>
 		</Page>
 	</App>

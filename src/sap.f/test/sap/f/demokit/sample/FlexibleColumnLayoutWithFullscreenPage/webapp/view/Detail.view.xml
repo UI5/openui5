@@ -18,7 +18,7 @@
 			<Table
 				id="productsTable"
 				mode="SingleSelectMaster"
-				itemPress="onListItemPress"
+				itemPress=".onListItemPress"
 				inset="false"
 				items="{
 					path: 'products>/ProductCollection'
@@ -28,9 +28,9 @@
 				<headerToolbar>
 					<OverflowToolbar>
 						<ToolbarSpacer/>
-						<SearchField search="onSearch" width="17.5rem"/>
-						<OverflowToolbarButton icon="sap-icon://add" type="Transparent" press="onAdd"/>
-						<OverflowToolbarButton icon="sap-icon://sort" type="Transparent" press="onSort"/>
+						<SearchField search=".onSearch" width="17.5rem"/>
+						<OverflowToolbarButton icon="sap-icon://add" type="Transparent" press=".onAdd"/>
+						<OverflowToolbarButton icon="sap-icon://sort" type="Transparent" press=".onSort"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>

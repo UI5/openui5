@@ -19,7 +19,7 @@
 					<ToolbarSpacer />
 					<ComboBox id="idPopinLayout"
 						placeholder="Popin layout options"
-						change="onPopinLayoutChanged">
+						change=".onPopinLayoutChanged">
 						<items>
 							<core:Item  text="Block"
 								key="Block"/>
@@ -31,14 +31,14 @@
 					</ComboBox>
 					<Label text="Sticky options:" />
 					<CheckBox text="ColumnHeaders"
-						select="onSelect"/>
+						select=".onSelect"/>
 					<CheckBox text="HeaderToolbar"
-						select="onSelect"/>
+						select=".onSelect"/>
 					<CheckBox text="InfoToolbar"
-						select="onSelect"/>
+						select=".onSelect"/>
 					<ToggleButton id="toggleInfoToolbar"
 						text="Hide/Show InfoToolbar"
-						press="onToggleInfoToolbar" />
+						press=".onToggleInfoToolbar" />
 				</content>
 			</OverflowToolbar>
 		</headerToolbar>
@@ -52,7 +52,7 @@
 				width="12em">
 				<Text text="Product" />
 				<dependents>
-					<p:ColumnAIAction press="onAIActionPress"></p:ColumnAIAction>
+					<p:ColumnAIAction press=".onAIActionPress"></p:ColumnAIAction>
 				</dependents>
 			</Column>
 			<Column
