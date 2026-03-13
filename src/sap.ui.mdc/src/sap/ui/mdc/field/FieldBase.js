@@ -3799,10 +3799,13 @@ sap.ui.define([
 					return true;
 				}
 			}
-		} else {
+		} else if (Array.isArray(vValue) && vValue.length > 1) { // check if CompositeType is used
 			const sDataType = _getDataTypeName.call(this);
-			if (this.getTypeMap().getBaseType(sDataType) === BaseType.Unit &&
-				Array.isArray(vValue) && vValue.length > 1 && (vValue[0] === undefined || vValue[0] === null) && !vValue[1]) { // as 0 is a valid number
+			const sBaseType = this.getTypeMap().getBaseType(sDataType); // is false for DateTimeWithTimeZone
+			const oType = this.getContentFactory().getDataType(); // we just need the name or class, not FormatOptions or Constraints. (So OriginalDate/UnitType not needed here.)
+			const bIsComposite = oType?.isA("sap.ui.model.CompositeType"); // only if type set / internal content created. But no user input possible before. Needed to handle other CompositeTypes as DateTimeWithTimezone or Unit fields with only number part used
+			if ((sBaseType === BaseType.Unit || bIsComposite) &&
+				(vValue[0] === undefined || vValue[0] === null) && !vValue[1]) { // as 0 is a valid number
 				//no number and no unit -> initial
 				return true;
 			}

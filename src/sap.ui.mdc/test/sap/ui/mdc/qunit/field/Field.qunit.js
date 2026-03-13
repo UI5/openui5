@@ -2092,6 +2092,7 @@ sap.ui.define([
 		let oPromise = Promise.resolve(oField.getResultForChangePromise(oField.getConditions()));
 		oField.fireChangeEvent(oField.getConditions(), true, undefined, oPromise); // fake change event
 		assert.equal(oField.setProperty.withArgs("value").getCalls().length, 1, "value only updated with change event");
+		assert.ok(oField.setProperty.withArgs("value").calledWith("value", [2, null]), "value updated with null as currency");
 		assert.deepEqual(oField.getValue(), [2, null], "Field value");
 
 		oField.setValue([null, "", oCurrencyCodeList]);
@@ -2102,6 +2103,7 @@ sap.ui.define([
 		oPromise = Promise.resolve(oField.getResultForChangePromise(oField.getConditions()));
 		oField.fireChangeEvent(oField.getConditions(), true, undefined, oPromise); // fake change event
 		assert.equal(oField.setProperty.withArgs("value").getCalls().length, 1, "value only updated with change event");
+		assert.ok(oField.setProperty.withArgs("value").calledWith("value", [2, ""]), "value updated with \"\" as currency");
 		assert.deepEqual(oField.getValue(), [2, ""], "Field value");
 
 		oField.setValue([null, "", oCurrencyCodeList]);
@@ -2112,6 +2114,7 @@ sap.ui.define([
 		oPromise = Promise.resolve(oField.getResultForChangePromise(oField.getConditions()));
 		oField.fireChangeEvent(oField.getConditions(), true, undefined, oPromise); // fake change event
 		assert.equal(oField.setProperty.withArgs("value").getCalls().length, 1, "value only updated with change event");
+		assert.ok(oField.setProperty.withArgs("value").calledWith("value", [null, "USD"]), "value updated with null as number");
 		assert.deepEqual(oField.getValue(), [null, "USD"], "Field value");
 
 	});
@@ -2257,7 +2260,7 @@ sap.ui.define([
 			}).placeAt("content");
 			oField.setModel(oModel);
 
-			oField2 = new Field("F12", {
+			oField2 = new Field("F2", {
 				value: {parts: [{path: "/dateTime", type: oType2}, {path: "/timezone", type: oType3}], type: oType},
 				editMode: FieldEditMode.Display,
 				change: _myChangeHandler
@@ -2318,6 +2321,41 @@ sap.ui.define([
 		assert.deepEqual(aCompositeTypes, [oType2, oType3], "Composite types stored used in ConditionsType");
 		oMyOriginalType = oConditionsType.getFormatOptions().originalDateType;
 		assert.notOk(oMyOriginalType, "no type used in ConditionsType as originalDateType");
+
+	});
+
+	QUnit.test("update value", async (assert) => {
+
+		oModel.setData({ // initialize
+			dateTime: null,
+			timezone: null
+		});
+		await new Promise((resolve) => {setTimeout(resolve, 0);}); // wait for binding update
+
+		sinon.spy(oField, "setProperty");
+
+		assert.equal(oField.getConditions().length, 0, "No Condition");
+		assert.deepEqual(oField.getValue(), [null, null], "Value of Field");
+
+		oField.setConditions([Condition.createItemCondition(["2026-03-17T09:30:00+01:00", null])]); // fake user Input with parsing
+		assert.equal(oField.setProperty.withArgs("value").getCalls().length, 2, "value updated twice");
+		assert.ok(oField.setProperty.withArgs("value").calledWith("value", ["2026-03-17T09:30:00+01:00", undefined]), "value updated with undefined as timezone");
+		assert.ok(oField.setProperty.withArgs("value").calledWith("value", ["2026-03-17T09:30:00+01:00", null]), "value updated with null as timezone");
+		assert.deepEqual(oField.getValue(), ["2026-03-17T09:30:00+01:00", null], "Field value");
+
+		// check update not initial Field
+		oField.setProperty.reset();
+		oField.setConditions([Condition.createItemCondition(["2026-03-17T10:05:00+01:00", null])]); // fake user Input with parsing
+		assert.equal(oField.setProperty.withArgs("value").getCalls().length, 2, "value updated twice");
+		assert.ok(oField.setProperty.withArgs("value").calledWith("value", ["2026-03-17T10:05:00+01:00", undefined]), "value updated with undefined as timezone");
+		assert.ok(oField.setProperty.withArgs("value").calledWith("value", ["2026-03-17T10:05:00+01:00", null]), "value updated with null as timezone");
+		assert.deepEqual(oField.getValue(), ["2026-03-17T10:05:00+01:00", null], "Field value");
+
+		oField.setProperty.reset();
+		oField.setConditions([Condition.createItemCondition(["2026-03-17T10:05:00+01:00", "Europe/Berlin"])]); // fake user Input with parsing
+		assert.equal(oField.setProperty.withArgs("value").getCalls().length, 2, "value updated twice"); //once from field, once from Brinding. (Is the update from Binding really needed?)
+		assert.ok(oField.setProperty.withArgs("value").calledWith("value", ["2026-03-17T10:05:00+01:00", "Europe/Berlin"]), "value updated with \"Europe/Berlin\" as timezone");
+		assert.deepEqual(oField.getValue(), ["2026-03-17T10:05:00+01:00", "Europe/Berlin"], "Field value");
 
 	});
 
