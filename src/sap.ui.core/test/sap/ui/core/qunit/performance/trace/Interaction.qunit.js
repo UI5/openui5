@@ -4,9 +4,11 @@ sap.ui.define([
 	'sap/ui/core/mvc/XMLView',
 	'sap/ui/performance/trace/FESRHelper',
 	"sap/ui/test/actions/Press",
+	"sap/ui/test/actions/EnterText",
 	"sap/m/Button",
+	"sap/m/Input",
 	"sap/ui/test/utils/nextUIUpdate"
-], function(Interaction, XMLView, FESRHelper, Press, Button, nextUIUpdate) {
+], function(Interaction, XMLView, FESRHelper, Press, EnterText, Button, Input, nextUIUpdate) {
 	"use strict";
 
 	QUnit.config.reorder = false;
@@ -17,16 +19,13 @@ sap.ui.define([
 	//
 	// *Note:* Call this method after sinon.useFakeTimers(); as for example performance.timeOrigin is read only
 	// in its nature and cannot be modified otherwise.
-	function mockPerformanceObject () {
+	function mockPerformanceObject (bRestorePerformance) {
 		const oPerformance = globalThis.performance;
 		const clock = sinon.useFakeTimers();
-		globalThis.performance = oPerformance;
+		if (bRestorePerformance !== false) {
+			globalThis.performance = oPerformance;
+		}
 		return clock;
-	}
-
-	function cleanPerformanceObject() {
-		delete performance.getEntriesByType;
-		delete performance.timeOrigin;
 	}
 
 	QUnit.module("Interaction API", {
@@ -97,8 +96,91 @@ sap.ui.define([
 
 	});
 
+	QUnit.module("Interaction API - liveChange filtering", {
+		before: async function() {
+			this.oOriginalPerformance = globalThis.performance;
+			// Use sinon fake timers WITHOUT restoring the real performance object,
+			// so that clock.tick() also controls performance.now() — needed to
+			// produce a measurable duration while keeping legacyDuration near zero.
+			this.clock = mockPerformanceObject(false);
+			// Sinon's fake performance does not implement the full Performance API.
+			// Stub the missing methods as noops so _InteractionImpl.js does not throw.
+			globalThis.performance.getEntriesByType = () => [];
+			globalThis.performance.clearResourceTimings = () => {};
+			globalThis.performance.timeOrigin = 1000; // must be non-zero: now()=timeOrigin+performance.now()=0 would be falsy
+			// setActive is async; await it so that _InteractionImpl is loaded and the
+			// startup interaction is created before we call end(true) to clear it.
+			await Interaction.setActive(true);
+			// setActive(true) always creates a startup interaction via notifyStepStart;
+			// end and clear it so it does not absorb liveChange step notifications.
+			Interaction.end(true);
+			Interaction.clear();
+		},
+		after: function() {
+			Interaction.setActive(false);
+			this.clock.runAll();
+			this.clock.restore();
+			globalThis.performance = this.oOriginalPerformance;
+		}
+	});
+
+	QUnit.test("liveChange keystrokes should not be recorded as interactions", async function(assert) {
+		assert.expect(3);
+
+		let iDebounceTimer;
+		const oInput = new Input({
+			liveChange() {
+				// Simulate FilterField's _fnLiveChangeTimer: 300ms debounce that resets on each
+				// keystroke and triggers an async step (e.g. typeahead request) after 300ms idle.
+				clearTimeout(iDebounceTimer);
+				iDebounceTimer = setTimeout(() => {
+					const fnEnd = Interaction.notifyAsyncStep();
+					fnEnd();
+				}, 300);
+			}
+		});
+		oInput.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		const iBaselineCount = Interaction.getAll().length;
+
+		// keepFocus: true avoids _simulateFocusout, which would trigger Input re-rendering
+		// and set preliminaryEnd before the 301ms grace-period timer fires.
+		const oEnterText = new EnterText({ text: "a", clearTextFirst: false, keepFocus: true });
+
+		// First keystroke: creates interaction, liveChange fires, starts 300ms debounce.
+		oEnterText.executeOn(oInput);
+		this.clock.tick(100); // < 301ms: grace period not yet expired, interaction still pending
+
+		assert.strictEqual(Interaction.getAll().length - iBaselineCount, 0,
+			"liveChange interaction stays pending before the 301ms grace period expires");
+
+		// Second keystroke within the grace period resets the debounce.
+		// The 301ms grace period (from "a") fires at t=301ms → finalizes the interaction.
+		// legacyDuration ≈ 0ms (set at t=0); without fix (duration >= 2): recorded, with fix: filtered.
+		oEnterText.executeOn(oInput);
+		this.clock.tick(400); // > 301ms: grace period fires, debounce from "b" also expires (noop: no pending interaction)
+
+		assert.strictEqual(Interaction.getAll().length - iBaselineCount, 0,
+			"liveChange keystroke interactions without a typeahead request are filtered");
+
+		// Final keystroke: user stops typing → 300ms debounce fires → notifyAsyncStep resets
+		// legacyEndTime to now(). When the new 301ms grace period fires, legacyDuration = 300ms >= 2
+		// → the interaction IS recorded. This verifies the fix does not filter valid interactions.
+		oEnterText.executeOn(oInput);
+		this.clock.tick(700); // covers 300ms debounce + 301ms new grace period
+
+		assert.strictEqual(Interaction.getAll().length - iBaselineCount, 1,
+			"final liveChange interaction followed by an async step (typeahead request) is recorded");
+
+		Interaction.clear();
+		oInput.destroy();
+		await nextUIUpdate(this.clock);
+	});
+
 	QUnit.module("Interaction API with fake timer", {
 		before: function() {
+			this.oOriginalPerformance = globalThis.performance;
 			this.clock = mockPerformanceObject();
 			Interaction.setActive(true);
 		},
@@ -107,8 +189,8 @@ sap.ui.define([
 
 			// Run all pending setTimeout and restore the timer
 			this.clock.runAll();
-			cleanPerformanceObject();
 			this.clock.restore();
+			globalThis.performance = this.oOriginalPerformance;
 		}
 	});
 
