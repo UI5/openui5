@@ -2,7 +2,7 @@
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core">
 	<ViewSettingsDialog
-		confirm="handleFilterDialogConfirm">
+		confirm=".handleFilterDialogConfirm">
 		<filterItems>
 			<ViewSettingsFilterItem
 				text="Weight"

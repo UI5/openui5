@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
     controllerName="sap.ui.layout.cssgrid.gridplayground.controller.Main">
 
-	<Slider value="100" app:mydata="boxContainer"  liveChange="onSliderMoved" />
+	<Slider value="100" app:mydata="boxContainer" liveChange=".onSliderMoved" />
 	<Panel id="boxContainer" width="100%" class="sapUiResponsiveMargin">
 		<headerToolbar>
 			<Toolbar height="3rem">

@@ -15,14 +15,14 @@
 						id="hash"
 						showSuggestion="true"
 						showValueHelp="true"
-						valueHelpRequest="handleValueHelp"
+						valueHelpRequest=".handleValueHelp"
 						suggestionItems="{/sampleRoutes}"
 						placeholder="Enter new hash">
 					<suggestionItems>
 						<core:Item text="{pattern}" />
 					</suggestionItems>
 				</Input>
-				<Button text="Set Hash" press="onSetHash"></Button>
+				<Button text="Set Hash" press=".onSetHash"></Button>
 			</f:SimpleForm>
 			<Title class="sapUiSmallMarginBegin sapUiSmallMarginTop" text="Routes" level="H2"/>
 			<Table items="{/patterns}">
@@ -35,7 +35,7 @@
 								width="50%"
 								placeholder="Enter new pattern">
 						</Input>
-						<Button icon="sap-icon://add" press="onAddPattern"></Button>
+						<Button icon="sap-icon://add" press=".onAddPattern"></Button>
 					</Toolbar>
 				</headerToolbar>
 				<columns>

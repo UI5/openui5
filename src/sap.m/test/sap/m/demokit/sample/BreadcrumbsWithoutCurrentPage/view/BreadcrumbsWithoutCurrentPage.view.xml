@@ -8,19 +8,19 @@
 			class="sapUiContentPadding"
 			width="100%">
 		<Breadcrumbs separatorStyle="{/separatorStyle}">
-			<Link text="Home" press="onPress"/>
-			<Link text="Page 1" press="onPress" />
-			<Link text="Page 2" press="onPress" />
-			<Link text="Page 3" press="onPress" />
-			<Link text="Page 4" press="onPress" />
-			<Link text="Page 5" press="onPress" />
+			<Link text="Home" press=".onPress"/>
+			<Link text="Page 1" press=".onPress" />
+			<Link text="Page 2" press=".onPress" />
+			<Link text="Page 3" press=".onPress" />
+			<Link text="Page 4" press=".onPress" />
+			<Link text="Page 5" press=".onPress" />
 		</Breadcrumbs>
 		<HBox alignItems="Center">
 			<Label labelFor="separatorSelect" text="Change separator style" />
 			<Select class="sapUiSmallMarginBegin"
 					id="separatorSelect"
 					selectedKey="{/separatorStyle}"
-					change="onChange"
+					change=".onChange"
 					items="{ path: '/items' }">
 				<core:Item key="{text}" text="{key}" />
 			</Select>

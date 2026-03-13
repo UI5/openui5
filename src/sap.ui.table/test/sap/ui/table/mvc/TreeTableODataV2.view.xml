@@ -215,15 +215,15 @@
 								<Button text="Save" icon="sap-icon://loan" press=".onSaveTreeState"></Button>
 								<Button text="Restore" icon="sap-icon://soccor" press=".onRestoreTreeState"></Button>-->
 								<ToolbarSpacer />
-								<Button type="Emphasized" text="doMagic()" icon="sap-icon://activate" press="onCreateTableClick"/>
+								<Button type="Emphasized" text="doMagic()" icon="sap-icon://activate" press=".onCreateTableClick"/>
 							</Toolbar>
 						</table:extension>
 						<table:dragDropConfig>
 							<dnd:DragDropInfo
 								sourceAggregation="rows"
 								targetAggregation="rows"
-								dragStart="onDragStart"
-								drop="onDrop"/>
+								dragStart=".onDragStart"
+								drop=".onDrop"/>
 						</table:dragDropConfig>
 					</table:TreeTable>
 				</content>
@@ -236,7 +236,7 @@
 				<headerToolbar>
 					<Toolbar>
 						<Title text="Performance" level="H2" id="Performance"/>
-						<Button icon="sap-icon://download" press="onDownload"/>
+						<Button icon="sap-icon://download" press=".onDownload"/>
 					</Toolbar>
 				</headerToolbar>
 				<content>
@@ -319,7 +319,7 @@
 		<footer>
 			<Toolbar>
 				<Button id="btn_messagePopover" icon="sap-icon://message-popup" text="{/messagesLength}" type="Emphasized"
-						press="handleMessagePopoverPress"/>
+						press=".handleMessagePopoverPress"/>
 				<ToolbarSpacer/>
 			</Toolbar>
 		</footer>

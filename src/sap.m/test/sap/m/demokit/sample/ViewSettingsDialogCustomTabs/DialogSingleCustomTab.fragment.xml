@@ -2,7 +2,7 @@
 		xmlns="sap.m"
 		xmlns:core="sap.ui.core">
 	<ViewSettingsDialog id="settingsDialogCustomTab"
-			confirm="handleConfirm">
+			confirm=".handleConfirm">
 		<customTabs>
 			<ViewSettingsCustomTab id="app-settings" icon="sap-icon://action-settings" title="Settings" tooltip="Application Settings">
 				<content>

@@ -41,7 +41,7 @@
 				</snappedTitleOnMobile>
 
 				<actions>
-					<m:Button type="Emphasized" text="Focus" press="handleFocusBtnPress"/>
+					<m:Button type="Emphasized" text="Focus" press=".handleFocusBtnPress"/>
 				</actions>
 			</ObjectPageDynamicHeaderTitle>
 		</headerTitle>

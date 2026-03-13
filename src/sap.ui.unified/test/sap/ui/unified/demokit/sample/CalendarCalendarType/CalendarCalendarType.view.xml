@@ -10,10 +10,10 @@
 			id="calendar"
 			primaryCalendarType="Islamic"
 			secondaryCalendarType="Gregorian"
-			select="handleCalendarSelect" />
+			select=".handleCalendarSelect" />
 		<l:HorizontalLayout allowWrapping="true">
 			<Button
-				press="handleFocusToday"
+				press=".handleFocusToday"
 				text="Focus Today"
 				class="sapUiSmallMarginEnd"/>
 			<Label

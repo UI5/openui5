@@ -135,7 +135,7 @@
 				class="sapUiSmallMarginBottom"
 				active="true"
 				binding="{/ProductCollection/0}"
-				press="onPress"
+				press=".onPress"
 				number="{
 						parts:[{path:'Price'},{path:'CurrencyCode'}],
 						type: 'sap.ui.model.type.Currency',
@@ -146,7 +146,7 @@
 				class="sapUiSmallMarginBottom"
 				active="true"
 				binding="{/ProductCollection/1}"
-				press="onPress"
+				press=".onPress"
 				number="{
 						parts:[{path:'Price'},{path:'CurrencyCode'}],
 						type: 'sap.ui.model.type.Currency',
@@ -158,7 +158,7 @@
 				class="sapUiSmallMarginBottom"
 				active="true"
 				binding="{/ProductCollection/2}"
-				press="onPress"
+				press=".onPress"
 				number="{
 						parts:[{path:'Price'},{path:'CurrencyCode'}],
 						type: 'sap.ui.model.type.Currency',
@@ -170,7 +170,7 @@
 				class="sapUiSmallMarginBottom"
 				active="true"
 				binding="{/ProductCollection/3}"
-				press="onPress"
+				press=".onPress"
 				number="{
 						parts:[{path:'Price'},{path:'CurrencyCode'}],
 						type: 'sap.ui.model.type.Currency',
@@ -182,7 +182,7 @@
 				class="sapUiSmallMarginBottom"
 				active="true"
 				binding="{/ProductCollection/4}"
-				press="onPress"
+				press=".onPress"
 				number="{
 						parts:[{path:'Price'},{path:'CurrencyCode'}],
 						type: 'sap.ui.model.type.Currency',
@@ -204,7 +204,7 @@
 				active="true"
 				inverted="true"
 				binding="{/ProductCollection/0}"
-				press="onPress"
+				press=".onPress"
 				number="{
 						parts:[{path:'Price'},{path:'CurrencyCode'}],
 						type: 'sap.ui.model.type.Currency',
@@ -216,7 +216,7 @@
 				active="true"
 				inverted="true"
 				binding="{/ProductCollection/1}"
-				press="onPress"
+				press=".onPress"
 				number="{
 						parts:[{path:'Price'},{path:'CurrencyCode'}],
 						type: 'sap.ui.model.type.Currency',
@@ -229,7 +229,7 @@
 				active="true"
 				inverted="true"
 				binding="{/ProductCollection/2}"
-				press="onPress"
+				press=".onPress"
 				number="{
 						parts:[{path:'Price'},{path:'CurrencyCode'}],
 						type: 'sap.ui.model.type.Currency',
@@ -242,7 +242,7 @@
 				active="true"
 				inverted="true"
 				binding="{/ProductCollection/3}"
-				press="onPress"
+				press=".onPress"
 				number="{
 						parts:[{path:'Price'},{path:'CurrencyCode'}],
 						type: 'sap.ui.model.type.Currency',
@@ -255,7 +255,7 @@
 				active="true"
 				inverted="true"
 				binding="{/ProductCollection/4}"
-				press="onPress"
+				press=".onPress"
 				number="{
 						parts:[{path:'Price'},{path:'CurrencyCode'}],
 						type: 'sap.ui.model.type.Currency',
@@ -288,7 +288,7 @@
 			class="sapMObjectNumberLarge"
 			active="true"
 			binding="{/ProductCollection/5}"
-			press="onPress"
+			press=".onPress"
 			number="{
 					parts:[{path:'Price'},{path:'CurrencyCode'}],
 					type: 'sap.ui.model.type.Currency',
@@ -305,14 +305,14 @@
 			width="100px">
 			<content>
 				<ObjectNumber
-				class="sapMObjectNumberLongText"
-				active="true"
-				binding="{/ProductCollection/5}"
-				press="onPress"
-				number="12345678901234567890"
-				unit="{CurrencyCode}"
-				emphasized="false"
-				state="None" />
+					class="sapMObjectNumberLongText"
+					active="true"
+					binding="{/ProductCollection/5}"
+					press=".onPress"
+					number="12345678901234567890"
+					unit="{CurrencyCode}"
+					emphasized="false"
+					state="None" />
 			</content>
 		</Panel>
 

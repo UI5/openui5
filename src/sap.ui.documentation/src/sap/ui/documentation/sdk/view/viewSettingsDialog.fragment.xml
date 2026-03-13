@@ -3,7 +3,7 @@
 		xmlns:core="sap.ui.core">
 	<ViewSettingsDialog
 			id="viewSettingsDialog"
-			confirm="onConfirmViewSettings">
+			confirm=".onConfirmViewSettings">
 		<groupItems>
 			<ViewSettingsItem text="{i18n>VIEW_SETTINGS_DIALOG_ITEM_1}" key="name" selected="true" />
 			<ViewSettingsItem text="{i18n>VIEW_SETTINGS_DIALOG_ITEM_2}" key="category" />

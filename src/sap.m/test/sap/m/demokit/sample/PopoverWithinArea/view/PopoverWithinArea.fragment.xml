@@ -6,7 +6,7 @@
 		title="{Name}"
 		contentHeight="20em"
 		placement="Right"
-		afterClose="handleAfterClose">
+		afterClose=".handleAfterClose">
 		<Image src="{ProductPicUrl}" width="18em" densityAware="false" />
 	</Popover>
 </core:FragmentDefinition>

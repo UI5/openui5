@@ -4,10 +4,10 @@
 >
 	<Input
 		value="{value}"
-		change="_onChange"
-		suggestionItemSelected="_onSuggestionItemSelected"
+		change="._onChange"
+		suggestionItemSelected="._onSuggestionItemSelected"
 		showSuggestion="true"
 		showValueHelp="true"
-		valueHelpRequest="_handleValueHelp"
+		valueHelpRequest="._handleValueHelp"
 	/>
 </core:FragmentDefinition>

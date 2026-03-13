@@ -19,7 +19,7 @@
 					propertyInfo='[\{"key": "first_ascent", "label": "First Ascent", "path": "first_ascent", "dataType":"sap.ui.model.type.Date", "formatOptions": \{"style": "long"\}, "maxConditions": 1, "visible": true\},
 								   \{"key": "rank", "label": "Rank", "path": "rank", "dataType":"sap.ui.model.type.Integer", "formatOptions": \{"emptyString": 0\}, "constraints": \{"minimum": 0\}, "visible": true\}]'
 					showAdaptFiltersButton="false"
-					filtersChanged="handleFiltersChanged">
+					filtersChanged=".handleFiltersChanged">
 					<mdc:filterItems>
 						<!-- Rank - Custom operator -->
 						<mdc:FilterField

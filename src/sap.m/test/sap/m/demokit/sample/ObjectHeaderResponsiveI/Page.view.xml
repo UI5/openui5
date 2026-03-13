@@ -69,7 +69,7 @@
 					text="Attachments"
 					count="1"
 					key="key3">
-					<Link text="Attachment" press="onPress"/>
+					<Link text="Attachment" press=".onPress"/>
 				</IconTabFilter>
 				<IconTabFilter
 					text="PartnerInfo"

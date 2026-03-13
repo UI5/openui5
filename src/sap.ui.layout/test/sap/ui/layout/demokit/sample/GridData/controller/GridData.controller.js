@@ -5,7 +5,7 @@ sap.ui.define([
 	function(Element, Controller) {
 		'use strict';
 
-		return Controller.extend('sap.ui.layout.GridData.controller.GridData', {
+		return Controller.extend('sap.ui.layout.sample.GridData.controller.GridData', {
 			onSliderMoved: function (oEvent) {
 				var iValue = oEvent.getParameter('value'),
 					$oGridWrapperRef = this._getNextGridRef(oEvent.getSource());

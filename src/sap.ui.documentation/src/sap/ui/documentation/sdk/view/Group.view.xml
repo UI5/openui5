@@ -9,7 +9,7 @@
 
 	<m:Page
 			id="controlsDetailPage"
-			navButtonPress="onNavBack"
+			navButtonPress=".onNavBack"
 			showHeader="{device>/orientation/portrait}"
 			showSubHeader="false"
 			showFooter="false"

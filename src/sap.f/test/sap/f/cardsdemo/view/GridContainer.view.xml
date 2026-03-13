@@ -18,15 +18,15 @@
 				<HBox>
 					<HBox alignItems="Center">
 						<Label class="sapUiSmallMargin" text="Snap to Row:"/>
-						<Switch change="onSnapToRowChange" state="false" />
+						<Switch change=".onSnapToRowChange" state="false" />
 					</HBox>
 					<HBox alignItems="Center">
 						<Label class="sapUiSmallMargin" text="Allow dense fill:"/>
-						<Switch change="onDensityChange" state="false" />
+						<Switch change=".onDensityChange" state="false" />
 					</HBox>
 					<HBox alignItems="Center">
 						<Label class="sapUiSmallMargin" text="Inline block layout:"/>
-						<Switch change="onInlineBlockChange" state="false" />
+						<Switch change=".onInlineBlockChange" state="false" />
 					</HBox>
 				</HBox>
 			</Panel>

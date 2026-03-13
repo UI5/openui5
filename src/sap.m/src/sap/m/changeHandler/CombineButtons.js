@@ -364,12 +364,12 @@ sap.ui.define([
 	 * @public
 	 */
 	CombineButtons.completeChangeContent = function(oChange, oSpecificChangeInfo, mPropertyBag) {
-		var oModifier = mPropertyBag.modifier;
-		var oAppComponent = mPropertyBag.appComponent;
-		var aCombineButtonIds = oSpecificChangeInfo.combineElementIds;
+		const oModifier = mPropertyBag.modifier;
+		const oAppComponent = mPropertyBag.appComponent;
+		const aCombineButtonIds = oSpecificChangeInfo.content?.combineElementIds;
 
 		if (aCombineButtonIds && aCombineButtonIds.length > 1) {
-			var oContent = {};
+			const oContent = {};
 			oChange.addDependentControl(aCombineButtonIds, "combinedButtons", mPropertyBag);
 			oContent.combineButtonSelectors = aCombineButtonIds.map(function (sCombineButtonId) {
 				return oModifier.getSelector(sCombineButtonId, oAppComponent);
@@ -385,7 +385,7 @@ sap.ui.define([
 			});
 			oChange.setContent(oContent);
 		} else {
-			throw new Error("Combine buttons action cannot be completed: oSpecificChangeInfo.combineElementIds attribute required");
+			throw new Error("Combine buttons action cannot be completed: oSpecificChangeInfo.content.combineElementIds attribute required");
 		}
 	};
 

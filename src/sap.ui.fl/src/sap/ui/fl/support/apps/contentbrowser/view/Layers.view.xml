@@ -6,7 +6,7 @@
 				<StandardListItem
 					title="{layers>name}"
 					type="Navigation"
-					press="onLayerSelected"
+					press=".onLayerSelected"
 					icon="{layers>icon}">
 				</StandardListItem>
 			</items>

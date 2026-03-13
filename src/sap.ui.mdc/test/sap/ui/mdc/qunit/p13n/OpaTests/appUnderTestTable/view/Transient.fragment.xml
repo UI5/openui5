@@ -12,7 +12,7 @@
 		<fl:VariantManagement id="IDVariantManagementOfInternalSampleApp_01" for="IDContainerForVariantManagement"/>
 		<p13n:PersistenceProvider id="IDPersistenceProviderOfInternalSampleApp_01" for="IDContainerForVariantManagement" mode="Transient"/>
 		<m:ToolbarSpacer id="idTbs"/>
-		<m:Button id="rtaBtn" text="Start RTA" press="onPressRTA"/>
+		<m:Button id="rtaBtn" text="Start RTA" press=".onPressRTA"/>
 	</m:OverflowToolbar>
 
 	<m:VBox class="sapUiSmallMargin" id="IDContainerForVariantManagement">

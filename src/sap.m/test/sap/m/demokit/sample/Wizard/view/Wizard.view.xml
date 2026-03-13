@@ -13,7 +13,7 @@
 				showHeader="false">
 					<content>
 						<Wizard id="CreateProductWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
-								complete="wizardCompletedHandler">
+								complete=".wizardCompletedHandler">
 							<WizardStep id="ProductTypeStep"
 										title="Product Type"
 										validated="true">
@@ -28,7 +28,7 @@
 										width="100%">
 									<SegmentedButton
 										width="320px"
-										selectionChange="setProductTypeFromSegmented">
+										selectionChange=".setProductTypeFromSegmented">
 										<items>
 											<SegmentedButtonItem icon="sap-icon://iphone" text="Mobile"/>
 											<SegmentedButtonItem icon="sap-icon://sys-monitor" text="Desktop"/>
@@ -40,7 +40,7 @@
 							<WizardStep id="ProductInfoStep"
 										validated="false"
 										title="Product Information"
-										activate="additionalInfoValidation">
+										activate=".additionalInfoValidation">
 								<MessageStrip class="sapUiSmallMarginBottom"
 										text="Validation in the wizard is controlled by calling the validateStep(Step) and invalidateStep(Step) methods "
 										showIcon="true"/>
@@ -50,12 +50,12 @@
 										layout="ResponsiveGridLayout">
 									<Label text="Name" required="true"/>
 									<Input valueStateText="Enter 6 symbols or more"
-											valueState="{/productNameState}" id="ProductName" liveChange="additionalInfoValidation"
+											valueState="{/productNameState}" id="ProductName" liveChange=".additionalInfoValidation"
 											placeholder="Enter name with length greater than 6" value="{/productName}"/>
 									<Label text="Weight" required="true"/>
 									<Input valueStateText="Enter digits"
 											valueState="{/productWeightState}" id="ProductWeight"
-											liveChange="additionalInfoValidation" type="Number" placeholder="Enter digits"
+											liveChange=".additionalInfoValidation" type="Number" placeholder="Enter digits"
 											value="{/productWeight}"/>
 									<Label text="Manufacturer"/>
 									<Select selectedKey="{/productManufacturer}">
@@ -72,7 +72,7 @@
 							</WizardStep>
 							<WizardStep id="OptionalInfoStep"
 										validated="true"
-										activate="optionalStepActivation"
+										activate=".optionalStepActivation"
 										title="Optional Information">
 								<MessageStrip class="sapUiSmallMarginBottom"
 										text="You can validate steps by default with the validated='true' property of the step. The next button is always enabled."
@@ -112,8 +112,8 @@
 								</form:SimpleForm>
 							</WizardStep>
 							<WizardStep id="PricingStep"
-										activate="pricingActivate"
-										complete="pricingComplete"
+										activate=".pricingActivate"
+										complete=".pricingComplete"
 										validated="true"
 										title="Pricing">
 								<MessageStrip class="sapUiSmallMarginBottom"
@@ -140,7 +140,7 @@
 					<footer>
 						<OverflowToolbar>
 							<ToolbarSpacer/>
-							<Button text="Cancel" press="handleWizardCancel"/>
+							<Button text="Cancel" press=".handleWizardCancel"/>
 						</OverflowToolbar>
 					</footer>
 				</Page>
@@ -153,7 +153,7 @@
 							<form:content>
 								<Label text="Type"/>
 								<Text id="ProductTypeChosen" text="{/productType}"/>
-								<Link press="editStepOne" text="Edit" />
+								<Link press=".editStepOne" text="Edit" />
 							</form:content>
 						</form:SimpleForm>
 
@@ -170,7 +170,7 @@
 								<Text id="ProductManufacturerChosen" text="{/productManufacturer}"/>
 								<Label text="Description"/>
 								<Text id="ProductDescriptionChosen" text="{/productDescription}"/>
-								<Link press="editStepTwo" text="Edit" />
+								<Link press=".editStepTwo" text="Edit" />
 							</form:content>
 						</form:SimpleForm>
 
@@ -191,7 +191,7 @@
 									<Text id="Size" text="{/size}"/>
 									<Text id="Size2" class="sapUiTinyMarginBegin" text="{/measurement}"/>
 								</HBox>
-								<Link press="editStepThree" text="Edit" />
+								<Link press=".editStepThree" text="Edit" />
 							</form:content>
 						</form:SimpleForm>
 
@@ -206,15 +206,15 @@
 								<Text id="DiscountGroupChosen" text="{/discountGroup}"/>
 								<Label text="VAT Included"/>
 								<Text id="ProductVATChosen" text="{/productVAT}"/>
-								<Link press="editStepFour" text="Edit" />
+								<Link press=".editStepFour" text="Edit" />
 							</form:content>
 						</form:SimpleForm>
 					</content>
 					<footer>
 						<Bar>
 							<contentRight>
-								<Button text="Submit" press="handleWizardSubmit"/>
-								<Button text="Cancel" press="handleWizardCancel"/>
+								<Button text="Submit" press=".handleWizardSubmit"/>
+								<Button text="Cancel" press=".handleWizardCancel"/>
 							</contentRight>
 						</Bar>
 					</footer>

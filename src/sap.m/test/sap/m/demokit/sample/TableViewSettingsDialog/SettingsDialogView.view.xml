@@ -13,16 +13,16 @@
 					<Button
 						tooltip="Sort"
 						icon="sap-icon://sort"
-						press="handleSortButtonPressed"/>
+						press=".handleSortButtonPressed"/>
 					<Button
 						tooltip="Filter"
 						icon="sap-icon://filter"
-						press="handleFilterButtonPressed"/>
+						press=".handleFilterButtonPressed"/>
 					<Button
 						tooltip="Group"
 						icon="sap-icon://group-2"
-						press="handleGroupButtonPressed"/>
-					<ToggleButton icon="sap-icon://menu" tooltip="Enable Custom Context Menu" press="onToggleContextMenu" />
+						press=".handleGroupButtonPressed"/>
+					<ToggleButton icon="sap-icon://menu" tooltip="Enable Custom Context Menu" press=".onToggleContextMenu" />
 				</OverflowToolbar>
 			</headerToolbar>
 			<infoToolbar>

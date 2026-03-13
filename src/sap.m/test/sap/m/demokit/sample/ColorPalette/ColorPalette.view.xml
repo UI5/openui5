@@ -15,6 +15,6 @@
 		</form:toolbar>
 
 		<Label text="Choose Color"/>
-		<ColorPalette colorSelect="handleColorSelect"/>
+		<ColorPalette colorSelect=".handleColorSelect"/>
 	</form:SimpleForm>
 </mvc:View>

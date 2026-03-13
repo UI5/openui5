@@ -99,15 +99,15 @@ sap.ui.define([
 	 * @private
 	 */
 	RenameForm.completeChangeContent = function(oChange, oSpecificChangeInfo, mPropertyBag) {
-		var oContent = {};
+		const oContent = {};
 
 		if (!oSpecificChangeInfo.changeType) {
 			throw new Error("oSpecificChangeInfo.changeType attribute required");
 		}
 
-		if (oSpecificChangeInfo.renamedElement && oSpecificChangeInfo.renamedElement.id) {
-			var oRenamedElement = Element.getElementById(oSpecificChangeInfo.renamedElement.id);
-			var oStableRenamedElement;
+		if (oSpecificChangeInfo.content?.renamedElement?.id) {
+			const oRenamedElement = Element.getElementById(oSpecificChangeInfo.content.renamedElement.id);
+			let oStableRenamedElement;
 			if (oSpecificChangeInfo.changeType === "renameLabel") {
 				oStableRenamedElement = oRenamedElement.getLabel();
 			} else if (oSpecificChangeInfo.changeType === "renameTitle") {
@@ -116,13 +116,13 @@ sap.ui.define([
 			oContent.elementSelector = JsControlTreeModifier.getSelector(oStableRenamedElement, mPropertyBag.appComponent);
 			oChange.addDependentControl(oStableRenamedElement, "elementSelector", mPropertyBag);
 		} else {
-			throw new Error("oSpecificChangeInfo.renamedElement attribute required");
+			throw new Error("oSpecificChangeInfo.content.renamedElement attribute required");
 		}
 
-		if (this._isProvided(oSpecificChangeInfo.value)) {
-			oChange.setText("formText", oSpecificChangeInfo.value, "XFLD");
+		if (this._isProvided(oSpecificChangeInfo.content.value)) {
+			oChange.setText("formText", oSpecificChangeInfo.content.value, "XFLD");
 		} else {
-			throw new Error("oSpecificChangeInfo.value attribute required");
+			throw new Error("oSpecificChangeInfo.content.value attribute required");
 		}
 
 		oChange.setContent(oContent);

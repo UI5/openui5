@@ -12,7 +12,7 @@
 					<form:ColumnElementData cellsSmall="8" cellsLarge="-1"/>
 				</layoutData>
 			</Label>
-			<Switch change="onSwitchEVS" state="{/sSelectedEVS}">
+			<Switch change=".onSwitchEVS" state="{/sSelectedEVS}">
 				<layoutData>
 					<form:ColumnElementData cellsSmall="4" cellsLarge="-1"/>
 				</layoutData>
@@ -27,7 +27,7 @@
 					<form:ColumnElementData cellsSmall="4" cellsLarge="-1"/>
 				</layoutData>
 			</Label>
-			<Select change="onSelectSize" items="{/sizeTypes}">
+			<Select change=".onSelectSize" items="{/sizeTypes}">
 				<core:Item key="{key}" text="{text}"/>
 				<layoutData>
 					<form:ColumnElementData cellsSmall="8" cellsLarge="-1"/>
@@ -43,7 +43,7 @@
 					<form:ColumnElementData cellsSmall="4" cellsLarge="-1"/>
 				</layoutData>
 			</Label>
-			<Select change="onSelectType" items="{/typeTypes}">
+			<Select change=".onSelectType" items="{/typeTypes}">
 				<core:Item key="{key}" text="{text}"/>
 				<layoutData>
 					<form:ColumnElementData cellsSmall="8" cellsLarge="-1"/>

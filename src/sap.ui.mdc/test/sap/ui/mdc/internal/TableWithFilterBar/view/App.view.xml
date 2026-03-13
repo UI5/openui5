@@ -11,7 +11,7 @@
 			</items>
 		</IconTabHeader>
 		<ToolbarSpacer />
-		<ToggleButton text="RTA" icon="sap-icon://user-edit" type="Emphasized" press="onStartRTA" />
+		<ToggleButton text="RTA" icon="sap-icon://user-edit" type="Emphasized" press=".onStartRTA" />
 	</tnt:ToolHeader>
 	<App id="app">
 	</App>

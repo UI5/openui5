@@ -152,26 +152,26 @@ sap.ui.define([
 	 * @public
 	 */
 	AddSimpleFormGroup.completeChangeContent = function (oChange, oSpecificChangeInfo, mPropertyBag) {
-		var oAppComponent = mPropertyBag.appComponent;
-		var oContent = {
+		const oAppComponent = mPropertyBag.appComponent;
+		const oContent = {
 			group: {}
 		};
 
-		if (oSpecificChangeInfo.newLabel) {
-			oChange.setText("groupLabel", oSpecificChangeInfo.newLabel, "XFLD");
+		if (oSpecificChangeInfo.content?.newLabel) {
+			oChange.setText("groupLabel", oSpecificChangeInfo.content.newLabel, "XFLD");
 		} else {
-			throw new Error("oSpecificChangeInfo.newLabel attribute required");
+			throw new Error("oSpecificChangeInfo.content.newLabel attribute required");
 		}
-		if (oSpecificChangeInfo.newControlId) {
-			oContent.group.selector = JsControlTreeModifier.getSelector(oSpecificChangeInfo.newControlId, oAppComponent);
+		if (oSpecificChangeInfo.content.newControlId) {
+			oContent.group.selector = JsControlTreeModifier.getSelector(oSpecificChangeInfo.content.newControlId, oAppComponent);
 		} else {
-			throw new Error("oSpecificChangeInfo.newControlId attribute required");
+			throw new Error("oSpecificChangeInfo.content.newControlId attribute required");
 		}
 
-		if (oSpecificChangeInfo.index === undefined) {
-			throw new Error("oSpecificChangeInfo.index attribute required");
+		if (oSpecificChangeInfo.content.index === undefined) {
+			throw new Error("oSpecificChangeInfo.content.index attribute required");
 		} else {
-			oContent.group.relativeIndex = oSpecificChangeInfo.index;
+			oContent.group.relativeIndex = oSpecificChangeInfo.content.index;
 		}
 
 		oChange.setContent(oContent);

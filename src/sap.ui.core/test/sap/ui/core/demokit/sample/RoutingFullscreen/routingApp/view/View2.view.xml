@@ -6,10 +6,10 @@
 	<Page
 		title="Second Page"
 		showNavButton="true"
-		navButtonPress="onBack">
+		navButtonPress=".onBack">
 		<content>
 			<layout:VerticalLayout>
-				<Button text="To the first Page" press="onToPage1"/>
+				<Button text="To the first Page" press=".onToPage1"/>
 				<Link id="link" text="A link to the first Page"/>
 			</layout:VerticalLayout>
 		</content>

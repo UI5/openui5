@@ -3,8 +3,8 @@
 	xmlns:core="sap.ui.core"
 >
 	<PropertyEditors
-		init="wrapperInit"
-		propertyEditorsChange="_propertyEditorsChange"
+		init=".wrapperInit"
+		propertyEditorsChange="._propertyEditorsChange"
 		config="{
 			path: 'itemsModel>/',
 			formatter: '._configItemsFormatter'

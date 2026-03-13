@@ -79,7 +79,7 @@
 		</semantic:content>
 
 		<semantic:titleMainAction>
-			<semantic:TitleMainAction id="editAction" text="Edit" press="onEdit"/>
+			<semantic:TitleMainAction id="editAction" text="Edit" press=".onEdit"/>
 		</semantic:titleMainAction>
 
 		 <!--Semantic ShareMenu Buttons-->
@@ -101,15 +101,15 @@
 
 		<!-- Semantic Footer Buttons -->
 		<semantic:footerMainAction>
-			<semantic:FooterMainAction text="Save" press="onSave"/>
+			<semantic:FooterMainAction text="Save" press=".onSave"/>
 		</semantic:footerMainAction>
 
 		<semantic:footerCustomActions>
-			<Button id="cancelAction" text="Cancel" press="onCancel"/>
+			<Button id="cancelAction" text="Cancel" press=".onCancel"/>
 		</semantic:footerCustomActions>
 
 		<semantic:messagesIndicator>
-			<semantic:MessagesIndicator press="onMessagesButtonPress"/>
+			<semantic:MessagesIndicator press=".onMessagesButtonPress"/>
 		</semantic:messagesIndicator>
 
 		<semantic:draftIndicator>

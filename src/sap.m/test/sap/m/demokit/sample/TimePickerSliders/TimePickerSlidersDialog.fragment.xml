@@ -8,16 +8,15 @@
 			id="TPS2"
 			valueFormat="hh:mm a"
 			displayFormat="hh:mm a"
-			change="handleChange"
 			height="400px"/>
 		<buttons>
 			<Button
 				text="OK"
-				press="handleOKPress"
+				press=".handleOKPress"
 				type="Emphasized"/>
 			<Button
 				text="Cancel"
-				press="handleCancelPress"/>
+				press=".handleCancelPress"/>
 		</buttons>
 	</Dialog>
 </core:FragmentDefinition>

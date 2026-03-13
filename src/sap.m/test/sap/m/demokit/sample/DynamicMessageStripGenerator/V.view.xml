@@ -12,7 +12,7 @@
 			<Button
 				text="Generate MessageStrip"
 				class="sapUiSmallMarginBottom"
-				press="showMsgStrip"
+				press=".showMsgStrip"
 				width="250px"/>
 		</l:content>
 	</l:VerticalLayout>

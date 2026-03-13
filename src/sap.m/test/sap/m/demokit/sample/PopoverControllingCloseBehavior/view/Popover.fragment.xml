@@ -13,7 +13,7 @@
 				<Button
 					id="action"
 					text="Action"
-					press="handleActionPress" />
+					press=".handleActionPress" />
 			</Toolbar>
 		</footer>
 		<VBox>

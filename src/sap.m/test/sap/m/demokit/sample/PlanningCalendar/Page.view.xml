@@ -10,20 +10,20 @@
 			startDate="{path: '/startDate'}"
 			rows="{path: '/people'}"
 			appointmentsVisualization="Filled"
-			appointmentSelect="handleAppointmentSelect"
-			rowHeaderPress="handleRowHeaderPress"
+			appointmentSelect=".handleAppointmentSelect"
+			rowHeaderPress=".handleRowHeaderPress"
 			showEmptyIntervalHeaders="false"
 			showWeekNumbers="true">
 			<toolbarContent>
 				<Title text="Title" titleStyle="H4"/>
-				<Select id="primaryCalendarTypeSelect" change="onCalendarTypeSelect" selectedKey="None">
+				<Select id="primaryCalendarTypeSelect" change=".onCalendarTypeSelect" selectedKey="None">
 					<core:Item key="Gregorian" text="Gregorian" />
 					<core:Item key="Islamic" text="Islamic" />
 					<core:Item key="Japanese" text="Japanese" />
 					<core:Item key="Persian" text="Persian" />
 					<core:Item key="Buddhist" text="Buddhist" />
 				</Select>
-				<Select id="secondaryCalendarTypeSelect" change="onCalendarSecondaryTypeSelect" selectedKey="None">
+				<Select id="secondaryCalendarTypeSelect" change=".onCalendarSecondaryTypeSelect" selectedKey="None">
 					<core:Item text="Select secondary calendar type" key="None" />
 					<core:Item key="Gregorian" text="Gregorian" />
 					<core:Item key="Islamic" text="Islamic" />
@@ -67,7 +67,7 @@
 		</PlanningCalendar>
 		<Label text="Add available built-in views to the example:"/>
 		<MultiComboBox
-				selectionFinish="handleSelectionFinish"
+				selectionFinish=".handleSelectionFinish"
 				width="230px"
 				placeholder="Choose built-in views">
 			<items>

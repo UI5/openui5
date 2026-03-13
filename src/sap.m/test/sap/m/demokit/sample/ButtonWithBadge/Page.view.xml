@@ -44,7 +44,7 @@
 						id="CurrentValue"
 						value="{/badgeCurrent}"
 						width="130px"
-						change="currentChangeHandler"/>
+						change=".currentChangeHandler"/>
 				</FlexBox>
 				<FlexBox
 					class="sapUiTinyMarginBeginEnd"
@@ -59,7 +59,7 @@
 						value="{/badgeMin}"
 						width="55px"
 						type="Number"
-						change="minChangeHandler"/>
+						change=".minChangeHandler"/>
 					<Text
 						renderWhitespace="true"
 						text=" to "/>
@@ -68,7 +68,7 @@
 						value="{/badgeMax}"
 						width="55px"
 						type="Number"
-						change="maxChangeHandler"/>
+						change=".maxChangeHandler"/>
 				</FlexBox>
 				<Text
 					class="sapUiTinyMarginBeginEnd"

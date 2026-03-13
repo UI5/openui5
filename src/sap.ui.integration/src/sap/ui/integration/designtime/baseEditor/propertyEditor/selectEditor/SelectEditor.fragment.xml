@@ -7,7 +7,7 @@
 		value="{path: 'value', formatter: '._getItemTitle'}"
 		selectedKey="{value}"
 		width="100%"
-		change="_onChange"
+		change="._onChange"
 		items="{config/items}"
 	>
 		<items>

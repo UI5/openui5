@@ -14,10 +14,10 @@
 		showNavButton="true"
         enableScrolling="false"
 		title="{i18n>LIVE_EDITOR_TITLE}"
-		navButtonPress="onNavButtonPress">
+		navButtonPress=".onNavButtonPress">
         <custom:DivContainer class="editorWrapper">
             <custom:DivContainer>
-                <IconTabHeader selectedKey="{viewModel>/selectedFileName}" select="onFileSwitch">
+                <IconTabHeader selectedKey="{viewModel>/selectedFileName}" select=".onFileSwitch">
                     <items>
                         <IconTabFilter text="App.view.xml" key="App.view.xml"/>
                         <IconTabFilter text="App.controller.js" key="App.controller.js"/>
@@ -30,14 +30,14 @@
                                        editable="{= ${viewModel>/selectedFileType} !== 'text' }"
                                        value="{viewModel>/selectedFileContent}"
                                        type="{viewModel>/selectedFileType}"
-                                       liveChange="onSrcLiveChange"/>
+                                       liveChange=".onSrcLiveChange"/>
                 </custom:DivContainer>
             </custom:DivContainer>
 
             <VBox id="resultBox" class="liveEditorResultBox" width="100%" height="100%">
                 <Toolbar style="Clear" class="editorToolbar">
                     <Button text="{i18n>LIVE_EDITOR_PREVIEW_BTN}"
-                            press="requestExecuteCurrentSrc"
+                            press=".requestExecuteCurrentSrc"
                             enabled="{= !${viewModel>/autoPreview}}"/>
                     <CheckBox text="{i18n>LIVE_EDITOR_LIVE_PREVIEW_TEXT}"
                               selected="{viewModel>/autoPreview}"/>

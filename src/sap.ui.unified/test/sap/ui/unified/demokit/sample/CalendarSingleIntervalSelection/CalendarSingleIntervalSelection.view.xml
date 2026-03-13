@@ -8,9 +8,9 @@
 	<l:VerticalLayout>
 		<u:Calendar
 				id="calendar"
-				select="handleCalendarSelect"
+				select=".handleCalendarSelect"
 				intervalSelection="true"
-				weekNumberSelect="handleWeekNumberSelect"/>
+				weekNumberSelect=".handleWeekNumberSelect"/>
 		<l:HorizontalLayout>
 			<Label
 					text="Selected From (yyyy-mm-dd):"

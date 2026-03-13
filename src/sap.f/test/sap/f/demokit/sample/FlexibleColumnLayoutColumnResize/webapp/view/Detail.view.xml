@@ -14,7 +14,7 @@ height="100%">
 
 			<f:navigationActions>
 				<Button
-					press="handleClose"
+					press=".handleClose"
 					icon="sap-icon://decline"
 					type="Transparent" />
 			</f:navigationActions>

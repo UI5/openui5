@@ -5,7 +5,7 @@
 	xmlns:f="sap.f"
     controllerName="sap.f.gridlist.controller.Main">
 
-	<Slider value="100" liveChange="onSliderMoved"/>
+	<Slider value="100" liveChange=".onSliderMoved"/>
 
     <f:GridList
 		id="growingGridListBoxes"

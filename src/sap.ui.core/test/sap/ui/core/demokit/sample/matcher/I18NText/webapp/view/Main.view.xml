@@ -11,7 +11,7 @@
 						items="{/ProductCollection}"
 						mode="MultiSelect"
 						includeItemInSelection="true"
-						updateFinished="onListUpdated">
+						updateFinished=".onListUpdated">
 						<headerToolbar>
 							<Toolbar>
 								<content>
@@ -20,10 +20,10 @@
 									<!-- this button has no ID -->
 									<Button
 										text="{i18n>loadButtonText}"
-										press="onLoadProducts" />
+										press=".onLoadProducts" />
 									<Button
 										text="OK"
-										press="onAccept" />
+										press=".onAccept" />
 								</content>
 							</Toolbar>
 						</headerToolbar>

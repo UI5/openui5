@@ -77,9 +77,11 @@ sap.ui.define([
 
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
-					value: this.sNewValue,
 					changeType: "renameLabel",
-					renamedElement: {id: this.oFormElement.getId()}
+					content: {
+						value: this.sNewValue,
+						renamedElement: {id: this.oFormElement.getId()}
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent
@@ -155,9 +157,11 @@ sap.ui.define([
 	QUnit.test('when calling completeChangeContent for FormContainer', function (assert) {
 		return FlexTestAPI.createFlexObject({
 			changeSpecificData: {
-				value: this.sNewValue,
 				changeType: "renameTitle",
-				renamedElement: {id: this.oFormContainer.getId()}
+				content: {
+					value: this.sNewValue,
+					renamedElement: {id: this.oFormContainer.getId()}
+				}
 			},
 			selector: this.oSimpleForm,
 			appComponent: this.oMockedComponent
@@ -172,9 +176,11 @@ sap.ui.define([
 	QUnit.test('when calling applyChange with an empty string as value', function (assert) {
 		return FlexTestAPI.createFlexObject({
 			changeSpecificData: {
-				value: "",
 				changeType: "renameLabel",
-				renamedElement: {id: this.oFormElement.getId()}
+				content: {
+					value: "",
+					renamedElement: {id: this.oFormElement.getId()}
+				}
 			},
 			selector: this.oSimpleForm,
 			appComponent: this.oMockedComponent
@@ -189,9 +195,11 @@ sap.ui.define([
 	QUnit.test('when calling applyChange and revertChange with a binding', function (assert) {
 		return FlexTestAPI.createFlexObject({
 			changeSpecificData: {
-				value: "New Value",
 				changeType: "renameLabel",
-				renamedElement: {id: this.oFormElementBinding.getId()}
+				content: {
+					value: "New Value",
+					renamedElement: {id: this.oFormElementBinding.getId()}
+				}
 			},
 			selector: this.oSimpleForm,
 			appComponent: this.oMockedComponent
@@ -216,18 +224,20 @@ sap.ui.define([
 		};
 
 		var oSpecificChangeInfo = {
-			renamedElement :{
-				id: this.oFormContainer.getId()
-			},
 			changeType: "renameTitle",
-			value: undefined
+			content: {
+				value: undefined,
+				renamedElement :{
+				id: this.oFormContainer.getId()
+				}
+			}
 		};
 
 		assert.throws(
 			function() {
 				this.oChangeHandler.completeChangeContent(oChange, oSpecificChangeInfo, {});
 			},
-			new Error("oSpecificChangeInfo.value attribute required"),
+			new Error("oSpecificChangeInfo.content.value attribute required"),
 			"the undefined value raises an error message"
 		);
 	});
@@ -235,14 +245,16 @@ sap.ui.define([
 	QUnit.test('when calling completeChangeContent without renamedElementId', function (assert) {
 		var oSpecificChangeInfo = {
 			changeType: "renameTitle",
-			value: this.sNewValue
+			content: {
+				value: this.sNewValue
+			}
 		};
 
 		assert.throws(
 			function() {
 				this.oChangeHandler.completeChangeContent({}, oSpecificChangeInfo, {});
 			},
-			new Error("oSpecificChangeInfo.renamedElement attribute required"),
+			new Error("oSpecificChangeInfo.content.renamedElement attribute required"),
 			"the undefined value raises an error message"
 		);
 	});

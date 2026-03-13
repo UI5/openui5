@@ -18,7 +18,7 @@
 			<Table
 				id="productsTable"
 				mode="SingleSelectMaster"
-				itemPress="onListItemPress"
+				itemPress=".onListItemPress"
 				inset="false"
 				items="{
 					path: 'products>/ProductCollectionStats/Filters/0/values'

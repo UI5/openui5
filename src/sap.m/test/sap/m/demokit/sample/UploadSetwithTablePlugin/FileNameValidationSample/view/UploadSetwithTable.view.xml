@@ -32,22 +32,22 @@
 				<Text text="Mode:" class="sapUiTinyMarginBottom sapUiSmallMarginTop" design="Bold" />
 
 				<HBox alignItems="Center" justifyContent="Start" class="sapUiTinyMarginTop">
-  					<CheckBox text="include" select="onCheckboxSelect" id="cbInclude" />
-  					<CheckBox text="exclude" select="onCheckboxSelect" id="cbExclude" />
-  					<CheckBox text="override" select="onCheckboxSelect" id="cbOverride" selected="true" />
+					<CheckBox text="include" select=".onCheckboxSelect" id="cbInclude" />
+					<CheckBox text="exclude" select=".onCheckboxSelect" id="cbExclude" />
+					<CheckBox text="override" select=".onCheckboxSelect" id="cbOverride" selected="true" />
 				</HBox>
 
 				<!-- Heading for Input -->
 				<Text text="Characters:" class="sapUiTinyMarginTop" design="Bold" />
 
 				<!-- Input Box -->
-				<Input id="charInput" class="sapUiSmallMarginTop" placeholder="Enter characters..." value="{documents>/characters}" liveChange="onInputChange" width="50%" />
+				<Input id="charInput" class="sapUiSmallMarginTop" placeholder="Enter characters..." value="{documents>/characters}" liveChange=".onInputChange" width="50%" />
 
 				<!-- Button to fetch selected mode and characters -->
-				<Button text="Configure" press="onConfigureHandler" class="sapUiSmallMarginTop"
+				<Button text="Configure" press=".onConfigureHandler" class="sapUiSmallMarginTop"
 				enabled="{documents>/isConfigureButtonEnabled}" />
-  			</VBox>
-			
+			</VBox>
+
 			<Table
 				id="table-uploadSet"
 				sticky="ColumnHeaders,HeaderToolbar"
@@ -58,7 +58,7 @@
 				autoPopinMode="true"
 				hiddenInPopin="None"
 				items="{path: 'documents>/items', templateShareable: false}"
-				selectionChange="onSelectionChange">
+				selectionChange=".onSelectionChange">
 
 				<headerToolbar>
 					<OverflowToolbar>
@@ -70,7 +70,7 @@
 
 						<SearchField
 							width="20%"
-							liveChange="onSearch"
+							liveChange=".onSearch"
 						>
 							<layoutData>
 								<OverflowToolbarLayoutData
@@ -87,14 +87,14 @@
 							id="downloadSelectedButton"
 							text="Download"
 							enabled="false"
-							press="onDownloadFiles"
+							press=".onDownloadFiles"
 						/>
 						<MenuButton text="Add">
 							<menu>
 								<Menu>
 									<MenuItem
 										text="URL"
-										press="openAddOrEditDialog"
+										press=".openAddOrEditDialog"
 									/>
 								</Menu>
 							</menu>
@@ -107,7 +107,7 @@
 						<Button
 							id="removeDocumentButton"
 							text="Remove"
-							press="onRemoveButtonPress"
+							press=".onRemoveButtonPress"
 							enabled="false"
 						>
 							<layoutData>
@@ -119,7 +119,7 @@
 						<Button
 							id="renameButton"
 							enabled="false"
-							press="onRenameDocument"
+							press=".onRenameDocument"
 							text="Rename"
 						>
 							<layoutData>
@@ -132,7 +132,7 @@
 							id="editUrlButton"
 							text="Edit URL"
 							enabled="false"
-							press="onEditUrl"
+							press=".onEditUrl"
 						>
 							<layoutData>
 								<OverflowToolbarLayoutData
@@ -147,10 +147,10 @@
 					<plugins.UploadSetwithTable
 						uploadUrl="/uploadFiles"
 						multiple="true"
-						beforeUploadStarts="onBeforeUploadStarts"
-						itemRenamed="onDocumentRenamedSuccess"
-						uploadCompleted="onUploadCompleted"
-						onActivated="onPluginActivated"
+						beforeUploadStarts=".onBeforeUploadStarts"
+						itemRenamed=".onDocumentRenamedSuccess"
+						uploadCompleted=".onUploadCompleted"
+						onActivated=".onPluginActivated"
 						cloudFilePickerEnabled="true"
 						actions="uploadButton"
 						fileNameValidationConfig="{mode: 'override', characters: '@$#'}"
@@ -207,7 +207,7 @@
 					<ColumnListItem
 						highlight="{= ${documents>uploadState} === 'Complete' ? 'Indication05' : null }"
 					>
-	
+
 					<!-- Cells with cell template defining content for each column (cells and columns work with 1:1 mapping) -->
 						<cells>
 							<HBox>
@@ -226,7 +226,7 @@
 								>
 									<Link
 										text="{documents>fileName}"
-										press="openPreview"
+										press=".openPreview"
 										class="sapUiTinyMarginBottom"
 									/>
 									<Text text="{documents>documentType}" />
@@ -249,7 +249,7 @@
 								class="sapUiTinyMarginBegin"
 								type="Transparent"
 								icon="sap-icon://decline"
-								press="onRemoveHandler"
+								press=".onRemoveHandler"
 							/>
 						</cells>
 					</ColumnListItem>

@@ -22,7 +22,7 @@
 			<Toolbar>
 				<Title text="Products (Correct Usage)" level="H2"/>
 				<ToolbarSpacer />
-				<CheckBox text="Strict Layout" select="onCheckBoxSelect"/>
+				<CheckBox text="Strict Layout" select=".onCheckBoxSelect"/>
 			</Toolbar>
 		</headerToolbar>
 		<columns>

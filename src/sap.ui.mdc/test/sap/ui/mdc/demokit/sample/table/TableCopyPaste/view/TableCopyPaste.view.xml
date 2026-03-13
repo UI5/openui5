@@ -17,14 +17,14 @@
 				selectionMode="Multi"
 				enablePaste="true"
 				showPasteButton="true"
-				beforeOpenContextMenu="onBeforeOpenContextMenu"
+				beforeOpenContextMenu=".onBeforeOpenContextMenu"
 				delegate="{
 					name: 'mdc/sample/delegate/JSONTableDelegate',
 					payload: {
 						bindingPath: 'mountains>/mountains'
 					}
 				}"
-				paste="onPaste">
+				paste=".onPaste">
 				<mdct:Column
 					propertyKey="name_range"
 					header="Name (Range)">
@@ -61,7 +61,7 @@
 				</mdc:dependents>
 				<mdc:contextMenu>
 					<Menu>
-						<MenuItem text="Copy Selected Rows" press="copySelectionData" />
+						<MenuItem text="Copy Selected Rows" press=".copySelectionData" />
 					</Menu>
 				</mdc:contextMenu>
 			</mdc:Table>

@@ -21,15 +21,15 @@
 						<m:Title id="title" text="Products"/>
 						<m:ToolbarSpacer/>
 						<m:Label text="SelectionMode:"/>
-						<m:Select id="select" selectedKey="MultiToggle" change="onSelectionModeChange">
+						<m:Select id="select" selectedKey="MultiToggle" change=".onSelectionModeChange">
 							<m:items>
 								<core:Item key="MultiToggle" text="MultiToggle"/>
 								<core:Item key="Single" text="Single"/>
 								<core:Item key="None" text="None"/>
 							</m:items>
 						</m:Select>
-						<m:ToggleButton text="Toggle Highlights" pressed="true" press="onHighlightToggle"/>
-						<m:ToggleButton text="Toggle Alternate Row Colors" press="onAlternateToggle"/>
+						<m:ToggleButton text="Toggle Highlights" pressed="true" press=".onHighlightToggle"/>
+						<m:ToggleButton text="Toggle Alternate Row Colors" press=".onAlternateToggle"/>
 					</m:OverflowToolbar>
 				</extension>
 				<rowSettingsTemplate>

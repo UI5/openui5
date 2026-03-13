@@ -12,7 +12,7 @@
 					<Toolbar>
 						<Title text="Item List"/>
 						<ToolbarSpacer/>
-						<SearchField width="50%" search="onFilterList"/>
+						<SearchField width="50%" search=".onFilterList"/>
 					</Toolbar>
 				</headerToolbar>
 				<columns>
@@ -23,7 +23,7 @@
 				<items>
 					<ColumnListItem
 						type="Navigation"
-						press="onPress">
+						press=".onPress">
 						<cells>
 							<Text text="{items>name}"/>
 						</cells>
@@ -33,12 +33,12 @@
 		</Page>
 		<Page id="Sample11"
 			showNavButton="true"
-			navButtonPress="onBack">
+			navButtonPress=".onBack">
 			<Title text="Sample11"/>
 		</Page>
 		<Page id="Sample12"
 			showNavButton="true"
-			navButtonPress="onBack">
+			navButtonPress=".onBack">
 			<headerContent>
 				<Title text="Sample12"/>
 			</headerContent>
@@ -53,7 +53,7 @@
 		</Page>
 		<Page id="Sample3"
 			showNavButton="true"
-			navButtonPress="onBack">
+			navButtonPress=".onBack">
 			<Title text="Sample3"/>
 		</Page>
 	</App>

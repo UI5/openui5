@@ -5,7 +5,7 @@
 		<CustomTreeItem>
 			<FlexBox alignItems="Start" width="100%">
 				<items>
-					<Button icon="{ref}" press="handleButtonPress" class="sapUiSmallMarginEnd" />
+					<Button icon="{ref}" press=".handleButtonPress" class="sapUiSmallMarginEnd" />
 					<Input value="{text}">
 						<layoutData>
 							<FlexItemData growFactor="1" />

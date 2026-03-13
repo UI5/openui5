@@ -4,20 +4,19 @@
 		xmlns="sap.m">
 	<Dialog id="createDialog">
 		<beginButton>
-			<Button text="Save" type="Emphasized" press="handleDialogSaveButton"/>
+			<Button text="Save" type="Emphasized" press=".handleDialogSaveButton"/>
 		</beginButton>
 		<endButton>
-			<Button text="Cancel" press="handleDialogCancelButton"/>
+			<Button text="Cancel" press=".handleDialogCancelButton"/>
 		</endButton>
 		<l:VerticalLayout
 			class="sapUiContentPadding"
 			width="100%">
-			<CheckBox id="isIntervalAppointment" text="Interval appointment" select="handleAppointmentTypeChange"/>
+			<CheckBox id="isIntervalAppointment" text="Interval appointment" select=".handleAppointmentTypeChange"/>
 			<Label text="Select person: " labelFor="selectPerson"/>
 			<Select
 					id="selectPerson"
 					forceSelection="false"
-					change="handleChangeSelect"
 					width="100%"
 					items="{
 						path: '/people'
@@ -31,13 +30,13 @@
 					id="startDate"
 					displayFormat="short"
 					required="true"
-					change="handleCreateChange"/>
+					change=".handleCreateChange"/>
 			<Label text="End date: " labelFor="endDate"/>
 			<DateTimePicker
 					id="endDate"
 					displayFormat="short"
 					required="true"
-					change="handleCreateChange"/>
+					change=".handleCreateChange"/>
 			<Label text="More information: " labelFor="inputInfo"/>
 			<Input id="moreInfo"/>
 		</l:VerticalLayout>

@@ -15,7 +15,7 @@
 					level="H1"
 				/>
 				<ToolbarSpacer />
-				<Button text="Toggle Modify View" press="onPress"/>
+				<Button text="Toggle Modify View" press=".onPress"/>
 			</OverflowToolbar>
 		</headerToolbar>
 
@@ -25,9 +25,9 @@
 					<f:heading>
 
 						<VariantManagement id="vm"
-							select="onSelect"
-							save="onSave"
-							manage="onManage"
+							select=".onSelect"
+							save=".onSave"
+							manage=".onManage"
 							selectedKey="2"
 							defaultKey="2"
 							showFooter="true"

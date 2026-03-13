@@ -41,13 +41,13 @@
 					text="{=${message>/}.length}"
 					visible="{=${message>/}.length > 0}"
 					type="Emphasized"
-					press="onMessagePopoverPress">
+					press=".onMessagePopoverPress">
 				</Button>
 
 				<ToolbarSpacer/>
 
-				<Button text="Delete" press="onDelete" type="Reject"/>
-				<Button text="Clear" press="onClearPress"/>
+				<Button text="Delete" press=".onDelete" type="Reject"/>
+				<Button text="Clear" press=".onClearPress"/>
 
 			</OverflowToolbar>
 		</footer>

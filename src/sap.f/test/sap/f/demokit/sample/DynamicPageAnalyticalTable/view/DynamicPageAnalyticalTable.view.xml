@@ -28,7 +28,7 @@
 						<OverflowToolbar>
 							<GenericTag text="SR"
 								status="Error"
-								press="onGenericTagPress"
+								press=".onGenericTagPress"
 								design="StatusIconHidden">
 								<ObjectNumber number="2"
 									unit="M"
@@ -147,7 +147,7 @@
 						<t:Column width="9rem">
 							<Label text="Details" />
 							<t:template>
-								<Button text="Show Details" press="handleDetailsPress"/>
+								<Button text="Show Details" press=".handleDetailsPress"/>
 							</t:template>
 						</t:Column>
 						<t:Column width="7rem">

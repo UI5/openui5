@@ -27,11 +27,11 @@
 					</FlexBox>
 				</uxap:snappedHeading>
 				<uxap:actions>
-					<ToggleButton text="Edit" type="Emphasized" press="onEditButtonPress" visible="{=!${view>/editMode}}" />
-					<Button text="Delete" type="Transparent" press="onDeleteButtonPress" visible="{=!${view>/editMode}}" />
+					<ToggleButton text="Edit" type="Emphasized" press=".onEditButtonPress" visible="{=!${view>/editMode}}" />
+					<Button text="Delete" type="Transparent" press=".onDeleteButtonPress" visible="{=!${view>/editMode}}" />
 
-					<Button id="save" text="Save" type="Emphasized" visible="{view>/editMode}" press="onSavePress" />
-					<Button id="cancel" text="Cancel" visible="{view>/editMode}" press="onCancelPress" />
+					<Button id="save" text="Save" type="Emphasized" visible="{view>/editMode}" press=".onSavePress" />
+					<Button id="cancel" text="Cancel" visible="{view>/editMode}" press=".onCancelPress" />
 
 				</uxap:actions>
 			</uxap:ObjectPageDynamicHeaderTitle>
@@ -270,7 +270,7 @@
 									</mdc:Field>
 
 									<Label text="Genres"></Label>
-									<mdc:MultiValueField id="fGenres" items="{genres}" editMode="{=${view>/editMode} ? 'Editable' : 'Display'}" change="onMultiChange" display= "Description" valueHelp="FHAuthorGenre">
+									<mdc:MultiValueField id="fGenres" items="{genres}" editMode="{=${view>/editMode} ? 'Editable' : 'Display'}" change=".onMultiChange" display= "Description" valueHelp="FHAuthorGenre">
 										<mdcf:MultiValueFieldItem key="{path: 'genre/code', type: 'sap.ui.model.odata.type.String'}" description="{genre_label}" />
 										<mdc:dependents>
 											<mdc:ValueHelp id="FHAuthorGenre" delegate='\{"name": "sap/ui/v4demo/delegate/ValueHelp.delegate", "payload": \{\}\}'>

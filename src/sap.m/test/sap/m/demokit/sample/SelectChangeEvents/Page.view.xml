@@ -15,8 +15,8 @@
 						path: '/ProductCollection',
 						sorter: { path: 'Name' }
 					}"
-					change="onChange"
-					liveChange="onLiveChange">
+					change=".onChange"
+					liveChange=".onLiveChange">
 					<core:ListItem key="{ProductId}" text="{Name}" />
 				</Select>
 		</content>

@@ -13,7 +13,7 @@
 					<SearchField
 						id="searchField"
 						showRefreshButton="{device>/isNoTouch}"
-						search="handleRefresh"
+						search=".handleRefresh"
 						width="100%" >
 					</SearchField>
 				</contentMiddle>
@@ -23,7 +23,7 @@
 			<PullToRefresh
 				id="pullToRefresh"
 				visible="{device>/isTouch}"
-				refresh="handleRefresh" />
+				refresh=".handleRefresh" />
 			<List id="list" items="{/ProductCollection}">
 				<StandardListItem
 					title="{Name}"

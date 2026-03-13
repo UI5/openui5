@@ -6,7 +6,7 @@
 		    id="Tree"
 		    items="{path: '/'}"
 			busyIndicatorDelay="0"
-			toggleOpenState="onToggleOpenState">
+			toggleOpenState=".onToggleOpenState">
 			<StandardTreeItem title="{text}"/>
 		</Tree>
 </mvc:View>

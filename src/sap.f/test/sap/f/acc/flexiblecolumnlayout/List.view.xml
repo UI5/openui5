@@ -3,6 +3,6 @@
 		<landmarkInfo>
 			<PageAccessibleLandmarkInfo headerRole="None" contentRole="None"/>
 		</landmarkInfo>
-		<Button text="To Detail" press="handleListPress"/>
+		<Button text="To Detail" press=".handleListPress"/>
 	</Page>
 </mvc:View>

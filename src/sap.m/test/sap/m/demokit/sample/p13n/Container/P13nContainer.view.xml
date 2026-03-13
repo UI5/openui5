@@ -15,12 +15,12 @@
 		</RadioButtonGroup>
 
 		<Label labelFor="layoutType" text="Chose P13nContainer layout type"/>
-		<RadioButtonGroup select="selectLayout" id="layoutType" columns="2" class="sapUiMediumMarginBottom">
+		<RadioButtonGroup select=".selectLayout" id="layoutType" columns="2" class="sapUiMediumMarginBottom">
 			<RadioButton id="list" text="List" />
 			<RadioButton id="tabs" text="IconTabBar" />
 		</RadioButtonGroup>
 
-		<Button id="openBtn" text="Show P13nContainer used in Popup" press="onContainerOpen"/>
+		<Button id="openBtn" text="Show P13nContainer used in Popup" press=".onContainerOpen"/>
 
 		<Dialog id="d1" title="My custom p13n Dialog" verticalScrolling="false" contentWidth="25rem" contentHeight="35rem">
 			<p13n:Container id="P13nContainer" listLayout="{/listLayout}" defaultView="view2">
@@ -41,8 +41,8 @@
 				</p13n:AbstractContainerItem>
 			</p13n:Container>
 			<buttons>
-				<Button text="Add custom view" press="addCustomView"/>
-				<Button text="Close Dialog" press="closeDialog"/>
+				<Button text="Add custom view" press=".addCustomView"/>
+				<Button text="Close Dialog" press=".closeDialog"/>
 			</buttons>
 		</Dialog>
 
@@ -65,7 +65,7 @@
 				</p13n:AbstractContainerItem>
 			</p13n:Container>
 			<beginButton>
-				<Button text="Add custom view" press="addCustomView"/>
+				<Button text="Add custom view" press=".addCustomView"/>
 			</beginButton>
 		</ResponsivePopover>
 

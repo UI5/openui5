@@ -21,7 +21,7 @@
 									</l:layoutData>
 									<Label text="Severity:" class="customMargin" />
 									<Select id='severityFilter'
-											change="updateIssuesVisibility"
+											change=".updateIssuesVisibility"
 											selectedKey="{/severityFilter}"
 											items="{/severitiesFilter}"
 											class="customMargin" >
@@ -34,7 +34,7 @@
 									</l:layoutData>
 									<Label text="Category:" class="customMargin" />
 									<Select id='categoryFilter'
-											change="updateIssuesVisibility"
+											change=".updateIssuesVisibility"
 											selectedKey="{/categoryFilter}"
 											items="{/categoriesFilter}"
 											class="customMargin">
@@ -47,7 +47,7 @@
 									</l:layoutData>
 									<Label text="Audiences:" class="customMargin" />
 									<Select id='audiencesFilter'
-											change="updateIssuesVisibility"
+											change=".updateIssuesVisibility"
 											selectedKey="{/audienceFilter}"
 											items="{/audiencesFilter}"
 											class="customMargin" >
@@ -66,7 +66,7 @@
 								<Label text="" class="customMargin" />
 								<MenuButton id='ReportMenuButton' text="Report" icon="sap-icon://order-status" visible="{= ${/analyzePressed}}">
 											<menu>
-												<Menu itemSelected="onReportPress">
+												<Menu itemSelected=".onReportPress">
 													<items>
 														<MenuItem text="View" />
 														<MenuItem text="Download" />
@@ -109,7 +109,7 @@
 										<FlexItemData growFactor="2" />
 									</layoutData>
 								</Text>
-								<Button icon="sap-icon://clear-filter"  press="clearFiltersAndElementSelection" enabled="{/bEnabledFilterButton}">
+								<Button icon="sap-icon://clear-filter"  press=".clearFiltersAndElementSelection" enabled="{/bEnabledFilterButton}">
 									<layoutData>
 										<FlexItemData growFactor="0" />
 									</layoutData>
@@ -123,7 +123,7 @@
 							selectionBehavior="RowOnly"
 							enableColumnReordering="false"
 							rows="{path: '/issues'}"
-							rowSelectionChange="onRowSelectionChanged">
+							rowSelectionChange=".onRowSelectionChanged">
 						<t:rowMode>
 							<trm:Auto rowContentHeight="24"/>
 						</t:rowMode>
@@ -154,7 +154,7 @@
 							selectionMode="Single"
 							selectionBehavior="RowOnly"
 							enableColumnReordering="false"
-							rowSelectionChange="onRowSelection"
+							rowSelectionChange=".onRowSelection"
 							id="issueTable">
 							<t:rowMode>
 								<trm:Fixed rowContentHeight="24" rowCount="{/visibleRowCount}"/>
@@ -230,7 +230,7 @@
 															''
 														],
 														formatter: '.formatter.resolutionUrl'
-													}" press="openDocumentation">
+													}" press=".openDocumentation">
 													<layoutData>
 														<f:ColumnElementData cellsLarge="8" cellsSmall="12" />
 													</layoutData>

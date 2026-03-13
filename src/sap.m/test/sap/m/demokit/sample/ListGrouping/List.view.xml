@@ -21,7 +21,7 @@
 				<ToggleButton
 					icon="sap-icon://menu"
 					tooltip="Enable / Disable Custom Context Menu"
-					press="onToggleContextMenu" />
+					press=".onToggleContextMenu" />
 			</OverflowToolbar>
 		</headerToolbar>
 		<StandardListItem

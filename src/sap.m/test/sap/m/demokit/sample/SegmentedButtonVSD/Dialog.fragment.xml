@@ -3,7 +3,7 @@
 	xmlns:core="sap.ui.core">
 	<ViewSettingsDialog
 		id="mySettingsDialog"
-		confirm="handleConfirm">
+		confirm=".handleConfirm">
 		<sortItems>
 			<ViewSettingsItem text="Field 1" key="1" selected="true" />
 			<ViewSettingsItem text="Field 2" key="2" />

@@ -161,6 +161,7 @@ sap.ui.define([
 
 		opaTest("Should be able to download all apps", function (Given, When, Then) {
 			var fnCreateArchive;
+			var fnHandleExternalDownload;
 			var fnHandleError;
 			var fnHandleWarning;
 
@@ -170,6 +171,7 @@ sap.ui.define([
 				success: function (oPage) {
 					var oController = oPage.getParent().getController();
 					fnCreateArchive = sinon.stub(oController, "createArchive", function () { });
+					fnHandleExternalDownload = sinon.stub(oController, "_handleExternalDownload", function () { });
 					fnHandleError = sinon.stub(oController, "handleError", function () { });
 					fnHandleWarning = sinon.stub(oController, "handleWarning", function () { });
 				}
@@ -209,6 +211,7 @@ sap.ui.define([
 							Opa5.assert.ok(true, "All downloads worked");
 							fnHandleError.restore();
 							fnCreateArchive.restore();
+							fnHandleExternalDownload.restore();
 						}
 					});
 

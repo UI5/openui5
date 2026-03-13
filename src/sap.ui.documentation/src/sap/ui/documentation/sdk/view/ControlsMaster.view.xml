@@ -8,15 +8,15 @@
 	<Page
 			id="exploredMasterPage"
 			showFooter="false"
-			navButtonPress="onNavBack"
+			navButtonPress=".onNavBack"
 			showNavButton="false"
 			class="sapUiDocumentationMasterPage">
 
 		<!-- Header -->
 		<customHeader>
 			<Toolbar width="100%">
-				<SearchField id="searchField" placeholder="{i18n>CONTROLS_MASTER_FILTER_PLACERHOLDER}" liveChange="handleListFilter" class="sapUiDocumentationFilterField" />
-				<Button id="listFilterSettings" icon="sap-icon://filter" press="handleListSettings" tooltip="{i18n>CONTROLS_MASTER_FILTER_BTN_TOOLTIP}"/>
+				<SearchField id="searchField" placeholder="{i18n>CONTROLS_MASTER_FILTER_PLACERHOLDER}" liveChange=".handleListFilter" class="sapUiDocumentationFilterField" />
+				<Button id="listFilterSettings" icon="sap-icon://filter" press=".handleListSettings" tooltip="{i18n>CONTROLS_MASTER_FILTER_BTN_TOOLTIP}"/>
 			</Toolbar>
 		</customHeader>
 
@@ -26,7 +26,7 @@
 				<l:flexContent>
 					<List id="exploredMasterList"
 							mode="{viewModel>/listMode}"
-							selectionChange="onNavToEntity"
+							selectionChange=".onNavToEntity"
 							noDataText="{i18n>CONTROLS_MASTER_NO_DATA_TEXT}"
 							items="{path: '/entities',
 							groupHeaderFactory: '.getGroupHeader',
@@ -42,7 +42,7 @@
 							<Toolbar id="vsFilterBar"
 									active="true"
 									visible="false"
-									press="handleListSettings">
+									press=".handleListSettings">
 								<Label id="vsFilterLabel" />
 							</Toolbar>
 						</infoToolbar>
@@ -51,7 +51,7 @@
 									title="{name}"
 									counter="{sampleCount}"
 									type="{viewModel>/listItemType}"
-									press="onNavToEntity" />
+									press=".onNavToEntity" />
 						</items>
 					</List>
 				</l:flexContent>

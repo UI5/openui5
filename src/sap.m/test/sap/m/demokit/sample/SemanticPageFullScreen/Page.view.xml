@@ -10,44 +10,44 @@
 
 			<semantic:FullscreenPage title="FullScreen Page Title"
 									 showNavButton="true"
-									 navButtonPress="onNavButtonPress">
+									 navButtonPress=".onNavButtonPress">
 					<semantic:addAction>
-						<semantic:AddAction press="onSemanticButtonPress"/>
+						<semantic:AddAction press=".onSemanticButtonPress"/>
 					</semantic:addAction>
 					<semantic:editAction>
-						<semantic:EditAction press="onSemanticButtonPress"/>
+						<semantic:EditAction press=".onSemanticButtonPress"/>
 					</semantic:editAction>
 					<semantic:deleteAction>
-						<semantic:DeleteAction press="onSemanticButtonPress"/>
+						<semantic:DeleteAction press=".onSemanticButtonPress"/>
 					</semantic:deleteAction>
 					<semantic:flagAction>
-						<semantic:FlagAction press="onSemanticButtonPress"/>
+						<semantic:FlagAction press=".onSemanticButtonPress"/>
 					</semantic:flagAction>
 					<semantic:favoriteAction>
-						<semantic:FavoriteAction press="onSemanticButtonPress"/>
+						<semantic:FavoriteAction press=".onSemanticButtonPress"/>
 					</semantic:favoriteAction>
 					<semantic:sendEmailAction>
-						<semantic:SendEmailAction press="onSemanticButtonPress"/>
+						<semantic:SendEmailAction press=".onSemanticButtonPress"/>
 					</semantic:sendEmailAction>
 					<semantic:sendMessageAction>
-						<semantic:SendMessageAction press="onSemanticButtonPress"/>
+						<semantic:SendMessageAction press=".onSemanticButtonPress"/>
 					</semantic:sendMessageAction>
 					<semantic:discussInJamAction>
-						<semantic:DiscussInJamAction press="onSemanticButtonPress"/>
+						<semantic:DiscussInJamAction press=".onSemanticButtonPress"/>
 					</semantic:discussInJamAction>
 					<semantic:shareInJamAction>
-						<semantic:ShareInJamAction press="onSemanticButtonPress"/>
+						<semantic:ShareInJamAction press=".onSemanticButtonPress"/>
 					</semantic:shareInJamAction>
 					<semantic:printAction>
-						<semantic:PrintAction press="onSemanticButtonPress"/>
+						<semantic:PrintAction press=".onSemanticButtonPress"/>
 					</semantic:printAction>
 					<semantic:messagesIndicator>
-						<semantic:MessagesIndicator press="onMessagesButtonPress"/>
+						<semantic:MessagesIndicator press=".onMessagesButtonPress"/>
 					</semantic:messagesIndicator>
 
 					<semantic:customFooterContent>
-						<Button text="CustomFooterBtn" press="onPress"/>
-						<OverflowToolbarButton icon="sap-icon://settings" text="Settings" press="onPress"/>
+						<Button text="CustomFooterBtn" press=".onPress"/>
+						<OverflowToolbarButton icon="sap-icon://settings" text="Settings" press=".onPress"/>
 					</semantic:customFooterContent>
 
 			</semantic:FullscreenPage>

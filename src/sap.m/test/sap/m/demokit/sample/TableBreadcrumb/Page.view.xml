@@ -6,7 +6,7 @@
 	<Page showHeader="false">
 		<content>
 			<Table
-				selectionChange="handleSelectionChange"
+				selectionChange=".handleSelectionChange"
 				inset="false"
 				id="idProductsTable">
 				<headerToolbar>
@@ -56,7 +56,7 @@
 						path: 'Order>/',
 						formatter: '.isAnyProductSelected'
 					}"
-					press="handleOrderPress" />
+					press=".handleOrderPress" />
 			</OverflowToolbar>
 		</footer>
 	</Page>

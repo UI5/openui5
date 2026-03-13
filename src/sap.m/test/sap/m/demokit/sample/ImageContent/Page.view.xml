@@ -4,18 +4,18 @@
 		class="sapUiLargeMarginTop sapUiLargeMarginBottom"
 		src="sap-icon://area-chart"
 		description="Icon"
-		press="press">
+		press=".press">
 	</ImageContent>
 	<ImageContent
 		class="sapUiLargeMarginTop sapUiLargeMarginBottom"
 		src="test-resources/sap/m/demokit/sample/ImageContent/images/ProfileImage_LargeGenTile.png"
 		description="Profile image"
-		press="press">
+		press=".press">
 	</ImageContent>
 	<ImageContent
 		class="sapUiLargeMarginTop sapUiLargeMarginBottom"
 		src="test-resources/sap/m/demokit/sample/ImageContent/images/SAPLogoLargeTile_28px_height.png"
 		description="Logo"
-		press="press">
+		press=".press">
 	</ImageContent>
 </mvc:View>

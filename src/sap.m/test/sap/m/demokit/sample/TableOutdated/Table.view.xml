@@ -7,13 +7,13 @@
 	xmlns="sap.m">
 
 	<OverflowToolbar>
-		<ComboBox change="onChange" selectionChange="onChange" id="oComboBox"
+		<ComboBox change=".onChange" selectionChange=".onChange" id="oComboBox"
 		 items="{ path: '/ProductCollectionStats/Filters/1/values'}">
 			<core:Item text="{text}" />
 		</ComboBox>
 
-		<Button	text="Filter" press="onSearch" icon="sap-icon://filter"/>
-		<Button	text="Reset" press="onReset" type="Transparent"/>
+		<Button	text="Filter" press=".onSearch" icon="sap-icon://filter"/>
+		<Button	text="Reset" press=".onReset" type="Transparent"/>
 		<ToolbarSpacer/>
 
 		<SegmentedButton enabled="false">

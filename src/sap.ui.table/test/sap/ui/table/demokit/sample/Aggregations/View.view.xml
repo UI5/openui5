@@ -29,7 +29,7 @@
 						<m:SearchField
 							placeholder="Filter"
 							value="{ui>/filterValue}"
-							search="handleTxtFilter"
+							search=".handleTxtFilter"
 							width="15rem"/>
 					</m:OverflowToolbar>
 					<m:FacetFilter
@@ -37,14 +37,14 @@
 						type="Simple"
 						showReset="true"
 						showPopoverOKButton="true"
-						reset="handleFacetFilterReset"
+						reset=".handleFacetFilterReset"
 						lists="{/ProductCollectionStats/Filters}">
 						<m:lists>
 							<m:FacetFilterList
 								title="{type}"
 								key="{key}"
 								mode="MultiSelect"
-								listClose="handleListClose"
+								listClose=".handleListClose"
 								items="{ path: 'values', templateShareable: false }" >
 								<m:items>
 									<m:FacetFilterItem
@@ -59,7 +59,7 @@
 					<m:Link
 						class="sapUiMediumMargin"
 						text="No Data found. Press here to reset all filters."
-						press="clearAllFilters"/>
+						press=".clearAllFilters"/>
 				</noData>
 				<columns>
 					<Column width="11rem">

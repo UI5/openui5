@@ -14,7 +14,7 @@
 				width="3rem" />
 		</VBox>
 		<Button
-			press="handleOpenDialog"
+			press=".handleOpenDialog"
 			text="Open Dialog"
 			class="sapUiSmallMarginBegin" />
 	</VBox>

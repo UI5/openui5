@@ -3,6 +3,6 @@
 	<core:ComponentContainer
 		name="manifestModules.scenario9child"
 		id="childComponent"
-		componentCreated="onComponentCreated"
+		componentCreated=".onComponentCreated"
 	/>
 </mvc:View>

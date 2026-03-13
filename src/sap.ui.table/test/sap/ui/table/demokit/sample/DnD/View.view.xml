@@ -17,7 +17,7 @@
 					id="table1"
 					selectionMode="Single"
 					ariaLabelledBy="title"
-					beforeOpenContextMenu="onBeforeOpenContextMenu"
+					beforeOpenContextMenu=".onBeforeOpenContextMenu"
 					rows="{
 						path: '/ProductCollection',
 						filters: {path: 'Rank', operator: 'EQ', value1: '0'}
@@ -32,7 +32,7 @@
 					</dependents>
 					<contextMenu>
 						<m:Menu>
-							<m:MenuItem text="Move to Selected Products" press="moveToTable2" />
+							<m:MenuItem text="Move to Selected Products" press=".moveToTable2" />
 						</m:Menu>
 					</contextMenu>
 					<columns>
@@ -69,10 +69,10 @@
 						<dnd:DragInfo
 							groupName="moveToTable2"
 							sourceAggregation="rows"
-							dragStart="onDragStart" />
+							dragStart=".onDragStart" />
 						<dnd:DropInfo
 							groupName="moveToTable1"
-							drop="onDropTable1" />
+							drop=".onDropTable1" />
 					</dragDropConfig>
 				</Table>
 				<m:VBox justifyContent="Center" class="sapUiTinyMarginBeginEnd">
@@ -80,17 +80,17 @@
 						class="sapUiTinyMarginBottom"
 						icon="sap-icon://navigation-right-arrow"
 						tooltip="Move to selected"
-						press="moveToTable2"/>
+						press=".moveToTable2"/>
 					<m:Button
 						icon="sap-icon://navigation-left-arrow"
 						tooltip="Move to available"
-						press="moveToTable1"/>
+						press=".moveToTable1"/>
 				</m:VBox>
 				<Table
 					id="table2"
 					selectionMode="Single"
 					ariaLabelledBy="title2"
-					beforeOpenContextMenu="onBeforeOpenContextMenu"
+					beforeOpenContextMenu=".onBeforeOpenContextMenu"
 					rows="{
 						path: '/ProductCollection',
 						filters: {path: 'Rank', operator: 'GT', value1: '0'},
@@ -102,9 +102,9 @@
 					</dependents>
 					<contextMenu>
 						<m:Menu>
-							<m:MenuItem text="Move to Available Products" press="moveToTable1" />
-							<m:MenuItem text="Move up" press="moveUp" />
-							<m:MenuItem text="Move down" press="moveDown" />
+							<m:MenuItem text="Move to Available Products" press=".moveToTable1" />
+							<m:MenuItem text="Move up" press=".moveUp" />
+							<m:MenuItem text="Move down" press=".moveDown" />
 						</m:Menu>
 					</contextMenu>
 					<extension>
@@ -114,11 +114,11 @@
 							<m:Button
 								icon="sap-icon://navigation-up-arrow"
 								tooltip="Move up"
-								press="moveUp"/>
+								press=".moveUp"/>
 							<m:Button
 								icon="sap-icon://navigation-down-arrow"
 								tooltip="Move down"
-								press="moveDown"/>
+								press=".moveDown"/>
 						</m:OverflowToolbar>
 					</extension>
 					<columns>
@@ -150,18 +150,18 @@
 						<dnd:DragInfo
 							groupName="moveToTable1"
 							sourceAggregation="rows"
-							dragStart="onDragStart" />
+							dragStart=".onDragStart" />
 						<dnd:DropInfo
 							groupName="moveToTable2"
 							targetAggregation="rows"
 							dropPosition="Between"
-							drop="onDropTable2" />
+							drop=".onDropTable2" />
 						<dnd:DragDropInfo
 							sourceAggregation="rows"
 							targetAggregation="rows"
 							dropPosition="Between"
-							dragStart="onDragStart"
-							drop="onDropTable2" />
+							dragStart=".onDragStart"
+							drop=".onDropTable2" />
 					</dragDropConfig>
 				</Table>
 			</m:HBox>

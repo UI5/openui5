@@ -7,7 +7,7 @@
 		<Button
 			text="Delete"
 			class="sapUiLargeMarginBegin sapUiLargeMarginTop"
-			press="handleDialogPress"/>
+			press=".handleDialogPress"/>
 	</content>
 </Page>
 </mvc:View>

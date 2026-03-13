@@ -2,25 +2,40 @@
 	controllerName="sap.m.sample.TableMultiSelectMode.Table"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
+	xmlns:table="sap.m.table"
 	xmlns:core="sap.ui.core">
 	<Table id="idProductsTable"
-		inset="false"
 		mode="MultiSelect"
 		items="{
 			path: '/ProductCollection',
 			sorter: {
 				path: 'Name'
+			},
+			events: {
+				change: '.onBindingChange'
 			}
-		}">
+		}"
+		selectionChange="onRowSelectionChange"
+		itemActionCount="1"
+		itemActionPress="onItemActionPress"
+		rememberSelections="false">
 		<headerToolbar>
 			<OverflowToolbar>
-				<Title text="Products" level="H2"/>
+				<table:Title id="idTableTitle" totalCount="{ui>/totalCount}" selectedCount="{ui>/selectedCount}">
+					<Title text="Products" level="H2"/>
+				</table:Title>
 				<ToolbarSpacer/>
-				<Label text="Multi selection modes" labelFor="idComboBoxSuccess"></Label>
-				<ComboBox id="idComboBoxSuccess" selectedKey="Default" selectionChange=".onSelectionChange">
+				<SearchField id="idSearchField" width="15rem" search="onSearch" placeholder="Search products..."/>
+				<Label text="Extended view" labelFor="extViewSwitch"/>
+				<Switch id="extViewSwitch" change="onToggleExtView"/>
+				<Label text="Show totalCount" labelFor="disableTotalCountSwitch"/>
+				<Switch id="disableTotalCountSwitch" state="true" change="onToggleTotalCount"/>
+				<Label text="Multi selection modes" labelFor="idComboBoxSuccess"/>
+				<ComboBox id="idComboBoxSuccess" selectedKey="Default" selectionChange="onSelectionChange">
 					<core:Item text="Default" key="Default"></core:Item>
 					<core:Item text="ClearAll" key="ClearAll"></core:Item>
 				</ComboBox>
+				<Button icon="sap-icon://add" text="Add randomized product" press="onAddRow" />
 			</OverflowToolbar>
 		</headerToolbar>
 		<columns>
@@ -36,6 +51,9 @@
 		</columns>
 		<items>
 			<ColumnListItem vAlign="Middle">
+				<actions>
+					<ListItemAction type="Delete" />
+				</actions>
 				<cells>
 					<ObjectIdentifier
 						title="{Name}"

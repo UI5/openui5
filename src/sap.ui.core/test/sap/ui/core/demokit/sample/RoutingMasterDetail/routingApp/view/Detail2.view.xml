@@ -7,7 +7,7 @@
 	<Page
 		title="{productName}"
 		showNavButton="true"
-		navButtonPress="onNavBack">
+		navButtonPress=".onNavBack">
 		<content>
 			<f:SimpleForm title="Product Details">
 				<f:content>
@@ -19,8 +19,8 @@
 			</f:SimpleForm>
 			<layout:VerticalLayout class="sapUiContentPadding">
 				<Text text="Static Routes:" />
-				<Link text="Go to product 1-C" press="onToProduct1C" />
-				<Link text="Go to product 2-D" press="onToProduct2D" />
+				<Link text="Go to product 1-C" press=".onToProduct1C" />
+				<Link text="Go to product 2-D" press=".onToProduct2D" />
 			</layout:VerticalLayout>
 		</content>
 	</Page>

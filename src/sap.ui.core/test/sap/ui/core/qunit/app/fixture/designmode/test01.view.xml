@@ -6,7 +6,7 @@
 	<Button
 		id="Button01"
 		text="Save"
-		press="onPress">
+		press=".onPress">
 	</Button>
 
 </mvc:View>

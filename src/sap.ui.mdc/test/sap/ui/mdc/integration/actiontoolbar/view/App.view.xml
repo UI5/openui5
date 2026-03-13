@@ -11,7 +11,7 @@
 	<App id="app">
 		<Page id="pageId">
 			<headerContent>
-				<Button id="RTAButtonId" icon="sap-icon://wrench" press="onPressRTA" />
+				<Button id="RTAButtonId" icon="sap-icon://wrench" press=".onPressRTA" />
 			</headerContent>
 			<content class="sapUiContentPadding">
 				<mdc:ActionToolbar id="actionToolbarId" width="100%">

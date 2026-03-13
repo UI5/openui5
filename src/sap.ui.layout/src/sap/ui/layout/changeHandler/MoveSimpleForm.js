@@ -380,12 +380,9 @@ sap.ui.define([
 	/**
 	 * Completes the change by adding change handler specific content
 	 *
-	 * @param {sap.ui.fl.Change}
-	 *          oChange change object to be completed
-	 * @param {object}
-	 *          mSpecificChangeInfo as an empty object since no additional attributes are required for this operation
-	 * @param {object}
-	 *          mPropertyBag map containing the application component
+	 * @param {sap.ui.fl.Change} oChange change object to be completed
+	 * @param {object} mSpecificChangeInfo as an empty object since no additional attributes are required for this operation
+	 * @param {object} mPropertyBag map containing the application component
 	 * @public
 	 */
 	MoveSimpleForm.completeChangeContent = function(oChange, mSpecificChangeInfo, mPropertyBag) {
@@ -396,14 +393,14 @@ sap.ui.define([
 		const oAppComponent = mPropertyBag.appComponent;
 
 		const oSimpleForm = oModifier.bySelector(mSpecificChangeInfo.selector, oAppComponent, oView);
-		const aMovedElements = mSpecificChangeInfo.movedElements;
+		const aMovedElements = mSpecificChangeInfo.content.movedElements;
 		if (aMovedElements.length > 1) {
 			Log.warning("Moving more than 1 Formelement is not yet supported.");
 		}
 		const mMovedElement = aMovedElements[0];
 		mMovedElement.element = Element.getElementById(mMovedElement.id);
-		const oSource = Object.assign({}, mSpecificChangeInfo.source);
-		const oTarget = Object.assign({}, mSpecificChangeInfo.target);
+		const oSource = Object.assign({}, mSpecificChangeInfo.content.source);
+		const oTarget = Object.assign({}, mSpecificChangeInfo.content.target);
 		if (!oTarget.parent) {
 			oTarget.parent = Element.getElementById(oTarget.id);
 		}

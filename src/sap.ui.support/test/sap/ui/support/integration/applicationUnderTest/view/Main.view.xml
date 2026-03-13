@@ -5,8 +5,8 @@
 	<App id="myApp">
 		<Page id="mainPage">
 			<headerContent>
-				<Button id="firstButton" text="Open first dialog (with no errors)" press="onFirstDialogPress"/>
-				<Button id="secondButton" text="Open second dialog (with errors)" press="onSecondDialogPress"/>
+				<Button id="firstButton" text="Open first dialog (with no errors)" press=".onFirstDialogPress"/>
+				<Button id="secondButton" text="Open second dialog (with errors)" press=".onSecondDialogPress"/>
 			</headerContent>
 			<Input id="testInput" placeholder="Test"></Input>
 		</Page>

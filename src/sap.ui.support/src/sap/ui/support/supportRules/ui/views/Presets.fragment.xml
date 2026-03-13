@@ -13,7 +13,7 @@
 					<Title id="rulePresetsTitle" text="Rule Presets" />
 				</contentMiddle>
 				<contentRight>
-					<core:Icon id="help" width="18px" src="sap-icon://sys-help" decorative="false" press="openHelp" />
+					<core:Icon id="help" width="18px" src="sap-icon://sys-help" decorative="false" press=".openHelp" />
 				</contentRight>
 			</Bar>
 		</customHeader>
@@ -28,8 +28,8 @@
 					},
 					groupHeaderFactory: '.getGroupHeader'
 				}"
-				itemPress="onPresetItemPress"
-				selectionChange="onPresetChange"
+				itemPress=".onPresetItemPress"
+				selectionChange=".onPresetChange"
 				mode="SingleSelectMaster">
 				<CustomListItem selected="{selected}" type="Active" tooltip="{description}">
 					<HBox
@@ -47,13 +47,13 @@
 								tooltip="Return to default selection"
 								icon="sap-icon://refresh"
 								type="Transparent"
-								press="onPresetItemReset"
+								press=".onPresetItemReset"
 								visible="{= ${isModified} ? true : false}"/>
 							<Button
 								tooltip="Delete Preset"
 								icon="sap-icon://sys-cancel"
 								type="Transparent"
-								press="onPresetItemDelete"
+								press=".onPresetItemDelete"
 								visible="{= ${disableDelete} ? false : true}" />
 						</HBox>
 					</HBox>
@@ -62,8 +62,8 @@
 			<footer>
 				<Toolbar>
 					<ToolbarSpacer />
-					<Button id="presetImport" text="Import" press="onImportPress" />
-					<Button id="presetExport" text="Export" press="onExportPress" />
+					<Button id="presetImport" text="Import" press=".onImportPress" />
+					<Button id="presetExport" text="Export" press=".onExportPress" />
 				</Toolbar>
 			</footer>
 		</Page>

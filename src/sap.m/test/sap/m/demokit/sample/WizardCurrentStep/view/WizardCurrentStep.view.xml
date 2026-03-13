@@ -25,13 +25,13 @@
 						<Bar>
 							<contentRight>
 								<Label text="Set current step: " />
-								<Select change="onCurrentStepChangeLinear" selectedKey="{/linearWizardSelectedStep}" visible="{= ${/selectedShowCase} === 'linear'}">
+								<Select change=".onCurrentStepChangeLinear" selectedKey="{/linearWizardSelectedStep}" visible="{= ${/selectedShowCase} === 'linear'}">
 									<core:Item text="ProductTypeStep" key="ProductTypeStep" />
 									<core:Item text="ProductInfoStep" key="ProductInfoStep" />
 									<core:Item text="OptionalInfoStep" key="OptionalInfoStep" />
 									<core:Item text="PricingStep" key="PricingStep" />
 								</Select>
-								<Select id="selectBranchingCurrentStep" change="onCurrentStepChangeBranching" selectedKey="A" visible="{= ${/selectedShowCase} === 'branching'}">
+								<Select id="selectBranchingCurrentStep" change=".onCurrentStepChangeBranching" selectedKey="A" visible="{= ${/selectedShowCase} === 'branching'}">
 									<core:Item text="A" key="A" />
 									<core:Item text="B1" key="B1" />
 									<core:Item text="B2" key="B2" />
@@ -61,7 +61,7 @@
 						<Bar>
 							<contentRight>
 								<Label text="Set background design: " />
-								<Select change="onBackgroundDesignChange" selectedKey="{/selectedBackgroundDesign}">
+								<Select change=".onBackgroundDesignChange" selectedKey="{/selectedBackgroundDesign}">
 									<core:Item text="Standard" key="Standard" />
 									<core:Item text="Solid" key="Solid" />
 									<core:Item text="List" key="List" />

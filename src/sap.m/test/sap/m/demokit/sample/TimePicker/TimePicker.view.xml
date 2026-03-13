@@ -41,7 +41,7 @@
 				value="{/timePickers/TP1/value}"
 				valueFormat="{/timePickers/TP1/format}"
 				displayFormat="{/timePickers/TP1/format}"
-				change="handleChange"
+				change=".handleChange"
 				maskMode="{= ${/maskMode/state} ? 'On' : 'Off'}"
 				placeholder="{/timePickers/TP1/placeholder}" />
 
@@ -53,7 +53,7 @@
 				valueFormat="{/timePickers/TP2/format}"
 				displayFormat="{/timePickers/TP2/format}"
 				showCurrentTimeButton="true"
-				change="handleChange"
+				change=".handleChange"
 				maskMode="{= ${/maskMode/state} ? 'On' : 'Off'}"
 				placeholder="{/timePickers/TP2/placeholder}" />
 
@@ -63,7 +63,7 @@
 				value: {/timePickers/TP3/value}" />
 		<TimePicker
 				id="TP3"
-				change="handleChange"
+				change=".handleChange"
 				value="{
 					'path':'/timePickers/TP3/value',
 					'type': 'sap.ui.model.type.Time',
@@ -81,7 +81,7 @@
 				id="TP4"
 				valueFormat="{/timePickers/TP4/format}"
 				displayFormat="{/timePickers/TP4/format}"
-				change="handleChange"
+				change=".handleChange"
 				maskMode="{= ${/maskMode/state} ? 'On' : 'Off'}"
 				placeholder="{/timePickers/TP4/placeholder}" />
 		<Label
@@ -91,7 +91,7 @@
 				id="TP5"
 				valueFormat="{/timePickers/TP5/format}"
 				displayFormat="{/timePickers/TP5/format}"
-				change="handleChange"
+				change=".handleChange"
 				initialFocusedDateValue="{/timePickers/TP5/initialFocusedDateValue}"
 				maskMode="{= ${/maskMode/state} ? 'On' : 'Off'}"
 				placeholder="{/timePickers/TP5/placeholder}" />
@@ -102,7 +102,7 @@
 				id="TP6"
 				valueFormat="{/timePickers/TP6/format}"
 				displayFormat="{/timePickers/TP6/format}"
-				change="handleChange"
+				change=".handleChange"
 				support2400="{/timePickers/TP6/support2400}"
 				maskMode="{= ${/maskMode/state} ? 'On' : 'Off'}"
 				value="{/timePickers/TP6/value}"

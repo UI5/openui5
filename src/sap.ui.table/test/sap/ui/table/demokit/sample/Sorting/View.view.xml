@@ -15,7 +15,7 @@
 				id="table"
 				selectionMode="MultiToggle"
 				rows="{/ProductCollection}"
-				sort="sortDeliveryDate"
+				sort=".sortDeliveryDate"
 				ariaLabelledBy="title">
 				<extension>
 					<m:OverflowToolbar style="Clear">
@@ -24,15 +24,15 @@
 						<m:Button
 							icon="sap-icon://sorting-ranking"
 							tooltip="Sort ascending across Categories and Name"
-							press="sortCategoriesAndName"/>
+							press=".sortCategoriesAndName"/>
 						<m:Button
 							icon="sap-icon://sort"
 							tooltip="Sort Categories in addition to current sorting"
-							press="sortCategories"/>
+							press=".sortCategories"/>
 						<m:Button
 							icon="sap-icon://decline"
 							tooltip="Clear all sortings"
-							press="clearAllSortings"/>
+							press=".clearAllSortings"/>
 					</m:OverflowToolbar>
 				</extension>
 				<columns>

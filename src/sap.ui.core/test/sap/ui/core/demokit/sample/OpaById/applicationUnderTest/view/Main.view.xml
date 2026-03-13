@@ -6,7 +6,7 @@
 		<App id="myApp">
 			<Page id="fistPage">
 				<headerContent>
-					<Button id="navigationButton" press="onNavButtonPress" text="I navigate to a secondPage"/>
+					<Button id="navigationButton" press=".onNavButtonPress" text="I navigate to a secondPage"/>
 				</headerContent>
 			</Page>
 			<Page id="secondPage">

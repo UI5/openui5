@@ -12,13 +12,13 @@
 		<DateTimePicker
 			id="DTP1"
 			placeholder="Enter Date"
-			change="handleChange"
+			change=".handleChange"
 			class="sapUiSmallMarginBottom"/>
 		<Label text="With initialFocusedDateValue UI5Date.getInstance(2017, 5, 13, 11, 12, 13)" labelFor="DTP6"/>
 		<DateTimePicker
 			id="DTP6"
 			placeholder="Enter Date"
-			change="handleChange"
+			change=".handleChange"
 			class="sapUiSmallMarginBottom"/>
 		<Label text="DateTimePicker with given Value, Formatter, and with shortcuts for current date and current time" labelFor="DTP2"/>
 		<DateTimePicker
@@ -32,7 +32,7 @@
 					'style': 'long'
 				}
 			}"
-			change="handleChange"
+			change=".handleChange"
 			class="sapUiSmallMarginBottom"/>
 		<Label text="DateTimePicker with given Value and Formatter" labelFor="DTP3"/>
 		<DateTimePicker
@@ -44,7 +44,7 @@
 					'pattern': 'M/d/yy h:mm a'
 				}
 			}"
-			change="handleChange"
+			change=".handleChange"
 			class="sapUiSmallMarginBottom"/>
 		<Label text="DateTimePicker with Islamic date and secondary Gregorian date in calendar" labelFor="DTP4"/>
 		<DateTimePicker
@@ -58,14 +58,14 @@
 				}
 			}"
 			secondaryCalendarType="Gregorian"
-			change="handleChange"
+			change=".handleChange"
 			class="sapUiSmallMarginBottom"/>
 		<Label text="DateTimePicker with steps for minutes and seconds sliders" labelFor="DTP7"/>
 		<DateTimePicker
 			id="DTP7"
 			valueFormat="yyyy-MM-dd-HH-mm-ss"
 			minutesStep="3" secondsStep="5"
-			change="handleChange"
+			change=".handleChange"
 			class="sapUiSmallMarginBottom"/>
 		<Text
 			id="textResult"

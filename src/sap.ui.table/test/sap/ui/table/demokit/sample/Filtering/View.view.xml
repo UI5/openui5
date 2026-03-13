@@ -15,7 +15,7 @@
 				selectionMode="MultiToggle"
 				rows="{/ProductCollection}"
 				enableCellFilter="{ui>/cellFilterOn}"
-				filter="filterPrice"
+				filter=".filterPrice"
 				ariaLabelledBy="title">
 				<extension>
 					<m:OverflowToolbar style="Clear">
@@ -24,7 +24,7 @@
 						<m:ToggleButton
 							icon="sap-icon://complete"
 							tooltip="Show available products only"
-							press="toggleAvailabilityFilter"
+							press=".toggleAvailabilityFilter"
 							pressed="{ui>/availabilityFilterOn}"/>
 						<m:ToggleButton
 							icon="sap-icon://grid"
@@ -33,12 +33,12 @@
 						<m:Button
 							icon="sap-icon://decline"
 							tooltip="Clear all filters"
-							press="clearAllFilters"/>
+							press=".clearAllFilters"/>
 						<m:ToolbarSeparator/>
 						<m:SearchField
 							placeholder="Filter"
 							value="{ui>/globalFilter}"
-							search="filterGlobally"
+							search=".filterGlobally"
 							width="15rem"/>
 					</m:OverflowToolbar>
 				</extension>

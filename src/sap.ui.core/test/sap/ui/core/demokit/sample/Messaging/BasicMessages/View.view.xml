@@ -116,16 +116,16 @@
 					text="{= ${message>/}.length }"
 					visible="{= ${message>/}.length > 0 }"
 					type="Emphasized"
-					press="onMessagePopoverPress" />
+					press=".onMessagePopoverPress" />
 
 				<ToolbarSpacer/>
 
-				<Button type="Accept" text="Success" press="onSuccessPress"/>
-				<Button type="Reject" text="Error" press="onErrorPress"/>
-				<Button text="Warning" press="onWarningPress"/>
-				<Button text="Info" press="onInfoPress"/>
-				<Button text="ValueState" press="onValueStatePress"/>
-				<Button text="Clear" press="onClearPress"/>
+				<Button type="Accept" text="Success" press=".onSuccessPress"/>
+				<Button type="Reject" text="Error" press=".onErrorPress"/>
+				<Button text="Warning" press=".onWarningPress"/>
+				<Button text="Info" press=".onInfoPress"/>
+				<Button text="ValueState" press=".onValueStatePress"/>
+				<Button text="Clear" press=".onClearPress"/>
 
 			</Toolbar>
 		</footer>

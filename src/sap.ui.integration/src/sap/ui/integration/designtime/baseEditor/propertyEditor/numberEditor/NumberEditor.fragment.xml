@@ -4,6 +4,6 @@
 >
 	<Input
 		value="{displayValue}"
-		liveChange="_onLiveChange"
+		liveChange="._onLiveChange"
 	/>
 </core:FragmentDefinition>

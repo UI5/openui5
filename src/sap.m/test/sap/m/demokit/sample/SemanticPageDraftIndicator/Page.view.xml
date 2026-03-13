@@ -12,18 +12,18 @@
 
 			<semantic:FullscreenPage title="FullScreen Page Title"
 									 showNavButton="true"
-									 navButtonPress="onNavButtonPress">
+									 navButtonPress=".onNavButtonPress">
 					<semantic:addAction>
-						<semantic:AddAction press="onSemanticButtonPress"/>
+						<semantic:AddAction press=".onSemanticButtonPress"/>
 					</semantic:addAction>
 					<semantic:flagAction>
-						<semantic:FlagAction press="onSemanticButtonPress"/>
+						<semantic:FlagAction press=".onSemanticButtonPress"/>
 					</semantic:flagAction>
 					<semantic:favoriteAction>
-						<semantic:FavoriteAction press="onSemanticButtonPress"/>
+						<semantic:FavoriteAction press=".onSemanticButtonPress"/>
 					</semantic:favoriteAction>
 					<semantic:messagesIndicator>
-						<semantic:MessagesIndicator press="onMessagesButtonPress"/>
+						<semantic:MessagesIndicator press=".onMessagesButtonPress"/>
 					</semantic:messagesIndicator>
 					<semantic:draftIndicator>
 						<DraftIndicator id="draftIndi" state="Saved"></DraftIndicator>
@@ -35,7 +35,7 @@
 							responsive="true"/>
 						<form:SimpleForm editable="true" layout="ResponsiveGridLayout">
 							<Label text="Type here"/>
-							<Input id="TypeHere" liveChange="handleLiveChange"/>
+							<Input id="TypeHere" liveChange=".handleLiveChange"/>
 						</form:SimpleForm>
 					</semantic:content>
 			</semantic:FullscreenPage>

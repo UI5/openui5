@@ -10,7 +10,7 @@
 					alt="Product photo of speakers"
 					width="{/imageWidth}"
 					decorative="false"
-					press="handleImagePress"/>
+					press=".handleImagePress"/>
 			</VBox>
 			<VBox>
 				<Text id="labelActiveImage" text="Using ariaLabelledBy:" class="sapUiSmallMarginBottom" />
@@ -19,7 +19,7 @@
 					ariaLabelledBy="labelActiveImage"
 					width="{/imageWidth}"
 					decorative="false"
-					press="handleImagePress"/>
+					press=".handleImagePress"/>
 			</VBox>
 		</HBox>
 	</VBox>

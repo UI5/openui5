@@ -2,10 +2,10 @@
 	  xmlns="sap.f"
 	  xmlns:mvc="sap.ui.core.mvc">
 	<FlexibleColumnLayout
-	    columnResize="onColumnResize"
+	    columnResize=".onColumnResize"
 		autoFocus="false"
 		id="fcl"
-		stateChange="onStateChanged"
+		stateChange=".onStateChanged"
 		restoreFocusOnBackNavigation="true"
 		layout="{/layout}"
 		backgroundDesign="Translucent"/>

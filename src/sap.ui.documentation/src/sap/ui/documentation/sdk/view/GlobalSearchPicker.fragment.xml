@@ -21,13 +21,13 @@
 						],
 						formatter: '.formatSuggestionTitle'
 					}"
-					press="onSearchPickerItemPress"
+					press=".onSearchPickerItemPress"
 					type="Active">
 			</StandardListItem>
 		</List>
 		<Link width="100%"
 			  class="sapMSelectListItem sapMSelectListItemBase sapMSelectListItemBaseHoverable"
-			  press="onSearchResultsSummaryPress"
+			  press=".onSearchResultsSummaryPress"
 			  text="{i18n>SEARCH_SUGGESTIONS_ALL_SECTION_TITLE} ({searchData>/matches/AllLength})"
 			  visible="{= ${searchData>/matches/AllLength}>0 }"/>
 		<List id="categoryList">
@@ -35,7 +35,7 @@
 			<StandardListItem
 					title="{i18n>SEARCH_SUGGESTIONS_API_SECTION_TITLE}"
 					counter="{searchData>/matches/APILength}"
-					press="onSearchResultsSummaryPress"
+					press=".onSearchResultsSummaryPress"
 					type="Active">
 				<customData>
 					<core:CustomData key="category" value="apiref" />
@@ -44,7 +44,7 @@
 			<StandardListItem
 					title="{i18n>SEARCH_SUGGESTIONS_DOCUMENTATION_SECTION_TITLE}"
 					counter="{searchData>/matches/DocLength}"
-					press="onSearchResultsSummaryPress"
+					press=".onSearchResultsSummaryPress"
 					type="Active">
 				<customData>
 					<core:CustomData key="category" value="topics" />
@@ -53,7 +53,7 @@
 			<StandardListItem
 					title="{i18n>SEARCH_SUGGESTIONS_SAMPLES_SECTION_TITLE}"
 					counter="{searchData>/matches/ExploredLength}"
-					press="onSearchResultsSummaryPress"
+					press=".onSearchResultsSummaryPress"
 					type="Active">
 				<customData>
 					<core:CustomData key="category" value="entity" />
@@ -62,7 +62,7 @@
 			<StandardListItem
 					title="{i18n>SEARCH_SUGGESTIONS_EXTERNAL_SECTION_TITLE}"
 					counter="{searchData>/matches/ExternalLength}"
-					press="onSearchResultsSummaryPress"
+					press=".onSearchResultsSummaryPress"
 					type="Active">
 				<customData>
 					<core:CustomData key="category" value="external" />

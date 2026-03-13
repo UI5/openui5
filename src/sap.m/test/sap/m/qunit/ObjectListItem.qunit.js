@@ -243,6 +243,30 @@ sap.ui.define([
 		oOLI.destroy();
 	});
 
+	QUnit.test("ARIA attribute 'aria-labelledby' is not set for ObjectMarkers that are invisible", async function(assert) {
+		// create ObjectListItem
+		var oMarkerListItem = new ObjectListItem({
+			id: 'oMarkerListItemListItemId',
+			title: "Title",
+			markers: [
+				new ObjectMarker( "FaveMarker-ARIA", {
+					type: ObjectMarkerType.Favorite,
+					visible: false
+				})
+			]
+		});
+		list.addItem(oMarkerListItem);
+
+		await nextUIUpdate();
+
+		var sAriaLabelledByValue = oMarkerListItem.$().attr("aria-labelledby");
+		// Assert
+		assert.ok(sAriaLabelledByValue.indexOf("FaveMarker-ARIA-text") == -1, "ObjectListItem flagId: 'FaveMarker-ARIA-text' is not added to aria-labelledby attribute");
+
+		// destroy ObjectListItem
+		oMarkerListItem.destroy();
+	});
+
 	/*********************************************/
 
 	var showTextDir = new ObjectListItem({

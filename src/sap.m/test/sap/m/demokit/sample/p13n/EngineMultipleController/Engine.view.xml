@@ -22,21 +22,21 @@
                     <ToolbarSeparator/>
                     <vm:VariantManagement id="p13nVm" for="persoTable"/>
                     <ToolbarSpacer/>
-                    <Button icon="sap-icon://action-settings" press="openPersoDialog" tooltip="Settings"/>
-                    <Button icon="sap-icon://add-employee" press="openPersoDialogPeople" tooltip="Settings"/>
+                    <Button icon="sap-icon://action-settings" press=".openPersoDialog" tooltip="Settings"/>
+                    <Button icon="sap-icon://add-employee" press=".openPersoDialogPeople" tooltip="Settings"/>
                 </OverflowToolbar>
             </headerToolbar>
 
             <dependents>
                 <columnmenu:Menu id="menu">
                     <columnmenu:items>
-                        <columnmenu:ActionItem icon="sap-icon://table-column" label="Columns" press="openPersoDialog"/>
+                        <columnmenu:ActionItem icon="sap-icon://table-column" label="Columns" press=".openPersoDialog"/>
                     </columnmenu:items>
                 </columnmenu:Menu>
             </dependents>
 
             <dragDropConfig>
-                <dnd:DragDropInfo sourceAggregation="columns" targetAggregation="columns" dropPosition="Between" drop="onColumnMove"/>
+                <dnd:DragDropInfo sourceAggregation="columns" targetAggregation="columns" dropPosition="Between" drop=".onColumnMove"/>
             </dragDropConfig>
 
             <noData>

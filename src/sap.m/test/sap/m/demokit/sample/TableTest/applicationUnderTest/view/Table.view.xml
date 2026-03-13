@@ -19,7 +19,7 @@
 					<ToolbarSpacer />
 					<ComboBox id="idPopinLayout"
 						placeholder="Popin layout options"
-						change="onPopinLayoutChanged">
+						change=".onPopinLayoutChanged">
 						<items>
 							<core:Item  text="Block"
 								key="Block"/>
@@ -60,7 +60,7 @@
 			</Column>
 		</columns>
 		<items>
-			<ColumnListItem type="Navigation" press="onMessageDialogPress">
+			<ColumnListItem type="Navigation" press=".onMessageDialogPress">
 				<cells>
 					<ObjectIdentifier
 						title="{Name}"

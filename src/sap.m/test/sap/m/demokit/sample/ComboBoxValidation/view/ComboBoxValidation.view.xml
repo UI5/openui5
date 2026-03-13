@@ -13,7 +13,7 @@
 				path: '/CountriesCollection',
 				sorter: { path: 'text' }
 			}"
-			change="handleChange">
+			change=".handleChange">
 			<core:Item text="{text}" key="{key}" />
 		</ComboBox>
 	</l:VerticalLayout>

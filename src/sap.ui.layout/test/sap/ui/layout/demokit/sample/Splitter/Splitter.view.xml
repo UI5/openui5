@@ -24,10 +24,10 @@
 				</Button>
 			</l:Splitter>
 			<l:HorizontalLayout class="sapUiSmallMarginTop sapUiSmallMarginBegin">
-				<Button text="Add content area" press="btnAddContentArea" />
-				<Button text="Remove content area" press="btnRemoveContentArea" />
-				<Button text="Invalidate Splitter" press="btnInvalidateSplitter" />
-				<Button text="Change Orientation" press="btnChangeOrientation" />
+				<Button text="Add content area" press=".btnAddContentArea" />
+				<Button text="Remove content area" press=".btnRemoveContentArea" />
+				<Button text="Invalidate Splitter" press=".btnInvalidateSplitter" />
+				<Button text="Change Orientation" press=".btnChangeOrientation" />
 				<Text id="eventStatus" text="Nothing happened so far..." class="sapUiTinyMarginTop sapUiTinyMarginBegin" />
 			</l:HorizontalLayout>
 			<l:VerticalLayout id="mainOptions" class="options" />

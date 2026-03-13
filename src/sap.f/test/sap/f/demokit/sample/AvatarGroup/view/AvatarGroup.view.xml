@@ -5,7 +5,7 @@
 		xmlns:m="sap.m"
 		xmlns:l="sap.ui.layout"
 		height="100%">
-			<m:Slider id="slider" value="{/viewPortPercentWidth}" liveChange="onSliderMoved"/>
+			<m:Slider id="slider" value="{/viewPortPercentWidth}" liveChange=".onSliderMoved"/>
 			<l:VerticalLayout id="vl1" width="100%" class="sapUiContentPadding">
 				<m:Label text="AvatarGroup control in Individual mode"
 					class="sapUiSmallMarginBottom sapUiMediumMarginTop" />
@@ -13,7 +13,7 @@
 					id="avatarGroup"
 					groupType="Individual"
 					avatarDisplaySize="S"
-					press="onIndividualPress"
+					press=".onIndividualPress"
 					items="{path: 'items>/content'}">
 						<AvatarGroupItem
 						initials="{items>initials}"
@@ -27,7 +27,7 @@
 					groupType="Group"
 					tooltip="Avatar Group"
 					avatarDisplaySize="M"
-					press="onGroupPress"
+					press=".onGroupPress"
 					items="{path: 'items>/content'}">
 					<AvatarGroupItem initials="{items>initials}"
 						fallbackIcon="{items>fallbackIcon}"

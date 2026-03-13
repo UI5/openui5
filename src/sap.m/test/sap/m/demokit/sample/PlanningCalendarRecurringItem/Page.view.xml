@@ -10,7 +10,7 @@
 			startDate="{path: '/startDate'}"
 			rows="{path: '/people'}"
 			appointmentsVisualization="Filled"
-			rowHeaderPress="handleRowHeaderPress"
+			rowHeaderPress=".handleRowHeaderPress"
 			showEmptyIntervalHeaders="false"
 			viewKey="A"
 			showWeekNumbers="true">

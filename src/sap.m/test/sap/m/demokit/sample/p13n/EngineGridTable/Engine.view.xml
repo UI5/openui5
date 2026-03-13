@@ -11,18 +11,18 @@
     controllerName="sap.m.sample.p13n.EngineGridTable.Engine">
 
     <m:Page showHeader="false">
-        <Table id="persoTable" sort="onSort" columnResize="onColumnResize" columnMove="onColumnMove" rowMode="Auto" ariaLabelledBy="title" sap.ui.fl:flexibility="sap/m/flexibility/EngineFlex" rows="{/items}">
+        <Table id="persoTable" sort=".onSort" columnResize=".onColumnResize" columnMove=".onColumnMove" rowMode="Auto" ariaLabelledBy="title" sap.ui.fl:flexibility="sap/m/flexibility/EngineFlex" rows="{/items}">
             <extension>
                 <m:OverflowToolbar>
                     <m:Title id="title" text="Persons"/>
                     <m:ToolbarSeparator/>
                     <vm:VariantManagement id="p13nVm" for="persoTable"/>
                     <m:ToolbarSpacer/>
-                    <m:Button icon="sap-icon://action-settings" press="openPersoDialog"/>
+                    <m:Button icon="sap-icon://action-settings" press=".openPersoDialog"/>
                 </m:OverflowToolbar>
             </extension>
             <dependents>
-                <columnmenu:Menu id="menu" showTableSettingsButton="true" tableSettingsPressed="openPersoDialog">
+                <columnmenu:Menu id="menu" showTableSettingsButton="true" tableSettingsPressed=".openPersoDialog">
                 </columnmenu:Menu>
             </dependents>
             <noData>

@@ -8,17 +8,17 @@
 		showNavButton="false">
 
 		<content>
-			<Table id="idProductsTable" growing="true" growingThreshold="10" paste="onPaste">
+			<Table id="idProductsTable" growing="true" growingThreshold="10" paste=".onPaste">
 				<headerToolbar>
 					<OverflowToolbar id="otbSubheader">
 						<Title text="Products" level="H2" />
 						<ToolbarSpacer />
 						<Button id="editButton" text="Edit" type="Transparent"
-							press="onEdit" />
+							press=".onEdit" />
 						<Button id="saveButton" text="Save" type="Transparent"
-							press="onSave" visible="false" />
+							press=".onSave" visible="false" />
 						<Button id="cancelButton" text="Cancel" type="Transparent"
-							press="onCancel" visible="false" />
+							press=".onCancel" visible="false" />
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
@@ -66,7 +66,7 @@
 		<footer>
 			<OverflowToolbar id="otbFooter">
 				<ToolbarSpacer />
-				<Button text="Order" press="onOrder">
+				<Button text="Order" press=".onOrder">
 					<layoutData>
 						<OverflowToolbarLayoutData
 							priority="NeverOverflow" />

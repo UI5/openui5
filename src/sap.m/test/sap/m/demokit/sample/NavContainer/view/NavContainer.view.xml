@@ -7,7 +7,7 @@
 		class="sapUiSmallMargin">
 
 		<NavContainer
-			navigationFinished="onNavigationFinished"
+			navigationFinished=".onNavigationFinished"
 			id="navCon"
 			width="98%"
 			height="16em"
@@ -37,7 +37,7 @@
 		<HBox>
 			<Button
 				text="To 1"
-				press="handleNav">
+				press=".handleNav">
 				<layoutData>
 					<FlexItemData growFactor="1" />
 				</layoutData>
@@ -49,7 +49,7 @@
 			</Button>
 			<Button
 				text="To 2"
-				press="handleNav">
+				press=".handleNav">
 				<layoutData>
 					<FlexItemData growFactor="1" />
 				</layoutData>
@@ -61,7 +61,7 @@
 			</Button>
 			<Button
 				text="To 3"
-				press="handleNav">
+				press=".handleNav">
 				<layoutData>
 					<FlexItemData growFactor="1" />
 				</layoutData>
@@ -73,7 +73,7 @@
 			</Button>
 			<Button
 				text="To 4"
-				press="handleNav">
+				press=".handleNav">
 				<layoutData>
 					<FlexItemData growFactor="1" />
 				</layoutData>
@@ -89,7 +89,7 @@
 			<Button
 				text="Back"
 				type="Back"
-				press="handleNav">
+				press=".handleNav">
 				<layoutData>
 					<FlexItemData growFactor="1" />
 				</layoutData>

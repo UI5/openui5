@@ -12,7 +12,7 @@
 			maxDate="{path: '/maxDate'}"
 			rows="{path: '/people'}"
 			appointmentsVisualization="Filled"
-			appointmentSelect="handleAppointmentSelect">
+			appointmentSelect=".handleAppointmentSelect">
 			<toolbarContent>
 				<Title text="Title" titleStyle="H4"/>
 			</toolbarContent>

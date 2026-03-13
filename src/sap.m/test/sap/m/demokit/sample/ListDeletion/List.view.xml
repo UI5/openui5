@@ -5,7 +5,7 @@
 	<List
 		id="list"
 		mode="Delete"
-		delete="handleDelete"
+		delete=".handleDelete"
 		enableBusyIndicator="true"
 		headerText="Products"
 		growing="true"

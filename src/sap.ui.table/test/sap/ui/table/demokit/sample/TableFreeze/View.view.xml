@@ -36,7 +36,7 @@
 							width="20%"
 							placeholder="fixed bottom row count"
 							tooltip="fixed bottom row count"/>
-						<m:Button id="button" text="Apply" press="buttonPress"/>
+						<m:Button id="button" text="Apply" press=".buttonPress"/>
 					</m:OverflowToolbar>
 				</extension>
 				<rowMode>
@@ -93,7 +93,7 @@
 					<Column width="9rem">
 						<m:Label text="Details" />
 						<template>
-							<m:Button text="Show Details" press="handleDetailsPress"/>
+							<m:Button text="Show Details" press=".handleDetailsPress"/>
 						</template>
 					</Column>
 					<Column width="7rem">

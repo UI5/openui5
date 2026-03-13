@@ -13,10 +13,10 @@
 						<l:content>
 							<Button
 								text="Show Message Toast"
-								press="showMessageToast" />
+								press=".showMessageToast" />
 							<Button
 								text="Show Dialog"
-								press="showDialog" />
+								press=".showDialog" />
 						</l:content>
 					</l:VerticalLayout>
 				</content>

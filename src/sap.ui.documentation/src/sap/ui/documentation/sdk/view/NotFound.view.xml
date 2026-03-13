@@ -12,7 +12,7 @@
 				<Button
 						visible="{device>/system/phone}"
 						text="{i18n>NOT_FOUND_BACK}"
-						press="onNavBack"
+						press=".onNavBack"
 						type="Emphasized"/>
 			</additionalContent>
 	</IllustratedMessage>

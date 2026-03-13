@@ -16,7 +16,7 @@
 					<ToolbarSpacer />
 					<Select
 						selectedKey="MultiSelect"
-						change="handleSelectChange">
+						change=".handleSelectChange">
 						<items>
 							<core:Item key="None" text="No Selection" />
 							<core:Item key="SingleSelect" text="Single Selection" />

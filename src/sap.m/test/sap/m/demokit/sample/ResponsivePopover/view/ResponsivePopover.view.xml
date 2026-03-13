@@ -9,12 +9,12 @@
 		<l:content>
 			<Button
 				text="Show Dialog (phone) or Popover (Other)"
-				press="handleResponsivePopoverPress"
+				press=".handleResponsivePopoverPress"
 				ariaHasPopup="Dialog" />
 
 			<Button
 				text="Popover with Custom Footer"
-				press="handleResponsivePopoverFooterPress"
+				press=".handleResponsivePopoverFooterPress"
 				ariaHasPopup="Dialog" />
 		</l:content>
 	</l:VerticalLayout>

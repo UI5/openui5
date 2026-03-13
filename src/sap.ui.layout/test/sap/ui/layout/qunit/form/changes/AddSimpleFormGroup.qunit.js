@@ -58,9 +58,11 @@ sap.ui.define([
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
 					changeType: "addSimpleFormGroup",
-					index: 5,
-					newLabel: "New Control",
-					newControlId: "newId"
+					content: {
+						index: 5,
+						newLabel: "New Control",
+						newControlId: "newId"
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent
@@ -150,9 +152,11 @@ sap.ui.define([
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
 					changeType: "addSimpleFormGroup",
-					index: 0,
-					newLabel: "New Control",
-					newControlId: "newId"
+					content: {
+						index: 0,
+						newLabel: "New Control",
+						newControlId: "newId"
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent
@@ -189,13 +193,15 @@ sap.ui.define([
 		return FlexTestAPI.createFlexObject({
 			changeSpecificData: {
 				changeType: "addSimpleFormGroup",
-				index: 0,
-				newControlId: "newId"
+				content: {
+					index: 0,
+					newControlId: "newId"
+				}
 			},
 			selector: this.oSimpleForm,
 			appComponent: this.oMockedComponent
 		}).catch(function(oError) {
-			assert.strictEqual(oError.message, "oSpecificChangeInfo.newLabel attribute required", "the undefined value raises an error message");
+			assert.strictEqual(oError.message, "oSpecificChangeInfo.content.newLabel attribute required", "the undefined value raises an error message");
 		});
 	});
 
@@ -230,9 +236,11 @@ sap.ui.define([
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
 					changeType: "addSimpleFormGroup",
-					index: 1,
-					newLabel: "New Control",
-					newControlId: "newId"
+					content: {
+						index: 1,
+						newLabel: "New Control",
+						newControlId: "newId"
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent
@@ -296,9 +304,11 @@ sap.ui.define([
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
 					changeType: "addSimpleFormGroup",
-					index: 0,
-					newLabel: "New Control",
-					newControlId: "newId"
+					content: {
+						index: 0,
+						newLabel: "New Control",
+						newControlId: "newId"
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent
@@ -369,9 +379,11 @@ sap.ui.define([
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
 					changeType: "addSimpleFormGroup",
-					index: 1,
-					newLabel: "New Control",
-					newControlId: "newId"
+					content: {
+						index: 1,
+						newLabel: "New Control",
+						newControlId: "newId"
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent

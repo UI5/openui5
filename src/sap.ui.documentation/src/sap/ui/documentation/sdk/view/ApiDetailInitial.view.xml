@@ -23,14 +23,14 @@
 							width="100%"
 							densityAware="false"
 							class="landingImage"
-							load="handleLandingImageLoad"
+							load=".handleLandingImageLoad"
 							visible="{device>/system/phone}"/>
 						<Image
 							src="./resources/sap/ui/documentation/sdk/images/API_ref_M_and_L_cropped_1.jpg"
 							width="100%"
 							class="landingImage"
 							densityAware="false"
-							load="handleLandingImageLoad"
+							load=".handleLandingImageLoad"
 							visible="{=!${device>/system/phone}}"/>
 
 						<Text id="landingImageHeadline"

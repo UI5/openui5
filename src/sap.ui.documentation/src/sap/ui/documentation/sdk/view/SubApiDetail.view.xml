@@ -45,7 +45,7 @@
 								visible="{device>/system/desktop}"
 								icon="sap-icon://full-screen"
 								tooltip="Show this sample in full screen mode"
-								press="onToggleFullScreen" />
+								press=".onToggleFullScreen" />
 						</actions>
 					</ObjectPageDynamicHeaderTitle>
 					<core:ExtensionPoint name="customTitle" />
@@ -101,7 +101,7 @@
 										<template:if test="{data>/hasAnnotations}">
 											<layout:HorizontalLayout class="sapUiTinyMarginTop sapUiDocumentationAnnotationsText">
 												<m:Text text="A detailed description of the OData annotations handled by this control is available"/>
-												<m:Link text="here" press="onAnnotationsLinkPress"/>
+												<m:Link text="here" press=".onAnnotationsLinkPress"/>
 												<m:Text text="."/>
 											</layout:HorizontalLayout>
 											<layout:HorizontalLayout class="sapUiDocumentationAnnotationsText">
@@ -284,7 +284,7 @@
 							<subSections>
 								<custom:ObjectPageSubSection>
 									<custom:blocks>
-										<m:CheckBox text="Show borrowed properties" visible="{/bHasBorrowedProps}" displayOnly="{=!${/bHasSelfProps}}" selected="{=${/bShowBorrowedProps}}" select="onBorrowedPropCheckboxClick"/>
+										<m:CheckBox text="Show borrowed properties" visible="{/bHasBorrowedProps}" displayOnly="{=!${/bHasSelfProps}}" selected="{=${/bShowBorrowedProps}}" select=".onBorrowedPropCheckboxClick"/>
 										<custom:LightTable rows="{path : '/ui5-metadata/properties'}"
 											columnTitles="Name,Type,Default Value,Description"
 											columnCount="4"
@@ -302,7 +302,7 @@
 															src="sap-icon://sys-help-2"
 															color="#286eb4"
 															class="sapUiDocumentationVisibilityInformationIcon"
-															press="onVisibilityInformationClick">
+															press=".onVisibilityInformationClick">
 														</core:Icon>
 													</layout:HorizontalLayout>
 													<m:MessageStrip
@@ -347,7 +347,7 @@
 							<subSections>
 								<custom:ObjectPageSubSection>
 									<custom:blocks>
-										<m:CheckBox text="Show borrowed aggregations" visible="{/bHasBorrowedAggr}" displayOnly="{=!${/bHasSelfAggr}}" selected="{/bShowBorrowedAggr}" select="onBorrowedAggrCheckboxClick"/>
+										<m:CheckBox text="Show borrowed aggregations" visible="{/bHasBorrowedAggr}" displayOnly="{=!${/bHasSelfAggr}}" selected="{/bShowBorrowedAggr}" select=".onBorrowedAggrCheckboxClick"/>
 										<custom:LightTable rows="{path : '/ui5-metadata/aggregations'}"
 											columnTitles="{= ${data>/hasAggregationAltTypes} ? 'Name,Cardinality,Type,Alt types,Description' : 'Name,Cardinality,Type,Description'}"
 											columnCount="{= ${data>/hasAggregationAltTypes} ? 5 : 4}"
@@ -421,7 +421,7 @@
 							<subSections>
 								<custom:ObjectPageSubSection>
 									<custom:blocks>
-										<m:CheckBox text="Show borrowed associations" visible="{/bHasBorrowedAssoc}" displayOnly="{=!${/bHasSelfAssoc}}" selected="{/bShowBorrowedAssoc}" select="onBorrowedAssocCheckboxClick"/>
+										<m:CheckBox text="Show borrowed associations" visible="{/bHasBorrowedAssoc}" displayOnly="{=!${/bHasSelfAssoc}}" selected="{/bShowBorrowedAssoc}" select=".onBorrowedAssocCheckboxClick"/>
 										<custom:LightTable rows="{path : '/ui5-metadata/associations'}"
 											columnCount="4"
 											columnTitles="Name,Cardinality,Type,Description"
@@ -519,7 +519,7 @@
 														src="sap-icon://sys-help-2"
 														color="#286eb4"
 														class="sapUiDocumentationVisibilityInformationIcon"
-														press="onVisibilityInformationClick">
+														press=".onVisibilityInformationClick">
 													</core:Icon>
 												</layout:HorizontalLayout>
 												<template:if test="{=${event>deprecated} !== undefined}">
@@ -634,7 +634,7 @@
 															src="sap-icon://sys-help-2"
 															color="#286eb4"
 															class="sapUiDocumentationVisibilityInformationIcon sapUiTinyMarginEnd"
-															press="onVisibilityInformationClick">
+															press=".onVisibilityInformationClick">
 														</core:Icon>
 														<m:ObjectStatus visible="{=${method>since} !== undefined}" text="Since: {method>since}"/>
 													</layout:HorizontalLayout>

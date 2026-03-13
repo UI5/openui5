@@ -5,132 +5,132 @@
 				<Column><Label text="List" /></Column>
 			</columns>
 			<items>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>
 				</ColumnListItem>
-				<ColumnListItem type="Navigation" vAlign="Middle" press="handleListPress">
+				<ColumnListItem type="Navigation" vAlign="Middle" press=".handleListPress">
 					<cells>
 						<Text text="Open mid column"/>
 					</cells>

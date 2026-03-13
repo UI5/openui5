@@ -35,7 +35,7 @@
 						<OverflowToolbar>
 							<GenericTag text="SR"
 								status="Error"
-								press="onPressOpenPopover"
+								press=".onPressOpenPopover"
 								design="StatusIconHidden">
 								<ObjectNumber number="2"
 									unit="M"
@@ -48,7 +48,7 @@
 						<Button
 								text="Edit"
 								type="Emphasized"
-								press="toggleAreaPriority"/>
+								press=".toggleAreaPriority"/>
 						<Button
 								text="Delete"
 								type="Transparent"/>
@@ -58,14 +58,14 @@
 						<Button
 								text="Toggle Footer"
 								type="Transparent"
-								press="onToggleFooter"/>
+								press=".onToggleFooter"/>
 						<Button
 								icon="sap-icon://action"
 								type="Transparent"/>
 						<Button
 								text="Button with layoutData"
 								type="Transparent"
-								press="onPressOpenPopover">
+								press=".onPressOpenPopover">
 							<layoutData>
 								<OverflowToolbarLayoutData priority="AlwaysOverflow" closeOverflowOnInteraction="false" />
 							</layoutData>
@@ -108,8 +108,8 @@
 								path: 'Name'
 							}
 						}"
-					   class="sapFDynamicPageAlignContent"
-					   width="auto">
+						class="sapFDynamicPageAlignContent"
+						width="auto">
 					<headerToolbar>
 						<Toolbar>
 							<Title text="Products" level="H2"/>

@@ -15,7 +15,7 @@
 			<Table
 				rows="{/ProductCollection}"
 				selectionMode="MultiToggle"
-				paste="onPaste"
+				paste=".onPaste"
 				ariaLabelledBy="title">
 				<extension>
 					<m:OverflowToolbar style="Clear">
@@ -29,7 +29,7 @@
 							<m:Text text="{Name}" wrapping="false" />
 						</template>
 						<dependents>
-							<p:ColumnAIAction press="onAIActionPress"></p:ColumnAIAction>
+							<p:ColumnAIAction press=".onAIActionPress"></p:ColumnAIAction>
 						</dependents>
 					</Column>
 					<Column width="11rem">
@@ -76,7 +76,7 @@
 					<Column width="9rem">
 						<m:Label text="Details" />
 						<template>
-							<m:Button text="Show Details" press="handleDetailsPress"/>
+							<m:Button text="Show Details" press=".handleDetailsPress"/>
 						</template>
 					</Column>
 					<Column width="7rem">
@@ -100,7 +100,7 @@
 						<m:Label text="Additional Categories" />
 						<template>
 							<m:MultiInput
-								tokenUpdate="updateMultipleSelection"
+								tokenUpdate=".updateMultipleSelection"
 								value="{AdditionalCategory}"
 								tokens="{
 									path: 'AdditionalCategoriesSelection',

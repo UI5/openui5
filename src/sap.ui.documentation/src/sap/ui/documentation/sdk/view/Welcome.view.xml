@@ -22,14 +22,14 @@
 							width="100%"
 							class="welcomeImage"
 							densityAware="false"
-							load="handleLandingImageLoad"
+							load=".handleLandingImageLoad"
 							visible="{device>/system/phone}"/>
 						<Image
 							src="./resources/sap/ui/documentation/sdk/images/Home_M_and_L_cropped_1.jpg"
 							width="100%"
 							densityAware="false"
 							class="welcomeImage"
-							load="handleLandingImageLoad"
+							load=".handleLandingImageLoad"
 							visible="{=!${device>/system/phone}}"/>
 
 						<l:VerticalLayout
@@ -45,14 +45,14 @@
 								<Button
 									text="{i18n>WELCOME_BLOCK_1_START_BTN}"
 									type="Emphasized"
-									press="onGetStarted"
+									press=".onGetStarted"
 									class="actionButton"/>
 								<Button
 									class="actionButton sapContrast sapContrastPlus sapUiSmallMarginBegin"
 									visible="{=${welcomeView>/isOpenUI5} !== undefined}"
 									id="readMoreButton"
 									text="{i18n>WELCOME_BLOCK_1_DOWNLOAD_BTN}"
-									press="onDownloadButtonPress">
+									press=".onDownloadButtonPress">
 								</Button>
 							</l:HorizontalLayout>
 						</l:VerticalLayout>
@@ -298,7 +298,7 @@
 									src="./resources/sap/ui/documentation/sdk/images/link-sap.png"
 									tooltip="{i18n>LEGAL_DISCLAIMER_INTERNAL_TOOLTIP}"
 									width="1.25rem"
-									press="onDisclaimerLinkPress"/>
+									press=".onDisclaimerLinkPress"/>
 							</custom:DivContainer>
 							<Text
 									text="{i18n>WELCOME_BLOCK_8_TEXT_1}"
@@ -337,7 +337,7 @@
 									src="./resources/sap/ui/documentation/sdk/images/link-sap.png"
 									tooltip="{i18n>LEGAL_DISCLAIMER_INTERNAL_TOOLTIP}"
 									width="1.25rem"
-									press="onDisclaimerLinkPress"/>
+									press=".onDisclaimerLinkPress"/>
 							</custom:DivContainer>
 							<Text
 									text="{i18n>WELCOME_BLOCK_9_TEXT_1}"
@@ -378,7 +378,7 @@
 									src="./resources/sap/ui/documentation/sdk/images/link-sap.png"
 									tooltip="{i18n>LEGAL_DISCLAIMER_INTERNAL_TOOLTIP}"
 									width="1.25rem"
-									press="onDisclaimerLinkPress"/>
+									press=".onDisclaimerLinkPress"/>
 							</custom:DivContainer>
 							<Text
 									text="{i18n>WELCOME_BLOCK_10_TEXT_1}"
@@ -478,7 +478,7 @@
 								tooltip="{i18n>LEGAL_DISCLAIMER_INTERNAL_TOOLTIP}"
 								width="1.25rem"
 								class="sapUiDisclaimerCommunityLink"
-								press="onDisclaimerLinkPress"/>
+								press=".onDisclaimerLinkPress"/>
 						</HBox>
 					</l:BlockLayoutCell>
 
@@ -503,7 +503,7 @@
 								tooltip="{i18n>LEGAL_DISCLAIMER_EXTERNAL_TOOLTIP}"
 								width="1.25rem"
 								class="sapUiDisclaimerCommunityLink"
-								press="onDisclaimerLinkPress"/>
+								press=".onDisclaimerLinkPress"/>
 						</HBox>
 					</l:BlockLayoutCell>
 
@@ -528,7 +528,7 @@
 								tooltip="{i18n>LEGAL_DISCLAIMER_EXTERNAL_TOOLTIP}"
 								width="1.25rem"
 								class="sapUiDisclaimerCommunityLink"
-								press="onDisclaimerLinkPress"/>
+								press=".onDisclaimerLinkPress"/>
 						</HBox>
 					</l:BlockLayoutCell>
 				</l:BlockLayoutRow>
@@ -555,7 +555,7 @@
 								tooltip="{i18n>LEGAL_DISCLAIMER_EXTERNAL_TOOLTIP}"
 								width="1.25rem"
 								class="sapUiDisclaimerCommunityLink"
-								press="onDisclaimerLinkPress"/>
+								press=".onDisclaimerLinkPress"/>
 						</HBox>
 					</l:BlockLayoutCell>
 
@@ -580,7 +580,7 @@
 								tooltip="{i18n>LEGAL_DISCLAIMER_EXTERNAL_TOOLTIP}"
 								width="1.25rem"
 								class="sapUiDisclaimerCommunityLink"
-								press="onDisclaimerLinkPress"/>
+								press=".onDisclaimerLinkPress"/>
 						</HBox>
 					</l:BlockLayoutCell>
 
@@ -605,7 +605,7 @@
 								tooltip="{i18n>LEGAL_DISCLAIMER_INTERNAL_TOOLTIP}"
 								width="1.25rem"
 								class="sapUiDisclaimerCommunityLink"
-								press="onDisclaimerLinkPress"/>
+								press=".onDisclaimerLinkPress"/>
 						</HBox>
 					</l:BlockLayoutCell>
 				</l:BlockLayoutRow>

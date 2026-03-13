@@ -14,7 +14,7 @@
 		<ToggleButton
 			id="revealGrid"
 			text="Reveal Grid"
-			press="onRevealGrid"
+			press=".onRevealGrid"
 			class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiTinyMarginBottom" />
 
 		<f:GridContainer

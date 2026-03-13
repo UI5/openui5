@@ -1,8 +1,7 @@
 <core:FragmentDefinition
 		xmlns="sap.m"
 		xmlns:core="sap.ui.core">
-	<ViewSettingsDialog id="settingsDialog"
-			confirm="handleConfirm">
+	<ViewSettingsDialog id="settingsDialog">
 		<filterItems>
 			<ViewSettingsFilterItem text="Products" key="1">
 				<items>

@@ -17,17 +17,17 @@
 
 		<customHeader>
 			<Toolbar height="100%" width="100%">
-				<SearchField id="searchField" placeholder="{i18n>API_MASTER_PLACEHOLDER}" liveChange="onTreeFilter" />
-				<Button id="expandAllButton" icon="sap-icon://expand-all" press="onTreeExpandAll" tooltip="{i18n>API_MASTER_EXPAND_BTN_TOOLTIP}" />
-				<Button id="collapseAllButton" icon="sap-icon://collapse-all" press="onTreeCollapseAll" tooltip="{i18n>API_MASTER_COLLAPSE_BTN_TOOLTIP}" />
+				<SearchField id="searchField" placeholder="{i18n>API_MASTER_PLACEHOLDER}" liveChange=".onTreeFilter" />
+				<Button id="expandAllButton" icon="sap-icon://expand-all" press=".onTreeExpandAll" tooltip="{i18n>API_MASTER_EXPAND_BTN_TOOLTIP}" />
+				<Button id="collapseAllButton" icon="sap-icon://collapse-all" press=".onTreeCollapseAll" tooltip="{i18n>API_MASTER_COLLAPSE_BTN_TOOLTIP}" />
 			</Toolbar>
 		</customHeader>
 
 		<subHeader>
 			<Toolbar height="100%" width="100%">
 				<FlexBox height="100%" width="100%" alignItems="Start" justifyContent="Start" wrap="Wrap">
-					<CheckBox id="includeDeprecated" text="{i18n>API_MASTER_DEPRECATED_CB}" select="onIncludeDeprecatedItemsChange" />
-					<CheckBox id="includeExperimental" text="{i18n>API_MASTER_EXPERIMENTAL_CB}" select="onIncludeExperimentalItemsChange" />
+					<CheckBox id="includeDeprecated" text="{i18n>API_MASTER_DEPRECATED_CB}" select=".onIncludeDeprecatedItemsChange" />
+					<CheckBox id="includeExperimental" text="{i18n>API_MASTER_EXPERIMENTAL_CB}" select=".onIncludeExperimentalItemsChange" />
 				</FlexBox>
 			</Toolbar>
 		</subHeader>
@@ -39,7 +39,7 @@
 						id="tree"
 						mode="SingleSelectMaster"
 						noDataText="{i18n>API_MASTER_NO_DATA_TEXT}"
-						selectionChange="onNodeSelect"
+						selectionChange=".onNodeSelect"
 						items="{treeData>/}">
 						<custom:DemokitTreeItem
 							title="{treeData>displayName}"

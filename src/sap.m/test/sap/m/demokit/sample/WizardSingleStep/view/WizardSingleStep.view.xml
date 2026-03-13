@@ -6,5 +6,5 @@
 		xmlns="sap.m">
 		<Button class="sapUiSmallMargin"
 				text="Open Wizard in Dialog"
-				press="handleOpenDialog" />
+				press=".handleOpenDialog" />
 </mvc:View>

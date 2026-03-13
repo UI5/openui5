@@ -22,7 +22,7 @@
 				threshold="15"
 				enableBusyIndicator="true"
 				ariaLabelledBy="title"
-				paste="onPaste">
+				paste=".onPaste">
 				<dependents>
 					<plugins.MultiSelectionPlugin limit="100" enableNotification="true" selectionMode="MultiToggle"/>
 				</dependents>

@@ -9,7 +9,7 @@
 		<u:Calendar
 				id="calendar"
 				showCurrentDateButton="true"
-				select="handleCalendarSelect" />
+				select=".handleCalendarSelect" />
 		<l:HorizontalLayout>
 			<Label
 					text="Selected Date (yyyy-mm-dd):"

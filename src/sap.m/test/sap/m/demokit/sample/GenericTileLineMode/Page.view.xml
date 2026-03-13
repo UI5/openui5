@@ -9,7 +9,7 @@
 			<OverflowToolbar>
 				<ToolbarSpacer/>
 				<Label text="Enforce small size:"/>
-				<Switch id="enforceSmallSwitch" change="changeEnforceSmall" state="false"/>
+				<Switch id="enforceSmallSwitch" change=".changeEnforceSmall" state="false"/>
 				<Label text="Tile Actions:"/>
 				<ComboBox selectedKey="{/scope}" items="{ path: '/scopes' }">
 					<core:Item key="{key}" text="{text}"/>
@@ -30,7 +30,7 @@
 					             subheader="{subtitle}"
 					             state="{=${state} || 'Loaded'}"
 					             scope="{/scope}"
-					             press="press"
+					             press=".press"
 					             class="sapUiTinyMarginEnd"
 					             sizeBehavior="{/sizeBehavior}">
 						<TileContent unit="{unit}" footer="{footer}">
@@ -59,7 +59,7 @@
 					           tiles="{/slideTile1}"
 					            scope="{=${/scope} === 'Actions' ? 'Actions' : 'Display'}"
 					           tooltip="SlideTile 1"
-					           press="pressSlideTile"
+					           press=".pressSlideTile"
 					           class="sapUiTinyMarginEnd"
 					           sizeBehavior="{/sizeBehavior}">
 						<GenericTile id="tile6"
@@ -67,7 +67,7 @@
 						             state="{=${state} || 'Loaded'}"
 						             tooltip="{tooltip}"
 						             frameType="TwoByOne"
-						             press="press"
+						             press=".press"
 						             sizeBehavior="{/sizeBehavior}">
 							<TileContent footer="{footer}">
 								<NewsContent contentText="{contentText}"
@@ -79,7 +79,7 @@
 					           tiles="{/slideTile2}"
 					           scope="{=${/scope} === 'Actions' ? 'Actions' : 'Display'}"
 					           tooltip="SlideTile 2"
-					           press="pressSlideTile"
+					           press=".pressSlideTile"
 					           transitionTime="250" displayTime="2500"
 					           sizeBehavior="{/sizeBehavior}">
 						<GenericTile id="tile7"
@@ -87,7 +87,7 @@
 						             state="{=${state} || 'Loaded'}"
 						             tooltip="{tooltip}"
 						             frameType="TwoByOne"
-						             press="press"
+						             press=".press"
 						             sizeBehavior="{/sizeBehavior}">
 							<TileContent footer="{footer}">
 								<NewsContent contentText="{contentText}"
@@ -106,7 +106,7 @@
 					             state="{=${state} || 'Loaded'}"
 					             scope="{/scope}"
 					             mode="LineMode"
-					             press="press"
+					             press=".press"
 					             sizeBehavior="{/sizeBehavior}"
 								 class="sapUiTinyMarginEnd sapUiTinyMarginBottom">
 						<TileContent footer="{footer}">

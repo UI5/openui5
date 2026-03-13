@@ -11,22 +11,22 @@
 				label="Telephone"
 				value="{Tel}"
 				type="Active"
-				press="handleTelPress" />
+				press=".handleTelPress" />
 			<DisplayListItem
 				label="SMS"
 				value="{Sms}"
 				type="Active"
-				press="handleSmsPress" />
+				press=".handleSmsPress" />
 			<DisplayListItem
 				label="Email"
 				value="{Email}"
 				type="Active"
-				press="handleEmailPress" />
+				press=".handleEmailPress" />
 			<DisplayListItem
 				label="Website"
 				value="{Url}"
 				type="Active"
-				press="handleUrlPress" />
+				press=".handleUrlPress" />
 		</items>
 	</List>
 </mvc:View>

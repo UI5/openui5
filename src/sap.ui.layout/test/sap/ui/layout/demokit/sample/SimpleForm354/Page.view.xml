@@ -9,9 +9,9 @@
 		<customHeader>
 			<Bar>
 				<contentRight>
-					<Button id="edit" text="Edit" enabled="false" press="handleEditPress" />
-					<Button id="save" text="Save" type="Emphasized" visible="false" press="handleSavePress" />
-					<Button id="cancel" text="Cancel" visible="false" press="handleCancelPress" />
+					<Button id="edit" text="Edit" enabled="false" press=".handleEditPress" />
+					<Button id="save" text="Save" type="Emphasized" visible="false" press=".handleSavePress" />
+					<Button id="cancel" text="Cancel" visible="false" press=".handleCancelPress" />
 				</contentRight>
 			</Bar>
 		</customHeader>

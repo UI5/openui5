@@ -13,7 +13,7 @@
 				<Button
 					icon="sap-icon://action"
 					text="Toggle Busy State of Both Controls"
-					press="onAction"
+					press=".onAction"
 				/>
 			</Toolbar>
 

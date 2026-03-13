@@ -7,7 +7,7 @@
 		</TileContent>
 	</GenericTile>
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Status Loaded - with press event"
-		subheader="Subheader" press="press">
+		subheader="Subheader" press=".press">
 		<TileContent unit="Unit" footer="Footer">
 			<ImageContent src="sap-icon://home-share" />
 		</TileContent>
@@ -19,7 +19,7 @@
 		</TileContent>
 	</GenericTile>
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Status Loading - with press event"
-		subheader="Subheader" state="Loading" press="press">
+		subheader="Subheader" state="Loading" press=".press">
 		<TileContent unit="Unit" footer="Footer">
 			<NumericContent scale="M" value="1.96" valueColor="Error" indicator="Down" withMargin="false" />
 		</TileContent>
@@ -33,7 +33,7 @@
 		</TileContent>
 	</GenericTile>
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Status Failed - with press event"
-		subheader="Subheader" frameType="TwoByOne" state="Failed" press="press">
+		subheader="Subheader" frameType="TwoByOne" state="Failed" press=".press">
 		<TileContent unit="Unit" footer="Footer">
 			<FeedContent
 				contentText="@@notify Great outcome of the Presentation today. The new functionality and the design was well received. Berlin, Tokyo, Rome, Budapest, New York, Munich, London"
@@ -52,7 +52,7 @@
 		</GenericTile>
 		<GenericTile
 			backgroundImage="test-resources/sap/m/demokit/sample/GenericTileAsFeedTile/images/NewsImage2.png"
-			frameType="TwoByOne" state="Loaded" press="press">
+			frameType="TwoByOne" state="Loaded" press=".press">
 			<TileContent unit="Unit" footer="Footer">
 				<NewsContent
 					contentText="Status Loaded - with press event"
@@ -67,7 +67,7 @@
 		</TileContent>
 	</GenericTile>
 	<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Status Disabled - with press event"
-		subheader="Subheader" state="Disabled" press="press">
+		subheader="Subheader" state="Disabled" press=".press">
 		<TileContent footer="Footer" unit="Unit">
 			<NumericContent value="3" icon="sap-icon://travel-expense" withMargin="false" />
 		</TileContent>

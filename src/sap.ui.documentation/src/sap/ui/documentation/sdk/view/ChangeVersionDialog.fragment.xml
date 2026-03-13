@@ -9,23 +9,23 @@
 			<Button
 				text="{i18n>CHANGE_VERSION_DIALOG_APPLY_BTN}"
 				type="Emphasized"
-				press="onVersionItemPress">
+				press=".onVersionItemPress">
 			</Button>
 			<Button
 					text="{i18n>CHANGE_VERSION_DIALOG_LATEST_BTN}"
 					type="Ghost"
-					press="onLatestVersionItemPress">
+					press=".onLatestVersionItemPress">
 			</Button>
 			<Button
 					text="{i18n>CHANGE_VERSION_DIALOG_CLOSE_BTN}"
-					press="onCloseVersionDialog">
+					press=".onCloseVersionDialog">
 			</Button>
 		</buttons>
 		<subHeader>
 			<Bar>
 				<contentMiddle>
 					<SearchField
-							liveChange="onChangeVersionDialogSearch"
+							liveChange=".onChangeVersionDialogSearch"
 							showSearchButton="false">
 					</SearchField>
 				</contentMiddle>

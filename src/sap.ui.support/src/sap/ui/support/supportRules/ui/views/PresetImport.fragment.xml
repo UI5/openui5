@@ -7,7 +7,7 @@
 	<Dialog
 		id="importDialog"
 		title="Import a Rule Preset"
-		beforeClose="onImportDialogClose"
+		beforeClose=".onImportDialogClose"
 		resizable="true"
 		contentWidth="650px"
 		contentHeight="400px">
@@ -25,8 +25,8 @@
 					id="fileUpload"
 					buttonOnly="true"
 					buttonText="Browse ..."
-					change="onImportFileChange"
-					typeMissmatch="onImportFileMismatch"
+					change=".onImportFileChange"
+					typeMissmatch=".onImportFileMismatch"
 					fileType="json"
 					mimeType="application/json"
 					class="sapUiTinyMarginBottom">
@@ -78,10 +78,10 @@
 			</f:content>
 		</f:SimpleForm>
 		<beginButton>
-			<Button id="cancel" text="Cancel" press="onImportCancelPress" />
+			<Button id="cancel" text="Cancel" press=".onImportCancelPress" />
 		</beginButton>
 		<endButton>
-			<Button id="importBtn" type="Emphasized" text="Import" enabled="false" press="onImportFinalizePress" class="sapUiTinyMarginEnd" />
+			<Button id="importBtn" type="Emphasized" text="Import" enabled="false" press=".onImportFinalizePress" class="sapUiTinyMarginEnd" />
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

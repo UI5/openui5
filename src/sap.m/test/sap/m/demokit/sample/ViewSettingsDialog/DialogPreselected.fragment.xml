@@ -5,7 +5,7 @@
 		title="Preselected Settings"
 		sortDescending="true"
 		groupDescending="true"
-		confirm="handleConfirm"
+		confirm=".handleConfirm"
 		selectedSortItem="sortItem3">
 		<sortItems>
 			<ViewSettingsItem text="Field 1" key="1" />

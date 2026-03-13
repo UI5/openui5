@@ -13,7 +13,7 @@
 			id="SPC1"
 			class="sapUiSmallMarginTop"
 			title= "My Calendar"
-			viewChange="handleViewChange"
+			viewChange=".handleViewChange"
 			startDate="{path: '/startDate'}"
 			nonWorkingPeriods="{path: '/nonWorkingPeriods'}">
 			<views>

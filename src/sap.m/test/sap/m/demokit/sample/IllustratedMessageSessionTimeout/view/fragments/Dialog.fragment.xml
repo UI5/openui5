@@ -9,17 +9,17 @@
 			<Button
 				visible="{/bIsExpiring}"
 				text="{i18n>ContinueWorking}"
-				press="onDialogClose"
+				press=".onDialogClose"
 				type="Emphasized" />
 			<Button
 				visible="{= !${/bIsExpiring} }"
 				text="{i18n>SignIn}"
-				press="onSignIn"
+				press=".onSignIn"
 				type="Emphasized" />
 			<Button
 				visible="{= !${/bIsExpiring} }"
 				text="{i18n>Close}"
-				press="onDialogClose"/>
+				press=".onDialogClose"/>
 		</buttons>
 		<IllustratedMessage
 			title="{= ${/bIsExpiring} ? ${i18n>TitleExpiring} : ${i18n>TitleExpired} }"

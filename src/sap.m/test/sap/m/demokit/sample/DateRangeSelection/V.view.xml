@@ -23,12 +23,12 @@
 					}
 				]
 			}"
-			change="handleChange"/>
+			change=".handleChange"/>
 
 		<Label text="DateRangeSelection with minDate=2016-01-01 and maxDate=2016-12-31:" labelFor="DRS2"/>
 		<DateRangeSelection
 			id="DRS2"
-			change="handleChange"
+			change=".handleChange"
 			value= "{
 				'type': 'sap.ui.model.type.DateInterval',
 				'parts': [
@@ -48,7 +48,7 @@
 			id="DRS3"
 			showCurrentDateButton="true"
 			showFooter="true"
-			change="handleChange"
+			change=".handleChange"
 			value= "{
 				'type': 'sap.ui.model.type.DateInterval',
 				'parts': [
@@ -66,7 +66,7 @@
 		<Label text="DateRangeSelection with displayFormat 'MM/yyyy':" labelFor="DRS4"/>
 		<DateRangeSelection
 			id="DRS4"
-			change="handleChange"
+			change=".handleChange"
 			value= "{
 				'type': 'sap.ui.model.type.DateInterval',
 				'formatOptions': {
@@ -88,7 +88,7 @@
 		<DateRangeSelection
 			id="DRS5"
 			displayFormat="yyyy"
-			change="handleChange"
+			change=".handleChange"
 			value= "{
 				'type': 'sap.ui.model.type.DateInterval',
 				'formatOptions': {

@@ -9,7 +9,7 @@
 			<VBox class="sapUiSmallMarginEnd">
 				<Label text="Appointment Size:"></Label>
 				<Select
-						change="handleAppointmentHeightChange"
+						change=".handleAppointmentHeightChange"
 						width="230px">
 					<items>
 						<core:Item key="Regular" text="Regular" />
@@ -22,7 +22,7 @@
 			<VBox class="sapUiSmallMarginEnd">
 				<Label text="Appointment Sort:"></Label>
 				<Select
-						change="handleSortChange"
+						change=".handleSortChange"
 						width="230px">
 					<items>
 						<core:Item key="default" text="Default Appointments Sort" />
@@ -33,7 +33,7 @@
 			<VBox class="sapUiSmallMarginEnd">
 				<Label text="Appointment Row Rounding:"></Label>
 				<Select
-					change="handleAppointmentRoundingChange"
+					change=".handleAppointmentRoundingChange"
 					width="230px">
 					<items>
 						<core:Item key="None" text="None" />

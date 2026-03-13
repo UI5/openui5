@@ -3,8 +3,8 @@
 		id="selectDialog"
 		title="{i18n>Purchases}"
 		items="{/Purchases}"
-		search="handleValueHelpSearch"
-		confirm="handleValueHelpConfirm">
+		search=".handleValueHelpSearch"
+		confirm=".handleValueHelpConfirm">
 		<StandardListItem title="{SupplierName}" description="{PurchaseID}"/>
 	</SelectDialog>
 </core:FragmentDefinition>

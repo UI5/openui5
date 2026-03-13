@@ -17,7 +17,7 @@
 						sorter: { path: 'text' },
 						suspended: true
 					}"
-						loadItems="handleLoadItems">
+						loadItems=".handleLoadItems">
 					<core:ListItem key="{key}" text="{text}"/>
 				</ComboBox>
 				<Label text="ComboBox in an Information state" labelFor="idComboBoxInformation"></Label>
@@ -29,7 +29,7 @@
 						sorter: { path: 'text' },
 						suspended: true
 					}"
-						loadItems="handleLoadItems">
+						loadItems=".handleLoadItems">
 					<core:ListItem key="{key}" text="{text}"/>
 				</ComboBox>
 				<Label text="Information state message with a link." labelFor="idComboBoxInformationWithLink"></Label>
@@ -42,7 +42,7 @@
 						sorter: { path: 'text' },
 						suspended: true
 					}"
-					loadItems="handleLoadItems">
+					loadItems=".handleLoadItems">
 					<core:ListItem key="{key}" text="{text}"/>
 					<formattedValueStateText>
 						<FormattedText htmlText="Warning message. Long text used as a warning message with a %%0." >
@@ -62,7 +62,7 @@
 						sorter: { path: 'text' },
 						suspended: true
 					}"
-					loadItems="handleLoadItems">
+					loadItems=".handleLoadItems">
 					<core:ListItem key="{key}" text="{text}"/>
 				</ComboBox>
 				<Label text="Warning state with multiple links." labelFor="idComboWarningWithLinks"></Label>
@@ -74,7 +74,7 @@
 						sorter: { path: 'text' },
 						suspended: true
 					}"
-						loadItems="handleLoadItems">
+						loadItems=".handleLoadItems">
 					<core:ListItem key="{key}" text="{text}"/>
 					<formattedValueStateText>
 						<FormattedText htmlText="Error message. Long text used as an error message with %%0 %%1." >
@@ -94,7 +94,7 @@
 						sorter: { path: 'text' },
 						suspended: true
 					}"
-						loadItems="handleLoadItems">
+						loadItems=".handleLoadItems">
 					<core:ListItem key="{key}" text="{text}"/>
 				</ComboBox>
 			</l:VerticalLayout>

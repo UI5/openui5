@@ -19,17 +19,17 @@
 				showCloseButton="false">
 
 				<buttons>
-					<Button text="{i18n>NEWS_BTN_MARK_AS_READ}" press="handleMarkAsRead" />
+					<Button text="{i18n>NEWS_BTN_MARK_AS_READ}" press=".handleMarkAsRead" />
 				</buttons>
 
 				<NotificationListItem
 					title="{title}"
 					description="{description}"
 					datetime="{updated}"
-					close="handleNewsItemClose"
+					close=".handleNewsItemClose"
 					class="sapUiDemokitCustomNLI">
 					<buttons>
-						<Button visible="{= %{link} !== ''}" text="{i18n>NEWS_BTN_VISIT_LINK}" press="handleVisitLink">
+						<Button visible="{= %{link} !== ''}" text="{i18n>NEWS_BTN_VISIT_LINK}" press=".handleVisitLink">
 							<customData>
 								<core:CustomData key="newsLink" value="{link}"/>
 							</customData>
@@ -54,7 +54,7 @@
 					showCloseButton="false"
 					class="sapUiDemokitCustomNLI">
 					<buttons>
-						<Button visible="{= %{link} !== ''}" text="{i18n>NEWS_BTN_VISIT_LINK}" press="handleVisitLink">
+						<Button visible="{= %{link} !== ''}" text="{i18n>NEWS_BTN_VISIT_LINK}" press=".handleVisitLink">
 							<customData>
 								<core:CustomData key="newsLink" value="{link}"/>
 							</customData>

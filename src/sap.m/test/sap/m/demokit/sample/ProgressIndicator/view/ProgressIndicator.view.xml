@@ -103,10 +103,10 @@
 				<Button id="pi-with-animation-button0"
 				        class="sapUiSmallMarginEnd"
 				        text="Set to 0%"
-				        press="onPIChangeValueButtonPressed"/>
+				        press=".onPIChangeValueButtonPressed"/>
 				<Button id="pi-with-animation-button100"
 				        text="Set to 100%"
-				        press="onPIChangeValueButtonPressed"/>
+				        press=".onPIChangeValueButtonPressed"/>
 			</FlexBox>
 			<Text text="Set the ProgressIndicator to 100% without animation" class="sapUiSmallMarginBottom" />
 			<ProgressIndicator
@@ -120,10 +120,10 @@
 				<Button id="pi-without-animation-button0"
 				        class="sapUiSmallMarginEnd"
 				        text="Set to 0%"
-				        press="onPIChangeValueButtonPressed"/>
+				        press=".onPIChangeValueButtonPressed"/>
 				<Button id="pi-without-animation-button100"
 				        text="Set to 100%"
-				        press="onPIChangeValueButtonPressed"/>
+				        press=".onPIChangeValueButtonPressed"/>
 			</FlexBox>
 		</l:content>
 	</l:VerticalLayout>

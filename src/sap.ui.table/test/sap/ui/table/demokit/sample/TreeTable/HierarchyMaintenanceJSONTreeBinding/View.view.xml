@@ -20,19 +20,19 @@
 				<extension>
 					<m:OverflowToolbar style="Clear">
 						<m:Title id="title" text="Clothing"/>
-						<m:Button id="cut" text="Cut" icon="sap-icon://scissors" press="onCut"/>
-						<m:Button id="paste" text="Paste" icon="sap-icon://paste" press="onPaste" enabled="false"/>
+						<m:Button id="cut" text="Cut" icon="sap-icon://scissors" press=".onCut"/>
+						<m:Button id="paste" text="Paste" icon="sap-icon://paste" press=".onPaste" enabled="false"/>
 						<m:ToolbarSpacer/>
-						<m:Button text="Collapse all" press="onCollapseAll"/>
-						<m:Button text="Expand first level" press="onExpandFirstLevel"/>
+						<m:Button text="Collapse all" press=".onCollapseAll"/>
+						<m:Button text="Expand first level" press=".onExpandFirstLevel"/>
 					</m:OverflowToolbar>
 				</extension>
 				<dragDropConfig>
 					<dnd:DragDropInfo
 							sourceAggregation="rows"
 							targetAggregation="rows"
-							dragStart="onDragStart"
-							drop="onDrop"/>
+							dragStart=".onDragStart"
+							drop=".onDrop"/>
 				</dragDropConfig>
 				<columns>
 					<Column width="13rem">

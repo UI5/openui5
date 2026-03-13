@@ -10,7 +10,7 @@
 				<f:ShellBar
 					title="HTTP Status 404 - Not Found"
 					homeIcon="/resources/sap/ui/documentation/sdk/images/logo_ui5.png"
-					homeIconPressed="onHomePress"
+					homeIconPressed=".onHomePress"
 				>
 				</f:ShellBar>
 			</customHeader>
@@ -25,13 +25,13 @@
 						id="readMoreButton"
 						visible="false"
 						text="Read More"
-						press="onReadMore"
+						press=".onReadMore"
 						type="Emphasized" />
 					<Button
 						id="homePageButton"
 						visible="true"
 						text="Home Page"
-						press="onHomePress" />
+						press=".onHomePress" />
 				</additionalContent>
 			</IllustratedMessage>
 		</Page>

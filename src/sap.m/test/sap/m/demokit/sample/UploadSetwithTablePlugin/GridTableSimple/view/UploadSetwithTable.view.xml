@@ -20,7 +20,7 @@
 				id="table-uploadSet"
 				rows="{documents>/items}"
 				selectionMode="MultiToggle"
-				rowSelectionChange="onSelectionChange">
+				rowSelectionChange=".onSelectionChange">
 
 				<extension>
 					<m:OverflowToolbar style="Clear">
@@ -36,14 +36,14 @@
 							id="downloadSelectedButton"
 							text="Download"
 							enabled="false"
-							press="onDownloadFiles"
+							press=".onDownloadFiles"
 							/>
 						<m:MenuButton text="Add">
 							<m:menu>
 								<m:Menu>
 									<m:MenuItem
 										text="URL"
-										press="openAddOrEditDialog"
+										press=".openAddOrEditDialog"
 									/>
 								</m:Menu>
 							</m:menu>
@@ -56,7 +56,7 @@
 						<m:Button
 							id="removeDocumentButton"
 							text="Remove"
-							press="onRemoveButtonPress"
+							press=".onRemoveButtonPress"
 							enabled="false"
 						>
 							<m:layoutData>
@@ -68,7 +68,7 @@
 						<m:Button
 							id="renameButton"
 							enabled="false"
-							press="onRenameDocument"
+							press=".onRenameDocument"
 							text="Rename"
 						>
 							<m:layoutData>
@@ -81,7 +81,7 @@
 							id="editUrlButton"
 							text="Edit URL"
 							enabled="false"
-							press="onEditUrl"
+							press=".onEditUrl"
 						>
 							<m:layoutData>
 								<m:OverflowToolbarLayoutData
@@ -96,10 +96,10 @@
 					<m:plugins.UploadSetwithTable
 						uploadUrl="/uploadFiles"
 						multiple="true"
-						beforeUploadStarts="onBeforeUploadStarts"
-						itemRenamed="onDocumentRenamedSuccess"
-						uploadCompleted="onUploadCompleted"
-						onActivated="onPluginActivated"
+						beforeUploadStarts=".onBeforeUploadStarts"
+						itemRenamed=".onDocumentRenamedSuccess"
+						uploadCompleted=".onUploadCompleted"
+						onActivated=".onPluginActivated"
 						cloudFilePickerEnabled="true"
 						actions="uploadButton"
 						>
@@ -138,7 +138,7 @@
 							>
 								<m:Link
 									text="{documents>fileName}"
-									press="openPreview"
+									press=".openPreview"
 									class="sapUiTinyMarginBottom"
 								/>
 								<m:Text text="{documents>documentType}" />
@@ -190,7 +190,7 @@
 							class="sapUiTinyMarginBegin"
 							type="Transparent"
 							icon="sap-icon://decline"
-							press="onRemoveHandler"
+							press=".onRemoveHandler"
 							/>
 						</template>
 					</Column>

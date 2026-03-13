@@ -4,9 +4,9 @@
 	<SelectDialog
 			title="Sample Routes"
 			items="{/sampleRoutes}"
-			confirm="handleValueHelpClose"
-			cancel="handleValueHelpClose"
-			search="handleValueHelpSearch">
+			confirm=".handleValueHelpClose"
+			cancel=".handleValueHelpClose"
+			search=".handleValueHelpSearch">
 		<StandardListItem
 				title="{pattern}"
 				description="{description}" />

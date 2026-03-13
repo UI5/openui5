@@ -36,8 +36,8 @@
 						path: 'priority',
 						formatter: '.priorityFormatter'
 					}"
-					close="onItemClose"
-					press="onListItemPress"
+					close=".onItemClose"
+					press=".onListItemPress"
 					authorPicture="{authorPicture}"
 					authorInitials="{authorInitials}"
 					authorAvatarColor="{authorAvatarColor}"

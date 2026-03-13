@@ -22,7 +22,7 @@
 				<headerContent>
 					<layout:VerticalLayout>
 						<m:Text text="This log includes the library notes for the libraries listed below. The distribution patch information shows when changes were delivered in SAPUI5. The version shown after each change indicates the library version where the change was first included."/>
-						<m:Select id="VersionSelect" items="{select>/items}" change="handleVersionChange" visible="false">
+						<m:Select id="VersionSelect" items="{select>/items}" change=".handleVersionChange" visible="false">
 							<core:Item text="{select>value}" key="{select>key}"/>
 						</m:Select>
 					</layout:VerticalLayout>

@@ -1,13 +1,13 @@
 <mvc:View controllerName="example.mvc.test" xmlns:m="sap.m"
 	xmlns:mvc="sap.ui.core.mvc" displayBlock="true">
-	<m:Button id="Button1" text="HEY!" press="doIt"></m:Button>
+	<m:Button id="Button1" text="HEY!" press=".doIt"></m:Button>
 	<m:Panel id="myPanel">
 		<!-- this comment should be ignored -->
-		<m:Button id="Button3" text="HEY default aggregation!" tooltip="hello tooltip" press="doIt"></m:Button>
+		<m:Button id="Button3" text="HEY default aggregation!" tooltip="hello tooltip" press=".doIt"></m:Button>
 		<m:Button id="ButtonX" text="Another Hello" press=".sap.doIt"></m:Button>
 		<m:content>
 			<!-- this comment should be ignored -->
-			<m:Button id="Button2" text="HEY named aggregation!" press="doIt">
+			<m:Button id="Button2" text="HEY named aggregation!" press=".doIt">
 				<!-- this comment should be ignored -->
 			</m:Button>
 			<m:CheckBox text="HEY named aggregation!" />

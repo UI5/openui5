@@ -6,13 +6,13 @@
 		title="{/executionScopeTitle}"
 		contentMinWidth="250px"
 		class="sapUiContentPadding"
-		beforeOpen="onBeforePopoverOpen"
+		beforeOpen=".onBeforePopoverOpen"
 		placement="Bottom">
 		<content>
 			<VBox>
 				<RadioButton groupName="analyzeContext"
 							 text="{/executionScopes/global/displayName}"
-							 select="onContextSelect"
+							 select=".onContextSelect"
 							 selected="{= ${/analyzeContext/key} === 'global'}"
 							 tooltip="{/executionScopes/global/description}">
 					<customData>
@@ -21,7 +21,7 @@
 				</RadioButton>
 				<RadioButton groupName="analyzeContext"
 							 text="{/executionScopes/subtree/displayName}"
-							 select="onContextSelect"
+							 select=".onContextSelect"
 							 selected="{= ${/analyzeContext/key} === 'subtree'}"
 							 tooltip="{/executionScopes/subtree/description}">
 					<customData>
@@ -35,11 +35,11 @@
 						enabled="{= ${/analyzeContext/key} === 'subtree'}"
 						value="{/subtreeExecutionContextId}"
 						width="300px"
-						liveChange="onExecutionContextChange"/>
+						liveChange=".onExecutionContextChange"/>
 				</l:VerticalLayout>
 				<RadioButton groupName="analyzeContext"
 							 text="{/executionScopes/components/displayName}"
-							 select="onContextSelect"
+							 select=".onContextSelect"
 							 selected="{= ${/analyzeContext/key} === 'components'}"
 							 tooltip="{/executionScopes/components/description}">
 					<customData>
@@ -52,7 +52,7 @@
 					class="sapUiSupportToolSettingsPopoverPadding">
 					<CheckBox text="{text}"
 							  enabled="{= ${/analyzeContext/key} === 'components'}"
-							  select="onScopeComponentSelect"
+							  select=".onScopeComponentSelect"
 							  selected="{selected}"
 					/>
 				</l:VerticalLayout>

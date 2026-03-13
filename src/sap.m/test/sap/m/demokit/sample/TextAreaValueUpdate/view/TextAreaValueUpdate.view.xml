@@ -10,7 +10,7 @@
 		<TextArea id="TypeHere"
 			value="{/InputValue}"
 			valueLiveUpdate="{/ValueLiveUpdate}"
-			liveChange="handleLiveChange"
+			liveChange=".handleLiveChange"
 		/>
 		<Label text="input.getValue()"/>
 		<Text id="getValue" text=" "/>

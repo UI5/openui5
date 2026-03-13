@@ -28,7 +28,7 @@
 						fieldWidth="{fieldWidth}"
 						textAlign="{textAlign}"
 						validationMode="{validationMode}"
-						change="onChange"/>
+						change=".onChange"/>
 				</VBox>
 			</HBox>
 		</CustomListItem>

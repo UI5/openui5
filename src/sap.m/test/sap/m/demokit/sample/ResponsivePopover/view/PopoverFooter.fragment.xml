@@ -16,7 +16,7 @@
 				<content>
 					<ToolbarSpacer />
 					<Button text="OK" />
-					<Button text="Cancel" press="handleCloseFooterButton" />
+					<Button text="Cancel" press=".handleCloseFooterButton" />
 				</content>
 			</OverflowToolbar>
 		</footer>

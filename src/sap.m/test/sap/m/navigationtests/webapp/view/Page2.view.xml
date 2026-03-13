@@ -7,7 +7,7 @@
 		id="page"
 		title="Home">
 		<content>
-			<Button text="Go to Home page" press="bntPress" />
+			<Button text="Go to Home page" press=".bntPress" />
 		</content>
 	</Page>
 </mvc:View>

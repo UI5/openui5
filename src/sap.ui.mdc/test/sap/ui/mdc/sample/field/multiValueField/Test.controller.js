@@ -35,7 +35,7 @@ sap.ui.define([
 		) {
 	"use strict";
 
-	return Controller.extend("sap.ui.mdc.base.sample.field.multiValueField.Test", {
+	return Controller.extend("sap.ui.mdc.sample.field.multiValueField.Test", {
 
 		onInit: function(oEvent) {
 			var oView = this.getView();

@@ -138,7 +138,7 @@
 
 		<!-- Custom Title Text Content-->
 		<semantic:titleCustomTextActions>
-			<Button text="ToggleFooter" press="showFooter"/>
+			<Button text="ToggleFooter" press=".showFooter"/>
 		</semantic:titleCustomTextActions>
 
 		<!-- Custom Title Icon Content-->
@@ -183,7 +183,7 @@
 		</semantic:negativeAction>
 
 		<semantic:messagesIndicator>
-			<semantic:MessagesIndicator press="onMessagesButtonPress"/>
+			<semantic:MessagesIndicator press=".onMessagesButtonPress"/>
 		</semantic:messagesIndicator>
 
 		<!-- Custom Footer Content-->

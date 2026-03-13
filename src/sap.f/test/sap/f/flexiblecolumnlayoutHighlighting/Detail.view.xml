@@ -1,7 +1,7 @@
 <mvc:View xmlns="sap.uxap" xmlns:mvc="sap.ui.core.mvc" xmlns:m="sap.m" xmlns:layout="sap.ui.layout" displayBlock="true" controllerName="flexiblecolumnlayoutHighlighting.Detail"
 		height="100%">
 	<m:Page id="detailPage" title="Detail page">
-		<m:SearchField search="onSearchFieldSearch"/>
+		<m:SearchField search=".onSearchFieldSearch"/>
 		<ObjectPageLayout id="ObjectPageLayout"
 						  showTitleInHeaderContent="true">
 			<headerTitle>
@@ -12,7 +12,6 @@
 								  markFavorite="true"
 								  markFlagged="true"
 								  markChanges="true"
-								  markChangesPress="handleMarkChangesPress"
 								  objectSubtitle="Senior Developer"
 								  objectImageURI="test-resources/sap/uxap/images/imageID_273624.png"
 								  objectImageShape="Circle"
@@ -22,16 +21,16 @@
 								  isActionAreaAlwaysVisible="true"
 								  showPlaceholder="true">
 					<actions>
-						<ObjectPageHeaderActionButton icon="sap-icon://full-screen" press="handleFullScreen" tooltip="Enter Full Screen Mode" visible="{= ${/actionButtonsInfo/midColumn/fullScreen} !== null }" />
-						<ObjectPageHeaderActionButton icon="sap-icon://exit-full-screen" press="handleExitFullScreen" tooltip="Exit Full Screen Mode" visible="{= ${/actionButtonsInfo/midColumn/exitFullScreen} !== null }" />
-						<ObjectPageHeaderActionButton icon="sap-icon://decline" press="handleClose" tooltip="Close column" visible="{= ${/actionButtonsInfo/midColumn/closeColumn} !== null }" />
+						<ObjectPageHeaderActionButton icon="sap-icon://full-screen" press=".handleFullScreen" tooltip="Enter Full Screen Mode" visible="{= ${/actionButtonsInfo/midColumn/fullScreen} !== null }" />
+						<ObjectPageHeaderActionButton icon="sap-icon://exit-full-screen" press=".handleExitFullScreen" tooltip="Exit Full Screen Mode" visible="{= ${/actionButtonsInfo/midColumn/exitFullScreen} !== null }" />
+						<ObjectPageHeaderActionButton icon="sap-icon://decline" press=".handleClose" tooltip="Close column" visible="{= ${/actionButtonsInfo/midColumn/closeColumn} !== null }" />
 					</actions>
 				</ObjectPageHeader>
 			</headerTitle>
 			<headerContent>
 				<layout:VerticalLayout>
 					<m:Link text="denise-smith"/>
-					<m:Button text="To detail detail" press="handleDetailPress" />
+					<m:Button text="To detail detail" press=".handleDetailPress" />
 					<m:Link text="DeniseSmith@sap.com"/>
 					<layout:HorizontalLayout>
 					</layout:HorizontalLayout>
@@ -52,7 +51,7 @@
 					<subSections>
 						<ObjectPageSubSection title=" ">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -62,19 +61,19 @@
 					<subSections>
 						<ObjectPageSubSection title="Connect">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
-								<m:Button text="To detail detail" press="handleDetailPress" />
-								<m:Button text="To detail detail" press="handleDetailPress" />
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 
 						<ObjectPageSubSection id="paymentSubSection" title="Payment information">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 							<moreBlocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</moreBlocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -84,12 +83,12 @@
 					<subSections>
 						<ObjectPageSubSection title="Subsection">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="Subsection2">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -99,12 +98,12 @@
 					<subSections>
 						<ObjectPageSubSection title="Subsection">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="Subsection2">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -114,12 +113,12 @@
 					<subSections>
 						<ObjectPageSubSection title="Subsection">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="Subsection2">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -129,12 +128,12 @@
 					<subSections>
 						<ObjectPageSubSection title="Subsection">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="Subsection2">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -144,12 +143,12 @@
 					<subSections>
 						<ObjectPageSubSection title="Subsection">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="Subsection2">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -159,12 +158,12 @@
 					<subSections>
 						<ObjectPageSubSection title="Subsection">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="Subsection2">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -174,12 +173,12 @@
 					<subSections>
 						<ObjectPageSubSection title="Subsection">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="Subsection2">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -189,12 +188,12 @@
 					<subSections>
 						<ObjectPageSubSection title="Subsection">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="Subsection2">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -204,12 +203,12 @@
 					<subSections>
 						<ObjectPageSubSection title="Subsection">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="Subsection2">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -219,12 +218,12 @@
 					<subSections>
 						<ObjectPageSubSection title="Subsection">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="Subsection2">
 							<blocks>
-								<m:Button text="To detail detail" press="handleDetailPress" />
+								<m:Button text="To detail detail" press=".handleDetailPress" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>

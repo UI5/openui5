@@ -22,7 +22,7 @@
 					],
 					formatter: '.isNavigated'
 				}"
-				press="onPress" />
+				press=".onPress" />
 		</items>
 	</List>
 </mvc:View>

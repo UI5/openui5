@@ -9,7 +9,7 @@
 				startDate="{path: '/startDate'}"
 				rows="{path: '/people'}"
 				appointmentsVisualization="Filled"
-				appointmentSelect="handleAppointmentSelect"
+				appointmentSelect=".handleAppointmentSelect"
 				showEmptyIntervalHeaders="false">
 			<toolbarContent>
 				<Title text="Title" titleStyle="H4"/>

@@ -22,7 +22,7 @@
 						description="{ProductId}"
 						type="Active"
 						icon="{ProductPicUrl}"
-						press="onNavToProduct"
+						press=".onNavToProduct"
 						iconDensityAware="false"
 						iconInset="false" />
 				</List>
@@ -31,7 +31,7 @@
 				id="detail"
 				class="sapUiResponsivePadding--header"
 				showNavButton="true"
-				navButtonPress="onNavBack"
+				navButtonPress=".onNavBack"
 				title="Product">
 				<content>
 					<ObjectHeader title="{Name}" >

@@ -7553,35 +7553,30 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	[{
-		iEnd : Infinity,
+		iLength : Infinity,
 		sQueryString : "",
 		iStart : 42,
 		sResourcePath : "Employees?$skip=42"
 	}, {
-		iEnd : Infinity,
+		iLength : Infinity,
 		sQueryString : "?foo",
 		iStart : 42,
 		sResourcePath : "Employees?foo&$skip=42"
 	}, {
-		iEnd : 55,
+		iLength : 55 - 42,
 		sQueryString : "?foo",
 		iStart : 42,
 		sResourcePath : "Employees?foo&$skip=42&$top=13"
 	}, {
-		iEnd : 10,
+		iLength : 10,
 		sQueryString : "?foo",
 		iStart : 0,
 		sResourcePath : "Employees?foo&$skip=0&$top=10"
 	}, {
-		iEnd : Infinity,
+		iLength : Infinity,
 		sQueryString : "?foo",
 		iStart : 0,
 		sResourcePath : "Employees?foo"
-	}, {
-		iEnd : undefined, // undefined is treated as Infinity
-		sQueryString : "",
-		iStart : 42,
-		sResourcePath : "Employees?$skip=42"
 	}].forEach(function (oFixture, i) {
 		QUnit.test("CollectionCache#getResourcePathWithQuery: " + i, function (assert) {
 			var oCache = this.createCache("Employees");
@@ -7589,42 +7584,37 @@ sap.ui.define([
 			oCache.sQueryString = oFixture.sQueryString;
 
 			// code under test
-			assert.strictEqual(oCache.getResourcePathWithQuery(oFixture.iStart, oFixture.iEnd),
+			assert.strictEqual(oCache.getResourcePathWithQuery(oFixture.iStart, oFixture.iLength),
 				oFixture.sResourcePath);
 		});
 	});
 
 	//*********************************************************************************************
 	[{
-		iEnd : Infinity,
+		iLength : Infinity,
 		sQueryString : "",
 		iStart : 43,
 		sResourcePath : "Employees?$skip=41"
 	}, {
-		iEnd : Infinity,
+		iLength : Infinity,
 		sQueryString : "?foo",
 		iStart : 43,
 		sResourcePath : "Employees?foo&$skip=41"
 	}, {
-		iEnd : 56,
+		iLength : 56 - 43,
 		sQueryString : "?foo",
 		iStart : 43,
 		sResourcePath : "Employees?foo&$skip=41&$top=13"
 	}, {
-		iEnd : 11,
+		iLength : 11 - 2,
 		sQueryString : "?foo",
 		iStart : 2,
 		sResourcePath : "Employees?foo&$skip=0&$top=9"
 	}, {
-		iEnd : Infinity,
+		iLength : Infinity,
 		sQueryString : "?foo",
 		iStart : 2,
 		sResourcePath : "Employees?foo"
-	}, {
-		iEnd : undefined, // undefined is treated as Infinity
-		sQueryString : "",
-		iStart : 43,
-		sResourcePath : "Employees?$skip=41"
 	}].forEach(function (oFixture, i) {
 		var sTitle = "CollectionCache#getResourcePathWithQuery: with create #" + i;
 
@@ -7651,7 +7641,7 @@ sap.ui.define([
 				{}, null, false, function fnSubmitCallback() {});
 
 			// code under test
-			assert.strictEqual(oCache.getResourcePathWithQuery(oFixture.iStart, oFixture.iEnd,
+			assert.strictEqual(oCache.getResourcePathWithQuery(oFixture.iStart, oFixture.iLength,
 					"~sSeparateProperty~"),
 				oFixture.sResourcePath);
 		});
@@ -7686,7 +7676,7 @@ sap.ui.define([
 
 		assert.throws(function () {
 			// code under test
-			oCache.getResourcePathWithQuery(1, 2);
+			oCache.getResourcePathWithQuery(1, 1);
 		}, new Error("Must not request created element"));
 	});
 
@@ -8320,7 +8310,7 @@ sap.ui.define([
 			oCache.bSentRequest = false;
 			oCache.aElements.$tail = undefined;
 
-			oCacheMock.expects("getResourcePathWithQuery").withExactArgs(iStart, iEnd)
+			oCacheMock.expects("getResourcePathWithQuery").withExactArgs(iStart, iEnd - iStart)
 				.returns(sResourcePath);
 			this.oRequestorMock.expects("request")
 				.withExactArgs("GET", sinon.match.same(sResourcePath), sinon.match.same(oGroupLock),
@@ -8389,7 +8379,7 @@ sap.ui.define([
 
 		oCache.bSentRequest = false;
 
-		oCacheMock.expects("getResourcePathWithQuery").withExactArgs(iStart, iEnd)
+		oCacheMock.expects("getResourcePathWithQuery").withExactArgs(iStart, iEnd - iStart)
 			.returns("~sResourcePath~");
 		this.oRequestorMock.expects("request")
 			.withExactArgs("GET", "~sResourcePath~", "~oGroupLock~", /*mHeaders*/undefined,
@@ -8487,7 +8477,7 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("CollectionCache#requestElements: obsolete request fails", function (assert) {
 		const oCache = this.createCache("Employees");
-		this.mock(oCache).expects("getResourcePathWithQuery").withExactArgs(5, 10)
+		this.mock(oCache).expects("getResourcePathWithQuery").withExactArgs(5, 5)
 			.returns("~sResourcePath~");
 		this.oRequestorMock.expects("request")
 			.withExactArgs("GET", "~sResourcePath~", "~oGroupLock~", /*mHeaders*/undefined,
@@ -8513,7 +8503,7 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("CollectionCache#requestElements: handleResponse fails", function (assert) {
 		const oCache = this.createCache("Employees");
-		this.mock(oCache).expects("getResourcePathWithQuery").withExactArgs(5, 10)
+		this.mock(oCache).expects("getResourcePathWithQuery").withExactArgs(5, 5)
 			.returns("~sResourcePath~");
 		this.oRequestorMock.expects("request")
 			.withExactArgs("GET", "~sResourcePath~", "~oGroupLock~", /*mHeaders*/undefined,
@@ -14314,13 +14304,13 @@ sap.ui.define([
 		const oBarPromise = new Promise(function (resolve) { fnResolveBar = resolve; });
 
 		const oRequestorMock = this.mock(oCache.oRequestor);
-		oCacheMock.expects("getResourcePathWithQuery").withExactArgs(3, 5, "foo")
+		oCacheMock.expects("getResourcePathWithQuery").withExactArgs(3, 5 - 3, "foo")
 			.returns("~fooPath~");
 		oRequestorMock.expects("lockGroup").withExactArgs("$single", sinon.match.same(oCache))
 			.returns("~fooLock~");
 		oRequestorMock.expects("request").withExactArgs("GET", "~fooPath~", "~fooLock~")
 			.returns(oFooPromise);
-		oCacheMock.expects("getResourcePathWithQuery").withExactArgs(3, 5, "bar")
+		oCacheMock.expects("getResourcePathWithQuery").withExactArgs(3, 5 - 3, "bar")
 			.returns("~barPath~");
 		oRequestorMock.expects("lockGroup").withExactArgs("$single", sinon.match.same(oCache))
 			.returns("~barLock~");
@@ -14465,7 +14455,7 @@ sap.ui.define([
 
 		this.mock(oCache).expects("fetchTypes").withExactArgs().resolves("~types~");
 		this.mock(oCache).expects("getResourcePathWithQuery")
-			.withExactArgs("~iStart~", "~iEnd~", "foo").returns("~path~");
+			.withExactArgs(42, 99 - 42, "foo").returns("~path~");
 		this.mock(oCache.oRequestor).expects("lockGroup")
 			.withExactArgs("$single", sinon.match.same(oCache)).returns("~lock~");
 		const oResponse = {
@@ -14484,8 +14474,7 @@ sap.ui.define([
 		this.mock(oCache.oRequestor).expects("request")
 			.withExactArgs("GET", "~path~", "~lock~").resolves(oResponse);
 		const oVisitResponseMock = this.mock(oCache).expects("visitResponse")
-			.withExactArgs(sinon.match.same(oResponse), "~types~", undefined, undefined,
-				"~iStart~");
+			.withExactArgs(sinon.match.same(oResponse), "~types~", undefined, undefined, 42);
 		const oHelperMock = this.mock(_Helper);
 		oHelperMock.expects("getPrivateAnnotation")
 			.withExactArgs(sinon.match.same(oResponse.value[0]), "predicate").returns("(0)");
@@ -14517,7 +14506,7 @@ sap.ui.define([
 			});
 
 		// code under test
-		await oCache.requestSeparateProperties("~iStart~", "~iEnd~",
+		await oCache.requestSeparateProperties(42, 99,
 			/*oMainPromise*/Promise.resolve(), fnSeparateReceived);
 
 		// wait until processing is completed (note that the promise returned by
@@ -14528,7 +14517,7 @@ sap.ui.define([
 		sinon.assert.callOrder(oVisitResponseMock, oUpdateSelectedMock0, oUpdateSelectedMock1,
 			oUpdateSelectedMock2, fnSeparateReceived);
 		sinon.assert.callCount(fnSeparateReceived, 1);
-		sinon.assert.calledWithExactly(fnSeparateReceived, "foo", "~iStart~", "~iEnd~");
+		sinon.assert.calledWithExactly(fnSeparateReceived, "foo", 42, 99);
 	});
 
 	//*********************************************************************************************
@@ -14540,7 +14529,7 @@ sap.ui.define([
 
 		const oCacheMock = this.mock(oCache);
 		oCacheMock.expects("fetchTypes").withExactArgs().resolves("n/a");
-		oCacheMock.expects("getResourcePathWithQuery").withExactArgs(3, 5, "foo")
+		oCacheMock.expects("getResourcePathWithQuery").withExactArgs(3, 5 - 3, "foo")
 			.returns("~fooPath~");
 		const oRequestorMock = this.mock(oCache.oRequestor);
 		oRequestorMock.expects("lockGroup").withExactArgs("$single", sinon.match.same(oCache))
@@ -14549,7 +14538,7 @@ sap.ui.define([
 		const oFooPromise = new Promise(function (_, reject) { fnRejectFoo = reject; });
 		oRequestorMock.expects("request").withExactArgs("GET", "~fooPath~", "~fooLock~")
 			.returns(oFooPromise);
-		oCacheMock.expects("getResourcePathWithQuery").withExactArgs(3, 5, "bar")
+		oCacheMock.expects("getResourcePathWithQuery").withExactArgs(3, 5 - 3, "bar")
 			.returns("~barPath~");
 		oRequestorMock.expects("lockGroup").withExactArgs("$single", sinon.match.same(oCache))
 			.returns("~barLock~");
@@ -14628,7 +14617,7 @@ sap.ui.define([
 		oCache.setSeparate(["separate"]);
 
 		this.mock(oCache).expects("fetchTypes").withExactArgs().resolves("n/a");
-		this.mock(oCache).expects("getResourcePathWithQuery").withExactArgs(3, 5, "separate")
+		this.mock(oCache).expects("getResourcePathWithQuery").withExactArgs(3, 5 - 3, "separate")
 			.returns("~sResourcePath~");
 		this.mock(oCache.oRequestor).expects("lockGroup")
 			.withExactArgs("$single", sinon.match.same(oCache))

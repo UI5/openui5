@@ -25,10 +25,10 @@
 			</VBox>
 		</content>
 		<beginButton>
-			<Button text="{i18n>APP_SETTINGS_DIALOG_OK_BTN}" press="handleSaveAppSettings" type="Emphasized"/>
+			<Button text="{i18n>APP_SETTINGS_DIALOG_OK_BTN}" press=".handleSaveAppSettings" type="Emphasized"/>
 		</beginButton>
 		<endButton>
-			<Button text="{i18n>APP_SETTINGS_DIALOG_CANCEL_BTN}" press="handleCloseAppSettings"/>
+			<Button text="{i18n>APP_SETTINGS_DIALOG_CANCEL_BTN}" press=".handleCloseAppSettings"/>
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

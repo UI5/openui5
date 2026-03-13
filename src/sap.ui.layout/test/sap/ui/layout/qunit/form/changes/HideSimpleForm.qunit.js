@@ -57,7 +57,9 @@ sap.ui.define([
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
 					changeType: "hideSimpleFormField",
-					removedElement: {id: this.oLabel0.getId()}
+					content: {
+						removedElement: {id: this.oLabel0.getId()}
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent
@@ -109,7 +111,9 @@ sap.ui.define([
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
 					changeType: "hideSimpleFormField",
-					removedElement: {id: this.oLabel0.getId()}
+					content: {
+						removedElement: {id: this.oLabel0.getId()}
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent
@@ -172,7 +176,7 @@ sap.ui.define([
 		assert.throws(function() {
 			HideSimpleForm.completeChangeContent({}, this.oSimpleForm, this.mPropertyBag);
 			},
-			new Error("oSpecificChangeInfo.removedElement.id attribute required"),
+			new Error("oSpecificChangeInfo.content.removedElement.id attribute required"),
 			"the undefined value raises an error message"
 		);
 	});
@@ -214,7 +218,9 @@ sap.ui.define([
 			return FlexTestAPI.createFlexObject({
 				changeSpecificData: {
 					changeType: "removeSimpleFormGroup",
-					removedElement: {id: this.oToolbar1.getId()}
+					content: {
+						removedElement: {id: this.oToolbar1.getId()}
+					}
 				},
 				selector: this.oSimpleForm,
 				appComponent: this.oMockedComponent
@@ -319,7 +325,9 @@ sap.ui.define([
 				FlexTestAPI.createFlexObject({
 					changeSpecificData: {
 						changeType: "removeSimpleFormGroup",
-						removedElement: {id: this.oToolbar1.getId()}
+						content: {
+							removedElement: {id: this.oToolbar1.getId()}
+						}
 					},
 					selector: this.oSimpleForm,
 					appComponent: this.oMockedComponent
@@ -327,7 +335,9 @@ sap.ui.define([
 				FlexTestAPI.createFlexObject({
 					changeSpecificData: {
 						changeType: "removeSimpleFormGroup",
-						removedElement: {id: this.oToolbar1.getId()}
+						content: {
+							removedElement: {id: this.oToolbar1.getId()}
+						}
 					},
 					selector: this.oSimpleForm,
 					appComponent: this.oMockedComponent

@@ -11,7 +11,7 @@
 			value="Astro Phone 6"
 			placeholder="Enter Product ..."
 			showValueHelp="true"
-			valueHelpRequest="handleValueHelp"
+			valueHelpRequest=".handleValueHelp"
 			width="15rem"
 			class="sapUiSmallMarginBottom"/>
 		<Button

@@ -36,12 +36,12 @@
 				<actions>
 					<ObjectPageHeaderActionButton icon="sap-icon://pull-down" text="show section" type="Emphasized"/>
 					<ObjectPageHeaderActionButton icon="sap-icon://show" text="show state" type="Emphasized"/>
-					<ObjectPageHeaderActionButton text="Toggle Footer" hideIcon="true" hideText="false" type="Emphasized" press="toggleFooter"/>
+					<ObjectPageHeaderActionButton text="Toggle Footer" hideIcon="true" hideText="false" type="Emphasized" press=".toggleFooter"/>
 				</actions>
 				<breadcrumbs>
 					<m:Breadcrumbs id="breadcrumbsId" currentLocationText="Object Page Example" >
-						<m:Link text="Page 1 a very long link" press="handleLink1Press"/>
-						<m:Link text="Page 2 long link" press="handleLink2Press"/>
+						<m:Link text="Page 1 a very long link" press=".handleLink1Press"/>
+						<m:Link text="Page 2 long link" press=".handleLink2Press"/>
 					</m:Breadcrumbs>
 				</breadcrumbs>
 			</ObjectPageHeader>

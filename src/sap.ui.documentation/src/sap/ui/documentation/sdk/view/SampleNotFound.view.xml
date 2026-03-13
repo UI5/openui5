@@ -13,11 +13,11 @@
 					<Button
 						visible="{device>/system/phone}"
 						text="{i18n>NOT_FOUND_BACK}"
-						press="onNavBack"
+						press=".onNavBack"
 						type="Emphasized"/>
 					<Button
 						text="{i18n>NOT_FOUND_SAMPLE_NAV_TO_SAMPLES}"
-						press="onNavToSamples"
+						press=".onNavToSamples"
 						type="Emphasized"/>
 				</VBox>
 			</additionalContent>

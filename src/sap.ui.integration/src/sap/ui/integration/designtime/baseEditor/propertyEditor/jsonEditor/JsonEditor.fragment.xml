@@ -4,10 +4,10 @@
 >
 	<Input
 		value="{path: 'value', formatter: 'JSON.stringify'}"
-		liveChange="_onLiveChange"
+		liveChange="._onLiveChange"
 		showSuggestion="true"
 		showValueHelp="true"
-		valueHelpRequest="_openJsonEditor"
+		valueHelpRequest="._openJsonEditor"
 		enabled="{config/enabled}"
 	/>
 </core:FragmentDefinition>

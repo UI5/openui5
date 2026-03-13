@@ -26,7 +26,7 @@
 				</actions>
 				<breadcrumbs>
 					<m:Breadcrumbs>
-						<m:Link text="Page 2 long link" press="handleLink2Press"/>
+						<m:Link text="Page 2 long link" press=".handleLink2Press"/>
 					</m:Breadcrumbs>
 				</breadcrumbs>
 			</ObjectPageHeader>

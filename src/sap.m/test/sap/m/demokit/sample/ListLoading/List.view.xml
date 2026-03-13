@@ -16,7 +16,7 @@
 				<ToolbarSpacer />
 				<Button
 					icon="sap-icon://refresh"
-					press="refreshDataFromBackend" />
+					press=".refreshDataFromBackend" />
 			</OverflowToolbar>
 		</headerToolbar>
 		<StandardListItem

@@ -4,7 +4,7 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m">
 	<Page showHeader="false">
-		<Slider liveChange="onSliderLiveChange" step="20" value="100"/>
+		<Slider liveChange=".onSliderLiveChange" step="20" value="100"/>
 
 		<MessageStrip text="By default, Toolbar items are shrinkable if they have percent-based width (e.g. Input, Slider) or implement the IShrinkable interface (e.g. Text, Label)." class="sapUiTinyMargin" />
 		<Toolbar class="sapUiMediumMarginTop" id="toolbar1">

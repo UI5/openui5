@@ -8,7 +8,7 @@
 
 	<Page>
 		<content>
-			<f:SidePanel id="mySidePanel" sidePanelResizable="true" toggle="onToggle">
+			<f:SidePanel id="mySidePanel" sidePanelResizable="true" toggle=".onToggle">
 				<f:mainContent>
 					<Button text="Button 1" />
 					<Button text="Button 2" />

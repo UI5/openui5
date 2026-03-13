@@ -22,7 +22,7 @@
 					<Button
 						text="Open the popover"
 						id="togglePopoverButton"
-						press="togglePopover">
+						press=".togglePopover">
 					</Button>
 				</l:content>
 			</l:HorizontalLayout>

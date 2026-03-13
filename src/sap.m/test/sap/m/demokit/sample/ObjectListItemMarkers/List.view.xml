@@ -7,7 +7,7 @@
 		<ObjectListItem
 				title="Gladiator MX"
 				type="Active"
-				press="onListItemPress"
+				press=".onListItemPress"
 				number="87.50"
 				numberUnit="EUR">
 			<firstStatus>
@@ -25,7 +25,7 @@
 		<ObjectListItem
 				title="Hurricane GX"
 				type="Active"
-				press="onListItemPress"
+				press=".onListItemPress"
 				number="235"
 				numberUnit="EUR">
 			<firstStatus>
@@ -43,7 +43,7 @@
 		<ObjectListItem
 				title="Power Projector 4713"
 				type="Active"
-				press="onListItemPress"
+				press=".onListItemPress"
 				number="135"
 				numberUnit="EUR">
 			<firstStatus>
@@ -62,7 +62,7 @@
 		<ObjectListItem
 				title="Webcam"
 				type="Active"
-				press="onListItemPress"
+				press=".onListItemPress"
 				number="15"
 				numberUnit="EUR">
 			<firstStatus>

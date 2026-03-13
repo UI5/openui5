@@ -43,9 +43,9 @@
 
 			<mdc:FilterBar id="authorsFilterBar"
 				variantBackreference="IDVariantManagementOfTable"
-				filtersChanged="onFiltersChanged" 
-				liveMode="false" 
-				delegate='\{"name": "sap/ui/v4demo/delegate/Authors.FB.delegate", "payload": \{"collectionName": "Authors"\}\}' 
+				filtersChanged=".onFiltersChanged"
+				liveMode="false"
+				delegate='\{"name": "sap/ui/v4demo/delegate/Authors.FB.delegate", "payload": \{"collectionName": "Authors"\}\}'
 				propertyInfo='[
 					\{"name": "name", "label": "Name", "dataType": "Edm.String", "constraints": \{"maxLength": 111\}, "group": "CatalogService.Authors", "groupLabel": "Authors"\},
 					\{"name": "dateOfBirth", "label": "Date of Birth", "dataType": "Edm.Date", "maxConditions": -1, "group": "CatalogService.Authors", "groupLabel": "Authors"\},
@@ -383,13 +383,13 @@
 					<mdc:rowSettings>
 						<mdc:table.RowSettings >
 							<mdc:rowActions >
-								<mdc:table.RowActionItem type="Navigation" press="onRowPress"/>
+								<mdc:table.RowActionItem type="Navigation" press=".onRowPress"/>
 							</mdc:rowActions >
 						</mdc:table.RowSettings>
 					</mdc:rowSettings>
 					<mdc:actions>
 						<mdcat:ActionToolbarAction>
-							<Button type="Emphasized" text="Add Author" press="onAddButtonPress" />
+							<Button type="Emphasized" text="Add Author" press=".onAddButtonPress" />
 						</mdcat:ActionToolbarAction>
 					</mdc:actions>
 					<mdc:columns>

@@ -7,7 +7,7 @@
 		title="{i18n>NotFound.title}"
 		description="{i18n>NotFound.description}">
 		<additionalContent>
-			<Button text="{i18n>NotFound.back}" press="onNavBack" />
+			<Button text="{i18n>NotFound.back}" press=".onNavBack" />
 		</additionalContent>
 	</IllustratedMessage>
 </mvc:View>

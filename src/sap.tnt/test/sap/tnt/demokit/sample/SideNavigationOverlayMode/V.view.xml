@@ -16,7 +16,7 @@
 								showSearch="true"
 								showNotifications="true"
 								notificationsNumber="2"
-								menuButtonPressed="onToggleSideNav">
+								menuButtonPressed=".onToggleSideNav">
 								<f:profile>
 									<Avatar initials="SN"/>
 								</f:profile>

@@ -21,7 +21,7 @@
 						],
 						formatter: '.isNavigated'
 					}"
-				press="onPress">
+				press=".onPress">
 				<cells>
 					<ObjectIdentifier title="{Name}" text="{ProductId}" />
 					<Text text="{SupplierName}" />

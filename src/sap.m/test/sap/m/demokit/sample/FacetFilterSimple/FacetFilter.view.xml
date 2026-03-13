@@ -8,8 +8,8 @@
 			type="Simple"
 			showPersonalization="true"
 			showReset="true"
-			reset="handleFacetFilterReset"
-			confirm="handleConfirm"
+			reset=".handleFacetFilterReset"
+			confirm=".handleConfirm"
 			lists="{/ProductCollectionStats/Filters}">
 				<FacetFilterList
 					title="{type}"

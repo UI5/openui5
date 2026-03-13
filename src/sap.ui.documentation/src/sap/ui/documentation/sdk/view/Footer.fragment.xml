@@ -33,7 +33,7 @@
 						<Link
 								class="sapUiLargeMarginEnd sapUiTinyMarginBottom sapUiDocumentationFooterLink"
 								text="{i18n>FOOTER_PRIVACY}"
-								press="navToPrivacyStatement"/>
+								press=".navToPrivacyStatement"/>
 						<Link
 								class="sapUiTinyMarginBottom sapUiLargeMarginEnd sapUiDocumentationFooterLink"
 								text="{i18n>FOOTER_TERMS}"
@@ -55,7 +55,7 @@
 						<Link
 								class="sapUiDocumentationFooterLink"
 								text="{i18n>APP_SETTINGS_DIALOG_COOKIE_PREFERENCES}"
-								press="onEditCookiePreferencesRequest"/>
+								press=".onEditCookiePreferencesRequest"/>
 					</items>
 				</FlexBox>
 			</items>

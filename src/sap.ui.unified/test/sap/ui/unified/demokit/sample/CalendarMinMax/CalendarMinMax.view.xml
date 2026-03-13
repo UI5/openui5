@@ -8,7 +8,7 @@
 	<l:VerticalLayout>
 		<u:Calendar
 				id="calendar"
-				select="handleCalendarSelect"
+				select=".handleCalendarSelect"
 				minDate="{path: '/minDate'}"
 				maxDate="{path: '/maxDate'}"
 				disabledDates="{path: '/disabled'}">
@@ -33,7 +33,7 @@
 				<Label
 						text="Toggle week numbers:"/>
 				<Switch
-						state="true" change="handleShowWeekNumbers"/>
+						state="true" change=".handleShowWeekNumbers"/>
 			</FlexBox>
 		</l:HorizontalLayout>
 	</l:VerticalLayout>

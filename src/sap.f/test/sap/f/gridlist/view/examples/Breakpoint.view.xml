@@ -10,7 +10,7 @@
 		items="{ path: '/' }">
 
 		<f:customLayout>
-            <grid:GridResponsiveLayout layoutChange="onLayoutChange">
+            <grid:GridResponsiveLayout layoutChange=".onLayoutChange">
                 <grid:layoutS>
                     <grid:GridSettings
                         gridTemplateColumns="repeat(auto-fit, 8rem)"
@@ -56,7 +56,7 @@
 		items="{ path: '/' }">
 
         <f:customLayout>
-            <grid:GridResponsiveLayout layoutChange="onLayoutChange">
+            <grid:GridResponsiveLayout layoutChange=".onLayoutChange">
                 <grid:layoutS>
                     <grid:GridSettings
                         gridTemplateColumns="repeat(auto-fit, 8rem)"

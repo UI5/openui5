@@ -21,7 +21,7 @@
 			</VBox>
 		</content>
 		<beginButton>
-			<Button text="{i18n>CACHE_CLEANUP_DIALOG_OK_BTN}" press="handleDialogClose" type="Emphasized" />
+			<Button text="{i18n>CACHE_CLEANUP_DIALOG_OK_BTN}" press=".handleDialogClose" type="Emphasized" />
 		</beginButton>
 	</Dialog>
 </core:FragmentDefinition>

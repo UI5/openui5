@@ -9,7 +9,7 @@
 		<l:content>
 			<Button
 				text="Start"
-				press="startPolling"/>
+				press=".startPolling"/>
 		</l:content>
 	</l:VerticalLayout>
 </mvc:View>

@@ -25,7 +25,7 @@
 										tooltip="{groupedAvatars>initials}"
 										fallbackIcon="{personData>/fallbackIcon}"
 										backgroundColor="{groupedAvatars>backgroundColor}"
-										press="onAvatarPress"/>
+										press=".onAvatarPress"/>
 							</VBox>
 							<VBox>
 								<Text text="{groupedAvatars>name}"/>
@@ -38,7 +38,7 @@
 			<Page
 				id="detail"
 				showNavButton="true"
-				navButtonPress="onNavBack"
+				navButtonPress=".onNavBack"
 				titleAlignment="Center"
 				title="{/popoverTitle}" >
 				<core:Fragment fragmentName="sap.f.sample.AvatarGroup.view.Card" type="XML"> </core:Fragment>

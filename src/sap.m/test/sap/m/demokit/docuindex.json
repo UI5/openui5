@@ -3229,7 +3229,7 @@
 			{
 				"id": "sap.m.sample.TableMultiSelectMode",
 				"name": "Table - MultiSelectMode",
-				"description": "This example demonstrates the different multi-selection modes when the table is configured with MultiToggle mode."
+				"description": "This example demonstrates the different multi-selection modes if the table is configured with MultiToggle mode and the sap.m.table.Title control."
 			},
 			{
 				"id": "sap.m.sample.TableScrollToIndex",

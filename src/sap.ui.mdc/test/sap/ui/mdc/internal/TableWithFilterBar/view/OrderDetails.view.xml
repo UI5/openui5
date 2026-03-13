@@ -31,10 +31,10 @@
 				</uxap:snappedHeading>
 
 				<uxap:actions>
-					<ToggleButton text="Edit" type="Emphasized" press="onEditButtonPress" visible="{=!${view>/editMode}}" />
-					<Button text="Delete" type="Transparent" press="onDeleteButtonPress" visible="{=!${view>/editMode}}" />
-					<Button id="save" text="Save" type="Emphasized" visible="{view>/editMode}" press="onSavePress" />
-					<Button id="cancel" text="Cancel" visible="{view>/editMode}" press="onCancelPress" />
+					<ToggleButton text="Edit" type="Emphasized" press=".onEditButtonPress" visible="{=!${view>/editMode}}" />
+					<Button text="Delete" type="Transparent" press=".onDeleteButtonPress" visible="{=!${view>/editMode}}" />
+					<Button id="save" text="Save" type="Emphasized" visible="{view>/editMode}" press=".onSavePress" />
+					<Button id="cancel" text="Cancel" visible="{view>/editMode}" press=".onCancelPress" />
 				</uxap:actions>
 			</uxap:ObjectPageDynamicHeaderTitle>
 		</uxap:headerTitle>
@@ -101,13 +101,13 @@
 				<uxap:subSections>
 					<uxap:ObjectPageSubSection>
 						<uxap:blocks>
-							<mdc:Table id="childOrderItemsTable" p13nMode="{=['Sort', 'Column', 'Filter']}" delegate='\{"name": "sap/ui/v4demo/delegate/OrderItems.Table.delegate", "payload": \{"collectionName": "OrderItems", "collectionPath": "Items"\}\}' header="Order Items" showRowCount="true" rowPress="onRowPress" threshold="50" width="100%" rowAction="{=['Navigation']}" enableAutoColumnWidth="true">
+							<mdc:Table id="childOrderItemsTable" p13nMode="{=['Sort', 'Column', 'Filter']}" delegate='\{"name": "sap/ui/v4demo/delegate/OrderItems.Table.delegate", "payload": \{"collectionName": "OrderItems", "collectionPath": "Items"\}\}' header="Order Items" showRowCount="true" rowPress=".onRowPress" threshold="50" width="100%" rowAction="{=['Navigation']}" enableAutoColumnWidth="true">
 								<mdc:variant>
 									<fl:VariantManagement id="opTableVM" for="childOrderItemsTable"/>
 								</mdc:variant>
 								<mdc:actions>
 									<mdcat:ActionToolbarAction>
-										<Button type="Emphasized" text="Add Order Item" press="onAddButtonPress" visible="{=!${view>/addMode}}" />
+										<Button type="Emphasized" text="Add Order Item" press=".onAddButtonPress" visible="{=!${view>/addMode}}" />
 									</mdcat:ActionToolbarAction>
 								</mdc:actions>
 								<mdc:columns>

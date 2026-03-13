@@ -5,7 +5,7 @@ xmlns:grid="sap.ui.layout.cssgrid"
 xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
 controllerName="sap.ui.layout.cssgrid.gridplayground.controller.Main">
 
-<Slider value="100" app:mydata="breakContainer"  liveChange="onSliderMoved" />
+<Slider value="100" app:mydata="breakContainer" liveChange=".onSliderMoved" />
 <Panel id="breakContainer" width="100%" class="sapUiResponsiveMargin">
 	<headerToolbar>
 		<Toolbar height="3rem">
@@ -22,7 +22,7 @@ controllerName="sap.ui.layout.cssgrid.gridplayground.controller.Main">
 			<content>
 				<grid:CSSGrid id="grid1" items="{ path: '/' }">
 					<grid:customLayout>
-						<grid:GridResponsiveLayout containerQuery="true"  layoutChange="onLayoutChange">
+						<grid:GridResponsiveLayout containerQuery="true"  layoutChange=".onLayoutChange">
 							<grid:layoutS>
 								<grid:GridSettings
 										gridTemplateColumns="repeat(auto-fit, 8rem)"
@@ -75,7 +75,7 @@ controllerName="sap.ui.layout.cssgrid.gridplayground.controller.Main">
 			<content>
 				<grid:CSSGrid items="{ path: '/' }">
 					<grid:customLayout>
-						<grid:GridResponsiveLayout layoutChange="onLayoutChange">
+						<grid:GridResponsiveLayout layoutChange=".onLayoutChange">
 							<grid:layoutS>
 								<grid:GridSettings
 										gridTemplateColumns="repeat(auto-fit, 8rem)"

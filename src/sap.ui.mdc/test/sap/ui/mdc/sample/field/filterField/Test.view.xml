@@ -27,8 +27,8 @@
 						maxConditions="1"
 						placeholder="{/#Product/ProductId/@sap:label}"
 						label="{/#Product/ProductId/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH1">
 						<mdc:dependents>
 							<mdc:ValueHelp id="VH1" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate", "payload": \{"searchKeys":["ProductId","Name"]\}\}'>
@@ -105,8 +105,8 @@
 						editMode="Display"
 						placeholder="{/#Product/ProductId/@sap:label}"
 						label="{/#Product/ProductId/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH1">
 					</mdc:FilterField>
 
@@ -118,8 +118,8 @@
 						maxConditions="10"
 						placeholder="{/#Product/Name/@sap:label}"
 						label="{/#Product/Name/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH1">
 					</mdc:FilterField>
 
@@ -131,8 +131,8 @@
 						editMode="Display"
 						placeholder="{/#Product/Name/@sap:label}"
 						label="{/#Product/Name/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="multi value field (Description)"/>
@@ -145,8 +145,8 @@
 						maxConditions="3"
 						placeholder="{/#Product/Description/@sap:label}"
 						label="{/#Product/Description/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="multi value field in display mode (Description)"/>
@@ -157,8 +157,8 @@
 						editMode="Display"
 						placeholder="{/#Product/Description/@sap:label}"
 						label="{/#Product/Description/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="single value field (DateTime) only equals"/>
@@ -173,8 +173,8 @@
 						operators="EQ"
 						placeholder="{/#Product/DateTime/@sap:label}"
 						label="{/#Product/DateTime/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="single value field (DateTime) with DynamicDateRange"/>
@@ -188,8 +188,8 @@
 						maxConditions="1"
 						placeholder="{/#Product/DateTime/@sap:label}"
 						label="{/#Product/DateTime/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="single value field in display mode (DateTime)"/>
@@ -203,8 +203,8 @@
 						editMode="Display"
 						placeholder="{/#Product/DateTime/@sap:label}"
 						label="{/#Product/DateTime/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="single value field (Date) all operators"/>
@@ -219,8 +219,8 @@
 						maxConditions="1"
 						placeholder="{/#Product/Date/@sap:label}"
 						label="{/#Product/Date/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-Conditions">
 					</mdc:FilterField>
 
@@ -236,8 +236,8 @@
 						maxConditions="1"
 						placeholder="{/#Product/Date/@sap:label}"
 						label="{/#Product/Date/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="single value field (Date) only between"/>
@@ -253,8 +253,8 @@
 						operators="BT"
 						placeholder="{/#Product/Date/@sap:label}"
 						label="{/#Product/Date/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="multi value field (Date) only equal"/>
@@ -270,8 +270,8 @@
 						operators="EQ"
 						placeholder="{/#Product/Date/@sap:label}"
 						label="{/#Product/Date/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-Conditions">
 					</mdc:FilterField>
 
@@ -283,8 +283,8 @@
 						maxConditions="1"
 						placeholder="{/#Product/Status/@sap:label}"
 						label="{/#Product/Status/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-Status">
 						<mdc:dependents>
 							<mdc:ValueHelp id="VH-Status" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate"\}'>
@@ -307,8 +307,8 @@
 						maxConditions="1"
 						placeholder="{/#Product/Status/@sap:label}"
 						label="{/#Product/Status/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-Status2">
 						<mdc:dependents>
 							<mdc:ValueHelp id="VH-Status2" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate"\}'>
@@ -331,8 +331,8 @@
 						editMode="Display"
 						placeholder="{/#Product/Status/@sap:label}"
 						label="{/#Product/Status/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="multi (2) value field (Quantity)"/>
@@ -346,8 +346,8 @@
 						maxConditions="2"
 						placeholder="{/#Product/Quantity/@sap:label}"
 						label="{/#Product/Quantity/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-Conditions">
 					</mdc:FilterField>
 
@@ -361,8 +361,8 @@
 						editMode="Display"
 						placeholder="{/#Product/Quantity/@sap:label}"
 						label="{/#Product/Quantity/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="Custom field"/>
@@ -373,8 +373,8 @@
 						maxConditions="1"
 						placeholder="{/#Product/Status/@sap:label}"
 						label="{/#Product/Status/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 						<custom:CustomFilter id="FF13-Custom"
 							conditions="{$field>/conditions}"
 							maxConditions="{$field>/maxConditions}"
@@ -391,8 +391,8 @@
 						editMode="Editable"
 						placeholder="{/#Product/WeightMeasure/@sap:label}"
 						label="{/#Product/WeightMeasure/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-WeightUnit">
 						<mdc:dependents>
 							<mdc:ValueHelp id="VH-WeightUnit" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate"\}'>
@@ -416,8 +416,8 @@
 						editMode="Display"
 						placeholder="{/#Product/WeightMeasure/@sap:label}"
 						label="{/#Product/WeightMeasure/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="Material (empty key)"/>
@@ -430,8 +430,8 @@
 						display="ValueDescription"
 						placeholder="{/#Product/MatrId/@sap:label}"
 						label="{/#Product/MatrId/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-Material">
 						<mdc:dependents>
 							<mdc:ValueHelp id="VH-Material" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate", "payload": \{"searchKeys":["MatrId","Text"], "showWithoutFilter": true, "shouldOpenOnFocus": true\}\}'>
@@ -501,8 +501,8 @@
 						editMode="Editable"
 						placeholder="My Search"
 						label="My Search"
-						change="handleChange"
-						liveChange="handleLiveChange">
+						change=".handleChange"
+						liveChange=".handleLiveChange">
 					</mdc:FilterField>
 
 					<m:Label text="type date as additionalValue"/>
@@ -517,8 +517,8 @@
 						maxConditions="-1"
 						placeholder="{/#Product/Name/@sap:label}"
 						label="{/#Product/Name/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-DateDescription">
 						<mdc:dependents>
 							<mdc:ValueHelp id="VH-DateDescription" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate"\}'>
@@ -547,8 +547,8 @@
 						dataTypeConstraints='\{"maxLength": 3\}'
 						display="ValueDescription"
 						label="{/#Product/CountryId/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-Country">
 						<mdc:dependents>
 							<mdc:ValueHelp id="VH-Country" delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelpODataV2.delegate", "payload": \{"searchKeys":["countryId","text"]\}\}'>
@@ -618,8 +618,8 @@
 						dataTypeConstraints='\{"maxLength": 2, "search": "^[0-9]+$"\}'
 						display="ValueDescription"
 						label="{/#Product/RegionId/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-Region">
 						<mdc:dependents>
 							<mdc:ValueHelp id="VH-Region"
@@ -715,8 +715,8 @@
 						delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
 						display="ValueDescription"
 						label="{/#Product/CityId/@sap:label}"
-						change="handleChange"
-						liveChange="handleLiveChange"
+						change=".handleChange"
+						liveChange=".handleLiveChange"
 						valueHelp="VH-City">
 					</mdc:FilterField>
 
@@ -727,7 +727,7 @@
 
 					<m:Label text="Conditions"/>
 					<m:TextArea id="Cond" editable="false" rows="10"></m:TextArea>
-					<m:Button id="clear" icon="sap-icon://clear-filter" press="clearFilters">
+					<m:Button id="clear" icon="sap-icon://clear-filter" press=".clearFilters">
 						<m:layoutData>
 							<form:ColumnElementData cellsLarge="1" cellsSmall="1"></form:ColumnElementData>
 						</m:layoutData>

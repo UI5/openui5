@@ -35,8 +35,10 @@ sap.ui.define(["sap/ui/rta/command/FlexCommand"], function(FlexCommand) {
 
 		const mSpecificInfo = {
 			changeType: this.getChangeType(),
-			removedElement: {
-				id: oElement.getId()
+			content: {
+				removedElement: {
+					id: oElement.getId()
+				}
 			}
 		};
 		return mSpecificInfo;

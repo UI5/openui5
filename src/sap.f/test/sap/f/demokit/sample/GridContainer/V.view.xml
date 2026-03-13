@@ -15,23 +15,23 @@
 		<ToggleButton
 			id="revealGrid"
 			text="Reveal Grid"
-			press="onRevealGrid"
+			press=".onRevealGrid"
 			class="sapUiSmallMargin" />
 
 		<Panel headerText="Grid Container Properties">
 			<HBox alignItems="Center">
 				<Label width="8rem" class="sapUiSmallMarginBegin" text="Snap to Row:" />
-				<Switch change="onSnapToRowChange" state="false" />
+				<Switch change=".onSnapToRowChange" state="false" />
 				<Text class="sapUiTinyMarginBeginEnd" text="(Should the items stretch to fill the rows which they occupy, or not. If turned on the items will stretch.)" />
 			</HBox>
 			<HBox alignItems="Center">
 				<Label width="8rem" class="sapUiSmallMarginBegin" text="Allow dense fill:" />
-				<Switch change="onAllowDenseFillChange" state="false" />
+				<Switch change=".onAllowDenseFillChange" state="false" />
 				<Text class="sapUiTinyMarginBeginEnd" text="(Smaller items will take up all of the available space, ignoring their order.)" />
 			</HBox>
 			<HBox alignItems="Center">
 				<Label width="8rem" class="sapUiSmallMarginBegin" text="Inline block layout:" />
-				<Switch change="onInlineBlockLayoutChange" state="false" />
+				<Switch change=".onInlineBlockLayoutChange" state="false" />
 				<Text class="sapUiTinyMarginBeginEnd" text="(Makes the grid items act like an inline-block elements.)" />
 			</HBox>
 		</Panel>
@@ -47,7 +47,7 @@
 			</f:layoutXS>
 
 			<GenericTile
-				press="onPress"
+				press=".onPress"
 				header="Sales Fulfillment Application Title"
 				subheader="Subtitle">
 				<layoutData>
@@ -82,7 +82,7 @@
 						title="Buy bus ticket on-line"
 						subtitle="Buy a single drive ticket for a date"
 						iconSrc="sap-icon://bus-public-transport"
-						press="onPress"/>
+						press=".onPress"/>
 				</f:header>
 				<f:content>
 					<VBox

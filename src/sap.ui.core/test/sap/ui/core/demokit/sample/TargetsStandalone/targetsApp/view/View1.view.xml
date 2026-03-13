@@ -2,7 +2,7 @@
 	<Page
 		title="First Page">
 		<content>
-			<Button text="To the second page" press="onToView2"/>
+			<Button text="To the second page" press=".onToView2"/>
 		</content>
 	</Page>
 </mvc:View>

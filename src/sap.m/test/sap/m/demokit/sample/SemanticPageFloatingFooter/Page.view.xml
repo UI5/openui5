@@ -13,7 +13,7 @@
 			<semantic:MasterPage title="Master Page Title"
 								 floatingFooter="true">
 				<semantic:sort>
-					<semantic:SortSelect change="onSemanticSelectChange"
+					<semantic:SortSelect change=".onSemanticSelectChange"
 										 items="{
 							path: '/ProductCollectionStats/Filters',
 							sorter: { path: 'Name' }
@@ -22,16 +22,16 @@
 					</semantic:SortSelect>
 				</semantic:sort>
 				<semantic:filter>
-					<semantic:FilterAction press="onSemanticButtonPress"/>
+					<semantic:FilterAction press=".onSemanticButtonPress"/>
 				</semantic:filter>
 				<semantic:group>
-					<semantic:GroupAction press="onSemanticButtonPress"/>
+					<semantic:GroupAction press=".onSemanticButtonPress"/>
 				</semantic:group>
 				<semantic:addAction>
-					<semantic:AddAction press="onSemanticButtonPress"/>
+					<semantic:AddAction press=".onSemanticButtonPress"/>
 				</semantic:addAction>
 				<semantic:multiSelectAction>
-					<semantic:MultiSelectAction press="onMultiSelectPress"/>
+					<semantic:MultiSelectAction press=".onMultiSelectPress"/>
 				</semantic:multiSelectAction>
 			</semantic:MasterPage>
 		</masterPages>
@@ -40,50 +40,50 @@
 					title="Detail Page Title"
 					floatingFooter="true">
 				<semantic:positiveAction>
-					<semantic:PositiveAction text="Positive" press="onSemanticButtonPress"/>
+					<semantic:PositiveAction text="Positive" press=".onSemanticButtonPress"/>
 				</semantic:positiveAction>
 				<semantic:negativeAction>
-					<semantic:NegativeAction text="Negative" press="onSemanticButtonPress"/>
+					<semantic:NegativeAction text="Negative" press=".onSemanticButtonPress"/>
 				</semantic:negativeAction>
 				<semantic:forwardAction>
-					<semantic:ForwardAction press="onSemanticButtonPress"/>
+					<semantic:ForwardAction press=".onSemanticButtonPress"/>
 				</semantic:forwardAction>
 				<semantic:flagAction>
-					<semantic:FlagAction press="onSemanticButtonPress"/>
+					<semantic:FlagAction press=".onSemanticButtonPress"/>
 				</semantic:flagAction>
 				<semantic:favoriteAction>
-					<semantic:FavoriteAction press="onSemanticButtonPress"/>
+					<semantic:FavoriteAction press=".onSemanticButtonPress"/>
 				</semantic:favoriteAction>
 				<semantic:sendEmailAction>
-					<semantic:SendEmailAction press="onSemanticButtonPress"/>
+					<semantic:SendEmailAction press=".onSemanticButtonPress"/>
 				</semantic:sendEmailAction>
 				<semantic:sendMessageAction>
-					<semantic:SendMessageAction press="onSemanticButtonPress"/>
+					<semantic:SendMessageAction press=".onSemanticButtonPress"/>
 				</semantic:sendMessageAction>
 				<semantic:discussInJamAction>
-					<semantic:DiscussInJamAction press="onSemanticButtonPress"/>
+					<semantic:DiscussInJamAction press=".onSemanticButtonPress"/>
 				</semantic:discussInJamAction>
 				<semantic:shareInJamAction>
-					<semantic:ShareInJamAction press="onSemanticButtonPress"/>
+					<semantic:ShareInJamAction press=".onSemanticButtonPress"/>
 				</semantic:shareInJamAction>
 				<semantic:printAction>
-					<semantic:PrintAction press="onSemanticButtonPress"/>
+					<semantic:PrintAction press=".onSemanticButtonPress"/>
 				</semantic:printAction>
 				<semantic:messagesIndicator>
-					<semantic:MessagesIndicator press="onMessagesButtonPress"/>
+					<semantic:MessagesIndicator press=".onMessagesButtonPress"/>
 				</semantic:messagesIndicator>
 				<semantic:pagingAction>
-					<PagingButton count="5" positionChange="onPositionChange"/>
+					<PagingButton count="5" positionChange=".onPositionChange"/>
 				</semantic:pagingAction>
 
 				<semantic:customFooterContent>
-					<OverflowToolbarButton icon="sap-icon://settings" text="Settings" press="onPress"/>
-					<OverflowToolbarButton icon="sap-icon://video" text="Video" press="onPress"/>
+					<OverflowToolbarButton icon="sap-icon://settings" text="Settings" press=".onPress"/>
+					<OverflowToolbarButton icon="sap-icon://video" text="Video" press=".onPress"/>
 				</semantic:customFooterContent>
 
 				<semantic:customShareMenuContent>
-					<Button text="CustomShareBtn1" icon="sap-icon://color-fill" press="onPress"/>
-					<Button text="CustomShareBtn2" icon="sap-icon://crop" press="onPress"/>
+					<Button text="CustomShareBtn1" icon="sap-icon://color-fill" press=".onPress"/>
+					<Button text="CustomShareBtn2" icon="sap-icon://crop" press=".onPress"/>
 				</semantic:customShareMenuContent>
 
 			</semantic:DetailPage>

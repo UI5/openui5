@@ -3,9 +3,9 @@
 	xmlns:core="sap.ui.core"
 >
 	<MultiInput
-		tokenUpdate="_onTokenUpdate"
-		submit="_onTokenSubmission"
-		liveChange="_onLiveChange"
+		tokenUpdate="._onTokenUpdate"
+		submit="._onTokenSubmission"
+		liveChange="._onLiveChange"
 		tokens="{value}"
 		showValueHelp="false"
 	>

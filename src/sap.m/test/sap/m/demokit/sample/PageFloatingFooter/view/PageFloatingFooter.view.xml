@@ -9,10 +9,10 @@
 		floatingFooter="true"
 		class="sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter">
 
-		<Button text="Toggle floating footer" press="toggleFooter"/>
-		<Button text="Toggle footer visibility" press="toggleVisibility"/>
-		<Button text="Add Panel" press="addPanel"/>
-		<Button text="Remove Panel" press="removePanel"/>
+		<Button text="Toggle floating footer" press=".toggleFooter"/>
+		<Button text="Toggle footer visibility" press=".toggleVisibility"/>
+		<Button text="Add Panel" press=".addPanel"/>
+		<Button text="Remove Panel" press=".removePanel"/>
 		<footer>
 			<OverflowToolbar>
 				<ToolbarSpacer/>

@@ -10,8 +10,8 @@
 					<dnd:DragDropInfo
 							sourceAggregation="items"
 							targetAggregation="items"
-							dragStart="onDragStart"
-							drop="onDrop"/>
+							dragStart=".onDragStart"
+							drop=".onDrop"/>
 				</dragDropConfig>
 			<StandardTreeItem title="{text}"/>
 		</Tree>

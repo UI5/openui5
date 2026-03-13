@@ -215,23 +215,23 @@ sap.ui.define([
 	 * @public
 	 */
 	MoveTableColumns.completeChangeContent = function (oChange, mSpecificChangeInfo, mPropertyBag) {
-		var oModifier = mPropertyBag.modifier;
-		var oAppComponent = mPropertyBag.appComponent;
-		var oSourceControl = oModifier.bySelector(mSpecificChangeInfo.source.id, oAppComponent);
-		var oTargetControl = oModifier.bySelector(mSpecificChangeInfo.target.id, oAppComponent);
-		var mAdditionalSourceInfo = {
-			aggregation: mSpecificChangeInfo.source.aggregation,
+		const oModifier = mPropertyBag.modifier;
+		const oAppComponent = mPropertyBag.appComponent;
+		const oSourceControl = oModifier.bySelector(mSpecificChangeInfo.content.source.id, oAppComponent);
+		const oTargetControl = oModifier.bySelector(mSpecificChangeInfo.content.target.id, oAppComponent);
+		const mAdditionalSourceInfo = {
+			aggregation: mSpecificChangeInfo.content.source.aggregation,
 			type: oModifier.getControlType(oSourceControl)
 		};
-		var	mAdditionalTargetInfo = {
-			aggregation: mSpecificChangeInfo.target.aggregation,
+		const mAdditionalTargetInfo = {
+			aggregation: mSpecificChangeInfo.content.target.aggregation,
 			type: oModifier.getControlType(oTargetControl)
 		};
 
 		// We need to add the information about the movedElements together with the source and target index
-		var oContent = {movedElements: []};
-		mSpecificChangeInfo.movedElements.forEach(function (mElement) {
-			var oElement = mElement.element || oModifier.bySelector(mElement.id, oAppComponent);
+		const oContent = {movedElements: []};
+		mSpecificChangeInfo.content.movedElements.forEach(function (mElement) {
+			const oElement = mElement.element || oModifier.bySelector(mElement.id, oAppComponent);
 
 			oContent.movedElements.push({
 				selector: oModifier.getSelector(oElement, oAppComponent),
@@ -241,9 +241,9 @@ sap.ui.define([
 		});
 
 		oChange.setContent(oContent);
-		oChange.addDependentControl(mSpecificChangeInfo.source.id, SOURCE_ALIAS, mPropertyBag, mAdditionalSourceInfo);
-		oChange.addDependentControl(mSpecificChangeInfo.target.id, TARGET_ALIAS, mPropertyBag, mAdditionalTargetInfo);
-		oChange.addDependentControl(mSpecificChangeInfo.movedElements.map(function (element) {
+		oChange.addDependentControl(mSpecificChangeInfo.content.source.id, SOURCE_ALIAS, mPropertyBag, mAdditionalSourceInfo);
+		oChange.addDependentControl(mSpecificChangeInfo.content.target.id, TARGET_ALIAS, mPropertyBag, mAdditionalTargetInfo);
+		oChange.addDependentControl(mSpecificChangeInfo.content.movedElements.map(function (element) {
 			return element.id;
 		}), MOVED_ELEMENTS_ALIAS, mPropertyBag);
 	};

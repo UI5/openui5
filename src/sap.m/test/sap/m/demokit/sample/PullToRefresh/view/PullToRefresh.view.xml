@@ -8,7 +8,7 @@
 		<content>
 			<PullToRefresh
 				id="pullToRefresh"
-				refresh="handleRefresh" />
+				refresh=".handleRefresh" />
 			<List
 				id="list"
 				items="{/ProductCollection}" >

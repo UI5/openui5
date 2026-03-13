@@ -21,7 +21,7 @@
 					<DynamicDateRange
 						placeholder="Choose date range"
 						id="dynamic-range"
-						change="onChange"
+						change=".onChange"
 						width="{env>/filterInputWidth}"/>
 				</content>
 			</OverflowToolbar>

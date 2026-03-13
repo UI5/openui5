@@ -45,9 +45,9 @@
 									class="sapUiTinyMarginLeft"
 									src="sap-icon://copy"
 									tooltip="Copy Location"
-									press="copySupportAssistantOriginToClipboard" />
+									press=".copySupportAssistantOriginToClipboard" />
 							</l:HorizontalLayout>
-							
+
 							<l:HorizontalLayout class="sapUiTinyMarginTop">
 								<Text text="Support Assistant Version : {/supportAssistantVersion}" renderWhitespace="true"></Text>
 							</l:HorizontalLayout>

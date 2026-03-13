@@ -26,7 +26,7 @@
 				<f:content>
 					<Wizard id="ShoppingCartWizard"
 					        class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
-					        complete="completedHandler"
+					        complete=".completedHandler"
 					        height="auto"
 					        enableBranching="true">
 						<WizardStep
@@ -45,7 +45,7 @@
 							<List mode="Delete"
 							      items="{/ProductCollection}"
 							      enableBusyIndicator="true"
-							      delete="handleDelete"
+							      delete=".handleDelete"
 							      headerText="Items">
 								<StandardListItem
 									title="{Name}"
@@ -61,7 +61,7 @@
 							id="PaymentTypeStep"
 							title="Payment type"
 							subsequentSteps="CreditCardStep, BankAccountStep, CashOnDeliveryStep"
-							complete="goToPaymentStep"
+							complete=".goToPaymentStep"
 							icon="sap-icon://money-bills">
 							<Text class="sapUiSmallMarginBottom"
 							      text="We accept all major credit cards. No extra cost will be charged when paying with a credit card. Bank transfer and Cash on delivery are only possible for inland deliveries. A service charge of 2.99 EUR will be charged for these types of deliveries. Be aware, that for Bank transfers, the shipping will start on the day after the payment is received."/>
@@ -69,7 +69,7 @@
 								alignItems="Center"
 								justifyContent="Center"
 								width="100%">
-								<SegmentedButton selectionChange="setPaymentMethod" id="paymentMethodSelection"
+								<SegmentedButton selectionChange=".setPaymentMethod" id="paymentMethodSelection"
 								                 selectedKey="{/selectedPayment}">
 									<items>
 										<SegmentedButtonItem key="Credit Card" icon="sap-icon://credit-card"
@@ -86,14 +86,14 @@
 							id="CreditCardStep"
 							title="Credit card info"
 							nextStep="BillingStep"
-							activate="checkCreditCardStep"
+							activate=".checkCreditCardStep"
 							icon="sap-icon://credit-card">
 							<MessageStrip text="Enter at least 3 symbols for credit card name."/>
 							<form:SimpleForm
 								editable="true"
 								layout="ColumnLayout">
 								<Label text="Name on card" required="true"/>
-								<Input value="{/CreditCard/Name}" liveChange="checkCreditCardStep"
+								<Input value="{/CreditCard/Name}" liveChange=".checkCreditCardStep"
 								       valueLiveUpdate="true"/>
 								<Label text="Card number"/>
 								<Input value="{/CardNumber}"/>
@@ -134,14 +134,14 @@
 							id="CashOnDeliveryStep"
 							title="Cash on delivery info"
 							nextStep="BillingStep"
-							activate="checkCashOnDeliveryStep"
+							activate=".checkCashOnDeliveryStep"
 							icon="sap-icon://money-bills">
 							<MessageStrip text="Enter at least 3 symbols for first name."/>
 							<form:SimpleForm
 								editable="true"
 								layout="ColumnLayout">
 								<Label text="First Name" required="true"/>
-								<Input value="{/CashOnDelivery/FirstName}" liveChange="checkCashOnDeliveryStep"
+								<Input value="{/CashOnDelivery/FirstName}" liveChange=".checkCashOnDeliveryStep"
 								       valueLiveUpdate="true"/>
 								<Label text="Last Name"/>
 								<Input value="{/CashOnDelivery/LastName}"/>
@@ -155,8 +155,8 @@
 							id="BillingStep"
 							title="Billing address"
 							subsequentSteps="DeliveryAddressStep, DeliveryTypeStep"
-							activate="checkBillingStep"
-							complete="billingAddressComplete"
+							activate=".checkBillingStep"
+							complete=".billingAddressComplete"
 							icon="sap-icon://sales-quote">
 							<MessageStrip text="Enter at least 3 symbols for each required field"/>
 							<form:SimpleForm
@@ -165,18 +165,18 @@
 								<Label text="Delivery address is different"/>
 								<CheckBox
 									selected="{/differentDeliveryAddress}"
-									select="setDifferentDeliveryAddress"/>
+									select=".setDifferentDeliveryAddress"/>
 								<Label text="Address" required="true"/>
-								<Input value="{/BillingAddress/Address}" liveChange="checkBillingStep"
+								<Input value="{/BillingAddress/Address}" liveChange=".checkBillingStep"
 								       valueLiveUpdate="true"/>
 								<Label text="City" required="true"/>
-								<Input value="{/BillingAddress/City}" liveChange="checkBillingStep"
+								<Input value="{/BillingAddress/City}" liveChange=".checkBillingStep"
 								       valueLiveUpdate="true"/>
 								<Label text="Zip Code" required="true"/>
-								<Input value="{/BillingAddress/ZipCode}" liveChange="checkBillingStep"
+								<Input value="{/BillingAddress/ZipCode}" liveChange=".checkBillingStep"
 								       valueLiveUpdate="true"/>
 								<Label text="Country" required="true"/>
-								<Input value="{/BillingAddress/Country}" liveChange="checkBillingStep"
+								<Input value="{/BillingAddress/Country}" liveChange=".checkBillingStep"
 								       valueLiveUpdate="true"/>
 								<Label text="Note" required="false"/>
 								<TextArea rows="8" value="{/BillingAddress/Note}"/>
@@ -253,7 +253,7 @@
 							numberUnit="EUR">
 							<attributes>
 								<ObjectAttribute
-									press="handleNavBackToList"
+									press=".handleNavBackToList"
 									active="true"
 									text="Edit"/>
 							</attributes>
@@ -266,7 +266,7 @@
 						<form:content>
 							<Label text="Chosen payment type"/>
 							<Text text="{/selectedPayment}"/>
-							<Link press="handleNavBackToPaymentType" text="Edit"/>
+							<Link press=".handleNavBackToPaymentType" text="Edit"/>
 						</form:content>
 					</form:SimpleForm>
 
@@ -284,7 +284,7 @@
 							<Text text="{/CreditCard/SecurityCode}"/>
 							<Label text="Expiration date"/>
 							<Text text="{/CreditCard/Expire}"/>
-							<Link press="handleNavBackToCreditCard" text="Edit"/>
+							<Link press=".handleNavBackToCreditCard" text="Edit"/>
 						</form:content>
 					</form:SimpleForm>
 
@@ -325,7 +325,7 @@
 							<Text text="{/CashOnDelivery/Phone Number}"/>
 							<Label text="Email address"/>
 							<Text text="{/CashOnDelivery/Email}"/>
-							<Link press="handleNavBackToCashOnDelivery" text="Edit"/>
+							<Link press=".handleNavBackToCashOnDelivery" text="Edit"/>
 						</form:content>
 					</form:SimpleForm>
 
@@ -344,7 +344,7 @@
 							<Text text="{/BillingAddress/Country}"/>
 							<Label text="Note"/>
 							<Text text="{/BillingAddress/Note}"/>
-							<Link press="handleNavBackToBillingAddress" text="Edit"/>
+							<Link press=".handleNavBackToBillingAddress" text="Edit"/>
 						</form:content>
 					</form:SimpleForm>
 
@@ -355,15 +355,15 @@
 						<form:content>
 							<Label text="Chosen delivery type"/>
 							<Text text="{/selectedDeliveryMethod}"/>
-							<Link press="handleNavBackToDeliveryType" text="Edit"/>
+							<Link press=".handleNavBackToDeliveryType" text="Edit"/>
 						</form:content>
 					</form:SimpleForm>
 				</content>
 				<footer>
 					<Bar>
 						<contentRight>
-							<Button text="Submit" press="handleWizardSubmit"/>
-							<Button text="Cancel" press="handleWizardCancel"/>
+							<Button text="Submit" press=".handleWizardSubmit"/>
+							<Button text="Cancel" press=".handleWizardCancel"/>
 						</contentRight>
 					</Bar>
 				</footer>

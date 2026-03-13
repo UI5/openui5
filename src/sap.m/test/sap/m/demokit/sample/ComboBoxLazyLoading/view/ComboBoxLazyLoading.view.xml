@@ -11,7 +11,7 @@
 					path: '/ProductCollection',
 					suspended: true
 				}"
-				loadItems="handleLoadItems">
+				loadItems=".handleLoadItems">
 				<core:ListItem key="{ProductId}" text="{Name}"/>
 			</ComboBox>
 		</content>

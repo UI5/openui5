@@ -12,7 +12,7 @@
 		showNavButton="true"
 		title="{i18n>SITEMAP_TITLE}"
 		titleAlignment="Center"
-		navButtonPress="onNavButtonPress"
+		navButtonPress=".onNavButtonPress"
 		class="sapUiDemoKitSitemapPage sapUiContentPadding">
 		<content>
 			<l:HorizontalLayout class="sapUiDemoKitSitemapLinksWrapper sapUiResponsiveMargin" allowWrapping="true">

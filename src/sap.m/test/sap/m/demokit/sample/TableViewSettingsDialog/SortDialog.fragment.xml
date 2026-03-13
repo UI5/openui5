@@ -2,7 +2,7 @@
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core">
 	<ViewSettingsDialog
-		confirm="handleSortDialogConfirm">
+		confirm=".handleSortDialogConfirm">
 		<sortItems>
 			<ViewSettingsItem text="Product" key="Name" selected="true" />
 			<ViewSettingsItem text="Supplier" key="SupplierName" />

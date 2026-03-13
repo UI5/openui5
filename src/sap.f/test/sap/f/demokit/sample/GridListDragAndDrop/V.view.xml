@@ -20,7 +20,7 @@
 
 			<f:dragDropConfig>
 				<dnd:DragInfo sourceAggregation="items" />
-				<dnd-grid:GridDropInfo targetAggregation="items" dropPosition="Between" dropLayout="Horizontal" drop="onDrop" />
+				<dnd-grid:GridDropInfo targetAggregation="items" dropPosition="Between" dropLayout="Horizontal" drop=".onDrop" />
 			</f:dragDropConfig>
 
 			<f:customLayout>

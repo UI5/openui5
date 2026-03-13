@@ -15,7 +15,7 @@
 		</subHeader>
 		<content>
 			<Panel>
-				<Slider value="100" liveChange="onSliderMoved" />
+				<Slider value="100" liveChange=".onSliderMoved" />
 			</Panel>
 
 			<Panel id="panel1" headerText="Card Group 1">

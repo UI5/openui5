@@ -4,7 +4,7 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:grid="sap.ui.layout.cssgrid"
 	xmlns:f="sap.f">
-	<Slider value="100" liveChange="onSliderMoved" />
+	<Slider value="100" liveChange=".onSliderMoved" />
 	<Panel id="panelForGridList" backgroundDesign="Transparent">
 		<headerToolbar>
 			<Toolbar height="3rem">
@@ -17,7 +17,7 @@
 			headerText="GridList header"
 			items="{/items}">
 			<f:customLayout>
-				<grid:GridResponsiveLayout layoutChange="onLayoutChange">
+				<grid:GridResponsiveLayout layoutChange=".onLayoutChange">
 					<grid:layoutS>
 						<grid:GridSettings gridTemplateColumns="repeat(auto-fit, 8rem)" gridGap="0.25rem 0.25rem" />
 					</grid:layoutS>

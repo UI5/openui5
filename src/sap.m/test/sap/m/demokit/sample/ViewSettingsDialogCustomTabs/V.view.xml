@@ -8,13 +8,12 @@
 		width="100%">
 		<Button
 			text="Open View Settings Dialog with several tabs"
-			press="handleOpenDialog" />
-
+			press=".handleOpenDialog" />
 		<Button
-				text="Open View Settings Dialog with single custom tab"
-				press="handleOpenDialogSingleCustomTab" />
-		<Button 
-				text="Open View Settings Dialog with single custom tab with DatePicker"
-				press="handleOpenDialogSingleCustomTabWithDatePicker" />
+			text="Open View Settings Dialog with single custom tab"
+			press=".handleOpenDialogSingleCustomTab" />
+		<Button
+			text="Open View Settings Dialog with single custom tab with DatePicker"
+			press=".handleOpenDialogSingleCustomTabWithDatePicker" />
 	</l:VerticalLayout>
 </mvc:View>

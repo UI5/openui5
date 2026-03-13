@@ -15,7 +15,7 @@
 				path: '/ProductCollection',
 				sorter: { path: 'Name' }
 			}"
-			valueHelpRequest="handleValueHelp">
+			valueHelpRequest=".handleValueHelp">
 			<core:Item key="{ProductId}" text="{Name}" />
 		</MultiInput>
 	</l:VerticalLayout>

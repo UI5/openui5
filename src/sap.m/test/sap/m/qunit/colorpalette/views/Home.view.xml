@@ -15,25 +15,25 @@
 			<ColumnListItem>
 				<cells>
 					<Label text='Simple scenario, control defaults'/>
-					<Button id="open-simple-control-defaults-sample" press="openSimpleControlDefaultsSample" icon="sap-icon://text-color"/>
+					<Button id="open-simple-control-defaults-sample" press=".openSimpleControlDefaultsSample" icon="sap-icon://text-color"/>
 				</cells>
 			</ColumnListItem>
 			<ColumnListItem>
 				<cells>
 					<Label text='Simple scenario, custom colors'/>
-					<Button id="open-simple-custom-colors-sample" press="openSimpleCustomColorsSample" icon="sap-icon://palette"/>
+					<Button id="open-simple-custom-colors-sample" press=".openSimpleCustomColorsSample" icon="sap-icon://palette"/>
 				</cells>
 			</ColumnListItem>
 			<ColumnListItem>
 				<cells>
 					<Label text='Complex scenario, control defaults'/>
-					<Button id="open-complex-control-defaults-sample" press="openComplexControlDefaultsSample" icon="sap-icon://color-fill"/>
+					<Button id="open-complex-control-defaults-sample" press=".openComplexControlDefaultsSample" icon="sap-icon://color-fill"/>
 				</cells>
 			</ColumnListItem>
 			<ColumnListItem>
 				<cells>
 					<Label text='Complex scenario, custom colors, "Default color" shown, "More colors..." shown'/>
-					<Button id="open-complex-custom-colors-sample" press="openComplexCustomColorsSample" icon="sap-icon://color-fill"/>
+					<Button id="open-complex-custom-colors-sample" press=".openComplexCustomColorsSample" icon="sap-icon://color-fill"/>
 				</cells>
 			</ColumnListItem>
 		</items>

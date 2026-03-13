@@ -10,8 +10,8 @@
 		<Input type="Number" value="{cardParameters>/intProperty}" />
 		<Input type="Number" value="{cardParameters>/floatProperty}" />
 		<DatePicker value="{cardParameters>/dateProperty}" />
-		<Button text="Cancel" press="fireCancel"/>
-		<Button text="OK" type="Emphasized" press="fireOK"/>
+		<Button text="Cancel" press=".fireCancel"/>
+		<Button text="OK" type="Emphasized" press=".fireOK"/>
 		<Image src="./img/app_icon.png" width="50px" height="50px" alt="Image not shown"></Image>
 		<List
 			headerText="Products from Northwind"

@@ -10,8 +10,8 @@
 		vertical="true">
 		<FlexBox direction="Column" renderType="Div" class="sapUiSmallMargin">
 			<FlexBox>
-				<Button text="Correctly Displayed" press="onCorrectPathClick"/>
-				<Button text="Loading Error" press="onIncorrectPathClick"/>
+				<Button text="Correctly Displayed" press=".onCorrectPathClick"/>
+				<Button text="Loading Error" press=".onIncorrectPathClick"/>
 			</FlexBox>
 			<PDFViewer source="{/Source}" isTrustedSource="true" title="{/Title}" height="{/Height}">
 				<layoutData>

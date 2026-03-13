@@ -9,10 +9,10 @@
 			<Text text="'sapUiContentPadding' class is applied to the Dialog's content." />
 		</content>
 		<beginButton>
-			<Button text="Ok" app:dialogType="Std" press="onDialogCloseButton" />
+			<Button text="Ok" app:dialogType="Std" press=".onDialogCloseButton" />
 		</beginButton>
 		<endButton>
-			<Button text="Cancel" app:dialogType="Std" press="onDialogCloseButton" />
+			<Button text="Cancel" app:dialogType="Std" press=".onDialogCloseButton" />
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

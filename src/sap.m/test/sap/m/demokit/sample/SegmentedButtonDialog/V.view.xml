@@ -8,7 +8,7 @@
 		width="100%">
 		<Button
 			text="Open Dialog"
-			press="onOpenDialog"
+			press=".onOpenDialog"
 			class="sapUiSmallMarginBottom" />
 	</l:VerticalLayout>
 </mvc:View>

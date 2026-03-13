@@ -10,20 +10,20 @@
 		class="sapUiContentPadding" >
 		<customHeader>
 			<Toolbar>
-				<Button type="Back" press="onPress" />
+				<Button type="Back" press=".onPress" />
 				<ToolbarSpacer/>
 				<Title text="Title" level="H2"/>
 				<ToolbarSpacer/>
-				<Button icon="sap-icon://edit" type="Transparent" press="onPress" ariaLabelledBy="editButtonLabel"/>
+				<Button icon="sap-icon://edit" type="Transparent" press=".onPress" ariaLabelledBy="editButtonLabel"/>
 			</Toolbar>
 
 		</customHeader>
 		<subHeader>
 			<Toolbar>
 				<ToolbarSpacer/>
-				<Button text="Default" press="onPress" />
-				<Button type="Reject" text="Reject" press="onPress" />
-				<Button icon="sap-icon://action" type="Transparent" press="onPress" ariaLabelledBy="actionButtonLabel"/>
+				<Button text="Default" press=".onPress" />
+				<Button type="Reject" text="Reject" press=".onPress" />
+				<Button icon="sap-icon://action" type="Transparent" press=".onPress" ariaLabelledBy="actionButtonLabel"/>
 				<ToolbarSpacer/>
 			</Toolbar>
 
@@ -31,7 +31,7 @@
 		<content>
 			<HBox>
 				<Button text="Default"
-						press="onPress"
+						press=".onPress"
 						ariaDescribedBy="defaultButtonDescription genericButtonDescription">
 					<layoutData>
 						<FlexItemData growFactor="1" />
@@ -39,7 +39,7 @@
 				</Button>
 				<Button type="Accept"
 						text="Accept"
-						press="onPress"
+						press=".onPress"
 						ariaDescribedBy="acceptButtonDescription genericButtonDescription">
 					<layoutData>
 						<FlexItemData growFactor="1" />
@@ -47,14 +47,14 @@
 				</Button>
 				<Button type="Reject"
 						text="Reject"
-						press="onPress"
+						press=".onPress"
 						ariaDescribedBy="rejectButtonDescription genericButtonDescription">
 					<layoutData>
 						<FlexItemData growFactor="1" />
 					</layoutData>
 				</Button>
 				<Button text="Coming Soon"
-						press="onPress"
+						press=".onPress"
 						ariaDescribedBy="comingSoonButtonDescription genericButtonDescription"
 						enabled="false">
 					<layoutData>
@@ -78,9 +78,9 @@
 		<footer>
 			<Toolbar>
 				<ToolbarSpacer/>
-				<Button type="Emphasized" text="Emphasized" press="onPress" />
-				<Button text="Default" press="onPress" />
-				<Button icon="sap-icon://action" type="Transparent" press="onPress" />
+				<Button type="Emphasized" text="Emphasized" press=".onPress" />
+				<Button text="Default" press=".onPress" />
+				<Button icon="sap-icon://action" type="Transparent" press=".onPress" />
 			</Toolbar>
 		</footer>
 	</Page>

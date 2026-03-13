@@ -16,7 +16,7 @@
 					<Button
 						icon="sap-icon://syntax"
 						tooltip="{i18n>BASE_EDITOR.JSON.BEAUTIFY}"
-						press="onBeautify"
+						press=".onBeautify"
 					/>
 				</contentLeft>
 				<contentMiddle>
@@ -36,13 +36,13 @@
 			<Button
 				text="{i18n>BASE_EDITOR.CODE.OK}"
 				type="Emphasized"
-				press="onSave"
+				press=".onSave"
 			/>
 		</beginButton>
 		<endButton>
 			<Button
 				text="{i18n>BASE_EDITOR.CODE.CANCEL}"
-				press="onClose"
+				press=".onClose"
 			/>
 		</endButton>
 	</Dialog>

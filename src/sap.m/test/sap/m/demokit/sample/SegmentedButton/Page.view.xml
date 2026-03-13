@@ -42,7 +42,7 @@
 				</items>
 			</SegmentedButton>
 			<Label text="Fire selectionChange event"/>
-			<SegmentedButton id="SB1" selectionChange="onSelectionChange">
+			<SegmentedButton id="SB1" selectionChange=".onSelectionChange">
 				<items>
 					<SegmentedButtonItem text="One" />
 					<SegmentedButtonItem text="Two" />

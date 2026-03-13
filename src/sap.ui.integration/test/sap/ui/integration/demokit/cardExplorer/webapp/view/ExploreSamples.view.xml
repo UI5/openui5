@@ -15,7 +15,7 @@
 								<Title class="sapUiSmallMarginBegin" text="{/sample/title}"></Title>
 							</contentLeft>
 							<contentRight>
-								<ComboBox id="subSample" selectedKey="{/subSample/key}" items="{/sample/subSamples}" visible="{= ${/sample/subSamples} ? true : false }" selectionChange="onSubSampleChange">
+								<ComboBox id="subSample" selectedKey="{/subSample/key}" items="{/sample/subSamples}" visible="{= ${/sample/subSamples} ? true : false }" selectionChange=".onSubSampleChange">
 									<core:Item key="{key}" text="{title}" />
 								</ComboBox>
 							</contentRight>
@@ -51,7 +51,7 @@
 				<Page id="editPage" showFooter="{= ${settings>/editorType} === 'CARDEDITOR' &amp;&amp; ${settings>/editorMode} !== 'Translation'}">
 					<customHeader>
 						<OverflowToolbar id="toolbar">
-							<Button class="sapUiSmallMarginBegin" text="Run" type="Emphasized" icon="sap-icon://media-play" press="onRunPressed" enabled="{settings>/editable}">
+							<Button class="sapUiSmallMarginBegin" text="Run" type="Emphasized" icon="sap-icon://media-play" press=".onRunPressed" enabled="{settings>/editable}">
 								<layoutData>
 									<OverflowToolbarLayoutData priority="High" />
 								</layoutData>

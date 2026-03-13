@@ -24,7 +24,7 @@
 	</Panel>
 	<Panel id="expandablePanel" expandable="true" width="auto" class="sapUiResponsiveMargin">
 		<headerToolbar>
-			<OverflowToolbar active="true" press="onOverflowToolbarPress">
+			<OverflowToolbar active="true" press=".onOverflowToolbarPress">
 				<Title text="Clickable Custom Toolbar with a header text" />
 				<ToolbarSpacer />
 				<Button icon="sap-icon://settings" />
