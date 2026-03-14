@@ -23,7 +23,6 @@ sap.ui.define([
 	 *
 	 * @constructor
 	 * @public
-	 * @experimental since 1.122
 	 * @since 1.122
 	 * @alias sap.m.TileAttribute
 	 */

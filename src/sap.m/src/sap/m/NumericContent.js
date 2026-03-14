@@ -191,7 +191,6 @@ sap.ui.define([
 				/**
 				 * If set to its default value true this property applies the appropriate font style class based on the language. When set to false the font size will always be large
 				 *
-				 * @experimental As of version 1.73 Disclaimer: this property is in a beta state - incompatible API changes may be done before its official public release. Use at your own discretion.
 				 * @since 1.73
 				 */
 				"adaptiveFontSize": { type: "boolean", group: "Appearance", defaultValue: true }

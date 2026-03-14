@@ -1,0 +1,42 @@
+<mvc:View
+	class="sapUiSizeCompact"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:table="sap.ui.table"
+	xmlns:core="sap.ui.core">
+	<table:Table id="myTable" rows="{/customers}">
+		<table:extension>
+			<Toolbar>
+				<Title id="title" text="Customers"/>
+			</Toolbar>
+		</table:extension>
+		<table:columns>
+			<table:Column>
+				<Label text="Customer"/>
+				<table:template>
+					<Text text="{name}"/>
+				</table:template>
+			</table:Column>
+			<table:Column>
+				<Label text="Region"/>
+				<table:template>
+					<Text text="{region}"/>
+				</table:template>
+			</table:Column>
+			<table:Column>
+				<Label text="Key Account Manager (filtered by region)"/>
+				<table:template>
+					<Select forceSelection="false" selectedKey="{accountManagerId}"
+						items="{path: '/accountManagers', templateShareable: false,
+							boundFilters: [{
+								path: 'region',
+								operator: 'EQ',
+								value1: '{region}'
+							}]}">
+						<core:Item key="{id}" text="{parts: ['firstName', 'lastName']}"/>
+					</Select>
+				</table:template>
+			</table:Column>
+		</table:columns>
+	</table:Table>
+</mvc:View>

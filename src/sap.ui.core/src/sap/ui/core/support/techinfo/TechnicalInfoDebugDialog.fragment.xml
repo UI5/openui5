@@ -31,16 +31,16 @@
 					id="customDebugValue"
 					width="100%"
 					value="{view>/CustomDebugMode}"
-					change="onChangeCustomDebugMode"/>
+					change=".onChangeCustomDebugMode"/>
 				<ToolbarSpacer/>
 				<Button
 					icon="sap-icon://copy"
 					tooltip="{i18n>TechInfo.DebugModulesCopy.Tooltip}"
-					press="onConfigureDebugModulesCopyToClipboard"/>
+					press=".onConfigureDebugModulesCopyToClipboard"/>
 				<Button
 					icon="sap-icon://reset"
 					tooltip="{i18n>TechInfo.DebugModulesReset.Tooltip}"
-					press="onConfigureDebugModulesReset"/>
+					press=".onConfigureDebugModulesReset"/>
 			</Toolbar>
 		</subHeader>
 		<content>
@@ -49,7 +49,7 @@
 					id="tree"
 					items="{view>/DebugModules}"
 					mode="MultiSelect"
-					selectionChange="onConfigureDebugModuleSelect"
+					selectionChange=".onConfigureDebugModuleSelect"
 					includeItemInSelection="true">
 					<StandardTreeItem
 						title="{view>text}"
@@ -60,11 +60,11 @@
 		<buttons>
 			<Button
 				text="{i18n>TechInfo.DebugModulesConfigPopup.Confirm}"
-				press="onConfigureDebugModulesConfirm"
+				press=".onConfigureDebugModulesConfirm"
 				type="Emphasized"/>
 			<Button
 				text="{i18n>CLOSE}"
-				press="onConfigureDebugModulesClose"
+				press=".onConfigureDebugModulesClose"
 				type="Emphasized"/>
 		</buttons>
 	</Dialog>

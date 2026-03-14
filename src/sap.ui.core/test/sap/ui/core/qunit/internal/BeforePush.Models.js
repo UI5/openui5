@@ -83,6 +83,7 @@ sap.ui.define([
 		"Test.qunit.html?testsuite=test-resources/sap/ui/core/internal/samples/odata/v2/Products/testsuite.qunit&test=OPA.Products" : "both",
 		"Test.qunit.html?testsuite=test-resources/sap/ui/core/qunit/odata/type/testsuite.odata.types.qunit&test=OPA.ViewTemplate.Types&supportAssistant=true" : "both",
 		"Test.qunit.html?testsuite=test-resources/sap/ui/core/qunit/odata/type/testsuite.odata.types.qunit&test=OPA.ViewTemplate.Types&realOData=true" : "both",
+		"Test.qunit.html?testsuite=test-resources/sap/ui/core/qunit/testsuites/testsuite.databinding.qunit&test=OPA.BoundFilters.FilteredListInTable" : "both",
 		"../../../sap/m/demokit/cart/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/cart/testsuite.qunit&test=integration/opaTestsComponent": "both",
 		"../../../sap/m/demokit/cart/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/cart/testsuite.qunit&test=integration/opaTestsGherkinComponent": "both",
 		"qunit/internal/AnnotationParser.qunit.html?hidepassed&coverage" : "both"
@@ -124,6 +125,12 @@ sap.ui.define([
 		"demokit/sample/common/index.html?component=ViewTemplate.types&realOData=true",
 		"Test.qunit.html?testsuite=test-resources/sap/ui/core/qunit/odata/type/testsuite.odata.types.qunit&test=OPA.ViewTemplate.Types&supportAssistant=true",
 		"Test.qunit.html?testsuite=test-resources/sap/ui/core/qunit/odata/type/testsuite.odata.types.qunit&test=OPA.ViewTemplate.Types&realOData=true"
+	];
+
+	// Bound Filters Sample
+	mApps["BoundFilters.FilteredListInTable"] = [
+		"/demokit/sample/common/index.html?component=BoundFilters.FilteredListInTable",
+		"Test.qunit.html?testsuite=test-resources/sap/ui/core/qunit/testsuites/testsuite.databinding.qunit&test=OPA.BoundFilters.FilteredListInTable"
 	];
 
 	// OData V2 Internal Samples

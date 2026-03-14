@@ -6,10 +6,10 @@
 			<sap.m:Text class="sapUiRtaConfirmationDialogText" text="{/messageText}" />
 		</layout:VerticalLayout>
 		<sap.m:beginButton>
-			<sap.m:Button class="sapUiRtaConfirmationDialogRemoveButton" text="{/removeText}" press="removeField" />
+			<sap.m:Button class="sapUiRtaConfirmationDialogRemoveButton" text="{/removeText}" press=".removeField" />
 		</sap.m:beginButton>
 		<sap.m:endButton>
-			<sap.m:Button class="sapUiRtaConfirmationDialogCancelButton" text="{/cancelText}" press="closeDialog" />
+			<sap.m:Button class="sapUiRtaConfirmationDialogCancelButton" text="{/cancelText}" press=".closeDialog" />
 		</sap.m:endButton>
 	</sap.m:Dialog>
 </core:FragmentDefinition>

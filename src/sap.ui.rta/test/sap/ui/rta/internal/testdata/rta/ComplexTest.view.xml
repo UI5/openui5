@@ -394,7 +394,7 @@
 			</Panel>
 
 			<Panel id="smartFilterLayout" expandable="true" headerText="Panel with SmartFilterBar / SmartTable" width="auto" class="sapUiResponsiveMargin">
-				<Button id="toggleUpdateMode" text="Change to 'LiveMode'" press="toggleUpdateMode"></Button>
+				<Button id="toggleUpdateMode" text="Change to 'LiveMode'" press=".toggleUpdateMode"></Button>
 				<smartFilterBar:SmartFilterBar id="smartFilterBar" entitySet="LineItems">
 					<smartFilterBar:controlConfiguration>
 						<smartFilterBar:ControlConfiguration

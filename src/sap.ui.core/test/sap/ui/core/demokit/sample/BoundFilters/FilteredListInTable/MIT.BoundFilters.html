@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<html>
+	<head><meta charset="utf-8">
+		<link rel="stylesheet" href="./MIT.BoundFilters.css">
+		<title>Manual Integration Test: Bound Filters</title>
+	</head>
+	<body>
+		<h1>Manual Integration Test: Bound Filters in a Table</h1>
+		<h2>DESCRIPTION</h2>
+		<p>
+			Test that the Bound Filters feature works correctly in an aggregation
+			binding. The application shows a table of customers. Each row contains a dropdown
+			(Select) whose list of account managers is filtered to only show managers responsible
+			for the same region as the customer in that row.
+		</p>
+
+		<p><strong>Automated Tests:</strong> All manual tests described here are automated in
+			<code>Opa.qunit.js</code>.</p>
+
+		<h2>PREPARATION</h2>
+		<p>
+			To check console errors open the developer tools before starting the application and
+			verify that there are no errors or warnings during any of the steps below.
+		</p>
+		<p>
+			Start the Bound Filters application. URL (adjust host and port if necessary):
+		</p>
+		<ul>
+			<li>as sample preview in the SDK:
+				http://&lt;host&gt;:&lt;port&gt;/sapui5-sdk-dist/#/sample/sap.ui.core.sample.BoundFilters.FilteredListInTable/preview
+			</li>
+			<li>local:
+				<a href="http://localhost:8080/test-resources/sap/ui/core/demokit/sample/common/index.html?component=BoundFilters.FilteredListInTable">
+					http://&lt;host&gt;:&lt;port&gt;/test-resources/sap/ui/core/demokit/sample/common/index.html?component=BoundFilters.FilteredListInTable
+				</a>
+			</li>
+		</ul>
+
+		<h2>REALIZE and CHECK</h2>
+
+		<h3>Initial State</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>Step</th>
+					<th>Action</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Open the application.</td>
+					<td class="success">A table titled "Customers" is displayed with 10 visible rows.
+						Each row shows a customer name, a region, and a Select control.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Bound Filters: Americas region (first row)</h3>
+		<p>
+			The first row shows customer <strong>TechCorp Solutions</strong> with region
+			<strong>Americas</strong>. There are 5 account managers responsible for the Americas
+			region: John Smith, Sarah Johnson, Mike Williams, Jennifer Brown, and David Jones.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Step</th>
+					<th>Action</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Click on the Select dropdown in the first row (TechCorp Solutions,
+						Americas).</td>
+					<td class="success">The dropdown opens and shows exactly 5 entries:
+						John Smith, Sarah Johnson, Mike Williams, Jennifer Brown, David Jones.
+						No account managers from other regions are shown.</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>Close the dropdown (press Escape or click elsewhere).</td>
+					<td class="success">The dropdown closes.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Bound Filters: EMEA region</h3>
+		<p>
+			Find a row with region <strong>EMEA</strong> (e.g. <strong>Global Industries Ltd</strong>,
+			row 3). There are 4 account managers for EMEA: Emma Anderson, Lucas Mueller,
+			Sophie Dubois, and Marco Rossi.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Step</th>
+					<th>Action</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Click on the Select dropdown in a row with region EMEA.</td>
+					<td class="success">The dropdown shows exactly 4 entries: Emma Anderson,
+						Lucas Mueller, Sophie Dubois, Marco Rossi. No Americas or APJ managers
+						are shown.</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>Close the dropdown.</td>
+					<td class="success">The dropdown closes.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Bound Filters: APJ region</h3>
+		<p>
+			Find a row with region <strong>APJ</strong> (e.g. <strong>Asia Pacific
+			Ventures</strong>, row 4). There are 4 account managers for APJ: Yuki Tanaka,
+			Raj Patel, Li Chen, and Priya Sharma.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Step</th>
+					<th>Action</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Click on the Select dropdown in a row with region APJ.</td>
+					<td class="success">The dropdown shows exactly 4 entries: Yuki Tanaka,
+						Raj Patel, Li Chen, Priya Sharma. No Americas or EMEA managers
+						are shown.</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>Close the dropdown.</td>
+					<td class="success">The dropdown closes.</td>
+				</tr>
+			</tbody>
+		</table>
+	</body>
+</html>

@@ -12,17 +12,17 @@
 				<Label
 					design="Bold"
 					text="{i18n>TechInfo.SupportAssistantConfigPopup.Locations}"/>
-				<RadioButton id="standard" select="onSelectBootstrapOption" groupName="Bootstrap" text="{i18n>TechInfo.SupportAssistantConfigPopup.StandardLocation}"/>
+				<RadioButton id="standard" select=".onSelectBootstrapOption" groupName="Bootstrap" text="{i18n>TechInfo.SupportAssistantConfigPopup.StandardLocation}"/>
 				<Select
 					items="{view>/SupportAssistantPopoverURLs}"
 					id="standardBootstrapURL"
 					class="sapUiMediumMarginBegin"
 					width="85%"
 					selectedKey="{view>/StandardBootstrapURL}"
-					change="onChangeStandardBootstrapURL">
+					change=".onChangeStandardBootstrapURL">
 					<core:Item key="{view>Value}" text="{view>DisplayName}"/>
 				</Select>
-				<RadioButton id="custom" select="onSelectBootstrapOption" groupName="Bootstrap" text="{i18n>TechInfo.SupportAssistantConfigPopup.CustomLocation}"/>
+				<RadioButton id="custom" select=".onSelectBootstrapOption" groupName="Bootstrap" text="{i18n>TechInfo.SupportAssistantConfigPopup.CustomLocation}"/>
 				<Label
 					visible="false"
 					text="{i18n>TechInfo.SupportAssistantConfigPopup.CustomLocation}"
@@ -32,7 +32,7 @@
 					width="85%"
 					class="sapUiMediumMarginBegin"
 					value="{view>/CustomBootstrapURL}"
-					liveChange="onLiveChangeCustomBootstrapURL"
+					liveChange=".onLiveChangeCustomBootstrapURL"
 					valueLiveUpdate="true"
 					valueStateText="{i18n>TechInfo.SupportAssistantConfigPopup.URLValidationMessage}"
 					enabled="false"
@@ -45,7 +45,7 @@
 					id="openInNewWindow"
 					selected="{view>/OpenSupportAssistantInNewWindow}"
 					text="{i18n>TechInfo.SupportAssistantConfigPopup.OpenInNewWindow}"
-					select="onChangeOpenInNewWindow"/>
+					select=".onChangeOpenInNewWindow"/>
 			</VBox>
 		</content>
 	</Popover>

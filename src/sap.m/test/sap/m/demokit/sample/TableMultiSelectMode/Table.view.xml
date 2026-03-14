@@ -15,7 +15,7 @@
 				change: '.onBindingChange'
 			}
 		}"
-		selectionChange="onRowSelectionChange"
+		selectionChange=".onRowSelectionChange"
 		itemActionCount="1"
 		itemActionPress="onItemActionPress"
 		rememberSelections="false">
@@ -25,17 +25,17 @@
 					<Title text="Products" level="H2"/>
 				</table:Title>
 				<ToolbarSpacer/>
-				<SearchField id="idSearchField" width="15rem" search="onSearch" placeholder="Search products..."/>
+				<SearchField id="idSearchField" width="15rem" search=".onSearch" placeholder="Search products..."/>
 				<Label text="Extended view" labelFor="extViewSwitch"/>
-				<Switch id="extViewSwitch" change="onToggleExtView"/>
+				<Switch id="extViewSwitch" change=".onToggleExtView"/>
 				<Label text="Show totalCount" labelFor="disableTotalCountSwitch"/>
-				<Switch id="disableTotalCountSwitch" state="true" change="onToggleTotalCount"/>
+				<Switch id="disableTotalCountSwitch" state="true" change=".onToggleTotalCount"/>
 				<Label text="Multi selection modes" labelFor="idComboBoxSuccess"/>
-				<ComboBox id="idComboBoxSuccess" selectedKey="Default" selectionChange="onSelectionChange">
+				<ComboBox id="idComboBoxSuccess" selectedKey="Default" selectionChange=".onSelectionChange">
 					<core:Item text="Default" key="Default"></core:Item>
 					<core:Item text="ClearAll" key="ClearAll"></core:Item>
 				</ComboBox>
-				<Button icon="sap-icon://add" text="Add randomized product" press="onAddRow" />
+				<Button icon="sap-icon://add" text="Add randomized product" press=".onAddRow" />
 			</OverflowToolbar>
 		</headerToolbar>
 		<columns>

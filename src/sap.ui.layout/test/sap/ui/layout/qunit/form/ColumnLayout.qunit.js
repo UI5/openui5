@@ -376,8 +376,9 @@ sap.ui.define([
 		assert.equal($Container.children().length, 1, "only one DOM node in Container");
 		assert.equal($Container.children()[0].id, "FC1-content", "content node for Container rendered");
 		assert.ok(jQuery($Container.children()[0]).is("dl"), "content node for Container is <dl>");
-		assert.notOk($Container.attr("role"), "no role set");
-		assert.equal(jQuery("#F1").attr("role"), "form", "role \"form\" set on Form");
+		assert.notOk($Container.attr("role"), "no role set on Container");
+		assert.notOk($Container.attr("aria-Labelledby"), "Container has no aria-labelledby");
+		assert.equal(jQuery("#F1").attr("role"), "region", "role \"region\" set on Form");
 
 		oDomRef = window.document.getElementById("FE1");
 		assert.ok(oDomRef, "Element rendered");

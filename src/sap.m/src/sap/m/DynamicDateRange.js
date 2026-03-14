@@ -569,9 +569,6 @@ sap.ui.define([
 		var aNextIncludedOptions = ["NEXTMINUTESINCLUDED", "NEXTHOURSINCLUDED", "NEXTDAYSINCLUDED", "NEXTWEEKSINCLUDED", "NEXTMONTHSINCLUDED", "NEXTQUARTERSINCLUDED", "NEXTYEARSINCLUDED"];
 
 		const POPUP_MAX_HEIGHT = 512;
-		const POPUP_HEADER_HEIGHT = 45;
-		const POPUP_LIST_ITEM_HEIGHT = 51;
-		const POPUP_LIST_ITEM_COMPACT_HEIGHT = 49;
 
 		DynamicDateRange.prototype.init = function() {
 			var bValueHelpDecorative = !Device.support.touch || Device.system.desktop ? true : false;
@@ -784,6 +781,12 @@ sap.ui.define([
 
 				//reset value help page
 				this._oNavContainer.to(this._oNavContainer.getPages()[0]);
+
+				// Enable auto-sizing for the options list page
+				if (!Device.system.phone) {
+					this._oPopup.addStyleClass("sapMDDRAutoSize");
+					this._oPopup.setContentHeight("");
+				}
 
 				this._openPopup(oDomRef);
 			}
@@ -1273,21 +1276,9 @@ sap.ui.define([
 			return this._calendarParser;
 		};
 
-		DynamicDateRange.prototype._getPopupHeight = function() {
-			let height;
-			if (document.body.classList.contains("sapUiSizeCompact") || this.hasStyleClass("sapUiSizeCompact") || this.getDomRef()?.closest(".sapUiSizeCompact")) {
-				height = this.getStandardOptions().length * POPUP_LIST_ITEM_COMPACT_HEIGHT + POPUP_HEADER_HEIGHT;
-			} else {
-				height = this.getStandardOptions().length * POPUP_LIST_ITEM_HEIGHT + POPUP_HEADER_HEIGHT;
-			}
-			return (height < POPUP_MAX_HEIGHT) ? height + "px" : POPUP_MAX_HEIGHT + "px";
-		};
-
 		DynamicDateRange.prototype._createPopup = function() {
 			if (!this._oPopup) {
 				this._oPopup = new ResponsivePopover(this.getId() + "-RP", {
-					//read the documentation about those two - the page addapts its size to its container...
-					contentHeight: this._getPopupHeight(),
 					contentWidth: '320px',
 					showCloseButton: false,
 					showArrow: false,
@@ -1496,7 +1487,12 @@ sap.ui.define([
 
 				oSecondPage.setFooter(oToolbar);
 				oSecondPage.setTitle(oOption.getText(this));
-				this._oPopup.setContentHeight(POPUP_MAX_HEIGHT + "px");
+
+				// Switch to fixed height for value help page
+				if (!Device.system.phone) {
+					this._oPopup.removeStyleClass("sapMDDRAutoSize");
+					this._oPopup.setContentHeight(POPUP_MAX_HEIGHT + "px");
+				}
 
 				this._setFooterVisibility(true);
 				this._updateInternalControls(oOption);
@@ -1816,8 +1812,11 @@ sap.ui.define([
 					}
 				}, this);
 			} else if (oToPage === oOptionsListPage) {
-				// set height to available options list height
-				this._oPopup.setContentHeight(this._getPopupHeight());
+				// Switch back to auto-sizing for options list page
+				if (!Device.system.phone) {
+					this._oPopup.addStyleClass("sapMDDRAutoSize");
+					this._oPopup.setContentHeight("");
+				}
 				// Remove the invisible label from popover when navigating back to options list
 				this._removeInvisibleLabelFromPopover();
 			}

@@ -52,7 +52,7 @@ sap.ui.define([
 		assert.strictEqual(oContext.isDeleted(), false);
 		assert.strictEqual(oContext.isInactive(), undefined);
 		assert.strictEqual(oContext.isKeepAlive(), false);
-		assert.strictEqual(oContext.isOutdated(), undefined);
+		assert.notOk("bOutdated" in oContext);
 		assert.strictEqual(oContext.isOutOfPlace(), false);
 		assert.strictEqual(oContext.isSelected(), false);
 		assert.ok(oContext.hasOwnProperty("fnOnBeforeDestroy"));
@@ -389,8 +389,10 @@ sap.ui.define([
 [undefined, "", "/foo"].forEach(function (sPath) {
 	[false, true].forEach((bSelected) => {
 		[undefined, 42].forEach((iSelectionCount) => {
-			const sTitle = "fetchValue: header context, path=" + JSON.stringify(sPath)
-				+ ", select all=" + bSelected + ", $selectionCount internally=" + iSelectionCount;
+			[undefined, false, true].forEach((bOutdated) => {
+	const sTitle = "fetchValue: header context, path=" + JSON.stringify(sPath)
+		+ ", select all=" + bSelected + ", $selectionCount internally=" + iSelectionCount
+		+ ", outdated=" + bOutdated;
 
 	QUnit.test(sTitle, function (assert) {
 		var oBinding = {
@@ -399,6 +401,9 @@ sap.ui.define([
 			},
 			oContext = Context.create(null, oBinding, "/foo");
 
+		if (bOutdated !== undefined) {
+			oContext.bOutdated = bOutdated;
+		}
 		oContext.bSelected = bSelected;
 		oContext.iSelectionCount = iSelectionCount;
 
@@ -408,13 +413,18 @@ sap.ui.define([
 			.returns(SyncPromise.resolve(Promise.resolve(42)));
 
 		return oContext.fetchValue(sPath, null, "bCached").then(function (oResult) {
-			assert.deepEqual(oResult, {
+			const oExpectedResult = {
 				"@$ui5.context.isSelected" : bSelected,
 				$count : 42,
 				$selectionCount : bSelected ? undefined : iSelectionCount ?? 0
-			});
+			};
+			if (bOutdated !== undefined) {
+				oExpectedResult["@$ui5.context.isOutdated"] = bOutdated;
+			}
+			assert.deepEqual(oResult, oExpectedResult);
 		});
 	});
+			});
 		});
 	});
 });
@@ -5651,19 +5661,19 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("setOutdated, isOutdated", function (assert) {
+	QUnit.test("setOutdated, bOutdated", function (assert) {
 		const oContext = Context.create({/*oModel*/}, {/*oBinding*/}, "/path");
 		oContext.mChangeListeners = "~mChangeListeners~";
 
 		// code under test
-		assert.strictEqual(oContext.isOutdated(), undefined);
+		assert.notOk("bOutdated" in oContext);
 
 		const oHelperMock = this.mock(_Helper);
 		oHelperMock.expects("fireChange")
 			.withExactArgs("~mChangeListeners~", "@$ui5.context.isOutdated", true)
 			.callsFake(() => {
 				// code under test
-				assert.strictEqual(oContext.isOutdated(), true);
+				assert.strictEqual(oContext.bOutdated, true);
 			});
 
 		// code under test
@@ -5673,11 +5683,21 @@ sap.ui.define([
 			.withExactArgs("~mChangeListeners~", "@$ui5.context.isOutdated", false)
 			.callsFake(() => {
 				// code under test
-				assert.strictEqual(oContext.isOutdated(), false);
+				assert.strictEqual(oContext.bOutdated, false);
 			});
 
 		// code under test
 		oContext.setOutdated(false);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isOutdated", function (assert) {
+		const oContext = Context.create({/*oModel*/}, {/*oBinding*/}, "/path");
+		this.mock(oContext).expects("getProperty").withExactArgs("@$ui5.context.isOutdated")
+			.returns("~anything~");
+
+		// code under test
+		assert.strictEqual(oContext.isOutdated(), "~anything~");
 	});
 
 	//*********************************************************************************************

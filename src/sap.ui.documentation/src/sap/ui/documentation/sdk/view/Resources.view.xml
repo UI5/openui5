@@ -231,7 +231,7 @@
 							<!-- SAP Fiori Tools -->
 							<f:Card class="sapUiDemoKitResourcesRegularCard">
 								<f:header>
-									<card:Header title="{i18n>RESOURCES_CARD_TITLE_FIORI_TOOLS}" iconSrc="sap-icon://fx" />
+									<card:Header title="{i18n>RESOURCES_CARD_TITLE_FIORI_TOOLS}" iconSrc="sap-icon://SAP-icons-TNT/sap-fiori-tools" />
 								</f:header>
 								<f:content>
 									<VBox class="sapUiDemoKitResourcesCardContentSpacing" wrap="Wrap">
@@ -314,6 +314,29 @@
 											href="{resources>/mcpserver/href}"
 											target="_blank"
 											text="{i18n>RESOURCES_CARD_LINK_MCPSERVER}"
+											tooltip="{i18n>RESOURCES_CARD_LINK_TOOLTIP}"
+											wrapping="true" />
+									</VBox>
+								</f:content>
+							</f:Card>
+
+							<!-- SAP Fiori MCP server -->
+							<f:Card class="sapUiDemoKitResourcesRegularCard">
+								<f:header>
+									<card:Header title="{i18n>RESOURCES_CARD_TITLE_FIORI_MCPSERVER}" iconSrc="sap-icon://ai" />
+								</f:header>
+								<f:content>
+									<VBox class="sapUiDemoKitResourcesCardContentSpacing" wrap="Wrap">
+										<Text text="{i18n>RESOURCES_CARD_DESC_FIORI_MCPSERVER}">
+											<layoutData>
+												<FlexItemData growFactor="1" />
+											</layoutData>
+										</Text>
+										<Link
+											class="sapUiDemoKitResourcesCardLink"
+											href="{resources>/fioriMcpServer/href}"
+											target="_blank"
+											text="{i18n>RESOURCES_CARD_LINK_FIORI_MCPSERVER}"
 											tooltip="{i18n>RESOURCES_CARD_LINK_TOOLTIP}"
 											wrapping="true" />
 									</VBox>

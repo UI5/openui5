@@ -4,6 +4,7 @@
 
 sap.ui.define([
 	"sap/ui/thirdparty/jquery",
+	"sap/ui/core/IconPool",
 	"sap/ui/core/UIComponent",
 	"sap/ui/Device",
 	"sap/ui/documentation/sdk/model/models",
@@ -21,6 +22,7 @@ sap.ui.define([
 	"sap/m/ColumnListItem"
 ], function(
 	jQuery,
+	IconPool,
 	UIComponent,
 	Device,
 	models,
@@ -53,6 +55,10 @@ sap.ui.define([
 			init : function () {
 
 				this._oErrorHandler = new ErrorHandler(this);
+				IconPool.registerFont({
+					fontFamily: "SAP-icons-TNT",
+					fontURI: sap.ui.require.toUrl("sap/tnt/themes/base/fonts/")
+				});
 
 				// set the device model
 				this.setModel(models.createDeviceModel(), "device");

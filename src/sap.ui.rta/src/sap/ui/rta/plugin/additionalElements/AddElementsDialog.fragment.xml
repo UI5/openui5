@@ -46,7 +46,7 @@
 							<MenuItem
 								text="{text}"
 								tooltip="{tooltip}"
-								press="_redirectToExtensibilityAction(${actionKey})"/>
+								press="._redirectToExtensibilityAction(${actionKey})"/>
 						</items>
 					</Menu>
 				</MenuButton>

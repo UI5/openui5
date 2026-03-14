@@ -16,7 +16,7 @@
 					<contentMiddle>
 						<Image src="../ui/images/Logo_O_22x22.png" densityAware="false"></Image>
 						<Text text="{/iFrameTitle}" />
-						<c:Icon src="sap-icon://full-screen" press="toggleMinimize" />
+						<c:Icon src="sap-icon://full-screen" press=".toggleMinimize" />
 					</contentMiddle>
 				</Bar>
 				<Bar id="ttStandardHeaderBar" class="sapContrast ttPageBar ttStandardPageBar">
@@ -29,15 +29,15 @@
 					</contentMiddle>
 					<contentRight>
 						<!-- <c:Icon src="sap-icon://sys-help" tooltip="{i18n>TestRecorder.TitleBar.Documentation.Tooltip}" /> -->
-						<c:Icon src="sap-icon://settings" press="openSettingsDialog" tooltip="{i18n>TestRecorder.TitleBar.Window.Settings.Tooltip}"/>
+						<c:Icon src="sap-icon://settings" press=".openSettingsDialog" tooltip="{i18n>TestRecorder.TitleBar.Window.Settings.Tooltip}"/>
 
-						<c:Icon src="sap-icon://minimize" press="toggleMinimize" tooltip="{i18n>TestRecorder.TitleBar.Window.Minimize.Tooltip}" visible="{/isInIframe}" />
-						<c:Icon src="sap-icon://slim-arrow-down" press="dockBottom" tooltip="{i18n>TestRecorder.TitleBar.Window.Dock.Bottom.Tooltip}" />
-						<c:Icon src="sap-icon://slim-arrow-left" press="dockLeft" tooltip="{i18n>TestRecorder.TitleBar.Window.Dock.Left.Tooltip}" />
-						<c:Icon src="sap-icon://slim-arrow-right" press="dockRight" tooltip="{i18n>TestRecorder.TitleBar.Window.Dock.Right.Tooltip}" />
+						<c:Icon src="sap-icon://minimize" press=".toggleMinimize" tooltip="{i18n>TestRecorder.TitleBar.Window.Minimize.Tooltip}" visible="{/isInIframe}" />
+						<c:Icon src="sap-icon://slim-arrow-down" press=".dockBottom" tooltip="{i18n>TestRecorder.TitleBar.Window.Dock.Bottom.Tooltip}" />
+						<c:Icon src="sap-icon://slim-arrow-left" press=".dockLeft" tooltip="{i18n>TestRecorder.TitleBar.Window.Dock.Left.Tooltip}" />
+						<c:Icon src="sap-icon://slim-arrow-right" press=".dockRight" tooltip="{i18n>TestRecorder.TitleBar.Window.Dock.Right.Tooltip}" />
 
-						<c:Icon src="sap-icon://popup-window" press="openWindow" tooltip="{i18n>TestRecorder.TitleBar.Window.New.Tooltip}" visible="{/isInIframe}"/>
-						<c:Icon src="sap-icon://decline" press="close" tooltip="{i18n>TestRecorder.TitleBar.Window.Close.Tooltip}"/>
+						<c:Icon src="sap-icon://popup-window" press=".openWindow" tooltip="{i18n>TestRecorder.TitleBar.Window.New.Tooltip}" visible="{/isInIframe}"/>
+						<c:Icon src="sap-icon://decline" press=".close" tooltip="{i18n>TestRecorder.TitleBar.Window.Close.Tooltip}"/>
 					</contentRight>
 				</Bar>
 			</l:fixContent>
@@ -73,7 +73,7 @@
 										<c:Item key="{key}" text="{label}" />
 									</Select>
 									<Label text="{i18n>TestRecorder.Inspect.Snippet.MultiSwitch.Label}" labelFor="multiSwitch" class="sapUiSmallMarginEnd" />
-									<Switch id="multiSwitch" state="{/settings/multipleSnippets}" type="AcceptReject" change="_onChangeMultiple"/>
+									<Switch id="multiSwitch" state="{/settings/multipleSnippets}" type="AcceptReject" change="._onChangeMultiple"/>
 								</HBox>
 							</VBox>
 							<code:CodeEditor
@@ -90,8 +90,8 @@
 								colorTheme="theme-ambiance"
 								lineNumbers="false"/>
 							<HBox justifyContent="End" alignItems="Center">
-								<Button text="{i18n>TestRecorder.Inspect.Snippet.Copy.Text}" press="copyCodeSnippet"/>
-								<Button text="{i18n>TestRecorder.Inspect.Snippet.Clear.Text}" press="clearCodeSnippet" class="sapUiSmallMarginBegin"/>
+								<Button text="{i18n>TestRecorder.Inspect.Snippet.Copy.Text}" press=".copyCodeSnippet"/>
+								<Button text="{i18n>TestRecorder.Inspect.Snippet.Clear.Text}" press=".clearCodeSnippet" class="sapUiSmallMarginBegin"/>
 							</HBox>
 						</ScrollContainer>
 						</Panel>
@@ -129,7 +129,7 @@
 													<c:Icon src="sap-icon://add-process"
 														class="sapUiSmallMarginEnd"
 														tooltip="{i18n>TestRecorder.Inspect.Properties.Property.Icon.Tooltip}"
-														press="handlePropertyIconPress"/>
+														press=".handlePropertyIconPress"/>
 													<Text text="{controls>property}"/>
 												</HBox>
 												<Text text="{controls>value}"/>
@@ -158,7 +158,7 @@
 													<c:Icon src="sap-icon://add-process"
 														class="sapUiSmallMarginEnd"
 														tooltip="{i18n>TestRecorder.Inspect.Properties.Property.Icon.Tooltip}"
-														press="handlePropertyIconPress"/>
+														press=".handlePropertyIconPress"/>
 													<Text text="{controls>property}"/>
 												</HBox>
 												<Text text="{controls>value}"/>

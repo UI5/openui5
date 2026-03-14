@@ -10269,10 +10269,21 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("doSetProperty: returns undefined", function (assert) {
+[false, true].forEach((bWithAggregationCache) => {
+	const sTitle = "doSetProperty: returns undefined, bWithAggregationCache="
+		+ bWithAggregationCache;
+
+	QUnit.test(sTitle, function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		if (bWithAggregationCache) {
+			oBinding.oCache.setGrandTotalOutdated = mustBeMocked;
+			this.mock(oBinding.oCache).expects("setGrandTotalOutdated").withExactArgs(true);
+		}
+
 		// code under test
-		assert.strictEqual(this.bindList("/EMPLOYEES").doSetProperty(), undefined);
+		assert.strictEqual(oBinding.doSetProperty(), undefined);
 	});
+});
 
 	//*********************************************************************************************
 [{

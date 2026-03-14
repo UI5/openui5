@@ -1,17 +1,6 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "ignoreDeps": [
-        "@ui5/tooling-webc",
-        "@ui5/webcomponents",
-        "@ui5/webcomponents-base",
-        "@ui5/webcomponents-fiori",
-        "@ui5/webcomponents-localization",
-        "@ui5/webcomponents-icons",
-        "@ui5/webcomponents-icons-business-suite",
-        "@ui5/webcomponents-icons-tnt",
-        "@ui5/webcomponents-theming",
-        "lit-html"
-    ],
+    "ignoreDeps": [],
     "commitMessagePrefix": "[INTERNAL] Infra:",
     "rangeStrategy": "bump",
     "reviewers": ["UI5 Foundation"],
