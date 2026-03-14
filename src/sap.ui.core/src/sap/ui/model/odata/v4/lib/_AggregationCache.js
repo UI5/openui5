@@ -2267,6 +2267,10 @@ sap.ui.define([
 			.then((oResult) => {
 				_Helper.updateExisting(this.mChangeListeners, "()",
 					this.aElements.$byPredicate["()"], oResult.value[0]);
+				this.setGrandTotalOutdated(false);
+			}, (oError) => {
+				this.setGrandTotalOutdated(true);
+				throw oError;
 			});
 	};
 
@@ -2632,6 +2636,28 @@ sap.ui.define([
 		// "super" call (like @borrows ...)
 		const fnSuper = this.oFirstLevel.restore;
 		fnSuper.call(this, bReally);
+	};
+
+	/**
+	 * Sets the outdated state of the grand total row, if there is any.
+	 *
+	 * @param {boolean} bOutdated - Whether the grand total row is outdated
+	 *
+	 * @private
+	 */
+	_AggregationCache.prototype.setGrandTotalOutdated = function (bOutdated) {
+		const oGrandTotal = this.aElements.$byPredicate["()"];
+		if (oGrandTotal) {
+			_Helper.updateAll(this.mChangeListeners, "()", oGrandTotal,
+				{"@$ui5.context.isOutdated" : bOutdated});
+			// Update also the copy of the grand total if it exists
+			const oGrandTotalCopy = _Helper.getPrivateAnnotation(oGrandTotal, "copy");
+			if (oGrandTotalCopy) {
+				_Helper.updateAll(this.mChangeListeners,
+					_Helper.getPrivateAnnotation(oGrandTotalCopy, "predicate"), oGrandTotalCopy,
+					{"@$ui5.context.isOutdated" : bOutdated});
+			}
+		}
 	};
 
 	/**

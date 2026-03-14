@@ -287,6 +287,75 @@ sap.ui.define([
 		}.bind(this), 1000);
 	});
 
+	QUnit.test("Multiple InlineSvg images have unique scoped IDs", async function(assert) {
+		// Arrange - Use same SVG file three times to test duplicate ID handling
+		var sSvgPath = IMAGE_PATH + "avatar_with_nested_images.svg",
+			oImage1 = new Image("image1", { src: sSvgPath, mode: "InlineSvg" }),
+			oImage2 = new Image("image2", { src: sSvgPath, mode: "InlineSvg" }),
+			oImage3 = new Image("image3", { src: sSvgPath, mode: "InlineSvg" }),
+			fnDone = assert.async(),
+			iRerenderingCount = 0;
+
+		assert.expect(4);
+
+		oImage3.addEventDelegate({
+			onAfterRendering: function () {
+				if (iRerenderingCount === 1) {
+					setTimeout(function() {
+						// Assert 1: No duplicate IDs in DOM
+						var aAllIds = [];
+						document.querySelectorAll("pattern[id]").forEach(function(pattern) {
+							aAllIds.push(pattern.id);
+						});
+						var bNoDuplicates = aAllIds.length === new Set(aAllIds).size;
+						assert.ok(bNoDuplicates, "No duplicate IDs found in the DOM");
+
+						// Assert 2: IDs are scoped with control ID
+						var oPattern1 = oImage1.$().find("pattern[id]")[0];
+						assert.ok(oPattern1.id.indexOf("image1--") === 0, "Pattern IDs are scoped with control ID");
+
+						// Assert 3: All url(#id) references work
+						var bAllReferencesValid = true;
+						document.querySelectorAll("path[fill^='url(#']").forEach(function(path) {
+							var sFill = path.getAttribute("fill");
+							var iStart = sFill.indexOf("url(#") + 5;
+							var iEnd = sFill.indexOf(")", iStart);
+							if (iEnd > iStart) {
+								var sRefId = sFill.substring(iStart, iEnd);
+								if (!document.getElementById(sRefId)) {
+									bAllReferencesValid = false;
+								}
+							}
+						});
+						assert.ok(bAllReferencesValid, "All url(#id) references point to existing elements");
+
+						// Assert 4: Re-rendering doesn't cause double-scoping
+						oImage1.setWidth("100px");
+						nextUIUpdate.runSync()/*context not obviously suitable for an async function*/;
+
+						setTimeout(function() {
+							var oPatternAfter = oImage1.$().find("pattern[id]")[0];
+							var bNoDoubleScoping = oPatternAfter.id.split("--").length === 2;
+							assert.ok(bNoDoubleScoping, "Re-rendering doesn't cause double-scoping");
+
+							// Clean up
+							oImage1.destroy();
+							oImage2.destroy();
+							oImage3.destroy();
+							fnDone();
+						}, 100);
+					}, 100);
+				}
+				iRerenderingCount++;
+			}
+		});
+
+		oImage1.placeAt("qunit-fixture");
+		oImage2.placeAt("qunit-fixture");
+		oImage3.placeAt("qunit-fixture");
+		await nextUIUpdate();
+	});
+
 	QUnit.module("Rendering decorative image");
 
 	QUnit.test("Alt text and tooltip", async function(assert) {

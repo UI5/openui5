@@ -20,7 +20,6 @@ sap.ui.define(["sap/m/Column"], function (mColumn) {
 	 *
 	 * @constructor
 	 * @public
-	 * @experimental since 1.120
 	 * @since 1.120
 	 * @alias sap.m.upload.Column
 	 */

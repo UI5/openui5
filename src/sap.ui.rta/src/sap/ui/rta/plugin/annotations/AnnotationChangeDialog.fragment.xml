@@ -40,7 +40,7 @@
 						id="sapUiRtaChangeAnnotationDialog_propertiesFilter"
 						placeholder="{i18n>ANNOTATION_CHANGE_DIALOG_PROPERTY_SEARCH}"
 						value="{/filterText}"
-						liveChange="onFilterProperties"
+						liveChange=".onFilterProperties"
 						enabled="{= ${/properties}.length > 0}">
 						<layoutData>
 							<FlexItemData growFactor="1" styleClass="sapUiSmallMarginEnd"/>
@@ -52,7 +52,7 @@
 						<Switch
 							id="sapUiRtaChangeAnnotationDialog_toggleShowAllPropertiesSwitch"
 							state="{/showChangedPropertiesOnly}"
-							change="switchDisplayMode"
+							change=".switchDisplayMode"
 							customTextOn=" "
 							customTextOff=" "
 							enabled="{= ${/properties}.length > 0}"/>
@@ -96,7 +96,7 @@
 				id="sapUiRtaChangeAnnotationDialog_saveButton"
 				type="Emphasized"
 				text="{i18n>ANNOTATION_CHANGE_DIALOG_CONFIRM}"
-				press="onSave"
+				press=".onSave"
 				visible="{= ${/properties}.length > 0}"
 			/>
 		</beginButton>
@@ -105,7 +105,7 @@
 				id="sapUiRtaChangeAnnotationDialog_cancelButton"
 				type="Transparent"
 				text="{i18n>ANNOTATION_CHANGE_DIALOG_CANCEL}"
-				press="onCancel"
+				press=".onCancel"
 			/>
 		</endButton>
 	</Dialog>

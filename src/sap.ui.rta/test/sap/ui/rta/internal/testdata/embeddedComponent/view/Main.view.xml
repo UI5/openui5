@@ -44,7 +44,6 @@
 					async="true"
 					height="75%"
 					id="idComponentContainer_RTA_SAMPLE"
-					componentCreated="onComponentCreated"
 					propagateModel="true"
 			/>
 

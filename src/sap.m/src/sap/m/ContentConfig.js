@@ -24,7 +24,6 @@ sap.ui.define([
 	 * @version ${version}
 	 * @constructor
 	 * @public
-	 * @experimental since 1.122
 	 * @since 1.122
 	 * @alias sap.m.ContentConfig
 	 */

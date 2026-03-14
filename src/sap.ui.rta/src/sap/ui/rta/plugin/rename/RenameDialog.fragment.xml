@@ -32,7 +32,7 @@
 					id="sapUiRtaRenameDialog_input"
 					value="{/newText}"
 					placeholder="{i18n>RENAME_DIALOG_PLACEHOLDER}"
-					liveChange="onTextChange"
+					liveChange=".onTextChange"
 					valueState="{= ${/validationError} === undefined ? 'None' : 'Error'}"
 					valueStateText="{/validationError}"
 					width="100%"
@@ -49,7 +49,7 @@
 				enabled="{/isSaveEnabled}"
 				type="Emphasized"
 				text="{i18n>RENAME_DIALOG_CONFIRM}"
-				press="onSave"
+				press=".onSave"
 			/>
 		</beginButton>
 		<endButton>
@@ -57,7 +57,7 @@
 				id="sapUiRtaRenameDialog_cancelButton"
 				type="Transparent"
 				text="{i18n>RENAME_DIALOG_CANCEL}"
-				press="onCancel"
+				press=".onCancel"
 			/>
 		</endButton>
 	</Dialog>

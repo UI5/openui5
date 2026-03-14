@@ -52,6 +52,11 @@ sap.ui.define([], function () {
 			"href": "https://github.com/UI5/mcp-server"
 		},
 		{
+			"id": "fioriMcpServer",
+			"text": "SAP Fiori MCP server",
+			"href": "https://github.com/SAP/open-ux-tools/tree/main/packages/fiori-mcp-server"
+		},
+		{
 			"id": "businessAppStudio",
 			"text": "SAP Business Application Studio",
 			"href": "https://pages.community.sap.com/topics/business-application-studio"

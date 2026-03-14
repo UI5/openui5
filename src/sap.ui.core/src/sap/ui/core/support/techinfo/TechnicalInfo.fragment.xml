@@ -22,11 +22,11 @@
 					class="sapUiTinyMarginBegin"
 					icon="sap-icon://copy"
 					tooltip="{i18n>TechInfo.CopyButton.Tooltip}"
-					press="onCopyTechnicalInfoToClipboard"/>
+					press=".onCopyTechnicalInfoToClipboard"/>
 				<Button
 					icon="sap-icon://sys-help"
 					tooltip="{i18n>TechInfo.HelpButton.Tooltip}"
-					press="onShowHelp"/>
+					press=".onShowHelp"/>
 			</Toolbar>
 		</customHeader>
 		<f:SimpleForm
@@ -43,7 +43,7 @@
 					<l:HorizontalLayout>
 						<Link
 							text="{view>/ProductVersion}"
-							press="onShowVersion"
+							press=".onShowVersion"
 							tooltip="{i18n>TechInfo.VersionLink.Tooltip}"/>
 						<Text
 							id="versionBuiltAt"
@@ -90,17 +90,17 @@
 						id="debugMode"
 						selected="{view>/DebugMode}"
 						tooltip="{i18n>TechInfo.DebugSources.Tooltip}"
-						select="onDebugSources"/>
+						select=".onDebugSources"/>
 					<Link
 						text="{i18n>TechInfo.DebugSourcesModules.Link}"
-						press="onConfigureDebugModules"/>
+						press=".onConfigureDebugModules"/>
 				</HBox>
 			</f:content>
 		</f:SimpleForm>
 		<buttons>
 			<Button
 				text="{i18n>TechnInfo.DiagnosticsButton.Text}"
-				press="onOpenDiagnostics">
+				press=".onOpenDiagnostics">
 				<layoutData>
 					<OverflowToolbarLayoutData priority="Low"/>
 				</layoutData>
@@ -108,7 +108,7 @@
 			<Button
 				id="startTestRecorderButton"
 				text="{i18n>TechnInfo.TestRecorderButton.Text}"
-				press="onOpenTestRecorderInIFrame">
+				press=".onOpenTestRecorderInIFrame">
 				<layoutData>
 					<OverflowToolbarLayoutData priority="Low"/>
 				</layoutData>
@@ -116,7 +116,7 @@
 			<Button
 				id="startSupportAssistantButton"
 				text="{i18n>TechnInfo.AssistantButton.Text}"
-				press="onOpenAssistant"
+				press=".onOpenAssistant"
 				class="sapUiDebugTechnicalInfoAssistantButton"
 				type="Emphasized">
 				<layoutData>
@@ -127,7 +127,7 @@
 				id="supportAssistantSettingsButton"
 				icon="sap-icon://settings"
 				tooltip="{i18n>Icon.settings}"
-				press="onConfigureAssistantBootstrap"
+				press=".onConfigureAssistantBootstrap"
 				class="sapUiDebugTechnicalInfoAssistantSettingsButton"
 				type="Emphasized">
 				<layoutData>
@@ -136,7 +136,7 @@
 			</Button>
 			<Button
 				text="{i18n>CLOSE}"
-				press="close">
+				press=".close">
 				<layoutData>
 					<OverflowToolbarLayoutData priority="NeverOverflow"/>
 				</layoutData>

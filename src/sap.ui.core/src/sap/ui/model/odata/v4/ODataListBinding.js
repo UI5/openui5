@@ -1780,7 +1780,9 @@ sap.ui.define([
 	 * @override
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#doSetProperty
 	 */
-	ODataListBinding.prototype.doSetProperty = function () {};
+	ODataListBinding.prototype.doSetProperty = function () {
+		this.oCache.setGrandTotalOutdated?.(true);
+	};
 
 	/**
 	 * @override

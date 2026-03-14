@@ -310,6 +310,28 @@ sap.ui.define([
 		oRBGroup.destroy();
 	});
 
+	QUnit.test("setWidth() && setEntireWidth()", function(assert) {
+
+		// arrange
+		const oRBGroup = new RadioButtonGroup({
+			buttons: [
+				new RadioButton({
+					width: '50px',
+					useEntireWidth: false,
+					text:"Option 1"
+				})
+			]
+		});
+		oRBGroup.placeAt("qunit-fixture");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assertions
+		assert.equal(oRBGroup.getButtons()[0].$("label").children().first().css("width"), "48px", "Width of the label should be 50px");
+
+		// cleanup
+		oRBGroup.destroy();
+	});
+
 	QUnit.test("Invisible buttons", function(assert) {
 		var oRBGroup = new RadioButtonGroup({
 			buttons: [

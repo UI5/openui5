@@ -822,6 +822,8 @@ sap.ui.define([
 				return this.oBinding.fetchValue(this.sPath + "/$count", null, bCached)
 					.then((iCount) => {
 						return {
+							...(this.bOutdated !== undefined
+									&& {"@$ui5.context.isOutdated" : this.bOutdated}),
 							"@$ui5.context.isSelected" : this.bSelected,
 							$count : iCount,
 							$selectionCount : iSelectionCount
@@ -1089,8 +1091,8 @@ sap.ui.define([
 	 *   <ul>
 	 *     <li> the context's root binding is suspended,
 	 *     <li> the value is not primitive,
-	 *     <li> or the context is a header context and the path is not "$count" or
-	 *        "@ui5.context.isSelected".
+	 *     <li> or the context is a header context and the path is neither "$count",
+	 *        "@ui5.context.isOutdated", nor "@ui5.context.isSelected".
 	 *   </ul>
 	 *
 	 * @public
@@ -1387,27 +1389,26 @@ sap.ui.define([
 	};
 
 	/**
-	 * Tells whether this context is outdated.
-	 *
-	 * For the header context of a list binding, the following states are supported:
+	 * Tells whether this context is outdated:
 	 * <ul>
-	 *   <li><code>undefined</code>: The outdated state has not yet been determined
+	 *   <li><code>undefined</code>: The outdated state has not been determined yet
 	 *   <li><code>true</code>: The context is outdated
-	 *   <li><code>false</code>: The context is up-to-date
+	 *   <li><code>false</code>: The context is up to date
 	 * </ul>
 	 *
-	 * The outdated state can also be accessed via instance annotation "@$ui5.context.isOutdated"
-	 * at the header context.
+	 * The outdated state can also be accessed via the instance annotation
+	 * "@$ui5.context.isOutdated".
 	 *
 	 * @returns {boolean|undefined}
 	 *   Whether this context is outdated, or <code>undefined</code> if the outdated state has not
-	 *   yet been determined
+	 *   been determined yet
+	 * @throws {Error} If this context's root binding is suspended
 	 *
-	 * @experimental As of version 1.147.0
+	 * @ui5-experimental-since 1.147
 	 * @public
 	 */
 	Context.prototype.isOutdated = function () {
-		return this.bOutdated;
+		return this.getProperty("@$ui5.context.isOutdated");
 	};
 
 	/**
@@ -1429,8 +1430,8 @@ sap.ui.define([
 	/**
 	 * Tells whether this context is currently selected, but not {@link #delete deleted} on the
 	 * client. Selection was experimental as of version 1.111.0. Since 1.122.0, the selection state
-	 * can also be accessed via instance annotation "@$ui5.context.isSelected" at the entity. Note
-	 * that the annotation does not take the deletion state into account.
+	 * can also be accessed via the instance annotation "@$ui5.context.isSelected" at the entity.
+	 * Note that the annotation does not take the deletion state into account.
 	 *
 	 * @returns {boolean} Whether this context is currently selected
 	 *

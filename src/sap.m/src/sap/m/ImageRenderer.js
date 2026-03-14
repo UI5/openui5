@@ -170,17 +170,34 @@ ImageRenderer._renderSvg = function(oRm, oImage) {
 };
 
 ImageRenderer._renderSvgAttributes = function (oRm, aAttributes, oImage) {
+	var sControlId = oImage.getId();
+
 	for (var i = 0; i < aAttributes.length; i++) {
 		var oAttr = aAttributes[i],
 			iNamespaceIndex = oAttr.name.indexOf(":"),
 			sAttributeName = iNamespaceIndex < 0 ? oAttr.name : oAttr.name.slice(iNamespaceIndex + 1),
 			sAttributeValue = oAttr.value;
 
+		// Scope IDs
+		if (sAttributeName === "id") {
+			sAttributeValue = sControlId + "--" + sAttributeValue;
+		}
+
+		// Scope ID references in url(#id) patterns
+		if (sAttributeValue.indexOf("url(#") > -1) {
+			sAttributeValue = sAttributeValue.split("url(#").join("url(#" + sControlId + "--");
+		}
+
 		if (sAttributeName === "href") {
-			if (!oImage._isHrefValid(sAttributeValue)) {
-				continue;
+			if (sAttributeValue.charAt(0) === "#") {
+				sAttributeValue = "#" + sControlId + "--" + sAttributeValue.substring(1);
+			} else {
+				// Validate and convert external URLs only
+				if (!oImage._isHrefValid(sAttributeValue)) {
+					continue;
+				}
+				sAttributeValue = oImage._toAbsoluteUrl(sAttributeValue, oImage.getSrc());
 			}
-			sAttributeValue = oImage._toAbsoluteUrl(sAttributeValue, oImage.getSrc());
 		}
 
 		oRm.attr(sAttributeName, sAttributeValue);

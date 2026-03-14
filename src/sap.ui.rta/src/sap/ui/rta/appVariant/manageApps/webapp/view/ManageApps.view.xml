@@ -62,7 +62,7 @@
 
 					<MenuButton text="{i18n>MAA_DIALOG_ACTIONS}">
 						<menu>
-							<Menu itemSelected="onMenuAction">
+							<Menu itemSelected=".onMenuAction">
 								<items>
 									<MenuItem text="{i18n>MAA_DIALOG_ADAPT_UI}"
 										visible="{parts: [{path: 'adaptUIButtonVisibility'}, {path: 'isKeyUser'}], formatter:'.formatAdaptUIButtonVisibility'}"

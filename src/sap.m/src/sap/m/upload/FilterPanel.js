@@ -72,7 +72,6 @@ sap.ui.define(
 		 *
 		 * @constructor
 		 * @private
-		 * @experimental
 		 * @internal
 		 * @alias sap.m.upload.FilterPanel
 		 */

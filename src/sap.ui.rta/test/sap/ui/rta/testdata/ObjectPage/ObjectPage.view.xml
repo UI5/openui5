@@ -18,7 +18,7 @@
 							objectSubtitle=""
 							objectImageURI="">
 						<actions>
-							<ObjectPageHeaderActionButton icon="sap-icon://synchronize" press="toggleTitle" text="toggle title"/>
+							<ObjectPageHeaderActionButton icon="sap-icon://synchronize" text="toggle title"/>
 						</actions>
 					</ObjectPageHeader>
 				</headerTitle>
