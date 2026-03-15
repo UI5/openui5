@@ -152,12 +152,10 @@ sap.ui.define([
 								"sap.ui.viewExtensions": {
 									"sap.suite.ui.generic.template.ObjectPage.view.Details": {
 										"ReplaceFacet|SEPMRA_C_PD_Product|ProductReviewFacetID": {
-											_version: "2.0.0",
 											className: "sap.ui.core.mvc.View",
 											viewName: "fixture.application.ext.view.ProductDetailReview",
 											type: "XML",
 											id: "reviewView",
-
 											"sap.ui.generic.app": {
 												title: "Reviews"
 											}
