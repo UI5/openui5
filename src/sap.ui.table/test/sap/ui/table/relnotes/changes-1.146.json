@@ -3,6 +3,11 @@
     "date": "March 2026",
     "notes": [
       {
+        "id": "fff6859bafe7f66194931efb1ab4edd368a034a2",
+        "type": "FIX",
+        "text": " rowmodes.Auto: Automatic row count adjustment"
+      },
+      {
         "id": "50ee853dd2d866a715eda4daf636a0c5b0dd8b36",
         "type": "FEATURE",
         "text": " ui.Table: Implemented momentum scrolling"

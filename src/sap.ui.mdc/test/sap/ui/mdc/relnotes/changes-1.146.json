@@ -3,6 +3,11 @@
     "date": "March 2026",
     "notes": [
       {
+        "id": "07dd6864e2b02794978ff7036b20ac4c2b410b27",
+        "type": "FIX",
+        "text": " Table: sorter and grouping not applied"
+      },
+      {
         "id": "7496c02d2f253b94cdedfddbb812949500a4fe35",
         "type": "FIX",
         "text": "Fix addCustomView Functionality"
