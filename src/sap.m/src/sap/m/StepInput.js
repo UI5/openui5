@@ -603,7 +603,7 @@ function(
 			this._bValueStatePreset = false;
 
 			// Handle the special case where string representation needs formatting
-			let bShouldFireChange = (this._fTempValue != this._fOldValue && this._isValueWithCorrectPrecision(this._sTempValue)) || bForce;
+			let bShouldFireChange = (this._fTempValue != this._fOldValue) || bForce;
 
 			// Check if we need to format string representation (e.g., ".50" -> "0.50")
 			if (!bShouldFireChange && this._sTempValue && typeof this._sTempValue === 'string') {
@@ -611,25 +611,25 @@ function(
 				const sFormattedValue = this._getFormattedValue(this._fTempValue);
 				// Round the parsed input according to displayValuePrecision so inputs like
 				// ".4" with displayValuePrecision=0 are treated as 0 after rounding.
-				const iPrecision = this.getDisplayValuePrecision();
+				const iPrecision = this._getDisplayValuePrecision();
 				const fParsedRounded = !isNaN(fParsedInput) ? Math.round(fParsedInput * Math.pow(10, iPrecision)) / Math.pow(10, iPrecision) : NaN;
 
 				if (!isNaN(fParsedInput) && !isNaN(fParsedRounded) &&
 					fParsedRounded === this._fTempValue &&
-					this._isValueWithCorrectPrecision(this._sTempValue) &&
-					this._sTempValue !== sFormattedValue) {
+					this._sTempValue !== sFormattedValue && fParsedInput !== this._fTempValue) {
 					bShouldFireChange = true;
 				}
 			}
 
+			const bIsValueWithCorrectPrecision = this._isValueWithCorrectPrecision(this._sTempValue);
 			if (bShouldFireChange) {
 				// change the value and fire the event
 				this.setValue(this._fTempValue);
-				this._getInput().setValue(this._getFormattedValue());
+				this._getInput().setValue(bIsValueWithCorrectPrecision ? this._getFormattedValue() : this._sTempValue);
 				this.fireChange({value: this._fTempValue});
 			} else {
 				// just update the visual value and buttons
-				this._getInput().setValue(this._sTempValue || this._fTempValue);
+				this._getInput().setValue(bIsValueWithCorrectPrecision ? this._getFormattedValue() : this._sTempValue);
 				this._disableButtons(this._parseNumber(this._getInput().getValue()), this._getMax(), this._getMin());
 			}
 			return this;
@@ -647,7 +647,7 @@ function(
 			if (!this._bSpinStarted) {
 				// short click, just a single inc/dec button
 				this._bDelayedEventFire = false;
-				this._changeValueWithStep(fMultiplier);
+				this._changeValueWithStep(fMultiplier, true);
 				this._btndown = false;
 				this._changeValue();
 			} else {
@@ -663,34 +663,58 @@ function(
 		 *
 		 * @param {float} fMultiplier Indicates the direction - increment (positive value)
 		 * or decrement (negative value), and multiplier for modifying the value
+		 * @param {boolean} bFromButton Indicates if the change is triggered by button press
 		 * @returns {this} Reference to the control instance for chaining
 		 * @private
 		 */
-		StepInput.prototype._changeValueWithStep = function (fMultiplier) {
+		StepInput.prototype._changeValueWithStep = function (fMultiplier, bFromButton) {
 			var iMultiplier,
 				fNewValue,
 				fDelta;
+
+			if (bFromButton) {
+				this._sTempValue = undefined;
+			} else {
+				this._sTempValue = this._getInput().getValue();
+			}
 
 			// calculate precision multiplier
 			if (isNaN(this._iValuePrecision)) {
 				this._iValuePrecision = this._getNumberPrecision(this.getValue());
 			}
-			iMultiplier = Math.pow(10, Math.max(this.getDisplayValuePrecision(), this._iValuePrecision));
+			iMultiplier = Math.pow(10, Math.max(this._getDisplayValuePrecision(), this._iValuePrecision));
 
 			if (isNaN(this._fTempValue) || this._fTempValue === undefined) {
 				this._fTempValue = this.getValue();
 			}
 
-			// check input value to correct requested step if necessary
-			fDelta = this._checkInputValue();
-			this._fTempValue += fDelta;
-
-			// calculate new value
-			fNewValue = fMultiplier !== 0 ? this._calculateNewValue(fMultiplier) : this._fTempValue;
-
-			// fix value precision
+			// When typing (fMultiplier === 0), directly use the parsed input value to avoid floating-point errors
+			// When performing step operations, use delta-based approach
 			if (fMultiplier === 0) {
-				fNewValue = Math.round(fNewValue * iMultiplier) / iMultiplier;
+				// Direct value assignment when typing
+				let sInputValue = this._getInput().getValue();
+
+				// Handle empty input value - use default value (min if set, otherwise 0)
+				if (sInputValue === "") {
+					this._fTempValue = this._getDefaultValue(sInputValue, this._getMax(), this._getMin());
+				} else {
+					const sGroupSeparator = this._getNumberFormatter().oFormatOptions.groupingSeparator;
+					sInputValue = sInputValue.replaceAll(sGroupSeparator, "");
+					this._fTempValue = this._parseNumber(sInputValue);
+				}
+			} else {
+				// Delta-based approach for step operations
+				fDelta = this._checkInputValue();
+				this._fTempValue += fDelta;
+				// Round to avoid floating-point precision issues during step operations
+				this._fTempValue = Math.round(this._fTempValue * iMultiplier) / iMultiplier;
+			}			// calculate new value
+			fNewValue = fMultiplier !== 0 ? this._calculateNewValue(fMultiplier) : this._fTempValue;// fix value precision (but not when typing with displayValuePrecision=0)
+			if (fMultiplier === 0) {
+				// Skip rounding when displayValuePrecision=0 and not from button press (i.e., during typing)
+				if (!(this._getDisplayValuePrecision() === 0 && !bFromButton)) {
+					fNewValue = Math.round(fNewValue * iMultiplier) / iMultiplier;
+				}
 			}
 
 			// save new temp value
@@ -795,7 +819,7 @@ function(
 				sMessage = this.getValueStateText() ? this.getValueStateText() : oCoreMessageBundle.getText("Float.Invalid");
 			} else if (!this._isValueWithCorrectPrecision(sValue)) {
 				aViolatedConstraints.push("precision");
-				sMessage = oCoreMessageBundle.getText("EnterNumberWithPrecision", [this.getDisplayValuePrecision()]);
+				sMessage = oCoreMessageBundle.getText("EnterNumberWithPrecision", [this._getDisplayValuePrecision()]);
 			}
 
 			if (sMessage) {
@@ -884,7 +908,7 @@ function(
 
 		StepInput.prototype._getNumberFormatter = function(bReset) {
 			if (!this._formatter || bReset) {
-				this._formatter = NumberFormat.getFloatInstance({ decimals: this.getDisplayValuePrecision() });
+				this._formatter = NumberFormat.getFloatInstance({ decimals: this._getDisplayValuePrecision() });
 			}
 
 			return this._formatter;
@@ -898,7 +922,7 @@ function(
 		 * @private
 		 */
 		StepInput.prototype._getFormattedValue = function (vValue) {
-			var iPrecision = this.getDisplayValuePrecision(),
+			var iPrecision = this._getDisplayValuePrecision(),
 				iValueLength,
 				sDigits;
 
@@ -963,6 +987,9 @@ function(
 				sInputValue = this._getDefaultValue(sInputValue, this._getMax(), this._getMin()).toString();
 			}
 
+			var sGroupSeparator = this._getNumberFormatter().oFormatOptions.groupingSeparator;
+			sInputValue = sInputValue.replaceAll(sGroupSeparator, "");
+
 			// fix the entered value if the precision is 0; and filter 'e/E' meanwhile
 			if (this.getDisplayValuePrecision() === 0) {
 				sInputValue = Math.round(this._parseNumber(sInputValue.toLowerCase().split('e')[0])).toString();
@@ -973,6 +1000,13 @@ function(
 				fDelta = this._parseNumber(sInputValue) - this._fTempValue;
 			}
 			return fDelta;
+		};
+
+		StepInput.prototype._verifyValueIfNeeded = function () {
+			if (this._bNeedsVerification) {
+				this._verifyValue();
+				this._bNeedsVerification = false;
+			}
 		};
 
 		/**
@@ -988,7 +1022,8 @@ function(
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
-				this._changeValueWithStep(this.getLargerStep());
+				this._changeValueWithStep(this.getLargerStep(), true);
+				this._verifyValueIfNeeded();
 			}
 		};
 
@@ -1003,7 +1038,8 @@ function(
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
-				this._changeValueWithStep(-this.getLargerStep());
+				this._changeValueWithStep(-this.getLargerStep(), true);
+				this._verifyValueIfNeeded();
 			}
 		};
 
@@ -1016,7 +1052,8 @@ function(
 			if (this.getEditable() && this._isNumericLike(this._getMax()) && !(oEvent.ctrlKey || oEvent.metaKey || oEvent.altKey) && oEvent.shiftKey) {
 				this._bDelayedEventFire = true;
 				this._fTempValue = this._parseNumber(this._getInput().getValue());
-				this._changeValueWithStep(this._getMax() - this._fTempValue);
+				this._changeValueWithStep(this._getMax() - this._fTempValue, true);
+				this._verifyValueIfNeeded();
 			}
 		};
 
@@ -1029,7 +1066,8 @@ function(
 			if (this.getEditable() && this._isNumericLike(this._getMin()) && !(oEvent.ctrlKey || oEvent.metaKey || oEvent.altKey) && oEvent.shiftKey) {
 				this._bDelayedEventFire = true;
 				this._fTempValue = this._parseNumber(this._getInput().getValue());
-				this._changeValueWithStep(-(this._fTempValue - this._getMin()));
+				this._changeValueWithStep(-(this._fTempValue - this._getMin()), true);
+				this._verifyValueIfNeeded();
 			}
 		};
 
@@ -1043,7 +1081,8 @@ function(
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
-				this._changeValueWithStep(1);
+				this._changeValueWithStep(1, true);
+				this._verifyValueIfNeeded();
 				oEvent.setMarked();
 			}
 		};
@@ -1058,7 +1097,8 @@ function(
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
-				this._changeValueWithStep(-1);
+				this._changeValueWithStep(-1, true);
+				this._verifyValueIfNeeded();
 				oEvent.setMarked();
 			}
 		};
@@ -1070,7 +1110,8 @@ function(
 				var oOriginalEvent = oEvent.originalEvent,
 					bDirectionPositive = oOriginalEvent.detail ? (-oOriginalEvent.detail > 0) : (oOriginalEvent.wheelDelta > 0);
 				this._bDelayedEventFire = true;
-				this._changeValueWithStep((bDirectionPositive ? 1 : -1));
+				this._changeValueWithStep((bDirectionPositive ? 1 : -1), true);
+				this._verifyValueIfNeeded();
 			}
 		};
 
@@ -1324,7 +1365,7 @@ function(
 
 		StepInput.prototype._isValueWithCorrectPrecision = function (sValue) {
 			const sDecimalSeparator = Device.system.desktop ? this._getNumberFormatter().oFormatOptions.decimalSeparator : ".",
-				iCharsSet = this.getDisplayValuePrecision();
+				iCharsSet = this._getDisplayValuePrecision();
 
 			// If the value starts with the decimal separator, normalize it to "0.xxx" for the precision check
 			if (sValue && sValue.indexOf(sDecimalSeparator) === 0) {
@@ -1332,6 +1373,11 @@ function(
 			}
 
 			const iDecimalMark = sValue?.indexOf(sDecimalSeparator);
+
+			if (iDecimalMark < 0 && iCharsSet > 0) {
+				// if there is no decimal mark but displayValuePrecision is more than 0 -> invalid
+				return false;
+			}
 
 			if (iDecimalMark >= 0 && iCharsSet >= 0) { // only for decimals
 				const sEventValueAfterTheDecimal = sValue?.split(sDecimalSeparator)[1],
@@ -1428,7 +1474,7 @@ function(
 		 */
 		StepInput.prototype._areFoldChangeRequirementsFulfilled = function () {
 			return this.getStepMode() === StepModeType.Multiple &&
-				this.getDisplayValuePrecision() === 0 &&
+				this._getDisplayValuePrecision() === 0 &&
 				this._isInteger(this.getStep()) &&
 				this._isInteger(this.getLargerStep());
 		};
@@ -1569,6 +1615,14 @@ function(
 			if (this._bSpinStarted) {
 				this._changeValue();
 			}
+		};
+
+		StepInput.prototype._getDisplayValuePrecision = function() {
+			var oBinding = this.getBinding("value"),
+				oBindingType = oBinding && oBinding.getType && oBinding.getType(),
+				sBindingConstraintPrecision = oBindingType && oBindingType.oConstraints && oBindingType.oConstraints.precision;
+
+			return sBindingConstraintPrecision !== undefined ? parseInt(sBindingConstraintPrecision) : this.getDisplayValuePrecision();
 		};
 
 		StepInput.prototype._getMin = function() {

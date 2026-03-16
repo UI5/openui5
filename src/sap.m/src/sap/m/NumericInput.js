@@ -112,8 +112,10 @@ function(
 			return;
 		}
 
+		var sGroupSeparator = this._getNumberFormat().oFormatOptions.groupingSeparator;
 		var oIsMinusSignAtZeroPosition =  iCursorPos === 0 && (oEvent.which === KeyCodes.SLASH || oEvent.which === KeyCodes.NUMPAD_MINUS);
 		sTypedValue = this.getValue().substring(0, iCursorPos) + oEvent.originalEvent.key + this.getValue().substring(iCursorPos);
+		sTypedValue = sTypedValue.replaceAll(sGroupSeparator, "");
 		fParsedValue = this._getNumberFormat().parse(sTypedValue);
 		if (!isKeyAllowed(oEvent.which) || (!fParsedValue && fParsedValue !== 0 && !oIsMinusSignAtZeroPosition)) {
 			oEvent.preventDefault();
