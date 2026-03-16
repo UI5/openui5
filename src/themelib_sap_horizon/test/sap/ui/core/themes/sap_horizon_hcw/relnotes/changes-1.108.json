@@ -581,5 +581,15 @@
         "text": " sap.m.ValueStateMessage: Warning icon name corrected"
       }
     ]
+  },
+  "1.108.49": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "e07ed6d0067843ccfbf805c39eb7bfbe81894c60",
+        "type": "FIX",
+        "text": " sap.uxap.AnchorBar: Enable upperCaseAnchorBar property for Horizon theme"
+      }
+    ]
   }
 }

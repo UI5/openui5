@@ -1992,5 +1992,15 @@
         "text": " sap.m.ComboBoxBase: Value state popup is now hidden when the picker is opened"
       }
     ]
+  },
+  "1.108.49": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "3d41ffd170fc29e402a8c8eb6aaff19c1c24ce3c",
+        "type": "FIX",
+        "text": " sap.m.Button: Press event is fired correctly on pressing SPACE"
+      }
+    ]
   }
 }

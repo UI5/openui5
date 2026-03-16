@@ -354,5 +354,20 @@
         "text": " sap.ui.unified.Calendar: fixed weekday announcement in multi-month setup"
       }
     ]
+  },
+  "1.108.49": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "c9dd043f11f72885e28b770a1dda40f4dbc8ddb4",
+        "type": "FIX",
+        "text": " sap.ui.unified.CalendarDateInterval: shows correct year"
+      },
+      {
+        "id": "4a90854c32bd7fa4ee8e66064a11d5f87d0a73c2",
+        "type": "FIX",
+        "text": " sap.ui.unified.Calendar: fix unstable test"
+      }
+    ]
   }
 }

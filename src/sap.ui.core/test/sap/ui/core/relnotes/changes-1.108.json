@@ -787,5 +787,15 @@
         "text": " routing/History: avoid creating history entry when same hash is applied"
       }
     ]
+  },
+  "1.108.49": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "43aee1b9f36b8e510ac7a540192da018613a30f6",
+        "type": "FIX",
+        "text": " sap.base.strings.formatMessage: Accept nullish arguments"
+      }
+    ]
   }
 }
