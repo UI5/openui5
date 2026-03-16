@@ -1076,7 +1076,7 @@ sap.ui.define([
 		oCore.applyChanges();
 
 		// assert
-		assert.strictEqual(oChangeSpy.callCount, 1, "Change event fired once for '.5'");
+		assert.strictEqual(oChangeSpy.callCount, 0, "Change event not fired once for '.5'");
 		assert.strictEqual(oInput.getValue(), "0.5", "Input is formatted to '0.5'");
 		assert.strictEqual(this.stepInput.getValue(), 0.5, "StepInput numeric value is 0.5");
 
@@ -1120,6 +1120,32 @@ sap.ui.define([
 
 		// Assert
 		assert.equal(oStepInput.getAggregation("_input")._getInputValue(), "1.2", "The input is set correctly");
+
+		// Clean up
+		oStepInput.destroy();
+	});
+
+	QUnit.test("Change event is fired when value is changed but it is with not correct precision and value is not formatted", function (assert) {
+		// Prepare
+		const oStepInput = new StepInput({
+			value: 0,
+			displayValuePrecision: 2
+		}).placeAt("qunit-fixture");
+		const oChangeSpy = sinon.spy();
+		oStepInput.attachChange(oChangeSpy);
+		oCore.applyChanges();
+
+		// Act
+		oStepInput._getInput().onfocusin();
+		oStepInput._getInput()._$input.trigger("focus").val("1.1").trigger("input");
+		oStepInput._getInput().fireChange({ value: "1.1" });
+		oCore.applyChanges();
+
+		// Assert
+		assert.strictEqual(oChangeSpy.callCount, 1, "Change event fired once for '1.1'");
+		assert.strictEqual(oStepInput._getInput().getValue(), "1.1", "Input value is '1.1'");
+		assert.strictEqual(oStepInput.getValue(), 1.1, "StepInput numeric value is 1.1");
+		assert.equal(oStepInput.getValueState(), ValueState.Error, "ValueState is Error when precision does not match");
 
 		// Clean up
 		oStepInput.destroy();
