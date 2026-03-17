@@ -51,6 +51,7 @@ sap.ui.define([
 
 		this.mock(oModel).expects("checkFilter")
 			.withExactArgs(sinon.match.same(aApplicationFilters));
+		this.mock(FilterProcessor).expects("createNormalizeCache").withExactArgs().returns("~mNormalizeCache");
 
 		// code under test
 		oBinding = new ODataTreeBinding(oModel, "path", oContext, aApplicationFilters, mParameters,
@@ -70,7 +71,7 @@ sap.ui.define([
 		assert.strictEqual(oBinding._bRootMissing, false);
 		assert.strictEqual(oBinding.bSkipDataEvents, false);
 		assert.strictEqual(oBinding.sFilterParams, "");
-		assert.deepEqual(oBinding.mNormalizeCache, {});
+		assert.deepEqual(oBinding.mNormalizeCache, "~mNormalizeCache");
 		assert.deepEqual(oBinding.mRequestHandles, {});
 		assert.strictEqual(oBinding.oRootContext, null);
 		assert.strictEqual(oBinding.bInitial, true);

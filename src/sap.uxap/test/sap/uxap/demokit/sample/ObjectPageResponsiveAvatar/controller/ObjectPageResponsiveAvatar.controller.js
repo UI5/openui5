@@ -11,12 +11,12 @@ sap.ui.define([
 	return Controller.extend("sap.uxap.sample.ObjectPageResponsiveAvatar.controller.ObjectPageResponsiveAvatar", {
 
 		onInit: function () {
-			// Attach to the breakpointChanged event to adjust Avatar sizes
+			// Attach to the breakpointChange event to adjust Avatar sizes
 			var oObjectPage = this.byId("ObjectPageLayout");
-			oObjectPage.attachBreakpointChanged(this.onBreakpointChanged, this);
+			oObjectPage.attachBreakpointChange(this.onBreakpointChange, this);
 		},
 
-		onBreakpointChanged: function (oEvent) {
+		onBreakpointChange: function (oEvent) {
 			var sCurrentRange = oEvent.getParameter("currentRange"),
 				iCurrentWidth = oEvent.getParameter("currentWidth");
 

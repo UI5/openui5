@@ -67,7 +67,7 @@
 				</FlexBox>
 
 				<MessageStrip
-					text="The Avatar size changes automatically based on screen size: Phone (M), Tablet (L), Desktop/DesktopExtraLarge (XL). This is handled using the breakpointChanged event."
+					text="The Avatar size changes automatically based on screen size: Phone (M), Tablet (L), Desktop/DesktopExtraLarge (XL). This is handled using the breakpointChange event."
 					type="Information"
 					showIcon="true"
 					class="sapUiTinyMarginTopBottom"/>
@@ -80,8 +80,8 @@
 				<Title text="About" titleStyle="H2" class="sapUiMediumMarginBottom"/>
 				<layout:VerticalLayout class="sapUiSmallMarginBottom">
 					<Title text="Responsive Avatar Example" level="H3"/>
-					<Text text="This sample demonstrates how to use the breakpointChanged event to make Avatar sizes responsive."/>
-					<Text text="The DynamicPage fires the breakpointChanged event whenever its width changes and crosses a breakpoint."/>
+					<Text text="This sample demonstrates how to use the breakpointChange event to make Avatar sizes responsive."/>
+					<Text text="The DynamicPage fires the breakpointChange event whenever its width changes and crosses a breakpoint."/>
 					<Text text="The application can handle this event to adjust UI elements like Avatar sizes accordingly."/>
 					<Text class="sapUiSmallMarginTop" text="Breakpoints:"/>
 					<Text text="- Phone: less than 600px ? Avatar size M (4rem)"/>
@@ -94,7 +94,7 @@
 				<Title text="Implementation" titleStyle="H2" class="sapUiMediumMarginTopBottom"/>
 				<layout:VerticalLayout class="sapUiSmallMarginBottom">
 					<Title text="How it Works" level="H3"/>
-					<Text text="1. Attach to the breakpointChanged event in the controller's onInit method"/>
+					<Text text="1. Attach to the breakpointChange event in the controller's onInit method"/>
 					<Text text="2. In the event handler, get the currentRange parameter (Phone/Tablet/Desktop/DesktopExtraLarge)"/>
 					<Text text="3. Map the range to appropriate Avatar sizes using a switch statement"/>
 					<Text text="4. Update the Avatar's displaySize property"/>

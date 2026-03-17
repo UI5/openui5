@@ -128,7 +128,7 @@ sap.ui.define([
 			this.aSorters = vSorters || [];
 			this.sFilterParams = "";
 
-			this.mNormalizeCache = {};
+			this.mNormalizeCache = FilterProcessor.createNormalizeCache();
 
 			// check filter integrity
 			this.oModel.checkFilter(this.aApplicationFilters);

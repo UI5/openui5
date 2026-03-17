@@ -375,9 +375,12 @@ sap.ui.define([
 	};
 
 	ObjectPageSubSection.prototype.destroyActions = function () {
-		this._getHeaderToolbar()?.destroyContent();
+		var oActionsToolbar = this._getHeaderToolbar();
+
 		this.getActions().forEach(function (oAction) {
 			this._postProcessAction(oAction);
+			oActionsToolbar?.removeContent(oAction);
+			oAction.destroy();
 		}, this);
 
 		return this;

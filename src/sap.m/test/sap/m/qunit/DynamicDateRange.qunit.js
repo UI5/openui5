@@ -1971,6 +1971,36 @@ sap.ui.define([
 		oDDR.destroy();
 	});
 
+	QUnit.test("DynamicDateRangeListItem navigation control has correct tooltip", async function(assert) {
+		// Arrange
+		var oDDR = new DynamicDateRange("ddrTooltip", {
+			standardOptions: ["DATE"]
+		});
+		oDDR.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var sExpectedTooltip = Library.getResourceBundleFor("sap.m").getText("OPEN_PICKER_TEXT");
+
+		// Act
+		oDDR.open();
+		await nextUIUpdate();
+
+		var aListItems = oDDR._oOptionsList.getItems();
+		var oFirstItem = aListItems[1];
+		var oNavigationControl = oFirstItem.getNavigationControl();
+
+		// Assert
+		assert.strictEqual(
+			oNavigationControl.getTooltip(),
+			sExpectedTooltip,
+			"Navigation control has correct OPEN_PICKER_TEXT tooltip"
+		);
+
+		// Cleanup
+		oDDR.destroy();
+	});
+
+
 	QUnit.module("Groups", {
 		beforeEach: async function() {
 			this.ddr = new DynamicDateRange();
@@ -2036,4 +2066,3 @@ sap.ui.define([
 	});
 
 });
-

@@ -3019,6 +3019,7 @@ sap.ui.define([
 	 * @returns {number|undefined}
 	 *   The count of elements (leaves, nodes) or <code>undefined</code> if the count or the header
 	 *   context is not available.
+	 * @throws {Error} If the binding's root binding is suspended
 	 *
 	 * @public
 	 * @since 1.91.0

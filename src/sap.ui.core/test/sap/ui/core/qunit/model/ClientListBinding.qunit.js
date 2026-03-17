@@ -39,6 +39,7 @@ sap.ui.define([
 			};
 
 		this.mock(oModel).expects("checkFilter").withExactArgs(sinon.match.same(aFilters));
+		this.mock(FilterProcessor).expects("createNormalizeCache").withExactArgs().returns("~mNormalizeCache");
 		this.mock(FilterProcessor).expects("combineFilters")
 			.withExactArgs([], sinon.match.same(aFilters))
 			.returns("~combinedFilters");
@@ -48,7 +49,7 @@ sap.ui.define([
 		oBinding = new MyClientListBinding(oModel, "/path", /*oContext*/undefined,
 			/*aSorters*/undefined, aFilters);
 
-		assert.deepEqual(oBinding.mNormalizeCache, {});
+		assert.strictEqual(oBinding.mNormalizeCache, "~mNormalizeCache");
 		assert.strictEqual(oBinding.oCombinedFilter, "~combinedFilters");
 		assert.strictEqual(oBinding.bIgnoreSuspend, false);
 		assert.ok(oBinding.hasOwnProperty("aLastContextData"));

@@ -967,6 +967,67 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oObjectPageLayout.destroy();
 	});
 
+	QUnit.test("destroyActions destroys only actions, not Title and ToolbarSpacer", function(assert) {
+		var oActionButton1 = new Button({text: "Button1"}),
+			oActionButton2 = new Button({text: "Button2"}),
+			oSubSection = new ObjectPageSubSectionClass({
+				title: "SubSection Title",
+				actions: [oActionButton1, oActionButton2],
+				blocks: new Label({text: "Block1" })
+			}),
+			oSection = new ObjectPageSection({
+				title:"Personal",
+				subSections: [ oSubSection ]
+			}),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: [ oSection ]
+			});
+
+		//assert precondition
+		assert.strictEqual(oSubSection.getActions().length, 2, "SubSection has 2 actions before destroy");
+		assert.strictEqual(oSubSection._getHeaderToolbar().getContent().length, 4, "Toolbar has 4 items (Title, Spacer, 2 actions) before destroy");
+
+		//act
+		oSubSection.destroyActions();
+
+		//assert
+		assert.strictEqual(oSubSection.getActions().length, 0, "SubSection has no actions after destroyActions");
+		assert.ok(oActionButton1.isDestroyed(), "Action1 is destroyed");
+		assert.ok(oActionButton2.isDestroyed(), "Action2 is destroyed");
+		assert.strictEqual(oSubSection._getHeaderToolbar().getContent().length, 2, "Toolbar still has 2 items (Title and ToolbarSpacer) after destroyActions");
+		assert.ok(!oSubSection._getTitleControl().isDestroyed(), "Title control is NOT destroyed");
+
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("destroyActions calls _postProcessAction for each action", function(assert) {
+		var oActionButton1 = new Button({text: "Button1"}),
+			oActionButton2 = new Button({text: "Button2"}),
+			oSubSection = new ObjectPageSubSectionClass({
+				title: "SubSection Title",
+				actions: [oActionButton1, oActionButton2],
+				blocks: new Label({text: "Block1" })
+			}),
+			oSection = new ObjectPageSection({
+				title:"Personal",
+				subSections: [ oSubSection ]
+			}),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: [ oSection ]
+			}),
+			oPostProcessSpy = this.spy(oSubSection, "_postProcessAction");
+
+		//act
+		oSubSection.destroyActions();
+
+		//assert
+		assert.strictEqual(oPostProcessSpy.callCount, 2, "_postProcessAction is called once for each action");
+		assert.ok(oPostProcessSpy.calledWith(oActionButton1), "_postProcessAction is called with action1");
+		assert.ok(oPostProcessSpy.calledWith(oActionButton2), "_postProcessAction is called with action2");
+
+		oObjectPageLayout.destroy();
+	});
+
 	QUnit.test("Show action after subSection rendering", async function(assert) {
 		var oActionButton = new Button({text: "Button1", visible: false}),
 			oSubSection = new ObjectPageSubSectionClass({

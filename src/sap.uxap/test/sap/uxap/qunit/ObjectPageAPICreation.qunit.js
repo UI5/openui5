@@ -4228,7 +4228,7 @@ function(
 		assert.equal(this.oObjectPage._storeScrollLocation(), false, "We make sure we don`t store scroll location on hidden ObjectPage DOM reference");
 	});
 
-	QUnit.module("BreakpointChanged Event", {
+	QUnit.module("BreakpointChange Event", {
 		beforeEach: function () {
 			this.oObjectPage = new ObjectPageLayout();
 		},
@@ -4238,11 +4238,11 @@ function(
 		}
 	});
 
-	QUnit.test("breakpointChanged event is fired on resize", function(assert) {
+	QUnit.test("breakpointChange event is fired on resize", function(assert) {
 		var oEventSpy = this.spy();
 
 		// Attach event handler
-		this.oObjectPage.attachBreakpointChanged(oEventSpy);
+		this.oObjectPage.attachBreakpointChange(oEventSpy);
 
 		// Set initial state to Desktop
 		this.oObjectPage._sCurrentMediaRange = ObjectPageLayoutMediaRange.Desktop;
@@ -4260,10 +4260,10 @@ function(
 		assert.strictEqual(oParams.currentWidth, 400, "currentWidth is 400px");
 	});
 
-	QUnit.test("breakpointChanged event provides correct range values", function(assert) {
+	QUnit.test("breakpointChange event provides correct range values", function(assert) {
 		var oEventSpy = this.spy();
 
-		this.oObjectPage.attachBreakpointChanged(oEventSpy);
+		this.oObjectPage.attachBreakpointChange(oEventSpy);
 
 		// Start from a known state
 		this.oObjectPage._sCurrentMediaRange = ObjectPageLayoutMediaRange.Desktop;

@@ -294,6 +294,20 @@ function(
 		this._bShowListWithTokens = false;
 		this._bIsValidating = false;
 
+		// This prevents Tokenizer from opening the N-more popup when a Token is focused
+		oTokenizer.addDelegate({
+			onsapshow: function(oEvent) {
+				if (this.getShowValueHelp() && oEvent.srcControl && oEvent.srcControl.isA("sap.m.Token")) {
+					oEvent.setMarked();
+				}
+			},
+			onsaphide: function(oEvent) {
+				if (this.getShowValueHelp() && oEvent.srcControl && oEvent.srcControl.isA("sap.m.Token")) {
+					oEvent.setMarked();
+				}
+			}
+		}, true, this);
+
 		oTokenizer.addEventDelegate({
 			onThemeChanged: this._handleInnerVisibility.bind(this),
 			onAfterRendering: function () {

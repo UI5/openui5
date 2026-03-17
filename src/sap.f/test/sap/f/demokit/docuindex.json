@@ -171,7 +171,7 @@
 		{
 		  "id": "sap.f.sample.DynamicPageResponsiveAvatar",
 		  "name": "Dynamic Page with Responsive Avatar",
-		  "description": "Dynamic Page demonstrating the breakpointChanged event to adjust Avatar sizes responsively based on breakpoints."
+		  "description": "Dynamic Page demonstrating the breakpointChange event to adjust Avatar sizes responsively based on breakpoints."
 		},
 		{
 		  "id": "sap.f.sample.DynamicPageWithStickySubheader",

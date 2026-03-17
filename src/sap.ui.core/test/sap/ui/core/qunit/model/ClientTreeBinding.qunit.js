@@ -201,6 +201,18 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("constructor: normalize cache", function (assert) {
+		const oModel = {_getObject() {}};
+		this.mock(FilterProcessor).expects("createNormalizeCache").withExactArgs().returns("~mNormalizeCache");
+		this.mock(oModel).expects("_getObject")	.withExactArgs("~path", "~oContext").returns({/*any data*/});
+
+		// code under test
+		const oBinding = new ClientTreeBinding(oModel, "~path", "~oContext");
+
+		assert.strictEqual(oBinding.mNormalizeCache, "~mNormalizeCache");
+	});
+
+	//*********************************************************************************************
 	QUnit.test("applyFilter: resets iMatches before applying filters", function (assert) {
 		var oBinding = new ClientTreeBinding({_getObject() {}}, "~path"),
 			oFilterInfo = {

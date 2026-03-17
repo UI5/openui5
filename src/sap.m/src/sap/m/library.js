@@ -1879,6 +1879,7 @@ sap.ui.define([
 		  * Action Mode (Two lines for the header).
 		  *
 		  * Generic Tile renders buttons that are specified under 'actionButtons' aggregation
+		  * @since 1.96.0
 		  * @public
 		  */
 		 ActionMode: "ActionMode",
@@ -1887,6 +1888,7 @@ sap.ui.define([
 		  * Article Mode (Two lines for the header and one line for the subtitle).
 		  *
 		  * Enables Article Mode.
+		  * @since 1.96.0
 		  * @public
 		  */
 		 ArticleMode: "ArticleMode",

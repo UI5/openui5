@@ -534,10 +534,9 @@ sap.ui.define([
 				 * Fired when the media range of the control changes, allowing the application
 				 * to adjust the UI accordingly (e.g., change Avatar sizes responsively).
 				 *
-	 			 * @experimental Since 1.147 This event is experimental and it might change significantly.
 				 * @since 1.147
 				 */
-				breakpointChanged: {
+				breakpointChange: {
 					parameters: {
 						/**
 						 * The name of the current media range ("Phone", "Tablet", "Desktop", or "DesktopExtraLarge").
@@ -2649,11 +2648,11 @@ sap.ui.define([
 			sCurrentRange = ObjectPageLayoutMediaRange.DesktopExtraLarge;
 		}
 
-		// Fire breakpointChanged event when using standard MEDIA (not DYNAMIC_HEADERS_MEDIA)
+		// Fire breakpointChange event when using standard MEDIA (not DYNAMIC_HEADERS_MEDIA)
 		// and only if the range actually changed
 		if (oMedia === ObjectPageLayout.MEDIA && sCurrentRange !== this._sCurrentMediaRange) {
 			this._sCurrentMediaRange = sCurrentRange;
-			this.fireBreakpointChanged({
+			this.fireBreakpointChange({
 				currentRange: sCurrentRange,
 				currentWidth: iWidth
 			});

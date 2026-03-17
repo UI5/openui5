@@ -16,7 +16,17 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.m.ListMode
-	var ListMode = library.ListMode;
+	const ListMode = library.ListMode;
+
+	const INDENTATION_FACTOR = [
+		0,   // Root
+		1.5, // Level 1
+		1,   // Level 2
+		0.5, // Level 3
+		0.5, // Level 4
+		0.5, // Level 5
+		0.25 // Level 6 and above
+	];
 
 	/**
 	 * Constructor for a new TreeItemBase.
@@ -257,38 +267,15 @@ sap.ui.define([
 	/**
 	 * Gets the indentation of the node for rendering purposes.
 	 *
-	 * @returns {float}
+	 * @returns {float} The indentation value for the current node level.
 	 * @private
 	 * @since 1.42.0
 	 */
 	TreeItemBase.prototype._getPadding = function() {
-		var oTree = this.getTree(),
-		iNodeLevel = this.getLevel(),
-		iIndentation = 0,
-		iDeepestLevel;
-
-		// use number count from hierarchy binding
-		if (oTree) {
-			iDeepestLevel = oTree.getDeepestLevel();
-		}
-
-		// for add node
-		if (iDeepestLevel < iNodeLevel) {
-			oTree._iDeepestLevel = iNodeLevel;
-			iDeepestLevel = oTree._iDeepestLevel;
-		}
-
-		if (iDeepestLevel < 2) {
-			iIndentation = iNodeLevel * 1.5;
-		} else if (iDeepestLevel === 2) {
-			iIndentation = iNodeLevel * 1;
-		} else if (iDeepestLevel < 6) {
-			iIndentation = iNodeLevel * 0.5;
-		} else {
-			iIndentation = iNodeLevel * 0.25;
-		}
-
-		return iIndentation;
+		const iLevel = this.getLevel();
+		const iDeepestLevel = this.getTree() ? this.getTree().getDeepestLevel() : 0;
+		const fIndentationFactor = INDENTATION_FACTOR[Math.min(iDeepestLevel, INDENTATION_FACTOR.length - 1)];
+		return iLevel * fIndentationFactor;
 	};
 
 	/**

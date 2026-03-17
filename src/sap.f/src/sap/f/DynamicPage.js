@@ -309,10 +309,9 @@ sap.ui.define([
 				 * The event is fired when the media breakpoint changes.
 				 * Applications can use this event to adjust content based on the current screen size.
 				 *
-	 			 * @experimental Since 1.147 This event is experimental and it might change significantly.
 				 * @since 1.147
 				 */
-				breakpointChanged: {
+				breakpointChange: {
 					parameters: {
 
 						/**
@@ -1525,10 +1524,10 @@ sap.ui.define([
 			sCurrentRange = DynamicPageMediaRange.DesktopExtraLarge;
 		}
 
-		// Fire breakpointChanged event only if the range actually changed
+		// Fire breakpointChange event only if the range actually changed
 		if (sCurrentRange !== this._sCurrentMediaRange) {
 			this._sCurrentMediaRange = sCurrentRange;
-			this.fireBreakpointChanged({
+			this.fireBreakpointChange({
 				currentRange: sCurrentRange,
 				currentWidth: iWidth
 			});

@@ -106,9 +106,15 @@
 									press=".toggleParameterVisibility"
 									type="Transparent" />
 							</HBox>
+							<SearchField
+								id="sapUiRtaAddIFrameDialog_ParametersSearch"
+								ariaLabelledBy="sapUiRtaAddIFrameDialog_ParameterSearchLabel"
+								class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+								liveChange=".onLiveChange"
+								showSearchButton="false"
+							/>
 							<ScrollContainer
 								id="sapUiRtaAddIFrameDialog_ParameterScrollContainer"
-								class="sapUiTinyMarginTop"
 								height="11rem"
 								vertical="true"
 							>
@@ -119,17 +125,6 @@
 									class="sapUiSizeCompact sapUiRtaAddIFrameDialogParameterTable"
 									sticky="ColumnHeaders"
 								>
-									<headerToolbar>
-										<Toolbar id="sapUiRtaAddIFrameDialog_ParameterToolbar">
-											<SearchField
-												id="sapUiRtaAddIFrameDialog_ParametersSearch"
-												ariaLabelledBy="sapUiRtaAddIFrameDialog_ParameterSearchLabel"
-												class="sapUiNoMargin"
-												liveChange=".onLiveChange"
-												showSearchButton="false"
-											/>
-										</Toolbar>
-									</headerToolbar>
 									<columns>
 										<Column>
 											<header>
@@ -196,7 +191,6 @@
 							press=".onPreviewPress"
 							enabled="{= !${dialogInfo>/frameUrlError/value} &amp;&amp; ${dialogInfo>/frameUrl/value} !== '' &amp;&amp; (${dialogInfo>/previousFrameUrl/value} !== ${dialogInfo>/frameUrl/value} || ${dialogInfo>/settingsUpdate/value})}"
 							icon="{=${dialogInfo>/previousFrameUrl/value} ? 'sap-icon://refresh' : null }"
-							type="{= !${dialogInfo>/frameUrlError/value} &amp;&amp; ${dialogInfo>/frameUrl/value} !== '' &amp;&amp; (${dialogInfo>/previousFrameUrl/value} !== ${dialogInfo>/frameUrl/value} || ${dialogInfo>/settingsUpdate/value}) ? 'Emphasized' : 'Default' }"
 							/>
 					</HBox>
 					<VBox id="sapUiRtaAddIFrameDialog_PreviewLinkVBox" class="sapUiRtaAddIFrameDialogContainer sapUiTinyMarginTop" renderType="Bare">
@@ -237,6 +231,8 @@
 								id="sapUiRtaAddIFrameDialog_PreviewFrame"
 								title="{i18n>IFRAME_ADDIFRAME_DIALOG_PREVIEW_FRAME_LABEL}"
 								class="sapUiRtaAddIFrameDialogPreviewFrame"
+								width="{= ${dialogInfo>/frameWidth/value} + ${dialogInfo>/frameWidthUnit/value} }"
+								height="{= ${dialogInfo>/frameHeight/value} + ${dialogInfo>/frameHeightUnit/value} }"
 								advancedSettings="{dialogInfo>/advancedSettings/value}"
 								visible="{= !!${dialogInfo>/previewUrl/value} }"/>
 						</items>
@@ -272,7 +268,7 @@
 									value="{path: 'dialogInfo>/frameWidth/value', type: 'FloatType', constraints: {minimum: 1}}"
 									valueState="{dialogInfo>/frameWidth/valueState}"
 									valueStateText="{i18n>IFRAME_ADDIFRAME_DIALOG_DIMENSIONS_ERROR}"
-									change=".onSizeValueChange"
+									change=".onSizeChange"
 								/>
 								<Select
 									id="sapUiRtaAddIFrameDialog_WidthUnit"
@@ -284,7 +280,7 @@
 									columnRatio="1:5"
 									width="auto"
 									maxWidth="400px"
-									change=".onSizeUnitChange"
+									change=".onSizeChange"
 									tooltip="{i18n>IFRAME_ADDIFRAME_DIALOG_UNIT_TOOLTIP}"
 								>
 									<core:ListItem key="{dialogInfo>unit}" text="{dialogInfo>unit}" additionalText="{dialogInfo>descriptionText}"/>
@@ -315,7 +311,7 @@
 									value="{path: 'dialogInfo>/frameHeight/value', type: 'FloatType', constraints: {minimum: 1}}"
 									valueState="{dialogInfo>/frameHeight/valueState}"
 									valueStateText="{dialogInfo>/text/dimensionsErrorText}"
-									change=".onSizeValueChange"
+									change=".onSizeChange"
 								/>
 								<Select
 									id="sapUiRtaAddIFrameDialog_HeightUnit"
@@ -328,7 +324,7 @@
 									columnRatio="1:5"
 									width="auto"
 									maxWidth="400px"
-									change=".onSizeUnitChange"
+									change=".onSizeChange"
 									tooltip="{i18n>IFRAME_ADDIFRAME_DIALOG_UNIT_TOOLTIP}"
 								>
 										<core:ListItem key="{dialogInfo>unit}" text="{= ${dialogInfo>unit} === 'vh' ? '%' : ${dialogInfo>unit}}" additionalText="{dialogInfo>descriptionText}"/>

@@ -771,6 +771,7 @@ sap.ui.define([
 		this.mock(oModel).expects("resolveDeep")
 			.withExactArgs("~sPath", "~oContext")
 			.returns("~sDeepPath");
+		this.mock(FilterProcessor).expects("createNormalizeCache").withExactArgs().returns("~mNormalizeCache");
 		this.mock(oModel).expects("checkFilter").withExactArgs([]);
 		this.mock(ODataListBinding.prototype).expects("checkExpandedList")
 			.withExactArgs()
@@ -813,7 +814,7 @@ sap.ui.define([
 		assert.strictEqual(oBinding.oCombinedFilter, null);
 		assert.strictEqual(oBinding.sDeepPath, "~sDeepPath");
 		assert.strictEqual(oBinding.bCanonicalRequest, undefined);
-		assert.deepEqual(oBinding.mNormalizeCache, {});
+		assert.deepEqual(oBinding.mNormalizeCache, "~mNormalizeCache");
 		assert.strictEqual(oBinding.bTransitionMessagesOnly, false);
 		assert.strictEqual(oBinding.sCreatedEntitiesKey, "");
 		assert.deepEqual(oBinding.oCreatedPersistedToRemove, new Set());

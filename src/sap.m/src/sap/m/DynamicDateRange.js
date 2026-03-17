@@ -2263,6 +2263,7 @@ sap.ui.define([
 			if (bDateOption || bDateTimeOption) {
 				oNavControl.addStyleClass("sapMDDRDateOption");
 				sNavgationIconURI = bDateOption ? IconPool.getIconURI("appointment-2") : IconPool.getIconURI("date-time");
+				oNavControl.setTooltip(oResourceBundle.getText("OPEN_PICKER_TEXT"));
 			} else {
 				sNavgationIconURI = IconPool.getIconURI("slim-arrow-right");
 			}

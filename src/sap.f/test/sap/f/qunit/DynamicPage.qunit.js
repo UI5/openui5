@@ -3787,8 +3787,8 @@ function(
 		assert.strictEqual(this.oDynamicPage._getAriaRoleDescription(), sRoleDescription);
 	});
 
-	/* --------------------------- DynamicPage - BreakpointChanged Event -------------------------------------- */
-	QUnit.module("BreakpointChanged Event", {
+	/* --------------------------- DynamicPage - BreakpointChange Event -------------------------------------- */
+	QUnit.module("BreakpointChange Event", {
 		beforeEach: function () {
 			this.oDynamicPage = new DynamicPage();
 		},
@@ -3798,11 +3798,11 @@ function(
 		}
 	});
 
-	QUnit.test("breakpointChanged event is fired on resize", function(assert) {
+	QUnit.test("breakpointChange event is fired on resize", function(assert) {
 		var oEventSpy = this.spy();
 
 		// Attach event handler
-		this.oDynamicPage.attachBreakpointChanged(oEventSpy);
+		this.oDynamicPage.attachBreakpointChange(oEventSpy);
 
 		// Set initial state to Desktop
 		this.oDynamicPage._sCurrentMediaRange = DynamicPageMediaRange.Desktop;
@@ -3820,10 +3820,10 @@ function(
 		assert.strictEqual(oParams.currentWidth, 400, "currentWidth is 400px");
 	});
 
-	QUnit.test("breakpointChanged event provides correct range values", function(assert) {
+	QUnit.test("breakpointChange event provides correct range values", function(assert) {
 		var oEventSpy = this.spy();
 
-		this.oDynamicPage.attachBreakpointChanged(oEventSpy);
+		this.oDynamicPage.attachBreakpointChange(oEventSpy);
 
 		// Start from a known state
 		this.oDynamicPage._sCurrentMediaRange = DynamicPageMediaRange.DesktopExtraLarge;
@@ -3850,10 +3850,10 @@ function(
 		assert.strictEqual(oEventSpy.getCall(3).args[0].getParameter("currentRange"), DynamicPageMediaRange.DesktopExtraLarge, "Range is DesktopExtraLarge for 1600px");
 	});
 
-	QUnit.test("breakpointChanged event does not fire when range stays the same", function(assert) {
+	QUnit.test("breakpointChange event does not fire when range stays the same", function(assert) {
 		var oEventSpy = this.spy();
 
-		this.oDynamicPage.attachBreakpointChanged(oEventSpy);
+		this.oDynamicPage.attachBreakpointChange(oEventSpy);
 
 		// Set initial state to Desktop
 		this.oDynamicPage._sCurrentMediaRange = DynamicPageMediaRange.Desktop;

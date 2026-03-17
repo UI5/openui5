@@ -68,14 +68,6 @@ sap.ui.define([
 		return new Token({ key: sText, text: sText });
 	}
 
-	function setNewPreviewSize(sPropertyName) {
-		const sUnit = this._oJSONModel.getProperty(`${sPropertyName}Unit/value`);
-		const sValue = this._oJSONModel.getProperty(`${sPropertyName}/value`);
-		const oIFramePreview = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewFrame");
-		const sIFramePropertyName = sPropertyName === "/frameWidth" ? "width" : "height";
-		oIFramePreview.setProperty(sIFramePropertyName, sValue + sUnit);
-	}
-
 	function setURLErrorMessage(sError) {
 		const sErrorKey = {
 			[IFrame.VALIDATION_ERROR.UNSAFE_PROTOCOL]: "IFRAME_ADDIFRAME_ERROR_UNSAFE_PROTOCOL",
@@ -291,32 +283,9 @@ sap.ui.define([
 		},
 
 		/**
-		 * Event handler for size value change - can be the width or height
-		 * This is used to update the iFrame size in the preview
-		 * @param {sap.ui.base.Event} oEvent - Event
+		 * Event handler for size change - can be the width/height value or unit
 		 */
-		onSizeValueChange(oEvent) {
-			// Get changed field and retrieve its unit from this._oJSONModel
-			const oSource = oEvent.getSource();
-			const sPropertyPath = oSource.getBindingInfo("value").parts[0].path;
-			// Extract "/frameWidth" or "/frameHeight" from the binding path (e.g. /frameWidth/value)
-			const sPropertyName = sPropertyPath.replace(/\/value$/, "");
-			setNewPreviewSize.call(this, sPropertyName);
-			this._checkIfSaveIsEnabled(true);
-		},
-
-		/**
-		 * Event handler for size unit change - can be the width or height
-		 * This is used to update the iFrame size in the preview
-		 * @param {sap.ui.base.Event} oEvent - Event
-		 */
-		onSizeUnitChange(oEvent) {
-			// Get changed field and retrieve its unit from this._oJSONModel
-			const oSource = oEvent.getSource();
-			const sPropertyPath = oSource.getBindingInfo("selectedKey").parts[0].path;
-			// Extract "/frameWidth" or "/frameHeight" from the binding path (e.g. /frameWidthUnit/value)
-			const sPropertyName = sPropertyPath.replace(/Unit\/value$/, "");
-			setNewPreviewSize.call(this, sPropertyName);
+		onSizeChange() {
 			this._checkIfSaveIsEnabled(true);
 		},
 
