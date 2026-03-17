@@ -933,6 +933,7 @@ sap.ui.define([
 				const oHeightValueInput = Element.getElementById("sapUiRtaAddIFrameDialog_HeightInput");
 				const oWidthUnitSelect = Element.getElementById("sapUiRtaAddIFrameDialog_WidthUnit");
 				const oHeightUnitSelect = Element.getElementById("sapUiRtaAddIFrameDialog_HeightUnit");
+				const oModel = this.oAddIFrameDialog._oJSONModel;
 				const oIFramePreview = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewFrame");
 
 				// Simulate select - copied from Select.qunit.js
@@ -941,6 +942,7 @@ sap.ui.define([
 				oWidthUnitSelect.open();
 				QUnitUtils.triggerKeydown(oWidthUnitSelect.getDomRef(), KeyCodes.ARROW_DOWN);
 				QUnitUtils.triggerEvent("tap", oWidthUnitSelect.getItems()[1].getDomRef());
+				assert.strictEqual(oModel.getProperty("/frameWidthUnit/value"), "px", "then the width unit of the model is set to px");
 				assert.strictEqual(oIFramePreview.getWidth(), "100px", "then the width of the preview is set to 100px");
 
 				// Simulate user input - copied from StepInput.qunit.js
@@ -948,18 +950,21 @@ sap.ui.define([
 				oWidthInnerInput.focus();
 				oWidthInnerInput.getDomRef("inner").value = 200;
 				QUnitUtils.triggerKeydown(oWidthInnerInput.getDomRef(), KeyCodes.ENTER);
+				assert.strictEqual(oModel.getProperty("/frameWidth/value"), 200, "then the width value of the model is set to 200");
 				assert.strictEqual(oIFramePreview.getWidth(), "200px", "then the width of the preview is set to 200px");
 
 				oHeightUnitSelect.focus();
 				oHeightUnitSelect.open();
 				QUnitUtils.triggerKeydown(oHeightUnitSelect.getDomRef(), KeyCodes.ARROW_DOWN);
 				QUnitUtils.triggerEvent("tap", oHeightUnitSelect.getItems()[2].getDomRef());
+				assert.strictEqual(oModel.getProperty("/frameHeightUnit/value"), "rem", "then the height unit of the model is set to rem");
 				assert.strictEqual(oIFramePreview.getHeight(), "35rem", "then the height of the preview is set to 35rem");
 
 				const oHeightInnerInput = oHeightValueInput._getInput();
 				oHeightInnerInput.focus();
 				oHeightInnerInput.getDomRef("inner").value = 20;
 				QUnitUtils.triggerKeydown(oHeightInnerInput.getDomRef(), KeyCodes.ENTER);
+				assert.strictEqual(oModel.getProperty("/frameHeight/value"), 20, "then the height value of the model is set to 20");
 				assert.strictEqual(oIFramePreview.getHeight(), "20rem", "then the height of the preview is set to 20rem");
 				clickOnSave();
 			}, this);

@@ -47,7 +47,7 @@ sap.ui.define([
 		constructor : function(oModel, sPath, oContext, aSorters, aFilters, mParameters){
 			ListBinding.apply(this, arguments);
 
-			this.mNormalizeCache = {};
+			this.mNormalizeCache = FilterProcessor.createNormalizeCache();
 			this.oModel.checkFilter(this.aApplicationFilters);
 			this.oCombinedFilter = FilterProcessor.combineFilters(this.aFilters, this.aApplicationFilters);
 			this.bIgnoreSuspend = false;

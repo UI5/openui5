@@ -315,7 +315,6 @@ sap.ui.define([
 	 * @author SAP SE
 	 * @enum {string}
 	 * @public
-	 * @experimental Since 1.147 This enumeration is experimental and it might change significantly.
 	 * @since 1.147
 	 */
 	thisLib.ObjectPageLayoutMediaRange = {

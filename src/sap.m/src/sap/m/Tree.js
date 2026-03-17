@@ -25,8 +25,6 @@ function(
 ) {
 	"use strict";
 
-
-
 	/**
 	 * Constructor for a new Tree.
 	 *
@@ -84,6 +82,7 @@ function(
 	Tree.prototype.init = function() {
 		ListBase.prototype.init.apply(this, arguments);
 		this._oProxy = new TreeBindingProxy(this, "items");
+		this._iDeepestLevel = 0;
 	};
 
 	Tree.prototype.isTreeBinding = function(sName) {
@@ -109,6 +108,13 @@ function(
 		return oBinding;
 	};
 
+	Tree.prototype._bindAggregation = function(sName) {
+		if (sName === "items") {
+			this._iDeepestLevel = 0;
+		}
+		ListBase.prototype._bindAggregation.apply(this, arguments);
+	};
+
 	Tree.prototype.updateAggregation = function(sName) {
 		if (sName != "items") {
 			return ListBase.prototype.updateAggregation.apply(this, arguments);
@@ -122,19 +128,16 @@ function(
 		// Update a single aggregation with the array of contexts. Reuse existing children
 		// and just append or remove at the end, if some are missing or too many.
 		function update(oControl, aContexts) {
-			var aChildren = oControl.getItems() || [],
-				oContext,
-				oClone;
-
+			const aChildren = oControl.getItems();
 			if (aChildren.length > aContexts.length) {
-				for (var i = aContexts.length; i < aChildren.length; i++) {
+				for (let i = aContexts.length; i < aChildren.length; i++) {
 					oControl.removeItem(aChildren[i]);
 					aChildren[i].destroy("KeepDom");
 				}
 			}
-			for (var i = 0; i < aContexts.length; i++) {
-				oContext = aContexts[i];
-				oClone = aChildren[i];
+			for (let i = 0; i < aContexts.length; i++) {
+				const oContext = aContexts[i];
+				let oClone = aChildren[i];
 				if (oClone) {
 					oClone.setBindingContext(oContext, oBindingInfo.model);
 				} else {
@@ -142,8 +145,11 @@ function(
 					oClone.setBindingContext(oContext, oBindingInfo.model);
 					oControl.addItem(oClone);
 				}
+				if (oClone.getLevel() > oControl._iDeepestLevel) {
+					oControl._iDeepestLevel = oClone.getLevel();
+					oControl.invalidate();
+				}
 			}
-
 		}
 
 		// Context length will be filled by model.
@@ -180,13 +186,6 @@ function(
 		this._oProxy = null;
 	};
 
-	Tree.prototype._updateDeepestLevel = function(oItem) {
-		// for level change action, e.g. expand
-		if (oItem.getLevel() + 1 > this.getDeepestLevel()) {
-			this._iDeepestLevel = oItem.getLevel() + 1;
-		}
-	};
-
 	Tree.prototype.onItemExpanderPressed = function(oItem, bExpand) {
 		var iIndex = this.indexOfItem(oItem);
 		var oBindingInfo = this.getBindingInfo("items");
@@ -195,9 +194,6 @@ function(
 		if (oBindingInfo && oItemContext) {
 			var bExpandedBeforePress = oItem.getExpanded();
 			var bExpandedAfterPress;
-
-			// make sure when rendering is called, the padding calc uses the correct deepest level
-			this._updateDeepestLevel(oItem);
 
 			if (bExpand == undefined) {
 				this._oProxy.toggleExpandedState(iIndex);
@@ -241,15 +237,7 @@ function(
 		return this;
 	};
 
-	Tree.prototype.getNumberOfExpandedLevel = function() {
-		return this.getBinding("items").getNumberOfExpandedLevels();
-	};
-
 	Tree.prototype.getDeepestLevel = function() {
-		if (this._iDeepestLevel === undefined) {
-			this._iDeepestLevel = this.getNumberOfExpandedLevel();
-		}
-
 		return this._iDeepestLevel;
 	};
 
@@ -298,26 +286,11 @@ function(
 
 	Tree.prototype._preExpand = function(vParam) {
 		var aIndices = this._sortHelper(vParam);
-
 		aIndices = this._removeLeaf(aIndices);
-
 		return aIndices;
 	};
 
-	Tree.prototype._getDeepestLevelFromIndexArray = function(aIndex) {
-		var oDeepestLevel;
-
-		aIndex.forEach((iIndex) => {
-			if (oDeepestLevel == undefined || this.getItems()[iIndex].getLevel() > oDeepestLevel.getLevel()) {
-				oDeepestLevel = this.getItems()[iIndex];
-			}
-		});
-
-		return oDeepestLevel;
-	};
-
 	/**
-	 *
 	 * Expands one or multiple items. Note that items that are hidden at the time of calling this API can't be expanded.
 	 *
 	 * @returns {this} A reference to the Tree control
@@ -326,10 +299,6 @@ function(
 	 * @since 1.56.0
 	 */
 	Tree.prototype.expand = function(vParam) {
-		// make sure when rendering is called, the padding calc uses the correct deepest level
-		var oDeepestItem = (vParam.constructor == Array ? this._getDeepestLevelFromIndexArray(vParam) : this.getItems()[vParam]);
-		this._updateDeepestLevel(oDeepestItem);
-
 		this._oProxy.expand(vParam);
 		return this;
 	};
@@ -366,16 +335,13 @@ function(
 			oItemContext = oItem && oItem.getBindingContext(oBindingInfo.model);
 
 		// toggleOpenState event should be fired when an item is expand via DnD interaction
-		if (oItem) {
-			this._updateDeepestLevel(oItem);
-			if (!oItem.isLeaf()) {
-				this._oProxy.expand(iIndex);
-				this.fireToggleOpenState({
-					itemIndex: iIndex,
-					itemContext: oItemContext,
-					expanded: this._oProxy.isExpanded(iIndex)
-				});
-			}
+		if (oItem && !oItem.isLeaf()) {
+			this._oProxy.expand(iIndex);
+			this.fireToggleOpenState({
+				itemIndex: iIndex,
+				itemContext: oItemContext,
+				expanded: this._oProxy.isExpanded(iIndex)
+			});
 		}
 	};
 

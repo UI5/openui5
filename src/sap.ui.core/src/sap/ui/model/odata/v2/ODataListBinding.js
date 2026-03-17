@@ -136,7 +136,7 @@ sap.ui.define([
 			this.oCombinedFilter = null;
 			this.sDeepPath = oModel.resolveDeep(sPath, oContext);
 			this.bCanonicalRequest = mParameters && mParameters.bCanonicalRequest;
-			this.mNormalizeCache = {};
+			this.mNormalizeCache = FilterProcessor.createNormalizeCache();
 			this.bTransitionMessagesOnly = !!(mParameters
 				&& mParameters.transitionMessagesOnly);
 			this.sCreatedEntitiesKey = mParameters && mParameters.createdEntitiesKey || "";

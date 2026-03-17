@@ -164,7 +164,6 @@ sap.ui.define([
 	  *
 	  * @author SAP SE
 	  * @enum {string}
-	  * @experimental Since 1.147 This enum is experimental and it might change significantly.
 	  * @public
 	  * @since 1.147
 	  */

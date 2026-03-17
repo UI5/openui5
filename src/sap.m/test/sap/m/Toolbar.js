@@ -249,8 +249,11 @@ sap.ui.define([
 	// add toolbars to the page
 	var oPage = new Page("toolbar-page", {
 		landmarkInfo: new PageAccessibleLandmarkInfo({
+			headerRole: AccessibleLandmarkRole.Search,
 			rootRole: AccessibleLandmarkRole.Main,
-			contentRole: AccessibleLandmarkRole.Region
+			footerRole: AccessibleLandmarkRole.Navigation,
+			contentRole: AccessibleLandmarkRole.None
+
 		}),
 		customHeader : TBHeader,
 		subHeader : TBSubHeader,

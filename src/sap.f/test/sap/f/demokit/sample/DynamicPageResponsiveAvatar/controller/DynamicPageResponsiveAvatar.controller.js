@@ -12,10 +12,10 @@ sap.ui.define([
 
 		onInit: function () {
 			var oDynamicPage = this.byId("dynamicPageId");
-			oDynamicPage.attachBreakpointChanged(this.onBreakpointChanged, this);
+			oDynamicPage.attachBreakpointChange(this.onBreakpointChange, this);
 		},
 
-		onBreakpointChanged: function (oEvent) {
+		onBreakpointChange: function (oEvent) {
 			var sCurrentRange = oEvent.getParameter("currentRange");
 			var iCurrentWidth = oEvent.getParameter("currentWidth");
 

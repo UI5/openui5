@@ -206,27 +206,27 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		assert.equal(oTree.getDeepestLevel(), 1, "deepestLevel");
-		assert.equal(oTree.getItems()[1].$().css("padding-left"), "0px", "padding");
-		assert.equal(oTree.getItems()[2].$().css("padding-left"), "24px", "padding");
+		assert.equal(oTree.getItems()[1].$().css("padding-inline-start"), "0px", "padding");
+		assert.equal(oTree.getItems()[2].$().css("padding-inline-start"), "24px", "padding");
 
 		oArrow = Element.getElementById(oTree.getItems()[2].getId() + "-expander");
 		oArrow.firePress();
 		await nextUIUpdate();
 
 		assert.equal(oTree.getDeepestLevel(), 2, "deepestLevel");
-		assert.equal(oTree.getItems()[1].$().css("padding-left"), "0px", "padding");
-		assert.equal(oTree.getItems()[2].$().css("padding-left"), "16px", "padding");
-		assert.equal(oTree.getItems()[3].$().css("padding-left"), "32px", "padding");
+		assert.equal(oTree.getItems()[1].$().css("padding-inline-start"), "0px", "padding");
+		assert.equal(oTree.getItems()[2].$().css("padding-inline-start"), "16px", "padding");
+		assert.equal(oTree.getItems()[3].$().css("padding-inline-start"), "32px", "padding");
 
 		oArrow = Element.getElementById(oTree.getItems()[3].getId() + "-expander");
 		oArrow.firePress();
 		await nextUIUpdate();
 
 		assert.equal(oTree.getDeepestLevel(), 3, "deepestLevel");
-		assert.equal(oTree.getItems()[1].$().css("padding-left"), "0px", "padding");
-		assert.equal(oTree.getItems()[2].$().css("padding-left"), "8px", "padding");
-		assert.equal(oTree.getItems()[3].$().css("padding-left"), "16px", "padding");
-		assert.equal(oTree.getItems()[4].$().css("padding-left"), "24px", "padding");
+		assert.equal(oTree.getItems()[1].$().css("padding-inline-start"), "0px", "padding");
+		assert.equal(oTree.getItems()[2].$().css("padding-inline-start"), "8px", "padding");
+		assert.equal(oTree.getItems()[3].$().css("padding-inline-start"), "16px", "padding");
+		assert.equal(oTree.getItems()[4].$().css("padding-inline-start"), "24px", "padding");
 
 		oArrow = Element.getElementById(oTree.getItems()[4].getId() + "-expander");
 		oArrow.firePress();
@@ -241,12 +241,12 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		assert.equal(oTree.getDeepestLevel(), 6, "deepestLevel");
-		assert.equal(oTree.getItems()[1].$().css("padding-left"), "0px", "padding");
-		assert.equal(oTree.getItems()[2].$().css("padding-left"), "4px", "padding");
-		assert.equal(oTree.getItems()[3].$().css("padding-left"), "8px", "padding");
-		assert.equal(oTree.getItems()[4].$().css("padding-left"), "12px", "padding");
-		assert.equal(oTree.getItems()[5].$().css("padding-left"), "16px", "padding");
-		assert.equal(oTree.getItems()[6].$().css("padding-left"), "20px", "padding");
+		assert.equal(oTree.getItems()[1].$().css("padding-inline-start"), "0px", "padding");
+		assert.equal(oTree.getItems()[2].$().css("padding-inline-start"), "4px", "padding");
+		assert.equal(oTree.getItems()[3].$().css("padding-inline-start"), "8px", "padding");
+		assert.equal(oTree.getItems()[4].$().css("padding-inline-start"), "12px", "padding");
+		assert.equal(oTree.getItems()[5].$().css("padding-inline-start"), "16px", "padding");
+		assert.equal(oTree.getItems()[6].$().css("padding-inline-start"), "20px", "padding");
 
 		// collapse
 		const oArrowDomRef = oTree.getItems()[2].$().find(".sapMTreeItemBaseExpander");
@@ -258,9 +258,58 @@ sap.ui.define([
 		oArrow.firePress();
 		await nextUIUpdate();
 
-		assert.equal(oTree.getItems()[2].$().css("padding-left"), "4px", "padding");
+		assert.equal(oTree.getItems()[2].$().css("padding-inline-start"), "4px", "padding");
 
 		oTree.collapseAll();
+	});
+
+	QUnit.test("expandToLevel deep and initial indentation", async function(assert) {
+		const aIndentations = [
+			0,   // Root
+			1.5, // Level 1
+			1,   // Level 2
+			0.5, // Level 3
+			0.5, // Level 4
+			0.5, // Level 5
+			0.25,// Level 6
+			0.25,// Level 7
+			0.25 // Level 8
+		];
+
+		const assertIndentation = (iPaddingStep) => {
+			const aItems = this.oTree.getItems();
+			const oStartItem = aItems.find((oItem) => oItem.getTitle() === "Node2");
+			const iStartIndex = aItems.indexOf(oStartItem);
+
+			for (let i = iStartIndex, iExpectedPadding = 0; i < aItems.length; i++, iExpectedPadding += iPaddingStep) {
+				assert.equal(
+					aItems[i].getDomRef().style.paddingInlineStart,
+					`${iExpectedPadding}rem`,
+					`Item at index ${i} has correct indentation`
+				);
+			}
+		};
+
+		for (const [iLevel, fIndentation] of aIndentations.entries()) {
+			this.oTree.expandToLevel(iLevel);
+			await nextUIUpdate();
+			assert.equal(this.oTree.getDeepestLevel(), iLevel, `deepestLevel is ${iLevel}`);
+			assertIndentation(fIndentation);
+		}
+
+		for (const [iLevel, fIndentation] of aIndentations.entries()) {
+			const oTreeItem = new StandardTreeItem({title: "{text}"});
+			this.oTree.bindItems({
+				path: "/",
+				template: oTreeItem,
+				parameters: {
+					numberOfExpandedLevels: iLevel
+				}
+			});
+			await nextUIUpdate();
+			assert.equal(this.oTree.getDeepestLevel(), iLevel, `deepestLevel is ${iLevel}`);
+			assertIndentation(fIndentation);
+		}
 	});
 
 	QUnit.module("Selection", {

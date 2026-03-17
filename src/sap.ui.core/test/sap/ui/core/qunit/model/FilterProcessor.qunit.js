@@ -530,6 +530,7 @@ sap.ui.define([
 		}, oError);
 	});
 
+	//*********************************************************************************************
 	QUnit.test("apply: values contain 'toString' value", function (assert) {
 		var aData = ["foo", "toString", "bar", "foo bar"],
 			oFilter = new Filter({path: "name", operator: FilterOperator.Contains, value1: "foo"});
@@ -537,6 +538,25 @@ sap.ui.define([
 		// code under test
 		assert.deepEqual(FilterProcessor.apply(aData, oFilter, function (sValue) {return sValue;}),
 			["foo", "foo bar"]);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("apply: with normalize cache parameter", function (assert) {
+		const fnGetValue = (/*vRef, sPath*/) => "value";
+		const oFilterProcessorMock = this.mock(FilterProcessor);
+		oFilterProcessorMock.expects("createNormalizeCache").never();
+		oFilterProcessorMock.expects("_evaluateFilter")
+			.withExactArgs("~oFilter~", "data0", sinon.match.same(fnGetValue))
+			.returns(false);
+		oFilterProcessorMock.expects("_evaluateFilter")
+			.withExactArgs("~oFilter~", "data1", sinon.match.same(fnGetValue))
+			.returns(true);
+
+		// code under test
+		const aFiltered = FilterProcessor.apply(["data0", "data1"], "~oFilter~", fnGetValue, "~mNormalizeCache~");
+
+		assert.strictEqual(FilterProcessor._normalizeCache, "~mNormalizeCache~");
+		assert.deepEqual(aFiltered, ["data1"]);
 	});
 
 // ***********************************************************************************************
@@ -558,8 +578,10 @@ if (String.prototype.normalize) {
 			aFiltered,
 			oSpy = sinon.spy(String.prototype, "normalize");
 
+		this.mock(FilterProcessor).expects("createNormalizeCache").withExactArgs().callThrough();
+
 		// code under test
-		aFiltered = FilterProcessor.apply(aData, oFilter, function (s) { return s; }, {});
+		aFiltered = FilterProcessor.apply(aData, oFilter, function (s) { return s; });
 
 		assert.strictEqual(aFiltered.length, 2, "Two results found");
 		assert.strictEqual(oSpy.callCount, 9,
@@ -567,24 +589,42 @@ if (String.prototype.normalize) {
 		oSpy.restore();
 	});
 
-	["foo", "toString"].forEach(function (sValue) {
+	// ********************************************************************************************
+	["foo", "toString", ""].forEach(function (sValue) {
 		QUnit.test("normalizeFilterValue: case sensitive, value: " + sValue, function (assert) {
-			FilterProcessor._normalizeCache = {"false": {}, "true" : {}};
+			FilterProcessor._normalizeCache = FilterProcessor.createNormalizeCache();
 
-			this.mock(String.prototype).expects("normalize")
+			const oNormalizeCall = this.mock(String.prototype).expects("normalize")
 				.on(sValue)
 				.withExactArgs("NFC")
-				.returns("~normalized");
+				.callThrough();
 
 			// code under test
-			assert.deepEqual(FilterProcessor.normalizeFilterValue(sValue, true), "~normalized");
+			const sResult = FilterProcessor.normalizeFilterValue(sValue, true);
 
-			assert.strictEqual(FilterProcessor._normalizeCache["true"][sValue], "~normalized",
-				"noramalized value for '" + sValue + "' has been cached");
+			const sNormalized = oNormalizeCall.returnValues[0];
+			assert.strictEqual(sResult, sNormalized);
+			assert.strictEqual(FilterProcessor._normalizeCache["true"][sValue], sNormalized,
+				"normalized value for '" + sValue + "' has been cached");
 
 			// code under test - take it from cache
-			assert.deepEqual(FilterProcessor.normalizeFilterValue(sValue, true), "~normalized");
+			assert.strictEqual(FilterProcessor.normalizeFilterValue(sValue, true), sNormalized);
 		});
 	});
 }
+
+	//*********************************************************************************************
+	QUnit.test("createNormalizeCache", function (assert) {
+		// code under test
+		const oCache = FilterProcessor.createNormalizeCache();
+
+		assert.strictEqual(typeof oCache, "object");
+		const aKeys = Object.keys(oCache);
+		assert.strictEqual(aKeys.length, 2);
+		assert.deepEqual(aKeys, ["true", "false"]);
+		aKeys.forEach((sKey) => {
+			assert.strictEqual(typeof oCache[sKey], "object");
+			assert.strictEqual(Object.getPrototypeOf(oCache[sKey]), null);
+		});
+	});
 });

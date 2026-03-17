@@ -339,7 +339,7 @@
 			{
 				"id": "sap.uxap.sample.ObjectPageResponsiveAvatar",
 				"name": "Object Page with Responsive Avatar",
-				"description": "ObjectPage sample demonstrating the breakpointChanged event to adjust Avatar sizes responsively based on screen size (phone: M, tablet: L, desktop/desktop_XL: XL)."
+				"description": "ObjectPage sample demonstrating the breakpointChange event to adjust Avatar sizes responsively based on screen size (phone: M, tablet: L, desktop/desktop_XL: XL)."
 			}
 		]
 	}

@@ -42,7 +42,7 @@
 				</subSections>
 			</ObjectPageSection>
 
-			<ObjectPageSection>
+			<ObjectPageSection titleUppercase="false" title="Section 4">
 				<subSections>
 					<ObjectPageSubSection titleUppercase="false">
 						<blocks>
