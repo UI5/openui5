@@ -628,6 +628,8 @@ sap.ui.define([
 	 * @param {string|Element|sap.ui.core.Control} oRef container into which the control should be put
 	 * @param {string|int} [vPosition="last"] Describes the position where the control should be put into the container
 	 * @returns {this} Returns <code>this</code> to allow method chaining
+	 * @throws {Error} If the given container does not have a <code>content</code> aggregation.
+	 * @throws {Error} If the given <code>vPosition</code> is not supported.
 	 * @public
 	 */
 	Control.prototype.placeAt = function(oRef, vPosition) {

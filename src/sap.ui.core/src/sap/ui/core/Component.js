@@ -795,7 +795,7 @@ sap.ui.define([
 	 * Logs an error in case the application Component is missing a mandatory
 	 * constructor super call.
 	 * For compatibility reason we must not fail in this obviously broken scenario!
-	 *
+	 * @throws {Error} If the Component is missing a mandatory constructor super call.
 	 * @private
 	 */
 	Component.prototype._getDestroyables = function() {
@@ -807,8 +807,12 @@ sap.ui.define([
 		return this._aDestroyables;
 	};
 
-	/*
-	 * clean up the component and its dependent entities like models or event handlers
+	/**
+	 * Cleans up the component and its dependent entities like models or event handlers.
+	 * Nested Components (e.g. created via {@link Component#createComponent} or routing)
+	 * are awaited before destruction to ensure proper cleanup and prevent duplicate ID issues.
+	 * @throws {Error} If a nested Component is missing a mandatory constructor super call.
+	 * @public
 	 */
 	Component.prototype.destroy = function() {
 		var pAsyncDestroy, bSomeRejected = false;
@@ -896,6 +900,7 @@ sap.ui.define([
 	/**
 	 * Returns the event bus of this component.
 	 * @return {sap.ui.core.EventBus} the event bus
+	 * @throws {Error} If the module <code>sap/ui/core/EventBus</code> is not loaded. Make sure to require it before calling this method.
 	 * @since 1.20.0
 	 * @public
 	 */
@@ -2240,6 +2245,12 @@ sap.ui.define([
 	 * @param {Promise|Promise[]} [mOptions.asyncHints.waitFor] <code>Promise</code> or array of <code>Promise</code>s for which the Component instantiation should wait
 	 * @returns {Promise<sap.ui.core.Component>} A Promise that resolves with the newly created component instance
 	 * @throws {TypeError} When <code>mOptions</code> is null or not an object.
+	 * @throws {Error} If super constructor isn't called in the constructor of a subclass of <code>sap.ui.core.Component</code>.
+	 * @throws {Error} If the manifest contains invalid model configurations. For example, if invalid dataSource references, or if unknown model classes are used, or if unknown ODataModel versions are defined.
+	 * @throws {Error} If ODataAnnotation references in the manifest are not correct, e.g., if <code>uri</code> property for ODataAnnotation is missing.
+	 * @throws {Error} If error occurs during the loading of routing information from the manifest.
+	 * @throws {Error} If the component controller module cannot be loaded or does not export a valid component class.
+	 * @throws {Error} If an error is thrown during the instantiation of the component controller, e.g. in the constructor or {@link sap.ui.core.Component#init init} method.
 	 * @since 1.56.0
 	 * @static
 	 * @public
@@ -2541,6 +2552,7 @@ sap.ui.define([
 	 * @param {boolean} [mOptions.asyncHints.preloadOnly=false] Whether only the preloads should be done, but not the loading of the Component controller class itself.
 	 * @returns {Promise<function>} A Promise that resolves with the loaded component class or <code>undefined</code> in case
 	 *      <code>mOptions.asyncHints.preloadOnly</code> is set to <code>true</code>
+	 * @throws {Error} If the component controller class could not be loaded.
 	 *
 	 * @since 1.56.0
 	 * @static

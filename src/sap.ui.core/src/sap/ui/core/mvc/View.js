@@ -868,6 +868,8 @@ sap.ui.define([
 	 * 		by setting <code>preprocessors : { xml }</code>, for example. There can only be one on-demand preprocessor per content type.
 	 * @param {object} [mSettings]
 	 * 		optional configuration for preprocessor
+	 * @throws {Error} If on-demand preprocessor is registered but already exists for the given view type and content type
+	 * @throws {Error} If no <code>vPreprocessor</code> is given
 	 */
 	View.registerPreprocessor = function(sType, vPreprocessor, sViewType, bSyncSupport, bOnDemand, mSettings) {
 

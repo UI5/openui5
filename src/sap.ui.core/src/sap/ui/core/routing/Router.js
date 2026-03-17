@@ -351,6 +351,7 @@ sap.ui.define([
 			 * @param {sap.ui.core.routing.$RouteSettings} oConfig Configuration object for the route, see {@link sap.ui.core.routing.Route#constructor}
 			 * @param {sap.ui.core.routing.Route} oParent The parent route - if a parent route is given, the <code>routeMatched</code> event of this route will also trigger the <code>routeMatched</code> of the parent and it will also create the view of the parent (if provided).
 			 * @public
+			 * @throws {Error} If no <code>oConfig.name</code> is specified
 			 */
 			addRoute : function (oConfig, oParent) {
 				if (!oConfig.name) {
@@ -387,6 +388,7 @@ sap.ui.define([
 			 * @param {boolean} [bIgnoreInitialHash=false] Since 1.48.0. Whether the current URL hash shouldn't be parsed after the router is initialized
 			 * @public
 			 * @returns {this} this for chaining.
+			 * @throws {Error} If <code>navTo</code> was called before <code>initialize</code>
 			 */
 			initialize : function (bIgnoreInitialHash) {
 				var that = this,
@@ -622,6 +624,7 @@ sap.ui.define([
 			 * @public
 			 * @throws {Error} Error will be thrown when any mandatory parameter in the route's pattern is missing from
 			 *  <code>oParameters</code> or assigned with empty string.
+			 * @throws {Error} If the route with the given <code>sName</code> does not exist
 			 */
 			getURL : function (sName, oParameters) {
 				var oRoute = this.getRoute(sName);
@@ -800,6 +803,7 @@ sap.ui.define([
 			 * @returns {this} this for chaining.
 			 * @throws {Error} Error will be thrown when any mandatory parameter in the route's pattern is missing from
 			 *  <code>oParameters</code> or assigned with empty string.
+			 * @throws {Error} If the route with the given <code>sName</code> does not exist.
 			 */
 			navTo : function (sName, oParameters, oComponentTargetInfo, bReplace) {
 				var that = this,
@@ -1275,8 +1279,8 @@ sap.ui.define([
 			 *            <code>sap.ui.core.routing.Router</code> itself
 			 *
 			 * @returns {this} Reference to <code>this</code> in order to allow method chaining
- 			 * @public
- 			 */
+			 * @public
+			 */
 			attachTitleChanged : function(oData, fnFunction, oListener) {
 				this.attachEvent(Router.M_EVENTS.TITLE_CHANGED, oData, fnFunction, oListener);
 				return this;

@@ -247,6 +247,8 @@ sap.ui.define([
 	 * @param {string | string[]} vName.name the (array with) CSS parameter name(s)
 	 * @param {function(sap.ui.core.theming.Parameters.Value)} [vName.callback] If given, the callback is only executed in case there are still parameters pending and one or more of the requested parameters is missing.
 	 * @returns {sap.ui.core.theming.Parameters.Value} the CSS parameter value(s) or <code>undefined</code> if not all parameters could be retrieved synchronously.
+	 * @throws {Error} If <code>Parameters.get</code> is called with an object argument without one or more parameter names.
+	 * @throws {Error} If <code>Parameters.get</code> is called with a plain string or array argument (legacy variant) instead of the expected object argument.
 	 *
 	 * @public
 	 */

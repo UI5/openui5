@@ -1513,6 +1513,13 @@ sap.ui.define([
 			designtime: "sap/ui/core/designtime/CustomData.designtime"
 		}});
 
+		/**
+		 * Sets a new value for property <code>value</code>.
+		 * @param {any} oValue New value for property <code>value</code>
+		 * @throws {Error} If the given <code>value</code> is not a string when <code>writeToDom</code> is true
+		 * @throws {Error} If the key is not a valid <code>sap.ui.core.ID</code> when <code>writeToDom</code> is true, e.g., if it contains a colon or starts with "sap-ui"
+		 * @returns {this} Returns <code>this</code> to allow method chaining
+		*/
 		CustomData.prototype.setValue = function(oValue) {
 			this.setProperty("value", oValue, true);
 
@@ -2167,6 +2174,7 @@ sap.ui.define([
 		 * @public
 		 * @since 1.106
 		 * @throws {DOMException} when an invalid CSS selector is given
+		 * @throws {Error} If the given <code>vParam</code> is a jQuery object. The function should be called with either a DOM Element or a CSS selector.
 		 *
 		 */
 		Element.closestTo = function(vParam, bIncludeRelated) {

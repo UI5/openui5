@@ -250,6 +250,7 @@ sap.ui.define([
 		 * Set message type
 		 *
 		 * @param {module:sap/ui/core/message/MessageType} sType The Message type
+		 * @throws {Error} If <code>sType</code> is not of type {@link sap.ui.core.message.MessageType}
 		 * @public
 		 */
 		Message.prototype.setType = function(sType) {
@@ -299,6 +300,7 @@ sap.ui.define([
 		 * Set message processor
 		 *
 		 * @param {sap.ui.model.Model} oMessageProcessor The Message processor
+		 * @throws {Error} If <code>oMessageProcessor</code> is not of type {@link sap.ui.core.message.MessageProcessor}
 		 * @public
 		 */
 		Message.prototype.setMessageProcessor = function(oMessageProcessor) {

@@ -388,6 +388,9 @@ sap.ui.define([
 		 *
 		 * @param {string} sPath Either the manifest section name (namespace) or a concrete path
 		 * @return {any|null} Value of the key (could be any kind of value)
+		 * @throws {Error} If <code>sPath</code> lacks a namespace prefix (not dot separated)
+		 * @throws {Error} If <code>sPath</code> has an invalid path syntax (no leading /)
+		 * @throws {Error} If the path given as <code>sPath</code> does not resolve to an object.
 		 * @public
 		 */
 		getEntry: function(sPath) {

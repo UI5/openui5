@@ -418,6 +418,7 @@ sap.ui.define([
 		 *
 		 * @since 1.90.0
 		 * @returns {Promise<sap.ui.core.Control|null>} resolves with the created root control or null if none was created, rejects with any thrown error
+		 * @throws {Error} If a subclass of {@link sap.ui.core.UIComponent} does not call <code>super.init()</code> in the overridden <code>init</code> function
 		 * @public
 		 */
 		UIComponent.prototype.rootControlLoaded = function() {

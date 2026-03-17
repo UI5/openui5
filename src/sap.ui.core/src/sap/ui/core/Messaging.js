@@ -158,6 +158,7 @@ sap.ui.define([
 		 * @param {sap.ui.base.ManagedObject} oObject The sap.ui.base.ManagedObject
 		 * @param {boolean} bHandleValidation Handle validationError/parseError events for this object. If set to true,
 		 * the Messaging creates a Message for each validation/parse error. The event bubbling is canceled in every case.
+		 * @throws {Error} If <code>oObject</code> is not of type {@link sap.ui.base.ManagedObject}
 		 * @public
 		 */
 		registerObject: function(oObject, bHandleValidation) {
@@ -175,6 +176,7 @@ sap.ui.define([
 		 * Unregister ManagedObject
 		 *
 		 * @param {sap.ui.base.ManagedObject} oObject The sap.ui.base.ManagedObject
+		 * @throws {Error} If <code>oObject</code> is not of type {@link sap.ui.base.ManagedObject}
 		 * @public
 		 */
 		unregisterObject: function(oObject) {

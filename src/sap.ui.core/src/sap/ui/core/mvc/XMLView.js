@@ -646,6 +646,8 @@ sap.ui.define([
 		 *      by setting <code>preprocessors : { xml }</code>, for example.
 		 * @param {object} [mSettings]
 		 *      optional configuration for preprocessor
+		 * @throws {Error} If given <code>sType</code> is unknown
+		 * @throws {TypeError} If given <code>sType</code> does not match the type defined for the current view class
 		 */
 		XMLView.registerPreprocessor = function(sType, vPreprocessor, sViewType, bSyncSupport, bOnDemand, mSettings) {
 			var sOwnViewType = this.getMetadata().getClass()._sType;

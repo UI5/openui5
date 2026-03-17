@@ -27,6 +27,7 @@ sap.ui.define([
 	 * @public
 	 * @class
 	 * @alias sap.ui.core.routing.History
+	 * @throws {Error} If no {@link sap.ui.core.routing.HashChanger} was provided
 	 */
 	var History = function(oHashChanger) {
 		var that = this;

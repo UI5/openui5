@@ -220,7 +220,7 @@ sap.ui.define([
 			 * @param {sap.ui.core.routing.$TargetSettings} oTargetOptions Options of a target. The option names are the same as the ones in "oOptions.targets.anyName" of {@link #constructor}.
 			 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 			 * @public
-			 *
+			 * @throws {Error} If a target with the specified <code>sName</code> already exists
 			 */
 			addTarget : function (sName, oTargetOptions) {
 				var oOldTarget = this.getTarget(sName, true /* suppress not found error log*/),
@@ -668,6 +668,8 @@ sap.ui.define([
 			 * @param {string} [sTitleTarget] the name of the target from which the title option is taken for firing the {@link sap.ui.core.routing.Targets#event:titleChanged titleChanged} event
 			 * @public
 			 * @returns {Promise} resolving with {{name: *, view: *, control: *}|undefined} for every vTargets, object for single, array for multiple
+			 * @throws {Error} If a target specified in <code>vTargets</code> does not exist
+			 * @throws {Error} If the target specified with <code>sTitleTarget</code> does not exist
 			 */
 			display : function (vTargets, vData, sTitleTarget) {
 				var oSequencePromise = Promise.resolve();

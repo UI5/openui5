@@ -71,7 +71,7 @@ function(
 	 * sap.ui.define(["sap/m/Button", "sap/base/i18n/ResourceBundle"], function(Button, ResourceBundle) {
 	 *  return {
 	 *    createContent: async (oController) => {
-     *      // loading a resource bundle async to retrieve button text
+	 *      // loading a resource bundle async to retrieve button text
 	 *      const myBundle  = await ResourceBundle.create({ bundleName: "...", async: true });
 	 *      return new Button({ text: myBundle.getText("...") });
 	 *    }
@@ -158,6 +158,7 @@ function(
 	 * @param {object} oFragmentImpl an object having the properties "init" and "load".
 	 * @param {function} oFragmentImpl.init Called on Fragment instantiation with the settings map as argument. Function needs to return a promise which resolves with sap.ui.core.Control|sap.ui.core.Control[]
 	 * @param {function} oFragmentImpl.load Called to load the fragment content. Must return a Promise which resolves with the loaded resource. This resource is passed as 'fragmentContent' to the init() function via a parameter object.
+	 * @throws {Error} If the provided fragment type <code>sType</code> is not a string.
 	 * @public
 	 */
 	Fragment.registerType = function(sType, oFragmentImpl) {
@@ -239,6 +240,7 @@ function(
 	 * @param {string} sId ID of the Element/Control to retrieve
 	 *
 	 * @returns {sap.ui.core.Element|undefined} Element by its ID and Fragment ID
+	 * @throws {Error} If <code>sFragmentId</code> or <code>sId</code> is not a string
 	 * @public
 	 * @static
 	 */
@@ -256,6 +258,7 @@ function(
 	 * @param {string} sId Fragment-local ID of the Control to calculate the ID for
 	 *
 	 * @returns {string} the prefixed ID
+	 * @throws {Error} If <code>sFragmentId</code> or <code>sId</code> is not a string
 	 * @public
 	 * @static
 	 */
@@ -407,11 +410,11 @@ function(
 	 *    definition: '&lt;Button xmlns=&quot;sap.m&quot; id=&quot;xmlfragbtn&quot; text=&quot;This is an XML Fragment&quot; press=&quot;doSomething&quot;&gt;&lt;/Button&gt;'
 	 *  });
 	 * });
-     *
+	 *
 	 * @example <caption>Creating a JS fragment</caption>
 	 * sap.ui.require(["sap/ui/core/Fragment"], async (Fragment) => {
 	 *  const myFrag = await Fragment.load({
-     *    name: "module:my/sample/AsyncButton",
+	 *    name: "module:my/sample/AsyncButton",
 	 *    type: "JS",
 	 *  });
 	 * });
