@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/ui/mdc/field/ConditionType",
 	"sap/ui/mdc/condition/Condition",
 	"sap/ui/mdc/field/FieldBaseDelegate",
+	"sap/ui/mdc/odata/v4/TypeMap",
 	"sap/ui/mdc/ValueHelp",
 	"sap/ui/mdc/condition/FilterOperatorUtil",
 	"sap/ui/mdc/condition/Operator",
@@ -28,6 +29,7 @@ sap.ui.define([
 	ConditionType,
 	Condition,
 	FieldBaseDelegate,
+	TypeMapV4,
 	ValueHelp,
 	FilterOperatorUtil,
 	Operator,
@@ -575,6 +577,7 @@ sap.ui.define([
 	let oConditionType2;
 	QUnit.module("DateTimeWithTimezone type", {
 		beforeEach() {
+			sinon.stub(FieldBaseDelegate, "getTypeMap").returns(TypeMapV4);
 			oValueType = new DateTimeWithTimezoneType({pattern: "yyyy-MM-dd'T'HH:mm:ss", showTimezone: false});
 			oOriginalType = new DateTimeWithTimezoneType({showTimezone: true});
 			oDateTimeOffsetType = new DateTimeOffsetType({}, {V4: true});
@@ -611,6 +614,7 @@ sap.ui.define([
 			oDateTimeOffsetType = undefined;
 			oStringType.destroy();
 			oStringType = undefined;
+			FieldBaseDelegate.getTypeMap.restore();
 		}
 	});
 
@@ -657,6 +661,30 @@ sap.ui.define([
 		assert.ok(Array.isArray(oCondition.values), "values are array");
 		assert.equal(oCondition.values.length, 1, "Values length");
 		assert.deepEqual(oCondition.values[0], ["2022-02-25T07:06:30+01:00", "Europe/Berlin"], "Values entry");
+
+	});
+
+	QUnit.test("Parsing: EQ (from intial value)", (assert) => {
+
+		oValueType._aCurrentValue = [null, null]; // fake formatting before (to have at least timezone)
+		oValueType2._aCurrentValue = [null, null]; // fake formatting before (to have at least timezone)
+		oOriginalType._aCurrentValue = [null, null]; // fake formatting before (to have at least timezone)
+		let oCondition = oConditionType.parseValue("2022-02-25T07:32:30");
+		assert.ok(oCondition, "Result returned");
+		assert.equal(typeof oCondition, "object", "Result is object");
+		assert.equal(oCondition.operator, OperatorName.EQ, "Operator");
+		assert.ok(Array.isArray(oCondition.values), "values are array");
+		assert.equal(oCondition.values.length, 1, "Values length");
+		assert.deepEqual(oCondition.values[0], ["2022-02-25T07:32:30+01:00", null], "Values entry");
+
+		// changing of TimeZone not a use case right now
+		oCondition = oConditionType2.parseValue("Americas, New York");
+		assert.ok(oCondition, "Result returned");
+		assert.equal(typeof oCondition, "object", "Result is object");
+		assert.equal(oCondition.operator, OperatorName.EQ, "Operator");
+		assert.ok(Array.isArray(oCondition.values), "values are array");
+		assert.equal(oCondition.values.length, 1, "Values length");
+		assert.deepEqual(oCondition.values[0], [null, "America/New_York"], "Values entry");
 
 	});
 
@@ -748,6 +776,7 @@ sap.ui.define([
 			sinon.stub(oValueHelp, "getItemForValue").callsFake(fnGetItemsForValue);
 			sinon.stub(oValueHelp, "isValidationSupported").returns(true);
 
+			sinon.stub(FieldBaseDelegate, "getTypeMap").returns(TypeMapV4);
 			oValueType = new StringType(); // use odata-String type to parse "" to null -> so "" cannot be a value for typing
 			oConditionType = new ConditionType({
 				valueType: oValueType,
@@ -768,6 +797,7 @@ sap.ui.define([
 			oValueType.destroy();
 			oValueType = undefined;
 			bAsyncCalled = undefined;
+			FieldBaseDelegate.getTypeMap.restore();
 		}
 	});
 
@@ -2407,6 +2437,7 @@ sap.ui.define([
 
 	QUnit.module("Not nullable type", {
 		beforeEach() {
+			sinon.stub(FieldBaseDelegate, "getTypeMap").returns(TypeMapV4);
 			oValueType = new StringType({}, {nullable: false});
 			oConditionType = new ConditionType({valueType: oValueType, fieldPath: "X", operators: [OperatorName.EQ]});
 		},
@@ -2415,6 +2446,7 @@ sap.ui.define([
 			oConditionType = undefined;
 			oValueType.destroy();
 			oValueType = undefined;
+			FieldBaseDelegate.getTypeMap.restore();
 		}
 	});
 
@@ -2435,6 +2467,7 @@ sap.ui.define([
 
 	QUnit.module("Not nullable type with parseKeepsEmptyString", {
 		beforeEach() {
+			sinon.stub(FieldBaseDelegate, "getTypeMap").returns(TypeMapV4);
 			oValueType = new StringType({parseKeepsEmptyString: true}, {nullable: false});
 			oConditionType = new ConditionType({valueType: oValueType, fieldPath: "X", operators: [OperatorName.EQ]});
 		},
@@ -2443,6 +2476,7 @@ sap.ui.define([
 			oConditionType = undefined;
 			oValueType.destroy();
 			oValueType = undefined;
+			FieldBaseDelegate.getTypeMap.restore();
 		}
 	});
 
