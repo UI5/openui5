@@ -5013,6 +5013,40 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("WeeksRow is rendered and shows week numbers for custom day-based view keys", async function(assert) {
+		this.oPC.removeAllViews();
+		this.oPC.addView(new PlanningCalendarView({
+			key: "A",
+			intervalType: CalendarIntervalType.Day,
+			intervalsS: 30,
+			intervalsM: 30,
+			intervalsL: 30
+		}));
+		this.oPC.addView(new PlanningCalendarView({
+			key: "D",
+			intervalType: CalendarIntervalType.Day,
+			intervalsS: 7,
+			intervalsM: 7,
+			intervalsL: 7
+		}));
+
+		this.oPC.setViewKey("A");
+		await nextUIUpdate();
+
+		let oWeeksRow = document.querySelector('.sapUiCalWeeksRow');
+		assert.ok(oWeeksRow, "WeeksRow is rendered for custom key A");
+		let aWeekNumbers = oWeeksRow.querySelectorAll('.sapUiCalRowWeekNumber');
+		assert.ok(aWeekNumbers.length > 0, "Week numbers are rendered for custom key A");
+
+		this.oPC.setViewKey("D");
+		await nextUIUpdate();
+
+		oWeeksRow = document.querySelector('.sapUiCalWeeksRow');
+		assert.ok(oWeeksRow, "WeeksRow is rendered for custom key D");
+		aWeekNumbers = oWeeksRow.querySelectorAll('.sapUiCalRowWeekNumber');
+		assert.ok(aWeekNumbers.length > 0, "Week numbers are rendered for custom key D");
+	});
+
 	QUnit.test("WeeksRow is NOT rendered in views which does not support this feature", async function(assert) {
 		const aOtherViews = [CalendarIntervalType.Hour]; // Add any other custom or built-in view keys as needed
 		for (let i = 0; i < aOtherViews.length; i++) {

@@ -28,6 +28,7 @@ sap.ui.define([
 		const bShowWeekNumbers = oWeeksRow.getShowWeekNumbers();
 		const sPrimaryCalendarType = oWeeksRow.getPrimaryCalendarType();
 		const sViewKey = oWeeksRow.getViewKey();
+		const sIntervalType = oWeeksRow.getIntervalType() || sViewKey;
 		if (!bShowWeekNumbers || sPrimaryCalendarType !== CalendarType.Gregorian) {
 			return;
 		}
@@ -39,7 +40,7 @@ sap.ui.define([
 		oRm.openStart("div");
 		oRm.class("sapMPlanWeeksLabelRow");
 		oRm.openEnd();
-		if (sViewKey === CalendarIntervalType.Month) {
+		if (sIntervalType === CalendarIntervalType.Month) {
 			const oResourceBundle = coreLibrary.getResourceBundleFor("sap.ui.unified");
 			oRm.openStart("div");
 			oRm.class("sapUiCalRowWeekLabel");
@@ -51,11 +52,11 @@ sap.ui.define([
 		oRm.openStart("div");
 		oRm.class("sapMPlanWeeksDataRow");
 		oRm.openEnd();
-		if (sViewKey === CalendarIntervalType.Day || sViewKey === CalendarIntervalType.Week ||
-				sViewKey === CalendarIntervalType.OneMonth || sViewKey === CalendarIntervalType.OneWeek ||
-				sViewKey === "OneMonth") {
+		if (sIntervalType === CalendarIntervalType.Day || sIntervalType === CalendarIntervalType.Week ||
+				sIntervalType === CalendarIntervalType.OneMonth || sIntervalType === CalendarIntervalType.OneWeek ||
+				sIntervalType === "OneMonth") {
 			this.renderDaysWeeks(oRm, oWeeksRow);
-		} else if (sViewKey === CalendarIntervalType.Month) {
+		} else if (sIntervalType === CalendarIntervalType.Month) {
 			this.renderMonthsWeeks(oRm, oWeeksRow);
 		}
 		oRm.close("div");

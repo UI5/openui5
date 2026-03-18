@@ -2099,6 +2099,7 @@ sap.ui.define([
 							primaryCalendarType: this.getPrimaryCalendarType(),
 							interval: iIntervals,
 							viewKey: sKey,
+							intervalType: sIntervalType,
 							showWeekNumbers: this.getShowWeekNumbers(),
 							calendarWeekNumbering: this.getCalendarWeekNumbering()
 						});
@@ -2108,6 +2109,7 @@ sap.ui.define([
 						this._oCalendarWeeks.setPrimaryCalendarType(this.getPrimaryCalendarType());
 						this._oCalendarWeeks.setStartDate(this.getStartDate());
 						this._oCalendarWeeks.setViewKey(sKey);
+						this._oCalendarWeeks.setIntervalType(sIntervalType);
 					}
 					this._oInfoToolbar.addContent(this._oCalendarWeeks);
 				break;
@@ -2150,6 +2152,7 @@ sap.ui.define([
 							primaryCalendarType: this.getPrimaryCalendarType(),
 							interval: iIntervals,
 							viewKey: CalendarIntervalType.Month,
+							intervalType: CalendarIntervalType.Month,
 							showWeekNumbers: this.getShowWeekNumbers(),
 							calendarWeekNumbering: this.getCalendarWeekNumbering()
 						});
@@ -2159,6 +2162,7 @@ sap.ui.define([
 						this._oCalendarWeeks.setPrimaryCalendarType(this.getPrimaryCalendarType());
 						this._oCalendarWeeks.setStartDate(this.getStartDate());
 						this._oCalendarWeeks.setViewKey(CalendarIntervalType.Month);
+						this._oCalendarWeeks.setIntervalType(CalendarIntervalType.Month);
 					}
 					this._oInfoToolbar.addContent(this._oCalendarWeeks);
 					break;
