@@ -219,44 +219,6 @@ sap.ui.define([
 	});
 
 	//**********************************************************************************************
-	QUnit.test("getFilters", function(assert) {
-		var oBinding = {},
-			aReturnedFilters;
-
-		assert.throws(function() {
-			// code under test
-			ListBinding.prototype.getFilters.call(oBinding);
-		}, new Error("Invalid FilterType: undefined"));
-
-		oBinding.aApplicationFilters = ["~appfilter~"];
-
-		// code under test
-		aReturnedFilters = ListBinding.prototype.getFilters.call(oBinding, FilterType.Application);
-
-		assert.deepEqual(aReturnedFilters, ["~appfilter~"]);
-		assert.notStrictEqual(oBinding.aApplicationFilters, aReturnedFilters);
-
-		oBinding.aFilters = ["~filter~"];
-
-		// code under test
-		aReturnedFilters = ListBinding.prototype.getFilters.call(oBinding, FilterType.Control);
-
-		assert.deepEqual(aReturnedFilters, ["~filter~"]);
-		assert.notStrictEqual(oBinding.aFilters, aReturnedFilters);
-
-		// all models in sap/ui/model have an empty array. but it is not a requirement for other
-		// models
-		oBinding.aFilters = undefined;
-		oBinding.aApplicationFilters = undefined;
-
-		// code under test
-		assert.deepEqual(ListBinding.prototype.getFilters.call(oBinding, FilterType.Application),
-			[]);
-		assert.deepEqual(ListBinding.prototype.getFilters.call(oBinding, FilterType.Control),
-			[]);
-	});
-
-	//**********************************************************************************************
 	QUnit.module("sap.ui.model.Sorter", {
 		before() {
 			this.__ignoreIsolatedCoverage__ = true;

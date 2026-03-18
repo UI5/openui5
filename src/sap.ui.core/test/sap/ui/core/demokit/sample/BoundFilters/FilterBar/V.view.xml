@@ -1,0 +1,88 @@
+<mvc:View
+	class="sapUiSizeCompact"
+	controllerName="sap.ui.core.sample.BoundFilters.FilterBar.C"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:table="sap.ui.table"
+	xmlns:rm="sap.ui.table.rowmodes"
+	core:require="{
+		StringType: 'sap/ui/model/odata/type/String'}"> <!-- use odata types as they map empty input to null -->
+	<table:Table id="myTable"
+			rows="{path: '/teamMembers',
+				boundFilters: [{
+					path: 'firstName',
+					operator: 'StartsWith',
+					value1: '{filter>/firstName}'
+				}, {
+					path: 'lastName',
+					operator: 'StartsWith',
+					value1: '{filter>/lastName}'
+				}, {
+					path: 'location',
+					operator: 'StartsWith',
+					value1: '{filter>/locationPrefix}'
+				}, {
+					path: 'department',
+					operator: 'StartsWith',
+					value1: '{filter>/departmentPrefix}'
+				}]
+			}">
+		<table:extension>
+			<Title id="title" text="Employees"/>
+			<Toolbar>
+				<Label text="Department prefix" labelFor="departmentInput" visible="{ui>/showOrganizational}"/>
+				<Input id="departmentInput" width="200px"
+					value="{path: 'filter>/departmentPrefix', type: 'StringType'}"
+					visible="{ui>/showOrganizational}"/>
+				<Label text="Location prefix" labelFor="locationInput" visible="{ui>/showOrganizational}"/>
+				<Input id="locationInput" width="200px"
+					value="{path: 'filter>/locationPrefix', type: 'StringType'}"
+					visible="{ui>/showOrganizational}"/>
+				<Label text="First name prefix" labelFor="firstNameInput" visible="{= !%{ui>/showOrganizational}}"/>
+				<Input id="firstNameInput" width="200px"
+					value="{path: 'filter>/firstName', type: 'StringType'}"
+					visible="{= !%{ui>/showOrganizational}}"/>
+				<Label text="Last name prefix" labelFor="lastNameInput" visible="{= !%{ui>/showOrganizational}}"/>
+				<Input id="lastNameInput" width="200px"
+					value="{path: 'filter>/lastName', type: 'StringType'}"
+					visible="{= !%{ui>/showOrganizational}}"/>
+				<ToolbarSpacer/>
+				<Button id="toggleFiltersButton" press=".onToggleFilters"
+					text="{= %{ui>/showOrganizational} ? 'Show Personal Filters' : 'Show Organizational Filters'}"/>
+			</Toolbar>
+		</table:extension>
+		<table:columns>
+			<table:Column>
+				<Label text="Department"/>
+				<table:template>
+					<Text text="{department}"/>
+				</table:template>
+			</table:Column>
+			<table:Column>
+				<Label text="First Name"/>
+				<table:template>
+					<Text text="{firstName}"/>
+				</table:template>
+			</table:Column>
+			<table:Column>
+				<Label text="Last Name"/>
+				<table:template>
+					<Text text="{lastName}"/>
+				</table:template>
+			</table:Column>
+			<table:Column>
+				<Label text="Age"/>
+				<table:template>
+					<Text text="{age}"/>
+				</table:template>
+			</table:Column>
+			<table:Column>
+				<Label text="Location"/>
+				<table:template>
+					<Text text="{location}"/>
+				</table:template>
+			</table:Column>
+		</table:columns>
+	</table:Table>
+</mvc:View>

@@ -417,7 +417,7 @@ sap.ui.define([
 			const oCurrentCondition = aConditions[0];
 			const vOldValue = oCurrentCondition && oCurrentCondition.values[0];
 			const vOldAdditionalValue = oCurrentCondition && oCurrentCondition.values[1] ? oCurrentCondition.values[1] : null; // to compare with default value
-			if (!oCurrentCondition || oCurrentCondition.operator !== OperatorName.EQ || !_compareValues.call(this, vOldValue, vValue) || !_compareAdditionalValues.call(this, vAdditionalValue, vOldAdditionalValue)) {
+			if (!oCurrentCondition || oCurrentCondition.operator !== OperatorName.EQ || !_compareValues.call(this, vValue, vOldValue) || !_compareAdditionalValues.call(this, vAdditionalValue, vOldAdditionalValue)) {
 				const oDelegate = this.getControlDelegate();
 				const oNextCondition = oDelegate.createCondition(this, this, [vValue, vAdditionalValue], oCurrentCondition);
 				if (!Condition.compareConditions(oCurrentCondition, oNextCondition)) { // We do a full comparison here as FilterOperatorUtils.compareConditions may ignore text changes
@@ -464,20 +464,23 @@ sap.ui.define([
 
 	function _compareValues(vValue1, vValue2, bUpdateCheck) {
 
-		let bEqual = vValue1 === vValue2;
-		const sDataType = this.getContentFactory().getDataType() ? this.getContentFactory().getDataType().getMetadata().getName() : this.getDataType(); // as type must not exist now
+		let bEqual = deepEqual(vValue1, vValue2);
+		const oDataType = this.getContentFactory().getDataType(); // we just need the name or class, not FormatOptions or Constraints. (So OriginalDate/UnitType not needed here.)
+		const sDataType = oDataType ? oDataType.getMetadata().getName() : this.getDataType(); // as type must not exist now
+		const sBaseType = this.getTypeMap().getBaseType(sDataType); // is false for DateTimeWithTimeZone
+		const bIsComposite = oDataType?.isA("sap.ui.model.CompositeType"); // only if type set / internal content created. But no user input possible before. Needed to handle other CompositeTypes as DateTimeWithTimezone or Unit fields with only number part used
 
-		if (!bEqual && this.getTypeMap().getBaseType(sDataType) === BaseType.Unit && Array.isArray(vValue1) && Array.isArray(vValue2)) {
+		if (!bEqual && (sBaseType === BaseType.Unit || bIsComposite) && Array.isArray(vValue1) && Array.isArray(vValue2)) {
 			// in unit type the unit table is in there setting the value but not after parsing
 			// units must be set at least once. so if not set compare too
-			const vNumber1 = vValue1[0];
-			const vUnit1 = vValue1[1];
+			const [vNumber1, vUnit1] = vValue1;
 			const vCustomUnit1 = vValue1.length >= 3 ? vValue1[2] : null; // if no custom units are given handle it like null
-			const vNumber2 = vValue2[0];
-			const vUnit2 = vValue2[1];
+			const [vNumber2, vUnit2] = vValue2;
 			const vCustomUnit2 = vValue2.length >= 3 ? vValue2[2] : null; // if no custom units are given handle it like null
-			// null and undefined are handled different in Unit type, so don't handle it as equal
-			if (vNumber1 === vNumber2 && vUnit1 === vUnit2 &&
+			// null and undefined are handled different in binding update, so don't handle it as equal
+			// undefined means "no update", so it is equal to the old value
+			// undefined cannot come from outside, only from internal handling. (in setProperty undefined will be changed to default value)
+			if (deepEqual(vNumber1, vNumber2) && deepEqual(vUnit1, vUnit2) &&
 				(((this._bUnitSet || bUpdateCheck) && (!vCustomUnit1 || !vCustomUnit2)) || deepEqual(vCustomUnit1, vCustomUnit2))) {
 				bEqual = true;
 			}
@@ -599,7 +602,6 @@ sap.ui.define([
 		}
 
 		vValue = this.getResultForChangePromise(aConditions);
-		vValue = _updateEmptyValue.call(this, vValue, vOldValue);
 		if (aConditions.length === 0 || aConditions[0].values.length === 1) {
 			if (vOldAdditionalValue) {
 				const oDataType = this.getContentFactory().getAdditionalDataType();
@@ -614,8 +616,10 @@ sap.ui.define([
 		}
 
 		// save internal as observer is called for each property and so might have the old value in getProperty.
-		this._vValue = vValue;
+		this._vValue = _updateEmptyValue.call(this, vValue, vOldValue, false); // don't use "undefined" as overwitten with old value from Binding
 		this._vAdditionalValue = vAdditionalValue;
+
+		vValue = _updateEmptyValue.call(this, vValue, vOldValue, this.isBound("value")); // use "undefined" only if "value" is bound, otherwise it will not be updated
 
 		if (!_compareValues.call(this, vValue, vOldValue, true)) {
 			// to run not in V4 update issues if data not already loaded
@@ -629,18 +633,32 @@ sap.ui.define([
 
 	}
 
-	function _updateEmptyValue(vValue, vOldValue) {
+	function _updateEmptyValue(vValue, vOldValue, bUseUndefined) {
 
 		// if value of composite binding was "initial" before and not lead to a condition in the new value, only the changed parts
 		// of the composite value must be updated. (Parsing in Operator and ConditionType sets it to null if no old value is known.)
-		const sDataType = this.getContentFactory().getDataType() ? this.getContentFactory().getDataType().getMetadata().getName() : this.getDataType(); // as type must not exist now
+		const oDataType = this.getContentFactory().getDataType(); // we just need the name or class, not FormatOptions or Constraints. (So OriginalDate/UnitType not needed here.)
+		const sDataType = oDataType ? oDataType.getMetadata().getName() : this.getDataType(); // as type must not exist now (but if set from Binding it normally exist)
+		const sBaseType = this.getTypeMap().getBaseType(sDataType); // is false for DateTimeWithTimeZone
+		const bIsComposite = oDataType?.isA("sap.ui.model.CompositeType"); // only if type set / internal content created. But no user input possible before. Needed to handle other CompositeTypes as DateTimeWithTimezone or Unit fields with only number part used
+		const bOldValueInitial = this.checkValueInitial(vOldValue);
 
-		if (this.getTypeMap().getBaseType(sDataType) === BaseType.Unit && Array.isArray(vValue) && Array.isArray(vOldValue) && !this.checkValueInitial(vValue) && this.checkValueInitial(vOldValue)) {
+		if ((sBaseType === BaseType.Unit || bIsComposite) && Array.isArray(vValue) && Array.isArray(vOldValue)) {
+			const aResult = []; // don't modify original Array
 			for (let i = 0; i < vValue.length; i++) {
-				if (vValue[i] === null && vOldValue[i] !== undefined) {
-					vValue[i] = vOldValue[i]; // take initial value from old value (might be "")
+				if (vValue[i] === null) {
+					if (vOldValue[i] === null && bUseUndefined) {
+						aResult.push(undefined); // old value initial and not changed -> prevent validation from data-type. (Otherwise not-nullable-check might lead to error.)
+					} else  if (bOldValueInitial) {
+						aResult.push(vOldValue[i]); // take initial value from old value (might be "")
+					} else {
+						aResult.push(null);
+					}
+				} else {
+					aResult.push(vValue[i]);
 				}
 			}
+			return aResult;
 		}
 
 		return vValue;
@@ -736,7 +754,7 @@ sap.ui.define([
 
 		const vOldValue = this.getValue();
 		let vValue = this.getResultForChangePromise(aConditions);
-		vValue = _updateEmptyValue.call(this, vValue, vOldValue);
+		vValue = _updateEmptyValue.call(this, vValue, vOldValue, false); // don't use undefined here, only on updating Property
 
 		if (_compareValues.call(this, vValue, vOldValue, true)) {
 			// value will not be updated, therefore ValidationSuccess need to be fired manually

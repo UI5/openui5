@@ -38,6 +38,18 @@
 							class="sapUiSmallMargin"
 							showIcon="true"
 						/>
+						<HBox alignItems="Center" class="sapUiSmallMargin" visible="{= !!${/subSample/showSlider} }">
+							<Label text="Card Width:" class="sapUiTinyMarginEnd" />
+							<Slider
+								id="cardWidthSlider"
+								width="300px"
+								min="20"
+								max="100"
+								value="{settings>/cardWidth}"
+								liveChange="onCardWidthChange"
+								class="sapUiTinyMarginEnd" />
+							<Text text="{settings>/cardWidth}%" />
+						</HBox>
 						<f:GridContainer id="cardContainer" visible="{= !${settings>/useIFrame} }"></f:GridContainer>
 						<core:HTML id="iframeWrapper" visible="{= ${settings>/useIFrame} }" preferDOM="false" content='&lt;div style="height:100%;"&gt;&lt;/div&gt;'>
 							<core:layoutData>

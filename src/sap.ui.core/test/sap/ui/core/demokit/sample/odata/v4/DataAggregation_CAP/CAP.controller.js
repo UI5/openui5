@@ -177,6 +177,10 @@ sap.ui.define([
 			this.byId("details").getBindingContext().requestSideEffects(["FlightDate"]);
 		},
 
+		onRefreshFlightPrice : function () {
+			this.byId("details").getBindingContext().requestSideEffects(["FlightPrice"]);
+		},
+
 		onSearch : function () {
 			this._oAggregation.search
 				= this.getView().getModel("ui").getProperty("/sSearch");

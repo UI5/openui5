@@ -42,18 +42,13 @@ sap.ui.define(["sap/m/AvatarSize", "sap/m/AvatarType", "sap/base/security/encode
 			aLabelledBy = oAvatar._getAriaLabelledBy(),
 			aDescribedBy = oAvatar.getAriaDescribedBy(),
 			aHasPopup = oAvatar.getAriaHasPopup(),
-			bHasListener = oAvatar.hasListeners("press"),
 			bHasSrc = (!oAvatar._getUseDefaultIcon() && bHasDetailBox) || (!bHasDetailBox),
 			bHideBadge = bHasDetailBox && bIsIconURI && !bHasBadgeIcon,
-			bShouldBeClickable = bHasListener && bHasSrc,
 			oBadge = bHasSrc && !bHideBadge ?  oAvatar._getBadge() : null,
-			sDefaultTooltip = oAvatar._getDefaultTooltip(),
 			sInitialsLength = sInitials.length,
-			bActive = oAvatar.getActive() && bShouldBeClickable,
-			sCustomBadgeTooltip = oAvatar._getBadgeTooltip(),
-			sDefaultBadgeTooltip = oAvatar._getDefaultTooltip(),
-			bDecorative = oAvatar.getDecorative(),
-			sBadgeTooltip = (sCustomBadgeTooltip && sCustomBadgeTooltip !== sDefaultBadgeTooltip) ? sDefaultTooltip + " " + sCustomBadgeTooltip : sDefaultBadgeTooltip;
+			sRole = oAvatar._getRole(),
+			bActive = oAvatar.getActive() && bEnabled && sRole === "button",
+			sAriaLabel = oAvatar._getAriaLabel();
 
 		oRm.openStart("span", oAvatar);
 		oRm.class(sAvatarClass);
@@ -66,17 +61,16 @@ sap.ui.define(["sap/m/AvatarSize", "sap/m/AvatarType", "sap/base/security/encode
 			oRm.class("sapMAvatarPressed");
 		}
 
+		// Set role using the centralized logic from Avatar._getRole()
 		if (bEnabled) {
-			if (bShouldBeClickable) {
+			oRm.attr("role", sRole);
+
+			if (sRole === "button") {
 				oRm.class("sapMPointer");
 				oRm.class(sAvatarClass + "Focusable");
-				oRm.attr("role", "button");
 				oRm.attr("tabindex", 0);
-			} else if (bDecorative) {
-				oRm.attr("role", "presentation");
+			} else if (sRole === "presentation") {
 				oRm.attr("aria-hidden", "true");
-			} else {
-				oRm.attr("role", "img");
 			}
 		} else {
 			oRm.attr("disabled", "disabled");
@@ -90,26 +84,16 @@ sap.ui.define(["sap/m/AvatarSize", "sap/m/AvatarType", "sap/base/security/encode
 			oRm.style("height", sCustomDisplaySize);
 			oRm.style("font-size", sCustomFontSize);
 		}
-		if (!bDecorative || bHasListener) {
+
+		// Set aria-label using the centralized logic from Avatar._getAriaLabel()
+		if (sAriaLabel) {
+			// If tooltip property is set, also set the title attribute
 			if (sTooltip) {
-				// if tooltip property is set the initials should be overwritten
 				oRm.attr("title", sTooltip);
-				oRm.attr("aria-label", sTooltip);
-			} else if (sBadgeTooltip) {
-				// if both initials and badgeTooltip are available, their value should also be incorporated into the aria-label
-				if (sInitials) {
-					sBadgeTooltip += " " + sInitials;
-				}
-				// if only badgeTooltip is available, its value should be incorporated into the aria-label
-				oRm.attr("aria-label", sBadgeTooltip);
-			} else if (sInitials) {
-				// default "Avatar" text + initials
-				oRm.attr("aria-label", sDefaultTooltip + " " + sInitials);
-			} else {
-				// no tooltip set nor initials - set only the default "Avatar" text
-				oRm.attr("aria-label", sDefaultTooltip);
 			}
+			oRm.attr("aria-label", sAriaLabel);
 		}
+
 		// aria-labelledby references
 		if (aLabelledBy && aLabelledBy.length > 0) {
 			oRm.attr("aria-labelledby", aLabelledBy.join(" "));

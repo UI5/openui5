@@ -229,6 +229,15 @@ sap.ui.define([
 			}.bind(this));
 		},
 
+		onCardWidthChange: function (oEvent) {
+			const iValue = oEvent.getParameter("value");
+			exploreSettingsModel.setProperty("/cardWidth", iValue);
+
+			if (this._oCardSample) {
+				this._oCardSample.setWidth(iValue + "%");
+			}
+		},
+
 		/**
 		 * Handy decorator that executes the callback only if the sample hasn't changed
 		 * @param {function} fnCb The callback function
@@ -1056,6 +1065,14 @@ sap.ui.define([
 			}
 
 			this._oCardSample.setManifest(null);
+
+			if (this._oCardSample.getWidth() !== "100%") {
+				this._oCardSample.setWidth("100%");
+
+				if (exploreSettingsModel.getProperty("/cardWidth") !== 100) {
+					exploreSettingsModel.setProperty("/cardWidth", 100);
+				}
+			}
 
 			if (oSample.key === "mockData") {
 				this._oCardSample.setPreviewMode("MockData");

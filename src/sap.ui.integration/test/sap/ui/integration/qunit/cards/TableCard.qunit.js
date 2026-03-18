@@ -1626,4 +1626,185 @@ sap.ui.define([
 		assert.ok(oStatusCell.getDomRef(), "ObjectStatus should be rendered in the DOM");
 		assert.ok(oStatusCell.getDomRef().textContent.includes("Delivered"), "Rendered ObjectStatus should contain the status text");
 	});
+
+	QUnit.module("Pop-in Behavior", {
+		beforeEach: function () {
+			this.oCard = new Card({
+				width: "400px"
+			});
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+		},
+		afterEach: function () {
+			this.oCard.destroy();
+			this.oCard = null;
+		}
+	});
+
+	QUnit.test("Pop-in properties should set props correctly", async function (assert) {
+		const oManifest = {
+			"sap.card": {
+				"type": "Table",
+				"header": {
+					"title": "Pop-in Properties Test"
+				},
+				"content": {
+					"autoPopinMode": true,
+					"hiddenInPopin": ["Low", "None"],
+					"popinLayout": "GridLarge",
+					"data": {
+						"json": [
+							{
+								"id": "1",
+								"name": "Test Item 1",
+								"category": "Electronics",
+								"status": "Active",
+								"note": "Important note",
+								"description": "Long description text"
+							},
+							{
+								"id": "2",
+								"name": "Test Item 2",
+								"category": "Furniture",
+								"status": "Inactive",
+								"note": "Another note",
+								"description": "Another long description"
+							}
+						]
+					},
+					"row": {
+						"columns": [
+							{
+								"title": "ID",
+								"value": "{id}",
+								"importance": "High"
+							},
+							{
+								"title": "Name",
+								"value": "{name}",
+								"importance": "High",
+								"autoPopinWidth": 8
+							},
+							{
+								"title": "Category",
+								"value": "{category}",
+								"importance": "Medium"
+							},
+							{
+								"title": "Status",
+								"value": "{status}",
+								"importance": "Low"
+							},
+							{
+								"title": "Note",
+								"value": "{note}",
+								"importance": "None"
+							},
+							{
+								"title": "Description",
+								"value": "{description}",
+								"autoPopinWidth": 10
+							}
+						]
+					}
+				}
+			}
+		};
+
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oTable = this.oCard.getCardContent().getAggregation("_content");
+		const aColumns = oTable.getColumns();
+
+		assert.ok(oTable.getAutoPopinMode(), "Table should have autoPopinMode enabled");
+		assert.equal(oTable.getPopinLayout(), "GridLarge", "Table should have GridLarge popinLayout");
+		assert.equal(oTable.getContextualWidth(), "Auto", "Table should have contextualWidth set to Auto");
+
+		const aHiddenInPopin = oTable.getHiddenInPopin();
+		assert.equal(aHiddenInPopin.length, 2, "Table should have 2 importance levels hidden in pop-in");
+		assert.ok(aHiddenInPopin.includes("Low"), "Low importance should be hidden in pop-in");
+		assert.ok(aHiddenInPopin.includes("None"), "None importance should be hidden in pop-in");
+
+		assert.equal(aColumns.length, 6, "Table should have 6 columns");
+		assert.equal(aColumns[0].getImportance(), "High", "First column should have High importance");
+
+		assert.equal(aColumns[1].getImportance(), "High", "Second column should have High importance");
+		assert.equal(aColumns[1].getAutoPopinWidth(), 8, "Second column should have autoPopinWidth 8");
+
+		assert.equal(aColumns[2].getImportance(), "Medium", "Third column should have Medium importance");
+		assert.equal(aColumns[3].getImportance(), "Low", "Fourth column should have Low importance");
+		assert.equal(aColumns[4].getImportance(), "None", "Fifth column should have None importance");
+
+		assert.equal(aColumns[5].getAutoPopinWidth(), 10, "Sixth column should have autoPopinWidth 10");
+	});
+
+	QUnit.test("_fMinHeight should be reset when card width changes", async function (assert) {
+		const oManifest = {
+			"sap.card": {
+				"type": "Table",
+				"header": {
+					"title": "Width Change Height Reset Test"
+				},
+				"content": {
+					"autoPopinMode": true,
+					"data": {
+						"json": [
+							{ "name": "Item 1", "status": "Active", "description": "Description 1", "notes": "Notes 1" },
+							{ "name": "Item 2", "status": "Inactive", "description": "Description 2", "notes": "Notes 2" },
+							{ "name": "Item 3", "status": "Active", "description": "Description 3", "notes": "Notes 3" }
+						]
+					},
+					"row": {
+						"columns": [
+							{
+								"title": "Name",
+								"value": "{name}",
+								"importance": "High"
+							},
+							{
+								"title": "Status",
+								"value": "{status}",
+								"importance": "Medium"
+							},
+							{
+								"title": "Description",
+								"value": "{description}",
+								"importance": "Low"
+							},
+							{
+								"title": "Notes",
+								"value": "{notes}",
+								"importance": "None"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		this.oCard.setWidth("800px");
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oCardContent = this.oCard.getCardContent();
+
+		const fInitialMinHeight = oCardContent._fMinHeight;
+		assert.ok(fInitialMinHeight !== 0, "Initial _fMinHeight should be greater than 0");
+
+		this.oCard.setWidth("300px");
+		await nextUIUpdate();
+
+		const fMinHeightAfterWidthChange = oCardContent._fMinHeight;
+		assert.ok(fMinHeightAfterWidthChange === 0, "_fMinHeight should be recalculated after width change");
+
+		this.oCard.setWidth("800px");
+		await nextUIUpdate();
+
+		const fMinHeightAfterExpand = oCardContent._fMinHeight;
+		assert.ok(fMinHeightAfterExpand === 0, "_fMinHeight should be recalculated when expanding width");
+
+		assert.ok(oCardContent._fLastWidth !== 0, "_fLastWidth should be tracking the current width");
+	});
 });

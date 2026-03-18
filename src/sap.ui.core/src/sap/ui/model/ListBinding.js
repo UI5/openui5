@@ -416,9 +416,11 @@ sap.ui.define(['./AggregationBinding', './Binding', './Filter', './FilterType', 
 		ListBinding.prototype.getFilters = function (sFilterType) {
 			switch (sFilterType) {
 				case FilterType.Application:
-					return this.aApplicationFilters && this.aApplicationFilters.slice() || [];
+					return this.aApplicationFilters.filter((oFilter) => !oFilter.isBound());
+				case FilterType.ApplicationBound:
+					return this.aApplicationFilters.filter((oFilter) => oFilter.isBound());
 				case FilterType.Control:
-					return this.aFilters && this.aFilters.slice() || [];
+					return this.aFilters.slice();
 				default:
 					throw new Error("Invalid FilterType: " + sFilterType);
 			}

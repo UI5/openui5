@@ -26,22 +26,92 @@ sap.ui.define([
 	createAndAppendDiv("area9");
 
 
+	function getEnumerableKeys(obj) {
+		const keys = [];
+		for (const name in obj) {
+			keys.push(name);
+		}
+		return keys;
+	}
+
 	QUnit.module("Core API");
 
 	QUnit.test("Core.createRenderManager", function(assert) {
 		assert.notStrictEqual(new RenderManager().getInterface(), new RenderManager().getInterface(), "Core.createRenderManager should always return a new RenderManager instance");
 	});
 
-	var aCommonMethods = ["renderControl", "cleanupControlWithoutRendering"];
+	QUnit.module("Interfaces");
 
-	var aStringRendererMethods = ["write", "writeEscaped", "writeAcceleratorKey", "writeControlData", "writeElementData",
-		"writeAttribute", "writeAttributeEscaped", "addClass", "writeClasses", "addStyle", "writeStyles",
-		"writeAccessibilityState", "writeIcon", "translate", "getConfiguration", "getHTML"];
+	var aCommonMethods = ["renderControl", "cleanupControlWithoutRendering"];
 
 	var aDomRendererMethods = ["openStart", "openEnd", "close", "voidStart", "voidEnd", "text", "attr", "class", "style",
 		"accessibilityState", "icon", "unsafeHtml"];
 
-	aCommonMethods.concat(aStringRendererMethods, aDomRendererMethods);
+	const aInterfaceMethods = [
+		...aCommonMethods,
+		...aDomRendererMethods
+	];
+
+	var aNonRendererFunctions = ["render", "flush", "destroy"];
+
+	QUnit.test("Full Interface", function(assert) {
+		var rm = new RenderManager().getInterface();
+		var aAllFunctions = aInterfaceMethods.concat(aNonRendererFunctions);
+
+		assert.deepEqual(
+			getEnumerableKeys(rm).sort(),
+			aAllFunctions.sort(),
+			"RenderManager interface should contain exactly the expected methods"
+		);
+	});
+
+	QUnit.test("Interface provided to Renderer with apiVersion 2", function(assert) {
+		const aDomInterfaceMethods = [...aCommonMethods, ...aDomRendererMethods];
+		const TestControlV2 = Control.extend("TestControlV2", {
+			renderer: {
+				apiVersion: 2,
+				render(oRM, oControl) {
+					oRM.openStart("div", oControl).openEnd().close("div");
+					assert.deepEqual(
+						getEnumerableKeys(oRM).sort(),
+						aDomInterfaceMethods.sort(),
+						"Interface given to control renderer should contain exactly the expected methods");
+				}
+			}
+		});
+
+		const rm = new RenderManager().getInterface();
+		const oControl = new TestControlV2();
+		rm.renderControl(oControl);
+
+		// cleanup
+		rm.destroy();
+		oControl.destroy();
+	});
+
+	QUnit.test("Interface provided to Renderer with apiVersion 4", function(assert) {
+		const aDomInterfaceMethods = [...aCommonMethods, ...aDomRendererMethods];
+		const TestControlV4 = Control.extend("TestControlV4", {
+			renderer: {
+				apiVersion: 4,
+				render(oRM, oControl) {
+					oRM.openStart("div", oControl).openEnd().close("div");
+					assert.deepEqual(
+						getEnumerableKeys(oRM).sort(),
+						aDomInterfaceMethods.sort(),
+						"Interface given to control renderer should contain exactly the expected methods");
+				}
+			}
+		});
+
+		const rm = new RenderManager().getInterface();
+		const oControl = new TestControlV4();
+		rm.renderControl(oControl);
+
+		// cleanup
+		rm.destroy();
+		oControl.destroy();
+	});
 
 	QUnit.module("Writer API: Semantic Syntax (DOM) Assertions (future=true)", {
 		before: function() {

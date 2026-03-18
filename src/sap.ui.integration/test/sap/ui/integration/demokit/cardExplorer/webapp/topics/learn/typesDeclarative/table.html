@@ -24,6 +24,7 @@
 					<tr>
 						<th>Property</th>
 						<th>Type</th>
+						<th>Default Value</th>
 						<th>Required</th>
 						<th>Description</th>
 						<th>Schema Version</th>
@@ -32,6 +33,7 @@
 					<tr>
 						<td>row</td>
 						<td><a href="#tableRowProperties">TableRow</a></td>
+						<td></td>
 						<td>Yes</td>
 						<td>The row template from which all the rows in the table will be created.</td>
 						<td>1.15.0</td>
@@ -40,6 +42,7 @@
 					<tr>
 						<td>maxItems</td>
 						<td>int</td>
+						<td></td>
 						<td>No</td>
 						<td>The maximum number of items.</td>
 						<td>1.15.0</td>
@@ -48,6 +51,7 @@
 					<tr>
 						<td>minItems</td>
 						<td>int</td>
+						<td></td>
 						<td>No</td>
 						<td>The minimum number of items that are expected. This property is used to calculate the minimum height of the card.</td>
 						<td>1.50.0</td>
@@ -55,12 +59,54 @@
 					</tr>
 					<tr>
 						<td>group</td>
-						<td><a href="#groupApi">Group</a>
-						</td>
+						<td><a href="#groupApi">Group</a></td>
+						<td></td>
 						<td>No</td>
 						<td>Defines whether and how items are grouped.</td>
 						<td>1.37.0</td>
 						<td>1.96</td>
+					</tr>
+					<tr>
+						<td>autoPopinMode</td>
+						<td>boolean</td>
+						<td>false</td>
+						<td>No</td>
+						<td>
+							Specifies if columns automatically move to the pop-in area based on importance. When true, the table dynamically calculates breakpoints.
+							<br>
+							<span class="mobileNoteIcon"></span>
+							<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
+						</td>
+						<td>1.85.0</td>
+						<td>1.147</td>
+					</tr>
+					<tr>
+						<td>hiddenInPopin</td>
+						<td><a data-demokit-href="#/api/sap.ui.core.Priority" target="_blank">sap.ui.core.Priority[]</a></td>
+						<td></td>
+						<td>No</td>
+						<td>
+							Indicates the importance levels of columns that should be hidden rather than displayed in the pop-in area.
+							<br>
+							<span class="mobileNoteIcon"></span>
+							<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
+						</td>
+						<td>1.85.0</td>
+						<td>1.147</td>
+					</tr>
+					<tr>
+						<td>popinLayout</td>
+						<td><a data-demokit-href="#/api/sap.m.PopinLayout" target="_blank">sap.m.PopinLayout</a></td>
+						<td>"Block"</td>
+						<td>No</td>
+						<td>
+							Specifies the layout style for rendering table pop-in rows.
+							<br>
+							<span class="mobileNoteIcon"></span>
+							<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
+						</td>
+						<td>1.85.0</td>
+						<td>1.147</td>
 					</tr>
 				</table>
 			</div>
@@ -125,6 +171,7 @@
 					<tr>
 						<th>Property</th>
 						<th>Type</th>
+						<th>Default Value</th>
 						<th>Required</th>
 						<th>Description</th>
 						<th>Schema Version</th>
@@ -133,6 +180,7 @@
 					<tr>
 						<td>title</td>
 						<td>string</td>
+						<td></td>
 						<td>No</td>
 						<td>The title of the column.</td>
 						<td>1.15.0</td>
@@ -141,6 +189,7 @@
 					<tr>
 						<td>width</td>
 						<td><a data-demokit-href="#/api/sap.ui.core.CSSSize" target="_blank">sap.ui.core.CSSSize</a></td>
+						<td></td>
 						<td>No</td>
 						<td>Defines the width of the column.</td>
 						<td>1.15.0</td>
@@ -149,6 +198,7 @@
 					<tr>
 						<td>hAlign</td>
 						<td><a data-demokit-href="#/api/sap.ui.core.TextAlign" target="_blank">sap.ui.core.TextAlign</a></td>
+						<td></td>
 						<td>No</td>
 						<td>Defines the horizontal alignment of the column content.</td>
 						<td>1.19.0</td>
@@ -157,10 +207,39 @@
 					<tr>
 						<td>visible</td>
 						<td>boolean</td>
+						<td></td>
 						<td>No</td>
 						<td>Determines the visibility of the column.</td>
 						<td>1.25.0</td>
 						<td>1.81</td>
+					</tr>
+					<tr>
+						<td>importance</td>
+						<td><a data-demokit-href="#/api/sap.ui.core.Priority" target="_blank">sap.ui.core.Priority</a></td>
+						<td>"None"</td>
+						<td>No</td>
+						<td>
+							Defines the priority of the column for responsive behavior. When autoPopinMode is enabled, columns with lower importance are moved to the pop-in area first when space is limited.
+							<br>
+							<span class="mobileNoteIcon"></span>
+							<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
+						</td>
+						<td>1.85.0</td>
+						<td>1.147</td>
+					</tr>
+					<tr>
+						<td>autoPopinWidth</td>
+						<td>number</td>
+						<td></td>
+						<td>No</td>
+						<td>
+							Width value in rem units used for columns without fixed width when calculating automatic breakpoints in autoPopinMode. Helps the table determine when columns should move to the pop-in area.
+							<br>
+							<span class="mobileNoteIcon"></span>
+							<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
+						</td>
+						<td>1.85.0</td>
+						<td>1.147</td>
 					</tr>
 				</table>
 			</div>

@@ -135,7 +135,8 @@
 				"category": "Data Binding",
 				"since": "1.146",
 				"samples": [
-					"sap.ui.core.sample.BoundFilters.FilteredListInTable"
+					"sap.ui.core.sample.BoundFilters.FilteredListInTable",
+					"sap.ui.core.sample.BoundFilters.FilterBar"
 				]
 			},
 			{
@@ -856,6 +857,11 @@
 				"id": "sap.ui.core.sample.BoundFilters.FilteredListInTable",
 				"name": "Bound Filters - Filtered List in Table",
 				"description": "This sample shows how bound filters work: A table of customers displays a Select control in each row. The Select shows account managers filtered by the region of that customer row by using boundFilters."
+			},
+			{
+				"id": "sap.ui.core.sample.BoundFilters.FilterBar",
+				"name": "Bound Filters - Filter Bar",
+				"description": "This sample shows how bound filters work in a filter bar: A toolbar with filter inputs instantly filters the customer table as the user enters values."
 			}
 		]
 	}

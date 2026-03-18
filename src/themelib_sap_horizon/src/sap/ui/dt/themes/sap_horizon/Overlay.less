@@ -48,6 +48,14 @@
 	}
 }
 
+.sapUiDtOverlayHighlighted:not(.sapUiDtOverlaySelected) {
+
+	&::after {
+		box-shadow: none;
+		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
+	}
+}
+
 .sapUiDtOverlayHover {
 
 	&::after {

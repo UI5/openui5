@@ -1781,7 +1781,10 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#doSetProperty
 	 */
 	ODataListBinding.prototype.doSetProperty = function () {
-		this.oCache.setGrandTotalOutdated?.(true);
+		if (_Helper.isDataAggregation(this.mParameters)) {
+			this.oCache.setGrandTotalOutdated?.(true);
+			this.oHeaderContext.setOutdated(true);
+		}
 	};
 
 	/**
@@ -1913,6 +1916,13 @@ sap.ui.define([
 
 			if (oResult) {
 				oResult.$checkStillValid?.();
+				// Reset the outdated flag after the first read after #reset has been called;
+				// after #reset the length is not final and aContexts contains only created contexts
+				if (!that.bLengthFinal && that.aContexts.length === that.iCreatedContexts
+						&& that.oHeaderContext.isOutdated() !== undefined) {
+					that.oHeaderContext.setOutdated(false);
+				}
+
 				return that.createContexts(iStart, oResult.value);
 			}
 			// return undefined;
@@ -4687,24 +4697,20 @@ sap.ui.define([
 		}
 
 		if (_Helper.isDataAggregation(this.mParameters)) {
-			if (bSingle) {
-				if (this.mParameters.$$aggregation.groupLevels.length) {
-					throw new Error("Unsupported for data aggregation with groupLevels: " + this);
-				}
-				if (oContext.isAggregated()) {
-					throw new Error("Unsupported on aggregated data: " + oContext);
-				}
-
-				return this.refreshSingle(oContext, sGroupId, /*bLocked*/false,
-					/*bAllowRemoval*/false, /*bKeepCacheOnError*/true, /*bWithMessages*/false);
+			if (!bSingle) {
+				return _AggregationHelper.isAffected(this.mParameters.$$aggregation,
+						this.aFilters.concat(this.aApplicationFilters), aPaths)
+					? this.refreshInternal("", sGroupId, false, true)
+					: SyncPromise.resolve();
 			}
 
-			if (_AggregationHelper.isAffected(this.mParameters.$$aggregation,
-					this.aFilters.concat(this.aApplicationFilters), aPaths)) {
-				return this.refreshInternal("", sGroupId, false, true);
+			if (this.mParameters.$$aggregation.groupLevels.length) {
+				throw new Error("Unsupported for data aggregation with groupLevels: " + this);
 			}
-
-			return SyncPromise.resolve();
+			if (oContext.isAggregated()) {
+				throw new Error("Unsupported on aggregated data: " + oContext);
+			}
+			// fall through
 		}
 
 		if (!bSingle && this.oCache && this.oCache.isDeletingInOtherGroup(sGroupId)) {
@@ -4736,8 +4742,7 @@ sap.ui.define([
 			}
 		}
 		if (bSingle) {
-			oModel.withUnresolvedBindings("removeCachesAndMessages",
-				oContext.getPath().slice(1));
+			oModel.withUnresolvedBindings("removeCachesAndMessages", oContext.getPath().slice(1));
 
 			return this.refreshSingle(oContext, sGroupId, /*bLocked*/false, /*bAllowRemoval*/false,
 				/*bKeepCacheOnError*/true, /*bWithMessages*/true);

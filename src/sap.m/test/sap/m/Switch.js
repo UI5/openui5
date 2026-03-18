@@ -33,6 +33,30 @@ sap.ui.define([
 	  enabled: false
   });
 
+  var oSwitchReadOnly = new Switch({
+	  id: "switch_readonly",
+	  editable: false
+  });
+
+  var oSwitchReadOnlyOn = new Switch({
+	  id: "switch_readonly_on",
+	  state: true,
+	  editable: false
+  });
+
+  var oSwitchReadOnlyAcceptReject = new Switch({
+	  id: "switch_readonly_semantic",
+	  type: SwitchType.AcceptReject,
+	  editable: false
+  });
+
+  var oSwitchReadOnlyAcceptRejectOn = new Switch({
+	  id: "switch_readonly_semantic_on",
+	  state: true,
+	  type: SwitchType.AcceptReject,
+	  editable: false
+  });
+
   var oSwitchNoText = new Switch({
 	  id: "switch_notext",
 	  customTextOn: " ",
@@ -64,6 +88,13 @@ sap.ui.define([
 
 		  new HTML({ content: "<h3>Disabled</h3>" }),
 		  oSwitchDisabled,
+		  new HTML({ content: "<hr>" }),
+
+		  new HTML({ content: "<h3>Read Only</h3>" }),
+		  oSwitchReadOnly,
+		  oSwitchReadOnlyOn,
+		  oSwitchReadOnlyAcceptReject,
+		  oSwitchReadOnlyAcceptRejectOn,
 		  new HTML({ content: "<hr>" }),
 
 		  new HTML({ content: "<h3>No text</h3>" }),

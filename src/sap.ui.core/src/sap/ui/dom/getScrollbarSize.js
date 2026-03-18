@@ -1,7 +1,7 @@
 /*!
  * ${copyright}
  */
-sap.ui.define(['sap/ui/thirdparty/jquery'], function(jQuery) {
+sap.ui.define([], function() {
 	"use strict";
 
 	var _oScrollbarSize = {};
@@ -43,36 +43,40 @@ sap.ui.define(['sap/ui/thirdparty/jquery'], function(jQuery) {
 			return {width: 0, height: 0};
 		}
 
-		var $Area = jQuery("<DIV></DIV>")
-			.css("visibility", "hidden")
-			.css("height", "0")
-			.css("width", "0")
-			.css("overflow", "hidden");
+		// Create container element (hidden)
+		var oArea = document.createElement("div");
+		oArea.style.cssText = "visibility:hidden;height:0;width:0;overflow:hidden;";
 
 		if (sClasses) {
-			$Area.addClass(sClasses);
+			oArea.className = sClasses;
 		}
 
-		$Area.prependTo(document.body);
+		// Insert at beginning of body
+		document.body.insertBefore(oArea, document.body.firstChild);
 
-		var $Dummy = jQuery("<div></div>");
-		$Dummy[0].style = "visibility:visible;position:absolute;height:100px;width:100px;overflow:scroll;opacity:0;";
-		$Area.append($Dummy);
+		// Create test element with forced scrollbars
+		var oDummy = document.createElement("div");
+		oDummy.style.cssText = "visibility:visible;position:absolute;height:100px;width:100px;overflow:scroll;opacity:0;";
+		oArea.appendChild(oDummy);
 
-		var oDomRef = $Dummy.get(0);
-		var iWidth = oDomRef.offsetWidth - oDomRef.scrollWidth;
-		var iHeight = oDomRef.offsetHeight - oDomRef.scrollHeight;
+		// Check if test element is actually visible/rendered
+		var bIsVisible = oDummy.checkVisibility?.();
 
-		$Area.remove();
+		// Calculate scrollbar size
+		var iWidth = oDummy.offsetWidth - oDummy.scrollWidth;
+		var iHeight = oDummy.offsetHeight - oDummy.scrollHeight;
 
-		// due to a bug in FireFox when hiding iframes via an outer DIV element
-		// the height and width calculation is not working properly - by not storing
-		// height and width when one value is 0 we make sure that once the iframe
-		// gets visible the height calculation will be redone (see snippix: #64049)
-		if (iWidth === 0 || iHeight === 0) {
+		// Cleanup - remove test elements
+		document.body.removeChild(oArea);
+
+		// IMPORTANT: Check visibility FIRST
+		// If element is not visible, measurements are unreliable (Firefox iframe bug)
+		if (!bIsVisible) {
+			// Don't cache - return uncached value to allow recalculation when visible
 			return {width: iWidth, height: iHeight};
 		}
 
+		// Element is visible - measurement is reliable, always cache
 		_oScrollbarSize[sKey] = {width: iWidth, height: iHeight};
 
 		return _oScrollbarSize[sKey];

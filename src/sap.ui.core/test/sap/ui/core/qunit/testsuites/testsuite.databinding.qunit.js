@@ -339,6 +339,16 @@ sap.ui.define(function() {
 				},
 				module : ["sap/ui/core/sample/BoundFilters/FilteredListInTable/Opa.qunit"],
 				title : "OPA test sap.ui.core.sample.BoundFilters.FilteredListInTable"
+			},
+
+			"OPA.BoundFilters.FilterBar" : {
+				loader : {
+					paths : {
+						"sap/ui/core/sample" : "test-resources/sap/ui/core/demokit/sample"
+					}
+				},
+				module : ["sap/ui/core/sample/BoundFilters/FilterBar/Opa.qunit"],
+				title : "OPA test sap.ui.core.sample.BoundFilters.FilterBar"
 			}
 		}
 	};

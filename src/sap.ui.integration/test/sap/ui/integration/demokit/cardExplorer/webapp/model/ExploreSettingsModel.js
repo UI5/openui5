@@ -17,6 +17,7 @@ sap.ui.define([
 		designtimeEnabled: true,
 		//to enable/disable "Show Manifest Changes" button
 		manifestChanged: false,
-		editorMode: EditorConstants.EDITOR_MODE.ADMIN
+		editorMode: EditorConstants.EDITOR_MODE.ADMIN,
+		cardWidth: 100
 	});
 });

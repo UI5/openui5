@@ -6,9 +6,7 @@
 	xmlns:core="sap.ui.core">
 	<table:Table id="myTable" rows="{/customers}">
 		<table:extension>
-			<Toolbar>
-				<Title id="title" text="Customers"/>
-			</Toolbar>
+			<Title id="title" text="Customers"/>
 		</table:extension>
 		<table:columns>
 			<table:Column>

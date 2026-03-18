@@ -82,5 +82,16 @@
 				</w:layoutData>
 			</w:Card>
 		</f:GridContainer>
+		<Panel>
+			<Slider value="{settings>/cardWidth}" />
+			<w:Card
+				width="{settings>/cardWidth}%"
+				id="tablecard9"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				manifest="{manifests>/tablecard9}"
+				height="auto"
+				class="sapUiMediumMarginEnd">
+			</w:Card>
+		</Panel>
 	</Page>
 </mvc:View>

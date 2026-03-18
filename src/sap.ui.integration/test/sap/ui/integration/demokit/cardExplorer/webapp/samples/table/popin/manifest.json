@@ -1,0 +1,171 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.popin.table.card",
+		"type": "card",
+		"title": "Sample of a Table Card with Pop-in Behavior",
+		"subTitle": "Sample of a Table Card with Pop-in Behavior",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Table",
+				"Pop-in",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://table-view"
+		}
+	},
+	"sap.card": {
+		"type": "Table",
+		"header": {
+			"title": "Table with Pop-in Support"
+		},
+		"content": {
+			"autoPopinMode": true,
+			"row": {
+				"columns": [
+					{
+						"title": "ID",
+						"value": "{ID}",
+						"importance": "High"
+					},
+					{
+						"title": "Full Name",
+						"value": "{FullName}",
+						"importance": "High"
+					},
+					{
+						"title": "Role",
+						"width": "20%",
+						"value": "{Role}",
+						"importance": "Medium"
+					},
+					{
+						"title": "Department",
+						"width": "20%",
+						"value": "{Department}",
+						"importance": "None"
+					},
+					{
+						"title": "Location",
+						"width": "20%",
+						"value": "{Location}",
+						"importance": "Low"
+					},
+					{
+						"title": "Status",
+						"value": "{Status}",
+						"importance": "Low",
+						"state": "{= ${Status} === 'Active' ? 'Success' : (${Status} === 'Onboarding' ? 'Warning' : 'Error')}",
+						"inverted": true,
+						"autoPopinWidth": 10
+					},
+					{
+						"title": "Availability",
+						"progressIndicator": {
+							"percent": "{availability}",
+							"text": "{= format.percent(${availability} / 100)}",
+							"state": "{statusState}"
+						},
+						"importance": "High"
+					}
+				]
+			}
+		},
+		"data": {
+			"json": [
+				{
+					"ID": 1,
+					"FullName": "Alexandria Schmidt",
+					"Role": "Senior Principal",
+					"Department": "Global Engineering and Product Development",
+					"Location": "Waldorf, Germany",
+					"Status": "Active",
+					"availability": 100,
+					"statusState": "Success"
+				},
+				{
+					"ID": 2,
+					"FullName": "Benjamin Johnson",
+					"Role": "Operations Specialist",
+					"Department": "Customer Success & Support - EMEA",
+					"Location": "London, United Kingdom",
+					"Status": "Onboarding",
+					"availability": 75,
+					"statusState": "Warning"
+				},
+				{
+					"ID": 3,
+					"FullName": "Charlotte O'Connor",
+					"Role": "UX Researcher",
+					"Department": "User Experience & Accessibility",
+					"Location": "Dublin, Ireland",
+					"Status": "Active",
+					"availability": 50,
+					"statusState": "Error"
+				},
+				{
+					"ID": 4,
+					"FullName": "Dmitry Smirnov",
+					"Role": "DevOps Automation Engineer",
+					"Department": "Cloud Infrastructure & Automation",
+					"Location": "Moscow, Russia",
+					"Status": "Active",
+					"availability": 80,
+					"statusState": "Warning"
+				},
+				{
+					"ID": 5,
+					"FullName": "Emilia-Rose de la Vega",
+					"Role": "Machine Learning Lead",
+					"Department": "Data Science & AI",
+					"Location": "Barcelona, Spain",
+					"Status": "InActive",
+					"availability": 0,
+					"statusState": "Error"
+				},
+				{
+					"ID": 6,
+					"FullName": "Fiona Gallagher",
+					"Role": "Product Manager",
+					"Department": "Product Management & Strategy",
+					"Location": "Dublin, Ireland",
+					"Status": "Onboarding",
+					"availability": 25,
+					"statusState": "Error"
+				},
+				{
+					"ID": 7,
+					"FullName": "George Thompson",
+					"Role": "Security Analyst",
+					"Department": "Cybersecurity & Risk Management",
+					"Location": "Berlin, Germany",
+					"Status": "Active",
+					"availability": 60,
+					"statusState": "Warning"
+				},
+				{
+					"ID": 8,
+					"FullName": "Hannah Patel",
+					"Role": "Cloud Solutions Architect",
+					"Department": "Cloud Solutions & Architecture",
+					"Location": "Bangalore, India",
+					"Status": "Active",
+					"availability": 30,
+					"statusState": "Error"
+				}
+			]
+		}
+	}
+}

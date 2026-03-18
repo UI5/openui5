@@ -43,7 +43,6 @@ sap.ui.define([
 	 * @alias sap.ui.model.odata.v4.lib._AggregationCache
 	 * @borrows sap.ui.model.odata.v4.lib._CollectionCache#addKeptElement as #addKeptElement
 	 * @borrows sap.ui.model.odata.v4.lib._CollectionCache#removeKeptElement as #removeKeptElement
-	 * @borrows sap.ui.model.odata.v4.lib._CollectionCache#requestSideEffects as #requestSideEffects
 	 * @constructor
 	 * @extends sap.ui.model.odata.v4.lib._Cache
 	 * @private
@@ -65,7 +64,6 @@ sap.ui.define([
 		this.doReset(oAggregation, bHasGrandTotal);
 		this.addKeptElement = this.oFirstLevel.addKeptElement; // @borrows ...
 		this.removeKeptElement = this.oFirstLevel.removeKeptElement; // @borrows ...
-		this.requestSideEffects = this.oFirstLevel.requestSideEffects; // @borrows ...
 		this.oTreeState = new _TreeState(oAggregation.$NodeProperty,
 			(oNode) => _Helper.getKeyFilter(oNode, this.sMetaPath, this.getTypes()));
 	}
@@ -304,19 +302,16 @@ sap.ui.define([
 	 *
 	 * @param {object} mQueryOptions
 	 *   A modifiable map of key-value pairs representing the query string
-	 * @throws {Error}
-	 *   If no recursive hierarchy is used
 	 *
 	 * @protected
 	 * @see sap.ui.model.odata.v4.lib._CollectionCache#requestSideEffects
 	 */
 	_AggregationCache.prototype.beforeRequestSideEffects = function (mQueryOptions) {
-		if (!this.oAggregation.hierarchyQualifier) {
-			throw new Error("Missing recursive hierarchy");
-		}
 		delete mQueryOptions.$apply;
-		if (!mQueryOptions.$select.includes(this.oAggregation.$NodeProperty)) {
-			mQueryOptions.$select.push(this.oAggregation.$NodeProperty);
+		if (this.oAggregation.hierarchyQualifier) {
+			if (!mQueryOptions.$select.includes(this.oAggregation.$NodeProperty)) {
+				mQueryOptions.$select.push(this.oAggregation.$NodeProperty);
+			}
 		}
 	};
 
@@ -333,8 +328,10 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.lib._CollectionCache#requestSideEffects
 	 */
 	_AggregationCache.prototype.beforeUpdateSelected = function (sPredicate, oNewValue) {
-		_AggregationHelper.checkNodeProperty(this.aElements.$byPredicate[sPredicate], oNewValue,
-			this.oAggregation.$NodeProperty, true);
+		if (this.oAggregation.hierarchyQualifier) {
+			_AggregationHelper.checkNodeProperty(this.aElements.$byPredicate[sPredicate], oNewValue,
+				this.oAggregation.$NodeProperty, true);
+		}
 	};
 
 	/**
@@ -2230,7 +2227,8 @@ sap.ui.define([
 	 * Reads and updates the grand total row.
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
-	 *   A lock for the group to associate the requests with
+	 *   An original lock for the group ID to be used for the GET request, to be cloned via
+	 *   {@link sap.ui.model.odata.v4.lib._GroupLock#getUnlockedCopy}
 	 * @returns {Promise<void>|undefined}
 	 *   A promise which is resolved without a defined result when the read is finished, or
 	 *   rejected in case of an error; <code>undefined</code> in case no grand total is used
@@ -2293,8 +2291,7 @@ sap.ui.define([
 	// Additionally the grand total row is refreshed. The resulting promise resolves with the
 	// refreshed entity after the entity and the grand total are updated in the cache, and rejects
 	// with an error when no key predicate is known or the grand total could not be refreshed.
-	_AggregationCache.prototype.refreshSingle = function (oGroupLock/*, sPath, iIndex, sPredicate,
-			bKeepAlive, bWithMessages, fnDataRequested*/) {
+	_AggregationCache.prototype.refreshSingle = function (oGroupLock/*, ...*/) {
 		return SyncPromise.all([
 			_Cache.prototype.refreshSingle.apply(this, arguments),
 			this.readGrandTotal(oGroupLock)
@@ -2572,6 +2569,22 @@ sap.ui.define([
 		return oSibling["@$ui5.node.level"] === oNode["@$ui5.node.level"]
 			? iSiblingRank
 			: -1; // no such sibling
+	};
+
+	/**
+	 * @override
+	 * @see sap.ui.model.odata.v4.lib._CollectionCache#requestSideEffects
+	 */
+	// Additionally the grand total row is refreshed. The resulting promise resolves without a
+	// defined result when the side effects and the grand total are updated; rejects if one of these
+	// requests fails.
+	_AggregationCache.prototype.requestSideEffects = function (oGroupLock/*, ...*/) {
+		// "super" call (like @borrows ...)
+		const fnSuper = this.oFirstLevel.requestSideEffects;
+		return SyncPromise.all([
+			fnSuper.apply(this, arguments),
+			this.readGrandTotal(oGroupLock)
+		]);
 	};
 
 	/**
