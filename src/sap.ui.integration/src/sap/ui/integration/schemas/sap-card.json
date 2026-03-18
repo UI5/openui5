@@ -2253,6 +2253,48 @@
             }
           }
         },
+        "autoPopinMode": {
+          "description": "Controls the table's auto pop-in mode. When true, columns automatically adjust based on available space. When false, manually set 'autoPopinWidth' for each column.",
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "hiddenInPopin": {
+          "description": "Specifies columns to hide rather than move into the pop-in area, based on importance.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "None",
+              "Low",
+              "Medium",
+              "High"
+            ]
+          }
+        },
+        "popinLayout": {
+          "description": "Sets the layout style for rendering table pop-in rows.",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Block",
+                "GridSmall",
+                "GridLarge"
+              ],
+              "default": "Block"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
         "maxItems": {
           "description": "Represents number of items",
           "oneOf": [
@@ -2399,6 +2441,27 @@
         "customStateIcon": {
           "description": "The custom state icon",
           "type": "string"
+        },
+        "importance": {
+          "description": "Specifies the column's significance, affecting its behavior in responsive design.",
+          "oneOf": [
+            {
+              "enum": [
+                "None",
+                "Low",
+                "Medium",
+                "High"
+              ],
+              "default": "None"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "autoPopinWidth": {
+          "description": "Sets the minimum width threshold for displaying the column in the pop-in area.",
+          "type": "number"
         }
       }
     },

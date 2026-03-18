@@ -250,15 +250,20 @@ html.sap-desktop {
 	color: var(--sapButton_Handle_TextColor);
 }
 
-.sapMSwtOn.sapMSwtAcceptReject .sapMSwtLabelOn::before,
-.sapMSwtOff.sapMSwtAcceptReject .sapMSwtLabelOff::before {
+.sapMSwtOn.sapMSwtAcceptReject .sapMSwtLabelOn::before {
 	position: absolute;
 	right: 0.375rem;
 	font-size: var(--sapFontLargeSize);
+	content: '\e05b';
+	color: var(--sapPositiveElementColor);
 }
 
 .sapMSwtOff.sapMSwtAcceptReject .sapMSwtLabelOff::before {
+	position: absolute;
 	right: 0.625rem;
+	font-size: var(--sapFontLargeSize);
+	content: '\e03e';
+	color: var(--sapNegativeElementColor);
 }
 
 .sapMSwtOn > .sapMSwtInner {
@@ -352,5 +357,26 @@ html.sap-desktop {
 
 	.sapMSwtOff.sapMSwtAcceptReject .sapMSwtLabelOff::before {
 		right: 0.4375rem;
+	}
+}
+
+/* Read only - extended selectors for Horizon specificity */
+.sapMSwt.sapMSwtReadOnly {
+	&.sapMSwtOn:not(.sapMSwtAcceptReject),
+	&.sapMSwtOff:not(.sapMSwtAcceptReject),
+	&.sapMSwtAcceptReject.sapMSwtOn,
+	&.sapMSwtAcceptReject.sapMSwtOff {
+		background: var(--sapField_ReadOnly_Background);
+		border: 0.0625rem dashed var(--sapField_ReadOnly_BorderColor);
+
+		.sapMSwtHandle {
+			background: var(--sapField_ReadOnly_Background);
+			border: 0.0625rem solid var(--sapField_ReadOnly_BorderColor);
+			box-shadow: none;
+		}
+	}
+
+	&.sapMSwtOn.sapMSwtNoLabel .sapMSwtLabelOn::before {
+		color: var(--sapButton_Handle_TextColor);
 	}
 }

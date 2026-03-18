@@ -1042,6 +1042,127 @@ sap.ui.define([
 		avatar.destroy();
 	});
 
+	QUnit.test("getAccessibilityInfo returns correct role and focusable", function(assert) {
+		// Arrange
+		var oAvatar = new Avatar({
+			src: "test.jpg"
+		});
+		var fnPressHandler = function() {};
+		var oAccInfo;
+
+		// Act - standard avatar
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.strictEqual(oAccInfo.role, "img", "Role should be 'img' for standard avatar");
+		assert.strictEqual(oAccInfo.focusable, false, "Avatar should not be focusable when role is 'img'");
+
+		// Act - attach press handler
+		oAvatar.attachPress(fnPressHandler);
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.strictEqual(oAccInfo.role, "button", "Role should be 'button' when press handler is attached");
+		assert.strictEqual(oAccInfo.focusable, true, "Avatar should be focusable when role is 'button'");
+
+		// Act - detach press handler and set decorative
+		oAvatar.detachPress(fnPressHandler);
+		oAvatar.setDecorative(true);
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.deepEqual(oAccInfo, {}, "Decorative avatar should return empty object");
+
+		// Act - attach press handler to decorative avatar
+		oAvatar.attachPress(fnPressHandler);
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.strictEqual(oAccInfo.role, "button", "Role should be 'button' even when decorative if press handler is attached");
+		assert.strictEqual(oAccInfo.focusable, true, "Avatar with press handler should be focusable");
+
+		// Cleanup
+		oAvatar.destroy();
+	});
+
+	QUnit.test("getAccessibilityInfo returns correct description", function(assert) {
+		// Arrange
+		var sCustomTooltip = "Custom Tooltip Text";
+		var sInitials = "BP";
+		var sDefaultTooltip = Library.getResourceBundleFor("sap.m").getText("AVATAR_TOOLTIP");
+		var oAvatar = new Avatar();
+		var oAccInfo;
+
+		// Act - custom tooltip
+		oAvatar.setTooltip(sCustomTooltip);
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.strictEqual(oAccInfo.description, sCustomTooltip, "Description should reflect custom tooltip");
+
+		// Act - initials without custom tooltip
+		oAvatar.setTooltip("");
+		oAvatar.setInitials(sInitials);
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.strictEqual(oAccInfo.description, sDefaultTooltip + " " + sInitials, "Description should include default tooltip and initials");
+
+		// Act - badge tooltip with initials
+		var sCustomBadgeTooltip = "Custom Badge";
+		oAvatar.setBadgeTooltip(sCustomBadgeTooltip);
+		var sDefaultBadgeTooltip = oAvatar._getDefaultTooltip();
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.strictEqual(oAccInfo.description, sDefaultBadgeTooltip + " " + sCustomBadgeTooltip + " " + sInitials,
+			"Description should include default badge tooltip, custom badge tooltip, and initials");
+
+		// Act - decorative avatar without press handler
+		oAvatar.setDecorative(true);
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.deepEqual(oAccInfo, {}, "Decorative avatar should return empty object");
+
+		// Cleanup
+		oAvatar.destroy();
+	});
+
+	QUnit.test("getAccessibilityInfo returns correct type and enabled", function(assert) {
+		// Arrange
+		var oAvatar = new Avatar({
+			src: "test.jpg"
+		});
+		var sButtonType = Library.getResourceBundleFor("sap.m").getText("ACC_CTR_TYPE_BUTTON");
+		var sImageType = Library.getResourceBundleFor("sap.m").getText("ACC_CTR_TYPE_IMAGE");
+		var oAccInfo;
+
+		// Act - standard avatar (image role)
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.strictEqual(oAccInfo.type, sImageType, "Type should be 'Image' when role is 'img'");
+		assert.strictEqual(oAccInfo.enabled, true, "Enabled state should be true by default");
+
+		// Act - attach press handler (button role)
+		oAvatar.attachPress(function() {});
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.strictEqual(oAccInfo.type, sButtonType, "Type should be 'Button' when role is 'button'");
+
+		// Act - disable avatar
+		oAvatar.setEnabled(false);
+		oAccInfo = oAvatar.getAccessibilityInfo();
+
+		// Assert
+		assert.strictEqual(oAccInfo.enabled, false, "Enabled state should be false");
+
+		// Cleanup
+		oAvatar.destroy();
+	});
+
 	QUnit.module("Avatar backgroundColor API", {
 		beforeEach: async function () {
 			this.oAvatar = createAvatar({ tooltip: "sampleTooltip" });

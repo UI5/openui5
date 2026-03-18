@@ -159,11 +159,13 @@
 			<m:Toolbar>
 				<m:Title text="Booking Details"/>
 				<m:ToolbarSpacer/>
-				<m:Button icon="sap-icon://response" tooltip="Refresh" press=".onRefreshBooking"/>
-				<m:Button icon="sap-icon://refresh" tooltip="Side-Effects Refresh"
-					press=".onRefreshBookingViaSideEffects"/>
-				<m:Button icon="sap-icon://synchronize" tooltip="Side Effect for Flight Date"
-					press=".onRefreshFlightDate"/>
+				<m:Button icon="sap-icon://response" press=".onRefreshBooking" tooltip="Refresh"/>
+				<m:Button icon="sap-icon://refresh" press=".onRefreshBookingViaSideEffects"
+					tooltip="Side-Effects Refresh"/>
+				<m:Button icon="sap-icon://synchronize" press=".onRefreshFlightDate"
+					tooltip="Side Effect for Flight Date"/>
+				<m:Button icon="sap-icon://travel-expense" press=".onRefreshFlightPrice"
+					tooltip="Side Effect for Flight Price"/>
 			</m:Toolbar>
 		</form:toolbar>
 		<m:Label text="Booking"/>

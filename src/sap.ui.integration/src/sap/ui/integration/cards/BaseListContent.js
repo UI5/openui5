@@ -54,6 +54,7 @@ sap.ui.define([
 		BaseContent.prototype.init.apply(this, arguments);
 		this._oAwaitingPromise = null;
 		this._fMinHeight = 0;
+		this._fLastWidth = 0;
 	};
 
 	/**
@@ -67,8 +68,40 @@ sap.ui.define([
 
 	BaseListContent.prototype.onAfterRendering = function () {
 		if (this.isReady() && this.getCardInstance()?.isReady()) {
-			this._keepHeight();
+			if (this._hasWidthChanged()) {
+				this._resetHeightCalculations();
+			} else {
+				this._keepHeight();
+			}
 		}
+	};
+
+	/**
+	 * Checks if the width of the content has changed since the last rendering.
+	 * @returns {boolean} <code>true</code> if the width has changed, otherwise <code>false</code>.
+	 * @private
+	 */
+	BaseListContent.prototype._hasWidthChanged = function () {
+		const fCurrentWidth = this.getCardInstance()?.getDomRef()?.getBoundingClientRect().width;
+		let bHasChanged = false;
+
+		if (this._fLastWidth && fCurrentWidth !== this._fLastWidth) {
+			// Width has changed, reset height calculations
+			bHasChanged = true;
+		}
+
+		this._fLastWidth = fCurrentWidth;
+
+		return bHasChanged;
+	};
+
+	/**
+	 * Resets height calculations by clearing the minimum height and resetting the stored minimum height value.
+	 * @private
+	 */
+	BaseListContent.prototype._resetHeightCalculations = function () {
+		this.getDomRef().style.minHeight = "";
+		this._fMinHeight = 0;
 	};
 
 	BaseListContent.prototype.onDataChanged = function () {
@@ -95,6 +128,24 @@ sap.ui.define([
 		} else {
 			BaseContent.prototype.setModelData.apply(this, arguments);
 		}
+	};
+
+	/**
+	 * Checks if the width has changed and resets height calculations if needed.
+	 * @private
+	 */
+	BaseListContent.prototype._checkWidthChange = function () {
+		if (!this.getDomRef()) {
+			return;
+		}
+
+		const fCurrentWidth = this.getCardInstance()?.getDomRef()?.getBoundingClientRect().width;
+		if (this._fLastWidth && fCurrentWidth !== this._fLastWidth) {
+			// Width has changed, reset height calculations
+			this.getDomRef().style.minHeight = "";
+			this._fMinHeight = 0;
+		}
+		this._fLastWidth = fCurrentWidth;
 	};
 
 	BaseListContent.prototype._keepHeight = function () {

@@ -12,7 +12,6 @@ sap.ui.define([
 	"sap/base/assert",
 	"sap/base/Log",
 	"sap/base/security/encodeCSS",
-	"sap/base/security/encodeXML",
 	"sap/base/util/extend",
 	'sap/base/util/uid',
 	'sap/ui/base/Object',
@@ -29,7 +28,6 @@ sap.ui.define([
 	assert,
 	Log,
 	encodeCSS,
-	encodeXML,
 	extend,
 	uid,
 	BaseObject,
@@ -39,7 +37,6 @@ sap.ui.define([
 	ActivityDetection
 ) {
 	"use strict";
-	/*global SVGElement*/
 
 	const mOwnerInfo = new Map();
 
@@ -51,9 +48,7 @@ sap.ui.define([
 
 	var aNonRendererMethods = ["render", "flush", "destroy"];
 
-	var oTemplate = document.createElement("template");
-
-	var ATTR_STYLE_KEY_MARKER = "data-sap-ui-stylekey";
+	document.createElement("template");
 
 	/**
 	 * An attribute marker that is set on a DOM element of a control or element to indicate
@@ -76,6 +71,48 @@ sap.ui.define([
 	 * @private
 	 */
 	var ATTR_DO_NOT_SKIP_RENDERING_MARKER = "data-sap-ui-render";
+
+	/**
+	 * Converts an element to a specified namespace URI.
+	 *
+	 * This function recursively converts a DOM element and all its child elements to a target namespace.
+	 * If an element already belongs to the target namespace, it is returned unchanged for performance reasons.
+	 * All attributes and child nodes are preserved during the conversion.
+	 *
+	 * Non-element nodes (text nodes, comment nodes, etc.) are returned as-is without modification.
+	 *
+	 * @param {Element} oElement - The DOM element to be converted
+	 * @param {string} sNamespaceURI - The target namespace URI (e.g., "http://www.w3.org/2000/svg")
+	 *
+	 * @returns {Element|Node} A new element with the target namespace URI, or the original element
+	 *                         if it already belongs to the target namespace or is a non-element node
+	 * @private
+	 */
+	function convertElementToNamespace(oElement, sNamespaceURI) {
+		if (oElement.nodeType !== Node.ELEMENT_NODE) {
+			return oElement;
+		}
+
+		const sCurrentNamespace = oElement.namespaceURI;
+
+		if (sCurrentNamespace === sNamespaceURI) {
+			return oElement;
+		}
+
+		const oNewElement = document.createElementNS(sNamespaceURI, oElement.tagName.toLowerCase());
+
+		for (const oAttr of oElement.attributes) {
+			oNewElement.setAttribute(oAttr.name, oAttr.value);
+		}
+
+		const aChildren = Array.from(oElement.childNodes);
+
+		for (const oChild of aChildren) {
+			oNewElement.appendChild(convertElementToNamespace(oChild, sNamespaceURI));
+		}
+
+		return oNewElement;
+	}
 
 	/**
 	 * Creates an instance of the RenderManager.
@@ -239,19 +276,21 @@ sap.ui.define([
 	 */
 	function RenderManager() {
 		var that = this,
-			aBuffer,
 			aRenderedControls,
 			aStyleStack,
 			bLocked,
-			sOpenTag = "",                 // stores the last open tag that is used for the validation
-			bVoidOpen = false,             // specifies whether the last open tag is a void tag or not
-			bDomInterface,                 // specifies the rendering interface that is used by the control renderers
-			sLegacyRendererControlId = "", // stores the id of the control that has a legacy renderer while its parent has the new semantic renderer
-			oStringInterface = {},         // holds old string based rendering API and the string implementation of the new semantic rendering API
-			oDomInterface = {},            // semantic rendering API for the controls whose renderer provides apiVersion=2 marker
-			aRenderingStyles = [],         // during string-based rendering, stores the styles that couldn't be set via style attribute due to CSP restrictions
-			oPatcher = new Patcher(),      // the Patcher instance to handle in-place DOM patching
-			iOpenTagCount = 0,             // the number of open tags, this is used to detect missing tags
+			// stores the last open tag that is used for the validation
+			sOpenTag = "",
+			// specifies whether the last open tag is a void tag or not
+			bVoidOpen = false,
+			// specifies whether the rendering process has been initialized by calling the render method or not
+			bInitialized = false,
+			// semantic rendering API for the controls whose renderer provides apiVersion=2 marker
+			oDomInterface = {},
+			// the Patcher instance to handle in-place DOM patching
+			oPatcher = new Patcher(),
+			// the number of open tags, this is used to detect missing tags
+			iOpenTagCount = 0,
 			sLastStyleMethod,
 			sLastClassMethod;
 
@@ -260,59 +299,12 @@ sap.ui.define([
 		 */
 		function reset() {
 			assert(!(sLastStyleMethod = sLastClassMethod = ""));
-			aBuffer = that.aBuffer = [];
 			aRenderedControls = that.aRenderedControls = [];
 			aStyleStack = that.aStyleStack = [{}];
-			bDomInterface = undefined;
 			bVoidOpen = false;
+			bInitialized = false;
 			iOpenTagCount = 0;
 			sOpenTag = "";
-		}
-
-		function writeAttribute(sName, vValue) {
-			aBuffer.push(" ", sName, "=\"", vValue, "\"");
-		}
-
-		function writeClasses(oElement) {
-			var oStyle = aStyleStack[aStyleStack.length - 1];
-
-			// Custom classes are added by default from the currently rendered control. If an oElement is given, this Element's custom style
-			// classes are added instead. If oElement === false, no custom style classes are added.
-			var aCustomClasses;
-			if (oElement) {
-				aCustomClasses = oElement.aCustomStyleClasses;
-			} else if (oElement === false) {
-				aCustomClasses = [];
-			} else {
-				aCustomClasses = oStyle.aCustomStyleClasses;
-			}
-
-			if (oStyle.aClasses || aCustomClasses) {
-				var aClasses = [].concat(oStyle.aClasses || [], aCustomClasses || []);
-				if (aClasses.length) {
-					writeAttribute("class", aClasses.join(" "));
-				}
-			}
-
-			if (!oElement) {
-				oStyle.aCustomStyleClasses = null;
-			}
-			oStyle.aClasses = null;
-		}
-
-		/**
-		 * Used by the string rendering APIs to write out the collected styles during writeStyles/openEnd/voidEnd
-		 * @param {sap.ui.core.RenderManager} oRm The <code>RenderManager</code> instance
-		 * @private
-		 */
-		function writeStyles() {
-			var oStyle = aStyleStack[aStyleStack.length - 1];
-			if (oStyle.aStyle && oStyle.aStyle.length) {
-				// Due to possible CSP restrictions we do not write styles into the HTML buffer. Instead, we store the styles in the aRenderingStyles array
-				// and add a ATTR_STYLE_KEY_MARKER attribute marker for which the value references the original style index in the aRenderingStyles array.
-				writeAttribute(ATTR_STYLE_KEY_MARKER, aRenderingStyles.push(oStyle.aStyle.join(" ")) - 1);
-			}
-			oStyle.aStyle = null;
 		}
 
 		//#################################################################################################
@@ -376,10 +368,6 @@ sap.ui.define([
 		// i.e. used methods in render-method of Renderers
 		//#################################################################################################
 
-		//#################################################################################################
-		// Semantic Rendering Interface for String Based Rendering
-		//#################################################################################################
-
 		/**
 		 * Opens the start tag of an HTML element.
 		 *
@@ -392,32 +380,11 @@ sap.ui.define([
 	 	 * @param {sap.ui.core.Element|sap.ui.core.ID} [vControlOrId] Control instance or ID to identify the element
 		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 		 *
+		 * @name sap.ui.core.RenderManager#openStart
+		 * @function
 		 * @public
 		 * @since 1.67
 		 */
-		this.openStart = function(sTagName, vControlOrId) {
-			assertValidName(sTagName, "tag");
-			assertOpenTagHasEnded();
-			assert(!(sLastStyleMethod = sLastClassMethod = ""));
-			sOpenTag = sTagName;
-			iOpenTagCount++;
-
-			aBuffer.push("<" + sTagName);
-			if (vControlOrId) {
-				if (typeof vControlOrId == "string") {
-					this.attr("id", vControlOrId);
-				} else {
-					if (!(vControlOrId && BaseObject.isObjectA(vControlOrId, 'sap.ui.core.Element'))) {
-						throw new Error("vControlOrId must be an sap.ui.core.Element");
-					}
-
-					this.attr("id", vControlOrId.getId());
-					renderElementData(this, vControlOrId);
-				}
-			}
-
-			return this;
-		};
 
 		/**
 		 * Ends an open tag started with <code>openStart</code>.
@@ -425,24 +392,12 @@ sap.ui.define([
 		 * This indicates that there are no more attributes to set to the open tag.
 		 *
 		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 *
+		 * @name sap.ui.core.RenderManager#openEnd
+		 * @function
 		 * @public
 		 * @since 1.67
 		 */
-		this.openEnd = function(bExludeStyleClasses /* private */) {
-			assertOpenTagHasStarted("openEnd");
-			assertOpenTagHasEnded(!bVoidOpen);
-
-			if (!(bExludeStyleClasses === undefined || bExludeStyleClasses === true)) {
-				throw new Error("The private parameter bExludeStyleClasses must be true or omitted!");
-			}
-
-			sOpenTag = "";
-
-			writeClasses(bExludeStyleClasses === true ? false : undefined);
-			writeStyles();
-			aBuffer.push(">");
-			return this;
-		};
 
 		/**
 		 * Closes an open tag started with <code>openStart</code> and ended with <code>openEnd</code>.
@@ -451,17 +406,12 @@ sap.ui.define([
 		 *
 		 * @param {string} sTagName Tag name of the HTML element
 		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 *
+		 * @name sap.ui.core.RenderManager#close
+		 * @function
 		 * @public
 		 * @since 1.67
 		 */
-		this.close = function(sTagName) {
-			assertValidName(sTagName, "tag");
-			assertOpenTagHasEnded();
-			iOpenTagCount--;
-
-			aBuffer.push("</" + sTagName + ">");
-			return this;
-		};
 
 		/**
 		 * Starts a self-closing tag, such as <code>img</code> or <code>input</code>.
@@ -474,15 +424,12 @@ sap.ui.define([
 		 * @param {string} sTagName Tag name of the HTML element
 		 * @param {sap.ui.core.Element|sap.ui.core.ID} [vControlOrId] Control instance or ID to identify the element
 		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 *
+		 * @name sap.ui.core.RenderManager#voidStart
+		 * @function
 		 * @public
 		 * @since 1.67
 		 */
-		this.voidStart = function (sTagName, vControlOrId) {
-			this.openStart(sTagName, vControlOrId);
-
-			bVoidOpen = true;
-			return this;
-		};
 
 		/**
 		 * Ends an open self-closing tag started with <code>voidStart</code>.
@@ -491,21 +438,12 @@ sap.ui.define([
 		 * For self-closing tags <code>close</code> must not be called.
 		 *
 		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 *
+		 * @name sap.ui.core.RenderManager#voidEnd
+		 * @function
 		 * @public
 		 * @since 1.67
 		 */
-		this.voidEnd = function (bExludeStyleClasses /* private */) {
-			assertOpenTagHasStarted("voidEnd");
-			assertOpenTagHasEnded(bVoidOpen || !sOpenTag);
-			bVoidOpen = false;
-			iOpenTagCount--;
-			sOpenTag = "";
-
-			writeClasses(bExludeStyleClasses ? false : undefined);
-			writeStyles();
-			aBuffer.push(">");
-			return this;
-		};
 
 		/**
 		 * Sets the given HTML markup without any encoding or sanitizing.
@@ -514,16 +452,13 @@ sap.ui.define([
 		 *
 		 * @param {string} sHtml Well-formed, valid HTML markup
 		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 *
+		 * @name sap.ui.core.RenderManager#unsafeHtml
+		 * @function
 		 * @public
 		 * @since 1.67
 		 * @SecSink {*|XSS}
 		 */
-		this.unsafeHtml = function(sHtml) {
-			assertOpenTagHasEnded();
-
-			aBuffer.push(sHtml);
-			return this;
-		};
 
 		/**
 		 * Sets the text content with the given text.
@@ -539,17 +474,12 @@ sap.ui.define([
 		 *
 		 * @param {string} sText The text to be written
 		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 *
+		 * @name sap.ui.core.RenderManager#text
+		 * @function
 		 * @public
 		 * @since 1.67
 		 */
-		this.text = function(sText) {
-			assertOpenTagHasEnded();
-			if ( sText != null ) {
-				sText = encodeXML( String(sText) );
-				aBuffer.push(sText);
-			}
-			return this;
-		};
 
 		/**
 		 * Adds an attribute name-value pair to the last open HTML element.
@@ -569,19 +499,12 @@ sap.ui.define([
 		 * @param {string} sName Name of the attribute
 		 * @param {*} vValue Value of the attribute
 		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 *
+		 * @name sap.ui.core.RenderManager#attr
+		 * @function
 		 * @public
 		 * @since 1.67
 		 */
-		this.attr = function(sName, vValue) {
-			assertValidAttr(sName);
-
-			if (sName == "style") {
-				aStyleStack[aStyleStack.length - 1].aStyle = [vValue];
-			} else {
-				aBuffer.push(" ", sName, "=\"", encodeXML(String(vValue)), "\"");
-			}
-			return this;
-		};
 
 		/**
 		 * Adds a class name to the class collection of the last open HTML element.
@@ -591,20 +514,12 @@ sap.ui.define([
 		 *
 		 * @param {string} sClass Class name to be written
 		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 *
+		 * @name sap.ui.core.RenderManager#class
+		 * @function
 		 * @public
 		 * @since 1.67
 		 */
-		this.class = function(sClass) {
-			if (sClass) {
-				assertValidClass.apply(this, arguments);
-				var oStyle = aStyleStack[aStyleStack.length - 1];
-				if (!oStyle.aClasses) {
-					oStyle.aClasses = [];
-				}
-				oStyle.aClasses.push(encodeXML(sClass));
-			}
-			return this;
-		};
 
 		/**
 		 * Adds a style name-value pair to the style collection of the last open HTML element.
@@ -617,25 +532,16 @@ sap.ui.define([
 		 * @param {string} sName Name of the style property
 		 * @param {string|float|int} vValue Value of the style property
 		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 *
+		 * @name sap.ui.core.RenderManager#style
+		 * @function
 		 * @public
 		 * @since 1.67
 		 */
-		this.style = function(sName, vValue) {
-			assertValidStyle(sName);
 
-			if (vValue != null && vValue != "") {
-				if (!(typeof vValue === "string" || typeof vValue === "number")) {
-					throw new Error("value must be a string or number");
-				}
-
-				var oStyle = aStyleStack[aStyleStack.length - 1];
-				if (!oStyle.aStyle) {
-					oStyle.aStyle = [];
-				}
-				oStyle.aStyle.push(sName + ": " + vValue + ";");
-			}
-			return this;
-		};
+		//#################################################################################################
+		// Semantic Rendering Interface for String Based Rendering
+		//#################################################################################################
 
 		//#################################################################################################
 		// Semantic Rendering Interface for DOM Based Rendering
@@ -646,6 +552,13 @@ sap.ui.define([
 			assertValidName(sTagName, "tag");
 			assertOpenTagHasEnded();
 			assert(!(sLastStyleMethod = sLastClassMethod = ""));
+
+			// initialize patcher's root node if not yet done
+			if (!bInitialized) {
+				oPatcher.setRootNode();
+				bInitialized = true;
+			}
+
 			sOpenTag = sTagName;
 			iOpenTagCount++;
 
@@ -860,6 +773,10 @@ sap.ui.define([
 
 			var oDomRef = oControl.getDomRef();
 			if (oDomRef) {
+				if (!bInitialized) {
+					oPatcher.setRootNode();
+					bInitialized = true;
+				}
 
 				// Call beforeRendering to allow cleanup
 				triggerBeforeRendering(oControl);
@@ -904,12 +821,15 @@ sap.ui.define([
 			if (oRenderer == InvisibleRenderer) {
 
 				// invoke the InvisibleRenderer in case the control uses the default visible property
-				InvisibleRenderer.render(bDomInterface ? oDomInterface : oStringInterface, oControl);
+				InvisibleRenderer.render(oDomInterface, oControl);
 
 				// if an invisible placeholder was rendered, mark with invisible marker
 				oControl.bOutput = "invisible";
 
 			} else if (oRenderer && typeof oRenderer.render === "function") {
+				if (RenderManager.getApiVersion(oRenderer) == 1) {
+					throw new Error("The renderer for class " + oControl.getMetadata().getName() + " does not support the required API version 2!");
+				}
 
 				// before the control rendering get custom style classes of the control
 				var oControlStyles = {};
@@ -923,40 +843,25 @@ sap.ui.define([
 				// mark that the rendering phase has been started
 				oControl._bRenderingPhase = true;
 
-				// execute the control renderer according to rendering interface
-				if (bDomInterface) {
+				// remember the cursor of the Patcher before the control renderer is executed
+				var oCurrentNode = oPatcher.getCurrentNode();
 
-					// remember the cursor of the Patcher before the control renderer is executed
-					var oCurrentNode = oPatcher.getCurrentNode();
+				// let the rendering happen with DOM rendering interface
+				oRenderer.render(oDomInterface, oControl);
 
-					// let the rendering happen with DOM rendering interface
-					oRenderer.render(oDomInterface, oControl);
+				// determine whether an output is produced
+				if (oPatcher.getCurrentNode() == oCurrentNode) {
 
-					// determine whether an output is produced
-					if (oPatcher.getCurrentNode() == oCurrentNode) {
-
-						// during the rendering the cursor of the Patcher should move to the next element when openStart or voidStart is called
-						// compare after rendering cursor with before rendering cursor to determine whether the control produced any output
-						// we need to remove the control DOM if there is no output produced
-						oPatcher.unsafeHtml("", oControl.getId());
-						oControl.bOutput = false;
-
-					} else {
-
-						// the cursor of the patcher is moved so the output is produced
-						oControl.bOutput = true;
-					}
+					// during the rendering the cursor of the Patcher should move to the next element when openStart or voidStart is called
+					// compare after rendering cursor with before rendering cursor to determine whether the control produced any output
+					// we need to remove the control DOM if there is no output produced
+					oPatcher.unsafeHtml("", oControl.getId());
+					oControl.bOutput = false;
 
 				} else {
 
-					// remember the buffer size before the control renderer is executed
-					var iBufferLength = aBuffer.length;
-
-					// let the rendering happen with DOM rendering interface
-					oRenderer.render(oStringInterface, oControl);
-
-					// compare after rendering buffer size with the before rendering buffer size to determine whether the control produced any output
-					oControl.bOutput = (aBuffer.length != iBufferLength);
+					// the cursor of the patcher is moved so the output is produced
+					oControl.bOutput = true;
 				}
 
 				// mark that the rendering phase is over
@@ -964,7 +869,6 @@ sap.ui.define([
 
 				// pop from the style stack after rendering for the next control
 				aStyleStack.pop();
-
 			} else {
 				Log.error("The renderer for class " + oControl.getMetadata().getName() + " is not defined or does not define a render function! Rendering of " + oControl.getId() + " will be skipped!");
 			}
@@ -1008,17 +912,11 @@ sap.ui.define([
 
 			const fnDone = Interaction.notifyControlRendering?.(sAppComponentId);
 
-			var oDomRef, oRenderer;
+			var oDomRef, bPreserveContent;
 			var bTriggerBeforeRendering = true;
 
-			// determine the rendering interface
-			if (aBuffer.length) {
 
-				// string rendering has been already started therefore we cannot use DOM rendering interface anymore
-				bDomInterface = false;
-
-			} else if (bDomInterface === undefined) {
-
+			if (!bInitialized) {
 				// trigger onBeforeRendering before checking the visibility, since the visible property might change in the event handler
 				triggerBeforeRendering(oControl);
 
@@ -1026,77 +924,35 @@ sap.ui.define([
 				bTriggerBeforeRendering = false;
 
 				// if the control uses the default visible property then use the InvisibleRenderer, otherwise the renderer of the control
-				oRenderer = getCurrentRenderer(oControl);
+				getCurrentRenderer(oControl);
 
-				// rendering interface must be determined for the root control once per rendering
-				if (RenderManager.getApiVersion(oRenderer) != 1) {
+				// get the visible or invisible DOM element of the control
+				oDomRef = oControl.getDomRef() || InvisibleRenderer.getDomRef(oControl);
 
-					// get the visible or invisible DOM element of the control
-					oDomRef = oControl.getDomRef() || InvisibleRenderer.getDomRef(oControl);
-
-					// If the control is in the preserved area then we should not use the DOM-based rendering to avoid patching of preserved nodes
-					if (RenderManager.isPreservedContent(oDomRef)) {
-						bDomInterface = false;
-					} else {
-						// patching will happen during the control renderer calls therefore we need to get the focus info before the patching
-						oDomRef && FocusHandler.storePatchingControlFocusInfo(oDomRef);
-
-						// set the starting point of the Patcher
-						oPatcher.setRootNode(oDomRef);
-
-						// remember that we are using DOM based rendering interface
-						bDomInterface = true;
-					}
-
-				} else {
-
-					// DOM rendering is not possible we fall back to string rendering interface
-					bDomInterface = false;
+				bPreserveContent = RenderManager.isPreservedContent(oDomRef);
+				if (oDomRef && !bPreserveContent) {
+					// patching will happen during the control renderer calls therefore we need to get the focus info before the patching
+					FocusHandler.storePatchingControlFocusInfo(oDomRef);
 				}
 
-			} else if (!sLegacyRendererControlId && bDomInterface) {
+				// set the starting point of the Patcher
+				oPatcher.setRootNode(bPreserveContent ? null : oDomRef);
 
-				// if the control uses the default visible property then use the InvisibleRenderer, otherwise the renderer of the control
-				oRenderer = getCurrentRenderer(oControl);
-
-				// for every subsequent renderControl call we need to check whether we can continue with the DOM based rendering
-				if (RenderManager.getApiVersion(oRenderer) == 1) {
-
-					// remember the control id that we have to provide string rendering interface
-					sLegacyRendererControlId = oControl.getId();
-					bDomInterface = false;
-				}
+				bInitialized = true;
 			}
 
-			// execute the renderer of the control through the valid rendering interface
-			if (bDomInterface) {
+			// determine whether we should execute the control renderer with DOM rendering interface or whether we can skip the rendering of the control if it does not need rendering
+			if (oControl._bNeedsRendering || !oControl.getParent() || oPatcher.isCreating() || !RenderManager.canSkipRendering(oControl)
+				|| !(oDomRef = oDomRef || oControl.getDomRef() || InvisibleRenderer.getDomRef(oControl))
+				|| oDomRef.hasAttribute(ATTR_DO_NOT_SKIP_RENDERING_MARKER) || oDomRef.querySelector("[" + ATTR_DO_NOT_SKIP_RENDERING_MARKER + "]")) {
 
-				// determine whether we should execute the control renderer with DOM rendering interface or whether we can skip the rendering of the control if it does not need rendering
-				if (oControl._bNeedsRendering || !oControl.getParent() || oPatcher.isCreating() || !RenderManager.canSkipRendering(oControl)
-					|| !(oDomRef = oDomRef || oControl.getDomRef() || InvisibleRenderer.getDomRef(oControl))
-					|| oDomRef.hasAttribute(ATTR_DO_NOT_SKIP_RENDERING_MARKER) || oDomRef.querySelector("[" + ATTR_DO_NOT_SKIP_RENDERING_MARKER + "]")) {
-
-					// let the rendering happen with DOM rendering interface
-					executeRenderer(oControl, bTriggerBeforeRendering);
-
-				} else {
-
-					// skip the control rendering and re-arrange the cursor of the Patcher
-					oPatcher.alignWithDom(oDomRef);
-				}
+				// let the rendering happen with DOM rendering interface
+				executeRenderer(oControl, bTriggerBeforeRendering);
 
 			} else {
 
-				// let the rendering happen with string rendering interface
-				executeRenderer(oControl, bTriggerBeforeRendering);
-
-				// at the end of the rendering apply the rendering buffer of the control that is forced to render string interface
-				if (sLegacyRendererControlId && sLegacyRendererControlId === oControl.getId()) {
-					oPatcher.unsafeHtml(aBuffer.join(""), sLegacyRendererControlId, restoreStyles);
-					sLegacyRendererControlId = "";
-					bDomInterface = true;
-					aBuffer = [];
-				}
+				// skip the control rendering and re-arrange the cursor of the Patcher
+				oPatcher.alignWithDom(oDomRef);
 			}
 
 			fnDone?.();
@@ -1166,52 +1022,28 @@ sap.ui.define([
 		}
 
 		function flushInternal(fnPutIntoDom, fnDone, oTargetDomNode) {
-
 			var oStoredFocusInfo;
-			if (!bDomInterface) {
-				// DOM-based rendering was not possible we are in the string-based initial rendering or re-rendering phase
+			// get the root node of the Patcher to determine whether we are in the initial rendering or the re-rendering phase
+			var oRootNode = oPatcher.getRootNode();
+
+			// !oRootNode: no rendering API called before this function, so empty the target DOM node
+			// in case of DOM-based initial rendering, the Patcher creates a DocumentFragment to assemble all created control DOM nodes within it
+			if (!oRootNode || oRootNode.nodeType == 11 /* Node.DOCUMENT_FRAGMENT_NODE */) {
+				// even though we are in the initial rendering phase a control within the control tree might has been already rendered before
+				// therefore we need to store the currectly focused control info before we inject the DocumentFragment into the real DOM tree
 				oStoredFocusInfo = FocusHandler.getControlFocusInfo();
-				var sHtml = aBuffer.join("");
-				if (sHtml && aRenderingStyles.length) {
-					// During the string-based rendering, RM#writeStyles method is not writing the styles into the HTML buffer due to possible CSP restrictions.
-					// Instead, we store the styles in the aRenderingStyles array and add an ATTR_STYLE_KEY_MARKER attribute marker for which the value
-					// references the original style index in this array.
-					// Not to violate the CSP, we need to bring the original styles via HTMLElement.style API. Here we are converting the HTML buffer of
-					// string-based rendering to DOM nodes so that we can restore the orginal styles before we inject the rendering output to the DOM tree.
-					if (oTargetDomNode instanceof SVGElement && oTargetDomNode.localName != "foreignObject") {
-						oTemplate.innerHTML = "<svg>" + sHtml + "</svg>";
-						oTemplate.replaceWith.apply(oTemplate.content.firstChild, oTemplate.content.firstChild.childNodes);
-					} else {
-						oTemplate.innerHTML = sHtml;
-					}
 
-					restoreStyles(oTemplate.content.childNodes);
-					fnPutIntoDom(oTemplate.content);
-				} else {
-					fnPutIntoDom(sHtml);
-				}
+				// controls are not necessarily need to produce output during their rendering
+				// in case of output is produced, let the callback injects the DocumentFragment
+				fnPutIntoDom(oRootNode?.lastChild ? oRootNode : "");
 			} else {
-				// get the root node of the Patcher to determine whether we are in the initial rendering or the re-rendering phase
-				var oRootNode = oPatcher.getRootNode();
-
-				// in case of DOM-based initial rendering, the Patcher creates a DocumentFragment to assemble all created control DOM nodes within it
-				if (oRootNode.nodeType == 11 /* Node.DOCUMENT_FRAGMENT_NODE */) {
-					// even though we are in the initial rendering phase a control within the control tree might has been already rendered before
-					// therefore we need to store the currectly focused control info before we inject the DocumentFragment into the real DOM tree
-					oStoredFocusInfo = FocusHandler.getControlFocusInfo();
-
-					// controls are not necessarily need to produce output during their rendering
-					// in case of output is produced, let the callback injects the DocumentFragment
-					fnPutIntoDom(oRootNode.lastChild ? oRootNode : "");
-				} else {
-					// in case of DOM-based re-rendering, the root node of the Patcher must be an existing HTMLElement
-					// since the re-rendering happens during the control renderer APIs are executed here we get the stored focus info before the patching
-					oStoredFocusInfo = FocusHandler.getPatchingControlFocusInfo();
-				}
-
-				// make the Patcher ready for the next patching
-				oPatcher.reset();
+				// in case of DOM-based re-rendering, the root node of the Patcher must be an existing HTMLElement
+				// since the re-rendering happens during the control renderer APIs are executed here we get the stored focus info before the patching
+				oStoredFocusInfo = FocusHandler.getPatchingControlFocusInfo();
 			}
+
+			// make the Patcher ready for the next patching
+			oPatcher.reset();
 
 			finalizeRendering(oStoredFocusInfo);
 
@@ -1222,34 +1054,6 @@ sap.ui.define([
 			if (fnDone) {
 				fnDone();
 			}
-		}
-
-		function restoreStyle(oElement, iDomIndex) {
-			var sStyleIndex = oElement.getAttribute(ATTR_STYLE_KEY_MARKER);
-			if (sStyleIndex != iDomIndex) {
-				return 0;
-			}
-
-			oElement.style = aRenderingStyles[iDomIndex];
-			oElement.removeAttribute(ATTR_STYLE_KEY_MARKER);
-			return 1;
-		}
-
-		function restoreStyles(aDomNodes) {
-			if (!aRenderingStyles.length) {
-				return;
-			}
-
-			var iDomIndex = 0;
-			aDomNodes.forEach(function(oDomNode) {
-				if (oDomNode.nodeType == 1 /* Node.ELEMENT_NODE */) {
-					iDomIndex += restoreStyle(oDomNode, iDomIndex);
-					oDomNode.querySelectorAll("[" + ATTR_STYLE_KEY_MARKER + "]").forEach(function(oElement) {
-						iDomIndex += restoreStyle(oElement, iDomIndex);
-					});
-				}
-			});
-			aRenderingStyles = [];
 		}
 
 		/**
@@ -1297,6 +1101,22 @@ sap.ui.define([
 			}
 
 			flushInternal(function(vHTML) {
+
+				// If vHTML is a DocumentFragment and the target node is in a non-XHTML namespace,
+				// convert child nodes to the target namespace before insertion
+				if (vHTML?.nodeType === Node.DOCUMENT_FRAGMENT_NODE && oTargetDomNode.namespaceURI !== "http://www.w3.org/1999/xhtml") {
+					const aChildNodes = Array.from(vHTML.childNodes);
+					const sTargetNamespaceURI = oTargetDomNode.namespaceURI;
+
+					for (const oChild of aChildNodes) {
+						// Only check element nodes for namespace
+						// If namespace differs, convert and replace
+						if (oChild.nodeType === Node.ELEMENT_NODE && oChild.namespaceURI !== sTargetNamespaceURI) {
+							const oConvertedNode = convertElementToNamespace(oChild, sTargetNamespaceURI);
+							vHTML.replaceChild(oConvertedNode, oChild);
+						}
+					}
+				}
 
 				for (var i = 0; i < aRenderedControls.length; i++) {
 					//TODO It would be enough to loop over the controls for which renderControl was initially called but for this
@@ -1447,10 +1267,12 @@ sap.ui.define([
 
 		var oInterface = {};
 		aCommonMethods.forEach(function (sMethod) {
-			oStringInterface[sMethod] = oDomInterface[sMethod] = oInterface[sMethod] = this[sMethod];
+			oDomInterface[sMethod] = oInterface[sMethod] = this[sMethod];
 		}, this);
+
+
 		aDomInterfaceMethods.forEach(function (sMethod) {
-			oStringInterface[sMethod] = oInterface[sMethod] = this[sMethod];
+			this[sMethod] = oInterface[sMethod] = oDomInterface[sMethod];
 		}, this);
 		aNonRendererMethods.forEach(function (sMethod) {
 			oInterface[sMethod] = this[sMethod];
@@ -1463,7 +1285,7 @@ sap.ui.define([
 		 * @private
 		 */
 		this.getRendererInterface = function() {
-			return oStringInterface;
+			return oDomInterface;
 		};
 
 		this.getInterface = function() {
@@ -1830,7 +1652,6 @@ sap.ui.define([
 	 * @alias sap.ui.core.RenderManager.RenderPrefixes
 	 */
 	var RenderPrefixes = RenderManager.RenderPrefixes = {
-
 		/**
 		 * The control has not been rendered because it is invisible, the element rendered with this
 		 * prefix can be found by the RenderManager to avoid rerendering the parents
@@ -1844,16 +1665,7 @@ sap.ui.define([
 		 * @private
 		 * @ui5-restricted sap.ui.core
 		 */
-		Dummy: "sap-ui-dummy-",
-
-		/**
-		 * A temporary element for a control that participates in DOM preservation.
-		 * The temporary element is rendered during string rendering, flushed into DOM
-		 * and then replaced with the preserved DOM during onAfterRendering.
-		 * @private
-		 * @ui5-restricted sap.ui.core
-		 */
-		Temporary: "sap-ui-tmp-"
+		Dummy: "sap-ui-dummy-"
 	};
 
 

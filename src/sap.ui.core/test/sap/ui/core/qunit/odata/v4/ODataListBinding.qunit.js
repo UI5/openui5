@@ -1632,8 +1632,13 @@ sap.ui.define([
 [false, true].forEach(function (bAsync) {
 	[false, true].forEach(function (bGroupLock) {
 		[false, true].forEach(function (bReadGroupLock) {
+			[false, true].forEach(function (bLengthFinal) {
+				[false, true].forEach(function (bMoreContexts) {
+					[undefined, false, true].forEach(function (bOutdated) {
 	const sTitle = "fetchContexts: async=" + bAsync + ", groupLock=" + bGroupLock
-		+ ", readGroupLock=" + bReadGroupLock;
+		+ ", readGroupLock=" + bReadGroupLock + ", lengthFinal=" + bLengthFinal
+		+ ", moreContexts=" + bMoreContexts + ", outdated=" + bOutdated;
+
 	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
 			bPending = true,
@@ -1642,6 +1647,10 @@ sap.ui.define([
 			oResult = {value : []};
 
 		oBinding.oReadGroupLock = oReadGroupLock;
+		oBinding.bLengthFinal = bLengthFinal;
+		oBinding.aContexts = bMoreContexts ? [{}, {}] : [{}];
+		oBinding.iCreatedContexts = 1;
+
 		this.mock(oBinding).expects("lockGroup").exactly(bGroupLock || bReadGroupLock ? 0 : 1)
 			.withExactArgs().returns("~oGroupLock~");
 		this.mock(oBinding).expects("fetchData")
@@ -1649,6 +1658,11 @@ sap.ui.define([
 				!bGroupLock && bReadGroupLock ? "~oReadGroupLock~" : "~oGroupLock~",
 				"~fnDataRequested~")
 			.returns(SyncPromise.resolve(oResult));
+		this.mock(oBinding.oHeaderContext).expects("isOutdated").withExactArgs()
+			.exactly(bLengthFinal || bMoreContexts ? 0 : 1)
+			.returns(bOutdated);
+		this.mock(oBinding.oHeaderContext).expects("setOutdated").withExactArgs(false)
+			.exactly(bLengthFinal || bMoreContexts || bOutdated === undefined ? 0 : 1);
 		this.mock(oBinding).expects("createContexts")
 			.withExactArgs(1, sinon.match.same(oResult.value))
 			.returns(SyncPromise.resolve("~bChanged~"));
@@ -1668,6 +1682,9 @@ sap.ui.define([
 
 		return oPromise;
 	});
+					});
+				});
+			});
 		});
 	});
 });
@@ -5568,6 +5585,8 @@ sap.ui.define([
 			oContextMock.expects("fetchValue")
 				.withExactArgs("/TEAMS/1/TEAM_2_EMPLOYEES")
 				.returns(SyncPromise.resolve(aCacheResult));
+			this.mock(oBinding.oHeaderContext).expects("isOutdated").withExactArgs()
+				.returns(undefined);
 
 			// code under test - ensure that getContexts delivers the created context correctly
 			aContexts = oBinding.getContexts(0, 4);
@@ -7960,6 +7979,7 @@ sap.ui.define([
 				done();
 			}, 0);
 		});
+		this.mock(oBinding.oHeaderContext).expects("isOutdated").withExactArgs().returns(undefined);
 
 		aContexts = oBinding.getContexts(0, 50);
 		assert.strictEqual(aContexts.length, 0);
@@ -9091,7 +9111,9 @@ sap.ui.define([
 			oExpectedFilterInfo);
 	});
 
-[false, true].forEach(function (bRecursiveHierarchy) { //******************************************
+[0, 1, 2].forEach(function (iMode) { //************************************************************
+	const bRecursiveHierarchy = iMode === 1;
+	const bDataAggregation = iMode === 2;
 	function bindList(that, sPath, oContext) { // eslint-disable-line consistent-this
 		var oListBinding = that.bindList(sPath, oContext);
 
@@ -9099,6 +9121,11 @@ sap.ui.define([
 		// too far :-(
 		if (bRecursiveHierarchy) {
 			oListBinding.mParameters.$$aggregation = {hierarchyQualifier : "X"};
+		} else if (bDataAggregation) {
+			oListBinding.mParameters.$$aggregation = {
+				aggregate : {foo : {grandTotal : true}},
+				groupLevels : [] /* data aggregation always has groupLevels */
+			};
 		}
 
 		return oListBinding;
@@ -9106,7 +9133,12 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [false, true].forEach(function (bHeader) {
-	QUnit.test("requestSideEffects: refresh needed, refresh fails, " + bHeader, function (assert) {
+	const sTitle = "requestSideEffects: refresh needed, refresh fails, " + bHeader + " #" + iMode;
+	if (bDataAggregation) {
+		return; // data aggregation with !bSingle has a separate implementation
+	}
+
+	QUnit.test(sTitle, function (assert) {
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
 			oBinding = bindList(this, "/Set"),
 			oContext = bHeader ? oBinding.getHeaderContext() : undefined,
@@ -9115,7 +9147,7 @@ sap.ui.define([
 
 		oBinding.iCurrentEnd = 42;
 		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
-			.returns(false);
+			.returns(bDataAggregation); // see return above
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs(sGroupId).returns(false);
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
@@ -9135,16 +9167,20 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("requestSideEffects: refreshSingle needed, refreshSingle fails", function (assert) {
+	QUnit.test("requestSideEffects: refreshSingle needed, refreshSingle fails #" + iMode,
+			function (assert) {
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
 			oContext = {
-				getPath : mustBeMocked
+				getPath : mustBeMocked,
+				isAggregated : mustBeMocked
 			},
 			oBinding = bindList(this, "/Set"),
 			oError = new Error();
 
 		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
-			.returns(false);
+			.returns(bDataAggregation);
+		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs().returns(false);
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").never();
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
@@ -9167,13 +9203,18 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [false, true].forEach(function (bHeader) {
-	QUnit.test("requestSideEffects: deleting in other group, " + bHeader, function (assert) {
+	const sTitle = "requestSideEffects: deleting in other group, " + bHeader + " #" + iMode;
+	if (bDataAggregation) {
+		return; // data aggregation with !bSingle has a separate implementation
+	}
+
+	QUnit.test(sTitle, function (assert) {
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
 			oBinding = bindList(this, "/Set"),
 			oContext = bHeader ? oBinding.getHeaderContext() : undefined;
 
 		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
-			.returns(false);
+			.returns(bDataAggregation); // see return above
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs("group").returns(true);
 		oCacheMock.expects("getPendingRequestsPromise").never();
@@ -9189,9 +9230,13 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("requestSideEffects: wait for getPendingRequestsPromise()", function (assert) {
+	QUnit.test("requestSideEffects: wait for getPendingRequestsPromise() #" + iMode,
+			function (assert) {
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
 			oBinding = bindList(this, "/Set"),
+			oContext = {
+				isAggregated : mustBeMocked
+			},
 			fnResolve,
 			oPendingRequestsPromise = new Promise(function (resolve) {
 				fnResolve = resolve;
@@ -9199,19 +9244,21 @@ sap.ui.define([
 			oPromise;
 
 		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
-			.returns(false);
+			.returns(bDataAggregation);
+		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs().returns(false);
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").never();
 		oCacheMock.expects("getPendingRequestsPromise").twice().withExactArgs()
 			.returns(oPendingRequestsPromise);
 
 		// code under test
-		oPromise = oBinding.requestSideEffects("group", ["A"], "~oContext~");
+		oPromise = oBinding.requestSideEffects("group", ["A"], oContext);
 
 		assert.strictEqual(oPromise.isPending(), true);
 
 		this.mock(oBinding).expects("requestSideEffects")
-			.withExactArgs("group", ["A"], "~oContext~").returns("~result~");
+			.withExactArgs("group", ["A"], sinon.match.same(oContext)).returns("~result~");
 
 		// code under test
 		fnResolve();
@@ -9222,7 +9269,11 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("requestSideEffects: call refreshInternal for relative binding", function (assert) {
+	QUnit.test("requestSideEffects: call refreshInternal for relative binding #" + iMode,
+			function (assert) {
+		if (bDataAggregation) {
+			return; // data aggregation with !bSingle has a separate implementation
+		}
 		var oBinding = bindList(this, "relative", this.oModel.createBindingContext("/")),
 			oContext = oBinding.getHeaderContext(),
 			oResult = {};
@@ -9239,11 +9290,14 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("requestSideEffects: call refreshSingle for relative binding", function (assert) {
+	QUnit.test("requestSideEffects: call refreshSingle for relative binding #" + iMode,
+			function (assert) {
 		var oBinding = bindList(this, "relative", this.oModel.createBindingContext("/")),
 			oContext = Context.create(this.oModel, {}, "/EMPLOYEES('42')"),
 			oResult = {};
 
+		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs().returns(false);
 		this.mock(this.oModel).expects("withUnresolvedBindings")
 			.withExactArgs("removeCachesAndMessages", "EMPLOYEES('42')");
 		this.mock(oBinding).expects("refreshSingle")
@@ -9263,13 +9317,18 @@ sap.ui.define([
 	[false, true].forEach(function (bRecursionRejects) {
 		[false, true].forEach(function (bHasCache) {
 			var sTitle = "requestSideEffects: efficient request possible, header=" + bHeader
-					+ ", reject=" + bRecursionRejects + ", has cache=" + bHasCache;
+					+ ", reject=" + bRecursionRejects + ", has cache=" + bHasCache
+					+ " #" + iMode;
+
+			if (bDataAggregation && bHeader) {
+				return; // data aggregation with !bSingle has a separate implementation
+			}
 
 	QUnit.test(sTitle, function (assert) {
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
 			oBinding = bindList(this, "/Set"),
 			oCanceledError = new Error(),
-			oContext = bHeader ? oBinding.getHeaderContext() : "~oContext~",
+			oContext = bHeader ? oBinding.getHeaderContext() : {isAggregated : mustBeMocked},
 			oError = new Error(),
 			sGroupId = "group",
 			oGroupLock = {},
@@ -9297,7 +9356,9 @@ sap.ui.define([
 		oBinding.iCurrentEnd = 6;
 
 		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
-			.returns(false);
+			.returns(bDataAggregation); // see return above
+		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs().returns(false);
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").exactly(bHeader && bHasCache ? 1 : 0)
 			.withExactArgs(sGroupId).returns(false);
@@ -9347,7 +9408,10 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("requestSideEffects: fallback to refresh", function (assert) {
+	QUnit.test("requestSideEffects: fallback to refresh #" + iMode, function (assert) {
+		if (bDataAggregation) {
+			return; // data aggregation with !bSingle has a separate implementation
+		}
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
 			oBinding = bindList(this, "/Set"),
 			oError = new Error(),
@@ -9355,7 +9419,7 @@ sap.ui.define([
 
 		oBinding.iCurrentEnd = 8;
 		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
-			.returns(false);
+			.returns(bDataAggregation); // see return above
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs(sGroupId).returns(false);
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
@@ -9380,12 +9444,15 @@ sap.ui.define([
 	// side effects now and the late property will fetch its own value later on.
 
 	//*********************************************************************************************
-	QUnit.test("requestSideEffects: no data read => no refresh", function (assert) {
+	QUnit.test("requestSideEffects: no data read => no refresh #" + iMode, function (assert) {
+		if (bDataAggregation) {
+			return; // data aggregation with !bSingle has a separate implementation
+		}
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
 			oBinding = bindList(this, "/Set");
 
 		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
-			.returns(false);
+			.returns(bDataAggregation); // see return above
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs("group").returns(false);
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
@@ -9399,7 +9466,7 @@ sap.ui.define([
 			SyncPromise.resolve()
 		);
 	});
-}); // END of forEach: bRecursiveHierarchy ********************************************************
+}); // END of forEach: iMode **********************************************************************
 
 	//*********************************************************************************************
 [false, true].forEach(function (bRefresh) {
@@ -9476,28 +9543,6 @@ sap.ui.define([
 			// code under test
 			oBinding.requestSideEffects("group", [/*aPaths*/], oContext);
 		}, new Error("Unsupported on aggregated data: " + oContext));
-	});
-
-	//*********************************************************************************************
-	QUnit.test("requestSideEffects: data aggregation, single entity", function (assert) {
-		const oBinding = this.bindList("/Set");
-		oBinding.mParameters.$$aggregation = {groupLevels : [/*empty*/]};
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
-			.returns(true);
-		const oContext = Context.create({/*oModel*/}, oBinding, "/Set('42')");
-		this.mock(oContext).expects("isAggregated").withExactArgs().returns(false);
-		this.mock(oBinding).expects("refreshSingle")
-			.withExactArgs(sinon.match.same(oContext), "group", false, false, true, false)
-			.returns("~refreshSingleResult~");
-		this.mock(oBinding.oCache).expects("requestSideEffects").never();
-		this.mock(oBinding).expects("refreshInternal").never();
-		this.mock(_AggregationHelper).expects("isAffected").never();
-
-		assert.strictEqual(
-			// code under test
-			oBinding.requestSideEffects("group", [/*aPaths*/], oContext),
-			"~refreshSingleResult~"
-		);
 	});
 
 	//*********************************************************************************************
@@ -10269,19 +10314,27 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-[false, true].forEach((bWithAggregationCache) => {
-	const sTitle = "doSetProperty: returns undefined, bWithAggregationCache="
-		+ bWithAggregationCache;
+[false, true].forEach((bDataAggregation) => {
+	[false, true].forEach((bWithAggregationCache) => {
+		const sTitle = "doSetProperty: returns undefined, bDataAggregation="
+			+ bDataAggregation + ", bWithAggregationCache=" + bWithAggregationCache;
 
 	QUnit.test(sTitle, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(bDataAggregation);
 		if (bWithAggregationCache) {
 			oBinding.oCache.setGrandTotalOutdated = mustBeMocked;
-			this.mock(oBinding.oCache).expects("setGrandTotalOutdated").withExactArgs(true);
+			this.mock(oBinding.oCache).expects("setGrandTotalOutdated").withExactArgs(true)
+				.exactly(bDataAggregation ? 1 : 0);
 		}
+		this.mock(oBinding.oHeaderContext).expects("setOutdated").withExactArgs(true)
+			.exactly(bDataAggregation ? 1 : 0);
 
 		// code under test
 		assert.strictEqual(oBinding.doSetProperty(), undefined);
+	});
 	});
 });
 

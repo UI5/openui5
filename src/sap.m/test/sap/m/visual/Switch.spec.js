@@ -22,6 +22,34 @@ describe("sap.m.Switch", function() {
 		expect(takeScreenshot(element(by.id('switch_disabled')))).toLookAs('switch_disabled_before_click');
 	});
 
+	// verify read-only switch
+	it('should click on read-only switch', function() {
+		expect(takeScreenshot(element(by.id('switch_readonly')))).toLookAs('switch_readonly_off');
+		element(by.id('switch_readonly')).click();
+		expect(takeScreenshot(element(by.id('switch_readonly')))).toLookAs('switch_readonly_off');
+	});
+
+	// verify read-only switch in On state
+	it('should click on read-only switch (on state)', function() {
+		expect(takeScreenshot(element(by.id('switch_readonly_on')))).toLookAs('switch_readonly_on');
+		element(by.id('switch_readonly_on')).click();
+		expect(takeScreenshot(element(by.id('switch_readonly_on')))).toLookAs('switch_readonly_on');
+	});
+
+	// verify read-only semantic switch
+	it('should click on read-only semantic switch', function() {
+		expect(takeScreenshot(element(by.id('switch_readonly_semantic')))).toLookAs('switch_readonly_semantic_off');
+		element(by.id('switch_readonly_semantic')).click();
+		expect(takeScreenshot(element(by.id('switch_readonly_semantic')))).toLookAs('switch_readonly_semantic_off');
+	});
+
+	// verify read-only semantic switch in On state
+	it('should click on read-only semantic switch (on state)', function() {
+		expect(takeScreenshot(element(by.id('switch_readonly_semantic_on')))).toLookAs('switch_readonly_semantic_on');
+		element(by.id('switch_readonly_semantic_on')).click();
+		expect(takeScreenshot(element(by.id('switch_readonly_semantic_on')))).toLookAs('switch_readonly_semantic_on');
+	});
+
 	// verify switch with no text
 	it('should click on no-text switch', function() {
 		expect(takeScreenshot(element(by.id('switch_notext')))).toLookAs('switch_notext_before_click');

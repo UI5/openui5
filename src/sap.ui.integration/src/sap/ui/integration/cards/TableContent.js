@@ -138,7 +138,8 @@ sap.ui.define([
 				id: this.getId() + "-Table",
 				sticky: ["ColumnHeaders", "GroupHeaders"],
 				showSeparators: ListSeparators.None,
-				ariaLabelledBy: this.getHeaderTitleId()
+				ariaLabelledBy: this.getHeaderTitleId(),
+				contextualWidth: "Auto"
 			});
 
 			oTable.addEventDelegate({
@@ -184,6 +185,12 @@ sap.ui.define([
 		if (oConfiguration.row && oConfiguration.row.columns) {
 			this._setColumns(oConfiguration.row);
 		}
+
+		this._getTable().applySettings({
+			autoPopinMode: oConfiguration.autoPopinMode,
+			hiddenInPopin: oConfiguration.hiddenInPopin,
+			popinLayout: oConfiguration.popinLayout
+		});
 	};
 
 	/**
@@ -296,7 +303,9 @@ sap.ui.define([
 				header: new Text({ text: oColumn.title }),
 				width: oColumn.width,
 				hAlign: oColumn.hAlign,
-				visible: oColumn.visible
+				visible: oColumn.visible,
+				importance: oColumn.importance,
+				autoPopinWidth: oColumn.autoPopinWidth
 			}));
 			aCells.push(this._createCell(oColumn));
 		}.bind(this));

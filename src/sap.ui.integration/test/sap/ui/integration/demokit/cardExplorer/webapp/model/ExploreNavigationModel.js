@@ -733,6 +733,22 @@ sap.ui.define([
 										editable: true
 									}
 								]
+							},
+							{
+								title: 'Pop-in of the Columns',
+								key: 'popin',
+								showSlider: true,
+								settings: {
+									columns: 12
+								},
+								files: [
+									{
+										url: '/samples/table/popin/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
 							}
 						]
 					}, {

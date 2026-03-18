@@ -187,4 +187,54 @@ sap.ui.define([
 		assert.strictEqual(oBinding._isExpectingMoreContexts(["a", "b"], 10, 3), true,
 			"too short and final, but collection length not reached yet");
 	});
+
+	//**********************************************************************************************
+	QUnit.test("getFilters", function(assert) {
+		let oBinding = new ListBinding("~oModel", "~sPath");
+
+		assert.throws(function() {
+			// code under test
+			oBinding.getFilters.call(oBinding);
+		}, new Error("Invalid FilterType: undefined"));
+
+		// code under test
+		[FilterType.Application, FilterType.ApplicationBound, FilterType.Control].forEach((sFilterType) => {
+			assert.deepEqual(oBinding.getFilters(sFilterType), []);
+		});
+
+		const oFilter0 = new Filter({path: "path0", test() {}});
+
+		oBinding = new ListBinding("~oModel", "~sPath", undefined, undefined, oFilter0);
+
+		// code under test
+		let aReturnedFilters = oBinding.getFilters(FilterType.Application);
+
+		assert.deepEqual(aReturnedFilters, [oFilter0]);
+		assert.notStrictEqual(oBinding.aApplicationFilters, aReturnedFilters);
+
+		const oFilter1 = new Filter({path: "path1", test() {}});
+		oBinding.aFilters = [oFilter1];
+
+		// code under test
+		aReturnedFilters = oBinding.getFilters(FilterType.Control);
+
+		assert.deepEqual(aReturnedFilters, [oFilter1]);
+		assert.notStrictEqual(oBinding.aFilters, aReturnedFilters);
+
+		const oFilter2 = new Filter({path: "path2", test() {}});
+		oFilter2.setBound();
+		oBinding = new ListBinding("~oModel", "~sPath", undefined, undefined, [oFilter0, oFilter2]);
+
+		// code under test
+		aReturnedFilters = oBinding.getFilters(FilterType.ApplicationBound);
+
+		assert.deepEqual(aReturnedFilters, [oFilter2]);
+		assert.notStrictEqual(oBinding.aApplicationFilters, aReturnedFilters);
+
+		// code under test
+		aReturnedFilters = oBinding.getFilters(FilterType.Application);
+
+		assert.deepEqual(aReturnedFilters, [oFilter0]);
+		assert.notStrictEqual(oBinding.aApplicationFilters, aReturnedFilters);
+	});
 });

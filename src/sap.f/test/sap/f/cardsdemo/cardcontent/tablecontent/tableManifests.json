@@ -337,5 +337,75 @@
 				"path": "/tableCard4"
 			}
 		}
+	},
+	"tablecard9": {
+		"sap.app": {
+			"id": "tablecard9",
+			"type": "card"
+		},
+		"sap.card": {
+			"type": "Table",
+			"header": {
+				"title": "Table with Pop-in Support"
+			},
+			"content": {
+				"autoPopinMode": true,
+				"row": {
+					"columns": [
+						{
+							"title": "ID",
+							"value": "{ID}",
+							"importance": "High"
+						},
+						{
+							"title": "Full Name",
+							"value": "{FullName}",
+							"importance": "High"
+						},
+						{
+							"title": "Role",
+							"width": "20%",
+							"value": "{Role}",
+							"importance": "Medium"
+						},
+						{
+							"title": "Department",
+							"width": "20%",
+							"value": "{Department}",
+							"importance": "Low"
+						},
+						{
+							"title": "Location",
+							"width": "20%",
+							"value": "{Location}",
+							"importance": "Low"
+						},
+						{
+							"title": "Status",
+							"value": "{Status}",
+							"state": "{StatusState}",
+							"showStateIcon": true,
+							"inverted": true,
+							"importance": "None"
+						},
+						{
+							"title": "Score",
+							"progressIndicator": {
+								"percent": "{Score}",
+								"text": "{Score}",
+								"state": "{= ${Score} >= 95 ? 'Success' : (${Score} >= 90 ? 'Warning' : 'Error')}"
+							},
+							"importance": "None"
+						}
+					]
+				}
+			},
+			"data": {
+				"request": {
+					"url": "./cardcontent/tableitems.json"
+				},
+				"path": "/tableCard9"
+			}
+		}
 	}
 }

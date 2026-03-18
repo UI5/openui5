@@ -5631,6 +5631,7 @@ sap.ui.define([
 
 		await nextUIUpdate(this.clock);
 		oMCB.focus();
+		this.clock.tick(200);
 
 		// we focus the last token with BACKSPACE
 		qutils.triggerKeydown(oMCB.getDomRef(), KeyCodes.BACKSPACE);
@@ -5647,6 +5648,7 @@ sap.ui.define([
 
 		triggerBackspaceOnLastToken();
 		triggerBackspaceOnLastToken();
+		await nextUIUpdate(this.clock);
 
 		assert.strictEqual(document.activeElement, oMCB.getAggregation("tokenizer").getTokens()[0].getDomRef(), "First token is focused");
 

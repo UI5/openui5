@@ -21933,6 +21933,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-1670: Use "If-Match: *" if a PATCH is in the same changeset
 	// JIRA: CPOUI5ODATAV4-1637: state messages
 	// JIRA: CPOUI5ODATAV4-1745: transition messages
+	//
+	// Context#setProperty does not change the header context's outdated state in scenarios without
+	// data aggregation.
+	// JIRA: CPOUI5ODATAV4-3392
 	[
 		{desc : "submit"},
 		{desc : "reset via model", resetViaModel : true},
@@ -22015,6 +22019,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						message : "Only multiples of 2 are allowed",
 						target : sQuantityTarget
 					});
+
+				// outdated state is used only with data aggregation (JIRA: CPOUI5ODATAV4-3392)
+				assert.strictEqual(oListBinding.getHeaderContext().isOutdated(), undefined);
 
 				that.oLogMock.expects("error")
 					.withArgs("Failed to update path " + sQuantityTarget);
@@ -24557,8 +24564,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// only a single grand total request is sent.
 	// JIRA: CPOUI5ODATAV4-3300
 	//
-	// Support Context#requestSideEffects for single entities if there is no visual grouping. It
-	// always refreshes the complete entity and the grand total. Messages are not yet requested.
+	// Support Context#requestSideEffects for single entities if there is no visual grouping. The
+	// side effect for an empty navigation property path refreshes the complete entity and the grand
+	// total. Messages are not yet requested.
 	// JIRA: CPOUI5ODATAV4-3258
 	//
 	// Context#setOutdated and Context#isOutdated are supported for header contexts.
@@ -24568,6 +24576,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// (@$ui5.context.isOutdated is set to false). Ensure that the outdated flag is also updated in
 	// the copy of the grand total row.
 	// JIRA: CPOUI5ODATAV4-3392
+	//
+	// Context#requestSideEffects for single entities. Requesting side effects for a single property
+	// selects only the given property and refreshes the grand total.
+	// JIRA: CPOUI5ODATAV4-3389
 	QUnit.test("Data Aggregation: leaves' key predicates", function (assert) {
 		var oBinding,
 			oHeaderContext,
@@ -24683,22 +24695,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						"Unsupported on aggregated data: " + aCurrentContexts[0]);
 				});
 		}).then(function () {
-			that.expectChange("isOutdatedHeader", true);
-
-			// code under test (JIRA: CPOUI5ODATAV4-3392)
-			oHeaderContext.setOutdated(true); //TODO: Will be called by ODLB#doSetProperty
-
-			assert.strictEqual(oHeaderContext.isOutdated(), true);
-			assert.strictEqual(oHeaderContext.getProperty("@$ui5.context.isOutdated"), true);
-			assert.deepEqual(oHeaderContext.getObject(), {
-				"@$ui5.context.isOutdated" : true,
-				"@$ui5.context.isSelected" : false,
-				$count : 3,
-				$selectionCount : 0
-			});
-
-			return that.waitForChanges(assert);
-		}).then(function () {
 			const [oGrandTotalContext, oContext26] = oBinding.getCurrentContexts();
 			assert.deepEqual(oGrandTotalContext.getObject(), {
 					// NO @$ui5.context.isOutdated
@@ -24713,6 +24709,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			// #setProperty sets "isOutdated" flag to true (JIRA: CPOUI5ODATAV4-3392)
 			that.expectChange("isOutdated", [true,,,, true])
+				.expectChange("isOutdatedHeader", true)
 				.expectChange("lifecycleStatus", [, "Z*"])
 				.expectRequest("PATCH SalesOrderList('26')?sap-client=123&custom=foo", {
 					payload : {LifecycleStatus : "Z*"}
@@ -24746,6 +24743,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			const [oGrandTotalContext, oContext26] = oBinding.getCurrentContexts();
 			assert.strictEqual(oGrandTotalContext.getProperty("@$ui5.context.isOutdated"), true);
 			assert.strictEqual(oGrandTotalContext.isOutdated(), true);
+			assert.strictEqual(oHeaderContext.isOutdated(), true);
+			assert.strictEqual(oHeaderContext.getProperty("@$ui5.context.isOutdated"), true);
+			assert.deepEqual(oHeaderContext.getObject(), {
+				"@$ui5.context.isOutdated" : true,
+				"@$ui5.context.isSelected" : false,
+				$count : 3,
+				$selectionCount : 0
+			});
 			assert.strictEqual(oBinding.getCount(), 3);
 
 			that.expectRequest("DELETE SalesOrderList('26')")
@@ -24764,12 +24769,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(async function () {
 			assert.strictEqual(oBinding.getCount(), 2);
 
-			function expect() {
+			function expect(bMessages) {
 				const iBatchNo = that.iBatchNo + 1; // don't care about exact no.
+				const sSelect = "GrossAmount,LifecycleStatus" + (bMessages ? ",Messages" : "")
+					+ ",Note,SalesOrderID";
 				that.expectRequest(`#${iBatchNo} SalesOrderList('25')?sap-client=123&custom=foo`
-						+ "&$select=GrossAmount,LifecycleStatus,Note,SalesOrderID", {
+						+ "&$select=" + sSelect, {
 						GrossAmount : `${iBatchNo}`,
 						LifecycleStatus : "Y",
+						...(bMessages && {Messages : []}),
 						Note : "n/a",
 						SalesOrderID : "25"
 					})
@@ -24779,9 +24787,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						value : [{GrossAmount : `${2 * iBatchNo}`}]
 					})
 					.expectRequest(`#${iBatchNo} SalesOrderList('24')?sap-client=123&custom=foo`
-						+ "&$select=GrossAmount,LifecycleStatus,Note,SalesOrderID", {
+						+ "&$select=" + sSelect, {
 						GrossAmount : `${iBatchNo}`,
 						LifecycleStatus : "X",
+						...(bMessages && {Messages : []}),
 						Note : "n/a",
 						SalesOrderID : "24"
 					})
@@ -24805,10 +24814,60 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.strictEqual(oGrandTotalContext.getProperty("@$ui5.context.isOutdated"), false);
 			assert.strictEqual(oGrandTotalContext.isOutdated(), false);
 
-			that.expectChange("isOutdatedHeader", false);
+			expect(true);
 
-			// code under test (JIRA: CPOUI5ODATAV4-3392)
-			oHeaderContext.setOutdated(false); //TODO: Will be called by ODLB#reset
+			await Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3258)
+				oContext25.requestSideEffects([""]),
+				// code under test (JIRA: CPOUI5ODATAV4-3258)
+				oContext24.requestSideEffects([""]),
+				that.waitForChanges(assert, "requestSideEffects")
+			]);
+
+			that.expectRequest("#6 SalesOrderList('25')?sap-client=123&custom=foo"
+					+ "&$select=LifecycleStatus,Note", {
+					LifecycleStatus : "Y*",
+					Note : "Late*"
+				})
+				.expectRequest("#6 SalesOrderList?sap-client=123&custom=foo"
+					+ "&$apply=filter(LifecycleStatus gt 'P' and GrossAmount lt 100)"
+					+ "/search(covfefe)/aggregate(GrossAmount)", {
+					value : [{GrossAmount : "42"}]
+				})
+				.expectChange("lifecycleStatus", [, "Y*"])
+				.expectChange("grossAmount", ["42"]);
+
+			await Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3389)
+				oContext25.requestSideEffects(["LifecycleStatus"]),
+				oContext25.requestSideEffects(["Note", "NoteLanguage"]), // NoteLanguage ignored
+				that.waitForChanges(assert, "requestSideEffects - single property")
+			]);
+
+			assert.strictEqual(oContext25.getProperty("Note"), "Late*");
+
+			that.expectRequest("SalesOrderList?sap-client=123&custom=foo&$apply="
+					+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
+					+ "/concat(aggregate(GrossAmount)"
+					+ ",groupby((LifecycleStatus,SalesOrderID),aggregate(GrossAmount))"
+					+ "/orderby(LifecycleStatus desc)"
+					+ "/concat(aggregate($count as UI5__count),top(99)))", {
+					value : [
+						{GrossAmount : "5"},
+						{UI5__count : "2", "UI5__count@odata.type" : "#Decimal"},
+						{GrossAmount : "2", LifecycleStatus : "Y*", SalesOrderID : "25"},
+						{GrossAmount : "3", LifecycleStatus : "X", SalesOrderID : "24"}
+					]
+				})
+				.expectChange("isOutdated", [undefined,,, undefined])
+				.expectChange("grossAmount", ["5", "2", "3", "5"])
+				.expectChange("isOutdatedHeader", false);
+
+			await Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3392)
+				oHeaderContext.requestSideEffects([""]),
+				that.waitForChanges(assert, "requestSideEffects")
+			]);
 
 			assert.strictEqual(oHeaderContext.isOutdated(), false);
 			assert.strictEqual(oHeaderContext.getProperty("@$ui5.context.isOutdated"), false);
@@ -24818,18 +24877,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				$count : 2,
 				$selectionCount : 0
 			});
-
-			await that.waitForChanges(assert);
-
-			expect();
-
-			await Promise.all([
-				// code under test (JIRA: CPOUI5ODATAV4-3258)
-				oContext25.requestSideEffects([""]),
-				// code under test (JIRA: CPOUI5ODATAV4-3258)
-				oContext24.requestSideEffects(["LifecycleStatus"]),
-				that.waitForChanges(assert, "requestSideEffects")
-			]);
 		}).then(function () {
 			that.expectRequest("SalesOrderList?sap-client=123&$apply=groupby((LifecycleStatus))"
 					+ "&$count=true&$skip=0&$top=100", {
@@ -28107,6 +28154,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Binding-specific parameter $$aggregation is used; no visual grouping, but single
 	// entities with additional min/max: late properties are requested.
 	// JIRA: CPOUI5ODATAV4-3209
+	//
+	// The outdated flag at the header context is set when modifying a property.
+	// JIRA: CPOUI5ODATAV4-3392
 	QUnit.test("Data Aggregation: late properties with min/max", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -28157,7 +28207,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const oListBinding = this.oView.byId("table").getBinding("rows");
 		const [oContext] = oListBinding.getCurrentContexts();
 
-		return Promise.all([
+		await Promise.all([
 			// code under test (JIRA: CPOUI5ODATAV4-2756)
 			oContext.requestProperty("Industry").then(function (sIndustry) {
 				assert.strictEqual(sIndustry, "Late",
@@ -28165,6 +28215,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}),
 			this.waitForChanges(assert)
 		]);
+
+		assert.strictEqual(oListBinding.getHeaderContext().isOutdated(), undefined);
+
+		this.expectRequest("PATCH BusinessPartners(26)", {
+				payload : {Industry : "Modified"}
+			}, oNO_CONTENT);
+
+		// code under test - currently the outdated flag is always set after changing a property
+		//TODO: set only if the property is used e.g. in a filter
+		oContext.setProperty("Industry", "Modified");
+
+		await this.waitForChanges(assert);
+
+		assert.strictEqual(oListBinding.getHeaderContext().isOutdated(), true);
 	});
 
 	//*********************************************************************************************
@@ -32728,6 +32792,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// #setAggregation before resolving the ODLB (JIRA: CPOUI5ODATAV4-2408)
 	// Collapse root and then PATCH the kept-alive child (SNOW: DINC0702621)
 	// Request a side effect (not refresh!) and expand again (JIRA: CPOUI5ODATAV4-3311)
+	//
+	// Context#setProperty does not change the header context's outdated state in scenarios without
+	// data aggregation.
+	// JIRA: CPOUI5ODATAV4-3392
 	[false, true].forEach(function (bSuspended) {
 		var sTitle = "Recursive Hierarchy: getKeepAliveContext, suspended = " + bSuspended;
 
@@ -32923,6 +32991,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				return that.waitForChanges(assert, "PATCH");
 			}).then(function () {
+				// outdated state is used only with data aggregation (JIRA: CPOUI5ODATAV4-3392)
+				assert.strictEqual(oListBinding.getHeaderContext().isOutdated(), undefined);
+
 				that.expectRequest("EMPLOYEES?$select=ID,Name"
 						+ "&$filter=ID eq '1' or ID eq '3' or ID eq '4'&$top=3", {
 						value : [{

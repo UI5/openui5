@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html>
+	<head><meta charset="utf-8">
+		<link rel="stylesheet" href="./MIT.FilterBar.css">
+		<title>Manual Integration Test: Bound Filters</title>
+	</head>
+	<body>
+		<h1>Manual Integration Test: Bound Filters in a Filter Bar</h1>
+		<h2>DESCRIPTION</h2>
+		<p>
+			Test that the Bound Filters feature works correctly in a filter bar scenario.
+			The application shows a table of 15 team members with a filter bar toolbar. Filters are
+			split into two groups: <strong>Organizational</strong> (department prefix, location
+			prefix) and <strong>Personal</strong> (first name prefix, last name prefix).
+			A "Show Personal Filters" / "Show Organizational Filters" button toggles between the
+			two groups. Switching groups clears the now-hidden group's filter values so they
+			become inactive. All visible filters are applied instantly when a value is entered.
+		</p>
+
+		<p><strong>Automated Tests:</strong> All manual tests described here are automated in
+			<code>Opa.qunit.js</code>.</p>
+
+		<h2>PREPARATION</h2>
+		<p>
+			To check console errors open the developer tools before starting the application and
+			verify that there are no errors or warnings during any of the steps below.
+		</p>
+		<p>
+			Start the Bound Filters application. URL (adjust host and port if necessary):
+		</p>
+		<ul>
+			<li>as sample preview in the SDK:
+				http://&lt;host&gt;:&lt;port&gt;/sapui5-sdk-dist/#/sample/sap.ui.core.sample.BoundFilters.FilterBar/preview
+			</li>
+			<li>local:
+				<a href="http://localhost:8080/test-resources/sap/ui/core/demokit/sample/common/index.html?component=BoundFilters.FilterBar">
+					http://&lt;host&gt;:&lt;port&gt;/test-resources/sap/ui/core/demokit/sample/common/index.html?component=BoundFilters.FilterBar
+				</a>
+			</li>
+		</ul>
+
+		<h2>REALIZE and CHECK</h2>
+
+		<h3>Initial State</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>Step</th>
+					<th>Action</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Open the application.</td>
+					<td class="success">A table titled "Employees" is displayed. The filter bar shows
+						the organizational filters: Department prefix and Location prefix inputs are
+						empty. The "Show Personal Filters" button is visible on the right. All 15
+						team members are shown.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Instant Filter: Department prefix & Location prefix</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>Step</th>
+					<th>Action</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Type "Dev" in the Department prefix input. Press Enter.</td>
+					<td class="success">The table instantly updates and shows 7 rows:
+						all Development employees.</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>Type "Wal" in the Location prefix input. Press Enter.</td>
+					<td class="success">The table instantly updates and shows 2 rows:
+						all Development employees located in Walldorf.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Instant Filter: First name prefix & Last name prefix</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>Step</th>
+					<th>Action</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Click "Show Personal Filters".</td>
+					<td class="success">The organizational filter inputs (Department prefix, Location
+						prefix) are hidden and the personal filter inputs (First name prefix, Last
+						name prefix) appear. All 15 rows are shown. The button now reads
+						"Show Organizational Filters".</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>Type "J" in the First name prefix input. Press Enter.</td>
+					<td class="success">The table shows 4 rows with first names starting with "J".</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>Type "S" in the Last name prefix input. Press Enter.</td>
+					<td class="success">The table shows 1 rows with first names starting with "J"
+						and last names starting with "S".</td>
+				</tr>
+			</tbody>
+		</table>
+	</body>
+</html>

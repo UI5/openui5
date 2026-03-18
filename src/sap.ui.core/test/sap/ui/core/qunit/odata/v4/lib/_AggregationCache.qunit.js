@@ -401,8 +401,7 @@ sap.ui.define([
 				.callsFake(function () {
 					this.oFirstLevel = {
 						addKeptElement : "~addKeptElement~",
-						removeKeptElement : "~removeKeptElement~",
-						requestSideEffects : "~requestSideEffects~"
+						removeKeptElement : "~removeKeptElement~"
 					};
 					if (i === 2) {
 						oAggregation.$NodeProperty = "node/property";
@@ -433,7 +432,6 @@ sap.ui.define([
 			assert.strictEqual(oCache.iResetCount, 0);
 			assert.strictEqual(oCache.addKeptElement, "~addKeptElement~", "@borrows ...");
 			assert.strictEqual(oCache.removeKeptElement, "~removeKeptElement~", "@borrows ...");
-			assert.strictEqual(oCache.requestSideEffects, "~requestSideEffects~", "@borrows ...");
 			assert.strictEqual(oCache.isDeletingInOtherGroup(), false); // <-- code under test
 			assert.ok(oCache.oTreeState instanceof _TreeState);
 			assert.strictEqual(oCache.oTreeState.sNodeProperty, i === 2 ? "node/property" : undefined);
@@ -4644,6 +4642,31 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	[
+		["~oGroupLock~"],
+		["~oGroupLock~", "~foo~", "~bar~"]
+	].forEach((aArguments, i) => {
+		QUnit.test("requestSideEffects: #" + i, function (assert) {
+			const oAggregation = { // filled before by buildApply
+				aggregate : {foo : {grandTotal : true}},
+				groupLevels : [] /* data aggregation always has groupLevels */
+			};
+			const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
+			this.mock(oCache.oFirstLevel).expects("requestSideEffects").on(oCache)
+				.withExactArgs(...aArguments).returns("promise0");
+			this.mock(oCache).expects("readGrandTotal").withExactArgs("~oGroupLock~")
+				.returns("promise1");
+			this.mock(SyncPromise).expects("all").withExactArgs(["promise0", "promise1"])
+				.returns("~result~");
+
+			assert.strictEqual(
+				// code under test
+				oCache.requestSideEffects(...aArguments),
+				"~result~", "without a defined result");
+		});
+	});
+
+	//*********************************************************************************************
 	QUnit.test("replaceElement", function () {
 		const oCache
 			= _AggregationCache.create(this.oRequestor, "~", "", {}, {hierarchyQualifier : "X"});
@@ -5085,24 +5108,22 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("beforeRequestSideEffects: Missing recursive hierarchy", function (assert) {
-		var oAggregation = { // filled before by buildApply
-				aggregate : {},
-				group : {},
-				groupLevels : ["a"]
-			},
-			oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
-
-		assert.throws(function () {
-			// code under test
-			oCache.beforeRequestSideEffects({});
-		}, new Error("Missing recursive hierarchy"));
-	});
-
-	//*********************************************************************************************
 	[false, true].forEach(function (bIn) {
-		QUnit.test("beforeRequestSideEffects: NodeProperty already in = " + bIn, function (assert) {
-			var oAggregation = {
+		[false, true].forEach(function (bDataAggregation) {
+			const sTitle = "beforeRequestSideEffects: NodeProperty already in = " + bIn
+				+ ", data aggregation = " + bDataAggregation;
+			if (bIn && bDataAggregation) {
+				return;
+			}
+
+		QUnit.test(sTitle, function (assert) {
+			var oAggregation = bDataAggregation
+				? { // filled before by buildApply
+					aggregate : {},
+					group : {},
+					groupLevels : ["a"]
+				}
+				: {
 					hierarchyQualifier : "X",
 					$NodeProperty : "SomeNodeID"
 				},
@@ -5122,21 +5143,40 @@ sap.ui.define([
 			// code under test
 			oCache.beforeRequestSideEffects(mQueryOptions);
 
+			let aExpectedSelect = bIn ? ["Name", "SomeNodeID", "XYZ"] : ["Name", "XYZ", "SomeNodeID"];
+			if (bDataAggregation) {
+				aExpectedSelect = ["Name", "XYZ"];
+			}
 			assert.deepEqual(mQueryOptions, {
 				$count : true,
 				$expand : {EMPLOYEE_2_TEAM : null},
 				$filter : "age gt 40",
 				$orderby : "TEAM_ID desc",
 				$search : "OR",
-				$select : bIn ? ["Name", "SomeNodeID", "XYZ"] : ["Name", "XYZ", "SomeNodeID"],
+				$select : aExpectedSelect,
 				foo : "bar",
 				"sap-client" : "123"
 			}, "only $apply is dropped");
 		});
+		});
 	});
 
 	//*********************************************************************************************
-	QUnit.test("beforeUpdateSelected", function (assert) {
+	QUnit.test("beforeUpdateSelected: data aggregation", function () {
+		const oAggregation = { // filled before by buildApply
+			aggregate : {},
+			group : {},
+			groupLevels : ["a"]
+		};
+		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
+		this.mock(_AggregationHelper).expects("checkNodeProperty").never();
+
+		// code under test
+		oCache.beforeUpdateSelected("('A')", "~oNewValue~");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("beforeUpdateSelected: recursive hierarchy", function (assert) {
 		var oAggregation = {
 				hierarchyQualifier : "X",
 				$NodeProperty : "Some/NodeID"

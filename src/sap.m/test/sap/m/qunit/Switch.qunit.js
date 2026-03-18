@@ -320,7 +320,7 @@ sap.ui.define([
 		assert.strictEqual(oInfo.description, oBundle.getText("SWITCH_OFF") + ", " + oSwitch.getCustomTextOff(), "Description");
 		assert.strictEqual(oInfo.focusable, true, "Focusable");
 		assert.strictEqual(oInfo.enabled, true, "Enabled");
-		assert.ok(oInfo.editable === undefined || oInfo.editable === null, "Editable");
+		assert.strictEqual(oInfo.editable, true, "Editable");
 
 		oSwitch.setState(true);
 		oInfo = oSwitch.getAccessibilityInfo();
@@ -983,6 +983,42 @@ sap.ui.define([
 		assert.equal(oEvent.preventDefault.callCount, 1, "preventDefault is called to prevent scrolling");
 
 		// Cleanup
+		oSwitch.destroy();
+	});
+
+	QUnit.test("Acting on a read-only switch should not fire the change event", function (assert) {
+
+		// system under test
+		var oSwitch = new Switch({
+			state: false,
+			editable: false
+		});
+
+		// arrange
+		oSwitch.placeAt("content");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		var fnFireChangeSpy = this.spy(oSwitch, "fireChange");
+
+		// act - press ENTER on the read-only switch
+		qutils.triggerKeydown(oSwitch.getDomRef(), KeyCodes.ENTER);
+		this.clock.tick(1000);
+
+		// assert
+		assert.strictEqual(oSwitch.getState(), false, "The switch state should not change when read-only");
+		assert.strictEqual(fnFireChangeSpy.callCount, 0, "The change event should not be fired when the switch is read-only");
+
+		// act - make the switch editable and press ENTER again
+		oSwitch.setEditable(true);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		qutils.triggerKeydown(oSwitch.getDomRef(), KeyCodes.ENTER);
+		this.clock.tick(1000);
+
+		// assert
+		assert.strictEqual(oSwitch.getState(), true, "The switch state should change when editable");
+		assert.strictEqual(fnFireChangeSpy.callCount, 1, "The change event should be fired once when the switch is editable");
+
+		// cleanup
 		oSwitch.destroy();
 	});
 
