@@ -68,8 +68,11 @@ sap.ui.define([
 
 	QUnit.test("Formatting: nothing", (assert) => {
 
+		sinon.spy(oConditionsType._oConditionType, "formatValue");
 		const sResult = oConditionsType.formatValue();
 		assert.equal(sResult, null, "Result of formatting");
+		assert.ok(oConditionsType._oConditionType.formatValue.calledOnce, "formatValue of internal ConditionType called");
+		assert.ok(oConditionsType._oConditionType.formatValue.calledWith(null), "formatValue of internal ConditionType called with null");
 
 	});
 
@@ -185,11 +188,14 @@ sap.ui.define([
 
 	QUnit.test("Parsing: EQ - empty", (assert) => {
 
+		sinon.spy(oConditionsType._oConditionType, "parseValue");
 		const aConditions = oConditionsType.parseValue("");
 		assert.ok(aConditions, "Result returned");
 		assert.ok(Array.isArray(aConditions), "Arry returned");
 		assert.equal(aConditions.length, 0, "no conditions returned");
 		assert.notOk(bAsyncCalled, "asyncParsing function not called");
+		assert.ok(oConditionsType._oConditionType.parseValue.calledOnce, "parseValue of internal ConditionType called");
+		assert.ok(oConditionsType._oConditionType.parseValue.calledWith(""), "parseValue of internal ConditionType called with empty string");
 
 	});
 
