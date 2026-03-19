@@ -2067,7 +2067,8 @@ sap.ui.define([
 						}
 
 						if (!mTouchSessionData.initialScrolledToEnd) {
-							oVSb.scrollTop = mTouchSessionData.initialScrollTop - iTouchDistanceY;
+							const nSensitivityFactor = ScrollingHelper._getVerticalTouchScrollSensitivityFactor(this);
+							oVSb.scrollTop = mTouchSessionData.initialScrollTop - iTouchDistanceY * nSensitivityFactor;
 							bScrollingPerformed = true;
 							oScrollExtension._bTouchScroll = true;
 						}
@@ -2152,6 +2153,23 @@ sap.ui.define([
 		},
 
 		/**
+		 * Calculates a sensitivity factor for vertical touch scrolling that considers the total number of rows.
+		 *
+		 * In native scrolling, one pixel of touch movement scrolls one pixel of content. In the table, the scrollbar range may be compressed, so one
+		 * pixel of touch movement can scroll multiple rows. This factor corrects for that compression so that the perceived scrolling velocity
+		 * matches native behavior regardless of the total row count.
+		 *
+		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @returns {number} A factor between 0.001 and 1 to multiply the touch delta with.
+		 */
+		_getVerticalTouchScrollSensitivityFactor: function(oTable) {
+			const iBaseRowHeight = oTable._getBaseRowHeight();
+			const nScrollRangeRowFraction = VerticalScrollingHelper.getScrollRangeRowFraction(oTable);
+
+			return Math.max(0.001, Math.min(1, nScrollRangeRowFraction / iBaseRowHeight));
+		},
+
+		/**
 		 * Starts and manages the momentum scrolling animation.
 		 *
 		 * @param {sap.ui.table.extensions.Scrolling.EventListenerOptions} mOptions The options.
@@ -2169,6 +2187,7 @@ sap.ui.define([
 			const oScrollExtension = this._getScrollExtension();
 			const oHSb = oScrollExtension.getHorizontalScrollbar();
 			const oVSb = oScrollExtension.getVerticalScrollbar();
+			const nSensitivityFactor = ScrollingHelper._getVerticalTouchScrollSensitivityFactor(this);
 
 			// Deceleration parameters
 			const fDeceleration = 0.95; // Exponential decay factor (0-1, lower = faster stop)
@@ -2242,7 +2261,7 @@ sap.ui.define([
 						if (oVSb && (mOptions.scrollDirection === ScrollDirection.VERTICAL
 							|| mOptions.scrollDirection === ScrollDirection.BOTH)) {
 
-							const fNewScrollTop = oVSb.scrollTop - fDeltaY;
+							const fNewScrollTop = oVSb.scrollTop - fDeltaY * nSensitivityFactor;
 							const fMaxScrollTop = oVSb.scrollHeight - oVSb.clientHeight;
 
 							// Boundary check - stop at edges

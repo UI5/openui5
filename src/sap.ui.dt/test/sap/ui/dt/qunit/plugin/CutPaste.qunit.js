@@ -2,27 +2,36 @@
 
 sap.ui.define([
 	"sap/m/Button",
-	"sap/ui/layout/VerticalLayout",
+	"sap/m/CustomListItem",
+	"sap/m/List",
+	"sap/m/VBox",
+	"sap/ui/dt/plugin/CutPaste",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/OverlayRegistry",
-	"sap/ui/dt/plugin/CutPaste",
-	"sap/ui/Device",
 	"sap/ui/events/KeyCodes",
+	"sap/ui/layout/VerticalLayout",
+	"sap/ui/model/json/JSONModel",
+	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/thirdparty/sinon-4",
-	"sap/ui/test/utils/nextUIUpdate"
+	"sap/ui/Device"
 ],
 function(
 	Button,
-	VerticalLayout,
+	CustomListItem,
+	List,
+	VBox,
+	CutPaste,
 	DesignTime,
 	OverlayRegistry,
-	CutPaste,
-	Device,
 	KeyCodes,
+	VerticalLayout,
+	JSONModel,
+	nextUIUpdate,
 	sinon,
-	nextUIUpdate
+	Device
 ) {
 	"use strict";
+	const oSandbox = sinon.createSandbox();
 
 	function triggerKeydown(oTargetDomRef, iKeyCode, bShiftKey, bAltKey, bCtrlKey, bMetaKey) {
 		const oEvent = new KeyboardEvent("keydown", {
@@ -58,7 +67,6 @@ function(
 			this.oLayout.placeAt("qunit-fixture");
 			await nextUIUpdate();
 
-			await nextUIUpdate();
 			this.oCutPaste = new CutPaste({
 				movableTypes: [
 					"sap.m.Button"
@@ -176,6 +184,122 @@ function(
 			assert.equal(aContent.indexOf(this.oButton2), 1, "the second Button is at position 1");
 			assert.equal(aContent.indexOf(this.oButton3), 2, "the third Button is at position 2");
 			assert.equal(oPasteSpy.callCount, 0, "then the paste function was not called");
+		});
+	});
+
+	QUnit.module("Given a control with a template containing multiple containers", {
+		async beforeEach(assert) {
+			const fnDone = assert.async();
+
+			const oModel = new JSONModel({
+				texts: [
+					{ text1: "Text 1", text2: "More Text 1", text3: "Even More Text 1" },
+					{ text1: "Text 2", text2: "More Text 2", text3: "Even More Text 2" },
+					{ text1: "Text 3", text2: "More Text 3", text3: "Even More Text 3" }
+				]
+			});
+			this.oButton1 = new Button("text1", { text: "{text1}" });
+			this.oButton3 = new Button("text3", { text: "{text3}" });
+			this.oItemTemplate = new CustomListItem("item", {
+				content: new VBox("vbox1", {
+					items: [
+						new VBox("vbox2", {
+							items: [
+								new VBox("vbox31", {
+									items: [
+										this.oButton1,
+										new Button("text2", { text: "{text2}" })
+									]
+								}),
+								new VBox("vbox32", {
+									items: [
+										this.oButton3
+									]
+								})
+							]
+						})
+					]
+				})
+			});
+			this.oList = new List("list", {
+				items: {
+					path: "/texts",
+					template: this.oItemTemplate,
+					templateShareable: true
+				}
+			}).setModel(oModel);
+
+			this.oList.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oCutPaste = new CutPaste({
+				movableTypes: [
+					"sap.m.Button"
+				]
+			});
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [
+					this.oList
+				],
+				plugins: [
+					this.oCutPaste
+				]
+			});
+
+			this.oDesignTime.attachEventOnce("synced", fnDone);
+		},
+		afterEach() {
+			oSandbox.restore();
+			this.oList.destroy();
+			this.oItemTemplate.destroy();
+			this.oCutPaste.destroy();
+			this.oDesignTime.destroy();
+		}
+	}, function() {
+		QUnit.test("When a control is pasted on another container", function(assert) {
+			const fnDone = assert.async();
+			const [oVBox1, oVBox2] = this.oList.getItems()[1].getContent()[0].getItems()[0].getItems();
+			const [oButton1] = oVBox1.getItems();
+			const oButton1Overlay = OverlayRegistry.getOverlay(oButton1);
+			const oVBox2Overlay = OverlayRegistry.getOverlay(oVBox2);
+			const oSetSpy = oSandbox.spy(oButton1Overlay, "setOngoingMoveInformation");
+			const oResetSpy = oSandbox.spy(oButton1Overlay, "resetOngoingMoveInformation");
+			triggerKeydown(oButton1Overlay.getDomRef(), KeyCodes.X, false, false, true, false);
+
+			this.oCutPaste.getElementMover().attachValidTargetZonesActivated(() => {
+				triggerKeydown(oVBox2Overlay.getDomRef(), KeyCodes.V, false, false, true, false);
+
+				assert.strictEqual(oSetSpy.callCount, 1, "then the setOngoingMoveInformation function was called once");
+				assert.deepEqual(oSetSpy.firstCall.args[0], {
+					sourceParentInstance: oVBox1
+				}, "then the setOngoingMoveInformation function was called with the correct move information");
+				assert.strictEqual(oResetSpy.callCount, 1, "then the resetOngoingMoveInformation function was called once");
+				fnDone();
+			});
+		});
+
+		QUnit.test("When a control is pasted on an element in another container", function(assert) {
+			const fnDone = assert.async();
+			const [oVBox1, oVBox2] = this.oList.getItems()[1].getContent()[0].getItems()[0].getItems();
+			const [oButton1] = oVBox1.getItems();
+			const oButton1Overlay = OverlayRegistry.getOverlay(oButton1);
+			const [oButton3] = oVBox2.getItems();
+			const oButton3Overlay = OverlayRegistry.getOverlay(oButton3);
+			const oSetSpy = oSandbox.spy(oButton1Overlay, "setOngoingMoveInformation");
+			const oResetSpy = oSandbox.spy(oButton1Overlay, "resetOngoingMoveInformation");
+			triggerKeydown(oButton1Overlay.getDomRef(), KeyCodes.X, false, false, true, false);
+
+			this.oCutPaste.getElementMover().attachValidTargetZonesActivated(() => {
+				triggerKeydown(oButton3Overlay.getDomRef(), KeyCodes.V, false, false, true, false);
+
+				assert.strictEqual(oSetSpy.callCount, 1, "then the setOngoingMoveInformation function was called once");
+				assert.deepEqual(oSetSpy.firstCall.args[0], {
+					sourceParentInstance: oVBox1
+				}, "then the setOngoingMoveInformation function was called with the correct move information");
+				assert.strictEqual(oResetSpy.callCount, 1, "then the resetOngoingMoveInformation function was called once");
+				fnDone();
+			});
 		});
 	});
 

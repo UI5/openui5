@@ -3298,13 +3298,14 @@ sap.ui.define([
 		Device.support.pointer = false;
 		Device.support.touch = true;
 
-		const iBindingLength = 1000000000;
+		const iBindingLength = 100000000;
 		const oTable = this.createTable({
 			bindingLength: iBindingLength
 		});
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength);
 		const iRowsPerPixel = iMaxFirstVisibleRow / iMaxScrollTop;
+		const nSensitivityFactor = 0.001; // The minimum sensitivity factor that is applied for large data is 0.001
 
 		function scrollWithTouch(iScrollDelta) {
 			return function() {
@@ -3316,22 +3317,19 @@ sap.ui.define([
 		return oTable.qunit.whenRenderingFinished().then(function() {
 			oTable.qunit.preventFocusOnTouch();
 			TableQUnitUtils.startTouchScrolling(oTable.qunit.getDataCell(0, 0));
-		}).then(scrollWithTouch(1)).then(function() {
-			that.assertPosition(assert, Math.floor(iRowsPerPixel), 1, 0, "Scrolled 1 pixel down");
-		}).then(scrollWithTouch(48)).then(function() {
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * 49), 49, 0, "Scrolled 48 pixels down");
-		}).then(scrollWithTouch(500000)).then(function() {
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * 500049), 500049, 0, "Scrolled 500000 pixels down");
-		}).then(scrollWithTouch(-500050, true, "Scrolled to the top")).then(function() {
-			that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
-		}).then(scrollWithTouch(iMaxScrollTop + 2, true, "Scrolled to the bottom")).then(function() {
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
-		}).then(scrollWithTouch(-2)).then(function() {
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 1)), iMaxScrollTop - 1, 0, "Scrolled 1 pixel up");
-		}).then(scrollWithTouch(-48)).then(function() {
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 49)), iMaxScrollTop - 49, 0, "Scrolled 48 pixels up");
+		}).then(scrollWithTouch(500)).then(function() {
+			that.assertPosition(assert, Math.floor(iRowsPerPixel * 1), 1, 0, "Scrolled 500 pixels down");
+		}).then(scrollWithTouch(499500)).then(function() {
+			that.assertPosition(assert, Math.floor(iRowsPerPixel * 500), 500, 0, "Scrolled 499000 pixels down");
 		}).then(scrollWithTouch(-500000)).then(function() {
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 500049)), iMaxScrollTop - 500049, 0,
+			that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
+		}).then(scrollWithTouch((iMaxScrollTop + 20) / nSensitivityFactor)).then(function() {
+			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
+		}).then(scrollWithTouch(-50000)).then(function() {
+			that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 30)), iMaxScrollTop - 30, 0,
+				"Scrolled 50000 pixels up");
+		}).then(scrollWithTouch(-500000)).then(function() {
+			that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 530)), iMaxScrollTop - 530, 0,
 				"Scrolled 500000 pixels up");
 		}).then(function() {
 			TableQUnitUtils.endTouchScrolling();
@@ -3349,14 +3347,22 @@ sap.ui.define([
 		Device.support.pointer = false;
 		Device.support.touch = true;
 
-		const iBindingLength = 1000000000;
+		const iBindingLength = 100000000;
 		const oTable = this.createTable({
 			bindingLength: iBindingLength,
 			_bVariableRowHeightEnabled: true
 		});
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength, true);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength, true);
+		const nSensitivityFactor = 0.001; // The minimum sensitivity factor that is applied for large data is 0.001
 
+		// For variable row heights, the scroll range without buffer determines the non-buffer row mapping.
+		// buffer = VERTICAL_OVERFLOW_BUFFER_LENGTH(2) * iBaseRowHeight(49) = 98
+		const iScrollRangeWithoutBuffer = iMaxScrollTop - 98;
+		const iVirtualRowCount = iBindingLength - 10; // _fullsize = 10
+		const nScrollRangeRowFraction = iScrollRangeWithoutBuffer / iVirtualRowCount;
+
+		// Touch deltas are multiplied by the sensitivity factor to obtain the effective scrollbar position.
 		function scrollWithTouch(iScrollDelta) {
 			return function() {
 				TableQUnitUtils.doTouchScrolling(0, iScrollDelta);
@@ -3367,22 +3373,24 @@ sap.ui.define([
 		return oTable.qunit.whenRenderingFinished().then(function() {
 			oTable.qunit.preventFocusOnTouch();
 			TableQUnitUtils.startTouchScrolling(oTable.qunit.getDataCell(0, 0));
-		}).then(scrollWithTouch(1)).then(function() {
-			that.assertPosition(assert, 1000, 1, 29, "Scrolled 1 pixel down");
-		}).then(scrollWithTouch(48)).then(function() {
-			that.assertPosition(assert, 49028, 49, 41, "Scrolled 48 pixels down");
-		}).then(scrollWithTouch(500000)).then(function() {
-			that.assertPosition(assert, 500343196, 500049, 39, "Scrolled 500000 pixels down");
-		}).then(scrollWithTouch(-500050, true, "Scrolled to the top")).then(function() {
+		}).then(scrollWithTouch(500)).then(function() {
+			that.assertPosition(assert, Math.floor(1 / nScrollRangeRowFraction), 1, 3, "Scrolled 500 pixels down");
+		}).then(scrollWithTouch(48000)).then(function() {
+			that.assertPosition(assert, Math.floor(49 / nScrollRangeRowFraction), 49, 43, "Scrolled 48000 pixels down");
+		}).then(scrollWithTouch(500000000)).then(function() {
+			that.assertPosition(assert, Math.floor(500049 / nScrollRangeRowFraction), 500049, 27, "Scrolled 500000000 pixels down");
+		}).then(scrollWithTouch(-500050000)).then(function() {
 			that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
-		}).then(scrollWithTouch(iMaxScrollTop + 2, true, "Scrolled to the bottom")).then(function() {
+		}).then(scrollWithTouch((iMaxScrollTop + 2) / nSensitivityFactor)).then(function() {
 			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "Scrolled to the bottom");
-		}).then(scrollWithTouch(-2)).then(function() {
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, "Scrolled 1 pixel up");
-		}).then(scrollWithTouch(-48)).then(function() {
-			that.assertPosition(assert, 999999991, iMaxScrollTop - 49, 328, "Scrolled 48 pixels up");
-		}).then(scrollWithTouch(-500000)).then(function() {
-			that.assertPosition(assert, 499754850, iMaxScrollTop - 500049, 42, "Scrolled 500000 pixels up");
+		}).then(scrollWithTouch(-2000)).then(function() {
+			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, "Scrolled 2000 pixels up");
+		}).then(scrollWithTouch(-48000)).then(function() {
+			that.assertPosition(assert, iMaxFirstVisibleRow - 4, iMaxScrollTop - 49, 328, "Scrolled 48000 pixels up");
+		}).then(scrollWithTouch(-500000000)).then(function() {
+
+			that.assertPosition(assert, Math.floor((iMaxScrollTop - 500049) / nScrollRangeRowFraction), iMaxScrollTop - 500049, 29,
+				"Scrolled 500000000 pixels up");
 		}).then(function() {
 			TableQUnitUtils.endTouchScrolling();
 		}).finally(function() {

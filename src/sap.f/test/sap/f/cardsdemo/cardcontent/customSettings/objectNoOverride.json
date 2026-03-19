@@ -1,0 +1,69 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "test.card.customSettings.objectNoOverride",
+		"type": "card",
+		"title": "Card 'objectNoOverride'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"header": {
+			"title": "Custom Settings - Objects Without Override",
+			"subtitle": "SDK objects used directly with bindings, no manifest overrides"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "API Config (SDK Object - Not Overridden)",
+					"items": [
+						{
+							"label": "Endpoint",
+							"value": "{customSettings>/apiConfig/endpoint}"
+						},
+						{
+							"label": "Timeout (ms)",
+							"value": "{customSettings>/apiConfig/timeout}"
+						},
+						{
+							"label": "Retries",
+							"value": "{customSettings>/apiConfig/retries}"
+						}
+					]
+				},
+				{
+					"title": "Features Array (SDK - Not Overridden)",
+					"items": [
+						{
+							"label": "First Feature",
+							"value": "{customSettings>/features/0}"
+						},
+						{
+							"label": "Second Feature",
+							"value": "{customSettings>/features/1}"
+						}
+					]
+				},
+				{
+					"title": "Expected Results",
+					"items": [
+						{
+							"label": "Note 1",
+							"value": "All values come from SDK (no manifest overrides)"
+						},
+						{
+							"label": "Note 2",
+							"value": "Demonstrates nested object bindings work correctly"
+						},
+						{
+							"label": "Note 3",
+							"value": "Demonstrates array index bindings work correctly"
+						}
+					]
+				}
+			]
+		}
+	}
+}

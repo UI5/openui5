@@ -52,7 +52,7 @@ sap.ui.define([
 		...aDomRendererMethods
 	];
 
-	var aNonRendererFunctions = ["render", "flush", "destroy"];
+	var aNonRendererFunctions = ["render", "flush", "renderAndFlush", "destroy"];
 
 	QUnit.test("Full Interface", function(assert) {
 		var rm = new RenderManager().getInterface();
@@ -439,6 +439,180 @@ sap.ui.define([
 		this.oRM.openEnd();
 
 		assert.ok(true, "No error should be thrown");
+	});
+
+	// Custom control for testing namespace() method with MathML
+	const MathMLControl = Control.extend("MathMLControl", {
+		renderer: {
+			apiVersion: 2,
+			render: function(oRM, oControl) {
+				oRM.openStart("div", oControl);
+				oRM.openEnd();
+
+				// Render HTML heading
+				oRM.openStart("h3").openEnd();
+				oRM.text("Matrix");
+				oRM.close("h3");
+
+				oRM.openStart("math").openEnd();
+
+				// Matrix row container
+				oRM.openStart("mrow").openEnd();
+
+				// Opening bracket
+				oRM.openStart("mo").openEnd();
+				oRM.text("[");
+				oRM.close("mo");
+
+				// Matrix table
+				oRM.openStart("mtable").openEnd();
+
+				// First row
+				oRM.openStart("mtr").openEnd();
+				oRM.openStart("mtd").openEnd();
+				oRM.openStart("mn").openEnd();
+				oRM.text("1");
+				oRM.close("mn");
+				oRM.close("mtd");
+				oRM.openStart("mtd").openEnd();
+				oRM.openStart("mn").openEnd();
+				oRM.text("2");
+				oRM.close("mn");
+				oRM.close("mtd");
+				oRM.close("mtr");
+
+				// Second row
+				oRM.openStart("mtr").openEnd();
+				oRM.openStart("mtd").openEnd();
+				oRM.openStart("mn").openEnd();
+				oRM.text("3");
+				oRM.close("mn");
+				oRM.close("mtd");
+				oRM.openStart("mtd").openEnd();
+				oRM.openStart("mn").openEnd();
+				oRM.text("4");
+				oRM.close("mn");
+				oRM.close("mtd");
+				oRM.close("mtr");
+
+				oRM.close("mtable");
+
+				// Closing bracket
+				oRM.openStart("mo").openEnd();
+				oRM.text("]");
+				oRM.close("mo");
+
+				oRM.close("mrow");
+				oRM.close("math");
+
+				oRM.openStart("div").attr("class", "footer").openEnd();
+				oRM.text("Additional HTML content after MathML");
+				oRM.close("div");
+
+				oRM.close("div");
+			}
+		}
+	});
+
+	// Custom control for testing SVG namespace
+	const SVGControl = Control.extend("SVGControl", {
+		renderer: {
+			apiVersion: 2,
+			render: function(oRM, oControl) {
+				oRM.openStart("div", oControl).openEnd();
+
+				// Render HTML heading
+				oRM.openStart("h3").openEnd();
+				oRM.text("SVG Example");
+				oRM.close("h3");
+
+				oRM.openStart("svg").attr("width", "200").attr("height", "200").openEnd();
+
+				oRM.openStart("circle").attr("cx", "100").attr("cy", "100").attr("r", "50").openEnd();
+				oRM.close("circle");
+
+				oRM.openStart("rect").attr("x", "10").attr("y", "10").attr("width", "50").attr("height", "50").openEnd();
+				oRM.close("rect");
+
+				oRM.close("svg");
+
+				oRM.close("div");
+			}
+		}
+	});
+
+	QUnit.module("Namespace handling for foreign elements", {
+		beforeEach: function() {
+			this.container = document.createElement("div");
+			document.body.appendChild(this.container);
+		},
+		afterEach: function() {
+			document.body.removeChild(this.container);
+		}
+	});
+
+	QUnit.test("Namespace handling - MathML control rendering", async function(assert) {
+		const oControl = new MathMLControl();
+		oControl.placeAt(this.container);
+		await nextUIUpdate();
+
+		// Verify the MathML element was created with correct namespace
+		const oMath = oControl.getDomRef().querySelector("math");
+		assert.ok(oMath, "MathML element created");
+		assert.equal(oMath.namespaceURI, "http://www.w3.org/1998/Math/MathML", "MathML element has correct namespace");
+
+		// Verify MathML children have correct namespace
+		const oMrow = oMath.querySelector("mrow");
+		assert.ok(oMrow, "MathML mrow element created");
+		assert.equal(oMrow.namespaceURI, "http://www.w3.org/1998/Math/MathML", "MathML mrow inherits correct namespace");
+
+		const oMtable = oMath.querySelector("mtable");
+		assert.ok(oMtable, "MathML mtable element created");
+		assert.equal(oMtable.namespaceURI, "http://www.w3.org/1998/Math/MathML", "MathML mtable inherits correct namespace");
+
+		const oMo = oMath.querySelector("mo");
+		assert.ok(oMo, "MathML mo element created");
+		assert.equal(oMo.namespaceURI, "http://www.w3.org/1998/Math/MathML", "MathML mo inherits correct namespace");
+
+		// Verify HTML elements within MathML control
+		const oH3 = oControl.getDomRef().querySelector("h3");
+		assert.ok(oH3, "HTML h3 element created");
+		assert.equal(oH3.namespaceURI, "http://www.w3.org/1999/xhtml", "HTML element has HTML namespace");
+
+		// Verify footer div is created after namespace reset with namespace(null)
+		const oFooterDiv = oControl.getDomRef().querySelector("div.footer");
+		assert.ok(oFooterDiv, "Footer div created after namespace reset");
+		assert.equal(oFooterDiv.namespaceURI, "http://www.w3.org/1999/xhtml", "Footer div has HTML namespace");
+		assert.equal(oFooterDiv.textContent, "Additional HTML content after MathML", "Footer div has correct text content");
+
+		oControl.destroy();
+	});
+
+	QUnit.test("RenderManager.namespace - SVG control rendering", async function(assert) {
+		const oControl = new SVGControl();
+		oControl.placeAt(this.container);
+		await nextUIUpdate();
+
+		// Verify SVG element was created with correct namespace
+		const oSvg = oControl.getDomRef().querySelector("svg");
+		assert.ok(oSvg, "SVG element created");
+		assert.equal(oSvg.namespaceURI, "http://www.w3.org/2000/svg", "SVG element has correct namespace");
+
+		// Verify SVG child elements inherit namespace
+		const oCircle = oSvg.querySelector("circle");
+		assert.ok(oCircle, "SVG circle element created");
+		assert.equal(oCircle.namespaceURI, "http://www.w3.org/2000/svg", "SVG circle inherits correct namespace");
+
+		const oRect = oSvg.querySelector("rect");
+		assert.ok(oRect, "SVG rect element created");
+		assert.equal(oRect.namespaceURI, "http://www.w3.org/2000/svg", "SVG rect inherits correct namespace");
+
+		// Verify HTML elements outside SVG
+		const oH3 = oControl.getDomRef().querySelector("h3");
+		assert.ok(oH3, "HTML h3 element created");
+		assert.equal(oH3.namespaceURI, "http://www.w3.org/1999/xhtml", "HTML element has HTML namespace");
+
+		oControl.destroy();
 	});
 
 	QUnit.module("RenderManager.prototype.icon");
@@ -989,5 +1163,88 @@ sap.ui.define([
 			"HTML2 has DOM, and is not preserved");
 		assert.equal(oHtml2.$().children().length, 4,
 			"Modifications to HTML2 still are present");
+	});
+
+	QUnit.module("Manual RenderManager with SVG/MathML namespace", {
+		before: function() {
+			this.oContainer = document.getElementById("qunit-fixture");
+		}
+	});
+
+	QUnit.test("Manual RenderManager - SVG shapes with automatic namespace", function(assert) {
+		const oRm = new RenderManager().getInterface();
+		const aDomInterfaceMethods = [...aCommonMethods, ...aDomRendererMethods];
+
+		const oSvgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		oSvgContainer.setAttribute("viewBox", "0 0 100 100");
+		this.oContainer.appendChild(oSvgContainer);
+
+		oRm.renderAndFlush(function(rm) {
+			assert.deepEqual(
+				getEnumerableKeys(rm).sort(),
+				aDomInterfaceMethods.sort(),
+				"Interface given to the callback of renderAndFlush should contain exactly the expected methods");
+			rm.openStart("circle")
+				.attr("cx", "50")
+				.attr("cy", "50")
+				.attr("r", "40")
+			.openEnd()
+			.close("circle")
+			.openStart("rect")
+				.attr("x", "10")
+				.attr("y", "10")
+				.attr("width", "20")
+				.attr("height", "20")
+			.openEnd()
+			.close("rect");
+		}, oSvgContainer);
+
+		// Verify children inherit the SVG namespace
+		const oCircle = oSvgContainer.querySelector("circle");
+		assert.ok(oCircle, "Circle element exists");
+		assert.equal(oCircle.namespaceURI, "http://www.w3.org/2000/svg", "Circle inherits SVG namespace");
+
+		const oRect = oSvgContainer.querySelector("rect");
+		assert.ok(oRect, "Rect element exists");
+		assert.equal(oRect.namespaceURI, "http://www.w3.org/2000/svg", "Rect inherits SVG namespace");
+
+		oSvgContainer.remove();
+		oRm.destroy();
+	});
+
+	QUnit.test("Manual RenderManager - MathML with automatic namespace", function(assert) {
+		const oRm = new RenderManager().getInterface();
+
+		const oMathContainer = document.createElementNS("http://www.w3.org/1998/Math/MathML", "math");
+		this.oContainer.appendChild(oMathContainer);
+
+		oRm.renderAndFlush(function(rm) {
+			rm.openStart("mrow")
+				.openEnd()
+				.openStart("mi")
+				.openEnd()
+					.text("x")
+				.close("mi")
+				.openStart("mo")
+				.openEnd()
+					.text("+")
+				.close("mo")
+				.openStart("mn")
+				.openEnd()
+					.text("2")
+				.close("mn")
+				.close("mrow");
+		}, oMathContainer);
+
+		const oMrow = oMathContainer.querySelector("mrow");
+		assert.ok(oMrow, "MRow element exists");
+		assert.equal(oMrow.namespaceURI, "http://www.w3.org/1998/Math/MathML", "MRow inherits MathML namespace");
+
+		const oMi = oMathContainer.querySelector("mi");
+		assert.ok(oMi, "Mi element exists");
+		assert.equal(oMi.namespaceURI, "http://www.w3.org/1998/Math/MathML", "Mi inherits MathML namespace");
+
+		oMathContainer.remove();
+		oRm.destroy();
 	});
 });

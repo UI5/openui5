@@ -1,0 +1,93 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "test.card.customSettings.objectOverride",
+		"type": "card",
+		"title": "Card 'objectOverride'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"customSettings": {
+			"theme": {
+				"primaryColor": "#ff6b6b",
+				"secondaryColor": "#28a745",
+				"fontSize": 16
+			},
+			"metadata": {
+				"version": "2.0.0",
+				"author": "Manifest"
+			}
+		},
+		"header": {
+			"title": "Custom Settings - Object Property Override",
+			"subtitle": "Manifest overrides specific properties in SDK objects"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Theme Object - Partially Overridden",
+					"items": [
+						{
+							"label": "Primary Color",
+							"value": "{customSettings>/theme/primaryColor}",
+							"icon": {
+								"src": "sap-icon://palette"
+							}
+						},
+						{
+							"label": "Secondary Color",
+							"value": "{customSettings>/theme/secondaryColor}",
+							"icon": {
+								"src": "sap-icon://palette"
+							}
+						},
+						{
+							"label": "Font Size",
+							"value": "{customSettings>/theme/fontSize}",
+							"icon": {
+								"src": "sap-icon://text-formatting"
+							}
+						}
+					]
+				},
+				{
+					"title": "Metadata Object - Partially Overridden",
+					"items": [
+						{
+							"label": "Version",
+							"value": "{customSettings>/metadata/version}"
+						},
+						{
+							"label": "Author",
+							"value": "{customSettings>/metadata/author}"
+						}
+					]
+				},
+				{
+					"title": "Expected Results",
+					"items": [
+						{
+							"label": "Note 1",
+							"value": "SHALLOW MERGE: Entire objects replaced at property level"
+						},
+						{
+							"label": "Note 2",
+							"value": "Theme: Completely replaced by manifest (all 3 props from manifest)"
+						},
+						{
+							"label": "Note 3",
+							"value": "Metadata: Completely replaced by manifest (both props from manifest)"
+						},
+						{
+							"label": "Note 4",
+							"value": "SDK nested properties NOT preserved when manifest provides same key"
+						}
+					]
+				}
+			]
+		}
+	}
+}

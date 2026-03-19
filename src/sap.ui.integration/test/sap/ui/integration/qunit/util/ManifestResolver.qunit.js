@@ -4564,4 +4564,358 @@ sap.ui.define([
 		oCard.destroy();
 	});
 
+	QUnit.module("Resolve customSettings");
+
+	QUnit.test("Resolves simple bindings from manifest only", function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.skeleton.customsettings.manifestonly"
+			},
+			"sap.card": {
+				"type": "Object",
+				"customSettings": {
+					"theme": {
+						"primaryColor": "#ff0000",
+						"fontSize": 16
+					},
+					"headerText": {
+						"headerSubtitle": "Object Subtitle"
+					},
+					"features": ["feature1", "feature2"]
+				},
+				"header": {
+					"title": "SkeletonCard CustomSettings Test",
+					"subtitle": "{customSettings>/headerText/headerSubtitle}",
+					"status": {
+						"text": "{customSettings>/features/0}"
+					}
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Settings",
+							"items": [
+								{
+									"label": "Primary Color",
+									"value": "{customSettings>/theme/primaryColor}"
+								},
+								{
+									"label": "Font Size",
+									"value": "{customSettings>/theme/fontSize}"
+								},
+								{
+									"label": "First Feature",
+									"value": "{customSettings>/features/0}"
+								}
+							]
+						}
+					]
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+		});
+
+		// Act
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oResolvedManifest) {
+				const oHeader = oResolvedManifest["sap.card"].header;
+				const oContent = oResolvedManifest["sap.card"].content;
+
+				// Assert
+				assert.strictEqual(oHeader.subTitle, "Object Subtitle", "Object binding in header resolved");
+				assert.strictEqual(oHeader.status.text, "feature1", "Array binding in header resolved");
+				assert.strictEqual(oContent.groups[0].items[0].value, "#ff0000", "Nested object binding resolved");
+				assert.strictEqual(oContent.groups[0].items[1].value, 16, "Nested object binding for number resolved");
+				assert.strictEqual(oContent.groups[0].items[2].value, "feature1", "Array index binding resolved");
+
+				oCard.destroy();
+			});
+	});
+
+	QUnit.test("Resolves bindings with property and manifest merge", function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.skeleton.customsettings.merge"
+			},
+			"sap.card": {
+				"type": "Object",
+				"customSettings": {
+					"theme": {
+						"primaryColor": "#ff0000"
+					}
+				},
+				"header": {
+					"title": "Merge Test",
+					"subtitle": "{customSettings>/theme/primaryColor}"
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Settings",
+							"items": [
+								{
+									"label": "Primary (manifest)",
+									"value": "{customSettings>/theme/primaryColor}"
+								},
+								{
+									"label": "Property Setting",
+									"value": "{customSettings>/propertyOnlySetting}"
+								}
+							]
+						}
+					]
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+		});
+
+		oCard.setProperty("customSettings", {
+			theme: {
+				primaryColor: "#007bff",
+				secondaryColor: "#6c757d"
+			},
+			propertyOnlySetting: "Property value"
+		});
+
+		// Act
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oResolvedManifest) {
+				const oHeader = oResolvedManifest["sap.card"].header;
+				const oContent = oResolvedManifest["sap.card"].content;
+				const oCustomSettings = oResolvedManifest["sap.card"].customSettings;
+
+				// Assert
+				assert.strictEqual(oHeader.subTitle, "#ff0000", "Binding resolved to manifest value (overrides property)");
+				assert.strictEqual(oContent.groups[0].items[0].value, "#ff0000", "Manifest override applied");
+				assert.strictEqual(oContent.groups[0].items[1].value, "Property value", "Property-only setting preserved and resolved");
+				assert.strictEqual(oCustomSettings.theme.primaryColor, "#ff0000", "Manifest theme present");
+				assert.strictEqual(oCustomSettings.theme.secondaryColor, undefined, "Property secondaryColor lost (shallow merge)");
+				assert.strictEqual(oCustomSettings.propertyOnlySetting, "Property value", "Property-only setting preserved");
+
+				oCard.destroy();
+			});
+	});
+
+	QUnit.test("Resolves visibility expression bindings", function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.skeleton.customsettings.visibility"
+			},
+			"sap.card": {
+				"type": "Object",
+				"customSettings": {
+					"showHeader": true
+				},
+				"header": {
+					"title": "Visibility Test",
+					"subTitle": "Header is visible",
+					"visible": "{= ${customSettings>/showHeader} === true}"
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Status",
+							"items": [
+								{
+									"label": "Result",
+									"value": "{= ${customSettings>/showHeader} ? 'Visible' : 'Hidden'}"
+								}
+							]
+						}
+					]
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+		});
+
+		// Act
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oResolvedManifest) {
+				const oHeader = oResolvedManifest["sap.card"].header;
+				const oContent = oResolvedManifest["sap.card"].content;
+
+				// Assert
+				assert.strictEqual(oHeader.visible, true, "Header visibility expression resolved");
+				assert.strictEqual(oContent.groups[0].items[0].value, "Visible", "Ternary expression resolved");
+
+				oCard.destroy();
+			});
+	});
+
+	QUnit.test("Resolves complex expression bindings", function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.skeleton.customsettings.expressions"
+			},
+			"sap.card": {
+				"type": "Object",
+				"customSettings": {
+					"minValue": 25,
+					"maxValue": 100,
+					"prefix": "Range: "
+				},
+				"header": {
+					"title": "Expression Test",
+					"subTitle": "{= ${customSettings>/prefix} + ${customSettings>/minValue} + ' - ' + ${customSettings>/maxValue}}"
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Calculations",
+							"items": [
+								{
+									"label": "Concatenation",
+									"value": "{= ${customSettings>/prefix} + ${customSettings>/minValue}}"
+								},
+								{
+									"label": "Math",
+									"value": "{= ${customSettings>/minValue} + ${customSettings>/maxValue}}"
+								}
+							]
+						}
+					]
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+		});
+
+		oCard.setProperty("customSettings", {
+			minValue: 10,
+			maxValue: 50
+		});
+
+		// Act
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oResolvedManifest) {
+				const oHeader = oResolvedManifest["sap.card"].header;
+				const oContent = oResolvedManifest["sap.card"].content;
+
+				// Assert
+				assert.strictEqual(oHeader.subTitle, "Range: 25 - 100", "Complex string concatenation expression resolved");
+				assert.strictEqual(oContent.groups[0].items[0].value, "Range: 25", "Expression with concatenation resolved");
+				assert.strictEqual(oContent.groups[0].items[1].value, 125, "Math expression resolved");
+
+				oCard.destroy();
+			});
+	});
+
+	QUnit.test("Resolves bindings with property settings only", function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.skeleton.customsettings.propertyonly"
+			},
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"title": "Property Settings Only Test",
+					"subTitle": "{customSettings>/subtitle}",
+					"visible": "{= ${customSettings>/showHeader} === true}"
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Property Values",
+							"items": [
+								{
+									"label": "Setting",
+									"value": "{customSettings>/propertyValue}"
+								}
+							]
+						}
+					]
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+		});
+
+		oCard.setProperty("customSettings", {
+			showHeader: true,
+			subtitle: "From property",
+			propertyValue: "Property-provided value"
+		});
+
+		// Act
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oResolvedManifest) {
+				const oHeader = oResolvedManifest["sap.card"].header;
+				const oContent = oResolvedManifest["sap.card"].content;
+
+				// Assert
+				assert.strictEqual(oHeader.subTitle, "From property", "Binding resolved to property value");
+				assert.strictEqual(oHeader.visible, true, "Expression resolved to property boolean value");
+				assert.strictEqual(oContent.groups[0].items[0].value, "Property-provided value", "Property-only value resolved");
+
+				oCard.destroy();
+			});
+	});
+
+	QUnit.test("Handles empty customSettings", function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.card.resolver4"
+			},
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"title": "Empty Custom Settings Test"
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Group 1",
+							"items": [
+								{
+									"label": "Label",
+									"value": "Value"
+								}
+							]
+						}
+					]
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+		});
+
+		// Act
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oResolvedManifest) {
+				const oCustomSettings = oResolvedManifest["sap.card"].customSettings;
+
+				// Assert
+				assert.deepEqual(oCustomSettings, {}, "customSettings is empty object when nothing provided");
+
+				oCard.destroy();
+			});
+	});
+
 });

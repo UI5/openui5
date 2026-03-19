@@ -3,17 +3,17 @@
  */
 
 sap.ui.define([
-	"sap/ui/rta/plugin/Plugin",
-	"sap/ui/rta/Utils",
-	"sap/ui/fl/Utils",
+	"sap/base/util/uid",
 	"sap/ui/dt/Util",
-	"sap/base/util/uid"
+	"sap/ui/fl/Utils",
+	"sap/ui/rta/plugin/Plugin",
+	"sap/ui/rta/Utils"
 ], function(
-	Plugin,
-	Utils,
-	FlUtils,
+	uid,
 	DtUtil,
-	uid
+	FlUtils,
+	Plugin,
+	Utils
 ) {
 	"use strict";
 
@@ -29,12 +29,9 @@ sap.ui.define([
 	 * @since 1.46
 	 * @alias sap.ui.rta.plugin.Combine
 	 */
-	var Combine = Plugin.extend("sap.ui.rta.plugin.Combine", /** @lends sap.ui.rta.plugin.Combine.prototype */ {
+	const Combine = Plugin.extend("sap.ui.rta.plugin.Combine", /** @lends sap.ui.rta.plugin.Combine.prototype */ {
 		metadata: {
-			library: "sap.ui.rta",
-			properties: {},
-			associations: {},
-			events: {}
+			library: "sap.ui.rta"
 		}
 	});
 
@@ -45,24 +42,26 @@ sap.ui.define([
 	 * @private
 	 */
 	Combine.prototype._isEditable = function(oOverlay) {
-		var oCombineAction = this.getAction(oOverlay);
-		if (!oOverlay.isRoot() && oCombineAction && oCombineAction.changeOnRelevantContainer) {
+		const oCombineAction = this.getAction(oOverlay);
+		if (!oOverlay.isRoot() && oCombineAction?.changeOnRelevantContainer) {
 			return this._checkChangeHandlerAndStableId(oOverlay);
 		}
 		return Promise.resolve(false);
 	};
 
 	Combine.prototype._checkForSameRelevantContainer = function(aElementOverlays) {
-		var aRelevantContainer = [];
-		for (var i = 0, n = aElementOverlays.length; i < n; i++) {
+		const aRelevantContainer = [];
+		for (let i = 0, n = aElementOverlays.length; i < n; i++) {
 			aRelevantContainer[i] = aElementOverlays[i].getRelevantContainer();
-			var oCombineAction = this.getAction(aElementOverlays[i]);
+			const oCombineAction = this.getAction(aElementOverlays[i]);
 			if (!oCombineAction || !oCombineAction.changeType) {
 				return false;
 			}
 			if (i > 0) {
-				if ((aRelevantContainer[0] !== aRelevantContainer[i])
-					|| (this.getAction(aElementOverlays[0]).changeType !== oCombineAction.changeType)) {
+				if (
+					(aRelevantContainer[0] !== aRelevantContainer[i])
+					|| (this.getAction(aElementOverlays[0]).changeType !== oCombineAction.changeType)
+				) {
 					return false;
 				}
 			}
@@ -97,9 +96,7 @@ sap.ui.define([
 		}
 
 		return (
-			aElementOverlays.every(function(oElementOverlay) {
-				return this._isEditableByPlugin(oElementOverlay);
-			}, this)
+			aElementOverlays.every((oElementOverlay) => this._isEditableByPlugin(oElementOverlay))
 			&& this._checkForSameRelevantContainer(aElementOverlays)
 		);
 	};
@@ -116,13 +113,11 @@ sap.ui.define([
 			return false;
 		}
 
-		var aControls = aElementOverlays.map(function(oElementOverlay) {
-			return oElementOverlay.getElement();
-		});
+		const aControls = aElementOverlays.map((oElementOverlay) => oElementOverlay.getElement());
 
 		// check that each specified element has an enabled action
-		var bActionCheck = aElementOverlays.every(function(oElementOverlay) {
-			var oAction = this.getAction(oElementOverlay);
+		const bActionCheck = aElementOverlays.every((oElementOverlay) => {
+			const oAction = this.getAction(oElementOverlay);
 			if (!oAction) {
 				return false;
 			}
@@ -136,11 +131,11 @@ sap.ui.define([
 			}
 
 			return true;
-		}, this);
+		});
 
 		if (bActionCheck) {
 			// check if all the target elements have the same binding context
-			var oDefaultModel = aControls[0] && aControls[0].getModel();
+			const oDefaultModel = aControls[0]?.getModel();
 			return this._checkBindingCompatibilityOfControls(aControls, oDefaultModel);
 		}
 
@@ -152,40 +147,43 @@ sap.ui.define([
 	 * @param {sap.ui.core.Element} oCombineElement - element where the combine was triggered
 	 * @returns {Promise} Promise
 	 */
-	Combine.prototype.handleCombine = function(aElementOverlays, oCombineElement) {
-		var oCombineElementOverlay;
-		var aElements = aElementOverlays.map(function(oElementOverlay) {
+	Combine.prototype.handleCombine = async function(aElementOverlays, oCombineElement) {
+		let oCombineElementOverlay;
+		const aElements = aElementOverlays.map((oElementOverlay) => {
 			if (oElementOverlay.getElement().getId() === oCombineElement.getId()) {
 				oCombineElementOverlay = oElementOverlay;
 			}
 			return oElementOverlay.getElement();
 		});
-		var oDesignTimeMetadata = oCombineElementOverlay.getDesignTimeMetadata();
-		var sVariantManagementReference = this.getVariantManagementReference(oCombineElementOverlay);
-		var oView = FlUtils.getViewForControl(oCombineElement);
-		var sNewElementId = oView.createId(uid());
+		const oDesignTimeMetadata = oCombineElementOverlay.getDesignTimeMetadata();
+		const sVariantManagementReference = this.getVariantManagementReference(oCombineElementOverlay);
+		const oView = FlUtils.getViewForControl(oCombineElement);
+		const sNewElementId = oView.createId(uid());
 
-		return this.getCommandFactory().getCommandFor(
-			oCombineElement,
-			"combine",
-			{
-				newElementId: sNewElementId,
-				source: oCombineElement,
-				combineElements: aElements
-			},
-			oDesignTimeMetadata,
-			sVariantManagementReference
-		)
+		try {
+			const oCombineCommand = await this.getCommandFactory().getCommandFor(
+				oCombineElement,
+				"combine",
+				{
+					newElementId: sNewElementId,
+					source: oCombineElement,
+					combineElements: aElements
+				},
+				oDesignTimeMetadata,
+				sVariantManagementReference
+			);
 
-		.then(function(oCombineCommand) {
 			this.fireElementModified({
 				command: oCombineCommand
 			});
-		}.bind(this))
-
-		.catch(function(oMessage) {
-			throw DtUtil.createError("Combine#handleCombine", oMessage, "sap.ui.rta");
-		});
+		} catch (oError) {
+			throw DtUtil.propagateError(
+				oError,
+				"Combine#handleCombine",
+				"Error occurred in Combine handler function",
+				"sap.ui.rta"
+			);
+		}
 	};
 
 	/**

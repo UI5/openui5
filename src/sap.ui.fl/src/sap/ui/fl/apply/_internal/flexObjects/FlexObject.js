@@ -551,6 +551,17 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns an object that contains all changeable objects for the condenser.
+	 * This function is called when the condense request is built.
+	 * @returns {object} The Update object
+	 */
+	FlexObject.prototype.getCondensingUpdateDiff = function() {
+		return {
+			content: this.getContent()
+		};
+	};
+
+	/**
 	 * Checks if the flex object can be visualized.
 	 * This function is called before even the ChangeHandler is fetched and getChangeVisualizationInfo is called.
 	 *

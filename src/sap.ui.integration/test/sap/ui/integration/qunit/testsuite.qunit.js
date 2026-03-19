@@ -55,6 +55,15 @@ sap.ui.define([
 
 			"CardAsTile": { },
 			"CardCleanup": { },
+
+			"CardCustomSettings": {
+				coverage: {
+					only: [
+						"sap/ui/integration/widgets/Card"
+					]
+				}
+			},
+
 			"CardPagination": { },
 
 			"CardLoading": {

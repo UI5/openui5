@@ -46,7 +46,7 @@ sap.ui.define([
 
 	var aDomInterfaceMethods = ["openStart", "voidStart", "attr", "class", "style", "openEnd", "voidEnd", "text", "unsafeHtml", "close"];
 
-	var aNonRendererMethods = ["render", "flush", "destroy"];
+	var aNonRendererMethods = ["render", "flush", "renderAndFlush", "destroy"];
 
 	document.createElement("template");
 
@@ -1247,6 +1247,59 @@ sap.ui.define([
 
 				}
 			}, () => {fnDone(); mOwnerInfo.clear();}, oTargetDomNode);
+		};
+
+		/**
+		 * Executes a rendering callback and flushes the result into the provided DOM node.
+		 *
+		 * The rendering callback receives a RenderManager instance with the semantic rendering API
+		 * implementation (DOM interface methods like <code>openStart</code>, <code>attr</code>,
+		 * <code>openEnd</code>, <code>text</code>, <code>close</code>, etc.).
+		 *
+		 * This method combines rendering and flushing in a single call, automatically handling
+		 * non-HTML namespaces (e.g., SVG, MathML) by detecting the namespace of the target DOM node.
+		 *
+		 * <b>Difference from calling render() then flush() separately:</b>
+		 * When rendering into a non-HTML namespace context (e.g., SVG or MathML elements), this method
+		 * automatically detects the target node's namespace and applies it as a fallback namespace for
+		 * the rendering operation. This ensures that elements created without an explicit parent element
+		 * (such as when rendering into a DocumentFragment initially) inherit the correct namespace.
+		 *
+		 * This function must not be called within control renderers.
+		 *
+		 * Usage:
+		 * <pre>
+		 *   const oRM = new RenderManager().getInterface();
+		 *
+		 *   // assume that oSvgContainer is already part of the DOM and we want to render a circle into it
+		 *   oRM.renderAndFlush(function(oRM) {
+		 *     oRM.openStart("circle").attr("cx", "50").attr("cy", "50").attr("r", "40");
+		 *     oRM.openEnd();
+		 *     oRM.close("circle");
+		 *   }, oSvgContainer);
+		 *
+		 *   oRM.destroy();
+		 * </pre>
+		 *
+		 * @param {function(sap.ui.core.RenderManager)} fnRender Rendering callback that receives a RenderManager instance
+		 *                  with the semantic rendering API implementation (DOM interface methods like <code>openStart</code>,
+		 *                  <code>attr</code>, <code>openEnd</code>, <code>text</code>, <code>close</code>, etc.)
+		 * @param {Element} oTargetDomNode Node in the DOM where the result should be flushed into
+		 * @param {boolean|int} [vInsert] Determines whether the buffer of the target DOM node is expanded (<code>true</code>) or
+		 *                  replaced (<code>false</code>), or the new entry is inserted at a specific position
+		 *                  (value of type <code>int</code>)
+		 * @returns {this} Reference to <code>this</code> to allow method chaining
+		 * @public
+		 * @since 1.147
+		 */
+		this.renderAndFlush = function(fnRender, oTargetDomNode, vInsert) {
+			oPatcher.setFallbackNamespace(oTargetDomNode.namespaceURI);
+
+			fnRender(oDomInterface);
+
+			this.flush(oTargetDomNode, /* no preserve content */ true, vInsert);
+
+			return this;
 		};
 
 		/**

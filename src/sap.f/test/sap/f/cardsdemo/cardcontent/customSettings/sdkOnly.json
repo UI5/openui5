@@ -1,0 +1,45 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "test.card.customSettingsSDKOnly",
+		"type": "card",
+		"title": "Card 'customSettingsSDKOnly'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"header": {
+			"title": "SDK Settings Only Test",
+			"subtitle": "No manifest customSettings - all from SDK",
+			"visible": "{= ${customSettings>/showHeader} !== false}"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Feature 1",
+						"Status": "{= ${customSettings>/feature1} ? 'Enabled' : 'Disabled'}"
+					},
+					{
+						"Name": "Feature 2",
+						"Status": "{= ${customSettings>/feature2} ? 'Enabled' : 'Disabled'}"
+					},
+					{
+						"Name": "Preview Mode",
+						"Status": "{= ${customSettings>/isPreview} ? 'Active' : 'Inactive'}"
+					}
+				]
+			},
+			"item": {
+				"title": {
+					"value": "{Name}"
+				},
+				"description": {
+					"value": "{Status}"
+				}
+			}
+		}
+	}
+}

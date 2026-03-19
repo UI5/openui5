@@ -1,9 +1,12 @@
 {
-	"_version": "%LATEST_SCHEMA_VERSION%",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.filters.dynamicFilter",
 		"type": "card",
-		"title": "Sample of Card with Filters"
+		"title": "Sample of Card with Filters",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"configuration": {

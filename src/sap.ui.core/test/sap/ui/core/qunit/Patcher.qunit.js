@@ -1073,4 +1073,93 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("MathML namespace support", function(assert) {
+
+		this.render(function() {
+			oPatcher.openStart("math").openEnd().
+				openStart("mrow").openEnd().
+					openStart("mi").openEnd().text("x").close("mi").
+					openStart("mo").openEnd().text("=").close("mo").
+					openStart("mn").openEnd().text("42").close("mn").
+				close("mrow").
+			close("math");
+		}, function(oElement) {
+			assert.equal(oElement.tagName, "math", "math element is created");
+			assert.equal(oElement.namespaceURI, "http://www.w3.org/1998/Math/MathML", "math element has MathML namespace");
+			assert.equal(oElement.firstChild.namespaceURI, "http://www.w3.org/1998/Math/MathML", "mrow element has MathML namespace");
+			assert.equal(oElement.firstChild.firstChild.namespaceURI, "http://www.w3.org/1998/Math/MathML", "mi element has MathML namespace");
+			assert.equal(oElement.textContent, "x=42", "MathML content is correct");
+		});
+
+	});
+
+	QUnit.test("Fallback namespace for DocumentFragment parent", function(assert) {
+
+		this.render(function() {
+			oPatcher.setFallbackNamespace("http://www.w3.org/2000/svg");
+			oPatcher.openStart("circle").attr("cx", "5").attr("cy", "5").attr("r", "4").openEnd().close("circle");
+		}, function(oElement) {
+			assert.equal(oElement.tagName, "circle", "circle element is created");
+			assert.equal(oElement.namespaceURI, "http://www.w3.org/2000/svg", "circle element has SVG namespace from fallback");
+			assert.equal(oElement.getAttribute("cx"), "5", "circle has correct attributes");
+		});
+
+		this.render(function() {
+			oPatcher.setFallbackNamespace("http://www.w3.org/1998/Math/MathML");
+			oPatcher.openStart("mi").openEnd().text("x").close("mi");
+		}, function(oElement) {
+			assert.equal(oElement.tagName, "mi", "mi element is created");
+			assert.equal(oElement.namespaceURI, "http://www.w3.org/1998/Math/MathML", "mi element has MathML namespace from fallback");
+		});
+
+	});
+
+	QUnit.test("Fallback namespace reset", function(assert) {
+
+		this.render(function() {
+			oPatcher.setFallbackNamespace("http://www.w3.org/2000/svg");
+			oPatcher.openStart("circle").attr("cx", "5").attr("cy", "5").attr("r", "4").openEnd().close("circle");
+		}, function(oElement) {
+			assert.equal(oElement.namespaceURI, "http://www.w3.org/2000/svg", "First rendering: circle has SVG namespace from fallback");
+		});
+
+		// Reset should clear the fallback namespace
+		this.render(function() {
+			oPatcher.openStart("div").openEnd().close("div");
+		}, function(oElement) {
+			assert.equal(oElement.tagName, "DIV", "div element is created");
+			assert.equal(oElement.namespaceURI, "http://www.w3.org/1999/xhtml", "After reset: div has HTML namespace (no fallback)");
+		});
+
+	});
+
+	QUnit.test("foreignObject creates HTML namespace context", function(assert) {
+
+		this.render(function() {
+			oPatcher.openStart("svg").openEnd().
+				openStart("foreignObject").attr("x", "20").attr("y", "20").openEnd().
+					openStart("div").openEnd().
+						openStart("p").openEnd().text("Text").close("p").
+					close("div").
+				close("foreignObject").
+			close("svg");
+		}, function(oElement) {
+			assert.equal(oElement.tagName, "svg", "svg element is created");
+			assert.equal(oElement.namespaceURI, "http://www.w3.org/2000/svg", "svg has SVG namespace");
+
+			const oForeignObject = oElement.firstChild;
+			assert.equal(oForeignObject.localName, "foreignObject", "foreignObject element exists");
+			assert.equal(oForeignObject.namespaceURI, "http://www.w3.org/2000/svg", "foreignObject has SVG namespace");
+
+			const oDiv = oForeignObject.firstChild;
+			assert.equal(oDiv.tagName, "DIV", "div element exists inside foreignObject");
+			assert.equal(oDiv.namespaceURI, "http://www.w3.org/1999/xhtml", "div has HTML namespace (foreignObject creates HTML context)");
+
+			const oP = oDiv.firstChild;
+			assert.equal(oP.tagName, "P", "p element exists");
+			assert.equal(oP.namespaceURI, "http://www.w3.org/1999/xhtml", "p has HTML namespace");
+		});
+
+	});
+
 });

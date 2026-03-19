@@ -1362,7 +1362,7 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._onAddAggregation = function(oElement, oParent, sAggregationName) {
-		if (ElementUtil.isElementValid(oElement)) {
+		if (ElementUtil.isElementValid(oElement, OverlayRegistry.getOverlay(oElement)?.getOngoingMoveInformation())) {
 			var oParentOverlay = OverlayRegistry.getOverlay(oParent);
 			var oParentAggregationOverlay = oParentOverlay && oParentOverlay.getAggregationOverlay(sAggregationName);
 			if (!oParentAggregationOverlay) {

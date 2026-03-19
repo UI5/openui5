@@ -22,8 +22,8 @@ sap.ui.define([
 	/**
 	 * Constructor for a new CreateContainer Plugin.
 	 *
-	 * @param {string} [sId] id for the new object, generated automatically if no id is given
-	 * @param {object} [mSettings] initial settings for the new object
+	 * @param {string} [sId] - Id for the new object, generated automatically if no id is given
+	 * @param {object} [mSettings] - Initial settings for the new object
 	 * @class The CreateContainer allows trigger CreateContainer operations on the overlay
 	 * @extends sap.ui.rta.plugin.BaseCreate
 	 * @author SAP SE
@@ -33,12 +33,9 @@ sap.ui.define([
 	 * @since 1.34
 	 * @alias sap.ui.rta.plugin.CreateContainer
 	 */
-	var CreateContainer = BaseCreate.extend("sap.ui.rta.plugin.CreateContainer", /** @lends sap.ui.rta.plugin.CreateContainer.prototype */ {
+	const CreateContainer = BaseCreate.extend("sap.ui.rta.plugin.CreateContainer", /** @lends sap.ui.rta.plugin.CreateContainer.prototype */ {
 		metadata: {
-			library: "sap.ui.rta",
-			properties: {},
-			associations: {},
-			events: {}
+			library: "sap.ui.rta"
 		}
 	});
 
@@ -49,28 +46,28 @@ sap.ui.define([
 
 	/**
 	 * Returns true if create container action is enabled for the selected element overlays
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays Array of selected element overlays
-	 * @param {boolean} bSibling Indicator for a sibling action
-	 * @return {boolean} Indicates if action is enabled
+	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Array of selected element overlays
+	 * @param {boolean} bSibling - Indicator for a sibling action
+	 * @return {boolean} Whether the action is enabled
 	 * @override
 	 */
 	CreateContainer.prototype.isEnabled = function(aElementOverlays, bSibling) {
-		var oElementOverlay = aElementOverlays[0];
-		var oAction = this.getCreateAction(bSibling, oElementOverlay);
+		const oElementOverlay = aElementOverlays[0];
+		const oAction = this.getCreateAction(bSibling, oElementOverlay);
 		return this.isActionEnabled(oAction, bSibling, oElementOverlay);
 	};
 
 	CreateContainer.prototype.getCreateContainerText = function(bSibling, oOverlay) {
-		var vAction = this.getCreateAction(bSibling, oOverlay);
-		var oParentOverlay = this._getParentOverlay(bSibling, oOverlay);
-		var oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
-		var oElement = oParentOverlay.getElement();
-		var sText = "CTX_CREATE_CONTAINER";
+		const vAction = this.getCreateAction(bSibling, oOverlay);
+		const oParentOverlay = this._getParentOverlay(bSibling, oOverlay);
+		const oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
+		const oElement = oParentOverlay.getElement();
+		const sText = "CTX_CREATE_CONTAINER";
 		return this._getText(vAction, oElement, oDesignTimeMetadata, sText);
 	};
 
 	CreateContainer.prototype._getContainerTitle = function(vAction, oElement, oDesignTimeMetadata) {
-		var sText = "TITLE_CREATE_CONTAINER";
+		const sText = "TITLE_CREATE_CONTAINER";
 		return this._getText(vAction, oElement, oDesignTimeMetadata, sText);
 	};
 
@@ -116,7 +113,12 @@ sap.ui.define([
 				newControlId: sNewControlID
 			});
 		} catch (oError) {
-			throw DtUtil.createError("CreateContainer#handleCreate", oError, "sap.ui.rta");
+			throw DtUtil.propagateError(
+				oError,
+				"CreateContainer#handleCreate",
+				"Error occurred in CreateContainer handler function",
+				"sap.ui.rta"
+			);
 		}
 	};
 
@@ -127,16 +129,16 @@ sap.ui.define([
 	 * @return {object[]} returns array containing the items with required data
 	 */
 	CreateContainer.prototype.getMenuItems = function(aElementOverlays) {
-		var bOverlayIsSibling = true;
-		var sPluginId = "CTX_CREATE_SIBLING_CONTAINER";
-		var iRank = this.getRank(sPluginId);
-		var aMenuItems = [];
+		let bOverlayIsSibling = true;
+		let sPluginId = "CTX_CREATE_SIBLING_CONTAINER";
+		let iRank = this.getRank(sPluginId);
+		const aMenuItems = [];
 
-		var isMenuItemEnabled = function(bOverlayIsSibling, aOverlays) {
+		function isMenuItemEnabled(bOverlayIsSibling, aOverlays) {
 			return this.isEnabled(aOverlays, bOverlayIsSibling);
-		}.bind(this);
+		}
 
-		for (var i = 0; i < 2; i++) {
+		for (let i = 0; i < 2; i++) {
 			if (this.isAvailable(aElementOverlays, bOverlayIsSibling)) {
 				aMenuItems.push({
 					id: sPluginId,
@@ -156,7 +158,7 @@ sap.ui.define([
 
 	/**
 	 * Get the name of the action related to this plugin.
-	 * @return {string} Returns the action name
+	 * @return {string} Action name
 	 */
 	CreateContainer.prototype.getActionName = function() {
 		return "createContainer";

@@ -23,13 +23,22 @@ sap.ui.define([
 		};
 	};
 
-	ControlAPI.prototype.getAllControlData = function () {
-		var renderedControls = ToolsAPI.getRenderedControlTree();
+	ControlAPI.prototype.getAllControlData = function (oOptions) {
+		var renderedControls = ToolsAPI.getRenderedControlTree(oOptions);
 		return {
 			renderedControls: renderedControls
 		};
 	};
 
+	/**
+	 * Retrieves detailed information about a control based on the provided data.
+	 * @param {object} mData The data containing control identification information
+	 * @param {object} mData.controlId The ID of the control (optional)
+	 * @param {object} mData.domElementId The ID of the DOM element associated with the control (optional)
+	 * @param {object} mData.includeAggregations Whether to include aggregations in the control data (optional, default: false)
+	 * @param {object} mData.includeAssociations Whether to include associations in the control data (optional, default: false)
+	 * @returns {object} An object containing the control's properties and bindings
+	 */
 	ControlAPI.prototype.getControlData = function (mData) {
 		var sControlId;
 		if (mData.controlId) {
@@ -48,10 +57,18 @@ sap.ui.define([
 		var aProperties = this._getFormattedProperties(sControlId);
 		var aBindings = this._getFormattedBindings(sControlId);
 
-		return {
+		var oData = {
 			properties: aProperties,
 			bindings: aBindings
 		};
+
+		if (mData.includeAggregations) {
+			oData.aggregations = this._getFormattedAggregations(sControlId);
+		}
+		if (mData.includeAssociations) {
+			oData.associations = this._getFormattedAssociations(sControlId);
+		}
+		return oData;
 	};
 
 	ControlAPI.prototype._getFormattedProperties = function (sControlId) {
@@ -110,6 +127,56 @@ sap.ui.define([
 
 		return aFormattedBindings;
 	};
+
+	ControlAPI.prototype._getFormattedAggregations = function (sControlId) {
+		var oAllAggregations = ToolsAPI.getControlAggregations(sControlId);
+		oAllAggregations.own = [oAllAggregations.own];
+		var mFormattedAggregations = {};
+		["own", "inherited"].forEach(function (sType) {
+			mFormattedAggregations[sType] = [];
+			oAllAggregations[sType].forEach(function (mAggregationsContainer) {
+				Object.keys(mAggregationsContainer.aggregations).forEach(function (sAggregation) {
+					var mAggregation = mAggregationsContainer.aggregations[sAggregation];
+					mFormattedAggregations[sType].push({
+						inheritedFrom: mAggregationsContainer.meta.controlName,
+						aggregation: sAggregation,
+						type: mAggregation.type,
+						count: mAggregation.count
+					});
+				});
+			});
+		});
+
+		return mFormattedAggregations;
+	};
+
+	ControlAPI.prototype._getFormattedAssociations = function (sControlId) {
+		var oAllAssociations = ToolsAPI.getControlAssociations(sControlId);
+		oAllAssociations.own = [oAllAssociations.own];
+		var mFormattedAssociations = {};
+		["own", "inherited"].forEach(function (sType) {
+			mFormattedAssociations[sType] = [];
+			oAllAssociations[sType].forEach(function (mAssociationsContainer) {
+				Object.keys(mAssociationsContainer.associations).forEach(function (sAssociation) {
+					var mAssociation = mAssociationsContainer.associations[sAssociation];
+					var vValue = isManagedObject(mAssociation.value) ? mAssociation.value.getId() : mAssociation.value;
+					mFormattedAssociations[sType].push({
+						inheritedFrom: mAssociationsContainer.meta.controlName,
+						association: sAssociation,
+						type: mAssociation.type,
+						value: vValue
+					});
+				});
+			});
+		});
+
+		return mFormattedAssociations;
+	};
+
+	// utils
+	function isManagedObject(oValue) {
+		return oValue && typeof oValue === "object" && typeof oValue.isA === "function" && oValue.isA("sap.ui.base.ManagedObject");
+	}
 
 	return new ControlAPI();
 

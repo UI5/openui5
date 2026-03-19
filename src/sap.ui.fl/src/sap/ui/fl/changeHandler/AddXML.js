@@ -70,8 +70,7 @@ sap.ui.define([
 	 * @name sap.ui.fl.changeHandler.AddXML#completeChangeContent
 	 */
 	AddXML.completeChangeContent = function(oChange, oSpecificChangeInfo) {
-		// TODO: Remove assignment without content after all derived change handlers are adjusted to use content. todos#4
-		const oChangeInfoContent = oSpecificChangeInfo.content || oSpecificChangeInfo;
+		const oChangeInfoContent = oSpecificChangeInfo.content;
 		const oContent = {};
 		if (!oChangeInfoContent.targetAggregation) {
 			BaseAddXml._throwMissingAttributeError("targetAggregation");

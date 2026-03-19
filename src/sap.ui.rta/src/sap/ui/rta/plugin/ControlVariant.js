@@ -74,9 +74,7 @@ sap.ui.define([
 			library: "sap.ui.rta",
 			properties: {
 				oldValue: "string"
-			},
-			associations: {},
-			events: {}
+			}
 		}
 	});
 
@@ -181,11 +179,11 @@ sap.ui.define([
 		oParentElementOverlay.setVariantManagement(sVariantManagementReference);
 		let aElementOverlaysRendered = OverlayUtil.getAllChildOverlays(oParentElementOverlay);
 
-		aElementOverlaysRendered.forEach(function(oElementOverlay) {
+		aElementOverlaysRendered.forEach((oElementOverlay) => {
 			aElementOverlaysRendered = aElementOverlaysRendered.concat(
 				this._propagateVariantManagement(oElementOverlay, sVariantManagementReference)
 			);
-		}.bind(this));
+		});
 
 		return aElementOverlaysRendered;
 	};
@@ -312,9 +310,7 @@ sap.ui.define([
 	 * @public
 	 */
 	ControlVariant.prototype.isVariantSaveEnabled = function(aElementOverlays) {
-		const oOverlay = aElementOverlays[0];
-		const oVMControl = oOverlay.getElement();
-		return oVMControl.getModified();
+		return aElementOverlays[0].getElement().getModified();
 	};
 
 	/**
@@ -365,47 +361,39 @@ sap.ui.define([
 	 * @param {string} sCurrentVariantReference The current variant reference
 	 * @public
 	 */
-	ControlVariant.prototype.switchVariant = function(oTargetOverlay, sNewVariantReference, sCurrentVariantReference) {
+	ControlVariant.prototype.switchVariant = async function(oTargetOverlay, sNewVariantReference, sCurrentVariantReference) {
 		const oTargetElement = oTargetOverlay.getElement();
 		const oLibraryBundle = Lib.getResourceBundleFor("sap.ui.rta");
 
-		function onDirtySwitchWarningClose(sAction) {
-			if (sAction === MessageBox.Action.CANCEL) {
-				return;
-			}
+		async function onDirtySwitchWarningClose(sAction) {
+			switch (sAction) {
+				case MessageBox.Action.CANCEL:
+					break;
 
-			if (sAction === oLibraryBundle.getText("BTN_MODIFIED_VARIANT_SAVE")) {
-				let oCompositeCommand;
-				this.getCommandFactory().getCommandFor(oTargetElement, "composite")
-				.then(function(_oCompositeCommand) {
-					oCompositeCommand = _oCompositeCommand;
-					return getCommandForSave.call(this, oTargetOverlay);
-				}.bind(this))
-				.then(function(oSaveCommand) {
-					oCompositeCommand.addCommand(oSaveCommand);
-					return getCommandForSwitch.call(this, oTargetOverlay, sNewVariantReference, sCurrentVariantReference);
-				}.bind(this))
-				.then(function(oSwitchCommand) {
-					oCompositeCommand.addCommand(oSwitchCommand);
+				case oLibraryBundle.getText("BTN_MODIFIED_VARIANT_SAVE"):{
+					const oCompositeCommand = await this.getCommandFactory().getCommandFor(oTargetElement, "composite");
+					oCompositeCommand.addCommand(await getCommandForSave.call(this, oTargetOverlay));
+					oCompositeCommand.addCommand(await getCommandForSwitch.call(this, oTargetOverlay, sNewVariantReference, sCurrentVariantReference));
 					this.fireElementModified({
 						command: oCompositeCommand
 					});
-				}.bind(this));
-			}
+					break;
+				}
 
-			if (sAction === oLibraryBundle.getText("BTN_MODIFIED_VARIANT_DISCARD")) {
-				getCommandForSwitch.call(
-					this,
-					oTargetOverlay,
-					sNewVariantReference,
-					sCurrentVariantReference,
-					true // discard variant content
-				)
-				.then(function(oSwitchCommand) {
+				case oLibraryBundle.getText("BTN_MODIFIED_VARIANT_DISCARD"):{
+					const oSwitchCommand = await getCommandForSwitch.call(
+						this,
+						oTargetOverlay,
+						sNewVariantReference,
+						sCurrentVariantReference,
+						true // discard variant content
+					);
 					this.fireElementModified({
 						command: oSwitchCommand
 					});
-				}.bind(this));
+					break;
+				}
+				default:
 			}
 		}
 
@@ -422,16 +410,19 @@ sap.ui.define([
 				id: "controlVariantWarningDialog"
 			});
 		} else {
-			getCommandForSwitch.call(this, oTargetOverlay, sNewVariantReference, sCurrentVariantReference)
-			.then(function(oSwitchCommand) {
+			try {
+				const oSwitchCommand = await getCommandForSwitch.call(this, oTargetOverlay, sNewVariantReference, sCurrentVariantReference);
 				this.fireElementModified({
 					command: oSwitchCommand
 				});
-			}.bind(this))
-
-			.catch(function(oMessage) {
-				throw DtUtil.createError("ControlVariant#switchVariant", oMessage, "sap.ui.rta");
-			});
+			} catch (oError) {
+				throw DtUtil.propagateError(
+					oError,
+					"ControlVariant#switchVariant",
+					"Error occurred in ControlVariant#switchVariant function",
+					"sap.ui.rta"
+				);
+			}
 		}
 	};
 
@@ -467,30 +458,27 @@ sap.ui.define([
 		});
 	};
 
-	ControlVariant.prototype.createSaveCommand = function(aElementOverlays) {
+	ControlVariant.prototype.createSaveCommand = async function(aElementOverlays) {
 		const oOverlay = aElementOverlays[0];
-		return getCommandForSave.call(this, oOverlay)
-		.then(function(oSaveCommand) {
-			this.fireElementModified({
-				command: oSaveCommand
-			});
-		}.bind(this));
+		const oSaveCommand = await getCommandForSave.call(this, oOverlay);
+		this.fireElementModified({
+			command: oSaveCommand
+		});
 	};
 
-	ControlVariant.prototype.createSaveAsCommand = function(aElementOverlays) {
+	ControlVariant.prototype.createSaveAsCommand = async function(aElementOverlays) {
 		const oOverlay = aElementOverlays[0];
 		const oVMControl = oOverlay.getElement();
 		const oDesignTimeMetadata = oOverlay.getDesignTimeMetadata();
 		const sVariantManagementReference = oOverlay.getVariantManagement();
 
-		return this.getCommandFactory().getCommandFor(oVMControl, "saveAs", {
+		const oSaveAsCommand = await this.getCommandFactory().getCommandFor(oVMControl, "saveAs", {
 			sourceVariantReference: oVMControl.getCurrentVariantReference()
-		}, oDesignTimeMetadata, sVariantManagementReference)
-		.then(function(oSaveAsCommand) {
-			this.fireElementModified({
-				command: oSaveAsCommand
-			});
-		}.bind(this));
+		}, oDesignTimeMetadata, sVariantManagementReference);
+
+		this.fireElementModified({
+			command: oSaveAsCommand
+		});
 	};
 
 	/**
@@ -515,7 +503,7 @@ sap.ui.define([
 	 * @returns {Promise} Resolving when the dialog is closed and the command is created
 	 * @public
 	 */
-	ControlVariant.prototype.configureVariants = function(aElementOverlays) {
+	ControlVariant.prototype.configureVariants = async function(aElementOverlays) {
 		const oElementOverlay = aElementOverlays[0];
 		const oVariantManagementControl = oElementOverlay.getElement();
 		const sVariantManagementReference = oElementOverlay.getVariantManagement();
@@ -524,15 +512,15 @@ sap.ui.define([
 		const mComponentPropertyBag = mFlexSettings;
 		mComponentPropertyBag.variantManagementControl = oVariantManagementControl;
 
-		return ControlVariantWriteAPI.openManageVariantsDialog({
+		const oModelChanges = await ControlVariantWriteAPI.openManageVariantsDialog({
 			variantManagementControl: oVariantManagementControl,
 			layer: mFlexSettings.layer,
 			styleClass: Utils.getRtaStyleClassName(),
 			contextSharingComponentPromise: ContextSharingAPI.createComponent(mComponentPropertyBag)
-		})
-		.then(function(oModelChanges) {
-			if (oModelChanges.changes.length > 0) {
-				return this.getCommandFactory().getCommandFor(
+		});
+		if (oModelChanges.changes.length > 0) {
+			try {
+				const oConfigureCommand = await this.getCommandFactory().getCommandFor(
 					oVariantManagementControl,
 					"configure",
 					{
@@ -543,21 +531,18 @@ sap.ui.define([
 					oDesignTimeMetadata,
 					sVariantManagementReference
 				);
-			}
-			return undefined;
-		}.bind(this))
-
-		.then(function(oConfigureCommand) {
-			if (oConfigureCommand) {
 				this.fireElementModified({
 					command: oConfigureCommand
 				});
+			} catch (oError) {
+				throw DtUtil.propagateError(
+					oError,
+					"ControlVariant#configureVariants",
+					"Error occurred in ControlVariant#configureVariants function",
+					"sap.ui.rta"
+				);
 			}
-		}.bind(this))
-
-		.catch(function(oMessage) {
-			throw DtUtil.createError("ControlVariant#configureVariants", oMessage, "sap.ui.rta");
-		});
+		}
 	};
 
 	/**

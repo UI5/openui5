@@ -374,7 +374,7 @@ sap.ui.define([
 		});
 	});
 
-	function createChangesAndSetState(aStates, aDependentSelectors) {
+	function createChangesAndSetState(aStates, aDependentSelectors, bSkipCondenserState) {
 		var aChanges = [];
 		aStates.forEach(function(sState, i) {
 			aChanges[i] = FlexObjectFactory.createFromFileContent({
@@ -393,7 +393,9 @@ sap.ui.define([
 				aChanges[i].setState(States.LifecycleState.PERSISTED);
 				aChanges[i].setState(States.LifecycleState.UPDATED);
 			}
-			aChanges[i].condenserState = sState;
+			if (!bSkipCondenserState) {
+				aChanges[i].condenserState = sState;
+			}
 		});
 		return aChanges;
 	}
@@ -931,6 +933,48 @@ sap.ui.define([
 				assert.propEqual(oWriteCallArgs.flexObjects, mCondenseExpected, "then flexObject is filled correctly");
 			});
 		});
+
+		QUnit.test("with new and updated changes without condenserState", function(assert) {
+			const aAllChanges = createChangesAndSetState(["update", "delete", "select"], undefined, true);
+			aAllChanges[0].setContent({ foo: "bar" });
+			const oCreatedChange = aAllChanges[2].convertToFileContent();
+			const mCondenseExpected = {
+				namespace: "a.name.space",
+				layer: this.sLayer,
+				create: {
+					change: [{ c2: merge(oCreatedChange, { support: { sapui5Version: "123" } }) }]
+				},
+				update: {
+					change: [
+						{
+							c0: {
+								content: { foo: "bar" }
+							}
+						}
+					]
+				}
+			};
+			const mPropertyBag = {
+				layer: this.sLayer,
+				allChanges: aAllChanges,
+				condensedChanges: [aAllChanges[2]]
+			};
+			const sUrl = "/some/url";
+			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
+				{ connector: "LrepConnector", url: sUrl }
+			]);
+			const oWriteStub = sandbox.stub(WriteLrepConnector, "condense").resolves({ status: 205 });
+
+			return Storage.condense(mPropertyBag).then(function(oResult) {
+				assert.equal(oResult.response.length, 1, "one change is save in the backend");
+				assert.deepEqual(oResult.response[0], oCreatedChange, "content of the change is correct");
+				assert.strictEqual(oWriteStub.callCount, 1, "the write was triggered once");
+				const oWriteCallArgs = oWriteStub.getCall(0).args[0];
+				assert.strictEqual(oWriteCallArgs.url, sUrl, "the url was added to the property bag");
+				assert.deepEqual(oWriteCallArgs.flexObjects, mCondenseExpected, "the flexObject was passed in the property bag");
+				assert.strictEqual(oResult.response[0].support.sapui5Version, "123", "the version was added");
+			});
+		});
 	});
 
 	QUnit.module("Given Storage when contextBasedAdaptation.create is called", {
@@ -1033,7 +1077,7 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("and a list of context-based adaptations is reorderd", function(assert) {
+		QUnit.test("and a list of context-based adaptations is reordered", function(assert) {
 			var mPropertyBag = {
 				reference: "reference",
 				layer: Layer.CUSTOMER

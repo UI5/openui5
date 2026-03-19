@@ -47,6 +47,15 @@ sap.ui.define([
 			"codeSnippets/CodeSnippetProvider": {
 				title: "QUnit Page for sap.ui.testrecorder.codeSnippets.CodeSnippetProvider"
 			},
+			"ControlTree": {
+				title: "QUnit Page for sap.ui.testrecorder.ControlTree"
+			},
+			"utils/filterControlTree": {
+				title: "QUnit Page for sap.ui.testrecorder.utils.filterControlTree"
+			},
+			"utils/convertTreeToMarkdown": {
+				title: "QUnit Page for sap.ui.testrecorder.utils.convertTreeToMarkdown"
+			},
 			"integration/opaTests": {
 				title: "QUnit Page for sap.ui.testrecorder OPA tests",
 				loader: {

@@ -1,72 +1,74 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/m/Bar",
 	"sap/m/Button",
+	"sap/m/CustomListItem",
 	"sap/m/Input",
+	"sap/m/List",
 	"sap/m/MessageBox",
 	"sap/m/Text",
 	"sap/m/VBox",
-	"sap/m/List",
-	"sap/m/CustomListItem",
-	"sap/ui/layout/VerticalLayout",
-	"sap/ui/model/type/Integer",
-	"sap/ui/table/Column",
 	"sap/ui/dt/DesignTime",
-	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/ElementDesignTimeMetadata",
-	"sap/ui/rta/command/CommandFactory",
-	"sap/ui/rta/command/FlexCommand",
-	"sap/ui/rta/command/BaseCommand",
-	"sap/ui/rta/command/CompositeCommand",
-	"sap/ui/rta/command/Stack",
-	"sap/ui/fl/changeHandler/MoveControls",
-	"sap/ui/fl/changeHandler/HideControl",
-	"sap/ui/fl/changeHandler/UnhideControl",
-	"sap/ui/fl/changeHandler/PropertyChange",
-	"sap/ui/fl/library",
-	"sap/ui/fl/write/api/ChangesWriteAPI",
+	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/changeHandler/HideControl",
+	"sap/ui/fl/changeHandler/MoveControls",
+	"sap/ui/fl/changeHandler/PropertyChange",
+	"sap/ui/fl/changeHandler/UnhideControl",
+	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/Layer",
-	"sap/ui/model/json/JSONModel",
-	"sap/ui/fl/Utils",
 	"sap/ui/fl/LayerUtils",
+	"sap/ui/fl/library",
+	"sap/ui/fl/Utils",
+	"sap/ui/layout/VerticalLayout",
+	"sap/ui/model/json/JSONModel",
+	"sap/ui/model/type/Integer",
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/rta/command/BaseCommand",
+	"sap/ui/rta/command/CommandFactory",
+	"sap/ui/rta/command/CompositeCommand",
+	"sap/ui/rta/command/FlexCommand",
+	"sap/ui/rta/command/Stack",
+	"sap/ui/table/Column",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/rta/qunit/RtaQunitUtils",
-	"sap/ui/test/utils/nextUIUpdate"
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
+	Bar,
 	Button,
+	CustomListItem,
 	Input,
+	List,
 	MessageBox,
 	Text,
 	VBox,
-	List,
-	CustomListItem,
+	DesignTime,
+	ElementDesignTimeMetadata,
+	OverlayRegistry,
+	ControlVariantApplyAPI,
+	HideControl,
+	MoveControls,
+	PropertyChange,
+	UnhideControl,
+	ChangesWriteAPI,
+	Layer,
+	flLayerUtils,
+	flLibrary,
+	flUtils,
 	VerticalLayout,
+	JSONModel,
 	// the Integer type must be  available for the binding definition
 	Integer,
-	Column,
-	DesignTime,
-	OverlayRegistry,
-	ElementDesignTimeMetadata,
-	CommandFactory,
-	FlexCommand,
+	nextUIUpdate,
 	BaseCommand,
+	CommandFactory,
 	CompositeCommand,
+	FlexCommand,
 	Stack,
-	MoveControls,
-	HideControl,
-	UnhideControl,
-	PropertyChange,
-	flLibrary,
-	ChangesWriteAPI,
-	ControlVariantApplyAPI,
-	Layer,
-	JSONModel,
-	flUtils,
-	flLayerUtils,
+	Column,
 	sinon,
-	RtaQunitUtils,
-	nextUIUpdate
+	RtaQunitUtils
 ) {
 	"use strict";
 
@@ -1149,12 +1151,14 @@ sap.ui.define([
 	QUnit.module("Given a command factory and a bound control containing a template binding", {
 		async beforeEach(assert) {
 			sandbox.stub(flUtils, "getComponentForControl").returns(oMockedAppComponent);
+			const fnDone = assert.async();
 
-			var done = assert.async();
-
-			var aTexts = [{ text1: "Text 1", text2: "More Text 1" }, { text1: "Text 2", text2: "More Text 2" }, { text1: "Text 3", text2: "More Text 3" }];
-			var oModel = new JSONModel({
-				texts: aTexts
+			const oModel = new JSONModel({
+				texts: [
+					{ text1: "Text 1", text2: "More Text 1" },
+					{ text1: "Text 2", text2: "More Text 2" },
+					{ text1: "Text 3", text2: "More Text 3" }
+				]
 			});
 
 			this.oItemTemplate = new CustomListItem("item", {
@@ -1162,12 +1166,13 @@ sap.ui.define([
 					items: [
 						new VBox("vbox2", {
 							items: [
-								new VBox("vbox3", {
+								new VBox("vbox31", {
 									items: [
 										new Text("text1", { text: "{text1}" }),
 										new Text("text2", { text: "{text2}" })
 									]
-								})
+								}),
+								new VBox("vbox32")
 							]
 						})
 					]
@@ -1184,19 +1189,13 @@ sap.ui.define([
 			this.oList.placeAt("qunit-fixture");
 			await nextUIUpdate();
 
-			[this.oVBox31] = this.oList.getItems()[1].getContent()[0].getItems()[0].getItems();
-			[this.oText1, this.oText2] = this.oList.getItems()[1].getContent()[0].getItems()[0].getItems()[0].getItems();
+			[this.oVBox31, this.oVBox32] = this.oList.getItems()[1].getContent()[0].getItems()[0].getItems();
+			[this.oText1] = this.oVBox31.getItems();
 			this.oDesignTime = new DesignTime({
 				rootElements: [this.oList]
 			});
 
-			this.oDesignTime.attachEventOnce("synced", function() {
-				this.oListOverlay = OverlayRegistry.getOverlay(this.oList);
-				this.oVbox31Overlay = OverlayRegistry.getOverlay(this.oVBox31);
-				this.oText1Overlay = OverlayRegistry.getOverlay(this.oText1);
-				this.oText2Overlay = OverlayRegistry.getOverlay(this.oText2);
-				done();
-			}.bind(this));
+			this.oDesignTime.attachEventOnce("synced", fnDone);
 		},
 		afterEach() {
 			sandbox.restore();
@@ -1205,30 +1204,19 @@ sap.ui.define([
 			this.oDesignTime.destroy();
 		}
 	}, function() {
-		QUnit.test("when getting a move change command for a bound control deep inside a bound list control,", function(assert) {
-			var oCreateChangeFromDataSpy = sandbox.spy(FlexCommand.prototype, "_createChangeFromData");
-			var oCompleteChangeContentSpy = sandbox.spy(MoveControls, "completeChangeContent");
-			var oApplyChangeSpy = sandbox.spy(MoveControls, "applyChange");
+		QUnit.test("when moving a control across parents deep inside a bound list control,", async function(assert) {
+			const oCreateChangeFromDataSpy = sandbox.spy(FlexCommand.prototype, "_createChangeFromData");
+			const oCompleteChangeContentSpy = sandbox.spy(MoveControls, "completeChangeContent");
+			const oApplyChangeSpy = sandbox.spy(MoveControls, "applyChange");
 
-			var oCommandFactory = new CommandFactory({
+			const oCommandFactory = new CommandFactory({
 				flexSettings: {
 					layer: Layer.CUSTOMER,
 					developerMode: false
 				}
 			});
 
-			var oMovedElement = this.oText1;
-			var oRelevantContainer = oMovedElement.getParent();
-			var oSource = {
-				parent: oRelevantContainer,
-				aggregation: "items"
-			};
-			// var oTarget = oSource;
-			var oTarget = {
-				parent: oRelevantContainer,
-				aggregation: "items"
-			};
-			var oSourceParentDesignTimeMetadata = new ElementDesignTimeMetadata({
+			const oSourceParentDesignTimeMetadata = new ElementDesignTimeMetadata({
 				data: {
 					actions: {
 						move: "moveControls"
@@ -1236,50 +1224,80 @@ sap.ui.define([
 				}
 			});
 
-			var oExpectedFlexSettings = {
+			const oExpectedFlexSettings = {
 				layer: Layer.CUSTOMER,
 				developerMode: false,
-				originalSelector: "vbox3",
+				originalSelector: "vbox31",
 				templateSelector: "list",
 				content: {
 					boundAggregation: "items"
 				}
 			};
-			return oCommandFactory.getCommandFor(oRelevantContainer, "move", {
+
+			// before a command is created, the element is already moved on the UI for that instance, but not in the template
+			const oMovedItem = this.oVBox31.removeItem(0);
+			this.oVBox32.insertItem(oMovedItem, 0);
+
+			const oMoveCommand = await oCommandFactory.getCommandFor(this.oVBox31, "move", {
 				movedElements: [{
-					element: oMovedElement,
+					element: oMovedItem,
 					sourceIndex: 0,
-					targetIndex: 1
+					targetIndex: 0
 				}],
-				source: oSource,
-				target: oTarget
-			}, oSourceParentDesignTimeMetadata)
+				source: {
+					parent: this.oVBox31,
+					aggregation: "items"
+				},
+				target: {
+					parent: this.oVBox32,
+					aggregation: "items"
+				}
+			}, oSourceParentDesignTimeMetadata);
 
-			.then(function(oMoveCommand) {
-				assert.ok(oMoveCommand, "then command is available");
-				assert.equal(oCreateChangeFromDataSpy.callCount, 1, "and '_createChangeFromData' is called once");
-				assert.deepEqual(oCreateChangeFromDataSpy.args[0][1], oExpectedFlexSettings, "and '_createChangeFromData' is called with the enriched set of flex settings");
-				assert.strictEqual(oMoveCommand.getPreparedChange().getOriginalSelector().id, oExpectedFlexSettings.originalSelector, "and the prepared change contains the original selector as dependency");
-				assert.strictEqual(oMoveCommand.getPreparedChange().getContent().boundAggregation, "items", "and the bound aggregation is written to the change content");
-				assert.strictEqual(oMoveCommand.getPreparedChange().getContent().source.selector.id, oMoveCommand.getPreparedChange().getDependentSelectors().source.id, "and the content of the change is also adjusted");
-				assert.strictEqual(oMoveCommand.getPreparedChange().getContent().target.selector.id, oMoveCommand.getPreparedChange().getDependentSelectors().target.id, "and the content of the change is also adjusted");
-				assert.strictEqual(oMoveCommand.getPreparedChange().getContent().movedElements[0].selector.id, oMoveCommand.getPreparedChange().getDependentSelectors().movedElements[0].id, "and the content of the change is also adjusted");
-				assert.notEqual(oMoveCommand.getMovedElements()[0].element.getId(), this.oText1.getId(), "and the moved element is not the UI control anymore");
-				var oTextItem = this.oItemTemplate.getContent()[0].getItems()[0].getItems()[0].getItems()[0];
-				assert.strictEqual(oMoveCommand.getMovedElements()[0].element, oTextItem, "the moved element is the corresponding control in the template");
-				return oMoveCommand.execute();
-			}.bind(this))
+			assert.ok(oMoveCommand, "then command is available");
+			assert.strictEqual(oCreateChangeFromDataSpy.callCount, 1, "and '_createChangeFromData' is called once");
+			const oChange = oMoveCommand.getPreparedChange();
+			const oContent = oChange.getContent();
+			assert.deepEqual(
+				oCreateChangeFromDataSpy.args[0][1], oExpectedFlexSettings,
+				"and '_createChangeFromData' is called with the enriched set of flex settings"
+			);
+			assert.strictEqual(
+				oChange.getOriginalSelector().id, oExpectedFlexSettings.originalSelector,
+				"and the prepared change contains the original selector as dependency"
+			);
+			assert.strictEqual(oContent.boundAggregation, "items", "and the bound aggregation is written to the change content");
+			assert.strictEqual(
+				oContent.source.selector.id, oChange.getDependentSelectors().source.id,
+				"and the content of the change is also adjusted"
+			);
+			assert.strictEqual(
+				oContent.target.selector.id, oChange.getDependentSelectors().target.id,
+				"and the content of the change is also adjusted"
+			);
+			assert.strictEqual(
+				oContent.movedElements[0].selector.id, oChange.getDependentSelectors().movedElements[0].id,
+				"and the content of the change is also adjusted"
+			);
+			assert.notEqual(
+				oMoveCommand.getMovedElements()[0].element.getId(), this.oText1.getId(),
+				"and the moved element is not the UI control anymore"
+			);
+			const oTextItem = this.oItemTemplate.getContent()[0].getItems()[0].getItems()[0].getItems()[0];
+			assert.strictEqual(
+				oMoveCommand.getMovedElements()[0].element, oTextItem,
+				"the moved element is the corresponding control in the template"
+			);
 
-			.then(function() {
-				assert.equal(oCompleteChangeContentSpy.callCount, 1, "then completeChangeContent is called once");
-				assert.equal(oApplyChangeSpy.callCount, 1, "then applyChange is called once");
-				assert.equal(this.oList.getItems()[0].getContent()[0].getItems()[0].getItems()[0].getItems()[0].getText(), "More Text 1", "and text control in first item has been moved");
-				assert.equal(this.oList.getItems()[0].getContent()[0].getItems()[0].getItems()[0].getItems()[1].getText(), "Text 1", "and text control in first item has been moved");
-				assert.equal(this.oList.getItems()[1].getContent()[0].getItems()[0].getItems()[0].getItems()[0].getText(), "More Text 2", "and text control in second item has been moved");
-				assert.equal(this.oList.getItems()[1].getContent()[0].getItems()[0].getItems()[0].getItems()[1].getText(), "Text 2", "and text control in second item has been moved");
-				assert.equal(this.oList.getItems()[2].getContent()[0].getItems()[0].getItems()[0].getItems()[0].getText(), "More Text 3", "and text control in third item has been moved");
-				assert.equal(this.oList.getItems()[2].getContent()[0].getItems()[0].getItems()[0].getItems()[1].getText(), "Text 3", "and text control in third item has been moved");
-			}.bind(this));
+			await oMoveCommand.execute();
+
+			assert.strictEqual(oCompleteChangeContentSpy.callCount, 1, "then completeChangeContent is called once");
+			assert.strictEqual(oApplyChangeSpy.callCount, 1, "then applyChange is called once");
+			[0, 1, 2].forEach((iIndex) => {
+				const [oVBox1, oVBox2] = this.oList.getItems()[iIndex].getContent()[0].getItems()[0].getItems();
+				assert.strictEqual(oVBox1.getItems()[0].getText(), `More Text ${iIndex + 1}`, "and text control in first item has been moved");
+				assert.strictEqual(oVBox2.getItems()[0].getText(), `Text ${iIndex + 1}`, "and text control in first item has been moved");
+			});
 		});
 
 		QUnit.test("when getting a reveal change command for an invisible bound control deep inside a bound list control,", function(assert) {

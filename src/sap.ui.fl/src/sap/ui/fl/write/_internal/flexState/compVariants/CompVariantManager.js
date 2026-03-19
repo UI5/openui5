@@ -5,8 +5,6 @@
 sap.ui.define([
 	"sap/base/util/restricted/_omit",
 	"sap/base/util/restricted/_pick",
-	"sap/ui/fl/Layer",
-	"sap/ui/fl/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/CompVariant",
 	"sap/ui/fl/apply/_internal/flexObjects/CompVariantRevertData",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
@@ -17,15 +15,13 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/compVariants/CompVariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/Settings",
-	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
-	"sap/ui/fl/write/_internal/Storage",
-	"sap/ui/fl/write/_internal/Versions"
+	"sap/ui/fl/write/_internal/Versions",
+	"sap/ui/fl/Layer",
+	"sap/ui/fl/Utils"
 ], function(
 	_omit,
 	_pick,
-	Layer,
-	Utils,
 	CompVariant,
 	CompVariantRevertData,
 	FlexObjectFactory,
@@ -36,12 +32,24 @@ sap.ui.define([
 	CompVariantManagementState,
 	FlexState,
 	Settings,
-	Version,
 	FlexObjectManager,
-	Storage,
-	Versions
+	Versions,
+	Layer,
+	Utils
 ) {
 	"use strict";
+
+	/**
+	 * CompVariant state class to handle the state of the compVariants and its changes.
+	 * This class is in charge of updating the maps stored in the <code>sap.ui.fl.apply._internal.flexState.FlexState</code>.
+	 *
+	 * @namespace sap.ui.fl.write._internal.flexState.compVariants.CompVariantState
+	 * @since 1.83
+	 * @version ${version}
+	 * @private
+	 * @ui5-restricted sap.ui.fl
+	 */
+	var CompVariantManager = {};
 
 	function isVersionIndependentOrInDraft(oChange, mPropertyBag) {
 		const aDraftFilenames = getPropertyFromVersionsModel("/draftFilenames", mPropertyBag);
@@ -76,111 +84,6 @@ sap.ui.define([
 		return bSameLayer && bNotTransported && isVersionIndependentOrInDraft(oFlexObject, mPropertyBag);
 	}
 
-	async function writeObjectAndAddToState(oFlexObject, sParentVersion, sReference) {
-		// new public variant should not be visible for other users
-		if (oFlexObject.getLayer() === Layer.PUBLIC) {
-			oFlexObject.setFavorite(false);
-		}
-		const oResult = await Storage.write({
-			flexObjects: [oFlexObject.convertToFileContent()],
-			layer: oFlexObject.getLayer(),
-			transport: oFlexObject.getRequest(),
-			isLegacyVariant: oFlexObject.isVariant && oFlexObject.isVariant(),
-			parentVersion: sParentVersion
-		});
-
-		// updateFlexObject and versionModel
-		if (oResult?.response?.[0]) {
-			oFlexObject.setResponse(oResult.response[0]);
-			if (sParentVersion) {
-				Versions.onAllChangesSaved({
-					reference: oResult.response[0].reference,
-					layer: oResult.response[0].layer,
-					draftFilenames: [oResult.response[0].fileName]
-				});
-			}
-		} else {
-			oFlexObject.setState(States.LifecycleState.PERSISTED);
-			// the checkUpdate is needed because the FlexState.update does not trigger this for added objects
-			// once a central save is implemented this would include this update
-			FlexState.getFlexObjectsDataSelector().checkUpdate({ reference: sReference });
-		}
-
-		const oFileContent = oFlexObject.convertToFileContent();
-		FlexState.update(sReference, [{
-			type: "add",
-			flexObject: oFileContent
-		}]);
-		return oFileContent;
-	}
-
-	async function updateObjectAndStorage(oFlexObject, sParentVersion, sReference) {
-		const oResult = await Storage.update({
-			flexObject: oFlexObject.convertToFileContent(),
-			layer: oFlexObject.getLayer(),
-			transport: oFlexObject.getRequest(),
-			parentVersion: sParentVersion
-		});
-
-		// update FlexObject and versionModel
-		if (oResult?.response) {
-			oFlexObject.setResponse(oResult.response);
-			if (sParentVersion) {
-				Versions.onAllChangesSaved({
-					reference: oResult.response.reference,
-					layer: oResult.response.layer,
-					draftFilenames: oResult.response.fileName
-				});
-			}
-		} else {
-			oFlexObject.setState(States.LifecycleState.PERSISTED);
-		}
-
-		const oFileContent = oFlexObject.convertToFileContent();
-		FlexState.update(sReference, [{
-			type: "update",
-			flexObject: oFileContent
-		}]);
-		return oFileContent;
-	}
-
-	async function deleteObjectAndRemoveFromStorage(oFlexObject, sParentVersion, sReference) {
-		var oFileContent = oFlexObject.convertToFileContent();
-		await Storage.remove({
-			flexObject: oFileContent,
-			layer: oFlexObject.getLayer(),
-			transport: oFlexObject.getRequest(),
-			parentVersion: sParentVersion
-		});
-
-		await Versions.updateModelFromBackend({
-			reference: oFileContent.reference,
-			layer: oFileContent.layer
-		});
-
-		FlexState.update(sReference, [{ type: "delete", flexObject: oFileContent }]);
-		return oFileContent;
-	}
-
-	function saveObject(oFlexObject, sParentVersion, sReference) {
-		switch (oFlexObject.getState()) {
-			case States.LifecycleState.NEW:
-				ifVariantClearRevertData(oFlexObject);
-				return writeObjectAndAddToState(oFlexObject, sParentVersion, sReference);
-			case States.LifecycleState.UPDATED:
-				ifVariantClearRevertData(oFlexObject);
-				return updateObjectAndStorage(oFlexObject, sParentVersion, sReference);
-			case States.LifecycleState.DELETED:
-				if (oFlexObject._sPreviousState !== States.LifecycleState.NEW) {
-					ifVariantClearRevertData(oFlexObject);
-					return deleteObjectAndRemoveFromStorage(oFlexObject, sParentVersion, sReference);
-				}
-				return Promise.resolve();
-			default:
-				return undefined;
-		}
-	}
-
 	function getTexts(mPropertyBag) {
 		var mInternalTexts = {};
 		if (typeof (mPropertyBag.texts) === "object") {
@@ -192,11 +95,6 @@ sap.ui.define([
 			});
 		}
 		return mInternalTexts;
-	}
-
-	function needsPersistencyCall(oFlexObject) {
-		return oFlexObject &&
-			[States.LifecycleState.NEW, States.LifecycleState.UPDATED, States.LifecycleState.DELETED].includes(oFlexObject.getState());
 	}
 
 	function determineLayer(mPropertyBag) {
@@ -223,12 +121,6 @@ sap.ui.define([
 
 		var bPublicLayerAvailable = Settings.getInstanceOrUndef()?.getIsPublicLayerAvailable?.();
 		return bPublicLayerAvailable ? Layer.PUBLIC : Layer.CUSTOMER;
-	}
-
-	function ifVariantClearRevertData(oFlexObject) {
-		if (oFlexObject instanceof CompVariant) {
-			oFlexObject.removeAllRevertData();
-		}
 	}
 
 	function revertVariantUpdate(oVariant, oRevertDataContent) {
@@ -272,18 +164,6 @@ sap.ui.define([
 			};
 		}
 	}
-
-	/**
-	 * CompVariant state class to handle the state of the compVariants and its changes.
-	 * This class is in charge of updating the maps stored in the <code>sap.ui.fl.apply._internal.flexState.FlexState</code>.
-	 *
-	 * @namespace sap.ui.fl.write._internal.flexState.compVariants.CompVariantState
-	 * @since 1.83
-	 * @version ${version}
-	 * @private
-	 * @ui5-restricted sap.ui.fl
-	 */
-	var CompVariantManager = {};
 
 	CompVariantManager.checkSVMControlsForDirty = function(sReference) {
 		return FlexState.getSVMControls(sReference).some((oSVMControl) => {
@@ -798,40 +678,25 @@ sap.ui.define([
 	 * @param {object} mPropertyBag - Map of parameters, see below
 	 * @param {string} mPropertyBag.reference - Flex reference of the app
 	 * @param {string} mPropertyBag.persistencyKey - Key of the variant management
+	 * @param {sap.ui.core.Control} mPropertyBag.control - Control for which the flex objects should be saved
 	 *
-	 * @returns {Promise} Promise resolving with an array of responses or rejecting with the first error
+	 * @returns {Promise} Resolves with an array of responses or rejects with the first error
 	 * @private
 	 */
-	CompVariantManager.persist = function(mPropertyBag) {
-		/* TODO
-		 * 1. use condensing route to reduce backend requests
-		 * 2. don't call the Storage directly
-		 * 3. don't mutate storage response, use FlexState.update
-		 * 4. bundle all updates to the FlexState
-		*/
+	CompVariantManager.persist = async function(mPropertyBag) {
 		const aCompVariantEntities = CompVariantManagementState.getCompEntitiesByPersistencyKey(mPropertyBag);
 
-		const aFlexObjects = aCompVariantEntities.filter(needsPersistencyCall);
-		const aPromises = aFlexObjects.map(async (oFlexObject, index) => {
-			if (index === 0) {
-				const sParentVersion = getPropertyFromVersionsModel("/persistedVersion", {
-					layer: oFlexObject.getLayer(),
-					reference: mPropertyBag.reference
-				});
-				// need to save first entry to generate draft version in backend
-				await saveObject(oFlexObject, sParentVersion, mPropertyBag.reference);
-				const aPromises = aFlexObjects.map((oFlexObject, index) => {
-					if (index !== 0) {
-						const sDraftVersion = sParentVersion ? Version.Number.Draft : undefined;
-						return saveObject(oFlexObject, sDraftVersion, mPropertyBag.reference);
-					}
-					return undefined;
-				});
-				return Promise.all(aPromises);
-			}
-			return undefined;
+		const aFlexObjects = aCompVariantEntities.filter((oFlexObject) => oFlexObject.getState() !== States.LifecycleState.PERSISTED);
+		await FlexObjectManager.saveFlexObjects({
+			flexObjects: aFlexObjects,
+			reference: mPropertyBag.reference,
+			selector: mPropertyBag.control
 		});
-		return Promise.all(aPromises);
+		aFlexObjects.forEach((oFlexObject) => {
+			if (oFlexObject instanceof CompVariant) {
+				oFlexObject.removeAllRevertData();
+			}
+		});
 	};
 
 	/**

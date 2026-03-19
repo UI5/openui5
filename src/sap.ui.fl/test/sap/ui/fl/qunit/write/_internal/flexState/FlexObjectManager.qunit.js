@@ -468,6 +468,9 @@ sap.ui.define([
 			this.oStorageRemoveStub = sandbox.stub(Storage, "remove").callsFake((oPropertyBag) => {
 				return Promise.resolve({ response: [oPropertyBag.flexObject] });
 			});
+			this.oStorageUpdateStub = sandbox.stub(Storage, "update").callsFake((oPropertyBag) => {
+				return Promise.resolve({ response: [oPropertyBag.flexObject] });
+			});
 			this.oStorageCondenseStub = sandbox.stub(Storage, "condense").callsFake((oPropertyBag) => {
 				return Promise.resolve({ response: oPropertyBag.condensedChanges.map((oChange) => oChange.convertToFileContent()) });
 			});
@@ -618,32 +621,38 @@ sap.ui.define([
 					fileName: "deletedChange2", layer: Layer.CUSTOMER, selector: { id: "control1" }
 				},
 				{
-					fileName: "notSavedChange1", layer: Layer.CUSTOMER, selector: { id: "control1" }
+					fileName: "updatedChange", layer: Layer.CUSTOMER, selector: { id: "control1" }
 				},
 				{
-					fileName: "notSavedChange2", layer: Layer.CUSTOMER, selector: { id: "control1" }
+					fileName: "notSavedChange1", layer: Layer.CUSTOMER, selector: { id: "control1" }
 				}
 			], this.oAppComponent);
+			this.oCondenserStub.restore();
+			this.oCondenserStub = sandbox.stub(Condenser, "condense").resolves([...this.aChanges, aChanges[2]]);
 			aChanges[0].setState(States.LifecycleState.PERSISTED);
 			aChanges[0].setState(States.LifecycleState.DELETED);
 			aChanges[1].setState(States.LifecycleState.PERSISTED);
 			aChanges[1].setState(States.LifecycleState.DELETED);
+			aChanges[2].setState(States.LifecycleState.PERSISTED);
+			aChanges[2].setState(States.LifecycleState.UPDATED);
 			sandbox.stub(Settings.getInstanceOrUndef(), "getIsCondensingEnabled").returns(false);
 			const oReturn = await FlexObjectManager.saveFlexObjects({
 				selector: this.oAppComponent,
+				reference: sReference,
 				layer: Layer.CUSTOMER
 			});
 
 			assert.deepEqual(oReturn, {
-				response: [...this.aChanges].map((oChange) => oChange.convertToFileContent())
+				response: this.aChanges.map((oChange) => oChange.convertToFileContent())
 			}, "the function returns the changes that were saved");
 			assert.strictEqual(this.oCondenserStub.callCount, 1, "the Condenser was called");
 			assert.strictEqual(this.oStorageWriteStub.callCount, 1, "the Storage.write was called once");
 			assert.strictEqual(this.oStorageRemoveStub.callCount, 2, "the Storage.remove was called twice");
+			assert.strictEqual(this.oStorageUpdateStub.callCount, 1, "the Storage.update was called once");
 			assert.strictEqual(this.oStorageCondenseStub.callCount, 0, "the Storage.condense was not called");
 			assert.strictEqual(this.oDHRemoveFromMapSpy.callCount, 0, "removeChangeFromMap was not called directly");
 			assert.strictEqual(this.oDHRemoveFromDependenciesSpy.callCount, 0, "removeChangeFromDependencies was not called directly");
-			assert.strictEqual(oDeleteStub.callCount, 4, "deleteFlexObjects was called four times");
+			assert.strictEqual(oDeleteStub.callCount, 3, "deleteFlexObjects was called three times");
 		});
 
 		QUnit.test("without backend condensing and the condenser returning no changes", async function(assert) {

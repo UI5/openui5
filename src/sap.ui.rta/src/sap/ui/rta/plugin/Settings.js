@@ -4,7 +4,6 @@
 
 sap.ui.define([
 	"sap/base/Log",
-	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/Util",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/plugin/Plugin",
@@ -12,7 +11,6 @@ sap.ui.define([
 
 ], function(
 	BaseLog,
-	OverlayRegistry,
 	DtUtil,
 	FlUtils,
 	Plugin,
@@ -36,9 +34,7 @@ sap.ui.define([
 	 */
 	const Settings = Plugin.extend("sap.ui.rta.plugin.Settings", /** @lends sap.ui.rta.plugin.Settings.prototype */ {
 		metadata: {
-			library: "sap.ui.rta",
-			associations: {},
-			events: {}
+			library: "sap.ui.rta"
 		}
 	});
 
@@ -65,8 +61,8 @@ sap.ui.define([
 	}
 
 	/**
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay overlay to be checked for editable
-	 * @returns {boolean} true if it's editable
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
+	 * @returns {boolean} <code>true</code> if it's editable
 	 * @private
 	 */
 	Settings.prototype._isEditable = function(oOverlay) {
@@ -86,7 +82,7 @@ sap.ui.define([
 	 * Checks if settings is enabled for oOverlay
 	 *
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {boolean} true if it's enabled
+	 * @returns {boolean} <code>true</code> if it's enabled
 	 * @public
 	 */
 	Settings.prototype.isEnabled = function(aElementOverlays) {
@@ -112,17 +108,16 @@ sap.ui.define([
 	Settings.prototype._getUnsavedChanges = function(sId, aChangeTypes) {
 		let sElementId;
 
-		const aUnsavedChanges = this.getCommandStack().getAllExecutedCommands().filter(function(oCommand) {
+		const aUnsavedChanges = this.getCommandStack().getAllExecutedCommands()
+		.filter((oCommand) => {
 			sElementId = oCommand.getElementId && oCommand.getElementId() || oCommand.getElement && oCommand.getElement().getId();
 			return sElementId === sId && aChangeTypes.indexOf(oCommand.getChangeType()) >= 0;
-		}).map(function(oCommand) {
-			return oCommand.getPreparedChange();
-		});
+		}).map((oCommand) => oCommand.getPreparedChange());
 
 		return aUnsavedChanges;
 	};
 
-	Settings.prototype._handleFlexChangeCommand = function(mChange, aSelectedOverlays, oCompositeCommand, oSettingsAction) {
+	Settings.prototype._handleFlexChangeCommand = async function(mChange, aSelectedOverlays, oCompositeCommand, oSettingsAction) {
 		const mChangeSpecificData = mChange.changeSpecificData;
 		let sVariantManagementReference;
 		// temporarily support both
@@ -136,86 +131,66 @@ sap.ui.define([
 			oControl = vSelector;
 		}
 
-		return this.hasChangeHandler(mChangeSpecificData.changeType, oControl, sControlType)
-		.then(function(bHasChangeHandler) {
-			if (aSelectedOverlays[0].getVariantManagement && bHasChangeHandler && !oSettingsAction.CAUTION_variantIndependent) {
-				sVariantManagementReference = aSelectedOverlays[0].getVariantManagement();
-			}
-			return this.getCommandFactory().getCommandFor(
-				vSelector,
-				"settings",
-				mChangeSpecificData,
-				undefined,
-				sVariantManagementReference
-			);
-		}.bind(this))
-		.then(function(oSettingsCommand) {
-			const bRuntimeOnly = oSettingsAction.runtimeOnly;
-			if (oSettingsCommand && bRuntimeOnly) {
-				oSettingsCommand.setRuntimeOnly(bRuntimeOnly);
-			}
-			return oCompositeCommand.addCommand(oSettingsCommand);
-		});
+		const bHasChangeHandler = await this.hasChangeHandler(mChangeSpecificData.changeType, oControl, sControlType);
+		if (aSelectedOverlays[0].getVariantManagement && bHasChangeHandler && !oSettingsAction.CAUTION_variantIndependent) {
+			sVariantManagementReference = aSelectedOverlays[0].getVariantManagement();
+		}
+		const oSettingsCommand = await this.getCommandFactory().getCommandFor(
+			vSelector,
+			"settings",
+			mChangeSpecificData,
+			undefined,
+			sVariantManagementReference
+		);
+		const bRuntimeOnly = oSettingsAction.runtimeOnly;
+		if (oSettingsCommand && bRuntimeOnly) {
+			oSettingsCommand.setRuntimeOnly(bRuntimeOnly);
+		}
+		return oCompositeCommand.addCommand(oSettingsCommand);
 	};
 
-	Settings.prototype._handleManifestChangeCommand = function(mChange, oElement, oCompositeCommand) {
+	Settings.prototype._handleManifestChangeCommand = async function(mChange, oElement, oCompositeCommand) {
 		const mChangeSpecificData = mChange.changeSpecificData;
 		const oComponent = mChange.appComponent;
-		const mManifest = oComponent.getManifest();
-		const sReference = mManifest["sap.app"].id;
 
-		return this.getCommandFactory().getCommandFor(
+		const oManifestCommand = await this.getCommandFactory().getCommandFor(
 			oElement,
 			"manifest",
 			{
-				reference: sReference,
+				reference: oComponent.getManifest()["sap.app"].id,
 				appComponent: oComponent,
 				changeType: mChangeSpecificData.appDescriptorChangeType,
 				parameters: mChangeSpecificData.content.parameters,
 				texts: mChangeSpecificData.content.texts
 			}
-		)
-		.then(function(oManifestCommand) {
-			return oCompositeCommand.addCommand(oManifestCommand);
-		});
+		);
+		return oCompositeCommand.addCommand(oManifestCommand);
 	};
 
-	Settings.prototype._handleCompositeCommand = function(aElementOverlays, oElement, aChanges, oSettingsAction) {
-		let oCompositeCommand;
+	Settings.prototype._handleCompositeCommand = async function(aElementOverlays, oElement, aChanges, oSettingsAction) {
+		const oCompositeCommand = await this.getCommandFactory().getCommandFor(oElement, "composite");
 
-		return this.getCommandFactory().getCommandFor(oElement, "composite")
-
-		.then(function(_oCompositeCommand) {
-			oCompositeCommand = _oCompositeCommand;
-		})
-
-		.then(function() {
-			return aChanges.map(function(mChange) {
-				const mChangeSpecificData = mChange.changeSpecificData;
-				// Flex Change
-				if (mChangeSpecificData.changeType) {
-					return () => this._handleFlexChangeCommand(mChange, aElementOverlays, oCompositeCommand, oSettingsAction);
-				// Manifest Change
-				} else if (mChangeSpecificData.appDescriptorChangeType) {
-					return () => this._handleManifestChangeCommand(mChange, oElement, oCompositeCommand);
-				}
-				return undefined;
-			}, this);
-		}.bind(this))
-
-		.then(function(aPromises) {
-			// Since oCompositeCommand gets modified by each handler, the promise execution must be sequential
-			// to ensure the correct order of the commands
-			return FlUtils.execPromiseQueueSequentially(aPromises);
-		})
-
-		.then(function() {
-			if (oCompositeCommand.getCommands().length > 0) {
-				this.fireElementModified({
-					command: oCompositeCommand
-				});
+		const aPromises = aChanges.map((mChange) => {
+			const mChangeSpecificData = mChange.changeSpecificData;
+			// Flex Change
+			if (mChangeSpecificData.changeType) {
+				return () => this._handleFlexChangeCommand(mChange, aElementOverlays, oCompositeCommand, oSettingsAction);
+			// Manifest Change
+			} else if (mChangeSpecificData.appDescriptorChangeType) {
+				return () => this._handleManifestChangeCommand(mChange, oElement, oCompositeCommand);
 			}
-		}.bind(this));
+			return undefined;
+		});
+
+		// Since oCompositeCommand gets modified by each handler, the promise execution must be sequential
+		// to ensure the correct order of the commands
+		await FlUtils.execPromiseQueueSequentially(aPromises);
+
+		if (oCompositeCommand.getCommands().length > 0) {
+			this.fireElementModified({
+				command: oCompositeCommand
+			});
+		}
 	};
 
 	/**
@@ -225,44 +200,39 @@ sap.ui.define([
 	 * @param {object} mPropertyBag - Property bag
 	 * @param {function} [mPropertyBag.fnHandler] - Handler function for the case of multiple settings actions
 	 * @param {object} [oSettingsAction] - The action object defined in the designtime
-	 * @return {Promise} Returns promise resolving with the creation of the commands
+	 * @returns {Promise} Returns promise resolving with the creation of the commands
 	 */
-	Settings.prototype.handler = function(aElementOverlays, mPropertyBag, oSettingsAction) {
-		mPropertyBag ||= {};
+	Settings.prototype.handler = async function(aElementOverlays, mPropertyBag, oSettingsAction) {
+		const mProperties = Object.assign({}, mPropertyBag);
 		const oElement = aElementOverlays[0].getElement();
-		let { fnHandler } = mPropertyBag;
+		const fnHandler = mProperties.fnHandler || aElementOverlays[0].getDesignTimeMetadata().getAction("settings").handler;
 
-		fnHandler ||= aElementOverlays[0].getDesignTimeMetadata().getAction("settings").handler;
 		if (!fnHandler) {
 			throw new Error("Handler not found for settings action");
 		}
-		mPropertyBag.getUnsavedChanges = this._getUnsavedChanges.bind(this);
-		mPropertyBag.styleClass = Utils.getRtaStyleClassName();
+		mProperties.getUnsavedChanges = this._getUnsavedChanges.bind(this);
+		mProperties.styleClass = Utils.getRtaStyleClassName();
 
-		return fnHandler(oElement, mPropertyBag)
-
-		.then(function(aChanges) {
+		try {
+			const aChanges = await fnHandler(oElement, mProperties);
 			if (aChanges.length > 0) {
 				return this._handleCompositeCommand(aElementOverlays, oElement, aChanges, oSettingsAction);
 			}
-			return undefined;
-		}.bind(this))
-
-		.catch(function(vError) {
+		} catch (vError) {
 			throw DtUtil.propagateError(
 				vError,
 				"Settings#handler",
 				"Error occurred during handler execution",
 				"sap.ui.rta.plugin"
 			);
-		});
+		}
 	};
 
 	/**
 	 * Retrieve the context menu item for the actions.
 	 * If multiple actions are defined for Settings, it returns multiple menu items.
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {object[]} array of the items with required data
+	 * @returns {object[]} Items with required data
 	 */
 	Settings.prototype.getMenuItems = async function(aElementOverlays) {
 		const oElementOverlay = aElementOverlays[0];
@@ -272,7 +242,6 @@ sap.ui.define([
 		const aMenuItems = [];
 		if (vSettingsActions) {
 			const iRank = this.getRank("CTX_SETTINGS");
-
 			const aSettingsActions = getValidActions(vSettingsActions, oResponsibleElementOverlay);
 
 			if (this._isEditableByPlugin(oResponsibleElementOverlay) === undefined) {
@@ -280,7 +249,7 @@ sap.ui.define([
 				// has no visible geometry, thus evaluateEditable now
 				await this.evaluateEditable([oResponsibleElementOverlay], { onRegistration: false });
 			}
-			aSettingsActions.forEach(function(oSettingsAction, iIndex, aActions) {
+			aSettingsActions.forEach((oSettingsAction, iIndex, aActions) => {
 				if (
 					this._checkRelevantContainerStableID(oSettingsAction, oResponsibleElementOverlay)
 					&& this.isAvailable([oResponsibleElementOverlay])
@@ -293,14 +262,11 @@ sap.ui.define([
 						rank: bSingleAction ? iRank : iRank + iIndex,
 						text: this.getActionText(oResponsibleElementOverlay, oSettingsAction, sPluginId),
 						icon: getActionIcon(oSettingsAction),
-						enabled: (
-							typeof oSettingsAction.isEnabled === "function"
-							&& function(aElementOverlays) {
-								return oSettingsAction.isEnabled(aElementOverlays[0].getElement());
-							}
+						enabled:
+							(typeof oSettingsAction.isEnabled === "function"
+							&& ((aElementOverlays) => oSettingsAction.isEnabled(aElementOverlays[0].getElement())))
 							|| oSettingsAction.isEnabled
-							|| this.isEnabled([oResponsibleElementOverlay])
-						),
+							|| this.isEnabled([oResponsibleElementOverlay]),
 						handler: function(fnHandler, aElementOverlays, mPropertyBag) {
 							mPropertyBag ||= {};
 							mPropertyBag.fnHandler = fnHandler;
@@ -311,7 +277,7 @@ sap.ui.define([
 				} else {
 					BaseLog.warning("Action is not available or relevant container has no stable id");
 				}
-			}, this);
+			});
 		}
 
 		return aMenuItems;
@@ -319,7 +285,7 @@ sap.ui.define([
 
 	function formatSubMenuItems(aSubMenu) {
 		if (aSubMenu) {
-			return aSubMenu.map(function(oSubMenu, iIndex) {
+			return aSubMenu.map((oSubMenu, iIndex) => {
 				return {
 					id: oSubMenu.key || `${sPluginId}_SUB_${iIndex}`,
 					icon: oSubMenu.icon || "blank",
@@ -346,7 +312,7 @@ sap.ui.define([
 
 	/**
 	 * Get the name of the action related to this plugin.
-	 * @return {string} Returns the action name
+	 * @returns {string} Action name
 	 */
 	Settings.prototype.getActionName = function() {
 		return "settings";

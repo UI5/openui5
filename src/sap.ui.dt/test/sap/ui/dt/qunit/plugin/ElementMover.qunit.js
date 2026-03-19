@@ -1,27 +1,32 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/m/Button",
+	"sap/m/HBox",
+	"sap/ui/core/Element",
 	"sap/ui/dt/plugin/ElementMover",
-	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/DesignTime",
+	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/layout/form/Form",
 	"sap/ui/layout/form/FormContainer",
-	"sap/m/Button",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/core/Element"
+	"sap/ui/thirdparty/sinon-4"
 ], function(
+	Button,
+	HBox,
+	Element,
 	ElementMover,
-	OverlayRegistry,
 	DesignTime,
+	OverlayRegistry,
 	Form,
 	FormContainer,
-	Button,
 	VerticalLayout,
 	nextUIUpdate,
-	Element
+	sinon
 ) {
 	"use strict";
+	const oSandbox = sinon.createSandbox();
 
 	QUnit.module("Given smartform groups and groupElements", {
 		async beforeEach() {
@@ -127,46 +132,51 @@ sap.ui.define([
 
 	QUnit.module("Given verticalLayout, buttons and associated overlays", {
 		async beforeEach(assert) {
-			this.oElementMover = new ElementMover();
 			this.oButton1 = new Button("button1");
 			this.oButton2 = new Button("button2");
 			this.oButton3 = new Button("button3");
-			this.oVerticalLayout = new VerticalLayout("layout1", {
+			this.oVerticalLayout1 = new VerticalLayout("layout1", {
 				content: [
 					this.oButton1,
 					this.oButton2,
 					this.oButton3
+				]
+			});
+			this.oVerticalLayout2 = new VerticalLayout("layout2");
+			this.oHBox = new HBox({
+				items: [
+					this.oVerticalLayout1,
+					this.oVerticalLayout2
 				]
 			}).placeAt("qunit-fixture");
 
 			await nextUIUpdate();
 
 			this.oDesignTime = new DesignTime({
-				rootElements: [this.oVerticalLayout]
+				rootElements: [this.oHBox]
 			});
-
+			this.oElementMover = new ElementMover({
+				designTime: this.oDesignTime
+			});
 			var done = assert.async();
 
 			this.oDesignTime.attachEventOnce("synced", function() {
-				this.oVerticalLayoutOverlay = OverlayRegistry.getOverlay(this.oVerticalLayout);
 				this.oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
 				this.oButton2Overlay = OverlayRegistry.getOverlay(this.oButton2);
 				this.oButton3Overlay = OverlayRegistry.getOverlay(this.oButton3);
+				this.oVerticalLayout2Overlay = OverlayRegistry.getOverlay(this.oVerticalLayout2);
 				done();
 			}.bind(this));
 		},
 		afterEach() {
-			this.oButton1Overlay.destroy();
-			this.oButton2Overlay.destroy();
-			this.oButton3Overlay.destroy();
-			this.oVerticalLayoutOverlay.destroy();
-			this.oVerticalLayout.destroy();
+			oSandbox.restore();
+			this.oHBox.destroy();
 			this.oDesignTime.destroy();
 		}
 	}, function() {
 		QUnit.test("Calling repositionOn method with button1 as source and button2 as target overlay", function(assert) {
 			this.oElementMover.repositionOn(this.oButton1Overlay, this.oButton2Overlay);
-			var aContent = this.oVerticalLayout.getContent();
+			const aContent = this.oVerticalLayout1.getContent();
 			assert.strictEqual(aContent.indexOf(this.oButton1), 1, "then button1 is moved to position 1");
 			assert.strictEqual(aContent.indexOf(this.oButton2), 0, "then button2 is moved to position 0");
 			assert.strictEqual(aContent.indexOf(this.oButton3), 2, "then button3 is moved to position 2");
@@ -174,7 +184,7 @@ sap.ui.define([
 
 		QUnit.test("Calling repositionOn method with button1 as source and button3 as target overlay", function(assert) {
 			this.oElementMover.repositionOn(this.oButton1Overlay, this.oButton3Overlay);
-			var aContent = this.oVerticalLayout.getContent();
+			const aContent = this.oVerticalLayout1.getContent();
 			assert.strictEqual(aContent.indexOf(this.oButton1), 2, "then button1 is moved to position 2");
 			assert.strictEqual(aContent.indexOf(this.oButton2), 0, "then button2 is moved to position 0");
 			assert.strictEqual(aContent.indexOf(this.oButton3), 1, "then button3 is moved to position 1");
@@ -182,7 +192,7 @@ sap.ui.define([
 
 		QUnit.test("Calling repositionOn method with button3 as source and button2 as target overlay", function(assert) {
 			this.oElementMover.repositionOn(this.oButton3Overlay, this.oButton2Overlay);
-			var aContent = this.oVerticalLayout.getContent();
+			const aContent = this.oVerticalLayout1.getContent();
 			assert.strictEqual(aContent.indexOf(this.oButton1), 0, "then button1 is moved to position 0");
 			assert.strictEqual(aContent.indexOf(this.oButton2), 2, "then button2 is moved to position 2");
 			assert.strictEqual(aContent.indexOf(this.oButton3), 1, "then button3 is moved to position 1");
@@ -190,7 +200,7 @@ sap.ui.define([
 
 		QUnit.test("Calling repositionOn method with button3 as source and button2 as target overlay and InsertAfterElement is TRUE", function(assert) {
 			this.oElementMover.repositionOn(this.oButton3Overlay, this.oButton2Overlay, true);
-			var aContent = this.oVerticalLayout.getContent();
+			const aContent = this.oVerticalLayout1.getContent();
 			assert.strictEqual(aContent.indexOf(this.oButton1), 0, "then button1 is moved to position 0");
 			assert.strictEqual(aContent.indexOf(this.oButton2), 1, "then button2 is moved to position 1");
 			assert.strictEqual(aContent.indexOf(this.oButton3), 2, "then button3 is moved to position 2");
@@ -198,7 +208,7 @@ sap.ui.define([
 
 		QUnit.test("Calling insertInto method with button1 as source and verticalLayout as target overlay", function(assert) {
 			this.oElementMover.insertInto(this.oButton1Overlay, this.oButton1Overlay.getParentAggregationOverlay());
-			var aContent = this.oVerticalLayout.getContent();
+			const aContent = this.oVerticalLayout1.getContent();
 			assert.strictEqual(aContent.indexOf(this.oButton1), 0, "then button1 is moved to position 0");
 			assert.strictEqual(aContent.indexOf(this.oButton2), 1, "then button2 is moved to position 1");
 			assert.strictEqual(aContent.indexOf(this.oButton3), 2, "then button3 is moved to position 2");
@@ -206,10 +216,26 @@ sap.ui.define([
 
 		QUnit.test("Calling insertInto method with button1 as source and verticalLayout as target overlay and InsertAfterElement is TRUE", function(assert) {
 			this.oElementMover.insertInto(this.oButton1Overlay, this.oButton1Overlay.getParentAggregationOverlay(), true);
-			var aContent = this.oVerticalLayout.getContent();
+			const aContent = this.oVerticalLayout1.getContent();
 			assert.strictEqual(aContent.indexOf(this.oButton1), 2, "then button1 is moved to position 2");
 			assert.strictEqual(aContent.indexOf(this.oButton2), 0, "then button2 is moved to position 0");
 			assert.strictEqual(aContent.indexOf(this.oButton3), 1, "then button3 is moved to position 1");
+		});
+
+		QUnit.test("Calling insertInto method with button1 as source and verticalLayout2 as target overlay", function(assert) {
+			const oSetSpy = oSandbox.spy(this.oButton1Overlay, "setOngoingMoveInformation");
+			const oResetSpy = oSandbox.spy(this.oButton1Overlay, "resetOngoingMoveInformation");
+			this.oElementMover.insertInto(this.oButton1Overlay, this.oVerticalLayout2Overlay.getAggregationOverlay("content"));
+			const aContent = this.oVerticalLayout1.getContent();
+			assert.strictEqual(aContent.indexOf(this.oButton2), 0, "then button2 is moved to position 0");
+			assert.strictEqual(aContent.indexOf(this.oButton3), 1, "then button3 is moved to position 1");
+			const aContent1 = this.oVerticalLayout2.getContent();
+			assert.strictEqual(aContent1.indexOf(this.oButton1), 0, "then button1 is moved to position 0 of verticalLayout2");
+			assert.strictEqual(oSetSpy.calledOnce, true, "then setOngoingMoveInformation is called once");
+			assert.deepEqual(oSetSpy.firstCall.args[0], {
+				sourceParentInstance: this.oVerticalLayout1
+			}, "then the setOngoingMoveInformation function was called with the correct move information");
+			assert.strictEqual(oResetSpy.calledOnce, true, "then resetOngoingMoveInformation is called once");
 		});
 	});
 

@@ -1,0 +1,84 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "test.card.customSettings.withObjects",
+		"type": "card",
+		"title": "Card 'withObjects'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"customSettings": {
+			"features": [
+				"manifestFeature1",
+				"manifestFeature2"
+			]
+		},
+		"header": {
+			"title": "Custom Settings - Mixed Object Bindings",
+			"subtitle": "SDK objects + manifest overrides with nested bindings",
+			"status": {
+				"text": "{customSettings>/features/0}"
+			}
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Theme Object (SDK)",
+					"items": [
+						{
+							"label": "Primary Color",
+							"value": "{customSettings>/theme/primaryColor}",
+							"icon": {
+								"src": "sap-icon://palette"
+							}
+						},
+						{
+							"label": "Secondary Color",
+							"value": "{customSettings>/theme/secondaryColor}",
+							"icon": {
+								"src": "sap-icon://palette"
+							}
+						},
+						{
+							"label": "Font Size",
+							"value": "{= ${customSettings>/theme/fontSize} + 'px' }"
+						}
+					]
+				},
+				{
+					"title": "Features Array (Manifest Override)",
+					"items": [
+						{
+							"label": "First Feature",
+							"value": "{customSettings>/features/0}"
+						},
+						{
+							"label": "Second Feature",
+							"value": "{customSettings>/features/1}"
+						},
+						{
+							"label": "Third Feature (from SDK)",
+							"value": "{customSettings>/features/2}"
+						}
+					]
+				},
+				{
+					"title": "API Config (Nested Object Binding)",
+					"items": [
+						{
+							"label": "Endpoint URL",
+							"value": "{customSettings>/apiConfig/endpoint}"
+						},
+						{
+							"label": "Timeout",
+							"value": "{= ${customSettings>/apiConfig/timeout} + ' ms' }"
+						}
+					]
+				}
+			]
+		}
+	}
+}

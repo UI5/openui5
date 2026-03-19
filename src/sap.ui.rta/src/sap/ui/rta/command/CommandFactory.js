@@ -53,11 +53,11 @@ sap.ui.define([
 
 	// For the Move Action the UI control is already moved while the corresponding object in the binding template is in the source position.
 	// Therefore we have to overwrite the index of the control in the stack with the source index (iIndex) to determine the needed template object.
-	function getTemplateElementId(vElementOrId, iIndex) {
+	function getTemplateElementId(vElementOrId, iIndex, oMoveInformation) {
 		const oElement = (typeof vElementOrId === "string") ? Element.getElementById(vElementOrId) : vElementOrId;
 		const oElementOverlay = OverlayRegistry.getOverlay(oElement);
 		if (oElementOverlay) {
-			const mBoundControl = ElementUtil.getAggregationInformation(oElement);
+			const mBoundControl = ElementUtil.getAggregationInformation(oElement, oMoveInformation);
 			if (typeof iIndex === "number") {
 				mBoundControl.stack[0].index = iIndex;
 			}
@@ -145,7 +145,15 @@ sap.ui.define([
 
 	function adjustMoveCommand(mSettings) {
 		const aTemplateMovedElements = mSettings.movedElements.map(function(oMovedElement) {
-			const oMovedElementInTemplate = Element.getElementById(getTemplateElementId(oMovedElement.element, oMovedElement.sourceIndex));
+			const oMoveInformation = {
+				sourceParentInstance: mSettings.source.parent
+			};
+			const sId = getTemplateElementId(
+				oMovedElement.element,
+				oMovedElement.sourceIndex,
+				mSettings.source.parent.getId() === mSettings.target.parent.getId() ? undefined : oMoveInformation
+			);
+			const oMovedElementInTemplate = Element.getElementById(sId);
 			evaluateResult(oMovedElementInTemplate);
 			return oMovedElementInTemplate;
 		});

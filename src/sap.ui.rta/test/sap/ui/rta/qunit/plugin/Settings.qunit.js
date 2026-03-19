@@ -422,20 +422,19 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when the handle settings function is called and no handler is present in Designtime Metadata,", function(assert) {
+		QUnit.test("when the handle settings function is called and no handler is present in Designtime Metadata,", async function(assert) {
+			assert.expect(1);
 			const oButtonOverlay = createOverlayWithSettingsAction(this.oButton, {
 				isEnabled: true
 			});
 
 			const aSelectedOverlays = [oButtonOverlay];
 
-			assert.throws(
-				function() {
-					this.oSettingsPlugin.handler(aSelectedOverlays, { eventItem: {}, contextElement: this.oButton });
-				},
-				/Handler not found/,
-				"an error message is raised referring to the missing handler"
-			);
+			try {
+				await this.oSettingsPlugin.handler(aSelectedOverlays, { eventItem: {}, contextElement: this.oButton });
+			} catch (oError) {
+				assert.strictEqual(oError.message, "Handler not found for settings action", "the correct error is thrown");
+			}
 		});
 
 		QUnit.test("when the handle settings function is called and the handler returns a rejected promise with error object,", function(assert) {
@@ -1091,7 +1090,7 @@ sap.ui.define([
 			assert.strictEqual(aMenuItems[1].enabled([oButtonOverlay]), false, "and it is disabled");
 		});
 
-		QUnit.test("when retrieving the context menu items and executing two 'settings' actions with diffrent icon settings", async function(assert) {
+		QUnit.test("when retrieving the context menu items and executing two 'settings' actions with different icon settings", async function(assert) {
 			const sIconAction1 = "sap-icon://myIconAction1";
 
 			const oButtonOverlay = createOverlayWithSettingsAction(this.oButton, [

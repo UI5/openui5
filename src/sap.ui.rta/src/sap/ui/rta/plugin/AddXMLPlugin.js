@@ -48,9 +48,7 @@ sap.ui.define([
 				fragmentHandler: {
 					type: "function"
 				}
-			},
-			associations: {},
-			events: {}
+			}
 		}
 	});
 
@@ -68,7 +66,7 @@ sap.ui.define([
 		// Action should be available by default
 		const oAddXMLAction = this.getAction(oOverlay);
 		if (oAddXMLAction === null) {
-			return Promise.resolve(false);
+			return false;
 		}
 		const bHasChangeHandler = await this.hasChangeHandler(FLEX_CHANGE_TYPE, oOverlay.getElement());
 		return bHasChangeHandler;
@@ -81,10 +79,9 @@ sap.ui.define([
 	 * @public
 	 */
 	AddXML.prototype.isEnabled = function(aElementOverlays) {
-		const bEnabled = (aElementOverlays.length === 1) &&
-			!this.isInReuseComponentOnS4HanaCloud(aElementOverlays[0]) &&
-			this.hasStableId(aElementOverlays[0]);
-		return bEnabled;
+		return (aElementOverlays.length === 1)
+			&& !this.isInReuseComponentOnS4HanaCloud(aElementOverlays[0])
+			&& this.hasStableId(aElementOverlays[0]);
 	};
 
 	/**

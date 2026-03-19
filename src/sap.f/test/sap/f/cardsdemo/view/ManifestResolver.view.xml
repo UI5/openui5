@@ -47,6 +47,13 @@
 					<core:Item text="Card with Filters" key="filtersCard" />
 					<core:Item text="Card with Severe Error" key="cardWithSevereError" />
 					<core:Item text="Card with Extension" key="cardWithExtension" />
+					<core:Item text="Custom Settings" key="customSettings" />
+					<core:Item text="Custom Settings - SDK Only" key="customSettingsSDKOnly" />
+					<core:Item text="Custom Settings - Manifest Only" key="customSettingsManifestOnly" />
+					<core:Item text="Custom Settings - Complex Bindings" key="customSettingsComplexBindings" />
+					<core:Item text="Custom Settings - With Objects" key="customSettingsWithObjects" />
+					<core:Item text="Custom Settings - Object Override" key="customSettingsObjectOverride" />
+					<core:Item text="Custom Settings - Object No Override" key="customSettingsObjectNoOverride" />
 				</Select>
 
 				<Label text="baseUrl" labelFor="baseUrlInp" />
