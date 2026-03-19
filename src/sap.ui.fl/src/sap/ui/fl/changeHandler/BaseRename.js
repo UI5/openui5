@@ -99,8 +99,7 @@ sap.ui.define([
 						originalControlType: mPropertyBag.modifier.getControlType(oControlToBeRenamed)
 					});
 
-					// TODO: Remove assignment without content after all derived change handlers are adjusted to use content. todos#4
-					const oChangeContent = mSpecificChangeInfo.content || mSpecificChangeInfo;
+					const oChangeContent = mSpecificChangeInfo.content;
 					if (typeof (oChangeContent.value) === "string") {
 						oChange.setText(sChangePropertyName, oChangeContent.value, sTranslationTextType);
 					} else {

@@ -1,0 +1,72 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "test.card.customSettings",
+		"type": "card",
+		"title": "Card 'customSettings'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"customSettings": {
+			"feature2": false,
+			"feature3": "overridden from manifest",
+			"cardSpecific": "only in manifest"
+		},
+		"header": {
+			"title": "Custom Settings Test Card",
+			"subtitle": "Testing SDK defaults + manifest overrides",
+			"visible": "{= ${customSettings>/showHeader} !== false}"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Item 1",
+						"Description": "First test item"
+					},
+					{
+						"Name": "Item 2",
+						"Description": "Second test item"
+					},
+					{
+						"Name": "Item 3",
+						"Description": "Third test item"
+					}
+				]
+			},
+			"item": {
+				"title": {
+					"value": "{Name}"
+				},
+				"description": {
+					"value": "{Description}"
+				}
+			}
+		},
+		"footer": {
+			"actionsStrip": [
+				{
+					"text": "Submit",
+					"actions": [
+						{
+							"type": "Submit",
+							"enabled": "{= !${customSettings>/isPreview}}"
+						}
+					]
+				},
+				{
+					"text": "Info Button",
+					"visible": "{= ${customSettings>/feature1} === true}",
+					"actions": [
+						{
+							"type": "Navigation"
+						}
+					]
+				}
+			]
+		}
+	}
+}

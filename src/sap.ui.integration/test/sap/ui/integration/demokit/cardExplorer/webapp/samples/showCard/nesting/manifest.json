@@ -1,5 +1,5 @@
 {
-	"_version": "%LATEST_SCHEMA_VERSION%",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.actionslabels.list.card",
 		"type": "card",
@@ -67,7 +67,7 @@
 				"description": "{QuantityPerUnit}",
 				"highlight": "{= ${UnitsInStock} === 0 ? 'Error' : (${UnitsInStock} < ${ReorderLevel} ? 'Warning' : 'Success') }",
 				"info": {
-				    "value": "Unit Price: {= ${UnitPrice} ? '$' + ${UnitPrice} : 'N/A' }"
+					"value": "Unit Price: {= ${UnitPrice} ? '$' + ${UnitPrice} : 'N/A' }"
 				},
 				"actionsStrip": [
 					{

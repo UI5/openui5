@@ -296,10 +296,11 @@ sap.ui.define([
 	 * Checks whether specified Element is in a binding template, if so it checks if template has a valid control representation.
 	 *
 	 * @param {sap.ui.base.Object} oObject - Object for validation
+	 * @param {object} [oMoveInformation] - Information about the source parent, needed for correct template id extraction in move scenarios
 	 * @returns {boolean} <code>true</code> if object is not in bound aggregation or has a valid template representation
 	 */
-	ElementUtil.isElementInTemplate = function(oObject) {
-		var mLocationInTemplate = ElementUtil.getAggregationInformation(oObject);
+	ElementUtil.isElementInTemplate = function(oObject, oMoveInformation) {
+		var mLocationInTemplate = ElementUtil.getAggregationInformation(oObject, oMoveInformation);
 
 		if (mLocationInTemplate.templateId) {
 			var sTemplateId = ElementUtil.extractTemplateId(mLocationInTemplate);
@@ -340,14 +341,14 @@ sap.ui.define([
 	 * @param {sap.ui.base.Object} oObject - Object for validation
 	 * @returns {boolean} <code>true</code> if object is supported
 	 */
-	ElementUtil.isElementValid = function(oObject) {
+	ElementUtil.isElementValid = function(oObject, oMoveInformation) {
 		var bValid = (
 			(
 				oObject instanceof Element
 				|| oObject instanceof Component
 			)
 			&& !oObject.bIsDestroyed
-			&& ElementUtil.isElementInTemplate(oObject)
+			&& ElementUtil.isElementInTemplate(oObject, oMoveInformation)
 		);
 
 		return bValid;
@@ -440,12 +441,27 @@ sap.ui.define([
 	/**
 	 * Returns the element ID and the aggregation name of the bound control for an element which is part of an aggregation binding.
 	 * The check is done recursively.
-	 * @param  {sap.ui.core.Element} oElement - Element being checked
+	 * @param {sap.ui.core.Element} oElement - Element being checked
+	 * @param {object} [oMoveInformation] - Information about the source parent, needed for correct template id extraction in move scenarios
 	 * @return {AggregationBindingStack} {@link sap.ui.dt.ElementUtil.AggregationBindingStack} object
 	 */
-	ElementUtil.getAggregationInformation = function(oElement) {
+	ElementUtil.getAggregationInformation = function(oElement, oMoveInformation) {
 		var aStack = [];
-		return ElementUtil._evaluateBinding(oElement, aStack);
+		const oResult = ElementUtil._evaluateBinding(oElement, aStack);
+
+		// oResult is based on the current state of the UI, which means in move scenarios the element instance was already moved
+		// in case of move inside a template, the template is not yet updated and we have to adjust the parent information
+		// based on the move information which is saved before the move is executed
+		if (oMoveInformation) {
+			const iIndexOfParent = ElementUtil.getIndexInAggregation(
+				oMoveInformation.sourceParentInstance,
+				oMoveInformation.sourceParentInstance.getParent(),
+				oMoveInformation.sourceParentInstance.sParentAggregationName
+			);
+			oResult.stack[1].index = iIndexOfParent;
+			oResult.stack[1].element = oMoveInformation.sourceParentInstance.getId();
+		}
+		return oResult;
 	};
 
 	ElementUtil._evaluateBinding = function(oElement, aStack) {

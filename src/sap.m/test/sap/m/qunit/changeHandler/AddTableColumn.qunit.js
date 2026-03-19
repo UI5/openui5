@@ -53,16 +53,18 @@ sap.ui.define([
 				entityType: "EntityTypeNav",
 				propertyName: "NavProperty"
 			},
-			bindingPath: "EntityTypeNav_Property04",
-			newControlId: "test---view--table_EntityTypeNav_EntityTypeNav_Property04",
-			oDataServiceVersion: "2.0",
-			index: 1,
-			relevantContainerId: "test---view--myTable",
-			selector: {
-				id: "view--myTable",
-				idIsLocal: true
-			},
-			parentId: "test---view--myTable"
+			content: {
+				bindingPath: "EntityTypeNav_Property04",
+				newControlId: "test---view--table_EntityTypeNav_EntityTypeNav_Property04",
+				oDataServiceVersion: "2.0",
+				index: 1,
+				relevantContainerId: "test---view--myTable",
+				selector: {
+					id: "view--myTable",
+					idIsLocal: true
+				},
+				parentId: "test---view--myTable"
+			}
 		}, mDefinition);
 	}
 

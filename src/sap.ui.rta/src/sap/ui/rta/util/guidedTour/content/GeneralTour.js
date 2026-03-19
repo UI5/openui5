@@ -118,6 +118,12 @@ sap.ui.define([
 				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_redo"
 			},
 			{
+				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_BACK_BUTTON_TITLE"),
+				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_BACK_BUTTON_DESCRIPTION"),
+				listContent: [],
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_backButton"
+			},
+			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_TITLE"),
 				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_DESCRIPTION"),
 				listContent: [],

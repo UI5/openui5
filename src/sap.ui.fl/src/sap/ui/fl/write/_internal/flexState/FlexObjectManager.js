@@ -187,7 +187,11 @@ sap.ui.define([
 			} else if (oDirtyChange.getState() === States.LifecycleState.DELETED) {
 				oPropertyBag.flexObject = oDirtyChange.convertToFileContent();
 				oStorageResponse = await Storage.remove(oPropertyBag);
+			} else if (oDirtyChange.getState() === States.LifecycleState.UPDATED) {
+				oPropertyBag.flexObject = oDirtyChange.convertToFileContent();
+				oStorageResponse = await Storage.update(oPropertyBag);
 			}
+
 			const oUpdate = createStorageUpdate(oDirtyChange, bSkipUpdateCache);
 			if (oUpdate) {
 				aUpdates.push(oUpdate);
@@ -290,20 +294,21 @@ sap.ui.define([
 				});
 			} else {
 				const aDeletedChanges = aAllFlexObjects.filter((oChange) => oChange.getState() === States.LifecycleState.DELETED);
-				const aNewChanges = aCondensedChanges.filter((oChange) => (oChange.getState() !== States.LifecycleState.DELETED));
+				const oGroupedChanges = Object.groupBy(aCondensedChanges, (oChange) => oChange.getState());
 
-				// "remove" only supports a single change; multiple calls are required
-				if (aDeletedChanges.length) {
+				// "remove" and "update" only support a single change; multiple calls are required
+				if (aDeletedChanges.length || oGroupedChanges[States.LifecycleState.UPDATED]?.length) {
 					await saveSequenceOfDirtyChanges(
-						aDeletedChanges, mPropertyBag.skipUpdateCache, mPropertyBag.parentVersion, mPropertyBag.reference
+						[...aDeletedChanges, ...oGroupedChanges[States.LifecycleState.UPDATED] || []], mPropertyBag.skipUpdateCache,
+						mPropertyBag.parentVersion, mPropertyBag.reference
 					);
 				}
 
 				// "write" supports multiple changes at once
-				if (aNewChanges.length) {
+				if (oGroupedChanges[States.LifecycleState.NEW]?.length) {
 					oResponse = await Storage.write({
 						layer: mPropertyBag.layer,
-						flexObjects: aNewChanges.map((oChange) => oChange.convertToFileContent()),
+						flexObjects: oGroupedChanges[States.LifecycleState.NEW].map((oChange) => oChange.convertToFileContent()),
 						transport: sRequest,
 						isLegacyVariant: false,
 						parentVersion: mPropertyBag.parentVersion
@@ -461,6 +466,7 @@ sap.ui.define([
 	 * Save Flex objects and reload Flex State
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {sap.ui.fl.Selector} mPropertyBag.selector - Selector to retrieve the associated flex persistence
+	 * @param {string} [mPropertyBag.reference] - Flex reference of the application
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} [mPropertyBag.flexObjects] - Dirty flex objects to be saved
 	 * @param {boolean} [mPropertyBag.skipUpdateCache] - Indicates if cache update should be skipped
 	 * @param {string} [mPropertyBag.layer] - Specifies a single layer for saving changes
@@ -471,7 +477,7 @@ sap.ui.define([
 	 */
 	FlexObjectManager.saveFlexObjects = async function(mPropertyBag) {
 		const oAppComponent = Utils.getAppComponentForSelector(mPropertyBag.selector);
-		const sReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.selector);
+		const sReference = mPropertyBag.reference || ManifestUtils.getFlexReferenceForControl(mPropertyBag.selector);
 
 		const bConsiderDraftHandling = mPropertyBag.layer === Layer.CUSTOMER;
 		const oVersionModel = bConsiderDraftHandling && Versions.getVersionsModel({

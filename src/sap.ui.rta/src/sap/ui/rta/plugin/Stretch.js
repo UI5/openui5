@@ -2,25 +2,24 @@
  * ${copyright}
  */
 
-// Provides class sap.ui.rta.plugin.Stretch.
 sap.ui.define([
-	"sap/ui/rta/plugin/Plugin",
+	"sap/base/util/restricted/_debounce",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/OverlayUtil",
-	"sap/base/util/restricted/_debounce"
+	"sap/ui/rta/plugin/Plugin"
 ], function(
-	Plugin,
+	_debounce,
 	OverlayRegistry,
 	OverlayUtil,
-	_debounce
+	Plugin
 ) {
 	"use strict";
 
 	/**
 	 * Constructor for a new Stretch plugin.
 	 *
-	 * @param {string} [sId] id for the new object, generated automatically if no id is given
-	 * @param {object} [mSettings] initial settings for the new object
+	 * @param {string} [sId] - Id for the new object, generated automatically if no Id is given
+	 * @param {object} [mSettings] - Initial settings for the new object
 	 *
 	 * @class
 	 * The Stretch plugin adds functionality/styling required for RTA.
@@ -34,10 +33,9 @@ sap.ui.define([
 	 * @since 1.60
 	 * @alias sap.ui.rta.plugin.Stretch
 	 */
-	var Stretch = Plugin.extend("sap.ui.rta.plugin.Stretch", /** @lends sap.ui.rta.plugin.Stretch.prototype */ {
+	const Stretch = Plugin.extend("sap.ui.rta.plugin.Stretch", /** @lends sap.ui.rta.plugin.Stretch.prototype */ {
 		metadata: {
 			library: "sap.ui.rta",
-			properties: {},
 			associations: {
 				/**
 				 * Stores all candidates for stretching
@@ -46,8 +44,7 @@ sap.ui.define([
 					type: "sap.ui.core.Control",
 					multiple: true
 				}
-			},
-			events: {}
+			}
 		}
 	});
 
@@ -55,7 +52,7 @@ sap.ui.define([
 
 	function startAtSamePosition(oParentOverlay, oOverlay) {
 		return (
-			oParentOverlay && oParentOverlay.getGeometry() && oOverlay.getGeometry()
+			oParentOverlay?.getGeometry() && oOverlay?.getGeometry()
 			&& oParentOverlay.getGeometry().position.top === oOverlay.getGeometry().position.top
 			&& oParentOverlay.getGeometry().position.left === oOverlay.getGeometry().position.left
 		);
@@ -84,55 +81,53 @@ sap.ui.define([
 
 	/**
 	 * Check if the size of an overlay is the same as an array of overlays.
-	 * If no array is passed to the functionthe children of the reference overlay are used.
+	 * If no array is passed to the function the children of the reference overlay are used.
 	 * If the control is already stretched we need to remove the padding that we add
 	 *
-	 * @param {sap.ui.dt.ElementOverlay} oReferenceOverlay - overlay object
-	 * @param {sap.ui.dt.ElementOverlay[]} [aChildOverlays] - array of overlay objects that should be checked
-	 * @param {boolean} [bIsAlreadyStretched] - indicater if the control is already stretched
-	 * @returns {boolean} Returns true if the overlay has the same size as all the children
-	 * @private
+	 * @param {sap.ui.dt.ElementOverlay} oReferenceOverlay - Overlay object
+	 * @param {sap.ui.dt.ElementOverlay[]} [aChildOverlays] - Array of overlay objects that should be checked
+	 * @param {boolean} [bIsAlreadyStretched] - Indicator if the control is already stretched
+	 * @returns {boolean} <code>true</code> if the overlay has the same size as all the children
 	 */
 	function childrenAreSameSize(oReferenceOverlay, aChildOverlays, bIsAlreadyStretched) {
-		var oParentGeometry = oReferenceOverlay.getGeometry();
+		const oParentGeometry = oReferenceOverlay.getGeometry();
 
 		if (!oParentGeometry) {
 			return false;
 		}
 
 		// remove padding if it is already stretched
-		var iHeight = oParentGeometry.size.height;
+		let iHeight = oParentGeometry.size.height;
 		if (bIsAlreadyStretched) {
 			iHeight -= parseInt(window.getComputedStyle(oParentGeometry.domRef, null).getPropertyValue("padding-top"));
 		}
-		var iParentSize = Math.round(oParentGeometry.size.width) * Math.round(iHeight);
+		const iParentSize = Math.round(oParentGeometry.size.width) * Math.round(iHeight);
 		aChildOverlays ||= OverlayUtil.getAllChildOverlays(oReferenceOverlay);
 
-		var aChildrenGeometry = aChildOverlays.map(function(oChildOverlay) {
+		const aChildrenGeometry = aChildOverlays.map(function(oChildOverlay) {
 			return oChildOverlay.getGeometry();
 		});
 
-		var oChildrenGeometry = OverlayUtil.getGeometry(aChildrenGeometry);
+		const oChildrenGeometry = OverlayUtil.getGeometry(aChildrenGeometry);
 
 		if (!oChildrenGeometry) {
 			return false;
 		}
 
-		var iChildrenSize = Math.round(oChildrenGeometry.size.width) * Math.round(oChildrenGeometry.size.height);
+		const iChildrenSize = Math.round(oChildrenGeometry.size.width) * Math.round(oChildrenGeometry.size.height);
 		return iChildrenSize === iParentSize;
 	}
 
 	/**
-	 * Checks all the decendants for an editable child. Stops as soon as an editable is found
+	 * Checks all the descendants for an editable child. Stops as soon as an editable is found
 	 * or the children don't have the same size anymore.
 	 *
-	 * @param {sap.ui.dt.ElementOverlay} oReferenceOverlay - overlay object
-	 * @param {sap.ui.dt.ElementOverlay[]} aChildOverlays - array of child overlay objects
-	 * @returns {boolean} Returns true if there is an editable descendant
-	 * @private
+	 * @param {sap.ui.dt.ElementOverlay} oReferenceOverlay - Overlay object
+	 * @param {sap.ui.dt.ElementOverlay[]} aChildOverlays - Array of child overlay objects
+	 * @returns {boolean} <code>true</code> if there is an editable descendant
 	 */
 	function atLeastOneDescendantEditable(oReferenceOverlay, aChildOverlays) {
-		var bAtLeastOneChildEditable = aChildOverlays.some(function(oOverlay) {
+		const bAtLeastOneChildEditable = aChildOverlays.some(function(oOverlay) {
 			return oOverlay.getEditable() && oOverlay.getGeometry();
 		});
 
@@ -140,7 +135,7 @@ sap.ui.define([
 			return true;
 		}
 
-		var aChildrensChildrenOverlays = [];
+		let aChildrensChildrenOverlays = [];
 		aChildOverlays.forEach(function(oChildOverlay) {
 			aChildrensChildrenOverlays = aChildrensChildrenOverlays.concat(OverlayUtil.getAllChildOverlays(oChildOverlay));
 		});
@@ -157,7 +152,7 @@ sap.ui.define([
 	/**
 	 * Override for DesignTime setter to attach to synced event
 	 *
-	 * @param {sap.ui.dt.DesignTime} oDesignTime DesignTime object
+	 * @param {sap.ui.dt.DesignTime} oDesignTime - DesignTime instance
 	 * @override
 	 */
 	Stretch.prototype.setDesignTime = function(...aArgs) {
@@ -180,7 +175,7 @@ sap.ui.define([
 	};
 
 	Stretch.prototype.addStretchCandidate = function(oOverlay) {
-		var oElement = oOverlay.getElement();
+		const oElement = oOverlay.getElement();
 		if (!this.getStretchCandidates().includes(oElement.getId())) {
 			this.addAssociation("stretchCandidates", oElement);
 		}
@@ -205,7 +200,7 @@ sap.ui.define([
 
 	/**
 	 * Additionally to super->deregisterOverlay this method removes the Style-class
-	 * @param  {sap.ui.dt.ElementOverlay} oOverlay overlay object
+	 * @param  {sap.ui.dt.ElementOverlay} oOverlay - Overlay object
 	 * @override
 	 */
 	Stretch.prototype.deregisterElementOverlay = function(...aArgs) {
@@ -238,8 +233,8 @@ sap.ui.define([
 			return;
 		}
 
-		var oParams = oEvent.getParameters();
-		var oOverlay = oEvent.getSource();
+		const oParams = oEvent.getParameters();
+		const oOverlay = oEvent.getSource();
 		if (oParams.type === "afterRendering") {
 			// the timeout should be changed to 0 as soon as DT refactoring is done
 			this.fnDebounced ||= _debounce(function() {
@@ -262,10 +257,10 @@ sap.ui.define([
 			return;
 		}
 
-		var aNewStretchCandidates = [];
-		var oParentOverlay = oEvent.getParameters().elementOverlay.getParentElementOverlay();
+		let aNewStretchCandidates = [];
+		const oParentOverlay = oEvent.getParameters().elementOverlay.getParentElementOverlay();
 		if (oParentOverlay && !oParentOverlay._bIsBeingDestroyed) {
-			var aRelevantElements = this._getRelevantOverlays(oParentOverlay)
+			const aRelevantElements = this._getRelevantOverlays(oParentOverlay)
 			.filter(function(oOverlay) {
 				return oOverlay.getElement();
 			});
@@ -279,65 +274,65 @@ sap.ui.define([
 	 * When editable changes on an overlay, all parent-overlays and the overlay itself,
 	 * who are already stretch candidates, have to be reevaluated
 	 *
-	 * @param {sap.ui.base.Event} oEvent event object
+	 * @param {sap.ui.base.Event} oEvent - Event object
 	 */
 	Stretch.prototype._onElementOverlayEditableChanged = function(oEvent) {
-		var oOverlay = OverlayRegistry.getOverlay(oEvent.getParameters().id);
+		const oOverlay = OverlayRegistry.getOverlay(oEvent.getParameters().id);
 		if (this.getDesignTime().getBusyPlugins().length || !oOverlay) {
 			return;
 		}
 
-		var aOverlaysToReevaluate = this._getRelevantOverlaysOnEditableChange(oOverlay);
+		const aOverlaysToReevaluate = this._getRelevantOverlaysOnEditableChange(oOverlay);
 		this._setStyleClassForAllStretchCandidates(aOverlaysToReevaluate);
 	};
 
 	Stretch.prototype._onElementPropertyChanged = function(oEvent) {
-		var oOverlay = OverlayRegistry.getOverlay(oEvent.getParameters().id);
+		const oOverlay = OverlayRegistry.getOverlay(oEvent.getParameters().id);
 		if (this.getDesignTime().getBusyPlugins().length || !oOverlay) {
 			return;
 		}
 
-		var aRelevantOverlays = this._getRelevantOverlays(oOverlay);
-		var fnDebounced = _debounce(function() {
+		const aRelevantOverlays = this._getRelevantOverlays(oOverlay);
+		const fnDebounced = _debounce(() => {
 			if (!this.bIsDestroyed && !oOverlay.bIsDestroyed) {
-				var aNewStretchCandidates =
+				let aNewStretchCandidates =
 					this._getNewStretchCandidates(aRelevantOverlays)
 					.concat(this._getRelevantOverlaysOnEditableChange(oOverlay));
-				aNewStretchCandidates = aNewStretchCandidates.filter(function(sId, iPosition, aAllCandidates) {
+				aNewStretchCandidates = aNewStretchCandidates.filter((sId, iPosition, aAllCandidates) => {
 					return aAllCandidates.indexOf(sId) === iPosition;
 				});
 				this._setStyleClassForAllStretchCandidates(aNewStretchCandidates);
 			}
-		}.bind(this));
+		});
 
-		aRelevantOverlays.forEach(function(oOverlay) {
+		aRelevantOverlays.forEach((oOverlay) => {
 			oOverlay.attachEventOnce("geometryChanged", fnDebounced);
 		});
 	};
 
 	Stretch.prototype._onElementOverlayChanged = function(oEvent) {
 		// overlay might be destroyed until this event listener is called - BCP: 1980286428
-		var oOverlay = OverlayRegistry.getOverlay(oEvent.getParameters().id);
+		const oOverlay = OverlayRegistry.getOverlay(oEvent.getParameters().id);
 		if (this.getDesignTime().getBusyPlugins().length || !oOverlay) {
 			return;
 		}
 
-		var aRelevantOverlays = this._getRelevantOverlays(oOverlay);
-		var aNewStretchCandidates = this._getNewStretchCandidates(aRelevantOverlays);
+		const aRelevantOverlays = this._getRelevantOverlays(oOverlay);
+		const aNewStretchCandidates = this._getNewStretchCandidates(aRelevantOverlays);
 		this._setStyleClassForAllStretchCandidates(aNewStretchCandidates);
 	};
 
 	Stretch.prototype._getRelevantOverlaysOnEditableChange = function(oOverlay) {
-		var aRelevantElements = this.getStretchCandidates().includes(oOverlay.getElement().getId()) ? [oOverlay.getElement().getId()] : [];
-		var oParentAggregationOverlay = oOverlay.getParentAggregationOverlay();
+		const aRelevantElements = this.getStretchCandidates().includes(oOverlay.getElement().getId()) ? [oOverlay.getElement().getId()] : [];
+		const oParentAggregationOverlay = oOverlay.getParentAggregationOverlay();
 		if (!oParentAggregationOverlay) {
 			return aRelevantElements;
 		}
 
 		// if there are siblings that are editable and visible, the change has no effect on the parents
-		var aOnlySiblings = oParentAggregationOverlay.getChildren();
+		const aOnlySiblings = oParentAggregationOverlay.getChildren();
 		aOnlySiblings.splice(aOnlySiblings.indexOf(oOverlay), 1);
-		var bAnySiblingAlreadyEditable = aOnlySiblings.some(function(oOverlay) {
+		const bAnySiblingAlreadyEditable = aOnlySiblings.some(function(oOverlay) {
 			return oOverlay.getEditable() && oOverlay.getGeometry();
 		});
 
@@ -349,10 +344,10 @@ sap.ui.define([
 	};
 
 	Stretch.prototype._getRelevantParents = function(oOverlay) {
-		var aReturn = [];
+		const aReturn = [];
 
 		// add all parents who are stretch candidates, but stop after 25 parents
-		for (var i = 0; i < 25; i++) {
+		for (let i = 0; i < 25; i++) {
 			oOverlay = oOverlay.getParentElementOverlay();
 			if (!oOverlay) {
 				return aReturn;
@@ -368,24 +363,24 @@ sap.ui.define([
 	};
 
 	Stretch.prototype._getNewStretchCandidates = function(aOverlays) {
-		var aNewStretchCandidates = [];
-		aOverlays.forEach(function(oOverlay) {
+		const aNewStretchCandidates = [];
+		aOverlays.forEach((oOverlay) => {
 			if (this._reevaluateStretching(oOverlay)) {
 				aNewStretchCandidates.push(oOverlay.getElement().getId());
 			}
-		}, this);
+		});
 
 		return aNewStretchCandidates;
 	};
 
 	Stretch.prototype._reevaluateStretching = function(oOverlay) {
 		if (!oOverlay.bIsDestroyed) {
-			var oElementDomRef = Array.isArray(oOverlay.getAssociatedDomRef())
+			const oElementDomRef = Array.isArray(oOverlay.getAssociatedDomRef())
 				? oOverlay.getAssociatedDomRef()[0]
 				: oOverlay.getAssociatedDomRef();
 			if (oElementDomRef) {
-				var bIsStretched = oElementDomRef.classList.contains(Stretch.STRETCHSTYLECLASS);
-				var bShouldBeStretched = childrenAreSameSize(oOverlay, undefined, bIsStretched);
+				const bIsStretched = oElementDomRef.classList.contains(Stretch.STRETCHSTYLECLASS);
+				const bShouldBeStretched = childrenAreSameSize(oOverlay, undefined, bIsStretched);
 				if (bIsStretched && !bShouldBeStretched) {
 					this.removeStretchCandidate(oOverlay);
 				} else if (!bIsStretched && bShouldBeStretched) {
@@ -398,8 +393,8 @@ sap.ui.define([
 	};
 
 	Stretch.prototype._checkParentAndAddToStretchCandidates = function(oOverlay) {
-		var oParentOverlay = oOverlay.getParentElementOverlay();
-		var oParentElementDOM = oParentOverlay?.getAssociatedDomRef();
+		const oParentOverlay = oOverlay.getParentElementOverlay();
+		const oParentElementDOM = oParentOverlay?.getAssociatedDomRef();
 		if (oParentElementDOM) {
 			if (startAtSamePosition(oParentOverlay, oOverlay)) {
 				if (childrenAreSameSize(oParentOverlay)) {
@@ -413,20 +408,20 @@ sap.ui.define([
 	 * Check editable and set the Style-class for padding on the given Elements.
 	 * When no array is given all the stretch candidates are evaluated
 	 *
-	 * @param {sap.ui.core.Control[]} [aStretchCandidates] - array of Ids of stretch candidates
+	 * @param {sap.ui.core.Control[]} [aStretchCandidates] - Array of Ids of stretch candidates
 	 * @private
 	 */
 	Stretch.prototype._setStyleClassForAllStretchCandidates = function(aStretchCandidates) {
 		if (!Array.isArray(aStretchCandidates)) {
 			aStretchCandidates = this.getStretchCandidates();
 		}
-		aStretchCandidates.forEach(function(sElementId) {
-			var oOverlay = OverlayRegistry.getOverlay(sElementId);
-			var aChildOverlays = OverlayUtil.getAllChildOverlays(oOverlay);
-			var bAddClass = oOverlay.getEditable() && atLeastOneDescendantEditable(oOverlay, aChildOverlays);
+		aStretchCandidates.forEach((sElementId) => {
+			const oOverlay = OverlayRegistry.getOverlay(sElementId);
+			const aChildOverlays = OverlayUtil.getAllChildOverlays(oOverlay);
+			const bAddClass = oOverlay.getEditable() && atLeastOneDescendantEditable(oOverlay, aChildOverlays);
 
 			toggleStyleClass(oOverlay, bAddClass);
-		}, this);
+		});
 	};
 
 	return Stretch;

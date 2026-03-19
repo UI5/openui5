@@ -323,5 +323,10 @@ sap.ui.define([
 		return mFileContent;
 	};
 
+	CompVariant.prototype.getCondensingUpdateDiff = function() {
+		// TODO #17: Save the properties that are updated in the change instance and only return those here
+		return _pick(this.convertToFileContent(), ["content", "executeOnSelection", "favorite", "contexts", "texts"]);
+	};
+
 	return CompVariant;
 });

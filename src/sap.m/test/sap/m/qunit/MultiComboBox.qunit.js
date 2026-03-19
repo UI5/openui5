@@ -5630,12 +5630,12 @@ sap.ui.define([
 		}).placeAt("MultiComboBoxContent");
 
 		await nextUIUpdate(this.clock);
-		oMCB.focus();
-		this.clock.tick(200);
+		oMCB.open();
+		await nextUIUpdate(this.clock);
+		this.clock.tick(300);
 
 		// we focus the last token with BACKSPACE
 		qutils.triggerKeydown(oMCB.getDomRef(), KeyCodes.BACKSPACE);
-
 		this.clock.tick(200);
 
 		var triggerBackspaceOnLastToken = function () {
@@ -5647,6 +5647,7 @@ sap.ui.define([
 		}.bind(this);
 
 		triggerBackspaceOnLastToken();
+		await nextUIUpdate(this.clock);
 		triggerBackspaceOnLastToken();
 		await nextUIUpdate(this.clock);
 

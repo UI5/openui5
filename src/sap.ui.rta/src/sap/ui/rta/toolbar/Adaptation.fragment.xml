@@ -9,18 +9,18 @@
 			id="sapUiRta_iconAndDraftToolbar"
 			class="sapUiRtaIconAndDraftToolbar">
 			<content>
+				<Button
+						id="sapUiRta_backButton"
+						icon="{parts: [{path: 'controls>/backButton/enabled'}], formatter: '.formatBackButtonIcon'}"
+						enabled="{controls>/backButton/enabled}"
+						visible="{controls>/backButton/visible}"
+						tooltip="{i18n>BTN_BACK}"
+						press=".navigateBack" />
 				<HBox id="sapUiRta_iconBox" />
 				<ToolbarSpacer
 						id="sapUiRta_iconSpacer"
 						width="0%"
 						visible="true" />
-				<Button
-						id="sapUiRta_backButton"
-						icon="{parts: [{path: 'controls>/backButton/enabled'}], formatter: '.formatBackButtonIcon'}"
-						enabled="{controls>/backButton/enabled}"
-						visible="{= ${controls>/backButton/visible} &amp;&amp; ${controls>/modeSwitcher} === 'navigation'}"
-						tooltip="{i18n>BTN_BACK}"
-						press=".navigateBack" />
 				<Button
 						id="sapUiRta_versionButton"
 						type="Transparent"

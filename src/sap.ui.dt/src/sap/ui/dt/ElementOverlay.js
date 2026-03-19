@@ -1012,5 +1012,22 @@ sap.ui.define([
 		return mScrollContainerGeometry.size[sType] === iSize;
 	};
 
+	/**
+	 * Sets information about the ongoing move of an overlay. This information can be used in template scenarios,
+	 * where the element in the template is still in the original place and we try to find it.
+	 * @param {object} oMoveInformation - Information about the ongoing move
+	 */
+	ElementOverlay.prototype.setOngoingMoveInformation = function(oMoveInformation) {
+		this._oOngoingMoveInformation = oMoveInformation;
+	};
+
+	ElementOverlay.prototype.resetOngoingMoveInformation = function() {
+		this._oOngoingMoveInformation = undefined;
+	};
+
+	ElementOverlay.prototype.getOngoingMoveInformation = function() {
+		return this._oOngoingMoveInformation;
+	};
+
 	return ElementOverlay;
 });

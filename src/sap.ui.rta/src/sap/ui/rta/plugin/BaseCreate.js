@@ -4,13 +4,13 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
-	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/fl/Utils",
+	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/rta/Utils"
 ], function(
 	Lib,
-	Plugin,
 	FlexUtils,
+	Plugin,
 	RtaUtils
 ) {
 	"use strict";
@@ -30,12 +30,9 @@ sap.ui.define([
 	 * @alias sap.ui.rta.plugin.BaseCreate
 	 * @abstract
 	 */
-	var BaseCreate = Plugin.extend("sap.ui.rta.plugin.BaseCreate", /** @lends sap.ui.rta.plugin.BaseCreate.prototype */ {
+	const BaseCreate = Plugin.extend("sap.ui.rta.plugin.BaseCreate", /** @lends sap.ui.rta.plugin.BaseCreate.prototype */ {
 		metadata: {
-			library: "sap.ui.rta",
-			properties: {},
-			associations: {},
-			events: {}
+			library: "sap.ui.rta"
 		}
 	});
 
@@ -45,78 +42,66 @@ sap.ui.define([
 	 * @returns {object} Object with editable boolean values for <code>asChild</code> and <code>asSibling</code>
 	 * @private
 	 */
-	BaseCreate.prototype._isEditable = function(oOverlay) {
-		return Promise.all([this._isEditableCheck(oOverlay, true), this._isEditableCheck(oOverlay, false)])
-		.then(function(aPromiseValues) {
-			return {
-				asSibling: aPromiseValues[0],
-				asChild: aPromiseValues[1]
-			};
-		});
+	BaseCreate.prototype._isEditable = async function(oOverlay) {
+		const aPromiseValues = await Promise.all([this._isEditableCheck(oOverlay, true), this._isEditableCheck(oOverlay, false)]);
+		return {
+			asSibling: aPromiseValues[0],
+			asChild: aPromiseValues[1]
+		};
 	};
 
-	BaseCreate.prototype._isEditableCheck = function(oOverlay, bOverlayIsSibling) {
-		var oParentOverlay = this._getParentOverlay(bOverlayIsSibling, oOverlay);
-		var sAggregationName;
-
+	BaseCreate.prototype._isEditableCheck = async function(oOverlay, bOverlayIsSibling) {
+		const oParentOverlay = this._getParentOverlay(bOverlayIsSibling, oOverlay);
 		if (!oParentOverlay || !oParentOverlay.getParentElementOverlay()) {
 			// root element is not editable as parent and as sibling
-			return Promise.resolve(false);
+			return false;
 		}
 
+		let sAggregationName;
 		if (bOverlayIsSibling) {
 			sAggregationName = oOverlay.getParentAggregationOverlay().getAggregationName();
 		}
 
-		return this.checkAggregationsOnSelf(oParentOverlay, this.getActionName(), sAggregationName)
-		.then(function(bEditableCheck) {
-			if (bEditableCheck) {
-				// If IDs are created within fragments or controller code,
-				// the ID of the parent view might not be part of the control ID.
-				// In these cases the control might have a stable ID (this.hasStableId()), but the view doesn't.
-				// As the view is needed create the ID for the newly created container,
-				// it has to be stable, otherwise the new ID will not be stable.
-				var oParentView = FlexUtils.getViewForControl(oParentOverlay.getElement());
-				return this.hasStableId(oOverlay) && FlexUtils.checkControlId(oParentView);
-			}
-			return false;
-		}.bind(this));
+		const bEditableCheck = await this.checkAggregationsOnSelf(oParentOverlay, this.getActionName(), sAggregationName);
+		if (bEditableCheck) {
+			// If IDs are created within fragments or controller code,
+			// the ID of the parent view might not be part of the control ID.
+			// In these cases the control might have a stable ID (this.hasStableId()), but the view doesn't.
+			// As the view is needed create the ID for the newly created container,
+			// it has to be stable, otherwise the new ID will not be stable.
+			const oParentView = FlexUtils.getViewForControl(oParentOverlay.getElement());
+			return this.hasStableId(oOverlay) && FlexUtils.checkControlId(oParentView);
+		}
+		return false;
 	};
 
 	BaseCreate.prototype._getParentOverlay = function(bSibling, oOverlay) {
-		var oParentOverlay;
-		var oResponsibleElementOverlay = this.getResponsibleElementOverlay(oOverlay);
-		if (bSibling) {
-			oParentOverlay = oResponsibleElementOverlay.getParentElementOverlay();
-		} else {
-			oParentOverlay = oResponsibleElementOverlay;
-		}
-		return oParentOverlay;
+		const oResponsibleElementOverlay = this.getResponsibleElementOverlay(oOverlay);
+		return bSibling ? oResponsibleElementOverlay.getParentElementOverlay() : oResponsibleElementOverlay;
 	};
 
 	BaseCreate.prototype.getCreateActions = function(bSibling, oOverlay) {
-		var oResponsibleElementOverlay = this.getResponsibleElementOverlay(oOverlay);
-		var oParentOverlay = this._getParentOverlay(bSibling, oResponsibleElementOverlay);
-		var oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
-		var aActions = oDesignTimeMetadata.getActionDataFromAggregations(this.getActionName(), oResponsibleElementOverlay.getElement());
+		const oResponsibleElementOverlay = this.getResponsibleElementOverlay(oOverlay);
+		const oParentOverlay = this._getParentOverlay(bSibling, oResponsibleElementOverlay);
+		const oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
+		const aActions = oDesignTimeMetadata.getActionDataFromAggregations(this.getActionName(), oResponsibleElementOverlay.getElement());
 		if (bSibling) {
-			var sParentAggregation = oResponsibleElementOverlay.getParentAggregationOverlay().getAggregationName();
-			return aActions.filter(function(oAction) {
-				return oAction.aggregation === sParentAggregation;
-			});
+			const sParentAggregation = oResponsibleElementOverlay.getParentAggregationOverlay().getAggregationName();
+			return aActions.filter((oAction) => oAction.aggregation === sParentAggregation);
 		}
 		return aActions;
 	};
 
 	BaseCreate.prototype.getCreateAction = function(bSibling, oOverlay, sAggregationName) {
-		var aActions = this.getCreateActions(bSibling, oOverlay);
+		const aActions = this.getCreateActions(bSibling, oOverlay);
 		if (sAggregationName) {
-			var oCreateActionForAggregation;
-			aActions.some(function(oAction) {
+			let oCreateActionForAggregation;
+			aActions.some((oAction) => {
 				if (oAction.aggregation === sAggregationName) {
 					oCreateActionForAggregation = oAction;
 					return true;
 				}
+				return false;
 			});
 			return oCreateActionForAggregation;
 		}
@@ -133,8 +118,8 @@ sap.ui.define([
 		}
 
 		if (oAction.isEnabled && typeof oAction.isEnabled === "function") {
-			var fnIsEnabled = oAction.isEnabled;
-			var oParentOverlay = this._getParentOverlay(bSibling, oElementOverlay);
+			const fnIsEnabled = oAction.isEnabled;
+			const oParentOverlay = this._getParentOverlay(bSibling, oElementOverlay);
 			return fnIsEnabled(oParentOverlay.getElement());
 		}
 
@@ -149,12 +134,8 @@ sap.ui.define([
 	 * @return {string} ID of the created control
 	 */
 	BaseCreate.prototype.getCreatedContainerId = function(vAction, sNewControlID) {
-		var sId = sNewControlID;
-		if (vAction.getCreatedContainerId && typeof vAction.getCreatedContainerId === "function") {
-			var fnMapToRelevantControlID = vAction.getCreatedContainerId;
-			sId = fnMapToRelevantControlID(sNewControlID);
-		}
-		return sId;
+		const bHasCreateFunction = vAction.getCreatedContainerId && typeof vAction.getCreatedContainerId === "function";
+		return bHasCreateFunction ? vAction.getCreatedContainerId(sNewControlID) : sNewControlID;
 	};
 
 	BaseCreate.prototype._determineIndex = function(oParentElement, oSiblingElement, sAggregationName, fnGetIndex) {
@@ -165,12 +146,12 @@ sap.ui.define([
 		if (!vAction) {
 			return sText;
 		}
-		var oAggregationDescription = oDesignTimeMetadata.getAggregationDescription(vAction.aggregation, oElement);
+		const oAggregationDescription = oDesignTimeMetadata.getAggregationDescription(vAction.aggregation, oElement);
 		if (!oAggregationDescription) {
 			return sText;
 		}
-		var sContainerTitle = oAggregationDescription.singular;
-		var oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
+		const sContainerTitle = oAggregationDescription.singular;
+		const oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
 		return oTextResources.getText(sText, [sContainerTitle]);
 	};
 

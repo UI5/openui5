@@ -91,6 +91,10 @@ sap.ui.define([
 			// Prepare binding infos only once for all sections
 			oManifest = BindingHelper.createBindingInfos(oManifest, oCard.getBindingNamespaces());
 
+			// Include merged customSettings in resolved manifest
+			const oCustomSettings = oCard.getCombinedCustomSettings();
+			oManifest["sap.card"].customSettings = oCustomSettings;
+
 			if (oCard.getAggregation("_filterBar")) {
 				aFilters =  oCard.getAggregation("_filterBar")._getFilters().map(function (oFilter) {
 					return ["/sap.card/configuration/filters/" + oFilter.getKey(), oFilter];

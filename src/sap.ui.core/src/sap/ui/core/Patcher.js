@@ -59,21 +59,6 @@ sap.ui.define([
 		};
 	}
 
-	/**
-	 * Creates an HTML element from the given tag name and parent namespace
-	 */
-	var createElement = function (sTagName, oParent) {
-		if (sTagName == "svg") {
-			return document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		}
-
-		var sNamespaceURI = oParent && oParent.namespaceURI;
-		if (!sNamespaceURI || sNamespaceURI == "http://www.w3.org/1999/xhtml" || oParent.localName == "foreignObject") {
-			return document.createElement(sTagName);
-		}
-
-		return document.createElementNS(sNamespaceURI, sTagName);
-	};
 
 	/**
 	 * @class Creates a <code>Patcher</code> instance which can be used for in-place DOM patching.
@@ -95,6 +80,7 @@ sap.ui.define([
 		this._sStyles = "";                      // Style collection of the current node
 		this._sClasses = "";                     // Class name collection of the current node
 		this._mAttributes = Object.create(null); // Set of all attributes name-value pair of the current node
+		this._sFallbackNamespace = "";
 	};
 
 	/**
@@ -132,11 +118,54 @@ sap.ui.define([
 	};
 
 	/**
+	 * Sets the fallback namespace URI for elements created during patching.
+	 *
+	 * This method is used when elements are created without a parent element to inherit
+	 * namespace from (e.g., when the parent is a DocumentFragment). The fallback namespace
+	 * will be applied to elements when the namespace can't be determined from parent.
+	 *
+	 * The fallback namespace is automatically reset when {@link #reset} is called.
+	 *
+	 * @param {string} sNamespaceURI The namespace URI to use as fallback (e.g., "http://www.w3.org/2000/svg")
+	 */
+	Patcher.prototype.setFallbackNamespace = function(sNamespaceURI) {
+		this._sFallbackNamespace = sNamespaceURI;
+	};
+
+	/**
 	 * Cleans up the current patching references and makes the patcher ready for the next patching.
 	 */
 	Patcher.prototype.reset = function() {
 		this._oRoot = this._oCurrent = this._oParent = this._oReference = this._oNewElement = this._oNewParent = this._oNewReference = null;
+		this._sFallbackNamespace = "";
 		this._iTagOpenState = 0; /* Tag is Closed */
+	};
+
+	/**
+	 * Creates an HTML element from the given tag name
+	 *
+	 * @param {string} sTagName Tag name of the element
+	 * @returns {Element} The created DOM element
+	 * @private
+	 */
+	Patcher.prototype._createElement = function(sTagName) {
+		let sNamespaceURI;
+		switch (sTagName) {
+			case "svg":
+				sNamespaceURI = "http://www.w3.org/2000/svg";
+				break;
+			case "math":
+				sNamespaceURI = "http://www.w3.org/1998/Math/MathML";
+				break;
+			default:
+				sNamespaceURI = this._oParent?.namespaceURI ?? this._sFallbackNamespace;
+		}
+
+		if (!sNamespaceURI || sNamespaceURI == "http://www.w3.org/1999/xhtml" || this._oParent?.localName == "foreignObject") {
+			return document.createElement(sTagName);
+		}
+
+		return document.createElementNS(sNamespaceURI, sTagName);
 	};
 
 	/**
@@ -307,7 +336,7 @@ sap.ui.define([
 			this._getAttributes();
 			this._iTagOpenState = 2; /* Tag is Open and Existing */
 		} else {
-			this._oCurrent = createElement(sTagName, this._oParent);
+			this._oCurrent = this._createElement(sTagName);
 			this._setNewElement(this._oCurrent);
 			this._iTagOpenState = 1; /* Tag is Open and Created */
 		}
@@ -329,7 +358,6 @@ sap.ui.define([
 	 * @return {this} Reference to <code>this</code> in order to allow method chaining
 	 */
 	Patcher.prototype.voidStart = Patcher.prototype.openStart;
-
 
 	/**
 	 * Sets an attribute name-value pair to the current element.

@@ -73,13 +73,12 @@ sap.ui.define([
 		// in case a control is marked as not adaptable by designTimeMetadata, it should not be possible to evaluate editable
 		// for this control due to parent aggregation action definitions
 
-		var oResponsibleElementOverlay = oSourceElementOverlay;
-		if (typeof this.getActionName() === "string") {
-			if (this.isResponsibleElementActionAvailable(oSourceElementOverlay)) {
-				oResponsibleElementOverlay = this.getResponsibleElementOverlay(oSourceElementOverlay);
-			}
-		}
-		var vEditable = oResponsibleElementOverlay.getElement() &&
+		const bResponsibleElementActionAvailable =
+			typeof this.getActionName() === "string" && this.isResponsibleElementActionAvailable(oSourceElementOverlay);
+		const oResponsibleElementOverlay = bResponsibleElementActionAvailable
+			? this.getResponsibleElementOverlay(oSourceElementOverlay)
+			: oSourceElementOverlay;
+		const vEditable = oResponsibleElementOverlay.getElement() &&
 			oResponsibleElementOverlay.getDesignTimeMetadata() &&
 			!oResponsibleElementOverlay.getDesignTimeMetadata().markedAsNotAdaptable() &&
 			this._isEditable(
@@ -120,7 +119,7 @@ sap.ui.define([
 	 * @alias sap.ui.rta.plugin.Plugin
 	 */
 
-	var BasePlugin = Plugin.extend("sap.ui.rta.plugin.Plugin", /** @lends sap.ui.rta.plugin.Plugin.prototype */ {
+	const BasePlugin = Plugin.extend("sap.ui.rta.plugin.Plugin", /** @lends sap.ui.rta.plugin.Plugin.prototype */ {
 		metadata: {
 			"abstract": true,
 			library: "sap.ui.rta",
@@ -150,14 +149,14 @@ sap.ui.define([
 	BasePlugin.prototype._isEditable = function() {};
 
 	BasePlugin.prototype.executeWhenVisible = function(oElementOverlay, fnCallback) {
-		var fnGeometryChangedCallback = function(oEvent) {
+		const fnGeometryChangedCallback = function(oEvent) {
 			if (oEvent.getSource().getGeometry() && oEvent.getSource().getGeometry().visible) {
 				oElementOverlay.detachEvent("geometryChanged", fnGeometryChangedCallback, this);
 				fnCallback();
 			}
 		};
 
-		var mOverlayGeometry = oElementOverlay.getGeometry();
+		const mOverlayGeometry = oElementOverlay.getGeometry();
 		if (
 			oElementOverlay.getElementVisibility()
 			&& (
@@ -173,7 +172,7 @@ sap.ui.define([
 
 	function debounceFunction(mDebounceFunctions, oOverlay, sName, fnOriginalFunction) {
 		// Create debounced function for the given parameters if it was not created before
-		var sOverlayId = oOverlay.getId();
+		const sOverlayId = oOverlay.getId();
 		mDebounceFunctions[sOverlayId] ||= {};
 		// Debounce with approximately one frame to cover multiple synchronous calls
 		// without causing a huge delay
@@ -182,7 +181,7 @@ sap.ui.define([
 		mDebounceFunctions[sOverlayId][sName]();
 	}
 
-	var _onElementModified = async function(oEvent) {
+	const onElementModified = async function(oEvent) {
 		// Wait for all commands to be executed before evaluating the results of the element modified event
 		if (this.getCommandStack()) {
 			await this.getCommandStack().getLastCommandExecuted();
@@ -192,7 +191,7 @@ sap.ui.define([
 		// Therefore the constructor/init might not be properly called
 		// eslint-disable-next-line logical-assignment-operators
 		if (!this._mDebounceFunctions) {
-			// The _onElementModified callback might be triggered many times in a row, e.g.
+			// The onElementModified callback might be triggered many times in a row, e.g.
 			// by SimpleForms which add all aggregation items one by one
 			// Since the resulting editable checks in the plugins can be expensive async functions
 			// the calls are debounced
@@ -205,15 +204,15 @@ sap.ui.define([
 			};
 		}
 
-		var oParams = oEvent.getParameters();
-		var aRelevantOverlays;
-		var oOverlay = oEvent.getSource();
+		const oParams = oEvent.getParameters();
+		let aRelevantOverlays;
+		const oOverlay = oEvent.getSource();
 		if (oParams.type === "propertyChanged" && oParams.name === "visible") {
 			aRelevantOverlays = this._getRelevantOverlays(oOverlay);
 			if (oParams.value === true) {
-				this.executeWhenVisible(oOverlay, function() {
+				this.executeWhenVisible(oOverlay, () => {
 					this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
-				}.bind(this));
+				});
 			} else {
 				this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
 			}
@@ -221,23 +220,23 @@ sap.ui.define([
 			if (this.getDesignTime().getStatus() === "synced") {
 				this.evaluateEditable([oOverlay], { onRegistration: false });
 			} else {
-				this.getDesignTime().attachEventOnce("synced", function() {
+				this.getDesignTime().attachEventOnce("synced", () => {
 					this.evaluateEditable([oOverlay], { onRegistration: false });
-				}, this);
+				});
 			}
 		} else if (
 			oParams.type === "insertAggregation"
 			|| oParams.type === "removeAggregation"
 		) {
-			debounceFunction(this._mDebounceFunctions.insertOrRemove, oOverlay, oParams.name, function() {
+			debounceFunction(this._mDebounceFunctions.insertOrRemove, oOverlay, oParams.name, () => {
 				aRelevantOverlays = this._getRelevantOverlays(oOverlay, oParams.name);
 				this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
-			}.bind(this));
+			});
 		} else if (oParams.type === "addOrSetAggregation") {
-			debounceFunction(this._mDebounceFunctions.addOrSet, oOverlay, oParams.name, function() {
+			debounceFunction(this._mDebounceFunctions.addOrSet, oOverlay, oParams.name, () => {
 				// Designtime might have been destroyed while waiting for the debounce callback
 				// In this case, the updates are no longer relevant
-				var oDesignTime = this.getDesignTime();
+				const oDesignTime = this.getDesignTime();
 				if (!oDesignTime) {
 					return;
 				}
@@ -246,27 +245,27 @@ sap.ui.define([
 					aRelevantOverlays = this._getRelevantOverlays(oOverlay, oParams.name);
 					this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
 				} else {
-					oDesignTime.attachEventOnce("synced", function() {
+					oDesignTime.attachEventOnce("synced", () => {
 						aRelevantOverlays = this._getRelevantOverlays(oOverlay, oParams.name);
 						this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
-					}, this);
+					});
 				}
-			}.bind(this));
+			});
 		}
 	};
 
 	BasePlugin.prototype._getRelevantOverlays = function(oOverlay, sAggregationName) {
-		var aAlreadyDefinedRelevantOverlays = oOverlay.getRelevantOverlays();
+		const aAlreadyDefinedRelevantOverlays = oOverlay.getRelevantOverlays();
 		if (aAlreadyDefinedRelevantOverlays.length === 0) {
-			var aRelevantOverlays = [];
+			let aRelevantOverlays = [];
 			// Overlays in aggregation binding templates are not relevant
 			if (!oOverlay.getIsPartOfTemplate()) {
 				aRelevantOverlays = OverlayUtil.findAllOverlaysInContainer(oOverlay);
 
 				// if an aggregation name is given, those overlays are added without checking the relevant container
 				if (sAggregationName) {
-					var oAggregationOverlay = oOverlay.getAggregationOverlay(sAggregationName);
-					var aAggregationChildren = oAggregationOverlay ? oAggregationOverlay.getChildren() : [];
+					const oAggregationOverlay = oOverlay.getAggregationOverlay(sAggregationName);
+					let aAggregationChildren = oAggregationOverlay ? oAggregationOverlay.getChildren() : [];
 					aAggregationChildren = aAggregationChildren.filter(function(oChildOverlay) {
 						return aRelevantOverlays.indexOf(oChildOverlay) === -1;
 					});
@@ -283,26 +282,27 @@ sap.ui.define([
 	/**
 	 * Checks if the overlay has an associated element and calls the _isEditable function.
 	 * If there is an associated element it also modifies the plugin list.
-	 * @param {sap.ui.dt.ElementOverlay[]} aOverlays Array of overlays to be checked
-	 * @param {object} mPropertyBag Map of additional information to be passed to isEditable
+	 * @param {sap.ui.dt.ElementOverlay[]} aOverlays - Array of overlays to be checked
+	 * @param {object} mPropertyBag - Map of additional information to be passed to isEditable
 	 */
 	BasePlugin.prototype.evaluateEditable = async function(aOverlays, mPropertyBag) {
 		// If there are busy plugins, do not evaluate
 		// When the action is finished, if the affected controls are modified, the evaluation will be done anyway
-		if (!mPropertyBag.onRegistration &&
-			this.getDesignTime() &&
-			this.getDesignTime().getBusyPlugins().length) {
+		if (
+			!mPropertyBag.onRegistration &&
+			this.getDesignTime()?.getBusyPlugins().length
+		) {
 			return;
 		}
 		this.setProcessingStatus(true);
 
-		var aPromises = aOverlays.reduce(_handleEditableByPlugin.bind(this, mPropertyBag), []);
+		const aPromises = aOverlays.reduce(_handleEditableByPlugin.bind(this, mPropertyBag), []);
 
 		if (aPromises.length) {
 			try {
 				await Promise.all(aPromises);
 				this.setProcessingStatus(false);
-			} catch (error) {
+			} catch (oError) {
 				this.setProcessingStatus(false);
 			}
 		} else {
@@ -332,7 +332,7 @@ sap.ui.define([
 	};
 
 	BasePlugin.prototype._retrievePluginName = function(bSibling) {
-		var sName = this.getMetadata().getName();
+		let sName = this.getMetadata().getName();
 		if (bSibling !== undefined) {
 			sName += bSibling ? ".asSibling" : ".asChild";
 		}
@@ -340,72 +340,68 @@ sap.ui.define([
 	};
 
 	BasePlugin.prototype._isEditableByPlugin = function(oOverlay, bSibling) {
-		var sPluginName = this._retrievePluginName(bSibling);
+		const sPluginName = this._retrievePluginName(bSibling);
 		return oOverlay.getEditableByPlugins()[sPluginName];
 	};
 
 	BasePlugin.prototype.registerElementOverlay = function(oOverlay) {
-		this.executeWhenVisible(oOverlay, function() {
+		this.executeWhenVisible(oOverlay, () => {
 			this.evaluateEditable([oOverlay], { onRegistration: true });
-			oOverlay.attachElementModified(_onElementModified, this);
-		}.bind(this));
+			oOverlay.attachElementModified(onElementModified, this);
+		});
 	};
 
 	BasePlugin.prototype.deregisterElementOverlay = function(oOverlay) {
 		this.removeFromPluginsList(oOverlay);
 		this.removeFromPluginsList(oOverlay, true);
 		this.removeFromPluginsList(oOverlay, false);
-		oOverlay.detachElementModified(_onElementModified, this);
+		oOverlay.detachElementModified(onElementModified, this);
 	};
 
 	/**
 	 * Checks if the element of an overlay has a stable ID.
 	 * Keeps this information on the Overlay, as stable IDs cannot be modified in runtime.
-	 * @param  {sap.ui.dt.ElementOverlay}  oOverlay Overlay for the element to be checked
-	 * @return {boolean} Returns true if the element has a stable ID
+	 * @param  {sap.ui.dt.ElementOverlay} oOverlay - Overlay for the element to be checked
+	 * @returns {boolean} <code>true</code> if the element has a stable ID
 	 */
 	BasePlugin.prototype.hasStableId = function(oOverlay) {
 		return hasStableId(oOverlay);
 	};
 
 	BasePlugin.prototype.getVariantManagementReference = function(oOverlay) {
-		var sVariantManagementReference;
-		if (oOverlay.getVariantManagement) {
-			sVariantManagementReference = oOverlay.getVariantManagement();
-		}
-		return sVariantManagementReference;
+		return oOverlay.getVariantManagement?.();
 	};
 
 	/**
 	 * Checks the Aggregations on the Overlay for a specific Action
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay Overlay to be checked for action
-	 * @param {string} sAction Action to be checked
-	 * @param {string} [sParentAggregationName] The aggregation in the parent where the element is
-	 * @param {string} [sSubAction] Sub action
-	 * @return {boolean} Whether the Aggregation has a valid action
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for action
+	 * @param {string} sAction - Action to be checked
+	 * @param {string} [sParentAggregationName] - The aggregation in the parent where the element is
+	 * @param {string} [sSubAction] - Sub action
+	 * @returns {boolean} Whether the Aggregation has a valid action
 	 * @protected
 	 */
 	BasePlugin.prototype.checkAggregationsOnSelf = function(oOverlay, sAction, sParentAggregationName, sSubAction) {
-		var oDesignTimeMetadata = oOverlay.getDesignTimeMetadata();
-		var oElement = oOverlay.getElement();
+		const oDesignTimeMetadata = oOverlay.getDesignTimeMetadata();
+		let oElement = oOverlay.getElement();
 
-		var aActionData = oDesignTimeMetadata.getActionDataFromAggregations(sAction, oElement, undefined, sSubAction);
-		var oAction = aActionData.filter(function(oActionData) {
+		const aActionData = oDesignTimeMetadata.getActionDataFromAggregations(sAction, oElement, undefined, sSubAction);
+		const oAction = aActionData.filter(function(oActionData) {
 			if (oActionData && sParentAggregationName) {
 				return oActionData.aggregation === sParentAggregationName;
 			}
 			return true;
 		})[0];
-		var sChangeType = oAction ? oAction.changeType : null;
-		var bChangeOnRelevantContainer = oAction && oAction.changeOnRelevantContainer;
+		const bChangeOnRelevantContainer = oAction?.changeOnRelevantContainer;
 		if (bChangeOnRelevantContainer) {
 			oElement = oOverlay.getRelevantContainer();
-			var oRelevantOverlay = OverlayRegistry.getOverlay(oElement);
+			const oRelevantOverlay = OverlayRegistry.getOverlay(oElement);
 			if (!this.hasStableId(oRelevantOverlay)) {
 				return Promise.resolve(false);
 			}
 		}
 
+		const sChangeType = oAction?.changeType;
 		if (sChangeType) {
 			return this.hasChangeHandler(sChangeType, oElement);
 		}
@@ -438,32 +434,29 @@ sap.ui.define([
 		}
 	};
 
-	BasePlugin.prototype.hasChangeHandler = function(sChangeType, oElement, sControlType) {
-		return ChangesWriteAPI.getChangeHandler({
-			changeType: sChangeType,
-			element: oElement,
-			modifier: JsControlTreeModifier,
-			layer: this.getCommandFactory().getFlexSettings().layer,
-			controlType: sControlType
-		})
-		.then(function() {
+	BasePlugin.prototype.hasChangeHandler = async function(sChangeType, oElement, sControlType) {
+		try {
+			await ChangesWriteAPI.getChangeHandler({
+				changeType: sChangeType,
+				element: oElement,
+				modifier: JsControlTreeModifier,
+				layer: this.getCommandFactory().getFlexSettings().layer,
+				controlType: sControlType
+			});
 			return true;
-		})
-		.catch(function() {
+		} catch (oError) {
 			return false;
-		});
+		}
 	};
 
 	BasePlugin.prototype.isAvailable = function(aElementOverlays) {
-		return aElementOverlays.every(function(oElementOverlay) {
-			return this._isEditableByPlugin(oElementOverlay);
-		}, this);
+		return aElementOverlays.every((oElementOverlay) => this._isEditableByPlugin(oElementOverlay));
 	};
 
 	BasePlugin.prototype._checkRelevantContainerStableID = function(oAction, oElementOverlay) {
 		if (oAction.changeOnRelevantContainer) {
-			var oRelevantContainer = oElementOverlay.getRelevantContainer();
-			var oRelevantOverlay = OverlayRegistry.getOverlay(oRelevantContainer);
+			const oRelevantContainer = oElementOverlay.getRelevantContainer();
+			const oRelevantOverlay = OverlayRegistry.getOverlay(oRelevantContainer);
 			if (!this.hasStableId(oRelevantOverlay)) {
 				return false;
 			}
@@ -471,27 +464,25 @@ sap.ui.define([
 		return true;
 	};
 
-	BasePlugin.prototype._checkChangeHandlerAndStableId = function(oElementOverlay) {
-		var oAction = this.getAction(oElementOverlay);
-		if (oAction && oAction.changeType) {
-			var oElement = oAction.changeOnRelevantContainer ?
-				oElementOverlay.getRelevantContainer() :
-				oElementOverlay.getElement();
+	BasePlugin.prototype._checkChangeHandlerAndStableId = async function(oElementOverlay) {
+		const oAction = this.getAction(oElementOverlay);
+		if (oAction?.changeType) {
+			const oElement = oAction.changeOnRelevantContainer
+				? oElementOverlay.getRelevantContainer()
+				: oElementOverlay.getElement();
 
-			return this.hasChangeHandler(oAction.changeType, oElement)
-			.then(function(bHasChangeHandler) {
-				return bHasChangeHandler
-						&& this._checkRelevantContainerStableID(oAction, oElementOverlay)
-						&& this.hasStableId(oElementOverlay);
-			}.bind(this));
+			const bHasChangeHandler = await this.hasChangeHandler(oAction.changeType, oElement);
+			return bHasChangeHandler
+				&& this._checkRelevantContainerStableID(oAction, oElementOverlay)
+				&& this.hasStableId(oElementOverlay);
 		}
-		return Promise.resolve(false);
+		return false;
 	};
 
 	/**
 	 * Returns the rank (order) of the plugin action in the context menu.
-	 * @param {string} sPluginId Plugin ID
-	 * @return {number} Rank of the plugin action
+	 * @param {string} sPluginId - Plugin ID
+	 * @returns {number} Rank of the plugin action
 	 */
 	BasePlugin.prototype.getRank = function(sPluginId) {
 		return CONTEXT_MENU_RANKS[sPluginId];
@@ -501,11 +492,11 @@ sap.ui.define([
 	 * Generic function to return the menu items for a context menu.
 	 * Retrieves the rank and then calls the method from the DT Plugin.
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @param {object} mPropertyBag Additional properties for the menu item
-	 * @param {string} mPropertyBag.pluginId The ID of the plugin
-	 * @param {string} mPropertyBag.icon an icon for the Button inside the context menu
-	 * @param {number} [mPropertyBag.rank] The rank (order) of the plugin action in the context menu
-	 * @return {object[]} Returns an array with the object containing the required data for a context menu item
+	 * @param {object} mPropertyBag - Additional properties for the menu item
+	 * @param {string} mPropertyBag.pluginId - The ID of the plugin
+	 * @param {string} mPropertyBag.icon - An icon for the Button inside the context menu
+	 * @param {number} [mPropertyBag.rank] - The rank (order) of the plugin action in the context menu
+	 * @returns {object[]} Returns an array with the object containing the required data for a context menu item
 	 */
 	BasePlugin.prototype._getMenuItems = function(aElementOverlays, mPropertyBag) {
 		mPropertyBag.rank ||= this.getRank(mPropertyBag.pluginId);
@@ -514,9 +505,9 @@ sap.ui.define([
 
 	/**
 	 * Checks if the control is a reuse component on S4HanaCloud. This is used to disable
-	 * certain plugins under these circumstancces, e.g. AddXMLPlugin.
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay Overlay for the control to be checked
-	 * @return {boolean} Whether the control is in a reuse component on S4HanaCloud
+	 * certain plugins under these circumstances, e.g. AddXMLPlugin.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay for the control to be checked
+	 * @returns {boolean} Whether the control is in a reuse component on S4HanaCloud
 	 */
 	BasePlugin.prototype.isInReuseComponentOnS4HanaCloud = function(oOverlay) {
 		const oComponent = Utils.getComponentForControl(oOverlay.getElement());

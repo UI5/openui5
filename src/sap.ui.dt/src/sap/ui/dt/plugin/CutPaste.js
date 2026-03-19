@@ -166,14 +166,15 @@ sap.ui.define([
 	 * @return {boolean} Return true if paste was successfully executed
 	 */
 	CutPaste.prototype._executePaste = function(oTargetOverlay) {
-		var oCutOverlay = this.getElementMover().getMovedOverlay();
+		const oCutOverlay = this.getElementMover().getMovedOverlay();
 		if (!oCutOverlay) {
 			return false;
 		}
 
-		var bResult = false;
+		let bResult = false;
 		if (!this._isForSameElement(oCutOverlay, oTargetOverlay)) {
-			var oTargetZoneAggregation = this._getTargetZoneAggregation(oTargetOverlay);
+			// if the paste is done on a container, insertInto is used, otherwise repositionOn is used
+			const oTargetZoneAggregation = this._getTargetZoneAggregation(oTargetOverlay);
 			if (oTargetZoneAggregation) {
 				this.getElementMover().insertInto(oCutOverlay, oTargetZoneAggregation);
 				bResult = true;

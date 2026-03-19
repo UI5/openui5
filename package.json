@@ -35,9 +35,9 @@
 	},
 	"devDependencies": {
 		"@ui5/builder": "^4.1.4",
-		"@ui5/cli": "^4.0.47",
-		"@ui5/project": "^4.0.12",
-		"@ui5/server": "^4.0.13",
+		"@ui5/cli": "^4.0.49",
+		"@ui5/project": "^4.0.14",
+		"@ui5/server": "^4.0.14",
 		"async": "^3.2.6",
 		"cheerio": "1.0.0",
 		"cookie": "^1.0.2",

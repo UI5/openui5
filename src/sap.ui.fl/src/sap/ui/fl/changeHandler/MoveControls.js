@@ -282,8 +282,7 @@ function(
 	MoveControls.completeChangeContent = async function(oChange, mSpecificChangeInfo, mPropertyBag) {
 		const oModifier = mPropertyBag.modifier;
 		const oAppComponent = mPropertyBag.appComponent;
-		// TODO: Remove assignment without content after all derived change handlers are adjusted to use content. todos#4
-		const oChangeContent = mSpecificChangeInfo.content || mSpecificChangeInfo;
+		const oChangeContent = mSpecificChangeInfo.content;
 
 		checkCompleteChangeContentConditions(oChangeContent);
 		const mCompleteSpecificChangeInfo = await completeSpecificChangeInfo(oModifier, oChangeContent, oAppComponent);

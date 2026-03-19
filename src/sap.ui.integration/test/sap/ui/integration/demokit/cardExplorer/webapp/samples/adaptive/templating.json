@@ -1,8 +1,12 @@
 {
-	"_version": "%LATEST_SCHEMA_VERSION%",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "adaptivecard.embedded",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'embedded'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"header": {

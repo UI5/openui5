@@ -61,9 +61,7 @@ sap.ui.define([
 				fragmentHandler: {
 					type: "function"
 				}
-			},
-			associations: {},
-			events: {}
+			}
 		}
 	});
 
@@ -103,14 +101,13 @@ sap.ui.define([
 	 * @returns {Promise.<boolean>} <code>true</code> when editable wrapped in a promise
 	 * @private
 	 */
-	AddXMLAtExtensionPoint.prototype._isEditable = function(oOverlay) {
+	AddXMLAtExtensionPoint.prototype._isEditable = async function(oOverlay) {
 		if (isDesignMode()) {
 			const oElement = oOverlay.getElement();
-			return this.hasChangeHandler(FLEX_CHANGE_TYPE, oElement).then(function(bHasChangeHandler) {
-				return bHasChangeHandler && hasExtensionPoints(oElement) && checkViewId(oOverlay);
-			});
+			const bHasChangeHandler = await this.hasChangeHandler(FLEX_CHANGE_TYPE, oElement);
+			return bHasChangeHandler && hasExtensionPoints(oElement) && checkViewId(oOverlay);
 		}
-		return Promise.resolve(false);
+		return false;
 	};
 
 	/**
@@ -132,7 +129,7 @@ sap.ui.define([
 		return false;
 	};
 
-	function handleAddXmlAtExtensionPointCommand(oElement, mExtensionData, oCompositeCommand) {
+	async function handleAddXmlAtExtensionPointCommand(oElement, mExtensionData, oCompositeCommand) {
 		const sExtensionPointName = mExtensionData.extensionPointName;
 		const oView = FlUtils.getViewForControl(oElement);
 		const mExtensionPointReference = {
@@ -144,26 +141,24 @@ sap.ui.define([
 			fragmentPath: mExtensionData.fragmentPath
 		};
 
-		return this.getCommandFactory().getCommandFor(
+		const oAddXmlAtExtensionPointCommand = await this.getCommandFactory().getCommandFor(
 			mExtensionPointReference,
 			FLEX_CHANGE_TYPE,
 			mExtensionPointSettings
-		)
-		.then(function(oAddXmlAtExtensionPointCommand) {
-			return oCompositeCommand.addCommand(oAddXmlAtExtensionPointCommand);
-		});
+		);
+		oCompositeCommand.addCommand(oAddXmlAtExtensionPointCommand);
 	}
 
-	function handleManifestChangeCommand(oElement, oCompositeCommand) {
+	async function handleManifestChangeCommand(oElement, oCompositeCommand) {
 		// without manifest change when the FlexExtensionPointEnabled flag is already set
 		const bFlexExtensionPointHandlingEnabled = ManifestUtils.isFlexExtensionPointHandlingEnabled(oElement);
 		if (bFlexExtensionPointHandlingEnabled || this.bManifestCommandAlreadyAvailable) {
-			return Promise.resolve();
+			return;
 		}
 
 		const oComponent = FlUtils.getAppComponentForControl(oElement);
 		const sReference = oComponent.getManifestEntry("sap.app").id;
-		return this.getCommandFactory().getCommandFor(
+		const oManifestCommand = await this.getCommandFactory().getCommandFor(
 			oElement,
 			"manifest",
 			{
@@ -173,37 +168,23 @@ sap.ui.define([
 				parameters: { flexExtensionPointEnabled: true },
 				texts: {}
 			}
-		)
-		.then(function(oManifestCommand) {
-			this.bManifestCommandAlreadyAvailable = true;
-			return oCompositeCommand.addCommand(oManifestCommand);
-		}.bind(this));
+		);
+		this.bManifestCommandAlreadyAvailable = true;
+		oCompositeCommand.addCommand(oManifestCommand);
 	}
 
-	function handleCompositeCommand(aElementOverlays, mExtensionData) {
-		let oCompositeCommand;
+	async function handleCompositeCommand(aElementOverlays, mExtensionData) {
 		const oOverlay = aElementOverlays[0];
 		const oElement = oOverlay.getElement();
 
-		return this.getCommandFactory().getCommandFor(oElement, "composite")
-
-		.then(function(_oCompositeCommand) {
-			oCompositeCommand = _oCompositeCommand;
-		})
+		const oCompositeCommand = await this.getCommandFactory().getCommandFor(oElement, "composite");
 
 		// Flex Change
-		.then(function() {
-			return handleAddXmlAtExtensionPointCommand.call(this, oElement, mExtensionData, oCompositeCommand);
-		}.bind(this))
-
+		await handleAddXmlAtExtensionPointCommand.call(this, oElement, mExtensionData, oCompositeCommand);
 		// Manifest Change
-		.then(function() {
-			return handleManifestChangeCommand.call(this, oElement, oCompositeCommand);
-		}.bind(this))
+		await handleManifestChangeCommand.call(this, oElement, oCompositeCommand);
 
-		.then(function() {
-			return oCompositeCommand;
-		});
+		return oCompositeCommand;
 	}
 
 	/**
@@ -213,9 +194,8 @@ sap.ui.define([
 	 * @param {sap.ui.rta.plugin.AddXMLAtExtensionPoint.fragmentHandler} [mPropertyBag.fragmentHandler] - Handler function for fragment handling. The fragment handler is a callback function that needs to be passed here into the <code>propertyBag</code> or alternatively on instantiation of the plugin.
 	 * @returns {Promise} Resolves when handler is executed successfully
 	 */
-	AddXMLAtExtensionPoint.prototype.handler = function(aElementOverlays, mPropertyBag) {
-		return Promise.resolve()
-		.then(function() {
+	AddXMLAtExtensionPoint.prototype.handler = async function(aElementOverlays, mPropertyBag) {
+		try {
 			const fnFragmentHandler = mPropertyBag.fragmentHandler || this.getFragmentHandler();
 			if (!fnFragmentHandler) {
 				throw new Error("Fragment handler function is not available in the handler");
@@ -223,43 +203,33 @@ sap.ui.define([
 			const oOverlay = aElementOverlays[0];
 			const oElement = oOverlay.getElement();
 			const aExtensionPointInfos = getExtensionPointList(oElement);
-			return fnFragmentHandler(oOverlay, aExtensionPointInfos);
-		}.bind(this))
+			const mExtensionData = await fnFragmentHandler(oOverlay, aExtensionPointInfos);
 
-		.then(function(mExtensionData) {
 			if (!mExtensionData.extensionPointName || !(typeof mExtensionData.extensionPointName === "string")) {
 				throw new Error("Extension point name is not selected!");
 			}
 			if (!mExtensionData.fragmentPath || !(typeof mExtensionData.fragmentPath === "string")) {
 				throw new Error("Fragment path is not available");
 			}
-			return mExtensionData;
-		})
+			const oCompositeCommand = await handleCompositeCommand.call(this, aElementOverlays, mExtensionData);
 
-		.then(function(mExtensionData) {
-			return handleCompositeCommand.call(this, aElementOverlays, mExtensionData);
-		}.bind(this))
-
-		.then(function(oCompositeCommand) {
 			this.fireElementModified({
 				command: oCompositeCommand
 			});
-		}.bind(this))
-
-		.catch(function(vError) {
+		} catch (vError) {
 			throw DtUtil.propagateError(
 				vError,
 				"AddXMLAtExtensionPoint#handler",
 				"Error occurred in AddXMLAtExtensionPoint handler function",
 				"sap.ui.rta"
 			);
-		});
+		}
 	};
 
 	/**
 	 * Retrieves the context menu item for the action.
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {object[]} Array of the items with required data
+	 * @returns {object[]} Items with required data
 	 */
 	AddXMLAtExtensionPoint.prototype.getMenuItems = function(aElementOverlays) {
 		return this._getMenuItems(aElementOverlays, {

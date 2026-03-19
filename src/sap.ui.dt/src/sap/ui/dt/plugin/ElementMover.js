@@ -215,8 +215,18 @@ sap.ui.define([
 		}
 	};
 
+	// If the source and target are different, we need to store the parent instance,
+	// as templates do not get immediately updated and we search for the moved element there.
+	function storeInformationIfNecessary(oMovedOverlay, oSourceParent, oTargetParent) {
+		if (oTargetParent.getId() !== oSourceParent.getId()) {
+			oMovedOverlay.setOngoingMoveInformation({
+				sourceParentInstance: oSourceParent
+			});
+		}
+	}
+
 	/**
-	 * Move an element inside the same container (reposition).
+	 * Move an element before or after a passed element.
 	 * In case of special handling required (e.g. SimpleForm), the methods "beforeMove" and "afterMove"
 	 * are called before and after the reposition. They should be implemented on the control design time
 	 * metadata for the relevant aggregation.
@@ -225,37 +235,45 @@ sap.ui.define([
 	 * @param  {boolean} bInsertAfterElement Flag defining if the Element should be inserted After the Selection
 	 */
 	ElementMover.prototype.repositionOn = function(oMovedOverlay, oTargetElementOverlay, bInsertAfterElement) {
-		var oMovedElement = oMovedOverlay.getElement();
-		var oTargetParentInformation = OverlayUtil.getParentInformation(oTargetElementOverlay);
-		var oSourceParentInformation = OverlayUtil.getParentInformation(oMovedOverlay);
-		var oAggregationDesignTimeMetadata;
-
-		var oParentAggregationOverlay = oMovedOverlay.getParentAggregationOverlay();
-		var oRelevantContainerElement = oMovedOverlay.getRelevantContainer();
-		var oParentElementOverlay = oMovedOverlay.getParentElementOverlay();
-
+		const oTargetParentInformation = OverlayUtil.getParentInformation(oTargetElementOverlay);
+		const oParentAggregationOverlay = oMovedOverlay.getParentAggregationOverlay();
+		const oParentElementOverlay = oMovedOverlay.getParentElementOverlay();
+		let oAggregationDesignTimeMetadata;
 		if (oParentAggregationOverlay && oParentElementOverlay) {
-			var sAggregationName = oParentAggregationOverlay.getAggregationName();
+			const sAggregationName = oParentAggregationOverlay.getAggregationName();
 			oAggregationDesignTimeMetadata = oParentElementOverlay.getDesignTimeMetadata().getAggregation(sAggregationName);
 		}
 
 		if (oTargetParentInformation.index !== -1) {
-			if (oAggregationDesignTimeMetadata && oAggregationDesignTimeMetadata.beforeMove) {
+			const oMovedElement = oMovedOverlay.getElement();
+			const oSourceParentInformation = OverlayUtil.getParentInformation(oMovedOverlay);
+			const oRelevantContainerElement = oMovedOverlay.getRelevantContainer();
+
+			storeInformationIfNecessary(oMovedOverlay, oSourceParentInformation.parent, oTargetParentInformation.parent);
+
+			if (oAggregationDesignTimeMetadata?.beforeMove) {
 				oAggregationDesignTimeMetadata.beforeMove(oRelevantContainerElement, oMovedElement);
 			}
 			if (bInsertAfterElement) {
 				oTargetParentInformation.index++;
 				if (oSourceParentInformation.aggregation === oTargetParentInformation.aggregation) {
-					// index should not be incremented if cut-paste occurs inside the same container, where source index is less than the target index
-					oTargetParentInformation.index = ElementUtil.adjustIndexForMove(oSourceParentInformation.parent, oTargetParentInformation.parent, oSourceParentInformation.index, oTargetParentInformation.index);
+					// index should not be incremented if cut-paste occurs inside the same container,
+					// where source index is less than the target index
+					oTargetParentInformation.index = ElementUtil.adjustIndexForMove(
+						oSourceParentInformation.parent, oTargetParentInformation.parent,
+						oSourceParentInformation.index, oTargetParentInformation.index
+					);
 				}
 			}
-			ElementUtil.insertAggregation(oTargetParentInformation.parent, oTargetParentInformation.aggregation,
-				oMovedElement, oTargetParentInformation.index);
-			if (oAggregationDesignTimeMetadata && oAggregationDesignTimeMetadata.afterMove) {
+			ElementUtil.insertAggregation(
+				oTargetParentInformation.parent, oTargetParentInformation.aggregation,
+				oMovedElement, oTargetParentInformation.index
+			);
+			if (oAggregationDesignTimeMetadata?.afterMove) {
 				oAggregationDesignTimeMetadata.afterMove(oRelevantContainerElement, oMovedElement);
 			}
-			this._setSourceAndTargetParentInformation();
+			this._setSourceAndTargetParentInformation(oSourceParentInformation, oTargetParentInformation);
+			oMovedOverlay.resetOngoingMoveInformation();
 		}
 	};
 
@@ -269,35 +287,43 @@ sap.ui.define([
 	 * @param  {boolean} bInsertAtEnd Flag defining if the Element should be inserted at the End of an Aggregation
 	 */
 	ElementMover.prototype.insertInto = function(oMovedOverlay, oTargetAggregationOverlay, bInsertAtEnd) {
-		var oMovedElement = oMovedOverlay.getElement();
-		var oTargetParentElement = oTargetAggregationOverlay.getElement();
-		var oAggregationDesignTimeMetadata;
+		const oMovedElement = oMovedOverlay.getElement();
+		const oParentAggregationOverlay = oMovedOverlay.getParentAggregationOverlay();
+		const oParentElementOverlay = oMovedOverlay.getParentElementOverlay();
+		const sTargetAggregationName = oTargetAggregationOverlay.getAggregationName();
+		const aTargetAggregationItems = ElementUtil.getAggregation(oTargetAggregationOverlay.getElement(), sTargetAggregationName);
 
-		var oParentAggregationOverlay = oMovedOverlay.getParentAggregationOverlay();
-		var oRelevantContainerElement = oMovedOverlay.getRelevantContainer();
-		var oParentElementOverlay = oMovedOverlay.getParentElementOverlay();
-
+		let oAggregationDesignTimeMetadata;
 		if (oParentAggregationOverlay && oParentElementOverlay) {
-			var sAggregationName = oParentAggregationOverlay.getAggregationName();
-			oAggregationDesignTimeMetadata = oParentElementOverlay.getDesignTimeMetadata().getAggregation(sAggregationName);
+			const sSourceAggregationName = oParentAggregationOverlay.getAggregationName();
+			oAggregationDesignTimeMetadata = oParentElementOverlay.getDesignTimeMetadata().getAggregation(sSourceAggregationName);
 		}
 
-		var aTargetAggregationItems = ElementUtil.getAggregation(oTargetAggregationOverlay.getElement(), oTargetAggregationOverlay.getAggregationName());
-		var iIndex = aTargetAggregationItems.indexOf(oMovedElement);
-		// insert as first element (index=0) or AFTER the last element (Index=length)
-		var iInsertIndex = bInsertAtEnd ? aTargetAggregationItems.length : 0;
+		const iInsertIndex = bInsertAtEnd ? aTargetAggregationItems.length : 0;
+		const iCurrentIndex = aTargetAggregationItems.indexOf(oMovedElement);
 		// check if element already on desired position
 		// for checking last position, we have to reduce the iInsertIndex by one
-		if (!(iIndex > -1 && iIndex === (iInsertIndex === 0 ? iInsertIndex : iInsertIndex - 1))) {
+		if (!(iCurrentIndex > -1 && iCurrentIndex === (iInsertIndex === 0 ? iInsertIndex : iInsertIndex - 1))) {
+			const oTargetParentElement = oTargetAggregationOverlay.getElement();
+			const oTargetParentInformation = {
+				parent: oTargetParentElement,
+				aggregation: sTargetAggregationName,
+				index: iInsertIndex
+			};
+			const oSourceParentInformation = OverlayUtil.getParentInformation(oMovedOverlay);
+
+			storeInformationIfNecessary(oMovedOverlay, oSourceParentInformation.parent, oTargetParentInformation.parent);
+
+			const oRelevantContainerElement = oMovedOverlay.getRelevantContainer();
 			if (oAggregationDesignTimeMetadata && oAggregationDesignTimeMetadata.beforeMove) {
 				oAggregationDesignTimeMetadata.beforeMove(oRelevantContainerElement, oMovedElement);
 			}
-			var sTargetAggregationName = oTargetAggregationOverlay.getAggregationName();
 			ElementUtil.insertAggregation(oTargetParentElement, sTargetAggregationName, oMovedElement, iInsertIndex);
 			if (oAggregationDesignTimeMetadata && oAggregationDesignTimeMetadata.afterMove) {
 				oAggregationDesignTimeMetadata.afterMove(oRelevantContainerElement, oMovedElement);
 			}
-			this._setSourceAndTargetParentInformation();
+			this._setSourceAndTargetParentInformation(oSourceParentInformation, oTargetParentInformation);
+			oMovedOverlay.resetOngoingMoveInformation();
 		}
 	};
 
@@ -316,26 +342,16 @@ sap.ui.define([
 		return true;
 	};
 
-	ElementMover.prototype._setSourceAndTargetParentInformation = function() {
+	ElementMover.prototype._setSourceAndTargetParentInformation = function(oSourceParentInformation, oTargetParentInformation) {
 		var oMovedOverlay = this.getMovedOverlay();
-		if (!oMovedOverlay) {
+		if (!oMovedOverlay || !oSourceParentInformation || !oTargetParentInformation) {
 			delete this._mSourceParentInformation;
 			delete this._mTargetParentInformation;
 			return;
 		}
-		var mSource = this._getSource();
-		if (mSource) {
-			this._mSourceParentInformation = {};
-			Object.assign(this._mSourceParentInformation, mSource);
-		} else {
-			delete this._mSourceParentInformation;
-		}
-		var mTarget = OverlayUtil.getParentInformation(oMovedOverlay);
-		if (mTarget) {
-			this._mTargetParentInformation = mTarget;
-		} else {
-			delete this._mTargetParentInformation;
-		}
+		this._mSourceParentInformation = {};
+		Object.assign(this._mSourceParentInformation, oSourceParentInformation);
+		this._mTargetParentInformation = oTargetParentInformation;
 	};
 
 	/**

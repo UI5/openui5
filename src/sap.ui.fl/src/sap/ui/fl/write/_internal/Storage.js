@@ -160,9 +160,7 @@ sap.ui.define([
 						mCondense.update[sFileType] ||= [];
 						var iChangeUpdateIndex = mCondense.update[sFileType].length;
 						mCondense.update[sFileType][iChangeUpdateIndex] = {};
-						mCondense.update[sFileType][iChangeUpdateIndex][oChange.getId()] = {
-							content: oChange.getContent()
-						};
+						mCondense.update[sFileType][iChangeUpdateIndex][oChange.getId()] = oChange.getCondensingUpdateDiff();
 					}
 
 					delete oChange.condenserState;
@@ -171,6 +169,12 @@ sap.ui.define([
 					mCondense.create[sFileType] ||= [];
 					mCondense.create[sFileType][iChangeCreateIndex] = {};
 					mCondense.create[sFileType][iChangeCreateIndex][oChange.getId()] = oChange.convertToFileContent();
+				} else if (oChange.getState() === States.LifecycleState.UPDATED) {
+					mCondense.update ||= {};
+					mCondense.update[sFileType] ||= [];
+					const iChangeUpdateIndex = mCondense.update[sFileType].length;
+					mCondense.update[sFileType][iChangeUpdateIndex] = {};
+					mCondense.update[sFileType][iChangeUpdateIndex][oChange.getId()] = oChange.getCondensingUpdateDiff();
 				}
 			});
 		}

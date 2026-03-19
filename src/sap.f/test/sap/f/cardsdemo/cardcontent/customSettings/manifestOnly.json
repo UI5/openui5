@@ -1,0 +1,50 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "test.card.customSettingsManifestOnly",
+		"type": "card",
+		"title": "Card 'customSettingsManifestOnly'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"customSettings": {
+			"theme": "dark",
+			"enableActions": true,
+			"layout": "compact",
+			"maxItems": 5
+		},
+		"header": {
+			"title": "Manifest Settings Only Test",
+			"subtitle": "No SDK settings - all from manifest",
+			"visible": "{= ${customSettings>/enableActions}}"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Configuration",
+					"items": [
+						{
+							"label": "Theme",
+							"value": "{customSettings>/theme}"
+						},
+						{
+							"label": "Actions Enabled",
+							"value": "{= ${customSettings>/enableActions} ? 'Yes' : 'No'}"
+						},
+						{
+							"label": "Layout",
+							"value": "{customSettings>/layout}"
+						},
+						{
+							"label": "Max Items",
+							"value": "{customSettings>/maxItems}"
+						}
+					]
+				}
+			]
+		}
+	}
+}

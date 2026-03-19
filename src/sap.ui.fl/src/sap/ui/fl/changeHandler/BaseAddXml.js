@@ -139,8 +139,7 @@ sap.ui.define([
 	 */
 	BaseAddXml.completeChangeContent = function(oChange, oSpecificChangeInfo, oContent) {
 		oContent ||= {};
-		// TODO: Remove assignment without content after all derived change handlers are adjusted to use content. todos#4
-		const oSpecificChangeContent = oSpecificChangeInfo.content || oSpecificChangeInfo;
+		const oSpecificChangeContent = oSpecificChangeInfo.content;
 		if (!oSpecificChangeContent.fragmentPath) {
 			BaseAddXml._throwMissingAttributeError("fragmentPath");
 		}

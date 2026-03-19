@@ -124,17 +124,6 @@ sap.ui.define([
 		)
 		.then((oChangeHandler) => {
 			const oChangeSpecificData = { ...mPropertyBag.changeSpecificData };
-			// Copy the content properties into the change specific data so any change handler can use the "settings" change structure
-			// TODO: consolidate in all commands/change handlers so the "content" structure is always used. todos#4
-			if (oChangeSpecificData.content) {
-				Object.keys(oChangeSpecificData.content).forEach((sKey) => {
-					if (!oChangeSpecificData[sKey]) {
-						oChangeSpecificData[sKey] = oChangeSpecificData.content[sKey];
-					} else {
-						Log.warning(`The property '${sKey}' is defined both in the change specific data and its content.`);
-					}
-				});
-			}
 
 			return oChangeHandler.completeChangeContent(oFlexObject, oChangeSpecificData, {
 				modifier: JsControlTreeModifier,

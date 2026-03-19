@@ -394,6 +394,7 @@ sap.ui.define([
 			if (oChange.isPersisted()) {
 				oChange.condenserState = "update";
 			}
+			// TODO #17: Save the properties that are updated in the change instance
 			oCondenserInfo.update(oChange, oUpdateCondenserInfo.updateContent);
 			oChange.setState(States.LifecycleState.UPDATED);
 			delete mTypes[CondenserUtils.NOT_INDEX_RELEVANT][CondenserClassification.Update][oCondenserInfo.uniqueKey];

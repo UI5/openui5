@@ -2389,6 +2389,14 @@ sap.ui.define([
 	QUnit.test("download API should invoke uploaderTableItem's download API", async function (assert) {
 		const done = assert.async();
 
+		var oWindow = null;
+
+		// Stub window.open to capture reference
+		const stub = sinon.stub(window, 'open').callsFake(function(url) {
+		oWindow = { close: sinon.spy() }; // Mock window object
+		return oWindow;
+		});
+
 		this.uploadSetInstance = new UploadSetwithTable();
 
 		this.uploadSetInstance.getRowConfiguration = () => {
@@ -2439,6 +2447,11 @@ sap.ui.define([
 
 		setTimeout(() => {
 			assert.ok(oUploaderSpy.calledOnce, "Uploader download method was called once");
+			// Cleanup
+			stub.restore();
+			if (oWindow) {
+				oWindow.close();
+			}
 			done();
 		});
 	});

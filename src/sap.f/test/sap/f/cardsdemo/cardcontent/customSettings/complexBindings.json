@@ -1,0 +1,69 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "test.card.customSettingsComplexBindings",
+		"type": "card",
+		"title": "Card 'customSettingsComplexBindings'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"customSettings": {
+			"minValue": 25,
+			"maxValue": 100,
+			"threshold": 50,
+			"prefix": "Value: ",
+			"enableWarnings": true
+		},
+		"header": {
+			"title": "Complex Binding Expressions Test",
+			"subtitle": "{= ${customSettings>/prefix} + ${customSettings>/minValue} + ' - ' + ${customSettings>/maxValue}}",
+			"visible": "{= ${customSettings>/minValue} < ${customSettings>/maxValue}}"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Range Check",
+						"Result": "{= ${customSettings>/minValue} < ${customSettings>/maxValue} ? 'Valid Range' : 'Invalid Range'}"
+					},
+					{
+						"Name": "Threshold Status",
+						"Result": "{= ${customSettings>/threshold} >= ${customSettings>/minValue} && ${customSettings>/threshold} <= ${customSettings>/maxValue} ? 'Within Range' : 'Out of Range'}"
+					},
+					{
+						"Name": "Warning Level",
+						"Result": "{= ${customSettings>/enableWarnings} && ${customSettings>/threshold} > 60 ? 'High' : 'Normal'}"
+					},
+					{
+						"Name": "Calculated Percentage",
+						"Result": "{= ((${customSettings>/threshold} - ${customSettings>/minValue}) / (${customSettings>/maxValue} - ${customSettings>/minValue}) * 100).toFixed(1) + '%'}"
+					}
+				]
+			},
+			"item": {
+				"title": {
+					"value": "{Name}"
+				},
+				"description": {
+					"value": "{Result}"
+				}
+			}
+		},
+		"footer": {
+			"actionsStrip": [
+				{
+					"text": "Action",
+					"visible": "{= ${customSettings>/enableWarnings} && ${customSettings>/threshold} > ${customSettings>/minValue}}",
+					"actions": [
+						{
+							"type": "Navigation"
+						}
+					]
+				}
+			]
+		}
+	}
+}

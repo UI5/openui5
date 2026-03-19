@@ -76,6 +76,85 @@ sap.ui.define([
 		"cardWithExtension": {
 			path: "sap/f/cardsdemo/cardcontent/withExtension.json",
 			baseUrl: "sap/f/cardsdemo/cardcontent/"
+		},
+		"customSettings": {
+			path: "sap/f/cardsdemo/cardcontent/customSettings/manifest.json",
+			baseUrl: "sap/f/cardsdemo/cardcontent/customSettings/",
+			customSettings: {
+				feature1: true,
+				feature2: true,
+				feature3: "default value",
+				showHeader: true,
+				isPreview: true
+			}
+		},
+		"customSettingsSDKOnly": {
+			path: "sap/f/cardsdemo/cardcontent/customSettings/sdkOnly.json",
+			baseUrl: "sap/f/cardsdemo/cardcontent/customSettings/",
+			customSettings: {
+				feature1: true,
+				feature2: false,
+				showHeader: true,
+				isPreview: false
+			}
+		},
+		"customSettingsManifestOnly": {
+			path: "sap/f/cardsdemo/cardcontent/customSettings/manifestOnly.json",
+			baseUrl: "sap/f/cardsdemo/cardcontent/customSettings/"
+		},
+		"customSettingsComplexBindings": {
+			path: "sap/f/cardsdemo/cardcontent/customSettings/complexBindings.json",
+			baseUrl: "sap/f/cardsdemo/cardcontent/customSettings/",
+			customSettings: {
+				minValue: 10,
+				maxValue: 80,
+				threshold: 65,
+				prefix: "SDK: ",
+				enableWarnings: false
+			}
+		},
+		"customSettingsWithObjects": {
+			path: "sap/f/cardsdemo/cardcontent/customSettings/withObjects.json",
+			baseUrl: "sap/f/cardsdemo/cardcontent/customSettings/",
+			customSettings: {
+				theme: {
+					primaryColor: "#007bff",
+					secondaryColor: "#6c757d",
+					fontSize: 14
+				},
+				features: ["feature1", "feature2", "feature3"],
+				apiConfig: {
+					endpoint: "https://sdk.example.com/api",
+					timeout: 5000
+				}
+			}
+		},
+		"customSettingsObjectOverride": {
+			path: "sap/f/cardsdemo/cardcontent/customSettings/objectOverride.json",
+			baseUrl: "sap/f/cardsdemo/cardcontent/customSettings/",
+			customSettings: {
+				theme: {
+					primaryColor: "#007bff",
+					secondaryColor: "#6c757d",
+					fontSize: 14
+				},
+				metadata: {
+					version: "1.0.0",
+					author: "SDK"
+				}
+			}
+		},
+		"customSettingsObjectNoOverride": {
+			path: "sap/f/cardsdemo/cardcontent/customSettings/objectNoOverride.json",
+			baseUrl: "sap/f/cardsdemo/cardcontent/customSettings/",
+			customSettings: {
+				apiConfig: {
+					endpoint: "https://sdk.example.com/api",
+					timeout: 5000,
+					retries: 3
+				},
+				features: ["analytics", "logging"]
+			}
 		}
 	};
 
@@ -105,12 +184,18 @@ sap.ui.define([
 		},
 
 		resolveManifest: function () {
-			var oCard = new SkeletonCard({
+			const sSelectedKey = this.byId("manifestId").getSelectedKey();
+			const oManifestConfig = aManifests[sSelectedKey];
+			const oCard = new SkeletonCard({
 					manifest: JSON.parse(this.byId("editor").getValue()),
 					baseUrl: this.byId("baseUrlInp").getValue()
-				}),
-				errorOutput = this.byId("error"),
-				output = this.byId("output");
+				});
+			const errorOutput = this.byId("error");
+			const output = this.byId("output");
+
+			if (oManifestConfig.customSettings) {
+				oCard.setProperty("customSettings", oManifestConfig.customSettings);
+			}
 
 			errorOutput.setVisible(false);
 			output.setValue("");

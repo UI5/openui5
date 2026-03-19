@@ -288,7 +288,7 @@ sap.ui.define([
 		When.onTheMainPage.enterStepInputValue("stepInput", "102");
 		Then.onTheMainPage.checkStepInputValueState("stepInput", ValueState.Error,
 			oBundle.getText("EnterNumberMax", ["99"]));
-		When.onTheMainPage.enterStepInputValue("stepInput", "1.234", "102");
+		When.onTheMainPage.enterStepInputValue("stepInput", "1.234", "1.234");
 		Then.onTheMainPage.checkStepInputValueState("stepInput", ValueState.Error,
 			oBundle.getText("EnterNumberWithPrecision", ["0"]));
 		When.onTheMainPage.enterStepInputValue("stepInput", "0");

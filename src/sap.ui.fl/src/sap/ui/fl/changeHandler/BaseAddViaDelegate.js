@@ -280,8 +280,7 @@ sap.ui.define([
 				 */
 				completeChangeContent(oChange, mSpecificChangeInfo, mPropertyBag) {
 					const oAppComponent = mPropertyBag.appComponent;
-					// TODO: Remove assignment without content after all derived change handlers are adjusted to use content. todos#4
-					const oChangeInfoContent = mSpecificChangeInfo.content || mSpecificChangeInfo;
+					const oChangeInfoContent = mSpecificChangeInfo.content;
 					const oContent = {};
 					if (oChangeInfoContent.parentId) {
 						if (isFunction(mAddViaDelegateSettings.mapParentIdIntoChange)) {

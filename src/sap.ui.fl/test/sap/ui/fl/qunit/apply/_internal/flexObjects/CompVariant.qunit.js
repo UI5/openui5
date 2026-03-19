@@ -272,6 +272,26 @@ sap.ui.define([
 			assert.notStrictEqual(oBaseVariant.getVariantId(), oCopiedCompVariant.getVariantId(), "the variantId is properly set");
 			assert.deepEqual(oBaseVariant.getContexts(), oCopiedCompVariant.getContexts(), "the contexts are properly set");
 		});
+
+		QUnit.test("when the variant is updated and getCondensingUpdateDiff is called", function(assert) {
+			const oCompVariant = FlexObjectFactory.createCompVariant({
+				content: { foo: "bar" },
+				executeOnSelection: true,
+				favorite: true,
+				contexts: { test: "test" },
+				texts: { variantName: { value: "test-variant-name", type: "XFLD" } }
+			});
+			oCompVariant.setName("new name");
+
+			const mDiff = oCompVariant.getCondensingUpdateDiff();
+			assert.deepEqual(mDiff, {
+				content: { foo: "bar" },
+				executeOnSelection: true,
+				favorite: true,
+				contexts: { test: "test" },
+				texts: { variantName: { value: "new name", type: "XFLD" } }
+			}, "then the diff contains all properties of the comp variant");
+		});
 	});
 
 	var aScenarios = [{

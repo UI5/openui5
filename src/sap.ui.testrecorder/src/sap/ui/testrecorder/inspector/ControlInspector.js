@@ -64,13 +64,19 @@ sap.ui.define([
 	/**
 	 * send an event to the test recorder frame that has as payload:
 	 * the most basic data about the app - framework name + version and control IDs
+	 * @param {Object} [oOptions] - Optional settings for enriching tree nodes.
+	 * @param {boolean} [oOptions.includeAssignedProperties] - Whether to include assigned properties in each node.
+	 * @param {boolean} [oOptions.includeAssignedAssociations] - Whether to include assigned associations in each node.
+	 * @param {boolean} [oOptions.includeTooltipText] - Whether to include tooltip text in each node.
 	 */
-	ControlInspector.prototype.getAllControlData = function () {
+	ControlInspector.prototype.getAllControlData = function (oOptions) {
+		var oRenderedControls = ControlAPI.getAllControlData(oOptions).renderedControls;
 		CommunicationBus.publish(CommunicationChannels.RECEIVE_ALL_CONTROLS_DATA, {
-			renderedControls: ControlAPI.getAllControlData().renderedControls,
+			renderedControls: oRenderedControls,
 			framework: ControlAPI.getFrameworkData().framework
 		});
 		ControlInspectorRepo.clear();
+		return oRenderedControls;
 	};
 
 	/**
@@ -79,6 +85,8 @@ sap.ui.define([
 	 * @param {object} mData control identifier
 	 * @param {string} mData.controlId ID of the control to inspect
 	 * @param {string} mData.domElementId ID of a dom element from which the control is found (e.g. dom ref)
+	 * @param {object} mData.includeAggregations Whether to include aggregations in the control data (optional, default: false)
+	 * @param {object} mData.includeAssociations Whether to include associations in the control data (optional, default: false)
 	 */
 	ControlInspector.prototype.getControlData = function (mData) {
 		var oDomElement = mData.domElementId ? document.getElementById(mData.domElementId) : Element.getElementById(mData.controlId).getDomRef();
@@ -87,17 +95,18 @@ sap.ui.define([
 
 		var mControlData = ControlAPI.getControlData(mData);
 		CommunicationBus.publish(CommunicationChannels.RECEIVE_CONTROL_DATA, mControlData);
+		return mControlData;
 	};
 
 	/**
-	 * send an event to the test recorder frame that has as payload:
-	 * a generated code snippet for locating controls
+	 * generate a code snippet for locating controls, without publishing to the communication bus.
 	 * @param {object} mData object containing control identifiers and actions
 	 * @param {string} mData.domElementId ID of a dom element from which the control is found (e.g. dom ref)
 	 * @param {string} mData.action name of an action to record in the snippet (e.g. press, enter text)
 	 * @param {object} mData.assertion assertion details - property name, type and expected value
+	 * @returns {Promise<string>} resolves with the generated code snippet
 	 */
-	ControlInspector.prototype.getCodeSnippet = function (mData) {
+	ControlInspector.prototype._getCodeSnippet = function (mData) {
 		var mDataForGenerator = Object.assign({}, mData, {
 			settings: mSelectorSettings
 		});
@@ -129,7 +138,19 @@ sap.ui.define([
 					assertion: mData.assertion
 				}, mSelectorSettings), DialectRegistry.getActiveDialect() === Dialects.WDI5);
 			}
-		}).then(function (sSnippet) {
+		});
+	};
+
+	/**
+	 * send an event to the test recorder frame that has as payload:
+	 * a generated code snippet for locating controls
+	 * @param {object} mData object containing control identifiers and actions
+	 * @param {string} mData.domElementId ID of a dom element from which the control is found (e.g. dom ref)
+	 * @param {string} mData.action name of an action to record in the snippet (e.g. press, enter text)
+	 * @param {object} mData.assertion assertion details - property name, type and expected value
+	 */
+	ControlInspector.prototype.getCodeSnippet = function (mData) {
+		return this._getCodeSnippet(mData).then(function (sSnippet) {
 			// here sSnippet contains the snippets for one or multiple controls
 			CommunicationBus.publish(CommunicationChannels.RECEIVE_CODE_SNIPPET, {
 				codeSnippet: sSnippet
@@ -137,7 +158,7 @@ sap.ui.define([
 		}).catch(function (oError) {
 			CommunicationBus.publish(CommunicationChannels.RECEIVE_CODE_SNIPPET, {
 				error: "Could not generate code snippet for " + JSON.stringify(mData) + ". Details: " + oError,
-				domElementId: mDataForGenerator.domElementId
+				domElementId: mData.domElementId
 			});
 		});
 	};
