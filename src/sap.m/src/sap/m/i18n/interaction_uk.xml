@@ -130,11 +130,11 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Відкриває керування поданнями.</p>
+				<p>Відкриває діалогове вікно &quot;Мої подання&quot;.</p>
 			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Закриває виринаюче повідомлення про помилку для керування поданнями</p>
+				<p>Закриває виринаюче вікно помилки у діалоговому вікні &quot;Мої подання&quot;</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Enter</kbd> <description>

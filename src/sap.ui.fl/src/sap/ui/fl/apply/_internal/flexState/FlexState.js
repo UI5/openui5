@@ -735,15 +735,6 @@ sap.ui.define([
 		return _mFlexObjectInfo[sMapName].prepareFunction(mPropertyBag);
 	};
 
-	// TODO: used by the CompVariantState to mutate the storage response, this has to be changed
-	FlexState.getStorageResponse = async function(sReference) {
-		if (_mInitPromises[sReference]) {
-			await _mInitPromises[sReference].promise;
-			return Loader.getCachedFlexData(sReference).data;
-		}
-		return undefined;
-	};
-
 	FlexState.getComponentData = function(sReference) {
 		return _mInstances[sReference] && _mInstances[sReference].componentData;
 	};

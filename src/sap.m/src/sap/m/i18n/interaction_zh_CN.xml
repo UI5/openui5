@@ -130,11 +130,11 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>打开视图管理。</p>
+				<p>打开“我的视图”对话框。</p>
 			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>关闭视图管理的错误弹出窗口。</p>
+				<p>关闭“我的视图”对话框的错误弹出窗口</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Enter</kbd> <description>

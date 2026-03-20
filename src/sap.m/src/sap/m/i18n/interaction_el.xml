@@ -130,11 +130,11 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Ανοίγει τη διαχείριση προβολής.</p>
+				<p>Ανοίγει τον διάλογο Προβολή Ρυθμίσεων.</p>
 			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Κλείνει το αναδυόμενο πλαίσιο σφάλματος για τη διαχείριση προβολής</p>
+				<p>Κλείνει το αναδυόμενο παράθυρο σφάλματος του διαλόγου Οι Προβολές Μου</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Enter</kbd> <description>

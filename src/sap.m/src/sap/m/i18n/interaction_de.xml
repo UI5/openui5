@@ -130,11 +130,11 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Öffnet die Ansichtsverwaltung.</p>
+				<p>Öffnet den Dialog &quot;Meine Ansichten&quot;.</p>
 			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Schließt das Fehler-Popover der Ansichtsverwaltung.</p>
+				<p>Schließt das Fehler-Popover des Dialogs &quot;Meine Ansichten&quot;.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Enter</kbd> <description>

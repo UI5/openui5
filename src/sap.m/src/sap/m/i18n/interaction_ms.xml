@@ -130,11 +130,11 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Membuka pengurusan paparan.</p>
+				<p>Membuka dialog Paparan Saya.</p>
 			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Menutup popover ralat bagi pengurusan paparan</p>
+				<p>Menutup timbul ralat bagi dialog Paparan Saya</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Enter</kbd> <description>

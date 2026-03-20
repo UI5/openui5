@@ -69,9 +69,7 @@ sap.ui.define(['./WebSocket', "sap/base/Log"],
 
 		/**
 		 * Protocol v10.pcp.sap.com
-		 * What's wrong here?
 		 * @public
-		 * @name sap.ui.core.ws.SapPcpWebSocket.SUPPORTED_PROTOCOLS.v10
 		 */
 		v10 : "v10.pcp.sap.com"
 

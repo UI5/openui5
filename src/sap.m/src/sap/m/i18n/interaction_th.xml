@@ -130,11 +130,11 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>เปิดการจัดการมุมมอง</p>
+				<p>เปิดไดอะลอก 'มุมมองของฉัน'</p>
 			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>ปิด Popover ข้อผิดพลาดสำหรับการจัดการมุมมอง</p>
+				<p>ปิด Popover ข้อผิดพลาดของไดอะลอก 'มุมมองของฉัน'</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Enter</kbd> <description>

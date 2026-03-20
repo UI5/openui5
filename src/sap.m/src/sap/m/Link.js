@@ -533,7 +533,7 @@ function(
 	};
 
 	Link.prototype.setEndIcon = function(sSrc) {
-		if (!IconPool.isIconURI(sSrc)) {
+		if (sSrc && !IconPool.isIconURI(sSrc)) {
 			Log.error("setEndIcon: The provided URI ' + sSrc + ' is is not a valid Icon URI!");
 		} else {
 			var oIcon = this._getEndIcon();
