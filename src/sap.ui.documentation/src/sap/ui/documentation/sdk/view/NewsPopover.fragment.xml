@@ -14,7 +14,7 @@
 			</beginButton>
 			<endButton>
 				<Button
-					id=".showAllNotifications"
+					id="showAllNotifications"
 					text="{i18n>APP_NEWS_SHOW_ALL_BTN}"
 					press=".handleShowAllPress" />
 			</endButton>

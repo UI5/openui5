@@ -33,6 +33,13 @@ function(
 		assert.strictEqual(oHeader.getDomRef().tagName, "SECTION", "The root tag is 'section'");
 	});
 
+	QUnit.test("DynamicPage Header root element has tabindex=-1", function (assert) {
+		var oHeader = this.oDynamicPage.getHeader();
+
+		assert.strictEqual(oHeader.getDomRef().getAttribute("tabindex"), "-1",
+			"The root element has tabindex='-1' so it is focusable on click without entering the tab order");
+	});
+
 	QUnit.test("DynamicPage Header default aggregation", function (assert) {
 		var oHeader = this.oDynamicPage.getHeader(),
 				sHeaderDefaultAggregation = oHeader.getMetadata().getDefaultAggregationName();

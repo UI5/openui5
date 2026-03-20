@@ -977,4 +977,55 @@ sap.ui.define([
 		assert.strictEqual(this.oLink.getAggregation("_icon").getSrc(), "sap-icon://add", "Icon control in _icon aggregation is not changed when invalid URI is set");
 		assert.strictEqual(this.oLink.getAggregation("_endIcon").getSrc(), "sap-icon://add", "Icon control in _endIcon aggregation is not changed when invalid URI is set");
 	});
+
+	QUnit.test("endIcon is removed when empty value is set", async function(assert) {
+		var oLinkDomRef;
+
+		// Arrange
+		this.oLink.setEndIcon("sap-icon://add");
+		await nextUIUpdate();
+		oLinkDomRef = this.oLink.getDomRef();
+
+		// Assert
+		assert.ok(oLinkDomRef.querySelector(".sapUiIcon.sapMLnkEndIcon"), "End Icon is rendered initially");
+
+		// Act - remove with empty string
+		this.oLink.setEndIcon("");
+		await nextUIUpdate();
+		oLinkDomRef = this.oLink.getDomRef();
+
+		// Assert
+		assert.strictEqual(this.oLink.getProperty("endIcon"), "", "endIcon property is cleared after setting empty string");
+		assert.notOk(oLinkDomRef.querySelector(".sapUiIcon.sapMLnkEndIcon"), "End Icon is not rendered after setting empty string");
+
+		// Arrange - set icon again
+		this.oLink.setEndIcon("sap-icon://add");
+		await nextUIUpdate();
+		oLinkDomRef = this.oLink.getDomRef();
+		assert.ok(oLinkDomRef.querySelector(".sapUiIcon.sapMLnkEndIcon"), "End Icon is rendered again");
+
+		// Act - remove with null
+		this.oLink.setEndIcon(null);
+		await nextUIUpdate();
+		oLinkDomRef = this.oLink.getDomRef();
+
+		// Assert
+		assert.strictEqual(this.oLink.getProperty("endIcon"), "", "endIcon property is cleared after setting null");
+		assert.notOk(oLinkDomRef.querySelector(".sapUiIcon.sapMLnkEndIcon"), "End Icon is not rendered after setting null");
+
+		// Arrange - set icon again
+		this.oLink.setEndIcon("sap-icon://add");
+		await nextUIUpdate();
+		oLinkDomRef = this.oLink.getDomRef();
+		assert.ok(oLinkDomRef.querySelector(".sapUiIcon.sapMLnkEndIcon"), "End Icon is rendered again");
+
+		// Act - remove with undefined
+		this.oLink.setEndIcon(undefined);
+		await nextUIUpdate();
+		oLinkDomRef = this.oLink.getDomRef();
+
+		// Assert
+		assert.strictEqual(this.oLink.getProperty("endIcon"), "", "endIcon property is cleared after setting undefined");
+		assert.notOk(oLinkDomRef.querySelector(".sapUiIcon.sapMLnkEndIcon"), "End Icon is not rendered after setting undefined");
+	});
 });

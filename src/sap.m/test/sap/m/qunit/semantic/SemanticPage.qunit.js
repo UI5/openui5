@@ -1219,6 +1219,19 @@ sap.ui.define([
 		oPage.destroy();
 	}); */
 
+	QUnit.test("DetailPage.getAggregation returns null for unset special aggregations", function (assert) {
+		var oDetailPage = new DetailPage();
+
+		assert.strictEqual(oDetailPage.getAggregation("saveAsTileAction"), null,
+			"getAggregation('saveAsTileAction') returns null when not set");
+		assert.strictEqual(oDetailPage.getAggregation("pagingAction"), null,
+			"getAggregation('pagingAction') returns null when not set");
+		assert.strictEqual(oDetailPage.getAggregation("draftIndicator"), null,
+			"getAggregation('draftIndicator') returns null when not set");
+
+		oDetailPage.destroy();
+	});
+
 	QUnit.module("Semantic Share Button should behave correctly", {
 		beforeEach: function () {
 		},

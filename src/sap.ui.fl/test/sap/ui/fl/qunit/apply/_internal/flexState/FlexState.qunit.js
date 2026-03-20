@@ -463,63 +463,36 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when initialize is called with complete information", function(assert) {
+		QUnit.test("when initialize is called with complete information", async function(assert) {
 			assert.notOk(FlexState.isInitialized({ reference: sReference }), "FlexState is not initialized at beginning");
 			assert.notOk(FlexState.isInitialized({ control: this.oAppComponent }), "FlexState is not initialized at beginning");
 			var aInitialPreparationSpies = Object.getOwnPropertyNames(InitialPrepareFunctions).map(function(sName) {
 				return sandbox.spy(InitialPrepareFunctions, sName);
 			});
 
-			return FlexState.initialize({
+			await FlexState.initialize({
 				reference: sReference,
 				componentId: sComponentId
-			})
-			.then(function() {
-				assert.ok(FlexState.isInitialized({ reference: sReference }), "FlexState has been initialized");
-				assert.notOk(FlexState.isInitialized({ control: this.oAppComponent }), "FlexState is not initialized at beginning");
-				assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the FlexState made a call to load the flex data");
-				assert.strictEqual(this.oCallPrepareFunctionStub.callCount, 0, "no prepare function was called");
-				return FlexState.getStorageResponse(sReference);
-			}.bind(this))
-			.then(function() {
-				assert.ok(
-					aInitialPreparationSpies.every(function(oSpy) {
-						return oSpy.calledOnce;
-					}),
-					"then the initial prepare functions are all called during the state initialization"
-				);
 			});
-		});
-
-		QUnit.test("when initialize is called without a reference and with a componentID", function(assert) {
-			const oMockResponse = { changes: merge(StorageUtils.getEmptyFlexDataResponse(), { foo: "FlexResponse" }), authors: {} };
-			this.oLoadFlexDataStub = mockLoader(oMockResponse);
-
-			const oExpectedResponse = { ...oMockResponse };
-
-			return FlexState.initialize({
-				componentId: sComponentId
-			})
-			.then(FlexState.getStorageResponse.bind(null, ManifestUtils.getFlexReference({
-				manifest: this.oAppComponent.getManifest(),
-				componentData: {}
-			})))
-			.then(function(oFlexResponse) {
-				assert.deepEqual(oFlexResponse, oExpectedResponse, "then flex state was initialized correctly");
-			});
+			assert.ok(FlexState.isInitialized({ reference: sReference }), "FlexState has been initialized");
+			assert.notOk(FlexState.isInitialized({ control: this.oAppComponent }), "FlexState is not initialized at beginning");
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the FlexState made a call to load the flex data");
+			assert.strictEqual(this.oCallPrepareFunctionStub.callCount, 0, "no prepare function was called");
+			assert.ok(
+				aInitialPreparationSpies.every((oSpy) => oSpy.calledOnce),
+				"then the initial prepare functions are all called during the state initialization"
+			);
 		});
 
 		QUnit.test("when initialize is called without a componentId", async function(assert) {
-			const aInitialPreparationSpies = Object.getOwnPropertyNames(InitialPrepareFunctions).map(function(sName) {
+			const aInitialPreparationSpies = Object.getOwnPropertyNames(InitialPrepareFunctions).map((sName) => {
 				return sandbox.spy(InitialPrepareFunctions, sName);
 			});
 			await FlexState.initialize({
 				reference: sReference
 			});
 			assert.ok(
-				aInitialPreparationSpies.every(function(oSpy) {
-					return oSpy.notCalled;
-				}),
+				aInitialPreparationSpies.every((oSpy) => oSpy.notCalled),
 				"then the initial prepare functions are not called during the state initialization"
 			);
 		});
@@ -776,7 +749,7 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when initialize is called in parallel after skipLoadBundle is set", function(assert) {
+		QUnit.test("when initialize is called in parallel after skipLoadBundle is set", async function(assert) {
 			var mResponse = merge(
 				{},
 				mEmptyResponse,
@@ -792,38 +765,31 @@ sap.ui.define([
 			);
 			this.oApplyStorageLoadFlexDataStub.resolves(mResponse.changes);
 			var oFlexStateSpy = sandbox.spy(FlexState, "initialize");
-			return FlexState.initialize({
+			await FlexState.initialize({
 				reference: sReference,
 				componentId: sComponentId,
 				skipLoadBundle: true
-			})
-			.then(function() {
-				assert.equal(oFlexStateSpy.callCount, 1, "FlexState is called once");
-				assert.equal(this.oLoaderSpy.callCount, 1, "Loader is called once");
-				assert.equal(this.oApplyStorageLoadFlexDataStub.callCount, 1, "storage loadFlexData is called once");
-				assert.equal(this.oApplyStorageCompleteFlexDataSpy.callCount, 0, "storage completeFlexData is not called");
-			}.bind(this))
-			.then(function() {
-				var oStatePromise1 = FlexState.initialize({
-					reference: sReference,
-					componentId: sComponentId
-				});
-				var oStatePromise2 = FlexState.initialize({
-					reference: sReference,
-					componentId: sComponentId
-				});
-				return Promise.all([oStatePromise1, oStatePromise2]);
-			})
-			.then(function() {
-				assert.equal(oFlexStateSpy.callCount, 3, "FlexState is called three times");
-				assert.equal(this.oLoaderSpy.callCount, 3, "Loader is called three times");
-				assert.equal(this.oApplyStorageLoadFlexDataStub.callCount, 1, "storage loadFlexData is called once");
-				assert.equal(this.oApplyStorageCompleteFlexDataSpy.callCount, 1, "storage completeFlexData is called once");
-				return FlexState.getStorageResponse(sReference);
-			}.bind(this))
-			.then(function(oUnfilteredStorageResponse) {
-				assert.equal(oUnfilteredStorageResponse.changes.changes.length, 1, "there is one changes");
 			});
+			assert.equal(oFlexStateSpy.callCount, 1, "FlexState is called once");
+			assert.equal(this.oLoaderSpy.callCount, 1, "Loader is called once");
+			assert.equal(this.oApplyStorageLoadFlexDataStub.callCount, 1, "storage loadFlexData is called once");
+			assert.equal(this.oApplyStorageCompleteFlexDataSpy.callCount, 0, "storage completeFlexData is not called");
+			var oStatePromise1 = FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+			var oStatePromise2 = FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+			await Promise.all([oStatePromise1, oStatePromise2]);
+			assert.equal(oFlexStateSpy.callCount, 3, "FlexState is called three times");
+			assert.equal(this.oLoaderSpy.callCount, 3, "Loader is called three times");
+			assert.equal(this.oApplyStorageLoadFlexDataStub.callCount, 1, "storage loadFlexData is called once");
+			assert.equal(this.oApplyStorageCompleteFlexDataSpy.callCount, 1, "storage completeFlexData is called once");
+
+			const aFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
+			assert.equal(aFlexObjects.length, 1, "there is one change flex object in the selector");
 		});
 
 		QUnit.test("when initialize is called multiple times and the loader response changing in between", async function(assert) {
@@ -1640,7 +1606,7 @@ sap.ui.define([
 			FlexState.clearState(sReference);
 		}
 	}, function() {
-		QUnit.test("with all operations at once", async function(assert) {
+		QUnit.test("with all operations at once", function(assert) {
 			const oFlexObjectsDataSelector = FlexState.getFlexObjectsDataSelector();
 			let aFlexObjects = oFlexObjectsDataSelector.get({ reference: sReference });
 			assert.strictEqual(aFlexObjects.length, 7, "initially there are 7 flexObjects");
@@ -1661,18 +1627,9 @@ sap.ui.define([
 					type: "add",
 					flexObject: flexObject.convertToFileContent()
 				})),
-				{ type: "ui2", newData: "ui2" }
+				{ type: "ui2", newData: { value: "ui2" } }
 			]);
-			const oStorageResponse = await FlexState.getStorageResponse(sReference);
-			assert.strictEqual(oStorageResponse.changes.changes.length, 2, "UIChange was added");
-			assert.strictEqual(oStorageResponse.changes.variantDependentControlChanges.length, 2, "variant dependent UIChange was added");
-			assert.strictEqual(oStorageResponse.changes.comp.changes.length, 2, "comp change was added");
-			assert.strictEqual(oStorageResponse.changes.comp.variants.length, 2, "comp variant was added");
-			assert.strictEqual(oStorageResponse.changes.variantChanges.length, 2, "variant change was added");
-			assert.strictEqual(oStorageResponse.changes.variantManagementChanges.length, 2, "variant management change was added");
-			assert.strictEqual(oStorageResponse.changes.variants.length, 2, "fl variant was added");
-			assert.strictEqual(oStorageResponse.changes.ui2personalization, "ui2", "ui2 was set");
-
+			assert.deepEqual(FlexState.getUI2Personalization(sReference), { value: "ui2" }, "ui2 is returned by the state");
 			aFlexObjects = oFlexObjectsDataSelector.get({ reference: sReference });
 			assert.strictEqual(aFlexObjects.length, 14, "all flexObjects are part of the DataSelector");
 
@@ -1688,9 +1645,9 @@ sap.ui.define([
 					type: "update",
 					flexObject: flexObject.convertToFileContent()
 				})),
-				{ type: "ui2", newData: "newUi2" }
+				{ type: "ui2", newData: { value: "newUi2" } }
 			]);
-			assert.strictEqual(oStorageResponse.changes.ui2personalization, "newUi2", "ui2 was set");
+			assert.deepEqual(FlexState.getUI2Personalization(sReference), { value: "newUi2" }, "ui2 was set");
 			aFlexObjects = oFlexObjectsDataSelector.get({ reference: sReference });
 			assert.strictEqual(aFlexObjects.length, 14, "all flexObjects are part of the DataSelector");
 			assert.strictEqual(

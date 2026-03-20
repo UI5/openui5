@@ -130,11 +130,11 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Mae'n agor y rheolaeth gwedd.</p>
+				<p>Yn agor y ddeialog Fy Ngweddau</p>
 			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Yn cau ffenestr naid gwall ar gyfer rheoli'r wedd</p>
+				<p>Yn cau'r ffenestr naid gwall yn y ddeialog Fy Ngweddau</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Enter</kbd> <description>
