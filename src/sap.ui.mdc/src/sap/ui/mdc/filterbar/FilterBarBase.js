@@ -5,7 +5,6 @@ sap.ui.define([
 		"sap/ui/core/Element",
 		"sap/ui/core/Lib",
 		'sap/ui/mdc/p13n/subcontroller/FilterController',
-		'sap/ui/core/library',
 		'sap/ui/core/ShortcutHintsMixin',
 		'sap/ui/Device',
 		'sap/ui/mdc/Control',
@@ -27,13 +26,15 @@ sap.ui.define([
 		"./FilterBarBaseRenderer",
 		"sap/ui/mdc/FilterField",
 		"sap/ui/mdc/filterbar/PropertyInfoValidator",
-		"sap/ui/core/InvisibleText"
+		"sap/ui/core/InvisibleText",
+		"sap/ui/core/Messaging",
+		"sap/ui/core/message/Message",
+		"sap/ui/core/message/MessageType"
 	],
 	(
 		Element,
 		Library,
 		FilterController,
-		coreLibrary,
 		ShortcutHintsMixin,
 		Device,
 		Control,
@@ -55,13 +56,15 @@ sap.ui.define([
 		FilterBarBaseRenderer,
 		FilterField,
 		PropertyInfoValidator,
-		InvisibleText
+		InvisibleText,
+		Messaging,
+		Message,
+		MessageType
 	) => {
 		"use strict";
 
 		// sap.ui.fl-related classes (loaded async after library load)
 		let FlexApplyAPI;
-		const { ValueState } = coreLibrary;
 
 		const SEARCH_CONDITION = "$search";
 
@@ -1014,27 +1017,31 @@ sap.ui.define([
 			return vRetErrorState;
 		};
 
-		FilterBarBase.prototype._getRequiredFilterFieldValueText = function(oFilterField) {
-			if (oFilterField) {
-				return this._oRb.getText("filterbar.REQUIRED_FILTER_VALUE_MISSING", [oFilterField.getLabel()]);
+		FilterBarBase.prototype._getRequiredFilterFieldValueText = function(oProperty) {
+			if (!oProperty) {
+				return "";
+			}
+			const label = oProperty.label ?? oProperty.getLabel?.();
+			if (label) {
+				return this._oRb.getText("filterbar.REQUIRED_FILTER_VALUE_MISSING", [label]);
 			} else {
 				return "";
 			}
 		};
 
 		FilterBarBase.prototype._recheckMissingRequiredFields = function() {
-			this.getFilterItems().forEach((oFilterField) => {
+			this.getPropertyInfoSet().forEach((oProperty) => {
 				let aReqFiltersWithoutValue;
-				if (oFilterField) {
-					if ((oFilterField.getValueState() !== ValueState.None) &&
-						(oFilterField.getValueStateText() === this._getRequiredFilterFieldValueText(oFilterField))) {
-
+				if (oProperty) {
+					const sPropertyKey = IdentifierUtil.getPropertyKey(oProperty);
+					const aMessages = this.getMessages(sPropertyKey);
+					if (aMessages.some((msg) => msg.type !== MessageType.None && msg.message === this._getRequiredFilterFieldValueText(oProperty))) {
 						if (!aReqFiltersWithoutValue) {
 							aReqFiltersWithoutValue = FilterUtil.getRequiredFieldNamesWithoutValues(this);
 						}
 
-						if (aReqFiltersWithoutValue.indexOf(oFilterField.getPropertyKey()) < 0) {
-							oFilterField.setValueState(ValueState.None);
+						if (aReqFiltersWithoutValue.indexOf(sPropertyKey) < 0) {
+							this.removeMessages(sPropertyKey);
 						}
 					}
 				}
@@ -1046,11 +1053,10 @@ sap.ui.define([
 
 			const aReqFiltersWithoutValue = FilterUtil.getRequiredFieldNamesWithoutValues(this);
 			aReqFiltersWithoutValue.forEach((sName) => {
-				const oFilterField = this._getFilterField(sName);
-				if (oFilterField) {
-					if (oFilterField.getValueState() === ValueState.None) {
-						oFilterField.setValueState(ValueState.Error);
-						oFilterField.setValueStateText(this._getRequiredFilterFieldValueText(oFilterField));
+				const oProperty = FilterUtil.getPropertyByKey(this.getPropertyInfoSet(), sName);
+				if (oProperty) {
+					if (this.getMessages(IdentifierUtil.getPropertyKey(oProperty)).length === 0) {
+						this.addMessage(IdentifierUtil.getPropertyKey(oProperty), this._getRequiredFilterFieldValueText(oProperty), MessageType.Error);
 					}
 				} else {
 					Log.error("Mandatory filter field '" + sName + "' not visible on FilterBarBase has no value.");
@@ -1060,6 +1066,78 @@ sap.ui.define([
 			});
 
 			return vRetErrorState;
+		};
+
+		/**
+		 * Adds a message to the {@link sap.ui.model.message.MessageModel MessageModel} for a <code>propertyKey</code>.
+		 * The message is displayed on the corresponding {@link sap.ui.mdc.FilterField FilterField}.
+		 *
+		 * @param {string} sPropertyKey The <code>propertyKey</code> of the {@link sap.ui.mdc.FilterField FilterField}
+		 * @param {string} sMessage The message text
+		 * @param {sap.ui.core.MessageType} sMessageType The message type
+		 * @returns {sap.ui.core.message.Message} The created message object
+		 * @since 1.147
+		 * @public
+		 */
+		FilterBarBase.prototype.addMessage = function(sPropertyKey, sMessage, sMessageType) {
+			const sConditionPath = `/conditions/${sPropertyKey}`;
+			const oConditionsModel = this._getConditionModel();
+
+			const oMessage = new Message({
+				message: sMessage,
+				type: sMessageType,
+				target: sConditionPath,
+				fullTarget: sConditionPath,
+				processor: oConditionsModel
+			});
+
+			Messaging.addMessages(oMessage);
+			return oMessage;
+		};
+
+		/**
+		 * Removes a given message from the {@link sap.ui.model.message.MessageModel MessageModel}.
+		 * The message is removed from the corresponding {@link sap.ui.mdc.FilterField FilterField}.
+		 *
+		 * @param {sap.ui.core.Message} oMessage The message to remove
+		 * @since 1.147
+		 * @public
+		 */
+		FilterBarBase.prototype.removeMessage = function(oMessage) {
+			Messaging.removeMessages(oMessage);
+		};
+
+		/**
+		 * Removes all messages for the given <code>propertyKey</code> from the {@link sap.ui.model.message.MessageModel MessageModel}.
+		 * Clears the messages from the corresponding {@link sap.ui.mdc.FilterField FilterField}.
+		 *
+		 * @param {string} sPropertyKey The <code>propertyKey</code> of the {@link sap.ui.mdc.FilterField FilterField}
+		 * @since 1.147
+		 * @public
+		 */
+		FilterBarBase.prototype.removeMessages = function(sPropertyKey) {
+			const aMessagesForProperty = this.getMessages(sPropertyKey);
+			Messaging.removeMessages(aMessagesForProperty);
+		};
+
+		/**
+		 * Returns all messages associated with the given <code>propertyKey</code> from the {@link sap.ui.model.message.MessageModel MessageModel}.
+		 *
+		 * @param {string} sPropertyKey The <code>propertyKey</code> of the {@link sap.ui.mdc.FilterField FilterField}
+		 * @returns {sap.ui.core.message.Message[]} Array of messages for the given <code>propertyKey</code>
+		 * @since 1.147
+		 * @public
+		 */
+		FilterBarBase.prototype.getMessages = function(sPropertyKey) {
+			const oMessageModel = Messaging.getMessageModel();
+			const sFilterFieldId = this._getFilterField(sPropertyKey)?.getId();
+			return oMessageModel.getProperty("/").filter((oMessage) => {
+				const bIsFilterBarMessage = oMessage.processor === this._getConditionModel();
+				const bIsTargetingProperty = oMessage.aTargets.some((sTarget) => sTarget === `/conditions/${sPropertyKey}`);
+				// Messages set by the field due to e.g. parse errors don't use the FilterBar's condition model as processor.
+				const bIsTargetingOwnFilterField = oMessage.aTargets.some((sTarget) => sTarget === `${sFilterFieldId}/conditions`);
+				return (bIsFilterBarMessage && bIsTargetingProperty) || bIsTargetingOwnFilterField;
+			});
 		};
 
 		FilterBarBase.prototype._checkFieldsInErrorState = function() {
@@ -1074,10 +1152,11 @@ sap.ui.define([
 					vRetErrorState = FilterBarValidationStatus.FieldInErrorState;
 				}
 
-				if (oFilterField && (oFilterField.getValueState() !== ValueState.None)) {
-					if (oFilterField.getValueStateText() !== this._getRequiredFilterFieldValueText(oFilterField)) {
-						vRetErrorState = FilterBarValidationStatus.FieldInErrorState;
-					}
+				const sPropertyKey = oFilterField.getPropertyKey();
+				const aErrorMessages = this.getMessages(sPropertyKey).filter((msg) => msg.type === MessageType.Error);
+				const oProperty = FilterUtil.getPropertyByKey(this.getPropertyInfoSet(), sPropertyKey);
+				if (aErrorMessages.length > 0 && aErrorMessages.some((msg) => msg.message !== this._getRequiredFilterFieldValueText(oProperty))) {
+					vRetErrorState = FilterBarValidationStatus.FieldInErrorState;
 				}
 
 				return vRetErrorState !== FilterBarValidationStatus.NoError;
@@ -1123,8 +1202,8 @@ sap.ui.define([
 
 			const oFilterField = oEvent.oSource;
 
-			if (oFilterField.getRequired() && (oFilterField.getValueState() === ValueState.Error) && oEvent.getParameter("valid")) {
-				oFilterField.setValueState(ValueState.None);
+			if (oFilterField.getRequired() && (this.getMessages(oFilterField.getPropertyKey()).length > 0) && oEvent.getParameter("valid")) {
+				this.removeMessages(oFilterField.getPropertyKey());
 				return;
 			}
 
@@ -1156,10 +1235,10 @@ sap.ui.define([
 
 					// Clear error state if the field is now valid
 					// Check if field has valid input based on conditions: empty array means cleared field
-					if (oFilterField.getValueState() === ValueState.Error) {
+					const aErrorMessages = this.getMessages(oFilterField.getPropertyKey()).filter((msg) => msg.type === MessageType.Error);
+					if (aErrorMessages.length > 0) {
 						if (bValid || (aConditions && aConditions.length === 0)) {
-							oFilterField.setValueState(ValueState.None);
-							oFilterField.setValueStateText("");
+							aErrorMessages.forEach((msg) => this.removeMessage(msg));
 						}
 					}
 
@@ -1212,15 +1291,15 @@ sap.ui.define([
 		};
 
 		FilterBarBase.prototype._setFocusOnFirstErroneousField = function() {
-			let oFilterField = null;
-			this.getFilterItems().some((oFilterItem) => {
-				if (oFilterItem.getValueState() !== ValueState.None) {
-					oFilterField = oFilterItem;
-					setTimeout(oFilterItem["focus"].bind(oFilterItem), 0);
+			const oFilterField = this.getFilterItems().find((oFilterItem) => {
+				const aMessages = this.getMessages(oFilterItem.getPropertyKey());
+				if (aMessages.some(({type}) => type !== MessageType.None)) {
+					return oFilterItem;
 				}
-				return oFilterField != null;
+				return null;
 			});
 
+			oFilterField?.focus();
 			return oFilterField;
 		};
 
@@ -1253,8 +1332,8 @@ sap.ui.define([
 
 						aConditionsArray.forEach(function(aConditions, nIdx) {
 							const oFF = this._getFilterField(aNamePromisesArray[nIdx].name);
-							if (oFF && oFF.getRequired() && (oFF.getValueState() === ValueState.Error)) {
-								oFF.setValueState(ValueState.None); //valid existing value -> clear missing required error
+							if (oFF && oFF.getRequired() && (this.getMessages(oFF.getPropertyKey()).length > 0)) {
+								this.removeMessages(oFF.getPropertyKey()); //valid existing value -> clear missing required error
 							}
 						}, this);
 						fnCallBack(bFireSearch);
@@ -1952,21 +2031,15 @@ sap.ui.define([
 		 *
 		 * @public
 		 */
-		FilterBarBase.prototype.cleanUpAllFilterFieldsInErrorState = function() {
+		FilterBarBase.prototype.cleanUpAllFilterFieldsInErrorState = async function() {
 
 			this._getConditionModel().checkUpdate(true);
 
 			const aFilterFields = this.getFilterItems();
+			const oDelegate = await this.awaitControlDelegate();
 			aFilterFields.forEach((oFilterField) => {
-				this._cleanUpFilterFieldInErrorState(oFilterField);
+				oDelegate.cleanUpFilterFieldState(this, oFilterField);
 			});
-		};
-
-		FilterBarBase.prototype._cleanUpFilterFieldInErrorState = function(oFilterField) {
-
-			if (oFilterField && (oFilterField.getValueState() !== ValueState.None)) {
-				oFilterField.setValueState(ValueState.None);
-			}
 		};
 
 		FilterBarBase.prototype._applyInitialFilterConditions = function() {

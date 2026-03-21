@@ -11,14 +11,6 @@
 	<table:Table id="myTable"
 			rows="{path: '/teamMembers',
 				boundFilters: [{
-					path: 'firstName',
-					operator: 'StartsWith',
-					value1: '{filter>/firstName}'
-				}, {
-					path: 'lastName',
-					operator: 'StartsWith',
-					value1: '{filter>/lastName}'
-				}, {
 					path: 'location',
 					operator: 'StartsWith',
 					value1: '{filter>/locationPrefix}'

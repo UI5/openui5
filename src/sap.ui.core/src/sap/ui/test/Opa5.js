@@ -1251,6 +1251,24 @@ sap.ui.define([
 		 * @property {string} [viewId]
 		 *   When a <code>viewId</code> is given, all <code>waitFor</code> calls inside of the page object will
 		 *   get a <code>viewId</code> parameter. Use when there are multiple views with the same viewName.
+		 * @property {string} [viewNamespace]
+		 *   The namespace to be prepended to the view name defined in the <code>viewName</code> parameter.
+		 *   When set, all <code>waitFor</code> calls inside the page object will resolve the view by
+		 *   <code>viewNamespace + "." + viewName</code>.
+		 *
+		 *   Example:
+		 *   <pre>
+		 *     Opa5.createPageObjects({
+		 *       onMyPage: {
+		 *         viewName: "myView",
+		 *         viewNamespace: "my.app.namespace",
+		 *         assertions: { ... }
+		 *       }
+		 *     });
+		 *   </pre>
+		 *
+		 *   Note: If all page objects share the same <code>viewNamespace</code>, consider setting it
+		 *   globally via {@link sap.ui.test.Opa5.extendConfig} to avoid repetition.
 		 * @property {function} [baseClass=sap.ui.test.Opa5]
 		 *   Base class for the page object's actions and assertions
 		 * @property {string} [namespace="sap.ui.test.opa.pageObject"]

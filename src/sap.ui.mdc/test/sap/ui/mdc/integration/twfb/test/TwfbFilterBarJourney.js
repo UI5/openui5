@@ -185,6 +185,46 @@ sap.ui.define([
 		Then.iTeardownMyAppFrame();
 	});
 
+	opaTest("twfb - Setting focus on first erroneous field on FilterBar is successful", function(Given, When, Then) {
+		Given.iStartMyAppInAFrame("test-resources/sap/ui/mdc/internal/TableWithFilterBar/index.html");
+
+		// Enter invalid value to cause an error in FilterField
+		When.onTheMDCFilterField.iEnterTextOnTheFilterField({ label: "Language" }, "1234");
+
+		// Enter valid value to another FilterField to switch focus away from the erroneous field
+		When.onTheMDCFilterField.iEnterTextOnTheFilterField({ label: "Title" }, "Pride and Prejudice");
+
+		// Find the FilterField
+		When.waitFor({
+			matchers: new PropertyStrictEquals({
+				name: "label",
+				value: "Language"
+			}),
+			controlType: "sap.ui.mdc.FilterField",
+			success: function ([oFilterField]) {
+				// document.activeElement is the iframe containing the app
+				Opa5.assert.ok(document.activeElement.contentDocument.activeElement !== oFilterField.getFocusDomRef(), "Focus is currently not on the field with error");
+				const oFilterBar = oFilterField.getParent();
+				// Set focus to first erroneous field
+				oFilterBar.setFocusOnFirstErroneousField();
+
+				// Wait for the filter field again to give time for focus update (awaiting a timeout/promise here leads to Opa5.assert being undefined)
+				When.waitFor({
+					matchers: new PropertyStrictEquals({
+						name: "label",
+						value: "Language"
+					}),
+					controlType: "sap.ui.mdc.FilterField",
+					success: function ([oFilterField]) {
+						Opa5.assert.ok(document.activeElement.contentDocument.activeElement === oFilterField.getFocusDomRef(), "Focus is set to the field with error");
+					}
+				});
+			}
+		});
+
+		Then.iTeardownMyAppFrame();
+	});
+
 	opaTest("twfb - when resetting invalid field with variant management, no error should occur", function(Given, When, Then) {
 		Given.iStartMyAppInAFrame({source: "test-resources/sap/ui/mdc/internal/TableWithFilterBar/index.html"});
 

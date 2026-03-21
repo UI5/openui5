@@ -13,8 +13,8 @@
 			split into two groups: <strong>Organizational</strong> (department prefix, location
 			prefix) and <strong>Personal</strong> (first name prefix, last name prefix).
 			A "Show Personal Filters" / "Show Organizational Filters" button toggles between the
-			two groups. Switching groups clears the now-hidden group's filter values so they
-			become inactive. All visible filters are applied instantly when a value is entered.
+			two groups. Switching groups does not clear the now-hidden group's filter values but they
+			are no longer applied. All visible filters are applied instantly when a value is entered.
 		</p>
 
 		<p><strong>Automated Tests:</strong> All manual tests described here are automated in
@@ -115,6 +115,39 @@
 					<td>Type "S" in the Last name prefix input. Press Enter.</td>
 					<td class="success">The table shows 1 rows with first names starting with "J"
 						and last names starting with "S".</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Instant Filter: Switch between organizational and personal filters</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>Step</th>
+					<th>Action</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Click "Show Organizational Filters".</td>
+					<td class="success">The personal filter inputs (First name prefix, Last name prefix)
+						are hidden and the organizational filter inputs (Department prefix, Location prefix) appear.
+						The previously entered values for Department prefix ("Dev") and Location prefix ("Wal") are
+						restored. The table instantly updates and shows 2 rows:
+						all Development employees located in Walldorf.
+						The button now reads "Show Personal Filters".</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>Click "Show Personal Filters".</td>
+					<td class="success">The organizational filter inputs (Department prefix, Location prefix)
+						are hidden and the personal filter inputs (First name prefix, Last name prefix) appear.
+						The previously entered values for First name prefix ("J") and Last name prefix ("S") are
+						restored. The table instantly updates and shows 1 row:
+						all employees with first names starting with "J" and last names starting with "S".
+						The button now reads "Show Personal Filters".</td>
 				</tr>
 			</tbody>
 		</table>

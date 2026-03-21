@@ -26,8 +26,7 @@ sap.ui.define([
 	 *
 	 * @constructor
 	 * @public
-	 * @since 1.127.0
-	 * @experimental Since version 1.127.0.
+	 * @ui5-experimental-since 1.127.0
 	 * @alias sap.ui.unified.RecurringNonWorkingPeriod
 	 */
 	var RecurringNonWorkingPeriod = NonWorkingPeriod.extend("sap.ui.unified.RecurringNonWorkingPeriod", /** @lends sap.ui.unified.RecurringNonWorkingPeriod.prototype */ { metadata : {

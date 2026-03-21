@@ -427,8 +427,7 @@ sap.ui.define([
 	 * @enum {string}
 	 * @alias sap.ui.unified.CalendarAppointmentRoundWidth
 	 * @public
-	 * @experimental Since 1.81.0
-	 * @since 1.81.0
+	 * @ui5-experimental-since 1.81.0
 	 */
 	thisLib.CalendarAppointmentRoundWidth = {
 
@@ -506,9 +505,8 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @since 1.16.0
-	 * @experimental Since version 1.16.0.
 	 * API is not yet finished and might change completely
+	 * @ui5-experimental-since 1.16.0
 	 */
 	thisLib.ContentSwitcherAnimation = {
 

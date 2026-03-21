@@ -18,6 +18,7 @@ sap.ui.define([
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/mdc/enums/FilterBarValidationStatus",
 	"sap/ui/mdc/condition/Condition",
+	"sap/ui/core/message/MessageType",
 	"sap/ui/core/library"
 ], function (
 	AdaptationFilterBar,
@@ -37,6 +38,7 @@ sap.ui.define([
 	OperatorName,
 	FilterBarValidationStatus,
 	Condition,
+	MessageType,
 	coreLibrary
 ) {
 	"use strict";
@@ -186,6 +188,48 @@ sap.ui.define([
 
 		const oFF1 = new FilterField("FF1", {
 			conditions: "{$filters>/conditions/key1}",
+			propertyKey: "key1"
+		});
+		const oFF2 = new FilterField("FF2", {
+			conditions: "{$filters>/conditions/key2}",
+			propertyKey: "key2"
+		});
+		this.oAdaptationFilterBar.addFilterItem(oFF1);
+		this.oAdaptationFilterBar.addFilterItem(oFF2);
+
+		this.oAdaptationFilterBar.addMessage(oFF1.getPropertyKey(), "Test Error", MessageType.Error);
+	}
+
+	QUnit.test("onBeforeClose with 'Ok'", function(assert) {
+		// arrange
+		_prepareOnBeforeCloseTest.call(this);
+		const that = this;
+		return this.oTestTable.awaitControlDelegate().then(function(oDelegate) {
+			// act
+			const oPromise = that.oAdaptationFilterBar.onBeforeClose("Ok");
+			// checks
+			assert.ok(oPromise instanceof Promise, "Promise returned");
+			return oPromise.then(() => {
+				const oFF1 = that.oAdaptationFilterBar.getFilterItems()[0];
+				const oFF2 = that.oAdaptationFilterBar.getFilterItems()[1];
+
+				// After onBeforeClose, error states should be cleared
+				assert.equal(oFF1.getValueState(), ValueState.None, "ValueState cleared for key1");
+				assert.equal(oFF1.getValueStateText(), "", "ValueStateText cleared for key1");
+				assert.equal(oFF2.getValueState(), ValueState.None, "ValueState remains None for key2");
+				assert.equal(oFF2.getValueStateText(), "", "ValueStateText remains empty for key2");
+			});
+		});
+	});
+
+	QUnit.test("onBeforeClose with 'Ok' but manually set filter state", function(assert) {
+		// arrange
+		const oConditionModel = this.oAdaptationFilterBar._getConditionModel();
+		oConditionModel.addCondition("key1", Condition.createCondition(OperatorName.EQ, ["Test 1"]));
+		oConditionModel.addCondition("key2", Condition.createCondition(OperatorName.EQ, ["Test 2"]));
+
+		const oFF1 = new FilterField("FF1", {
+			conditions: "{$filters>/conditions/key1}",
 			propertyKey: "key1",
 			valueState: ValueState.Error,
 			valueStateText: "Test Error"
@@ -196,29 +240,20 @@ sap.ui.define([
 		});
 		this.oAdaptationFilterBar.addFilterItem(oFF1);
 		this.oAdaptationFilterBar.addFilterItem(oFF2);
-	}
 
-	QUnit.test("onBeforeClose with 'Ok'", function(assert) {
-		// arrange
-		_prepareOnBeforeCloseTest.call(this);
 		const that = this;
 		return this.oTestTable.awaitControlDelegate().then(function(oDelegate) {
-			let fResolve;
-			const oWaitForChangesPromise = new Promise(function(resolve) {fResolve = resolve;});
-			const oEngineSpy = sinon.stub(that.oAdaptationFilterBar.getEngine(), "waitForChanges").returns(oWaitForChangesPromise); // just to check call, inside configuation fails -> but not needed to test this functionality
 			// act
 			const oPromise = that.oAdaptationFilterBar.onBeforeClose("Ok");
 			// checks
-			assert.equal(oPromise, oWaitForChangesPromise, "WaitForChanges promise returned");
-			fResolve();
-			oPromise.then(() => {
-				const oConditionModel = that.oAdaptationFilterBar._getConditionModel();
-				assert.equal(oConditionModel.getConditions("key1").length, 0, "No Conditions for key1");
-				assert.equal(oConditionModel.getConditions("key2").length, 1, "1 Condition for key2");
-				assert.ok(oEngineSpy.calledOnce, "Engine.waitForChanges has been called once");
-				oEngineSpy.restore();
+			assert.ok(oPromise instanceof Promise, "Promise returned");
+			return oPromise.then(() => {
+				// After onBeforeClose, error states should be cleared
+				assert.equal(oFF1.getValueState(), ValueState.None, "ValueState cleared for key1");
+				assert.equal(oFF1.getValueStateText(), "", "ValueStateText cleared for key1");
+				assert.equal(oFF2.getValueState(), ValueState.None, "ValueState remains None for key2");
+				assert.equal(oFF2.getValueStateText(), "", "ValueStateText remains empty for key2");
 			});
-			return oPromise;
 		});
 	});
 
@@ -799,7 +834,7 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("_checkFilterState and _checkFilterValue should not be called when inner layout is not AdaptFiltersPanel", function(assert){
+	QUnit.test("_updateFilterItemMessage should not be called when inner layout is not AdaptFiltersPanel", function(assert){
 		const done = assert.async();
 		this.prepareTestSetup(false);
 
@@ -825,8 +860,7 @@ sap.ui.define([
 		.then(function(){
 			oAdaptationFilterBar.createFilterFields().then(function(){
 
-				const oCheckFilterStateSpy = sinon.spy(oAdaptationFilterBar, "_checkFilterState");
-				const oCheckFilterValueSpy = sinon.spy(oAdaptationFilterBar, "_checkFilterValue");
+				const oUpdateFilterItemMessageSpy = sinon.spy(oAdaptationFilterBar, "_updateFilterItemMessage");
 
 				assert.notOk(oFilterPanel.isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel"), "Inner layout is not AdaptFiltersPanel");
 
@@ -857,12 +891,80 @@ sap.ui.define([
 					},
 					reason: "Add"
 				});
-				assert.equal(oCheckFilterStateSpy.notCalled, true,"_checkFilterState was not called when inner layout is not AdaptFiltersPanel");
-				assert.equal(oCheckFilterValueSpy.notCalled, true,  "_checkFilterValue was not called when inner layout is not AdaptFiltersPanel");
+				assert.equal(oUpdateFilterItemMessageSpy.notCalled, true, "_updateFilterItemMessage was not called when inner layout is not AdaptFiltersPanel");
 
 				// Clean up
-				oCheckFilterStateSpy.restore();
-				oCheckFilterValueSpy.restore();
+				oUpdateFilterItemMessageSpy.restore();
+				done();
+			});
+		});
+	});
+
+	QUnit.test("_updateFilterItemMessage should not be called when _checkIsNewUI returns false", function(assert){
+		const done = assert.async();
+		this.prepareTestSetup(true);
+
+		oAdaptationFilterBar._checkIsNewUI.restore();
+		sinon.stub(oAdaptationFilterBar, "_checkIsNewUI").returns(false);
+
+		this.oAddStub.callsFake(this.addItem);
+		this.oParent.getFilterItems = function() {
+			return [];
+		};
+
+		oAdaptationFilterBar.setP13nData({
+			items: [
+				{
+					name: "key1",
+					visible: true
+				},
+				{
+					name: "key2",
+					visible: false
+				}
+			]
+		});
+
+		Promise.all([
+			this.oParent.initPropertyHelper(this.createPropertyHelper()),
+			this.oParent.initControlDelegate()
+		])
+		.then(function(){
+			oAdaptationFilterBar.createFilterFields().then(function(){
+				const oFilterPanel = oAdaptationFilterBar._oFilterBarLayout.getInner();
+				const oUpdateFilterItemMessageSpy = sinon.spy(oAdaptationFilterBar, "_updateFilterItemMessage");
+
+				oFilterPanel.fireChange({
+					item: {
+						name: "key1"
+					},
+					reason: "Show"
+				});
+
+				oFilterPanel.fireChange({
+					item: {
+						name: "key2"
+					},
+					reason: "Hide"
+				});
+
+				oFilterPanel.fireChange({
+					item: {
+						name: "key1"
+					},
+					reason: "Filter"
+				});
+
+				oFilterPanel.fireChange({
+					item: {
+						name: "key2"
+					},
+					reason: "Add"
+				});
+				assert.equal(oUpdateFilterItemMessageSpy.notCalled, true, "_updateFilterItemMessage was not called when _checkIsNewUI returns false");
+
+				// Clean up
+				oUpdateFilterItemMessageSpy.restore();
 				done();
 			});
 		});

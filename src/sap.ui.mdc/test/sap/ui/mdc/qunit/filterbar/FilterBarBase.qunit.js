@@ -9,10 +9,10 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/base/Log",
     "sap/ui/core/Lib",
-    "sap/ui/core/Core",
+    "sap/ui/core/message/MessageType",
 	"sap/ui/core/library"
 ], function (
-	FilterBarBase, FilterField, DefaultTypeMap, ConditionValidated, OperatorName, nextUIUpdate, Log, Library, coreLibrary
+	FilterBarBase, FilterField, DefaultTypeMap, ConditionValidated, OperatorName, nextUIUpdate, Log, Library, MessageType, coreLibrary
 ) {
 	"use strict";
 
@@ -328,7 +328,7 @@ sap.ui.define([
 		// Helper function to wait for async operations
 		const wait = (ms) => new Promise((resolve) => {setTimeout(resolve, ms);});
 
-		await this.oFilterBarBase.initialized();
+		await this.oFilterBarBase.initializedWithMetadata();
 		await nextUIUpdate();
 
 		// Clear initial events - these are from FilterBar initialization
@@ -337,8 +337,7 @@ sap.ui.define([
 		nSearchCount = 0;
 
 		// Step 1: Set field1 to error state
-		oFilterField1.setValueState("Error");
-		oFilterField1.setValueStateText("Invalid value");
+		this.oFilterBarBase.addMessage(oFilterField1.getPropertyKey(), "Invalid value", MessageType.Error);
 		oFilterField1.fireChange({
 			value: "invalid",
 			valid: false,
@@ -421,7 +420,7 @@ sap.ui.define([
 		// Helper function to wait for async operations
 		const wait = (ms) => new Promise((resolve) => {setTimeout(resolve, ms);});
 
-		await this.oFilterBarBase.initialized();
+		await this.oFilterBarBase.initializedWithMetadata();
 		await nextUIUpdate();
 
 		// Test with isInvalidInput
@@ -1031,7 +1030,59 @@ sap.ui.define([
 
 	});
 
-    QUnit.test("Check cleanUpAllFilterFieldsInErrorState", function(assert){
+    QUnit.test("Adding and removing messages should change FilterItem state appropriately", async function(assert){
+		const oFilterField = new FilterField("key1", {
+			label: "key1",
+			conditions: "{$filters>/conditions/key1}",
+			propertyKey: "key1",
+			dataTypeConstraints: { maxLength: 2},
+			dataType: "sap.ui.model.type.String",
+			required: false
+		});
+		this.oFilterBarBase.addFilterItem(oFilterField);
+
+        await this.oFilterBarBase.initialized();
+        this.oFilterBarBase.addMessage(oFilterField.getPropertyKey(), "Test Message", MessageType.Error);
+
+        // allow async update
+        await new Promise((resolve) => {setTimeout(resolve, 0);});
+        assert.equal(oFilterField.getValueState(), "Error");
+
+        this.oFilterBarBase.removeMessages(oFilterField.getPropertyKey());
+
+        // allow async update
+        await new Promise((resolve) => {setTimeout(resolve, 0);});
+        assert.equal(oFilterField.getValueState(), "None");
+    });
+
+    QUnit.test("Adding multiple messages and removing one should keep FilterItem in appropriate state", async function(assert){
+		const oFilterField = new FilterField("key1", {
+			label: "key1",
+			conditions: "{$filters>/conditions/key1}",
+			propertyKey: "key1",
+			dataTypeConstraints: { maxLength: 2},
+			dataType: "sap.ui.model.type.String",
+			required: false
+		});
+		this.oFilterBarBase.addFilterItem(oFilterField);
+
+        await this.oFilterBarBase.initialized();
+        this.oFilterBarBase.addMessage(oFilterField.getPropertyKey(), "Test Error Message", MessageType.Error);
+        this.oFilterBarBase.addMessage(oFilterField.getPropertyKey(), "Test Warning Message", MessageType.Warning);
+
+        // allow async update
+        await new Promise((resolve) => {setTimeout(resolve, 0);});
+        assert.equal(oFilterField.getValueState(), "Error");
+
+        const errorMessage = this.oFilterBarBase.getMessages(oFilterField.getPropertyKey()).find((msg) => msg.getType() === MessageType.Error);
+        this.oFilterBarBase.removeMessage(errorMessage);
+
+        // allow async update
+        await new Promise((resolve) => {setTimeout(resolve, 0);});
+        assert.equal(oFilterField.getValueState(), "Warning");
+    });
+
+    QUnit.test("Check cleanUpAllFilterFieldsInErrorState", async function(assert){
 
 		const oFilterField = new FilterField("key1", {
 			label: "key1",
@@ -1042,24 +1093,76 @@ sap.ui.define([
 			required: false
 		});
 
-		oFilterField.setValueState("Error");
 		this.oFilterBarBase.addFilterItem(oFilterField);
 
-		assert.equal(oFilterField.getValueState(), "Error");
-		this.oFilterBarBase.cleanUpAllFilterFieldsInErrorState();
+        await this.oFilterBarBase.initialized();
+        this.oFilterBarBase.addMessage(oFilterField.getPropertyKey(), "Test Message", MessageType.Error);
 
-		assert.equal(oFilterField.getValueState(), "None");
+        // allow async update
+        await new Promise((resolve) => {setTimeout(resolve, 0);});
+
+        assert.equal(oFilterField.getValueState(), "Error");
+        this.oFilterBarBase.cleanUpAllFilterFieldsInErrorState();
+
+        // allow async update, needing slightly more time, due to indirection towards delegate
+        await new Promise((resolve) => {setTimeout(resolve, 10);});
+        assert.equal(oFilterField.getValueState(), "None");
     });
 
-    QUnit.test("Check required missing handling on filter changes", function(assert){
+    QUnit.test("Check cleanUpAllFilterFieldsInErrorState for FilterFields with explicitly set value states", async function(assert){
+		const oFilterField1 = new FilterField("key1", {
+			label: "key1",
+			conditions: "{$filters>/conditions/key1}",
+			propertyKey: "key1",
+			dataTypeConstraints: { maxLength: 2},
+			dataType: "sap.ui.model.type.String",
+			required: false
+		});
 
-        const done = assert.async();
+		const oFilterField2 = new FilterField("key2", {
+			label: "key2",
+			conditions: "{$filters>/conditions/key2}",
+			propertyKey: "key2",
+			dataTypeConstraints: { maxLength: 2},
+			dataType: "sap.ui.model.type.String",
+			required: false
+		});
 
+		this.oFilterBarBase.addFilterItem(oFilterField1);
+		this.oFilterBarBase.addFilterItem(oFilterField2);
+
+        await this.oFilterBarBase.initialized();
+        this.oFilterBarBase.addMessage(oFilterField1.getPropertyKey(), "Test Message", MessageType.Error);
+        oFilterField2.setValueState("Error");
+
+        // allow async update
+        await new Promise((resolve) => {setTimeout(resolve, 0);});
+
+        assert.equal(oFilterField1.getValueState(), "Error");
+        assert.equal(oFilterField2.getValueState(), "Error");
+        this.oFilterBarBase.cleanUpAllFilterFieldsInErrorState();
+
+        // allow async update, needing slightly more time, due to indirection towards delegate
+        await new Promise((resolve) => {setTimeout(resolve, 10);});
+        assert.equal(oFilterField1.getValueState(), "None");
+        assert.equal(oFilterField2.getValueState(), "None");
+    });
+
+    QUnit.test("Check required missing handling on filter changes", async function(assert){
 		const oStub = sinon.stub(this.oFilterBarBase, "_getPropertyByName");
 		oStub.withArgs("key1").returns({key: "key1", required: true, typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String"), constraints: {maxLength: 4}});
 		oStub.withArgs("key2").returns({key: "key2", required: true, typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String")});
 
 		sinon.stub(this.oFilterBarBase, "_getRequiredPropertyNames").returns(["key1", "key2"]);
+
+        sinon.stub(this.oFilterBarBase, "getPropertyHelper").returns({
+            getProperties: function() {
+                return [
+                    {key: "key1", label: "key1", required: true, typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String"), constraints: {maxLength: 4}},
+                    {key: "key2", label: "key2", required: true, typeConfig: DefaultTypeMap.getTypeConfig("sap.ui.model.type.String")}
+                ];
+            }
+        });
 
 		const oFilterField1 = new FilterField("key1", {
 			label: "key1",
@@ -1079,56 +1182,61 @@ sap.ui.define([
 		});
         this.oFilterBarBase.addFilterItem(oFilterField2);
 
-
         this.oFilterBarBase.checkFilters();
+
+        // allow async update
+        await new Promise((resolve) => {setTimeout(resolve, 0);});
+
         assert.equal(oFilterField1.getValueState(), "Error");
         assert.equal(oFilterField2.getValueState(), "Error");
 
 
-		this.oFilterBarBase.initialized().then(function () {
-            // --> this would happen during runtime through a change
-            this.oFilterBarBase.setFilterConditions({
-                "key1": [
-                    {
-                    "operator": OperatorName.EQ,
-                    "values": [
-                        "test"
-                    ]
-                    }
+		await this.oFilterBarBase.initialized();
+
+        // --> this would happen during runtime through a change
+        this.oFilterBarBase.setFilterConditions({
+            "key1": [
+                {
+                "operator": OperatorName.EQ,
+                "values": [
+                    "test"
                 ]
-            });
+                }
+            ]
+        });
 
-            //trigger the handling after changes have been applied
-            this.oFilterBarBase._onModifications().then(function() {
-                assert.equal(oFilterField1.getValueState(), "None");
-                assert.equal(oFilterField2.getValueState(), "Error");
-                assert.equal(oFilterField2.getValueStateText(), this.oFilterBarBase._getRequiredFilterFieldValueText(oFilterField2));
+        //trigger the handling after changes have been applied
+        await this.oFilterBarBase._onModifications();
+
+        // allow async update
+        await new Promise((resolve) => {setTimeout(resolve, 0);});
+
+        assert.equal(oFilterField1.getValueState(), "None");
+        assert.equal(oFilterField2.getValueState(), "Error");
+        assert.equal(oFilterField2.getValueStateText(), this.oFilterBarBase._getRequiredFilterFieldValueText(oFilterField2));
 
 
-                //Check required field in error state
-                oFilterField1.setValueState("Error");
-                oFilterField1.setValueStateText("Some Error Text");
-                this.oFilterBarBase.setFilterConditions({
-                    "key1": [
-                        {
-                        "operator": OperatorName.EQ,
-                        "values": [
-                           "too long"
-                        ],
-                        "validated": ConditionValidated.Validated
-                        }
-                    ]
-                });
-                this.oFilterBarBase._onModifications().then(function() {
-                    assert.equal(oFilterField1.getValueState(), "Error");
-                    assert.equal(oFilterField1.getValueStateText(), "Some Error Text");
-                    assert.equal(oFilterField2.getValueState(), "Error");
-                    assert.equal(oFilterField2.getValueStateText(), this.oFilterBarBase._getRequiredFilterFieldValueText(oFilterField2));
-                    done();
-                }.bind(this));
-            }.bind(this));
-        }.bind(this));
+        //Check required field in error state
+        oFilterField1.setValueState("Error");
+        oFilterField1.setValueStateText("Some Error Text");
+        this.oFilterBarBase.setFilterConditions({
+            "key1": [
+                {
+                "operator": OperatorName.EQ,
+                "values": [
+                    "too long"
+                ],
+                "validated": ConditionValidated.Validated
+                }
+            ]
+        });
 
+        this.oFilterBarBase._onModifications();
+
+        assert.equal(oFilterField1.getValueState(), "Error");
+        assert.equal(oFilterField1.getValueStateText(), "Some Error Text");
+        assert.equal(oFilterField2.getValueState(), "Error");
+        assert.equal(oFilterField2.getValueStateText(), this.oFilterBarBase._getRequiredFilterFieldValueText(oFilterField2));
     });
 
     QUnit.test("check reason information", async function(assert){

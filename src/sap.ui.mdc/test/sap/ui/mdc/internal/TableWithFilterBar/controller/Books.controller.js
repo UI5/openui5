@@ -8,9 +8,11 @@ sap.ui.define([
 	"sap/ui/mdc/field/FieldMultiInput", // to have it loaded before rendering starts
 	"sap/m/Token", // to have it loaded before rendering starts
 	"sap/m/ExpandableText", // to have it loaded before rendering starts
+	"sap/ui/core/Element",
 	"sap/ui/mdc/enums/FilterBarValidationStatus",
+	"sap/ui/core/Messaging",
 	'sap/base/Log'
-], function (Controller, UIComponent, MessageToast, Table, Text, FieldBaseDelegate, FieldMultiInput, Token, ExpandableText, FilterBarValidationStatus, Log) {
+], function (Controller, UIComponent, MessageToast, Table, Text, FieldBaseDelegate, FieldMultiInput, Token, ExpandableText, Element, FilterBarValidationStatus, Messaging, Log) {
 
 	"use strict";
 
@@ -20,6 +22,8 @@ sap.ui.define([
 			this.byId("bookChart").attachSelectionDetailsActionPressed(function(oEvent) {
 				MessageToast.show(oEvent.getParameter("action").getText() + " is pressed" + "\n " + oEvent.getParameter("itemContexts").length + " items selected" + "\n level is: " + oEvent.getParameter("level"));
 			});
+			// Set the message model
+			this.getView().setModel(Messaging.getMessageModel(), "message");
 		},
 
 		onSearch: function(oEvent) {
@@ -97,6 +101,28 @@ sap.ui.define([
 				bookId: oContext.getProperty("ID")
 			});
 
+		},
+
+		onMessagePopoverPress: async function(oEvent) {
+			const oSourceControl = oEvent.getSource();
+			const oMessagePopover = await this._getMessagePopover();
+			oMessagePopover.openBy(oSourceControl);
+		},
+
+		handleMessagePress: function(oEvent) {
+			const oItem = oEvent.getParameter("item");
+			const oMessage = oItem.getBinding("title")?.getContext()?.getObject(); // title is bound to message
+			const aControlIds = oMessage?.getControlIds();
+			if (aControlIds?.[0]) {
+				const oControl = Element.getElementById(aControlIds[0]);
+				oControl.focus();
+			}
+		},
+
+		_getMessagePopover: function() {
+			return this.loadFragment({
+				name: "sap.ui.v4demo.view.MessagePopover"
+			});
 		}
 	});
 });

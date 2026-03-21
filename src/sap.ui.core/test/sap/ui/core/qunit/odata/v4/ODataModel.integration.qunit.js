@@ -208,8 +208,13 @@ sap.ui.define([
 						if (sPredicate === undefined) {
 							return;
 						}
-						strictEqual(oListBinding.oCache.aElements.$byPredicate[sPredicate],
-							oElement, `${sPredicate} in $byPredicate`, oElement);
+						const oActual = oListBinding.oCache.aElements.$byPredicate[sPredicate];
+						if (oActual !== oElement) {
+							assert.ok(false, `${sPredicate} in $byPredicate:\n`
+								+ JSON.stringify(_Helper.publicClone(oActual)) + "\nvs.\n"
+								+ JSON.stringify(_Helper.publicClone(oElement))
+							);
+						}
 					};
 
 					checkByPredicate("predicate");
@@ -480,7 +485,8 @@ sap.ui.define([
 			aExpectedPaths.forEach((vExpectedPath, i) => {
 				if (typeof vExpectedPath !== "string") {
 					if (vExpectedPath !== aAllExistingContexts[i]) {
-						assert.ok(false, `${sTitle}: Context not same @${i}: ${vExpectedPath}`);
+						assert.ok(false, `${sTitle}: Context not same @${i}:`
+							+ ` ${aAllExistingContexts[i]} vs. ${vExpectedPath}`);
 					}
 					aExpectedPaths[i] = getNormalizedPath(vExpectedPath);
 				}
@@ -689,12 +695,7 @@ sap.ui.define([
 			if (oElement) {
 				sDetails += ": " + JSON.stringify(_Helper.publicClone(oElement));
 			}
-			if (vActual && Object.keys(vActual).length > 12
-				|| vExpected && Object.keys(vExpected).length > 12) {
-				assert.ok(false, sTitle + ": " + sDetails);
-			} else {
-				assert.strictEqual(vActual, vExpected, sTitle + ": " + sDetails);
-			}
+			assert.strictEqual(vActual, vExpected, sTitle + ": " + sDetails);
 		} // else: do not spam the output ;-)
 	}
 
@@ -24570,7 +24571,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3258
 	//
 	// Context#setOutdated and Context#isOutdated are supported for header contexts.
-	// Context#getObject also returns "@$ui5.context.isOutdated" if it has been set at least once.
+	// Context#getObject also returns "@$ui5.context.isOutdated" unless it cannot be determined.
 	// If any property is updated the grand total is marked as outdated (@$ui5.context.isOutdated is
 	// set to true). If the grand total is read again the grand total is marked as "up-to-date"
 	// (@$ui5.context.isOutdated is set to false). Ensure that the outdated flag is also updated in

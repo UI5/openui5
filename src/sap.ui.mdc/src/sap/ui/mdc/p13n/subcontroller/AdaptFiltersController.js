@@ -82,7 +82,10 @@ sap.ui.define([
 					oAdaptationFilter.cleanUpAllFilterFieldsInErrorState();
 					oAdaptationFilter.validate(true).then((oResult) => {
 						oPopup._onClose(null, "Filter");
-					}).catch(() => {});
+						oAdaptationFilter._validateAdaptationState();
+					}).catch(() => {
+						oAdaptationFilter._validateAdaptationState();
+					});
 				},
 				type: ButtonType.Ghost
 			});
@@ -104,8 +107,8 @@ sap.ui.define([
 
 			oAdaptationFilterBar.setP13nData(oAdaptationData);
 			oAdaptationFilterBar.setLiveMode(false);
-			oAdaptationFilterBar._determineValidationState();
 			return oAdaptationFilterBar.createFilterFields().then(() => {
+				oAdaptationFilterBar._determineValidationState();
 				return oAdaptationFilterBar;
 			});
 		});
@@ -140,6 +143,8 @@ sap.ui.define([
 			oItem.position = oExistingProperty ? oExistingProperty.position : -1;
 			oItem.isFiltered = aExistingFilters && aExistingFilters.length > 0 ? true : false;
 			oItem.required = oProperty.required;
+			// requiresValidation is true if the item is visible or has been toggled in the current session
+			oItem.requiresValidation = oItem.visible;
 
 			return !(oProperty.hiddenFilter === true || sPropertyKey == "$search");
 		}, true);

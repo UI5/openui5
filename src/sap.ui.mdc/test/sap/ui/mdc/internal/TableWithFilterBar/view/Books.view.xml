@@ -18,7 +18,7 @@
 	xmlns:mdcvh="sap.ui.mdc.valuehelp"
 	xmlns:mdcvc="sap.ui.mdc.valuehelp.content"
 	xmlns:demo="sap.ui.v4demo.controls" controllerName="sap.ui.v4demo.controller.Books">
-	<f2:DynamicPage id="dynamicPage">
+	<f2:DynamicPage id="dynamicPage" showFooter="{=${message>/}.length > 0}">
 		<f2:title>
 			<f2:DynamicPageTitle stateChange=".onStateChanged">
 				<f2:actions>
@@ -42,16 +42,28 @@
 				</f2:expandedContent>
 			</f2:DynamicPageTitle>
 		</f2:title>
+		<f2:footer>
+			<OverflowToolbar>
+				<Button
+					icon="sap-icon://alert"
+					text="{=${message>/}.length}"
+					visible="{=${message>/}.length > 0}"
+					type="Emphasized"
+					press="onMessagePopoverPress" />
+				<ToolbarSpacer/>
+			</OverflowToolbar>
+		</f2:footer>
 		<f2:header>
 			<f2:DynamicPageHeader>
 				<f2:content>
 					<mdc:FilterBar id="booksFilterBar" variantBackreference="IDVariantManagementOfTable"
 						filtersChanged=".onFiltersChanged" search=".onSearch"
-						filterConditions='\{"stock" : [\{"operator":"BT","values":[100,50000]}]\}'
+						filterConditions='\{"stock" : [\{"operator":"BT","values":[100,50000]}],
+										    "published" : [\{"operator":"LT","values":["2026-01-12"]}]\}'
 						propertyInfo='[\{"key": "stock", "dataType":"Edm.Int32", "maxConditions": 1, "required": false, "label": "Stock range", "group": "CatalogService.Books", "groupLabel": "Books"\},
 						               \{"key": "author_ID", "dataType":"Edm.Int32", "required":false, "label":"Author ID", "formatOptions":\{"groupingEnabled":false\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
 									   \{"key": "title", "dataType":"Edm.String", "required":false, "label":"Title", "constraints": \{"maxLength": 1111\}, "caseSensitive": false, "group": "CatalogService.Books", "groupLabel": "Books"\},
-									   \{"key": "published", "dataType":"Edm.Date", "maxConditions": -1, "required":false, "label":"Published", "group": "CatalogService.Books", "groupLabel": "Books"\},
+						               \{"key": "published", "dataType":"Edm.Date", "maxConditions": -1, "required": true, "label":"Published", "group": "CatalogService.Books", "groupLabel": "Books"\},
 									   \{"key": "language_code", "dataType":"Edm.String", "maxConditions": 1, "required":false, "label":"Language", "constraints": \{"nullable": false, "maxLength": 3\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
 									   \{"key": "genre_code", "dataType":"Edm.String", "maxConditions": -1, "required":false, "label":"Genre", "constraints": \{"maxLength": 1111\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
 									   \{"key": "subgenre_code", "dataType":"Edm.String", "maxConditions": -1, "required":false, "label":"Sub Genre", "constraints": \{"maxLength": 1111\}, "group": "CatalogService.Books", "groupLabel": "Books"\}
