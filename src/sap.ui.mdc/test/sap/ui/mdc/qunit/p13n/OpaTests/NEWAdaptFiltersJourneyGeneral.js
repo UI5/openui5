@@ -1,12 +1,12 @@
 sap.ui.define([
+	'sap/ui/core/Lib',
 	'sap/ui/test/Opa5',
 	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Arrangement',
 	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Util',
 	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Action',
 	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Assertion',
-	'sap/ui/Device',
-	'sap/ui/core/Lib'
-], function (Opa5, Arrangement, TestUtil, Action, Assertion, Device, Library) {
+	'sap/ui/Device'
+], function(Library, Opa5, Arrangement, TestUtil, Action, Assertion, Device) {
 	'use strict';
 
 	return function (opaTestOrSkip) {
@@ -378,6 +378,9 @@ sap.ui.define([
 			oFilterItems["Artists"][1].selected = false;
 
 			When.onTheMDCFilterBar.iCloseTheAdaptFiltersDialogWithOk();
+			When.onTheMDCFilterBar.iPressOnTheAdaptFiltersButton();
+			Then.iShouldSeeValueStateInAdaptFiltersPanel("Founding Year", "Information", oErrorAndWarningTexts.Info);
+			When.onTheMDCFilterBar.iCloseTheAdaptFiltersDialogWithOk();
 			When.iResetTheAdaptFiltersDialog();
 			When.onTheMDCFilterBar.iPressOnTheAdaptFiltersButton();
 			Then.iShouldSeeValueStateInAdaptFiltersPanel("Name", "None", "");
@@ -385,7 +388,46 @@ sap.ui.define([
 			Then.iShouldSeeValueStateInAdaptFiltersPanel("artistUUID", "None", "");
 			Then.iShouldSeeValueStateInAdaptFiltersPanel("Breakout Year", "None", "");
 
-			// test required field in unit test because of issue when setting required in delegate
+			Then.iTeardownMyAppFrame();
+		});
+
+		opaTestOrSkip("Check Validation (Required Fields)", function(Given, When, Then){
+			Given.iStartMyAppInAFrame({
+				source: 'test-resources/sap/ui/mdc/internal/TableWithFilterBar/index.html', //use TableWithFilterBar as it contains required fields
+				autoWait: true
+			});
+
+			Then.waitFor({
+				controlType: "sap.ui.mdc.FilterBar",
+				success: (aFilterBars) => {
+					const oFilterBar = aFilterBars[0];
+					When.onTheMDCFilterBar.iClearFilterValue(oFilterBar, "Published");
+				}
+			});
+
+
+			When.onTheMDCFilterBar.iPressOnTheAdaptFiltersButton();
+			Then.iShouldSeeValueStateInAdaptFiltersPanel("Published", "Error", "Published is a required field.");
+			When.iDeselectColumn("Genre");
+			Then.iShouldSeeValueStateInAdaptFiltersPanel("Genre", "Warning", oErrorAndWarningTexts.Warning1);
+
+			When.iPressButtonWithText("Filter");
+			Then.iShouldSeeValueStateInAdaptFiltersPanel("Published", "Error", "Published is a required field.");
+			Then.iShouldSeeValueStateInAdaptFiltersPanel("Genre", "Warning", oErrorAndWarningTexts.Warning1);
+
+			When.onTheMDCFilterBar.iCloseTheAdaptFiltersDialogWithOk();
+			When.iEnterFilterValue("Author ID", "Books", ["Austen, Jane"]);
+			When.onTheMDCFilterBar.iPressOnTheAdaptFiltersButton();
+			When.iDeselectColumn("Author ID");
+			Then.iShouldSeeValueStateInAdaptFiltersPanel("Author ID", "Information", oErrorAndWarningTexts.Info);
+
+			When.onTheMDCFilterBar.iCloseTheAdaptFiltersDialogWithOk();
+
+			When.iResetTheAdaptFiltersDialog();
+			Then.iShouldSeeValueStateInAdaptFiltersPanel("Published", "None", "");
+			Then.iShouldSeeValueStateInAdaptFiltersPanel("Genre", "None", "");
+			Then.iShouldSeeValueStateInAdaptFiltersPanel("Author ID", "None", "");
+
 
 			Then.iTeardownMyAppFrame();
 		});

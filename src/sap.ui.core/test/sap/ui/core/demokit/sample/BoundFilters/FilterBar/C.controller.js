@@ -1,8 +1,36 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
-	"sap/ui/model/json/JSONModel"
-], function (Controller, JSONModel) {
+	"sap/ui/model/json/JSONModel",
+	"sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator",
+	"sap/ui/model/FilterType"
+], function (Controller, JSONModel, Filter, FilterOperator, FilterType) {
 	"use strict";
+
+	const aOrgFilters = [
+		new Filter({
+			path: 'department',
+			operator: FilterOperator.StartsWith,
+			value1: '{filter>/departmentPrefix}'
+		}),
+		new Filter({
+			path: 'location',
+			operator: FilterOperator.StartsWith,
+			value1: '{filter>/locationPrefix}'
+		})
+	];
+	const aPersonFilters = [
+		new Filter({
+			path: 'firstName',
+			operator: FilterOperator.StartsWith,
+			value1: '{filter>/firstName}'
+		}),
+		new Filter({
+			path: 'lastName',
+			operator: FilterOperator.StartsWith,
+			value1: '{filter>/lastName}'
+		})
+	];
 
 	return Controller.extend("sap.ui.core.sample.BoundFilters.FilterBar.C", {
 		onInit() {
@@ -22,14 +50,9 @@ sap.ui.define([
 			const oUiModel = this.getView().getModel("ui");
 			const bShowOrganizational = !oUiModel.getProperty("/showOrganizational");
 			oUiModel.setProperty("/showOrganizational", bShowOrganizational);
-			const oFilterModel = this.getView().getModel("filter");
-			if (bShowOrganizational) {
-				oFilterModel.setProperty("/firstName", null);
-				oFilterModel.setProperty("/lastName", null);
-			} else {
-				oFilterModel.setProperty("/departmentPrefix", null);
-				oFilterModel.setProperty("/locationPrefix", null);
-			}
+			const aFilters = bShowOrganizational ? aOrgFilters : aPersonFilters;
+			const oListBinding = this.getView().byId("myTable").getBinding("rows");
+			oListBinding.filter(aFilters, FilterType.ApplicationBound);
 		}
 	});
 });

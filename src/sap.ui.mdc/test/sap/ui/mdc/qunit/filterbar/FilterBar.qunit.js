@@ -21,6 +21,8 @@ sap.ui.define([
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/core/Lib",
+	"sap/ui/core/Messaging",
+	"sap/ui/core/message/MessageType",
 	"sap/ui/mdc/filterbar/PropertyInfoValidator",
 	"sap/base/Log"
 ], function(
@@ -43,6 +45,8 @@ sap.ui.define([
 	ConditionValidated,
 	OperatorName,
 	Library,
+	Messaging,
+	MessageType,
 	PropertyInfoValidator,
 	Log
 ) {
@@ -53,7 +57,6 @@ sap.ui.define([
 
 	let oFilterBar;
 	const HasPopup = CoreLibrary.aria.HasPopup;
-	const ValueState = CoreLibrary.ValueState;
 
 	const oRB = Library.getResourceBundleFor("sap.ui.mdc");
 
@@ -386,10 +389,10 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("check api setFocusOnFirstErroneousField", function(assert) {
-		const oFilterField0 = new FilterField("FF0", { conditions: "{cm>/conditions/filter0}" });
-		const oFilterField1 = new FilterField("FF1", { conditions: "{cm>/conditions/filter1}" });
-		const oFilterField2 = new FilterField("FF2", { conditions: "{cm>/conditions/filter2}" });
+	QUnit.test("check api setFocusOnFirstErroneousField", async function(assert) {
+		const oFilterField0 = new FilterField("ff0", { propertyKey: "filter0", conditions: "{$filters>/conditions/filter0}" });
+		const oFilterField1 = new FilterField("ff1", { propertyKey: "filter1", conditions: "{$filters>/conditions/filter1}" });
+		const oFilterField2 = new FilterField("ff2", { propertyKey: "filter2", conditions: "{$filters>/conditions/filter2}" });
 
 		oFilterBar.addFilterItem(oFilterField0);
 		oFilterBar.addFilterItem(oFilterField1);
@@ -398,16 +401,19 @@ sap.ui.define([
 		let oFilterField = oFilterBar.setFocusOnFirstErroneousField();
 		assert.ok(!oFilterField);
 
-		oFilterField1.setValueState(ValueState.Error);
+		oFilterBar.addMessage(oFilterField1.getPropertyKey(), "", MessageType.Error);
+		await new Promise((resolve) => {setTimeout(resolve, 0);});
 		oFilterField = oFilterBar.setFocusOnFirstErroneousField();
 		assert.ok(oFilterField === oFilterField1);
 
-		oFilterField0.setValueState(ValueState.Error);
+		oFilterBar.addMessage(oFilterField0.getPropertyKey(), "", MessageType.Error);
+		await new Promise((resolve) => {setTimeout(resolve, 0);});
 		oFilterField = oFilterBar.setFocusOnFirstErroneousField();
 		assert.ok(oFilterField === oFilterField0);
 
-		oFilterField0.setValueState(ValueState.None);
-		oFilterField1.setValueState(ValueState.None);
+		oFilterBar.removeMessages(oFilterField0.getPropertyKey());
+		oFilterBar.removeMessages(oFilterField1.getPropertyKey());
+		await new Promise((resolve) => {setTimeout(resolve, 0);});
 		oFilterField = oFilterBar.setFocusOnFirstErroneousField();
 		assert.ok(!oFilterField);
 

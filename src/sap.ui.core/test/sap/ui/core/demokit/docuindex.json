@@ -856,12 +856,12 @@
 			{
 				"id": "sap.ui.core.sample.BoundFilters.FilteredListInTable",
 				"name": "Bound Filters - Filtered List in Table",
-				"description": "This sample shows how bound filters work: A table of customers displays a Select control in each row. The Select shows account managers filtered by the region of that customer row by using boundFilters."
+				"description": "This sample shows how bound filters work. It features a table of customers with a 'Select' control in each row. The 'Select' control uses the customer's region to filter the list of available account managers."
 			},
 			{
 				"id": "sap.ui.core.sample.BoundFilters.FilterBar",
 				"name": "Bound Filters - Filter Bar",
-				"description": "This sample shows how bound filters work in a filter bar: A toolbar with filter inputs instantly filters the customer table as the user enters values."
+				"description": "This sample shows how bound filters work in a filter bar. As the user enters values, a toolbar with filter inputs instantly filters the customer table. It also demonstrates how to use the filter API to change the bound filters programmatically."
 			}
 		]
 	}

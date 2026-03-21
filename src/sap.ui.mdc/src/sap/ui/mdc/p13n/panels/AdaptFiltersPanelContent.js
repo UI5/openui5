@@ -1031,6 +1031,9 @@ sap.ui.define([
 		}
 
 		aData[iIndex][this.PRESENCE_ATTRIBUTE] = bAdd;
+		// Mark item as requiring validation when visibility is toggled
+		// This ensures validation runs for items that are being made invisible
+		aData[iIndex].requiresValidation = true;
 		this._getP13nModel().setProperty("/items", aData, null, true);
 	};
 

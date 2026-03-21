@@ -15,11 +15,10 @@ sap.ui.define([
 	"sap/ui/mdc/field/ConditionsType",
 	"delegates/util/DelegateCache",
 	"sap/ui/mdc/enums/FilterBarValidationStatus",
+	"sap/ui/core/message/MessageType",
 	"sap/ui/core/library"
-], function (FilterBarDelegate, FlUtils, JsControlTreeModifier, FieldDisplay, OperatorName, ConditionsType, DelegateCache, FilterBarValidationStatus, coreLibrary) {
+], function (FilterBarDelegate, FlUtils, JsControlTreeModifier, FieldDisplay, OperatorName, ConditionsType, DelegateCache, FilterBarValidationStatus, MessageType, coreLibrary) {
 	"use strict";
-
-	const { ValueState } = coreLibrary;
 
 	var FilterBarBooksSampleDelegate = Object.assign({}, FilterBarDelegate);
 
@@ -53,6 +52,8 @@ sap.ui.define([
 				} else if (oPropertyInfo.key === "stock") {
 					oPropertyInfo.label = "Stock range";
 					oPropertyInfo.maxConditions = 1;
+				} else if (oPropertyInfo.key === "published") {
+					oPropertyInfo.required = true;
 				} else if (oPropertyInfo.key === "subgenre_code") {
 					oPropertyInfo.label = "Sub Genre";
 				} else if (oPropertyInfo.key === "detailgenre_code") {
@@ -150,16 +151,20 @@ sap.ui.define([
 		const bPriceConditionPresent = !!oFilterBarConditions?.[sPriceConditionName]?.length,
 			bCurrencyConditionPresent = !!oFilterBarConditions[sCurrencyConditionName]?.length;
 
-		const oPriceFilterField = [].find((oFilterItem) => oFilterItem.getPropertyKey() === sPriceConditionName);
+		const oCurrencyValidationMessage = oFilterBar.getMessages(sPriceConditionName).find((oMsg) => {
+			return oMsg.getType() === MessageType.Error && oMsg.getMessage() === "Please select a Currency!";
+		});
 
 		if (!bPriceConditionPresent || (bPriceConditionPresent && bCurrencyConditionPresent)) {
-			oPriceFilterField?.setValueState(ValueState.None);
-			oPriceFilterField?.setValueStateText();
+			if (oCurrencyValidationMessage) {
+				oFilterBar.removeMessage(oCurrencyValidationMessage);
+			}
 		}
 
 		if (bPriceConditionPresent && !bCurrencyConditionPresent) {
-			oPriceFilterField?.setValueState(ValueState.Error);
-			oPriceFilterField?.setValueStateText("Please select a Currency!");
+			if (!oCurrencyValidationMessage) {
+				oFilterBar.addMessage(sPriceConditionName, "Please select a Currency!", MessageType.Error);
+			}
 
 			return FilterBarValidationStatus.RequiredHasNoValue;
 		}

@@ -24,8 +24,7 @@ sap.ui.define([
 	 *
 	 * @constructor
 	 * @public
-	 * @since 1.127.0
-	 * @experimental Since version 1.127.0.
+	 * @ui5-experimental-since 1.127
 	 * @alias sap.ui.unified.TimeRange
 	 */
 	var TimeRange = Element.extend("sap.ui.unified.TimeRange", /** @lends sap.ui.unified.TimeRange.prototype */ { metadata : {

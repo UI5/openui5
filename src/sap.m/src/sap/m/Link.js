@@ -521,7 +521,7 @@ function(
 
 	Link.prototype.setIcon = function(sSrc) {
 		if (!IconPool.isIconURI(sSrc)) {
-			Log.error("setIcon: The provided URI ' + sSrc + ' is is not a valid Icon URI!");
+			Log.error("setIcon: The provided URI '" + sSrc + "' is not a valid Icon URI!");
 		} else {
 			var oIcon = this._getIcon();
 
@@ -534,7 +534,7 @@ function(
 
 	Link.prototype.setEndIcon = function(sSrc) {
 		if (sSrc && !IconPool.isIconURI(sSrc)) {
-			Log.error("setEndIcon: The provided URI ' + sSrc + ' is is not a valid Icon URI!");
+			Log.error("setEndIcon: The provided URI '" + sSrc + "' is not a valid Icon URI!");
 		} else {
 			var oIcon = this._getEndIcon();
 

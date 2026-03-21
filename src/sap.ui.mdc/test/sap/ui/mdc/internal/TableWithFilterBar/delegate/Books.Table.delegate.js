@@ -12,8 +12,9 @@ sap.ui.define([
 	"sap/ui/model/odata/type/String",
 	"sap/m/Text",
 	"sap/ui/mdc/enums/FilterBarValidationStatus",
+	"sap/ui/core/message/MessageType",
 	'delegates/util/DelegateCache'
-], function (ODataTableDelegate, BooksFBDelegate, Field, Link, FieldDisplay, FieldEditMode, OperatorName, DelegateUtil, CurrencyType, DecimalType, StringType, Text, FilterBarValidationStatus, DelegateCache) {
+], function (ODataTableDelegate, BooksFBDelegate, Field, Link, FieldDisplay, FieldEditMode, OperatorName, DelegateUtil, CurrencyType, DecimalType, StringType, Text, FilterBarValidationStatus, MessageType, DelegateCache) {
 	"use strict";
 	var BooksTableDelegate = Object.assign({}, ODataTableDelegate);
 	var getFullId = function(oControl, sVHId) {
@@ -137,16 +138,20 @@ sap.ui.define([
 				const bPriceConditionPresent = !!oFilterBarConditions?.[sPriceConditionName]?.length,
 					bCurrencyConditionPresent = !!oFilterBarConditions[sCurrencyConditionName]?.length;
 
-				const oPriceFilterField = [].find((oFilterItem) => oFilterItem.getPropertyKey() === sPriceConditionName);
+				const oCurrencyValidationMessage = oFilterBar.getMessages(sPriceConditionName).find((oMsg) => {
+					return oMsg.getType() === MessageType.Error && oMsg.getMessage() === "Please select a Currency!";
+				});
 
 				if (!bPriceConditionPresent || (bPriceConditionPresent && bCurrencyConditionPresent)) {
-					oPriceFilterField?.setValueState("None");
-					oPriceFilterField?.setValueStateText();
+					if (oCurrencyValidationMessage) {
+						oFilterBar.removeMessage(oCurrencyValidationMessage);
+					}
 				}
 
 				if (bPriceConditionPresent && !bCurrencyConditionPresent) {
-					oPriceFilterField?.setValueState("Error");
-					oPriceFilterField?.setValueStateText("Please select a Currency!");
+					if (!oCurrencyValidationMessage) {
+						oFilterBar.addMessage(sPriceConditionName, "Please select a Currency!", MessageType.Error);
+					}
 
 					return FilterBarValidationStatus.RequiredHasNoValue;
 				}

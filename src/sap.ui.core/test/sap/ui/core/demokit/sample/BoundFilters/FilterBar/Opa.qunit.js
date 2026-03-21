@@ -52,7 +52,7 @@ sap.ui.define([
 		Then.onTheMainPage.iSeeTableRowCount(2);
 
 		When.onTheMainPage.iToggleFilters();
-		// Switching to personal clears department and location filters
+		// Switching to personal deactivates department and location filters (values preserved)
 		Then.onTheMainPage.iSeeTableRowCount(15);
 
 		Then.iTeardownMyUIComponent();
@@ -77,6 +77,39 @@ sap.ui.define([
 
 		When.onTheMainPage.iEnterLastNamePrefix("S");
 		// Jane Smith (first name "J" + last name "S")
+		Then.onTheMainPage.iSeeTableRowCount(1);
+
+		Then.iTeardownMyUIComponent();
+	});
+
+	//*****************************************************************************
+	opaTest("Switching between filters preserves previously entered values",
+			(Given, When, Then) => {
+		Given.iStartMyUIComponent({
+			autoWait: true,
+			componentConfig: {
+				name: "sap.ui.core.sample.BoundFilters.FilterBar"
+			}
+		});
+
+		// Set up org filter values
+		When.onTheMainPage.iEnterDepartmentPrefix("Dev");
+		When.onTheMainPage.iEnterLocationPrefix("Wal");
+		// John Doe, Jessica Williams (Development + Walldorf)
+		Then.onTheMainPage.iSeeTableRowCount(2);
+
+		// Switch to personal, enter personal filter values
+		When.onTheMainPage.iToggleFilters();
+		When.onTheMainPage.iEnterFirstNamePrefix("J");
+		When.onTheMainPage.iEnterLastNamePrefix("S");
+		Then.onTheMainPage.iSeeTableRowCount(1);
+
+		// Toggle back to org: previously entered "Dev" and "Wal" are restored
+		When.onTheMainPage.iToggleFilters();
+		Then.onTheMainPage.iSeeTableRowCount(2);
+
+		// Toggle back to personal: previously entered "J" and "S" are restored
+		When.onTheMainPage.iToggleFilters();
 		Then.onTheMainPage.iSeeTableRowCount(1);
 
 		Then.iTeardownMyUIComponent();

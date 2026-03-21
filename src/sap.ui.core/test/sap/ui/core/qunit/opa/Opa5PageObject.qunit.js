@@ -230,10 +230,14 @@ sap.ui.define([
 			//       We therefore cannot rely on the built-in promise handling of QUnit 2.
 			return Promise.all([
 				viewUtils.createXmlView("foo", "myFooView"),
-				viewUtils.createXmlView("bar", "myBarView")
+				viewUtils.createXmlView("bar", "myBarView"),
+				viewUtils.createXmlView("my.namespace.foo", "myNamespacedFooView"),
+				viewUtils.createXmlView("my.view.bar", "myNamespacedBarView")
 			]).then(function (aViews) {
 				this.oView = aViews[0].placeAt("qunit-fixture");
 				this.oView2 = aViews[1].placeAt("qunit-fixture");
+				this.oNamespacedView = aViews[2].placeAt("qunit-fixture");
+				this.oNamespacedView2 = aViews[3].placeAt("qunit-fixture");
 				return nextUIUpdate();
 			}.bind(this), function(oErr) {
 				assert.strictEqual(oErr, undefined, "failed to load view");
@@ -242,6 +246,8 @@ sap.ui.define([
 		afterEach: function () {
 			this.oView.destroy();
 			this.oView2.destroy();
+			this.oNamespacedView.destroy();
+			this.oNamespacedView2.destroy();
 		}
 	});
 
@@ -351,6 +357,71 @@ sap.ui.define([
 		Opa.config.actions.onMyPageWithViewId.iWait();
 		Opa.config.actions.onMyPageWithViewId.iWaitWithOtherViewId();
 		Opa.config.actions.onMyPageWithViewIdAndName.iWait();
+
+		Opa.emptyQueue().done(fnDone);
+	});
+
+	QUnit.test("Should search for controls when viewNamespace is given", function (assert) {
+		var fnDone = assert.async();
+		assert.expect(4);
+		var oNamespacedView = this.oNamespacedView;
+		var oNamespacedView2 = this.oNamespacedView2;
+
+		Opa5.createPageObjects({
+			onMyPageWithViewNamespace: {
+				viewName: "foo",
+				viewNamespace: "my.namespace.",
+				actions: {
+					iWait: function () {
+						this.waitFor({
+							id: "foo",
+							success: function (oButton) {
+								assert.strictEqual(oButton, oNamespacedView.byId("foo"), "Should define action viewName with viewNamespace in page object");
+							}
+						});
+					},
+					iWaitWithOtherViewNamespace: function () {
+						this.waitFor({
+							viewNamespace: "my.view.",
+							viewName: "bar",
+							id: "foo",
+							success: function (oButton) {
+								assert.strictEqual(oButton, oNamespacedView2.byId("foo"), "Should allow overriding viewNamespace in waitFor");
+							}
+						});
+					}
+				},
+				assertions: {
+					iWait: function () {
+						this.waitFor({
+							id: "bar",
+							success: function (oButton) {
+								assert.strictEqual(oButton, oNamespacedView.byId("bar"), "Should define assertion viewName with viewNamespace in page object");
+							}
+						});
+					}
+				}
+			},
+			onMyPageWithNamespaceAndView: {
+				viewNamespace: "my.view.",
+				viewName: "bar",
+				actions: {
+					iWait: function () {
+						this.waitFor({
+							id: "foo",
+							success: function (oButton) {
+								assert.strictEqual(oButton, oNamespacedView2.byId("foo"), "Should define viewNamespace and viewName together in page object");
+							}
+						});
+					}
+				}
+			}
+		});
+
+		Opa.config.actions.onMyPageWithViewNamespace.iWait();
+		Opa.config.actions.onMyPageWithViewNamespace.iWaitWithOtherViewNamespace();
+		Opa.config.assertions.onMyPageWithViewNamespace.iWait();
+		Opa.config.actions.onMyPageWithNamespaceAndView.iWait();
 
 		Opa.emptyQueue().done(fnDone);
 	});

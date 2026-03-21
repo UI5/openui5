@@ -784,16 +784,18 @@ sap.ui.define([
 				controlType: "sap.m.CustomListItem",
 				success: (aCustomListItems) => {
 					let oItem;
-					aCustomListItems.forEach((oCustomListItem) => {
+					let iIndex = 0;
+					aCustomListItems.forEach((oCustomListItem, iIndexOfIteration) => {
 						if (oCustomListItem.getContent()[0].getContent()[0].getText() === sItemName) {
 							oItem = oCustomListItem;
+							iIndex = iIndexOfIteration;
 						}
 					});
 					Opa5.assert.ok(!!oItem, "ListItem for column " + sItemName + " found");
 					return this.waitFor({
 						controlType: "sap.m.ToggleButton",
 						success: (aToggleButtons) => {
-							const oToggleButton = aToggleButtons[0];
+							const oToggleButton = aToggleButtons[iIndex === 0 ? iIndex : iIndex - 1];
 							const bIsCurrentlySelected = oToggleButton.getPressed();
 							if (bIsCurrentlySelected) {
 								new Press().executeOn(oToggleButton);

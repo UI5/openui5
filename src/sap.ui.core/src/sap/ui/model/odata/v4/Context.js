@@ -2006,9 +2006,15 @@ sap.ui.define([
 	 *   before {@link #requestSideEffects} and make them editable again when the promise resolves;
 	 *   in the error handler, you can repeat the loading of side effects.
 	 *   <br>
-	 *   The promise is rejected if the call wants to refresh a whole list binding (via header
-	 *   context or an absolute path), but the deletion of a row context (see {@link #delete}) is
-	 *   pending with a different group ID.
+	 *   The promise is rejected if
+	 *   <ul>
+	 *     <li> the call attempts to refresh an entire list binding (via header context or an
+	 *       absolute path) while the deletion of a row context (see {@link #delete}) is pending
+	 *       with a different group ID,
+	 *     <li> this is the row context of a list binding with data aggregation which has
+	 *       <code>groupLevels</code> or <code>"grandTotal like 1.84"</code>, or
+	 *     <li> this context does not represent a single entity
+	 *   </ul>
 	 * @throws {Error} If
 	 *   <ul>
 	 *     <li> metadata has not yet been loaded
@@ -2030,9 +2036,6 @@ sap.ui.define([
 	 *     <li> a <code>$PropertyPath</code> has been requested which contains a navigation
 	 *       property that was changed on the server and now targets a different entity
 	 *       (since 1.79.0)
-	 *     <li> this is the row context of a list binding with data aggregation which has
-	 *       <code>groupLevels</code> or <code>"grandTotal like 1.84"</code>
-	 *     <li> this context does not represent a single entity
 	 *   </ul>
 	 * @public
 	 * @see sap.ui.model.odata.v4.ODataContextBinding#getBoundContext

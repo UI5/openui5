@@ -8,8 +8,9 @@
 // ---------------------------------------------------------------------------------------
 sap.ui.define([
 	"sap/ui/mdc/AggregationBaseDelegate",
-	"sap/ui/mdc/enums/FilterBarValidationStatus"
-], (AggregationBaseDelegate, FilterBarValidationStatus) => {
+	"sap/ui/mdc/enums/FilterBarValidationStatus",
+	"sap/ui/core/library"
+], (AggregationBaseDelegate, FilterBarValidationStatus, coreLibrary) => {
 	"use strict";
 	/**
 	 * Base Delegate for {@link sap.ui.mdc.FilterBar FilterBar}. Extend this object in your project to use all functionalities of the {@link sap.ui.mdc.FilterBar FilterBar}.
@@ -23,6 +24,8 @@ sap.ui.define([
 	 * @extends module:sap/ui/mdc/AggregationBaseDelegate
 	 */
 	const FilterBarDelegate = Object.assign({}, AggregationBaseDelegate);
+
+	const {ValueState} = coreLibrary;
 
 	/**
 	 * Creates an instance of a filter field control.
@@ -180,6 +183,14 @@ sap.ui.define([
 		}
 	};
 
+	FilterBarDelegate.cleanUpFilterFieldState = function(oFilterBar, oFilterField) {
+		if (oFilterField && (oFilterBar.getMessages(oFilterField.getPropertyKey()).length > 0)) {
+			oFilterBar.removeMessages(oFilterField.getPropertyKey());
+		} else if (oFilterField && (oFilterField.getValueState() !== ValueState.None)) {
+			// FilterField state set without using Messaging -> needs reset as well
+			oFilterField.setValueState(ValueState.None);
+		}
+	};
 
 	return FilterBarDelegate;
 });
