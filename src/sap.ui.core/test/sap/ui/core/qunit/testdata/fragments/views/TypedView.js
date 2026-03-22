@@ -24,7 +24,7 @@
 			}));
 
 			aContentPromises.push(Fragment.load({
-				definition: '<Button xmlns="sap.m" id="xmlfragbtn" text="This is an XML Fragment" press="doSomething"></Button>',
+				definition: '<Button xmlns="sap.m" id="xmlfragbtn" text="This is an XML Fragment" press=".doSomething"></Button>',
 				type: "XML",
 				controller: oController
 			}));

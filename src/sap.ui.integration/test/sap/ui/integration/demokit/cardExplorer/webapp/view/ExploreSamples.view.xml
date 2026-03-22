@@ -46,7 +46,7 @@
 								min="20"
 								max="100"
 								value="{settings>/cardWidth}"
-								liveChange="onCardWidthChange"
+								liveChange=".onCardWidthChange"
 								class="sapUiTinyMarginEnd" />
 							<Text text="{settings>/cardWidth}%" />
 						</HBox>
