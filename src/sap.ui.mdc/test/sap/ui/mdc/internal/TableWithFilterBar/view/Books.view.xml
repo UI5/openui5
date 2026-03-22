@@ -49,7 +49,7 @@
 					text="{=${message>/}.length}"
 					visible="{=${message>/}.length > 0}"
 					type="Emphasized"
-					press="onMessagePopoverPress" />
+					press=".onMessagePopoverPress" />
 				<ToolbarSpacer/>
 			</OverflowToolbar>
 		</f2:footer>
