@@ -84,7 +84,7 @@ sap.ui.define('sap/ui/debug/PropertyList', [
 	 */
 	PropertyList.prototype.update = function(oParams) {
 		var sControlId = this.sControlId = oParams.getParameter("controlId");
-		this.oParentDomRef.innerHTML = "";
+		this.oParentDomRef.replaceChildren();
 
 		var oControl = Element.getElementById(sControlId);
 		if (!oControl) {
