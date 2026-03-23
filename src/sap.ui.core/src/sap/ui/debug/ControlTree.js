@@ -101,7 +101,7 @@ sap.ui.define('sap/ui/debug/ControlTree', [
 		var oDomRef = this.oParentDomRef;
 		var oUIArea = null,
 			oUIAreas = UIAreaRegistry.all();
-		oDomRef.innerHTML = "";
+		oDomRef.replaceChildren();
 		for (var i in oUIAreas) {
 			var oUIArea = oUIAreas[i],
 				oDomNode = this.createTreeNodeDomRef(oUIArea.getId(),0,"UIArea", this.sTestResourcePath + "sap/ui/core/images/controls/sap.ui.core.UIArea.gif");

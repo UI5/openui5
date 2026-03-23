@@ -407,7 +407,7 @@ sap.ui.define(['sap/ui/thirdparty/jquery', 'sap/base/Log', 'sap/base/security/en
 
 			jQuery(reportWindow.document).ready(function () {
 				// make sure everything is cleared before writing the new report
-				reportWindow.document.documentElement.innerHTML = '';
+				reportWindow.document.documentElement.replaceChildren();
 
 				reportWindow.document.write(content);
 			});

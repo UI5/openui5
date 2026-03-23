@@ -538,7 +538,7 @@ sap.ui.define([
 						}
 
 						if (this._bLayoutDataChanged || bRender) {
-							this._oDomRef.innerHTML = "";
+							this._oDomRef.replaceChildren();
 
 							// reset this to be clean for next check interval
 							this._bLayoutDataChanged = false;

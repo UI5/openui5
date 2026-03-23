@@ -190,7 +190,7 @@ sap.ui.define([
 				//show "nodata overlay" if there is data
 				sapUiSupportNoDataOverlay.style.display = 'block';
 				domSlider.classList.add('sapUiSupportHidden');
-				domTimelineOverview.innerHTML = '';
+				domTimelineOverview.replaceChildren();
 				return;
 			} else {
 				domSlider.classList.remove('sapUiSupportHidden');
