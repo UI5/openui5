@@ -168,5 +168,20 @@
         "text": " sap.uxap.ObjectPageLayout: Fix initial title rendering in FCL"
       }
     ]
+  },
+  "1.136.14": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "08ce03904a4531e184f1f46a2cb822377566b4bf",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: fix wrong aria-labelledBy id references"
+      },
+      {
+        "id": "f775dc997146644ebcb80de8efa0de48b090a32b",
+        "type": "FIX",
+        "text": " ObjectPageLayout: prevent endless loop in ResizeHandler callbacks"
+      }
+    ]
   }
 }

@@ -48,5 +48,15 @@
         "text": " SemanticFormElement: _updateDisplayText does no longer fail without available _displayField"
       }
     ]
+  },
+  "1.136.14": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "aa3bc984a4cc2543ad953f4e868f5f727c1a314e",
+        "type": "FIX",
+        "text": " ColumnLayout: role=\"form\" rendered in display mode"
+      }
+    ]
   }
 }

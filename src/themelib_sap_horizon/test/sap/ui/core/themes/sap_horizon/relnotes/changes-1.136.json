@@ -133,5 +133,25 @@
         "text": " sap.m.PlanningCalendar: fixed focus on Planning Calendar Row"
       }
     ]
+  },
+  "1.136.14": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "ef9b812e72416971a73997b8c5a64f5d8b2b526a",
+        "type": "FIX",
+        "text": " sap.m.Button: Emphasized button has correct font"
+      },
+      {
+        "id": "65f4fd9df9f21093a069425c34b674589ab00647",
+        "type": "FIX",
+        "text": " sap.m.Switch: Font is according to VD spec now"
+      },
+      {
+        "id": "0d06da256400b31889f493b46d3d36613fb908f7",
+        "type": "FIX",
+        "text": " sap.uxap.AnchorBar: Enable upperCaseAnchorBar property for Horizon theme"
+      }
+    ]
   }
 }

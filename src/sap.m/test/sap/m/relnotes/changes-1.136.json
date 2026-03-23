@@ -623,5 +623,30 @@
         "text": " sap.m.Button: Default type is shown correctly in Info bar"
       }
     ]
+  },
+  "1.136.14": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "dd85ac4b0e6c9d1841bf733d2da4043f0128b6cf",
+        "type": "FIX",
+        "text": " sap.m.Avatar: prevent event bubbling when LightBox is present"
+      },
+      {
+        "id": "0ecc04d050c63e93b4364a376f8d1d5543b5bb37",
+        "type": "FIX",
+        "text": " We've now fixed a jump issue in the header container by using an outline instead of a border"
+      },
+      {
+        "id": "fabd9d4bdf55fc299f952c5f6bae096b6e2a0c17",
+        "type": "FIX",
+        "text": " We've now fixed an issue in slide tile where the tile indicator buttons were not visible"
+      },
+      {
+        "id": "f9282f73d2a616a3fbb436850f6d4552e820dc6f",
+        "type": "FIX",
+        "text": " sap.m.OverflowToolbar: onfocusfail no longer throws an error"
+      }
+    ]
   }
 }
