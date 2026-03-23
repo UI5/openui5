@@ -4028,5 +4028,15 @@
         "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
       }
     ]
+  },
+  "1.71.77": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "d484ab6cf0de0c53ed7c97536df88e72110c4266",
+        "type": "FIX",
+        "text": " We now ensure that the uploadCompleted event passes the backend response when upload fails in the upload set"
+      }
+    ]
   }
 }
