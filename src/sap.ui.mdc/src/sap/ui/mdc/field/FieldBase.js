@@ -2750,15 +2750,21 @@ sap.ui.define([
 								const oOperator = FilterOperatorUtil.getEQOperator(aOperators);
 								const bHideOperator = this.getContentFactory().getHideOperator();
 								const bSymbolEntered = bHideOperator ? false : oOperator.test(this._vLiveChangeValue); // if operator always hidden symbol is always part of text
-								const aParts = oOperator.getValues(this._vLiveChangeValue, sDisplay, true, bHideOperator);
-								if (aParts) {
-									if (aParts[0]) {
-										this._sFilterValue = aParts[0];
-									} else if (aParts[1]) {
-										this._sFilterValue = aParts[1];
-									}
+								//DINC0824639: in case user will search for example for "Test(abc)" use in MultiValue case the whole string.
+								if (this.getMaxConditions() !== 1 && !bSymbolEntered) {
+									this._sFilterValue = this._vLiveChangeValue;
 								} else {
-									this._sFilterValue = "";
+									const aParts = oOperator.getValues(this._vLiveChangeValue, sDisplay, true, bHideOperator);
+									if (aParts) {
+										const [sPart0, sPart1] = aParts;
+										if (sPart0) {
+											this._sFilterValue = sPart0;
+										} else if (sPart1) {
+											this._sFilterValue = sPart1;
+										}
+									} else {
+										this._sFilterValue = "";
+									}
 								}
 								if (bSymbolEntered) {
 									this._bPreventAutocomplete = true; // if symbol is used -> no autocomplete
@@ -3661,8 +3667,8 @@ sap.ui.define([
 						if (oContent.bValueHelpRequested) {
 							oContent.bValueHelpRequested = false; // to enable change-event after closing value help
 						}
-						if (this._sFilterValue) { // remove Autocomplete as selection is not shown if focus goes to ValueHelp
-							oContent.setDOMValue(this._sFilterValue);
+						if (this._vLiveChangeValue) { // remove Autocomplete as selection is not shown if focus goes to ValueHelp
+							oContent.setDOMValue(this._vLiveChangeValue);
 						}
 						this._oFocusInHelp = oEvent; // as focus can be set to table header in popover, here on closing input might be validated.
 					} else {
