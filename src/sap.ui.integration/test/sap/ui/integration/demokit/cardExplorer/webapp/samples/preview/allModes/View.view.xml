@@ -12,7 +12,7 @@
 				<core:Item text="{previewModes>}" key="{previewModes>}" />
 			</Select>
 			<f:GridContainer class="sapUiSmallMarginTop">
-				<w:Card id="card1" manifest="./listCard/manifest.json" previewMode="{previewModes>/selectedMode}">
+				<w:Card id="card1" manifest="./listCard/manifest.json" baseUrl="./listCard/" previewMode="{previewModes>/selectedMode}">
 					<w:layoutData>
 						<f:GridContainerItemLayoutData columns="3" />
 					</w:layoutData>

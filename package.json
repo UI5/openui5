@@ -54,7 +54,7 @@
 	},
 	"overrides": {
 		"pacote": {
-			"tar": "^7.5.11"
+			"tar": "^7.5.12"
 		}
 	},
 	"workspaces": [

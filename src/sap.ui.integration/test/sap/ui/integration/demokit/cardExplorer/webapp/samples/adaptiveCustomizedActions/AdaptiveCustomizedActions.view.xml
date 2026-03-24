@@ -4,7 +4,7 @@
 	xmlns:f="sap.f"
 	xmlns:mvc="sap.ui.core.mvc">
 	<f:GridContainer>
-		<w:Card id="adaptiveCard" action=".onCardAction" manifest="./cardManifest.json">
+		<w:Card id="adaptiveCard" action=".onCardAction" manifest="./cardManifest.json" baseUrl="./">
 			<w:layoutData>
 				<f:GridContainerItemLayoutData columns="4" />
 			</w:layoutData>

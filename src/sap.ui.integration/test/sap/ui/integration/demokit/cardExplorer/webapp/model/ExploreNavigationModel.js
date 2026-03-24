@@ -3465,7 +3465,7 @@ sap.ui.define([
 						isApplication: true,
 						files: [
 							{
-								url: '/samples/badge/indexTemplate.html',
+								url: '/samples/badge/index.html',
 								name: 'index.html',
 								key: 'index.html'
 							},
@@ -3538,7 +3538,7 @@ sap.ui.define([
 								experimental: true,
 								files: [
 									{
-										url: '/samples/htmlConsumption/customList/indexTemplate.html',
+										url: '/samples/htmlConsumption/customList/index.html',
 										name: 'index.html',
 										key: 'index.html'
 									},
@@ -3753,7 +3753,7 @@ sap.ui.define([
 						isApplication: true,
 						files: [
 							{
-								url: '/samples/hostActions/indexTemplate.html',
+								url: '/samples/hostActions/index.html',
 								name: 'index.html',
 								key: 'index.html'
 							},
@@ -3842,7 +3842,7 @@ sap.ui.define([
 						isApplication: true,
 						files: [
 							{
-								url: '/samples/interactionInGrid/indexTemplate.html',
+								url: '/samples/interactionInGrid/index.html',
 								name: 'index.html',
 								key: 'index.html'
 							},
@@ -4027,7 +4027,7 @@ sap.ui.define([
 						experimental: true,
 						files: [
 							{
-								url: '/samples/configurationChanges/indexTemplate.html',
+								url: '/samples/configurationChanges/index.html',
 								name: 'index.html',
 								key: 'index.html'
 							},
@@ -4107,7 +4107,7 @@ sap.ui.define([
 						isApplication: true,
 						experimental: true,
 						files: [{
-								url: '/samples/design/indexTemplate.html',
+								url: '/samples/design/index.html',
 								name: 'index.html',
 								key: 'index.html'
 							},

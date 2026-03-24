@@ -1399,9 +1399,8 @@ sap.ui.define([
 				oCountPromise.$old = "~oldCountPromise~";
 			}
 			oCache.oCountPromise = oCountPromise;
-			this.mock(oCache).expects("registerChangeListener")
-				.withExactArgs("./$count", "~oListener~")
-				.exactly(bRecursiveHierarchy ? 1 : 0);
+			this.mock(oCache).expects("registerChangeListener").exactly(bRecursiveHierarchy ? 1 : 0)
+				.withExactArgs("./$count", "~oListener~");
 			this.mock(oCache.oFirstLevel).expects("fetchValue").never();
 			this.mock(oCache).expects("drillDown").never();
 
@@ -1432,7 +1431,7 @@ sap.ui.define([
 			this.mock(oCache).expects("fetchValue")
 				.withExactArgs(sinon.match.same(_GroupLock.$cached), "some/path")
 				.returns(oFixture.oPromise);
-			this.mock(oFixture.oPromise).expects("caught").withExactArgs().exactly(i);
+			this.mock(oFixture.oPromise).expects("caught").exactly(i).withExactArgs();
 
 			// code under test
 			assert.strictEqual(oCache.getValue("some/path"), oFixture.vValue);
@@ -4433,52 +4432,63 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("readGrandTotal: success", function (assert) {
-		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {
-			// $expand, $filter, $search, and $select must not be used with grand totals
-			$$filterBeforeAggregate : "~$$filterBeforeAggregate~",
-			$apply : "~apply~",
-			$count : true,
-			$orderby : "~orderby~",
-			custom : "~custom~"
-		}, {
-			$leafLevelAggregated : false,
-			aggregate : {
-				bar : {
-					grandTotal : true
-				}
-			}
-		});
-		this.mock(_AggregationHelper).expects("hasGrandTotal")
-			.withExactArgs(sinon.match.same(oCache.oAggregation.aggregate))
-			.returns(true);
-		this.mock(_AggregationHelper).expects("buildApply")
-			.withExactArgs(sinon.match.same(oCache.oAggregation), {
+	[false, true].forEach((bWithGrandTotalCopy) => {
+		QUnit.test("readGrandTotal: success, 2 grand totals:" + bWithGrandTotalCopy, function (assert) {
+			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {
+				// $expand, $filter, $search, and $select must not be used with grand totals
 				$$filterBeforeAggregate : "~$$filterBeforeAggregate~",
+				$apply : "~apply~",
+				$count : true,
+				$orderby : "~orderby~",
 				custom : "~custom~"
-			}, -1)
-			.returns("~mQueryOptions~");
-		this.mock(this.oRequestor).expects("buildQueryString")
-			.withExactArgs("/Foo", "~mQueryOptions~", false, false, true)
-			.returns("~sQueryString~");
-		const oGroupLock = {
-			getUnlockedCopy : mustBeMocked
-		};
-		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
-			.returns("~oUnlockedGroupLock~");
-		this.mock(this.oRequestor).expects("request")
-			.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~", undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, {/*mMergeableQueryOptions*/})
-			.resolves({value : ["~newGrandTotal~"]});
-		oCache.aElements.$byPredicate["()"] = "~oldGrandTotal~";
-		this.mock(_Helper).expects("updateExisting")
-			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "()", "~oldGrandTotal~",
-				"~newGrandTotal~");
-		this.mock(oCache).expects("setGrandTotalOutdated").withExactArgs(false);
+			}, {
+				$leafLevelAggregated : false,
+				aggregate : {
+					bar : {
+						grandTotal : true
+					}
+				}
+			});
+			this.mock(_AggregationHelper).expects("hasGrandTotal")
+				.withExactArgs(sinon.match.same(oCache.oAggregation.aggregate))
+				.returns(true);
+			this.mock(_AggregationHelper).expects("buildApply")
+				.withExactArgs(sinon.match.same(oCache.oAggregation), {
+					$$filterBeforeAggregate : "~$$filterBeforeAggregate~",
+					custom : "~custom~"
+				}, -1)
+				.returns("~mQueryOptions~");
+			this.mock(this.oRequestor).expects("buildQueryString")
+				.withExactArgs("/Foo", "~mQueryOptions~", false, false, true)
+				.returns("~sQueryString~");
+			const oGroupLock = {
+				getUnlockedCopy : mustBeMocked
+			};
+			this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
+				.returns("~oUnlockedGroupLock~");
+			this.mock(this.oRequestor).expects("request")
+				.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~", undefined, undefined,
+					undefined, undefined, undefined, undefined, undefined, {/*mMergeableQueryOptions*/})
+				.resolves({value : ["~newGrandTotal~"]});
+			oCache.aElements.$byPredicate["()"] = "~oGrandTotal~";
+			const oHelperMock = this.mock(_Helper);
+			oHelperMock.expects("updateExisting")
+				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "()", "~oGrandTotal~",
+					"~newGrandTotal~");
+			oHelperMock.expects("getPrivateAnnotation").withExactArgs("~oGrandTotal~", "copy")
+				.returns(bWithGrandTotalCopy ? "~oGrandTotalCopy~" : undefined);
+			oHelperMock.expects("getPrivateAnnotation").exactly(bWithGrandTotalCopy ? 1 : 0)
+				.withExactArgs("~oGrandTotalCopy~", "predicate")
+				.returns("~oGrandTotalCopyPredicate~");
+			oHelperMock.expects("updateExisting").exactly(bWithGrandTotalCopy ? 1 : 0)
+				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "~oGrandTotalCopyPredicate~",
+					"~oGrandTotalCopy~", "~newGrandTotal~");
+			this.mock(oCache).expects("setGrandTotalOutdated").withExactArgs(false);
 
-		// code under test
-		return oCache.readGrandTotal(oGroupLock).then((oResult) => {
-			assert.strictEqual(oResult, undefined);
+			// code under test
+			return oCache.readGrandTotal(oGroupLock).then((oResult) => {
+				assert.strictEqual(oResult, undefined);
+			});
 		});
 	});
 
@@ -5954,7 +5964,7 @@ sap.ui.define([
 			const oPostBody = {};
 			const oCollectionCache = bInFirstLevel ? oCache.oFirstLevel : oGroupLevelCache;
 			let bNodePropertyCompleted = false;
-			oCacheMock.expects("createCountPromise").withExactArgs(true).exactly(oCountPromise ? 1 : 0)
+			oCacheMock.expects("createCountPromise").exactly(oCountPromise ? 1 : 0).withExactArgs(true)
 				.callsFake(() => {
 					oCache.oCountPromise = {
 						$restore : sinon.spy()

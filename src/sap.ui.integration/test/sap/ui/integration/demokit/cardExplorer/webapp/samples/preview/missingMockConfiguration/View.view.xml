@@ -9,7 +9,7 @@
 	<App >
 		<Page class="sapUiContentPadding" showHeader="false">
 			<f:GridContainer class="sapUiSmallMarginTop">
-				<w:Card id="card1" manifest="./tableCard/manifest.json" previewMode="MockData">
+				<w:Card id="card1" manifest="./tableCard/manifest.json" baseUrl="./tableCard/" previewMode="MockData">
 					<w:layoutData>
 						<f:GridContainerItemLayoutData columns="5" />
 					</w:layoutData>

@@ -80,18 +80,33 @@ sap.ui.define([
 				value: { type: "string", group: "Misc", defaultValue: "" },
 				/**
 				 * The type of the code in the editor used for syntax highlighting.
-				 * Possible types are: abap, abc, actionscript, ada, apache_conf, applescript, asciidoc, assembly_x86,
-				 * autohotkey, batchfile, bro, c9search, c_cpp, cirru, clojure, cobol, coffee, coldfusion, csharp, css,
-				 * curly, d, dart, diff, django, dockerfile, dot, drools, eiffel, ejs, elixir, elm, erlang, forth, fortran,
-				 * ftl, gcode, gherkin, gitignore, glsl, gobstones, golang, groovy, haml, handlebars, haskell, haskell_cabal,
-				 * haxe, hjson, html, html_elixir, html_ruby, ini, io, jack, jade, java, javascript, json, jsoniq, jsp, jsx, julia,
-				 * kotlin, latex, lean, less, liquid, lisp, live_script, livescript, logiql, lsl, lua, luapage, lucene, makefile, markdown,
-				 * mask, matlab, mavens_mate_log, maze, mel, mips_assembler, mipsassembler, mushcode, mysql, nix, nsis, objectivec,
-				 * ocaml, pascal, perl, pgsql, php, plain_text, powershell, praat, prolog, properties, protobuf, python, r,
-				 * razor, rdoc, rhtml, rst, ruby, rust, sass, scad, scala, scheme, scss, sh, sjs, smarty, snippets,
-				 * soy_template, space, sql, sqlserver, stylus, svg, swift, swig, tcl, tex, text, textile, toml, tsx,
-				 * twig, typescript, vala, vbscript, velocity, verilog, vhdl, wollok, xml, xquery, yaml, terraform, slim, redshift,
-				 * red, puppet, php_laravel_blade, mixal, jssm, fsharp, edifact, csp, cssound_score, cssound_orchestra, cssound_document
+				 *
+				 * Possible types are:
+				 * "abap", "abc", "actionscript", "ada", "alda", "apache_conf", "apex", "aql", "asciidoc", "asl", "assembly_arm32", "assembly_x86", "astro", "autohotkey",
+				 * "batchfile", "basic", "bibtex",
+				 * "c_cpp", "c9search", "cirru", "clojure", "cobol", "coffee", "coldfusion", "crystal", "csharp", "csound_document", "csound_orchestra", "csound_score", "css", "curly", "cuttlefish",
+				 * "d", "dart", "diff", "django", "dockerfile", "dot", "drools",
+				 * "edifact", "eiffel", "ejs", "elixir", "elm", "erlang",
+				 * "flix", "forth", "fortran", "fsharp", "fsl", "ftl",
+				 * "gcode", "gherkin", "gitignore", "glsl", "gobstones", "golang", "graphqlschema", "groovy",
+				 * "haml", "handlebars", "haskell", "haskell_cabal", "haxe", "hjson", "html", "html_elixir", "html_ruby",
+				 * "ini", "io", "ion",
+				 * "jack", "jade", "java", "javascript", "jexl", "json", "json5", "jsoniq", "jsp", "jssm", "jsx", "julia",
+				 * "kotlin",
+				 * "latex", "latte", "less", "liquid", "lisp", "livescript", "log", "logiql", "logtalk", "lsl", "lua", "luapage", "lucene",
+				 * "makefile", "markdown", "mask", "matlab", "maze", "mediawiki", "mel", "mips", "mixal", "mushcode", "mysql",
+				 * "nasal", "nginx", "nim", "nix", "nsis", "nunjucks",
+				 * "objectivec", "ocaml", "odin",
+				 * "partiql", "pascal", "perl", "pgsql", "php", "php_laravel_blade", "pig", "plsql", "powershell", "praat", "prisma", "prolog", "properties", "protobuf", "prql", "puppet", "python",
+				 * "qml",
+				 * "r", "raku", "razor", "rdoc", "red", "rhtml", "robot", "rst", "ruby", "rust",
+				 * "sac", "sass", "scad", "scala", "scheme", "scrypt", "scss", "sh", "sjs", "slim", "smarty", "smithy", "snippets", "soy_template", "space", "sparql", "sql", "sqlserver", "stylus", "svg", "swift",
+				 * "tcl", "terraform", "tex", "text", "textile", "toml", "tsx", "turtle", "twig", "typescript",
+				 * "vala", "vbscript", "velocity", "verilog", "vhdl", "visualforce", "vue",
+				 * "wollok",
+				 * "xml", "xquery",
+				 * "yaml",
+				 * "zeek", "zig"
 				 */
 				type: { type: "string", group: "Appearance", defaultValue: "javascript" },
 				/**

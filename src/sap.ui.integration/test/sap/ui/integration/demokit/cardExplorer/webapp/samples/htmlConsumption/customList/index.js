@@ -8,19 +8,19 @@ sap.ui.define([
 
 	  document.querySelectorAll("div[role='list']").forEach((list) => {
 
-		  let listItems = list.querySelectorAll("div[role='listitem']"),
-			  currentLI = 0;
+		  var listItems = list.querySelectorAll("div[role='listitem']");
+		  var currentLI = 0;
 
 		  list.addEventListener("keydown", function (event) {
 
 			  switch (event.keyCode) {
 				  case 38: // Up arrow
-						  listItems[currentLI].setAttribute("tabindex", "-1");
+					  listItems[currentLI].setAttribute("tabindex", "-1");
 
-						  currentLI = currentLI > 0 ? --currentLI : 0;     // Decrease the counter
-						  listItems[currentLI].setAttribute("tabindex", "0");
-						  listItems[currentLI].focus();
-						  break;
+					  currentLI = currentLI > 0 ? --currentLI : 0;     // Decrease the counter
+					  listItems[currentLI].setAttribute("tabindex", "0");
+					  listItems[currentLI].focus();
+					  break;
 				  case 40: // Down arrow
 					  listItems[currentLI].setAttribute("tabindex", "-1");
 
@@ -28,7 +28,7 @@ sap.ui.define([
 					  listItems[currentLI].setAttribute("tabindex", "0");
 					  listItems[currentLI].focus();
 					  break;
-				  }
+			  }
 		  });
 	  });
   }

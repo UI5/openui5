@@ -24575,6 +24575,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// If any property is updated the grand total is marked as outdated (@$ui5.context.isOutdated is
 	// set to true). If the grand total is read again the grand total is marked as "up-to-date"
 	// (@$ui5.context.isOutdated is set to false). Ensure that the outdated flag is also updated in
+	// the copy of the grand total row. Ensure that the updated grand total value is also updated in
 	// the copy of the grand total row.
 	// JIRA: CPOUI5ODATAV4-3392
 	//
@@ -24795,7 +24796,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						Note : "n/a",
 						SalesOrderID : "24"
 					})
-					.expectChange("grossAmount", [`${2 * iBatchNo}`, `${iBatchNo}`, `${iBatchNo}`]);
+					.expectChange("grossAmount",
+						[`${2 * iBatchNo}`, `${iBatchNo}`, `${iBatchNo}`, `${2 * iBatchNo}`]);
 			}
 
 			const [oGrandTotalContext, oContext25, oContext24] = oBinding.getCurrentContexts();
@@ -24836,7 +24838,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					value : [{GrossAmount : "42"}]
 				})
 				.expectChange("lifecycleStatus", [, "Y*"])
-				.expectChange("grossAmount", ["42"]);
+				.expectChange("grossAmount", ["42",,, "42"]);
 
 			await Promise.all([
 				// code under test (JIRA: CPOUI5ODATAV4-3389)
