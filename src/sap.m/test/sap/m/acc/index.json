@@ -618,16 +618,6 @@
 			"appComponent": "CA-UI5-CTR-BAL"
 		},
 		{
-			"control": "sap.m.Table",
-			"url": "../Table.html",
-			"appComponent": "CA-UI5-TBL",
-			"accTest": {
-				"name": "sap.m.Table",
-				"title": "ACC test for sap.m.Table",
-				"module": "./table.qunit"
-			}
-		},
-		{
 			"control": "sap.m.TableSelectDialog",
 			"url": "TableSelectDialog.html",
 			"appComponent": "CA-UI5-CTR-ROD",

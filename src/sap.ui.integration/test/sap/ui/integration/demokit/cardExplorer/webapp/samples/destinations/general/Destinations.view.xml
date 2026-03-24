@@ -4,7 +4,7 @@
 	xmlns:f="sap.f"
 	xmlns:mvc="sap.ui.core.mvc">
 	<f:GridContainer>
-		<w:Card id="card1" manifest="./cardManifest.json">
+		<w:Card id="card1" manifest="./cardManifest.json" baseUrl="./">
 			<w:layoutData>
 				<f:GridContainerItemLayoutData columns="5" />
 			</w:layoutData>

@@ -22,7 +22,7 @@ sap.ui.define([], () => {
 		oRm.openStart("div", oFilterBar);
 		this.addRootDivClasses(oRm, oFilterBar);
 		oRm.openEnd();
-		this.renderFocusSentinel(oRm, oFilterBar);
+		this.renderFirstFocusableElement(oRm, oFilterBar);
 		this.renderToolbar(oRm, oFilterBar);
 		this.renderItems(oRm, oFilterBar);
 
@@ -39,7 +39,7 @@ sap.ui.define([], () => {
 
 	FilterBarLayoutRenderer.renderHintText = function (oRm, oFilterBar) {};
 
-	FilterBarLayoutRenderer.renderFocusSentinel = function (oRm, oFilterBar) {};
+	FilterBarLayoutRenderer.renderFirstFocusableElement = function (oRm, oFilterBar) {};
 
 	FilterBarLayoutRenderer.renderItems = function (oRm, oFilterBar) {
 		throw new Error("Method 'renderItems' is not implemented. Implementation should be provided by child classes.");

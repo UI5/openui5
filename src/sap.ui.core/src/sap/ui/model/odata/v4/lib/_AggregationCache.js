@@ -2263,8 +2263,14 @@ sap.ui.define([
 				undefined, undefined, undefined, undefined, undefined, undefined, undefined,
 				{/*mMergeableQueryOptions*/})
 			.then((oResult) => {
-				_Helper.updateExisting(this.mChangeListeners, "()",
-					this.aElements.$byPredicate["()"], oResult.value[0]);
+				const oGrandTotal = this.aElements.$byPredicate["()"];
+				_Helper.updateExisting(this.mChangeListeners, "()", oGrandTotal, oResult.value[0]);
+				const oGrandTotalCopy = _Helper.getPrivateAnnotation(oGrandTotal, "copy");
+				if (oGrandTotalCopy) {
+					_Helper.updateExisting(this.mChangeListeners,
+						_Helper.getPrivateAnnotation(oGrandTotalCopy, "predicate"), oGrandTotalCopy,
+						oResult.value[0]);
+				}
 				this.setGrandTotalOutdated(false);
 			}, (oError) => {
 				this.setGrandTotalOutdated(true);

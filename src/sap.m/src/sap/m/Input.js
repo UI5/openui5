@@ -2393,9 +2393,14 @@ function(
 	Input.prototype.onfocusout = function (oEvent) {
 		InputBase.prototype.onfocusout.apply(this, arguments);
 
-		// Keep the focused class if focus moves to an element within the Input (e.g., clear icon, value help icon)
-		if (!containsOrEquals(this.getDomRef(), oEvent.relatedTarget)) {
+		var oRelatedTarget = oEvent.relatedTarget,
+			oTokenizer = this.getAggregation && this.getAggregation("tokenizer"),
+			bFocusMovesToTokenizer = oTokenizer && oRelatedTarget && containsOrEquals(oTokenizer.getDomRef(), oRelatedTarget);
+
+		// Keep the focused classес if focus moves to an element within the Input but not to a token within the tokenizer (e.g., clear icon, value help icon)
+		if (!containsOrEquals(this.getDomRef(), oRelatedTarget) || bFocusMovesToTokenizer) {
 			this.removeStyleClass("sapMInputFocused");
+			this.removeStyleClass("sapMFocus");
 		}
 	};
 

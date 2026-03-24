@@ -2,6 +2,9 @@ sap.ui.loader.config({
 	shim: {
 		"sap/ui/codeeditor/js/ace/ext-themelist": {
 			deps: ["sap/ui/codeeditor/js/ace/ace"]
+		},
+		"sap/ui/codeeditor/js/ace/ext-modelist": {
+			deps: ["sap/ui/codeeditor/js/ace/ace"]
 		}
 	}
 });
@@ -17,7 +20,8 @@ sap.ui.require([
 	"sap/m/Select",
 	"sap/ui/core/Item",
 	"sap/ui/codeeditor/js/ace/ace",
-	"sap/ui/codeeditor/js/ace/ext-themelist"
+	"sap/ui/codeeditor/js/ace/ext-themelist",
+	"sap/ui/codeeditor/js/ace/ext-modelist"
 ],  function (
 	ManagedObject,
 	CodeEditor,
@@ -30,24 +34,26 @@ sap.ui.require([
 	Item,
 	ace
 	// ext-themelist
+	// ext-modelist
 ) {
 	"use strict";
 
-	var mValues = {
-		"html": document.getElementById("htmlSample").textContent.trim().replace(/&sol;/g, "/"), // Handling escaped closing script tag sol
-		"javascript": document.getElementById("javascriptSample").textContent,
-		"css": document.getElementById("cssSample").textContent,
-		"xquery": document.getElementById("xquerySample").textContent,
-		"java": document.getElementById("javaSample").textContent,
-		"coffee": document.getElementById("coffeeSample").textContent,
-		"plain_text": document.getElementById("plainText").textContent,
-		"json": document.getElementById("json").textContent,
-		"properties": document.getElementById("i18n.properties").textContent
-	};
+	const aModes = ace.require("ace/ext/modelist").modes;
+	const mModeSnippets = {};
+
+	aModes.forEach((oMode) => {
+		const oSnippetElement = document.getElementById("codeSnippet-" + oMode.name);
+
+		if (!oSnippetElement) {
+			throw new Error("Missing code snippet for: " + oMode.name);
+		}
+
+		mModeSnippets[oMode.name] = oSnippetElement.textContent;
+	});
 
 	var oCodeEditor = new CodeEditor({
 		type: "html",
-		value: ManagedObject.escapeSettingsValue(mValues["html"]),
+		value: ManagedObject.escapeSettingsValue(mModeSnippets["html"]),
 		height: "auto",
 		maxLines: 70,
 		tooltip: "Code editor control"
@@ -70,20 +76,13 @@ sap.ui.require([
 					}),
 					new Label({ text: "type:"}),
 					new Select({
-						items: [
-							new Item({ key: "html", text: "html"}),
-							new Item({ key: "javascript", text: "javascript"}),
-							new Item({ key: "css", text: "css"}),
-							new Item({ key: "xquery", text: "xquery"}),
-							new Item({ key: "coffee", text: "coffee"}),
-							new Item({ key: "plain_text", text: "plain text"}),
-							new Item({ key: "json", text: "json"}),
-							new Item({ key: "properties", text: "i18n.properties"}),
-							new Item({ key: "java", text: "java"})
-						],
+						items: aModes.map(function (mMode) {
+							return new Item({ key: mMode.name, text: mMode.name });
+						}),
+						selectedKey: "html",
 						change: function (e) {
 							var sKey = e.getSource().getSelectedKey();
-							oCodeEditor.setType(sKey).setValue(mValues[sKey]);
+							oCodeEditor.setType(sKey).setValue(mModeSnippets[sKey]);
 						}
 					}),
 					new Label({ text: "colorTheme", showColon: true }),

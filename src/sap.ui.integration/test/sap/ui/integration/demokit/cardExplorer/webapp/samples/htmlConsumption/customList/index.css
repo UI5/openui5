@@ -2,8 +2,3 @@
 	margin: 1rem;
 	width: 25rem;
 }
-
-.layout {
-	display: flex;
-	flex-direction: column;
-}

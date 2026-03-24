@@ -167,8 +167,10 @@ sap.ui.define([
 		 */
 		ConditionsType.prototype.formatValue = function(aConditions, sTargetType) {
 
-			if (aConditions == undefined || aConditions == null || this._bDestroyed) { // if destroyed do nothing
+			if (this._bDestroyed) { // if destroyed do nothing
 				return null;
+			} else if (aConditions == null /* null or undefined */) { // should never happen as condition in FieldBase is an empty Array per default
+				return this._oConditionType.formatValue(null, sTargetType); // as async handling might be called before
 			}
 
 			if (!Array.isArray(aConditions)) {

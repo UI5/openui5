@@ -2782,6 +2782,34 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("Formatting: multiple promises and call with empty condition", (assert) => {
+
+		let oCondition = Condition.createCondition(OperatorName.EQ, ["1"], undefined, undefined, ConditionValidated.Validated);
+		const vResult1 = oConditionType.formatValue(oCondition);
+		assert.ok(vResult1 instanceof Promise, "Promise returned");
+
+		oCondition = Condition.createCondition(OperatorName.EQ, ["2"], undefined, undefined, ConditionValidated.Validated);
+		const vResult2 = oConditionType.formatValue(oCondition);
+		assert.ok(vResult2 instanceof Promise, "Promise returned");
+
+		const vResult3 = oConditionType.formatValue(null);
+		assert.equal(vResult3, null, "null returned");
+
+		fResolve2("Text 2");
+		fResolve1("Text 1");
+
+		// all promises resolved after the last one should return the result of the last one -> at the end the last value is shown
+		return Promise.all([vResult1, vResult2]).then((aResult) => {
+			assert.ok(true, "All promises resolved");
+			assert.equal(aResult[0], null, "Result 1");
+			assert.equal(aResult[1], null, "Result 2");
+			assert.equal(oConditionType._oCalls.last, 0, "Internal Async counter cleared");
+		}).catch((oError) => {
+			assert.notOk(true, "Promise Catch must not be called");
+		});
+
+	});
+
 	QUnit.test("Parsing: multiple promises", (assert) => {
 
 		const vResult1 = oConditionType.parseValue("1");
@@ -2922,6 +2950,32 @@ sap.ui.define([
 			assert.ok(true, "All promises resolved");
 			assert.equal(aResult[0].values[0], "S", "Result 1");
 			assert.equal(aResult[1].values[0], "S", "Result 2");
+			assert.equal(oConditionType._oCalls.last, 0, "Internal Async counter cleared");
+		}).catch((oError) => {
+			assert.notOk(true, "Promise Catch must not be called");
+		});
+
+	});
+
+	QUnit.test("Parsing: multiple promises and empty value", (assert) => {
+
+		const vResult1 = oConditionType.parseValue("1");
+		assert.ok(vResult1 instanceof Promise, "Promise returned");
+
+		const vResult2 = oConditionType.parseValue("2");
+		assert.ok(vResult2 instanceof Promise, "Promise returned");
+
+		const vResult3 = oConditionType.parseValue(null);
+		assert.deepEqual(vResult3, null, "null returned");
+
+		fResolve2({key: "2", description: "Text 2"});
+		fResolve1({key: "1", description: "Text 1"});
+
+		// all promises resolved after the last one should return the result of the last one -> at the end the last value is shown
+		return Promise.all([vResult1, vResult2]).then((aResult) => {
+			assert.ok(true, "All promises resolved");
+			assert.deepEqual(aResult[0], null, "Result 1");
+			assert.deepEqual(aResult[1], null, "Result 2");
 			assert.equal(oConditionType._oCalls.last, 0, "Internal Async counter cleared");
 		}).catch((oError) => {
 			assert.notOk(true, "Promise Catch must not be called");

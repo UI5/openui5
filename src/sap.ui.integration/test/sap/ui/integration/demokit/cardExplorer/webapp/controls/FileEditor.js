@@ -517,11 +517,18 @@ sap.ui.define([
 	};
 
 	FileEditor.prototype.getCardManifestFile = function () {
-		return this._aFiles.find(function (oFile) {
-			if (oFile.name.toLowerCase().endsWith("manifest.json") || oFile.key === "manifestChanges.json") {
-				return oFile;
-			}
+		// search for editable manifest file first
+		let oFile = this._aFiles.find((oFile) => {
+			return oFile.name.toLowerCase().endsWith("manifest.json") && oFile.editable;
 		});
+
+		if (!oFile) {
+			oFile = this._aFiles.find((oFile) => {
+				return oFile.name.toLowerCase().endsWith("manifest.json") || oFile.key === "manifestChanges.json";
+			});
+		}
+
+		return oFile;
 	};
 
 	FileEditor.prototype.setCardManifestContent = function (sValue) {
