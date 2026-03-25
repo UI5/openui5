@@ -361,6 +361,21 @@ sap.ui.define([
 					group: "Misc",
 					defaultValue: "",
 					visibility: "hidden"
+				},
+				/**
+				 * Callback function that can be used to dynamically load variants when the <i>Manage Views</i> dialog is opened.
+				 * The provided function must return a <code>Promise</code>. The management table will be set to busy
+				 * until the returned <code>Promise</code> is resolved.
+				 * If no callback is provided, the management table's busy state will not be affected.
+				 *
+				 * @since 1.147
+				 *
+				 * @private
+	 			 * @ui5-restricted sap.ui.fl, sap.m
+				 */
+				dynamicVariantsLoadedCallback: {
+					type: "function",
+					bindable: false
 				}
 			},
 			defaultAggregation: "items",
@@ -453,11 +468,6 @@ sap.ui.define([
 				 * This event is fired when users presses the cancel button inside <i>Manage Views</i> dialog.
 				 */
 				manageCancel: {},
-
-				/**
-				 * This event is fired when users opens the <i>Manage Views</i> dialog.
-				 */
-				manageOpen: {},
 
 				/**
 				 * This event is fired when users apply changes variant information in the <i>Manage Views</i> dialog.
@@ -2536,15 +2546,12 @@ sap.ui.define([
 		this._clearRenamedItems();
 		this._createManagementDialog();
 
-		//Open dialog before re-binding the table to avoid any delays on the UI
 		this.oManagementDialog.open();
-		this.fireManageOpen();
 
 		if (this.oVariantPopOver) {
 			this.oVariantPopOver.close();
 		}
 
-		this.oManagementTable.setBusy(true);
 		this._suspendManagementTableBinding();
 
 		this._sDefaultKey = this.getDefaultKey();
@@ -2564,8 +2571,17 @@ sap.ui.define([
 		if (this.oManagementTable.getItems().length < 1) {
 			this.oManagementTable.setNoData(this._oNoDataIllustratedMessage);
 		}
-
-		this.oManagementTable.setBusy(false);
+		//Lazy loading of variants
+		const fnCallback = this.dynamicVariantsLoadedCallback;
+		if (typeof fnCallback === "function") {
+			const oResult = fnCallback();
+			if (oResult instanceof Promise) {
+				this.oManagementTable.setBusy(true);
+				oResult.finally(function() {
+					this.oManagementTable.setBusy(false);
+				}.bind(this));
+			}
+		}
 	};
 
 	VariantManagement.prototype._toggleIconActivityState = function(oIcon, oItem, bToInActive) {

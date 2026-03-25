@@ -389,6 +389,20 @@ sap.ui.define([
 			disabledPropertyValue: ListType.Inactive
 		});
 
+		const oNavAction = this._getNavigationAction(mItem.actions);
+
+		if (oNavAction && oNavAction.navigationArrow) {
+			this._oItemTemplate.bindProperty("type", BindingHelper.formattedProperty(
+				[oNavAction.navigationArrow, oNavAction.enabled],
+				function (bNavigation, bEnabled) {
+					if (bEnabled === false) {
+						return ListType.Inactive;
+					}
+					return bNavigation ? ListType.Navigation : ListType.Active;
+				}
+			));
+		}
+
 		this._oActions.attach({
 			area: ActionArea.ContentItem,
 			actions: mItem?.info?.actions,

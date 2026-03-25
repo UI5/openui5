@@ -103,24 +103,21 @@ sap.ui.define([
 	 * @param {object} mData object containing control identifiers and actions
 	 * @param {string} mData.domElementId ID of a dom element from which the control is found (e.g. dom ref)
 	 * @param {string} mData.action name of an action to record in the snippet (e.g. press, enter text)
+	 * @param {string} mData.actionSettings settings for the action contructor
 	 * @param {object} mData.assertion assertion details - property name, type and expected value
 	 * @returns {Promise<string>} resolves with the generated code snippet
 	 */
 	ControlInspector.prototype._getCodeSnippet = function (mData) {
-		var mDataForGenerator = Object.assign({}, mData, {
-			settings: mSelectorSettings
-		});
-		// find a cached selector or generate a new one
-		var mControlSelector = ControlInspectorRepo.findSelector(mData.domElementId);
-		var oSelectorPromise = mControlSelector ? Promise.resolve(mControlSelector) : ControlSelectorGenerator.getSelector(mDataForGenerator);
+		var mControlSelector;
 
-		return oSelectorPromise.then(function (mSelector) {
+		return this.getSelector(mData).then(function (mSelector) {
 			mControlSelector = mSelector;
 			// given the selector, generate a dialect-specific code snippet
 			return CodeSnippetProvider.getSnippet({
 				controlSelector: mSelector,
-				action: mDataForGenerator.action,
-				assertion: mDataForGenerator.assertion,
+				action: mData.action,
+				actionSettings: mData.actionSettings,
+				assertion: mData.assertion,
 				settings: mSelectorSettings
 			});
 		}).then(function (sSnippet) {
@@ -147,6 +144,7 @@ sap.ui.define([
 	 * @param {object} mData object containing control identifiers and actions
 	 * @param {string} mData.domElementId ID of a dom element from which the control is found (e.g. dom ref)
 	 * @param {string} mData.action name of an action to record in the snippet (e.g. press, enter text)
+	 * @param {string} mData.actionSettings settings for the action contructor
 	 * @param {object} mData.assertion assertion details - property name, type and expected value
 	 */
 	ControlInspector.prototype.getCodeSnippet = function (mData) {
@@ -161,6 +159,20 @@ sap.ui.define([
 				domElementId: mData.domElementId
 			});
 		});
+	};
+
+	/**
+	 * find a cached selector or generate a new one
+	 * @param {object} mData object containing control identifiers
+	 * @param {string} mData.domElementId ID of a dom element from which the control is found (e.g. dom ref)
+	 * @returns {Promise<object>} resolves with the control selector
+	 */
+	ControlInspector.prototype.getSelector = function (mData) {
+		var mDataForGenerator = Object.assign({}, mData, {
+			settings: mSelectorSettings
+		});
+		var mControlSelector = ControlInspectorRepo.findSelector(mData.domElementId);
+		return mControlSelector ? Promise.resolve(mControlSelector) : ControlSelectorGenerator.getSelector(mDataForGenerator);
 	};
 
 	/**

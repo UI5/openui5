@@ -8243,6 +8243,7 @@ sap.ui.define([
 			.returns("~key~predicate~");
 		this.mock(oBinding).expects("getModelIndex").withExactArgs(sinon.match.same(oContext))
 			.returns(42);
+		this.mock(oBinding).expects("setOutdated").withExactArgs();
 		this.mock(oBinding).expects("lockGroup").withExactArgs("groupId", "~bLocked~")
 			.returns(oGroupLock);
 		oRefreshSingleExpectation = this.mock(oCache).expects("refreshSingle")
@@ -8421,6 +8422,7 @@ sap.ui.define([
 				this.mock(_Helper).expects("getRelativePath")
 					.withExactArgs("/EMPLOYEES('2')", "/EMPLOYEES")
 					.returns("~key~predicate~");
+				this.mock(oBinding).expects("setOutdated").withExactArgs();
 				oBindingMock.expects("lockGroup")
 					.withExactArgs("groupId", "~bLocked~").returns(oGroupLock);
 				oExpectation = this.mock(oCache).expects("refreshSingleWithRemove")
@@ -8530,6 +8532,7 @@ sap.ui.define([
 		this.mock(_Helper).expects("getRelativePath")
 			.withExactArgs("~context~path~", "~header~context~path~")
 			.returns("~key~predicate~");
+		this.mock(oBinding).expects("setOutdated").withExactArgs();
 		this.mock(oBinding).expects("lockGroup").withExactArgs("groupId", "~bLocked~")
 			.returns(oGroupLock);
 		oExpectation = this.mock(oCache).expects("refreshSingleWithRemove")
@@ -8578,6 +8581,7 @@ sap.ui.define([
 		this.mock(_Helper).expects("getRelativePath")
 			.withExactArgs("/EMPLOYEES('2')", "/EMPLOYEES")
 			.returns("~key~predicate~");
+		this.mock(oBinding).expects("setOutdated").withExactArgs();
 		this.mock(oBinding).expects("lockGroup").withExactArgs("groupId", undefined)
 			.returns(oGroupLock);
 		this.mock(oCache).expects("refreshSingle")
@@ -8617,6 +8621,7 @@ sap.ui.define([
 				.returns("~key~predicate~");
 			this.mock(oBinding).expects("getModelIndex").withExactArgs(sinon.match.same(oContext))
 				.returns(42);
+			this.mock(oBinding).expects("setOutdated").withExactArgs();
 			this.mock(oBinding).expects("lockGroup").withExactArgs("groupId", undefined)
 				.returns(oGroupLock);
 			oExpectation = this.mock(oCache).expects("refreshSingle")
@@ -8667,6 +8672,7 @@ sap.ui.define([
 			});
 		this.mock(oBinding).expects("getModelIndex").withExactArgs(sinon.match.same(oContext))
 			.returns(-1);
+		this.mock(oBinding).expects("setOutdated").never();
 		this.mock(oBinding).expects("fireDataRequested").never();
 		this.mock(oBinding).expects("fireDataReceived").never();
 		this.mock(this.oModel).expects("reportError").never();
@@ -9153,6 +9159,7 @@ sap.ui.define([
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
 
 		this.mock(oBinding).expects("lockGroup").never();
+		this.mock(oBinding).expects("setOutdated").never();
 		oCacheMock.expects("requestSideEffects").never();
 		this.mock(oBinding).expects("refreshInternal").withExactArgs("", sGroupId, false, true)
 			.rejects(oError);
@@ -9184,6 +9191,7 @@ sap.ui.define([
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").never();
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
+		this.mock(oBinding).expects("setOutdated").never();
 		oCacheMock.expects("requestSideEffects").never();
 		this.mock(oContext).expects("getPath").withExactArgs().returns("/Set('42')");
 		this.mock(this.oModel).expects("withUnresolvedBindings")
@@ -9218,6 +9226,7 @@ sap.ui.define([
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs("group").returns(true);
 		oCacheMock.expects("getPendingRequestsPromise").never();
+		this.mock(oBinding).expects("setOutdated").never();
 		oCacheMock.expects("requestSideEffects").never();
 		this.mock(oBinding).expects("refreshSingle").never();
 
@@ -9279,6 +9288,7 @@ sap.ui.define([
 			oResult = {};
 
 		oBinding.iCurrentEnd = 42;
+		this.mock(oBinding).expects("setOutdated").never();
 		this.mock(oBinding).expects("refreshSingle").never();
 		this.mock(oBinding).expects("refreshInternal").withExactArgs("", "group", false, true)
 			.resolves(oResult);
@@ -9300,6 +9310,7 @@ sap.ui.define([
 			.withExactArgs().returns(false);
 		this.mock(this.oModel).expects("withUnresolvedBindings")
 			.withExactArgs("removeCachesAndMessages", "EMPLOYEES('42')");
+		this.mock(oBinding).expects("setOutdated").never();
 		this.mock(oBinding).expects("refreshSingle")
 			.withExactArgs(sinon.match.same(oContext), "group", /*bLocked*/false,
 				/*bAllowRemoval*/false, /*bKeepCacheOnError*/true, /*bWithMessages*/true)
@@ -9370,6 +9381,7 @@ sap.ui.define([
 			.withExactArgs(bHeader ? "~aContexts~" : [oContext]).returns("~aPredicates~");
 		this.mock(oBinding).expects("lockGroup").exactly(bHasCache ? 1 : 0)
 			.withExactArgs(sGroupId).returns(oGroupLock);
+		this.mock(oBinding).expects("setOutdated").withExactArgs();
 		oCacheMock.expects("requestSideEffects").exactly(bHasCache ? 1 : 0)
 			.withExactArgs(sinon.match.same(oGroupLock), sinon.match.same(aPaths), "~aPredicates~",
 				!bHeader, !bHeader)
@@ -9428,6 +9440,7 @@ sap.ui.define([
 		this.mock(_Helper).expects("getPredicates").withExactArgs("~aContexts~")
 			.returns(null); // no key predicates
 		this.mock(oBinding).expects("lockGroup").never();
+		this.mock(oBinding).expects("setOutdated").never();
 		oCacheMock.expects("requestSideEffects").never();
 		this.mock(oBinding).expects("refreshInternal").withExactArgs("", sGroupId, false, true)
 			.rejects(oError);
@@ -9457,6 +9470,7 @@ sap.ui.define([
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs("group").returns(false);
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
 		this.mock(oBinding).expects("lockGroup").never();
+		this.mock(oBinding).expects("setOutdated").never();
 		oCacheMock.expects("requestSideEffects").never();
 		this.mock(oBinding).expects("refreshInternal").never();
 
@@ -9491,6 +9505,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation),
 				sinon.match.same(aFilters), sinon.match.same(aPaths))
 			.returns(bRefresh);
+		this.mock(oBinding).expects("setOutdated").never();
 		this.mock(oBinding).expects("refreshInternal").exactly(bRefresh ? 1 : 0)
 			.withExactArgs("", "group", false, true)
 			.returns(oRefreshPromise);
@@ -9516,6 +9531,7 @@ sap.ui.define([
 		const oContext = Context.create({/*oModel*/}, oBinding, "/Set('42')");
 		this.mock(oContext).expects("isAggregated").never();
 		this.mock(oBinding).expects("refreshSingle").never();
+		this.mock(oBinding).expects("setOutdated").never();
 		this.mock(oBinding.oCache).expects("requestSideEffects").never();
 		this.mock(oBinding).expects("refreshInternal").never();
 		this.mock(_AggregationHelper).expects("isAffected").never();
@@ -9534,6 +9550,7 @@ sap.ui.define([
 			.returns(true);
 		const oContext = Context.create({/*oModel*/}, oBinding, "/Set('42')");
 		this.mock(oContext).expects("isAggregated").withExactArgs().returns(true);
+		this.mock(oBinding).expects("setOutdated").never();
 		this.mock(oBinding).expects("refreshSingle").never();
 		this.mock(oBinding.oCache).expects("requestSideEffects").never();
 		this.mock(oBinding).expects("refreshInternal").never();
@@ -10314,9 +10331,18 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("doSetProperty", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		this.mock(oBinding).expects("setOutdated").withExactArgs();
+
+		// code under test
+		assert.strictEqual(oBinding.doSetProperty(), undefined);
+	});
+
+	//*********************************************************************************************
 [false, true].forEach((bDataAggregation) => {
 	[false, true].forEach((bWithAggregationCache) => {
-		const sTitle = "doSetProperty: returns undefined, bDataAggregation="
+		const sTitle = "setOutdated: returns undefined, bDataAggregation="
 			+ bDataAggregation + ", bWithAggregationCache=" + bWithAggregationCache;
 
 	QUnit.test(sTitle, function (assert) {
@@ -10333,7 +10359,7 @@ sap.ui.define([
 			.exactly(bDataAggregation ? 1 : 0);
 
 		// code under test
-		assert.strictEqual(oBinding.doSetProperty(), undefined);
+		assert.strictEqual(oBinding.setOutdated(), undefined);
 	});
 	});
 });

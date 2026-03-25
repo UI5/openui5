@@ -23,16 +23,13 @@ sap.ui.define([
 		storage: window.localStorage
 	});
 
-	LocalStorageConnector.loadFeatures = function(...aArgs) {
-		return ObjectStorageConnector.loadFeatures.apply(this, aArgs)
-		.then(function(oFeatures) {
-			return merge({
-				isPublicLayerAvailable: true,
-				isPublicFlVariantEnabled: true,
-				isVariantAdaptationEnabled: true,
-				isCondensingEnabled: false
-			}, oFeatures);
-		});
+	LocalStorageConnector.loadFeatures = async function(...aArgs) {
+		const oFeatures = await ObjectStorageConnector.loadFeatures.apply(this, aArgs);
+		return merge({
+			isPublicLayerAvailable: true,
+			isPublicFlVariantEnabled: true,
+			isVariantAdaptationEnabled: true
+		}, oFeatures);
 	};
 
 	return LocalStorageConnector;

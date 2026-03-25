@@ -83,8 +83,46 @@ sap.ui.define([
 
 	const oModel = new JSONModel(oData);
 
+	// --- Lazy Loading: Simulated dynamic variants ---
+	// These variants will be loaded dynamically when the Manage Views dialog is opened
+	const oDynamicVariants = [
+		{
+			key: "variantLazy1",
+			title: "Lazy Loaded View 1",
+			visible: true,
+			favorite: false,
+			executeOnSelect: false,
+			sharing: "Private",
+			contexts: { role: [] },
+			author: "Dynamic User",
+			remove: true,
+			rename: true,
+			changeable: true
+		},
+		{
+			key: "variantLazy2",
+			title: "Lazy Loaded View 2",
+			visible: true,
+			favorite: true,
+			executeOnSelect: false,
+			sharing: "Public",
+			contexts: { role: ["ADMIN"] },
+			author: "Dynamic User",
+			remove: true,
+			rename: true,
+			changeable: true
+		}
+	];
+
+	let bDynamicVariantsLoaded = false;
+
 	// --- Status Text (shows current selection) ---
 	const oStatusText = new Text("statusText", { text: "Selected variant: Standard (variant1)" });
+
+	// --- Lazy Loading Status Text ---
+	const oLazyLoadStatusText = new Text("lazyLoadStatusText", {
+		text: "Lazy Loading: Not triggered yet. Open 'Manage Views' dialog to load additional variants."
+	}).addStyleClass("sapUiSmallMarginTop");
 
 	// --- Mock Roles Component Container ---
 	// The VariantManagement control expects _oRolesComponentContainer to be a UI control
@@ -164,6 +202,31 @@ sap.ui.define([
 		supportContexts: false,
 		showSaveAs: true,
 		creationAllowed: true,
+		// Lazy loading callback: loads additional variants dynamically when Manage Views dialog is opened
+		dynamicVariantsLoadedCallback: () => {
+			// Simulate async loading with a Promise
+			return new Promise((resolve) => {
+				oLazyLoadStatusText.setText("Lazy Loading: Loading additional variants... (simulating network delay)");
+				setTimeout(() => {
+					if (!bDynamicVariantsLoaded) {
+						// Add dynamic variants to the model
+						const aVariants = oModel.getProperty("/variants");
+						aVariants.push(...oDynamicVariants);
+						oModel.setProperty("/variants", aVariants);
+						bDynamicVariantsLoaded = true;
+
+						// Force model refresh to update the management table binding
+						oModel.refresh(true);
+
+						oLazyLoadStatusText.setText("Lazy Loading: ✓ Successfully loaded 2 additional variants!");
+						MessageToast.show("Lazy loaded 2 additional variants!");
+					} else {
+						oLazyLoadStatusText.setText("Lazy Loading: ✓ Already loaded (callback called again)");
+					}
+					resolve();
+				}, 1500); // Simulate 1.5 second loading delay
+			});
+		},
 		items: {
 			path: "/variants",
 			template: new VariantItem({
@@ -328,6 +391,21 @@ sap.ui.define([
 		}
 	});
 
+	// --- Reset Lazy Loading Button ---
+	const oResetLazyLoadButton = new Button("resetLazyLoadBtn", {
+		text: "Reset Lazy Loading Demo",
+		icon: "sap-icon://refresh",
+		press: () => {
+			// Remove lazy-loaded variants
+			const aVariants = oModel.getProperty("/variants");
+			const aFiltered = aVariants.filter((v) => !v.key.startsWith("variantLazy"));
+			oModel.setProperty("/variants", aFiltered);
+			bDynamicVariantsLoaded = false;
+			oLazyLoadStatusText.setText("Lazy Loading: Reset complete. Open 'Manage Views' dialog to load additional variants.");
+			MessageToast.show("Lazy loading demo reset - open Manage Views dialog to load variants again");
+		}
+	});
+
 	// --- Model Data Table ---
 	const oDataTable = new Table("dataTable", {
 		headerToolbar: new Toolbar("dataTable-toolbar", {
@@ -411,10 +489,18 @@ sap.ui.define([
 
 	// --- Page Layout ---
 	const oPage = new Page("page", {
-		title: "sap.m.VariantManagement \u2013 JSONModel Sample",
+		title: "sap.m.VariantManagement \u2013 JSONModel Sample with Lazy Loading",
 		content: [
 			new VBox("layout", {
-				items: [oVariantManagement, oOpenManageButton, oOpenSaveAsButton, oDirtyButton, oStatusText],
+				items: [
+					oVariantManagement,
+					oOpenManageButton,
+					oOpenSaveAsButton,
+					oDirtyButton,
+					oResetLazyLoadButton,
+					oStatusText,
+					oLazyLoadStatusText
+				],
 				alignItems: "Start"
 			}).addStyleClass("sapUiMediumMargin"),
 			oDataTable

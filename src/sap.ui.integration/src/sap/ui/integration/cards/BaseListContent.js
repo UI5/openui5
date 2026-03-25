@@ -346,6 +346,18 @@ sap.ui.define([
 		return Object.getOwnPropertyNames(oData).length;
 	};
 
+	/**
+	 * Returns the first action if it is of type "Navigation"; otherwise, it returns undefined.
+	 * Only one action is supported.
+	 *
+	 * @protected
+	 * @param {Array} aActions The actions array from the item/row configuration.
+	 * @returns {Object|undefined} The navigation action or undefined.
+	 */
+	BaseListContent.prototype._getNavigationAction = function (aActions) {
+		return aActions && aActions[0] && aActions[0].type === "Navigation" ? aActions[0] : undefined;
+	};
+
 	BaseListContent.prototype.ontap = function (oEvent) {
 		oEvent.stopPropagation();
 	};

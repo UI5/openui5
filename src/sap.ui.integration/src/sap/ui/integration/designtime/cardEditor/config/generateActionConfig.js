@@ -82,6 +82,13 @@ sap.ui.define([
 					"defaultValue": "_blank",
 					"path": "target",
 					"visible": "{= !!${enabled} && ${type} === 'Navigation' && !!${url}}"
+				},
+				"navigationArrow": {
+					"label": "{i18n>CARD_EDITOR.ACTION.NAVIGATION_ARROW}",
+					"type": "boolean",
+					"defaultValue": false,
+					"path": "navigationArrow",
+					"visible": "{= !!${enabled} && ${type} === 'Navigation'}"
 				}
 			}
 		}, oCustomConfig);

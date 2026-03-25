@@ -18,12 +18,17 @@ sap.ui.define([
 	 * @param {object} mData data from which to generate a snippet
 	 * @param {object} mData.controlSelector control selector in string format
 	 * @param {string} mData.action name of the action to record for the control
+	 * @param {object} mData.actionSettings options for the action contructor
 	 * @param {object} mData.assertion assertion details - property name, type and expected value
 	 * @returns {string} a stringified code snippet
 	 */
 	OPA5ControlSnippetGenerator.prototype._generate = function (mData) {
 		var sIdSuffix = mData.controlSelector.interaction && mData.controlSelector.interaction.idSuffix;
-		var sAction = this._getActionAsString(mData.action, sIdSuffix);
+		var oActionSettings = mData.actionSettings || {};
+		if (sIdSuffix) {
+			oActionSettings.idSuffix = sIdSuffix;
+		}
+		var sAction = this._getActionAsString(mData.action, oActionSettings);
 		var sAssertion = this._getAssertionAsString(mData.assertion);
 
 		if (sAction) {
@@ -42,17 +47,24 @@ sap.ui.define([
 		return "this.waitFor(" + sFullSelector + ");";
 	};
 
-	OPA5ControlSnippetGenerator.prototype._getActionAsString = function (sAction, sIdSuffix) {
-		sIdSuffix = sIdSuffix ? 'idSuffix: "' + sIdSuffix + '"' : "";
-		var sParams;
+	/**
+	 * @param {string} sAction name of the action to record for the control
+	 * @param {object} oSettings settings for the action constructor
+	 * @returns {string} a stringified code snippet for the action
+	 */
+	OPA5ControlSnippetGenerator.prototype._getActionAsString = function (sAction, oSettings) {
+		oSettings = oSettings || {};
+
 		switch (sAction) {
 			case Commands.PRESS:
-				sParams = sIdSuffix && "{\n" + this._getIndentation(3) + sIdSuffix + "\n" + this._getIndentation(2) + "}";
-				return "new Press(" + sParams + ")";
+				return "new Press(" + this._getSettingsAsString(oSettings, 2) + ")";
+
 			case Commands.ENTER_TEXT:
-				sParams = "{\n" + this._getIndentation(2) + (sIdSuffix && sIdSuffix + ",\n" + this._getIndentation(2)) +
-					'text: "test"' + "\n" + this._getIndentation(1) + "}";
-				return "new EnterText(" + sParams + ")";
+				if (oSettings.text === undefined) {
+					oSettings.text = "test";
+				}
+				return "new EnterText(" + this._getSettingsAsString(oSettings, 2) + ")";
+
 			default: return "";
 		}
 	};
@@ -71,6 +83,17 @@ sap.ui.define([
 		} else {
 			return "";
 		}
+	};
+
+	OPA5ControlSnippetGenerator.prototype._getSettingsAsString = function (oSettings, iIndentationLevel) {
+		if (!oSettings || Object.keys(oSettings).length === 0) {
+			return "";
+		}
+		return "{\n" + this._getIndentation(iIndentationLevel) +
+			Object.keys(oSettings).map(function(sKey) {
+				return sKey + ': "' + oSettings[sKey] + '"';
+			}).join(",\n" + this._getIndentation(iIndentationLevel + 1)) +
+			"\n" + this._getIndentation(iIndentationLevel - 1) + "}";
 	};
 
 	OPA5ControlSnippetGenerator.prototype._getSelectorWithAction = function (sSelector, sAction) {
