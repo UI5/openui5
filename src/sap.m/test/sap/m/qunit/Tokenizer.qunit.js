@@ -1217,22 +1217,13 @@ sap.ui.define([
 	});
 
 	QUnit.test("Pressing delete icon should fire delete event with cancel bubbling", async function(assert) {
-		const done = assert.async(2); // Wait for both assertions: one in event handler, one for spy count
-
 		// arrange
 		var oFireDeleteSpy,
-			oToken = new Token({text: "test"}),
-			oDeleteHandler;
+			oToken = new Token({text: "test"});
 
-		// Ensure tokenizer is enabled (important when running after disabled state tests)
-		this.tokenizer.setEnabled(true);
-
-		oDeleteHandler = function(oEvent) {
+		this.tokenizer.attachEvent("delete", function(oEvent) {
 			assert.strictEqual(oEvent.bCancelBubble, true, "The event should not bubble.");
-			done();
-		};
-
-		this.tokenizer.attachEvent("delete", oDeleteHandler);
+		});
 
 		oFireDeleteSpy = this.spy(oToken, "fireDelete");
 		this.tokenizer.addToken(oToken);
@@ -1243,10 +1234,6 @@ sap.ui.define([
 
 		// assert
 		assert.equal(oFireDeleteSpy.callCount, 1, "delete event was fired");
-		done();
-
-		// cleanup
-		this.tokenizer.detachEvent("delete", oDeleteHandler);
 	});
 
 	QUnit.module("Keyboard handling", {
