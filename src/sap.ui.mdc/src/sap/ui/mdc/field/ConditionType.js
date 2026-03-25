@@ -150,8 +150,16 @@ sap.ui.define([
 		ConditionType.prototype.formatValue = function(oCondition, sTargetType) {
 
 			let oType = this._getValueType();
-			if (oCondition == undefined || oCondition == null || this._bDestroyed) { // if destroyed do nothing
+
+			if (this._bDestroyed) { // if destroyed do nothing
+				return null;
+			} else if (oCondition == null /* null or undefined */) {
 				_attachCurrentValueAtType.call(this, oCondition, oType); // initialize current value
+				if (this._oCalls.active > 0) { // active async changes -> use async update-logic
+					this._oCalls.active++;
+					this._oCalls.last++;
+					return _returnResult.call(this, null, undefined, this._oCalls.last, true, oType);
+				}
 				return null;
 			}
 
@@ -248,6 +256,10 @@ sap.ui.define([
 
 		function _formatToString(oCondition, oType, oAdditionalType) {
 
+			if (!oCondition) {
+				return null;
+			}
+
 			const sDisplay = this._getDisplay();
 			const bIsUnit = this._isUnit(oType);
 
@@ -291,7 +303,7 @@ sap.ui.define([
 			}
 
 			if (iCallCount === this._oCalls.last && this._oCalls.active > 0) {
-				this._oCalls.condition = merge({}, oCondition); // don't use same object
+				this._oCalls.condition = oCondition ? merge({}, oCondition) : null; // don't use same object
 				this._oCalls.exception = oException;
 			} else if (this._oCalls.active === 0 && this._oCalls.last > 0) { // no pending calls -> clean up
 				this._oCalls = { active: 0, last: 0, condition: undefined, exception: undefined };
@@ -438,8 +450,13 @@ sap.ui.define([
 			const bIsUnit = this._isUnit(oType);
 			let sDefaultOperator;
 
-			if (vValue === null || vValue === undefined || (vValue === "" && !bInputValidationEnabled)) { // check if "" is a key in ValueHelp
+			if (vValue == null /* null or undefined */ || (vValue === "" && !bInputValidationEnabled)) { // check if "" is a key in ValueHelp
 				if (!this._isCompositeType(oType)) {
+					if (this._oCalls.active > 0) { // active async changes -> use async update-logic
+						this._oCalls.active++;
+						this._oCalls.last++;
+						return _returnResult.call(this, null, undefined, this._oCalls.last, false, oType);
+					}
 					return null; // TODO: for all types???
 				}
 			}
