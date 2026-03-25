@@ -3415,6 +3415,17 @@
             }
           ]
         },
+        "navigationArrow": {
+          "description": "Indicates whether a navigation arrow is shown for the item or row. Applicable only to actions of type Navigation.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
         "enabled": {
           "description": "Represents the state of the action",
           "oneOf": [

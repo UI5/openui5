@@ -733,6 +733,112 @@ sap.ui.define([
 		assert.equal(aCellsThirdRow[2].getShowStateIcon(), oManifestData[2].showStateIcon, "Should have 'showStateIcon' correctly set to " + oManifestData[2].showStateIcon);
 	});
 
+	QUnit.test("Navigation arrow - shown when navigationArrow is true on a Navigation action", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": { "id": "table.card.test.navigationArrow" },
+			"sap.card": {
+				"type": "Table",
+				"data": {
+					"json": [
+						{ "product": "Item 1", "hasNavigation": true },
+						{ "product": "Item 2", "hasNavigation": false },
+						{ "product": "Item 3", "hasNavigation": true }
+					]
+				},
+				"content": {
+					"row": {
+						"actions": [{
+							"type": "Navigation",
+							"navigationArrow": "{hasNavigation}",
+							"enabled": "{hasNavigation}",
+							"parameters": { "url": "https://www.sap.com" }
+						}],
+						"columns": [{ "title": "Product", "value": "{product}" }]
+					}
+				}
+			}
+		};
+
+		// Act
+		this.oCard.setManifest(oManifest);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const aRows = this.oCard.getCardContent().getAggregation("_content").getItems();
+
+		// Assert
+		assert.ok(aRows[0].getDomRef("imgNav"), "Row with navigationArrow:true should render the navigation arrow");
+		assert.notOk(aRows[1].getDomRef("imgNav"), "Row with navigationArrow:false should not render the navigation arrow");
+		assert.ok(aRows[2].getDomRef("imgNav"), "Row with navigationArrow:true should render the navigation arrow");
+	});
+
+	QUnit.test("Navigation arrow - not shown when navigationArrow is absent", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": { "id": "table.card.test.navigationArrow.absent" },
+			"sap.card": {
+				"type": "Table",
+				"data": { "json": [{ "product": "Item 1" }] },
+				"content": {
+					"row": {
+						"actions": [{
+							"type": "Navigation",
+							"parameters": { "url": "https://www.sap.com" }
+						}],
+						"columns": [{ "title": "Product", "value": "{product}" }]
+					}
+				}
+			}
+		};
+
+		// Act
+		this.oCard.setManifest(oManifest);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const aRows = this.oCard.getCardContent().getAggregation("_content").getItems();
+
+		// Assert
+		assert.notOk(aRows[0].getDomRef("imgNav"), "Row without navigationArrow should not render the navigation arrow");
+	});
+
+	QUnit.test("Navigation arrow - not shown when enabled is false", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": { "id": "table.card.test.navigationArrow.disabled" },
+			"sap.card": {
+				"type": "Table",
+				"data": { "json": [{ "product": "Item 1" }] },
+				"content": {
+					"row": {
+						"actions": [{
+							"type": "Navigation",
+							"navigationArrow": true,
+							"enabled": false,
+							"parameters": { "url": "https://www.sap.com" }
+						}],
+						"columns": [{ "title": "Product", "value": "{product}" }]
+					}
+				}
+			}
+		};
+
+		// Act
+		this.oCard.setManifest(oManifest);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const aRows = this.oCard.getCardContent().getAggregation("_content").getItems();
+
+		// Assert
+		assert.notOk(aRows[0].getDomRef("imgNav"), "Row with enabled:false should not render the navigation arrow even if navigationArrow is true");
+		assert.strictEqual(aRows[0].getType(), "Inactive", "Row with enabled:false should have Inactive type");
+	});
+
 	QUnit.test("Visible columns", async function (assert) {
 		// Act
 		this.oCard.setManifest(oManifest_TableCard_Visible);

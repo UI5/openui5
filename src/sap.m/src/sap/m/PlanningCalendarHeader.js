@@ -605,6 +605,19 @@ function(
 					priority: library.OverflowToolbarPriority.High
 				})
 			});
+			if (!this._segmentedButtonAriaDelegateAdded) {
+				this._oViewSwitch.addEventDelegate({
+					onAfterRendering: function () {
+						const bIsSelectMode = this._bInOverflow || this.hasStyleClass("sapMSegBSelectWrapper");
+						if (!bIsSelectMode) {
+							this.getDomRef()?.setAttribute("aria-labelledby", InvisibleText.getStaticId("sap.m", "PCH_VIEW_SWITCH"));
+						} else {
+							this.getDomRef()?.removeAttribute("aria-labelledby");
+						}
+					}
+				}, this._oViewSwitch);
+				this._segmentedButtonAriaDelegateAdded = true;
+			}
 			this._oViewSwitch.attachEvent("selectionChange", this._handleViewSwitchChange, this);
 			this.addDependent(this._oViewSwitch);
 		}

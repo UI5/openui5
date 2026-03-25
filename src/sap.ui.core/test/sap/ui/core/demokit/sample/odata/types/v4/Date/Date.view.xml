@@ -14,6 +14,14 @@
 	<Page id="page" floatingFooter="true" showHeader="false"
 		title="Example how to use OData V4 Edm.Date in SAPUI5 applications">
 	<VBox width="100%">
+		<MessageStrip class="sapUiResponsiveMargin"
+			enableFormattedText="true"
+			showIcon="true"
+			text="- This sample uses a JSON model to keep the structure simple. For productive apps,
+				we strongly recommend using the OData V4 model.&lt;br&gt;- OData types can also be
+				used without the OData models. The prerequisite is that the data format matches the
+				expected serialization format of OData."
+			type="Information" />
 		<form:SimpleForm class="sapUiResponsiveMargin" columnsL="1" columnsM="1" editable="true"
 				labelSpanL="3" labelSpanM="3" layout="ResponsiveGridLayout" width="auto">
 			<form:toolbar>

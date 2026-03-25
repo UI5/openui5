@@ -14,57 +14,57 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.m.Sticky
-	var Sticky = mobileLibrary.Sticky;
+	const Sticky = mobileLibrary.Sticky;
 
-	var fChangeApplyAutomatic = async function(oManagementTable, iRow, vValue) {
-		var aItems = oManagementTable.getItems();
-		var aCells = aItems[iRow].getCells();
+	const fChangeApplyAutomatic = async function(oManagementTable, iRow, vValue) {
+		const aItems = oManagementTable.getItems();
+		const aCells = aItems[iRow].getCells();
 
-		var oExec = aCells[4].getFocusDomRef();
+		const oExec = aCells[4].getFocusDomRef();
 		QUnitUtils.triggerTouchEvent("tap", oExec, {
 			srcControl: null
 		});
 		await nextUIUpdate();
 	};
 
-	var fChangeDefault = async function(oManagementTable, iRow, vValue) {
-		var aItems = oManagementTable.getItems();
-		var aCells = aItems[iRow].getCells();
+	const fChangeDefault = async function(oManagementTable, iRow, vValue) {
+		const aItems = oManagementTable.getItems();
+		const aCells = aItems[iRow].getCells();
 
-		var oDefault = aCells[3].getFocusDomRef();
+		const oDefault = aCells[3].getFocusDomRef();
 		QUnitUtils.triggerTouchEvent("tap", oDefault, {
 			srcControl: null
 		});
 		await nextUIUpdate();
 	};
 
-	var fChangeDelete = async function(oManagementTable, iRow, vValue) {
-		var aItems = oManagementTable.getItems();
-		var aCells = aItems[iRow].getCells();
+	const fChangeDelete = async function(oManagementTable, iRow, vValue) {
+		const aItems = oManagementTable.getItems();
+		const aCells = aItems[iRow].getCells();
 
-		var oDelete = aCells[7].getFocusDomRef();
+		const oDelete = aCells[7].getFocusDomRef();
 		QUnitUtils.triggerTouchEvent("tap", oDelete, {
 			srcControl: null
 		});
 		await nextUIUpdate();
 	};
 
-	var fChangeFavorite = async function(oManagementTable, iRow, vValue) {
-		var aItems = oManagementTable.getItems();
-		var aCells = aItems[iRow].getCells();
+	const fChangeFavorite = async function(oManagementTable, iRow, vValue) {
+		const aItems = oManagementTable.getItems();
+		const aCells = aItems[iRow].getCells();
 
-		var oFavorite = aCells[0].getFocusDomRef();
+		const oFavorite = aCells[0].getFocusDomRef();
 		QUnitUtils.triggerTouchEvent("click", oFavorite, {
 			srcControl: null
 		});
 		await nextUIUpdate();
 	};
 
-	var fChangeTitle = async function(oManagementTable, iRow, vValue, bFocusOut) {
-		var aItems = oManagementTable.getItems();
-		var aCells = aItems[iRow].getCells();
+	const fChangeTitle = async function(oManagementTable, iRow, vValue, bFocusOut) {
+		const aItems = oManagementTable.getItems();
+		const aCells = aItems[iRow].getCells();
 
-		var oInput = aCells[1];
+		const oInput = aCells[1];
 		oInput.focus();
 		oInput.$("inner").val(vValue);
 		if (bFocusOut) {
@@ -112,7 +112,7 @@ sap.ui.define([
 		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One"}));
 		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 
-		var oTitle = Element.getElementById(this.oVM.getId() + "-text");
+		const oTitle = Element.getElementById(this.oVM.getId() + "-text");
 		assert.ok(oTitle);
 		assert.equal(oTitle.getText(), "", "expected no text");
 
@@ -132,7 +132,7 @@ sap.ui.define([
 
 		assert.equal(this.oVM.getTitle().getText(), "Two", "expected text");
 
-		var aItems = this.oVM.getItems();
+		const aItems = this.oVM.getItems();
 		assert.equal(aItems.length, 2, "expected items found");
 
 		aItems[1].setTitle("Hugo");
@@ -160,8 +160,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("VariantManagement check _IsItemDeleted", function(assert) {
-		var oVMI1 = new VariantItem("VMI1", {key: "1", title:"One"});
-		var oVMI2 = new VariantItem("VMI2", {key: "2", title:"Two"});
+		const oVMI1 = new VariantItem("VMI1", {key: "1", title:"One"});
+		const oVMI2 = new VariantItem("VMI2", {key: "2", title:"Two"});
 
 		this.oVM._clearDeletedItems();
 		this.oVM._addDeletedItem(oVMI1);
@@ -293,9 +293,9 @@ sap.ui.define([
 
 		this.oVM.setPopoverTitle("My List");
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
 
 			fOriginalCall(oEvent);
@@ -334,9 +334,9 @@ sap.ui.define([
 		this.oVM.addItem(new VariantItem("VMI4", {key: "4", title:"Four", favorite: false}));
 		this.oVM.setSelectedKey("2");
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
 
 			fOriginalCall(oEvent);
@@ -359,10 +359,10 @@ sap.ui.define([
 		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 
-		var bSelectCalled = false;
+		let bSelectCalled = false;
 
 		this.oVM.attachSelect(function(oEvent) {
-			var mParameters = oEvent.getParameters();
+			const mParameters = oEvent.getParameters();
 
 			assert.ok(mParameters);
 			assert.equal(mParameters.key, "1", "key expected");
@@ -385,10 +385,10 @@ sap.ui.define([
 		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two"}));
 		this.oVM.setSelectedKey("2");
 
-		var done = assert.async();
+		const done = assert.async();
 
 		this.oVM.attachSelect(function(oEvent) {
-			var mParameters = oEvent.getParameters();
+			const mParameters = oEvent.getParameters();
 
 			assert.ok(mParameters);
 			assert.equal(mParameters.key, "1", "key expected");
@@ -407,10 +407,10 @@ sap.ui.define([
 		this.oVM.setSelectedKey("2");
 		this.oVM.setModified(true);
 
-		var done = assert.async();
+		const done = assert.async();
 
 		this.oVM.attachSave(function(oEvent) {
-			var mParameters = oEvent.getParameters();
+			const mParameters = oEvent.getParameters();
 
 			assert.ok(mParameters);
 			assert.equal(mParameters.key, "2", "key expected");
@@ -419,7 +419,7 @@ sap.ui.define([
 			done();
 		});
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
@@ -427,7 +427,7 @@ sap.ui.define([
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			assert.ok(this.oVM.oVariantSaveBtn.getVisible(), "should be visible");
 
-			var oTarget = this.oVM.oVariantSaveBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantSaveBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -446,9 +446,9 @@ sap.ui.define([
 
 		this.oVM.setPopoverTitle("My List");
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
 
 			fOriginalCall(oEvent);
@@ -472,9 +472,9 @@ sap.ui.define([
 		this.oVM.setSelectedKey("2");
 		this.oVM.setShowFooter(false);
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
 
 			fOriginalCall(oEvent);
@@ -493,9 +493,9 @@ sap.ui.define([
 		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", changeable: true}));
 		this.oVM.setSelectedKey("2");
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
 
 			fOriginalCall(oEvent);
@@ -524,9 +524,9 @@ sap.ui.define([
 		this.oVM.setSelectedKey("2");
 		this.oVM.setModified(true);
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
 
 			fOriginalCall(oEvent);
@@ -553,9 +553,9 @@ sap.ui.define([
 		this.oVM.setSelectedKey("2");
 		this.oVM.setShowSaveAs(false);
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
 
 			fOriginalCall(oEvent);
@@ -582,9 +582,9 @@ sap.ui.define([
 		this.oVM.setSelectedKey("2");
 		this.oVM.setCreationAllowed(false);
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
 
 			fOriginalCall(oEvent);
@@ -614,9 +614,9 @@ sap.ui.define([
 
 		this.oVM.setPopoverTitle("My List");
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
 
 			fOriginalCall(oEvent);
@@ -664,8 +664,8 @@ sap.ui.define([
 		assert.ok(this.oVM.oVariantList.getVisible(), "list is visible");
 		assert.ok(!this.oVM.oNodataTextLayout.getVisible(), "no data text is invisible");
 
-		var sSearchText = "XXX";
-		var oEvent = {
+		let sSearchText = "XXX";
+		const oEvent = {
 			getParameters: function() { return {newValue: sSearchText};}
 		};
 
@@ -713,9 +713,9 @@ sap.ui.define([
 
 		this.oVM.setSelectedKey("2");
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
+		const fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openSaveAsDialog").callsFake(function (oEvent) {
 
 			fOriginalSaveAsCall(oEvent);
@@ -739,13 +739,13 @@ sap.ui.define([
 
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -765,9 +765,9 @@ sap.ui.define([
 		this.oVM.setSupportApplyAutomatically(false);
 		this.oVM.setSupportDefault(false);
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
+		const fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openSaveAsDialog").callsFake(function (oEvent) {
 
 			fOriginalSaveAsCall(oEvent);
@@ -788,13 +788,13 @@ sap.ui.define([
 
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -812,9 +812,9 @@ sap.ui.define([
 		this.oVM.setSelectedKey("2");
 		this.oVM._setShowCreateTile(true);
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
+		const fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openSaveAsDialog").callsFake(function (oEvent) {
 
 			fOriginalSaveAsCall(oEvent);
@@ -835,13 +835,13 @@ sap.ui.define([
 
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -855,7 +855,7 @@ sap.ui.define([
 	QUnit.test("check text selection in save as dialog", function(assert) {
 
 		_createSaveAsDialog.call(this, assert);
-		var fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
+		const fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
 
 		sinon.stub(this.oVM, "_openSaveAsDialog").callsFake(async (oEvent) => {
 			fOriginalSaveAsCall(oEvent);
@@ -873,7 +873,7 @@ sap.ui.define([
 
 	QUnit.test("check event 'save' on save button press", function(assert) {
 
-		var triggerAction = (target) => {
+		const triggerAction = (target) => {
 			QUnitUtils.triggerTouchEvent("tap", target, {
 				srcControl: null
 			});
@@ -883,7 +883,7 @@ sap.ui.define([
 
 	QUnit.test("check event 'save' on enter key press", function(assert) {
 
-		var triggerAction = (target) => {
+		const triggerAction = (target) => {
 			QUnitUtils.triggerKeydown(target, KeyCodes.ENTER);
 		};
 
@@ -902,7 +902,7 @@ sap.ui.define([
 
 
 		this.oVM.attachSave(function(oEvent) {
-			var mParameters = oEvent.getParameters();
+			const mParameters = oEvent.getParameters();
 
 			assert.ok(mParameters);
 			assert.ok(mParameters.def, "default flag expected");
@@ -923,13 +923,13 @@ sap.ui.define([
 	 */
 	function _checkSaveAction(assert, triggerAction) {
 		_createSaveAsDialog.call(this, assert);
-		var done = assert.async();
+		const done = assert.async();
 
 		this.oVM.oSaveAsDialog.attachAfterClose(function(oEvent) {
 			done();
 		});
 
-		var fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
+		const fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
 
 		sinon.stub(this.oVM, "_openSaveAsDialog").callsFake(async (oEvent) => {
 
@@ -947,7 +947,7 @@ sap.ui.define([
 			assert.ok(this.oVM.oExecuteOnSelect, "should exists");
 			this.oVM.oExecuteOnSelect.setSelected(true);
 
-			var oTarget = this.oVM.oSaveSave.getFocusDomRef();
+			const oTarget = this.oVM.oSaveSave.getFocusDomRef();
 			assert.ok(oTarget);
 			// Use the provided triggerAction function to simulate user action
 			triggerAction(oTarget);
@@ -956,12 +956,12 @@ sap.ui.define([
 
 		});
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async(oEvent) => {
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -982,9 +982,9 @@ sap.ui.define([
 		}
 	});
 	QUnit.test("check opens", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
 
 			fOriginalManageCall(oEvent);
@@ -994,7 +994,7 @@ sap.ui.define([
 			assert.ok(this.oVM.oManagementTable, "management table exists");
 			assert.equal(this.oVM.oManagementTable.getSticky().length, 1);
 			assert.equal(this.oVM.oManagementTable.getSticky()[0], Sticky.ColumnHeaders, "management table has sticky column headers");
-			var aColumns = this.oVM.oManagementTable.getColumns();
+			const aColumns = this.oVM.oManagementTable.getColumns();
 			assert.ok(aColumns, "columns in the management table exists");
 			assert.equal(aColumns.length, 9, "columns in the management table exists");
 			assert.ok(aColumns[0].getVisible(), "favorite column is visible");
@@ -1011,13 +1011,13 @@ sap.ui.define([
 
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1034,16 +1034,16 @@ sap.ui.define([
 		this.oVM.setSupportPublic(false);
 		this.oVM.setSupportFavorites(false);
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
 
 			fOriginalManageCall(oEvent);
 
 			assert.ok(this.oVM.oManagementTable, "management table exists");
 
-			var aColumns = this.oVM.oManagementTable.getColumns();
+			const aColumns = this.oVM.oManagementTable.getColumns();
 			assert.ok(aColumns, "columns in the management table exists");
 			assert.equal(aColumns.length, 9, "columns in the management table exists");
 			assert.ok(!aColumns[0].getVisible(), "favorite column is visible");
@@ -1060,13 +1060,13 @@ sap.ui.define([
 
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1085,20 +1085,20 @@ sap.ui.define([
 
 		this.oVM.setDefaultKey("3");
 
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
 
 			fOriginalManageCall(oEvent);
 
 			assert.ok(this.oVM.oManagementTable, "management table exists");
 
-			var aItems = this.oVM.oManagementTable.getItems();
+			const aItems = this.oVM.oManagementTable.getItems();
 			assert.ok(aItems, "items in the management table exists");
 			assert.equal(aItems.length, 4,  "expected count of items in the management table exists");
 
-			var i, j, aCells, oControl, sTemp, bSkip;
+			let i, j, aCells, oControl, sTemp, bSkip;
 
 			for (i = 0; i < this.oVM.oManagementTable.getItems().length; i++) {
 				aCells = this.oVM.oManagementTable.getItems()[i].getCells();
@@ -1158,7 +1158,7 @@ sap.ui.define([
 					assert.ok(!aCells[7].getVisible(), "expected delete info found" + "' for (" + i + ',' + 7 + ')');
 				}
 
-				var sIdPrefix = this.oVM.getId() + "-manage-";
+				const sIdPrefix = this.oVM.getId() + "-manage-";
 
 				for (j = 0; j < aCells.length; j++) {
 					oControl = aCells[j];
@@ -1185,13 +1185,13 @@ sap.ui.define([
 
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1203,7 +1203,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("check opens check event 'cancel'", async function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
 		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
 		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
@@ -1217,11 +1217,11 @@ sap.ui.define([
 
 			assert.equal(this.oVM.getDefaultKey(), "3", "default reverted correctly");
 
-			var aItems = this.oVM.getItems();
+			const aItems = this.oVM.getItems();
 			assert.ok(aItems, "items exists");
 			assert.equal(aItems.length, 4,  "expected count of items in the management table exists");
 
-			for (var i = 0; i < aItems.length; i++) {
+			for (let i = 0; i < aItems.length; i++) {
 
 				if (i === 0) {
 					assert.equal(aItems[i].getTitle(), "One", "expected title. Row=0");
@@ -1261,7 +1261,7 @@ sap.ui.define([
 
 		this.oVM.oManagementDialog.attachAfterOpen(async function() {
 
-			var aItems = this.oVM.oManagementTable.getItems();
+			let aItems = this.oVM.oManagementTable.getItems();
 			assert.ok(aItems, "items in the management table exists");
 			assert.equal(aItems.length, 4,  "expected count of items in the management table exists");
 			assert.equal(aItems[2].getVisible(), true,  "item 2 is visible");
@@ -1289,8 +1289,8 @@ sap.ui.define([
 			assert.ok(aItems, "aggregation items exists");
 			assert.equal(aItems.length, 4, "aggregation items count");
 
-			var oOrigItem;
-			for (var i = 0; i < aItems.length; i++) {
+			let oOrigItem;
+			for (let i = 0; i < aItems.length; i++) {
 				oOrigItem = this.oVM._getItemByKey(aItems[i].getKey());
 				assert.ok(oOrigItem, "expected aggregation item found");
 
@@ -1318,7 +1318,7 @@ sap.ui.define([
 				}
 			}
 
-			var oTarget = this.oVM.oManagementCancel.getFocusDomRef();
+			const oTarget = this.oVM.oManagementCancel.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1329,27 +1329,27 @@ sap.ui.define([
 		}.bind(this));
 
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
 
 			fOriginalManageCall(oEvent);
 
 			assert.ok(this.oVM.oManagementTable, "management table exists");
 
-			var aItems = this.oVM.oManagementTable.getItems();
+			const aItems = this.oVM.oManagementTable.getItems();
 			assert.ok(aItems, "items in the management table exists");
 			assert.equal(aItems.length, 4,  "expected items");
 
 		}.bind(this));
 
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1370,10 +1370,10 @@ sap.ui.define([
 
 		this.oVM.setDefaultKey("3");
 
-		var done = assert.async();
+		const done = assert.async();
 
 		this.oVM.attachManage(function(oEvent) {
-			var mParameters = oEvent.getParameters();
+			const mParameters = oEvent.getParameters();
 			assert.ok(mParameters);
 
 			// unittest issue
@@ -1405,7 +1405,7 @@ sap.ui.define([
 
 		this.oVM.oManagementDialog.attachAfterOpen(async function() {
 
-			var aItems = this.oVM.oManagementTable.getItems();
+			let aItems = this.oVM.oManagementTable.getItems();
 			assert.ok(aItems, "items in the management table exists");
 			assert.equal(aItems.length, 4,  "expected count of items in the management table exists");
 			assert.equal(aItems[2].getVisible(), true,  "item 2 is visible");
@@ -1437,7 +1437,7 @@ sap.ui.define([
 			assert.equal(aItems.length, 4, "aggregation items count");
 
 
-			var oTarget = this.oVM.oManagementSave.getFocusDomRef();
+			const oTarget = this.oVM.oManagementSave.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1446,27 +1446,27 @@ sap.ui.define([
 		}.bind(this));
 
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
 
 			fOriginalManageCall(oEvent);
 
 			assert.ok(this.oVM.oManagementTable, "management table exists");
 
-			var aItems = this.oVM.oManagementTable.getItems();
+			const aItems = this.oVM.oManagementTable.getItems();
 			assert.ok(aItems, "items in the management table exists");
 			assert.equal(aItems.length, 4,  "expected count of items in the management table exists");
 
 		}.bind(this));
 
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1485,25 +1485,25 @@ sap.ui.define([
 
 		this.oVM.setDefaultKey("3");
 
-		var done = assert.async();
+		const done = assert.async();
 
 		this.oVM._createManagementDialog();
 		assert.ok(this.oVM.oManagementDialog, "manage dialog should exists.");
 
-		var fOriginalSaveHandler = this.oVM._handleManageSavePressed.bind(this.oVM);
+		const fOriginalSaveHandler = this.oVM._handleManageSavePressed.bind(this.oVM);
 		sinon.stub(this.oVM, "_handleManageSavePressed").callsFake(function (oEvent) {
 			fOriginalSaveHandler();
 
 			assert.ok(this.oVM.oManagementTable, "management table exists");
-			var aItems = this.oVM.oManagementTable.getItems();
-			var aCells = aItems[1].getCells();
+			const aItems = this.oVM.oManagementTable.getItems();
+			const aCells = aItems[1].getCells();
 
-			var oInput = aCells[1];
+			const oInput = aCells[1];
 			assert.ok(oInput, "expected input field");
 
 			assert.equal(oInput.getValueState(), "Error", "expected error state");
 
-			var oTarget = this.oVM.oManagementCancel.getFocusDomRef();
+			const oTarget = this.oVM.oManagementCancel.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1520,7 +1520,7 @@ sap.ui.define([
 			await fChangeTitle(this.oVM.oManagementTable, 1, "One");
 
 
-			var oTarget = this.oVM.oManagementSave.getFocusDomRef();
+			const oTarget = this.oVM.oManagementSave.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1528,7 +1528,7 @@ sap.ui.define([
 
 		}.bind(this));
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(async function (oEvent) {
 
 			await fOriginalManageCall(oEvent);
@@ -1537,13 +1537,13 @@ sap.ui.define([
 		}.bind(this));
 
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1561,7 +1561,7 @@ sap.ui.define([
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(async function (oEvent) {
 
 			// simulate Enter key press on Save button
-			var oTarget = this.oVM.oManagementSave.getFocusDomRef();
+			const oTarget = this.oVM.oManagementSave.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerKeydown(oTarget, KeyCodes.ENTER, false, false, true);
 
@@ -1578,15 +1578,15 @@ sap.ui.define([
 
 		assert.ok(this.oVM._handleManageSavePressed(), "expected no errors");
 
-		var oRow = this.oVM._getRowForKey("3");
+		const oRow = this.oVM._getRowForKey("3");
 		assert.ok(oRow, "expected row found");
 
-		var oInput = oRow.getCells()[VariantManagement.COLUMN_NAME_IDX];
+		const oInput = oRow.getCells()[VariantManagement.COLUMN_NAME_IDX];
 		assert.ok(oInput, "expected input found");
 		oInput.setValueState("Error");
 		assert.ok(!this.oVM._handleManageSavePressed(), "expected errors detected");
 
-		var oView = this.oVM.getItemByKey("3");
+		const oView = this.oVM.getItemByKey("3");
 		assert.ok(oView, "expected view found");
 		this.oVM._handleManageDeletePressed(oView);
 		assert.ok(this.oVM._handleManageSavePressed(), "expected no errors");
@@ -1677,13 +1677,13 @@ sap.ui.define([
 
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1742,13 +1742,13 @@ sap.ui.define([
 
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -1796,8 +1796,8 @@ sap.ui.define([
 
 	QUnit.test("no management table returns cancel button", function(assert) {
 		// Test when no management table exists
-		var oVariantItem = this.oVM.getItemByKey("2");
-		var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem);
+		const oVariantItem = this.oVM.getItemByKey("2");
+		const oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem);
 
 		assert.strictEqual(oResult, this.oVM.oManagementCancel, "Should return cancel button when no management table exists");
 	});
@@ -1903,33 +1903,33 @@ sap.ui.define([
 	});
 
 	QUnit.test("returns previous row when no next row", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
 			fOriginalManageCall();
 
 			// Test deleting the last item "4", should return the previous row for item "3"
-			var oVariantItem4 = this.oVM.getItemByKey("4");
-			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem4);
+			const oVariantItem4 = this.oVM.getItemByKey("4");
+			const oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem4);
 
 			assert.ok(oResult, "Should return a result");
 			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
 
-			var oResultBindingContext = oResult.getBindingContext("$mVariants");
+			const oResultBindingContext = oResult.getBindingContext("$mVariants");
 			assert.ok(oResultBindingContext, "Result should have a binding context");
 
-			var oResultRowItem = oResultBindingContext.getObject();
+			const oResultRowItem = oResultBindingContext.getObject();
 			assert.strictEqual(oResultRowItem.getKey(), "3", "Should return the previous row for item '3' when no next row available");
 
 			done();
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function() {
 			fOriginalCall();
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
 			});
@@ -1939,21 +1939,21 @@ sap.ui.define([
 	});
 
 	QUnit.test("returns previous row when next row is invisible", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
 			fOriginalManageCall();
 
 			// Hide the last row (item 4) to simulate no next visible row
-			var aTableItems = this.oVM.oManagementTable.getItems();
-			var oRowToHide = null;
+			const aTableItems = this.oVM.oManagementTable.getItems();
+			let oRowToHide = null;
 
-			for (var i = 0; i < aTableItems.length; i++) {
-				var oRow = aTableItems[i];
-				var oBindingContext = oRow.getBindingContext("$mVariants");
+			for (let i = 0; i < aTableItems.length; i++) {
+				const oRow = aTableItems[i];
+				const oBindingContext = oRow.getBindingContext("$mVariants");
 				if (oBindingContext) {
-					var oRowItem = oBindingContext.getObject();
+					const oRowItem = oBindingContext.getObject();
 					if (oRowItem && oRowItem.getKey() === "4") {
 						oRowToHide = oRow;
 						break;
@@ -1966,26 +1966,26 @@ sap.ui.define([
 			}
 
 			// Test deleting item "3", should return previous row for item "2" since next row is hidden
-			var oVariantItem3 = this.oVM.getItemByKey("3");
-			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem3);
+			const oVariantItem3 = this.oVM.getItemByKey("3");
+			const oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem3);
 
 			assert.ok(oResult, "Should return a result");
 			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
 
-			var oResultBindingContext = oResult.getBindingContext("$mVariants");
+			const oResultBindingContext = oResult.getBindingContext("$mVariants");
 			assert.ok(oResultBindingContext, "Result should have a binding context");
 
-			var oResultRowItem = oResultBindingContext.getObject();
+			const oResultRowItem = oResultBindingContext.getObject();
 			assert.strictEqual(oResultRowItem.getKey(), "2", "Should return the previous row for item '2' when next row is hidden");
 
 			done();
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function() {
 			fOriginalCall();
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
 			});
@@ -1995,31 +1995,31 @@ sap.ui.define([
 	});
 
 	QUnit.test("returns cancel button when only one item", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
 		// Remove all items except one to test the edge case
 		this.oVM.removeItem(this.oVM.getItemByKey("2")).destroy();
 		this.oVM.removeItem(this.oVM.getItemByKey("3")).destroy();
 		this.oVM.removeItem(this.oVM.getItemByKey("4")).destroy();
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
 			fOriginalManageCall();
 
 			// Test deleting the only remaining item "1", should return cancel button
-			var oVariantItem1 = this.oVM.getItemByKey("1");
-			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem1);
+			const oVariantItem1 = this.oVM.getItemByKey("1");
+			const oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem1);
 
 			assert.strictEqual(oResult, this.oVM.oManagementCancel, "Should return cancel button when deleting the only remaining item");
 
 			done();
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function() {
 			fOriginalCall();
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
 			});
@@ -2029,20 +2029,20 @@ sap.ui.define([
 	});
 
 	QUnit.test("skips invisible previous rows", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
 			fOriginalManageCall();
 
 			// Hide both the next row (item 4) and immediate previous row (item 2)
-			var aTableItems = this.oVM.oManagementTable.getItems();
+			const aTableItems = this.oVM.oManagementTable.getItems();
 
-			for (var i = 0; i < aTableItems.length; i++) {
-				var oRow = aTableItems[i];
-				var oBindingContext = oRow.getBindingContext("$mVariants");
+			for (let i = 0; i < aTableItems.length; i++) {
+				const oRow = aTableItems[i];
+				const oBindingContext = oRow.getBindingContext("$mVariants");
 				if (oBindingContext) {
-					var oRowItem = oBindingContext.getObject();
+					const oRowItem = oBindingContext.getObject();
 					if (oRowItem && (oRowItem.getKey() === "2" || oRowItem.getKey() === "4")) {
 						oRow.setVisible(false);
 					}
@@ -2050,26 +2050,26 @@ sap.ui.define([
 			}
 
 			// Test deleting item "3", should skip hidden item "2" and return item "1"
-			var oVariantItem3 = this.oVM.getItemByKey("3");
-			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem3);
+			const oVariantItem3 = this.oVM.getItemByKey("3");
+			const oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem3);
 
 			assert.ok(oResult, "Should return a result");
 			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
 
-			var oResultBindingContext = oResult.getBindingContext("$mVariants");
+			const oResultBindingContext = oResult.getBindingContext("$mVariants");
 			assert.ok(oResultBindingContext, "Result should have a binding context");
 
-			var oResultRowItem = oResultBindingContext.getObject();
+			const oResultRowItem = oResultBindingContext.getObject();
 			assert.strictEqual(oResultRowItem.getKey(), "1", "Should skip invisible previous row and return the next available previous row for item '1'");
 
 			done();
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function() {
 			fOriginalCall();
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
 			});
@@ -2079,21 +2079,21 @@ sap.ui.define([
 	});
 
 	QUnit.test("handles invisible rows", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
 			fOriginalManageCall();
 
 			// Hide the next row (item 3) to test skipping invisible rows
-			var aTableItems = this.oVM.oManagementTable.getItems();
-			var oRowToHide = null;
+			const aTableItems = this.oVM.oManagementTable.getItems();
+			let oRowToHide = null;
 
-			for (var i = 0; i < aTableItems.length; i++) {
-				var oRow = aTableItems[i];
-				var oBindingContext = oRow.getBindingContext("$mVariants");
+			for (let i = 0; i < aTableItems.length; i++) {
+				const oRow = aTableItems[i];
+				const oBindingContext = oRow.getBindingContext("$mVariants");
 				if (oBindingContext) {
-					var oRowItem = oBindingContext.getObject();
+					const oRowItem = oBindingContext.getObject();
 					if (oRowItem && oRowItem.getKey() === "3") {
 						oRowToHide = oRow;
 						break;
@@ -2106,26 +2106,26 @@ sap.ui.define([
 			}
 
 			// Test deleting item "2", should skip invisible item "3" and return item "4"
-			var oVariantItem2 = this.oVM.getItemByKey("2");
-			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem2);
+			const oVariantItem2 = this.oVM.getItemByKey("2");
+			const oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem2);
 
 			assert.ok(oResult, "Should return a result");
 			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
 
-			var oResultBindingContext = oResult.getBindingContext("$mVariants");
+			const oResultBindingContext = oResult.getBindingContext("$mVariants");
 			assert.ok(oResultBindingContext, "Result should have a binding context");
 
-			var oResultRowItem = oResultBindingContext.getObject();
+			const oResultRowItem = oResultBindingContext.getObject();
 			assert.strictEqual(oResultRowItem.getKey(), "4", "Should skip invisible row and return the row for item '4'");
 
 			done();
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function() {
 			fOriginalCall();
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
 			});
@@ -2135,21 +2135,21 @@ sap.ui.define([
 	});
 
 	QUnit.test("handles row without binding context", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
 			fOriginalManageCall();
 
 			// Find the row for item "3" and stub its getBindingContext to return null
-			var aTableItems = this.oVM.oManagementTable.getItems();
-			var oRowToStub = null;
+			const aTableItems = this.oVM.oManagementTable.getItems();
+			let oRowToStub = null;
 
-			for (var i = 0; i < aTableItems.length; i++) {
-				var oRow = aTableItems[i];
-				var oBindingContext = oRow.getBindingContext("$mVariants");
+			for (let i = 0; i < aTableItems.length; i++) {
+				const oRow = aTableItems[i];
+				const oBindingContext = oRow.getBindingContext("$mVariants");
 				if (oBindingContext) {
-					var oRowItem = oBindingContext.getObject();
+					const oRowItem = oBindingContext.getObject();
 					if (oRowItem && oRowItem.getKey() === "3") {
 						oRowToStub = oRow;
 						break;
@@ -2162,32 +2162,102 @@ sap.ui.define([
 			}
 
 			// Test deleting item "2", should skip item "3" (no binding context) and return item "4"
-			var oVariantItem2 = this.oVM.getItemByKey("2");
-			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem2);
+			const oVariantItem2 = this.oVM.getItemByKey("2");
+			const oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem2);
 
 			assert.ok(oResult, "Should return a result");
 			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
 
-			var oResultBindingContext = oResult.getBindingContext("$mVariants");
+			const oResultBindingContext = oResult.getBindingContext("$mVariants");
 			assert.ok(oResultBindingContext, "Result should have a binding context");
 
-			var oResultRowItem = oResultBindingContext.getObject();
+			const oResultRowItem = oResultBindingContext.getObject();
 			assert.strictEqual(oResultRowItem.getKey(), "4", "Should skip row without binding context and return the row for item '4'");
 
 			done();
 		}.bind(this));
 
-		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(async function() {
 			fOriginalCall();
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
-			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
 			});
 		}.bind(this));
 
 		this.oVM.onclick();
+	});
+
+	QUnit.module("VariantManagement Manage dialog busy state with dynamic variants callback", {
+		beforeEach: async function() {
+			let oPromiseResolve;
+			this.oPromise = new Promise(function(resolve) {
+				oPromiseResolve = resolve;
+			});
+			this.oPromiseResolve = oPromiseResolve;
+
+			this.oVM = new VariantManagement("VM1");
+			// dynamicVariantsLoadedCallback is a hidden property, accessed directly as an instance field
+			this.oVM.dynamicVariantsLoadedCallback = function() {
+				return this.oPromise;
+			}.bind(this);
+			this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+			this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
+			this.oVM.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oVM.destroy();
+		}
+	});
+
+	QUnit.test("check table busy state is set and cleared during management dialog opening with promise callback", function(assert) {
+		const done = assert.async();
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		const oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			// At this point, busy state should be true since promise is not resolved yet
+			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called");
+			assert.ok(this.oVM.oManagementTable.getBusy(), "table should be busy while promise is pending");
+
+			// Now resolve the promise
+			this.oPromiseResolve();
+
+			// Wait for promise to resolve and busy state to clear
+			this.oPromise.then(function() {
+				return new Promise(function(resolve) {setTimeout(resolve, 10);});
+			}).then(function() {
+				// Verify setBusy was called with false after promise resolved
+				assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called");
+
+				// Verify the order: setBusy(true) should be called before setBusy(false)
+				let bTrueCalledFirst = false;
+				for (let i = 0; i < oSetBusySpy.callCount; i++) {
+					if (oSetBusySpy.getCall(i).args[0] === true) {
+						bTrueCalledFirst = true;
+					}
+					if (oSetBusySpy.getCall(i).args[0] === false && bTrueCalledFirst) {
+						assert.ok(true, "setBusy(true) was called before setBusy(false)");
+						break;
+					}
+				}
+
+				// Verify final state is not busy
+				assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy after promise resolves");
+
+				oSetBusySpy.restore();
+				this.oVM.oManagementDialog.close();
+				done();
+			}.bind(this));
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
 	});
 
 	QUnit.module("VariantManagement Manage dialog busy state", {
@@ -2201,8 +2271,8 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("check table busy state is set and cleared during management dialog opening", function(assert) {
-		var done = assert.async();
+	QUnit.test("check table binding is suspended during dialog opening", function(assert) {
+		const done = assert.async();
 
 		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
 		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
@@ -2210,46 +2280,7 @@ sap.ui.define([
 		this.oVM._createManagementDialog();
 		assert.ok(this.oVM.oManagementTable, "management table should exist");
 
-		var oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
-
-		this.oVM.oManagementDialog.attachAfterOpen(function() {
-			// Verify setBusy was called with true and then false
-			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called");
-			assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called");
-
-			// Verify the order: setBusy(true) should be called before setBusy(false)
-			var bTrueCalledFirst = false;
-			for (var i = 0; i < oSetBusySpy.callCount; i++) {
-				if (oSetBusySpy.getCall(i).args[0] === true) {
-					bTrueCalledFirst = true;
-				}
-				if (oSetBusySpy.getCall(i).args[0] === false && bTrueCalledFirst) {
-					assert.ok(true, "setBusy(true) was called before setBusy(false)");
-					break;
-				}
-			}
-
-			// Verify final state is not busy
-			assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy after dialog opens");
-
-			oSetBusySpy.restore();
-			this.oVM.oManagementDialog.close();
-			done();
-		}.bind(this));
-
-		this.oVM._openManagementDialog();
-	});
-
-	QUnit.test("check table binding is suspended during busy state", function(assert) {
-		var done = assert.async();
-
-		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
-		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
-
-		this.oVM._createManagementDialog();
-		assert.ok(this.oVM.oManagementTable, "management table should exist");
-
-		var oSuspendSpy = sinon.spy(this.oVM, "_suspendManagementTableBinding");
+		const oSuspendSpy = sinon.spy(this.oVM, "_suspendManagementTableBinding");
 
 		this.oVM.oManagementDialog.attachAfterOpen(function() {
 			// Verify _suspendManagementTableBinding was called
@@ -2264,7 +2295,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("check busy state with rebind required", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
 		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
 		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
@@ -2275,13 +2306,12 @@ sap.ui.define([
 		// Force rebind to be required
 		this.oVM._bRebindRequired = true;
 
-		var oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
-		var oRebindSpy = sinon.spy(this.oVM, "_rebindVMTable");
+		const oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+		const oRebindSpy = sinon.spy(this.oVM, "_rebindVMTable");
 
 		this.oVM.oManagementDialog.attachAfterOpen(function() {
-			// Verify setBusy was called with true and then false
-			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called");
-			assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called");
+			// Verify setBusy was NOT called since there's no promise callback
+			assert.ok(!oSetBusySpy.called, "setBusy should not have been called without promise callback");
 
 			// Verify rebind was called
 			assert.ok(oRebindSpy.called, "_rebindVMTable should have been called when _bRebindRequired is true");
@@ -2299,20 +2329,19 @@ sap.ui.define([
 	});
 
 	QUnit.test("check busy state clears correctly when no items exist", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
 		// No items added - empty table scenario
 
 		this.oVM._createManagementDialog();
 		assert.ok(this.oVM.oManagementTable, "management table should exist");
 
-		var oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
-		var oSetNoDataSpy = sinon.spy(this.oVM.oManagementTable, "setNoData");
+		const oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+		const oSetNoDataSpy = sinon.spy(this.oVM.oManagementTable, "setNoData");
 
 		this.oVM.oManagementDialog.attachAfterOpen(function() {
-			// Verify setBusy was called with true and then false
-			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called");
-			assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called");
+			// Verify setBusy was NOT called since there's no promise callback
+			assert.ok(!oSetBusySpy.called, "setBusy should not have been called without promise callback");
 
 			// Verify setNoData was called since there are no items
 			assert.ok(oSetNoDataSpy.called, "setNoData should have been called when no items exist");
@@ -2330,7 +2359,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("check busy state sequence with multiple dialog openings", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 
 		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
 		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
@@ -2338,7 +2367,7 @@ sap.ui.define([
 		this.oVM._createManagementDialog();
 		assert.ok(this.oVM.oManagementTable, "management table should exist");
 
-		var nOpenCount = 0;
+		let nOpenCount = 0;
 
 		this.oVM.oManagementDialog.attachAfterOpen(function() {
 			nOpenCount++;
@@ -2383,7 +2412,7 @@ sap.ui.define([
 		afterEach: function() {
 
 			if (this.oCompContainer) {
-				var oComponent = this.oCompContainer.getComponentInstance();
+				const oComponent = this.oCompContainer.getComponentInstance();
 				oComponent.destroy();
 
 				this.oCompContainer.destroy();
@@ -2395,7 +2424,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("check roles inside managed views", async function (assert) {
-		var done = assert.async();
+		const done = assert.async();
 
 		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
 		this.oVM.addItem(new VariantItem("VMI2", {key: "2", title:"Two", contexts: {role: ["test"]}, remove: true, sharing: "Private", author: "B"}));
@@ -2407,7 +2436,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		this.oVM.attachManage(function(oEvent) {
-			var mParameters = oEvent.getParameters();
+			const mParameters = oEvent.getParameters();
 			assert.ok(mParameters);
 			assert.ok(this.oCompContainer, "context sharing component exists");
 
@@ -2423,17 +2452,17 @@ sap.ui.define([
 		assert.ok(this.oVM.oManagementDialog, "manage dialog should exists.");
 
 		this.oVM.oManagementDialog.attachAfterOpen(async function() {
-			var oIcon = null;
-			var oRb = this.oVM._oRb;
+			let oIcon = null;
+			const oRb = this.oVM._oRb;
 
 			assert.ok(this.oVM.getSupportContexts());
 
-			var aItems = this.oVM.oManagementTable.getItems();
+			const aItems = this.oVM.oManagementTable.getItems();
 			assert.ok(aItems, "items in the management table exists");
 			assert.equal(aItems.length, 4,  "expected count of items in the management table exists");
 
-			for (var i = 0; i < aItems.length; i++) {
-				var oRolesCell = aItems[i].getCells()[5];
+			for (let i = 0; i < aItems.length; i++) {
+				const oRolesCell = aItems[i].getCells()[5];
 				assert.ok(oRolesCell, "expected contexts element");
 
 				if (i === 0) {
@@ -2441,7 +2470,7 @@ sap.ui.define([
 				} else {
 					 assert.ok(oRolesCell.isA("sap.m.HBox"), "item with contexts");
 
-					 var oText = oRolesCell.getItems()[0];
+					 const oText = oRolesCell.getItems()[0];
 					 if (i === 1) {
 						 assert.equal(oText.getText(), oRb.getText("VARIANT_MANAGEMENT_VISIBILITY_RESTRICTED"), "restricted expected");
 						 oIcon = oRolesCell.getItems()[1];
@@ -2452,7 +2481,7 @@ sap.ui.define([
 			}
 
 			assert.ok(oIcon, "restricted icon");
-			var oTarget = oIcon.getFocusDomRef();
+			const oTarget = oIcon.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("click", oTarget, {
 				srcControl: null
@@ -2463,7 +2492,7 @@ sap.ui.define([
 		}.bind(this));
 
 
-		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function () {
 
 			fOriginalManageCall();
@@ -2478,7 +2507,7 @@ sap.ui.define([
 
 		this.oVM._oRolesDialog.attachAfterClose(async function() {
 
-			var oTarget = this.oVM.oManagementSave.getFocusDomRef();
+			const oTarget = this.oVM.oManagementSave.getFocusDomRef();
 			assert.ok(oTarget, "dom ref of save button of manage dialog ob tained");
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -2490,10 +2519,10 @@ sap.ui.define([
 
 		this.oVM._oRolesDialog.attachAfterOpen(async function() {
 
-			var oCancelButton = Element.getElementById(this.oVM.getId() + "-rolecancel");
+			const oCancelButton = Element.getElementById(this.oVM.getId() + "-rolecancel");
 			assert.ok(oCancelButton, "cancel button of roles dialog existst");
 
-			var oTarget = oCancelButton.getFocusDomRef();
+			const oTarget = oCancelButton.getFocusDomRef();
 			assert.ok(oTarget, "dom ref of cancel button of roles dialog ob tained");
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -2503,12 +2532,12 @@ sap.ui.define([
 
 		}.bind(this));
 
-		var fOriginalRolesCall = this.oVM._openRolesDialog.bind(this.oVM);
+		const fOriginalRolesCall = this.oVM._openRolesDialog.bind(this.oVM);
 		sinon.stub(this.oVM, "_openRolesDialog").callsFake(function (oItem, oTextControl) {
 			fOriginalRolesCall(oItem, oTextControl);
 		});
 
-		var oContextSharing = ContextSharingAPI.createComponent({ layer: "CUSTOMER" });
+		const oContextSharing = ContextSharingAPI.createComponent({ layer: "CUSTOMER" });
 		oContextSharing.then(function(oCompContainer) {
 			this.oCompContainer = oCompContainer;
 			//oCompContainer.getComponentInstance().getRootControl().loaded().then(function() {
@@ -2524,11 +2553,11 @@ sap.ui.define([
 
 		this.oVM.setSelectedKey("2");
 
-		var done = assert.async();
+		const done = assert.async();
 
 
 		this.oVM.attachSave(function(oEvent) {
-			var mParameters = oEvent.getParameters();
+			const mParameters = oEvent.getParameters();
 
 			assert.ok(mParameters);
 			assert.ok(!mParameters.def, "default flag not expected");
@@ -2549,7 +2578,7 @@ sap.ui.define([
 
 		this.oVM.oSaveAsDialog.attachAfterOpen(function() {
 
-			var oTarget = this.oVM.oSaveSave.getFocusDomRef();
+			const oTarget = this.oVM.oSaveSave.getFocusDomRef();
 			assert.ok(oTarget, "dom ref of the save button inside SaveAs dialog exists");
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
@@ -2558,7 +2587,7 @@ sap.ui.define([
 		}.bind(this));
 
 
-		var fOpenCall = this.oVM.oSaveAsDialog.open.bind(this.oVM.oSaveAsDialog);
+		const fOpenCall = this.oVM.oSaveAsDialog.open.bind(this.oVM.oSaveAsDialog);
 		sinon.stub(this.oVM.oSaveAsDialog, "open").callsFake(function (sClass, oContext) {
 
 			assert.ok(this.oVM.oInputName, "input entry should exists");
@@ -2567,7 +2596,7 @@ sap.ui.define([
 			fOpenCall(sClass, oContext);
 		}.bind(this));
 
-		var oContextSharing = ContextSharingAPI.createComponent({ layer: "CUSTOMER" });
+		const oContextSharing = ContextSharingAPI.createComponent({ layer: "CUSTOMER" });
 		oContextSharing.then(function(oCompContainer) {
 			this.oCompContainer = oCompContainer;
 			//oCompContainer.getComponentInstance().getRootControl().loaded().then(function() {

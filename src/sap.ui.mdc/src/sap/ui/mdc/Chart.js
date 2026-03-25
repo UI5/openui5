@@ -1944,99 +1944,175 @@ sap.ui.define([
 		};
 
 		/**
+		 * Adds an action to the {@link #getActions actions} aggregation.
+		 *
+		 * @param {sap.ui.core.Control} oAction The action to add; if empty, nothing is inserted
 		 * @name sap.ui.mdc.Chart#addAction
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {this} A reference to <code>this</code>, allowing for method chaining
 		 */
 
 		/**
+		 * Destroys all actions in the {@link #getActions actions} aggregation.
+		 *
 		 * @name sap.ui.mdc.Chart#destroyActions
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {this} A reference to <code>this</code>, allowing for method chaining
 		 */
 
 		/**
+		 * Inserts an action into the {@link #getActions actions} aggregation.
+		 *
+		 * @param {sap.ui.core.Control} oAction The action to insert; if empty, nothing is inserted
+		 * @param {int} iIndex The <code>0</code>-based index at which to insert the action. If <code>iIndex</code> is negative, the action will be inserted at position 0.
+		 * If <code>iIndex</code> is greater than the current size of the actions aggregation, the action will be inserted at the last position.
 		 * @name sap.ui.mdc.Chart#insertAction
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {this} A reference to <code>this</code>, allowing for method chaining
 		 */
 
 		/**
+		 * Removes an action from the {@link #getActions actions} aggregation.
+		 *
+		 * @param {int|string|sap.ui.core.Control} vAction The action to remove or its index or ID
 		 * @name sap.ui.mdc.Chart#removeAction
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {sap.ui.core.Control|null} The removed action or <code>null</code>
 		 */
 
 		/**
+		 * Removes all actions from the {@link #getActions actions} aggregation.
+		 *
 		 * @name sap.ui.mdc.Chart#removeAllActions
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {sap.ui.core.Control[]} An array of the removed actions (might be empty)
 		 */
 
 		/**
+		 * Adds an item to the {@link #getItems items} aggregation.
+		 *
+		 * @param {sap.ui.mdc.chart.Item} oItem The item to add; if empty, nothing is inserted
 		 * @name sap.ui.mdc.Chart#addItem
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {this} A reference to <code>this</code>, allowing for method chaining
 		 */
 
 		/**
+		 * Destroys all items in the {@link #getItems items} aggregation.
+		 *
 		 * @name sap.ui.mdc.Chart#destroyItems
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {this} A reference to <code>this</code>, allowing for method chaining
 		 */
 
 		/**
+		 * Inserts an item into the {@link #getItems items} aggregation.
+		 *
+		 * @param {sap.ui.mdc.chart.Item} oItem The item to insert; if empty, nothing is inserted
+		 * @param {int} iIndex The <code>0</code>-based index at which to insert the item. If <code>iIndex</code> is negative, the item will be inserted at position 0.
+		 * If <code>iIndex</code> is greater than the current size of the items aggregation, the item will be inserted at the last position.
 		 * @name sap.ui.mdc.Chart#insertItem
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {this} A reference to <code>this</code>, allowing for method chaining
 		 */
 
 		/**
+		 * Removes an item from the {@link #getItems items} aggregation.
+		 *
+		 * @param {int|string|sap.ui.mdc.chart.Item} vItem The item to remove or its index or ID
 		 * @name sap.ui.mdc.Chart#removeItem
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {sap.ui.mdc.chart.Item|null} The removed item or <code>null</code>
 		 */
 
 		/**
+		 * Removes all items from the {@link #getItems items} aggregation.
+		 *
 		 * @name sap.ui.mdc.Chart#removeAllItems
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {sap.ui.mdc.chart.Item[]} An array of the removed items (might be empty)
 		 */
 
 		/**
+		 * Sets a new value for the {@link #getSortConditions sortConditions} property.
+		 *
+		 * @param {object} oSortConditions The new value for the <code>sortConditions</code> property
 		 * @name sap.ui.mdc.Chart#setSortConditions
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {this} A reference to <code>this</code>, allowing for method chaining
 		 */
 
 		/**
+		 * Gets the current value of the {@link #getSortConditions sortConditions} property.
+		 *
 		 * @name sap.ui.mdc.Chart#getSortConditions
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {object} The value of the <code>sortConditions</code> property
 		 */
 
 		/**
+		 * Sets a new value for the {@link #getFilterConditions filterConditions} property.
+		 *
+		 * @param {object} oFilterConditions The new value for the <code>filterConditions</code> property
 		 * @name sap.ui.mdc.Chart#setFilterConditions
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {this} A reference to <code>this</code>, allowing for method chaining
 		 */
 
 		/**
+		 * Gets the current value of the {@link #getFilterConditions filterConditions} property.
 		 * @name sap.ui.mdc.Chart#getFilterConditions
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {object} The value of the <code>filterConditions</code> property
 		 */
 
 		/**
+		 * Sets a new value for the {@link #getPropertyInfo propertyInfo} property.
+		 *
+		 * @param {object} oPropertyInfo The new value for the <code>propertyInfo</code> property
 		 * @name sap.ui.mdc.Chart#setPropertyInfo
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {this} A reference to the Chart instance, allowing for method chaining
 		 */
 
 		/**
+		 * Gets the current value of the {@link #getPropertyInfo propertyInfo} property.
+		 *
 		 * @name sap.ui.mdc.Chart#getPropertyInfo
+		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+		 * @returns {object} The value of the <code>propertyInfo</code> property
 		 */
 
 		return Chart;

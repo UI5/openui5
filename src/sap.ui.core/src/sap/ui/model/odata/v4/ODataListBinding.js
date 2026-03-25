@@ -1781,10 +1781,7 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#doSetProperty
 	 */
 	ODataListBinding.prototype.doSetProperty = function () {
-		if (_Helper.isDataAggregation(this.mParameters)) {
-			this.oCache.setGrandTotalOutdated?.(true);
-			this.oHeaderContext.setOutdated(true);
-		}
+		this.setOutdated();
 	};
 
 	/**
@@ -4353,6 +4350,7 @@ sap.ui.define([
 				throw new Error("Cannot refresh. Hint: Side-effects refresh in parallel? "
 					+ oContext);
 			}
+			that.setOutdated();
 			const oGroupLock = that.lockGroup(sGroupId, bLocked);
 			aPromises.push(
 				(bAllowRemoval
@@ -4730,6 +4728,7 @@ sap.ui.define([
 			aPredicates
 				= _Helper.getPredicates(bSingle ? [oContext] : this.keepOnlyVisibleContexts());
 			if (aPredicates) {
+				that.setOutdated();
 				aPromises = this.oCache
 					? [this.oCache.requestSideEffects(this.lockGroup(sGroupId), aPaths, aPredicates,
 						bSingle, /*bWithMessages*/bSingle)]
@@ -5188,6 +5187,18 @@ sap.ui.define([
 				// remember context even if no "change" fired
 				this.oContext = oContext;
 			}
+		}
+	};
+
+	/**
+	 * Sets the outdated flags at the grand total and the header contexts.
+	 *
+	 * @private
+	 */
+	ODataListBinding.prototype.setOutdated = function () {
+		if (_Helper.isDataAggregation(this.mParameters)) {
+			this.oCache.setGrandTotalOutdated?.(true);
+			this.oHeaderContext.setOutdated(true);
 		}
 	};
 

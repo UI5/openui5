@@ -724,4 +724,603 @@ sap.ui.define([
 			done();
 		});
 	});
+
+	// --- press() Unit Tests ---
+	QUnit.module("ControlTree - press() - Basic Functionality", {
+		beforeEach: function () {
+			this.fnUpdateSettings = sinon.stub(ControlInspector, "updateSettings");
+			this.fnGetCodeSnippet = sinon.stub(ControlInspector, "_getCodeSnippet");
+			this.fnGetCodeSnippet.resolves("mock press snippet");
+			this.fnGetSelector = sinon.stub(ControlInspector, "getSelector");
+			this.fnGetSelector.resolves({});
+			this.fnWaitFor = sinon.stub(Opa5.prototype, "waitFor").returns(Promise.resolve());
+			this.fnEmptyQueue = sinon.stub(Opa5, "emptyQueue");
+			this.fnWaitForUI5 = sinon.stub(RecordReplay, "waitForUI5").resolves();
+		},
+		afterEach: function () {
+			this.fnUpdateSettings.restore();
+			this.fnGetCodeSnippet.restore();
+			this.fnGetSelector.restore();
+			this.fnWaitFor.restore();
+			this.fnEmptyQueue.restore();
+			this.fnWaitForUI5.restore();
+		}
+	});
+
+	QUnit.test("Returns a Promise", function (assert) {
+		var result = ControlTree.press("test-id");
+		assert.strictEqual(typeof result.then, "function", "Result has a then function");
+		assert.ok(result instanceof Promise, "Result is a Promise object");
+	});
+
+	QUnit.test("Accepts regular control ID", function (assert) {
+		var done = assert.async();
+
+		ControlTree.press("container").then(function () {
+			assert.ok(this.fnGetCodeSnippet.calledWithMatch({ domElementId: "container", action: "PRESS" }),
+				"getCodeSnippet called with domElementId: 'container' and action: 'PRESS'");
+			assert.ok(this.fnGetSelector.calledWithMatch({ domElementId: "container" }),
+				"getSelector called with domElementId: 'container'");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Accepts and resolves node ID format", function (assert) {
+		var done = assert.async();
+
+		// Populate the map as if search() had previously assigned this nodeId
+		ControlTree._oNodeIdToControlIdMap["1_2"] = "container";
+
+		ControlTree.press("1_2").then(function () {
+			assert.ok(this.fnGetCodeSnippet.calledWithMatch({ domElementId: "container" }),
+				"getCodeSnippet called with resolved control ID 'container'");
+			assert.ok(this.fnGetSelector.calledWithMatch({ domElementId: "container" }),
+				"getSelector called with resolved control ID 'container'");
+
+			// Cleanup
+			delete ControlTree._oNodeIdToControlIdMap["1_2"];
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Returns the action snippet from getCodeSnippet", function (assert) {
+		var done = assert.async();
+
+		this.fnGetCodeSnippet.resolves("press action code");
+
+		ControlTree.press("test-id").then(function (result) {
+			assert.strictEqual(result, "press action code",
+				"Resolved value equals the snippet returned by getCodeSnippet");
+			done();
+		});
+	});
+
+	QUnit.test("Passes actionSettings to getCodeSnippet", function (assert) {
+		var done = assert.async();
+
+		ControlTree.press("test-id", { altKey: true, shiftKey: true }).then(function () {
+			assert.ok(this.fnGetCodeSnippet.calledWithMatch({
+				action: "PRESS",
+				actionSettings: { altKey: true, shiftKey: true }
+			}), "getCodeSnippet called with action 'PRESS' and the provided actionSettings");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Executes action via Opa5.waitFor", function (assert) {
+		var done = assert.async();
+
+		ControlTree.press("test-id").then(function () {
+			assert.ok(this.fnWaitFor.calledOnce, "Opa5.waitFor called once");
+			var oSelectorArg = this.fnWaitFor.firstCall.args[0];
+			assert.ok(oSelectorArg.actions instanceof Press,
+				"waitFor selector has an actions property that is an instance of Press");
+			assert.ok(this.fnEmptyQueue.calledOnce, "Opa5.emptyQueue called once");
+			assert.ok(this.fnWaitForUI5.calledOnce, "RecordReplay.waitForUI5 called once");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Merges idSuffix from selector into action settings", function (assert) {
+		var done = assert.async();
+
+		this.fnGetSelector.resolves({ interaction: { idSuffix: "inner" } });
+
+		ControlTree.press("test-id", { altKey: true }).then(function () {
+			var oSelectorArg = this.fnWaitFor.firstCall.args[0];
+			var oPressAction = oSelectorArg.actions;
+			assert.strictEqual(oPressAction.getIdSuffix(), "inner",
+				"idSuffix from selector merged into Press action settings");
+			assert.strictEqual(oPressAction.getAltKey(), true,
+				"altKey from caller settings preserved");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Handles undefined oSettings gracefully", function (assert) {
+		var done = assert.async();
+
+		ControlTree.press("test-id").then(function (result) {
+			assert.strictEqual(result, "mock press snippet",
+				"Promise resolves successfully when oSettings is undefined");
+			done();
+		});
+	});
+
+	QUnit.test("Handles invalid/unmapped node ID", function (assert) {
+		var done = assert.async();
+
+		// Ensure "999_999" is not in the map
+		delete ControlTree._oNodeIdToControlIdMap["999_999"];
+
+		ControlTree.press("999_999").then(function () {
+			assert.ok(this.fnGetCodeSnippet.calledWithMatch({ domElementId: null }),
+				"getCodeSnippet called with domElementId: null for unmapped node ID");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Rejects when getCodeSnippet fails", function (assert) {
+		var done = assert.async();
+
+		this.fnGetCodeSnippet.rejects(new Error("snippet error"));
+
+		ControlTree.press("test-id").then(function () {
+			assert.ok(false, "Promise should have been rejected");
+			done();
+		}).catch(function () {
+			assert.ok(true, "Promise rejected when getCodeSnippet fails");
+			assert.ok(this.fnGetSelector.notCalled,
+				"getSelector was not called — action was never executed");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Rejects when getSelector fails", function (assert) {
+		var done = assert.async();
+
+		this.fnGetSelector.rejects(new Error("selector error"));
+
+		ControlTree.press("test-id").then(function () {
+			assert.ok(false, "Promise should have been rejected");
+			done();
+		}).catch(function () {
+			assert.ok(true, "Promise rejected when getSelector fails");
+			done();
+		});
+	});
+
+	// --- press() Integration Tests ---
+	QUnit.module("ControlTree - press() - Integration", {
+		beforeEach: async function () {
+			// Create and render a real Button
+			this.oButton = new Button("integration-btn");
+			this.fnPressSpy = sinon.spy();
+			this.oButton.attachPress(this.fnPressSpy);
+			this.oButton.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Stub ControlInspector
+			this.fnUpdateSettings = sinon.stub(ControlInspector, "updateSettings");
+			this.fnGetCodeSnippet = sinon.stub(ControlInspector, "_getCodeSnippet");
+			this.fnGetCodeSnippet.resolves("integration snippet");
+			this.fnGetSelector = sinon.stub(ControlInspector, "getSelector");
+			this.fnGetSelector.resolves({ id: "integration-btn" });
+
+			// Stub OPA/RecordReplay — waitFor executes the Press action on the real Button
+			var that = this;
+			this.fnWaitFor = sinon.stub(Opa5.prototype, "waitFor").callsFake(function (oSelector) {
+				if (oSelector.actions) {
+					oSelector.actions.executeOn(that.oButton);
+				}
+				return Promise.resolve();
+			});
+			this.fnEmptyQueue = sinon.stub(Opa5, "emptyQueue");
+			this.fnWaitForUI5 = sinon.stub(RecordReplay, "waitForUI5").resolves();
+		},
+		afterEach: function () {
+			this.oButton.destroy();
+			this.fnUpdateSettings.restore();
+			this.fnGetCodeSnippet.restore();
+			this.fnGetSelector.restore();
+			this.fnWaitFor.restore();
+			this.fnEmptyQueue.restore();
+			this.fnWaitForUI5.restore();
+		}
+	});
+
+	QUnit.test("Pressing a real Button triggers its press event handler", function (assert) {
+		var done = assert.async();
+
+		ControlTree.press("integration-btn").then(function () {
+			assert.ok(this.fnPressSpy.calledOnce,
+				"Button press event handler was called exactly once");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Press action is constructed with the passed settings", function (assert) {
+		var done = assert.async();
+
+		ControlTree.press("integration-btn", { altKey: true, ctrlKey: true, xPercentage: 50 }).then(function () {
+			// Verify the Press instance was created with correct settings
+			var oSelectorArg = this.fnWaitFor.firstCall.args[0];
+			var oPressAction = oSelectorArg.actions;
+			assert.ok(oPressAction instanceof Press, "actions is a Press instance");
+			assert.strictEqual(oPressAction.getAltKey(), true, "altKey is true");
+			assert.strictEqual(oPressAction.getCtrlKey(), true, "ctrlKey is true");
+			assert.strictEqual(oPressAction.getXPercentage(), 50, "xPercentage is 50");
+			assert.notOk(oPressAction.getShiftKey(), "shiftKey defaults to falsy");
+
+			// The action still executed on the real button
+			assert.ok(this.fnPressSpy.calledOnce,
+				"Button press event handler was still called");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("idSuffix from selector is merged into Press action settings", function (assert) {
+		var done = assert.async();
+
+		this.fnGetSelector.resolves({ id: "integration-btn", interaction: { idSuffix: "content" } });
+
+		// Override waitFor to only capture the Press instance without executing
+		// (the Button has no "content" sub-element, so executeOn would fail)
+		this.fnWaitFor.callsFake(function (oSelector) {
+			return Promise.resolve();
+		});
+
+		ControlTree.press("integration-btn", { altKey: true }).then(function () {
+			var oSelectorArg = this.fnWaitFor.firstCall.args[0];
+			var oPressAction = oSelectorArg.actions;
+			assert.strictEqual(oPressAction.getIdSuffix(), "content",
+				"idSuffix from selector merged into Press action");
+			assert.strictEqual(oPressAction.getAltKey(), true,
+				"altKey from caller settings preserved after merge");
+			done();
+		}.bind(this));
+	});
+
+	// --- enterText() Unit Tests ---
+	QUnit.module("ControlTree - enterText() - Basic Functionality", {
+		beforeEach: function () {
+			this.fnUpdateSettings = sinon.stub(ControlInspector, "updateSettings");
+			this.fnGetCodeSnippet = sinon.stub(ControlInspector, "_getCodeSnippet");
+			this.fnGetCodeSnippet.resolves("mock enterText snippet");
+			this.fnGetSelector = sinon.stub(ControlInspector, "getSelector");
+			this.fnGetSelector.resolves({});
+			this.fnWaitFor = sinon.stub(Opa5.prototype, "waitFor").returns(Promise.resolve());
+			this.fnEmptyQueue = sinon.stub(Opa5, "emptyQueue");
+			this.fnWaitForUI5 = sinon.stub(RecordReplay, "waitForUI5").resolves();
+		},
+		afterEach: function () {
+			this.fnUpdateSettings.restore();
+			this.fnGetCodeSnippet.restore();
+			this.fnGetSelector.restore();
+			this.fnWaitFor.restore();
+			this.fnEmptyQueue.restore();
+			this.fnWaitForUI5.restore();
+		}
+	});
+
+	QUnit.test("Returns a Promise", function (assert) {
+		var result = ControlTree.enterText("test-id", { text: "hello" });
+		assert.strictEqual(typeof result.then, "function", "Result has a then function");
+		assert.ok(result instanceof Promise, "Result is a Promise object");
+	});
+
+	QUnit.test("Accepts regular control ID", function (assert) {
+		var done = assert.async();
+
+		ControlTree.enterText("container", { text: "hello" }).then(function () {
+			assert.ok(this.fnGetCodeSnippet.calledWithMatch({ domElementId: "container", action: "ENTER_TEXT" }),
+				"getCodeSnippet called with domElementId: 'container' and action: 'ENTER_TEXT'");
+			assert.ok(this.fnGetSelector.calledWithMatch({ domElementId: "container" }),
+				"getSelector called with domElementId: 'container'");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Accepts and resolves node ID format", function (assert) {
+		var done = assert.async();
+
+		// Populate the map as if search() had previously assigned this nodeId
+		ControlTree._oNodeIdToControlIdMap["1_2"] = "container";
+
+		ControlTree.enterText("1_2", { text: "hello" }).then(function () {
+			assert.ok(this.fnGetCodeSnippet.calledWithMatch({ domElementId: "container" }),
+				"getCodeSnippet called with resolved control ID 'container'");
+			assert.ok(this.fnGetSelector.calledWithMatch({ domElementId: "container" }),
+				"getSelector called with resolved control ID 'container'");
+
+			// Cleanup
+			delete ControlTree._oNodeIdToControlIdMap["1_2"];
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Returns the action snippet from getCodeSnippet", function (assert) {
+		var done = assert.async();
+
+		this.fnGetCodeSnippet.resolves("enterText action code");
+
+		ControlTree.enterText("test-id", { text: "hello" }).then(function (result) {
+			assert.strictEqual(result, "enterText action code",
+				"Resolved value equals the snippet returned by getCodeSnippet");
+			done();
+		});
+	});
+
+	QUnit.test("Passes adapted actionSettings to getCodeSnippet", function (assert) {
+		var done = assert.async();
+
+		ControlTree.enterText("test-id", { text: "hello", clearTextFirst: true, submitText: false }).then(function () {
+			var oCallArgs = this.fnGetCodeSnippet.firstCall.args[0];
+			assert.strictEqual(oCallArgs.action, "ENTER_TEXT", "action is ENTER_TEXT");
+			assert.strictEqual(oCallArgs.actionSettings.text, "hello", "text setting preserved");
+			assert.strictEqual(oCallArgs.actionSettings.clearTextFirst, true, "clearTextFirst setting preserved");
+			assert.strictEqual(oCallArgs.actionSettings.keepFocus, true,
+				"keepFocus set to true (adapted from submitText: false)");
+			assert.notOk(oCallArgs.actionSettings.hasOwnProperty("submitText"),
+				"submitText removed from actionSettings");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Executes action via Opa5.waitFor", function (assert) {
+		var done = assert.async();
+
+		ControlTree.enterText("test-id", { text: "hello" }).then(function () {
+			assert.ok(this.fnWaitFor.calledOnce, "Opa5.waitFor called once");
+			var oSelectorArg = this.fnWaitFor.firstCall.args[0];
+			assert.ok(oSelectorArg.actions instanceof EnterText,
+				"waitFor selector has an actions property that is an instance of EnterText");
+			assert.ok(this.fnEmptyQueue.calledOnce, "Opa5.emptyQueue called once");
+			assert.ok(this.fnWaitForUI5.calledOnce, "RecordReplay.waitForUI5 called once");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Merges idSuffix from selector into action settings", function (assert) {
+		var done = assert.async();
+
+		this.fnGetSelector.resolves({ interaction: { idSuffix: "inner" } });
+
+		ControlTree.enterText("test-id", { text: "hello" }).then(function () {
+			var oSelectorArg = this.fnWaitFor.firstCall.args[0];
+			var oEnterTextAction = oSelectorArg.actions;
+			assert.strictEqual(oEnterTextAction.getIdSuffix(), "inner",
+				"idSuffix from selector merged into EnterText action settings");
+			assert.strictEqual(oEnterTextAction.getText(), "hello",
+				"text from caller settings preserved");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Handles invalid/unmapped node ID", function (assert) {
+		var done = assert.async();
+
+		// Ensure "999_999" is not in the map
+		delete ControlTree._oNodeIdToControlIdMap["999_999"];
+
+		ControlTree.enterText("999_999", { text: "hello" }).then(function () {
+			assert.ok(this.fnGetCodeSnippet.calledWithMatch({ domElementId: null }),
+				"getCodeSnippet called with domElementId: null for unmapped node ID");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Rejects when getCodeSnippet fails", function (assert) {
+		var done = assert.async();
+
+		this.fnGetCodeSnippet.rejects(new Error("snippet error"));
+
+		ControlTree.enterText("test-id", { text: "hello" }).then(function () {
+			assert.ok(false, "Promise should have been rejected");
+			done();
+		}).catch(function () {
+			assert.ok(true, "Promise rejected when getCodeSnippet fails");
+			assert.ok(this.fnGetSelector.notCalled,
+				"getSelector was not called \u2014 action was never executed");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Rejects when getSelector fails", function (assert) {
+		var done = assert.async();
+
+		this.fnGetSelector.rejects(new Error("selector error"));
+
+		ControlTree.enterText("test-id", { text: "hello" }).then(function () {
+			assert.ok(false, "Promise should have been rejected");
+			done();
+		}).catch(function () {
+			assert.ok(true, "Promise rejected when getSelector fails");
+			done();
+		});
+	});
+
+	// --- enterText() _adaptEnterTextSettings Tests ---
+	QUnit.module("ControlTree - enterText() - _adaptEnterTextSettings", {
+		beforeEach: function () {
+			this.fnUpdateSettings = sinon.stub(ControlInspector, "updateSettings");
+			this.fnGetCodeSnippet = sinon.stub(ControlInspector, "_getCodeSnippet");
+			this.fnGetCodeSnippet.resolves("mock enterText snippet");
+			this.fnGetSelector = sinon.stub(ControlInspector, "getSelector");
+			this.fnGetSelector.resolves({});
+			this.fnWaitFor = sinon.stub(Opa5.prototype, "waitFor").returns(Promise.resolve());
+			this.fnEmptyQueue = sinon.stub(Opa5, "emptyQueue");
+			this.fnWaitForUI5 = sinon.stub(RecordReplay, "waitForUI5").resolves();
+		},
+		afterEach: function () {
+			this.fnUpdateSettings.restore();
+			this.fnGetCodeSnippet.restore();
+			this.fnGetSelector.restore();
+			this.fnWaitFor.restore();
+			this.fnEmptyQueue.restore();
+			this.fnWaitForUI5.restore();
+		}
+	});
+
+	QUnit.test("submitText: false sets keepFocus: true and removes submitText", function (assert) {
+		var done = assert.async();
+
+		ControlTree.enterText("test-id", { text: "hello", submitText: false }).then(function () {
+			var oCallArgs = this.fnGetCodeSnippet.firstCall.args[0];
+			assert.strictEqual(oCallArgs.actionSettings.keepFocus, true,
+				"keepFocus set to true when submitText is false");
+			assert.notOk(oCallArgs.actionSettings.hasOwnProperty("submitText"),
+				"submitText removed from settings");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("submitText: true removes submitText without setting keepFocus", function (assert) {
+		var done = assert.async();
+
+		ControlTree.enterText("test-id", { text: "hello", submitText: true }).then(function () {
+			var oCallArgs = this.fnGetCodeSnippet.firstCall.args[0];
+			assert.notOk(oCallArgs.actionSettings.hasOwnProperty("submitText"),
+				"submitText removed from settings");
+			assert.notOk(oCallArgs.actionSettings.hasOwnProperty("keepFocus"),
+				"keepFocus was not set when submitText is true");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("submitText absent — no mutation of keepFocus", function (assert) {
+		var done = assert.async();
+
+		ControlTree.enterText("test-id", { text: "hello", clearTextFirst: true }).then(function () {
+			var oCallArgs = this.fnGetCodeSnippet.firstCall.args[0];
+			assert.notOk(oCallArgs.actionSettings.hasOwnProperty("submitText"),
+				"submitText not present in settings");
+			assert.notOk(oCallArgs.actionSettings.hasOwnProperty("keepFocus"),
+				"keepFocus not set when submitText is absent");
+			assert.strictEqual(oCallArgs.actionSettings.clearTextFirst, true,
+				"other settings preserved");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("EnterText action receives adapted settings", function (assert) {
+		var done = assert.async();
+
+		ControlTree.enterText("test-id", { text: "hello", submitText: false, clearTextFirst: true }).then(function () {
+			var oSelectorArg = this.fnWaitFor.firstCall.args[0];
+			var oEnterTextAction = oSelectorArg.actions;
+			assert.strictEqual(oEnterTextAction.getKeepFocus(), true,
+				"keepFocus is true (adapted from submitText: false)");
+			assert.strictEqual(oEnterTextAction.getClearTextFirst(), true,
+				"clearTextFirst preserved");
+			assert.strictEqual(oEnterTextAction.getText(), "hello",
+				"text preserved");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("EnterText action with submitText: true has default keepFocus (false)", function (assert) {
+		var done = assert.async();
+
+		ControlTree.enterText("test-id", { text: "hello", submitText: true }).then(function () {
+			var oSelectorArg = this.fnWaitFor.firstCall.args[0];
+			var oEnterTextAction = oSelectorArg.actions;
+			assert.strictEqual(oEnterTextAction.getKeepFocus(), false,
+				"keepFocus defaults to false when submitText is true");
+			assert.strictEqual(oEnterTextAction.getText(), "hello",
+				"text preserved");
+			done();
+		}.bind(this));
+	});
+
+	// --- enterText() Integration Tests ---
+	QUnit.module("ControlTree - enterText() - Integration", {
+		beforeEach: async function () {
+			// Create and render a real SearchField
+			this.oSearchField = new SearchField("integration-sf");
+			this.oSearchField.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Stub ControlInspector
+			this.fnUpdateSettings = sinon.stub(ControlInspector, "updateSettings");
+			this.fnGetCodeSnippet = sinon.stub(ControlInspector, "_getCodeSnippet");
+			this.fnGetCodeSnippet.resolves("integration enterText snippet");
+			this.fnGetSelector = sinon.stub(ControlInspector, "getSelector");
+			this.fnGetSelector.resolves({ id: "integration-sf" });
+
+			// Stub OPA/RecordReplay — waitFor executes the EnterText action on the real SearchField
+			var that = this;
+			this.fnWaitFor = sinon.stub(Opa5.prototype, "waitFor").callsFake(function (oSelector) {
+				if (oSelector.actions) {
+					oSelector.actions.executeOn(that.oSearchField);
+				}
+				return Promise.resolve();
+			});
+			this.fnEmptyQueue = sinon.stub(Opa5, "emptyQueue");
+			this.fnWaitForUI5 = sinon.stub(RecordReplay, "waitForUI5").resolves();
+		},
+		afterEach: function () {
+			this.oSearchField.destroy();
+			this.fnUpdateSettings.restore();
+			this.fnGetCodeSnippet.restore();
+			this.fnGetSelector.restore();
+			this.fnWaitFor.restore();
+			this.fnEmptyQueue.restore();
+			this.fnWaitForUI5.restore();
+		}
+	});
+
+	QUnit.test("Entering text into a real SearchField updates its value", function (assert) {
+		var done = assert.async();
+
+		ControlTree.enterText("integration-sf", { text: "search query" }).then(function () {
+			assert.strictEqual(this.oSearchField.getValue(), "search query",
+				"SearchField value updated to entered text");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("EnterText action is constructed with the passed settings", function (assert) {
+		var done = assert.async();
+
+		ControlTree.enterText("integration-sf", { text: "typed text", clearTextFirst: true, submitText: false }).then(function () {
+			// Verify the EnterText instance was created with correct settings
+			var oSelectorArg = this.fnWaitFor.firstCall.args[0];
+			var oEnterTextAction = oSelectorArg.actions;
+			assert.ok(oEnterTextAction instanceof EnterText, "actions is an EnterText instance");
+			assert.strictEqual(oEnterTextAction.getText(), "typed text", "text is 'typed text'");
+			assert.strictEqual(oEnterTextAction.getClearTextFirst(), true, "clearTextFirst is true");
+			assert.strictEqual(oEnterTextAction.getKeepFocus(), true,
+				"keepFocus is true (adapted from submitText: false)");
+
+			// The action still executed on the real SearchField
+			assert.strictEqual(this.oSearchField.getValue(), "typed text",
+				"SearchField value was updated");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("idSuffix from selector is merged into EnterText action settings", function (assert) {
+		var done = assert.async();
+
+		this.fnGetSelector.resolves({ id: "integration-sf", interaction: { idSuffix: "I" } });
+
+		// Override waitFor to only capture the EnterText instance without executing
+		// (the SearchField may not have an "I" sub-element, so executeOn could fail)
+		this.fnWaitFor.callsFake(function (oSelector) {
+			return Promise.resolve();
+		});
+
+		ControlTree.enterText("integration-sf", { text: "hello", submitText: false }).then(function () {
+			var oSelectorArg = this.fnWaitFor.firstCall.args[0];
+			var oEnterTextAction = oSelectorArg.actions;
+			assert.strictEqual(oEnterTextAction.getIdSuffix(), "I",
+				"idSuffix from selector merged into EnterText action");
+			assert.strictEqual(oEnterTextAction.getKeepFocus(), true,
+				"keepFocus from adapted settings preserved after merge");
+			assert.strictEqual(oEnterTextAction.getText(), "hello",
+				"text from caller settings preserved after merge");
+			done();
+		}.bind(this));
+	});
 });

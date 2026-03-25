@@ -2938,6 +2938,38 @@ sap.ui.define([
 										editable: true
 									}
 								]
+							},
+							{
+								title: 'Table with Navigation Arrow',
+								key: 'tableNavigationArrow',
+								target: 'exploreSamples',
+								settings: {
+									columns: 6
+								},
+								files: [
+									{
+										url: '/samples/actions/navigationArrow/table.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							},
+							{
+								title: 'List with Navigation Arrow',
+								key: 'listNavigationArrow',
+								target: 'exploreSamples',
+								settings: {
+									columns: 3
+								},
+								files: [
+									{
+										url: '/samples/actions/navigationArrow/list.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
 							}
 						]
 					},

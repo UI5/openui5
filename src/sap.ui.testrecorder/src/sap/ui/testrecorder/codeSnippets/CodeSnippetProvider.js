@@ -34,6 +34,7 @@ sap.ui.define([
 	 * @param {object} mData data from which to generate a snippet
 	 * @param {object} mData.controlSelector control selector in string format
 	 * @param {string} mData.action name of the action to record for the control
+	 * @param {string} mData.actionSettings settings for the action constructor
 	 * @returns {Promise<string>} Promise for a code snippet or error
 	 */
 	ControlSnippetProvider.prototype.getSnippet = function (mData) {
