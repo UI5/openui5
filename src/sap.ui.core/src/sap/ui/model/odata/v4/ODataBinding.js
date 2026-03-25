@@ -240,14 +240,16 @@ sap.ui.define([
 	 * one. The error has the property <code>canceled : true</code>
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._Cache} oExpectedCache - The expected cache
+	 * @param {number} [iResetCount] - The cache's expected reset count
 	 * @throws {Error} If the current cache is not the expected one
 	 *
 	 * @private
 	 */
-	ODataBinding.prototype.checkSameCache = function (oExpectedCache) {
+	ODataBinding.prototype.checkSameCache = function (oExpectedCache, iResetCount) {
 		var oError;
 
-		if (this.oCache !== oExpectedCache) {
+		if (this.oCache !== oExpectedCache
+				|| iResetCount !== undefined && this.oCache.iResetCount !== iResetCount) {
 			oError = new Error(this + " is ignoring response from inactive cache: "
 				+ oExpectedCache);
 			oError.canceled = true;
