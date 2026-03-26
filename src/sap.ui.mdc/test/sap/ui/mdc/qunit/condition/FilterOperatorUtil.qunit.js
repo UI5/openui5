@@ -2908,4 +2908,126 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("getModelFilter: Empty for navigation properties (Any)", function(assert) {
+
+		const oType = new StringType({}, {nullable: true});
+		const oOperator = FilterOperatorUtil.getOperator(OperatorName.Empty);
+		const oCondition = Condition.createCondition(OperatorName.Empty, [], undefined, undefined, ConditionValidated.NotValidated);
+		let oFilter = oOperator.getModelFilter(oCondition, "navPath*/propertyPath", oType, false, BaseType.String);
+		let aFilters = oFilter?.getFilters();
+
+		assert.ok(oFilter, "Filter returned");
+		assert.notOk(oFilter.isAnd(), "Filters OR combined");
+		assert.equal(aFilters?.length, 2, "2 Filters included");
+		assert.equal(aFilters?.[0]?.getPath(), "navPath", "Filter0 path");
+		assert.equal(aFilters?.[0]?.getOperator(), FilterOperator.NotAny, "Filter0 operator");
+		assert.notOk(aFilters?.[0]?.getCondition(), "Filter0 condition");
+		assert.equal(aFilters?.[1]?.getPath(), "navPath", "Filter1 path");
+		assert.equal(aFilters?.[1]?.getOperator(), FilterOperator.Any, "Filter1 operator");
+		assert.equal(aFilters?.[1]?.getVariable(), "L1", "Filter1 variable");
+		assert.ok(aFilters?.[1]?.getCondition(), "Filter1 condition");
+		oFilter = aFilters?.[1]?.getCondition();
+		aFilters = oFilter?.getFilters();
+		assert.notOk(oFilter.isAnd(), "Condition-Filters OR combined");
+		assert.equal(aFilters?.length, 2, "2 Condition-Filters included");
+		assert.equal(aFilters?.[0]?.getPath(), "L1/propertyPath", "Condition-Filter0 path");
+		assert.equal(aFilters?.[0]?.getOperator(), FilterOperator.EQ, "Condition-Filter0 operator");
+		assert.equal(aFilters?.[0]?.getValue1(), "", "Condition-Filter0 value1");
+		assert.equal(aFilters?.[0]?.getValue2(), undefined, "Condition-Filter0 value2");
+		assert.equal(aFilters?.[1]?.getPath(), "L1/propertyPath", "Condition-Filter1 path");
+		assert.equal(aFilters?.[1]?.getOperator(), FilterOperator.EQ, "Condition-Filter1 operator");
+		assert.equal(aFilters?.[1]?.getValue1(), null, "Condition-Filter1 value1");
+		assert.equal(aFilters?.[1]?.getValue2(), undefined, "Condition-Filter1 value2");
+
+	});
+
+	QUnit.test("getModelFilter: NotEmpty for navigation properties (Any)", function(assert) {
+
+		const oType = new StringType({}, {nullable: true});
+		const oOperator = FilterOperatorUtil.getOperator(OperatorName.NotEmpty);
+		const oCondition = Condition.createCondition(OperatorName.NotEmpty, [], undefined, undefined, ConditionValidated.NotValidated);
+		let oFilter = oOperator.getModelFilter(oCondition, "navPath*/propertyPath", oType, false, BaseType.String);
+		let aFilters = oFilter?.getFilters();
+
+		assert.ok(oFilter, "Filter returned");
+		assert.equal(oFilter.getPath(), "navPath", "Filter path");
+		assert.equal(oFilter.getOperator(), FilterOperator.Any, "Filter operator");
+		assert.equal(oFilter.getVariable(), "L1", "Filter variable");
+		assert.ok(oFilter.getCondition(), "Filter condition");
+		oFilter = oFilter.getCondition();
+		aFilters = oFilter.getFilters();
+		assert.ok(oFilter.isAnd(), "Condition-Filters AND combined");
+		assert.equal(aFilters?.length, 2, "2 Condition-Filters included");
+		assert.equal(aFilters?.[0]?.getPath(), "L1/propertyPath", "Condition-Filter0 path");
+		assert.equal(aFilters?.[0]?.getOperator(), FilterOperator.NE, "Condition-Filter0 operator");
+		assert.equal(aFilters?.[0]?.getValue1(), "", "Condition-Filter0 value1");
+		assert.equal(aFilters?.[0]?.getValue2(), undefined, "Condition-Filter0 value2");
+		assert.equal(aFilters?.[1]?.getPath(), "L1/propertyPath", "Condition-Filter1 path");
+		assert.equal(aFilters?.[1]?.getOperator(), FilterOperator.NE, "Condition-Filter1 operator");
+		assert.equal(aFilters?.[1]?.getValue1(), null, "Condition-Filter1 value1");
+		assert.equal(aFilters?.[1]?.getValue2(), undefined, "Condition-Filter1 value2");
+
+	});
+
+	QUnit.test("getModelFilter: Empty for navigation properties (All)", function(assert) {
+
+		const oType = new StringType({}, {nullable: true});
+		const oOperator = FilterOperatorUtil.getOperator(OperatorName.Empty);
+		const oCondition = Condition.createCondition(OperatorName.Empty, [], undefined, undefined, ConditionValidated.NotValidated);
+		let oFilter = oOperator.getModelFilter(oCondition, "navPath+/propertyPath", oType, false, BaseType.String);
+		let aFilters = oFilter?.getFilters();
+
+		assert.ok(oFilter, "Filter returned");
+		assert.notOk(oFilter.isAnd(), "Filters OR combined");
+		assert.equal(aFilters?.length, 2, "2 Filters included");
+		assert.equal(aFilters?.[0]?.getPath(), "navPath", "Filter0 path");
+		assert.equal(aFilters?.[0]?.getOperator(), FilterOperator.NotAny, "Filter0 operator");
+		assert.notOk(aFilters?.[0]?.getCondition(), "Filter0 condition");
+		assert.equal(aFilters?.[1]?.getPath(), "navPath", "Filter1 path");
+		assert.equal(aFilters?.[1]?.getOperator(), FilterOperator.All, "Filter1 operator");
+		assert.equal(aFilters?.[1]?.getVariable(), "L1", "Filter1 variable");
+		assert.ok(aFilters?.[1]?.getCondition(), "Filter1 condition");
+		oFilter = aFilters?.[1]?.getCondition();
+		aFilters = oFilter?.getFilters();
+		assert.notOk(oFilter.isAnd(), "Condition-Filters OR combined");
+		assert.equal(aFilters?.length, 2, "2 Condition-Filters included");
+		assert.equal(aFilters?.[0]?.getPath(), "L1/propertyPath", "Condition-Filter0 path");
+		assert.equal(aFilters?.[0]?.getOperator(), FilterOperator.EQ, "Condition-Filter0 operator");
+		assert.equal(aFilters?.[0]?.getValue1(), "", "Condition-Filter0 value1");
+		assert.equal(aFilters?.[0]?.getValue2(), undefined, "Condition-Filter0 value2");
+		assert.equal(aFilters?.[1]?.getPath(), "L1/propertyPath", "Condition-Filter1 path");
+		assert.equal(aFilters?.[1]?.getOperator(), FilterOperator.EQ, "Condition-Filter1 operator");
+		assert.equal(aFilters?.[1]?.getValue1(), null, "Condition-Filter1 value1");
+		assert.equal(aFilters?.[1]?.getValue2(), undefined, "Condition-Filter1 value2");
+
+	});
+
+	QUnit.test("getModelFilter: NotEmpty for navigation properties (All)", function(assert) {
+
+		const oType = new StringType({}, {nullable: true});
+		const oOperator = FilterOperatorUtil.getOperator(OperatorName.NotEmpty);
+		const oCondition = Condition.createCondition(OperatorName.NotEmpty, [], undefined, undefined, ConditionValidated.NotValidated);
+		let oFilter = oOperator.getModelFilter(oCondition, "navPath+/propertyPath", oType, false, BaseType.String);
+		let aFilters = oFilter?.getFilters();
+
+		assert.ok(oFilter, "Filter returned");
+		assert.equal(oFilter.getPath(), "navPath", "Filter path");
+		assert.equal(oFilter.getOperator(), FilterOperator.All, "Filter operator");
+		assert.equal(oFilter.getVariable(), "L1", "Filter variable");
+		assert.ok(oFilter.getCondition(), "Filter condition");
+		oFilter = oFilter.getCondition();
+		aFilters = oFilter.getFilters();
+		assert.ok(oFilter.isAnd(), "Condition-Filters AND combined");
+		assert.equal(aFilters?.length, 2, "2 Condition-Filters included");
+		assert.equal(aFilters?.[0]?.getPath(), "L1/propertyPath", "Condition-Filter0 path");
+		assert.equal(aFilters?.[0]?.getOperator(), FilterOperator.NE, "Condition-Filter0 operator");
+		assert.equal(aFilters?.[0]?.getValue1(), "", "Condition-Filter0 value1");
+		assert.equal(aFilters?.[0]?.getValue2(), undefined, "Condition-Filter0 value2");
+		assert.equal(aFilters?.[1]?.getPath(), "L1/propertyPath", "Condition-Filter1 path");
+		assert.equal(aFilters?.[1]?.getOperator(), FilterOperator.NE, "Condition-Filter1 operator");
+		assert.equal(aFilters?.[1]?.getValue1(), null, "Condition-Filter1 value1");
+		assert.equal(aFilters?.[1]?.getValue2(), undefined, "Condition-Filter1 value2");
+
+	});
+
 });
