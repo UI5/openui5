@@ -140,7 +140,7 @@
 										useAsValueHelp="false">
 										<m:Table id="VH-Quantity-Pop-Table" items="{/weightODataUnits}" width="16rem" mode="SingleSelectMaster">
 											<m:columns>
-												<m:Column width="10rem">
+												<m:Column width="6rem">
 													<m:Label text="{/#ODataUnits/MatrId/@sap:label}"/>
 												</m:Column>
 												<m:Column width="3rem">

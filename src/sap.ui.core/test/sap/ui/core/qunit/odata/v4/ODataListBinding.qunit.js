@@ -1959,6 +1959,7 @@ sap.ui.define([
 			iMaximumPrefetchSize = bKeepCurrent ? 0 : 100,
 			aResults;
 
+		oBinding.bLengthFinal = true;
 		oBinding.oReadGroupLock = "~oReadGroupLock~";
 		oBinding.iCurrentBegin = 2;
 		oBinding.iCurrentEnd = 7;
@@ -1967,6 +1968,7 @@ sap.ui.define([
 				undefined, sClassName);
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
 		this.mock(oBinding).expects("isResolved").withExactArgs().returns(true);
+		this.mock(oBinding).expects("getLength").never();
 		this.mock(oBinding).expects("getDiff").never();
 		this.mock(oBinding).expects("fetchContexts")
 			.withExactArgs(5, 10, iMaximumPrefetchSize, undefined, false, sinon.match.func)
@@ -2027,7 +2029,7 @@ sap.ui.define([
 	// sometimes all visible data is already available, but still a prefetch request is sent
 	// (SNOW: DINC0278304)
 [false, true].forEach(function (bAvailable, i) {
-	QUnit.test("getContexts: dataRequested/dataReceived #" + i, function () {
+	QUnit.test("getContexts: dataRequested/dataReceived #" + i, function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oBindingMock = this.mock(oBinding),
 			oFetchContextsCall,
@@ -2040,6 +2042,8 @@ sap.ui.define([
 					return false;
 				});
 
+		assert.strictEqual(oBinding.bLengthFinal, false);
+		this.mock(oBinding).expects("getLength").never(); // iStart === 0
 		oFetchContextsCall = oBindingMock.expects("fetchContexts")
 			.withExactArgs(0, 10, 100, undefined, false, sinon.match.func)
 			.returns(oFetchContextsPromise);
@@ -2062,10 +2066,12 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("getContexts: default values", function () {
+	QUnit.test("getContexts: default values", function (assert) {
 		var oBinding = this.bindList("n/a"),
 			oBindingMock = this.mock(oBinding);
 
+		assert.strictEqual(oBinding.bLengthFinal, false);
+		this.mock(oBinding).expects("getLength").never(); // iLength !== 1 || iMaximumPrefetchSize
 		oBindingMock.expects("checkSuspended").withExactArgs();
 		oBindingMock.expects("isResolved").withExactArgs().returns(true);
 		oBindingMock.expects("fetchContexts")
@@ -2083,6 +2089,15 @@ sap.ui.define([
 
 		// code under test
 		oBinding.getContexts(1, 2, -42);
+
+		oBindingMock.expects("checkSuspended").withExactArgs();
+		oBindingMock.expects("isResolved").withExactArgs().returns(true);
+		oBindingMock.expects("fetchContexts")
+			.withExactArgs(1, 2, 0, undefined, false, sinon.match.func)
+			.returns(SyncPromise.resolve());
+
+		// code under test
+		oBinding.getContexts(1, 2);
 	});
 
 	//*********************************************************************************************
@@ -2230,6 +2245,24 @@ sap.ui.define([
 
 		assert.strictEqual(oBinding.sChangeReason, undefined);
 		assert.deepEqual(aContexts, []);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getContexts: ignore fixed bottom row w/ grand total", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		assert.strictEqual(oBinding.bLengthFinal, false);
+		this.mock(oBinding).expects("checkSuspended").withExactArgs();
+		this.mock(oBinding).expects("isResolved").withExactArgs().returns(true);
+		this.mock(oBinding).expects("getLength").withExactArgs().returns(2);
+		this.mock(oBinding).expects("fetchContexts").never();
+		this.mock(oBinding).expects("resolveRefreshPromise").never();
+		this.mock(oBinding).expects("_fireChange").never();
+		this.mock(oBinding).expects("getContextsInViewOrder").never();
+
+		assert.deepEqual(
+			// code under test
+			oBinding.getContexts(1, 1, 0),
+			[]);
 	});
 
 	//*********************************************************************************************
@@ -9152,7 +9185,8 @@ sap.ui.define([
 			sGroupId = "group";
 
 		oBinding.iCurrentEnd = 42;
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation); // see return above
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs(sGroupId).returns(false);
@@ -9184,7 +9218,8 @@ sap.ui.define([
 			oBinding = bindList(this, "/Set"),
 			oError = new Error();
 
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation);
 		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
 			.withExactArgs().returns(false);
@@ -9221,7 +9256,8 @@ sap.ui.define([
 			oBinding = bindList(this, "/Set"),
 			oContext = bHeader ? oBinding.getHeaderContext() : undefined;
 
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation); // see return above
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs("group").returns(true);
@@ -9252,7 +9288,8 @@ sap.ui.define([
 			}),
 			oPromise;
 
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation);
 		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
 			.withExactArgs().returns(false);
@@ -9288,6 +9325,10 @@ sap.ui.define([
 			oResult = {};
 
 		oBinding.iCurrentEnd = 42;
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(false);
+		this.mock(_AggregationHelper).expects("isAffected").never();
 		this.mock(oBinding).expects("setOutdated").never();
 		this.mock(oBinding).expects("refreshSingle").never();
 		this.mock(oBinding).expects("refreshInternal").withExactArgs("", "group", false, true)
@@ -9308,6 +9349,7 @@ sap.ui.define([
 
 		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
 			.withExactArgs().returns(false);
+		this.mock(_AggregationHelper).expects("isAffected").never();
 		this.mock(this.oModel).expects("withUnresolvedBindings")
 			.withExactArgs("removeCachesAndMessages", "EMPLOYEES('42')");
 		this.mock(oBinding).expects("setOutdated").never();
@@ -9366,7 +9408,8 @@ sap.ui.define([
 		oCanceledError.canceled = true;
 		oBinding.iCurrentEnd = 6;
 
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation); // see return above
 		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
 			.withExactArgs().returns(false);
@@ -9430,7 +9473,8 @@ sap.ui.define([
 			sGroupId = "group";
 
 		oBinding.iCurrentEnd = 8;
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation); // see return above
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs(sGroupId).returns(false);
@@ -9464,7 +9508,8 @@ sap.ui.define([
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
 			oBinding = bindList(this, "/Set");
 
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation); // see return above
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs("group").returns(false);
@@ -9488,7 +9533,7 @@ sap.ui.define([
 		var sTitle = "requestSideEffects: $$aggregation, refresh=" + bRefresh + ", headerContext="
 				+ bHeaderContext;
 
-		QUnit.test(sTitle, function (assert) {
+	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("/Set"),
 			oContext = bHeaderContext ? oBinding.getHeaderContext() : undefined,
 			aFilters = [],
@@ -9496,7 +9541,8 @@ sap.ui.define([
 			oPromise,
 			oRefreshPromise = {};
 
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(true);
 		this.mock(oBinding.oCache).expects("requestSideEffects").never();
 		this.mock(oBinding.aFilters).expects("concat").withExactArgs(oBinding.aApplicationFilters)
@@ -9526,7 +9572,8 @@ sap.ui.define([
 	QUnit.test("requestSideEffects: data aggregation with groupLevels", function (assert) {
 		const oBinding = this.bindList("/Set");
 		oBinding.mParameters.$$aggregation = {groupLevels : ["Foo"]};
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(true);
 		const oContext = Context.create({/*oModel*/}, oBinding, "/Set('42')");
 		this.mock(oContext).expects("isAggregated").never();
@@ -9546,7 +9593,8 @@ sap.ui.define([
 	QUnit.test("requestSideEffects: on aggregated data", function (assert) {
 		const oBinding = this.bindList("/Set");
 		oBinding.mParameters.$$aggregation = {groupLevels : []};
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(oBinding.mParameters)
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(true);
 		const oContext = Context.create({/*oModel*/}, oBinding, "/Set('42')");
 		this.mock(oContext).expects("isAggregated").withExactArgs().returns(true);
@@ -9560,6 +9608,30 @@ sap.ui.define([
 			// code under test
 			oBinding.requestSideEffects("group", [/*aPaths*/], oContext);
 		}, new Error("Unsupported on aggregated data: " + oContext));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("requestSideEffects: with created rows", function (assert) {
+		const oBinding = this.bindList("/Set");
+		oBinding.iCreatedContexts = 1;
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(true);
+		this.mock(oBinding.aFilters).expects("concat")
+			.withExactArgs(sinon.match.same(oBinding.aApplicationFilters))
+			.returns("~aFilters~");
+		this.mock(_AggregationHelper).expects("isAffected")
+			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation), "~aFilters~",
+				"~aPaths~")
+			.returns(true);
+		this.mock(oBinding).expects("refreshSingle").never();
+		this.mock(oBinding.oCache).expects("requestSideEffects").never();
+		this.mock(oBinding).expects("refreshInternal").never();
+
+		assert.throws(function () {
+			// code under test
+			oBinding.requestSideEffects("group", "~aPaths~");
+		}, new Error("Unsupported for data aggregation with created rows: " + oBinding));
 	});
 
 	//*********************************************************************************************
@@ -12015,6 +12087,7 @@ sap.ui.define([
 				}
 			};
 
+		oBinding.mCanUseCachePromiseByChildPath = "~mCanUseCachePromiseByChildPath~";
 		this.mock(this.oModel).expects("releaseKeepAliveBinding").withExactArgs("/path")
 			.returns(oTemporaryBinding);
 		this.mock(_Helper).expects("clone").withExactArgs("~mQueryOptions~")
@@ -12033,6 +12106,7 @@ sap.ui.define([
 			oCache);
 
 		assert.strictEqual(oBinding.mLateQueryOptions, "~mQueryOptionsClone~");
+		assert.deepEqual(oBinding.mCanUseCachePromiseByChildPath, {});
 		assert.strictEqual(Object.keys(oBinding.mPreviousContextsByPath).length, 2);
 		assert.strictEqual(oBinding.mPreviousContextsByPath["/path(1)"], oContext1);
 		assert.strictEqual(oBinding.mPreviousContextsByPath["/path(2)"], oContext2);
@@ -12046,6 +12120,7 @@ sap.ui.define([
 				{$$getKeepAliveContext : true});
 
 		oBinding.mLateQueryOptions = "~mLateQueryOptions~";
+		oBinding.mCanUseCachePromiseByChildPath = "~mCanUseCachePromiseByChildPath~";
 		this.mock(this.oModel).expects("releaseKeepAliveBinding").withExactArgs("/path")
 			.returns(undefined);
 
@@ -12053,6 +12128,8 @@ sap.ui.define([
 		assert.strictEqual(oBinding.getCacheAndMoveKeepAliveContexts("path"), undefined);
 
 		assert.strictEqual(oBinding.mLateQueryOptions, "~mLateQueryOptions~");
+		assert.strictEqual(oBinding.mCanUseCachePromiseByChildPath,
+			"~mCanUseCachePromiseByChildPath~");
 		assert.strictEqual(Object.keys(oBinding.mPreviousContextsByPath).length, 0);
 	});
 
@@ -12061,21 +12138,25 @@ sap.ui.define([
 		var oBinding = this.bindList("/path");
 
 		oBinding.mLateQueryOptions = "~mLateQueryOptions~";
+		oBinding.mCanUseCachePromiseByChildPath = "~mCanUseCachePromiseByChildPath~";
 		this.mock(this.oModel).expects("releaseKeepAliveBinding").never();
 
 		// code under test
 		assert.strictEqual(oBinding.getCacheAndMoveKeepAliveContexts("path"), undefined);
 
 		assert.strictEqual(oBinding.mLateQueryOptions, "~mLateQueryOptions~");
+		assert.strictEqual(oBinding.mCanUseCachePromiseByChildPath,
+			"~mCanUseCachePromiseByChildPath~");
 		assert.strictEqual(Object.keys(oBinding.mPreviousContextsByPath).length, 0);
 	});
 
 	//*********************************************************************************************
 ["foo", "bar", "$$patchWithoutSideEffects", "$$updateGroupId"].forEach(function (sParameter) {
-	QUnit.test("getCacheAndMoveKeepAliveContexts: mismatch in" + sParameter, function (assert) {
+	QUnit.test("getCacheAndMoveKeepAliveContexts: mismatch in " + sParameter, function (assert) {
 		var oBinding = this.bindList("/path"),
 			oTemporaryBinding = {};
 
+		oBinding.mCanUseCachePromiseByChildPath = "~mCanUseCachePromiseByChildPath~";
 		this.mock(this.oModel).expects("releaseKeepAliveBinding").twice().withExactArgs("/path")
 			.returns(oTemporaryBinding);
 
@@ -12096,6 +12177,9 @@ sap.ui.define([
 			// code under test
 			oBinding.getCacheAndMoveKeepAliveContexts("path");
 		}, new Error(oBinding + ": parameter does not match getKeepAliveContext: " + sParameter));
+
+		assert.strictEqual(oBinding.mCanUseCachePromiseByChildPath,
+			"~mCanUseCachePromiseByChildPath~");
 	});
 });
 

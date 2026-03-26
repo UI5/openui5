@@ -49,8 +49,15 @@ sap.ui.define([
 			 */
 			// @override sap.ui.model.odata.v4.lib._CollectionCache#getResourcePathWithQuery
 			oCache.getResourcePathWithQuery = function (iStart, iLength) {
+				// @see _CollectionCache.prototype.getResourcePathWithQuery
+				const iCreated = this.aElements.$created;
+				if (iStart < iCreated) {
+					throw new Error("Must not request created element");
+				}
+				iStart -= iCreated;
+
 				// Note: ignore existing mQueryOptions.$apply, e.g. from ODLB#updateAnalyticalInfo
-				var mQueryOptionsWithApply = _AggregationHelper.buildApply(oAggregation,
+				const mQueryOptionsWithApply = _AggregationHelper.buildApply(oAggregation,
 						Object.assign({}, this.mQueryOptions, {
 							$skip : iStart,
 							$top : iLength

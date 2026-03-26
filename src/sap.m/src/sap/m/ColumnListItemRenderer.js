@@ -128,6 +128,17 @@ ColumnListItemRenderer.renderActions = function(rm, oLI) {
 	rm.close("td");
 };
 
+// render navigation action within the actions block
+ColumnListItemRenderer.renderNavigationInActions = function(rm, oLI) {
+	var oTable = oLI.getTable();
+	if (!oTable || !oTable.doItemsNeedTypeColumn()) {
+		return;
+	}
+
+	// let the list item base render the navigation action
+	ListItemBaseRenderer.renderNavigationInActions.call(this, rm, oLI, true);
+};
+
 // ColumnListItem does not respect counter property of the LIB
 ColumnListItemRenderer.renderCounter = function(rm, oLI) {
 };

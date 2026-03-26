@@ -3068,14 +3068,14 @@ sap.ui.define([
 		 Inactive : "Inactive",
 
 		 /**
-		  * Enables detail button of the list item that fires <code>detailPress</code> event.
-		  * Also see {@link sap.m.ListItemBase#attachDetailPress}.
+		  * Enables the detail button of the list item that fires the {@link sap.m.ListItemBase#event:detailPress detailPress} event.
 		  * @public
 		  */
 		 Detail : "Detail",
 
 		 /**
-		  * Indicates the list item is navigable to show extra information about the item.
+		  * Enables the navigation button of the list item to navigate and display additional information about the item.
+		  * Fires the {@link sap.m.ListBase#event:itemPress} event when pressed.
 		  * @public
 		  */
 		 Navigation : "Navigation",

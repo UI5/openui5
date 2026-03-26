@@ -34,6 +34,7 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
 	"sap/ui/core/Theming",
+	"sap/ui/core/ShortcutHintsMixin",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/model/Filter",
@@ -79,6 +80,7 @@ sap.ui.define([
 	Library,
 	coreLibrary,
 	Theming,
+	ShortcutHintsMixin,
 	KeyCodes,
 	VerticalLayout,
 	Filter,
@@ -2208,7 +2210,7 @@ sap.ui.define([
 			oInput2.setEnabled(false);
 			await nextUIUpdate();
 			qutils.triggerKeydown(document.activeElement, "ARROW_DOWN", false, false, true);
-			assert.strictEqual(document.activeElement, oListItem2.getModeControl().getFocusDomRef(), "Focus is moved to the selection control of 2nd item since the input is disabled");
+			assert.strictEqual(document.activeElement, oListItem2.getNavigationControl().getFocusDomRef(), "Focus is moved to the navigation control of 2nd item since the input is disabled");
 
 			qutils.triggerKeydown(document.activeElement, "TAB", true, false, false);
 			assert.notStrictEqual(document.activeElement, oList.getItemsContainerDomRef(), "Focus is not forwarded before the table");
@@ -4441,10 +4443,17 @@ sap.ui.define([
 		aSteps.push("Delete");
 		assert.verifySteps(aSteps, "Correct actions are triggered");
 
+		const fnShortcutHintsMixinSpy = sinon.spy(ShortcutHintsMixin, "addConfig");
 		this.oItem1.setType("Navigation");
 		this.oList.setMode("Delete");
 		await nextUIUpdate();
-		assert.ok(this.oItem1.getDomRef("imgNav"), "Navigation type is rendered this is independent from custom actions");
+		assert.ok(fnShortcutHintsMixinSpy.calledWithExactly(
+			this.oItem1.getNavigationControl(),
+			sinon.match({ shortcut: "Enter" }),
+			this.oItem1.getNavigationControl()
+		), "ShortcutHintsMixin config of the Navigation Button is correct");
+		fnShortcutHintsMixinSpy.restore();
+		assert.ok(this.oItem1.getDomRef("imgNav").parentNode === this.oItem1.getDomRef("actions") ,"Navigation type is rendered inside the custom actions");
 		assert.notOk(this.oItem1.getDomRef("imgDel"), "Delete mode button is not rendered since custom actions active");
 		assert.notOk(this.oList.getDomRef("listUl").classList.contains("sapMListModeDelete"), "Delete mode class is not added to the list");
 

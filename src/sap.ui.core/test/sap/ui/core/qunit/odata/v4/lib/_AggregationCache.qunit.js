@@ -704,15 +704,18 @@ sap.ui.define([
 		groupLevels : ["group"]
 	}].forEach(function (oNewAggregation, i) {
 		[false, true].forEach(function (bCount) {
-			const sTitle = "doReset: #" + i + ", bCount=" + bCount;
-			const bCountLeaves = bCount && oNewAggregation.groupLevels?.length > 0;
-			const bHasGrandTotal = !!oNewAggregation.aggregate?.SalesNumber?.grandTotal;
+			[false, true].forEach(function (bHasFirstLevel) {
+				const sTitle = "doReset: #" + i + ", bCount=" + bCount
+					+ ", has oFirstLevel=" + bHasFirstLevel;
+				const bCountLeaves = bCount && oNewAggregation.groupLevels?.length > 0;
+				const bHasGrandTotal = !!oNewAggregation.aggregate?.SalesNumber?.grandTotal;
 
 		QUnit.test(sTitle, function (assert) {
 			const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
 				hierarchyQualifier : "n/a" // unrealistic for i !== 1, but never mind
 			});
 			oCache.oCountPromise = "~oOldCountPromise~";
+			oCache.oFirstLevel = bHasFirstLevel ? "~oOldFirstLevel~" : null;
 			this.mock(oCache).expects("getDownloadUrl").withExactArgs("").returns("~sDownloadUrl~");
 			this.mock(oCache).expects("createCountPromise").exactly(bCount && i === 1 ? 1 : 0)
 				.withExactArgs()
@@ -722,14 +725,15 @@ sap.ui.define([
 				});
 			this.mock(oCache).expects("setQueryOptions").exactly(bCount && i > 1 ? 1 : 0)
 				.withExactArgs({$count : true, $$leaves : true});
-			this.mock(oCache).expects("createGroupLevelCache")
+			this.mock(oCache).expects("createGroupLevelCache").exactly(bHasFirstLevel ? 0 : 1)
 				.withExactArgs(null, bHasGrandTotal || bCountLeaves)
 				.returns("~oFirstLevelCache~");
 			let fnLeaves;
 			let fnGrandTotal;
 			this.mock(_ConcatHelper).expects("enhanceCache")
 				.exactly(bHasGrandTotal || bCountLeaves ? 1 : 0)
-				.withExactArgs("~oFirstLevelCache~", sinon.match.same(oNewAggregation),
+				.withExactArgs(bHasFirstLevel ? "~oOldFirstLevel~" : "~oFirstLevelCache~",
+					sinon.match.same(oNewAggregation),
 					sinon.match((aAdditionalRowHandlers) => {
 						let iIndex = 0;
 						if (bCountLeaves) {
@@ -758,7 +762,8 @@ sap.ui.define([
 			assert.strictEqual(oCache.oAggregation, oNewAggregation);
 			assert.strictEqual(oCache.sToString, "~sDownloadUrl~");
 			assert.strictEqual(oCache.toString(), "~sDownloadUrl~"); // <-- code under test
-			assert.strictEqual(oCache.oFirstLevel, "~oFirstLevelCache~");
+			assert.strictEqual(oCache.oFirstLevel,
+				bHasFirstLevel ? "~oOldFirstLevel~" : "~oFirstLevelCache~");
 			assert.ok("oCountPromise" in oCache, "be nice to V8");
 			assert.ok("oGrandTotalPromise" in oCache, "be nice to V8");
 
@@ -796,6 +801,7 @@ sap.ui.define([
 
 			assert.deepEqual(mQueryOptions, {$count : bCount}, "unchanged");
 		});
+			});
 		});
 	});
 
@@ -1984,7 +1990,8 @@ sap.ui.define([
 			for (let j = 0; j < Math.min(iExpectedLength, 42); j += 1) {
 				oReadResult.value.push({});
 			}
-			oReadResult.value.$count = 42;
+			oReadResult.value.$count = 40;
+			oReadResult.value.$inactive = 2;
 			this.mock(oCache.oTreeState).expects("getOutOfPlaceCount").withExactArgs()
 				.returns(oFixture.iOutOfPlaceCount ?? 0);
 			this.mock(oCache.oFirstLevel).expects("read")
@@ -2110,6 +2117,7 @@ sap.ui.define([
 				value : []
 			};
 			oReadResult.value.$count = 0; // no data
+			oReadResult.value.$inactive = 0;
 			this.mock(oCache.oFirstLevel).expects("read")
 				.withExactArgs(0, 30, 0, "~oGroupLock~", "~fnDataRequested~")
 				.returns(SyncPromise.resolve(Promise.resolve(oReadResult)));
@@ -4037,6 +4045,7 @@ sap.ui.define([
 				oPlaceholder44 = _AggregationHelper.createPlaceholder(NaN, 44, "~parent~"),
 				aElements = [{}, {}, oPlaceholder42,,, oPlaceholder44, {}, {}],
 				aReadElements = [
+					aElements[1],
 					{"@$ui5._" : {predicate : "(1)"}},
 					{"@$ui5._" : {predicate : "(2)", transientPredicate : "$uid=id-1-23"}},
 					{"@$ui5._" : {predicate : "(3)"}},
@@ -4044,41 +4053,42 @@ sap.ui.define([
 					aElements[6]
 				];
 
+			aElements[1]["@$ui5._"] = {transientPredicate : "$uid=id-A-BC"};
 			oCache.aElements = aElements.slice();
 			oCache.aElements.$byPredicate = {
 				"(2)" : SyncPromise.resolve() // SyncPromise may safely be overwritten
 			};
 			const oAggregationHelperMock = this.mock(_AggregationHelper);
 			oAggregationHelperMock.expects("beforeOverwritePlaceholder")
-				.withExactArgs(sinon.match.same(oPlaceholder42), sinon.match.same(aReadElements[0]),
+				.withExactArgs(sinon.match.same(oPlaceholder42), sinon.match.same(aReadElements[1]),
 					"~parent~", iStart, "SomeNodeID");
 			oAggregationHelperMock.expects("beforeOverwritePlaceholder")
-				.withExactArgs(sinon.match.same(oPlaceholder44), sinon.match.same(aReadElements[3]),
+				.withExactArgs(sinon.match.same(oPlaceholder44), sinon.match.same(aReadElements[4]),
 					"~parent~", iStart + 2, "SomeNodeID");
 			this.mock(_Helper).expects("updateNonExisting").never();
 			this.mock(oCache).expects("hasPendingChangesForPath").never();
 
 			// code under test
-			oCache.addElements(aReadElements, 2, "~parent~", iStart);
+			oCache.addElements(aReadElements, 1, "~parent~", iStart);
 
 			assert.strictEqual(oCache.aElements[0], aElements[0]);
 			assert.strictEqual(oCache.aElements[1], aElements[1]);
-			assert.strictEqual(oCache.aElements[2], aReadElements[0]);
-			assert.strictEqual(oCache.aElements[3], aReadElements[1]);
-			assert.strictEqual(oCache.aElements[4], aReadElements[2]);
-			assert.strictEqual(oCache.aElements[5], aReadElements[3]);
+			assert.strictEqual(oCache.aElements[2], aReadElements[1]);
+			assert.strictEqual(oCache.aElements[3], aReadElements[2]);
+			assert.strictEqual(oCache.aElements[4], aReadElements[3]);
+			assert.strictEqual(oCache.aElements[5], aReadElements[4]);
 			assert.strictEqual(oCache.aElements[6], aElements[6]);
 			assert.strictEqual(oCache.aElements[7], aElements[7]);
 			assert.deepEqual(oCache.aElements.$byPredicate, {
-				"(1)" : aReadElements[0],
-				"(2)" : aReadElements[1],
-				"$uid=id-1-23" : aReadElements[1],
-				"(3)" : aReadElements[2],
-				"(4)" : aReadElements[3]
+				"(1)" : aReadElements[1],
+				"(2)" : aReadElements[2],
+				"$uid=id-1-23" : aReadElements[2],
+				"(3)" : aReadElements[3],
+				"(4)" : aReadElements[4]
 			});
 			assert.deepEqual(oCache.aElements, [
 				{},
-				{},
+				{"@$ui5._" : {transientPredicate : "$uid=id-A-BC"}},
 				{"@$ui5._" : {parent : "~parent~", predicate : "(1)", rank : iStart}},
 				{"@$ui5._" // no rank!
 					: {parent : "~parent~", predicate : "(2)", transientPredicate : "$uid=id-1-23"}},
@@ -4839,8 +4849,9 @@ sap.ui.define([
 	[undefined, "~group~"].forEach(function (sGroupId) {
 		[false, true].forEach(function (bHasGrandTotal) {
 			[false, true].forEach(function (bDataAggregation) {
+				[false, true].forEach(function (bHasCreated) {
 		var sTitle = "reset: sGroupId = " + sGroupId + ", has grand total = " + bHasGrandTotal
-				+ ", data aggregation = " + bDataAggregation;
+				+ ", data aggregation = " + bDataAggregation + ", has $created = " + bHasCreated;
 
 		QUnit.test(sTitle, function (assert) {
 			var oCache = _AggregationCache.create(this.oRequestor, "~", "", {},
@@ -4850,7 +4861,18 @@ sap.ui.define([
 				oNewAggregation = bDataAggregation
 					? {aggregate : "~aggregate~"}
 					: {aggregate : "~aggregate~", hierarchyQualifier : "Y"},
-				sNewAggregation = JSON.stringify(oNewAggregation);
+				sNewAggregation = JSON.stringify(oNewAggregation),
+				mQueryOptions = {
+					$$filterBeforeAggregate : "filterBeforeAggregate",
+					$apply : "A.P.P.L.E.",
+					$count : "to be overridden",
+					// Unsupported system query option: $filter
+					$orderby : "orderby",
+					// Unsupported system query option: $search
+					foo : "bar",
+					"sap-client" : "123"
+				},
+				sQueryOptions = JSON.stringify(mQueryOptions);
 
 			oCache.aElements.$byPredicate = {
 				bar : {
@@ -4878,9 +4900,17 @@ sap.ui.define([
 			oCache.oCountPromise = "~oCountPromise~";
 			oCache.bUnifiedCache = "~bUnifiedCache~";
 			oCache.oGrandTotalPromise = "~oGrandTotalPromise~";
-			const oResetExpectation = this.mock(oCache.oFirstLevel).expects("reset").on(oCache)
-				.withExactArgs(sinon.match.same(mKeptElementPredicates), sGroupId, "~mQueryOptions~")
+			assert.strictEqual(oCache.aElements.$created, 0);
+			if (bHasCreated) {
+				oCache.oFirstLevel.aElements.$created = "~$created~";
+			}
+			const oFirstLevelMock = this.mock(oCache.oFirstLevel);
+			const oResetExpectation = oFirstLevelMock.expects("reset").on(oCache)
+				.withExactArgs(sinon.match.same(mKeptElementPredicates), sGroupId,
+					sinon.match.same(mQueryOptions))
 				.callsFake(function () {
+					assert.strictEqual(oCache.aElements.$created,
+						bDataAggregation && bHasCreated ? "~$created~" : 0);
 					oCache.oBackup = sGroupId ? {} : null;
 				});
 			const oTreeStateResetExpectation = this.mock(oCache.oTreeState).expects("reset")
@@ -4889,17 +4919,31 @@ sap.ui.define([
 				.withExactArgs().returns("~sExpandLevels~");
 			this.mock(_AggregationHelper).expects("hasGrandTotal").withExactArgs("~aggregate~")
 				.returns(bHasGrandTotal);
+			const oResetFirstExpectation = oFirstLevelMock.expects("reset").on(oCache.oFirstLevel)
+				.exactly(bDataAggregation && bHasCreated ? 1 : 0)
+				.withExactArgs(sinon.match.same(mKeptElementPredicates), sGroupId, {
+					$$filterBeforeAggregate : "filterBeforeAggregate",
+					$apply : "A.P.P.L.E.",
+					$count : true, // overridden
+					$orderby : "orderby",
+					foo : "bar",
+					"sap-client" : "123"
+				});
 			const oDoResetExpectation = this.mock(oCache).expects("doReset")
 				.withExactArgs(Object.assign({}, oNewAggregation, {$ExpandLevels : "~sExpandLevels~"}),
 					bHasGrandTotal);
 
 			// code under test
-			oCache.reset(mKeptElementPredicates, sGroupId, "~mQueryOptions~", oNewAggregation);
+			oCache.reset(mKeptElementPredicates, sGroupId, mQueryOptions, oNewAggregation);
 
 			if (!sGroupId) {
 				sinon.assert.callOrder(oTreeStateResetExpectation, oGetExpandLevelsExpectation);
 			}
 			sinon.assert.callOrder(oResetExpectation, oGetExpandLevelsExpectation, oDoResetExpectation);
+			if (bDataAggregation && bHasCreated) {
+				sinon.assert.callOrder(oResetExpectation, oResetFirstExpectation, oDoResetExpectation);
+				// Note: no order for oGetExpandLevelsExpectation vs. oResetFirstExpectation
+			}
 			assert.deepEqual(oCache.aElements.$byPredicate, {
 				bar : {
 					"@$ui5._" : {predicate : "bar"},
@@ -4920,17 +4964,24 @@ sap.ui.define([
 				}
 			});
 			if (sGroupId) {
+				const oExpectedBackupFirstLevel = bDataAggregation && bHasCreated ? null : oFirstLevel;
 				assert.deepEqual(oCache.oBackup, {
 					oCountPromise : "~oCountPromise~",
-					oFirstLevel : oFirstLevel,
+					oFirstLevel : oExpectedBackupFirstLevel,
 					oGrandTotalPromise : "~oGrandTotalPromise~",
 					bUnifiedCache : "~bUnifiedCache~"
 				});
-				assert.strictEqual(oCache.oBackup.oFirstLevel, oFirstLevel);
+				assert.strictEqual(oCache.oBackup.oFirstLevel, oExpectedBackupFirstLevel);
 				assert.strictEqual(oCache.bUnifiedCache, !bDataAggregation);
+			} else {
+				assert.strictEqual(oCache.oBackup, null);
 			}
 			assert.strictEqual(JSON.stringify(oNewAggregation), sNewAggregation, "unchanged");
+			assert.strictEqual(oCache.oFirstLevel,
+				bDataAggregation && bHasCreated ? oFirstLevel : null);
+			assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptions, "unchanged");
 		});
+				});
 			});
 		});
 	});
@@ -4981,27 +5032,40 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	[false, true].forEach(function (bReally) {
-		QUnit.test("restore: bReally = " + bReally, function (assert) {
+		[false, true].forEach(function (bCallRestore) {
+			const sTitle = "restore: bReally = " + bReally
+				+ ", #restore oFirstLevel = " + bCallRestore;
+			if (bCallRestore && !bReally) {
+				return;
+			}
+
+		QUnit.test(sTitle, function (assert) {
 			var oCache = _AggregationCache.create(this.oRequestor, "~", "", {$count : true}, {
 					hierarchyQualifier : "X"
 				}),
 				oNewFirstLevel = {
 					restore : function () {}
 				},
-				oOldFirstLevel = oCache.oFirstLevel;
+				oOldFirstLevel = oCache.oFirstLevel,
+				oResultingFirstLevel = bReally && !bCallRestore ? oNewFirstLevel : oOldFirstLevel,
+				oResultingFirstLevelMock = this.mock(oResultingFirstLevel);
 
 			oCache.bUnifiedCache = "~bOldUnifiedCache~";
 			oCache.oBackup = bReally
 				? {
 					oCountPromise : "~oNewCountPromise~",
-					oFirstLevel : oNewFirstLevel,
+					// either restore oFirstLevel from backup or call #restore on the old one
+					oFirstLevel : bCallRestore ? null : oNewFirstLevel,
 					oGrandTotalPromise : "~oNewGrandTotalPromise~",
 					bUnifiedCache : "~bNewUnifiedCache~"
 				}
 				: null;
 			oCache.oCountPromise = "~oOldCountPromise~";
 			oCache.oGrandTotalPromise = "~oOldGrandTotalPromise~";
-			this.mock(bReally ? oNewFirstLevel : oOldFirstLevel).expects("restore").on(oCache)
+			oResultingFirstLevelMock.expects("restore").on(oResultingFirstLevel)
+				.exactly(bCallRestore ? 1 : 0)
+				.withExactArgs(bReally);
+			oResultingFirstLevelMock.expects("restore").on(oCache)
 				.withExactArgs(bReally)
 				.callsFake(function () {
 					oCache.oBackup = null; // must not be used anymore after this call
@@ -5012,11 +5076,12 @@ sap.ui.define([
 
 			assert.strictEqual(oCache.oCountPromise,
 				bReally ? "~oNewCountPromise~" : "~oOldCountPromise~");
-			assert.strictEqual(oCache.oFirstLevel, bReally ? oNewFirstLevel : oOldFirstLevel);
+			assert.strictEqual(oCache.oFirstLevel, oResultingFirstLevel);
 			assert.strictEqual(oCache.oGrandTotalPromise,
 				bReally ? "~oNewGrandTotalPromise~" : "~oOldGrandTotalPromise~");
 			assert.strictEqual(oCache.bUnifiedCache,
 				bReally ? "~bNewUnifiedCache~" : "~bOldUnifiedCache~");
+		});
 		});
 	});
 
@@ -5893,13 +5958,15 @@ sap.ui.define([
 					[undefined, "~iRank~"].forEach(function (iRank) {
 						[undefined, "~oldCountPromise"].forEach(function (oCountPromise) {
 							[false, true].forEach(function (bAtEndOfCreated) {
+								[false, true].forEach(function (bHasCount) {
 		const sTitle = "create: already has group level cache: " + bHasGroupLevelCache
 			+ ", expandTo: " + iExpandTo
 			+ ", parent's @$ui5.node.isExpanded: " + bParentExpanded
 			+ ", create root node: " + bCreateRoot
 			+ ", rank: " + iRank
 			+ ", old count promise: " + oCountPromise
-			+ ", at end of created: " + bAtEndOfCreated;
+			+ ", at end of created: " + bAtEndOfCreated
+			+ ", has $count: " + bHasCount;
 		const bInFirstLevel = bCreateRoot || iExpandTo > 24;
 
 		if (bHasGroupLevelCache && bInFirstLevel || bParentExpanded && bCreateRoot
@@ -5931,7 +5998,9 @@ sap.ui.define([
 			}
 			oCache.aElements = ["0", "1", oParentNode, "3", "4"];
 			oCache.aElements.$byPredicate = {"('42')" : oParentNode};
-			oCache.aElements.$count = 5;
+			if (bHasCount) {
+				oCache.aElements.$count = 5;
+			}
 			if (bAtEndOfCreated) {
 				delete oCache.oAggregation.hierarchyQualifier;
 			}
@@ -6079,7 +6148,7 @@ sap.ui.define([
 				bar : "~bar~",
 				foo : "~foo~"
 			});
-			assert.strictEqual(oCache.aElements.$count, 6);
+			assert.strictEqual(oCache.aElements.$count, bHasCount ? 6 : undefined, "avoid NaN");
 			assert.strictEqual(oResult.isPending(), true);
 
 			return oResult.then(function (oEntityData0) {
@@ -6094,7 +6163,7 @@ sap.ui.define([
 					"('42')" : oParentNode,
 					"('ABC')" : oEntityData
 				});
-				assert.strictEqual(oCache.aElements.$count, 6);
+				assert.strictEqual(oCache.aElements.$count, bHasCount ? 6 : undefined, "avoid NaN");
 				assert.strictEqual(bNodePropertyCompleted, !bAtEndOfCreated,
 					"await #requestNodeProperty");
 				if (oCountPromise) {
@@ -6120,7 +6189,7 @@ sap.ui.define([
 				if (oCountPromise) {
 					assert.ok(oCache.oCountPromise.$restore.calledOnceWithExactly(), "restored");
 				}
-				assert.strictEqual(oCache.aElements.$count, 5);
+				assert.strictEqual(oCache.aElements.$count, bHasCount ? 5 : undefined, "avoid NaN");
 				assert.deepEqual(oCache.aElements.$byPredicate, {
 					"('42')" : oParentNode,
 					"('ABC')" : oEntityData
@@ -6162,6 +6231,7 @@ sap.ui.define([
 				}
 			});
 		});
+								});
 							});
 						});
 					});
@@ -6175,14 +6245,16 @@ sap.ui.define([
 		[2, 25].forEach(function (iExpandTo) {
 			[undefined, true].forEach(function (bParentExpanded) {
 				[false, true].forEach(function (bCreateRoot) {
-					const sTitle = "create: createInPlace, rank: " + iRank
-						+ ", expandTo: " + iExpandTo
-						+ ", parent's @$ui5.node.isExpanded: " + bParentExpanded
-						+ ", create root node: " + bCreateRoot;
+					[false, true].forEach(function (bHasCount) {
+		const sTitle = "create: createInPlace, rank: " + iRank
+			+ ", expandTo: " + iExpandTo
+			+ ", parent's @$ui5.node.isExpanded: " + bParentExpanded
+			+ ", create root node: " + bCreateRoot
+			+ ", has $count: " + bHasCount;
 
-					if (bParentExpanded && bCreateRoot) {
-						return;
-					}
+		if (bParentExpanded && bCreateRoot) {
+			return;
+		}
 
 		QUnit.test(sTitle, function (assert) {
 			var that = this;
@@ -6200,7 +6272,9 @@ sap.ui.define([
 			}
 			oCache.aElements = ["0", oParentNode, "2"];
 			oCache.aElements.$byPredicate = {"('42')" : oParentNode};
-			oCache.aElements.$count = 3;
+			if (bHasCount) {
+				oCache.aElements.$count = 3;
+			}
 			this.mock(oCache).expects("createGroupLevelCache").never();
 			this.mock(oCache.oTreeState).expects("setOutOfPlace").never();
 			const oEntityData = {
@@ -6291,7 +6365,7 @@ sap.ui.define([
 				foo : "~foo~"
 			};
 			assert.deepEqual(oEntityData, oExpectedEntity);
-			assert.strictEqual(oCache.aElements.$count, 3);
+			assert.strictEqual(oCache.aElements.$count, bHasCount ? 3 : undefined);
 			assert.deepEqual(oCache.aElements.$byPredicate, {"('42')" : oParentNode});
 			assert.deepEqual(oCache.aElements, ["0", oParentNode, "2"]);
 			assert.strictEqual(oResult.isPending(), true);
@@ -6304,8 +6378,10 @@ sap.ui.define([
 					oExpectedEntity["@$ui5._"].rank = iRank;
 				}
 				assert.deepEqual(oEntityData, oExpectedEntity);
-				const iExpectedCount = iRank && !bExpandTreeState ? 4 : 3;
-				assert.strictEqual(oCache.aElements.$count, iExpectedCount);
+				const iExpectedCount = bHasCount // eslint-disable-line no-nested-ternary
+					? (iRank && !bExpandTreeState ? 4 : 3)
+					: undefined;
+				assert.strictEqual(oCache.aElements.$count, iExpectedCount, "avoid NaN");
 				const aExpectedElements = iRank && !bExpandTreeState
 					? ["0", oParentNode, null, "2"] : ["0", oParentNode, "2"];
 				assert.deepEqual(oCache.aElements, aExpectedElements);
@@ -6321,6 +6397,7 @@ sap.ui.define([
 				assert.strictEqual(oCache.aElements.$count, iExpectedCount, "unchanged");
 			});
 		});
+					});
 				});
 			});
 		});

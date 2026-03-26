@@ -278,11 +278,12 @@ function(
 				multiSelectMode : {type: "sap.m.MultiSelectMode", group: "Behavior", defaultValue: MultiSelectMode.Default},
 
 				/**
-				 * Defines the maximum number of item actions.
+				 * Defines the maximum number of {@link sap.m.ListItemBase#getActions actions} displayed for the items.
 				 *
 				 * If the number of item actions exceeds the <code>itemActionCount</code> property value, an overflow button will appear, providing access to the additional actions.
 				 *
-				 * <b>Note:</b> Only values between <code>0-2</code> enables the use of the new <code>actions</code> aggregation. When enabled, the {@link sap.m.ListMode Delete} mode and the {@link sap.m.ListType Detail} list item type have no effect. Instead, dedicated actions of {@link sap.m.ListItemActionType type} <code>Delete</code> or <code>Edit</code> should be used.
+				 * <b>Note:</b> Only values between <code>0-2</code> enables the use of the new <code>actions</code> aggregation. When enabled, the {@link sap.m.ListMode Delete} mode and the {@link sap.m.ListType Detail} list item type have no effect. Instead, dedicated actions of {@link sap.m.ListItemActionType type} <code>Delete</code> or <code>Edit</code> should be used.<br>
+				 * <b>Note:</b> As of version 1.147, items with type {@link sap.m.ListType Navigation} render the navigation indicator as an action, which is not counted in <code>itemActionCount</code>.
 				 *
 				 * @since 1.137
 				 */

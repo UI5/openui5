@@ -129,10 +129,25 @@ ListItemBaseRenderer.renderCounterContent = function(rm, oLI, iCounter) {
  *
  * @param {sap.ui.core.RenderManager} rm The RenderManager that can be used for writing to the Render-Output-Buffer.
  * @param {sap.m.ListItemBase} oLI an object representation of the control that should be rendered.
+ * @param {sap.m.ListType} [sCheckType] optional type to check before rendering
  * @protected
  */
-ListItemBaseRenderer.renderType = function(rm, oLI) {
-	var oTypeControl = oLI.getTypeControl(true);
+ListItemBaseRenderer.renderType = function(rm, oLI, sCheckType) {
+	if (!sCheckType || oLI.getEffectiveType() === sCheckType) {
+		const oTypeControl = oLI.getTypeControl(true);
+		this.renderTypeContent(rm, oLI, oTypeControl);
+	}
+};
+
+/**
+ * Renders type content for the list item
+ *
+ * @param {sap.ui.core.RenderManager} rm The RenderManager that can be used for writing to the Render-Output-Buffer.
+ * @param {sap.m.ListItemBase} oLI an object representation of the control that should be rendered.
+ * @param {sap.ui.core.Control} oTypeControl the control representing the type content
+ * @protected
+ */
+ListItemBaseRenderer.renderTypeContent = function(rm, oLI, oTypeControl) {
 	if (oTypeControl) {
 		rm.renderControl(oTypeControl);
 	}
@@ -422,13 +437,10 @@ ListItemBaseRenderer.renderContentLatter = function(rm, oLI) {
 	if (iMaxActionsCount < 0) {
 		this.renderType(rm, oLI);
 		this.renderMode(rm, oLI, 1);
+	} else if (iMaxActionsCount > 0) {
+		this.renderActions(rm, oLI);
 	} else {
-		if (iMaxActionsCount > 0) {
-			this.renderActions(rm, oLI);
-		}
-		if (oLI.getEffectiveType() === ListItemType.Navigation) {
-			this.renderType(rm, oLI);
-		}
+		this.renderType(rm, oLI, ListItemType.Navigation);
 	}
 	this.renderNavigated(rm, oLI);
 };
@@ -464,13 +476,30 @@ ListItemBaseRenderer.renderActions = function(rm, oLI) {
 		if (oAction.getVisible()) {
 			rm.renderControl(oAction._getAction());
 		} else {
-			rm.openStart("div", oAction.getId() + "-hidden").class("sapMLIBActionHidden").openEnd().close("div");
+			this.renderHiddenAction(rm, oAction.getId());
 		}
 	});
 	if (oLI._hasOverflowActions()) {
 		rm.renderControl(oLI._getOverflowButton());
 	}
+	this.renderNavigationInActions(rm, oLI);
 
+	rm.close("div");
+};
+
+ListItemBaseRenderer.renderNavigationInActions = function(rm, oLI, bRenderHidden) {
+	if (oLI.getEffectiveType() === ListItemType.Navigation) {
+		const oNavigationControl = oLI.getNavigationControl(true);
+		this.renderTypeContent(rm, oLI, oNavigationControl);
+	} else if (bRenderHidden) {
+		this.renderHiddenAction(rm, oLI.getId() + "-imgNav");
+	}
+};
+
+ListItemBaseRenderer.renderHiddenAction = function(rm, sActionId) {
+	rm.openStart("div", sActionId + "-hidden");
+	rm.class("sapMLIBActionHidden");
+	rm.openEnd();
 	rm.close("div");
 };
 

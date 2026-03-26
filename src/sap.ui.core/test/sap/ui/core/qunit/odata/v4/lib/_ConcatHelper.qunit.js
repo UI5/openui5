@@ -35,6 +35,7 @@ sap.ui.define([
 			oFirstLevelCache = Object.assign(Object.create({
 				handleResponse : sinon.stub().returns("~result~")
 			}), {
+				aElements : [],
 				sMetaPath : "/meta/path",
 				mQueryOptions : {"sap-client" : "123"},
 				oRequestor : {
@@ -51,9 +52,16 @@ sap.ui.define([
 			sResourcePath,
 			oResult = {value : [oCountRow, oDataRow]};
 
+		oFirstLevelCache.aElements.$created = 2;
+
 		// code under test
 		_ConcatHelper.enhanceCache(oFirstLevelCache, "~oAggregation~",
 			[fnLeaves, fnCount, fnGrandTotal], "~mAlias2MeasureAndMethod~");
+
+		assert.throws(function () {
+			// code under test
+			oFirstLevelCache.getResourcePathWithQuery(1, 100);
+		}, new Error("Must not request created element"));
 
 		oAggregationHelperMock.expects("buildApply")
 			.withExactArgs("~oAggregation~", {$skip : 42, $top : 57, "sap-client" : "123"}, 1,
@@ -64,7 +72,7 @@ sap.ui.define([
 			.returns("?$apply=1st");
 
 		// code under test
-		sResourcePath = oFirstLevelCache.getResourcePathWithQuery(42, 99 - 42);
+		sResourcePath = oFirstLevelCache.getResourcePathWithQuery(42 + 2, 99 - 42);
 
 		assert.strictEqual(sResourcePath, "SalesOrderList?$apply=1st");
 		assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptionsJSON, "unmodified");
@@ -78,7 +86,7 @@ sap.ui.define([
 			.returns("?$apply=2nd");
 
 		// code under test
-		sResourcePath = oFirstLevelCache.getResourcePathWithQuery(42, 99 - 42);
+		sResourcePath = oFirstLevelCache.getResourcePathWithQuery(42 + 2, 99 - 42);
 
 		assert.strictEqual(sResourcePath, "SalesOrderList?$apply=2nd");
 		assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptionsJSON, "unmodified");

@@ -3419,7 +3419,6 @@ sap.ui.define([
 	_CollectionCache.prototype.read = function (iIndex, iLength, iPrefetchLength, oGroupLock,
 			fnDataRequested, bIndexIsSkip, fnSeparateReceived) {
 		var iCreatedPersisted = 0,
-			oElement,
 			aElementsRange,
 			iEnd,
 			oPromise = this.oPendingRequestsPromise || this.aElements.$tail,
@@ -3446,7 +3445,7 @@ sap.ui.define([
 			iIndex += this.aElements.$created;
 		}
 		for (i = 0; i < this.aElements.$created; i += 1) {
-			oElement = this.aElements[i];
+			const oElement = this.aElements[i];
 			if (_Helper.getPrivateAnnotation(oElement, "transient") === oGroupLock.getGroupId()) {
 				// prepare for client-side filter for newly created persisted (see #handleResponse)
 				iTransientElements += 1;
@@ -3494,6 +3493,9 @@ sap.ui.define([
 			var aElements = that.aElements.slice(iIndex, iIndex + iLength);
 
 			aElements.$count = that.aElements.$count;
+			aElements.$inactive
+				= that.aElements.slice(0, that.aElements.$created)
+					.filter((oElement) => oElement["@$ui5.context.isInactive"]).length;
 
 			return {
 				"@$ui5.resetCount" : that.iResetCount,

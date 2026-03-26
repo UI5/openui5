@@ -228,7 +228,7 @@ sap.ui.define(["sap/ui/core/Lib", "sap/ui/base/DataType", "sap/ui/core/library"]
 		 * Preset to find usages of deprecated controls, properties, aggregations and others.
 		 *
 		 * @public
-		 * @experimental since 1.120
+		 * @since 1.120
 		 */
 		Deprecations : {
 			id: "Deprecations",
