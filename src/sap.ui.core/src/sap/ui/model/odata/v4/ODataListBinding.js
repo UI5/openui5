@@ -2690,6 +2690,7 @@ sap.ui.define([
 		// createAndSetCache copies them to the cache later
 		this.mLateQueryOptions = _Helper.clone(mQueryOptions);
 		_Helper.aggregateExpandSelect(this.mLateQueryOptions, oBinding.mLateQueryOptions);
+		this.mCanUseCachePromiseByChildPath = {};
 		this.mPreviousContextsByPath = oBinding.mPreviousContextsByPath;
 		Object.values(this.mPreviousContextsByPath).forEach(function (oContext) {
 			oContext.oBinding = that;

@@ -82806,4 +82806,84 @@ make root = ${bMakeRoot}`;
 			this.waitForChanges(assert, "bind table + side-effects refresh")
 		]);
 	});
+
+	//*********************************************************************************************
+	// Scenario: A relative list binding requests a late property. Then, ODM#getKeepAliveContext
+	// leads to a temporary binding (e.g. requests a draft entity). When setting a new context to
+	// the relative list binding which is matching the temporary binding, it will reuse the cache of
+	// the temporary binding. The same late property can be requested for the current entity.
+	// SNOW: DINC0827223
+	QUnit.test("DINC0827223", async function (assert) {
+		const oModel = this.createSalesOrdersModel({autoExpandSelect : true});
+		const sView = `
+<Table id="table" items="{path : 'SO_2_SOITEM',
+		parameters : {$$getKeepAliveContext : true, $$ownRequest : true}}">
+	<Text text="{ItemPosition}"/>
+</Table>`;
+
+		await this.createView(assert, sView, oModel);
+
+		this.expectRequest("SalesOrderList('1')/SO_2_SOITEM"
+				+ "?$select=ItemPosition,SalesOrderID&$skip=0&$top=100", {
+				value : [{
+					ItemPosition : "0010",
+					SalesOrderID : "1"
+				}]
+			});
+
+		const oTable = this.oView.byId("table");
+		oTable.setBindingContext(oModel.createBindingContext("/SalesOrderList('1')"));
+
+		await this.waitForChanges(assert, "init relative list binding");
+
+		const oListBinding = oTable.getBinding("items");
+		let [oContext] = oListBinding.getAllCurrentContexts();
+
+		this.expectRequest("SalesOrderList('1')/SO_2_SOITEM(SalesOrderID='1',ItemPosition='0010')"
+				+ "?$select=Note", {
+				Note : "late #1"
+			});
+
+		let [sNote] = await Promise.all([
+			oContext.requestProperty("Note"),
+			this.waitForChanges(assert, "request late property #1")
+		]);
+		assert.strictEqual(sNote, "late #1");
+
+		this.expectRequest("SalesOrderList('2')/SO_2_SOITEM(SalesOrderID='2',ItemPosition='0010')"
+				+ "?$select=ItemPosition,SalesOrderID", {
+				ItemPosition : "0010",
+				SalesOrderID : "2"
+			});
+
+		oModel.getKeepAliveContext(
+			"/SalesOrderList('2')/SO_2_SOITEM(SalesOrderID='2',ItemPosition='0010')");
+
+		await this.waitForChanges(assert, "getKeepAliveContext creates temporary binding");
+
+		this.expectRequest("SalesOrderList('2')/SO_2_SOITEM"
+				+ "?$select=ItemPosition,SalesOrderID&$skip=0&$top=100", {
+				value : [{
+					ItemPosition : "0010",
+					SalesOrderID : "2"
+				}]
+			});
+
+		oTable.setBindingContext(oModel.createBindingContext("/SalesOrderList('2')"));
+
+		await this.waitForChanges(assert, "change binding context");
+
+		[oContext] = oListBinding.getAllCurrentContexts();
+
+		this.expectRequest("SalesOrderList('2')/SO_2_SOITEM(SalesOrderID='2',ItemPosition='0010')"
+				+ "?$select=Note", {
+				Note : "late #2"
+			});
+
+		[sNote] = await Promise.all([
+			oContext.requestProperty("Note"),
+			this.waitForChanges(assert, "request late property #2")
+		]);
+		assert.strictEqual(sNote, "late #2");
+	});
 });
