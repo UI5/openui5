@@ -141,7 +141,24 @@ sap.ui.define([
 			throw new Error("Registering a configuration provider after configuration is frozen is not allowed!");
 		}
 		if (aProvider.indexOf(oProvider) === -1) {
-			aProvider.push(oProvider);
+			if (oProvider.external) {
+				// External provider: add to end (highest priority within external group)
+				aProvider.push(oProvider);
+			} else {
+				// Non-external provider: insert before first external provider
+				var iFirstExternalIndex = aProvider.findIndex(function(provider) {
+					return provider.external === true;
+				});
+
+				if (iFirstExternalIndex !== -1) {
+					// Insert before first external provider
+					aProvider.splice(iFirstExternalIndex, 0, oProvider);
+				} else {
+					// No external provider yet, add to end
+					aProvider.push(oProvider);
+				}
+			}
+
 			invalidate();
 			bGlobalIgnoreExternal = get(mUrlParamOptions);
 			oProvider.setConfiguration?.(Configuration);
@@ -394,6 +411,11 @@ sap.ui.define([
 		getWritableInstance: getWritableInstance,
 
 		/** Register a new Configuration provider
+		 *
+		 * Provider registration maintains priority groups:
+		 * - Non-external providers are inserted before the first external provider
+		 * - External providers (oProvider.external === true) are added to the end (highest priority)
+		 * This ensures external providers always have priority over non-external providers.
 		 *
 		 * @name module:sap/base/config.registerProvider
 		 * @function

@@ -1,0 +1,7 @@
+{
+	"extends": "sap/ui/core/boot/boot.json",
+	"config": [
+		"cascadeboot/TestNonExternalProvider",
+		"cascadeboot/TestExternalProvider"
+	]
+}
