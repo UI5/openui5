@@ -1,25 +1,26 @@
 {
 	"_version": "2.0.0",
 	"sap.app": {
-		"id": "cardsdemo.navigationService.analytical",
+		"id": "cardsdemo.cardActions.analyticalNavigation",
 		"type": "card",
-		"title": "Card 'analytical'",
+		"title": "Card 'analyticalNavigation'",
 		"applicationVersion": {
 			"version": "1.0.0"
 		}
 	},
-	"sap.ui5": {
-		"services": {
-			"Navigation2": {
-				"factoryName": "cardsdemo.service.SampleNavigationFactory"
-			}
-		}
-	},
 	"sap.card": {
 		"type": "Analytical",
+		"actions": [
+			{
+				"type": "Navigation",
+				"parameters": {
+					"url": "https://www.sap.com"
+				}
+			}
+		],
 		"header": {
 			"type": "Numeric",
-			"title": "Content with Navigation Service",
+			"title": "Header and Content with Navigation URL",
 			"data": {
 				"json": {
 					"n": 6547394.45496,
@@ -41,6 +42,14 @@
 					"number": "24",
 					"unit": "weeks"
 				}
+			],
+			"actions": [
+				{
+					"type": "Navigation",
+					"parameters": {
+						"url": "https://www.sap.com"
+					}
+				}
 			]
 		},
 		"content": {
@@ -59,7 +68,7 @@
 			"title": {
 				"text": "Donut chart",
 				"visible": true,
-				"alignment": "Bottom"
+				"alignment": "Center"
 			},
 			"measureAxis": "size",
 			"dimensionAxis": "color",
@@ -79,15 +88,6 @@
 				{
 					"label": "Revenue",
 					"value": "{Revenue}"
-				}
-			],
-			"actions": [
-				{
-					"type": "Navigation",
-					"service": "Navigation2",
-					"parameters": {
-						"url": "https://www.sap.com"
-					}
 				}
 			]
 		}

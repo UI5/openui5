@@ -6,19 +6,39 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate",
 	"qunit/testResources/nextCardReadyEvent",
 	"qunit/testResources/genericTests/actionEnablementTests",
-	"sap/m/library"
+	"sap/m/library",
+	"sap/ui/integration/controls/Microchart"
 ], (
 	AvatarImageFitType,
 	Card,
 	nextUIUpdate,
 	nextCardReadyEvent,
 	actionEnablementTests,
-	mLibrary
+	mLibrary,
+	Microchart
 ) => {
 	"use strict";
 
 	const DOM_RENDER_LOCATION = "qunit-fixture";
 	const WrappingType = mLibrary.WrappingType;
+	const pIfMicrochartsAvailable = Microchart.loadDependencies();
+
+	function testWithMicrochart(assert, oCard, oManifest, fnTest) {
+		const done = assert.async();
+
+		pIfMicrochartsAvailable
+			.then(function () {
+				oCard.attachEventOnce("_ready", async function () {
+					await nextUIUpdate();
+					fnTest(done);
+				});
+				oCard.setManifest(oManifest);
+			})
+			.catch(function () {
+				assert.ok(true, "Usage of Microcharts is not available with this distribution.");
+				done();
+			});
+	}
 
 	actionEnablementTests("Numeric Header", {
 		manifest: {
@@ -753,5 +773,118 @@ sap.ui.define([
 		assert.equal(oClonedHeader.getAggregation("_unitOfMeasurement").getText(), oManifest["sap.card"].header.unitOfMeasurement, "Cloned header unitOfMeasurement should be correct.");
 		assert.equal(oClonedHeader.getAggregation("_details").getText(), oManifest["sap.card"].header.details, "Cloned header details should be correct.");
 		assert.equal(oClonedHeader.getDataTimestamp(), oManifest["sap.card"].header.dataTimestamp, "Cloned header dataTimestamp should be correct.");
+	});
+
+	QUnit.test("Numeric Header with microchart but no mainIndicator", function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.card.numericHeader.microchartOnly"
+			},
+			"sap.card": {
+				"type": "List",
+				"header": {
+					"type": "Numeric",
+					"title": "Income from products",
+					"chart": {
+						"type": "Bullet",
+						"minValue": 0,
+						"maxValue": 100,
+						"target": 80,
+						"value": 60,
+						"scale": "€"
+					}
+				}
+			}
+		};
+
+		testWithMicrochart(assert, this.oCard, oManifest, function (done) {
+			const oHeader = this.oCard.getAggregation("_header");
+			const oMicroChart = oHeader.getMicroChart();
+
+			// Assert
+			assert.ok(oMicroChart, "Card header should have a microchart aggregation.");
+			assert.ok(oMicroChart.getDomRef(), "Card header microchart should be rendered even without mainIndicator.");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Numeric Header with microchart and mainIndicator with empty number", function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.card.numericHeader.microchartEmptyNumber"
+			},
+			"sap.card": {
+				"type": "List",
+				"header": {
+					"type": "Numeric",
+					"title": "Income from products",
+					"mainIndicator": {
+						"number": "",
+						"unit": "%"
+					},
+					"chart": {
+						"type": "Bullet",
+						"minValue": 0,
+						"maxValue": 100,
+						"target": 80,
+						"value": 60,
+						"scale": "€"
+					}
+				}
+			}
+		};
+
+		testWithMicrochart(assert, this.oCard, oManifest, function (done) {
+			const oHeader = this.oCard.getAggregation("_header");
+			const oMicroChart = oHeader.getMicroChart();
+
+			// Assert
+			assert.ok(oMicroChart, "Card header should have a microchart aggregation.");
+			assert.ok(oMicroChart.getDomRef(), "Card header microchart should be rendered even when mainIndicator number is empty.");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("Numeric Header with microchart and mainIndicator with visible false", function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test.card.numericHeader.microchartHiddenIndicator"
+			},
+			"sap.card": {
+				"type": "List",
+				"header": {
+					"type": "Numeric",
+					"title": "Income from products",
+					"mainIndicator": {
+						"visible": false,
+						"number": "25",
+						"unit": "%"
+					},
+					"chart": {
+						"type": "Bullet",
+						"minValue": 0,
+						"maxValue": 100,
+						"target": 80,
+						"value": 60,
+						"scale": "€"
+					}
+				}
+			}
+		};
+
+		testWithMicrochart(assert, this.oCard, oManifest, function (done) {
+			const oHeader = this.oCard.getAggregation("_header");
+			const oMicroChart = oHeader.getMicroChart();
+			const oMainIndicator = oHeader.getAggregation("_numericIndicators").getAggregation("_mainIndicator");
+
+			// Assert
+			assert.notOk(oMainIndicator.getVisible(), "Card header main indicator should be hidden.");
+			assert.ok(oMicroChart, "Card header should have a microchart aggregation.");
+			assert.ok(oMicroChart.getDomRef(), "Card header microchart should be rendered even when mainIndicator is hidden.");
+			done();
+		}.bind(this));
 	});
 });

@@ -2124,6 +2124,7 @@ sap.ui.define([
 				}
 
 				that.addElements(oResult.value, iStart + iOffset, that.oFirstLevel, iStart);
+				iOffset += oResult.value.$created; // "shift" rank of non-created elements
 				for (j = 0; j < that.aElements.$count; j += 1) {
 					that.aElements[j] ??= _AggregationHelper.createPlaceholder(
 						that.oAggregation.expandTo > 1 || that.bUnifiedCache

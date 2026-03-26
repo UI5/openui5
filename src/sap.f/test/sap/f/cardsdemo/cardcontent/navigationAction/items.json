@@ -1,0 +1,32 @@
+[
+	{
+		"Name": "Notebook Basic 15",
+		"Description": "Notebook Basic 15 with 2,80 GHz quad core, 15\" LCD, 4 GB DDR3 RAM, 500 GB Hard Disc, Windows 8 Pro",
+		"icon": "./images/Woman_avatar_01.png",
+		"url": "https://www.sap.com"
+	},
+	{
+		"Name": "Notebook Basic 16",
+		"Description": "Notebook Basic 16 with 2,80 GHz quad core, 16\" LCD, 4 GB DDR3 RAM, 500 GB Hard Disc, Windows 8 Pro",
+		"icon": "./images/Woman_avatar_01.png",
+		"url": ""
+	},
+	{
+		"Name": "Notebook Basic 17",
+		"Description": "Notebook Basic 17 with 2,80 GHz quad core, 17\" LCD, 8 GB DDR3 RAM, 1000 GB Hard Disc, Windows 8 Pro",
+		"icon": "./images/Woman_avatar_01.png",
+		"url": "https://www.sap.com/products.html"
+	},
+	{
+		"Name": "Notebook Basic 18",
+		"Description": "Notebook Basic 18 with 2,80 GHz quad core, 18\" LCD, 8 GB DDR3 RAM, 1000 GB Hard Disc, Windows 8 Pro",
+		"icon": "./images/Woman_avatar_01.png",
+		"url": ""
+	},
+	{
+		"Name": "Notebook Basic 19",
+		"Description": "Notebook Basic 19 with 2,80 GHz quad core, 18\" LCD, 8 GB DDR3 RAM, 1000 GB Hard Disc, Windows 8 Pro",
+		"icon": "./images/Woman_avatar_01.png",
+		"url": "https://www.sap.com/products.html"
+	}
+]

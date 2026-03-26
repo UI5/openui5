@@ -31,8 +31,9 @@ sap.ui.define([
 		const bHasSideIndicators = oHeader.getSideIndicators().length > 0;
 		const bHasDetails = oHeader.getDetails() || oBindingInfos.details;
 		const bHasDataTimestamp = oHeader.getDataTimestamp() || oBindingInfos.dataTimestamp;
+		const bHasMicroChart = !!oHeader.getMicroChart();
 
-		return bHasMainIndicator || bHasSideIndicators || bHasDetails || bHasDataTimestamp;
+		return bHasMainIndicator || bHasSideIndicators || bHasDetails || bHasDataTimestamp || bHasMicroChart;
 	};
 
 	/**

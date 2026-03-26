@@ -31,14 +31,6 @@
 		}
 	},
 	"sap.ui5": {
-		"services": {
-			"UserRecent": {
-				"factoryName": "cardsdemo.service.UserRecentFactory"
-			},
-			"Navigation": {
-				"factoryName": "cardsdemo.service.SampleNavigationFactory"
-			}
-		},
 		"rootView": {
 			"viewName": "sap.f.cardsdemo.view.Main",
 			"id": "app"
@@ -193,16 +185,6 @@
 					"pattern": "calendarCard",
 					"name": "calendarCard",
 					"target": "calendarCard"
-				},
-				{
-					"pattern": "navigationService",
-					"name": "navigationService",
-					"target": "navigationService"
-				},
-				{
-					"pattern": "dataService",
-					"name": "dataService",
-					"target": "dataService"
 				},
 				{
 					"pattern": "objectContent",
@@ -375,6 +357,11 @@
 					"target": "cardActionsGridContainer"
 				},
 				{
+					"pattern": "navigationAction",
+					"name": "navigationAction",
+					"target": "navigationAction"
+				},
+				{
 					"pattern": "changesChildCards",
 					"name": "changesChildCards",
 					"target": "changesChildCards"
@@ -484,16 +471,6 @@
 				"gridContainerQuery": {
 					"id": "GridContainerQuery",
 					"name": "GridContainerQuery",
-					"level": 1
-				},
-				"navigationService": {
-					"id": "navigationService",
-					"name": "NavigationService",
-					"level": 1
-				},
-				"dataService": {
-					"id": "dataService",
-					"name": "DataService",
 					"level": 1
 				},
 				"delayedLoading": {
@@ -678,6 +655,11 @@
 				"cardActionsGridContainer": {
 					"id": "cardActionsGridContainer",
 					"name": "CardActionsGridContainer",
+					"level": 1
+				},
+				"navigationAction": {
+					"id": "navigationAction",
+					"name": "NavigationAction",
 					"level": 1
 				},
 				"changesChildCards": {

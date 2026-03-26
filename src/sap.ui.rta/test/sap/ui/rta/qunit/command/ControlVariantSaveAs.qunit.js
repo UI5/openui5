@@ -94,7 +94,11 @@ sap.ui.define([
 			];
 			aExistingChanges[0].setSavedToVariant(true);
 			sandbox.stub(ControlVariantWriteAPI, "getControlChangesForVariant")
-			.withArgs("Dummy", "variantMgmtId1", "mySourceReference")
+			.withArgs({
+				variantManagementControl: this.oVariantManagement,
+				variantManagementReference: "variantMgmtId1",
+				variantReference: "mySourceReference"
+			})
 			.returns(aExistingChanges);
 			const oRemoveStub = sandbox.stub(ControlVariantWriteAPI, "removeVariant").resolves();
 			const oApplyChangeStub = sandbox.stub(ControlVariantWriteAPI, "addAndApplyControlChangesOnVariant");
@@ -138,7 +142,7 @@ sap.ui.define([
 				sourceVariantReference: "mySourceReference",
 				variantManagementReference: "variantMgmtId1",
 				appComponent: oMockedAppComponent,
-				vmControl: this.oVariantManagement
+				variantManagementControl: this.oVariantManagement
 			};
 			assert.strictEqual(oRemoveStub.callCount, 1, "removeVariant was called");
 			assert.deepEqual(oRemoveStub.firstCall.args[0], mExpectedProperties, "the correct properties were passed-1");
@@ -147,8 +151,8 @@ sap.ui.define([
 			assert.deepEqual(oPersistencyStub.firstCall.args[0].flexObjects, [aChanges[2]], "the correct changes were passed");
 			assert.deepEqual(oPersistencyStub.firstCall.args[0].selector, oMockedAppComponent, "the correct app component was passed");
 			assert.strictEqual(oApplyChangeStub.callCount, 1, "one change was applied again");
-			assert.strictEqual(oApplyChangeStub.lastCall.args[0].length, 1, "only one change get added");
-			assert.strictEqual(oApplyChangeStub.lastCall.args[0][0].getId(), "change3", "the correct change got added");
+			assert.strictEqual(oApplyChangeStub.lastCall.args[0].changes.length, 1, "only one change get added");
+			assert.strictEqual(oApplyChangeStub.lastCall.args[0].changes[0].getId(), "change3", "the correct change got added");
 		});
 
 		QUnit.test("cancel", async function(assert) {

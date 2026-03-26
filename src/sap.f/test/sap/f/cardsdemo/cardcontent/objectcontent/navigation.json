@@ -1,19 +1,12 @@
 {
 	"_version": "2.0.0",
 	"sap.app": {
-		"id": "cardsdemo.navigationService.object1",
+		"id": "cardsdemo.object.navigation",
 		"type": "card",
 		"i18n": "i18n/i18n.properties",
-		"title": "Card 'object1'",
+		"title": "Card 'navigation'",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
-	},
-	"sap.ui5": {
-		"services": {
-			"Navigation2": {
-				"factoryName": "cardsdemo.service.SampleNavigationFactory"
-			}
 		}
 	},
 	"sap.card": {
@@ -22,19 +15,16 @@
 			{
 				"type": "Navigation",
 				"parameters": {
-					"url": "{url}"
+					"url": "https://www.sap.com"
 				}
 			}
 		],
 		"data": {
 			"request": {
-				"url": "../objectcontent/datahandling_employee.json"
+				"url": "./employee.json"
 			}
 		},
 		"header": {
-			"data": {
-				"path": "/nested_level_1/nested_level_2"
-			},
 			"icon": {
 				"src": "{photo}"
 			},
@@ -42,9 +32,6 @@
 			"subtitle": "{position}"
 		},
 		"content": {
-			"data": {
-				"path": "/nested_level_1/nested_level_2"
-			},
 			"groups": [
 				{
 					"title": "{{contactDetails}}",

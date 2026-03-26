@@ -3,14 +3,12 @@
  */
 sap.ui.define([
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
-	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/command/BaseCommand",
 	"sap/ui/rta/library"
 ], function(
 	ControlVariantApplyAPI,
-	FlexRuntimeInfoAPI,
 	ControlVariantWriteAPI,
 	FlUtils,
 	BaseCommand,
@@ -73,11 +71,10 @@ sap.ui.define([
 		const oVariantManagementControl = this.getControl();
 		this.oAppComponent = FlUtils.getAppComponentForControl(oVariantManagementControl);
 		this.sVariantManagementReference = oVariantManagementControl.getVariantManagementReference();
-		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oVariantManagementControl });
-		const sNewDefaultVariantReferenceParameter = ControlVariantWriteAPI.getVariantManagementReferenceForVariant(
-			sFlexReference,
-			this.sVariantManagementReference
-		);
+		const sNewDefaultVariantReferenceParameter = ControlVariantWriteAPI.getVariantManagementReferenceForVariant({
+			variantManagementControl: oVariantManagementControl,
+			variantManagementReference: this.sVariantManagementReference
+		});
 
 		this._aPreparedChanges = [];
 
@@ -86,10 +83,10 @@ sap.ui.define([
 			this._aDeletedFlexObjects,
 			this._sOldVReference
 		] = await ControlVariantWriteAPI.handleManageViewDialogExecution({
-			vmReference: this.sVariantManagementReference,
+			variantManagementReference: this.sVariantManagementReference,
 			appComponent: this.oAppComponent,
 			changeContents: this.getChanges(),
-			vmControl: oVariantManagementControl,
+			variantManagementControl: oVariantManagementControl,
 			newDefaultVariantReferenceParameter: sNewDefaultVariantReferenceParameter,
 			generatorName: rtaLibrary.GENERATOR_NAME,
 			variantsToBeDeleted: this.getDeletedVariants(),
@@ -138,9 +135,9 @@ sap.ui.define([
 	 */
 	ControlVariantConfigure.prototype.undo = async function() {
 		// Restore deleted variants
-		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: this.getControl() });
+		const oVariantManagementControl = this.getControl();
 		ControlVariantWriteAPI.restoreDeletedFlexObjects({
-			reference: sFlexReference,
+			variantManagementControl: oVariantManagementControl,
 			flexObjects: this._aDeletedFlexObjects,
 			componentId: this.oAppComponent.getId()
 		});

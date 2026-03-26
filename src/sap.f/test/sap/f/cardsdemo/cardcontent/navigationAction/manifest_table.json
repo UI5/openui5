@@ -1,29 +1,22 @@
 {
 	"_version": "2.0.0",
 	"sap.app": {
-		"id": "cardsdemo.hiddenItems.table",
+		"id": "cardsdemo.navigationAction.table",
 		"type": "card",
-		"title": "Card 'cardsdemo.hiddenItems.table'",
+		"title": "Card 'cardsdemo.navigationAction.table'",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
-	},
-	"sap.ui5": {
-		"services": {
-			"IntentBasedNavigation": {
-				"factoryName": "cardsdemo.service.SampleNavigationFactory"
-			}
 		}
 	},
 	"sap.card": {
 		"type": "Table",
 		"header": {
-			"title": "Request Table Content",
+			"title": "Navigation Action - Table Card",
 			"icon": {
 				"src": "sap-icon://accept"
 			},
 			"status": {
-				"text": "{parameters>/visibleItems} of 20"
+				"text": "5 of 20"
 			}
 		},
 		"content": {
@@ -65,24 +58,38 @@
 					},
 					{
 						"title": "Category",
-						"value": "{Category}"
+						"value": "{Category}",
+						"actions": [
+							{
+								"type": "Navigation",
+								"enabled": "{= ${url}}",
+								"parameters": {
+									"url": "{url}"
+								}
+							}
+						]
 					},
 					{
 						"title": "Number",
 						"value": "356865544",
-						"identifier": {
-							"url": "{identifierUrl}",
-							"target": "_blank"
-						}
+						"identifier": true,
+						"actions": [
+							{
+								"type": "Navigation",
+								"enabled": "{= ${identifierUrl}}",
+								"parameters": {
+									"url": "{identifierUrl}"
+								}
+							}
+						]
 					}
 				],
 				"actions": [
 					{
 						"type": "Navigation",
-						"service": "IntentBasedNavigation",
+						"enabled": "{= ${url}}",
 						"parameters": {
-							"url": "{url}",
-							"hidden": "{url}"
+							"url": "{url}"
 						}
 					}
 				]

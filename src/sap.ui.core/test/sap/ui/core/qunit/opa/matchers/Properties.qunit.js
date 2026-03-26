@@ -72,6 +72,38 @@ sap.ui.define([
 		assert.ok(bPipleineResult, "Should match equal properties");
 	});
 
+	QUnit.test("Should match with global regexp across multiple controls - lastIndex must be reset", function(assert) {
+		// Regression test for: when a global RegExp matches control A but a second property
+		// fails on A, lastIndex is left stale. Without the fix, testing control B would start
+		// from the stale lastIndex and produce a false negative even though B should match.
+		var oDecoyButton = new Button("decoy-removeButton-0", {
+			enabled: false
+		});
+		var oTargetButton = new Button("target-removeButton-1", {
+			enabled: true
+		});
+
+		var oGlobalRegExp = new RegExp(".*removeButton.*", "g");
+		// Use the global RegExp directly to test both controls in sequence,
+		// simulating what the Properties matcher does internally.
+		var fnMatcherWithGlobalRegExp = new Properties({
+			id: oGlobalRegExp,
+			enabled: true
+		});
+
+		// Decoy: text matches regex but enabled does not → early exit; lastIndex gets stale without the fix
+		var bDecoy = fnMatcherWithGlobalRegExp(oDecoyButton);
+		assert.strictEqual(bDecoy, false, "Decoy button should not match (enabled: false)");
+
+		// Target: text matches regex AND enabled matches → must return true
+		var bTarget = fnMatcherWithGlobalRegExp(oTargetButton);
+		assert.strictEqual(bTarget, true,
+			"Target button must match even after the decoy caused an early exit (lastIndex reset required)");
+
+		oDecoyButton.destroy();
+		oTargetButton.destroy();
+	});
+
 	QUnit.test("Should match with regexp - declarative", function(assert) {
 		var bResult = new Properties({
 			src: {

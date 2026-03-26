@@ -47,7 +47,8 @@ sap.ui.define([
 	"use strict";
 
 	/**
-	 * Provides an API for tools like {@link sap.ui.rta} to create, apply and revert {@link sap.ui.fl.apply._internal.flexObjects.FlexObject}.
+	 * Provides an API for tools like {@link sap.ui.rta} to create, apply
+	 * and revert {@link sap.ui.fl.apply._internal.flexObjects.FlexObject}.
 	 *
 	 * @namespace
 	 * @alias module:sap/ui/fl/write/api/ChangesWriteAPI
@@ -146,7 +147,8 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.changeSpecificData.changeType - Type of the change
 	 * @param {string} mPropertyBag.changeSpecificData.layer - Layer in which the change should be created
 	 * @param {string} mPropertyBag.changeSpecificData.reference - Flex reference of the application
-	 * The property <code>mPropertyBag.changeSpecificData.packageName</code> is set to <code>$TMP</code> and internally since flex changes are always local when they are created.
+	 * The property <code>mPropertyBag.changeSpecificData.packageName</code> is set to <code>$TMP</code>
+	 * and internally since flex changes are always local when they are created.
 	 * @param {sap.ui.fl.Selector} mPropertyBag.selector - Managed object or selector object
 	 *
 	 * @returns {Promise|sap.ui.fl.apply._internal.flexObjects.FlexObject} Returns the FlexObject directly in case of a controller extension,
@@ -259,8 +261,9 @@ sap.ui.define([
 	};
 
 	/**
-	 * Reverts a change or an array of changes on the passed control if the changes have already been applied or are in the process of being applied.
-	 * Make sure to provide the changes in the order that they were applied - this method executes the reversal in the reverse order.
+	 * Reverts a change or an array of changes on the passed control if the changes have already been applied
+	 * or are in the process of being applied. Make sure to provide the changes in the order that they
+	 * were applied - this method executes the reversal in the reverse order.
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject|sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.change - Change object that should be reverted from the passed element, or an array of changes

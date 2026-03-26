@@ -83,10 +83,16 @@ sap.ui.define([
 			);
 			const oGetDirtyControlChangesSpy = sandbox.spy(VariantManager, "getDirtyControlChangesFromVariant");
 
-			const aResult = ControlVariantWriteAPI.getDirtyControlChangesFromVariant(aControlChanges, sReference);
+			const aResult = ControlVariantWriteAPI.getDirtyControlChangesFromVariant({
+				controlChanges: aControlChanges,
+				variantManagementControl: this.oVMControl
+			});
 			assert.deepEqual(aResult, aControlChanges, "then the correct changes are returned");
 			assert.strictEqual(
-				oGetDirtyControlChangesSpy.calledOnceWith(aControlChanges, sReference),
+				oGetDirtyControlChangesSpy.calledOnceWith({
+					controlChanges: aControlChanges,
+					variantManagementControl: this.oVMControl
+				}),
 				true,
 				"then VariantManager.getDirtyControlChangesFromVariant is called with correct parameters"
 			);
@@ -108,7 +114,11 @@ sap.ui.define([
 			aChanges.push(oVariant);
 			const oCheckUpdateStub = sandbox.stub(VariantManagementState.getVariantManagementMap(), "checkUpdate");
 
-			ControlVariantWriteAPI.setSavedToVariant(sReference, aChanges, true);
+			ControlVariantWriteAPI.setSavedToVariant({
+				variantManagementControl: this.oVMControl,
+				changes: aChanges,
+				setSavedToVariant: true
+			});
 
 			assert.strictEqual(
 				aChanges[0].getSavedToVariant(),
@@ -180,7 +190,7 @@ sap.ui.define([
 				variantManagementReference: "vmRef",
 				appComponent: oAppComponent,
 				changeContents: [],
-				vmControl: this.oVMControl,
+				variantManagementControl: this.oVMControl,
 				newDefaultVariantReferenceParameter: "newDefVarRef",
 				generatorName: RtaQunitUtils.GENERATOR_NAME,
 				variantsToBeDeleted: []
@@ -204,7 +214,7 @@ sap.ui.define([
 				appComponent: oAppComponent,
 				variant: { fileName: "variant1" },
 				sourceVariantReference: "variant0",
-				vmControl: this.oVMControl
+				variantManagementControl: this.oVMControl
 			};
 			const oRemoveVariantStub = sandbox.stub(VariantManager, "removeVariant");
 
@@ -294,9 +304,9 @@ sap.ui.define([
 			const oAddAndApplyStub = sandbox.stub(VariantManager, "addAndApplyControlChangesOnVariant")
 			.resolves();
 
-			await ControlVariantWriteAPI.addAndApplyControlChangesOnVariant(aChanges, this.oVMControl);
+			await ControlVariantWriteAPI.addAndApplyControlChangesOnVariant({ changes: aChanges, control: this.oVMControl });
 			assert.strictEqual(
-				oAddAndApplyStub.calledOnceWith(aChanges, this.oVMControl),
+				oAddAndApplyStub.calledOnceWith({ changes: aChanges, control: this.oVMControl }),
 				true,
 				"then VariantManager.addAndApplyControlChangesOnVariant is called with correct parameters"
 			);
@@ -333,7 +343,11 @@ sap.ui.define([
 			const oGetVariantStub = sandbox.stub(VariantManagementState, "getVariant")
 			.returns({ controlChanges: aExpectedChanges });
 
-			const aResult = ControlVariantWriteAPI.getControlChangesForVariant(sReference, sVMReference, "variant1");
+			const aResult = ControlVariantWriteAPI.getControlChangesForVariant({
+				variantManagementControl: this.oVMControl,
+				variantManagementReference: sVMReference,
+				variantReference: "variant1"
+			});
 
 			assert.deepEqual(aResult, aExpectedChanges, "then the correct control changes are returned");
 			assert.strictEqual(
@@ -344,6 +358,23 @@ sap.ui.define([
 				}),
 				true,
 				"then VariantManagementState.getVariant is called with correct parameters"
+			);
+		});
+
+		QUnit.test("When getVariantManagementReferenceForVariant is called", function(assert) {
+			const oGetVMReferenceStub = sandbox.stub(VariantManagementState, "getVariantManagementReferenceForVariant")
+			.returns(sVMReference);
+
+			const sResult = ControlVariantWriteAPI.getVariantManagementReferenceForVariant({
+				variantManagementControl: this.oVMControl,
+				variantManagementReference: "variant1"
+			});
+
+			assert.strictEqual(sResult, sVMReference, "then the correct variant management reference is returned");
+			assert.strictEqual(
+				oGetVMReferenceStub.calledOnceWith(sReference, "variant1"),
+				true,
+				"then VariantManagementState.getVariantManagementReferenceForVariant is called with correct parameters"
 			);
 		});
 	});

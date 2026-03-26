@@ -286,6 +286,46 @@ sap.ui.define([
 		oLabeloRBGroupRBG1a, oRBGroupRBG1a
 	]});
 
+	const oRBGroupStates = new RadioButtonGroup("RBGStates", {
+		columns: 1,
+		buttons: [
+			new RadioButton({
+				text: "Normal (enabled & editable)",
+				tooltip: "Default state - user can interact"
+			}),
+			new RadioButton({
+				text: "Disabled only",
+				enabled: false,
+				tooltip: "Only disabled - shows disabled styling"
+			}),
+			new RadioButton({
+				text: "Read-only",
+				editable: false,
+				tooltip: "Only read-only - shows read-only styling"
+			}),
+			new RadioButton({
+				text: "Disabled AND Read-only",
+				enabled: false,
+				editable: false,
+				tooltip: "Both disabled and read-only - should show ONLY disabled styling (most restrictive)"
+			})
+		]
+	});
+
+	const oLabelRBGStates = new Label({
+		text: "Combined States Test: ",
+		labelFor: oRBGroupStates
+	});
+
+	const flexBoxRBGStates = new FlexBox("rbgStates", {
+		alignItems: "Start",
+		direction: "Column",
+		items: [
+			oLabelRBGStates,
+			oRBGroupStates
+		]
+	});
+
 	const oRBGWrap = new RadioButtonGroup("RBGWrap", {
 		columns: 1,
 		buttons: [
@@ -675,6 +715,7 @@ sap.ui.define([
 						content: [
 							flexBoxRBG1,
 							flexBoxRBG1a,
+							flexBoxRBGStates,
 							flexBoxRBGWrap,
 							flexBoxRBG2,
 							flexBoxRBG3,

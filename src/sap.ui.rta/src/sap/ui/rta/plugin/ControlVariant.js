@@ -372,8 +372,16 @@ sap.ui.define([
 
 				case oLibraryBundle.getText("BTN_MODIFIED_VARIANT_SAVE"):{
 					const oCompositeCommand = await this.getCommandFactory().getCommandFor(oTargetElement, "composite");
-					oCompositeCommand.addCommand(await getCommandForSave.call(this, oTargetOverlay));
-					oCompositeCommand.addCommand(await getCommandForSwitch.call(this, oTargetOverlay, sNewVariantReference, sCurrentVariantReference));
+					oCompositeCommand.addCommand(await getCommandForSave.call(
+						this,
+						oTargetOverlay
+					));
+					oCompositeCommand.addCommand(await getCommandForSwitch.call(
+						this,
+						oTargetOverlay,
+						sNewVariantReference,
+						sCurrentVariantReference
+					));
 					this.fireElementModified({
 						command: oCompositeCommand
 					});

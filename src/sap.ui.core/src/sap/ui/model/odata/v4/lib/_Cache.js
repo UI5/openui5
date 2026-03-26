@@ -3405,12 +3405,16 @@ sap.ui.define([
 	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise to be resolved with the requested range given as an OData response object (with
 	 *   "@$ui5.resetCount", "@odata.context", and the rows as an array in the property
-	 *   <code>value</code>, enhanced with a number property <code>$count</code> representing the
-	 *   element count on server-side; <code>$count</code> may be <code>undefined</code>, but not
-	 *   <code>Infinity</code>). If an HTTP request fails, the error from the _Requestor is returned
-	 *   and the requested range is reset to <code>undefined</code>. If the request has been
-	 *   obsoleted by a {@link #reset}, the promise is rejected with an error having a property
-	 *   <code>canceled = true</code>.
+	 *   <code>value</code>, enhanced with:
+	 *   - a number property <code>$count</code> representing the element count on server-side; it
+	 *     may be <code>undefined</code>, but not <code>Infinity</code>,
+	 *   - a number property <code>$created</code> representing the number of all (client-side)
+	 *     created elements (active or inactive),
+	 *   - a number property <code>$inactive</code> representing the number of all inactive
+	 *     created elements.
+	 *   If an HTTP request fails, the error from the _Requestor is returned and the requested range
+	 *   is reset to <code>undefined</code>. If the request has been obsoleted by a {@link #reset},
+	 *   the promise is rejected with an error having a property <code>canceled = true</code>.
 	 * @throws {Error} If given index or length is less than 0
 	 *
 	 * @public
@@ -3493,6 +3497,7 @@ sap.ui.define([
 			var aElements = that.aElements.slice(iIndex, iIndex + iLength);
 
 			aElements.$count = that.aElements.$count;
+			aElements.$created = that.aElements.$created;
 			aElements.$inactive
 				= that.aElements.slice(0, that.aElements.$created)
 					.filter((oElement) => oElement["@$ui5.context.isInactive"]).length;

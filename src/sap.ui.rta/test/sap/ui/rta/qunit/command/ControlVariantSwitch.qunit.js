@@ -99,7 +99,7 @@ sap.ui.define([
 
 			await oSwitchCommand.undo();
 
-			assert.deepEqual(oAddAndApplyChangesStub.getCall(0).args[0], aDirtyChanges, "then the changes are applied again");
+			assert.deepEqual(oAddAndApplyChangesStub.getCall(0).args[0].changes, aDirtyChanges, "then the changes are applied again");
 			assert.deepEqual(oSwitchCommand.getDiscardedChanges(), [], "then the dirty changes are cleared on the command");
 			assert.equal(
 				this.oActivateVariantStub.callCount,

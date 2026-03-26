@@ -67,6 +67,9 @@ sap.ui.define([
 				var vCurrentPropertyValue = fnProperty.call(oControl);
 				// propertyValue is set in parent frame (on matcher instantiation), so match it against the parent's RegExp constructor
 				if (oPropertyValue instanceof RegExp) {
+					// Reset lastIndex so that a global/sticky RegExp is not affected by a previous
+					// partial match in the loop (where the id matched but a later property check failed).
+					oPropertyValue.lastIndex = 0;
 					bIsMatching = oPropertyValue.test(vCurrentPropertyValue);
 				} else if (isPlainObject(oPropertyValue) && oPropertyValue.regex && oPropertyValue.regex.source) {
 					// declarative syntax

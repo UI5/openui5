@@ -1,28 +1,18 @@
 {
 	"_version": "2.0.0",
 	"sap.app": {
-		"id": "cardsdemo.hiddenItems.timeline",
+		"id": "cardsdemo.navigationAction.timeline",
 		"type": "card",
 		"title": "Card 'timeline'",
 		"applicationVersion": {
 			"version": "1.0.0"
 		}
 	},
-	"sap.ui5": {
-		"services": {
-			"Navigation2": {
-				"factoryName": "cardsdemo.service.SampleNavigationFactory"
-			}
-		}
-	},
 	"sap.card": {
 		"type": "Timeline",
 		"header": {
 			"title": "Upcoming Activities",
-			"subtitle": "For Today",
-			"status": {
-				"text": "{parameters>/visibleItems} of 20"
-			}
+			"subtitle": "For Today"
 		},
 		"content": {
 			"data": {
@@ -32,13 +22,13 @@
 						"Description": "MRR WDF18 C3.2(GLASSBOX)",
 						"Icon": "sap-icon://appointment-2",
 						"Time": "10:00 - 10:30",
-						"url": "www.sap.com"
+						"url": "https://www.sap.com"
 					},
 					{
-						"Title": "Video Conference for FLP@SF, S4,Hybris",
+						"Title": "Video Conference for FLP@SF, S4, Hybris",
 						"Icon": "sap-icon://my-view",
 						"Time": "14:00 - 15:30",
-						"url": "www.google.com"
+						"url": "https://www.sap.com"
 					},
 					{
 						"Title": "Call 'Project Nimbus'",
@@ -49,15 +39,12 @@
 			},
 			"item": {
 				"dateTime": {
-					"label": "{{time_label}}",
 					"value": "{Time}"
 				},
 				"description": {
-					"label": "{{description_label}}",
 					"value": "{Description}"
 				},
 				"title": {
-					"label": "{{title_label}}",
 					"value": "{Title}"
 				},
 				"icon": {
@@ -66,10 +53,9 @@
 				"actions": [
 					{
 						"type": "Navigation",
-						"service": "Navigation2",
 						"enabled": "{= ${url}}",
 						"parameters": {
-							"hidden": "{url}"
+							"url": "{url}"
 						}
 					}
 				]

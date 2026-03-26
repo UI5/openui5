@@ -1,0 +1,70 @@
+<mvc:View
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:w="sap.ui.integration.widgets"
+	controllerName="sap.f.cardsdemo.controller.NavigationAction"
+	displayBlock="true">
+	<Page title="{i18n>appTitle}">
+		<subHeader>
+			<Toolbar>
+				<ToolbarSpacer />
+				<Title text="Navigation Action scenarios" />
+				<ToolbarSpacer />
+			</Toolbar>
+		</subHeader>
+
+		<Panel>
+			<VBox>
+				<VBox class="sapUiMediumMarginLeft">
+					<Text text="List and Table cards with navigation actions" />
+				</VBox>
+				<HBox wrap="Wrap">
+					<w:Card
+						id="listNavAction"
+						action=".onActionLog"
+						manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/navigationAction/manifest_list.json"
+						width="400px"
+						class="sapUiSmallMargin" />
+					<w:Card
+						id="tableNavAction"
+						action=".onActionLog"
+						manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/navigationAction/manifest_table.json"
+						width="400px"
+						class="sapUiSmallMargin" />
+				</HBox>
+				<VBox class="sapUiMediumMarginLeft">
+					<Text text="Analytical cards with navigation actions" />
+				</VBox>
+				<HBox wrap="Wrap">
+					<w:Card
+						class="sapUiSmallMargin"
+						manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/cardActions/analyticalNavigation.json"
+						height="500px"
+						width="500px" />
+				</HBox>
+				<VBox class="sapUiMediumMarginLeft">
+					<Text text="Object card with navigation action" />
+				</VBox>
+				<f:GridContainer>
+					<w:Card
+						manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/objectcontent/navigation.json">
+						<w:layoutData>
+							<f:GridContainerItemLayoutData minRows="6" columns="5" />
+						</w:layoutData>
+					</w:Card>
+				</f:GridContainer>
+				<VBox class="sapUiMediumMarginLeft">
+					<Text text="Timeline card with navigation actions" />
+				</VBox>
+				<HBox wrap="Wrap">
+					<w:Card
+						action=".onActionLog"
+						manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/navigationAction/manifest_timeline.json"
+						width="400px"
+						class="sapUiSmallMargin" />
+				</HBox>
+			</VBox>
+		</Panel>
+	</Page>
+</mvc:View>
