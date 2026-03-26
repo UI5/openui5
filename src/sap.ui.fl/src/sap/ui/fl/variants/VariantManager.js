@@ -503,10 +503,10 @@ sap.ui.define([
 
 	VariantManager.handleManageViewDialogExecution = async function(mPropertyBag) {
 		const {
-			vmReference: sVMReference,
+			variantManagementReference: sVMReference,
 			appComponent: oAppComponent,
 			changeContents: aConfigurationChangesContent,
-			vmControl: oVMControl,
+			variantManagementControl: oVMControl,
 			newDefaultVariantReferenceParameter: sNewDefaultVariantReferenceParameter,
 			generatorName: sGeneratorName,
 			variantsToBeDeleted: aVariantsToBeDeleted,
@@ -562,10 +562,10 @@ sap.ui.define([
 			aNewVariantChanges,
 			aVariantDeletionChanges
 		 ] = await VariantManager.handleManageViewDialogExecution({
-			vmReference: sVMReference,
+			variantManagementReference: sVMReference,
 			appComponent: oAppComponent,
 			changeContents: aConfigurationChangesContent,
-			vmControl: oVMControl,
+			variantManagementControl: oVMControl,
 			newDefaultVariantReferenceParameter: oEvent.getParameter("def"),
 			generatorName: null,
 			variantsToBeDeleted: aVariantsToBeDeleted,
@@ -692,14 +692,15 @@ sap.ui.define([
 	/**
 	 * Adds and applies the given changes.
 	 *
-	 * @param {Array<sap.ui.fl.apply._internal.flexObjects.FlexObject>} aChanges Changes to be applied
-	 * @param {sap.ui.core.Control} oControl - Control instance to fetch the variant model
+	 * @param {object} mPropertyBag - Map of properties
+	 * @param {sap.ui.core.Control} mPropertyBag.control - Control instance to fetch the variant model
+	 * @param {Array<sap.ui.fl.apply._internal.flexObjects.FlexObject>} mPropertyBag.changes - Changes to be applied
 	 * @returns {Promise<undefined>} Promise resolving when all changes are applied
 	 */
-	VariantManager.addAndApplyControlChangesOnVariant = function(aChanges, oControl) {
-		const oAppComponent = Utils.getAppComponentForControl(oControl);
+	VariantManager.addAndApplyControlChangesOnVariant = function(mPropertyBag) {
+		const oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
 		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oAppComponent });
-		const aAddedChanges = UIChangeManager.addDirtyChanges(sFlexReference, aChanges, oAppComponent);
+		const aAddedChanges = UIChangeManager.addDirtyChanges(sFlexReference, mPropertyBag.changes, oAppComponent);
 		return aAddedChanges.reduce(async function(oPreviousPromise, oChange) {
 			await oPreviousPromise;
 			const oControl = Element.getElementById(
@@ -768,7 +769,7 @@ sap.ui.define([
 	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
 	 * @param {sap.ui.fl.variants.Variant} mPropertyBag.variant - Variant to be removed
 	 * @param {string} mPropertyBag.sourceVariantReference - Source variant reference that should be set as current after removing
-	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.vmControl - Variant management control
+	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.variantManagementControl - Variant management control
 	 */
 	VariantManager.removeVariant = async function(mPropertyBag) {
 		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: mPropertyBag.appComponent });
@@ -781,7 +782,7 @@ sap.ui.define([
 		await VariantManagerApply.updateCurrentVariant({
 			newVariantReference: mPropertyBag.sourceVariantReference,
 			appComponent: mPropertyBag.appComponent,
-			vmControl: mPropertyBag.vmControl
+			vmControl: mPropertyBag.variantManagementControl
 		});
 		FlexObjectManager.deleteFlexObjects({
 			reference: sFlexReference,
@@ -897,13 +898,15 @@ sap.ui.define([
 
 	/**
 	 * Returns the dirty control changes from the given control changes.
-	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aControlChanges - Array of changes to be checked
-	 * @param {string} sFlexReference - Flex reference of the app
+	 * @param {object} mPropertyBag - Map of properties
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.controlChanges - Array of changes to be checked
+	 * @param {sap.ui.core.Control} mPropertyBag.variantManagementControl - Variant management control
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} Array of filtered changes
 	 * @private
 	 */
-	VariantManager.getDirtyControlChangesFromVariant = function(aControlChanges, sFlexReference) {
-		return getDirtyControlChangesFromVariant(aControlChanges, sFlexReference);
+	VariantManager.getDirtyControlChangesFromVariant = function(mPropertyBag) {
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.variantManagementControl);
+		return getDirtyControlChangesFromVariant(mPropertyBag.controlChanges, sFlexReference);
 	};
 
 	/**

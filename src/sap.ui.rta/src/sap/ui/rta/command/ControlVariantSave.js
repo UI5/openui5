@@ -3,11 +3,9 @@
  */
 sap.ui.define([
 	"sap/ui/fl/write/api/ControlVariantWriteAPI",
-	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/rta/command/BaseCommand"
 ], function(
 	ControlVariantWriteAPI,
-	FlexRuntimeInfoAPI,
 	BaseCommand
 ) {
 	"use strict";
@@ -39,14 +37,20 @@ sap.ui.define([
 	 */
 	ControlVariantSave.prototype.execute = function() {
 		const oVMControl = this.getElement();
-		this.sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oVMControl });
-		this._aControlChanges = ControlVariantWriteAPI.getControlChangesForVariant(
-			this.sFlexReference,
-			oVMControl.getVariantManagementReference(),
-			oVMControl.getCurrentVariantReference()
-		);
-		this._aDirtyChanges = ControlVariantWriteAPI.getDirtyControlChangesFromVariant(this._aControlChanges, this.sFlexReference);
-		ControlVariantWriteAPI.setSavedToVariant(this.sFlexReference, this._aDirtyChanges, true);
+		this._aControlChanges = ControlVariantWriteAPI.getControlChangesForVariant({
+			variantManagementControl: oVMControl,
+			variantManagementReference: oVMControl.getVariantManagementReference(),
+			variantReference: oVMControl.getCurrentVariantReference()
+		});
+		this._aDirtyChanges = ControlVariantWriteAPI.getDirtyControlChangesFromVariant({
+			controlChanges: this._aControlChanges,
+			variantManagementControl: oVMControl
+		});
+		ControlVariantWriteAPI.setSavedToVariant({
+			variantManagementControl: oVMControl,
+			changes: this._aDirtyChanges,
+			setSavedToVariant: true
+		});
 		return Promise.resolve();
 	};
 
@@ -56,7 +60,12 @@ sap.ui.define([
 	 * @returns {Promise} Returns resolve after undo
 	 */
 	ControlVariantSave.prototype.undo = function() {
-		ControlVariantWriteAPI.setSavedToVariant(this.sFlexReference, this._aDirtyChanges, false);
+		const oVMControl = this.getElement();
+		ControlVariantWriteAPI.setSavedToVariant({
+			variantManagementControl: oVMControl,
+			changes: this._aDirtyChanges,
+			setSavedToVariant: false
+		});
 		return Promise.resolve();
 	};
 

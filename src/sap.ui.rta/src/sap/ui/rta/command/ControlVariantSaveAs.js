@@ -2,8 +2,6 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
-	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/write/api/ContextSharingAPI",
 	"sap/ui/fl/write/api/ControlVariantWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
@@ -12,8 +10,6 @@ sap.ui.define([
 	"sap/ui/rta/library",
 	"sap/ui/rta/Utils"
 ], function(
-	ControlVariantApplyAPI,
-	FlexRuntimeInfoAPI,
 	ContextSharingAPI,
 	ControlVariantWriteAPI,
 	PersistenceWriteAPI,
@@ -104,12 +100,11 @@ sap.ui.define([
 	 * @returns {Promise} Promise that resolves after execution
 	 */
 	ControlVariantSaveAs.prototype.execute = async function() {
-		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: this.oVariantManagementControl });
-		this._aControlChangesWithoutVariant = ControlVariantWriteAPI.getControlChangesForVariant(
-			sFlexReference,
-			this.sVariantManagementReference,
-			this.getSourceVariantReference()
-		).filter(
+		this._aControlChangesWithoutVariant = ControlVariantWriteAPI.getControlChangesForVariant({
+			variantManagementControl: this.oVariantManagementControl,
+			variantManagementReference: this.sVariantManagementReference,
+			variantReference: this.getSourceVariantReference()
+		}).filter(
 			(oFlexObject) => !oFlexObject.getSavedToVariant()
 		);
 
@@ -122,7 +117,11 @@ sap.ui.define([
 		this._aPreparedChanges = aDirtyChanges;
 		[this._oVariantChange] = aDirtyChanges;
 		this.sNewVariantReference = this._oVariantChange.getId();
-		ControlVariantWriteAPI.setSavedToVariant(sFlexReference, this._aPreparedChanges, true);
+		ControlVariantWriteAPI.setSavedToVariant({
+			variantManagementControl: this.oVariantManagementControl,
+			changes: this._aPreparedChanges,
+			setSavedToVariant: true
+		});
 	};
 
 	/**
@@ -147,12 +146,15 @@ sap.ui.define([
 				variant: this._oVariantChange,
 				sourceVariantReference: this.getSourceVariantReference(),
 				variantManagementReference: this.sVariantManagementReference,
-				vmControl: this.getElement(),
+				variantManagementControl: this.getElement(),
 				appComponent: this.oAppComponent
 			};
 
 			await ControlVariantWriteAPI.removeVariant(mPropertyBag, true);
-			await ControlVariantWriteAPI.addAndApplyControlChangesOnVariant(this._aControlChangesWithoutVariant, this.oAppComponent);
+			await ControlVariantWriteAPI.addAndApplyControlChangesOnVariant({
+				changes: this._aControlChangesWithoutVariant,
+				control: this.oAppComponent
+			});
 			this._aPreparedChanges = null;
 			this._oVariantChange = null;
 		}

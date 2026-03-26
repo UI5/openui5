@@ -11,6 +11,7 @@ sap.ui.define([], function() {
 	 * @namespace
 	 * @private
 	 * @ui5-restricted sap.ui.core
+	 * @deprecated As of version 1.147.0, the concept has been discarded.
 	 */
 	const ElementHooks = {
 		/**

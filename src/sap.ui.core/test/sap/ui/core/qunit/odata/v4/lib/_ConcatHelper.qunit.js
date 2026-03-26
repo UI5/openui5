@@ -19,9 +19,13 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-[undefined, sinon.spy()].forEach(function (fnGrandTotal) {
-	[undefined, sinon.spy()].forEach(function (fnLeaves) {
-		var sTitle = "enhanceCache, fnGrandTotal: " + fnGrandTotal + ", fnLeaves: " + fnLeaves;
+[false, true].forEach(function (bHasFilterBeforeAggregate) {
+	[false, true].forEach(function (bHasExclusiveFilter) {
+		[undefined, sinon.spy()].forEach(function (fnGrandTotal) {
+			[undefined, sinon.spy()].forEach(function (fnLeaves) {
+	const sTitle = "enhanceCache, fnGrandTotal: " + fnGrandTotal + ", fnLeaves: " + fnLeaves
+		+ ", has $$filterBeforeAggregate: " + bHasFilterBeforeAggregate
+		+ ", has exclusive filter: " + bHasExclusiveFilter;
 
 	QUnit.test(sTitle, function (assert) {
 		var oAggregationHelperMock = this.mock(_AggregationHelper),
@@ -31,18 +35,25 @@ sap.ui.define([
 				"UI5__count@odata.type" : "#Decimal"
 			},
 			oDataRow = {},
+			oExpectedQueryOptions = {$skip : 42, $top : 57, "sap-client" : "123"},
 			// handleResponse must be at the prototype
 			oFirstLevelCache = Object.assign(Object.create({
 				handleResponse : sinon.stub().returns("~result~")
 			}), {
 				aElements : [],
 				sMetaPath : "/meta/path",
-				mQueryOptions : {"sap-client" : "123"},
+				mQueryOptions : bHasFilterBeforeAggregate
+					? {$$filterBeforeAggregate : "~filterBeforeAggregate~", "sap-client" : "123"}
+					: {"sap-client" : "123"},
 				oRequestor : {
 					buildQueryString : function () {}
 				},
-				sResourcePath : "SalesOrderList"
+				sResourcePath : "SalesOrderList",
+				getExclusiveFilter : function () {
+					throw new Error("Must be mocked");
+				}
 			}),
+			oFirstLevelCacheMock = this.mock(oFirstLevelCache),
 			oGrandTotalRow = {},
 			fnHandleResponse = oFirstLevelCache.handleResponse,
 			oLeavesRow = {},
@@ -53,6 +64,13 @@ sap.ui.define([
 			oResult = {value : [oCountRow, oDataRow]};
 
 		oFirstLevelCache.aElements.$created = 2;
+		if (bHasExclusiveFilter) {
+			oExpectedQueryOptions.$$filterBeforeAggregate = bHasFilterBeforeAggregate
+				? "(~filterBeforeAggregate~) and ~exclusiveFilter~"
+				: "~exclusiveFilter~";
+		} else if (bHasFilterBeforeAggregate) {
+			oExpectedQueryOptions.$$filterBeforeAggregate = "~filterBeforeAggregate~";
+		}
 
 		// code under test
 		_ConcatHelper.enhanceCache(oFirstLevelCache, "~oAggregation~",
@@ -63,9 +81,11 @@ sap.ui.define([
 			oFirstLevelCache.getResourcePathWithQuery(1, 100);
 		}, new Error("Must not request created element"));
 
+		oFirstLevelCacheMock.expects("getExclusiveFilter").twice().withExactArgs()
+			.returns(bHasExclusiveFilter ? "~exclusiveFilter~" : undefined);
 		oAggregationHelperMock.expects("buildApply")
-			.withExactArgs("~oAggregation~", {$skip : 42, $top : 57, "sap-client" : "123"}, 1,
-				undefined, "~mAlias2MeasureAndMethod~")
+			.withExactArgs("~oAggregation~", oExpectedQueryOptions, 1, undefined,
+				"~mAlias2MeasureAndMethod~")
 			.returns("~mQueryOptionsWithApply1~");
 		oRequestorMock.expects("buildQueryString")
 			.withExactArgs(oFirstLevelCache.sMetaPath, "~mQueryOptionsWithApply1~", false, true)
@@ -78,7 +98,7 @@ sap.ui.define([
 		assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptionsJSON, "unmodified");
 
 		oAggregationHelperMock.expects("buildApply")
-			.withExactArgs("~oAggregation~", {$skip : 42, $top : 57, "sap-client" : "123"}, 1, true,
+			.withExactArgs("~oAggregation~", oExpectedQueryOptions, 1, true,
 				"~mAlias2MeasureAndMethod~")
 			.returns("~mQueryOptionsWithApply2~");
 		oRequestorMock.expects("buildQueryString")
@@ -121,6 +141,8 @@ sap.ui.define([
 		assert.strictEqual(oResult.value.length, 1, "extra rows removed");
 		assert.strictEqual(oResult.value[0], oDataRow);
 	});
+			});
+		});
 	});
 });
 });

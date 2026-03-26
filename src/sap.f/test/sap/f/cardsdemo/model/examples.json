@@ -119,7 +119,7 @@
 	{
 		"title": "Navigation Action",
 		"description": "Navigation action examples",
-		"route": "navigationService",
+		"route": "navigationAction",
 		"group": "Card Actions"
 	},
 	{
@@ -199,12 +199,6 @@
 		"title": "Manifest initialization",
 		"description": "Details two approaches for initializing card manifests.",
 		"route": "manifest",
-		"group": "Initialization and Data"
-	},
-	{
-		"title": "Data Service",
-		"description": "Examples for FLP data scenarios.",
-		"route": "dataService",
 		"group": "Initialization and Data"
 	},
 	{

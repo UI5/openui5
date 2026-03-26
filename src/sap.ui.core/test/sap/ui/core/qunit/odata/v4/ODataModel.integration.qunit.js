@@ -110,8 +110,13 @@ sap.ui.define([
 	 * @param {sap.ui.model.odata.v4.ODataListBinding} oListBinding - A list binding
 	 */
 	function checkAggregationCache(sTitle, assert, oListBinding) {
+		var iExpandTo;
+
 		const aParentByLevel = [];
+		const aNextRankByLevel = [];
 		const bUnifiedCache = oListBinding.oCache.bUnifiedCache;
+		const oAggregation = oListBinding.getAggregation();
+		const bRecursiveHierarchy = !!oAggregation.hierarchyQualifier;
 
 		function checkCache(oCache) {
 			for (let i = 0, n = oCache.aElements.$created; i < n; i += 1) {
@@ -160,7 +165,7 @@ sap.ui.define([
 				// every "created" element needs to know its context (if not using createInPlace!),
 				// no others must do so
 				strictEqual(oElement["@$ui5.context.isTransient"] !== undefined
-						&& !oListBinding.getAggregation().createInPlace,
+						&& !oAggregation.createInPlace,
 					 _Helper.hasPrivateAnnotation(oElement, "context"),
 					`"context" @ level ${iLevel}`, oElement);
 				if (_Helper.hasPrivateAnnotation(oElement, "context")) {
@@ -168,7 +173,7 @@ sap.ui.define([
 						_Helper.getPrivateAnnotation(oElement, "context").isTransient(),
 						`"@$ui5.context.isTransient" @ level ${iLevel}`, oElement);
 				}
-				if (oListBinding.getAggregation().hierarchyQualifier) {
+				if (bRecursiveHierarchy) {
 					strictEqual(oListBinding.oCache.oTreeState.isOutOfPlace(
 							_Helper.getPrivateAnnotation(oElement, "predicate")),
 						oElement["@$ui5.context.isTransient"] === false, "OOP = created persisted",
@@ -191,16 +196,26 @@ sap.ui.define([
 						strictEqual(_Helper.getPrivateAnnotation(oElement, "parent"), oParent,
 							`"parent" @ level ${iLevel}`, oElement);
 					}
+					const checkRankConsecutive = () => {
+						if (bRecursiveHierarchy && iExpandTo > 1) {
+							return; //TODO: "rank" not consecutive *per level*
+						}
+						strictEqual(iRank, aNextRankByLevel[iLevel], `rank @ level ${iLevel}`,
+							oElement);
+						aNextRankByLevel[iLevel] = iRank + 1; // no gaps expected
+					};
 					if (_Helper.hasPrivateAnnotation(oElement, "transientPredicate")) {
 						strictEqual(iRank, undefined,
 							`created persisted @ level ${iLevel}`, oElement);
 					} else if (bPlaceholder) {
+						checkRankConsecutive();
 						strictEqual(oParent.aElements.indexOf(oElement), -1,
 							`placeholder @ level ${iLevel}`, oElement);
 					} else if (iRank !== undefined) {
 						strictEqual(iRank,
 							oParent.aElements.indexOf(oElement) - oParent.aElements.$created,
 							`$skip index @ level ${iLevel}`, oElement);
+						checkRankConsecutive();
 					}
 				} else {
 					assert.ok(false, `no known parent for level ${iLevel}`);
@@ -231,6 +246,7 @@ sap.ui.define([
 						"must not have a group level cache", oElement);
 					checkCache(oCache);
 					aParentByLevel[iLevel + 1] = oCache;
+					aNextRankByLevel[iLevel + 1] = 0;
 				}
 
 				const aSpliced = _Helper.getPrivateAnnotation(oElement, "spliced");
@@ -254,17 +270,18 @@ sap.ui.define([
 				true, `unknown predicate ${sPredicate}`, oElement);
 		}
 
-		let iExpandTo = oListBinding.getAggregation().expandTo ?? 1;
+		iExpandTo = oAggregation.expandTo ?? 1;
 		if (iExpandTo >= Number.MAX_SAFE_INTEGER || bUnifiedCache) {
 			iExpandTo = 99; // avoid "Invalid array length" :-)
 		}
 		for (let i = 0; i <= iExpandTo; i += 1) {
 			// Note: level 0 or 1 is used for initial placeholders of 1st level cache!
 			aParentByLevel[i] = oListBinding.oCache.oFirstLevel;
+			aNextRankByLevel[i] = 0;
 		}
 		checkCache(oListBinding.oCache.oFirstLevel);
 		visitElements(aElements);
-		if (oListBinding.getAggregation().createInPlace) {
+		if (oAggregation.createInPlace) {
 			strictEqual(oListBinding.oCache.oTreeState.getOutOfPlacePredicates().length, 0,
 				"no OOP w/ createInPlace");
 		}
@@ -292,7 +309,7 @@ sap.ui.define([
 			} // else: cannot count "descendants" this way
 		}
 
-		if (!oListBinding.getAggregation().hierarchyQualifier && !oListBinding.iCreatedContexts) {
+		if (!bRecursiveHierarchy && !oListBinding.iCreatedContexts) {
 			checkAggregationCache4NonHierarchy(sTitle, assert, oListBinding);
 		}
 	}
@@ -977,7 +994,8 @@ sap.ui.define([
 			// regular expression to ignore certain canceled errors according to their message
 			this.rIgnoredCanceledErrors = null;
 			// {map<string, true>}
-			// If an ID is in this.mIgnoredChanges, change events with null are ignored
+			// If an ID is in this.mIgnoredChanges, change events (with null or all) are ignored,
+			// depending on the value: false just ignores null changes, true all changes
 			this.mIgnoredChanges = {};
 			this.bIgnoreOrder4GET = false; // whether GET request order is (exceptionally) ignored
 			// {map<string, boolean|undefined>}
@@ -1311,9 +1329,12 @@ sap.ui.define([
 			var sExpectedValue,
 				aExpectedValues = vRow === undefined
 					? this.mChanges[sControlId]
-					: this.mListChanges[sControlId] && this.mListChanges[sControlId][vRow],
+					: this.mListChanges[sControlId]?.[vRow],
 				sVisibleId = vRow === undefined ? sControlId : sControlId + "[" + vRow + "]";
 
+			if (this.mIgnoredChanges[sControlId]) { // ignore *all* changes
+				return;
+			}
 			if (!aExpectedValues || !aExpectedValues.length) {
 				if (!(sControlId in this.mIgnoredChanges && sValue === null)) {
 					assert.ok(false, sVisibleId + ": " + JSON.stringify(sValue) + " (unexpected)");
@@ -2671,13 +2692,15 @@ sap.ui.define([
 		 * Allows that the property "text" of the control with the given ID is set to undefined or
 		 * null. This may happen when the property is part of a list, this list is reset and the
 		 * request to deliver the new value is slowed down due to a group lock. (Then the row
-		 * context might be destroyed in a prerendering task.)
+		 * context might be destroyed in a prerendering task.) With <code>bAll</code>, this allows
+		 * to ignore all changes, no matter which value.
 		 *
-		 * @param {string} sControlId The control ID
+		 * @param {string} sControlId - The control ID
+		 * @param {boolean} [bAll] - Whether to ignore *all* changes, not just nullishones
 		 * @returns {object} The test instance for chaining
 		 */
-		ignoreNullChanges : function (sControlId) {
-			this.mIgnoredChanges[sControlId] = true;
+		ignoreChanges : function (sControlId, bAll = false) {
+			this.mIgnoredChanges[sControlId] = bAll;
 
 			return this;
 		},
@@ -24071,7 +24094,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				})
 				// The field is reset first, because the filter request is delayed until the next
 				// prerendering task
-				.ignoreNullChanges("name")
+				.ignoreChanges("name")
 				.expectChange("name", ["Foo"]);
 
 			// This binding has no control -> no request, but timeout of group lock expected
@@ -28450,7 +28473,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Create at start is supported (JIRA: CPOUI5ODATAV4-3350)
 	// Create at end of start is supported (JIRA: CPOUI5ODATAV4-3351)
-	// Inactive elements are supported, even w/ refresh (JIRA: CPOUI5ODATAV4-3409)
+	// Inactive elements are supported, even w/ refresh and scrolling (JIRA: CPOUI5ODATAV4-3409)
 	[undefined, false, true].forEach((bInactive) => { // Note: false means "gets activated"
 		const sTitle = "Data Aggregation: filter w/o aggregation on leaves, bInactive=" + bInactive;
 		const bActivate = bInactive === false;
@@ -28791,15 +28814,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.strictEqual(oListBinding.getLength(), 27 + 2,
 				"unchanged (JIRA: CPOUI5ODATAV4-3409)");
 
-			this.expectChange("region", ["Start Of Start", "New", "End Of Start", "A"]);
-			if (bInactive) {
-				this.expectChange("isInactive", [, true]);
-			} else {
-				this.expectChange("isInactive", [true]);
-				if (bActivate) {
-					this.expectChange("isInactive", [, false]);
-				}
-			}
+			this.expectChange("region", ["Start Of Start", "New", "End Of Start", "A"])
+				.ignoreChanges("isInactive", /*bAll*/true); // STOP listening ;-)
 
 			const oStartOfStartContext = oListBinding.create({Region : "Start Of Start"},
 				/*bSkipRefresh*/true, /*bAtEnd*/false, /*bInactive*/true);
@@ -28849,8 +28865,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.strictEqual(oCreatedContext.isInactive(), bInactive, "still inactive");
 
 			if (bInactive) {
-				this.expectChange("isInactive", [, undefined])
-					.expectChange("region", [, "End Of Start", "A", "B"]);
+				this.expectChange("region", [, "End Of Start", "A", "B"]);
 
 				await Promise.all([
 					// code under test (JIRA: CPOUI5ODATAV4-3409) - requires "model order" inside _AC
@@ -28879,8 +28894,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				], 27 + 2);
 			}
 
-			this.expectChange("isInactive", bInactive ? [,, true] : [,,, true])
-				.expectChange("region",
+			this.expectChange("region",
 					bInactive ? [,, "Again At End Of Start", "A"] : [,,, "Again At End Of Start"]);
 
 			const oAgainEndOfStartContext = oListBinding.create({Region : "Again At End Of Start"},
@@ -28913,13 +28927,80 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						"Unsupported for data aggregation with created rows: " + oListBinding);
 				});
 
+			this.expectChange("region", bInactive
+					? [,,, "A", "B", "C", "D"]
+					: [,,,, "A", "B", "C", "D"]);
+
+			oTable.setFirstVisibleRow(bInactive ? 3 : 4); // no GET needed
+
+			await this.waitForChanges(assert, "scroll down");
+
+			checkTable("after scroll down", assert, oTable, [
+				oStartOfStartContext,
+				bInactive || oCreatedContext,
+				oEndOfStartContext,
+				oAgainEndOfStartContext,
+				"/BusinessPartners(1)",
+				"/BusinessPartners(2)",
+				"/BusinessPartners(3)",
+				"/BusinessPartners(4)",
+				"/BusinessPartners()"
+			], [
+				[undefined, undefined, undefined, false, 1, "1", "A", "195.583", "DEM"],
+				[undefined, undefined, undefined, false, 1, "2", "B", "200", "EUR"],
+				[undefined, undefined, undefined, false, 1, "3", "C", "300", "EUR"],
+				[undefined, undefined, undefined, false, 1, "4", "D", "400", "EUR"],
+				[undefined, undefined, true, true, 0, "", "", "35,100", "EUR"]
+			], (bInactive ? 27 : 28) + 3);
+
+			this.expectRequest("BusinessPartners?$apply=filter((Currency ne 'USD' and SalesAmount gt 0)"
+					// exclusive filter (see _CollectionCache#getExclusiveFilter)
+					+ " and not (" + (bInactive ? "" : "Id eq 27 or ") + "Id eq 28))"
+					+ "/search(covfefe)/groupby((Currency,Id,Region),aggregate(SalesAmount))"
+					+ "/orderby(Region asc,SalesAmount desc)/skip(4)/top(4)", {
+					value : [{
+						Currency : "EUR",
+						Id : 5, // Edm.Int16
+						Region : "E",
+						SalesAmount : "500"
+					}, {
+						Currency : "EUR",
+						Id : 6, // Edm.Int16
+						Region : "F",
+						SalesAmount : "600"
+					}, {
+						Currency : "EUR",
+						Id : 7, // Edm.Int16
+						Region : "G",
+						SalesAmount : "700"
+					}, {
+						Currency : "EUR",
+						Id : 8, // Edm.Int16
+						Region : "H",
+						SalesAmount : "800"
+					}]
+				})
+				.expectChange("region", bInactive
+					? [,,,,,,, "E", "F", "G", "H"]
+					: [,,,,,,,, "E", "F", "G", "H"]);
+
+			oTable.setFirstVisibleRow(bInactive ? 7 : 8);
+
+			await this.waitForChanges(assert, "scroll further down");
+
+			this.expectChange("region", bInactive
+					? ["Start Of Start", "End Of Start", "Again At End Of Start", "A"]
+					: ["Start Of Start", "New", "End Of Start", "Again At End Of Start"]);
+
+			oTable.setFirstVisibleRow(0); // Note: ChangeReason.Refresh does not reset 1st visible row!
+
+			await this.waitForChanges(assert, "scroll up again");
+
 			// for simplicity, ignore all POSTs above
 			this.expectRequest(sUrl.replace("top(4)", "top(2)"), new Promise(function (resolve) {
-					fnRespond = resolve.bind(null, {value : aResults.slice(0, 4)});
+					fnRespond = resolve.bind(null, {value : aResults.slice(0, 2 + 2)});
 				}))
 				.expectChange("count", "26")
-				.expectChange("isInactive", [, true])
-				.expectChange("isInactive", bInactive ? [,, undefined] : [,,, undefined])
 				.expectChange("region", [, "Again At End Of Start", "A", "B"]);
 
 			// code under test (JIRA: CPOUI5ODATAV4-3409)

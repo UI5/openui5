@@ -255,7 +255,7 @@ sap.ui.define([
 			var oApplyChangeStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({ success: true });
 			sandbox.stub(JsControlTreeModifier, "getControlIdBySelector");
 
-			await VariantManager.addAndApplyControlChangesOnVariant(aDummyChanges, oComponent);
+			await VariantManager.addAndApplyControlChangesOnVariant({ changes: aDummyChanges, control: oComponent });
 			assert.strictEqual(oAddChangesStub.lastCall.args[1].length, 2, "then every change in the array was added");
 			assert.ok(oApplyChangeStub.calledTwice, "then every change in the array was applied");
 			oControl.destroy();
@@ -290,7 +290,7 @@ sap.ui.define([
 				variant: oVariant,
 				sourceVariantReference: "sourceVariant",
 				appComponent: oComponent,
-				vmControl: this.oVMControl
+				variantManagementControl: this.oVMControl
 			};
 			await VariantManager.removeVariant(mPropertyBag);
 			assert.deepEqual(fnUpdateCurrentVariantStub.getCall(0).args[0], {
@@ -839,8 +839,11 @@ sap.ui.define([
 				})
 			];
 			aControlChanges[2].setSavedToVariant(true);
-			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").withArgs("DummyReference").returns([aControlChanges[0]]);
-			const aDirtyChanges = VariantManager.getDirtyControlChangesFromVariant(aControlChanges, "DummyReference");
+			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").withArgs(sReference).returns([aControlChanges[0]]);
+			const aDirtyChanges = VariantManager.getDirtyControlChangesFromVariant({
+				controlChanges: aControlChanges,
+				variantManagementControl: this.oVMControl
+			});
 			assert.strictEqual(aDirtyChanges.length, 1, "then one dirty change is returned");
 			assert.strictEqual(aDirtyChanges[0].getId(), "dirtyChange", "then the dirty change is returned");
 		});

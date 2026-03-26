@@ -44,7 +44,8 @@ sap.ui.define(['sap/base/Log', '../../Component', '../../Element', '../../Elemen
 		 * @alias sap.ui.core.support.usage.EventBroadcaster
 		 * @private
 		 * @ui5-restricted
-		 * @experimental Since 1.58
+		 * @ui5-experimental-since 1.58.0
+		 * @deprecated As of version 1.147.0, the concept has been discarded.
 		 */
 		var EventBroadcaster = {};
 
@@ -64,8 +65,7 @@ sap.ui.define(['sap/base/Log', '../../Component', '../../Element', '../../Elemen
 		 * Returned object is copied from the original one.
 		 * In case you modify it, you have to set it by using the
 		 * <code>setEventExcludeList</code> setter in order for it to take effect.
-		 * @experimental
-		 * @since 1.65
+		 * @ui5-experimental-since 1.65.0
 		 * @public
 		 */
 		EventBroadcaster.getEventsExcludeList = function() {
@@ -115,8 +115,7 @@ sap.ui.define(['sap/base/Log', '../../Component', '../../Element', '../../Elemen
 		 *	}
 		 * </pre>
 		 * The set configuration object is copied from the given one.
-		 * @experimental
-		 * @since 1.65
+		 * @ui5-experimental-since 1.65.0
 		 * @public
 		 */
 		EventBroadcaster.setEventsExcludeList = function(oConfig) {

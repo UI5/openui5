@@ -6493,6 +6493,7 @@ sap.ui.define([
 				}
 				assert.deepEqual(oResult, oExpectedResult);
 				assert.strictEqual(oResult.value.$count, oFixture.count);
+				assert.strictEqual(oResult.value.$created, 0);
 				if (oFixture.types) {
 					oFixture.result.forEach(function (oItem, i) {
 						assert.strictEqual(
@@ -6511,6 +6512,7 @@ sap.ui.define([
 				return oPromise2.then(function (oResult0) {
 					assert.deepEqual(oResult0, oExpectedResult);
 					assert.strictEqual(oResult0.value.$count, oFixture.count);
+					assert.strictEqual(oResult0.value.$created, 0);
 				});
 			});
 		});
@@ -9201,6 +9203,7 @@ sap.ui.define([
 				var oExpectedResult = createResult(0, 26, undefined, true);
 
 				oExpectedResult.value.$count = 26;
+				oExpectedResult.value.$created = 0;
 				assert.deepEqual(oResult, oExpectedResult);
 				assert.strictEqual(oCache.aElements.$count, 26);
 			}),
@@ -9208,6 +9211,7 @@ sap.ui.define([
 				var oExpectedResult = createResult(0, 0);
 
 				oExpectedResult.value.$count = 26;
+				oExpectedResult.value.$created = 0;
 				assert.deepEqual(oResult, oExpectedResult);
 				assert.strictEqual(oCache.aElements.$count, 26);
 			})
@@ -9266,6 +9270,7 @@ sap.ui.define([
 			.then(function (oResult) {
 				assert.strictEqual(oCache.aElements.$count, 26);
 				assert.strictEqual(oResult.value.$count, 26);
+				assert.strictEqual(oResult.value.$created, 0);
 				assert.strictEqual(oCache.iActiveElements, 0);
 				assert.strictEqual(oCache.iLimit, 26);
 
@@ -9295,6 +9300,7 @@ sap.ui.define([
 				let oResult = oCache.read(0, 10, 0, oReadGroupLock).getResult();
 				assert.strictEqual(oResult.value.$inactive, bInactive ? 1 : 0);
 				assert.strictEqual(oResult.value.$count, iCountAfterCreate);
+				assert.strictEqual(oResult.value.$created, 1);
 				assert.strictEqual(oCache.aElements.$count, iCountAfterCreate);
 				assert.strictEqual(oCache.iLimit, 26);
 				assert.strictEqual(oCache.iActiveElements, bInactive ? 0 : 1);
@@ -9315,6 +9321,7 @@ sap.ui.define([
 				oResult = oCache.read(0, 10, 0, oReadGroupLock).getResult();
 				assert.strictEqual(oResult.value.$inactive, 0);
 				assert.strictEqual(oResult.value.$count, 26);
+				assert.strictEqual(oResult.value.$created, 0);
 				assert.strictEqual(oCache.aElements.$count, 26);
 				assert.strictEqual(oCache.iLimit, 26);
 				assert.strictEqual(oCache.iActiveElements, 0);

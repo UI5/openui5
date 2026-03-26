@@ -454,5 +454,108 @@ sap.ui.require([
 		}, new TypeError("Invalid configuration key 'sap-ui-param1'!"), "oWritableInstance1.set for param 'sap-ui-param1' throws error 'Invalid configuration key 'sap-ui-param1'!'");
 	});
 
+	QUnit.test("Provider registration priority: non-external cannot override external", function(assert) {
+		assert.expect(7);
+		BaseConfiguration._.invalidate();
+
+		// Verify initial state: URL parameter (external provider) has value "url"
+		assert.strictEqual(BaseConfiguration.get({
+			name: "sapUiParamA",
+			type: BaseConfiguration.Type.String,
+			external: true
+		}), "url", "Initial: sapUiParamA from external provider returns 'url'");
+
+		// Create a non-external provider that tries to override sapUiParamA
+		var oNonExternalProvider = {
+			get: function(sName) {
+				if (sName === "sapUiParamA") {
+					return "non-external-override-attempt";
+				}
+				return undefined;
+			}
+		};
+
+		// Register non-external provider after setup
+		BaseConfiguration.registerProvider(oNonExternalProvider);
+		BaseConfiguration._.invalidate();
+
+		// Verify that external provider still has priority (should return "url", not "non-external-override-attempt")
+		assert.strictEqual(BaseConfiguration.get({
+			name: "sapUiParamA",
+			type: BaseConfiguration.Type.String,
+			external: true
+		}), "url", "After registering non-external provider: sapUiParamA still returns 'url' from external provider");
+
+		// Clear cache before testing non-external access
+		BaseConfiguration._.invalidate();
+
+		// Verify that non-external provider works for internal access (without external flag)
+		assert.strictEqual(BaseConfiguration.get({
+			name: "sapUiParamA",
+			type: BaseConfiguration.Type.String
+		}), "non-external-override-attempt", "Without external flag: sapUiParamA returns value from non-external provider");
+
+		// Test with additional external provider
+		var oExternalProvider = {
+			external: true,
+			get: function(sName) {
+				if (sName === "sapUiParamA") {
+					return "new-external-provider";
+				}
+				if (sName === "sapUiNewExternalParam") {
+					return "external-value";
+				}
+				return undefined;
+			}
+		};
+
+		// Register external provider
+		BaseConfiguration.registerProvider(oExternalProvider);
+		BaseConfiguration._.invalidate();
+
+		// New external provider should have highest priority
+		assert.strictEqual(BaseConfiguration.get({
+			name: "sapUiParamA",
+			type: BaseConfiguration.Type.String,
+			external: true
+		}), "new-external-provider", "After registering additional external provider: sapUiParamA returns 'new-external-provider' from newest external provider");
+
+		// New external parameter should work
+		assert.strictEqual(BaseConfiguration.get({
+			name: "sapUiNewExternalParam",
+			type: BaseConfiguration.Type.String,
+			external: true
+		}), "external-value", "New external provider can provide new parameters");
+
+		// Register another non-external provider
+		var oNonExternalProvider2 = {
+			get: function(sName) {
+				if (sName === "sapUiParamA") {
+					return "second-non-external-attempt";
+				}
+				if (sName === "sapUiNewExternalParam") {
+					return "non-external-attempt";
+				}
+				return undefined;
+			}
+		};
+
+		BaseConfiguration.registerProvider(oNonExternalProvider2);
+		BaseConfiguration._.invalidate();
+
+		// External providers should still have priority
+		assert.strictEqual(BaseConfiguration.get({
+			name: "sapUiParamA",
+			type: BaseConfiguration.Type.String,
+			external: true
+		}), "new-external-provider", "After registering second non-external provider: sapUiParamA still returns 'new-external-provider' from external provider");
+
+		assert.strictEqual(BaseConfiguration.get({
+			name: "sapUiNewExternalParam",
+			type: BaseConfiguration.Type.String,
+			external: true
+		}), "external-value", "After registering second non-external provider: sapUiNewExternalParam still returns 'external-value' from external provider");
+	});
+
 	QUnit.start();
 });

@@ -4,10 +4,12 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager"
 ], function(
 	VariantManagementState,
+	ManifestUtils,
 	VariantManager,
 	FlexObjectManager
 ) {
@@ -27,42 +29,47 @@ sap.ui.define([
 	/**
 	 * Returns the dirty changes from the given control changes.
 	 *
-	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aControlChanges - Array of changes to be checked
-	 * @param {string} sFlexReference - Flex reference of the app
+	 * @param {object} mPropertyBag - Map of properties
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.controlChanges - Array of changes to be checked
+	 * @param {sap.ui.core.Control} mPropertyBag.variantManagementControl - Variant management control
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} Array of filtered changes
 	 * @private
 	 */
-	ControlVariantWriteAPI.getDirtyControlChangesFromVariant = function(aControlChanges, sFlexReference) {
-		return VariantManager.getDirtyControlChangesFromVariant(aControlChanges, sFlexReference);
+	ControlVariantWriteAPI.getDirtyControlChangesFromVariant = function(mPropertyBag) {
+		return VariantManager.getDirtyControlChangesFromVariant(mPropertyBag);
 	};
 
 	/**
 	 * Returns the variant management reference for the given variant reference.
 	 *
-	 * @param {string} sFlexReference - Flex reference of the app
-	 * @param {string} sVariantManagementReference - Variant management reference
+	 * @param {object} mPropertyBag - Map of properties
+	 * @param {sap.ui.core.Control} mPropertyBag.variantManagementControl - Variant management control
+	 * @param {string} mPropertyBag.variantManagementReference - Variant management reference
 	 * @returns {string} Variant management reference for the given variant reference
 	 * @private
 	 */
-	ControlVariantWriteAPI.getVariantManagementReferenceForVariant = function(sFlexReference, sVariantManagementReference) {
+	ControlVariantWriteAPI.getVariantManagementReferenceForVariant = function(mPropertyBag) {
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.variantManagementControl);
 		return VariantManagementState.getVariantManagementReferenceForVariant(
 			sFlexReference,
-			sVariantManagementReference
+			mPropertyBag.variantManagementReference
 		);
 	};
 
 	/**
 	 * Returns all control changes for the given variant.
-	 * @param {string} sFlexReference - Flex reference of the app
-	 * @param {string} sVMReference - Variant Management reference
-	 * @param {string} sVReference - Variant reference
+	 * @param {object} mPropertyBag - Map of properties
+	 * @param {sap.ui.core.Control} mPropertyBag.variantManagementControl - Variant management control
+	 * @param {string} mPropertyBag.variantManagementReference - Variant Management reference
+	 * @param {string} mPropertyBag.variantReference - Variant reference
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} Array of control changes for the given variant
 	 */
-	ControlVariantWriteAPI.getControlChangesForVariant = function(sFlexReference, sVMReference, sVReference) {
+	ControlVariantWriteAPI.getControlChangesForVariant = function(mPropertyBag) {
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.variantManagementControl);
 		return VariantManagementState.getVariant({
-			reference: sFlexReference,
-			vmReference: sVMReference,
-			vReference: sVReference
+			vmReference: mPropertyBag.variantManagementReference,
+			vReference: mPropertyBag.variantReference,
+			reference: sFlexReference
 		}).controlChanges;
 	};
 
@@ -71,17 +78,19 @@ sap.ui.define([
 	 * Invalidates the variant management map for the given flex reference.
 	 * This ensures that the variant management map is updated when changes are made.
 	 *
-	 * @param {string} sFlexReference - Flex reference of the app
-	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aChanges - Array of changes to be marked
-	 * @param {boolean} bSetSavedToVariant - Whether to mark the changes as saved to variant or not
+	 * @param {object} mPropertyBag - Map of properties
+	 * @param {sap.ui.core.Control} mPropertyBag.variantManagementControl - Variant management control
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.changes - Array of changes to be marked
+	 * @param {boolean} mPropertyBag.setSavedToVariant - Whether to mark the changes as saved to variant or not
 	 * @private
 	 */
-	ControlVariantWriteAPI.setSavedToVariant = function(sFlexReference, aChanges, bSetSavedToVariant) {
-		aChanges.forEach((oChange) => {
+	ControlVariantWriteAPI.setSavedToVariant = function(mPropertyBag) {
+		mPropertyBag.changes.forEach((oChange) => {
 			if (oChange.getFileType() === "change") {
-				oChange.setSavedToVariant(bSetSavedToVariant);
+				oChange.setSavedToVariant(mPropertyBag.setSavedToVariant);
 			}
 		});
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.variantManagementControl);
 		VariantManagementState.getVariantManagementMap().checkUpdate({ reference: sFlexReference });
 	};
 
@@ -128,7 +137,7 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.variantManagementReference - Variant management reference
 	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
 	 * @param {object[]} mPropertyBag.changeContents - Array of change content objects
-	 * @param {object} mPropertyBag.vmControl - Variant management control
+	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.variantManagementControl - Variant management control
 	 * @param {string} [mPropertyBag.newDefaultVariantReferenceParameter] - New default variant reference
 	 * @param {string} [mPropertyBag.generatorName] - Generator name for the changes
 	 * @param {object[]} [mPropertyBag.variantsToBeDeleted] - Array of variants required to be deleted variants
@@ -147,7 +156,7 @@ sap.ui.define([
 	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
 	 * @param {sap.ui.fl.variants.Variant} mPropertyBag.variant - Variant to be removed
 	 * @param {string} mPropertyBag.sourceVariantReference - Source variant reference that should be set as current after removing
-	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.vmControl - Variant management control
+	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.variantManagementControl - Variant management control
 	 */
 	ControlVariantWriteAPI.removeVariant = function(mPropertyBag) {
 		VariantManager.removeVariant(mPropertyBag);
@@ -200,25 +209,30 @@ sap.ui.define([
 	 * Once the deletion is persisted, changes will not be restored.
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
-	 * @param {string} mPropertyBag.reference - Flex reference of the application
+	 * @param {sap.ui.core.Control} mPropertyBag.variantManagementControl - Variant management control
 	 * @param {string} mPropertyBag.componentId - Id of the application instance
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.flexObjects - FlexObjects to be restored
 	 * @private
 	 * @ui5-restricted sap.ui.fl, sap.ui.rta, similar tools
 	 */
 	ControlVariantWriteAPI.restoreDeletedFlexObjects = function(mPropertyBag) {
-		FlexObjectManager.restoreDeletedFlexObjects(mPropertyBag);
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.variantManagementControl);
+		FlexObjectManager.restoreDeletedFlexObjects({
+			...mPropertyBag,
+			reference: sFlexReference
+		});
 	};
 
 	/**
 	 * Adds and applies the given control changes.
 	 *
-	 * @param {Array<sap.ui.fl.apply._internal.flexObjects.FlexObject>} aChanges Changes to be added and applied
-	 * @param {sap.ui.core.Control} oControl - Control instance to fetch the variant model
+	 * @param {object} mPropertyBag - Map of properties
+	 * @param {Array<sap.ui.fl.apply._internal.flexObjects.FlexObject>} mPropertyBag.changes - Changes to be added and applied
+	 * @param {sap.ui.core.Control} mPropertyBag.control - Control instance to fetch the variant model
 	 * @returns {Promise<undefined>} Promise resolving when all changes are added and applied
 	 */
-	ControlVariantWriteAPI.addAndApplyControlChangesOnVariant = function(aChanges, oControl) {
-		return VariantManager.addAndApplyControlChangesOnVariant(aChanges, oControl);
+	ControlVariantWriteAPI.addAndApplyControlChangesOnVariant = function(mPropertyBag) {
+		return VariantManager.addAndApplyControlChangesOnVariant(mPropertyBag);
 	};
 
 	/**

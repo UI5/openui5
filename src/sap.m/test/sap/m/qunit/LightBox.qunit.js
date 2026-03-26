@@ -428,6 +428,108 @@ sap.ui.define([
 			}.bind(this), 2 * LIGHTBOX_OPEN_TIME);
 		});
 
+		QUnit.test('Focus is restored to Close button after unsuccessful image load', async function(assert) {
+			// Arrange
+			const done = assert.async();
+			const oImageContent = this.LightBox.getImageContent()[0],
+				sImageSource = IMAGE_PATH + 'fakepath';
+
+			oImageContent.setImageSrc(sImageSource);
+			await nextUIUpdate();
+
+			// Act
+			this.LightBox.open();
+
+			// Assert
+			setTimeout(function () {
+				const oCloseButtonDomRef = this.LightBox._oPopup.getContent().getDomRef().querySelector(".sapMBtn");
+
+				assert.ok(oCloseButtonDomRef.matches(":focus"), 'The close button should be focused after transitioning from loading to error state');
+				assert.ok(this.LightBox.getAggregation("_errorMessage"), 'Error message should be displayed');
+				done();
+			}.bind(this), 500);
+		});
+
+		QUnit.test('Focus is maintained on Close button after successful image load', async function(assert) {
+			// Arrange
+			const done = assert.async();
+			const oImageContent = this.LightBox.getImageContent()[0],
+				sImageSource = IMAGE_PATH + 'demo/nature/elephant.jpg',
+				oNativeImage = oImageContent._getNativeImage(),
+				fnOnload = oNativeImage.onload;
+
+			oImageContent.setImageSrc(sImageSource);
+			await nextUIUpdate();
+
+			oNativeImage.onload = function () {
+				fnOnload.apply(oNativeImage, arguments);
+
+				setTimeout(function () {
+					const oCloseButtonDomRef = this.LightBox._oPopup.getContent().getDomRef().querySelector(".sapMBtn");
+
+					assert.ok(oCloseButtonDomRef.matches(":focus"), 'The close button should maintain focus after transitioning from loading to loaded state');
+					assert.strictEqual(oImageContent._getImageState(), LightBoxLoadingStates.Loaded, 'Image should be in loaded state');
+					done();
+				}.bind(this), 100);
+			}.bind(this);
+
+			// Act
+			this.LightBox.open();
+		});
+
+		QUnit.test('ESC closes LightBox when image fails to load', async function(assert) {
+			// Arrange
+			const done = assert.async();
+			const oImageContent = this.LightBox.getImageContent()[0],
+				sImageSource = IMAGE_PATH + 'fakepath';
+
+			oImageContent.setImageSrc(sImageSource);
+			await nextUIUpdate();
+
+			// Act
+			this.LightBox.open();
+
+			setTimeout(function () {
+				qutils.triggerKeydown(this.LightBox.getDomRef(), KeyCodes.ESCAPE);
+
+				setTimeout(function () {
+					assert.strictEqual(this.LightBox.isOpen(), false, 'Dialog should be closed after ESC key press');
+					done();
+				}.bind(this), 500);
+			}.bind(this), 500);
+		});
+
+		QUnit.test('Focus handling across multiple open/close cycles', async function(assert) {
+			// Arrange
+			const done = assert.async();
+			const oImageContent = this.LightBox.getImageContent()[0],
+				sImageSource = IMAGE_PATH + 'demo/nature/elephant.jpg';
+
+			oImageContent.setImageSrc(sImageSource);
+			await nextUIUpdate();
+
+			// Act
+			this.LightBox.open();
+
+			setTimeout(function () {
+				const oFirstCloseButtonDomRef = this.LightBox._oPopup.getContent().getDomRef().querySelector(".sapMBtn");
+				assert.ok(oFirstCloseButtonDomRef.matches(":focus"), 'Close button should be focused on first open');
+
+				this.LightBox.close();
+
+				setTimeout(function () {
+					this.LightBox.open();
+
+					setTimeout(function () {
+						const oSecondCloseButtonDomRef = this.LightBox._oPopup.getContent().getDomRef().querySelector(".sapMBtn");
+						assert.ok(oSecondCloseButtonDomRef.matches(":focus"), 'Close button should be focused on second open');
+						assert.strictEqual(this.LightBox.isOpen(), true, 'LightBox should be open');
+						done();
+					}.bind(this), 2 * LIGHTBOX_OPEN_TIME);
+				}.bind(this), 500);
+			}.bind(this), 2 * LIGHTBOX_OPEN_TIME);
+		});
+
 		//================================================================================
 		// LightBox sapMLightBoxTopCornersRadius class
 		//================================================================================

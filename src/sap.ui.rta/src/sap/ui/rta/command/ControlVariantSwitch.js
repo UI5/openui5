@@ -90,7 +90,10 @@ sap.ui.define([
 		await this._updateVariant(sSourceVariantReference);
 		// When discarding, dirty changes on source variant need to be applied AFTER the switch
 		if (this.getDiscardVariantContent()) {
-			await ControlVariantWriteAPI.addAndApplyControlChangesOnVariant(this.getDiscardedChanges(), this.getElement());
+			await ControlVariantWriteAPI.addAndApplyControlChangesOnVariant({
+				changes: this.getDiscardedChanges(),
+				control: this.getElement()
+			});
 			this.setDiscardedChanges([]);
 		}
 	};

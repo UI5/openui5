@@ -11,14 +11,8 @@ sap.ui.define([
 			"type": "card",
 			"i18n": "i18n/i18n.properties"
 		},
-		"sap.ui5": {
-			"services": {
-				"RandomRevenue": {
-					"factoryName": "cardsdemo.service.RandomRevenueFactory"
-				}
-			}
-		},
 		"sap.card": {
+			"extension": "./Extension",
 			"type": "Analytical",
 			"header": {
 				"type": "Numeric",
@@ -53,8 +47,8 @@ sap.ui.define([
 			},
 			"content": {
 				"data": {
-					"service": {
-						"name": "RandomRevenue"
+					"extension": {
+						"method": "getData"
 					},
 					"path": "/"
 				},
@@ -100,7 +94,7 @@ sap.ui.define([
 
 		onBeforeRendering: function () {
 			this.getView().byId("card").setManifest(oCardManifest);
-			this.getView().byId("card").setBaseUrl(sap.ui.require.toUrl("sap/f/cardsdemo/cardcontent/objectcontent/"));
+			this.getView().byId("card").setBaseUrl(sap.ui.require.toUrl("sap/f/cardsdemo/cardcontent/dataMode/"));
 		},
 
 		onSelectionChange: function (oEvent) {

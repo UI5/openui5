@@ -56,12 +56,18 @@ sap.ui.define([
 				}
 				iStart -= iCreated;
 
+				const mQueryOptions = {...this.mQueryOptions, $skip : iStart, $top : iLength};
+				const sExclusiveFilter = this.getExclusiveFilter();
+				if (sExclusiveFilter) {
+					const sFilterBeforeAggregate = mQueryOptions.$$filterBeforeAggregate;
+					mQueryOptions.$$filterBeforeAggregate = sFilterBeforeAggregate
+						? "(" + sFilterBeforeAggregate + ") and " + sExclusiveFilter
+						: sExclusiveFilter;
+				}
+
 				// Note: ignore existing mQueryOptions.$apply, e.g. from ODLB#updateAnalyticalInfo
 				const mQueryOptionsWithApply = _AggregationHelper.buildApply(oAggregation,
-						Object.assign({}, this.mQueryOptions, {
-							$skip : iStart,
-							$top : iLength
-						}), 1, bFollowUp, mAlias2MeasureAndMethod);
+					mQueryOptions, 1, bFollowUp, mAlias2MeasureAndMethod);
 
 				bFollowUp = true; // next request is a follow-up
 

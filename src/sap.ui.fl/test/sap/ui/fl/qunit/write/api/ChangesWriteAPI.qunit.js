@@ -13,18 +13,13 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/changes/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/descriptorRelated/api/DescriptorChangeFactory",
 	"sap/ui/fl/initial/_internal/Settings",
-	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/write/_internal/appVariant/AppVariantInlineChangeFactory",
-	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
-	"sap/ui/fl/write/api/FeaturesAPI",
-	"sap/ui/fl/write/api/VersionsAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4",
@@ -42,18 +37,13 @@ sap.ui.define([
 	Reverter,
 	Utils,
 	States,
-	VariantManagementState,
 	FlexObjectState,
 	ManifestUtils,
 	DescriptorChangeFactory,
 	Settings,
-	VariantManagement,
 	AppVariantInlineChangeFactory,
-	ControlVariantWriteUtils,
 	ChangesWriteAPI,
 	ContextBasedAdaptationsAPI,
-	FeaturesAPI,
-	VersionsAPI,
 	Layer,
 	FlexUtils,
 	sinon,
@@ -314,7 +304,8 @@ sap.ui.define([
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("testComponent");
 			sandbox.stub(FlexUtils, "getAppDescriptor").returns(mPropertyBag.selector.appComponent.getManifest());
 
-			var oCreateInlineChangeStub = sandbox.stub(AppVariantInlineChangeFactory, "createDescriptorInlineChange").rejects(new Error("myError"));
+			var oCreateInlineChangeStub = sandbox.stub(AppVariantInlineChangeFactory, "createDescriptorInlineChange")
+			.rejects(new Error("myError"));
 			var oCreateChangeStub = sandbox.stub(DescriptorChangeFactory.prototype, "createNew");
 			var oErrorLogStub = sandbox.stub(Log, "error");
 
@@ -507,8 +498,16 @@ sap.ui.define([
 			.resolves(sReturnValue2);
 
 			return ChangesWriteAPI.revert(mPropertyBag).then(function(aValues) {
-				assert.strictEqual(aValues[0], sReturnValue, "then the flex persistence was called with correct parameters for the first change");
-				assert.strictEqual(aValues[1], sReturnValue2, "then the flex persistence was called with correct parameters for the second change");
+				assert.strictEqual(
+					aValues[0],
+					sReturnValue,
+					"then the flex persistence was called with correct parameters for the first change"
+				);
+				assert.strictEqual(
+					aValues[1],
+					sReturnValue2,
+					"then the flex persistence was called with correct parameters for the second change"
+				);
 			});
 		});
 
@@ -541,8 +540,16 @@ sap.ui.define([
 			.resolves(false);
 
 			return ChangesWriteAPI.revert(mPropertyBag).then(function(aValues) {
-				assert.strictEqual(aValues[0], sReturnValue, "then the flex persistence was called with correct parameters for the first change");
-				assert.strictEqual(aValues[1], false, "then the second revert returns false");
+				assert.strictEqual(
+					aValues[0],
+					sReturnValue,
+					"then the flex persistence was called with correct parameters for the first change"
+				);
+				assert.strictEqual(
+					aValues[1],
+					false,
+					"then the second revert returns false"
+				);
 			});
 		});
 
@@ -658,7 +665,11 @@ sap.ui.define([
 
 			return ChangesWriteAPI.create(mPropertyBag)
 			.then(function(oChange) {
-				assert.strictEqual(oChange._oInlineChange._getChangeType(), sChangeType, "then the correct descriptor change type was created");
+				assert.strictEqual(
+					oChange._oInlineChange._getChangeType(),
+					sChangeType,
+					"then the correct descriptor change type was created"
+				);
 			});
 		});
 
@@ -717,7 +728,11 @@ sap.ui.define([
 
 			return ChangesWriteAPI.create(mPropertyBag)
 			.then(function(oChange) {
-				assert.strictEqual(oChange._oInlineChange._getChangeType(), sChangeType, "then the correct descriptor change type was created");
+				assert.strictEqual(
+					oChange._oInlineChange._getChangeType(),
+					sChangeType,
+					"then the correct descriptor change type was created"
+				);
 			});
 		});
 	});

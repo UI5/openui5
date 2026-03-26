@@ -266,7 +266,7 @@ sap.ui.define([
 				oEvent.preventDefault();
 			}
 			this.fireClosePopover();
-		} else if (oEvent.keyCode === KeyCodes.F6 && this.oFocusedEndContentItem) {
+		} else if ((oEvent.keyCode === KeyCodes.F6 || oEvent.keyCode === KeyCodes.F2) && this.oFocusedEndContentItem) {
 			this.oHoveredItem.focus();
 			this.oFocusedEndContentItem = null;
 		} else {

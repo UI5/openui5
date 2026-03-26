@@ -17,7 +17,7 @@
 		<Panel>
 			<w:Card
 				id="card1"
-				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/navigationService/manifest_navigation_objectContent.json"
+				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/objectcontent/navigation.json"
 				class="sapUiMediumMargin sapFCardFocusFullCard"
 				width="400px" />
 			<w:Card
@@ -33,7 +33,7 @@
 				width="400px" />
 			<w:Card
 				id="card4"
-				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/navigationService/manifest_navigationAction_url_analyticalContent.json"
+				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/cardActions/analyticalNavigation.json"
 				class="sapUiMediumMargin sapFCardFocusFullCard"
 				width="400px" />
 		</Panel>

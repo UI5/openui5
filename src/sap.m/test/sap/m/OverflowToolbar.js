@@ -705,7 +705,7 @@ sap.ui.define([
 			})
 		}),
 		new Input("labelledInput", {
-			value : "I am labelled",
+			value : "Labelled",
 			layoutData: new OverflowToolbarLayoutData({
 				group: 1
 			}),
@@ -787,14 +787,14 @@ sap.ui.define([
 		}),
 		new Label({
 			id: "labelLayoutData",
-			text : "Shrinkable LayoutData",
+			text : "Shrinkable",
 			layoutData: new OverflowToolbarLayoutData({
 				shrinkable: true,
 				minWidth: "100px"
 			})
 		}),
 		new Button({
-			text: "Shrinkable LayoutData",
+			text: "Shrinkable",
 			layoutData: new OverflowToolbarLayoutData({
 				shrinkable: true,
 				minWidth: "50px"
@@ -819,17 +819,17 @@ sap.ui.define([
 			items: [
 				new Item({
 					key: "0",
-					text: "French"
+					text: "Fr"
 				}),
 
 				new Item({
 					key: "1",
-					text: "English"
+					text: "En"
 				}),
 
 				new Item({
 					key: "2",
-					text: "German"
+					text: "De"
 				})
 			],
 			layoutData: new OverflowToolbarLayoutData({
@@ -848,18 +848,14 @@ sap.ui.define([
 		}),
 		new ToolbarSpacer(),
 		new CheckBox({
-			text : "Checkbox",
-			layoutData: new OverflowToolbarLayoutData({
-				shrinkable: true,
-				minWidth: "100px"
-			})
+			text : "Checkbox"
 		}),
 		new Label({
 			text : "Items:",
 			labelFor: "comboBox"
 		}),
 		new ComboBox("comboBox", {
-			placeholder: "Choose item",
+			placeholder: "Choose",
 			items: [
 						new Item({
 								key: "0",

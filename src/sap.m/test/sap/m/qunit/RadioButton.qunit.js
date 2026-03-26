@@ -1202,6 +1202,27 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("Disabled and not editable radio button - most restrictive state should be displayed", function (assert) {
+		// arrange
+		this.oRB.setEnabled(false);
+		this.oRB.setEditable(false);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.ok(this.oRB.$().hasClass("sapMRbDis"), "The disabled class is added when radio button is disabled and not editable");
+		assert.notOk(this.oRB.$().hasClass("sapMRbRo"), "The readonly class is not added when radio button is disabled and not editable");
+		assert.ok(this.oRB.$().find("input")[0].getAttribute("disabled"), "The input element has the disabled attribute when the radio button is disabled and not editable");
+		assert.notOk(this.oRB.$().find("input")[0].getAttribute("readonly"), "The input element does not have the readonly attribute when the radio button is disabled and not editable");
+
+		for (const sState in this.mStateClass) {
+			const sClass = this.mStateClass[sState];
+			this.oRB.setValueState(sState);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			assert.notOk(this.oRB.$().hasClass(sClass), sClass + " class is not added when radio button is disabled and not editable");
+		}
+	});
+
 	QUnit.module("Wrapping", {
 		beforeEach: function () {
 			this.oRB = new RadioButton({

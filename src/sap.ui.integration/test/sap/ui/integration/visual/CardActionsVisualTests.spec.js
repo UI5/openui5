@@ -7,9 +7,8 @@ describe("sap.ui.integration.CardActionsVisualTests", function () {
 	"use strict";
 	browser.testrunner.currentSuite.meta.controlName = "sap.ui.integration.widgets.Card";
 
-
 	it("Navigation Action page", function () {
-		var aCardIds = ["listNavService", "tableNavService"];
+		var aCardIds = ["listNavAction", "tableNavAction"];
 
 		utils.navigateTo("Navigation Action");
 
@@ -17,14 +16,30 @@ describe("sap.ui.integration.CardActionsVisualTests", function () {
 			var oCard = {
 				control: {
 					viewNamespace: "sap.f.cardsdemo.view.",
-					viewName: "NavigationService",
+					viewName: "NavigationAction",
 					interaction: "root",
 					id: sId
 				}
 			};
 
+			var oCardElement = utils.getElement(oCard);
+
+			// Pre-scroll the card into view so that takePictureOfElement's scroll is a no-op,
+			// ensuring the page does not shift after hovering.
+			oCardElement.getWebElement().then(function (webElem) {
+				return webElem.getAttribute("id").then(function (id) {
+					return browser.executeScript("document.getElementById('" + id + "').scrollIntoView()");
+				});
+			});
+
+			// For table cards, hover on a <td> cell inside the first row —
+			// moving the mouse to a <tr> alone does not trigger CSS :hover visually in Chrome.
+			var sFirstRowSelector = sId === "tableNavAction"
+				? ".sapMLIB:nth-child(1) .sapMListTblCell"
+				: ".sapMLIB:nth-child(1)";
+
 			utils.hoverOn(
-				utils.getElement(oCard).element(by.css(".sapMLIB:nth-child(1)"))
+				oCardElement.element(by.css(sFirstRowSelector))
 			);
 
 			utils.takePictureOfElement(oCard, "Actions_" + sId);

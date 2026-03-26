@@ -5,7 +5,6 @@ sap.ui.define([
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/write/api/ControlVariantWriteAPI",
-	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/library",
@@ -16,7 +15,6 @@ sap.ui.define([
 	ControlVariantApplyAPI,
 	VariantManagement,
 	ControlVariantWriteAPI,
-	ChangesWriteAPI,
 	Layer,
 	CommandFactory,
 	rtaLibrary,
@@ -130,10 +128,10 @@ sap.ui.define([
 			assert.deepEqual(aPreparedChanges, aChanges, "all changes are saved in the command");
 			assert.strictEqual(
 				this.oHandleVariantConfigExecuteStub.calledWith({
-					vmReference: "variantMgmtId1",
+					variantManagementReference: "variantMgmtId1",
 					appComponent: oMockedAppComponent,
 					changeContents: aChanges,
-					vmControl: this.oVariantManagement,
+					variantManagementControl: this.oVariantManagement,
 					newDefaultVariantReferenceParameter: undefined,
 					generatorName: rtaLibrary.GENERATOR_NAME,
 					variantsToBeDeleted: aDeletedVariants,
@@ -152,7 +150,7 @@ sap.ui.define([
 			await oConfigureCommand.undo();
 			assert.ok(
 				oRestoreDeletedFlexObjectsStub.calledWith({
-					reference: sReference,
+					variantManagementControl: this.oVariantManagement,
 					componentId: "myFlexReference",
 					flexObjects: aDummyDeletedFlexObjects
 				}),
@@ -207,10 +205,10 @@ sap.ui.define([
 
 			assert.strictEqual(
 				this.oHandleVariantConfigExecuteStub.calledWith({
-					vmReference: "variantMgmtId1",
+					variantManagementReference: "variantMgmtId1",
 					appComponent: oMockedAppComponent,
 					changeContents: [oVisibleChange],
-					vmControl: this.oVariantManagement,
+					variantManagementControl: this.oVariantManagement,
 					newDefaultVariantReferenceParameter: undefined,
 					generatorName: rtaLibrary.GENERATOR_NAME,
 					variantsToBeDeleted: ["variant1"],

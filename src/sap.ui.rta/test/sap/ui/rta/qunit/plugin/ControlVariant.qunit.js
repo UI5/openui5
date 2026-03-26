@@ -516,7 +516,9 @@ sap.ui.define([
 
 			const aChanges = [oSetTitleVariantChange, oVMDependentChange];
 			this.oControlVariantPlugin.registerElementOverlay(this.oVariantManagementOverlay);
-			sandbox.stub(VariantManager, "openManageVariantsDialog").resolves({ changes: aChanges, variantsToBeDeleted: [oVariant.getId()] });
+			sandbox.stub(VariantManager, "openManageVariantsDialog").resolves(
+				{ changes: aChanges, variantsToBeDeleted: [oVariant.getId()] }
+			);
 			sandbox.stub(VersionsAPI, "getDraftFilenames").returns([]);
 
 			this.oControlVariantPlugin.attachElementModified(function(oEvent) {

@@ -1368,6 +1368,58 @@ sap.ui.define([
 		oStub.restore();
 	});
 
+	QUnit.test("F2 on EndContent item should focus the parent menu item", async function (assert) {
+		// Arrange
+		const oPressSpy = sinon.spy();
+		const oMenu = new Menu({
+				items: [
+					new MenuItem({
+						text: "Item with EndContent",
+						endContent: [
+							new Button({
+								icon: "sap-icon://accept",
+								press: oPressSpy
+							})
+						]
+					})
+				]
+			}),
+			oButton = new Button({ text: "Open Menu" }).placeAt("qunit-fixture");
+
+		await nextUIUpdate(this.clock);
+
+		oMenu.openBy(oButton);
+		await nextUIUpdate(this.clock);
+
+		const oEndContentButton = oMenu.getItems()[0].getEndContent()[0];
+		const $EndContentButton = jQuery(oEndContentButton.getDomRef());
+
+		// Ensure the first menu item is focused/hovered
+		const oItem = oMenu.getItems()[0];
+		oItem.getDomRef().focus();
+		await nextUIUpdate(this.clock);
+
+		// Navigate to the endContent via Right Arrow
+		oItem.$().trigger({ type: "keydown", keyCode: KeyCodes.ARROW_RIGHT });
+		await nextUIUpdate(this.clock);
+
+		// Assert focus moved to the endContent button
+		assert.strictEqual(document.activeElement, oEndContentButton.getDomRef(), "Focus moved to EndContent button after Right Arrow");
+
+		// Press F2 on the endContent to move focus back to parent menu item
+		$EndContentButton.trigger({ type: "keydown", keyCode: KeyCodes.F2 });
+		await nextUIUpdate(this.clock);
+
+		// Assert focus returned to the parent menu item
+		assert.strictEqual(document.activeElement, oItem.getDomRef(), "F2 on EndContent moved focus back to the parent menu item");
+
+		// Cleanup
+		oMenu.destroy();
+		oButton.destroy();
+		oEndContentButton.destroy();
+
+	});
+
 	QUnit.test("EndContent Button press event fires on mouse and keyboard", async function(assert) {
 		// Arrange
 		var oPressSpy = sinon.spy();
