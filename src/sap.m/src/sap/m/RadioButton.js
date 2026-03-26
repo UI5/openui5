@@ -203,13 +203,16 @@ function(
 			},
 			events : {
 				/**
-				 * Event is triggered when the user makes a change on the radio button (selecting or unselecting it).
+				 * The event is triggered when the user selects or deselects the radio button.
 				 */
 				select : {
 					parameters : {
 
 						/**
-						 * Checks whether the RadioButton is active or not.
+						 * Indicates whether the RadioButton is selected.
+						 *
+						 * <b>Note:</b> A single RadioButton cannot be deselected by user interaction.
+						 * Deselection only occurs when another RadioButton in the same group receives a selection.
 						 */
 						selected : {type : "boolean"}
 					}

@@ -187,6 +187,9 @@ sap.ui.define([
 				sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate"),
 				sTransientPredicate = _Helper.getPrivateAnnotation(oElement, "transientPredicate");
 
+			if (sTransientPredicate && iStart !== undefined) { // created
+				iStart -= 1; // "shift" rank of non-created elements behind this one
+			}
 			if (oOldElement) { // check before overwriting
 				if (oOldElement === oElement) {
 					return;
@@ -233,9 +236,7 @@ sap.ui.define([
 				_Helper.setPrivateAnnotation(oElement, "parent", oCache);
 			}
 
-			if (sTransientPredicate) { // created
-				iStart -= 1; // "shift" rank of non-created elements behind this one
-			} else if (iStart !== undefined) {
+			if (!sTransientPredicate && iStart !== undefined) {
 				_Helper.setPrivateAnnotation(oElement, "rank", iStart + i);
 			}
 		}
@@ -539,7 +540,9 @@ sap.ui.define([
 				if (this.oAggregation.createInPlace) {
 					return;
 				}
-				aElements.$count -= 1;
+				if (aElements.$count !== undefined) {
+					aElements.$count -= 1;
+				}
 				delete aElements.$byPredicate[sTransientPredicate];
 				aElements.splice(aElements.indexOf(oEntityData), 1);
 			}, /*fnAt*/(iIndex0) => {
@@ -571,7 +574,9 @@ sap.ui.define([
 				iLevel); // do not send via POST!
 			aElements.splice(iIndex0, 0, null); // create a gap
 			this.addElements(oEntityData, iIndex0, oCache, iRank);
-			aElements.$count += 1;
+			if (aElements.$count !== undefined) {
+				aElements.$count += 1;
+			}
 		};
 
 		const completeCreation = (iIndex0, iRank) => {
@@ -783,7 +788,7 @@ sap.ui.define([
 			: undefined;
 
 		const bHasConcatHelper = aAdditionalRowHandlers.length > 0;
-		this.oFirstLevel = this.createGroupLevelCache(null, bHasConcatHelper);
+		this.oFirstLevel ??= this.createGroupLevelCache(null, bHasConcatHelper);
 		if (bHasConcatHelper) {
 			// no specific handling needed for "UI5__count" here
 			aAdditionalRowHandlers.push(function () {});
@@ -2089,7 +2094,8 @@ sap.ui.define([
 					iOffset = 0, // offset for 1st level data rows
 					j;
 
-				that.aElements.length = that.aElements.$count = oResult.value.$count;
+				that.aElements.length = that.aElements.$count
+					= oResult.value.$count + oResult.value.$inactive;
 
 				if (that.aElements.length && that.oGrandTotalPromise) {
 					that.aElements.$count += 1;
@@ -2616,6 +2622,9 @@ sap.ui.define([
 
 		// "super" call (like @borrows ...)
 		const fnSuper = this.oFirstLevel.reset;
+		if (!this.oAggregation.hierarchyQualifier) {
+			this.aElements.$created = this.oFirstLevel.aElements.$created;
+		}
 		fnSuper.call(this, mKeptElementPredicates, sGroupId, mQueryOptions);
 		if (sGroupId) { // sGroupId means we are in a side-effects refresh
 			this.oBackup.oCountPromise = this.oCountPromise;
@@ -2629,6 +2638,17 @@ sap.ui.define([
 		oAggregation = Object.assign({}, oAggregation);
 		oAggregation.$ExpandLevels = this.oTreeState.getExpandLevels();
 
+		if (!this.oAggregation.hierarchyQualifier && this.oFirstLevel.aElements.$created) {
+			this.oFirstLevel.reset(mKeptElementPredicates, sGroupId, {
+				...mQueryOptions,
+				$count : true
+			});
+			if (sGroupId) {
+				this.oBackup.oFirstLevel = null;
+			}
+		} else {
+			this.oFirstLevel = null; // we need a new one ;-)
+		}
 		this.doReset(oAggregation, _AggregationHelper.hasGrandTotal(oAggregation.aggregate));
 	};
 
@@ -2648,7 +2668,11 @@ sap.ui.define([
 	_AggregationCache.prototype.restore = function (bReally) {
 		if (bReally) {
 			this.oCountPromise = this.oBackup.oCountPromise;
-			this.oFirstLevel = this.oBackup.oFirstLevel;
+			if (this.oBackup.oFirstLevel) {
+				this.oFirstLevel = this.oBackup.oFirstLevel;
+			} else {
+				this.oFirstLevel.restore(bReally);
+			}
 			this.oGrandTotalPromise = this.oBackup.oGrandTotalPromise;
 			this.bUnifiedCache = this.oBackup.bUnifiedCache;
 		}

@@ -120,52 +120,43 @@ sap.ui.define([
 		oTable.destroy();
 	});
 
-	QUnit.test("Monkey Patch", function(assert) {
-		const foo = function() {};
-		let oMenu = this.oTable.getContextMenu();
-		oMenu.openAsContextMenu = foo;
-		const oSetting = new ContextMenuSetting();
-		let count = 0;
+	QUnit.test("Event Handlers", function(assert) {
+		const oMenu = this.oTable.getContextMenu();
+		const oSetting = new ContextMenuSetting({scope: "Selection"});
 
-		const check = (bIsPatched) => {
-			count++;
-			if (bIsPatched) {
-				assert.ok(oMenu.openAsContextMenu != foo, count + ": Menu has monkey patched openAsContextMenu function");
-				assert.ok(oSetting._original_openAsContextMenu === foo, count + ": Original function stored");
-			} else {
-				assert.ok(oMenu.openAsContextMenu === foo, count + ": Menu has original openAsContextMenu function");
-				assert.ok(!oSetting._original_openAsContextMenu, count + ": No function stored");
-			}
-		};
-
-		check(false);
+		assert.notOk(this.oTable.hasListeners("beforeOpenContextMenu"), "No 'beforeOpenContextMenu' listener before plugin is added");
 		this.oTable.addDependent(oSetting);
-		check(true);
+		assert.ok(this.oTable.hasListeners("beforeOpenContextMenu"), "'beforeOpenContextMenu' listener attached on activate");
 		oSetting.setEnabled(false);
-		check(false);
+		assert.notOk(this.oTable.hasListeners("beforeOpenContextMenu"), "'beforeOpenContextMenu' listener detached on disable");
 		oSetting.setEnabled(true);
-		check(true);
+		assert.ok(this.oTable.hasListeners("beforeOpenContextMenu"), "'beforeOpenContextMenu' listener re-attached on enable");
 		this.oTable.removeAllDependents();
-		check(false);
-		this.oTable.setContextMenu(null);
+		assert.notOk(this.oTable.hasListeners("beforeOpenContextMenu"), "'beforeOpenContextMenu' listener detached on remove");
+
+		// open/closed listeners on sap.m.Menu are attached transiently during beforeOpenContextMenu
 		this.oTable.addDependent(oSetting);
-		check(false);
-		this.oTable.setContextMenu(oMenu);
-		check(true);
-		this.oTable.setContextMenu(null);
-		check(false);
-		oMenu.destroy();
-		oMenu = new UnifiedMenu();
-		oMenu.openAsContextMenu = foo;
-		this.oTable.setContextMenu(oMenu);
-		check(false);
-		oMenu.destroy();
-		oMenu = new Menu();
-		oMenu.openAsContextMenu = foo;
-		this.oTable.setContextMenu(oMenu);
-		check(true);
-		oSetting.destroy();
-		check(false);
+		assert.notOk(oMenu.hasListeners("open"), "No 'open' listener before context menu is triggered");
+		this.oTable.fireBeforeOpenContextMenu({listItem: this.oTable.getItems()[0]});
+		assert.ok(oMenu.hasListeners("open"), "'open' listener attached after beforeOpenContextMenu");
+		assert.ok(oMenu.hasListeners("closed"), "'closed' listener attached after beforeOpenContextMenu");
+		oMenu.fireOpen();
+		assert.notOk(oMenu.hasListeners("open"), "'open' listener detached after menu opened");
+		oMenu.fireClosed();
+		assert.notOk(oMenu.hasListeners("closed"), "'closed' listener detached after menu closed");
+
+		// when beforeOpenContextMenu is prevented, handlers must not accumulate
+		this.oTable.attachBeforeOpenContextMenu(function(oEvent) { oEvent.preventDefault(); });
+		this.oTable.fireBeforeOpenContextMenu({listItem: this.oTable.getItems()[0]});
+		this.oTable.fireBeforeOpenContextMenu({listItem: this.oTable.getItems()[0]});
+		this.oTable.fireBeforeOpenContextMenu({listItem: this.oTable.getItems()[0]});
+		assert.equal(oMenu.mEventRegistry["open"]?.length, 1, "Only one 'open' listener after multiple prevented beforeOpenContextMenu events");
+		assert.equal(oMenu.mEventRegistry["closed"]?.length, 1, "Only one 'closed' listener after multiple prevented beforeOpenContextMenu events");
+
+		// no listeners attached for non-sap.m.Menu
+		this.oTable.setContextMenu(new UnifiedMenu());
+		this.oTable.fireBeforeOpenContextMenu({listItem: this.oTable.getItems()[0]});
+		assert.notOk(this.oTable.getContextMenu().hasListeners("open"), "No 'open' listener for UnifiedMenu");
 	});
 
 	QUnit.module("ResponsiveTable", {

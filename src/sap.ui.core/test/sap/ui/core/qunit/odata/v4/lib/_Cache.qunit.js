@@ -9292,9 +9292,9 @@ sap.ui.define([
 					};
 
 				that.mock(oReadGroupLock).expects("unlock").twice().withExactArgs();
-				assert.strictEqual(
-					oCache.read(0, 10, 0, oReadGroupLock).getResult().value.$count,
-					iCountAfterCreate);
+				let oResult = oCache.read(0, 10, 0, oReadGroupLock).getResult();
+				assert.strictEqual(oResult.value.$inactive, bInactive ? 1 : 0);
+				assert.strictEqual(oResult.value.$count, iCountAfterCreate);
 				assert.strictEqual(oCache.aElements.$count, iCountAfterCreate);
 				assert.strictEqual(oCache.iLimit, 26);
 				assert.strictEqual(oCache.iActiveElements, bInactive ? 0 : 1);
@@ -9312,9 +9312,9 @@ sap.ui.define([
 				// code under test - cancel the create
 				oPostRequest.args[0][6]();
 
-				assert.strictEqual(
-					oCache.read(0, 10, 0, oReadGroupLock).getResult().value.$count,
-					26);
+				oResult = oCache.read(0, 10, 0, oReadGroupLock).getResult();
+				assert.strictEqual(oResult.value.$inactive, 0);
+				assert.strictEqual(oResult.value.$count, 26);
 				assert.strictEqual(oCache.aElements.$count, 26);
 				assert.strictEqual(oCache.iLimit, 26);
 				assert.strictEqual(oCache.iActiveElements, 0);

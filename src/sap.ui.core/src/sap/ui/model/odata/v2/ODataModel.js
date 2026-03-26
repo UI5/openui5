@@ -8000,11 +8000,12 @@ sap.ui.define([
 	 * {@link sap.ui.model.odata.ODataMetaModel#loaded loaded} has been resolved!
 	 *
 	 * @public
-	 * @returns {sap.ui.model.odata.ODataMetaModel} The meta model for this <code>ODataModel</code>
+	 * @returns {sap.ui.model.odata.ODataMetaModel|undefined} The meta model for this
+	 *   <code>ODataModel</code>, or <code>undefined</code> if the model has been destroyed
 	 */
 	ODataModel.prototype.getMetaModel = function() {
 		var that = this;
-		if (!this.oMetaModel) {
+		if (!this.oMetaModel && !this.bDestroyed) {
 			this.oMetaModel = new ODataMetaModel(this.oMetadata, this.oAnnotations, this);
 			// Call checkUpdate when metamodel has been loaded to update metamodel bindings
 			this.oMetaModel.loaded().then(function() {

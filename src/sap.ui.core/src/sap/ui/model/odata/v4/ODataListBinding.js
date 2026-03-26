@@ -2751,6 +2751,7 @@ sap.ui.define([
 		// createAndSetCache copies them to the cache later
 		this.mLateQueryOptions = _Helper.clone(mQueryOptions);
 		_Helper.aggregateExpandSelect(this.mLateQueryOptions, oBinding.mLateQueryOptions);
+		this.mCanUseCachePromiseByChildPath = {};
 		this.mPreviousContextsByPath = oBinding.mPreviousContextsByPath;
 		Object.values(this.mPreviousContextsByPath).forEach(function (oContext) {
 			oContext.oBinding = that;
@@ -2886,7 +2887,10 @@ sap.ui.define([
 		}
 
 		if (sChangeReason === "RemoveVirtualContext"
-				|| (this.oContext && this.oContext.iIndex === Context.VIRTUAL)) {
+				|| (this.oContext && this.oContext.iIndex === Context.VIRTUAL)
+				// ignore fixed bottom row w/ grand total temporarily
+				|| !this.bLengthFinal && iStart > 0 && iLength === 1 && !iMaximumPrefetchSize
+					&& iStart === this.getLength() - 1) {
 			return [];
 		}
 
@@ -4696,10 +4700,14 @@ sap.ui.define([
 
 		if (_Helper.isDataAggregation(this.mParameters)) {
 			if (!bSingle) {
-				return _AggregationHelper.isAffected(this.mParameters.$$aggregation,
-						this.aFilters.concat(this.aApplicationFilters), aPaths)
-					? this.refreshInternal("", sGroupId, false, true)
-					: SyncPromise.resolve();
+				if (!_AggregationHelper.isAffected(this.mParameters.$$aggregation,
+						this.aFilters.concat(this.aApplicationFilters), aPaths)) {
+					return SyncPromise.resolve();
+				}
+				if (this.iCreatedContexts) {
+					throw new Error("Unsupported for data aggregation with created rows: " + this);
+				}
+				return this.refreshInternal("", sGroupId, false, true);
 			}
 
 			if (this.mParameters.$$aggregation.groupLevels.length) {

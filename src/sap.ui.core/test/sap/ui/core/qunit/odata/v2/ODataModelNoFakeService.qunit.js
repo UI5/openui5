@@ -6338,6 +6338,22 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("getMetaModel: model is destroyed", function (assert) {
+		const oModel = {
+			bDestroyed : true,
+			oMetaModel : undefined,
+			annotationsLoaded() {}
+		};
+
+		// would be called in ODataMetaModel constructor
+		this.mock(oModel).expects("annotationsLoaded").never();
+
+		// code under test (SNOW: DINC0815584)
+		assert.strictEqual(ODataModel.prototype.getMetaModel.call(oModel), undefined);
+		assert.strictEqual(oModel.oMetaModel, undefined);
+	});
+
+	//*********************************************************************************************
 	QUnit.test("createCodeListModelParameters: mParameters=undefined and defaulting",
 			function (assert) {
 		var mExpectedResult = {

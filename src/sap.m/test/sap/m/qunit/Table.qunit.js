@@ -4631,46 +4631,62 @@ sap.ui.define([
 		const CONTROL_EMPTY = oRB.getText("CONTROL_EMPTY");
 		const ONE_ACTION_AVAILABLE = oRB.getText("LIST_ITEM_SINGLE_ACTION");
 		const TWO_ACTIONS_AVAILABLE = oRB.getText("LIST_ITEM_MULTIPLE_ACTIONS", [2]);
+		const THREE_ACTIONS_AVAILABLE = oRB.getText("LIST_ITEM_MULTIPLE_ACTIONS", [3]);
 		const oInvisibleText = ListBase.getInvisibleText();
 
 		assert.ok(this.oTable.getDomRef("tblHeadActions"), "Actions column header is rendered");
 		assert.equal(this.oTable.getDomRef("tblHeadActions").textContent, ROW_ACTION, "Actions column header label is set");
-		assert.ok(this.oTable.getDomRef("tblHeadActions").classList.contains("sapMTable2ActionsCol"), "2 actions column header class is added");
-		assert.ok(this.oTable.getDomRef("tblHeadNav"), "Navigation column header is rendered since type is Navigation");
+		assert.ok(this.oTable.getDomRef("tblHeadActions").classList.contains("sapMTable3ActionsCol"), "3 actions column header class is added");
+		assert.notOk(this.oTable.getDomRef("tblHeadNav"), "Navigation column header is not rendered since type is Navigation");
 		assert.notOk(this.oTable.getDomRef("tblHeadModeCol"), "Delete column is not rendered since custom row actions are enabled");
 
 		assert.ok(this.oItem1.getDomRef("Actions"), "Actions cell is rendered for the item");
 		assert.ok(this.oItem1.getDomRef("actions"), "Actions cell content is rendered for the item");
-		assert.equal(this.oItem1.getDomRef("actions").childElementCount, 2, "There are two actions");
+		assert.equal(this.oItem1.getDomRef("actions").childElementCount, 3, "There are three actions");
 
 		this.oItem1.getDomRef("Actions").focus();
-		assert.ok(oInvisibleText.getText().endsWith(TWO_ACTIONS_AVAILABLE), "Two actions available");
+		assert.ok(oInvisibleText.getText().endsWith(THREE_ACTIONS_AVAILABLE), "Three actions available");
 
 		this.oItem1.getActions()[1].setVisible(false);
 		await nextUIUpdate();
 		assert.ok(this.oItem1.getDomRef().querySelector(".sapMLIBActionHidden"), "There hidden class is added for the hidden action");
-		assert.equal(this.oItem1.getDomRef().querySelector(".sapMLIBActionHidden"), this.oItem1.getDomRef("actions").lastChild);
+		assert.equal(this.oItem1.getDomRef().querySelector(".sapMLIBActionHidden"), this.oItem1.getDomRef("actions").firstElementChild.nextElementSibling);
 
 		document.activeElement.blur();
 		this.oItem1.getDomRef("Actions").focus();
-		assert.ok(oInvisibleText.getText().endsWith(ONE_ACTION_AVAILABLE), "One action available");
+		assert.ok(oInvisibleText.getText().endsWith(TWO_ACTIONS_AVAILABLE), "Two actions available");
 
 		this.oItem1.getActions()[0].setVisible(false);
 		await nextUIUpdate();
 		document.activeElement.blur();
 		this.oItem1.getDomRef("Actions").focus();
+		assert.ok(oInvisibleText.getText().endsWith(ONE_ACTION_AVAILABLE), "One action available");
+
+		this.oItem2 = new ColumnListItem({
+			cells: new Text({text: "Cell 1"})
+		});
+		this.oTable.addItem(this.oItem2);
+		await nextUIUpdate();
+		assert.equal(this.oItem2.getType(), "Inactive", "There is no type defined for the 2nd row");
+		assert.ok(this.oItem2.getDomRef("imgNav-hidden"), "A hidden navigation element is rendered since first item is of type Navigation");
+
+		this.oItem1.setType("Inactive");
+		await nextUIUpdate();
+		document.activeElement.blur();
+		this.oItem1.getDomRef("Actions").focus();
 		assert.ok(oInvisibleText.getText().endsWith(CONTROL_EMPTY), "No actions available");
 
+		this.oItem1.setType("Navigation");
 		this.oItem1.getActions()[0].setVisible(true);
 		this.oTable.setItemActionCount(1);
 		await nextUIUpdate();
-		assert.ok(this.oTable.getDomRef("tblHeadActions").classList.contains("sapMTable1ActionsCol"), "1 action column header class is added");
-		assert.equal(this.oItem1.getDomRef("actions").childElementCount, 1, "There is only one action");
+		assert.ok(this.oTable.getDomRef("tblHeadActions").classList.contains("sapMTable2ActionsCol"), "2 actions column header class is added");
+		assert.equal(this.oItem1.getDomRef("actions").childElementCount, 2, "There are two actions");
 
 		this.oTable.setItemActionCount(0);
 		await nextUIUpdate();
 		assert.notOk(this.oItem1.getDomRef("Actions"), "There is no more actions to render");
-		assert.ok(this.oTable.getDomRef("tblHeadNav"), "Navigation column header is still rendered");
+		assert.ok(this.oTable.getDomRef("tblHeadNav"), "Navigation column header is now rendered");
 		assert.notOk(this.oTable.getDomRef("tblHeadModeCol"), "Delete column is still not rendered");
 
 		this.oTable.setItemActionCount(-1);

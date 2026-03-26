@@ -11,11 +11,6 @@
 @_sap_m_ListItemBase_Focus_Outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 @_sap_m_ListItemBase_Focus_OffsetWithGap: calc(-@sapUiContentFocusWidth ~"- 0.0625rem");
 
-.sapMLIB,
-.sapMLIBImgNav {
-	box-sizing: border-box;
-}
-
 .sapMLIB {
 	display: flex;
 	align-items: center;
@@ -23,10 +18,12 @@
 	background: var(--sapList_Background);
 	border-bottom: 1px solid var(--sapList_BorderColor);
 	padding: 0 1rem 0 1rem;
+	box-sizing: border-box;
 }
 
-.sapMLIBIconDet,
-.sapMLIBIconDel {
+.sapMLIB > .sapMLIBImgNav,
+.sapMLIB > .sapMLIBIconDet,
+.sapMLIB > .sapMLIBIconDel {
 	margin-left: @_sap_m_ListItemBase_Detail_Delete_MarginLeft;
 }
 
@@ -57,8 +54,6 @@
 }
 
 .sapMLIBActionable,
-.sapMLIBActionable > .sapMLIBImgNav,
-.sapMListTblNavCol > .sapMLIBImgNav,
 .sapMLIBActionable .sapMSLIThumbnail,
 .sapMLIBActionable .sapMSLIImgIcon {
 	cursor: pointer;
@@ -162,10 +157,6 @@
 	background: var(--sapIndicationColor_10);
 }
 
-:not(.sapMListModeDelete) > .sapMLIB.sapMLIBTypeNavigation {
-	padding-right: 0;
-}
-
 .sapMListShowSeparatorsNone .sapMLIBShowSeparator {
 	border-bottom: 1px solid transparent;
 }
@@ -246,12 +237,6 @@
 	padding-left: 1rem;
 }
 
-.sapMLIBImgNav {
-	width: 2.5rem;
-	font-size: 0.75rem;
-	color: var(--sapContent_LabelColor);
-}
-
 .sapMLIBActive .sapMLIBImgNav,
 .sapMLIBActive .sapMLIBIconDet .sapMBtnIcon,
 .sapMLIBActive .sapMLIBIconDel .sapMBtnIcon {
@@ -308,7 +293,7 @@
 .sapMLIBActions {
 	display: flex;
 	align-items: center;
-	margin-inline: 0.5rem -0.125rem;
+	margin-inline: 0.25rem 0;
 	gap: 0.125rem;
 }
 

@@ -2268,7 +2268,7 @@ sap.ui.define([
 				sNavgationIconURI = IconPool.getIconURI("slim-arrow-right");
 			}
 
-			oNavControl.setSrc(sNavgationIconURI);
+			oNavControl.setIcon(sNavgationIconURI);
 
 			return oNavControl;
 		};
