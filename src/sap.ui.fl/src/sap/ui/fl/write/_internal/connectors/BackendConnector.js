@@ -38,7 +38,10 @@ sap.ui.define([
 		if (this.isLanguageInfoRequired) {
 			InitialUtils.addLanguageInfo(mParameters);
 		}
-		var sWriteUrl = InitialUtils.getUrl(this.ROUTES.CHANGES, mPropertyBag, mParameters);
+		if (!mPropertyBag.route) {
+			mPropertyBag.route = this.ROUTES.CHANGES;
+		}
+		var sWriteUrl = InitialUtils.getUrl(mPropertyBag.route, mPropertyBag, mParameters);
 		delete mPropertyBag.fileName;
 		delete mParameters["sap-language"];
 		var sTokenUrl = InitialUtils.getUrl(this.ROUTES.TOKEN, mPropertyBag, mParameters);
@@ -86,13 +89,14 @@ sap.ui.define([
 		 * @param {object} mPropertyBag - Property bag
 		 * @param {string} mPropertyBag.reference - Flex reference of the application
 		 * @param {string} mPropertyBag.url - Configured url for the connector
+		 * @param {sap.ui.fl.Layer} mPropertyBag.layer - Layer
 		 * @param {string} [mPropertyBag.generator] - Generator with which the changes were created
 		 * @param {string} [mPropertyBag.selectorIds] - Selector IDs of controls for which the reset should filter (comma-separated list)
 		 * @param {string} [mPropertyBag.changeTypes] - Change types of the changes which should be reset (comma-separated list)
 		 * @returns {Promise} Promise resolves as soon as the reset has completed
 		 */
 		reset: function (mPropertyBag) {
-			var aParameters = ["reference", "generator"];
+			var aParameters = ["reference", "generator", "layer"];
 			var mParameters = _pick(mPropertyBag, aParameters);
 			if (mPropertyBag.selectorIds) {
 				mParameters.selector = mPropertyBag.selectorIds;
@@ -120,6 +124,7 @@ sap.ui.define([
 		 * @param {object} mPropertyBag - Property bag
 		 * @param {object[]} mPropertyBag.flexObjects - Objects to be written (i.e. change definitions, variant definitions etc.)
 		 * @param {string} mPropertyBag.url - Configured url for the connector
+		 * @param {string} [mPropertyBag.route] - Configured route for the connector
 		 * @param {number} [mPropertyBag.parentVersion] - Indicates if changes should be written as a draft and on which version the changes should be based on
 		 * @returns {Promise} Promise resolves as soon as the writing was completed
 		 */
@@ -141,6 +146,7 @@ sap.ui.define([
 		 * @param {object} mPropertyBag - Property bag
 		 * @param {object} mPropertyBag.flexObject - Flex Object to be updated
 		 * @param {string} mPropertyBag.url - Configured url for the connector
+		 * @param {string} [mPropertyBag.route] - Configured route for the connector
 		 * @returns {Promise} Resolves as soon as the writing is completed without data
 		 */
 		update: function (mPropertyBag) {
@@ -154,6 +160,7 @@ sap.ui.define([
 		 * @param {object} mPropertyBag - Property bag
 		 * @param {object} mPropertyBag.flexObject - Flex Object to be deleted
 		 * @param {string} mPropertyBag.url - Configured url for the connector
+		 * @param {string} [mPropertyBag.route] - Configured route for the connector
 		 * @returns {Promise} Resolves as soon as the deletion is completed without data
 		 */
 		remove: function (mPropertyBag) {
@@ -161,7 +168,10 @@ sap.ui.define([
 				namespace: mPropertyBag.flexObject.namespace
 			};
 			mPropertyBag.fileName = mPropertyBag.flexObject.fileName;
-			var sDeleteUrl = InitialUtils.getUrl(this.ROUTES.CHANGES, mPropertyBag, mParameters);
+			if (!mPropertyBag.route) {
+				mPropertyBag.route = this.ROUTES.CHANGES;
+			}
+			var sDeleteUrl = InitialUtils.getUrl(mPropertyBag.route, mPropertyBag, mParameters);
 			delete mPropertyBag.fileName;
 			var sTokenUrl = InitialUtils.getUrl(this.ROUTES.TOKEN, mPropertyBag);
 

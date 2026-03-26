@@ -1200,6 +1200,7 @@ sap.ui.define([
 			};
 
 			var mParameter = {
+				layer: Layer.USER,
 				reference: "reference"
 			};
 
@@ -1236,6 +1237,7 @@ sap.ui.define([
 			};
 
 			var mParameter = {
+				layer: Layer.USER,
 				reference: "reference"
 			};
 
@@ -1274,6 +1276,7 @@ sap.ui.define([
 			};
 
 			var mParameter = {
+				layer: Layer.CUSTOMER,
 				reference: "reference"
 			};
 

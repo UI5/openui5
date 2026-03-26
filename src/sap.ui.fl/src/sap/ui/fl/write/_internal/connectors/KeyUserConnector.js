@@ -23,7 +23,7 @@ sap.ui.define([
 	function _enhancePropertyBagWithTokenInfo(mPropertyBag) {
 		mPropertyBag.initialConnector = InitialConnector;
 		mPropertyBag.xsrfToken = InitialConnector.xsrfToken;
-		mPropertyBag.tokenUrl = KeyUserConnector.ROUTES.TOKEN;
+		mPropertyBag.tokenUrl = this.ROUTES.TOKEN;
 	}
 
 	function _enhancePropertyBagForDraftActivation(mPropertyBag) {
@@ -65,7 +65,7 @@ sap.ui.define([
 		},
 		isLanguageInfoRequired: true,
 		loadFeatures: function (mPropertyBag) {
-			return BackendConnector.loadFeatures.call(KeyUserConnector, mPropertyBag).then(function (oFeatures) {
+			return BackendConnector.loadFeatures.call(this, mPropertyBag).then(function (oFeatures) {
 				// in case the variants can be adapted via RTA, the public option should not be offered
 				oFeatures.isPublicLayerAvailable = oFeatures.isPublicLayerAvailable && !oFeatures.isVariantAdaptationEnabled;
 				return oFeatures;
@@ -75,11 +75,11 @@ sap.ui.define([
 
 	KeyUserConnector.versions = {
 		load: function (mPropertyBag) {
-			_enhancePropertyBagWithTokenInfo(mPropertyBag);
+			_enhancePropertyBagWithTokenInfo.call(this, mPropertyBag);
 			var mParameters = {};
 			InitialUtils.addLanguageInfo(mParameters);
 			mParameters.limit = mPropertyBag.limit;
-			var sVersionsUrl = InitialUtils.getUrl(KeyUserConnector.ROUTES.VERSIONS.GET, mPropertyBag, mParameters);
+			var sVersionsUrl = InitialUtils.getUrl(this.ROUTES.VERSIONS.GET, mPropertyBag, mParameters);
 			return InitialUtils.sendRequest(sVersionsUrl, "GET", mPropertyBag).then(function (oResult) {
 				return oResult.response.map(function (oVersion) {
 					return renameVersionNumberProperty(oVersion);
@@ -87,19 +87,19 @@ sap.ui.define([
 			});
 		},
 		activate: function (mPropertyBag) {
-			_enhancePropertyBagWithTokenInfo(mPropertyBag);
+			_enhancePropertyBagWithTokenInfo.call(this, mPropertyBag);
 			_enhancePropertyBagForDraftActivation(mPropertyBag);
 			var mParameters = {version: mPropertyBag.version};
 			InitialUtils.addLanguageInfo(mParameters);
-			var sVersionsUrl = InitialUtils.getUrl(KeyUserConnector.ROUTES.VERSIONS.ACTIVATE, mPropertyBag, mParameters);
+			var sVersionsUrl = InitialUtils.getUrl(this.ROUTES.VERSIONS.ACTIVATE, mPropertyBag, mParameters);
 			return WriteUtils.sendRequest(sVersionsUrl, "POST", mPropertyBag).then(function (oResult) {
 				var oVersion = oResult.response;
 				return renameVersionNumberProperty(oVersion);
 			});
 		},
 		discardDraft: function (mPropertyBag) {
-			_enhancePropertyBagWithTokenInfo(mPropertyBag);
-			var sVersionsUrl = InitialUtils.getUrl(KeyUserConnector.ROUTES.VERSIONS.DISCARD, mPropertyBag);
+			_enhancePropertyBagWithTokenInfo.call(this, mPropertyBag);
+			var sVersionsUrl = InitialUtils.getUrl(this.ROUTES.VERSIONS.DISCARD, mPropertyBag);
 			return WriteUtils.sendRequest(sVersionsUrl, "DELETE", mPropertyBag);
 		}
 	};

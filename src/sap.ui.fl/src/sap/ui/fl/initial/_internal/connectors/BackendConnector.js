@@ -24,6 +24,36 @@ sap.ui.define([
 		xsrfToken: undefined,
 		settings: undefined,
 		/**
+		 * Sends request to a back end.
+		 *
+		 * @param {object} mPropertyBag Further properties
+		 * @param {string} mPropertyBag.url Configured url for the connector
+		 * @param {string} mPropertyBag.reference Flexibility reference
+		 * @param {string} [mPropertyBag.version] Version of the adaptation to be loaded
+		 * @returns {Promise<object>} Promise resolving with the raw JSON parsed server response of the flex data request
+		 */
+		sendRequest: function(mPropertyBag) {
+			var mParameters = _pick(mPropertyBag, ["version"]);
+
+			if (this.isLanguageInfoRequired) {
+				InitialUtils.addLanguageInfo(mParameters);
+			}
+			var sDataUrl = InitialUtils.getUrl(this.ROUTES.DATA, mPropertyBag, mParameters);
+			return InitialUtils.sendRequest(sDataUrl, "GET", { xsrfToken: this.xsrfToken }).then(function (oResult) {
+				var oResponse = oResult.response;
+				if (oResult.xsrfToken) {
+					this.xsrfToken = oResult.xsrfToken;
+				}
+				if (oResult.etag) {
+					oResponse.cacheKey = oResult.etag;
+				}
+				if (oResponse.settings) {
+					this.settings = oResponse.settings;
+				}
+				return oResponse;
+			}.bind(this));
+		},
+		/**
 		 * Loads flexibility data from a back end.
 		 *
 		 * @param {object} mPropertyBag Further properties
@@ -33,26 +63,10 @@ sap.ui.define([
 		 * @returns {Promise<object>} Promise resolving with the JSON parsed server response of the flex data request
 		 */
 		loadFlexData: function(mPropertyBag) {
-			var mParameters = _pick(mPropertyBag, ["version"]);
-
-			if (this.isLanguageInfoRequired) {
-				InitialUtils.addLanguageInfo(mParameters);
-			}
-			var sDataUrl = InitialUtils.getUrl(this.ROUTES.DATA, mPropertyBag, mParameters);
-			return InitialUtils.sendRequest(sDataUrl, "GET", { xsrfToken: this.xsrfToken}).then(function (oResult) {
-				var oResponse = oResult.response;
-				if (oResult.xsrfToken) {
-					this.xsrfToken = oResult.xsrfToken;
-				}
-				if (oResult.etag) {
-					oResponse.cacheKey = oResult.etag;
-				}
+			return this.sendRequest(mPropertyBag).then(function (oResponse) {
 				oResponse.changes = oResponse.changes.concat(oResponse.compVariants || []);
-				if (oResponse.settings) {
-					this.settings = oResponse.settings;
-				}
 				return oResponse;
-			}.bind(this));
+			});
 		}
 	};
 });
