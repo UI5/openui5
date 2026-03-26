@@ -532,23 +532,10 @@ sap.ui.define([
 					// groupsForTypes: _getGroupsForTypes([{id: "901", name: "GROUP3", baseType: BaseType.Date}]), // need to had a group number starting > 2 otherwise in operators dropdown it would me inserted between 1 and 2
 					valueTypes: [],
 					getModelFilter: function(oCondition, sFieldPath, oType, bCaseSensitive, sBaseType) {
+						let oFilter;
 						const oAnyAllPath = _getAnyAllPath(sFieldPath);
-						if (oAnyAllPath) {
-							// Any or All Filter -> Empty needs to filter for non-existance of navigation targets
-							// once the NOT-filtering exists this can be changed into NOT-Any (at least for oData V4)
-							return new Filter({
-								path: oAnyAllPath.navPath,
-								operator: ModelOperator.All,
-								variable: "L1",
-								condition: new Filter({
-										filters: [ // create a Filter that cannot bring a result
-											new Filter({path: "L1/" + oAnyAllPath.propertyPath, operator: ModelOperator.EQ, value1: null}),
-											new Filter({path: "L1/" + oAnyAllPath.propertyPath, operator: ModelOperator.NE, value1: null})
-											],
-										and: true
-									})
-								});
-						} else if (sBaseType === BaseType.String) { // depending on backend and/or Type configuration filter is "" or null
+						const sPath = oAnyAllPath ?  "L1/" + oAnyAllPath.propertyPath : sFieldPath;
+						if (sBaseType === BaseType.String) { // depending on backend and/or Type configuration filter is "" or null
 							let isNullable = false;
 							if (oType) {
 								const vResult = oType.parseValue("", "string");
@@ -560,16 +547,35 @@ sap.ui.define([
 								}
 							}
 							if (isNullable) {
-								return new Filter({
-									filters: [new Filter({ path: sFieldPath, operator: ModelOperator.EQ, value1: "" }), new Filter({ path: sFieldPath, operator: ModelOperator.EQ, value1: null })],
+								oFilter = new Filter({
+									filters: [new Filter({ path: sPath, operator: ModelOperator.EQ, value1: "" }), new Filter({ path: sPath, operator: ModelOperator.EQ, value1: null })],
 									and: false
 								});
 							} else {
-								return new Filter({ path: sFieldPath, operator: this.filterOperator, value1: "" });
+								oFilter = new Filter({ path: sPath, operator: this.filterOperator, value1: "" });
 							}
 						} else { // per default filter for null
-							return new Filter({ path: sFieldPath, operator: this.filterOperator, value1: null });
+							oFilter = new Filter({ path: sPath, operator: this.filterOperator, value1: null });
 						}
+
+						if (oAnyAllPath) {
+							// Any or All Filter -> Empty needs to filter for non-existance of navigation targets
+							// and targets where the vaule is empty
+							oFilter = new Filter({
+								filters: [
+									new Filter({path: oAnyAllPath.navPath, operator: ModelOperator.NotAny}),
+									new Filter({
+										path: oAnyAllPath.navPath,
+										operator: oAnyAllPath.operator,
+										variable: "L1",
+										condition: oFilter
+									})
+								],
+								and: false
+							});
+						}
+
+						return oFilter;
 					}
 				}),
 				/*
@@ -585,14 +591,10 @@ sap.ui.define([
 					valueTypes: [],
 					exclude: true,
 					getModelFilter: function(oCondition, sFieldPath, oType, bCaseSensitive, sBaseType) {
+						let oFilter;
 						const oAnyAllPath = _getAnyAllPath(sFieldPath);
-						if (oAnyAllPath) {
-							// Any or All Filter -> NotEmpty needs to filter for existance of navigation targets
-							return new Filter({
-								path: oAnyAllPath.navPath,
-								operator: ModelOperator.Any
-								});
-						} else if (sBaseType === BaseType.String) { // depending on backend and/or Type configuration filter is "" or null
+						const sPath = oAnyAllPath ?  "L1/" + oAnyAllPath.propertyPath : sFieldPath;
+						if (sBaseType === BaseType.String) { // depending on backend and/or Type configuration filter is "" or null
 							let isNullable = false;
 							if (oType) {
 								const vResult = oType.parseValue("", "string");
@@ -604,16 +606,28 @@ sap.ui.define([
 								}
 							}
 							if (isNullable) {
-								return new Filter({
-									filters: [new Filter({ path: sFieldPath, operator: ModelOperator.NE, value1: "" }), new Filter({ path: sFieldPath, operator: ModelOperator.NE, value1: null })],
+								oFilter = new Filter({
+									filters: [new Filter({ path: sPath, operator: ModelOperator.NE, value1: "" }), new Filter({ path: sPath, operator: ModelOperator.NE, value1: null })],
 									and: true
 								});
 							} else {
-								return new Filter({ path: sFieldPath, operator: this.filterOperator, value1: "" });
+								oFilter = new Filter({ path: sPath, operator: this.filterOperator, value1: "" });
 							}
 						} else { // per default filter for not-null
-							return new Filter({ path: sFieldPath, operator: this.filterOperator, value1: null });
+							oFilter = new Filter({ path: sPath, operator: this.filterOperator, value1: null });
 						}
+
+						if (oAnyAllPath) {
+							// Any or All Filter -> NotEmpty needs to filter for existance of navigation targets that are not empty
+							oFilter = new Filter({
+								path: oAnyAllPath.navPath,
+								operator: oAnyAllPath.operator,
+								variable: "L1",
+								condition: oFilter
+							});
+						}
+
+						return oFilter;
 					}
 				}),
 				/*
@@ -2607,7 +2621,7 @@ sap.ui.define([
 			if (sPattern) {
 				// Any or All Filter -> Empty needs to filter for non-existance of navigation targets
 				if (!sWrongPart) { // only one occurence of pattern allowed
-					return {navPath: sNavPath, propertyPath: sPropertyPath};
+					return {navPath: sNavPath, propertyPath: sPropertyPath, operator: sPattern === "*/" ? ModelOperator.Any : ModelOperator.All};
 				} else {
 					throw new Error("FilterOperatorUtil: not supported binding " + sFieldPath);
 				}
