@@ -76,6 +76,12 @@ sap.ui.define([
 				viewKey : {type : "string", group : "Appearance", defaultValue : CalendarIntervalType.Hour},
 
 				/**
+				 * Defines the interval type that is used to choose the week number rendering mode.
+				 * If not set, the <code>viewKey</code> is used for backward compatibility.
+				 */
+				intervalType : {type : "sap.ui.unified.CalendarIntervalType", group : "Appearance", defaultValue : null},
+
+				/**
 				 * Determines if the week numbers are displayed.
 				 */
 				showWeekNumbers : {type : "boolean", group : "Appearance", defaultValue : false},

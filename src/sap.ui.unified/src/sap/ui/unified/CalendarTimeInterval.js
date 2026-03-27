@@ -1298,6 +1298,7 @@ sap.ui.define([
 			oWeeksRow.setPrimaryCalendarType(oDatesRow.getPrimaryCalendarType());
 			oWeeksRow.setShowWeekNumbers(oDatesRow.getShowWeekNumbers());
 			oWeeksRow.setViewKey(CalendarIntervalType.Day);
+			oWeeksRow.setIntervalType(CalendarIntervalType.Day);
 		}
 
 		oWeeksRow.setVisible(true);
