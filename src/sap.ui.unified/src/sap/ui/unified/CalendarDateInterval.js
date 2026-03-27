@@ -437,7 +437,8 @@ sap.ui.define([
 			showWeekNumbers: this.getShowWeekNumbers(),
 			primaryCalendarType: this.getPrimaryCalendarType(),
 			interval: this.getDays(),
-			viewKey: CalendarIntervalType.Day
+			viewKey: CalendarIntervalType.Day,
+			intervalType: CalendarIntervalType.Day
 		});
 
 		return oWeekRow;
