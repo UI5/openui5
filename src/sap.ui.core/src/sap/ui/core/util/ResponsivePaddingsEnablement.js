@@ -37,7 +37,7 @@ sap.ui.define([
 	 * @param oSelectors
 	 * @private
 	 * @ui5-restricted
-	 * @experimental Since 1.72
+	 * @since 1.72
 	 */
 	var ResponsivePaddingsEnablement = function (oSelectors) {
 		// Ensure only Controls are enhanced

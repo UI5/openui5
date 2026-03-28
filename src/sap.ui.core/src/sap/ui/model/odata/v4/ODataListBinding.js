@@ -4700,14 +4700,10 @@ sap.ui.define([
 
 		if (_Helper.isDataAggregation(this.mParameters)) {
 			if (!bSingle) {
-				if (!_AggregationHelper.isAffected(this.mParameters.$$aggregation,
-						this.aFilters.concat(this.aApplicationFilters), aPaths)) {
-					return SyncPromise.resolve();
-				}
-				if (this.iCreatedContexts) {
-					throw new Error("Unsupported for data aggregation with created rows: " + this);
-				}
-				return this.refreshInternal("", sGroupId, false, true);
+				return _AggregationHelper.isAffected(this.mParameters.$$aggregation,
+						this.aFilters.concat(this.aApplicationFilters), aPaths)
+					? this.refreshInternal("", sGroupId, false, true)
+					: SyncPromise.resolve();
 			}
 
 			if (this.mParameters.$$aggregation.groupLevels.length) {

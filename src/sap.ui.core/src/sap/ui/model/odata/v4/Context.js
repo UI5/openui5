@@ -2010,8 +2010,7 @@ sap.ui.define([
 	 *   <ul>
 	 *     <li> the call attempts to refresh an entire list binding (via header context or an
 	 *       absolute path) while the deletion of a row context (see {@link #delete}) is pending
-	 *       with a different group ID or (since 1.147.0) there are created rows in case of data
-	 *       aggregation,
+	 *       with a different group ID,
 	 *     <li> this is the row context of a list binding with data aggregation which has
 	 *       <code>groupLevels</code> or <code>"grandTotal like 1.84"</code>, or
 	 *     <li> this context does not represent a single entity

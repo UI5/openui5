@@ -93,9 +93,10 @@ sap.ui.define([
 
 					/**
 					 * Object related to the <code>Delegate</code> module that provides the required APIs to execute model-specific logic.<br>
-					 * The object has the following properties:
+					 * The object has the following properties (see {@link sap.ui.mdc.DelegateConfig DelegateConfig}):
 					 * <ul>
-					 * 	<li><code>name</code> defines the path to the <code>Delegate</code> module</li>
+					 * 	<li><code>name</code> defines the path to the <code>Delegate</code> module. The used delegate module must inherit from
+				 	 *       {@link module:sap/ui/mdc/FilterBarDelegate FilterBarDelegate}.</li>
 					 * 	<li><code>payload</code> (optional) defines application-specific information that can be used in the given delegate</li>
 					 * </ul>
 					 * <i>Sample delegate object:</i>
@@ -114,7 +115,8 @@ sap.ui.define([
 								modelName: undefined,
 								collectionName: ""
 							}
-						}
+						},
+						bindable: false
 					},
 
 					/**
@@ -158,7 +160,8 @@ sap.ui.define([
 					 */
 					filterConditions: {
 						type: "object",
-						defaultValue: {}
+						defaultValue: {},
+						bindable: false
 					},
 
 					/**
@@ -168,13 +171,14 @@ sap.ui.define([
 					 * Metadata for initially rendered {@link sap.ui.mdc.FilterField FilterFields} (those in the <code>filterItems</code> aggregation) should be specified here, rather than in the <code>FilterField</code> configuration.<br>
 					 * <b>Note</b>: This property must not be bound.<br>
 					 * <b>Node</b>: Please check {@link sap.ui.mdc.filterbar.PropertyInfo} for more information about the supported inner elements.
-					 * <b>Note</b>: Existing properties (set via <code>sap.ui.mdc.filterbar.FilterBarBase#setPropertyInfo</code>) must not be removed and their attributes must not be changed during the {@link module:sap/ui/mdc/FilterBarDelegate.fetchProperties fetchProperties} callback. Otherwise validation errors might occur whenever personalization-related control features (such as the opening of any personalization dialog) are activated.
+					 * <b>Note</b>: Existing properties (set via {@link #setPropertyInfo setPropertyInfo}) must not be removed and their attributes must not be changed during the {@link module:sap/ui/mdc/FilterBarDelegate.fetchProperties fetchProperties} callback. Otherwise validation errors might occur whenever personalization-related control features (such as the opening of any personalization dialog) are activated.
 					 *
 					 * @since 1.97
 					 */
 					propertyInfo: {
 						type: "object",
-						defaultValue: []
+						defaultValue: [],
+						bindable: false
 					},
 
 					/**
@@ -2278,55 +2282,100 @@ sap.ui.define([
 		};
 
 		/**
+		 * Adds a {@link sap.ui.mdc.FilterField FilterField} to the {@link #getFilterItems filterItems} aggregation.
+		 *
 		 * @name sap.ui.mdc.filterbar.FilterBarBase#addFilterItem
+		 * @function
+		 * @param {sap.ui.mdc.FilterField} oFilterItem The filter item to be added
+		 * @returns {this} Reference to <code>this</code> to allow method chaining
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 		 */
 
 		/**
+		 * Destroys all {@link sap.ui.mdc.FilterField FilterFields} in the {@link #getFilterItems filterItems} aggregation.
+		 *
 		 * @name sap.ui.mdc.filterbar.FilterBarBase#destroyFilterItems
+		 * @function
+		 * @returns {this} Reference to <code>this</code> to allow method chaining
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 		 */
 
 		/**
+		 * Inserts a {@link sap.ui.mdc.FilterField FilterField} into the {@link #getFilterItems filterItems} aggregation.
+		 *
 		 * @name sap.ui.mdc.filterbar.FilterBarBase#insertFilterItem
+		 * @function
+		 * @param {sap.ui.mdc.FilterField} oFilterItem The filter item to be inserted
+		 * @param {int} iIndex the <code>0</code>-based index the managed object should be inserted at; for a negative
+		 * value <code>iIndex</code>, <code>oObject</code> is inserted at position 0; for a value
+		 * greater than the current size of the aggregation, <code>oObject</code> is inserted at
+		 * the last position
+		 * @returns {this} Reference to <code>this</code> to allow method chaining
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 		 */
 
 		/**
+		 * Removes a {@link sap.ui.mdc.FilterField FilterField} from the {@link #getFilterItems filterItems} aggregation.
+		 *
 		 * @name sap.ui.mdc.filterbar.FilterBarBase#removeFilterItem
+		 * @function
+		 * @param {int|string|sap.ui.mdc.FilterField} oFilterItem The filter item to be removed or its index or id
+		 * @returns {sap.ui.mdc.FilterField} The removed filter item or <code>null</code>
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 		 */
 
 		/**
+		 * Removes all {@link sap.ui.mdc.FilterField FilterFields} from the {@link #getFilterItems filterItems} aggregation.
+		 *
 		 * @name sap.ui.mdc.filterbar.FilterBarBase#removeAllFilterItems
+		 * @function
+		 * @returns {sap.ui.mdc.FilterField[]} An array of the removed filter items or an empty array
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 		 */
 
 		/**
+		 * Sets a new value for the {@link #getFilterConditions filterConditions} property.
+		 *
 		 * @name sap.ui.mdc.filterbar.FilterBarBase#setFilterConditions
+		 * @function
+		 * @param {object} oFilterConditions FilterConditions set on the filter bar
+		 * @returns {this} Reference to <code>this</code> to allow method chaining
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 		 */
 
 		/**
+		 * Gets the current value of the {@link #getFilterConditions filterConditions} property.
+		 *
 		 * @name sap.ui.mdc.filterbar.FilterBarBase#getFilterConditions
+		 * @function
+		 * @returns {object} The filter conditions set on the filter bar
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 		 */
 
 		/**
+		 * Sets a new value for the {@link #getPropertyInfo propertyInfo} property.
+		 *
 		 * @name sap.ui.mdc.filterbar.FilterBarBase#setPropertyInfo
+		 * @function
+		 * @param {sap.ui.mdc.filterbar.PropertyInfo[]} aPropertyInfo The property info objects containing the metadata for filter fields
+		 * @returns {this} Reference to <code>this</code> to allow method chaining
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 		 */
 
 		/**
+		 * Gets the current value of the {@link #getPropertyInfo propertyInfo} property.
+		 *
 		 * @name sap.ui.mdc.filterbar.FilterBarBase#getPropertyInfo
+		 * @function
+		 * @returns {sap.ui.mdc.filterbar.PropertyInfo[]} The property info objects containing the metadata for a filter field
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 		 */

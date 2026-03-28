@@ -4079,9 +4079,12 @@ sap.ui.define([
 					? "@$ui5.context.isInactive" in oElement
 						|| sTransientGroup && sTransientGroup !== sGroupId
 					: sTransientGroup) {
-				const sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate")
-					|| _Helper.getPrivateAnnotation(oElement, "transientPredicate");
-				mKeptElementPredicates[sPredicate] = true;
+				const sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate");
+				if (sPredicate) {
+					mKeptElementPredicates[sPredicate] = true;
+				}
+				mKeptElementPredicates[_Helper.getPrivateAnnotation(oElement, "transientPredicate")]
+					= true;
 				this.aElements[iCreated] = oElement;
 				iCreated += 1;
 			} else { // Note: inactive elements are always kept

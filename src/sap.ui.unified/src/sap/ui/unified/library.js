@@ -505,6 +505,7 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
+	 * @deprecated As of version 1.147.0, the concept has been discarded.
 	 * API is not yet finished and might change completely
 	 * @ui5-experimental-since 1.16.0
 	 */

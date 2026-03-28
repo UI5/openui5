@@ -109,7 +109,7 @@ sap.ui.define([
 
 	function deprecation(fn, name) {
 		return function() {
-			Log.warning("Usage of deprecated feature: " + name);
+			Log.warning("[DEPRECATED] Usage of deprecated feature: " + name);
 			return fn.apply(this, arguments);
 		};
 	}
@@ -736,7 +736,7 @@ sap.ui.define([
 			add(that._sRemoveAllMutator, function() { return this.removeAllAssociation(n); });
 			if ( n !== that.singularName ) {
 				add('removeAll' + capitalize(that.singularName), function() {
-					Log.warning("Usage of deprecated method " +
+					Log.warning("[DEPRECATED] Usage of deprecated method " +
 						that._oParent.getName() + ".prototype." + 'removeAll' + capitalize(that.singularName) + "," +
 						" use method " + that._sRemoveAllMutator  + " (plural) instead.");
 					return this[that._sRemoveAllMutator]();

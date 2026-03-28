@@ -123,9 +123,10 @@ sap.ui.define([
 
 					/**
 					 * Object related to the <code>Delegate</code> module that provides the required APIs to execute model-specific logic.<br>
-					 * The object has the following properties:
+					 * The object has the following properties (see {@link sap.ui.mdc.DelegateConfig DelegateConfig}):
 					 * <ul>
-					 * 	<li><code>name</code> defines the path to the <code>Delegate</code> module</li>
+					 * 	<li><code>name</code> defines the path to the <code>Delegate</code> module. The used delegate module must inherit from
+				 	 *       {@link module:sap/ui/mdc/ChartDelegate ChartDelegate}.</li>
 					 * 	<li><code>payload</code> (optional) defines application-specific information that can be used in the given delegate</li>
 					 * </ul>
 					 * <i>Sample delegate object:</i>
@@ -142,7 +143,8 @@ sap.ui.define([
 						defaultValue: {
 							name: "sap/ui/mdc/ChartDelegate",
 							payload: {}
-						}
+						},
+						bindable: false
 					},
 
 					/**
@@ -225,7 +227,8 @@ sap.ui.define([
 					 * @since 1.88
 					 */
 					sortConditions: {
-						type: "object"
+						type: "object",
+						bindable: false
 					},
 
 					/**
@@ -238,7 +241,8 @@ sap.ui.define([
 					 */
 					filterConditions: {
 						type: "object",
-						defaultValue: {}
+						defaultValue: {},
+						bindable: false
 					},
 
 					/**
@@ -292,7 +296,8 @@ sap.ui.define([
 					 */
 					propertyInfo: {
 						type: "object",
-						defaultValue: []
+						defaultValue: [],
+						bindable: false
 					},
 
 					/**
@@ -2097,7 +2102,7 @@ sap.ui.define([
 		/**
 		 * Sets a new value for the {@link #getPropertyInfo propertyInfo} property.
 		 *
-		 * @param {object} oPropertyInfo The new value for the <code>propertyInfo</code> property
+		 * @param {sap.ui.mdc.chart.PropertyInfo[]} aPropertyInfo The new value for the <code>propertyInfo</code> property
 		 * @name sap.ui.mdc.Chart#setPropertyInfo
 		 * @function
 		 * @private
@@ -2112,7 +2117,7 @@ sap.ui.define([
 		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.mdc, sap.ui.fl
-		 * @returns {object} The value of the <code>propertyInfo</code> property
+		 * @returns {sap.ui.mdc.chart.PropertyInfo[]} The value of the <code>propertyInfo</code> property
 		 */
 
 		return Chart;

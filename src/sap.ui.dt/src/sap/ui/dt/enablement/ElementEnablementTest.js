@@ -148,7 +148,7 @@ sap.ui.define([
 				resolve(new Element());
 			}, function() {
 				// fall back to global name
-				Log.warning(`[Deprecated] Control ${sType} could only be loaded via global name`);
+				Log.warning(`[DEPRECATED] Control ${sType} could only be loaded via global name`);
 				var Element = ObjectPath.get(sType || "");
 				resolve(new Element());
 			});

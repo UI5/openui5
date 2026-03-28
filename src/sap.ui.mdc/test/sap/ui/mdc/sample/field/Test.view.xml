@@ -911,7 +911,7 @@
 					valueHelp="VH-WeightUnit3">
 					<mdc:dependents>
 						<mdc:ValueHelp id="VH-WeightUnit3"
-							delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelp.delegate", "payload": \{"searchKeys":["unit","text"], "in": [\{"path": "MatrId", "value": 1\}]\}\}'>
+							delegate='\{"name": "sap/ui/mdc/sample/field/ValueHelp.delegate", "payload": \{"searchKeys":["unit","text"], "in": [\{"path": "MatrId", "value": "1"\}]\}\}'>
 							<mdc:typeahead>
 								<mdcvh:Popover id="VH-WeightUnit3-Pop">
 									<mdcValueHelpContent:MTable id="VH-WeightUnit3-Pop-MTable"

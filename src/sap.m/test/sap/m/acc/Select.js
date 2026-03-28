@@ -485,7 +485,7 @@ sap.ui.define([
 		ariaLabelledBy: 'select_label',
 		width: "15rem",
 		valueState: ValueState.Warning,
-		valueStateText: "value state text",
+		valueStateText: "text coming from the value state text property",
 		items: {
 			path: "/items",
 			template: oItemTemplate
@@ -501,7 +501,7 @@ sap.ui.define([
 		ariaLabelledBy: 'select_label',
 		width: "15rem",
 		valueState: ValueState.Error,
-		valueStateText: "value state text",
+		valueStateText: "text coming from the value state text property",
 		items: {
 			path: "/items",
 			template: oItemTemplate
@@ -512,7 +512,7 @@ sap.ui.define([
 		ariaLabelledBy: 'select_label',
 		width: "15rem",
 		valueState: ValueState.Information,
-		valueStateText: "value state text",
+		valueStateText: "text coming from the value state text property",
 		items: {
 			path: "/items",
 			template: oItemTemplate
