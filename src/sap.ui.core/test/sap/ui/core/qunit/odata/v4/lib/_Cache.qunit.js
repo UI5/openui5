@@ -11879,12 +11879,12 @@ sap.ui.define([
 			oCreated = {}, // ordinary created persisted => not kept!
 			oDeleted = {"@$ui5.context.isDeleted" : true},
 			oActive = {"@$ui5.context.isInactive" : false}, // "inline creation row"
-			mChangeListeners = {
+			mChangeListeners = { // more or less as expected afterwards
 				$count : "~listener~count~",
 				"($uid=id-1-23)/bar" : "~listener[]~2~",
 				"($uid=id-1-42)/baz" : "~listener[]~3~",
-				"('0')/a" : "~listener[]~4~",
-				"('1')/b" : "~listener[]~5~",
+				"($uid=id-0-0)/a" : "~listener[]~4~",
+				"($uid=id-0-2)/c" : "~listener[]~6~",
 				"('2')/c" : "~listener[]~6~",
 				"('3')/bar/baz" : "~listener[]~0~",
 				"('3')/foo" : "~listener[]~1~",
@@ -11896,11 +11896,11 @@ sap.ui.define([
 			oTail = SyncPromise.resolve(),
 			oTransient0 = {}, // "inline creation row" does not matter here
 			oTransient1 = {},
-			mByPredicate = {
+			mByPredicate = { // more or less as expected afterwards
 				"($uid=id-1-23)" : oTransient0,
 				"($uid=id-1-42)" : oTransient1,
-				"('0')" : oInactive,
-				"('1')" : oCreated,
+				"($uid=id-0-0)" : oInactive,
+				"($uid=id-0-2)" : oActive,
 				"('2')" : oActive,
 				"('3')" : oElement0,
 				"('6')" : oDeleted
@@ -11913,7 +11913,6 @@ sap.ui.define([
 		_Helper.setPrivateAnnotation(oInactive, "transientPredicate", "($uid=id-0-0)");
 		_Helper.setPrivateAnnotation(oCreated, "transientPredicate", "($uid=id-0-1)");
 		_Helper.setPrivateAnnotation(oActive, "transientPredicate", "($uid=id-0-2)");
-		_Helper.setPrivateAnnotation(oInactive, "predicate", "('0')");
 		_Helper.setPrivateAnnotation(oCreated, "predicate", "('1')");
 		_Helper.setPrivateAnnotation(oActive, "predicate", "('2')");
 		_Helper.setPrivateAnnotation(oTransient0, "transientPredicate", "($uid=id-1-23)");
@@ -11932,13 +11931,14 @@ sap.ui.define([
 		assert.strictEqual(oCache.oBackup, null, "be nice to V8");
 		oCache.oBackup = "~oBackup~";
 		oCache.mChangeListeners = Object.assign({
-				"($uid=id-0-0)/n/a" : "~listener[]~n/a~",
 				"($uid=id-0-1)/n/a" : "~listener[]~n/a~",
-				"($uid=id-0-2)/n/a" : "~listener[]~n/a~"
+				"('1')/b" : "~listener[]~5~"
 			}, mChangeListeners);
 		oCache.sContext = "foo";
 		oCache.aElements = aElements;
 		oCache.aElements.$byPredicate = Object.assign({
+			"($uid=id-0-1)" : oCreated,
+			"('1')" : oCreated,
 			"('4')" : oElement1,
 			"('5')" : oElement2
 		}, mByPredicate);
@@ -11969,12 +11969,12 @@ sap.ui.define([
 			delete mChangeListeners["('3')/foo"];
 			delete mByPredicate["('3')"];
 		}
-		delete mChangeListeners["('1')/b"];
-		delete mByPredicate["('1')"];
 		if (!sGroupId) {
-			delete mChangeListeners["('0')/a"];
+			delete mChangeListeners["($uid=id-0-0)/a"];
+			delete mChangeListeners["($uid=id-0-2)/c"];
 			delete mChangeListeners["('2')/c"];
-			delete mByPredicate["('0')"];
+			delete mByPredicate["($uid=id-0-0)"];
+			delete mByPredicate["($uid=id-0-2)"];
 			delete mByPredicate["('2')"];
 
 			assert.strictEqual(oCache.oBackup, "~oBackup~");
@@ -12048,12 +12048,11 @@ sap.ui.define([
 			assert.strictEqual(oCache.iActiveElements, 4);
 			assert.deepEqual(oCache.mChangeListeners, {
 				$count : "~listener~count~",
-				"($uid=id-0-0)/n/a" : "~listener[]~n/a~",
-				"($uid=id-0-1)/n/a" : "~listener[]~n/a~",
-				"($uid=id-0-2)/n/a" : "~listener[]~n/a~",
 				"($uid=id-1-23)/bar" : "~listener[]~2~",
 				"($uid=id-1-42)/baz" : "~listener[]~3~",
-				"('0')/a" : "~listener[]~4~",
+				"($uid=id-0-0)/a" : "~listener[]~4~",
+				"($uid=id-0-1)/n/a" : "~listener[]~n/a~",
+				"($uid=id-0-2)/c" : "~listener[]~6~",
 				"('1')/b" : "~listener[]~5~",
 				"('2')/c" : "~listener[]~6~",
 				"('3')/bar/baz" : "~listener[]~0~",
@@ -12077,7 +12076,9 @@ sap.ui.define([
 			assert.deepEqual(oCache.aElements.$byPredicate, {
 				"($uid=id-1-23)" : oTransient0,
 				"($uid=id-1-42)" : oTransient1,
-				"('0')" : oInactive,
+				"($uid=id-0-0)" : oInactive,
+				"($uid=id-0-1)" : oCreated,
+				"($uid=id-0-2)" : oActive,
 				"('1')" : oCreated,
 				"('2')" : oActive,
 				"('3')" : oElement0,

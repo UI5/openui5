@@ -272,7 +272,7 @@ sap.ui.define([
 				/**
 				 * Object related to the <code>Delegate</code> module that provides the required APIs to execute model-specific logic.
 				 *
-				 * The object has the following properties:
+				 * The object has the following properties (see {@link sap.ui.mdc.DelegateConfig DelegateConfig}):
 				 * <ul>
 				 *   <li><code>name</code> defines the path to the <code>Delegate</code> module. The used delegate module must inherit from
 				 *       {@link module:sap/ui/mdc/TableDelegate TableDelegate}.</li>
@@ -294,7 +294,8 @@ sap.ui.define([
 					defaultValue: {
 						name: "sap/ui/mdc/TableDelegate",
 						payload: {}
-					}
+					},
+					bindable: false
 				},
 
 				/**
@@ -417,7 +418,8 @@ sap.ui.define([
 				 * @since 1.73
 				 */
 				sortConditions: {
-					type: "object"
+					type: "object",
+					bindable: false
 				},
 
 				/**
@@ -430,7 +432,8 @@ sap.ui.define([
 				 */
 				filterConditions: {
 					type: "object",
-					defaultValue: {}
+					defaultValue: {},
+					bindable: false
 				},
 
 				/**
@@ -442,7 +445,8 @@ sap.ui.define([
 				 * @since 1.87
 				 */
 				groupConditions: {
-					type: "object"
+					type: "object",
+					bindable: false
 				},
 
 				/**
@@ -454,7 +458,8 @@ sap.ui.define([
 				 * @since 1.87
 				 */
 				aggregateConditions: {
-					type: "object"
+					type: "object",
+					bindable: false
 				},
 
 				/**
@@ -579,7 +584,8 @@ sap.ui.define([
 				 */
 				propertyInfo: {
 					type: "object",
-					defaultValue: []
+					defaultValue: [],
+					bindable: false
 				},
 
 				/**
@@ -3180,121 +3186,222 @@ sap.ui.define([
 	};
 
 	/**
+	 * Adds an action to the {@link #getActions actions} aggregation.
+	 *
 	 * @name sap.ui.mdc.Table#addAction
+	 * @function
+	 * @param {sap.ui.core.Control} oAction Additional action that will be available in the toolbar.
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Destroys all actions in the {@link #getActions actions} aggregation.
+	 *
 	 * @name sap.ui.mdc.Table#destroyActions
+	 * @function
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Inserts an action into the {@link #getActions actions} aggregation.
+	 *
 	 * @name sap.ui.mdc.Table#insertAction
+	 * @function
+	 * @param {sap.ui.core.Control} oAction The action to be inserted
+	 * @param {int} iIndex the <code>0</code>-based index the managed object should be inserted at; for a negative
+	 * value <code>iIndex</code>, <code>oObject</code> is inserted at position 0; for a value
+	 * greater than the current size of the aggregation, <code>oObject</code> is inserted at
+	 * the last position
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Removes an action from the {@link #getActions actions} aggregation.
+	 *
 	 * @name sap.ui.mdc.Table#removeAction
+	 * @function
+	 * @param {int|string|sap.ui.core.Control} oAction The action to be removed or its index or id
+	 * @returns {sap.ui.core.Control} The removed action or <code>null</code>
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Removes all actions from the {@link #getActions actions} aggregation.
+	 *
 	 * @name sap.ui.mdc.Table#removeAllActions
+	 * @function
+	 * @returns {sap.ui.core.Control[]} An array of the removed actions or an empty array
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Adds a column to the {@link #getColumns columns} aggregation.
+	 *
 	 * @name sap.ui.mdc.Table#addColumn
+	 * @function
+	 * @param {sap.ui.mdc.table.Column} oColumn Additional column that will be available in the table.
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Destroys all columns in the {@link #getColumns columns} aggregation.
+	 *
 	 * @name sap.ui.mdc.Table#destroyColumns
+	 * @function
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Inserts a column into the {@link #getColumns columns} aggregation.
+	 *
 	 * @name sap.ui.mdc.Table#insertColumn
+	 * @function
+	 * @param {sap.ui.mdc.table.Column} oColumn The column to be inserted
+	 * @param {int} iIndex the <code>0</code>-based index the managed object should be inserted at; for a negative
+	 * value <code>iIndex</code>, <code>oObject</code> is inserted at position 0; for a value
+	 * greater than the current size of the aggregation, <code>oObject</code> is inserted at
+	 * the last position
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Removes a column from the {@link #getColumns columns} aggregation.
+	 *
 	 * @name sap.ui.mdc.Table#removeColumn
+	 * @function
+	 * @param {int|string|sap.ui.mdc.table.Column} oColumn The column to be removed or its index or id
+	 * @returns {sap.ui.mdc.table.Column} The removed column or <code>null</code>
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Removes all columns from the {@link #getColumns columns} aggregation.
+	 *
 	 * @name sap.ui.mdc.Table#removeAllColumns
+	 * @function
+	 * @returns {sap.ui.mdc.table.Column[]} An array of the removed columns or an empty array
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Sets a new value for the {@link #getSortConditions sortConditions} property.
+	 *
 	 * @name sap.ui.mdc.Table#setSortConditions
+	 * @function
+	 * @param {object} oSortConditions SortConditions set on the table
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Gets the current value of the {@link #getSortConditions sortConditions} property.
+	 *
 	 * @name sap.ui.mdc.Table#getSortConditions
+	 * @function
+	 * @returns {object} The sort conditions set on the table
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Sets a new value for the {@link #getFilterConditions filterConditions} property.
+	 *
 	 * @name sap.ui.mdc.Table#setFilterConditions
+	 * @function
+	 * @param {object} oFilterConditions FilterConditions set on the table
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Gets the current value of the {@link #getFilterConditions filterConditions} property.
+	 *
 	 * @name sap.ui.mdc.Table#getFilterConditions
+	 * @function
+	 * @returns {object} The filter conditions set on the table
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Sets a new value for the {@link #getGroupConditions groupConditions} property.
+	 *
 	 * @name sap.ui.mdc.Table#setGroupConditions
+	 * @function
+	 * @param {object} oGroupConditions GroupConditions set on the table
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Gets the current value of the {@link #getGroupConditions groupConditions} property.
+	 *
 	 * @name sap.ui.mdc.Table#getGroupConditions
+	 * @function
+	 * @returns {object} The group conditions set on the table
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Sets a new value for the {@link #getAggregateConditions aggregateConditions} property.
+	 *
 	 * @name sap.ui.mdc.Table#setAggregateConditions
+	 * @function
+	 * @param {object} oAggregateConditions AggregateConditions set on the table
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Gets the current value of the {@link #getAggregateConditions aggregateConditions} property.
+	 *
 	 * @name sap.ui.mdc.Table#getAggregateConditions
+	 * @function
+	 * @returns {object} The aggregate conditions set on the table
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Sets a new value for the {@link #getPropertyInfo propertyInfo} property.
+	 *
 	 * @name sap.ui.mdc.Table#setPropertyInfo
+	 * @function
+	 * @param {Array.<sap.ui.mdc.table.PropertyInfo|sap.ui.mdc.table.ComplexPropertyInfo>} aPropertyInfo
+	 * 	The property info objects containing the metadata for a table
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
 
 	/**
+	 * Gets the current value of the {@link #getPropertyInfo propertyInfo} property.
+	 *
 	 * @name sap.ui.mdc.Table#getPropertyInfo
+	 * @function
+	 * @returns {Array.<sap.ui.mdc.table.PropertyInfo|sap.ui.mdc.table.ComplexPropertyInfo>}
+	 * 	The property info objects containing the metadata for a table
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */

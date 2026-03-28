@@ -2923,7 +2923,7 @@ sap.ui.define([
 
 			for (const oCondition of aConditions) {
 				if (oCondition.values[0] && oCondition.values[0][1]) {
-					const oHelpCondition = Condition.createItemCondition(oCondition.values[0][1], undefined, oCondition.inParameters, oCondition.outParameters, oCondition.payload);
+					const oHelpCondition = Condition.createCondition(OperatorName.EQ, [oCondition.values[0][1]], oCondition.inParameters, oCondition.outParameters, ConditionValidated.Validated, oCondition.payload); // handle unit part like Field, always validated to show as selected in value help
 					aHelpConditions.push(oHelpCondition);
 				}
 			}

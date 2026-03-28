@@ -6222,11 +6222,16 @@ sap.ui.define([
 		assert.ok(oValueHelp.connect.calledOnce, "ValueHelp connected");
 		assert.equal(oValueHelp.connect.args[0][0], oField, "ValueHelp connected to Field");
 		assert.equal(oValueHelp.connect.args[0][1].dataType, oStringType, "Type of currency part used for ValueHelp");
+		let aConditions = oValueHelp.getConditions();
+		let oCondition = aConditions[0];
+		assert.equal(aConditions.length, 1, "one condition in ValueHelp");
+		assert.equal(oCondition.values[0], "USD", "condition value0 in ValueHelp");
+		assert.equal(oCondition.validated, ConditionValidated.Validated, "condition validated in ValueHelp");
 		// simulate select event to see if field is updated
-		let oCondition = Condition.createCondition(OperatorName.EQ, ["EUR", "EUR"], {inTest: "X"}, {outTest: "Y"}, ConditionValidated.Validated, {payloadTest: "Z"});
+		oCondition = Condition.createCondition(OperatorName.EQ, ["EUR", "EUR"], {inTest: "X"}, {outTest: "Y"}, ConditionValidated.Validated, {payloadTest: "Z"});
 		oValueHelp.fireSelect({ conditions: [oCondition] });
 		assert.equal(iCount, 0, "Change Event not fired");
-		let aConditions = oCM.getConditions("Price");
+		aConditions = oCM.getConditions("Price");
 		assert.equal(aConditions.length, 1, "one condition in Codition model");
 		assert.equal(aConditions[0].values[0][0], 123.45, "condition value0");
 		assert.equal(aConditions[0].values[0][1], "EUR", "condition value1");

@@ -410,10 +410,13 @@ sap.ui.define([
 	 * Example:
 	 * <code>oTableModel.setProperty("/columns/0/visible", false)</code> hides the first column of the table
 	 *
+	 * <b>Note:</b> This is only restricted to properties not to aggregations. This means it is not possible to add an aggregation within the managed object model.
 	 * @param {string} sPath The path to the property of the corresponding managed object, for example, <code>/text</code> for the text property of the root object
+	 * @param {any} oValue The new value to be set for this property
+	 * @param {sap.ui.model.Context} [oContext] The context used to set the property
+	 * @param {boolean} [bAsyncUpdate] Whether to update bindings dependent on this property asynchronously
 	 * @returns {boolean} <code>true</code> if the property was set, <code>false</code> otherwise
 	 * @private
-	 * @experimental This is only restricted to properties not to aggregations. This means it is not possible to add an aggregation within the managed object model.
 	 */
 	ManagedObjectModel.prototype.setProperty = function (sPath, oValue, oContext, bAsyncUpdate) {
 		var sResolvedPath = this.resolve(sPath, oContext), iLastSlash, sObjectPath, sProperty;
@@ -486,6 +489,8 @@ sap.ui.define([
 
 	/**
 	 * Adds the binding to the model.
+	 *
+	 * @param {sap.ui.model.Binding} oBinding The binding to be added
 	 */
 	ManagedObjectModel.prototype.addBinding = function (oBinding) {
 		JSONModel.prototype.addBinding.apply(this, arguments);
@@ -508,19 +513,31 @@ sap.ui.define([
 	/**
 	 * Overwrites the default property change event and enriches its parameters with the resolved path for convenience.
 	 *
-	 * @see sap.ui.model.Model.prototype.firePropertChange
+	 * @see sap.ui.model.Model.prototype.firePropertyChange
 	 *
+	 * @param {object} [oParameters] Parameters to pass along with the event
+	 * @param {sap.ui.model.ChangeReason} [oParameters.reason] The reason of the property change
+	 * @param {string} [oParameters.path] The path of the property
+	 * @param {object} [oParameters.context] The context of the property
+	 * @param {object} [oParameters.value] The value of the property
+	 *
+	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 	 * @private
 	 */
 	ManagedObjectModel.prototype.firePropertyChange = function (oParameters) {
 		if (oParameters.reason === ChangeReason.Binding) {
 			oParameters.resolvedPath = this.resolve(oParameters.path, oParameters.context);
 		}
-		JSONModel.prototype.firePropertyChange.call(this, oParameters);
+		return JSONModel.prototype.firePropertyChange.call(this, oParameters);
 	};
 
 	/**
 	 * @see sap.ui.model.Model.prototype.bindProperty
+	 * @param {string} sPath The path pointing to the property that should be bound
+	 * @param {sap.ui.model.Context} [oContext] The context object for this databinding
+	 * @param {object} [mParameters] Additional model-specific parameters
+	 *
+	 * @return {sap.ui.model.PropertyBinding} The newly created binding
 	 */
 	ManagedObjectModel.prototype.bindAggregation = function (sPath, oContext, mParameters) {
 		return JSONModel.prototype.bindProperty.apply(this, arguments);
@@ -528,6 +545,11 @@ sap.ui.define([
 
 	/**
 	 * @see sap.ui.model.Model.prototype.bindProperty
+	 * @param {string} sPath The path pointing to the property that should be bound
+	 * @param {sap.ui.model.Context} [oContext] The context object for this databinding
+	 * @param {object} [mParameters] Additional model-specific parameters
+	 *
+	 * @return {sap.ui.model.PropertyBinding} The newly created binding
 	 */
 	ManagedObjectModel.prototype.bindProperty = function (sPath, oContext, mParameters) {
 		var oBinding = new ManagedObjectModelPropertyBinding(this, sPath, oContext, mParameters);
@@ -536,6 +558,14 @@ sap.ui.define([
 
 	/**
 	 * @see sap.ui.model.Model.prototype.bindList
+	 * @param {string} sPath The path pointing to the list / array that should be bound
+	 * @param {sap.ui.model.Context} [oContext] The context object for this databinding
+	 * @param {sap.ui.model.Sorter[]|sap.ui.model.Sorter} [aSorters=[]] The sorters used initially; call {@link sap.ui.model.ListBinding#sort} to replace them
+	 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter} [aFilters=[]] The filters to be used initially with type {@link sap.ui.model.FilterType.Application};
+	 * 	call {@link sap.ui.model.ListBinding#filter} to replace them
+	 * @param {object} [mParameters] Additional model-specific parameters
+	 * @throws {Error} If the {@link sap.ui.model.Filter.NONE} filter instance is contained in <code>aFilters</code> together with other filters
+	 * @return {sap.ui.model.ListBinding} The newly created binding
 	 */
 	ManagedObjectModel.prototype.bindList = function (sPath, oContext, aSorters, aFilters, mParameters) {
 		var oBinding = new ManagedObjectModelAggregationBinding(this, sPath, oContext, aSorters, aFilters, mParameters);
@@ -1011,9 +1041,11 @@ sap.ui.define([
 
 	/**
 	 * Private method iterating the registered bindings of this model instance and initiating their check for update
-	 * @param {boolean} [bForceUpdate]
-	 * @param {boolean} bAsync
-	 * @param {function} fnFilter an optional test function to filter the binding
+	 * @param {boolean} [bForceUpdate=false] The parameter <code>bForceUpdate</code> for the <code>checkUpdate</code> call on the bindings
+	 * @param {boolean} [bAsync=false] Whether this function is called in a new task via <code>setTimeout</code>
+	 * @param {function} [fnFilter] an optional test function to filter the binding
+	 * @returns {number|undefined} The number of bindings which were checked synchronously for updates; 0 if <code>bAsync</code> is set.
+	 *	Subclasses overwriting this method may also return <code>undefined</code>.
 	 * @protected
 	 */
 	ManagedObjectModel.prototype.checkUpdate = function (bForceUpdate, bAsync, fnFilter) {
@@ -1027,7 +1059,7 @@ sap.ui.define([
 			} else if (this.fnFilter && this.fnFilter !== fnFilter) {
 				this.fnFilter = undefined; // if different filter set use no filter
 			}
-			return;
+			return 0;
 		}
 		bForceUpdate = this.bForceUpdate || bForceUpdate;
 
@@ -1040,11 +1072,15 @@ sap.ui.define([
 			this.fnFilter = undefined;
 		}
 		var aBindings = this.getBindings();
+		var iUpdatedBindings = 0;
 		aBindings.forEach(function (oBinding) {
 			if (!fnFilter || fnFilter(oBinding)) {
 				oBinding.checkUpdate(bForceUpdate);
+				iUpdatedBindings++;
 			}
 		});
+
+		return iUpdatedBindings;
 	};
 
 	return ManagedObjectModel;

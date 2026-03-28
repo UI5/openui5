@@ -826,7 +826,7 @@ sap.ui.define([
   * @typedef {object} sap.ui.mdc.TypeConfig
   * @property {string} [className] Model-specific data type
   * @property {sap.ui.model.SimpleType} typeInstance Type instance for given data type
-  * @property {string} baseType Basic type category for given data type
+  * @property {sap.ui.mdc.enums.BaseType} baseType Basic type category for given data type
   * @private
   * @ui5-restricted sap.ui.mdc
   */
@@ -834,9 +834,8 @@ sap.ui.define([
  /**
   * @typedef {object} sap.ui.mdc.DelegateConfig
   * @property {string} name Delegate module path
-  * @property {*} payload Delegate payload
-  * @private
-  * @ui5-restricted sap.ui.mdc
+  * @property {*} [payload] defines application-specific information that can be used in the given delegate
+  * @public
   */
 
  /**

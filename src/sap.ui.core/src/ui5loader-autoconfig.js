@@ -145,7 +145,7 @@
 				if (sLowerCaseAlias) {
 					vValue = oWriteableConfig[sLowerCaseAlias] || oConfig[sLowerCaseAlias];
 					if (vValue) {
-						ui5loader._.logger.warning(`Deprecated configuration option '${sLowerCaseAlias.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' given in global configuration. Please use '${sKey.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' instead.`);
+						ui5loader._.logger.warning(`[DEPRECATED] configuration option '${sLowerCaseAlias.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' given in global configuration. Please use '${sKey.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}' instead.`);
 					}
 				}
 			}

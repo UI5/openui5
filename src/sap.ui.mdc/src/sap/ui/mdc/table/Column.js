@@ -135,7 +135,7 @@ sap.ui.define([
 				 * <b>Note:</b> Once the binding supports creating transient records, this aggregation will be removed.
 				 *
 				 * @ui5-restricted sap.fe
-				 * @experimental Internal use only
+				 * @ui5-experimental-since 1.80.0
 				 * @deprecated As of version 1.124, the concept has been discarded.
 				 */
 				creationTemplate: {

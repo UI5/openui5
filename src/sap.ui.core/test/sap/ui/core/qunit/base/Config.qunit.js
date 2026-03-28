@@ -146,7 +146,7 @@ globalThis.fnInit = () => {
 					type: BaseConfiguration.Type.String,
 					external: false
 				}), "test", "BaseConfiguration.get for param 'sapUiMissSpelled' returns correct value 'test'");
-				assert.ok(oLogWarningSpy.calledWith("Deprecated configuration option 'sap-ui-missspelled' given in global configuration. Please use 'sap-ui-miss-spelled' instead."), "Logged deprecated configuration spelling 'sap-ui-missspelled'");
+				assert.ok(oLogWarningSpy.calledWith("[DEPRECATED] configuration option 'sap-ui-missspelled' given in global configuration. Please use 'sap-ui-miss-spelled' instead."), "Logged deprecated configuration spelling 'sap-ui-missspelled'");
 			}
 		});
 

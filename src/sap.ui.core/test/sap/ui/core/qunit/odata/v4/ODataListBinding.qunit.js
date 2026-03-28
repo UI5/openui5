@@ -9611,30 +9611,6 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("requestSideEffects: with created rows", function (assert) {
-		const oBinding = this.bindList("/Set");
-		oBinding.iCreatedContexts = 1;
-		this.mock(_Helper).expects("isDataAggregation")
-			.withExactArgs(sinon.match.same(oBinding.mParameters))
-			.returns(true);
-		this.mock(oBinding.aFilters).expects("concat")
-			.withExactArgs(sinon.match.same(oBinding.aApplicationFilters))
-			.returns("~aFilters~");
-		this.mock(_AggregationHelper).expects("isAffected")
-			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation), "~aFilters~",
-				"~aPaths~")
-			.returns(true);
-		this.mock(oBinding).expects("refreshSingle").never();
-		this.mock(oBinding.oCache).expects("requestSideEffects").never();
-		this.mock(oBinding).expects("refreshInternal").never();
-
-		assert.throws(function () {
-			// code under test
-			oBinding.requestSideEffects("group", "~aPaths~");
-		}, new Error("Unsupported for data aggregation with created rows: " + oBinding));
-	});
-
-	//*********************************************************************************************
 	QUnit.test("keepOnlyVisibleContexts", function (assert) {
 		var oBinding = this.bindList("/Set"),
 			oCreatedContext0 = { // in

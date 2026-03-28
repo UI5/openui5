@@ -1614,6 +1614,9 @@ sap.ui.define([
 				aTokens = this._getVisibleTokens(),
 				oFocusedToken, iFocusIndex, iIndex, iMinIndex, iMaxIndex;
 
+			// Mark event to prevent propagation to parent controls
+			oEvent.setMarked();
+
 			// Close popover if it's open and user clicks on a token in tokenizer
 			if (oTargetToken && this._oPopup && this._oPopup.isOpen()) {
 				this._oPopup.close();

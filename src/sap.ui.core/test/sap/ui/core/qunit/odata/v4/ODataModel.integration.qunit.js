@@ -28473,7 +28473,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Create at start is supported (JIRA: CPOUI5ODATAV4-3350)
 	// Create at end of start is supported (JIRA: CPOUI5ODATAV4-3351)
-	// Inactive elements are supported, even w/ refresh and scrolling (JIRA: CPOUI5ODATAV4-3409)
+	// Inactive elements, even w/ (side-effects) refresh and scrolling (JIRA: CPOUI5ODATAV4-3409)
 	[undefined, false, true].forEach((bInactive) => { // Note: false means "gets activated"
 		const sTitle = "Data Aggregation: filter w/o aggregation on leaves, bInactive=" + bInactive;
 		const bActivate = bInactive === false;
@@ -28878,6 +28878,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					this.waitForChanges(assert, "delete inactive")
 				]);
 
+				assert.strictEqual(oCreatedContext.getBinding(), undefined, "destroyed");
 				checkTable("after delete inactive", assert, oTable, [
 					oStartOfStartContext,
 					oEndOfStartContext,
@@ -28920,13 +28921,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				[undefined, undefined, true, true, 0, "", "", "35,100", "EUR"]
 			], (bInactive ? 27 : 28) + 3);
 
-			// code under test (JIRA: CPOUI5ODATAV4-3409)
-			await oListBinding.getHeaderContext().requestSideEffects([""])
-				.then(mustFail(assert), function (oError) {
-					assert.strictEqual(oError.message,
-						"Unsupported for data aggregation with created rows: " + oListBinding);
-				});
-
 			this.expectChange("region", bInactive
 					? [,,, "A", "B", "C", "D"]
 					: [,,,, "A", "B", "C", "D"]);
@@ -28945,13 +28939,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/BusinessPartners(3)",
 				"/BusinessPartners(4)",
 				"/BusinessPartners()"
-			], [
-				[undefined, undefined, undefined, false, 1, "1", "A", "195.583", "DEM"],
-				[undefined, undefined, undefined, false, 1, "2", "B", "200", "EUR"],
-				[undefined, undefined, undefined, false, 1, "3", "C", "300", "EUR"],
-				[undefined, undefined, undefined, false, 1, "4", "D", "400", "EUR"],
-				[undefined, undefined, true, true, 0, "", "", "35,100", "EUR"]
-			], (bInactive ? 27 : 28) + 3);
+			], null, (bInactive ? 27 : 28) + 3); // Note: aExpectedContent is not interesting here
 
 			this.expectRequest("BusinessPartners?$apply=filter((Currency ne 'USD' and SalesAmount gt 0)"
 					// exclusive filter (see _CollectionCache#getExclusiveFilter)
@@ -28996,12 +28984,78 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			await this.waitForChanges(assert, "scroll up again");
 
+			let sSideEffectsRefreshUrl = sUrl.replace("top(4)", "top(2)");
+			if (bActivate) {
+				sSideEffectsRefreshUrl = sSideEffectsRefreshUrl.replace(
+					"filter(Currency ne 'USD' and SalesAmount gt 0)",
+					"filter((Currency ne 'USD' and SalesAmount gt 0) and not (Id eq 27))");
+				this.expectRequest("BusinessPartners?$select=Currency,Id,Region,SalesAmount"
+						+ "&$filter=Id eq 27", {
+						value : [{
+							Currency : "EUR",
+							Id : 27, // Edm.Int16
+							Region : "New*",
+							SalesAmount : "2700"
+						}]
+					})
+					.expectChange("region", [, "New*"]);
+			}
+			this.expectRequest(sSideEffectsRefreshUrl, {
+					value : [
+						{ // Note: grand total cannot include Id : 27
+							Currency : "EUR",
+							SalesAmount : "" + 13 * 27 * 100,
+							"SalesAmount@odata.type" : "#Decimal"
+						},
+						// for simplicity, ignore all POSTs above
+						{UI5__count : "26", "UI5__count@odata.type" : "#Decimal"},
+						{
+							Currency : "DEM",
+							Id : 1, // Edm.Int16
+							Region : "A",
+							SalesAmount : "195.583"
+						},
+						{
+							Currency : "EUR",
+							Id : 2, // Edm.Int16
+							Region : "B",
+							SalesAmount : "200"
+						}
+					]
+				})
+				.expectChange("count", bActivate ? "27" : "26")
+				.expectChange("region", bActivate
+					? [,, "Again At End Of Start", "A"]
+					: [, "Again At End Of Start", "A", "B"]);
+
+			await Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3409)
+				oListBinding.getHeaderContext().requestSideEffects([""]),
+				this.waitForChanges(assert, "side-effects refresh")
+			]);
+
+			assert.strictEqual(oEndOfStartContext.getBinding(), undefined,
+				"destroyed because it was never inactive");
+			checkTable("after side-effects refresh", assert, oTable, [
+				oStartOfStartContext,
+				bActivate && oCreatedContext,
+				oAgainEndOfStartContext,
+				"/BusinessPartners(1)",
+				bActivate || "/BusinessPartners(2)",
+				"/BusinessPartners()"
+			], [
+				[true, true, undefined, false, 1, "", "Start Of Start", "", ""],
+				bActivate && [bInactive, false, undefined, false, 1, "27", "New*", "2,700", "EUR"],
+				[true, true, undefined, false, 1, "", "Again At End Of Start", "", ""],
+				[undefined, undefined, undefined, false, 1, "1", "A", "195.583", "DEM"],
+				bActivate || [undefined, undefined, undefined, false, 1, "2", "B", "200", "EUR"],
+				[undefined, undefined, true, true, 0, "", "", "35,100", "EUR"]
+			], (bActivate ? 27 : 26) + 3);
+
 			// for simplicity, ignore all POSTs above
 			this.expectRequest(sUrl.replace("top(4)", "top(2)"), new Promise(function (resolve) {
 					fnRespond = resolve.bind(null, {value : aResults.slice(0, 2 + 2)});
-				}))
-				.expectChange("count", "26")
-				.expectChange("region", [, "Again At End Of Start", "A", "B"]);
+				}));
 
 			// code under test (JIRA: CPOUI5ODATAV4-3409)
 			const oRefreshPromise = oListBinding.requestRefresh();
@@ -29021,6 +29075,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oAgainEndOfStartContext
 			], null, 10 + 2, /*bLengthFinal*/false);
 
+			if (bActivate) {
+				this.expectChange("count", "26")
+					.expectChange("region", [, "Again At End Of Start", "A", "B"]);
+			}
+
 			fnRespond();
 
 			await Promise.all([
@@ -29028,8 +29087,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				this.waitForChanges(assert, "refresh")
 			]);
 
-			assert.strictEqual(oCreatedContext.getBinding(), undefined, "destroyed");
-			assert.strictEqual(oEndOfStartContext.getBinding(), undefined, "destroyed");
+			assert.strictEqual(oCreatedContext.getBinding(), undefined,
+				"destroyed because it was not inactive anymore");
 			checkTable("after refresh", assert, oTable, [
 				oStartOfStartContext,
 				oAgainEndOfStartContext,

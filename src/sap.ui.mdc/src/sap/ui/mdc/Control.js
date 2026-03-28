@@ -50,7 +50,7 @@ sap.ui.define([
 			properties: {
 				/**
 				 * Object related to the <code>Delegate</code> module that provides the required APIs to execute model-specific logic.<br>
-				 * The object has the following properties:
+				 * The object has the following properties (see {@link sap.ui.mdc.DelegateConfig DelegateConfig}):
 				 * <ul>
 				 * 	<li><code>name</code> defines the path to the <code>Delegate</code> module</li>
 				 * 	<li><code>payload</code> (optional) defines application-specific information that can be used in the given delegate</li>
@@ -65,7 +65,8 @@ sap.ui.define([
 				 */
 				delegate: {
 					type: "object",
-					group: "Data"
+					group: "Data",
+					bindable: false
 				}
 			}
 		},
@@ -78,13 +79,22 @@ sap.ui.define([
 	PropertyHelperMixin.call(Control.prototype);
 
 	/**
+	 * Sets a new delegate for the {@link #getDelegate delegate} property.
+	 *
 	 * @name sap.ui.mdc.Control#setDelegate
+	 * @function
+	 * @param {sap.ui.mdc.DelegateConfig} oDelegate Delegate object
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
 	 */
 
 	/**
+	 * Gets the current delegate from the {@link #getDelegate delegate} property.
+	 *
 	 * @name sap.ui.mdc.Control#getDelegate
+	 * @function
+	 * @returns {sap.ui.mdc.DelegateConfig} Delegate object
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
 	 */
