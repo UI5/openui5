@@ -235,19 +235,19 @@ sap.ui.define([
 
 		let oFilter = FilterConverter.createFilters( oCM.getAllConditions(), oConditionTypes);
 		let result = FilterConverter.prettyPrintFilters(oFilter);
-		assert.strictEqual(result, "L1:fieldPath1 All (L1/foo EQ 'null' and L1/foo NE 'null')", "result contains the expected Any filter");
+		assert.strictEqual(result, "(fieldPath1 NotAny 'undefined' or L1:fieldPath1 Any L1/foo EQ '')", "result contains the expected Any filter");
 
 		oCM.addCondition("fieldPath1*/foo", Condition.createCondition(OperatorName.EQ, ["foo"]));
 
 		oFilter = FilterConverter.createFilters( oCM.getAllConditions(), oConditionTypes);
 		result = FilterConverter.prettyPrintFilters(oFilter);
-		assert.strictEqual(result, "(L1:fieldPath1 All (L1/foo EQ 'null' and L1/foo NE 'null') or L1:fieldPath1 Any L1/foo EQ 'foo')", "result contains the expected Any filter");
+		assert.strictEqual(result, "(fieldPath1 NotAny 'undefined' or L1:fieldPath1 Any L1/foo EQ '' or L1:fieldPath1 Any L1/foo EQ 'foo')", "result contains the expected Any filter");
 
 		oCM.addCondition("fieldPath1*/foo", Condition.createCondition(OperatorName.NE, ["xxx"]));
 
 		oFilter = FilterConverter.createFilters( oCM.getAllConditions(), oConditionTypes);
 		result = FilterConverter.prettyPrintFilters(oFilter);
-		assert.strictEqual(result, "((L1:fieldPath1 All (L1/foo EQ 'null' and L1/foo NE 'null') or L1:fieldPath1 Any L1/foo EQ 'foo') and L1:fieldPath1 All L1/foo NE 'xxx')", "result contains the expected Any filter");
+		assert.strictEqual(result, "((fieldPath1 NotAny 'undefined' or L1:fieldPath1 Any L1/foo EQ '' or L1:fieldPath1 Any L1/foo EQ 'foo') and L1:fieldPath1 All L1/foo NE 'xxx')", "result contains the expected Any filter");
 	});
 
 	QUnit.test("testing NotEmpty operation for Any conditions", function(assert) {
@@ -255,19 +255,19 @@ sap.ui.define([
 
 		let oFilter = FilterConverter.createFilters( oCM.getAllConditions(), oConditionTypes);
 		let result = FilterConverter.prettyPrintFilters(oFilter);
-		assert.strictEqual(result, "fieldPath1 Any no filters set", "result contains the expected Any filter");
+		assert.strictEqual(result, "L1:fieldPath1 Any L1/foo NE ''", "result contains the expected Any filter");
 
 		oCM.addCondition("fieldPath1*/foo", Condition.createCondition(OperatorName.NE, ["foo"]));
 
 		oFilter = FilterConverter.createFilters( oCM.getAllConditions(), oConditionTypes);
 		result = FilterConverter.prettyPrintFilters(oFilter);
-		assert.strictEqual(result, "(fieldPath1 Any no filters set and L1:fieldPath1 All L1/foo NE 'foo')", "result contains the expected Any filter");
+		assert.strictEqual(result, "(L1:fieldPath1 Any L1/foo NE '' and L1:fieldPath1 All L1/foo NE 'foo')", "result contains the expected Any filter");
 
 		oCM.addCondition("fieldPath1*/foo", Condition.createCondition(OperatorName.NE, ["xxx"]));
 
 		oFilter = FilterConverter.createFilters( oCM.getAllConditions(), oConditionTypes);
 		result = FilterConverter.prettyPrintFilters(oFilter);
-		assert.strictEqual(result, "(fieldPath1 Any no filters set and L1:fieldPath1 All (L1/foo NE 'foo' and L1/foo NE 'xxx'))", "result contains the expected Any filter");
+		assert.strictEqual(result, "(L1:fieldPath1 Any L1/foo NE '' and L1:fieldPath1 All (L1/foo NE 'foo' and L1/foo NE 'xxx'))", "result contains the expected Any filter");
 	});
 
 	QUnit.test("testing caseSensitive types", function(assert) {

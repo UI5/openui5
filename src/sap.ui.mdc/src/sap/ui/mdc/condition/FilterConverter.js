@@ -88,7 +88,7 @@ sap.ui.define([
 				const aOverallFilters = [];
 
 				const convertAnyAllFilter = function(oFilter, sFieldPath, sPropertyPath) {
-					if ([FilterOperator.Any,FilterOperator.All].includes(oFilter.getOperator())) {
+					if ([FilterOperator.Any, FilterOperator.All, FilterOperator.NotAny, FilterOperator.NotAll].includes(oFilter.getOperator())) {
 						// existing Any/All filters are not changed
 						return {filter: null, anyAllFilters: [oFilter]};
 					} else if (!oFilter.getPath() && oFilter.getFilters()) {
