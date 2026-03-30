@@ -8,5 +8,20 @@
         "text": " MultiSelectionPlugin: Correctly enable header selector when used in AnalyticalTable"
       }
     ]
+  },
+  "1.145.1": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "75a6e302c375949886ec0dd810aae268497827c0",
+        "type": "FIX",
+        "text": " Table: Correctly update selected and enabled state of the SelectAll checkbox"
+      },
+      {
+        "id": "0d0b19ec836bcff09537b00151b11bb799135ff3",
+        "type": "FIX",
+        "text": " rowmodes.Auto: Automatic row count adjustment"
+      }
+    ]
   }
 }

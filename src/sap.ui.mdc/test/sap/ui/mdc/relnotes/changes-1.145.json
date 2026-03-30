@@ -58,5 +58,25 @@
         "text": " sap.m.VariantManagement: Improve save dialog"
       }
     ]
+  },
+  "1.145.1": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "29b6729022785259d177e39b626221f7dadf2f5d",
+        "type": "FIX",
+        "text": " FilterBar: Empty, NotEmpty - incorrect result"
+      },
+      {
+        "id": "6b4cc5f3a913200c00c13cc767a7072d2cb98963",
+        "type": "FIX",
+        "text": " ConditionType: formatting null after async formatting returns wrong value"
+      },
+      {
+        "id": "299cb8c025f9efc0cbcf2a5a9afc98b0f26d4664",
+        "type": "FIX",
+        "text": " Field: initial Timezone leads to error"
+      }
+    ]
   }
 }

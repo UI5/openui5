@@ -33,5 +33,25 @@
         "text": " Diagnostics: Vertical scrolling issue is now resolved"
       }
     ]
+  },
+  "1.145.1": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "7befe9362270f345e7edc22ff75c8af625eb0d8f",
+        "type": "FIX",
+        "text": " sap.m.StepInput: change event when value is not with correct precision is thrown now."
+      },
+      {
+        "id": "51132f7431f1204af5e3f4c835b60fbd522f6f12",
+        "type": "FIX",
+        "text": " sap.ui.core.delegate.ScrollEnablement: prevent TypeError on null offsetParent"
+      },
+      {
+        "id": "5cb9d93037b02cfb748abe6a331bd973145b5e19",
+        "type": "FIX",
+        "text": " core/Control: Improve focus restoration for busy indicator"
+      }
+    ]
   }
 }

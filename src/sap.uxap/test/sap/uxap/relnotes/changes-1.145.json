@@ -33,5 +33,15 @@
         "text": " sap.uxap.ObjectPageSubSection: fix order of unstashed controls"
       }
     ]
+  },
+  "1.145.1": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "b3c768e1f724cba076bdd9045843b30b7ec6f7cb",
+        "type": "FIX",
+        "text": " ObjectPageLayout: prevent endless loop in ResizeHandler callbacks"
+      }
+    ]
   }
 }

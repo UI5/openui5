@@ -253,5 +253,40 @@
         "text": " sap.m.SearchField: Prevented unnecessary reopening of suggestions"
       }
     ]
+  },
+  "1.145.1": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "abacc046ab6b5eeeb91303e1a0ae020bf40794f5",
+        "type": "FIX",
+        "text": " sap.m.Tokenizer: Keep n-more popover open on item delete"
+      },
+      {
+        "id": "7befe9362270f345e7edc22ff75c8af625eb0d8f",
+        "type": "FIX",
+        "text": " sap.m.StepInput: change event when value is not with correct precision is thrown now."
+      },
+      {
+        "id": "c780e78687a920935f9e58f07b54c70a01c7b205",
+        "type": "FIX",
+        "text": " We've now fixed a jump issue in the header container by using an outline instead of a border"
+      },
+      {
+        "id": "defeb8391418a739ccc49fca3434f34923523553",
+        "type": "FIX",
+        "text": " sap.m.OverflowToolbar: onfocusfail no longer throws an error"
+      },
+      {
+        "id": "51132f7431f1204af5e3f4c835b60fbd522f6f12",
+        "type": "FIX",
+        "text": " sap.ui.core.delegate.ScrollEnablement: prevent TypeError on null offsetParent"
+      },
+      {
+        "id": "5cb9d93037b02cfb748abe6a331bd973145b5e19",
+        "type": "FIX",
+        "text": " core/Control: Improve focus restoration for busy indicator"
+      }
+    ]
   }
 }

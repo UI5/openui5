@@ -68,5 +68,15 @@
         "text": "sap.ui.unified.CalendarRow: Corrected rendering of non-working periods"
       }
     ]
+  },
+  "1.145.1": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "8ea5d407ac34d0221048f6dca7a20c85176ae0a8",
+        "type": "FIX",
+        "text": " sap.ui.unified.RecurrenceUtils: Comparison of UTC dates."
+      }
+    ]
   }
 }

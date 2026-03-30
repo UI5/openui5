@@ -38,5 +38,15 @@
         "text": " sap.m.ObjectNumber: removed text shadow on hover in Horizon HC themes"
       }
     ]
+  },
+  "1.145.1": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "51389a27cff7e877ef26944355e2922f40b272e8",
+        "type": "FIX",
+        "text": " sap.uxap.AnchorBar: Enable upperCaseAnchorBar property for Horizon theme"
+      }
+    ]
   }
 }

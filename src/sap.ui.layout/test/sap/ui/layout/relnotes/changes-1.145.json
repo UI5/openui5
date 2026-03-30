@@ -1,0 +1,12 @@
+{
+  "1.145.1": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "352ab4840c15e000a9e88600d923ceaedd26c3f1",
+        "type": "FIX",
+        "text": " ColumnLayout: role=\"form\" rendered in display mode"
+      }
+    ]
+  }
+}
