@@ -38,5 +38,15 @@
         "text": " SimpleForm: use ColumnLayout as default"
       }
     ]
+  },
+  "1.142.7": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "2babec08bc85bc5fe889fb3eaccd814325a7d6e9",
+        "type": "FIX",
+        "text": " ColumnLayout: role=\"form\" rendered in display mode"
+      }
+    ]
   }
 }

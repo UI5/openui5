@@ -63,5 +63,20 @@
         "text": " Field: runtime error if DOM removed while update"
       }
     ]
+  },
+  "1.142.7": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "a6f671bf937418af17dfac8e70246ba5c5d13d7a",
+        "type": "FIX",
+        "text": " ConditionType: formatting null after async formatting returns wrong value"
+      },
+      {
+        "id": "456ec6541b886fb11fb114365469c9bf2f1bdfa0",
+        "type": "FIX",
+        "text": " Field: initial Timezone leads to error"
+      }
+    ]
   }
 }

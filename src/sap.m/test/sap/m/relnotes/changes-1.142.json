@@ -323,5 +323,15 @@
         "text": " core/Control: Improve focus restoration for busy indicator"
       }
     ]
+  },
+  "1.142.7": {
+    "date": "March 2026",
+    "notes": [
+      {
+        "id": "4ce0f00e57af00a16ae6e34fb5e27a82c91a3e8f",
+        "type": "FIX",
+        "text": " sap.m.OverflowToolbar: onfocusfail no longer throws an error"
+      }
+    ]
   }
 }
