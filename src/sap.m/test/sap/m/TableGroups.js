@@ -139,6 +139,7 @@ sap.ui.define([
 	  growing : true,
 	  growingThreshold : 5,
 	  headerText : "Team Members",
+	  mode: "MultiSelect",
 	  columns : [
 		  new Column({
 			  width : "2rem",

@@ -660,14 +660,8 @@ sap.ui.define([
 			} else if (sUrlParam === "false") {
 				this._bUseNewUI = false;
 			} else {
-				// Check the FilterBar's enableLegacyUI property
-				const oFilterBar = this._getAdaptationControlInstance();
-				if (oFilterBar?.isA?.("sap.ui.mdc.FilterBar") && oFilterBar.getEnableLegacyUI) {
-					this._bUseNewUI = !oFilterBar.getEnableLegacyUI();
-				} else {
-					// Default to new UI
-					this._bUseNewUI = true;
-				}
+				// Default to new UI
+				this._bUseNewUI = true;
 			}
 		}
 		return this._bUseNewUI;

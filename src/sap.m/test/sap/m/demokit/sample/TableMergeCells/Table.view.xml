@@ -4,6 +4,7 @@
 	xmlns="sap.m">
 	<Table
 		headerText="Products"
+		mode="MultiSelect"
 		items="{
 			path:'/ProductCollection',
 			sorter: {
@@ -33,7 +34,9 @@
 			<Column
 				minScreenWidth="Tablet"
 				demandPopin="true"
-				hAlign="Center" >
+				hAlign="Center"
+				mergeDuplicates="true"
+				mergeFunctionName="getNumber">
 				<header>
 					<Text text="Weight" />
 				</header>
@@ -44,7 +47,13 @@
 				</header>
 			</Column>
 		</columns>
-		<ColumnListItem vAlign="Middle">
+		<ColumnListItem
+			vAlign="Middle"
+			type="{
+				path: 'Price',
+				formatter: '.formatter.formatType'
+			}"
+		>
 			<Text text="{SupplierName}" />
 			<ObjectIdentifier title="{Name}" text="{ProductId}" />
 			<Text text="{Width} x {Depth} x {Height} {DimUnit}" />

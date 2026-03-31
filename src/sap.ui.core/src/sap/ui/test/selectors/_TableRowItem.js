@@ -29,7 +29,7 @@ sap.ui.define([
          * Undefined if the control is not inside a table
          * @private
          */
-        _generate: function (oControl, mSelectorParts) {
+        _generate: function (oControl, mSelectorParts, mSettings) {
             if (mSelectorParts.ancestor && mSelectorParts.relative) {
                 var oRow = this._getValidationRoot(oControl);
                 var oTable = this._getAncestor(oControl);
@@ -39,7 +39,7 @@ sap.ui.define([
                 var mRowSelector = {};
                 // tables may not have an items binding eg: forms as tables
                 if (oTableBindingInfo && sRowBindingContextPath) {
-                    mRowSelector = $.extend(this._createSelectorBase(oRow, {}), {
+                    mRowSelector = $.extend(this._createSelectorBase(oRow, {}, mSettings), {
                         bindingPath: {
                             modelName: oTableBindingInfo.model || undefined,
                             path: sRowBindingContextPath

@@ -21,6 +21,9 @@ sap.ui.define([
 			} catch (err) {
 				return ValueState.None;
 			}
+		},
+		formatType(fPrice) {
+			return fPrice > 400 ? "Navigation" : "Inactive";
 		}
 	};
 

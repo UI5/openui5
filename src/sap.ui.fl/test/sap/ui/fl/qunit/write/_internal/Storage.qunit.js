@@ -1887,6 +1887,34 @@ sap.ui.define([
 				variantManagementReferences: ["vm1", "vm2"]
 			});
 		});
+
+		QUnit.test("when update is called, and the connector returns an object", async function(assert) {
+			const oResponse = { success: true };
+			this.oConnector.update = () => {
+				return Promise.resolve({ response: oResponse, status: 200 });
+			};
+
+			const oResult = await Storage.update({
+				layer: Layer.CUSTOMER,
+				flexReference: "testReference"
+			});
+			assert.deepEqual(oResult, {
+				response: [oResponse],
+				status: 200
+			}, "then the response is returned correctly");
+		});
+
+		QUnit.test("when update is called, and the connector does not return anything", async function(assert) {
+			this.oConnector.update = () => {
+				return Promise.resolve();
+			};
+
+			const oResult = await Storage.update({
+				layer: Layer.CUSTOMER,
+				flexReference: "testReference"
+			});
+			assert.deepEqual(oResult, undefined, "then the function does not fail");
+		});
 	});
 
 	QUnit.done(function() {

@@ -14,8 +14,6 @@ sap.ui.define([
 ], function(extend, Column, ColumnListItem, Label, Table, Icon, Sorter, JSONModel, ODataV4Model, nextUIUpdate, TestUtils) {
 	"use strict";
 
-	let $MergedLabel, $MergedIcon;
-
 	async function ui5Event(sEventName, oControl) {
 		return await new Promise((fnResolve) => {
 			oControl?.attachEventOnce(sEventName, fnResolve);
@@ -27,6 +25,7 @@ sap.ui.define([
 		const oTable = new Table(sId, {
 			growing : bGrowing,
 			growingThreshold : 5,
+			mode: "MultiSelect",
 			columns : [
 				new Column({
 					mergeDuplicates : true,
@@ -105,12 +104,29 @@ sap.ui.define([
 		oTable.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		$MergedLabel = oTable.getItems()[3].getCells()[2].$();
-		$MergedIcon = oTable.getItems()[3].getCells()[0].$();
+		const TRANSPARENT = "rgba(0, 0, 0, 0)";
+		const oMergedRow = oTable.getItems()[3];
+		const $MergedLabel = oMergedRow.getCells()[2].$();
+		const $MergedLabelCell = $MergedLabel.parent();
+		const $MergedIcon = oMergedRow.getCells()[0].$();
+		const $MergedIconCell = $MergedIcon.parent();
 
 		assert.ok($MergedLabel.hasClass("sapMListTblCellDupCnt"), "duplicated label should be merged.");
 		assert.strictEqual($MergedLabel.text(), "Male", "duplicated label is still available in the dom for screen readers.");
 		assert.ok($MergedIcon.hasClass("sapMListTblCellDupCnt"), "duplicated icon should be merged.");
+
+		assert.equal($MergedIconCell.css("border-top-color"), TRANSPARENT, "merged icon cell border top color is transparent.");
+		assert.equal($MergedLabelCell.css("border-top-color"), TRANSPARENT, "merged label cell border top color is transparent.");
+		assert.equal($MergedIcon.css("opacity"), "0", "merged icon cell content is hidden initially.");
+		assert.equal($MergedLabel.css("opacity"), "0", "merged label cell content is hidden initially.");
+
+		oMergedRow.focus();
+		await new Promise((resolve) => { setTimeout(resolve, 400); }); // wait for the animations to be finished
+
+		assert.equal($MergedIcon.css("opacity"), "1", "merged icon cell content becomes visible when row is focused.");
+		assert.equal($MergedLabel.css("opacity"), "1", "merged label cell content becomes visible when row is focused.");
+		assert.equal($MergedIconCell.css("border-top-color"), TRANSPARENT, "merged icon cell border top color remains transparent when focused.");
+		assert.equal($MergedLabelCell.css("border-top-color"), TRANSPARENT, "merged label cell border top color remains transparent when focused.");
 
 		oTable.destroy();
 	});

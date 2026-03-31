@@ -19,11 +19,16 @@ sap.ui.define([
 
          /**
          * @param {object} oControl the control for which to generate a selector
+         * @param {object} mSelectorParts additional selector parts from the base generator
+         * @param {object} [mSettings] optional settings
+         * @param {boolean} [mSettings.preferViewNameAsViewLocator=false] if true, use viewName instead of viewId as the view locator,
+         * and include private sub-controls whose view-relative IDs contain hyphens
+         * @param {boolean} [mSettings.separateViewNamespace=false] if true, split the fully qualified viewName into viewName and viewNamespace
          * @returns {object} a plain object representation of a control. Contains viewName and view relative ID.
          * If the selector cannot be constructed, undefined is returned.
          * @private
          */
-        _generate: function (oControl) {
+        _generate: function (oControl, mSelectorParts, mSettings) {
             var sControlId = oControl.getId();
             var oView = this._getControlView(oControl);
             var mResult;
@@ -34,11 +39,12 @@ sap.ui.define([
                 var sViewRelativeId;
                 var sValueWithSeparator = sViewId + "--";
                 var iIndex = sControlId.indexOf(sValueWithSeparator);
+                var bPreferViewName = mSettings && mSettings.preferViewNameAsViewLocator;
 
                 if (iIndex > -1) {
                     sViewRelativeId = sControlId.substring(iIndex + sValueWithSeparator.length);
 
-                    if (sViewRelativeId.indexOf("-") === -1 && !sViewRelativeId.match(/[0-9]$/)) {
+                    if (bPreferViewName || (sViewRelativeId.indexOf("-") === -1 && !sViewRelativeId.match(/[0-9]$/))) {
                         this._oLogger.debug("Control with ID " + sControlId + " has view-relative ID " + sViewRelativeId);
 
                         mResult = {
@@ -46,9 +52,9 @@ sap.ui.define([
                             skipBasic: true
                         };
 
-                        if (ManagedObjectMetadata.isGeneratedId(sViewId)) {
+                        if (bPreferViewName || ManagedObjectMetadata.isGeneratedId(sViewId)) {
                             this._oLogger.debug("Control " + oControl + " has view with viewName " + sViewName);
-                            mResult.viewName = sViewName;
+                            Object.assign(mResult, this._getViewNameSelector(sViewName, mSettings));
                         } else {
                             this._oLogger.debug("Control " + oControl + " has view with stable ID " + sViewId);
                             mResult.viewId = sViewId;

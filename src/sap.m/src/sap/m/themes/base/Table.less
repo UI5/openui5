@@ -35,12 +35,28 @@
 	height: 0;
 }
 
-.sapMTableScreenReaderOnly,
-.sapMListTblCellDup > .sapMListTblCellDupCnt {
+.sapMTableScreenReaderOnly {
 	/* hide content visually but have it available for screen readers */
 	position: absolute;
 	clip: rect(0, 0, 0, 0);
 	height: 0;
+}
+
+.sapMListTblCellDup > .sapMListTblCellDupCnt {
+	/* hide content visually but have it available for screen readers */
+	opacity: 0;
+	transition: opacity 300ms ease;
+}
+
+.sapMListTblRow:active > .sapMListTblCellDup > .sapMListTblCellDupCnt,
+.sapMListTblRow:focus-within > .sapMListTblCellDup > .sapMListTblCellDupCnt {
+	opacity: 1;
+}
+
+@media (hover: hover) {
+	.sapMListTblRow:hover > .sapMListTblCellDup > .sapMListTblCellDupCnt {
+		opacity: 1;
+	}
 }
 
 tr.sapMListTblHeaderNone > .sapMTableTH {
@@ -208,7 +224,8 @@ tr.sapMListTblHeaderNone > .sapMTableTH {
 	border-bottom: 0;
 }
 
-.sapMListTblCell.sapMListTblCellDup {
+.sapMListTblCell.sapMListTblCellDup,
+.sapMListTblSelCol:has( + .sapMListTblCellDup) {
 	border-color: transparent;
 }
 

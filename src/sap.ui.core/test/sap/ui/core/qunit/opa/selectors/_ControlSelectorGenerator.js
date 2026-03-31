@@ -353,7 +353,7 @@ sap.ui.define([
 				}.bind(this)
 			};
 			this.fnGenerate = sinon.stub(_ControlSelectorGenerator, "_generate");
-			this.fnGenerate.withArgs({control: this.oMockAncestor}).returns(Promise.resolve(this.mAncestorSelector));
+			this.fnGenerate.withArgs(sinon.match({control: this.oMockAncestor})).returns(Promise.resolve(this.mAncestorSelector));
 			this.fnGenerateInSubtree = sinon.stub(_ControlSelectorGenerator, "_generateUniqueSelectorInSubtree");
 			this.fnGenerateInSubtree.withArgs(this.oMockControl, this.oMockValidationRoot).returns(Promise.resolve(this.mRelativeSelector));
 		},

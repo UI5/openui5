@@ -4,8 +4,10 @@
 
 // Provides control sap.ui.mdc.filterbar.FilterItemLayout.
 sap.ui.define([
-	'sap/ui/mdc/filterbar/IFilterContainer', 'sap/ui/mdc/p13n/panels/AdaptFiltersPanel'
-], (IFilterContainer, AdaptFiltersPanel) => {
+	'sap/ui/mdc/filterbar/IFilterContainer',
+	'sap/ui/mdc/p13n/panels/AdaptFiltersPanel',
+	'sap/ui/mdc/filterbar/p13n/FilterGroupLayout'
+], (IFilterContainer, AdaptFiltersPanel, FilterGroupLayout) => {
 	"use strict";
 
 	/**
@@ -49,7 +51,19 @@ sap.ui.define([
 
 		this.oLayout.setItemFactory((oBindingContext) => {
 			const sKey = oBindingContext.getProperty(oBindingContext.sPath).name;
-			const oFilterItem = this.mFilterItems[sKey];
+			let oFilterItem = this.mFilterItems[sKey];
+
+			if (!oFilterItem) {
+				const oParent = this.getParent();
+				if (oParent && oParent.mFilterFields && oParent.mFilterFields[sKey]) {
+					const oFilterField = oParent.mFilterFields[sKey];
+					const oLayoutItem = new FilterGroupLayout();
+					oLayoutItem.setFilterField(oFilterField);
+					oFilterItem = oLayoutItem;
+					this.mFilterItems[sKey] = oFilterItem;
+				}
+			}
+
 			return oFilterItem;
 		});
 	};

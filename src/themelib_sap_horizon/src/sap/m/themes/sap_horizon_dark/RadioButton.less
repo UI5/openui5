@@ -85,7 +85,8 @@
 	}
 }
 
-.sapMRb:not(.sapMRbErr):not(.sapMRbWarn):not(.sapMRbInfo):not(.sapMRbSucc):not(.sapMRbDis) .sapMRbHoverable:hover .sapMRbBOut {
+.sapMRb:not(.sapMRbErr):not(.sapMRbWarn):not(.sapMRbInfo):not(.sapMRbSucc):not(.sapMRbDis) .sapMRbHoverable:hover .sapMRbBOut,
+.sapMRb:not(.sapMRbErr):not(.sapMRbWarn):not(.sapMRbInfo):not(.sapMRbSucc):not(.sapMRbDis):hover .sapMRbHoverable .sapMRbBOut {
 	stroke: var(--sapField_Hover_BorderColor);
 	fill: var(--sapField_Selector_Hover_Background);
 }
@@ -140,7 +141,8 @@
 	}
 }
 
-.sapMRb.sapMRbErr .sapMRbHoverable:hover .sapMRbBOut {
+.sapMRb.sapMRbErr .sapMRbHoverable:hover .sapMRbBOut,
+.sapMRb.sapMRbErr:hover .sapMRbHoverable .sapMRbBOut {
 	fill: var(--sapField_Selector_Hover_InvalidBackground);
 }
 
@@ -163,7 +165,8 @@
 	}
 }
 
-.sapMRb.sapMRbWarn .sapMRbHoverable:hover .sapMRbBOut {
+.sapMRb.sapMRbWarn .sapMRbHoverable:hover .sapMRbBOut,
+.sapMRb.sapMRbWarn:hover .sapMRbHoverable .sapMRbBOut {
 	fill: var(--sapField_Selector_Hover_WarningBackground);
 }
 
@@ -186,7 +189,8 @@
 	}
 }
 
-.sapMRb.sapMRbSucc .sapMRbHoverable:hover .sapMRbBOut {
+.sapMRb.sapMRbSucc .sapMRbHoverable:hover .sapMRbBOut,
+.sapMRb.sapMRbSucc:hover .sapMRbHoverable .sapMRbBOut {
 	fill: var(--sapField_Selector_Hover_SuccessBackground);
 }
 
@@ -209,7 +213,8 @@
 	}
 }
 
-.sapMRb.sapMRbInfo .sapMRbHoverable:hover .sapMRbBOut {
+.sapMRb.sapMRbInfo .sapMRbHoverable:hover .sapMRbBOut,
+.sapMRb.sapMRbInfo:hover .sapMRbHoverable .sapMRbBOut {
 	fill: var( --sapField_Selector_Hover_InformationBackground);
 }
 
