@@ -4,6 +4,7 @@ sap.ui.define([
 	"sap/ui/testrecorder/ControlTree",
 	"sap/ui/testrecorder/inspector/ControlInspector",
 	"sap/ui/testrecorder/inspector/ControlAPI",
+	"sap/ui/testrecorder/controlSelectors/ControlSelectorGenerator",
 	"sap/ui/core/Element",
 	"sap/m/Button",
 	"sap/m/SearchField",
@@ -13,7 +14,7 @@ sap.ui.define([
 	"sap/ui/test/actions/EnterText",
 	"sap/ui/test/utils/nextUIUpdate",
 	"../fixture/tree"
-], function (ControlTree, ControlInspector, ControlAPI, Element, Button, SearchField, Opa5, RecordReplay, Press, EnterText, nextUIUpdate, testTree) {
+], function (ControlTree, ControlInspector, ControlAPI, ControlSelectorGenerator, Element, Button, SearchField, Opa5, RecordReplay, Press, EnterText, nextUIUpdate, testTree) {
 	"use strict";
 
 	/**
@@ -479,6 +480,66 @@ sap.ui.define([
 			}
 			done();
 		});
+	});
+
+	// --- selector settings ---
+	QUnit.module("ControlTree - selector settings", {
+		beforeEach: function () {
+			// Stub ControlSelectorGenerator.getSelector (the layer below ControlInspector.getSelector)
+			// so the real ControlInspector.getSelector runs and injects mSelectorSettings
+			this.fnGenerateSelector = sinon.stub(ControlSelectorGenerator, "getSelector");
+			this.fnGenerateSelector.resolves({ id: "container" });
+			this.fnGetCodeSnippet = sinon.stub(ControlInspector, "_getCodeSnippet");
+			this.fnGetCodeSnippet.callsFake(function (mData) {
+				return ControlInspector.getSelector(mData).then(function () {
+					return "mock snippet";
+				});
+			});
+			this.fnGetControlData = sinon.stub(ControlAPI, "getControlData");
+			this.fnGetControlData.returns({ properties: { own: [], inherited: [] } });
+			this.fnGetElementById = sinon.stub(Element, "getElementById");
+			this.fnGetElementById.withArgs("container").returns({
+				getMetadata: function () {
+					return { getName: function () { return "sap.m.Button"; } };
+				}
+			});
+		},
+		afterEach: function () {
+			this.fnGenerateSelector.restore();
+			this.fnGetCodeSnippet.restore();
+			this.fnGetControlData.restore();
+			this.fnGetElementById.restore();
+		}
+	});
+
+	QUnit.test("Should enable preferViewId for selector generation", function (assert) {
+		var fnDone = assert.async();
+		ControlTree.getControlData("container").then(function () {
+			assert.ok(this.fnGenerateSelector.calledOnce, "ControlSelectorGenerator.getSelector was called");
+			var mSettings = this.fnGenerateSelector.firstCall.args[0].settings;
+			assert.strictEqual(mSettings.preferViewId, true,
+				"preferViewId should be enabled for ControlTree selectors");
+		}.bind(this)).finally(fnDone);
+	});
+
+	QUnit.test("Should enable preferViewNameAsViewLocator for selector generation", function (assert) {
+		var fnDone = assert.async();
+		ControlTree.getControlData("container").then(function () {
+			assert.ok(this.fnGenerateSelector.calledOnce, "ControlSelectorGenerator.getSelector was called");
+			var mSettings = this.fnGenerateSelector.firstCall.args[0].settings;
+			assert.strictEqual(mSettings.preferViewNameAsViewLocator, true,
+				"preferViewNameAsViewLocator should be enabled for ControlTree selectors");
+		}.bind(this)).finally(fnDone);
+	});
+
+	QUnit.test("Should enable separateViewNamespace for selector generation", function (assert) {
+		var fnDone = assert.async();
+		ControlTree.getControlData("container").then(function () {
+			assert.ok(this.fnGenerateSelector.calledOnce, "ControlSelectorGenerator.getSelector was called");
+			var mSettings = this.fnGenerateSelector.firstCall.args[0].settings;
+			assert.strictEqual(mSettings.separateViewNamespace, true,
+				"separateViewNamespace should be enabled for ControlTree selectors");
+		}.bind(this)).finally(fnDone);
 	});
 
 	// --- getControlData Tests ---

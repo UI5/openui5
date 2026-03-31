@@ -88,18 +88,6 @@ sap.ui.define([
 					defaultValue: false
 				},
 				/**
-				 * Enables the legacy (old) Adapt Filters UI design as an opt-out from the new default design.
-				 * When set to <code>true</code>, the old UI with SegmentedButton and SelectionPanel will be shown.
-				 * When set to <code>false</code> (default), the new UI with IconTabBar and AdaptFiltersPanelContent will be shown.
-				 * The URL parameter <code>sap-ui-xx-new-adapt-filters</code> takes precedence over this property.
-				 * @private
-				 * @ui5-restricted sap.fe
-				 */
-				enableLegacyUI: {
-					type: "boolean",
-					defaultValue: false
-				},
-				/**
 				 * Defines a text for the "Adapt Filters" button.
 				 *
 				 * <b>Note:</b> Both <code>adaptFiltersText</code> and <code>adaptFiltersTextNonZero</code> need to be set for them to take effect.

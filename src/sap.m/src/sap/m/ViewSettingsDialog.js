@@ -3022,13 +3022,21 @@ function(
 	 * @returns {sap.m.SearchField} A search field instance
 	 * @private
 	 */
-	ViewSettingsDialog.prototype._getFilterSearchField = function(oFilterDetailList) {
+	ViewSettingsDialog.prototype._getFilterSearchField = function (oFilterDetailList) {
+		var sDetailTitleText = this._getDetailTitleLabel().getText(); // e.g. 'Filter by: Type'
+		var sSearchFieldLabel = sDetailTitleText.includes(':') ? sDetailTitleText.split(':')[1].trim() : sDetailTitleText;
+		var sInvisibleText = this._rb.getText('VIEWSETTINGS_SEARCHFIELD_ARIA', [sSearchFieldLabel]); // e.g. 'Search for Type'
+		var oInvisibleText = new InvisibleText({ text: sInvisibleText }).toStatic();
 		var oFilterSearchField = new SearchField({
-				liveChange: function() {
-					this._setFilterDetailItemsVisibility(oFilterDetailList);
-				}.bind(this)
-			});
+			ariaLabelledBy: oInvisibleText,
+			liveChange: function () {
+				this._setFilterDetailItemsVisibility(oFilterDetailList);
 
+				// announce number of visible items
+				var iVisibleItems = oFilterDetailList.getItems().filter(function (oItem) { return oItem.getVisible(); }).length;
+				this._oInvisibleMessage.announce(this._rb.getText("VIEWSETTINGS_FOUND_RESULTS", [iVisibleItems]), InvisibleMessageMode.Polite);
+			}.bind(this)
+		});
 		return oFilterSearchField;
 	};
 

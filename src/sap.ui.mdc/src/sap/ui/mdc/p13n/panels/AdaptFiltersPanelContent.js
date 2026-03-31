@@ -479,10 +479,11 @@ sap.ui.define([
 					`${this.P13N_MODEL}>${this.PRESENCE_ATTRIBUTE}`,
 					`${this.P13N_MODEL}>isFiltered`,
 					`${this.P13N_MODEL}>position`,
-					`${this.P13N_MODEL}>visibleInDialog`
+					`${this.P13N_MODEL}>visibleInDialog`,
+					`${this.P13N_MODEL}>required`
 				],
-				formatter: (bVisible, bIsFiltered, iPosition, visibleInDialog) => {
-					return visibleInDialog && (bVisible || bIsFiltered || iPosition >= 0);
+				formatter: (bVisible, bIsFiltered, iPosition, visibleInDialog, bRequired) => {
+					return visibleInDialog && (bVisible || bIsFiltered || iPosition >= 0 || bRequired);
 				}
 			}
 		});
@@ -608,7 +609,7 @@ sap.ui.define([
 			span: "XL8 L8 M8 S8"
 		}));
 
-		const oFilterClone = oFilterControl.clone();
+		const oFilterClone = oFilterControl?.clone();
 		if (oFilterClone.isA("sap.ui.mdc.filterbar.p13n.FilterGroupLayout")) {
 			oFilterClone.setFilterField(oField);
 		}

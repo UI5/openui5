@@ -51,6 +51,11 @@ sap.ui.define([
 				this._oNodeIdToControlIdMap = {};
 				this._iSnapshotsCount = 0;
 				this._iNodesCount = 0;  // count of nodes in last snapshot
+				ControlInspector.updateSettings({
+					preferViewId: true, // prefer view-relative control id over global control id
+					preferViewNameAsViewLocator: true,
+					separateViewNamespace: true
+				});
 			} else {
 				Log.warning("Only one ControlTree allowed");
 				return oControlTree;

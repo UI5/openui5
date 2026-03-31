@@ -269,28 +269,8 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					]
 				}
 			},
-			"AdaptFiltersJourneyGeneral": {
-				group: "FilterBar UI Test",
-				autostart: false,
-				module: "./OpaTests/P13nOpa.qunit",
-				ui5: {
-					libs: [
-						"sap.ui.fl", "sap.ui.mdc"
-					]
-				}
-			},
 			"NEWAdaptFiltersJourneyGeneral": {
 				group: "FilterBar UI Test",
-				autostart: false,
-				module: "./OpaTests/P13nOpa.qunit",
-				ui5: {
-					libs: [
-						"sap.ui.fl", "sap.ui.mdc"
-					]
-				}
-			},
-			"PersonalizationFilterBarVariants": {
-				group: "FilterBar UI Test - variant based",
 				autostart: false,
 				module: "./OpaTests/P13nOpa.qunit",
 				ui5: {
@@ -309,27 +289,7 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					]
 				}
 			},
-			"PersonalizationFilterBarRTA": {
-				group: "FilterBar UI Test",
-				autostart: false,
-				module: "./OpaTests/P13nOpa.qunit",
-				ui5: {
-					libs: [
-						"sap.ui.fl", "sap.ui.mdc"
-					]
-				}
-			},
 			"NEWPersonalizationFilterBarRTA": {
-				group: "FilterBar UI Test",
-				autostart: false,
-				module: "./OpaTests/P13nOpa.qunit",
-				ui5: {
-					libs: [
-						"sap.ui.fl", "sap.ui.mdc"
-					]
-				}
-			},
-			"InternalAndExternalFiltering": {
 				group: "FilterBar UI Test",
 				autostart: false,
 				module: "./OpaTests/P13nOpa.qunit",

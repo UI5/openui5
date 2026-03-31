@@ -205,4 +205,100 @@ sap.ui.define([
 		assert.ok(!mSelector.viewId, "myView", "Should not add generated view ID");
 		assert.ok(!mSelector.viewName, "myView", "Should not add non-unique view name");
 	});
+
+	QUnit.module("_Selector - preferViewNameAsViewLocator", {
+		beforeEach: function (assert) {
+			return XMLView.create({
+				id: "stableView",
+				definition:
+					'<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" viewName="my.stable.View">' +
+					'<App id="myApp"><Page id="page1"><Input id="myInput"></Input></Page></App>' +
+					'</mvc:View>'
+			}).then(function(oView) {
+				this.oView = oView.placeAt("qunit-fixture");
+				this.oInput = this.oView.byId("myInput");
+				return nextUIUpdate();
+			}.bind(this), function(oErr) {
+				assert.strictEqual(oErr, undefined, "failed to load view");
+			});
+		},
+		afterEach: function () {
+			this.oView.destroy();
+		}
+	});
+
+	QUnit.test("Should use viewName in base decoration when preferViewNameAsViewLocator is true", function (assert) {
+		singleStub.returns({
+			property: "value"
+		});
+		var oSelector = new SingleSelector();
+		var mSelector = oSelector.generate(this.oInput, undefined, { preferViewNameAsViewLocator: true });
+		assert.strictEqual(mSelector.viewName, "my.stable.View", "Should have viewName");
+		assert.ok(!mSelector.viewId, "Should not have viewId");
+		assert.strictEqual(mSelector.controlType, "sap.m.Input", "Should still have controlType");
+	});
+
+	QUnit.test("Should use viewId in base decoration by default", function (assert) {
+		singleStub.returns({
+			property: "value"
+		});
+		var oSelector = new SingleSelector();
+		var mSelector = oSelector.generate(this.oInput);
+		assert.strictEqual(mSelector.viewId, "stableView", "Should have viewId");
+		assert.strictEqual(mSelector.viewName, "my.stable.View", "Should have viewName");
+	});
+
+	QUnit.module("_Selector - separateViewNamespace", {
+		beforeEach: function (assert) {
+			return XMLView.create({
+				id: "nsView",
+				definition:
+					'<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" viewName="sap.my.app.namespace.MyView">' +
+					'<App id="myApp"><Page id="page1"><Input id="myInput"></Input></Page></App>' +
+					'</mvc:View>'
+			}).then(function(oView) {
+				this.oView = oView.placeAt("qunit-fixture");
+				this.oInput = this.oView.byId("myInput");
+				return nextUIUpdate();
+			}.bind(this), function(oErr) {
+				assert.strictEqual(oErr, undefined, "failed to load view");
+			});
+		},
+		afterEach: function () {
+			this.oView.destroy();
+		}
+	});
+
+	QUnit.test("Should split viewName in base decoration when separateViewNamespace is true and preferViewNameAsViewLocator is true", function (assert) {
+		singleStub.returns({
+			property: "value"
+		});
+		var oSelector = new SingleSelector();
+		var mSelector = oSelector.generate(this.oInput, undefined, { preferViewNameAsViewLocator: true, separateViewNamespace: true });
+		assert.strictEqual(mSelector.viewName, "MyView", "Should have short viewName");
+		assert.strictEqual(mSelector.viewNamespace, "sap.my.app.namespace", "Should have viewNamespace");
+		assert.ok(!mSelector.viewId, "Should not have viewId");
+		assert.strictEqual(mSelector.controlType, "sap.m.Input", "Should still have controlType");
+	});
+
+	QUnit.test("Should split viewName in base decoration with viewId when separateViewNamespace is true", function (assert) {
+		singleStub.returns({
+			property: "value"
+		});
+		var oSelector = new SingleSelector();
+		var mSelector = oSelector.generate(this.oInput, undefined, { separateViewNamespace: true });
+		assert.strictEqual(mSelector.viewName, "MyView", "Should have short viewName");
+		assert.strictEqual(mSelector.viewNamespace, "sap.my.app.namespace", "Should have viewNamespace");
+		assert.strictEqual(mSelector.viewId, "nsView", "Should have viewId");
+	});
+
+	QUnit.test("Should keep full viewName in base decoration when separateViewNamespace is false", function (assert) {
+		singleStub.returns({
+			property: "value"
+		});
+		var oSelector = new SingleSelector();
+		var mSelector = oSelector.generate(this.oInput, undefined, { preferViewNameAsViewLocator: true, separateViewNamespace: false });
+		assert.strictEqual(mSelector.viewName, "sap.my.app.namespace.MyView", "Should have full viewName");
+		assert.ok(!mSelector.viewNamespace, "Should not have viewNamespace");
+	});
 });

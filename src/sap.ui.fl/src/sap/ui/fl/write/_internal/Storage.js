@@ -290,13 +290,17 @@ sap.ui.define([
 	 * The promise is rejected in case the writing failed or no connector is configured to handle the layer.
 	 *
 	 * @param {object} mPropertyBag - Contains additional information for all the Connectors
-	 * @param {object} mPropertyBag.flexObject - Flex object to be deleted
-	 * @param {sap.ui.fl.Layer} mPropertyBag.layer - Layer on which the data should be deleted
+	 * @param {object} mPropertyBag.flexObject - Flex object to be updated
+	 * @param {sap.ui.fl.Layer} mPropertyBag.layer - Layer on which the data should be updated
 	 * @param {string} [mPropertyBag._transport] - The transport ID which will be handled internally, so there is no need to be passed
-	 * @returns {Promise} Promise resolving as soon as the writing was completed or rejects in case of an error
+	 * @returns {Promise<object[]>} Promise resolving as soon as the writing was completed or rejects in case of an error
 	 */
-	Storage.update = function(mPropertyBag) {
-		return _executeActionByName("update", mPropertyBag);
+	Storage.update = async function(mPropertyBag) {
+		const oReturn = await _executeActionByName("update", mPropertyBag);
+		if (oReturn?.response && !Array.isArray(oReturn.response)) {
+			oReturn.response = [oReturn.response];
+		}
+		return oReturn;
 	};
 
 	/**
