@@ -4,20 +4,13 @@
 		"id": "teamCalendar",
 		"applicationVersion": {
 			"version": "1.0.0"
-		},
-		"type": "application",
-		"title": "Application 'teamCalendar'"
-	},
-	"sap.ui": {
-		"technology": "UI5",
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
 		}
 	},
 	"sap.ui5": {
-		"rootView": "teamCalendar.view.Main",
+		"rootView": {
+			"viewName": "teamCalendar.view.Main",
+			"type": "XML"
+		},
 		"models": {
 			"calendar": {
 				"type": "sap.ui.model.json.JSONModel",
@@ -25,7 +18,6 @@
 			}
 		},
 		"dependencies": {
-			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {},
 				"sap.ui.core": {},

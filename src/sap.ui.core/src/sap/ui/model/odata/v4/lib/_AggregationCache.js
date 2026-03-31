@@ -748,7 +748,7 @@ sap.ui.define([
 	 * @param {object} oAggregation
 	 *   An object holding the information needed for data aggregation; see also "OData Extension
 	 *   for Data Aggregation Version 4.0"; must already be normalized by
-	 *   {@link _AggregationHelper.buildApply} - it's MODIFIED here!
+	 *   {@link _AggregationHelper.buildApply}
 	 * @param {boolean} bHasGrandTotal
 	 *   Whether a grand total is needed
 	 *

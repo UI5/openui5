@@ -17,7 +17,7 @@
 				</f:heading>
 				<f:snappedTitleOnMobile>
 					<Title
-						text="{calendar>title}"/>
+						text="{calendar>/title}"/>
 				</f:snappedTitleOnMobile>
 			</f:DynamicPageTitle>
 		</f:title>

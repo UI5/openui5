@@ -3,9 +3,11 @@
  */
 
 sap.ui.define([
-	"sap/ui/core/Lib"
+	"sap/ui/core/Lib",
+	"sap/ui/fl/write/api/FeaturesAPI"
 ], function(
-	Lib
+	Lib,
+	FeaturesAPI
 ) {
 	"use strict";
 
@@ -65,6 +67,29 @@ sap.ui.define([
 	 */
 	const aWhatsNewFeaturesContent =
 	[
+		{
+			featureId: "ContextBasedAdaptationCF",
+			title: oTextResources.getText("TIT_WHATS_NEW_CBA_CF_TITLE"),
+			description: oTextResources.getText("TXT_WHATS_NEW_DIALOG_CBA_CF_DESCRIPTION"),
+			documentationUrls: {
+				btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/adapting-ui-for-specific-roles-all-you-need-to-know",
+				s4HanaCloudUrl: null,
+				s4HanaOnPremUrl: null
+			},
+			information: [
+				{
+					text: oTextResources.getText("TXT_WHATS_NEW_DIALOG_CBA_CF_TEXT"),
+					image: getImagePath("CBAInitial.png")
+				},
+				{
+					text: oTextResources.getText("TXT_WHATS_NEW_DIALOG_CBA_CF_TEXT_2"),
+					image: getImagePath("CBAPrios.png")
+				}
+			],
+			isFeatureApplicable(sLayer) {
+				return FeaturesAPI.isContextBasedAdaptationAvailable(sLayer);
+			}
+		},
 		{
 			featureId: "GuidedTour",
 			title: oTextResources.getText("TIT_WHATS_NEW_RTA_TOUR_TITLE"),

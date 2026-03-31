@@ -50,7 +50,7 @@ sap.ui.define([
 
 	DetailsDialogExtension.prototype._openDetailsDialog = function () {
 		var oCard = this.getCard(),
-			sUrl = oCard.getRuntimeUrl("./detailsCard.json"),
+			sUrl = oCard.resolveUrl("./detailsCard.json"),
 			oDetailsCard = new Card({
 				manifest: sUrl,
 				width: "100%",

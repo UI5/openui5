@@ -12,12 +12,10 @@ sap.ui.define(
 		 * @param {string} sDateTimeUTC a date in UTC string format
 		 * @returns {object} new date object created from sDateTimeUTC string
 		 */
-		utcToLocalDateTime : function (sDateTimeUTC) {
-
+		utcToLocalDateTime(sDateTimeUTC) {
 			if (!sDateTimeUTC) {
 				return null;
 			}
-
 			return new Date(sDateTimeUTC);
 		},
 
@@ -29,10 +27,9 @@ sap.ui.define(
 		 * @param {string} sImage an image URL
 		 * @returns {string} prefixed image URL (if necessary)
 		 */
-		fixImagePath : function (sImage) {
-			if (sImage && sImage.substr(0, 11) !== "sap-icon://") {
+		fixImagePath(sImage) {
+			if (sImage && !sImage.startsWith("sap-icon://")) {
 				sImage = this.imagePath + sImage;
-
 			}
 			return sImage;
 		}

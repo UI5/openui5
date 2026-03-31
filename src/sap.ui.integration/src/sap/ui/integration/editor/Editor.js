@@ -1357,32 +1357,37 @@ sap.ui.define([
 	};
 
 	/**
-	 * Resolves the given URL relatively to the manifest base path.
+	 * Resolves the given URL relative to the manifest base path.
 	 * Absolute paths are not changed.
 	 *
 	 * @example
-	 * oEditor.getRuntimeUrl("images/Avatar.png") === "sample/card/images/Avatar.png"
-	 * oEditor.getRuntimeUrl("http://www.someurl.com/Avatar.png") === "http://www.someurl.com/Avatar.png"
-	 * oEditor.getRuntimeUrl("https://www.someurl.com/Avatar.png") === "https://www.someurl.com/Avatar.png"
+	 * oEditor.resolveUrl("images/Avatar.png") === "sample/card/images/Avatar.png"
+	 * oEditor.resolveUrl("http://www.someurl.com/Avatar.png") === "http://www.someurl.com/Avatar.png"
+	 * oEditor.resolveUrl("https://www.someurl.com/Avatar.png") === "https://www.someurl.com/Avatar.png"
 	 *
 	 * @ui5-restricted
 	 * @param {string} sUrl The URL to resolve.
 	 * @returns {string} The resolved URL.
 	 */
-	 Editor.prototype.getRuntimeUrl = function (sUrl) {
-		var sAppId = this._sAppId,
-			sAppName,
+	 Editor.prototype.resolveUrl = function (sUrl) {
+		var sAppName,
 			sSanitizedUrl = sUrl && sUrl.trim().replace(/^\//, "");
 
-		if (sAppId === null) {
-			Log.error("sap.ui.integration.editor.Editor: manifest is not ready so the URL can not be resolved. Consider using the 'manifestReady' event.", "sap.ui.integration.editor.Editor");
+		if (!this._oManifest) {
+			Log.error("sap.ui.integration.editor.Editor: The manifest is not ready so the URL can not be resolved. Consider using the 'manifestReady' event.", "sap.ui.integration.editor.Editor");
 			return null;
 		}
 
-		if (!sAppId ||
-			sUrl.startsWith("http://") ||
+		const sAppId = this._sAppId;
+
+		if (sUrl.startsWith("http://") ||
 			sUrl.startsWith("https://") ||
 			sUrl.startsWith("//")) {
+			return sUrl;
+		}
+
+		if (!sAppId) {
+			Log.error("The manifest property 'sap.app/id' is missing or empty. The URL '" + sUrl + "' cannot be resolved.", "sap.ui.integration.editor.Editor");
 			return sUrl;
 		}
 
@@ -1391,6 +1396,25 @@ sap.ui.define([
 		// do not use sap.ui.require.toUrl(sAppName + "/" + sSanitizedUrl)
 		// because it doesn't work when the sSanitizedUrl starts with ".."
 		return sap.ui.require.toUrl(sAppName) + "/" + sSanitizedUrl;
+	};
+
+	/**
+	 * Resolves the given URL relative to the manifest base path.
+	 * Absolute paths are not modified.
+	 *
+	 * @example
+	 * oEditor.resolveUrl("images/Avatar.png") === "sample/card/images/Avatar.png"
+	 * oEditor.resolveUrl("http://www.someurl.com/Avatar.png") === "http://www.someurl.com/Avatar.png"
+	 * oEditor.resolveUrl("https://www.someurl.com/Avatar.png") === "https://www.someurl.com/Avatar.png"
+	 *
+	 * @deprecated As of version 1.146, replaced by {@link sap.ui.integration.editor.Editor#resolveUrl}
+	 * @ui5-restricted
+	 * @param {string} sUrl The URL to resolve.
+	 * @returns {string} The resolved URL.
+	 */
+	Editor.prototype.getRuntimeUrl = function (sUrl) {
+		Log.warning("'getRuntimeUrl' is deprecated. Use 'resolveUrl' instead.", "sap.ui.integration.editor.Editor");
+		return this.resolveUrl(sUrl);
 	};
 
 	/**

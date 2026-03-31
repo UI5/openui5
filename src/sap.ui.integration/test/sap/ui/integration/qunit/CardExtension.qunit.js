@@ -794,7 +794,7 @@ sap.ui.define([
 			{ name: "refresh", params: [] },
 			{ name: "refreshData", params: [] },
 			{ name: "showMessage", params: ["sMessage", "sType", "bAutoClose"], testArgs: ["Test message", "Information", false] },
-			{ name: "getBaseUrl", params: [] },
+			{ name: "resolveUrl", params: ["sUrl"], testArgs: ["test/url"] },
 			{ name: "getRuntimeUrl", params: ["sUrl"], testArgs: ["test/url"] },
 			{ name: "getTranslatedText", params: ["sKey", "aArgs", "bIgnoreKeyFallback"], testArgs: ["TEST_KEY"] },
 			{ name: "getModel", params: ["sName"] },

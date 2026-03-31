@@ -82,7 +82,7 @@ sap.ui.define([
 
 	FooterExtension.prototype._openSnack = function () {
 		var oCard = this.getCard(),
-			sUrl = oCard.getRuntimeUrl("./snack.json"),
+			sUrl = oCard.resolveUrl("./snack.json"),
 			oSnack = new Card({
 				manifest: sUrl,
 				width: "100%",

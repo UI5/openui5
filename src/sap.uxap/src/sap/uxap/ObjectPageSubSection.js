@@ -340,15 +340,25 @@ sap.ui.define([
 
 	/* ========== ObjectPageSubSection actions aggregation methods ========== */
 
+	/**
+	 * Returns the number of fixed toolbar slots that precede user-added actions.
+	 * The default is NUMBER_OF_ADDITIONAL_ACTIONS (Title + ToolbarSpacer = 2).
+	 * @returns {int}
+	 * @private
+	 */
+	ObjectPageSubSection.prototype._getActionsOffset = function () {
+		return ObjectPageSubSection.NUMBER_OF_ADDITIONAL_ACTIONS;
+	};
+
 	ObjectPageSubSection.prototype.addAction = function (oAction) {
-		this._getHeaderToolbar()?.insertContent(oAction, ObjectPageSubSection.NUMBER_OF_ADDITIONAL_ACTIONS + this.getActions().length);
+		this._getHeaderToolbar()?.insertContent(oAction, this._getActionsOffset() + this.getActions().length);
 		this._preProcessAction(oAction, "actions");
 
 		return this;
 	};
 
 	ObjectPageSubSection.prototype.insertAction = function (oAction, iIndex) {
-		var iIndexToInsertAt = iIndex + ObjectPageSubSection.NUMBER_OF_ADDITIONAL_ACTIONS;
+		var iIndexToInsertAt = iIndex + this._getActionsOffset();
 		this._getHeaderToolbar()?.insertContent(oAction, iIndexToInsertAt);
 		this._preProcessAction(oAction, "actions");
 
@@ -387,7 +397,7 @@ sap.ui.define([
 	};
 
 	ObjectPageSubSection.prototype.getActions = function () {
-		return this._getHeaderToolbar()?.getContent().slice(ObjectPageSubSection.NUMBER_OF_ADDITIONAL_ACTIONS) || [];
+		return this._getHeaderToolbar()?.getContent().slice(this._getActionsOffset()) || [];
 	};
 
 	ObjectPageSubSection.prototype.indexOfAction = function (oAction) {

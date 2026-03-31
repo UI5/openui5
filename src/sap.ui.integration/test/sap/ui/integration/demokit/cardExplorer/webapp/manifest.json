@@ -44,6 +44,7 @@
 				"sap.m": {},
 				"sap.tnt": {},
 				"sap.ui.core": {},
+				"sap.ui.documentation": {},
 				"sap.ui.integration": {
 					"lazy": true
 				},

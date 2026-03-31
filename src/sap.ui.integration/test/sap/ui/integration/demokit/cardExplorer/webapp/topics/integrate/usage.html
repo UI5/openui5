@@ -87,6 +87,25 @@ const oCard = new Card({
 someContainer.addContent(oCard);
 </pre>
 
+			<h3 id="urlResolution">How baseUrl Resolves URLs</h3>
+			<p>
+				When a card uses a manifest object, the <code>baseUrl</code> serves as the base path for resolving relative URLs in the card manifest.
+				This includes data requests, icon paths, i18n resource bundles, and extension modules.
+			</p>
+			<p>
+				<b>URL resolution behavior:</b>
+			</p>
+			<ul>
+				<li><b>Relative paths</b> such as <code>"./images/icon.png"</code> or <code>"./data.json"</code> are resolved relative to the <code>baseUrl</code>.</li>
+				<li><b>Absolute URLs</b> such as <code>"https://example.com/data.json"</code> are used as-is without resolution.</li>
+				<li><b>Root-absolute paths</b> such as <code>"/images/icon.png"</code> are resolved relative to the host application root.
+					<br><b>Note:</b> Card developers should avoid root-absolute paths. Use relative paths, destinations, or absolute URLs instead.</li>
+			</ul>
+			<p>
+				When using a manifest URL instead of a manifest object, the <code>baseUrl</code> is automatically derived from the manifest's location.
+				If both a manifest URL and an explicit <code>baseUrl</code> are provided, the explicit <code>baseUrl</code> takes precedence.
+			</p>
+
 			<h1 id="FirstConsumptionHTML">Consumption in HTML</h1>
 			<p>
 				Cards can also be consumed in HTML. To do that you should load the integration card bundle which

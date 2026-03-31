@@ -252,10 +252,14 @@ sap.ui.define([
 				},
 
 				/**
-				 * Defines the base URL of the card manifest. It should be used when manifest property is an object instead of a URL.
-				 * If both manifest URL and base URL are defined - the base URL will be used for loading dependencies.
-				 * If both manifest URL and base URL are not defined - relative resources might not be loaded correctly.
-				 * @ui5-experimental-since 1.70
+				 * Defines the base URL of the card manifest. It must be provided when the manifest is an object and not a URL.
+				 * The base URL is used to load relatively referenced resources.
+				 *
+				 *	If the base URL is not defined and the manifest URL is defined, the manifest URL is used as the base URL.
+				 *	<ul>
+				 *	<li>If both the manifest URL and the base URL are defined, the base URL is used.</li>
+				 *	<li>If neither the manifest URL nor the base URL is defined, relative resources will not load correctly.</li>
+				 *	</ul>
 				 */
 				baseUrl: {
 					type: "sap.ui.core.URI",
@@ -638,8 +642,7 @@ sap.ui.define([
 		 * @borrows sap.ui.integration.widgets.Card#refreshData as refreshData
 		 * @borrows sap.ui.integration.widgets.Card#showMessage as showMessage
 		 * @borrows sap.ui.integration.widgets.Card#hideMessage as hideMessage
-		 * @borrows sap.ui.integration.widgets.Card#getBaseUrl as getBaseUrl
-		 * @borrows sap.ui.integration.widgets.Card#getRuntimeUrl as getRuntimeUrl
+		 * @borrows sap.ui.integration.widgets.Card#resolveUrl as resolveUrl
 		 * @borrows sap.ui.integration.widgets.Card#getTranslatedText as getTranslatedText
 		 * @borrows sap.ui.integration.widgets.Card#triggerAction as triggerAction
 		 * @borrows sap.ui.integration.widgets.Card#addActionDefinition as addActionDefinition
@@ -671,7 +674,8 @@ sap.ui.define([
 			"refreshData",
 			"showMessage",
 			"getBaseUrl",
-			"getRuntimeUrl",
+			"resolveUrl",
+			"getRuntimeUrl", // @deprecated since 1.147.0
 			"getTranslatedText",
 			"getModel",
 			"triggerAction",
@@ -691,6 +695,13 @@ sap.ui.define([
 			"hideBlockingMessage",
 			"getBlockingMessage"
 		]);
+
+		// Temporary compatibility for deprecated getBaseUrl method
+		const fnOriginalGetBaseUrl = this._oLimitedInterface.getBaseUrl;
+		this._oLimitedInterface.getBaseUrl = function() {
+			Log.warning("Method 'getBaseUrl' must not be used through the card interface. It will be removed soon. Use 'resolveUrl' instead.");
+			return fnOriginalGetBaseUrl.apply(this, arguments);
+		};
 	};
 
 	/**
@@ -1863,34 +1874,39 @@ sap.ui.define([
 	};
 
 	/**
-	 * Resolves the given URL relatively to the manifest base path.
+	 * Resolves the given URL relative to the manifest base path.
 	 * Absolute paths are not changed.
 	 *
 	 * @example
-	 * oCard.getRuntimeUrl("images/Avatar.png") === "{cardBaseUrl}/images/Avatar.png"
-	 * oCard.getRuntimeUrl("/images/Avatar.png") === "/images/Avatar.png" (remains relative to host root)
-	 * oCard.getRuntimeUrl("http://www.someurl.com/Avatar.png") === "http://www.someurl.com/Avatar.png"
-	 * oCard.getRuntimeUrl("https://www.someurl.com/Avatar.png") === "https://www.someurl.com/Avatar.png"
+	 * oCard.resolveUrl("images/Avatar.png") === "{cardBaseUrl}/images/Avatar.png"
+	 * oCard.resolveUrl("/images/Avatar.png") === "/images/Avatar.png" (remains relative to host root)
+	 * oCard.resolveUrl("http://www.someurl.com/Avatar.png") === "http://www.someurl.com/Avatar.png"
+	 * oCard.resolveUrl("https://www.someurl.com/Avatar.png") === "https://www.someurl.com/Avatar.png"
 	 *
 	 * @ui5-restricted
 	 * @param {string} sUrl The URL to resolve.
 	 * @returns {string} The resolved URL.
 	 */
-	Card.prototype.getRuntimeUrl = function (sUrl) {
+	Card.prototype.resolveUrl = function (sUrl) {
 		if (!sUrl) {
 			sUrl = "";
 		}
 
-		const sAppId = this._oCardManifest ? this._oCardManifest.get("/sap.app/id") : null;
-		if (sAppId === null) {
+		if (!this._oCardManifest) {
 			Log.error("The manifest is not ready so the URL can not be resolved. Consider using the 'manifestReady' event.", "sap.ui.integration.widgets.Card");
 			return null;
 		}
 
-		if (!sAppId ||
-			sUrl.startsWith("http://") ||
+		const sAppId = this._oCardManifest.get("/sap.app/id");
+
+		if (sUrl.startsWith("http://") ||
 			sUrl.startsWith("https://") ||
 			sUrl.startsWith("//")) {
+			return sUrl;
+		}
+
+		if (!sAppId) {
+			Log.error("The manifest property 'sap.app/id' is missing or empty. The URL '" + sUrl + "' cannot be resolved.", "sap.ui.integration.widgets.Card");
 			return sUrl;
 		}
 
@@ -1905,6 +1921,26 @@ sap.ui.define([
 		// do not use sap.ui.require.toUrl(sAppName + "/" + sSanitizedUrl)
 		// because it doesn't work when the sSanitizedUrl starts with ".."
 		return sap.ui.require.toUrl(sAppName) + "/" + sSanitizedUrl;
+	};
+
+	/**
+	 * Resolves the given URL relative to the manifest base path.
+	 * Absolute paths are not changed.
+	 *
+	 * @example
+	 * oCard.getRuntimeUrl("images/Avatar.png") === "{cardBaseUrl}/images/Avatar.png"
+	 * oCard.getRuntimeUrl("/images/Avatar.png") === "/images/Avatar.png" (remains relative to host root)
+	 * oCard.getRuntimeUrl("http://www.someurl.com/Avatar.png") === "http://www.someurl.com/Avatar.png"
+	 * oCard.getRuntimeUrl("https://www.someurl.com/Avatar.png") === "https://www.someurl.com/Avatar.png"
+	 *
+	 * @deprecated As of version 1.146, replaced by {@link sap.ui.integration.widgets.Card#resolveUrl}
+	 * @ui5-restricted
+	 * @param {string} sUrl The URL to resolve.
+	 * @returns {string} The resolved URL.
+	 */
+	Card.prototype.getRuntimeUrl = function (sUrl) {
+		Log.warning("'getRuntimeUrl' is deprecated. Use 'resolveUrl' instead.", "sap.ui.integration.widgets.Card");
+		return this.resolveUrl(sUrl);
 	};
 
 	/**
@@ -2353,7 +2389,7 @@ sap.ui.define([
 					sAncestorUrl = new URL(oAncestor.getManifest(), window.location).href;
 				}
 
-				if (new URL(this.getRuntimeUrl(manifest), window.location).href === sAncestorUrl) {
+				if (new URL(this.resolveUrl(manifest), window.location).href === sAncestorUrl) {
 					sMatchingChildManifestUrl = manifest;
 					break;
 				}
@@ -3486,13 +3522,13 @@ sap.ui.define([
 		}
 
 		if (typeof vManifest === "string") {
-			oChildCard.setManifest(this.getRuntimeUrl(vManifest));
+			oChildCard.setManifest(this.resolveUrl(vManifest));
 			if (sBaseUrl) {
 				oChildCard.setBaseUrl(sBaseUrl);
 			}
 		} else {
 			oChildCard.setManifest(vManifest);
-			oChildCard.setBaseUrl(sBaseUrl || this.getRuntimeUrl());
+			oChildCard.setBaseUrl(sBaseUrl || this.resolveUrl());
 		}
 
 		return oChildCard;

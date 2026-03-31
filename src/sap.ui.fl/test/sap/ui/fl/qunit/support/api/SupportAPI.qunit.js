@@ -1,8 +1,11 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/Log",
+	"sap/base/util/Deferred",
 	"sap/ui/core/Component",
 	"sap/ui/core/ComponentContainer",
+	"sap/ui/core/ComponentRegistry",
 	"sap/ui/fl/apply/_internal/flexState/changes/UIChangesState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
@@ -12,10 +15,14 @@ sap.ui.define([
 	"sap/ui/fl/support/_internal/extractChangeDependencies",
 	"sap/ui/fl/support/api/SupportAPI",
 	"sap/ui/fl/Utils",
+	"sap/m/MessageBox",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	Log,
+	Deferred,
 	Component,
 	ComponentContainer,
+	ComponentRegistry,
 	UIChangesState,
 	VariantManagementState,
 	FlexObjectState,
@@ -25,17 +32,18 @@ sap.ui.define([
 	extractChangeDependencies,
 	SupportAPI,
 	Utils,
+	MessageBox,
 	sinon
 ) {
 	"use strict";
 
 	const sandbox = sinon.createSandbox();
 
-	QUnit.module("When the SupportAPI is called with a standalone app without iframe", {
+	QUnit.module("Module 1: Standalone Application Scenarios (No UShell)", {
 		async beforeEach() {
 			const oComponent = await Component.create({
 				name: "testComponentAsync",
-				id: "testComponentAsync"
+				id: "testComponentStandalone"
 			});
 			this.oComponentContainer = new ComponentContainer({
 				component: oComponent,
@@ -48,36 +56,46 @@ sap.ui.define([
 			this.oComponentContainer.destroy();
 		}
 	}, function() {
-		QUnit.test("when getAllUIChanges is called", async function(assert) {
-			const oGetAllChangesStub = sandbox.stub(UIChangesState, "getAllUIChanges").returns(["myChange"]);
-			const aAllChanges = await SupportAPI.getAllUIChanges();
-			assert.strictEqual(oGetAllChangesStub.getCall(0).args[0], "testComponentAsync", "then the correct reference is passed");
-			assert.deepEqual(aAllChanges, ["myChange"], "then the change is returned");
+		QUnit.test("getAllUIChanges - retrieves all UI changes", async function(assert) {
+			const aExpectedChanges = [
+				{ id: "change1", changeType: "addField" },
+				{ id: "change2", changeType: "hideControl" }
+			];
+			sandbox.stub(UIChangesState, "getAllUIChanges").returns(aExpectedChanges);
+
+			const aChanges = await SupportAPI.getAllUIChanges();
+
+			assert.deepEqual(aChanges, aExpectedChanges, "Returns all UI changes");
+			assert.ok(UIChangesState.getAllUIChanges.calledOnce, "getAllUIChanges was called once");
+		});
+
+		QUnit.test("getApplicationComponent - returns component in standalone", async function(assert) {
+			const oComponent = await SupportAPI.getApplicationComponent();
+
+			assert.ok(oComponent, "Component is returned");
+			assert.strictEqual(oComponent.getId(), "testComponentStandalone", "Correct component ID");
 		});
 	});
 
-	QUnit.module("When the SupportAPI is called with an app embedded in a FLP sandbox", {
+	QUnit.module("Module 2: FLP Scenarios (with UShell and Component)", {
 		async beforeEach() {
-			const oComponent = await Component.create({
+			this.oComponent = await Component.create({
 				name: "testComponentAsync",
-				id: "testComponentAsync"
+				id: "testComponentFLP"
 			});
 			this.oComponentContainer = new ComponentContainer({
-				component: oComponent,
+				component: this.oComponent,
 				async: true
 			});
 			sandbox.stub(Utils, "getUshellContainer").returns(true);
-			sandbox.stub(Utils, "getUShellService").resolves({
-				getCurrentApplication: () => {
-					return {
-						componentInstance: oComponent
-					};
-				}
+			sandbox.stub(Utils, "getUShellService")
+			.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => ({
+					componentInstance: this.oComponent
+				})
 			});
 
 			this.getFlexReferenceForControlSpy = sandbox.spy(ManifestUtils, "getFlexReferenceForControl");
-			this.getAllUIChangesStub = sandbox.stub(UIChangesState, "getAllUIChanges")
-			.resolves(["myFlpChange"]);
 			this.getObjectDataSelectorStub = sandbox.stub(FlexState, "getFlexObjectsDataSelector")
 			.returns({
 				get: () => {
@@ -96,19 +114,31 @@ sap.ui.define([
 					return "variantManagementMap";
 				}
 			});
+			this.getAllUIChangesStub = sandbox.stub(UIChangesState, "getAllUIChanges").returns([
+				{ id: "flpChange1", changeType: "rename" }
+			]);
 		},
 		afterEach() {
 			sandbox.restore();
 			this.oComponentContainer.destroy();
 		}
 	}, function() {
-		QUnit.test("when getAllUIChanges is called", async function(assert) {
-			const aAllChanges = await SupportAPI.getAllUIChanges();
-			assert.strictEqual(this.getAllUIChangesStub.getCall(0).args[0], "testComponentAsync", "then the correct reference is passed");
-			assert.deepEqual(aAllChanges, ["myFlpChange"], "then the change is returned");
+		QUnit.test("getAllUIChanges - in FLP context", async function(assert) {
+			const aChanges = await SupportAPI.getAllUIChanges();
+
+			assert.ok(Array.isArray(aChanges), "Returns an array");
+			assert.strictEqual(aChanges.length, 1, "Returns one change");
+			assert.strictEqual(aChanges[0].id, "flpChange1", "Correct change ID");
 		});
 
-		QUnit.test("when getFlexObjectInfo is called", async function(assert) {
+		QUnit.test("getApplicationComponent - retrieves FLP component", async function(assert) {
+			const oComponent = await SupportAPI.getApplicationComponent();
+
+			assert.ok(oComponent, "Component is returned");
+			assert.strictEqual(oComponent.getId(), "testComponentFLP", "Correct FLP component ID");
+		});
+
+		QUnit.test("getFlexObjectInfos - in FLP context", async function(assert) {
 			const oFlexObjectInfos = await SupportAPI.getFlexObjectInfos();
 
 			assert.strictEqual(
@@ -166,7 +196,8 @@ sap.ui.define([
 				"testComponentAsync",
 				"then the flex reference is passed to the live dependency map function"
 			);
-			assert.strictEqual(oFlexObjectInfos.liveDependencyMap,
+			assert.strictEqual(
+				oFlexObjectInfos.liveDependencyMap,
 				"liveDependencyMap",
 				"then the live dependency map is returned"
 			);
@@ -190,9 +221,14 @@ sap.ui.define([
 				"testComponentAsync",
 				"then the flex reference is passed to the all UI changes function"
 			);
+			assert.deepEqual(
+				oFlexObjectInfos.allUIChanges,
+				[{ id: "flpChange1", changeType: "rename" }],
+				"then the all UI changes are returned"
+			);
 		});
 
-		QUnit.test("when getFlexSettings is called", async function(assert) {
+		QUnit.test("getFlexSettings - in FLP context", async function(assert) {
 			const oSettings = await Settings.getInstance();
 			oSettings.mySampleGetter = function() {
 				return "mySampleValue";
@@ -220,7 +256,7 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("when getChangeDependencies is called", async function(assert) {
+		QUnit.test("getChangeDependencies - in FLP context", async function(assert) {
 			const oExtractChangeDependenciesStub = sandbox.stub(extractChangeDependencies, "extract").returns("dependencyMap");
 			const oChangeDependencies = await SupportAPI.getChangeDependencies();
 
@@ -236,24 +272,177 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("when getApplicationComponent is called", async function(assert) {
-			const oComponent = await SupportAPI.getApplicationComponent();
-			assert.strictEqual(oComponent.getId(), "testComponentAsync", "then the correct component is returned");
-			assert.ok(oComponent, "then a component is returned");
+		QUnit.test("printAllUIChanges - logs to console in FLP context", async function(assert) {
+			const oConsoleStub = sandbox.stub(console, "log");
+
+			await SupportAPI.printAllUIChanges();
+
+			assert.ok(oConsoleStub.calledOnce, "Console.log was called");
+			assert.ok(Array.isArray(oConsoleStub.getCall(0).args[0]), "Logged data is an array");
+		});
+
+		QUnit.test("printFlexObjectInfos - logs to console in FLP context", async function(assert) {
+			const oConsoleStub = sandbox.stub(console, "log");
+
+			await SupportAPI.printFlexObjectInfos();
+
+			assert.ok(oConsoleStub.calledOnce, "Console.log was called");
+			assert.ok(oConsoleStub.getCall(0).args[0].allFlexObjects, "Logged object contains allFlexObjects");
+		});
+
+		QUnit.test("printMixOfChanges - logs to console in FLP context", async function(assert) {
+			const oConsoleStub = sandbox.stub(console, "log");
+			sandbox.stub(SupportAPI, "getFlexObjectInfos").resolves({
+				allFlexObjects: [
+					{ isChangeFromOtherSystem: () => true, getLayer: () => "CUSTOMER" },
+					{ isChangeFromOtherSystem: () => false, getLayer: () => "CUSTOMER" }
+				]
+			});
+
+			await SupportAPI.printMixOfChanges();
+
+			assert.ok(oConsoleStub.calledOnce, "Console.log was called");
+			const oOutput = oConsoleStub.getCall(0).args[0];
+			assert.strictEqual(oOutput.flexObjectsFromOtherSystems.length, 1, "Contains one change from other systems");
+			assert.strictEqual(oOutput.localFlexObjects.length, 1, "Contains one local change");
+		});
+
+		QUnit.test("printLocalChangeDescriptions - logs to console in FLP context", async function(assert) {
+			const oConsoleStub = sandbox.stub(console, "log");
+			sandbox.stub(SupportAPI, "getAllUIChanges").resolves([
+				{
+					isChangeFromOtherSystem: () => false,
+					getDefinition: () => ({
+						changeType: "hideControl",
+						selector: { id: "control1" }
+					})
+				}
+			]);
+
+			await SupportAPI.printLocalChangeDescriptions();
+
+			assert.ok(oConsoleStub.calledOnce, "Console.log was called");
+			const oOutput = oConsoleStub.getCall(0).args[0];
+			assert.ok(oOutput.descriptions, "Logged object contains descriptions");
+			assert.strictEqual(oOutput.descriptions[0], "control1 was hidden", "Correct description generated");
 		});
 	});
 
-	QUnit.module("When the SupportAPI is called and component not found (possible cFLP scenario - app in iframe)", {
+	QUnit.module("Module 3: cFLP Scenarios (MessageBroker Mode - No Component)", {
 		beforeEach() {
 			sandbox.stub(Utils, "getUshellContainer").returns(true);
-			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService")
+			this.oPublishStub = sandbox.stub().resolves();
+			this.oSubscribeStub = sandbox.stub().resolves();
+			this.oConnectStub = sandbox.stub().resolves();
+			this.oDisconnectStub = sandbox.stub().resolves();
+
+			sandbox.stub(Utils, "getUShellService")
 			.withArgs("AppLifeCycle").resolves({
-				getCurrentApplication: () => {
-					return {};
-				}
+				getCurrentApplication: () => ({})
+			})
+			.withArgs("MessageBroker").resolves({
+				publish: this.oPublishStub,
+				subscribe: this.oSubscribeStub,
+				connect: this.oConnectStub,
+				disconnect: this.oDisconnectStub
 			});
-			this.oPublishStub = sandbox.stub();
-			this.oGetUShellServiceStub.withArgs("MessageBroker").resolves({
+
+			sandbox.stub(SupportAPI, "checkAndPrepareMessageBroker").resolves();
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("printAllUIChanges - sends message via MessageBroker", async function(assert) {
+			await SupportAPI.printAllUIChanges();
+
+			assert.ok(SupportAPI.checkAndPrepareMessageBroker.calledOnce, "checkAndPrepareMessageBroker was called");
+			assert.ok(this.oPublishStub.calledOnce, "Publish was called");
+			assert.strictEqual(this.oPublishStub.getCall(0).args[0], "flex.support.channel", "Correct channel");
+			assert.strictEqual(this.oPublishStub.getCall(0).args[1], "FlexSupportClient", "Correct client ID");
+			assert.strictEqual(this.oPublishStub.getCall(0).args[2], "printAllUIChanges", "Correct message ID");
+			assert.deepEqual(this.oPublishStub.getCall(0).args[3], ["FlexAppClient"], "Correct recipient");
+		});
+
+		QUnit.test("printMixOfChanges - sends message via MessageBroker", async function(assert) {
+			await SupportAPI.printMixOfChanges();
+
+			assert.ok(SupportAPI.checkAndPrepareMessageBroker.calledOnce, "checkAndPrepareMessageBroker was called");
+			assert.ok(this.oPublishStub.calledOnce, "Publish was called");
+			assert.strictEqual(this.oPublishStub.getCall(0).args[2], "printMixOfChanges", "Correct message ID");
+		});
+
+		QUnit.test("printLocalChangeDescriptions - sends message via MessageBroker", async function(assert) {
+			await SupportAPI.printLocalChangeDescriptions();
+
+			assert.ok(SupportAPI.checkAndPrepareMessageBroker.calledOnce, "checkAndPrepareMessageBroker was called");
+			assert.ok(this.oPublishStub.calledOnce, "Publish was called");
+			assert.strictEqual(this.oPublishStub.getCall(0).args[2], "printLocalChangeDescriptions", "Correct message ID");
+		});
+
+		QUnit.test("printFlexObjectInfos - sends message via MessageBroker", async function(assert) {
+			await SupportAPI.printFlexObjectInfos();
+
+			assert.ok(SupportAPI.checkAndPrepareMessageBroker.calledOnce, "checkAndPrepareMessageBroker was called");
+			assert.ok(this.oPublishStub.calledOnce, "Publish was called");
+			assert.strictEqual(this.oPublishStub.getCall(0).args[2], "getFlexObjectInfos", "Correct message ID");
+		});
+
+		QUnit.test("getChangeDependencies - sends message via MessageBroker and resolves with response data",
+			async function(assert) {
+				const oExpectedData = { changeDependencies: "testData" };
+				this.oPublishStub.callsFake(() => {
+					SupportAPI.oDeferredResult.resolve(oExpectedData);
+					return Promise.resolve();
+				});
+
+				const oResult = await SupportAPI.getChangeDependencies();
+
+				assert.ok(SupportAPI.checkAndPrepareMessageBroker.calledOnce, "checkAndPrepareMessageBroker was called");
+				assert.ok(this.oPublishStub.calledOnce, "Publish was called once");
+				assert.strictEqual(
+					this.oPublishStub.getCall(0).args[2],
+					"getChangeDependencies",
+					"Correct message ID sent"
+				);
+				assert.deepEqual(oResult, oExpectedData, "Returns the data resolved by the Deferred");
+			});
+
+		QUnit.test("getFlexSettings - sends message via MessageBroker and resolves with response data",
+			async function(assert) {
+				const oExpectedData = { flexSettings: "testData" };
+				this.oPublishStub.callsFake(() => {
+					SupportAPI.oDeferredResult.resolve(oExpectedData);
+					return Promise.resolve();
+				});
+
+				const oResult = await SupportAPI.getFlexSettings();
+
+				assert.ok(SupportAPI.checkAndPrepareMessageBroker.calledOnce, "checkAndPrepareMessageBroker was called");
+				assert.ok(this.oPublishStub.calledOnce, "Publish was called once");
+				assert.strictEqual(
+					this.oPublishStub.getCall(0).args[2],
+					"getFlexSettings",
+					"Correct message ID sent"
+				);
+				assert.deepEqual(oResult, oExpectedData, "Returns the data resolved by the Deferred");
+			});
+	});
+
+	QUnit.module("Module 4: MessageBroker Integration (Application Client Side)", {
+		beforeEach() {
+			sandbox.stub(Utils, "getUshellContainer").returns(true);
+			this.oSubscribeStub = sandbox.stub();
+			this.oConnectStub = sandbox.stub().resolves();
+			this.oPublishStub = sandbox.stub().resolves();
+
+			sandbox.stub(Utils, "getUShellService")
+			.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => ({})
+			})
+			.withArgs("MessageBroker").resolves({
+				subscribe: this.oSubscribeStub,
+				connect: this.oConnectStub,
 				publish: this.oPublishStub
 			});
 		},
@@ -261,208 +450,355 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when getFlexObjectInfos (example function) is called", async function(assert) {
-			const oResult = await SupportAPI.getFlexObjectInfos();
-			assert.strictEqual(
-				oResult, undefined, "then nothing is returned because the function is not called, only a message published"
-			);
-			assert.strictEqual(
-				this.oPublishStub.getCall(0).args[0],
-				"flex.support.channel",
-				"then the correct channel ID is used to publish the message"
-			);
-			assert.strictEqual(
-				this.oPublishStub.getCall(0).args[1],
-				"FlexSupportClient",
-				"then the correct support client ID is used to publish the message"
-			);
-			assert.strictEqual(
-				this.oPublishStub.getCall(0).args[2],
-				"getFlexObjectInfos",
-				"then the correct message ID is used to publish the message"
-			);
-			assert.deepEqual(
-				this.oPublishStub.getCall(0).args[3],
-				["FlexAppClient"],
-				"then the correct app client ID is used to publish the message"
-			);
-		});
-	});
-
-	QUnit.module("Error handling when component not found (possible cFLP scenario)", {
-		beforeEach() {
-			sandbox.stub(Utils, "getUshellContainer").returns(true);
-			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService")
-			.withArgs("AppLifeCycle").resolves({
-				getCurrentApplication: () => {
-					return {};
-				}
+		QUnit.test("initializeMessageBrokerForComponent - connects and subscribes", async function(assert) {
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
 			});
-		},
-		afterEach() {
-			sandbox.restore();
-		}
-	}, function() {
-		QUnit.test("when MessageBroker service is not available", async function(assert) {
-			this.oGetUShellServiceStub.withArgs("MessageBroker").resolves(undefined);
-			const fnDone = assert.async();
-			try {
-				await SupportAPI.getFlexObjectInfos();
-			} catch (oError) {
-				assert.strictEqual(
-					oError.message,
-					"Component not found (possible cFLP scenario) but MessageBroker service is not available",
-					"then the correct error is thrown"
-				);
-				fnDone();
-			}
+
+			await SupportAPI.initializeMessageBrokerForComponent();
+
+			assert.ok(this.oConnectStub.calledOnce, "Connect was called");
+			assert.strictEqual(this.oConnectStub.getCall(0).args[0], "FlexAppClient", "Correct client ID");
+			assert.ok(this.oSubscribeStub.calledOnce, "Subscribe was called");
+			assert.deepEqual(this.oSubscribeStub.getCall(0).args[1], [{ channelId: "flex.support.channel" }], "Correct channel");
+			assert.ok(typeof this.messageHandler === "function", "Message handler is set");
+		});
+
+		QUnit.test("Message handler - MESSAGE_GET_FLEX_OBJECT_INFOS logs to console", async function(assert) {
+			const oConsoleStub = sandbox.stub(console, "log");
+			sandbox.stub(SupportAPI, "getFlexObjectInfos").resolves({ data: "test" });
+
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
+			});
+
+			await SupportAPI.initializeMessageBrokerForComponent();
+			await this.messageHandler("FlexSupportClient", "flex.support.channel", "getFlexObjectInfos");
+
+			assert.ok(SupportAPI.getFlexObjectInfos.calledOnce, "getFlexObjectInfos was called");
+			assert.ok(oConsoleStub.calledOnce, "Console.log was called");
+			assert.deepEqual(oConsoleStub.getCall(0).args[0], { data: "test" }, "Correct data logged");
+		});
+
+		QUnit.test("Message handler - MESSAGE_PRINT_MIX_OF_CHANGES logs to console", async function(assert) {
+			const oConsoleStub = sandbox.stub(console, "log");
+			sandbox.stub(SupportAPI, "getFlexObjectInfos").resolves({
+				allFlexObjects: [
+					{
+						isChangeFromOtherSystem: () => true,
+						getLayer: () => "CUSTOMER"
+					},
+					{
+						isChangeFromOtherSystem: () => false,
+						getLayer: () => "CUSTOMER"
+					}
+				]
+			});
+
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
+			});
+
+			await SupportAPI.initializeMessageBrokerForComponent();
+			await this.messageHandler("FlexSupportClient", "flex.support.channel", "printMixOfChanges");
+
+			assert.ok(oConsoleStub.calledOnce, "Console.log was called");
+			const oOutput = oConsoleStub.getCall(0).args[0];
+			assert.ok(oOutput.flexObjectsFromOtherSystems, "Contains flexObjectsFromOtherSystems");
+			assert.ok(oOutput.localFlexObjects, "Contains localFlexObjects");
+		});
+
+		QUnit.test("Message handler - MESSAGE_PRINT_LOCAL_CHANGE_DESCRIPTIONS logs to console", async function(assert) {
+			const oConsoleStub = sandbox.stub(console, "log");
+			sandbox.stub(SupportAPI, "getAllUIChanges").resolves([
+				{
+					isChangeFromOtherSystem: () => false,
+					getDefinition: () => ({
+						changeType: "hideControl",
+						selector: { id: "control1" }
+					})
+				}
+			]);
+
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
+			});
+
+			await SupportAPI.initializeMessageBrokerForComponent();
+			await this.messageHandler("FlexSupportClient", "flex.support.channel", "printLocalChangeDescriptions");
+
+			assert.ok(oConsoleStub.calledOnce, "Console.log was called");
+			const oOutput = oConsoleStub.getCall(0).args[0];
+			assert.ok(oOutput.descriptions, "Contains descriptions array");
+			assert.strictEqual(oOutput.descriptions[0], "control1 was hidden", "Correct description generated");
+		});
+
+		QUnit.test("Message handler - MESSAGE_GET_CHANGE_DEPENDENCIES publishes response", async function(assert) {
+			sandbox.stub(SupportAPI, "getChangeDependencies").resolves({ deps: "data" });
+
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
+			});
+
+			await SupportAPI.initializeMessageBrokerForComponent();
+			await this.messageHandler("FlexSupportClient", "flex.support.channel", "getChangeDependencies");
+
+			assert.ok(this.oPublishStub.calledOnce, "Publish was called");
+			assert.strictEqual(this.oPublishStub.getCall(0).args[2], "changeDependenciesResult", "Correct message type");
+			assert.deepEqual(this.oPublishStub.getCall(0).args[4], { deps: "data" }, "Correct data sent");
+		});
+
+		QUnit.test("Message handler - MESSAGE_GET_FLEX_SETTINGS publishes response", async function(assert) {
+			sandbox.stub(SupportAPI, "getFlexSettings").resolves({ settings: "data" });
+
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
+			});
+
+			await SupportAPI.initializeMessageBrokerForComponent();
+			await this.messageHandler("FlexSupportClient", "flex.support.channel", "getFlexSettings");
+
+			assert.ok(this.oPublishStub.calledOnce, "Publish was called");
+			assert.strictEqual(this.oPublishStub.getCall(0).args[2], "getFlexSettingsResult", "Correct message type");
+			assert.deepEqual(this.oPublishStub.getCall(0).args[4], { settings: "data" }, "Correct data sent");
+		});
+
+		QUnit.test("Message handler - MESSAGE_CHECK_CONNECTION publishes response", async function(assert) {
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
+			});
+
+			await SupportAPI.initializeMessageBrokerForComponent();
+			await this.messageHandler("FlexSupportClient", "flex.support.channel", "CheckConnection");
+
+			assert.ok(this.oPublishStub.calledOnce, "Publish was called");
+			assert.strictEqual(this.oPublishStub.getCall(0).args[2], "ConnectionEstablished", "Correct message type");
+		});
+
+		QUnit.test("Message handler - ignores messages from wrong client", async function(assert) {
+			const oConsoleStub = sandbox.stub(console, "log");
+
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
+			});
+
+			await SupportAPI.initializeMessageBrokerForComponent();
+			await this.messageHandler("WrongClient", "flex.support.channel", "getFlexObjectInfos");
+
+			assert.notOk(oConsoleStub.called, "Console.log was not called");
+		});
+
+		QUnit.test("Message handler - ignores messages from wrong channel", async function(assert) {
+			const oConsoleStub = sandbox.stub(console, "log");
+
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
+			});
+
+			await SupportAPI.initializeMessageBrokerForComponent();
+			await this.messageHandler("FlexSupportClient", "wrong.channel", "getFlexObjectInfos");
+
+			assert.notOk(oConsoleStub.called, "Console.log was not called");
 		});
 	});
 
-	QUnit.module("Different messages received with Message Broker(e.g. cFLP scenario)", {
+	QUnit.module("Module 5: MessageBroker Integration (Support Client Side)", {
 		beforeEach() {
 			sandbox.stub(Utils, "getUshellContainer").returns(true);
-			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService")
-			.withArgs("MessageBroker").resolves({
-				subscribe: sandbox.stub().callsFake((sAppClientId, aChannels, onFlexMessageReceived) => {
-					this.onMessageReceived = onFlexMessageReceived;
-				}),
-				connect: sandbox.stub().resolves()
+			this.oSubscribeStub = sandbox.stub();
+			this.oConnectStub = sandbox.stub().resolves();
+
+			sandbox.stub(Utils, "getUShellService")
+			.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => ({})
 			})
-			.withArgs("AppLifeCycle").resolves({
-				getCurrentApplication: () => {
-					// No component instance, simulating cFLP scenario
-					return {};
-				}
+			.withArgs("MessageBroker").resolves({
+				subscribe: this.oSubscribeStub,
+				connect: this.oConnectStub,
+				publish: sandbox.stub().resolves()
 			});
 		},
 		afterEach() {
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("check initializeMessageBrokerForComponent", async function(assert) {
-			const fnDone = assert.async();
-			this.oGetUShellServiceStub.withArgs("MessageBroker").resolves({
-				connect: sandbox.stub().callsFake((sClientId, fnCallback) => {
-					assert.strictEqual(sClientId, "FlexAppClient", "then the correct client ID is used to connect");
-					assert.strictEqual(fnCallback(), undefined, "then the callback is set correctly");
-					return Promise.resolve();
-				}),
-				subscribe: sandbox.stub().callsFake((sAppClientId, aChannels, onFlexMessageReceived) => {
-					assert.strictEqual(sAppClientId, "FlexAppClient", "then the correct client ID is used to subscribe");
-					assert.deepEqual(aChannels, [{ channelId: "flex.support.channel" }], "then the correct channel is used to subscribe");
-					assert.ok(typeof onFlexMessageReceived === "function", "then the message handler function is set");
-					fnDone();
-				})
+		QUnit.test("Response handler - MESSAGE_CONNECTION_ESTABLISHED logs to console", async function(assert) {
+			const oLogStub = sandbox.stub(Log, "info");
+
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.responseHandler = fnHandler;
 			});
-			// Simulate client subscription to the message broker (e.g. during component initialization)
-			await SupportAPI.initializeMessageBrokerForComponent();
+
+			await SupportAPI.checkAndPrepareMessageBroker();
+			this.responseHandler.call({}, "FlexAppClient", "flex.support.channel", "ConnectionEstablished");
+
+			assert.ok(oLogStub.calledWith("Connection Established"), "Connection message logged");
 		});
 
-		QUnit.test("when message getFlexObjectInfos is received", async function(assert) {
-			// Simulate client subscription to the message broker (e.g. during component initialization)
-			await SupportAPI.initializeMessageBrokerForComponent();
-			const fnDone = assert.async();
-			sandbox.stub(SupportAPI, "getFlexObjectInfos").resolves("dummyResult");
-			sandbox.stub(console, "log").callsFake((loggedValue) => {
-				assert.deepEqual(
-					loggedValue, "dummyResult", "then 'getFlexObjectInfos' result is logged in the console"
-				);
-				fnDone();
+		QUnit.test("Response handler - MESSAGE_CHANGE_DEPENDENCIES_RESULT resolved", async function(assert) {
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.responseHandler = fnHandler;
 			});
-			this.onMessageReceived("FlexSupportClient", "flex.support.channel", "getFlexObjectInfos");
+
+			await SupportAPI.checkAndPrepareMessageBroker();
+			SupportAPI.oDeferredResult = new Deferred();
+			const oExpectedResponse = { aAppliedChanges: ["change1"] };
+			const oDeferredPromise = SupportAPI.oDeferredResult.promise;
+			this.responseHandler.call({}, "FlexAppClient", "flex.support.channel", "changeDependenciesResult", oExpectedResponse);
+
+			const oResult = await oDeferredPromise;
+			assert.deepEqual(oResult, oExpectedResponse, "Deferred resolved with expected data");
+		});
+
+		QUnit.test("Response handler - MESSAGE_GET_FLEX_SETTINGS_RESULT resolved", async function(assert) {
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.responseHandler = fnHandler;
+			});
+
+			await SupportAPI.checkAndPrepareMessageBroker();
+			SupportAPI.oDeferredResult = new Deferred();
+			const oExpectedResponse = [{ client: "test" }, { user: "DEFAULT_USER" }];
+			const oDeferredPromise = SupportAPI.oDeferredResult.promise;
+			this.responseHandler.call({}, "FlexAppClient", "flex.support.channel", "getFlexSettingsResult", oExpectedResponse);
+
+			const oResult = await oDeferredPromise;
+			assert.deepEqual(oResult, oExpectedResponse, "Deferred resolved with expected data");
+		});
+
+		QUnit.test("Response handler - ignores messages from wrong client", async function(assert) {
+			const oConsoleStub = sandbox.stub(console, "log");
+
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.responseHandler = fnHandler;
+			});
+
+			await SupportAPI.checkAndPrepareMessageBroker();
+			this.responseHandler.call({}, "WrongClient", "flex.support.channel", "ConnectionEstablished");
+
+			assert.notOk(oConsoleStub.called, "Console.log was not called");
 		});
 	});
 
-	QUnit.module("When SupportAPI.checkAndPrepareMessageBroker is called", {
+	QUnit.module("Module 6: MessageBroker Initialization (checkAndPrepareMessageBroker)", {
 		beforeEach() {
 			sandbox.stub(Utils, "getUshellContainer").returns(true);
 			this.oSubscribeStub = sandbox.stub().resolves();
 			this.oConnectStub = sandbox.stub().resolves();
+			this.oDisconnectStub = sandbox.stub().resolves();
+			this.oPublishStub = sandbox.stub().resolves();
+
 			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService")
 			.withArgs("MessageBroker").resolves({
 				subscribe: this.oSubscribeStub,
-				connect: this.oConnectStub
+				connect: this.oConnectStub,
+				disconnect: this.oDisconnectStub,
+				publish: this.oPublishStub
 			});
 		},
 		afterEach() {
 			sandbox.restore();
 		}
-
 	}, function() {
-		QUnit.test("and component is found", async function(assert) {
+		QUnit.test("Does not initialize MessageBroker when component exists", async function(assert) {
 			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
-				getCurrentApplication: () => {
-					return {
-						componentInstance: "dummyComponent"
-					};
-				}
+				getCurrentApplication: () => ({
+					componentInstance: { id: "testComponent" }
+				})
 			});
+
 			await SupportAPI.checkAndPrepareMessageBroker();
-			assert.notOk(
-				this.oConnectStub.called,
-				"then MessageBroker connect is not called"
-			);
-			assert.notOk(
-				this.oSubscribeStub.called,
-				"then MessageBroker subscribe is not called"
-			);
+
+			assert.notOk(this.oConnectStub.called, "Connect not called");
+			assert.notOk(this.oSubscribeStub.called, "Subscribe not called");
 		});
 
-		QUnit.test("and component is not found", async function(assert) {
+		QUnit.test("Initializes MessageBroker when component not found", async function(assert) {
 			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
-				getCurrentApplication: () => {
-					return {};
-				}
+				getCurrentApplication: () => ({})
 			});
+
 			await SupportAPI.checkAndPrepareMessageBroker();
-			assert.ok(
-				this.oConnectStub.calledWith("FlexSupportClient"),
-				"then MessageBroker.connect is called with correct client ID"
-			);
-			assert.ok(
-				this.oSubscribeStub.calledWith(
-					"FlexSupportClient",
-					[{ channelId: "flex.support.channel" }]
-				),
-				"then MessageBroker.subscribe is called with correct client ID and channel"
-			);
+
+			assert.ok(this.oConnectStub.calledWith("FlexSupportClient"), "Connect called with correct client ID");
+			assert.ok(this.oSubscribeStub.calledOnce, "Subscribe called");
+			assert.ok(this.oPublishStub.calledOnce, "Connection check message published");
 		});
 
-		QUnit.test("and component is not found and Message Broker is already connected", async function(assert) {
+		QUnit.test("Handles 'already connected' error gracefully", async function(assert) {
 			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
-				getCurrentApplication: () => {
-					return {};
-				}
+				getCurrentApplication: () => ({})
 			});
-			this.oConnectStub.throws(new Error("Client is already connected"));
+			this.oConnectStub.rejects(new Error("Client is already connected"));
+
 			await SupportAPI.checkAndPrepareMessageBroker();
-			assert.ok(
-				this.oSubscribeStub.notCalled,
-				"then MessageBroker subscribe is not called"
-			);
+
+			assert.notOk(this.oSubscribeStub.called, "Subscribe not called after already connected error");
 		});
 
-		QUnit.test("and component is not found and Message Broker connection fails", async function(assert) {
+		QUnit.test("Propagates other connection errors", async function(assert) {
 			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
-				getCurrentApplication: () => {
-					return {};
-				}
+				getCurrentApplication: () => ({})
 			});
-			this.oConnectStub.throws(new Error("Some other connection error"));
+			this.oConnectStub.rejects(new Error("Connection failed"));
+
 			try {
 				await SupportAPI.checkAndPrepareMessageBroker();
+				assert.ok(false, "Should have thrown error");
 			} catch (oError) {
-				assert.strictEqual(
-					oError.message,
-					"Some other connection error",
-					"then the correct error is thrown"
-				);
+				assert.strictEqual(oError.message, "Connection failed", "Correct error thrown");
 			}
-			assert.notOk(
-				this.oSubscribeStub.called,
-				"then MessageBroker subscribe is not called"
-			);
+		});
+
+		QUnit.test("Handles connection check failure and disconnects", async function(assert) {
+			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => ({})
+			});
+			this.oPublishStub.rejects(new Error("Publish failed"));
+			sandbox.stub(MessageBox, "error");
+
+			await SupportAPI.checkAndPrepareMessageBroker();
+
+			assert.ok(this.oDisconnectStub.calledWith("FlexSupportClient"), "Disconnect called");
+		});
+	});
+
+	QUnit.module("Module 7: Edge Cases and Error Handling", {
+		beforeEach() {
+			sandbox.stub(Utils, "getUshellContainer").returns(true);
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("getAllUIChanges throws in MessageBroker scenario", async function(assert) {
+			sandbox.stub(Utils, "getUShellService")
+			.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => ({})
+			});
+
+			try {
+				await SupportAPI.getAllUIChanges();
+				assert.ok(false, "Should have thrown error");
+			} catch (oError) {
+				assert.ok(oError, "Error was thrown");
+				assert.ok(oError.message.includes("MessageBroker"), "Error message mentions 'MessageBroker'");
+			}
+		});
+
+		QUnit.test("getFlexObjectInfos throws in MessageBroker scenario", async function(assert) {
+			sandbox.stub(Utils, "getUShellService")
+			.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => ({})
+			})
+			.withArgs("MessageBroker").resolves(null);
+
+			try {
+				await SupportAPI.getFlexObjectInfos();
+				assert.ok(false, "Should have thrown error");
+			} catch (oError) {
+				assert.ok(oError, "Error was thrown");
+				assert.ok(oError.message.includes("MessageBroker"), "Error message mentions 'MessageBroker'");
+			}
 		});
 	});
 

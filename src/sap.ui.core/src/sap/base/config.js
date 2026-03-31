@@ -18,7 +18,7 @@ sap.ui.define([
 	 * @author SAP SE
 	 * @version ${version}
 	 * @private
-	 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.integration, sap.ui.export
+	 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.integration, sap.ui.export, sap.ushell
 	 * @alias module:sap/base/config
 	 * @namespace
 	 */

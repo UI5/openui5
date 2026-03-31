@@ -1,7 +1,8 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
-	"sap/base/Log"
-], (Controller, Log) => {
+	"sap/base/Log",
+	"sap/ui/util/openWindow"
+], (Controller, Log, openWindow) => {
 	"use strict";
 
 	return Controller.extend("sap.f.cardsdemo.controller.NavigationAction", {
@@ -12,7 +13,7 @@ sap.ui.define([
 
 			const oParameters = oEvent.getParameter("parameters");
 			const sUrl = oParameters?.url;
-			window.open(sUrl, "_blank");
+			openWindow(sUrl, "_blank");
 		},
 
 		onActionLog(oEvent) {

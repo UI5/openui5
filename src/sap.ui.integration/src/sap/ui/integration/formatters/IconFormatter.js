@@ -55,7 +55,7 @@ sap.ui.define([
 		}
 
 		const oCard = this._getCardInstance();
-		return oCard.getRuntimeUrl(sUrl);
+		return oCard.resolveUrl(sUrl);
 	};
 
 	IconFormatter.prototype._getCardInstance = function () {

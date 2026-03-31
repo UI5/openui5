@@ -801,6 +801,36 @@ sap.ui.define([
 		oTP.destroy();
 	});
 
+	QUnit.test("writeInnerValue: renders formatted value when user types a valid time", async function(assert) {
+		// arrange
+		const oTP = new TimePicker();
+
+		oTP.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// act
+		const oDate = UI5Date.getInstance(2016, 1, 17, 10, 11, 12);
+		const sFormatted = oTP._formatValue(oDate);
+		oTP._handleInputChange(sFormatted);
+
+		// assert
+		assert.strictEqual(oTP._getInputValue(), sFormatted, "Input shows the formatted value after typing and change");
+	});
+
+	QUnit.test("writeInnerValue: preserves raw invalid value when user types invalid time", async function(assert) {
+		// arrange
+		const oTP = new TimePicker();
+		oTP.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// act
+		oTP.getFocusDomRef().focus();
+		oTP._handleInputChange("dsadsadas");
+
+		// assert
+		assert.strictEqual(oTP._getInputValue(), "dsadsadas", "Renderer preserves invalid typed input after change");
+	});
+
 	QUnit.module("Keyboard handling of input");
 
 	QUnit.test("pageup increases the hours", function(assert) {

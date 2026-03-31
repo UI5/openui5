@@ -132,6 +132,31 @@ sap.ui.define([
 		oMenuButton.destroy();
 	});
 
+	QUnit.test("MenuButton sets type button to the internal button", function (assert) {
+		const oInnerButton = this.sut._getButtonControl();
+
+		// assert
+		assert.strictEqual(oInnerButton.getDomRef().getAttribute("type"), "button", "internal button has type button");
+	});
+
+	QUnit.test("MenuButton sets type button to both text and action button in the internal split button", function (assert) {
+		// arrange
+		const oMenuButton = new MenuButton("splitButton", { buttonMode: MenuButtonMode.Split });
+		oMenuButton.placeAt("content");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		const oInnerButton = oMenuButton._getButtonControl(),
+			oArrowButton = oInnerButton._getArrowButton(),
+			oTextButton = oInnerButton._getTextButton();
+
+		// assert
+		assert.strictEqual(oTextButton.getDomRef().getAttribute("type"), "button", "text button has type button");
+		assert.strictEqual(oArrowButton.getDomRef().getAttribute("type"), "button", "action button has type button");
+
+		// cleanup
+		oMenuButton.destroy();
+	});
+
 	QUnit.test("Property - Default Values", function(assert) {
 		this.sut.destroy();
 		this.sut = null;

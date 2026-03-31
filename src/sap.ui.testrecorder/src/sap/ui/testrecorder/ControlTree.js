@@ -54,7 +54,8 @@ sap.ui.define([
 				ControlInspector.updateSettings({
 					preferViewId: true, // prefer view-relative control id over global control id
 					preferViewNameAsViewLocator: true,
-					separateViewNamespace: true
+					separateViewNamespace: true,
+					preferChainableSnippets: true
 				});
 			} else {
 				Log.warning("Only one ControlTree allowed");

@@ -460,7 +460,7 @@
 		 * @function
 		 * @param {object} oProvider The provider instance
 		 * @private
-		 * @ui5-restricted sap.ui.core
+		 * @ui5-restricted sap.ui.core, sap.ushell
 		 */
 		function registerProvider(oProvider) {
 			if (aProvider.indexOf(oProvider) === -1) {

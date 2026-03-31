@@ -11,10 +11,10 @@ sap.ui.define([
 	return Controller.extend("teamCalendar.controller.Main", {
 
 		myformatter : formatter,
-		imagePath : sap.ui.require.toUrl("sap/m/demokit/teamCalendar/webapp/").replace('/resources/', '/test-resources/'),
 
 		// Initial setup
 		onInit: function() {
+			this.imagePath = sap.ui.require.toUrl("sap/m/demokit/teamCalendar/webapp/").replace('/resources/', '/test-resources/');
 			this._oModel = this.getView().getModel("calendar");
 			this._oStartDate = this.myformatter.utcToLocalDateTime(this._oModel.getProperty("/startDate"));
 			this._sSelectedView = this._oModel.getProperty("/viewKey");
@@ -35,8 +35,8 @@ sap.ui.define([
 
 		// Loads SPC for a person which row is clicked
 		rowSelectionHandler: function(oEvent) {
-			var oSelectedRow = oEvent.getParameter("rows")[0],
-				sSelectedId = oSelectedRow.getId();
+			const oSelectedRow = oEvent.getParameter("rows")[0];
+			const sSelectedId = oSelectedRow.getId();
 			this._sSelectedMember = sSelectedId.substr(sSelectedId.lastIndexOf('-') + 1);
 			oSelectedRow.setSelected(false);
 			this._loadCalendar("SinglePlanningCalendar");
@@ -49,7 +49,7 @@ sap.ui.define([
 
 		// Saves currently selected view
 		viewChangeHandler: function(oEvent) {
-			var oCalendar = oEvent.getSource();
+			const oCalendar = oEvent.getSource();
 			if (isNaN(this._sSelectedMember)) {
 				this._sSelectedView = oCalendar.getViewKey();
 			} else {
@@ -63,21 +63,21 @@ sap.ui.define([
 			MessageToast.show("Creating new appointment...");
 		},
 
-		// Opend a legend
+		// Opens a legend
 		openLegend: function(oEvent) {
-			var oSource = oEvent.getSource(),
-				oView = this.getView();
+			const oSource = oEvent.getSource();
+			const oView = this.getView();
 			if (!this._pLegendPopover) {
 				this._pLegendPopover = Fragment.load({
 					id: oView.getId(),
 					name: "teamCalendar.view.Legend",
 					controller: this
-				}).then(function(oLegendPopover){
+				}).then((oLegendPopover) => {
 					oView.addDependent(oLegendPopover);
 					return oLegendPopover;
 				});
 			}
-			this._pLegendPopover.then(function(oLegendPopover){
+			this._pLegendPopover.then((oLegendPopover) => {
 				if (oLegendPopover.isOpen()) {
 					oLegendPopover.close();
 				} else {
@@ -88,40 +88,40 @@ sap.ui.define([
 
 		// Loads and displays calendar (if not already loaded), otherwise just displays it
 		_loadCalendar: function(sCalendarId) {
-			var oView = this.getView();
+			const oView = this.getView();
 
 			if (!this._mCalendars[sCalendarId]) {
-				this._mCalendars[sCalendarId] =	Fragment.load({
+				this._mCalendars[sCalendarId] = Fragment.load({
 					id: oView.getId(),
-					name: "teamCalendar.view." + sCalendarId,
+					name: `teamCalendar.view.${sCalendarId}`,
 					controller: this
-				}).then(function(oCalendarVBox){
-					this._populateSelect(this.byId(sCalendarId + "TeamSelector"));
+				}).then((oCalendarVBox) => {
+					this._populateSelect(this.byId(`${sCalendarId}TeamSelector`));
 					return oCalendarVBox;
-				}.bind(this));
+				});
 			}
 
-			this._mCalendars[sCalendarId].then(function(oCalendarVBox){
+			this._mCalendars[sCalendarId].then((oCalendarVBox) => {
 				this._displayCalendar(sCalendarId, oCalendarVBox);
-			}.bind(this));
+			});
 		},
 
-		_hideCalendar: function(){
+		_hideCalendar: function() {
 			if (this._sCalendarDisplayed === '') {
 				return Promise.resolve();
 			}
-			return this._mCalendars[this._sCalendarDisplayed].then(function(oOldCalendarVBox){
+			return this._mCalendars[this._sCalendarDisplayed].then((oOldCalendarVBox) => {
 				this._oCalendarContainer.removeContent(oOldCalendarVBox);
-			}.bind(this));
+			});
 		},
 
 		// Displays already loaded calendar
 		_displayCalendar: function(sCalendarId, oCalendarVBox) {
-			this._hideCalendar().then(function(){
+			this._hideCalendar().then(() => {
 				this._oCalendarContainer.addContent(oCalendarVBox);
 				this._sCalendarDisplayed = sCalendarId;
-				var oCalendar = oCalendarVBox.getItems()[0];
-				var oTeamSelect = this.byId(sCalendarId + "TeamSelector");
+				const oCalendar = oCalendarVBox.getItems()[0];
+				const oTeamSelect = this.byId(`${sCalendarId}TeamSelector`);
 				oTeamSelect.setSelectedKey(this._sSelectedMember);
 				oCalendar.setStartDate(this._oStartDate);
 				if (isNaN(this._sSelectedMember)) {
@@ -135,21 +135,20 @@ sap.ui.define([
 					// Single Planning Calendar
 					oCalendar.setSelectedView(oCalendar.getViewByKey(this._sSelectedView));
 					oCalendar.bindElement({
-						path: "/team/" + this._sSelectedMember,
+						path: `/team/${this._sSelectedMember}`,
 						model: "calendar"
 					});
 				}
-			}.bind(this));
+			});
 		},
 
 		// Adds "Team" and all team members as select items
 		_populateSelect: function(oSelect) {
-			var iCount = this._oModel.getProperty("/team").length,
-			iPerson;
-			for (iPerson = 0; iPerson < iCount; iPerson++) {
+			const aTeam = this._oModel.getProperty("/team");
+			for (let iPerson = 0; iPerson < aTeam.length; iPerson++) {
 				oSelect.addItem(new Item({
 					key: iPerson,
-					text: this._oModel.getProperty("/team")[iPerson].name
+					text: aTeam[iPerson].name
 				}));
 			}
 		}

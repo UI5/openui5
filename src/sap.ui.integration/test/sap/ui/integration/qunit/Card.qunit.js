@@ -723,105 +723,6 @@ sap.ui.define([
 			oCard.destroy();
 		});
 
-		QUnit.test("Card with manifest as object, without baseUrl", async function (assert) {
-			// Arrange
-			var oCard = new Card({
-					manifest: {
-						"sap.app": {
-							"id": "my.card.qunit.test.NoBaseUrl",
-							"i18n": "./i18n/i18n.properties"
-						},
-						"sap.card": {
-							"type": "List",
-							"header": {
-								"title": "Test No Base URL"
-							},
-							"content": {
-								"item": {
-									"title": "item1"
-								}
-							}
-						}
-					}
-				}),
-				fnManifestLoadI18NSpy = sinon.spy(CardManifest.prototype, "loadI18n"),
-				fnErrorSpy = sinon.spy(Log, "error");
-
-			// Act
-			oCard.placeAt(DOM_RENDER_LOCATION);
-			await nextCardReadyEvent(oCard);
-
-			// Assert
-			assert.ok(fnManifestLoadI18NSpy.called, "Load of translation files is called.");
-			assert.ok(fnErrorSpy.notCalled, "There is no error logged for missing base url.");
-
-			// Clean up
-			oCard.destroy();
-			fnErrorSpy.restore();
-		});
-
-		QUnit.test("Register module path for card with manifest as object, without baseUrl", async function (assert) {
-			// Arrange
-			var oCard = new Card({
-					manifest: oManifest_ListCard
-				}),
-				fnRegisterSpy = sinon.spy(LoaderExtensions, "registerResourcePath");
-
-			// Act
-			oCard.placeAt(DOM_RENDER_LOCATION);
-			await nextCardReadyEvent(oCard);
-
-			// Assert
-			assert.ok(fnRegisterSpy.called, "LoaderExtensions.registerResourcePath is called.");
-			assert.ok(fnRegisterSpy.calledWith("my/card/qunit/test/ListCard", "/"), "LoaderExtensions.registerResourcePath is called with correct params.");
-
-			// Clean up
-			oCard.destroy();
-			fnRegisterSpy.restore();
-		});
-
-		QUnit.test("Register module path for card with manifest as object, with baseUrl", async function (assert) {
-			// Arrange
-			var sBaseUrl = "test-resources/sap/ui/integration/qunit/testResources/cardWithTranslations",
-				oCard = new Card({
-					manifest: oManifest_ListCard,
-					baseUrl: sBaseUrl
-				}),
-				fnRegisterSpy = sinon.spy(LoaderExtensions, "registerResourcePath");
-
-			// Act
-			oCard.placeAt(DOM_RENDER_LOCATION);
-			await nextCardReadyEvent(oCard);
-
-			// Assert
-			assert.ok(fnRegisterSpy.called, "LoaderExtensions.registerResourcePath is called.");
-			assert.ok(fnRegisterSpy.calledWith("my/card/qunit/test/ListCard", sBaseUrl), "LoaderExtensions.registerResourcePath is called with correct params.");
-
-			// Clean up
-			oCard.destroy();
-			fnRegisterSpy.restore();
-		});
-
-		QUnit.test("Register module path for card with manifest given by URL", async function (assert) {
-			// Arrange
-			var oCard = new Card({
-					manifest: "test-resources/sap/ui/integration/qunit/testResources/cardWithTranslations/manifest.json"
-				}),
-				fnRegisterSpy = sinon.spy(LoaderExtensions, "registerResourcePath");
-
-			// Act
-			oCard.placeAt(DOM_RENDER_LOCATION);
-			await nextCardReadyEvent(oCard);
-
-			// Assert
-			assert.ok(fnRegisterSpy.called, "LoaderExtensions.registerResourcePath is called.");
-			assert.ok(fnRegisterSpy.calledWith("my/test/card", "test-resources/sap/ui/integration/qunit/testResources/cardWithTranslations"), "LoaderExtensions.registerResourcePath is called with correct params.");
-
-			// Clean up
-			oCard.destroy();
-			fnRegisterSpy.restore();
-		});
-
 		QUnit.test("Default model is not propagated", async function (assert) {
 			// Arrange
 			var oContainer = new HBox({
@@ -869,9 +770,118 @@ sap.ui.define([
 			oCard.destroy();
 		});
 
+		QUnit.module("baseUrl", {
+			beforeEach: function () {
+				this.oCard = new Card();
+			},
+			afterEach: function () {
+				this.oCard.destroy();
+				this.oCard = null;
+			}
+		});
+
+		QUnit.test("Card with manifest as object, without baseUrl", async function (assert) {
+			// Arrange
+			const oCard = new Card({
+					manifest: {
+						"sap.app": {
+							"id": "my.card.qunit.test.NoBaseUrl",
+							"i18n": "./i18n/i18n.properties"
+						},
+						"sap.card": {
+							"type": "List",
+							"header": {
+								"title": "Test No Base URL"
+							},
+							"content": {
+								"item": {
+									"title": "item1"
+								}
+							}
+						}
+					}
+				}),
+				fnManifestLoadI18NSpy = sinon.spy(CardManifest.prototype, "loadI18n"),
+				fnErrorSpy = sinon.spy(Log, "error");
+
+			// Act
+			oCard.placeAt(DOM_RENDER_LOCATION);
+			await nextCardReadyEvent(oCard);
+
+			// Assert
+			assert.ok(fnManifestLoadI18NSpy.called, "Load of translation files is called.");
+			assert.ok(fnErrorSpy.notCalled, "There is no error logged for missing base url.");
+
+			// Clean up
+			oCard.destroy();
+			fnErrorSpy.restore();
+		});
+
+		QUnit.test("Register module path for card with manifest as object, without baseUrl", async function (assert) {
+			// Arrange
+			const oCard = new Card({
+					manifest: oManifest_ListCard
+				}),
+				fnRegisterSpy = sinon.spy(LoaderExtensions, "registerResourcePath");
+
+			// Act
+			oCard.placeAt(DOM_RENDER_LOCATION);
+			await nextCardReadyEvent(oCard);
+
+			// Assert
+			assert.ok(fnRegisterSpy.called, "LoaderExtensions.registerResourcePath is called.");
+			assert.ok(fnRegisterSpy.calledWith("my/card/qunit/test/ListCard", "/"), "LoaderExtensions.registerResourcePath is called with correct params.");
+
+			// Clean up
+			oCard.destroy();
+			fnRegisterSpy.restore();
+		});
+
+		QUnit.test("Register module path for card with manifest as object, with baseUrl", async function (assert) {
+			// Arrange
+			const sBaseUrl = "test-resources/sap/ui/integration/qunit/testResources/cardWithTranslations",
+				oCard = new Card({
+					manifest: oManifest_ListCard,
+					baseUrl: sBaseUrl
+				}),
+				fnRegisterSpy = sinon.spy(LoaderExtensions, "registerResourcePath");
+
+			// Act
+			oCard.placeAt(DOM_RENDER_LOCATION);
+			await nextCardReadyEvent(oCard);
+
+			// Assert
+			assert.ok(fnRegisterSpy.called, "LoaderExtensions.registerResourcePath is called.");
+			assert.ok(fnRegisterSpy.calledWith("my/card/qunit/test/ListCard", sBaseUrl), "LoaderExtensions.registerResourcePath is called with correct params.");
+
+			// Clean up
+			oCard.destroy();
+			fnRegisterSpy.restore();
+		});
+
+		QUnit.test("Register module path for card with manifest given by URL", async function (assert) {
+			// Arrange
+			const oCard = new Card({
+					manifest: "test-resources/sap/ui/integration/qunit/testResources/cardWithTranslations/manifest.json"
+				}),
+				fnRegisterSpy = sinon.spy(LoaderExtensions, "registerResourcePath");
+
+			// Act
+			oCard.placeAt(DOM_RENDER_LOCATION);
+			await nextCardReadyEvent(oCard);
+
+			// Assert
+			assert.ok(fnRegisterSpy.called, "LoaderExtensions.registerResourcePath is called.");
+			assert.ok(fnRegisterSpy.calledWith("my/test/card", "test-resources/sap/ui/integration/qunit/testResources/cardWithTranslations"), "LoaderExtensions.registerResourcePath is called with correct params.");
+
+			// Clean up
+			oCard.destroy();
+			fnRegisterSpy.restore();
+		});
+
 		QUnit.test("Base url in combination with manifest path", async function (assert) {
 			// Arrange
-			var oCard = new Card({
+			const oCard = new Card({
 					manifest: "test-resources/sap/ui/integration/qunit/manifests/manifest.json",
 					baseUrl: "http://someurltest/"
 				});
@@ -881,10 +891,564 @@ sap.ui.define([
 			await nextCardReadyEvent(oCard);
 
 			// Assert
-			assert.strictEqual(oCard.getRuntimeUrl(), "http://someurltest/", "The given baseUrl is used for card base url.");
+			assert.strictEqual(oCard.resolveUrl(), "http://someurltest/", "The given baseUrl is used for card base url.");
 
 			// Clean up
 			oCard.destroy();
+		});
+
+		QUnit.test("Card with manifest as object, with empty string baseUrl", async function (assert) {
+			// Arrange
+			const oCard = new Card({
+					manifest: oManifest_ListCard,
+					baseUrl: ""
+				}),
+				fnRegisterSpy = sinon.spy(LoaderExtensions, "registerResourcePath"),
+				fnInfoLogSpy = sinon.spy(Log, "info");
+
+			// Act
+			oCard.placeAt(DOM_RENDER_LOCATION);
+			await nextCardReadyEvent(oCard);
+
+			// Assert
+			assert.ok(fnRegisterSpy.called, "LoaderExtensions.registerResourcePath is called.");
+			assert.ok(fnRegisterSpy.calledWith("my/card/qunit/test/ListCard", "/"), "Empty string baseUrl defaults to '/' like null.");
+			assert.ok(fnInfoLogSpy.calledWith(sinon.match("Property baseUrl is not provided")), "Info log is shown for missing baseUrl.");
+
+			// Clean up
+			oCard.destroy();
+			fnRegisterSpy.restore();
+			fnInfoLogSpy.restore();
+		});
+
+		QUnit.test("Register module path with baseUrl containing trailing slashes", async function (assert) {
+			// Arrange
+			const aTestCases = [
+				{ baseUrl: "http://example.com/", expected: "http://example.com/", description: "single trailing slash" },
+				{ baseUrl: "http://example.com//", expected: "http://example.com//", description: "double trailing slash" },
+				{ baseUrl: "http://example.com///", expected: "http://example.com///", description: "triple trailing slash" }
+			];
+
+			for (const testCase of aTestCases) {
+				const fnRegisterSpy = sinon.spy(LoaderExtensions, "registerResourcePath");
+				const oCard = new Card({
+					manifest: oManifest_ListCard,
+					baseUrl: testCase.baseUrl
+				});
+
+				// Act
+				oCard.placeAt(DOM_RENDER_LOCATION);
+				await nextCardReadyEvent(oCard);
+
+				// Assert
+				assert.ok(fnRegisterSpy.called, "LoaderExtensions.registerResourcePath is called for " + testCase.description + ".");
+				assert.ok(
+					fnRegisterSpy.calledWith("my/card/qunit/test/ListCard", testCase.expected),
+					"Trailing slashes are preserved as-is for " + testCase.description + ": " + testCase.expected
+				);
+
+				// Clean up
+				oCard.destroy();
+				fnRegisterSpy.restore();
+			}
+		});
+
+		QUnit.test("BaseUrl takes precedence over manifest URL", async function (assert) {
+			// Arrange
+			const sManifestUrl = "test-resources/sap/ui/integration/qunit/testResources/cardWithTranslations/manifest.json";
+			const sExplicitBaseUrl = "http://explicit-base-url.com/";
+			const fnRegisterSpy = sinon.spy(LoaderExtensions, "registerResourcePath");
+			const oCard = new Card({
+				manifest: sManifestUrl,
+				baseUrl: sExplicitBaseUrl
+			});
+
+			// Act
+			oCard.placeAt(DOM_RENDER_LOCATION);
+			await nextCardReadyEvent(oCard);
+
+			// Assert
+			assert.ok(fnRegisterSpy.called, "LoaderExtensions.registerResourcePath is called.");
+			assert.ok(
+				fnRegisterSpy.calledWith("my/test/card", sExplicitBaseUrl),
+				"Explicit baseUrl takes precedence over manifest URL path extraction."
+			);
+			assert.strictEqual(
+				oCard.resolveUrl(),
+				sExplicitBaseUrl,
+				"Card resolveUrl() returns the explicit baseUrl, not the extracted manifest URL path."
+			);
+
+			// Clean up
+			oCard.destroy();
+			fnRegisterSpy.restore();
+		});
+
+		QUnit.test("resolveUrl logs error when sap.app/id is missing", async function (assert) {
+			// Arrange
+			const oLogSpy = this.spy(Log, "error"),
+				oManifest = {
+					"_version": "2.0.0",
+
+					"sap.app": {
+						"id": ""
+					}
+				},
+				sUrl = "images/Avatar.png";
+
+			// Act
+			this.oCard.setManifest(oManifest);
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardManifestReadyEvent(this.oCard);
+
+			const sResult = this.oCard.resolveUrl(sUrl);
+
+			// Assert
+			assert.strictEqual(sResult, sUrl, "The URL is returned unchanged when sap.app/id is missing.");
+			assert.ok(oLogSpy.calledWith("The manifest property 'sap.app/id' is missing or empty. The URL '" + sUrl + "' cannot be resolved.", "sap.ui.integration.widgets.Card"), "Error is logged when sap.app/id is missing or empty.");
+		});
+
+		QUnit.test("resolveUrl returns null when manifest is not ready", function (assert) {
+			// Arrange
+			const oLogSpy = this.spy(Log, "error");
+
+			// Act - call resolveUrl before manifest is set
+			const sResult = this.oCard.resolveUrl("images/Avatar.png");
+
+			// Assert
+			assert.strictEqual(sResult, null, "resolveUrl returns null when manifest is not ready.");
+			assert.ok(oLogSpy.calledWith("The manifest is not ready so the URL can not be resolved. Consider using the 'manifestReady' event.", "sap.ui.integration.widgets.Card"), "Error is logged when manifest is not ready.");
+		});
+
+		QUnit.test("resolveUrl with null or undefined input", async function (assert) {
+			// Arrange
+			const oManifest = {
+				"_version": "2.0.0",
+
+				"sap.app": {
+					"id": "sample.card"
+				}
+			};
+
+			// Act
+			this.oCard.setManifest(oManifest);
+			this.oCard.setBaseUrl("https://example.com");
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardManifestReadyEvent(this.oCard);
+
+			const sResultNull = this.oCard.resolveUrl(null);
+			const sResultUndefined = this.oCard.resolveUrl(undefined);
+			const sResultEmpty = this.oCard.resolveUrl("");
+
+			// Assert
+			assert.strictEqual(sResultNull, "https://example.com/", "null input is treated as empty string and resolves to baseUrl + '/'.");
+			assert.strictEqual(sResultUndefined, "https://example.com/", "undefined input is treated as empty string and resolves to baseUrl + '/'.");
+			assert.strictEqual(sResultEmpty, "https://example.com/", "Empty string input resolves to baseUrl + '/'.");
+		});
+
+		QUnit.test("resolveUrl with whitespace-only URLs", async function (assert) {
+			// Arrange
+			const oManifest = {
+				"_version": "2.0.0",
+
+				"sap.app": {
+					"id": "sample.card"
+				}
+			};
+
+			// Act
+			this.oCard.setManifest(oManifest);
+			this.oCard.setBaseUrl("https://example.com");
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardManifestReadyEvent(this.oCard);
+
+			const sResultSpaces = this.oCard.resolveUrl("   ");
+			const sResultTab = this.oCard.resolveUrl("\t");
+			const sResultNewline = this.oCard.resolveUrl("\n");
+			const sResultMixed = this.oCard.resolveUrl(" \t\n ");
+
+			// Assert
+			assert.strictEqual(sResultSpaces, "https://example.com/", "Whitespace-only URL with spaces is sanitized to empty and resolves correctly.");
+			assert.strictEqual(sResultTab, "https://example.com/", "Whitespace-only URL with tab is sanitized to empty and resolves correctly.");
+			assert.strictEqual(sResultNewline, "https://example.com/", "Whitespace-only URL with newline is sanitized to empty and resolves correctly.");
+			assert.strictEqual(sResultMixed, "https://example.com/", "Whitespace-only URL with mixed whitespace is sanitized to empty and resolves correctly.");
+		});
+
+		QUnit.test("resolveUrl with baseUrl containing trailing slashes", async function (assert) {
+			// Arrange
+			const oManifest = {
+				"_version": "2.0.0",
+
+				"sap.app": {
+					"id": "sample.card"
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			this.oCard.setBaseUrl("https://example.com/");
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+			await nextCardManifestReadyEvent(this.oCard);
+
+			assert.strictEqual(
+				this.oCard.resolveUrl("images/test.png"),
+				"https://example.com/images/test.png",
+				"Single trailing slash: relative URL resolves correctly."
+			);
+			assert.strictEqual(
+				this.oCard.resolveUrl(""),
+				"https://example.com/",
+				"Single trailing slash: empty URL resolves correctly."
+			);
+
+			this.oCard.setBaseUrl("https://example.com//");
+			this.oCard.setManifest(oManifest);
+			await nextCardManifestReadyEvent(this.oCard);
+
+			assert.strictEqual(
+				this.oCard.resolveUrl("images/test.png"),
+				"https://example.com//images/test.png",
+				"Double trailing slash: slashes are preserved in resolved URL."
+			);
+
+			this.oCard.setBaseUrl("https://example.com///");
+			this.oCard.setManifest(oManifest);
+			await nextCardManifestReadyEvent(this.oCard);
+
+			assert.strictEqual(
+				this.oCard.resolveUrl("images/test.png"),
+				"https://example.com///images/test.png",
+				"Triple trailing slash: all slashes are preserved in resolved URL."
+			);
+		});
+
+		QUnit.test("resolveUrl with URLs containing multiple leading slashes", async function (assert) {
+			// Arrange
+			const oManifest = {
+				"_version": "2.0.0",
+
+				"sap.app": {
+					"id": "sample.card"
+				}
+			};
+			const mSamples = new Map([
+				["//file.json", "//file.json"],
+				["///file.json", "///file.json"],
+				["////file.json", "////file.json"],
+				["/file.json", "/file.json"]
+			]);
+
+			// Act
+			this.oCard.setManifest(oManifest);
+			this.oCard.setBaseUrl("https://example.com");
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardManifestReadyEvent(this.oCard);
+
+			// Assert
+			mSamples.forEach((sExpectedResult, sUrl) => {
+				const sResult = this.oCard.resolveUrl(sUrl);
+				assert.strictEqual(sResult, sExpectedResult, "URL '" + sUrl + "' is handled correctly.");
+			});
+		});
+
+		QUnit.test("resolveUrl with special characters in path", async function (assert) {
+			// Arrange
+			const oManifest = {
+				"_version": "2.0.0",
+
+				"sap.app": {
+					"id": "sample.card"
+				}
+			};
+			const mSamples = new Map([
+				["images/test file.png", "https://example.com/images/test file.png"],
+				["images/file%20name.png", "https://example.com/images/file%20name.png"],
+				["images/тест.png", "https://example.com/images/тест.png"],
+				["images/测试.png", "https://example.com/images/测试.png"],
+				["images/file&param=value.png", "https://example.com/images/file&param=value.png"]
+			]);
+
+			// Act
+			this.oCard.setManifest(oManifest);
+			this.oCard.setBaseUrl("https://example.com");
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardManifestReadyEvent(this.oCard);
+
+			// Assert
+			mSamples.forEach((sExpectedResult, sUrl) => {
+				const sResult = this.oCard.resolveUrl(sUrl);
+				assert.strictEqual(sResult, sExpectedResult, "URL with special characters '" + sUrl + "' is preserved correctly.");
+			});
+		});
+
+		QUnit.test("Child card with string manifest and explicit baseUrl", async function (assert) {
+			// Arrange
+			const sExplicitBaseUrl = "https://child-explicit.com/";
+
+			// Act
+			this.oCard.setManifest({
+				"sap.app": {
+					"id": "test.card.parent"
+				},
+				"sap.card": {
+					"type": "Object",
+					"header": {
+						"title": "Parent Card"
+					}
+				}
+			});
+			this.oCard.setBaseUrl("https://parent.com/");
+			this.oCard.startManifestProcessing();
+
+			await nextCardReadyEvent(this.oCard);
+
+			const oChildCard = this.oCard._createChildCard({
+				manifest: "child/manifest.json",
+				baseUrl: sExplicitBaseUrl
+			});
+
+			// Assert
+			assert.strictEqual(oChildCard.getBaseUrl(), sExplicitBaseUrl, "Child card uses explicit baseUrl when manifest is string.");
+
+			// Clean up
+			oChildCard.destroy();
+		});
+
+		QUnit.test("Child card with string manifest without baseUrl", async function (assert) {
+			// Arrange & Act
+			this.oCard.setManifest({
+				"sap.app": {
+					"id": "test.card.parent"
+				},
+				"sap.card": {
+					"type": "Object",
+					"header": {
+						"title": "Parent Card"
+					}
+				}
+			});
+			this.oCard.setBaseUrl("https://parent.com/");
+			this.oCard.startManifestProcessing();
+
+			await nextCardReadyEvent(this.oCard);
+
+			const oChildCard = this.oCard._createChildCard({
+				manifest: "child/manifest.json"
+			});
+
+			// Assert
+			assert.strictEqual(oChildCard.getBaseUrl(), "", "Child card baseUrl is empty string when not provided with string manifest.");
+			assert.ok(!oChildCard.getBaseUrl(), "Child card baseUrl is falsy (empty).");
+
+			// Clean up
+			oChildCard.destroy();
+		});
+
+		QUnit.test("Child card with object manifest and explicit baseUrl", async function (assert) {
+			// Arrange
+			const sExplicitBaseUrl = "https://child-explicit.com/";
+
+			// Act
+			this.oCard.setManifest({
+				"sap.app": {
+					"id": "test.card.parent"
+				},
+				"sap.card": {
+					"type": "Object",
+					"header": {
+						"title": "Parent Card"
+					}
+				}
+			});
+			this.oCard.setBaseUrl("https://parent.com/");
+			this.oCard.startManifestProcessing();
+
+			await nextCardReadyEvent(this.oCard);
+
+			const oChildCard = this.oCard._createChildCard({
+				manifest: {
+					"sap.app": {
+						"id": "test.card.child"
+					},
+					"sap.card": {
+						"type": "Object",
+						"header": {
+							"title": "Child Card"
+						}
+					}
+				},
+				baseUrl: sExplicitBaseUrl
+			});
+
+			// Assert
+			assert.strictEqual(oChildCard.getBaseUrl(), sExplicitBaseUrl, "Child card uses explicit baseUrl when manifest is object.");
+
+			// Clean up
+			oChildCard.destroy();
+		});
+
+		QUnit.test("Child card with object manifest without baseUrl inherits parent's baseUrl", async function (assert) {
+			// Arrange
+			const sParentBaseUrl = "https://parent.com/";
+
+			// Act
+			this.oCard.setManifest({
+				"sap.app": {
+					"id": "test.card.parent"
+				},
+				"sap.card": {
+					"type": "Object",
+					"header": {
+						"title": "Parent Card"
+					}
+				}
+			});
+			this.oCard.setBaseUrl(sParentBaseUrl);
+			this.oCard.startManifestProcessing();
+
+			await nextCardReadyEvent(this.oCard);
+
+			const sParentResolvedUrl = this.oCard.resolveUrl();
+			const oChildCard = this.oCard._createChildCard({
+				manifest: {
+					"sap.app": {
+						"id": "test.card.child"
+					},
+					"sap.card": {
+						"type": "Object",
+						"header": {
+							"title": "Child Card"
+						}
+					}
+				}
+			});
+
+			// Assert
+			assert.strictEqual(oChildCard.getBaseUrl(), sParentResolvedUrl, "Child card inherits parent's resolveUrl() result when manifest is object and no explicit baseUrl.");
+			assert.strictEqual(oChildCard.getBaseUrl(), sParentBaseUrl, "Child baseUrl matches parent baseUrl.");
+
+			// Clean up
+			oChildCard.destroy();
+		});
+
+		QUnit.test("Child card baseUrl is independent from parent baseUrl", async function (assert) {
+			// Arrange
+			const sParentBaseUrl = "https://parent.com/";
+			const sChildBaseUrl = "https://child.com/";
+
+			// Act
+			this.oCard.setManifest({
+				"sap.app": {
+					"id": "test.card.parent"
+				},
+				"sap.card": {
+					"type": "Object",
+					"header": {
+						"title": "Parent Card"
+					}
+				}
+			});
+			this.oCard.setBaseUrl(sParentBaseUrl);
+			this.oCard.startManifestProcessing();
+
+			await nextCardReadyEvent(this.oCard);
+
+			const oChildCard = this.oCard._createChildCard({
+				manifest: {
+					"sap.app": {
+						"id": "test.card.child"
+					},
+					"sap.card": {
+						"type": "Object",
+						"header": {
+							"title": "Child Card"
+						}
+					}
+				},
+				baseUrl: sChildBaseUrl
+			});
+
+			// Assert
+			assert.strictEqual(this.oCard.getBaseUrl(), sParentBaseUrl, "Parent card maintains its own baseUrl.");
+			assert.strictEqual(oChildCard.getBaseUrl(), sChildBaseUrl, "Child card has its own independent baseUrl.");
+			assert.notStrictEqual(this.oCard.getBaseUrl(), oChildCard.getBaseUrl(), "Parent and child have different baseUrl values.");
+
+			// Clean up
+			oChildCard.destroy();
+		});
+
+		QUnit.test("Nested child cards with different baseUrl values", async function (assert) {
+			// Arrange
+			const sParentBaseUrl = "https://parent.com/";
+			const sChild1BaseUrl = "https://child1.com/";
+			const sChild2BaseUrl = "https://child2.com/";
+
+			// Act - Create parent
+			this.oCard.setManifest({
+				"sap.app": {
+					"id": "test.card.parent"
+				},
+				"sap.card": {
+					"type": "Object",
+					"header": {
+						"title": "Parent Card"
+					}
+				}
+			});
+			this.oCard.setBaseUrl(sParentBaseUrl);
+			this.oCard.startManifestProcessing();
+
+			await nextCardReadyEvent(this.oCard);
+
+			// Create first-level child
+			const oChild1Card = this.oCard._createChildCard({
+				manifest: {
+					"sap.app": {
+						"id": "test.card.child1"
+					},
+					"sap.card": {
+						"type": "Object",
+						"header": {
+							"title": "Child Card 1"
+						}
+					}
+				},
+				baseUrl: sChild1BaseUrl
+			});
+
+			oChild1Card.startManifestProcessing();
+			await nextCardReadyEvent(oChild1Card);
+
+			// Create second-level child (nested)
+			const oChild2Card = oChild1Card._createChildCard({
+				manifest: {
+					"sap.app": {
+						"id": "test.card.child2"
+					},
+					"sap.card": {
+						"type": "Object",
+						"header": {
+							"title": "Child Card 2"
+						}
+					}
+				},
+				baseUrl: sChild2BaseUrl
+			});
+
+			// Assert
+			assert.strictEqual(this.oCard.getBaseUrl(), sParentBaseUrl, "Parent card has correct baseUrl.");
+			assert.strictEqual(oChild1Card.getBaseUrl(), sChild1BaseUrl, "First-level child has correct baseUrl.");
+			assert.strictEqual(oChild2Card.getBaseUrl(), sChild2BaseUrl, "Second-level child (nested) has correct baseUrl.");
+			assert.notStrictEqual(this.oCard.getBaseUrl(), oChild1Card.getBaseUrl(), "Parent and child1 have different baseUrl.");
+			assert.notStrictEqual(oChild1Card.getBaseUrl(), oChild2Card.getBaseUrl(), "Child1 and child2 have different baseUrl.");
+
+			// Clean up
+			oChild2Card.destroy();
+			oChild1Card.destroy();
 		});
 
 		QUnit.module("Clone");
@@ -1049,7 +1613,7 @@ sap.ui.define([
 			assert.ok(oDataProviderFactory instanceof DataProviderFactory, "The result is of type sap.ui.integration.util.DataProviderFactory.");
 		});
 
-		QUnit.test("getRuntimeUrl when baseUrl is not set", async function (assert) {
+		QUnit.test("resolveUrl when baseUrl is not set", async function (assert) {
 			// Arrange
 			var oManifest = {
 				"_version": "2.0.0",
@@ -1085,13 +1649,13 @@ sap.ui.define([
 
 			// Assert
 			mSamples.forEach((sExpectedResult, sUrl) => {
-				var sResult = this.oCard.getRuntimeUrl(sUrl);
+				var sResult = this.oCard.resolveUrl(sUrl);
 
 				assert.strictEqual(sResult, sExpectedResult, "Result is correct for '" + sUrl + "'.");
 			});
 		});
 
-		QUnit.test("getRuntimeUrl when baseUrl is set", async function (assert) {
+		QUnit.test("resolveUrl when baseUrl is set", async function (assert) {
 			// Arrange
 			var sBaseUrl = "https://sdk.openui5.org",
 				oManifest = {
@@ -1128,11 +1692,12 @@ sap.ui.define([
 
 			// Assert
 			mSamples.forEach((sExpectedResult, sUrl) => {
-				var sResult = this.oCard.getRuntimeUrl(sUrl);
+				var sResult = this.oCard.resolveUrl(sUrl);
 
 				assert.strictEqual(sResult, sExpectedResult, "Result is correct for '" + sUrl + "'.");
 			});
 		});
+
 
 		QUnit.module("showMessage", {
 			beforeEach: async function () {
@@ -3228,6 +3793,7 @@ sap.ui.define([
 			// Assert
 			assert.strictEqual(oChildCard.getReferenceId(), sReferenceId, "The created child card has the same reference id as the parent card.");
 		});
+
 
 		QUnit.module("Design property", {
 			beforeEach: function () {

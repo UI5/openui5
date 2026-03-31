@@ -1055,6 +1055,7 @@ sap.ui.define([
 			sGroupId = "$inactive." + sGroupId;
 		} else if (!oAggregation?.hierarchyQualifier) {
 			this.iActiveContexts += 1;
+			this.setOutdated();
 		}
 
 		if (this.bFirstCreateAtEnd === undefined) {
@@ -1384,6 +1385,7 @@ sap.ui.define([
 					if (bCreated) {
 						that.iCreatedContexts += iOffset;
 						that.iActiveContexts += iOffset;
+						// don't set outdated flags in case of a cancelled deletion
 					} else {
 						// iMaxLength is the number of server rows w/o the created entities
 						that.iMaxLength += iOffset; // this doesn't change Infinity
@@ -1780,8 +1782,12 @@ sap.ui.define([
 	 * @override
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#doSetProperty
 	 */
-	ODataListBinding.prototype.doSetProperty = function () {
-		this.setOutdated();
+	ODataListBinding.prototype.doSetProperty = function (sPath/*, ...*/) {
+		// entities with transient predicates are either inactive, in that case the outdated flags
+		// must not be set, or the outdated flags have been set already while creating the entity
+		if (!sPath.startsWith("($uid=")) {
+			this.setOutdated();
+		}
 	};
 
 	/**
@@ -1917,7 +1923,14 @@ sap.ui.define([
 				// after #reset the length is not final and aContexts contains only created contexts
 				if (!that.bLengthFinal && that.aContexts.length === that.iCreatedContexts
 						&& that.oHeaderContext.isOutdated() !== undefined) {
-					that.oHeaderContext.setOutdated(false);
+					if (that.iActiveContexts > 0) {
+						// some persisted entries are still in the creation area, so the grand total
+						// may still be outdated
+						that.setOutdated();
+					} else {
+						// entries and grand total are in sync again
+						that.oHeaderContext.setOutdated(false);
+					}
 				}
 
 				return that.createContexts(iStart, oResult.value);
@@ -2592,7 +2605,7 @@ sap.ui.define([
 	ODataListBinding.prototype.fireCreateActivate = function (oContext) {
 		if (this.fireEvent("createActivate", {context : oContext}, true)) {
 			this.iActiveContexts += 1;
-
+			this.setOutdated();
 			return true;
 		}
 
@@ -3770,7 +3783,16 @@ sap.ui.define([
 	 * @override
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#isUnchangedParameter
 	 */
-	ODataListBinding.prototype.isUnchangedParameter = function (sName, vOtherValue) {
+	// * @param {string[]} [aExceptions=[]]
+	// *   Properties of $$aggregation to be ignored
+	ODataListBinding.prototype.isUnchangedParameter = function (sName, vOtherValue, aExceptions) {
+		function ignoreExceptions(oClone) {
+			if (aExceptions) {
+				aExceptions.forEach((sProperty) => delete oClone[sProperty]);
+			}
+			return oClone;
+		}
+
 		if (sName === "$$aggregation") {
 			if (!vOtherValue) {
 				return this.mParameters.$$aggregation === vOtherValue;
@@ -3782,8 +3804,8 @@ sap.ui.define([
 			_AggregationHelper.buildApply(vOtherValue);
 
 			return _Helper.deepEqual(
-				_Helper.cloneNo$(this.mParameters.$$aggregation),
-				_Helper.cloneNo$(vOtherValue)
+				ignoreExceptions(_Helper.cloneNo$(this.mParameters.$$aggregation)),
+				ignoreExceptions(_Helper.cloneNo$(vOtherValue))
 			);
 		}
 
@@ -4782,6 +4804,7 @@ sap.ui.define([
 			that = this;
 
 		if (bDrop === true) { // drop 'em all
+			// the outdated flags are reset/set after the first read, see #fetchContexts
 			this.iActiveContexts = 0;
 			this.iCreatedContexts = 0;
 		}
@@ -4866,6 +4889,8 @@ sap.ui.define([
 				that.iCreatedContexts += 1;
 				if (!oElement["@$ui5.context.isInactive"]) {
 					that.iActiveContexts += 1;
+					// this function is called after #reset, the outdated flags are reset/set after
+					// the first read, see #fetchContexts
 				}
 			});
 		}).catch(this.oModel.getReporter());
@@ -5048,7 +5073,7 @@ sap.ui.define([
 	 *       context when switching the use case of data aggregation (recursive hierarchy, pure data
 	 *       aggregation, or none at all),
 	 *     <li> there are pending changes (unless the aggregation is unchanged), including created
-	 *       contexts (since 1.147.0),
+	 *       contexts (since 1.147.0) unless only <code>search</code> is changed,
 	 *     <li> a recursive hierarchy is requested, but the model does not use the
 	 *       <code>autoExpandSelect</code> parameter,
 	 *     <li> the binding is part of a {@link #create deep create} because it is relative to a
@@ -5102,7 +5127,9 @@ sap.ui.define([
 		if (this.hasFilterNone()) {
 			throw new Error("Cannot combine Filter.NONE with $$aggregation");
 		}
-		if (this.iCreatedContexts || this.hasPendingChanges()) {
+		if (this.iCreatedContexts
+				&& !this.isUnchangedParameter("$$aggregation", oAggregation, ["search"])
+			|| this.hasPendingChanges()) {
 			throw new Error("Cannot set $$aggregation due to pending changes");
 		}
 		const bOldUseCase = useCase(this.mParameters.$$aggregation);

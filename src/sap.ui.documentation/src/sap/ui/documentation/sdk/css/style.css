@@ -1837,3 +1837,26 @@ table.cookieList td {
 		font-size: 1.325rem;
 	}
 }
+
+/* Align the section link icon with the title - scoped to API detail page only */
+.apiDetailPage .sapUxAPObjectPageSectionHeader {
+	display: flex;
+	align-items: center;
+}
+
+.sapUiDocSectionLinkIcon {
+	flex-shrink: 0;
+	margin-left: 0.375rem;
+	margin-bottom: 0.375rem;
+	font-size: 1rem;
+	cursor: pointer;
+	color: var(--sapLinkColor) !important;
+}
+
+.sapUiDocSectionLinkIcon:hover {
+	color: var(--sapLink_Hover_Color) !important;
+}
+
+.sapUiDocSectionLinkIcon:active {
+	color: var(--sapLink_Active_Color) !important;
+}

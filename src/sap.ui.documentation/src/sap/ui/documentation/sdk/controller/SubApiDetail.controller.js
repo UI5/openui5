@@ -3,6 +3,7 @@
  */
 
 sap.ui.define([
+		"sap/ui/core/Lib",
 		"sap/ui/thirdparty/jquery",
 		"sap/base/Log",
 		"sap/ui/core/Fragment",
@@ -23,6 +24,7 @@ sap.ui.define([
 		"sap/m/ObjectStatus",
 		"sap/m/Popover",
 		"sap/m/library",
+		"sap/m/MessageToast",
 		"sap/ui/core/library",
 		"sap/m/CustomListItem",
 		"sap/m/List",
@@ -31,10 +33,10 @@ sap.ui.define([
 		"sap/uxap/ObjectPageSection",
 		"sap/ui/documentation/ObjectPageSubSection",
 		"sap/ui/core/HTML"
-	], function (jQuery, Log, Fragment, APIInfo, BaseController, ToggleFullScreenHandler,
-			formatter, Row, ParamText, JSDocType, JSDocText, Image, Label, Link, Text, HBox, ObjectAttribute, ObjectStatus, Popover,
-			library, coreLibrary, CustomListItem, List, includeStylesheet, includeScript,
-			ObjectPageSection, ObjectPageSubSection, HTML) {
+	], function (Library, jQuery, Log, Fragment, APIInfo, BaseController,
+			ToggleFullScreenHandler, formatter, Row, ParamText, JSDocType, JSDocText, Image, Label, Link, Text, HBox, ObjectAttribute, ObjectStatus,
+			Popover, library, MessageToast, coreLibrary, CustomListItem, List, includeStylesheet,
+			includeScript, ObjectPageSection, ObjectPageSubSection, HTML) {
 		"use strict";
 
 		// shortcut for sap.m.FlexWrap
@@ -264,6 +266,42 @@ sap.ui.define([
 				// As this is a nested sub-view we pass the container view and controller context so fullscreen will
 				// work as expected.
 				ToggleFullScreenHandler.updateMode(oEvent, this._oContainerView, this._oContainerController);
+			},
+
+			onSectionLinkIconPress: function (oEvent) {
+				var oSection = oEvent.getSource();
+				this._copyBookmarkURL(oSection, null);
+			},
+
+			onSubSectionLinkIconPress: function (oEvent) {
+				// SubSection fires the event directly - one getParent() to reach the Section
+				var oSubSection = oEvent.getSource(),
+					oSection = oSubSection.getParent();
+				this._copyBookmarkURL(oSection, oSubSection);
+			},
+
+			/**
+			 * Updates the browser URL to reflect the given section/subsection and copies
+			 * it to the clipboard, then scrolls to the target.
+			 * @param {sap.uxap.ObjectPageSection} oSection
+			 * @param {sap.uxap.ObjectPageSubSection|null} oSubSection  null for section-only links
+			 * @private
+			 */
+			_copyBookmarkURL: function (oSection, oSubSection) {
+				var oI18n = Library.getResourceBundleFor("sap.ui.documentation"),
+					oTarget = oSubSection || oSection;
+
+				this._modifyURL(oSection, oSubSection, true);
+
+				if (navigator.clipboard) {
+					navigator.clipboard.writeText(window.location.href).then(function () {
+						MessageToast.show(oI18n.getText("API_DETAIL_BOOKMARK_COPIED"));
+					}).catch(function () {
+						MessageToast.show(oI18n.getText("API_DETAIL_BOOKMARK_URL_UPDATED"));
+					});
+				}
+
+				this._objectPage.scrollToSection(oTarget.getId(), 250);
 			},
 
 			onBorrowedPropCheckboxClick: function (oEvent) {
