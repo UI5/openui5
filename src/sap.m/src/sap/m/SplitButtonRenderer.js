@@ -79,7 +79,9 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 		oRm.openEnd();
 
 		oRm.renderControl(oButton._getTextButton());
+		oRm.attr("type", "button");
 		oRm.renderControl(oButton._getArrowButton());
+		oRm.attr("type", "button");
 
 		oRm.close("div");
 

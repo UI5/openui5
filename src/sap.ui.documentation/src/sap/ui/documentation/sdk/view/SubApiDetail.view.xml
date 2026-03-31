@@ -60,8 +60,9 @@
 				</headerContent>
 
 				<sections>
-					<ObjectPageSection id="overview" title="Overview" titleUppercase="false" visible="{= !!${/description} }">
-						<subSections>
+					<custom:ObjectPageSection id="overview" title="Overview" titleUppercase="false" visible="{= !!${/description} }"
+					showBookmarkIcon="true" bookmarkIconPress="onSectionLinkIconPress">
+						<custom:subSections>
 							<custom:ObjectPageSubSection>
 								<custom:blocks>
 									<layout:VerticalLayout width="100%">
@@ -166,14 +167,15 @@
 									</layout:VerticalLayout>
 								</custom:blocks>
 							</custom:ObjectPageSubSection>
-						</subSections>
-					</ObjectPageSection>
+						</custom:subSections>
+					</custom:ObjectPageSection>
 
 					<template:if test="{data>/hasProperties}">
-						<ObjectPageSection id="properties"
+						<custom:ObjectPageSection id="properties"
 										   title="Fields"
-										   titleUppercase="false">
-							<subSections>
+										   titleUppercase="false"
+										showBookmarkIcon="true" bookmarkIconPress="onSectionLinkIconPress">
+							<custom:subSections>
 								<custom:ObjectPageSubSection>
 									<custom:blocks>
 										<custom:LightTable rows="{path : '/properties'}"
@@ -222,15 +224,16 @@
 										</custom:LightTable>
 									</custom:blocks>
 								</custom:ObjectPageSubSection>
-							</subSections>
-						</ObjectPageSection>
+							</custom:subSections>
+						</custom:ObjectPageSection>
 					</template:if>
 
 					<template:if test="{data>/hasConstructor}">
-						<ObjectPageSection id="constructor"
+						<custom:ObjectPageSection id="constructor"
 										   title="Constructor"
-										   titleUppercase="false">
-							<subSections>
+										   titleUppercase="false"
+										showBookmarkIcon="true" bookmarkIconPress="onSectionLinkIconPress">
+							<custom:subSections>
 								<custom:ObjectPageSubSection>
 									<custom:blocks>
 										<layout:VerticalLayout width="100%">
@@ -273,15 +276,16 @@
 										</layout:VerticalLayout>
 									</custom:blocks>
 								</custom:ObjectPageSubSection>
-							</subSections>
-						</ObjectPageSection>
+							</custom:subSections>
+						</custom:ObjectPageSection>
 					</template:if>
 
 					<template:if test="{data>/hasControlProperties}">
-						<ObjectPageSection id="controlproperties"
+						<custom:ObjectPageSection id="controlproperties"
 										   title="Properties"
-										   titleUppercase="false">
-							<subSections>
+										   titleUppercase="false"
+										showBookmarkIcon="true" bookmarkIconPress="onSectionLinkIconPress">
+							<custom:subSections>
 								<custom:ObjectPageSubSection>
 									<custom:blocks>
 										<m:CheckBox text="Show borrowed properties" visible="{/bHasBorrowedProps}" displayOnly="{=!${/bHasSelfProps}}" selected="{=${/bShowBorrowedProps}}" select=".onBorrowedPropCheckboxClick"/>
@@ -336,15 +340,16 @@
 										</custom:LightTable>
 									</custom:blocks>
 								</custom:ObjectPageSubSection>
-							</subSections>
-						</ObjectPageSection>
+							</custom:subSections>
+						</custom:ObjectPageSection>
 					</template:if>
 
 					<template:if test="{data>/hasAggregations}">
-						<ObjectPageSection id="aggregations"
+						<custom:ObjectPageSection id="aggregations"
 										   title="Aggregations"
-										   titleUppercase="false">
-							<subSections>
+										   titleUppercase="false"
+										showBookmarkIcon="true" bookmarkIconPress="onSectionLinkIconPress">
+							<custom:subSections>
 								<custom:ObjectPageSubSection>
 									<custom:blocks>
 										<m:CheckBox text="Show borrowed aggregations" visible="{/bHasBorrowedAggr}" displayOnly="{=!${/bHasSelfAggr}}" selected="{/bShowBorrowedAggr}" select=".onBorrowedAggrCheckboxClick"/>
@@ -410,15 +415,16 @@
 										</custom:LightTable>
 									</custom:blocks>
 								</custom:ObjectPageSubSection>
-							</subSections>
-						</ObjectPageSection>
+							</custom:subSections>
+						</custom:ObjectPageSection>
 					</template:if>
 
 					<template:if test="{data>/hasAssociations}">
-						<ObjectPageSection id="associations"
+						<custom:ObjectPageSection id="associations"
 										   title="Associations"
-										   titleUppercase="false">
-							<subSections>
+										   titleUppercase="false"
+										showBookmarkIcon="true" bookmarkIconPress="onSectionLinkIconPress">
+							<custom:subSections>
 								<custom:ObjectPageSubSection>
 									<custom:blocks>
 										<m:CheckBox text="Show borrowed associations" visible="{/bHasBorrowedAssoc}" displayOnly="{=!${/bHasSelfAssoc}}" selected="{/bShowBorrowedAssoc}" select=".onBorrowedAssocCheckboxClick"/>
@@ -465,15 +471,16 @@
 										</custom:LightTable>
 									</custom:blocks>
 								</custom:ObjectPageSubSection>
-							</subSections>
-						</ObjectPageSection>
+							</custom:subSections>
+						</custom:ObjectPageSection>
 					</template:if>
 
 					<template:if test="{data>/hasEvents}">
-						<ObjectPageSection id="events"
+						<custom:ObjectPageSection id="events"
 										   title="Events"
-										   titleUppercase="false">
-							<subSections>
+										   titleUppercase="false"
+										showBookmarkIcon="true" bookmarkIconPress="onSectionLinkIconPress">
+							<custom:subSections>
 								<custom:ObjectPageSubSection title="{= ${data>/hasEvents} &amp;&amp; !${data>/hasOwnEvents} ? 'Events' : 'Summary'}">
 									<custom:blocks>
 										<layout:VerticalLayout width="100%">
@@ -506,7 +513,8 @@
 								</custom:ObjectPageSubSection>
 
 								<template:repeat list="{data>/events}" var="event">
-									<custom:ObjectPageSubSection title="{event>name}">
+									<custom:ObjectPageSubSection title="{event>name}"
+									showBookmarkIcon="true" bookmarkIconPress="onSubSectionLinkIconPress">
 										<custom:blocks>
 											<layout:VerticalLayout width="100%">
 
@@ -567,16 +575,17 @@
 										</custom:blocks>
 									</custom:ObjectPageSubSection>
 								</template:repeat>
-							</subSections>
-						</ObjectPageSection>
+							</custom:subSections>
+						</custom:ObjectPageSection>
 					</template:if>
 
 					<template:if test="{data>/hasMethods}">
-						<ObjectPageSection id="methods"
+						<custom:ObjectPageSection id="methods"
 									   title="Methods"
 									   titleUppercase="false"
-									   class="APIDetailMethodsSection">
-							<subSections>
+									   class="APIDetailMethodsSection"
+									showBookmarkIcon="true" bookmarkIconPress="onSectionLinkIconPress">
+							<custom:subSections>
 
 								<custom:ObjectPageSubSection title="{= ${data>/hasMethods} &amp;&amp; !${data>/hasOwnMethods} ? 'Methods' : 'Summary'}">
 									<custom:blocks>
@@ -611,7 +620,8 @@
 								</custom:ObjectPageSubSection>
 
 								<template:repeat list="{data>/methods}" var="method">
-									<custom:ObjectPageSubSection title="{method>name}" id="{method>placeholderId}">
+									<custom:ObjectPageSubSection title="{method>name}" id="{method>placeholderId}"
+									showBookmarkIcon="true" bookmarkIconPress="onSubSectionLinkIconPress">
 										<custom:blocks>
 
 											<ObjectPageLazyLoader stashed="true" id="{method>subPlaceholderId}">
@@ -712,15 +722,16 @@
 										</custom:blocks>
 									</custom:ObjectPageSubSection>
 								</template:repeat>
-							</subSections>
-						</ObjectPageSection>
+							</custom:subSections>
+						</custom:ObjectPageSection>
 					</template:if>
 
 					<template:if test="{data>/hasSpecialSettings}">
-						<ObjectPageSection id="specialsettings"
+						<custom:ObjectPageSection id="specialsettings"
 										   title="Special Settings"
-										   titleUppercase="false">
-							<subSections>
+										   titleUppercase="false"
+										showBookmarkIcon="true" bookmarkIconPress="onSectionLinkIconPress">
+							<custom:subSections>
 								<custom:ObjectPageSubSection>
 									<custom:blocks>
 										<custom:LightTable rows="{path : '/ui5-metadata/specialSettings'}"
@@ -735,15 +746,16 @@
 										</custom:LightTable>
 									</custom:blocks>
 								</custom:ObjectPageSubSection>
-							</subSections>
-						</ObjectPageSection>
+							</custom:subSections>
+						</custom:ObjectPageSection>
 					</template:if>
 
 					<template:if test="{data>/hasAnnotations}">
-						<ObjectPageSection id="annotations"
+						<custom:ObjectPageSection id="annotations"
 										   title="Annotations"
-										   titleUppercase="false">
-							<subSections>
+										   titleUppercase="false"
+										showBookmarkIcon="true" bookmarkIconPress="onSectionLinkIconPress">
+							<custom:subSections>
 								<custom:ObjectPageSubSection title="Summary">
 									<custom:blocks>
 										<custom:LightTable columnCount="2" columnTitles="Annotation,Description">
@@ -760,7 +772,8 @@
 								</custom:ObjectPageSubSection>
 
 								<template:repeat list="{data>/ui5-metadata/annotations}" var="annotation">
-									<custom:ObjectPageSubSection title="{= ${annotation>annotation} !== 'undefined' ? ${annotation>annotation} : '(' + ${annotation>namespaceText} + ')' }">
+									<custom:ObjectPageSubSection title="{= ${annotation>annotation} !== 'undefined' ? ${annotation>annotation} : '(' + ${annotation>namespaceText} + ')' }"
+									showBookmarkIcon="true" bookmarkIconPress="onSubSectionLinkIconPress">
 										<custom:blocks>
 											<layout:VerticalLayout width="100%">
 
@@ -778,8 +791,8 @@
 										</custom:blocks>
 									</custom:ObjectPageSubSection>
 								</template:repeat>
-							</subSections>
-						</ObjectPageSection>
+							</custom:subSections>
+						</custom:ObjectPageSection>
 					</template:if>
 
 				</sections>

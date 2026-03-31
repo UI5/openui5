@@ -12,7 +12,7 @@
 			}
 		},
 		{
-			"control" : "sap.ui.mdc.Filterbar",
+			"control" : "sap.ui.mdc.FilterBar",
 			"url" : "./filterbar/FilterBar.html",
 			"desc" : "A filter bar with several filter fields of various data types",
 			"appComponent" : "CA-UI5-MDC",

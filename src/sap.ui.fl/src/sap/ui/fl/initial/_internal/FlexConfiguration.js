@@ -16,6 +16,7 @@ sap.ui.define([
 	 * @author SAP SE
 	 * @version ${version}
 	 * @private
+	 * @ui5-restricted sap.ui.fl, sap.ushell
 	 * @alias module:sap/ui/fl/initial/_internal/FlexConfiguration
 	 * @namespace
 	 */
@@ -67,6 +68,7 @@ sap.ui.define([
 		 * @param {string} [aFlexibilityServices.path] - Path for loading data in the ObjectPath connector
 		 * @param {sap.ui.fl.Layer[]} [aFlexibilityServices.layers] - List of layers in which the connector is allowed to write
 		 * @private
+		 * @ui5-restricted sap.ui.fl, sap.ushell
 		 * @since 1.120.0
 		 */
 		setFlexibilityServices(aFlexibilityServices) {

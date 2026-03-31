@@ -72,6 +72,26 @@ sap.ui.define([
 		}).finally(fnDone);
 	});
 
+	QUnit.test("Should get OPA5 snippet with return when preferChainableSnippets is true", function (assert) {
+		var fnDone = assert.async();
+		ControlSnippetProvider.getSnippet({
+			controlSelector: this.mSelector,
+			settings: { preferChainableSnippets: true }
+		}).then(function (sResult) {
+			assert.ok(sResult.startsWith("return this.waitFor("), "Should include return before waitFor");
+		}).finally(fnDone);
+	});
+
+	QUnit.test("Should get OPA5 snippet without return when preferChainableSnippets is false", function (assert) {
+		var fnDone = assert.async();
+		ControlSnippetProvider.getSnippet({
+			controlSelector: this.mSelector,
+			settings: { preferChainableSnippets: false }
+		}).then(function (sResult) {
+			assert.ok(sResult.startsWith("this.waitFor("), "Should not include return before waitFor");
+		}).finally(fnDone);
+	});
+
 	QUnit.test("Should get raw snippet", function (assert) {
 		DialectRegistry.setActiveDialect(Dialects.RAW);
 

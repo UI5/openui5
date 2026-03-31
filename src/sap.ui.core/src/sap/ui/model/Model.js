@@ -162,7 +162,7 @@ sap.ui.define([
 		 * @param {object} oEvent.getParameters
 		 * @param {string} oEvent.getParameters.message
 		 *   A text that describes the failure.
-		 * @param {string} oEvent.getParameters.statusCode
+		 * @param {string|number} oEvent.getParameters.statusCode
 		 *   HTTP status code returned by the request (if available)
 		 * @param {string} oEvent.getParameters.statusText
 		 *   The status as a text, details not specified, intended only for diagnosis output

@@ -224,14 +224,14 @@ sap.ui.define([
 		const oEditor = this._oEditor;
 
 		if (oCard) {
-			oSettings.baseRuntimeUrl = oCard.getRuntimeUrl();
+			oSettings.baseRuntimeUrl = oCard.resolveUrl();
 			oSettings.card = oCard;
 
 			if (!bConfigurationResolved) {
 				oSettings.configurationJson = JSONBindingHelper.createJsonWithBindingInfos(oDataConfiguration, oCard.getBindingNamespaces());
 			}
 		} else if (oEditor) {
-			oSettings.baseRuntimeUrl = oEditor.getRuntimeUrl("/"); // @todo should behave the same as card.getRuntimeUrl
+			oSettings.baseRuntimeUrl = oEditor.resolveUrl("/"); // @todo should behave the same as card.resolveUrl
 			oSettings.configurationJson = JSONBindingHelper.createJsonWithBindingInfos(oDataConfiguration, oEditor.getBindingNamespaces());
 		} else {
 			oSettings.configurationJson = JSONBindingHelper.createJsonWithBindingInfos(oDataConfiguration, {});

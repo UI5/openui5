@@ -38,55 +38,55 @@ sap.ui.define([
 	 * @enum {string}
 	 * @alias module:sap/base/config.Type
 	 * @private
-	 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+	 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 	 */
 	const TypeEnum = {
 		/**
 		 * defaultValue: false
 		 * @private
-		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 		 */
 		"Boolean": "boolean",
 		/**
 		 * defaultValue: 0
 		 * @private
-		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 		 */
 		"Integer": "integer",
 		/**
 		 * defaultValue: ""
 		 * @private
-		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 		 */
 		"String": "string",
 		/**
 		 * defaultValue: []
 		 * @private
-		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 		 */
 		"StringArray": "string[]",
 		/**
 		 * defaultValue: []
 		 * @private
-		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 		 */
 		"FunctionArray": "function[]",
 		/**
 		 * defaultValue: undefined
 		 * @private
-		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 		 */
 		"Function": "function",
 		/**
 		 * defaultValue: {}
 		 * @private
-		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 		 */
 		"Object":  "object",
 		/**
 		 * defaultValue: {}
 		 * @private
-		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 		 */
 		"MergedObject":  "mergedObject"
 	};
@@ -379,7 +379,7 @@ sap.ui.define([
 	 * @author SAP SE
 	 * @version ${version}
 	 * @private
-	 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+	 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 	 * @alias module:sap/base/config
 	 * @namespace
 	 */
@@ -398,7 +398,7 @@ sap.ui.define([
 		 * @returns {any} Value of the configuration parameter
 		 * @throws {TypeError} Throws an error if the given parameter name does not match the definition.
 		 * @private
-		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
+		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export, sap.ushell
 		 */
 		get: get,
 
@@ -421,7 +421,7 @@ sap.ui.define([
 		 * @function
 		 * @param {object} oProvider The provider instance
 		 * @private
-		 * @ui5-restricted sap.ui.core
+		 * @ui5-restricted sap.ui.core, sap.ushell
 		 */
 		registerProvider: registerProvider,
 		Type: TypeEnum,

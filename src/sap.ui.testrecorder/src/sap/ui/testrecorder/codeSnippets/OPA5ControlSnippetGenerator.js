@@ -44,7 +44,8 @@ sap.ui.define([
 		var sBasicSelector = this._getSelectorAsString(mData.controlSelector);
 		var sSelectorWithAction = this._getSelectorWithAction(sBasicSelector, sAction);
 		var sFullSelector = this._getSelectorWithAssertion(sSelectorWithAction, sAssertion);
-		return "this.waitFor(" + sFullSelector + ");";
+		var sReturnPrefix = mData.settings && mData.settings.preferChainableSnippets ? "return " : "";
+		return sReturnPrefix + "this.waitFor(" + sFullSelector + ");";
 	};
 
 	/**

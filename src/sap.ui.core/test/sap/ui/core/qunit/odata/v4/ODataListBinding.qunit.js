@@ -433,17 +433,20 @@ sap.ui.define([
 	const sTitle = "setAggregation: pending changes/iCreatedContexts=" + iCreatedContexts;
 
 	QUnit.test(sTitle, function (assert) {
-		var oBinding = this.bindList("/EMPLOYEES");
+		var oBinding = this.bindList("/EMPLOYEES"),
+			oBindingMock = this.mock(oBinding);
 
 		oBinding.iCreatedContexts = iCreatedContexts;
-		this.mock(oBinding).expects("checkTransient").withExactArgs();
-		this.mock(oBinding).expects("isUnchangedParameter")
+		oBindingMock.expects("checkTransient").withExactArgs();
+		oBindingMock.expects("isUnchangedParameter")
 			.withExactArgs("$$aggregation", "~oAggregation~").returns(false);
-		this.mock(oBinding).expects("hasFilterNone").withExactArgs().returns(false);
-		this.mock(oBinding).expects("hasPendingChanges").exactly(1 - iCreatedContexts)
+		oBindingMock.expects("hasFilterNone").withExactArgs().returns(false);
+		oBindingMock.expects("isUnchangedParameter").exactly(iCreatedContexts ? 1 : 0)
+			.withExactArgs("$$aggregation", "~oAggregation~", ["search"]).returns(false);
+		oBindingMock.expects("hasPendingChanges").exactly(1 - iCreatedContexts)
 			.withExactArgs().returns(true);
-		this.mock(oBinding).expects("hasEffectivelyKeptAlive").never();
-		this.mock(oBinding).expects("applyParameters").never();
+		oBindingMock.expects("hasEffectivelyKeptAlive").never();
+		oBindingMock.expects("applyParameters").never();
 
 		assert.throws(function () {
 			// code under test
@@ -489,12 +492,16 @@ sap.ui.define([
 	//*********************************************************************************************
 [0, 1, 2].forEach(function (i) {
 	[0, 1, 2].forEach(function (j) {
-		if (!i && !j) {
-			return; // tested separately, see "unchanged aggregation"
-		}
+		[0, 1].forEach((iCreatedContexts) => {
+			const sTitle = "setAggregation: " + i + " <-> " + j
+				+ ", iCreatedContexts=" + iCreatedContexts;
+			if (!i && !j) {
+				return; // tested separately, see "unchanged aggregation"
+			}
 
-	QUnit.test("setAggregation: " + i + " <-> " + j, function (assert) {
+	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
+			oBindingMock = this.mock(oBinding),
 			mExpectedNewParameters = {
 				$$groupId : "foo",
 				$filter : "bar",
@@ -524,19 +531,23 @@ sap.ui.define([
 		if (oNewAggregation !== undefined) {
 			mExpectedNewParameters.$$aggregation = "~oNewAggregation~cloned~";
 		}
-		this.mock(oBinding).expects("checkTransient").withExactArgs();
-		this.mock(oBinding).expects("isUnchangedParameter")
+		oBinding.iCreatedContexts = iCreatedContexts;
+		oBindingMock.expects("checkTransient").withExactArgs();
+		oBindingMock.expects("isUnchangedParameter")
 			.withExactArgs("$$aggregation", sinon.match.same(oNewAggregation)).returns(false);
-		this.mock(oBinding).expects("hasPendingChanges").withExactArgs().returns(false);
-		this.mock(oBinding).expects("hasEffectivelyKeptAlive").exactly(i === j ? 0 : 1)
+		oBindingMock.expects("isUnchangedParameter").exactly(iCreatedContexts ? 1 : 0)
+			.withExactArgs("$$aggregation", sinon.match.same(oNewAggregation), ["search"])
+			.returns(true);
+		oBindingMock.expects("hasPendingChanges").withExactArgs().returns(false);
+		oBindingMock.expects("hasEffectivelyKeptAlive").exactly(i === j ? 0 : 1)
 			.withExactArgs().returns(true);
-		this.mock(oBinding).expects("resetKeepAlive").never();
+		oBindingMock.expects("resetKeepAlive").never();
 		this.mock(_Helper).expects("clone")
 			.exactly(i === j && oNewAggregation !== undefined ? 1 : 0)
 			.withExactArgs(sinon.match.same(oNewAggregation))
 			.returns("~oNewAggregation~cloned~");
 		// idea: #setAggregation(o) is like #changeParameters({$$aggregation : o})
-		this.mock(oBinding).expects("applyParameters").exactly(i === j ? 1 : 0)
+		oBindingMock.expects("applyParameters").exactly(i === j ? 1 : 0)
 			.withExactArgs(mExpectedNewParameters, "");
 
 		if (i === j) {
@@ -549,6 +560,7 @@ sap.ui.define([
 			}, new Error("Cannot set $$aggregation due to a kept-alive context"));
 		}
 	});
+		});
 	});
 });
 
@@ -1635,9 +1647,11 @@ sap.ui.define([
 			[false, true].forEach(function (bLengthFinal) {
 				[false, true].forEach(function (bMoreContexts) {
 					[undefined, false, true].forEach(function (bOutdated) {
+						[0, 1].forEach(function (iActiveContexts) {
 	const sTitle = "fetchContexts: async=" + bAsync + ", groupLock=" + bGroupLock
 		+ ", readGroupLock=" + bReadGroupLock + ", lengthFinal=" + bLengthFinal
-		+ ", moreContexts=" + bMoreContexts + ", outdated=" + bOutdated;
+		+ ", moreContexts=" + bMoreContexts + ", outdated=" + bOutdated
+		+ ", activeContexts=" + iActiveContexts;
 
 	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
@@ -1649,6 +1663,7 @@ sap.ui.define([
 		oBinding.oReadGroupLock = oReadGroupLock;
 		oBinding.bLengthFinal = bLengthFinal;
 		oBinding.aContexts = bMoreContexts ? [{}, {}] : [{}];
+		oBinding.iActiveContexts = iActiveContexts;
 		oBinding.iCreatedContexts = 1;
 
 		this.mock(oBinding).expects("lockGroup").exactly(bGroupLock || bReadGroupLock ? 0 : 1)
@@ -1661,8 +1676,13 @@ sap.ui.define([
 		this.mock(oBinding.oHeaderContext).expects("isOutdated").withExactArgs()
 			.exactly(bLengthFinal || bMoreContexts ? 0 : 1)
 			.returns(bOutdated);
-		this.mock(oBinding.oHeaderContext).expects("setOutdated").withExactArgs(false)
-			.exactly(bLengthFinal || bMoreContexts || bOutdated === undefined ? 0 : 1);
+		const bSetOutdated = !(bLengthFinal || bMoreContexts || bOutdated === undefined);
+		this.mock(oBinding).expects("setOutdated")
+			.exactly(bSetOutdated && iActiveContexts ? 1 : 0)
+			.withExactArgs();
+		this.mock(oBinding.oHeaderContext).expects("setOutdated")
+			.exactly(bSetOutdated && !iActiveContexts ? 1 : 0)
+			.withExactArgs(false);
 		this.mock(oBinding).expects("createContexts")
 			.withExactArgs(1, sinon.match.same(oResult.value))
 			.returns(SyncPromise.resolve("~bChanged~"));
@@ -1682,6 +1702,7 @@ sap.ui.define([
 
 		return oPromise;
 	});
+						});
 					});
 				});
 			});
@@ -5395,6 +5416,8 @@ sap.ui.define([
 					.withExactArgs(oFixture.sGroupId || "$auto")
 					.returns(oFixture.sGroupId === "deferred");
 				oBindingMock.expects("getUpdateGroupId").withExactArgs().returns(oFixture.sGroupId);
+				oBindingMock.expects("setOutdated").exactly(oFixture.bInactive ? 0 : 1)
+					.withExactArgs();
 				oBindingMock.expects("lockGroup")
 					.withExactArgs(oFixture.bInactive
 							? "$inactive." + oFixture.sGroupId
@@ -5682,6 +5705,7 @@ sap.ui.define([
 
 		this.mock(oBinding).expects("isTransient").withExactArgs().returns(false);
 		this.mock(oBinding).expects("getUpdateGroupId").withExactArgs().returns("$auto");
+		this.mock(oBinding).expects("setOutdated").never();
 
 		assert.throws(function () {
 			// code under test
@@ -6137,6 +6161,7 @@ sap.ui.define([
 		// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that leads
 		// too far :-(
 		oBinding.mParameters.$$aggregation = {hierarchyQualifier : "X"};
+		this.mock(oBinding).expects("setOutdated").never();
 
 		assert.throws(function () {
 			// code under test
@@ -6196,6 +6221,7 @@ sap.ui.define([
 				iIndex : "~parentIndex~"
 			};
 		oBinding.aContexts[2] = oParentContext;
+		this.mock(oBinding).expects("setOutdated").never();
 		const oInitialData = {"@$ui5.node.parent" : oParentContext};
 		const oEntityData = {};
 		this.mock(_Helper).expects("publicClone")
@@ -6282,6 +6308,8 @@ sap.ui.define([
 		this.mock(oBinding).expects("isTransient").twice().withExactArgs().returns(false);
 		this.mock(oBinding).expects("checkDeepCreate").never();
 		this.mock(oBinding).expects("isRelative").never();
+		this.mock(oBinding).expects("setOutdated").exactly(bRecursiveHierarchy ? 0 : 1)
+			.withExactArgs();
 		this.mock(_Helper).expects("publicClone")
 			.withExactArgs(sinon.match.same(oInitialData), true).returns("~oEntityData~");
 		this.mock(oBinding).expects("lockGroup")
@@ -6356,6 +6384,7 @@ sap.ui.define([
 		this.mock(oBinding).expects("isTransient").twice().withExactArgs().returns(false);
 		this.mock(oBinding).expects("checkDeepCreate").never();
 		this.mock(oBinding).expects("isRelative").never();
+		this.mock(oBinding).expects("setOutdated").never();
 		const oParentContext = {
 				getCanonicalPath : mustBeMocked,
 				isExpanded : mustBeMocked,
@@ -10379,13 +10408,18 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("doSetProperty", function (assert) {
+[true, false].forEach(function (bTransientPredicate) {
+	QUnit.test("doSetProperty: transient predicate=" + bTransientPredicate, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
-		this.mock(oBinding).expects("setOutdated").withExactArgs();
+		this.mock(oBinding).expects("setOutdated").exactly(bTransientPredicate ? 0 : 1)
+			.withExactArgs();
 
 		// code under test
-		assert.strictEqual(oBinding.doSetProperty(), undefined);
+		assert.strictEqual(
+			oBinding.doSetProperty(bTransientPredicate ? "($uid=...)/foo" : "(42)/foo"),
+			undefined);
 	});
+});
 
 	//*********************************************************************************************
 [false, true].forEach((bDataAggregation) => {
@@ -11405,6 +11439,48 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("isUnchangedParameter: $$aggregation w/ exceptions", function (assert) {
+		const oAggregation = {
+			expandTo : 1,
+			hierarchyQualifier : "X",
+			search : "old"
+		};
+		const oBinding = this.bindList("/EMPLOYEES");
+		// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that leads
+		// too far :-(
+		oBinding.mParameters.$$aggregation = oAggregation;
+
+		let oNewAggregation = {...oAggregation, expandTo : 42};
+		assert.strictEqual(
+			// code under test
+			oBinding.isUnchangedParameter("$$aggregation", oNewAggregation, ["search"]),
+			false);
+
+		oNewAggregation = {...oAggregation, search : "new"};
+		assert.strictEqual(
+			// code under test
+			oBinding.isUnchangedParameter("$$aggregation", oNewAggregation),
+			false);
+
+		assert.strictEqual(
+			// code under test
+			oBinding.isUnchangedParameter("$$aggregation", oNewAggregation, ["search"]),
+			true);
+
+		oNewAggregation = {...oAggregation, expandTo : 42, search : "new"};
+		assert.strictEqual(
+			// code under test
+			oBinding.isUnchangedParameter("$$aggregation", oNewAggregation, ["expandTo", "search"]),
+			true);
+
+		oNewAggregation = {...oAggregation, foo : "bar"};
+		assert.strictEqual(
+			// code under test
+			oBinding.isUnchangedParameter("$$aggregation", oNewAggregation, ["foo"]),
+			true);
+	});
+
+	//*********************************************************************************************
 	QUnit.test("getCount", function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oBindingMock = this.mock(oBinding);
@@ -11737,18 +11813,20 @@ sap.ui.define([
 		oBindingMock.expects("fireEvent")
 			.withExactArgs("createActivate", {context : "~oContext~"}, true)
 			.returns(false);
+		oBindingMock.expects("setOutdated").never();
 
 		// code under test
-		oBinding.fireCreateActivate("~oContext~");
+		assert.strictEqual(oBinding.fireCreateActivate("~oContext~"), false);
 
 		assert.strictEqual(oBinding.iActiveContexts, 40);
 
 		oBindingMock.expects("fireEvent")
 			.withExactArgs("createActivate", {context : "~oContext~"}, true)
 			.returns(true);
+		oBindingMock.expects("setOutdated").withExactArgs();
 
 		// code under test
-		oBinding.fireCreateActivate("~oContext~");
+		assert.strictEqual(oBinding.fireCreateActivate("~oContext~"), true);
 
 		assert.strictEqual(oBinding.iActiveContexts, 41);
 	});

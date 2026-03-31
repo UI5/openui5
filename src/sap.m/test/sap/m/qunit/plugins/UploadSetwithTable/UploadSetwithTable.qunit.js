@@ -32,11 +32,12 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/ui/table/TreeTable",
 	"sap/m/MessageBox",
-	"sap/ui/events/KeyCodes"
+	"sap/ui/events/KeyCodes",
+	"sap/ui/core/InvisibleMessage"
 ], function (Text, MTable, MColumn, ColumnListItem, UploadSetwithTable, MDCTable, MDCColumn, JSONModel,
 			qutils, nextUIUpdate, GridColumn, GridTable, TemplateHelper, ActionsPlaceholder, OverflowToolbar,
 			Uploader, Boolean, EventBase, UploadItem, mLibrary, Log, Event, UploadItemConfiguration, Dialog,
-			FilePreviewDialog, CodeEditor, Button, TreeTable, MessageBox, KeyCodes) {
+			FilePreviewDialog, CodeEditor, Button, TreeTable, MessageBox, KeyCodes, InvisibleMessage) {
 	"use strict";
 
 	const oJSONModel = new JSONModel();
@@ -1103,11 +1104,18 @@ sap.ui.define([
 
 	const oInvalidateSpy = this.spy(oComputedItem, "invalidate");
 	const oItemRenameCanceledEventSpy = this.spy(oUploadSetwithTablePlugin, "fireItemRenameCanceled");
-	const oMessageBoxSpy = this.spy(MessageBox, "show");
+	const oMessageBoxStub = this.stub(MessageBox, "warning").callsFake(function (sMsg, mOptions) {
+		if (mOptions && mOptions.onClose) {
+			// Simulate user pressing "Discard Changes" (second action)
+			mOptions.onClose(mOptions.actions[1]);
+		}
+	});
 
 	function fnRenameCancelledHandler() {
 		assert.ok(oItemRenameCanceledEventSpy.called, "ItemRenameCancelled event is fired successfully");
 		assert.ok(oInvalidateSpy.notCalled, "Item model is not updated");
+		assert.ok(oMessageBoxStub.calledOnce, "MessageBox warning was shown when canceling with unsaved changes");
+		oMessageBoxStub.restore();
 		done();
 	}
 
@@ -1120,16 +1128,8 @@ sap.ui.define([
 		oInput.setValue(`Invoice summary test`);
 		oInput.fireLiveChange({ value: oInput.getValue() });
 
-		// Simulate pressing cancel, which should show MessageBox
+		// Simulate pressing cancel – stub intercepts MessageBox and immediately invokes discard
 		oCancelBtn.firePress();
-
-		// Simulate MessageBox discard changes button press
-		if (oMessageBoxSpy.called) {
-			const args = oMessageBoxSpy.getCall(0).args;
-			const mOptions = args[1] || {};
-			// Simulate user pressing discard
-			mOptions.onClose(mOptions.actions[1]); // assuming first action is discard
-		}
 	});
 	this.stub(oUploadSetwithTablePlugin, "_getFileRenameDialog").callsFake(function () {
 		oDialog.open();
@@ -1915,6 +1915,88 @@ sap.ui.define([
 			oDialog.attachEventOnce("afterOpen", afterDialogOpen);
 		});
     });
+
+	QUnit.test("File Preview Dialog announces file name to screen readers on carousel navigation", async function (assert) {
+		const done = assert.async();
+		const oPreviewDialog = new FilePreviewDialog();
+		const oRow = new UploadItemConfiguration({
+			fileNamePath: "fileName",
+			urlPath: "imageUrl",
+			mediaTypePath: "mediaType",
+			fileSizePath: "size"
+		});
+		const oUploadSetwithTablePlugin = new UploadSetwithTable({
+			actions: ["uploadButton"],
+			previewDialog: oPreviewDialog,
+			rowConfiguration: oRow
+		});
+		fnPreviewHandler = function (oEvent) {
+			const oSource = oEvent.getSource();
+			const oBindingContext = oSource.getBindingContext();
+			if (oBindingContext && oUploadSetwithTablePlugin) {
+				oUploadSetwithTablePlugin.openFilePreview(oBindingContext);
+			}
+		};
+		setFilePreviewHandler(fnPreviewHandler);
+		const oMdcTable = await createMDCTable({
+			actions: [
+				new ActionsPlaceholder({ id: "uploadButton", placeholderFor: "UploadButtonPlaceholder" })
+			]
+		});
+		oMdcTable.addDependent(oUploadSetwithTablePlugin);
+		oMdcTable.placeAt("qunit-fixture");
+		await oMdcTable.initialized();
+		await nextUIUpdate();
+		const oLink = oMdcTable._oTable.getItems()[1]?.getCells()[0]?.getItems()[2]?.getItems()[0];
+		if (!oLink) {
+			assert.ok(false, "File preview link not found in the table");
+		}
+		oLink.firePress();
+		let oDialog;
+		const afterDialogOpen = function (oEvent) {
+			oDialog = oEvent.getSource();
+			assert.ok(oDialog?.isOpen(), "File preview dialog is opened");
+			// Spy on InvisibleMessage.announce before navigating
+			const oInvisibleMessage = InvisibleMessage.getInstance();
+			const oAnnounceSpy = sinon.spy(oInvisibleMessage, "announce");
+			const oCarousel = oUploadSetwithTablePlugin._filePreviewDialogControl._oCarousel;
+			const oDialogHeader = oDialog?.getCustomHeader()?.getContentLeft()[0];
+			const sInitialFileName = oDialogHeader?.getText();
+			// Listen to pageChanged event to validate after navigation
+			const fnPageChangedHandler = function () {
+				setTimeout(function () {
+					// Read the new filename after async operations complete
+					const sNewFileName = oDialogHeader?.getText();
+					// Verify file name changed visually
+					assert.notStrictEqual(sInitialFileName, sNewFileName, "Dialog title updated to new file name after navigation");
+					// Verify InvisibleMessage.announce was called once
+					assert.ok(oAnnounceSpy.calledOnce, "InvisibleMessage.announce was called on carousel navigation");
+					// Verify it was called with the new file name
+					assert.strictEqual(oAnnounceSpy.getCall(0).args[0], sNewFileName,
+						"InvisibleMessage.announce was called with the new file name");
+					// Verify Polite mode is used (does not interrupt current announcements)
+					assert.strictEqual(oAnnounceSpy.getCall(0).args[1], "Polite",
+						"InvisibleMessage.announce was called with Polite mode");
+					oCarousel.detachPageChanged(fnPageChangedHandler);
+					oAnnounceSpy.restore();
+					// Wait for dialog to fully close before destroying to avoid race conditions
+					oDialog.attachEventOnce("afterClose", function() {
+						oPreviewDialog.destroy();
+						oMdcTable.destroy();
+						done();
+					});
+					oDialog.close();
+				}, 100);
+			};
+			oCarousel.attachPageChanged(fnPageChangedHandler);
+			// Trigger navigation to next file
+			oCarousel.next();
+		};
+		oPreviewDialog.attachEventOnce("beforePreviewDialogOpen", (oEvent) => {
+			oDialog = oEvent.getParameter("oDialog");
+			oDialog.attachEventOnce("afterOpen", afterDialogOpen);
+		});
+	});
 
 	// Write Qunit to test property CustomPageContentHandler of FilePreviewDialog control
 	QUnit.test("File Preview Dialog to test custom page content handler", async function (assert) {

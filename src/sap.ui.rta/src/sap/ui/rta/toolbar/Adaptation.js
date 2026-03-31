@@ -297,7 +297,7 @@ sap.ui.define([
 					formatManageAppVariants: formatAppVariantsEnabled.bind(this),
 					formatSaveAsAppVariants: formatSaveAsAppVariantsEnabled.bind(this),
 					saveAs: onSaveAsPressed.bind(this),
-					openWhatsNewOverviewDialog,
+					openWhatsNewOverviewDialog: openWhatsNewOverviewDialog.bind(this, this.getRtaInformation().flexSettings.layer),
 					openGuidedTour
 				}
 			}).then(function(oMenu) {
@@ -529,8 +529,8 @@ sap.ui.define([
 		AppVariantFeature.onGetOverview(true, this.getRtaInformation().flexSettings.layer);
 	}
 
-	function openWhatsNewOverviewDialog() {
-		WhatsNewOverview.openWhatsNewOverviewDialog();
+	function openWhatsNewOverviewDialog(sLayer) {
+		WhatsNewOverview.openWhatsNewOverviewDialog(sLayer);
 	}
 
 	function openGuidedTour() {

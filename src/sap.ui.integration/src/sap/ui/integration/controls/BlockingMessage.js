@@ -186,7 +186,7 @@ sap.ui.define([
 		});
 
 		if (mSettings.imageSrc) {
-			oBlockingMessage.setImageSrc(oCard.getRuntimeUrl(mSettings.imageSrc));
+			oBlockingMessage.setImageSrc(oCard.resolveUrl(mSettings.imageSrc));
 		}
 
 		if (sDetails && Supportability.isDebugModeEnabled()) {
