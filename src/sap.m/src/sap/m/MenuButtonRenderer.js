@@ -36,9 +36,6 @@ sap.ui.define([], function() {
 		oRm.openEnd();
 		oMenuButton._ensureBackwardsReference();
 		oRm.renderControl(oMenuButton._getButtonControl());
-		if (!oMenuButton._isSplitButton()) {
-			oRm.attr("type", "button");
-		}
 		oMenuButton._activeButton = oMenuButton._isSplitButton() ? oMenuButton._getButtonControl()._getArrowButton() : oMenuButton._getButtonControl();
 		oRm.close("div");
 	};

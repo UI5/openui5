@@ -247,6 +247,34 @@ sap.ui.define([
 						},
 						errorMessage: "Action event was called."
 					});
+				},
+
+				iShouldSeeVersionInEditor: function (sVersion) {
+					return this.waitFor({
+						id: "fileEditor",
+						viewName: sViewName,
+						success: function (oFileEditor) {
+							this.waitFor({
+								controlType: "sap.ui.codeeditor.CodeEditor",
+								matchers: {
+									ancestor: oFileEditor
+								},
+								check: function (aEditors) {
+									try {
+										const oManifest = JSON.parse(aEditors[0].getValue());
+										return oManifest["_version"] === sVersion;
+									} catch {
+										return false;
+									}
+								},
+								success: function () {
+									Opa5.assert.ok(true, "_version \"" + sVersion + "\" is shown in editor");
+								},
+								errorMessage: "_version \"" + sVersion + "\" not found in editor content"
+							});
+						},
+						errorMessage: "Could not find the file editor"
+					});
 				}
 			}
 		}

@@ -3948,7 +3948,25 @@ sap.ui.define([
 		aFilteredItems = this.oVSD._filterDetailList.getItems().filter(fnIsVisible);
 
 		// Assert
-		assert.equal(oAnnounceSpy.args[0][0], this.oResourceBundle.getText('VIEWSETTINGS_FOUND_RESULTS', [aFilteredItems.length]), "Number of the found items should be announced.");
+		assert.equal(oAnnounceSpy.args[0][0], this.oResourceBundle.getText('VIEWSETTINGS_FOUND_MANY_RESULTS', aFilteredItems.length), "Announce number of found results: 2 results found");
+
+		//Act
+		oAnnounceSpy.resetHistory();
+		oSearchField.setValue("item C");
+		oSearchField.fireLiveChange();
+		aFilteredItems = this.oVSD._filterDetailList.getItems().filter(fnIsVisible);
+
+		// Assert
+		assert.equal(oAnnounceSpy.args[0][0], this.oResourceBundle.getText('VIEWSETTINGS_FOUND_ONE_RESULT'), "Announce number of found results: One result found.");
+
+		//Act
+		oAnnounceSpy.resetHistory();
+		oSearchField.setValue("something else");
+		oSearchField.fireLiveChange();
+		aFilteredItems = this.oVSD._filterDetailList.getItems().filter(fnIsVisible);
+
+		// Assert
+		assert.equal(oAnnounceSpy.args[0][0], this.oResourceBundle.getText('VIEWSETTINGS_NO_RESULTS'), "Announce number of found results: No results found");
 
 		//cleanup
 		oAnnounceSpy.restore();

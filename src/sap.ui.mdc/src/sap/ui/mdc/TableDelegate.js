@@ -551,22 +551,17 @@ sap.ui.define([
 	}
 
 	function initializeTitleProvider(oTable) {
-		if (oTable._isOfType(TableType.TreeTable)) {
-			// The number of selectable rows cannot be determined very well for the TreeTable
-			// Binding#getCount does not include nodes that do not match the filter criteria
-			return Promise.resolve();
-		}
-
 		return loadModules("sap/m/plugins/TitleProvider").then(([TitleProvider]) => {
 			if (oTable.isDestroyed()) {
 				return Promise.reject("Destroyed");
 			}
 
+			const bIsTreeTable = oTable._isOfType(TableType.TreeTable);
 			const oTitleProvider = new TitleProvider({
 				id: `${oTable.getId()}-titleProvider`,
 				title: `${oTable.getId()}-tableTitle`,
 				enabled: "{= ${$sap.ui.mdc.Table>/headerVisible} && ${$sap.ui.mdc.Table>/showRowCount} && !${$sap.ui.mdc.Table>/hideToolbar} }",
-				manageSelectedCount: "{= ${$sap.ui.mdc.Table>/selectionMode} === 'Multi' }"
+				manageSelectedCount: bIsTreeTable ? false : "{= ${$sap.ui.mdc.Table>/selectionMode} === 'Multi' }"
 			});
 			oTable._oTable.addDependent(oTitleProvider);
 			return Promise.resolve();

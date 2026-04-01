@@ -255,6 +255,13 @@ sap.ui.define([
 		};
 
 		MenuButton.prototype.onAfterRendering = function() {
+			if (this._isSplitButton()) {
+				this._getButtonControl()._getArrowButton().$().attr("type", "button");
+				this._getButtonControl()._getTextButton().$().attr("type", "button");
+			} else {
+				this._getButtonControl().$().attr("type", "button");
+			}
+
 			if (this._activeButton) {
 				this._activeButton.$().attr("aria-expanded", "false");
 				this._activeButton = null;
