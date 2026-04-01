@@ -2309,16 +2309,16 @@ sap.ui.define([
 			return;
 		}
 
-		if (bOtherMonth) {
-			this.fireStartDateChange();
-		}
-
 		if (oRowInstance &&
 			!(oRowInstance.getMode && oRowInstance.getMode() < 2 && !bOtherMonth)) {
 			this.setStartDate(oStart);
 			oRowInstance.setStartDate(oStart);
 			oRowInstance.setDate(oCurrent);
 			this._addMonthFocusDelegate(oRowInstance);
+		}
+
+		if (bOtherMonth) {
+			this.fireStartDateChange();
 		}
 	};
 

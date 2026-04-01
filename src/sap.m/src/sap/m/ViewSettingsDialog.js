@@ -3032,9 +3032,17 @@ function(
 			liveChange: function () {
 				this._setFilterDetailItemsVisibility(oFilterDetailList);
 
-				// announce number of visible items
-				var iVisibleItems = oFilterDetailList.getItems().filter(function (oItem) { return oItem.getVisible(); }).length;
-				this._oInvisibleMessage.announce(this._rb.getText("VIEWSETTINGS_FOUND_RESULTS", [iVisibleItems]), InvisibleMessageMode.Polite);
+				// announce number of found items
+				var sAriaText,
+					iVisibleItems = oFilterDetailList.getItems().filter(function (oItem) { return oItem.getVisible(); }).length;
+				if (iVisibleItems === 1) {
+					sAriaText = this._rb.getText("VIEWSETTINGS_FOUND_ONE_RESULT");
+				} else if (iVisibleItems > 1) {
+					sAriaText = this._rb.getText("VIEWSETTINGS_FOUND_MANY_RESULTS", [iVisibleItems]);
+				} else {
+					sAriaText = this._rb.getText("VIEWSETTINGS_NO_RESULTS");
+				}
+				this._oInvisibleMessage.announce(sAriaText, InvisibleMessageMode.Polite);
 			}.bind(this)
 		});
 		return oFilterSearchField;

@@ -628,6 +628,7 @@ sap.ui.define([
 			await this.oTable._fullyInitialized();
 		},
 		assertTitleProviderSettings: function(assert) {
+			const bIsTreeTable = this.oTable._isOfType(TableType.TreeTable);
 			const oTitleProvider = PluginBase.getPlugin(this.oTable._oTable, "sap.m.plugins.TitleProvider");
 			assert.ok(oTitleProvider, "TitleProvider plugin added to the inner table");
 			assert.equal(oTitleProvider.getId(), this.oTable.getId() + "-titleProvider", "TitleProvider id is correct");
@@ -651,7 +652,8 @@ sap.ui.define([
 			Object.values(SelectionMode).forEach((sSelectionMode) => {
 				this.oTable.setSelectionMode(sSelectionMode);
 				assert.strictEqual(
-					oTitleProvider.getManageSelectedCount(), sSelectionMode === SelectionMode.Multi,
+					oTitleProvider.getManageSelectedCount(),
+					bIsTreeTable ? false : sSelectionMode === SelectionMode.Multi,
 					`ManageSelectedCount case: selectionMode=${sSelectionMode}`
 				);
 			});
@@ -671,14 +673,15 @@ sap.ui.define([
 	});
 
 	QUnit.test("TreeTable Type", async function(assert) {
-		const oTitleProviderInitSpy = sinon.spy(TitleProvider.prototype, "init");
+		const oTitleProviderOnActivateSpy = sinon.spy(TitleProvider.prototype, "onActivate");
+		const oSelectionPluginOnActivateSpy = sinon.spy(SelectionPlugin.prototype, "onActivate");
 
 		await this.initTable({type: TableType.TreeTable});
-		const oTitleProvider = PluginBase.getPlugin(this.oTable._oTable, "sap.m.plugins.TitleProvider");
-		assert.notOk(oTitleProvider, "TitleProvider plugin not added to the inner table");
-		assert.ok(oTitleProviderInitSpy.notCalled, "TitleProvider is not instantiated");
+		this.assertTitleProviderSettings(assert);
+		assert.ok(oTitleProviderOnActivateSpy.calledAfter(oSelectionPluginOnActivateSpy), "TitleProvider is activated after SelectionPlugin");
 
-		oTitleProviderInitSpy.restore();
+		oSelectionPluginOnActivateSpy.restore();
+		oTitleProviderOnActivateSpy.restore();
 	});
 
 	QUnit.test("ResponsiveTable Type", async function(assert) {

@@ -326,7 +326,7 @@ sap.ui.define([
 									url: '/samples/list/grouping.json',
 									name: 'manifest.json',
 									key: 'manifest.json',
-										editable: true
+									editable: true
 								}]
 							},
 							{
@@ -716,7 +716,7 @@ sap.ui.define([
 									url: '/samples/table/grouping.json',
 									name: 'manifest.json',
 									key: 'manifest.json',
-										editable: true
+									editable: true
 								}]
 							},
 							{
@@ -1711,7 +1711,7 @@ sap.ui.define([
 						title: 'Samples',
 						useIFrame: true,
 						experimental: true,
-						isApplication: false,
+						isApplication: true,
 						hidden: !isDevelopmentBuild(),
 						files: [
 							{

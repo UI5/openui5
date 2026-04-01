@@ -20,6 +20,7 @@ sap.ui.define([
 	"sap/ui/integration/editor/Constants",
 	"sap/base/util/restricted/_debounce",
 	"sap/base/util/ObjectPath",
+	"sap/base/Log",
 	"sap/m/Dialog",
 	"sap/m/Button",
 	"sap/m/ToolbarSpacer",
@@ -54,6 +55,7 @@ sap.ui.define([
 	EditorConstants,
 	_debounce,
 	ObjectPath,
+	Log,
 	Dialog,
 	Button,
 	ToolbarSpacer,
@@ -128,8 +130,28 @@ sap.ui.define([
 				return;
 			}
 
+			if (!oFile.url || !oFile.url.endsWith(".json")) {
+				return;
+			}
+
+			let oManifest;
+
+			try {
+				oManifest = JSON.parse(vContent);
+			} catch (oError) {
+				Log.error("Failed to parse manifest JSON", oError, "sap.ui.demo.cardExplorer.controller.ExploreSamples");
+				return;
+			}
+
+			if (oManifest?.["sap.app"]?.type !== "card") {
+				return;
+			}
+
 			const sLatestSchemaVersion = await fetchLatestSchemaVersion();
-			oFile.content = vContent.replaceAll("%LATEST_SCHEMA_VERSION%", sLatestSchemaVersion);
+			oFile.content = JSON.stringify({
+				"_version": sLatestSchemaVersion,
+				...oManifest
+			}, null, "\t");
 		},
 
 		onExit: function () {

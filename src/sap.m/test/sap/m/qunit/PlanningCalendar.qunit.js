@@ -3378,6 +3378,37 @@ sap.ui.define([
 		assert.ok(bStartDateChange, "selected day from next month must fire startDateChange");
 	});
 
+	QUnit.test("startDateChange returns correct start date", async function (assert) {
+		// Arrange
+		const oExpectedDate = UI5Date.getInstance(2020,2,1), // Get second row
+			handleStartDateChange = function (oEvent) {
+				const oStartDate = oEvent.oSource.getStartDate();
+
+				// Assert
+				assert.equal(oExpectedDate.getFullYear(), oStartDate.getFullYear(), "Start date year is OK");
+				assert.equal(oExpectedDate.getMonth(), oStartDate.getMonth(), "Start date month is OK");
+				assert.equal(oExpectedDate.getDate(), oStartDate.getDate(), "Start date day is OK");
+			},
+			oSpy = this.spy(handleStartDateChange);
+
+		oPC1.attachEvent("startDateChange", oSpy);
+		oPC1.setStartDate(UI5Date.getInstance(2020,1,1));
+		oPC1.setViewKey(CalendarIntervalType.OneMonth);
+		bStartDateChange = false;
+		await nextUIUpdate();
+
+		const oPC1Interval = oPC1.getAggregation("table").getAggregation("infoToolbar").getContent()[1],
+			aDays = oPC1Interval.getDomRef().querySelectorAll(".sapUiCalItem"),
+			$02Mar = aDays[30];
+
+		$02Mar.focus();
+		await nextUIUpdate();
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Cleanup
+		oPC1.detachEvent("startDateChange", oSpy);
+	});
+
 	QUnit.test("viewChange", async function(assert) {
 		oPC1 = await initPlanningCalendar("PC1", "SF1", "B1");
 		bViewChange = false;

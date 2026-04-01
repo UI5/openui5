@@ -4984,13 +4984,12 @@ sap.ui.define([
 		await new Promise((resolve) => {setTimeout(resolve, 400);});
 
 		assert.equal(oValueHelp.getFilterValue(), "X", "FilterValue set");
-
 		oContent._$input.val("B (C)");
 		oContent.fireLiveChange({ value: "B (C)" });
 
 		await new Promise((resolve) => {setTimeout(resolve, 400);});
 
-		assert.equal(oValueHelp.getFilterValue(), "C", "FilterValue set");
+		assert.equal(oValueHelp.getFilterValue(), "B (C)", "FilterValue set");
 		sinon.stub(oValueHelp, "isOpen").returns(true); // as it not really opens without content
 		sinon.stub(oVHPopover, "isOpen").returns(true);
 
@@ -6827,6 +6826,109 @@ sap.ui.define([
 
 	});
 
+		QUnit.module("FilterValue - maxConditions check", {
+		beforeEach: async () => {
+			oCM = new ConditionModel();
+
+			oField = new FieldBase("F1", {
+				dataType: "sap.ui.model.type.String",
+				editMode: FieldEditMode.Editable,
+				conditions: "{cm>/conditions/Name}",
+				models: { cm: oCM }
+			});
+			oField.fireChangeEvent = _myFireChange;
+			oField.attachEvent("change", _myChangeHandler);
+			oField.attachEvent("liveChange", _myLiveChangeHandler);
+			oField.placeAt("content");
+
+			const oValueHelp = new ValueHelp("F1-H", {});
+			sinon.stub(oValueHelp, "getIcon").returns("sap-icon://value-help");
+			sinon.stub(oValueHelp, "getMaxConditions").returns(-1);
+			sinon.stub(oValueHelp, "isValidationSupported").returns(true);
+			sinon.stub(oValueHelp, "isTypeaheadSupported").returns(Promise.resolve(true));
+			sinon.stub(oValueHelp, "isOpen").returns(false);
+			sinon.stub(oValueHelp, "onControlChange").returns();
+			sinon.stub(oValueHelp, "open").returns();
+
+			oField.setValueHelp(oValueHelp);
+			await nextUIUpdate();
+		},
+		afterEach() {
+			oField.destroy();
+			oField = undefined;
+			const oValueHelp = Element.getElementById("F1-H");
+			if (oValueHelp) {
+				oValueHelp.destroy();
+			}
+			oCM.destroy();
+			oCM = undefined;
+			iCount = 0;
+			sId = "";
+			sValue = "";
+			iLiveCount = 0;
+			sLiveId = "";
+			sLiveValue = "";
+			FieldBase._init();
+			FocusHandler.oLastFocusedControlInfo = null;
+		}
+	});
+
+	QUnit.test("FilterValue: multi value (maxConditions!=1) without symbol uses LiveValue directly", (assert) => {
+		const fnDone = assert.async();
+
+		oField.setMaxConditions(-1); // multi-value
+
+		const aContent = oField.getAggregation("_content");
+		const oContent = aContent?.length > 0 && aContent[0];
+
+		oField.focus();
+		oContent._$input.val("Test (123)");
+		oContent.fireLiveChange({ value: "Test (123)" });
+
+		setTimeout(() => {
+			assert.equal(oField._sFilterValue, "Test (123)", "FilterValue is LiveValue directly without parsing");
+			fnDone();
+		}, 400);
+	});
+
+	QUnit.test("FilterValue: operator symbol entered forces value extraction", (assert) => {
+		const fnDone = assert.async();
+
+		oField.setMaxConditions(-1); // multi-value
+
+		const aContent = oField.getAggregation("_content");
+		const oContent = aContent?.length > 0 && aContent[0];
+
+		oField.focus();
+		oContent._$input.val("=Test");
+		oContent.fireLiveChange({ value: "=Test" });
+
+		setTimeout(() => {
+			assert.equal(oField._sFilterValue, "Test", "FilterValue extracts value when operator symbol is entered");
+			fnDone();
+		}, 400);
+	});
+
+	QUnit.test("FilterValue: single value field use not LiveChangeValue", async (assert) => {
+		const fnDone = assert.async();
+
+		oField.setMaxConditions(1);
+		oField.setDisplay(FieldDisplay.DescriptionValue);
+		await nextUIUpdate();
+
+		const aContent = oField.getAggregation("_content");
+		const oContent = aContent?.length > 0 && aContent[0];
+
+		oField.focus();
+		oContent._$input.val("Item1 (I1)");
+		oContent.fireLiveChange({ value: "Item1 (I1)" });
+
+		setTimeout(() => {
+			assert.equal(oField._sFilterValue, "I1", "FilterValue is not LiveValue but extracted key for single value field");
+			fnDone();
+		}, 400);
+	});
+
 	// test FieldInfo only from API side, simulate behaviour
 	QUnit.module("FieldInfo not triggerable", {
 		beforeEach: async () => {
@@ -6891,6 +6993,8 @@ sap.ui.define([
 		assert.equal(oContent.getText?.(), "Test", "Text used");
 
 	});
+
+
 
 	QUnit.module("FieldInfo triggerable", {
 		beforeEach: async () => {

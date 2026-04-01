@@ -156,7 +156,7 @@ sap.ui.define([
 	};
 
 	ValueHelpDelegate.updateBindingInfo = function(oValueHelp, oContent, oBindingInfo) {
-		ODataV4ValueHelpDelegate.updateBindingInfo(oValueHelp, oContent, oBindingInfo);
+		ODataV4ValueHelpDelegate.updateBindingInfo.apply(this, arguments);
 
 		const oContainer = oContent.getParent();
 		if (Device.system.phone && oBindingInfo.length && oContainer.isA("sap.ui.mdc.valuehelp.Popover")){
