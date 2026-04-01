@@ -134,8 +134,8 @@ sap.ui.define([
 	 * Control renderers only have access to a subset of the public and protected instance methods of
 	 * this class. The instance methods {@link #flush}, {@link #render} and {@link #destroy} are not part
 	 * of that subset and are reserved to the owner of the corresponding RenderManager instance.
-	 * Renderers will use the provided methods to create their HTML output. The RenderManager will
-	 * collect the HTML output and inject the final HTML DOM at the desired location.
+	 * Renderers will use the provided methods to describe the desired DOM output. The RenderManager will
+	 * then update the DOM at the desired location according to the description.
 	 *
 	 *
 	 * <h3>Renderers</h3>
@@ -146,7 +146,7 @@ sap.ui.define([
 	 * for under the global name <code>sap.m.Input<i>Renderer</i></code>.
 	 *
 	 * <h3>Semantic Rendering</h3>
-	 * As of 1.67, <code>RenderManager</code> provides a set of new APIs to describe the structure of the DOM that can be used by the control renderers.
+	 * The <code>RenderManager</code> provides APIs to describe the structure of the DOM that are used by the control renderers.
 	 *
 	 * <pre>
 	 *
@@ -169,18 +169,14 @@ sap.ui.define([
 	 * method of the control renderer is executed via a specified <code>RenderManager</code> interface and the control
 	 * instance.
 	 *
-	 * Traditional string-based rendering creates a new HTML structure of the control in every rendering cycle and removes
-	 * the existing control DOM structure from the DOM tree.
-	 *
-	 * The set of new semantic <code>RenderManager</code> APIs lets us understand the structure of the DOM, walk along the
+	 * The <code>RenderManager</code> APIs let us understand the structure of the DOM, walk along the
 	 * live DOM tree, and figure out changes as new APIs are called. If there is a change, then <code>RenderManager</code>
 	 * patches only the required parts of the live DOM tree. This allows control developers to remove their DOM-related
 	 * custom setters.
 	 *
-	 * <b>Note:</b> To enable the new in-place rendering technology, the <code>apiVersion</code> property of the control
-	 * renderer must be set to <code>2</code>. This property is not inherited by subclass renderers. It has to be set
-	 * anew by each subclass to assure that the extended contract between framework and renderer is fulfilled (see next
-	 * paragraph).
+	 * <b>Note:</b> The <code>apiVersion</code> property of the control renderer must be set to <code>2</code> or higher.
+	 * This property is not inherited by subclass renderers. It has to be set anew by each subclass to assure that the
+	 * extended contract between framework and renderer is fulfilled (see next paragraph).
 	 *
 	 * <pre>
 	 *
@@ -295,7 +291,7 @@ sap.ui.define([
 			sLastClassMethod;
 
 		/**
-		 * Reset all rendering related buffers.
+		 * Reset all rendering related state.
 		 */
 		function reset() {
 			assert(!(sLastStyleMethod = sLastClassMethod = ""));
@@ -364,8 +360,7 @@ sap.ui.define([
 		}
 
 		//#################################################################################################
-		// Methods for 'Buffered writer' functionality... (all public)
-		// i.e. used methods in render-method of Renderers
+		// Rendering Interface
 		//#################################################################################################
 
 		/**
@@ -538,10 +533,6 @@ sap.ui.define([
 		 * @public
 		 * @since 1.67
 		 */
-
-		//#################################################################################################
-		// Semantic Rendering Interface for String Based Rendering
-		//#################################################################################################
 
 		//#################################################################################################
 		// Semantic Rendering Interface for DOM Based Rendering
@@ -837,7 +828,7 @@ sap.ui.define([
 					oControlStyles.aCustomStyleClasses = oControl.aCustomStyleClasses;
 				}
 
-				// push them to the style stack that will be read by the first writeClasses/openEnd/voidEnd call to append additional classes
+				// push them to the style stack that will be read by the first openEnd/voidEnd call to append additional classes
 				aStyleStack.push(oControlStyles);
 
 				// mark that the rendering phase has been started
@@ -887,8 +878,7 @@ sap.ui.define([
 		}
 
 		/**
-		 * Turns the given control into its HTML representation and appends it to the
-		 * rendering buffer.
+		 * Renders the given control and applies the result to the DOM tree.
 		 *
 		 * If the given control is undefined or null, then nothing is rendered.
 		 *
@@ -1057,7 +1047,7 @@ sap.ui.define([
 		}
 
 		/**
-		 * Renders the content of the rendering buffer into the provided DOM node.
+		 * Renders the collected rendering output into the provided DOM node.
 		 *
 		 * This function must not be called within control renderers.
 		 *
@@ -1067,13 +1057,13 @@ sap.ui.define([
 		 *   // Create a new instance of the RenderManager
 		 *   var rm = sap.ui.getCore().createRenderManager();
 		 *
-		 *   // Use the writer API to fill the buffers
-		 *   rm.write(...);
+		 *   // Use the rendering API to create DOM elements
+		 *   rm.openStart("div");
+		 *   rm.openEnd();
 		 *   rm.renderControl(oControl);
-		 *   rm.write(...);
-		 *   ...
+		 *   rm.close("div");
 		 *
-		 *   // Finally flush the buffer into the provided DOM node (The current content is removed)
+		 *   // Finally flush the rendering output into the provided DOM node (The current content is removed)
 		 *   rm.flush(oDomNode);
 		 *
 		 *   // If the instance is not needed anymore, destroy it
@@ -1081,9 +1071,9 @@ sap.ui.define([
 		 *
 		 * </pre>
 		 *
-		 * @param {Element} oTargetDomNode Node in the DOM where the buffer should be flushed into
+		 * @param {Element} oTargetDomNode Node in the DOM where the rendering output should be flushed into
 		 * @param {boolean} bDoNotPreserve Determines whether the content is preserved (<code>false</code>) or not (<code>true</code>)
-		 * @param {boolean|int} vInsert Determines whether the buffer of the target DOM node is expanded (<code>true</code>) or
+		 * @param {boolean|int} vInsert Determines whether the content of the target DOM node is extended (<code>true</code>) or
 		 *                  replaced (<code>false</code>), or the new entry is inserted at a specific position
 		 *                  (value of type <code>int</code>)
 		 * @public
@@ -1144,9 +1134,9 @@ sap.ui.define([
 						}
 					}
 				} else if (!vInsert) {
-					jQuery(oTargetDomNode).html(vHTML); // Put the HTML into the given DOM Node
+					jQuery(oTargetDomNode).html(vHTML); // Put the rendering output into the given DOM Node
 				} else {
-					insertAdjacent(oTargetDomNode, "append", vHTML); // Append the HTML into the given DOM Node
+					insertAdjacent(oTargetDomNode, "append", vHTML); // Append the rendering output into the given DOM Node
 				}
 
 			}, fnDone, oTargetDomNode);
@@ -1184,7 +1174,7 @@ sap.ui.define([
 			// Reset internal state before rendering
 			reset();
 
-			// Retrieve the markup (the rendering phase)
+			// Execute the rendering phase
 			this.renderControl(oControl);
 
 			// FIXME: MULTIPLE ROOTS
@@ -1285,7 +1275,7 @@ sap.ui.define([
 		 *                  with the semantic rendering API implementation (DOM interface methods like <code>openStart</code>,
 		 *                  <code>attr</code>, <code>openEnd</code>, <code>text</code>, <code>close</code>, etc.)
 		 * @param {Element} oTargetDomNode Node in the DOM where the result should be flushed into
-		 * @param {boolean|int} [vInsert] Determines whether the buffer of the target DOM node is expanded (<code>true</code>) or
+		 * @param {boolean|int} [vInsert] Determines whether the content of the target DOM node is extended (<code>true</code>) or
 		 *                  replaced (<code>false</code>), or the new entry is inserted at a specific position
 		 *                  (value of type <code>int</code>)
 		 * @returns {this} Reference to <code>this</code> to allow method chaining
@@ -1580,7 +1570,7 @@ sap.ui.define([
 			oIconInfo = IconPool.getIconInfo(sURI);
 
 			if (!oIconInfo) {
-				Log.error("An unregistered icon: " + sURI + " is used in sap.ui.core.RenderManager's writeIcon method.");
+				Log.error("An unregistered icon: " + sURI + " is used in sap.ui.core.RenderManager's icon method.");
 				return this;
 			}
 
@@ -2122,7 +2112,7 @@ sap.ui.define([
 	//#################################################################################################
 
 	/**
-	 * Renders the element data that can be used for both DOM and String rendering interfaces
+	 * Renders the element data
 	 *
 	 * @param {sap.ui.core.RenderManager} oRm The <code>RenderManager</code> instance
 	 * @param {sap.ui.core.Element} oElement The <code>Element</code> instance
