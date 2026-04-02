@@ -766,6 +766,10 @@
 
 	function getMappedName(sResourceName, sRequestingResourceName) {
 
+		if (decodeURI(sResourceName) !== sResourceName) {
+			throw new TypeError(`URL encoded module IDs are not supported: '${sResourceName}'`);
+		}
+
 		const mMap = findMapForContext(sRequestingResourceName);
 
 		// resolve relative names
