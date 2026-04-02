@@ -195,6 +195,10 @@
         }
       }
     },
+    "customSettings": {
+      "description": "[RESTRICTED] Defines custom settings passed from the Mobile SDK or a hosting application. These are global defaults that can be overridden by individual cards via their manifest. The value is an object containing custom settings as key-value pairs. This property is restricted to Mobile SDK usage",
+      "type": "object"
+    },
     "type": {
       "description": "Represents the type of the card's content",
       "type": "string",

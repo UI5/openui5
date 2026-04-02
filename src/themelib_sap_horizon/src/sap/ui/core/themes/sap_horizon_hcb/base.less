@@ -1,11 +1,11 @@
 // /**
-// * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company and Theming Base Content contributors. Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
-// * Theming Engine 17.0.0
-// * data:{"sModified":"2026-02-10T08:50:44Z"}
+// * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company. All rights reserved.
+// * Theming Engine 17.0.8
+// * data:{"sModified":"2026-04-01T08:05:13Z"}
 // */
 
 
-/******************* FILE /Base/baseLib/sap_horizon_hcb/base.less (Version 11.34.0) *******************/
+/******************* FILE /Base/baseLib/sap_horizon_hcb/base.less (Version 11.35.0) *******************/
 
 
 // [Tags "SapInternal", "Base", "Dimension", "Protected"]
@@ -936,6 +936,18 @@
 // [Tags "!Protected"]
 // [Protected "!true"]
 @sapShell_SubBrand_TextColor: contrast(@sapShellColor, @sapTextColor, @sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
+
+// [Tags "!Protected"]
+// [Protected "!true"]
+@sapShell_HeroBanner_Background: #223548;
+
+// [Tags "!Protected"]
+// [Protected "!true"]
+@sapShell_HeroBanner_BackgroundImage: linear-gradient(135deg, #0000 45%, #00000073 75%);
+
+// [Tags "!Protected"]
+// [Protected "!true"]
+@sapShell_HeroBanner_TextColor: contrast(@sapShell_HeroBanner_Background, @sapTextColor, @sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
 @sapShell_Category_1_Background: @sapHC_StandardBackground;
 
 // [Tags "!Protected"]
@@ -2246,6 +2258,10 @@
 // [Tags "!Protected"]
 // [Protected "!true"]
 @sapGroup_ContentBackground: @sapBackgroundColor;
+
+// [Tags "!Protected"]
+// [Protected "!true"]
+@sapGroup_ContentAlternatingBackground: @sapGroup_ContentBackground;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
@@ -4134,6 +4150,10 @@
 @sapChart_Sequence_Neutral_Minus5: darken(@sapChart_Sequence_Neutral, 33);
 @sapChart_Sequence_Neutral_Minus5_TextColor: contrast(@sapChart_Sequence_Neutral_Minus5, @sapChart_Data_TextColor, @sapChart_Data_ContrastTextColor, .6);
 @sapChart_Sequence_Neutral_Minus5_TextShadow: -1px 0 contrast(@sapChart_Sequence_Neutral_Minus5_TextColor, @sapContent_ShadowColor, @sapChart_ContrastShadowColor, @sapContent_ContrastTextThreshold), 0 1px contrast(@sapChart_Sequence_Neutral_Minus5_TextColor, @sapContent_ShadowColor, @sapChart_ContrastShadowColor, @sapContent_ContrastTextThreshold), 1px 0 contrast(@sapChart_Sequence_Neutral_Minus5_TextColor, @sapContent_ShadowColor, @sapChart_ContrastShadowColor, @sapContent_ContrastTextThreshold), 0 -1px contrast(@sapChart_Sequence_Neutral_Minus5_TextColor, @sapContent_ShadowColor, @sapChart_ContrastShadowColor, @sapContent_ContrastTextThreshold);
+@sapBreakpoint_S_Min: 0;
+@sapBreakpoint_M_Min: 600px;
+@sapBreakpoint_L_Min: 1024px;
+@sapBreakpoint_XL_Min: 1440px;
 @sapFontUrl_SAP-icons_ttf: url(./../sap_horizon/fonts/SAP-icons.ttf);
 @sapFontUrl_SAP-icons_woff: url(./../sap_horizon/fonts/SAP-icons.woff);
 @sapFontUrl_SAP-icons_woff2: url(./../sap_horizon/fonts/SAP-icons.woff2);
@@ -4196,10 +4216,6 @@
 @sapBackgroundColorDefault: @sapBackgroundColor;
 @sapList_HighlightColor: @sapHighlightColor;
 @sapButton_Emphasized_FontWeight: bold;
-@sapBreakpoint_S_Min: 0;
-@sapBreakpoint_M_Min: 600px;
-@sapBreakpoint_L_Min: 1024px;
-@sapBreakpoint_XL_Min: 1440px;
 
 // [Label "Shell Background Pattern Color"]
 // [Description "This parameter is deprecated and has no effect. There is no background pattern."]

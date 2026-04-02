@@ -3948,7 +3948,7 @@ sap.ui.define([
 		aFilteredItems = this.oVSD._filterDetailList.getItems().filter(fnIsVisible);
 
 		// Assert
-		assert.equal(oAnnounceSpy.args[0][0], this.oResourceBundle.getText('VIEWSETTINGS_FOUND_MANY_RESULTS', aFilteredItems.length), "Announce number of found results: 2 results found");
+		assert.equal(oAnnounceSpy.args[0][0], this.oResourceBundle.getText('VIEWSETTINGS_FOUND_MANY_RESULTS', [aFilteredItems.length]), "Announce number of found results: 2 results found");
 
 		//Act
 		oAnnounceSpy.resetHistory();
