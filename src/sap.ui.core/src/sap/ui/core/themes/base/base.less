@@ -1,11 +1,11 @@
 // /**
-// * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company and Theming Base Content contributors. Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
-// * Theming Engine 17.0.0
-// * data:{"sModified":"2026-02-10T08:50:44Z"}
+// * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company. All rights reserved.
+// * Theming Engine 17.0.8
+// * data:{"sModified":"2026-04-01T08:05:13Z"}
 // */
 
 
-/******************* FILE /Base/baseLib/baseTheme/base.less (Version 11.34.0) *******************/
+/******************* FILE /Base/baseLib/baseTheme/base.less (Version 11.35.0) *******************/
 
 
 // [Label "Brand Color"]
@@ -1834,6 +1834,31 @@
 // [Category "Shell"]
 // [Type "color"]
 @sapShell_SubBrand_TextColor: @sapDefault_Color;
+
+// [Label "Shell Hero Banner Background Color"]
+// [Description "The background color of the shell hero banner."]
+// [Tags "Base", "Shell", "Color", "Protected"]
+// [Protected "true"]
+// [Category "Shell", "HeroBanner"]
+// [Type "color"]
+@sapShell_HeroBanner_Background: @sapDefault_Color;
+
+// [Label "Shell Hero Banner Background Image"]
+// [Description "The background image of the shell hero banner. Top-left aligned, covering the shell hero banner. Layered on top of sapShell_HeroBanner_Background."]
+// [Tags "Base", "Shell", "URI", "Image", "Protected"]
+// [Protected "true"]
+// [Category "Shell", "HeroBanner"]
+// [Type "image"]
+// [TranslationKey "sapShell_HeroBanner_BgImage"]
+@sapShell_HeroBanner_BackgroundImage: @sapDefault_URI;
+
+// [Label "Shell Hero Banner Text Color"]
+// [Description "The text color of the shell hero banner, used for salutation and date. Layered on top of sapShell_HeroBanner_BackgroundImage and sapShell_HeroBanner_Background."]
+// [Tags "Base", "Shell", "Color", "Protected"]
+// [Protected "true"]
+// [Category "Shell", "HeroBanner"]
+// [Type "color"]
+@sapShell_HeroBanner_TextColor: @sapDefault_Color;
 
 // [Label "Shell Category 1 Background Color"]
 // [Description "The background color of shell elements of category 1."]
@@ -5048,6 +5073,15 @@
 // [Category "Container"]
 // [Type "color"]
 @sapGroup_ContentBackground: @sapDefault_Color;
+
+// [Label "Group Content Alternating Background Color"]
+// [Description "The background color of the content area of an alternating group."]
+// [Tags "Base", "Group", "Color", "Protected"]
+// [Protected "true"]
+// [Category "Container"]
+// [Type "color"]
+// [TranslationKey "sapGroup_ContentAlternatingBg"]
+@sapGroup_ContentAlternatingBackground: @sapDefault_Color;
 
 // [Label "Group Content Border Color"]
 // [Description "The color of the borders of a group's content area."]
@@ -13376,13 +13410,13 @@ src: @sapFontUrl_72Mono_Bold_full_woff2 format('woff2'), @sapFontUrl_72Mono_Bold
 .sapCss_72MonoBoldfull();
 /*</SAP_FREETEXT_LESS>*//*!SAP_POSTPROCESS_REDUCE_END*/
 // /**
-// * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company and Theming Base Content contributors. Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
-// * Theming Engine 17.0.0
-// * data:{"sModified":"2026-02-10T08:50:44Z"}
+// * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company. All rights reserved.
+// * Theming Engine 17.0.8
+// * data:{"sModified":"2026-04-01T08:05:13Z"}
 // */
 
 
-/******************* FILE /Base/baseLib/sap_belize_hcw/base.less (Version 11.34.0) *******************/
+/******************* FILE /Base/baseLib/sap_belize_hcw/base.less (Version 11.35.0) *******************/
 
 
 // [Tags "SapInternal", "Base", "Dimension", "Protected"]
@@ -14315,6 +14349,9 @@ src: @sapFontUrl_72Mono_Bold_full_woff2 format('woff2'), @sapFontUrl_72Mono_Bold
 // [Tags "!Protected"]
 // [Protected "!true"]
 @sapShell_SubBrand_TextColor: contrast(@sapShellColor, @sapTextColor, @sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
+@sapShell_HeroBanner_Background: #d1efff;
+@sapShell_HeroBanner_BackgroundImage: linear-gradient(135deg, #0000 45%, #00000073 75%);
+@sapShell_HeroBanner_TextColor: contrast(@sapShell_HeroBanner_Background, @sapTextColor, @sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
 @sapShell_Category_1_Background: @sapHC_StandardBackground;
 
 // [Tags "!Protected"]
@@ -15625,6 +15662,7 @@ src: @sapFontUrl_72Mono_Bold_full_woff2 format('woff2'), @sapFontUrl_72Mono_Bold
 // [Tags "!Protected"]
 // [Protected "!true"]
 @sapGroup_ContentBackground: @sapBackgroundColor;
+@sapGroup_ContentAlternatingBackground: @sapGroup_ContentBackground;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
@@ -17423,6 +17461,10 @@ src: @sapFontUrl_72Mono_Bold_full_woff2 format('woff2'), @sapFontUrl_72Mono_Bold
 @sapChart_Sequence_Neutral_Minus5: darken(@sapChart_Sequence_Neutral, 32);
 @sapChart_Sequence_Neutral_Minus5_TextColor: contrast(@sapChart_Sequence_Neutral_Minus5, @sapChart_Data_TextColor, @sapChart_Data_ContrastTextColor, .5);
 @sapChart_Sequence_Neutral_Minus5_TextShadow: -1px 0 contrast(@sapChart_Sequence_Neutral_Minus5_TextColor, @sapContent_ShadowColor, @sapChart_ContrastShadowColor, @sapContent_ContrastTextThreshold), 0 1px contrast(@sapChart_Sequence_Neutral_Minus5_TextColor, @sapContent_ShadowColor, @sapChart_ContrastShadowColor, @sapContent_ContrastTextThreshold), 1px 0 contrast(@sapChart_Sequence_Neutral_Minus5_TextColor, @sapContent_ShadowColor, @sapChart_ContrastShadowColor, @sapContent_ContrastTextThreshold), 0 -1px contrast(@sapChart_Sequence_Neutral_Minus5_TextColor, @sapContent_ShadowColor, @sapChart_ContrastShadowColor, @sapContent_ContrastTextThreshold);
+@sapBreakpoint_S_Min: 0;
+@sapBreakpoint_M_Min: 600px;
+@sapBreakpoint_L_Min: 1024px;
+@sapBreakpoint_XL_Min: 1440px;
 @sapFontUrl_SAP-icons_ttf: url(./../baseTheme/fonts/SAP-icons.ttf);
 @sapFontUrl_SAP-icons_woff: url(./../baseTheme/fonts/SAP-icons.woff);
 @sapFontUrl_SAP-icons_woff2: url(./../baseTheme/fonts/SAP-icons.woff2);
@@ -17487,7 +17529,3 @@ src: @sapFontUrl_72Mono_Bold_full_woff2 format('woff2'), @sapFontUrl_72Mono_Bold
 @sapButton_Emphasized_FontWeight: bold;
 @sapContent_ElementHeight: 1.37em;
 @sapContent_ElementHeight_PX: 22px;
-@sapBreakpoint_S_Min: 0;
-@sapBreakpoint_M_Min: 600px;
-@sapBreakpoint_L_Min: 1024px;
-@sapBreakpoint_XL_Min: 1440px;
