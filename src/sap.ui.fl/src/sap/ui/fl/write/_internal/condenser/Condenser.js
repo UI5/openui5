@@ -128,6 +128,7 @@ sap.ui.define([
 				mClassifications[sClassification] = [oCondenserInfo];
 			} else {
 				oChange.condenserState = "delete";
+				mClassifications[sClassification][0].oldestChange = oChange;
 			}
 			mClassifications[sClassification][0].updateChange = oChange;
 		} else {
@@ -491,15 +492,29 @@ sap.ui.define([
 		});
 	}
 
-	function updateRevertData(mReducedChanges) {
+	function updateRevertData(mReducedChanges, bUnclassifiedChanges) {
+		function setRevertDataForChanges(aPath) {
+			const oUniqueKeys = ObjectPath.get(aPath, mReducedChanges);
+			if (oUniqueKeys) {
+				for (const oCondenserInfo of Object.values(oUniqueKeys)) {
+					if (oCondenserInfo.oldestChange?.getRevertData) {
+						oCondenserInfo.change.setRevertData(oCondenserInfo.oldestChange.getRevertData());
+					}
+				}
+			}
+		}
 		for (const sId in mReducedChanges) {
-			for (const sClassification of ["lastOneWins", "update"]) {
-				const oUniqueKeys = ObjectPath.get([sId, CondenserUtils.NOT_INDEX_RELEVANT, sClassification], mReducedChanges);
-				if (oUniqueKeys) {
-					for (const oCondenserInfo of Object.values(oUniqueKeys)) {
-						if (oCondenserInfo.oldestChange?.getRevertData) {
-							oCondenserInfo.change.setRevertData(oCondenserInfo.oldestChange.getRevertData());
-						}
+			// non-index-relevant changes
+			setRevertDataForChanges([sId, CondenserUtils.NOT_INDEX_RELEVANT, CondenserClassification.LastOneWins]);
+			setRevertDataForChanges([sId, CondenserUtils.NOT_INDEX_RELEVANT, CondenserClassification.Update]);
+
+			// with unclassified changes, index based condensing is completely skipped, so we must not update the revert data
+			// index-relevant changes have the aggregation in the classification level, so we need to loop through the aggregations first
+			if (!bUnclassifiedChanges) {
+				const mTargetAggregations = ObjectPath.get([sId, CondenserUtils.INDEX_RELEVANT], mReducedChanges);
+				if (mTargetAggregations) {
+					for (const sAggregationName of Object.keys(mTargetAggregations)) {
+						setRevertDataForChanges([sId, CondenserUtils.INDEX_RELEVANT, sAggregationName, CondenserClassification.Move]);
 					}
 				}
 			}
@@ -601,11 +616,11 @@ sap.ui.define([
 		await defineMaps(oAppComponent, mReducedChanges, mUIReconstructions, aAllIndexRelatedChanges, aCondensableChanges);
 		Measurement.end("Condenser_defineMaps");
 
-		// for Update and LastOneWins changes only the last change is kept, but the revert data of that change does not revert
-		// to the initial state of the control. Thus we need to update the revert data with the oldest change per unique key
-		updateRevertData(mReducedChanges);
-
 		const bUnclassifiedChanges = mReducedChanges[UNCLASSIFIED];
+		// for Update, LastOneWins and Move changes only the last change is kept, but the revert data of that change does not revert
+		// to the initial state of the control. Thus we need to update the revert data with the oldest change per unique key
+		updateRevertData(mReducedChanges, bUnclassifiedChanges);
+
 		if (!bUnclassifiedChanges) {
 			UIReconstruction.compareAndUpdate(mReducedChanges, mUIReconstructions);
 		}

@@ -525,18 +525,55 @@ sap.ui.define([
 	/**
 	 * Returns the number of <code>Avatars</code> to be shown
 	 *
-	 * @param {int} iWidth - the width of the <code>sap.f.AvatarGroup</code>
-	 * @param {int} iAvatarWidth - the width full of the <code>sap.m.Avatar</code>
-	 * @param {int} iAvatarNetWidth - the net width of the <code>sap.m.Avatar</code>
+	 * @param {float} iWidth - the width of the <code>sap.f.AvatarGroup</code> in pixels
+	 * @param {float} iAvatarWidth - the width of the <code>sap.m.Avatar</code> in rem
+	 * @param {float} iAvatarNetWidth - the net width of the <code>sap.m.Avatar</code> in rem
+	 * @param {float} [iActualAvatarPxWidth] - the actual rendered width of the first avatar in pixels,
+	 *   as measured via <code>getBoundingClientRect</code>. When provided, it is used instead of
+	 *   <code>iAvatarWidth * Rem.toPx(1)</code> to avoid sub-pixel rounding errors that can
+	 *   cause infinite re-rendering loops at tight container widths.
 	 * @returns {int} The <code>Avatars</code> to be shown
 	 * @private
 	 */
-	AvatarGroup.prototype._getAvatarsToShow = function (iWidth, iAvatarWidth, iAvatarNetWidth) {
-		var iRemToPx = Rem.toPx(1),
-			iRestWidth = iWidth - (iAvatarWidth * iRemToPx),
-			iAvatarsToShow = Math.floor(iRestWidth / (iAvatarNetWidth * iRemToPx));
+	AvatarGroup.prototype._getAvatarsToShow = function (iWidth, iAvatarWidth, iAvatarNetWidth, iActualAvatarPxWidth) {
+		var iAvatarWidthPx, iAvatarNetWidthPx, iRestWidth, iAvatarsToShow;
+
+		if (iActualAvatarPxWidth) {
+			// Use actual DOM-measured avatar width to avoid rem→px conversion rounding errors
+			iAvatarWidthPx = iActualAvatarPxWidth;
+			iAvatarNetWidthPx = (iAvatarNetWidth / iAvatarWidth) * iActualAvatarPxWidth;
+		} else {
+			var iRemToPx = Rem.toPx(1);
+			iAvatarWidthPx = iAvatarWidth * iRemToPx;
+			iAvatarNetWidthPx = iAvatarNetWidth * iRemToPx;
+		}
+
+		iRestWidth = iWidth - iAvatarWidthPx;
+		iAvatarsToShow = this._floorWithTolerance(iRestWidth / iAvatarNetWidthPx);
 
 		return iAvatarsToShow + 1;
+	};
+
+	/**
+	 * Rounds a value down (floor), but snaps to the nearest integer first if the
+	 * value is within a small tolerance. This compensates for sub-pixel rounding
+	 * differences between browser layout and arithmetic (e.g. 1.9997 -> 2 instead
+	 * of being floored to 1).
+	 * @param {float} fValue The value to floor
+	 * @returns {int} The floored value
+	 * @private
+	 */
+	AvatarGroup.prototype._floorWithTolerance = function (fValue) {
+		// Maximum distance from the nearest integer that still triggers snapping.
+		// 0.01 covers the typical CSS sub-pixel rounding error (~1/320px ~ 0.003).
+		var fTolerance = 0.01,
+			iRounded = Math.round(fValue);
+
+		if (Math.abs(fValue - iRounded) < fTolerance) {
+			return iRounded;
+		}
+
+		return Math.floor(fValue);
 	};
 
 	/**
@@ -560,7 +597,14 @@ sap.ui.define([
 	 * @private
 	 */
 	AvatarGroup.prototype._getWidth = function () {
-		return Math.ceil(this.$().width());
+		var oDomRef = this.getDomRef();
+		if (!oDomRef) {
+			return 0;
+		}
+		var oStyle = window.getComputedStyle(oDomRef);
+		return Math.max(0, oDomRef.getBoundingClientRect().width
+			- parseFloat(oStyle.paddingLeft)
+			- parseFloat(oStyle.paddingRight));
 	};
 
 	/**
@@ -577,13 +621,15 @@ sap.ui.define([
 			iAvatarWidth = this._getAvatarWidth(sAvatarDisplaySize),
 			iAvatarMargin = this._getAvatarMargin(sAvatarDisplaySize),
 			iAvatarNetWidth = this._getAvatarNetWidth(iAvatarWidth, iAvatarMargin),
-			iRenderedAvatars = this.$().children(".sapFAvatarGroupItem").length;
+			iRenderedAvatars = this.$().children(".sapFAvatarGroupItem").length,
+			oFirstItemDom = iRenderedAvatars > 0 ? aItems[0].getDomRef() : null,
+			iActualAvatarPxWidth = oFirstItemDom ? oFirstItemDom.getBoundingClientRect().width : null;
 
 		if (iWidth === 0) {
 			return;
 		}
 
-		this._iAvatarsToShow = this._getAvatarsToShow(iWidth, iAvatarWidth, iAvatarNetWidth);
+		this._iAvatarsToShow = this._getAvatarsToShow(iWidth, iAvatarWidth, iAvatarNetWidth, iActualAvatarPxWidth);
 
 		// Set CSS variable for button inner height (avatar size)
 		this.getDomRef().style.setProperty("--sapUiAvatarGroupButtonInnerHeight", iAvatarWidth + "rem");

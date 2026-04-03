@@ -2302,6 +2302,8 @@ sap.ui.define([
 		 *                               // control is a template within a table.
 		 * this.expectChange("foo", ["a", "b"]); // expect values for two rows of the control with
 		 *                                       // ID "foo"
+		 * this.expectChange("foo", ["a", "b"], 5); // expect values for two rows starting at row 5
+		 *                                          // of the control with ID "foo"
 		 * this.expectChange("foo", ["a",, "b"]); // expect values for the rows 0 and 2 of the
 		 *                                       // control with the ID "foo", because this is a
 		 *                                       // sparse array in which index 1 is unset
@@ -2318,10 +2320,11 @@ sap.ui.define([
 		 * @param {string|string[]|number|number[]} [vValue]
 		 *   The expected value or a list of expected values
 		 * @param {number|string} [vRow]
-		 *   Index of an additional ("far out") row of a table, e.g. a fixed bottom row
-		 *   (Only for meta model tests) The path of the binding's parent context, in case that a
-		 *   change is expected for a single row of a list; in this case <code>vValue</code> must be
-		 *   a string
+		 *   Index of an additional ("far out") row of a table, e.g. a fixed bottom row, or the
+		 *   start index of multiple rows of a table, e.g. to avoid sparse arrays with many empty
+		 *   slots at the beginning, or (only for meta model tests) the path of the binding's parent
+		 *   context, in case that a change is expected for a single row of a list; in this case
+		 *   <code>vValue</code> must be a string
 		 * @returns {object} The test instance for chaining
 		 * @throws {Error} For unsupported or inconsistently used control IDs
 		 */
@@ -2357,8 +2360,18 @@ sap.ui.define([
 			if (arguments.length === 3) {
 				isList(true);
 				aExpectations = array(this.mListChanges, sControlId);
-				// This may create a sparse array this.mListChanges[sControlId]
-				array(aExpectations, vRow).push(vValue);
+				if (Array.isArray(vValue)) {
+					if (typeof vRow !== "number") {
+						throw new Error("vRow must be a number if vValue is an array");
+					}
+					vValue.forEach((vValue0, i) => {
+						// This may create a sparse array this.mListChanges[sControlId]
+						array(aExpectations, vRow + i).push(vValue0);
+					});
+				} else {
+					// This may create a sparse array this.mListChanges[sControlId]
+					array(aExpectations, vRow).push(vValue);
+				}
 			} else if (Array.isArray(vValue)) {
 				isList(true);
 				aExpectations = array(this.mListChanges, sControlId);
@@ -22428,7 +22441,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						"@odata.count" : "17",
 						value : [{SalesOrderID : "8"}]
 					})
-					.expectChange("listId", [,,,, "8"]);
+					.expectChange("listId", ["8"], 4);
 
 				return Promise.all([
 					oContext3.delete("$auto"),
@@ -22747,7 +22760,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						{SalesOrderID : "8"}
 					]}
 				)
-				.expectChange("id", [,,,,,, "6", "7", "8"]);
+				.expectChange("id", ["6", "7", "8"], 6);
 
 			that.oView.byId("list").requestItems();
 
@@ -24366,11 +24379,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						{CurrencyCode : "EUR", GrossAmount : "9", LifecycleStatus : "R"}
 					]
 				})
-				.expectChange("isExpanded", [,,,,,,, "No", "No", "No"])
-				.expectChange("isTotal", [,,,,,,, "Yes", "Yes", "Yes"])
-				.expectChange("level", [,,,,,,, "1", "1", "1"])
-				.expectChange("grossAmount", [,,,,,,, "7", "8", "9"])
-				.expectChange("lifecycleStatus", [,,,,,,, "T", "S", "R"]);
+				.expectChange("isExpanded", ["No", "No", "No"], 7)
+				.expectChange("isTotal", ["Yes", "Yes", "Yes"], 7)
+				.expectChange("level", ["1", "1", "1"], 7)
+				.expectChange("grossAmount", ["7", "8", "9"], 7)
+				.expectChange("lifecycleStatus", ["T", "S", "R"], 7);
 
 			oTable.setFirstVisibleRow(7);
 
@@ -25467,7 +25480,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("isExpanded", [,,, undefined,, false])
 				.expectChange("isTotal", [,,, false, false, true])
 				.expectChange("level", [,,, 2, 2, 1])
-				.expectChange("region", [,,,, "Z", "Y"])
+				.expectChange("region", ["Z", "Y"], 4)
 				.expectChange("accountResponsible", [,,, "c", "d", null])
 				.expectChange("salesAmount", [,,, "30", "40", "280"])
 				.expectChange("salesNumber", [,,, "3", "4", null]);
@@ -25489,8 +25502,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					]
 				})
 				// no other changes because "Y" is the last visible row
-				.expectChange("groupLevelCount", [,,,,, 8])
-				.expectChange("isExpanded", [,,,,, true]);
+				.expectChange("groupLevelCount", [8], 5)
+				.expectChange("isExpanded", [true], 5);
 
 			return Promise.all([
 				// code under test
@@ -25513,13 +25526,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						{Region : "W", SalesAmount : "400"}
 					]
 				})
-				.expectChange("isExpanded", [,,,,,,,,,,,,, /*undefined*/, false, false])
-				.expectChange("isTotal", [,,,,,,,,,,,,, false, true, true])
-				.expectChange("level", [,,,,,,,,,,,,, 2, 1, 1])
-				.expectChange("region", [,,,,,,,,,,,,, "Y", "X", "W"])
-				.expectChange("accountResponsible", [,,,,,,,,,,,,, "h", null/*, null*/])
-				.expectChange("salesAmount", [,,,,,,,,,,,,, "80", "300", "400"])
-				.expectChange("salesNumber", [,,,,,,,,,,,,, "8", null/*, null*/]);
+				.expectChange("isExpanded", [/*undefined*/, false, false], 13)
+				.expectChange("isTotal", [false, true, true], 13)
+				.expectChange("level", [2, 1, 1], 13)
+				.expectChange("region", ["Y", "X", "W"], 13)
+				.expectChange("accountResponsible", ["h", null/*, null*/], 13)
+				.expectChange("salesAmount", ["80", "300", "400"], 13)
+				.expectChange("salesNumber", ["8", null/*, null*/], 13);
 
 			// code under test
 			// creates a gap to show that we are not requesting unnecessary data
@@ -25538,12 +25551,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					]
 				})
 				// .expectChange("isExpanded", [])
-				.expectChange("isTotal", [,,,,,,,,, false, false, false])
-				.expectChange("level", [,,,,,,,,, 2, 2, 2])
-				.expectChange("region", [,,,,,,,,, "Y", "Y", "Y"])
-				.expectChange("accountResponsible", [,,,,,,,,, "d", "e", "f"])
-				.expectChange("salesAmount", [,,,,,,,,, "40", "50", "60"])
-				.expectChange("salesNumber", [,,,,,,,,, "4", "5", "6"]);
+				.expectChange("isTotal", [false, false, false], 9)
+				.expectChange("level", [2, 2, 2], 9)
+				.expectChange("region", ["Y", "Y", "Y"], 9)
+				.expectChange("accountResponsible", ["d", "e", "f"], 9)
+				.expectChange("salesAmount", ["40", "50", "60"], 9)
+				.expectChange("salesNumber", ["4", "5", "6"], 9);
 
 			// code under test
 			oTable.setFirstVisibleRow(9);
@@ -25680,11 +25693,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				return that.waitForChanges(assert, "second scroll to node 'V'");
 			}).then(function () {
 				if (bWithExpand) {
-					that.expectChange("isExpanded", [,,,, false, false, false])
-						.expectChange("isTotal", [,,,, true, true, true])
-						.expectChange("level", [,,,, 1, 1, 1])
-						.expectChange("region", [/*Z*/, /*Y*/, /*Y*/, /*X*/, "W", "V", "U"])
-						.expectChange("salesAmount", [,,,, "400", "500", "600"])
+					that.expectChange("isExpanded", [false, false, false], 4)
+						.expectChange("isTotal", [true, true, true], 4)
+						.expectChange("level", [1, 1, 1], 4)
+						.expectChange("region", ["W", "V", "U"], 4)
+						.expectChange("salesAmount", ["400", "500", "600"], 4)
 						.expectCanceledError("Failed to get contexts for /aggregation/BusinessPartners"
 								+ " with start index 3 and length 3",
 							"Collapse or expand before read has finished")
@@ -25695,11 +25708,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					// code under test
 					fnRespondExpand();
 				} else {
-					that.expectChange("isExpanded", [,,,, false, false, false])
-						.expectChange("isTotal", [,,,, true, true, true])
-						.expectChange("level", [,,,, 1, 1, 1])
-						.expectChange("region", [/*Z*/, /*Y*/, /*X*/, /*W*/, "V", "U", "T"])
-						.expectChange("salesAmount", [,,,, "500", "600", "700"]);
+					that.expectChange("isExpanded", [false, false, false], 4)
+						.expectChange("isTotal", [true, true, true], 4)
+						.expectChange("level", [1, 1, 1], 4)
+						.expectChange("region", ["V", "U", "T"], 4)
+						.expectChange("salesAmount", ["500", "600", "700"], 4);
 				}
 				// code under test
 				fnRespondScroll1();
@@ -25937,17 +25950,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						SalesAmountLocalCurrency : "400"
 					}]
 				})
-				.expectChange("isExpanded", [,,,,,, undefined, undefined, , false])
-				.expectChange("isTotal", [,,,,,, false, false, false, true])
-				.expectChange("level", [,,,,,, 2, 2, 2, 1])
-				.expectChange("country", [,,,,,, "X", "X", "X", "W"])
-				.expectChange("region", [,,,,,, "c", "d", "e"/*, null*/])
-				.expectChange("amountPerSale", [,,,,,,, "10", "10"/*, undefined*/])
-				.expectChange("salesAmount", [,,,,,, "30.30", "40.40", "50.50"/*, undefined*/])
-				.expectChange("currency", [,,,,,,, "DEM", "DEM"/*, null*/])
-				.expectChange("salesAmountLocalCurrency", [,,,,,, "30", "40", "50", "400"])
-				.expectChange("localCurrency", [,,,,,, "USD", "USD", "USD", "JPY"])
-				.expectChange("salesNumber", [,,,,,, "3", "4", "5"/*, null*/]);
+				.expectChange("isExpanded", [undefined, undefined, , false], 6)
+				.expectChange("isTotal", [false, false, false, true], 6)
+				.expectChange("level", [2, 2, 2, 1], 6)
+				.expectChange("country", ["X", "X", "X", "W"], 6)
+				.expectChange("region", ["c", "d", "e"/*, null*/], 6)
+				.expectChange("amountPerSale", [/*"10"*/, "10", "10"/*, undefined*/], 6)
+				.expectChange("salesAmount", ["30.30", "40.40", "50.50"/*, undefined*/], 6)
+				.expectChange("currency", ["DEM", "DEM"/*, null*/], 7)
+				.expectChange("salesAmountLocalCurrency", ["30", "40", "50", "400"], 6)
+				.expectChange("localCurrency", ["USD", "USD", "USD", "JPY"], 6)
+				.expectChange("salesNumber", ["3", "4", "5"/*, null*/], 6);
 
 			// code under test
 			oTable.setFirstVisibleRow(6);
@@ -26977,15 +26990,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				})
 				.expectChange("groupLevelCount", [,,, 2, undefined, undefined])
 				.expectChange("isExpanded", [,,, true, undefined, undefined])
-				.expectChange("isTotal", [,,,, false, false])
-				.expectChange("level", [,,,, 3, 3])
-				.expectChange("isActiveEntity", [,,,, true, true])
-				.expectChange("inProcessByUser", [,,,, "", ""])
-				.expectChange("name", [,,,, "B", "B"])
-				.expectChange("bestFriendName", [,,,, "B's best friend", "B's best friend"])
-				.expectChange("artistID", [,,,, "1", "2"])
-				.expectChange("city", [,,,, "Liverpool", "London"])
-				.expectChange("sendsAutographs", [,,,, false, true]);
+				.expectChange("isTotal", [false, false], 4)
+				.expectChange("level", [3, 3], 4)
+				.expectChange("isActiveEntity", [true, true], 4)
+				.expectChange("inProcessByUser", ["", ""], 4)
+				.expectChange("name", ["B", "B"], 4)
+				.expectChange("bestFriendName", ["B's best friend", "B's best friend"], 4)
+				.expectChange("artistID", ["1", "2"], 4)
+				.expectChange("city", ["Liverpool", "London"], 4)
+				.expectChange("sendsAutographs", [false, true], 4);
 
 			return Promise.all([
 				// code under test
@@ -27434,12 +27447,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			// Note: we only see the delta of row content compared to above, but then with a
 			// different row index!
-			that.expectChange("groupLevelCount", [,,,, undefined])
-				.expectChange("isExpanded", [,,,, undefined])
-				.expectChange("isTotal", [,,,, false])
-				.expectChange("level", [,,,, 2])
-				.expectChange("region", [,,,, "W", "V", "U", "T"])
-				.expectChange("salesAmount", [,,,, "40", "50", "60", "70"]);
+			that.expectChange("groupLevelCount", [undefined], 4)
+				.expectChange("isExpanded", [undefined], 4)
+				.expectChange("isTotal", [false], 4)
+				.expectChange("level", [2], 4)
+				.expectChange("region", ["W", "V", "U", "T"], 4)
+				.expectChange("salesAmount", ["40", "50", "60", "70"], 4);
 
 			// code under test
 			oTable.setFirstVisibleRow(4);
@@ -28938,9 +28951,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				[, true,, true, true, 0, "", "", "35,100", "EUR"]
 			], (bInactive ? 27 : 28) + 3);
 
-			this.expectChange("region", bInactive
-					? [,,, "A", "B", "C", "D"]
-					: [,,,, "A", "B", "C", "D"]);
+			this.expectChange("region", ["A", "B", "C", "D"], bInactive ? 3 : 4);
 
 			oTable.setFirstVisibleRow(bInactive ? 3 : 4); // no GET needed
 
@@ -28985,9 +28996,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						SalesAmount : "800"
 					}]
 				})
-				.expectChange("region", bInactive
-					? [,,,,,,, "E", "F", "G", "H"]
-					: [,,,,,,,, "E", "F", "G", "H"]);
+				.expectChange("region", ["E", "F", "G", "H"], bInactive ? 7 : 8);
 
 			oTable.setFirstVisibleRow(bInactive ? 7 : 8);
 
@@ -29411,11 +29420,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					]
 				})
 				// .expectChange("isExpanded", [])
-				.expectChange("isTotal", [,,,,,,, false, false, false])
-				.expectChange("level", [,,,,,,, 2, 2, 2])
-				.expectChange("country", [,,,,,,, "A", "A", "A"])
-				.expectChange("region", [,,,,,,, "f", "g", "h"])
-				.expectChange("salesNumber", [,,,,,,, "6", "7", "8"]);
+				.expectChange("isTotal", [false, false, false], 7)
+				.expectChange("level", [2, 2, 2], 7)
+				.expectChange("country", ["A", "A", "A"], 7)
+				.expectChange("region", ["f", "g", "h"], 7)
+				.expectChange("salesNumber", ["6", "7", "8"], 7);
 
 			// scroll down
 			oTable.setFirstVisibleRow(7);
@@ -35346,7 +35355,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						Name : "Theta Pi"
 					}]
 				})
-				.expectChange("name", [,,,, "Zeta", "Eta", "Theta Pi"]);
+				.expectChange("name", ["Zeta", "Eta", "Theta Pi"], 4);
 
 			// code under test
 			oTable.setFirstVisibleRow(4);
@@ -35955,8 +35964,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Name : "Zeta"
 				}]
 			})
-			.expectChange("expanded", [,,,, false, true])
-			.expectChange("name", [,,,, "Epsilon", "Zeta"]);
+			.expectChange("expanded", [false, true], 4)
+			.expectChange("name", ["Epsilon", "Zeta"], 4);
 
 		const oTable = this.oView.byId("table");
 		oTable.setFirstVisibleRow(4);
@@ -35988,8 +35997,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Name : "Eta"
 				}]
 			})
-			.expectChange("expanded", [,,,, true])
-			.expectChange("name", [,,,, "Zeta", "Eta"]);
+			.expectChange("expanded", [true], 4)
+			.expectChange("name", ["Zeta", "Eta"], 4);
 
 		await Promise.all([
 			// code under test
@@ -36197,8 +36206,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Name : "Theta"
 				}]
 			})
-			.expectChange("expanded", [,,,, false])
-			.expectChange("name", [,,,, "Epsilon", "Zeta", "Theta"]);
+			.expectChange("expanded", [false], 4)
+			.expectChange("name", ["Epsilon", "Zeta", "Theta"], 4);
 
 		const oTable = this.oView.byId("table");
 		oTable.setFirstVisibleRow(4);
@@ -36216,8 +36225,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Name : "Omega"
 				}]
 			})
-			.expectChange("expanded", [,,,, true])
-			.expectChange("name", [,,,,, "Omega", "Zeta"]);
+			.expectChange("expanded", [true], 4)
+			.expectChange("name", ["Omega", "Zeta"], 5);
 
 		await Promise.all([
 			oTable.getRows()[0].getBindingContext().expand(),
@@ -46661,7 +46670,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Name : "Eta"
 				}]
 			})
-			.expectChange("id", [,,,,, "5", "6"]);
+			.expectChange("id", ["5", "6"], 5);
 
 		oTable.setFirstVisibleRow(5);
 
@@ -46927,7 +46936,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Name : "Eta"
 				}]
 			})
-			.expectChange("id", [,,,,, "5", "6"]);
+			.expectChange("id", ["5", "6"], 5);
 
 		oTable.setFirstVisibleRow(5);
 
@@ -48593,8 +48602,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							}
 						}]
 					})
-					.expectChange("id", [,,,,, "3", "4", "5"])
-					.expectChange("name", [,,,,, "Delta", "Epsilon", "Zeta"]);
+					.expectChange("id", ["3", "4", "5"], 5)
+					.expectChange("name", ["Delta", "Epsilon", "Zeta"], 5);
 
 				// code under test
 				oTable.setFirstVisibleRow(5);
@@ -49336,13 +49345,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					{DrillState : "leaf", ID : "10", Name : "Nu*"}
 				]
 			})
-			.expectChange("name", [,,,,, "Theta*", "Iota*"]);
+			.expectChange("name", ["Theta*", "Iota*"], 5);
 
 		oTable.setFirstVisibleRow(5);
 
 		await this.waitForChanges(assert, "(5) scroll to 5");
 
-		this.expectChange("name", [,,,,, "Zeta*", "Eta*"]);
+		this.expectChange("name", ["Zeta*", "Eta*"], 5);
 
 		await Promise.all([
 			oAlpha.expand(),
@@ -49356,7 +49365,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oGamma.getProperty("@$ui5.context.isTransient"), undefined, "not now");
 		assert.strictEqual(oGamma.created(), oGammaCreated);
 
-		this.expectChange("name", [,,,, "Epsilon*", "Zeta*"])
+		this.expectChange("name", ["Epsilon*", "Zeta*"], 4)
 			// Note: due to threshold="4", Beta and Gamma are read now
 			.expectRequest("EMPLOYEES('0.0')?$select=DrillState,ID,Name",
 				{DrillState : "leaf", ID : "0.0", Name : "Beta*"})
@@ -57635,9 +57644,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						PublicationID : "42-8"
 					}]
 				})
-				.expectChange("price", [,,,,,,, "7.77", "7.88"])
-				.expectChange("currency", [,,,,,,, "EUR", "EUR"])
-				.expectChange("inProcessByUser", [,,,,,,, "", ""]);
+				.expectChange("price", ["7.77", "7.88"], 7)
+				.expectChange("currency", ["EUR", "EUR"], 7)
+				.expectChange("inProcessByUser", ["", ""], 7);
 
 			oTable.setFirstVisibleRow(7);
 
@@ -57655,7 +57664,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						PublicationID : "42-7"
 					}]
 				})
-				.expectChange("price", [,,,,,,, "5.77", "5.88"]);
+				.expectChange("price", ["5.77", "5.88"], 7);
 
 			return Promise.all([
 				// code under test
@@ -64551,7 +64560,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						{ID : "10", Name : "Daniel Red"}
 					]
 				})
-				.expectChange("text", [,,,,,,, "John Field", "Susan Bay", "Daniel Red"]);
+				.expectChange("text", ["John Field", "Susan Bay", "Daniel Red"], 7);
 
 			oTable.setFirstVisibleRow(7);
 
@@ -64585,7 +64594,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return that.waitForChanges(assert);
 		}).then(function () {
-			that.expectChange("text", [,,,,,,, "John Field", "Susan Bay", "Daniel Red"]);
+			that.expectChange("text", ["John Field", "Susan Bay", "Daniel Red"], 7);
 
 			oTable.setFirstVisibleRow(7);
 
@@ -74707,8 +74716,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						{Name : "Team #9", Team_Id : "TEAM_09"}
 					]
 				})
-				.expectChange("id", [,,,,,,, "TEAM_08", "TEAM_09", "TEAM_A", "TEAM_B", "TEAM_C"])
-				.expectChange("name", [,,,,,,, "Team #8", "Team #9", "New A", "New B", "New C"]);
+				.expectChange("id", ["TEAM_08", "TEAM_09", "TEAM_A", "TEAM_B", "TEAM_C"], 7)
+				.expectChange("name", ["Team #8", "Team #9", "New A", "New B", "New C"], 7);
 			oTable.setFirstVisibleRow(7);
 
 			return that.waitForChanges(assert, "3x transient at bottom");
@@ -74763,9 +74772,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						{Name : "'#9' Team", Team_Id : "TEAM_09"}
 					]
 				})
-				.expectChange("id", [,,,,,,,, "TEAM_C", "TEAM_09", "TEAM_A", "TEAM_B"])
+				.expectChange("id", [/*"TEAM_08"*/, "TEAM_C", "TEAM_09", "TEAM_A", "TEAM_B"], 7)
 				.expectChange("name",
-					[,,,,,,, "'#8' Team", "'C' Team", "'#9' Team", "'A' Team", "'B' Team"]);
+					["'#8' Team", "'C' Team", "'#9' Team", "'A' Team", "'B' Team"], 7);
 
 			return Promise.all([
 				// code under test
@@ -74826,9 +74835,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					]
 				})
 				.expectChange("count", "11")
-				.expectChange("id", [,,,,,, "TEAM_07", "TEAM_08", "TEAM_C", "TEAM_09", "TEAM_A"])
+				.expectChange("id", ["TEAM_07", "TEAM_08", "TEAM_C", "TEAM_09", "TEAM_A"], 6)
 				.expectChange("name",
-					[,,,,,, "Team no. 7", "Team no. 8", "Team 'C'", "Team no. 9", "Team 'A'"]);
+					["Team no. 7", "Team no. 8", "Team 'C'", "Team no. 9", "Team 'A'"], 6);
 
 			return Promise.all([
 				// code under test
@@ -81334,7 +81343,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}
 
 			let fnResolve;
-			this.expectChange("id", [,,,, "4", "5", "6", "7"])
+			this.expectChange("id", ["4", "5", "6", "7"], 4)
 				.expectEvents(assert, oListBinding, [
 					[, "dataRequested"]
 				])
@@ -81356,7 +81365,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			await resolveLater(); // allow time for the response processing
 
-			this.expectChange("id", [,,,,,,,,,, "10", "11"])
+			this.expectChange("id", ["10", "11"], 10)
 				.expectEvents(assert, oListBinding, [
 					[, "dataRequested"]
 				])
@@ -81373,7 +81382,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					[, "change", {reason : "change"}],
 					[, "dataReceived", {data : {}}]
 				])
-				.expectChange("id", [,,,,,,,,,,,, "12", "13"]);
+				.expectChange("id", ["12", "13"], 12);
 
 			fnResolve();
 
@@ -81759,7 +81768,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					{SalesOrderID : "1"}
 				]
 			})
-			.expectChange("id", [,,,, "1"]);
+			.expectChange("id", ["1"], 4);
 
 		oTable.requestItems(); // show more items (requests the missing one)
 
@@ -82205,7 +82214,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("friend", [,,, "Friend D"])
 				.expectChange("friendBusy__AS_COMPOSITE", [,,, false, true])
 				.expectChange("friendBusy__AS_COMPOSITE", [,,, false])
-				.expectChange("sibling", [,,,, "Sibling E"])
+				.expectChange("sibling", ["Sibling E"], 4)
 				.expectRequest("#11 Artists(ArtistID='40',IsActiveEntity=true)?custom=foo"
 					+ "&$select=SiblingEntity"
 					+ "&$expand=SiblingEntity($select=ArtistID,IsActiveEntity,Name)", {
@@ -82215,9 +82224,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					+ "&$select=BestFriend&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)", {
 					BestFriend : {ArtistID : "F5", IsActiveEntity : true, Name : "Friend E"}
 				})
-				.expectChange("friend", [,,,, "Friend E"])
-				.expectChange("friendBusy__AS_COMPOSITE", [,,,, false])
-				.expectChange("friendBusy__AS_COMPOSITE", [,,,, false])
+				.expectChange("friend", ["Friend E"], 4)
+				.expectChange("friendBusy__AS_COMPOSITE", [false], 4)
+				.expectChange("friendBusy__AS_COMPOSITE", [false], 4)
 				.expectChange("sibling", [,,, "Sibling D"]);
 
 			oTable.requestItems();
@@ -82265,10 +82274,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						Name : "Artist F"
 					}]
 				})
-				.expectChange("name", [,,,,, "Artist F"])
-				.expectChange("publicationCurrency", [,,,,, "CAD"])
-				.expectChange("friendBusy__AS_COMPOSITE", [,,,,, true])
-				.expectChange("sibling", [,,,,, "Sibling F"]);
+				.expectChange("name", ["Artist F"], 5)
+				.expectChange("publicationCurrency", ["CAD"], 5)
+				.expectChange("friendBusy__AS_COMPOSITE", [true], 5)
+				.expectChange("sibling", ["Sibling F"], 5);
 
 			oTable.requestItems(1);
 
@@ -82303,12 +82312,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						Name : "Artist G"
 					}]
 				})
-				.expectChange("name", [,,,,,, "Artist G"])
-				.expectChange("publicationCurrency", [,,,,,, "EUR"])
-				.expectChange("friend", [,,,,,, "Friend G"])
-				.expectChange("friendBusy__AS_COMPOSITE", [,,,,,, false])
-				.expectChange("friendBusy__AS_COMPOSITE", [,,,,,, false])
-				.expectChange("sibling", [,,,,,, "Sibling G"]);
+				.expectChange("name", ["Artist G"], 6)
+				.expectChange("publicationCurrency", ["EUR"], 6)
+				.expectChange("friend", ["Friend G"], 6)
+				.expectChange("friendBusy__AS_COMPOSITE", [false], 6)
+				.expectChange("friendBusy__AS_COMPOSITE", [false], 6)
+				.expectChange("sibling", ["Sibling G"], 6);
 
 			oTable.requestItems(1);
 
@@ -82326,8 +82335,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			await this.waitForChanges(assert, "show item 60 on object page");
 
-			this.expectChange("friend", [,,,,, "Friend F"])
-				.expectChange("friendBusy__AS_COMPOSITE", [,,,,, false])
+			this.expectChange("friend", ["Friend F"], 5)
+				.expectChange("friendBusy__AS_COMPOSITE", [false], 5)
 				.expectChange("detailFriendName", "Friend F");
 
 			fnResolveBestFriend60();
@@ -82407,12 +82416,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						Name : "Artist H"
 					}]
 				})
-				.expectChange("name", [,,,,,,, "Artist G", "Artist H"])
-				.expectChange("publicationCurrency", [,,,,,,, "EUR", "CHF"])
-				.expectChange("friend", [,,,,,,, "Friend G", "Friend H"])
-				.expectChange("friendBusy__AS_COMPOSITE", [,,,,,,, false, false])
-				.expectChange("friendBusy__AS_COMPOSITE", [,,,,,,, false, false])
-				.expectChange("sibling", [,,,,,,, "Sibling G", "Sibling H"]);
+				.expectChange("name", ["Artist G", "Artist H"], 7)
+				.expectChange("publicationCurrency", ["EUR", "CHF"], 7)
+				.expectChange("friend", ["Friend G", "Friend H"], 7)
+				.expectChange("friendBusy__AS_COMPOSITE", [false, false], 7)
+				.expectChange("friendBusy__AS_COMPOSITE", [false, false], 7)
+				.expectChange("sibling", ["Sibling G", "Sibling H"], 7);
 
 			// 70 was hidden by the #create; requesting 2 items makes 70 visible again and loads 1 more
 			oTable.requestItems();

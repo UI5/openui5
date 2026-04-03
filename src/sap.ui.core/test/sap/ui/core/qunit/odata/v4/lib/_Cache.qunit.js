@@ -11953,6 +11953,9 @@ sap.ui.define([
 			};
 		}
 		oCache.iResetCount = 11;
+		oCache.bSentRequest = "~bSentRequest~";
+		oCache.bServerDrivenPaging = true;
+		oCache.oSyncPromiseAll = "~oSyncPromiseAll~";
 		oCacheMock.expects("checkSharedRequest").exactly(sGroupId ? 1 : 0).withExactArgs();
 		oCacheMock.expects("setQueryOptions").never();
 
@@ -12031,6 +12034,9 @@ sap.ui.define([
 			});
 		}
 		assert.strictEqual(oCache.iResetCount, 12);
+		assert.strictEqual(oCache.bSentRequest, false);
+		assert.strictEqual(oCache.bServerDrivenPaging, false);
+		assert.strictEqual(oCache.oSyncPromiseAll, undefined);
 
 		if (sGroupId) {
 			if (i) {
@@ -12088,6 +12094,8 @@ sap.ui.define([
 			});
 			assert.strictEqual(oCache.iLimit, 42);
 			assert.strictEqual(oCache.iResetCount, 11);
+			assert.strictEqual(oCache.bSentRequest, "~bSentRequest~");
+			// Note: no need to restore bSentRequest, oSyncPromiseAll
 		}
 	});
 		});
@@ -12112,6 +12120,9 @@ sap.ui.define([
 		oCache.aElements.$count = oCache.iLimit = 3;
 		oCache.aReadRequests = [{iStart : 1, iEnd : 2}, {iStart : 3, iEnd : 4}];
 		oCache.mSeparateProperty2ReadRequests = {prop1 : ["range0", "range1"], prop2 : ["range2"]};
+		oCache.bSentRequest = true;
+		oCache.bServerDrivenPaging = true;
+		oCache.oSyncPromiseAll = "~oSyncPromiseAll~";
 
 		oSetQueryOptionsExpectation = this.mock(oCache).expects("setQueryOptions")
 			.withExactArgs("~mQueryOptions~", true);
@@ -12140,6 +12151,10 @@ sap.ui.define([
 		assert.deepEqual(oCache.mChangeListeners, {"" : "~listeners~"});
 		sinon.assert.callOrder(oSetQueryOptionsExpectation, oFireChangeExpectation);
 		assert.deepEqual(oCache.mSeparateProperty2ReadRequests, {prop1 : [], prop2 : []});
+		assert.strictEqual(oCache.sContext, undefined);
+		assert.strictEqual(oCache.bSentRequest, false);
+		assert.strictEqual(oCache.bServerDrivenPaging, false);
+		assert.strictEqual(oCache.oSyncPromiseAll, undefined);
 	});
 
 	//*********************************************************************************************

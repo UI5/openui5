@@ -309,6 +309,104 @@ function (
 		"Avatars to be shown are calculated correctly");
 	});
 
+	QUnit.test("_getAvatarsToShow uses actual DOM avatar width to handle sub-pixel boundary", function (assert) {
+		// 1.2rem avatars (19.188px actual) in 42.219px container.
+		// Rem.toPx(1)=16 → needs 42.24px for 3 avatars, exceeds the 42px integer → only 2 fit (wrong).
+		// Actual DOM width (19.188px) → needs 42.204px < 42.219px → all 3 fit (correct).
+		assert.strictEqual(
+			this.oAvatarGroup._getAvatarsToShow(42.219, 1.2, 0.72, 19.188),
+			3,
+			"All 3 avatars correctly calculated to fit when actual DOM avatar width is provided"
+		);
+
+		// Chrome sub-pixel rounding regression: container renders 0.003125px narrower than
+		// the theoretical sum, yielding quotient 1.9997 instead of 2.0.
+		// Without tolerance, Math.floor(1.9997) = 1, giving 2 avatars (wrong).
+		assert.strictEqual(
+			this.oAvatarGroup._getAvatarsToShow(42.2265625, 1.2, 0.72, 19.1953125),
+			3,
+			"Chrome sub-pixel rounding: 3 avatars fit despite 0.003px container shortfall"
+		);
+	});
+
+	QUnit.test("_floorWithTolerance snaps near-integer values", function (assert) {
+		var oAG = this.oAvatarGroup;
+
+		// Values within tolerance (0.01) snap to nearest integer
+		assert.strictEqual(oAG._floorWithTolerance(1.9997), 2,
+			"1.9997 snaps to 2 (distance 0.0003 < 0.01)");
+		assert.strictEqual(oAG._floorWithTolerance(2.003), 2,
+			"2.003 snaps to 2 (distance 0.003 < 0.01)");
+		assert.strictEqual(oAG._floorWithTolerance(3.0), 3,
+			"Exact integer 3.0 stays 3");
+
+		// Values outside tolerance use normal Math.floor
+		assert.strictEqual(oAG._floorWithTolerance(1.8), 1,
+			"1.8 floors to 1 (distance 0.2 > 0.01)");
+		assert.strictEqual(oAG._floorWithTolerance(2.5), 2,
+			"2.5 floors to 2 (distance 0.5 > 0.01)");
+		assert.strictEqual(oAG._floorWithTolerance(2.98), 2,
+			"2.98 floors to 2 (distance 0.02 > 0.01)");
+
+		// Negative near-zero snaps to 0
+		assert.strictEqual(oAG._floorWithTolerance(-0.003), 0,
+			"-0.003 snaps to 0 (container ~ exactly one avatar wide)");
+	});
+
+	QUnit.test("_getWidth returns fractional content width with padding excluded", async function (assert) {
+		// Arrange
+		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+		var oDomRef = this.oAvatarGroup.getDomRef();
+		this.stub(oDomRef, "getBoundingClientRect").returns({ width: 100.75 });
+		var oStyle = window.getComputedStyle(oDomRef);
+		var iExpected = Math.max(0, 100.75 - parseFloat(oStyle.paddingLeft) - parseFloat(oStyle.paddingRight));
+
+		// Act
+		var iWidth = this.oAvatarGroup._getWidth();
+
+		// Assert
+		assert.strictEqual(iWidth, iExpected,
+			"_getWidth returns the fractional getBoundingClientRect width minus computed padding");
+	});
+
+	QUnit.test("_getWidth returns 0 (not negative) when parent container is hidden", async function (assert) {
+		// Arrange
+		this.oPage = new Page({ content: [this.oAvatarGroup] });
+		this.oPage.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Act - hide parent so getBoundingClientRect().width returns 0
+		this.oPage.$().css("display", "none");
+		var iWidth = this.oAvatarGroup._getWidth();
+
+		// Assert
+		assert.strictEqual(iWidth, 0, "_getWidth returns 0 (not negative) when parent is hidden");
+
+		// Cleanup
+		this.oPage.destroy();
+	});
+
+	QUnit.test("_onResize passes actual first avatar DOM width to _getAvatarsToShow", async function (assert) {
+		// Arrange
+		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+		var oSpy = this.spy(this.oAvatarGroup, "_getAvatarsToShow");
+
+		// Act
+		this.oAvatarGroup._onResize();
+
+		// Assert
+		assert.ok(oSpy.calledOnce, "_getAvatarsToShow was called once");
+		var iActualAvatarPxWidth = oSpy.getCall(0).args[3];
+		assert.ok(iActualAvatarPxWidth > 0, "4th argument (actual avatar DOM width) is a positive number");
+		assert.strictEqual(
+			iActualAvatarPxWidth,
+			this.oAvatarGroup.getItems()[0].getDomRef().getBoundingClientRect().width,
+			"4th argument matches the first item's getBoundingClientRect().width"
+		);
+	});
+
 	QUnit.test("_iAvatarsToShow after addItem", function (assert) {
 		var iExpectedCount = this.oAvatarGroup.getItems().length + 1;
 
@@ -540,5 +638,41 @@ function (
 		assert.strictEqual(oFirePressSpy.callCount, 0, "firePress event is not fired");
 		var iTabbaleAvatars = this.oAvatarGroup.getDomRef().querySelectorAll('.sapFAvatarGroupItem[tabindex="-1"]').length;
 		assert.strictEqual(iTabbaleAvatars, 0, "Avatars are not included in the tab chain");
+	});
+
+	QUnit.module("Sub-pixel rendering regression");
+
+	QUnit.test("_onResize does not invalidate when all avatars fit at sub-pixel boundary", async function (assert) {
+		// Reproduce the exact bug: custom-size 1.2rem avatars in an auto-width container.
+		// After onAfterRendering sets style.width="auto", the ResizeHandler fires _onResize again.
+		// Bug: integer container width + Rem.toPx rounding caused a false overflow detection → invalidate loop.
+		// Fix: fractional getBoundingClientRect widths for both container and avatar are used.
+		var oAvatarGroup = new AvatarGroup({
+			avatarDisplaySize: "Custom",
+			avatarCustomDisplaySize: "1.2rem",
+			avatarCustomFontSize: ".6rem",
+			items: [
+				new AvatarGroupItem({initials: "A"}),
+				new AvatarGroupItem({initials: "B"}),
+				new AvatarGroupItem({initials: "C"})
+			]
+		});
+		oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+		// onAfterRendering has already called _onResize once (sets style.width="auto")
+
+		var oInvalidateSpy = this.spy(oAvatarGroup, "invalidate");
+
+		// Simulate the ResizeHandler firing after style.width="auto" was set
+		oAvatarGroup._onResize();
+
+		// Assert
+		assert.strictEqual(oAvatarGroup._bShowMoreButton, false,
+			"Show more button is not triggered when all avatars fit");
+		assert.ok(oInvalidateSpy.notCalled,
+			"No invalidation triggered — infinite re-render loop does not occur");
+
+		// Cleanup
+		oAvatarGroup.destroy();
 	});
 });

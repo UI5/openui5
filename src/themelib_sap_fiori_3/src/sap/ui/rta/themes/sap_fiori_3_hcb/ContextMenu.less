@@ -4,9 +4,11 @@
 /* ======================================= */
 
 @_sap_ui_rta_ContextMenu_BorderDarkColor: var(--sapShell_Background); /* #000000 */
+@_sap_ui_rta_ContextMenu_BorderLightColor: var(--sapSuccessBorderColor); /* #9c9 */
+@_sap_ui_rta_ContextMenu_BoxShadowColor: fade(@sapUiContentContrastShadowColor, 50%);
 
-.sapUiDtContextMenu.sapMMenu {
-
+.sapUiRtaMode .sapUiDtContextMenu.sapMMenu {
+	box-shadow: 0 0 1rem 0 @_sap_ui_rta_ContextMenu_BoxShadowColor, 0 0 0 0.125rem @_sap_ui_rta_ContextMenu_BorderLightColor;
 	.sapMMenuList {
 
 		.sapMMenuItem {

@@ -4,6 +4,7 @@
 
 sap.ui.define([
 	"sap/base/util/Deferred",
+	"sap/base/util/merge",
 	"sap/base/util/ObjectPath",
 	"sap/base/util/uid",
 	"sap/base/Log",
@@ -15,6 +16,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/StorageUtils"
 ], function(
 	Deferred,
+	merge,
 	ObjectPath,
 	uid,
 	Log,
@@ -405,13 +407,13 @@ sap.ui.define([
 
 	/**
 	 * Retrieves the cached flexibility data for a specific reference.
+	 * The returned data must not be mutated by a consumer.
 	 *
 	 * @param {string} sReference - The flex reference for which to retrieve the cached data.
 	 * @returns {object} The cached flexibility data or an empty object if not found.
 	 */
 	Loader.getCachedFlexData = function(sReference) {
-		// TODO return copy of the data once the CompVariantManager does not mutate it anymore
-		return _mCachedFlexData[sReference] || {};
+		return merge({}, _mCachedFlexData[sReference]);
 	};
 
 	/**

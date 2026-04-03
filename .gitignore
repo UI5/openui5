@@ -69,3 +69,7 @@ src/sap.ui.documentation/src/sap/ui/documentation/sdk/model/data/guide/
 
 # Ignore eslint cache file
 .eslintcache
+
+# Ignore Claude Code local files
+.claude/settings.local.json
+**/CLAUDE.local.md

@@ -1888,6 +1888,7 @@ sap.ui.define([
 		oContext.oDeletePromise = "~oDeletePromise~";
 		oContext.mChangeListeners = "~mChangeListeners~";
 		oContext.bOutdated = "~bOutdated~";
+		oContext.iSelectionCount = "~iSelectionCount~";
 		oContext.setNewGeneration();
 		iGeneration = oContext.getGeneration(true);
 
@@ -1915,6 +1916,7 @@ sap.ui.define([
 		assert.strictEqual(oContext.toString(), "/EMPLOYEES/42[42;destroyed]");
 		assert.notOk("mChangeListeners" in oContext);
 		assert.notOk("bOutdated" in oContext);
+		assert.notOk("iSelectionCount" in oContext);
 
 		if (bfnOnBeforeDestroy) {
 			assert.ok(bCallbackCalled);

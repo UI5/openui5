@@ -2855,6 +2855,22 @@ sap.ui.define([
 		oGetMaskModeStub.restore();
 	});
 
+	QUnit.test("onfocusin event should not add aria-description attribute when value is entered", function (assert) {
+		// prepare
+		var oGetMaskModeStub = this.stub(this.oTp, "getMaskMode").callsFake(function () { return TimePickerMaskMode.On; }),
+			oGetValueStub = this.stub(this.oTp, "getValue").callsFake(function () { return "10:30 AM"; });
+
+		// act
+		this.oTp.onfocusin({ target: this.oTp.getDomRef() });
+
+		// assert
+		assert.ok(!this.oTp.$("inner").attr("aria-description"), "aria-description attribute is not present when value is entered");
+
+		// cleanup
+		oGetMaskModeStub.restore();
+		oGetValueStub.restore();
+	});
+
 	QUnit.test("onfocusout event should remove aria-description attribute if maskMode is different than 'Off'", function (assert) {
 		// prepare
 		var oGetMaskModeStub = this.stub(this.oTp, "getMaskMode").callsFake(function () { return TimePickerMaskMode.On; });
@@ -3254,9 +3270,9 @@ sap.ui.define([
 		this.oTp.attachChange(oChangeSpy);
 
 		// act
-		this.oTp.focus();
+		this.oTp.onfocusin({ target: this.oTp.getDomRef() });
 		jQuery(this.oTp.getFocusDomRef()).val("11");
-		jQuery(this.oTp.getFocusDomRef()).trigger("blur");
+		this.oTp.onfocusout({ target: this.oTp.getDomRef() });
 
 		// assert
 		assert.equal(oChangeSpy.callCount, 1, "change event should be called once");

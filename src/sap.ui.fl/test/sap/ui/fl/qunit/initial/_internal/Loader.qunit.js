@@ -1085,6 +1085,20 @@ sap.ui.define([
 			assert.deepEqual(oFlexData, {}, "no data is returned");
 			assert.strictEqual(oLoadFlexDataStub.callCount, 0, "loadFlexData is not called");
 		});
+
+		QUnit.test("getCachedFlexData result can't be mutated", async function(assert) {
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference
+			});
+			const oFlexData1 = Loader.getCachedFlexData(sReference);
+			oFlexData1.data.changes.variants = [];
+			oFlexData1.data.changes.changes[0].fileName = "mutatedFileName";
+
+			const oFlexData2 = Loader.getCachedFlexData(sReference);
+			assert.strictEqual(oFlexData2.data.changes.variants.length, 1, "the variants are not mutated");
+			assert.strictEqual(oFlexData2.data.changes.changes[0].fileName, "change1", "the changes are not mutated");
+		});
 	});
 
 	QUnit.module("Loader with an empty cache", {

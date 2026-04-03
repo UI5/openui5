@@ -609,7 +609,7 @@ function(
 			if (!this._isMobileDevice()) {
 				DateTimeField.prototype.onfocusin.apply(this, arguments);
 				MaskEnabler.onfocusin.apply(this, arguments);
-				if (this.getMaskMode() !== TimePickerMaskMode.Off) {
+				if (this.getMaskMode() !== TimePickerMaskMode.Off && !this.getValue()) {
 					var sPlaceholder = this._getPlaceholder();
 					this._$input.attr("aria-description", sPlaceholder);
 				}

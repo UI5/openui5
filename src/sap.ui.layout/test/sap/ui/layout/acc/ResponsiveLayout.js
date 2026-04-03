@@ -8,17 +8,19 @@ sap.ui.define([
 	"sap/m/Text",
 	"sap/ui/core/Item",
 	"sap/ui/core/Title",
-	"sap/ui/layout/form/SimpleForm"
-], function(DatePicker, Input, Label, RadioButton, RadioButtonGroup, Select, Text, Item, Title, SimpleForm) {
+	"sap/ui/layout/form/SimpleForm",
+	"sap/ui/layout/library",
+	"sap/ui/core/library"
+], function(DatePicker, Input, Label, RadioButton, RadioButtonGroup, Select, Text, Item, Title, SimpleForm, LayoutLib, CoreLib) {
 	"use strict";
 
-	new SimpleForm({
-		id: "SF1",
+	new SimpleForm("SF1", {
+		layout: LayoutLib.form.SimpleFormLayout.ResponsiveLayout,
 		maxContainerCols: 2,
 		editable: true,
-		title: new Title({text: "Customer data"}),
+		title: new Title({text: "Customer data", level: CoreLib.TitleLevel.H2}),
 		content:[
-			new Title({text: "contact data"}),
+			new Title({text: "Contact data", level: CoreLib.TitleLevel.H3}),
 			new Label({text: "Name"}),
 			new Input({value: "Mustermann"}),
 			new Label({text: "First name"}),
@@ -35,7 +37,7 @@ sap.ui.define([
 				}),
 			new Label({text: "Info"}),
 			new Text({text: "additional information"}),
-			new Title({text: "Address"}),
+			new Title({text: "Address", level: CoreLib.TitleLevel.H3}),
 			new Label({text: "Street / Housenumber"}),
 			new Input({placeholder: "Street"}),
 			new Input({placeholder: "Number"}),
