@@ -423,6 +423,7 @@ sap.ui.define([
 		this.bKeepAlive = undefined;
 		delete this.bOutdated;
 		this.bSelected = false;
+		delete this.iSelectionCount; // on demand, for header contexts only
 		// When removing oModel, ManagedObject#getBindingContext does not return the destroyed
 		// context although the control still refers to it
 		this.oModel = undefined;

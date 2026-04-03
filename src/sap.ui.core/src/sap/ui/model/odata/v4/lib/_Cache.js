@@ -4063,7 +4063,8 @@ sap.ui.define([
 				$byPredicate : mByPredicate,
 				$count : this.aElements.$count,
 				$created : this.aElements.$created,
-				iLimit : this.iLimit
+				iLimit : this.iLimit,
+				bSentRequest : this.bSentRequest
 			};
 		}
 		this.iResetCount += 1;
@@ -4103,6 +4104,9 @@ sap.ui.define([
 		this.aElements.$count = undefined; // needed for _Helper.setCount
 		// Note: this.aElements.$deleted must remain unchanged
 		this.iLimit = Infinity;
+		this.bSentRequest = false;
+		this.bServerDrivenPaging = false;
+		this.oSyncPromiseAll = undefined;
 
 		Object.keys(mChangeListeners).forEach(function (sPath) {
 			if (sPath === "$count" || mKeptElementPredicates[sPath.split("/")[0]]) {
@@ -4153,6 +4157,7 @@ sap.ui.define([
 			this.aElements.$count = this.oBackup.$count;
 			this.aElements.$created = this.oBackup.$created;
 			this.iLimit = this.oBackup.iLimit;
+			this.bSentRequest = this.oBackup.bSentRequest;
 			this.iResetCount -= 1;
 		}
 		this.oBackup = null;

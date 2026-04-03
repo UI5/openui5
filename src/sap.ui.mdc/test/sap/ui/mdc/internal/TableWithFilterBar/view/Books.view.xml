@@ -45,6 +45,7 @@
 		<f2:footer>
 			<OverflowToolbar>
 				<Button
+					id="messageButton"
 					icon="sap-icon://alert"
 					text="{=${message>/}.length}"
 					visible="{=${message>/}.length > 0}"

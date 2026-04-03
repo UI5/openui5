@@ -4,8 +4,9 @@
 /* ======================================= */
 
 @_sap_ui_rta_ContextMenu_BorderLightColor: var(--sapShell_Background); /* #fff */
-@_sap_ui_rta_ContextMenu_BorderDarkColor: var(--sapContent_ShadowColor); /* #000 */
+@_sap_ui_rta_ContextMenu_BorderDarkColor: darken(@sapUiSelected, 25%); /* #004adc */
 @_sap_ui_rta_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.375rem */
+@_sap_ui_rta_ContextMenu_BoxShadowColor: fade(@sapUiContentContrastShadowColor, 50%);
 
 .sapUiRtaMode {
 
@@ -15,6 +16,7 @@
 			border: 0.188rem dashed @_sap_ui_rta_ContextMenu_BorderDarkColor; /* 2px */
 			border-image: none;
 			border-radius: @_sap_ui_rta_ContextMenu_BorderRadius;
+			box-shadow: 0 0 1rem 0 @_sap_ui_rta_ContextMenu_BoxShadowColor, 0 0 0 0.125rem @_sap_ui_rta_ContextMenu_BorderDarkColor;
 		}
 	}
 }

@@ -19,6 +19,9 @@ sap.ui.define([
 ) {
 	"use strict";
 
+	const sAppBaseId = "container-v4demo---app";
+	const sRTAButtonId = sAppBaseId + "--ToggleRTA";
+
 	Opa5.extendConfig({
 
 		// TODO: increase the timeout timer from 15 (default) to 50 seconds
@@ -45,7 +48,7 @@ sap.ui.define([
 		actions: new Opa5({
 			iPressTheAdaptUiButton: function () {
 				return this.waitFor({
-					id: "__button0",
+					id: sRTAButtonId,
 					controlType: "sap.m.Button",
 					actions: new Press()
 				});

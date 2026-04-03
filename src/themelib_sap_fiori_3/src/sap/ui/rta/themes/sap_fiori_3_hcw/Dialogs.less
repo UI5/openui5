@@ -4,4 +4,15 @@
 /* =================================== */
 
 @_sap_ui_rta_Dialogs_BorderLightColor: var(--sapShell_Background); /* #fff */
-@_sap_ui_rta_Dialogs_BorderDarkColor: var(--sapShell_BorderColor); /* #000000 */
+@_sap_ui_rta_Dialogs_BorderDarkColor: darken(@sapUiSelected, 40%); /* #0042c2 */
+@_sap_ui_rta_Dialogs_BoxShadowColor: fade(@sapUiContentContrastShadowColor, 60%);
+@_sap_ui_rta_Dialogs_BoxShadowDarkColor: fade(@sapUiContentContrastShadowColor, 80%);
+
+.sapMDialog.sapUiRTABorder {
+	box-shadow: 0 0.625rem 4rem 0 @_sap_ui_rta_Dialogs_BoxShadowDarkColor, 0 0 0 0.125rem @_sap_ui_rta_Dialogs_BorderLightColor;
+}
+
+.sapUiRtaPopover.sapMPopover,
+.sapUiRtaPopover .sapMPopover {
+	box-shadow: 0 0.25rem 2rem 0 @_sap_ui_rta_Dialogs_BoxShadowColor, 0 0 0 0.125rem @_sap_ui_rta_Dialogs_BorderLightColor;
+}

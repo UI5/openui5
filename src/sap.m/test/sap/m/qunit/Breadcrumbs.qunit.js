@@ -910,4 +910,56 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.equal(typeof oConfig.getCustomImportance, "function", "getCustomImportance function is set");
 		assert.equal(oConfig.getCustomImportance(), "Medium", "customImportance is set to 'Medium'");
 	});
+
+	QUnit.module("Mobile phone - picker dialog", {
+		beforeEach: function () {
+			helpers.setMobile();
+			this.oBreadcrumbs = new Breadcrumbs({
+				links: oFactory.getLinks(4),
+				currentLocationText: "Current"
+			});
+			helpers.renderObject(this.oBreadcrumbs);
+		},
+		afterEach: function () {
+			helpers.resetMobile();
+			this.oBreadcrumbs.destroy();
+		}
+	});
+
+	QUnit.test("Phone picker dialog has no header", function (assert) {
+		var oPicker = this.oBreadcrumbs._getSelect().getPicker();
+
+		assert.strictEqual(oPicker.getShowHeader(), false,
+			"Dialog showHeader is false ? header container is not rendered");
+	});
+
+	QUnit.test("Phone picker dialog has no custom header aggregation", function (assert) {
+		var oPicker = this.oBreadcrumbs._getSelect().getPicker();
+
+		assert.notOk(oPicker.getCustomHeader(),
+			"Custom header aggregation is destroyed/absent ? no title or close icon");
+	});
+
+	QUnit.test("Phone picker dialog has a footer Cancel button", function (assert) {
+		var oPicker = this.oBreadcrumbs._getSelect().getPicker(),
+			oEndButton = oPicker.getEndButton();
+
+		assert.ok(oEndButton, "An end button exists in the dialog footer");
+		assert.strictEqual(
+			oEndButton.getText(),
+			oFactory.getResourceBundle().getText("SELECT_CANCEL_BUTTON"),
+			"Footer button text is the i18n Cancel label"
+		);
+	});
+
+	QUnit.test("Footer Cancel button closes the dialog", function (assert) {
+		var oSelect = this.oBreadcrumbs._getSelect(),
+			oPicker = oSelect.getPicker(),
+			oEndButton = oPicker.getEndButton(),
+			oCloseSpy = this.spy(oSelect, "close");
+
+		oEndButton.firePress();
+
+		assert.ok(oCloseSpy.calledOnce, "Pressing the Cancel button calls Select.close()");
+	});
 });

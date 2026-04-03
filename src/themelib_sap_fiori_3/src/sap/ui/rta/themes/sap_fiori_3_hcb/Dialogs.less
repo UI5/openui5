@@ -3,5 +3,16 @@
 /* Quartz High Contrast Black theme    */
 /* =================================== */
 
-@_sap_ui_rta_Dialogs_BorderLightColor: var(--sapShell_BorderColor); /* #fff */
+@_sap_ui_rta_Dialogs_BorderLightColor: var(--sapSuccessBorderColor); /* #9c9 */
 @_sap_ui_rta_Dialogs_BorderDarkColor: var(--sapShell_Background); /* #000000 */
+@_sap_ui_rta_Dialogs_BoxShadowColor: fade(@sapUiContentContrastShadowColor, 60%);
+@_sap_ui_rta_Dialogs_BoxShadowDarkColor: fade(@sapUiContentContrastShadowColor, 80%);
+
+.sapMDialog.sapUiRTABorder {
+	box-shadow: 0 0.625rem 4rem 0 @_sap_ui_rta_Dialogs_BoxShadowDarkColor, 0 0 0 0.125rem @_sap_ui_rta_Dialogs_BorderLightColor;
+}
+
+.sapUiRtaPopover.sapMPopover,
+.sapUiRtaPopover .sapMPopover {
+	box-shadow: 0 0.25rem 2rem 0 @_sap_ui_rta_Dialogs_BoxShadowColor, 0 0 0 0.125rem @_sap_ui_rta_Dialogs_BorderLightColor;
+}
