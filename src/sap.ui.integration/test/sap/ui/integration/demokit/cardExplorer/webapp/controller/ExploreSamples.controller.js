@@ -5,7 +5,7 @@ sap.ui.define([
 	"../model/ExploreSettingsModel",
 	"../model/formatter",
 	"../util/FileUtils",
-	"../util/fetchLatestSchemaVersion",
+	"../util/SchemaUtils",
 	"../localService/MockServerManager",
 	"sap/m/MessageToast",
 	"sap/f/GridContainerItemLayoutData",
@@ -40,7 +40,7 @@ sap.ui.define([
 	exploreSettingsModel,
 	formatter,
 	FileUtils,
-	fetchLatestSchemaVersion,
+	SchemaUtils,
 	MockServerManager,
 	MessageToast,
 	GridContainerItemLayoutData,
@@ -147,9 +147,10 @@ sap.ui.define([
 				return;
 			}
 
-			const sLatestSchemaVersion = await fetchLatestSchemaVersion();
+			const sLatestSchemaVersion = await SchemaUtils.fetchLatestVersion();
 			oFile.content = JSON.stringify({
 				"_version": sLatestSchemaVersion,
+				"$schema": SchemaUtils.getSchemaUrl(sLatestSchemaVersion),
 				...oManifest
 			}, null, "\t");
 		},

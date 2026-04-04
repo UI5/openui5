@@ -6,6 +6,7 @@ sap.ui.define([
 	"use strict";
 
 	const APP_SCHEMA_VERSION = "1.83.1";
+	const APP_SCHEMA_URL = "https://raw.githubusercontent.com/SAP/ui5-manifest/v" + APP_SCHEMA_VERSION + "/schema.json";
 
 	/**
 	 * Collects all sample entries from the navigation model.
@@ -62,8 +63,14 @@ sap.ui.define([
 						APP_SCHEMA_VERSION,
 						`Application manifest _version must be fixed at ${APP_SCHEMA_VERSION}`
 					);
+					assert.strictEqual(
+						oManifest["$schema"],
+						APP_SCHEMA_URL,
+						`Application manifest $schema must be "${APP_SCHEMA_URL}"`
+					);
 				} else if (sType === "card") {
 					assert.notOk("_version" in oManifest, "Card manifest must not have _version property");
+					assert.notOk("$schema" in oManifest, "Card manifest must not have $schema property");
 				} else {
 					throw new Error(`Unexpected sap.app.type "${sType}" in ${oFile.url}`);
 				}

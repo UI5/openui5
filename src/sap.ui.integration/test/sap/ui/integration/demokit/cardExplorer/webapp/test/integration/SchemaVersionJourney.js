@@ -8,13 +8,15 @@ sap.ui.define([
 	"use strict";
 
 	const MOCKED_VERSION = "1.99.0";
+	const MOCKED_SCHEMA_URL = "https://raw.githubusercontent.com/SAP/ui5-manifest/v" + MOCKED_VERSION + "/schema.json";
 
 	QUnit.module("Schema version injection");
 
-	opaTest("_version is injected into card manifest displayed in the editor", function (Given, When, Then) {
+	opaTest("_version and $schema are injected into card manifest displayed in the editor", function (Given, When, Then) {
 		Given.iStartMyApp({ hash: "explore/list/highlight" });
 
 		Then.onTheExploreSamplesPage.iShouldSeeVersionInEditor(MOCKED_VERSION);
+		Then.onTheExploreSamplesPage.iShouldSeeSchemaUrlInEditor(MOCKED_SCHEMA_URL);
 
 		Then.iTeardownMyApp();
 	});

@@ -260,6 +260,8 @@ sap.ui.define([
 				 *	<li>If both the manifest URL and the base URL are defined, the base URL is used.</li>
 				 *	<li>If neither the manifest URL nor the base URL is defined, relative resources will not load correctly.</li>
 				 *	</ul>
+				 *
+				 * @since 1.70
 				 */
 				baseUrl: {
 					type: "sap.ui.core.URI",
