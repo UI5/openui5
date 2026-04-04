@@ -1,6 +1,7 @@
 function init() {
 	var sampleManifest = {
-		"_version": "1.14.0",
+		"_version": "1.84.0",
+		"$schema": "https://raw.githubusercontent.com/SAP/ui5-manifest/v1.84.0/schema.json",
 		"sap.app": {
 			"id": "card.explorer.highlight.list.card",
 			"type": "card",

@@ -1,12 +1,13 @@
 {
 	"_version": "2.0.0",
+	"$schema": "https://raw.githubusercontent.com/SAP/ui5-manifest/v1.83.1/schema.json",
 	"sap.app": {
 		"id": "sap.ui.integration.localServices.oath3lo.hostApp",
+		"type": "application",
+		"title": "OAuth 3LO Host App",
 		"applicationVersion": {
 			"version": "1.0.0"
-		},
-		"type": "application",
-		"title": "Application 'hostApp'"
+		}
 	},
 	"sap.ui": {
 		"technology": "UI5",
@@ -23,6 +24,10 @@
 			"libs": {
 				"sap.m": {}
 			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
 		}
 	}
 }

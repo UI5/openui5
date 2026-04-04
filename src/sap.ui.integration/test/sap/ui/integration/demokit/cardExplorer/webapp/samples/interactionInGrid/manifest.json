@@ -1,20 +1,13 @@
 {
 	"_version": "2.0.0",
+	"$schema": "https://raw.githubusercontent.com/SAP/ui5-manifest/v1.83.1/schema.json",
 	"sap.app": {
 		"type": "application",
 		"id": "sap.ui.integration.sample.InteractionInGrid",
 		"applicationVersion": {
 			"version": "1.0.0"
 		},
-		"title": "Application 'InteractionInGrid'"
-	},
-	"sap.ui": {
-		"technology": "UI5",
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
-		}
+		"title": "Interaction in Grid"
 	},
 	"sap.ui5": {
 		"rootView": "sap.ui.integration.sample.interactionInGrid.InteractionInGrid",
@@ -26,6 +19,18 @@
 				"sap.ui.integration": {}
 			}
 		},
-		"config": {}
+		"config": {},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
 	}
 }

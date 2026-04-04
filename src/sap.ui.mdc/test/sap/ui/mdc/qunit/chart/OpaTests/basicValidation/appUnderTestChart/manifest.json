@@ -10,15 +10,7 @@
 		"i18n": "i18n/i18n.properties",
 		"title": "{{sap.app.title}}",
 		"type": "application",
-		"dataSources": {
-			"default": {
-				"uri": "/tenant(MDCChartP13nOpaTestApplication)/catalog/",
-				"type": "OData",
-				"settings": {
-					"odataVersion": "4.0"
-				}
-			}
-		}
+		"dataSources": {}
 	},
 	"sap.ui": {
 		"deviceTypes": {
@@ -43,16 +35,7 @@
 			}
 		},
 		"handleValidation": true,
-		"models": {
-			"": {
-				"dataSource": "default",
-				"preload": true,
-				"settings": {
-					"operationMode": "Server",
-					"updateGroupId": "update"
-				}
-			}
-		},
+		"models": {},
 		"rootView": {
 			"viewName": "view.Main",
 			"id": "IDViewOfAppUnderTestChart"

@@ -275,6 +275,34 @@ sap.ui.define([
 						},
 						errorMessage: "Could not find the file editor"
 					});
+				},
+
+				iShouldSeeSchemaUrlInEditor: function (sSchemaUrl) {
+					return this.waitFor({
+						id: "fileEditor",
+						viewName: sViewName,
+						success: function (oFileEditor) {
+							this.waitFor({
+								controlType: "sap.ui.codeeditor.CodeEditor",
+								matchers: {
+									ancestor: oFileEditor
+								},
+								check: function (aEditors) {
+									try {
+										const oManifest = JSON.parse(aEditors[0].getValue());
+										return oManifest["$schema"] === sSchemaUrl;
+									} catch {
+										return false;
+									}
+								},
+								success: function () {
+									Opa5.assert.ok(true, "$schema \"" + sSchemaUrl + "\" is shown in editor");
+								},
+								errorMessage: "$schema \"" + sSchemaUrl + "\" not found in editor content"
+							});
+						},
+						errorMessage: "Could not find the file editor"
+					});
 				}
 			}
 		}
