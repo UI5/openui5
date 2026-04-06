@@ -331,5 +331,15 @@
         "text": " sap.m.Button: has correct css parameters for active Emphasized"
       }
     ]
+  },
+  "1.120.43": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "b162f91cc34e1e57813f509fb693d27710d325a8",
+        "type": "FIX",
+        "text": " sap.uxap.AnchorBar: Enable upperCaseAnchorBar property for Horizon theme"
+      }
+    ]
   }
 }

@@ -209,5 +209,15 @@
         "text": " sap.ui.unified.Calendar: fix unstable test"
       }
     ]
+  },
+  "1.120.43": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "a17003ab928559e7608d87f0c59199fd16a0162b",
+        "type": "FIX",
+        "text": " sap.ui.unified.CalendarDateInterval: shows correct year"
+      }
+    ]
   }
 }

@@ -1103,5 +1103,15 @@
         "text": " test/sap/ui/core/qunit/i18n/UI5Date.qunit.js: Fix failing test for JS Date API \"toTemporalInstant\""
       }
     ]
+  },
+  "1.120.43": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "cacfe8df7e2421699ac6b66b7022cc99908f25e8",
+        "type": "FIX",
+        "text": " sap.base.strings.formatMessage: Accept nullish arguments"
+      }
+    ]
   }
 }

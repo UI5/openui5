@@ -1476,5 +1476,15 @@
         "text": " sap.m.StepInput: format value when the front number is removed (e.g .50 -> 0.50) also, allow start typing a number with the decimal separator"
       }
     ]
+  },
+  "1.120.43": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "11b2a421459fad77daa029f54108664765c70584",
+        "type": "FIX",
+        "text": " sap.m.Avatar: prevent event bubbling when LightBox is present"
+      }
+    ]
   }
 }
