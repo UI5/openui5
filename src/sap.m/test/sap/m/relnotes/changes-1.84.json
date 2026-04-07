@@ -2368,5 +2368,15 @@
         "text": " We've now removed the iframe content check while loading a PDF to display it"
       }
     ]
+  },
+  "1.84.55": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "1355eab2697c6f8c85db8f5d6149a305b0a4494c",
+        "type": "FIX",
+        "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
+      }
+    ]
   }
 }

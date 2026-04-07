@@ -890,5 +890,15 @@
         "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
       }
     ]
+  },
+  "1.84.55": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "69e1eb09ced1988a7ba3093c4dc1010d2d0e0baf",
+        "type": "FIX",
+        "text": " sap.base.strings.formatMessage: Accept nullish arguments"
+      }
+    ]
   }
 }
