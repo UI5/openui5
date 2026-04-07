@@ -169,7 +169,7 @@ sap.ui.define([
 		value: new ObjectNumber({
 			number: "493",
 			unit: "EUR",
-			state: "Success"
+			state: "Information"
 		}),
 		press: onPress
 	});
@@ -207,7 +207,7 @@ sap.ui.define([
 		value: new ObjectNumber({
 			number: "335",
 			unit: "EUR",
-			state: "Warning"
+			state: "Success"
 		}),
 		press: onPress
 	});
