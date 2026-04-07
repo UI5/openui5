@@ -51,15 +51,16 @@ sap.ui.define([
 			sState = oDialog.getState(),
 			bStretch = oDialog.getStretch(),
 			oValueStateText = oDialog.getAggregation("_valueState"),
-			oFooter = oDialog.getFooter();
+			oFooter = oDialog.getFooter(),
+			sContentHeight = oDialog.getContentHeight(),
+			sContentWidth = oDialog.getContentWidth();
 
 		// write the HTML into the render manager
 		// the initial size of the dialog have to be 0, because if there is a large dialog content the initial size can be larger than the html's height (scroller)
 		// The scroller will make the initial window width smaller and in the next recalculation the maxWidth will be larger.
 
 		oRM.openStart("div", oDialog)
-			.style("width", oDialog.getContentWidth())
-			.style("height", oDialog.getContentHeight())
+			.style("width", sContentWidth)
 			.class("sapMDialog")
 			.class("sapMDialog-CTX")
 			.class("sapMPopup-CTX");
@@ -234,8 +235,12 @@ sap.ui.define([
 		}
 
 		oRM.openStart("section", sId + "-cont")
-			.class("sapMDialogSection")
-			.openEnd();
+			.class("sapMDialogSection");
+		if (!bStretch && sContentHeight && !sContentHeight.includes("%")) {
+			oRM.style("flex-basis", sContentHeight);
+		}
+
+		oRM.openEnd();
 
 		oRM.openStart("div", sId + "-scroll")
 			.class("sapMDialogScroll")
@@ -244,7 +249,7 @@ sap.ui.define([
 		oRM.openStart("div", sId + "-scrollCont")
 			.class("sapMDialogScrollCont");
 
-		if (oDialog.getStretch() || oDialog.getContentHeight()) {
+		if (oDialog.getStretch() || sContentHeight) {
 			oRM.class("sapMDialogStretchContent");
 		}
 

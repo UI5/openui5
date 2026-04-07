@@ -25,17 +25,14 @@
 	}
 
 	function registerLibraryTags(oIntegrationLib) {
-		var mCustomElements = oIntegrationLib.extensions["sap.ui.integration"].customElements,
-			aTags = Object.keys(mCustomElements);
+		const mCustomElements = oIntegrationLib.extensions?.["sap.ui.integration"]?.customElements;
+
+		if (!mCustomElements) {
+			return;
+		}
 
 		//collect all the implementation classes and require them
-		window.sap.ui.require(
-			aTags.map(
-				function (o, i) {
-					return mCustomElements[aTags[i]];
-				}
-			)
-		);
+		window.sap.ui.require(Object.values(mCustomElements));
 	}
 
 	function initTags() {
