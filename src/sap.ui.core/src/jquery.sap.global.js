@@ -3139,6 +3139,10 @@
 
 		function requireModule(sModuleName, bSync) {
 
+			if (decodeURI(sModuleName) !== sModuleName) {
+				throw new TypeError("URL encoded module IDs are not supported: '" + sModuleName + "'");
+			}
+
 			// TODO enable when preload has been adapted:
 			// sModuleName = mAMDAliases[sModuleName] || sModuleName;
 
