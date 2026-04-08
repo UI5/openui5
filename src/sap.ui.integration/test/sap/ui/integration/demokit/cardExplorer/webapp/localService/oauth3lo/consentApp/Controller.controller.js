@@ -1,6 +1,8 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller"
-], function(Controller) {
+	"sap/ui/core/mvc/Controller",
+	"sap/base/security/URLListValidator",
+	"sap/base/Log"
+], function(Controller, URLListValidator, Log) {
 	"use strict";
 	return Controller.extend("sap.ui.integration.localServices.oath3lo.consentApp.Controller", {
 		onInit: function () {
@@ -12,7 +14,26 @@ sap.ui.define([
 		},
 
 		giveConsent: function () {
-			window.location.href = this._sRedirect;
+			if (this._validateRedirectUrl(this._sRedirect)) {
+				window.location.href = this._sRedirect;
+			}
+		},
+
+		_validateRedirectUrl: function (sUrl) {
+			try {
+				const sNormalized = new URL(sUrl, document.baseURI).href;
+
+				if (!URLListValidator.validate(sNormalized)) {
+					Log.error("URL validation failed: " + sUrl);
+					return false;
+				}
+
+				return true;
+			} catch (e) {
+				Log.error("Invalid URL: " + sUrl);
+
+				return false;
+			}
 		}
 	});
 });
