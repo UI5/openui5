@@ -3692,6 +3692,16 @@ sap.ui.define([
 		assert.strictEqual(oSelectedItemsPicker.getContent()[0].getMetadata().getName(), "sap.m.List", "The popover contains a list.");
 	});
 
+	QUnit.test("getTokensPopup should not show arrow when inside MultiInput", function(assert) {
+		this.multiInput.setTokens([
+			new Token({text: "XXXX"})
+		]);
+
+		var oSelectedItemsPicker = this.multiInput.getAggregation("tokenizer").getTokensPopup();
+
+		assert.strictEqual(oSelectedItemsPicker.getShowArrow(), false, "The popover should not show an arrow when inside MultiInput.");
+	});
+
 	QUnit.skip('Selected items list on mobile', async function(assert) {
 		this.clock = sinon.useFakeTimers();
 		// system under test

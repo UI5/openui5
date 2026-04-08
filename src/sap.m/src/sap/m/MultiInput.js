@@ -427,10 +427,14 @@ function(
 	 * @ui5-restricted sap.ui.comp.smartfilterbar
 	 */
 	MultiInput.prototype._initTokenizer = function () {
-		return new Tokenizer({
+		var oTokenizer = new Tokenizer({
 			renderMode: TokenizerRenderMode.Narrow,
 			tokenDelete: this._tokenDelete.bind(this)
 		});
+
+		oTokenizer.setProperty("_usePopoverArrow", false);
+
+		return oTokenizer;
 	};
 
 	/**

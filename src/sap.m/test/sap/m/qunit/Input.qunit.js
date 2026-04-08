@@ -4782,6 +4782,86 @@ sap.ui.define([
 		oInputWithTabularSuggestions.destroy();
 	});
 
+	QUnit.test("Focus handling - clicking input field when visual focus is on suggestion should not cause double focus", async function(assert) {
+		this.stub(Device, "system").value({desktop: true, phone: false, tablet: false});
+
+		const oInput = new Input({
+			showSuggestion: true,
+			suggestionItems: [
+				new Item({text: "Germany"}),
+				new Item({text: "Bulgaria"}),
+				new Item({text: "Greece"})
+			]
+		});
+
+		oInput.placeAt("content");
+		this.clock = sinon.useFakeTimers();
+		await nextUIUpdate(this.clock);
+
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val("g").trigger("input");
+		this.clock.tick(500);
+
+		qutils.triggerKeydown(oInput.getDomRef(), KeyCodes.ARROW_DOWN);
+		this.clock.tick(100);
+
+		const oList = oInput._getSuggestionsPopover().getItemsContainer();
+		const oFirstItem = oList.getItems()[0];
+
+		assert.ok(oFirstItem.$().hasClass("sapMLIBFocused"), "First item has visual focus after ARROW_DOWN");
+		assert.ok(oList.hasStyleClass("sapMListFocus"), "List has sapMListFocus class");
+		assert.notOk(oInput.hasStyleClass("sapMFocus"), "Input does not have sapMFocus class");
+
+		qutils.triggerMouseEvent(oInput.getFocusDomRef(), "mousedown");
+		this.clock.tick(100);
+
+		assert.ok(oInput.hasStyleClass("sapMFocus"), "Input has sapMFocus class after click");
+		assert.notOk(oFirstItem.$().hasClass("sapMLIBFocused"), "First item no longer has visual focus");
+		assert.notOk(oList.hasStyleClass("sapMListFocus"), "List no longer has sapMListFocus class");
+
+		oInput.destroy();
+	});
+
+	QUnit.test("Focus handling - clicking value help icon when visual focus is on suggestion should not cause double focus", async function(assert) {
+		this.stub(Device, "system").value({desktop: true, phone: false, tablet: false});
+
+		const oInput = new Input({
+			showSuggestion: true,
+			showValueHelp: true,
+			suggestionItems: [
+				new Item({text: "Germany"}),
+				new Item({text: "Bulgaria"}),
+				new Item({text: "Greece"})
+			]
+		});
+
+		oInput.placeAt("content");
+		this.clock = sinon.useFakeTimers();
+		await nextUIUpdate(this.clock);
+
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val("g").trigger("input");
+		this.clock.tick(500);
+
+		qutils.triggerKeydown(oInput.getDomRef(), KeyCodes.ARROW_DOWN);
+		this.clock.tick(100);
+
+		const oList = oInput._getSuggestionsPopover().getItemsContainer();
+		const oFirstItem = oList.getItems()[0];
+
+		assert.ok(oFirstItem.$().hasClass("sapMLIBFocused"), "First item has visual focus after ARROW_DOWN");
+		assert.notOk(oInput.hasStyleClass("sapMFocus"), "Input does not have sapMFocus class");
+
+		qutils.triggerMouseEvent(oInput._getValueHelpIcon().getDomRef(), "mousedown");
+		this.clock.tick(100);
+
+		assert.ok(oInput.hasStyleClass("sapMFocus"), "Input has sapMFocus class after clicking value help icon");
+		assert.notOk(oFirstItem.$().hasClass("sapMLIBFocused"), "First item no longer has visual focus");
+		assert.notOk(oList.hasStyleClass("sapMListFocus"), "List no longer has sapMListFocus class");
+
+		oInput.destroy();
+	});
+
 	QUnit.test("Focus handling - Leaving the input field should trigger suggestions item selection", async function(assert) {
 		// Setup
 		this.stub(Device, "system").value({desktop: true, phone: false, tablet: false});

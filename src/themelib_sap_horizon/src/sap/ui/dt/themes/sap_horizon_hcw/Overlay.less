@@ -10,6 +10,7 @@
 @_sap_ui_dt_Overlay_HoverBackgroundColor: fade(@sapUiSelected, 15%); /* rgba(92, 147, 255, 0.15) */
 @_sap_ui_dt_Overlay_DropZoneBackgroundColor: fade(@sapUiSelected, 15%); /* rgba(92, 147, 255, 0.15) */
 @_sap_ui_dt_Overlay_SelectionOutlineColor: darken(@sapUiSelected, 25%); /* #004adc */
+@_sap_ui_dt_Overlay_BoxShadowColor: fade(@sapUiContentContrastShadowColor, 50%);
 
 .sapUiDtOverlayFocusable {
 
@@ -66,7 +67,7 @@
 .sapUiDtOverlayHover {
 
 	&::after {
-		box-shadow: none;
+		box-shadow: 0 0 1rem 0 @_sap_ui_dt_Overlay_BoxShadowColor, 0 0 0 0.125rem @_sap_ui_dt_Overlay_HoverBackgroundColor;
 		outline: 0.125rem dotted @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 2px */
 		outline-offset: -0.125rem; /* 2px */
 		border-radius: @_sap_ui_dt_Overlay_BorderRadius;

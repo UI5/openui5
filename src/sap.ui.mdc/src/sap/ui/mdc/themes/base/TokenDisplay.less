@@ -15,6 +15,8 @@
 
 .sapUiMdcTokenizerDisplay.sapMTokenizer.sapMTokenizerReadonly .sapMToken {
 	padding-left: 0; /* remove left padding of a token. The right padding will be used to show the delimiters */
+	padding-top: 0.125rem;
+	padding-bottom: 0.125rem;
 
 	/* right margin and padding of the token (space for the delimiter) */
 	padding-right: 0.375rem;
@@ -92,4 +94,9 @@ html.sap-desktop .sapUiMdcTokenizerDisplay .sapMToken:hover {
 
 .sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMTokenText {
 	line-height: @mdctoken-large-line-height;
+}
+
+.sapUiSizeCompact .sapUiForm .sapUiMdcTokenizerDisplay.sapMTokenizer .sapMToken {
+	padding-top: 0.0625rem;
+	padding-bottom: 0.0625rem;
 }

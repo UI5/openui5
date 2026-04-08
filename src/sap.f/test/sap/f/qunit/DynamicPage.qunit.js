@@ -535,6 +535,73 @@ function(
 		oStub.restore();
 	});
 
+	QUnit.test("_toggleSpaceForScrollbar offsets title for classic scrollbar", function (assert) {
+		// Arrange
+		this.stub(this.oDynamicPage, "_getEffectiveScrollbarWidth").returns(15);
+		this.stub(this.oDynamicPage, "_hasOverlayScrollbar").returns(false);
+
+		// Act
+		this.oDynamicPage._toggleSpaceForScrollbar(true);
+
+		// Assert
+		assert.strictEqual(this.oDynamicPage.$titleArea.css("right"), "15px",
+			"Title area 'right' offset equals the scrollbar width");
+		assert.notOk(this.oDynamicPage.hasStyleClass("sapFDynamicPageWithOverlayScrollbar"),
+			"'sapFDynamicPageWithOverlayScrollbar' class is not added");
+	});
+
+	QUnit.test("_toggleSpaceForScrollbar offsets title for overlay scrollbar", function (assert) {
+		// Arrange
+		this.stub(this.oDynamicPage, "_getEffectiveScrollbarWidth").returns(12);
+		this.stub(this.oDynamicPage, "_hasOverlayScrollbar").returns(true);
+
+		// Act
+		this.oDynamicPage._toggleSpaceForScrollbar(true);
+
+		// Assert
+		assert.strictEqual(this.oDynamicPage.$titleArea.css("right"), "12px",
+			"Title area 'right' offset equals the overlay scrollbar fallback width");
+		assert.ok(this.oDynamicPage.hasStyleClass("sapFDynamicPageWithOverlayScrollbar"),
+			"'sapFDynamicPageWithOverlayScrollbar' class is added");
+	});
+
+	QUnit.test("_toggleSpaceForScrollbar sets zero offset when no scrollbar is needed", function (assert) {
+		// Arrange
+		this.stub(this.oDynamicPage, "_getEffectiveScrollbarWidth").returns(0);
+		this.stub(this.oDynamicPage, "_hasOverlayScrollbar").returns(false);
+
+		// Act
+		this.oDynamicPage._toggleSpaceForScrollbar(false);
+
+		// Assert
+		assert.strictEqual(this.oDynamicPage.$titleArea.css("right"), "0px",
+			"Title area 'right' offset is 0");
+		assert.notOk(this.oDynamicPage.hasStyleClass("sapFDynamicPageWithOverlayScrollbar"),
+			"'sapFDynamicPageWithOverlayScrollbar' class is not added");
+	});
+
+	QUnit.test("_toggleSpaceForScrollbar removes overlay class on transition to no scrollbar", function (assert) {
+		// Arrange — start with overlay scrollbar
+		this.stub(this.oDynamicPage, "_hasOverlayScrollbar")
+			.withArgs(true).returns(true)
+			.withArgs(false).returns(false);
+		this.stub(this.oDynamicPage, "_getEffectiveScrollbarWidth")
+			.withArgs(true).returns(12)
+			.withArgs(false).returns(0);
+		this.oDynamicPage._toggleSpaceForScrollbar(true);
+		assert.ok(this.oDynamicPage.hasStyleClass("sapFDynamicPageWithOverlayScrollbar"),
+			"'sapFDynamicPageWithOverlayScrollbar' class is initially added");
+
+		// Act — transition to no scrollbar
+		this.oDynamicPage._toggleSpaceForScrollbar(false);
+
+		// Assert
+		assert.notOk(this.oDynamicPage.hasStyleClass("sapFDynamicPageWithOverlayScrollbar"),
+			"'sapFDynamicPageWithOverlayScrollbar' class is removed after transition");
+		assert.strictEqual(this.oDynamicPage.$titleArea.css("right"), "0px",
+			"Title area 'right' offset is 0");
+	});
+
 	QUnit.test("'_isContentOverflowingFullscreenContainer' returns true when fullscreen content overflows into footer area", function (assert) {
 		//Arrange
 		var oContent = new Panel({height: "100%"});

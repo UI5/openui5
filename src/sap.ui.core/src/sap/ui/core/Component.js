@@ -2250,13 +2250,13 @@ sap.ui.define([
 	 *     Instead of specifying just the names of preload bundles, an object might be given that contains a
 	 *     mandatory <code>name</code> property and optionally, an <code>url</code> that will be used for a <code>registerModulePath</code>.
 	 * @param {Promise|Promise[]} [mOptions.asyncHints.waitFor] <code>Promise</code> or array of <code>Promise</code>s for which the Component instantiation should wait
-	 * @returns {Promise<sap.ui.core.Component>} A Promise that resolves with the newly created component instance
-	 * @throws {TypeError} When <code>mOptions</code> is null or not an object.
+	 * @returns {Promise<sap.ui.core.Component>} A Promise that resolves with the newly created
+	 *   component instance, or rejects with an error if the component could not be created
 	 * @since 1.56.0
 	 * @static
 	 * @public
 	 */
-	Component.create = function(mOptions) {
+	Component.create = async function(mOptions) {
 		if (mOptions == null || typeof mOptions !== "object") {
 			throw new TypeError("Component.create() must be called with a configuration object.");
 		}
@@ -2270,7 +2270,12 @@ sap.ui.define([
 			mParameters.manifest = true;
 		}
 
-		return componentFactory(mParameters);
+		try {
+			return await componentFactory(mParameters);
+		} catch (err) {
+			Log.error("Component.create() failed", err, "sap.ui.core.Component");
+			throw err;
+		}
 	};
 
 	/**
