@@ -1176,6 +1176,51 @@ sap.ui.define([
 			await loadApplyCondenseChanges.call(this, "moveToInitialUiReconstruction.json", 7, 0, assert);
 			await loadApplyCondenseChanges.call(this, "moveWithinTwoGroupsWithoutUnknowns.json", 30, 3, assert);
 		});
+
+		QUnit.test("create groups and move fields inside, then changing field order inside the new group", async function(assert) {
+			await loadApplyCondenseChanges.call(this, "createGroupsAndMoveFields.json", 6, 5, assert);
+			await revertAndApplyNew.call(this);
+
+			const oSmartForm = oAppComponent.byId(sLocalSmartFormId);
+			const aGroups = oSmartForm.getGroups();
+
+			const aGroupElements0 = aGroups[0].getGroupElements();
+			assert.strictEqual(aGroupElements0.length, 2, sContainerElementsMsg + 2);
+			assert.strictEqual(
+				aGroupElements0[0].getId(),
+				getControlSelectorId(sCompanyCodeFieldId),
+				getMessage(sAffectedControlMgs, undefined, 2) + sCompanyCodeFieldId
+			);
+			assert.strictEqual(
+				aGroupElements0[1].getId(),
+				getControlSelectorId(sNameFieldId),
+				getMessage(sAffectedControlMgs, undefined, 1) + sNameFieldId
+			);
+
+			const aGroupElements1 = aGroups[1].getGroupElements();
+			assert.strictEqual(aGroupElements1.length, 1, sContainerElementsMsg + 1);
+			assert.strictEqual(
+				aGroupElements1[0].getId(),
+				getControlSelectorId("Dates.BoundButton35"),
+				`${getMessage(sAffectedControlMgs, undefined, 1)}Dates.BoundButton35`
+			);
+
+			const aGroupElements2 = aGroups[2].getGroupElements();
+			assert.strictEqual(aGroupElements2.length, 1, sContainerElementsMsg + 1);
+			assert.strictEqual(
+				aGroupElements2[0].getId(),
+				getControlSelectorId(sVictimFieldId),
+				getMessage(sAffectedControlMgs, undefined, 0) + sVictimFieldId
+			);
+
+			const aGroupElements3 = aGroups[3].getGroupElements();
+			assert.strictEqual(aGroupElements3.length, 1, sContainerElementsMsg + 1);
+			assert.strictEqual(
+				aGroupElements3[0].getId(),
+				getControlSelectorId("Dates.SpecificFlexibility"),
+				getMessage(sAffectedControlMgs, undefined, 0) + getControlSelectorId("Dates.SpecificFlexibility")
+			);
+		});
 	});
 
 	QUnit.module("Given an app with controls with templates", {
