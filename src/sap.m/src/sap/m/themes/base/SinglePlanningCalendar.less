@@ -7,10 +7,12 @@
 @_sap_m_PlanningCalendarHeader_ActionsToolbarHeight: 2.75rem;
 @_sap_m_SinglePlanningCalendarGrid_HoursBackground: var(--sapList_Background);
 
-.sapMPlanCal:not(.sapUiLocalBusy) .sapMPCHead,
-.sapMPlanCal:not(.sapUiLocalBusy) .sapMSinglePCColumnHeader {
-	position: sticky;
-	z-index: 4;
+.sapMPlanCal:not(.sapUiLocalBusy), .sapMSinglePC:not(.sapUiLocalBusy),
+.sapMPlanCal:not(.sapUiLocalBusy), .sapMSinglePC:not(.sapUiLocalBusy) {
+	.sapMPCHead, .sapMSinglePCColumnHeader {
+		position: sticky;
+		z-index: 4;
+	}
 }
 
 .sapMSinglePCStickyAll {

@@ -716,6 +716,22 @@ sap.ui.define([
 		oTokenizer.destroy();
 	});
 
+	QUnit.test("Standalone Tokenizer popover should show arrow", async function (assert) {
+		var oTokenizer = new Tokenizer({
+			width: "300px"
+		}).placeAt("content");
+
+		oTokenizer.addToken(new Token({text: "Token 1", key: "0001"}));
+
+		await nextUIUpdate();
+
+		var oTokenPopover = oTokenizer.getTokensPopup();
+
+		assert.ok(oTokenPopover.getShowArrow(), "The standalone Tokenizer popover should show an arrow");
+
+		oTokenizer.destroy();
+	});
+
 	QUnit.test("Should open/close suggestion popover on F4, ALT + ARROW DOWN and ALT + ARROW UP", async function (assert) {
 		this.clock = sinon.useFakeTimers();
 

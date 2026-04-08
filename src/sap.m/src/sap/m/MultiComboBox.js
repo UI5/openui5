@@ -2117,6 +2117,10 @@ function(
 		var oTokenizer = new Tokenizer({
 			renderMode: TokenizerRenderMode.Narrow
 		}).attachTokenDelete(this._handleTokenDelete, this);
+
+		// Disable the arrow on the n-more popover when used inside MultiComboBox
+		oTokenizer.setProperty("_usePopoverArrow", false);
+
 		oTokenizer.getTokensPopup()
 			.attachAfterOpen(function () {
 				if (oTokenizer.hasOneTruncatedToken()) {

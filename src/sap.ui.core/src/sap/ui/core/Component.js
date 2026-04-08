@@ -2243,19 +2243,23 @@ sap.ui.define([
 	 *     Instead of specifying just the names of preload bundles, an object might be given that contains a
 	 *     mandatory <code>name</code> property and optionally, an <code>url</code> that will be used for a <code>registerModulePath</code>.
 	 * @param {Promise|Promise[]} [mOptions.asyncHints.waitFor] <code>Promise</code> or array of <code>Promise</code>s for which the Component instantiation should wait
-	 * @returns {Promise<sap.ui.core.Component>} A Promise that resolves with the newly created component instance
-	 * @throws {TypeError} When <code>mOptions</code> is null or not an object.
-	 * @throws {Error} If super constructor isn't called in the constructor of a subclass of <code>sap.ui.core.Component</code>.
-	 * @throws {Error} If the manifest contains invalid model configurations. For example, if invalid dataSource references, or if unknown model classes are used, or if unknown ODataModel versions are defined.
-	 * @throws {Error} If ODataAnnotation references in the manifest are not correct, e.g., if <code>uri</code> property for ODataAnnotation is missing.
-	 * @throws {Error} If error occurs during the loading of routing information from the manifest.
-	 * @throws {Error} If the component controller module cannot be loaded or does not export a valid component class.
-	 * @throws {Error} If an error is thrown during the instantiation of the component controller, e.g. in the constructor or {@link sap.ui.core.Component#init init} method.
+	 * @returns {Promise<sap.ui.core.Component>} A Promise that resolves with the newly created
+	 *   component instance, or rejects with an error if the component could not be created.
+	 *   Potential rejection reasons are:
+	 *   <ul>
+	 *   <li>When <code>mOptions</code> is null or not an object.</li>
+	 *   <li>If super constructor isn't called in the constructor of a subclass of <code>sap.ui.core.Component</code>.</li>
+	 *   <li>If the manifest contains invalid model configurations. For example, if invalid dataSource references, or if unknown model classes are used, or if unknown ODataModel versions are defined.</li>
+	 *   <li>If ODataAnnotation references in the manifest are not correct, e.g., if <code>uri</code> property for ODataAnnotation is missing.</li>
+	 *   <li>If error occurs during the loading of routing information from the manifest.</li>
+	 *   <li>If the component controller module cannot be loaded or does not export a valid component class.</li>
+	 *   <li>If an error is thrown during the instantiation of the component controller, e.g. in the constructor or {@link sap.ui.core.Component#init init} method.</li>
+	 *   </ul>
 	 * @since 1.56.0
 	 * @static
 	 * @public
 	 */
-	Component.create = function(mOptions) {
+	Component.create = async function(mOptions) {
 		if (mOptions == null || typeof mOptions !== "object") {
 			throw new TypeError("Component.create() must be called with a configuration object.");
 		}
@@ -2269,7 +2273,12 @@ sap.ui.define([
 			mParameters.manifest = true;
 		}
 
-		return componentFactory(mParameters);
+		try {
+			return await componentFactory(mParameters);
+		} catch (err) {
+			Log.error("Component.create() failed", err, "sap.ui.core.Component");
+			throw err;
+		}
 	};
 
 	/**

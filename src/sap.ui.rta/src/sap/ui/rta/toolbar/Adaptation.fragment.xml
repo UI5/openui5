@@ -15,6 +15,7 @@
 						enabled="{controls>/backButton/enabled}"
 						visible="{controls>/backButton/visible}"
 						tooltip="{i18n>BTN_BACK}"
+						class="sapUiTinyMarginEnd"
 						press=".navigateBack" />
 				<HBox id="sapUiRta_iconBox" />
 				<ToolbarSpacer

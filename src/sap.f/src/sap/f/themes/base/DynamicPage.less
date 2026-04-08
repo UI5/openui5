@@ -6,6 +6,7 @@
 @_sap_f_DynamicPage_FooterHeight: 3rem;
 @_sap_f_DynamicPage_FooterHeight_Compact: 2.5rem;
 @_sap_f_DynamicPage_FooterMarginBottom: 0.5rem;
+@_sap_f_DynamicPage_OverlayScrollbarWidth: 12px;
 
 .sapFDynamicPage {
 	width: 100%;
@@ -48,15 +49,23 @@
 	z-index: 3;
 }
 
-html[data-sap-ui-browser^='ff'].sap-desktop .sapFDynamicPage.sapFDynamicPageWithScroll,
-html[data-sap-ui-os^='win'][data-sap-ui-browser^='cr'].sap-desktop .sapFDynamicPage.sapFDynamicPageWithScroll {
-
-	 .sapFDynamicPageTitleWrapper {
-		right: 17px;
+.sap-desktop .sapFDynamicPage.sapFDynamicPageWithOverlayScrollbar {
+	.sapFDynamicPageHeaderWrapper {
+		padding-right: @_sap_f_DynamicPage_OverlayScrollbarWidth;
 	}
 
-	.sapFDynamicPageFooter .sapFDynamicPageActualFooterControl {
-		right: 17px;
+	&:not(.sapFDynamicPage-Std-Phone).sapUiNoContentPadding .sapFDynamicPageContent .sapFDynamicPageStickySubheader:not(.sapFDynamicPageHeaderWrapper .sapFDynamicPageStickySubheader) {
+		margin-right: @_sap_f_DynamicPage_OverlayScrollbarWidth;
+	}
+}
+
+.sap-desktop .sapFDynamicPage.sapFDynamicPage-Std-Phone.sapFDynamicPageWithOverlayScrollbar {
+	.sapFDynamicPageContent .sapFDynamicPageAlignContent {
+		margin-right: 0;
+	}
+
+	&.sapUiNoContentPadding .sapFDynamicPageContent {
+		margin-right: @_sap_f_DynamicPage_OverlayScrollbarWidth;
 	}
 }
 
@@ -225,12 +234,9 @@ html[data-sap-ui-os^='win'][data-sap-ui-browser^='cr'].sap-desktop .sapFDynamicP
 
 html.sap-desktop .sapFDynamicPage.sapFDynamicPageWithScroll {
 
-	.sapFDynamicPageTitleWrapper {
-		right: 12px;
-	}
 
 	.sapFDynamicPageFooter .sapFDynamicPageActualFooterControl {
-		right: 12px;
+		right: @_sap_f_DynamicPage_OverlayScrollbarWidth;
 	}
 }
 
@@ -408,4 +414,8 @@ To be used in Comparison pattern scenario. */
 /* Avoid visible gap between content and header when title is snapped */
 .sapFDynamicPageTitleWrapper.sapFDynamicPageTitleSnapped + .sapFDynamicPageContentWrapper > .sapFDynamicPageHeaderWrapper {
 	background: var(--sapObjectHeader_Background);
+}
+
+.sapFDynamicPageWithOverlayScrollbar .sapFDynamicPageTitleWrapper.sapFDynamicPageTitleSnapped + .sapFDynamicPageContentWrapper > .sapFDynamicPageHeaderWrapper {
+	margin-inline-end: @_sap_f_DynamicPage_OverlayScrollbarWidth;
 }

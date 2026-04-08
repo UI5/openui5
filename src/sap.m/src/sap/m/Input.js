@@ -1542,6 +1542,8 @@ function(
 	Input.prototype.onmousedown = function(oEvent) {
 		if (this._isSuggestionsPopoverOpen()) {
 			oEvent.stopPropagation();
+			// prevent double focus while a suggestion item has visual focus
+			this._getSuggestionsPopover()?.updateFocus(this, null);
 		}
 	};
 
