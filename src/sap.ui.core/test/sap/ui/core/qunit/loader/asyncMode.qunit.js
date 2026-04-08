@@ -1061,4 +1061,50 @@
 		}.bind(this));
 	});
 
+	QUnit.module("URL Encoded Module IDs");
+
+	// helper class - we try to avoid loading UI5 modules in this test
+	class Deferred {
+		constructor() {
+			this.promise = new Promise((resolve, reject) => {
+				this.resolve = resolve;
+				this.reject = reject;
+			});
+		}
+	}
+
+	QUnit.test("sap.ui.require rejects single-encoded dot segments (%2E)", async function(assert) {
+		const deferred = new Deferred();
+		sap.ui.require(
+			["%2E%2E/foo"],
+			function() {
+				assert.ok(false, "success callback must not be called for an encoded module ID");
+				deferred.resolve();
+			},
+			function(e) {
+				assert.ok(e instanceof TypeError, "error callback should receive a TypeError");
+				assert.ok(/URL encoded module IDs are not supported/.test(e.message), "error message mentions URL encoded module IDs");
+				deferred.resolve();
+			}
+		);
+		await deferred.promise;
+	});
+
+	QUnit.test("sap.ui.require rejects double-encoded dot segments (%252E)", async function(assert) {
+		const deferred = new Deferred();
+		sap.ui.require(
+			["%252E%252E/%252E%252E/foo"],
+			function() {
+				assert.ok(false, "success callback must not be called for an encoded module ID");
+				deferred.resolve();
+			},
+			function(e) {
+				assert.ok(e instanceof TypeError, "error callback should receive a TypeError");
+				assert.ok(/URL encoded module IDs are not supported/.test(e.message), "error message mentions URL encoded module IDs");
+				deferred.resolve();
+			}
+		);
+		await deferred.promise;
+	});
+
 }());

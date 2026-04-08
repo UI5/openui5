@@ -1365,4 +1365,22 @@ ${toDot(MODULE_C)} = "C";
 
 	});
 
+	QUnit.module("URL Encoded Module IDs");
+
+	QUnit.test("requireSync rejects single-encoded dot segments (%2E)", function(assert) {
+		assert.throws(
+			function() { sap.ui.requireSync("%2E%2E/foo"); },
+			function(e) { return e instanceof TypeError && /URL encoded module IDs are not supported/.test(e.message); },
+			"requireSync should throw a TypeError for a module ID containing %2E"
+		);
+	});
+
+	QUnit.test("requireSync rejects double-encoded dot segments (%252E)", function(assert) {
+		assert.throws(
+			function() { sap.ui.requireSync("%252E%252E/%252E%252E/foo"); },
+			function(e) { return e instanceof TypeError && /URL encoded module IDs are not supported/.test(e.message); },
+			"requireSync should throw a TypeError for a module ID containing %252E"
+		);
+	});
+
 });
