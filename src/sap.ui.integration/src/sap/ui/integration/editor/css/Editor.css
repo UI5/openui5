@@ -3,11 +3,11 @@
 	padding: 1rem 1rem 1rem 0.5rem;
 	display: flex;
 	box-sizing: border-box;
-	background-color: var(--sapShellColor);
+	background-color: var(--sapBackgroundColor);
 }
 
 .sapUiIntegrationEditor .sapMTreeItemBaseChildren {
-	background-color: var(--sapShellColor);
+	background-color: var(--sapBackgroundColor);
 }
 
 .sapUiIntegrationEditor .childsTreeContainer {
