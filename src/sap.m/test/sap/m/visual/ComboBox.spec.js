@@ -14,7 +14,7 @@ describe("sap.m.ComboBox", function() {
 	it("should open first ComboBox - Default", function() {
 		var defaultArrow = element(by.id("box_default-arrow"));
 		defaultArrow.click();
-		element.all(by.css('.sapMComboBoxBasePicker[style*="display: block"] li.sapMLIB')).get(2).click();
+		element.all(by.css('.sapMComboBoxBasePicker[style*="display: flex"] li.sapMLIB')).get(2).click();
 		defaultArrow.click();
 		expect(takeScreenshot()).toLookAs("default_fullscreen");
 		defaultArrow.click();

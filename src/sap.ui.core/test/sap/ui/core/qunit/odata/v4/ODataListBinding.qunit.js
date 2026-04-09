@@ -5455,6 +5455,10 @@ sap.ui.define([
 						.withExactArgs(sinon.match.same(aContexts[iCurrentCreateNo]),
 							oFixture.sGroupId === "$direct" ? "$direct" : "$auto")
 						.returns(aRefreshSinglePromises[iCurrentCreateNo]);
+					oHelperMock.expects("getPrivateAnnotation")
+						.withExactArgs(sinon.match.same(aCreatedElements[iCurrentCreateNo]),
+							"additionalPromise")
+						.returns(undefined);
 				});
 				aRefreshSinglePromises[iCurrentCreateNo].then(function () {
 					aRefreshSingleFinished[iCurrentCreateNo] = true;
@@ -5515,8 +5519,9 @@ sap.ui.define([
 		{bSkipRefresh : false, bDeepCreate : false, bRefreshSingle : true},
 		{bSkipRefresh : false, bDeepCreate : true}
 	].forEach(function (oFixture) {
-		QUnit.test("create: " + JSON.stringify(oFixture), function () {
-			var oBinding = this.bindList("/EMPLOYEES"),
+		QUnit.test("create: " + JSON.stringify(oFixture), function (assert) {
+			var bAdditionalPromiseResolved,
+				oBinding = this.bindList("/EMPLOYEES"),
 				oBindingMock = this.mock(oBinding),
 				oContext,
 				oCreatedEntity = {},
@@ -5558,19 +5563,28 @@ sap.ui.define([
 				that.mock(oContext).expects("updateAfterCreate")
 					.exactly(oFixture.bRefreshSingle ? 0 : 1)
 					.withExactArgs(oFixture.bSkipRefresh, "$auto");
-				oBindingMock.expects("refreshSingle")
+				oBindingMock.expects("refreshSingle").exactly(oFixture.bRefreshSingle ? 1 : 0)
 					.withExactArgs(sinon.match(function (oContext0) {
 						return oContext0 === oContext
 							&& oContext0.getPath() === "/EMPLOYEES(ID=42)";
 					}), "$auto")
-				.exactly(oFixture.bRefreshSingle ? 1 : 0)
 					.returns(SyncPromise.resolve(oRefreshedEntity));
+				oHelperMock.expects("getPrivateAnnotation")
+					.withExactArgs(sinon.match.same(oCreatedEntity), "additionalPromise")
+					.returns(new Promise(function (resolve) {
+						setTimeout(function () {
+							bAdditionalPromiseResolved = true;
+							resolve();
+						});
+					}));
 			});
 
 			// code under test
 			oContext = oBinding.create("~oInitialData~", oFixture.bSkipRefresh);
 
-			return oContext.created();
+			return oContext.created().then(function () {
+				assert.strictEqual(bAdditionalPromiseResolved, true);
+			});
 		});
 	});
 
@@ -5629,6 +5643,9 @@ sap.ui.define([
 				oBindingMock.expects("refreshSingle")
 					.withExactArgs(sinon.match.same(oContext), "$auto")
 					.returns(oRefreshPromise);
+				oHelperMock.expects("getPrivateAnnotation")
+					.withExactArgs(sinon.match.same(oCreatedEntity), "additionalPromise")
+					.returns(undefined);
 			});
 			oContextMock.expects("fetchValue").withExactArgs().resolves({});
 
@@ -6439,6 +6456,8 @@ sap.ui.define([
 					.withExactArgs("~sGroupId~").returns(false);
 				this.mock(oContext).expects("updateAfterCreate").exactly(bUseContext ? 1 : 0)
 					.withExactArgs(true, "~sGroupId~");
+				oHelperMock.expects("getPrivateAnnotation").exactly(bUseContext ? 1 : 0)
+					.withExactArgs("~oCreatedEntity~", "additionalPromise").returns(undefined);
 
 				resolve("~oCreatedEntity~");
 			}, 0);
@@ -6456,9 +6475,10 @@ sap.ui.define([
 				"~sResolvedPath~($uid=id-1-23)", /*iIndex*/undefined,
 				sinon.match(function (oCreatePromise0) {
 					oCreatePromise0.then(function (vResult) {
-						assert.deepEqual(vResult,
-							// createInCache's oCreatePromise resolves with no defined result
-							bRefresh ? [undefined, "~refreshResult~"] : undefined);
+						// createInCache's oCreatePromise resolves with no defined result, but in
+						// case of bRefresh the oCreatePromise also waits for #refreshInternal
+						assert.strictEqual(_Helper.toArray(vResult).includes("~refreshResult~"),
+							bRefresh);
 					});
 					return oCreatePromise0 instanceof SyncPromise;
 				}), undefined)

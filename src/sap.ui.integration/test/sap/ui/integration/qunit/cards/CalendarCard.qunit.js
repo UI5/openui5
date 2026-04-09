@@ -1,4 +1,4 @@
-/* global QUnit */
+/* global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/core/Lib",
@@ -8,7 +8,8 @@ sap.ui.define([
 	"sap/ui/unified/calendar/CalendarDate",
 	"sap/ui/integration/cards/CalendarContent",
 	"sap/ui/core/date/UI5Date",
-	"qunit/testResources/nextCardReadyEvent"
+	"qunit/testResources/nextCardReadyEvent",
+	"qunit/testResources/genericTests/actionEnablementTests"
 ],
 	function (
 		Library,
@@ -18,7 +19,8 @@ sap.ui.define([
 		CalendarDate,
 		CalendarContent,
 		UI5Date,
-		nextCardReadyEvent
+		nextCardReadyEvent,
+		actionEnablementTests
 	) {
 		"use strict";
 
@@ -1930,6 +1932,32 @@ sap.ui.define([
 			aLegendItemsRefs = this.oCard.$().find(".sapUiUnifiedLegendItem");
 			// Assert
 			assert.strictEqual(aLegendItemsRefs.length, 6, "Should have 5 rendered legend items and one 'More' indicator.");
+		});
+
+		actionEnablementTests("Calendar Card More Items Button", {
+			manifest: {
+				"sap.app": {
+					"id": "test.card.actions.calendar.moreItems",
+					"type": "card"
+				},
+				"sap.card": {
+					"type": "Calendar",
+					"header": {
+						"title": "Calendar Card"
+					},
+					"content": {
+						"date": "2019-09-01T09:00",
+						"moreItems": {}
+					}
+				}
+			},
+			partUnderTestPath: "/sap.card/content/moreItems",
+			getActionControl: (oCard) => {
+				return oCard.getCardContent()._getMoreButton();
+			},
+			DOM_RENDER_LOCATION,
+			QUnit,
+			sinon
 		});
 	}
 );

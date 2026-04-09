@@ -6124,5 +6124,6 @@
 	"sap-calendarWeek": {
 		"narrow": "CW {0}",
 		"wide": "สัปดาห์ตามปฏิทิน {0}"
-	}
+	},
+	"sap-datePlaceholder": "เช่น {0}"
 }

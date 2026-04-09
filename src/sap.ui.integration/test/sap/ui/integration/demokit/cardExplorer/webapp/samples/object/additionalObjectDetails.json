@@ -110,11 +110,21 @@
 			"actionsStrip": [
 				{
 					"text": "Pay Bill",
-					"buttonType": "Accept"
+					"buttonType": "Accept",
+					"actions": [
+						{
+							"type": "Custom"
+						}
+					]
 				},
 				{
 					"text": "Block Payment",
-					"buttonType": "Reject"
+					"buttonType": "Reject",
+					"actions": [
+						{
+							"type": "Custom"
+						}
+					]
 				}
 			]
 		}

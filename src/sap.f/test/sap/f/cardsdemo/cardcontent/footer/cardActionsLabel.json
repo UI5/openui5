@@ -215,6 +215,47 @@
 							}
 						}
 					]
+				},
+				{
+					"text": "No Action",
+					"overflowPriority": "AlwaysOverflow"
+				},
+				{
+					"text": "Empty Actions",
+					"actions": [],
+					"overflowPriority": "AlwaysOverflow"
+				},
+				{
+					"text": "Enabled True",
+					"enabled": true,
+					"overflowPriority": "AlwaysOverflow"
+				},
+				{
+					"text": "Enabled False",
+					"enabled": false,
+					"overflowPriority": "AlwaysOverflow"
+				},
+				{
+					"type": "Link",
+					"text": "Link No Action",
+					"overflowPriority": "AlwaysOverflow"
+				},
+				{
+					"text": "Empty Action Object",
+					"actions": [
+						{}
+					],
+					"overflowPriority": "AlwaysOverflow"
+				},
+				{
+					"buttonType": "Accept",
+					"text": "Accept No Action",
+					"overflowPriority": "AlwaysOverflow"
+				},
+				{
+					"buttonType": "Reject",
+					"text": "Reject No Action",
+					"overflowPriority": "AlwaysOverflow"
 				}
 			]
 		}

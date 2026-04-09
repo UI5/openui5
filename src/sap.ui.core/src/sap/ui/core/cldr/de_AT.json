@@ -6173,5 +6173,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KW {0}",
 		"wide": "Kalenderwoche {0}"
-	}
+	},
+	"sap-datePlaceholder": "z.B. {0}"
 }

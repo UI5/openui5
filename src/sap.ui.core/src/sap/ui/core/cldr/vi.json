@@ -6014,5 +6014,6 @@
 	"sap-calendarWeek": {
 		"narrow": "Tuần theo lịch {0}",
 		"wide": "Tuần theo lịch {0}"
-	}
+	},
+	"sap-datePlaceholder": "ví dụ\\: {0}"
 }

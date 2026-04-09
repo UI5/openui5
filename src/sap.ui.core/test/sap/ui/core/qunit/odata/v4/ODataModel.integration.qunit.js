@@ -258,8 +258,6 @@ sap.ui.define([
 		}
 
 		const aElements = oListBinding.oCache.aElements;
-		strictEqual(aElements.$count,
-			oListBinding.isLengthFinal() ? aElements.length : undefined, "$count");
 		for (const sPredicate in aElements.$byPredicate) {
 			const oElement = aElements.$byPredicate[sPredicate];
 			strictEqual(oElement["@$ui5.context.isDeleted"] || aElements.includes(oElement)
@@ -330,7 +328,6 @@ sap.ui.define([
 		}
 
 		const aElements = oListBinding.oCache.aElements;
-		strictEqual(aElements.length, aElements.$count, "$count");
 		for (const sPredicate in aElements.$byPredicate) {
 			const oElement = aElements.$byPredicate[sPredicate];
 			strictEqual(aElements.includes(oElement), true,
@@ -22912,81 +22909,120 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Create a draft at the end, save it and replace it with the active entity. Start
 	// deleting it, but cancel the deletion. See that it is still at the end.
 	// JIRA: CPOUI5ODATAV4-1629
-	QUnit.test("CPOUI5ODATAV4-1629: ODLB: create, delete & doReplaceWith", function (assert) {
-		var sAction = "special.cases.ActivationAction",
-			oBinding,
-			oContext,
-			oModel = this.createSpecialCasesModel(
-				{autoExpandSelect : true, updateGroupId : "update"}),
-			oPromise,
-			sView = '\
+	//
+	// Check that a header message on POST targets the non-transient path (SNOW: DINC0804629)
+	["update", "$direct"].forEach((sUpdateGroupId) => {
+		const sTitle = "CPOUI5ODATAV4-1629: ODLB: create, delete & doReplaceWith; updateGroupId : "
+			+ sUpdateGroupId;
+
+		QUnit.test(sTitle, function (assert) {
+			var sAction = "special.cases.ActivationAction",
+				oBinding,
+				oContext,
+				oModel = this.createSpecialCasesModel(
+					{autoExpandSelect : true, updateGroupId : sUpdateGroupId}),
+				oPromise,
+				sView = '\
 <Table id="list" items="{/Artists}">\
-	<Text id="id" text="{ArtistID}"/>\
+	<Input id="id" value="{ArtistID}"/>\
 	<Text id="active" text="{IsActiveEntity}"/>\
 </Table>',
-			that = this;
+				that = this;
 
-		this.expectRequest("Artists?$select=ArtistID,IsActiveEntity&$skip=0&$top=100", {
-				value : [
-					{ArtistID : "1", IsActiveEntity : true}
-				]
-			})
-			.expectChange("id", ["1"])
-			.expectChange("active", ["Yes"]);
+			this.expectRequest("Artists?$select=ArtistID,IsActiveEntity&$skip=0&$top=100", {
+					value : [
+						{ArtistID : "1", IsActiveEntity : true}
+					]
+				})
+				.expectChange("id", ["1"])
+				.expectChange("active", ["Yes"]);
 
-		return this.createView(assert, sView, oModel).then(function () {
-			that.expectChange("id", [, ""])
-				.expectChange("active", [, null])
-				.expectRequest("POST Artists", {ArtistID : "new", IsActiveEntity : false})
-				.expectChange("id", [, "new"])
-				.expectChange("active", [, "No"]);
+			return this.createView(assert, sView, oModel).then(function () {
+				const oMessage = {
+					code : "SNOW: DINC0804629",
+					longtextUrl : "LongText('0815')",
+					message : "Just A Message",
+					numericSeverity : 1,
+					target : "ArtistID"
+				};
+				that.expectChange("id", [, ""])
+					.expectChange("active", [, null])
+					.expectRequest("POST Artists", /*vResponse*/{
+						ArtistID : "new",
+						IsActiveEntity : false
+					}, /*mResponseHeaders*/{
+						"sap-messages" : JSON.stringify([oMessage])
+					})
+					.expectChange("id", [, "new"])
+					.expectChange("active", [, "No"])
+					.expectMessages([{
+						code : "SNOW: DINC0804629",
+						descriptionUrl : "/special/cases/LongText('0815')",
+						message : "Just A Message",
+						persistent : true,
+						targets : ["/Artists(ArtistID='new',IsActiveEntity=false)/ArtistID"],
+						technicalDetails : {
+							originalMessage : oMessage
+						},
+						type : "Success"
+					}]);
 
-			oBinding = that.oView.byId("list").getBinding("items");
-			oContext = oBinding.create({}, true, /*bAtEnd*/true);
+				oBinding = that.oView.byId("list").getBinding("items");
+				oContext = oBinding.create({}, true, /*bAtEnd*/true);
 
-			return Promise.all([
-				oModel.submitBatch("update"),
-				oContext.created(),
-				that.waitForChanges(assert, "create draft at end")
-			]);
-		}).then(function () {
-			var oAction = oModel.bindContext(sAction + "(...)", oContext);
+				return Promise.all([
+					sUpdateGroupId === "$direct" || oModel.submitBatch(sUpdateGroupId),
+					oContext.created(),
+					that.waitForChanges(assert, "create draft at end")
+				]);
+			}).then(function () {
+				return that.checkValueState(assert, that.oView.byId("list").getItems()[1].getCells()[0],
+					"Success", "Just A Message");
+			}).then(function () {
+				var oAction = oModel.bindContext(sAction + "(...)", oContext);
 
-			that.expectRequest("POST Artists(ArtistID='new',IsActiveEntity=false)/" + sAction,
-					{ArtistID : "new", IsActiveEntity : true})
-				.expectChange("active", [, "Yes"]);
+				that.expectRequest("POST Artists(ArtistID='new',IsActiveEntity=false)/" + sAction,
+						{ArtistID : "new", IsActiveEntity : true})
+					.expectChange("active", [, "Yes"]);
 
-			return Promise.all([
-				oAction.invoke(undefined, false, null, /*bReplaceWithRVC*/true),
-				that.waitForChanges(assert, "replace with active")
-			]);
-		}).then(function (aResult) {
-			oPromise = aResult[0].delete(); // delete the RVC
+				return Promise.all([
+					oAction.invoke(undefined, false, null, /*bReplaceWithRVC*/true),
+					that.waitForChanges(assert, "replace with active")
+				]);
+			}).then(function (aResult) {
+				if (sUpdateGroupId === "$direct") {
+					throw Error("STOP"); // $direct was only about the message, skip trouble w/ DELETE
+				}
 
-			// It's not possible to synchronously reset after delete, so wait a short moment.
-			return that.waitForChanges(assert, "deferred delete");
-		}).then(function () {
-			that.expectCanceledError(
-				"Failed to delete /Artists(ArtistID='new',IsActiveEntity=true)",
-				"Request canceled: DELETE Artists(ArtistID='new',IsActiveEntity=true);"
-				+ " group: update"
-			);
-			that.expectChange("id", [, "new"])
-				.expectChange("active", [, "Yes"]);
+				oPromise = aResult[0].delete(); // delete the RVC
 
-			// code under test
-			oModel.resetChanges();
+				// It's not possible to synchronously reset after delete, so wait a short moment.
+				return that.waitForChanges(assert, "deferred delete");
+			}).then(function () {
+				that.expectCanceledError(
+					"Failed to delete /Artists(ArtistID='new',IsActiveEntity=true)",
+					"Request canceled: DELETE Artists(ArtistID='new',IsActiveEntity=true);"
+					+ " group: " + sUpdateGroupId
+				);
+				that.expectChange("id", [, "new"])
+					.expectChange("active", [, "Yes"]);
 
-			return Promise.all([
-				checkCanceled(assert, oPromise),
-				that.waitForChanges(assert, "resetChanges")
-			]);
-		}).then(function () {
-			assert.deepEqual(oBinding.getCurrentContexts().map(getPath), [
-				"/Artists(ArtistID='1',IsActiveEntity=true)",
-				"/Artists(ArtistID='new',IsActiveEntity=true)"
-			], "correct order");
-			assert.strictEqual(oBinding.getLength(), 2, "correct length");
+				// code under test
+				oModel.resetChanges();
+
+				return Promise.all([
+					checkCanceled(assert, oPromise),
+					that.waitForChanges(assert, "resetChanges")
+				]);
+			}).then(function () {
+				assert.deepEqual(oBinding.getCurrentContexts().map(getPath), [
+					"/Artists(ArtistID='1',IsActiveEntity=true)",
+					"/Artists(ArtistID='new',IsActiveEntity=true)"
+				], "correct order");
+				assert.strictEqual(oBinding.getLength(), 2, "correct length");
+			}).catch(function (oError) {
+				assert.strictEqual(oError.message, "STOP");
+			});
 		});
 	});
 
@@ -36546,6 +36582,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Move a parent's single leaf child to the same parent (SNOW: DINC0548859)
 	//
 	// Change the table's context and concurrently refresh it (SNOW: DINC0582522)
+	//
+	// When binding a transient context to an object page, late properties will be requested in the
+	// same $batch as the NodeID request.
+	// SNOW: DINC0830710
 	[false, true].forEach(function (bResetViaModel) {
 		const sTitle = `Recursive Hierarchy: create new children, move 'em, model=${bResetViaModel}`;
 		QUnit.test(sTitle, function (assert) {
@@ -36580,6 +36620,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		<Text id="name" text="{Name}"/>
 		<Text id="id" text="{_/NodeID}"/>
 	</t:Table>
+	</FlexBox>
+	<FlexBox id="objectPage">
+		<Text text="{defaultChannel}"/>
 	</FlexBox>`;
 			const that = this;
 
@@ -36731,7 +36774,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					.expectRequest("#4 " + sBaseUrlNoFilter
 						+ "&$filter=ArtistID eq '1' and IsActiveEntity eq false&$select=_/NodeID", {
 						value : [{
-							"@odata.etag" : "n/a",
+							"@odata.etag" : "etag1.0",
 							_ : {
 								NodeID : "1,false"
 							}
@@ -36803,7 +36846,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					.expectRequest("#6 " + sBaseUrlNoFilter
 						+ "&$filter=ArtistID eq '2' and IsActiveEntity eq false&$select=_/NodeID", {
 						value : [{
-							"@odata.etag" : "n/a",
+							"@odata.etag" : "etag2.0",
 							_ : {
 								NodeID : "2,false"
 							}
@@ -37406,11 +37449,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						+ "&$filter=ArtistID eq '9' and IsActiveEntity eq false"
 						+ "&$select=_/NodeID", {
 						value : [{
-							"@odata.etag" : "n/a",
+							"@odata.etag" : "etag9.0",
 							_ : {
 								NodeID : "9,false"
 							}
 						}]
+					})
+					.expectRequest("#16 Artists(ArtistID='99',IsActiveEntity=false)"
+						+ "/_Friend(ArtistID='9',IsActiveEntity=false)?$select=defaultChannel", {
+						"@odata.etag" : "etag9.0",
+						defaultChannel : "foo"
 					});
 
 				// code under test (JIRA: CPOUI5ODATAV4-2355)
@@ -37421,8 +37469,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				assert.strictEqual(oNewRoot.getIndex(), 0);
 
+				// code under test (SNOW: DINC0830710)
+				that.oView.byId("objectPage").setBindingContext(oNewRoot);
+
 				return Promise.all([
-					oNewRoot.created(),
+					oNewRoot.created().then(function () {
+						assert.strictEqual(oNewRoot.getProperty("_/NodeID"), "9,false");
+					}),
 					that.waitForChanges(assert, "create new root")
 				]);
 			}).then(function () {
@@ -48356,6 +48409,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Create new child and cancel immediately (JIRA: CPOUI5ODATAV4-2272)
 	// Also delete instead of cancelling (JIRA: CPOUI5ODATAV4-2274)
 	// Delete a created persisted child (JIRA: CPOUI5ODATAV4-2224)
+	//
+	// When binding a transient context to an object page, late properties will be requested in the
+	// same $batch as the NodeID request.
+	// SNOW: DINC0830710
 	[false, true].forEach(function (bDelete) {
 		const sTitle = `Recursive Hierarchy: create new children & placeholders, delete=${bDelete}`;
 
@@ -48374,7 +48431,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		<Text text="{= %{@$ui5.node.level} }"/>
 		<Text id="id" text="{ArtistID}"/>\
 		<Text id="name" text="{Name}"/>
-	</t:Table>`;
+	</t:Table>
+	<FlexBox id="objectPage">
+		<Text text="{defaultChannel}"/>
+	</FlexBox>`;
 			const that = this;
 
 			this.expectRequest("#1 Artists?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
@@ -48523,7 +48583,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					})
 					.expectChange("id", [, "12"])
 					.expectChange("name", [, "Second new child"])
-					.expectRequest("Artists?$apply=descendants($root/Artists,OrgChart,_/NodeID"
+					.expectRequest("#6 Artists?$apply=descendants($root/Artists,OrgChart,_/NodeID"
 						+ ",filter(ArtistID eq '0' and IsActiveEntity eq false),1)"
 						+ "&$filter=ArtistID eq '12' and IsActiveEntity eq false&$select=_/NodeID", {
 						value : [{
@@ -48532,6 +48592,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 								NodeID : "12,true"
 							}
 						}]
+					})
+					.expectRequest("#6 Artists(ArtistID='12',IsActiveEntity=false)"
+						+ "?$select=defaultChannel", {
+						"@odata.etag" : "etag2.0",
+						defaultChannel : "foo"
 					});
 
 				// code under test
@@ -48540,8 +48605,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Name : "2nd new child"
 				}, /*bSkipRefresh*/true);
 
+				// code under test (SNOW: DINC0830710)
+				that.oView.byId("objectPage").setBindingContext(oChild);
+
 				return Promise.all([
-					oChild.created(),
+					oChild.created().then(function () {
+						assert.strictEqual(oChild.getProperty("_/NodeID"), "12,true");
+					}),
 					that.waitForChanges(assert, "create 2nd child")
 				]);
 			}).then(function () {

@@ -6457,5 +6457,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KS {0}",
 		"wide": "Kalendorinė savaitė {0}"
-	}
+	},
+	"sap-datePlaceholder": "pvz., {0}"
 }

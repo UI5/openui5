@@ -4881,6 +4881,8 @@ sap.ui.define([
 			.withExactArgs(aMessages[0], "/sServiceUrl/~sRequestUrl~");
 		oHelperMock.expects("makeAbsoluteLongtextUrl")
 			.withExactArgs(aMessages[1], "/sServiceUrl/~sRequestUrl~");
+		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs(sResourcePath)
+			.returns(null);
 		this.mock(oModelInterface).expects("reportTransitionMessages")
 			.withExactArgs(aMessages, sResourcePath);
 
@@ -4889,10 +4891,44 @@ sap.ui.define([
 	});
 
 	//*****************************************************************************************
+	QUnit.test("reportHeaderMessages with $uid", function () {
+		var aMessages = [{
+				code : "42",
+				message : "Test"
+			}],
+			sMessages = JSON.stringify(aMessages),
+			oRequestor = _Requestor.create("/sServiceUrl/", oModelInterface, {}, {}, "4.0"),
+			sResourcePath = "Product($uid=1-23)",
+			mTypeForMetaPath;
+
+		this.mock(_Helper).expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(aMessages[0], "/sServiceUrl/~sRequestUrl~");
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").withExactArgs(sResourcePath)
+			.returns(["($uid=1-23)"]);
+		this.mock(_Helper).expects("getMetaPath").withExactArgs("~sRequestUrl~")
+			.returns("~sMetaPath~");
+		this.mock(oRequestor).expects("fetchType")
+			.withExactArgs(sinon.match.object.and(sinon.match((mTypeForMetaPath0) => {
+				mTypeForMetaPath = mTypeForMetaPath0;
+				return true;
+			})), "/~sMetaPath~");
+		this.mock(_Helper).expects("getKeyPredicate")
+			.withExactArgs("~oResponse~", "/~sMetaPath~", sinon.match((mTypeForMetaPath0) => {
+				return mTypeForMetaPath0 === mTypeForMetaPath;
+			})).returns("(foo)");
+		this.mock(oModelInterface).expects("reportTransitionMessages")
+			.withExactArgs(aMessages, "Product(foo)");
+
+		// code under test
+		oRequestor.reportHeaderMessages(sResourcePath, sMessages, "~oResponse~", "~sRequestUrl~");
+	});
+
+	//*****************************************************************************************
 	QUnit.test("reportHeaderMessages without messages", function () {
 		var oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0");
 
 		this.mock(_Helper).expects("makeAbsoluteLongtextUrl").never();
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oModelInterface).expects("reportTransitionMessages").never();
 
 		// code under test
@@ -4903,6 +4939,7 @@ sap.ui.define([
 	QUnit.test("reportHeaderMessages for 'R#V#C'", function () {
 		const oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0");
 		this.mock(_Helper).expects("makeAbsoluteLongtextUrl").never();
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oModelInterface).expects("reportTransitionMessages").never();
 		const aMessages = [{code : "42", message : "Test"}, {code : "43", type : "Warning"}];
 		const sMessages = JSON.stringify(aMessages);

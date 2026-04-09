@@ -6169,5 +6169,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KN {0}",
 		"wide": "Kalendarska nedelja {0}"
-	}
+	},
+	"sap-datePlaceholder": "Na primer\\: {0}"
 }

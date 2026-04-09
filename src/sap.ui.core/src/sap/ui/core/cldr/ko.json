@@ -6022,5 +6022,6 @@
 	"sap-calendarWeek": {
 		"narrow": "CW {0}",
 		"wide": "역주 {0}"
-	}
+	},
+	"sap-datePlaceholder": "예\\: {0}"
 }

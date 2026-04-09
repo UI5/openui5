@@ -6046,5 +6046,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KU {0}",
 		"wide": "Kalenderuge {0}"
-	}
+	},
+	"sap-datePlaceholder": "for eksempel {0}"
 }

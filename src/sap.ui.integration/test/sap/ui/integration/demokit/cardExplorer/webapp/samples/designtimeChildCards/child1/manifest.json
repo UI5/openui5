@@ -28,29 +28,12 @@
 			"parameters": {
 				"cardTitle": {
 					"value": "{{TRANSLATED_CARD_TITLE_EMPLOYEES}}"
+				},
+				"maxItems": {
+					"value": 2
 				}
 			},
-			"destinations": {
-				"string": {
-					"name": "Simple"
-				},
-				"local": {
-					"name": "local",
-					"label": "local destination label defined in manifest"
-				},
-				"dest": {
-					"name": "Northwind",
-					"defaultUrl": "https://services.odata.org/V4/Northwind/Northwind.svc"
-				},
-				"destLabel": {
-					"name": "products",
-					"label": "Direct Destination Label defined in manifest"
-				},
-				"destLabelTrans": {
-					"name": "SF",
-					"label": "{i18n>TRANSLATED_DESTINATION_LABEL} defined in manifest"
-				}
-			}
+			"useMainDestinations": true
 		},
 		"header": {
 			"title": "{parameters>/cardTitle/value}",
@@ -62,7 +45,7 @@
 		},
 		"data": {
 			"request": {
-				"url": "{{destinations.dest}}/Employees",
+				"url": "{{mainDestinations.dest}}/Employees",
 				"parameters": {
 					"$select": "EmployeeID, FirstName, LastName, Country, Title, HomePhone"
 				}
@@ -77,7 +60,7 @@
 					"value": "Info: {Country} - {Title} - {HomePhone}"
 				}
 			},
-			"maxItems": 4
+			"maxItems": "{parameters>/maxItems/value}"
 		}
 	}
 }

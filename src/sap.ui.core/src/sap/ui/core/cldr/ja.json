@@ -6143,5 +6143,6 @@
 	"sap-calendarWeek": {
 		"narrow": "CW {0}",
 		"wide": "カレンダ週 {0}"
-	}
+	},
+	"sap-datePlaceholder": "例\\: {0}"
 }

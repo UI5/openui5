@@ -5029,11 +5029,10 @@ sap.ui.define([
 	QUnit.test("getPlaceholderText: " + oFixture.method, function (assert) {
 		this.stub(UI5Date, "getInstance").onFirstCall().returns({getFullYear: function () {return 2012;}})
 			.callThrough(); // only stub first call of UI5Date.getInstance to fake current year
+		this.mock(LocaleData.prototype).expects("getDatePlaceholder").returns("date.placeholder {0}");
 
-		TestUtils.withNormalizedMessages(function () {
-			// code under test
-			assert.strictEqual(DateFormat[oFixture.method]().getPlaceholderText(), oFixture.result);
-		});
+		// code under test
+		assert.strictEqual(DateFormat[oFixture.method]().getPlaceholderText(), oFixture.result);
 	});
 });
 
@@ -5049,11 +5048,10 @@ sap.ui.define([
 	QUnit.test("getPlaceholderText, with interval: " + oFixture.method, function (assert) {
 		this.stub(UI5Date, "getInstance").onFirstCall().returns({getFullYear: function () {return 2012;}})
 			.callThrough(); // only stub first call of UI5Date.getInstance to fake current year
+		this.mock(LocaleData.prototype).expects("getDatePlaceholder").returns("date.placeholder {0}");
 
-		TestUtils.withNormalizedMessages(function () {
-			// code under test
-			assert.strictEqual(DateFormat[oFixture.method]({interval: true}).getPlaceholderText(), oFixture.result);
-		});
+		// code under test
+		assert.strictEqual(DateFormat[oFixture.method]({interval: true}).getPlaceholderText(), oFixture.result);
 	});
 });
 
@@ -5068,13 +5066,12 @@ sap.ui.define([
 	QUnit.test("getPlaceholderText: different calendar types: " + oFixture.type, function (assert) {
 		this.stub(UI5Date, "getInstance").onFirstCall().returns({getFullYear: function () {return 2012;}})
 			.callThrough(); // only stub first call of UI5Date.getInstance to fake current year
+		this.mock(LocaleData.prototype).expects("getDatePlaceholder").returns("date.placeholder {0}");
 
-		TestUtils.withNormalizedMessages(function () {
-			// code under test
-			assert.strictEqual(
-				DateFormat.getDateInstance({calendarType: oFixture.type}).getPlaceholderText(),
-				oFixture.result);
-		});
+		// code under test
+		assert.strictEqual(
+			DateFormat.getDateInstance({calendarType: oFixture.type}).getPlaceholderText(),
+			oFixture.result);
 	});
 });
 

@@ -6065,5 +6065,6 @@
 	"sap-calendarWeek": {
 		"narrow": "{0}. NH",
 		"wide": "Naptári hét {0}"
-	}
+	},
+	"sap-datePlaceholder": "Például {0}"
 }

@@ -53,7 +53,7 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (
 						"values": {
 							"data": {
 								"request": {
-									"url": "{{destinations.mock_request}}/Orders"
+									"url": "{{mainDestinations.mock_request}}/Orders"
 								},
 								"path": "/value"
 							},

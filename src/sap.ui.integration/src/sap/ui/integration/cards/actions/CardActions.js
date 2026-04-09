@@ -117,9 +117,9 @@ sap.ui.define([
 		oConfig.disabledPropertyValue = oConfig.disabledPropertyValue || false;
 		oConfig.eventName = oConfig.eventName || "press";
 
-		if (!oConfig.actions) {
-			// For now firing the event here, after refactor need to think
-			// of a way to sync async navigation setters
+		if (!oConfig.actions || !oConfig.actions.length) {
+			// No actions defined - disable the control
+			this._setControlDisabled(oConfig);
 			this._fireActionReady(oControl, sActionArea);
 
 			return;
@@ -127,6 +127,7 @@ sap.ui.define([
 
 		// For now we allow for only one action of type navigation.
 		var oAction = oConfig.actions[0];
+
 		if (oAction && oAction.type) { // todo - check if the type is valid
 			oConfig.action = oAction;
 			this._attachAction(oConfig);
@@ -134,6 +135,23 @@ sap.ui.define([
 		} else {
 			// For now firing the event here, after refactor need to think of a way to sync async navigation setters
 			this._fireActionReady(oControl, sActionArea);
+		}
+	};
+
+	/**
+	 * Disables the control if the enabledPropertyName is set.
+	 * @param {object} oConfig The action configuration
+	 * @private
+	 */
+	CardActions.prototype._setControlDisabled = function (oConfig) {
+		if (!oConfig.control?.isA("sap.m.Link") && !oConfig.control?.isA("sap.m.Button")) {
+			return;
+		}
+
+		if (oConfig.enabledPropertyName) {
+			// No valid action configuration - disable the control
+			Log.warning("Button disabled: no actions defined");
+			oConfig.actionControl.setProperty(oConfig.enabledPropertyName, oConfig.disabledPropertyValue);
 		}
 	};
 

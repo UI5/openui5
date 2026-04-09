@@ -2023,4 +2023,77 @@ sap.ui.define([
 		oDialog.destroy();
 	});
 
+	QUnit.module("Initial Focus");
+
+	QUnit.test("Binding after opening", function (assert) {
+		const oDialog = new SelectDialog("selectDialogLateBinding", {
+			title: "Late Binding Test",
+			multiSelect: true
+		});
+
+		oDialog.setModel(new JSONModel(generateData()));
+		oDialog.bindAggregation("items", {
+			path: "/items",
+			template: createTemplateListItem()
+		});
+
+		oDialog.open();
+
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		oDialog.setModel(new JSONModel(generateData()));
+		oDialog.bindAggregation("items", {
+			path: "/items",
+			template: createTemplateListItem()
+		});
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		this.clock.tick(1000);
+
+		// Assert - focus should be on the first list item, not jumping away
+		const oFirstItem = oDialog._oDialog.getContent()[1].getItems()[0];
+		assert.strictEqual(
+			oFirstItem.getFocusDomRef(),
+			document.activeElement,
+			"After late binding, the focus should be on the first list item"
+		);
+
+		// Clean up
+		oDialog.destroy();
+	});
+
+	QUnit.test("Binding after opening and initial focus = search field", function (assert) {
+		const oDialog = new SelectDialog("selectDialogLateBinding", {
+			initialFocus: "SearchField",
+			title: "Late Binding Test",
+			multiSelect: true
+		});
+
+		oDialog.setModel(new JSONModel(generateData()));
+		oDialog.bindAggregation("items", {
+			path: "/items",
+			template: createTemplateListItem()
+		});
+
+		oDialog.open();
+
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		oDialog.setModel(new JSONModel(generateData()));
+		oDialog.bindAggregation("items", {
+			path: "/items",
+			template: createTemplateListItem()
+		});
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		this.clock.tick(1000);
+
+		const oSearchField = oDialog._oSearchField;
+		assert.strictEqual(
+			oSearchField.getFocusDomRef(),
+			document.activeElement,
+			"After late binding, the focus should be on the search field"
+		);
+
+		// Clean up
+		oDialog.destroy();
+	});
 });

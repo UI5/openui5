@@ -242,9 +242,11 @@ sap.ui.define([
 
 		if (this.getDisableItemsInitially()) {
 			oActionsConfig.enabledPropertyValue = false;
-			oItem._mActionsConfig = oActionsConfig;
 			oItem._bIsDisabled = true;
 		}
+
+		// Store config for later use by disableItems/enableItems
+		oItem._mActionsConfig = oActionsConfig;
 
 		if (oConfig.type !== "Label") {
 			this.getCardActions().attach(oActionsConfig);
@@ -276,11 +278,8 @@ sap.ui.define([
 				if (mActionsConfig?.action) {
 					mActionsConfig.enabledPropertyValue = true;
 					this.getCardActions()._setControlEnabledState(mActionsConfig);
-				} else {
-					oItem.setEnabled(true);
+					delete oItem._bIsDisabled;
 				}
-
-				delete oItem._bIsDisabled;
 			}
 		});
 	};

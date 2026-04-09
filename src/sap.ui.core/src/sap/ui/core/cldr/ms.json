@@ -5819,5 +5819,6 @@
 	"sap-calendarWeek": {
 		"narrow": "CW {0}",
 		"wide": "Minggu Kalendar {0}"
-	}
+	},
+	"sap-datePlaceholder": "Contohnya, {0}"
 }

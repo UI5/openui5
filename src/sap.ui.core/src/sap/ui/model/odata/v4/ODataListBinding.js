@@ -1147,9 +1147,12 @@ sap.ui.define([
 				sGroupId0 = "$auto";
 			}
 			// currently the optimized update w/o bSkipRefresh is restricted to deep create
-			return bSkipRefresh || bDeepCreate
-				? oContext.updateAfterCreate(bSkipRefresh, sGroupId0)
-				: that.refreshSingle(oContext, sGroupId0);
+			return Promise.all([
+				bSkipRefresh || bDeepCreate
+					? oContext.updateAfterCreate(bSkipRefresh, sGroupId0)
+					: that.refreshSingle(oContext, sGroupId0),
+				_Helper.getPrivateAnnotation(oCreatedEntity, "additionalPromise")
+			]);
 		}, function (oError) {
 			oGroupLock.unlock(true); // createInCache failed, so the lock might still be blocking
 			throw oError;

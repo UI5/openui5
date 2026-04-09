@@ -1387,7 +1387,7 @@ sap.ui.define([
 			aItems = oActionsStrip._getToolbar().getContent();
 
 		assert.strictEqual(aItems[1].getText(), "Add to Favorites Comfort Easy", "Action text is correct");
-		assert.ok(aItems[1].getEnabled(), "Action is initially enabled");
+		assert.notOk(aItems[1].getEnabled(), "Action is initially disabled");
 	});
 
 	QUnit.test("List Card - ActionsStrip with template", async function (assert) {

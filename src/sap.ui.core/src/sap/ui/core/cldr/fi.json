@@ -6437,5 +6437,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KV {0}",
 		"wide": "Kalenteriviikko {0}"
-	}
+	},
+	"sap-datePlaceholder": "Esimerkiksi {0}"
 }

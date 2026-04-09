@@ -1251,6 +1251,17 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("getDatePlaceholder", function (assert) {
+		const oLocaleData = {_get() {}};
+		this.mock(oLocaleData).expects("_get")
+			.withExactArgs("sap-datePlaceholder")
+			.returns("z.B. {0}");
+
+		// code under test
+		assert.strictEqual(LocaleData.prototype.getDatePlaceholder.call(oLocaleData), "z.B. {0}");
+	});
+
+	//*********************************************************************************************
 	QUnit.test("_resetLocaleDataCache", function(assert) {
 		LocaleData._resetLocaleDataCache();
 		const oLoadResourceSpy = this.spy(LoaderExtensions, "loadResource");

@@ -5993,5 +5993,6 @@
 	"sap-calendarWeek": {
 		"narrow": "CW {0}",
 		"wide": "Ημ/γιακή Βδομάδα {0}"
-	}
+	},
+	"sap-datePlaceholder": "π.χ. {0}"
 }

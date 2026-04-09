@@ -50,8 +50,16 @@ sap.ui.define([
 			return IconFormatter.SRC_FOR_HIDDEN_ICON;
 		}
 
+		if (sUrl === "sap-icon://") {
+			return "";
+		}
+
 		if (sUrl.startsWith("data:") || IconPool.isIconURI(sUrl)) {
 			return sUrl;
+		}
+
+		if (!sUrl.includes("/") && !sUrl.includes(".") && !sUrl.startsWith("http")) {
+			return "";
 		}
 
 		const oCard = this._getCardInstance();
