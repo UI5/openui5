@@ -6053,6 +6053,30 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("matchEndsWithTransientPredicate", function (assert) {
+		assert.deepEqual(
+			// code under test
+			_Helper.matchEndsWithTransientPredicate(""),
+			null);
+		assert.deepEqual(
+			// code under test
+			_Helper.matchEndsWithTransientPredicate("bar/baz"),
+			null);
+		assert.deepEqual(
+			// code under test
+			_Helper.matchEndsWithTransientPredicate("($uid=id-1-23)"),
+			["($uid=id-1-23)"]);
+		assert.deepEqual(
+			// code under test
+			_Helper.matchEndsWithTransientPredicate("('0500000001')/SO_2_SOITEM($uid=id-3-21)"),
+			["($uid=id-3-21)"]);
+		assert.deepEqual(
+			// code under test
+			_Helper.matchEndsWithTransientPredicate("($uid=id-3-21)/SO_2_SOITEM('0500000001')"),
+			null);
+	});
+
+	//*********************************************************************************************
 	QUnit.test("getUrlParameters", function (assert) {
 		assert.deepEqual(
 			_Helper.getUrlParameters("foo=bar&baz&array=A&encoded=ID%20eq%20'1'&array=C&array=B"),

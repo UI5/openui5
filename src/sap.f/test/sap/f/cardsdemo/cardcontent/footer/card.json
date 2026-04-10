@@ -246,6 +246,48 @@
 							}
 						}
 					]
+				},
+				{
+					"text": "No Action Button",
+					"buttonType": "Default"
+				},
+				{
+					"text": "Empty Actions Array",
+					"actions": []
+				},
+				{
+					"type": "Link",
+					"text": "Link No Action"
+				},
+				{
+					"text": "Empty Action Object",
+					"actions": [
+						{}
+					]
+				},
+				{
+					"text": "Action Enabled True No Type",
+					"actions": [
+						{
+							"enabled": true
+						}
+					]
+				},
+				{
+					"text": "Action Enabled False No Type",
+					"actions": [
+						{
+							"enabled": false
+						}
+					]
+				},
+				{
+					"buttonType": "Accept",
+					"text": "Accept No Action"
+				},
+				{
+					"buttonType": "Reject",
+					"text": "Reject No Action"
 				}
 			]
 		}

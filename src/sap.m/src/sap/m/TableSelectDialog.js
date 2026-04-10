@@ -449,6 +449,9 @@ sap.ui.define([
 				oPromiseWrapper.resolve();
 			}
 		}).addStyleClass("sapMTableSelectDialog");
+
+		this._oDialog._setInitialFocus = function () {};
+
 		this._dialog = this._oDialog; // for downward compatibility
 		this.setAggregation("_dialog", this._oDialog);
 

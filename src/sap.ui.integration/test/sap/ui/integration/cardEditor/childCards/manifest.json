@@ -432,12 +432,6 @@
 				}
 			},
 			"maxItems": "{parameters>/maxItems/value}"
-		},
-		"footer": {
-			"paginator": {
-				"totalCount": 80,
-				"pageSize": "{parameters>/maxItems/value}"
-			}
 		}
 	}
 }

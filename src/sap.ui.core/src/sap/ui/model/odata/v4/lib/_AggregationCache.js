@@ -53,8 +53,8 @@ sap.ui.define([
 
 		this.aElements = [];
 		this.aElements.$byPredicate = {};
-		this.aElements.$count = undefined;
 		this.aElements.$created = 0; // required for _Cache#drillDown (see _Cache.from$skip)
+		this.iReadLength = undefined;
 		this.iResetCount = 0;
 		// Whether this cache is a unified cache, using oFirstLevel with ExpandLevels instead of
 		// separate group level caches
@@ -126,7 +126,7 @@ sap.ui.define([
 			this.readCount(oGroupLock)
 		]).then(() => {
 			this.oTreeState.delete(oElement);
-			if (this.aElements.$count === undefined) {
+			if (this.aElements.length === 0) {
 				return; // concurrent side-effects refresh takes care of cleanup
 			}
 
@@ -401,7 +401,6 @@ sap.ui.define([
 			aSpliced.$rank = _Helper.getPrivateAnnotation(oGroupNode, "rank");
 			_Helper.setPrivateAnnotation(oGroupNode, "spliced", aSpliced);
 		}
-		aElements.$count -= iRemaining;
 
 		if (bAll && !bNested) {
 			this.validateAndDeleteExpandInfo(oGroupLock, oGroupNode);
@@ -540,9 +539,6 @@ sap.ui.define([
 				if (this.oAggregation.createInPlace) {
 					return;
 				}
-				if (aElements.$count !== undefined) {
-					aElements.$count -= 1;
-				}
 				delete aElements.$byPredicate[sTransientPredicate];
 				aElements.splice(aElements.indexOf(oEntityData), 1);
 			}, /*fnAt*/(iIndex0) => {
@@ -574,9 +570,6 @@ sap.ui.define([
 				iLevel); // do not send via POST!
 			aElements.splice(iIndex0, 0, null); // create a gap
 			this.addElements(oEntityData, iIndex0, oCache, iRank);
-			if (aElements.$count !== undefined) {
-				aElements.$count += 1;
-			}
 		};
 
 		const completeCreation = (iIndex0, iRank) => {
@@ -616,7 +609,7 @@ sap.ui.define([
 
 		addElement(iIndex, /*iRank*/undefined);
 
-		return oPromise.then(async () => {
+		return oPromise.then(() => {
 			_Helper.removeByPath(this.mPostRequests, sTransientPredicate, oEntityData);
 			aElements.$byPredicate[_Helper.getPrivateAnnotation(oEntityData, "predicate")]
 				= oEntityData;
@@ -629,16 +622,13 @@ sap.ui.define([
 			// Note: key predicate required
 			this.oTreeState.setOutOfPlace(oEntityData, oParentNode);
 
-			if (oCache === this.oFirstLevel && this.oAggregation.expandTo > 1) {
-				const [iRank] = await Promise.all([
+			_Helper.setPrivateAnnotation(oEntityData, "additionalPromise",
+				oCache === this.oFirstLevel && this.oAggregation.expandTo > 1
+				? Promise.all([
 					this.requestRank(oEntityData, oGroupLock),
 					this.requestNodeProperty(oEntityData, oGroupLock, /*bDropFilter*/true)
-				]);
-
-				completeCreation(iIndex, iRank);
-			} else {
-				await this.requestNodeProperty(oEntityData, oGroupLock, /*bDropFilter*/true);
-			}
+				]).then(([iRank]) => completeCreation(iIndex, iRank))
+				: this.requestNodeProperty(oEntityData, oGroupLock, /*bDropFilter*/true));
 
 			return oEntityData;
 		});
@@ -850,7 +840,6 @@ sap.ui.define([
 			this.aElements = aOldElements.concat(aSpliced, aOldElements.splice(iIndex));
 			this.aElements.$byPredicate = aOldElements.$byPredicate;
 			iCount = aSpliced.length;
-			this.aElements.$count = aOldElements.$count + iCount;
 			_Helper.copySelected(aOldElements, this.aElements);
 			const iLevelDiff = oGroupNode["@$ui5.node.level"] - aSpliced.$level;
 			const iRankDiff = _Helper.getPrivateAnnotation(oGroupNode, "rank") - aSpliced.$rank;
@@ -958,7 +947,6 @@ sap.ui.define([
 						+ ",$isTotal=true)");
 				that.addElements(oSubtotals, iIndex + iCount - 1);
 			}
-			that.aElements.$count += iCount;
 
 			return iCount;
 		}, function (oError) {
@@ -1229,7 +1217,7 @@ sap.ui.define([
 		const aElements = this.aElements.slice(iStart, iEnd).map((oElement) => {
 			return _Helper.hasPrivateAnnotation(oElement, "placeholder") ? undefined : oElement;
 		});
-		aElements.$count = this.aElements.$count;
+		aElements.$count = this.aElements.length;
 
 		return aElements;
 	};
@@ -1898,7 +1886,7 @@ sap.ui.define([
 			});
 		}
 
-		if (this.aElements.$count === undefined) {
+		if (this.oFirstLevel.getCount() === undefined) {
 			this.iReadLength = iLength + iPrefetchLength;
 			if (bHasGrandTotalAtTop) { // account for grand total row at top
 				if (iFirstLevelIndex) {
@@ -1965,7 +1953,7 @@ sap.ui.define([
 							: oElement;
 					});
 
-			aElements.$count = that.aElements.$count;
+			aElements.$count = that.aElements.length;
 
 			return {
 				"@$ui5.resetCount" : that.iResetCount,
@@ -2094,18 +2082,15 @@ sap.ui.define([
 					iOffset = 0, // offset for 1st level data rows
 					j;
 
-				that.aElements.length = that.aElements.$count
-					= oResult.value.$count + oResult.value.$inactive;
+				that.aElements.length = oResult.value.$count + oResult.value.$inactive;
 
 				if (that.aElements.length && that.oGrandTotalPromise) {
-					that.aElements.$count += 1;
 					that.aElements.length += 1;
 					oGrandTotal = that.oGrandTotalPromise.getResult();
 
 					switch (that.oAggregation.grandTotalAtBottomOnly) {
 						case false: // top & bottom
 							iOffset = 1;
-							that.aElements.$count += 1;
 							that.aElements.length += 1;
 							that.addElements(oGrandTotal, 0);
 							oGrandTotalCopy
@@ -2125,7 +2110,7 @@ sap.ui.define([
 
 				that.addElements(oResult.value, iStart + iOffset, that.oFirstLevel, iStart);
 				iOffset += oResult.value.$created; // "shift" rank of non-created elements
-				for (j = 0; j < that.aElements.$count; j += 1) {
+				for (j = 0; j < that.aElements.length; j += 1) {
 					that.aElements[j] ??= _AggregationHelper.createPlaceholder(
 						that.oAggregation.expandTo > 1 || that.bUnifiedCache
 							? /*don't know*/0
@@ -2396,8 +2381,14 @@ sap.ui.define([
 			return; // already available
 		}
 
-		await this.requestProperties(oElement, [this.oAggregation.$NodeProperty], oGroupLock, true,
+		const aSelect = [this.oAggregation.$NodeProperty];
+		const oResult = await this.requestProperties(oElement, aSelect, oGroupLock, false,
 			bDropFilter);
+
+		if (oResult) {
+			_Helper.updateSelected(this.mChangeListeners,
+				_Helper.getPrivateAnnotation(oElement, "predicate"), oElement, oResult, aSelect);
+		}
 	};
 
 	/**
@@ -2624,7 +2615,7 @@ sap.ui.define([
 		// "super" call (like @borrows ...)
 		const fnSuper = this.oFirstLevel.reset;
 		if (!this.oAggregation.hierarchyQualifier) {
-			this.aElements.$created = this.oFirstLevel.aElements.$created;
+			this.aElements.$created = this.oFirstLevel.getCreated();
 		}
 		fnSuper.call(this, mKeptElementPredicates, sGroupId, mQueryOptions);
 		if (sGroupId) { // sGroupId means we are in a side-effects refresh
@@ -2639,7 +2630,7 @@ sap.ui.define([
 		oAggregation = Object.assign({}, oAggregation);
 		oAggregation.$ExpandLevels = this.oTreeState.getExpandLevels();
 
-		if (!this.oAggregation.hierarchyQualifier && this.oFirstLevel.aElements.$created) {
+		if (!this.oAggregation.hierarchyQualifier && this.oFirstLevel.getCreated()) {
 			this.oFirstLevel.reset(mKeptElementPredicates, sGroupId, {
 				...mQueryOptions,
 				$count : true

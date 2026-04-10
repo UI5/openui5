@@ -90,4 +90,39 @@ function (
 
 		assert.strictEqual(sSrc, APP_URL + "/" + sImageSrc, "The image src is as expected.");
 	});
+
+	QUnit.test("Empty sap-icon URI returns empty string", function (assert) {
+		const sSrc = this.oIconFormatter.formatSrc("sap-icon://");
+
+		assert.strictEqual(sSrc, "", "Empty sap-icon:// URI returns empty string to avoid incorrect thumbnail sizing.");
+	});
+
+	QUnit.test("Invalid icon names return empty string", function (assert) {
+		const aInvalidIcons = [
+			"invalidIconName",
+			"icon",
+			"MyIcon",
+			"icon_name",
+			"icon-name"
+		];
+
+		aInvalidIcons.forEach(function (sInvalidIcon) {
+			const sSrc = this.oIconFormatter.formatSrc(sInvalidIcon);
+			assert.strictEqual(sSrc, "", `Invalid icon name '${sInvalidIcon}' returns empty string.`);
+		}.bind(this));
+	});
+
+	QUnit.test("Valid icon patterns are not affected", function (assert) {
+		const aValidPatterns = [
+			{ input: "icon/name.png", expected: APP_URL + "/icon/name.png" },
+			{ input: "icon.png", expected: APP_URL + "/icon.png" },
+			{ input: "https://example.com/icon", expected: "https://example.com/icon" },
+			{ input: "http://example.com/icon", expected: "http://example.com/icon" }
+		];
+
+		aValidPatterns.forEach(function (oPattern) {
+			const sSrc = this.oIconFormatter.formatSrc(oPattern.input);
+			assert.strictEqual(sSrc, oPattern.expected, `Valid pattern '${oPattern.input}' is correctly resolved.`);
+		}.bind(this));
+	});
 });

@@ -6459,5 +6459,6 @@
 	"sap-calendarWeek": {
 		"narrow": "TK {0}",
 		"wide": "Tydzień kalendarzowy {0}"
-	}
+	},
+	"sap-datePlaceholder": "np. {0}"
 }

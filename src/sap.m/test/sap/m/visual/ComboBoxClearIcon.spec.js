@@ -39,7 +39,7 @@ describe("sap.m.ComboBoxClearIcon", function() {
 		var multiComboBox = element(by.id("__box9"));
 		multiComboBox.click();
 		browser.actions().sendKeys("D").perform();
-		element.all(by.css('.sapMComboBoxBasePicker[style*="display: block"] li.sapMLIB')).get(0).click();
+		element.all(by.css('.sapMComboBoxBasePicker[style*="display: flex"] li.sapMLIB')).get(0).click();
 		expect(takeScreenshot()).toLookAs("mcbClearIcon-hidden-selection");
 	});
 

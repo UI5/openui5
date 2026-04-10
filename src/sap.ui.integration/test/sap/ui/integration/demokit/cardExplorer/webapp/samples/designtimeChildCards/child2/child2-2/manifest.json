@@ -23,29 +23,12 @@
 			"parameters": {
 				"string": {
 					"value": "StringValue child2-2"
+				},
+				"maxItems": {
+					"value": 1
 				}
 			},
-			"destinations": {
-				"string": {
-					"name": "Simple"
-				},
-				"local": {
-					"name": "local",
-					"label": "local destination label defined in manifest"
-				},
-				"dest": {
-					"name": "Northwind",
-					"defaultUrl": "https://services.odata.org/V4/Northwind/Northwind.svc"
-				},
-				"destLabel": {
-					"name": "products",
-					"label": "Direct Destination Label defined in manifest"
-				},
-				"destLabelTrans": {
-					"name": "SF",
-					"label": "{i18n>TRANSLATED_DESTINATION_LABEL} defined in manifest"
-				}
-			}
+			"useMainDestinations": true
 		},
 		"header": {
 			"title": "{parameters>/string/value}",
@@ -57,7 +40,7 @@
 		},
 		"data": {
 			"request": {
-				"url": "{{destinations.dest}}/Customers",
+				"url": "{{mainDestinations.dest}}/Customers",
 				"parameters": {
 					"$select": "CustomerID, CompanyName, Country, City, Address"
 				}
@@ -72,7 +55,7 @@
 					"value": "Location: {Country} - {City} - {Address}"
 				}
 			},
-			"maxItems": 1
+			"maxItems": "{parameters>/maxItems/value}"
 		}
 	}
 }

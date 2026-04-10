@@ -51,7 +51,7 @@ sap.ui.define([
 	function handleChange2(oEvent){
 		var oInput = oEvent.getSource();
 		var sValue = oEvent.getParameter("value");
-		if ( sValue != "hello") {
+		if ( sValue.toLowerCase() != "hello") {
 			oInput.setValueState(ValueState.Error);
 		} else {
 			oInput.setValueState(ValueState.None);
@@ -144,31 +144,31 @@ sap.ui.define([
 			new VerticalLayout("oVL", {
 				width: "100%",
 				content:[
-					new Label({text: "Name", labelFor: "I1"}),
+					new Label({text: "Full Name", labelFor: "I1"}),
 					new Input("I1", {type: InputType.Text, change: handleChange }),
-					new Label({text: "email address", labelFor: "I2"}),
+					new Label({text: "Email Address", labelFor: "I2"}),
 					new Input("I2", {type: InputType.Email, change: handleChange}),
-					new Label({text: "Amount", labelFor: "I3"}),
+					new Label({text: "Age", labelFor: "I3"}),
 					new Input("I3", {type: InputType.Number, change: handleChange}),
-					new Label({text: "phone", labelFor: "I4"}),
+					new Label({text: "Phone Number", labelFor: "I4"}),
 					new Input("I4", {type: InputType.Tel, change: handleChange}),
-					new Label({text: "link", labelFor: "I5"}),
+					new Label({text: "Website URL", labelFor: "I5"}),
 					new Input("I5", {type: InputType.Url, change: handleChange}),
-					new Label({text: "Passcode", required: true, labelFor: "I6"}),
+					new Label({text: "Password", required: true, labelFor: "I6"}),
 					new Input("I6", {type: InputType.Password, required: true, change: handleChange}),
-					new Label({text: "Name", labelFor: "I7"}),
-					new Input("I7", { placeholder: "choose name", showValueHelp: true, valueHelpRequest: handleValueHelp, change: handleChange}),
-					new Label({text: "User", labelFor: "I8"}),
+					new Label({text: "Choose a product", labelFor: "I7"}),
+					new Input("I7", { showValueHelp: true, valueHelpRequest: handleValueHelp, change: handleChange}),
+					new Label({text: "Choose an employee", labelFor: "I8"}),
 					new Input("I8", { showSuggestion: true, change: handleChange}).setModel(oModel1).bindAggregation("suggestionItems", "/", new Item({text: "{name}"})),
-					new Label({text: "Hardware (try with C)", labelFor: "I9"}),
+					new Label({text: "Choose a hardware product", labelFor: "I9"}),
 					new Input("I9", { showSuggestion: true, suggestionColumns: mySuggestionColumns, showValueHelp: true, valueHelpRequest: handleValueHelp, change: handleChange}).setModel(oModel2).bindAggregation("suggestionRows", "/tabularSuggestionItems", oTableItemTemplate),
 					new Label({text: "Price", labelFor: "I10"}),
 					new Input("I10", { value: "220", description: "EUR", fieldWidth: "30%", change: handleChange}),
-					new Label({text: "only \"hello\" is valid", labelFor: "I11"}),
+					new Label({text: "Text with Validation (only \"hello\" is valid)", labelFor: "I11"}),
 					new Input("I11", {type: InputType.Text, value: "hello", valueStateText: "Valid Value is hello", change: handleChange2 }),
-					new Label({text: "Input with aria-describedby", labelFor: "I13"}),
+					new Label({text: "Additional Information (\"aria-describedby\" used)", labelFor: "I13"}),
 					new Input("I13", {type: InputType.Text, change: handleChange, ariaDescribedBy: "descriptionNodeId"}),
-					new Label({text: "Input with value state Error", labelFor: "I12"}),
+					new Label({text: "Input with suggestions and value state Error", labelFor: "I12"}),
 					new Input("I12", {
 						showSuggestion: true,
 						valueState: "Error",

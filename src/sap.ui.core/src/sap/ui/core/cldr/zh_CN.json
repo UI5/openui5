@@ -5967,5 +5967,6 @@
 	"sap-calendarWeek": {
 		"narrow": "日历周 {0}",
 		"wide": "日历周 {0}"
-	}
+	},
+	"sap-datePlaceholder": "例如 {0}"
 }

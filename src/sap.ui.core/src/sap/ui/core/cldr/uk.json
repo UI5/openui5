@@ -6804,5 +6804,6 @@
 	"sap-calendarWeek": {
 		"narrow": "КТ {0}",
 		"wide": "Календарний тиждень {0}"
-	}
+	},
+	"sap-datePlaceholder": "наприклад, {0}"
 }

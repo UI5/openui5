@@ -1166,7 +1166,7 @@ sap.ui.define([
 			vManifest = null;
 		}
 
-		if (this._oManifest) {
+		if (vIdOrSettings.destoryManifest !== false && this._oManifest) {
 			this._oManifest.destroy();
 		}
 		this.destroyAggregation("_extension");
@@ -1331,16 +1331,21 @@ sap.ui.define([
 			);
 		}
 
-		if (this._oDestinations) {
-			this._oDestinations.setHost(oHostInstance);
-		} else {
-			var sConfigurationPath = this.getConfigurationPath();
-			this._oDestinations = new Destinations({
-				host: oHostInstance,
-				manifestConfig: this._oManifestModel.getProperty(sConfigurationPath + "/destinations"),
-				prefix: "destinations"
-			});
+		// use configurations of main manifest for destinations if current is child and useMainDestinations flag is true
+		var sConfigurationPath = this.getConfigurationPath();
+		var sPrefix = "destinations";
+		var oManifestConfig = this._oManifestModel.getProperty(sConfigurationPath + "/destinations");
+		const bUseMainDestinations = this._oManifestModel.getProperty(sConfigurationPath + "/useMainDestinations") === true;
+
+		if (this.isChild && bUseMainDestinations) {
+			sPrefix = "mainDestinations";
+			oManifestConfig = this._mainManifest.get(sConfigurationPath + "/destinations");
 		}
+		this._oDestinations = new Destinations({
+			host: oHostInstance,
+			manifestConfig: oManifestConfig,
+			prefix: sPrefix
+		});
 	};
 
 	Editor.prototype.initDataProviderFactory = function () {
@@ -1860,6 +1865,11 @@ sap.ui.define([
 			this._oChildTreeSettings[this._oChildTree._path] = deepClone(this._vIdOrSettings, 500);
 		}
 
+		// keep current manifest as main manifest if it is not a child
+		var bDestoryCurrentManifest = !!this.isChild;
+		if (!bDestoryCurrentManifest) {
+			this._mainManifest = this._oManifest;
+		}
 		// get settings for the pressed item
 		this.isChild = oItemObject.isChild;
 		var oManifestChanges;
@@ -1875,6 +1885,7 @@ sap.ui.define([
 			this._vIdOrSettings.manifest = oManifest;
 		}
 		this._vIdOrSettings.manifestChanges = oManifestChanges;
+		this._vIdOrSettings.destoryManifest = bDestoryCurrentManifest;
 
 		// switch to the pressed editor
 		this.setJson(this._vIdOrSettings, true); //suppress rerendering as the editor will be rerendered anyway

@@ -122,30 +122,35 @@ sap.ui.define([
 
 		// Header
 		if (oHeader) {
-			oRm.openStart("header")
+			const bShouldRenderHeader = !oHeader.isA("sap.m.ValueStateHeader") || oHeader._hasVisibleContent();
+			if (bShouldRenderHeader) {
+				oRm.openStart("header")
 				.class("sapMPopoverHeader")
 				.openEnd();
 
-			if (oHeader._applyContextClassFor) {
-				oHeader._applyContextClassFor("header");
+				if (oHeader._applyContextClassFor) {
+					oHeader._applyContextClassFor("header");
+				}
+				oRm.renderControl(oHeader);
+				oRm.close("header");
 			}
-			oRm.renderControl(oHeader);
-			oRm.close("header");
 		}
 
 		// Sub header
 		if (oSubHeader) {
-
-			oRm.openStart("header")
+			const bShouldRenderSubHeader = !oSubHeader.isA("sap.m.ValueStateHeader") || oSubHeader._hasVisibleContent();
+			if (bShouldRenderSubHeader) {
+				oRm.openStart("header")
 				.class("sapMPopoverSubHeader")
 				.openEnd();
 
-			if (oSubHeader._applyContextClassFor) {
-				oSubHeader._applyContextClassFor("subheader");
-			}
+				if (oSubHeader._applyContextClassFor) {
+					oSubHeader._applyContextClassFor("subheader");
+				}
 
-			oRm.renderControl(oSubHeader);
-			oRm.close("header");
+				oRm.renderControl(oSubHeader);
+				oRm.close("header");
+			}
 		}
 
 		// content container

@@ -6031,5 +6031,6 @@
 	"sap-calendarWeek": {
 		"narrow": "曆週 {0}",
 		"wide": "曆週 {0}"
-	}
+	},
+	"sap-datePlaceholder": "例如 {0}"
 }

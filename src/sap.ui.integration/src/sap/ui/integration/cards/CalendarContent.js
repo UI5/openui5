@@ -342,7 +342,8 @@ sap.ui.define([
 				this._oActions.attach({
 					area: ActionArea.Content,
 					actions: oConfiguration.moreItems.actions,
-					control: this._getMoreButton()
+					control: this._getMoreButton(),
+					enabledPropertyName: "enabled"
 				});
 			}
 
@@ -863,7 +864,10 @@ sap.ui.define([
 		 */
 		CalendarContent.prototype._getMoreButton = function () {
 			if (!this._oMoreAppsButton) {
-				this._oMoreAppsButton = new Button({ text: "More" });
+				this._oMoreAppsButton = new Button({
+					text: "More",
+					enabled: false  // Start disabled, will be enabled if actions are attached.
+				});
 			}
 			return this._oMoreAppsButton;
 		};

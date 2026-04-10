@@ -299,6 +299,8 @@ sap.ui.define([
 		this._oCardPreview.setManifestChanges(aChanges);
 		this._oCardPreview.setManifest(this.getCard()._oCardManifest._oManifest.getRawJson());
 		this._oCardPreview.setHost(this.getCard().getHost());
+		// set opener reference for destinations
+		this._oCardPreview.setAssociation("openerReference", this.getCard().getAssociation("openerReference"));
 		this._oCardPreview.attachManifestApplied(function () {
 			var sShow = this._oCardPreview.getManifestEntry("/sap.card/root/show");
 			if (sShow && !this._oCardPreview._refreshedByVariant) {

@@ -31,14 +31,7 @@
 					"value": "1"
 				}
 			},
-			"destinations": {
-				"northwind": {
-					"name": "Northwind"
-				},
-				"mock_request": {
-					"name": "mock_request"
-				}
-			}
+			"useMainDestinations": true
 		},
 		"header": {
 			"title": "{parameters>/string/value}",
@@ -50,7 +43,7 @@
 		},
 		"data": {
 			"request": {
-				"url": "{{destinations.mock_request}}/Order_Details",
+				"url": "{{mainDestinations.mock_request}}/Order_Details",
 				"parameters": {
 					"$filter": "(OrderID eq '{parameters>Order/value}')"
 				}

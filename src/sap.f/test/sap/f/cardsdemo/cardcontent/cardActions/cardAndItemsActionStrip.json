@@ -78,6 +78,13 @@
 								}
 							}
 						]
+					},
+					{
+						"text": "Disabled Item Button"
+					},
+					{
+						"type": "Link",
+						"text": "Disabled Link"
 					}
 				]
 			},
@@ -112,6 +119,21 @@
 							}
 						}
 					]
+				},
+				{
+					"text": "No Action"
+				},
+				{
+					"text": "Empty Actions",
+					"actions": []
+				},
+				{
+					"type": "Link",
+					"text": "Link Disabled"
+				},
+				{
+					"buttonType": "Reject",
+					"text": "Reject No Action"
 				}
 			]
 		}

@@ -2,5 +2,9 @@
   "languagename.cnr" : {
     "comment" : "XTIT: the official language name of Montenegro: Montenegrin",
     "text" : "[[[Μŏŋţēŋēğŗįŋ∙∙∙∙∙∙∙∙]]]"
+  },
+  "date.placeholder" : {
+    "comment" : "XTXT: Placeholder text for input control with a sample value such as date or time; demo output \"e.g. 31/12/2022\" (translation must contain an abbreviated form of \"for example\" such as the English \"e.g.\" to keep the placeholder short)",
+    "text" : "[[[ē.ğ. {0}]]]"
   }
 }

@@ -19,6 +19,27 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (
 						"editableToUser": true,
 						"visibleToUser": true
 					},
+					"maxItems": {
+						"manifestpath": "/sap.card/configuration/parameters/maxItems/value",
+						"type": "integer",
+						"allowDynamicValues": false,
+						"allowSettings": false,
+						"editableToUser": true,
+						"visibleToUser": true,
+						"visualization": {
+							"type": "Slider",
+							"settings": {
+								"value": "{currentSettings>value}",
+								"min": 0,
+								"max": 10,
+								"width": "100%",
+								"showAdvancedTooltip": true,
+								"showHandleTooltip": false,
+								"inputsAsTooltips": true,
+								"enabled": "{currentSettings>editable}"
+							}
+						}
+					},
 					"string": {
 						"manifestpath": "/sap.card/configuration/parameters/string/value",
 						"type": "string",
@@ -34,7 +55,7 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (
 						"values": {
 							"data": {
 								"request": {
-									"url": "{{destinations.dest}}/Customers",
+									"url": "{{mainDestinations.dest}}/Customers",
 									"parameters": {
 										"$select": "CustomerID, CompanyName, Country, City, Address"
 									}
@@ -54,7 +75,7 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (
 						"values": {
 							"data": {
 								"request": {
-									"url": "{{destinations.dest}}/Employees",
+									"url": "{{mainDestinations.dest}}/Employees",
 									"parameters": {
 										"$select": "EmployeeID, FirstName, LastName, Country, Title, HomePhone"
 									}

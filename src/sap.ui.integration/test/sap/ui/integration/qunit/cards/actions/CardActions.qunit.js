@@ -1709,5 +1709,155 @@ sap.ui.define([
 			oStubOpenUrl.restore();
 		});
 
+		QUnit.module("Enabled Property Without Action Type", {
+			beforeEach: function () {
+				this.oCard = new Card({
+					width: "400px",
+					height: "600px",
+					baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+				});
+
+				this.oCard.placeAt(DOM_RENDER_LOCATION);
+			},
+			afterEach: function () {
+				this.oCard.destroy();
+				this.oCard = null;
+			}
+		});
+
+		QUnit.test("List item without action should not be actionable", async function (assert) {
+			const oManifest = {
+				"sap.card": {
+					"type": "List",
+					"header": {
+						"title": "Test Card"
+					},
+					"content": {
+						"data": {
+							"json": [
+								{ "Name": "Item 1" }
+							]
+						},
+						"item": {
+							"title": "{Name}"
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oContent = this.oCard.getCardContent();
+			const oListItem = oContent.getInnerList().getItems()[0];
+
+			assert.strictEqual(oListItem.getType(), ListType.Inactive, "List item should be inactive when no action is configured");
+		});
+
+		QUnit.test("List item with enabled:false should not be actionable even with action type", async function (assert) {
+			const oManifest = {
+				"sap.card": {
+					"type": "List",
+					"header": {
+						"title": "Test Card"
+					},
+					"content": {
+						"data": {
+							"json": [
+								{ "Name": "Item 1", "url": "http://sap.com" }
+							]
+						},
+						"item": {
+							"title": "{Name}",
+							"actions": [{
+								"type": "Navigation",
+								"enabled": false,
+								"parameters": {
+									"url": "{url}"
+								}
+							}]
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oContent = this.oCard.getCardContent();
+			const oListItem = oContent.getInnerList().getItems()[0];
+
+			assert.strictEqual(oListItem.getType(), ListType.Inactive, "List item should be inactive when action has enabled:false");
+		});
+
+		QUnit.test("List item with actions should be active", async function (assert) {
+			const oManifest = {
+				"sap.card": {
+					"type": "List",
+					"header": {
+						"title": "Test Card"
+					},
+					"content": {
+						"data": {
+							"json": [
+								{ "Name": "Item 1", "url": "http://sap.com" }
+							]
+						},
+						"item": {
+							"title": "{Name}",
+							"actions": [{
+								"type": "Navigation",
+								"parameters": {
+									"url": "{url}"
+								}
+							}]
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oContent = this.oCard.getCardContent();
+			const oListItem = oContent.getInnerList().getItems()[0];
+
+			assert.strictEqual(oListItem.getType(), ListType.Active, "List item should be active when action is configured");
+		});
+
+		QUnit.test("Object content field with enabled:true without type should be enabled", async function (assert) {
+			const oManifest = {
+				"sap.card": {
+					"type": "Object",
+					"header": {
+						"title": "Test Card"
+					},
+					"content": {
+						"groups": [{
+							"items": [{
+								"label": "Website",
+								"value": "www.sap.com",
+								"type": "link",
+								"actions": [{
+									"enabled": true
+								}]
+							}]
+						}]
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oContent = this.oCard.getCardContent();
+			const oLink = Element.closestTo(oContent.$().find(".sapMLnk")[0]);
+
+			assert.ok(oLink.getEnabled(), "Link should be enabled when action has enabled:true");
+		});
 	}
 );

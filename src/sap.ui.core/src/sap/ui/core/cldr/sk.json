@@ -6254,5 +6254,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KT {0}",
 		"wide": "Kalendárny týždeň {0}"
-	}
+	},
+	"sap-datePlaceholder": "Napríklad {0}"
 }

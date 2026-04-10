@@ -6517,5 +6517,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KT {0}",
 		"wide": "Kalendářní týden {0}"
-	}
+	},
+	"sap-datePlaceholder": "například {0}"
 }

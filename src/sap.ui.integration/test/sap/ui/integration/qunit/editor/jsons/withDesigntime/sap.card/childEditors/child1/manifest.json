@@ -42,14 +42,7 @@
 				"objectWithPropertiesDefinedAndValueFromJsonList": {},
 				"objectsWithPropertiesDefinedAndValueFromJsonList": {}
 			},
-			"destinations": {
-				"northwind": {
-					"name": "Northwind"
-				},
-				"mock_request": {
-					"name": "mock_request"
-				}
-			}
+			"useMainDestinations": true
 		},
 		"header": {
 			"title": "{parameters>/cardTitle/value}",
@@ -62,7 +55,7 @@
 		},
 		"data": {
 			"request": {
-				"url": "{{destinations.mock_request}}/Employees"
+				"url": "{{mainDestinations.mock_request}}/Employees"
 			},
 			"path": "/value"
 		},

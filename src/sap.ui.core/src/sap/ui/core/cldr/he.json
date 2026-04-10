@@ -6359,5 +6359,6 @@
 	"sap-calendarWeek": {
 		"narrow": "שבוע קלנדרי {0}",
 		"wide": "שבוע קלנדרי {0}"
-	}
+	},
+	"sap-datePlaceholder": "לדוגמה {0}"
 }

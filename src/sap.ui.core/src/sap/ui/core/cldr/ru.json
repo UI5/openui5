@@ -6730,5 +6730,6 @@
 	"sap-calendarWeek": {
 		"narrow": "КН {0}",
 		"wide": "Календарная неделя {0}"
-	}
+	},
+	"sap-datePlaceholder": "Например, {0}"
 }

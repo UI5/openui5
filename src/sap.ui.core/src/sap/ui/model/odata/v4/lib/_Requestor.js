@@ -1824,8 +1824,8 @@ sap.ui.define([
 
 	/**
 	 * Reports OData messages from the "sap-messages" response header (or forwards them via the
-	 * response object). When reporting, the longtext URL is already resolved w.r.t. the request URL
-	 * and the original message is preserved early on.
+	 * response object) in case of success. When reporting, the longtext URL is already resolved
+	 * w.r.t. the request URL and the original message is preserved early on.
 	 *
 	 * @param {string} sResourcePath
 	 *   The resource path of the request whose response contained the messages, see also
@@ -1834,7 +1834,7 @@ sap.ui.define([
 	 *   The messages in the serialized form as contained in the "sap-messages" response header
 	 * @param {object} oResponse
 	 *   The response object, needed in case <code>sResourcePath === "R#V#C"</code> as described
-	 *   at {@link #request}
+	 *   at {@link #request} or to replace a transient predicate with a real one
 	 * @param {string} [sRequestUrl]
 	 *   A resource path relative to the service URL for which this requestor has been created
 	 *
@@ -1851,6 +1851,16 @@ sap.ui.define([
 				aMessages.forEach((oMessage) => {
 					_Helper.makeAbsoluteLongtextUrl(oMessage, sAbsoluteRequestUrl);
 				});
+
+				const aMatches = _Helper.matchEndsWithTransientPredicate(sResourcePath);
+				if (aMatches) {
+					const sMetaPath = "/" + _Helper.getMetaPath(sRequestUrl);
+					const mTypeForMetaPath = {};
+					this.fetchType(mTypeForMetaPath, sMetaPath); // Note: no need to wait here
+					sResourcePath = sResourcePath.slice(0, -aMatches[0].length)
+						+ _Helper.getKeyPredicate(oResponse, sMetaPath, mTypeForMetaPath);
+				}
+
 				this.oModelInterface.reportTransitionMessages(aMessages, sResourcePath);
 			}
 		}

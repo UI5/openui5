@@ -129,29 +129,7 @@
 					"value": "2020-09-02"
 				}
 			},
-			"destinations": {
-				"string": {
-					"name": "Simple"
-				},
-				"local": {
-					"name": "local",
-					"label": "local destination label defined in manifest"
-				},
-				"dest": {
-					"name": "JAM"
-				},
-				"destLabel": {
-					"name": "products",
-					"label": "Direct Destination Label defined in manifest"
-				},
-				"destLabelTrans": {
-					"name": "SF",
-					"label": "{i18n>TRANSLATED_DESTINATION_LABEL} defined in manifest"
-				},
-				"northwind": {
-					"name": "Northwind"
-				}
-			}
+			"useMainDestinations": true
 		},
 		"header": {
 			"title": "{parameters>/string/value}",
@@ -184,7 +162,7 @@
 		},
 		"data": {
 			"request": {
-				"url": "{{destinations.northwind}}/Customers",
+				"url": "{{mainDestinations.northwind}}/Customers",
 				"parameters": {
 					"$select": "CustomerID, CompanyName, Country, City, Address"
 				}
@@ -207,12 +185,6 @@
 				}
 			},
 			"maxItems": "{parameters>/maxItems/value}"
-		},
-		"footer": {
-			"paginator": {
-				"totalCount": 80,
-				"pageSize": "{parameters>/maxItems/value}"
-			}
 		}
 	}
 }

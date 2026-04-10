@@ -6243,5 +6243,6 @@
 	"sap-calendarWeek": {
 		"narrow": "TH {0}",
 		"wide": "Takvim haftası {0}"
-	}
+	},
+	"sap-datePlaceholder": "Örneğin {0}"
 }

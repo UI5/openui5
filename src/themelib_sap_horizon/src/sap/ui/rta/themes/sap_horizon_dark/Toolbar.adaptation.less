@@ -119,12 +119,18 @@
 		/* Buttons */
 		.sapMBtn:not(.sapUiRtaVersionButton) {
 
-			&.sapMBtnDisabled .sapMBtnInner {
-				opacity: 1.0;
+			&.sapMBtnDisabled {
+				&:hover {
+					.sapMBtnInner > .sapMBtnIcon {
+						color: @_sap_ui_rta_Toolbar_Adaptation_TextColor !important;
+					}
+				}
+				.sapMBtnInner {
+					opacity: 1.0;
+				}
 			}
 
 			&:not(:hover) {
-
 				.sapMBtnTransparent,
 				.sapMBtnTransparent bdi,
 				.sapMBtnTransparent > .sapMBtnIcon {

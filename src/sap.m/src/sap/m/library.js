@@ -3524,54 +3524,239 @@ sap.ui.define([
 	 };
 
 	 /**
+	  * Operations for conditions used in the personalization condition panel.
+	  *
 	  * @enum {string}
 	  * @public
 	  */
 	 thisLib.P13nConditionOperation = {
+
 		 // filter operations
+
+		 /**
+		  * "between" operation: filters for values between two given operands.
+		  * @public
+		  */
 		 BT: "BT",
+
+		 /**
+		  * "equal to" operation: filters for values equal to the given operand.
+		  * @public
+		  */
 		 EQ: "EQ",
+
+		 /**
+		  * "contains" operation: filters for values that contain the given substring.
+		  * @public
+		  */
 		 Contains: "Contains",
+
+		 /**
+		  * "starts with" operation: filters for values that start with the given string.
+		  * @public
+		  */
 		 StartsWith: "StartsWith",
+
+		 /**
+		  * "ends with" operation: filters for values that end with the given string.
+		  * @public
+		  */
 		 EndsWith: "EndsWith",
+
+		 /**
+		  * "less than" operation: filters for values less than the given operand.
+		  * @public
+		  */
 		 LT: "LT",
+
+		 /**
+		  * "less than or equal to" operation: filters for values less than or equal to the given operand.
+		  * @public
+		  */
 		 LE: "LE",
+
+		 /**
+		  * "greater than" operation: filters for values greater than the given operand.
+		  * @public
+		  */
 		 GT: "GT",
+
+		 /**
+		  * "greater than or equal to" operation: filters for values greater than or equal to the given operand.
+		  * @public
+		  */
 		 GE: "GE",
+
+		 /**
+		  * "initial" operation: filters for entries whose value has not been changed from its initial state.
+		  * @public
+		  */
 		 Initial: "Initial",
+
+		 /**
+		  * "empty" operation: filters for entries whose value is empty.
+		  * @public
+		  */
 		 Empty: "Empty",
 
 		 // filter exclude operations
+
+		 /**
+		  * "not between" operation: excludes values between two given operands.
+		  * @public
+		  */
 		 NotBT: "NotBT",
+
+		 /**
+		  * "not equal to" operation: excludes values equal to the given operand.
+		  * @public
+		  */
 		 NotEQ: "NotEQ",
+
+		 /**
+		  * "does not contain" operation: excludes values that contain the given substring.
+		  * @public
+		  */
 		 NotContains: "NotContains",
+
+		 /**
+		  * "does not start with" operation: excludes values that start with the given string.
+		  * @public
+		  */
 		 NotStartsWith: "NotStartsWith",
+
+		 /**
+		  * "does not end with" operation: excludes values that end with the given string.
+		  * @public
+		  */
 		 NotEndsWith: "NotEndsWith",
+
+		 /**
+		  * "not less than" operation: excludes values less than the given operand.
+		  * @public
+		  */
 		 NotLT: "NotLT",
+
+		 /**
+		  * "not less than or equal to" operation: excludes values less than or equal to the given operand.
+		  * @public
+		  */
 		 NotLE: "NotLE",
+
+		 /**
+		  * "not greater than" operation: excludes values greater than the given operand.
+		  * @public
+		  */
 		 NotGT: "NotGT",
+
+		 /**
+		  * "not greater than or equal to" operation: excludes values greater than or equal to the given operand.
+		  * @public
+		  */
 		 NotGE: "NotGE",
+
+		 /**
+		  * "not initial" operation: excludes entries whose value has not been changed from its initial state.
+		  * @public
+		  */
 		 NotInitial: "NotInitial",
+
+		 /**
+		  * "not empty" operation: excludes entries whose value is empty.
+		  * @public
+		  */
 		 NotEmpty: "NotEmpty",
 
+		 // default values
+
+		 /**
+		  * "default values" operation: applies default values for the condition.
+		  * @public
+		  * @since 1.148
+		  */
+		 DefaultValues: "DefaultValues",
+
 		 // sort operations
+
+		 /**
+		  * "ascending" operation: sorts values in ascending order.
+		  * @public
+		  */
 		 Ascending: "Ascending",
+
+		 /**
+		  * "descending" operation: sorts values in descending order.
+		  * @public
+		  */
 		 Descending: "Descending",
 
 		 // group operations
+
+		 /**
+		  * "group ascending" operation: groups values in ascending order.
+		  * @public
+		  */
 		 GroupAscending: "GroupAscending",
+
+		 /**
+		  * "group descending" operation: groups values in descending order.
+		  * @public
+		  */
 		 GroupDescending: "GroupDescending",
-		 //
+
 		 // calculation operations
+
+		 /**
+		  * "total" operation: calculates the total of values.
+		  * @public
+		  */
 		 Total: "Total",
+
+		 /**
+		  * "average" operation: calculates the average of values.
+		  * @public
+		  */
 		 Average: "Average",
+
+		 /**
+		  * "minimum" operation: determines the minimum value.
+		  * @public
+		  */
 		 Minimum: "Minimum",
+
+		 /**
+		  * "maximum" operation: determines the maximum value.
+		  * @public
+		  */
 		 Maximum: "Maximum"
 	 };
 
+	 /**
+	  * Type of a condition operation in the personalization condition panel.
+	  *
+	  * @enum {string}
+	  * @public
+	  */
 	 thisLib.P13nConditionOperationType = {
+
+		 /**
+		  * Values that should be included in the result.
+		  * @public
+		  */
 		 Include: "Include",
-		 Exclude: "Exclude"
+
+		 /**
+		  * Values that should be excluded from the result.
+		  * @public
+		  */
+		 Exclude: "Exclude",
+
+		 /**
+		  * Default values for the condition.
+		  * @public
+		  * @since 1.148
+		  */
+		 DefaultValues: "DefaultValues"
 	 };
 
 	 /**

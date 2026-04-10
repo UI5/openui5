@@ -6235,5 +6235,6 @@
 	"sap-calendarWeek": {
 		"narrow": "КА {0}",
 		"wide": "Күнтізбелік апта {0}"
-	}
+	},
+	"sap-datePlaceholder": "мысалы, {0}"
 }

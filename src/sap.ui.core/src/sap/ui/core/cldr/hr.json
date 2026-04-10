@@ -6201,5 +6201,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KT {0}",
 		"wide": "Kalendarski tjedan {0}"
-	}
+	},
+	"sap-datePlaceholder": "Na primjer {0}"
 }

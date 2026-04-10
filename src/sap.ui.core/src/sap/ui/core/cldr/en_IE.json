@@ -6412,5 +6412,6 @@
 	"sap-calendarWeek": {
 		"narrow": "CW {0}",
 		"wide": "Calendar Week {0}"
-	}
+	},
+	"sap-datePlaceholder": "e.g. {0}"
 }

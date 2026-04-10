@@ -2006,6 +2006,18 @@ sap.ui.define([
 		},
 
 		/**
+		 * Gets the locale-specific date input placeholder pattern.
+		 *
+		 * @returns {string} The placeholder pattern, for example "e.g. {0}" or "z.B. {0}"
+		 *
+		 * @public
+		 * @since 1.147.0
+		 */
+		getDatePlaceholder: function() {
+			return this._get("sap-datePlaceholder");
+		},
+
+		/**
 		 * Whether 1 January is the first day of the first calendar week.
 		 * This is the definition of the calendar week in the US.
 		 *

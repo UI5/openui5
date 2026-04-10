@@ -7352,5 +7352,6 @@
 	"sap-calendarWeek": {
 		"narrow": "أسبوع التقويم {0}",
 		"wide": "أسبوع التقويم {0}"
-	}
+	},
+	"sap-datePlaceholder": "على سبيل المثال {0}"
 }

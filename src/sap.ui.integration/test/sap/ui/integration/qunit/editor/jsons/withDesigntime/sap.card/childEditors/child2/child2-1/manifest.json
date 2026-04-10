@@ -28,14 +28,7 @@
 					"value": "StringValue Child2-1"
 				}
 			},
-			"destinations": {
-				"northwind": {
-					"name": "Northwind"
-				},
-				"mock_request": {
-					"name": "mock_request"
-				}
-			}
+			"useMainDestinations": true
 		},
 		"header": {
 			"title": "{parameters>/cardTitle/value}",
@@ -47,7 +40,7 @@
 		},
 		"data": {
 			"request": {
-				"url": "{{destinations.mock_request}}/Customers",
+				"url": "{{mainDestinations.mock_request}}/Customers",
 				"parameters": {
 					"$select": "CustomerID, CompanyName, Country, City, Address"
 				}

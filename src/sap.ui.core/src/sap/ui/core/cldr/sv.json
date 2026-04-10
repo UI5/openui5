@@ -6209,5 +6209,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KV {0}",
 		"wide": "Kalendervecka {0}"
-	}
+	},
+	"sap-datePlaceholder": "Till exempel {0}"
 }

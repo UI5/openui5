@@ -133,7 +133,13 @@ sap.ui.define([
 			this._oChildTreeSettings[this._oChildTree._path] = this._oEditorCard;
 		}
 
-		// get settings for the pressed item
+		// if current card is not a child card, keep it as the main card for child cards
+		var bDestoryCurrentCard = !!this.isChild;
+		if (!bDestoryCurrentCard) {
+			this._mainCard = this._oEditorCard;
+		}
+
+		// switch to pressed item, get settings
 		this.isChild = oItemObject.isChild;
 		var oManifestChanges;
 		if (!this.isChild) {
@@ -151,19 +157,20 @@ sap.ui.define([
 		}
 
 		// switch to the pressed item card
-		this.setCard(this._vIdOrSettings, true); //suppress rerendering as the editor will be rerendered anyway
+		this.setCard(this._vIdOrSettings, true, bDestoryCurrentCard); //suppress rerendering as the editor will be rerendered anyway
 	};
 
 	/**
 	 * Sets the card property as a string, object {manifest:{}, baseUrl:{}} or a reference to a card instance
 	 * @param {any} vCardIdOrSettings
 	 * @param {boolean} bSuppressRerendering
+	 * @param {boolean} bDestoryCurrentCard
 	 */
-	CardEditor.prototype.setCard = function (vCardIdOrSettings, bSuppressRerendering) {
+	CardEditor.prototype.setCard = function (vCardIdOrSettings, bSuppressRerendering, bDestoryCurrentCard) {
 		if (vCardIdOrSettings === this.getProperty("card")) {
 			return this;
 		}
-		if (this._oEditorCard) {
+		if (this._oEditorCard && bDestoryCurrentCard !== false) {
 			this._oEditorCard.destroy();
 		}
 		this.setProperty("card", vCardIdOrSettings, bSuppressRerendering);
@@ -198,6 +205,8 @@ sap.ui.define([
 			if (!vCardIdOrSettings.dataMode) {
 				vCardIdOrSettings.dataMode = CardDataMode.Active;
 			}
+			// remove useless property
+			delete vCardIdOrSettings.destoryManifest;
 			this._oEditorCard = new Card(vCardIdOrSettings);
 			this._oEditorCard.attachEventOnce("_contentReady", function () {
 				var oCardContent = this._oEditorCard.getCardContent();
@@ -208,9 +217,14 @@ sap.ui.define([
 			this._oEditorCard.attachEventOnce("_dataReady", function () {
 				// copy models from Card to editor
 				this.propagateModels(this._oEditorCard, this, ["i18n", "context", "contextflat"]);
+				vCardIdOrSettings.destoryManifest = bDestoryCurrentCard;
 				this.setJson(vCardIdOrSettings, bSuppressRerendering);
 			}.bind(this));
 			this._oEditorCard.onBeforeRendering();
+			// set the main card as opener reference to the child card for destinations
+			if (this.isChild) {
+				this._oEditorCard.setAssociation("openerReference", this._mainCard);
+			}
 		}
 	};
 
@@ -269,7 +283,7 @@ sap.ui.define([
 
 	CardEditor.prototype.createManifest = async function (vIdOrSettings, bSuppress) {
 		this._isManifestReady = false;
-		if (this._oManifest) {
+		if (vIdOrSettings.destoryManifest !== false && this._oManifest) {
 			this._oManifest.destroy();
 		}
 		this.destroyAggregation("_extension");

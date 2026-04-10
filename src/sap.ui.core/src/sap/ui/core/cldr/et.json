@@ -6180,5 +6180,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KN {0}",
 		"wide": "Kalendrinädal {0}"
-	}
+	},
+	"sap-datePlaceholder": "nt {0}"
 }

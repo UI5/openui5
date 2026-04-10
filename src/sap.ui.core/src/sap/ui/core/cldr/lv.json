@@ -6112,5 +6112,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KN {0}",
 		"wide": "Kalendārā nedēļa {0}"
-	}
+	},
+	"sap-datePlaceholder": "piemēram\\: {0}"
 }

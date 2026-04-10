@@ -10,5 +10,9 @@
   "calendarweek.narrow" : {
     "comment" : "XTIT: the short pattern for formatting a date using calendar week number",
     "text" : "SN {0}"
+  },
+  "date.placeholder" : {
+    "comment" : "XTXT: Placeholder text for input control with a sample value such as date or time; demo output \"e.g. 31/12/2022\" (translation must contain an abbreviated form of \"for example\" such as the English \"e.g.\" to keep the placeholder short)",
+    "text" : "por ejemplo {0}"
   }
 }

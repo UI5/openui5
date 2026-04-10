@@ -6232,5 +6232,6 @@
 	"sap-calendarWeek": {
 		"narrow": "SA {0}",
 		"wide": "Semana do ano {0}"
-	}
+	},
+	"sap-datePlaceholder": "por exemplo {0}"
 }

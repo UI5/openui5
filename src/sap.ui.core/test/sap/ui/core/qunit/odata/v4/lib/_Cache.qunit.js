@@ -3574,6 +3574,7 @@ sap.ui.define([
 
 		oCacheMock.expects("checkSharedRequest").never();
 		oCacheMock.expects("calculateKeyPredicate").never();
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 
 		// code under test
 		oCache.visitResponse({value : ["Business Suite"]}, mTypeForMetaPath, undefined,
@@ -3604,6 +3605,8 @@ sap.ui.define([
 		this.mock(_Helper).expects("getKeyPredicate").withExactArgs(sinon.match.same(oEntity),
 				"/TEAMS", sinon.match.same(mTypeForMetaPath))
 			.returns(sPredicate);
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").withExactArgs("")
+			.returns(null);
 		this.oModelInterfaceMock.expects("reportStateMessages").never();
 
 		// code under test
@@ -3624,6 +3627,8 @@ sap.ui.define([
 		this.mock(_Helper).expects("getKeyPredicate").withExactArgs(sinon.match.same(oEntity),
 			"/~/$Type", sinon.match.same(mTypeForMetaPath))
 			.returns(sPredicate);
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").withExactArgs("")
+			.returns(null);
 		this.oModelInterfaceMock.expects("reportStateMessages").never();
 
 		// code under test
@@ -3676,6 +3681,12 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oEntity.property.navigation),
 				"/TEAMS/property/navigation", sinon.match.same(mTypeForMetaPath))
 			.returns(sPredicate4);
+		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("bar").returns(null);
+		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("").returns(null);
+		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("bar/baz")
+			.returns(null);
+		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("property/navigation")
+			.returns(null);
 		this.oModelInterfaceMock.expects("reportStateMessages").never();
 
 		// code under test
@@ -3716,6 +3727,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oEntity.bar[1]), "/TEAMS/bar",
 				sinon.match.same(mTypeForMetaPath))
 			.returns(undefined);
+		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("").returns(null);
 		this.oModelInterfaceMock.expects("reportStateMessages").never();
 
 		// code under test
@@ -3782,6 +3794,7 @@ sap.ui.define([
 				}
 			};
 
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		// Note: no calls for null or empty array!
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs().exactly(4);
 		this.oModelInterfaceMock.expects("reportStateMessages")
@@ -3813,6 +3826,7 @@ sap.ui.define([
 				}
 			};
 
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, ["SO_2_BP"]);
@@ -3839,6 +3853,7 @@ sap.ui.define([
 				}
 			};
 
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, ["('0500000001')/SO_2_BP"]);
@@ -3879,6 +3894,9 @@ sap.ui.define([
 			}
 			mExpectedMessages[sMessagePath] = aMessages;
 
+			this.mock(_Helper).expects("matchEndsWithTransientPredicate")
+				.exactly(bMissingPredicate ? 0 : 1).withExactArgs("($uid=id-1-23)")
+				.returns(["($uid=id-1-23)"]);
 			this.mock(oCache).expects("checkSharedRequest").withExactArgs();
 			this.oModelInterfaceMock.expects("reportStateMessages")
 				.withExactArgs("original/resource/path", mExpectedMessages, [sMessagePath]);
@@ -3916,6 +3934,8 @@ sap.ui.define([
 				}
 			};
 
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate")
+			.withExactArgs("('0500000001')/SO_2_SOITEM($uid=id-1-23)").returns(["($uid=id-1-23)"]);
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages,
@@ -3931,6 +3951,7 @@ sap.ui.define([
 			function () {
 		var oCache = new _Cache(this.oRequestor, "SalesOrderList('0500000001')");
 
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").never();
 		this.oModelInterfaceMock.expects("reportStateMessages").never();
 
@@ -3950,6 +3971,7 @@ sap.ui.define([
 		this.mock(_Helper).expects("drillDown")
 			.withExactArgs(oData, ["foo", "bar", "messages"])
 			.returns();
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").never();
 		this.oModelInterfaceMock.expects("reportStateMessages").never();
 
@@ -4029,6 +4051,7 @@ sap.ui.define([
 			oHelperMock.expects("drillDown")
 				.withExactArgs(sinon.match.same(oData.value[2]), aMessagePathSegments)
 				.returns([]);
+			oHelperMock.expects("matchEndsWithTransientPredicate").never();
 			this.mock(oCache).expects("checkSharedRequest").withExactArgs().twice();
 			this.oModelInterfaceMock.expects("reportStateMessages")
 				.withExactArgs("original/resource/path", mExpectedMessages,
@@ -4100,6 +4123,7 @@ sap.ui.define([
 			oHelperMock.expects("drillDown")
 				.withExactArgs(oData.value[0].SO_2_SOITEM[1], ["messages"])
 				.returns(aMessages);
+			oHelperMock.expects("matchEndsWithTransientPredicate").never();
 			this.mock(oCache).expects("checkSharedRequest").withExactArgs();
 			this.oModelInterfaceMock.expects("reportStateMessages")
 				.withExactArgs("original/resource/path", mExpectedMessages,
@@ -4137,6 +4161,8 @@ sap.ui.define([
 
 		mExpectedMessages[""].$count = 1;
 		mExpectedMessages[""].$created = 0;
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").withExactArgs("")
+			.returns(null);
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
 		this.mock(_Helper).expects("makeAbsoluteLongtextUrl")
 			.withExactArgs(sinon.match.same(oData.messages[0]), "/~/EntitySet('42')/Navigation");
@@ -4209,6 +4235,12 @@ sap.ui.define([
 			mExpectedMessages[sKey].$count = 1;
 			mExpectedMessages[sKey].$created = 0;
 		}
+		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("foo").returns(null);
+		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("").returns(null);
+		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("foo/bar")
+			.returns(null);
+		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("foo/baz")
+			.returns(null);
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs().exactly(4);
 		oHelperMock.expects("makeAbsoluteLongtextUrl")
 			.withExactArgs(sinon.match.same(oData.messages[0]), "/~/$metadata#foo");
@@ -4284,6 +4316,7 @@ sap.ui.define([
 			mExpectedMessages[sKey].$count = 1;
 			mExpectedMessages[sKey].$created = 0;
 		}
+		oHelperMock.expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs().thrice();
 		oHelperMock.expects("makeAbsoluteLongtextUrl")
 			.withExactArgs(sinon.match.same(oData.value[0].messages[0]), "/~/$metadata#foo");
@@ -4337,6 +4370,7 @@ sap.ui.define([
 		oCache.sReportedMessagesPath = "~sReportedMessagesPath~";
 		mExpectedMessages[""].$count = 1;
 		mExpectedMessages[""].$created = 0;
+		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
 		this.oModelInterfaceMock.expects("reportStateMessages").exactly(bSharedRequest ? 0 : 1)
 			.withExactArgs("original/resource/path", mExpectedMessages, undefined);
@@ -7290,6 +7324,24 @@ sap.ui.define([
 
 		// code under test
 		assert.strictEqual(oCache.getExclusiveFilter(), undefined);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("CollectionCache#getCount", function (assert) {
+		const oCache = this.createCache("Employees");
+		oCache.aElements.$count = "~$count~";
+
+		// code under test
+		assert.strictEqual(oCache.getCount(), "~$count~");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("CollectionCache#getCreated", function (assert) {
+		const oCache = this.createCache("Employees");
+		oCache.aElements.$created = "~$created~";
+
+		// code under test
+		assert.strictEqual(oCache.getCreated(), "~$created~");
 	});
 
 	//*********************************************************************************************

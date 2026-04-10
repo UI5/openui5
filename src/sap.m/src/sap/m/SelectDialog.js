@@ -438,6 +438,8 @@ function(
 			}
 		}).addStyleClass("sapMSelectDialog");
 
+		this._oDialog._setInitialFocus = function () {};
+
 		// for downward compatibility reasons
 		this._dialog = this._oDialog;
 		this.setAggregation("_dialog", this._oDialog);

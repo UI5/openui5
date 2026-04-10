@@ -29,6 +29,7 @@ sap.ui.define([
 	"sap/m/Title",
 	"sap/m/Text",
 	"sap/m/Input",
+	"sap/m/ValueStateHeader",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/dom/containsOrEquals",
 	"sap/ui/test/utils/nextUIUpdate"
@@ -62,6 +63,7 @@ sap.ui.define([
 	Title,
 	Text,
 	Input,
+	ValueStateHeader,
 	KeyCodes,
 	containsOrEquals,
 	nextUIUpdate
@@ -2386,6 +2388,35 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		assert.strictEqual(this.oPopover.$().attr('aria-modal'), "true", 'Popover aria-modal attribute is set to true');
+	});
+
+	QUnit.test("Header element should not be rendered when ValueStateHeader has no visible content", async function (assert) {
+		const oValueStateHeader = new ValueStateHeader();
+		this.oPopover.setCustomHeader(oValueStateHeader);
+
+		this.oPopover.openBy(this.oButton);
+		await nextUIUpdate(this.clock);
+
+		const oHeaderElement = this.oPopover.getDomRef().querySelector(".sapMPopoverHeader");
+		assert.strictEqual(oHeaderElement, null, "Header element should not be rendered when ValueStateHeader has no visible content");
+
+		oValueStateHeader.destroy();
+	});
+
+	QUnit.test("Header element should be rendered when ValueStateHeader has visible content", async function (assert) {
+		const oValueStateHeader = new ValueStateHeader({
+			valueState: "Error",
+			text: "Error message"
+		});
+		this.oPopover.setCustomHeader(oValueStateHeader);
+
+		this.oPopover.openBy(this.oButton);
+		await nextUIUpdate(this.clock);
+
+		const oHeaderElement = this.oPopover.getDomRef().querySelector(".sapMPopoverHeader");
+		assert.ok(oHeaderElement, "Header element should be rendered when ValueStateHeader has visible content");
+
+		oValueStateHeader.destroy();
 	});
 
 	QUnit.module("Integration");

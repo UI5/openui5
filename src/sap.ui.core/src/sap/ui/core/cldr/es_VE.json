@@ -6041,5 +6041,6 @@
 	"sap-calendarWeek": {
 		"narrow": "SN {0}",
 		"wide": "Semana natural {0}"
-	}
+	},
+	"sap-datePlaceholder": "por ejemplo {0}"
 }

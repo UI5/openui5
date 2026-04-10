@@ -19,6 +19,24 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (
 						"allowDynamicValues": true,
 						"editableToUser": true,
 						"visibleToUser": true
+					},
+					"maxItems": {
+						"manifestpath": "/sap.card/configuration/parameters/maxItems/value",
+						"type": "integer",
+						"label": "Max Items",
+						"visualization": {
+							"type": "Slider",
+							"settings": {
+								"value": "{currentSettings>value}",
+								"min": 0,
+								"max": 20,
+								"width": "100%",
+								"showAdvancedTooltip": true,
+								"showHandleTooltip": false,
+								"inputsAsTooltips": true,
+								"enabled": "{currentSettings>editable}"
+							}
+						}
 					}
 				}
 			},

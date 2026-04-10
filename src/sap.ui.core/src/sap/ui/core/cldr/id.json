@@ -5977,5 +5977,6 @@
 	"sap-calendarWeek": {
 		"narrow": "KM {0}",
 		"wide": "Kalender Minggu {0}"
-	}
+	},
+	"sap-datePlaceholder": "mis. {0}"
 }

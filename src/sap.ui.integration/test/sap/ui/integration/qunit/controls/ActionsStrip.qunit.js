@@ -306,7 +306,7 @@ sap.ui.define([
 		assert.ok(aItems[1].getEnabled(), "Item with action is enabled.");
 		assert.notOk(aItems[2].getEnabled(), "Item with action with enabled:false is disabled.");
 		assert.ok(aItems[3].getEnabled(), "Item with action with enabled:true is enabled.");
-		assert.ok(aItems[4].getEnabled(), "Item without action action is enabled.");
+		assert.notOk(aItems[4].getEnabled(), "Item without action action is disabled.");
 
 		oActionsStrip.disableItems();
 
@@ -320,7 +320,7 @@ sap.ui.define([
 		assert.ok(aItems[1].getEnabled(), "Item with action is enabled after enableItems().");
 		assert.notOk(aItems[2].getEnabled(), "Item with action with enabled:false is disabled after enableItems().");
 		assert.ok(aItems[3].getEnabled(), "Item with action with enabled:true is enabled after enableItems().");
-		assert.ok(aItems[4].getEnabled(), "Item without action is enabled after enableItems().");
+		assert.notOk(aItems[4].getEnabled(), "Item without action is disabled after enableItems().");
 
 		// Clean up
 		oActionsStrip.destroy();
@@ -363,14 +363,128 @@ sap.ui.define([
 		assert.notOk(aItems[1].getEnabled(), "Item with action is disabled initially.");
 		assert.notOk(aItems[2].getEnabled(), "Item with action with enabled:false is disabled initially.");
 		assert.notOk(aItems[3].getEnabled(), "Item with action with enabled:true is disabled initially.");
-		assert.ok(aItems[4].getEnabled(), "Item without action is still enabled initially.");
+		assert.notOk(aItems[4].getEnabled(), "Item without action is still disabled initially.");
 
 		oActionsStrip.enableItems();
 
 		assert.ok(aItems[1].getEnabled(), "Item with action is enabled after enableItems().");
 		assert.notOk(aItems[2].getEnabled(), "Item with action with enabled:false is disabled after enableItems().");
 		assert.ok(aItems[3].getEnabled(), "Item with action with enabled:true is enabled after enableItems().");
-		assert.ok(aItems[4].getEnabled(), "Item without action is enabled after enableItems().");
+		assert.notOk(aItems[4].getEnabled(), "Item without action is disabled after enableItems().");
+
+		// Clean up
+		oActionsStrip.destroy();
+	});
+
+	QUnit.test("Button without actions should be disabled", function (assert) {
+		const oActionsStrip = ActionsStrip.create([
+			{
+				text: "Default Button"
+			}
+		], this.oCard);
+
+		const aItems = oActionsStrip._getToolbar().getContent();
+
+		// Assert
+		assert.notOk(aItems[1].getEnabled(), "Button without enabled property or action should be disabled.");
+
+		oActionsStrip.destroy();
+	});
+
+	QUnit.test("Buttons with enabled property and action type combination", function (assert) {
+		const oActionsStrip = ActionsStrip.create([
+			{
+				text: "Custom Action with enabled true",
+				actions: [{
+					type: "Custom",
+					enabled: true
+				}]
+			},
+			{
+				text: "Custom Action with enabled false",
+				actions: [{
+					type: "Custom",
+					enabled: false
+				}]
+			},
+			{
+				text: "Custom Action without enabled",
+				actions: [{
+					type: "Custom"
+				}]
+			}
+		], this.oCard);
+
+		const aItems = oActionsStrip._getToolbar().getContent();
+
+		assert.ok(aItems[1].getEnabled(), "Button with type and enabled: true should be enabled.");
+		assert.notOk(aItems[2].getEnabled(), "Button with type and enabled: false should be disabled.");
+		assert.ok(aItems[3].getEnabled(), "Button with type but no enabled property should be enabled by default.");
+
+		oActionsStrip.destroy();
+	});
+
+	QUnit.test("Links with disabled/enabled state", function (assert) {
+		// Arrange
+		const oActionsStrip = ActionsStrip.create([
+			{
+				text: "Link1",
+				type: "Link",
+				actions: [{
+					type: "Navigation",
+					parameters: {
+						url: "https://www.sap.com"
+					}
+				}]
+			},
+			{
+				text: "Link2",
+				type: "Link",
+				actions: [{
+					enabled: false,
+					type: "Navigation",
+					parameters: {
+						url: "https://www.sap.com"
+					}
+				}]
+			},
+			{
+				text: "Link3",
+				type: "Link",
+				actions: [{
+					enabled: true,
+					type: "Navigation",
+					parameters: {
+						url: "https://www.sap.com"
+					}
+				}]
+			},
+			{
+				text: "Link4",
+				type: "Link"
+			}
+		], this.oCard);
+
+		const aItems = oActionsStrip._getToolbar().getContent();
+
+		assert.ok(aItems[1].getEnabled(), "Link with action is enabled.");
+		assert.notOk(aItems[2].getEnabled(), "Link with action with enabled:false is disabled.");
+		assert.ok(aItems[3].getEnabled(), "Link with action with enabled:true is enabled.");
+		assert.notOk(aItems[4].getEnabled(), "Link without action is disabled.");
+
+		oActionsStrip.disableItems();
+
+		assert.notOk(aItems[1].getEnabled(), "Link with action is disabled after disableItems().");
+		assert.notOk(aItems[2].getEnabled(), "Link with action with enabled:false is disabled after disableItems().");
+		assert.notOk(aItems[3].getEnabled(), "Link with action with enabled:true is disabled after disableItems().");
+		assert.notOk(aItems[4].getEnabled(), "Link without action is disabled after disableItems().");
+
+		oActionsStrip.enableItems();
+
+		assert.ok(aItems[1].getEnabled(), "Link with action is enabled after enableItems().");
+		assert.notOk(aItems[2].getEnabled(), "Link with action with enabled:false is disabled after enableItems().");
+		assert.ok(aItems[3].getEnabled(), "Link with action with enabled:true is enabled after enableItems().");
+		assert.notOk(aItems[4].getEnabled(), "Link without action is disabled after enableItems().");
 
 		// Clean up
 		oActionsStrip.destroy();

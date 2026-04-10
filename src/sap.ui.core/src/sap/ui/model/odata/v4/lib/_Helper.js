@@ -21,6 +21,10 @@ sap.ui.define([
 	var rAmpersand = /&/g,
 		rApplicationGroupID = /^\w+$/,
 		sClassName = "sap.ui.model.odata.v4.lib._Helper",
+		// Matches if ending with a transient key predicate:
+		//   EMPLOYEE($uid=id-1550828854217-16) -> aMatches[0] === "($uid=id-1550828854217-16)"
+		//   @see sap/base/util/uid
+		rEndsWithTransientPredicate = /\(\$uid=[-\w]+\)$/,
 		rEquals = /\=/g,
 		rGroupID = /^(\$auto(\.\w+)?|\$direct|\w+)$/,
 		rHash = /#/g,
@@ -2378,6 +2382,24 @@ sap.ui.define([
 				}
 				return oResult;
 			}, vValue);
+		},
+
+		/**
+		 * Returns matches for a regular expression if the given path ends with a transient key
+		 * predicate, or <code>null</code> in case it doesn't.
+		 *
+		 * "foo/bar($uid=id-1-23) -> ["($uid=id-1-23)"]
+		 * "foo/bar" -> null
+		 *
+		 * @param {string} sPath - Some path
+		 * @returns {null|string[]}
+		 *   Matches for a regular expression, just a single entry with the transient key predicate;
+		 *   <code>null</code> if the given path does not end with a transient key predicate
+		 *
+		 * @see sap/base/util/uid
+		 */
+		matchEndsWithTransientPredicate : function (sPath) {
+			return rEndsWithTransientPredicate.exec(sPath);
 		},
 
 		// Trampoline property to allow for mocking function module in unit tests.

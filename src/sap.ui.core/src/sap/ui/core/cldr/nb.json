@@ -6152,5 +6152,6 @@
 	"sap-calendarWeek": {
 		"narrow": "Uke {0}",
 		"wide": "Kalenderuke {0}"
-	}
+	},
+	"sap-datePlaceholder": "f.eks. {0}"
 }

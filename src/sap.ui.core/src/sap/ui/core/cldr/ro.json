@@ -6168,5 +6168,6 @@
 	"sap-calendarWeek": {
 		"narrow": "SC {0}",
 		"wide": "Săptămână calendaristică {0}"
-	}
+	},
+	"sap-datePlaceholder": "De ex., {0}"
 }

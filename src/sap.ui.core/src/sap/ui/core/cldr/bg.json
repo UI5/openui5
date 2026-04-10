@@ -6101,5 +6101,6 @@
 	"sap-calendarWeek": {
 		"narrow": "КС {0}",
 		"wide": "Календарна седмица {0}"
-	}
+	},
+	"sap-datePlaceholder": "Например {0}"
 }
