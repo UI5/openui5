@@ -149,6 +149,20 @@ sap.ui.define([
 	}
 
 	/**
+	 * Verifies if there is a change depending on any of the passed condenser info objects.
+	 * Such a dependency would be for example a move or create in a newly created container.
+	 *
+	 * @param {object[]} aCondenserInfos - Array of condenser info objects
+	 * @param {object} mContainers - Map of containers
+	 * @returns {boolean} <code>true</code> if the array of condenser info objects has no dependent changes
+	 */
+	function hasNoDependentChanges(aCondenserInfos, mContainers) {
+		return !aCondenserInfos.some((oCondenserInfo) => {
+			return !!mContainers[oCondenserInfo.affectedControl];
+		});
+	}
+
+	/**
 	 * Verifies whether the passed arrays are equal.
 	 *
 	 * @param {string[]} a - The first passed arrays of values
@@ -210,13 +224,15 @@ sap.ui.define([
 
 	/**
 	 * Updates the target index of the index-related changes.
+	 * This must only be done if there is no other change depending on the change for which the target index should be updated,
+	 * otherwise the order of changes might change and the changes depending on it might be tried to be applied first.
 	 *
 	 * @param {Map} mReducedChanges - Map of reduced changes
 	 * @param {Map} mUIReconstructions - Map of UI reconstructions
 	 */
 	function updateTargetIndex(mReducedChanges, mUIReconstructions) {
 		function updateCondenserChange(iIndex, oCondenserInfo) {
-			if (getTargetIndex(oCondenserInfo) !== iIndex) {
+			if (getTargetIndex(oCondenserInfo) !== iIndex && hasNoDependentChanges([oCondenserInfo], mUIReconstructions)) {
 				// setting the target index will most likely make the change dirty,
 				// but the condenser needs the current state of the change.
 				// so in this function the state should not change
@@ -314,7 +330,6 @@ sap.ui.define([
 			aAllReducedChanges[aIndexes.shift()] = oChange;
 		});
 	};
-
 	/**
 	 * Sorts the index-related changes per container until the look and feel of the UI fits the target UI reconstruction.
 	 *
@@ -332,12 +347,15 @@ sap.ui.define([
 			let bCorrectSortingFound = true;
 
 			if (
-				containsNoPlaceholder(aTargetElementIds)
-				|| containsOnlyCreateChanges(aCondenserInfos)
+				(containsNoPlaceholder(aTargetElementIds) || containsOnlyCreateChanges(aCondenserInfos))
+				&& hasNoDependentChanges(aCondenserInfos, mContainers)
 			) {
 				sortAscendingByTargetIndex(aCondenserInfos);
 				// this should always be the correct sorting, but the function still needs to be called to
 				// remove obsolete changes during the simulation of Move
+				// exception: If there are changes depending on any of the newly created elements, the sorting needs to be kept as is,
+				// as we don't have a direct dependency between those changes. But by keeping the original sorting we make sure that
+				// the changes still work after condensing.
 				bCorrectSortingFound = isEqualReconstructedUI(sContainerKey, sAggregationName, aInitialElementIds, aTargetElementIds, aCondenserInfos);
 			} else if (!isEqualReconstructedUI(sContainerKey, sAggregationName, aInitialElementIds, aTargetElementIds, aCondenserInfos)) {
 				bCorrectSortingFound = false;

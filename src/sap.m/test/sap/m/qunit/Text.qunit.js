@@ -8,10 +8,11 @@ sap.ui.define([
 	"sap/m/library",
 	"sap/ui/model/json/JSONModel",
 	"sap/m/Text",
-	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/thirdparty/jquery",
+	"sap/ui/core/Core",
 	"sap/ui/core/mvc/XMLView",
-	"sap/m/Panel"
+	"sap/m/Panel",
+	"sap/ui/test/utils/nextUIUpdate"
 ], function(
 	Device,
 	Library,
@@ -21,10 +22,11 @@ sap.ui.define([
 	mobileLibrary,
 	JSONModel,
 	Text,
-	nextUIUpdate,
 	jQuery,
+	Core,
 	XMLView,
-	Panel
+	Panel,
+	nextUIUpdate
 ) {
 	"use strict";
 
@@ -155,6 +157,7 @@ sap.ui.define([
 		// test if text is escaped
 		t1.setText("~!@#$%^&*()_+{}:\"|<>?\'\"><script>alert('xss')<\/script>");
 		await nextUIUpdate();
+		// eslint-disable-next-line require-atomic-updates
 		oDom = document.getElementById('Text1');
 		assert.equal(jQuery(oDom).text(),"~!@#$%^&*()_+{}:\"|<>?\'\"><script>alert('xss')<\/script>", "Escaping HTML-Text");
 	});
@@ -187,16 +190,19 @@ sap.ui.define([
 		// right
 		t1.setTextAlign(TextAlign.Right);
 		await nextUIUpdate();
+		// eslint-disable-next-line require-atomic-updates
 		oDom = document.getElementById('Text1');
 		assert.equal(jQuery(oDom).css("text-align"),"right","Text Align Right");
 		// end
 		t1.setTextAlign(TextAlign.End);
 		await nextUIUpdate();
+		// eslint-disable-next-line require-atomic-updates
 		oDom = document.getElementById('Text1');
 		assert.equal(jQuery(oDom).css("text-align"),"right","Text Align End");
 		// RTL end
 		t1.setTextDirection(TextDirection.RTL);
 		await nextUIUpdate();
+		// eslint-disable-next-line require-atomic-updates
 		oDom = document.getElementById('Text1');
 		assert.equal(jQuery(oDom).css("text-align"),"left","Text Align End in RTL");
 		assert.equal(jQuery(oDom).attr("dir"),"rtl","Attribute 'dir' for Text Direction is set to RTL");
@@ -204,6 +210,7 @@ sap.ui.define([
 		// RTL left
 		t1.setTextAlign(TextAlign.Left);
 		await nextUIUpdate();
+		// eslint-disable-next-line require-atomic-updates
 		oDom = document.getElementById('Text1');
 		assert.equal(jQuery(oDom).css("text-align"),"left","Text Align Left in RTL");
 		// reset
@@ -223,6 +230,7 @@ sap.ui.define([
 		}
 		t1.setText("Hello World!");
 		await nextUIUpdate();
+		// eslint-disable-next-line require-atomic-updates
 		oDom = document.getElementById('Text1');
 		assert.equal(oDom.textContent,"Hello World!", "Text entered again");
 	});
@@ -378,7 +386,7 @@ sap.ui.define([
 		oText.destroy();
 	});
 
-	QUnit.test("Break words when wrapping type is 'Hyphenated'", async function(assert) {
+	QUnit.test("Break words when wrapping type is 'Hyphenated'", async function (assert) {
 		var oText = new Text({
 			text: "singlewordwithoutspacesbutwithhyphenationenabled",
 			wrapping: true,

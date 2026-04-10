@@ -12,6 +12,7 @@
 				<Button
 						id="sapUiRta_backButton"
 						icon="{parts: [{path: 'controls>/backButton/enabled'}], formatter: '.formatBackButtonIcon'}"
+						type="Transparent"
 						enabled="{controls>/backButton/enabled}"
 						visible="{controls>/backButton/visible}"
 						tooltip="{i18n>BTN_BACK}"
