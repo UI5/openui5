@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "1.81.0",
 	"sap.app": {
 		"id": "card.explorer.object.form",
 		"i18n": "i18n/i18n.properties",
@@ -49,49 +49,36 @@
 			}
 		},
 		"data": {
-			"json": {
-				"departments": [
-					{
-						"id": "engineering",
-						"title": "Engineering & Development"
-					},
-					{
-						"id": "marketing",
-						"title": "Marketing & Communications"
-					},
-					{
-						"id": "sales",
-						"title": "Sales & Business Development"
-					},
-					{
-						"id": "hr",
-						"title": "Human Resources"
-					},
-					{
-						"id": "finance",
-						"title": "Finance & Accounting"
-					}
-				],
-				"workLocationOptions": [
-					{
-						"key": "office",
-						"text": "Office (Full-time)"
-					},
-					{
-						"key": "remote",
-						"text": "Remote (Full-time)"
-					},
-					{
-						"key": "hybrid",
-						"text": "Hybrid (3 days office)"
-					},
-					{
-						"key": "flexible",
-						"text": "Flexible arrangement",
-						"enabled": false
-					}
-				]
-			}
+				"json": {
+					"departments": [
+						{
+							"id": "engineering",
+							"title": "Engineering & Development"
+						},
+						{
+							"id": "marketing",
+							"title": "Marketing & Communications"
+						},
+						{
+							"id": "sales",
+							"title": "Sales & Business Development"
+						},
+						{
+							"id": "hr",
+							"title": "Human Resources"
+						},
+						{
+							"id": "finance",
+							"title": "Finance & Accounting"
+						}
+					],
+					"workLocationOptions": [
+						{ "key": "office", "text": "Office (Full-time)" },
+						{ "key": "remote", "text": "Remote (Full-time)" },
+						{ "key": "hybrid", "text": "Hybrid (3 days office)" },
+						{ "key": "flexible", "text": "Flexible arrangement", "enabled": false }
+					]
+				}
 		},
 		"header": {
 			"icon": {

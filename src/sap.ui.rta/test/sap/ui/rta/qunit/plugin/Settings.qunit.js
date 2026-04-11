@@ -1,43 +1,45 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/ui/thirdparty/sinon-4",
 	"sap/base/Log",
 	"sap/m/Button",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/dt/DesignTime",
-	"sap/ui/dt/ElementOverlay",
 	"sap/ui/dt/ElementDesignTimeMetadata",
+	"sap/ui/dt/ElementOverlay",
 	"sap/ui/dt/OverlayRegistry",
-	"sap/ui/fl/write/api/ChangesWriteAPI",
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/changeHandler/PropertyChange",
+	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/layout/VerticalLayout",
-	"sap/ui/rta/command/ManifestCommand",
+	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/rta/command/CommandFactory",
+	"sap/ui/rta/command/ManifestCommand",
 	"sap/ui/rta/command/Settings",
 	"sap/ui/rta/command/Stack",
 	"sap/ui/rta/plugin/Settings",
-	"test-resources/sap/ui/rta/qunit/RtaQunitUtils",
-	"sap/ui/test/utils/nextUIUpdate"
+	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
-	sinon,
 	BaseLog,
 	Button,
 	ManagedObject,
 	DesignTime,
-	ElementOverlay,
 	ElementDesignTimeMetadata,
+	ElementOverlay,
 	OverlayRegistry,
-	ChangesWriteAPI,
+	ControlVariantApplyAPI,
 	PropertyChange,
+	ChangesWriteAPI,
 	VerticalLayout,
-	ManifestCommand,
+	nextUIUpdate,
 	CommandFactory,
+	ManifestCommand,
 	SettingsCommand,
 	Stack,
 	SettingsPlugin,
-	RtaQunitUtils,
-	nextUIUpdate
+	sinon,
+	RtaQunitUtils
 ) {
 	"use strict";
 
@@ -483,11 +485,7 @@ sap.ui.define([
 				oButtonOverlay.getVariantManagement = function() {
 					return "myVMR";
 				};
-				sandbox.stub(oMockedAppComponent, "getModel").returns({
-					getCurrentVariantReference() {
-						return "currentVR";
-					}
-				});
+				sandbox.stub(ControlVariantApplyAPI, "getCurrentVariantReference").returns("currentVR");
 				const aSelectedOverlays = [oButtonOverlay];
 
 				this.oSettingsPlugin.attachEventOnce("elementModified", function() {

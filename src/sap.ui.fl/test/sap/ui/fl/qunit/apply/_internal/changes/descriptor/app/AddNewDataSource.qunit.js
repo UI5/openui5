@@ -213,7 +213,7 @@ function(
 			assert.throws(function() {
 				AddNewDataSource.applyChange(this.oManifestDataSourcesEmpty, oChange);
 			}, Error("The ID of your dataSource is empty."),
-			"throws error that empty data source name is not allwoed");
+			"throws error that empty data source name is not allowed");
 		});
 
 		QUnit.test("when calling '_applyChange' by adding a dataSource without mandatory property", function(assert) {
@@ -459,30 +459,6 @@ function(
 			"throws error that the data source must not start with a specific prefix");
 		});
 
-		QUnit.test("when calling '_applyChange' by adding a dataSources of type OData (default)", function(assert) {
-			const oChange = new AppDescriptorChange({
-				flexObjectMetadata: {
-					changeType: "appdescr_app_addNewDataSource"
-				},
-				layer: Layer.CUSTOMER,
-				content: {
-					dataSource: {
-						"customer.fancy_dataSource": {
-							uri: "/sap/opu/odata/snce/PO_S_SRV;v=2/"
-						}
-					}
-				}
-			});
-
-			const oNewManifest = AddNewDataSource.applyChange(this.oManifestDataSourcesEmpty, oChange);
-			assert.equal(Object.keys(oNewManifest["sap.app"].dataSources).length, 1, "data source count is correctly");
-			assert.deepEqual(oNewManifest["sap.app"].dataSources, {
-				"customer.fancy_dataSource": {
-					uri: "/sap/opu/odata/snce/PO_S_SRV;v=2/"
-				}
-			}, "data source is added correctly");
-		});
-
 		QUnit.test("when calling '_applyChange' by adding a dataSource of type OData", function(assert) {
 			const oChange = new AppDescriptorChange({
 				flexObjectMetadata: {
@@ -605,7 +581,7 @@ function(
 
 			assert.throws(function() {
 				AddNewDataSource.applyChange(this.oManifestWithExistingDataSources, oChange);
-			}, Error("When adding two data sources it is only allwoed to add a data source with type 'OData' and the other one must be of type 'ODataAnnotation'."),
+			}, Error("When adding two data sources it is only allowed to add a data source with type 'OData' and the other one must be of type 'ODataAnnotation'."),
 			"throws error that when adding two data source one of them needs to be of type OData and the other of type ODataAnnotation");
 		});
 
@@ -929,6 +905,42 @@ function(
 				AddNewDataSource.applyChange(this.oManifestWithExistingDataSources, oChange);
 			}, Error("Property 'annotations' must be of type 'array'."),
 			"throws error that the annotations array is of wrong type");
+		});
+
+		[
+			{ type: "OData", uri: "/sap/opu/odata/snce/PO_S_SRV;v=2/" },
+			{ type: "INA", uri: "/api/ina" },
+			{ type: "XML", uri: "/api/data.xml" },
+			{ type: "JSON", uri: "/api/data.json" },
+			{ type: "FHIR", uri: "/api/fhir" },
+			{ type: "WebSocket", uri: "/api/websocket" },
+			{ type: "http", uri: "/api/endpoint" }
+		].forEach(function(oTestSetup) {
+			QUnit.test(`when calling '_applyChange' by adding a single dataSource of type ${oTestSetup.type}`, function(assert) {
+				const oChange = new AppDescriptorChange({
+					flexObjectMetadata: {
+						changeType: "appdescr_app_addNewDataSource"
+					},
+					layer: Layer.CUSTOMER,
+					content: {
+						dataSource: {
+							"customer.fancy_dataSource": {
+								uri: oTestSetup.uri,
+								type: oTestSetup.type
+							}
+						}
+					}
+				});
+
+				const oNewManifest = AddNewDataSource.applyChange(this.oManifestDataSourcesEmpty, oChange);
+				assert.equal(Object.keys(oNewManifest["sap.app"].dataSources).length, 1, "data source count is correct");
+				assert.deepEqual(oNewManifest["sap.app"].dataSources, {
+					"customer.fancy_dataSource": {
+						uri: oTestSetup.uri,
+						type: oTestSetup.type
+					}
+				}, "data source is added correctly");
+			});
 		});
 
 		QUnit.test("when calling '_applyChange' by adding one dataSource type http which contains annotations", function(assert) {

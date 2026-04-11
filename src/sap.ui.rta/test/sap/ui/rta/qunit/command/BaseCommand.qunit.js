@@ -576,15 +576,7 @@ sap.ui.define([
 				layer: Layer.VENDOR,
 				developerMode: false
 			};
-
-			var oVariantModel = {
-				getCurrentVariantReference() {}
-			};
-			sandbox.stub(oMockedAppComponent, "getModel")
-			.callThrough()
-			.withArgs(ControlVariantApplyAPI.getVariantModelName())
-			.returns(oVariantModel);
-			this.oGetCurrentVariantReferenceStub = sandbox.stub(oVariantModel, "getCurrentVariantReference");
+			this.oGetCurrentVariantReferenceStub = sandbox.stub(ControlVariantApplyAPI, "getCurrentVariantReference");
 
 			sandbox.spy(FlexCommand.prototype, "prepare");
 
@@ -607,7 +599,6 @@ sap.ui.define([
 			sandbox.restore();
 			this.oButton.destroy();
 			this.oCommandFactory.destroy();
-			delete this.fnOriginalGetModel;
 			delete this.oFlexSettings;
 			delete this.sCurrentVMReference;
 		}

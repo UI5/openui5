@@ -68,12 +68,12 @@ sap.ui.define([
 				variantReference: "variant0",
 				changeType: "setTitle",
 				title: "variant A",
-				appComponent: oMockedAppComponent
+				appComponent: oMockedAppComponent,
+				variantManagementReference: "variantMgmtId1",
+				change: "setTitleChange"
 			};
 			assert.strictEqual(oDeleteStub.callCount, 1, "the change got deleted");
-			assert.strictEqual(oDeleteStub.firstCall.args[0], "variantMgmtId1", "the vm reference was passed");
-			assert.deepEqual(oDeleteStub.firstCall.args[1], mExpectedParams2, "the propertyBag was passed");
-			assert.strictEqual(oDeleteStub.firstCall.args[2], "setTitleChange", "the change was passed");
+			assert.deepEqual(oDeleteStub.firstCall.args[0], mExpectedParams2, "the expected parameters were passed");
 		});
 	});
 

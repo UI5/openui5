@@ -14,5 +14,79 @@
   "date.placeholder" : {
     "comment" : "XTXT: Placeholder text for input control with a sample value such as date or time; demo output \"e.g. 31/12/2022\" (translation must contain an abbreviated form of \"for example\" such as the English \"e.g.\" to keep the placeholder short)",
     "text" : "OXuhn9SBUBVB0Ct0pNCvGw_e.g. {0}"
+  },
+  "FileSize" : {
+    "Byte" : {
+      "comment" : "YMSG,20: File Size Unit one Byte",
+      "text" : "bBLaa0RKbP1sxxIPFGHgjQ_{0} Byte"
+    },
+    "Bytes" : {
+      "comment" : "YMSG,20: File Size Unit Bytes",
+      "text" : "ERHT+oexOEI/uCvKq7zmAA_{0} Bytes"
+    },
+    "Kilobyte" : {
+      "comment" : "YMSG,20: File Size Unit Kilobyte (short)",
+      "text" : "CkNRe7ErnE68qrsXXgSQzA_{0} KB"
+    },
+    "Megabyte" : {
+      "comment" : "YMSG,20: File Size Unit Megabyte (short)",
+      "text" : "k2Dr5zD1FqaUONP2bM7pOQ_{0} MB"
+    },
+    "Gigabyte" : {
+      "comment" : "YMSG,20: File Size Unit Gigabyte (short)",
+      "text" : "yz5NjWfhggYpk5WBPLw5Nw_{0} GB"
+    },
+    "Terabyte" : {
+      "comment" : "YMSG,20: File Size Unit Terabyte (short)",
+      "text" : "eB42VaKSEzQvXAE+yCeMyg_{0} TB"
+    },
+    "Petabyte" : {
+      "comment" : "YMSG,20: File Size Unit Petabyte (short)",
+      "text" : "gMg7tfRhbrdtV+Lv3defLA_{0} PB"
+    },
+    "Exabyte" : {
+      "comment" : "YMSG,20: File Size Unit Exabyte (short)",
+      "text" : "y+98tAlFyJWa5FKkVOarNg_{0} EB"
+    },
+    "Zettabyte" : {
+      "comment" : "YMSG,20: File Size Unit Zettabyte (short)",
+      "text" : "ccD3TcgHsD/BJA6MmEgf/g_{0} ZB"
+    },
+    "Yottabyte" : {
+      "comment" : "YMSG,20: File Size Unit Yottabyte (short)",
+      "text" : "u6xH9IsPAsJy6sGPbVwJKQ_{0} YB"
+    },
+    "Kibibyte" : {
+      "comment" : "YMSG,20: File Size Unit Kibibyte (short)",
+      "text" : "0nRC+713kepOTCyHjaegPA_{0} KiB"
+    },
+    "Mebibyte" : {
+      "comment" : "YMSG,20: File Size Unit Mebibyte (short)",
+      "text" : "Kgyue4ZuIO3j4l9XuqPyHA_{0} MiB"
+    },
+    "Gibibyte" : {
+      "comment" : "YMSG,20: File Size Unit Gibibyte (short)",
+      "text" : "6hfAY+vRZbC3K5nYYj3zIQ_{0} GiB"
+    },
+    "Tebibyte" : {
+      "comment" : "YMSG,20: File Size Unit Tebibyte (short)",
+      "text" : "pc7oosgE6zPqmP6lyQPz0w_{0} TiB"
+    },
+    "Pebibyte" : {
+      "comment" : "YMSG,20: File Size Unit Pebibyte (short)",
+      "text" : "d+vT95Y1hAE4HATxpqr3nw_{0} PiB"
+    },
+    "Exbibyte" : {
+      "comment" : "YMSG,20: File Size Unit Exbibyte (short)",
+      "text" : "aP8AF4e4MNLPLZKRNpZRGQ_{0} EiB"
+    },
+    "Zebibyte" : {
+      "comment" : "YMSG,20: File Size Unit Zebibyte (short)",
+      "text" : "12LKMnYb/YI4wZs0wFOjNg_{0} ZiB"
+    },
+    "Yobibyte" : {
+      "comment" : "YMSG,20: File Size Unit Yobibyte (short)",
+      "text" : "6DVx/IODXbiC53qivCY3kw_{0} YiB"
+    }
   }
 }

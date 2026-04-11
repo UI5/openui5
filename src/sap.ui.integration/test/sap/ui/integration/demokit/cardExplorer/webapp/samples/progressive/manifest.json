@@ -1,23 +1,25 @@
 {
-	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
 		"id": "sap.ui.integration.sample.Progressive.Preview",
 		"applicationVersion": {
 			"version": "1.0.0"
-		},
-		"title": "Card 'Preview'"
+		}
 	},
 	"sap.ui5": {
-		"rootView": "sap.ui.integration.sample.Progressive.Preview",
+		"rootView": {
+			"viewName": "sap.ui.integration.sample.Progressive.Preview",
+			"type": "XML",
+			"async": true
+		},
 		"dependencies": {
-			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.f": {},
 				"sap.ui.core": {},
 				"sap.ui.integration": {}
 			}
 		},
-		"config": {}
+		"config": {
+		}
 	}
 }

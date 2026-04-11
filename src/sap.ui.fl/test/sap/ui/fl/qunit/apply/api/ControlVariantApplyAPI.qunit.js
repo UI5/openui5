@@ -53,37 +53,24 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var sandbox = sinon.createSandbox();
+	const sandbox = sinon.createSandbox();
 
-	function stubTechnicalParameterValues(aUrlTechnicalParameters) {
-		sandbox.stub(this.oModel, "getLocalId").withArgs(this.oDummyControl.getId(), this.oAppComponent).returns("variantMgmtId1");
-		sandbox.spy(URLHandler, "update");
-		sandbox.stub(this.oModel, "getVariant").withArgs("variant1", "variantMgmtId1").returns({ simulate: "foundVariant" });
-		sandbox.stub(hasher, "replaceHash");
-		this.fnParseShellHashStub = sandbox.stub().callsFake(function() {
-			if (!this.bCalled) {
-				var oReturnObject = {
-					params: {}
-				};
-				oReturnObject.params[URLHandler.variantTechnicalParameterName] = aUrlTechnicalParameters;
-				this.bCalled = true;
-				return oReturnObject;
-			}
-			return {};
-		}.bind(this));
-		sandbox.stub(this.oModel, "getUShellService").callsFake(function(sServiceName) {
+	function stubUshellServices() {
+		this.fnParseShellHashStub = sandbox.stub();
+		sandbox.stub(Utils, "getUshellContainer").returns({});
+		sandbox.stub(Utils, "getUShellService").callsFake(function(sServiceName) {
 			switch (sServiceName) {
 				case "URLParsing":
-					return {
+					return Promise.resolve({
 						parseShellHash: this.fnParseShellHashStub,
 						constructShellHash() {return "constructedHash";}
-					};
+					});
 				case "ShellNavigationInternal":
-					return { registerNavigationFilter() {}, unregisterNavigationFilter() {} };
+					return Promise.resolve({ registerNavigationFilter() {}, unregisterNavigationFilter() {} });
 				case "Navigation":
-					return { navigate() {} };
+					return Promise.resolve({ navigate() {} });
 				default:
-					return undefined;
+					return Promise.resolve(undefined);
 			}
 		}.bind(this));
 	}
@@ -107,7 +94,7 @@ sap.ui.define([
 	}
 
 	QUnit.module("Given an instance of VariantModel", {
-		beforeEach() {
+		async beforeEach() {
 			this.oData = {
 				variantMgmtId1: {
 					defaultVariant: "variantMgmtId1",
@@ -145,15 +132,19 @@ sap.ui.define([
 			this.oModel = new VariantModel(this.oData, {
 				appComponent: this.oAppComponent
 			});
-			return this.oModel.initialize()
-			.then(function() {
-				this.oAppComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-				this.oComponent = new Component("EmbeddedComponent");
-				sandbox.stub(Utils, "getAppComponentForControl")
-				.callThrough()
-				.withArgs(this.oDummyControl).returns(this.oAppComponent)
-				.withArgs(this.oComponent).returns(this.oAppComponent);
-			}.bind(this));
+			sandbox.stub(this.oModel, "getLocalId").withArgs(this.oDummyControl.getId(), this.oAppComponent).returns("variantMgmtId1");
+			sandbox.spy(URLHandler, "update");
+			sandbox.stub(this.oModel, "getVariant").withArgs("variant1", "variantMgmtId1").returns({ simulate: "foundVariant" });
+			sandbox.stub(hasher, "replaceHash");
+			sandbox.stub(hasher, "getHash").returns("");
+			stubUshellServices.call(this);
+			await this.oModel.initialize();
+			this.oAppComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			this.oComponent = new Component("EmbeddedComponent");
+			sandbox.stub(Utils, "getAppComponentForControl")
+			.callThrough()
+			.withArgs(this.oDummyControl).returns(this.oAppComponent)
+			.withArgs(this.oComponent).returns(this.oAppComponent);
 		},
 		afterEach() {
 			sandbox.restore();
@@ -163,14 +154,23 @@ sap.ui.define([
 			this.oDummyControl.destroy();
 		}
 	}, function() {
-		QUnit.test("when calling 'clearVariantParameterInURL' with a control as parameter", function(assert) {
+		QUnit.test("when calling 'clearVariantParameterInURL' with a control as parameter", async function(assert) {
 			var aUrlTechnicalParameters = ["fakevariant", "variant1"];
-			stubTechnicalParameterValues.call(this, aUrlTechnicalParameters);
+			this.fnParseShellHashStub.reset();
+			this.fnParseShellHashStub.returns({
+				params: {
+					[URLHandler.variantTechnicalParameterName]: aUrlTechnicalParameters
+				}
+			});
 
-			ControlVariantApplyAPI.clearVariantParameterInURL({ control: this.oDummyControl });
+			await ControlVariantApplyAPI.clearVariantParameterInURL({ control: this.oDummyControl });
 
-			assert.ok(this.fnParseShellHashStub.calledTwice, "then variant parameter values were requested; once for read and write each");
-			assert.deepEqual(_omit(URLHandler.update.getCall(0).args[0], "model"), {
+			assert.strictEqual(
+				this.fnParseShellHashStub.callCount,
+				2,
+				"then variant parameter values were requested; once for read and write each"
+			);
+			assert.deepEqual(_omit(URLHandler.update.getCall(0).args[0], ["flexReference", "appComponent"]), {
 				parameters: [aUrlTechnicalParameters[0]],
 				updateURL: true,
 				updateHashEntry: true,
@@ -181,7 +181,6 @@ sap.ui.define([
 		QUnit.test("when calling 'clearVariantParameterInURL' without a VariantModel available", function(assert) {
 			sandbox.stub(Log, "error");
 			sandbox.stub(this.oAppComponent, "getModel").returns(undefined);
-			sandbox.spy(URLHandler, "update");
 			ControlVariantApplyAPI.clearVariantParameterInURL({ control: this.oDummyControl });
 			assert.strictEqual(URLHandler.update.callCount, 0, "the URLHandler was not called");
 			assert.strictEqual(
@@ -389,6 +388,10 @@ sap.ui.define([
 				this.oView = oView;
 				this.oVariantModel = new VariantModel({}, {
 					appComponent: this.oComp
+				});
+				await stubUshellServices.call(this);
+				this.fnParseShellHashStub.returns({
+					params: {}
 				});
 				return this.oVariantModel.initialize();
 			}.bind(this)).then(async function() {
@@ -778,12 +781,36 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("Others", function() {
+	QUnit.module("Others", {
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
 		QUnit.test("getVariantModelName returns the correct model name", function(assert) {
 			assert.strictEqual(
 				ControlVariantApplyAPI.getVariantModelName(),
 				"$FlexVariants",
 				"The variant model name is correct"
+			);
+		});
+
+		QUnit.test("getCurrentVariantReference returns the current variant reference", function(assert) {
+			const oGetCurrentVariantReferenceStub = sandbox.stub(VariantManagementState, "getCurrentVariantReference")
+			.returns("testVariantReference");
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").withArgs("dummyControl").returns("testReference");
+
+			const sResult = ControlVariantApplyAPI.getCurrentVariantReference({
+				vmReference: "testVMReference",
+				control: "dummyControl"
+			});
+
+			assert.strictEqual(sResult, "testVariantReference", "the correct variant reference is returned");
+			assert.ok(
+				oGetCurrentVariantReferenceStub.calledOnceWithExactly({
+					vmReference: "testVMReference",
+					reference: "testReference"
+				}),
+				"VariantManagementState.getCurrentVariantReference was called with the correct parameters"
 			);
 		});
 

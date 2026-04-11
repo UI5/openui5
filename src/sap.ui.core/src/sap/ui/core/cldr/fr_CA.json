@@ -6243,5 +6243,25 @@
 		"narrow": "SC {0}",
 		"wide": "Semaine civile {0}"
 	},
-	"sap-datePlaceholder": "Par exemple\\: {0}"
+	"sap-datePlaceholder": "Par exemple\\: {0}",
+	"sap-fileSize": {
+		"Byte": "{0} octet",
+		"Bytes": "{0} octets",
+		"Kilobyte": "{0} Ko",
+		"Megabyte": "{0} Mo",
+		"Gigabyte": "{0} Go",
+		"Terabyte": "{0} To",
+		"Petabyte": "{0} Po",
+		"Exabyte": "{0} Eo",
+		"Zettabyte": "{0} Zo",
+		"Yottabyte": "{0} Yo",
+		"Kibibyte": "{0} Kio",
+		"Mebibyte": "{0} Mio",
+		"Gibibyte": "{0} Gio",
+		"Tebibyte": "{0} Tio",
+		"Pebibyte": "{0} Pio",
+		"Exbibyte": "{0} Eio",
+		"Zebibyte": "{0} Zio",
+		"Yobibyte": "{0} Yio"
+	}
 }

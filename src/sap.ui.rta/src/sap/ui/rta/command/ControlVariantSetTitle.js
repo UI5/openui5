@@ -94,10 +94,12 @@ sap.ui.define([
 			variantReference: this.sCurrentVariantKey,
 			changeType: "setTitle",
 			title: this.getOldText(),
-			appComponent: this.oAppComponent
+			appComponent: this.oAppComponent,
+			variantManagementReference: this.sVariantManagementReference,
+			change: this._oVariantChange
 		};
 
-		ControlVariantWriteAPI.deleteVariantChange(this.sVariantManagementReference, mPropertyBag, this._oVariantChange);
+		ControlVariantWriteAPI.deleteVariantChange(mPropertyBag);
 		this._oVariantChange = null;
 	};
 

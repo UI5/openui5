@@ -6,16 +6,18 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/base/util/restricted/_difference",
 	"sap/base/util/merge",
+	"sap/m/library",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Element",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
+	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
+	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
-	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
@@ -30,16 +32,18 @@ sap.ui.define([
 	Log,
 	_difference,
 	merge,
+	mobileLibrary,
 	JsControlTreeModifier,
 	Element,
 	Applier,
 	Reverter,
+	URLHandler,
+	VariantUtil,
 	FlexObjectFactory,
 	States,
 	VariantManagementState,
 	VariantManagerApply,
 	FlexObjectState,
-	FlexRuntimeInfoAPI,
 	ManifestUtils,
 	Settings,
 	ControlVariantWriteUtils,
@@ -64,8 +68,131 @@ sap.ui.define([
 	 */
 	var VariantManager = {};
 
+	const { SharingMode } = mobileLibrary;
+
 	function getVariantModel(oAppComponent) {
 		return oAppComponent.getModel("$FlexVariants");
+	}
+
+	function updateURLForSetDefault(sVariantManagementReference, mPropertyBag) {
+		const oVMControl = VariantUtil.getVariantManagementControlByVMReference(
+			sVariantManagementReference,
+			mPropertyBag.appComponent
+		);
+		if (!oVMControl?.getUpdateVariantInURL()) {
+			return;
+		}
+
+		const aHashParameters = URLHandler.getStoredHashParams({ flexReference: mPropertyBag.reference });
+		if (!aHashParameters) {
+			return;
+		}
+
+		const sNewDefaultVariant = mPropertyBag.defaultVariant;
+		const sCurrentVariant = VariantManagementState.getCurrentVariantReference({
+			reference: mPropertyBag.reference,
+			vmReference: sVariantManagementReference
+		});
+		const bDesignTimeMode = oVMControl.getDesignMode();
+
+		if (
+			sNewDefaultVariant !== sCurrentVariant
+			&& !aHashParameters.includes(sCurrentVariant)
+		) {
+			// if the new default differs from the current variant, add the current variant id as a variant URL parameter
+			URLHandler.update({
+				parameters: aHashParameters.concat(sCurrentVariant),
+				updateURL: !bDesignTimeMode,
+				updateHashEntry: true,
+				flexReference: mPropertyBag.reference,
+				appComponent: mPropertyBag.appComponent
+			});
+		} else if (
+			sNewDefaultVariant === sCurrentVariant
+			&& aHashParameters.includes(sCurrentVariant)
+		) {
+			// if current variant is now the new default, remove the current variant id as a variant URL parameter
+			aHashParameters.splice(aHashParameters.indexOf(sCurrentVariant), 1);
+			URLHandler.update({
+				parameters: aHashParameters,
+				updateURL: !bDesignTimeMode,
+				updateHashEntry: true,
+				flexReference: mPropertyBag.reference,
+				appComponent: mPropertyBag.appComponent
+			});
+		}
+	}
+
+	/**
+	 * Sets the passed properties on a variant for the passed variant management reference and
+	 * returns the content for change creation. This function modifies the variant instance directly.
+	 *
+	 * @param {string} sVariantManagementReference - Variant management reference
+	 * @param {object} mPropertyBag - Map of properties
+	 * @param {string} mPropertyBag.variantReference - Variant reference for which properties should be set
+	 * @param {string} mPropertyBag.changeType - Change type due to which properties are being set
+	 * @param {string} mPropertyBag.reference - Flex reference of the app
+	 * @param {sap.ui.core.Component} [mPropertyBag.appComponent] - App component (required for setDefault)
+	 * @param {string} [mPropertyBag.title] - New variant title value for <code>setTitle</code> change type
+	 * @param {boolean} [mPropertyBag.visible] - New visible value for <code>setVisible</code> change type
+	 * @param {object} [mPropertyBag.contexts] - New contexts object (e.g. roles) for <code>setContexts</code> change type
+	 * @param {boolean} [mPropertyBag.favorite] - New favorite value for <code>setFavorite</code> change type
+	 * @param {boolean} [mPropertyBag.executeOnSelect] - New executeOnSelect value for <code>setExecuteOnSelect</code> change type
+	 * @param {string} [mPropertyBag.defaultVariant] - New default variant for <code>setDefault</code> change type
+	 * @returns {object} Additional content for change creation
+	 * @private
+	 */
+	function setVariantProperties(sVariantManagementReference, mPropertyBag) {
+		const oVariant = VariantManagementState.getVariant({
+			vmReference: sVariantManagementReference,
+			vReference: mPropertyBag.variantReference,
+			reference: mPropertyBag.reference
+		});
+		const oVariantInstance = oVariant?.instance;
+
+		const mAdditionalChangeContent = {};
+
+		// For setDefault, we don't need a variant instance
+		if (mPropertyBag.changeType !== "setDefault" && !oVariantInstance) {
+			return mAdditionalChangeContent;
+		}
+
+		switch (mPropertyBag.changeType) {
+			case "setTitle":
+				// Skip state change in setName for title updates as a new change is created and
+				// the variant instance itself is not updated and thus should not be marked as dirty
+				oVariantInstance.setName(mPropertyBag.title, /* bSkipStateChange = */true);
+				break;
+			case "setFavorite":
+				mAdditionalChangeContent.favorite = mPropertyBag.favorite;
+				oVariantInstance.setFavorite(mPropertyBag.favorite);
+				break;
+			case "setExecuteOnSelect":
+				mAdditionalChangeContent.executeOnSelect = mPropertyBag.executeOnSelect;
+				oVariantInstance.setExecuteOnSelection(mPropertyBag.executeOnSelect);
+				break;
+			case "setVisible":
+				mAdditionalChangeContent.visible = mPropertyBag.visible;
+				// 'createdByReset' is used by the backend to distinguish between setVisible change created via reset and delete
+				mAdditionalChangeContent.createdByReset = false;
+				oVariantInstance.setVisible(mPropertyBag.visible);
+				break;
+			case "setContexts":
+				mAdditionalChangeContent.contexts = mPropertyBag.contexts;
+				oVariantInstance.setContexts(mPropertyBag.contexts);
+				break;
+			case "setDefault":
+				mAdditionalChangeContent.defaultVariant = mPropertyBag.defaultVariant;
+				// Update hash data
+				if (mPropertyBag.appComponent) {
+					updateURLForSetDefault(sVariantManagementReference, mPropertyBag);
+				}
+				break;
+			default:
+				break;
+		}
+
+		return mAdditionalChangeContent;
 	}
 
 	function getDirtyControlChangesFromVariant(aControlChanges, sFlexReference) {
@@ -363,7 +490,7 @@ sap.ui.define([
 			rename: true,
 			change: true,
 			remove: true,
-			sharing: mPropertyBag.layer === Layer.USER ? oVariantModel.sharing.PRIVATE : oVariantModel.sharing.PUBLIC
+			sharing: mPropertyBag.layer === Layer.USER ? SharingMode.Private : SharingMode.Public
 		});
 
 		const aChanges = [];
@@ -699,7 +826,7 @@ sap.ui.define([
 	 */
 	VariantManager.addAndApplyControlChangesOnVariant = function(mPropertyBag) {
 		const oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
-		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oAppComponent });
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.control);
 		const aAddedChanges = UIChangeManager.addDirtyChanges(sFlexReference, mPropertyBag.changes, oAppComponent);
 		return aAddedChanges.reduce(async function(oPreviousPromise, oChange) {
 			await oPreviousPromise;
@@ -741,7 +868,7 @@ sap.ui.define([
 			revert: bRevert
 		} = mPropertyBag;
 
-		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oControl });
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oControl);
 		var aSourceVariantChanges = VariantManagementState.getControlChangesForVariant({
 			reference: sFlexReference,
 			vmReference: sVariantManagementReference,
@@ -772,7 +899,7 @@ sap.ui.define([
 	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.variantManagementControl - Variant management control
 	 */
 	VariantManager.removeVariant = async function(mPropertyBag) {
-		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: mPropertyBag.appComponent });
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.appComponent);
 		var aChangesToBeDeleted = FlexObjectState.getDirtyFlexObjects(sFlexReference)
 		.filter(function(oChange) {
 			return (oChange.getVariantReference && oChange.getVariantReference() === mPropertyBag.variant.getId()) ||
@@ -819,28 +946,65 @@ sap.ui.define([
 	};
 
 	/**
+	 * Sets the variant properties and deletes a variant change
+	 *
+	 * @param {object} mPropertyBag - Property bag
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} mPropertyBag.change - Variant change to be deleted
+	 * @param {string} mPropertyBag.variantManagementReference - Variant management reference
+	 * @param {string} [mPropertyBag.changeType] - Change type due to which properties are being set
+	 * @param {string} [mPropertyBag.variantReference] - Variant reference for which properties should be set
+	 * @param {string} [mPropertyBag.title] - Variant title value for <code>setTitle</code> change type
+	 * @param {boolean} [mPropertyBag.visible] - Visible value for <code>setVisible</code> change type
+	 * @param {object} [mPropertyBag.contexts] - Contexts object (e.g. roles) for <code>setContexts</code> change type
+	 * @param {boolean} [mPropertyBag.favorite] - Favorite value for <code>setFavorite</code> change type
+	 * @param {boolean} [mPropertyBag.executeOnSelect] - ExecuteOnSelect value for <code>setExecuteOnSelect</code> change type
+	 * @param {string} [mPropertyBag.defaultVariant] - Default variant for <code>setDefault</code> change type
+	 */
+	VariantManager.deleteVariantChange = function(mPropertyBag) {
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.appComponent);
+		setVariantProperties(mPropertyBag.variantManagementReference, { ...mPropertyBag, reference: sFlexReference });
+		FlexObjectManager.deleteFlexObjects({
+			reference: sFlexReference,
+			componentId: mPropertyBag.appComponent.getId(),
+			flexObjects: [mPropertyBag.change]
+		});
+	};
+
+	/**
 	 * Sets the variant properties and creates a variant change
 	 *
 	 * @param {string} sVariantManagementReference - Variant management reference
 	 * @param {object} mPropertyBag - Map of properties
+	 * @param {string} mPropertyBag.changeType - Change type of the variant change
+	 * @param {string} mPropertyBag.layer - Layer of the variant change
+	 * @param {string} mPropertyBag.generator - Generator for the variant change
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
+	 * @param {string} [mPropertyBag.variantReference] - Variant reference, required for changes on variants, not for changes on variant management
+	 * @param {string} [mPropertyBag.title] - Variant title value for <code>setTitle</code> change type
+	 * @param {boolean} [mPropertyBag.visible] - Visible value for <code>setVisible</code> change type
+	 * @param {object} [mPropertyBag.contexts] - Contexts object (e.g. roles) for <code>setContexts</code> change type
+	 * @param {boolean} [mPropertyBag.favorite] - Favorite value for <code>setFavorite</code> change type
+	 * @param {boolean} [mPropertyBag.executeOnSelect] - ExecuteOnSelect value for <code>setExecuteOnSelect</code> change type
+	 * @param {string} [mPropertyBag.defaultVariant] - Default variant for <code>setDefault</code> change type
 	 * @param {string} [mPropertyBag.adaptationId] - Adaptation ID to set which overrules the currently display adaptation
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject} Created Change object
 	 */
 	VariantManager.createVariantChange = function(sVariantManagementReference, mPropertyBag) {
-		const oVariantModel = getVariantModel(mPropertyBag.appComponent);
-		var mAdditionalChangeContent = oVariantModel.setVariantProperties(sVariantManagementReference, mPropertyBag);
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.appComponent);
+		const mAdditionalChangeContent = setVariantProperties(sVariantManagementReference, { ...mPropertyBag, reference: sFlexReference });
 
-		var mNewChangeData = {
+		const mNewChangeData = {
 			changeType: mPropertyBag.changeType,
 			layer: mPropertyBag.layer,
 			generator: mPropertyBag.generator,
-			reference: oVariantModel.sFlexReference
+			reference: sFlexReference
 		};
 
 		if (mPropertyBag.adaptationId !== undefined) {
 			mNewChangeData.adaptationId = mPropertyBag.adaptationId;
 		} else {
-			mNewChangeData.adaptationId = getAdaptationId(mPropertyBag.layer, mPropertyBag.appComponent, oVariantModel.sFlexReference);
+			mNewChangeData.adaptationId = getAdaptationId(mPropertyBag.layer, mPropertyBag.appComponent, sFlexReference);
 		}
 
 		let oChange;

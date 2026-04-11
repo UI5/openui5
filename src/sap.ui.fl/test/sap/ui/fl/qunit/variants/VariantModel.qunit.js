@@ -101,6 +101,7 @@ sap.ui.define([
 			}).then(function() {
 				sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
 				sandbox.stub(URLHandler, "attachHandlers");
+				sandbox.stub(Utils, "getUShellService").resolves();
 
 				sandbox.spy(URLHandler, "initialize");
 				this.oDataSelectorUpdateSpy = sandbox.spy(VariantManagementState.getVariantManagementMap(), "addUpdateListener");
@@ -537,54 +538,48 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'setModelPropertiesForControl' with updateVariantInURL = true", function(assert) {
-			assert.expect(8);
 			this.oVMControl.setEditable(true);
 			this.oVMControl.setUpdateVariantInURL(true);
 			this.oModel.getData()[sVMReference].updateVariantInURL = true;
 			this.oModel.getData()[sVMReference].currentVariant = "variant0";
-			var iUpdateCallCount = 0;
-			var oParams = {};
-			oParams[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = "foo";
-			var oMockedURLParser = {
-				parseShellHash() {
-					return {
-						params: oParams
-					};
-				}
-			};
-			sandbox.stub(this.oModel, "getUShellService").withArgs("URLParsing").returns(oMockedURLParser);
-			sandbox.stub(URLHandler, "update").callsFake(function(mPropertyBag) {
-				var mExpectedParameters = {
-					parameters: [],
-					updateURL: true,
-					updateHashEntry: false,
-					model: this.oModel
-				};
 
-				if (iUpdateCallCount === 1) {
-					// second URLHandler.update() call with designTime mode being set from true -> false
-					mExpectedParameters.parameters = ["currentHash1", "currentHash2"];
-				}
-				assert.strictEqual(
-					mPropertyBag.model._bDesignTimeMode,
-					iUpdateCallCount === 0,
-					"then model's _bDesignTime property was set before URLHandler.update() was called"
-				);
-
-				assert.deepEqual(mPropertyBag, mExpectedParameters, "then URLHandler.update() called with the correct parameters");
-				iUpdateCallCount++;
-			}.bind(this));
+			sandbox.stub(URLHandler, "clearAllVariantURLParameters").resolves();
+			sandbox.stub(URLHandler, "update").resolves();
 			sandbox.stub(URLHandler, "getStoredHashParams").returns(["currentHash1", "currentHash2"]);
 
+			// First call: undefined -> false - no mode change, no URL operations
 			this.oModel.setModelPropertiesForControl(sVMReference, false, this.oVMControl);
+			assert.strictEqual(URLHandler.clearAllVariantURLParameters.callCount, 0, "then clearAllVariantURLParameters not called");
+			assert.strictEqual(URLHandler.update.callCount, 0, "then URLHandler.update() not called");
 			assert.strictEqual(URLHandler.getStoredHashParams.callCount, 0, "then URLHandler.getStoredHashParams() not called");
-			assert.strictEqual(this.oModel._bDesignTimeMode, false, "the model's _bDesignTimeMode property is initially false");
+			assert.strictEqual(this.oModel._bDesignTimeMode, false, "the model's _bDesignTimeMode property is set to false");
 
+			// Second call: false -> true - mode change to design time, clears URL parameters
 			this.oModel.setModelPropertiesForControl(sVMReference, true, this.oVMControl);
-			assert.strictEqual(URLHandler.getStoredHashParams.callCount, 0, "then URLHandler.getStoredHashParams() not called");
+			assert.strictEqual(
+				URLHandler.clearAllVariantURLParameters.callCount,
+				1,
+				"then clearAllVariantURLParameters called once"
+			);
+			assert.deepEqual(URLHandler.clearAllVariantURLParameters.firstCall.args[0], {
+				flexReference: this.oModel.sFlexReference,
+				appComponent: this.oModel.oAppComponent
+			}, "then clearAllVariantURLParameters called with correct parameters");
+			assert.strictEqual(URLHandler.getStoredHashParams.callCount, 0, "then URLHandler.getStoredHashParams() still not called");
+			assert.strictEqual(this.oModel._bDesignTimeMode, true, "the model's _bDesignTimeMode property is set to true");
 
+			// Third call: true -> false - mode change from design time, restores URL parameters
 			this.oModel.setModelPropertiesForControl(sVMReference, false, this.oVMControl);
 			assert.strictEqual(URLHandler.getStoredHashParams.callCount, 1, "then URLHandler.getStoredHashParams() called once");
+			assert.strictEqual(URLHandler.update.callCount, 1, "then URLHandler.update() called once");
+			assert.deepEqual(URLHandler.update.firstCall.args[0], {
+				parameters: ["currentHash1", "currentHash2"],
+				updateURL: true,
+				updateHashEntry: false,
+				flexReference: this.oModel.sFlexReference,
+				appComponent: this.oModel.oAppComponent
+			}, "then URLHandler.update() called with the correct parameters");
+			assert.strictEqual(this.oModel._bDesignTimeMode, false, "the model's _bDesignTimeMode property is set to false");
 		});
 
 		QUnit.test("when calling 'getVariantManagementReference'", function(assert) {
@@ -708,7 +703,8 @@ sap.ui.define([
 					sandbox.stub(ContextBasedAdaptationsAPI, "getDisplayedAdaptationId").returns("id_12345");
 				}
 				var oVariantInstance = createVariant(this.oModel.oData[sVMReference].variants[2]);
-				sandbox.stub(this.oModel, "getVariant").returns({ instance: oVariantInstance });
+				// Stub VariantManagementState.getVariant since VariantManager.setVariantProperties uses it
+				sandbox.stub(VariantManagementState, "getVariant").returns({ instance: oVariantInstance });
 
 				const oChange = VariantManager.addVariantChanges({
 					variantManagementReference: sVMReference,
@@ -759,127 +755,18 @@ sap.ui.define([
 			const fnChangeStub = sandbox.stub().returns({
 				convertToFileContent() {}
 			});
-			const mPropertyBag = { appComponent: this.oComponent };
+			const mPropertyBag = {
+				variantManagementReference: sVMReference,
+				appComponent: this.oComponent,
+				change: fnChangeStub()
+			};
 			const oDeleteFlexObjectsStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
-			const oSetPropertiesStub = sandbox.stub(this.oModel, "setVariantProperties");
-			ControlVariantWriteAPI.deleteVariantChange(sVMReference, mPropertyBag, fnChangeStub());
+			VariantManager.deleteVariantChange(mPropertyBag);
 			assert.ok(oDeleteFlexObjectsStub.calledWith({
 				reference: sReference,
 				flexObjects: [fnChangeStub()],
 				componentId: "MyComponent"
 			}), "then deleteFlexObjects called with the passed change");
-			assert.ok(oSetPropertiesStub.calledWith(sVMReference, mPropertyBag), "the correct properties were passed");
-		});
-
-		[true, false].forEach(function(bUpdateVariantInURL) {
-			const sTitle = `when calling 'setVariantProperties' for 'setDefault' with different current and default variants, in UI adaptation mode ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
-			QUnit.test(sTitle, function(assert) {
-				sandbox.stub(this.oModel, "getVariant").returns({ instance: createVariant(this.oModel.oData[sVMReference].variants[2]) });
-				var mPropertyBag = {
-					changeType: "setDefault",
-					defaultVariant: "variant1",
-					layer: Layer.CUSTOMER,
-					variantManagementReference: sVMReference,
-					appComponent: this.oComponent,
-					change: {
-						convertToFileContent() {}
-					}
-				};
-				sandbox.stub(URLHandler, "getStoredHashParams").returns([]);
-				sandbox.stub(FlexObjectManager, "addDirtyFlexObjects");
-				sandbox.stub(URLHandler, "update");
-
-				// set adaptation mode true
-				this.oModel._bDesignTimeMode = true;
-
-				// mock current variant id to make it different
-				this.oModel.oData[sVMReference].currentVariant = "variantCurrent";
-				this.oVMControl.setUpdateVariantInURL(bUpdateVariantInURL);
-
-				this.oModel.setVariantProperties(sVMReference, mPropertyBag);
-				if (bUpdateVariantInURL) {
-					assert.ok(URLHandler.update.calledWithExactly({
-						parameters: [this.oModel.oData[sVMReference].currentVariant],
-						updateURL: false,
-						updateHashEntry: true,
-						model: this.oModel
-					}), "then the URLHandler.update() called with the current variant id as a parameter in UI adaptation mode");
-				} else {
-					assert.ok(URLHandler.update.notCalled, "then the URLHandler.update() not called");
-				}
-			});
-
-			const sTitle1 = `when calling 'setVariantProperties' for 'setDefault' with same current and default variants, in personalization mode ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
-			QUnit.test(sTitle1, function(assert) {
-				sandbox.stub(this.oModel, "getVariant").returns({ instance: createVariant(this.oModel.oData[sVMReference].variants[2]) });
-				var mPropertyBag = {
-					changeType: "setDefault",
-					defaultVariant: "variant1",
-					layer: Layer.CUSTOMER,
-					variantManagementReference: sVMReference,
-					appComponent: this.oComponent,
-					change: {
-						convertToFileContent() {}
-					}
-				};
-				// current variant already exists in hash parameters
-				sandbox.stub(URLHandler, "getStoredHashParams").returns([this.oModel.oData[sVMReference].currentVariant]);
-				sandbox.stub(FlexObjectManager, "addDirtyFlexObjects");
-				sandbox.stub(URLHandler, "update");
-
-				// set adaptation mode false
-				this.oModel._bDesignTimeMode = false;
-				this.oVMControl.setUpdateVariantInURL(bUpdateVariantInURL);
-
-				this.oModel.setVariantProperties(sVMReference, mPropertyBag);
-				if (bUpdateVariantInURL) {
-					assert.ok(URLHandler.update.calledWithExactly({
-						parameters: [],
-						updateURL: bUpdateVariantInURL,
-						updateHashEntry: true,
-						model: this.oModel
-					}), "then the URLHandler.update() called without the current variant id as a parameter in personalization mode");
-				} else {
-					assert.ok(URLHandler.update.notCalled, "then the URLHandler.update() not called");
-				}
-			});
-
-			const sTitle2 = `when calling 'setVariantProperties' for 'setDefault' with different current and default variants, in personalization mode ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
-			QUnit.test(sTitle2, function(assert) {
-				sandbox.stub(this.oModel, "getVariant").returns({ instance: createVariant(this.oModel.oData[sVMReference].variants[2]) });
-				var mPropertyBag = {
-					changeType: "setDefault",
-					defaultVariant: "variant1",
-					layer: Layer.CUSTOMER,
-					variantManagementReference: sVMReference,
-					appComponent: this.oComponent,
-					change: {
-						convertToFileContent() {}
-					}
-				};
-				sandbox.stub(URLHandler, "getStoredHashParams").returns([]);
-				sandbox.stub(FlexObjectManager, "addDirtyFlexObjects");
-				sandbox.stub(URLHandler, "update");
-
-				// set adaptation mode false
-				this.oModel._bDesignTimeMode = false;
-
-				// mock current variant id to make it different
-				this.oModel.oData[sVMReference].currentVariant = "variantCurrent";
-				this.oVMControl.setUpdateVariantInURL(bUpdateVariantInURL);
-
-				this.oModel.setVariantProperties(sVMReference, mPropertyBag);
-				if (bUpdateVariantInURL) {
-					assert.ok(URLHandler.update.calledWithExactly({
-						parameters: [this.oModel.oData[sVMReference].currentVariant],
-						updateURL: bUpdateVariantInURL,
-						updateHashEntry: true,
-						model: this.oModel
-					}), "then the URLHandler.update() called with the current variant id as a parameter in personalization mode");
-				} else {
-					assert.ok(URLHandler.update.notCalled, "then the URLHandler.update() not called");
-				}
-			});
 		});
 
 		QUnit.test("when calling '_ensureStandardVariantExists'", function(assert) {
@@ -1216,44 +1103,6 @@ sap.ui.define([
 				);
 				this.oVariantManagement.setModel(oResourceModel, "anotherResourceModel");
 			}.bind(this));
-		});
-	});
-
-	QUnit.module("Given a VariantModel without data and with Ushell available", {
-		beforeEach() {
-			this.oComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, sReference);
-			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("foo");
-			this.oModel = new VariantModel({}, {
-				appComponent: this.oComponent
-			});
-			this.oComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-
-			sandbox.stub(Utils, "getUShellService").callsFake(function(sServiceName) {
-				return Promise.resolve(sServiceName);
-			});
-			sandbox.stub(Utils, "getUshellContainer").returns({});
-			sandbox.stub(URLHandler, "initialize");
-			return this.oModel.initialize();
-		},
-		afterEach() {
-			this.oModel.destroy();
-			this.oComponent.destroy();
-			sandbox.restore();
-		}
-	}, function() {
-		QUnit.test("when calling getUShellService", function(assert) {
-			assert.strictEqual(this.oModel.getUShellService("UserInfo"), "UserInfo", "the UserInfo service was loaded");
-			assert.strictEqual(this.oModel.getUShellService("URLParsing"), "URLParsing", "the URLParsing service was loaded");
-			assert.strictEqual(
-				this.oModel.getUShellService("Navigation"),
-				"Navigation", "the Navigation service was loaded"
-			);
-			assert.strictEqual(
-				this.oModel.getUShellService("ShellNavigationInternal"),
-				"ShellNavigationInternal",
-				"the ShellNavigationInternal service was loaded"
-			);
-			assert.notOk(this.oModel.getUShellService("UnknownService"), "the UnknownService service was not loaded");
 		});
 	});
 

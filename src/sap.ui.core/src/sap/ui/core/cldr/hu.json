@@ -6066,5 +6066,25 @@
 		"narrow": "{0}. NH",
 		"wide": "Naptári hét {0}"
 	},
-	"sap-datePlaceholder": "Például {0}"
+	"sap-datePlaceholder": "Például {0}",
+	"sap-fileSize": {
+		"Byte": "{0} bájt",
+		"Bytes": "{0} bájt",
+		"Kilobyte": "{0} kB",
+		"Megabyte": "{0} MB",
+		"Gigabyte": "{0} GB",
+		"Terabyte": "{0} TB",
+		"Petabyte": "{0} PB",
+		"Exabyte": "{0} EB",
+		"Zettabyte": "{0} ZB",
+		"Yottabyte": "{0} YB",
+		"Kibibyte": "{0} KiB",
+		"Mebibyte": "{0} MiB",
+		"Gibibyte": "{0} GiB",
+		"Tebibyte": "{0} TiB",
+		"Pebibyte": "{0} PiB",
+		"Exbibyte": "{0} EiB",
+		"Zebibyte": "{0} ZiB",
+		"Yobibyte": "{0} YiB"
+	}
 }

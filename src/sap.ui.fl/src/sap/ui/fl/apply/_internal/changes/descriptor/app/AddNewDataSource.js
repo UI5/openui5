@@ -19,9 +19,9 @@ sap.ui.define([
 	const SUPPORTED_TYPES = {
 		uri: "string",
 		type: "string",
-		settings: typeof {},
+		settings: "object",
 		dataSourceCustom: "boolean",
-		annotations: typeof []
+		annotations: "array"
 	};
 
 	function isDataSourceIdExistingInManifest(oManifestDataSources, sDataSourceId) {
@@ -50,7 +50,7 @@ sap.ui.define([
 		const sDataSourceOfTypeODataAnnotation = getDataSourceNameByType(oChangeDataSource, "ODataAnnotation");
 
 		if (!(sDataSourceOfTypeOData && sDataSourceOfTypeODataAnnotation)) {
-			throw new Error("When adding two data sources it is only allwoed to add a data source with type 'OData' and the other one must be of type 'ODataAnnotation'.");
+			throw new Error("When adding two data sources it is only allowed to add a data source with type 'OData' and the other one must be of type 'ODataAnnotation'.");
 		}
 
 		if (!oChangeDataSource[sDataSourceOfTypeOData]?.settings?.annotations?.includes(sDataSourceOfTypeODataAnnotation)) {
@@ -64,9 +64,9 @@ sap.ui.define([
 	}
 
 	function checksWhenAddingOneDataSource(oManifestDataSources, oChangeDataSource) {
-		const sDataSourceOfTypeOData = getDataSourceNameByType(oChangeDataSource, "OData");
-		if (oChangeDataSource[sDataSourceOfTypeOData].settings?.annotations) {
-			checkDefinedAnnotationsExistInManifest(oManifestDataSources, sDataSourceOfTypeOData, oChangeDataSource[sDataSourceOfTypeOData].settings.annotations);
+		const [sDataSourceName, oDataSource] = Object.entries(oChangeDataSource)[0];
+		if (oDataSource.settings?.annotations) {
+			checkDefinedAnnotationsExistInManifest(oManifestDataSources, sDataSourceName, oDataSource.settings.annotations);
 		}
 	}
 

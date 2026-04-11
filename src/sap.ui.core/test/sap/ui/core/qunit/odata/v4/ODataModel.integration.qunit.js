@@ -24667,6 +24667,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Context#requestSideEffects for single entities. Requesting side effects for a single property
 	// selects only the given property and refreshes the grand total.
 	// JIRA: CPOUI5ODATAV4-3389
+	//
+	// Read grand total if entity is deleted; ensure that filter, search, and custom query options
+	// are considered when requesting the grand total again. All filters are applied before
+	// aggregation, because the leaves are not aggregated.
+	// JIRA: CPOUI5ODATAV4-3287
 	[
 		"context refresh",
 		"context refresh via side effects",
@@ -24675,6 +24680,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	].forEach((sScenario) => {
 		QUnit.test("Data Aggregation: leaves' key predicates; " + sScenario, function (assert) {
 			var oBinding,
+				sGrandTotalURL = "SalesOrderList?sap-client=123&custom=foo"
+					+ "&$apply=filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
+					+ "/aggregate(GrossAmount)",
 				oHeaderContext,
 				oModel = this.createSalesOrdersModel123({autoExpandSelect : true}),
 				oTable,
@@ -24825,11 +24833,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}).then(function () {
 				assert.strictEqual(oBinding.getCount(), 3);
 
-				that.expectRequest("DELETE SalesOrderList('26')")
+				const iBatchNo = that.iBatchNo + 1; // don't care about exact no.
+				that.expectRequest(`#${iBatchNo} DELETE SalesOrderList('26')`)
+					.expectRequest(`#${iBatchNo} ${sGrandTotalURL}`, {
+						value : [{GrossAmount : "5"}]
+					})
+					// update is done before entry is deleted, change at index 4
+					.expectChange("isOutdated", [false,,,, false])
+					.expectChange("grossAmount", ["5",,,, "5"])
+					// after row is deleted
+					.expectChange("isOutdated", [,,, false])
 					.expectChange("isTotal", [,,, true])
 					.expectChange("level", [,,, 0])
 					.expectChange("lifecycleStatus", [, "Y", "X", null])
-					.expectChange("grossAmount", [, "2", "3", "6"])
+					.expectChange("grossAmount", [, "2", "3", "5"])
 					.expectChange("salesOrderID", [, "25", "24", null]);
 
 				return Promise.all([
@@ -24841,9 +24858,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				assert.strictEqual(oBinding.getCount(), 2);
 
 				const iBatchNo = that.iBatchNo + 1; // don't care about exact no.
-				const sGrandTotalURL = `#${iBatchNo} SalesOrderList?sap-client=123&custom=foo`
-					+ "&$apply=filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
-					+ "/aggregate(GrossAmount)";
 
 				function expect(bMessages) {
 					const sSelect = "GrossAmount,LifecycleStatus" + (bMessages ? ",Messages" : "")
@@ -24856,7 +24870,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							Note : "n/a",
 							SalesOrderID : "25"
 						})
-						.expectRequest(sGrandTotalURL, {
+						.expectRequest(`#${iBatchNo} ${sGrandTotalURL}`, {
 							value : [{GrossAmount : "11"}]
 						})
 						.expectRequest(`#${iBatchNo} SalesOrderList('24')?sap-client=123&custom=foo`
@@ -24906,7 +24920,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							LifecycleStatus : "Y*",
 							Note : "Late*"
 						})
-						.expectRequest(sGrandTotalURL, {
+						.expectRequest(`#${iBatchNo} ${sGrandTotalURL}`, {
 							value : [{GrossAmount : "11"}]
 						})
 						// requestSideEffects also reads the grand total and the outdated flags of the

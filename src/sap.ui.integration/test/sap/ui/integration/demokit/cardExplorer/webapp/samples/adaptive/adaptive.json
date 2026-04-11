@@ -1,5 +1,4 @@
 {
-	"_version": "2.0.0",
 	"sap.app": {
 		"id": "adaptivecard.embedded",
 		"type": "card",
@@ -44,7 +43,7 @@
 		"configuration": {
 			"editor": "dt/Configuration",
 			"parameters": {
-				"title": {
+				"title" : {
 					"value": "Employee ID card"
 				},
 				"subtitle": {

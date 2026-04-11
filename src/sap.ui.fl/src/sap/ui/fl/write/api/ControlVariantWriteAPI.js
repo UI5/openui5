@@ -165,9 +165,10 @@ sap.ui.define([
 	/**
 	 * Sets the variant properties and deletes a variant change.
 	 *
-	 * @param {string} sVariantManagementReference - Variant management reference
 	 * @param {object} mPropertyBag - Property bag with variant properties to be set before deleting the change
 	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
+	 * @param {string} mPropertyBag.variantManagementReference - Variant management reference
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} mPropertyBag.change - Variant change to be deleted
 	 * @param {string} [mPropertyBag.variantReference] - Variant reference for which properties should be set
 	 * @param {string} [mPropertyBag.changeType] - Change type due to which properties are being set
 	 * @param {string} [mPropertyBag.layer] - Current layer
@@ -177,16 +178,9 @@ sap.ui.define([
 	 * @param {boolean} [mPropertyBag.favorite] - New favorite value for <code>setFavorite</code> change type
 	 * @param {boolean} [mPropertyBag.executeOnSelect] - New executeOnSelect value for <code>setExecuteOnSelect</code> change type
 	 * @param {string} [mPropertyBag.defaultVariant] - New default variant for <code>setDefault</code> change type
-	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} oChange - Variant change to be deleted
 	 */
-	ControlVariantWriteAPI.deleteVariantChange = function(sVariantManagementReference, mPropertyBag, oChange) {
-		const oVariantModel = mPropertyBag.appComponent.getModel("$FlexVariants");
-		oVariantModel.setVariantProperties(sVariantManagementReference, mPropertyBag);
-		FlexObjectManager.deleteFlexObjects({
-			reference: oVariantModel.sFlexReference,
-			flexObjects: [oChange],
-			componentId: mPropertyBag.appComponent.getId()
-		});
+	ControlVariantWriteAPI.deleteVariantChange = function(mPropertyBag) {
+		VariantManager.deleteVariantChange(mPropertyBag);
 	};
 
 	/**

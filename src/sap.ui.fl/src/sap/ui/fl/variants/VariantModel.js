@@ -18,7 +18,6 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
-	"sap/ui/fl/apply/_internal/flexObjects/Variant",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/Layer",
@@ -42,7 +41,6 @@ sap.ui.define([
 	DependencyHandler,
 	VariantManagementState,
 	FlexObjectState,
-	Variant,
 	ManifestUtils,
 	Settings,
 	Layer,
@@ -53,18 +51,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var _mUShellServices = {};
 	const { SharingMode } = mobileLibrary;
-
-	/**
-	 * Saves the specified Unified Shell service on the model
-	 *
-	 * @param {string} sServiceName Name of the ushell service (e.g. "URLParsing")
-	 * @param {sap.ui.core.service.Service} oService The service object
-	 */
-	function setUShellService(sServiceName, oService) {
-		_mUShellServices[sServiceName] = oService;
-	}
 
 	function updatePersonalVariantPropertiesWithFlpSettings(oVariant) {
 		var oSettings = Settings.getInstanceOrUndef();
@@ -90,29 +77,6 @@ sap.ui.define([
 			return true;
 		}
 		return false;
-	}
-
-	function initUshellServices() {
-		var oUShellContainer = Utils.getUshellContainer();
-		if (oUShellContainer) {
-			var aServicePromises = [
-				Utils.getUShellService("UserInfo"),
-				Utils.getUShellService("URLParsing"),
-				Utils.getUShellService("Navigation"),
-				Utils.getUShellService("ShellNavigationInternal")
-			];
-			return Promise.all(aServicePromises)
-			.then(function(aServices) {
-				setUShellService("UserInfo", aServices[0]);
-				setUShellService("URLParsing", aServices[1]);
-				setUShellService("Navigation", aServices[2]);
-				setUShellService("ShellNavigationInternal", aServices[3]);
-			})
-			.catch(function(vError) {
-				throw new Error(`Error getting service from Unified Shell: ${vError}`);
-			});
-		}
-		return undefined;
 	}
 
 	function getVariant(aVariants, sVariantKey) {
@@ -236,15 +200,12 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets the necessary UShell Services and initializes the URL Handler
+	 * Initializes the URL Handler
 	 * @returns {Promise} Promise resolving when the VariantModel is initialized
 	 */
-	VariantModel.prototype.initialize = function() {
-		return Promise.all([Settings.getInstance(), initUshellServices()])
-		.then(function() {
-			// initialize hash data - variants map & model should exist at this point (set on constructor)
-			URLHandler.initialize({ model: this });
-		}.bind(this));
+	VariantModel.prototype.initialize = async function() {
+		// initialize hash data - variants map & model should exist at this point (set on constructor)
+		await URLHandler.initialize({ model: this });
 	};
 
 	/**
@@ -285,94 +246,6 @@ sap.ui.define([
 		);
 	};
 
-	/**
-	 * Sets the passed properties on a variant for the passed variant management reference and
-	 * returns the content for change creation
-	 * @param {string} sVariantManagementReference - Variant management reference
-	 * @param {object} mPropertyBag - Map of properties
-	 * @param {string} mPropertyBag.variantReference - Variant reference for which properties should be set
-	 * @param {string} mPropertyBag.changeType - Change type due to which properties are being set
-	 * @param {string} mPropertyBag.layer - Current layer
-	 * @param {string} mPropertyBag.appComponent - App component instance
-	 * @param {string} [mPropertyBag.title] - New variant title value for <code>setTitle</code> change type
-	 * @param {boolean} [mPropertyBag.visible] - New visible value for <code>setVisible</code> change type
-	 * @param {object} [mPropertyBag.contexts] - New contexts object (e.g. roles) for <code>setContexts</code> change type
-	 * @param {boolean} [mPropertyBag.favorite] - New favorite value for <code>setFavorite</code> change type
-	 * @param {boolean} [mPropertyBag.executeOnSelect] - New executeOnSelect value for <code>setExecuteOnSelect</code> change type
-	 * @param {string} [mPropertyBag.defaultVariant] - New default variant for <code>setDefault</code> change type
-	 * @returns {{title: string} | {favorite: boolean} | {executeOnSelect: boolean} | {visible: boolean, createdByReset: boolean} | {contexts: object} | {defaultVariant: string}} Additional content for change creation
-	 * @private
-	 * @ui5-restricted
-	 */
-	VariantModel.prototype.setVariantProperties = function(sVariantManagementReference, mPropertyBag) {
-		// TODO: this function needs refactoring
-		var oData = this.getData();
-		var oVariantInstance = this.getVariant(mPropertyBag.variantReference, sVariantManagementReference).instance;
-		const oVMControl = VariantUtil.getVariantManagementControlByVMReference(sVariantManagementReference, this.oAppComponent);
-
-		var mAdditionalChangeContent = {};
-
-		switch (mPropertyBag.changeType) {
-			case "setTitle":
-				oVariantInstance.setName(mPropertyBag.title, true);
-				break;
-			case "setFavorite":
-				mAdditionalChangeContent.favorite = mPropertyBag.favorite;
-				oVariantInstance.setFavorite(mPropertyBag.favorite);
-				break;
-			case "setExecuteOnSelect":
-				mAdditionalChangeContent.executeOnSelect = mPropertyBag.executeOnSelect;
-				oVariantInstance.setExecuteOnSelection(mPropertyBag.executeOnSelect);
-				break;
-			case "setVisible":
-				mAdditionalChangeContent.visible = mPropertyBag.visible;
-				// 'createdByReset' is used by the backend to distinguish between setVisible change created via reset and delete
-				mAdditionalChangeContent.createdByReset = false;
-				oVariantInstance.setVisible(mPropertyBag.visible);
-				break;
-			case "setContexts":
-				mAdditionalChangeContent.contexts = mPropertyBag.contexts;
-				oVariantInstance.setContexts(mPropertyBag.contexts);
-				break;
-			case "setDefault":
-				mAdditionalChangeContent.defaultVariant = mPropertyBag.defaultVariant;
-				// Update hash data
-				var aHashParameters = URLHandler.getStoredHashParams({ model: this });
-				if (aHashParameters && oVMControl.getUpdateVariantInURL()) {
-					if (
-						oData[sVariantManagementReference].defaultVariant !== oData[sVariantManagementReference].currentVariant
-						&& aHashParameters.indexOf(oData[sVariantManagementReference].currentVariant) === -1
-					) {
-						// if default variant is changed from the current variant, add the current variant id as a variant URI parameter
-						URLHandler.update({
-							parameters: aHashParameters.concat(oData[sVariantManagementReference].currentVariant),
-							updateURL: !this._bDesignTimeMode,
-							updateHashEntry: true,
-							model: this
-						});
-					} else if (
-						oData[sVariantManagementReference].defaultVariant === oData[sVariantManagementReference].currentVariant
-						&& aHashParameters.indexOf(oData[sVariantManagementReference].currentVariant) > -1
-					) {
-						// if current variant is now the default variant, then remove the current variant id as a variant URI parameter
-						aHashParameters.splice(aHashParameters.indexOf(oData[sVariantManagementReference].currentVariant), 1);
-						URLHandler.update({
-							parameters: aHashParameters,
-							updateURL: !this._bDesignTimeMode,
-							updateHashEntry: true,
-							model: this
-						});
-					}
-				}
-
-				break;
-			default:
-				break;
-		}
-
-		return mAdditionalChangeContent;
-	};
-
 	VariantModel.prototype._ensureStandardVariantExists = function(sVariantManagementReference) {
 		var oData = this.getData();
 		var oVMDataSection = oData[sVariantManagementReference] || {};
@@ -403,14 +276,18 @@ sap.ui.define([
 			this._bDesignTimeMode = bDesignTimeModeToBeSet;
 
 			if (bDesignTimeModeToBeSet) {
-				URLHandler.clearAllVariantURLParameters({ model: this });
+				URLHandler.clearAllVariantURLParameters({
+					flexReference: this.sFlexReference,
+					appComponent: this.oAppComponent
+				});
 			} else if (bOriginalMode && oVMControl.getUpdateVariantInURL()) {
 				// use case: switch from end user -> key user with a restart; the initial hash data is empty
 				URLHandler.update({
-					parameters: URLHandler.getStoredHashParams({ model: this }),
+					parameters: URLHandler.getStoredHashParams({ flexReference: this.sFlexReference }),
 					updateURL: true,
 					updateHashEntry: false,
-					model: this
+					flexReference: this.sFlexReference,
+					appComponent: this.oAppComponent
 				});
 			}
 		}
@@ -634,16 +511,6 @@ sap.ui.define([
 		} else {
 			this.oDestroyPromise.resolve();
 		}
-	};
-
-	/**
-	 * Returns the Unified Shell service saved on the model, if available
-	 *
-	 * @param {string} sServiceName Name of the ushell service (e.g. "UserInfo")
-	 * @returns {sap.ui.core.service.Service} The service object
-	 */
-	VariantModel.prototype.getUShellService = function(sServiceName) {
-		return Utils.getUshellContainer() && _mUShellServices[sServiceName];
 	};
 
 	return VariantModel;

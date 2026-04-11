@@ -229,50 +229,18 @@ sap.ui.define([
 
 		QUnit.test("When deleteVariantChange is called", function(assert) {
 			const mPropertyBag = {
-				appComponent: oAppComponent
-			};
-			const oChange = createChanges(["change1"], sReference)[0];
-			const oVariant = createVariant({
-				fileName: "variant1",
-				reference: sReference,
+				appComponent: oAppComponent,
 				variantManagementReference: sVMReference,
-				title: "Variant 1"
-			});
-			this.oModel = new VariantModel({}, {
-				appComponent: oAppComponent
-			});
-			sandbox.stub(this.oModel, "setVariantProperties").returns(oVariant);
-			oAppComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-			const oDeleteFlexObjectsStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
-
-			ControlVariantWriteAPI.deleteVariantChange(sVMReference, mPropertyBag, oChange);
-
-			assert.strictEqual(
-				this.oModel.setVariantProperties.calledOnceWith(sVMReference, mPropertyBag),
-				true,
-				"then variant properties are set"
-			);
-			assert.strictEqual(
-				oDeleteFlexObjectsStub.calledOnceWith({
-					reference: sReference,
-					flexObjects: [oChange],
-					componentId: "myFlexReference"
-				}),
-				true,
-				"then change is deleted"
-			);
-		});
-
-		QUnit.test("When deleteVariantChange is called without variant model", function(assert) {
-			const mPropertyBag = {
-				appComponent: oAppComponent
+				change: { fileName: "change1" }
 			};
-			const oChange = { fileName: "change1" };
-			sandbox.stub(oAppComponent, "getModel").returns(null);
+			const oDeleteVariantChangeStub = sandbox.stub(VariantManager, "deleteVariantChange");
 
-			assert.throws(function() {
-				ControlVariantWriteAPI.deleteVariantChange(sVMReference, mPropertyBag, oChange);
-			}, "then an error is thrown when variant model is not available");
+			ControlVariantWriteAPI.deleteVariantChange(mPropertyBag);
+
+			assert.ok(
+				oDeleteVariantChangeStub.calledOnceWith(mPropertyBag),
+				"then VariantManager.deleteVariantChange is called with correct parameters"
+			);
 		});
 
 		QUnit.test("When eraseDirtyChangesOnVariant is called", async function(assert) {

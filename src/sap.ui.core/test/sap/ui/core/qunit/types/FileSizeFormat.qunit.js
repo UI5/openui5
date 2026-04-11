@@ -3,12 +3,11 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/base/i18n/Formatting",
 	"sap/base/i18n/Localization",
-	"sap/ui/core/Lib",
 	"sap/ui/core/Locale",
 	"sap/ui/core/LocaleData",
 	"sap/ui/core/format/FileSizeFormat",
 	"sap/ui/core/format/NumberFormat"
-], function (Log, Formatting, Localization, Lib, Locale, LocaleData, FileSizeFormat, NumberFormat) {
+], function (Log, Formatting, Localization, Locale, LocaleData, FileSizeFormat, NumberFormat) {
 	"use strict";
 
 	var oFormatBinary = FileSizeFormat.getInstance({ binaryFilesize: true, maxFractionDigits: 2 }, new Locale("en"));
@@ -23,7 +22,7 @@ sap.ui.define([
 
 	function extractUnits(names) {
 		return names.map(function (name) {
-			var sPattern = oFormatDefault.oBundle.getText("FileSize." + name);
+			var sPattern = oFormatDefault.oLocaleData.getFileSizePattern(name);
 			// trim the string
 			var sName = sPattern.split("{0}")[1].trim();
 			return sName;
@@ -209,7 +208,6 @@ sap.ui.define([
 		this.mock(LocaleData).expects("getInstance").withExactArgs(sinon.match.same(oLocale)).returns("~oLocaleData");
 		this.mock(NumberFormat).expects("getFloatInstance").withExactArgs("~oFormatOptions", sinon.match.same(oLocale))
 			.returns("~oNumberFormat");
-		this.mock(Lib).expects("getResourceBundleFor").withExactArgs("sap.ui.core", "~locale").returns("~oBundle");
 
 		// code under test
 		const oFormat = FileSizeFormat.createInstance("~oFormatOptions", oLocale);
@@ -218,7 +216,6 @@ sap.ui.define([
 		assert.strictEqual(oFormat.oLocale, oLocale);
 		assert.strictEqual(oFormat.oLocaleData, "~oLocaleData");
 		assert.strictEqual(oFormat.oNumberFormat, "~oNumberFormat");
-		assert.strictEqual(oFormat.oBundle, "~oBundle");
 		assert.strictEqual(oFormat.bBinary, false);
 	});
 
@@ -228,7 +225,6 @@ sap.ui.define([
 		this.mock(LocaleData).expects("getInstance").withExactArgs(sinon.match.same(oLocale)).returns("~oLocaleData");
 		this.mock(NumberFormat).expects("getFloatInstance").withExactArgs(undefined, sinon.match.same(oLocale))
 			.returns("~oNumberFormat");
-		this.mock(Lib).expects("getResourceBundleFor").withExactArgs("sap.ui.core", "en").returns("~oBundle");
 
 		// code under test
 		const oFormat = FileSizeFormat.createInstance(oLocale);
@@ -237,7 +233,6 @@ sap.ui.define([
 		assert.strictEqual(oFormat.oLocale, oLocale);
 		assert.strictEqual(oFormat.oLocaleData, "~oLocaleData");
 		assert.strictEqual(oFormat.oNumberFormat, "~oNumberFormat");
-		assert.strictEqual(oFormat.oBundle, "~oBundle");
 		assert.strictEqual(oFormat.bBinary, false);
 	});
 
@@ -255,7 +250,6 @@ sap.ui.define([
 		this.mock(NumberFormat).expects("getFloatInstance")
 			.withExactArgs(sinon.match.same(oFormatOptions), sinon.match((oLocale0) => oLocale0 === oLocale))
 			.returns("~oNumberFormat");
-		this.mock(Lib).expects("getResourceBundleFor").withExactArgs("sap.ui.core", "en").returns("~oBundle");
 
 		// code under test
 		const oFormat = FileSizeFormat.createInstance(oFormatOptions);
@@ -264,7 +258,6 @@ sap.ui.define([
 		assert.strictEqual(oFormat.oLocale, oLocale);
 		assert.strictEqual(oFormat.oLocaleData, "~oLocaleData");
 		assert.strictEqual(oFormat.oNumberFormat, "~oNumberFormat");
-		assert.strictEqual(oFormat.oBundle, "~oBundle");
 		assert.strictEqual(oFormat.bBinary, true);
 	});
 });

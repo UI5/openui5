@@ -1,19 +1,6 @@
 {
-	"_version": "2.0.0",
 	"sap.app": {
-		"id": "card.explorer.landingPage",
-		"title": "'landingPage'",
-		"applicationVersion": {
-			"version": "1.0.0"
-		}
-	},
-	"sap.ui": {
-		"technology": "UI5",
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
-		}
+		"id": "card.explorer.landingPage"
 	},
 	"sap.card": {
 		"type": "Object",

@@ -2018,6 +2018,20 @@ sap.ui.define([
 		},
 
 		/**
+		 * Gets the locale-specific file size format pattern for the given unit.
+		 *
+		 * @param {string} sUnit
+		 *   The file size unit key
+		 * @returns {string} The format pattern
+		 *
+		 * @public
+		 * @since 1.147.0
+		 */
+		getFileSizePattern: function(sUnit) {
+			return this._get("sap-fileSize", sUnit);
+		},
+
+		/**
 		 * Whether 1 January is the first day of the first calendar week.
 		 * This is the definition of the calendar week in the US.
 		 *

@@ -1,11 +1,13 @@
 /* global QUnit */
 sap.ui.define([
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/Layer",
 	"sap/ui/rta/util/whatsNew/whatsNewContent/WhatsNewFeatures",
 	"sap/ui/rta/util/whatsNew/WhatsNewUtils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	FlexRuntimeInfoAPI,
+	Layer,
 	WhatsNewFeatures,
 	WhatsNewUtils,
 	sinon
@@ -129,6 +131,24 @@ sap.ui.define([
 			aFilteredFeatures.map((oFeature) => oFeature.featureId).includes("feature3"),
 			true,
 			"Feature without isFeatureApplicable function is included in the filtered result"
+		);
+	});
+
+	QUnit.test("getFilteredFeatures should pass layer to isFeatureApplicable", async function(assert) {
+		const oIsFeatureApplicableStub = sandbox.stub().resolves(true);
+		sandbox.stub(WhatsNewFeatures, "getAllFeatures").returns([
+			{
+				featureId: "feature1",
+				isFeatureApplicable: oIsFeatureApplicableStub
+			}
+		]);
+
+		await WhatsNewUtils.getFilteredFeatures([], Layer.CUSTOMER);
+		assert.strictEqual(oIsFeatureApplicableStub.callCount, 1, "isFeatureApplicable is called exactly once");
+		assert.strictEqual(
+			oIsFeatureApplicableStub.firstCall.args[0],
+			Layer.CUSTOMER,
+			"isFeatureApplicable of first feature is called with the correct layer"
 		);
 	});
 });

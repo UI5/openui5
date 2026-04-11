@@ -196,10 +196,12 @@ sap.ui.define([
 			mChangeSpecificData = merge({}, mChangeSpecificData, mFlexSettings);
 		}
 		mChangeSpecificData.jsOnly = this.getJsOnly();
-		const oModel = this.getAppComponent().getModel(ControlVariantApplyAPI.getVariantModelName());
 		let sVariantReference;
-		if (oModel && sVariantManagementReference) {
-			sVariantReference = oModel.getCurrentVariantReference(sVariantManagementReference);
+		if (sVariantManagementReference) {
+			sVariantReference = ControlVariantApplyAPI.getCurrentVariantReference({
+				vmReference: sVariantManagementReference,
+				control: this.getAppComponent()
+			});
 		}
 		if (sVariantReference && !this.getVariantIndependent()) {
 			const mVariantObj = {
