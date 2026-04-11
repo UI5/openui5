@@ -6458,5 +6458,25 @@
 		"narrow": "KS {0}",
 		"wide": "Kalendorinė savaitė {0}"
 	},
-	"sap-datePlaceholder": "pvz., {0}"
+	"sap-datePlaceholder": "pvz., {0}",
+	"sap-fileSize": {
+		"Byte": "{0} baitas",
+		"Bytes": "{0} baitų",
+		"Kilobyte": "{0} KB",
+		"Megabyte": "{0} MB",
+		"Gigabyte": "{0} GB",
+		"Terabyte": "{0} TB",
+		"Petabyte": "{0} PB",
+		"Exabyte": "{0} EB",
+		"Zettabyte": "{0} ZB",
+		"Yottabyte": "{0} YB",
+		"Kibibyte": "{0} KiB",
+		"Mebibyte": "{0} MiB",
+		"Gibibyte": "{0} GiB",
+		"Tebibyte": "{0} TiB",
+		"Pebibyte": "{0} PiB",
+		"Exbibyte": "{0} EiB",
+		"Zebibyte": "{0} ZiB",
+		"Yobibyte": "{0} YiB"
+	}
 }

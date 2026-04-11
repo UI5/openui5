@@ -6236,5 +6236,25 @@
 		"narrow": "КА {0}",
 		"wide": "Күнтізбелік апта {0}"
 	},
-	"sap-datePlaceholder": "мысалы, {0}"
+	"sap-datePlaceholder": "мысалы, {0}",
+	"sap-fileSize": {
+		"Byte": "{0} байт",
+		"Bytes": "{0} байттар",
+		"Kilobyte": "{0} Кбайт",
+		"Megabyte": "{0} Мбайт",
+		"Gigabyte": "{0} Гбайт",
+		"Terabyte": "{0} Тбайт",
+		"Petabyte": "{0} Пбайт",
+		"Exabyte": "{0} Эбайт",
+		"Zettabyte": "{0} Збайт",
+		"Yottabyte": "{0} Йбайт",
+		"Kibibyte": "{0} КиБ",
+		"Mebibyte": "{0} МиБ",
+		"Gibibyte": "{0} ГиБ",
+		"Tebibyte": "{0} ТиБ",
+		"Pebibyte": "{0} ПиБ",
+		"Exbibyte": "{0} ЭиБ",
+		"Zebibyte": "{0} ЗиБ",
+		"Yobibyte": "{0} ЙиБ"
+	}
 }

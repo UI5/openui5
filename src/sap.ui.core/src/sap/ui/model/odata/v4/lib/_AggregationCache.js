@@ -123,7 +123,8 @@ sap.ui.define([
 
 		return SyncPromise.all([
 			this.oRequestor.request("DELETE", sEditUrl, oGroupLock, {"If-Match" : oElement}),
-			this.readCount(oGroupLock)
+			this.readCount(oGroupLock),
+			this.readGrandTotal(oGroupLock)
 		]).then(() => {
 			this.oTreeState.delete(oElement);
 			if (this.aElements.length === 0) {

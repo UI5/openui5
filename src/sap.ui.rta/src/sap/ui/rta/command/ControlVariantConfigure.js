@@ -97,23 +97,24 @@ sap.ui.define([
 	};
 
 	function removeVariantChanges() {
-		this.getChanges().forEach((mChangeProperties, index) => {
+		this.getChanges().forEach((mChangeProperties, iIndex) => {
 			const mPropertyBag = {
-				appComponent: this.oAppComponent
+				appComponent: this.oAppComponent,
+				variantManagementReference: this.sVariantManagementReference,
+				change: this._aPreparedChanges[iIndex]
 			};
 			Object.keys(mChangeProperties).forEach(function(sProperty) {
-				const sOriginalProperty = `original${sProperty.charAt(0).toUpperCase()}${sProperty.substr(1)}`;
+				const sOriginalProperty = `original${sProperty.charAt(0).toUpperCase()}${sProperty.substring(1)}`;
 				if (sProperty === "visible") {
 					mPropertyBag[sProperty] = true; /* visibility of the variant always set back to true on undo */
 				} else if (mChangeProperties[sOriginalProperty]) {
 					mPropertyBag[sProperty] = mChangeProperties[sOriginalProperty];
 					mPropertyBag[sOriginalProperty] = mChangeProperties[sProperty];
-				} else if (sProperty.indexOf("original") === -1) {
+				} else if (!sProperty.includes("original")) {
 					mPropertyBag[sProperty] = mChangeProperties[sProperty];
 				}
 			});
-			const oChange = this._aPreparedChanges[index];
-			ControlVariantWriteAPI.deleteVariantChange(this.sVariantManagementReference, mPropertyBag, oChange);
+			ControlVariantWriteAPI.deleteVariantChange(mPropertyBag);
 		});
 		this._aPreparedChanges = null;
 	}

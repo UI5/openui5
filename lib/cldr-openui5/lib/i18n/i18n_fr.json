@@ -14,5 +14,79 @@
   "date.placeholder" : {
     "comment" : "XTXT: Placeholder text for input control with a sample value such as date or time; demo output \"e.g. 31/12/2022\" (translation must contain an abbreviated form of \"for example\" such as the English \"e.g.\" to keep the placeholder short)",
     "text" : "Par exemple \\: {0}"
+  },
+  "FileSize" : {
+    "Byte" : {
+      "comment" : "YMSG,20: File Size Unit one Byte",
+      "text" : "{0} octet"
+    },
+    "Bytes" : {
+      "comment" : "YMSG,20: File Size Unit Bytes",
+      "text" : "{0} octets"
+    },
+    "Kilobyte" : {
+      "comment" : "YMSG,20: File Size Unit Kilobyte (short)",
+      "text" : "{0} Ko"
+    },
+    "Megabyte" : {
+      "comment" : "YMSG,20: File Size Unit Megabyte (short)",
+      "text" : "{0} Mo"
+    },
+    "Gigabyte" : {
+      "comment" : "YMSG,20: File Size Unit Gigabyte (short)",
+      "text" : "{0} Go"
+    },
+    "Terabyte" : {
+      "comment" : "YMSG,20: File Size Unit Terabyte (short)",
+      "text" : "{0} To"
+    },
+    "Petabyte" : {
+      "comment" : "YMSG,20: File Size Unit Petabyte (short)",
+      "text" : "{0} Po"
+    },
+    "Exabyte" : {
+      "comment" : "YMSG,20: File Size Unit Exabyte (short)",
+      "text" : "{0} Eo"
+    },
+    "Zettabyte" : {
+      "comment" : "YMSG,20: File Size Unit Zettabyte (short)",
+      "text" : "{0} Zo"
+    },
+    "Yottabyte" : {
+      "comment" : "YMSG,20: File Size Unit Yottabyte (short)",
+      "text" : "{0} Yo"
+    },
+    "Kibibyte" : {
+      "comment" : "YMSG,20: File Size Unit Kibibyte (short)",
+      "text" : "{0} Kio"
+    },
+    "Mebibyte" : {
+      "comment" : "YMSG,20: File Size Unit Mebibyte (short)",
+      "text" : "{0} Mio"
+    },
+    "Gibibyte" : {
+      "comment" : "YMSG,20: File Size Unit Gibibyte (short)",
+      "text" : "{0} Gio"
+    },
+    "Tebibyte" : {
+      "comment" : "YMSG,20: File Size Unit Tebibyte (short)",
+      "text" : "{0} Tio"
+    },
+    "Pebibyte" : {
+      "comment" : "YMSG,20: File Size Unit Pebibyte (short)",
+      "text" : "{0} Pio"
+    },
+    "Exbibyte" : {
+      "comment" : "YMSG,20: File Size Unit Exbibyte (short)",
+      "text" : "{0} Eio"
+    },
+    "Zebibyte" : {
+      "comment" : "YMSG,20: File Size Unit Zebibyte (short)",
+      "text" : "{0} Zio"
+    },
+    "Yobibyte" : {
+      "comment" : "YMSG,20: File Size Unit Yobibyte (short)",
+      "text" : "{0} Yio"
+    }
   }
 }

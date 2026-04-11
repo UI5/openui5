@@ -8,6 +8,8 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
+	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
+	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
@@ -23,6 +25,7 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
 	"sap/ui/fl/write/_internal/flexState/changes/UIChangeManager",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
+	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/ui/fl/write/api/FeaturesAPI",
 	"sap/ui/fl/write/api/VersionsAPI",
 	"sap/ui/fl/Layer",
@@ -37,6 +40,8 @@ sap.ui.define([
 	Control,
 	Applier,
 	Reverter,
+	URLHandler,
+	VariantUtil,
 	FlexObjectFactory,
 	DependencyHandler,
 	VariantManagementState,
@@ -52,6 +57,7 @@ sap.ui.define([
 	ControlVariantWriteUtils,
 	UIChangeManager,
 	FlexObjectManager,
+	ContextBasedAdaptationsAPI,
 	FeaturesAPI,
 	VersionsAPI,
 	Layer,
@@ -658,10 +664,8 @@ sap.ui.define([
 			var oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves({
 				response: [{ fileName: "change1" }, { fileName: "change2" }, { fileName: "change3" }]
 			});
-			var oSetVariantPropertiesSpy = sandbox.spy(this.oModel, "setVariantProperties");
 
 			await VariantManager.handleSaveEvent(this.oVMControl, oParameters, this.oModel);
-			assert.ok(oSetVariantPropertiesSpy.notCalled, "SetVariantProperties is not called");
 			assert.ok(oSaveStub.calledOnce, "SaveAll is called");
 			oSaveStub.getCall(0).args[0].flexObjects.forEach((oChange) => {
 				assert.equal(oChange.getLayer(), Layer.PUBLIC, "layer of dirty change is PUBLIC layer when source variant is PUBLIC");
@@ -859,6 +863,75 @@ sap.ui.define([
 				oCheckUpdateStub.calledWith({ reference: sFlexReference }),
 				"then the invalidate method was called for the reference"
 			);
+		});
+
+		[true, false].forEach(function(bUpdateVariantInURL) {
+			const sTitle = `when calling 'createVariantChange' for 'setDefault' with different current and default variants ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
+			QUnit.test(sTitle, function(assert) {
+				const oMockVMControl = {
+					getUpdateVariantInURL() { return bUpdateVariantInURL; },
+					getDesignMode() { return true; }
+				};
+				sandbox.stub(VariantUtil, "getVariantManagementControlByVMReference").returns(oMockVMControl);
+				sandbox.stub(URLHandler, "getStoredHashParams").returns([]);
+				sandbox.stub(URLHandler, "update");
+				sandbox.stub(VariantManagementState, "getCurrentVariantReference").returns("currentVariant");
+				sandbox.stub(ContextBasedAdaptationsAPI, "hasAdaptationsModel").returns(false);
+
+				VariantManager.createVariantChange(sVMReference, {
+					changeType: "setDefault",
+					defaultVariant: "variant1",
+					layer: Layer.CUSTOMER,
+					appComponent: oComponent
+				});
+
+				if (bUpdateVariantInURL) {
+					assert.ok(URLHandler.update.calledOnce, "then URLHandler.update() was called");
+					assert.deepEqual(URLHandler.update.firstCall.args[0], {
+						parameters: ["currentVariant"],
+						updateURL: false,
+						updateHashEntry: true,
+						flexReference: sReference,
+						appComponent: oComponent
+					}, "then URLHandler.update() called with the current variant added as a parameter in design time mode");
+				} else {
+					assert.ok(URLHandler.update.notCalled, "then URLHandler.update() was not called");
+				}
+			});
+
+			const sTitle2 = `when calling 'createVariantChange' for 'setDefault' with same current and default variants ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
+			QUnit.test(sTitle2, function(assert) {
+				const oMockVMControl = {
+					getUpdateVariantInURL() { return bUpdateVariantInURL; },
+					getDesignMode() { return false; }
+				};
+				sandbox.stub(VariantUtil, "getVariantManagementControlByVMReference").returns(oMockVMControl);
+				// current variant is already in hash parameters
+				sandbox.stub(URLHandler, "getStoredHashParams").returns(["currentVariant"]);
+				sandbox.stub(URLHandler, "update");
+				sandbox.stub(VariantManagementState, "getCurrentVariantReference").returns("currentVariant");
+				sandbox.stub(ContextBasedAdaptationsAPI, "hasAdaptationsModel").returns(false);
+
+				VariantManager.createVariantChange(sVMReference, {
+					changeType: "setDefault",
+					defaultVariant: "currentVariant",
+					layer: Layer.CUSTOMER,
+					appComponent: oComponent
+				});
+
+				if (bUpdateVariantInURL) {
+					assert.ok(URLHandler.update.calledOnce, "then URLHandler.update() was called");
+					assert.deepEqual(URLHandler.update.firstCall.args[0], {
+						parameters: [],
+						updateURL: true,
+						updateHashEntry: true,
+						flexReference: sReference,
+						appComponent: oComponent
+					}, "then URLHandler.update() called with the current variant removed as a parameter in personalization mode");
+				} else {
+					assert.ok(URLHandler.update.notCalled, "then URLHandler.update() was not called");
+				}
+			});
 		});
 
 		QUnit.test("when calling 'openManageVariantsDialog' in Adaptation mode with changes", function(assert) {

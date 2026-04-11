@@ -6805,5 +6805,25 @@
 		"narrow": "КТ {0}",
 		"wide": "Календарний тиждень {0}"
 	},
-	"sap-datePlaceholder": "наприклад, {0}"
+	"sap-datePlaceholder": "наприклад, {0}",
+	"sap-fileSize": {
+		"Byte": "{0} байт",
+		"Bytes": "{0} байти",
+		"Kilobyte": "{0} КБ",
+		"Megabyte": "{0} МБ",
+		"Gigabyte": "{0} ГБ",
+		"Terabyte": "{0} ТБ",
+		"Petabyte": "{0} ПБ",
+		"Exabyte": "{0} ЕБ",
+		"Zettabyte": "{0} ЗБ",
+		"Yottabyte": "{0} ЙБ",
+		"Kibibyte": "{0} КіБ",
+		"Mebibyte": "{0} МіБ",
+		"Gibibyte": "{0} ГиБ",
+		"Tebibyte": "{0} ТіБ",
+		"Pebibyte": "{0} ПіБ",
+		"Exbibyte": "{0} ЕіБ",
+		"Zebibyte": "{0} ЗіБ",
+		"Yobibyte": "{0} ЙіБ"
+	}
 }

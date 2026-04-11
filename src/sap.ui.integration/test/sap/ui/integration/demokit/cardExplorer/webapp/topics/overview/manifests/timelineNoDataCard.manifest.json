@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "1.14.0",
 	"sap.app": {
 		"id": "card.explorer.analytical.bubble.card",
 		"type": "card",
@@ -30,7 +30,7 @@
 					"size": "Auto"
 				}
 			},
-			"childCards": {
+            "childCards": {
 				"teamMembersCard": {
 					"manifest": "./teamMembersNoDataSnackCard.manifest.json"
 				}
@@ -61,7 +61,7 @@
 				"highlight": "{= ${Discontinued} ? 'Error' : 'Success'}"
 			}
 		},
-		"footer": {
+        "footer": {
 			"actionsStrip": [
 				{
 					"text": "Manage Team",

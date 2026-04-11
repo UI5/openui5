@@ -6174,5 +6174,25 @@
 		"narrow": "КН {0}",
 		"wide": "Календарска недела {0}"
 	},
-	"sap-datePlaceholder": "пример {0}"
+	"sap-datePlaceholder": "пример {0}",
+	"sap-fileSize": {
+		"Byte": "{0} Бајт",
+		"Bytes": "{0} бајти",
+		"Kilobyte": "{0} KB (килобајти)",
+		"Megabyte": "{0} MB (мегабајти)",
+		"Gigabyte": "{0} GB (гигабајти)",
+		"Terabyte": "{0} TB (терабајти)",
+		"Petabyte": "{0} PB (петабајти)",
+		"Exabyte": "{0} EB (ескабајти)",
+		"Zettabyte": "{0}ZB (зетабајти)",
+		"Yottabyte": "{0} YB (јотабајти)",
+		"Kibibyte": "{0} KiB (кибибајти)",
+		"Mebibyte": "{0} MiB (мебибајти)",
+		"Gibibyte": "{0} GiB (гибибајти)",
+		"Tebibyte": "{0} TiB (тебибајти)",
+		"Pebibyte": "{0} PiB (пебибајти)",
+		"Exbibyte": "{0} EiB (ексбибајти)",
+		"Zebibyte": "{0} ZiB (зебибајти)",
+		"Yobibyte": "{0} YiB (јобибајти)"
+	}
 }

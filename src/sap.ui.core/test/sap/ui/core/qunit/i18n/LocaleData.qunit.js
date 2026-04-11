@@ -1262,6 +1262,17 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("getFileSizePattern", function (assert) {
+		const oLocaleData = {_get() {}};
+		this.mock(oLocaleData).expects("_get")
+			.withExactArgs("sap-fileSize", "Kilobyte")
+			.returns("{0} KB");
+
+		// code under test
+		assert.strictEqual(LocaleData.prototype.getFileSizePattern.call(oLocaleData, "Kilobyte"), "{0} KB");
+	});
+
+	//*********************************************************************************************
 	QUnit.test("_resetLocaleDataCache", function(assert) {
 		LocaleData._resetLocaleDataCache();
 		const oLoadResourceSpy = this.spy(LoaderExtensions, "loadResource");

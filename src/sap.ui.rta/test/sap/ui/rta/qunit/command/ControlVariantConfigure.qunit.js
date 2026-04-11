@@ -1,7 +1,6 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/base/util/restricted/_omit",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/write/api/ControlVariantWriteAPI",
@@ -11,7 +10,6 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
-	_omit,
 	ControlVariantApplyAPI,
 	VariantManagement,
 	ControlVariantWriteAPI,
@@ -48,12 +46,6 @@ sap.ui.define([
 				variantReference: "variant0",
 				generator: rtaLibrary.GENERATOR_NAME
 			};
-			const oTitleUndoChange = {
-				...oTitleChange,
-				generator: rtaLibrary.GENERATOR_NAME,
-				originalTitle: "test",
-				title: "variant A"
-			};
 			const oFavoriteChange = {
 				changeType: "setFavorite",
 				favorite: false,
@@ -62,12 +54,6 @@ sap.ui.define([
 				variantReference: "variant0",
 				generator: rtaLibrary.GENERATOR_NAME
 			};
-			const oFavoriteUndoChange = {
-				...oFavoriteChange,
-				generator: rtaLibrary.GENERATOR_NAME,
-				originalFavorite: false,
-				favorite: true
-			};
 			const oVisibleChange = {
 				changeType: "setVisible",
 				layer: Layer.CUSTOMER,
@@ -75,7 +61,6 @@ sap.ui.define([
 				visible: false,
 				generator: rtaLibrary.GENERATOR_NAME
 			};
-			const oVisibleUndoChange = { ...oVisibleChange, generator: rtaLibrary.GENERATOR_NAME, visible: true };
 			const oContextsChange = {
 				changeType: "setContexts",
 				layer: Layer.CUSTOMER,
@@ -84,12 +69,6 @@ sap.ui.define([
 				originalContexts: { role: ["OGROLE1", "OGROLE2"], country: ["OR"] },
 				generator: rtaLibrary.GENERATOR_NAME
 			};
-			const oContextsUndoChange = {
-				...oContextsChange,
-				generator: rtaLibrary.GENERATOR_NAME,
-				originalContexts: { role: ["ROLE1", "ROLE2"], country: ["DE", "IT"] },
-				contexts: { role: ["OGROLE1", "OGROLE2"], country: ["OR"] }
-			};
 			const oDefaultChange = {
 				changeType: "setDefault",
 				defaultVariant: "variantMgmtId1",
@@ -97,12 +76,6 @@ sap.ui.define([
 				originalDefaultVariant: "variant0",
 				variantManagementReference: "variantMgmtId1",
 				generator: rtaLibrary.GENERATOR_NAME
-			};
-			const oDefaultUndoChange = {
-				...oDefaultChange,
-				generator: rtaLibrary.GENERATOR_NAME,
-				originalDefaultVariant: "variantMgmtId1",
-				defaultVariant: "variant0"
 			};
 			const aChanges = [oTitleChange, oFavoriteChange, oVisibleChange, oContextsChange, oDefaultChange];
 
@@ -158,23 +131,62 @@ sap.ui.define([
 			);
 			assert.strictEqual(this.oDeleteVariantChangeStub.callCount, 5, "all changes got removed");
 			assert.deepEqual(
-				_omit(this.oDeleteVariantChangeStub.getCall(0).args[1], "appComponent"), oTitleUndoChange,
+				this.oDeleteVariantChangeStub.getCall(0).args[0],
+				{
+					...oTitleChange,
+					originalTitle: "test",
+					title: "variant A",
+					appComponent: oMockedAppComponent,
+					variantManagementReference: "variantMgmtId1",
+					change: oTitleChange
+				},
 				"the change was correctly removed"
 			);
 			assert.deepEqual(
-				_omit(this.oDeleteVariantChangeStub.getCall(1).args[1], "appComponent"), oFavoriteUndoChange,
+				this.oDeleteVariantChangeStub.getCall(1).args[0],
+				{
+					...oFavoriteChange,
+					originalFavorite: false,
+					favorite: true,
+					appComponent: oMockedAppComponent,
+					variantManagementReference: "variantMgmtId1",
+					change: oFavoriteChange
+				},
 				"the change was correctly removed"
 			);
 			assert.deepEqual(
-				_omit(this.oDeleteVariantChangeStub.getCall(2).args[1], "appComponent"), oVisibleUndoChange,
+				this.oDeleteVariantChangeStub.getCall(2).args[0],
+				{
+					...oVisibleChange,
+					visible: true,
+					appComponent: oMockedAppComponent,
+					variantManagementReference: "variantMgmtId1",
+					change: oVisibleChange
+				},
 				"the change was correctly removed"
 			);
 			assert.deepEqual(
-				_omit(this.oDeleteVariantChangeStub.getCall(3).args[1], "appComponent"), oContextsUndoChange,
+				this.oDeleteVariantChangeStub.getCall(3).args[0],
+				{
+					...oContextsChange,
+					originalContexts: { role: ["ROLE1", "ROLE2"], country: ["DE", "IT"] },
+					contexts: { role: ["OGROLE1", "OGROLE2"], country: ["OR"] },
+					appComponent: oMockedAppComponent,
+					variantManagementReference: "variantMgmtId1",
+					change: oContextsChange
+				},
 				"the change was correctly removed"
 			);
 			assert.deepEqual(
-				_omit(this.oDeleteVariantChangeStub.getCall(4).args[1], "appComponent"), oDefaultUndoChange,
+				this.oDeleteVariantChangeStub.getCall(4).args[0],
+				{
+					...oDefaultChange,
+					originalDefaultVariant: "variantMgmtId1",
+					defaultVariant: "variant0",
+					appComponent: oMockedAppComponent,
+					variantManagementReference: "variantMgmtId1",
+					change: oDefaultChange
+				},
 				"the change was correctly removed"
 			);
 			assert.notOk(oConfigureCommand.getPreparedChange(), "the prepared changes got removed");

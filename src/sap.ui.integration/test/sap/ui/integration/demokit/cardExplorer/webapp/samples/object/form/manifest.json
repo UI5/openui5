@@ -1,5 +1,4 @@
 {
-	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.object.form",
 		"type": "card",
@@ -58,23 +57,10 @@
 					}
 				],
 				"statusOptions": [
-					{
-						"key": "active",
-						"text": "Active"
-					},
-					{
-						"key": "inactive",
-						"text": "Inactive"
-					},
-					{
-						"key": "vacation",
-						"text": "On Vacation"
-					},
-					{
-						"key": "sick",
-						"text": "Sick Leave",
-						"enabled": false
-					}
+					{ "key": "active", "text": "Active" },
+					{ "key": "inactive", "text": "Inactive" },
+					{ "key": "vacation", "text": "On Vacation" },
+					{ "key": "sick", "text": "Sick Leave", "enabled": false }
 				]
 			}
 		},

@@ -6438,5 +6438,25 @@
 		"narrow": "KV {0}",
 		"wide": "Kalenteriviikko {0}"
 	},
-	"sap-datePlaceholder": "Esimerkiksi {0}"
+	"sap-datePlaceholder": "Esimerkiksi {0}",
+	"sap-fileSize": {
+		"Byte": "{0} tavu",
+		"Bytes": "{0} tavua",
+		"Kilobyte": "{0} kB",
+		"Megabyte": "{0} MB",
+		"Gigabyte": "{0} GB",
+		"Terabyte": "{0} TB",
+		"Petabyte": "{0} PB",
+		"Exabyte": "{0} EB",
+		"Zettabyte": "{0} ZB",
+		"Yottabyte": "{0} YB",
+		"Kibibyte": "{0} kB",
+		"Mebibyte": "{0} MB",
+		"Gibibyte": "{0} GiB",
+		"Tebibyte": "{0} TB",
+		"Pebibyte": "{0} PB",
+		"Exbibyte": "{0} EB",
+		"Zebibyte": "{0} ZB",
+		"Yobibyte": "{0} YB"
+	}
 }

@@ -7354,5 +7354,25 @@
 		"narrow": "أسبوع التقويم {0}",
 		"wide": "أسبوع التقويم {0}"
 	},
-	"sap-datePlaceholder": "على سبيل المثال {0}"
+	"sap-datePlaceholder": "على سبيل المثال {0}",
+	"sap-fileSize": {
+		"Byte": "{0} بايت",
+		"Bytes": "{0} وحدات بايت",
+		"Kilobyte": "{0} كيلو بايت",
+		"Megabyte": "{0} ميجا بايت",
+		"Gigabyte": "{0} جيجا بايت",
+		"Terabyte": "{0} تريليون بايت",
+		"Petabyte": "{0} بيتا بايت",
+		"Exabyte": "{0} إكسا بايت",
+		"Zettabyte": "{0} زيتا بايت",
+		"Yottabyte": "{0} يوتا بايت",
+		"Kibibyte": "{0} الكيبيبايت",
+		"Mebibyte": "{0} مبيبايت",
+		"Gibibyte": "{0} جيبي بايت",
+		"Tebibyte": "{0} كي بي بايت",
+		"Pebibyte": "{0} بي بي بايت",
+		"Exbibyte": "{0} إكس بي بايت",
+		"Zebibyte": "{0} زي بي بايت",
+		"Yobibyte": "{0} يو بي بايت"
+	}
 }

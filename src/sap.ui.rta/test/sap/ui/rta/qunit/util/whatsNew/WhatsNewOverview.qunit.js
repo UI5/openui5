@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/Fragment",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/Layer",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/rta/util/whatsNew/whatsNewContent/WhatsNewFeatures",
 	"sap/ui/rta/util/whatsNew/WhatsNewOverview",
@@ -15,6 +16,7 @@ sap.ui.define([
 	Element,
 	Fragment,
 	FlexRuntimeInfoAPI,
+	Layer,
 	nextUIUpdate,
 	WhatsNewFeatures,
 	WhatsNewOverview,
@@ -59,8 +61,9 @@ sap.ui.define([
 	QUnit.module("Basic What's New Overview Functionality", {
 		async beforeEach() {
 			this.oFeaturesStub = sandbox.stub(WhatsNewFeatures, "getAllFeatures").returns(aFeatureCollection);
+			this.oGetFilteredFeaturesSpy = sandbox.spy(WhatsNewUtils, "getFilteredFeatures");
 			this.oRedirectStub = sandbox.stub(mLibrary.URLHelper, "redirect");
-			this.oWhatsNewOverviewDialog = await WhatsNewOverview.openWhatsNewOverviewDialog();
+			this.oWhatsNewOverviewDialog = await WhatsNewOverview.openWhatsNewOverviewDialog(Layer.CUSTOMER);
 			await nextUIUpdate();
 		},
 		afterEach() {
@@ -75,6 +78,12 @@ sap.ui.define([
 			assert.strictEqual(aFeatures.length, 2, "all features are loaded");
 			assert.ok(this.oWhatsNewOverviewDialog.getContent()[0].isActive(), "the first page is active");
 			assert.strictEqual(this.oWhatsNewOverviewDialog.getContent()[0].getItems().length, 2, "the items are set correctly");
+			assert.strictEqual(this.oGetFilteredFeaturesSpy.callCount, 1, "getFilteredFeatures is called once");
+			assert.strictEqual(
+				this.oGetFilteredFeaturesSpy.firstCall.args[1],
+				Layer.CUSTOMER,
+				"getFilteredFeatures is called with the correct layer"
+			);
 		});
 
 		QUnit.test("When the first entry is opened", async function(assert) {

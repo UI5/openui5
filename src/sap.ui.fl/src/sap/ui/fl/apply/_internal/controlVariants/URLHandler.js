@@ -13,6 +13,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
+	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/hasher"
 ], function(
 	deepEqual,
@@ -25,11 +26,14 @@ sap.ui.define([
 	VariantUtil,
 	VariantManagementState,
 	VariantManagerApply,
+	Utils,
 	hasher
 ) {
 	"use strict";
 
-	var _mVariantIdChangeHandlers = {};
+	const _mVariantIdChangeHandlers = {};
+	const _mHashData = {};
+	const _mUShellServices = {};
 
 	/**
 	 * URL handler utility for <code>sap.ui.fl variants</code> (see {@link sap.ui.fl.variants.VariantManagement})
@@ -38,9 +42,17 @@ sap.ui.define([
 	 * @alias sap.ui.fl.apply._internal.controlVariants.URLHandler
 	 * @since 1.72
 	 * @private
-	 * @ui5-restricted sap.ui.fl.variants.VariantModel
+	 * @ui5-restricted sap.ui.fl.variants.VariantModel, sap.ui.fl.variants.VariantManager
 	 */
-	 var URLHandler = {};
+	const URLHandler = {};
+
+	function getUShellService(sServiceName) {
+		return _mUShellServices[sServiceName];
+	}
+
+	function getHashDataForReference(sFlexReference) {
+		return _mHashData[sFlexReference];
+	}
 
 	/**
 	 * Checks if the parsed shell hash contains outdated variant parameters.
@@ -83,7 +95,8 @@ sap.ui.define([
 	}
 
 	function checkAndUpdateURLParameters(oModel, sHash) {
-		const oParsedHash = oModel.getUShellService("URLParsing")?.parseShellHash(sHash || hasher.getHash());
+		const oURLParsingService = getUShellService("URLParsing");
+		const oParsedHash = oURLParsingService?.parseShellHash(sHash || hasher.getHash());
 		var vRelevantParameters = ObjectPath.get(["params", VariantUtil.VARIANT_TECHNICAL_PARAMETER], oParsedHash);
 		// In legacy urls the parameter was present multiple times
 		if (Array.isArray(vRelevantParameters) && vRelevantParameters.length === 1) {
@@ -96,7 +109,8 @@ sap.ui.define([
 					updateURL: !oModel._bDesignTimeMode, // not required in UI Adaptation mode
 					parameters: oUpdatedParameters.parameters,
 					updateHashEntry: true,
-					model: oModel
+					flexReference: oModel.sFlexReference,
+					appComponent: oModel.oAppComponent
 				});
 			}
 		}
@@ -116,14 +130,14 @@ sap.ui.define([
 	 */
 	function handleVariantIdChangeInURL(oModel, sNewHash) {
 		try {
-			const oURLParsingService = oModel.getUShellService("URLParsing");
+			const oURLParsingService = getUShellService("URLParsing");
 			if (oURLParsingService) {
 				checkAndUpdateURLParameters(oModel, sNewHash);
 			}
 		} catch (oError) {
 			Log.error(oError.message);
 		}
-		const oShellNavigationInternalService = oModel.getUShellService("ShellNavigationInternal");
+		const oShellNavigationInternalService = getUShellService("ShellNavigationInternal");
 		return oShellNavigationInternalService?.NavigationFilterStatus.Continue;
 	}
 
@@ -135,7 +149,7 @@ sap.ui.define([
 	 * @private
 	 */
 	function registerNavigationFilter(oModel) {
-		const oShellNavigationInternalService = oModel.getUShellService("ShellNavigationInternal");
+		const oShellNavigationInternalService = getUShellService("ShellNavigationInternal");
 		if (!_mVariantIdChangeHandlers[oModel.sFlexReference]) {
 			_mVariantIdChangeHandlers[oModel.sFlexReference] = handleVariantIdChangeInURL.bind(null, oModel);
 			if (oShellNavigationInternalService) {
@@ -152,7 +166,7 @@ sap.ui.define([
 	 * @private
 	 */
 	function deRegisterNavigationFilter(oModel) {
-		const oShellNavigationInternalService = oModel.getUShellService("ShellNavigationInternal");
+		const oShellNavigationInternalService = getUShellService("ShellNavigationInternal");
 		if (oShellNavigationInternalService) {
 			oShellNavigationInternalService.unregisterNavigationFilter(_mVariantIdChangeHandlers[oModel.sFlexReference]);
 			delete _mVariantIdChangeHandlers[oModel.sFlexReference];
@@ -166,20 +180,19 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Property bag
 	 * @param {string[]} mPropertyBag.parameters - Array of values for the technical parameter
-	 * @param {sap.ui.fl.variants.VariantModel} mPropertyBag.model - Variant model
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
 	 * @param {boolean} [mPropertyBag.silent] - <code>true</code> if the technical parameter should be set without triggering event listeners
 	 *
 	 * @private
 	 */
 	function setTechnicalURLParameterValues(mPropertyBag) {
-		const oModel = mPropertyBag.model;
-		const oURLParsingService = oModel.getUShellService("URLParsing");
-		const oNavigationService = oModel.getUShellService("Navigation");
+		const oURLParsingService = getUShellService("URLParsing");
+		const oNavigationService = getUShellService("Navigation");
 		const oParsedHash = oURLParsingService?.parseShellHash(hasher.getHash());
 
 		if (oParsedHash?.params) {
 			const mOldHashParams = { ...oParsedHash.params };
-			const mTechnicalParameters = oModel.oAppComponent?.getComponentData?.()?.technicalParameters;
+			const mTechnicalParameters = mPropertyBag.appComponent?.getComponentData?.()?.technicalParameters;
 			// if mTechnicalParameters are not available we write a warning and continue updating the hash
 			if (!mTechnicalParameters) {
 				Log.warning(
@@ -237,15 +250,17 @@ sap.ui.define([
 		var oModel = mPropertyBag.model;
 
 		// if ushell container is not present an empty object is returned
-		var oURLParsingService = oModel.getUShellService("URLParsing");
-		var mURLParameters = oURLParsingService?.parseShellHash(hasher.getHash()).params;
+		const oURLParsingService = getUShellService("URLParsing");
+		const mURLParameters = oURLParsingService?.parseShellHash(hasher.getHash()).params;
 
 		if (mURLParameters) {
 			mReturnObject.parameters = [];
 			// in UI Adaptation the URL parameters are empty
 			// the current URL parameters are retrieved from the stored hash data
 			if (oModel._bDesignTimeMode) {
-				mURLParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = URLHandler.getStoredHashParams(mPropertyBag);
+				mURLParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = URLHandler.getStoredHashParams({
+					flexReference: oModel.sFlexReference
+				});
 			}
 
 			if (Array.isArray(mURLParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER])) {
@@ -277,12 +292,6 @@ sap.ui.define([
 		);
 	}
 
-	function isVariantParameterPresent(oModel) {
-		var oURLParsingService = oModel.getUShellService("URLParsing");
-		var oParsedHash = oURLParsingService?.parseShellHash(hasher.getHash());
-		return oParsedHash?.params && oParsedHash.params[VariantUtil.VARIANT_TECHNICAL_PARAMETER];
-	}
-
 	URLHandler.variantTechnicalParameterName = "sap-ui-fl-control-variant-id";
 
 	/**
@@ -295,12 +304,24 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted sap.ui.fl.variants.VariantModel
 	 */
-	URLHandler.initialize = function(mPropertyBag) {
+	URLHandler.initialize = async function(mPropertyBag) {
+		if (Utils.getUshellContainer()) {
+			await Promise.allSettled(["UserInfo", "URLParsing", "Navigation", "ShellNavigationInternal"]
+			.map(async (sServiceName) => {
+				try {
+					_mUShellServices[sServiceName] = await Utils.getUShellService(sServiceName);
+				} catch (vError) {
+					Log.error(`Error getting service ${sServiceName} from Unified Shell: ${vError}`);
+				}
+			}));
+		}
+
 		var oModel = mPropertyBag.model;
 		// register navigation filters and component creation / destroy observers
 		URLHandler.attachHandlers(mPropertyBag);
 
-		oModel._oHashData = {
+		// Initialize module-level hash data for this flexReference
+		_mHashData[oModel.sFlexReference] = {
 			hashParams: [],
 			controlPropertyObservers: [],
 			variantControlIds: []
@@ -323,16 +344,16 @@ sap.ui.define([
 	 */
 	URLHandler.updateVariantInURL = function(mPropertyBag) {
 		// remove parameter for variant management if available
-		var mUpdatedParameters = URLHandler.removeURLParameterForVariantManagement(mPropertyBag);
+		const mUpdatedParameters = URLHandler.removeURLParameterForVariantManagement(mPropertyBag);
 
 		// standalone mode
 		if (!mUpdatedParameters.parameters) {
 			return;
 		}
 
-		var aParameters = mUpdatedParameters.parameters || [];
-		var iIndex = mUpdatedParameters.index;
-		var bIsDefaultVariant = mPropertyBag.newVReference === mPropertyBag.model.oData[mPropertyBag.vmReference].defaultVariant;
+		let aParameters = mUpdatedParameters.parameters || [];
+		const iIndex = mUpdatedParameters.index;
+		const bIsDefaultVariant = mPropertyBag.newVReference === mPropertyBag.model.oData[mPropertyBag.vmReference].defaultVariant;
 
 		// default variant should not be added as parameter to the URL (no parameter => default)
 		if (!bIsDefaultVariant) {
@@ -350,7 +371,8 @@ sap.ui.define([
 				parameters: aParameters,
 				updateURL: !mPropertyBag.model._bDesignTimeMode,
 				updateHashEntry: true,
-				model: mPropertyBag.model
+				flexReference: mPropertyBag.model.sFlexReference,
+				appComponent: mPropertyBag.model.oAppComponent
 			});
 		}
 	};
@@ -369,7 +391,7 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.fl
 	 */
 	URLHandler.removeURLParameterForVariantManagement = function(mPropertyBag) {
-		var mVariantParametersInURL = getVariantIndexInURL(mPropertyBag);
+		const mVariantParametersInURL = getVariantIndexInURL(mPropertyBag);
 		if (mVariantParametersInURL.index > -1) {
 			mVariantParametersInURL.parameters.splice(mVariantParametersInURL.index, 1);
 		}
@@ -392,11 +414,15 @@ sap.ui.define([
 			// variant switch promise needs to be checked, since there might be a pending on-going variants switch
 			// which might result in unnecessary data being stored
 			await VariantManagementState.waitForAllVariantSwitches(mPropertyBag.model.sFlexReference);
-			mPropertyBag.model._oHashData.controlPropertyObservers.forEach(function(oObserver) {
+			const oHashData = getHashDataForReference(mPropertyBag.model.sFlexReference);
+			oHashData.controlPropertyObservers.forEach(function(oObserver) {
 				oObserver.destroy();
 			});
 			// deregister navigation filter if ushell is available
 			deRegisterNavigationFilter(mPropertyBag.model);
+
+			// clean up module-level data for this flex reference
+			delete _mHashData[mPropertyBag.model.sFlexReference];
 
 			// this promise is not returned since the component is getting destroyed,
 			// which will also destroy the variant model anyway,
@@ -428,7 +454,7 @@ sap.ui.define([
 	 */
 	URLHandler.registerControl = function(mPropertyBag) {
 		if (mPropertyBag.updateURL) {
-			mPropertyBag.model._oHashData.variantControlIds.push(mPropertyBag.vmReference);
+			getHashDataForReference(mPropertyBag.model.sFlexReference).variantControlIds.push(mPropertyBag.vmReference);
 		}
 	};
 
@@ -437,13 +463,14 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Properties for hash update
 	 * @param {string[]} mPropertyBag.parameters - Array of variant URL parameter values
+	 * @param {string} mPropertyBag.flexReference - Flex reference
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
 	 * @param {boolean} [mPropertyBag.updateURL] - Indicates if URL needs to be updated
 	 * @param {boolean} [mPropertyBag.updateHashEntry] - Indicates if hash data should be updated
 	 * @param {boolean} [mPropertyBag.silent] - <code>true</code> if the technical parameter should be set without triggering event listeners
-	 * @param {sap.ui.fl.variants.VariantModel} mPropertyBag.model - Variant model
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.fl.variants.VariantModel
+	 * @ui5-restricted sap.ui.fl.variants.VariantModel, sap.ui.fl.variants.VariantManager
 	 */
 	URLHandler.update = function(mPropertyBag) {
 		if (!Array.isArray(mPropertyBag.parameters)) {
@@ -454,24 +481,23 @@ sap.ui.define([
 			setTechnicalURLParameterValues(mPropertyBag);
 		}
 		if (mPropertyBag.updateHashEntry) {
-			mPropertyBag.model._oHashData.hashParams = mPropertyBag.parameters;
+			getHashDataForReference(mPropertyBag.flexReference).hashParams = mPropertyBag.parameters;
 		}
 	};
 
 	/**
-	 * Returns the current hash parameters from the variant model's hash data
-	 * (see {@link sap.ui.fl.variants.VariantModel}).
+	 * Returns a copy of the current hash parameters for the given flex reference.
 	 *
 	 * @param {object} mPropertyBag - Property bag
-	 * @param {sap.ui.fl.variants.VariantModel} mPropertyBag.model - Variant model
+	 * @param {string} mPropertyBag.flexReference - Flex reference
 	 *
 	 * @returns {array} Array of variant parameter values in the URL
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.fl.variants.VariantModel
+	 * @ui5-restricted sap.ui.fl.variants.VariantModel, sap.ui.fl.variants.VariantManager
 	 */
 	URLHandler.getStoredHashParams = function(mPropertyBag) {
-		return Array.prototype.slice.call(mPropertyBag.model._oHashData.hashParams);
+		return getHashDataForReference(mPropertyBag.flexReference).hashParams.slice();
 	};
 
 	/**
@@ -489,30 +515,31 @@ sap.ui.define([
 		var sContextChangeEvent = "modelContextChange";
 
 		function handleContextChange(oEvent, oParams) {
-			var sVariantManagementReference = oEvent.getSource().getVariantManagementReference();
-			var aVariantManagements = oParams.model._oHashData.variantControlIds;
+			const sVariantManagementReference = oEvent.getSource().getVariantManagementReference();
+			const oHashData = getHashDataForReference(oParams.model.sFlexReference);
+			const aVariantManagements = oHashData.variantControlIds;
 			// variant management will only exist in the hash data if 'updateInVariantURL' property is set (see attachHandlers())
-			var iIndex = aVariantManagements.indexOf(sVariantManagementReference);
+			const iIndex = aVariantManagements.indexOf(sVariantManagementReference);
 			if (iIndex > -1) {
 				// all controls which were later initialized need to be reset to default variant
-				aVariantManagements.slice(iIndex).forEach(
-					function(sVariantManagementToBeReset) {
-						if (getVariantIndexInURL({
-							vmReference: sVariantManagementToBeReset,
-							model: mPropertyBag.model
-						}).index === -1) {
-							const oAffectedVMControl = VariantUtil.getVariantManagementControlByVMReference(
-								sVariantManagementToBeReset,
-								mPropertyBag.appComponent
-							);
-							VariantManagerApply.updateCurrentVariant({
-								newVariantReference: oAffectedVMControl.getDefaultVariantKey(),
-								vmControl: oAffectedVMControl,
-								appComponent: mPropertyBag.appComponent
-							});
-						}
+				aVariantManagements.slice(iIndex).forEach((sVariantManagementToBeReset) => {
+					const mResult = getVariantIndexInURL({
+						vmReference: sVariantManagementToBeReset,
+						model: mPropertyBag.model
+					});
+					// only reset if the variant management reference is NOT present in the URL
+					if (mResult.index === -1) {
+						const oAffectedVMControl = VariantUtil.getVariantManagementControlByVMReference(
+							sVariantManagementToBeReset,
+							mPropertyBag.appComponent
+						);
+						VariantManagerApply.updateCurrentVariant({
+							newVariantReference: oAffectedVMControl.getDefaultVariantKey(),
+							vmControl: oAffectedVMControl,
+							appComponent: mPropertyBag.appComponent
+						});
 					}
-				);
+				});
 			}
 		}
 
@@ -526,7 +553,7 @@ sap.ui.define([
 
 		oControlPropertyObserver.observe(mPropertyBag.vmControl, { properties: ["resetOnContextChange"] });
 
-		mPropertyBag.model._oHashData.controlPropertyObservers.push(oControlPropertyObserver);
+		getHashDataForReference(mPropertyBag.model.sFlexReference).controlPropertyObservers.push(oControlPropertyObserver);
 
 		if (mPropertyBag.vmControl.getResetOnContextChange() !== false) {
 			mPropertyBag.vmControl.attachEvent(sContextChangeEvent, { model: mPropertyBag.model }, handleContextChange);
@@ -534,21 +561,25 @@ sap.ui.define([
 	};
 
 	/**
-	 * Clears all variant URL parameters for the passed variant model.
+	 * Clears all variant URL parameters.
 	 *
 	 * @param {object} mPropertyBag - Property bag
-	 * @param {sap.ui.fl.variants.VariantModel} mPropertyBag.model - Variant model
+	 * @param {string} mPropertyBag.flexReference - Flex reference
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
 	 *
 	 * @private
 	 * @ui5-restricted sap.ui.fl.variants.VariantModel
 	 */
 	URLHandler.clearAllVariantURLParameters = function(mPropertyBag) {
-		if (isVariantParameterPresent(mPropertyBag.model)) {
+		const oURLParsingService = getUShellService("URLParsing");
+		const oParsedHash = oURLParsingService?.parseShellHash(hasher.getHash());
+		if (oParsedHash?.params?.[VariantUtil.VARIANT_TECHNICAL_PARAMETER]) {
 			URLHandler.update({
 				updateURL: true,
 				parameters: [],
 				updateHashEntry: false,
-				model: mPropertyBag.model
+				flexReference: mPropertyBag.flexReference,
+				appComponent: mPropertyBag.appComponent
 			});
 		}
 	};

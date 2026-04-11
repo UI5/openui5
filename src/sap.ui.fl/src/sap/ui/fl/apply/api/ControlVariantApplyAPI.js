@@ -170,19 +170,20 @@ sap.ui.define([
 		 * @public
 		 */
 		clearVariantParameterInURL(mPropertyBag) {
-			var aUpdatedVariantParameters;
-			var oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
-			var oVariantModel = oAppComponent && oAppComponent.getModel(VARIANT_MODEL_NAME);
+			const oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
+			const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
+			const oVariantModel = oAppComponent && oAppComponent.getModel(VARIANT_MODEL_NAME);
 			if (!oVariantModel) {
 				// technical parameters are not updated, only URL hash is updated
 				Log.error("Variant model could not be found on the provided control");
 				return;
 			}
+			let aUpdatedVariantParameters;
 
 			// check if variant for the passed variant management control is present
 			if (mPropertyBag.control.isA("sap.ui.fl.variants.VariantManagement")) {
-				var sVariantManagementReference = oVariantModel.getLocalId(mPropertyBag.control.getId(), oAppComponent);
-				var mCleansedParametersWithIndex = URLHandler.removeURLParameterForVariantManagement({
+				const sVariantManagementReference = oVariantModel.getLocalId(mPropertyBag.control.getId(), oAppComponent);
+				const mCleansedParametersWithIndex = URLHandler.removeURLParameterForVariantManagement({
 					model: oVariantModel,
 					vmReference: sVariantManagementReference
 				});
@@ -193,9 +194,10 @@ sap.ui.define([
 			URLHandler.update({
 				parameters: aUpdatedVariantParameters || [],
 				updateURL: true,
-				updateHashEntry: !!oVariantModel,
-				model: oVariantModel || {},
-				silent: !oVariantModel
+				updateHashEntry: true,
+				flexReference: sFlexReference,
+				appComponent: oAppComponent,
+				silent: false
 			});
 		},
 
@@ -376,6 +378,25 @@ sap.ui.define([
 			// Ensure that the variant attach process is finished before removing the listener
 			await Promise.all([oVariantManagementControl.waitForInit(), waitForControlToBeRendered(oControl)]);
 			oVariantManagementControl._removeVariantAppliedListener(oControl);
+		},
+
+		/**
+		 * Returns the current variant reference for a given variant management reference and control.
+		 *
+		 * @param {object} mPropertyBag - Object with parameters as properties
+		 * @param {string} mPropertyBag.vmReference - Variant management reference
+		 * @param {sap.ui.core.Control} mPropertyBag.control - Control for the reference determination
+		 * @returns {string} Current variant reference
+		 *
+		 * @public
+		 * @since 1.148
+		 */
+		getCurrentVariantReference(mPropertyBag) {
+			const sReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.control);
+			return VariantManagementState.getCurrentVariantReference({
+				vmReference: mPropertyBag.vmReference,
+				reference: sReference
+			});
 		}
 	};
 

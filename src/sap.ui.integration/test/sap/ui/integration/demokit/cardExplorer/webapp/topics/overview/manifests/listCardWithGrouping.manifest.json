@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "1.81.0",
 	"sap.app": {
 		"id": "card.explorer.numeric.list.card",
 		"type": "card",
@@ -111,7 +111,7 @@
 					"customStateIcon": "{CustomStateIcon}"
 				}
 			},
-			"group": {
+            "group": {
 				"title": "{= ${Sales} > 150 ? 'Over 150' : 'Under 150'}",
 				"order": {
 					"path": "Sales",

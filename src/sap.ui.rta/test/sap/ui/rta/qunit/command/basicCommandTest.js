@@ -3,20 +3,18 @@
 sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/dt/ElementDesignTimeMetadata",
-	"sap/ui/model/json/JSONModel",
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/Layer",
-	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	Control,
 	ElementDesignTimeMetadata,
-	JSONModel,
+	ControlVariantApplyAPI,
 	ChangesWriteAPI,
 	Layer,
-	ControlVariantApplyAPI,
 	CommandFactory,
 	sinon,
 	RtaQunitUtils
@@ -100,11 +98,9 @@ sap.ui.define([
 				this.mCurrentCommandProperties = { ...mCommandProperties };
 				this.mCurrentExpectedSpecificData = { ...mExpectedSpecificData };
 				this.oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox);
-				const oVariantModel = new JSONModel();
-				oVariantModel.getCurrentVariantReference = function(sVariantManagementReference) {
-					return sVariantManagementReference;
-				};
-				this.oMockedAppComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
+				sandbox.stub(ControlVariantApplyAPI, "getCurrentVariantReference").callsFake((mPropertyBag) => {
+					return mPropertyBag.vmReference;
+				});
 				sandbox.stub(ChangesWriteAPI, "getChangeHandler").resolves();
 				this.oCreateStub = sandbox.stub(ChangesWriteAPI, "create").resolves();
 				this.oControl = new Control("myFancyControlId");
