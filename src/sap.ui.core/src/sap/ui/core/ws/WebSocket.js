@@ -16,7 +16,7 @@ sap.ui.define([
 	 * Creates a new WebSocket connection.
 	 *
 	 * @param {string} sUrl relative or absolute URL for WebSocket connection.
-	 * @param {array} [aProtocols] array of protocols as strings, a single protocol as a string
+	 * @param {string|string[]} [aProtocols] array of protocols as strings, a single protocol as a string
 	 * @public
 	 *
 	 * @class Basic WebSocket class.
@@ -393,7 +393,7 @@ sap.ui.define([
 	 * Opens the connection and binds the event-handlers.
 	 *
 	 * @param {string} sUrl	URL for WebSocket
-	 * @param {array} [aProtocols] array of protocols as strings, a single protocol as a string
+	 * @param {string|string[]} [aProtocols] array of protocols as strings, a single protocol as a string
 	 * @private
 	 */
 	WebSocket.prototype._openConnection = function(sUrl, aProtocols) {
