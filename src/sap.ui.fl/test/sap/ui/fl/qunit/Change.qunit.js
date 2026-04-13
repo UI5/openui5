@@ -357,6 +357,23 @@ function(
 			this.oChangeDef.layer = "VENDOR";
 			oInstance = new Change(this.oChangeDef);
 			assert.equal(oInstance._isReadOnlyDueToLayer(), false);
+			// check for PUBLIC layer without settings
+			this.oChangeDef.layer = "PUBLIC";
+			assert.equal(oInstance._isReadOnlyDueToLayer(), true);
+		});
+
+		QUnit.test("Change._isReadOnlyDueToLayer with PUBLIC layer and user is not set", function(assert) {
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({isKeyuser: true}));
+			this.oChangeDef.layer = "PUBLIC";
+			var oInstance = new Change(this.oChangeDef);
+			assert.equal(oInstance._isReadOnlyDueToLayer(), true);
+		});
+
+		QUnit.test("Change._isReadOnlyDueToLayer with PUBLIC layer", function(assert) {
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({isKeyuser: true, logonUser: "cookieMonster"}));
+			this.oChangeDef.layer = "PUBLIC";
+			var oInstance = new Change(this.oChangeDef);
+			assert.equal(oInstance._isReadOnlyDueToLayer(), false);
 		});
 
 		QUnit.test("Change.markForDeletion", function(assert) {

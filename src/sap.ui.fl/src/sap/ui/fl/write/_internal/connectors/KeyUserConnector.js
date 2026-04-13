@@ -23,11 +23,6 @@ sap.ui.define([
 
 	var PREFIX = "/flex/keyuser";
 	var API_VERSION = "/v1";
-	var ROUTES = {
-		CHANGES: PREFIX + API_VERSION + "/changes/",
-		SETTINGS: PREFIX + API_VERSION + "/settings",
-		TOKEN: PREFIX + API_VERSION + "/settings"
-	};
 	/**
 	 * Write flex data into KeyUser service or update an existing an existing flex data stored in KeyUser service
 	 *
@@ -45,9 +40,9 @@ sap.ui.define([
 			mPropertyBag.fileName = mPropertyBag.flexObject.fileName;
 		}
 
-		var sWriteUrl = ApplyUtils.getUrl(ROUTES.CHANGES, mPropertyBag);
+		var sWriteUrl = ApplyUtils.getUrl(this.ROUTES.CHANGES, mPropertyBag);
 		delete mPropertyBag.fileName;
-		var sTokenUrl = ApplyUtils.getUrl(ROUTES.TOKEN, mPropertyBag);
+		var sTokenUrl = ApplyUtils.getUrl(this.ROUTES.TOKEN, mPropertyBag);
 
 		var oRequestOption = WriteUtils.getRequestOptions(
 			ApplyConnector,
@@ -75,6 +70,12 @@ sap.ui.define([
 			flLibrary.Layer.CUSTOMER
 		],
 
+		ROUTES: {
+			CHANGES: PREFIX + API_VERSION + "/changes/",
+			SETTINGS: PREFIX + API_VERSION + "/settings",
+			TOKEN: PREFIX + API_VERSION + "/settings"
+		},
+
 		/**
 		 * Resets flexibility files for a given application.
 		 *
@@ -98,9 +99,9 @@ sap.ui.define([
 			}
 			delete mPropertyBag.reference;
 
-			var sResetUrl = ApplyUtils.getUrl(ROUTES.CHANGES, mPropertyBag, mParameters);
+			var sResetUrl = ApplyUtils.getUrl(this.ROUTES.CHANGES, mPropertyBag, mParameters);
 
-			var sTokenUrl = ApplyUtils.getUrl(ROUTES.SETTINGS, mPropertyBag);
+			var sTokenUrl = ApplyUtils.getUrl(this.ROUTES.SETTINGS, mPropertyBag);
 
 			var oRequestOption = WriteUtils.getRequestOptions(
 				ApplyConnector,
@@ -120,7 +121,7 @@ sap.ui.define([
 		 */
 		write:function (mPropertyBag) {
 			mPropertyBag.method = "POST";
-			return _doWrite(mPropertyBag);
+			return _doWrite.call(this, mPropertyBag);
 		},
 
 		/**
@@ -133,7 +134,7 @@ sap.ui.define([
 		 */
 		update: function (mPropertyBag) {
 			mPropertyBag.method = "PUT";
-			return _doWrite(mPropertyBag);
+			return _doWrite.call(this, mPropertyBag);
 		},
 
 		/**
@@ -149,9 +150,9 @@ sap.ui.define([
 				namespace: mPropertyBag.flexObject.namespace
 			};
 			mPropertyBag.fileName = mPropertyBag.flexObject.fileName;
-			var sDeleteUrl = ApplyUtils.getUrl(ROUTES.CHANGES, mPropertyBag, mParameters);
+			var sDeleteUrl = ApplyUtils.getUrl(this.ROUTES.CHANGES, mPropertyBag, mParameters);
 			delete mPropertyBag.fileName;
-			var sTokenUrl = ApplyUtils.getUrl(ROUTES.TOKEN, mPropertyBag);
+			var sTokenUrl = ApplyUtils.getUrl(this.ROUTES.TOKEN, mPropertyBag);
 
 			var oRequestOption = WriteUtils.getRequestOptions(
 				ApplyConnector,
@@ -168,7 +169,7 @@ sap.ui.define([
 		 * @returns {Promise<object>} Promise resolves with an object containing the flex features
 		 */
 		loadFeatures: function (mPropertyBag) {
-			var sFeaturesUrl = ApplyUtils.getUrl(ROUTES.SETTINGS, mPropertyBag);
+			var sFeaturesUrl = ApplyUtils.getUrl(this.ROUTES.SETTINGS, mPropertyBag);
 			return ApplyUtils.sendRequest(sFeaturesUrl).then(function (oResult) {
 				return oResult.response;
 			});

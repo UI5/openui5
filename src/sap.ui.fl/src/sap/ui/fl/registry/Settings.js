@@ -299,5 +299,15 @@ sap.ui.define([
 		return this._oSettings.developerModeLayerPermissions;
 	};
 
+	/**
+	 * Getter for the id of the current user.
+	 * Taken from the property 'userId' of the flex settings. Only filled when UShell is available.
+	 *
+	 * @returns {string} User ID of the current user. Undefined if UShell is not available.
+	 */
+	 Settings.prototype.getUserId = function() {
+		return this._oSettings.logonUser;
+	};
+
 	return Settings;
 }, /* bExport= */true);
