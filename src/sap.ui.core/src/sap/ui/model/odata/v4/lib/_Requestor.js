@@ -1824,8 +1824,9 @@ sap.ui.define([
 
 	/**
 	 * Reports OData messages from the "sap-messages" response header (or forwards them via the
-	 * response object) in case of success. When reporting, the longtext URL is already resolved
-	 * w.r.t. the request URL and the original message is preserved early on.
+	 * response object) in case of success. The original messages are preserved in
+	 * "@$ui5.originalMessage" of each message. When reporting, the longtext URL is already resolved
+	 * w.r.t. the request URL.
 	 *
 	 * @param {string} sResourcePath
 	 *   The resource path of the request whose response contained the messages, see also
@@ -1844,6 +1845,9 @@ sap.ui.define([
 			sRequestUrl) {
 		if (sMessages) {
 			const aMessages = JSON.parse(sMessages);
+			aMessages.forEach(function (oMessage) {
+				oMessage["@$ui5.originalMessage"] = _Helper.clone(oMessage);
+			});
 			if (sResourcePath === "R#V#C") {
 				_Helper.setPrivateAnnotation(oResponse, "headerMessages", aMessages);
 			} else {

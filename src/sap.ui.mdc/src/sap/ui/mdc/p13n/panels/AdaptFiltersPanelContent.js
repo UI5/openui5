@@ -742,7 +742,6 @@ sap.ui.define([
 			src: "sap-icon://horizontal-grip",
 			tooltip: this._getResourceText("adaptFiltersPanel.ACTION_SORT"),
 			useIconTooltip: true,
-			color: "#000",
 			visible: {
 				parts: [
 					`${this.CONTROL_MODEL}>/editable`,

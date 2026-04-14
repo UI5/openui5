@@ -1855,7 +1855,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("reportTransitionMessages", function (assert) {
-		var aMessages = [{"@$ui5.originalMessage" : "n/a"}, {"@$ui5.originalMessage" : "n/a"}],
+		var aMessages = [{}, {}],
 			oMetaModel = {
 				getObject : mustBeMocked
 			},
@@ -1867,7 +1867,6 @@ sap.ui.define([
 			.returns("~metaPath~");
 		this.mock(oMetaModel).expects("getObject").withExactArgs("~metaPath~")
 			.returns("~metadata~"); // not an array
-		this.mock(_Helper).expects("clone").never();
 		oModelMock.expects("createUI5Message")
 			.withExactArgs(sinon.match(function (oMessage) {
 				return oMessage === aMessages[0] && oMessage.transition === true;
@@ -1891,26 +1890,19 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("reportTransitionMessages: w/o resourcePath, silent", function (assert) {
-		var oHelperMock = this.mock(_Helper),
-			aMessages = [{}, {}],
+		var aMessages = [{}, {}],
 			oModel = this.createModel(),
 			oModelMock = this.mock(oModel);
 
 		oModelMock.expects("getMetaModel").never();
-		oHelperMock.expects("clone").withExactArgs(sinon.match.same(aMessages[0]))
-			.returns("~clone0~");
 		oModelMock.expects("createUI5Message")
 			.withExactArgs(sinon.match(function (oMessage) {
-				return oMessage === aMessages[0] && oMessage.transition === true
-					&& oMessage["@$ui5.originalMessage"] === "~clone0~";
+				return oMessage === aMessages[0] && oMessage.transition === true;
 			}), undefined)
 			.returns("~UI5msg0~");
-		oHelperMock.expects("clone").withExactArgs(sinon.match.same(aMessages[1]))
-			.returns("~clone1~");
 		oModelMock.expects("createUI5Message")
 			.withExactArgs(sinon.match(function (oMessage) {
-				return oMessage === aMessages[1] && oMessage.transition === true
-					&& oMessage["@$ui5.originalMessage"] === "~clone1~";
+				return oMessage === aMessages[1] && oMessage.transition === true;
 			}), undefined)
 			.returns("~UI5msg1~");
 		this.mock(Messaging).expects("updateMessages").never();
@@ -1922,7 +1914,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("reportTransitionMessages: operation metadata is used", function (assert) {
-		const aMessages = [{"@$ui5.originalMessage" : "~clone0~"}, {}];
+		const aMessages = [{}, {}];
 		const oModel = this.createModel();
 		const oModelMock = this.mock(oModel);
 		const oMetaModel = {
@@ -1940,8 +1932,6 @@ sap.ui.define([
 		oMetaModelMock.expects("getObject")
 			.withExactArgs("~metaPath~/@$ui5.overload/0")
 			.returns("~operationMetadata~");
-		oHelperMock.expects("clone").withExactArgs(sinon.match.same(aMessages[1]))
-			.returns("~clone1~");
 		oHelperMock.expects("adjustTargets")
 			.withExactArgs(sinon.match.same(aMessages[0]), "~operationMetadata~", undefined,
 				"/resource/path", "~sOriginalResourcePath~");
@@ -1950,14 +1940,12 @@ sap.ui.define([
 				"/resource/path", "~sOriginalResourcePath~");
 		oModelMock.expects("createUI5Message")
 			.withExactArgs(sinon.match(function (oMessage) {
-				return oMessage === aMessages[0] && oMessage.transition === true
-					&& oMessage["@$ui5.originalMessage"] === "~clone0~";
+				return oMessage === aMessages[0] && oMessage.transition === true;
 			}), "resource/path/operation?~queryOptions~")
 			.returns("~UI5msg0~");
 		oModelMock.expects("createUI5Message")
 			.withExactArgs(sinon.match(function (oMessage) {
-				return oMessage === aMessages[1] && oMessage.transition === true
-					&& oMessage["@$ui5.originalMessage"] === "~clone1~";
+				return oMessage === aMessages[1] && oMessage.transition === true;
 			}), "resource/path/operation?~queryOptions~")
 			.returns("~UI5msg1~");
 		this.mock(Messaging).expects("updateMessages")

@@ -4436,6 +4436,30 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("readGrandTotal: grand total outdated, full refresh needed", function () {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			$leafLevelAggregated : false,
+			aggregate : {
+				bar : {
+					grandTotal : true
+				}
+			}
+		});
+		oCache.aElements.$byPredicate = {
+			"()" : {"@$ui5.context.isOutdated" : true} // grand total is outdated
+		};
+		this.mock(_AggregationHelper).expects("hasGrandTotal")
+			.withExactArgs(sinon.match.same(oCache.oAggregation.aggregate))
+			.returns(true);
+		this.mock(_AggregationHelper).expects("buildApply").never();
+		this.mock(this.oRequestor).expects("buildQueryString").never();
+		this.mock(this.oRequestor).expects("request").never();
+
+		// code under test
+		_AggregationCache.prototype.readGrandTotal.call(oCache);
+	});
+
+	//*********************************************************************************************
 	[false, true].forEach((bWithGrandTotalCopy) => {
 		QUnit.test("readGrandTotal: success, 2 grand totals:" + bWithGrandTotalCopy, function (assert) {
 			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {
@@ -4474,12 +4498,14 @@ sap.ui.define([
 				.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~", undefined, undefined,
 					undefined, undefined, undefined, undefined, undefined, {/*mMergeableQueryOptions*/})
 				.resolves({value : ["~newGrandTotal~"]});
-			oCache.aElements.$byPredicate["()"] = "~oGrandTotal~";
+			const oGrandTotal = {"@$ui5.context.isOutdated" : false}; // grand total is up-to-date
+			oCache.aElements.$byPredicate["()"] = oGrandTotal;
 			const oHelperMock = this.mock(_Helper);
 			oHelperMock.expects("updateExisting")
-				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "()", "~oGrandTotal~",
-					"~newGrandTotal~");
-			oHelperMock.expects("getPrivateAnnotation").withExactArgs("~oGrandTotal~", "copy")
+				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "()",
+					sinon.match.same(oGrandTotal), "~newGrandTotal~");
+			oHelperMock.expects("getPrivateAnnotation")
+				.withExactArgs(sinon.match.same(oGrandTotal), "copy")
 				.returns(bWithGrandTotalCopy ? "~oGrandTotalCopy~" : undefined);
 			oHelperMock.expects("getPrivateAnnotation").exactly(bWithGrandTotalCopy ? 1 : 0)
 				.withExactArgs("~oGrandTotalCopy~", "predicate")
@@ -4506,6 +4532,7 @@ sap.ui.define([
 				}
 			}
 		});
+		oCache.aElements.$byPredicate["()"] = {}; // grand total is not outdated
 		this.mock(_AggregationHelper).expects("hasGrandTotal")
 			.withExactArgs(sinon.match.same(oCache.oAggregation.aggregate))
 			.returns(true);

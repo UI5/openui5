@@ -229,6 +229,7 @@ sap.ui.define([
 		body : {
 			error : {
 				code : "/IWBEP/CM_V4_RUNTIME/021",
+				details : [{message : "~detail0~"}, {message : "~detail1~"}],
 				message :
 					// Note: "a human-readable, language-dependent representation of the error"
 					"The state of the resource (entity) was already changed (If-Match)",
@@ -360,6 +361,11 @@ sap.ui.define([
 	}].forEach(function (oFixture) {
 		QUnit.test("createError: " + oFixture.message, function (assert) {
 			var oError,
+				bHasDetails = oFixture.body?.error?.details,
+				oErrorClone = {
+					...(bHasDetails && {details : ["~cloneDetail0~", "~cloneDetail1~"]})
+				},
+				oHelperMock = this.mock(_Helper),
 				jqXHR = {
 					getResponseHeader : function (sName) {
 						return oFixture.response.headers[sName];
@@ -376,11 +382,26 @@ sap.ui.define([
 				this.oLogMock.expects("warning").withExactArgs(oFixture.warning,
 					oFixture.response.responseText, "sap.ui.model.odata.v4.lib._Helper");
 			}
+			oHelperMock.expects("clone").exactly(oFixture.body ? 1 : 0)
+				.withExactArgs(oFixture.body?.error).returns(oErrorClone);
 
 			oError = _Helper.createError(jqXHR, "message", "/request/path", "original/path");
 
 			assert.ok(oError instanceof Error);
-			assert.deepEqual(oError.error, oFixture.body && oFixture.body.error);
+			assert.deepEqual(oError.error,
+				oFixture.body && {
+					"@$ui5.originalMessage" : bHasDetails
+						? {details : ["~cloneDetail0~", "~cloneDetail1~"]}
+						: oErrorClone,
+					...oFixture.body.error,
+					...(bHasDetails && {details : [
+							{"@$ui5.originalMessage" : "~cloneDetail0~", message : "~detail0~"},
+							{"@$ui5.originalMessage" : "~cloneDetail1~", message : "~detail1~"}
+						]})
+				});
+			if (oFixture.body) {
+				assert.strictEqual(oError.error["@$ui5.originalMessage"], oErrorClone);
+			}
 			assert.strictEqual(oError.isConcurrentModification, oFixture.isConcurrentModification);
 			assert.strictEqual(oError.strictHandlingFailed, oFixture.strictHandlingFailed);
 			assert.strictEqual(oError.message, oFixture.message);
@@ -397,42 +418,34 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-[
-	{message : {/* any original message */}},
-	{"@$ui5.originalMessage" : {message : {/* any original message */}}}
-].forEach(function (oFixture, i) {
-	QUnit.test("createTechnicalDetails," + i, function (assert) {
+[false, true].forEach((bWithOriginalMessage) => {
+	const sTitle = "createTechnicalDetails, with original message: " + bWithOriginalMessage;
+
+	QUnit.test(sTitle, function (assert) {
 		var oClone = {foo : "bar"},
+			oMessage = bWithOriginalMessage
+				? {"@$ui5.originalMessage" : {message : {/* any original message */}}}
+				: {message : {/* any original message */}},
 			oResult;
 
-		this.mock(_Helper).expects("publicClone")
-			.withExactArgs(sinon.match.same(i === 0 ? oFixture : oFixture["@$ui5.originalMessage"]))
+		this.mock(_Helper).expects("publicClone").exactly(bWithOriginalMessage ? 1 : 0)
+			.withExactArgs(sinon.match.same(oMessage["@$ui5.originalMessage"]))
 			.returns(oClone);
 
 		// code under test
-		oResult = _Helper.createTechnicalDetails(oFixture);
+		oResult = _Helper.createTechnicalDetails(oMessage);
 
-		assert.deepEqual(oResult, {originalMessage : oClone});
+		assert.deepEqual(oResult, bWithOriginalMessage ? {originalMessage : oClone} : {});
 
-		// code under test
-		assert.strictEqual(oResult.originalMessage, oClone);
+		if (bWithOriginalMessage) {
+			// code under test
+			assert.strictEqual(oResult.originalMessage, oClone);
 
-		// code under test (take care that further accesses point to the same object)
-		assert.strictEqual(oResult.originalMessage, oClone);
+			// code under test (take care that further accesses point to the same object)
+			assert.strictEqual(oResult.originalMessage, oClone);
+		}
 	});
 });
-
-	//*********************************************************************************************
-	QUnit.test("createTechnicalDetails with a JS Error instance", function (assert) {
-		this.mock(_Helper).expects("publicClone").never();
-
-		// code under test
-		assert.deepEqual(_Helper.createTechnicalDetails(new Error()), {});
-
-		// code under test
-		assert.deepEqual(_Helper.createTechnicalDetails({"@$ui5.originalMessage" : new Error()}),
-			{});
-	});
 
 	//*********************************************************************************************
 	QUnit.test("createTechnicalDetails with @$ui5.error, no status", function (assert) {
@@ -2351,11 +2364,9 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("makeAbsoluteLongtextUrl", function (assert) {
-		const oMessage = {longtextUrl : "relative/path"};
+		let oMessage = {longtextUrl : "relative/path"};
 		this.mock(_Helper).expects("makeAbsolute").withExactArgs("relative/path", "/base/")
 			.returns("/base/relative/path");
-		this.mock(_Helper).expects("clone").withExactArgs(sinon.match.same(oMessage))
-			.returns("~clone~");
 
 		assert.strictEqual(
 			// code under test
@@ -2363,56 +2374,15 @@ sap.ui.define([
 			undefined, "no return value");
 
 		assert.deepEqual(oMessage, {
-			"@$ui5.originalMessage" : "~clone~",
 			longtextUrl : "/base/relative/path"
 		});
-	});
 
-	//*********************************************************************************************
-	QUnit.test("makeAbsoluteLongtextUrl: already cloned", function (assert) {
-		const oMessage = {
-			"@$ui5.originalMessage" : "~clone~",
-			longtextUrl : "relative/path"
-		};
-		this.mock(_Helper).expects("makeAbsolute").withExactArgs("relative/path", "/base/")
-			.returns("/absolute/path");
-		this.mock(_Helper).expects("clone").never();
+		oMessage = {};
 
-		assert.strictEqual(
-			// code under test
-			_Helper.makeAbsoluteLongtextUrl(oMessage, "/base/"),
-			undefined, "no return value");
+		// code under test
+		_Helper.makeAbsoluteLongtextUrl(oMessage, "/base/");
 
-		assert.deepEqual(oMessage, {
-			"@$ui5.originalMessage" : "~clone~",
-			longtextUrl : "/absolute/path"
-		});
-	});
-
-	//*********************************************************************************************
-	QUnit.test("makeAbsoluteLongtextUrl: no clone needed", function (assert) {
-		const oMessage = {longtextUrl : "/absolute/path"};
-		this.mock(_Helper).expects("makeAbsolute").withExactArgs("/absolute/path", "/base/")
-			.returns("/absolute/path");
-		this.mock(_Helper).expects("clone").never();
-
-		assert.strictEqual(
-			// code under test
-			_Helper.makeAbsoluteLongtextUrl(oMessage, "/base/"),
-			undefined, "no return value");
-
-		assert.deepEqual(oMessage, {longtextUrl : "/absolute/path"});
-	});
-
-	//*********************************************************************************************
-	QUnit.test("makeAbsoluteLongtextUrl: nothing to do", function (assert) {
-		this.mock(_Helper).expects("makeAbsolute").never();
-		this.mock(_Helper).expects("clone").never();
-
-		assert.strictEqual(
-			// code under test
-			_Helper.makeAbsoluteLongtextUrl({}),
-			undefined, "no return value");
+		assert.deepEqual(oMessage, {});
 	});
 
 	//*********************************************************************************************
@@ -5184,8 +5154,8 @@ sap.ui.define([
 				numericSeverity : 4,
 				technical : true,
 				transition : true,
-				"@$ui5.error" : oError,
-				"@$ui5.originalMessage" : oError
+				"@$ui5.error" : oError
+				// NO "@$ui5.originalMessage" due to Error instance
 			}],
 			oResult;
 
@@ -5199,7 +5169,6 @@ sap.ui.define([
 
 		assert.deepEqual(oResult, aExpectedMessages);
 		assert.strictEqual(oResult[0]["@$ui5.error"], oError);
-		assert.strictEqual(oResult[0]["@$ui5.originalMessage"], oError);
 	});
 
 	//*********************************************************************************************
@@ -5208,6 +5177,7 @@ sap.ui.define([
 			oDataError = {
 				code : "code",
 				details : [{
+					"@$ui5.originalMessage" : "~originalMessage0~",
 					code : "detail-code0",
 					message : "detail-message0",
 					technical : "~bTechnical0~"
@@ -5221,6 +5191,7 @@ sap.ui.define([
 					technical : "~bTechnical2~",
 					target : "$filter"
 				}, {
+					"@$ui5.originalMessage" : "~originalMessage3~",
 					target : "",
 					technical : "~bTechnical3~"
 				}],
@@ -5243,7 +5214,7 @@ sap.ui.define([
 				transition : true,
 				numericSeverity : undefined,
 				"@$ui5.error" : oError,
-				"@$ui5.originalMessage" : oDataError.details[0]
+				"@$ui5.originalMessage" : "~originalMessage0~"
 			}, {
 				additionalTargets : "~add1-undefined~",
 				code : "detail-code1",
@@ -5271,7 +5242,7 @@ sap.ui.define([
 				technical : "~bTechnical3~",
 				transition : true,
 				"@$ui5.error" : oError,
-				"@$ui5.originalMessage" : oDataError.details[3]
+				"@$ui5.originalMessage" : "~originalMessage3~"
 			}],
 			oHelperMock = this.mock(_Helper),
 			aMessages;
@@ -5297,9 +5268,9 @@ sap.ui.define([
 		assert.strictEqual(aMessages[0]["@$ui5.error"], oError);
 		assert.strictEqual(aMessages[0]["@$ui5.originalMessage"], oDataError);
 		assert.strictEqual(aMessages[1]["@$ui5.error"], oError);
-		assert.strictEqual(aMessages[1]["@$ui5.originalMessage"], oDataError.details[0]);
 		assert.strictEqual(aMessages[2]["@$ui5.error"], oError);
 		assert.strictEqual(aMessages[2]["@$ui5.originalMessage"], oDataError.details[1]);
+		assert.strictEqual(aMessages[3]["@$ui5.originalMessage"], oDataError.details[2]);
 	});
 
 	//*********************************************************************************************

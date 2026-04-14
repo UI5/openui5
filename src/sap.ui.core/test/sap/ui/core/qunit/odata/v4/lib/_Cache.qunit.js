@@ -3744,11 +3744,10 @@ sap.ui.define([
 	QUnit.test("Cache#visitResponse: reportStateMessages; single entity", function () {
 		var oCache = new _Cache(this.oRequestor, "SalesOrderList('0500000001')", {}, false,
 				"original/resource/path"),
-			aMessagesInBusinessPartner = [{/* any message object */}],
-			aMessagesSalesOrder = [{/* any message object */}],
-			aMessagesSalesOrderSchedules0 = [{/* any message object */}],
-			aMessagesSalesOrderSchedules1 = [{/* any message object */}],
-			aMessagesEmpty = [],
+			aMessagesInBusinessPartner = ["~message0~"],
+			aMessagesSalesOrder = ["~message1~", "~message2~"],
+			aMessagesSalesOrderSchedules0 = ["~message3~"],
+			aMessagesSalesOrderSchedules1 = ["~message4~"],
 			oData = {
 				messagesInSalesOrder : aMessagesSalesOrder,
 				SO_2_BP : {
@@ -3766,16 +3765,20 @@ sap.ui.define([
 					messagesInSalesOrderSchedule : null,
 					ScheduleKey : "45"
 				}, {
-					messagesInSalesOrderSchedule : aMessagesEmpty,
+					messagesInSalesOrderSchedule : [],
 					ScheduleKey : "46"
 				}]
 			},
 			mExpectedMessages = {
-				"" : aMessagesSalesOrder,
-				SO_2_BP : aMessagesInBusinessPartner,
-				"SO_2_SCHDL('42')" : aMessagesSalesOrderSchedules0,
-				"SO_2_SCHDL('44')" : aMessagesSalesOrderSchedules1
+				"" : [
+					{"@$ui5.originalMessage" : "~message1~", clone : "1"},
+					{"@$ui5.originalMessage" : "~message2~", clone : "2"}
+				],
+				SO_2_BP : [{"@$ui5.originalMessage" : "~message0~", clone : "0"}],
+				"SO_2_SCHDL('42')" : [{"@$ui5.originalMessage" : "~message3~", clone : "3"}],
+				"SO_2_SCHDL('44')" : [{"@$ui5.originalMessage" : "~message4~", clone : "4"}]
 			},
+			oHelperMock = this.mock(_Helper),
 			mTypeForMetaPath = {
 				"/SalesOrderList" : {
 					"@com.sap.vocabularies.Common.v1.Messages" : {$Path : "messagesInSalesOrder"}
@@ -3797,6 +3800,14 @@ sap.ui.define([
 		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		// Note: no calls for null or empty array!
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs().exactly(4);
+		oHelperMock.expects("clone").withExactArgs(sinon.match.same(aMessagesSalesOrder))
+			.returns([{clone : "1"}, {clone : "2"}]);
+		oHelperMock.expects("clone").withExactArgs(sinon.match.same(aMessagesInBusinessPartner))
+			.returns([{clone : "0"}]);
+		oHelperMock.expects("clone").withExactArgs(sinon.match.same(aMessagesSalesOrderSchedules0))
+			.returns([{clone : "3"}]);
+		oHelperMock.expects("clone").withExactArgs(sinon.match.same(aMessagesSalesOrderSchedules1))
+			.returns([{clone : "4"}]);
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, undefined);
 
@@ -3812,12 +3823,12 @@ sap.ui.define([
 			function () {
 		var oCache = new _Cache(this.oRequestor, "SalesOrderList('0500000001')", {}, false,
 				"original/resource/path"),
-			aMessagesInBusinessPartner = [{/* any message object */}],
+			aMessagesInBusinessPartner = ["~message0~"],
 			oData = {
 				messagesInBusinessPartner : aMessagesInBusinessPartner
 			},
 			mExpectedMessages = {
-				SO_2_BP : aMessagesInBusinessPartner
+				SO_2_BP : [{"@$ui5.originalMessage" : "~message0~", clone : "0"}]
 			},
 			mTypeForMetaPath = {
 				"/SalesOrderList/SO_2_BP" : {
@@ -3828,6 +3839,9 @@ sap.ui.define([
 
 		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
+		this.mock(_Helper).expects("clone")
+			.withExactArgs(sinon.match.same(aMessagesInBusinessPartner))
+			.returns([{clone : "0"}]);
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, ["SO_2_BP"]);
 
@@ -3839,12 +3853,14 @@ sap.ui.define([
 	QUnit.test("Cache#visitResponse: reportStateMessages; nested; collection entity", function () {
 		var oCache = new _Cache(this.oRequestor, "SalesOrderList", {}, false,
 				"original/resource/path"),
-			aMessagesInBusinessPartner = [{/* any message object */}],
+			aMessagesInBusinessPartner = ["~message0~"],
 			oData = {
 				messagesInBusinessPartner : aMessagesInBusinessPartner
 			},
 			mExpectedMessages = {
-				"('0500000001')/SO_2_BP" : aMessagesInBusinessPartner
+				"('0500000001')/SO_2_BP" : [
+					{"@$ui5.originalMessage" : "~message0~", clone : "0"}
+				]
 			},
 			mTypeForMetaPath = {
 				"/SalesOrderList/SO_2_BP" : {
@@ -3855,6 +3871,9 @@ sap.ui.define([
 
 		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
+		this.mock(_Helper).expects("clone")
+			.withExactArgs(sinon.match.same(aMessagesInBusinessPartner))
+			.returns([{clone : "0"}]);
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, ["('0500000001')/SO_2_BP"]);
 
@@ -3871,7 +3890,7 @@ sap.ui.define([
 		QUnit.test(sTitle, function () {
 			var oCache = new _Cache(this.oRequestor, "SalesOrderList", {}, false,
 					"original/resource/path"),
-				aMessages = [{/* any message object */}],
+				aMessages = ["~message0~"],
 				oData = {
 					Messages : aMessages,
 					SalesOrderID : "0500000001"
@@ -3892,12 +3911,16 @@ sap.ui.define([
 			if (bMissingPredicate) {
 				delete oData.SalesOrderID; // missing key property -> no key predicate available
 			}
-			mExpectedMessages[sMessagePath] = aMessages;
+			mExpectedMessages[sMessagePath] = [
+				{"@$ui5.originalMessage" : "~message0~", clone : "0"}
+			];
 
 			this.mock(_Helper).expects("matchEndsWithTransientPredicate")
 				.exactly(bMissingPredicate ? 0 : 1).withExactArgs("($uid=id-1-23)")
 				.returns(["($uid=id-1-23)"]);
 			this.mock(oCache).expects("checkSharedRequest").withExactArgs();
+			this.mock(_Helper).expects("clone").withExactArgs(sinon.match.same(aMessages))
+				.returns([{clone : "0"}]);
 			this.oModelInterfaceMock.expects("reportStateMessages")
 				.withExactArgs("original/resource/path", mExpectedMessages, [sMessagePath]);
 
@@ -3910,7 +3933,7 @@ sap.ui.define([
 	QUnit.test("Cache#visitResponse: reportStateMessages for new nested entity", function () {
 		var oCache = new _Cache(this.oRequestor, "SalesOrderList", {}, false,
 				"original/resource/path"),
-			aMessages = [{/* any message object */}],
+			aMessages = ["~message0~"],
 			oData = {
 				ItemPosition : "42",
 				Messages : aMessages,
@@ -3918,7 +3941,7 @@ sap.ui.define([
 			},
 			mExpectedMessages = {
 				"('0500000001')/SO_2_SOITEM(SalesOrderID='0500000001',ItemPosition='42')" :
-					aMessages
+					[{"@$ui5.originalMessage" : "~message0~", clone : "0"}]
 			},
 			sTransientPredicate = "($uid=id-1-23)",
 			mTypeForMetaPath = {
@@ -3937,6 +3960,8 @@ sap.ui.define([
 		this.mock(_Helper).expects("matchEndsWithTransientPredicate")
 			.withExactArgs("('0500000001')/SO_2_SOITEM($uid=id-1-23)").returns(["($uid=id-1-23)"]);
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
+		this.mock(_Helper).expects("clone").withExactArgs(sinon.match.same(aMessages))
+			.returns([{clone : "0"}]);
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages,
 				["('0500000001')/SO_2_SOITEM(SalesOrderID='0500000001',ItemPosition='42')"]);
@@ -3953,6 +3978,7 @@ sap.ui.define([
 
 		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").never();
+		this.mock(_Helper).expects("clone").never();
 		this.oModelInterfaceMock.expects("reportStateMessages").never();
 
 		// code under test
@@ -3973,6 +3999,7 @@ sap.ui.define([
 			.returns();
 		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").never();
+		this.mock(_Helper).expects("clone").never();
 		this.oModelInterfaceMock.expects("reportStateMessages").never();
 
 		// code under test
@@ -3999,8 +4026,8 @@ sap.ui.define([
 				sFirst,
 				oHelperMock = this.mock(_Helper),
 				aMessagePathSegments = ["messagesInSalesOrder"],
-				aMessagesSalesOrder0 = [{/* any message object */}],
-				aMessagesSalesOrder1 = [{/* any message object */}],
+				aMessagesSalesOrder0 = ["~message0~"],
+				aMessagesSalesOrder1 = ["~message1~"],
 				oData = {value : [{}, {}, {}]},
 				mExpectedMessages = {},
 				sSecond,
@@ -4026,13 +4053,8 @@ sap.ui.define([
 				sSecond = (oFixture.iStart + 1).toString();
 				sThird = (oFixture.iStart + 2).toString();
 			}
-			mExpectedMessages[sFirst] = aMessagesSalesOrder0;
-			mExpectedMessages[sSecond] = aMessagesSalesOrder1;
-			// $count and key predicates are also computed for messages array
-			mExpectedMessages[sFirst].$count = 1;
-			mExpectedMessages[sFirst].$byPredicate = {}; // no key predicates
-			mExpectedMessages[sSecond].$count = 0;
-			mExpectedMessages[sSecond].$byPredicate = {}; // no key predicates
+			mExpectedMessages[sFirst] = [{"@$ui5.originalMessage" : "~message0~", clone : "0"}];
+			mExpectedMessages[sSecond] = [{"@$ui5.originalMessage" : "~message1~", clone : "1"}];
 			oHelperMock.expects("drillDown")
 				.withExactArgs(sinon.match.same(oData.value[0]), [])
 				.returns(oFixture.bPredicate ? {SalesOrderID : "42"} : {});
@@ -4053,6 +4075,10 @@ sap.ui.define([
 				.returns([]);
 			oHelperMock.expects("matchEndsWithTransientPredicate").never();
 			this.mock(oCache).expects("checkSharedRequest").withExactArgs().twice();
+			oHelperMock.expects("clone").withExactArgs(sinon.match.same(aMessagesSalesOrder0))
+				.returns([{clone : "0"}]);
+			oHelperMock.expects("clone").withExactArgs(sinon.match.same(aMessagesSalesOrder1))
+				.returns([{clone : "1"}]);
 			this.oModelInterfaceMock.expects("reportStateMessages")
 				.withExactArgs("original/resource/path", mExpectedMessages,
 					[sFirst, sSecond, sThird]);
@@ -4071,7 +4097,7 @@ sap.ui.define([
 			var oCache = new _Cache(this.oRequestor, "SalesOrderList", {}, false,
 					"original/resource/path"),
 				oHelperMock = this.mock(_Helper),
-				aMessages = [{/* any message object */}],
+				aMessages = ["~message0~"],
 				oData = {
 					value : [{
 						SO_2_SOITEM : [{
@@ -4106,7 +4132,7 @@ sap.ui.define([
 				oData.value[0].SO_2_SOITEM[1].SalesOrderItemID = "42.1";
 			}
 			mExpectedMessages[bPredicate ? "('42')/SO_2_SOITEM('42.1')" : "5/SO_2_SOITEM/1"]
-				= aMessages;
+				= [{"@$ui5.originalMessage" : "~message0~", clone : "0"}];
 
 			oHelperMock.expects("drillDown")
 				.withExactArgs(sinon.match.same(oData.value[0]), [])
@@ -4125,6 +4151,8 @@ sap.ui.define([
 				.returns(aMessages);
 			oHelperMock.expects("matchEndsWithTransientPredicate").never();
 			this.mock(oCache).expects("checkSharedRequest").withExactArgs();
+			oHelperMock.expects("clone").withExactArgs(sinon.match.same(aMessages))
+				.returns([{clone : "0"}]);
 			this.oModelInterfaceMock.expects("reportStateMessages")
 				.withExactArgs("original/resource/path", mExpectedMessages,
 					[bPredicate ? "('42')" : "5"]);
@@ -4138,15 +4166,15 @@ sap.ui.define([
 	QUnit.test("_Cache#visitResponse: longtextUrl/media link, no context", function (assert) {
 		var oCache = new _Cache(this.oRequestor, "EntitySet('42')/Navigation", {}, false,
 				"original/resource/path"),
+			oClonedMessage = {longtextUrl : "ClonedLongtext(1)"},
+			oMessage = {longtextUrl : "Longtext(1)"},
 			oData = {
 				id : "1",
 				"picture1@odata.mediaReadLink" : "img_1.jpg",
-				messages : [{
-					longtextUrl : "Longtext(1)"
-				}]
+				messages : [oMessage]
 			},
 			mExpectedMessages = {
-				"" : oData.messages
+				"" : [{...oClonedMessage, "@$ui5.originalMessage" : {...oMessage}}]
 			},
 			oType = {
 				"@com.sap.vocabularies.Common.v1.Messages" : {$Path : "messages"},
@@ -4159,13 +4187,13 @@ sap.ui.define([
 				"/EntitySet/Navigation" : oType
 			};
 
-		mExpectedMessages[""].$count = 1;
-		mExpectedMessages[""].$created = 0;
 		this.mock(_Helper).expects("matchEndsWithTransientPredicate").withExactArgs("")
 			.returns(null);
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
+		this.mock(_Helper).expects("clone").withExactArgs(sinon.match.same(oData.messages))
+			.returns([oClonedMessage]);
 		this.mock(_Helper).expects("makeAbsoluteLongtextUrl")
-			.withExactArgs(sinon.match.same(oData.messages[0]), "/~/EntitySet('42')/Navigation");
+			.withExactArgs(sinon.match.same(oClonedMessage), "/~/EntitySet('42')/Navigation");
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, undefined);
 
@@ -4183,38 +4211,30 @@ sap.ui.define([
 				"@odata.context" : "../$metadata#foo",
 				id : "1",
 				"picture@odata.mediaReadLink" : "img_42.jpg",
-				messages : [{
-					longtextUrl : "Longtext(1)"
-				}],
+				messages : ["~message0~"],
 				foo : {
 					"@odata.context" : "/foo/context",
 					id : "2",
 					"picture@odata.mediaReadLink" : "img_43.jpg",
-					messages : [{
-						longtextUrl : "Longtext(2)"
-					}],
+					messages : ["~message1~"],
 					bar : {
 						id : "3",
 						"picture@odata.mediaReadLink" : "img_44.jpg",
-						messages : [{
-							longtextUrl : "Longtext(3)"
-						}]
+						messages : ["~message2~"]
 					},
 					baz : {
 						"@odata.context" : "baz/context",
 						id : "4",
 						"picture@odata.mediaReadLink" : "img_45.jpg",
-						messages : [{
-							longtextUrl : "Longtext(4)"
-						}]
+						messages : ["~message3~"]
 					}
 				}
 			},
 			mExpectedMessages = {
-				"" : oData.messages,
-				foo : oData.foo.messages,
-				"foo/bar" : oData.foo.bar.messages,
-				"foo/baz" : oData.foo.baz.messages
+				"" : [{"@$ui5.originalMessage" : "~message0~", clone : "0"}],
+				foo : [{"@$ui5.originalMessage" : "~message1~", clone : "1"}],
+				"foo/bar" : [{"@$ui5.originalMessage" : "~message2~", clone : "2"}],
+				"foo/baz" : [{"@$ui5.originalMessage" : "~message3~", clone : "3"}]
 			},
 			oHelperMock = this.mock(_Helper),
 			oType = {
@@ -4231,10 +4251,6 @@ sap.ui.define([
 				"/EntitySet/Navigation/foo/baz" : oType
 			};
 
-		for (const sKey in mExpectedMessages) {
-			mExpectedMessages[sKey].$count = 1;
-			mExpectedMessages[sKey].$created = 0;
-		}
 		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("foo").returns(null);
 		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("").returns(null);
 		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("foo/bar")
@@ -4242,14 +4258,22 @@ sap.ui.define([
 		oHelperMock.expects("matchEndsWithTransientPredicate").withExactArgs("foo/baz")
 			.returns(null);
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs().exactly(4);
+		oHelperMock.expects("clone").withExactArgs(sinon.match.same(oData.messages))
+			.returns([{clone : "0"}]);
 		oHelperMock.expects("makeAbsoluteLongtextUrl")
-			.withExactArgs(sinon.match.same(oData.messages[0]), "/~/$metadata#foo");
+			.withExactArgs(sinon.match(mExpectedMessages[""][0]), "/~/$metadata#foo");
+		oHelperMock.expects("clone").withExactArgs(sinon.match.same(oData.foo.messages))
+			.returns([{clone : "1"}]);
 		oHelperMock.expects("makeAbsoluteLongtextUrl")
-			.withExactArgs(sinon.match.same(oData.foo.messages[0]), "/foo/context");
+			.withExactArgs(sinon.match(mExpectedMessages["foo"][0]), "/foo/context");
+		oHelperMock.expects("clone").withExactArgs(sinon.match.same(oData.foo.bar.messages))
+			.returns([{clone : "2"}]);
 		oHelperMock.expects("makeAbsoluteLongtextUrl")
-			.withExactArgs(sinon.match.same(oData.foo.bar.messages[0]), "/foo/context");
+			.withExactArgs(sinon.match(mExpectedMessages["foo/bar"][0]), "/foo/context");
+		oHelperMock.expects("clone").withExactArgs(sinon.match.same(oData.foo.baz.messages))
+			.returns([{clone : "3"}]);
 		oHelperMock.expects("makeAbsoluteLongtextUrl")
-			.withExactArgs(sinon.match.same(oData.foo.baz.messages[0]), "/foo/baz/context");
+			.withExactArgs(sinon.match(mExpectedMessages["foo/baz"][0]), "/foo/baz/context");
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, undefined);
 
@@ -4272,31 +4296,25 @@ sap.ui.define([
 				value : [{
 					id : "1",
 					"picture@odata.mediaReadLink" : "img_1.jpg",
-					messages : [{
-						longtextUrl : "Longtext(1)"
-					}],
+					messages : ["~message0~"],
 					"foo@odata.context" : "/foo/context",
 					foo : [{
 						id : "2",
 						"picture@odata.mediaReadLink" : "img_2.jpg",
-						messages : [{
-							longtextUrl : "Longtext(2)"
-						}],
+						messages : ["~message1~"],
 						"bar@odata.context" : "bar/context",
 						bar : [{
 							id : "3",
 							"picture@odata.mediaReadLink" : "img_3.jpg",
-							messages : [{
-								longtextUrl : "Longtext(3)"
-							}]
+							messages : ["~message2~"]
 						}]
 					}]
 				}]
 			},
 			mExpectedMessages = {
-				"(1)" : oData.value[0].messages,
-				"(1)/foo(2)" : oData.value[0].foo[0].messages,
-				"(1)/foo(2)/bar(3)" : oData.value[0].foo[0].bar[0].messages
+				"(1)" : [{"@$ui5.originalMessage" : "~message0~", clone : "0"}],
+				"(1)/foo(2)" : [{"@$ui5.originalMessage" : "~message1~", clone : "1"}],
+				"(1)/foo(2)/bar(3)" : [{"@$ui5.originalMessage" : "~message2~", clone : "2"}]
 			},
 			oHelperMock = this.mock(_Helper),
 			oType = {
@@ -4312,18 +4330,21 @@ sap.ui.define([
 				"/EntitySet/Navigation/foo/bar" : oType
 			};
 
-		for (const sKey in mExpectedMessages) {
-			mExpectedMessages[sKey].$count = 1;
-			mExpectedMessages[sKey].$created = 0;
-		}
 		oHelperMock.expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs().thrice();
+		oHelperMock.expects("clone").withExactArgs(sinon.match.same(oData.value[0].messages))
+			.returns([{clone : "0"}]);
 		oHelperMock.expects("makeAbsoluteLongtextUrl")
-			.withExactArgs(sinon.match.same(oData.value[0].messages[0]), "/~/$metadata#foo");
+			.withExactArgs(sinon.match(mExpectedMessages["(1)"][0]), "/~/$metadata#foo");
+		oHelperMock.expects("clone").withExactArgs(sinon.match.same(oData.value[0].foo[0].messages))
+			.returns([{clone : "1"}]);
 		oHelperMock.expects("makeAbsoluteLongtextUrl")
-			.withExactArgs(sinon.match.same(oData.value[0].foo[0].messages[0]), "/foo/context");
+			.withExactArgs(sinon.match(mExpectedMessages["(1)/foo(2)"][0]), "/foo/context");
+		oHelperMock.expects("clone")
+			.withExactArgs(sinon.match.same(oData.value[0].foo[0].bar[0].messages))
+			.returns([{clone : "2"}]);
 		oHelperMock.expects("makeAbsoluteLongtextUrl")
-			.withExactArgs(sinon.match.same(oData.value[0].foo[0].bar[0].messages[0]),
+			.withExactArgs(sinon.match(mExpectedMessages["(1)/foo(2)/bar(3)"][0]),
 				"/foo/bar/context");
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, ["(1)"]);
@@ -4349,14 +4370,10 @@ sap.ui.define([
 			oCache = _Cache.createSingle(this.oRequestor, sResourcePath, {}, false, false,
 				"original/resource/path"),
 			oData = {
-				messages : [{
-					message : "text"
-				}]
+				messages : ["~message0~"]
 			},
 			mExpectedMessages = {
-				"" : [{
-					message : "text"
-				}]
+				"" : [{"@$ui5.originalMessage" : "~message0~", clone : "0"}]
 			},
 			mTypeForMetaPath = {
 				"/OperationImport" : {
@@ -4368,10 +4385,10 @@ sap.ui.define([
 
 		oCache.bSharedRequest = bSharedRequest;
 		oCache.sReportedMessagesPath = "~sReportedMessagesPath~";
-		mExpectedMessages[""].$count = 1;
-		mExpectedMessages[""].$created = 0;
 		this.mock(_Helper).expects("matchEndsWithTransientPredicate").never();
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
+		this.mock(_Helper).expects("clone").withExactArgs(sinon.match.same(oData.messages))
+			.returns([{clone : "0"}]);
 		this.oModelInterfaceMock.expects("reportStateMessages").exactly(bSharedRequest ? 0 : 1)
 			.withExactArgs("original/resource/path", mExpectedMessages, undefined);
 

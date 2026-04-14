@@ -14494,7 +14494,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						target : "n/a", // must be ignored because of missing ContentID
 						"@SAP__common.numericSeverity" : 2
 					}]
-				});
+				}),
+				oErrorResponse = _Helper.clone(oError.error);
 
 			aItems = that.oView.byId("table").getItems();
 
@@ -14514,6 +14515,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					persistent : true,
 					target : "/SalesOrderList('41')",
 					technical : true,
+					technicalDetails : {
+						httpStatus : 500,
+						originalMessage : oErrorResponse
+					},
 					type : "Error"
 				}, {
 					code : "CODE0",
@@ -24641,15 +24646,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Refreshing a single entity without bAllowRemoval is allowed if there is no visual grouping.
 	// JIRA: CPOUI5ODATAV4-3257
 	//
-	// Update grand total when single entity is refreshed; ensure that filter, search, and custom
-	// query options are considered when requesting the grand total again. All filters are applied
-	// before aggregation, because the leaves are not aggregated. If there are multiple refreshes,
-	// only a single grand total request is sent.
-	// JIRA: CPOUI5ODATAV4-3300
-	//
 	// Support Context#requestSideEffects for single entities if there is no visual grouping. The
-	// side effect for an empty navigation property path refreshes the complete entity and the grand
-	// total. Messages are not yet requested.
+	// side effect for an empty navigation property path refreshes the complete entity.
 	// JIRA: CPOUI5ODATAV4-3258
 	//
 	// Context#setOutdated and Context#isOutdated are supported for header contexts.
@@ -24665,13 +24663,19 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3392
 	//
 	// Context#requestSideEffects for single entities. Requesting side effects for a single property
-	// selects only the given property and refreshes the grand total.
+	// selects only the given property.
 	// JIRA: CPOUI5ODATAV4-3389
 	//
 	// Read grand total if entity is deleted; ensure that filter, search, and custom query options
 	// are considered when requesting the grand total again. All filters are applied before
 	// aggregation, because the leaves are not aggregated.
 	// JIRA: CPOUI5ODATAV4-3287
+	//
+	// When refreshing a single entity or requesting side effects for a single property, the
+	// outdated flag at the grand total is set only if the binding has filters, search, or custom
+	// query options. If the outdated flag at the grand total is set, the grand total is not
+	// requested.
+	// JIRA: CPOUI5ODATAV4-3300, CPOUI5ODATAV4-3287
 	[
 		"context refresh",
 		"context refresh via side effects",
@@ -24680,9 +24684,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	].forEach((sScenario) => {
 		QUnit.test("Data Aggregation: leaves' key predicates; " + sScenario, function (assert) {
 			var oBinding,
-				sGrandTotalURL = "SalesOrderList?sap-client=123&custom=foo"
-					+ "&$apply=filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
-					+ "/aggregate(GrossAmount)",
 				oHeaderContext,
 				oModel = this.createSalesOrdersModel123({autoExpandSelect : true}),
 				oTable,
@@ -24835,7 +24836,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				const iBatchNo = that.iBatchNo + 1; // don't care about exact no.
 				that.expectRequest(`#${iBatchNo} DELETE SalesOrderList('26')`)
-					.expectRequest(`#${iBatchNo} ${sGrandTotalURL}`, {
+					.expectRequest(`#${iBatchNo} SalesOrderList?sap-client=123&custom=foo`
+						+ "&$apply=filter(LifecycleStatus gt 'P' and GrossAmount lt 100)"
+						+ "/search(covfefe)/aggregate(GrossAmount)", {
 						value : [{GrossAmount : "5"}]
 					})
 					// update is done before entry is deleted, change at index 4
@@ -24870,25 +24873,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							Note : "n/a",
 							SalesOrderID : "25"
 						})
-						.expectRequest(`#${iBatchNo} ${sGrandTotalURL}`, {
-							value : [{GrossAmount : "11"}]
-						})
-						.expectRequest(`#${iBatchNo} SalesOrderList('24')?sap-client=123&custom=foo`
-							+ "&$select=" + sSelect, {
-							GrossAmount : "6",
-							LifecycleStatus : "X",
-							...(bMessages && {Messages : []}),
-							Note : "n/a",
-							SalesOrderID : "24"
-						})
-						// when refreshing a whole context the grand total is also read and the outdated
-						// flags of the grand total rows are set to false (JIRA: CPOUI5ODATAV4-3392)
-						.expectChange("isOutdated", [false,,, false])
 						.expectChange("lifecycleStatus", [, "Y*"])
-						.expectChange("grossAmount", ["11", "5", "6", "11"]);
+						.expectChange("grossAmount", [, "5"]);
 				}
 
-				const [oGrandTotalContext, oContext25, oContext24] = oBinding.getCurrentContexts();
+				const [oGrandTotalContext, oContext25] = oBinding.getCurrentContexts();
 
 				// Context#requestRefresh, Context#requestSideEffects and Context#setProperty set
 				// "isOutdated" flags to true (JIRA: CPOUI5ODATAV4-3392)
@@ -24900,8 +24889,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					await Promise.all([
 						// code under test (JIRA: CPOUI5ODATAV4-3257, CPOUI5ODATAV4-3300)
 						oContext25.requestRefresh(),
-						// code under test - grand total is requested only once
-						oContext24.requestRefresh(),
 						that.waitForChanges(assert, sScenario)
 					]);
 				} else if (sScenario === "context refresh via side effects") {
@@ -24910,8 +24897,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					await Promise.all([
 						// code under test (JIRA: CPOUI5ODATAV4-3258)
 						oContext25.requestSideEffects([""]),
-						// code under test (JIRA: CPOUI5ODATAV4-3258)
-						oContext24.requestSideEffects([""]),
 						that.waitForChanges(assert, sScenario)
 					]);
 				} else if (sScenario === "request properties of a context via side effects") {
@@ -24920,14 +24905,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							LifecycleStatus : "Y*",
 							Note : "Late*"
 						})
-						.expectRequest(`#${iBatchNo} ${sGrandTotalURL}`, {
-							value : [{GrossAmount : "11"}]
-						})
-						// requestSideEffects also reads the grand total and the outdated flags of the
-						// grand total rows are set to false (JIRA: CPOUI5ODATAV4-3392)
-						.expectChange("isOutdated", [false,,, false])
-						.expectChange("lifecycleStatus", [, "Y*"])
-						.expectChange("grossAmount", ["11",,, "11"]);
+						.expectChange("lifecycleStatus", [, "Y*"]);
 
 					await Promise.all([
 						// code under test (JIRA: CPOUI5ODATAV4-3389)
@@ -24962,11 +24940,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				} else {
 					assert.notOk(true, "Unknown scenario: " + sScenario);
 				}
-				// grand total is up-to-date again after refresh or requestSideEffects
-				// (JIRA: CPOUI5ODATAV4-3392)
-				assert.strictEqual(oGrandTotalContext.getProperty("@$ui5.context.isOutdated"),
-					sScenario === "setProperty");
-				assert.strictEqual(oGrandTotalContext.isOutdated(), sScenario === "setProperty");
+				// grand total is not updated after refresh or requestSideEffects due to e.g. filters
+				// (JIRA: CPOUI5ODATAV4-3287)
+				assert.strictEqual(oGrandTotalContext.getProperty("@$ui5.context.isOutdated"), true);
+				assert.strictEqual(oGrandTotalContext.isOutdated(), true);
 
 				that.expectRequest("SalesOrderList?sap-client=123&custom=foo&$apply="
 						+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
@@ -25049,6 +25026,145 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					that.waitForChanges(assert, "No late property on collapsed group header")
 				]);
 			});
+		});
+	});
+
+	//*********************************************************************************************
+	// Scenario: When refreshing a single entity or requesting side effects for a single property,
+	// the grand total is updated as well if there are no filter, search, or custom query options.
+	// In that case the outdated flag at the grand total is not set. If there are multiple
+	// refreshes, only a single grand total request is sent. If there are sorters the outdated flag
+	// at the header context is.
+	// JIRA: CPOUI5ODATAV4-3300, CPOUI5ODATAV4-3287
+	["context refresh", "request properties of a context via side effects"].forEach((sScenario) => {
+		[false, true].forEach(function (bWithSorter) {
+			const sTitle = "Data Aggregation: leaves' key predicates; update grand total; "
+				+ sScenario + "; with sorters: " + bWithSorter;
+
+		QUnit.test(sTitle, async function (assert) {
+			const oModel = this.createSalesOrdersModel123({autoExpandSelect : true});
+			const sView = `
+	<Table id="table" items="{path : '/SalesOrderList',
+			parameters : {
+				$$aggregation : {
+					aggregate : {
+						GrossAmount : {grandTotal : true}
+					},
+					grandTotalAtBottomOnly : false,
+					group : {
+						LifecycleStatus : {},
+						SalesOrderID : {}
+					}
+				},
+				$count : true
+			}${bWithSorter ? ", sorter : {path : 'LifecycleStatus', descending : true}" : ""} }">
+		<Text id="isOutdated" text="{= %{@$ui5.context.isOutdated} }"/>
+		<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>
+		<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>
+		<Text id="level" text="{= %{@$ui5.node.level} }"/>
+		<Text id="lifecycleStatus" text="{LifecycleStatus}"/>
+		<Text id="grossAmount" text="{= %{GrossAmount} }"/>
+		<Text id="salesOrderID" text="{SalesOrderID}"/>
+	</Table>
+	<Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>`;
+
+			this.expectRequest("SalesOrderList?sap-client=123&$apply="
+					+ "concat(aggregate(GrossAmount),groupby((LifecycleStatus,SalesOrderID)"
+					+ ",aggregate(GrossAmount))"
+					+ (bWithSorter ? "/orderby(LifecycleStatus desc)" : "")
+					+ "/concat(aggregate($count as UI5__count),top(99)))", {
+					value : [
+						{GrossAmount : "6"},
+						{UI5__count : "3", "UI5__count@odata.type" : "#Decimal"},
+						{GrossAmount : "2", LifecycleStatus : "Y", SalesOrderID : "25"},
+						{GrossAmount : "4", LifecycleStatus : "X", SalesOrderID : "24"}
+					]
+				})
+				.expectChange("isOutdated", [undefined, undefined, undefined, undefined])
+				.expectChange("isExpanded", [true, undefined, undefined, undefined])
+				.expectChange("isTotal", [true, false, false, true])
+				.expectChange("level", [0, 1, 1, 0])
+				.expectChange("lifecycleStatus", [null, "Y", "X", null])
+				.expectChange("grossAmount", ["6", "2", "4", "6"])
+				.expectChange("salesOrderID", [null, "25", "24", null])
+				.expectChange("isOutdatedHeader");
+
+			await this.createView(assert, sView, oModel);
+
+			const oTable = this.oView.byId("table");
+			const oBinding = oTable.getBinding("items");
+			const oHeaderContext = oBinding.getHeaderContext();
+
+			this.expectChange("isOutdatedHeader", undefined);
+
+			this.oView.byId("isOutdatedHeader").setBindingContext(oHeaderContext);
+
+			await this.waitForChanges(assert, "set header context");
+
+			const iBatchNo = this.iBatchNo + 1; // don't care about exact no.
+			const sGrandTotalURL = `#${iBatchNo} SalesOrderList?sap-client=123`
+				+ "&$apply=aggregate(GrossAmount)";
+			const [oGrandTotalContext, oContext25, oContext24] = oBinding.getCurrentContexts();
+
+			if (bWithSorter) {
+				this.expectChange("isOutdatedHeader", true);
+			}
+			if (sScenario === "context refresh") {
+				const sQuery = "?sap-client=123&$select=GrossAmount,LifecycleStatus,SalesOrderID";
+				this.expectRequest(`#${iBatchNo} SalesOrderList('25')${sQuery}`, {
+						GrossAmount : "5",
+						LifecycleStatus : "Y*",
+						SalesOrderID : "25"
+					})
+					.expectRequest(sGrandTotalURL, {
+						value : [{GrossAmount : "11"}]
+					})
+					.expectRequest(`#${iBatchNo} SalesOrderList('24')${sQuery}`, {
+						GrossAmount : "6",
+						LifecycleStatus : "X",
+						SalesOrderID : "24"
+					})
+					// when refreshing a whole context the grand total is also read and the
+					// outdated flags of the grand total rows are set to false
+					// (JIRA: CPOUI5ODATAV4-3392)
+					.expectChange("isOutdated", [false,,, false])
+					.expectChange("lifecycleStatus", [, "Y*"])
+					.expectChange("grossAmount", ["11", "5", "6", "11"]);
+
+				await Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-3257, CPOUI5ODATAV4-3300)
+					oContext25.requestRefresh(),
+					// code under test - grand total is requested only once
+					oContext24.requestRefresh(),
+					this.waitForChanges(assert, sScenario)
+				]);
+			} else if (sScenario === "request properties of a context via side effects") {
+				this.expectRequest(`#${iBatchNo} SalesOrderList('25')?sap-client=123`
+						+ "&$select=GrossAmount,LifecycleStatus", {
+						GrossAmount : "7",
+						LifecycleStatus : "Y*"
+					})
+					.expectRequest(sGrandTotalURL, {
+						value : [{GrossAmount : "11"}]
+					})
+					// requestSideEffects also reads the grand total and the outdated flags of
+					// the grand total rows are set to false (JIRA: CPOUI5ODATAV4-3392)
+					.expectChange("isOutdated", [false,,, false])
+					.expectChange("lifecycleStatus", [, "Y*"])
+					.expectChange("grossAmount", ["11", "7",, "11"]);
+
+				await Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-3389)
+					oContext25.requestSideEffects(["LifecycleStatus"]),
+					oContext25.requestSideEffects(["GrossAmount", /*ignored:*/"NoteLanguage"]),
+					this.waitForChanges(assert, sScenario)
+				]);
+			}
+			// grand total is up-to-date again after refresh or requestSideEffects
+			// (JIRA: CPOUI5ODATAV4-3392)
+			assert.strictEqual(oGrandTotalContext.getProperty("@$ui5.context.isOutdated"), false);
+			assert.strictEqual(oGrandTotalContext.isOutdated(), false);
+		});
 		});
 	});
 
@@ -33179,6 +33295,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		QUnit.test(sTitle, function (assert) {
 			var oContext,
 				oListBinding,
+				oMessage = {
+					message : "You're looking younger than ever!",
+					numericSeverity : 2,
+					target : "AGE",
+					transition : false
+				},
 				oModel = this.createTeaBusiModel({autoExpandSelect : true}),
 				oTable,
 				sView = '\
@@ -33224,12 +33346,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						ROOM_ID : "3.0",
 						Name : "Lambda",
 						__CT__FAKE__Message : {
-							__FAKE__Messages : [{
-								message : "You're looking younger than ever!",
-								numericSeverity : 2,
-								target : "AGE",
-								transition : false
-							}]
+							// clone to make sure the original message cannot be modified and can be
+							// safely used for comparison below
+							__FAKE__Messages : [{...oMessage}]
 						}
 					})
 					.expectChange("age", "57")
@@ -33238,6 +33357,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						message : "You're looking younger than ever!",
 						persistent : false,
 						target : "/EMPLOYEES('3')/AGE",
+						technicalDetails : {
+							originalMessage : oMessage
+						},
 						type : "Information"
 					}]);
 
@@ -33321,12 +33443,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						Name : "Lambda",
 						ROOM_ID : "3.0",
 						__CT__FAKE__Message : {
-							__FAKE__Messages : [{
-								message : "You're looking younger than ever!",
-								numericSeverity : 2,
-								target : "AGE",
-								transition : false
-							}]
+							__FAKE__Messages : [oMessage]
 						}
 					}, "merged");
 
@@ -33440,12 +33557,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						Name : "Lambda #1",
 						ROOM_ID : "3.0",
 						__CT__FAKE__Message : {
-							__FAKE__Messages : [{
-								message : "You're looking younger than ever!",
-								numericSeverity : 2,
-								target : "AGE",
-								transition : false
-							}]
+							__FAKE__Messages : [oMessage]
 						}
 					}, "merged again");
 			});

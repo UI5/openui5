@@ -4,14 +4,51 @@
 sap.ui.define([
 	"sap/base/Log",
 	"sap/m/MessageBox",
+	"sap/m/MessageToast",
 	"sap/ui/core/sample/common/Controller",
 	"sap/ui/model/Filter",
 	"sap/ui/model/Sorter",
 	"sap/ui/model/json/JSONModel"
-], function (Log, MessageBox, Controller, Filter, Sorter, JSONModel) {
+], function (Log, MessageBox, MessageToast, Controller, Filter, Sorter, JSONModel) {
 	"use strict";
 
-	return Controller.extend("sap.ui.core.sample.odata.v4.DataAggregation_RAP.RAP", {
+	return Controller.extend("sap.ui.core.sample.odata.v4.AnalyzeTravel_RAP.AnalyzeTravel_RAP", {
+		onActivate : function () { //TODO: factor out code common w/ onEdit, onDiscard?
+			const oContext = this.byId("selectTravel").getSelectedItem()?.getBindingContext();
+			if (!oContext) {
+				MessageToast.show("No travel selected");
+				return;
+			}
+			const oView = this.getView();
+			oView.setBusy(true);
+			//TODO: preparation might have side effects, activation could fail...
+			Promise.all([
+				oView.getModel().bindContext(
+						"com.sap.gateway.srvd.zee_ui_travel_editanly_d_d.v0001.Prepare(...)",
+						oContext)
+					.invoke(), // Note: no return value
+				oView.getModel().bindContext(
+						"com.sap.gateway.srvd.zee_ui_travel_editanly_d_d.v0001.Activate(...)",
+						oContext, {$$inheritExpandSelect : true})
+					// Note: ignore ETag in case preparation has side effects
+					.invoke("$auto", /*bIgnoreETag*/true, /*fnOnStrictHandlingFailed*/null,
+						/*bReplaceWithRVC*/true)
+					.then((oActiveContext) => {
+						this.onChangeTravel(null, oActiveContext);
+
+						MessageToast.show("Activate action invoked successfully");
+					})
+			]).catch((oError) => {
+				MessageBox.error(oError.message);
+			}).finally(() => {
+				oView.setBusy(false);
+			});
+		},
+
+		onBookingStatusChanged : function (oEvent) {
+			oEvent.getSource().getBindingContext().requestSideEffects(["BookingStatusText"]);
+		},
+
 		onChangeGrandTotal : function (vEventOrSelectedKey) {
 			const sGrandTotalAtBottomOnly = typeof vEventOrSelectedKey === "string"
 				? vEventOrSelectedKey
@@ -43,10 +80,95 @@ sap.ui.define([
 			oTable.getBinding("rows").setAggregation(this._oAggregation);
 		},
 
+		onChangeTravel : function (oEvent, oContext) {
+			const oSource = oEvent?.getSource();
+			oContext ??= oSource.toString().includes("ODataListBinding")
+				? oSource.getAllCurrentContexts()[0]
+				: oSource.getSelectedItem().getBindingContext();
+			const oView = this.getView();
+			oView.setBindingContext(oContext);
+			oView.setModel(oView.getModel(), "header");
+			oView.setBindingContext(this.byId("table").getBinding("rows").getHeaderContext(),
+				"header");
+		},
+
+		onCreate : function (_oEvent, bAtEnd, bInactive) {
+			const oListBinding = this.byId("table").getBinding("rows");
+			oListBinding.create({
+				CurrencyCode : "USD", // needed by ABAP
+				FlightPrice : "" + oListBinding.getLength() // Edm.Decimal
+			}, /*bSkipRefresh*/true, bAtEnd, bInactive);
+		},
+
+		onDeleteBooking : function () {
+			const oView = this.getView();
+			oView.setBusy(true);
+			this.byId("details").getBindingContext().delete().then(() => {
+				MessageToast.show("Booking deleted successfully");
+			}, (oError) => {
+				MessageBox.error(oError.message);
+			}).finally(() => {
+				oView.setBusy(false);
+			});
+		},
+
+		onDiscard : function () { //TODO: factor out code common w/ onEdit?
+			const oContext = this.byId("selectTravel").getSelectedItem()?.getBindingContext();
+			if (!oContext) {
+				MessageToast.show("No travel selected");
+				return;
+			}
+			const oView = this.getView();
+			oView.setBusy(true);
+			oView.getModel()
+				.bindContext("SiblingEntity(...)", oContext, {$$inheritExpandSelect : true})
+				.invoke("$auto", /*bIgnoreETag*/false, /*fnOnStrictHandlingFailed*/null,
+					/*bReplaceWithRVC*/true)
+				.then((oActiveContext) => {
+					this.onChangeTravel(null, oActiveContext);
+
+					return oView.getModel().bindContext(
+							"com.sap.gateway.srvd.zee_ui_travel_editanly_d_d.v0001.Discard(...)",
+							oContext)
+						.invoke()
+						.then(() => {
+							MessageToast.show("Discard action invoked successfully");
+						});
+				}).catch((oError) => {
+					MessageBox.error(oError.message);
+				}).finally(() => {
+					oView.setBusy(false);
+				});
+		},
+
 		onDownload : function () {
 			this.byId("table").getBinding("rows").requestDownloadUrl().then(function (sUrl) {
 				window.open(sUrl, sUrl);
 			});
+		},
+
+		onEdit : function () {
+			const oContext = this.byId("selectTravel").getSelectedItem()?.getBindingContext();
+			if (!oContext) {
+				MessageToast.show("No travel selected");
+				return; //TODO: can this ever happen?
+			}
+			const oView = this.getView();
+			oView.setBusy(true);
+			oView.getModel() //TODO: who destroys this ODCB?
+				.bindContext("com.sap.gateway.srvd.zee_ui_travel_editanly_d_d.v0001.Edit(...)",
+					oContext, {$$inheritExpandSelect : true})
+				.setParameter("PreserveChanges", true) //TODO: do we ever need false here?
+				.invoke("$auto", /*bIgnoreETag*/false, /*fnOnStrictHandlingFailed*/null,
+					/*bReplaceWithRVC*/true)
+				.then((oDraftContext) => {
+					MessageToast.show("Edit action invoked successfully");
+					this.onChangeTravel(null, oDraftContext);
+				}, (oError) => {
+					MessageBox.error(oError.message);
+				}).finally(() => {
+					oView.setBusy(false);
+				});
 		},
 
 		onExit : function () {
@@ -62,6 +184,7 @@ sap.ui.define([
 					sFilter = oURLSearchParams.get("filter"),
 					sGrandTotalAtBottomOnly = oURLSearchParams.get("grandTotalAtBottomOnly"),
 					sGroupLevels = oURLSearchParams.get("groupLevels"),
+					oJsonModel,
 					sSort = oURLSearchParams.get("sort"),
 					sSubtotalsAtBottomOnly = oURLSearchParams.get("subtotalsAtBottomOnly"),
 					oTable = this.byId("table"),
@@ -69,33 +192,56 @@ sap.ui.define([
 					oRowsBinding = oTable.getBinding("rows"),
 					sVisibleRowCount = oURLSearchParams.get("visibleRowCount");
 
-				this.getView().setModel(new JSONModel({
+				oJsonModel = new JSONModel({
+					// NO @$ui5.context.isOutdated
 					bBookingID : bBookingID,
 					iMessages : 0,
 					sSearch : "",
 					iVisibleRowCount : parseInt(sVisibleRowCount) || 20
-				}), "ui");
+				});
+				this.getView().setModel(oJsonModel, "ui");
+				this.getView().setModel(oJsonModel, "header"); // until #onChangeTravel takes over
+				this.getView().setBindingContext(oJsonModel.createBindingContext("/"), "header");
+
 				this.initMessagePopover("showMessages");
+
+				this.getView().getModel().getMetaModel().requestValueListInfo(
+						"/ZEE_C_ANALYZE_TRAVEL_D_D/_AnalyzeBooking/BookingStatus",
+						/*bAutoExpandSelect*/true)
+					.then((mValueListInfo) => {
+						this.getView().setModel(mValueListInfo[""].$model, "bookingStatus");
+					});
+
+				this.byId("details").setBindingContext(null);
+
+				//TODO: remove this workaround once ETags work fine
+				this.getView().getModel().setIgnoreETag(true);
 
 				this._oAggregation = {
 					aggregate : {
 						FlightPrice : {
 							grandTotal : true,
 							subtotals : true,
-							unit : "CurrencyCode_code"
+							unit : "CurrencyCode"
 						}
 					},
 					group : {
-						airline : {additionally : ["airlineName"]},
-						ConnectionID : {
-							additionally : ["DepAirport", "DepCity", "DestAirport", "DestCity"]
+						AirlineID : {additionally : ["CarrierName"]},
+						BookingStatus : {
+							additionally : ["BookingStatusText"]
+						},
+						CustomerID : {
+							additionally : ["CustomerName"]
 						}
 					},
-					groupLevels : ["airline", "ConnectionID", "FlightDate", "status", "TravelID",
-						"BookingDate"]
+					groupLevels : ["AirlineID", "ConnectionID", "FlightDate", "BookingStatus",
+						"CustomerID", "TravelUUID", "BookingDate"]
 				};
 				if (bBookingID) { // leaf level is individual bookings
-					this._oAggregation.groupLevels.push("BookingID");
+					this._oAggregation.group.BookingUUID = {
+						additionally : ["BookingID", "IsActiveEntity"]
+					};
+					this._oAggregation.groupLevels.push("BookingUUID");
 				}
 				if (sGroupLevels !== null) {
 					this._oAggregation.groupLevels.forEach((sGroupLevel) => {
@@ -108,8 +254,6 @@ sap.ui.define([
 						this._oAggregation.groupLevels = sGroupLevels.split(",");
 					}
 				}
-				this.getView().setModel(oRowsBinding.getModel(), "header");
-				this.getView().setBindingContext(oRowsBinding.getHeaderContext(), "header");
 				if (sThreshold) {
 					oTable.setThreshold(parseInt(sThreshold));
 				}
@@ -147,7 +291,9 @@ sap.ui.define([
 						});
 					}));
 				}
-				oRowsBinding.resume(); // now that "ui" model is available...
+
+				this.byId("selectTravel").getBinding("items")
+					.attachEventOnce("dataReceived", this.onChangeTravel.bind(this));
 			}, this);
 		},
 
@@ -182,9 +328,7 @@ sap.ui.define([
 			oDetails.getBindingContext()?.setKeepAlive(false);
 
 			const oContext = oEvent.getSource().getBindingContext();
-			oContext.setKeepAlive(true, (oVictim = oContext) => {
-				MessageBox.alert("Unexpected #destroy of " + oVictim);
-			});
+			oContext.setKeepAlive(true);
 			oDetails.setBindingContext(oContext);
 		},
 
@@ -201,8 +345,8 @@ sap.ui.define([
 				const bSelectedGetter = oContext.isSelected();
 				const bSelectedProperty = oContext.getProperty("@$ui5.context.isSelected") ?? false;
 				if (bSelectedGetter !== bSelectedProperty) {
-					Log.warning(`${bSelectedGetter} vs. ${bSelectedProperty}`,
-						oContext, "sap.ui.core.sample.odata.v4.DataAggregation_RAP.RAP");
+					Log.warning(`${bSelectedGetter} vs. ${bSelectedProperty}`, oContext,
+						this.getMetadata().getName());
 				}
 			});
 		},

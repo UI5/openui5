@@ -43,14 +43,6 @@ sap.ui.define([
 			oTable.getBinding("rows").setAggregation(this._oAggregation);
 		},
 
-		onCreate : function (_oEvent, bAtEnd, bInactive) {
-			const oListBinding = this.byId("table").getBinding("rows");
-			oListBinding.create({
-				// Note: no CurrencyCode_code needed
-				FlightPrice : "" + oListBinding.getLength() // Edm.Decimal
-			}, /*bSkipRefresh*/true, bAtEnd, bInactive);
-		},
-
 		onDownload : function () {
 			this.byId("table").getBinding("rows").requestDownloadUrl().then(function (sUrl) {
 				window.open(sUrl, sUrl);
