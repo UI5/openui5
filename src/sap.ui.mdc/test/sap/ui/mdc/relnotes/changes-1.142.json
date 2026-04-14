@@ -78,5 +78,15 @@
         "text": " Field: initial Timezone leads to error"
       }
     ]
+  },
+  "1.142.8": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "70053997ffd8a098ed091a8b3d73fda8570955c8",
+        "type": "FIX",
+        "text": " FilterBar: Empty, NotEmpty - incorrect result"
+      }
+    ]
   }
 }

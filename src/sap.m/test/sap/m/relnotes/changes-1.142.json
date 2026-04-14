@@ -333,5 +333,15 @@
         "text": " sap.m.OverflowToolbar: onfocusfail no longer throws an error"
       }
     ]
+  },
+  "1.142.8": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "b601fa597082bf5af6d2827b389297dd5654e561",
+        "type": "FIX",
+        "text": " sap.m.Popover: Prevent shifting of root html element to ensure correct positioning"
+      }
+    ]
   }
 }
