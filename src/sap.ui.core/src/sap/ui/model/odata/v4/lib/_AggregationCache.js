@@ -2217,7 +2217,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Reads and updates the grand total row.
+	 * Reads and updates the grand total row if the grand total is not outdated. If the grand total
+	 * is outdated a full refresh is needed.
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
 	 *   An original lock for the group ID to be used for the GET request, to be cloned via
@@ -2240,6 +2241,10 @@ sap.ui.define([
 		if (this.oAggregation.$leafLevelAggregated) {
 			throw new Error("Leaves must not be aggregated");
 		}
+		const oGrandTotal = this.aElements.$byPredicate["()"];
+		if (oGrandTotal["@$ui5.context.isOutdated"]) {
+			return; // don't read grand total, a full refresh is needed
+		}
 
 		let mQueryOptions = {...this.mQueryOptions};
 		// drop not needed system query options; $expand, $filter, $search, and $select must not be
@@ -2256,7 +2261,6 @@ sap.ui.define([
 				undefined, undefined, undefined, undefined, undefined, undefined, undefined,
 				{/*mMergeableQueryOptions*/})
 			.then((oResult) => {
-				const oGrandTotal = this.aElements.$byPredicate["()"];
 				_Helper.updateExisting(this.mChangeListeners, "()", oGrandTotal, oResult.value[0]);
 				const oGrandTotalCopy = _Helper.getPrivateAnnotation(oGrandTotal, "copy");
 				if (oGrandTotalCopy) {

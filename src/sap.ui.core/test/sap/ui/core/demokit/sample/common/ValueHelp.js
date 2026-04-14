@@ -21,6 +21,8 @@ sap.ui.define([
 
 	// shortcut for sap.m.PlacementType
 	var PlacementType = library.PlacementType,
+		sInOut = "com.sap.vocabularies.Common.v1.ValueListParameterInOut",
+		sOut = "com.sap.vocabularies.Common.v1.ValueListParameterOut",
 		bSharedRequest
 			= new URLSearchParams(window.location.search).get("$$sharedRequest") !== "false";
 
@@ -195,7 +197,7 @@ sap.ui.define([
 		},
 
 		onValueChange : function (oEvent) {
-			this.setValue(oEvent.getParameter("newValue"), oEvent.getSource().getBindingContext());
+			this.setValue(oEvent.getParameter("value"), oEvent.getSource().getBindingContext());
 		},
 
 		onValueHelp : function () {
@@ -227,8 +229,26 @@ sap.ui.define([
 				}
 
 				function onSelectionChange(oEvent) {
-					that.setValue(oEvent.getParameter("listItem").getCells()[0].getText(),
-						oBinding.getContext());
+					if (oBinding.getPath().includes("/")) { //TODO: how to do this right?
+						that.setValue(oEvent.getParameter("listItem").getCells()[0].getText(),
+							oBinding.getContext());
+					} else {
+						const aCells = oEvent.getParameter("listItem").getCells();
+						const oContext = oEvent.getParameter("listItem").getBindingContext();
+						oValueListMapping.Parameters.forEach(function (oParameter, i) {
+							if (oParameter.$Type === sInOut || oParameter.$Type === sOut) {
+								const sLocalProperty = oParameter.LocalDataProperty.$PropertyPath;
+								const vRawValue
+									= oContext.getProperty(oParameter.ValueListProperty);
+								if (sLocalProperty === oBinding.getPath()) {
+									that.setValue(aCells[i].getText(), oBinding.getContext(),
+										vRawValue);
+								} else {
+									oBinding.getContext().setProperty(sLocalProperty, vRawValue);
+								}
+							}
+						});
+					}
 					onClose();
 				}
 
@@ -291,15 +311,15 @@ sap.ui.define([
 			}
 		},
 
-		setValue : function (sValue, oContext) {
+		setValue : function (sFormattedValue, oContext, vRawValue = sFormattedValue) {
 			var oField = this.getAggregation("field");
 
-			this.setProperty("value", sValue);
+			this.setProperty("value", vRawValue);
 			if (oField) {
-				oField.setValue(sValue);
+				oField.setValue(sFormattedValue);
 			}
 			if (oContext) {
-				this.fireEvent("selectionChanged", {context : oContext, value : sValue});
+				this.fireEvent("selectionChanged", {context : oContext, value : sFormattedValue});
 			}
 		}
 	});

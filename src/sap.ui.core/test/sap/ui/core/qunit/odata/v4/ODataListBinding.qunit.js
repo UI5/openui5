@@ -1679,7 +1679,7 @@ sap.ui.define([
 		const bSetOutdated = !(bLengthFinal || bMoreContexts || bOutdated === undefined);
 		this.mock(oBinding).expects("setOutdated")
 			.exactly(bSetOutdated && iActiveContexts ? 1 : 0)
-			.withExactArgs();
+			.withExactArgs(true);
 		this.mock(oBinding.oHeaderContext).expects("setOutdated")
 			.exactly(bSetOutdated && !iActiveContexts ? 1 : 0)
 			.withExactArgs(false);
@@ -5417,7 +5417,7 @@ sap.ui.define([
 					.returns(oFixture.sGroupId === "deferred");
 				oBindingMock.expects("getUpdateGroupId").withExactArgs().returns(oFixture.sGroupId);
 				oBindingMock.expects("setOutdated").exactly(oFixture.bInactive ? 0 : 1)
-					.withExactArgs();
+					.withExactArgs(true);
 				oBindingMock.expects("lockGroup")
 					.withExactArgs(oFixture.bInactive
 							? "$inactive." + oFixture.sGroupId
@@ -6326,7 +6326,7 @@ sap.ui.define([
 		this.mock(oBinding).expects("checkDeepCreate").never();
 		this.mock(oBinding).expects("isRelative").never();
 		this.mock(oBinding).expects("setOutdated").exactly(bRecursiveHierarchy ? 0 : 1)
-			.withExactArgs();
+			.withExactArgs(true);
 		this.mock(_Helper).expects("publicClone")
 			.withExactArgs(sinon.match.same(oInitialData), true).returns("~oEntityData~");
 		this.mock(oBinding).expects("lockGroup")
@@ -10432,7 +10432,7 @@ sap.ui.define([
 	QUnit.test("doSetProperty: transient predicate=" + bTransientPredicate, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
 		this.mock(oBinding).expects("setOutdated").exactly(bTransientPredicate ? 0 : 1)
-			.withExactArgs();
+			.withExactArgs(true);
 
 		// code under test
 		assert.strictEqual(
@@ -10444,25 +10444,104 @@ sap.ui.define([
 	//*********************************************************************************************
 [false, true].forEach((bDataAggregation) => {
 	[false, true].forEach((bWithAggregationCache) => {
-		const sTitle = "setOutdated: returns undefined, bDataAggregation="
-			+ bDataAggregation + ", bWithAggregationCache=" + bWithAggregationCache;
+		[undefined, false, true].forEach((bForce) => {
+			[{
+				title : "aFilters",
+				setup : function (oBinding) {
+					oBinding.aFilters = [new Filter("foo", FilterOperator.EQ, "bar")];
+				},
+				bGrandTotal : true,
+				bHeaderContext : true
+			}, {
+				title : "aApplicationFilters",
+				setup : function (oBinding) {
+					oBinding.aApplicationFilters = [new Filter("foo", FilterOperator.EQ, "bar")];
+				},
+				bGrandTotal : true,
+				bHeaderContext : true
+			}, {
+				title : "$filter parameter",
+				setup : function (oBinding) {
+					oBinding.mParameters.$filter = "foo eq 'bar'";
+				},
+				bGrandTotal : true,
+				bHeaderContext : true
+			}, {
+				title : "$search parameter",
+				setup : function (oBinding) {
+					oBinding.mParameters.$search = "~searchterm~";
+				},
+				bGrandTotal : true,
+				bHeaderContext : true
+			}, {
+				title : "$$aggregation.search",
+				setup : function (oBinding) {
+					oBinding.mParameters.$$aggregation.search = "~term~";
+				},
+				bGrandTotal : true,
+				bHeaderContext : true
+			}, {
+				title : "custom query option",
+				setup : function (oBinding) {
+					oBinding.mParameters.foo = "bar";
+				},
+				bGrandTotal : true,
+				bHeaderContext : true
+			}, { // sap-valid-* has to be handled as $search; other sap-* parameters are forbidden
+				title : "sap-valid-... parameter",
+				setup : function (oBinding) {
+					oBinding.mParameters["sap-valid-at"] = "now";
+				},
+				bGrandTotal : true,
+				bHeaderContext : true
+			}, {
+				title : "aSorters (header context outdated, not grand total)",
+				setup : function (oBinding) {
+					oBinding.aSorters = [new Sorter("~field~")];
+				},
+				bGrandTotal : false,
+				bHeaderContext : true
+			}, {
+				title : "$orderby (header context outdated, not grand total)",
+				setup : function (oBinding) {
+					oBinding.mParameters.$orderby = "~field~";
+				},
+				bGrandTotal : false,
+				bHeaderContext : true
+			}, {
+				title : "ignore $-parameters",
+				setup : function (oBinding) {
+					oBinding.mParameters.$apply = "~apply~";
+				},
+				bGrandTotal : false,
+				bHeaderContext : false
+			}].forEach((oFixture) => {
+	const sTitle = "setOutdated: bDataAggregation=" + bDataAggregation
+		+ ", bWithAggregationCache=" + bWithAggregationCache + ", bForce=" + bForce
+		+ ", " + oFixture.title;
 
 	QUnit.test(sTitle, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
+		oBinding.mParameters.$$aggregation = {};
+		oFixture.setup(oBinding);
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation);
 		if (bWithAggregationCache) {
 			oBinding.oCache.setGrandTotalOutdated = mustBeMocked;
-			this.mock(oBinding.oCache).expects("setGrandTotalOutdated").withExactArgs(true)
-				.exactly(bDataAggregation ? 1 : 0);
+			this.mock(oBinding.oCache).expects("setGrandTotalOutdated")
+				.exactly(bDataAggregation && (bForce || oFixture.bGrandTotal) ? 1 : 0)
+				.withExactArgs(true);
 		}
-		this.mock(oBinding.oHeaderContext).expects("setOutdated").withExactArgs(true)
-			.exactly(bDataAggregation ? 1 : 0);
+		this.mock(oBinding.oHeaderContext).expects("setOutdated")
+			.exactly(bDataAggregation && (bForce || oFixture.bHeaderContext) ? 1 : 0)
+			.withExactArgs(true);
 
 		// code under test
-		assert.strictEqual(oBinding.setOutdated(), undefined);
+		assert.strictEqual(oBinding.setOutdated(bForce), undefined);
 	});
+			});
+		});
 	});
 });
 
@@ -11843,7 +11922,7 @@ sap.ui.define([
 		oBindingMock.expects("fireEvent")
 			.withExactArgs("createActivate", {context : "~oContext~"}, true)
 			.returns(true);
-		oBindingMock.expects("setOutdated").withExactArgs();
+		oBindingMock.expects("setOutdated").withExactArgs(true);
 
 		// code under test
 		assert.strictEqual(oBinding.fireCreateActivate("~oContext~"), true);

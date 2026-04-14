@@ -88,6 +88,7 @@ sap.ui.define([
 	addAppsAndTests(oODataSuite, "odata/v4/testsuite.odatav4.qunit");
 	addAppsAndTests(oFeatureSuite, "internal/testsuite.feature-odata-v4.qunit");
 	const mName2Sandbox = {
+		"AnalyzeTravel_RAP" : false,
 		"Ancestry" : false,
 		"DataAggregation_CAP" : false,
 		"DataAggregation_RAP" : false,

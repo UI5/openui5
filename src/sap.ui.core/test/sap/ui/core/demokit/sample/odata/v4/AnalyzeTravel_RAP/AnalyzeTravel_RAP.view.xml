@@ -1,0 +1,271 @@
+<mvc:View
+	class="sapUiSizeCompact"
+	controllerName="sap.ui.core.sample.odata.v4.AnalyzeTravel_RAP.AnalyzeTravel_RAP"
+	core:require="{
+		Currency : 'sap/ui/model/odata/type/Currency',
+		Unit : 'sap/ui/model/odata/type/Unit'
+	}"
+	xmlns="sap.ui.table"
+	xmlns:core="sap.ui.core"
+	xmlns:demo="sap.ui.core.sample.common"
+	xmlns:form="sap.ui.layout.form"
+	xmlns:m="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:plugins="sap.ui.table.plugins"
+	xmlns:rm="sap.ui.table.rowmodes">
+
+	<m:HBox alignItems="Center" renderType="Bare">
+		<m:Select change=".onChangeTravel" id="selectTravel"
+			items="{path : '/ZEE_C_ANALYZE_TRAVEL_D_D',
+				parameters : {
+					$filter : 'IsActiveEntity eq false or SiblingEntity/IsActiveEntity eq null'
+				},
+				sorter : [{path : 'IsActiveEntity'}, {path : 'TravelID'}]}">
+			<core:ListItem icon="{= %{IsActiveEntity} ? '' : 'sap-icon://status-inactive'}"
+				text="{TravelID}: {CustomerName} ({Description})"/>
+		</m:Select>
+		<m:Button enabled="{= %{IsActiveEntity} }" icon="sap-icon://edit" press=".onEdit"
+			tooltip="Edit"/>
+		<m:Button enabled="{= !%{IsActiveEntity} }" icon="sap-icon://cancel" press=".onDiscard"
+			tooltip="Discard"/>
+		<m:Button enabled="{= !%{IsActiveEntity} }" icon="sap-icon://activate" press=".onActivate"
+			tooltip="Activate"/>
+	</m:HBox>
+
+	<!-- Note: for $$aggregation, see controller's onInit! -->
+	<Table id="table" ariaLabelledBy="title" rowActionCount="{:= %{ui>/bBookingID} ? 1 : 0 }"
+		rows="{path : '_AnalyzeBooking', parameters : {$count : true, $$ownRequest : true}}"
+		selectionMode="None" threshold="100">
+		<dependents>
+			<plugins:ODataV4Aggregation/>
+			<!-- plugins:ODataV4MultiSelection enableNotification="true"/ -->
+		</dependents>
+		<extension>
+			<m:Toolbar design="Transparent" class="sapMTBHeader-CTX">
+				<m:Title level="H1"
+					text="{header>$count} Flight Bookings ({header>$selectionCount} selected)"/>
+				<m:SearchField placeholder="Search for anything..." search=".onSearch"
+					value="{ui>/sSearch}" width="40%"/>
+				<m:Button icon="sap-icon://download" press=".onDownload" tooltip="Download"/>
+				<m:Button icon="sap-icon://response" press=".onRefresh" tooltip="Refresh"/>
+				<m:Button id="showMessages" icon="sap-icon://message-popup" tooltip="Show messages"
+					press=".onToggleMessagePopover" text="{ui>/iMessages}"
+					type="{= ${ui>/iMessages} ? 'Emphasized' : 'Default' }"/>
+				<m:Button icon="sap-icon://multi-select" press=".onShowSelection"
+					tooltip="Show Selection"/>
+				<m:CheckBox select=".onToggleCount" selected="true" text="$count"/>
+				<m:Select change=".onChangeGrandTotal" id="grandTotalAtBottomOnly">
+					<core:Item key="" text="Grand Total At Top"/>
+					<core:Item key="false" text="Grand Total At Top &amp; Bottom"/>
+					<core:Item key="true" text="Grand Total At Bottom"/>
+					<core:Item key="off" text="No Grand Total"/>
+				</m:Select>
+				<m:Label design="Bold" showColon="true" text="Create"/>
+				<m:Button icon="sap-icon://arrow-top" press=".onCreate($event, false, false)"
+					tooltip="Create At Top"/>
+				<m:Button icon="sap-icon://arrow-bottom" press=".onCreate($event, true, false)"
+					tooltip="Create At Bottom"/>
+				<m:Button icon="sap-icon://slim-arrow-up" press=".onCreate($event, false, true)"
+					tooltip="Create Inactive At Top"/>
+				<m:Button icon="sap-icon://slim-arrow-down" press=".onCreate($event, true, true)"
+					tooltip="Create Inactive At Bottom"/>
+			</m:Toolbar>
+		</extension>
+		<rowActionTemplate>
+			<RowAction>
+				<RowActionItem press=".onShowDetails" type="Navigation" visible="{ui>/bBookingID}"/>
+			</RowAction>
+		</rowActionTemplate>
+		<rowMode>
+			<rm:Interactive rowCount="{ui>/iVisibleRowCount}" fixedTopRowCount="1" minRowCount="2"/>
+		</rowMode>
+		<Column filterProperty="AirlineID" sortProperty="AirlineID" width="20em">
+			<m:Label text="Airline"/>
+			<template>
+				<m:Text text="{AirlineID} - {CarrierName}" wrapping="false"/>
+			</template>
+		</Column>
+		<Column filterProperty="ConnectionID" hAlign="End" sortProperty="ConnectionID" width="7em">
+			<m:Label text="Connection ID"/>
+			<template>
+				<m:Text text="{ConnectionID}" wrapping="false"/>
+			</template>
+		</Column>
+		<Column filterProperty="FlightDate" sortProperty="FlightDate" width="9em">
+			<m:Label text="Flight Date"/>
+			<template>
+				<demo:ValueHelp enabled="{= !%{@$ui5.node.isTotal} }" value="{FlightDate}"/>
+			</template>
+		</Column>
+		<Column filterProperty="BookingStatus" sortProperty="BookingStatus" width="8em">
+			<m:Label text="Booking Status"/>
+			<template>
+				<m:Select change=".onBookingStatusChanged" enabled="{= !%{@$ui5.node.isTotal} }"
+					forceSelection="false" selectedKey="{BookingStatus}"
+					items="{path : 'bookingStatus>/xDMOxI_Booking_Status_VH',
+						parameters : {$$sharedRequest : true}, templateShareable : false}">
+					<core:ListItem key="{bookingStatus>BookingStatus}"
+						text="{bookingStatus>BookingStatus_Text}"/>
+				</m:Select>
+			</template>
+		</Column>
+		<Column filterProperty="BookingDate" sortProperty="BookingDate" width="7em">
+			<m:Label text="Booking Date"/>
+			<template>
+				<m:Text text="{BookingDate}" wrapping="false"/>
+			</template>
+		</Column>
+		<Column filterProperty="BookingID" hAlign="End" sortProperty="BookingID"
+				visible="{ui>/bBookingID}" width="6em">
+			<m:Label text="Booking ID"/>
+			<template>
+				<m:Text text="{BookingID}" wrapping="false"/>
+			</template>
+		</Column>
+		<Column filterProperty="FlightPrice" sortProperty="FlightPrice" hAlign="End" width="7em">
+			<m:Label text="Flight Price"/>
+			<template>
+				<m:Input editable="{= !%{@$ui5.node.isTotal} }" value="{
+						mode: 'TwoWay',
+						parts : ['FlightPrice', 'CurrencyCode', {
+							mode : 'OneTime',
+							path : '/##@@requestCurrencyCodes',
+							targetType : 'any'
+						}],
+						type : 'Currency',
+						formatOptions : { showMeasure : false }
+					}"/>
+			</template>
+		</Column>
+		<Column filterProperty="CurrencyCode" sortProperty="CurrencyCode" width="6em">
+			<m:Label text="Currency"/>
+			<template>
+				<demo:ValueHelp enabled="{= !%{@$ui5.node.isTotal} }" value="{CurrencyCode}"/>
+			</template>
+		</Column>
+		<Column hAlign="Center" width="6em">
+			<m:Label text="Outdated?"/>
+			<template>
+				<core:Icon
+					color="{= %{@$ui5.context.isOutdated} === true ? 'Critical' : 'Positive' }"
+					src="{= %{@$ui5.context.isOutdated} === true
+						? 'sap-icon://disconnected' : 'sap-icon://connected' }"
+					tooltip="Grand Total {= (%{@$ui5.context.isOutdated}
+						? 'may be outdated' : 'is up to date') }"
+					visible="{= %{@$ui5.node.isTotal}
+						&amp;&amp; %{@$ui5.context.isOutdated} !== undefined }"/>
+			</template>
+		</Column>
+		<Column hAlign="Center" width="4em">
+			<m:Label text="State"/>
+			<template>
+				<core:Icon src="{= %{@$ui5.context.isInactive}
+							? 'sap-icon://sys-minus'
+							: (%{@$ui5.context.isTransient}
+								? 'sap-icon://sys-add'
+								: (%{@$ui5.context.isTransient} === undefined
+									? 'sap-icon://cloud'
+									: 'sap-icon://sys-enter'
+								)) }"
+					tooltip="{= %{@$ui5.context.isInactive}
+							? 'Inactive'
+							: (%{@$ui5.context.isTransient}
+								? 'Transient'
+								: (%{@$ui5.context.isTransient} === undefined
+									? 'From Server'
+									: 'Persisted'
+								)) }"/>
+			</template>
+		</Column>
+		<Column width="4em">
+			<m:CheckBox selected="{header>@$ui5.context.isSelected}" tooltip="Select All"/>
+			<template>
+				<m:CheckBox selected="{@$ui5.context.isSelected}"/>
+			</template>
+		</Column>
+		<footer>
+			<m:MessageStrip
+				text="{= %{header>@$ui5.context.isOutdated}
+					? 'Table content may be outdated. Please refresh to see the latest data.'
+					: 'Table content is up to date.' }"
+				type="{= %{header>@$ui5.context.isOutdated} ? 'Warning' : 'Success' }"
+				visible="{= %{header>@$ui5.context.isOutdated} !== undefined }">
+				<m:link>
+					<m:Link accessibleRole="Button" press=".onRefresh" text="Refresh"
+						visible="{header>@$ui5.context.isOutdated}"/>
+				</m:link>
+			</m:MessageStrip>
+		</footer>
+	</Table>
+
+	<m:VBox id="details" visible="{ui>/bBookingID}">
+		<form:SimpleForm columnsL="3" layout="ColumnLayout">
+			<form:toolbar>
+				<m:Toolbar>
+					<m:Title text="Booking Details #{BookingID}"/>
+					<m:ToolbarSpacer/>
+					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://response"
+						press=".onRefreshBooking" tooltip="Refresh"/>
+					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://refresh"
+						press=".onRefreshBookingViaSideEffects" tooltip="Side-Effects Refresh"/>
+					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://synchronize"
+						press=".onRefreshFlightDate" tooltip="Side Effect for Flight Date"/>
+					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://travel-expense"
+						press=".onRefreshFlightPrice" tooltip="Side Effect for Flight Price"/>
+					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://delete"
+						press=".onDeleteBooking" tooltip="Delete"/>
+				</m:Toolbar>
+			</form:toolbar>
+			<m:Label text="Flight Date"/>
+			<demo:ValueHelp value="{FlightDate}"/>
+			<m:Label text="Booking Status"/>
+			<m:Text text="{BookingStatus} - {BookingStatusText}"/>
+		</form:SimpleForm>
+		<form:SimpleForm binding="{_Travel}" columnsL="3" layout="ColumnLayout"
+				title="Travel Details #{TravelID} ({Description})">
+			<m:Label text="Agency"/>
+			<m:Text text="{AgencyID} - {AgencyName}"/>
+			<m:Label text="Customer"/>
+			<m:Text text="{CustomerID} - {CustomerName}"/>
+			<m:Label text="Date"/>
+			<m:Text text="{BeginDate} to {EndDate}"/>
+			<m:Label text="Overall Status"/>
+			<m:Text text="{OverallStatus} - {OverallStatusText}"/>
+			<m:Label text="Booking Fee"/>
+			<m:Text text="{
+					parts : ['BookingFee', 'CurrencyCode', {
+						mode : 'OneTime',
+						path : '/##@@requestCurrencyCodes',
+						targetType : 'any'
+					}],
+					type : 'Currency'
+				}"/>
+			<m:Label text="Total Price"/>
+			<m:Text text="{
+					parts : ['TotalPrice', 'CurrencyCode', {
+						mode : 'OneTime',
+						path : '/##@@requestCurrencyCodes',
+						targetType : 'any'
+					}],
+					type : 'Currency'
+				}"/>
+		</form:SimpleForm>
+	</m:VBox>
+
+	<m:FormattedText htmlText="&lt;em>Available URL parameters:&lt;/em>
+		&lt;ul>
+			&lt;li> &lt;code>BookingID&lt;/code> - If present, the leaf level is individual bookings
+			&lt;li> &lt;code>filter&lt;/code> - Comma separated list of UI5-like filter conditions,
+				for example &lt;code>BookingStatus EQ B,CurrencyCode EQ USD,FlightPrice GT 1234
+				&lt;/code>
+			&lt;li> &lt;code>grandTotalAtBottomOnly&lt;/code> - Optional boolean (empty, false, or
+				true) or &lt;code>off&lt;/code> to turn off grand totals
+			&lt;li> &lt;code>groupLevels&lt;/code> - Optional comma separated list of properties to
+				overwrite the default grouping; if empty, grouping is disabled
+			&lt;li> &lt;code>sort&lt;/code> - Comma separated list of UI5-like sorter conditions,
+				for example &lt;code>BookingStatus,FlightPrice desc&lt;/code>
+			&lt;li> &lt;code>subtotalsAtBottomOnly&lt;/code> - Optional boolean (empty, false, or
+				true) or &lt;code>off&lt;/code> to turn off subtotals
+			&lt;li> &lt;code>threshold&lt;/code> - A number; default 100
+			&lt;li> &lt;code>visibleRowCount&lt;/code> - A number; default 20"/>
+</mvc:View>

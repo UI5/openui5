@@ -2659,7 +2659,6 @@ sap.ui.define([
 		}
 
 		const aUI5Messages = aMessages.map((oMessage) => {
-			oMessage["@$ui5.originalMessage"] ??= _Helper.clone(oMessage);
 			oMessage.transition = true;
 			if (oOperationMetadata) {
 				// make targets absolute, will not be adjusted again in #createUI5Message

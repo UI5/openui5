@@ -1055,7 +1055,7 @@ sap.ui.define([
 			sGroupId = "$inactive." + sGroupId;
 		} else if (!oAggregation?.hierarchyQualifier) {
 			this.iActiveContexts += 1;
-			this.setOutdated();
+			this.setOutdated(true);
 		}
 
 		if (this.bFirstCreateAtEnd === undefined) {
@@ -1789,7 +1789,7 @@ sap.ui.define([
 		// entities with transient predicates are either inactive, in that case the outdated flags
 		// must not be set, or the outdated flags have been set already while creating the entity
 		if (!sPath.startsWith("($uid=")) {
-			this.setOutdated();
+			this.setOutdated(true);
 		}
 	};
 
@@ -1929,7 +1929,7 @@ sap.ui.define([
 					if (that.iActiveContexts > 0) {
 						// some persisted entries are still in the creation area, so the grand total
 						// may still be outdated
-						that.setOutdated();
+						that.setOutdated(true);
 					} else {
 						// entries and grand total are in sync again
 						that.oHeaderContext.setOutdated(false);
@@ -2608,7 +2608,7 @@ sap.ui.define([
 	ODataListBinding.prototype.fireCreateActivate = function (oContext) {
 		if (this.fireEvent("createActivate", {context : oContext}, true)) {
 			this.iActiveContexts += 1;
-			this.setOutdated();
+			this.setOutdated(true);
 			return true;
 		}
 
@@ -5225,14 +5225,32 @@ sap.ui.define([
 	};
 
 	/**
-	 * Sets the outdated flags at the grand total and the header contexts.
+	 * Sets the outdated flags at the grand total and the header context considering filters,
+	 * sorters, search and custom query options.
+	 *
+	 * @param {boolean} bForce
+	 *   Whether to force setting the outdated flags at the grand total and the header context
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.setOutdated = function () {
+	ODataListBinding.prototype.setOutdated = function (bForce) {
 		if (_Helper.isDataAggregation(this.mParameters)) {
-			this.oCache.setGrandTotalOutdated?.(true);
-			this.oHeaderContext.setOutdated(true);
+			const bGrandTotalOutdated = bForce
+				|| this.aFilters.length > 0
+				|| this.aApplicationFilters.length > 0
+				|| this.mParameters.$filter
+				|| this.mParameters.$search
+				|| this.mParameters.$$aggregation.search
+				|| Object.keys(this.mParameters).some((sKey) => sKey[0] !== "$");
+			if (bGrandTotalOutdated) {
+				this.oCache.setGrandTotalOutdated?.(true);
+			}
+			const bHeaderContextOutdated = bGrandTotalOutdated
+				|| this.aSorters.length > 0
+				|| this.mParameters.$orderby;
+			if (bHeaderContextOutdated) {
+				this.oHeaderContext.setOutdated(true);
+			}
 		}
 	};
 

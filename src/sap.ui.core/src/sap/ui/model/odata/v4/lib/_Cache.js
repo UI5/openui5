@@ -2514,7 +2514,9 @@ sap.ui.define([
 			that = this;
 
 		/*
-		 * Adds the messages to mPathToODataMessages after adjusting the message longtext
+		 * Clones the messages and adds them to mPathToODataMessages after adjusting the message
+		 * longtext URL. The original messages are preserved in "@$ui5.originalMessage" of each
+		 * message.
 		 * @param {object[]} aMessages The message list
 		 * @param {string} sInstancePath The path of the instance in the cache
 		 * @param {string} sContextUrl The context URL for message longtexts
@@ -2523,9 +2525,11 @@ sap.ui.define([
 			bHasMessages = true;
 			if (aMessages && aMessages.length) {
 				that.checkSharedRequest();
-				mPathToODataMessages[sInstancePath] = aMessages;
-				aMessages.forEach(function (oMessage) {
-					_Helper.makeAbsoluteLongtextUrl(oMessage, sContextUrl);
+				const aClonedMessages = _Helper.clone(aMessages);
+				mPathToODataMessages[sInstancePath] = aClonedMessages;
+				aClonedMessages.forEach(function (oClone, i) {
+					oClone["@$ui5.originalMessage"] = aMessages[i];
+					_Helper.makeAbsoluteLongtextUrl(oClone, sContextUrl);
 				});
 			}
 		}

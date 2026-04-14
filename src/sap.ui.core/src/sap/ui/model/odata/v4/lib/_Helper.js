@@ -648,6 +648,11 @@ sap.ui.define([
 						// error message in the property value
 						oResult.message = oResult.error.message.value;
 					}
+					const oClone = oResult.error["@$ui5.originalMessage"]
+						= _Helper.clone(oResult.error);
+					oResult.error.details?.forEach(function (oDetail, i) {
+						oDetail["@$ui5.originalMessage"] = oClone.details[i];
+					});
 				} catch (e) {
 					Log.warning(e.toString(), sBody, sClassName);
 				}
@@ -743,24 +748,27 @@ sap.ui.define([
 		},
 
 		/**
-		 * Creates a technical details object that contains a property <code>originalMessage</code>
-		 * and an optional property <code>httpStatus</code> with the original error's HTTP status.
-		 * <code>isConcurrentModification</code> and <code>retryAfter</code> are copied as well.
+		 * Creates a technical details object that contains optional properties
+		 * <code>httpStatus</code>, <code>isConcurrentModification</code>,
+		 * <code>originalMessage</code> and <code>retryAfter</code>.
 		 *
 		 * @param {object} oMessage
 		 *   The message for which to get technical details
-		 * @returns {object|undefined}
-		 *    An object with a property <code>originalMessage</code> that contains a clone of either
-		 *    the given message itself or if supplied, the "@$ui5.originalMessage" property.
-		 *    If one of these is an <code>Error</code> instance, then <code>{}</code> is returned.
-		 *    The clone is created lazily.
+		 * @returns {object}
+		 *    An object with following optional properties:
+		 *    - <code>httpStatus</code> with the original error's HTTP status
+		 *    - <code>isConcurrentModification</code> with the original error's
+		 *      <code>isConcurrentModification</code>
+		 *    - <code>originalMessage</code> that contains a clone of the "@$ui5.originalMessage"
+		 *      property if supplied. The clone is created lazily.
+		 *    - <code>retryAfter</code> with the original error's <code>retryAfter</code>
 		 *
 		 * @public
 		 */
 		createTechnicalDetails : function (oMessage) {
 			var oClonedMessage,
 				oError = oMessage["@$ui5.error"],
-				oOriginalMessage = oMessage["@$ui5.originalMessage"] || oMessage,
+				oOriginalMessage = oMessage["@$ui5.originalMessage"],
 				oTechnicalDetails = {};
 
 			if (oError && (oError.status || oError.cause)) {
@@ -774,9 +782,7 @@ sap.ui.define([
 					oTechnicalDetails.retryAfter = oError.retryAfter;
 				}
 			}
-			// We don't need the original message for internal errors (errors NOT returned from the
-			// back end, but raised within our framework)
-			if (!(oOriginalMessage instanceof Error)) {
+			if (oOriginalMessage) {
 				Object.defineProperty(oTechnicalDetails, "originalMessage", {
 					enumerable : true,
 					get : function () {
@@ -1072,9 +1078,13 @@ sap.ui.define([
 						technical : bTechnical || oMessage.technical,
 						// use "@$ui5." prefix to overcome name collisions with instance annotations
 						// returned from back end.
-						"@$ui5.error" : oError,
-						"@$ui5.originalMessage" : oMessage
+						"@$ui5.error" : oError
 					};
+
+				if (!(oMessage instanceof Error)) {
+					oRawMessage["@$ui5.originalMessage"]
+						= oMessage["@$ui5.originalMessage"] ?? oMessage;
+				} // else: don't add Error instances as original message
 
 				Object.keys(oMessage).forEach(function (sProperty) {
 					if (sProperty[0] === "@") {
@@ -2310,8 +2320,7 @@ sap.ui.define([
 		},
 
 		/**
-		 * Makes the given message's longtext URL absolute. Clones and keeps the original message
-		 * only if needed.
+		 * Makes the given message's longtext URL absolute.
 		 *
 		 * @param {object} oMessage - An object potentially containing a longtext URL
 		 * @param {string} [oMessage.longtextUrl] - The longtext URL
@@ -2320,13 +2329,7 @@ sap.ui.define([
 		 * @public
 		 */
 		makeAbsoluteLongtextUrl : function (oMessage, sBase) {
-			if (oMessage.longtextUrl) {
-				const sAbsoluteLongtextURL = _Helper.makeAbsolute(oMessage.longtextUrl, sBase);
-				if (oMessage.longtextUrl !== sAbsoluteLongtextURL) {
-					oMessage["@$ui5.originalMessage"] ??= _Helper.clone(oMessage);
-					oMessage.longtextUrl = sAbsoluteLongtextURL;
-				}
-			}
+			oMessage.longtextUrl &&= _Helper.makeAbsolute(oMessage.longtextUrl, sBase);
 		},
 
 		/**
