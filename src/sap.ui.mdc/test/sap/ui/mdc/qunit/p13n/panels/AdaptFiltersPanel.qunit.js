@@ -1468,6 +1468,25 @@ if (sModeName === "Modern") {
 		fnChangeSpy.restore();
 	});
 
+	QUnit.test("SearchField placeholder is set correctly", async function(assert){
+		// Arrange
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oSearchField = oViewContent._getSearchField();
+
+		// Assert
+		assert.ok(oSearchField, "SearchField exists");
+		assert.ok(oSearchField.isA("sap.m.SearchField"), "SearchField is of correct type");
+
+		const sPlaceholder = oSearchField.getPlaceholder();
+		assert.ok(sPlaceholder, "Placeholder is set");
+		assert.equal(sPlaceholder, oViewContent._getResourceText("p13nDialog.ADAPT_FILTER_SEARCH"),
+			"Placeholder matches the i18n text key");
+	});
+
 	QUnit.test("Test _enhanceP13nData: re-insert filtered invisible items at their old position", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel.switchView("list");
@@ -1630,6 +1649,85 @@ if (sModeName === "Modern") {
 		// Assert:
 		assert.ok(aEnhancedData, "Enhanced data is returned");
 		assert.equal(aEnhancedData.length, 2, "All items are present");
+	});
+
+	QUnit.test("Test drag and drop reordering: item is moved and focus is set", async function(assert){
+		// Arrange
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oListControl = oViewContent._oListControl;
+
+		// Switch to sort mode to enable drag and drop
+		oViewContent._oViewModel.setProperty("/editable", false);
+		await nextUIUpdate();
+
+		const aInitialItems = oListControl.getItems().filter((oItem) => oItem.getVisible() && !oItem.isA("sap.m.GroupHeaderListItem"));
+		assert.ok(aInitialItems.length >= 2, "At least 2 items are available for drag and drop");
+
+		const oDraggedItem = aInitialItems[0];
+		const oDroppedItem = aInitialItems[2];
+		const sDraggedItemName = oViewContent._getModelEntry(oDraggedItem).name;
+		const iInitialPosition = oViewContent._getModelEntry(oDraggedItem).position;
+
+		// Spy on fireChange to verify the change event is fired
+		const fnChangeSpy = sinon.spy(oViewContent, "fireChange");
+
+		// Act: Simulate drag and drop (drag first item and drop it after the third item)
+		oViewContent._onRearrange({
+			getParameter: function(sParam) {
+				if (sParam === "draggedControl") {
+					return oDraggedItem;
+				}
+				if (sParam === "droppedControl") {
+					return oDroppedItem;
+				}
+				if (sParam === "dropPosition") {
+					return "After";
+				}
+			}
+		});
+
+		// Wait for async operations and rendering
+		await nextUIUpdate();
+		await new Promise((resolve) => {
+			setTimeout(resolve, 100);
+		});
+
+		// Assert: Check that item was moved
+		const aItems = oViewContent._getP13nModel().getProperty("/items");
+		const oMovedItem = aItems.find((oItem) => oItem.name === sDraggedItemName);
+		assert.ok(oMovedItem, "Moved item exists in model");
+		assert.notEqual(oMovedItem.position, iInitialPosition, "Item position changed from initial position");
+
+		// Assert: Check that change event was fired with correct reason
+		assert.ok(fnChangeSpy.called, "fireChange was called");
+		assert.equal(fnChangeSpy.lastCall.args[0].reason, oViewContent.CHANGE_REASON_REORDER, "Change reason is 'Reorder'");
+
+		// Assert: Check that focus is set on the moved item
+		const aUpdatedItems = oListControl.getItems().filter((oItem) => oItem.getVisible() && !oItem.isA("sap.m.GroupHeaderListItem"));
+		const oMovedListItem = aUpdatedItems.find((oItem) => {
+			const oModelEntry = oViewContent._getModelEntry(oItem);
+			return oModelEntry && oModelEntry.name === sDraggedItemName;
+		});
+
+		assert.ok(oMovedListItem, "Moved item found in updated list");
+
+		// Check if the moved item has focus
+		if (oMovedListItem && oMovedListItem.getDomRef()) {
+			const bItemHasFocus = document.activeElement === oMovedListItem.getDomRef();
+			const bChildHasFocus = oMovedListItem.getDomRef().contains(document.activeElement);
+			const bHasFocus = bItemHasFocus || bChildHasFocus;
+
+			assert.ok(bHasFocus, "Focus is set on the moved item or one of its children");
+		} else {
+			assert.ok(true, "Focus check skipped - DOM ref not available");
+		}
+
+		// Clean up
+		fnChangeSpy.restore();
 	});
 
 	QUnit.module(`${sModeName} - Modern addCustomView Specific Tests`, {

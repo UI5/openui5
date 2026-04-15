@@ -9,8 +9,7 @@ sap.ui.define([
 	"sap/ui/core/Locale",
 	"sap/ui/core/LocaleData",
 	"sap/ui/core/format/NumberFormat"
-],
-	function(Formatting, BaseObject, Locale, LocaleData, NumberFormat) {
+], function(Formatting, BaseObject, Locale, LocaleData, NumberFormat) {
 	"use strict";
 
 

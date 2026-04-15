@@ -199,11 +199,15 @@ sap.ui.define([
 
 	AdaptFiltersPanelContent.prototype._getToolbar = function() {
 		if (!this._oToolbar) {
+			const oSearchField = this._getSearchField();
+			if (oSearchField) {
+				oSearchField.setPlaceholder(this._getResourceText("p13nDialog.ADAPT_FILTER_SEARCH"));
+			}
 			this._oToolbar = new OverflowToolbar(this.getId() + "-toolbar", {
 				content: [
 					new Title(this.getId() + "-title", { text: this._getResourceText("adaptFiltersPanel.TOOLBAR_TITLE") }),
 					new ToolbarSpacer(),
-					this._getSearchField(),
+					oSearchField,
 					this._getModeButton()
 				]
 			});
@@ -276,25 +280,20 @@ sap.ui.define([
 
 	AdaptFiltersPanelContent.prototype._getAddFilterSection = function() {
 		if (!this._oAddFilterSelect) {
-			this._oKeySelect = this._createKeySelect().setLayoutData(new GridData({
-				span: "XL5 L5 M5 S12"
-			}));
+			this._oKeySelect = this._createKeySelect();
+			this._oKeySelect.setWidth("220px");
+
 			const oLabel = new Label(this.getId() + "-addFilterLabel", {
 				text: this._getResourceText("adaptFiltersPanel.ADD_FILTER_LABEL"),
 				showColon: true,
 				labelFor: this._oKeySelect,
 				vAlign: "Middle",
-				width: "100%",
-				wrapping: true
-			}).setLayoutData(new GridData({
-				span: "XL2 L2 M2 S12"
-			})).addStyleClass("sapUiMDCAdaptFiltersPanelFilterLabel");
+				wrapping: false
+			}).addStyleClass("sapUiMDCAdaptFiltersPanelFilterLabel sapUiTinyMarginEnd");
 
-			this._oAddFilterSelect = new Grid(this.getId() + "-addFilterSection", {
-				containerQuery: true,
-				width: "100%",
-				hSpacing: 0.5,
-				content: [oLabel, this._oKeySelect]
+			this._oAddFilterSelect = new HBox(this.getId() + "-addFilterSection", {
+				alignItems: "Center",
+				items: [oLabel, this._oKeySelect]
 			}).addStyleClass("sapUiMDCAdaptFiltersPanelAddFilterSection");
 		}
 		return this._oAddFilterSelect;
@@ -687,7 +686,7 @@ sap.ui.define([
 		const aContent = [oLabel];
 		if (oFilterControl) {
 			oFilterControl.setLayoutData(new GridData({
-				span: "XL8 L6 M6 S8",
+				span: "XL6 L6 M6 S8",
 				linebreakS: true
 			}));
 			aContent.push(oFilterControl);
@@ -955,7 +954,7 @@ sap.ui.define([
 		setTimeout(() => {
 			const aListItems = this._oListControl.getItems().filter((oItem) => oItem.getVisible());
 			aListItems[iNewIndex - 1].focus();
-		}, 0);
+		}, 100);
 	};
 
 	AdaptFiltersPanelContent.prototype._selectKey = function(oComboBox) {

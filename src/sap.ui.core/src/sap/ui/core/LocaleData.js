@@ -2010,8 +2010,7 @@ sap.ui.define([
 		 *
 		 * @returns {string} The placeholder pattern, for example "e.g. {0}" or "z.B. {0}"
 		 *
-		 * @public
-		 * @since 1.147.0
+		 * @private
 		 */
 		getDatePlaceholder: function() {
 			return this._get("sap-datePlaceholder");
@@ -2024,8 +2023,7 @@ sap.ui.define([
 		 *   The file size unit key
 		 * @returns {string} The format pattern
 		 *
-		 * @public
-		 * @since 1.147.0
+		 * @private
 		 */
 		getFileSizePattern: function(sUnit) {
 			return this._get("sap-fileSize", sUnit);

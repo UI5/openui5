@@ -265,7 +265,7 @@ sap.ui.define([
 			this._oDataProvider.destroy();
 		}
 
-		this._oDataProvider = oCard.getDataProviderFactory().create(oDataConfig, null, true);
+		this._oDataProvider = oCard.getDataProviderFactory().create(oDataConfig, true);
 
 		if (oDataConfig.name) {
 			oModel = oCard.getModel(oDataConfig.name);

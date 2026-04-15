@@ -209,7 +209,7 @@ sap.ui.define([
 	/* ariaLabelledBy()               */
 	/* ------------------------------ */
 
-	QUnit.test("it should set the value of the aria-labelledby attribute to the id of the label concatenated with the id of the invisible element separated by a space (test case 1)", function (assert) {
+	QUnit.test("it should set the value of the aria-labelledby attribute to the id of the label no custom text (test case 1)", function (assert) {
 
 		// system under test
 		var oLabel = new Label({
@@ -225,7 +225,7 @@ sap.ui.define([
 		oLabel.placeAt("content");
 		oSwitch.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		var sExpectedLabelledBy = "label " + oSwitch.getInvisibleElementId();
+		var sExpectedLabelledBy = "label";
 
 		// assert
 		assert.strictEqual(oSwitch.getDomRef().getAttribute("aria-labelledby"), sExpectedLabelledBy);
@@ -235,7 +235,7 @@ sap.ui.define([
 		oLabel.destroy();
 	});
 
-	QUnit.test("it should set the value of the aria-labelledby attribute to the id of the label concatenated with the id of the invisible element separated by a space (test case 2)", function (assert) {
+	QUnit.test("it should set the value of the aria-labelledby attribute to the id of the label no custom text (test case 2)", function (assert) {
 
 		// system under test
 		var oSwitch = new Switch({
@@ -251,7 +251,7 @@ sap.ui.define([
 		oLabel.placeAt("content");
 		oSwitch.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		var sExpectedLabelledBy = "label " + oSwitch.getInvisibleElementId();
+		var sExpectedLabelledBy = "label";
 
 		// assert
 		assert.strictEqual(oSwitch.getDomRef().getAttribute("aria-labelledby"), sExpectedLabelledBy);
@@ -261,7 +261,63 @@ sap.ui.define([
 		oLabel.destroy();
 	});
 
-	QUnit.test("it should set the value of the aria-labelledby attribute to the id of the label concatenated with the id of the invisible element separated by a space (test case 3)", function (assert) {
+	QUnit.test("it should set the value of the aria-labelledby attribute to the id of the label concatenated with the id of the invisible element separated by a space when there is CustomTextOn (test case 3)", function (assert) {
+
+		// system under test
+		var oLabel = new Label({
+			id: "label"
+		});
+
+		var oSwitch = new Switch({
+			state: true,
+			ariaLabelledBy: oLabel,
+			customTextOn: "Yes"
+		});
+
+		// arrange
+		oLabel.placeAt("content");
+		oSwitch.placeAt("content");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		var sExpectedLabelledBy = "label " + oSwitch.getInvisibleElementId();
+
+		// assert
+		assert.strictEqual(oSwitch.getDomRef().getAttribute("aria-labelledby"), sExpectedLabelledBy);
+		assert.strictEqual(oSwitch.getDomRef("invisible").textContent, "Yes");
+
+		// cleanup
+		oSwitch.destroy();
+		oLabel.destroy();
+	});
+
+	QUnit.test("it should set the value of the aria-labelledby attribute to the id of the label concatenated with the id of the invisible element separated by a space when there is CustomTextOff (test case 4)", function (assert) {
+
+		// system under test
+		var oLabel = new Label({
+			id: "label"
+		});
+
+		var oSwitch = new Switch({
+			state: false,
+			ariaLabelledBy: oLabel,
+			customTextOff: "No"
+		});
+
+		// arrange
+		oLabel.placeAt("content");
+		oSwitch.placeAt("content");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		var sExpectedLabelledBy = "label " + oSwitch.getInvisibleElementId();
+
+		// assert
+		assert.strictEqual(oSwitch.getDomRef().getAttribute("aria-labelledby"), sExpectedLabelledBy);
+		assert.strictEqual(oSwitch.getDomRef("invisible").textContent, "No");
+
+		// cleanup
+		oSwitch.destroy();
+		oLabel.destroy();
+	});
+
+	QUnit.test("it should set the value of the aria-labelledby attribute to the id of the label concatenated with the id of the invisible element separated by a space (test case 5)", function (assert) {
 
 		// system under test
 		var oLabel = new Label({
@@ -280,27 +336,6 @@ sap.ui.define([
 
 		// assert
 		assert.strictEqual(oSwitch.getDomRef().getAttribute("aria-labelledby"), sExpectedLabelledBy);
-
-		// cleanup
-		oSwitch.destroy();
-	});
-
-	QUnit.test("it should set the value of the invisible element for custom text", function (assert) {
-
-		// system under test
-		var oSwitch = new Switch({
-			id: "label1",
-			state: true,
-			customTextOn: "Yes",
-			customTextOff: "No"
-		});
-
-		// arrange
-		oSwitch.placeAt("content");
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
-
-		// assert
-		assert.strictEqual(oSwitch.getDomRef("invisible").textContent, "Yes");
 
 		// cleanup
 		oSwitch.destroy();
@@ -1057,12 +1092,12 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("invisible text", function(assert) {
+	QUnit.test("invisible text no custom texts", function(assert) {
 		// arrange
 		var $IT = this.switch.$().find(".sapUiInvisibleText");
 
 		// assert
-		assert.ok($IT.length, "invisible text exists");
+		assert.ok($IT.length === 0, "invisible text exists");
 		assert.notOk($IT.html(), "There is no default 'Off 'state text");
 
 		// act
@@ -1073,4 +1108,35 @@ sap.ui.define([
 		assert.notOk($IT.html(), "There is no default 'On' state text");
 	});
 
+	QUnit.test("invisible text custom texts are set", function(assert) {
+		// arrange
+		this.switch.setCustomTextOn("On");
+		this.switch.setCustomTextOff("Off");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		var $IT = this.switch.$().find(".sapUiInvisibleText");
+
+		// assert
+		assert.ok($IT.length, "invisible text exists");
+		assert.ok($IT.html(), "There 'Off 'state text");
+
+		// act
+		this.switch.setState(true);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.ok($IT.html(), "There is 'On' state text");
+	});
+
+	QUnit.test("Read-only Switch should have aria-describedby attribute", function(assert) {
+		// arrange
+		this.switch.setEditable(false);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		const sDescribedBy = this.switch.getDomRef().getAttribute("aria-describedby");
+		const oDescribedByElement = document.getElementById(sDescribedBy);
+		assert.ok(sDescribedBy, "aria-describedby attribute is set");
+		assert.ok(oDescribedByElement, "The element referenced by aria-describedby exists");
+		assert.strictEqual(oDescribedByElement.textContent, Library.getResourceBundleFor("sap.m").getText("CONTROL_READONLY"), "The aria-describedby element has the correct text");
+	});
 });

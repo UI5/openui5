@@ -236,13 +236,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("New line characters in XML view", function(assert) {
-		var sViewXML =
+		const done = assert.async();
+		const sViewXML =
 			"<mvc:View xmlns=\"sap.m\" xmlns:mvc=\"sap.ui.core.mvc\">" +
 			"    <Text id=\"xmltext1\" text=\"Should visualize tab&#009;and new line&#xA;and escaped \n and \t\" renderWhitespace=\"true\" width=\"100%\"></Text>" +
 			"    <Text id=\"xmltext2\" text=\"{/text}\" renderWhitespace=\"true\" width=\"100%\"></Text>" +
 			"</mvc:View>";
 
-		return XMLView.create({
+		XMLView.create({
 			definition: sViewXML
 		}).then(async function(oView) {
 			oView.setModel(
@@ -253,15 +254,18 @@ sap.ui.define([
 			oView.placeAt('content64');
 			await nextUIUpdate();
 
-			// assert
-			var myText64a = oView.byId("xmltext1");
-			assert.equal(countLines(myText64a), 2, "Text from XML view should be in 2 lines");
+			setTimeout(function() {
+				// assert
+				var myText64a = oView.byId("xmltext1");
+				assert.equal(countLines(myText64a), 2, "Text from XML view should be in 2 lines");
 
-			var myText64b = oView.byId("xmltext2");
-			assert.equal(countLines(myText64b), 2, "Text from XML view with binding should be in 2 lines");
+				var myText64b = oView.byId("xmltext2");
+				assert.equal(countLines(myText64b), 2, "Text from XML view with binding should be in 2 lines");
 
-			// cleanup
-			oView.destroy();
+				// cleanup
+				oView.destroy();
+				done();
+			}, 100);
 		});
 	});
 

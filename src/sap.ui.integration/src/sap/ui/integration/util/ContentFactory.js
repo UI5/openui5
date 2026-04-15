@@ -76,7 +76,6 @@ sap.ui.define([
 			oContent.setCardDataProvider(oCard._oDataProvider);
 		}
 
-		oContent.setServiceManager(mConfig.serviceManager);
 		oContent.setDataProviderFactory(mConfig.dataProviderFactory);
 		oContent.setIconFormatter(mConfig.iconFormatter);
 		oContent.setActions(new CardActions({

@@ -1369,7 +1369,9 @@ sap.ui.define([
 
 			// This survey could be displayed in a Qualtrics intercept
 			// dialog in the future, instead of a new tab
-			URLHelper.redirect(bProd ? sProdURL : sDevURL, true);
+			var sUrl = bProd ? sProdURL : sDevURL;
+			this._logFeedbackSurveyClick("short survey", sUrl);
+			URLHelper.redirect(sUrl, true);
 		},
 
 		longSurveyRedirect: function () {
@@ -1382,7 +1384,17 @@ sap.ui.define([
 				sDevURL = sBaseUrl + sQueryParams + "&Q_CHL=preview&Q_SurveyVersionID=current",
 				bProd = !this.getModel("versionData").getProperty("/isDevEnv");
 
-			URLHelper.redirect(bProd ? sProdURL : sDevURL, true);
+			var sUrl = bProd ? sProdURL : sDevURL;
+			this._logFeedbackSurveyClick("quarterly survey", sUrl);
+			URLHelper.redirect(sUrl, true);
+		},
+
+		_logFeedbackSurveyClick: function (sSurveyType, sDestination) {
+			this.getOwnerComponent().getUsageTracker().logActivityMapEvent({
+				region: "header",
+				link: "feedback icon - " + sSurveyType,
+				destination: sDestination
+			});
 		},
 
 		setSurveyModelData: function () {

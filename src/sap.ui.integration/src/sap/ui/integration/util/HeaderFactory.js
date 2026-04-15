@@ -97,7 +97,6 @@ sap.ui.define([
 			}
 		}
 
-		oHeader.setServiceManager(oCard._oServiceManager);
 		oHeader.setDataProviderFactory(oCard._oDataProviderFactory);
 		oHeader._setDataConfiguration(mConfiguration.data);
 

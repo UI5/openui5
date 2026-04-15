@@ -278,15 +278,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Handler for when data is changed.
-	 */
-	TableContent.prototype.onDataChanged = function () {
-		BaseListContent.prototype.onDataChanged.apply(this, arguments);
-
-		this._checkHiddenNavigationItems(this.getParsedConfiguration().row);
-	};
-
-	/**
 	 * Binds/Sets properties to the inner item template based on the configuration object row template which is already parsed.
 	 * Attaches all required actions.
 	 *

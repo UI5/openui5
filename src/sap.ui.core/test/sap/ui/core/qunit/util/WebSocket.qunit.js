@@ -93,7 +93,7 @@ sap.ui.define(["sap/ui/core/ws/WebSocket", "sap/ui/Device"],
 			assert.ok(theEx !== undefined, "Wrong protocol parameter. Exception was raised.");
 
 			if (Device.support.websocket) {
-				assert.equal(theEx.message, 'aProtocols must be a string, array of strings or undefined.', 'Correct exception message.');
+				assert.equal(theEx.message, 'vProtocols must be a string, array of strings or undefined.', 'Correct exception message.');
 			} else {
 				assert.equal(theEx.message, 'Browser does not support WebSockets.', 'Correct exception message.');
 			}

@@ -73,7 +73,13 @@ sap.ui.define([
 			 * @public
 			 */
 			onDownloadButtonPress: function () {
-				window.open(this._determineFileLocation(), "_blank");
+				var sUrl = this._determineFileLocation();
+				this.getOwnerComponent().getUsageTracker().logActivityMapEvent({
+					region: "body",
+					link: "download " + this._determinePdfName(),
+					destination: sUrl
+				});
+				window.open(sUrl, "_blank");
 			},
 
 			/**
@@ -99,6 +105,16 @@ sap.ui.define([
 				}
 
 				return bIsDevVersion ? 'https://help.sap.com/DRAFT/SAPUI5_Internal_PDF/SAPUI5_Internal.pdf' : 'https://help.sap.com/SAPUI5_PDF/SAPUI5.pdf';
+			},
+
+			/**
+			 * Determines the PDF's human-readable name for analytics tracking.
+			 * @returns {string} The name of the PDF
+			 * @private
+			 */
+			_determinePdfName: function () {
+				var bIsOpenUI5 = this.getModel("versionData").getProperty("/isOpenUI5");
+				return bIsOpenUI5 ? "OpenUI5 Developer Guide" : "SAPUI5 Developer Guide";
 			}
 		});
 	}

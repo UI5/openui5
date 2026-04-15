@@ -256,7 +256,6 @@ sap.ui.define([
 			}, this);
 		}
 
-		this._oServiceManager = null;
 		this._oDataProviderFactory = null;
 		this._oIconFormatter = null;
 
@@ -609,7 +608,7 @@ sap.ui.define([
 			this._oDataProvider.destroy();
 		}
 
-		this._oDataProvider = this._oDataProviderFactory.create(oDataSettings, this._oServiceManager);
+		this._oDataProvider = this._oDataProviderFactory.create(oDataSettings);
 
 		if (oDataSettings.name) {
 			oModel = oCard.getModel(oDataSettings.name);
@@ -853,11 +852,6 @@ sap.ui.define([
 	*/
 	BaseContent.prototype.handleError = function (mErrorInfo) {
 		this.fireEvent("_error", { errorInfo: mErrorInfo });
-	};
-
-	BaseContent.prototype.setServiceManager = function (oServiceManager) {
-		this._oServiceManager = oServiceManager;
-		return this;
 	};
 
 	BaseContent.prototype.setDataProviderFactory = function (oDataProviderFactory) {
