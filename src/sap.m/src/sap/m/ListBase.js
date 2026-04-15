@@ -287,7 +287,22 @@ function(
 				 *
 				 * @since 1.137
 				 */
-				itemActionCount : {type : "int", group: "Misc", defaultValue: -1}
+				itemActionCount : {type : "int", group: "Misc", defaultValue: -1},
+
+				/**
+				 * Defines whether the control remembers and restores the focus position of items.
+				 *
+				 * If set to <code>true</code> (default), the control remembers the last focused item and restores
+				 * focus to it when the user returns to the control. This is helpful for data inspection scenarios
+				 * where users navigate away and return to continue their work.
+				 *
+				 * If set to <code>false</code>, the control does not restore the previously focused item on re-entry.
+				 * This is suitable for configuration dialogs, settings panels, and other form-like usages where
+				 * a predictable initial focus is required.
+				 *
+				 * @since 1.148
+				 */
+				rememberFocus : {type : "boolean", group : "Behavior", defaultValue : true}
 			},
 			defaultAggregation : "items",
 			aggregations : {
@@ -2651,13 +2666,21 @@ function(
 
 	ListBase.prototype.onsapfocusleave = function(oEvent) {
 		const oNavigationRoot = this.getNavigationRoot();
-		if (oNavigationRoot && !oNavigationRoot.contains(document.activeElement)) {
+		const oRelatedControl = oEvent.relatedControlId && Element.getElementById(oEvent.relatedControlId);
+		const oNextFocusedDomRef = oRelatedControl?.getFocusDomRef?.() || document.activeElement;
+		const bFocusLeftNavigationRoot = oNavigationRoot && !oNavigationRoot.contains(oNextFocusedDomRef);
+
+		if (bFocusLeftNavigationRoot) {
 			this.$("after").attr("tabindex", "0");
 		}
-		if (this._oItemNavigation &&
-			!this.bAnnounceDetails &&
-			!this.getNavigationRoot().contains(document.activeElement)) {
-			this.bAnnounceDetails = true;
+
+		if (this._oItemNavigation && bFocusLeftNavigationRoot) {
+			if (!this.getRememberFocus()) {
+				this._oItemNavigation.resetFocusedIndex();
+			}
+			if (!this.bAnnounceDetails) {
+				this.bAnnounceDetails = true;
+			}
 		}
 	};
 

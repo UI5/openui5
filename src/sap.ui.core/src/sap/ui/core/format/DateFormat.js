@@ -21,8 +21,7 @@ sap.ui.define([
 	"sap/ui/core/date/UniversalDate",
 	"sap/ui/core/format/FormatUtils"
 ], function(Log, Formatting, Localization, CalendarType, CalendarWeekNumbering, TimezoneUtils, formatMessage,
-		deepEqual, extend, Locale, LocaleData, Supportability, CalendarUtils, UI5Date,
-		UniversalDate, FormatUtils) {
+		deepEqual, extend, Locale, LocaleData, Supportability, CalendarUtils, UI5Date, UniversalDate, FormatUtils) {
 	"use strict";
 
 	/**

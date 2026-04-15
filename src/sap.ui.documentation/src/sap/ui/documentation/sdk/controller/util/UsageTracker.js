@@ -300,6 +300,27 @@ sap.ui.define(
                     });
                     this._oLastRouteParameters = null; // clear last route parameters after logging
                 },
+                /**
+                 * Logs an Activity Map click event to Adobe Analytics.
+                 * @param {object} oActivityMapInfo Activity Map details
+                 * @param {string} oActivityMapInfo.region Page region where the click occurred (e.g. "body", "footer")
+                 * @param {string} oActivityMapInfo.link Name of the clicked element (e.g. "download")
+                 * @param {string} oActivityMapInfo.destination Target URL, or "no destination" if not a redirect
+                 */
+                logActivityMapEvent: function (oActivityMapInfo) {
+                    if (!this._isStarted) {
+                        return;
+                    }
+                    this._addToLogs({
+                        event: "activityMap",
+                        activityMap: {
+                            region: oActivityMapInfo.region,
+                            link: oActivityMapInfo.link,
+                            destination: oActivityMapInfo.destination
+                        }
+                    });
+                    this._publishLoggedInfo(false); // stlBeaconReady — no page reload
+                },
                 _publishLoggedInfo: function (bIncrementPageCount) {
                     this._addToLogs({
                         event: bIncrementPageCount

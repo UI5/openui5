@@ -235,8 +235,6 @@ sap.ui.define([
 	ListContent.prototype.onDataChanged = function () {
 		BaseListContent.prototype.onDataChanged.apply(this, arguments);
 
-		this._checkHiddenNavigationItems(this.getParsedConfiguration().item);
-
 		this._getList().getItems().forEach((oItem) => {
 			if (oItem.getActionsStrip && oItem.getActionsStrip()) {
 				oItem.getActionsStrip().onDataChanged();

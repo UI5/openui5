@@ -816,6 +816,10 @@ sap.ui.define([
 	 */
 	Component.prototype.destroy = function() {
 		var pAsyncDestroy, bSomeRejected = false;
+
+		// destroy the object and call exit
+		ManagedObject.prototype.destroy.apply(this, arguments);
+
 		// destroy all services
 		for (var sLocalServiceAlias in this._mServices) {
 			if (this._mServices[sLocalServiceAlias].instance) {
@@ -865,9 +869,6 @@ sap.ui.define([
 				}
 			}.bind(this));
 		}
-
-		// destroy the object
-		ManagedObject.prototype.destroy.apply(this, arguments);
 
 		// unregister for messaging (on Messaging)
 		const Messaging = sap.ui.require("sap/ui/core/Messaging");

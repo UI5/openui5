@@ -11,7 +11,7 @@ sap.ui.define(['./WebSocket', "sap/base/Log"],
 	 * Creates a new WebSocket connection and uses the pcp-protocol for communication.
 	 *
 	 * @param {string} sUrl relative or absolute URL for WebSocket connection.
-	 * @param {array} [aProtocols] array of protocols as strings, a single protocol as a string.
+	 * @param {string|string[]} [vProtocols] array of protocols as strings, a single protocol as a string.
 	 * Protocol(s) should be selected from {@link sap.ui.core.ws.SapPcpWebSocket.SUPPORTED_PROTOCOLS}.
 	 *
 	 * @public
@@ -24,7 +24,7 @@ sap.ui.define(['./WebSocket', "sap/base/Log"],
 	 */
 	var SapPcpWebSocket = WebSocket.extend("sap.ui.core.ws.SapPcpWebSocket", /** @lends sap.ui.core.ws.SapPcpWebSocket.prototype */ {
 
-		constructor: function(sUrl, aProtocols) {
+		constructor: function(sUrl, vProtocols) {
 			WebSocket.apply(this, arguments);
 		}
 
@@ -39,7 +39,7 @@ sap.ui.define(['./WebSocket', "sap/base/Log"],
 	 * @param {sap.ui.base.EventProvider} oControlEvent.getSource
 	 * @param {object} oControlEvent.getParameters
 	 * @param {string} oControlEvent.getParameters.data Received data from the server.
-	 * @param {string} oControlEvent.getParameters.pcpFields Received pcpFields as a key-value map.
+	 * @param {Object<string,string>} oControlEvent.getParameters.pcpFields Received pcpFields as a key-value map.
 	 * @public
 	 */
 
@@ -48,7 +48,7 @@ sap.ui.define(['./WebSocket', "sap/base/Log"],
 	 *
 	 * @param {object} [oParameters] Parameters to pass along with the event
 	 * @param {string} [oParameters.data] Received data from the server.
-	 * @param {string} [oParameters.pcpFields] Received pcpFields as a key-value map.
+	 * @param {Object<string,string>} [oParameters.pcpFields] Received pcpFields as a key-value map.
 	 * @return {this} <code>this</code> to allow method chaining
 	 * @protected
 	 * @name sap.ui.core.ws.SapPcpWebSocket#fireMessage
@@ -156,7 +156,7 @@ sap.ui.define(['./WebSocket', "sap/base/Log"],
 	 * Extracts the pcp-fields from a header string.
 	 *
 	 * @param {string} sHeader Header as string
-	 * @return {object} oPcpFields extracted fields as key-value map
+	 * @return {Object<string,string>} oPcpFields extracted fields as key-value map
 	 * @private
 	 */
 	SapPcpWebSocket.prototype._extractPcpFields = function(sHeader) {
@@ -198,7 +198,7 @@ sap.ui.define(['./WebSocket', "sap/base/Log"],
 	/**
 	 * Serializes pcp-fields into a string.
 	 *
-	 * @param {object} oPcpFields key-value map with pcp-fields
+	 * @param {Object<string,any>} oPcpFields key-value map with pcp-fields
 	 * @param {string} sMessageType message-type, one of 'string', 'blob' or 'arraybuffer'.
 	 * @param {string} sPcpAction pcp-action value
 	 * @returns {string} serialized pcp-fields
@@ -245,7 +245,7 @@ sap.ui.define(['./WebSocket', "sap/base/Log"],
 	 * when the connection is established.
 	 *
 	 * @param {string|Blob|ArrayBuffer} message message to send
-	 * @param {object} [oPcpFields] additional pcp-fields as key-value map
+	 * @param {Object<string,any>} [oPcpFields] additional pcp-fields as key-value map
 	 * @return {this} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */

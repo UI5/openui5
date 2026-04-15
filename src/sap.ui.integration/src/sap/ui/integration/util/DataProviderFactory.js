@@ -5,7 +5,6 @@ sap.ui.define([
 	"sap/ui/base/EventProvider",
 	"sap/base/Log",
 	"sap/ui/integration/library",
-	"sap/ui/integration/util/ServiceDataProvider",
 	"sap/ui/integration/util/RequestDataProvider",
 	"sap/ui/integration/util/CacheAndRequestDataProvider",
 	"sap/ui/integration/util/DataProvider",
@@ -18,7 +17,6 @@ sap.ui.define([
 	EventProvider,
 	Log,
 	library,
-	ServiceDataProvider,
 	RequestDataProvider,
 	CacheAndRequestDataProvider,
 	DataProvider,
@@ -117,7 +115,6 @@ sap.ui.define([
 	 * Factory function which returns an instance of <code>DataProvider</code>.
 	 *
 	 * @param {object} oDataConfiguration The data configuration.
-	 * @param {sap.ui.integration.util.ServiceManager} [oServiceManager] A reference to the service manager.
 	 * @param {boolean} [bIsFilter=false] Whether the caller of this method is Filter.
 	 * @param {boolean} [bConfigurationResolved=false] Whether parsing and resolving of the configuration is done.
 	 * @param {boolean} [bApiCardRequest=false] Whether the request is coming from a card API.
@@ -125,7 +122,7 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.integration, shell-toolkit
 	 * @returns {sap.ui.integration.util.DataProvider|null} A data provider instance used for data retrieval.
 	 */
-	DataProviderFactory.prototype.create = function (oDataConfiguration, oServiceManager, bIsFilter, bConfigurationResolved, bApiCardRequest) {
+	DataProviderFactory.prototype.create = function (oDataConfiguration, bIsFilter, bConfigurationResolved, bApiCardRequest) {
 		var oCard = this._oCard;
 
 		if (!DataProviderFactory.isProvidingConfiguration(oDataConfiguration) || oCard && oCard.getPreviewMode() === CardPreviewMode.Abstract) {
@@ -151,8 +148,6 @@ sap.ui.define([
 			if (oHost) {
 				oDataProvider.setHost(oHost);
 			}
-		} else if (oDataConfiguration.service) {
-			oDataProvider = new ServiceDataProvider(oSettings);
 		} else if (oDataConfiguration.json) {
 			oDataProvider = new DataProvider(oSettings);
 		} else if (oDataConfiguration.extension) {
@@ -169,10 +164,6 @@ sap.ui.define([
 
 		oDataProvider.bindObject("/");
 		oDataProvider.setDestinations(this._oDestinations);
-
-		if (oDataProvider.isA("sap.ui.integration.util.IServiceDataProvider")) {
-			oDataProvider.createServiceInstances(oServiceManager);
-		}
 
 		this._aDataProviders.push(oDataProvider);
 
@@ -248,7 +239,6 @@ sap.ui.define([
 
 		var oNewDataConfiguration = Object.assign({}, oDataConfiguration);
 		delete oNewDataConfiguration.request;
-		delete oNewDataConfiguration.service;
 		delete oNewDataConfiguration.json;
 		delete oNewDataConfiguration.extension;
 
@@ -260,7 +250,7 @@ sap.ui.define([
 	 * @returns {boolean} Whether the configuration provides data
 	 */
 	DataProviderFactory.isProvidingConfiguration = function (oDataCfg) {
-		return oDataCfg && (oDataCfg.request || oDataCfg.service || oDataCfg.json || oDataCfg.extension);
+		return oDataCfg && (oDataCfg.request || oDataCfg.json || oDataCfg.extension);
 	};
 
 	return DataProviderFactory;

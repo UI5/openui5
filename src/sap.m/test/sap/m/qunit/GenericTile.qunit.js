@@ -361,6 +361,14 @@ sap.ui.define([
 		assert.notOk(document.querySelector("#generic-tile .sapMGTCriticalBorder"), "Generic tile border was not rendered");
 	});
 
+	QUnit.test("GenericTile has overflow hidden to clip valueColor border", async function(assert) {
+		this.oGenericTile.setValueColor("Error");
+		await nextUIUpdate();
+		var oTileDomRef = document.querySelector("#generic-tile");
+		var sOverflow = window.getComputedStyle(oTileDomRef).overflow;
+		assert.strictEqual(sOverflow, "hidden", "GenericTile has overflow:hidden to properly clip the valueColor border");
+	});
+
 	QUnit.test("GenericTile is dragged", async function(assert) {
 		this.oGenericTile.invalidate();
 		await nextUIUpdate();

@@ -46,8 +46,7 @@ sap.ui.define([
 			{
 				request: this._createRequest(oSubmitActionHandler, oData)
 			},
-			undefined,
-			undefined,
+			false,
 			true
 		);
 

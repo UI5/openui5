@@ -5,7 +5,6 @@ sap.ui.define([
 	"sap/ui/integration/library",
 	"sap/base/Log",
 	"sap/ui/dom/detectTextSelection",
-	"sap/ui/base/BindingInfo",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/integration/cards/actions/CustomAction",
 	"sap/ui/integration/cards/actions/DateChangeAction",
@@ -22,7 +21,6 @@ sap.ui.define([
 	library,
 	Log,
 	detectTextSelection,
-	BindingInfo,
 	ManagedObject,
 	CustomAction,
 	DateChangeAction,
@@ -37,14 +35,6 @@ sap.ui.define([
 	HideCardAction
 ) {
 	"use strict";
-
-	function _getServiceName(vService) {
-		if (vService && typeof vService === "object") {
-			return vService.name;
-		}
-
-		return vService;
-	}
 
 	var ActionArea = library.CardActionArea,
 		CardActionType = library.CardActionType;
@@ -161,35 +151,16 @@ sap.ui.define([
 			oAreaControl = oConfig.control,
 			sEnabledPropertyName = oConfig.enabledPropertyName,
 			bCheckEnabledState = true,
-			bSingleAction = this._isSingleAction(sActionArea),
 			bActionEnabled = true;
 
 		if (sEnabledPropertyName) {
 			bCheckEnabledState = false;
-
-			if (oAction.service && !bSingleAction) {
-				// When there is a service let it handle the "enabled" state.
-				this._setControlEnabledStateUsingService(oConfig);
-			} else {
-				// Or when there is a list item template, handle the "enabled" state with bindProperty + formatter
-				this._setControlEnabledState(oConfig);
-			}
-		}
-
-		if (oAction.service && bSingleAction) {
-			this._getSingleActionEnabledState(oAction, oAreaControl).then(function (bEnabled) {
-				if (bEnabled) {
-					this._attachEventListener(oConfig);
-				}
-
-				this._fireActionReady(oAreaControl, sActionArea);
-			}.bind(this));
-
-			return;
+			// When there is a list item template, handle the "enabled" state with bindProperty + formatter
+			this._setControlEnabledState(oConfig);
 		}
 
 		if (bCheckEnabledState) {
-			// Handle the "enabled" state when there is no service and item template with formatter.
+			// Handle the "enabled" state when there is no item template with formatter.
 			bActionEnabled = oAction.enabled !== false && oAction.enabled !== "false";
 		}
 
@@ -198,69 +169,6 @@ sap.ui.define([
 		}
 
 		this._fireActionReady(oAreaControl, sActionArea);
-	};
-
-	CardActions.prototype._setControlEnabledStateUsingService = function (oConfig) {
-		var oAction = oConfig.action,
-			oAreaControl = oConfig.control,
-			oActionControl = oConfig.actionControl,
-			sEnabledPropertyName = oConfig.enabledPropertyName,
-			vEnabled = oConfig.enabledPropertyValue,
-			vDisabled = oConfig.disabledPropertyValue,
-			oBindingInfo = BindingInfo.parse("{path:''}");
-
-		// Async formatter to set oActionControl's property depending
-		// if the list item context is a correct navigation target (decided by the navigation service).
-		oBindingInfo.formatter = function (vValue) {
-
-			var oBindingContext = this.getBindingContext(),
-				sPath,
-				mParameters;
-
-			if (oBindingContext) {
-				sPath = oBindingContext.getPath();
-			}
-
-			mParameters = BindingResolver.resolveValue(oAction.parameters, oAreaControl, sPath);
-
-			if (vValue.__resolved) {
-				if (!vValue.__enabled || vValue.__enabled === "false") {
-					return vDisabled;
-				}
-
-				return vEnabled;
-			}
-
-			if (!vValue.__promise) {
-				vValue.__promise = true;
-
-				oAreaControl._oServiceManager.getService(_getServiceName(oAction.service))
-					.then(function (oNavigationService) {
-						if (oNavigationService) {
-							oNavigationService
-								.enabled({
-									parameters: mParameters
-								})
-								.then(function (bEnabled) {
-									vValue.__resolved = true;
-									vValue.__enabled = bEnabled;
-									oAreaControl.getModel().checkUpdate(true);
-								})
-								.catch(function () {
-									vValue.__resolved = true;
-									vValue.__enabled = false;
-								});
-						} else {
-							vValue.__resolved = true;
-							vValue.__enabled = false;
-						}
-					});
-			}
-
-			return vDisabled;
-		};
-
-		oActionControl.bindProperty(sEnabledPropertyName, oBindingInfo);
 	};
 
 	/**
@@ -299,41 +207,6 @@ sap.ui.define([
 		}
 	};
 
-	CardActions.prototype._getSingleActionEnabledState = function (oAction, oAreaControl) {
-		var oBindingContext = oAreaControl.getBindingContext(),
-			mParameters,
-			sPath;
-
-		if (oBindingContext) {
-			sPath = oBindingContext.getPath();
-		}
-
-		mParameters = BindingResolver.resolveValue(oAction.parameters, oAreaControl, sPath);
-
-		return new Promise(function (resolve) {
-			oAreaControl._oServiceManager.getService(_getServiceName(oAction.service))
-				.then(function (oNavigationService) {
-					if (oNavigationService) {
-						oNavigationService
-							.enabled({
-								parameters: mParameters
-							})
-							.then(function (bEnabled) {
-								resolve(bEnabled);
-							})
-							.catch(function () {
-								resolve(false);
-							});
-					} else {
-						resolve(false);
-					}
-				})
-				.catch(function () {
-					resolve(false);
-				});
-		});
-	};
-
 	CardActions.prototype._fireActionReady = function (oAreaControl, sActionArea) {
 		var bHeader = sActionArea === ActionArea.Header;
 		var sEventName = bHeader ? "_actionHeaderReady" : "_actionContentReady";
@@ -351,25 +224,6 @@ sap.ui.define([
 		}
 
 		return sPath;
-	};
-
-	CardActions.prototype._handleServiceAction = function (oEvent, oAction, oAreaControl) {
-		var oSource = oEvent.getSource();
-		var sPath = this._resolveBindingPath(oEvent);
-
-		oAreaControl._oServiceManager.getService(_getServiceName(oAction.service))
-			.then(function (oService) {
-				if (oService) {
-					oService.navigate({ // only for navigation?
-						parameters: BindingResolver.resolveValue(oAction.parameters, oSource, sPath)
-					});
-				}
-			})
-			.catch(function (e) {
-				Log.error("Navigation service unavailable", e);
-			}).finally(function () {
-				this._processAction(oSource, oAction, sPath, oEvent);
-			}.bind(this));
 	};
 
 	CardActions.prototype._attachEventListener = function (oConfig) {
@@ -393,11 +247,7 @@ sap.ui.define([
 				}
 			}
 
-			if (oAction.service) {
-				this._handleServiceAction(oEvent, oAction, oConfig.control);
-			} else {
-				this._processAction(oSource, oAction, this._resolveBindingPath(oEvent), oEvent);
-			}
+			this._processAction(oSource, oAction, this._resolveBindingPath(oEvent), oEvent);
 		}.bind(this));
 	};
 
@@ -501,17 +351,6 @@ sap.ui.define([
 		}
 
 		return true;
-	};
-
-	/**
-	 * @param {sap.ui.integration.CardActionArea} sActionArea The area that describes what the action will be attached to
-	 * @returns {boolean} If the action is configured for the header, content, or a detail of an item in the content of the card
-	 */
-	CardActions.prototype._isSingleAction = function (sActionArea) {
-		return [ActionArea.Header,
-			ActionArea.Content,
-			ActionArea.ContentItemDetail,
-			ActionArea.ActionsStrip].indexOf(sActionArea) > -1;
 	};
 
 	CardActions._createHandler = function (mConfig) {

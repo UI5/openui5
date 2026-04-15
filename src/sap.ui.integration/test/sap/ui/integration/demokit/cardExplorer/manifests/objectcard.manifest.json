@@ -1,6 +1,13 @@
 {
+	"_version": "1.84.0",
+	"$schema": "https://raw.githubusercontent.com/SAP/ui5-manifest/v1.84.0/schema.json",
 	"sap.app": {
-		"id": "card.explorer.landingPage"
+		"id": "card.explorer.landingPage",
+		"type": "card",
+		"title": "Landing Page Card",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "Object",

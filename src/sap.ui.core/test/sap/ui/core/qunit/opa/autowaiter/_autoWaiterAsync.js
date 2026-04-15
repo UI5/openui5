@@ -119,6 +119,37 @@ sap.ui.define([
 		fnConfigSpy.restore();
 	});
 
+	QUnit.test("Should forward nested frequencyDetection config to _autoWaiter", function (assert) {
+		var fnConfigSpy = sinon.spy(_autoWaiter, "extendConfig");
+		_autoWaiterAsync.extendConfig({
+			timeoutWaiter: {
+				frequencyDetection: {
+					minObservations: 5,
+					disabled: true
+				}
+			}
+		});
+		assert.ok(fnConfigSpy.calledOnce, "Should call _autoWaiter.extendConfig");
+		assert.ok(fnConfigSpy.calledWithMatch({
+			timeoutWaiter: {
+				frequencyDetection: {
+					minObservations: 5,
+					disabled: true
+				}
+			}
+		}), "Should forward nested frequencyDetection config intact");
+		fnConfigSpy.restore();
+		// Restore defaults
+		_autoWaiterAsync.extendConfig({
+			timeoutWaiter: {
+				frequencyDetection: {
+					minObservations: 3,
+					disabled: false
+				}
+			}
+		});
+	});
+
 	QUnit.test("Should not start a second wait", function (assert) {
 		this.fnHasToWaitStub.returns(true).onCall(1).returns(false);
 		var fnCallbackSpy = sinon.spy();

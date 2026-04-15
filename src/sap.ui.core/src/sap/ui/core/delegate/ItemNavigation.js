@@ -671,6 +671,23 @@ sap.ui.define([
 	};
 
 	/**
+	 * Resets the focused index.
+	 *
+	 * This sets the focused index to -1, meaning no item is focused.
+	 * Unlike {@link #setFocusedIndex}, which clamps negative values to 0,
+	 * this method allows resetting the focus state completely.
+	 *
+	 * @return {this} <code>this</code> to allow method chaining
+	 * @private
+	 * @ui5-restricted sap.m.ListBase
+	 * @since 1.148
+	 */
+	ItemNavigation.prototype.resetFocusedIndex = function() {
+		this.iFocusedIndex = -1;
+		return this;
+	};
+
+	/**
 	 * Handles the onfocusin event.
 	 *
 	 * @param {jQuery.Event} oEvent the browser event

@@ -2,7 +2,6 @@
 
 sap.ui.define([
 	"sap/ui/integration/util/DataProviderFactory",
-	"sap/ui/integration/util/ServiceDataProvider",
 	"sap/ui/integration/util/DataProvider",
 	"sap/ui/integration/util/RequestDataProvider",
 	"sap/ui/integration/widgets/Card",
@@ -12,7 +11,6 @@ sap.ui.define([
 	"sap/ui/core/Supportability"
 ], function (
 	DataProviderFactory,
-	ServiceDataProvider,
 	DataProvider,
 	RequestDataProvider,
 	Card,
@@ -98,31 +96,6 @@ sap.ui.define([
 		assert.ok(oDataProvider.isA("sap.ui.integration.util.RequestDataProvider"), "Should have created a DataProvider instance of type RequestDataProvider.");
 		assert.ok(DataProvider.prototype.setConfiguration.calledOnce, "Should have called setConfiguration.");
 		assert.ok(DataProvider.prototype.setConfiguration.getCall(0).calledWith(oConfiguration), "Should have called setConfiguration with correct arguments.");
-	});
-
-	QUnit.test("create with service configuration", function (assert) {
-		// Arrange
-		const oConfiguration = {
-			service: {
-				name: "UserRecent"
-			}
-		};
-		var oServiceManager = {};
-		sinon.stub(ServiceDataProvider.prototype, "createServiceInstances");
-
-		// Act
-		const oDataProvider = this.oDataProviderFactory.create(oConfiguration, oServiceManager);
-
-		// Assert
-		assert.ok(oDataProvider, "Should have created a DataProvider instance.");
-		assert.ok(oDataProvider.isA("sap.ui.integration.util.ServiceDataProvider"), "Should have created a DataProvider instance of type ServiceDataProvider.");
-		assert.ok(DataProvider.prototype.setConfiguration.calledOnce, "Should have called setConfiguration.");
-		assert.ok(DataProvider.prototype.setConfiguration.getCall(0).calledWith(oConfiguration), "Should have called setConfiguration with correct arguments.");
-		assert.ok(ServiceDataProvider.prototype.createServiceInstances.calledOnce, "Should have called createServiceInstances.");
-		assert.ok(ServiceDataProvider.prototype.createServiceInstances.getCall(0).calledWith(oServiceManager), "Should have called createServiceInstances with ServiceManager reference.");
-
-		// Cleanup
-		ServiceDataProvider.prototype.createServiceInstances.restore();
 	});
 
 	QUnit.test("create with static JSON configuration", function (assert) {
@@ -365,219 +338,6 @@ sap.ui.define([
 	});
 
 	testSetConfiguration(RequestDataProvider);
-
-	QUnit.module("ServiceDataProvider", {
-		beforeEach: function () {
-			var that = this;
-			this.oDataProvider = new ServiceDataProvider();
-			this.oData = {
-				data: {
-					"key": "value"
-				}
-			};
-
-			// Mocks a sap.ui.integration.util.ServiceManager.
-			this.oServiceManagerMock = {
-				_getServiceShouldFail: false,
-				getService: function () {
-					if (this._getServiceShouldFail) {
-						return Promise.reject("Some error message.");
-					} else {
-						return Promise.resolve(that.oServiceInstanceMock);
-					}
-				}
-			};
-
-			// Mocks an instance of a service implementing sap.ui.integration.services.Data interface.
-			this.oServiceInstanceMock = {
-				_getDataShouldFail: false,
-				update: function () {
-					this._fnCbk(that.oData);
-				},
-				attachDataChanged: function (fnCbk) {
-					this._fnCbk = fnCbk;
-				},
-				getData: function () {
-					if (this._getDataShouldFail) {
-						return Promise.reject("Some error message.");
-					} else {
-						return Promise.resolve(that.oData);
-					}
-				}
-			};
-		},
-		afterEach: function () {
-			this.oDataProvider.destroy();
-			this.oDataProvider = null;
-			this.oData = null;
-			this.oServiceManagerMock = null;
-			this.oServiceInstanceMock = null;
-		}
-	});
-
-	testSetConfiguration(ServiceDataProvider);
-
-	QUnit.test("triggerDataUpdate - data request successful", function (assert) {
-
-		// Arrange
-		var done = assert.async();
-		const oConfiguration = {
-			service: "UserRecent"
-		};
-		var fnErrorSpy = sinon.spy();
-
-		this.oDataProvider.attachError(fnErrorSpy);
-		this.oDataProvider.attachDataChanged(function (oEvent) {
-
-			// Assert
-			assert.ok(fnErrorSpy.notCalled, "Should NOT call the error handler.");
-			assert.deepEqual(oEvent.getParameter("data"), this.oData, "Should have correct data.");
-
-			done();
-		}.bind(this));
-		this.oDataProvider.setConfiguration(oConfiguration);
-		this.oDataProvider.createServiceInstances(this.oServiceManagerMock);
-
-		// Act
-		this.oDataProvider.triggerDataUpdate();
-	});
-
-	QUnit.test("triggerDataUpdate - data request failed", function (assert) {
-
-		// Arrange
-		var done = assert.async();
-		const oConfiguration = {
-			service: "UserRecent"
-		};
-		var fnDataChangedSpy = sinon.spy();
-		this.oServiceInstanceMock._getDataShouldFail = true;
-
-		this.oDataProvider.attachDataChanged(fnDataChangedSpy);
-		this.oDataProvider.attachError(function (oEvent) {
-
-			// Assert
-			assert.ok(fnDataChangedSpy.notCalled, "Should NOT call data changed handler.");
-			assert.ok(oEvent.getParameter("message"), "Should have an error message.");
-
-			done();
-		});
-		this.oDataProvider.setConfiguration(oConfiguration);
-		this.oDataProvider.createServiceInstances(this.oServiceManagerMock);
-
-		// Act
-		this.oDataProvider.triggerDataUpdate();
-	});
-
-	QUnit.test("triggerDataUpdate - No service instance", function (assert) {
-
-		// Arrange
-		var done = assert.async();
-		const oConfiguration = {
-			service: "UserRecent"
-		};
-		var fnDataChangedSpy = sinon.spy();
-		this.oServiceInstanceMock._getDataShouldFail = true;
-
-		this.oDataProvider.attachDataChanged(fnDataChangedSpy);
-		this.oDataProvider.attachError(function (oEvent) {
-
-			// Assert
-			assert.ok(fnDataChangedSpy.notCalled, "Should NOT call data changed handler.");
-			assert.ok(oEvent.getParameter("message"), "Should have an error message.");
-
-			done();
-		});
-		this.oDataProvider.setConfiguration(oConfiguration);
-
-		// Act
-		this.oDataProvider.triggerDataUpdate();
-	});
-
-	QUnit.test("No service instance", function (assert) {
-
-		// Arrange
-		var done = assert.async();
-		const oConfiguration = {
-			service: "UserRecent"
-		};
-		var fnDataChangedSpy = sinon.spy();
-		this.oServiceManagerMock._getServiceShouldFail = true;
-
-		this.oDataProvider.attachDataChanged(fnDataChangedSpy);
-		this.oDataProvider.attachError(function (oEvent) {
-
-			// Assert
-			assert.ok(fnDataChangedSpy.notCalled, "Should NOT call data changed handler.");
-			assert.ok(oEvent.getParameter("message"), "Should have an error message.");
-
-			done();
-		});
-		this.oDataProvider.setConfiguration(oConfiguration);
-		this.oDataProvider.createServiceInstances(this.oServiceManagerMock);
-
-		// Act
-		this.oDataProvider.triggerDataUpdate();
-	});
-
-	QUnit.test("Service triggers data changed", function (assert) {
-
-		// Arrange
-		var done = assert.async();
-		const oConfiguration = {
-			service: {
-				name: "UserRecent"
-			}
-		};
-		var fnErrorSpy = sinon.spy();
-		var fnDataChangedSpy = sinon.spy();
-
-		this.oDataProvider.attachError(fnErrorSpy);
-		this.oDataProvider.attachDataChanged(fnDataChangedSpy);
-		this.oDataProvider.setConfiguration(oConfiguration);
-		this.oDataProvider.createServiceInstances(this.oServiceManagerMock);
-
-		this.oDataProvider._oDataServicePromise.then(function () {
-
-			// Act
-			this.oServiceInstanceMock.update();
-			this.oServiceInstanceMock.update();
-			this.oServiceInstanceMock.update();
-
-			// Assert
-			assert.ok(fnErrorSpy.notCalled, "Should NOT call the error handler.");
-			assert.equal(fnDataChangedSpy.callCount, 3, "Should call data changed handler three times.");
-
-			done();
-		}.bind(this));
-	});
-
-	QUnit.test("createServiceInstances after setConfiguration", function (assert) {
-
-		// Arrange
-		var done = assert.async();
-		const oConfiguration = {
-			service: {
-				name: "UserRecent"
-			}
-		};
-		var fnErrorSpy = sinon.spy();
-		var fnDataChangedSpy = sinon.spy();
-
-		this.oDataProvider.attachError(fnErrorSpy);
-		this.oDataProvider.attachDataChanged(fnDataChangedSpy);
-		this.oDataProvider.createServiceInstances(this.oServiceManagerMock);
-		this.oDataProvider.setConfiguration(oConfiguration);
-
-		// Act
-		this.oDataProvider.triggerDataUpdate().then(function () {
-
-			// Assert
-			assert.ok(fnErrorSpy.calledOnce, "Should have an error message.");
-			assert.ok(fnDataChangedSpy.notCalled, "Should NOT call data changed handler.");
-
-			done();
-		});
-	});
 
 	QUnit.module("Usage without a card or editor", {
 		beforeEach: function () {

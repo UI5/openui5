@@ -2830,4 +2830,47 @@ sap.ui.define([
 		assert.ok(this.oCarousel.getDomRef().contains(document.activeElement), "Focus should still be inside the carousel");
 		assert.strictEqual(this.oCarousel._iFocusedPageIndex, 5, "Focused page index should be 5 (last of new visible set)");
 	});
+
+	QUnit.module("Resize handling", {
+		beforeEach: function () {
+			sinon.config.useFakeTimers = false;
+			this.oCarousel = new Carousel({
+				width: "400px",
+				pages: [
+					new Page(),
+					new Page(),
+					new Page(),
+					new Page(),
+					new Page()
+				],
+				customLayout: new CarouselLayout({
+					responsive: true
+				})
+			});
+			this.oCarousel.placeAt(DOM_RENDER_LOCATION);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+		},
+		afterEach: function () {
+			this.oCarousel.destroy();
+			sinon.config.useFakeTimers = true;
+		}
+	});
+
+	QUnit.test("Responsive Carousel should not invalidate on resize when visible pages count stays the same", function (assert) {
+		// Arrange
+		var iInitialItemsToShow = this.oCarousel._getNumberOfItemsToShow();
+		var iInvalidateCallCount = 0;
+		var fnOrigInvalidate = this.oCarousel.invalidate.bind(this.oCarousel);
+		this.oCarousel.invalidate = function () {
+			iInvalidateCallCount++;
+			fnOrigInvalidate();
+		};
+
+		// Act - trigger _resize without changing the width (visible pages count stays the same)
+		this.oCarousel._resize();
+
+		// Assert
+		assert.strictEqual(this.oCarousel._getNumberOfItemsToShow(), iInitialItemsToShow, "Number of items to show should remain the same");
+		assert.strictEqual(iInvalidateCallCount, 0, "invalidate should NOT be called when visible pages count hasn't changed");
+	});
 });

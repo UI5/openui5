@@ -162,15 +162,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Handler for when data is changed.
-	 */
-	TimelineContent.prototype.onDataChanged = function () {
-		BaseListContent.prototype.onDataChanged.apply(this, arguments);
-
-		this._checkHiddenNavigationItems(this.getParsedConfiguration().item);
-	};
-
-	/**
 	 * Binds/Sets properties to the inner item template based on the configuration object item template which is already parsed.
 	 *
 	 * @private

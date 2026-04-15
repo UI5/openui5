@@ -4531,5 +4531,103 @@ sap.ui.define([
 		assert.equal(this.oItem1.getType(), "Active", "Item type is Active public API is not changed");
 		assert.equal(this.oItem1.getEffectiveType(), "Active", "Item effective type is Active again since action of type Navigation is removed");
 	});
+
+	QUnit.module("rememberFocus", {
+		beforeEach: function() {
+			this.oList = new List();
+		},
+		afterEach: function() {
+			this.oList.destroy();
+		}
+	});
+
+	QUnit.test("Default value should be true", function(assert) {
+		assert.strictEqual(this.oList.getRememberFocus(), true, "Default value of rememberFocus is true");
+	});
+
+	QUnit.test("Property can be set to false", function(assert) {
+		this.oList.setRememberFocus(false);
+		assert.strictEqual(this.oList.getRememberFocus(), false, "rememberFocus can be set to false");
+	});
+
+	QUnit.test("Property can be set via constructor", function(assert) {
+		const oList = new List({
+			rememberFocus: false
+		});
+		assert.strictEqual(oList.getRememberFocus(), false, "rememberFocus can be set via constructor");
+		oList.destroy();
+	});
+
+	if (document.hasFocus()) {
+		QUnit.test("First item should be focused on re-entry when rememberFocus=false", async function(assert) {
+			const oListItem1 = new StandardListItem({ title: "Item 1" });
+			const oListItem2 = new StandardListItem({ title: "Item 2" });
+			const oExternalInput = new Input();
+
+			this.oList.setRememberFocus(false);
+			this.oList.addItem(oListItem1);
+			this.oList.addItem(oListItem2);
+
+			const oVBox = new VBox({
+				items: [oExternalInput, this.oList]
+			});
+			oVBox.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Focus second item
+			this.oList.getItems()[1].focus();
+			await timeout(1);
+			assert.strictEqual(document.activeElement, oListItem2.getFocusDomRef(), "Second item is focused");
+
+			// Move focus outside the list
+			oExternalInput.focus();
+			await timeout(1);
+			assert.strictEqual(document.activeElement, oExternalInput.getFocusDomRef(), "External input is focused");
+
+			// Return focus to list
+			this.oList.focus();
+			await timeout(1);
+
+			// First item should be focused (not the previously focused second item)
+			assert.strictEqual(document.activeElement, oListItem1.getFocusDomRef(), "First item is focused on re-entry when rememberFocus=false");
+
+			oVBox.destroy();
+		});
+
+		QUnit.test("Previously focused item should be focused on re-entry when rememberFocus=true", async function(assert) {
+			const oListItem1 = new StandardListItem({ title: "Item 1" });
+			const oListItem2 = new StandardListItem({ title: "Item 2" });
+			const oExternalInput = new Input();
+
+			// rememberFocus defaults to true
+			this.oList.addItem(oListItem1);
+			this.oList.addItem(oListItem2);
+
+			const oVBox = new VBox({
+				items: [oExternalInput, this.oList]
+			});
+			oVBox.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Focus second item
+			this.oList.getItems()[1].focus();
+			await timeout(1);
+			assert.strictEqual(document.activeElement, oListItem2.getFocusDomRef(), "Second item is focused");
+
+			// Move focus outside the list
+			oExternalInput.focus();
+			await timeout(1);
+			assert.strictEqual(document.activeElement, oExternalInput.getFocusDomRef(), "External input is focused");
+
+			// Return focus to list
+			this.oList.focus();
+			await timeout(1);
+
+			// Previously focused item (second) should be focused
+			assert.strictEqual(document.activeElement, oListItem2.getFocusDomRef(), "Previously focused item is focused on re-entry when rememberFocus=true");
+
+			oVBox.destroy();
+		});
+	}
 }
 );

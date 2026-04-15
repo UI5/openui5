@@ -234,4 +234,125 @@ function (UsageTracker, Localization) {
 		this.oTracker._logRouteMatched(oMockRouteEventDetail);
 		assert.ok(oAddToLogsSpy.calledTwice, "page-view event is logged");
 	});
+
+	QUnit.module("logActivityMapEvent", {
+		beforeEach: function () {
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
+			this.sandbox = sinon.createSandbox();
+		},
+		afterEach: function () {
+			this.oTracker.destroy();
+			this.oTracker = null;
+			this.sandbox.restore();
+		}
+	});
+
+	QUnit.test("logs activityMap event with correct structure", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		this.oTracker.start("testSiteName");
+		oAddToLogsSpy.resetHistory();
+
+		// act
+		this.oTracker.logActivityMapEvent({
+			region: "body",
+			link: "download",
+			destination: "no destination"
+		});
+
+		// assert
+		assert.ok(oAddToLogsSpy.calledTwice, "two events are logged (activityMap event + beacon)");
+		assert.ok(oAddToLogsSpy.firstCall.calledWithMatch({
+			event: "activityMap",
+			activityMap: {
+				region: "body",
+				link: "download",
+				destination: "no destination"
+			}
+		}), "activityMap event has correct structure");
+	});
+
+	QUnit.test("fires stlBeaconReady (non-page-view beacon)", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		this.oTracker.start("testSiteName");
+		oAddToLogsSpy.resetHistory();
+
+		// act
+		this.oTracker.logActivityMapEvent({
+			region: "body",
+			link: "download",
+			destination: "no destination"
+		});
+
+		// assert
+		assert.ok(oAddToLogsSpy.secondCall.calledWithMatch({
+			event: "stlBeaconReady"
+		}), "beacon is stlBeaconReady (non-page-view)");
+	});
+
+	QUnit.test("passes all activityMap properties through", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		this.oTracker.start("testSiteName");
+		oAddToLogsSpy.resetHistory();
+
+		// act
+		this.oTracker.logActivityMapEvent({
+			region: "footer",
+			link: "Company Information",
+			destination: "https://www.sap.com/about/company.html"
+		});
+
+		// assert
+		var oActivityMap = oAddToLogsSpy.firstCall.args[0].activityMap;
+		assert.strictEqual(oActivityMap.region, "footer", "region is passed through");
+		assert.strictEqual(oActivityMap.link, "Company Information", "link is passed through");
+		assert.strictEqual(oActivityMap.destination, "https://www.sap.com/about/company.html", "destination is passed through");
+	});
+
+	QUnit.test("is a no-op when tracker is not started", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		// note: do NOT call this.oTracker.start()
+
+		// act
+		this.oTracker.logActivityMapEvent({
+			region: "body",
+			link: "download",
+			destination: "no destination"
+		});
+
+		// assert
+		assert.strictEqual(oAddToLogsSpy.callCount, 0, "nothing is logged when tracker is not started");
+	});
+
+	QUnit.test("is a no-op after tracker is stopped", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		this.oTracker.start("testSiteName");
+		this.oTracker.stop();
+		oAddToLogsSpy.resetHistory();
+
+		// act
+		this.oTracker.logActivityMapEvent({
+			region: "body",
+			link: "download",
+			destination: "no destination"
+		});
+
+		// assert
+		assert.strictEqual(oAddToLogsSpy.callCount, 0, "nothing is logged after tracker is stopped");
+	});
+
+	QUnit.test("always uses activityMap as event type", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		this.oTracker.start("testSiteName");
+		oAddToLogsSpy.resetHistory();
+
+		// act
+		this.oTracker.logActivityMapEvent({
+			region: "header",
+			link: "navigation",
+			destination: "https://example.com"
+		});
+
+		// assert
+		assert.strictEqual(oAddToLogsSpy.firstCall.args[0].event, "activityMap", "event type is always activityMap");
+	});
 });

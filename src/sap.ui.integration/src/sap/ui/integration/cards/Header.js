@@ -157,7 +157,6 @@ sap.ui.define([
 	Header.prototype.exit = function () {
 		FHeader.prototype.exit.call(this);
 
-		this._oServiceManager = null;
 		this._oDataProviderFactory = null;
 
 		if (this._oDataProvider) {
@@ -225,11 +224,6 @@ sap.ui.define([
 		}.bind(this)));
 	};
 
-	Header.prototype.setServiceManager = function (oServiceManager) {
-		this._oServiceManager = oServiceManager;
-		return this;
-	};
-
 	Header.prototype.setDataProviderFactory = function (oDataProviderFactory) {
 		this._oDataProviderFactory = oDataProviderFactory;
 		return this;
@@ -286,7 +280,7 @@ sap.ui.define([
 			this._oDataProvider.destroy();
 		}
 
-		this._oDataProvider = this._oDataProviderFactory.create(oDataSettings, this._oServiceManager);
+		this._oDataProvider = this._oDataProviderFactory.create(oDataSettings);
 
 		if (oDataSettings && oDataSettings.name) {
 			oModel = oCard.getModel(oDataSettings.name);

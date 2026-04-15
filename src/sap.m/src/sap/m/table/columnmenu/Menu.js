@@ -704,6 +704,7 @@ sap.ui.define([
 					content: [new Title({text: sTitle, level: coreLibrary.TitleLevel.H3})]
 				}),
 				keyboardMode: "Edit",
+				rememberFocus: false,
 				items: []
 			});
 

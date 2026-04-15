@@ -52,18 +52,8 @@ sap.ui.define([
 	 */
 	BaseListContent.prototype.init = function () {
 		BaseContent.prototype.init.apply(this, arguments);
-		this._oAwaitingPromise = null;
 		this._fMinHeight = 0;
 		this._fLastWidth = 0;
-	};
-
-	/**
-	 * @override
-	 */
-	BaseListContent.prototype.exit = function () {
-		BaseContent.prototype.exit.apply(this, arguments);
-
-		this._oAwaitingPromise = null;
 	};
 
 	BaseListContent.prototype.onAfterRendering = function () {
@@ -246,80 +236,6 @@ sap.ui.define([
 
 	BaseListContent.prototype.getPaginator = function () {
 		return this._oPaginator;
-	};
-
-	/**
-	 * Used to check which content items should be hidden based on the Navigation Service.
-	 *
-	 * @protected
-	 * @param {Object} mItemConfig The item template.
-	 */
-	BaseListContent.prototype._checkHiddenNavigationItems = function (mItemConfig) {
-		if (!mItemConfig.actions) {
-			return;
-		}
-
-		if (!this.getInnerList()) {
-			return;
-		}
-
-		var oInnerList = this.getInnerList(),
-			aItems = this.isA("sap.ui.integration.cards.TimelineContent") ? oInnerList.getContent() : oInnerList.getItems(),
-			aPromises = [],
-			oAction = mItemConfig.actions[0],
-			sActionName,
-			iVisibleItems = 0;
-
-		if (!oAction || !oAction.service || oAction.type !== "Navigation") {
-			return;
-		}
-
-		if (oAction.service === "object") {
-			sActionName = oAction.service.name;
-		} else {
-			sActionName = oAction.service;
-		}
-
-		// create new promises
-		aItems.forEach(function (oItem) {
-			var mParameters = BindingResolver.resolveValue(
-				oAction.parameters,
-				this,
-				oItem.getBindingContext().getPath()
-			);
-
-			aPromises.push(this._oServiceManager
-				.getService(sActionName)
-				.then(function (oNavigationService) {
-					if (!oNavigationService.hidden) {
-						return false;
-					}
-
-					return oNavigationService.hidden({parameters: mParameters});
-				})
-				.then(function (bHidden) {
-					oItem.setVisible(!bHidden);
-					if (!bHidden) {
-						iVisibleItems++;
-					}
-				})
-				.catch(function (sMessage) {
-					Log.error(sMessage);
-				}));
-
-		}.bind(this));
-
-		this.awaitEvent("_filterNavItemsReady");
-
-		var pCurrent = this._oAwaitingPromise = Promise.all(aPromises)
-			.then(function () {
-				if (this._oAwaitingPromise === pCurrent) {
-					if (this.getModel("parameters")) {
-						this.getModel("parameters").setProperty("/visibleItems", iVisibleItems);
-					}
-					this.fireEvent("_filterNavItemsReady");
-				}
-			}.bind(this));
 	};
 
 	BaseListContent.prototype.hasData = function () {

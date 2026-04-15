@@ -9,8 +9,7 @@ sap.ui.define([
 	"sap/ui/integration/cards/actions/CardActions",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/test/utils/nextUIUpdate",
-	"qunit/testResources/nextCardReadyEvent",
-	"../services/SampleServices"
+	"qunit/testResources/nextCardReadyEvent"
 ], function (
 	Library,
 	Log,
@@ -20,8 +19,7 @@ sap.ui.define([
 	CardActions,
 	QUnitUtils,
 	nextUIUpdate,
-	nextCardReadyEvent,
-	SampleServices
+	nextCardReadyEvent
 ) {
 	"use strict";
 
@@ -180,73 +178,6 @@ sap.ui.define([
 			}
 		}
 	};
-
-	var oManifest_Analytical_Service = {
-		"_version": "1.8.0",
-		"sap.app": {
-			"id": "test.cards.analytical.card5",
-			"type": "card"
-		},
-		"sap.ui5": {
-			"services": {
-				"Navigation4": {
-					"factoryName": "test.service.SampleNavigationFactory"
-				}
-			}
-		},
-		"sap.card": {
-			"type": "Analytical",
-			"header": {
-				"type": "Numeric",
-				"title": "Content with Navigation Action (Service)"
-			},
-			"content": {
-				"chartType": "Donut",
-				"legend": {
-					"visible": true,
-					"position": "Top",
-					"alignment": "Center"
-				},
-				"plotArea": {
-					"dataLabel": {
-						"visible": true,
-						"showTotal": true
-					}
-				},
-				"title": {
-					"text": "Donut chart",
-					"visible": true,
-					"alignment": "Bottom"
-				},
-				"measureAxis": "size",
-				"dimensionAxis": "color",
-				"data": {
-					"request": {
-						"url": "./cost.json"
-					},
-					"path": "/milk"
-				},
-				"dimensions": [{
-					"label": "Store Name",
-					"value": "{Store Name}"
-				}],
-				"measures": [{
-					"label": "Revenue",
-					"value": "{Revenue}"
-				}],
-				"actions": [{
-					"type": "Navigation",
-					"service": {
-						"name": "Navigation4"
-					},
-					"parameters": {
-						"url": "https://www.sap.com"
-					}
-				}]
-			}
-		}
-	};
-
 	var oManifest_Analytical_Url = {
 		"_version": "1.8.0",
 		"sap.app": {
@@ -1096,35 +1027,6 @@ sap.ui.define([
 				this.oCard.destroy();
 				this.oCard = null;
 			}
-		});
-
-		QUnit.test("Analytical content should be actionable - service ", async function (assert) {
-			// Arrange
-			var done = assert.async(),
-				oActionSpy = sinon.spy(CardActions, "fireAction"),
-				oStubOpenUrl = sinon.stub(NavigationAction.prototype, "execute").callsFake(function () {});
-
-			this.oCard.setManifest(oManifest_Analytical_Service);
-
-			await nextCardReadyEvent(this.oCard);
-			await nextUIUpdate();
-
-			const oCardLContent = this.oCard.getCardContent();
-
-			this.oCard.attachAction(function (oEvent) {
-				oEvent.preventDefault();
-				// Assert
-				assert.ok(oCardLContent.$().hasClass("sapFCardSectionClickable"), "Card Content is clickable");
-				assert.ok(oActionSpy.callCount === 1, "Card Content is clicked and action event is fired");
-
-				// Cleanup
-				oStubOpenUrl.restore();
-				oActionSpy.restore();
-				done();
-			});
-
-			// Act
-			oCardLContent.firePress();
 		});
 
 		QUnit.test("Analytical Card should be actionable - url", async function (assert) {

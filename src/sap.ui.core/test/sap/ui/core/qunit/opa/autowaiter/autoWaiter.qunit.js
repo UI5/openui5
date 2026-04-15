@@ -10,6 +10,7 @@ sap.ui.define([
 	"./_jsAnimationWaiter",
 	"./_timeoutWaiter",
 	"./_promiseWaiter",
+	"./_frequencyTracker",
 	"./_moduleWaiter",
 	"./_resourceWaiter",
 	"./_autoWaiterAsync",

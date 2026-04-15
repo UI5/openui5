@@ -4,7 +4,6 @@ sap.ui.define([
 	"sap/ui/integration/widgets/Card",
 	"sap/ui/integration/util/DataProvider",
 	"sap/ui/integration/util/RequestDataProvider",
-	"sap/ui/integration/util/ServiceDataProvider",
 	"sap/ui/integration/cards/Header",
 	"sap/ui/integration/cards/BaseContent",
 	"sap/ui/integration/library",
@@ -15,7 +14,6 @@ function(
 	Card,
 	DataProvider,
 	RequestDataProvider,
-	ServiceDataProvider,
 	Header,
 	BaseContent,
 	library,
@@ -58,17 +56,6 @@ function(
 		},
 		"sap.card": {
 			"type": "List"
-		}
-	};
-	var oManifest_CardCase4 = {
-		"sap.app": {
-			"id": "test.card.dataHandling.card4"
-		},
-		"sap.card": {
-			"type": "List",
-			"data": {
-				"service": "UserRecent"
-			}
 		}
 	};
 	var oManifest_CardCase5 = {
@@ -181,19 +168,6 @@ function(
 			}
 		}
 	};
-	var oManifest_HeaderCase1 = {
-		"sap.app": {
-			"id": "test.card.dataHandling.card7"
-		},
-		"sap.card": {
-			"type": "List",
-			"header": {
-				"data": {
-					"service": "UserRecent"
-				}
-			}
-		}
-	};
 	var oManifest_HeaderCase2 = {
 		"sap.app": {
 			"id": "test.card.dataHandling.card8"
@@ -244,24 +218,6 @@ function(
 			"type": "List",
 			"header": {
 				"title": "Header Title"
-			}
-		}
-	};
-	var oManifest_ContentCase1 = {
-		"sap.app": {
-			"id": "test.card.dataHandling.card12"
-		},
-		"sap.card": {
-			"type": "List",
-			"content": {
-				"data": {
-					"service": "UserRecent"
-				},
-				"item": {
-					"title": {
-						"value": "Gery"
-					}
-				}
 			}
 		}
 	};
@@ -425,15 +381,15 @@ function(
 		}
 	};
 
-	function testServiceOrRequestSection(sName, sTestTitle, oManifest, bShouldFail) {
+	function testRequestSection(sName, sTestTitle, oManifest, bShouldFail) {
 		QUnit.test(sTestTitle, async function (assert) {
-			var sMessage = "Should set data when there is a data service.";
+			var sMessage = "Should set data when the request succeeds.";
 
 			this.bTriggerFailure = !!bShouldFail;
 			var oExpectedData = this.oData;
 			if (this.bTriggerFailure) {
 				oExpectedData = {};
-				sMessage = "Should NOT set data when the service fails.";
+				sMessage = "Should NOT set data when the request fails.";
 			}
 
 			// Act
@@ -523,7 +479,7 @@ function(
 			}
 
 			// Assert
-			assert.deepEqual(oControlToTest.getModel().getData(), this.oData, "Should set data when there is a data service.");
+			assert.deepEqual(oControlToTest.getModel().getData(), this.oData, "Should set data when the request succeeds.");
 
 			var oNewData = { test: "Test" };
 
@@ -616,8 +572,6 @@ function(
 				"key2": "value2"
 			};
 			this._fnRequestStub = sinon.stub(RequestDataProvider.prototype, "getData").callsFake(fnFake);
-			this._fnServiceStub = sinon.stub(ServiceDataProvider.prototype, "getData").callsFake(fnFake);
-			this._fnStub = sinon.stub(ServiceDataProvider.prototype, "createServiceInstances");
 			this._fnHandleErrorStub = sinon.stub(Card.prototype, "_handleError");
 		},
 		afterEach: function () {
@@ -625,8 +579,6 @@ function(
 			this.oCard = null;
 			this.oData = null;
 			this._fnRequestStub.restore();
-			this._fnServiceStub.restore();
-			this._fnStub.restore();
 			this._fnHandleErrorStub.restore();
 			this.bTriggerFailure = false;
 		}
@@ -635,39 +587,33 @@ function(
 	// Consistency tests. Header, Card and Content data sections should work the same:
 
 	// Card level data section testing
-	testServiceOrRequestSection("Card", "Card with service - success", oManifest_CardCase4);
-	testServiceOrRequestSection("Card", "Card with service - failure", oManifest_CardCase4, true);
-	testServiceOrRequestSection("Card", "Card level data section with successful request", oManifest_CardCase2);
-	testServiceOrRequestSection("Card", "Card level data section with failing request", oManifest_CardCase2, true);
+	testRequestSection("Card", "Card level data section with successful request", oManifest_CardCase2);
+	testRequestSection("Card", "Card level data section with failing request", oManifest_CardCase2, true);
 	testStaticDataSection("Card", "Card level data section with static JSON", oManifest_CardCase1);
 	testNoDataSection("Card", "Card with NO data section", oManifest_CardCase3);
-	testDataChanged("Card", "Card DataProvider triggers data changed", oManifest_CardCase4);
-	testDataError("Card", "Card DataProvider fires error", oManifest_CardCase4);
+	testDataChanged("Card", "Card DataProvider triggers data changed", oManifest_CardCase2);
+	testDataError("Card", "Card DataProvider fires error", oManifest_CardCase2);
 
 	// Header level data section testing
-	testServiceOrRequestSection("Header", "Header with service - success", oManifest_HeaderCase1);
-	testServiceOrRequestSection("Header", "Header with service - failure", oManifest_HeaderCase1, true);
-	testServiceOrRequestSection("Header", "Header level data section with successful request", oManifest_HeaderCase4);
-	testServiceOrRequestSection("Header", "Header level data section with failing request", oManifest_HeaderCase4, true);
+	testRequestSection("Header", "Header level data section with successful request", oManifest_HeaderCase4);
+	testRequestSection("Header", "Header level data section with failing request", oManifest_HeaderCase4, true);
 	testStaticDataSection("Header", "Header level data section with static JSON", oManifest_HeaderCase3);
 	testNoDataSection("Header", "Header with NO data section", oManifest_HeaderCase2);
-	testDataChanged("Header", "Header DataProvider triggers data changed", oManifest_HeaderCase1);
-	testDataError("Header", "Header DataProvider fires error", oManifest_HeaderCase1);
-	testDataReady("Header", "Header _dataReady event", oManifest_HeaderCase1);
-	testDataReady("Header", "Header _dataReady event on error", oManifest_HeaderCase1, true);
+	testDataChanged("Header", "Header DataProvider triggers data changed", oManifest_HeaderCase4);
+	testDataError("Header", "Header DataProvider fires error", oManifest_HeaderCase4);
+	testDataReady("Header", "Header _dataReady event", oManifest_HeaderCase4);
+	testDataReady("Header", "Header _dataReady event on error", oManifest_HeaderCase4, true);
 	testDataReady("Header", "Header _dataReady event when no data section", oManifest_HeaderCase5);
 
 	// Content level data section testing
-	testServiceOrRequestSection("Content", "Content with service - success", oManifest_ContentCase1);
-	testServiceOrRequestSection("Content", "Content with service - failure", oManifest_ContentCase1, true);
-	testServiceOrRequestSection("Content", "Content level data section with successful request", oManifest_ContentCase4);
-	testServiceOrRequestSection("Content", "Content level data section with failing request", oManifest_ContentCase4, true);
+	testRequestSection("Content", "Content level data section with successful request", oManifest_ContentCase4);
+	testRequestSection("Content", "Content level data section with failing request", oManifest_ContentCase4, true);
 	testStaticDataSection("Content", "Content level data section with static JSON", oManifest_ContentCase3);
 	testNoDataSection("Content", "Content with NO data section", oManifest_ContentCase2);
-	testDataChanged("Content", "Content DataProvider triggers data changed", oManifest_ContentCase1);
-	testDataError("Content", "Content DataProvider fires error", oManifest_ContentCase1);
-	testDataReady("Content", "Content _dataReady event", oManifest_ContentCase1);
-	testDataReady("Content", "Content _dataReady event on error", oManifest_ContentCase1, true);
+	testDataChanged("Content", "Content DataProvider triggers data changed", oManifest_ContentCase4);
+	testDataError("Content", "Content DataProvider fires error", oManifest_ContentCase4);
+	testDataReady("Content", "Content _dataReady event", oManifest_ContentCase4);
+	testDataReady("Content", "Content _dataReady event on error", oManifest_ContentCase4, true);
 	testDataReady("Content", "Content _dataReady event when no data section", oManifest_ContentCase5);
 
 	QUnit.test("Content and Header override card level data", async function (assert) {
