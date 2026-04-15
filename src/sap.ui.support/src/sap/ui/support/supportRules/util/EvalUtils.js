@@ -1,4 +1,4 @@
-/* eslint-disable no-eval */
+/* eslint-disable no-new-func */
 
 /*!
  * ${copyright}
@@ -9,9 +9,10 @@ sap.ui.define([], function () {
 
 	var bIsEvalAllowed;
 
-	// Checks if eval can be used in the current platform (based on CSP restrictions)
+	// Checks if the Function constructor can be used in the current platform (based on CSP restrictions)
 	try {
-		eval("");
+		// eslint-disable-next-line no-new
+		new Function("");
 		bIsEvalAllowed = true;
 	} catch (e) {
 		bIsEvalAllowed = false;
@@ -32,11 +33,7 @@ sap.ui.define([], function () {
 		 * @throws Error why eval failed, for example invalid syntax
 		 */
 		evalFunction: function (sFunction) {
-			var fn;
-
-			eval("fn = " + sFunction);
-
-			return fn;
+			return new Function("return (" + sFunction + ")")();
 		}
 	};
 });
