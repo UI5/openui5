@@ -1,4 +1,4 @@
-/* global QUnit, sinon */
+/* global QUnit */
 sap.ui.define([
 	"sap/ui/support/supportRules/util/EvalUtils"
 ], function (EvalUtils) {
@@ -7,29 +7,41 @@ sap.ui.define([
 	QUnit.module("EvalUtils.js methods");
 
 	QUnit.test("#evalFunction when syntax is correct", function (assert) {
-		// arrange
-		var oStub = sinon.stub(window, "eval");
+		if (!EvalUtils.isEvalAllowed()) {
+			assert.ok(true, "Skipped: Function constructor is blocked by CSP");
+			return;
+		}
 
 		// act
-		EvalUtils.evalFunction("function () {}");
+		const fn = EvalUtils.evalFunction("function () { return 42; }");
 
 		// assert
-		assert.ok(true, "No error thrown when function syntax is correct");
+		assert.strictEqual(typeof fn, "function", "Should return a function");
+		assert.strictEqual(fn(), 42, "Returned function should be callable");
+	});
 
-		// clean up
-		oStub.restore();
+	QUnit.test("#evalFunction with parameters", function (assert) {
+		if (!EvalUtils.isEvalAllowed()) {
+			assert.ok(true, "Skipped: Function constructor is blocked by CSP");
+			return;
+		}
+
+		// act
+		const fn = EvalUtils.evalFunction("function (a, b) { return a + b; }");
+
+		// assert
+		assert.strictEqual(fn(2, 3), 5, "Should correctly handle function parameters");
 	});
 
 	QUnit.test("#evalFunction when syntax is incorrect", function (assert) {
-		// arrange
-		var oStub = sinon.stub(window, "eval").throws();
+		if (!EvalUtils.isEvalAllowed()) {
+			assert.ok(true, "Skipped: Function constructor is blocked by CSP");
+			return;
+		}
 
 		// assert
 		assert.throws(function () {
 			EvalUtils.evalFunction("some invalid function () {}");
 		}, "Error should be thrown when function syntax is incorrect");
-
-		// clean up
-		oStub.restore();
 	});
 });
