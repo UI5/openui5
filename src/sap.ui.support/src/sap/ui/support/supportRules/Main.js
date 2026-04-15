@@ -125,7 +125,11 @@ function (jQuery, ManagedObject, Element, Component, Analyzer, CoreFacade,
 
 						// Validate messages
 						CommunicationBus.onMessageChecks.push(function (msg) {
-							return msg.origin === IFrameController.getFrameOrigin();
+							try {
+								return new window.URL(msg.origin).origin === new window.URL(IFrameController.getFrameOrigin()).origin;
+							} catch (e) {
+								return false;
+							}
 						});
 
 						CommunicationBus.onMessageChecks.push(function (msg) {
@@ -133,10 +137,19 @@ function (jQuery, ManagedObject, Element, Component, Analyzer, CoreFacade,
 						});
 
 						CommunicationBus.onMessageChecks.push(function (msg) {
-							var frameUrl = IFrameController.getFrameUrl();
-							// remove relative path information
-							frameUrl = frameUrl.replace(/\.\.\//g, '');
-							return msg.data._origin.indexOf(frameUrl) > -1;
+							try {
+								var oOriginUrl = new window.URL(msg.data._origin);
+								var sFramePath;
+								try {
+									sFramePath = new window.URL(IFrameController.getFrameUrl()).pathname;
+								} catch (e) {
+									// relative URL — strip query string and relative path segments manually
+									sFramePath = IFrameController.getFrameUrl().split("?")[0].replace(/\.\.\//g, "");
+								}
+								return oOriginUrl.pathname.endsWith(sFramePath);
+							} catch (e) {
+								return false;
+							}
 						});
 					});
 				} else {

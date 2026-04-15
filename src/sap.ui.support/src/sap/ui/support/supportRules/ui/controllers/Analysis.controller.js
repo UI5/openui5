@@ -777,9 +777,9 @@ sap.ui.define([
 
 		checkFunctionString: function (functionString) {
 			try {
-				/* eslint-disable no-eval */
-				eval("var testAsignedVar = " + functionString);
-				/* eslint-enable no-eval */
+				/* eslint-disable no-new-func */
+				new Function("return (" + functionString + ")");
+				/* eslint-enable no-new-func */
 			} catch (err) {
 				MessageToast.show("Your check function contains errors, and can't be evaluated:" + err);
 				return false;
