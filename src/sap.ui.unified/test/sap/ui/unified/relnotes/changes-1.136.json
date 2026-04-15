@@ -53,5 +53,15 @@
         "text": " sap.ui.unified.CalendarDateInterval: shows correct year"
       }
     ]
+  },
+  "1.136.15": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "72539bb0c9e5a6d6311f71caffb4ec48233a2b77",
+        "type": "FIX",
+        "text": "sap.ui.unified.CalendarRow: Corrected rendering of non-working periods"
+      }
+    ]
   }
 }

@@ -153,5 +153,15 @@
         "text": " ActionToolbarAction: implement IToolbarInteractiveControl"
       }
     ]
+  },
+  "1.136.15": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "619549ff826e53452f007a0598e2d8c7e55cc274",
+        "type": "FIX",
+        "text": " FilterBar: Empty, NotEmpty - incorrect result"
+      }
+    ]
   }
 }
