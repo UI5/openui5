@@ -23,6 +23,10 @@ sap.ui.define([
 
 	const ROUTES = {
 		DATA: "/flex/data/",
+		VARIANT_DATA: "/variantdata/",
+		VARIANT_DATA_CONTENT: "/variantdata/content/",
+		COMP_VARIANT_DATA: "/compvariantdata/",
+		COMP_VARIANT_DATA_CONTENT: "/compvariantdata/content/",
 		MODULES: "/flex/modules/",
 		SETTINGS: "/flex/settings",
 		VARIANTS_AUTHORS: "/variants/authors/"
@@ -117,6 +121,8 @@ sap.ui.define([
 		 * @param {boolean} [mPropertyBag.allContexts] Includes also restricted context
 		 * @param {string} [mPropertyBag.version] Version to be loaded
 		 * @param {string} [mPropertyBag.adaptationId] - Context-based adaptation to be loaded
+		 * @param {boolean} [mPropertyBag.lazyLoadingViewsEnabled] Signals to the back end that lazy loading of variants is supported;
+		 * must not be set when starting key user adaptation
 		 * @returns {Promise<object>} Promise resolving with the JSON parsed server response of the flex data request
 		 * or resolves with undefined in case cache bustering determines that no data is present
 		 */
@@ -130,10 +136,10 @@ sap.ui.define([
 				return Promise.resolve({ ...StorageUtils.getEmptyFlexDataResponse() });
 			}
 
-			var mParameters = _pick(mPropertyBag, ["version", "allContexts", "adaptationId"]);
+			const mParameters = _pick(mPropertyBag, ["version", "allContexts", "adaptationId", "lazyLoadingViewsEnabled"]);
 			this._addClientInfo(mParameters);
 			Utils.addSAPLogonLanguageInfo(mParameters);
-			var sAppDescriptorId;
+			let sAppDescriptorId;
 			if (mPropertyBag.appDescriptor && mPropertyBag.appDescriptor["sap.app"]) {
 				sAppDescriptorId = mPropertyBag.appDescriptor["sap.app"].id;
 			}
@@ -148,7 +154,7 @@ sap.ui.define([
 			// Store parameters for possible subsequence GET variants' authors names request
 			_mFlexDataParameters = mParameters;
 
-			var sDataUrl = Utils.getUrl(ROUTES.DATA, mPropertyBag, mParameters);
+			const sDataUrl = Utils.getUrl(ROUTES.DATA, mPropertyBag, mParameters);
 			return Utils.sendRequest(sDataUrl, "GET", {
 				initialConnector: this,
 				xsrfToken: this.xsrfToken,
@@ -156,7 +162,7 @@ sap.ui.define([
 				cacheable: true,
 				sAppDescriptorId
 			}).then(function(oResult) {
-				var oResponse = oResult.response;
+				const oResponse = oResult.response;
 				if (oResult.etag) {
 					oResponse.cacheKey = oResult.etag;
 				} else if (mPropertyBag.cacheKey) {
@@ -173,7 +179,7 @@ sap.ui.define([
 					return oResponse;
 				}
 
-				var sModulesUrl = Utils.getUrl(ROUTES.MODULES, mPropertyBag, mParameters);
+				const sModulesUrl = Utils.getUrl(ROUTES.MODULES, mPropertyBag, mParameters);
 				return this._loadModules(sModulesUrl).then(function() {
 					return oResponse;
 				});
@@ -191,6 +197,78 @@ sap.ui.define([
 		loadVariantsAuthors(mPropertyBag) {
 			const sVariantsAuthorsUrl = Utils.getUrl(ROUTES.VARIANTS_AUTHORS, mPropertyBag, _mFlexDataParameters);
 			return Utils.sendRequest(sVariantsAuthorsUrl, "GET", { initialConnector: this }).then(function(oResult) {
+				return oResult.response;
+			});
+		},
+
+		/**
+		 * Load all FL variants and their metadata for Manage Views dialog.
+		 * @param {object} mPropertyBag Property bag
+		 * @param {string} mPropertyBag.reference Flexibility reference
+		 * @param {string} mPropertyBag.vmReference Id of the control for which the variants should be loaded
+		 * @returns {Promise<object>} Promise resolves with an object containing the flex variants for the given control
+		 */
+		loadAllFLVariants(mPropertyBag) {
+			const mParameters = _pick(mPropertyBag, ["vmReference"]);
+			this._addClientInfo(mParameters);
+			Utils.addSAPLogonLanguageInfo(mParameters);
+
+			const sVariantUrl = Utils.getUrl(ROUTES.VARIANT_DATA, mPropertyBag, mParameters);
+			return Utils.sendRequest(sVariantUrl, "GET", { initialConnector: this }).then((oResult) => {
+				return oResult.response;
+			});
+		},
+
+		/**
+		 * Load missing UI changes when switching to a variant that has variantDependentControlChangesRemoved: true
+		 * @param {object} mPropertyBag Property bag
+		 * @param {string} mPropertyBag.reference Flexibility reference
+		 * @param {string} mPropertyBag.id Id of the variant for which the content should be loaded
+		 * @returns {Promise<object>} Promise resolves with an object containing the flex variant content for the given variant ID
+		 */
+		loadFlVariantContent(mPropertyBag) {
+			const mParameters = _pick(mPropertyBag, ["id"]);
+			this._addClientInfo(mParameters);
+			Utils.addSAPLogonLanguageInfo(mParameters);
+
+			const sVariantUrl = Utils.getUrl(ROUTES.VARIANT_DATA_CONTENT, mPropertyBag, mParameters);
+			return Utils.sendRequest(sVariantUrl, "GET", { initialConnector: this }).then((oResult) => {
+				return oResult.response;
+			});
+		},
+
+		/**
+		 * Load all comp variants and their metadata for Manage Views dialog.
+		 * @param {object} mPropertyBag Property bag
+		 * @param {string} mPropertyBag.reference Flexibility reference
+		 * @param {string} mPropertyBag.persistencyKey Persistency key of the control for which the variants should be loaded
+		 * @returns {Promise<object>} Promise resolves with an object containing the flex variants for the given control
+		 */
+		loadAllCompVariants(mPropertyBag) {
+			const mParameters = _pick(mPropertyBag, ["persistencyKey"]);
+			this._addClientInfo(mParameters);
+			Utils.addSAPLogonLanguageInfo(mParameters);
+
+			const sVariantUrl = Utils.getUrl(ROUTES.COMP_VARIANT_DATA, mPropertyBag, mParameters);
+			return Utils.sendRequest(sVariantUrl, "GET", { initialConnector: this }).then((oResult) => {
+				return oResult.response;
+			});
+		},
+
+		/**
+		 * Load missing content when switching to a variant that has contentRemoved: true.
+		 * @param {object} mPropertyBag Property bag
+		 * @param {string} mPropertyBag.reference Flexibility reference
+		 * @param {string} mPropertyBag.id Id of the variant for which the content should be loaded
+		 * @returns {Promise<object>} Promise resolves with an object containing the flex variant content for the given variant ID
+		 */
+		loadCompVariantContent(mPropertyBag) {
+			const mParameters = _pick(mPropertyBag, ["id"]);
+			this._addClientInfo(mParameters);
+			Utils.addSAPLogonLanguageInfo(mParameters);
+
+			const sVariantUrl = Utils.getUrl(ROUTES.COMP_VARIANT_DATA_CONTENT, mPropertyBag, mParameters);
+			return Utils.sendRequest(sVariantUrl, "GET", { initialConnector: this }).then((oResult) => {
 				return oResult.response;
 			});
 		}

@@ -13,7 +13,7 @@ sap.ui.define([], function() {
 	 * @returns {number} clamped value
 	 * @public
 	 * @since 1.130
-	 * @alias module:/sap/base/util/clamp
+	 * @alias module:sap/base/util/clamp
 	 */
 	const clamp = (val, min, max) => {
 		// handles case when max < min

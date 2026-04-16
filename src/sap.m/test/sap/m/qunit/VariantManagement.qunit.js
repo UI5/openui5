@@ -1694,6 +1694,68 @@ sap.ui.define([
 		this.oVM.onclick();
 	});
 
+	QUnit.test("Fall back to 'text' binding when 'title' is not bound in the template", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantName: "Standard", author: "A", visible: true},
+			{variantKey: "2", variantName: "Custom View", author: "B", visible: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				text: "{variantName}",
+				author: "{author}",
+				visible: "{visible}"
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			assert.ok(this.oVM.oManagementTable, "management table exists");
+
+			const aItems = this.oVM.oManagementTable.getItems();
+			assert.equal(aItems.length, 2, "expected count of items in the management table exists");
+
+			const aCells = aItems[0].getCells();
+			assert.ok(aCells[1].isA("sap.m.Input"), "expected controltype found");
+			assert.equal(aCells[1].getValue(), "Standard", "expected title found via 'text' fallback");
+
+			const aCells2 = aItems[1].getCells();
+			assert.equal(aCells2[1].getValue(), "Custom View", "expected title found via 'text' fallback");
+
+			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
 	QUnit.test("Fall back to Managed Object Model for favorite binding, in case it's given as constant", async function(assert) {
 		const oVariantsModel = new JSONModel({variants: [
 			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", author: "A", favorite: true, visible: true}

@@ -206,8 +206,8 @@ sap.ui.define([
 
 			oPendingInteraction.completed = true;
 
-			// Duration threshold 2 in order to filter not performance relevant aInteractions such as liveChange
-			if (oPendingInteraction.semanticStepName || oPendingInteraction.duration >= 2 || oPendingInteraction.requests.length > 0 || bIsNavigation) {
+			// legacyDuration threshold 2 in order to filter not performance relevant aInteractions such as liveChange
+			if (oPendingInteraction.semanticStepName || oPendingInteraction.legacyDuration >= 2 || oPendingInteraction.requests.length > 0 || bIsNavigation) {
 				aInteractions.push(oPendingInteraction);
 				oFinshedInteraction = aInteractions[aInteractions.length - 1];
 				if (Log.isLoggable()) {
