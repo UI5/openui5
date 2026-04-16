@@ -7,6 +7,52 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 	// indicator if the reference can't be resolved
 	var oNotFound = Object.create(null);
 
+	var oJQuery;
+
+	/**
+	 * Checks whether the given value or its context is a restricted
+	 * function that must not be resolved.
+	 *
+	 * @param {any} vValue The resolved value to check
+	 * @param {any} [oContext] The parent object from which <code>vValue</code>
+	 *  was retrieved
+	 * @returns {boolean} Whether the value or its context is restricted
+	 */
+	function _isRestricted(vValue, oContext) {
+		return _isWindow(oContext)
+			|| _isBlocklisted(vValue) || _isBlocklisted(oContext);
+	}
+
+	/**
+	 * Checks whether the given value is identical to one of the known
+	 * restricted global functions.
+	 *
+	 * @param {any} vValue The value to check
+	 * @returns {boolean} Whether the value is a restricted function
+	 */
+	function _isBlocklisted(vValue) {
+		if (!oJQuery) {
+			oJQuery = window.jQuery || sap.ui.require("sap/ui/thirdparty/jquery");
+		}
+
+		// eslint-disable-next-line no-eval
+		return vValue === eval || vValue === setTimeout || vValue === setInterval
+			|| vValue === document.write || vValue === document.writeln
+			|| vValue === location.assign || vValue === location.replace
+			|| (oJQuery && vValue === oJQuery.globalEval)
+			|| (oJQuery && oJQuery.sap && vValue === oJQuery.sap.globalEval);
+	}
+
+	/**
+	 * Checks whether the given value is a <code>Window</code> object.
+	 *
+	 * @param {any} vValue The value to check
+	 * @returns {boolean} Whether the value is a Window object
+	 */
+	function _isWindow(vValue) {
+		return vValue != null && vValue.window == vValue;
+	}
+
 	/**
 	 * Resolve the path segments under the given root context
 	 *
@@ -31,8 +77,13 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 			oContext = aParts.length > 1 ? ObjectPath.get(aParts.slice(0, -1), oRoot) : oRoot;
 			vRef = oContext && oContext[aParts[aParts.length - 1]];
 
-			if (typeof vRef === "function" && mOptions.bindContext) {
-				vRef = vRef.bind(mOptions.rootContext || oContext);
+			if (typeof vRef === "function") {
+				if (_isRestricted(vRef, oContext)) {
+					return oNotFound;
+				}
+				if (mOptions.bindContext) {
+					vRef = vRef.bind(mOptions.rootContext || oContext);
+				}
 			}
 
 			return vRef;
@@ -140,6 +191,13 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 			// fallback if no value could be found under the given sPath's first segment
 			// otherwise resolve under global namespace
 			vRef = ObjectPath.get(sPath);
+
+			// Block restricted functions from being resolved via global fallback
+			if (_isRestricted(vRef,
+				aParts.length > 1 ? ObjectPath.get(aParts.slice(0, -1)) : undefined
+			)) {
+				vRef = undefined;
+			}
 		}
 
 		return vRef;
