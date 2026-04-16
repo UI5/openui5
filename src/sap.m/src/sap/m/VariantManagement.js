@@ -2341,6 +2341,10 @@ sap.ui.define([
 
 		const fnCreateBinding = (sProperty) => {
 			// use OneWay Binding to not update text and flags via Model but using the explicit event handlers. (fl-VariantModel is alwqays OneWay per default)
+			// VariantItem extends Item: "title" (VariantItem) may be bound as "text" (Item) in the template.
+			if (!fnPropertyIsInTemplate(sProperty) && sProperty === "title" && fnPropertyIsInTemplate("text")) {
+				sProperty = "text";
+			}
 			if (fnPropertyIsInTemplate(sProperty)) {
 				let oBindingCopy = merge({}, fnTemplateExtractBinding(sProperty));
 				if (!oBindingCopy.parts) {

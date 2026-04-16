@@ -362,7 +362,7 @@ sap.ui.define([
 
 		DynamicDateOption.prototype._createIntegerControl = function(oValue, iIndex, fnControlsUpdated) {
 			var oControl = new StepInput({
-				width: "120px"
+				width: "10rem"
 			});
 
 			if (oValue && this.getKey() === oValue.operator) {

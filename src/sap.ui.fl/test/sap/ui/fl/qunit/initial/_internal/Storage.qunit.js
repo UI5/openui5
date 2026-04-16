@@ -782,6 +782,44 @@ sap.ui.define([
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].allContexts, true, "the allContexts parameters was added");
 			assert.notOk(this.oLoadFlexDataStub.getCall(0).args[0].cacheKey, "the cacheKey parameter was removed");
 		});
+
+		QUnit.test("when loadFlexData is called with lazyLoadingViewsEnabled, it is forwarded to the connector", async function(assert) {
+			await Storage.loadFlexData({
+				reference: sFlexReference,
+				lazyLoadingViewsEnabled: true
+			});
+			assert.strictEqual(
+				this.oLoadFlexDataStub.getCall(0).args[0].lazyLoadingViewsEnabled,
+				true,
+				"the lazyLoadingViewsEnabled parameter was forwarded to the connector"
+			);
+		});
+
+		QUnit.test("when loadFlexData is called with lazyLoadingViewsEnabled and adaptationMode is set, the parameter is removed", async function(assert) {
+			FlexInfoSession.setByReference({ adaptationMode: true }, sFlexReference);
+
+			await Storage.loadFlexData({
+				reference: sFlexReference,
+				lazyLoadingViewsEnabled: true
+			});
+			assert.notOk(
+				this.oLoadFlexDataStub.getCall(0).args[0].lazyLoadingViewsEnabled,
+				"the lazyLoadingViewsEnabled parameter was removed for key user adaptation"
+			);
+		});
+
+		QUnit.test("when loadFlexData is called with lazyLoadingViewsEnabled and rta restart session is set, the parameter is removed", async function(assert) {
+			window.sessionStorage.setItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`, true);
+
+			await Storage.loadFlexData({
+				reference: sFlexReference,
+				lazyLoadingViewsEnabled: true
+			});
+			assert.notOk(
+				this.oLoadFlexDataStub.getCall(0).args[0].lazyLoadingViewsEnabled,
+				"the lazyLoadingViewsEnabled parameter was removed when rta restart is pending"
+			);
+		});
 	});
 
 	QUnit.module("Connector disassembles the variantSections", {

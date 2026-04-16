@@ -2263,6 +2263,16 @@ sap.ui.define([
 		assert.ok(oSpy.calledWith(true), "Truncation function should be called with True value");
 	});
 
+	QUnit.test("Truncated one long token should remove sapMHiddenToken class", function(assert) {
+		var oToken = this.tokenizer.getTokens()[0];
+		oToken.addStyleClass("sapMHiddenToken");
+
+		this.tokenizer._adjustTokensVisibility();
+
+		assert.notOk(oToken.$().hasClass("sapMHiddenToken"), "The sapMHiddenToken class should be removed from the single long token.");
+		assert.ok(this.tokenizer.$().hasClass("sapMTokenizerOneLongToken"), "Should have class for one long token.");
+	});
+
 	QUnit.test("Small container + One long truncated token should call setFirstTokenTruncated with false", async function(assert) {
 		// Arrange
 		var oSpy = this.spy(this.tokenizer, 'setFirstTokenTruncated');

@@ -64,7 +64,7 @@ Use when `mcp__playwright__` tools are available:
 
 ```javascript
 mcp__playwright__browser_navigate({ url: testUrl })
-mcp__playwright__browser_wait_for({ text: "tests completed", timeout: 120000 })
+mcp__playwright__browser_wait_for({ text: "tests completed" })
 mcp__playwright__browser_snapshot()
 ```
 

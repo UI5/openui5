@@ -886,6 +886,8 @@ sap.ui.define([
 
 			if (iTokensCount === 1 && iFirstTokenToHide !== -1) {
 				this.setFirstTokenTruncated(true);
+				aTokens[0].removeStyleClass("sapMHiddenToken");
+
 				return;
 			} else if (iTokensCount === 1 && aTokens[0].getTruncated()) {
 				this.setFirstTokenTruncated(false);

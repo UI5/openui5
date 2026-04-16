@@ -55,6 +55,7 @@ sap.ui.define([
 			if (oFlexInfoSession.adaptationMode || window.sessionStorage.getItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`)) {
 				oConnectorSpecificPropertyBag.allContexts = true;
 				delete oConnectorSpecificPropertyBag.cacheKey;
+				delete oConnectorSpecificPropertyBag.lazyLoadingViewsEnabled;
 			}
 			return oConnectorConfig.loadConnectorModule.loadFlexData(oConnectorSpecificPropertyBag)
 			.then(function(oResponse) {
