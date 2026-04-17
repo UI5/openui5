@@ -11,7 +11,6 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/changes/UIChangesState",
 	"sap/ui/fl/apply/_internal/flexState/InitialPrepareFunctions",
 	"sap/ui/fl/initial/_internal/Loader",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/initial/_internal/StorageUtils",
@@ -30,7 +29,6 @@ sap.ui.define([
 	UIChangesState,
 	InitialPrepareFunctions,
 	Loader,
-	ManifestUtils,
 	FlexInfoSession,
 	Storage,
 	StorageUtils,
@@ -1460,89 +1458,6 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("FlexState.lazyLoadFlVariant", {
-		async beforeEach() {
-			mockLoader({
-				changes: {
-					changes: [
-						{
-							fileName: "uiChangeCustomer",
-							layer: Layer.CUSTOMER
-						}
-					]
-				}
-			});
-			const oResponse = await fetch("test-resources/sap/ui/fl/qunit/testResources/TestVariantsConnectorResponse.json");
-			this.oJson = await oResponse.json();
-			sandbox.stub(Loader, "loadFlVariant").resolves({
-				newData: this.oJson,
-				completeLoaderData: {
-					data: merge(
-						{},
-						this.oJson,
-						{
-							changes: [{
-								fileName: "uiChangeCustomer",
-								layer: Layer.CUSTOMER
-							}]
-						}
-					),
-					parameters: {
-						loaderCacheKey: "someCacheKey"
-					}
-				}
-			});
-			this.oCreateFlexObjectSpy = sandbox.spy(FlexObjectFactory, "createFromFileContent");
-		},
-		afterEach() {
-			FlexState.clearState();
-			sandbox.restore();
-		}
-	}, function() {
-		QUnit.test("with an initialized state and without max layer filtering", async function(assert) {
-			sandbox.stub(LayerUtils, "isLayerFilteringRequired").returns(false);
-			sandbox.stub(FlexInfoSession, "getByReference").returns({ maxLayer: Layer.CUSTOMER });
-			await FlexState.initialize({
-				reference: sReference,
-				componentId: sComponentId
-			});
-			assert.strictEqual(this.oCreateFlexObjectSpy.callCount, 1, "one flexObject is created");
-			await FlexState.lazyLoadFlVariant({
-				reference: sReference,
-				componentId: sComponentId
-			});
-			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
-			assert.strictEqual(aAllFlexObjects.length, 35, "all flex objects are loaded");
-			assert.strictEqual(this.oCreateFlexObjectSpy.callCount, 35, "the initial changes is not created again");
-		});
-
-		QUnit.test("with an initialized state and with max layer filtering", async function(assert) {
-			sandbox.stub(LayerUtils, "isLayerFilteringRequired").returns(true);
-			sandbox.stub(FlexInfoSession, "getByReference").returns({ maxLayer: Layer.CUSTOMER });
-			await FlexState.initialize({
-				reference: sReference,
-				componentId: sComponentId
-			});
-			assert.strictEqual(this.oCreateFlexObjectSpy.callCount, 1, "one flexObject is created");
-			await FlexState.lazyLoadFlVariant({
-				reference: sReference,
-				componentId: sComponentId
-			});
-			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
-			assert.strictEqual(aAllFlexObjects.length, 31, "all flex objects are loaded");
-			assert.strictEqual(this.oCreateFlexObjectSpy.callCount, 31, "the initial changes is not created again");
-		});
-
-		QUnit.test("without an initialized state", async function(assert) {
-			await FlexState.lazyLoadFlVariant({
-				reference: sReference,
-				componentId: sComponentId
-			});
-			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
-			assert.strictEqual(aAllFlexObjects.length, 34, "all flex objects are loaded");
-		});
-	});
-
 	QUnit.module("FlexState.update", {
 		async beforeEach() {
 			this.oAppComponent = new UIComponent(sComponentId);
@@ -1741,6 +1656,165 @@ sap.ui.define([
 				this.oUIChange.getContent(),
 				"bar",
 				"then the content of the runtime persistence object is also updated"
+			);
+		});
+	});
+
+	QUnit.module("Lazy variants loaded", {
+		beforeEach() {
+			this.sReference = "lazy.reference";
+			this.sComponentId = "lazyComponent";
+			this.oAppComponent = new UIComponent(this.sComponentId);
+			mockLoader();
+			return FlexState.initialize({
+				reference: this.sReference,
+				componentId: this.sComponentId
+			});
+		},
+		afterEach() {
+			FlexState.clearState(this.sReference);
+			this.oAppComponent.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when getting lazy variants for an initialized reference without added entries", function(assert) {
+			assert.deepEqual(
+				FlexState.getLazyVariantsLoaded(this.sReference),
+				[],
+				"then an empty array is returned"
+			);
+		});
+
+		QUnit.test("when adding lazy-loaded variant management references", function(assert) {
+			FlexState.addLazyVariantsLoaded(this.sReference, "vmReference1");
+			FlexState.addLazyVariantsLoaded(this.sReference, "vmReference1");
+			FlexState.addLazyVariantsLoaded(this.sReference, "vmReference2");
+
+			assert.deepEqual(
+				FlexState.getLazyVariantsLoaded(this.sReference),
+				["vmReference1", "vmReference2"],
+				"then entries are stored once and duplicates are ignored"
+			);
+		});
+
+		QUnit.test("when getting lazy variants for an unknown reference", function(assert) {
+			assert.deepEqual(
+				FlexState.getLazyVariantsLoaded("unknown.reference"),
+				[],
+				"then an empty array is returned"
+			);
+		});
+	});
+
+	QUnit.module("FlexState.addNewObjects", {
+		beforeEach() {
+			this.sReference = "add.new.objects.reference";
+			this.sComponentId = "addNewObjectsComponent";
+			this.oAppComponent = new UIComponent(this.sComponentId);
+			mockLoader({
+				changes: {
+					changes: [{
+						fileName: "existingChange",
+						fileType: "change",
+						changeType: "rename",
+						layer: Layer.USER
+					}]
+				}
+			});
+			return FlexState.initialize({
+				reference: this.sReference,
+				componentId: this.sComponentId
+			});
+		},
+		afterEach() {
+			FlexState.clearState(this.sReference);
+			this.oAppComponent.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when backend response contains new and existing IDs", function(assert) {
+			const oUpdateCachedResponseStub = sandbox.stub(Loader, "updateCachedResponse").returns("newLoaderCacheKey");
+			const oUpdateStorageResponseSpy = sandbox.spy(StorageUtils, "updateStorageResponse");
+			const oCheckUpdateSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
+
+			FlexState.addNewObjects({
+				reference: this.sReference,
+				componentId: this.sComponentId,
+				newData: {
+					changes: [
+						{
+							fileName: "existingChange",
+							fileType: "change",
+							changeType: "rename",
+							layer: Layer.USER
+						},
+						{
+							fileName: "newChange",
+							fileType: "change",
+							changeType: "rename",
+							layer: Layer.USER
+						}
+					],
+					variants: [{
+						fileName: "newVariant",
+						fileType: "ctrl_variant",
+						variantReference: "vmReference",
+						variantManagementReference: "vmReference",
+						layer: Layer.USER,
+						support: {
+							user: "USER"
+						}
+					}],
+					ignoredObject: {
+						foo: "bar"
+					}
+				}
+			});
+
+			assert.strictEqual(oUpdateCachedResponseStub.callCount, 1, "then the loader cache is updated once");
+			assert.strictEqual(oUpdateCachedResponseStub.firstCall.args[0], this.sReference, "then the reference is passed");
+			assert.deepEqual(
+				oUpdateCachedResponseStub.firstCall.args[1].map((oUpdate) => oUpdate.flexObject.fileName),
+				["newChange", "newVariant"],
+				"then only new objects are converted into add updates"
+			);
+			assert.strictEqual(oUpdateStorageResponseSpy.callCount, 1, "then storage response is updated once");
+			assert.deepEqual(
+				oUpdateStorageResponseSpy.firstCall.args[1].map((oUpdate) => oUpdate.flexObject.fileName),
+				["newChange", "newVariant"],
+				"then storage response receives the same add updates"
+			);
+			assert.strictEqual(oCheckUpdateSpy.callCount, 1, "then flex object data selector is invalidated once");
+			assert.strictEqual(
+				FlexState.getFlexObjectsDataSelector().get({ reference: this.sReference }).length,
+				3,
+				"then exactly two new flex objects are added to the existing runtime object (3 in total)"
+			);
+		});
+
+		QUnit.test("when backend response contains only existing IDs", function(assert) {
+			const oUpdateCachedResponseStub = sandbox.stub(Loader, "updateCachedResponse");
+			const oUpdateStorageResponseSpy = sandbox.spy(StorageUtils, "updateStorageResponse");
+
+			FlexState.addNewObjects({
+				reference: this.sReference,
+				componentId: this.sComponentId,
+				newData: {
+					changes: [{
+						fileName: "existingChange",
+						fileType: "change",
+						changeType: "rename",
+						layer: Layer.USER
+					}]
+				}
+			});
+
+			assert.strictEqual(oUpdateCachedResponseStub.callCount, 0, "then the loader cache is not updated");
+			assert.strictEqual(oUpdateStorageResponseSpy.callCount, 0, "then storage response is not updated");
+			assert.strictEqual(
+				FlexState.getFlexObjectsDataSelector().get({ reference: this.sReference }).length,
+				1,
+				"then no additional flex object is added"
 			);
 		});
 	});

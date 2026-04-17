@@ -321,11 +321,11 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("when loadAllFLVariants is triggered", function(assert) {
+		QUnit.test("when loadAllFlVariants is triggered", function(assert) {
 			mockResponse.call(this, JSON.stringify(oFLVariantServerResponse));
 			const mPropertyBag = { url: "/sap/bc/lrep", reference: "test.app", vmReference: "vmControl1" };
 
-			return LrepConnector.loadAllFLVariants(mPropertyBag).then(function(oResponse) {
+			return LrepConnector.loadAllFlVariants(mPropertyBag).then(function(oResponse) {
 				assert.equal(this.oXHR.method, "GET", "request method is GET");
 				const sExpectedUrl = "/sap/bc/lrep/variantdata/test.app?vmReference=vmControl1&sap-language=EN";
 				assert.equal(this.oXHR.url, sExpectedUrl, "the URL is correct");

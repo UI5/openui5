@@ -34,8 +34,6 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var ActionArea = library.CardActionArea;
-
 	var ActionType = library.CardActionType;
 
 	var CardDisplayVariant = library.CardDisplayVariant;
@@ -111,7 +109,7 @@ sap.ui.define([
 		});
 
 		oActions.attach({
-			area: ActionArea.Header,
+			isHeader: true,
 			enabledPropertyName: "interactive",
 			actions: mConfiguration.actions,
 			control: oHeader
@@ -271,7 +269,7 @@ sap.ui.define([
 		const oStatus = ObjectStatusFactory.createStatusItem(oItem);
 
 		oActions.attach({
-			area: ActionArea.Header,
+			isHeader: true,
 			actions: oItem.actions,
 			control: oStatus,
 			enabledPropertyName: "active"

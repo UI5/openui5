@@ -110,9 +110,6 @@ sap.ui.define([
 
 	var FlexJustifyContent = mLibrary.FlexJustifyContent;
 
-	// shortcut for sap.ui.integration.CardActionArea
-	var ActionArea = library.CardActionArea;
-
 	var AvatarGroupType = fLibrary.AvatarGroupType;
 
 	var ToolbarStyle = mLibrary.ToolbarStyle;
@@ -375,7 +372,6 @@ sap.ui.define([
 		}, this);
 
 		this._oActions.attach({
-			area: ActionArea.Content,
 			actions: oConfiguration.actions,
 			control: this
 		});
@@ -633,7 +629,6 @@ sap.ui.define([
 		const oStatus = ObjectStatusFactory.createStatusItem(oItem);
 
 		this._oActions.attach({
-			area: ActionArea.ContentItemDetail,
 			actions: oItem.actions,
 			control: oStatus,
 			enabledPropertyName: "active"
@@ -661,7 +656,6 @@ sap.ui.define([
 			}
 
 			this._oActions.attach({
-				area: ActionArea.ContentItemDetail,
 				actions: oItem.actions,
 				control: this,
 				actionControl: oControl,

@@ -56,7 +56,9 @@ sap.ui.define([
 	 * 		runtimePersistence: {
 	 * 			flexObjects: [...],
 	 * 			runtimeOnlyData: {
-	 * 				liveDependencyMap: {...}
+	 * 				liveDependencyMap: {...},
+	 * 				flexObjects: [...], // e.g. standard variants, so they survive cache invalidation
+	 * 				lazyVariantsLoaded: [...] // VM references / persistency keys for which all variants were loaded (lazy loading)
 	 * 			}
 	 * 		},
 	 * 		maxLayer: <string>,
@@ -211,7 +213,8 @@ sap.ui.define([
 			flexObjects: createFlexObjects(oStorageResponse),
 			runtimeOnlyData: {
 				liveDependencyMap: DependencyHandler.createEmptyDependencyMap(),
-				flexObjects: []
+				flexObjects: [],
+				lazyVariantsLoaded: []
 			}
 		};
 		if (!oFlexStateInstance.componentId) {
@@ -395,6 +398,16 @@ sap.ui.define([
 		_mInstances[sReference].runtimePersistence.runtimeOnlyData.flexObjects.push(...aFlexObjects);
 	};
 
+	FlexState.addLazyVariantsLoaded = function(sReference, sVMReferenceOrPersistenceKey) {
+		if (!_mInstances[sReference].runtimePersistence.runtimeOnlyData.lazyVariantsLoaded.includes(sVMReferenceOrPersistenceKey)) {
+			_mInstances[sReference].runtimePersistence.runtimeOnlyData.lazyVariantsLoaded.push(sVMReferenceOrPersistenceKey);
+		}
+	};
+
+	FlexState.getLazyVariantsLoaded = function(sReference) {
+		return _mInstances[sReference]?.runtimePersistence?.runtimeOnlyData?.lazyVariantsLoaded || [];
+	};
+
 	/**
 	 * Initializes the FlexState for a given reference. A request for the flex data is sent to the Loader and the response is saved.
 	 * The FlexState can only be initialized once, every subsequent init call will just resolve as soon as it is initialized.
@@ -465,28 +478,6 @@ sap.ui.define([
 	FlexState.isInitialized = function(mPropertyBag) {
 		var sReference = mPropertyBag.reference ? mPropertyBag.reference : ManifestUtils.getFlexReferenceForControl(mPropertyBag.control);
 		return !!_mInstances[sReference];
-	};
-
-	/**
-	 * Lazy loads the flex variant for a specific reference and adds it to the runtime persistence
-	 *
-	 * @param {object} mPropertyBag - Contains additional data needed for reading and storing changes
-	 * @param {string} mPropertyBag.reference - Flex reference of the app
-	 * @param {string} mPropertyBag.componentId - ID of the component
-	 * @param {string} mPropertyBag.variantReference - The reference of the variant to load.
-	 */
-	FlexState.lazyLoadFlVariant = async function(mPropertyBag) {
-		initializeEmptyStateIfNeeded(mPropertyBag.reference, mPropertyBag.componentId);
-		const oResult = await Loader.loadFlVariant(mPropertyBag);
-		const oInstance = _mInstances[mPropertyBag.reference];
-		oInstance.loaderCacheKey = oResult.completeLoaderData.parameters.loaderCacheKey;
-		oInstance.storageResponse = filterByMaxLayer(mPropertyBag.reference, oResult.completeLoaderData.data);
-		oInstance.runtimePersistence.flexObjects =
-		[
-			...oInstance.runtimePersistence.flexObjects,
-			...createFlexObjects(filterByMaxLayer(mPropertyBag.reference, { changes: oResult.newData }))
-		];
-		oFlexObjectsDataSelector.checkUpdate({ reference: mPropertyBag.reference });
 	};
 
 	/**
@@ -746,6 +737,80 @@ sap.ui.define([
 
 	FlexState.getSVMControls = function(sReference) {
 		return _mExternalData.smartVariantManagementControls[sReference] || [];
+	};
+
+	/**
+	 * Filters backend response entries by existing IDs to retain only new entries.
+	 *
+	 * @param {object} oBackendResponse - The backend response potentially including existing objects
+	 * @param {Set<string>} oExistingIds - IDs already present in runtime persistence
+	 * @returns {object} Backend response containing only entries that are not in runtime persistence
+	 */
+	function filterBackendResponseByExistingIds(oBackendResponse, oExistingIds) {
+		return Object.keys(oBackendResponse).reduce((oFilteredResponse, sKey) => {
+			const vValue = oBackendResponse[sKey];
+			if (Array.isArray(vValue)) {
+				oFilteredResponse[sKey] = vValue.filter((oRawFlexObject) => !oExistingIds.has(oRawFlexObject.fileName));
+			}
+			return oFilteredResponse;
+		}, {});
+	}
+
+	/**
+	 * Convert backend response to update format for Loader.updateCachedResponse and StorageUtils.updateStorageResponse.
+	 *
+	 * @param {object} oBackendResponse - The backend response containing new flex objects
+	 * @returns {object[]} Array of update objects for Loader.updateCachedResponse
+	 */
+	function createAddUpdatesFromBackendResponse(oBackendResponse) {
+		const aUpdates = [];
+		Object.values(oBackendResponse).forEach((vValue) => {
+			if (Array.isArray(vValue)) {
+				vValue.forEach((oRawFlexObject) => {
+					aUpdates.push({
+						type: "add",
+						flexObject: oRawFlexObject
+					});
+				});
+			}
+		});
+		return aUpdates;
+	}
+
+	/**
+	 * Adds new FlexObjects from a backend response to the FlexState. Only objects not already in the runtime persistence are added.
+	 * Used for lazy loading scenarios where new data is fetched from the backend
+	 * and needs to be added to the existing state without a full reinitialization.
+	 * This function also updates the Loader cache as part of the flow.
+	 *
+	 * @param {object} mPropertyBag - Contains additional data needed for adding the new objects
+	 * @param {string} mPropertyBag.reference - Flex reference of the app
+	 * @param {string} mPropertyBag.componentId - ID of the component
+	 * @param {object} mPropertyBag.newData - The new data from the backend (with the backend response structure)
+	 */
+	FlexState.addNewObjects = function(mPropertyBag) {
+		initializeEmptyStateIfNeeded(mPropertyBag.reference, mPropertyBag.componentId);
+		const oInstance = _mInstances[mPropertyBag.reference];
+
+		// Filter duplicate entries first and then create FlexObjects only for new entries
+		const oExistingIds = new Set(oInstance.runtimePersistence.flexObjects.map((oObj) => oObj.getId()));
+		const oFilteredNewData = filterBackendResponseByExistingIds(mPropertyBag.newData, oExistingIds);
+		const aNewFlexObjects = createFlexObjects({ changes: oFilteredNewData });
+
+		if (aNewFlexObjects.length > 0) {
+			const aFlexObjectUpdates = [];
+			const aUpdates = createAddUpdatesFromBackendResponse(oFilteredNewData);
+			const sLoaderCacheKey = Loader.updateCachedResponse(mPropertyBag.reference, aUpdates);
+
+			oInstance.loaderCacheKey = sLoaderCacheKey;
+			StorageUtils.updateStorageResponse(oInstance.storageResponse, aUpdates);
+
+			aNewFlexObjects.forEach((oFlexObject) => {
+				oInstance.runtimePersistence.flexObjects.push(oFlexObject);
+				aFlexObjectUpdates.push({ type: "addFlexObject", updatedObject: oFlexObject });
+			});
+			oFlexObjectsDataSelector.checkUpdate({ reference: mPropertyBag.reference }, aFlexObjectUpdates);
+		}
 	};
 
 	return FlexState;

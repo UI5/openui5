@@ -52,9 +52,12 @@ sap.ui.define([
 			// a sign that we are either loading RTA mode or are already in the RTA mode
 			// and allContexts query parameter should be set for flex/data request
 			// and the cacheKey should be removed to disable browser caching
+			// and lazy loading of views should be disabled to ensure all variants and their contents are loaded for RTA
 			if (oFlexInfoSession.adaptationMode || window.sessionStorage.getItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`)) {
 				oConnectorSpecificPropertyBag.allContexts = true;
 				delete oConnectorSpecificPropertyBag.cacheKey;
+				// todos#18: this property is not set yet because the client cannot handle lazy loading of Comp variant contents.
+				// It will be added as soon as the client can handle the full scenario.
 				delete oConnectorSpecificPropertyBag.lazyLoadingViewsEnabled;
 			}
 			return oConnectorConfig.loadConnectorModule.loadFlexData(oConnectorSpecificPropertyBag)
@@ -222,39 +225,85 @@ sap.ui.define([
 	};
 
 	/**
-	 * Loads the flex objects for the given variant reference
+	 * Loads variant-related data from connectors.
 	 *
 	 * @param {object} mPropertyBag - Object with the necessary properties
-	 * @param {string} mPropertyBag.reference - Flexibility reference
-	 * @param {string} mPropertyBag.variantReference - Variant reference to be loaded
-	 * @returns {Promise<object>} Resolves with the data for the variant
+	 * @param {string} sMethodName - Name of the connector method to call (loadFlVariant, loadAllFlVariants, loadFlVariantContent)
+	 * @returns {Promise<object>} Resolves with merged variant data
 	 */
-	Storage.loadFlVariant = async function(mPropertyBag) {
+	async function loadVariantDataFromConnectors(mPropertyBag, sMethodName) {
 		const aConnectors = await StorageUtils.getLoadConnectors();
 		const aResponses = [];
+
 		for (const oConnectorConfig of aConnectors) {
-			if (oConnectorConfig?.loadConnectorModule?.loadFlVariant) {
+			if (oConnectorConfig?.loadConnectorModule?.[sMethodName]) {
 				const oConnectorSpecificPropertyBag = {
 					...mPropertyBag,
 					url: oConnectorConfig.url,
 					layers: oConnectorConfig.layers
 				};
 				try {
-					aResponses.push(await oConnectorConfig.loadConnectorModule.loadFlVariant(oConnectorSpecificPropertyBag));
+					const oResponse = await oConnectorConfig.loadConnectorModule[sMethodName](oConnectorSpecificPropertyBag);
+					aResponses.push(oResponse || {});
 				} catch (oError) {
 					aResponses.push({});
 				}
 			}
 		}
-		const aRelevantKeys = ["variants", "variantChanges", "variantDependentControlChanges"];
-		return aResponses.reduce((oResult, oResponse) => {
-			aRelevantKeys.forEach((sKey) => {
-				if (oResponse[sKey]) {
-					oResult[sKey] = [...(oResult[sKey] || []), ...oResponse[sKey]];
-				}
-			});
-			return oResult;
-		}, {});
+
+		return StorageResultMerger.merge(aResponses);
+	}
+
+	/**
+	 * Loads a single FL variant with its related changes.
+	 *
+	 * @param {object} mPropertyBag - Object with the necessary properties
+	 * @param {string} mPropertyBag.reference - Flexibility reference
+	 * @param {string} mPropertyBag.variantReference - Variant reference to load
+	 * @returns {Promise<object>} Resolves with variants, variantChanges, and variantDependentControlChanges
+	 */
+	Storage.loadFlVariant = function(mPropertyBag) {
+		return loadVariantDataFromConnectors(mPropertyBag, "loadFlVariant");
+	};
+
+	/**
+	 * Loads all FL variants and their metadata changes for a given variant management control.
+	 * Used for lazy loading when opening the Manage Views or Save As dialog.
+	 *
+	 * @param {object} mPropertyBag - Object with the necessary properties
+	 * @param {string} mPropertyBag.reference - Flexibility reference
+	 * @param {string} mPropertyBag.vmReference - Variant management control reference
+	 * @returns {Promise<object>} Resolves with variants, variantChanges, and variantDependentControlChanges
+	 */
+	Storage.loadAllFlVariants = function(mPropertyBag) {
+		return loadVariantDataFromConnectors(mPropertyBag, "loadAllFlVariants");
+	};
+
+	/**
+	 * Loads the UI changes (variantDependentControlChanges) for a given FL variant.
+	 * Used for lazy loading when switching to a variant that has variantContentRemoved: true.
+	 *
+	 * @param {object} mPropertyBag - Object with the necessary properties
+	 * @param {string} mPropertyBag.reference - Flexibility reference
+	 * @param {string} mPropertyBag.variantId - Variant ID to load content for
+	 * @returns {Promise<object>} Resolves with variants (including referenced), variantChanges, and variantDependentControlChanges
+	 */
+	Storage.loadFlVariantContent = function(mPropertyBag) {
+		return loadVariantDataFromConnectors(mPropertyBag, "loadFlVariantContent");
+	};
+
+	/**
+	 * Loads all comp variants and their changes for a given persistency key.
+	 * Used for lazy loading when opening the Manage Views dialog or saving
+	 * a new variant (to avoid duplicate titles).
+	 *
+	 * @param {object} mPropertyBag - Object with the necessary properties
+	 * @param {string} mPropertyBag.reference - Flexibility reference
+	 * @param {string} mPropertyBag.persistencyKey - Persistency key of the SVM control
+	 * @returns {Promise<object>} Resolves with merged comp variant data in storage response format
+	 */
+	Storage.loadAllCompVariants = function(mPropertyBag) {
+		return loadVariantDataFromConnectors(mPropertyBag, "loadAllCompVariants");
 	};
 
 	return Storage;

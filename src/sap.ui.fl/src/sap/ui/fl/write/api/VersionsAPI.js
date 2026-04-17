@@ -7,7 +7,6 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/api/Version",
-	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/_internal/Versions",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/ui/fl/write/api/FeaturesAPI",
@@ -18,7 +17,6 @@ sap.ui.define([
 	FlexInfoSession,
 	ManifestUtils,
 	Version,
-	FlexObjectManager,
 	Versions,
 	ContextBasedAdaptationsAPI,
 	FeaturesAPI,
@@ -300,38 +298,20 @@ sap.ui.define([
 	 * rejects if an error occurs or the layer does not support draft handling
 	 */
 	VersionsAPI.discardDraft = function(mPropertyBag) {
-		const oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
-		const sReference = getFlexReferenceForControl(oAppComponent);
-		function removeDirtyChanges() {
-			const aDirtyChanges = FlexObjectState.getDirtyFlexObjects(sReference);
-			FlexObjectManager.deleteFlexObjects({
-				reference: sReference,
-				componentId: oAppComponent.getId(),
-				flexObjects: aDirtyChanges
-			});
-			return aDirtyChanges.length > 0;
-		}
-
 		if (!mPropertyBag.control) {
 			return Promise.reject(new Error("No control was provided"));
 		}
 		if (!mPropertyBag.layer) {
 			return Promise.reject(new Error("No layer was provided"));
 		}
+		const oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
+		const sReference = getFlexReferenceForControl(oAppComponent);
 		return Versions.discardDraft({
 			reference: sReference,
 			layer: mPropertyBag.layer,
 			discardDraftAndKeepActiveVersion: mPropertyBag.discardDraftAndKeepActiveVersion
 		})
 		.then(function(oDiscardInfo) {
-			// in case of a existing draft known by the backend;
-			// we remove dirty changes only after successful DELETE request
-			var bDirtyChangesRemoved = false;
-			if (!mPropertyBag.discardDraftAndKeepActiveVersion) {
-				bDirtyChangesRemoved = removeDirtyChanges();
-			}
-			oDiscardInfo.dirtyChangesDiscarded = bDirtyChangesRemoved;
-
 			if (oDiscardInfo.backendChangesDiscarded) {
 				const bHasAdaptationsModel = ContextBasedAdaptationsAPI.hasAdaptationsModel({
 					layer: mPropertyBag.layer,

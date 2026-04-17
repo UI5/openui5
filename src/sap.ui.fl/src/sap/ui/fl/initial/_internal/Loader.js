@@ -309,7 +309,10 @@ sap.ui.define([
 		// This is necessary because when we call clear the FlexInfoSession with needToDeleteFlexInfoSession at the beginning,
 		// parameters like version or allContextsProvided might be stale and lead to unnecessary second flex/data requests,
 		// due to out-of sync information in the cache and the FlexInfoSession.
+
+		let aNonFavoriteVariantsRemoved = [];
 		if (oFormattedFlexData.changes.info !== undefined) {
+			aNonFavoriteVariantsRemoved = oFormattedFlexData.changes.info.nonFavoriteVariantsRemoved || [];
 			oFlexInfoSession = { ...oFlexInfoSession, ...oFormattedFlexData.changes.info };
 		}
 
@@ -321,7 +324,8 @@ sap.ui.define([
 				allContextsProvided: oFlexInfoSession.allContextsProvided,
 				adaptationId: oFlexInfoSession.displayedAdaptationId,
 				loaderCacheKey: oFlexDataCopy.cacheKey || uid(),
-				previouslyFilledData: bPreviouslyFilledData
+				previouslyFilledData: bPreviouslyFilledData,
+				nonFavoriteVariantsRemoved: aNonFavoriteVariantsRemoved
 			}
 		};
 
@@ -367,29 +371,6 @@ sap.ui.define([
 				delete _mAsyncHintsCacheBusterTokens[sReference];
 			});
 		}
-	};
-
-	/**
-	 * Loads a FlVariant and updates the cached flex data.
-	 *
-	 * @param {object} mPropertyBag - The property bag containing the variant reference and other parameters.
-	 * @param {string} mPropertyBag.variantReference - The reference of the variant to load.
-	 * @param {string} mPropertyBag.reference - The flex reference of the application.
-	 * @returns {Promise<object>} Resolves with the loaded variant data.
-	 */
-	Loader.loadFlVariant = async function(mPropertyBag) {
-		const oNewData = await Storage.loadFlVariant({
-			variantReference: mPropertyBag.variantReference,
-			reference: mPropertyBag.reference
-		});
-		Object.entries(oNewData).forEach(([sKey, vValue]) => {
-			_mCachedFlexData[mPropertyBag.reference].data.changes[sKey].push(...vValue);
-		});
-		_mCachedFlexData[mPropertyBag.reference].parameters.loaderCacheKey = _mAsyncHintsCacheBusterTokens[mPropertyBag.reference] = uid();
-		return {
-			newData: oNewData,
-			completeLoaderData: _mCachedFlexData[mPropertyBag.reference]
-		};
 	};
 
 	/**

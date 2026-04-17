@@ -28,7 +28,6 @@ sap.ui.define([
 	 * Provides data for the card, card header and card content by reading the "data" part of the card manifest.
 	 * Hides the complexity of working with different data providers like:
 	 *  - static JSON data
-	 * 	- data services which implements the interface <code>sap.ui.integration.services.Data</code> class
 	 *  - AJAX calls like <code>sap.ui.integration.cards.Data</code> class
 	 * Allows for an extensible way to add more data providers.
 	 *

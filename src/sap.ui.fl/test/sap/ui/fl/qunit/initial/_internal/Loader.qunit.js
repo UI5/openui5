@@ -55,7 +55,8 @@ sap.ui.define([
 			this.oManifest = new Manifest(this.oRawManifest);
 			const oFlexDataResponse = {
 				info: {
-					foo: "bar"
+					foo: "bar",
+					nonFavoriteVariantsRemoved: ["vmReference1"]
 				},
 				changes: [
 					{
@@ -202,6 +203,31 @@ sap.ui.define([
 
 			const oFlexInfoSession = FlexInfoSession.getByReference(sReference);
 			assert.strictEqual(oFlexInfoSession.foo, "bar", "the info is stored in the FlexInfoSession");
+			assert.deepEqual(
+				oResult.parameters.nonFavoriteVariantsRemoved,
+				["vmReference1"],
+				"the nonFavoriteVariantsRemoved are exposed in the loader parameters"
+			);
+		});
+
+		QUnit.test("when getFlexData is called and info does not contain nonFavoriteVariantsRemoved", async function(assert) {
+			const oFlexDataWithoutInfo = {
+				...StorageUtils.getEmptyFlexDataResponse(),
+				cacheKey: "cacheKeyWithoutInfo"
+			};
+			this.oLoadFlexDataStub.callsFake(() => Promise.resolve(oFlexDataWithoutInfo));
+
+			const oResult = await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			assert.deepEqual(
+				oResult.parameters.nonFavoriteVariantsRemoved,
+				[],
+				"then nonFavoriteVariantsRemoved defaults to an empty array"
+			);
 		});
 
 		QUnit.test("when getFlexData is called twice for the same component with skipLoadBundle", async function(assert) {
@@ -590,7 +616,10 @@ sap.ui.define([
 			assert.strictEqual(this.oLoadFlexDataStub.getCalls().length, 1, "the flex data request is called once");
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].version, undefined, "the version is undefined to loadFlexData");
 			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
-			assert.deepEqual(oFlexInfoSession, { foo: "bar" }, "the FlexInfoSession is cleared before filled with flex data content");
+			assert.deepEqual(oFlexInfoSession, {
+				foo: "bar",
+				nonFavoriteVariantsRemoved: ["vmReference1"]
+			}, "the FlexInfoSession is cleared before filled with flex data content");
 		});
 
 		QUnit.test("when getFlexData is called with sap.ui.rta.restart, saveChangeKeepSession not set and filled _mCachedFlexData", async function(assert) {
@@ -616,7 +645,11 @@ sap.ui.define([
 
 			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
 			assert.strictEqual(this.oLoadFlexDataStub.getCalls().length, 1, "the flex data request is called once");
-			assert.deepEqual(oFlexInfoSession, { foo: "bar", key: "value" }, "the FlexInfoSession is not cleared");
+			assert.deepEqual(oFlexInfoSession, {
+				foo: "bar",
+				key: "value",
+				nonFavoriteVariantsRemoved: ["vmReference1"]
+			}, "the FlexInfoSession is not cleared");
 		});
 
 		QUnit.test("when getFlexData is called with sap.ui.rta.restart set, saveChangeKeepSession not set and empty _mCachedFlexData", async function(assert) {
@@ -644,7 +677,8 @@ sap.ui.define([
 				{
 					allContextsProvided: false,
 					version: sVersionID,
-					foo: "bar"
+					foo: "bar",
+					nonFavoriteVariantsRemoved: ["vmReference1"]
 				}, "the FlexInfoSession is not cleared before filled again");
 		});
 
@@ -675,7 +709,8 @@ sap.ui.define([
 					allContextsProvided: false,
 					version: sVersionID,
 					foo: "bar",
-					saveChangeKeepSession: true
+					saveChangeKeepSession: true,
+					nonFavoriteVariantsRemoved: ["vmReference1"]
 				}, "the FlexInfoSession is not cleared before filled again");
 		});
 
@@ -713,7 +748,8 @@ sap.ui.define([
 					allContextsProvided: false,
 					version: sVersionID,
 					foo: "bar",
-					saveChangeKeepSession: true
+					saveChangeKeepSession: true,
+					nonFavoriteVariantsRemoved: ["vmReference1"]
 				}, "the FlexInfoSession is not cleared before filled again");
 		});
 
@@ -1219,88 +1255,6 @@ sap.ui.define([
 			assert.strictEqual(oCachedData2.appDescriptorChanges.length, 1, "the manifest change is still stored");
 			assert.strictEqual(oCachedData2.annotationChanges.length, 1, "the annotation change is still stored");
 			assert.strictEqual(oCachedData2.ui2personalization, "newData2", "the ui2 data is updated");
-		});
-
-		QUnit.test("loadFlVariant with getIsVariantAuthorNameAvailable = true", async function(assert) {
-			sandbox.stub(Storage, "loadFlVariant").resolves({
-				variants: [
-					FlexObjectFactory.createFlVariant({ id: "flVariant2" }).convertToFileContent(),
-					FlexObjectFactory.createFlVariant({ id: "flVariant3" }).convertToFileContent()
-				],
-				variantChanges: [
-					FlexObjectFactory.createUIChange({
-						id: "uiChange3",
-						fileType: "ctrl_variant_change"
-					}).convertToFileContent()
-				],
-				variantDependentControlChanges: [
-					FlexObjectFactory.createUIChange({
-						id: "uiChange2",
-						variantReference: "flVariant2"
-					}).convertToFileContent()
-				],
-				variantManagementChanges: [
-					FlexObjectFactory.createUIChange({
-						id: "uiChange4",
-						fileType: "ctrl_variant_management_change"
-					}).convertToFileContent()
-				]
-			});
-
-			Loader.updateCachedResponse(sReference, [
-				{
-					type: "add",
-					flexObject: FlexObjectFactory.createFlVariant({ id: "flVariant1" }).convertToFileContent()
-				}
-			]);
-
-			const oLoadedVariantData = await Loader.loadFlVariant({
-				reference: sReference,
-				variantReference: "flVariant1"
-			});
-
-			const oFlexData = Loader.getCachedFlexData(sReference).data;
-			assert.deepEqual(oFlexData.changes, oLoadedVariantData.completeLoaderData.data.changes, "the cached data is correct");
-			assert.strictEqual(
-				oLoadedVariantData.newData.variants.length, 2,
-				"the cached data contains two FL variants"
-			);
-			assert.strictEqual(
-				oLoadedVariantData.newData.variants[0].fileName, "flVariant2",
-				"the first FL variant is the one requested"
-			);
-			assert.strictEqual(
-				oLoadedVariantData.newData.variants[1].fileName, "flVariant3",
-				"the second FL variant is the one loaded from the backend"
-			);
-			assert.strictEqual(
-				oLoadedVariantData.newData.variantChanges.length, 1,
-				"the cached data contains one variant change"
-			);
-			assert.strictEqual(
-				oLoadedVariantData.newData.variantChanges[0].fileName, "uiChange3",
-				"the variant change is the one loaded from the backend"
-			);
-			assert.strictEqual(
-				oLoadedVariantData.newData.variantDependentControlChanges.length, 1,
-				"the cached data contains one variant dependent control change"
-			);
-			assert.strictEqual(
-				oLoadedVariantData.newData.variantDependentControlChanges[0].fileName,
-				"uiChange2", "the variant dependent control change is the one loaded from the backend"
-			);
-			assert.strictEqual(
-				oLoadedVariantData.newData.variantManagementChanges.length, 1,
-				"the cached data contains one variant management change"
-			);
-			assert.strictEqual(
-				oLoadedVariantData.newData.variantManagementChanges[0].fileName, "uiChange4",
-				"the variant management change is the one loaded from the backend"
-			);
-			assert.notStrictEqual(
-				oLoadedVariantData.completeLoaderData.parameters.loaderCacheKey, this.sInitialLoaderCacheKey,
-				"the cache key was updated"
-			);
 		});
 	});
 });

@@ -20,9 +20,6 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	// shortcuts for sap.ui.integration.CardActionArea
-	var ActionArea = library.CardActionArea;
-
 	// lazy dependencies, loaded on the first attempt to create TimelineContent
 	var Timeline, TimelineItem;
 
@@ -188,7 +185,6 @@ sap.ui.define([
 		this._oTimeLineItemTemplate = new TimelineItem(mSettings);
 
 		this._oActions.attach({
-			area: ActionArea.ContentItem,
 			actions: mItem.actions,
 			control: this,
 			actionControl: this._oTimeLineItemTemplate,

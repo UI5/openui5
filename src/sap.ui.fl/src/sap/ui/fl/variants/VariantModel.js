@@ -16,8 +16,11 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/Layer",
@@ -39,8 +42,11 @@ sap.ui.define([
 	VariantUtil,
 	FlexObjectFactory,
 	DependencyHandler,
+	VariantManagerApply,
 	VariantManagementState,
 	FlexObjectState,
+	FlexState,
+	Loader,
 	ManifestUtils,
 	Settings,
 	Layer,
@@ -398,6 +404,26 @@ sap.ui.define([
 				model: this,
 				vmControl: oVariantManagementControl,
 				appComponent: this.oAppComponent
+			});
+		}
+
+		// Set up lazy loading callback for Manage Views dialog
+		const oLoaderData = Loader.getCachedFlexData(this.sFlexReference);
+		const aControlsWithRemovedVariants = oLoaderData.parameters?.nonFavoriteVariantsRemoved;
+		if (
+			aControlsWithRemovedVariants?.includes(sVariantManagementReference)
+		) {
+			const sComponentId = this.oAppComponent.getId();
+			const sReference = this.sFlexReference;
+			oVariantManagementControl.setDynamicVariantsLoadedCallback(() => {
+				if (FlexState.getLazyVariantsLoaded(sReference).includes(sVariantManagementReference)) {
+					return Promise.resolve();
+				}
+				return VariantManagerApply.loadAllVariantsForVM({
+					reference: sReference,
+					componentId: sComponentId,
+					vmReference: sVariantManagementReference
+				});
 			});
 		}
 

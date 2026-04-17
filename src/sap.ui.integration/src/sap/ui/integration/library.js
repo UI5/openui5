@@ -235,21 +235,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Specifies different areas of a card where actions can be attached.
-	 *
-	 * @private
-	 */
-	thisLib.CardActionArea = {
-		None: "None",
-		Content: "Content",
-		ContentItem: "ContentItem",
-		ActionsStrip: "ActionsStrip",
-		ContentItemDetail: "ContentItemDetail",
-		Header: "Header",
-		Card: "Card"
-	};
-
-	/**
 	 * Card message strip types.
 	 *
 	 * @enum {string}

@@ -208,7 +208,7 @@ sap.ui.define([
 		 * @param {string} mPropertyBag.vmReference Id of the control for which the variants should be loaded
 		 * @returns {Promise<object>} Promise resolves with an object containing the flex variants for the given control
 		 */
-		loadAllFLVariants(mPropertyBag) {
+		loadAllFlVariants(mPropertyBag) {
 			const mParameters = _pick(mPropertyBag, ["vmReference"]);
 			this._addClientInfo(mParameters);
 			Utils.addSAPLogonLanguageInfo(mParameters);

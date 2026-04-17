@@ -105,6 +105,14 @@ sap.ui.define([
 		return FlexInfoSession.getByReference(sReference).allContextsProvided === false;
 	}
 
+	function hasRemovedNonFavoriteVariants(sReference) {
+		// Check if the initial backend response has non-favorite variants removed
+		// This determines if a reload is needed before starting RTA
+		const oLoaderData = Loader.getCachedFlexData(sReference);
+		const aNonFavoriteVariantsRemoved = oLoaderData.parameters?.nonFavoriteVariantsRemoved || [];
+		return aNonFavoriteVariantsRemoved.length > 0;
+	}
+
 	function needAdaptationReloadOnExit(sReference) {
 		return FlexInfoSession.getByReference(sReference).isEndUserAdaptation === false;
 	}
@@ -142,6 +150,8 @@ sap.ui.define([
 			]);
 			const oReloadReasons = {};
 			[oReloadReasons.hasHigherLayerChanges, oReloadReasons.isDraftAvailable, oReloadReasons.allContexts] = aReasons;
+			// Check if lazy loading removed some variant data that needs to be reloaded for RTA
+			oReloadReasons.hasRemovedNonFavoriteVariants = hasRemovedNonFavoriteVariants(sReference);
 			return oReloadReasons;
 		},
 
@@ -272,8 +282,12 @@ sap.ui.define([
 				oFlexInfoSession.version = Version.Number.Draft;
 				bFlexInfoSessionChanged = true;
 			}
+
 			FlexInfoSession.setByReference(oFlexInfoSession, sReference);
-			return bFlexInfoSessionChanged;
+
+			// hasRemovedNonFavoriteVariants causes a reload, after which the FlexState and Loader cache
+			// are cleared anyway. The new backend request will not have lazy loading enabled for RTA.
+			return bFlexInfoSessionChanged || !!oReloadInfo.hasRemovedNonFavoriteVariants;
 		},
 
 		/**

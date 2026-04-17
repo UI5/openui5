@@ -11,6 +11,8 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/connectors/LrepConnector",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/base/util/LoaderExtensions",
+	"sap/ui/fl/initial/_internal/Loader",
+	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Utils,
@@ -23,6 +25,8 @@ sap.ui.define([
 	LrepConnector,
 	Settings,
 	LoaderExtensions,
+	Loader,
+	Storage,
 	sinon
 ) {
 	"use strict";
@@ -293,6 +297,151 @@ sap.ui.define([
 				false,
 				"and is executed on selection, because it is flagged within the content"
 			);
+		});
+
+		QUnit.test("When loadVariants() is called and the persistency key is in nonFavoriteVariantsRemoved", async function(assert) {
+			const sPersistencyKey = "myPersistencyKey";
+			this.oControl = new Control("controlId3");
+			this.oControl.getPersonalizableControlPersistencyKey = function() {
+				return sPersistencyKey;
+			};
+			const oSetCallbackStub = sandbox.stub();
+			this.oControl.setDynamicVariantsLoadedCallback = oSetCallbackStub;
+
+			sandbox.stub(LrepConnector, "loadFlexData").resolves({});
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: [sPersistencyKey] }
+			});
+
+			await FlexState.initialize({ reference: "sap.ui.core", componentId: "AppComponent21" });
+			await SmartVariantManagementApplyAPI.loadVariants({
+				control: this.oControl,
+				standardVariant: { name: "Standard" }
+			});
+
+			assert.strictEqual(oSetCallbackStub.callCount, 1, "setDynamicVariantsLoadedCallback was called");
+			assert.ok(typeof oSetCallbackStub.firstCall.args[0] === "function", "a callback function was passed");
+		});
+
+		QUnit.test("When loadVariants() is called and the persistency key is NOT in nonFavoriteVariantsRemoved", async function(assert) {
+			const sPersistencyKey = "myPersistencyKey";
+			this.oControl = new Control("controlId4");
+			this.oControl.getPersonalizableControlPersistencyKey = function() {
+				return sPersistencyKey;
+			};
+			const oSetCallbackStub = sandbox.stub();
+			this.oControl.setDynamicVariantsLoadedCallback = oSetCallbackStub;
+
+			sandbox.stub(LrepConnector, "loadFlexData").resolves({});
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: ["someOtherKey"] }
+			});
+
+			await FlexState.initialize({ reference: "sap.ui.core", componentId: "AppComponent21" });
+			await SmartVariantManagementApplyAPI.loadVariants({
+				control: this.oControl,
+				standardVariant: { name: "Standard" }
+			});
+
+			assert.strictEqual(oSetCallbackStub.callCount, 0, "setDynamicVariantsLoadedCallback was not called");
+		});
+
+		QUnit.test("When the dynamicVariantsLoadedCallback is invoked, it loads comp variants", async function(assert) {
+			const sPersistencyKey = "myPersistencyKey";
+			const sReference = "sap.ui.core";
+			this.oControl = new Control("controlId5");
+			this.oControl.getPersonalizableControlPersistencyKey = function() {
+				return sPersistencyKey;
+			};
+			let fnCallback;
+			this.oControl.setDynamicVariantsLoadedCallback = function(fn) {
+				fnCallback = fn;
+			};
+
+			sandbox.stub(LrepConnector, "loadFlexData").resolves({});
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: [sPersistencyKey] }
+			});
+			const oLoadAllCompVariantsStub = sandbox.stub(Storage, "loadAllCompVariants").resolves({
+				comp: {
+					variants: [{ fileName: "newVariant1" }],
+					changes: []
+				}
+			});
+			const oAddNewObjectsStub = sandbox.stub(FlexState, "addNewObjects");
+			const oAddLazyVariantsLoadedStub = sandbox.stub(FlexState, "addLazyVariantsLoaded");
+
+			await FlexState.initialize({ reference: sReference, componentId: "AppComponent21" });
+			await SmartVariantManagementApplyAPI.loadVariants({
+				control: this.oControl,
+				standardVariant: { name: "Standard" }
+			});
+
+			await fnCallback();
+
+			assert.ok(oLoadAllCompVariantsStub.calledOnce, "Storage.loadAllCompVariants was called");
+			assert.strictEqual(
+				oLoadAllCompVariantsStub.firstCall.args[0].reference,
+				sReference,
+				"with the correct reference"
+			);
+			assert.strictEqual(
+				oLoadAllCompVariantsStub.firstCall.args[0].persistencyKey,
+				sPersistencyKey,
+				"with the correct persistency key"
+			);
+			assert.ok(oAddNewObjectsStub.calledOnce, "FlexState.addNewObjects was called");
+			assert.strictEqual(
+				oAddNewObjectsStub.firstCall.args[0].reference,
+				sReference,
+				"addNewObjects received the correct reference"
+			);
+			assert.deepEqual(
+				oAddNewObjectsStub.firstCall.args[0].newData,
+				{ comp: { variants: [{ fileName: "newVariant1" }], changes: [] } },
+				"addNewObjects received the Storage response"
+			);
+			assert.ok(oAddLazyVariantsLoadedStub.calledOnce, "FlexState.addLazyVariantsLoaded was called");
+			assert.strictEqual(
+				oAddLazyVariantsLoadedStub.firstCall.args[0],
+				sReference,
+				"with the correct reference"
+			);
+			assert.strictEqual(
+				oAddLazyVariantsLoadedStub.firstCall.args[1],
+				sPersistencyKey,
+				"with the correct persistency key"
+			);
+		});
+
+		QUnit.test("When the dynamicVariantsLoadedCallback is invoked a second time, it resolves immediately", async function(assert) {
+			const sPersistencyKey = "myPersistencyKey";
+			const sReference = "sap.ui.core";
+			this.oControl = new Control("controlId6");
+			this.oControl.getPersonalizableControlPersistencyKey = function() {
+				return sPersistencyKey;
+			};
+			let fnCallback;
+			this.oControl.setDynamicVariantsLoadedCallback = function(fn) {
+				fnCallback = fn;
+			};
+
+			sandbox.stub(LrepConnector, "loadFlexData").resolves({});
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: [sPersistencyKey] }
+			});
+			sandbox.stub(FlexState, "getLazyVariantsLoaded").returns([sPersistencyKey]);
+			const oLoadAllCompVariantsStub = sandbox.stub(Storage, "loadAllCompVariants");
+
+			await FlexState.initialize({ reference: sReference, componentId: "AppComponent21" });
+			await SmartVariantManagementApplyAPI.loadVariants({
+				control: this.oControl,
+				standardVariant: { name: "Standard" }
+			});
+
+			await fnCallback();
+
+			assert.ok(oLoadAllCompVariantsStub.notCalled, "Storage.loadAllCompVariants was NOT called since variants are already loaded");
 		});
 	});
 

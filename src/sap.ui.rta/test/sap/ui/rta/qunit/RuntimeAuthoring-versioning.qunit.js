@@ -415,6 +415,7 @@ sap.ui.define([
 				assert.strictEqual(oShowMessageBoxStub.lastCall.args[1], "MSG_DRAFT_DISCARD_DIALOG", "then the message is correct");
 				assert.strictEqual(oDiscardDraftStub.callCount, 1, "then the discardDraft() method is called once");
 				assert.strictEqual(oRemoveAllCommandsStub.callCount, 1, "and all commands were removed");
+				assert.ok(oRemoveAllCommandsStub.calledWith(true, true), "with suppress invalidate and remove from persistence flags");
 				const oDiscardCallPropertyBag = oDiscardDraftStub.getCall(0).args[0];
 				assert.strictEqual(oDiscardCallPropertyBag.control, this.oRta.getRootControlInstance(), "with the correct control");
 				assert.strictEqual(oDiscardCallPropertyBag.layer, this.oRta.getLayer(), "and layer");

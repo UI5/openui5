@@ -12,7 +12,6 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/_internal/flexState/InitialPrepareFunctions",
 	"sap/ui/fl/initial/_internal/Loader",
-	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/Layer",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
@@ -28,7 +27,6 @@ sap.ui.define([
 	FlexState,
 	InitialPrepareFunctions,
 	Loader,
-	Storage,
 	Layer,
 	sinon,
 	FlQUnitUtils
@@ -1533,6 +1531,37 @@ sap.ui.define([
 				"then only the VM change for the provided variant is returned"
 			);
 		});
+
+		QUnit.test("when checking if variant content was removed", function(assert) {
+			const oVariant = createVariant({
+				variantReference: sVariantManagementReference,
+				fileName: "customVariantWithRemovedContent"
+			});
+			oVariant.setVariantContentRemoved(true);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
+				oVariant
+			]);
+
+			assert.strictEqual(
+				VariantManagementState.isVariantContentRemoved({
+					reference: sReference,
+					vmReference: sVariantManagementReference,
+					variantId: "customVariantWithRemovedContent"
+				}),
+				true,
+				"then true is returned for a variant with removed content"
+			);
+
+			assert.strictEqual(
+				VariantManagementState.isVariantContentRemoved({
+					reference: sReference,
+					vmReference: sVariantManagementReference,
+					variantId: "nonExistentVariant"
+				}),
+				false,
+				"then false is returned for a non-existent variant"
+			);
+		});
 	});
 
 	QUnit.module("Initial changes handling", {
@@ -1675,36 +1704,6 @@ sap.ui.define([
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, aFlexObjects);
 			const aFilteredFlexObjects = VariantManagementState.filterHiddenFlexObjects(aFlexObjects, sReference);
 			assert.strictEqual(aFilteredFlexObjects.length, 1, "only the visible variant is left");
-		});
-	});
-
-	QUnit.module("lazy load variant", {
-		async beforeEach() {
-			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {
-				changes: [{ fileName: "change1" }],
-				variantDependentControlChanges: [{ fileName: "change2" }],
-				variants: [{ fileName: "variant1" }]
-			}, sComponentId);
-		},
-		afterEach() {
-			FlexState.clearState();
-			sandbox.restore();
-		}
-	}, function() {
-		QUnit.test("with the Storage returning a full response", async function(assert) {
-			const oUpdateSpy = sandbox.spy(FlexState, "lazyLoadFlVariant");
-			const oResponse = await fetch("test-resources/sap/ui/fl/qunit/testResources/TestVariantsConnectorResponse.json");
-			const oJson = await oResponse.json();
-			sandbox.stub(Storage, "loadFlVariant").resolves(oJson);
-			await VariantManagementState.loadVariant({
-				reference: sReference,
-				variantReference: sVariantManagementReference,
-				componentId: sComponentId
-			});
-			assert.ok(oUpdateSpy.calledOnce, "then the storage response is updated");
-			assert.strictEqual(oUpdateSpy.lastCall.args[0].reference, sReference, "with the correct reference");
-			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
-			assert.strictEqual(aAllFlexObjects.length, 37, "all flex objects are loaded");
 		});
 	});
 

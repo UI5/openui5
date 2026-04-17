@@ -209,6 +209,15 @@ sap.ui.define([
 			assert.ok(!this.oVariantManagement._oRb);
 		});
 
+		QUnit.test("Check setDynamicVariantsLoadedCallback delegation", function(assert) {
+			const fnCallback = function() {};
+			const oSetCallbackSpy = sandbox.spy(this._oVM, "setDynamicVariantsLoadedCallback");
+			const oResult = this.oVariantManagement.setDynamicVariantsLoadedCallback(fnCallback);
+			assert.strictEqual(oSetCallbackSpy.callCount, 1, "then the inner VM's setter is called");
+			assert.strictEqual(oSetCallbackSpy.firstCall.args[0], fnCallback, "then the callback is forwarded");
+			assert.deepEqual(oResult, this.oVariantManagement, "then the FL VariantManagement is returned for chaining");
+		});
+
 		QUnit.test("Check rendering", function(assert) {
 			var sString = "";
 			var oRm = {

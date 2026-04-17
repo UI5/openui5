@@ -58,9 +58,6 @@ sap.ui.define([
 	var ListSeparators = mobileLibrary.ListSeparators;
 	var ListType = mobileLibrary.ListType;
 
-	// shortcuts for sap.ui.integration.CardActionArea
-	var ActionArea = library.CardActionArea;
-
 	/**
 	 * Constructor for a new <code>TableContent</code>.
 	 *
@@ -309,7 +306,6 @@ sap.ui.define([
 		});
 
 		this._oActions.attach({
-			area: ActionArea.ContentItem,
 			actions: oRow.actions,
 			control: this,
 			actionControl: this._oItemTemplate,
@@ -371,7 +367,6 @@ sap.ui.define([
 
 			if (oRow.actions && Array.isArray(oRow.actions)) {
 				this._oActions.attach({
-					area: ActionArea.ContentItem,
 					actions: oRow.actions,
 					control: this,
 					actionControl: oItem,
@@ -424,7 +419,6 @@ sap.ui.define([
 				oControl.setTitleActive(true);
 
 				this._oActions.attach({
-					area: ActionArea.ContentItemDetail,
 					actions: oColumn.actions,
 					control: this,
 					actionControl: oControl,
@@ -446,7 +440,6 @@ sap.ui.define([
 			});
 
 			this._oActions.attach({
-				area: ActionArea.ContentItemDetail,
 				actions: oColumn.actions,
 				control: oStatus,
 				enabledPropertyName: "active"
@@ -473,7 +466,6 @@ sap.ui.define([
 			});
 
 			this._oActions.attach({
-				area: ActionArea.ContentItemDetail,
 				actions: oColumn.actions,
 				control: this,
 				actionControl: oControl,

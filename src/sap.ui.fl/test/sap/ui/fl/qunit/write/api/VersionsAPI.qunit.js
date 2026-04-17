@@ -2,12 +2,10 @@
 
 sap.ui.define([
 	"sap/ui/core/Control",
-	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/initial/_internal/Settings",
-	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/_internal/Versions",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
@@ -17,12 +15,10 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Control,
-	FlexObjectState,
 	ManifestUtils,
 	FlexInfoSession,
 	Version,
 	Settings,
-	FlexObjectManager,
 	Storage,
 	Versions,
 	ContextBasedAdaptationsAPI,
@@ -653,8 +649,6 @@ sap.ui.define([
 				control: new Control()
 			};
 
-			const oDeleteStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
-			const oGetDirtyFlexObjectsStub = sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(["foo"]);
 			const oDiscardStub = sandbox.stub(Versions, "discardDraft").resolves({
 				backendChangesDiscarded: true
 			});
@@ -663,17 +657,13 @@ sap.ui.define([
 			const oAdaptationsRefreshStub = sandbox.stub(ContextBasedAdaptationsAPI, "refreshAdaptationModel").resolves(sDisplayedAdaptationId);
 			return VersionsAPI.discardDraft(mPropertyBag)
 			.then(function(oDiscardInfo) {
-				assert.strictEqual(oDeleteStub.callCount, 1, "then the dirty changes were deleted");
 				assert.strictEqual(oAdaptationsRefreshStub.callCount, 1, "then the Adaptation Model was refreshed");
-				assert.strictEqual(oGetDirtyFlexObjectsStub.callCount, 1, "then getDirtyFlexObjects was called");
-				assert.ok(oGetDirtyFlexObjectsStub.calledWith("com.sap.test"), "and has been called with the correct reference");
 				const oInfoSession = FlexInfoSession.getByReference(sReference);
 				assert.strictEqual(
 					oInfoSession.displayedAdaptationId, sDisplayedAdaptationId,
 					"then the FlexState gets the correct adaptationId"
 				);
 				assert.strictEqual(oDiscardInfo.backendChangesDiscarded, true, "then the discard outcome was returned");
-				assert.strictEqual(oDiscardInfo.dirtyChangesDiscarded, true, "then the discard outcome was returned");
 				const oCallingPropertyBag = oDiscardStub.getCall(0).args[0];
 				assert.strictEqual(oCallingPropertyBag.reference, sReference, "the reference was passed");
 				assert.strictEqual(oCallingPropertyBag.layer, mPropertyBag.layer, "the layer was passed");
@@ -686,8 +676,6 @@ sap.ui.define([
 				control: new Control()
 			};
 
-			const oDeleteStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
-			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(["foo"]);
 			const oDiscardStub = sandbox.stub(Versions, "discardDraft").resolves({
 				backendChangesDiscarded: true
 			});
@@ -696,7 +684,6 @@ sap.ui.define([
 			const oAdaptationsDiscardStub = sandbox.stub(ContextBasedAdaptationsAPI, "refreshAdaptationModel").resolves(sDisplayedAdaptationId);
 			return VersionsAPI.discardDraft(mPropertyBag)
 			.then(function(oDiscardInfo) {
-				assert.strictEqual(oDeleteStub.callCount, 1, "then the dirty changes were deleted");
 				assert.strictEqual(oAdaptationsDiscardStub.callCount, 1, "then the Adaptation Model was refreshed");
 				const oInfoSession = FlexInfoSession.getByReference(sReference);
 				assert.strictEqual(
@@ -704,7 +691,6 @@ sap.ui.define([
 					"then the FlexState gets the correct adaptationId"
 				);
 				assert.strictEqual(oDiscardInfo.backendChangesDiscarded, true, "then the discard outcome was returned");
-				assert.strictEqual(oDiscardInfo.dirtyChangesDiscarded, true, "then the discard outcome was returned");
 				assert.deepEqual(oDiscardStub.getCall(0).args[0].reference, sReference, "the reference was passed");
 				assert.deepEqual(oDiscardStub.getCall(0).args[0].layer, Layer.CUSTOMER, "the layer was passed");
 			});
@@ -716,18 +702,14 @@ sap.ui.define([
 				control: new Control()
 			};
 
-			const oDeleteStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
-			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(["foo"]);
 			const oDiscardStub = sandbox.stub(Versions, "discardDraft").resolves({
 				backendChangesDiscarded: false
 			});
 			const oAdaptationsDiscardStub = sandbox.stub(ContextBasedAdaptationsAPI, "refreshAdaptationModel");
 			return VersionsAPI.discardDraft(mPropertyBag)
 			.then(function(oDiscardInfo) {
-				assert.strictEqual(oDeleteStub.callCount, 1, "then the dirty changes were deleted");
 				assert.strictEqual(oAdaptationsDiscardStub.calledOnce, false, "then the Adaptation Model was not called");
 				assert.strictEqual(oDiscardInfo.backendChangesDiscarded, false, "then the discard outcome was returned");
-				assert.strictEqual(oDiscardInfo.dirtyChangesDiscarded, true, "then the discard outcome was returned");
 				assert.strictEqual(oDiscardStub.callCount, 1, "then the discard was called");
 				assert.deepEqual(oDiscardStub.getCall(0).args[0].reference, sReference, "the reference was passed");
 				assert.deepEqual(oDiscardStub.getCall(0).args[0].layer, Layer.CUSTOMER, "the layer was passed");
@@ -741,7 +723,6 @@ sap.ui.define([
 				discardDraftAndKeepActiveVersion: true
 			};
 
-			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(["foo"]);
 			const oDiscardStub = sandbox.stub(Versions, "discardDraft").resolves({
 				backendChangesDiscarded: false
 			});
@@ -750,7 +731,6 @@ sap.ui.define([
 			.then(function(oDiscardInfo) {
 				assert.strictEqual(oAdaptationsDiscardStub.calledOnce, false, "then the Adaptation Model was not called");
 				assert.strictEqual(oDiscardInfo.backendChangesDiscarded, false, "then the discard outcome was returned");
-				assert.strictEqual(oDiscardInfo.dirtyChangesDiscarded, false, "then the discard outcome was returned");
 				assert.strictEqual(oDiscardStub.callCount, 1, "then the discard was called");
 				assert.deepEqual(oDiscardStub.getCall(0).args[0].reference, sReference, "the reference was passed");
 				assert.deepEqual(oDiscardStub.getCall(0).args[0].layer, Layer.CUSTOMER, "the layer was passed");

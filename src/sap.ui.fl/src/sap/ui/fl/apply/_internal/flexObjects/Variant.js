@@ -2,12 +2,14 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/ui/fl/apply/_internal/flexObjects/getVariantAuthor",
+	"sap/base/util/restricted/_omit",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObject",
+	"sap/ui/fl/apply/_internal/flexObjects/getVariantAuthor",
 	"sap/ui/fl/initial/_internal/Settings"
 ], function(
-	getVariantAuthor,
+	_omit,
 	FlexObject,
+	getVariantAuthor,
 	Settings
 ) {
 	"use strict";
@@ -72,6 +74,14 @@ sap.ui.define([
 				 */
 				author: {
 					type: "string"
+				},
+				/**
+				 * Indicates whether the variant's content (UI changes for FL Variants) was removed during lazy loading.
+				 * When true, the content needs to be loaded before switching to this variant.
+				 */
+				variantContentRemoved: {
+					type: "boolean",
+					defaultValue: false
 				}
 			}
 		},
@@ -97,7 +107,8 @@ sap.ui.define([
 			...FlexObject.getMappingInfo(),
 			favorite: "favorite",
 			executeOnSelection: "executeOnSelection",
-			contexts: "contexts"
+			contexts: "contexts",
+			variantContentRemoved: "variantContentRemoved"
 		};
 	};
 
@@ -151,6 +162,12 @@ sap.ui.define([
 		const sUser = oSettings && oSettings.getUser();
 		const sUserId = oSettings && oSettings.getUserId();
 		return !sUser || (!!sAuthor && !!sUser && sUser.toUpperCase() === sAuthor.toUpperCase()) || (!!sAuthor && !!sUserId && sUserId.toUpperCase() === sAuthor.toUpperCase());
+	};
+
+	Variant.prototype.convertToFileContent = function() {
+		const oFileContent = FlexObject.prototype.convertToFileContent.apply(this);
+		// variantContentRemoved is only relevant in runtime and should not be persisted
+		return _omit(oFileContent, ["variantContentRemoved"]);
 	};
 
 	return Variant;

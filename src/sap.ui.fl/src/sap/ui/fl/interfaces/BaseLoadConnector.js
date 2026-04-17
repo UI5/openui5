@@ -76,8 +76,8 @@ sap.ui.define([], function() {
 		 * @param {string} mPropertyBag.vmReference Id of the control for which the variants should be loaded
 		 * @returns {Promise<object>} Promise resolves with an object containing the flex variants for the given control
 		 */
-		loadAllFLVariants() {
-			return Promise.reject(new Error("loadAllFLVariants is not implemented"));
+		loadAllFlVariants() {
+			return Promise.reject(new Error("loadAllFlVariants is not implemented"));
 		},
 
 		/**
