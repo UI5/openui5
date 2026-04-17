@@ -541,9 +541,14 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("apply: with normalize cache parameter", function (assert) {
+[
+	FilterProcessor,
+	// SNOW CS20260012173880: App has own filter processor; do not fail, although this is not supported
+	Object.assign({}, FilterProcessor)
+].forEach((FP, i) => {
+	QUnit.test("apply: with normalize cache parameter, " + i, function (assert) {
 		const fnGetValue = (/*vRef, sPath*/) => "value";
-		const oFilterProcessorMock = this.mock(FilterProcessor);
+		const oFilterProcessorMock = this.mock(FP);
 		oFilterProcessorMock.expects("createNormalizeCache").never();
 		oFilterProcessorMock.expects("_evaluateFilter")
 			.withExactArgs("~oFilter~", "data0", sinon.match.same(fnGetValue))
@@ -553,11 +558,12 @@ sap.ui.define([
 			.returns(true);
 
 		// code under test
-		const aFiltered = FilterProcessor.apply(["data0", "data1"], "~oFilter~", fnGetValue, "~mNormalizeCache~");
+		const aFiltered = FP.apply(["data0", "data1"], "~oFilter~", fnGetValue, "~mNormalizeCache~");
 
-		assert.strictEqual(FilterProcessor._normalizeCache, "~mNormalizeCache~");
+		assert.strictEqual(FP._normalizeCache, "~mNormalizeCache~");
 		assert.deepEqual(aFiltered, ["data1"]);
 	});
+});
 
 // ***********************************************************************************************
 // String.prototype.normalize is not available on all browsers
