@@ -1,9 +1,13 @@
 /* global QUnit */
 sap.ui.define([
 	"sap/ui/rta/util/whatsNew/whatsNewContent/WhatsNewFeatures",
+	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/write/api/FeaturesAPI",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	WhatsNewFeatures,
+	FlexRuntimeInfoAPI,
+	FeaturesAPI,
 	sinon
 ) {
 	"use strict";
@@ -36,5 +40,45 @@ sap.ui.define([
 				assert.ok(typeof oFeature.isFeatureApplicable === "function", "Feature isFeatureApplicable should be a function");
 			}
 		});
+	});
+
+	QUnit.test("isFeatureApplicable lazyLoadingForVariants", function(assert) {
+		const aFeatures = WhatsNewFeatures.getAllFeatures();
+		for (const oFeature of aFeatures) {
+			if (oFeature.featureId === "lazyLoadingForVariants") {
+				sandbox.stub(FlexRuntimeInfoAPI, "getSystem").returns({});
+				const fnIsFeatureApplicable = oFeature.isFeatureApplicable;
+				assert.ok(fnIsFeatureApplicable(), "Feature isFeatureApplicable returns true for ABAP systems");
+				sandbox.restore();
+				sandbox.stub(FlexRuntimeInfoAPI, "getSystem").returns(null);
+				assert.ok(!fnIsFeatureApplicable(), "Feature isFeatureApplicable returns false when not in ABAP system");
+			}
+		}
+	});
+
+	QUnit.test("isFeatureApplicable ContextBasedAdaptationCF", async function(assert) {
+		const aFeatures = WhatsNewFeatures.getAllFeatures();
+		for (const oFeature of aFeatures) {
+			if (oFeature.featureId === "ContextBasedAdaptationCF") {
+				sandbox.stub(
+					FeaturesAPI,
+					"isContextBasedAdaptationAvailable"
+				).withArgs("DummyLayer").resolves({});
+				const fnIsFeatureApplicable = oFeature.isFeatureApplicable;
+				assert.ok(
+					await fnIsFeatureApplicable("DummyLayer"),
+					"Feature isFeatureApplicable returns true when CBA is available"
+				);
+				sandbox.restore();
+				sandbox.stub(
+					FeaturesAPI,
+					"isContextBasedAdaptationAvailable"
+				).withArgs("DummyLayer").resolves(null);
+				assert.notOk(
+					await fnIsFeatureApplicable("DummyLayer"),
+					"Feature isFeatureApplicable returns false when CBA is not available"
+				);
+			}
+		}
 	});
 });
