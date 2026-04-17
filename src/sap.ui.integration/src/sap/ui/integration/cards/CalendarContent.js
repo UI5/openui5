@@ -60,8 +60,6 @@ sap.ui.define([
 		) {
 		"use strict";
 
-		var ActionArea = library.CardActionArea;
-
 		/**
 		 * Constructor for a new <code>CalendarContent</code>.
 		 *
@@ -340,7 +338,6 @@ sap.ui.define([
 
 			if (oConfiguration.moreItems && oConfiguration.moreItems.actions) {
 				this._oActions.attach({
-					area: ActionArea.Content,
 					actions: oConfiguration.moreItems.actions,
 					control: this._getMoreButton(),
 					enabledPropertyName: "enabled"
@@ -707,7 +704,6 @@ sap.ui.define([
 			this._oAppointmentTemplate = new CalendarAppointmentInCard(mAppointmentSettings);
 			var oCardActions = this.getActions();
 			oCardActions.attach({
-				area: ActionArea.ContentItem,
 				actions: mItem.template.actions,
 				control: this,
 				actionControl: this._oAppointmentTemplate,

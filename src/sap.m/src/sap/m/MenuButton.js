@@ -58,6 +58,7 @@ sap.ui.define([
 		 * @class
 		 * The <code>sap.m.MenuButton</code> control enables the user to show a hierarchical menu.
 		 * @extends sap.ui.core.Control
+		 * @implements sap.ui.core.IFormContent
 		 *
 		 * @author SAP SE
 		 * @version ${version}
@@ -70,6 +71,7 @@ sap.ui.define([
 		var MenuButton = Control.extend("sap.m.MenuButton", /** @lends sap.m.MenuButton.prototype */ {
 			metadata : {
 				interfaces : [
+					"sap.ui.core.IFormContent",
 					"sap.m.IToolbarInteractiveControl"
 				],
 				library : "sap.m",
@@ -1126,6 +1128,19 @@ sap.ui.define([
 			});
 
 			return this;
+		};
+
+		/**
+		 * Implements {@link sap.ui.core.IFormContent} interface.
+		 *
+		 * <code>MenuButton</code> must not be stretched by the Form layout
+		 * because it should keep its natural width.
+		 *
+		 * @protected
+		 * @returns {boolean} <code>true</code>
+		 */
+		MenuButton.prototype.getFormDoNotAdjustWidth = function () {
+			return true;
 		};
 
 		return MenuButton;

@@ -9,7 +9,9 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/requireAsync",
 	"sap/ui/fl/Utils"
 ], function(
@@ -19,7 +21,9 @@ sap.ui.define([
 	DependencyHandler,
 	VariantManagementState,
 	FlexObjectState,
+	FlexState,
 	ManifestUtils,
+	Storage,
 	requireAsync,
 	Utils
 ) {
@@ -64,6 +68,22 @@ sap.ui.define([
 	}
 
 	async function switchVariant(mPropertyBag) {
+		// Check if variant content needs to be loaded (lazy loading)
+		if (
+			VariantManagementState.isVariantContentRemoved({
+				reference: mPropertyBag.reference,
+				vmReference: mPropertyBag.vmReference,
+				variantId: mPropertyBag.newVReference
+			})
+		) {
+			await VariantManagerApply.loadVariantContent({
+				reference: mPropertyBag.reference,
+				componentId: mPropertyBag.appComponent.getId(),
+				vmReference: mPropertyBag.vmReference,
+				variantId: mPropertyBag.newVReference
+			});
+		}
+
 		const mChangesToBeSwitched = getControlChangesForVariantSwitch(mPropertyBag);
 		const oLiveDependencyMap = FlexObjectState.getLiveDependencyMap(mPropertyBag.reference);
 
@@ -192,6 +212,93 @@ sap.ui.define([
 				revert: !bVariantSwitch
 			});
 		}
+	};
+
+	/**
+	 * Loads the flex objects for a specified variant reference and adds them to the FlexState.
+	 *
+	 * @param {object} mPropertyBag - Object with the necessary properties
+	 * @param {string} mPropertyBag.reference - Flexibility reference
+	 * @param {string} mPropertyBag.variantReference - Variant reference to be loaded
+	 * @param {string} mPropertyBag.componentId - Component ID
+	 * @returns {Promise<object>} Resolves with the new data that was added
+	 */
+	VariantManagerApply.loadVariant = async function(mPropertyBag) {
+		const oBackendResponse = await Storage.loadFlVariant({
+			variantReference: mPropertyBag.variantReference,
+			reference: mPropertyBag.reference
+		});
+
+		FlexState.addNewObjects({
+			reference: mPropertyBag.reference,
+			componentId: mPropertyBag.componentId,
+			newData: oBackendResponse
+		});
+
+		return oBackendResponse;
+	};
+
+	/**
+	 * Loads all FL variants for a variant management control.
+	 * Used for lazy loading when opening the Manage Views dialog or
+	 * when saving a new variant.
+	 *
+	 * @param {object} mPropertyBag - Object with the necessary properties
+	 * @param {string} mPropertyBag.reference - Flex reference
+	 * @param {string} mPropertyBag.componentId - Component ID
+	 * @param {string} mPropertyBag.vmReference - Variant management reference
+	 * @returns {Promise<object>} Resolves with the new data that was added
+	 */
+	VariantManagerApply.loadAllVariantsForVM = async function(mPropertyBag) {
+		const oBackendResponse = await Storage.loadAllFlVariants({
+			reference: mPropertyBag.reference,
+			vmReference: mPropertyBag.vmReference
+		});
+
+		FlexState.addNewObjects({
+			reference: mPropertyBag.reference,
+			componentId: mPropertyBag.componentId,
+			newData: oBackendResponse
+		});
+
+		// Mark that all variants have been loaded for this VM
+		FlexState.addLazyVariantsLoaded(mPropertyBag.reference, mPropertyBag.vmReference);
+
+		return oBackendResponse;
+	};
+
+	/**
+	 * Loads the UI changes for a specific FL variant.
+	 * Used for lazy loading when switching to a variant with variantContentRemoved: true.
+	 *
+	 * @param {object} mPropertyBag - Object with the necessary properties
+	 * @param {string} mPropertyBag.reference - Flex reference
+	 * @param {string} mPropertyBag.componentId - Component ID
+	 * @param {string} mPropertyBag.vmReference - Variant management reference
+	 * @param {string} mPropertyBag.variantId - Variant ID to load content for
+	 * @returns {Promise<object>} Resolves with the new data that was added
+	 */
+	VariantManagerApply.loadVariantContent = async function(mPropertyBag) {
+		const oBackendResponse = await Storage.loadFlVariantContent({
+			reference: mPropertyBag.reference,
+			variantId: mPropertyBag.variantId
+		});
+
+		FlexState.addNewObjects({
+			reference: mPropertyBag.reference,
+			componentId: mPropertyBag.componentId,
+			newData: oBackendResponse
+		});
+
+		// Reset the flag so the content is not loaded again
+		const oVariant = VariantManagementState.getVariant({
+			reference: mPropertyBag.reference,
+			vmReference: mPropertyBag.vmReference,
+			vReference: mPropertyBag.variantId
+		});
+		oVariant.instance.setVariantContentRemoved(false);
+
+		return oBackendResponse;
 	};
 
 	return VariantManagerApply;

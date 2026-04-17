@@ -92,7 +92,7 @@ sap.ui.define([
 			//check container
 			assert.ok(oP13nControl, "Container has been created");
 			assert.ok(oP13nControl.isA("sap.m.p13n.Popup"));
-			assert.ok(!oP13nControl._oPopup.getVerticalScrolling(), "Vertical scrolling is disabled for FilterBarBase 'filterConfig'");
+			assert.ok(oP13nControl._oPopup.getVerticalScrolling(), "Vertical scrolling is disabled for FilterBarBase 'filterConfig'");
 			assert.equal(oP13nControl._oPopup.getCustomHeader().getContentLeft()[0].getText(), oResourceBundle.getText("filterbar.ADAPT_TITLE"), "Correct title has been set");
 			assert.ok(Engine.getInstance().hasActiveP13n(this.oFilterBar),"dialog is open");
 

@@ -26,8 +26,6 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var ActionArea = library.CardActionArea;
-
 	// lazy dependencies, loaded on the first attempt to create AnalyticalContent
 	var VizFrame, FeedItem, FlattenedDataset, Popover, MeasureDefinition, DimensionDefinition, VizTooltip;
 
@@ -313,7 +311,6 @@ sap.ui.define([
 
 	AnalyticalContent.prototype._attachActions = function (oConfiguration) {
 		var oActionConfig = {
-			area: ActionArea.Content,
 			actions: oConfiguration.actions,
 			control: this
 		};

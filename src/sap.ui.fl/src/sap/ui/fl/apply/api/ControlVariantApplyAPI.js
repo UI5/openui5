@@ -268,7 +268,7 @@ sap.ui.define([
 				if (!sVariantManagementReference) {
 					// if the variant management reference is not available, the variant is maybe not yet loaded
 					try {
-						await VariantManagementState.loadVariant({
+						await VariantManagerApply.loadVariant({
 							reference: sFlexReference,
 							variantReference: sVariantReference,
 							componentId: oAppComponent.getId()

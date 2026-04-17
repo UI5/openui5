@@ -47,12 +47,6 @@ sap.ui.define([
 					"path": "type",
 					"visible": "{= !!${enabled}}"
 				},
-				"service": {
-					"label": "{i18n>CARD_EDITOR.ACTION.SERVICE}",
-					"type": "string",
-					"path": "service",
-					"visible": false // Currently undocumented
-				},
 				"parameters": {
 					"label": "{i18n>CARD_EDITOR.PARAMETERS}",
 					"type": "map",

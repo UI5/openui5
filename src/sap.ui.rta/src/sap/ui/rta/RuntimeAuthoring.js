@@ -1392,7 +1392,8 @@ sap.ui.define([
 			selector: this.getRootControlInstance()
 		};
 		RuntimeAuthoring.enableRestart(sLayer, this.getRootControlInstance());
-		this.getCommandStack().removeAllCommands();
+		// suppress invalidate and remove dirty changes from persistence since a reload is triggered right after
+		this.getCommandStack().removeAllCommands(true, true);
 		ReloadManager.triggerReload(oReloadInfo);
 		return this.stop(true, true);
 	}

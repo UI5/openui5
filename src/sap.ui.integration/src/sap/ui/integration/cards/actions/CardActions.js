@@ -36,8 +36,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var ActionArea = library.CardActionArea,
-		CardActionType = library.CardActionType;
+	var CardActionType = library.CardActionType;
 
 	/**
 	 * Constructor for a new <code>CardActions</code>.
@@ -89,7 +88,7 @@ sap.ui.define([
 	 * Listens for a press event on the provided area control and triggers an action with the provided parameters from the item.
 	 * @private
 	 * @param {object} oConfig Object containing configuration for the action
-	 * @param {sap.ui.integration.CardActionArea} oConfig.area The area that describes what the action will be attached to
+	 * @param {boolean} [oConfig.isHeader] Whether the action is attached to a header area.
 	 * @param {object[]} oConfig.actions Configuration object for the actions on an item
 	 * @param {sap.ui.core.Control} oConfig.control The control that the action will be attached on
 	 * @param {sap.ui.core.Control} [oConfig.actionControl] Optional control that the action will be attached on. If supplied, <code>oConfig.control</code> will not receive the action.
@@ -100,7 +99,7 @@ sap.ui.define([
 	 */
 	CardActions.prototype.attach = function (oConfig) {
 		var oControl = oConfig.control,
-			sActionArea = oConfig.area;
+			bIsHeader = oConfig.isHeader;
 
 		oConfig.actionControl = oConfig.actionControl || oConfig.control;
 		oConfig.enabledPropertyValue = oConfig.enabledPropertyValue !== undefined ? oConfig.enabledPropertyValue : true;
@@ -110,7 +109,9 @@ sap.ui.define([
 		if (!oConfig.actions || !oConfig.actions.length) {
 			// No actions defined - disable the control
 			this._setControlDisabled(oConfig);
-			this._fireActionReady(oControl, sActionArea);
+			// For now firing the event here, after refactor need to think
+			// of a way to sync async navigation setters
+			this._fireActionReady(oControl, bIsHeader);
 
 			return;
 		}
@@ -124,7 +125,7 @@ sap.ui.define([
 
 		} else {
 			// For now firing the event here, after refactor need to think of a way to sync async navigation setters
-			this._fireActionReady(oControl, sActionArea);
+			this._fireActionReady(oControl, bIsHeader);
 		}
 	};
 
@@ -147,7 +148,7 @@ sap.ui.define([
 
 	CardActions.prototype._attachAction = function (oConfig) {
 		var oAction = oConfig.action,
-			sActionArea = oConfig.area,
+			bIsHeader = oConfig.isHeader,
 			oAreaControl = oConfig.control,
 			sEnabledPropertyName = oConfig.enabledPropertyName,
 			bCheckEnabledState = true,
@@ -168,7 +169,7 @@ sap.ui.define([
 			this._attachEventListener(oConfig);
 		}
 
-		this._fireActionReady(oAreaControl, sActionArea);
+		this._fireActionReady(oAreaControl, bIsHeader);
 	};
 
 	/**
@@ -207,9 +208,8 @@ sap.ui.define([
 		}
 	};
 
-	CardActions.prototype._fireActionReady = function (oAreaControl, sActionArea) {
-		var bHeader = sActionArea === ActionArea.Header;
-		var sEventName = bHeader ? "_actionHeaderReady" : "_actionContentReady";
+	CardActions.prototype._fireActionReady = function (oAreaControl, bIsHeader) {
+		var sEventName = bIsHeader ? "_actionHeaderReady" : "_actionContentReady";
 		oAreaControl.fireEvent(sEventName);
 	};
 

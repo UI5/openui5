@@ -46,9 +46,6 @@ sap.ui.define([
 	// shortcut for sap.m.ListSeparators;
 	var ListSeparators = mLibrary.ListSeparators;
 
-	// shortcut for sap.ui.integration.CardActionArea
-	var ActionArea = library.CardActionArea;
-
 	// shortcut for sap.m.EmptyIndicatorMode
 	var EmptyIndicatorMode = mLibrary.EmptyIndicatorMode;
 
@@ -353,7 +350,6 @@ sap.ui.define([
 				});
 
 				this._oActions.attach({
-					area: ActionArea.ContentItem,
 					actions: attr.actions,
 					control: oObjectStatus,
 					enabledPropertyName: "active"
@@ -378,7 +374,6 @@ sap.ui.define([
 
 		this._oItemTemplate = new ListContentItem(mSettings);
 		this._oActions.attach({
-			area: ActionArea.ContentItem,
 			actions: mItem.actions,
 			control: this,
 			actionControl: this._oItemTemplate,
@@ -402,7 +397,6 @@ sap.ui.define([
 		}
 
 		this._oActions.attach({
-			area: ActionArea.ContentItem,
 			actions: mItem?.info?.actions,
 			control: this._oItemTemplate,
 			enabledPropertyName: "infoActive",

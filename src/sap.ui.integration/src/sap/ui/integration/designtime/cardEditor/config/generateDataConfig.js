@@ -84,20 +84,6 @@ sap.ui.define(function () {
 					}
 				}
 			},
-			"DataServiceName": {
-				"tags": aTags.concat(["data"]),
-				"label": "{i18n>CARD_EDITOR.DATA.SERVICE.NAME}",
-				"type": "string",
-				"path": sRelativePath + "data/service/name",
-				"visible": false // Currently undocumented
-			},
-			"DataServiceParameters": {
-				"tags": aTags.concat(["data"]),
-				"label": "{i18n>CARD_EDITOR.DATA.SERVICE.PARAMETERS}",
-				"type": "map",
-				"path": sRelativePath + "data/service/parameters",
-				"visible": false // Currently undocumented
-			},
 			"DataUpdateInterval": {
 				"tags": aTags.concat(["data"]),
 				"label": "{i18n>CARD_EDITOR.DATA.UPDATEINTERVAL}",

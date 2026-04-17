@@ -13,9 +13,11 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/variants/VariantManagement",
@@ -44,9 +46,11 @@ sap.ui.define([
 	FlexObjectFactory,
 	States,
 	VariantManagementState,
+	VariantManagerApply,
 	FlexObjectState,
 	FlexState,
 	ControlVariantApplyAPI,
+	Loader,
 	ManifestUtils,
 	Settings,
 	VariantManagement,
@@ -897,6 +901,53 @@ sap.ui.define([
 				FlexObjectState.waitForFlexObjectsToBeApplied.callCount, 1,
 				"the initial changes promise was added to the variant switch promise"
 			);
+		});
+
+		QUnit.test("when 'registerToModel' is called and the VM reference is in nonFavoriteVariantsRemoved", async function(assert) {
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: [this.sVMReference] }
+			});
+			const oSetCallbackStub = sandbox.stub(this.oVariantManagement, "setDynamicVariantsLoadedCallback");
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await VariantManagementState.waitForVariantSwitch(sReference, this.sVMReference);
+
+			assert.strictEqual(oSetCallbackStub.callCount, 1, "then setDynamicVariantsLoadedCallback is called");
+			assert.ok(typeof oSetCallbackStub.firstCall.args[0] === "function", "then a callback function is passed");
+		});
+
+		QUnit.test("when 'registerToModel' is called and the VM reference is NOT in nonFavoriteVariantsRemoved", async function(assert) {
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: ["someOtherVMReference"] }
+			});
+			const oSetCallbackStub = sandbox.stub(this.oVariantManagement, "setDynamicVariantsLoadedCallback");
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await VariantManagementState.waitForVariantSwitch(sReference, this.sVMReference);
+
+			assert.strictEqual(oSetCallbackStub.callCount, 0, "then setDynamicVariantsLoadedCallback is not called");
+		});
+
+		QUnit.test("when the dynamic variants loaded callback is executed", async function(assert) {
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: [this.sVMReference] }
+			});
+			const oGetLazyVariantsLoadedStub = sandbox.stub(FlexState, "getLazyVariantsLoaded").returns([]);
+			const oLoadAllVariantsStub = sandbox.stub(VariantManagerApply, "loadAllVariantsForVM").resolves();
+			const oSetCallbackSpy = sandbox.spy(this.oVariantManagement, "setDynamicVariantsLoadedCallback");
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await VariantManagementState.waitForVariantSwitch(sReference, this.sVMReference);
+
+			const fnCallback = oSetCallbackSpy.firstCall.args[0];
+			await fnCallback();
+			assert.strictEqual(oLoadAllVariantsStub.callCount, 1, "then loadAllVariantsForVM is called");
+			assert.deepEqual(oLoadAllVariantsStub.firstCall.args[0], {
+				reference: sReference,
+				componentId: this.oComponent.getId(),
+				vmReference: this.sVMReference
+			}, "then loadAllVariantsForVM is called with the correct parameters");
+
+			oGetLazyVariantsLoadedStub.returns([this.sVMReference]);
+			await fnCallback();
+			assert.strictEqual(oLoadAllVariantsStub.callCount, 1, "then loadAllVariantsForVM is not called again");
 		});
 
 		QUnit.test("when creating a new variant based on a faked standard variant, and the Model gets destroyed", async function(assert) {

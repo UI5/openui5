@@ -15,6 +15,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/variants/VariantModel",
@@ -36,6 +37,7 @@ sap.ui.define([
 	FlexObjectState,
 	FlexState,
 	ControlVariantApplyAPI,
+	Storage,
 	VariantManagement,
 	VariantManager,
 	VariantModel,
@@ -194,6 +196,33 @@ sap.ui.define([
 				"then the switch variant promise was set before changes were applied"
 			);
 			assert.strictEqual(this.oCallVariantSwitchListenersSpy.callCount, 1, "then the listeners were called");
+		});
+
+		QUnit.test("when switching to a variant with removed content (standard -> variant2)", async function(assert) {
+			this.oVariant2.setVariantContentRemoved(true);
+			const oLoadVariantContentStub = sandbox.stub(VariantManagerApply, "loadVariantContent").resolves();
+
+			await VariantManagerApply.updateCurrentVariant({
+				vmControl: this.oVMControl,
+				newVariantReference: "variant2",
+				appComponent: oComponent
+			});
+
+			assert.strictEqual(oLoadVariantContentStub.callCount, 1, "then loadVariantContent is called once");
+			assert.deepEqual(
+				oLoadVariantContentStub.firstCall.args[0],
+				{
+					reference: sReference,
+					componentId: oComponent.getId(),
+					vmReference: sVMReference,
+					variantId: "variant2"
+				},
+				"then loadVariantContent is called with the correct parameters"
+			);
+			assert.ok(
+				oLoadVariantContentStub.calledBefore(this.oApplyStub),
+				"then content is loaded before applying variant changes"
+			);
 		});
 
 		QUnit.test("when switching to a variant with no shared changes (standard -> variant3)", async function(assert) {
@@ -517,6 +546,145 @@ sap.ui.define([
 				},
 				"same variant: dirty changes were erased before switching the variant, revert needed"
 			);
+		});
+	});
+
+	QUnit.module("lazy load variant", {
+		async beforeEach() {
+			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {
+				changes: [{ fileName: "change1" }],
+				variantDependentControlChanges: [{ fileName: "change2" }],
+				variants: [{ fileName: "variant1" }]
+			}, oComponent.getId());
+		},
+		afterEach() {
+			FlexState.clearState();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("with the Storage returning a full response", async function(assert) {
+			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
+			const oResponse = await fetch("test-resources/sap/ui/fl/qunit/testResources/TestVariantsConnectorResponse.json");
+			const oJson = await oResponse.json();
+			sandbox.stub(Storage, "loadFlVariant").resolves(oJson);
+			await VariantManagerApply.loadVariant({
+				reference: sReference,
+				variantReference: "variant1",
+				componentId: oComponent.getId()
+			});
+			assert.ok(oAddNewObjectsSpy.calledOnce, "then the storage response is updated");
+			assert.deepEqual(oAddNewObjectsSpy.lastCall.args[0], {
+				reference: sReference,
+				componentId: oComponent.getId(),
+				newData: oJson
+			}, "then addNewObjects is called with the correct data");
+			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
+			assert.strictEqual(aAllFlexObjects.length, 37, "all flex objects are loaded");
+		});
+	});
+
+	QUnit.module("lazy load", {
+		async beforeEach() {
+			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {}, oComponent.getId());
+
+			const oStandardVariant = createVariant({
+				key: sVMReference,
+				layer: Layer.BASE,
+				title: "Standard variant",
+				variantManagementReference: sVMReference
+			});
+			const oVariantWithRemovedContent = createVariant({
+				key: "variantWithRemovedContent",
+				layer: Layer.USER,
+				title: "Variant With Removed Content",
+				variantReference: sVMReference,
+				variantManagementReference: sVMReference
+			});
+			oVariantWithRemovedContent.setVariantContentRemoved(true);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oStandardVariant, oVariantWithRemovedContent]);
+		},
+		afterEach() {
+			FlexState.clearState();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("loadVariant forwards parameters and returns backend response", async function(assert) {
+			const oBackendResponse = { changes: { variants: [{ fileName: "variantFromBackend" }] } };
+			const oLoadFlVariantStub = sandbox.stub(Storage, "loadFlVariant").resolves(oBackendResponse);
+			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
+
+			const oResult = await VariantManagerApply.loadVariant({
+				reference: sReference,
+				variantReference: "variantFromBackend",
+				componentId: oComponent.getId()
+			});
+
+			assert.deepEqual(oLoadFlVariantStub.firstCall.args[0], {
+				variantReference: "variantFromBackend",
+				reference: sReference
+			}, "then Storage.loadFlVariant is called with the correct parameters");
+			assert.deepEqual(oAddNewObjectsSpy.firstCall.args[0], {
+				reference: sReference,
+				componentId: oComponent.getId(),
+				newData: oBackendResponse
+			}, "then backend response is added to FlexState");
+			assert.deepEqual(oResult, oBackendResponse, "then the backend response is returned");
+		});
+
+		QUnit.test("loadAllVariantsForVM marks lazy variants as loaded", async function(assert) {
+			const oBackendResponse = { changes: { variants: [{ fileName: "variantFromBackend" }] } };
+			const oLoadAllFlVariantsStub = sandbox.stub(Storage, "loadAllFlVariants").resolves(oBackendResponse);
+			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
+			const oAddLazyVariantsLoadedSpy = sandbox.spy(FlexState, "addLazyVariantsLoaded");
+
+			const oResult = await VariantManagerApply.loadAllVariantsForVM({
+				reference: sReference,
+				componentId: oComponent.getId(),
+				vmReference: sVMReference
+			});
+
+			assert.deepEqual(oLoadAllFlVariantsStub.firstCall.args[0], {
+				reference: sReference,
+				vmReference: sVMReference
+			}, "then Storage.loadAllFlVariants is called with the correct parameters");
+			assert.deepEqual(oAddNewObjectsSpy.firstCall.args[0], {
+				reference: sReference,
+				componentId: oComponent.getId(),
+				newData: oBackendResponse
+			}, "then backend response is added to FlexState");
+			assert.deepEqual(oAddLazyVariantsLoadedSpy.firstCall.args, [sReference, sVMReference], "then the VM is marked as lazy-loaded");
+			assert.deepEqual(oResult, oBackendResponse, "then the backend response is returned");
+		});
+
+		QUnit.test("loadVariantContent clears variantContentRemoved on loaded variant", async function(assert) {
+			const oBackendResponse = { changes: { variantDependentControlChanges: [{ fileName: "changeFromBackend" }] } };
+			const oLoadFlVariantContentStub = sandbox.stub(Storage, "loadFlVariantContent").resolves(oBackendResponse);
+			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
+			const oVariantData = VariantManagementState.getVariant({
+				reference: sReference,
+				vmReference: sVMReference,
+				vReference: "variantWithRemovedContent"
+			});
+			assert.ok(oVariantData.instance.getVariantContentRemoved(), "precondition: variant content is marked as removed");
+
+			const oResult = await VariantManagerApply.loadVariantContent({
+				reference: sReference,
+				componentId: oComponent.getId(),
+				vmReference: sVMReference,
+				variantId: "variantWithRemovedContent"
+			});
+
+			assert.deepEqual(oLoadFlVariantContentStub.firstCall.args[0], {
+				reference: sReference,
+				variantId: "variantWithRemovedContent"
+			}, "then Storage.loadFlVariantContent is called with the correct parameters");
+			assert.deepEqual(oAddNewObjectsSpy.firstCall.args[0], {
+				reference: sReference,
+				componentId: oComponent.getId(),
+				newData: oBackendResponse
+			}, "then backend response is added to FlexState");
+			assert.notOk(oVariantData.instance.getVariantContentRemoved(), "then the variantContentRemoved flag is cleared");
+			assert.deepEqual(oResult, oBackendResponse, "then the backend response is returned");
 		});
 	});
 

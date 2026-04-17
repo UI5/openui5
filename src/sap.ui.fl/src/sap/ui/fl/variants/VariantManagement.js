@@ -900,6 +900,20 @@ sap.ui.define([
 		return this;
 	};
 
+	/**
+	 * Sets a callback function to dynamically load variants when the Manage Views dialog is opened.
+	 * The provided callback function must return a <code>Promise</code>.
+	 * @param {function} fnCallback The callback function
+	 * @returns {this} Reference to <code>this</code> for method chaining
+	 * @private
+	 * @ui5-restricted sap.ui.fl
+	 * @since 1.148
+	 */
+	VariantManagement.prototype.setDynamicVariantsLoadedCallback = function(fnCallback) {
+		this._oVM.setDynamicVariantsLoadedCallback(fnCallback);
+		return this;
+	};
+
 	VariantManagement.prototype._setModel = function() {
 		this._setBindingContext();
 	};

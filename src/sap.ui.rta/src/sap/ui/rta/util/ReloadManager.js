@@ -50,6 +50,8 @@ sap.ui.define([
 			sReason = "MSG_DRAFT_EXISTS";
 		} else if (oReloadInfo.allContexts) {
 			sReason = "MSG_RESTRICTED_CONTEXT_EXIST";
+		} else if (oReloadInfo.hasRemovedNonFavoriteVariants) {
+			sReason = "MSG_VIEWS_NOT_FULLY_LOADED";
 		}// TODO add app descr changes case for start?
 		return sReason;
 	}
@@ -234,6 +236,7 @@ sap.ui.define([
 				oReloadInfo.hasHigherLayerChanges
 				|| oReloadInfo.isDraftAvailable
 				|| oReloadInfo.allContexts
+				|| oReloadInfo.hasRemovedNonFavoriteVariants
 			) {
 				return triggerReloadOnStart(merge(mProperties, oReloadInfo));
 			}

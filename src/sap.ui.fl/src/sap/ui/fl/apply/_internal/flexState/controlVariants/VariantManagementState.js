@@ -484,22 +484,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Loads the flex objects for a given variant reference and adds them to the FlexState.
-	 *
-	 * @param {object} mPropertyBag - Object with the necessary properties
-	 * @param {string} mPropertyBag.reference - Flexibility reference
-	 * @param {string} mPropertyBag.variantReference - Variant reference to be loaded
-	 * @param {string} mPropertyBag.componentId - Component ID
-	 */
-	VariantManagementState.loadVariant = async function(mPropertyBag) {
-		await FlexState.lazyLoadFlVariant({
-			variantReference: mPropertyBag.variantReference,
-			reference: mPropertyBag.reference,
-			componentId: mPropertyBag.componentId
-		});
-	};
-
-	/**
 	 * Returns control changes for a given variant reference.
 	 *
 	 * @param {object} mPropertyBag Object with the necessary properties
@@ -865,5 +849,25 @@ sap.ui.define([
 		});
 		return oVariantManagement?.variants || [];
 	};
+
+	/**
+	 * Checks whether a variant has its variantDependentControlChanges (UI changes) removed.
+	 * This occurs when there are many control changes that need to be lazy loaded.
+	 *
+	 * @param {object} mPropertyBag - Object with the necessary properties
+	 * @param {string} mPropertyBag.reference - Flex reference
+	 * @param {string} mPropertyBag.vmReference - Variant management reference
+	 * @param {string} mPropertyBag.variantId - Variant ID to check
+	 * @returns {boolean} True if the variant's UI changes were removed and need to be loaded
+	 */
+	VariantManagementState.isVariantContentRemoved = function(mPropertyBag) {
+		const oVariant = this.getVariant({
+			vmReference: mPropertyBag.vmReference,
+			vReference: mPropertyBag.variantId,
+			reference: mPropertyBag.reference
+		});
+		return !!oVariant?.instance?.getVariantContentRemoved();
+	};
+
 	return VariantManagementState;
 });

@@ -22,10 +22,6 @@ sap.ui.define([
 	NavigationAction.prototype.execute = function () {
 		var oResolvedConfig = this.getResolvedConfig();
 
-		if (oResolvedConfig.service) {
-			return;
-		}
-
 		var oParameters = this.getParameters(),
 			sUrl,
 			sTarget,

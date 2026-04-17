@@ -225,7 +225,7 @@ sap.ui.define([
 	 * @returns {boolean} The enablement of the vertical scrolling
 	 */
 	AdaptFiltersPanel.prototype.getVerticalScrolling = function() {
-		return true;
+		return false;
 	};
 
 	AdaptFiltersPanel.prototype.applySettings = function(mSettings) {

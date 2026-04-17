@@ -44,7 +44,6 @@ sap.ui.define([
 
 	const AriaHasPopup = coreLibrary.aria.HasPopup;
 
-	const ActionArea = library.CardActionArea;
 	const CardActionType = library.CardActionType;
 
 	/**
@@ -234,7 +233,6 @@ sap.ui.define([
 		}));
 
 		const oActionsConfig = {
-			area: ActionArea.ActionsStrip,
 			control: oItem,
 			actions: oConfig.actions,
 			enabledPropertyName: "enabled"

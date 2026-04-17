@@ -6,14 +6,18 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/compVariants/CompVariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/compVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/Utils",
 	"sap/ui/fl/apply/_internal/init"
 ], function(
 	CompVariantManagementState,
 	CompVariantUtils,
 	FlexState,
+	Loader,
 	ManifestUtils,
+	Storage,
 	Utils
 ) {
 	"use strict";
@@ -95,6 +99,29 @@ sap.ui.define([
 				componentId: mProperties.componentId
 			});
 			FlexState.addSVMControl(sReference, oControl);
+
+			// Set up lazy loading callback for Manage Views / Save As
+			const oLoaderData = Loader.getCachedFlexData(sReference);
+			const aControlsWithRemovedVariants = oLoaderData?.parameters?.nonFavoriteVariantsRemoved;
+			if (aControlsWithRemovedVariants?.includes(sPersistencyKey)) {
+				oControl.setDynamicVariantsLoadedCallback(() => {
+					if (FlexState.getLazyVariantsLoaded(sReference).includes(sPersistencyKey)) {
+						return Promise.resolve();
+					}
+					return Storage.loadAllCompVariants({
+						reference: sReference,
+						persistencyKey: sPersistencyKey
+					}).then((oResponse) => {
+						FlexState.addNewObjects({
+							reference: sReference,
+							componentId: mProperties.componentId,
+							newData: oResponse
+						});
+						FlexState.addLazyVariantsLoaded(sReference, sPersistencyKey);
+					});
+				});
+			}
+
 			CompVariantManagementState.addExternalVariants(mProperties);
 
 			const aVariants = CompVariantManagementState.assembleVariantList(mProperties);

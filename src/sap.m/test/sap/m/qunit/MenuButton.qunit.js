@@ -1742,4 +1742,34 @@ sap.ui.define([
 		oMenuButton.getMenu().close();
 		oMenuButton.destroy();
 	});
+
+	QUnit.module("IFormContent");
+
+	QUnit.test("Implements sap.ui.core.IFormContent interface", function(assert) {
+		// Arrange
+		var oMenuButton = new MenuButton();
+
+		// Assert
+		assert.ok(oMenuButton.isA("sap.ui.core.IFormContent"), "MenuButton implements IFormContent interface");
+
+		// Cleanup
+		oMenuButton.destroy();
+	});
+
+	QUnit.test("Method 'getFormDoNotAdjustWidth' always returns true", function(assert) {
+		// Arrange
+		var oMenuButton = new MenuButton();
+
+		// Assert
+		assert.equal(oMenuButton.getFormDoNotAdjustWidth(), true, "The method returns true for Regular mode.");
+
+		// Arrange
+		oMenuButton.setButtonMode(MenuButtonMode.Split);
+
+		// Assert
+		assert.equal(oMenuButton.getFormDoNotAdjustWidth(), true, "The method returns true for Split mode.");
+
+		// Cleanup
+		oMenuButton.destroy();
+	});
 });

@@ -378,6 +378,14 @@ sap.ui.define([
 				layer: Layer.CUSTOMER,
 				testName: "higher layer changes and allContexts",
 				expectedMessageKey: "MSG_RESTRICTED_CONTEXT_EXIST_AND_PERSONALIZATION"
+			},
+			{
+				oReloadInfo: {
+					hasRemovedNonFavoriteVariants: true
+				},
+				layer: Layer.CUSTOMER,
+				testName: "only removed non-favorite variants",
+				expectedMessageKey: "MSG_VIEWS_NOT_FULLY_LOADED"
 			}
 		].forEach(function(oTestInfo) {
 			QUnit.test(oTestInfo.testName, async function(assert) {

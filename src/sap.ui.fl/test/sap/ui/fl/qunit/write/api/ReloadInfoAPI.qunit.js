@@ -349,6 +349,43 @@ sap.ui.define([
 				assert.strictEqual(oReloadInfo.hasHigherLayerChanges, true, "hasHigherLayerChanges is set to true");
 			});
 		});
+		QUnit.test("when there are non-favorite variants removed by lazy loading", async function(assert) {
+			const oReloadParameters = {
+				ignoreMaxLayerParameter: false,
+				layer: Layer.CUSTOMER,
+				selector: {}
+			};
+			sandbox.stub(ReloadInfoAPI, "hasMaxLayerStorage").returns(false);
+			sandbox.stub(ReloadInfoAPI, "hasVersionStorage").returns(false);
+			sandbox.stub(FeaturesAPI, "isVersioningEnabled").resolves(false);
+			sandbox.stub(PersistenceWriteAPI, "hasHigherLayerChanges").resolves(false);
+			sandbox.stub(VersionsAPI, "isDraftAvailable").returns(false);
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: ["vmReference1"] }
+			});
+
+			const oReloadInfo = await ReloadInfoAPI.getReloadReasonsForStart(oReloadParameters);
+			assert.strictEqual(oReloadInfo.hasRemovedNonFavoriteVariants, true, "hasRemovedNonFavoriteVariants is set to true");
+		});
+
+		QUnit.test("when there are no non-favorite variants removed", async function(assert) {
+			const oReloadParameters = {
+				ignoreMaxLayerParameter: false,
+				layer: Layer.CUSTOMER,
+				selector: {}
+			};
+			sandbox.stub(ReloadInfoAPI, "hasMaxLayerStorage").returns(false);
+			sandbox.stub(ReloadInfoAPI, "hasVersionStorage").returns(false);
+			sandbox.stub(FeaturesAPI, "isVersioningEnabled").resolves(false);
+			sandbox.stub(PersistenceWriteAPI, "hasHigherLayerChanges").resolves(false);
+			sandbox.stub(VersionsAPI, "isDraftAvailable").returns(false);
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: [] }
+			});
+
+			const oReloadInfo = await ReloadInfoAPI.getReloadReasonsForStart(oReloadParameters);
+			assert.strictEqual(oReloadInfo.hasRemovedNonFavoriteVariants, false, "hasRemovedNonFavoriteVariants is set to false");
+		});
 	});
 
 	QUnit.module("Given that getReloadInfo is called in FLP", {
@@ -762,6 +799,13 @@ sap.ui.define([
 				var bResult = ReloadInfoAPI.handleReloadInfoOnStart(this.oReloadInfo);
 				assert.strictEqual(bResult, true, "parameters were changed");
 				assert.deepEqual(FlexInfoSession.getByReference(), { maxLayer: Layer.CUSTOMER, version: Version.Number.Draft }, "flex info session is correct");
+			});
+
+			QUnit.test("with hasRemovedNonFavoriteVariants only", function(assert) {
+				this.oReloadInfo.hasRemovedNonFavoriteVariants = true;
+				const bResult = ReloadInfoAPI.handleReloadInfoOnStart(this.oReloadInfo);
+				assert.strictEqual(bResult, true, "parameters were changed");
+				assert.deepEqual(FlexInfoSession.getByReference(), {}, "flex info session is not modified");
 			});
 		});
 
