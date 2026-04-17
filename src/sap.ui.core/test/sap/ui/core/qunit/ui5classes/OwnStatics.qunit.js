@@ -24,7 +24,7 @@ sap.ui.define([
 
 		assert.throws(function() {
 			oStaticData.key = "newValue";
-		}, /(Cannot|Attempt).*assign to (read ?only|readonly) property/i, "The static object is frozen and cannot be modified.");
+		}, TypeError, "The static object is frozen and cannot be modified.");
 	});
 
 	QUnit.test("should throw error when setting statics twice for same class", function(assert) {
