@@ -37,10 +37,7 @@ sap.ui.define([
 	});
 
 	/**
-	 * This function gets called on startup. It checks if the overlay is editable by this plugin.
-	 * @param {sap.ui.dt.Overlay} oOverlay - Overlay to be checked
-	 * @returns {object} Object with editable boolean values for <code>asChild</code> and <code>asSibling</code>
-	 * @private
+	 * @override
 	 */
 	BaseCreate.prototype._isEditable = async function(oOverlay) {
 		const aPromiseValues = await Promise.all([this._isEditableCheck(oOverlay, true), this._isEditableCheck(oOverlay, false)]);
@@ -80,7 +77,7 @@ sap.ui.define([
 		return bSibling ? oResponsibleElementOverlay.getParentElementOverlay() : oResponsibleElementOverlay;
 	};
 
-	BaseCreate.prototype.getCreateActions = function(bSibling, oOverlay) {
+	BaseCreate.prototype.getCreateActions = function(oOverlay, bSibling) {
 		const oResponsibleElementOverlay = this.getResponsibleElementOverlay(oOverlay);
 		const oParentOverlay = this._getParentOverlay(bSibling, oResponsibleElementOverlay);
 		const oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
@@ -92,34 +89,17 @@ sap.ui.define([
 		return aActions;
 	};
 
-	BaseCreate.prototype.getCreateAction = function(bSibling, oOverlay, sAggregationName) {
-		const aActions = this.getCreateActions(bSibling, oOverlay);
-		if (sAggregationName) {
-			let oCreateActionForAggregation;
-			aActions.some((oAction) => {
-				if (oAction.aggregation === sAggregationName) {
-					oCreateActionForAggregation = oAction;
-					return true;
-				}
-				return false;
-			});
-			return oCreateActionForAggregation;
-		}
-		return aActions[0];
-	};
-
-	BaseCreate.prototype.isAvailable = function(aElementOverlays, bSibling) {
-		return this._isEditableByPlugin(aElementOverlays[0], bSibling);
-	};
-
-	BaseCreate.prototype.isActionEnabled = function(oAction, bSibling, oElementOverlay) {
-		if (!oAction) {
+	/**
+	 * @override
+	 */
+	BaseCreate.prototype.isEnabled = function(aElementOverlays, oMenuItem) {
+		if (!oMenuItem.action) {
 			return false;
 		}
 
-		if (oAction.isEnabled && typeof oAction.isEnabled === "function") {
-			const fnIsEnabled = oAction.isEnabled;
-			const oParentOverlay = this._getParentOverlay(bSibling, oElementOverlay);
+		if (oMenuItem.action.isEnabled && typeof oMenuItem.action.isEnabled === "function") {
+			const fnIsEnabled = oMenuItem.action.isEnabled;
+			const oParentOverlay = this._getParentOverlay(oMenuItem.bAsSibling, aElementOverlays[0]);
 			return fnIsEnabled(oParentOverlay.getElement());
 		}
 
@@ -153,40 +133,6 @@ sap.ui.define([
 		const sContainerTitle = oAggregationDescription.singular;
 		const oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
 		return oTextResources.getText(sText, [sContainerTitle]);
-	};
-
-	/**
-	 * Gets the name of the action related to this plugin.
-	 * @return {string} Action name
-	 * @abstract
-	 */
-	BaseCreate.prototype.getActionName = function() {
-		throw new Error("abstract");
-	};
-
-	function ignoreAbstractParameters() {}
-
-	/**
-	 * Retrieve the context menu item for the actions.
-	 * Two items are returned here: one for when the overlay is a sibling and one for when it is a child.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {object[]} Array containing the items with required data
-	 * @abstract
-	 */
-	BaseCreate.prototype.getMenuItems = function(aElementOverlays) {
-		ignoreAbstractParameters(aElementOverlays);
-		throw new Error("abstract");
-	};
-
-	/**
-	 * Handles the creation.
-	 * @param {boolean} bSibling - Create as a sibling
-	 * @param {sap.ui.dt.Overlay} oOverlay - Reference overlay for creation
-	 * @abstract
-	 */
-	BaseCreate.prototype.handleCreate = function(bSibling, oOverlay) {
-		ignoreAbstractParameters(bSibling, oOverlay);
-		throw new Error("abstract");
 	};
 
 	return BaseCreate;

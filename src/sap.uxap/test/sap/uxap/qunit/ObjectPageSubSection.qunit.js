@@ -3187,4 +3187,43 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oObjectPageLayout.destroy();
 	});
 
+	QUnit.test("No error when block is externally destroyed and then removeAllBlocks is called", async function (assert) {
+		// Arrange
+		var oBlock1 = oHelpers.getBlock(),
+			oBlock2 = oHelpers.getBlock(),
+			oSubSection = oHelpers.getSubSection(),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: new ObjectPageSection({
+					subSections: [oSubSection]
+				})
+			}),
+			oGrid;
+
+		oSubSection.addBlock(oBlock1);
+		oSubSection.addBlock(oBlock2);
+
+		// Act: render the ObjectPageLayout so blocks are added to internal Grid
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		oGrid = oSubSection._getGrid();
+
+		// Assert: initial state
+		assert.strictEqual(oGrid.getContent().length, 2, "Internal Grid has 2 controls");
+		assert.strictEqual(oSubSection.getBlocks().length, 2, "SubSection has 2 blocks");
+
+		// Act: externally destroy the first block, then removeAllBlocks
+		oBlock1.destroy();
+		oSubSection.removeAllBlocks();
+
+		// Assert: no error thrown, block is removed from internal Grid
+		assert.strictEqual(oGrid.getContent().length, 0, "Internal Grid has no controls");
+		assert.strictEqual(oSubSection.getBlocks().length, 0, "SubSection has no blocks");
+		assert.ok(oBlock2.isDestroyed() === false, "Block 2 is not destroyed by removeAllBlocks");
+
+		// Cleanup
+		oBlock2.destroy();
+		oObjectPageLayout.destroy();
+	});
+
 });

@@ -159,7 +159,7 @@ sap.ui.define([
 	Plugin.prototype._deregisterOverlays = function(oDesignTime) {
 		if (this.deregisterElementOverlay || this.deregisterAggregationOverlay) {
 			var aOverlays = oDesignTime.getElementOverlays();
-			aOverlays.forEach(this._callElementOverlayDeregestrationMethods.bind(this));
+			aOverlays.forEach(this._callElementOverlayDeregistrationMethods.bind(this));
 		}
 	};
 
@@ -187,10 +187,10 @@ sap.ui.define([
 	};
 
 	/**
-	 * @param {sap.ui.dt.ElementOverlay} oElementOverlay to callde registration methods for
+	 * @param {sap.ui.dt.ElementOverlay} oElementOverlay to call deregistration methods for
 	 * @private
 	 */
-	Plugin.prototype._callElementOverlayDeregestrationMethods = function(oElementOverlay) {
+	Plugin.prototype._callElementOverlayDeregistrationMethods = function(oElementOverlay) {
 		if (this.deregisterElementOverlay) {
 			this.deregisterElementOverlay(oElementOverlay);
 		}
@@ -213,7 +213,7 @@ sap.ui.define([
 
 	/**
 	 * Called to retrieve a context menu item for the plugin.
-	 * Needs to be overriden by extending plugins.
+	 * Needs to be overridden by extending plugins.
 	 * @returns {array} Empty array
 	 * @protected
 	 */
@@ -223,7 +223,7 @@ sap.ui.define([
 
 	/**
 	 * Retrieve the action name related to the plugin
-	 * Method to be overwritten by the different plugins
+	 * Method to be overridden by the different plugins
 	 *
 	 * @public
 	 */
@@ -343,6 +343,10 @@ sap.ui.define([
 	 * Executes the plugin action
 	 * Method to be overwritten by the different plugins
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
+	 * @param {object} mPropertyBag - Additional properties for the action defined by the plugin
+	 * @param {object} mPropertyBag.menuItem - The menu item object containing the action to be executed
+	 * @param {object} mPropertyBag.eventItem - The event item object containing the event which triggered the action
+	 * @param {object} mPropertyBag.contextElement - The element which is the context of the action, e.g. the element on which the context menu was opened
 	 * @override
 	 * @public
 	 */
@@ -352,27 +356,29 @@ sap.ui.define([
 	 * Checks if the plugin is enabled for a set of overlays
 	 * Method can be overwritten by the different plugins
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
+	 * @param {object} oMenuItem - The menu item object containing the action to be executed
 	 * @returns {boolean} <code>true</code> if plugin is enabled
 	 */
-	Plugin.prototype.isEnabled = function(aElementOverlays) {
+	Plugin.prototype.isEnabled = function(aElementOverlays, oMenuItem) {
 		// The default implementation considers only one overlay
 		if (!Array.isArray(aElementOverlays) || aElementOverlays.length > 1) {
 			return false;
 		}
-		var oElementOverlay = aElementOverlays[0];
-		var vAction = this.getAction(oElementOverlay);
-		if (!vAction) {
+		const oResponsibleElementOverlay = oMenuItem?.responsible?.[0] || aElementOverlays[0];
+
+		const oAction = oMenuItem ? oMenuItem.action : this.getAction(oResponsibleElementOverlay);
+		if (!oAction) {
 			return false;
 		}
 
-		var oElement = oElementOverlay.getElement();
-		if (vAction.isEnabled === undefined) {
+		if (oAction.isEnabled === undefined) {
 			return true;
 		}
-		if (typeof vAction.isEnabled === "function") {
-			return vAction.isEnabled(oElement);
+		if (typeof oAction.isEnabled === "function") {
+			const oElement = oResponsibleElementOverlay.getElement();
+			return oAction.isEnabled(oElement);
 		}
-		return vAction.isEnabled;
+		return oAction.isEnabled;
 	};
 
 	/**
@@ -384,35 +390,50 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.pluginId - The ID of the plugin
 	 * @param {number} mPropertyBag.rank - The rank deciding the position of the action in the context menu
 	 * @param {string} mPropertyBag.icon - an icon for the Button inside the context menu
+	 * @param {boolean} [mPropertyBag.bAsSibling] - Indicates if the action is executed on the sibling overlay instead of the responsible element overlay
+	 * @param {object} [mPropertyBag.action] - The action object defined in the designtime, if the plugin wants to define it by itself instead of taking it from the designtime
+	 * @param {object[]} [mPropertyBag.submenu] - All submenu items if the item should open a submenu
 	 * @param {string} [mPropertyBag.additionalInfoKey] - The key for the additional information defined by the plugin
 	 * @return {object[]} Returns an array with the object containing the required data for a context menu item
 	 */
 	Plugin.prototype._getMenuItems = async function(aElementOverlays, mPropertyBag) {
-		var oMenuItem = this.enhanceItemWithResponsibleElement({
+		const oMenuItem = this.enhanceItemWithResponsibleElement({
 			id: mPropertyBag.pluginId,
 			handler: this.handler.bind(this),
 			enabled: this.isEnabled.bind(this),
 			rank: mPropertyBag.rank,
-			icon: mPropertyBag.icon
+			icon: mPropertyBag.icon,
+			bAsSibling: mPropertyBag.bAsSibling,
+			submenu: mPropertyBag.submenu
 		}, aElementOverlays);
 
-		var aResponsibleElementOverlays = oMenuItem.responsible || aElementOverlays;
-		var oResponsibleElementOverlay = aResponsibleElementOverlays[0];
+		// menu items with submenus don't trigger an action and must always be enabled
+		if (mPropertyBag.submenu) {
+			oMenuItem.enabled = true;
+		}
 
-		if (this._isEditableByPlugin(oResponsibleElementOverlay) === undefined) {
+		const aResponsibleElementOverlays = oMenuItem.responsible || aElementOverlays;
+		const oResponsibleElementOverlay = aResponsibleElementOverlays[0];
+
+		if (this._isEditableByPlugin(oResponsibleElementOverlay, mPropertyBag.bAsSibling) === undefined) {
 			// The responsibleElement editableByPlugin state was not evaluated yet e.g. because it
 			// has no visible geometry, thus evaluateEditable now
 			await this.evaluateEditable(aResponsibleElementOverlays, { onRegistration: false });
 		}
-		var mAction = this.getAction(oResponsibleElementOverlay);
+		const oAction = mPropertyBag.action || this.getAction(oResponsibleElementOverlay, mPropertyBag.bAsSibling);
+		oMenuItem.action = oAction;
 		// For most plugins, the action must be available on the responsible element and the element overlay
 		// because the element overlay is where the action is executed, e.g. rename in anchor bar
-		if (!mAction || !this.isAvailable(aResponsibleElementOverlays) || !this.isAvailable(aElementOverlays)) {
+		if (
+			!oAction
+			|| !this.isAvailable(aResponsibleElementOverlays, oAction, mPropertyBag.bAsSibling)
+			|| !this.isAvailable(aElementOverlays, oAction, mPropertyBag.bAsSibling)
+		) {
 			return [];
 		}
 
-		oMenuItem.additionalInfo = this._getAdditionalInfo(oResponsibleElementOverlay, mAction, mPropertyBag);
-		oMenuItem.text = this.getActionText(oResponsibleElementOverlay, mAction, mPropertyBag.pluginId);
+		oMenuItem.additionalInfo = this._getAdditionalInfo(oResponsibleElementOverlay, oAction, mPropertyBag);
+		oMenuItem.text = mPropertyBag.text || this.getActionText(oResponsibleElementOverlay, oAction, mPropertyBag.pluginId);
 		return [oMenuItem];
 	};
 
@@ -455,17 +476,20 @@ sap.ui.define([
 	};
 
 	/**
-	 * Generic function to retrieve the responsible element overlay
-	 * from design time metadata of a source element overlay
+	 * Checks if the action is available on the responsible element overlay instead of the element overlay where the context menu is opened,
+	 * e.g. in case of ObjectPageSection and the anchor bar, and returns the responsible element overlay.
+	 * If the action is not available on the responsible element overlay, returns the source element overlay.
 	 *
 	 * @param {sap.ui.dt.ElementOverlay} oElementOverlay - Source element overlay
+	 * @param {string} [sActionName] - Action name
 	 * @return {sap.ui.dt.ElementOverlay} Returns the element overlay of the responsible element
 	 */
-	Plugin.prototype.getResponsibleElementOverlay = function(oElementOverlay) {
-		var oElement = oElementOverlay.getElement();
-		var oDesignTimeMetadata = oElementOverlay.getDesignTimeMetadata();
-		if (oDesignTimeMetadata) {
-			var oResponsibleElement = oDesignTimeMetadata.getResponsibleElement(oElement);
+	Plugin.prototype.getResponsibleElementOverlay = function(oElementOverlay, sActionName) {
+		const bActionOnResponsibleElement = this.isResponsibleElementActionAvailable(oElementOverlay, sActionName || this.getActionName());
+		const oElement = oElementOverlay.getElement();
+		const oDesignTimeMetadata = oElementOverlay.getDesignTimeMetadata();
+		if (bActionOnResponsibleElement && oDesignTimeMetadata) {
+			const oResponsibleElement = oDesignTimeMetadata.getResponsibleElement(oElement);
 			if (oResponsibleElement) {
 				try {
 					return OverlayRegistry.getOverlay(oResponsibleElement);
@@ -478,7 +502,9 @@ sap.ui.define([
 	};
 
 	/**
-	 * Enhances a context menu item with the responsible element overlay if applicable
+	 * Enhances a context menu item with the responsible element overlay if applicable.
+	 * This is only the case if the action is copied from the responsible element.
+	 * Example: ObjectPageSection and the anchor bar
 	 *
 	 * @param {object} oMenuItem - Menu item
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Source element overlays
@@ -486,14 +512,15 @@ sap.ui.define([
 	 * @return {object} Enhanced menu item
 	 */
 	Plugin.prototype.enhanceItemWithResponsibleElement = function(oMenuItem, aElementOverlays, aActionNames) {
-		var aResponsibleElementOverlays = [];
-		var aActionsFromResponsibleElement = aActionNames || [this.getActionName()];
-		var bEnhanceMenuItem = aActionsFromResponsibleElement.some(function(sActionName) {
+		let aResponsibleElementOverlays = [];
+		const aActionsFromResponsibleElement = aActionNames || [this.getActionName()];
+		const bEnhanceMenuItem = aActionsFromResponsibleElement.some((sActionName) => {
 			if (this.isResponsibleElementActionAvailable(aElementOverlays[0], sActionName)) {
-				aResponsibleElementOverlays = aElementOverlays.map(this.getResponsibleElementOverlay.bind(this));
+				aResponsibleElementOverlays = aElementOverlays.map((oElementOverlay) => this.getResponsibleElementOverlay(oElementOverlay, sActionName));
 				return true;
 			}
-		}.bind(this));
+			return false;
+		});
 		return { ...oMenuItem, ...(bEnhanceMenuItem && { responsible: aResponsibleElementOverlays }) };
 	};
 

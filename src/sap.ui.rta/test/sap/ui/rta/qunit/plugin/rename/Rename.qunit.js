@@ -8,15 +8,16 @@ sap.ui.define([
 	"sap/ui/core/Title",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/dt/Util",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
+	"sap/ui/layout/form/Form",
 	"sap/ui/layout/form/FormContainer",
 	"sap/ui/layout/form/FormLayout",
-	"sap/ui/layout/form/Form",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/rta/command/CommandFactory",
-	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/rta/plugin/rename/Rename",
+	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/rta/plugin/Selection",
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4",
@@ -29,15 +30,16 @@ sap.ui.define([
 	Title,
 	DesignTime,
 	OverlayRegistry,
+	DtUtil,
 	ChangesWriteAPI,
+	Form,
 	FormContainer,
 	FormLayout,
-	Form,
 	VerticalLayout,
 	nextUIUpdate,
 	CommandFactory,
-	Plugin,
 	RenamePlugin,
+	Plugin,
 	SelectionPlugin,
 	Utils,
 	sinon,
@@ -59,6 +61,28 @@ sap.ui.define([
 			},
 			actionsFromResponsibleElement: ["rename"]
 		});
+	}
+
+	async function getMenuEntryAndCheck(assert, oOverlay, oAssertions) {
+		this.oRenamePlugin.deregisterElementOverlay(oOverlay);
+		this.oRenamePlugin.registerElementOverlay(oOverlay);
+
+		await DtUtil.waitForSynced(this.oDesignTime)();
+		const bIsEditable = await this.oRenamePlugin._isEditable(oOverlay);
+		assert.strictEqual(bIsEditable, oAssertions.editable, "then the editable property is correct");
+		if (oAssertions.available !== undefined) {
+			assert.strictEqual(this.oRenamePlugin.isAvailable([oOverlay], {}), oAssertions.available, "then available is correct");
+		}
+
+		const oMenuItem = (await this.oRenamePlugin.getMenuItems([oOverlay]))[0];
+		if (oMenuItem) {
+			if (typeof oMenuItem.enabled === "function") {
+				assert.strictEqual(oMenuItem.enabled([oOverlay], oMenuItem), oAssertions.enabled, "then the enabled property is correct");
+			} else {
+				assert.strictEqual(oMenuItem.enabled, oAssertions.enabled, "then the enabled property is correct");
+			}
+		}
+		return oMenuItem;
 	}
 
 	function addValidators(oDesignTimeMetadata, aValidator) {
@@ -120,10 +144,7 @@ sap.ui.define([
 			this.oFormContainerOverlay.setDesignTimeMetadata({
 				actions: {
 					rename: {
-						changeType: "renameGroup",
-						domRef(oFormContainer) {
-							return oFormContainer.getRenderedDomRef().querySelector(".sapUiFormTitle");
-						}
+						changeType: "renameGroup"
 					}
 				}
 			});
@@ -168,17 +189,13 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when isAvailable and isEnabled (returning function) are called", function(assert) {
-			var done = assert.async();
+		QUnit.test("when isAvailable and isEnabled (returning function) are called", async function(assert) {
 			var oDesignTimeMetadata = {
 				actions: {
 					rename: {
 						changeType: "renameGroup",
 						isEnabled(oFormContainer) {
 							return !(oFormContainer.getToolbar() || !oFormContainer.getTitle());
-						},
-						domRef(oFormContainer) {
-							return oFormContainer.getRenderedDomRef().querySelector(".sapUiFormTitle");
 						}
 					}
 				}
@@ -186,51 +203,25 @@ sap.ui.define([
 			this.oFormContainerOverlay.setDesignTimeMetadata(oDesignTimeMetadata);
 			this.oFormContainerOverlay0.setDesignTimeMetadata(oDesignTimeMetadata);
 
-			this.oDesignTime.attachEventOnce("synced", function() {
-				assert.strictEqual(
-					this.oRenamePlugin.isAvailable([this.oFormContainerOverlay0]),
-					true,
-					"then rename is available for the overlay"
-				);
-				assert.strictEqual(
-					this.oRenamePlugin.isEnabled([this.oFormContainerOverlay0]),
-					false,
-					"then rename is not enabled for the overlay"
-				);
-				assert.strictEqual(
-					this.oRenamePlugin.isAvailable([this.oFormContainerOverlay]),
-					true,
-					"then rename is available for the overlay"
-				);
-				assert.strictEqual(
-					this.oRenamePlugin.isEnabled([this.oFormContainerOverlay]),
-					true,
-					"then rename is enabled for the overlay"
-				);
-				this.oRenamePlugin._isEditable(this.oFormContainerOverlay)
-				.then(function(bEditable) {
-					assert.strictEqual(bEditable, true, "then rename is editable for the overlay");
-					done();
-				});
-			}.bind(this));
-
-			this.oRenamePlugin.deregisterElementOverlay(this.oFormContainerOverlay0);
-			this.oRenamePlugin.deregisterElementOverlay(this.oFormContainerOverlay);
-			this.oRenamePlugin.registerElementOverlay(this.oFormContainerOverlay0);
-			this.oRenamePlugin.registerElementOverlay(this.oFormContainerOverlay);
+			await getMenuEntryAndCheck.call(this, assert, this.oFormContainerOverlay0, {
+				editable: true,
+				available: true,
+				enabled: false
+			});
+			await getMenuEntryAndCheck.call(this, assert, this.oFormContainerOverlay, {
+				editable: true,
+				available: true,
+				enabled: true
+			});
 		});
 
-		QUnit.test("when isAvailable and isEnabled (returning boolean) are called", function(assert) {
-			var done = assert.async();
+		QUnit.test("when isAvailable and isEnabled (returning boolean) are called", async function(assert) {
 			var oDesignTimeMetadata = {
 				actions: {
 					rename(oFormContainer) {
 						return {
 							changeType: "renameGroup",
-							isEnabled: !(oFormContainer.getToolbar() || !oFormContainer.getTitle()),
-							domRef(oFormContainer) {
-								return oFormContainer.getRenderedDomRef().querySelector(".sapUiFormTitle");
-							}
+							isEnabled: !(oFormContainer.getToolbar() || !oFormContainer.getTitle())
 						};
 					}
 				}
@@ -238,38 +229,16 @@ sap.ui.define([
 			this.oFormContainerOverlay.setDesignTimeMetadata(oDesignTimeMetadata);
 			this.oFormContainerOverlay0.setDesignTimeMetadata(oDesignTimeMetadata);
 
-			this.oDesignTime.attachEventOnce("synced", function() {
-				assert.strictEqual(
-					this.oRenamePlugin.isAvailable([this.oFormContainerOverlay0]),
-					true,
-					"then rename is available for the overlay"
-				);
-				assert.strictEqual(
-					this.oRenamePlugin.isEnabled([this.oFormContainerOverlay0]),
-					false,
-					"then rename is not enabled for the overlay"
-				);
-				assert.strictEqual(
-					this.oRenamePlugin.isAvailable([this.oFormContainerOverlay]),
-					true,
-					"then rename is available for the overlay"
-				);
-				assert.strictEqual(
-					this.oRenamePlugin.isEnabled([this.oFormContainerOverlay]),
-					true,
-					"then rename is enabled for the overlay"
-				);
-				this.oRenamePlugin._isEditable(this.oFormContainerOverlay)
-				.then(function(bEditable) {
-					assert.strictEqual(bEditable, true, "then rename is editable for the overlay");
-					done();
-				});
-			}.bind(this));
-
-			this.oRenamePlugin.deregisterElementOverlay(this.oFormContainerOverlay0);
-			this.oRenamePlugin.deregisterElementOverlay(this.oFormContainerOverlay);
-			this.oRenamePlugin.registerElementOverlay(this.oFormContainerOverlay0);
-			this.oRenamePlugin.registerElementOverlay(this.oFormContainerOverlay);
+			await getMenuEntryAndCheck.call(this, assert, this.oFormContainerOverlay0, {
+				editable: true,
+				available: true,
+				enabled: false
+			});
+			await getMenuEntryAndCheck.call(this, assert, this.oFormContainerOverlay, {
+				editable: true,
+				available: true,
+				enabled: true
+			});
 		});
 
 		QUnit.test("when retrieving the context menu item", async function(assert) {
@@ -282,15 +251,8 @@ sap.ui.define([
 				);
 				return bIsAvailable;
 			}.bind(this));
-			sandbox.stub(this.oRenamePlugin, "startEdit").callsFake(function(oOverlay) {
-				assert.deepEqual(oOverlay, this.oFormContainerOverlay, "the 'startEdit' method is called with the right overlay");
-			}.bind(this));
-			sandbox.stub(this.oRenamePlugin, "isEnabled").callsFake(function(aElementOverlays) {
-				assert.equal(
-					aElementOverlays[0],
-					this.oFormContainerOverlay,
-					"the 'enabled' function calls isEnabled with the correct overlay"
-				);
+			sandbox.stub(this.oRenamePlugin, "handler").callsFake(function(aOverlays) {
+				assert.deepEqual(aOverlays[0], this.oFormContainerOverlay, "the 'handler' method is called with the right overlay");
 			}.bind(this));
 
 			const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oFormContainerOverlay]);
@@ -298,7 +260,6 @@ sap.ui.define([
 
 			this.oFormContainerOverlay.setSelected(true);
 			aMenuItems[0].handler([this.oFormContainerOverlay]);
-			aMenuItems[0].enabled([this.oFormContainerOverlay]);
 
 			bIsAvailable = false;
 			assert.equal(
@@ -308,41 +269,14 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("when isAvailable and isEnabled are called without designTime", function(assert) {
+		QUnit.test("when isAvailable and isEnabled are called without designTime", async function(assert) {
 			this.oFormContainerOverlay.setDesignTimeMetadata({});
-			this.oRenamePlugin.deregisterElementOverlay(this.oFormContainerOverlay);
-			this.oRenamePlugin.registerElementOverlay(this.oFormContainerOverlay);
 
-			assert.strictEqual(
-				this.oRenamePlugin.isAvailable([this.oFormContainerOverlay]),
-				false,
-				"then rename is not available for the overlay"
-			);
-			assert.strictEqual(
-				this.oRenamePlugin.isEnabled([this.oFormContainerOverlay]),
-				false,
-				"then rename is not enabled for the overlay"
-			);
-
-			return Promise.resolve()
-			.then(this.oRenamePlugin._isEditable.bind(this.oRenamePlugin, this.oFormContainerOverlay))
-			.then(function(bEditable) {
-				assert.strictEqual(bEditable, false, "then rename is not editable for the overlay");
+			await getMenuEntryAndCheck.call(this, assert, this.oFormContainerOverlay, {
+				editable: false,
+				available: false,
+				enabled: false
 			});
-		});
-
-		QUnit.test("when isEnabled are called with designTime with a domRef function pointing to nothing", function(assert) {
-			sandbox.stub(this.oFormContainerOverlay.getDesignTimeMetadata(), "getAssociatedDomRef").callsFake(function() {
-				return undefined;
-			});
-			this.oRenamePlugin.deregisterElementOverlay(this.oFormContainerOverlay);
-			this.oRenamePlugin.registerElementOverlay(this.oFormContainerOverlay);
-
-			assert.strictEqual(
-				this.oRenamePlugin.isEnabled([this.oFormContainerOverlay]),
-				false,
-				"then rename is not enabled for the overlay"
-			);
 		});
 
 		QUnit.test("when deregister is called", function(assert) {
@@ -381,6 +315,7 @@ sap.ui.define([
 				width: "200px"
 			}).placeAt("qunit-fixture");
 			await nextUIUpdate();
+			// sandbox.stub(this.oRenamePlugin, "isAvailable").returns(true);
 
 			this.oDesignTime = new DesignTime({
 				rootElements: [this.oVerticalLayout],
@@ -389,10 +324,7 @@ sap.ui.define([
 					"sap.ui.layout.VerticalLayout": {
 						actions: {
 							rename: {
-								changeType: "renameField",
-								domRef: function() {
-									return this.oLabel.getDomRef();
-								}.bind(this)
+								changeType: "renameField"
 							}
 						}
 					}
@@ -421,8 +353,10 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when the Label was selected and gets renamed", async function(assert) {
 			assert.ok(this.oLayoutOverlay.getSelected(), "then the overlay is initially selected");
-			await RtaQunitUtils.simulateRename(sandbox, "New Text", () => {
-				this.oRenamePlugin.handler([this.oLayoutOverlay]);
+			sandbox.stub(this.oRenamePlugin, "isAvailable").returns(true);
+			await RtaQunitUtils.simulateRename(sandbox, "New Text", async () => {
+				const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oLayoutOverlay]);
+				this.oRenamePlugin.handler([this.oLayoutOverlay], { menuItem: aMenuItems[0] });
 			});
 			assert.ok(this.oLayoutOverlay.getSelected(), "then the overlay is still selected after the rename");
 		});
@@ -439,8 +373,10 @@ sap.ui.define([
 				};
 			});
 
-			await RtaQunitUtils.simulateRename(sandbox, "New Text", () => {
-				this.oRenamePlugin.handler([this.oLayoutOverlay]);
+			sandbox.stub(this.oRenamePlugin, "isAvailable").returns(true);
+			await RtaQunitUtils.simulateRename(sandbox, "New Text", async () => {
+				const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oLayoutOverlay]);
+				this.oRenamePlugin.handler([this.oLayoutOverlay], { menuItem: aMenuItems[0] });
 			});
 
 			assert.strictEqual(oGetLabelStub.callCount, 1, "then the custom getter is called");
@@ -469,16 +405,15 @@ sap.ui.define([
 				fnDone();
 			});
 
-			RtaQunitUtils.simulateRename(sandbox, "New Text", () => {
-				this.oRenamePlugin.handler([this.oLayoutOverlay]);
+			sandbox.stub(this.oRenamePlugin, "isAvailable").returns(true);
+			RtaQunitUtils.simulateRename(sandbox, "New Text", async () => {
+				const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oLayoutOverlay]);
+				this.oRenamePlugin.handler([this.oLayoutOverlay], { menuItem: aMenuItems[0] });
 			});
 		});
 
 		QUnit.test("when retrieving the rename context menu item, with no action on the responsible element", async function(assert) {
 			addResponsibleElement(this.oLayoutOverlay.getDesignTimeMetadata(), this.oButton, this.oInnerButton);
-
-			const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oButtonOverlay]);
-			assert.equal(aMenuItems[0].id, "CTX_RENAME", "then rename menu item was returned");
 
 			// simulate actions on all overlays, except the responsible element
 			sandbox.stub(this.oRenamePlugin, "getAction")
@@ -486,56 +421,21 @@ sap.ui.define([
 			.withArgs(this.oInnerButtonOverlay)
 			.returns(false);
 
-			const bIsEnabled = aMenuItems[0].enabled([this.oButtonOverlay]);
-			assert.equal(bIsEnabled, false, "then the menu item was disabled");
-		});
-
-		QUnit.test("when retrieving an enabled action on target overlay, with an enabled action on the responsible element", async function(assert) {
-			var oButtonDesignTimeMetadata = this.oButtonOverlay.getDesignTimeMetadata();
-			addResponsibleElement(oButtonDesignTimeMetadata, this.oButton, this.oInnerButton);
-			oButtonDesignTimeMetadata.getData().actions.rename.isEnabled = function() {return true;};
-			var oGetAssociatedDomRefSpy = sandbox.spy(oButtonDesignTimeMetadata, "getAssociatedDomRef");
-
-			var aMenuItems = await this.oRenamePlugin.getMenuItems([this.oButtonOverlay]);
-			assert.equal(aMenuItems[0].id, "CTX_RENAME", "then rename menu item was returned");
-
-			var bIsEnabled = aMenuItems[0].enabled([this.oButtonOverlay]);
-			assert.ok(oGetAssociatedDomRefSpy.calledWith(this.oButton), "then the associated domRef was checked from the target overlay");
-			assert.equal(oGetAssociatedDomRefSpy.callCount, 1, "then domRef check was only done for the target overlay");
-			assert.equal(bIsEnabled, true, "then the menu item was enabled");
-		});
-
-		QUnit.test("when retrieving a disabled action on target overlay, with an enabled action on the responsible element", async function(assert) {
-			const oButtonDesignTimeMetadata = this.oButtonOverlay.getDesignTimeMetadata();
-			addResponsibleElement(oButtonDesignTimeMetadata, this.oButton, this.oInnerButton);
-			oButtonDesignTimeMetadata.getData().actions.rename.isEnabled = function() {return false;};
-
-			const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oButtonOverlay]);
-			assert.equal(aMenuItems[0].id, "CTX_RENAME", "then rename menu item was returned");
-
-			const bIsEnabled = aMenuItems[0].enabled([this.oButtonOverlay]);
-			assert.equal(bIsEnabled, false, "then the menu item was disabled");
-		});
-
-		QUnit.test("when retrieving an action on target overlay with no dom ref in DT, with an enabled action on the responsible element", async function(assert) {
-			const oButtonDesignTimeMetadata = this.oButtonOverlay.getDesignTimeMetadata();
-			addResponsibleElement(oButtonDesignTimeMetadata, this.oButton, this.oInnerButton);
-			oButtonDesignTimeMetadata.getData().actions.rename.domRef = undefined;
-
-			const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oButtonOverlay]);
-			assert.equal(aMenuItems[0].id, "CTX_RENAME", "then rename menu item was returned");
-
-			const bIsEnabled = aMenuItems[0].enabled([this.oButtonOverlay]);
-			assert.equal(bIsEnabled, false, "then the menu item was disabled");
+			await getMenuEntryAndCheck.call(this, assert, this.oButtonOverlay, {
+				editable: false,
+				enabled: false
+			});
 		});
 
 		QUnit.test("when the Label gets renamed and the new value is interpreted as a binding", async function(assert) {
 			const oCreateCommandSpy = sandbox.spy(this.oRenamePlugin, "createRenameCommand");
+			sandbox.stub(this.oRenamePlugin, "isAvailable").returns(true);
 			await RtaQunitUtils.simulateRename(
 				sandbox,
 				"{testText}",
-				() => {
-					this.oRenamePlugin.handler([this.oLayoutOverlay]);
+				async () => {
+					const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oLayoutOverlay]);
+					this.oRenamePlugin.handler([this.oLayoutOverlay], { menuItem: aMenuItems[0] });
 				},
 				(sErrorMessage) => {
 					assert.strictEqual(
@@ -550,11 +450,13 @@ sap.ui.define([
 
 		QUnit.test("when the Label gets renamed to }{", async function(assert) {
 			const oCreateCommandSpy = sandbox.spy(this.oRenamePlugin, "createRenameCommand");
+			sandbox.stub(this.oRenamePlugin, "isAvailable").returns(true);
 			await RtaQunitUtils.simulateRename(
 				sandbox,
 				"}{",
-				() => {
-					this.oRenamePlugin.handler([this.oLayoutOverlay]);
+				async () => {
+					const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oLayoutOverlay]);
+					this.oRenamePlugin.handler([this.oLayoutOverlay], { menuItem: aMenuItems[0] });
 				},
 				(sErrorMessage) => {
 					assert.strictEqual(
@@ -572,11 +474,13 @@ sap.ui.define([
 				"noEmptyText"
 			]);
 			const oCreateCommandSpy = sandbox.spy(this.oRenamePlugin, "createRenameCommand");
+			sandbox.stub(this.oRenamePlugin, "isAvailable").returns(true);
 			await RtaQunitUtils.simulateRename(
 				sandbox,
 				"",
-				() => {
-					this.oRenamePlugin.handler([this.oLayoutOverlay]);
+				async () => {
+					const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oLayoutOverlay]);
+					this.oRenamePlugin.handler([this.oLayoutOverlay], { menuItem: aMenuItems[0] });
 				},
 				(sErrorMessage) => {
 					assert.strictEqual(
@@ -598,11 +502,13 @@ sap.ui.define([
 			this.oButtonOverlay.setSelected(true);
 
 			const oCreateCommandSpy = sandbox.spy(this.oRenamePlugin, "createRenameCommand");
+			sandbox.stub(this.oRenamePlugin, "isAvailable").returns(true);
 			await RtaQunitUtils.simulateRename(
 				sandbox,
 				"",
-				() => {
-					this.oRenamePlugin.handler([this.oButtonOverlay]);
+				async () => {
+					const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oButtonOverlay]);
+					this.oRenamePlugin.handler([this.oButtonOverlay], { menuItem: aMenuItems[0] });
 				},
 				(sErrorMessage) => {
 					assert.strictEqual(
@@ -626,12 +532,14 @@ sap.ui.define([
 				"noEmptyText"
 			]);
 
+			sandbox.stub(this.oRenamePlugin, "isAvailable").returns(true);
 			const oCreateCommandSpy = sandbox.spy(this.oRenamePlugin, "createRenameCommand");
 			await RtaQunitUtils.simulateRename(
 				sandbox,
 				"",
-				() => {
-					this.oRenamePlugin.handler([this.oLayoutOverlay]);
+				async () => {
+					const aMenuItems = await this.oRenamePlugin.getMenuItems([this.oLayoutOverlay]);
+					this.oRenamePlugin.handler([this.oLayoutOverlay], { menuItem: aMenuItems[0] });
 				},
 				(sErrorMessage) => {
 					assert.strictEqual(

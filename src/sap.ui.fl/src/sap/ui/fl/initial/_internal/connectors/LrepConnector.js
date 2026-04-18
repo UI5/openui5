@@ -3,20 +3,24 @@
  */
 
 sap.ui.define([
-	"sap/base/util/merge",
 	"sap/base/util/restricted/_pick",
+	"sap/base/util/merge",
 	"sap/ui/dom/includeScript",
 	"sap/ui/fl/initial/_internal/connectors/Utils",
+	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/interfaces/BaseLoadConnector",
+	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils"
 ], function(
-	merge,
 	_pick,
+	merge,
 	includeScript,
 	Utils,
+	FlexInfoSession,
 	StorageUtils,
 	BaseConnector,
+	Layer,
 	FlexUtils
 ) {
 	"use strict";
@@ -137,6 +141,14 @@ sap.ui.define([
 			}
 
 			const mParameters = _pick(mPropertyBag, ["version", "allContexts", "adaptationId", "lazyLoadingViewsEnabled"]);
+
+			// todos#18: For the moment, only the LREP connector supports lazy loading of views. Therefore the flag is explicitly set here.
+			// The flag must not be set when in RTA.
+			const oFlexInfoSession = FlexInfoSession.getByReference(mPropertyBag.reference);
+			if (!(oFlexInfoSession.adaptationMode || window.sessionStorage.getItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`))) {
+				mParameters.lazyLoadingViewsEnabled = true;
+			}
+
 			this._addClientInfo(mParameters);
 			Utils.addSAPLogonLanguageInfo(mParameters);
 			let sAppDescriptorId;

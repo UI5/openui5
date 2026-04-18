@@ -61,9 +61,7 @@ sap.ui.define([
 	}
 
 	/**
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
-	 * @returns {boolean} <code>true</code> if it's editable
-	 * @private
+	 * @override
 	 */
 	Settings.prototype._isEditable = function(oOverlay) {
 		const vSettingsAction = this.getAction(oOverlay);
@@ -79,30 +77,18 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if settings is enabled for oOverlay
-	 *
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {boolean} <code>true</code> if it's enabled
-	 * @public
+	 * @override
 	 */
-	Settings.prototype.isEnabled = function(aElementOverlays) {
-		const oElementOverlay = aElementOverlays[0];
-		const oResponsibleElementOverlay = this.getResponsibleElementOverlay(oElementOverlay);
-		const vSettingsAction = this.getAction(oResponsibleElementOverlay);
-		if (vSettingsAction) {
-			const oSettingsActions = getValidActions(vSettingsAction, oResponsibleElementOverlay);
-			return oSettingsActions.some((oSettingsAction) => {
-				if (typeof oSettingsAction.isEnabled !== "undefined") {
-					if (typeof oSettingsAction.isEnabled === "function") {
-						return oSettingsAction.isEnabled(oResponsibleElementOverlay.getElement());
-					}
-					return oSettingsAction.isEnabled;
-				}
-				return !!oSettingsAction.handler;
-			});
+	Settings.prototype.isEnabled = function(aElementOverlays, oMenuItem) {
+		const oResponsibleElementOverlay = oMenuItem.responsible?.[0] || aElementOverlays[0];
+		const oSettingsAction = oMenuItem.action;
+		if (typeof oSettingsAction.isEnabled !== "undefined") {
+			if (typeof oSettingsAction.isEnabled === "function") {
+				return oSettingsAction.isEnabled(oResponsibleElementOverlay.getElement());
+			}
+			return oSettingsAction.isEnabled;
 		}
-
-		return false;
+		return !!oSettingsAction.handler;
 	};
 
 	Settings.prototype._getUnsavedChanges = function(sId, aChangeTypes) {
@@ -194,29 +180,23 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieves the available actions from the DesignTime Metadata and creates
-	 * the corresponding commands for them.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target Overlays of the action
-	 * @param {object} mPropertyBag - Property bag
-	 * @param {function} [mPropertyBag.fnHandler] - Handler function for the case of multiple settings actions
-	 * @param {object} [oSettingsAction] - The action object defined in the designtime
-	 * @returns {Promise} Returns promise resolving with the creation of the commands
+	 * @override
 	 */
-	Settings.prototype.handler = async function(aElementOverlays, mPropertyBag, oSettingsAction) {
+	Settings.prototype.handler = async function(aElementOverlays, mPropertyBag) {
 		const mProperties = Object.assign({}, mPropertyBag);
 		const oElement = aElementOverlays[0].getElement();
-		const fnHandler = mProperties.fnHandler || aElementOverlays[0].getDesignTimeMetadata().getAction("settings").handler;
+		const oAction = mPropertyBag.menuItem.action;
 
-		if (!fnHandler) {
+		if (!oAction.handler) {
 			throw new Error("Handler not found for settings action");
 		}
 		mProperties.getUnsavedChanges = this._getUnsavedChanges.bind(this);
 		mProperties.styleClass = Utils.getRtaStyleClassName();
 
 		try {
-			const aChanges = await fnHandler(oElement, mProperties);
+			const aChanges = await oAction.handler(oElement, mProperties);
 			if (aChanges.length > 0) {
-				return this._handleCompositeCommand(aElementOverlays, oElement, aChanges, oSettingsAction);
+				return this._handleCompositeCommand(aElementOverlays, oElement, aChanges, oAction);
 			}
 		} catch (vError) {
 			throw DtUtil.propagateError(
@@ -229,58 +209,36 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieve the context menu item for the actions.
-	 * If multiple actions are defined for Settings, it returns multiple menu items.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {object[]} Items with required data
+	 * @override
 	 */
 	Settings.prototype.getMenuItems = async function(aElementOverlays) {
-		const oElementOverlay = aElementOverlays[0];
-		const oResponsibleElementOverlay = this.getResponsibleElementOverlay(oElementOverlay);
-		const vSettingsActions = this.getAction(oResponsibleElementOverlay);
+		const oResponsibleElementOverlay = this.getResponsibleElementOverlay(aElementOverlays[0]);
+		const oSettingsActions = this.getAction(oResponsibleElementOverlay);
 
 		const aMenuItems = [];
-		if (vSettingsActions) {
+		if (oSettingsActions) {
 			const iRank = this.getRank("CTX_SETTINGS");
-			const aSettingsActions = getValidActions(vSettingsActions, oResponsibleElementOverlay);
+			const aSettingsActions = getValidActions(oSettingsActions, oResponsibleElementOverlay);
 
-			if (this._isEditableByPlugin(oResponsibleElementOverlay) === undefined) {
-				// The responsibleElement editableByPlugin state was not evaluated yet e.g. because it
-				// has no visible geometry, thus evaluateEditable now
-				await this.evaluateEditable([oResponsibleElementOverlay], { onRegistration: false });
-			}
-			aSettingsActions.forEach((oSettingsAction, iIndex, aActions) => {
-				if (
-					this._checkRelevantContainerStableID(oSettingsAction, oResponsibleElementOverlay)
-					&& this.isAvailable([oResponsibleElementOverlay])
-				) {
-					const bSingleAction = aActions.length === 1;
-
-					aMenuItems.push({
-						id: bSingleAction ? sPluginId : sPluginId + iIndex,
-						additionalInfo: this._getAdditionalInfo(oResponsibleElementOverlay, oSettingsAction),
-						rank: bSingleAction ? iRank : iRank + iIndex,
-						text: this.getActionText(oResponsibleElementOverlay, oSettingsAction, sPluginId),
+			let iIndex = 0;
+			for (const oSettingsAction of aSettingsActions) {
+				if (this._checkRelevantContainerStableID(oSettingsAction, oResponsibleElementOverlay)) {
+					const bSingleAction = aSettingsActions.length === 1;
+					aMenuItems.push(await this._getMenuItems(aElementOverlays, {
+						pluginId: bSingleAction ? sPluginId : sPluginId + iIndex,
 						icon: getActionIcon(oSettingsAction),
-						enabled:
-							(typeof oSettingsAction.isEnabled === "function"
-							&& ((aElementOverlays) => oSettingsAction.isEnabled(aElementOverlays[0].getElement())))
-							|| oSettingsAction.isEnabled
-							|| this.isEnabled([oResponsibleElementOverlay]),
-						handler: function(fnHandler, aElementOverlays, mPropertyBag) {
-							mPropertyBag ||= {};
-							mPropertyBag.fnHandler = fnHandler;
-							return this.handler(aElementOverlays, mPropertyBag, oSettingsAction);
-						}.bind(this, oSettingsAction.handler),
+						rank: iRank + iIndex,
+						action: oSettingsAction,
 						submenu: formatSubMenuItems(oSettingsAction.submenu)
-					});
+					}));
+					iIndex++;
 				} else {
 					BaseLog.warning("Action is not available or relevant container has no stable id");
 				}
-			});
+			}
 		}
 
-		return aMenuItems;
+		return aMenuItems.flat();
 	};
 
 	function formatSubMenuItems(aSubMenu) {
@@ -311,8 +269,7 @@ sap.ui.define([
 	}
 
 	/**
-	 * Get the name of the action related to this plugin.
-	 * @returns {string} Action name
+	 * @override
 	 */
 	Settings.prototype.getActionName = function() {
 		return "settings";

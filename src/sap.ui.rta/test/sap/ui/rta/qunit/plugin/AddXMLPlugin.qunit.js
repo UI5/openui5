@@ -193,8 +193,9 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("When the handler function is called and the fragment is returned successfully", function(assert) {
+		QUnit.test("When the handler function is called and the fragment is returned successfully", async function(assert) {
 			const fnDone = assert.async();
+			const aMenuItems = await this.oAddXmlPlugin.getMenuItems([this.oPanelOverlay]);
 			const mPropertyBag = {
 				fragmentHandler: () => {
 					return {
@@ -203,7 +204,8 @@ sap.ui.define([
 						targetAggregation: "content",
 						index: 0
 					};
-				}
+				},
+				menuItem: aMenuItems[0]
 			};
 
 			this.oAddXmlPlugin.attachEventOnce("elementModified", function(oEvent) {
@@ -220,13 +222,14 @@ sap.ui.define([
 			this.oAddXmlPlugin.handler([this.oPanelOverlay], mPropertyBag);
 		});
 
-		QUnit.test("When the handler function is called and the fragment handler and the action is available", function(assert) {
+		QUnit.test("When the handler function is called and the fragment handler and the action is available", async function(assert) {
 			sandbox.stub(this.oAddXmlPlugin, "getAction").returns({
 				excludedAggregations: ["excludedAggregation"]
 			});
 
 			const fnDone = assert.async();
 
+			const aMenuItems = await this.oAddXmlPlugin.getMenuItems([this.oPanelOverlay]);
 			const mPropertyBag = {
 				fragmentHandler: (...aArgs) => {
 					assert.deepEqual(
@@ -245,7 +248,8 @@ sap.ui.define([
 						targetAggregation: "content",
 						index: 0
 					};
-				}
+				},
+				menuItem: aMenuItems[0]
 			};
 
 			this.oAddXmlPlugin.attachEventOnce("elementModified", function(oEvent) {

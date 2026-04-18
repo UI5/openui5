@@ -235,7 +235,7 @@ sap.ui.define([
 					const aTargetSelectedOverlays = [oTargetOverlay];
 					const sText = typeof oMenuItem.text === "function" ? oMenuItem.text(oTargetOverlay) : oMenuItem.text;
 					const bEnabled = typeof oMenuItem.enabled === "function"
-						? oMenuItem.enabled(aTargetSelectedOverlays)
+						? oMenuItem.enabled(aTargetSelectedOverlays, oMenuItem)
 						: oMenuItem.enabled;
 					const oMenuItemInstance = new MenuItem({
 						key: oMenuItem.id,
@@ -272,7 +272,7 @@ sap.ui.define([
 				aMenuItems.forEach(function(oMenuItem, index) {
 					const sText = typeof oMenuItem.text === "function" ? oMenuItem.text(oOverlay) : oMenuItem.text;
 					const bEnabled = typeof oMenuItem.enabled === "function"
-						? oMenuItem.enabled(aTargetSelectedOverlays)
+						? oMenuItem.enabled(aTargetSelectedOverlays, oMenuItem)
 						: oMenuItem.enabled;
 					const oMenuItemInstance = new MenuItem({
 						key: oMenuItem.id,
@@ -462,10 +462,12 @@ sap.ui.define([
 				aSelection = oMenuItem.responsible || this.getSelectedOverlays() || [];
 			}
 			assert(aSelection.length > 0, "sap.ui.rta - Opening context menu, with empty selection - check event order");
-			const mPropertiesBag = {};
-			mPropertiesBag.eventItem = oEventItem;
-			mPropertiesBag.contextElement = this.getContextElement();
-			oMenuItem.handler(aSelection, mPropertiesBag);
+			const mPropertyBag = {
+				menuItem: oMenuItem,
+				eventItem: oEventItem,
+				contextElement: this.getContextElement()
+			};
+			oMenuItem.handler(aSelection, mPropertyBag);
 		}
 
 		const sSelectedItemId = oEventItem.getParameter("item").getKey();

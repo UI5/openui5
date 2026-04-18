@@ -45,9 +45,6 @@ sap.ui.define([
 	});
 
 	/**
-	 * Register browser event for an overlay
-	 *
-	 * @param {sap.ui.dt.Overlay} oOverlay overlay object
 	 * @override
 	 */
 	Remove.prototype.registerElementOverlay = function(...aArgs) {
@@ -59,27 +56,22 @@ sap.ui.define([
 	};
 
 	/**
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
-	 * @return {Promise.<boolean>} <code>true</code> if it's editable wrapped in a promise.
-	 * @private
+	 * @override
 	 */
 	Remove.prototype._isEditable = function(oOverlay) {
 		return this._checkChangeHandlerAndStableId(oOverlay);
 	};
 
 	/**
-	 * Checks if remove is enabled for oOverlay
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {boolean} true if enabled
-	 * @public
+	 * @override
 	 */
-	Remove.prototype.isEnabled = function(aElementOverlays) {
-		var aResponsibleElementOverlays = aElementOverlays.map(function(oElementOverlay) {
-			return this.getResponsibleElementOverlay(oElementOverlay);
-		}.bind(this));
-		var oElementOverlay = aResponsibleElementOverlays[0];
-		var oAction = this.getAction(oElementOverlay);
-		var bIsEnabled = false;
+	Remove.prototype.isEnabled = function(aElementOverlays, oMenuItem) {
+		// this function is also used in registerElementOverlay / deregisterElementOverlay, where no menu item is available
+		const aResponsibleElementOverlays = oMenuItem?.responsible
+			|| aElementOverlays.map((oOverlay) => this.getResponsibleElementOverlay(oOverlay));
+		const oElementOverlay = aResponsibleElementOverlays[0];
+		const oAction = oMenuItem?.action || this.getAction(oElementOverlay);
+		let bIsEnabled = false;
 
 		if (!oAction) {
 			return bIsEnabled;
@@ -212,6 +204,9 @@ sap.ui.define([
 		}
 	};
 
+	/**
+	 * @override
+	 */
 	Remove.prototype.handler = function(aElementOverlays) {
 		var aPromises = [];
 		var oCompositeCommand = new CompositeCommand();
@@ -304,17 +299,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieve the context menu item for the action.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {object[]} - array of the items with required data
+	 * @override
 	 */
 	Remove.prototype.getMenuItems = function(aElementOverlays) {
 		return this._getMenuItems(aElementOverlays, { pluginId: "CTX_REMOVE", icon: "sap-icon://less" });
 	};
 
 	/**
-	 * Get the name of the action related to this plugin.
-	 * @return {string} Returns the action name
+	 * @override
 	 */
 	Remove.prototype.getActionName = function() {
 		return "remove";

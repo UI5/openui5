@@ -89,31 +89,18 @@ sap.ui.define([
 			this.oContainer.destroy();
 		}
 	}, function() {
-		QUnit.test("if the action is not on the control designtime metadata of a column...", function(assert) {
-			this.oColumn0Overlay.setDesignTimeMetadata({
-				actions: {}
-			});
-
-			this.oResizePlugin.registerElementOverlay(this.oColumn0Overlay);
-
-			assert.notOk(this.oResizePlugin.isEnabled([this.oColumn0Overlay]), "then 'isEnabled' returns false");
-			return this.oResizePlugin._isEditable(this.oColumn0Overlay)
-			.then(function(bResult) {
-				assert.notOk(bResult, "then 'isEditable' returns false");
-			});
-		});
-
 		QUnit.test("if the action is disabled on the control designtime metadata of a column...", function(assert) {
-			this.oColumn0Overlay.setDesignTimeMetadata({
-				actions: {
-					resize: {
-						isEnabled: false
-					}
+			const oAction = {
+				resize: {
+					isEnabled: false
 				}
+			};
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: oAction
 			});
 			this.oResizePlugin.registerElementOverlay(this.oColumn0Overlay);
 
-			assert.notOk(this.oResizePlugin.isEnabled([this.oColumn0Overlay]), "then 'isEnabled' returns false");
+			assert.notOk(this.oResizePlugin.isEnabled([this.oColumn0Overlay], { action: oAction.resize }), "then 'isEnabled' returns false");
 		});
 
 		QUnit.test("if the action does not have a valid change handler for a column...", function(assert) {
@@ -179,7 +166,15 @@ sap.ui.define([
 				assert.strictEqual(oStub.callCount, iCallCount, `then on ${sEventName} event the method is called the correct number of times`);
 			}
 
-			sandbox.stub(this.oResizePlugin, "isEnabled").returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 
 			var oCreateHandleStub = sandbox.stub(this.oResizePlugin, "_onOverlayMouseMove");
 			var oOnMouseLeaveStub = sandbox.stub(this.oResizePlugin, "_onOverlayMouseLeave");
@@ -222,7 +217,15 @@ sap.ui.define([
 		QUnit.test("when the mouse is over an enabled and selectable overlay...", function(assert) {
 			this.oColumn0Overlay.setSelectable(true);
 
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 
 			this.oResizePlugin.registerElementOverlay(this.oColumn0Overlay);
 			this.oColumn0OverlayDomElement = this.oColumn0Overlay.getDomRef();
@@ -265,7 +268,15 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the overlay is selected and deselected... ", function(assert) {
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 
 			this.oResizePlugin.registerElementOverlay(this.oColumn0Overlay);
 			this.oColumn0Overlay.setSelectable(true);
@@ -277,7 +288,15 @@ sap.ui.define([
 		});
 
 		QUnit.test("when a selected overlay loses focus and then gets it again... ", function(assert) {
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 
 			this.oResizePlugin.registerElementOverlay(this.oColumn0Overlay);
 			this.oColumn0Overlay.setSelectable(true);
@@ -328,7 +347,15 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when the resize handle is dragged on the column header without any extra functions on DT Metadata... ", function(assert) {
 			var fnDone = assert.async();
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 
 			setDefaultMetadataAndSelectHandle(this.oResizePlugin, this.oColumn0Overlay);
 
@@ -633,7 +660,15 @@ sap.ui.define([
 
 		QUnit.test("when the resize handle is dragged on the column header and there are size limits defined on the designtime metadata... ", function(assert) {
 			var fnDone = assert.async();
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 			var iColumn0OverlayOldWidth = this.oColumn0Overlay.getDomRef().offsetWidth;
 			var iLimitStep = 40;
 			var iMinWidth = iColumn0OverlayOldWidth - iLimitStep;
@@ -708,7 +743,15 @@ sap.ui.define([
 
 		QUnit.test("when the resize handle is dragged on the column header and only maximumWidth is defined on the DesignTime Metadata... ", function(assert) {
 			var fnDone = assert.async();
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 			var iColumn0OverlayOldWidth = this.oColumn0Overlay.getDomRef().offsetWidth;
 			var iMaxWidth = iColumn0OverlayOldWidth + 40;
 
@@ -781,7 +824,15 @@ sap.ui.define([
 
 		QUnit.test("when the resize handle is dragged on the column header and there is a handle extension... ", function(assert) {
 			var fnDone = assert.async();
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 
 			this.oColumn0Overlay.setDesignTimeMetadata({
 				actions: {
@@ -820,7 +871,15 @@ sap.ui.define([
 
 		QUnit.test("when the resize handle is dragged on the column header and the escape key is pressed... ", function(assert) {
 			var fnDone = assert.async();
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 
 			setDefaultMetadataAndSelectHandle(this.oResizePlugin, this.oColumn0Overlay);
 
@@ -849,7 +908,15 @@ sap.ui.define([
 
 		QUnit.test("when the resize is executed using the keyboard (shift + arrow keys)... ", function(assert) {
 			var fnDone = assert.async();
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 			setDefaultMetadataAndSelectHandle(this.oResizePlugin, this.oColumn0Overlay);
 
 			var oOverlayDomElement = this.oColumn0Overlay.getDomRef();
@@ -898,7 +965,15 @@ sap.ui.define([
 
 		QUnit.test("when the arrow keys are pressed without shift key... ", function(assert) {
 			var fnDone = assert.async();
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 			setDefaultMetadataAndSelectHandle(this.oResizePlugin, this.oColumn0Overlay);
 
 			var oOverlayDomElement = this.oColumn0Overlay.getDomRef();
@@ -916,7 +991,15 @@ sap.ui.define([
 
 		QUnit.test("when a double click is done on the handle... ", function(assert) {
 			var fnDone = assert.async();
-			sandbox.stub(this.oResizePlugin, "isEnabled").withArgs([this.oColumn0Overlay]).returns(true);
+			this.oColumn0Overlay.setDesignTimeMetadata({
+				actions: {
+					resize: {
+						handler() {
+							return;
+						}
+					}
+				}
+			});
 
 			var oFinalizeResizeStub = sandbox.stub(this.oResizePlugin, "_finalizeResize");
 			var iDoubleClickWidth = 150;

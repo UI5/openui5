@@ -62,13 +62,13 @@ sap.ui.define([
 	/**
 	 * @override
 	 */
-	LocalReset.prototype.isEnabled = function(aElementOverlays) {
+	LocalReset.prototype.isEnabled = function(aElementOverlays, oMenuItem) {
 		if (aElementOverlays.length !== 1) {
 			return false;
 		}
-		const oElementOverlay = aElementOverlays[0];
+		const oElementOverlay = oMenuItem.responsible?.[0] || aElementOverlays[0];
 		const oElement = oElementOverlay.getElement();
-		const oAction = this.getAction(oElementOverlay);
+		const oAction = oMenuItem.action;
 		if (!oAction) {
 			return false;
 		}
@@ -100,9 +100,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieves the context menu item for the action.
-	 * @param {sap.ui.dt.ElementOverlay|sap.ui.dt.ElementOverlay[]} vElementOverlays - Target overlay(s)
-	 * @return {object[]} Array of the items with required data
+	 * @override
 	 */
 	LocalReset.prototype.getMenuItems = function(vElementOverlays) {
 		return this._getMenuItems(vElementOverlays, {
@@ -113,13 +111,15 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets the name of the action related to this plugin.
-	 * @return {string} Action name
+	 * @override
 	 */
 	LocalReset.prototype.getActionName = function() {
 		return "localReset";
 	};
 
+	/**
+	 * @override
+	 */
 	LocalReset.prototype.handler = function(aOverlays) {
 		const oOverlay = aOverlays[0];
 		const oElement = oOverlay.getElement();

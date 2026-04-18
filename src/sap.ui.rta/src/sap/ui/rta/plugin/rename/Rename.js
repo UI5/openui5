@@ -59,81 +59,23 @@ sap.ui.define([
 		this._oDialog = new RenameDialog();
 	};
 
-	Rename.prototype.startEdit = async function(oOverlay) {
-		const oResponsibleElementOverlay = this.getResponsibleElementOverlay(oOverlay);
-		const oDomRef = this.getAction(oOverlay).domRef;
+	/**
+	 * @override
+	 */
+	Rename.prototype.handler = async function(aElementOverlays, mPropertyBag) {
+		const aSelectedOverlays = this.getSelectedOverlays();
+		const [oOverlay] = aSelectedOverlays?.length > 0 ? aSelectedOverlays : aElementOverlays;
 		const sNewText = await this._oDialog.openDialogAndHandleRename({
 			overlay: oOverlay,
-			domRef: oDomRef,
-			action: this.getAction(oResponsibleElementOverlay)
+			action: mPropertyBag.menuItem.action
 		});
 		if (sNewText) {
 			this.createRenameCommand(oOverlay, sNewText);
 		}
 	};
 
-	Rename.prototype.handler = function(aElementOverlays) {
-		const aSelectedOverlays = this.getSelectedOverlays();
-		const [oOverlay] = aSelectedOverlays?.length > 0 ? aSelectedOverlays : aElementOverlays;
-		this.startEdit(oOverlay);
-	};
-
 	/**
-	 * Checks if rename is available for oOverlay
-	 *
-	 * @param {sap.ui.dt.Overlay} oOverlay overlay object
-	 * @returns {boolean} true if it's editable
-	 * @public
-	 */
-	Rename.prototype.isRenameAvailable = function(oOverlay) {
-		return this._isEditableByPlugin(oOverlay);
-	};
-
-	Rename.prototype.isRenameEnabled = function(aOverlays) {
-		return this.isEnabled(aOverlays);
-	};
-
-	/**
-	 * Checks if rename is enabled for oOverlay
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {boolean} true if it's enabled
-	 * @public
-	 */
-	Rename.prototype.isEnabled = function(aElementOverlays) {
-		if (aElementOverlays.length > 1) {
-			return false;
-		}
-		var oTargetOverlay = aElementOverlays[0];
-		var oResponsibleElementOverlay = this.getResponsibleElementOverlay(oTargetOverlay);
-		var bIsEnabled = true;
-		if (!this.getAction(oResponsibleElementOverlay)) {
-			bIsEnabled = false;
-		}
-
-		var oTargetOverlayAction = this.getAction(oTargetOverlay);
-		if (bIsEnabled && typeof oTargetOverlayAction.isEnabled !== "undefined") {
-			if (typeof oTargetOverlayAction.isEnabled === "function") {
-				bIsEnabled = oTargetOverlayAction.isEnabled(oTargetOverlay.getElement());
-			} else {
-				bIsEnabled = oTargetOverlayAction.isEnabled;
-			}
-		}
-
-		if (bIsEnabled) {
-			var oDesignTimeMetadata = oTargetOverlay.getDesignTimeMetadata();
-			var oAssociatedDomRef = oDesignTimeMetadata.getAssociatedDomRef(oTargetOverlay.getElement(), oTargetOverlayAction.domRef);
-			if (!oAssociatedDomRef) {
-				bIsEnabled = false;
-			}
-		}
-
-		return bIsEnabled;
-	};
-
-	/**
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
-	 * @returns {Promise.<boolean>|booolean} <code>true</code> if it's editable wrapped in a promise.
-	 * @private
+	 * @override
 	 */
 	Rename.prototype._isEditable = function(oOverlay) {
 		return this._checkChangeHandlerAndStableId(oOverlay);
@@ -162,17 +104,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieve the context menu item for the action.
-	 * @param {sap.ui.dt.ElementOverlay|sap.ui.dt.ElementOverlay[]} vElementOverlays - Target overlay(s)
-	 * @return {object[]} - array of the items with required data
+	 * @override
 	 */
 	Rename.prototype.getMenuItems = function(vElementOverlays) {
 		return this._getMenuItems(vElementOverlays, { pluginId: "CTX_RENAME", icon: "sap-icon://edit" });
 	};
 
 	/**
-	 * Get the name of the action related to this plugin.
-	 * @return {string} Returns the action name
+	 * @override
 	 */
 	Rename.prototype.getActionName = function() {
 		return "rename";

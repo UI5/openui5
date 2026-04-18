@@ -45,6 +45,11 @@ sap.ui.define([
 	const sandbox = sinon.createSandbox();
 	const oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon);
 
+	async function getMenuEntryAndCallHandler(oOverlay) {
+		const oMenuItem = (await this.oPlugin.getMenuItems([oOverlay]))[0];
+		return oMenuItem.handler([oOverlay], { menuItem: oMenuItem });
+	}
+
 	// PseudoPublicParent (VerticalLayout)
 	// 	oBar (Bar)
 	//  	contentLeft
@@ -108,7 +113,7 @@ sap.ui.define([
 			sandbox.stub(this.oDialog, "open").returns(Promise.reject(new CancelError()));
 			this.oDialogSetElementsSpy = sandbox.spy(this.oDialog, "setElements");
 
-			return this.oPlugin.showAvailableElements(false, "contentLeft", [this.oBarOverlay])
+			return getMenuEntryAndCallHandler.call(this, this.oBarOverlay)
 			.then(function() {
 				assert.equal(
 					this.oDialogSetElementsSpy.args[0][0].length,
@@ -132,7 +137,7 @@ sap.ui.define([
 			sandbox.stub(this.oDialog, "open").returns(Promise.reject(new CancelError()));
 			this.oDialogSetElementsSpy = sandbox.spy(this.oDialog, "setElements");
 
-			return this.oPlugin.showAvailableElements(true, "contentLeft", [this.oVisibleLeftButtonOverlay])
+			return getMenuEntryAndCallHandler.call(this, this.oVisibleLeftButtonOverlay)
 			.then(function() {
 				assert.equal(
 					this.oDialogSetElementsSpy.args[0][0].length,
@@ -157,7 +162,7 @@ sap.ui.define([
 			this.oDialogSetElementsSpy = sandbox.spy(this.oDialog, "setElements");
 			this.oVisibleMiddleButton1Overlay = OverlayRegistry.getOverlay(this.oVisibleMiddleButton1);
 
-			return this.oPlugin.showAvailableElements(true, "contentMiddle", [this.oVisibleMiddleButton1Overlay])
+			return getMenuEntryAndCallHandler.call(this, this.oVisibleMiddleButton1Overlay)
 			.then(function() {
 				assert.equal(
 					this.oDialogSetElementsSpy.args[0][0].length,
@@ -208,7 +213,7 @@ sap.ui.define([
 				});
 				this.oInvisibleLeftButton.setVisible(bVisibility);
 				await Promise.all([oDTSyncedPromise, oEvaluateEditablePromise]);
-				await this.oPlugin.showAvailableElements(true, "contentLeft", [this.oVisibleLeftButtonOverlay]);
+				await getMenuEntryAndCallHandler.call(this, this.oVisibleLeftButtonOverlay);
 				assert.equal(
 					this.oDialogSetElementsSpy.args[iCallNumber][0].length,
 					iExpectedElements,
@@ -252,7 +257,7 @@ sap.ui.define([
 
 			this.oPlugin.attachEventOnce("elementModified", executeAssertions);
 
-			return this.oPlugin.showAvailableElements(false, "contentLeft", [this.oBarOverlay]);
+			return getMenuEntryAndCallHandler.call(this, this.oBarOverlay);
 		});
 
 		QUnit.test("when adding the InvisibleRightButton to the contentLeft aggregation clicking on an element of the aggregation", function(assert) {
@@ -287,7 +292,7 @@ sap.ui.define([
 
 			this.oPlugin.attachEventOnce("elementModified", executeAssertions);
 
-			return this.oPlugin.showAvailableElements(true, "contentLeft", [this.oVisibleLeftButtonOverlay]);
+			return getMenuEntryAndCallHandler.call(this, this.oVisibleLeftButtonOverlay);
 		});
 
 		QUnit.test("when getting the available elements for the contentRight aggregation and this aggregation is not valid for the middle button which was made invisible", async function(assert) {
@@ -309,7 +314,7 @@ sap.ui.define([
 
 			await nextUIUpdate();
 			this.oDesignTime.attachEventOnce("synced", function() {
-				this.oPlugin.showAvailableElements(true, "contentRight", [this.oVisibleRightButtonOverlay])
+				getMenuEntryAndCallHandler.call(this, this.oVisibleRightButtonOverlay)
 				.then(function() {
 					assert.ok(bWasCalled, "isValidForAggregation is called");
 					assert.equal(this.oDialogSetElementsSpy.args[0][0].length, 2, "then two elements are returned");
@@ -338,12 +343,12 @@ sap.ui.define([
 				plural: "DUMMY_PLURAL_KEY"
 			};
 			oDTMetadataData.aggregations.contentMiddle.displayName = {
-				singular: () => {return "Middle";},
-				plural: () => {return "Middle Elements";}
+				singular: () => "Middle",
+				plural: () => "Middle Elements"
 			};
 			oDTMetadataData.aggregations.contentRight.displayName = {
-				singular: "Right",
-				plural: "Right Elements"
+				singular: () => "Right",
+				plural: () => "Right Elements"
 			};
 			const oGetLibraryTextStub = sandbox.stub(oDTMetadata, "getLibraryText").callsFake((...aArgs) => {
 				if (aArgs[1] === "DUMMY_PLURAL_KEY") {
@@ -353,48 +358,6 @@ sap.ui.define([
 				return undefined;
 			});
 			sandbox.stub(this.oBarOverlay, "getDesignTimeMetadata").returns(oDTMetadata);
-
-			const aMenuItems = await this.oPlugin.getMenuItems([this.oBarOverlay]);
-			const aSubMenuItems = aMenuItems[0].submenu;
-
-			assert.strictEqual(aSubMenuItems[0].text, "Left Elements", "then the correct text is displayed for the left aggregation");
-			assert.strictEqual(aSubMenuItems[1].text, "Middle Elements", "then the correct text is displayed for the middle aggregation");
-			assert.strictEqual(aSubMenuItems[2].text, "Right Elements", "then the correct text is displayed for the right aggregation");
-		});
-
-		QUnit.test("when opening the context menu for the aggregations on the Bar and there is a responsible element", async function(assert) {
-			const oVerticalLayoutOverlay = OverlayRegistry.getOverlay(this.oPseudoPublicParent);
-			const oDTMetadata = oVerticalLayoutOverlay.getDesignTimeMetadata();
-			const oDTMetadataData = oDTMetadata.getData();
-			oDTMetadataData.aggregations = {
-				contentLeft: {
-					displayName: {
-						singular: "DUMMY_SINGULAR_KEY",
-						plural: "DUMMY_PLURAL_KEY"
-					}
-				},
-				contentMiddle: {
-					displayName: {
-						singular: () => {return "Middle";},
-						plural: () => {return "Middle Elements";}
-					}
-				},
-				contentRight: {
-					displayName: {
-						singular: "Right",
-						plural: "Right Elements"
-					}
-				}
-			};
-			const oGetLibraryTextStub = sandbox.stub(oDTMetadata, "getLibraryText").callsFake((...aArgs) => {
-				if (aArgs[1] === "DUMMY_PLURAL_KEY") {
-					oGetLibraryTextStub.restore();
-					return "Left Elements";
-				}
-				return undefined;
-			});
-			sandbox.stub(oVerticalLayoutOverlay, "getDesignTimeMetadata").returns(oDTMetadata);
-			sandbox.stub(this.oPlugin, "getResponsibleElementOverlay").returns(oVerticalLayoutOverlay);
 
 			const aMenuItems = await this.oPlugin.getMenuItems([this.oBarOverlay]);
 			const aSubMenuItems = aMenuItems[0].submenu;

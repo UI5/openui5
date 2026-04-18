@@ -94,12 +94,7 @@ sap.ui.define([
 	AddXMLAtExtensionPoint.prototype.bManifestCommandAlreadyAvailable = false;
 
 	/**
-	 * Check if the given overlay is editable. A stable ID is not required for this,
-	 * as this is also not the case with the old extension points.
-	 *
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
-	 * @returns {Promise.<boolean>} <code>true</code> when editable wrapped in a promise
-	 * @private
+	 * @override
 	 */
 	AddXMLAtExtensionPoint.prototype._isEditable = async function(oOverlay) {
 		if (isDesignMode()) {
@@ -111,10 +106,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if AddXMLAtExtensionPoint is enabled for oOverlay
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {boolean} <code>true</code> if enabled
-	 * @public
+	 * @override
 	 */
 	AddXMLAtExtensionPoint.prototype.isEnabled = function(aElementOverlays) {
 		const bEnabled = aElementOverlays.length === 1;
@@ -188,11 +180,7 @@ sap.ui.define([
 	}
 
 	/**
-	 * Triggers the plugin execution.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @param {Object} mPropertyBag - Property bag
-	 * @param {sap.ui.rta.plugin.AddXMLAtExtensionPoint.fragmentHandler} [mPropertyBag.fragmentHandler] - Handler function for fragment handling. The fragment handler is a callback function that needs to be passed here into the <code>propertyBag</code> or alternatively on instantiation of the plugin.
-	 * @returns {Promise} Resolves when handler is executed successfully
+	 * @override
 	 */
 	AddXMLAtExtensionPoint.prototype.handler = async function(aElementOverlays, mPropertyBag) {
 		try {
@@ -227,9 +215,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieves the context menu item for the action.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {object[]} Items with required data
+	 * @override
 	 */
 	AddXMLAtExtensionPoint.prototype.getMenuItems = function(aElementOverlays) {
 		return this._getMenuItems(aElementOverlays, {
@@ -239,16 +225,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets the name of the action related to this plugin.
-	 * @returns {string} Action name
+	 * @override
 	 */
 	AddXMLAtExtensionPoint.prototype.getActionName = function() {
 		return "AddXMLAtExtensionPoint";
 	};
 
 	/**
-	 * Retrieves the action data for addXMLAtExtensionPoint.
-	 * @returns {object} Object with the action data
+	 * @override
 	 */
 	AddXMLAtExtensionPoint.prototype.getAction = function() {
 		return { changeType: FLEX_CHANGE_TYPE };

@@ -212,8 +212,8 @@ sap.ui.define([
 			);
 			assert.strictEqual(
 				this.oSplitPlugin.isEnabled([this.oButton2Overlay]),
-				false,
-				"isEnabled is called and returns false"
+				true,
+				"isEnabled is called and returns true"
 			);
 		});
 
@@ -242,8 +242,8 @@ sap.ui.define([
 			);
 			assert.strictEqual(
 				this.oSplitPlugin.isEnabled([this.oButton2Overlay]),
-				false,
-				"isEnabled is called and returns false"
+				true,
+				"isEnabled is called and returns true"
 			);
 		});
 
@@ -266,11 +266,10 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("when handleSplit is called", function(assert) {
+		QUnit.test("when handler is called", async function(assert) {
 			sandbox.stub(ChangesWriteAPI, "create").resolves({});
 			var oStub1 = sandbox.stub();
-			var oStub2 = oStub1
-			.withArgs(
+			var oStub2 = oStub1.withArgs(
 				sinon.match(function(oEvent) {
 					var oSplitCommand = oEvent.getParameter("command");
 					return oSplitCommand.getNewElementIds().length === this.oPanel.getContent().length;
@@ -282,15 +281,11 @@ sap.ui.define([
 
 			this.oSplitPlugin.deregisterElementOverlay(this.oButton1Overlay);
 			this.oSplitPlugin.registerElementOverlay(this.oButton1Overlay);
+			sandbox.stub(this.oSplitPlugin, "isAvailable").returns(true);
 
-			return this.oSplitPlugin.handleSplit(this.oButton1Overlay)
-
-			.then(function() {
-				assert.strictEqual(oStub2.callCount, 1, "fireElementModified is called once with correct arguments");
-			})
-			.catch(function(oError) {
-				assert.ok(false, `catch must never be called - Error: ${oError}`);
-			});
+			const aMenuItem = await this.oSplitPlugin.getMenuItems([this.oButton1Overlay]);
+			await this.oSplitPlugin.handler([this.oButton1Overlay], { menuItem: aMenuItem[0] });
+			assert.strictEqual(oStub2.callCount, 1, "fireElementModified is called once with correct arguments");
 		});
 
 		QUnit.test("when an overlay has a split action designTime metadata", function(assert) {
@@ -333,11 +328,11 @@ sap.ui.define([
 				);
 				return bIsAvailable;
 			}.bind(this));
-			sandbox.stub(this.oSplitPlugin, "handleSplit").callsFake(function(oElementOverlay) {
+			sandbox.stub(this.oSplitPlugin, "handler").callsFake(function(aElementOverlays) {
 				assert.deepEqual(
-					oElementOverlay.getId(),
+					aElementOverlays[0].getId(),
 					this.oButton1Overlay.getId(),
-					"the 'handleSplit' method is called with the right overlay");
+					"the 'handler' method is called with the right overlay");
 			}.bind(this));
 			sandbox.stub(this.oSplitPlugin, "isEnabled").callsFake(function(aElementOverlays) {
 				assert.equal(
@@ -350,8 +345,8 @@ sap.ui.define([
 			const aMenuItems = await this.oSplitPlugin.getMenuItems([this.oButton1Overlay]);
 			assert.equal(aMenuItems[0].id, "CTX_UNGROUP_FIELDS", "'getMenuItems' returns the context menu item for the plugin");
 
-			aMenuItems[0].handler([this.oButton1Overlay], { contextElement: this.oButton1 });
-			aMenuItems[0].enabled([this.oButton1Overlay]);
+			aMenuItems[0].handler([this.oButton1Overlay], { contextElement: this.oButton1, menuItem: aMenuItems[0] });
+			aMenuItems[0].enabled([this.oButton1Overlay], aMenuItems[0]);
 
 			bIsAvailable = false;
 			assert.equal(

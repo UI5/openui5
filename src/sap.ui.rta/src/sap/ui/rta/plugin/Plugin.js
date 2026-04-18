@@ -449,8 +449,8 @@ sap.ui.define([
 		}
 	};
 
-	BasePlugin.prototype.isAvailable = function(aElementOverlays) {
-		return aElementOverlays.every((oElementOverlay) => this._isEditableByPlugin(oElementOverlay));
+	BasePlugin.prototype.isAvailable = function(aElementOverlays, oAction, bOverlayIsSibling) {
+		return aElementOverlays.every((oElementOverlay) => this._isEditableByPlugin(oElementOverlay, bOverlayIsSibling));
 	};
 
 	BasePlugin.prototype._checkRelevantContainerStableID = function(oAction, oElementOverlay) {

@@ -113,9 +113,6 @@ sap.ui.define([
 					this.oSettingsPlugin.isAvailable([oButtonOverlay]), false, "... then isAvailable is called, then it returns false"
 				);
 				assert.strictEqual(
-					this.oSettingsPlugin.isEnabled([oButtonOverlay]), false, "... then isEnabled is called, then it returns false"
-				);
-				assert.strictEqual(
 					this.oSettingsPlugin._isEditable(oButtonOverlay), false, "then the overlay is not editable"
 				);
 
@@ -150,9 +147,6 @@ sap.ui.define([
 
 				assert.strictEqual(
 					this.oSettingsPlugin.isAvailable([oButtonOverlay]), true, "... then isAvailable is called, then it returns true"
-				);
-				assert.strictEqual(
-					this.oSettingsPlugin.isEnabled([oButtonOverlay]), true, "... then isEnabled is called, then it returns true"
 				);
 				assert.strictEqual(this.oSettingsPlugin._isEditable(oButtonOverlay), true, "then the overlay is editable");
 
@@ -195,9 +189,6 @@ sap.ui.define([
 				assert.strictEqual(
 					this.oSettingsPlugin.isAvailable([oButtonOverlay]), true, "... then isAvailable is called, then it returns true"
 				);
-				assert.strictEqual(
-					this.oSettingsPlugin.isEnabled([oButtonOverlay]), true, "... then isEnabled is called, then it returns true"
-				);
 				assert.strictEqual(this.oSettingsPlugin._isEditable(oButtonOverlay), true, "then the overlay is editable");
 
 				this.oDesignTime.destroy();
@@ -233,11 +224,12 @@ sap.ui.define([
 				assert.strictEqual(
 					this.oSettingsPlugin.isAvailable([oButtonOverlay]), true, "... then isAvailable is called, then it returns true"
 				);
-				assert.strictEqual(
-					this.oSettingsPlugin.isEnabled([oButtonOverlay]), false, "... then isEnabled is called, then it returns correct value"
-				);
 				assert.strictEqual(this.oSettingsPlugin._isEditable(oButtonOverlay), true, "then the overlay is editable");
 				const oMenuItems = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
+				assert.strictEqual(
+					this.oSettingsPlugin.isEnabled([oButtonOverlay], oMenuItems[0]), false,
+					"... then isEnabled is called, then it returns correct value"
+				);
 				assert.strictEqual(oMenuItems[0].icon, sDefaultSettingsIcon, "then the correct icon parameter is set");
 				this.oDesignTime.destroy();
 				fnDone();
@@ -273,9 +265,6 @@ sap.ui.define([
 				assert.strictEqual(
 					this.oSettingsPlugin.isAvailable([oButtonOverlay]), false, "... then isAvailable is called, then it returns false"
 				);
-				assert.strictEqual(
-					this.oSettingsPlugin.isEnabled([oButtonOverlay]), false, "... then isEnabled is called, then it returns false"
-				);
 				assert.strictEqual(this.oSettingsPlugin._isEditable(oButtonOverlay), false, "then the overlay is not editable");
 
 				assert.ok(oWarningStub.called, "then warnings are logged");
@@ -306,12 +295,13 @@ sap.ui.define([
 				}
 			});
 
-			this.oDesignTime.attachEventOnce("synced", function() {
+			this.oDesignTime.attachEventOnce("synced", async function() {
 				const oButtonOverlay = OverlayRegistry.getOverlay(this.oButton);
 				this.oSettingsPlugin.deregisterElementOverlay(oButtonOverlay);
 				this.oSettingsPlugin.registerElementOverlay(oButtonOverlay);
+				const oMenuItems = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
 				assert.strictEqual(
-					this.oSettingsPlugin.isEnabled([oButtonOverlay]),
+					this.oSettingsPlugin.isEnabled([oButtonOverlay], oMenuItems[0]),
 					false,
 					"... then isEnabled is called, then it returns correct value from function call"
 				);
@@ -351,11 +341,12 @@ sap.ui.define([
 				assert.strictEqual(
 					this.oSettingsPlugin.isAvailable([oButtonOverlay]), true, "... then isAvailable is called, then it returns true"
 				);
-				assert.strictEqual(
-					this.oSettingsPlugin.isEnabled([oButtonOverlay]), true, "... then isEnabled is called, then it returns correct value"
-				);
 				assert.strictEqual(this.oSettingsPlugin._isEditable(oButtonOverlay), true, "then the overlay is editable");
 				const oMenuItems = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
+				assert.strictEqual(
+					this.oSettingsPlugin.isEnabled([oButtonOverlay], oMenuItems[0]), true,
+					"... then isEnabled is called, then it returns correct value"
+				);
 				assert.strictEqual(oMenuItems[0].icon, sIcon, "then the correct icon parameter is set");
 
 				this.oDesignTime.destroy();
@@ -363,7 +354,7 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("when the handle settings function is called and the handler returns a change object,", function(assert) {
+		QUnit.test("when the handle settings function is called and the handler returns a change object,", async function(assert) {
 			const done = assert.async();
 			const oSettingsChange = {
 				selectorElement: this.oButton,
@@ -397,10 +388,11 @@ sap.ui.define([
 				assert.ok(oSettingsCommand, "... which contains a settings command");
 				done();
 			});
-			return this.oSettingsPlugin.handler(aSelectedOverlays, { eventItem: {}, contextElement: this.oButton }, {});
+			const oMenuItems = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
+			return this.oSettingsPlugin.handler(aSelectedOverlays, { menuItem: oMenuItems[0], contextElement: this.oButton });
 		});
 
-		QUnit.test("when the handle settings function is called and the handler returns a an empty change object,", function(assert) {
+		QUnit.test("when the handle settings function is called and the handler returns a an empty change object,", async function(assert) {
 			const oButtonOverlay = createOverlayWithSettingsAction(this.oButton, {
 				isEnabled: true,
 				handler() {
@@ -415,7 +407,8 @@ sap.ui.define([
 			const oFireEventSpy = sandbox.spy(this.oSettingsPlugin, "fireElementModified");
 			const aSelectedOverlays = [oButtonOverlay];
 
-			return this.oSettingsPlugin.handler(aSelectedOverlays, { eventItem: {}, contextElement: this.oButton })
+			const oMenuItems = await this.oSettingsPlugin.getMenuItems(aSelectedOverlays);
+			return this.oSettingsPlugin.handler(aSelectedOverlays, { menuItem: oMenuItems[0], contextElement: this.oButton })
 
 			.then(function() {
 				assert.strictEqual(oGetCommandForSpy.callCount, 0, "then commandFactory.getCommandFor function is not called");
@@ -433,13 +426,13 @@ sap.ui.define([
 			const aSelectedOverlays = [oButtonOverlay];
 
 			try {
-				await this.oSettingsPlugin.handler(aSelectedOverlays, { eventItem: {}, contextElement: this.oButton });
+				await this.oSettingsPlugin.handler(aSelectedOverlays, { menuItem: { action: {} }, contextElement: this.oButton });
 			} catch (oError) {
 				assert.strictEqual(oError.message, "Handler not found for settings action", "the correct error is thrown");
 			}
 		});
 
-		QUnit.test("when the handle settings function is called and the handler returns a rejected promise with error object,", function(assert) {
+		QUnit.test("when the handle settings function is called and the handler returns a rejected promise with error object,", async function(assert) {
 			const oButtonOverlay = createOverlayWithSettingsAction(this.oButton, {
 				isEnabled: true,
 				handler() {
@@ -451,7 +444,8 @@ sap.ui.define([
 
 			const aSelectedOverlays = [oButtonOverlay];
 
-			return this.oSettingsPlugin.handler(aSelectedOverlays, { eventItem: {}, contextElement: this.oButton })
+			const oMenuItems = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
+			return this.oSettingsPlugin.handler(aSelectedOverlays, { menuItem: oMenuItems[0], contextElement: this.oButton })
 
 			.catch(function() {
 				assert.notOk(this.oSettingsCommand, "... command is not created");
@@ -463,7 +457,7 @@ sap.ui.define([
 			if (bVariantIndependent) {
 				sMessage += " and variantIndependent is set";
 			}
-			QUnit.test(sMessage, function(assert) {
+			QUnit.test(sMessage, async function(assert) {
 				const done = assert.async();
 				const oSettingsChange = {
 					selectorElement: this.oButton,
@@ -479,7 +473,9 @@ sap.ui.define([
 						return new Promise(function(resolve) {
 							resolve([oSettingsChange]);
 						});
-					}
+					},
+					// eslint-disable-next-line camelcase
+					CAUTION_variantIndependent: bVariantIndependent
 				});
 				// this mix-in would normally be done by the ControlVariant plugin
 				oButtonOverlay.getVariantManagement = function() {
@@ -510,11 +506,10 @@ sap.ui.define([
 					}
 					done();
 				});
+				const oMenuItems = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
 				return this.oSettingsPlugin.handler(
 					aSelectedOverlays,
-					{ eventItem: {}, contextElement: this.oButton },
-					// eslint-disable-next-line camelcase
-					{ CAUTION_variantIndependent: bVariantIndependent }
+					{ menuItem: oMenuItems[0], eventItem: {}, contextElement: this.oButton }
 				);
 			});
 		});
@@ -576,7 +571,7 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("when the handle settings function is called and the handler returns a change object with a manifest change,", function(assert) {
+		QUnit.test("when the handle settings function is called and the handler returns a change object with a manifest change,", async function(assert) {
 			const done = assert.async();
 			const mManifestChange = {
 				appComponent: oMockedAppComponent,
@@ -627,10 +622,11 @@ sap.ui.define([
 
 				done();
 			});
-			return this.oSettingsPlugin.handler([oButtonOverlay], { eventItem: {}, contextElement: this.oButton });
+			const oMenuItem = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
+			return this.oSettingsPlugin.handler([oButtonOverlay], { menuItem: oMenuItem[0], contextElement: this.oButton });
 		});
 
-		QUnit.test("when the handle settings function is called and the handler returns a change object with a manifest change and a flex change,", function(assert) {
+		QUnit.test("when the handle settings function is called and the handler returns a change object with a manifest change and a flex change,", async function(assert) {
 			const done = assert.async();
 			const mManifestChange = {
 				appComponent: oMockedAppComponent,
@@ -698,7 +694,8 @@ sap.ui.define([
 				assert.strictEqual(oFlexCommand.getContent(), mSettingsChange.changeSpecificData.content, "with the correct parameters");
 				done();
 			});
-			return this.oSettingsPlugin.handler([oButtonOverlay], { eventItem: {}, contextElement: this.oButton }, {});
+			const oMenuItem = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
+			return this.oSettingsPlugin.handler([oButtonOverlay], { menuItem: oMenuItem[0], contextElement: this.oButton }, {});
 		});
 
 		QUnit.test("when retrieving the context menu item for single 'settings' action", async function(assert) {
@@ -876,12 +873,12 @@ sap.ui.define([
 			assert.strictEqual(aMenuItems[0].id, "CTX_SETTINGS0", "'getMenuItems' returns the context menu item for action 1");
 			assert.strictEqual(aMenuItems[0].rank, 110, "'getMenuItems' returns the correct item rank for action 1");
 			assert.strictEqual(aMenuItems[0].icon, sDefaultSettingsIcon, "'getMenuItems' returns the default item icon for action 1");
-			aMenuItems[0].handler([oButtonOverlay]);
+			aMenuItems[0].handler([oButtonOverlay], { menuItem: aMenuItems[0], contextElement: this.oButton });
 			assert.strictEqual(aMenuItems[1].id, "CTX_SETTINGS1", "'getMenuItems' returns the context menu item for action 2");
 			assert.strictEqual(aMenuItems[1].text, "Action 2 Name", "'getMenuItems' returns the correct item text for action 2");
 			assert.strictEqual(aMenuItems[1].rank, 111, "'getMenuItems' returns the correct item rank for action 2");
 			assert.strictEqual(aMenuItems[1].icon, sDefaultSettingsIcon, "'getMenuItems' returns the default item icon for action 2");
-			aMenuItems[1].handler([oButtonOverlay]);
+			aMenuItems[1].handler([oButtonOverlay], { menuItem: aMenuItems[1], contextElement: this.oButton });
 		});
 
 		QUnit.test("when retrieving the context menu items and executing two 'settings' actions, one without handler and one defined as a function in the Designtime Metadata", async function(assert) {
@@ -936,7 +933,7 @@ sap.ui.define([
 			assert.strictEqual(aMenuItems[0].rank, 110, "'getMenuItems' returns the correct item rank for action 2");
 			assert.strictEqual(aMenuItems[0].icon, sDefaultSettingsIcon, "'getMenuItems' returns the default item icon for action 2");
 			assert.ok(oWarningStub.calledWith("Handler not found for settings action"), "then a warning is logged for action 1");
-			aMenuItems[0].handler([oButtonOverlay]);
+			aMenuItems[0].handler([oButtonOverlay], { menuItem: aMenuItems[0], contextElement: this.oButton });
 		});
 
 		QUnit.test("when retrieving the context menu items for two 'settings' actions, but one does not have a handler", async function(assert) {
@@ -977,7 +974,7 @@ sap.ui.define([
 			const aMenuItems = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
 			assert.strictEqual(aMenuItems[0].id, "CTX_SETTINGS", "'getMenuItems' returns the context menu item for action 1");
 			assert.strictEqual(aMenuItems[0].rank, 110, "'getMenuItems' returns the correct item rank for action 1");
-			aMenuItems[0].handler([oButtonOverlay]);
+			aMenuItems[0].handler([oButtonOverlay], { menuItem: aMenuItems[0], contextElement: this.oButton });
 			assert.strictEqual(aMenuItems.length, 1, "'getMenuItems' only returns menu item for actions with handlers");
 			assert.ok(oWarningStub.called, "then there are warnings in the log that the handler was not found for action 2");
 		});
@@ -1083,9 +1080,9 @@ sap.ui.define([
 
 			const aMenuItems = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
 			assert.strictEqual(aMenuItems[0].text, "CTX_ACTION1", "'getMenuItems' returns the context menu item for action 1");
-			assert.strictEqual(aMenuItems[0].enabled, true, "and it is enabled");
+			assert.strictEqual(aMenuItems[0].enabled([oButtonOverlay], aMenuItems[0]), true, "and it is enabled");
 			assert.strictEqual(aMenuItems[1].text, "CTX_ACTION2", "'getMenuItems' returns the context menu item for action 2");
-			assert.strictEqual(aMenuItems[1].enabled([oButtonOverlay]), false, "and it is disabled");
+			assert.strictEqual(aMenuItems[1].enabled([oButtonOverlay], aMenuItems[1]), false, "and it is disabled");
 		});
 
 		QUnit.test("when retrieving the context menu items and executing two 'settings' actions with different icon settings", async function(assert) {
@@ -1138,13 +1135,13 @@ sap.ui.define([
 			assert.strictEqual(aMenuItems[0].rank, 110, "'getMenuItems' returns the correct item rank for action 1");
 			assert.strictEqual(aMenuItems[0].icon, sIconAction1, "'getMenuItems' returns the correct item icon for action 1");
 			assert.strictEqual(aMenuItems[0].additionalInfo, "Additional Info", "then the menu item additional info is correct");
-			aMenuItems[0].handler([oButtonOverlay]);
+			aMenuItems[0].handler([oButtonOverlay], { menuItem: aMenuItems[0], contextElement: this.oButton });
 			assert.strictEqual(aMenuItems[1].id, "CTX_SETTINGS1", "'getMenuItems' returns the context menu item for action 2");
 			assert.strictEqual(aMenuItems[1].text, "Action 2 Name", "'getMenuItems' returns the correct item text for action 2");
 			assert.strictEqual(aMenuItems[1].rank, 111, "'getMenuItems' returns the correct item rank for action 2");
 			assert.strictEqual(aMenuItems[1].icon, sDefaultSettingsIcon, "'getMenuItems' returns the default item icon for action 2");
 			assert.strictEqual(aMenuItems[1].additionalInfo, undefined, "then the menu item additional info not available");
-			aMenuItems[1].handler([oButtonOverlay]);
+			aMenuItems[1].handler([oButtonOverlay], { menuItem: aMenuItems[1], contextElement: this.oButton });
 			assert.strictEqual(aMenuItems[2].id, "CTX_SETTINGS2", "'getMenuItems' returns the context menu item for action 3");
 			assert.strictEqual(aMenuItems[2].text, "Action 3 Name", "'getMenuItems' returns the correct item text for action 3");
 			assert.strictEqual(aMenuItems[2].rank, 112, "'getMenuItems' returns the correct item rank for action 3");
@@ -1155,7 +1152,7 @@ sap.ui.define([
 				"Icon setting for settingsAction should be a string",
 				"'getMenuItems' cause the correct error message for action 3"
 			);
-			aMenuItems[2].handler([oButtonOverlay]);
+			aMenuItems[2].handler([oButtonOverlay], { menuItem: aMenuItems[2], contextElement: this.oButton });
 		});
 	});
 

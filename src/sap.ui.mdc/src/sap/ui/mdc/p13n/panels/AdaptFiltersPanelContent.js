@@ -27,12 +27,14 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/m/ToggleButton",
 	"sap/ui/core/InvisibleText",
+	"sap/ui/core/InvisibleMessage",
 	"sap/ui/Device",
 	"sap/ui/layout/VerticalLayout"
-], (Library, JSONModel, QueryPanel, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, Filter, Item, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, Button, ToggleButton, InvisibleText, Device, VerticalLayout) => {
+], (Library, JSONModel, QueryPanel, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, Filter, Item, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, Button, ToggleButton, InvisibleText, InvisibleMessage, Device, VerticalLayout) => {
 	"use strict";
 
 	const { ValueState } = coreLib;
+	const { InvisibleMessageMode } = coreLib;
 
 	const AdaptFiltersPanelContent = QueryPanel.extend("sap.ui.mdc.p13n.panels.AdaptFiltersPanelContent", {
 		metadata: {
@@ -71,6 +73,8 @@ sap.ui.define([
 			selectedKey: sDefaultView
 		});
 		this.setModel(this._oViewModel, this.CONTROL_MODEL);
+
+		this.oInvisibleMessage = InvisibleMessage.getInstance();
 	};
 
 	AdaptFiltersPanelContent.prototype.setP13nData = function(aP13nData) {
@@ -666,9 +670,9 @@ sap.ui.define([
 			oLabel.setLabelFor(oFilterControl);
 		}
 
-		const oDeleteButton = this._createDeleteAction();
+		const oDeleteButton = this._createDeleteAction(oLabel);
 		const oSortButton = this._createSortAction();
-		const oVisibleButton = this._createVisibilityAction(oContext);
+		const oVisibleButton = this._createVisibilityAction(oContext, oLabel);
 
 		const oActionContainer = new Grid({
 			containerQuery: true,
@@ -703,14 +707,16 @@ sap.ui.define([
 
 	/**
 	 * Creates the delete action button
+	 * @param {sap.m.Label} oLabel The label to associate with the button via ariaLabelledBy
 	 * @returns {sap.m.Button} delete button
 	 * @private
 	 */
-	AdaptFiltersPanelContent.prototype._createDeleteAction = function() {
-		return new Button({
+	AdaptFiltersPanelContent.prototype._createDeleteAction = function(oLabel) {
+		const oButton = new Button({
 			icon: "sap-icon://decline",
 			type: "Transparent",
 			tooltip: this._getResourceText("adaptFiltersPanel.ACTION_DELETE"),
+			ariaLabelledBy: oLabel,
 			visible: {
 				parts: [
 					`${this.P13N_MODEL}>${this.PRESENCE_ATTRIBUTE}`,
@@ -729,6 +735,8 @@ sap.ui.define([
 				this._updateAddFilterVisibility();
 			}
 		});
+
+		return oButton;
 	};
 
 	/**
@@ -753,7 +761,7 @@ sap.ui.define([
 		}).addStyleClass("sapUiMDCAdaptFiltersContentSortIcon");
 	};
 
-	AdaptFiltersPanelContent.prototype._createVisibilityAction = function(oContext) {
+	AdaptFiltersPanelContent.prototype._createVisibilityAction = function(oContext, oLabel) {
 		const oFilterField = this._getFilterFieldFromItem(oContext);
 		const oItem = oContext.getObject();
 		const bHasConditions = oFilterField?.isA("sap.ui.mdc.FilterField") ? oFilterField.getConditions().length != 0 : oFilterField?._bHasConditions;
@@ -775,19 +783,30 @@ sap.ui.define([
 						: this._getResourceText("adaptFiltersPanel.ACTION_VISIBILITY_HIDE");
 				}
 			},
+			ariaLabelledBy: oLabel,
 			press: (oEvent) => {
 				const oButton = oEvent.getSource();
 				const oListItem = this._getListItemFromControl(oButton);
 				const oContext = oListItem.getBindingContext(this.P13N_MODEL);
 				const sKey = _getKeyFromContext(oContext);
+				const sLabel = oContext.getObject().label;
 				const oItem = this.getP13nData().find((oItem) => oItem.name === sKey);
 				oItem.visible = !oListItem.getBindingContext(this.P13N_MODEL).getProperty(this.PRESENCE_ATTRIBUTE);
 
 				const bCurrentlyVisible = oListItem.getBindingContext(this.P13N_MODEL).getProperty(this.PRESENCE_ATTRIBUTE);
-				this._updatePresence(sKey, !bCurrentlyVisible);
+				const bNewVisibility = !bCurrentlyVisible;
+				this._updatePresence(sKey, bNewVisibility);
+
+				const sAnnouncementKey = bNewVisibility
+					? "p13nDialog.ADAPT_FILTER_VISIBLE_ANNOUNCE"
+					: "p13nDialog.ADAPT_FILTER_INVISIBLE_ANNOUNCE";
+				this.oInvisibleMessage.announce(
+					this._getResourceText(sAnnouncementKey, [sLabel]),
+					InvisibleMessageMode.Assertive
+				);
 
 				this.fireChange({
-					reason: !bCurrentlyVisible ? this.CHANGE_REASON_SHOW : this.CHANGE_REASON_HIDE,
+					reason: bNewVisibility ? this.CHANGE_REASON_SHOW : this.CHANGE_REASON_HIDE,
 					item: oItem
 				});
 
@@ -871,7 +890,8 @@ sap.ui.define([
 	AdaptFiltersPanelContent.prototype._onRemoveRow = function(oRow) {
 		const oContext = oRow.getBindingContext(this.P13N_MODEL);
 		const sKey = _getKeyFromContext(oContext);
-
+		const sLabel = oContext.getObject().label;
+		this.oInvisibleMessage.announce(this._getResourceText("p13nDialog.ADAPT_FILTER_REMOVE_ANNOUNCE", [sLabel]), InvisibleMessageMode.Assertive);
 		this._updateFocus(oRow);
 		this._removeFilteredState(sKey, oContext);
 		this._updatePresence(sKey, false);
@@ -894,22 +914,36 @@ sap.ui.define([
 		const fnUpdateFocusPosition = () => {
 			const oItems = this._oListControl.getItems().filter((oItem) => oItem.getVisible());
 
-			const fnIsRequired = (oItem) => {
-				const oModelEntry = this._getModelEntry(oItem);
-				return oModelEntry.required;
+			const fnFocusFilterField = (oItem) => {
+				const oMainGrid = oItem.getContent()[0];
+				if (!oMainGrid) {
+					oItem.focus();
+					return;
+				}
+
+				const oFilterControl = oMainGrid.getContent()[1];
+				if (!oFilterControl) {
+					oItem.focus();
+					return;
+				}
+
+				let oFilterField = oFilterControl;
+				if (oFilterControl.isA("sap.ui.mdc.filterbar.p13n.FilterGroupLayout")) {
+					const aItems = oFilterControl.getItems();
+					if (aItems && aItems.length > 0) {
+						oFilterField = aItems[0];
+					}
+				}
+
+				if (oFilterField && oFilterField.focus) {
+					oFilterField.focus();
+				}
 			};
 
 			if (iIndex >= 0 && iIndex < oItems.length) {
-				//if required, focus next item, this should prevent focusing a required item with a error state because this is done on other placee
-				//TODO; clarify with UX if the focus should always go to the last item also when there e.g. 2 fields with error.
-				// At the moment focus goes then if no other item is there to the first item with error state
-				if (!fnIsRequired(oItems[iIndex])) {
-					oItems[iIndex].focus();
-				}
+				fnFocusFilterField(oItems[iIndex]);
 			} else if (oItems.length > 0) {
-				if (!fnIsRequired(oItems[oItems.length - 1])) {
-					oItems[oItems.length - 1].focus();
-				}
+				fnFocusFilterField(oItems[oItems.length - 1]);
 			} else {
 				//if no item is left, focus the add filter ComboBox
 				this._getAddFilterSection().getContent()[1].focus();
@@ -1020,6 +1054,8 @@ sap.ui.define([
 			}, 0),
 			0);
 		}
+		const sLabel = this.getP13nData().find((oItem) => oItem.name === sNewKey)?.label;
+		this.oInvisibleMessage.announce(this._getResourceText("p13nDialog.ADAPT_FILTER_ADD_ANNOUNCE", [sLabel]), InvisibleMessageMode.Assertive);
 	};
 
 	AdaptFiltersPanelContent.prototype._updatePresence = function(sKey, bAdd, iNewIndex) {
