@@ -36,10 +36,7 @@ sap.ui.define([
 	});
 
 	/**
-	 * Check if the given overlay is editable.
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
-	 * @returns {Promise.<boolean>} <code>true</code> when editable wrapped in a promise.
-	 * @private
+	 * @override
 	 */
 	Combine.prototype._isEditable = function(oOverlay) {
 		const oCombineAction = this.getAction(oOverlay);
@@ -85,10 +82,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if Combine is available for oOverlay
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {boolean} true if available
-	 * @public
+	 * @override
 	 */
 	Combine.prototype.isAvailable = function(aElementOverlays) {
 		if (aElementOverlays.length <= 1) {
@@ -102,21 +96,19 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if Combine is enabled for oOverlay
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {boolean} true if enabled
-	 * @public
+	 * @override
 	 */
-	Combine.prototype.isEnabled = function(aElementOverlays) {
+	Combine.prototype.isEnabled = function(aElementOverlays, oMenuItem) {
 		// check that at least 2 fields can be combined
 		if (!this.isAvailable(aElementOverlays) || aElementOverlays.length <= 1) {
 			return false;
 		}
+		const oResponsibleElementOverlays = oMenuItem.responsible || aElementOverlays;
 
-		const aControls = aElementOverlays.map((oElementOverlay) => oElementOverlay.getElement());
+		const aControls = oResponsibleElementOverlays.map((oElementOverlay) => oElementOverlay.getElement());
 
 		// check that each specified element has an enabled action
-		const bActionCheck = aElementOverlays.every((oElementOverlay) => {
+		const bActionCheck = oResponsibleElementOverlays.every((oElementOverlay) => {
 			const oAction = this.getAction(oElementOverlay);
 			if (!oAction) {
 				return false;
@@ -187,9 +179,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieve the context menu item for the action.
-	 * @param  {sap.ui.dt.ElementOverlay[]} aElementOverlays - Overlays for which actions are requested
-	 * @return {object[]} - returns array containing the items with required data
+	 * @override
 	 */
 	Combine.prototype.getMenuItems = function(aElementOverlays) {
 		return this._getMenuItems(
@@ -202,18 +192,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Get the name of the action related to this plugin.
-	 * @return {string} Returns the action name
+	 * @override
 	 */
 	Combine.prototype.getActionName = function() {
 		return "combine";
 	};
 
 	/**
-	 * Trigger the plugin execution.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @param {object} mPropertyBag - Property bag
-	 * @param {sap.ui.core.Element} mPropertyBag.contextElement - Element where combine was triggered
+	 * @override
 	 */
 	Combine.prototype.handler = function(aElementOverlays, mPropertyBag) {
 		this.handleCombine(aElementOverlays, mPropertyBag.contextElement);

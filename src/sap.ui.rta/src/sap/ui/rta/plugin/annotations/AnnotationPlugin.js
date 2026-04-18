@@ -109,14 +109,11 @@ sap.ui.define([
 	 * @since 1.132
 	 * @alias sap.ui.rta.plugin.AnnotationPlugin
 	 */
-	const AnnotationPlugin =
-		Plugin.extend("sap.ui.rta.plugin.annotations.AnnotationPlugin", /** @lends sap.ui.rta.plugin.annotations.AnnotationPlugin.prototype */ {
-			metadata: {
-				library: "sap.ui.rta",
-				associations: {},
-				events: {}
-			}
-		});
+	const AnnotationPlugin = Plugin.extend("sap.ui.rta.plugin.annotations.AnnotationPlugin", /** @lends sap.ui.rta.plugin.annotations.AnnotationPlugin.prototype */ {
+		metadata: {
+			library: "sap.ui.rta"
+		}
+	});
 
 	const sPluginIdDefault = "CTX_ANNOTATION";
 	const sPluginIdSingleLabelChange = "CTX_ANNOTATION_CHANGE_SINGLE_LABEL";
@@ -127,9 +124,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * @param {sap.ui.dt.ElementOverlay} oElementOverlay - Overlay to be checked for editable
-	 * @returns {boolean} <code>true</code> if it's editable
-	 * @private
+	 * @override
 	 */
 	AnnotationPlugin.prototype._isEditable = function(oElementOverlay) {
 		// Currently annotation changes are not supported for developers,
@@ -150,50 +145,16 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if Annotation actions are enabled for oOverlay
-	 *
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {boolean} True if it's enabled
-	 * @public
+	 * @override
 	 */
-	AnnotationPlugin.prototype.isEnabled = function(aElementOverlays) {
-		if (!this.isAvailable(aElementOverlays) || aElementOverlays.length !== 1) {
-			return false;
-		}
-
-		const oElementOverlay = aElementOverlays[0];
-		const oResponsibleElementOverlay = this.getResponsibleElementOverlay(oElementOverlay);
-		const oActions = this.getAction(oResponsibleElementOverlay);
-
-		if (oActions) {
-			return Object.values(oActions).some((oAction) => {
-				if (typeof oAction.isEnabled !== "undefined") {
-					if (typeof oAction.isEnabled === "function") {
-						return oAction.isEnabled(oResponsibleElementOverlay.getElement());
-					}
-					return oAction.isEnabled;
-				}
-				return true;
-			});
-		}
-		return false;
-	};
-
-	/**
-	 * Opens the annotation dialog and creates the commands for the returned changes.
-	 *
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target Overlays of the action
-	 * @param {object} oAction - The action object defined in the designtime
-	 * @param {string} sKey - Key of the action, used to display the specific documentation link
-	 * @return {Promise} Resolves with the creation of the commands
-	 */
-	AnnotationPlugin.prototype.handler = async function(aElementOverlays, oAction, sKey) {
+	AnnotationPlugin.prototype.handler = async function(aElementOverlays, mPropertyBag) {
 		const oElementOverlay = aElementOverlays[0];
 		const oElement = oElementOverlay.getElement();
+		const oAction = mPropertyBag.menuItem.action;
 
 		try {
 			const aAnnotationChanges = await this._oDialog.openDialogAndHandleChanges({
-				title: getActionText(oElementOverlay, oAction),
+				title: this.getActionText(oElementOverlay, oAction),
 				type: oAction.type,
 				control: oElement,
 				delegate: oAction.delegate,
@@ -201,7 +162,7 @@ sap.ui.define([
 				description: oAction.description,
 				singleRename: oAction.singleRename,
 				controlBasedRenameChangeType: oAction.controlBasedRenameChangeType,
-				featureKey: sKey
+				featureKey: oAction.featureKey
 			});
 
 			if (aAnnotationChanges.length) {
@@ -232,10 +193,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieves the context menu item for the actions.
-	 * If multiple annotation actions are defined, it returns multiple menu items.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {object[]} Array of the items with required data
+	 * @override
 	 */
 	AnnotationPlugin.prototype.getMenuItems = async function(aElementOverlays) {
 		const oElementOverlay = aElementOverlays[0];
@@ -244,47 +202,33 @@ sap.ui.define([
 
 		const aMenuItems = [];
 		if (oAnnotationActionMap) {
-			if (this._isEditableByPlugin(oResponsibleElementOverlay) === undefined) {
-				// The responsibleElement editableByPlugin state was not evaluated yet e.g. because it
-				// has no visible geometry, thus evaluateEditable now
-				await this.evaluateEditable([oResponsibleElementOverlay], { onRegistration: false });
-			}
-			Object.entries(oAnnotationActionMap).forEach(function([sKey, oAction], iIndex) {
+			let iIndex = 0;
+			for (const sKey in oAnnotationActionMap) {
+				const oAction = oAnnotationActionMap[sKey];
+				oAction.featureKey = sKey;
 				const sPluginId = oAction.type === AnnotationTypes.StringType && oAction.singleRename
 					? sPluginIdSingleLabelChange
 					: sPluginIdDefault;
 				const iRank = this.getRank(sPluginId);
-				if (
-					this.isAvailable([oResponsibleElementOverlay])
-					&& checkDesigntimeActionProperties(oAction)
-				) {
-					const sActionText = getActionText(oResponsibleElementOverlay, oAction);
-					if (!sActionText) {
-						return;
-					}
-
-					aMenuItems.push({
-						id: `${sPluginId}_${sKey}`,
-						rank: iRank + iIndex,
-						text: sActionText,
+				const sActionText = getActionText(oResponsibleElementOverlay, oAction);
+				if (checkDesigntimeActionProperties(oAction) && sActionText) {
+					aMenuItems.push(await this._getMenuItems(aElementOverlays, {
+						pluginId: `${sPluginId}_${sKey}`,
 						icon: getActionIcon(oAction),
-						enabled: (
-							typeof oAction.isEnabled === "function" && oAction.isEnabled(aElementOverlays[0].getElement())
-							|| (oAction.isEnabled !== false) && this.isEnabled(aElementOverlays)
-						),
-						handler: this.handler.bind(this, aElementOverlays, oAction, sKey),
-						additionalInfo: this._getAdditionalInfo(oResponsibleElementOverlay, oAction)
-					});
+						rank: iRank + iIndex,
+						action: oAction,
+						text: sActionText
+					}));
 				}
-			}, this);
+				iIndex++;
+			}
 		}
 
-		return aMenuItems;
+		return aMenuItems.flat();
 	};
 
 	/**
-	 * Get the name of the action related to this plugin.
-	 * @return {string} Returns the action name
+	 * @override
 	 */
 	AnnotationPlugin.prototype.getActionName = function() {
 		return "annotation";

@@ -6,42 +6,64 @@ sap.ui.define([
 	"sap/m/OverflowToolbar",
 	"sap/m/OverflowToolbarButton",
 	"sap/m/Panel",
+	"sap/ui/core/mvc/View",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/dt/Util",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
+	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/plugin/Combine",
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/rta/qunit/RtaQunitUtils",
-	"sap/ui/core/mvc/View",
-	"sap/ui/test/utils/nextUIUpdate"
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	Button,
 	CheckBox,
 	OverflowToolbar,
 	OverflowToolbarButton,
 	Panel,
+	View,
 	DesignTime,
 	OverlayRegistry,
+	DtUtil,
 	ChangesWriteAPI,
+	nextUIUpdate,
 	CommandFactory,
 	CombinePlugin,
 	Utils,
 	sinon,
-	RtaQunitUtils,
-	View,
-	nextUIUpdate
+	RtaQunitUtils
 ) {
 	"use strict";
 
-	var DEFAULT_DTM = "default";
+	const DEFAULT_DTM = "default";
+	const oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon, "Dummy");
+	const sandbox = sinon.createSandbox();
 
-	var oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon, "Dummy");
+	async function getMenuEntryAndCheck(assert, aOverlays, oAssertions) {
+		// this.oCombinePlugin.deregisterElementOverlay(oOverlay);
+		// this.oCombinePlugin.registerElementOverlay(oOverlay);
 
-	var sandbox = sinon.createSandbox();
+		await DtUtil.waitForSynced(this.oDesignTime)();
+		const bIsEditable = await this.oCombinePlugin._isEditable(aOverlays[0]);
+		assert.strictEqual(bIsEditable, oAssertions.editable, "then the editable property is correct");
+		if (oAssertions.available !== undefined) {
+			assert.strictEqual(this.oCombinePlugin.isAvailable(aOverlays, {}), oAssertions.available, "then available is correct");
+		}
 
-	var fnSetOverlayDesigntimeMetadata = function(oOverlay, oDesignTimeMetadata, bEnabled) {
+		const oMenuItem = (await this.oCombinePlugin.getMenuItems(aOverlays))[0];
+		if (oMenuItem) {
+			if (typeof oMenuItem.enabled === "function") {
+				assert.strictEqual(oMenuItem.enabled(aOverlays, oMenuItem), oAssertions.enabled, "then the enabled property is correct");
+			} else {
+				assert.strictEqual(oMenuItem.enabled, oAssertions.enabled, "then the enabled property is correct");
+			}
+		}
+		return oMenuItem;
+	}
+
+	const fnSetOverlayDesigntimeMetadata = function(oOverlay, oDesignTimeMetadata, bEnabled) {
 		bEnabled = bEnabled === undefined || bEnabled === null ? true : bEnabled;
 		if (oDesignTimeMetadata === DEFAULT_DTM) {
 			oDesignTimeMetadata = {
@@ -249,105 +271,68 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when an overlay has a combine action in designTime metadata", function(assert) {
+		QUnit.test("when an overlay has a combine action in designTime metadata", async function(assert) {
 			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, DEFAULT_DTM);
 			fnSetOverlayDesigntimeMetadata(this.oButton2Overlay, oDesignTimeMetadata2);
 			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
 			sandbox.stub(this.oCombinePlugin, "hasChangeHandler").resolves(true);
 
-			assert.strictEqual(
-				this.oCombinePlugin.isAvailable([this.oButton1Overlay, this.oButton2Overlay]),
-				true,
-				"isAvailable is called and returns true"
-			);
-			assert.strictEqual(
-				this.oCombinePlugin.isEnabled([this.oButton1Overlay, this.oButton2Overlay]),
-				true,
-				"isEnabled is called and returns true"
-			);
-			return this.oCombinePlugin._isEditable(this.oButton1Overlay)
-			.then(function(bEditable) {
-				assert.strictEqual(
-					bEditable,
-					true,
-					"then the overlay is editable"
-				);
+			await getMenuEntryAndCheck.call(this, assert, [this.oButton1Overlay, this.oButton2Overlay], {
+				editable: true,
+				available: true,
+				enabled: true
 			});
 		});
 
-		QUnit.test("when two elements have different binding context", function(assert) {
+		QUnit.test("when two elements have different binding context", async function(assert) {
 			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(false);
 
-			assert.strictEqual(
-				this.oCombinePlugin.isAvailable([this.oButton1Overlay, this.oButton2Overlay]),
-				true,
-				"isAvailable is called and returns true"
-			);
-			assert.strictEqual(
-				this.oCombinePlugin.isEnabled([this.oButton1Overlay, this.oButton2Overlay]),
-				false,
-				"isEnabled is called and returns false"
-			);
+			await getMenuEntryAndCheck.call(this, assert, [this.oButton1Overlay, this.oButton2Overlay], {
+				editable: true,
+				available: true,
+				enabled: false
+			});
 		});
 
-		QUnit.test("when only one control is specified", function(assert) {
+		QUnit.test("when only one control is specified", async function(assert) {
 			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, DEFAULT_DTM);
 
-			assert.strictEqual(
-				this.oCombinePlugin.isAvailable([this.oButton1Overlay]),
-				false,
-				"isAvailable is called and returns false"
-			);
-			assert.strictEqual(
-				this.oCombinePlugin.isEnabled([this.oButton1Overlay]),
-				false,
-				"isEnabled is called and returns false"
-			);
+			await getMenuEntryAndCheck.call(this, assert, [this.oButton1Overlay], {
+				editable: true,
+				available: false,
+				enabled: false
+			});
 		});
 
-		QUnit.test("when controls which enabled function delivers false are specified", function(assert) {
+		QUnit.test("when controls which enabled function delivers false are specified", async function(assert) {
 			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, oDesignTimeMetadata1);
 			fnSetOverlayDesigntimeMetadata(this.oButton2Overlay, oDesignTimeMetadata1);
-			assert.strictEqual(
-				this.oCombinePlugin.isAvailable([this.oButton1Overlay, this.oButton2Overlay]),
-				true,
-				"isAvailable is called and returns true"
-			);
-			assert.strictEqual(
-				this.oCombinePlugin.isEnabled([this.oButton1Overlay, this.oButton2Overlay]),
-				false,
-				"isEnabled is called and returns false"
-			);
+
+			await getMenuEntryAndCheck.call(this, assert, [this.oButton1Overlay, this.oButton2Overlay], {
+				editable: true,
+				available: true,
+				enabled: false
+			});
 		});
 
-		QUnit.test("when a control without change type is specified", function(assert) {
+		QUnit.test("when a control without change type is specified", async function(assert) {
 			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, DEFAULT_DTM);
 			fnSetOverlayDesigntimeMetadata(this.oButton4Overlay, oDesignTimeMetadata3);
-			assert.strictEqual(
-				this.oCombinePlugin.isAvailable([this.oButton1Overlay]),
-				false,
-				"isAvailable is called and returns false"
-			);
-			assert.strictEqual(
-				this.oCombinePlugin.isEnabled([this.oButton1Overlay]),
-				false,
-				"isEnabled is called and returns false"
-			);
+			await getMenuEntryAndCheck.call(this, assert, [this.oButton1Overlay, this.oButton4Overlay], {
+				editable: true,
+				available: false,
+				enabled: false
+			});
 		});
 
-		QUnit.test("when controls from different relevant containers are specified", function(assert) {
+		QUnit.test("when controls from different relevant containers are specified", async function(assert) {
 			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, DEFAULT_DTM);
 			fnSetOverlayDesigntimeMetadata(this.oButton5Overlay, DEFAULT_DTM);
-			assert.strictEqual(
-				this.oCombinePlugin.isAvailable([this.oButton1Overlay]),
-				false,
-				"isAvailable is called and returns false"
-			);
-			assert.strictEqual(
-				this.oCombinePlugin.isEnabled([this.oButton1Overlay]),
-				false,
-				"isEnabled is called and returns false"
-			);
+			await getMenuEntryAndCheck.call(this, assert, [this.oButton1Overlay, this.oButton5Overlay], {
+				editable: true,
+				available: false,
+				enabled: false
+			});
 		});
 
 		QUnit.test("when handleCombine is called with two elements, being triggered on the second element", function(assert) {
@@ -369,31 +354,27 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when an overlay has a combine action designTime metadata which has no changeOnRelevantContainer", function(assert) {
+		QUnit.test("when an overlay has a combine action designTime metadata which has no changeOnRelevantContainer", async function(assert) {
 			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, oDesigntimeMetadata4);
-			return Promise.resolve()
-			.then(this.oCombinePlugin._isEditable.bind(this.oCombinePlugin, this.oButton1Overlay))
-			.then(function(bEditable) {
-				assert.strictEqual(bEditable, false, "then the overlay is not editable");
+
+			await getMenuEntryAndCheck.call(this, assert, [this.oButton1Overlay], {
+				editable: false,
+				available: false,
+				enabled: false
 			});
 		});
 
 		QUnit.test("when Controls of different type with same change type are specified", async function(assert) {
-			assert.expect(10);
+			assert.expect(11);
 			fnSetOverlayDesigntimeMetadata(this.oOverflowToolbarButton1Overlay, DEFAULT_DTM);
 			fnSetOverlayDesigntimeMetadata(this.oButton6Overlay, DEFAULT_DTM);
 			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
 
-			assert.strictEqual(
-				this.oCombinePlugin.isAvailable([this.oOverflowToolbarButton1Overlay, this.oButton6Overlay]),
-				true,
-				"isAvailable is called and returns true"
-			);
-			assert.strictEqual(
-				this.oCombinePlugin.isEnabled([this.oOverflowToolbarButton1Overlay, this.oButton6Overlay]),
-				true,
-				"isEnabled is called and returns true"
-			);
+			await getMenuEntryAndCheck.call(this, assert, [this.oOverflowToolbarButton1Overlay, this.oButton6Overlay], {
+				editable: true,
+				available: true,
+				enabled: true
+			});
 
 			let bIsAvailable = true;
 
@@ -422,7 +403,7 @@ sap.ui.define([
 			assert.equal(aMenuItems[0].id, "CTX_GROUP_FIELDS", "'getMenuItems' returns the context menu item for the plugin");
 
 			aMenuItems[0].handler([this.oButton6Overlay], { contextElement: this.oButton6 });
-			aMenuItems[0].enabled([this.oButton6Overlay]);
+			aMenuItems[0].enabled([this.oButton6Overlay], aMenuItems[0]);
 
 			bIsAvailable = false;
 			assert.equal(

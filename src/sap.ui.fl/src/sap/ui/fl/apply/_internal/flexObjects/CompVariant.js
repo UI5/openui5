@@ -65,6 +65,16 @@ sap.ui.define([
 		},
 		constructor: function(...aArgs) {
 			const [mPropertyBag] = aArgs;
+			// Fix for variants created in 1.139.
+			// Variants created lack their selectors and it leads to an undefined persistency key,
+			// which cannot be retrieved via the data selector
+			if (mPropertyBag.persistencyKey === undefined
+				&& (mPropertyBag.selector || mPropertyBag.variantId || mPropertyBag.content)
+			) {
+				// Only set persistencyKey to empty string if a selector or other property,
+				// that indicate this is a valid variant
+				mPropertyBag.persistencyKey = "";
+			}
 			Variant.apply(this, aArgs);
 
 			// fileType "variant" is only for compVariant

@@ -38,21 +38,17 @@ sap.ui.define([
 	 * @returns {object} Structure containing all relevant information about the overlay parents
 	 */
 	AdditionalElementsUtils.getParents = function(bSibling, oOverlay, oPlugin) {
-		var oParentOverlay;
-		var oResponsibleElementOverlay = oOverlay;
-		var bResponsibleElementAvailable = ["add.delegate", "reveal"].some(function(vActionName) {
-			return oPlugin.isResponsibleElementActionAvailable(oOverlay, vActionName);
+		let oResponsibleElementOverlay = oOverlay;
+		["add.delegate", "reveal"].some(function(vActionName) {
+			if (oPlugin.isResponsibleElementActionAvailable(oOverlay, vActionName)) {
+				oResponsibleElementOverlay = oPlugin.getResponsibleElementOverlay(oOverlay, vActionName);
+				return true;
+			}
+			return false;
 		});
-		if (bResponsibleElementAvailable) {
-			oResponsibleElementOverlay = oPlugin.getResponsibleElementOverlay(oOverlay);
-		}
-		var oRelevantContainer = oResponsibleElementOverlay.getRelevantContainer(!bSibling);
-		var oRelevantContainerOverlay = OverlayRegistry.getOverlay(oRelevantContainer);
-		if (bSibling) {
-			oParentOverlay = oResponsibleElementOverlay.getParentElementOverlay();
-		} else {
-			oParentOverlay = oResponsibleElementOverlay;
-		}
+		const oRelevantContainer = oResponsibleElementOverlay.getRelevantContainer(!bSibling);
+		const oRelevantContainerOverlay = OverlayRegistry.getOverlay(oRelevantContainer);
+		const oParentOverlay = bSibling ? oResponsibleElementOverlay.getParentElementOverlay() : oResponsibleElementOverlay;
 		return {
 			responsibleElementOverlay: oResponsibleElementOverlay,
 			relevantContainerOverlay: oRelevantContainerOverlay,
@@ -68,10 +64,9 @@ sap.ui.define([
 	 * @param {object} mActions - Object containing information about the add actions
 	 * @param {sap.ui.core.Element} oParentElement - Parent element that contains the aggregation being evaluated
 	 * @param {boolean} bSingular - Singular (true) or plural (false) name
-	 * @param {string} [sControlName] - Name of the control, if available
 	 * @returns {string} Text from the RTA i18n resource
 	 */
-	AdditionalElementsUtils.getText = function(sRtaTextKey, mActions, oParentElement, bSingular, sControlName) {
+	AdditionalElementsUtils.getText = function(sRtaTextKey, mActions, oParentElement, bSingular) {
 		var aNames = [];
 		var mControlType;
 		var sControlType;
@@ -102,8 +97,6 @@ sap.ui.define([
 
 		if (aNonDuplicateNames.length === 1) {
 			[sControlType] = aNonDuplicateNames;
-		} else if (sControlName) {
-			sControlType = sControlName;
 		} else {
 			sControlType = oTextResources.getText("MULTIPLE_CONTROL_NAME");
 		}

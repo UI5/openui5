@@ -73,9 +73,6 @@ sap.ui.define([
 	}
 
 	/**
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
-	 * @return {Promise.<boolean>} <code>true</code> if it's editable wrapped in a promise.
-	 * @private
 	 * @override
 	 */
 	Resize.prototype._isEditable = function(oOverlay) {
@@ -269,7 +266,8 @@ sap.ui.define([
 		const oOverlay = OverlayRegistry.getOverlay(oEvent.target.id);
 
 		// Mouse is over Overlay without action (e.g. child overlay)
-		if (!this.isEnabled([oOverlay])) {
+		const oAction = this.getAction(oOverlay);
+		if (!oAction || !this.isEnabled([oOverlay], { action: oAction })) {
 			this._removeHandle(false);
 			return;
 		}
@@ -360,15 +358,12 @@ sap.ui.define([
 	};
 
 	/**
-	 * Registers the event handlers for resizing on the enabled overlays
-	 *
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be registered
-	 *
 	 * @override
 	 */
 	Resize.prototype.registerElementOverlay = function(...aArgs) {
 		const [oOverlay] = aArgs;
-		if (this.isEnabled([oOverlay])) {
+		const oAction = this.getAction(oOverlay);
+		if (oAction && this.isEnabled([oOverlay], { action: oAction })) {
 			oOverlay.attachBrowserEvent("mousemove", this._onOverlayMouseMove, this);
 			oOverlay.attachBrowserEvent("mouseleave", this._onOverlayMouseLeave, this);
 			oOverlay.attachBrowserEvent("keydown", this._onOverlayKeyDown, this);
@@ -380,9 +375,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * De-registers the event handlers for resizing on the previously enabled overlays
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be de-registered
-	 *
 	 * @override
 	 */
 	Resize.prototype.deregisterElementOverlay = function(...aArgs) {
@@ -397,8 +389,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets the name of the action related to this plugin.
-	 * @return {string} Action name
+	 * @override
 	 */
 	Resize.prototype.getActionName = function() {
 		return "resize";

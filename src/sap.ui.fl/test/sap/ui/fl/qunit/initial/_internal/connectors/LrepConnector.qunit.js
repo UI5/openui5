@@ -4,12 +4,14 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4",
 	"sap/ui/fl/initial/_internal/connectors/LrepConnector",
 	"sap/ui/fl/initial/_internal/connectors/Utils",
+	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/Layer"
 ], function(
 	sinon,
 	LrepConnector,
 	InitialUtils,
+	FlexInfoSession,
 	StorageUtils,
 	Layer
 ) {
@@ -137,6 +139,8 @@ sap.ui.define([
 	QUnit.module("Given LrepConnector with a fake XHR", {
 		beforeEach() {
 			this.xhr = sandbox.useFakeXMLHttpRequest();
+			// todos#18: Remove when done
+			sandbox.stub(FlexInfoSession, "getByReference").returns({ adaptationMode: true });
 		},
 		afterEach() {
 			sandbox.restore();
@@ -318,6 +322,45 @@ sap.ui.define([
 			}).then(function() {
 				const sExpectedUrl = "/sap/bc/lrep/flex/data/reference?lazyLoadingViewsEnabled=true&sap-language=EN";
 				assert.equal(this.oXHR.url, sExpectedUrl, "the lazyLoadingViewsEnabled parameter is included in the request URL");
+			}.bind(this));
+		});
+
+		// todos#18: Remove when done
+		QUnit.test("when loading flex data, lazyLoadingViewsEnabled is set by default", function(assert) {
+			FlexInfoSession.getByReference.returns({});
+			mockResponse.call(this, JSON.stringify({ changes: [], loadModules: false }));
+			return LrepConnector.loadFlexData({
+				url: "/sap/bc/lrep", reference: "reference"
+			}).then(function() {
+				const sExpectedUrl = "/sap/bc/lrep/flex/data/reference?lazyLoadingViewsEnabled=true&sap-language=EN";
+				assert.equal(this.oXHR.url, sExpectedUrl, "lazyLoadingViewsEnabled is set to true");
+			}.bind(this));
+		});
+
+		// todos#18: Remove when done
+		QUnit.test("when loading flex data in adaptation mode, lazyLoadingViewsEnabled is not set", function(assert) {
+			FlexInfoSession.getByReference.returns({ adaptationMode: true });
+			mockResponse.call(this, JSON.stringify({ changes: [], loadModules: false }));
+			return LrepConnector.loadFlexData({
+				url: "/sap/bc/lrep", reference: "reference"
+			}).then(function() {
+				const sExpectedUrl = "/sap/bc/lrep/flex/data/reference?sap-language=EN";
+				assert.equal(this.oXHR.url, sExpectedUrl, "lazyLoadingViewsEnabled is not included");
+			}.bind(this));
+		});
+
+		// todos#18: Remove when done
+		QUnit.test("when loading flex data with RTA restart, lazyLoadingViewsEnabled is not set", function(assert) {
+			FlexInfoSession.getByReference.returns({});
+			const sRtaRestartKey = `sap.ui.rta.restart.${Layer.CUSTOMER}`;
+			window.sessionStorage.setItem(sRtaRestartKey, true);
+			mockResponse.call(this, JSON.stringify({ changes: [], loadModules: false }));
+			return LrepConnector.loadFlexData({
+				url: "/sap/bc/lrep", reference: "reference"
+			}).then(function() {
+				const sExpectedUrl = "/sap/bc/lrep/flex/data/reference?sap-language=EN";
+				assert.equal(this.oXHR.url, sExpectedUrl, "lazyLoadingViewsEnabled is not included");
+				window.sessionStorage.removeItem(sRtaRestartKey);
 			}.bind(this));
 		});
 

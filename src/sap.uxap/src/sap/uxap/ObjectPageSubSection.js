@@ -479,6 +479,20 @@ sap.ui.define([
 
 		oBlock._sOriginalParentAggregationName = oBlock.sParentAggregationName;
 		oBlock.sParentAggregationName = sParentAggregationName;
+
+		// Wrap the block's destroy method so that the pre-processing is undone before the actual
+		// destruction. This ensures that ManagedObject.prototype.destroy uses the correct (original)
+		// sParentAggregationName when removing the child from its real parent (the internal grid).
+		// Without this, an external block.destroy() would use the overridden sParentAggregationName
+		// ("blocks"), which the grid does not recognize, leaving the block in the grid and causing
+		// errors on subsequent removeAllBlocks() calls.
+		var that = this;
+		oBlock._fnOriginalDestroy = oBlock.destroy;
+		oBlock.destroy = function () {
+			var fnOriginalDestroy = oBlock._fnOriginalDestroy;
+			that._postProcessBlock(oBlock);
+			fnOriginalDestroy.apply(oBlock, arguments);
+		};
 	};
 
 	/**
@@ -523,6 +537,11 @@ sap.ui.define([
 
 		oBlock.sParentAggregationName = oBlock._sOriginalParentAggregationName;
 		oBlock._sOriginalParentAggregationName = null;
+
+		if (isFunction(oBlock._fnOriginalDestroy)) {
+			oBlock.destroy = oBlock._fnOriginalDestroy;
+			oBlock._fnOriginalDestroy = null;
+		}
 	};
 
 	function isFunction(oObject) {

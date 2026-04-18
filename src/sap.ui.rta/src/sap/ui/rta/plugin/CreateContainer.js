@@ -44,26 +44,12 @@ sap.ui.define([
 		this._oDialog = new RenameDialog();
 	};
 
-	/**
-	 * Returns true if create container action is enabled for the selected element overlays
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Array of selected element overlays
-	 * @param {boolean} bSibling - Indicator for a sibling action
-	 * @return {boolean} Whether the action is enabled
-	 * @override
-	 */
-	CreateContainer.prototype.isEnabled = function(aElementOverlays, bSibling) {
-		const oElementOverlay = aElementOverlays[0];
-		const oAction = this.getCreateAction(bSibling, oElementOverlay);
-		return this.isActionEnabled(oAction, bSibling, oElementOverlay);
-	};
-
-	CreateContainer.prototype.getCreateContainerText = function(bSibling, oOverlay) {
-		const vAction = this.getCreateAction(bSibling, oOverlay);
+	CreateContainer.prototype.getCreateContainerText = function(bSibling, oOverlay, oAction) {
 		const oParentOverlay = this._getParentOverlay(bSibling, oOverlay);
 		const oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
 		const oElement = oParentOverlay.getElement();
 		const sText = "CTX_CREATE_CONTAINER";
-		return this._getText(vAction, oElement, oDesignTimeMetadata, sText);
+		return this._getText(oAction, oElement, oDesignTimeMetadata, sText);
 	};
 
 	CreateContainer.prototype._getContainerTitle = function(vAction, oElement, oDesignTimeMetadata) {
@@ -71,26 +57,29 @@ sap.ui.define([
 		return this._getText(vAction, oElement, oDesignTimeMetadata, sText);
 	};
 
-	CreateContainer.prototype.handleCreate = async function(bSibling, oOverlay) {
-		const vAction = this.getCreateAction(bSibling, oOverlay);
-		const oParentOverlay = this._getParentOverlay(bSibling, oOverlay);
+	/**
+	 * @override
+	 */
+	CreateContainer.prototype.handler = async function(aElementOverlays, mPropertyBag) {
+		const oOverlay = aElementOverlays[0];
+		const oParentOverlay = this._getParentOverlay(mPropertyBag.menuItem.bAsSibling, oOverlay);
 		const oParent = oParentOverlay.getElement();
 		const oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
 		const oView = FlexUtils.getViewForControl(oParent);
-		const oSiblingElement = bSibling ? oOverlay.getElement() : null;
+		const oSiblingElement = mPropertyBag.menuItem.bAsSibling ? oOverlay.getElement() : null;
 		const sNewControlID = oView.createId(uid());
-		const fnGetIndex = oDesignTimeMetadata.getAggregation(vAction.aggregation).getIndex;
-		const iIndex = this._determineIndex(oParent, oSiblingElement, vAction.aggregation, fnGetIndex);
+		const fnGetIndex = oDesignTimeMetadata.getAggregation(mPropertyBag.menuItem.action.aggregation).getIndex;
+		const iIndex = this._determineIndex(oParent, oSiblingElement, mPropertyBag.menuItem.action.aggregation, fnGetIndex);
 		const sVariantManagementReference = this.getVariantManagementReference(oParentOverlay);
-		const sDefaultContainerTitle = this._getContainerTitle(vAction, oParent, oDesignTimeMetadata);
+		const sDefaultContainerTitle = this._getContainerTitle(mPropertyBag.menuItem.action, oParent, oDesignTimeMetadata);
 
 		const sNewText = await this._oDialog.openDialogAndHandleRename({
 			overlay: oOverlay,
-			action: vAction,
+			action: mPropertyBag.menuItem.action,
 			currentText: sDefaultContainerTitle,
 			acceptSameText: true,
 			dialogSettings: {
-				title: this.getCreateContainerText(bSibling, oOverlay)
+				title: this.getCreateContainerText(mPropertyBag.menuItem.bAsSibling, oOverlay, mPropertyBag.menuItem.action)
 			}
 		});
 
@@ -109,13 +98,13 @@ sap.ui.define([
 
 			this.fireElementModified({
 				command: oCreateCommand,
-				action: vAction,
+				action: mPropertyBag.menuItem.action,
 				newControlId: sNewControlID
 			});
 		} catch (oError) {
 			throw DtUtil.propagateError(
 				oError,
-				"CreateContainer#handleCreate",
+				"CreateContainer#handler",
 				"Error occurred in CreateContainer handler function",
 				"sap.ui.rta"
 			);
@@ -123,42 +112,29 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieve the context menu item for the actions.
-	 * Two items are returned here: one for when the overlay is sibling and one for when it is child.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {object[]} returns array containing the items with required data
+	 * @override
 	 */
-	CreateContainer.prototype.getMenuItems = function(aElementOverlays) {
-		let bOverlayIsSibling = true;
-		let sPluginId = "CTX_CREATE_SIBLING_CONTAINER";
-		let iRank = this.getRank(sPluginId);
-		const aMenuItems = [];
-
-		function isMenuItemEnabled(bOverlayIsSibling, aOverlays) {
-			return this.isEnabled(aOverlays, bOverlayIsSibling);
-		}
-
-		for (let i = 0; i < 2; i++) {
-			if (this.isAvailable(aElementOverlays, bOverlayIsSibling)) {
-				aMenuItems.push({
-					id: sPluginId,
-					text: this.getCreateContainerText.bind(this, bOverlayIsSibling),
-					handler: this.handleCreate.bind(this, bOverlayIsSibling, aElementOverlays[0]),
-					enabled: isMenuItemEnabled.bind(this, bOverlayIsSibling),
-					icon: "sap-icon://add-folder",
-					rank: iRank
-				});
+	CreateContainer.prototype.getMenuItems = async function(aElementOverlays) {
+		const oSiblingActions = this.getCreateActions(aElementOverlays[0], true)[0];
+		const aChildActions = this.getCreateActions(aElementOverlays[0], false);
+		const aMenuItems = await Promise.all([oSiblingActions, ...aChildActions].map((oAction, iIndex) => {
+			const sPluginId = iIndex === 0 ? "CTX_CREATE_SIBLING_CONTAINER" : "CTX_CREATE_CHILD_CONTAINER";
+			if (!oAction) {
+				return [];
 			}
-			bOverlayIsSibling = false;
-			sPluginId = "CTX_CREATE_CHILD_CONTAINER";
-			iRank = this.getRank(sPluginId);
-		}
-		return aMenuItems;
+			return this._getMenuItems(aElementOverlays, {
+				pluginId: sPluginId,
+				icon: "sap-icon://add-folder",
+				bAsSibling: sPluginId === "CTX_CREATE_SIBLING_CONTAINER",
+				text: this.getCreateContainerText(sPluginId === "CTX_CREATE_SIBLING_CONTAINER", aElementOverlays[0], oAction),
+				action: oAction
+			});
+		}));
+		return aMenuItems.flat();
 	};
 
 	/**
-	 * Get the name of the action related to this plugin.
-	 * @return {string} Action name
+	 * @override
 	 */
 	CreateContainer.prototype.getActionName = function() {
 		return "createContainer";

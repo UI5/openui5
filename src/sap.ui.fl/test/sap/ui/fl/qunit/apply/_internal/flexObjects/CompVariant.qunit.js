@@ -91,6 +91,37 @@ sap.ui.define([
 			});
 			assert.equal(oVariant.getFavorite(), true, "then it is a favorite");
 		});
+
+		QUnit.test("when persistencyKey is not set due to missing selector", function(assert) {
+			var oVariant = new CompVariant({
+				persistencyKey: undefined
+			});
+			assert.equal(oVariant.getPersistencyKey(), undefined, "then the persistencyKey remains undefined when no other variant indicators are present");
+		});
+
+		QUnit.test("when persistencyKey is not set but variant has content", function(assert) {
+			var oVariant = new CompVariant({
+				persistencyKey: undefined,
+				content: { someData: "test" }
+			});
+			assert.equal(oVariant.getPersistencyKey(), "", "then the persistencyKey is set to empty string when content is present");
+		});
+
+		QUnit.test("when persistencyKey is not set but variant has selector", function(assert) {
+			var oVariant = new CompVariant({
+				persistencyKey: undefined,
+				selector: { someSelector: "test" }
+			});
+			assert.equal(oVariant.getPersistencyKey(), "", "then the persistencyKey is set to empty string when selector is present");
+		});
+
+		QUnit.test("when persistencyKey is not set but variant has variantId", function(assert) {
+			var oVariant = new CompVariant({
+				persistencyKey: undefined,
+				variantId: "testVariant"
+			});
+			assert.equal(oVariant.getPersistencyKey(), "", "then the persistencyKey is set to empty string when variantId is present");
+		});
 	});
 
 	function createVariantTestData(oVariantData) {

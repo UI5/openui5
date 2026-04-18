@@ -55,12 +55,7 @@ sap.ui.define([
 	const FLEX_CHANGE_TYPE = "addXML";
 
 	/**
-	 * Check if the given overlay should be editable. This action is available by default,
-	 * disabling it requires explicitly setting it to null in the designtime metadata.
-	 *
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
-	 * @returns {Promise<boolean>} <code>true</code> when editable wrapped in a promise
-	 * @private
+	 * @override
 	 */
 	AddXML.prototype._isEditable = async function(oOverlay) {
 		// Action should be available by default
@@ -73,10 +68,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if AddXML is enabled for oOverlay
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {boolean} <code>true</code> if enabled
-	 * @public
+	 * @override
 	 */
 	AddXML.prototype.isEnabled = function(aElementOverlays) {
 		return (aElementOverlays.length === 1)
@@ -85,11 +77,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Redefinition of getActionText to add special texts for the context menu
-	 * @param  {sap.ui.dt.ElementOverlay} oOverlay Overlay containing the Designtime Metadata
-	 * @param  {object} mAction The action data from the Designtime Metadata
-	 * @param  {string} sPluginId The ID of the plugin
-	 * @returns {string} Returns the text for the menu item
+	 * @override
 	 */
 	AddXML.prototype.getActionText = function(oOverlay, mAction, sPluginId) {
 		const vName = mAction.name;
@@ -114,10 +102,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Triggers the plugin execution.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @param {Object} mPropertyBag - Property bag
-	 * @param {sap.ui.rta.plugin.AddXML.fragmentHandler} [mPropertyBag.fragmentHandler] - Handler function for fragment handling. The fragment handler is a callback function that needs to be passed here into the <code>propertyBag</code> or alternatively on instantiation of the plugin.
+	 * @override
 	 */
 	AddXML.prototype.handler = async function(aElementOverlays, mPropertyBag) {
 		try {
@@ -127,7 +112,7 @@ sap.ui.define([
 			}
 			const oOverlay = aElementOverlays[0];
 
-			const aExcludedAggregation = this.getAction(oOverlay)?.excludedAggregations || [];
+			const aExcludedAggregation = mPropertyBag.menuItem.action?.excludedAggregations || [];
 
 			const mAddXmlData = await fnFragmentHandler(oOverlay, aExcludedAggregation);
 
@@ -151,9 +136,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieves the context menu item for the action.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {object[]} Array of the items with required data
+	 * @override
 	 */
 	AddXML.prototype.getMenuItems = function(aElementOverlays) {
 		return this._getMenuItems(aElementOverlays, {
@@ -164,17 +147,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets the name of the action related to this plugin.
-	 * @returns {string} Action name
+	 * @override
 	 */
 	AddXML.prototype.getActionName = function() {
 		return "addXML";
 	};
 
 	/**
-	 * Returns the action information when defined in the designtime metadata or an object with only the changeType.
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay containing the Designtime Metadata
-	 * @returns {object} Action information
+	 * @override
 	 */
 	AddXML.prototype.getAction = function(oOverlay) {
 		const oAction = Plugin.prototype.getAction.apply(this, [oOverlay]);

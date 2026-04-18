@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/dt/Util",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/LocalResetAPI",
@@ -20,6 +21,7 @@ sap.ui.define([
 	JsControlTreeModifier,
 	DesignTime,
 	OverlayRegistry,
+	DtUtil,
 	ControlVariantApplyAPI,
 	ChangesWriteAPI,
 	LocalResetAPI,
@@ -32,6 +34,28 @@ sap.ui.define([
 	"use strict";
 
 	var sandbox = sinon.createSandbox();
+
+	async function getMenuEntryAndCheck(assert, oOverlay, oAssertions) {
+		this.oLocalResetPlugin.deregisterElementOverlay(oOverlay);
+		this.oLocalResetPlugin.registerElementOverlay(oOverlay);
+
+		await DtUtil.waitForSynced(this.oDesignTime)();
+		const bIsEditable = await this.oLocalResetPlugin._isEditable(oOverlay);
+		assert.strictEqual(bIsEditable, oAssertions.editable, "then the editable property is correct");
+		if (oAssertions.available !== undefined) {
+			assert.strictEqual(this.oLocalResetPlugin.isAvailable([oOverlay], {}), oAssertions.available, "then available is correct");
+		}
+
+		const oMenuItem = (await this.oLocalResetPlugin.getMenuItems([oOverlay]))[0];
+		if (oMenuItem) {
+			if (typeof oMenuItem.enabled === "function") {
+				assert.strictEqual(oMenuItem.enabled([oOverlay], oMenuItem), oAssertions.enabled, "then the enabled property is correct");
+			} else {
+				assert.strictEqual(oMenuItem.enabled, oAssertions.enabled, "then the enabled property is correct");
+			}
+		}
+		return oMenuItem;
+	}
 
 	QUnit.module("Given a designTime and localReset plugin are instantiated", {
 		async beforeEach(assert) {
@@ -68,18 +92,16 @@ sap.ui.define([
 			this.oSimpleForm.destroy();
 		}
 	}, function() {
-		QUnit.test("when an overlay has no localReset action designTime metadata", function(assert) {
+		QUnit.test("when an overlay has no localReset action designTime metadata", async function(assert) {
 			this.oSimpleFormOverlay.setDesignTimeMetadata({});
 
-			assert.strictEqual(
-				this.oLocalResetPlugin.isEnabled([this.oSimpleFormOverlay]), false, "... then isEnabled is called, then it returns false"
-			);
-			assert.strictEqual(
-				this.oLocalResetPlugin._isEditable(this.oSimpleFormOverlay), false, "... then _isEditable is called, then it returns false"
-			);
+			await getMenuEntryAndCheck.call(this, assert, this.oSimpleFormOverlay, {
+				editable: false,
+				enabled: false
+			});
 		});
 
-		QUnit.test("when an overlay has localReset action designTime metadata, but has no isEnabled property defined", function(assert) {
+		QUnit.test("when an overlay has localReset action designTime metadata, but has no isEnabled property defined", async function(assert) {
 			sandbox.stub(LocalResetAPI, "isResetEnabled").returns(true);
 
 			this.oSimpleFormOverlay.setDesignTimeMetadata({
@@ -90,15 +112,13 @@ sap.ui.define([
 				}
 			});
 
-			assert.strictEqual(
-				this.oLocalResetPlugin.isEnabled([this.oSimpleFormOverlay]), true, "... then isEnabled is called, then it returns true"
-			);
-			assert.strictEqual(
-				this.oLocalResetPlugin._isEditable(this.oSimpleFormOverlay), true, "... then _isEditable is called, then it returns true"
-			);
+			await getMenuEntryAndCheck.call(this, assert, this.oSimpleFormOverlay, {
+				editable: true,
+				enabled: true
+			});
 		});
 
-		QUnit.test("when an overlay has localReset action designTime metadata, and isEnabled property is boolean", function(assert) {
+		QUnit.test("when an overlay has localReset action designTime metadata, and isEnabled property is boolean", async function(assert) {
 			sandbox.stub(LocalResetAPI, "isResetEnabled").returns(true);
 
 			this.oSimpleFormOverlay.setDesignTimeMetadata({
@@ -110,17 +130,13 @@ sap.ui.define([
 				}
 			});
 
-			assert.strictEqual(
-				this.oLocalResetPlugin.isEnabled([this.oSimpleFormOverlay]),
-				false,
-				"... then isEnabled is called, then it returns correct value"
-			);
-			assert.strictEqual(
-				this.oLocalResetPlugin._isEditable(this.oSimpleFormOverlay), true, "... then _isEditable is called, then it returns true"
-			);
+			await getMenuEntryAndCheck.call(this, assert, this.oSimpleFormOverlay, {
+				editable: true,
+				enabled: false
+			});
 		});
 
-		QUnit.test("when an overlay has localReset action designTime metadata, and isEnabled is a function", function(assert) {
+		QUnit.test("when an overlay has localReset action designTime metadata, and isEnabled is a function", async function(assert) {
 			sandbox.stub(LocalResetAPI, "isResetEnabled").returns(true);
 
 			this.oSimpleFormOverlay.setDesignTimeMetadata({
@@ -134,17 +150,13 @@ sap.ui.define([
 				}
 			});
 
-			assert.strictEqual(
-				this.oLocalResetPlugin.isEnabled([this.oSimpleFormOverlay]),
-				false,
-				"... then isEnabled is called, then it returns correct value from function call"
-			);
-			assert.strictEqual(
-				this.oLocalResetPlugin._isEditable(this.oSimpleFormOverlay), true, "... then _isEditable is called, then it returns true"
-			);
+			await getMenuEntryAndCheck.call(this, assert, this.oSimpleFormOverlay, {
+				editable: true,
+				enabled: false
+			});
 		});
 
-		QUnit.test("when an overlay has localReset action designTime metadata but no stable id", function(assert) {
+		QUnit.test("when an overlay has localReset action designTime metadata but no stable id", async function(assert) {
 			sandbox.stub(LocalResetAPI, "isResetEnabled").returns(true);
 			this.oSimpleFormOverlay.data("hasStableId", false);
 
@@ -156,14 +168,13 @@ sap.ui.define([
 				}
 			});
 
-			assert.strictEqual(
-				this.oLocalResetPlugin._isEditable(this.oSimpleFormOverlay),
-				false,
-				"... then when _isEditable is called with an unstable Id it returns false"
-			);
+			await getMenuEntryAndCheck.call(this, assert, this.oSimpleFormOverlay, {
+				editable: false,
+				enabled: false
+			});
 		});
 
-		QUnit.test("when an overlay has localReset action designTime metadata, and isEnabled is function set to true, but there are no changes for localReset", function(assert) {
+		QUnit.test("when an overlay has localReset action designTime metadata, and isEnabled is function set to true, but there are no changes for localReset", async function(assert) {
 			sandbox.stub(LocalResetAPI, "isResetEnabled").returns(false);
 
 			this.oSimpleFormOverlay.setDesignTimeMetadata({
@@ -177,16 +188,10 @@ sap.ui.define([
 				}
 			});
 
-			assert.strictEqual(
-				this.oLocalResetPlugin.isEnabled([this.oSimpleFormOverlay]),
-				false,
-				"... then isEnabled is called, then it returns correct value from function call"
-			);
-			assert.strictEqual(
-				this.oLocalResetPlugin._isEditable(this.oSimpleFormOverlay),
-				true,
-				"... then _isEditable is called, then it returns true"
-			);
+			await getMenuEntryAndCheck.call(this, assert, this.oSimpleFormOverlay, {
+				editable: true,
+				enabled: false
+			});
 		});
 
 		QUnit.test("when handler and getMenuItems is called for an overlay with localReset action designTime metadata, and isEnabled property is boolean", async function(assert) {
@@ -200,47 +205,27 @@ sap.ui.define([
 				}
 			});
 
-			sandbox.stub(this.oLocalResetPlugin, "isAvailable")
-			.onFirstCall().returns(true)
-			.onSecondCall().returns(true);
+			sandbox.stub(this.oLocalResetPlugin, "isAvailable").returns(true);
 			const oHandlerStub = sandbox.stub(this.oLocalResetPlugin, "handler");
 			const oIsEnabledSpy = sandbox.spy(this.oLocalResetPlugin, "isEnabled");
 
-			assert.strictEqual(
-				this.oLocalResetPlugin.isEnabled([this.oSimpleFormOverlay]),
-				false, "... then isEnabled is called, then it returns correct value"
-			);
+			const oMenuItem = await getMenuEntryAndCheck.call(this, assert, this.oSimpleFormOverlay, {
+				editable: true,
+				enabled: false
+			});
 			assert.strictEqual(
 				oIsEnabledSpy.args[0][0][0].getId(),
-				 this.oSimpleFormOverlay.getId(),
-				 "... and isEnabled is called with the correct overlay");
-			assert.strictEqual(
-				this.oLocalResetPlugin._isEditable(this.oSimpleFormOverlay),
-				true,
-				"... then _isEditable is called, then it returns true"
+				this.oSimpleFormOverlay.getId(),
+				"... and isEnabled is called with the correct overlay"
 			);
-			assert.strictEqual(this.oLocalResetPlugin.getActionName(), "localReset", "... then getActionName returns the correct name");
 
-			const aMenuItems = await this.oLocalResetPlugin.getMenuItems([this.oSimpleFormOverlay]);
-			assert.strictEqual(aMenuItems[0].id, "CTX_LOCAL_RESET", "'getMenuItems' returns the context menu item for the plugin");
+			assert.strictEqual(oMenuItem.id, "CTX_LOCAL_RESET", "'getMenuItems' returns the context menu item for the plugin");
 
-			aMenuItems[0].handler([this.oSimpleFormOverlay]);
+			oMenuItem.handler([this.oSimpleFormOverlay]);
 			assert.deepEqual(oHandlerStub.args[0][0], [this.oSimpleFormOverlay], "the 'handler' method is called with the right overlays");
-
-			aMenuItems[0].enabled([this.oSimpleFormOverlay]);
-			assert.strictEqual(
-				oIsEnabledSpy.args[1][0][0].getId(), this.oSimpleFormOverlay.getId(),
-				 "the 'isEnabled' function is called with the correct overlay"
-				 );
-
-			assert.strictEqual(
-				(await this.oLocalResetPlugin.getMenuItems([this.oSimpleFormOverlay])).length,
-				0,
-				"and if the plugin is not enabled, no menu entries are returned"
-			);
 		});
 
-		QUnit.test("when the isEnabled check is called with an element where changeOnRelevantContainer is true", function(assert) {
+		QUnit.test("when the isEnabled check is called with an element where changeOnRelevantContainer is true", async function(assert) {
 			this.oNestedFormOverlay.setDesignTimeMetadata({
 				actions: {
 					localReset: {
@@ -249,8 +234,12 @@ sap.ui.define([
 					}
 				}
 			});
-			var oIsEnabledStub = sandbox.stub(LocalResetAPI, "isResetEnabled");
-			this.oLocalResetPlugin.isEnabled([this.oNestedFormOverlay]);
+			const oIsEnabledStub = sandbox.stub(LocalResetAPI, "isResetEnabled").returns(true);
+			sandbox.stub(this.oLocalResetPlugin, "isAvailable").returns(true);
+			await getMenuEntryAndCheck.call(this, assert, this.oNestedFormOverlay, {
+				editable: true,
+				enabled: true
+			});
 
 			assert.strictEqual(
 				oIsEnabledStub.args[0][0].getId(),

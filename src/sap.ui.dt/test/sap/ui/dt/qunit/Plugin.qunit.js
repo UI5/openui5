@@ -175,6 +175,7 @@ sap.ui.define([
 			this.fnGetResponsibleElement = function() {};
 			this.fnGetAction = function() {};
 			this.fnGetData = function() {};
+			this.fnIsResponsibleActionAvailable = function() {};
 			this.oOverlay = {
 				getElement() {
 					return "dummyElement";
@@ -190,7 +191,8 @@ sap.ui.define([
 								return "dummyText";
 							}
 							return undefined;
-						}
+						},
+						isResponsibleActionAvailable: this.fnIsResponsibleActionAvailable
 					};
 				}.bind(this)
 			};
@@ -299,7 +301,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getResponsibleElementOverlay() is called for an element overlay, with a responsible element and action derived from getActionName()", function(assert) {
-			assert.expect(2);
+			assert.expect(3);
 			var oResponsibleElement = new Button("responsibleElement");
 			this.oPlugin.getActionName = function() {
 				return "dummyAction";
@@ -308,23 +310,25 @@ sap.ui.define([
 			sandbox.stub(OverlayRegistry, "getOverlay").withArgs(oResponsibleElement).returns(oResponsibleElementOverlay);
 
 			this.fnGetResponsibleElement = function(oElement) {
-				assert.equal(oElement, "dummyElement", "then getResponsibleElement() called to retrieve the responsible element with the correct action");
+				assert.strictEqual(oElement, "dummyElement", "then getResponsibleElement() called to retrieve the responsible element");
 				return oResponsibleElement;
 			};
+			this.fnIsResponsibleActionAvailable = function(...aArgs) {
+				assert.strictEqual(aArgs[0], "dummyAction",
+					"then designTimeMetadata.isResponsibleActionAvailable() called with the plugin action name");
+				return true;
+			};
 			oResponsibleElement.destroy();
-			assert.deepEqual(this.oPlugin.getResponsibleElementOverlay(this.oOverlay), oResponsibleElementOverlay, "then the menu item from the responsible element is returned");
+			assert.deepEqual(this.oPlugin.getResponsibleElementOverlay(this.oOverlay), oResponsibleElementOverlay, "then the responsible element is returned");
 		});
 
 		QUnit.test("when getResponsibleElementOverlay() is called for an element overlay, with a responsible element and action derived from the passed parameter", function(assert) {
-			assert.expect(2);
 			var oResponsibleElement = new Button("responsibleElement");
 			var oResponsibleElementOverlay = { type: "responsibleElementOverlay" };
 			sandbox.stub(OverlayRegistry, "getOverlay").withArgs(oResponsibleElement).returns(oResponsibleElementOverlay);
 
-			this.fnGetResponsibleElement = function(oElement) {
-				assert.equal(oElement, "dummyElement", "then getResponsibleElement() called to retrieve the responsible element with the correct action");
-				return oResponsibleElement;
-			};
+			this.fnGetResponsibleElement = () => oResponsibleElement;
+			this.fnIsResponsibleActionAvailable = () => true;
 
 			oResponsibleElement.destroy();
 			assert.deepEqual(this.oPlugin.getResponsibleElementOverlay(this.oOverlay, "dummyAction"), oResponsibleElementOverlay, "then the menu item from the responsible element is returned");
@@ -466,7 +470,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when an action is enabled on a responsible element's overlay and _getMenuItems() is called", async function(assert) {
-			assert.expect(4);
+			assert.expect(2);
 			this.oPlugin.isAvailable = sandbox.stub();
 			const oResponsibleElement = new Button("responsibleElement");
 			const oResponsibleElementOverlay = {
@@ -483,15 +487,8 @@ sap.ui.define([
 			};
 			sandbox.stub(OverlayRegistry, "getOverlay").withArgs(oResponsibleElement).returns(oResponsibleElementOverlay);
 
-			this.fnGetResponsibleElement = function(oElement) {
-				assert.equal(oElement, "dummyElement", "then getResponsibleElement() called to retrieve the responsible element");
-				return oResponsibleElement;
-			};
-			this.fnIsResponsibleActionAvailable = function(...aArgs) {
-				assert.equal(aArgs[0], "dummyActionName",
-					"then designTimeMetadata.isResponsibleActionAvailable() called with the plugin action name");
-				return true;
-			};
+			this.fnGetResponsibleElement = () => oResponsibleElement;
+			this.fnIsResponsibleActionAvailable = () => true;
 
 			// when action is available on the source overlay
 			// and it is available on the responsible element overlay
@@ -523,15 +520,8 @@ sap.ui.define([
 			this.fnGetAction = function() {
 				return {};
 			};
-			this.fnGetResponsibleElement = function(oElement) {
-				assert.equal(oElement, "dummyElement", "then getResponsibleElement() called to retrieve the responsible element");
-				return oResponsibleElement;
-			};
-			this.fnIsResponsibleActionAvailable = function(...aArgs) {
-				assert.equal(aArgs[0], "dummyActionName",
-					"then designTimeMetadata.isResponsibleActionAvailable() called with the plugin action name");
-				return false;
-			};
+			this.fnGetResponsibleElement = () => oResponsibleElement;
+			this.fnIsResponsibleActionAvailable = () => false;
 
 			// when action is not available on the source overlay
 			// but it is available on the responsible element overlay

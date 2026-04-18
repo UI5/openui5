@@ -43,6 +43,7 @@ sap.ui.define([
 				aggregationName: mAction.aggregation,
 				addPropertyActionData: {
 					designTimeMetadata: oDesignTimeMetadata,
+					aggregationName: mAction.aggregation,
 					action: mAction,
 					delegateInfo: {
 						payload: mAction.delegateInfo.payload || {},
@@ -129,7 +130,8 @@ sap.ui.define([
 
 		let oRevealObject = {
 			elements: [],
-			controlTypeNames: []
+			controlTypeNames: [],
+			aggregationName: sAggregationName
 		};
 		for (const mInvisibleElement of aInvisibleElements) {
 			oRevealObject = await checkAndEnrichReveal(oRevealObject, mInvisibleElement, oPlugin, sAggregationName);
@@ -282,6 +284,10 @@ sap.ui.define([
 		]);
 		// join and condense all action data
 		const mAllActions = merge(oRevealAction, oAddViaDelegateAction);
+		Object.keys(mAllActions).forEach(function(sAggregationName) {
+			mAllActions[sAggregationName].aggregation = sAggregationName;
+		});
+
 		oSourceElementOverlay._mAddActions ||= { asSibling: {}, asChild: {} };
 		oSourceElementOverlay._mAddActions[sSiblingOrChild] = mAllActions;
 		return mAllActions;

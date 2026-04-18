@@ -37,9 +37,7 @@ sap.ui.define([
 	});
 
 	/**
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
-	 * @returns {Promise.<boolean>} <code>true</code> if it's editable wrapped in a promise.
-	 * @private
+	 * @override
 	 */
 	Split.prototype._isEditable = function(oOverlay) {
 		if (this.getAction(oOverlay)?.changeOnRelevantContainer) {
@@ -49,13 +47,9 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if Split is available for oOverlay
-	 *
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {boolean} <code>true</code> if available
-	 * @public
+	 * @override
 	 */
-	Split.prototype.isAvailable = function(aElementOverlays) {
+	Split.prototype.isAvailable = function(aElementOverlays, oAction) {
 		if (aElementOverlays.length !== 1) {
 			return false;
 		}
@@ -66,7 +60,7 @@ sap.ui.define([
 		}
 
 		const oElement = oElementOverlay.getElement();
-		if (this.getAction(oElementOverlay)?.getControlsCount(oElement) <= 1) {
+		if (oAction?.getControlsCount(oElement) <= 1) {
 			return false;
 		}
 
@@ -74,59 +68,25 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if Split is enabled for oOverlay
-	 *
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {boolean} <code>true</code> if enabled
-	 * @public
-	 */
-	Split.prototype.isEnabled = function(aElementOverlays) {
-		const oElementOverlay = aElementOverlays[0];
-
-		// check that each selected element has an enabled action
-		const oAction = this.getAction(oElementOverlay);
-		if (!oAction || !this.isAvailable(aElementOverlays)) {
-			return false;
-		}
-
-		// actions are by default enabled
-		let bActionIsEnabled = true;
-		if (typeof oAction.isEnabled !== "undefined") {
-			if (typeof oAction.isEnabled === "function") {
-				bActionIsEnabled = oAction.isEnabled(oElementOverlay.getElement());
-			} else {
-				bActionIsEnabled = oAction.isEnabled;
-			}
-		}
-		return bActionIsEnabled;
-	};
-
-	/**
 	 * @param {sap.ui.dt.ElementOverlay} oElementOverlay - Element overlay to split
 	 * @returns {Promise<sap.ui.rta.command.Split>} Resolves with a split command
 	 */
-	Split.prototype.handleSplit = async function(oElementOverlay) {
+	Split.prototype.handler = async function(aElementOverlays, mPropertyBag) {
+		const oElementOverlay = aElementOverlays[0];
 		const oSplitElement = oElementOverlay.getElement();
-		const oParent = oSplitElement.getParent();
-		const oDesignTimeMetadata = oElementOverlay.getDesignTimeMetadata();
-		const oAction = this.getAction(oElementOverlay);
-
-		const iElementsCount = oAction.getControlsCount(oSplitElement);
-		const oView = FlexUtils.getViewForControl(oSplitElement);
+		const oAction = mPropertyBag.menuItem.action;
 		const aNewElementIds = [];
 
-		for (let i = 0; i < iElementsCount; i++) {
-			aNewElementIds.push(oView.createId(uid()));
+		for (let i = 0; i < oAction.getControlsCount(oSplitElement); i++) {
+			aNewElementIds.push(FlexUtils.getViewForControl(oSplitElement).createId(uid()));
 		}
-
-		const sVariantManagementReference = this.getVariantManagementReference(oElementOverlay, oAction);
 
 		try {
 			const oSplitCommand = await this.getCommandFactory().getCommandFor(oSplitElement, "split", {
 				newElementIds: aNewElementIds,
 				source: oSplitElement,
-				parentElement: oParent
-			}, oDesignTimeMetadata, sVariantManagementReference);
+				parentElement: oSplitElement.getParent()
+			}, oElementOverlay.getDesignTimeMetadata(), this.getVariantManagementReference(oElementOverlay, oAction));
 
 			this.fireElementModified({
 				command: oSplitCommand
@@ -134,36 +94,25 @@ sap.ui.define([
 		} catch (vError) {
 			throw DtUtil.propagateError(
 				vError,
-				"Split#handleSplit",
-				"Error occurred during handleSplit execution",
+				"Split#handler",
+				"Error occurred during handler execution",
 				"sap.ui.rta.plugin"
 			);
 		}
 	};
 
 	/**
-	 * Retrieve the context menu item for the action.
-	 * @param {sap.ui.dt.ElementOverlay|sap.ui.dt.ElementOverlay[]} vElementOverlays - Overlays for which actions are requested
-	 * @returns {object[]} - Items with required data
+	 * @override
 	 */
 	Split.prototype.getMenuItems = function(vElementOverlays) {
 		return this._getMenuItems(vElementOverlays, { pluginId: "CTX_UNGROUP_FIELDS", icon: "sap-icon://split" });
 	};
 
 	/**
-	 * Get the name of the action related to this plugin.
-	 * @returns {string} Action name
+	 * @override
 	 */
 	Split.prototype.getActionName = function() {
 		return "split";
-	};
-
-	/**
-	 * Trigger the plugin execution.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 */
-	Split.prototype.handler = function(aElementOverlays) {
-		this.handleSplit(aElementOverlays[0]);
 	};
 
 	return Split;

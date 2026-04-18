@@ -58,12 +58,7 @@ sap.ui.define([
 	}
 
 	/**
-	 * Check if the given overlay should be editable. This action is available by default,
-	 * disabling it requires explicitly setting it to null in the designtime metadata.
-	 *
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
-	 * @returns {Promise<boolean>} <code>true</code> when editable wrapped in a promise
-	 * @private
+	 * @override
 	 */
 	ExtendControllerPlugin.prototype._isEditable = function(oOverlay) {
 		// Action should be available by default
@@ -75,10 +70,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if ExtendController is enabled for the given overlays
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {boolean} <code>true</code> if enabled
-	 * @public
+	 * @override
 	 */
 	ExtendControllerPlugin.prototype.isEnabled = function(aElementOverlays) {
 		return aElementOverlays.length === 1
@@ -87,11 +79,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Redefinition of getActionText to add special texts for the context menu
-	 * @param  {sap.ui.dt.ElementOverlay} oOverlay Overlay containing the Designtime Metadata
-	 * @param  {object} mAction The action data from the Designtime Metadata
-	 * @param  {string} sPluginId The ID of the plugin
-	 * @returns {string} Returns the text for the menu item
+	 * @override
 	 */
 	ExtendControllerPlugin.prototype.getActionText = function(oOverlay, mAction, sPluginId) {
 		const vName = mAction.name;
@@ -119,11 +107,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Triggers the plugin execution.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @param {Object} mPropertyBag - Property bag
-	 * @param {sap.ui.rta.plugin.ExtentController.handlerFunction} [mPropertyBag.handlerFunction] - Handler function for controller handling. The controller handler is a callback function that needs to be passed here into the <code>propertyBag</code> or alternatively on instantiation of the plugin.
-	 * @returns {Promise} Resolves when handler is executed successfully
+	 * @override
 	 */
 	ExtendControllerPlugin.prototype.handler = async function(aElementOverlays, mPropertyBag) {
 		try {
@@ -150,17 +134,15 @@ sap.ui.define([
 		} catch (vError) {
 			throw DtUtil.propagateError(
 				vError,
-				"ExtentController#handler",
-				"Error occurred in ExtentController handler function",
+				"ExtendController#handler",
+				"Error occurred in ExtendController handler function",
 				"sap.ui.rta"
 			);
 		}
 	};
 
 	/**
-	 * Retrieves the context menu item for the action.
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @returns {object[]} Array of the items with required data
+	 * @override
 	 */
 	ExtendControllerPlugin.prototype.getMenuItems = function(aElementOverlays) {
 		return this._getMenuItems(aElementOverlays, {
@@ -171,17 +153,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets the name of the action related to this plugin.
-	 * @returns {string} Action name
+	 * @override
 	 */
 	ExtendControllerPlugin.prototype.getActionName = function() {
 		return "extendController";
 	};
 
 	/**
-	 * Returns the action information when defined in the designtime metadata or an object with only the changeType.
-	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay containing the Designtime Metadata
-	 * @returns {object} Action information
+	 * @override
 	 */
 	ExtendControllerPlugin.prototype.getAction = function(oOverlay) {
 		const oAction = Plugin.prototype.getAction.apply(this, [oOverlay]);

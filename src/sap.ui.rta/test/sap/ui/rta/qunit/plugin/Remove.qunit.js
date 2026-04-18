@@ -9,7 +9,6 @@ sap.ui.define([
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/rta/command/CommandFactory",
-	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/rta/plugin/Remove",
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4",
@@ -24,7 +23,6 @@ sap.ui.define([
 	ChangesWriteAPI,
 	VerticalLayout,
 	CommandFactory,
-	QUnitUtils,
 	RemovePlugin,
 	Utils,
 	sinon,
@@ -131,9 +129,12 @@ sap.ui.define([
 						if (oElement === this.oButton) {
 							return this.oButton1;
 						}
-					}.bind(this)
+					}.bind(this),
+					actionsFromResponsibleElement: ["remove"]
 				}
 			});
+			this.oRemovePlugin.deregisterElementOverlay(this.oButtonOverlay);
+			this.oRemovePlugin.registerElementOverlay(this.oButtonOverlay);
 
 			this.oRemovePlugin.attachEventOnce("elementModified", function(oEvent) {
 				var oRemoveCommand = oEvent.getParameter("command").getCommands()[0];
@@ -177,7 +178,7 @@ sap.ui.define([
 			assert.strictEqual(this.oRemovePlugin.isEnabled([this.oButtonOverlay]), true, "... then isEnabled returns true");
 		});
 
-		QUnit.test("when remove is not available for all elements in the same aggregation (empty aggregation use-case)", function(assert) {
+		QUnit.test("when remove is not available for all elements in the same aggregation (empty aggregation use-case)", async function(assert) {
 			this.oButtonOverlay.setDesignTimeMetadata({
 				actions: {
 					remove: {
@@ -188,8 +189,13 @@ sap.ui.define([
 
 			this.oRemovePlugin.deregisterElementOverlay(this.oButtonOverlay);
 			this.oRemovePlugin.registerElementOverlay(this.oButtonOverlay);
+			sandbox.stub(this.oRemovePlugin, "isAvailable").returns(true);
+			const oMenuItem = (await this.oRemovePlugin.getMenuItems([this.oButtonOverlay, this.oButtonOverlay1]))[0];
 
-			assert.notOk(this.oRemovePlugin.isEnabled([this.oButtonOverlay, this.oButtonOverlay1]), "... then isEnabled returns false");
+			assert.strictEqual(
+				this.oRemovePlugin.isEnabled([this.oButtonOverlay, this.oButtonOverlay1], oMenuItem), false,
+				"then isEnabled returns false"
+			);
 		});
 
 		QUnit.test("when an overlay has remove action designTime metadata, but the control has no parent", function(assert) {

@@ -41,6 +41,7 @@ sap.ui.define([
 
 	const SINGULAR = true;
 	const PLURAL = false;
+	const sOnlyCustomFieldAggregation = "$$OnlyChildCustomField$$";
 
 	function isThereAnAggregationActionForSameAggregation(mActions, mParents) {
 		const sResponsibleElementsParentAggregation = mParents.responsibleElementOverlay.getParentAggregationOverlay().getAggregationName();
@@ -155,54 +156,29 @@ sap.ui.define([
 			return aRelevantOverlays;
 		},
 
-		getContextMenuText(bOverlayIsSibling, oOverlay, sAggregationName, bHasSubMenu) {
-			let oTextResources;
-
-			function getGenericText() {
-				oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
+		getActionText(oOverlay, oAction, sPluginId) {
+			// When adding custom fields to a parent we don't know which control type will be added,
+			// nor to which aggregation, so we just show a generic entry "Add: Content"
+			if (oAction.aggregation === sOnlyCustomFieldAggregation) {
+				const oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
 				return oTextResources.getText("CTX_ADD_ELEMENTS", [oTextResources.getText("MULTIPLE_CONTROL_NAME")]);
 			}
 
-			// When adding custom fields to a parent we don't know which control type will be added,
-			// nor to which aggregation, so we just show a generic entry "Add: Content"
-			if (sAggregationName === "$$OnlyChildCustomField$$") {
-				return getGenericText();
-			}
-
-			// When a submenu is present, the text is always the same
-			if (bHasSubMenu) {
-				oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
-				return oTextResources.getText("CTX_ADD_ELEMENTS_WITH_SUBMENU");
-			}
+			const bOverlayIsSibling = sPluginId === "CTX_ADD_ELEMENTS_AS_SIBLING";
 			const mParents = AdditionalElementsUtils.getParents(bOverlayIsSibling, oOverlay, this);
-			const mAllActions = ActionExtractor.getActionsOrUndef(bOverlayIsSibling, oOverlay);
-			sAggregationName ||= Object.keys(mAllActions)[0];
-			const mActions = mAllActions[sAggregationName];
-
-			// Safeguarding
-			if (!mActions) {
-				return getGenericText();
-			}
-			mActions.aggregation = sAggregationName;
-			return AdditionalElementsUtils.getText("CTX_ADD_ELEMENTS", mActions, mParents.parent, SINGULAR);
+			return AdditionalElementsUtils.getText("CTX_ADD_ELEMENTS", oAction, mParents.parent, SINGULAR);
 		},
 
-		isAvailable(aElementOverlays, bOverlayIsSibling) {
-			return aElementOverlays.every(function(oElementOverlay) {
-				return this._isEditableByPlugin(oElementOverlay, bOverlayIsSibling);
-			}, this);
-		},
-
-		isEnabled(aElementOverlays, bOverlayIsSibling, sAggregationName) {
+		isEnabled(aElementOverlays, oMenuItem) {
 			if (aElementOverlays.length > 1) {
 				return false;
 			}
 
+			const bOverlayIsSibling = oMenuItem.bAsSibling;
 			if (this.getExtensibilityInfo(bOverlayIsSibling)) {
 				return true;
 			}
-
-			const oOverlay = this.getResponsibleElementOverlay(aElementOverlays[0]);
+			const oOverlay = oMenuItem.responsible?.[0] || aElementOverlays[0];
 			let oParentOverlay;
 			let bIsEnabled = false;
 			if (bOverlayIsSibling) {
@@ -210,16 +186,8 @@ sap.ui.define([
 				if (oParentOverlay) {
 					bIsEnabled = true;
 				}
-			} else {
-				const mAllActions = ActionExtractor.getActionsOrUndef(bOverlayIsSibling, oOverlay);
-				const mActions = mAllActions[sAggregationName];
-				if (
-					mActions &&
-					((mActions.reveal && mActions.reveal.elements.length > 0)
-					|| mActions.addViaDelegate)
-				) {
-					bIsEnabled = true;
-				}
+			} else if (oMenuItem.action.reveal?.elements.length > 0 || oMenuItem.action.addViaDelegate) {
+				bIsEnabled = true;
 			}
 
 			const oCachedElements = this.getCachedElements(bOverlayIsSibling);
@@ -249,37 +217,21 @@ sap.ui.define([
 			Plugin.prototype.registerElementOverlay.apply(this, aArgs);
 		},
 
-		_checkIfCreateFunctionIsAvailable(mChangeHandlerSettings) {
-			return !mChangeHandlerSettings ||
-				(
-					mChangeHandlerSettings &&
-					mChangeHandlerSettings.content &&
-					mChangeHandlerSettings.content.createFunction
-				);
-		},
-
 		/**
-		 * Opens a dialog containing all the elements that can be added for a control and aggregation
-		 * @param {boolean} bOverlayIsSibling - Indicates if the elements should be added as sibling (true) or child (false) to the overlay
-		 * @param {string} sAggregationName - The name of the aggregation to where the elements can be added
-		 * @param {Array<sap.ui.dt.ElementOverlay>} aResponsibleElementOverlays - Array containing the overlay of the control
-		 * @param {number} [iIndex] - The position where the element will be added
-		 * @param {string} [sControlName] - The name of the control
-		 * @param {sDisplayText} [sDisplayText] - The display text of the control for the dialog
-		 *
-		 * @returns {Promise} Resolves when the dialog closes
+		 * @override
 		 */
-		async showAvailableElements(bOverlayIsSibling, sAggregationName, aResponsibleElementOverlays, iIndex, sControlName, sDisplayText) {
+		async handler(aResponsibleElementOverlays, mPropertyBag) {
+			const bOverlayIsSibling = mPropertyBag.menuItem.bAsSibling;
+			const sAggregationName = mPropertyBag.menuItem.action.aggregation;
 			const oResponsibleElementOverlay = aResponsibleElementOverlays[0];
 			const mParents = AdditionalElementsUtils.getParents(bOverlayIsSibling, oResponsibleElementOverlay, this);
 			const vSiblingElement = bOverlayIsSibling && oResponsibleElementOverlay.getElement();
 
-			const mRetrievedActions = await ActionExtractor.getActions(bOverlayIsSibling, oResponsibleElementOverlay, this, undefined, this.getDesignTime());
 			let aCollectedElements = [];
-			const mActions = mRetrievedActions[sAggregationName];
-			if (sAggregationName !== "$$OnlyChildCustomField$$") {
+			const mActions = mPropertyBag.menuItem.action;
+			if (sAggregationName !== sOnlyCustomFieldAggregation) {
 				try {
-					aCollectedElements = await this.getAllElements(bOverlayIsSibling, [mParents.responsibleElementOverlay], sControlName, sDisplayText);
+					aCollectedElements = await this.getAllElements(bOverlayIsSibling, [mParents.responsibleElementOverlay]);
 				} catch (oError) {
 					if (oError instanceof Error) {
 						throw oError;
@@ -297,14 +249,14 @@ sap.ui.define([
 			const aElementsPerAggregation = oAggregationWithElements ? oAggregationWithElements.elements : [];
 
 			this.getDialog().setElements(aElementsPerAggregation);
-			if (sDisplayText) {
+			if (mPropertyBag.menuItem.displayText) {
 				// Aggregation is part of title
 				const oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
-				const sDialogTitle = oTextResources.getText("HEADER_ADDITIONAL_ELEMENTS_WITH_AGGREGATION", [sDisplayText]);
+				const sDialogTitle = oTextResources.getText("HEADER_ADDITIONAL_ELEMENTS_WITH_AGGREGATION", [mPropertyBag.menuItem.displayText]);
 				this.getDialog().setTitle(sDialogTitle);
-			} else if (sAggregationName || sControlName) {
+			} else if (sAggregationName) {
 				// Only one aggregation, no aggregation in title
-				this._setDialogTitle(mActions || {}, mParents.parent, sControlName);
+				this._setDialogTitle(mActions || {}, mParents.parent);
 			}
 
 			try {
@@ -314,7 +266,7 @@ sap.ui.define([
 				await CommandBuilder.createCommands(mParents,
 					vSiblingElement,
 					mActions,
-					iIndex,
+					undefined,
 					aSelectedElements,
 					sAggregationName,
 					this
@@ -329,13 +281,12 @@ sap.ui.define([
 			}
 		},
 
-		_setDialogTitle(mActions, oParentElement, sControlName) {
+		_setDialogTitle(mActions, oParentElement) {
 			const sDialogTitle = AdditionalElementsUtils.getText(
 				"HEADER_ADDITIONAL_ELEMENTS",
 				mActions,
 				oParentElement,
-				PLURAL,
-				sControlName
+				PLURAL
 			);
 			this.getDialog().setTitle(sDialogTitle);
 		},
@@ -352,10 +303,6 @@ sap.ui.define([
 		},
 
 		/**
-		 * This function gets called on startup. It checks if the Overlay is editable by this plugin.
-		 * @param {sap.ui.dt.Overlay} oOverlay - Overlay to be checked
-		 * @param {object} mPropertyBag - Additional data for the check
-		 * @returns {object} Returns object with editable boolean values for "asChild" and "asSibling"
 		 * @override
 		 */
 		async _isEditable(oOverlay, mPropertyBag) {
@@ -456,11 +403,7 @@ sap.ui.define([
 		},
 
 		/**
-		 * Retrieves the context menu item for the actions
-		 * Two items are returned here: one for when the overlay is sibling and one for when it is child. In case of multiple
-		 * aggregations for child elements, a submenu is built containing all aggregations and the sibling.
-		 * @param {sap.ui.dt.ElementOverlay} aElementOverlays - List of overlays for which the context menu was opened
-		 * @returns {object[]} Array containing the items with required data
+		 * @override
 		 */
 		getMenuItems(aElementOverlays) {
 			const aMenuItems = [];
@@ -473,18 +416,18 @@ sap.ui.define([
 				this.getAllElements(false, aElementOverlays),
 				this.getAllElements(true, aElementOverlays)
 			])
-			.then(function(aElementsWithAggregations) {
+			.then(async (aElementsWithAggregations) => {
 				const bHasChildren = aElementsWithAggregations[0].length > 0;
 				const bHasMultipleAggregations = aElementsWithAggregations[0].length > 1;
 				const bHasSiblings = aElementsWithAggregations[1].length > 0;
-				const bIsAvailableForChildren = this.isAvailable(aElementOverlays, false);
-				const bIsAvailableForSibling = this.isAvailable(aElementOverlays, true);
+				const bIsAvailableForChildren = this.isAvailable(aElementOverlays, {}, false);
+				const bIsAvailableForSibling = this.isAvailable(aElementOverlays, {}, true);
 				if (
 					bIsAvailableForSibling
 					&& (!bIsAvailableForChildren || !bHasChildren)
 				) {
 					// Case 1: Only siblings -> No submenu required
-					oMenuItem = this._buildMenuItem(
+					oMenuItem = await this._buildMenuItem(
 						"CTX_ADD_ELEMENTS_AS_SIBLING",
 						true,
 						aElementOverlays,
@@ -497,7 +440,7 @@ sap.ui.define([
 					&& !bHasMultipleAggregations
 				) {
 					// Case 2: Only children, one aggregation -> No submenu required
-					oMenuItem = this._buildMenuItem(
+					oMenuItem = await this._buildMenuItem(
 						"CTX_ADD_ELEMENTS_AS_CHILD",
 						false,
 						aElementOverlays,
@@ -510,7 +453,7 @@ sap.ui.define([
 					&& bHasMultipleAggregations
 				) {
 					// Case 3: Only children, multiple aggregations -> Submenu required
-					oMenuItem = this._buildMenuItem(
+					oMenuItem = await this._buildMenuItem(
 						"CTX_ADD_ELEMENTS_AS_CHILD",
 						false,
 						aElementOverlays,
@@ -524,7 +467,7 @@ sap.ui.define([
 					&& bHasSiblings
 				) {
 					// Case 4: Children and siblings -> Submenu required
-					oMenuItem = this._buildMenuItem(
+					oMenuItem = await this._buildMenuItem(
 						"CTX_ADD_ELEMENTS_CHILD_AND_SIBLING",
 						false,
 						aElementOverlays,
@@ -540,56 +483,54 @@ sap.ui.define([
 					));
 				}
 				return aMenuItems;
-			}.bind(this));
+			});
 			return this._getMenuItemsPromise;
 		},
 
-		_buildMenuItem(sPluginId, bOverlayIsSibling, aElementOverlays, aElementsWithAggregations, bHasSubMenu) {
+		async _buildMenuItem(sPluginId, bOverlayIsSibling, aElementOverlays, aElementsWithAggregations, bHasSubMenu) {
 			let aSubMenuItems;
-			let vHandler;
 			let sAggregationName;
 			const oSelectedOverlay = aElementOverlays[0];
+			// If there are no elements to add but the action is still available, the dialog will open just to allow
+			// adding custom fields. When clicking on the parent, the aggregation name is irrelevant for the dialog
+			// since the field will be added to the underlying data model.
+			const bOnlyCustomField = aElementsWithAggregations[0].length === 0 && aElementsWithAggregations[1].length === 0;
 
 			if (bOverlayIsSibling) {
 				const mParents = AdditionalElementsUtils.getParents(bOverlayIsSibling, oSelectedOverlay, this);
 				sAggregationName = mParents.responsibleElementOverlay.getParentAggregationOverlay().getAggregationName();
 			} else {
-				// If there are no elements available but the action is still available, the dialog will open just to allow
-				// adding custom fields. When clicking on the parent, the aggregation name is irrelevant for the dialog
-				// since the field will be added to the underlying data model.
-				const bOnlyCustomField = aElementsWithAggregations[0].length === 0 && aElementsWithAggregations[1].length === 0;
-				sAggregationName = bOnlyCustomField ? "$$OnlyChildCustomField$$" :
+				sAggregationName = bOnlyCustomField
+					? sOnlyCustomFieldAggregation
 					// If only one child aggregation has invisible elements, get its aggregation name
-					aElementsWithAggregations[0] && aElementsWithAggregations[0][0] && aElementsWithAggregations[0][0].aggregation;
+					: aElementsWithAggregations[0] && aElementsWithAggregations[0][0] && aElementsWithAggregations[0][0].aggregation;
 			}
 			if (bHasSubMenu) {
 				// The children are displayed before the sibling
-				aSubMenuItems = this._buildSubmenuItems(false, aElementOverlays, aElementsWithAggregations[0]);
+				aSubMenuItems = await this._buildSubmenuItems(false, aElementOverlays, aElementsWithAggregations[0]);
 				if (sPluginId === "CTX_ADD_ELEMENTS_CHILD_AND_SIBLING") {
-					aSubMenuItems = aSubMenuItems.concat(this._buildSubmenuItems(true, aElementOverlays, aElementsWithAggregations[1]));
+					aSubMenuItems = aSubMenuItems.concat((await this._buildSubmenuItems(true, aElementOverlays, aElementsWithAggregations[1])));
 				}
-			} else {
-				vHandler = function(bOverlayIsSibling, aElementOverlays) {
-					return this.showAvailableElements(bOverlayIsSibling, sAggregationName, aElementOverlays);
-				}.bind(this, bOverlayIsSibling);
+				aSubMenuItems = aSubMenuItems.flat();
 			}
-			const oMenuItem = {
-				id: sPluginId,
-				text: this.getContextMenuText.bind(this, bOverlayIsSibling, oSelectedOverlay, sAggregationName, bHasSubMenu),
-				enabled: bHasSubMenu || function(bOverlayIsSibling, aElementOverlays) {
-					return this.isEnabled(aElementOverlays, bOverlayIsSibling, sAggregationName);
-				}.bind(this, bOverlayIsSibling),
-				rank: this.getRank(sPluginId),
+			const oAction = bOnlyCustomField && !bOverlayIsSibling
+				? {
+					aggregation: sOnlyCustomFieldAggregation
+				}
+				: ActionExtractor.getActionsOrUndef(bOverlayIsSibling, oSelectedOverlay)[sAggregationName];
+			const oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
+			const oMenuItem = await this._getMenuItems(aElementOverlays, {
+				pluginId: sPluginId,
+				submenu: aSubMenuItems,
 				icon: "sap-icon://add",
-				handler: vHandler
-			};
-			if (bHasSubMenu) {
-				oMenuItem.submenu = aSubMenuItems;
-			}
-			return oMenuItem;
+				bAsSibling: bOverlayIsSibling,
+				action: oAction,
+				text: bHasSubMenu ? oTextResources.getText("CTX_ADD_ELEMENTS_WITH_SUBMENU") : null
+			});
+			return oMenuItem[0];
 		},
 
-		_buildSubmenuItems(bOverlayIsSibling, aElementOverlays, aElementsWithAggregation) {
+		async _buildSubmenuItems(bOverlayIsSibling, aElementOverlays, aElementsWithAggregation) {
 			const aSubMenuItems = [];
 			const sPluginId = bOverlayIsSibling ? "CTX_ADD_ELEMENTS_AS_SIBLING" : "CTX_ADD_ELEMENTS_AS_CHILD";
 			let iPosition = 0;
@@ -608,32 +549,23 @@ sap.ui.define([
 				const mNames = oElementOverlayMetadata.getAggregationDisplayName(sAggregationName, oElementOverlay.getElement());
 				return mNames ? mNames.plural : sAggregationName;
 			}
-			aElementsWithAggregation.forEach(function(mElementsWithAggregation) {
+
+			const oResponsibleElementOverlay = this.getResponsibleElementOverlay(aElementOverlays[0]);
+			const oActions = ActionExtractor.getActionsOrUndef(bOverlayIsSibling, oResponsibleElementOverlay);
+			for (const mElementsWithAggregation of aElementsWithAggregation) {
 				const sAggregationName = mElementsWithAggregation.aggregation;
-				const oResponsibleElementOverlay = this.getResponsibleElementOverlay(aElementOverlays[0]);
 				const sDisplayText = getMenuItemText(bOverlayIsSibling, sAggregationName, oResponsibleElementOverlay);
-				const oItem = {
-					id: `${sPluginId}_${iPosition}`,
+				const oItem = (await this._getMenuItems(aElementOverlays, {
+					pluginId: `${sPluginId}_${iPosition}`,
 					text: sDisplayText,
-					enabled: function(aElementOverlays) {
-						return this.isEnabled(aElementOverlays, bOverlayIsSibling, sAggregationName);
-					}.bind(this),
-					handler: function(bOverlayIsSibling, aElementOverlays) {
-						// showAvailableElements has optional parameters
-						return this.showAvailableElements(
-							bOverlayIsSibling,
-							sAggregationName,
-							aElementOverlays,
-							undefined,
-							undefined,
-							sDisplayText
-						);
-					}.bind(this, bOverlayIsSibling),
-					icon: bOverlayIsSibling ? "sap-icon://BusinessSuiteInAppSymbols/icon-add-outside" : "sap-icon://add"
-				};
+					icon: bOverlayIsSibling ? "sap-icon://BusinessSuiteInAppSymbols/icon-add-outside" : "sap-icon://add",
+					bAsSibling: bOverlayIsSibling,
+					action: oActions[sAggregationName]
+				}))[0];
+				oItem.displayText = sDisplayText;
 				aSubMenuItems.push(this.enhanceItemWithResponsibleElement(oItem, aElementOverlays, ["addViaDelegate", "reveal", "custom"]));
 				iPosition++;
-			}.bind(this));
+			}
 			return aSubMenuItems;
 		},
 
