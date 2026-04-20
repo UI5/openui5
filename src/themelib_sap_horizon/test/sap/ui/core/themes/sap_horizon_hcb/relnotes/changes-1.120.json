@@ -341,5 +341,15 @@
         "text": " sap.uxap.AnchorBar: Enable upperCaseAnchorBar property for Horizon theme"
       }
     ]
+  },
+  "1.120.44": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "daf4ed1acd2e662e3ade49df718f884ad306905c",
+        "type": "FIX",
+        "text": " sap.m.Button: focus is visible on mobile"
+      }
+    ]
   }
 }
