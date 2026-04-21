@@ -28,11 +28,11 @@ sap.ui.define([],
 					rule = serializedRule;
 				}
 
-				/* eslint-disable no-eval */
+				/* eslint-disable no-new-func */
 				if (!stringifyCheck && rule.check !== undefined) {
-					eval("rule.check = " + rule.check);
+					rule.check = new Function("return (" + rule.check + ")")();
 				}
-				/* eslint-enable no-eval */
+				/* eslint-enable no-new-func */
 
 				return rule;
 			}
