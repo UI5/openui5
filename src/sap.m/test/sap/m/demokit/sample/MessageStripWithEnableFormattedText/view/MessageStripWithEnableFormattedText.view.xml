@@ -56,6 +56,24 @@
 					<Link href="http://www.sap.com" text="Link 3" />
 				</controls>
 			</MessageStrip>
+
+			<MessageStrip
+				text="{/inlineIconsUnicode}"
+				type="Warning"
+				enableFormattedText="true"
+				showIcon="true"
+				showCloseButton="true"
+				class="sapUiMediumMarginBottom">
+			</MessageStrip>
+
+			<MessageStrip
+				text="{/inlineIconsHelper}"
+				type="Success"
+				enableFormattedText="true"
+				showIcon="true"
+				showCloseButton="true"
+				class="sapUiMediumMarginBottom">
+			</MessageStrip>
 		</l:content>
 	</l:VerticalLayout>
 </mvc:View>

@@ -135,7 +135,7 @@ sap.ui.define(['./Filter', 'sap/base/Log'],
 			aFiltered,
 			that = this;
 
-		FilterProcessor._normalizeCache = mNormalizeCache ?? FilterProcessor.createNormalizeCache();
+		this._normalizeCache = mNormalizeCache ?? FilterProcessor.createNormalizeCache();
 		if (!aData) {
 			return [];
 		} else if (!oFilter) {

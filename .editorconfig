@@ -5,10 +5,18 @@ root = true
 [*]
 charset = utf-8
 
-[*.{css,html,java,js,json,less,txt}]
+[*.{html,java,js,json,txt}]
 trim_trailing_whitespace = true
 end_of_line = lf
 tab_width = 4
+
+[*.{css,less}]
+trim_trailing_whitespace = true
+end_of_line = lf
+tab_width = 4
+indent_style = tab
+indent_size = 4
+insert_final_newline = false
 
 [pom.xml]
 trim_trailing_whitespace = true

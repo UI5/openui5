@@ -30,18 +30,25 @@ sap.ui.define([
 
 	});
 
-	/*
-	 * @see sap.ui.model.PropertyBinding.prototype.setValue
+	/**
+	 * Sets the value for this <code>JSONPropertyBinding</code> if the binding is not suspended.
+	 * If a new value is set, an {@link sap.ui.model.Model#propertyChange} event is fired with change reason
+	 * {@link sap.ui.model.ChangeReason.Binding Binding}.
+	 *
+	 * @param {any} vValue The value to set for this binding
+	 *
+	 * @public
 	 */
-	JSONPropertyBinding.prototype.setValue = function(oValue){
+	JSONPropertyBinding.prototype.setValue = function(vValue) {
 		if (this.bSuspended) {
 			return;
 		}
-		if (!deepEqual(this.oValue, oValue)) {
-			if (this.oModel.setProperty(this.sPath, oValue, this.oContext, true)) {
-				this.oValue = oValue;
+		if (!deepEqual(this.oValue, vValue)) {
+			if (this.oModel.setProperty(this.sPath, vValue, this.oContext, true)) {
+				this.oValue = vValue;
 				this.getDataState().setValue(this.oValue);
-				this.oModel.firePropertyChange({reason: ChangeReason.Binding, path: this.sPath, context: this.oContext, value: oValue});
+				this.oModel.firePropertyChange({reason: ChangeReason.Binding, path: this.sPath, context: this.oContext,
+					value: vValue});
 			}
 		}
 	};

@@ -1301,6 +1301,9 @@ sap.ui.define([
 
 	/* --- Event Handling --- */
 	GenericTile.prototype.ontouchstart = function (event) {
+		if (_isInteractiveElement(event)) {
+			return;
+		}
 		if (event && event.target.id.indexOf("-action-more") === -1 && this.getDomRef()) {
 			this.getDomRef().classList.remove("sapMGTActionButtonPress"); // Sets focus on the tile when clicked other than the action-More Button in Icon mode
 		}
@@ -1335,6 +1338,9 @@ sap.ui.define([
 	};
 
 	GenericTile.prototype.ontap = function (event) {
+		if (_isInteractiveElement(event, true)) {
+			return;
+		}
 		if (!_isInnerTileButtonPressed(event, this) && !this._isLinkPressed(event)) {
 			var oParams;
 			// The ActionMore button in IconMode tile would be fired irrespective of the pressEnabled property
@@ -1346,11 +1352,17 @@ sap.ui.define([
 				}
 				event.preventDefault();
 			}
+		} else {
+			// Inner button or link was pressed — prevent <a> tag navigation
+			event.preventDefault();
 		}
 	};
 
 	var preventPress = false;
 	GenericTile.prototype.onkeydown = function (event) {
+		if (_isInteractiveElement(event)) {
+			return;
+		}
 		if (!_isInnerTileButtonPressed(event, this) && !this._isLinkPressed(event)) {
 			var bIsShiftKeyPressed = event.shiftKey;
 			var bIsTabKeyPressed = event.key === "Tab";
@@ -1399,6 +1411,9 @@ sap.ui.define([
 	};
 
 	GenericTile.prototype.onkeyup = function (event) {
+		if (_isInteractiveElement(event)) {
+			return;
+		}
 		if (!_isInnerTileButtonPressed(event, this) && !this._isLinkPressed(event)) {
 			var currentKey = keyPressed[event.keyCode];    //disable navigation to other tiles when one tile is selected
 			if (currentKey) {
@@ -2200,6 +2215,28 @@ sap.ui.define([
 	GenericTile.prototype._shouldRenderLink = function() {
 		return this.getUrl() && (!this._isInActionScope() || this.getMode() === GenericTileMode.IconMode) && this.getState() !== LoadState.Disabled && !this._isNavigateActionEnabled();
 	};
+
+	/**
+	 * Checks if the event target is an interactive form element (input, textarea, select)
+	 * inside the tile. These elements should receive native focus and interaction
+	 * without triggering the tile's press event. When bPreventDefault is true, it also
+	 * calls preventDefault on the event to block anchor tag navigation.
+	 * @param {object} event - jQuery event object
+	 * @param {boolean} [bPreventDefault=false] - whether to call preventDefault on the event
+	 * @returns {boolean} - returns true if the event target is an interactive form element
+	 * @private
+	 */
+	function _isInteractiveElement(event, bPreventDefault) {
+		if (!event || !event.target) {
+			return false;
+		}
+		var oTarget = event.target;
+		var bIsInteractive = oTarget.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/i.test(oTarget.tagName);
+		if (bIsInteractive && bPreventDefault) {
+			event.preventDefault();
+		}
+		return bIsInteractive;
+	}
 
 	/**
 	 * Checks if any of the inner buttons in the Tile are focused or clicked

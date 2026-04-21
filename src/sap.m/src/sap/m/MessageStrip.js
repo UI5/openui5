@@ -171,7 +171,13 @@ sap.ui.define([
 				 *	<li><code>em</code></li>
 				 *	<li><code>strong</code></li>
 				 *	<li><code>u</code></li>
+				 *	<li><code>span</code> (with <code>style</code> and <code>class</code> attributes)</li>
 				 * </ul>
+				 *
+				 * <b>Inline Icons:</b>
+				 * You can embed icons within the message text using the <code>span</code> element with the SAP-icons font family.
+				 * Use direct Unicode characters or the helper function {@link sap.m.MessageStripUtilities.getInlineIcon}.
+				 * See the {@link sap.m.MessageStrip Samples} for usage examples.
 				 *
 				 * @since 1.50
 				 */

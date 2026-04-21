@@ -88,6 +88,25 @@ sap.ui.define([
 		  "voluptate voluptates. Architecto blanditiis culpa eveniet expedita harum, iure molestias nam qui sint tenetur!"
   });
 
+  // Example using direct Unicode in span content
+  var oMCWithInlineIcons = new MessageStrip({
+	  type: "Warning",
+	  showIcon: true,
+	  enableFormattedText: true,
+	  text: "System status: <span class='sapMMsgStripInlineIcon'>&#xe1b4;</span> critical error detected <span class='sapMMsgStripInlineIcon'>&#xe049;</span> in module <span class='sapMMsgStripInlineIcon'>&#xe126;</span> configuration."
+  });
+
+  // Example using MessageStripUtilities.getInlineIcon() helper with icon names
+  var MSUtils = sap.ui.require("sap/m/MessageStripUtilities");
+  var oMCWithInlineIconsAndHTML = new MessageStrip({
+	  type: "Success",
+	  showIcon: true,
+	  text: "<strong>Deployment successful!</strong> " + MSUtils.getInlineIcon("sap-icon://message-success") +
+		  " All services " + MSUtils.getInlineIcon("sap-icon://sys-enter-2") +
+		  " are running. <em>Check status</em> " + MSUtils.getInlineIcon("sap-icon://stethoscope"),
+	  enableFormattedText: true
+  });
+
   var oMCWarning = new MessageStrip("mcontainer7", {
 	  type: "Warning",
 	  showIcon: true,
@@ -259,6 +278,9 @@ sap.ui.define([
 		  oMCInformationLong,
 		  oMCWarning,
 		  oMCWarningWithFormattedText,
+		  new Label({ text: "Inline Icon Examples:" }).addStyleClass("sapUiMediumMarginTop sapUiSmallMarginBottom"),
+		  oMCWithInlineIcons,
+		  oMCWithInlineIconsAndHTML,
 		  new Label({ text: "ColorSet Examples:" }).addStyleClass("sapUiMediumMarginTop sapUiSmallMarginBottom")
 	  ].concat(aColorSetExamples)
   }).addStyleClass("sapUiContentPadding");

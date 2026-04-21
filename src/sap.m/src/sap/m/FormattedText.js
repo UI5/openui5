@@ -212,14 +212,17 @@ function(
 		_limitedRenderingRules = {
 			ATTRIBS: {
 				'a::href' : 1,
-				'a::target' : 1
+				'a::target' : 1,
+				'span::style' : 1,
+				'span::class' : 1
 			},
 			ELEMENTS: {
 				'a' : {cssClass: 'sapMLnk'},
 				'br': 1,
 				'em': 1,
 				'strong': 1,
-				'u': 1
+				'u': 1,
+				'span' : 1
 			}
 		};
 

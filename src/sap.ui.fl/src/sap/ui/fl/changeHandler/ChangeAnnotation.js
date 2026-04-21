@@ -80,6 +80,9 @@ sap.ui.define([
 
 		if (oSpecificChangeInfo.content.text) {
 			oChange.setText("annotationText", oSpecificChangeInfo.content.text, oSpecificChangeInfo.content.textType);
+		} else if (oSpecificChangeInfo.content.text === "") {
+			// empty string values should be possible, but must not be translatable
+			oNewContent.value = "";
 		} else {
 			oNewContent.value = oSpecificChangeInfo.content.value;
 		}

@@ -220,12 +220,13 @@ sap.ui.define([
 		$Result = jQuery(this.oFT.$().html());
 
 		// Assert
-		oAssert.strictEqual($Result.length, 5, "Only 5 HTML elements are rendered and evaluated");
+		oAssert.strictEqual($Result.length, 6, "Only 6 HTML elements are rendered and evaluated");
 		oAssert.strictEqual($Result[0].localName, "a", "The element name should be 'a'");
 		oAssert.strictEqual($Result[1].localName, "br", "The element name should be 'br'");
 		oAssert.strictEqual($Result[2].localName, "em", "The element name should be 'em'");
 		oAssert.strictEqual($Result[3].localName, "strong", "The element name should be 'strong'");
-		oAssert.strictEqual($Result[4].localName, "u", "The element name should be 'u'");
+		oAssert.strictEqual($Result[4].localName, "span", "The element name should be 'span'");
+		oAssert.strictEqual($Result[5].localName, "u", "The element name should be 'u'");
 	});
 
 	QUnit.test("_setUseLimitedRenderingRules should effect only instance", function (oAssert) {
