@@ -323,44 +323,42 @@ sap.ui.define([
 		var done = assert.async();
 		assert.expect(2);
 		action = "update";
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-Update"), "click", 1, 1, 1, 1);
-		setTimeout(function() {
-			assert.ok(oThingInspector.getDomRef("actionBar-UpdateActionPopup"), "Rendered update popup should exist in the page");
-			//click again should hide comment popup
-			qutils.triggerMouseEvent(oThingInspector.$("actionBar-Update"), "click", 1, 1, 1, 1);
-			setTimeout(function() {
-				assert.equal(oThingInspector.$("actionBar-UpdateActionPopup").length, 0,
-						"Rendered update popup was removed in the page");
+		var oPopup = oThingInspector.getActionBar()._oUpdatePopup;
+
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Update"), "click", 1, 1, 1, 1);
+		oPopup.attachEventOnce("opened", function() {
+			assert.ok(oThingInspector.getDomRef("actionBar-UpdateActionPopup"), "Rendered update popup should exist");
+
+			oPopup.attachEventOnce("closed", function() {
+				assert.ok(!oThingInspector.getDomRef("actionBar-UpdateActionPopup"), "Popup was removed");
 				done();
-			}, 500);
-		}, 500);
+			});
+			qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Update"), "click", 1, 1, 1, 1);
+		});
 	});
 
 	QUnit.test("FeedSubmit Event", function(assert) {
 		var done = assert.async();
-		assert.expect(5);
+		assert.expect(4);
 		action = "update";
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-Update"), "click", 1, 1, 1, 1);
-		setTimeout(function() {
+		var oPopup = oThingInspector.getActionBar()._oUpdatePopup;
+
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Update"), "click", 1, 1, 1, 1);
+		oPopup.attachEventOnce("opened", function() {
 			assert.ok(oThingInspector.getDomRef("actionBar-UpdateActionPopup"), "Rendered update popup should exist in the page");
-			jQuery(jQuery(".sapUiFeederInput")[0]).trigger("focus");
-			setTimeout(function() {
-				jQuery(".sapUiFeederInput")[0].innerHTML = "my feed entry";
-				setTimeout(function() {
-					jQuery(jQuery(".sapUiFeederInput")[0]).trigger("keyup");
-					setTimeout(function() {
-						//click on feed submit button should hide comment popup
-						qutils.triggerMouseEvent(oThingInspector.$('actionBar-Feeder-send'), "click", 1, 1, 1, 1);
-						setTimeout(function() {
-							assert.ok(oThingInspector.$("actionBar-UpdateActionPopup"), "Rendered comment popup should exist in the page");
-							assert.equal(oThingInspector.$("actionBar-UpdateActionPopup").length, 0,
-									"Rendered update popup was removed in the page");
-							done();
-						}, 500);
-					}, 500);
-				}, 500);
-			}, 500);
-		}, 500);
+			var oFeederInput = document.querySelector(".sapUiFeederInput");
+			oFeederInput.focus();
+			oFeederInput.innerHTML = "my feed entry";
+			jQuery(oFeederInput).trigger("keyup");
+
+			oPopup.attachEventOnce("closed", function() {
+				assert.ok(!oThingInspector.getDomRef("actionBar-UpdateActionPopup"),
+						"Rendered update popup was removed in the page");
+				done();
+			});
+			//click on feed submit button should hide comment popup
+			qutils.triggerMouseEvent(oThingInspector.getDomRef('actionBar-Feeder-send'), "click", 1, 1, 1, 1);
+		});
 	});
 
 	QUnit.test("Disable Update Action", function(assert) {
@@ -384,18 +382,17 @@ sap.ui.define([
 		var done = assert.async();
 		assert.expect(5);
 		facet = "overview";
-		oThingInspector.close();
 		oThingInspector.setSelectedFacet(null);
-		setTimeout(function() {
+		oThingInspector.attachEventOnce("closed", function() {
+			oThingInspector._oPopup.attachEventOnce("opened", function() {
+				assert.ok(oThingInspector.isOpen(), "Rendered ThingInspector is open");
+				assert.ok(window.document.getElementById(oThingInspector.getId() + facet + "FacetButton"), "Rendered Facet Content for facet " + facet
+						+ " should exist in the page");
+				done();
+			});
 			oThingInspector.open();
-			assert.ok(oThingInspector.isOpen(), "Rendered ThingInspector is open");
-			setTimeout(
-					function() {
-						assert.ok(window.document.getElementById(oThingInspector.getId() + facet + "FacetButton"), "Rendered Facet Content for facet " + facet
-								+ " should exist in the page");
-						done();
-					}, 500);
-		}, 500);
+		});
+		oThingInspector.close();
 	});
 
 	QUnit.test("FacetSelected Event", function(assert) {
@@ -486,11 +483,11 @@ sap.ui.define([
 		assert.expect(3);
 		assert.ok(oThingInspector.isOpen(), "Rendered ThingInspector is open");
 
-		qutils.triggerMouseEvent(oThingInspector.$("close"), "click", 1, 1, 1, 1);
-		setTimeout(function() {
+		oThingInspector.attachEventOnce("closed", function() {
 			assert.ok(!oThingInspector.isOpen(), "Rendered ThingInspector is not open");
 			done();
-		}, 500);
+		});
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("close"), "click", 1, 1, 1, 1);
 	});
 
 	QUnit.test("Destroy and remove control", function(assert) {
