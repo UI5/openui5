@@ -366,9 +366,41 @@ sap.ui.define([
 						assert.ok(fnValidateHelperProperties(aFinalProperties), "property helper properties valid.");
 						oSomeInstance.setPropertyInfo(aIgnoredProperties);
 						assert.ok(fnValidateHelperProperties(aFinalProperties), "propertyinfo updates have no effect on final propertyHelper");
+						AggregationBaseDelegate.fetchProperties.restore();
 					});
 				});
 			});
 		});
     });
+
+    QUnit.test("initalize twice, one final", function(assert) {
+
+		fnCreateTestClass(true);
+
+		const oSomeInstance = fnCreateInstance({propertyInfo: [{key: "a", label: "a", dataType: "String"}]});
+		sinon.stub(AggregationBaseDelegate, "fetchProperties").returns(
+			Promise.resolve([
+				{key: "a", label: "a", dataType: "String"},
+				{key: "b", label: "b", dataType: "String"},
+				{key: "c", label: "b", dataType: "String"}
+			])
+		);
+
+		const oPromise1 = oSomeInstance.awaitPropertyHelper();
+		const oPromise2 = oSomeInstance.initPropertyHelper(); // leads to be finalized
+
+        return Promise.all([oPromise1, oPromise2]).then(function ([oPropertyHelper, oPropertyHelper2]) {
+
+            const aProperties = oPropertyHelper.getProperties();
+
+            assert.equal(oPropertyHelper, oPropertyHelper2, "both calls return the same property helper instance");
+			assert.ok(aProperties, "property helper field available");
+			assert.equal(aProperties.length, 3," expected 3 properties (from Delregate, as finalizePropertyHelper was called)");
+            assert.ok(aProperties[0].key === "a", "properties contain expected fields");
+            assert.ok(oSomeInstance.isPropertyHelperFinal(), "property helper is marked as final");
+
+			AggregationBaseDelegate.fetchProperties.restore();
+        });
+    });
+
 });

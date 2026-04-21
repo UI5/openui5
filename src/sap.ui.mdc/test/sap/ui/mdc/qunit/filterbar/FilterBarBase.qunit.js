@@ -998,9 +998,9 @@ sap.ui.define([
 		});
 
 		//set initial conditions
-		this.oFilterBarBase.setFilterConditions(this.oFilterBarBase._setXConditions({
+		this.oFilterBarBase.setFilterConditions({
 			key2: [{operator: OperatorName.EQ, values: ["Test"]}]
-		}));
+		});
 
 		return this.oFilterBarBase.initialized().then(function () {
 
@@ -1015,10 +1015,10 @@ sap.ui.define([
 			})
 			.then(function(){
 
-				//Only one condition has been removed, we expect no clear or no add to be executed --> only one remove
+				//One condition has been removed, one was addeed
 				assert.equal(oCMRemoveAllSpy.callCount, 0, "CM has not been cleared");
-				assert.equal(oCMRemoveSpy.callCount, 0, "Remove has not been called once");
-				assert.equal(oCMAddSpy.callCount, 1, "Add has not been called");
+				assert.equal(oCMRemoveSpy.callCount, 1, "Remove has been called once");
+				assert.equal(oCMAddSpy.callCount, 1, "Add has been called once");
 
 				this.oFilterBarBase._getConditionModel().removeAllConditions.restore();
 				this.oFilterBarBase._getConditionModel().removeCondition.restore();

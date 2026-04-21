@@ -251,9 +251,14 @@ sap.ui.define([
 
 	function _createOrUpdatePropertyHelper(aProperties, bFinal) {
 		if (!this.isDestroyed()) {
-			if (this._bPropertyHelperInitializing && typeof aProperties !== "undefined") {
+			if (this._bPropertyHelperInitializing && (typeof aProperties !== "undefined" || !this._pHelperFinalizationPromise)) {
+				// already initializing but properties changed or finalizing not triggered but now needed
 				return this._oPropertyHelperDeferred.promise.then(() => {
-					return _updatePropertyHelper.call(this, aProperties, bFinal);
+					if (typeof aProperties !== "undefined") {
+						return _updatePropertyHelper.call(this, aProperties, bFinal);
+					} else { // as in _createPropertyHelper finalized if no properties given
+						return this.finalizePropertyHelper();
+					}
 				});
 			}
 

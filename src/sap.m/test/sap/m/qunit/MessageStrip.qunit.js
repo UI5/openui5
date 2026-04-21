@@ -247,12 +247,13 @@ sap.ui.define([
 		oAssert.ok(FormattedText.prototype._setUseLimitedRenderingRules,
 			"sap.m.FormattedText should have this SAP-restricted method");
 		oAssert.strictEqual(oSpy.callCount, 1, "The method should be called once by the 'setEnableFormattedText' setter.");
-		oAssert.strictEqual($Result.length, 5, "Only 5 HTML elements are rendered and evaluated");
+		oAssert.strictEqual($Result.length, 6, "Only 6 HTML elements are rendered and evaluated");
 		oAssert.strictEqual($Result[0].localName, "a", "The element name should be 'a'");
 		oAssert.strictEqual($Result[1].localName, "br", "The element name should be 'br'");
 		oAssert.strictEqual($Result[2].localName, "em", "The element name should be 'em'");
 		oAssert.strictEqual($Result[3].localName, "strong", "The element name should be 'strong'");
-		oAssert.strictEqual($Result[4].localName, "u", "The element name should be 'u'");
+		oAssert.strictEqual($Result[4].localName, "span", "The element name should be 'span'");
+		oAssert.strictEqual($Result[5].localName, "u", "The element name should be 'u'");
 
 		// Cleanup
 		oSpy.restore();
@@ -801,5 +802,95 @@ sap.ui.define([
 			"should accept negative integer values");
 		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme1"),
 			"should add default CSS class based on invalid value");
+	});
+
+	QUnit.module("Inline Icons", {
+		beforeEach: async function() {
+			this.oMessageStrip = new MessageStrip({
+				enableFormattedText: true
+			});
+
+			this.oMessageStrip.placeAt(DOM_RENDER_LOCATION);
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oMessageStrip.destroy();
+		}
+	});
+
+	QUnit.test("MessageStripUtilities.getInlineIcon should handle invalid icons", function(assert) {
+		// Arrange
+		var MessageStripUtilities = sap.ui.require("sap/m/MessageStripUtilities");
+
+		// Act
+		var sIconHTML = MessageStripUtilities.getInlineIcon("invalid-icon");
+
+		// Assert
+		assert.strictEqual(sIconHTML, "",
+			"should return empty string for invalid icon");
+	});
+
+	QUnit.test("Inline icons should render with enableFormattedText", async function(assert) {
+		// Arrange
+		var MessageStripUtilities = sap.ui.require("sap/m/MessageStripUtilities");
+
+		// Act
+		this.oMessageStrip.setText("Status: " + MessageStripUtilities.getInlineIcon("sap-icon://alert") + " critical error");
+		await nextUIUpdate();
+
+		// Assert
+		var $formattedText = this.oMessageStrip.$().find(CLASS_FORMATTED_TEXT);
+		assert.strictEqual($formattedText.length, 1, "FormattedText should be rendered");
+
+		var $inlineIcon = $formattedText.find(".sapMMsgStripInlineIcon");
+		assert.strictEqual($inlineIcon.length, 1, "Inline icon span should be rendered");
+		assert.ok($inlineIcon.text().length > 0, "Icon content should be present");
+	});
+
+	QUnit.test("Multiple inline icons should render correctly", async function(assert) {
+		// Arrange
+		var MessageStripUtilities = sap.ui.require("sap/m/MessageStripUtilities");
+
+		// Act
+		this.oMessageStrip.setText(
+			MessageStripUtilities.getInlineIcon("sap-icon://message-success") + " Success " +
+			MessageStripUtilities.getInlineIcon("sap-icon://sys-enter-2") + " Completed"
+		);
+		await nextUIUpdate();
+
+		// Assert
+		var $inlineIcons = this.oMessageStrip.$().find(".sapMMsgStripInlineIcon");
+		assert.strictEqual($inlineIcons.length, 2, "Two inline icons should be rendered");
+	});
+
+	QUnit.test("Inline icons with custom colors should render", async function(assert) {
+		// Act
+		this.oMessageStrip.setText(
+			"Status: <span class='sapMMsgStripInlineIcon' style='color: red;'>&#xe1b4;</span> critical error"
+		);
+		await nextUIUpdate();
+
+		// Assert
+		var $inlineIcon = this.oMessageStrip.$().find(".sapMMsgStripInlineIcon");
+		assert.strictEqual($inlineIcon.length, 1, "Inline icon should be rendered");
+		assert.strictEqual($inlineIcon.css("color"), "rgb(255, 0, 0)", "Icon should have custom red color");
+	});
+
+	QUnit.test("Inline icons should work with other formatted text elements", async function(assert) {
+		// Arrange
+		var MessageStripUtilities = sap.ui.require("sap/m/MessageStripUtilities");
+
+		// Act
+		this.oMessageStrip.setText(
+			"<strong>Warning:</strong> " + MessageStripUtilities.getInlineIcon("sap-icon://alert") +
+			" <em>Critical</em> error detected"
+		);
+		await nextUIUpdate();
+
+		// Assert
+		var $formattedText = this.oMessageStrip.$().find(CLASS_FORMATTED_TEXT);
+		assert.ok($formattedText.find("strong").length === 1, "Strong tag should be rendered");
+		assert.ok($formattedText.find("em").length === 1, "Em tag should be rendered");
+		assert.ok($formattedText.find(".sapMMsgStripInlineIcon").length === 1, "Inline icon should be rendered");
 	});
 });

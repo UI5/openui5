@@ -164,6 +164,30 @@ npx eslint ./src
 npx eslint ./src/sap.ui.core --quiet
 ```
 
+### Stylelint (LESS files)
+
+Run before committing any `.less` changes. The config lives in [.stylelintrc.mjs](.stylelintrc.mjs).
+
+**Check all LESS files:**
+```sh
+npm run lint:styles
+```
+
+**Check a specific library:**
+```sh
+npx stylelint "src/sap.m/**/*.less"
+```
+
+**Check a single file:**
+```sh
+npx stylelint src/sap.m/src/sap/m/themes/base/Button.less
+```
+
+**Auto-fix fixable violations:**
+```sh
+npx stylelint "src/sap.m/**/*.less" --fix
+```
+
 ### Running Tests
 
 Test can be executed automatically with the Karma Test-Runner.

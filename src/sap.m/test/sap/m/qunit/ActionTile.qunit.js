@@ -17,7 +17,10 @@ sap.ui.define([
 	"sap/m/Link",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/core/Element",
-	"sap/ui/qunit/QUnitUtils"
+	"sap/ui/qunit/QUnitUtils",
+	"sap/m/TextArea",
+	"sap/m/VBox",
+	"sap/m/Label"
 ], function(
 	ActionTile,
 	ActionTileContent,
@@ -36,7 +39,10 @@ sap.ui.define([
 	Link,
 	nextUIUpdate,
 	Element,
-	qutils
+	qutils,
+	TextArea,
+	VBox,
+	Label
 ) {
 	"use strict";
 
@@ -574,6 +580,54 @@ sap.ui.define([
 			// Cleanup
 			this.oActionTile._shouldRenderLink.restore();
 		}.bind(this));
+	});
+	QUnit.module("Interactive elements inside ActionTile", {
+		beforeEach: async function() {
+			this.oTextArea = new TextArea("decisionTextarea", {
+				width: "100%",
+				rows: 3,
+				placeholder: "Enter decision note"
+			});
+
+			this.oActionTile = new ActionTile("interactiveTile", {
+				header: "Check Purchase Requisition",
+				state: "Loaded",
+				pressEnabled: true,
+				url: "https://www.sap.com",
+				tileContent: new TileContent("interactiveTileContent", {
+					content: new VBox({
+						items: [
+							new Label({ text: "Decision Note:", design: "Bold" }),
+							this.oTextArea
+						]
+					})
+				}),
+				actionButtons: [
+					new Button("approveBtn", { text: "Approve", type: "Accept" }),
+					new Button("rejectBtn", { text: "Reject", type: "Reject" })
+				]
+			}).placeAt("qunit-fixture");
+
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oActionTile.destroy();
+			this.oActionTile = null;
+			this.oTextArea = null;
+		}
+	});
+
+	QUnit.test("Tapping TextArea should not fire tile press event", function(assert) {
+		//Arrange
+		var oPressSpy = sinon.spy();
+		this.oActionTile.attachPress(oPressSpy);
+
+		//Act - simulate tap on the textarea's DOM element
+		var oTextAreaDomRef = this.oTextArea.getFocusDomRef();
+		qutils.triggerEvent("tap", oTextAreaDomRef);
+
+		//Assert
+		assert.strictEqual(oPressSpy.callCount, 0, "Tile press event should not be fired when TextArea is tapped");
 	});
 
 });

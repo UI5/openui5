@@ -720,6 +720,22 @@ sap.ui.define([
 				rowSettings: {type: "sap.ui.mdc.table.RowSettings", multiple: false},
 
 				/**
+				 * Default values shown in the export dialog.
+				 *
+				 * <b>Note:</b> These values are defaults shown to the user in the export dialog. The user can still modify them before export.
+				 * If the user modifies a value in the dialog, the user choice takes precedence and is not overridden by event handlers.
+				 *
+				 * The expected type is <code>sap.ui.export.TableExportSettings</code>. The <code>sap.ui.export</code> library must be loaded
+				 * before setting this aggregation.
+				 *
+				 * @since 1.148
+				 */
+				defaultExportSettings: {
+					type: "sap.ui.core.Element",
+					multiple: false
+				},
+
+				/**
 				 * <code>DataStateIndicator</code> plugin that can be used to show binding-related messages.
 				 *
 				 * @since 1.89
@@ -1312,6 +1328,14 @@ sap.ui.define([
 		}
 
 		return this;
+	};
+
+	Table.prototype.setDefaultExportSettings = function(oExportSettings) {
+		if (oExportSettings && !oExportSettings.isA("sap.ui.export.TableExportSettings")) {
+			throw new Error("The 'defaultExportSettings' aggregation must be of type 'sap.ui.export.TableExportSettings'.");
+		}
+
+		return this.setAggregation("defaultExportSettings", oExportSettings);
 	};
 
 	Table.prototype.setHeaderLevel = function(sLevel) {
@@ -2520,8 +2544,6 @@ sap.ui.define([
 	 * @private
 	 */
 	Table.prototype._onExport = function(bExportAs, bSuppressErrors = false) {
-		const that = this;
-
 		return this._createExportColumnConfiguration().then((aSheetColumns) => {
 
 			// If no columns exist, show message and return without exporting
@@ -2529,31 +2551,32 @@ sap.ui.define([
 				const sErrorMessage = Library.getResourceBundleFor("sap.ui.mdc").getText("table.NO_COLS_EXPORT");
 
 				if (!bSuppressErrors) {
-					sap.ui.require(["sap/m/MessageBox"], function(MessageBox) {
+					sap.ui.require(["sap/m/MessageBox"], (MessageBox) => {
 						MessageBox.error(sErrorMessage, {
 							styleClass: (this.$() && this.$().closest(".sapUiSizeCompact").length) ? "sapUiSizeCompact" : ""
 						});
-					}.bind(that));
+					});
 				}
 
 				throw new Error(sErrorMessage);
 			}
 
-			const oRowBinding = that.getRowBinding();
-			const fnGetColumnLabel = that._getColumnLabel.bind(that);
+			const oRowBinding = this.getRowBinding();
+			const fnGetColumnLabel = this._getColumnLabel.bind(this);
 			const sExportFunctionName = bExportAs ? "exportAs" : "export";
+			const oDefaultExportSettings = this.getDefaultExportSettings();
 			const mExportSettings = {
 				workbook: {
 					columns: aSheetColumns,
 					context: {
-						title: that.getHeader()
+						title: this.getHeader()
 					}
 				},
 				dataSource: oRowBinding,
-				fileName: that.getHeader()
+				fileName: oDefaultExportSettings?.getFileName() || this.getHeader()
 			};
 
-			return that._getExportHandler().then((oHandler) => {
+			return this._getExportHandler().then((oHandler) => {
 				oHandler[sExportFunctionName](mExportSettings, fnGetColumnLabel);
 			});
 		});

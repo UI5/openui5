@@ -88,6 +88,28 @@ sap.ui.define([
 			}, "applyChange returns the correct result");
 		});
 
+		QUnit.test("with an empty string as translatable text", function(assert) {
+			ChangeAnnotation.completeChangeContent(this.oAnnotationChange, {
+				content: {
+					annotationPath: "somePath",
+					value: "someValue",
+					text: "",
+					textType: "XFLD"
+				}
+			});
+			assert.deepEqual(this.oAnnotationChange.getContent(), {
+				annotationPath: "somePath",
+				value: ""
+			}, "content was set correctly");
+			assert.notOk(this.oAnnotationChange.convertToFileContent().texts?.annotationText, "text type was not set");
+
+			const oApplyChangeResult = ChangeAnnotation.applyChange(this.oAnnotationChange);
+			assert.deepEqual(oApplyChangeResult, {
+				path: "somePath",
+				value: ""
+			}, "applyChange returns the correct result");
+		});
+
 		QUnit.test("with objectTemplateInfo", function(assert) {
 			ChangeAnnotation.completeChangeContent(this.oAnnotationChange, {
 				content: {

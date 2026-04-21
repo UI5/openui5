@@ -6089,6 +6089,187 @@ sap.ui.define([
 		assert.deepEqual(aActualOutput, aExpectedOutput, "The export configuration was created as expected");
 	});
 
+	// Local mock for sap.ui.export.TableExportSettings to avoid a cross-repo dependency on sapui5.runtime.
+	// The mock registers under the same class name so that isA() checks in Table.prototype.setDefaultExportSettings pass.
+	const MockTableExportSettings = Element.extend("sap.ui.export.TableExportSettings", {
+		metadata: {
+			properties: {
+				fileName: {type: "string"}
+			}
+		}
+	});
+
+	QUnit.test("defaultExportSettings - Aggregation exists and has correct default value", function(assert) {
+		this.createTable();
+
+		assert.ok(this.oTable.getMetadata().hasAggregation("defaultExportSettings"), "Aggregation exists");
+		assert.strictEqual(this.oTable.getDefaultExportSettings(), null, "Default value is null");
+	});
+
+	QUnit.test("defaultExportSettings - fileName used in export", async function(assert) {
+		const sCustomFileName = "MyCustomExport";
+		const aPropertyInfos = [{
+			key: "name",
+			path: "name",
+			label: "Name",
+			dataType: "String"
+		}];
+
+		this.createTable({
+			enableExport: true,
+			columns: [
+				new Column({
+					propertyKey: "name",
+					header: "Name"
+				})
+			],
+			defaultExportSettings: new MockTableExportSettings({
+				fileName: sCustomFileName
+			})
+		}, aPropertyInfos);
+
+		await this.oTable.initialized();
+		this.oTable.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		let capturedExportSettings = null;
+		this.stub(this.oTable, "_getExportHandler").resolves({
+			"export": function(mSettings) {
+				capturedExportSettings = mSettings;
+				return Promise.resolve();
+			},
+			exportAs: function(mSettings) {
+				capturedExportSettings = mSettings;
+				return Promise.resolve();
+			}
+		});
+
+		await this.oTable.triggerExport();
+
+		assert.ok(capturedExportSettings, "Export settings were captured");
+		assert.strictEqual(capturedExportSettings.fileName, sCustomFileName,
+			"Custom fileName from defaultExportSettings is used");
+	});
+
+	QUnit.test("defaultExportSettings - Fallback to table header when fileName not specified", async function(assert) {
+		const sTableHeader = "My Table Header";
+		const aPropertyInfos = [{
+			key: "name",
+			path: "name",
+			label: "Name",
+			dataType: "String"
+		}];
+
+		this.createTable({
+			enableExport: true,
+			columns: [
+				new Column({
+					propertyKey: "name",
+					header: "Name"
+				})
+			],
+			header: sTableHeader,
+			defaultExportSettings: new MockTableExportSettings()
+		}, aPropertyInfos);
+
+		await this.oTable.initialized();
+		this.oTable.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		let capturedExportSettings = null;
+		this.stub(this.oTable, "_getExportHandler").resolves({
+			"export": function(mSettings) {
+				capturedExportSettings = mSettings;
+				return Promise.resolve();
+			}
+		});
+
+		await this.oTable.triggerExport();
+
+		assert.strictEqual(capturedExportSettings.fileName, sTableHeader,
+			"Falls back to table header when fileName not specified");
+	});
+
+	QUnit.test("defaultExportSettings - fileName used in both export and exportAs", async function(assert) {
+		const sCustomFileName = "ExportTestFile";
+		const aPropertyInfos = [{
+			key: "name",
+			path: "name",
+			label: "Name",
+			dataType: "String"
+		}];
+
+		this.createTable({
+			enableExport: true,
+			columns: [
+				new Column({
+					propertyKey: "name",
+					header: "Name"
+				})
+			],
+			defaultExportSettings: new MockTableExportSettings({
+				fileName: sCustomFileName
+			})
+		}, aPropertyInfos);
+
+		await this.oTable.initialized();
+		this.oTable.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		let capturedExportSettings = null;
+		let capturedExportAsSettings = null;
+
+		this.stub(this.oTable, "_getExportHandler").resolves({
+			"export": function(mSettings) {
+				capturedExportSettings = mSettings;
+				return Promise.resolve();
+			},
+			exportAs: function(mSettings) {
+				capturedExportAsSettings = mSettings;
+				return Promise.resolve();
+			}
+		});
+
+		await this.oTable.triggerExport();
+		assert.strictEqual(capturedExportSettings.fileName, sCustomFileName,
+			"Custom fileName used in direct export");
+
+		await this.oTable._onExport(true);
+		assert.strictEqual(capturedExportAsSettings.fileName, sCustomFileName,
+			"Custom fileName used in exportAs");
+	});
+
+	QUnit.test("defaultExportSettings - Properties accessible on ExportSettings element", function(assert) {
+		const oExportSettings = new MockTableExportSettings({
+			fileName: "MyExport"
+		});
+
+		this.createTable({
+			defaultExportSettings: oExportSettings
+		});
+
+		const oRetrievedSettings = this.oTable.getDefaultExportSettings();
+
+		assert.strictEqual(oRetrievedSettings, oExportSettings,
+			"ExportSettings element is preserved");
+		assert.strictEqual(oRetrievedSettings.getFileName(), "MyExport",
+			"fileName property accessible via getter");
+	});
+
+	QUnit.test("defaultExportSettings - Throws error when wrong type is set", function(assert) {
+		this.createTable();
+
+		const oElement = new Element();
+
+		assert.throws(function() {
+			this.oTable.setDefaultExportSettings(oElement);
+		}.bind(this),
+		/The 'defaultExportSettings' aggregation must be of type 'sap.ui.export.TableExportSettings'/,
+		"Throws error when wrong Element type is set via setter");
+
+		oElement.destroy();
+	});
+
 	QUnit.module("Theming", {
 		before: function() {
 			this.sDefaultTheme = Theming.getTheme();
