@@ -1865,6 +1865,21 @@ sap.ui.define([
 								editable: true
 							}
 						]
+					},
+					{
+						title: 'Separator Line',
+						key: 'listWithSeparator',
+						settings: {
+							columns: 4
+						},
+						files: [
+							{
+								url: '/samples/footer/listWithSeparator/manifest.json',
+								name: 'manifest.json',
+								key: 'manifest.json',
+								editable: true
+							}
+						]
 					}
 				]
 			},

@@ -25,6 +25,8 @@ sap.ui.define([
 					}),
 					new Input("nameInput", {
 						required: true,
+						width: "400px",
+						placeholder: "Enter at least 4 characters to proceed to the next step",
 						liveChange: function (oEvent) {
 							var val = oEvent.getParameter("value");
 							if (val.length > 3) {

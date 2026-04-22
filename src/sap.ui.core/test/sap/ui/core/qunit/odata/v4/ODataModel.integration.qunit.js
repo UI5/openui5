@@ -24672,9 +24672,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3287
 	//
 	// When refreshing a single entity or requesting side effects for a single property, the
-	// outdated flag at the grand total is set only if the binding has filters, search, or custom
-	// query options. If the outdated flag at the grand total is set, the grand total is not
-	// requested.
+	// outdated flag at the grand total is set because the binding has filters, search, or custom
+	// query options. The grand total is not requested because the outdated flag at the grand total
+	// is set.
 	// JIRA: CPOUI5ODATAV4-3300, CPOUI5ODATAV4-3287
 	[
 		"context refresh",
@@ -25033,13 +25033,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: When refreshing a single entity or requesting side effects for a single property,
 	// the grand total is updated as well if there are no filter, search, or custom query options.
 	// In that case the outdated flag at the grand total is not set. If there are multiple
-	// refreshes, only a single grand total request is sent. If there are sorters the outdated flag
-	// at the header context is.
+	// refreshes, only a single grand total request is sent. If there are sorters, the outdated flag
+	// at the header context is set.
 	// JIRA: CPOUI5ODATAV4-3300, CPOUI5ODATAV4-3287
 	["context refresh", "request properties of a context via side effects"].forEach((sScenario) => {
 		[false, true].forEach(function (bWithSorter) {
-			const sTitle = "Data Aggregation: leaves' key predicates; update grand total; "
-				+ sScenario + "; with sorters: " + bWithSorter;
+			const sTitle = "Data Aggregation: update grand total; " + sScenario + "; with sorters: "
+				+ bWithSorter;
 
 		QUnit.test(sTitle, async function (assert) {
 			const oModel = this.createSalesOrdersModel123({autoExpandSelect : true});
@@ -25138,7 +25138,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					oContext24.requestRefresh(),
 					this.waitForChanges(assert, sScenario)
 				]);
-			} else if (sScenario === "request properties of a context via side effects") {
+			} else { // "request properties of a context via side effects"
 				this.expectRequest(`#${iBatchNo} SalesOrderList('25')?sap-client=123`
 						+ "&$select=GrossAmount,LifecycleStatus", {
 						GrossAmount : "7",

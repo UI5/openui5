@@ -71,7 +71,10 @@ function(
 								return oSectionButton.getId();
 							}
 							return sNewControlID;
-						}
+						},
+						validators: [
+							"noEmptyText"
+						]
 					}
 				},
 				beforeMove : function (ObjectPageLayout) {

@@ -383,6 +383,37 @@ sap.ui.define([
 			aMenuItems[0].enabled([this.oNewObjectPageSectionOverlay], { menuItem: aMenuItems[0] });
 		});
 
+		QUnit.test("when the action is triggered, but the dialog is cancelled", async function(assert) {
+			this.oObjectPageLayoutOverlay.setDesignTimeMetadata({
+				aggregations: {
+					sections: {
+						actions: {
+							addIFrame: {
+								changeType: "addIFrame",
+								isEnabled(oElement) {
+									return oElement.getMetadata().getName() === "sap.uxap.ObjectPageLayout";
+								},
+								text: "foo"
+							}
+						}
+					}
+				}
+			});
+			this.oAddIFrame.deregisterElementOverlay(this.oObjectPageLayoutOverlay);
+			this.oAddIFrame.registerElementOverlay(this.oObjectPageLayoutOverlay);
+			await DtUtil.waitForSynced(this.oDesignTime)();
+
+			this.oOpenStub.resolves(undefined);
+			const oGetCommandStub = sandbox.stub(this.oAddIFrame.getCommandFactory(), "getCommandFor");
+			const aMenuItems = await this.oAddIFrame.getMenuItems([this.oObjectPageLayoutOverlay]);
+			try {
+				await aMenuItems[0].handler([this.oObjectPageLayoutOverlay], { menuItem: aMenuItems[0] });
+			} catch (oError) {
+				assert.ok(false, "should not go here");
+			}
+			assert.strictEqual(oGetCommandStub.callCount, 0, "then no command is created");
+		});
+
 		QUnit.test("when an overlay has an addIFrame action with changeOnRelevantContainer true, but its relevant container has no stable ID", async function(assert) {
 			this.oObjectPageLayoutOverlay.setDesignTimeMetadata({
 				aggregations: {

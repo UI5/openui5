@@ -634,4 +634,214 @@ sap.ui.define([
 		assert.ok(oShowMoreButton, "Show more button is created");
 		assert.ok(oShowMoreButton.getVisible(), "Show more button is visible");
 	});
+
+	QUnit.module("Footer showSeparator property", {
+		beforeEach: function () {
+			this.oCard = new Card({
+				baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+			});
+			this.oCard.placeAt("qunit-fixture");
+		},
+		afterEach: function () {
+			this.oCard.destroy();
+		}
+	});
+
+	QUnit.test("Default value of showSeparator property", function (assert) {
+		const oFooter = new Footer();
+
+		assert.strictEqual(oFooter.getShowSeparator(), false, "Default value should be false");
+
+		oFooter.destroy();
+	});
+
+	QUnit.test("Setting showSeparator to true", function (assert) {
+		const oFooter = new Footer();
+
+		oFooter.setShowSeparator(true);
+
+		assert.strictEqual(oFooter.getShowSeparator(), true, "Property should be set to true");
+
+		oFooter.destroy();
+	});
+
+	QUnit.test("Footer renders with border class when showSeparator is true", async function (assert) {
+		const oManifest = {
+			"sap.app": {
+				"id": "card.test.footer.borderLine",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"title": "Test Card"
+				},
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Name",
+							"value": "Test Value"
+						}]
+					}]
+				},
+				"footer": {
+					"showSeparator": true,
+					"actionsStrip": [{
+						"text": "Action",
+						"actions": [{
+							"type": "Custom"
+						}]
+					}]
+				}
+			}
+		};
+
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oFooter = this.oCard.getCardFooter();
+		const oDomRef = oFooter.getDomRef();
+
+		assert.ok(oFooter.getShowSeparator(), "showSeparator property is true");
+		assert.ok(oDomRef.classList.contains("sapFCardFooterBorderLine"), "Footer has the border line CSS class");
+	});
+
+	QUnit.test("Footer renders without border class when showSeparator is false", async function (assert) {
+		const oManifest = {
+			"sap.app": {
+				"id": "card.test.footer.noBorderLine",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"title": "Test Card"
+				},
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Name",
+							"value": "Test Value"
+						}]
+					}]
+				},
+				"footer": {
+					"showSeparator": false,
+					"actionsStrip": [{
+						"text": "Action",
+						"actions": [{
+							"type": "Custom"
+						}]
+					}]
+				}
+			}
+		};
+
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oFooter = this.oCard.getCardFooter();
+		const oDomRef = oFooter.getDomRef();
+
+		assert.notOk(oFooter.getShowSeparator(), "showSeparator property is false");
+		assert.notOk(oDomRef.classList.contains("sapFCardFooterBorderLine"), "Footer does not have the border line CSS class");
+	});
+
+	QUnit.test("Footer renders without border class when showSeparator is not set", async function (assert) {
+		const oManifest = {
+			"sap.app": {
+				"id": "card.test.footer.defaultBorderLine",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"title": "Test Card"
+				},
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Name",
+							"value": "Test Value"
+						}]
+					}]
+				},
+				"footer": {
+					"actionsStrip": [{
+						"text": "Action",
+						"actions": [{
+							"type": "Custom"
+						}]
+					}]
+				}
+			}
+		};
+
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oFooter = this.oCard.getCardFooter();
+		const oDomRef = oFooter.getDomRef();
+
+		assert.strictEqual(oFooter.getShowSeparator(), false, "showSeparator property defaults to false");
+		assert.notOk(oDomRef.classList.contains("sapFCardFooterBorderLine"), "Footer does not have the border line CSS class by default");
+	});
+
+	QUnit.test("Dynamically changing showSeparator property", async function (assert) {
+		const oManifest = {
+			"sap.app": {
+				"id": "card.test.footer.dynamicBorderLine",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"title": "Test Card"
+				},
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Name",
+							"value": "Test Value"
+						}]
+					}]
+				},
+				"footer": {
+					"showSeparator": false,
+					"actionsStrip": [{
+						"text": "Action",
+						"actions": [{
+							"type": "Custom"
+						}]
+					}]
+				}
+			}
+		};
+
+		this.oCard.setManifest(oManifest);
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oFooter = this.oCard.getCardFooter();
+		let oDomRef = oFooter.getDomRef();
+
+		assert.notOk(oDomRef.classList.contains("sapFCardFooterBorderLine"), "Footer does not have border class initially");
+
+		oFooter.setShowSeparator(true);
+		await nextUIUpdate();
+
+		oDomRef = oFooter.getDomRef();
+
+		assert.ok(oDomRef.classList.contains("sapFCardFooterBorderLine"), "Footer has border class after setting to true");
+
+		oFooter.setShowSeparator(false);
+		await nextUIUpdate();
+
+		oDomRef = oFooter.getDomRef();
+
+		assert.notOk(oDomRef.classList.contains("sapFCardFooterBorderLine"), "Footer does not have border class after setting back to false");
+	});
 });

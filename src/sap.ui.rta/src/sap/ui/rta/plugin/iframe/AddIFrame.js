@@ -94,13 +94,13 @@ sap.ui.define([
 
 		const oAddIFrameDialog = new AddIFrameDialog();
 		let sNewContainerTitle;
-		AddIFrameDialog.buildUrlBuilderParametersFor(oParent)
+		return AddIFrameDialog.buildUrlBuilderParametersFor(oParent)
 		.then(function(mURLParameters) {
 			const mAddIFrameDialogSettings = {
 				parameters: mURLParameters,
 				asContainer: bAsContainer
 			};
-			return oAddIFrameDialog.open(mAddIFrameDialogSettings, oParent);
+			return oAddIFrameDialog.open(mAddIFrameDialogSettings, oParent, mPropertyBag.menuItem.action);
 		})
 		.then(function(mSettings) {
 			if (!mSettings) {
@@ -120,7 +120,7 @@ sap.ui.define([
 			});
 		}.bind(this))
 		.catch(function(vError) {
-			if (vError) {
+			if (vError && !(vError instanceof CancelError)) {
 				throw DtUtil.createError("AddIFrame#handler", vError, "sap.ui.rta");
 			}
 		});

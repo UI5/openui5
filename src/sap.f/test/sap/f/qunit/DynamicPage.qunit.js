@@ -602,6 +602,65 @@ function(
 			"Title area 'right' offset is 0");
 	});
 
+	QUnit.test("_getEffectiveScrollbarWidth uses _iSystemScrollbarWidth", function (assert) {
+		// Arrange
+		this.oDynamicPage._iSystemScrollbarWidth = 17;
+
+		// Act — call twice
+		var iFirst = this.oDynamicPage._getEffectiveScrollbarWidth(true);
+		var iSecond = this.oDynamicPage._getEffectiveScrollbarWidth(true);
+
+		// Assert
+		assert.strictEqual(iFirst, 17, "First call returns the system scrollbar width");
+		assert.strictEqual(iSecond, 17, "Second call returns the same value");
+	});
+
+	QUnit.test("_getEffectiveScrollbarWidth returns overlay fallback when system scrollbar width is 0", function (assert) {
+		// Arrange — simulate overlay scrollbar (width = 0)
+		this.oDynamicPage._iSystemScrollbarWidth = 0;
+
+		// Act
+		var iWidth = this.oDynamicPage._getEffectiveScrollbarWidth(true);
+
+		// Assert
+		assert.strictEqual(iWidth, DynamicPage.OVERLAY_SCROLLBAR_WIDTH,
+			"Returns the overlay scrollbar fallback width when system scrollbar width is 0");
+	});
+
+	QUnit.test("_hasOverlayScrollbar uses _iSystemScrollbarWidth", function (assert) {
+		// Arrange — classic scrollbar
+		this.oDynamicPage._iSystemScrollbarWidth = 17;
+
+		// Assert
+		assert.notOk(this.oDynamicPage._hasOverlayScrollbar(true),
+			"Returns false when system scrollbar width is > 0");
+
+		// Arrange — overlay scrollbar
+		this.oDynamicPage._iSystemScrollbarWidth = 0;
+
+		// Assert
+		assert.ok(this.oDynamicPage._hasOverlayScrollbar(true),
+			"Returns true when system scrollbar width is 0 and scrolling is needed");
+		assert.notOk(this.oDynamicPage._hasOverlayScrollbar(false),
+			"Returns false when no scrolling is needed, even with system scrollbar width 0");
+	});
+
+	QUnit.test("_onResize refreshes _iSystemScrollbarWidth", function (assert) {
+		// Arrange — pre-fill with a stale value
+		this.oDynamicPage._iSystemScrollbarWidth = 99;
+		var oMockEvent = {
+			size: { width: 1000, height: 800 },
+			oldSize: { width: 1000, height: 800 }
+		};
+
+		// Act
+		this.oDynamicPage._onResize(oMockEvent);
+
+		// Assert — the stale value (99) must be replaced with a fresh measurement
+		assert.notStrictEqual(this.oDynamicPage._iSystemScrollbarWidth, 99,
+			"Stale system scrollbar width is replaced after resize");
+	});
+
 	QUnit.test("'_isContentOverflowingFullscreenContainer' returns true when fullscreen content overflows into footer area", function (assert) {
 		//Arrange
 		var oContent = new Panel({height: "100%"});

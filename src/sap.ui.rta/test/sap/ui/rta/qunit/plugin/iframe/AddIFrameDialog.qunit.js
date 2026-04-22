@@ -603,6 +603,28 @@ sap.ui.define([
 			assert.strictEqual(oResponse, undefined, "then the dialog can only be closed via cancel");
 		});
 
+		QUnit.test("when an empty string is entered as title", async function(assert) {
+			this.oAddIFrameDialog.attachOpened(() => {
+				const oInput = Element.getElementById("sapUiRtaAddIFrameDialog_ContainerTitle_TitleInput");
+				oInput.setValue("   ");
+
+				this.oAddIFrameDialog._oController.onContainerTitleChange({
+					getSource: () => oInput
+				});
+				assert.strictEqual(oInput.getValueState(), ValueState.Error, "then an error is displayed");
+				assert.strictEqual(this.oAddIFrameDialog._oJSONModel.getProperty("/saveEnabled"), false, "the save button is disabled");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaAddIFrameDialogSaveButton").getEnabled(),
+					false, "then the save button is disabled"
+				);
+				clickOnCancel();
+			});
+			const oResponse = await this.oAddIFrameDialog.open(mTestURLBuilderData, oReferenceControl, {
+				validators: ["noEmptyText"]
+			});
+			assert.strictEqual(oResponse, undefined, "then the dialog can only be closed via cancel");
+		});
+
 		QUnit.test("when a url with bindings is entered", function(assert) {
 			this.oAddIFrameDialog.attachOpened(async () => {
 				const oUrlTextArea = Element.getElementById("sapUiRtaAddIFrameDialog_EditUrlTA");
@@ -924,7 +946,11 @@ sap.ui.define([
 				frameWidth: "16px",
 				frameHeight: "100%",
 				frameUrl: "some_url"
-			}, oReferenceControl);
+			},
+			oReferenceControl,
+			{
+				validators: ["noEmptyText"]
+			});
 		});
 
 		QUnit.test("When the size/unit of the iframe is changed", async function(assert) {

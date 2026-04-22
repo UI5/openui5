@@ -5226,7 +5226,7 @@ sap.ui.define([
 
 	/**
 	 * Sets the outdated flags at the grand total and the header context considering filters,
-	 * sorters, search and custom query options.
+	 * sorters, search, and custom query options.
 	 *
 	 * @param {boolean} bForce
 	 *   Whether to force setting the outdated flags at the grand total and the header context
