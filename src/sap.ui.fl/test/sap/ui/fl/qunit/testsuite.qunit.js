@@ -112,6 +112,12 @@ sap.ui.define(function () {
 					only: ["sap/ui/fl/apply/_internal/connectors/KeyUserConnector"]
 				}
 			},
+			"apply/_internal/connectors/BtpServiceConnector": {
+				group: "Apply Internal",
+				coverage: {
+					only: ["sap/ui/fl/apply/_internal/connectors/BtpServiceConnector"]
+				}
+			},
 			"apply/_internal/ConnectorWithDebugEnabled": {
 				group: "Apply Internal",
 				ui5: {
@@ -244,6 +250,12 @@ sap.ui.define(function () {
 				group: "Write Internal",
 				coverage: {
 					only: ["sap/ui/fl/write/_internal/connectors/KeyUserConnector"]
+				}
+			},
+			"write/_internal/connectors/BtpServiceConnector": {
+				group: "Write Internal",
+				coverage: {
+					only: ["sap/ui/fl/write/_internal/connectors/BtpServiceConnector"]
 				}
 			},
 			"write/_internal/ConnectorWithCustomBrokenConnector": {

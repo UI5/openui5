@@ -49,6 +49,12 @@ sap.ui.define([
 			assert.equal(bIsKeyUser, false);
 		});
 
+		QUnit.test("getUserId", function(assert) {
+			assert.equal(this.cut._oSettings.getUserId, undefined);
+			var userId = this.cut.getUserId();
+			assert.equal(userId, undefined);
+		});
+
 		QUnit.test("isModelS", function(assert) {
 			assert.equal(this.cut._oSettings.isAtoAvailable, false);
 			var bIsModelS = this.cut.isModelS();
@@ -102,9 +108,11 @@ sap.ui.define([
 		});
 
 		QUnit.test("get instance from flex settings request when flex data promise is not available", function(assert) {
+			var logonUser = "someUser@test.de";
 			var oSetting = {
 				isKeyUser: true,
-				isAtoAvailable: true
+				isAtoAvailable: true,
+				logonUser: logonUser
 			};
 
 			var oStubCreateConnector = sandbox.stub(sap.ui.fl.LrepConnector, "createConnector").returns({
@@ -117,6 +125,7 @@ sap.ui.define([
 				assert.equal(oStubGetFlexDataPromise.callCount, 1);
 				assert.equal(oStubCreateConnector.callCount, 1);
 				assert.equal(oSettings.isKeyUser(), true);
+				assert.equal(oSettings.getUserId(), logonUser);
 				assert.equal(oSettings.isModelS(), true);
 				Settings.getInstance().then(function(oSettings2) {
 					assert.equal(oStubCreateConnector.callCount, 1);

@@ -597,6 +597,13 @@ sap.ui.define([
 	 * @private
 	 */
 	Change.prototype._isReadOnlyDueToLayer = function () {
+		if (this._oDefinition.layer === "PUBLIC") {
+			var oSettings = Settings.getInstanceOrUndef();
+			if (!oSettings) {
+				return true; // without settings the right to edit or delete a change cannot be determined
+			}
+			return (oSettings.getUserId() !== this.getOwnerId());
+		}
 		var sCurrentLayer;
 		sCurrentLayer = LayerUtils.getCurrentLayer(this._bUserDependent);
 		return (this._oDefinition.layer !== sCurrentLayer);
