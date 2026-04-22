@@ -63,6 +63,10 @@ sap.ui.define([
 				},
 				detectVisibility: {
 					type: "boolean"
+				},
+				showSeparator: {
+					type: "boolean",
+					defaultValue: false
 				}
 			},
 			aggregations: {
@@ -99,6 +103,10 @@ sap.ui.define([
 
 				if (oFooter.getCardInstance().isLoading() && oFooter._hasBinding()) {
 					oRM.class("sapFCardFooterLoading");
+				}
+
+				if (oFooter.getShowSeparator()) {
+					oRM.class("sapFCardFooterBorderLine");
 				}
 
 				oRM.openEnd();
@@ -142,7 +150,8 @@ sap.ui.define([
 			showCloseButton: bShouldShowCloseButton,
 			detectVisibility,
 			actionsStrip: ActionsStrip.create(configuration?.actionsStrip, card, true),
-			visible: configuration?.visible
+			visible: configuration?.visible,
+			showSeparator: configuration?.showSeparator
 		});
 
 		oFooter.setPaginator(paginator);

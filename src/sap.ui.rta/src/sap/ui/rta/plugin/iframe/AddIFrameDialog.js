@@ -169,13 +169,14 @@ sap.ui.define([
 	 *
 	 * @param {object|undefined} mSettings - Existing IFrame settings
 	 * @param {sap.ui.core.Control} oReferenceControl - Control to take the default model from
+	 * @param {object} oAction - Action object as defined in the designtime
 	 * @returns {Promise} Promise resolving to IFrame settings
 	 * @public
 	 */
-	AddIFrameDialog.prototype.open = function(mSettings, oReferenceControl) {
+	AddIFrameDialog.prototype.open = function(mSettings, oReferenceControl, oAction) {
 		return new Promise(function(resolve) {
 			this._fnResolve = resolve;
-			this._createDialog(mSettings, oReferenceControl);
+			this._createDialog(mSettings, oReferenceControl, oAction);
 		}.bind(this));
 	};
 
@@ -184,9 +185,10 @@ sap.ui.define([
 	 *
 	 * @param {object|undefined} mSettings - Existing IFrame settings
 	 * @param {sap.ui.core.Control} oReferenceControl - Control to take the default model from
+	 * @param {object} oAction - Action object as defined in the designtime
 	 * @private
 	 */
-	AddIFrameDialog.prototype._createDialog = function(mSettings, oReferenceControl) {
+	AddIFrameDialog.prototype._createDialog = function(mSettings, oReferenceControl, oAction) {
 		this._oJSONModel = createJSONModel(
 			!!mSettings?.updateMode,
 			!!mSettings?.asContainer,
@@ -194,7 +196,7 @@ sap.ui.define([
 			mSettings?.frameHeight,
 			mSettings?.advancedSettings
 		);
-		this._oController = new AddIFrameDialogController(this._oJSONModel, mSettings);
+		this._oController = new AddIFrameDialogController(this._oJSONModel, mSettings, oAction);
 		Fragment.load({
 			name: "sap.ui.rta.plugin.iframe.AddIFrameDialog",
 			controller: this._oController

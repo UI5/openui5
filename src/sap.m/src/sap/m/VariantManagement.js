@@ -2576,7 +2576,7 @@ sap.ui.define([
 			this.oManagementTable.setNoData(this._oNoDataIllustratedMessage);
 		}
 		//Lazy loading of variants
-		const fnCallback = this.dynamicVariantsLoadedCallback;
+		const fnCallback = this.getDynamicVariantsLoadedCallback();
 		if (typeof fnCallback === "function") {
 			const oResult = fnCallback();
 			if (oResult instanceof Promise) {

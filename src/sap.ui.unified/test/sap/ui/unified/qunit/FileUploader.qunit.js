@@ -1248,6 +1248,91 @@ sap.ui.define([
 		oFileUploader.destroy();
 	});
 
+	QUnit.test("clear() should not steal focus from another control", async function (assert) {
+		// prepare
+		var oButton = new Button({ text: "Other control" }),
+			oFileUploader = createFileUploader();
+
+		oButton.placeAt("qunit-fixture");
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// focus the button (simulates another control having focus)
+		oButton.focus();
+		await nextUIUpdate();
+		assert.strictEqual(document.activeElement, oButton.getDomRef(), "Button is focused before clear()");
+
+		// act - programmatically clear the FileUploader while another element is focused
+		oFileUploader.setValue("test.txt");
+		await nextUIUpdate();
+		oButton.focus();
+		await nextUIUpdate();
+
+		oFileUploader.clear();
+		await nextUIUpdate();
+
+		// assert - the _bFocusFileUploader flag must not be set
+		assert.notOk(oFileUploader._bFocusFileUploader, "_bFocusFileUploader is not set after clear()");
+		assert.strictEqual(document.activeElement, oButton.getDomRef(), "Focus stays on the button after clear()");
+
+		// cleanup
+		oButton.destroy();
+		oFileUploader.destroy();
+	});
+
+	QUnit.test("setValue() should not steal focus from another control", async function (assert) {
+		// prepare
+		var oButton = new Button({ text: "Other control" }),
+			oFileUploader = createFileUploader();
+
+		oButton.placeAt("qunit-fixture");
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// set initial value
+		oFileUploader.setValue("initial.txt");
+		await nextUIUpdate();
+
+		// focus the button (simulates another control having focus)
+		oButton.focus();
+		await nextUIUpdate();
+		assert.strictEqual(document.activeElement, oButton.getDomRef(), "Button is focused before setValue('')");
+
+		// act - programmatically clear via setValue while another element is focused
+		oFileUploader.setValue("");
+		await nextUIUpdate();
+
+		// assert - the _bFocusFileUploader flag must not be set
+		assert.notOk(oFileUploader._bFocusFileUploader, "_bFocusFileUploader is not set after setValue('') when not focused");
+		assert.strictEqual(document.activeElement, oButton.getDomRef(), "Focus stays on the button after setValue('')");
+
+		// cleanup
+		oButton.destroy();
+		oFileUploader.destroy();
+	});
+
+	QUnit.test("setValue() should preserve focus when FileUploader is focused", async function (assert) {
+		// prepare
+		var oFileUploader = createFileUploader();
+
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// focus the FileUploader itself
+		oFileUploader.focus();
+		await nextUIUpdate();
+
+		// act - call setValue while the FileUploader is focused
+		oFileUploader.setValue("newfile.txt");
+		await nextUIUpdate();
+
+		// assert - focus should remain on the FileUploader
+		assert.ok(document.activeElement, oFileUploader.getDomRef(), "FileUploader remains focused");
+
+		// cleanup
+		oFileUploader.destroy();
+	});
+
 	QUnit.test("Empty file event is fired", async function (assert){
 		var oFileUploader = createFileUploader(),
 			fnFireFileEmpty = this.spy( oFileUploader, "fireFileEmpty"),

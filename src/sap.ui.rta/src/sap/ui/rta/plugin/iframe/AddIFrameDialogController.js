@@ -80,9 +80,10 @@ sap.ui.define([
 	}
 
 	return Controller.extend("sap.ui.rta.plugin.iframe.AddIFrameDialogController", {
-		constructor: function(oJSONModel, mSettings) {
+		constructor: function(oJSONModel, mSettings, oAction) {
 			this._oJSONModel = oJSONModel;
 			this._importSettings(mSettings);
+			this._oAction = oAction;
 		},
 
 		onBeforeOpen() {
@@ -484,17 +485,12 @@ sap.ui.define([
 
 		onContainerTitleChange(oEvent) {
 			const oInput = oEvent.getSource();
-			const sValue = oInput.getValue();
+			const sInputValue = oInput.getValue().trim();
+			const sNewText = sInputValue.length ? sInputValue : "\xa0";
 			let sValueState = ValueState.None;
 
-			if (sValue.trim() === "") {
-				oInput.setValueState(ValueState.Error);
-				this._oJSONModel.setProperty("/saveEnabled", false);
-				return true;
-			}
-
 			try {
-				validateText(sValue);
+				validateText(sNewText, undefined, this._oAction);
 			} catch (oException) {
 				sValueState = ValueState.Error;
 			}

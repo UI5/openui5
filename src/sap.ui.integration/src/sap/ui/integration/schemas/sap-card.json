@@ -297,6 +297,18 @@
           "description": "[Experimental] Visibility of the footer",
           "$ref": "#/$defs/visibility"
         },
+        "showSeparator": {
+          "description": "Determines whether to display a separator line at the top of the footer to visually separate the footer from the card content area.",
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
         "closeButton": {
           "description": "[Experimental] Defines the Close button when the card is opened by the ShowCard action",
           "$ref": "#/$defs/closeButton"

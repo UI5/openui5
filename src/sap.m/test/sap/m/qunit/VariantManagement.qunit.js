@@ -2261,10 +2261,11 @@ sap.ui.define([
 			this.oPromiseResolve = oPromiseResolve;
 
 			this.oVM = new VariantManagement("VM1");
-			// dynamicVariantsLoadedCallback is a hidden property, accessed directly as an instance field
-			this.oVM.dynamicVariantsLoadedCallback = function() {
+			// Set the dynamic variants loaded callback to return the promise, simulating async loading of variants for the management dialog
+			this.oVM.setDynamicVariantsLoadedCallback(() => {
 				return this.oPromise;
-			}.bind(this);
+			});
+
 			this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
 			this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
 			this.oVM.placeAt("qunit-fixture");

@@ -1,0 +1,114 @@
+{
+	"sap.app": {
+		"id": "card.explorer.footer.listWithSeparator",
+		"type": "card",
+		"title": "List Card with Footer Separator",
+		"subTitle": "Demonstrates the showSeparator property"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://list"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"header": {
+			"title": "Product List",
+			"subtitle": "Available Products"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Notebook Pro 15",
+						"Description": "High-performance laptop with latest processor",
+						"Price": "1,299 EUR",
+						"Status": "Available",
+						"Icon": "sap-icon://laptop"
+					},
+					{
+						"Name": "USB-C Hub",
+						"Description": "Multi-port USB-C hub with HDMI and ethernet",
+						"Price": "89 EUR",
+						"Status": "Available",
+						"Icon": "sap-icon://connected"
+					},
+					{
+						"Name": "Keyboard Pro",
+						"Description": "Mechanical keyboard with backlight",
+						"Price": "159 EUR",
+						"Status": "Available",
+						"Icon": "sap-icon://keyboard-and-mouse"
+					}
+				]
+			},
+			"item": {
+				"icon": {
+					"src": "{Icon}"
+				},
+				"title": "{Name}",
+				"description": "{Description}",
+				"info": {
+					"value": "{Price}",
+					"state": "Success"
+				},
+				"actionsStrip": [
+					{
+						"text": "Add to Cart",
+						"buttonType": "Transparent",
+						"actions": [
+							{
+								"type": "Navigation",
+								"parameters": {
+									"url": "/cart/add"
+								}
+							}
+						]
+					},
+					{
+						"buttonType": "Transparent",
+						"text": "Favorite",
+						"actions": [
+							{
+								"type": "Navigation",
+								"parameters": {
+									"url": "/favorites/add"
+								}
+							}
+						]
+					}
+				]
+			}
+		},
+		"footer": {
+			"showSeparator": true,
+			"actionsStrip": [
+				{
+					"text": "View All Products",
+					"buttonType": "Transparent",
+					"actions": [
+						{
+							"type": "Navigation",
+							"parameters": {
+								"url": "/products"
+							}
+						}
+					]
+				},
+				{
+					"text": "Checkout",
+					"buttonType": "Transparent",
+					"actions": [
+						{
+							"type": "Navigation",
+							"parameters": {
+								"url": "/checkout"
+							}
+						}
+					]
+				}
+			]
+		}
+	}
+}

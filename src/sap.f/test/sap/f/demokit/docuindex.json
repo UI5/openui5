@@ -102,7 +102,7 @@
 		{
 			"id": "sap.f.ShellBar",
 			"name": "Shell Bar",
-			"category": "Display",
+			"category": "_PRIVATE_",
 			"since": "1.63",
 			  "samples": [
 				  "sap.f.sample.ShellBar",
