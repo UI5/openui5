@@ -6,7 +6,8 @@
 
 window.addEventListener("load", function () {
 	"use strict";
-	var sTargetRoot = document.location.href.substring(0, document.location.href.indexOf("/test-resources")),
+	var iIdx = document.location.pathname.indexOf("/test-resources"),
+		sTargetRoot = iIdx !== -1 ? window.location.origin + document.location.pathname.substring(0, iIdx) : window.location.origin,
 		sWebApp = sTargetRoot + "/test-resources/sap/m/demokit/accessibilityGuide/webapp/",
 		sRes = sTargetRoot + "/resources/",
 		aNodes = [],
