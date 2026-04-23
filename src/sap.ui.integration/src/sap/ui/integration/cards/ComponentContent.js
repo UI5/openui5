@@ -61,6 +61,12 @@ sap.ui.define([
 		}
 	});
 
+	ComponentContent.prototype.init = function () {
+		BaseContent.prototype.init.apply(this, arguments);
+
+		this.awaitEvent("_componentReady");
+	};
+
 	ComponentContent.prototype.onAfterRendering = function () {
 		if (this._oComponent?.tileSetVisible) {
 			const oCard = this.getCardInstance();
@@ -94,8 +100,7 @@ sap.ui.define([
 		}
 
 		if (oCard.getPreviewMode() === CardPreviewMode.Abstract) {
-			// TODO _updated event is always needed, so that the busy indicator knows when to stop. We should review this for contents which do not have data.
-			this.fireEvent("_actionContentReady");
+			this.fireEvent("_componentReady");
 			return;
 		}
 
@@ -108,12 +113,10 @@ sap.ui.define([
 			componentCreated: (oEvent) => {
 				this._oComponent = oEvent.getParameter("component");
 
-				// TODO _updated event is always needed, so that the busy indicator knows when to stop. We should review this for contents which do not have data.
-				this.fireEvent("_actionContentReady");
-				this.fireEvent("_updated");
+				this.fireEvent("_componentReady");
 			},
 			componentFailed: () => {
-				this.fireEvent("_actionContentReady");
+				this.fireEvent("_componentReady");
 				this.handleError({
 					illustrationType: IllustratedMessageType.UnableToLoad,
 					title: Library.getResourceBundleFor("sap.ui.integration").getText("CARD_DATA_LOAD_ERROR"),

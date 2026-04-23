@@ -13,7 +13,8 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/qunit/QUnitUtils",
+	"sap/ui/rta/plugin/Remove",
+	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/thirdparty/sinon-4",
 	"sap/ui/Device"
 ], function(
@@ -29,7 +30,8 @@ sap.ui.define([
 	KeyCodes,
 	VerticalLayout,
 	nextUIUpdate,
-	QUnitUtils,
+	RemovePlugin,
+	CommandFactory,
 	sinon,
 	Device
 ) {
@@ -84,6 +86,7 @@ sap.ui.define([
 			this.oButton = new Button();
 			this.oNotMovableButton = new Button();
 			this.oObjectAttribute = new ObjectAttribute({
+				id: "someAttribute",
 				text: "Some attribute"
 			});
 			this.oObjectHeader = new ObjectHeader({
@@ -107,10 +110,11 @@ sap.ui.define([
 			this.oControlDragDrop = new ControlDragDrop({
 				draggableTypes: aAllMovableTypes
 			});
-
 			this.oCutPaste = new CutPaste({
 				movableTypes: aAllMovableTypes
 			});
+			const oCommandFactory = new CommandFactory();
+			this.oRemovePlugin = new RemovePlugin({ commandFactory: oCommandFactory	});
 
 			var fnCheckMovable = function(oOverlay) {
 				if (oOverlay.getElement() === this.oNotMovableButton) {
@@ -121,12 +125,15 @@ sap.ui.define([
 			this.checkMovableDragStub = sinon.stub(this.oControlDragDrop.getElementMover(), "checkMovable").callsFake(fnCheckMovable);
 			this.checkMovableCutStub = sinon.stub(this.oCutPaste.getElementMover(), "checkMovable").callsFake(fnCheckMovable);
 
+			// Allow removing the last element from the ObjectHeader attributes aggregation
+			sinon.stub(this.oRemovePlugin, "getAction").returns({ removeLastElement: true });
+
 			this.oDesignTime = new DesignTime({
 				rootElements: [
 					this.oParentLayout
 				],
 				plugins: [
-					this.oControlDragDrop, this.oCutPaste
+					this.oControlDragDrop, this.oCutPaste, this.oRemovePlugin
 				]
 			});
 

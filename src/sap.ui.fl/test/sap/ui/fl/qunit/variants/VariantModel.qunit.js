@@ -224,8 +224,11 @@ sap.ui.define([
 		QUnit.test("when initializing a variant model instance", function(assert) {
 			assert.ok(URLHandler.initialize.calledOnce, "then URLHandler.initialize() called once");
 			assert.ok(
-				URLHandler.initialize.calledWith({ model: this.oModel }),
-				"then URLHandler.initialize() called with the the VariantModel"
+				URLHandler.initialize.calledWith({
+					flexReference: this.oModel.sFlexReference,
+					appComponent: this.oComponent
+				}),
+				"then URLHandler.initialize() called with the flex reference and app component"
 			);
 
 			var oVMData = this.oModel.getData()[sVMReference];
@@ -238,6 +241,27 @@ sap.ui.define([
 				1,
 				"then the persisted UI change of the current variant is added to the dependency map"
 			);
+		});
+
+		QUnit.test("when updateData() sets default UI properties on variants", function(assert) {
+			// Create a fresh model without VM control registration to verify updateData() defaults
+			// before setModelPropertiesForControl overrides them
+			const oFreshModel = new VariantModel({}, { appComponent: this.oComponent });
+			const oVMData = oFreshModel.getData()[sVMReference];
+
+			oVMData.variants.forEach((oVariant) => {
+				assert.strictEqual(oVariant.rename, true, `variant '${oVariant.key}' has rename=true by default`);
+				assert.strictEqual(oVariant.change, true, `variant '${oVariant.key}' has change=true by default`);
+				assert.strictEqual(oVariant.remove, true, `variant '${oVariant.key}' has remove=true by default`);
+			});
+			// USER layer variant gets Private sharing, all others get Public
+			const oUserVariant = oVMData.variants.find((oV) => oV.layer === Layer.USER);
+			assert.strictEqual(oUserVariant.sharing, "Private", "USER layer variant has Private sharing");
+			oVMData.variants.filter((oV) => oV.layer !== Layer.USER).forEach((oVariant) => {
+				assert.strictEqual(oVariant.sharing, "Public", `'${oVariant.key}' (${oVariant.layer}) has Public sharing`);
+			});
+
+			oFreshModel.destroy();
 		});
 
 		QUnit.test("when destroy() is called", function(assert) {
@@ -1038,7 +1062,7 @@ sap.ui.define([
 			assert.deepEqual(this.oRegisterControlStub.getCall(0).args[0], {
 				vmReference: oVariantManagementWithURLUpdate.getId(),
 				updateURL: true,
-				model: this.oModel
+				flexReference: sReference
 			}, "then URLHandler.attachHandlers was called once for a control without URL update");
 			oVariantManagementWithURLUpdate.destroy();
 			oVariantManagementWithoutURLUpdate.destroy();

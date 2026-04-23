@@ -353,6 +353,94 @@ sap.ui.define([
 			assert.strictEqual(this.oElementOverlay.hasStyleClass("sapUiDtOverlayEditable"), true, "the Overlay has the sapUiDtOverlayEditable StyleClass");
 		});
 
+		QUnit.test("when setLastElementMovable is called on the overlay", function(assert) {
+			// Initially set the overlay as movable
+			this.oElementOverlay.setMovable(true);
+			assert.strictEqual(
+				this.oElementOverlay.isMovable(),
+				true,
+				"then the overlay is initially movable"
+			);
+			assert.strictEqual(
+				this.oElementOverlay.isGenerallyMovable(),
+				true,
+				"then isGenerallyMovable returns true"
+			);
+
+			// Set lastElementMovable to false - should save movable state and set movable to false
+			this.oElementOverlay.setLastElementMovable(false);
+			assert.strictEqual(
+				this.oElementOverlay.isMovable(),
+				false,
+				"then the overlay is no longer movable"
+			);
+			assert.strictEqual(
+				this.oElementOverlay._bGenerallyMovable,
+				true,
+				"then the previous movable state is saved"
+			);
+			assert.strictEqual(
+				this.oElementOverlay.isGenerallyMovable(),
+				true,
+				"then isGenerallyMovable still returns true"
+			);
+
+			// Set lastElementMovable to true - should restore movable state
+			this.oElementOverlay.setLastElementMovable(true);
+			assert.strictEqual(
+				this.oElementOverlay.isMovable(),
+				true,
+				"then the overlay is movable again"
+			);
+			assert.strictEqual(
+				this.oElementOverlay._bGenerallyMovable,
+				undefined,
+				"then the saved movable state is cleared"
+			);
+			assert.strictEqual(
+				this.oElementOverlay.isGenerallyMovable(),
+				true,
+				"then isGenerallyMovable returns true"
+			);
+
+			// Test when overlay is not movable initially
+			this.oElementOverlay.setMovable(false);
+			this.oElementOverlay.setLastElementMovable(false);
+			assert.strictEqual(
+				this.oElementOverlay.isMovable(),
+				false,
+				"then the overlay remains not movable"
+			);
+			assert.strictEqual(
+				this.oElementOverlay._bGenerallyMovable,
+				undefined,
+				"then the movable state is not saved"
+			);
+			assert.strictEqual(
+				this.oElementOverlay.isGenerallyMovable(),
+				false,
+				"then isGenerallyMovable returns false"
+			);
+
+			// set lastElementMovable to true - should not change movable state
+			this.oElementOverlay.setLastElementMovable(true);
+			assert.strictEqual(
+				this.oElementOverlay.isMovable(),
+				false,
+				"then the overlay is still not movable"
+			);
+			assert.strictEqual(
+				this.oElementOverlay._bGenerallyMovable,
+				undefined,
+				"then the saved movable state is still undefined"
+			);
+			assert.strictEqual(
+				this.oElementOverlay.isGenerallyMovable(),
+				false,
+				"then isGenerallyMovable returns false"
+			);
+		});
+
 		QUnit.test("when setSelected is called on the overlay with undefined", function(assert) {
 			this.oElementOverlay.setSelectable(true);
 			this.oElementOverlay.setSelected(undefined);

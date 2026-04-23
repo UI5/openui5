@@ -11,6 +11,8 @@ sap.ui.define([
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/rta/command/CommandFactory",
+	"sap/ui/rta/plugin/Remove",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Button,
@@ -23,6 +25,8 @@ sap.ui.define([
 	OverlayRegistry,
 	VerticalLayout,
 	nextUIUpdate,
+	CommandFactory,
+	RemovePlugin,
 	sinon
 ) {
 	"use strict";
@@ -438,6 +442,74 @@ sap.ui.define([
 			);
 
 			sandbox.restore();
+		});
+	});
+
+	QUnit.module("Given DragDrop with removeLastElement = false is initialized", {
+		async beforeEach(assert) {
+			this.oButton = new Button();
+			this.oLayout = new VerticalLayout({ content: [this.oButton] });
+			this.oLayout.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oCommandFactory = new CommandFactory();
+			this.oDragDrop = new DragDrop({	commandFactory: oCommandFactory	});
+			this.oRemovePlugin = new RemovePlugin({ commandFactory: oCommandFactory	});
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oLayout],
+				plugins: [this.oDragDrop, this.oRemovePlugin],
+				designTimeMetadata: {
+					"sap.ui.layout.VerticalLayout": {
+						aggregations: {
+							content: {
+								actions: {
+									remove: {
+										removeLastElement: false
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			const done = assert.async();
+
+			this.oDesignTime.attachEventOnce("synced", () => {
+				this.oLayoutOverlay = OverlayRegistry.getOverlay(this.oLayout);
+				this.oButtonOverlay = OverlayRegistry.getOverlay(this.oButton);
+				done();
+			});
+		},
+		afterEach() {
+			this.oDesignTime.destroy();
+			this.oLayout.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when the element is the last visible element and removeLastElement is false", function(assert) {
+			const fnOnDragStartSpy = sandbox.spy(this.oDragDrop, "onDragStart");
+			this.oButtonOverlay.setMovable(true);
+
+			assert.strictEqual(
+				this.oButtonOverlay.getDomRef().getAttribute("draggable"),
+				"true",
+				"then the overlay is draggable before it is recognized as the last visible element"
+			);
+
+			this.oButtonOverlay.setLastElementMovable(false);
+			triggerEvent("dragstart", this.oButtonOverlay.getDomRef());
+
+			assert.strictEqual(
+				fnOnDragStartSpy.callCount,
+				0,
+				"then after set as last visible Element onDragStart is not called because drag events are not attached"
+			);
+			assert.strictEqual(
+				this.oButtonOverlay.getDomRef().getAttribute("draggable"),
+				null,
+				"then the overlay is not draggable"
+			);
 		});
 	});
 

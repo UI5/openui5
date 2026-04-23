@@ -94,7 +94,7 @@ function(
 	 * @return {Promise.<boolean>} promise with true value if editable
 	 */
 	function fnIsValidForMove(oOverlay, bOnRegistration) {
-		var	oDesignTimeMetadata = oOverlay.getDesignTimeMetadata();
+		var oDesignTimeMetadata = oOverlay.getDesignTimeMetadata();
 		var oParentElementOverlay = oOverlay.getParentElementOverlay();
 		// if the overlay has 'not-adaptable' as action it should also not be movable
 		var bNotAdaptable = oDesignTimeMetadata.markedAsNotAdaptable();

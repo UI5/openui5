@@ -9,9 +9,9 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/flexState/changes/UIChangeManager",
@@ -27,9 +27,9 @@ sap.ui.define([
 	ChangeHandlerStorage,
 	Reverter,
 	VariantUtils,
+	VariantManagementState,
 	FlexObjectState,
 	FlexState,
-	ControlVariantApplyAPI,
 	FlexRuntimeInfoAPI,
 	Settings,
 	UIChangeManager,
@@ -119,7 +119,6 @@ sap.ui.define([
 			);
 			const oAppComponent = Utils.getAppComponentForControl(oReferenceControl);
 			const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oReferenceControl });
-			const oVariantModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
 			const sLayer = Layer.USER;
 			const aSuccessfulChanges = [];
 			const mVMReferences = {};
@@ -155,7 +154,10 @@ sap.ui.define([
 								}
 								if (sVariantManagementReference) {
 									mVMReferences[sSelectorControlId] = sVariantManagementReference;
-									const sCurrentVariantReference = oVariantModel.oData[sVariantManagementReference].currentVariant;
+									const sCurrentVariantReference = VariantManagementState.getCurrentVariantReference({
+										vmReference: sVariantManagementReference,
+										reference: sFlexReference
+									});
 									oPersonalizationChange.changeSpecificData.variantReference = sCurrentVariantReference;
 								}
 							}

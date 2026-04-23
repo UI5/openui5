@@ -158,9 +158,6 @@ sap.ui.define([
 	WebPageContent.prototype.applyConfiguration = function () {
 		const oConfiguration = this.getParsedConfiguration();
 
-		//workaround until actions refactor
-		this.fireEvent("_actionContentReady"); // todo
-
 		if (!oConfiguration) {
 			return;
 		}

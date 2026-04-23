@@ -128,11 +128,6 @@ sap.ui.define([
 			this.pSequentialImportCompleted = Promise.resolve();
 			JSONModel.apply(this, [oData]);
 
-			this.sharing = {
-				PRIVATE: SharingMode.Private,
-				PUBLIC: SharingMode.Public
-			};
-
 			this.sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.appComponent);
 			this.oAppComponent = mPropertyBag.appComponent;
 			this._oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
@@ -168,8 +163,17 @@ sap.ui.define([
 				const oCurrentVariantData = (oCurrentData[sVariantManagementKey].variants || [])
 				.find(function(oVariantToCheck) {
 					return oVariantToCheck.key === oVariant.key;
-				});
-				return { ...(oCurrentVariantData || {}), ...oVariant };
+				}) || {};
+				return {
+					// Default values
+					rename: true,
+					change: true,
+					remove: true,
+					sharing: oVariant.layer === Layer.USER ? SharingMode.Private : SharingMode.Public,
+					// Previous values
+					...oCurrentVariantData,
+					...oVariant
+				};
 			});
 			const sOldCurrentVariant = oCurrentData[sVariantManagementKey].currentVariant;
 			// Currently the VariantModel is still created independent of the existence of a VM control
@@ -187,7 +191,8 @@ sap.ui.define([
 				URLHandler.updateVariantInURL({
 					vmReference: sVariantManagementKey,
 					newVReference: oVariantMapEntry.currentVariant,
-					model: this
+					flexReference: this.sFlexReference,
+					appComponent: this.oAppComponent
 				});
 			}
 			oCurrentData[sVariantManagementKey].currentVariant = oVariantMapEntry.currentVariant;
@@ -211,7 +216,7 @@ sap.ui.define([
 	 */
 	VariantModel.prototype.initialize = async function() {
 		// initialize hash data - variants map & model should exist at this point (set on constructor)
-		await URLHandler.initialize({ model: this });
+		await URLHandler.initialize({ flexReference: this.sFlexReference, appComponent: this.oAppComponent });
 	};
 
 	/**
@@ -306,9 +311,9 @@ sap.ui.define([
 			this.oData[sVariantManagementReference].variants.forEach(function(oVariant) {
 				oVariant.rename = true;
 				oVariant.change = true;
-				oVariant.sharing = this.sharing.PUBLIC;
+				oVariant.sharing = SharingMode.Public;
 				oVariant.remove = isVariantValidForRemove(oVariant, sVariantManagementReference, bDesignTimeModeToBeSet);
-			}.bind(this));
+			});
 		} else if (oVMControl.getEditable()) { // Personalization settings
 			this.oData[sVariantManagementReference].variantsEditable = true;
 
@@ -320,19 +325,19 @@ sap.ui.define([
 					case Layer.USER:
 						oVariant.rename = true;
 						oVariant.change = true;
-						oVariant.sharing = this.sharing.PRIVATE;
+						oVariant.sharing = SharingMode.Private;
 						updatePersonalVariantPropertiesWithFlpSettings(oVariant);
 						break;
 					case Layer.PUBLIC:
-						oVariant.sharing = this.sharing.PUBLIC;
+						oVariant.sharing = SharingMode.Public;
 						updatePublicVariantPropertiesWithSettings(oVariant);
 						break;
 					default:
 						oVariant.rename = false;
 						oVariant.change = false;
-						oVariant.sharing = this.sharing.PUBLIC;
+						oVariant.sharing = SharingMode.Public;
 				}
-			}.bind(this));
+			});
 		} else {
 			this.oData[sVariantManagementReference].variantsEditable = false;
 			this.oData[sVariantManagementReference].variants.forEach(function(oVariant) {
@@ -398,12 +403,12 @@ sap.ui.define([
 			URLHandler.registerControl({
 				vmReference: sVariantManagementReference,
 				updateURL: true,
-				model: this
+				flexReference: this.sFlexReference
 			});
 			URLHandler.handleModelContextChange({
-				model: this,
 				vmControl: oVariantManagementControl,
-				appComponent: this.oAppComponent
+				appComponent: this.oAppComponent,
+				flexReference: this.sFlexReference
 			});
 		}
 

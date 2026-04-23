@@ -10442,6 +10442,24 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
+[
+	"(42)/@$ui5.context.isSelected",
+	"(42)/@$ui5foo", // no dot after /@$ui5
+	"(42)/foo@$ui5.bar", // no slash before @$ui5.
+	"('%2F@$ui5.context.isSelected')/foo", // "/" has to be encoded in a predicate
+	"(42)/foo@any.annotation",
+	"(42)/@$any.annotation"
+].forEach(function (sPath, i) {
+	QUnit.test("doSetProperty: annotations; sPath=" + sPath, function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		this.mock(oBinding).expects("setOutdated").exactly(i > 0 ? 1 : 0).withExactArgs(true);
+
+		// code under test
+		assert.strictEqual(oBinding.doSetProperty(sPath), undefined);
+	});
+});
+
+//*********************************************************************************************
 [false, true].forEach((bDataAggregation) => {
 	[false, true].forEach((bWithAggregationCache) => {
 		[undefined, false, true].forEach((bForce) => {

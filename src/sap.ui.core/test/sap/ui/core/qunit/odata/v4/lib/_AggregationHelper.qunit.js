@@ -1987,14 +1987,23 @@ sap.ui.define([
 }, {
 	filter : and(f("a1"), and(f("a2"), f("b"))),
 	result : [and(f("a1"), f("a2")), f("b")]
-}, {
-	filter : and(f("a2"), f("unit")),
-	noThese : [1],
-	result : [and(f("a2"), f("unit")), f("unit")]
-}, {
-	filter : and(f("unit"), f("a1"), f("currency")),
+}, { // a1 has no unit
+	filter : and(f("a1"), f("unit"), f("currency")),
+	noThese : [1, 2],
+	result : [f("a1"), and(f("unit"), f("currency"))]
+}, { // a2 has "unit" (two phases required)
+	filter : and(f("unit"), f("a2"), f("currency")),
 	noThese : [0, 2],
-	result : [and(f("unit"), f("a1"), f("currency")), and(f("unit"), f("currency"))]
+	result : [and(f("unit"), f("a2")), and(f("unit"), f("currency"))]
+}, { // a3 has "currency" (two phases required)
+	filter : and(f("unit"), f("currency"), f("a3")),
+	noThese : [0, 1],
+	result : [and(f("currency"), f("a3")), and(f("unit"), f("currency"))]
+}, { // all together, order of units is preserved, unit needs to be searched inside multi-filter
+	filter : and(f("a1"), or(f("a2"), f("b")), f("a3"), f("currency"), f("unit")),
+	noThese : [3, 4],
+	result : [and(f("currency"), f("unit"), f("a1"), or(f("a2"), f("b")), f("a3")),
+		and(f("currency"), f("unit"))]
 }].forEach(function (oFixture, i) {
 	[false, true].forEach((bHasGroupLevels) => {
 		[false, true].forEach((bHasGrandTotal) => {

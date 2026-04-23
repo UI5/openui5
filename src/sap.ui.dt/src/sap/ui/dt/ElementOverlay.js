@@ -725,6 +725,31 @@ sap.ui.define([
 	};
 
 	/**
+	 * Sets the movability state for the last element in a container
+	 * @param {boolean} bLastElementMovable - Whether the last element should be movable
+	 * @public
+	 */
+	ElementOverlay.prototype.setLastElementMovable = function(bLastElementMovable) {
+		if (this.getMovable() && bLastElementMovable === false) {
+			this._bGenerallyMovable = true;
+			this.setMovable(false);
+		} else if (this._bGenerallyMovable && bLastElementMovable === true) {
+			this._bGenerallyMovable = undefined;
+			this.setMovable(true);
+		}
+	};
+
+	/**
+	 * Returns the basic movability state of the ElementOverlay, without considering the current
+	 * movablility state of the last ElementOverlay in a container
+	 * @returns {boolean} Whether the ElementOverlay is basically movable
+	 * @public
+	 */
+	ElementOverlay.prototype.isGenerallyMovable = function() {
+		return !!(this.getMovable() || this._bGenerallyMovable);
+	};
+
+	/**
 	 * Sets whether the ElementOverlay is editable and toggles corresponding css class
 	 * @param {boolean} bEditable if the ElementOverlay is editable
 	 * @returns {sap.ui.dt.ElementOverlay} returns this

@@ -3,12 +3,14 @@
 sap.ui.define([
 	"sap/ui/fl/Layer",
 	"sap/ui/rta/plugin/CutPaste",
+	"sap/ui/rta/plugin/Remove",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/layout/VerticalLayout",
 	"sap/m/ObjectStatus",
 	"sap/ui/rta/plugin/Plugin",
-	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/DesignTime",
+	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/dt/OverlayUtil",
 	"sap/m/Page",
 	"sap/ui/thirdparty/sinon-4",
 	"sap/ui/test/utils/nextUIUpdate"
@@ -16,12 +18,14 @@ sap.ui.define([
 function(
 	Layer,
 	CutPastePlugin,
+	RemovePlugin,
 	CommandFactory,
 	VerticalLayout,
 	ObjectStatus,
 	Plugin,
-	OverlayRegistry,
 	DesignTime,
+	OverlayRegistry,
+	OverlayUtil,
 	Page,
 	sinon,
 	nextUIUpdate
@@ -48,10 +52,14 @@ function(
 		}
 	}, function() {
 		QUnit.test("When retrieving the context menu items", function(assert) {
-			assert.expect(10);
-			var bIsAvailable = true;
-			var oMockOverlay = {
+			assert.expect(12);
+			let bIsAvailable = true;
+			const oMockParentAggregationOverlay = {
 				getDesignTimeMetadata() {}
+			};
+			const oMockOverlay = {
+				getDesignTimeMetadata() {},
+				getParentAggregationOverlay() { return oMockParentAggregationOverlay; }
 			};
 
 			// Cut
@@ -62,6 +70,20 @@ function(
 				assert.equal(aOverlays[0], oMockOverlay, "the 'available' function calls isAvailable with the correct overlay");
 				return bIsAvailable;
 			});
+			sandbox.stub(OverlayUtil, "canBeRemovedFromAggregationOnMove")
+			.callsFake(function(oElementOverlay, oDesignTime) {
+				assert.strictEqual(
+					oElementOverlay,
+					oMockOverlay,
+					"the 'canBeRemovedFromAggregationOnMove' function is called with the correct overlay"
+				);
+				assert.strictEqual(
+					oDesignTime,
+					this.CutPastePlugin.getDesignTime(),
+					"the 'canBeRemovedFromAggregationOnMove' function is called with the correct design time"
+				);
+				return true;
+			}.bind(this));
 			sandbox.stub(this.CutPastePlugin, "_isPasteEditable").callsFake(function(oOverlay) {
 				assert.equal(oOverlay, oMockOverlay, "the 'available' function calls _isEditable when isAvailable is false, with the correct overlay");
 				return Promise.resolve(true);
@@ -69,7 +91,7 @@ function(
 
 			// Paste
 			sandbox.stub(this.CutPastePlugin, "paste").callsFake(function(oOverlay) {
-				assert.equal(oOverlay, oMockOverlay, "the 'cut' method is called with the right overlay");
+				assert.equal(oOverlay, oMockOverlay, "the 'paste' method is called with the right overlay");
 			});
 			sandbox.stub(this.CutPastePlugin, "isElementPasteable").callsFake(function(oOverlay) {
 				assert.equal(oOverlay, oMockOverlay, "the 'enabled' function calls isElementPasteable with the correct overlay");
@@ -91,11 +113,23 @@ function(
 		});
 
 		QUnit.test("When retrieving the context menu items and a responsible element is available", function(assert) {
-			assert.expect(7);
-			var oMockOverlay = {
-				getDesignTimeMetadata() {}
+			assert.expect(9);
+			const oMockParentAggregationOverlay = {
+				getDesignTimeMetadata() {
+					return {
+						actions: {
+							remove: {
+								removeLastElement: true
+							}
+						}
+					};
+				}
 			};
-			var oResponsibleElementOverlay = { type: "responsibleElementOverlay" };
+			const oMockOverlay = {
+				getDesignTimeMetadata() {},
+				getParentAggregationOverlay() { return oMockParentAggregationOverlay; }
+			};
+			const oResponsibleElementOverlay = { type: "responsibleElementOverlay" };
 
 			sandbox.stub(this.CutPastePlugin, "isResponsibleElementActionAvailable").returns(true);
 			sandbox.stub(this.CutPastePlugin, "getResponsibleElementOverlay").returns(oResponsibleElementOverlay);
@@ -103,6 +137,20 @@ function(
 				assert.equal(aOverlays[0], oResponsibleElementOverlay, "then isAvailable() is called with the responsible element overlay");
 				return true;
 			});
+			sandbox.stub(OverlayUtil, "canBeRemovedFromAggregationOnMove")
+			.callsFake(function(oElementOverlay, oDesignTime) {
+				assert.strictEqual(
+					oElementOverlay,
+					oMockOverlay,
+					"then canBeRemovedFromAggregationOnMove() is called with the correct overlay"
+				);
+				assert.strictEqual(
+					oDesignTime,
+					this.CutPastePlugin.getDesignTime(),
+					"then canBeRemovedFromAggregationOnMove() is called with the correct design time"
+				);
+				return true;
+			}.bind(this));
 			sandbox.stub(this.CutPastePlugin, "_isPasteEditable").callsFake(function(oOverlay) {
 				assert.equal(oOverlay, oResponsibleElementOverlay, "then _isPasteEditable() is called with the responsible element overlay");
 				return Promise.resolve(false);
@@ -272,6 +320,102 @@ function(
 			.then(function(aMenuItemsForLayout) {
 				assert.equal(aMenuItemsForLayout.length, 0, "'getMenuItems' for formContainer returns no menu item for layout without stableid");
 			});
+		});
+	});
+
+	QUnit.module("Given a layout with just one object movable inside", {
+		async beforeEach(assert) {
+			const done = assert.async();
+			this.CutPastePlugin = new CutPastePlugin({
+				commandFactory: oCommandFactory
+			});
+			sandbox.stub(Plugin.prototype, "hasChangeHandler").resolves(true);
+
+			this.oObjectStatus = new ObjectStatus("objectStatusSingle", {
+				text: "Text Single",
+				title: "Title Single"
+			});
+			this.oVerticalLayout = new VerticalLayout("VerticalLayoutRemoveLast", {
+				content: [this.oObjectStatus]
+			});
+			this.oPage = new Page("pageRemoveLast", {
+				content: [this.oVerticalLayout]
+			}).placeAt("qunit-fixture");
+
+			await nextUIUpdate();
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oPage],
+				designTimeMetadata: {
+					"sap.ui.layout.VerticalLayout": {
+						aggregations: {
+							content: {
+								actions: {
+									move: "moveControls",
+									remove: {
+										removeLastElement: true
+									}
+								}
+							}
+						}
+					}
+				},
+				plugins: [new RemovePlugin({ commandFactory: oCommandFactory }), this.CutPastePlugin]
+			});
+			this.CutPastePlugin.setDesignTime(this.oDesignTime);
+
+			this.oDesignTime.attachEventOnce("synced", function() {
+				this.oVerticalLayoutOverlay = OverlayRegistry.getOverlay(this.oVerticalLayout);
+				this.oObjectStatusOverlay = OverlayRegistry.getOverlay(this.oObjectStatus);
+				done();
+			}.bind(this));
+		},
+
+		afterEach() {
+			this.oDesignTime.destroy();
+			this.oPage.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when cutting the last element and removeLastElement is true", async function(assert) {
+			sandbox.stub(this.oObjectStatusOverlay, "getMovable").returns(true);
+
+			const aMenuItems = await this.CutPastePlugin.getMenuItems([this.oObjectStatusOverlay]);
+			const oCutMenuItem = aMenuItems.find(function(oItem) {
+				return oItem.id === "CTX_CUT";
+			});
+			assert.ok(oCutMenuItem, "then the cut menu item is available");
+			assert.ok(oCutMenuItem.enabled([this.oObjectStatusOverlay]), "then the cut menu item is enabled for the last element");
+
+			// Execute cut
+			oCutMenuItem.handler([this.oObjectStatusOverlay]);
+			assert.ok(this.CutPastePlugin.getElementMover().getMovedOverlay(), "then the element is marked as moved");
+		});
+
+		QUnit.test("when checking cut availability with removeLastElement false", async function(assert) {
+			sandbox.stub(this.oVerticalLayoutOverlay, "getMovable").returns(true);
+			sandbox.stub(this.oObjectStatusOverlay, "getMovable").returns(true);
+			this.oVerticalLayoutOverlay.getDesignTimeMetadata().setData({
+				actions: {
+					remove: {
+						removeLastElement: false
+					}
+				}
+			});
+			const aMenuItems = await this.CutPastePlugin.getMenuItems([this.oVerticalLayoutOverlay]);
+			const oCutMenuItem = aMenuItems.find(function(oItem) {
+				return oItem.id === "CTX_CUT";
+			});
+			assert.strictEqual(
+				oCutMenuItem !== undefined,
+				true,
+				"then cut menu item is returned for the layout with removeLastElement false"
+			);
+			assert.strictEqual(
+				oCutMenuItem.enabled([this.oVerticalLayoutOverlay]),
+				false,
+				"then cut is disabled for the last element when removeLastElement is false"
+			);
 		});
 	});
 

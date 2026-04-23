@@ -107,12 +107,23 @@ sap.ui.define([
 	/**
 	 * @override
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {boolean} - true if the plugin is available
+	 * @return {boolean} - <code>true</code> if the plugin is available
 	 */
 	CutPaste.prototype.isAvailable = function(aElementOverlays) {
-		return aElementOverlays.every(function(oElementOverlay) {
-			return oElementOverlay.getMovable();
-		});
+		// This is required as the rta.cutPaste plugin is extended by both the
+		// dt.CutPaste and rta.Plugin module. See Utils.extendWith in this file.
+		return ControlCutPaste.prototype.isAvailable.apply(this, [aElementOverlays]);
+	};
+
+	/**
+	 * @override
+	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
+	 * @return {boolean} - <code>true</code> if the plugin is enabled
+	 */
+	CutPaste.prototype.isEnabled = function(aElementOverlays) {
+		// This is required as the rta.cutPaste plugin is extended by both the
+		// dt.CutPaste and rta.Plugin module. See Utils.extendWith in this file.
+		return ControlCutPaste.prototype.isEnabled.apply(this, [aElementOverlays]);
 	};
 
 	/**
@@ -196,9 +207,7 @@ sap.ui.define([
 				handler: function(aElementOverlays) {
 					return this.cut(aElementOverlays[0]);
 				}.bind(this),
-				enabled(aElementOverlays) {
-					return aElementOverlays.length === 1;
-				},
+				enabled: this.isEnabled.bind(this, aElementOverlays),
 				rank: this.getRank("CTX_CUT"),
 				icon: "sap-icon://scissors"
 			}, aElementOverlays, ["move"]);

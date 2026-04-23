@@ -297,9 +297,6 @@ sap.ui.define([
 		CalendarContent.prototype.applyConfiguration = function () {
 			var oConfiguration = this.getParsedConfiguration();
 
-			//workaround until actions refactor
-			this.fireEvent("_actionContentReady"); // todo
-
 			if (!oConfiguration) {
 				return;
 			}

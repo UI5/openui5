@@ -24,7 +24,8 @@ sap.ui.define([
 	"sap/ui/core/Messaging",
 	"sap/ui/core/message/MessageType",
 	"sap/ui/mdc/filterbar/PropertyInfoValidator",
-	"sap/base/Log"
+	"sap/base/Log",
+	"sap/ui/model/odata/type/String" // to be sure that type is loaded for TypeMap
 ], function(
 	FBTestDelegate,
 	Localization,
@@ -48,7 +49,8 @@ sap.ui.define([
 	Messaging,
 	MessageType,
 	PropertyInfoValidator,
-	Log
+	Log,
+	StringType
 ) {
 	"use strict";
 

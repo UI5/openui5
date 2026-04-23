@@ -32,24 +32,6 @@ sap.ui.define([
 
 	var VARIANT_MODEL_NAME = "$FlexVariants";
 
-	// The API methods can be called before the model is set on the component
-	function waitForVariantModel(oAppComponent) {
-		var oVariantModel = oAppComponent.getModel(VARIANT_MODEL_NAME);
-		if (oVariantModel) {
-			return Promise.resolve(oVariantModel);
-		}
-		return new Promise(function(resolve) {
-			function onModelContextChange() {
-				oVariantModel = oAppComponent.getModel(VARIANT_MODEL_NAME);
-				if (oVariantModel) {
-					oAppComponent.detachModelContextChange(onModelContextChange);
-					resolve(oVariantModel);
-				}
-			}
-			oAppComponent.attachModelContextChange(onModelContextChange);
-		});
-	}
-
 	function handleInitialLoadScenario(sVMReference, oVariantManagementControl, sFlexReference) {
 		const aVariantChangesForVariant = VariantManagementState.getVariantChangesForVariant({
 			vmReference: sVMReference,
@@ -133,19 +115,6 @@ sap.ui.define([
 		},
 
 		/**
-		 * Returns a promise that resolves to the variant model once it is available
-		 *
-		 * @param {sap.ui.core.Component} oAppComponent - Application component
-		 * @returns {Promise} Promise resolving to the Variant Model
-		 *
-		 * @private
-		 * @ui5-restricted sap.ui.fl, sap.ui.rta
-		 */
-		getVariantModel(oAppComponent) {
-			return waitForVariantModel(oAppComponent);
-		},
-
-		/**
 		 * Returns the variant management control instance for a variant management reference.
 		 *
 		 * @param {string} sVariantManagementReference - Reference to the variant management control
@@ -172,20 +141,14 @@ sap.ui.define([
 		clearVariantParameterInURL(mPropertyBag) {
 			const oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
 			const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
-			const oVariantModel = oAppComponent && oAppComponent.getModel(VARIANT_MODEL_NAME);
-			if (!oVariantModel) {
-				// technical parameters are not updated, only URL hash is updated
-				Log.error("Variant model could not be found on the provided control");
-				return;
-			}
 			let aUpdatedVariantParameters;
 
 			// check if variant for the passed variant management control is present
 			if (mPropertyBag.control.isA("sap.ui.fl.variants.VariantManagement")) {
-				const sVariantManagementReference = oVariantModel.getLocalId(mPropertyBag.control.getId(), oAppComponent);
+				const sVariantManagementReference = mPropertyBag.control.getVariantManagementReference();
 				const mCleansedParametersWithIndex = URLHandler.removeURLParameterForVariantManagement({
-					model: oVariantModel,
-					vmReference: sVariantManagementReference
+					vmReference: sVariantManagementReference,
+					flexReference: sFlexReference
 				});
 				aUpdatedVariantParameters = mCleansedParametersWithIndex.parameters;
 			}

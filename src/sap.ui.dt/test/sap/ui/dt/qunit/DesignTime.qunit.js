@@ -17,6 +17,7 @@ sap.ui.define([
 	"sap/ui/dt/ElementOverlay",
 	"sap/ui/dt/AggregationOverlay",
 	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/dt/OverlayUtil",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/DesignTimeStatus",
 	"sap/ui/dt/ElementUtil",
@@ -48,6 +49,7 @@ sap.ui.define([
 	ElementOverlay,
 	AggregationOverlay,
 	OverlayRegistry,
+	OverlayUtil,
 	DesignTime,
 	DesignTimeStatus,
 	ElementUtil,
@@ -2024,6 +2026,256 @@ sap.ui.define([
 				this.oButton2Overlay.getDesignTimeMetadata().getData().aggregations.content,
 				"after removing the button from the layout the 'content' aggregation is no longer on the button DT"
 			);
+		});
+	});
+
+	QUnit.module("On element modified - Given that the DesignTime is created for a root control", {
+		async beforeEach(assert) {
+			var fnDone = assert.async();
+
+			this.oButton1 = new Button("button1");
+			this.oButton2 = new Button("button2");
+			this.oLayout = new Panel({
+				id: "layout1",
+				content: [
+					this.oButton1,
+					this.oButton2
+				]
+			});
+			this.oLayout.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oLayout]
+			});
+			this.oDesignTime.attachEventOnce("synced", function() {
+				fnDone();
+			});
+		},
+		afterEach() {
+			this.oDesignTime.destroy();
+			this.oLayout.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when a new control is added to the panel content aggregation (_onAddAggregation)", function(assert) {
+			const fnDone = assert.async();
+			const oNewButton = new Button("newButton");
+			const oUpdateRemovabilitySpy = sandbox.spy(OverlayUtil, "updateLastElementRemovability");
+
+			this.oDesignTime.attachEventOnce("elementOverlayAdded", function(oEvent) {
+				const oNewButtonOverlay = OverlayRegistry.getOverlay(oNewButton);
+				assert.ok(oNewButtonOverlay, "then an overlay is created for the new button");
+				assert.deepEqual(
+					oEvent.getParameters(),
+					{
+						id: oNewButtonOverlay.getId(),
+						targetAggregation: "content",
+						targetId: oNewButtonOverlay.getParentAggregationOverlay().getId(),
+						targetIndex: 2
+					},
+					"then event 'elementOverlayAdded' was fired with the correct parameters"
+				);
+				assert.deepEqual(
+					oUpdateRemovabilitySpy.lastCall.args[0],
+					{
+						type: "add",
+						element: oNewButton,
+						parentElement: this.oLayout,
+						aggregationName: "content",
+						designTime: this.oDesignTime
+					},
+					"then OverlayUtil.updateLastElementRemovability was called with correct parameters"
+				);
+				fnDone();
+			}.bind(this));
+
+			this.oLayout.addContent(oNewButton);
+		});
+
+		QUnit.test("when an existing control is moved within the panel content aggregation (_onAddAggregation for move)", function(assert) {
+			const fnDone = assert.async();
+			const oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
+
+			this.oDesignTime.attachEventOnce("elementOverlayMoved", function(oEvent) {
+				assert.deepEqual(
+					oEvent.getParameters(),
+					{
+						id: oButton1Overlay.getId(),
+						targetAggregation: "content",
+						targetId: oButton1Overlay.getParentAggregationOverlay().getId(),
+						targetIndex: 1
+					},
+					"then event 'elementOverlayMoved' was fired with the correct parameters"
+				);
+				fnDone();
+			});
+
+			// Move button1 to the end (after button2)
+			this.oLayout.removeContent(this.oButton1);
+			this.oLayout.addContent(this.oButton1);
+		});
+
+		QUnit.test("when a control is removed from the panel content aggregation (_onRemoveAggregation)", function(assert) {
+			const fnDone = assert.async();
+			const oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
+			const sButton1OverlayId = oButton1Overlay.getId();
+			const oUpdateRemovabilitySpy = sandbox.spy(OverlayUtil, "updateLastElementRemovability");
+
+			this.oDesignTime.attachEventOnce("elementOverlayDestroyed", function(oEvent) {
+				assert.strictEqual(
+					oEvent.getParameter("elementOverlay").getId(),
+					sButton1OverlayId,
+					"then event 'elementOverlayDestroyed' was fired for the removed button"
+				);
+				assert.deepEqual(
+					oUpdateRemovabilitySpy.lastCall.args[0],
+					{
+						type: "remove",
+						element: this.oButton1,
+						parentElement: this.oLayout,
+						aggregationName: "content",
+						designTime: this.oDesignTime
+					},
+					"then OverlayUtil.updateLastElementRemovability was called with correct parameters"
+				);
+				fnDone();
+				this.oButton1.destroy();
+			}.bind(this));
+
+			this.oLayout.removeContent(this.oButton1);
+		});
+
+		QUnit.test("when a control visibility is set to false (_onPropertyChanged)", function(assert) {
+			const fnDone = assert.async();
+			const oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
+			const oExpectedResponse = {
+				id: oButton1Overlay.getId(),
+				name: "visible",
+				oldValue: true,
+				value: false
+			};
+			const oUpdateRemovabilitySpy = sandbox.spy(OverlayUtil, "updateLastElementRemovability");
+
+			this.oDesignTime.attachEventOnce("elementPropertyChanged", function(oEvent) {
+				assert.deepEqual(
+					oEvent.getParameters(),
+					oExpectedResponse,
+					"then event 'elementPropertyChanged' was fired with the correct parameters when setting visible to false"
+				);
+				assert.deepEqual(
+					oUpdateRemovabilitySpy.lastCall.args[0],
+					{
+						type: "remove",
+						element: this.oButton1,
+						parentElement: this.oLayout,
+						aggregationName: "content",
+						designTime: this.oDesignTime
+					},
+					"then OverlayUtil.updateLastElementRemovability was called with type 'remove'"
+				);
+				fnDone();
+			}.bind(this));
+
+			this.oButton1.setVisible(false);
+		});
+
+		QUnit.test("when a control visibility is set to true after being hidden (_onPropertyChanged)", function(assert) {
+			const fnDone = assert.async();
+			const oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
+
+			// First set to false
+			this.oButton1.setVisible(false);
+
+			const oExpectedResponse = {
+				id: oButton1Overlay.getId(),
+				name: "visible",
+				oldValue: false,
+				value: true
+			};
+			const oUpdateRemovabilitySpy = sandbox.spy(OverlayUtil, "updateLastElementRemovability");
+
+			this.oDesignTime.attachEventOnce("elementPropertyChanged", function(oEvent) {
+				assert.deepEqual(
+					oEvent.getParameters(),
+					oExpectedResponse,
+					"then event 'elementPropertyChanged' was fired with the correct parameters when setting visible to true"
+				);
+				assert.deepEqual(
+					oUpdateRemovabilitySpy.lastCall.args[0],
+					{
+						type: "add",
+						element: this.oButton1,
+						parentElement: this.oLayout,
+						aggregationName: "content",
+						designTime: this.oDesignTime
+					},
+					"then OverlayUtil.updateLastElementRemovability was called with type 'add'"
+				);
+				fnDone();
+			}.bind(this));
+
+			this.oButton1.setVisible(true);
+		});
+
+		QUnit.test("when multiple controls visibility is toggled (_onPropertyChanged)", function(assert) {
+			const fnDone = assert.async();
+			const oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
+			const oButton2Overlay = OverlayRegistry.getOverlay(this.oButton2);
+			const aExpectedEvents = [
+				{
+					id: oButton1Overlay.getId(),
+					name: "visible",
+					oldValue: true,
+					value: false
+				},
+				{
+					id: oButton2Overlay.getId(),
+					name: "visible",
+					oldValue: true,
+					value: false
+				}
+			];
+			let iEventCount = 0;
+
+			this.oDesignTime.attachEvent("elementPropertyChanged", function(oEvent) {
+				assert.deepEqual(
+					oEvent.getParameters(),
+					aExpectedEvents[iEventCount],
+					`then event 'elementPropertyChanged' was fired with the correct parameters for button ${iEventCount + 1}`
+				);
+				iEventCount++;
+				if (iEventCount === 2) {
+					fnDone();
+				}
+			});
+
+			this.oButton1.setVisible(false);
+			this.oButton2.setVisible(false);
+		});
+
+		QUnit.test("when a control is added and then removed from the panel (_onAddAggregation, _onRemoveAggregation)", function(assert) {
+			const fnDone = assert.async();
+			const oNewButton = new Button("tempButton");
+
+			this.oDesignTime.attachEventOnce("elementOverlayAdded", function() {
+				const oNewButtonOverlay = OverlayRegistry.getOverlay(oNewButton);
+				assert.ok(oNewButtonOverlay, "then an overlay is created for the new button");
+
+				this.oDesignTime.attachEventOnce("elementOverlayDestroyed", function(oEvent) {
+					assert.strictEqual(
+						oEvent.getParameter("elementOverlay").getElement(),
+						oNewButton,
+						"then event 'elementOverlayDestroyed' was fired for the removed button"
+					);
+					oNewButton.destroy();
+					fnDone();
+				});
+
+				this.oLayout.removeContent(oNewButton);
+			}.bind(this));
+
+			this.oLayout.addContent(oNewButton);
 		});
 	});
 

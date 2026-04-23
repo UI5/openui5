@@ -101,7 +101,7 @@ sap.ui.define([
 	DragDrop.prototype.registerElementOverlay = function(oOverlay) {
 		oOverlay.attachEvent("movableChange", this._onMovableChange, this);
 
-		if (oOverlay.isMovable()) {
+		if (oOverlay.isMovable() && OverlayUtil.canBeRemovedFromAggregationOnMove(oOverlay, this.getDesignTime())) {
 			this._attachDragEvents(oOverlay);
 		}
 

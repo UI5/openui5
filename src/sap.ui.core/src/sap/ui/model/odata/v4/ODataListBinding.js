@@ -1787,8 +1787,9 @@ sap.ui.define([
 	 */
 	ODataListBinding.prototype.doSetProperty = function (sPath/*, ...*/) {
 		// entities with transient predicates are either inactive, in that case the outdated flags
-		// must not be set, or the outdated flags have been set already while creating the entity
-		if (!sPath.startsWith("($uid=")) {
+		// must not be set, or the outdated flags have been set already while creating the entity;
+		// client-side annotation updates do not influence the outdated flags
+		if (!sPath.startsWith("($uid=") && !sPath.includes("/@$ui5.")) {
 			this.setOutdated(true);
 		}
 	};

@@ -5,10 +5,12 @@
 // Provides the Design Time Metadata for the sap.ui.fl.variants.VariantManagement control.
 sap.ui.define([
 	"sap/ui/core/Lib",
+	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/Utils"
 ], function(
 	Lib,
+	URLHandler,
 	ControlVariantApplyAPI,
 	flUtils
 ) {
@@ -69,13 +71,13 @@ sap.ui.define([
 		tool: {
 			start(oVariantManagement) {
 				// In personalization mode the variant management overlay cannot be selected
-				var bDesignTimeMode = true;
-				fnSetControlAttributes(oVariantManagement, bDesignTimeMode);
+				URLHandler.setDesigntimeMode(true);
+				fnSetControlAttributes(oVariantManagement, true);
 				oVariantManagement.enteringDesignMode();
 			},
 			stop(oVariantManagement) {
-				var bDesignTimeMode = false;
-				fnSetControlAttributes(oVariantManagement, bDesignTimeMode);
+				URLHandler.setDesigntimeMode(false);
+				fnSetControlAttributes(oVariantManagement, false);
 				oVariantManagement.leavingDesignMode();
 			}
 		},

@@ -1300,6 +1300,9 @@ sap.ui.define([
 			case "insertAggregation":
 				this._onAddAggregation(oParams.value, oParams.target, oParams.name);
 				break;
+			case "removeAggregation":
+				this._onRemoveAggregation(oElementOverlay, oParams);
+				break;
 			case "setParent":
 				// timeout is needed because UI5 controls & apps can temporary "detach" controls from control tree
 				// and add them again later, so the check if the control is detached from root element's tree is delayed
@@ -1317,10 +1320,12 @@ sap.ui.define([
 				if (this.getStatus() === DesignTimeStatus.SYNCING) {
 					this.attachEventOnce("synced", oParams, function(...aArgs) {
 						if (!oElementOverlay.bIsDestroyed) {
+							this._onPropertyChanged(oElementOverlay, aArgs[1]);
 							this.fireElementPropertyChanged(aArgs[1]);
 						}
 					}, this);
 				} else {
+					this._onPropertyChanged(oElementOverlay, oParams);
 					this.fireElementPropertyChanged(oParams);
 				}
 				break;
@@ -1378,6 +1383,16 @@ sap.ui.define([
 			} else {
 				this._addAggregation(oElement, oParentAggregationOverlay);
 			}
+			// When an element is added to an aggregation, the last visible element in the same aggregation should be checked
+			// if the last element is not removable because it was the last element in the aggregation. In this case, the last element
+			// will be set to removable again
+			OverlayUtil.updateLastElementRemovability({
+				type: "add",
+				element: oElement,
+				parentElement: oParent,
+				aggregationName: sAggregationName,
+				designTime: this
+			});
 		}
 	};
 
@@ -1477,6 +1492,19 @@ sap.ui.define([
 		}
 	};
 
+	DesignTime.prototype._onRemoveAggregation = function(oElementOverlay, oParams) {
+		// When an element is removed from an aggregation, the last visible element in the same aggregation
+		// should be checked if it can be removed. If not, It will be set to not removable
+		const oRemovedElement = typeof oParams.value === "object" ? oParams.value : oElementOverlay.getElement();
+		OverlayUtil.updateLastElementRemovability({
+			type: "remove",
+			element: oRemovedElement,
+			parentElement: oParams?.target,
+			aggregationName: oParams?.name,
+			designTime: this
+		});
+	};
+
 	/**
 	 * @param {sap.ui.core.Element} oElement which was modified
 	 * @private
@@ -1492,6 +1520,23 @@ sap.ui.define([
 			&& (!this._isElementInRootElements(oElement) || oElement.sParentAggregationName === "dependents")
 		) {
 			oElementOverlay.destroy();
+		}
+	};
+
+	DesignTime.prototype._onPropertyChanged = function(oElementOverlay, oParams) {
+		// When the visibility of an element has changed, then the last visible element in the same aggregation
+		// should be checked if it can be removed. If not, It will be set to not removable
+		const oModifiedElement = oElementOverlay.getElement();
+		const oParentElement = oModifiedElement.getParent();
+		if (oParams.name === "visible") {
+			const sType = oParams.value ? "add" : "remove";
+			OverlayUtil.updateLastElementRemovability({
+				type: sType,
+				element: oModifiedElement,
+				parentElement: oParentElement,
+				aggregationName: oModifiedElement.sParentAggregationName,
+				designTime: this
+			});
 		}
 	};
 

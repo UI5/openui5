@@ -12,7 +12,8 @@ sap.ui.define([
 				min: { type: "float", group: "Data", defaultValue: 0 },
 				max: { type: "float", group: "Data", defaultValue: 100 },
 				width: { type: "sap.ui.core.CSSSize", group: "Appearance", defaultValue: "100%" },
-				value: { type: "string", group: "Data"}
+				value: { type: "string", group: "Data"},
+				enabled: { type: "boolean", group: "Behavior", defaultValue: true }
 			},
 			aggregations: {
 				_content: { type: "sap.m.RangeSlider", multiple: false, visibility: "hidden" }
@@ -51,6 +52,7 @@ sap.ui.define([
 			this._oContent.setModel(this._oManagedObjectModel, "composite");
 			this._oContent.bindProperty("min", "composite>/min");
 			this._oContent.bindProperty("max", "composite>/max");
+			this._oContent.bindProperty("enabled", "composite>/enabled");
 
 			this._oContent.attachEvent("change", {}, this._changeListener, this);
 			this.setAggregation("_content", this._oContent);

@@ -3,6 +3,8 @@
 describe("sap.f.DynamicPageWithWizard", function () {
 	"use strict";
 
+	browser.testrunner.currentSuite.meta.controlName = "sap.f.DynamicPage";
+
 	it("Initial state", function () {
 		expect(takeScreenshot()).toLookAs("initial");
 	});

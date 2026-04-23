@@ -618,5 +618,114 @@ sap.ui.define([
 		return undefined;
 	};
 
+	function checkIfOverlayCanBeRemoved(oOverlay, oDesignTime) {
+		if (oOverlay) {
+			const oRemovePlugin = oDesignTime?.getPlugins()?.find(function(oPlugin) {
+				return oPlugin.isA("sap.ui.rta.plugin.Remove");
+			});
+			if (!oRemovePlugin) {
+				return false;
+			}
+			const oAction = oRemovePlugin.getAction(oOverlay);
+			return !!(oAction?.removeLastElement);
+		}
+		return false;
+	}
+
+	/**
+	 * Updates the ability to remove the last element in an aggregation if the second last element is moved or removed.
+	 * The removability of the last element is defined by the designtime of the aggregation.
+	 *
+	 * @param {object} mPropertyBag - Object with properties
+	 * @param {sap.ui.core.Element} mPropertyBag.element - The element which is added or removed
+	 * @param {sap.ui.core.Element} mPropertyBag.parentElement - The parent element of the element which is added or removed
+	 * @param {string} mPropertyBag.aggregationName - The name of the aggregation in which the element is added or removed
+	 * @param {string} mPropertyBag.type - The type of the change, either "add" or "remove"
+	 * @param {sap.ui.dt.DesignTime} mPropertyBag.designTime - The DesignTime instance
+	 */
+	OverlayUtil.updateLastElementRemovability = function(mPropertyBag) {
+		if (mPropertyBag.element && mPropertyBag.parentElement && mPropertyBag.aggregationName) {
+			const aSourceParentAggregationElements = ElementUtil.getAggregation(mPropertyBag.parentElement, mPropertyBag.aggregationName);
+			const aVisibleSourceParentAggregationElements = aSourceParentAggregationElements?.filter(
+				(oSourceParentAggregationElement) => {
+					const oElementOverlay = OverlayRegistry.getOverlay(oSourceParentAggregationElement);
+					return oElementOverlay?.getElementVisibility?.() === true
+						&& oSourceParentAggregationElement.getId() !== mPropertyBag.element?.getId();
+				}
+			);
+			if (aVisibleSourceParentAggregationElements?.length === 1) {
+				const oLastElement = aVisibleSourceParentAggregationElements[0];
+				const oLastElementOverlay = OverlayRegistry.getOverlay(oLastElement);
+				const oParentAggregationOverlay = oLastElementOverlay?.getParentAggregationOverlay();
+				const bCanBeRemoved = mPropertyBag.type === "remove"
+					? checkIfOverlayCanBeRemoved(oParentAggregationOverlay, mPropertyBag.designTime)
+					: true;
+				oLastElementOverlay?.setLastElementMovable(bCanBeRemoved);
+			}
+		}
+	};
+
+	/**
+	 * Checks if the given overlay is the last visible element in the aggregation and if it can be removed
+	 * called by the MOVE action. The removability of the last element in the aggregation can be defined by the parameter
+	 * 'removeLastElement' in the designtime of the aggregation.
+	 *
+	 * @param {sap.ui.dt.ElementOverlay} oElementOverlay - Selected overlay to be checked
+	 * @param {sap.ui.dt.DesignTime} oDesignTime - DesignTime instance
+	 * @returns {boolean} <code>true</code> if the given overlay is the last visible element in the aggregation and can be removed, otherwise <code>false</code>
+	 */
+	OverlayUtil.canBeRemovedFromAggregationOnMove = function(oElementOverlay, oDesignTime) {
+		const oElement = oElementOverlay.getElement();
+		const aSourceParentAggregationElements = ElementUtil.getAggregation(
+			oElement?.getParent(),
+			oElement?.sParentAggregationName
+		);
+		const aVisibleSourceParentAggregationElements = aSourceParentAggregationElements?.filter(
+			(oSourceParentAggregationElement) => oSourceParentAggregationElement.getVisible?.() === true
+		);
+		if (aVisibleSourceParentAggregationElements?.length === 1) {
+			const oLastElement = aVisibleSourceParentAggregationElements[0];
+			const oLastElementOverlay = OverlayRegistry.getOverlay(oLastElement);
+			const oParentAggregationOverlay = oLastElementOverlay?.getParentAggregationOverlay();
+			return checkIfOverlayCanBeRemoved(oParentAggregationOverlay, oDesignTime);
+		}
+		return true;
+	};
+
+	/**
+	 * Checks if the given element overlays can be removed from their parent aggregation called by the REMOVED action.
+	 * The removability of the last element in the aggregation can be defined by the parameter
+	 * 'removeLastElement' in the designtime of the aggregation.
+	 *
+	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Overlays to be removed from aggregation
+	 * @param {sap.ui.dt.DesignTime} oDesignTime - DesignTime instance
+	 * @return {boolean} Returns true if the controls can be removed
+	 * @private
+	 */
+	OverlayUtil.canBeRemovedFromAggregationOnRemove = function(aElementOverlays, oDesignTime) {
+		const oOverlay = aElementOverlays[0];
+		const oElement = oOverlay.getElement();
+		const oParent = oElement.getParent();
+		if (!oParent) {
+			return false;
+		}
+		const aElements = oParent.getAggregation(oElement.sParentAggregationName);
+		if (!Array.isArray(aElements)) {
+			return true;
+		}
+		// check if selected Overlays are the last visible elements in aggregation
+		const iNumberOfSelectedOverlays = aElementOverlays.length;
+		const aInvisibleElements = aElements.filter(function(oElement) {
+			const oElementOverlay = OverlayRegistry.getOverlay(oElement);
+			return !(oElementOverlay && oElementOverlay.getElementVisibility());
+		});
+		const bIsLastVisibleElement = (aInvisibleElements.length + iNumberOfSelectedOverlays === aElements.length);
+		if (bIsLastVisibleElement) {
+			const oParentAggregationOverlay = oOverlay?.getParentAggregationOverlay();
+			return checkIfOverlayCanBeRemoved(oParentAggregationOverlay, oDesignTime);
+		}
+		return true;
+	};
+
 	return OverlayUtil;
 });

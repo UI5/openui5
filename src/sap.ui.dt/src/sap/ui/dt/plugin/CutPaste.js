@@ -120,6 +120,30 @@ sap.ui.define([
 		return false;
 	};
 
+	/**
+	 * @override
+	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
+	 * @return {boolean} - <code>true</code> if the plugin is available
+	 */
+	CutPaste.prototype.isAvailable = function(aElementOverlays) {
+		return aElementOverlays.every(function(oElementOverlay) {
+			return oElementOverlay.isGenerallyMovable();
+		});
+	};
+
+	/**
+	 * @override
+	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
+	 * @return {boolean} - <code>true</code> if the plugin is enabled
+	 */
+	CutPaste.prototype.isEnabled = function(aElementOverlays) {
+		if (aElementOverlays.length === 1) {
+			const oElementOverlay = aElementOverlays[0];
+			return OverlayUtil.canBeRemovedFromAggregationOnMove(oElementOverlay, this.getDesignTime());
+		}
+		return false;
+	};
+
 	CutPaste.prototype._onKeyDown = function(oEvent) {
 		var oOverlay = OverlayRegistry.getOverlay(oEvent.currentTarget.id);
 
@@ -128,8 +152,10 @@ sap.ui.define([
 
 		if ((oEvent.keyCode === KeyCodes.X) && (oEvent.shiftKey === false) && (oEvent.altKey === false) && (bCtrlKey === true)) {
 			// CTRL+X
-			this.cut(oOverlay);
-			oEvent.stopPropagation();
+			if (this.isEnabled([oOverlay])) {
+				this.cut(oOverlay);
+				oEvent.stopPropagation();
+			}
 		} else if ((oEvent.keyCode === KeyCodes.V) && (oEvent.shiftKey === false) && (oEvent.altKey === false) && (bCtrlKey === true)) {
 			// CTRL+V
 			if (this.getElementMover().getMovedOverlay()) {

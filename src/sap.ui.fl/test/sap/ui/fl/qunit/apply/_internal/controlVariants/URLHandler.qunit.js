@@ -5,8 +5,10 @@ sap.ui.define([
 	"sap/ui/base/ManagedObjectObserver",
 	"sap/ui/core/UIComponent",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
+	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/variants/VariantManagement",
@@ -14,14 +16,17 @@ sap.ui.define([
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/hasher",
-	"sap/ui/thirdparty/sinon-4"
+	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	Log,
 	ManagedObjectObserver,
 	UIComponent,
 	URLHandler,
+	FlexObjectFactory,
 	VariantManagementState,
 	VariantManagerApply,
+	FlexState,
 	ControlVariantApplyAPI,
 	ManifestUtils,
 	VariantManagement,
@@ -29,7 +34,8 @@ sap.ui.define([
 	Layer,
 	Utils,
 	hasher,
-	sinon
+	sinon,
+	FlQUnitUtils
 ) {
 	"use strict";
 	document.getElementById("qunit-fixture").style.display = "none";
@@ -52,9 +58,10 @@ sap.ui.define([
 		async afterEach() {
 			if (this.oAppComponent instanceof UIComponent) {
 				this.oAppComponent.destroy();
-				// Variant switch promise is awaited in the observerHandler before deregistering
-				await VariantManagementState.waitForAllVariantSwitches(sFlexReference);
 			}
+			// Variant switch promise is awaited in the observerHandler before deregistering
+			await VariantManagementState.waitForAllVariantSwitches(sFlexReference);
+			URLHandler._reset();
 			sandbox.restore();
 		}
 	}, function() {
@@ -71,7 +78,7 @@ sap.ui.define([
 			sandbox.stub(Utils, "getUshellContainer").returns({});
 
 			sandbox.spy(URLHandler, "attachHandlers");
-			const mPropertyBag = { model: this.oModel };
+			const mPropertyBag = { flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent };
 			await URLHandler.initialize(mPropertyBag);
 
 			assert.ok(URLHandler.attachHandlers.calledWith(mPropertyBag), "then required handlers and observers were subscribed");
@@ -94,8 +101,8 @@ sap.ui.define([
 
 		QUnit.test("when registerControl is called for a variant management control's local id", async function(assert) {
 			const sVariantManagementReference = "sLocalControlId";
-			await URLHandler.initialize({ model: this.oModel });
-			URLHandler.registerControl({ vmReference: sVariantManagementReference, updateURL: true, model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
+			URLHandler.registerControl({ vmReference: sVariantManagementReference, updateURL: true, flexReference: this.oModel.sFlexReference });
 			const aCallArgs = this.fnDestroyObserverSpy.getCall(0).args;
 			assert.deepEqual(aCallArgs[0], this.oAppComponent, "then ManagedObjectObserver observers the AppComponent");
 			assert.strictEqual(aCallArgs[1].destroy, true, "then ManagedObjectObserver observers the destroy() method");
@@ -108,16 +115,16 @@ sap.ui.define([
 		});
 
 		QUnit.test("when attachHandlers() is called", async function(assert) {
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 
 			// first call
-			URLHandler.attachHandlers({ vmReference: "mockControlId1", updateURL: false, model: this.oModel });
+			URLHandler.attachHandlers({ vmReference: "mockControlId1", updateURL: false, flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 			const aCallArgs = this.fnDestroyObserverSpy.getCall(0).args;
 			assert.deepEqual(aCallArgs[0], this.oAppComponent, "then ManagedObjectObserver observers the AppComponent");
 			assert.strictEqual(aCallArgs[1].destroy, true, "then ManagedObjectObserver observers the destroy() method");
 
 			// second call
-			URLHandler.attachHandlers({ vmReference: "mockControlId2", updateURL: false, model: this.oModel });
+			URLHandler.attachHandlers({ vmReference: "mockControlId2", updateURL: false, flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 			assert.ok(this.fnDestroyObserverSpy.calledOnce, "then no new observers were listening to Component.destroy()");
 		});
 
@@ -135,11 +142,11 @@ sap.ui.define([
 			});
 			sandbox.stub(Utils, "getUshellContainer").returns({});
 
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 
 			this.oModel.destroy = sandbox.stub();
 			URLHandler.attachHandlers(
-				{ vmReference: sVariantManagementReference, updateURL: true, model: this.oModel }
+				{ vmReference: sVariantManagementReference, updateURL: true, flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent }
 			); // app component's destroy handlers are attached here
 
 			const fnVariantSwitchPromiseStub = sandbox.stub();
@@ -157,7 +164,6 @@ sap.ui.define([
 
 			await VariantManagementState.waitForAllVariantSwitches(sFlexReference);
 			const aCallArgs = this.fnDestroyUnobserverSpy.getCall(0).args;
-			assert.equal(this.oModel.destroy.callCount, 1, "then variant model resetMap() was called");
 			assert.deepEqual(
 				aCallArgs[0],
 				this.oAppComponent,
@@ -196,7 +202,7 @@ sap.ui.define([
 				Navigation: { navigate: oNavigateStub }
 			});
 			sandbox.stub(Utils, "getUshellContainer").returns({});
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 
 			await URLHandler.update(mPropertyBag);
 			assert.deepEqual(
@@ -226,7 +232,7 @@ sap.ui.define([
 				Navigation: { navigate: oNavigateStub }
 			});
 			sandbox.stub(Utils, "getUshellContainer").returns({});
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 
 			await URLHandler.update(mPropertyBag);
 			assert.deepEqual(
@@ -256,7 +262,7 @@ sap.ui.define([
 				Navigation: { navigate: oNavigateStub }
 			});
 			sandbox.stub(Utils, "getUshellContainer").returns({});
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 
 			await URLHandler.update(mPropertyBag);
 			assert.deepEqual(
@@ -267,7 +273,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when update() is called to update hash register without a URL update", async function(assert) {
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 			const mPropertyBag = {
 				parameters: ["testParam1,testParam2"],
 				updateHashEntry: true,
@@ -298,7 +304,7 @@ sap.ui.define([
 				Navigation: { navigate() { assert.ok(false, "but 'navigate' should not be called"); } }
 			});
 			sandbox.stub(Utils, "getUshellContainer").returns({});
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 
 			await URLHandler.update(mPropertyBag);
 			assert.ok(true, "update is called");
@@ -324,54 +330,89 @@ sap.ui.define([
 			this.sDefaultStatus = "Continue";
 
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
-			this.oModel = new VariantModel(
-				{
-					variantMgmtId1: {
-						defaultVariant: "variant1",
-						originalDefaultVariant: "variant1",
-						currentVariant: "variantMgmtId1",
-						variants: [
-							{
-								key: "variantMgmtId1",
-								layer: Layer.VENDOR
-							}, {
-								key: "variant1",
-								layer: Layer.VENDOR
-							}
-						]
-					},
-					variantMgmtId2: {
-						defaultVariant: "variantMgmtId2",
-						originalDefaultVariant: "variantMgmtId2",
-						currentVariant: "variant2",
-						variants: [
-							{
-								key: "variantMgmtId2",
-								layer: Layer.VENDOR
-							}, {
-								key: "variant2",
-								layer: Layer.VENDOR
-							}
-						]
-					},
-					variantMgmtId3: {
-						defaultVariant: "variantMgmtId3",
-						originalDefaultVariant: "variantMgmtId3",
-						currentVariant: "variantMgmtId3",
-						variants: [
-							{
-								key: "variantMgmtId3",
-								layer: Layer.VENDOR
-							}, {
-								key: "variant3",
-								layer: Layer.VENDOR
-							}
-						]
-					}
-				}, {
-					appComponent: this.oAppComponent
-				}
-			);
+			await FlexState.initialize({
+				reference: sFlexReference,
+				componentId: "appComponent",
+				componentData: {},
+				manifest: {}
+			});
+
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
+				// VM1: standard variant + variant1, default set to variant1
+				FlexObjectFactory.createFlVariant({
+					id: "variantMgmtId1",
+					variantName: "Standard",
+					variantManagementReference: "variantMgmtId1",
+					reference: sFlexReference,
+					layer: Layer.VENDOR
+				}),
+				FlexObjectFactory.createFlVariant({
+					id: "variant1",
+					variantName: "variant1",
+					variantManagementReference: "variantMgmtId1",
+					variantReference: "variantMgmtId1",
+					reference: sFlexReference,
+					layer: Layer.VENDOR
+				}),
+				FlexObjectFactory.createVariantManagementChange({
+					id: "setDefault_vm1",
+					layer: Layer.VENDOR,
+					changeType: "setDefault",
+					fileType: "ctrl_variant_management_change",
+					selector: { id: "variantMgmtId1" },
+					content: { defaultVariant: "variant1" }
+				}),
+
+				// VM2: standard variant + variant2
+				FlexObjectFactory.createFlVariant({
+					id: "variantMgmtId2",
+					variantName: "Standard",
+					variantManagementReference: "variantMgmtId2",
+					reference: sFlexReference,
+					layer: Layer.VENDOR
+				}),
+				FlexObjectFactory.createFlVariant({
+					id: "variant2",
+					variantName: "variant2",
+					variantManagementReference: "variantMgmtId2",
+					variantReference: "variantMgmtId2",
+					reference: sFlexReference,
+					layer: Layer.VENDOR
+				}),
+
+				// VM3: standard variant + variant3
+				FlexObjectFactory.createFlVariant({
+					id: "variantMgmtId3",
+					variantName: "Standard",
+					variantManagementReference: "variantMgmtId3",
+					reference: sFlexReference,
+					layer: Layer.VENDOR
+				}),
+				FlexObjectFactory.createFlVariant({
+					id: "variant3",
+					variantName: "variant3",
+					variantManagementReference: "variantMgmtId3",
+					variantReference: "variantMgmtId3",
+					reference: sFlexReference,
+					layer: Layer.VENDOR
+				})
+			]);
+
+			// VM1: default=variant1, current=variantMgmtId1 (standard)
+			VariantManagementState.setCurrentVariant({
+				reference: sFlexReference,
+				vmReference: "variantMgmtId1",
+				newVReference: "variantMgmtId1"
+			});
+			// VM2: default=variantMgmtId2 (standard), current=variant2
+			VariantManagementState.setCurrentVariant({
+				reference: sFlexReference,
+				vmReference: "variantMgmtId2",
+				newVReference: "variant2"
+			});
+			// VM3: default=variantMgmtId3 (standard), current=variantMgmtId3
+
+			this.oModel = new VariantModel({}, { appComponent: this.oAppComponent });
 
 			this.oParseShellHashStub = sandbox.stub().returns({ params: {} });
 			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService");
@@ -403,18 +444,18 @@ sap.ui.define([
 				updateURL: true
 			};
 		},
-		afterEach(assert) {
-			const fnDone = assert.async();
+		async afterEach() {
 			this.oVariantManagement1.destroy();
 			this.oVariantManagement2.destroy();
 			this.oVariantManagement3.destroy();
 			if (this.oAppComponent instanceof UIComponent) {
 				this.oAppComponent.destroy();
 			}
-			this.oUnregisterNavigationFilterStub.callsFake(() => {
-				sandbox.restore();
-				fnDone();
-			});
+			await VariantManagementState.waitForAllVariantSwitches(sFlexReference);
+			URLHandler._reset();
+			FlexState.clearState();
+			VariantManagementState.resetCurrentVariantReference(sFlexReference);
+			sandbox.restore();
 		}
 	}, function() {
 		QUnit.test("when 3 variant management controls are rendered", function(assert) {
@@ -457,8 +498,11 @@ sap.ui.define([
 			const fnDone = assert.async();
 			stubParseShellHash.call(this, [this.oVariantManagement1.getId()]);
 
-			sandbox.stub(this.oModel, "getVariant").callsFake((sVReference, sVMReference) => {
-				if (sVMReference === this.oVariantManagement1.getId() && sVReference === this.oVariantManagement1.getId()) {
+			sandbox.stub(VariantManagementState, "getVariant").callsFake((mPropertyBag) => {
+				if (
+					mPropertyBag.vmReference === this.oVariantManagement1.getId()
+					&& mPropertyBag.vReference === this.oVariantManagement1.getId()
+				) {
 					return { simulate: "foundVariant" };
 				}
 				return undefined;
@@ -547,7 +591,11 @@ sap.ui.define([
 			assert.notOk(this.oVariantManagement1.getResetOnContextChange(), "then initially 'resetOnContextChange' is set to false");
 			sandbox.stub(this.oVariantManagement1, "attachEvent").callsFake((sEventName, mParameters, fnCallBack) => {
 				if (sEventName === "modelContextChange") {
-					assert.deepEqual(mParameters.model, this.oModel, "then the correct parameters were passed for the event handler");
+					assert.deepEqual(
+						mParameters.flexReference,
+						sFlexReference,
+						"then the correct parameters were passed for the event handler"
+					);
 					assert.ok(typeof fnCallBack === "function", "then the event handler was attached to 'modelContextChange'");
 					fnDone();
 				}
@@ -658,11 +706,11 @@ sap.ui.define([
 				this.oModel.oData.variantMgmtId2.defaultVariant,
 				"otherParamValue"
 			];
-			this.oModel._bDesignTimeMode = true;
+			URLHandler.setDesigntimeMode(true);
 			const mExpectedPropertyBagToUpdate = {
 				flexReference: this.oModel.sFlexReference,
 				appComponent: this.oModel.oAppComponent,
-				updateURL: !this.oModel._bDesignTimeMode,
+				updateURL: false,
 				updateHashEntry: true,
 				parameters: [
 					this.oModel.oData.variantMgmtId1.currentVariant,
@@ -692,66 +740,87 @@ sap.ui.define([
 	QUnit.module("Given URLHandler.updateVariantInURL() to update a new variant parameter in the URL", {
 		async beforeEach() {
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
-			this.oModel = new VariantModel({
-				variantMgmtId1: {
-					defaultVariant: "variant1",
-					originalDefaultVariant: "variant1",
-					variants: [
-						{
-							author: "SAP",
-							key: "variantMgmtId1",
-							layer: Layer.VENDOR,
-							title: "Standard",
-							favorite: true,
-							visible: true
-						}, {
-							author: "Me",
-							key: "variant0",
-							layer: "CUSTOMER",
-							title: "variant A",
-							favorite: true,
-							visible: true
-						}, {
-							author: "Me",
-							key: "variant1",
-							layer: "CUSTOMER",
-							title: "variant B",
-							favorite: false,
-							visible: true
-						}
-					]
-				},
-				variantMgmtId2: {
-					defaultVariant: "variant21",
-					originalDefaultVariant: "variant21",
-					variants: [
-						{
-							author: "SAP",
-							key: "variantMgmtId2",
-							layer: Layer.VENDOR,
-							title: "Standard",
-							favorite: true,
-							visible: true
-						}, {
-							author: "Me",
-							key: "variant20",
-							layer: "CUSTOMER",
-							title: "variant A",
-							favorite: true,
-							visible: true
-						}, {
-							author: "Me",
-							key: "variant21",
-							layer: "CUSTOMER",
-							title: "variant B",
-							favorite: false,
-							visible: true
-						}
-					]
-				}
-			},
-			{
-				appComponent: { getId() { return "testid"; } }
+			await FlexState.initialize({
+				reference: sFlexReference,
+				componentId: "testid",
+				componentData: {},
+				manifest: {}
+			});
+
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
+				// VM1: standard + variant0 (CUSTOMER) + variant1 (CUSTOMER, default)
+				FlexObjectFactory.createFlVariant({
+					id: "variantMgmtId1",
+					variantName: "Standard",
+					variantManagementReference: "variantMgmtId1",
+					reference: sFlexReference,
+					layer: Layer.VENDOR
+				}),
+				FlexObjectFactory.createFlVariant({
+					id: "variant0",
+					variantName: "variant A",
+					variantManagementReference: "variantMgmtId1",
+					variantReference: "variantMgmtId1",
+					reference: sFlexReference,
+					layer: "CUSTOMER",
+					user: "Me"
+				}),
+				FlexObjectFactory.createFlVariant({
+					id: "variant1",
+					variantName: "variant B",
+					variantManagementReference: "variantMgmtId1",
+					variantReference: "variantMgmtId1",
+					reference: sFlexReference,
+					layer: "CUSTOMER",
+					user: "Me"
+				}),
+				FlexObjectFactory.createVariantManagementChange({
+					id: "setDefault_vm1",
+					layer: "CUSTOMER",
+					changeType: "setDefault",
+					fileType: "ctrl_variant_management_change",
+					selector: { id: "variantMgmtId1" },
+					content: { defaultVariant: "variant1" }
+				}),
+
+				// VM2: standard + variant20 (CUSTOMER) + variant21 (CUSTOMER, default)
+				FlexObjectFactory.createFlVariant({
+					id: "variantMgmtId2",
+					variantName: "Standard",
+					variantManagementReference: "variantMgmtId2",
+					reference: sFlexReference,
+					layer: Layer.VENDOR
+				}),
+				FlexObjectFactory.createFlVariant({
+					id: "variant20",
+					variantName: "variant A",
+					variantManagementReference: "variantMgmtId2",
+					variantReference: "variantMgmtId2",
+					reference: sFlexReference,
+					layer: "CUSTOMER",
+					user: "Me"
+				}),
+				FlexObjectFactory.createFlVariant({
+					id: "variant21",
+					variantName: "variant B",
+					variantManagementReference: "variantMgmtId2",
+					variantReference: "variantMgmtId2",
+					reference: sFlexReference,
+					layer: "CUSTOMER",
+					user: "Me"
+				}),
+				FlexObjectFactory.createVariantManagementChange({
+					id: "setDefault_vm2",
+					layer: "CUSTOMER",
+					changeType: "setDefault",
+					fileType: "ctrl_variant_management_change",
+					selector: { id: "variantMgmtId2" },
+					content: { defaultVariant: "variant21" }
+				})
+			]);
+
+			this.oModel = new VariantModel({}, {
+				appComponent: { getId() { return "testid"; }, byId() { return undefined; } }
 			});
 
 			this.oParseShellHashStub = sandbox.stub().returns({ params: {} });
@@ -765,20 +834,28 @@ sap.ui.define([
 			sandbox.stub(URLHandler, "update");
 		},
 		afterEach() {
-			this.oModel.destroy();
+			URLHandler._reset();
 			sandbox.restore();
+			this.oModel.destroy();
+			FlexState.clearState();
+			VariantManagementState.resetCurrentVariantReference(sFlexReference);
 		}
 	}, function() {
 		QUnit.test("when called with no variant URL parameter", async function(assert) {
 			this.oParseShellHashStub.returns({ params: {} });
 			const aModifiedUrlTechnicalParameters = ["variant0"];
-			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({ simulate: "foundVariant" });
+			sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
+				return mParams.vmReference === "variantMgmtId1" && mParams.vReference === "variantMgmtId1"
+					? { simulate: "foundVariant" }
+					: undefined;
+			});
 			sandbox.spy(URLHandler, "removeURLParameterForVariantManagement");
 
 			await URLHandler.updateVariantInURL({
 				vmReference: "variantMgmtId1",
 				newVReference: "variant0",
-				model: this.oModel
+				flexReference: this.oModel.sFlexReference,
+				appComponent: this.oModel.oAppComponent
 			});
 			assert.ok(this.oGetUShellServiceStub.called, "then url parameters requested");
 			const oRemoveResult = await URLHandler.removeURLParameterForVariantManagement.returnValues[0];
@@ -804,14 +881,19 @@ sap.ui.define([
 				}
 			};
 
-			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({ simulate: "foundVariant" });
+			sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
+				return mParams.vmReference === "variantMgmtId1" && mParams.vReference === "variantMgmtId1"
+					? { simulate: "foundVariant" }
+					: undefined;
+			});
 			this.oParseShellHashStub.returns(oReturnObject);
 			sandbox.spy(URLHandler, "removeURLParameterForVariantManagement");
 
 			await URLHandler.updateVariantInURL({
 				vmReference: "variantMgmtId1",
 				newVReference: "variant0",
-				model: this.oModel
+				flexReference: this.oModel.sFlexReference,
+				appComponent: this.oModel.oAppComponent
 			});
 			assert.ok(this.oGetUShellServiceStub.called, "then url parameters requested");
 			const oRemoveResult = await URLHandler.removeURLParameterForVariantManagement.returnValues[0];
@@ -838,7 +920,8 @@ sap.ui.define([
 			await URLHandler.updateVariantInURL({
 				vmReference: "variantMgmtId1",
 				newVReference: "variant0",
-				model: this.oModel
+				flexReference: this.oModel.sFlexReference,
+				appComponent: this.oModel.oAppComponent
 			});
 
 			assert.ok(this.oGetUShellServiceStub.called, "then url parameters requested");
@@ -855,7 +938,8 @@ sap.ui.define([
 			await URLHandler.updateVariantInURL({
 				vmReference: "variantMgmtId1",
 				newVReference: "variant1",
-				model: this.oModel
+				flexReference: this.oModel.sFlexReference,
+				appComponent: this.oModel.oAppComponent
 			}); // default variant
 
 			assert.strictEqual(URLHandler.update.callCount, 0, "then URLHandler.update() not called");
@@ -866,12 +950,17 @@ sap.ui.define([
 			oReturnObject.params[URLHandler.variantTechnicalParameterName] = ["Dummy", "variantMgmtId1", "Dummy1"];
 			this.oParseShellHashStub.returns(oReturnObject);
 
-			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({ simulate: "foundVariant" });
+			sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
+				return mParams.vmReference === "variantMgmtId1" && mParams.vReference === "variantMgmtId1"
+					? { simulate: "foundVariant" }
+					: undefined;
+			});
 
 			await URLHandler.updateVariantInURL({
 				vmReference: "variantMgmtId1",
 				newVReference: "variant1",
-				model: this.oModel
+				flexReference: this.oModel.sFlexReference,
+				appComponent: this.oModel.oAppComponent
 			}); // default variant
 
 			assert.ok(URLHandler.update.calledWith({
@@ -886,13 +975,18 @@ sap.ui.define([
 		QUnit.test("when called while in adaptation mode with variant parameters present in the hash register", async function(assert) {
 			// return parameters saved at the current index of the hash register
 			sandbox.stub(URLHandler, "getStoredHashParams").returns(["Dummy", "variantMgmtId1", "Dummy1"]);
-			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({ simulate: "foundVariant" });
-			this.oModel._bDesignTimeMode = true;
+			sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
+				return mParams.vmReference === "variantMgmtId1" && mParams.vReference === "variantMgmtId1"
+					? { simulate: "foundVariant" }
+					: undefined;
+			});
+			URLHandler.setDesigntimeMode(true);
 
 			await URLHandler.updateVariantInURL({
 				vmReference: "variantMgmtId1",
 				newVReference: "variant0",
-				model: this.oModel
+				flexReference: this.oModel.sFlexReference,
+				appComponent: this.oModel.oAppComponent
 			});
 
 			assert.ok(URLHandler.update.calledWith({
@@ -905,12 +999,13 @@ sap.ui.define([
 		});
 
 		QUnit.test("when called while in adaptation mode and there are no variant parameters saved in the hash register", async function(assert) {
-			this.oModel._bDesignTimeMode = true;
+			URLHandler.setDesigntimeMode(true);
 
 			await URLHandler.updateVariantInURL({
 				vmReference: "variantMgmtId1",
 				newVReference: "variant0",
-				model: this.oModel
+				flexReference: this.oModel.sFlexReference,
+				appComponent: this.oModel.oAppComponent
 			});
 
 			assert.ok(URLHandler.update.calledWith({
@@ -936,6 +1031,7 @@ sap.ui.define([
 		},
 		afterEach() {
 			this.oAppComponent.destroy();
+			URLHandler._reset();
 			sandbox.restore();
 		}
 	}, function() {
@@ -957,7 +1053,7 @@ sap.ui.define([
 					constructShellHash: oConstructShellHashStub
 				}
 			});
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 
 			await URLHandler.update({
 				flexReference: sFlexReference,
@@ -1008,7 +1104,7 @@ sap.ui.define([
 					constructShellHash: oConstructShellHashStub
 				}
 			});
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 
 			await URLHandler.update({
 				flexReference: sFlexReference,
@@ -1067,7 +1163,7 @@ sap.ui.define([
 				URLParsing: { parseShellHash: () => oMockParsedHash },
 				Navigation: oUshellNav
 			});
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 			const oExpectedResult = {
 				target: {
 					semanticObject: oMockParsedHash.semanticObject,
@@ -1103,7 +1199,7 @@ sap.ui.define([
 			stubUShellServices(this.oGetUShellServiceStub, {
 				URLParsing: { parseShellHash: () => ({ params: { myFancyParameter: "foo" } }) }
 			});
-			await URLHandler.initialize({ model: this.oModel });
+			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
 
 			const oUpdateStub = sandbox.stub(URLHandler, "update");
 			await URLHandler.clearAllVariantURLParameters({ flexReference: sFlexReference, appComponent: {} });
