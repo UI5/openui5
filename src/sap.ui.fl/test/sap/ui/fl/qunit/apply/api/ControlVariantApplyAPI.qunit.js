@@ -132,9 +132,12 @@ sap.ui.define([
 			this.oModel = new VariantModel(this.oData, {
 				appComponent: this.oAppComponent
 			});
-			sandbox.stub(this.oModel, "getLocalId").withArgs(this.oDummyControl.getId(), this.oAppComponent).returns("variantMgmtId1");
 			sandbox.spy(URLHandler, "update");
-			sandbox.stub(this.oModel, "getVariant").withArgs("variant1", "variantMgmtId1").returns({ simulate: "foundVariant" });
+			sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
+				return mParams.vmReference === "variantMgmtId1" && mParams.vReference === "variant1"
+					? { simulate: "foundVariant" }
+					: undefined;
+			});
 			sandbox.stub(hasher, "replaceHash");
 			sandbox.stub(hasher, "getHash").returns("");
 			stubUshellServices.call(this);
@@ -176,18 +179,6 @@ sap.ui.define([
 				updateHashEntry: true,
 				silent: false
 			}, "then URLHandler.update called with the desired arguments");
-		});
-
-		QUnit.test("when calling 'clearVariantParameterInURL' without a VariantModel available", function(assert) {
-			sandbox.stub(Log, "error");
-			sandbox.stub(this.oAppComponent, "getModel").returns(undefined);
-			ControlVariantApplyAPI.clearVariantParameterInURL({ control: this.oDummyControl });
-			assert.strictEqual(URLHandler.update.callCount, 0, "the URLHandler was not called");
-			assert.strictEqual(
-				Log.error.lastCall.args[0],
-				"Variant model could not be found on the provided control",
-				"an error was logged"
-			);
 		});
 
 		QUnit.test("when calling 'activateVariant' with a control id", function(assert) {
@@ -812,49 +803,6 @@ sap.ui.define([
 				}),
 				"VariantManagementState.getCurrentVariantReference was called with the correct parameters"
 			);
-		});
-
-		QUnit.test("getVariantModel resolves with the variant model if present", function(assert) {
-			const done = assert.async();
-			const oFakeModel = {};
-			const oAppComponent = {
-				getModel(sName) {
-					return sName === "$FlexVariants" ? oFakeModel : null;
-				}
-			};
-			ControlVariantApplyAPI.getVariantModel(oAppComponent).then(function(oModel) {
-				assert.strictEqual(oModel, oFakeModel, "Resolves with the correct model");
-				done();
-			});
-		});
-
-		QUnit.test("getVariantModel waits for ModelContextChange event if model is not yet loaded", function(assert) {
-			const fnDone = assert.async();
-			const oFakeModel = {};
-			let bModelLoaded = false;
-			let fnModelContextChangeHandler;
-			const oAppComponent = {
-				getModel(sName) {
-					return (sName === "$FlexVariants" && bModelLoaded) ? oFakeModel : null;
-				},
-				attachModelContextChange(fnFunction) {
-					fnModelContextChangeHandler = fnFunction;
-				},
-				detachModelContextChange(fnFunction) {
-					if (fnModelContextChangeHandler === fnFunction) {
-						fnModelContextChangeHandler = null;
-					}
-				}
-			};
-			const oPromise = ControlVariantApplyAPI.getVariantModel(oAppComponent);
-			setTimeout(function() {
-				bModelLoaded = true;
-				fnModelContextChangeHandler();
-			}, 0);
-			oPromise.then(function(oModel) {
-				assert.strictEqual(oModel, oFakeModel, "Resolves with the model after ModelContextChange event");
-				fnDone();
-			});
 		});
 	});
 

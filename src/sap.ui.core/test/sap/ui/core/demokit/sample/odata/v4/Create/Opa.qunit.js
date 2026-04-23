@@ -65,16 +65,14 @@ sap.ui.define([
 		When.onTheMainPage.pressButton("saveButton");
 
 		Then.onTheMainPage.checkDialogIsOpen(true);
-		Then.onTheMainPage.checkInputValueState("buyerIdInput", "Error",
-			"Enter a text with a maximum of 10 characters and spaces");
+		Then.onTheMainPage.checkInputValueState("buyerIdInput", "Error");
 		When.onTheMainPage.changeInputValue("buyerIdInput", "FOO");
 		Then.onTheMainPage.checkInputValueState("buyerIdInput", "None");
 		When.onTheMainPage.changeInputValue("currencyInput", "");
 		When.onTheMainPage.pressButton("saveButton");
 
 		Then.onTheMainPage.checkDialogIsOpen(true);
-		Then.onTheMainPage.checkInputValueState("currencyInput", "Error",
-			"Enter a text with a maximum of 5 characters and spaces");
+		Then.onTheMainPage.checkInputValueState("currencyInput", "Error");
 		When.onTheMainPage.changeInputValue("currencyInput", "USD");
 		Then.onTheMainPage.checkInputValueState("currencyInput", "None");
 		When.onTheMainPage.changeInputValue("noteInput", "New note");

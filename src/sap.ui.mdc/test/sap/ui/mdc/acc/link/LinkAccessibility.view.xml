@@ -2,7 +2,7 @@
 		   xmlns:mdc="sap.ui.mdc" xmlns:mdcField="sap.ui.mdc.field"
 		   controllerName="sap.ui.mdc.acc.link.LinkAccessibility">
 	<App defaultTransitionName="show">
-		<ScrollContainer height="100%" width="100%" horizontal="false" vertical="true" focusable="true">
+		<ScrollContainer height="100%" width="100%" horizontal="false" vertical="true">
 			<l:VerticalLayout class="sapUiContentPadding" width="100%">
 				<l:content>
 					<mdc:Field id="IDField_MNACI" value="{Name}" editMode="Display">

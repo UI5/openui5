@@ -288,6 +288,18 @@ sap.ui.define([
 			}.bind(this));
 		});
 
+		QUnit.test("when loading flex data sets lazyLoadingViewsEnabled, loadVariantsAuthors does not forward the parameter", function(assert) {
+			FlexInfoSession.getByReference.returns({});
+			mockResponse.call(this, JSON.stringify({ changes: [], loadModules: false }));
+			return LrepConnector.loadFlexData({ url: "/sap/bc/lrep", reference: "reference" }).then(function() {
+				return LrepConnector.loadVariantsAuthors({ url: "/sap/bc/lrep", reference: "reference" }).then(function() {
+					const sExpectedUrl = "/sap/bc/lrep/variants/authors/reference?sap-language=EN";
+					assert.equal(this.oXHR.url, sExpectedUrl,
+						"lazyLoadingViewsEnabled is not forwarded to the loadVariantsAuthors request");
+				}.bind(this));
+			}.bind(this));
+		});
+
 		QUnit.test("when loading flex data with version and undefined adaptationId parameter", function(assert) {
 			mockResponse.call(this, JSON.stringify({ changes: [], loadModules: true }));
 			var oStubLoadModule = sandbox.stub(LrepConnector, "_loadModules").resolves();
@@ -370,7 +382,7 @@ sap.ui.define([
 
 			return LrepConnector.loadAllFlVariants(mPropertyBag).then(function(oResponse) {
 				assert.equal(this.oXHR.method, "GET", "request method is GET");
-				const sExpectedUrl = "/sap/bc/lrep/variantdata/test.app?vmReference=vmControl1&sap-language=EN";
+				const sExpectedUrl = "/sap/bc/lrep/flex/variantdata/test.app?vmReference=vmControl1&sap-language=EN";
 				assert.equal(this.oXHR.url, sExpectedUrl, "the URL is correct");
 				assert.deepEqual(oResponse, oFLVariantServerResponse, "the response is returned correctly");
 			}.bind(this));
@@ -382,7 +394,7 @@ sap.ui.define([
 
 			return LrepConnector.loadFlVariantContent(mPropertyBag).then(function(oResponse) {
 				assert.equal(this.oXHR.method, "GET", "request method is GET");
-				const sExpectedUrl = "/sap/bc/lrep/variantdata/content/test.app?id=variant1&sap-language=EN";
+				const sExpectedUrl = "/sap/bc/lrep/flex/variantdata/content/test.app?id=variant1&sap-language=EN";
 				assert.equal(this.oXHR.url, sExpectedUrl, "the URL is correct");
 				assert.deepEqual(oResponse, oFLVariantServerResponse, "the response is returned correctly");
 			}.bind(this));
@@ -394,7 +406,7 @@ sap.ui.define([
 
 			return LrepConnector.loadAllCompVariants(mPropertyBag).then(function(oResponse) {
 				assert.equal(this.oXHR.method, "GET", "request method is GET");
-				const sExpectedUrl = "/sap/bc/lrep/compvariantdata/test.app?persistencyKey=myPersistencyKey&sap-language=EN";
+				const sExpectedUrl = "/sap/bc/lrep/flex/compvariantdata/test.app?persistencyKey=myPersistencyKey&sap-language=EN";
 				assert.equal(this.oXHR.url, sExpectedUrl, "the URL is correct");
 				assert.deepEqual(oResponse, oCompVariantServerResponse, "the response is returned correctly");
 			}.bind(this));
@@ -405,7 +417,7 @@ sap.ui.define([
 			const mPropertyBag = { url: "/sap/bc/lrep", reference: "test.app", persistencyKey: "" };
 
 			return LrepConnector.loadAllCompVariants(mPropertyBag).then(function(oResponse) {
-				const sExpectedUrl = "/sap/bc/lrep/compvariantdata/test.app?persistencyKey=&sap-language=EN";
+				const sExpectedUrl = "/sap/bc/lrep/flex/compvariantdata/test.app?persistencyKey=&sap-language=EN";
 				assert.equal(this.oXHR.url, sExpectedUrl, "empty persistencyKey is included in the URL");
 				assert.deepEqual(oResponse, oCompVariantServerResponse, "the response is returned correctly");
 			}.bind(this));
@@ -417,7 +429,7 @@ sap.ui.define([
 
 			return LrepConnector.loadCompVariantContent(mPropertyBag).then(function(oResponse) {
 				assert.equal(this.oXHR.method, "GET", "request method is GET");
-				const sExpectedUrl = "/sap/bc/lrep/compvariantdata/content/test.app?id=compVariant1&sap-language=EN";
+				const sExpectedUrl = "/sap/bc/lrep/flex/compvariantdata/content/test.app?id=compVariant1&sap-language=EN";
 				assert.equal(this.oXHR.url, sExpectedUrl, "the URL is correct");
 				assert.deepEqual(oResponse, oCompVariantServerResponse, "the response is returned correctly");
 			}.bind(this));

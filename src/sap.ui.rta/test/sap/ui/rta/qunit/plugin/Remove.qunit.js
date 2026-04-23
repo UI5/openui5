@@ -53,6 +53,7 @@ sap.ui.define([
 				plugins: [this.oRemovePlugin]
 			});
 
+			this.oRemovePlugin.setDesignTime(this.oDesignTime);
 			this.oDesignTime.attachEventOnce("synced", function() {
 				this.oLayoutOverlay = OverlayRegistry.getOverlay(this.oVerticalLayout);
 				this.oButtonOverlay = OverlayRegistry.getOverlay(this.oButton);

@@ -10,6 +10,8 @@ sap.ui.define([
 	"sap/ui/dt/qunit/TestUtil",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/rta/command/CommandFactory",
+	"sap/ui/rta/plugin/Remove",
 	"sap/uxap/ObjectPageLayout",
 	"sap/uxap/ObjectPageSection",
 	"sap/uxap/ObjectPageSubSection",
@@ -24,6 +26,8 @@ sap.ui.define([
 	TestUtil,
 	VerticalLayout,
 	nextUIUpdate,
+	CommandFactory,
+	RemovePlugin,
 	ObjectPageLayout,
 	ObjectPageSection,
 	ObjectPageSubSection,
@@ -114,7 +118,7 @@ sap.ui.define([
 			assert.strictEqual(aChildOverlays.length, 0, "oButtonOverlay01 has no children");
 
 			aChildOverlays = OverlayUtil.getAllChildOverlays(undefined);
-			assert.ok(Array.isArray(aChildOverlays), "undefined as function-parameter returns an empty array");
+			assert.strictEqual(Array.isArray(aChildOverlays), true, "undefined as function-parameter returns an empty array");
 			assert.strictEqual(aChildOverlays.length, 0, "undefined as function-parameter has no children");
 		});
 
@@ -189,7 +193,7 @@ sap.ui.define([
 		QUnit.test("when getParentInformation is requested for a control with a parent ", function(assert) {
 			var oParentInformation = OverlayUtil.getParentInformation(this.oButtonOverlay01);
 
-			assert.ok(oParentInformation, "then parent information is returned");
+			assert.strictEqual(!!oParentInformation, true, "then parent information is returned");
 			assert.strictEqual(oParentInformation.parent, this.oLayout0, "parent is correct");
 			assert.strictEqual(oParentInformation.aggregation, "content", "aggregation name is correct");
 			assert.strictEqual(oParentInformation.index, 0, "index in aggregation is correct");
@@ -201,8 +205,8 @@ sap.ui.define([
 
 			var oParentInformation = OverlayUtil.getParentInformation(oOverlay);
 
-			assert.ok(oParentInformation, "then parent information is returned");
-			assert.ok(!oParentInformation.parent, "parent is undefined");
+			assert.strictEqual(!!oParentInformation, true, "then parent information is returned");
+			assert.strictEqual(oParentInformation.parent, null, "parent is undefined");
 			assert.strictEqual(oParentInformation.aggregation, "", "aggregation is empty string");
 			assert.strictEqual(oParentInformation.index, -1, "index in aggregation is -1");
 
@@ -483,14 +487,19 @@ sap.ui.define([
 
 		QUnit.test("when setOrResetFirstParentMovable is called", function(assert) {
 			this.oSubSectionOverlay0.setMovable(true);
-			assert.ok(this.oSubSectionOverlay0.getMovable(), "the overlay is movable before the function has been called");
+			assert.strictEqual(this.oSubSectionOverlay0.getMovable(), true, "the overlay is movable before the function has been called");
 			OverlayUtil.setFirstParentMovable(this.oButtonOverlay0, false);
-			assert.notOk(
+			assert.strictEqual(
 				this.oSubSectionOverlay0.getMovable(),
+				false,
 				"the overlay is not movable after the function has been called with 'false'"
 			);
 			OverlayUtil.setFirstParentMovable(this.oButtonOverlay0, true);
-			assert.ok(this.oSubSectionOverlay0.getMovable(), "the overlay is movable after the function has been called with 'true'");
+			assert.strictEqual(
+				this.oSubSectionOverlay0.getMovable(),
+				true,
+				"the overlay is movable after the function has been called with 'true'"
+			);
 		});
 
 		QUnit.test("when findAllUniqueAggregationOverlaysInContainer is called", function(assert) {
@@ -700,6 +709,444 @@ sap.ui.define([
 			);
 			assert.strictEqual(
 				mAggregationBindingStack.stack.length, 4, "then the stack to the stack includes the whole path to the root element"
+			);
+		});
+	});
+
+	QUnit.module("Given that canBeRemovedFromAggregationOnRemove is called", {
+		async beforeEach(assert) {
+			const fnDone = assert.async();
+
+			this.oButton1 = new Button("button1");
+			this.oButton2 = new Button("button2");
+			this.oButton3 = new Button("button3");
+			this.oLayout = new VerticalLayout({
+				content: [this.oButton1, this.oButton2, this.oButton3]
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oLayout]
+			});
+
+			this.oDesignTime.attachEventOnce("synced", function() {
+				this.oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
+				this.oButton2Overlay = OverlayRegistry.getOverlay(this.oButton2);
+				this.oButton3Overlay = OverlayRegistry.getOverlay(this.oButton3);
+				this.oLayoutOverlay = OverlayRegistry.getOverlay(this.oLayout);
+				fnDone();
+			}, this);
+		},
+		afterEach() {
+			this.oLayout.destroy();
+			this.oDesignTime.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when element has no parent", function(assert) {
+			sandbox.stub(this.oButton1Overlay, "getElement").returns({
+				getParent() {
+					return undefined;
+				}
+			});
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnRemove([this.oButton1Overlay], this.oDesignTime),
+				false,
+				"then it returns false"
+			);
+		});
+
+		QUnit.test("when element is not the last visible element in aggregation", function(assert) {
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnRemove([this.oButton1Overlay], this.oDesignTime),
+				true,
+				"then it returns true"
+			);
+		});
+
+		QUnit.test("when multiple elements are selected but not all visible elements", function(assert) {
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnRemove([this.oButton1Overlay, this.oButton2Overlay], this.oDesignTime),
+				true,
+				"then it returns true"
+			);
+		});
+
+		QUnit.test("when element is the last visible element and removeLastElement is not defined", function(assert) {
+			this.oButton2.setVisible(false);
+			this.oButton3.setVisible(false);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnRemove([this.oButton1Overlay], this.oDesignTime),
+				false,
+				"then it returns false because removeLastElement is not allowed by default"
+			);
+		});
+
+		QUnit.test("when element is the last visible element and removeLastElement is true", function(assert) {
+			this.oButton2.setVisible(false);
+			this.oButton3.setVisible(false);
+
+			const oRemovePlugin = {
+				isA(sType) {
+					return sType === "sap.ui.rta.plugin.Remove";
+				},
+				getAction() {
+					return {
+						removeLastElement: true
+					};
+				},
+				destroy() {}
+			};
+
+			sandbox.stub(this.oDesignTime, "getPlugins").returns([oRemovePlugin]);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnRemove([this.oButton1Overlay], this.oDesignTime),
+				true,
+				"then it returns true because removeLastElement is allowed"
+			);
+		});
+
+		QUnit.test("when element is the last visible element and removeLastElement is false", function(assert) {
+			// Make button2 and button3 invisible
+			this.oButton2.setVisible(false);
+			this.oButton3.setVisible(false);
+
+			// Create a mock Remove plugin
+			const oRemovePlugin = {
+				isA(sType) {
+					return sType === "sap.ui.rta.plugin.Remove";
+				},
+				getAction() {
+					return {
+						removeLastElement: false
+					};
+				},
+				destroy() {}
+			};
+
+			sandbox.stub(this.oDesignTime, "getPlugins").returns([oRemovePlugin]);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnRemove([this.oButton1Overlay], this.oDesignTime),
+				false,
+				"then it returns false because removeLastElement is not allowed"
+			);
+		});
+
+		QUnit.test("when all visible elements are selected and removeLastElement is true", function(assert) {
+			// Create a mock Remove plugin
+			const oRemovePlugin = {
+				isA(sType) {
+					return sType === "sap.ui.rta.plugin.Remove";
+				},
+				getAction() {
+					return {
+						removeLastElement: true
+					};
+				},
+				destroy() {}
+			};
+
+			sandbox.stub(this.oDesignTime, "getPlugins").returns([oRemovePlugin]);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnRemove(
+					[this.oButton1Overlay, this.oButton2Overlay, this.oButton3Overlay],
+					this.oDesignTime
+				),
+				true,
+				"then it returns true because removeLastElement is allowed"
+			);
+		});
+	});
+
+	QUnit.module("Given that canBeRemovedFromAggregationOnMove is called", {
+		async beforeEach(assert) {
+			const fnDone = assert.async();
+
+			this.oButton1 = new Button("button1");
+			this.oButton2 = new Button("button2");
+			this.oButton3 = new Button("button3");
+			this.oLayout = new VerticalLayout({
+				content: [this.oButton1, this.oButton2, this.oButton3]
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oLayout]
+			});
+
+			this.oDesignTime.attachEventOnce("synced", function() {
+				this.oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
+				this.oButton2Overlay = OverlayRegistry.getOverlay(this.oButton2);
+				this.oButton3Overlay = OverlayRegistry.getOverlay(this.oButton3);
+				this.oLayoutOverlay = OverlayRegistry.getOverlay(this.oLayout);
+				fnDone();
+			}, this);
+		},
+		afterEach() {
+			this.oLayout.destroy();
+			this.oDesignTime.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when element is not the last visible element in aggregation", function(assert) {
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnMove(this.oButton1Overlay, this.oDesignTime),
+				true,
+				"then it returns true"
+			);
+		});
+
+		QUnit.test("when element is the last visible element and removeLastElement is not defined", function(assert) {
+			this.oButton2.setVisible(false);
+			this.oButton3.setVisible(false);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnMove(this.oButton1Overlay, this.oDesignTime),
+				false,
+				"then it returns false because removeLastElement defaults to false"
+			);
+		});
+
+		QUnit.test("when element is the last visible element and removeLastElement is true", function(assert) {
+			this.oButton2.setVisible(false);
+			this.oButton3.setVisible(false);
+
+			const oRemovePlugin = {
+				isA(sType) {
+					return sType === "sap.ui.rta.plugin.Remove";
+				},
+				getAction() {
+					return {
+						removeLastElement: true
+					};
+				},
+				destroy() {}
+			};
+
+			sandbox.stub(this.oDesignTime, "getPlugins").returns([oRemovePlugin]);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnMove(this.oButton1Overlay, this.oDesignTime),
+				true,
+				"then it returns true because removeLastElement is allowed"
+			);
+		});
+
+		QUnit.test("when element is the last visible element and removeLastElement is false", function(assert) {
+			this.oButton2.setVisible(false);
+			this.oButton3.setVisible(false);
+
+			const oRemovePlugin = {
+				isA(sType) {
+					return sType === "sap.ui.rta.plugin.Remove";
+				},
+				getAction() {
+					return {
+						removeLastElement: false
+					};
+				},
+				destroy() {}
+			};
+
+			sandbox.stub(this.oDesignTime, "getPlugins").returns([oRemovePlugin]);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnMove(this.oButton1Overlay, this.oDesignTime),
+				false,
+				"then it returns false because removeLastElement is not allowed"
+			);
+		});
+
+		QUnit.test("when there are multiple visible elements", function(assert) {
+			const oRemovePlugin = {
+				isA(sType) {
+					return sType === "sap.ui.rta.plugin.Remove";
+				},
+				getAction() {
+					return {
+						removeLastElement: false
+					};
+				},
+				destroy() {}
+			};
+
+			sandbox.stub(this.oDesignTime, "getPlugins").returns([oRemovePlugin]);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnMove(this.oButton1Overlay, this.oDesignTime),
+				true,
+				"then it returns true regardless of removeLastElement setting"
+			);
+		});
+
+		QUnit.test("when no Remove plugin is available", function(assert) {
+			this.oButton2.setVisible(false);
+			this.oButton3.setVisible(false);
+
+			sandbox.stub(this.oDesignTime, "getPlugins").returns([]);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnMove(this.oButton1Overlay, this.oDesignTime),
+				false,
+				"then it returns false when no Remove plugin is found"
+			);
+		});
+	});
+
+	QUnit.module("Given that updateLastElementRemovability is called", {
+		async beforeEach(assert) {
+			const fnDone = assert.async();
+
+			this.oButton1 = new Button("button1");
+			this.oButton2 = new Button("button2");
+			this.oButton3 = new Button("button3");
+			this.oLayout = new VerticalLayout({
+				content: [this.oButton1, this.oButton2, this.oButton3]
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oCommandFactory = new CommandFactory();
+			this.oRemovePlugin = new RemovePlugin({ commandFactory: oCommandFactory	});
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oLayout],
+				plugins: [this.oRemovePlugin]
+			});
+
+			this.oDesignTime.attachEventOnce("synced", function() {
+				this.oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
+				this.oButton2Overlay = OverlayRegistry.getOverlay(this.oButton2);
+				this.oButton3Overlay = OverlayRegistry.getOverlay(this.oButton3);
+				this.oLayoutOverlay = OverlayRegistry.getOverlay(this.oLayout);
+				fnDone();
+			}, this);
+		},
+		afterEach() {
+			this.oLayout.destroy();
+			this.oDesignTime.destroy();
+			this.oRemovePlugin.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when removing an element and one visible element remains", function(assert) {
+			this.oButton3.setVisible(false);
+			const oSetLastElementMovableSpy = sandbox.spy(this.oButton1Overlay, "setLastElementMovable");
+
+			OverlayUtil.updateLastElementRemovability({
+				element: this.oButton2,
+				parentElement: this.oLayout,
+				aggregationName: "content",
+				type: "remove",
+				designTime: this.oDesignTime
+			});
+
+			assert.strictEqual(oSetLastElementMovableSpy.calledOnce, true, "then setLastElementMovable was called once");
+			assert.strictEqual(
+				oSetLastElementMovableSpy.calledWith(false),
+				true,
+				"then setLastElementMovable was called with false (removal is not allowed)"
+			);
+		});
+
+		QUnit.test("when adding an element and one visible element remains", function(assert) {
+			this.oButton3.setVisible(false);
+			const oSetLastElementMovableSpy = sandbox.spy(this.oButton1Overlay, "setLastElementMovable");
+
+			OverlayUtil.updateLastElementRemovability({
+				element: this.oButton2,
+				parentElement: this.oLayout,
+				aggregationName: "content",
+				type: "add",
+				designTime: this.oDesignTime
+			});
+
+			assert.strictEqual(oSetLastElementMovableSpy.calledOnce, true, "then setLastElementMovable was called once");
+			assert.strictEqual(
+				oSetLastElementMovableSpy.calledWith(true),
+				true,
+				"then setLastElementMovable was called with true for add type"
+			);
+		});
+
+		QUnit.test("when removing an element and multiple visible elements remain", function(assert) {
+			const oSetLastElementMovableSpy1 = sandbox.spy(this.oButton1Overlay, "setLastElementMovable");
+			const oSetLastElementMovableSpy2 = sandbox.spy(this.oButton2Overlay, "setLastElementMovable");
+
+			OverlayUtil.updateLastElementRemovability({
+				element: this.oButton3,
+				parentElement: this.oLayout,
+				aggregationName: "content",
+				type: "remove",
+				designTime: this.oDesignTime
+			});
+
+			assert.strictEqual(oSetLastElementMovableSpy1.called, false, "then setLastElementMovable was not called on button1");
+			assert.strictEqual(oSetLastElementMovableSpy2.called, false, "then setLastElementMovable was not called on button2");
+		});
+
+		QUnit.test("when removing an element and no visible elements remain", function(assert) {
+			this.oButton2.setVisible(false);
+			this.oButton3.setVisible(false);
+			const oSetLastElementMovableSpy = sandbox.spy(this.oButton1Overlay, "setLastElementMovable");
+
+			OverlayUtil.updateLastElementRemovability({
+				element: this.oButton1,
+				parentElement: this.oLayout,
+				aggregationName: "content",
+				type: "remove",
+				designTime: this.oDesignTime
+			});
+
+			assert.strictEqual(oSetLastElementMovableSpy.called, false, "then setLastElementMovable was not called");
+		});
+
+		QUnit.test("when removing an element with removeLastElement set to false and one visible element remains", function(assert) {
+			this.oButton3.setVisible(false);
+
+			sandbox.stub(this.oRemovePlugin, "getAction").returns({ removeLastElement: false });
+
+			const oSetLastElementMovableSpy = sandbox.spy(this.oButton1Overlay, "setLastElementMovable");
+
+			OverlayUtil.updateLastElementRemovability({
+				element: this.oButton2,
+				parentElement: this.oLayout,
+				aggregationName: "content",
+				type: "remove",
+				designTime: this.oDesignTime
+			});
+
+			assert.strictEqual(oSetLastElementMovableSpy.calledOnce, true, "then setLastElementMovable was called once");
+			assert.strictEqual(
+				oSetLastElementMovableSpy.calledWith(false),
+				true,
+				"then setLastElementMovable was called with false (removal is not allowed)"
+			);
+		});
+
+		QUnit.test("when removing an element with removeLastElement set to true and one visible element remains", function(assert) {
+			this.oButton3.setVisible(false);
+
+			sandbox.stub(this.oRemovePlugin, "getAction").returns({ removeLastElement: true });
+
+			const oSetLastElementMovableSpy = sandbox.spy(this.oButton1Overlay, "setLastElementMovable");
+
+			OverlayUtil.updateLastElementRemovability({
+				element: this.oButton2,
+				parentElement: this.oLayout,
+				aggregationName: "content",
+				type: "remove",
+				designTime: this.oDesignTime
+			});
+
+			assert.strictEqual(oSetLastElementMovableSpy.calledOnce, true, "then setLastElementMovable was called once");
+			assert.strictEqual(
+				oSetLastElementMovableSpy.calledWith(true),
+				true,
+				"then setLastElementMovable was called with true (removal is allowed)"
 			);
 		});
 	});

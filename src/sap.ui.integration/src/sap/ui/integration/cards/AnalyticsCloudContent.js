@@ -90,14 +90,6 @@ sap.ui.define([
 	/**
 	 * @override
 	 */
-	AnalyticsCloudContent.prototype.applyConfiguration = function () {
-		//workaround until actions refactor
-		this.fireEvent("_actionContentReady");
-	};
-
-	/**
-	 * @override
-	 */
 	AnalyticsCloudContent.prototype.getStaticConfiguration = function () {
 		return this._getResolvedConfiguration();
 	};

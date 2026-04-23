@@ -6,7 +6,6 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/base/util/restricted/_difference",
 	"sap/base/util/merge",
-	"sap/m/library",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Element",
 	"sap/ui/fl/apply/_internal/changes/Applier",
@@ -32,7 +31,6 @@ sap.ui.define([
 	Log,
 	_difference,
 	merge,
-	mobileLibrary,
 	JsControlTreeModifier,
 	Element,
 	Applier,
@@ -67,12 +65,6 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.fl, sap.ui.rta
 	 */
 	var VariantManager = {};
-
-	const { SharingMode } = mobileLibrary;
-
-	function getVariantModel(oAppComponent) {
-		return oAppComponent.getModel("$FlexVariants");
-	}
 
 	function updateURLForSetDefault(sVariantManagementReference, mPropertyBag) {
 		const oVMControl = VariantUtil.getVariantManagementControlByVMReference(
@@ -479,19 +471,8 @@ sap.ui.define([
 	 * @returns {Promise<sap.ui.fl.apply._internal.flexObjects.FlexObject[]>} Resolves with dirty changes created during variant copy
 	 */
 	async function copyVariant(mPropertyBag) {
-		const oVariantModel = getVariantModel(mPropertyBag.appComponent);
 		const oDuplicateVariantData = duplicateVariant({ ...mPropertyBag });
 		oDuplicateVariantData.generator = mPropertyBag.generator;
-
-		// VMTODO: check if this can also be done in the updateData function of the variant model
-		// this information is not derived from the data selector, so it needs to be set manually
-		oVariantModel.oData[mPropertyBag.variantManagementReference].variants.push({
-			key: oDuplicateVariantData.instance.getId(),
-			rename: true,
-			change: true,
-			remove: true,
-			sharing: mPropertyBag.layer === Layer.USER ? SharingMode.Private : SharingMode.Public
-		});
 
 		const aChanges = [];
 

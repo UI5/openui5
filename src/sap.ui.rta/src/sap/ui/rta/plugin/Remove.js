@@ -5,6 +5,7 @@
 sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/dt/OverlayUtil",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/fl/util/CancelError",
 	"sap/ui/rta/command/CompositeCommand",
@@ -13,6 +14,7 @@ sap.ui.define([
 ], function(
 	Log,
 	OverlayRegistry,
+	OverlayUtil,
 	KeyCodes,
 	CancelError,
 	CompositeCommand,
@@ -86,52 +88,7 @@ sap.ui.define([
 		} else {
 			bIsEnabled = true;
 		}
-		return bIsEnabled && this._canBeRemovedFromAggregation(aResponsibleElementOverlays);
-	};
-
-	/**
-	 * Checks if Overlay control has a valid parent and if it is
-	 * not the last visible control in the aggregation
-	 * The removal of the last element in the aggregation can
-	 * be defined by the parameter 'removeLastElement' in the
-	 * designtime of the aggregation
-	 *
-	 * @param  {sap.ui.dt.ElementOverlay[]} aElementOverlays - overlays to be removed
-	 * @return {boolean} Returns true if the control can be removed
-	 * @private
-	 */
-	Remove.prototype._canBeRemovedFromAggregation = function(aElementOverlays) {
-		// Check if designtime allows removing last visible element
-		var fnCheckDesignTimeSettings = function(oOverlay) {
-			var oParentOverlay = oOverlay.getParentAggregationOverlay();
-			if (oParentOverlay) {
-				var oAction = this.getAction(oParentOverlay);
-				return !!(oAction && oAction.removeLastElement);
-			}
-			return false;
-		}.bind(this);
-
-		var oOverlay = aElementOverlays[0];
-		var oElement = oOverlay.getElement();
-		var oParent = oElement.getParent();
-		if (!oParent) {
-			return false;
-		}
-		var aElements = oParent.getAggregation(oElement.sParentAggregationName);
-		if (!Array.isArray(aElements)) {
-			return true;
-		}
-		// check if selected Overlays are the last visible elements in aggregation
-		var iNumberOfSelectedOverlays = aElementOverlays.length;
-		var aInvisibleElements = aElements.filter(function(oElement) {
-			var oElementOverlay = OverlayRegistry.getOverlay(oElement);
-			return !(oElementOverlay && oElementOverlay.getElementVisibility());
-		});
-		var bIsLastVisibleElement = (aInvisibleElements.length + iNumberOfSelectedOverlays === aElements.length);
-		if (bIsLastVisibleElement) {
-			return fnCheckDesignTimeSettings(oOverlay);
-		}
-		return true;
+		return bIsEnabled && OverlayUtil.canBeRemovedFromAggregationOnRemove(aResponsibleElementOverlays, this.getDesignTime());
 	};
 
 	/**

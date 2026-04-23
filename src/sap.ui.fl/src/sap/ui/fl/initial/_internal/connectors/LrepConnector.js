@@ -27,10 +27,10 @@ sap.ui.define([
 
 	const ROUTES = {
 		DATA: "/flex/data/",
-		VARIANT_DATA: "/variantdata/",
-		VARIANT_DATA_CONTENT: "/variantdata/content/",
-		COMP_VARIANT_DATA: "/compvariantdata/",
-		COMP_VARIANT_DATA_CONTENT: "/compvariantdata/content/",
+		VARIANT_DATA: "/flex/variantdata/",
+		VARIANT_DATA_CONTENT: "/flex/variantdata/content/",
+		COMP_VARIANT_DATA: "/flex/compvariantdata/",
+		COMP_VARIANT_DATA_CONTENT: "/flex/compvariantdata/content/",
 		MODULES: "/flex/modules/",
 		SETTINGS: "/flex/settings",
 		VARIANTS_AUTHORS: "/variants/authors/"
@@ -207,6 +207,7 @@ sap.ui.define([
 		 * @returns {Promise<object>} Promise resolves with an object containing maps of variants' IDs and their names
 		 */
 		loadVariantsAuthors(mPropertyBag) {
+			delete _mFlexDataParameters.lazyLoadingViewsEnabled;
 			const sVariantsAuthorsUrl = Utils.getUrl(ROUTES.VARIANTS_AUTHORS, mPropertyBag, _mFlexDataParameters);
 			return Utils.sendRequest(sVariantsAuthorsUrl, "GET", { initialConnector: this }).then(function(oResult) {
 				return oResult.response;

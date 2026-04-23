@@ -746,7 +746,6 @@ sap.ui.define([
 						}
 					});
 				} else {
-					delete oScrollExtension._bTouchScroll;
 					VerticalScrollingHelper._performUpdateFromScrollbar(oTable, oProcessInterface).then(resolve);
 				}
 			});
@@ -1964,6 +1963,16 @@ sap.ui.define([
 					isMomentumActive: false,
 					momentumAnimationFrame: null
 				};
+
+				const $Cell = TableUtils.getCell(this, oEvent.target);
+				const oCellInfo = TableUtils.getCellInfo($Cell);
+
+				// On touch devices: distinguish between tap, scroll and long tap.
+				// _bTouchScroll tracks whether a scroll occurred. The cell will be focused ontouchend only if no scrolling is detected.
+				// preventDefault is NOT called here so that the browser can still fire the contextmenu event on long tap.
+				if (oCellInfo.isOfType(TableUtils.CELLTYPE.ANYCONTENTCELL)) {
+					this._getKeyboardExtension().suspendItemNavigation();
+				}
 			}
 		},
 
@@ -2026,6 +2035,9 @@ sap.ui.define([
 					return;
 				}
 				mTouchSessionData.touchMoveDirection = Math.abs(iTouchDistanceX) > Math.abs(iTouchDistanceY) ? "horizontal" : "vertical";
+				if (Math.abs(iTouchDistanceX) > 5 || Math.abs(iTouchDistanceY) > 5) {
+					oScrollExtension._bTouchMove = true;
+				}
 			}
 
 			switch (mTouchSessionData.touchMoveDirection) {
@@ -2100,6 +2112,18 @@ sap.ui.define([
 					return;
 				}
 			}
+
+			// If the table didn't scroll, it was a tap — focus the cell.
+			const oScrollExtension = this._getScrollExtension();
+			if (!oScrollExtension._bTouchMove) {
+				const $Cell = TableUtils.getCell(this, oEvent.target);
+				if ($Cell) {
+					$Cell[0].focus();
+				}
+			}
+
+			delete oScrollExtension._bTouchMove;
+			this._getKeyboardExtension().resumeItemNavigation();
 
 			const mTouchSessionData = _private(this).mTouchSessionData;
 

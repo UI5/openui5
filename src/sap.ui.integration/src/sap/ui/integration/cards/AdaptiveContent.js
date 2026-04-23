@@ -58,8 +58,6 @@ sap.ui.define([
 			BaseContent.prototype.init.apply(this, arguments);
 
 			this.awaitEvent("_adaptiveCardElementsReady");
-			//workaround until actions refactor
-			this.fireEvent("_actionContentReady"); // todo
 			this.setComponentsReady(false);
 			this._setupCardContent();
 		};

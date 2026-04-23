@@ -15,7 +15,9 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/Context",
-	"sap/ui/model/ChangeReason"
+	"sap/ui/model/ChangeReason",
+	"sap/m/Menu",
+	"sap/m/MenuItem"
 ], function(
 	TableQUnitUtils,
 	nextUIUpdate,
@@ -31,7 +33,9 @@ sap.ui.define([
 	Control,
 	JSONModel,
 	Context,
-	ChangeReason
+	ChangeReason,
+	Menu,
+	MenuItem
 ) {
 	"use strict";
 
@@ -6018,5 +6022,85 @@ sap.ui.define([
 		assert.ok(iScrollLeftAfterMomentum > iInitialScrollLeft + 160,
 			"Horizontal momentum scrolling works. " +
 			"Initial: " + iInitialScrollLeft + ", After: " + iScrollLeftAfterMomentum);
+	});
+
+	QUnit.module("Distinguish between tap and scroll on touch", {
+		beforeEach: async function() {
+			this.bOriginalPointerSupport = Device.support.pointer;
+			this.bOriginalTouchSupport = Device.support.touch;
+			Device.support.pointer = false;
+			Device.support.touch = true;
+
+			this.oTable = TableQUnitUtils.createTable({
+				rows: {path: "/"},
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(20),
+				columns: [
+					TableQUnitUtils.createTextColumn(),
+					TableQUnitUtils.createTextColumn()
+				],
+				rowActionCount: 1,
+				rowActionTemplate: TableQUnitUtils.createRowAction(null)
+			});
+
+			await this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			Device.support.pointer = this.bOriginalPointerSupport;
+			Device.support.touch = this.bOriginalTouchSupport;
+			this.oTable.destroy();
+		},
+		triggerTouchEvent: function(sEventName, oTarget) {
+			const oEvent = new TouchEvent(sEventName, {
+				bubbles: true,
+				cancelable: true,
+				touches: sEventName === "touchend" ? [] : [
+					new Touch({
+						identifier: 1,
+						target: oTarget,
+						pageX: 0,
+						pageY: sEventName === "touchmove" ? -100 : 0
+					})
+				]
+			});
+			oTarget.dispatchEvent(oEvent);
+			return oEvent;
+		},
+		testTouchOnCell: function(assert, oCell, bTouchMove) {
+			const oKeyboardExtension = this.oTable._getKeyboardExtension();
+			document.body.focus();
+			this.triggerTouchEvent("touchstart", oCell);
+			assert.ok(oKeyboardExtension.isItemNavigationSuspended(), "Item navigation is suspended after touchstart on a content cell");
+
+			if (bTouchMove) {
+				this.triggerTouchEvent("touchmove", oCell);
+			}
+
+			this.triggerTouchEvent("touchend", oCell);
+			assert.notOk(oKeyboardExtension.isItemNavigationSuspended(), "Item navigation is resumed after touchend");
+
+			if (bTouchMove) {
+				assert.notEqual(document.activeElement, oCell, "Cell is not focused after scroll");
+			} else {
+				assert.strictEqual(document.activeElement, oCell, "Cell is focused after tap");
+			}
+		}
+	});
+
+	QUnit.test("Data cell", function(assert) {
+		const oCell = this.oTable.qunit.getDataCell(1, 0);
+		this.testTouchOnCell(assert, oCell, true);
+		this.testTouchOnCell(assert, oCell, false);
+	});
+
+	QUnit.test("Row header cell", function(assert) {
+		const oCell = this.oTable.qunit.getRowHeaderCell(1);
+		this.testTouchOnCell(assert, oCell, true);
+		this.testTouchOnCell(assert, oCell, false);
+	});
+
+	QUnit.test("Row action cell", function(assert) {
+		const oCell = this.oTable.qunit.getRowActionCell(1);
+		this.testTouchOnCell(assert, oCell, true);
+		this.testTouchOnCell(assert, oCell, false);
 	});
 });

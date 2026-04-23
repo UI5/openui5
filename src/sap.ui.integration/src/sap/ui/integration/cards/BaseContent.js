@@ -200,7 +200,6 @@ sap.ui.define([
 
 		this.setAggregation("_loadingProvider", new LoadingProvider());
 		this.awaitEvent("_dataReady");
-		this.awaitEvent("_actionContentReady");
 	};
 
 	BaseContent.prototype.onBeforeRendering = function () {

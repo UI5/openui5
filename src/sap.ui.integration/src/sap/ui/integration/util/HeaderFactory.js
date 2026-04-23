@@ -109,7 +109,6 @@ sap.ui.define([
 		});
 
 		oActions.attach({
-			isHeader: true,
 			enabledPropertyName: "interactive",
 			actions: mConfiguration.actions,
 			control: oHeader
@@ -269,7 +268,6 @@ sap.ui.define([
 		const oStatus = ObjectStatusFactory.createStatusItem(oItem);
 
 		oActions.attach({
-			isHeader: true,
 			actions: oItem.actions,
 			control: oStatus,
 			enabledPropertyName: "active"
