@@ -134,14 +134,15 @@ sap.ui.define([
 		// convert the old legacy metadata and merge with the new manifest
 		this._convertLegacyMetadata(this._oStaticInfo, oManifestJson);
 
-		this._oManifest = new Manifest(oManifestJson, {
+		const oManifest = new Manifest(oManifestJson, {
 			componentName: this.getComponentName(),
 			baseUrl: sap.ui.require.toUrl(this.getComponentName().replace(/\./g, "/")) + "/",
 			process: !bSkipProcess && this._oStaticInfo.__metadataVersion === 2
 		});
-		if (this._oManifest._getSchemaVersion() < 2) {
+		if (oManifest._getSchemaVersion() < 2) {
 			throw new TypeError(`This UI5 version requires a manifest with a schema version 2.0.0 or higher`);
 		}
+		this._oManifest = oManifest;
 
 	};
 
