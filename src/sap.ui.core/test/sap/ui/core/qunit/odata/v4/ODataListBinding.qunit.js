@@ -2516,6 +2516,13 @@ sap.ui.define([
 			aResults;
 
 		this.mock(oBinding.aContexts).expects("slice").withExactArgs(2, 5).returns(aContexts);
+		// fast path does not need these
+		// Note: cannot forbid Array#push/pop here
+		this.mock(Array.prototype).expects("concat").never();
+		this.mock(Array.prototype).expects("reverse").never();
+		this.mock(Array.prototype).expects("toReversed").never();
+		this.mock(oBinding).expects("getLength").never();
+		this.mock(_AggregationHelper).expects("hasGrandTotalAtBottom").never();
 
 		// code under test
 		aResults = oBinding.getContextsInViewOrder(2, 3);
@@ -2524,39 +2531,140 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("getContextsInViewOrder: create at end", function (assert) {
-		var oBinding = this.bindList("/EMPLOYEES"),
-			oBindingMock = this.mock(oBinding),
-			aResults;
-
-		// assuming 3 created entities (with index 0, 1 and 2)
-		// view order 3 4 5 2 1 0
-		oBindingMock.expects("getLength").withExactArgs().returns(6);
-		oBindingMock.expects("_getModelIndex").withExactArgs(3).returns(0);
-		oBindingMock.expects("_getModelIndex").withExactArgs(4).returns(1);
-		oBindingMock.expects("_getModelIndex").withExactArgs(5).returns(2);
-
+	QUnit.test("getContextsInViewOrder: create at end, no grand total at bottom",
+			function (assert) {
+		// Note: cannot forbid Array#push/pop here
+		const oAggregationHelperMock = this.mock(_AggregationHelper);
+		oAggregationHelperMock.expects("hasGrandTotalAtBottom").never();
+		const oBinding = this.bindList("/EMPLOYEES", null, [], [], {$$aggregation : {}});
+		this.mock(oBinding).expects("getLength").never();
+		// simulate ODataListBinding#create (3x at the end)
+		oBinding.iCreatedContexts = 3;
 		oBinding.bFirstCreateAtEnd = true;
-		oBinding.aContexts = [{}, {}, {}, {}, {}, {}];
+		// Note: bLengthFinal still falsy
+		oBinding.aContexts = ["3rd", "2nd", "1st"]; // stored in reverse order
 
 		// code under test
-		aResults = oBinding.getContextsInViewOrder(3, 10);
-
-		assert.strictEqual(aResults.length, 3);
-		assert.strictEqual(aResults[0], oBinding.aContexts[0]);
-		assert.strictEqual(aResults[1], oBinding.aContexts[1]);
-		assert.strictEqual(aResults[2], oBinding.aContexts[2]);
-
-		oBindingMock.expects("getLength").withExactArgs().returns(6);
-		oBindingMock.expects("_getModelIndex").withExactArgs(1).returns(4);
-		oBindingMock.expects("_getModelIndex").withExactArgs(2).returns(3);
+		assert.deepEqual(oBinding.getContextsInViewOrder(0, 99), ["1st", "2nd", "3rd"]);
 
 		// code under test
-		aResults = oBinding.getContextsInViewOrder(1, 2);
+		assert.deepEqual(oBinding.getContextsInViewOrder(1, 1), ["2nd"]);
 
-		assert.strictEqual(aResults.length, 2);
-		assert.strictEqual(aResults[0], oBinding.aContexts[4]);
-		assert.strictEqual(aResults[1], oBinding.aContexts[3]);
+		assert.deepEqual(oBinding.aContexts, ["3rd", "2nd", "1st"], "unchanged");
+
+		// simulate a read
+		oBinding.bLengthFinal = true;
+		oBinding.iMaxLength = 5;
+		oBinding.aContexts = ["3rd", "2nd", "1st", "a", "b", "c", "d", "e"];
+		oAggregationHelperMock.expects("hasGrandTotalAtBottom").exactly(4)
+			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation)).returns(false);
+		this.mock(Array.prototype).expects("toReversed").never();
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(0, 99),
+			["a", "b", "c", "d", "e", "1st", "2nd", "3rd"]);
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(3, 4), ["d", "e", "1st", "2nd"]);
+
+		// fast path does not need these
+		this.mock(Array.prototype).expects("concat").never();
+		this.mock(Array.prototype).expects("reverse").never();
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(0, 5), ["a", "b", "c", "d", "e"]);
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(1, 3), ["b", "c", "d"]);
+
+		assert.deepEqual(oBinding.aContexts, ["3rd", "2nd", "1st", "a", "b", "c", "d", "e"],
+			"unchanged");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getContextsInViewOrder: create at end, no grand total at bottom, partial read",
+			function (assert) {
+		// Note: cannot forbid Array#push/pop here
+		const oBinding = this.bindList("/EMPLOYEES", null, [], [], {$$aggregation : {}});
+		this.mock(oBinding).expects("getLength").never();
+		// simulate ODataListBinding#create (3x at the end)
+		oBinding.iCreatedContexts = 3;
+		oBinding.bFirstCreateAtEnd = true;
+		// simulate a partial(!) read
+		oBinding.bLengthFinal = true;
+		oBinding.iMaxLength = 5;
+		oBinding.aContexts = ["3rd", "2nd", "1st", "a", "b", "c"/*, "d", "e"*/];
+		this.mock(_AggregationHelper).expects("hasGrandTotalAtBottom").exactly(2)
+			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation)).returns(false);
+		this.mock(Array.prototype).expects("toReversed").never();
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(0, 99),
+			["a", "b", "c",,, "1st", "2nd", "3rd"]);
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(5, 3), ["1st", "2nd", "3rd"]);
+
+		assert.deepEqual(oBinding.aContexts, ["3rd", "2nd", "1st", "a", "b", "c"], "unchanged");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getContextsInViewOrder: create at end, grand total at bottom", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES", null, [], [], {$$aggregation : {}});
+		// simulate ODataListBinding#create (3x at the end)
+		oBinding.iCreatedContexts = 3;
+		oBinding.bFirstCreateAtEnd = true;
+		// simulate a read
+		oBinding.bLengthFinal = true;
+		oBinding.iMaxLength = 6;
+		oBinding.aContexts = ["3rd", "2nd", "1st", "a", "b", "c", "d", "e", "GT"];
+		const oBindingMock = this.mock(oBinding);
+		oBindingMock.expects("getLength").never();
+		this.mock(_AggregationHelper).expects("hasGrandTotalAtBottom").exactly(8)
+			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation)).returns(true);
+		this.mock(Array.prototype).expects("toReversed").never();
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(0, 99),
+			["a", "b", "c", "d", "e", "1st", "2nd", "3rd", "GT"]);
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(3, 4), ["d", "e", "1st", "2nd"]);
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(7, 2), ["3rd", "GT"]);
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(4, 2), ["e", "1st"],
+			"just NOT fast path");
+
+		const oGetLengthExpectation
+			= oBindingMock.expects("getLength").withExactArgs().returns(6 + 3);
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(7, 1), ["3rd"],
+			"just NOT fast path for grand total at bottom");
+
+		assert.ok(oGetLengthExpectation.called, "already called above");
+
+		// fast path does not need these
+		this.mock(Array.prototype).expects("concat").never();
+		this.mock(Array.prototype).expects("reverse").never();
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(0, 5), ["a", "b", "c", "d", "e"]);
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(1, 3), ["b", "c", "d"]);
+
+		oBindingMock.expects("getLength").withExactArgs().returns(6 + 3);
+
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(8, 1), ["GT"],
+			"fast path for grand total at bottom");
+
+		assert.deepEqual(oBinding.aContexts, ["3rd", "2nd", "1st", "a", "b", "c", "d", "e", "GT"],
+			"unchanged");
 	});
 
 	//*********************************************************************************************
@@ -6160,9 +6268,8 @@ sap.ui.define([
 		oContext1 = oBinding.create(undefined, true, true);
 		oContext2 = oBinding.create(undefined, true, true);
 
-		assert.strictEqual(oBinding._getModelIndex(0), 2);
-		assert.strictEqual(oBinding._getModelIndex(1), 1);
-		assert.strictEqual(oBinding._getModelIndex(2), 0);
+		// code under test
+		assert.deepEqual(oBinding.getContextsInViewOrder(0, 3), [oContext0, oContext1, oContext2]);
 
 		return Promise.all([
 			oContext0.created(),
@@ -10108,45 +10215,6 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("_getModelIndex", function (assert) {
-		var oBinding = this.bindList("/Set"),
-			oBindingMock = this.mock(oBinding);
-
-		oBindingMock.expects("getLength").atLeast(0).withExactArgs().returns(10);
-
-		// code under test
-		assert.strictEqual(oBinding._getModelIndex(5), 5);
-		assert.strictEqual(oBinding._getModelIndex(42), 42);
-
-		oBinding.bLengthFinal = true;
-		oBinding.iCreatedContexts = 1;
-
-		// code under test
-		assert.strictEqual(oBinding._getModelIndex(5), 5);
-		assert.strictEqual(oBinding._getModelIndex(42), 42);
-
-		oBinding.bFirstCreateAtEnd = true;
-
-		// code under test
-		assert.strictEqual(oBinding._getModelIndex(2), 3);
-		assert.strictEqual(oBinding._getModelIndex(5), 6);
-		assert.strictEqual(oBinding._getModelIndex(9), 0);
-
-		oBinding.iCreatedContexts = 2;
-
-		// code under test
-		assert.strictEqual(oBinding._getModelIndex(2), 4);
-		assert.strictEqual(oBinding._getModelIndex(5), 7);
-		assert.strictEqual(oBinding._getModelIndex(8), 1);
-		assert.strictEqual(oBinding._getModelIndex(9), 0);
-
-		oBinding.iCreatedContexts = 0;
-
-		// code under test
-		assert.strictEqual(oBinding._getModelIndex(0), 0);
-	});
-
-	//*********************************************************************************************
 	QUnit.test("getModelIndex: adds number of created contexts", function (assert) {
 		var oBinding = this.bindList("/Set"),
 			oContext;
@@ -10167,7 +10235,8 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("getViewIndex", function (assert) {
+	QUnit.test("getViewIndex: no create at end", function (assert) {
+		this.mock(_AggregationHelper).expects("hasGrandTotalAtBottom").never();
 		const oBinding = this.bindList("/Set");
 		let oContext = Context.create(null/*oModel*/, oBinding, "/foo", 42);
 
@@ -10184,12 +10253,17 @@ sap.ui.define([
 
 		// code under test
 		assert.strictEqual(oBinding.getViewIndex(oContext), 3);
+	});
 
+	//*********************************************************************************************
+	QUnit.test("getViewIndex: create at end, no grand total at bottom", function (assert) {
+		const oAggregationHelperMock = this.mock(_AggregationHelper);
+		oAggregationHelperMock.expects("hasGrandTotalAtBottom").never();
+		const oBinding = this.bindList("/EMPLOYEES", null, [], [], {$$aggregation : {}});
 		// simulate ODataListBinding#create (4x at the end)
 		oBinding.iCreatedContexts = 4;
 		oBinding.bFirstCreateAtEnd = true;
-
-		oContext = Context.create(null/*oModel*/, oBinding, "/foo", -1);
+		let oContext = Context.create(null/*oModel*/, oBinding, "/foo", -1);
 
 		// code under test
 		assert.strictEqual(oBinding.getViewIndex(oContext), 0);
@@ -10202,6 +10276,8 @@ sap.ui.define([
 		// simulate a read
 		oBinding.bLengthFinal = true;
 		oBinding.iMaxLength = 6;
+		oAggregationHelperMock.expects("hasGrandTotalAtBottom").exactly(4)
+			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation)).returns(false);
 
 		oContext = Context.create(null/*oModel*/, oBinding, "/foo", 0);
 
@@ -10222,6 +10298,52 @@ sap.ui.define([
 
 		// code under test
 		assert.strictEqual(oBinding.getViewIndex(oContext), 9);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getViewIndex: create at end, grand total at bottom", function (assert) {
+		const oAggregationHelperMock = this.mock(_AggregationHelper);
+		oAggregationHelperMock.expects("hasGrandTotalAtBottom").never();
+		const oBinding = this.bindList("/EMPLOYEES", null, [], [], {$$aggregation : {}});
+		// simulate ODataListBinding#create (4x at the end)
+		oBinding.iCreatedContexts = 4;
+		oBinding.bFirstCreateAtEnd = true;
+		let oContext = Context.create(null/*oModel*/, oBinding, "/foo", -1);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 0,
+			"not confused w/ grand total at bottom");
+
+		// simulate a read
+		oBinding.bLengthFinal = true;
+		oBinding.iMaxLength = 6; // Note: incl. grand total
+		oAggregationHelperMock.expects("hasGrandTotalAtBottom").exactly(5)
+			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation)).returns(true);
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", 0);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 0);
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", 4);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 4, "last server row");
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", -1);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 5, "first create at end");
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", -4);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 8, "last create at end");
+
+		oContext = Context.create(null/*oModel*/, oBinding, "/foo", 5);
+
+		// code under test
+		assert.strictEqual(oBinding.getViewIndex(oContext), 9, "grand total at bottom");
 	});
 
 	//*********************************************************************************************

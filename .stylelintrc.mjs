@@ -68,5 +68,6 @@ export default {
     "@stylistic/declaration-colon-space-after": "always",
     "@stylistic/string-quotes": "single",
     "@stylistic/no-eol-whitespace": true,
+    "@stylistic/block-opening-brace-space-before": "always",
   }
 };

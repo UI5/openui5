@@ -973,6 +973,18 @@ function(
 			},
 
 			{
+				"key" : "BR",
+				"text" : "Brazil",
+				"group" : "Countries 1"
+			},
+
+			{
+				"key" : "CA",
+				"text" : "Canada",
+				"group" : "Countries 1"
+			},
+
+			{
 				"key" : "BH",
 				"text" : "Bahrain",
 				"group" : "Countries 2"
@@ -982,6 +994,72 @@ function(
 				"key" : "BE",
 				"text" : "Belgium",
 				"group" : "Countries 2"
+			},
+
+			{
+				"key" : "BG",
+				"text" : "Bulgaria",
+				"group" : "Countries 2"
+			},
+
+			{
+				"key" : "HR",
+				"text" : "Croatia",
+				"group" : "Countries 2"
+			},
+
+			{
+				"key" : "CZ",
+				"text" : "Czech Republic",
+				"group" : "Countries 2"
+			},
+
+			{
+				"key" : "DK",
+				"text" : "Denmark",
+				"group" : "Countries 2"
+			},
+
+			{
+				"key" : "EG",
+				"text" : "Egypt",
+				"group" : "Countries 3"
+			},
+
+			{
+				"key" : "FR",
+				"text" : "France",
+				"group" : "Countries 3"
+			},
+
+			{
+				"key" : "DE",
+				"text" : "Germany",
+				"group" : "Countries 3"
+			},
+
+			{
+				"key" : "GR",
+				"text" : "Greece",
+				"group" : "Countries 3"
+			},
+
+			{
+				"key" : "IN",
+				"text" : "India",
+				"group" : "Countries 3"
+			},
+
+			{
+				"key" : "IT",
+				"text" : "Italy",
+				"group" : "Countries 3"
+			},
+
+			{
+				"key" : "JP",
+				"text" : "Japan",
+				"group" : "Countries 3"
 			},
 
 			{
@@ -1032,6 +1110,24 @@ function(
 		selectedKeys: [0, 2],
 		showSelectAll: true
 	});
+
+	// MultiComboBox with both showSelectAll and grouping
+	var oMultiComboBoxGroupingAndSelectAll = new MultiComboBox({
+		id : "MultiComboBoxGroupingAndSelectAll",
+		width : "300px",
+		placeholder: "showSelectAll + Grouping - Test keyboard open (Alt+Down)",
+		items : {
+			path: "groupedModel>/items",
+			template: new Item({
+				key : "{groupedModel>key}",
+				text : "{groupedModel>text}",
+				enabled : "{groupedModel>enabled}"
+			}),
+			sorter: [new Sorter("group", false, true)]
+		},
+		showSelectAll: true
+	});
+	oMultiComboBoxGroupingAndSelectAll.setModel(oGroupedModel, "groupedModel");
 
 	var oEmptyMultiComboBox = new MultiComboBox("mcbNoItems", {
 		placeholder: "MultiComboBox with no items"
@@ -1110,7 +1206,7 @@ function(
 			oMultiComboBoxErrorWithLink, oMultiComboBoxWarningWithLinks, oMultiComboBoxDisabled, oMultiComboBoxWithoutKey, oMultiComboBoxError, oMultiComboBoxWarning,
 			oMultiComboBoxSuccess, oMultiComboBoxOneToken, readOnlyButtonOneToken, oMultiComboBoxFourItems,
 			oMultiComboBoxBinding, oMultiComboBoxWithGrouping, oMultiComboBoxSelectAll, oToolbar, oEmptyMultiComboBox, oLabelWrapping, oMultiComboBoxLongSuggestions,
-			oLabelItemsOrder, oMultiComboBoxStrangeKeys, oLongValueStateHeader
+			oLabelItemsOrder, oMultiComboBoxStrangeKeys, oLongValueStateHeader, oMultiComboBoxGroupingAndSelectAll
 		],
 		showNavButton : true,
 		navButtonPress : function() {

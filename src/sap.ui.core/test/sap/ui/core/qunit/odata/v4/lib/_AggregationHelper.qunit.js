@@ -1921,6 +1921,36 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("hasGrandTotalAtBottom", function (assert) {
+		const oAggregationHelperMock = this.mock(_AggregationHelper);
+		oAggregationHelperMock.expects("hasGrandTotal").never();
+
+		// code under test
+		assert.strictEqual(_AggregationHelper.hasGrandTotalAtBottom(), false);
+
+		// code under test
+		assert.strictEqual(_AggregationHelper.hasGrandTotalAtBottom({}), false);
+
+		oAggregationHelperMock.expects("hasGrandTotal").withExactArgs("~aggregate1~")
+			.returns(true);
+
+		// code under test
+		assert.strictEqual(_AggregationHelper.hasGrandTotalAtBottom({
+			aggregate : "~aggregate1~",
+			grandTotalAtBottomOnly : false
+		}), true);
+
+		oAggregationHelperMock.expects("hasGrandTotal").withExactArgs("~aggregate2~")
+			.returns(false);
+
+		// code under test
+		assert.strictEqual(_AggregationHelper.hasGrandTotalAtBottom({
+			aggregate : "~aggregate2~",
+			grandTotalAtBottomOnly : true
+		}), false);
+	});
+
+	//*********************************************************************************************
 	QUnit.test("splitFilter: oAggregation or oAggregation.aggregate empty", function (assert) {
 		var oFilter = "~oFilter~";
 

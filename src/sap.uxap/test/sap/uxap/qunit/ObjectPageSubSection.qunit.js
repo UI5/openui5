@@ -3226,4 +3226,54 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oObjectPageLayout.destroy();
 	});
 
+	QUnit.module("Sticky Header");
+
+	QUnit.test("SubSection sticky header position should be static in RTA mode", async function(assert) {
+		// Arrange
+		var oObjectPageLayout = new ObjectPageLayout({
+			sections: [
+				new ObjectPageSection({
+					title: "Section Title",
+					subSections: [
+						new ObjectPageSubSectionClass({
+							title: "SubSection Title",
+							blocks: [new Text({text: "Content"})]
+						}),
+						new ObjectPageSubSectionClass({
+							title: "SubSection Title 2",
+							blocks: [new Text({text: "Content 2"})]
+						})
+					]
+				})
+			]
+		});
+
+		oObjectPageLayout.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var oSubSection = oObjectPageLayout.getSections()[0].getSubSections()[0];
+		var oHeaderDom = oSubSection.getDomRef("header");
+
+		// Assert - sticky is applied initially
+		assert.strictEqual(getComputedStyle(oHeaderDom).position, "sticky",
+			"SubSection header position is sticky before RTA mode");
+
+		// Act - simulate RTA mode
+		document.body.classList.add("sapUiRtaMode");
+
+		// Assert
+		assert.strictEqual(getComputedStyle(oHeaderDom).position, "static",
+			"SubSection header position is static in RTA mode");
+
+		// Act - leave RTA mode
+		document.body.classList.remove("sapUiRtaMode");
+
+		// Assert
+		assert.strictEqual(getComputedStyle(oHeaderDom).position, "sticky",
+			"SubSection header position is sticky again after leaving RTA mode");
+
+		// Clean up
+		oObjectPageLayout.destroy();
+	});
+
 });

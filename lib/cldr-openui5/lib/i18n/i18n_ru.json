@@ -1,92 +1,92 @@
 {
-  "languagename.cnr" : {
-    "comment" : "XTIT: the official language name of Montenegro: Montenegrin",
-    "text" : "Черногорский"
+  "languagename.cnr": {
+    "comment": "XTIT: the official language name of Montenegro: Montenegrin",
+    "text": "Черногорский"
   },
-  "calendarweek.wide" : {
-    "comment" : "XTIT: the long pattern for formatting a date using calendar week number",
-    "text" : "Календарная неделя {0}"
+  "calendarweek.wide": {
+    "comment": "XTIT: the long pattern for formatting a date using calendar week number",
+    "text": "Календарная неделя {0}"
   },
-  "calendarweek.narrow" : {
-    "comment" : "XTIT: the short pattern for formatting a date using calendar week number",
-    "text" : "КН {0}"
+  "calendarweek.narrow": {
+    "comment": "XTIT: the short pattern for formatting a date using calendar week number",
+    "text": "КН {0}"
   },
-  "date.placeholder" : {
-    "comment" : "XTXT: Placeholder text for input control with a sample value such as date or time; demo output \"e.g. 31/12/2022\" (translation must contain an abbreviated form of \"for example\" such as the English \"e.g.\" to keep the placeholder short)",
-    "text" : "Например, {0}"
+  "date.placeholder": {
+    "comment": "XTXT: Placeholder text for input control with a sample value such as date or time; demo output \"e.g. 31/12/2022\" (translation must contain an abbreviated form of \"for example\" such as the English \"e.g.\" to keep the placeholder short)",
+    "text": "Например, {0}"
   },
-  "FileSize" : {
-    "Byte" : {
-      "comment" : "YMSG,20: File Size Unit one Byte",
-      "text" : "{0} байт"
+  "FileSize": {
+    "Byte": {
+      "comment": "YMSG,20: File Size Unit one Byte",
+      "text": "{0} байт"
     },
-    "Bytes" : {
-      "comment" : "YMSG,20: File Size Unit Bytes",
-      "text" : "{0} байт"
+    "Bytes": {
+      "comment": "YMSG,20: File Size Unit Bytes",
+      "text": "{0} байт"
     },
-    "Kilobyte" : {
-      "comment" : "YMSG,20: File Size Unit Kilobyte (short)",
-      "text" : "{0} КБ"
+    "Kilobyte": {
+      "comment": "YMSG,20: File Size Unit Kilobyte (short)",
+      "text": "{0} КБ"
     },
-    "Megabyte" : {
-      "comment" : "YMSG,20: File Size Unit Megabyte (short)",
-      "text" : "{0} МБ"
+    "Megabyte": {
+      "comment": "YMSG,20: File Size Unit Megabyte (short)",
+      "text": "{0} МБ"
     },
-    "Gigabyte" : {
-      "comment" : "YMSG,20: File Size Unit Gigabyte (short)",
-      "text" : "{0} ГБ"
+    "Gigabyte": {
+      "comment": "YMSG,20: File Size Unit Gigabyte (short)",
+      "text": "{0} ГБ"
     },
-    "Terabyte" : {
-      "comment" : "YMSG,20: File Size Unit Terabyte (short)",
-      "text" : "{0} ТБ"
+    "Terabyte": {
+      "comment": "YMSG,20: File Size Unit Terabyte (short)",
+      "text": "{0} ТБ"
     },
-    "Petabyte" : {
-      "comment" : "YMSG,20: File Size Unit Petabyte (short)",
-      "text" : "{0} ПБ"
+    "Petabyte": {
+      "comment": "YMSG,20: File Size Unit Petabyte (short)",
+      "text": "{0} ПБ"
     },
-    "Exabyte" : {
-      "comment" : "YMSG,20: File Size Unit Exabyte (short)",
-      "text" : "{0} ЭБ"
+    "Exabyte": {
+      "comment": "YMSG,20: File Size Unit Exabyte (short)",
+      "text": "{0} ЭБ"
     },
-    "Zettabyte" : {
-      "comment" : "YMSG,20: File Size Unit Zettabyte (short)",
-      "text" : "{0} ЗБ"
+    "Zettabyte": {
+      "comment": "YMSG,20: File Size Unit Zettabyte (short)",
+      "text": "{0} ЗБ"
     },
-    "Yottabyte" : {
-      "comment" : "YMSG,20: File Size Unit Yottabyte (short)",
-      "text" : "{0} ЙБ"
+    "Yottabyte": {
+      "comment": "YMSG,20: File Size Unit Yottabyte (short)",
+      "text": "{0} ЙБ"
     },
-    "Kibibyte" : {
-      "comment" : "YMSG,20: File Size Unit Kibibyte (short)",
-      "text" : "{0} КиБ"
+    "Kibibyte": {
+      "comment": "YMSG,20: File Size Unit Kibibyte (short)",
+      "text": "{0} КиБ"
     },
-    "Mebibyte" : {
-      "comment" : "YMSG,20: File Size Unit Mebibyte (short)",
-      "text" : "{0} МиБ"
+    "Mebibyte": {
+      "comment": "YMSG,20: File Size Unit Mebibyte (short)",
+      "text": "{0} МиБ"
     },
-    "Gibibyte" : {
-      "comment" : "YMSG,20: File Size Unit Gibibyte (short)",
-      "text" : "{0} ГиБ"
+    "Gibibyte": {
+      "comment": "YMSG,20: File Size Unit Gibibyte (short)",
+      "text": "{0} ГиБ"
     },
-    "Tebibyte" : {
-      "comment" : "YMSG,20: File Size Unit Tebibyte (short)",
-      "text" : "{0} ТиБ"
+    "Tebibyte": {
+      "comment": "YMSG,20: File Size Unit Tebibyte (short)",
+      "text": "{0} ТиБ"
     },
-    "Pebibyte" : {
-      "comment" : "YMSG,20: File Size Unit Pebibyte (short)",
-      "text" : "{0} ПиБ"
+    "Pebibyte": {
+      "comment": "YMSG,20: File Size Unit Pebibyte (short)",
+      "text": "{0} ПиБ"
     },
-    "Exbibyte" : {
-      "comment" : "YMSG,20: File Size Unit Exbibyte (short)",
-      "text" : "{0} ЭиБ"
+    "Exbibyte": {
+      "comment": "YMSG,20: File Size Unit Exbibyte (short)",
+      "text": "{0} ЭиБ"
     },
-    "Zebibyte" : {
-      "comment" : "YMSG,20: File Size Unit Zebibyte (short)",
-      "text" : "{0} ЗиБ"
+    "Zebibyte": {
+      "comment": "YMSG,20: File Size Unit Zebibyte (short)",
+      "text": "{0} ЗиБ"
     },
-    "Yobibyte" : {
-      "comment" : "YMSG,20: File Size Unit Yobibyte (short)",
-      "text" : "{0} ЙиБ"
+    "Yobibyte": {
+      "comment": "YMSG,20: File Size Unit Yobibyte (short)",
+      "text": "{0} ЙиБ"
     }
   }
 }

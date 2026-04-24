@@ -5271,6 +5271,9 @@ sap.ui.define([
 				sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata),
 				"~metaPath~")
 			.returns("~mQueryOptions~"); // no $expand here, simplifies visitQueryOptions!
+		this.mock(oCache).expects("importFromPostResponse")
+			.withExactArgs(sinon.match.same(oEntity), "", sRequestedPropertyPath)
+			.returns(false);
 		oHelperMock.expects("buildPath").withExactArgs("~metaPath~", undefined).returns("~2~");
 		this.oRequestorMock.expects("fetchType").never();
 		oHelperMock.expects("buildPath").withExactArgs(oCache.sResourcePath, "").returns("~/");
@@ -5366,6 +5369,10 @@ sap.ui.define([
 				sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata),
 				"/Employees/entity/path")
 			.returns(mQueryOptions);
+		this.mock(oCache).expects("importFromPostResponse")
+			.withExactArgs(sinon.match.same(oEntity), "('31')/entity/path",
+				sRequestedPropertyPath)
+			.returns(false);
 		oHelperMock.expects("buildPath").withExactArgs("/Employees", "entity/path")
 			.returns("/Employees/entity/path");
 		oHelperMock.expects("buildPath").withExactArgs("/Employees/entity/path", undefined)
@@ -5490,6 +5497,9 @@ sap.ui.define([
 				sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata),
 				oCache.sMetaPath + "/entity/path")
 			.returns(mQueryOptions);
+		this.mock(oCache).expects("importFromPostResponse")
+			.withExactArgs(sinon.match.same(oEntity), "('1')/entity/path", "foo/bar/baz/qux")
+			.returns(false);
 		this.oRequestorMock.expects("fetchType").never();
 		oHelperMock.expects("buildPath").withExactArgs(oCache.sMetaPath + "/entity/path", undefined)
 			.returns("~");
@@ -5557,6 +5567,7 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("Cache#fetchLateProperty: parallel calls", function (assert) {
 		var oCache = new _Cache(this.oRequestor, "Employees('31')", {}),
+			oCacheMock = this.mock(oCache),
 			oData = {
 				"@odata.etag" : "etag",
 				property : {foo : "foo", bar : "bar"}
@@ -5576,7 +5587,7 @@ sap.ui.define([
 			};
 
 		oCache.mLateExpandSelect = {};
-		this.mock(oCache).expects("getTypes").twice().withExactArgs().returns(mTypeForMetaPath);
+		oCacheMock.expects("getTypes").twice().withExactArgs().returns(mTypeForMetaPath);
 		oHelperMock.expects("getQueryOptionsForPath").twice()
 			.withExactArgs(sinon.match.same(oCache.mLateExpandSelect), "")
 			.returns(mQueryOptionsForPath);
@@ -5590,6 +5601,12 @@ sap.ui.define([
 				sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata),
 				oCache.sMetaPath)
 			.returns(mQueryOptionsBar);
+		oCacheMock.expects("importFromPostResponse")
+			.withExactArgs(sinon.match.same(oEntity), "", "property/foo")
+			.returns(false);
+		oCacheMock.expects("importFromPostResponse")
+			.withExactArgs(sinon.match.same(oEntity), "", "property/bar")
+			.returns(false);
 		this.oRequestorMock.expects("buildQueryString")
 			.withExactArgs(oCache.sMetaPath, sinon.match.same(mQueryOptionsFoo), false, true)
 			.returns("?$select=property");
@@ -5608,7 +5625,7 @@ sap.ui.define([
 				sinon.match.same(mQueryOptionsFoo))
 			.callsArg(5)
 			.resolves(oData);
-		this.mock(oCache).expects("visitResponse")
+		oCacheMock.expects("visitResponse")
 			.withExactArgs(sinon.match.same(oData), sinon.match.same(mTypeForMetaPath),
 				oCache.sMetaPath, "");
 		oHelperMock.expects("updateSelected")
@@ -5660,6 +5677,9 @@ sap.ui.define([
 				sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata),
 				oCache.sMetaPath)
 			.returns(mQueryOptions);
+		this.mock(oCache).expects("importFromPostResponse")
+			.withExactArgs(sinon.match.same(oEntity), "", "property")
+			.returns(false);
 		this.oRequestorMock.expects("buildQueryString")
 			.withExactArgs(oCache.sMetaPath, sinon.match.same(mQueryOptions), false, true)
 			.returns("?~1");
@@ -5739,6 +5759,9 @@ sap.ui.define([
 				sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata),
 				oCache.sMetaPath)
 			.returns(mQueryOptions);
+		this.mock(oCache).expects("importFromPostResponse")
+			.withExactArgs(sinon.match.same(oCacheData), "", "property")
+			.returns(false);
 		this.oRequestorMock.expects("buildQueryString")
 			.withExactArgs(oCache.sMetaPath, sinon.match.same(mQueryOptions), false, true)
 			.returns("?~1");
@@ -5772,11 +5795,41 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
+	QUnit.test("Cache#fetchLateProperty: property already in POST response",
+			async function (assert) {
+		const oCache = new _Cache(this.oRequestor, "SalesOrderList");
+		oCache.mLateExpandSelect = "~mLateExpandSelect~";
+		const oEntity = {SalesOrderID : "43"};
+
+		this.mock(oCache).expects("getTypes").withExactArgs().returns("n/a");
+		this.mock(_Helper).expects("getQueryOptionsForPath")
+			.withExactArgs("~mLateExpandSelect~", "~sResourcePath~")
+			.returns("~mQueryOptionsForPath~");
+		this.mock(_Helper).expects("intersectQueryOptions")
+			.withExactArgs("~mQueryOptionsForPath~", ["~sRequestedPropertyPath~"],
+				sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata),
+				"/SalesOrderList/~sResourcePath~")
+			.returns("~mQueryOptions~");
+		this.mock(oCache).expects("importFromPostResponse")
+			.withExactArgs(sinon.match.same(oEntity), "~sResourcePath~", "~sRequestedPropertyPath~")
+			.returns(true);
+		this.oRequestorMock.expects("request").never();
+
+		// code under test
+		const oResult = oCache.fetchLateProperty({/*oGroupLock*/}, oEntity, "~sResourcePath~",
+			"~sRequestedPropertyPath~");
+
+		assert.ok(oResult instanceof Promise);
+		assert.strictEqual(await oResult, undefined, "without a defined result");
+	});
+
+	//*********************************************************************************************
 	QUnit.test("Cache#fetchLateProperty: no late properties", function (assert) {
 		var oCache = new _Cache(this.oRequestor, "Employees");
 
 		this.mock(oCache).expects("getTypes").withExactArgs().returns({});
 		this.mock(_Helper).expects("intersectQueryOptions").never();
+		this.mock(oCache).expects("importFromPostResponse").never();
 		this.oRequestorMock.expects("request").never();
 		this.mock(_Helper).expects("updateSelected").never();
 
@@ -5795,6 +5848,7 @@ sap.ui.define([
 		oCache.mLateExpandSelect = {};
 		this.mock(oCache).expects("getTypes").withExactArgs().returns({});
 		this.mock(_Helper).expects("intersectQueryOptions").never();
+		this.mock(oCache).expects("importFromPostResponse").never();
 		this.oRequestorMock.expects("request").never();
 		this.mock(_Helper).expects("updateSelected").never();
 
@@ -5822,6 +5876,7 @@ sap.ui.define([
 				sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata),
 				oCache.sMetaPath)
 			.returns(undefined);
+		this.mock(oCache).expects("importFromPostResponse").never();
 		this.oRequestorMock.expects("request").never();
 		this.mock(_Helper).expects("updateSelected").never();
 
@@ -5967,6 +6022,77 @@ sap.ui.define([
 		// code under test
 		assert.strictEqual(oCache.hasSentRequest(), "bSentRequest");
 	});
+
+	//*********************************************************************************************
+[null, "", "~vResult~"].forEach(function (vDrillDownResult) {
+	[false, true].forEach(function (bETag) {
+		const sTitle = "_Cache#importFromPostResponse: vDrillDownResult=" + vDrillDownResult
+			+ (bETag ? ", same ETag" : ", no ETag");
+
+	QUnit.test(sTitle, function (assert) {
+		const oCache = new _Cache(this.oRequestor, "Employees");
+		const oEntity = {"@odata.etag" : "etag0"};
+		const oPostResponse = {...(bETag && {"@odata.etag" : "etag0"})};
+		this.mock(_Helper).expects("getPrivateAnnotation")
+			.withExactArgs(sinon.match.same(oEntity), "postResponse")
+			.returns(oPostResponse);
+		this.mock(_Helper).expects("deletePrivateAnnotation").never();
+		this.mock(_Helper).expects("drillDown")
+			.withExactArgs(sinon.match.same(oPostResponse), "~sPropertyPath~")
+			.returns(vDrillDownResult);
+		this.mock(_Helper).expects("updateSelected")
+			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "~sResourcePath~",
+				sinon.match.same(oEntity), sinon.match.same(oPostResponse), ["~sPropertyPath~"]);
+
+		// code under test
+		assert.strictEqual(
+			oCache.importFromPostResponse(oEntity, "~sResourcePath~", "~sPropertyPath~"),
+			true);
+	});
+	});
+});
+
+	//*********************************************************************************************
+	QUnit.test("_Cache#importFromPostResponse: changed ETag", function (assert) {
+		const oCache = new _Cache(this.oRequestor, "Employees");
+		const oEntity = {"@odata.etag" : "etag0"}; // a missing ETag behaves like a changed ETag
+		const oPostResponse = {"@odata.etag" : "etag1"};
+		this.mock(_Helper).expects("getPrivateAnnotation")
+			.withExactArgs(sinon.match.same(oEntity), "postResponse")
+			.returns(oPostResponse);
+		this.mock(_Helper).expects("deletePrivateAnnotation")
+			.withExactArgs(sinon.match.same(oEntity), "postResponse");
+		this.mock(_Helper).expects("drillDown").never();
+		this.mock(_Helper).expects("updateSelected").never();
+
+		// code under test
+		assert.strictEqual(
+			oCache.importFromPostResponse(oEntity, "~sResourcePath~", "~sPropertyPath~"),
+			false);
+	});
+
+	//*********************************************************************************************
+[undefined, "~oPostResponse~"].forEach(function (oPostResponse) {
+	const sTitle = "_Cache#importFromPostResponse: "
+		+ (oPostResponse ? "property not found" : "no POST response");
+
+	QUnit.test(sTitle, function (assert) {
+		const oCache = new _Cache(this.oRequestor, "Employees");
+		this.mock(_Helper).expects("getPrivateAnnotation")
+			.withExactArgs("~oEntity~", "postResponse")
+			.returns(oPostResponse);
+		this.mock(_Helper).expects("deletePrivateAnnotation").never();
+		this.mock(_Helper).expects("drillDown").exactly(oPostResponse ? 1 : 0)
+			.withExactArgs(oPostResponse, "~sPropertyPath~")
+			.returns(undefined);
+		this.mock(_Helper).expects("updateSelected").never();
+
+		// code under test
+		assert.strictEqual(
+			oCache.importFromPostResponse("~oEntity~", "~sResourcePath~", "~sPropertyPath~"),
+			false);
+	});
+});
 
 	//*********************************************************************************************
 [{
@@ -6867,6 +6993,8 @@ sap.ui.define([
 				{
 					"@$ui5._" : {
 						transientPredicate : "($uid=id-1-23)",
+						postResponse : {"@$ui5._" : {visited : true},
+							"@$ui5.context.isTransient" : false},
 						deepCreate : false
 					},
 					"@$ui5.context.isTransient" : false
@@ -9690,6 +9818,9 @@ sap.ui.define([
 					sinon.match.same(oInitialData), sinon.match.same(oPostResult),
 					"~$select~")
 				.returns(bDeepCreate);
+			oHelperMock.expects("setPrivateAnnotation").exactly(bDeepCreate ? 0 : 1)
+				.withExactArgs(sinon.match.same(oInitialData), "postResponse",
+					sinon.match.same(oPostResult));
 			oUpdateExistingExpectation = oHelperMock.expects("updateExisting")
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners),
 					sPathInCache + (bMissingPredicate ? sTransientPredicate : sPredicate),

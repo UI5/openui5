@@ -182,7 +182,7 @@
                 <Annotation Term="SAP__common.Label" String="Internal UoM" />
                 <Annotation Term="SAP__common.Heading" String="MU" />
                 <Annotation Term="SAP__common.QuickInfo" String="Unit of Measurement" />
-                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&id=MSEHI" />
+                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&amp;id=MSEHI" />
             </Annotations>
             <Annotations Target="SAP__self.xDMOxI_Flight_StdVHType/ConnectionID">
                 <Annotation Term="SAP__common.ValueListMapping">
@@ -492,7 +492,7 @@
                 <Annotation Term="SAP__common.IsUpperCase" />
                 <Annotation Term="SAP__common.Label" String="Country/Region Key" />
                 <Annotation Term="SAP__common.Heading" String="C/R" />
-                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&id=LAND1" />
+                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&amp;id=LAND1" />
             </Annotations>
             <Annotations Target="SAP__self.xDMOxI_Airport_StdVHType">
                 <Annotation Term="SAP__common.Label" String="Airport ValueHelp" />
@@ -675,12 +675,12 @@
             <Annotations Target="SAP__self.xDMOxI_Airport_StdVHType/CountryCodeText">
                 <Annotation Term="SAP__UI.Hidden" />
                 <Annotation Term="SAP__common.Label" String="Country/Region Name" />
-                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&id=LANDX50" />
+                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&amp;id=LANDX50" />
             </Annotations>
             <Annotations Target="SAP__self.xDMOxI_Carrier_StdVHType/CurrencyName">
                 <Annotation Term="SAP__UI.Hidden" />
                 <Annotation Term="SAP__common.Label" String="Description" />
-                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&id=LTEXT_CDS" />
+                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&amp;id=LTEXT_CDS" />
             </Annotations>
             <Annotations Target="SAP__self.xDMOxI_Connection_StdVHType/AirlineName">
                 <Annotation Term="SAP__UI.Hidden" />

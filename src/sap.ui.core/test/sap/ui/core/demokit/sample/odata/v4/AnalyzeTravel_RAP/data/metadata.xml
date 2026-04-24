@@ -514,7 +514,7 @@
                 <Annotation Term="SAP__UI.Hidden" />
                 <Annotation Term="SAP__common.Label" String="Changed On" />
                 <Annotation Term="SAP__common.QuickInfo" String="Local Instance Last Change Date Time" />
-                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&id=ABP_LOCINST_LASTCHANGE_TSTMPL" />
+                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&amp;id=ABP_LOCINST_LASTCHANGE_TSTMPL" />
             </Annotations>
             <Annotations Target="SAP__self.ZEE_C_ANALYZE_TRAVEL_D_DType/HasDraftEntity">
                 <Annotation Term="SAP__core.Computed" />
@@ -1197,7 +1197,7 @@
                 <Annotation Term="SAP__UI.Hidden" />
                 <Annotation Term="SAP__common.Label" String="Changed On" />
                 <Annotation Term="SAP__common.QuickInfo" String="Local Instance Last Change Date Time" />
-                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&id=ABP_LOCINST_LASTCHANGE_TSTMPL" />
+                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&amp;id=ABP_LOCINST_LASTCHANGE_TSTMPL" />
             </Annotations>
             <Annotations Target="SAP__self.ZEE_C_EDIT_BOOKING_D_DType/HasDraftEntity">
                 <Annotation Term="SAP__core.Computed" />
@@ -1613,7 +1613,7 @@
                 <Annotation Term="SAP__UI.Hidden" />
                 <Annotation Term="SAP__common.Label" String="Changed On" />
                 <Annotation Term="SAP__common.QuickInfo" String="Local Instance Last Change Date Time" />
-                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&id=ABP_LOCINST_LASTCHANGE_TSTMPL" />
+                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&amp;id=ABP_LOCINST_LASTCHANGE_TSTMPL" />
             </Annotations>
             <Annotations Target="SAP__self.ZEE_C_EDIT_TRAVEL_D_DType/HasDraftEntity">
                 <Annotation Term="SAP__core.Computed" />
@@ -2244,7 +2244,7 @@
                 <Annotation Term="SAP__UI.Hidden" />
                 <Annotation Term="SAP__common.Label" String="Changed On" />
                 <Annotation Term="SAP__common.QuickInfo" String="Local Instance Last Change Date Time" />
-                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&id=ABP_LOCINST_LASTCHANGE_TSTMPL" />
+                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&amp;id=ABP_LOCINST_LASTCHANGE_TSTMPL" />
             </Annotations>
             <Annotations Target="SAP__self.ZEE_C_ANALYZE_BOOKING_D_DType/HasDraftEntity">
                 <Annotation Term="SAP__core.Computed" />

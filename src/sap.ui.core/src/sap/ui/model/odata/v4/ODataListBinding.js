@@ -219,28 +219,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Converts the view index of a context to the model index in case there are contexts created at
-	 * the end.
-	 *
-	 * @param {number} iViewIndex - The view index (see {@link #getContexts})
-	 * @returns {number} The corresponding model index inside <code>this.aContexts</code>
-	 *
-	 * @private
-	 */
-	ODataListBinding.prototype._getModelIndex = function (iViewIndex) {
-		if (!this.bFirstCreateAtEnd) {
-			return iViewIndex;
-		}
-		if (!this.bLengthFinal) { // created at end, but the read is pending and $count unknown yet
-			return this.aContexts.length - iViewIndex - 1;
-		}
-		return iViewIndex < this.getLength() - this.iCreatedContexts
-			? iViewIndex + this.iCreatedContexts
-			// Note: the created rows are mirrored at the end
-			: this.getLength() - iViewIndex - 1;
-	};
-
-	/**
 	 * Adjusts the paths of all contexts of this binding by replacing the given transient predicate
 	 * with the given predicate. Recursively adjusts all child bindings. Creates a cache and copies
 	 * the created entities from the parent cache if necessary.
@@ -2997,19 +2975,39 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataListBinding.prototype.getContextsInViewOrder = function (iStart, iLength) {
-		var aContexts, iCount, i;
+		let aContexts = this.aContexts;
 
 		if (this.bFirstCreateAtEnd) {
-			aContexts = [];
-			iCount = Math.min(iLength, this.getLength() - iStart);
-			for (i = 0; i < iCount; i += 1) {
-				aContexts[i] = this.aContexts[this._getModelIndex(iStart + i)];
+			if (!this.bLengthFinal) { // there can only be created contexts!
+				// Note: see "ignore fixed bottom row w/ grand total temporarily" in #getContexts
+				return aContexts.toReversed().slice(iStart, iStart + iLength);
 			}
-		} else {
-			aContexts = this.aContexts.slice(iStart, iStart + iLength);
+
+			const bGrandTotalAtBottom
+				= _AggregationHelper.hasGrandTotalAtBottom(this.mParameters.$$aggregation);
+			if (iStart + iLength <= this.iMaxLength - (bGrandTotalAtBottom ? 1 : 0)) {
+				iStart += this.iCreatedContexts;
+			} else if (bGrandTotalAtBottom && iLength === 1 && iStart === this.getLength() - 1) {
+				// fast path: grand total is last in both model and view order, no adjustment needed
+			} else {
+				// Note: the created rows are mirrored at the end
+				const aCreatedContexts = aContexts.slice(0, this.iCreatedContexts).reverse();
+
+				let oGrandTotalContext;
+				aContexts = aContexts.slice(this.iCreatedContexts);
+				if (bGrandTotalAtBottom) {
+					oGrandTotalContext = aContexts.pop();
+				} else if (aContexts.length < this.iMaxLength) {
+					aContexts.length = this.iMaxLength;
+				}
+				aContexts = aContexts.concat(aCreatedContexts);
+				if (oGrandTotalContext) {
+					aContexts.push(oGrandTotalContext);
+				}
+			}
 		}
 
-		return aContexts;
+		return aContexts.slice(iStart, iStart + iLength);
 	};
 
 	/**
@@ -3529,8 +3527,17 @@ sap.ui.define([
 	 */
 	ODataListBinding.prototype.getViewIndex = function (oContext) {
 		if (this.bFirstCreateAtEnd) {
+			let iMaxLength = (this.bLengthFinal ? this.iMaxLength : 0);
+			if (iMaxLength
+					&& _AggregationHelper.hasGrandTotalAtBottom(this.mParameters.$$aggregation)) {
+				if (oContext.iIndex === iMaxLength - 1) { // grand total at bottom
+					return oContext.iIndex + this.iCreatedContexts;
+				}
+				iMaxLength -= 1;
+			}
+
 			return oContext.iIndex < 0
-				? (this.bLengthFinal ? this.iMaxLength : 0) - oContext.iIndex - 1
+				? iMaxLength - oContext.iIndex - 1
 				: oContext.iIndex;
 		}
 		return oContext.iIndex + this.iCreatedContexts;
