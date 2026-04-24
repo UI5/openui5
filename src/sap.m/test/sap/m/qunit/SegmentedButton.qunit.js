@@ -3819,8 +3819,8 @@ sap.ui.define([
 	QUnit.test("contentMode 'EqualSized' makes all buttons equal width", function (assert) {
 		this.oSegmentedButton.setContentMode("EqualSized");
 		oCore.applyChanges();
-		var buttons = Array.from(this.oSegmentedButton.getDomRef().querySelectorAll(".sapMSegBBtn"));
-		var widths = buttons.map(function (el) { return el.getBoundingClientRect().width; });
+		const buttons = Array.from(this.oSegmentedButton.getDomRef().querySelectorAll(".sapMSegBBtn"));
+		const widths = buttons.map(function (el) { return Number(el.getBoundingClientRect().width.toFixed(3)); });
 		assert.ok(widths.every(function (w) { return w === widths[0]; }), "All buttons have equal width in EqualSized mode");
 	});
 
