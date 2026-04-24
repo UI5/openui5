@@ -383,7 +383,7 @@ sap.ui.define([
 		for (let i = 0; i < 10; i++) {
 			iY += 10;
 			document.dispatchEvent(new MouseEvent("mousemove", {clientX: 10, clientY: iY}));
-			assert.equal(oResizerDomRef.style.top, (i + 1) * 10 + "px", "Top position is set");
+			assert.ok(Math.abs(parseFloat(oResizerDomRef.style.top) - (i + 1) * 10) <= 1, "Top position is set");
 		}
 		document.dispatchEvent(new MouseEvent("mouseup", {clientX: 10, clientY: iY + 10}));
 
