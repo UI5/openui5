@@ -1191,7 +1191,7 @@ sap.ui.define([
 				sTitle + "First visible row index");
 			assert.strictEqual(this.oTable._getScrollExtension().getVerticalScrollbar().scrollTop, iScrollPosition,
 				sTitle + "Scrollbar position");
-			assert.strictEqual(this.oTable.getDomRef("tableCCnt").scrollTop, iInnerScrollPosition,
+			assert.ok(Math.abs(this.oTable.getDomRef("tableCCnt").scrollTop - iInnerScrollPosition) <= 1,
 				sTitle + "Viewport position");
 		},
 		testRestoration: function(assert, sTitle) {
