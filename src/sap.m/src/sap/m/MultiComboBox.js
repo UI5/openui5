@@ -1401,6 +1401,21 @@ function(
 
 		oDomRef && this.getFocusDomRef().setAttribute("aria-expanded", "true");
 		this._bPickerIsOpening = false;
+
+		// Ensure first group header is visible when using showSelectAll with grouping
+		if (this.getShowSelectAll() && this.getSelectedItems().length === 0) {
+			var bHasGroups = this.getItems().some(function(oItem) {
+				return oItem.isA("sap.ui.core.SeparatorItem");
+			});
+
+			if (bHasGroups) {
+				var oPickerDomRef = this.getPicker().getDomRef("cont");
+				if (oPickerDomRef) {
+					oPickerDomRef.scrollTop = 0;
+				}
+			}
+		}
+
 		// close error message when the list is open, otherwise the list can be covered by the message
 		this.closeValueStateMessage();
 	};

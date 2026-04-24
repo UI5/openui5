@@ -586,6 +586,7 @@ sap.ui.define([
 					aSelect = _Helper.getQueryOptionsForPath(
 						that.mLateExpandSelect ?? that.mQueryOptions, sPath
 					).$select;
+					_Helper.setPrivateAnnotation(oEntityData, "postResponse", oCreatedEntity);
 				}
 				// update all existing properties (including the properties of the initial data)
 				// except properties with pending user input
@@ -1029,6 +1030,10 @@ sap.ui.define([
 			return false;
 		}
 
+		if (this.importFromPostResponse(oResource, sResourcePath, sRequestedPropertyPath)) {
+			return Promise.resolve(); // must be async to ensure #drillDown repeats the step
+		}
+
 		visitQueryOptions(mQueryOptions);
 		sFullResourcePath = _Helper.buildPath(this.sResourcePath, sResourcePath);
 		// include $expand/$select only; this uniquely *describes* the late property request
@@ -1429,6 +1434,37 @@ sap.ui.define([
 	 */
 	_Cache.prototype.hasSentRequest = function () {
 		return this.bSentRequest;
+	};
+
+	/**
+	 * Checks if the given property was already returned in the POST response of a create request
+	 * and, if so, imports it into the given entity.
+	 *
+	 * @param {object} oEntity
+	 *   The entity
+	 * @param {string} sResourcePath
+	 *   The path of oEntity relative to the cache
+	 * @param {string} sPropertyPath
+	 *   The path of the requested property relative to oEntity
+	 * @returns {boolean}
+	 *   <code>true</code> if the property was found in the POST response and has been imported
+	 *
+	 * @private
+	 */
+	_Cache.prototype.importFromPostResponse = function (oEntity, sResourcePath, sPropertyPath) {
+		const oPostResponse = _Helper.getPrivateAnnotation(oEntity, "postResponse");
+		if (oPostResponse?.["@odata.etag"]
+				&& oPostResponse["@odata.etag"] !== oEntity["@odata.etag"]) {
+			_Helper.deletePrivateAnnotation(oEntity, "postResponse");
+			return false;
+		}
+		if (!oPostResponse || _Helper.drillDown(oPostResponse, sPropertyPath) === undefined) {
+			return false;
+		}
+
+		_Helper.updateSelected(this.mChangeListeners, sResourcePath, oEntity, oPostResponse,
+			[sPropertyPath]);
+		return true;
 	};
 
 	/**

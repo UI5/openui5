@@ -76,12 +76,12 @@
                 <Annotation Term="SAP__common.Label" String="Currency" />
                 <Annotation Term="SAP__common.Heading" String="Crcy" />
                 <Annotation Term="SAP__common.QuickInfo" String="Currency Key" />
-                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&id=WAERS_CURC" />
+                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&amp;id=WAERS_CURC" />
             </Annotations>
             <Annotations Target="SAP__self.I_CurrencyStdVHType/Currency_Text">
                 <Annotation Term="SAP__core.Computed" />
                 <Annotation Term="SAP__common.Label" String="Description" />
-                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&id=LTEXT_CDS" />
+                <Annotation Term="SAP__common.DocumentationRef" String="urn:sap-com:documentation:key?=type=DE&amp;id=LTEXT_CDS" />
             </Annotations>
             <Annotations Target="SAP__ParentService.ZEE_C_ANALYZE_TRAVEL_D_DType/CurrencyCode">
                 <Annotation Term="SAP__common.ValueListMapping">

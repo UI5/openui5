@@ -240,6 +240,21 @@ describe('sap.m.MultiComboBox', function() {
 		});
 	});
 
+	// MultiComboBox - showSelectAll and grouping
+	it("should visualize a MultiComboBox dropdown with showSelectAll and grouping", function() {
+		browser.executeScript('document.getElementById("MultiComboBoxGroupingAndSelectAll").scrollIntoView()').then(function() {
+			var oMultiComboBoxArrow = element(by.id("MultiComboBoxGroupingAndSelectAll"));
+
+			oMultiComboBoxArrow.click();
+			browser.actions().sendKeys(protractor.Key.F4).perform();
+			expect(takeScreenshot()).toLookAs("first_group_header_visible");
+
+			// clean up
+			browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
+		});
+	});
+
+
 	//MultiComboBox Compact Mode
 	it("should select Compact mode", function(){
 		element(by.id("compactMode")).click();
