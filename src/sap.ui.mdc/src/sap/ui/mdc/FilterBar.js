@@ -4,6 +4,7 @@
 sap.ui.define([
 	"sap/ui/mdc/p13n/subcontroller/FilterController",
 	"sap/ui/mdc/p13n/subcontroller/AdaptFiltersController",
+	"sap/ui/mdc/p13n/subcontroller/DynamicPropertiesController",
 	"sap/ui/mdc/filterbar/FilterContainer",
 	"sap/ui/mdc/filterbar/aligned/FilterItemLayout",
 	"sap/ui/mdc/filterbar/FilterBarBase",
@@ -13,8 +14,9 @@ sap.ui.define([
 	"sap/base/util/merge",
 	"sap/base/Log",
 	"sap/ui/mdc/enums/FilterBarP13nMode",
-	"sap/base/strings/formatMessage"
-], (FilterController, AdaptFiltersController, FilterContainer, FilterItemLayout, FilterBarBase, FilterBarBaseRenderer, mLibrary, Button, merge, Log, FilterBarP13nMode, formatMessage) => {
+	"sap/base/strings/formatMessage",
+	"sap/ui/mdc/mixin/DynamicPropertiesMixin"
+], (FilterController, AdaptFiltersController, DynamicPropertiesController, FilterContainer, FilterItemLayout, FilterBarBase, FilterBarBaseRenderer, mLibrary, Button, merge, Log, FilterBarP13nMode, formatMessage, DynamicPropertiesMixin) => {
 	"use strict";
 
 	/**
@@ -108,6 +110,27 @@ sap.ui.define([
 				 */
 				adaptFiltersTextNonZero: {
 					type: "string"
+				},
+
+				/**
+				 * Ordered list of property keys that define which filter items the filter bar has.
+				 * The filter bar creates and manages the <code>filterItems</code> aggregation based on this list.
+				 *
+				 * This is an alternative to defining <code>filterItems</code> directly in the aggregation.
+				 * You can't define both <code>propertyKeys</code> and <code>filterItems</code> at the same time.
+				 *
+				 * This property must be set during control creation (for example, in the XML view or constructor settings).
+				 * After initialization, it is managed by the control and must not be modified.
+				 *
+				 * <b>Note:</b> This property must not be bound.
+				 *
+				 * @private
+				 * @ui5-restricted sap.fe
+				 * @since 1.148
+				 */
+				propertyKeys: {
+					type: "string[]",
+					defaultValue: []
 				}
 			}
 		},
@@ -116,6 +139,19 @@ sap.ui.define([
 	});
 
 	const { ButtonType } = mLibrary;
+
+	FilterBar.prototype.getEngineControllers = function() {
+		const mControllers = FilterBarBase.prototype.getEngineControllers.apply(this, arguments);
+		mControllers["PropertyInfo"] = new DynamicPropertiesController({
+			control: this,
+			allowedPropertyAttributes: [
+				"isActive",
+				"label",
+				"tooltip"
+			]
+		});
+		return mControllers;
+	};
 
 	FilterBar.prototype._createInnerLayout = function() {
 		this._cLayoutItem = FilterItemLayout;
@@ -127,23 +163,22 @@ sap.ui.define([
 	FilterBar.prototype.setP13nMode = function(aMode) {
 		this.setProperty("p13nMode", aMode || [], false);
 
-		const oRegisterConfig = {
-			helper: this.getPropertyHelper(),
-			controller: {}
-		};
+		const mControllers = this.getEngineControllers();
 
 		let bItemAssigned = false;
 		aMode && aMode.forEach((sMode) => {
 			if (sMode == "Item") {
 				bItemAssigned = true;
-				oRegisterConfig.controller["Item"] = new AdaptFiltersController({ control: this });
+				mControllers["Item"] = new AdaptFiltersController({ control: this });
 			}
 		});
 
 		this._setP13nModeItem(bItemAssigned);
 
-		oRegisterConfig.controller["Filter"] = new FilterController({ control: this });
-		this.getEngine().register(this, oRegisterConfig);
+		this.getEngine().register(this, {
+			helper: this.getPropertyHelper(),
+			controller: mControllers
+		});
 
 		return this;
 	};
@@ -367,6 +402,29 @@ sap.ui.define([
 
 		this._btnClear = undefined;
 	};
+
+	/**
+	 * Sets a new value for the {@link #getPropertyKeys propertyKeys} property.
+	 *
+	 * @name sap.ui.mdc.FilterBar#setPropertyKeys
+	 * @function
+	 * @param {string[]} aPropertyKeys Ordered list of property keys
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @private
+	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+	 */
+
+	/**
+	 * Gets the current value of the {@link #getPropertyKeys propertyKeys} property.
+	 *
+	 * @name sap.ui.mdc.FilterBar#getPropertyKeys
+	 * @function
+	 * @returns {string[]} The property keys
+	 * @private
+	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+	 */
+
+	DynamicPropertiesMixin.call(FilterBar.prototype, {aggregation: "filterItems"});
 
 	return FilterBar;
 

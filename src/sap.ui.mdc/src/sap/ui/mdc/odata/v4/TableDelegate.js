@@ -566,6 +566,26 @@ sap.ui.define([
 		}
 	};
 
+	/**
+	 * Determines whether leaf selection is disabled.
+	 * Override this method and return <code>true</code> to disable the selection of leaf rows in a TreeTable.
+	 *
+	 * <b>Note:</b> The binding may not always be aware of all leaf nodes at a given point in time, for example, nodes in collapsed
+	 * subtrees or nodes that are not yet loaded. Because of this, existing leaf selections can only be removed when the corresponding
+	 * rows become visible (e.g. after scrolling, expanding, or filtering).<br>
+	 * It is recommended to use the {@link sap.ui.model.odata.v4.ODataModel#bindList $$clearSelectionOnFilter} binding parameter to
+	 * automatically clear the selections after filtering, rather than expecting all leaf selections to be cleared immediately.
+	 *
+	 * @param {sap.ui.mdc.Table} oTable Instance of the MDC table
+	 * @returns {boolean} Whether the selection of leaf rows is disabled
+	 * @private
+	 * @ui5-restricted sap.fe
+	 * @since 1.148
+	 */
+	Delegate.isLeafSelectionDisabled = function(oTable) {
+		return false;
+	};
+
 	function initializeGridTableSelection(oTable) {
 		return loadModules([
 			"sap/ui/table/plugins/ODataV4MultiSelection",
@@ -595,6 +615,9 @@ sap.ui.define([
 						hideHeaderSelector: "{= !${$sap.ui.mdc.Table#type>/showHeaderSelector} }",
 						selectionChange: () => oTable._onSelectionChange({selectAll: undefined})
 					});
+					if (oTable._isOfType(TableType.TreeTable)) {
+						oSelectionPlugin.setProperty("leafSelectionDisabled", oTable.getControlDelegate().isLeafSelectionDisabled(oTable));
+					}
 				} else if (sSelectionMode === SelectionMode.Single || sSelectionMode === SelectionMode.SingleMaster) {
 					oSelectionPlugin = new ODataV4SingleSelectionPlugin({
 						selectionChange: () => oTable._onSelectionChange({selectAll: undefined})
@@ -763,9 +786,13 @@ sap.ui.define([
 		}
 
 		const bOnlyVisibleColumns = aStates ? aStates.every((oState) => {
-			return aPropertyKeys.find((sPropertyKey) => {
-				return oState.name ? oState.name === sPropertyKey : oState === sPropertyKey;
-			});
+			const sPropertyKey = oState.name ?? oState;
+
+			if (!oTable.getPropertyHelper().getProperty(sPropertyKey)) {
+				return true; // Inactive properties should not trigger a restriction message.
+			}
+
+			return aPropertyKeys.includes(sPropertyKey);
 		}) : true;
 
 		return !bOnlyVisibleColumns;

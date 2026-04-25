@@ -82,6 +82,17 @@ sap.ui.define([
 		assert.ok(oFilterBar);
 	});
 
+	QUnit.test("getEngineControllers", function(assert) {
+		const mControllers = oFilterBar.getEngineControllers();
+		assert.ok(mControllers["Filter"], "Filter controller is returned");
+		assert.ok(mControllers["Filter"].isA("sap.m.p13n.FilterController"), "Filter controller is a FilterController");
+		assert.ok(mControllers["PropertyInfo"], "PropertyInfo controller is returned");
+		assert.ok(mControllers["PropertyInfo"].isA("sap.ui.mdc.p13n.subcontroller.DynamicPropertiesController"),
+			"PropertyInfo controller is a DynamicPropertiesController");
+		assert.deepEqual(mControllers["PropertyInfo"].aAllowedPropertyAttributes, ["isActive", "label", "tooltip"],
+			"allowedPropertyAttributes are correct");
+	});
+
 	QUnit.test("inner layout exists on initialization", function(assert) {
 		const done = assert.async();
 		assert.ok(oFilterBar);
@@ -1319,6 +1330,8 @@ sap.ui.define([
 				//				assert.deepEqual(aOp2, FilterOperatorUtil.getOperatorsForType("String"));
 
 				oFilterBar.getControlDelegate().fetchProperties.restore();
+				aFilterFields[0].destroy();
+				aFilterFields[1].destroy();
 				done();
 			});
 		});
@@ -1948,4 +1961,80 @@ sap.ui.define([
 		assert.ok(this.oErrorSpy.notCalled, "No Error logged");
 		assert.ok(this.oWarningSpy.notCalled, "No Warning logged");
 	});
+
+	QUnit.module("Property keys mode", {
+		afterEach: function() {
+			oFilterBar?.destroy();
+		},
+		createFilterBar: function(mSettings) {
+			oFilterBar = new FilterBar("FB1", {
+				delegate: {
+					name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate",
+					payload: { modelName: undefined, collectionName: "test" }
+				},
+				propertyKeys: ["key1"],
+				propertyInfo: [
+					{key: "key1", label: "key1", dataType: "Edm.String"}
+				],
+				...mSettings
+			});
+			return oFilterBar;
+		}
+	});
+
+	QUnit.test("DynamicPropertiesController registered", async function(assert) {
+		this.createFilterBar();
+		await oFilterBar.initialized();
+
+		const oController = oFilterBar.getEngine().getController(oFilterBar, "PropertyInfo");
+		assert.ok(oController, "PropertyInfo controller is registered");
+		assert.ok(oController.isA("sap.ui.mdc.p13n.subcontroller.DynamicPropertiesController"),
+			"PropertyInfo controller is a DynamicPropertiesController");
+		assert.deepEqual(oController.aAllowedPropertyAttributes, ["isActive", "label", "tooltip"],
+			"allowedPropertyAttributes are correct");
+	});
+
+	QUnit.test("Items created from propertyKeys", async function(assert) {
+		const oInitStub = sinon.stub(FilterBar.prototype, "initializeItemsFromPropertyKeys").callsFake(function() {
+			return this.syncItemsFromPropertyKeys();
+		});
+
+		this.createFilterBar();
+		await oFilterBar.initialized();
+		assert.ok(oInitStub.calledOnce, "initializeItemsFromPropertyKeys called once");
+		assert.equal(oFilterBar.getFilterItems().length, 1, "Filter item created from propertyKeys");
+		oInitStub.restore();
+	});
+
+	QUnit.test("initializeItemsFromPropertyKeys not called in aggregation mode", async function(assert) {
+		oFilterBar?.destroy();
+		const oInitSpy = sinon.spy(FilterBar.prototype, "initializeItemsFromPropertyKeys");
+
+		oFilterBar = new FilterBar("FB1", {
+			delegate: {
+				name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate",
+				payload: { modelName: undefined, collectionName: "test" }
+			},
+			filterItems: [
+				new FilterField({propertyKey: "key1", label: "key1", dataType: "sap.ui.model.type.String"})
+			]
+		});
+		await oFilterBar.initialized();
+		assert.ok(oInitSpy.notCalled, "initializeItemsFromPropertyKeys not called");
+		oInitSpy.restore();
+	});
+
+	QUnit.test("_onModifications updates FilterField", async function(assert) {
+		this.createFilterBar();
+		await oFilterBar.initialized();
+
+		// oFilterBar.setPropertyInfo([{key: "key1", label: "Test", isActive: true, dataType: "Edm.String"}]);
+		sinon.stub(oFilterBar, "_getPropertyByName").withArgs("key1").returns({key: "key1", label: "Test", isActive: true, dataType: "Edm.String"}); // fake set by modification
+		await oFilterBar._onModifications(["PropertyInfo"]);
+		const aFilterFields = oFilterBar.getFilterItems();
+		assert.equal(aFilterFields[0].getPropertyKey(), "key1", "FilterField has correct propertyKey");
+		assert.equal(aFilterFields[0].getLabel(), "Test", "FilterField label updated from PropertyInfo");
+
+	});
+
 });

@@ -4833,6 +4833,28 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("Row with headerContent aggregation announces actual content text", async function(assert) {
+		// Arrange
+		const oLabel = new Label({ text: "Edward II" });
+		const oRow = new PlanningCalendarRow({
+			headerContent: [oLabel]
+		});
+		const oPC = new PlanningCalendar({ rows: [oRow] });
+		oPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oListItem = _getListItem(oRow);
+
+		// Act
+		const sAnnouncement = oListItem.getContentAnnouncement();
+
+		// Assert
+		assert.ok(sAnnouncement.includes("Edward II"), "Announcement contains the actual header content text");
+
+		// Cleanup
+		oPC.destroy();
+	});
+
 	QUnit.test("View Switch remains the same type after Overflow", async function(assert) {
 		var fnDone = assert.async(),
 			oViewSwitch,

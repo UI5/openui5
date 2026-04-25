@@ -95,22 +95,40 @@ sap.ui.define([
 	QUnit.module("Column resize");
 
 	opaTest("Resize column and persist the change", function(Given, When, Then) {
-		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Created At");
+		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Range of Creation Date");
 		When.onTheAppMDCTable.iEnterColumnWidthValue(100);
-		Then.onTheAppMDCTable.iCheckColumnWidth(sTableId, `${sTableId}-CreatedAt`, 100);
+		Then.onTheAppMDCTable.iCheckColumnWidth(sTableId, `${sTableId}--CreatedAt`, 100);
 		When.onTheAppMDCTable.iCloseTheColumnMenu();
 		Then.onTheAppMDCTable.iShouldSeeTheVariantManagement(sTableId, true);
 
 		When.P13nActions.iSaveVariantAs("Standard", "TestVariant3");
 		When.iSelectVariant("Standard");
 
-		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Created At");
+		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Range of Creation Date");
 		When.onTheAppMDCTable.iEnterColumnWidthValue(200);
-		Then.onTheAppMDCTable.iCheckColumnWidth(sTableId, `${sTableId}-CreatedAt`, 200);
+		Then.onTheAppMDCTable.iCheckColumnWidth(sTableId, `${sTableId}--CreatedAt`, 200);
 		When.onTheAppMDCTable.iCloseTheColumnMenu();
 
 		When.iSelectVariant("TestVariant3");
-		Then.onTheAppMDCTable.iCheckColumnWidth(sTableId, `${sTableId}-CreatedAt`, 100);
+		Then.onTheAppMDCTable.iCheckColumnWidth(sTableId, `${sTableId}--CreatedAt`, 100);
+	});
+
+	QUnit.module("Dynamic property label update");
+
+	opaTest("Group header row title updated after property label change", function(Given, When, Then) {
+		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Category");
+		When.onTheAppMDCTable.iUseColumnMenuQuickGroup({key: "Category", grouped: true});
+		Then.onTheAppMDCTable.iCheckGroupHeaderRowTitle(sTableId, {
+			index: 0,
+			title: "Category: Computer System Accessories"
+		});
+		When.P13nActions.iApplyPropertyAttributeChanges(sTableId, {
+			Category: {label: "New Category"}
+		});
+		Then.onTheAppMDCTable.iCheckGroupHeaderRowTitle(sTableId, {
+			index: 0,
+			title: "New Category: Computer System Accessories"
+		});
 	});
 
 	return {

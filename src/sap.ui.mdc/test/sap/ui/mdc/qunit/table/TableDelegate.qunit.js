@@ -71,6 +71,15 @@ sap.ui.define([
 		}
 	};
 
+	TableDelegate.addItem = function(oTable, sPropertyKey) {
+		const oProperty = oTable.getPropertyHelper().getProperty(sPropertyKey);
+		return new Column(oTable.getId() + "-" + oProperty.key, {
+			header: oProperty.label,
+			template: new Text({text: "{" + oProperty.path + "}"}),
+			propertyKey: sPropertyKey
+		});
+	};
+
 	QUnit.module("API", {
 		beforeEach: async function(assert) {
 			this.oTable = new Table({
@@ -687,6 +696,141 @@ sap.ui.define([
 	QUnit.test("ResponsiveTable Type", async function(assert) {
 		await this.initTable({type: TableType.ResponsiveTable});
 		this.assertTitleProviderSettings(assert);
+	});
+
+	QUnit.module("Dynamic properties", {
+		afterEach: function() {
+			this.oTable?.destroy();
+		},
+		createTable: async function(mSettings) {
+			this.oTable = new Table({
+				delegate: {
+					name: "sap/ui/mdc/TableDelegate",
+					payload: {
+						collectionPath: "/foo",
+						propertyInfo: [{
+							key: "Name",
+							path: "Name_Path",
+							label: "Name_Label",
+							dataType: "String"
+						}, {
+							key: "Inactive",
+							path: "Inactive_Path",
+							label: "Inactive_Label",
+							dataType: "String",
+							isActive: false
+						}]
+					}
+				},
+				propertyKeys: ["Name", "Inactive"],
+				models: new JSONModel(),
+				...mSettings
+			});
+			this.oTable.placeAt("qunit-fixture");
+			await this.oTable.initialized();
+			await nextUIUpdate();
+		}
+	});
+
+	QUnit.test("Group header row title updated after property label change", async function(assert) {
+		const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
+		await this.createTable({
+			delegate: {
+				name: "sap/ui/mdc/TableDelegate",
+				payload: {
+					collectionPath: "/testPath",
+					propertyInfo: [{
+						key: "FirstName",
+						path: "FirstName",
+						label: "FirstName_Label",
+						dataType: "String",
+						isActive: true
+					}]
+				}
+			},
+			propertyKeys: ["FirstName"],
+			type: new ResponsiveTableType(),
+			p13nMode: ["Group"],
+			autoBindOnInit: false,
+			models: new JSONModel({
+				testPath: [
+					{FirstName: "Johnson"},
+					{FirstName: "Johnson"},
+					{FirstName: "Smith"}
+				]
+			}),
+			groupConditions: {groupLevels: [{name: "FirstName"}]}
+		});
+
+		await this.oTable.rebind();
+
+		const aItems = this.oTable._oTable.getItems();
+		const oGroupHeader = aItems.find((oItem) => oItem.isA("sap.m.GroupHeaderListItem"));
+		assert.strictEqual(
+			oGroupHeader.getTitle(),
+			oResourceBundle.getText("table.ROW_GROUP_TITLE", ["FirstName_Label", "Johnson"]),
+			"Group header shows original label"
+		);
+
+		this.oTable.data("xConfig", `\\{"propertyInfo":\\{"FirstName":\\{"label":"NewLabel"\\}\\}\\}`);
+		await this.oTable.rebind();
+
+		const aUpdatedItems = this.oTable._oTable.getItems();
+		const oUpdatedGroupHeader = aUpdatedItems.find((oItem) => oItem.isA("sap.m.GroupHeaderListItem"));
+		assert.strictEqual(
+			oUpdatedGroupHeader.getTitle(),
+			oResourceBundle.getText("table.ROW_GROUP_TITLE", ["NewLabel", "Johnson"]),
+			"Group header shows updated label after rebind"
+		);
+	});
+
+	QUnit.test("Sorters exclude inactive property", async function(assert) {
+		await this.createTable({
+			p13nMode: ["Sort"],
+			sortConditions: {sorters: [{name: "Name", descending: false}, {name: "Inactive", descending: true}]}
+		});
+
+		const oBindingInfo = {};
+		TableDelegate.updateBindingInfo(this.oTable, oBindingInfo);
+		assert.equal(oBindingInfo.sorter.length, 1, "Only one sorter in binding info");
+		assert.equal(oBindingInfo.sorter[0].sPath, "Name_Path", "Sorter is for the active property");
+	});
+
+	QUnit.test("Group sorter excludes inactive property", async function(assert) {
+		await this.createTable({
+			type: "ResponsiveTable",
+			p13nMode: ["Sort", "Group"],
+			groupConditions: {groupLevels: [{name: "Inactive"}]}
+		});
+
+		const oGroupSorter = TableDelegate.getGroupSorter(this.oTable);
+		assert.notOk(oGroupSorter, "No group sorter returned for inactive property");
+	});
+
+	QUnit.test("Filters exclude inactive property", async function(assert) {
+		await this.createTable({p13nMode: ["Sort", "Filter"]});
+		const oFilterConditions = {
+			Name: [{
+				isEmpty: null,
+				operator: OperatorName.EQ,
+				validated: ConditionValidated.NotValidated,
+				values: ["test"]
+			}],
+			Inactive: [{
+				isEmpty: null,
+				operator: OperatorName.EQ,
+				validated: ConditionValidated.NotValidated,
+				values: ["test"]
+			}]
+		};
+
+		sinon.stub(this.oTable, "getConditions").returns(oFilterConditions);
+		const oBindingInfo = {};
+		TableDelegate.updateBindingInfo(this.oTable, oBindingInfo);
+		const aFilters = oBindingInfo.filters;
+
+		assert.equal(aFilters.length, 1, "Only one filter in binding info");
+		assert.equal(aFilters[0].sPath, "Name_Path", "Filter is for the active property");
 	});
 
 	QUnit.module("Rebind with invalid state", {

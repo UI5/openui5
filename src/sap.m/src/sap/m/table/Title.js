@@ -20,7 +20,6 @@ sap.ui.define([
 	 * A composite title control intended to display a table title along with optional
 	 * total and selected row counts.
 	 *
-	 * <h3>Overview</h3>
 	 * The <code>sap.m.table.Title</code> control renders the provided <code>sap.m.Title</code> control and optionally
 	 * displays the table's total row count, the selected row count, or both independently.
 	 *

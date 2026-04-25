@@ -323,30 +323,7 @@ sap.ui.define([
 
 	QUnit.module("Column menu");
 
-	opaTest('Open column menu of grouped column (p13nMode = ["Column","Sort","Filter"])', function(Given, When, Then) {
-		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Region");
-		Then.onTheAppMDCTable.iShouldSeeTheColumnMenu();
-		Then.onTheAppMDCTable.iShouldSeeNumberOfColumnMenuQuickActions(2);
-		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickSort({key: "Region", label: "Region", sortOrder: coreLibrary.SortOrder.None});
-		Then.onTheAppMDCTable.iShouldSeeNumberOfColumnMenuItems(0);
-		Then.onTheAppMDCTable.iShouldSeeTableSettingsButton();
-	});
-
-	opaTest('Open column menu of aggregated column (p13nMode = ["Column","Sort","Filter"])', function(Given, When, Then) {
-		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Sales Amount (local currency)");
-		Then.onTheAppMDCTable.iShouldSeeTheColumnMenu();
-		Then.onTheAppMDCTable.iShouldSeeNumberOfColumnMenuQuickActions(2);
-		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickSort({
-			key: "SalesAmountLocalCurrency",
-			label: "Sales Amount (local currency)",
-			sortOrder: coreLibrary.SortOrder.None
-		});
-		Then.onTheAppMDCTable.iShouldSeeNumberOfColumnMenuItems(0);
-		Then.onTheAppMDCTable.iShouldSeeTableSettingsButton();
-	});
-
-	opaTest('Open column menu with groupable property (p13nMode = ["Column","Sort","Filter","Group","Aggregate"])', function(Given, When, Then) {
-		When.onTheAppMDCTable.iSetP13nMode(sTableId, ["Column", "Sort", "Filter", "Group", "Aggregate"]);
+	opaTest('Open column menu of grouped column (p13nMode includes "Group")', function(Given, When, Then) {
 		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Region");
 		Then.onTheAppMDCTable.iShouldSeeTheColumnMenu();
 		Then.onTheAppMDCTable.iShouldSeeNumberOfColumnMenuQuickActions(3);
@@ -356,7 +333,7 @@ sap.ui.define([
 		Then.onTheAppMDCTable.iShouldSeeTableSettingsButton();
 	});
 
-	opaTest('Open column menu with aggregatable property (p13nMode = ["Column","Sort","Filter","Group","Aggregate"])', function(Given, When, Then) {
+	opaTest('Open column menu of aggregated column (p13nMode includes "Aggregate")', function(Given, When, Then) {
 		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Sales Amount (local currency)");
 		Then.onTheAppMDCTable.iShouldSeeTheColumnMenu();
 		Then.onTheAppMDCTable.iShouldSeeNumberOfColumnMenuQuickActions(3);
@@ -374,9 +351,87 @@ sap.ui.define([
 		Then.onTheAppMDCTable.iShouldSeeTableSettingsButton();
 	});
 
+	opaTest('Open column menu of grouped column (p13nMode without "Group")', function(Given, When, Then) {
+		When.onTheAppMDCTable.iSetP13nMode(sTableId, ["Column", "Sort", "Filter"]);
+		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Region");
+		Then.onTheAppMDCTable.iShouldSeeTheColumnMenu();
+		Then.onTheAppMDCTable.iShouldSeeNumberOfColumnMenuQuickActions(2);
+		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickSort({key: "Region", label: "Region", sortOrder: coreLibrary.SortOrder.None});
+		Then.onTheAppMDCTable.iShouldSeeNumberOfColumnMenuItems(0);
+		Then.onTheAppMDCTable.iShouldSeeTableSettingsButton();
+	});
+
+	opaTest('Open column menu of aggregated column (p13nMode without "Aggregate")', function(Given, When, Then) {
+		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Sales Amount (local currency)");
+		Then.onTheAppMDCTable.iShouldSeeTheColumnMenu();
+		Then.onTheAppMDCTable.iShouldSeeNumberOfColumnMenuQuickActions(2);
+		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickSort({
+			key: "SalesAmountLocalCurrency",
+			label: "Sales Amount (local currency)",
+			sortOrder: coreLibrary.SortOrder.None
+		});
+		Then.onTheAppMDCTable.iShouldSeeNumberOfColumnMenuItems(0);
+		Then.onTheAppMDCTable.iShouldSeeTableSettingsButton();
+	});
+
 	opaTest('Open P13nDialog via the column menu', function(Given, When, Then) {
+		When.onTheAppMDCTable.iSetP13nMode(sTableId, ["Column", "Sort", "Filter", "Group", "Aggregate"]);
 		When.onTheAppMDCTable.iPressTableSettingsButton();
 		Then.P13nAssertions.iShouldSeeTheP13nDialog();
 		Then.onTheAppMDCTable.iShouldNotSeeTheColumnMenu();
+	});
+
+	QUnit.module("Dynamic property label update");
+
+	opaTest("Group header row title updated after property label change", function(Given, When, Then) {
+		Then.onTheAppMDCTable.iCheckGroupHeaderRowTitle(sTableId, {
+			index: 0,
+			title: "Country: 1 - USA"
+		});
+		When.P13nActions.iApplyPropertyAttributeChanges(sTableId, {
+			Country_Code: {label: "New Country"}
+		});
+		Then.onTheAppMDCTable.iCheckGroupHeaderRowTitle(sTableId, {
+			index: 0,
+			title: "New Country: 1 - USA"
+		});
+	});
+
+	opaTest("Column menu shows updated label in quick sort and group", function(Given, When, Then) {
+		When.P13nActions.iApplyPropertyAttributeChanges(sTableId, {
+			Region: {label: "New Region"}
+		});
+		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Region");
+		Then.onTheAppMDCTable.iShouldSeeTheColumnMenu();
+		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickSort({
+			key: "Region",
+			label: "New Region",
+			sortOrder: coreLibrary.SortOrder.None
+		});
+		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickGroup({
+			key: "Region",
+			label: "New Region",
+			grouped: true
+		});
+		When.onTheAppMDCTable.iCloseTheColumnMenu();
+	});
+
+	opaTest("Column menu shows updated label in quick sort and total", function(Given, When, Then) {
+		When.P13nActions.iApplyPropertyAttributeChanges(sTableId, {
+			SalesAmountLocalCurrency: {label: "New Sales Amount"}
+		});
+		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Sales Amount (local currency)");
+		Then.onTheAppMDCTable.iShouldSeeTheColumnMenu();
+		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickSort({
+			key: "SalesAmountLocalCurrency",
+			label: "New Sales Amount",
+			sortOrder: coreLibrary.SortOrder.None
+		});
+		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickTotal({
+			key: "SalesAmountLocalCurrency",
+			label: "New Sales Amount",
+			totaled: true
+		});
+		When.onTheAppMDCTable.iCloseTheColumnMenu();
 	});
 });

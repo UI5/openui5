@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/ui/mdc/Table",
 	"sap/ui/mdc/table/Column",
 	"sap/ui/mdc/table/ColumnSettings",
+	"sap/ui/mdc/table/TableTypeBase",
 	"sap/ui/mdc/table/ResponsiveTableType",
 	"sap/ui/mdc/table/ResponsiveColumnSettings",
 	"sap/ui/mdc/table/RowSettings",
@@ -28,6 +29,7 @@ sap.ui.define([
 	Table,
 	Column,
 	ColumnSettingsBase,
+	TableTypeBase,
 	ResponsiveTableType,
 	ResponsiveColumnSettings,
 	RowSettings,
@@ -748,7 +750,8 @@ sap.ui.define([
 				return "High";
 			}
 		});
-		oType._onColumnInsert(oColumn);
+		sinon.stub(TableTypeBase.prototype, "insertColumn"); // Stub base to avoid inner table manipulation with mock column
+		oType.insertColumn(oColumn);
 		await nextUIUpdate();
 
 		assert.equal(oType._oShowDetailsButton.getSelectedKey(), "hideDetails", "Details are not shown");
@@ -759,7 +762,7 @@ sap.ui.define([
 				return "Low";
 			}
 		});
-		oType._onColumnInsert(oColumn);
+		oType.insertColumn(oColumn);
 		await nextUIUpdate();
 
 		assert.equal(oType._oShowDetailsButton.getSelectedKey(), "showDetails", "Details are shown");
@@ -770,12 +773,13 @@ sap.ui.define([
 				return "High";
 			}
 		});
-		oType._onColumnInsert(oColumn);
+		oType.insertColumn(oColumn);
 		await nextUIUpdate();
 
 		assert.equal(oType._oShowDetailsButton.getSelectedKey(), "showDetails", "Details are still shown");
 
 		oColumn.getInnerColumn.restore();
+		TableTypeBase.prototype.insertColumn.restore();
 	});
 
 	QUnit.test("Switch variant (emulation)", async function(assert) {
@@ -1355,5 +1359,192 @@ sap.ui.define([
 			event: oInnerTableEvent,
 			groupLevel: undefined
 		});
+	});
+
+	QUnit.module("Column insert and remove", {
+		beforeEach: async function() {
+			this.oTable = new Table({
+				delegate: {
+					name: sDelegatePath,
+					payload: {
+						collectionPath: "/testPath"
+					}
+				},
+				type: new ResponsiveTableType(),
+				columns: [
+					new Column({
+						header: "Test0",
+						template: new Text({
+							text: "template0"
+						})
+					}),
+					new Column({
+						header: "Test1",
+						template: new Text({
+							text: "template1"
+						})
+					})
+				],
+				models: new JSONModel({
+					testPath: new Array(10).fill({})
+				})
+			});
+
+			await TableQUnitUtils.waitForBinding(this.oTable);
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("Initial cell templates", function(assert) {
+		const aInnerColumns = this.oTable._oTable.getColumns();
+		const oRowTemplate = this.oTable._oRowTemplate;
+
+		assert.equal(aInnerColumns[0].getHeader().getText(), "Test0", "Inner column 0 header");
+		assert.equal(aInnerColumns[1].getHeader().getText(), "Test1", "Inner column 1 header");
+		assert.equal(oRowTemplate.getCells()[0].getText(), "template0", "Cell template 0");
+		assert.equal(oRowTemplate.getCells()[1].getText(), "template1", "Cell template 1");
+	});
+
+	QUnit.test("Insert column updates cell templates", function(assert) {
+		const oRowTemplate = this.oTable._oRowTemplate;
+
+		this.oTable.insertColumn(new Column({
+			header: "Test2",
+			template: new Text({
+				text: "template2"
+			})
+		}), 1);
+
+		const aInnerColumns = this.oTable._oTable.getColumns();
+
+		assert.equal(this.oTable.getColumns().length, aInnerColumns.length, "Column count matches");
+		assert.equal(aInnerColumns[0].getHeader().getText(), "Test0", "Inner column 0 header");
+		assert.equal(aInnerColumns[1].getHeader().getText(), "Test2", "Inner column 1 header (inserted)");
+		assert.equal(aInnerColumns[2].getHeader().getText(), "Test1", "Inner column 2 header");
+		assert.equal(oRowTemplate.getCells()[0].getText(), "template0", "Cell template 0");
+		assert.equal(oRowTemplate.getCells()[1].getText(), "template2", "Cell template 1 (inserted)");
+		assert.equal(oRowTemplate.getCells()[2].getText(), "template1", "Cell template 2");
+	});
+
+	QUnit.test("Remove column cleans up cell templates", async function(assert) {
+		const oRowTemplate = this.oTable._oRowTemplate;
+		const oColumn0 = this.oTable.getColumns()[0];
+		const oColumn1 = this.oTable.getColumns()[1];
+		const oInnerColumn1 = oColumn1.getInnerColumn();
+
+		this.oTable.removeColumn(oColumn0);
+		let aInnerColumns = this.oTable._oTable.getColumns();
+		assert.equal(this.oTable.getColumns().length, aInnerColumns.length, "Column count matches after first remove");
+		assert.equal(aInnerColumns[0].getHeader().getText(), "Test1", "Inner column 0 header");
+		assert.equal(oRowTemplate.getCells()[0].getText(), "template1", "Cell template 0");
+
+		this.oTable.removeColumn(oColumn1);
+		aInnerColumns = this.oTable._oTable.getColumns();
+		assert.equal(this.oTable.getColumns().length, aInnerColumns.length, "Column count matches after second remove");
+		assert.equal(aInnerColumns.length, 0, "No inner columns left");
+		assert.equal(oRowTemplate.getCells().length, 0, "No cell templates left");
+
+		await new Promise(function(resolve) { setTimeout(resolve, 0); });
+		assert.ok(oInnerColumn1.isDestroyed(), "Inner column destroyed after deferred disconnect");
+
+		oColumn0.destroy();
+		oColumn1.destroy();
+	});
+
+	QUnit.test("Column move (remove + insert)", async function(assert) {
+		const oTable = new Table({
+			type: new ResponsiveTableType()
+		});
+
+		oTable.addColumn(new Column({
+			header: "Test1",
+			template: new Text({text: "Test1"})
+		}));
+		oTable.addColumn(new Column({
+			header: "Test2",
+			template: new Text({text: "Test2"})
+		}));
+		oTable.addColumn(new Column({
+			header: "Test3",
+			template: new Text({text: "Test3"})
+		}));
+
+		oTable.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		await oTable.initialized();
+
+		const oTest3MDCColumn = oTable.getColumns()[2];
+		const oTest3InnerColumn = oTest3MDCColumn.getInnerColumn();
+		const oRowTemplate = oTable._oRowTemplate;
+
+		assert.strictEqual(oTable.indexOfColumn(oTest3MDCColumn), 2, "Column index is 2");
+		assert.strictEqual(oTest3InnerColumn.getOrder(), 2, "Inner column has the correct order");
+		assert.strictEqual(oRowTemplate.getCells()[2].getText(), "Test3", "Correct cell template found");
+
+		// move column - Test3 column is moved to index 0 (remove + insert as move)
+		oTable.removeColumn(oTest3MDCColumn);
+		oTable.insertColumn(oTest3MDCColumn, 0);
+		assert.strictEqual(oTable.indexOfColumn(oTest3MDCColumn), 0, "Test3 column is moved to index 0");
+		assert.strictEqual(oTable._oTable.indexOfColumn(oTest3InnerColumn), 0, "Inner table column aggregation also updated");
+		assert.strictEqual(oTest3InnerColumn.getOrder(), 0, "Test3 inner column is updated with the correct column order");
+		assert.strictEqual(oRowTemplate.getCells()[0].getText(), "Test3", "Cell template moved to index 0");
+
+		oTable.destroy();
+	});
+
+	QUnit.test("Insert column with grouped items", async function(assert) {
+		const oTable = new Table({
+			delegate: {
+				name: sDelegatePath,
+				payload: {
+					collectionPath: "/testPath",
+					propertyInfo: [{
+						key: "col0",
+						path: "col0",
+						label: "Column 0",
+						dataType: "String"
+					}, {
+						key: "col1",
+						path: "col1",
+						label: "Column 1",
+						dataType: "String"
+					}, {
+						key: "col2",
+						path: "col2",
+						label: "Column 2",
+						dataType: "String"
+					}]
+				}
+			},
+			type: new ResponsiveTableType(),
+			columns: [
+				new Column({header: "Col0", template: new Text({text: "{col0}"}), propertyKey: "col0"}),
+				new Column({header: "Col1", template: new Text({text: "{col1}"}), propertyKey: "col1"})
+			],
+			models: new JSONModel({
+				testPath: new Array(10).fill({col0: "a", col1: "b", col2: "c"})
+			})
+		});
+
+		await oTable._fullyInitialized();
+		oTable.setGroupConditions({groupLevels: [{name: "col0"}]});
+		await TableQUnitUtils.waitForBindingInfo(oTable);
+
+		const aItems = oTable._oTable.getItems();
+		assert.ok(aItems[0].isA("sap.m.GroupHeaderListItem"), "First item is a GroupHeaderListItem");
+
+		const oRowTemplate = oTable._oRowTemplate;
+		const iCellsBefore = oRowTemplate.getCells().length;
+
+		oTable.insertColumn(new Column({
+			header: "Col2", template: new Text({text: "template2"}), propertyKey: "col2"
+		}), 1);
+
+		assert.strictEqual(oRowTemplate.getCells().length, iCellsBefore + 1, "Cell added to row template");
+		assert.strictEqual(oRowTemplate.getCells()[1].getText(), "template2", "Inserted cell template is at the correct position");
+
+		oTable.destroy();
 	});
 });

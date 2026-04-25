@@ -31,6 +31,7 @@ sap.ui.define([
 		let bExpanded = false;
 		let bExpandable = false;
 		let iLevel = 0;
+		let bSelectable = true;
 
 		Object.defineProperties(this, {
 			/** @type sap.ui.model.Context */
@@ -93,6 +94,13 @@ sap.ui.define([
 					iLevel = (typeof _iLevel === "number" ? Math.max(1, _iLevel || 1) : 1);
 				}
 			},
+			/** @type boolean */
+			selectable: {
+				get: function() { return this.empty ? false : bSelectable; },
+				set: function(_bSelectable) {
+					bSelectable = _bSelectable !== false;
+				}
+			},
 			/** @type Function */
 			reset: {
 				value: function() {
@@ -103,6 +111,7 @@ sap.ui.define([
 					bExpandable = false;
 					bExpanded = false;
 					iLevel = 1;
+					bSelectable = true;
 				}
 			}
 		});
@@ -336,12 +345,19 @@ sap.ui.define([
 	 */
 	Row.prototype._updateSelection = function() {
 		const oTable = this.getTable();
-		const bSelected = this._isSelected();
+		const bSelectable = this.isSelectable();
+		const bSelected = bSelectable && this._isSelected();
 
 		if (bSelected) {
 			this.addStyleClass("sapUiTableRowSel");
 		} else {
 			this.removeStyleClass("sapUiTableRowSel");
+		}
+
+		if (bSelectable && !this.isContentHidden() && !this.isGroupHeader() && !this.isSummary()) {
+			this.addStyleClass("sapUiTableRowSelectable");
+		} else {
+			this.removeStyleClass("sapUiTableRowSelectable");
 		}
 
 		oTable._getAccExtension().updateSelectionStateOfRow(this);
@@ -435,6 +451,16 @@ sap.ui.define([
 	 */
 	Row.prototype.isEmpty = function() {
 		return state(this).empty;
+	};
+
+	/**
+	 * Whether the row is selectable.
+	 *
+	 * @returns {boolean} Whether the row is selectable.
+	 * @private
+	 */
+	Row.prototype.isSelectable = function() {
+		return state(this).selectable;
 	};
 
 	/**

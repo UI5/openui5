@@ -35,6 +35,10 @@ sap.ui.define([
 	};
 
 	oCustomDelegate.addItem = function(oTable, sPropertyInfoName, mPropertyBag) {
+		if (oTable.isA) {
+			return TableDelegate.addItem.apply(this, arguments);
+		}
+
 		const oModifier = mPropertyBag.modifier;
 		const sId = mPropertyBag.id + "--" + sPropertyInfoName;
 
@@ -50,23 +54,19 @@ sap.ui.define([
 		const sLabel = aFoundValue && aFoundValue.length > 0 ? aFoundValue[0].label : sPropertyInfoName;
 		let oTemplate;
 
-		if (oTable.isA === undefined) {
-			return oModifier.createControl("sap.m.Text", mPropertyBag.appComponent, mPropertyBag.view, sId + "--text--" + sPropertyInfoName,{
-				text: "{" + sPropertyInfoName + "}"
-			}).then(function(oCreatedTemplate){
-				oTemplate = oCreatedTemplate;
-				return oModifier.createControl("sap.ui.mdc.table.Column", mPropertyBag.appComponent, mPropertyBag.view, sId, {
-					propertyKey: sPropertyInfoName,
-					width: "150px",
-					header: sLabel
-				});
-			}).then(function(oColumn) {
-				oColumn.appendChild(oTemplate);
-				return oColumn;
+		return oModifier.createControl("sap.m.Text", mPropertyBag.appComponent, mPropertyBag.view, sId + "--text--" + sPropertyInfoName,{
+			text: "{" + sPropertyInfoName + "}"
+		}).then(function(oCreatedTemplate){
+			oTemplate = oCreatedTemplate;
+			return oModifier.createControl("sap.ui.mdc.table.Column", mPropertyBag.appComponent, mPropertyBag.view, sId, {
+				propertyKey: sPropertyInfoName,
+				width: "150px",
+				header: sLabel
 			});
-		} else {
-			return TableDelegate.addItem.apply(this, arguments);
-		}
+		}).then(function(oColumn) {
+			oColumn.appendChild(oTemplate);
+			return oColumn;
+		});
 	};
 
 	return oCustomDelegate;

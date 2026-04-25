@@ -1,0 +1,27 @@
+<m:VBox
+	xmlns:mdc="sap.ui.mdc"
+	xmlns:fl="sap.ui.fl.variants"
+	xmlns:m="sap.m"
+	class="sapUiSizeCompact">
+
+	<m:OverflowToolbar id="idToolbar" class="sapUiSmallMargin">
+		<fl:VariantManagement id="IDVariantManagementOfInternalSampleApp_01" for="IDContainerForVariantManagement"/>
+		<m:ToolbarSpacer id="idTbs"/>
+	</m:OverflowToolbar>
+
+	<m:VBox class="sapUiSmallMargin" id="IDContainerForVariantManagement">
+		<mdc:FilterBar id="IDFilterBar"
+			delegate='\{"name": "AppUnderTestTable/view/DynamicPropertiesFilterBarDelegate", "payload": \{"collectionName": "Artists"\}\}'
+			liveMode="false"
+			propertyKeys="name,foundingYear"
+			p13nMode="Item,Value"/>
+
+		<mdc:Table id="IDTableOfInternalSampleApp_01"
+				   delegate='\{"name": "AppUnderTestTable/view/DynamicPropertiesTableDelegate", "payload": \{"collectionName": "Artists"\}\}'
+				   selectionMode="Multi"
+				   filter="IDFilterBar"
+				   type="Table"
+				   propertyKeys="name,foundingYear,modifiedBy,createdAt"
+				   p13nMode="Column,Sort,Filter,Group"/>
+	</m:VBox>
+</m:VBox>

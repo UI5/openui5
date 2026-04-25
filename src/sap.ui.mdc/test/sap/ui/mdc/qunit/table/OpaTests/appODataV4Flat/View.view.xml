@@ -9,11 +9,12 @@
     xmlns:template="http://schemas.sap.com/sapui5/extension/sap.ui.core.template/1">
     <App>
         <Page showHeader="false">
+            <Button text="Start RTA" press=".onPressRTA"/>
             <mdc:Table
                 id="mdcTable"
                 header="Products"
                 delegate="{
-                    name: 'sap/ui/mdc/table/OpaTests/appODataV4Flat/TableDelegate', 
+                    name: 'sap/ui/mdc/table/OpaTests/appODataV4Flat/TableDelegate',
                     payload: {collectionName: 'ProductList'}
                 }"
                 p13nMode="Column,Sort,Filter{= !${data>/tableType} || ${data>/tableType} === 'GridTableType' ? '' : ',Group'}"
@@ -22,6 +23,7 @@
                 beforeExport=".onBeforeExport"
                 selectionMode="Multi"
                 enableAutoColumnWidth="true"
+                propertyKeys="CreatedAt,ProductID,Category,Name,SupplierName,Price,WeightMeasure,Width,Depth,Height"
                 propertyInfo='[\{
                     "key": "Name",
                     "path": "Name",
@@ -58,68 +60,6 @@
                         </template:elseif>
                     </template:if>
                 </mdc:type>
-                <mdc:columns>
-                    <mdcTable:Column id="mdcTable-CreatedAt" header="Created At" tooltip="Created At" propertyKey="CreatedAt">
-                        <Text text="{CreatedAt}" />
-                        <mdcTable:extendedSettings>
-                            <mdcTable:ResponsiveColumnSettings importance="Low"/>
-                        </mdcTable:extendedSettings>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-ProductID" header="Product ID" tooltip="Product ID" propertyKey="ProductID">
-                        <ObjectIdentifier title="{ProductID}" />
-                        <mdcTable:extendedSettings>
-                            <mdcTable:ResponsiveColumnSettings importance="High"/>
-                        </mdcTable:extendedSettings>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-Category" header="Category" propertyKey="Category">
-                        <Text text="{Category}" />
-                        <mdcTable:extendedSettings>
-                            <mdcTable:ResponsiveColumnSettings importance="Low"/>
-                        </mdcTable:extendedSettings>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-Name" header="Product Name" propertyKey="Name">
-                        <Text text="{Name}" />
-                        <mdcTable:extendedSettings>
-                            <mdcTable:ResponsiveColumnSettings importance="Low"/>
-                        </mdcTable:extendedSettings>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-SupplierName" header="Supplier" propertyKey="SupplierName">
-                        <Text text="{SupplierName}" />
-                        <mdcTable:extendedSettings>
-                            <mdcTable:ResponsiveColumnSettings importance="Medium"/>
-                        </mdcTable:extendedSettings>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-Price" header="Unit Price of the Product" propertyKey="Price" hAlign="Right">
-                        <u:Currency xmlns:u="sap.ui.unified" value="{Price}" currency="{CurrencyCode}" useSymbol="false" />
-                        <mdcTable:extendedSettings>
-                            <mdcTable:ResponsiveColumnSettings importance="High"/>
-                        </mdcTable:extendedSettings>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-WeightMeasure" header="Weight" propertyKey="WeightMeasure" hAlign="End">
-                        <ObjectNumber number="{WeightMeasure}" emphasized="false" textAlign="End" unit="{WeightUnit}" />
-                        <mdcTable:extendedSettings>
-                            <mdcTable:ResponsiveColumnSettings importance="Low"/>
-                        </mdcTable:extendedSettings>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-Width" header="Width" propertyKey="Width" hAlign="End">
-                        <ObjectNumber number="{Width}" emphasized="false" textAlign="End" unit="{DimUnit}" />
-                        <mdcTable:extendedSettings>
-                            <mdcTable:ResponsiveColumnSettings importance="Low"/>
-                        </mdcTable:extendedSettings>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-Depth" header="Depth" propertyKey="Depth" hAlign="End">
-                        <ObjectNumber number="{Depth}" emphasized="false" textAlign="End" unit="{DimUnit}" />
-                        <mdcTable:extendedSettings>
-                            <mdcTable:ResponsiveColumnSettings importance="Low"/>
-                        </mdcTable:extendedSettings>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-Height" header="Height" propertyKey="Height" hAlign="End">
-                        <ObjectNumber number="{Height}" emphasized="false" textAlign="End" unit="{DimUnit}" />
-                        <mdcTable:extendedSettings>
-                            <mdcTable:ResponsiveColumnSettings importance="Low"/>
-                        </mdcTable:extendedSettings>
-                    </mdcTable:Column>
-                </mdc:columns>
                 <mdc:dataStateIndicator>
                     <plugins:DataStateIndicator enableFiltering="true" />
                 </mdc:dataStateIndicator>

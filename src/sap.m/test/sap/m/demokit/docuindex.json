@@ -1497,6 +1497,15 @@
 				]
 			},
 			{
+				"id": "sap.m.table.Title",
+				"name": "Table Title",
+				"category": "Display",
+				"since": "1.147",
+				"samples": [
+					"sap.m.sample.TableMultiSelectMode"
+				]
+			},
+			{
 				"id": "sap.m.Text",
 				"name": "Text",
 				"category": "Display",

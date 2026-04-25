@@ -346,9 +346,7 @@ sap.ui.define([
 			this._createInnerLayout();
 
 			this.getEngine().register(this, {
-				controller: {
-					Filter: new FilterController({ control: this })
-				}
+				controller: this.getEngineControllers()
 			});
 
 			this._fResolveInitialFiltersApplied = undefined;
@@ -361,6 +359,17 @@ sap.ui.define([
 			this._bSearchTriggered = false;
 			this._bIgnoreQueuing = false; // used to overrule the default behaviour of suspendSelection
 			this._mEnhancedFilterFields = new WeakMap();
+		};
+
+		/**
+		 * Returns the map of engine controller instances for registration.
+		 *
+		 * @returns {Object<string, sap.ui.mdc.p13n.subcontroller.Controller>} Map of controller key to controller instance
+		 */
+		FilterBarBase.prototype.getEngineControllers = function() {
+			return {
+				Filter: new FilterController({control: this})
+			};
 		};
 
 		/**
@@ -447,18 +456,20 @@ sap.ui.define([
 				this._validatePropertyInfos(mSettings.propertyInfo, mSettings.filterItems);
 			}
 			this._applySettings(mSettings, oScope);
-			Promise.all([this.awaitPropertyHelper()]).then(() => {
+			Promise.all([this.awaitPropertyHelper()]).then(async () => {
 				if (!this._bIsBeingDestroyed) {
-					this._applyInitialFilterConditions().then(() => {
-						this.getFilterItems().forEach((oFilterField) => {
-							this._enhanceFilterField(oFilterField);
-						});
-
-						const oBasicSearchField = this.getBasicSearchField();
-						if (oBasicSearchField) {
-							this._enhanceBasicSearchField(oBasicSearchField);
-						}
+					if (this.isInPropertyKeysMode?.()) {
+						await this.initializeItemsFromPropertyKeys();
+					}
+					await this._applyInitialFilterConditions();
+					this.getFilterItems().forEach((oFilterField) => {
+						this._enhanceFilterField(oFilterField);
 					});
+
+					const oBasicSearchField = this.getBasicSearchField();
+					if (oBasicSearchField) {
+						this._enhanceBasicSearchField(oBasicSearchField);
+					}
 				}
 			});
 		};
@@ -1588,6 +1599,12 @@ sap.ui.define([
 		 * @private
 		 */
 		FilterBarBase.prototype._onModifications = function(aAffectedControllers) {
+			if (this.isInPropertyKeysMode?.() && aAffectedControllers?.indexOf("PropertyInfo") >= 0) {
+				this.getFilterItems().forEach((oFilterField) => {
+					this._updateFilterField(oFilterField);
+				});
+			}
+
 			if (aAffectedControllers && aAffectedControllers.indexOf("Filter") === -1) {
 				// optimized executions in case nothing needs to be done
 				// --> no filter changes have been done
@@ -1949,6 +1966,29 @@ sap.ui.define([
 
 				oFilterField.triggerCheckCreateInternalContent();
 			}
+
+			return oFilterField;
+		};
+
+		FilterBarBase.prototype._updateFilterField = function(oFilterField) {
+			const sPropertyKey = oFilterField.getPropertyKey();
+
+			const oFilterFieldPropertyInfo = this._getPropertyByName(sPropertyKey, true);
+
+			if (!oFilterFieldPropertyInfo.isActive) {
+				return oFilterField; // only for dynamic properties
+			}
+
+			if (!oFilterFieldPropertyInfo) {
+				if (!this.isA("sap.ui.mdc.valuehelp.FilterBar") && this._bHasMetadataPropertiesOnFilterFields && sPropertyKey !== "$search") { // vh.FB does not support 'propertyInfo'...
+					Log.warning("Property '" + sPropertyKey + "' does not exist for filter field with the id = '" + oFilterField.getId() + "' on filter bar='" + this.getId() + "'");
+				}
+
+				return oFilterField;
+			}
+
+			PropertyInfoValidator.updateControlFromPropertyInfo(oFilterField, oFilterFieldPropertyInfo);
+			// no display, no valueHelp, no additionalDataType, no tooltip, no operators, no defaultOperator, no caseSensitive
 
 			return oFilterField;
 		};

@@ -33,9 +33,9 @@ sap.ui.define([
 	QUnit.module("Fixed Column Count");
 
 	opaTest("The column freeze quick action is shown in the column menu", function(Given, When, Then) {
-		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Created At");
+		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Range of Creation Date");
 		Then.onTheAppMDCTable.iShouldSeeTheColumnMenu();
-		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickAction("Freeze");
+		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickFreeze();
 	});
 
 	opaTest("Set the fixed column count and save it to a variant", function(Given, When, Then) {
@@ -53,9 +53,9 @@ sap.ui.define([
 	});
 
 	opaTest("Reset the fixed column count", function(Given, When, Then) {
-		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Created At");
+		When.onTheAppMDCTable.iPressOnColumnHeader(sTableId, "Range of Creation Date");
 		Then.onTheAppMDCTable.iShouldSeeTheColumnMenu();
-		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickAction("Freeze");
+		Then.onTheAppMDCTable.iShouldSeeColumnMenuQuickFreeze();
 		When.onTheAppMDCTable.iUseColumnMenuQuickFreeze();
 		Then.onTheAppMDCTable.iCheckFixedColumnCount(sTableId, 0);
 	});

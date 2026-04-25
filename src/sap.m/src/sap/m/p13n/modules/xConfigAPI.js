@@ -16,6 +16,36 @@ sap.ui.define([
 	const xConfigAPI = {};
 
 	/**
+	 * Returns the config for a given aggregation or virtual aggregation name.
+	 */
+	function _getConfigSection(oConfig, sAggregationName, oControlMetadata) {
+		if (oControlMetadata.hasAggregation(sAggregationName)) {
+			return oConfig?.aggregations?.[sAggregationName];
+		}
+		return oConfig?.[sAggregationName];
+	}
+
+	/**
+	 * Returns the config parent for a given aggregation or virtual aggregation name,
+	 * creating missing intermediate objects along the way.
+	 */
+	function _getOrCreateConfig(oConfig, sAggregationName, oControlMetadata) {
+		if (oControlMetadata.hasAggregation(sAggregationName)) {
+			if (!oConfig.hasOwnProperty("aggregations")) {
+				oConfig.aggregations = {};
+			}
+			if (!oConfig.aggregations.hasOwnProperty(sAggregationName)) {
+				oConfig.aggregations[sAggregationName] = {};
+			}
+			return oConfig.aggregations;
+		}
+		if (!oConfig.hasOwnProperty(sAggregationName)) {
+			oConfig[sAggregationName] = {};
+		}
+		return oConfig;
+	}
+
+	/**
 	 * Enhances the xConfig object for a given mdc control instance.
 	 *
 	 * @param {sap.ui.core.Element} oControl The according element which should be checked
@@ -110,12 +140,14 @@ sap.ui.define([
 		if (!oModificationPayload.propertyBag || !changeType || changeType.indexOf("Item") === -1) {
 			return;
 		}
+		const oControlMetadata = oModificationPayload.controlMetadata || oControl.getMetadata();
 		const { modifier, appComponent } = oModificationPayload.propertyBag;
 		const aTargetAggregationItems = await modifier.getAggregation(oControl, sAggregationName);
 		const aAggregationItems = aTargetAggregationItems || [];
 		const aCurrentState = [];
-		if (oConfig?.aggregations?.[sAggregationName] !== undefined && Object.keys(oConfig.aggregations[sAggregationName]).length > 0) {
-			Object.entries(oConfig.aggregations[sAggregationName]).forEach(([sKey, oItem]) => {
+		const oAggregationData = _getConfigSection(oConfig, sAggregationName, oControlMetadata);
+		if (oAggregationData !== undefined && Object.keys(oAggregationData).length > 0) {
+			Object.entries(oAggregationData).forEach(([sKey, oItem]) => {
 				if (oItem.visible !== false) {
 					aCurrentState.push({ key: sKey, position: oItem.position });
 				}
@@ -286,9 +318,10 @@ sap.ui.define([
 			operationActions[operation](key, newIndex, persistenceIdentifier);
 		}
 
+		const oAggregationData = _getConfigSection(oConfig, sAggregationName, oControlMetadata);
 		updatedState.forEach((item, index) => {
 			//find the xConfig item with the same key as item.key
-			const xConfigItem = oConfig.aggregations[sAggregationName]?.[item.key];
+			const xConfigItem = oAggregationData?.[item.key];
 			if (xConfigItem) {
 				xConfigItem.position = index;
 			} else {
@@ -296,7 +329,7 @@ sap.ui.define([
 				const currentItemIndex = currentState?.findIndex((currentItem) => currentItem.key === item.key);
 
 				if (currentItemIndex !== index) {
-					oConfig.aggregations[sAggregationName][item.key] = {
+					oAggregationData[item.key] = {
 						position: index
 					};
 				}
@@ -311,20 +344,13 @@ sap.ui.define([
 		const sAggregationName = sAffectedAggregation ? sAffectedAggregation : oControlMetadata.getDefaultAggregation().name;
 		const oConfig = oExistingConfig || {};
 
-		if (!oConfig.hasOwnProperty("aggregations")) {
-			oConfig.aggregations = {};
-		}
+		const oSection = _getOrCreateConfig(oConfig, sAggregationName, oControlMetadata);
 
-		if (!oConfig.aggregations.hasOwnProperty(sAggregationName)) {
-			if (oControlMetadata.hasAggregation(sAggregationName)) {
-				oConfig.aggregations[sAggregationName] = {};
-				const currentState = await xConfigAPI.getCurrentItemState(oControl, oModificationPayload, oConfig, sAggregationName);
-				currentState?.forEach((oItem) => {
-					oConfig.aggregations[sAggregationName][oItem.key] = { position: oItem.position };
-				});
-			} else {
-				throw new Error("The aggregation " + sAggregationName + " does not exist for" + oControl);
-			}
+		if (Object.keys(oSection[sAggregationName]).length === 0) {
+			const currentState = await xConfigAPI.getCurrentItemState(oControl, oModificationPayload, oConfig, sAggregationName);
+			currentState?.forEach((oItem) => {
+				oSection[sAggregationName][oItem.key] = { position: oItem.position };
+			});
 		}
 
 		oModificationPayload.currentState = oModificationPayload.currentState || await xConfigAPI.getCurrentItemState(oControl, oModificationPayload, oConfig, sAggregationName);
@@ -357,28 +383,18 @@ sap.ui.define([
 		const sAggregationName = sAffectedAggregation ? sAffectedAggregation : oControlMetadata.getDefaultAggregation().name;
 		const oConfig = oExistingConfig || {};
 
-		if (!oConfig.hasOwnProperty("aggregations")) {
-			oConfig.aggregations = {};
-		}
+		const oSection = _getOrCreateConfig(oConfig, sAggregationName, oControlMetadata);
 
-		if (!oConfig.aggregations.hasOwnProperty(sAggregationName)) {
-			if (oControlMetadata.hasAggregation(sAggregationName)) {
-				oConfig.aggregations[sAggregationName] = {};
-			} else {
-				throw new Error("The aggregation " + sAggregationName + " does not exist for" + oControl);
-			}
-		}
-
-		if (!oConfig.aggregations[sAggregationName].hasOwnProperty(sPropertyInfoKey)) {
-			oConfig.aggregations[sAggregationName][sPropertyInfoKey] = {};
+		if (!oSection[sAggregationName].hasOwnProperty(sPropertyInfoKey)) {
+			oSection[sAggregationName][sPropertyInfoKey] = {};
 		}
 
 		if (vValue !== null || (vValue && vValue.hasOwnProperty("value") && vValue.value !== null)) {
 			switch (oModificationPayload.operation) {
 				case "move":
-					oConfig.aggregations[sAggregationName][sPropertyInfoKey][sAffectedProperty] = vValue.index;
+					oSection[sAggregationName][sPropertyInfoKey][sAffectedProperty] = vValue.index;
 					if (vValue.persistenceIdentifier) {
-						oConfig.aggregations[sAggregationName][sPropertyInfoKey]["persistenceIdentifier"] = vValue.persistenceIdentifier;
+						oSection[sAggregationName][sPropertyInfoKey]["persistenceIdentifier"] = vValue.persistenceIdentifier;
 					}
 					updateIndex(oControl, oConfig, oModificationPayload);
 					break;
@@ -387,30 +403,30 @@ sap.ui.define([
 				default:
 					//Note: consider aligning xConfig value handling between sap.m and sap.ui.mdc
 					if (vValue.hasOwnProperty("value")) {
-						oConfig.aggregations[sAggregationName][sPropertyInfoKey][sAffectedProperty] = vValue.value;
+						oSection[sAggregationName][sPropertyInfoKey][sAffectedProperty] = vValue.value;
 						if (vValue.index !== undefined) {
-							oConfig.aggregations[sAggregationName][sPropertyInfoKey]["position"] = vValue.index;
+							oSection[sAggregationName][sPropertyInfoKey]["position"] = vValue.index;
 						}
 						if (vValue.persistenceIdentifier) {
-							oConfig.aggregations[sAggregationName][sPropertyInfoKey]["persistenceIdentifier"] = vValue.persistenceIdentifier;
+							oSection[sAggregationName][sPropertyInfoKey]["persistenceIdentifier"] = vValue.persistenceIdentifier;
 						}
 					} else {
-						oConfig.aggregations[sAggregationName][sPropertyInfoKey][sAffectedProperty] = vValue;
+						oSection[sAggregationName][sPropertyInfoKey][sAffectedProperty] = vValue;
 					}
 					updateIndex(oControl, oConfig, oModificationPayload);
 					break;
 			}
 
 		} else {
-			delete oConfig.aggregations[sAggregationName][sPropertyInfoKey][sAffectedProperty];
+			delete oSection[sAggregationName][sPropertyInfoKey][sAffectedProperty];
 
 			//Delete empty property name object
-			if (Object.keys(oConfig.aggregations[sAggregationName][sPropertyInfoKey]).length === 0) {
-				delete oConfig.aggregations[sAggregationName][sPropertyInfoKey];
+			if (Object.keys(oSection[sAggregationName][sPropertyInfoKey]).length === 0) {
+				delete oSection[sAggregationName][sPropertyInfoKey];
 
 				//Delete empty aggregation name object
-				if (Object.keys(oConfig.aggregations[sAggregationName]).length === 0) {
-					delete oConfig.aggregations[sAggregationName];
+				if (Object.keys(oSection[sAggregationName]).length === 0) {
+					delete oSection[sAggregationName];
 				}
 			}
 		}

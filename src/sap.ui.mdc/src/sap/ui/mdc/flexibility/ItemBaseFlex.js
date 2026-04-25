@@ -3,10 +3,11 @@
  */
 sap.ui.define([
 	"sap/ui/mdc/flexibility/Util",
+	"sap/ui/mdc/util/DynamicPropertiesUtil",
 	"sap/ui/fl/changeHandler/Base",
 	"sap/ui/fl/changeHandler/condenser/Classification",
 	"sap/ui/fl/changeHandler/common/ChangeCategories"
-], (Util, FLChangeHandlerBase, CondenserClassification, ChangeCategories) => {
+], (Util, DynamicPropertiesUtil, FLChangeHandlerBase, CondenserClassification, ChangeCategories) => {
 	"use strict";
 
 	const ItemBaseFlex = {
@@ -139,7 +140,102 @@ sap.ui.define([
 			return bAdd ? "add" : "remove";
 		},
 
-		_applyAdd: function(oChange, oControl, mPropertyBag, sChangeReason) {
+		/**
+		 * In property keys mode, only update the propertyKeys property. The control syncs
+		 * the aggregation from propertyKeys after all changes in a batch are applied.
+		 */
+		_applyAddToPropertyKeys: async function(oChange, oControl, mPropertyBag, sChangeReason) {
+			const bIsRevert = (sChangeReason === Util.REVERT);
+			const oChangeContent = bIsRevert ? oChange.getRevertData() : oChange.getContent();
+
+			this.beforeApply(oChange.getChangeType(), oControl, bIsRevert);
+
+			const aPropertyKeys = await DynamicPropertiesUtil.getPropertyKeys(oControl, mPropertyBag);
+			if (aPropertyKeys.includes(oChangeContent.name)) {
+				return FLChangeHandlerBase.markAsNotApplicable(
+					"The specified change is already existing - change appliance ignored", true
+				);
+			}
+
+			aPropertyKeys.splice(oChangeContent.index, 0, oChangeContent.name);
+			await DynamicPropertiesUtil.setPropertyKeys(oControl, aPropertyKeys, mPropertyBag);
+
+			if (bIsRevert) {
+				oChange.resetRevertData();
+			} else {
+				oChange.setRevertData({
+					name: oChangeContent.name,
+					index: oChangeContent.index
+				});
+			}
+
+			return this.afterApply(oChange.getChangeType(), oControl, bIsRevert);
+		},
+
+		_applyRemoveToPropertyKeys: async function(oChange, oControl, mPropertyBag, sChangeReason) {
+			const bIsRevert = (sChangeReason === Util.REVERT);
+			const oChangeContent = bIsRevert ? oChange.getRevertData() : oChange.getContent();
+
+			this.beforeApply(oChange.getChangeType(), oControl, bIsRevert);
+
+			const aPropertyKeys = await DynamicPropertiesUtil.getPropertyKeys(oControl, mPropertyBag);
+			const iIndex = aPropertyKeys.indexOf(oChangeContent.name);
+			if (iIndex < 0) {
+				return FLChangeHandlerBase.markAsNotApplicable(
+					"The specified change is already existing - change appliance ignored", true
+				);
+			}
+
+			aPropertyKeys.splice(iIndex, 1);
+			await DynamicPropertiesUtil.setPropertyKeys(oControl, aPropertyKeys, mPropertyBag);
+
+			if (bIsRevert) {
+				oChange.resetRevertData();
+			} else {
+				oChange.setRevertData({
+					name: oChangeContent.name,
+					index: iIndex
+				});
+			}
+
+			return this.afterApply(oChange.getChangeType(), oControl, bIsRevert);
+		},
+
+		_applyMoveToPropertyKeys: async function(oChange, oControl, mPropertyBag, sChangeReason) {
+			const bIsRevert = (sChangeReason === Util.REVERT);
+			const oChangeContent = bIsRevert ? oChange.getRevertData() : oChange.getContent();
+
+			this.beforeApply(oChange.getChangeType(), oControl, bIsRevert);
+
+			const aPropertyKeys = await DynamicPropertiesUtil.getPropertyKeys(oControl, mPropertyBag);
+			const iOldIndex = aPropertyKeys.indexOf(oChangeContent.name);
+			if (iOldIndex < 0) {
+				return FLChangeHandlerBase.markAsNotApplicable(
+					"The specified change is already existing - change appliance ignored", true
+				);
+			}
+
+			aPropertyKeys.splice(iOldIndex, 1);
+			aPropertyKeys.splice(oChangeContent.index, 0, oChangeContent.name);
+			await DynamicPropertiesUtil.setPropertyKeys(oControl, aPropertyKeys, mPropertyBag);
+
+			if (bIsRevert) {
+				oChange.resetRevertData();
+			} else {
+				oChange.setRevertData({
+					name: oChangeContent.name,
+					index: iOldIndex
+				});
+			}
+
+			return this.afterApply(oChange.getChangeType(), oControl, bIsRevert);
+		},
+
+		_applyAdd: async function(oChange, oControl, mPropertyBag, sChangeReason) {
+			if (await DynamicPropertiesUtil.isInPropertyKeysMode(oControl, mPropertyBag)) {
+				return this._applyAddToPropertyKeys(oChange, oControl, mPropertyBag, sChangeReason);
+			}
+
 			const bIsRevert = (sChangeReason === Util.REVERT);
 			this.beforeApply(oChange.getChangeType(), oControl, bIsRevert);
 			const oModifier = mPropertyBag.modifier,
@@ -222,7 +318,11 @@ sap.ui.define([
 
 		},
 
-		_applyRemove: function(oChange, oControl, mPropertyBag, sChangeReason) {
+		_applyRemove: async function(oChange, oControl, mPropertyBag, sChangeReason) {
+			if (await DynamicPropertiesUtil.isInPropertyKeysMode(oControl, mPropertyBag)) {
+				return this._applyRemoveToPropertyKeys(oChange, oControl, mPropertyBag, sChangeReason);
+			}
+
 			const bIsRevert = (sChangeReason === Util.REVERT);
 			this.beforeApply(oChange.getChangeType(), oControl, bIsRevert);
 
@@ -298,7 +398,11 @@ sap.ui.define([
 
 		},
 
-		_applyMove: function(oChange, oControl, mPropertyBag, sChangeReason) {
+		_applyMove: async function(oChange, oControl, mPropertyBag, sChangeReason) {
+			if (await DynamicPropertiesUtil.isInPropertyKeysMode(oControl, mPropertyBag)) {
+				return this._applyMoveToPropertyKeys(oChange, oControl, mPropertyBag, sChangeReason);
+			}
+
 			let sControlAggregationItemId;
 			const bIsRevert = (sChangeReason === Util.REVERT);
 			this.beforeApply(oChange.getChangeType(), oControl, bIsRevert);
@@ -338,15 +442,10 @@ sap.ui.define([
 				// 3) Trigger the move (remove&insert)
 				.then((iRetrievedIndex) => {
 					iOldIndex = iRetrievedIndex;
-					if (oControl.moveColumn) {
-						// Call optimized JS API for runtime changes
-						return oControl.moveColumn(oControlAggregationItem, oChangeContent.index);
-					} else {
-						return oModifier.removeAggregation(oControl, oAggregation.name, oControlAggregationItem)
-							.then(() => {
-								return oModifier.insertAggregation(oControl, oAggregation.name, oControlAggregationItem, oChangeContent.index);
-							});
-					}
+					return oModifier.removeAggregation(oControl, oAggregation.name, oControlAggregationItem)
+						.then(() => {
+							return oModifier.insertAggregation(oControl, oAggregation.name, oControlAggregationItem, oChangeContent.index);
+						});
 				})
 
 				// 4) Prepare the revert data
@@ -373,6 +472,34 @@ sap.ui.define([
 			oChange.setContent(oContent);
 		},
 
+		/**
+		 * Resolves the item ID for condenser info. In property keys mode, revert data may not
+		 * contain an item ID (changes don't touch the aggregation). Falls back to finding the
+		 * item by property key in the aggregation.
+		 */
+		_resolveAffectedControl: function(oChange, mSettings, oControl, oAggregation) {
+			if (mSettings?.getAffectedControl) {
+				return mSettings.getAffectedControl(oChange);
+			}
+
+			const sItemId = oChange.getRevertData()?.item;
+			if (sItemId) {
+				return { idIsLocal: false, id: sItemId };
+			}
+
+			// Property keys mode fallback: find item by property key in the (now synced) aggregation
+			const sPropertyKey = oChange.getContent().name;
+			const aItems = oControl[oControl.getMetadata().getAggregation(oAggregation.name)._sGetter]?.() || [];
+			for (const oItem of aItems) {
+				const sKey = oItem.getPropertyKey ? oItem.getPropertyKey() : undefined;
+				if (sKey === sPropertyKey) {
+					return { idIsLocal: false, id: oItem.getId() };
+				}
+			}
+
+			return { idIsLocal: false, id: sPropertyKey };
+		},
+
 		/******************************* Public methods *************************************/
 
 		createAddChangeHandler: function(mSettings) {
@@ -381,18 +508,23 @@ sap.ui.define([
 				revert: this._applyRemove.bind(this),
 				getCondenserInfo: function(oChange, mPropertyBag) {
 					const oControl = mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent);
+					const bPropertyKeysMode = oControl.isInPropertyKeysMode?.();
 					return this.determineAggregation(mPropertyBag.modifier, oControl)
 						.then((oAggregation) => {
 							return {
-								affectedControl: mSettings?.getAffectedControl?.(oChange) || { idIsLocal: false, id: oChange.getRevertData().item },
+								affectedControl: this._resolveAffectedControl(oChange, mSettings, oControl, oAggregation),
 								targetContainer: oChange.getSelector(),
 								targetAggregation: oAggregation.name,
 								classification: CondenserClassification.Create,
 								setTargetIndex: function(oChange, iNewTargetIndex) {
-									oChange.getContent().index = iNewTargetIndex;
+									oChange.getContent().index = bPropertyKeysMode
+										? DynamicPropertiesUtil.translateAggregationToPropertyKeysIndex(oControl, iNewTargetIndex)
+										: iNewTargetIndex;
 								},
 								getTargetIndex: function(oChange) {
-									return oChange.getContent().index;
+									return bPropertyKeysMode
+										? DynamicPropertiesUtil.translatePropertyKeysToAggregationIndex(oControl, oChange.getContent().index)
+										: oChange.getContent().index;
 								}
 							};
 						});
@@ -408,17 +540,22 @@ sap.ui.define([
 				revert: this._applyAdd.bind(this),
 				getCondenserInfo: function(oChange, mPropertyBag) {
 					const oControl = mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent);
+					const bPropertyKeysMode = oControl.isInPropertyKeysMode?.();
 					return this.determineAggregation(mPropertyBag.modifier, oControl)
 						.then((oAggregation) => {
 							return {
-								affectedControl: mSettings?.getAffectedControl?.(oChange) || { idIsLocal: false, id: oChange.getRevertData().item },
+								affectedControl: this._resolveAffectedControl(oChange, mSettings, oControl, oAggregation),
 								targetContainer: oChange.getSelector(),
 								targetAggregation: oAggregation.name,
 								classification: CondenserClassification.Destroy,
-								sourceIndex: oChange.getRevertData().index,
+								sourceIndex: bPropertyKeysMode
+									? DynamicPropertiesUtil.translatePropertyKeysToAggregationIndex(oControl, oChange.getRevertData().index)
+									: oChange.getRevertData().index,
 								setIndexInRevertData: function(oChange, iIndex) {
 									const oRevertData = oChange.getRevertData();
-									oRevertData.index = iIndex;
+									oRevertData.index = bPropertyKeysMode
+										? DynamicPropertiesUtil.translateAggregationToPropertyKeysIndex(oControl, iIndex)
+										: iIndex;
 									oChange.setRevertData(oRevertData);
 								}
 							};
@@ -434,26 +571,34 @@ sap.ui.define([
 				revert: this._applyMove.bind(this),
 				getCondenserInfo: function(oChange, mPropertyBag) {
 					const oControl = mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent);
+					const bPropertyKeysMode = oControl.isInPropertyKeysMode?.();
 					return this.determineAggregation(mPropertyBag.modifier, oControl)
 						.then((oAggregation) => {
 							return {
-								affectedControl: mSettings?.getAffectedControl?.(oChange) || { idIsLocal: false, id: oChange.getRevertData().item },
+								affectedControl: this._resolveAffectedControl(oChange, mSettings, oControl, oAggregation),
 								targetContainer: oChange.getSelector(),
 								targetAggregation: oAggregation.name,
 								classification: CondenserClassification.Move,
-								sourceIndex: oChange.getRevertData().index,
-								//sourceIndex: oChange.getContent().index,
+								sourceIndex: bPropertyKeysMode
+									? DynamicPropertiesUtil.translatePropertyKeysToAggregationIndex(oControl, oChange.getRevertData().index)
+									: oChange.getRevertData().index,
 								sourceContainer: oChange.getSelector(),
 								sourceAggregation: oAggregation.name,
 								setTargetIndex: function(oChange, iNewTargetIndex) {
-									oChange.getContent().index = iNewTargetIndex;
+									oChange.getContent().index = bPropertyKeysMode
+										? DynamicPropertiesUtil.translateAggregationToPropertyKeysIndex(oControl, iNewTargetIndex)
+										: iNewTargetIndex;
 								},
 								getTargetIndex: function(oChange) {
-									return oChange.getContent().index;
+									return bPropertyKeysMode
+										? DynamicPropertiesUtil.translatePropertyKeysToAggregationIndex(oControl, oChange.getContent().index)
+										: oChange.getContent().index;
 								},
 								setIndexInRevertData: function(oChange, iIndex) {
 									const oRevertData = oChange.getRevertData();
-									oRevertData.index = iIndex;
+									oRevertData.index = bPropertyKeysMode
+										? DynamicPropertiesUtil.translateAggregationToPropertyKeysIndex(oControl, iIndex)
+										: iIndex;
 									oChange.setRevertData(oRevertData);
 								}
 							};

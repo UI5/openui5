@@ -551,7 +551,10 @@ sap.ui.define([
 
 				const oRetrievedState = {};
 				Engine.getInstance().getRegisteredControllers(oControl).forEach((sKey) => {
-					oRetrievedState[sKey] = Engine.getInstance().getController(oControl, sKey).getCurrentState(true);
+					const oState = Engine.getInstance().getController(oControl, sKey).getCurrentState(true);
+					if (oState) {
+						oRetrievedState[sKey] = oState;
+					}
 				});
 
 				return merge({}, oRetrievedState);
@@ -641,7 +644,9 @@ sap.ui.define([
 
 					const oControllerHelper = oController.getMetadataHelper();
 					const oHelper = oControllerHelper ? oControllerHelper : oRegistryEntry.helper;
-					const oPropertyInfo = oHelper.getProperties().map((a) => {
+					// Include inactive properties so that sap.m.p13n.FilterController recognizes them and does not prevent change creation.
+					// Scenario: A property is made active and a filter is added via the StateUtil in the same state appliance.
+					const oPropertyInfo = oHelper.getProperties(true).map((a) => {
 						return {
 							key: a.key,
 							name: a.name
@@ -780,7 +785,10 @@ sap.ui.define([
 
 		this.uimanager.show(oControl, aKeys, {
 			showReset: false,
-			refreshPropertyHelper: true
+			refreshPropertyHelper: true,
+			close: () => {
+				fResolveRTA([]);
+			}
 		}).then((oContainer) => {
 			const oCustomHeader = oContainer.getCustomHeader();
 			if (oCustomHeader) {

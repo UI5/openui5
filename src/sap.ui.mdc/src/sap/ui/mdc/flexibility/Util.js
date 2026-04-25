@@ -112,6 +112,41 @@ sap.ui.define([
 	};
 
 	/**
+	 * Checks whether a property is inactive.
+	 *
+	 * @param {sap.ui.mdc.Control} oControl The control
+	 * @param {string} sPropertyKey The property key
+	 * @returns {boolean} Whether the property is inactive
+	 */
+	Util._isInactiveProperty = function(oControl, sPropertyKey) {
+		const oPropertyHelper = oControl?.getPropertyHelper?.();
+		if (!oPropertyHelper) {
+			return false;
+		}
+		if (oPropertyHelper.getProperty(sPropertyKey)) {
+			return false;
+		}
+		const oInactiveProperty = oPropertyHelper.getProperty(sPropertyKey, true);
+		return !!(oInactiveProperty && oInactiveProperty.isActive === false);
+	};
+
+	/**
+	 * Resolves a messagebundle text, automatically selecting the _INACTIVE key variant
+	 * when the property is inactive. Every key used with this method must have a corresponding
+	 * _INACTIVE variant in the messagebundle.
+	 *
+	 * @param {sap.ui.mdc.Control} oControl The MDC control
+	 * @param {string} sPropertyKey The property key to check for inactive status
+	 * @param {string} sTextKey The base messagebundle key
+	 * @param {array} aArgs Array of arguments for the resource text
+	 * @returns {Promise<string>} Resolves with the translated text
+	 */
+	Util.getInactiveAwareResourceText = function(oControl, sPropertyKey, sTextKey, aArgs) {
+		const sKey = Util._isInactiveProperty(oControl, sPropertyKey) ? sTextKey + "_INACTIVE" : sTextKey;
+		return Util.getMdcResourceText(sKey, aArgs);
+	};
+
+	/**
 	 * Creates a changehandler object for mdc controls.
 	 * The changehandler will also call the <code>onAfterXMLChangeProcessing</code> hook on the control's delegate
 	 * in case it's available.

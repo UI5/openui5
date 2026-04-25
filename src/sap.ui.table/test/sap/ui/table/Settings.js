@@ -578,6 +578,7 @@ sap.ui.define("test-resources/sap/ui/table/Settings", [
 							action: function(oTable) {
 								SelectionPlugin.findOn(oTable)?.destroy();
 								TABLESETTINGS.actions.SELECTION.group.SELECTIONPLUGINENABLED.disabled = true;
+								TABLESETTINGS.actions.SELECTION.group.LEAFSELECTIONDISABLED.disabled = true;
 								oSettingsMenu.removeAllContent();
 								oSettingsMenu.addContent(initForm(TABLESETTINGS.actions));
 							}
@@ -593,6 +594,7 @@ sap.ui.define("test-resources/sap/ui/table/Settings", [
 								oTable.addDependent(oPlugin);
 								Element.getElementById("__select5").setSelectedKey(oPlugin.getSelectionMode().toUpperCase());
 								TABLESETTINGS.actions.SELECTION.group.SELECTIONPLUGINENABLED.disabled = false;
+								TABLESETTINGS.actions.SELECTION.group.LEAFSELECTIONDISABLED.disabled = true;
 								oSettingsMenu.removeAllContent();
 								oSettingsMenu.addContent(initForm(TABLESETTINGS.actions));
 							}
@@ -603,6 +605,9 @@ sap.ui.define("test-resources/sap/ui/table/Settings", [
 								SelectionPlugin.findOn(oTable)?.destroy();
 								oTable.addDependent(new ODataV4MultiSelection());
 								TABLESETTINGS.actions.SELECTION.group.SELECTIONPLUGINENABLED.disabled = false;
+								TABLESETTINGS.actions.SELECTION.group.LEAFSELECTIONDISABLED.disabled = false;
+								oSettingsMenu.removeAllContent();
+								oSettingsMenu.addContent(initForm(TABLESETTINGS.actions));
 							}
 						},
 						ODATAV4SINGLEELECTION: {
@@ -611,6 +616,9 @@ sap.ui.define("test-resources/sap/ui/table/Settings", [
 								SelectionPlugin.findOn(oTable)?.destroy();
 								oTable.addDependent(new ODataV4SingleSelection());
 								TABLESETTINGS.actions.SELECTION.group.SELECTIONPLUGINENABLED.disabled = false;
+								TABLESETTINGS.actions.SELECTION.group.LEAFSELECTIONDISABLED.disabled = true;
+								oSettingsMenu.removeAllContent();
+								oSettingsMenu.addContent(initForm(TABLESETTINGS.actions));
 							}
 						}
 					}
@@ -624,6 +632,23 @@ sap.ui.define("test-resources/sap/ui/table/Settings", [
 					input: "boolean",
 					action: function(oTable, bValue) {
 						SelectionPlugin.findOn(oTable).setEnabled(bValue);
+					}
+				},
+				LEAFSELECTIONDISABLED: {
+					text: "Leaf Selection Disabled",
+					value: function(oTable) {
+						const oPlugin = SelectionPlugin.findOn(oTable);
+						if (oPlugin?.isA("sap.ui.table.plugins.ODataV4MultiSelection")) {
+							return oPlugin.getProperty("leafSelectionDisabled");
+						}
+						return false;
+					},
+					input: "boolean",
+					action: function(oTable, bValue) {
+						const oPlugin = SelectionPlugin.findOn(oTable);
+						if (oPlugin?.isA("sap.ui.table.plugins.ODataV4MultiSelection")) {
+							oPlugin.setProperty("leafSelectionDisabled", bValue);
+						}
 					}
 				},
 				CELLSELECTIONPLUGIN: {

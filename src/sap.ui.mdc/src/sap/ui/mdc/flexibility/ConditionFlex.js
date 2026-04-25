@@ -187,7 +187,7 @@ sap.ui.define([
 			sKey = "filterbar.COND_DEL_CHANGE";
 		}
 
-		const oProperty = oFilterBar?.getPropertyHelper()?.getProperty(oContent.name);
+		const oProperty = oFilterBar?.getPropertyHelper()?.getProperty(oContent.name, true);
 		if (oProperty) {
 			aArgs.splice(0, 1, oProperty.label);
 
@@ -231,8 +231,8 @@ sap.ui.define([
 
 		aArgs = aArgs.concat(vValue ? vValue : oContent.condition.values);
 
-		return Util.getMdcResourceText(sKey, aArgs).then((sText) => {
-			mVersionInfo.descriptionPayload.description = sText;
+		return Util.getInactiveAwareResourceText(oFilterBar, oContent.name, sKey, aArgs).then((sDescription) => {
+			mVersionInfo.descriptionPayload.description = sDescription;
 
 			mVersionInfo.updateRequired = true;
 			return mVersionInfo;

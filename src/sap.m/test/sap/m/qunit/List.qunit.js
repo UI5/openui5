@@ -1787,6 +1787,59 @@ sap.ui.define([
 		oList.destroy();
 	});
 
+	QUnit.test("StandardListItem scrolls expand/collapse button into view on expand", async function(assert) {
+		const oStdLI = new StandardListItem({
+			title: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.",
+			description: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.",
+			wrapping: true
+		});
+
+		const oList = new List({
+			items: [oStdLI]
+		});
+
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// title expand via tap
+		const oTitleButton = oStdLI.getDomRef("titleButton");
+		const fnTitleScrollSpy = sinon.spy(oTitleButton, "scrollIntoView");
+
+		jQuery(oTitleButton).trigger("tap");
+		await nextUIUpdate();
+
+		assert.ok(fnTitleScrollSpy.calledOnce, "scrollIntoView called on title expand");
+		assert.deepEqual(fnTitleScrollSpy.firstCall.args[0], {
+			behavior: "smooth",
+			block: "nearest"
+		}, "scrollIntoView called with correct options");
+
+		// title collapse via tap
+		fnTitleScrollSpy.resetHistory();
+		jQuery(oTitleButton).trigger("tap");
+		await nextUIUpdate();
+
+		assert.ok(fnTitleScrollSpy.notCalled, "scrollIntoView not called on title collapse");
+
+		// description expand via keyboard
+		const oDescButton = oStdLI.getDomRef("descriptionButton");
+		const fnDescScrollSpy = sinon.spy(oDescButton, "scrollIntoView");
+
+		oDescButton.focus();
+		qutils.triggerKeydown(oDescButton.getAttribute("id"), KeyCodes.SPACE);
+		await nextUIUpdate();
+
+		assert.ok(fnDescScrollSpy.calledOnce, "scrollIntoView called on description expand via keyboard");
+		assert.deepEqual(fnDescScrollSpy.firstCall.args[0], {
+			behavior: "smooth",
+			block: "nearest"
+		}, "scrollIntoView called with correct options for description");
+
+		fnTitleScrollSpy.restore();
+		fnDescScrollSpy.restore();
+		oList.destroy();
+	});
+
 	QUnit.test("StandardListItem infoText min-width test", async function(assert) {
 		const oStdLI = new StandardListItem({
 			title: "This is the Title Text",

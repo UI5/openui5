@@ -3975,13 +3975,18 @@ sap.ui.define([
 
 		oRowTimeline.setAssociation("row",  oRow.getId());
 
-		oListItem = oRowHeader.isA("sap.m.CustomListItem")
-			? new PlanningCalendarRowListItem(oRow.getId() + LISTITEM_SUFFIX, {
-				cells: [new List({items: [oRowHeader]}), oRowTimeline]
-			})
-			: new PlanningCalendarRowListItem(oRow.getId() + LISTITEM_SUFFIX, {
-				cells: [oRowHeader, oRowTimeline]
-			});
+		let oHeaderCell;
+		if (oRowHeader.isA("sap.m.CustomListItem")) {
+			oHeaderCell = new List({items: [oRowHeader]});
+			oHeaderCell.getAccessibilityInfo = function() { return null; };
+		} else {
+			oHeaderCell = oRowHeader;
+		}
+
+		oListItem = new PlanningCalendarRowListItem(oRow.getId() + LISTITEM_SUFFIX, {
+			cells: [oHeaderCell, oRowTimeline]
+		});
+
 
 		this._updateRowTimeline(oRow);
 

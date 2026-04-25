@@ -731,22 +731,54 @@ sap.ui.define([
 		oColumn.getInnerColumn().setSortIndicator(sSortOrder);
 	};
 
-	/**
-	 * Called when column is inserted
-	 * @param {object} oColumn - the mdc column instance.
-	 *
-	 * @private
-	 */
-	ResponsiveTableType.prototype._onColumnInsert = function(oColumn) {
+	ResponsiveTableType.prototype.insertColumn = function(oColumn, iIndex) {
+		TableTypeBase.prototype.insertColumn.apply(this, arguments);
+
 		const oTable = this.getTable();
-		const oResponsiveTable = this.getInnerTable();
+		const oRowTemplate = oTable._oRowTemplate;
+
+		if (oRowTemplate) {
+			const oCellTemplate = oColumn.getTemplateClone();
+
+			if (iIndex >= 0) {
+				oRowTemplate.insertCell(oCellTemplate, iIndex);
+			} else {
+				oRowTemplate.addCell(oCellTemplate);
+			}
+		}
 
 		if (PersonalizationUtils.isUserPersonalizationActive(oTable) &&
-			oResponsiveTable.getHiddenInPopin()?.includes(oColumn.getInnerColumn().getImportance()) &&
+			this.getInnerTable().getHiddenInPopin()?.includes(oColumn.getInnerColumn().getImportance()) &&
 			(oTable.getColumns().pop() === oColumn)) {
 			this._setShowDetailsState(true);
 		}
 	};
+
+	ResponsiveTableType.prototype.removeColumn = function(oColumn) {
+		const oTable = this.getTable();
+		const oRowTemplate = oTable._oRowTemplate;
+
+		if (oRowTemplate) {
+			const oCellTemplate = oColumn.getTemplateClone();
+			const iCellIndex = oRowTemplate.indexOfCell(oCellTemplate);
+
+			removeCellFromItem(oRowTemplate, iCellIndex);
+
+			if (iCellIndex > -1) {
+				this.getInnerTable().getItems().forEach((oItem) => {
+					removeCellFromItem(oItem, iCellIndex);
+				});
+			}
+		}
+
+		TableTypeBase.prototype.removeColumn.apply(this, arguments);
+	};
+
+	function removeCellFromItem(oItem, iIndex) {
+		// Group header item does not have cells
+		const oCell = oItem?.removeCell(iIndex);
+		oCell?.destroy();
+	}
 
 	ResponsiveTableType.prototype.onModifications = function() {
 		const oTable = this.getTable();

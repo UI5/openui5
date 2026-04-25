@@ -928,6 +928,41 @@ sap.ui.define([
 			};
 
 			return fiToggleFilterPanel.call(this, sGroupName, true);
+		},
+		iApplyPropertyAttributeChanges: function(sControlId, mPropertyAttributeChanges) {
+			return this.waitFor({
+				id: sControlId,
+				success: function(oControl) {
+					this.iWaitForPromise(new Promise(function(resolve, reject) {
+						Opa5.getWindow().sap.ui.require(["sap/ui/mdc/p13n/StateUtil"], function(StateUtil) {
+							StateUtil.applyExternalState(oControl, {
+								supplementaryConfig: {
+									propertyInfo: mPropertyAttributeChanges
+								}
+							}).then(resolve, reject);
+						}, reject);
+					}));
+				},
+				errorMessage: "No control found with id '" + sControlId + "'"
+			});
+		},
+		iResetPropertyAttributeChanges: function(sControlId) {
+			return this.waitFor({
+				id: sControlId,
+				success: function(oControl) {
+					this.iWaitForPromise(new Promise(function(resolve, reject) {
+						Opa5.getWindow().sap.ui.require(["sap/ui/mdc/p13n/StateUtil"], function(StateUtil) {
+							StateUtil.retrieveExternalState(oControl).then(async (oCurrentState) => {
+								const oTargetState = Object.assign({}, oCurrentState);
+								delete oTargetState.supplementaryConfig;
+								const oDelta = await StateUtil.diffState(oControl, oCurrentState, oTargetState);
+								await StateUtil.applyExternalState(oControl, oDelta);
+							}).then(resolve, reject);
+						}, reject);
+					}));
+				},
+				errorMessage: "No control found with id '" + sControlId + "'"
+			});
 		}
 	});
 

@@ -316,13 +316,30 @@ sap.ui.define([
 	Column.prototype.setParent = function(oParent) {
 		const oPreviousTable = this.getTable();
 		Control.prototype.setParent.apply(this, arguments);
+		const oNewTable = this.getTable();
 
-		if (this._bIsBeingMoved) { // Set by the table when moving this column.
-			return;
+		if (!oNewTable && oPreviousTable) {
+			// Column removed from table - defer disconnect to allow synchronous re-parenting (move) to cancel it
+			this._oPreviousTableForDeferredDisconnect = oPreviousTable;
+			this._iDeferredParentChangeTimer = setTimeout(() => {
+				delete this._iDeferredParentChangeTimer;
+				delete this._oPreviousTableForDeferredDisconnect;
+				this._disconnectFromTable();
+			}, 0);
+		} else if (this._iDeferredParentChangeTimer) {
+			clearTimeout(this._iDeferredParentChangeTimer);
+			delete this._iDeferredParentChangeTimer;
+			if (oNewTable === this._oPreviousTableForDeferredDisconnect) {
+				// Re-parented synchronously to the same table (move) - skip disconnect and connect
+			} else {
+				// Re-parented synchronously to a different table - disconnect from old, connect to new
+				this._disconnectFromTable();
+				this._connectToTable();
+			}
+			delete this._oPreviousTableForDeferredDisconnect;
+		} else {
+			this._connectToTable();
 		}
-
-		this._disconnectFromTable(oPreviousTable);
-		this._connectToTable();
 	};
 
 	Column.prototype._getAIAction = function() {
@@ -384,6 +401,11 @@ sap.ui.define([
 	};
 
 	Column.prototype.exit = function() {
+		if (this._iDeferredParentChangeTimer) {
+			clearTimeout(this._iDeferredParentChangeTimer);
+			delete this._iDeferredParentChangeTimer;
+			delete this._oPreviousTableForDeferredDisconnect;
+		}
 		this._disconnectFromTable();
 		this._oInnerColumnReady = null;
 		[

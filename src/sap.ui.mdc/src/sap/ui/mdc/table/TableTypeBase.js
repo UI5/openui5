@@ -183,11 +183,35 @@ sap.ui.define([
 	};
 
 	/**
-	 * Called whenever column is going to be inserted to the table.
-	 * @param {sap.ui.mdc.table.Column} oColumn - The mdc column instance
+	 * Called when a column is inserted. Adds the inner column to the inner table.
+	 *
+	 * @param {sap.ui.mdc.table.Column} oColumn The MDC column instance
+	 * @param {int} [iIndex] The insertion index. If <code>undefined</code>, the column is added at the end.
 	 * @private
 	 */
-	TableTypeBase.prototype._onColumnInsert = function(oColumn) {};
+	TableTypeBase.prototype.insertColumn = function(oColumn, iIndex) {
+		const oInnerColumn = oColumn.getInnerColumn();
+
+		if (iIndex === undefined) {
+			this.getInnerTable().addColumn(oInnerColumn);
+		} else {
+			this.getInnerTable().insertColumn(oInnerColumn, iIndex);
+		}
+	};
+
+	/**
+	 * Called when a column is removed. Removes the inner column from the inner table.
+	 *
+	 * @param {sap.ui.mdc.table.Column} oColumn The column instance
+	 * @private
+	 */
+	TableTypeBase.prototype.removeColumn = function(oColumn) {
+		const oInnerColumn = oColumn?.getInnerColumn();
+
+		if (oInnerColumn) {
+			this.getInnerTable()?.removeColumn(oInnerColumn);
+		}
+	};
 
 	TableTypeBase.prototype.loadModules = function() { return Promise.reject(this + " does not implement #loadModules"); };
 	TableTypeBase.prototype.updateTableByProperty = function(sProperty, vValue) {};

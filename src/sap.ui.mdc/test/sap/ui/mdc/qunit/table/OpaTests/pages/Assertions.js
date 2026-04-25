@@ -159,7 +159,9 @@ sap.ui.define([
 				success: function(oSegmentedButton) {
 					if (bValue) {
 						Opa5.assert.ok(oSegmentedButton, "Show/Hide Details button is visible");
-						Opa5.assert.equal(oSegmentedButton.getItems()[0].getTooltip(), 'Show More per Row', "ShowDetails button created");
+						Opa5.assert.equal(oSegmentedButton.getItems()[0].getTooltip(),
+							Util.getTextFromResourceBundle("sap.ui.mdc", "table.SHOWDETAILS_TEXT"),
+							"ShowDetails button created");
 						Opa5.assert.equal(oSegmentedButton.getSelectedKey(), sKey);
 					} else {
 						Opa5.assert.ok(true, "The show details button is not visible");
@@ -638,7 +640,7 @@ sap.ui.define([
 			});
 		},
 
-		iShouldSeeColumnMenuQuickAction: function(sLabel) {
+		iShouldSeeColumnMenuQuickFreeze: function() {
 			return Util.waitForColumnMenu.call(this, {
 				success: function(oColumnMenu) {
 					this.waitFor({
@@ -647,13 +649,13 @@ sap.ui.define([
 						matchers: [{
 							ancestor: oColumnMenu,
 							properties: {
-								label: sLabel
+								label: Util.getTextFromResourceBundle("sap.ui.table", "TBL_FREEZE")
 							}
 						}],
 						success: function(aQuickActions) {
-							Opa5.assert.equal(aQuickActions.length, 1, "Found column menu QuickAction");
+							Opa5.assert.equal(aQuickActions.length, 1, "Found column menu freeze QuickAction");
 						},
-						errorMessage: "Column menu QuickAction not found"
+						errorMessage: "Column menu freeze QuickAction not found"
 					});
 				}
 			});

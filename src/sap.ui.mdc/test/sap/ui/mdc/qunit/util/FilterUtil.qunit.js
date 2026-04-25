@@ -2,7 +2,7 @@
  * ${copyright}
  */
 
-/* global QUnit */
+/* global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/mdc/util/FilterUtil",
@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/model/FilterOperator",
+	"sap/base/Log",
 	"sap/ui/model/type/String" // needs to be loaded for legacyFree UI5
 ], function(
 	FilterUtil,
@@ -17,6 +18,7 @@ sap.ui.define([
 	ConditionValidated,
 	OperatorName,
 	FilterOperator,
+	Log,
 	StringType
 ) {
 	"use strict";
@@ -164,6 +166,37 @@ sap.ui.define([
 
 			return;
 
+		});
+	});
+
+	QUnit.test("getFilterInfo skips inactive properties without error", function(assert) {
+		const oControl = new Control({
+			delegate: {
+				payload: {},
+				name: "sap/ui/mdc/AggregationBaseDelegate"
+			}
+		});
+
+		return oControl.initControlDelegate().then(function() {
+			const oTypeConfig = oControl.getTypeMap(oControl).getTypeConfig("String", null, null);
+			const oConditions = {
+				activeProperty: [{operator: OperatorName.EQ, values: ["activeValue"]}],
+				inactiveProperty: [{operator: OperatorName.EQ, values: ["inactiveValue"]}]
+			};
+			const aProperties = [
+				{key: "activeProperty", path: "activeProperty", typeConfig: oTypeConfig},
+				{key: "inactiveProperty", path: "inactiveProperty", typeConfig: oTypeConfig, isActive: false}
+			];
+
+			const oLogSpy = sinon.spy(Log, "error");
+			const oFilterInfo = FilterUtil.getFilterInfo(oControl, oConditions, aProperties);
+			oLogSpy.restore();
+
+			assert.ok(oFilterInfo.filters, "Filter object created");
+			assert.notOk(oFilterInfo.filters.aFilters, "Only a single filter, not a multi-filter");
+			assert.equal(oFilterInfo.filters.sPath, "activeProperty", "Filter path is for active property");
+			assert.equal(oFilterInfo.filters.oValue1, "activeValue", "Correct filter value for active property");
+			assert.notOk(oLogSpy.called, "No error logged for inactive property");
 		});
 	});
 

@@ -1519,4 +1519,283 @@ sap.ui.define([
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
 	});
+
+	QUnit.module("Leaf Selection Disabled", {
+		beforeEach: async function() {
+			this.oSelectionPlugin = new ODataV4MultiSelection();
+			this.oSelectionPlugin.setProperty("leafSelectionDisabled", true);
+			this.oTable = TableQUnitUtils.createTable(TableQUnitUtils.createSettingsForHierarchy({
+				dependents: [this.oSelectionPlugin]
+			}), (oTable) => {
+				oTable.getBinding().resume();
+			});
+			await this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("#isContextSelectable", function(assert) {
+		const aRows = this.oTable.getRows();
+		const oNodeContext = aRows[0].getBindingContext();
+		const oLeafContext = aRows[4].getBindingContext();
+
+		assert.ok(this.oSelectionPlugin.isContextSelectable(oNodeContext), "Node context is selectable");
+		assert.notOk(this.oSelectionPlugin.isContextSelectable(oLeafContext), "Leaf context is not selectable");
+
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", false);
+		assert.ok(this.oSelectionPlugin.isContextSelectable(oLeafContext), "Leaf context is selectable after disabling the feature");
+	});
+
+	QUnit.test("#setSelected on leaf row is a no-op", async function(assert) {
+		const aRows = this.oTable.getRows();
+		const oSelectionChangeHandler = this.spy();
+
+		this.oSelectionPlugin.attachSelectionChange(oSelectionChangeHandler);
+
+		this.oSelectionPlugin.setSelected(aRows[4], true);
+		await TableQUnitUtils.wait(10);
+		assert.notOk(aRows[4].getBindingContext().isSelected(), "Leaf row not selected after #setSelected");
+		assert.equal(oSelectionChangeHandler.callCount, 0, "selectionChange event not fired");
+		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "No selected contexts");
+	});
+
+	QUnit.test("#setSelected on node row works", async function(assert) {
+		const aRows = this.oTable.getRows();
+		const oSelectionChangeHandler = this.spy();
+
+		this.oSelectionPlugin.attachSelectionChange(oSelectionChangeHandler);
+
+		this.oSelectionPlugin.setSelected(aRows[0], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		assert.ok(aRows[0].getBindingContext().isSelected(), "Node row is selected after #setSelected");
+		assert.equal(oSelectionChangeHandler.callCount, 1, "selectionChange event fired");
+		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 1, "1 selected context");
+	});
+
+	QUnit.test("Range selection skips leaf rows", async function(assert) {
+		const aRows = this.oTable.getRows();
+
+		this.oSelectionPlugin.setSelected(aRows[0], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 1, "Selected first (node) row");
+
+		this.oSelectionPlugin.setSelected(aRows[9], true, {range: true});
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+
+		const aSelectedContexts = this.oSelectionPlugin.getSelectedContexts();
+		assert.ok(aSelectedContexts.length > 0, "At least one context is selected");
+		assert.ok(aSelectedContexts.length < 10, "Number of selected contexts is less than the range (leaf rows were skipped)");
+		for (const oContext of aSelectedContexts) {
+			const bIsLeaf = oContext.getProperty("@$ui5.node.isExpanded") === undefined;
+			assert.notOk(bIsLeaf, "Selected context is not a leaf: " + oContext.getPath());
+		}
+	});
+
+	QUnit.test("Row state: selectable flag", function(assert) {
+		const aRows = this.oTable.getRows();
+
+		assert.ok(aRows[0].isSelectable(), "Node row is selectable");
+		assert.notOk(aRows[4].isSelectable(), "Leaf row is not selectable");
+	});
+
+	QUnit.test("Setting leafSelectionDisabled to true deselects leaf contexts", async function(assert) {
+		const oSelectionChangeHandler = this.spy();
+
+		this.oSelectionPlugin.attachSelectionChange(oSelectionChangeHandler);
+
+		// First disable leafSelectionDisabled so we can select leaf nodes
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", false);
+
+		const aRows = this.oTable.getRows();
+		const oNodeContext = aRows[0].getBindingContext();
+		const oLeafContext = aRows[4].getBindingContext();
+
+		// Select both a node and a leaf
+		this.oSelectionPlugin.setSelected(aRows[0], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		this.oSelectionPlugin.setSelected(aRows[4], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+
+		assert.ok(oNodeContext.isSelected(), "Node context is selected");
+		assert.ok(oLeafContext.isSelected(), "Leaf context is selected");
+		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 2, "2 contexts selected");
+
+		// Now enable leafSelectionDisabled — leaf selection should be cleared
+		oSelectionChangeHandler.resetHistory();
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+
+		assert.ok(oNodeContext.isSelected(), "Node context is still selected after enabling leafSelectionDisabled");
+		assert.notOk(oLeafContext.isSelected(), "Leaf context is deselected after enabling leafSelectionDisabled");
+		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 1, "1 context selected");
+	});
+
+	QUnit.test("Selected node becomes leaf after rows update", async function(assert) {
+		const aRows = this.oTable.getRows();
+		const oNodeContext = aRows[0].getBindingContext();
+
+		// Select a node
+		this.oSelectionPlugin.setSelected(aRows[0], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		assert.ok(oNodeContext.isSelected(), "Node context is selected");
+		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 1, "1 context selected");
+
+		// Simulate the node becoming a leaf (e.g. after filtering removes all its children)
+		this.stub(oNodeContext, "getProperty").callThrough()
+			.withArgs("@$ui5.node.isExpanded").returns(undefined);
+
+		// Trigger a rows update to simulate a binding update (e.g. filter applied)
+		this.oTable.getBinding().refresh();
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.notOk(oNodeContext.isSelected(), "Context is deselected after it became a leaf");
+	});
+
+	QUnit.test("Deselection in onRowUpdateState does not cause recursive row updates", async function(assert) {
+		const aRows = this.oTable.getRows();
+		const oBinding = this.oTable.getBinding();
+
+		// Select a node, then make it a leaf so deselection triggers during row update
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", false);
+		this.oSelectionPlugin.setSelected(aRows[0], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		this.oSelectionPlugin.setSelected(aRows[1], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", true);
+		await this.oTable.qunit.whenRenderingFinished();
+
+		// Make multiple rows appear as leaves so deselection fires during the next row update
+		const oRow0Context = aRows[0].getBindingContext();
+		const oRow1Context = aRows[1].getBindingContext();
+		this.stub(oRow0Context, "getProperty").callThrough().withArgs("@$ui5.node.isExpanded").returns(undefined);
+		this.stub(oRow1Context, "getProperty").callThrough().withArgs("@$ui5.node.isExpanded").returns(undefined);
+
+		// Spy on Table.prototype.updateRows to track how many times the binding triggers a row update
+		const oUpdateRowsSpy = this.spy(this.oTable, "updateRows");
+
+		// Trigger a binding refresh — this will cause Row.UpdateState hooks to fire,
+		// which will call context.setSelected(false) for the node that is converted to a leaf.
+		// The critical assertion: this must NOT cause a recursive updateRows call.
+		oBinding.refresh();
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.equal(oUpdateRowsSpy.callCount, 1, "Table.updateRows was called exactly once (no recursive update)");
+		assert.notOk(oRow0Context.isSelected(), "First context was deselected during row update");
+		assert.notOk(oRow1Context.isSelected(), "Second context was deselected during row update");
+	});
+
+	QUnit.test("Deselection in onRowUpdateState fires only one debounced selectionChange event", async function(assert) {
+		const oSelectionChangeHandler = this.spy();
+
+		// Select multiple nodes, then make them leaves to force deselection during the next row update
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", false);
+		const aRows = this.oTable.getRows();
+		this.oSelectionPlugin.setSelected(aRows[0], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		this.oSelectionPlugin.setSelected(aRows[1], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", true);
+		await this.oTable.qunit.whenRenderingFinished();
+
+		const oRow0Context = aRows[0].getBindingContext();
+		const oRow1Context = aRows[1].getBindingContext();
+		this.stub(oRow0Context, "getProperty").callThrough().withArgs("@$ui5.node.isExpanded").returns(undefined);
+		this.stub(oRow1Context, "getProperty").callThrough().withArgs("@$ui5.node.isExpanded").returns(undefined);
+
+		this.oSelectionPlugin.attachSelectionChange(oSelectionChangeHandler);
+
+		// Trigger row update — multiple contexts will be deselected
+		this.oTable.getBinding().refresh();
+		await this.oTable.qunit.whenRenderingFinished();
+
+		// The selectionChange event uses setTimeout(0) debouncing in ODataV4Selection.
+		// Even though multiple setSelected(false) calls happen, only one event should fire.
+		await TableQUnitUtils.wait(10);
+
+		assert.equal(oSelectionChangeHandler.callCount, 1, "selectionChange event fired exactly once despite multiple deselections");
+	});
+
+	QUnit.test("Binding and plugin selection stay in sync after per-row deselection", async function(assert) {
+		const aRows = this.oTable.getRows();
+
+		// Select two nodes
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", false);
+		this.oSelectionPlugin.setSelected(aRows[0], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		this.oSelectionPlugin.setSelected(aRows[1], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", true);
+		await this.oTable.qunit.whenRenderingFinished();
+
+		const oRow0Context = aRows[0].getBindingContext();
+		const oRow1Context = aRows[1].getBindingContext();
+
+		// Make only one of them a leaf
+		this.stub(oRow0Context, "getProperty").callThrough().withArgs("@$ui5.node.isExpanded").returns(undefined);
+
+		this.oTable.getBinding().refresh();
+		await this.oTable.qunit.whenRenderingFinished();
+		await TableQUnitUtils.wait(10);
+
+		// Row 0 (now leaf) should be deselected in both binding and plugin
+		assert.notOk(oRow0Context.isSelected(), "Leaf context is deselected at binding level");
+		// Row 1 (still a node) should remain selected
+		assert.ok(oRow1Context.isSelected(), "Node context is still selected at binding level");
+
+		// Plugin's getSelectedContexts should reflect the binding state
+		const aSelectedContexts = this.oSelectionPlugin.getSelectedContexts();
+		assert.equal(aSelectedContexts.length, 1, "Plugin reports 1 selected context");
+		assert.ok(aSelectedContexts.includes(oRow1Context), "Plugin's selected contexts contain the node context");
+		assert.notOk(aSelectedContexts.includes(oRow0Context), "Plugin's selected contexts do not contain the deselected leaf context");
+	});
+
+	QUnit.test("context.setSelected(false) in onRowUpdateState does not trigger Table.updateRows", async function(assert) {
+		const aRows = this.oTable.getRows();
+		const oBinding = this.oTable.getBinding();
+
+		// Select a node then make it a leaf
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", false);
+		this.oSelectionPlugin.setSelected(aRows[0], true);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		this.oSelectionPlugin.setProperty("leafSelectionDisabled", true);
+		await this.oTable.qunit.whenRenderingFinished();
+
+		const oRow0Context = aRows[0].getBindingContext();
+		this.stub(oRow0Context, "getProperty").callThrough().withArgs("@$ui5.node.isExpanded").returns(undefined);
+
+		// Instrument updateRows to detect any calls AFTER the first one
+		let iUpdateRowsCallCountDuringFirstCall = 0;
+		let bInUpdateRows = false;
+		const fnOriginalUpdateRows = this.oTable.updateRows.bind(this.oTable);
+
+		this.stub(this.oTable, "updateRows").callsFake(function() {
+			if (bInUpdateRows) {
+				iUpdateRowsCallCountDuringFirstCall++;
+				return;
+			}
+			bInUpdateRows = true;
+			fnOriginalUpdateRows.apply(this, arguments);
+			bInUpdateRows = false;
+		});
+
+		oBinding.refresh();
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.equal(iUpdateRowsCallCountDuringFirstCall, 0,
+			"No reentrant Table.updateRows call detected (setSelected(false) does not trigger binding change)");
+	});
+
+	QUnit.test("Context#setSelected on leaf throws error", async function(assert) {
+		const aRows = this.oTable.getRows();
+		const oLeafContext = aRows[4].getBindingContext();
+
+		assert.throws(
+			() => { oLeafContext.setSelected(true); },
+			"Selecting a leaf context via binding API throws an error"
+		);
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+		assert.notOk(oLeafContext.isSelected(), "Leaf context is not selected after error");
+	});
 });

@@ -164,7 +164,7 @@ sap.ui.define(['sap/ui/mdc/util/IdentifierUtil',
 						if (aIgnoreProperties.indexOf(sFieldPath) < 0) {
 
 							const oProperty = FilterUtil.getPropertyByKey(aPropertiesMetadata, sFieldPath);
-							if (oProperty) {
+							if (oProperty && oProperty.isActive !== false) {
 
 								mFilterTypes[sFieldPath] = { type: oProperty.typeConfig.typeInstance, caseSensitive: oProperty.caseSensitive, baseType: oProperty.typeConfig.baseType };
 								mInternalFilterConditions[sFieldPath] = [];
@@ -175,7 +175,7 @@ sap.ui.define(['sap/ui/mdc/util/IdentifierUtil',
 									mInternalFilterConditions[sFieldPath].push(ConditionConverter.toType(oConditionInternal, oProperty.typeConfig.typeInstance, _getTypeMap(vTypeProvider)));
 								}
 
-							} else {
+							} else if (!oProperty) {
 								Log.error("sap.ui.mdc.util.FilterUitl.js :", "could not find propertyMetadata of : " + sFieldPath);
 							}
 						}
