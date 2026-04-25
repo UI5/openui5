@@ -211,6 +211,21 @@ sap.ui.define([
 			inComplexProperty: {
 				allowed: true
 			}
+		},
+
+		// Enabled by:
+		// sap.ui.mdc.table.PropertyHelper
+		// sap.ui.mdc.filterbar.PropertyHelper
+		//
+		// ui5-restricted: sap.fe
+		isActive: {
+			type: "boolean",
+			"default": {
+				value: undefined
+			},
+			inComplexProperty: {
+				allowed: true
+			}
 		}
 	};
 
@@ -223,7 +238,7 @@ sap.ui.define([
 		 *
 		 * @this sap.ui.mdc.util.PropertyInfo
 		 * @param {sap.ui.mdc.util.PropertyHelper} oPropertyHelper The property helper instance
-		 * @returns {boolean | null} Whether the property is complex
+		 * @returns {boolean} Whether the property is complex
 		 */
 		isComplex: function(oPropertyHelper) {
 			return PropertyHelper.isPropertyComplex(this);
@@ -273,7 +288,8 @@ sap.ui.define([
 		}
 	};
 
-	const aCommonAttributes = ["key",
+	const aCommonAttributes = [
+		"key",
 		"label",
 		"tooltip",
 		"visible",
@@ -475,7 +491,7 @@ sap.ui.define([
 
 			mAttribute.mandatory = mAttribute.mandatory === true && bTopLevel;
 			mAttribute.default = {...mAttribute.default};
-			mAttribute.default.value = mAttribute.default.value ?? getTypeDefault(mAttribute.type);
+			mAttribute.default.value = "value" in mAttribute.default ? mAttribute.default.value : getTypeDefault(mAttribute.type);
 			mAttribute.inComplexProperty = {...mAttribute.inComplexProperty};
 
 			if (mAttribute.inComplexProperty.allowed === true) {
@@ -534,7 +550,7 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.mdc.util.PropertyInfo[]} aProperties
 	 *     The properties to process in this helper
-	 * @param {sap.ui.base.ManagedObject} [oParent]
+	 * @param {sap.ui.mdc.Control} [oParent]
 	 *     A reference to an instance that will act as the parent of this helper
 	 * @param {object} [mAdditionalAttributes]
 	 *     Additional attributes that the <code>PropertyInfo</code> may contain. It is a key-value map, where the key is the name of the
@@ -561,7 +577,7 @@ sap.ui.define([
 		constructor: function(aProperties, oParent, mAdditionalAttributes) {
 			BaseObject.call(this);
 
-			if (oParent && !BaseObject.isObjectA(oParent, "sap.ui.base.ManagedObject")) {
+			if (oParent && !BaseObject.isObjectA(oParent, "sap.ui.mdc.Control")) {
 				throw new Error("The type of the parent is invalid.");
 			}
 
@@ -772,6 +788,7 @@ sap.ui.define([
 	 * @protected
 	 */
 	PropertyHelper.prototype.prepareProperty = function(oProperty, mProperties) {
+		const oParent = this.getParent();
 		const aDependenciesForDefaults = preparePropertyDeep(this, oProperty, mProperties);
 
 		aDependenciesForDefaults.forEach((mDependency) => {
@@ -787,12 +804,37 @@ sap.ui.define([
 				oPropertySection[mDependency.targetAttribute] = vValue;
 			}
 		});
+
+		if (!oParent || oProperty.isActive === undefined) {
+			return;
+		}
+
+		if (oParent.isInPropertyKeysMode?.() === false) {
+			throw new Error("Dynamic properties (isActive) require the 'propertyKeys' property to be used."
+				+ " Property '" + getPropertyKey(oProperty) + "' has isActive set, but 'propertyKeys' is not configured.");
+		}
+
+		// Add support for attribute overrides of dynamic properties
+		for (const sAttribute of Object.keys(oProperty)) {
+			if (sAttribute === "key") {
+				continue;
+			}
+
+			const vOriginalValue = oProperty[sAttribute];
+
+			Object.defineProperty(oProperty, sAttribute, {
+				get: () => {
+					const oXConfig = oParent.getEngine().readXConfig(oParent);
+					return oXConfig?.propertyInfo?.[getPropertyKey(oProperty)]?.[sAttribute] ?? vOriginalValue;
+				}
+			});
+		}
 	};
 
 	/**
 	 * If available, it gets the instance that acts as the parent of this helper. This may not reflect the UI5 object relationship tree.
 	 *
-	 * @returns {sap.ui.base.ManagedObject | null} The parent if one was passed to the constructor, <code>null</code> otherwise.
+	 * @returns {sap.ui.mdc.Control | null} The parent if one was passed to the constructor, <code>null</code> otherwise.
 	 * @public
 	 */
 	PropertyHelper.prototype.getParent = function() {
@@ -815,36 +857,62 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets all properties known to this helper.
+	 * Gets all properties.
 	 *
+	 * @param {boolean} [bIncludeInactive=false] Whether to include inactive properties
 	 * @returns {sap.ui.mdc.util.PropertyInfo[]} All properties
 	 * @public
 	 */
-	PropertyHelper.prototype.getProperties = function() {
+	PropertyHelper.prototype.getProperties = function(bIncludeInactive) {
 		const oPrivate = _private.get(this);
-		return oPrivate ? oPrivate.aProperties : [];
+
+		if (!oPrivate) {
+			return [];
+		}
+
+		if (bIncludeInactive) {
+			return oPrivate.aProperties;
+		} else {
+			return Object.freeze(oPrivate.aProperties.filter((oProperty) => oProperty.isActive !== false));
+		}
 	};
 
 	/**
 	 * Gets the properties as a key-value map, where the key is the <code>name</code> attribute of a property.
 	 *
+	 * @param {boolean} [bIncludeInactive=false] Whether to include inactive properties
 	 * @returns {sap.ui.mdc.util.PropertyInfo} A map of all properties
 	 * @public
 	 */
-	PropertyHelper.prototype.getPropertyMap = function() {
+	PropertyHelper.prototype.getPropertyMap = function(bIncludeInactive) {
 		const oPrivate = _private.get(this);
-		return oPrivate ? oPrivate.mProperties : {};
+
+		if (!oPrivate) {
+			return {};
+		}
+
+		if (bIncludeInactive) {
+			return Object.freeze({...oPrivate.mProperties});
+		} else {
+			return Object.freeze(
+				Object.fromEntries(
+					Object.entries(oPrivate.mProperties).filter(([sPropertyKey, oProperty]) => oProperty.isActive !== false)
+				)
+			);
+		}
 	};
 
 	/**
-	 * Gets a property by its name.
+	 * Gets a property by its key.
 	 *
-	 * @param {string} sName Name of a property
-	 * @returns {sap.ui.mdc.util.PropertyInfo | null} The property, or <code>null</code> if it is unknown
+	 * @param {string} sName Key of the property
+	 * @param {boolean} [bIncludeInactive=false] Whether to include inactive properties
+	 * @returns {sap.ui.mdc.util.PropertyInfo | null}
+	 *     The property, or <code>null</code> if it is unknown or inactive and inactive properties are not included
 	 * @public
 	 */
-	PropertyHelper.prototype.getProperty = function(sName) {
-		return this.getPropertyMap()[sName] || null;
+	PropertyHelper.prototype.getProperty = function(sName, bIncludeInactive) {
+		return this.getPropertyMap(bIncludeInactive)[sName] || null;
 	};
 
 	/**
@@ -862,12 +930,35 @@ sap.ui.define([
 	 * Checks whether a property is a complex property. Works with any <code>PropertyInfo</code>, even if unknown to the property helper.
 	 *
 	 * @param {sap.ui.mdc.util.PropertyInfo} oProperty A <code>PropertyInfo</code> object
-	 * @returns {boolean} Whether the property is complex
+	 * @returns {boolean|undefined} Whether the property is complex, or <code>undefined</code> if the given property is not an object
 	 * @protected
 	 * @static
 	 */
 	PropertyHelper.isPropertyComplex = function(oProperty) {
-		return oProperty != null && typeof oProperty === "object" ? "propertyInfos" in oProperty : false;
+		return oProperty != null && typeof oProperty === "object" ? "propertyInfos" in oProperty : undefined;
+	};
+
+	/**
+	 * Validates that active complex properties do not reference inactive simple properties.
+	 *
+	 * @throws {Error} If an active complex property references an inactive simple property
+	 * @public
+	 */
+	PropertyHelper.prototype.validateDynamicProperties = function() {
+		for (const oProperty of this.getProperties(true)) {
+			if (oProperty.isActive === false) {
+				continue;
+			}
+			if (oProperty.isComplex()) {
+				for (const sSimpleKey of oProperty.propertyInfos) {
+					const oSimpleProperty = this.getProperty(sSimpleKey, true);
+					if (oSimpleProperty && oSimpleProperty.isActive === false) {
+						throw new Error("Active complex property '" + oProperty.key + "' references inactive simple property '" + sSimpleKey + "'."
+							+ " Deactivate the complex property or activate all its referenced simple properties.");
+					}
+				}
+			}
+		}
 	};
 
 	/**

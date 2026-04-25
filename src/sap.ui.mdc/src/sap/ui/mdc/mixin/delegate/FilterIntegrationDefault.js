@@ -12,7 +12,7 @@ sap.ui.define([
 	"use strict";
 
 	function _createFilterFromExternalConditions(oControl, oTypeMap) {
-		return FilterUtil.getFilterInfo(oTypeMap, oControl?.getConditions() || {}, oControl?.getPropertyHelper?.()?.getProperties() || [])?.filters;
+		return FilterUtil.getFilterInfo(oTypeMap, oControl?.getConditions() || {}, oControl?.getPropertyHelper?.()?.getProperties(true) || [])?.filters;
 	}
 
 	function _createInnerFilter(oControl, oTypeMap) {

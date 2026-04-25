@@ -33,17 +33,21 @@ sap.ui.define([
 	};
 
 	/**
-	 * Creates a changehandler specific to the provided aggregation and property name,
+	 * Creates a change handler specific to the provided aggregation and property,
 	 * to enhance the xConfig object for a given mdc control instance.
 	 *
-	 * The enhanced object can be accesed using <code>Engine#readAggregationConfig</code>.
+	 * The <code>property</code> can be a string (static, resolved at registration time) or a function
+	 * (dynamic, resolved per change). A function receives the change object and returns the property name.
 	 *
-	 * @param {object} mMetaConfig A map describing the metadata structure that is affected by this changehandler
-	 * @param {object} mMetaConfig.aggregation The aggregation name (such as <code>columns</code> or <code>filterItemes</code>)
-	 * @param {object} mMetaConfig.property The property name (such as <code>width</code> or <code>label</code>)
-	 * @param {string} mMetaConfig.classification The condenser classification for the changehandler
+	 * The enhanced object can be accessed using <code>Engine#readAggregationConfig</code>.
 	 *
-	 * @returns {object} The created changehandler object
+	 * @param {object} mMetaConfig A map describing the metadata structure that is affected by this change handler
+	 * @param {string} mMetaConfig.aggregation The aggregation name (such as <code>columns</code> or <code>propertyInfo</code>)
+	 * @param {string|function(sap.ui.fl.Change):string} mMetaConfig.property The property name (such as <code>width</code> or <code>label</code>),
+	 *   or a function that receives the change and returns the property name
+	 * @param {string} [mMetaConfig.classification] The condenser classification for the change handler
+	 *
+	 * @returns {object} The created change handler object
 	 */
 	xConfigFlex.createSetChangeHandler = function(mMetaConfig) {
 
@@ -52,58 +56,58 @@ sap.ui.define([
 		}
 
 		const sAffectedAggregation = mMetaConfig.aggregation;
-		const sAffectedProperty = mMetaConfig.property;
+		const bDynamic = typeof mMetaConfig.property === "function";
+
+		function resolveProperty(oChange) {
+			return bDynamic ? mMetaConfig.property(oChange) : mMetaConfig.property;
+		}
 
 		const fApply = function(oChange, oControl, mPropertyBag) {
+			return fnQueueChange(oControl, async () => {
+				const oPriorAggregationConfig = await Engine.getInstance().readXConfig(oControl, {
+					propertyBag: mPropertyBag
+				});
 
-			return fnQueueChange(oControl, () => {
-				return Engine.getInstance().readXConfig(oControl, {
-						propertyBag: mPropertyBag
-					})
-					.then((oPriorAggregationConfig) => {
-						let sOldValue = null;
+				let sOldValue = null;
+				const sPropertyKey = oChange.getContent().name;
+				const sProperty = resolveProperty(oChange);
 
-						if (oPriorAggregationConfig &&
-							oPriorAggregationConfig.aggregations &&
-							oPriorAggregationConfig.aggregations[sAffectedAggregation] &&
-							oPriorAggregationConfig.aggregations[sAffectedAggregation][oChange.getContent().name] &&
-							oPriorAggregationConfig.aggregations[sAffectedAggregation][oChange.getContent().name][sAffectedProperty]
-						) {
-							sOldValue = oPriorAggregationConfig.aggregations[sAffectedAggregation][oChange.getContent().name][sAffectedProperty];
-						}
+				const oPriorSection = oControl.getMetadata().hasAggregation(sAffectedAggregation)
+					? oPriorAggregationConfig?.aggregations?.[sAffectedAggregation]
+					: oPriorAggregationConfig?.[sAffectedAggregation];
 
-						oChange.setRevertData({
-							name: oChange.getContent().name,
-							value: sOldValue
-						});
+				if (oPriorSection?.[sPropertyKey]?.[sProperty] !== undefined) {
+					sOldValue = oPriorSection[sPropertyKey][sProperty];
+				}
 
-						return Engine.getInstance().enhanceXConfig(oControl, {
-							controlMeta: {
-								aggregation: sAffectedAggregation
-							},
-							property: sAffectedProperty,
-							name: oChange.getContent().name,
-							value: oChange.getContent().value,
-							propertyBag: mPropertyBag
-						});
-					});
-			});
+				oChange.setRevertData(bDynamic
+					? {name: sPropertyKey, property: sProperty, value: sOldValue}
+					: {name: sPropertyKey, value: sOldValue}
+				);
 
-		};
-
-		const fRevert = function(oChange, oControl, mPropertyBag) {
-			return Engine.getInstance().enhanceXConfig(oControl, {
+				return Engine.getInstance().enhanceXConfig(oControl, {
 					controlMeta: {
 						aggregation: sAffectedAggregation
 					},
-					property: sAffectedProperty,
-					name: oChange.getRevertData().name,
-					value: oChange.getRevertData().value,
+					property: sProperty,
+					name: sPropertyKey,
+					value: oChange.getContent().value,
 					propertyBag: mPropertyBag
-				})
-				.then(() => {
-					oChange.resetRevertData();
 				});
+			});
+		};
+
+		const fRevert = async function(oChange, oControl, mPropertyBag) {
+			await Engine.getInstance().enhanceXConfig(oControl, {
+				controlMeta: {
+					aggregation: sAffectedAggregation
+				},
+				property: bDynamic ? oChange.getRevertData().property : mMetaConfig.property,
+				name: oChange.getRevertData().name,
+				value: oChange.getRevertData().value,
+				propertyBag: mPropertyBag
+			});
+			oChange.resetRevertData();
 		};
 
 		return Util.createChangeHandler({
@@ -113,7 +117,7 @@ sap.ui.define([
 				return {
 					classification: mMetaConfig.classification ?? CondenserClassification.LastOneWins,
 					affectedControl: oChange.getSelector(),
-					uniqueKey: oChange.getContent().name + "_" + mMetaConfig.aggregation + "_" + mMetaConfig.property
+					uniqueKey: oChange.getContent().name + "_" + sAffectedAggregation + "_" + resolveProperty(oChange)
 				};
 			}
 		});

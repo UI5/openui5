@@ -22,7 +22,8 @@ sap.ui.define([
 			label: "Sales Amount (local currency)",
 			dataType: "Edm.Decimal",
 			aggregatable: true,
-			unit: "LocalCurrency"
+			unit: "LocalCurrency",
+			isActive: true
 		}, {
 			key: "LocalCurrency",
 			path: "LocalCurrency",
@@ -47,7 +48,8 @@ sap.ui.define([
 			label: "Country",
 			dataType: "Edm.String",
 			groupable: true,
-			text: "Country"
+			text: "Country",
+			isActive: true
 		}, {
 			key: "Country",
 			path: "Country",
@@ -59,7 +61,8 @@ sap.ui.define([
 			path: "Region",
 			label: "Region",
 			dataType: "Edm.String",
-			groupable: true
+			groupable: true,
+			isActive: true
 		}, {
 			key: "Segment",
 			path: "Segment",
@@ -70,25 +73,30 @@ sap.ui.define([
 	};
 
 	CustomTableDelegate.addItem = function(oTable, sPropertyKey, mPropertyBag) {
-		if (sPropertyKey === "SalesAmountLocalCurrency") {
-			const oProperty = oTable.getPropertyHelper().getProperty(sPropertyKey);
-			return Promise.resolve(new Column({
-				header: oProperty.label,
-				propertyKey: oProperty.key,
-				template: new Text({
-					text: {
-						parts: [
-							"SalesAmountLocalCurrency",
-							"LocalCurrency",
-							{path: "/##@@requestCurrencyCodes", mode: "OneTime", targetType: "any"}
-						],
-						type: new CurrencyType()
-					}
-				})
-			}));
+		const oProperty = oTable.getPropertyHelper().getProperty(sPropertyKey);
+		let oTemplate;
+
+		if (oProperty.unit) {
+			const sUnitPath = oTable.getPropertyHelper().getProperty(oProperty.unit).path;
+			oTemplate = new Text({
+				text: {
+					parts: [
+						oProperty.path,
+						sUnitPath,
+						{path: "/##@@requestCurrencyCodes", mode: "OneTime", targetType: "any"}
+					],
+					type: new CurrencyType()
+				}
+			});
+		} else {
+			oTemplate = new Text({text: "{" + oProperty.path + "}"});
 		}
 
-		return TableDelegate.addItem.apply(this, arguments);
+		return Promise.resolve(new Column({
+			header: oProperty.label,
+			propertyKey: oProperty.key,
+			template: oTemplate
+		}));
 	};
 
 	CustomTableDelegate.updateBindingInfo = function(oTable, oBindingInfo) {

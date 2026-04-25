@@ -18,17 +18,17 @@ sap.ui.define([
 	QUnit.module("Column reordering");
 
 	opaTest("Drag 2nd column to 4th position", function(Given, When, Then) {
-		Then.onTheAppMDCTable.iCheckColumnPosition(sTableId, `${sTableId}-Name`, 1);
+		Then.onTheAppMDCTable.iCheckColumnPosition(sTableId, `${sTableId}--Name`, 1);
 		When.onTheAppMDCTable.iDragColumn(sTableId, 1);
 		When.onTheAppMDCTable.iDropColumnAfter(sTableId, 3);
-		Then.onTheAppMDCTable.iCheckColumnPosition(sTableId, `${sTableId}-Name`, 3);
+		Then.onTheAppMDCTable.iCheckColumnPosition(sTableId, `${sTableId}--Name`, 3);
 	});
 
 	opaTest("Drag 1st column to 2nd position", function(Given, When, Then) {
-		Then.onTheAppMDCTable.iCheckColumnPosition(sTableId, `${sTableId}-ID`, 0);
+		Then.onTheAppMDCTable.iCheckColumnPosition(sTableId, `${sTableId}--ID`, 0);
 		When.onTheAppMDCTable.iDragColumn(sTableId, 0);
 		When.onTheAppMDCTable.iDropColumnAfter(sTableId, 2);
-		Then.onTheAppMDCTable.iCheckColumnPosition(sTableId, `${sTableId}-ID`, 0);
+		Then.onTheAppMDCTable.iCheckColumnPosition(sTableId, `${sTableId}--ID`, 0);
 	});
 
 	QUnit.module("No Selection - Expand/Collapse");

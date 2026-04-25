@@ -84,6 +84,15 @@ sap.ui.define([
 			}
 		};
 
+		TestDelegate.addItem = function(oTable, sPropertyKey) {
+			const oProperty = oTable.getPropertyHelper().getProperty(sPropertyKey);
+			return Promise.resolve(new Column({
+				header: oProperty.label,
+				propertyKey: sPropertyKey,
+				template: new Text({text: "{" + oProperty.path + "}"})
+			}));
+		};
+
 		return TestDelegate;
 	});
 
@@ -900,6 +909,84 @@ sap.ui.define([
 				dataType: "String",
 				extension: {
 					technicallyGroupable: true
+				}
+			}]
+		});
+		await this.oTable.rebind();
+		this.verify$$aggregation({
+			aggregate: {},
+			grandTotalAtBottomOnly: true,
+			subtotalsAtBottomOnly: true,
+			group: {
+				CountryPath: {}
+			},
+			groupLevels: []
+		});
+	});
+
+	QUnit.test("Group condition for inactive property", async function(assert) {
+		await this.initTable({
+			propertyKeys: ["Country", "InactiveGroup"],
+			groupConditions: {
+				groupLevels: [{
+					name: "InactiveGroup"
+				}]
+			}
+		}, [], {
+			propertyInfo: [{
+				key: "Country",
+				path: "CountryPath",
+				label: "Country Label",
+				dataType: "String",
+				extension: {
+					technicallyGroupable: true
+				}
+			}, {
+				key: "InactiveGroup",
+				path: "InactiveGroupPath",
+				label: "InactiveGroup Label",
+				dataType: "String",
+				isActive: false,
+				extension: {
+					technicallyGroupable: true
+				}
+			}]
+		});
+		await this.oTable.rebind();
+		this.verify$$aggregation({
+			aggregate: {},
+			grandTotalAtBottomOnly: true,
+			subtotalsAtBottomOnly: true,
+			group: {
+				CountryPath: {}
+			},
+			groupLevels: []
+		});
+	});
+
+	QUnit.test("Aggregate condition for inactive property", async function(assert) {
+		await this.initTable({
+			propertyKeys: ["Country", "InactiveSales"],
+			aggregateConditions: {
+				InactiveSales: {}
+			}
+		}, [], {
+			propertyInfo: [{
+				key: "Country",
+				path: "CountryPath",
+				label: "Country Label",
+				dataType: "String",
+				extension: {
+					technicallyGroupable: true
+				}
+			}, {
+				key: "InactiveSales",
+				path: "InactiveSalesPath",
+				label: "InactiveSales Label",
+				dataType: "String",
+				isActive: false,
+				extension: {
+					technicallyAggregatable: true
 				}
 			}]
 		});
@@ -1887,6 +1974,52 @@ sap.ui.define([
 			"Data aggregation disabled");
 	});
 
+	QUnit.test("Sort and filter exclude inactive property", async function(assert) {
+		await this.initTable({
+			p13nMode: ["Sort", "Filter"],
+			propertyKeys: ["Name", "Inactive"],
+			sortConditions: {
+				sorters: [
+					{name: "Name", descending: true},
+					{name: "Inactive", descending: false}
+				]
+			},
+			filterConditions: {
+				Name: [{
+					isEmpty: null,
+					operator: OperatorName.EQ,
+					validated: ConditionValidated.NotValidated,
+					values: ["test"]
+				}],
+				Inactive: [{
+					isEmpty: null,
+					operator: OperatorName.EQ,
+					validated: ConditionValidated.NotValidated,
+					values: ["test"]
+				}]
+			}
+		}, [{
+			key: "Name",
+			path: "Name_Path",
+			label: "Name_Label",
+			dataType: "String"
+		}, {
+			key: "Inactive",
+			path: "Inactive_Path",
+			label: "Inactive_Label",
+			dataType: "String",
+			isActive: false
+		}]);
+
+		const oBindingInfo = {};
+		TableDelegate.updateBindingInfo(this.oTable, oBindingInfo);
+
+		assert.equal(oBindingInfo.sorter.length, 1, "Only one sorter in binding info");
+		assert.equal(oBindingInfo.sorter[0].sPath, "Name_Path", "Sorter is for the active property");
+		assert.equal(oBindingInfo.filters.length, 1, "Only one filter in binding info");
+		assert.equal(oBindingInfo.filters[0].sPath, "Name_Path", "Filter is for the active property");
+	});
+
 	QUnit.test("$$aggregation.expandTo binding parameter", async function(assert) {
 		await this.initTable();
 
@@ -2537,6 +2670,63 @@ sap.ui.define([
 		}, "Removing the column that contains a grouped property with ResponsiveTable type");
 	});
 
+	QUnit.test("Restrictions for inactive property", async function(assert) {
+		this.oTable.destroy();
+		this.oTable = new Table({
+			p13nMode: ["Group", "Aggregate"],
+			propertyKeys: ["Name", "Inactive"],
+			delegate: {
+				name: "odata.v4.TestDelegate",
+				payload: {
+					propertyInfo: [{
+						key: "Name",
+						label: "Name",
+						path: "Name",
+						dataType: "String",
+						groupable: true,
+						aggregatable: true
+					}, {
+						key: "Inactive",
+						label: "Inactive",
+						path: "Inactive",
+						dataType: "String",
+						groupable: true,
+						aggregatable: true,
+						isActive: false
+					}]
+				}
+			}
+		});
+		await this.oTable.initialized();
+
+		assert.deepEqual(this.oTable.validateState({
+			items: [{name: "Name"}],
+			sorters: [{name: "Inactive"}]
+		}, "Sort"), {
+			validation: MessageType.None,
+			message: undefined
+		}, "Sort: inactive property does not trigger restriction message");
+
+		this.oTable.setType(TableType.ResponsiveTable);
+		assert.deepEqual(this.oTable.validateState({
+			items: [{name: "Name"}],
+			groupLevels: [{name: "Inactive"}]
+		}, "Group"), {
+			validation: MessageType.None,
+			message: undefined
+		}, "Group: inactive property does not trigger restriction message on ResponsiveTable");
+
+		this.oTable.setType(TableType.Table);
+		assert.deepEqual(this.oTable.validateState({
+			items: [{name: "Name"}],
+			sorters: [{name: "Inactive"}],
+			aggregations: {Inactive: {}}
+		}, "Column"), {
+			validation: MessageType.None,
+			message: undefined
+		}, "Column: inactive property with sort and aggregate does not trigger restriction messages");
+	});
+
 	QUnit.module("API", {
 		afterEach: function() {
 			this.destroyTable();
@@ -2816,6 +3006,7 @@ sap.ui.define([
 		oSelectionPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Selection");
 		assert.ok(oSelectionPlugin?.isA("sap.ui.table.plugins.ODataV4MultiSelection"), "Set selection mode to Multi: Applied ODataV4MultiSelection");
 		assert.ok(oSelectionPlugin.getEnabled(), "Plugin enabled");
+		assert.notOk(oSelectionPlugin.getProperty("leafSelectionDisabled"), "leafSelectionDisabled defaults to false");
 		this.oTable.getType().setSelectionLimit(123);
 		assert.equal(oSelectionPlugin.getLimit(), 123, "A 'selectionLimit' change correctly affects ODataV4MultiSelection");
 		this.oTable.getType().setShowHeaderSelector(true);
@@ -3142,6 +3333,75 @@ sap.ui.define([
 			this.oTable.attachEventOnce("_bindingChange", resolve);
 		});
 		assert.deepEqual(this.oTable.getSelectedContexts().map((oContext) => oContext.getPath()), [], "Selected contexts");
+	});
+
+	QUnit.test("isLeafSelectionDisabled returns true with TreeTableType", async function(assert) {
+		sap.ui.define("odata.v4.LeafSelectionDisabledDelegate", [
+			"odata.v4.TestDelegate"
+		], function(TestDelegate) {
+			const CustomDelegate = Object.assign({}, TestDelegate);
+			CustomDelegate.isLeafSelectionDisabled = function() {
+				return true;
+			};
+			return CustomDelegate;
+		});
+
+		await this.initTable({
+			selectionMode: SelectionMode.Multi,
+			type: new TreeTableType(),
+			delegate: {
+				name: "odata.v4.LeafSelectionDisabledDelegate",
+				payload: {
+					collectionPath: "/Products",
+					propertyInfo: [{
+						key: "ProductName",
+						path: "Name",
+						label: "Product Name",
+						dataType: "String"
+					}]
+				}
+			}
+		});
+		await this.oTable.initialized();
+
+		const oSelectionPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Selection");
+		assert.ok(oSelectionPlugin.isA("sap.ui.table.plugins.ODataV4MultiSelection"), "ODataV4MultiSelection applied");
+		assert.ok(oSelectionPlugin.getProperty("leafSelectionDisabled"), "leafSelectionDisabled is true on the plugin");
+	});
+
+	QUnit.test("isLeafSelectionDisabled is not applied for GridTableType", async function(assert) {
+		sap.ui.define("odata.v4.LeafSelectionDisabledGridDelegate", [
+			"odata.v4.TestDelegate"
+		], function(TestDelegate) {
+			const CustomDelegate = Object.assign({}, TestDelegate);
+			CustomDelegate.isLeafSelectionDisabled = function() {
+				return true;
+			};
+			return CustomDelegate;
+		});
+
+		await this.initTable({
+			selectionMode: SelectionMode.Multi,
+			type: new GridTableType(),
+			delegate: {
+				name: "odata.v4.LeafSelectionDisabledGridDelegate",
+				payload: {
+					collectionPath: "/Products",
+					propertyInfo: [{
+						key: "ProductName",
+						path: "Name",
+						label: "Product Name",
+						dataType: "String"
+					}]
+				}
+			}
+		});
+		await this.oTable.initialized();
+
+		const oSelectionPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Selection");
+		assert.ok(oSelectionPlugin.isA("sap.ui.table.plugins.ODataV4MultiSelection"), "ODataV4MultiSelection applied");
+		assert.notOk(oSelectionPlugin.getProperty("leafSelectionDisabled"),
+			"leafSelectionDisabled is not set for GridTableType even if delegate returns true");
 	});
 
 	QUnit.module("Rebind with invalid state", {

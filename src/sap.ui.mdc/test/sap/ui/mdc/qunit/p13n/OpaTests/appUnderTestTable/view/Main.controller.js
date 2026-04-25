@@ -21,7 +21,8 @@ sap.ui.define([
 				Transient: "AppUnderTestTable.view.Transient",
 				TransientGlobal: "AppUnderTestTable.view.TransientGlobal",
 				AutoImplicit: "AppUnderTestTable.view.AutoImplicit",
-				State: "AppUnderTestTable.view.State"
+				State: "AppUnderTestTable.view.State",
+				DynamicProperties: "AppUnderTestTable.view.DynamicProperties"
 			};
 
 			V4ServerHelper.requestServerURLForTenant("MDCTableP13nOpaTestApplication", true).then(function(tenantBaseUrl) {

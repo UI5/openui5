@@ -768,6 +768,38 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("Check 'getRTASettingsActionHandler' - handler restored after dialog close without changes", async function(assert) {
+		const oEngine = Engine.getInstance();
+		const oOriginalHandler = oEngine.getModificationHandler(this.oControl);
+
+		// Stub uimanager.show to capture the close callback and simulate dialog lifecycle
+		let fnSimulateCloseDialog;
+		const oShowStub = sinon.stub(oEngine.uimanager, "show").callsFake(function(oControl, aKeys, mSettings) {
+			fnSimulateCloseDialog = mSettings.close;
+			return Promise.resolve({
+				getCustomHeader: () => null,
+				addStyleClass: () => {},
+				attachAfterClose: () => {}
+			});
+		});
+
+		const oRTAPromise = oEngine.getRTASettingsActionHandler(this.oControl, {}, "Test");
+
+		// Verify temp handler is in place
+		assert.notStrictEqual(oEngine.getModificationHandler(this.oControl), oOriginalHandler,
+			"Temporary handler replaces original after dialog opens");
+
+		// Simulate dialog close without changes (Cancel/Escape)
+		fnSimulateCloseDialog();
+
+		const aResult = await oRTAPromise;
+		assert.deepEqual(aResult, [], "RTA promise resolves with empty array on cancel");
+		assert.strictEqual(oEngine.getModificationHandler(this.oControl), oOriginalHandler,
+			"Original handler is restored after dialog close");
+
+		oShowStub.restore();
+	});
+
 	QUnit.test("Check 'validateP13n' message handling (warning should display a message strip)", function(assert){
 
 		this.oControl.validateState = function(){

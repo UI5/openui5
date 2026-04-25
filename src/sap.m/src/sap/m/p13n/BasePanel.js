@@ -53,6 +53,12 @@ sap.ui.define([
 ) => {
 	"use strict";
 
+	// shortcut for sap.m.ListKeyboardMode
+	const ListKeyboardMode = library.ListKeyboardMode;
+
+	// shortcut for sap.m.ListMode
+	const ListMode = library.ListMode;
+
 	/**
 	 * P13n <code>Item</code> object type.
 	 *
@@ -601,8 +607,10 @@ sap.ui.define([
 
 	BasePanel.prototype._getListControlConfig = function() {
 		return {
-			mode: "MultiSelect",
+			mode: ListMode.MultiSelect,
 			rememberSelections: true,
+			rememberFocus: false,
+			keyboardMode: ListKeyboardMode.Edit,
 			itemPress: [this._onItemPressed, this],
 			selectionChange: [this._onSelectionChange, this],
 			sticky: ["HeaderToolbar", "ColumnHeaders", "InfoToolbar"],

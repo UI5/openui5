@@ -191,9 +191,10 @@ sap.ui.define([
 	QueryPanel.prototype._createInnerListControl = function() {
 		const oList = new List(this.getId() + "-innerP13nList", {
 			itemPress: [this._onItemPressed, this],
-			dragDropConfig: this._getDragDropConfig()
+			dragDropConfig: this._getDragDropConfig(),
+			rememberFocus: false,
+			keyboardMode: ListKeyboardMode.Edit
 		});
-		oList.setKeyboardMode(ListKeyboardMode.Edit);
 		return oList;
 	};
 

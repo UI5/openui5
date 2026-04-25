@@ -125,6 +125,15 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 	 * @private
 	 */
 	 SelectRenderer.renderFocusElement = function (oRm, oSelect) {
+		if (!oSelect.getEnabled()) {
+			// Do not render the focus element when the Select is disabled.
+			// This ensures that when the Select becomes enabled, a new DOM node
+			// is inserted (instead of patching the existing one), which forces
+			// screen readers like JAWS to create a fresh virtual-buffer entry
+			// and correctly announce the selected value.
+			return;
+		}
+
 		var oSelectedItem = oSelect.getSelectedItem(),
 			bIconOnly = oSelect.getType() === SelectType.IconOnly;
 
@@ -137,9 +146,7 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 		oRm.class(SelectRenderer.CSS_CLASS + "HiddenSelect");
 
 		// Attributes
-		if (oSelect.getEnabled()) {
-			oRm.attr("tabindex", "0");
-		}
+		oRm.attr("tabindex", "0");
 
 		oRm.openEnd();
 

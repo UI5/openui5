@@ -13,5 +13,9 @@ sap.ui.define([
 		};
 	};
 
+	CustomTableDelegate.isLeafSelectionDisabled = function(oTable) {
+		return new URLSearchParams(window.location.search).get("sap-ui-xx-leaf-selection-disabled") === "true";
+	};
+
 	return CustomTableDelegate;
 });

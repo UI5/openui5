@@ -300,6 +300,8 @@ function(
 				 * This is suitable for configuration dialogs, settings panels, and other form-like usages where
 				 * a predictable initial focus is required.
 				 *
+				 * @private
+				 * @ui5-restricted sap.m
 				 * @since 1.148
 				 */
 				rememberFocus : {type : "boolean", group : "Behavior", defaultValue : true}

@@ -29,9 +29,13 @@ sap.ui.define([
 	"sap/ui/core/InvisibleText",
 	"sap/ui/core/InvisibleMessage",
 	"sap/ui/Device",
-	"sap/ui/layout/VerticalLayout"
-], (Library, JSONModel, QueryPanel, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, Filter, Item, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, Button, ToggleButton, InvisibleText, InvisibleMessage, Device, VerticalLayout) => {
+	"sap/ui/layout/VerticalLayout",
+	"sap/m/library"
+], (Library, JSONModel, QueryPanel, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, Filter, Item, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, Button, ToggleButton, InvisibleText, InvisibleMessage, Device, VerticalLayout, library) => {
 	"use strict";
+
+	// shortcut for sap.m.ListKeyboardMode
+	const ListKeyboardMode = library.ListKeyboardMode;
 
 	const { ValueState } = coreLib;
 	const { InvisibleMessageMode } = coreLib;
@@ -192,11 +196,17 @@ sap.ui.define([
 		const oList = new List(this.getId() + "-innerP13nList", {
 			ariaLabelledBy: this.getId() + "-title",
 			dragDropConfig: oDragDropConfig,
-			keyboardMode: "Edit",
+			keyboardMode: ListKeyboardMode.Edit,
 			headerToolbar: this._getToolbar(),
-			selectionChange: this._onSelectionChange.bind(this)
+			selectionChange: this._onSelectionChange.bind(this),
+			rememberFocus: false
 		});
-
+		// Override to exclude GroupHeaderListItems from keyboard navigation in grouped mode.
+		// Without this, Edit keyboard mode behaves like Navigation mode when GroupHeaders are present,
+		// as GroupHeaders contain no tabbable elements and fallback to item-level focus.
+		oList._skipGroupHeaderFocus = function() {
+			return this._oViewModel?.getProperty("/grouped") || false;
+		}.bind(this);
 
 		return oList;
 	};
@@ -447,7 +457,7 @@ sap.ui.define([
 	};
 
 	AdaptFiltersPanelContent.prototype._groupHeaderFactory = function(oGroup) {
-		return new GroupHeaderListItem({
+		const oGroupHeader = new GroupHeaderListItem({
 			title: oGroup.text,
 			visible: {
 				path: `${this.P13N_MODEL}>/items`,
@@ -462,6 +472,14 @@ sap.ui.define([
 				}
 			}
 		});
+
+		// Override getTabbables to exclude GroupHeaderListItem from keyboard navigation
+		// This ensures that Edit mode keyboard navigation works correctly in grouped view
+		oGroupHeader.getTabbables = () => {
+			return oGroupHeader.$().filter(() => false);
+		};
+
+		return oGroupHeader;
 	};
 
 

@@ -34,6 +34,7 @@ sap.ui.define([
 	const PropertyHelper = PropertyHelperBase.extend("sap.ui.mdc.filterbar.PropertyHelper", {
 		constructor: function(aProperties, oParent) {
 			PropertyHelperBase.call(this, aProperties, oParent, {
+				isActive: true,
 				required: { // Whether there must be a filter condition for this property before firing a "search" event.
 					type: "boolean"
 				},

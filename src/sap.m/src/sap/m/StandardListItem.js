@@ -435,6 +435,7 @@ sap.ui.define([
 			oThreeDots.textContent = " ";
 			oButton.textContent = oRb.getText("EXPANDABLE_TEXT_SHOW_LESS");
 			bTextExpanded = true;
+			oButton.scrollIntoView({ behavior: "smooth", block: "nearest" });
 		} else {
 			oText.textContent = this._getCollapsedText(sText);
 			oThreeDots.textContent = " ... ";

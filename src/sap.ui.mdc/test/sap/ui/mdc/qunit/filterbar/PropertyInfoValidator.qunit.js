@@ -903,4 +903,74 @@ sap.ui.define([
 
 	});
 
+	QUnit.module("updateControlFromPropertyInfo");
+
+	QUnit.test("should do nothing when oControl is not provided", function(assert) {
+		const fnCheckMandatoryPropertySpy = sinon.spy(PropertyInfoValidator, "checkMandatoryProperties");
+		const oPropertyInfo = {};
+
+		assert.ok(fnCheckMandatoryPropertySpy.notCalled, "should not call 'updateControlFromPropertyInfo' initially");
+
+		PropertyInfoValidator.updateControlFromPropertyInfo(undefined, oPropertyInfo);
+		PropertyInfoValidator.updateControlFromPropertyInfo(null, oPropertyInfo);
+		PropertyInfoValidator.updateControlFromPropertyInfo(false, oPropertyInfo);
+
+		assert.ok(fnCheckMandatoryPropertySpy.notCalled, "should not call 'updateControlFromPropertyInfo'");
+
+		fnCheckMandatoryPropertySpy.restore();
+	});
+
+	QUnit.test("should do nothing when oPropertyInfo is not provided", function(assert) {
+		const fnCheckMandatoryPropertySpy = sinon.spy(PropertyInfoValidator, "checkMandatoryProperties");
+		const oControl = {};
+
+		assert.ok(fnCheckMandatoryPropertySpy.notCalled, "should not call 'updateControlFromPropertyInfo' initially");
+
+		PropertyInfoValidator.updateControlFromPropertyInfo(oControl, undefined);
+		PropertyInfoValidator.updateControlFromPropertyInfo(oControl, null);
+		PropertyInfoValidator.updateControlFromPropertyInfo(oControl, false);
+
+		assert.ok(fnCheckMandatoryPropertySpy.notCalled, "should not call 'updateControlFromPropertyInfo'");
+
+		fnCheckMandatoryPropertySpy.restore();
+	});
+
+	aMandatoryPropertiesWithRequired.forEach((sMandatoryProperty) => {
+		const sPropertyInfoPropertyName = PropertyInfoValidator._getPropertyInfoPropertyName(sMandatoryProperty);
+		QUnit.test(`should override '${sMandatoryProperty}' with the one provided in property info`, function (assert) {
+			const fnSetPropertyStub = sinon.stub();
+			const fnGetPropertyStub = sinon.stub().returns("old Value");
+			const oControlMock = {
+				setProperty: fnSetPropertyStub,
+				getProperty: fnGetPropertyStub
+			};
+
+			const vValue = "Updated Value";
+			const fnHasOwnPropertyStub = sinon.stub().returns(false);
+			fnHasOwnPropertyStub.withArgs(sPropertyInfoPropertyName).returns(true);
+
+			const oPropertyInfo = {
+				hasOwnProperty: fnHasOwnPropertyStub
+			};
+			oPropertyInfo[sPropertyInfoPropertyName] = vValue;
+
+			const fnCheckMandatoryPropertiesStub = sinon.stub(PropertyInfoValidator, "checkMandatoryProperties");
+			fnCheckMandatoryPropertiesStub.returns(false);
+
+			assert.ok(fnCheckMandatoryPropertiesStub.notCalled, "should not call 'checkMandatoryProperties' initially");
+			assert.ok(fnHasOwnPropertyStub.notCalled, "should not call 'hasOwnProperty'");
+			assert.ok(fnSetPropertyStub.notCalled, "should not call 'setProperty'");
+
+			PropertyInfoValidator.updateControlFromPropertyInfo(oControlMock, oPropertyInfo);
+
+			assert.ok(fnCheckMandatoryPropertiesStub.calledOnce, `should call 'checkMandatoryProperties'`);
+			assert.equal(fnHasOwnPropertyStub.callCount, aMandatoryPropertiesWithRequired.length, `should call 'hasOwnProperty' ${aMandatoryPropertiesWithRequired.length} times`);
+
+			assert.ok(fnSetPropertyStub.calledOnce, "should call 'setProperty'");
+			assert.ok(fnSetPropertyStub.calledWith(sMandatoryProperty, vValue), "should call 'setProperty' with correct parameters");
+
+			fnCheckMandatoryPropertiesStub.restore();
+		});
+	});
+
 });

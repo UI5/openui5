@@ -33,6 +33,13 @@ sap.ui.define([
         assert.ok(this.oFilterBarBase, "FilterBarBase instance created");
     });
 
+	QUnit.test("getEngineControllers", function(assert) {
+		const mControllers = this.oFilterBarBase.getEngineControllers();
+		assert.ok(mControllers["Filter"], "Filter controller is returned");
+		assert.ok(mControllers["Filter"].isA("sap.m.p13n.FilterController"), "Filter controller is a FilterController");
+		assert.ok(!mControllers["PropertyInfo"], "PropertyInfo controller is not returned");
+	});
+
     QUnit.test("getCurrentState returns conditions based on the persistence setting", function(assert){
         const done = assert.async();
 

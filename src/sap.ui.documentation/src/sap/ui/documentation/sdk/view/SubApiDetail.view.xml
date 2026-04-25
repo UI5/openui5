@@ -130,7 +130,7 @@
 												<custom:Row>
 													<custom:ParamText text="{name}" phoneText="{phoneName}" depth="{depth}" optional="{optional}"/>
 													<m:Text text="{type}" wrapping="false"/>
-													<m:Text text="{defaultValue}" wrapping="false"/>
+													<m:Text text="{path: 'defaultValue', formatter: 'formatter.escapeSettingsValue'}"/>
 													<custom:JSDocText sanitizeContent="false" text="{description}"/>
 												</custom:Row>
 											</custom:LightTable>
@@ -254,7 +254,7 @@
 													<custom:Row expandable="{= ${typeInfo/refersToTypedef} === true}" typedefName="{= ${typeInfo/UI5Types} ? ${typeInfo/UI5Types/0} : ${typeInfo/type} }" expandToggle="onTypedefToggle">
 														<custom:ParamText text="{name}" phoneText="{phoneName}" depth="{depth}" optional="{optional}"/>
 														<custom:JSDocType typeInfo="{parts: ['typeInfo', 'types', 'type', 'linkEnabled'], formatter: '.formatter.formatJSDocType'}"/>
-														<m:Text text="{defaultValue}" wrapping="false"/>
+														<m:Text text="{path: 'defaultValue', formatter: '.formatter.escapeSettingsValue'}"/>
 														<custom:JSDocText sanitizeContent="false" text="{description}"/>
 													</custom:Row>
 												</custom:LightTable>
@@ -296,7 +296,7 @@
 											<custom:Row>
 												<custom:ParamText class="sapUiDocumentationParamBold" text="{name}"/>
 												<custom:JSDocType typeInfo="{parts: ['typeInfo', 'types', 'type', 'linkEnabled'], formatter: '.formatter.formatJSDocType'}"/>
-												<m:Text text="{defaultValue}"/>
+												<m:Text text="{path: 'defaultValue', formatter: '.formatter.escapeSettingsValue'}"/>
 												<layout:VerticalLayout width="100%">
 													<custom:JSDocText sanitizeContent="false" text="{description}"/>
 													<layout:HorizontalLayout>
@@ -681,7 +681,7 @@
 																<custom:Row expandable="{= ${parameter>typeInfo/refersToTypedef} === true}" typedefName="{= ${parameter>typeInfo/UI5Types} ? ${parameter>typeInfo/UI5Types/0} : ${parameter>typeInfo/type} }" expandToggle="onTypedefToggle">
 																	<custom:ParamText text="{parameter>name}" phoneText="{parameter>phoneName}" depth="{parameter>depth}" optional="{parameter>optional}"/>
 																	<custom:JSDocType typeInfo="{parts: ['parameter>typeInfo','parameter>types'], formatter: '.formatter.stringifyJSDocType'}"/>
-																	<m:Text text="{parameter>defaultValue}" wrapping="false"/>
+																	<m:Text text="{path: 'parameter>defaultValue', formatter: '.formatter.escapeSettingsValue'}"/>
 																	<custom:JSDocText sanitizeContent="false" text="{path: 'parameter>description', formatter: '.formatter.escapeSettingsValue'}"/>
 																</custom:Row>
 															</template:repeat>

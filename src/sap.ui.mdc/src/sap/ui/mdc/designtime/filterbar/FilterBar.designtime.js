@@ -39,6 +39,9 @@ sap.ui.define([
 			}
 		},
 		properties: {
+			propertyKeys: {
+				ignore: true
+			},
 			showAdaptFiltersButton: {
 				ignore: false
 			},

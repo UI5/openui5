@@ -236,7 +236,13 @@ sap.ui.define([
 					return;
 				}
 
-				const sLabel = this.getPropertyHelper().getProperty(oConditionKey) ? this.getPropertyHelper().getProperty(oConditionKey).label : oConditionKey; //TODO the property for the filter might not exitst when you select a variant
+				const oProperty = this.getPropertyHelper().getProperty(oConditionKey, true);
+
+				if (oProperty && oProperty.isActive === false) {
+					return; // Skip inactive properties
+				}
+
+				const sLabel = oProperty ? oProperty.label : oConditionKey; //TODO the property for the filter might not exitst when you select a variant
 
 				if (sLabel) {
 					aLabels.push(sLabel);

@@ -58,7 +58,8 @@ sap.ui.define([
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/mdc/enums/TableActionPosition",
 	"sap/m/Menu",
-	"sap/ui/fl/variants/VariantManagement"
+	"sap/ui/fl/variants/VariantManagement",
+	"sap/ui/mdc/p13n/StateUtil"
 ], function(
 	TableQUnitUtils,
 	Element,
@@ -117,7 +118,8 @@ sap.ui.define([
 	OperatorName,
 	TableActionPosition,
 	Menu,
-	VariantManagement
+	VariantManagement,
+	StateUtil
 ) {
 	"use strict";
 
@@ -589,69 +591,6 @@ sap.ui.define([
 		assert.ok(oDomRef.classList.contains("MyTestClassB"), "Table has class MyTestClassB provided by the type");
 	});
 
-	QUnit.test("Columns added to inner table", function(assert) {
-		this.oTable.addColumn(new Column({
-			minWidth: 8.4,
-			header: "Test1",
-			template: new Text({
-				text: "Test1"
-			}),
-			creationTemplate: new Text({
-				text: "Test1"
-			}),
-			required: true
-		}));
-		this.oTable.insertColumn(new Column({
-			minWidth: 8.5,
-			header: "Test",
-			template: new Text({
-				text: "Test"
-			})
-		}), 0);
-		this.oTable.insertColumn(new Column({
-			header: "Test2",
-			template: new Text({
-				text: "Test2"
-			})
-		}), 2);
-
-		return this.oTable.initialized().then(function() {
-			const aMDCColumns = this.oTable.getColumns();
-			const aInnerColumns = this.oTable._oTable.getColumns();
-			assert.equal(aMDCColumns.length, aInnerColumns.length);
-		}.bind(this));
-	});
-
-	QUnit.test("Columns added to inner table - one by one E.g. pers", function(assert) {
-		this.oTable.addColumn(new Column({
-			header: "Test",
-			template: new Text({
-				text: "Test"
-			})
-		}));
-
-		return this.oTable.initialized().then(function() {
-			let aMDCColumns = this.oTable.getColumns();
-			let aInnerColumns = this.oTable._oTable.getColumns();
-			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aMDCColumns[0].getHeader(), aInnerColumns[0].getLabel().getText());
-
-			this.oTable.insertColumn(new Column({
-				header: "Test2",
-				template: new Text({
-					text: "Test2"
-				})
-			}), 0);
-
-			aMDCColumns = this.oTable.getColumns();
-			aInnerColumns = this.oTable._oTable.getColumns();
-			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aMDCColumns[0].getHeader(), aInnerColumns[0].getLabel().getText());
-			assert.equal("Test2", aInnerColumns[0].getLabel().getText());
-		}.bind(this));
-
-	});
-
 	QUnit.test("Destroy", async function(assert) {
 		await this.oTable.initialized();
 
@@ -682,166 +621,6 @@ sap.ui.define([
 			this.oTable.invalidate();
 
 			assert.equal(oInnerTableInvalidate.callCount, 0, "Inner table is not invalidated if the MDC Table is invalidated");
-		}.bind(this));
-	});
-
-	QUnit.test("insertAggregation('cell') should be skiped for sap.m.GroupHeaderListItem", function(assert) {
-		this.oTable.destroy();
-		this.oTable = new Table({
-			type: TableType.ResponsiveTable,
-			delegate: {
-				name: sDelegatePath,
-				payload: {
-					collectionPath: "/testPath",
-					propertyInfo: [{
-						key: "column1",
-						path: "column1",
-						label: "column1",
-						dataType: "String"
-					}, {
-						key: "column2",
-						path: "column2",
-						label: "column2",
-						dataType: "String"
-					}, {
-						key: "column3",
-						path: "column3",
-						label: "column3",
-						dataType: "String"
-					}]
-				}
-			},
-			columns: [
-				new Column({
-					header: "Column1",
-					template: new Text({
-						text: "{cell1}"
-					}),
-					propertyKey: "column1"
-				}), new Column({
-					header: "Column2",
-					template: new Text({
-						text: "{cell2}"
-					}),
-					propertyKey: "column2"
-				})
-			],
-			models: new JSONModel({
-				testPath: new Array(10).fill({
-					column1: "cell1",
-					column2: "cell2",
-					column3: "cell3"
-				})
-			})
-		});
-
-		return this.oTable._fullyInitialized().then(function() {
-			this.oTable.setGroupConditions({
-				groupLevels: [
-					{name: "column1"}
-				]
-			});
-			return TableQUnitUtils.waitForBindingInfo(this.oTable);
-		}.bind(this)).then(function() {
-			const aItems = this.oTable._oTable.getItems();
-			assert.ok(aItems[0].isA("sap.m.GroupHeaderListItem"), "Grouping applied as expected");
-			assert.strictEqual(aItems.length, 11, "1 group header item + 10 list items");
-
-			const fnIsASpy = sinon.spy(aItems[0], "isA");
-
-			// add a column
-			this.oTable.insertColumn(new Column({
-				header: "Column3",
-				template: new Text({
-					text: "{cell3}"
-				}),
-				propertyKey: "column3"
-			}), 1);
-
-			assert.ok(fnIsASpy.calledWith("sap.m.GroupHeaderListItem"), 10, "insertAggregation('cells') skipped for sap.m.GroupHeaderListItem");
-		}.bind(this));
-	});
-
-	QUnit.test("check for initial column index", function(assert) {
-		this.oTable.destroy();
-		this.oTable = new Table({
-			delegate: {
-				name: sDelegatePath,
-				payload: {
-					collectionPath: "/testPath"
-				}
-			},
-			type: TableType.ResponsiveTable,
-			columns: [
-				new Column({
-					id: "foo0",
-					header: "Test0",
-					template: new Text({
-						text: "template0"
-					})
-				}),
-				new Column({
-					id: "foo1",
-					header: "Test1",
-					template: new Text({
-						text: "template1"
-					})
-				})
-
-			],
-			models: new JSONModel({
-				testPath: new Array(10).fill({})
-			})
-		});
-
-		return TableQUnitUtils.waitForBinding(this.oTable).then(function() {
-			let aMDCColumns = this.oTable.getColumns();
-			let aInnerColumns = this.oTable._oTable.getColumns();
-			const oInnerColumnListItem = this.oTable._oRowTemplate;
-			const oFirstInnerItem = this.oTable._oTable.getItems()[0];
-
-			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aInnerColumns[0].getHeader().getText(), "Test0");
-			assert.equal(aInnerColumns[1].getHeader().getText(), "Test1");
-			assert.equal(oInnerColumnListItem.getCells()[0].getText(), "template0");
-			assert.equal(oInnerColumnListItem.getCells()[1].getText(), "template1");
-
-			this.oTable.insertColumn(new Column({
-				header: "Test2",
-				template: new Text({
-					text: "template2"
-				})
-			}), 1);
-			aMDCColumns = this.oTable.getColumns();
-			aInnerColumns = this.oTable._oTable.getColumns();
-			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aInnerColumns[0].getHeader().getText(), "Test0");
-			assert.equal(aInnerColumns[1].getHeader().getText(), "Test2");
-			assert.equal(aInnerColumns[2].getHeader().getText(), "Test1");
-			assert.equal(oInnerColumnListItem.getCells()[0].getText(), "template0");
-			assert.equal(oInnerColumnListItem.getCells()[1].getText(), "template2");
-			assert.equal(oInnerColumnListItem.getCells()[2].getText(), "template1");
-			assert.equal(oFirstInnerItem.getCells().length, 3, "Inner items have 3 cells");
-			assert.ok(oFirstInnerItem.getCells()[1].isA("sap.ui.core.InvisibleText"),
-				"A placeholder cell is added to the inner items for the inserted column");
-
-			this.oTable.removeColumn("foo0");
-			aMDCColumns = this.oTable.getColumns();
-			aInnerColumns = this.oTable._oTable.getColumns();
-			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aInnerColumns[0].getHeader().getText(), "Test2");
-			assert.equal(aInnerColumns[1].getHeader().getText(), "Test1");
-			assert.equal(oInnerColumnListItem.getCells()[0].getText(), "template2");
-			assert.equal(oInnerColumnListItem.getCells()[1].getText(), "template1");
-
-			const oColumnDestroy = sinon.spy(this.oTable._oTable.getColumns()[1], "destroy");
-			this.oTable.removeColumn("foo1");
-			aMDCColumns = this.oTable.getColumns();
-			aInnerColumns = this.oTable._oTable.getColumns();
-			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aInnerColumns[0].getHeader().getText(), "Test2");
-			assert.equal(oInnerColumnListItem.getCells()[0].getText(), "template2");
-			assert.ok(oColumnDestroy.calledOnce, "Inner column destroyed");
 		}.bind(this));
 	});
 
@@ -1115,55 +894,6 @@ sap.ui.define([
 		await fnRearrangeTest(this.oTable, 0, 0); // move from 0 --> 0
 		assert.ok(fCreateChanges.notCalled);
 		fCreateChanges.restore();
-	});
-
-	QUnit.test("rearrange columns - ResponsiveTable", async function(assert) {
-		const oTable = new Table({
-			type: TableType.ResponsiveTable
-		});
-
-		oTable.addColumn(new Column("test1", {
-			header: "Test1",
-			template: new Text({
-				text: "Test1"
-			})
-		}));
-
-		oTable.addColumn(new Column("test2", {
-			header: "Test2",
-			template: new Text({
-				text: "Test2"
-			})
-		}));
-
-		oTable.addColumn(new Column("test3", {
-			header: "Test3",
-			template: new Text({
-				text: "Test3"
-			})
-		}));
-
-		// place the table at the dom
-		oTable.placeAt("qunit-fixture");
-		await nextUIUpdate();
-
-		return oTable.initialized().then(function() {
-			const oTest3MDCColumn = oTable.getColumns()[2];
-			const oTest3InnerColumn = oTest3MDCColumn.getInnerColumn();
-			const oTest3Cell = oTable._oRowTemplate.getCells()[oTable._oTable.indexOfColumn(oTest3InnerColumn)];
-			assert.strictEqual(oTest3MDCColumn.getHeader(), "Test3");
-			assert.strictEqual(oTable.indexOfColumn(oTest3MDCColumn), 2, "Column index is 2");
-			assert.strictEqual(oTest3InnerColumn.getOrder(), 2, "inner column has the correct order");
-			assert.strictEqual(oTest3Cell.getText(), "Test3", "correct cell template found");
-
-			// trigger moveColumn - Test3 column is moved to index 0
-			oTable.moveColumn(oTest3MDCColumn, 0);
-			assert.strictEqual(oTable.indexOfColumn(oTest3MDCColumn), 0, "Test3 column is moved to index 0");
-			assert.strictEqual(oTable._oTable.indexOfColumn(oTest3InnerColumn), 0, "Inner table column aggregation also updated");
-			assert.strictEqual(oTest3InnerColumn.getOrder(), 0, "Test3 inner column is updated with the correct column order");
-
-			oTable.destroy();
-		});
 	});
 
 	QUnit.test("Selection - GridTable", async function(assert) {
@@ -3113,6 +2843,15 @@ sap.ui.define([
 		assert.ok(oDelegate.updateBinding.calledOnceWithExactly(this.oTable, oDelegate.updateBindingInfo.getCall(0).args[1],
 			this.oTable.getRowBinding(), {forceRefresh: true}), "Force refresh: TableDelegate.updateBinding call");
 
+		// Force refresh via flag
+		oDelegate.updateBindingInfo.resetHistory();
+		oDelegate.updateBinding.resetHistory();
+		this.oTable._bForceRefreshBinding = true;
+		await this.oTable._rebind();
+		assert.ok(oDelegate.updateBinding.calledOnceWithExactly(this.oTable, oDelegate.updateBindingInfo.getCall(0).args[1],
+			this.oTable.getRowBinding(), {forceRefresh: true}), "Force refresh via flag: TableDelegate.updateBinding call");
+		assert.notOk(this.oTable._bForceRefreshBinding, "Force refresh via flag: Flag reset after _rebind");
+
 		// Rebind fails with an error
 		oDelegate.updateBindingInfo.throws(new Error("Some fake error"));
 		oDelegate.updateBindingInfo.resetHistory();
@@ -3152,7 +2891,16 @@ sap.ui.define([
 			await this.oTable._onModifications([sP13nController]);
 			assert.ok(this.oTable.finalizePropertyHelper.calledOnce, sP13nController + ": Table#finalizePropertyHelper called once");
 			assert.ok(this.oTable.rebind.calledOnce, sP13nController + ": Table#rebind called once");
+			assert.notOk(this.oTable._bForceRefreshBinding, sP13nController + ": Force refresh flag not set");
 		}
+
+		this.oTable.finalizePropertyHelper.resetHistory();
+		this.oTable.rebind.resetHistory();
+		await this.oTable._onModifications(["PropertyInfo"]);
+		assert.ok(this.oTable.finalizePropertyHelper.calledOnce, "PropertyInfo: Table#finalizePropertyHelper called once");
+		assert.ok(this.oTable.rebind.calledOnce, "PropertyInfo: Table#rebind called once");
+		assert.ok(this.oTable._bForceRefreshBinding, "PropertyInfo: Force refresh flag set");
+		this.oTable._bForceRefreshBinding = false;
 
 		for (const sP13nController of ["ColumnWidth", "Dummy"]) {
 			this.oTable.finalizePropertyHelper.resetHistory();
@@ -3160,6 +2908,7 @@ sap.ui.define([
 			await this.oTable._onModifications([sP13nController]);
 			assert.ok(this.oTable.finalizePropertyHelper.notCalled, sP13nController + ": Table#finalizePropertyHelper not called");
 			assert.ok(this.oTable.rebind.notCalled, sP13nController + ": Table#rebind not called");
+			assert.notOk(this.oTable._bForceRefreshBinding, sP13nController + ": Force refresh flag not set");
 		}
 	});
 
@@ -3551,6 +3300,106 @@ sap.ui.define([
 			"Pressing the button to remove all filters calls utils.Personalization.createClearFiltersChange with the correct arguments");
 
 		PersonalizationUtils.createClearFiltersChange.restore();
+	});
+
+	QUnit.test("Filter info bar with dynamic property label", async function(assert) {
+		const sTableView = `
+			<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:mdc="sap.ui.mdc" xmlns:mdcTable="sap.ui.mdc.table">
+				<mdc:Table id="myTable"
+					delegate="\{name: '${sDelegatePath}', payload: \{collectionPath: '/testPath'\}\}"
+					p13nMode="Filter"
+					propertyInfo='[\\{"key":"name","label":"NameLabel","dataType":"String","isActive":true\\}]'
+					propertyKeys="name">
+				</mdc:Table>
+			</mvc:View>`;
+
+		const mCreatedApp = await createAppEnvironment(sTableView, "Table");
+		this.oUiComponentContainer = mCreatedApp.container;
+		this.oUiComponentContainer.placeAt("qunit-fixture");
+		this.oTable = mCreatedApp.view.byId("myTable");
+		await this.oTable.initialized();
+		await nextUIUpdate();
+
+		this.assertFilterInfoBarExists(false, "Before changes");
+
+		await StateUtil.applyExternalState(this.oTable, {
+			filter: {
+				name: [{
+					operator: OperatorName.EQ,
+					values: ["test"],
+					validated: ConditionValidated.NotValidated
+				}]
+			},
+			supplementaryConfig: {
+				propertyInfo: {
+					name: {label: "NewLabel"}
+				}
+			}
+		});
+
+		this.assertFilterInfoBarExists(true, "After combined changes");
+		this.assertFilterInfoBarText(["NewLabel"], "After combined filter and label change");
+
+		await StateUtil.applyExternalState(this.oTable, {
+			supplementaryConfig: {
+				propertyInfo: {
+					name: {label: "AnotherLabel"}
+				}
+			}
+		});
+
+		this.assertFilterInfoBarText(["AnotherLabel"], "After subsequent label change");
+
+		this.oUiComponentContainer.destroy();
+	});
+
+	QUnit.test("Filter info bar ignores inactive property filter conditions", async function(assert) {
+		await this.createTable({
+			p13nMode: ["Filter"],
+			propertyKeys: ["name", "inactive_prop"],
+			propertyInfo: [{
+				key: "name",
+				label: "NameLabel",
+				dataType: "String"
+			}, {
+				key: "inactive_prop",
+				label: "InactiveLabel",
+				dataType: "String",
+				isActive: false
+			}],
+			delegate: {
+				name: sDelegatePath,
+				payload: {
+					collectionPath: "/testPath",
+					propertyInfo: [{
+						key: "name",
+						label: "NameLabel",
+						dataType: "String"
+					}, {
+						key: "inactive_prop",
+						label: "InactiveLabel",
+						dataType: "String",
+						isActive: false
+					}]
+				}
+			},
+			filterConditions: {
+				name: [{
+					isEmpty: null,
+					operator: OperatorName.EQ,
+					validated: ConditionValidated.NotValidated,
+					values: ["test"]
+				}],
+				inactive_prop: [{
+					isEmpty: null,
+					operator: OperatorName.EQ,
+					validated: ConditionValidated.NotValidated,
+					values: ["test"]
+				}]
+			}
+		});
+
+		this.assertFilterInfoBarText(["NameLabel"], "Only active property label shown");
 	});
 
 	aTestedTypes.forEach(function(sTableType) {
@@ -4204,6 +4053,7 @@ sap.ui.define([
 	QUnit.test("ACC Announcement of table after a FilterBar search", function(assert) {
 		this.oTable.destroy();
 		this.oTable = new Table({
+			header: "Test Table",
 			delegate: {
 				name: sDelegatePath,
 				payload: {
@@ -4248,6 +4098,26 @@ sap.ui.define([
 			this.stub(oBinding, "getCount").returns(1);
 			oBinding.fireDataReceived(); // invoke event handler manually since we have a JSONModel
 			assert.equal(fnAnnounceTableUpdate.callCount, 1, "MTableUtil.announceTableUpdate call");
+			fnAnnounceTableUpdate.resetHistory();
+
+			this.oTable.setShowRowCount(false);
+			oFilter.fireSearch();
+			assert.ok(true, "Search is triggered.");
+			assert.equal(this.oTable._bAnnounceTableUpdate, true, "Table internal flag _bAnnounceTableUpdate is set to true");
+			oBinding.fireDataReceived(); // invoke event handler manually since we have a JSONModel
+			assert.ok(fnAnnounceTableUpdate.calledOnceWithExactly("Test Table", undefined),
+				"MTableUtil.announceTableUpdate called with correct parameters when showRowCount is false and row count > 0.");
+			fnAnnounceTableUpdate.resetHistory();
+
+			oBinding.getCount.returns(0);
+			oFilter.fireSearch();
+			assert.ok(true, "Search is triggered.");
+			assert.equal(this.oTable._bAnnounceTableUpdate, true, "Table internal flag _bAnnounceTableUpdate is set to true");
+			oBinding.fireDataReceived(); // invoke event handler manually since we have a JSONModel
+			assert.ok(fnAnnounceTableUpdate.calledOnceWithExactly("Test Table", 0),
+				"MTableUtil.announceTableUpdate called with correct parameters when showRowCount is false and row count = 0.");
+
+			this.oTable.setShowRowCount(true);
 
 			fnAnnounceTableUpdate.resetHistory();
 			oBinding.getCount.returns(2);
@@ -4327,7 +4197,7 @@ sap.ui.define([
 			}
 		},
 		createTable: function(mSettings) {
-			this.oTable = new Table(Object.assign({
+			const mDefaults = {
 				delegate: {
 					name: sDelegatePath,
 					payload: {
@@ -4359,18 +4229,6 @@ sap.ui.define([
 						}]
 					}
 				},
-				columns: [
-					new Column({
-						id: "lastnamecol",
-						template: new Text(),
-						propertyKey: "lastname"
-					}),
-					new Column({
-						id: "agecol",
-						template: new Text(),
-						propertyKey: "age"
-					})
-				],
 				propertyInfo: [{
 					key: "lastname",
 					label: "Last Name",
@@ -4386,7 +4244,24 @@ sap.ui.define([
 					label: "Age",
 					dataType: "String"
 				}]
-			}, mSettings));
+			};
+
+			if (!mSettings || !("columns" in mSettings)) {
+				mDefaults.columns = [
+					new Column({
+						id: "lastnamecol",
+						template: new Text(),
+						propertyKey: "lastname"
+					}),
+					new Column({
+						id: "agecol",
+						template: new Text(),
+						propertyKey: "age"
+					})
+				];
+			}
+
+			this.oTable = new Table(Object.assign(mDefaults, mSettings));
 			this.oFinalizePropertyHelperSpy = sinon.spy(this.oTable, "finalizePropertyHelper");
 
 			return this.oTable.awaitControlDelegate().then(function(oDelegate) {
@@ -4497,6 +4372,35 @@ sap.ui.define([
 		assert.ok(aLogs.find((oLogEntry) => matchLogEntry(oLogEntry, "Aggregation", "DoesNotExist")), "Error log found for aggregation");
 		assert.ok(aLogs.find((oLogEntry) => matchLogEntry(oLogEntry, "Column width", "DoesNotExist")), "Error log found for column width");
 		assert.equal(aLogs.length, 5, "Log entry count");
+	});
+
+	QUnit.test("State validation does not flag inactive dynamic properties", async function(assert) {
+		await this.createTable({
+			columns: undefined,
+			propertyKeys: ["lastname", "age"],
+			propertyInfo: [{
+				key: "lastname",
+				label: "Last Name",
+				path: "lastname",
+				dataType: "String"
+			}, {
+				key: "age",
+				path: "age",
+				label: "Age",
+				dataType: "String",
+				isActive: false
+			}],
+			sortConditions: {
+				sorters: [{name: "age"}, {name: "DoesNotExist"}]
+			}
+		});
+
+		const aLogs = Log.getLogEntries().filter((oLogEntry) =>
+			oLogEntry.details === this.oTable.toString() && oLogEntry.message.includes("Invalid state:")
+		);
+
+		assert.equal(aLogs.length, 1, "Only one error log");
+		assert.ok(aLogs[0].message.includes("DoesNotExist"), "Error log is for unknown property, not for inactive property");
 	});
 
 	QUnit.module("expand/collapse all", {
@@ -6528,5 +6432,165 @@ sap.ui.define([
 			await nextUIUpdate();
 			assert.ok(this.$(sSelector), `The ${sAction} action is positioned correctly at ${sPosition}`);
 		}
+	});
+
+	QUnit.module("Column management", {
+		beforeEach: function() {
+			this.oTable = new Table({
+				delegate: {
+					name: sDelegatePath,
+					payload: {
+						collectionPath: "/testPath"
+					}
+				}
+			});
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("addColumn", async function(assert) {
+		await this.oTable.initialized();
+
+		const oTypeInsertColumnSpy = sinon.spy(this.oTable._getType(), "insertColumn");
+		const oColumn = new Column({
+			header: "Test",
+			template: new Text({text: "Test"})
+		});
+
+		this.oTable._bForceRebind = false;
+		this.oTable.addColumn(oColumn);
+		assert.ok(oTypeInsertColumnSpy.calledOnceWithExactly(oColumn, undefined), "Type#insertColumn called once with (oColumn, undefined)");
+		assert.ok(this.oTable._bForceRebind, "_bForceRebind set to true");
+
+		oTypeInsertColumnSpy.restore();
+	});
+
+	QUnit.test("insertColumn", async function(assert) {
+		await this.oTable.initialized();
+
+		const oTypeInsertColumnSpy = sinon.spy(this.oTable._getType(), "insertColumn");
+		const oColumn = new Column({
+			header: "Test",
+			template: new Text({text: "Test"})
+		});
+
+		this.oTable._bForceRebind = false;
+		this.oTable.insertColumn(oColumn, 0);
+		assert.ok(oTypeInsertColumnSpy.calledOnceWithExactly(oColumn, 0), "Type#insertColumn called once with (oColumn, 0)");
+		assert.ok(this.oTable._bForceRebind, "_bForceRebind set to true");
+
+		oTypeInsertColumnSpy.restore();
+	});
+
+	QUnit.test("removeColumn", async function(assert) {
+		const oColumn = new Column({
+			header: "Test",
+			template: new Text({text: "Test"})
+		});
+
+		this.oTable.addColumn(oColumn);
+		await this.oTable.initialized();
+
+		const oTypeRemoveColumnSpy = sinon.spy(this.oTable._getType(), "removeColumn");
+
+		this.oTable._bForceRebind = false;
+		this.oTable.removeColumn(oColumn);
+		assert.ok(oTypeRemoveColumnSpy.calledOnceWithExactly(oColumn), "Type#removeColumn called once with (oColumn)");
+		assert.notOk(this.oTable._bForceRebind, "_bForceRebind not set");
+
+		oTypeRemoveColumnSpy.restore();
+		oColumn.destroy();
+	});
+
+	QUnit.test("removeAllColumns", async function(assert) {
+		const oColumn1 = new Column({header: "Test1", template: new Text({text: "Test1"})});
+		const oColumn2 = new Column({header: "Test2", template: new Text({text: "Test2"})});
+
+		this.oTable.addColumn(oColumn1);
+		this.oTable.addColumn(oColumn2);
+		await this.oTable.initialized();
+
+		const oTypeRemoveColumnSpy = sinon.spy(this.oTable._getType(), "removeColumn");
+
+		this.oTable._bForceRebind = false;
+		const aRemoved = this.oTable.removeAllColumns();
+		assert.equal(aRemoved.length, 2, "Two columns returned");
+		assert.strictEqual(aRemoved[0], oColumn1, "First column returned");
+		assert.strictEqual(aRemoved[1], oColumn2, "Second column returned");
+		assert.ok(oTypeRemoveColumnSpy.calledTwice, "removeColumn called twice");
+		assert.ok(oTypeRemoveColumnSpy.firstCall.calledWithExactly(oColumn1), "removeColumn called with first column");
+		assert.ok(oTypeRemoveColumnSpy.secondCall.calledWithExactly(oColumn2), "removeColumn called with second column");
+		assert.notOk(this.oTable._bForceRebind, "_bForceRebind not set");
+
+		oTypeRemoveColumnSpy.restore();
+		oColumn1.destroy();
+		oColumn2.destroy();
+	});
+
+	QUnit.module("Property keys mode", {
+		afterEach: function() {
+			this.oTable?.destroy();
+		},
+		createTable: function(mSettings) {
+			this.oTable = new Table({
+				delegate: {
+					name: sDelegatePath,
+					payload: {
+						collectionPath: "/testPath"
+					}
+				},
+				propertyKeys: ["col0"],
+				propertyInfo: [
+					{key: "col0", label: "Column 0", dataType: "String"}
+				],
+				...mSettings
+			});
+			return this.oTable;
+		}
+	});
+
+	QUnit.test("DynamicPropertiesController registered", async function(assert) {
+		this.createTable();
+		await this.oTable.initialized();
+
+		const oController = this.oTable.getEngine().getController(this.oTable, "PropertyInfo");
+		assert.ok(oController, "PropertyInfo controller is registered");
+		assert.ok(oController.isA("sap.ui.mdc.p13n.subcontroller.DynamicPropertiesController"),
+			"PropertyInfo controller is a DynamicPropertiesController");
+		assert.deepEqual(oController.aAllowedPropertyAttributes, ["isActive", "label", "tooltip"],
+			"allowedPropertyAttributes are correct");
+	});
+
+	QUnit.test("Items created from propertyKeys", async function(assert) {
+		const oInitStub = sinon.stub(Table.prototype, "initializeItemsFromPropertyKeys").callsFake(function() {
+			return this.syncItemsFromPropertyKeys();
+		});
+
+		this.createTable();
+		await this.oTable.initialized();
+		assert.ok(oInitStub.calledOnce, "initializeItemsFromPropertyKeys called once");
+		assert.equal(this.oTable.getColumns().length, 1, "Column created from propertyKeys");
+		oInitStub.restore();
+	});
+
+	QUnit.test("initializeItemsFromPropertyKeys not called in aggregation mode", async function(assert) {
+		const oInitSpy = sinon.spy(Table.prototype, "initializeItemsFromPropertyKeys");
+
+		this.oTable = new Table({
+			delegate: {
+				name: sDelegatePath,
+				payload: {
+					collectionPath: "/testPath"
+				}
+			},
+			columns: [
+				new Column({header: "Col0", template: new Text({text: "Test"})})
+			]
+		});
+		await this.oTable.initialized();
+		assert.ok(oInitSpy.notCalled, "initializeItemsFromPropertyKeys not called");
+		oInitSpy.restore();
 	});
 });

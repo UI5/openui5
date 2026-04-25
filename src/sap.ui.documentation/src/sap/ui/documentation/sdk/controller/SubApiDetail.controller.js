@@ -1002,8 +1002,8 @@ sap.ui.define([
 								typeInfo: oProperty.typeInfo
 							}),
 							new Text({
-								text: oProperty.defaultValue || "",
-								wrapping: false
+								text: this.formatter.escapeSettingsValue(oProperty.defaultValue) || "",
+								wrapping: true
 							}),
 							new JSDocText({
 								sanitizeContent: false,

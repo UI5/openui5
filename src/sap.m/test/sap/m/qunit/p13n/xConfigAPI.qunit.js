@@ -650,4 +650,41 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("Check #enhanceConfig with 'propertyInfo' virtual aggregation", async function(assert) {
+		await xConfigAPI.enhanceConfig(this.oControl, {
+			key: "myProperty",
+			property: "isActive",
+			operation: "add",
+			controlMeta: {
+				aggregation: "propertyInfo"
+			},
+			value: {
+				value: false
+			}
+		});
+
+		var oCustomData = this.oControl.getCustomData()[0];
+		assert.equal(oCustomData.getKey(), "xConfig", "The xConfig instance has been created");
+		assert.deepEqual(JSON.parse(oCustomData.getValue().replace(/\\/g, '')), {
+			"propertyInfo": {
+				"myProperty": {
+					"isActive": false
+				}
+			}
+		}, "propertyInfo aggregation accepted even though it is not a real aggregation on the control");
+	});
+
+	QUnit.test("Check #prepareAggregationConfig with 'propertyInfo' virtual aggregation", async function(assert) {
+		await xConfigAPI.prepareAggregationConfig(this.oControl, {
+			controlMeta: {
+				aggregation: "propertyInfo"
+			},
+			propertyBag: {
+				modifier: JsControlTreeModifier
+			},
+			changeType: "setPropertyIsActive"
+		}, null);
+		assert.ok(true, "prepareAggregationConfig does not throw for propertyInfo virtual aggregation");
+	});
+
 });

@@ -45,6 +45,7 @@ sap.ui.define([
 				filterable: true,
 				sortable: true,
 				propertyInfos: true,
+				isActive: true,
 
 				// Additional attributes
 				groupable: {

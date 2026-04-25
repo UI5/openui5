@@ -147,14 +147,14 @@ sap.ui.define([
 		}
 
 		if (oTable) {
-			const oProperty = oTable.getPropertyHelper()?.getProperty(oChangeContent.key);
+			const oProperty = oTable.getPropertyHelper()?.getProperty(oChangeContent.key, true);
 			if (oProperty) {
 				aArgs.splice(0, 1, oProperty.label);
 			}
 		}
 
-		return Util.getMdcResourceText(sKey, aArgs).then((sText) => {
-			mVersionInfo.descriptionPayload.description = sText;
+		return Util.getInactiveAwareResourceText(oTable, oChangeContent.key, sKey, aArgs).then((sDescription) => {
+			mVersionInfo.descriptionPayload.description = sDescription;
 
 			mVersionInfo.updateRequired = true;
 			return mVersionInfo;

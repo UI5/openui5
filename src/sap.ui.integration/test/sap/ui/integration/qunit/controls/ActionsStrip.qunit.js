@@ -424,6 +424,36 @@ sap.ui.define([
 		oActionsStrip.destroy();
 	});
 
+	QUnit.test("Actions without type but with enabled property", function (assert) {
+		const oActionsStrip = ActionsStrip.create([
+			{
+				text: "Action without type, enabled true",
+				actions: [{
+					enabled: true
+				}]
+			},
+			{
+				text: "Action without type, enabled false",
+				actions: [{
+					enabled: false
+				}]
+			},
+			{
+				text: "Action without type, no enabled",
+				actions: [{
+				}]
+			}
+		], this.oCard);
+
+		const aItems = oActionsStrip._getToolbar().getContent();
+
+		assert.ok(aItems[1].getEnabled(), "Button without type but with enabled: true should be enabled.");
+		assert.notOk(aItems[2].getEnabled(), "Button without type but with enabled: false should be disabled.");
+		assert.ok(aItems[3].getEnabled(), "Button without type and no enabled property should be enabled by default.");
+
+		oActionsStrip.destroy();
+	});
+
 	QUnit.test("Links with disabled/enabled state", function (assert) {
 		// Arrange
 		const oActionsStrip = ActionsStrip.create([

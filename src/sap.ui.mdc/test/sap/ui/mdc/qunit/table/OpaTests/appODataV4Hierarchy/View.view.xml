@@ -7,19 +7,21 @@
 	controllerName="sap.ui.mdc.table.OpaTests.appODataV4Hierarchy.Controller">
     <App>
         <Page showHeader="false">
+            <Button text="Start RTA" press=".onPressRTA"/>
             <mdc:Table
                 id="mdcTable"
                 header="Products"
                 delegate="{
-                    name: 'sap/ui/mdc/table/OpaTests/appODataV4Hierarchy/TableDelegate', 
+                    name: 'sap/ui/mdc/table/OpaTests/appODataV4Hierarchy/TableDelegate',
                     payload: {collectionName: 'EMPLOYEES'}
                 }"
                 p13nMode="Column,Sort,Filter"
                 showRowCount="false"
                 selectionMode="Multi"
+                propertyKeys="ID,Name,AGE,MANAGER_ID"
                 sortConditions="{
                     sorters:[{
-                        name: 'AGE', 
+                        name: 'AGE',
                         descending:false
                     }]
                 }">
@@ -29,20 +31,6 @@
                 <mdc:variant>
                     <variants:VariantManagement id="mdcTable-vm" for="mdcTable"/>
                 </mdc:variant>
-                <mdc:columns>
-                    <mdcTable:Column id="mdcTable-ID" header="ID" propertyKey="ID">
-                        <Text text="{ID}"/>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-Name" header="Name" propertyKey="Name">
-                        <Text text="{Name}"/>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-Age" header="Age" propertyKey="AGE">
-                        <Text text="{AGE}"/>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-ManagerID" header="Manager's ID" propertyKey="MANAGER_ID">
-                        <Text text="{MANAGER_ID}"/>
-                    </mdcTable:Column>
-                </mdc:columns>
             </mdc:Table>
         </Page>
     </App>

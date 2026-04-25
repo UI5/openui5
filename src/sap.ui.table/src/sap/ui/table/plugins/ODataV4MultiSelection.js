@@ -83,7 +83,19 @@ sap.ui.define([
 				/**
 				 * Hide the header selector.
 				 */
-				hideHeaderSelector: {type: "boolean", group: "Appearance", defaultValue: false}
+				hideHeaderSelector: {type: "boolean", group: "Appearance", defaultValue: false},
+
+				/**
+				 * Whether the selection of leaf rows is disabled.
+				 *
+				 * If set to <code>true</code>, leaf rows in a hierarchy cannot be selected. Only non-leaf (expandable) rows remain
+				 * selectable. This affects all selection paths including click, range, keyboard shortcuts, and select all.
+				 *
+				 * @since 1.148
+				 * @private
+				 * @ui5-private sap.ui.mdc.Table
+				 */
+				leafSelectionDisabled: {type: "boolean", group: "Behavior", defaultValue: false, visibility: "hidden"}
 			}
 		}
 	});
@@ -119,6 +131,7 @@ sap.ui.define([
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.TotalRowCountChanged, onTotalRowCountChanged, this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.UpdateRows, clearSelectionCache, this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.UnbindRows, clearSelectionCache, this);
+		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Row.UpdateState, onRowUpdateState, this);
 	};
 
 	/**
@@ -134,6 +147,7 @@ sap.ui.define([
 		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.TotalRowCountChanged, onTotalRowCountChanged, this);
 		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.UpdateRows, clearSelectionCache, this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.UnbindRows, clearSelectionCache, this);
+		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Row.UpdateState, onRowUpdateState, this);
 		clearSelectionCache.call(this);
 	};
 
@@ -158,6 +172,21 @@ sap.ui.define([
 
 		oContext.setSelected(bSelected);
 		_private(this).oRangeSelectionStartContext = bSelected ? oContext : null;
+	};
+
+	/**
+	 * @inheritDoc
+	 */
+	ODataV4MultiSelection.prototype.isContextSelectable = function(oContext) {
+		if (!ODataV4Selection.prototype.isContextSelectable.call(this, oContext)) {
+			return false;
+		}
+
+		if (this.getProperty("leafSelectionDisabled") && oContext.getProperty("@$ui5.node.isExpanded") === undefined) {
+			return false;
+		}
+
+		return true;
 	};
 
 	function extendLastSelectionTo(oPlugin, oRow) {
@@ -422,6 +451,38 @@ sap.ui.define([
 		this._getHeaderSelector()?.setVisible(!bHide);
 		return this;
 	};
+
+	ODataV4MultiSelection.prototype.setProperty = function(sPropertyName, vValue) {
+		const bWasLeafSelectionDisabled = this.getProperty("leafSelectionDisabled");
+		ODataV4Selection.prototype.setProperty.apply(this, arguments);
+
+		if (sPropertyName === "leafSelectionDisabled" && this.getProperty("leafSelectionDisabled") && !bWasLeafSelectionDisabled) {
+			deselectLeafContexts(this);
+		}
+
+		return this;
+	};
+
+	function deselectLeafContexts(oPlugin) {
+		if (!oPlugin.isActive()) {
+			return;
+		}
+
+		oPlugin.getControl()?.getBinding()?.getAllCurrentContexts().forEach(function(oContext) {
+			if (oContext.isSelected() && oContext.getProperty("@$ui5.node.isExpanded") === undefined) {
+				oContext.setSelected(false);
+			}
+		});
+	}
+
+	function onRowUpdateState(oState) {
+		if (this.getProperty("leafSelectionDisabled")) {
+			oState.selectable = this.isContextSelectable(oState.context);
+			if (!oState.selectable && oState.context.isSelected()) {
+				oState.context.setSelected(false);
+			}
+		}
+	}
 
 	/**
 	 * Calculates the correct start and end index for the range selection, loads the corresponding contexts and sets the selected state.

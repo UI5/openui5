@@ -2190,7 +2190,7 @@ sap.ui.define([
 			const iBaseRowHeight = oTable._getBaseRowHeight();
 			const nScrollRangeRowFraction = VerticalScrollingHelper.getScrollRangeRowFraction(oTable);
 
-			return Math.max(0.001, Math.min(1, nScrollRangeRowFraction / iBaseRowHeight));
+			return Math.max(0.002, Math.min(1, nScrollRangeRowFraction / iBaseRowHeight));
 		},
 
 		/**

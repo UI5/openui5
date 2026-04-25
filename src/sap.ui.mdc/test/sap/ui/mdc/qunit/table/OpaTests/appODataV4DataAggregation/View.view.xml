@@ -7,6 +7,7 @@
 	controllerName="sap.ui.mdc.table.OpaTests.appODataV4DataAggregation.Controller">
     <App>
         <Page showHeader="false">
+            <Button text="Start RTA" press=".onPressRTA"/>
             <mdc:FilterBar
                 id="mdcFilterBar"
                 delegate="{
@@ -25,10 +26,11 @@
                     payload: {collectionName: 'BusinessPartners'}
                 }"
                 filter="mdcFilterBar"
-                p13nMode="Column,Sort,Filter"
+                p13nMode="Column,Sort,Filter,Group,Aggregate"
                 selectionMode="Multi"
                 threshold="0"
                 showRowCount="false"
+                propertyKeys="Country,Region,Segment,SalesAmountLocalCurrency,SalesNumber,AccountResponsible"
                 groupConditions="{
                     groupLevels: [
                         {name: 'Country_Code'},
@@ -45,35 +47,6 @@
                 <mdc:variant>
                     <variants:VariantManagement id="mdcTable-vm" for="mdcTable"/>
                 </mdc:variant>
-                <mdc:columns>
-                    <mdcTable:Column id="mdcTable-Country" header="Country Name" propertyKey="Country">
-                        <Text text="{Country}"/>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-Region" header="Region" propertyKey="Region">
-                        <Text text="{Region}"/>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-Segment" header="Segment" propertyKey="Segment">
-                        <Text text="{Segment}"/>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-SalesAmountLocalCurrency"
-                        header="Sales Amount (local currency)"
-                        propertyKey="SalesAmountLocalCurrency">
-                        <Text text="{
-                            parts: [
-                                'SalesAmountLocalCurrency',
-                                'LocalCurrency',
-                                {path: '/##@@requestCurrencyCodes', mode: 'OneTime', targetType: 'any'}
-                            ],
-                            type: 'sap.ui.model.odata.type.Currency'
-                        }"/>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-SalesNumber" header="Sales Number" propertyKey="SalesNumber">
-                        <Text text="{SalesNumber}"/>
-                    </mdcTable:Column>
-                    <mdcTable:Column id="mdcTable-AccountResponsible" header="Account Responsible" propertyKey="AccountResponsible">
-                        <Text text="{AccountResponsible}"/>
-                    </mdcTable:Column>
-                </mdc:columns>
             </mdc:Table>
         </Page>
     </App>

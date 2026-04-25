@@ -232,6 +232,68 @@ sap.ui.define([
 		this.assertRowStyleUnselected(assert, oRow);
 	});
 
+	QUnit.test("isSelectable", function(assert) {
+		const oRow = this.oTable.getRows()[0];
+		assert.ok(oRow.isSelectable(), "Row is selectable by default");
+	});
+
+	QUnit.test("isSelectable - empty row", function(assert) {
+		const oRow = this.oTable.getRows()[0];
+		assert.ok(!oRow.isEmpty(), "Row is not empty");
+		assert.ok(oRow.isSelectable(), "Non-empty row is selectable");
+
+		oRow.setRowBindingContext(null, this.oTable);
+		assert.ok(oRow.isEmpty(), "Row is empty after removing binding context");
+		assert.notOk(oRow.isSelectable(), "Empty row is not selectable");
+	});
+
+	QUnit.test("isSelectable - not selectable via Row.UpdateState hook", function(assert) {
+		const oRow = this.oTable.getRows()[0];
+
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, function(oState) {
+			oState.selectable = false;
+		});
+		oRow.setRowBindingContext(oRow.getBindingContext(), this.oTable);
+		assert.notOk(oRow.isSelectable(), "Row is not selectable when hook sets selectable to false");
+	});
+
+	QUnit.test("sapUiTableRowSelectable CSS class", function(assert) {
+		const oRow = this.oTable.getRows()[0];
+		const oSelectionPlugin = new TableQUnitUtils.TestSelectionPlugin();
+		const mDomRefs = oRow.getDomRefs(false);
+
+		this.oTable.addDependent(oSelectionPlugin);
+		sinon.stub(oSelectionPlugin, "isSelected").withArgs(oRow).returns(false);
+
+		oRow._updateSelection();
+		assert.ok(mDomRefs.rowScrollPart.classList.contains("sapUiTableRowSelectable"),
+			"Selectable row has sapUiTableRowSelectable class");
+
+		sinon.stub(oRow, "isSelectable").returns(false);
+		oRow._updateSelection();
+		assert.notOk(mDomRefs.rowScrollPart.classList.contains("sapUiTableRowSelectable"),
+			"Not-selectable row does not have sapUiTableRowSelectable class");
+	});
+
+	QUnit.test("sapUiTableRowSelectable CSS class - not selectable via row state", function(assert) {
+		const oRow = this.oTable.getRows()[0];
+		const oSelectionPlugin = new TableQUnitUtils.TestSelectionPlugin();
+		const mDomRefs = oRow.getDomRefs(false);
+
+		this.oTable.addDependent(oSelectionPlugin);
+		sinon.stub(oSelectionPlugin, "isSelected").withArgs(oRow).returns(false);
+
+		oRow._updateSelection();
+		assert.ok(mDomRefs.rowScrollPart.classList.contains("sapUiTableRowSelectable"),
+			"Row with binding context has sapUiTableRowSelectable class");
+
+		oRow.setRowBindingContext(null, this.oTable);
+		oRow._updateSelection();
+		assert.notOk(oRow.isSelectable(), "Empty row is not selectable");
+		assert.notOk(mDomRefs.rowScrollPart.classList.contains("sapUiTableRowSelectable"),
+			"Empty row does not have sapUiTableRowSelectable class");
+	});
+
 	QUnit.test("_setFocus", function(assert) {
 		const oRow = this.oTable.getRows()[0];
 		const $SelectAll = this.oTable.$("selall");

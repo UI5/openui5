@@ -5,11 +5,11 @@
 
 /* For historical reasons, the row selection cell does not contain the checkbox, it is the checkbox */
 .sapUiTableRowSelectionCell {
-	
+
 	&::after:extend(.sapUiTableCheckBox::after) {
 		display: none;
 
-		.sapUiTableSelModeMultiToggle.sapUiTableRowSelectors .sapUiTableRow:not(.sapUiTableRowHidden, .sapUiTableGroupHeaderRow, .sapUiTableSummaryRow) & {
+		.sapUiTableSelModeMultiToggle.sapUiTableRowSelectors .sapUiTableRowSelectable & {
 			display: flex;
 		}
 

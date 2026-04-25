@@ -4458,7 +4458,7 @@ sap.ui.define([
 			oSelectDomRef = oSelect.getFocusDomRef();
 
 			// assert
-			assert.strictEqual(oSelectDomRef.getAttribute("title"), null, "tooltip is not set when the select is not enabled");
+			assert.strictEqual(oSelectDomRef, undefined, "focus DOM ref is not rendered when the select is not enabled");
 			assert.strictEqual(oSelect.$("label").attr("title"), undefined, "tooltip is not set when the select is not enabled");
 			assert.strictEqual(oSelect.$("arrow").attr("title"), undefined, "tooltip is not set when the select is not enabled");
 
@@ -10417,7 +10417,7 @@ sap.ui.define([
 
 			// Assertion
 			assert.strictEqual(oEnabledSelect._getHiddenSelect().attr("aria-disabled"), undefined, "Enabled Select isn't indicated as disabled");
-			assert.strictEqual(oDisabledSelect._getHiddenSelect().attr("aria-disabled"), "true", "Disabled Select is indicated as disabled appropriately");
+			assert.strictEqual(oDisabledSelect.getFocusDomRef(), undefined, "Disabled Select does not render a focus element");
 
 			// Cleanup
 			oEnabledSelect.destroy();

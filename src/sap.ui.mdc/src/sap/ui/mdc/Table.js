@@ -37,6 +37,8 @@ sap.ui.define([
 	"sap/m/table/ColumnWidthController",
 	"sap/ui/mdc/p13n/subcontroller/ShowDetailsController",
 	"sap/ui/mdc/p13n/subcontroller/ColumnFreezeController",
+	"sap/ui/mdc/p13n/subcontroller/DynamicPropertiesController",
+	"sap/ui/mdc/mixin/DynamicPropertiesMixin",
 	"sap/ui/mdc/actiontoolbar/ActionToolbarAction",
 	"sap/ui/mdc/table/menus/QuickActionContainer",
 	"sap/ui/core/theming/Parameters",
@@ -86,6 +88,8 @@ sap.ui.define([
 	ColumnWidthController,
 	ShowDetailsController,
 	ColumnFreezeController,
+	DynamicPropertiesController,
+	DynamicPropertiesMixin,
 	ActionToolbarAction,
 	QuickActionContainer,
 	ThemeParameters,
@@ -589,6 +593,27 @@ sap.ui.define([
 				},
 
 				/**
+				 * Ordered list of property keys that define which columns the table has.
+				 * The table creates and manages the <code>columns</code> aggregation based on this list.
+				 *
+				 * This is an alternative to defining <code>columns</code> directly in the aggregation.
+				 * You can't define both <code>propertyKeys</code> and <code>columns</code> at the same time.
+				 *
+				 * This property must be set during control creation (for example, in the XML view or constructor settings).
+				 * After initialization, it is managed by the control and must not be modified.
+				 *
+				 * <b>Note:</b> This property must not be bound.
+				 *
+				 * @private
+				 * @ui5-restricted sap.fe
+				 * @since 1.148
+				 */
+				propertyKeys: {
+					type: "string[]",
+					defaultValue: []
+				},
+
+				/**
 				 * Determines whether the toolbar is visible.
 				 *
 				 * <b>Note:</b> Hiding the toolbar limits the functionality of the table in the following ways:
@@ -930,8 +955,6 @@ sap.ui.define([
 		}
 	});
 
-	FilterIntegrationMixin.call(Table.prototype);
-
 	const aToolBarBetweenAggregations = ["variant", "quickFilter"];
 
 	/**
@@ -987,8 +1010,8 @@ sap.ui.define([
 			rowSettings: true
 		};
 
-		// indicates whether binding the table is inevitable or not
 		this._bForceRebind = true;
+		this._bForceRefreshBinding = false;
 
 		this._setPropertyHelperClass(PropertyHelper);
 		this._setupPropertyInfoStore("propertyInfo");
@@ -1412,7 +1435,8 @@ sap.ui.define([
 				aAffectedP13nControllers.indexOf("Column") > -1 ||
 				aAffectedP13nControllers.indexOf("Group") > -1 ||
 				aAffectedP13nControllers.indexOf("Aggregate") > -1 ||
-				aAffectedP13nControllers.indexOf("Filter") > -1
+				aAffectedP13nControllers.indexOf("Filter") > -1 ||
+				aAffectedP13nControllers.indexOf("PropertyInfo") > -1
 			)
 		) {
 			bRebindRequired = true;
@@ -1429,10 +1453,14 @@ sap.ui.define([
 		this._getType().onModifications(aAffectedP13nControllers);
 		if (fCheckIfRebindIsRequired(aAffectedP13nControllers) && this.isTableBound()) {
 			await this.finalizePropertyHelper();
+			if (aAffectedP13nControllers.indexOf("PropertyInfo") > -1) {
+				this._bForceRefreshBinding = true;
+			}
 			await this.rebind();
 		}
 
 		await validateStateAgainstPropertyInfo(this);
+		updateFilterInfoBar(this);
 	};
 
 	/**
@@ -1458,14 +1486,16 @@ sap.ui.define([
 			Filter: getFilteredProperties(oTable.getFilterConditions()),
 			"Group level": oTable._getGroupedProperties().map((oGroupCondition) => oGroupCondition.key),
 			Aggregation: Object.keys(oTable._getAggregatedProperties()),
-			"Column width": Object.keys(oXConfig?.aggregations?.columns || {}).filter((sKey) => oXConfig.aggregations.columns[sKey].width)
+			"Column width": Object.keys(oXConfig?.aggregations?.columns || {}).filter((sKey) => oXConfig.aggregations.columns[sKey].width),
+			"PropertyInfo": Object.keys(oXConfig?.propertyInfo || {})
+				.filter((sKey) => Object.keys(oXConfig.propertyInfo[sKey]).length > 0)
 		};
 		const oPropertyHelper = await oTable.awaitPropertyHelper();
 
 		if (oTable.isPropertyHelperFinal() || oPropertyHelper.getProperties().length > 0) {
 			for (const sStateType in mState) {
 				for (const sPropertyKey of mState[sStateType]) {
-					if (!oPropertyHelper.hasProperty(sPropertyKey)) {
+					if (!oPropertyHelper.getProperty(sPropertyKey, true)) {
 						Log.error(`Invalid state: ${sStateType} modification exists for non-existent property '${sPropertyKey}'`, oTable);
 					}
 				}
@@ -1529,31 +1559,37 @@ sap.ui.define([
 			aStableKeys.push(this.getColumns()[0].getPropertyKey());
 		}
 
-		const mRegistryOptions = {
+		const mP13nModeControllers = {
 			Column: new ColumnController({control: this, stableKeys: aStableKeys}),
 			Sort: new SortController({control: this}),
 			Group: new GroupController({control: this}),
 			Filter: new FilterController({control: this}),
-			Aggregate: new AggregateController({control: this}),
-			ColumnWidth: new ColumnWidthController({control: this, exposeXConfig: true})
+			Aggregate: new AggregateController({control: this})
 		};
 
+		oRegisterConfig.controller["PropertyInfo"] = new DynamicPropertiesController({
+			control: this,
+			allowedPropertyAttributes: [
+				"isActive",
+				"label",
+				"tooltip"
+			]
+		});
+
 		this.getActiveP13nModes().forEach((sMode) => {
-			oRegisterConfig.controller[sMode] = mRegistryOptions[sMode];
+			oRegisterConfig.controller[sMode] = mP13nModeControllers[sMode];
 		});
 
 		if (this.getEnableColumnResize()) {
-			oRegisterConfig.controller["ColumnWidth"] = mRegistryOptions["ColumnWidth"];
+			oRegisterConfig.controller["ColumnWidth"] = new ColumnWidthController({control: this, exposeXConfig: true});
 		}
 
 		if (this._isOfType(TableType.Table, true) && this._getType().getEnableColumnFreeze()) {
-			mRegistryOptions["ColumnFreeze"] = new ColumnFreezeController({control: this});
-			oRegisterConfig.controller["ColumnFreeze"] = mRegistryOptions["ColumnFreeze"];
+			oRegisterConfig.controller["ColumnFreeze"] = new ColumnFreezeController({control: this});
 		}
 
 		if (this._isOfType(TableType.ResponsiveTable) && this._getType().getShowDetailsButton()) {
-			mRegistryOptions["ShowDetails"] = new ShowDetailsController({control: this});
-			oRegisterConfig.controller["ShowDetails"] = mRegistryOptions["ShowDetails"];
+			oRegisterConfig.controller["ShowDetails"] = new ShowDetailsController({control: this});
 		}
 
 		this.getEngine().register(this, oRegisterConfig);
@@ -1821,7 +1857,7 @@ sap.ui.define([
 		}
 	};
 
-	Table.prototype._createContent = function() {
+	Table.prototype._createContent = async function() {
 		this._createToolbar();
 		this._createTable();
 		this._updateColumnResize();
@@ -1831,45 +1867,48 @@ sap.ui.define([
 		this._updateExportButton();
 		this.getColumns().forEach(this._insertInnerColumn, this);
 
-		return this.getControlDelegate().initializeContent(this).then(() => {
-			if (this.isDestroyed()) {
-				return Promise.reject("Destroyed");
-			}
+		await this.getControlDelegate().initializeContent(this);
+		if (this.isDestroyed()) {
+			throw "Destroyed";
+		}
 
-			this.setAggregation("_content", this._oTable);
-			this._onAfterInitialization();
+		this.setAggregation("_content", this._oTable);
 
-			return Promise.all([
-				this.getPropertyInfo().length === 0 ? this.finalizePropertyHelper() : this.awaitPropertyHelper(),
-				this.initialized() // Required for the CreationRow binding context handling.
-			]);
-		}).then(() => {
-			if (this.isDestroyed()) {
-				return Promise.reject("Destroyed");
-			}
+		if (this.isInPropertyKeysMode()) {
+			await this.initializeItemsFromPropertyKeys();
+		}
 
-			// Add this to the micro task execution queue to enable consumers to handle this correctly.
-			// For example to add a binding context between the initialized promise and binding the rows.
-			const oCreationRow = this.getCreationRow();
-			if (oCreationRow) {
-				oCreationRow.update();
-			}
+		this._onAfterInitialization();
 
-			if (this.getAutoBindOnInit()) {
-				const oEngine = this.getEngine();
-				oEngine.isModificationSupported(this).then((bModificationSupported) => {
-					if (bModificationSupported) {
-						oEngine.waitForChanges(this).then(() => {
-							this.rebind();
-						});
-					} else {
+		await Promise.all([
+			this.getPropertyInfo().length === 0 ? this.finalizePropertyHelper() : this.awaitPropertyHelper(),
+			this.initialized() // Required for the CreationRow binding context handling.
+		]);
+		if (this.isDestroyed()) {
+			throw "Destroyed";
+		}
+
+		// Add this to the micro task execution queue to enable consumers to handle this correctly.
+		// For example to add a binding context between the initialized promise and binding the rows.
+		const oCreationRow = this.getCreationRow();
+		if (oCreationRow) {
+			oCreationRow.update();
+		}
+
+		if (this.getAutoBindOnInit()) {
+			const oEngine = this.getEngine();
+			oEngine.isModificationSupported(this).then((bModificationSupported) => {
+				if (bModificationSupported) {
+					oEngine.waitForChanges(this).then(() => {
 						this.rebind();
-					}
-				});
-			}
+					});
+				} else {
+					this.rebind();
+				}
+			});
+		}
 
-			this._onAfterFullInitialization();
-		});
+		this._onAfterFullInitialization();
 	};
 
 	Table.prototype.setHeaderVisible = function(bVisible) {
@@ -2820,47 +2859,25 @@ sap.ui.define([
 			return;
 		}
 
-		const oInnerColumn = oColumn.getInnerColumn();
-
-		this._setMobileColumnTemplate(oColumn, iIndex);
 		this._bForceRebind = true;
-
-		if (iIndex === undefined) {
-			this._oTable.addColumn(oInnerColumn);
-		} else {
-			this._oTable.insertColumn(oInnerColumn, iIndex);
-		}
-		this._getType()._onColumnInsert(oColumn);
-	};
-
-	/**
-	 * Runtime API for JS flex change to avoid rebind.
-	 *
-	 * @param {object} oColumn - the mdc column instance which should be moved
-	 * @param {int} iIndex - the index to which the column should be moved to
-	 * @private
-	 */
-	Table.prototype.moveColumn = function(oColumn, iIndex) {
-		oColumn._bIsBeingMoved = true;
-		this.removeAggregation("columns", oColumn, true);
-		this.insertAggregation("columns", oColumn, iIndex, true);
-		delete oColumn._bIsBeingMoved;
-
-		if (this._oTable) {
-			const oInnerColumn = oColumn.getInnerColumn();
-
-			// move column in inner table
-			this._oTable.removeColumn(oInnerColumn);
-			this._oTable.insertColumn(oInnerColumn, iIndex);
-
-			this._updateMobileColumnTemplate(oColumn, iIndex);
-		}
+		this._getType().insertColumn(oColumn, iIndex);
 	};
 
 	Table.prototype.removeColumn = function(oColumn) {
 		oColumn = this.removeAggregation("columns", oColumn, true);
-		this._updateMobileColumnTemplate(oColumn, -1);
+		this._getType().removeColumn(oColumn);
 		return oColumn;
+	};
+
+	Table.prototype.removeAllColumns = function() {
+		const aRemovedColumns = this.removeAllAggregation("columns", true);
+		const oType = this._getType();
+
+		aRemovedColumns.forEach((oColumn) => {
+			oType.removeColumn(oColumn);
+		});
+
+		return aRemovedColumns;
 	};
 
 	Table.prototype.addColumn = function(oColumn) {
@@ -2874,69 +2891,6 @@ sap.ui.define([
 		this._insertInnerColumn(oColumn, iIndex);
 		return this;
 	};
-
-	Table.prototype._setMobileColumnTemplate = function(oColumn, iIndex) {
-		if (!this._oRowTemplate) {
-			return;
-		}
-
-		const oCellTemplate = oColumn.getTemplateClone();
-
-		if (iIndex >= 0) {
-			this._oRowTemplate.insertCell(oCellTemplate, iIndex);
-			this._oTable.getItems().forEach((oItem) => {
-				// ignore group headers since it does not have "cells" aggregation
-				if (oItem.isA("sap.m.GroupHeaderListItem")) {
-					return;
-				}
-				// Add lightweight placeholders that can be rendered - if they cannot be rendered, there will be errors in the console.
-				// The actual cells are created after rebind.
-				oItem.insertAggregation("cells", new InvisibleText(), iIndex, true);
-			});
-		} else {
-			this._oRowTemplate.addCell(oCellTemplate);
-		}
-	};
-
-	Table.prototype._updateMobileColumnTemplate = function(oMDCColumn, iIndex) {
-		if (!this._oRowTemplate) {
-			return;
-		}
-
-		let oCellTemplate;
-		let iCellIndex;
-		// TODO: Check if this can be moved inside the m.Table.
-
-		// Remove cell template when column is hidden
-		// Remove template cell from ColumnListItem (template)
-		if (this._oRowTemplate) {
-			oCellTemplate = oMDCColumn.getTemplateClone();
-			iCellIndex = this._oRowTemplate.indexOfCell(oCellTemplate);
-			removeMobileItemCell(this._oRowTemplate, iCellIndex, iIndex);
-		}
-
-		// Remove cells from actual rendered items, as this is not done automatically
-		if (iCellIndex > -1) {
-			this._oTable.getItems().forEach((oItem) => {
-				// Grouping row (when enabled) will not have cells
-				if (oItem.removeCell) {
-					removeMobileItemCell(oItem, iCellIndex, iIndex);
-				}
-			});
-		}
-	};
-
-	function removeMobileItemCell(oItem, iRemoveIndex, iInsertIndex) {
-		const oCell = oItem.removeCell(iRemoveIndex);
-		if (oCell) {
-			// -1 index destroys the inner content
-			if (iInsertIndex > -1) {
-				oItem.insertCell(oCell, iInsertIndex);
-			} else {
-				oCell.destroy();
-			}
-		}
-	}
 
 	/**
 	 * Gets contexts that have been selected by the user.
@@ -3012,7 +2966,8 @@ sap.ui.define([
 	Table.prototype._updateRowCountForHeader = function() {
 		if (this._bAnnounceTableUpdate && !this._bSkipAnnounceTableUpdate) {
 			this._bAnnounceTableUpdate = false;
-			MTableUtil.announceTableUpdate(this.getHeader(), this.getShowRowCount() ? this.getRowBinding().getCount() : undefined);
+			const iCount = this.getRowBinding().getCount();
+			MTableUtil.announceTableUpdate(this.getHeader(), (this.getShowRowCount() || iCount === 0) ? iCount : undefined);
 		}
 	};
 
@@ -3097,9 +3052,12 @@ sap.ui.define([
 		this._finalizeBindingInfo(oBindingInfo);
 		this._oTable.setShowOverlay(false);
 		this._updateColumnsBeforeBinding();
-		this.getControlDelegate().updateBinding(this, oBindingInfo, this._bForceRebind ? null : this.getRowBinding(), {forceRefresh: bForceRefresh});
+		this.getControlDelegate().updateBinding(this, oBindingInfo, this._bForceRebind ? null : this.getRowBinding(), {
+			forceRefresh: bForceRefresh || this._bForceRefreshBinding || false
+		});
 		this._updateInnerTableNoData();
 		this._bForceRebind = false;
+		this._bForceRefreshBinding = false;
 	};
 
 	Table.prototype._finalizeBindingInfo = function(oBindingInfo) {
@@ -3428,6 +3386,30 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
 	 */
+
+	/**
+	 * Sets a new value for the {@link #getPropertyKeys propertyKeys} property.
+	 *
+	 * @name sap.ui.mdc.Table#setPropertyKeys
+	 * @function
+	 * @param {string[]} aPropertyKeys Ordered list of property keys
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @private
+	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+	 */
+
+	/**
+	 * Gets the current value of the {@link #getPropertyKeys propertyKeys} property.
+	 *
+	 * @name sap.ui.mdc.Table#getPropertyKeys
+	 * @function
+	 * @returns {string[]} The property keys
+	 * @private
+	 * @ui5-restricted sap.ui.mdc, sap.ui.fl
+	 */
+
+	FilterIntegrationMixin.call(Table.prototype);
+	DynamicPropertiesMixin.call(Table.prototype, {aggregation: "columns"});
 
 	return Table;
 });

@@ -7,11 +7,15 @@
 
 sap.ui.define([
 	"sap/ui/mdc/util/PropertyHelper",
-	"sap/ui/base/ManagedObject",
+	"sap/ui/mdc/Control",
 	"sap/ui/model/type/String",
-	"sap/base/util/merge",
-	"sap/base/Log"
-], function(_PropertyHelper, ManagedObject, StringType, merge, Log) {
+	"sap/base/util/merge"
+], function(
+	_PropertyHelper,
+	MDCControl,
+	StringType,
+	merge
+) {
 	"use strict";
 
 	const PropertyHelper = _PropertyHelper.extend("sap.ui.mdc.util.test.PropertyHelper", {
@@ -33,6 +37,7 @@ sap.ui.define([
 			}, mAdditionalAttributes));
 		}
 	});
+	const TestControl = MDCControl.extend("sap.ui.mdc.util.test.TestControl");
 
 	QUnit.module("Validation of property infos");
 
@@ -62,7 +67,7 @@ sap.ui.define([
 				key: "foo",
 				label: "bar",
 				dataType: "String"
-			}, new ManagedObject()
+			}, new TestControl()
 			]);
 		}, new Error("Invalid property definition: Property info must be a plain object."), "object");
 
@@ -952,19 +957,23 @@ sap.ui.define([
 			key: "propB",
 			label: "Property B",
 			dataType: "String",
-			unit: "unit"
+			unit: "unit",
+			defaultValueUndefined: null
 		}, {
 			key: "complexPropA",
 			label: "Complex property A",
-			propertyInfos: ["propA"]
+			propertyInfos: ["propA"],
+			defaultValueUndefined: undefined
 		}, {
 			key: "complexPropB",
 			label: "Complex property B",
-			propertyInfos: ["propA"]
+			propertyInfos: ["propA"],
+			defaultValueUndefined: false
 		}, {
 			key: "unit",
 			label: "Unit",
-			dataType: "String"
+			dataType: "String",
+			defaultValueUndefined: true
 		}];
 		const oPropertyHelper = new PropertyHelper(aPropertyInfos, null, {
 			additionalAttribute: {
@@ -982,6 +991,11 @@ sap.ui.define([
 			additionalDefaultWithDeepPath: {
 				type: "string",
 				"default": {value: "attribute:additionalComplexAttribute.subAttribute"}
+			},
+			defaultValueUndefined: {
+				type: "Boolean",
+				"default": {value: undefined},
+				inComplexProperty: {allowed: true}
 			}
 		});
 
@@ -994,7 +1008,8 @@ sap.ui.define([
 			additionalComplexAttribute: {
 				subAttribute: "subAttr"
 			},
-			additionalDefaultWithDeepPath: "subAttr"
+			additionalDefaultWithDeepPath: "subAttr",
+			defaultValueUndefined: undefined
 		}, {
 			key: "propB",
 			label: "Property B",
@@ -1002,24 +1017,28 @@ sap.ui.define([
 			unit: "unit",
 			additionalAttribute: "AttributeDefault",
 			additionalComplexAttribute: null,
-			additionalDefaultWithDeepPath: ""
+			additionalDefaultWithDeepPath: "",
+			defaultValueUndefined: undefined
 		}, {
 			key: "complexPropA",
 			label: "Complex property A",
 			propertyInfos: ["propA"],
-			additionalAttribute: "DefaultForComplex"
+			additionalAttribute: "DefaultForComplex",
+			defaultValueUndefined: undefined
 		}, {
 			key: "complexPropB",
 			label: "Complex property B",
 			propertyInfos: ["propA"],
-			additionalAttribute: "DefaultForComplex"
+			additionalAttribute: "DefaultForComplex",
+			defaultValueUndefined: false
 		}, {
 			key: "unit",
 			label: "Unit",
 			dataType: "String",
 			additionalAttribute: "AttributeDefault",
 			additionalComplexAttribute: null,
-			additionalDefaultWithDeepPath: ""
+			additionalDefaultWithDeepPath: "",
+			defaultValueUndefined: true
 		}]);
 
 		oPropertyHelper.destroy();
@@ -1560,6 +1579,153 @@ sap.ui.define([
 		oPropertyHelper.destroy();
 	});
 
+	QUnit.module("Attribute overrides of dynamic properties", {
+		before: function() {
+			this.oPropertyHelperParent = new TestControl();
+			this.oPropertyHelper = new PropertyHelper([{
+				key: "staticSimpleProperty",
+				label: "Static Simple Property",
+				dataType: "String"
+			}, {
+				key: "activeDynamicSimpleProperty",
+				label: "Active Dynamic Simple Property",
+				dataType: "String",
+				isActive: true
+			}, {
+				key: "inactiveDynamicSimpleProperty",
+				label: "Inactive Dynamic Simple Property",
+				dataType: "String",
+				isActive: false
+			}, {
+				key: "staticComplexProperty",
+				label: "Static Complex Property",
+				propertyInfos: ["staticSimpleProperty"]
+			}, {
+				key: "activeDynamicComplexProperty",
+				label: "Active Dynamic Complex Property",
+				propertyInfos: ["staticSimpleProperty"],
+				isActive: true
+			}, {
+				key: "inactiveDynamicComplexProperty",
+				label: "Inactive Dynamic Complex Property",
+				propertyInfos: ["staticSimpleProperty"],
+				isActive: false
+			}], this.oPropertyHelperParent, {
+				isActive: true
+			});
+		},
+		after: function() {
+			this.oPropertyHelperParent.destroy();
+			this.oPropertyHelper.destroy();
+		}
+	});
+
+	QUnit.test("Without a parent", function(assert) {
+		const oPropertyHelper = new PropertyHelper([{
+			key: "activeDynamicSimpleProperty",
+			label: "Active Dynamic Simple Property",
+			dataType: "String",
+			isActive: true
+		}], null, {
+			isActive: true
+		});
+		const oDynamicProperty = oPropertyHelper.getProperty("activeDynamicSimpleProperty");
+		const oLabelDescriptor = Object.getOwnPropertyDescriptor(oDynamicProperty, "label");
+
+		assert.strictEqual(oDynamicProperty.label, "Active Dynamic Simple Property",
+			"Dynamic property label is not overridden without a parent");
+		assert.ok(oLabelDescriptor && "value" in oLabelDescriptor, "Label is a value property without a parent");
+		assert.strictEqual(oLabelDescriptor.get, undefined, "Label has no getter override without a parent");
+
+		oPropertyHelper.destroy();
+	});
+
+	QUnit.test("Overrides of static properties", function(assert) {
+		const oEngine = {
+			readXConfig: sinon.stub().returns({
+				aggregations: {
+					propertyInfo: {
+						staticSimpleProperty: {
+							label: "Overridden Static Simple Property",
+							tooltip: "Overridden Static Simple Tooltip"
+						},
+						staticComplexProperty: {
+							label: "Overridden Static Complex Property",
+							tooltip: "Overridden Static Complex Tooltip"
+						}
+					}
+				}
+			})
+		};
+		const oGetEngineStub = sinon.stub(this.oPropertyHelperParent, "getEngine").returns(oEngine);
+		const oStaticSimpleProperty = this.oPropertyHelper.getProperty("staticSimpleProperty");
+		const oStaticComplexProperty = this.oPropertyHelper.getProperty("staticComplexProperty");
+
+		assert.strictEqual(oStaticSimpleProperty.label, "Static Simple Property", "Static simple property ignores overrides");
+		assert.strictEqual(oStaticSimpleProperty.tooltip, "", "Static simple property retains original tooltip");
+		assert.strictEqual(oStaticComplexProperty.label, "Static Complex Property", "Static complex property ignores overrides");
+		assert.strictEqual(oStaticComplexProperty.tooltip, "", "Static complex property retains original tooltip");
+
+		oGetEngineStub.restore();
+	});
+
+	QUnit.test("Overrides of dynamic properties", function(assert) {
+		const oEngine = {
+			readXConfig: sinon.stub().returns({
+				propertyInfo: {
+					activeDynamicSimpleProperty: {
+						label: "Overridden Dynamic Simple Property",
+						tooltip: "Overridden Dynamic Simple Tooltip",
+						key: "OverriddenKey"
+					},
+					activeDynamicComplexProperty: {
+						label: "Overridden Dynamic Complex Property",
+						tooltip: "Overridden Dynamic Complex Tooltip"
+					}
+				}
+			})
+		};
+		const oGetEngineStub = sinon.stub(this.oPropertyHelperParent, "getEngine").returns(oEngine);
+		const oActiveDynamicSimpleProperty = this.oPropertyHelper.getProperty("activeDynamicSimpleProperty");
+		const oActiveDynamicComplexProperty = this.oPropertyHelper.getProperty("activeDynamicComplexProperty");
+		const oLabelDescriptor = Object.getOwnPropertyDescriptor(oActiveDynamicSimpleProperty, "label");
+		const oKeyDescriptor = Object.getOwnPropertyDescriptor(oActiveDynamicSimpleProperty, "key");
+
+		assert.strictEqual(oActiveDynamicSimpleProperty.label, "Overridden Dynamic Simple Property",
+			"Dynamic simple property uses XConfig override for label");
+		assert.strictEqual(oActiveDynamicSimpleProperty.tooltip, "Overridden Dynamic Simple Tooltip",
+			"Dynamic simple property uses XConfig override for tooltip");
+		assert.strictEqual(oActiveDynamicSimpleProperty.dataType, "String",
+			"Dynamic simple property retains original dataType when not overridden");
+		assert.strictEqual(oActiveDynamicSimpleProperty.key, "activeDynamicSimpleProperty",
+			"Dynamic property key is not overridden");
+		assert.strictEqual(typeof oLabelDescriptor.get, "function", "Dynamic property label uses a getter override");
+		assert.strictEqual(oKeyDescriptor.get, undefined, "Dynamic property key remains a value property");
+		assert.strictEqual(oActiveDynamicComplexProperty.label, "Overridden Dynamic Complex Property",
+			"Dynamic complex property uses XConfig override for label");
+		assert.strictEqual(oActiveDynamicComplexProperty.tooltip, "Overridden Dynamic Complex Tooltip",
+			"Dynamic complex property uses XConfig override for tooltip");
+		assert.deepEqual(oActiveDynamicComplexProperty.propertyInfos, ["staticSimpleProperty"],
+			"Dynamic complex property retains original propertyInfos when not overridden");
+
+		oGetEngineStub.restore();
+	});
+
+	QUnit.test("Dynamic properties without overrides", function(assert) {
+		const oEngine = {
+			readXConfig: sinon.stub().returns(undefined)
+		};
+		const oGetEngineStub = sinon.stub(this.oPropertyHelperParent, "getEngine").returns(oEngine);
+		const oActiveDynamicSimpleProperty = this.oPropertyHelper.getProperty("activeDynamicSimpleProperty");
+
+		assert.strictEqual(oActiveDynamicSimpleProperty.label, "Active Dynamic Simple Property",
+			"Dynamic property falls back to original label when XConfig is missing");
+		assert.strictEqual(oActiveDynamicSimpleProperty.tooltip, "",
+			"Dynamic property falls back to original tooltip when XConfig is missing");
+
+		oGetEngineStub.restore();
+	});
+
 	QUnit.module("Reference to a parent");
 
 	QUnit.test("Without a parent", function(assert) {
@@ -1573,7 +1739,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("With a valid parent", function(assert) {
-		const oParent = new ManagedObject();
+		const oParent = new TestControl();
 		const oPropertyHelper = new PropertyHelper([], oParent);
 
 		assert.strictEqual(oPropertyHelper.getParent(), oParent, "#getParent returns the reference to the parent");
@@ -1586,7 +1752,7 @@ sap.ui.define([
 
 	QUnit.test("With an invalid parent", function(assert) {
 		assert.throws(function() {
-			new PropertyHelper([], new (ManagedObject.getMetadata().getParent().getClass())());
+			new PropertyHelper([], new (MDCControl.getMetadata().getParent().getClass())());
 		}, new Error("The type of the parent is invalid."), "Error thrown if the type of the parent is invalid");
 
 		assert.throws(function() {
@@ -1857,13 +2023,13 @@ sap.ui.define([
 	});
 
 	QUnit.test("isPropertyComplex", function(assert) {
-		assert.strictEqual(_PropertyHelper.isPropertyComplex(), false, "No arguments");
+		assert.strictEqual(_PropertyHelper.isPropertyComplex(), undefined, "No arguments");
 		assert.strictEqual(_PropertyHelper.isPropertyComplex({}), false, "Empty object");
-		assert.strictEqual(_PropertyHelper.isPropertyComplex("propA"), false, "Name of a simple property");
+		assert.strictEqual(_PropertyHelper.isPropertyComplex("propA"), undefined, "Name of a simple property");
 		assert.strictEqual(_PropertyHelper.isPropertyComplex(this.aProperties[0]), false, "Known simple property");
-		assert.strictEqual(_PropertyHelper.isPropertyComplex("complexPropA"), false, "Name of a complex property");
+		assert.strictEqual(_PropertyHelper.isPropertyComplex("complexPropA"), undefined, "Name of a complex property");
 		assert.strictEqual(_PropertyHelper.isPropertyComplex(this.aProperties[2]), true, "Known complex property");
-		assert.strictEqual(_PropertyHelper.isPropertyComplex("unknownProp"), false, "Unknown property key");
+		assert.strictEqual(_PropertyHelper.isPropertyComplex("unknownProp"), undefined, "Unknown property key");
 		assert.strictEqual(_PropertyHelper.isPropertyComplex({
 			key: "propA",
 			label: "Property"
@@ -1873,6 +2039,9 @@ sap.ui.define([
 			label: "Complex Property",
 			propertyInfos: ["propA", "propB"]
 		}), true, "Unknown complex property");
+		assert.strictEqual(_PropertyHelper.isPropertyComplex({
+			propertyInfos: ["propA"]
+		}), true, "Property-like object with correct structure");
 
 		this.oPropertyHelper.destroy();
 		assert.strictEqual(_PropertyHelper.isPropertyComplex({
@@ -1881,7 +2050,6 @@ sap.ui.define([
 			propertyInfos: ["propA", "propB"]
 		}), true, "After destruction");
 	});
-
 
 	QUnit.test("throwInvalidPropertyError", function(assert) {
 		assert.throws(() => {
@@ -1910,12 +2078,200 @@ sap.ui.define([
 	});
 
 	QUnit.test("getRedundantProperties", function(assert) {
-		// act
 		const aRedundantProperties = this.oPropertyHelper.getRedundantProperties();
 
-		// assert
 		assert.ok(Array.isArray(aRedundantProperties), "Returns an array");
 		assert.equal(aRedundantProperties.length, 0, "Returns an empty array");
+	});
+
+	QUnit.module("API with dynamic properties", {
+		beforeEach: function() {
+			this.aOriginalProperties = [{
+				key: "staticSimpleProperty",
+				label: "Static Simple Property",
+				dataType: "String"
+			}, {
+				key: "activeDynamicSimpleProperty",
+				label: "Active Dynamic Simple Property",
+				dataType: "String",
+				isActive: true
+			}, {
+				key: "inactiveDynamicSimpleProperty",
+				label: "Inactive Dynamic Simple Property",
+				dataType: "String",
+				isActive: false
+			}, {
+				key: "staticComplexProperty",
+				label: "Static Complex Property",
+				propertyInfos: ["staticSimpleProperty"]
+			}, {
+				key: "activeDynamicComplexProperty",
+				label: "Active Dynamic Complex Property",
+				propertyInfos: ["staticSimpleProperty"],
+				isActive: true
+			}, {
+				key: "inactiveDynamicComplexProperty",
+				label: "Inactive Dynamic Complex Property",
+				propertyInfos: ["staticSimpleProperty"],
+				isActive: false
+			}];
+			this.aOriginalActiveProperties = this.aOriginalProperties.filter((oProperty) => oProperty.isActive !== false);
+			this.oPropertyHelper = new PropertyHelper(this.aOriginalProperties, null, {
+				isActive: true
+			});
+			this.aProperties = this.oPropertyHelper.getProperties();
+		},
+		afterEach: function() {
+			this.oPropertyHelper.destroy();
+		}
+	});
+
+	QUnit.test("getProperties", function(assert) {
+		const aProperties = this.oPropertyHelper.getProperties();
+
+		assert.equal(aProperties.length, this.aOriginalActiveProperties.length,
+			"The property array contains as many entries as there are active properties");
+
+		this.aOriginalActiveProperties.forEach(function(oOriginalProperty, iIndex) {
+			assert.strictEqual(aProperties[iIndex].key, oOriginalProperty.key,
+				"The property array references the correct property at index " + iIndex);
+		});
+	});
+
+	QUnit.test("getPropertyMap", function(assert) {
+		const mProperties = this.oPropertyHelper.getPropertyMap();
+
+		assert.equal(Object.keys(mProperties).length, this.aOriginalActiveProperties.length,
+			"The property map contains as many entries as there are active properties");
+
+		this.aProperties.forEach(function(oProperty) {
+			assert.strictEqual(mProperties[oProperty.key], oProperty,
+				"The map references the correct property for the key '" + oProperty.key + "'");
+		});
+	});
+
+	QUnit.test("getProperty", function(assert) {
+		assert.strictEqual(this.oPropertyHelper.getProperty("staticSimpleProperty"), this.aProperties[0],
+			"Static simple property");
+		assert.strictEqual(this.oPropertyHelper.getProperty("activeDynamicSimpleProperty"), this.aProperties[1],
+			"Dynamic active simple property");
+		assert.strictEqual(this.oPropertyHelper.getProperty("inactiveDynamicSimpleProperty"), null,
+			"Dynamic inactive simple property");
+		assert.strictEqual(this.oPropertyHelper.getProperty("staticComplexProperty"), this.aProperties[2],
+			"Static complex property");
+		assert.strictEqual(this.oPropertyHelper.getProperty("activeDynamicComplexProperty"), this.aProperties[3],
+			"Dynamic active complex property");
+		assert.strictEqual(this.oPropertyHelper.getProperty("inactiveDynamicComplexProperty"), null,
+			"Dynamic inactive complex property");
+	});
+
+	QUnit.test("hasProperty", function(assert) {
+		assert.strictEqual(this.oPropertyHelper.hasProperty("staticSimpleProperty"), true,
+			"Static simple property");
+		assert.strictEqual(this.oPropertyHelper.hasProperty("activeDynamicSimpleProperty"), true,
+			"Dynamic active simple property");
+		assert.strictEqual(this.oPropertyHelper.hasProperty("inactiveDynamicSimpleProperty"), false,
+			"Dynamic inactive simple property");
+		assert.strictEqual(this.oPropertyHelper.hasProperty("staticComplexProperty"), true,
+			"Static complex property");
+		assert.strictEqual(this.oPropertyHelper.hasProperty("activeDynamicComplexProperty"), true,
+			"Dynamic active complex property");
+		assert.strictEqual(this.oPropertyHelper.hasProperty("inactiveDynamicComplexProperty"), false,
+			"Dynamic inactive complex property");
+	});
+
+	QUnit.test("getProperties with bIncludeInactive=true", function(assert) {
+		const aAllProperties = this.oPropertyHelper.getProperties(true);
+
+		assert.equal(aAllProperties.length, this.aOriginalProperties.length,
+			"Returns all properties including inactive");
+
+		this.aOriginalProperties.forEach(function(oOriginalProperty, iIndex) {
+			assert.strictEqual(aAllProperties[iIndex].key, oOriginalProperty.key,
+				"Property at index " + iIndex + " has key '" + oOriginalProperty.key + "'");
+		});
+	});
+
+	QUnit.test("getPropertyMap with bIncludeInactive=true", function(assert) {
+		const mAllProperties = this.oPropertyHelper.getPropertyMap(true);
+
+		assert.equal(Object.keys(mAllProperties).length, this.aOriginalProperties.length,
+			"Map contains all properties including inactive");
+		assert.ok(mAllProperties.inactiveDynamicSimpleProperty, "Inactive simple property included in map");
+		assert.ok(mAllProperties.inactiveDynamicComplexProperty, "Inactive complex property included in map");
+	});
+
+	QUnit.test("getProperty with bIncludeInactive=true", function(assert) {
+		assert.ok(this.oPropertyHelper.getProperty("inactiveDynamicSimpleProperty", true) !== null,
+			"Inactive simple property returned when bIncludeInactive=true");
+		assert.ok(this.oPropertyHelper.getProperty("inactiveDynamicComplexProperty", true) !== null,
+			"Inactive complex property returned when bIncludeInactive=true");
+		assert.strictEqual(this.oPropertyHelper.getProperty("activeDynamicSimpleProperty", true).key,
+			"activeDynamicSimpleProperty", "Active property still returned with bIncludeInactive=true");
+		assert.strictEqual(this.oPropertyHelper.getProperty("unknownProp", true), null,
+			"Unknown property returns null even with bIncludeInactive=true");
+	});
+
+	QUnit.module("validateDynamicProperties", {
+		afterEach: function() {
+			this.oPropertyHelper?.destroy();
+		}
+	});
+
+	QUnit.test("No error when all complex properties reference only active simple properties", function(assert) {
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "simpleActive", label: "Simple Active", dataType: "String", isActive: true},
+			{key: "simpleStatic", label: "Simple Static", dataType: "String"},
+			{key: "complexActive", label: "Complex Active", isActive: true, propertyInfos: ["simpleActive", "simpleStatic"]}
+		], null, {isActive: true});
+
+		this.oPropertyHelper.validateDynamicProperties();
+		assert.ok(true, "No error thrown");
+	});
+
+	QUnit.test("Error when active complex property references inactive simple property", function(assert) {
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "simpleActive", label: "Simple Active", dataType: "String", isActive: true},
+			{key: "simpleInactive", label: "Simple Inactive", dataType: "String", isActive: false},
+			{key: "complexActive", label: "Complex Active", isActive: true, propertyInfos: ["simpleActive", "simpleInactive"]}
+		], null, {isActive: true});
+
+		assert.throws(function() {
+			this.oPropertyHelper.validateDynamicProperties();
+		}.bind(this), /complexActive.*simpleInactive/, "Error thrown for active complex referencing inactive simple");
+	});
+
+	QUnit.test("No error when inactive complex property references inactive simple property", function(assert) {
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "simpleActive", label: "Simple Active", dataType: "String", isActive: true},
+			{key: "simpleInactive", label: "Simple Inactive", dataType: "String", isActive: false},
+			{key: "complexInactive", label: "Complex Inactive", isActive: false, propertyInfos: ["simpleActive", "simpleInactive"]}
+		], null, {isActive: true});
+
+		this.oPropertyHelper.validateDynamicProperties();
+		assert.ok(true, "No error thrown for inactive complex property");
+	});
+
+	QUnit.test("Error when static complex property references inactive simple property", function(assert) {
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "simpleActive", label: "Simple Active", dataType: "String", isActive: true},
+			{key: "simpleInactive", label: "Simple Inactive", dataType: "String", isActive: false},
+			{key: "complexStatic", label: "Complex Static", propertyInfos: ["simpleActive", "simpleInactive"]}
+		], null, {isActive: true});
+
+		assert.throws(function() {
+			this.oPropertyHelper.validateDynamicProperties();
+		}.bind(this), /complexStatic.*simpleInactive/, "Error thrown for static complex referencing inactive simple");
+	});
+
+	QUnit.test("No error when no dynamic properties exist", function(assert) {
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "simple", label: "Simple", dataType: "String"},
+			{key: "complex", label: "Complex", propertyInfos: ["simple"]}
+		]);
+
+		this.oPropertyHelper.validateDynamicProperties();
+		assert.ok(true, "No error thrown when no dynamic properties exist");
 	});
 
 	QUnit.module("Property", {

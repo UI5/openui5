@@ -269,6 +269,16 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					]
 				}
 			},
+			"PersonalizationDynamicProperties": {
+				group: "Table UI Test",
+				autostart: false,
+				module: "./OpaTests/P13nOpa.qunit",
+				ui5: {
+					libs: [
+						"sap.ui.fl", "sap.ui.mdc"
+					]
+				}
+			},
 			"NEWAdaptFiltersJourneyGeneral": {
 				group: "FilterBar UI Test",
 				autostart: false,
@@ -342,6 +352,25 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 				ui5: {
 					libs: [
 						"sap.ui.fl", "sap.ui.mdc"
+					]
+				}
+			},
+			"DynamicPropertiesFlex": {
+				group: "changehandler tests",
+				module: "./flexibility/DynamicPropertiesFlex.qunit",
+				ui5: {
+					libs: [
+						"sap.ui.fl", "sap.ui.mdc"
+					]
+				},
+				sinon: false
+			},
+			"DynamicPropertiesController": {
+				group: "Controllers",
+				module: "./subcontroller/DynamicPropertiesController.qunit",
+				ui5: {
+					libs: [
+						"sap.ui.mdc"
 					]
 				}
 			},

@@ -726,7 +726,7 @@ sap.ui.define([
 						matchers: [{
 							ancestor: oColumnMenu,
 							properties: {
-								label: "Freeze"
+								label: Util.getTextFromResourceBundle("sap.ui.table", "TBL_FREEZE")
 							}
 						}],
 						success: function(aQuickFreezeItems) {

@@ -206,6 +206,32 @@ sap.ui.define([
 		return aPropertiesOnControl.some((sPropertyName) => !oControl.isPropertyInitial(sPropertyName));
 	};
 
+	/**
+	 * After <code>oPropertyInfo</code> has changed, corresponding properties on <code>Control</code> needs to be updated.
+	 * @param {sap.ui.mdc.Control} oControl Control instance to be checked.
+	 * @param {object} oPropertyInfo Property Info object to be compared to.
+	 * @returns {void}
+	 */
+	PropertyInfoValidator.updateControlFromPropertyInfo = (oControl, oPropertyInfo) => {
+		if (!oControl || !oPropertyInfo) {
+			return;
+		}
+		const aProperties = [ ...Object.keys(MANDATORY_PROPERTIES), "required" ]; // TODO: only currently supported properties?
+
+		for (const sPropertyName of aProperties) {
+			const sMappedPropertyName = PropertyInfoValidator._getPropertyInfoPropertyName(sPropertyName) ?? sPropertyName;
+			if (oPropertyInfo.hasOwnProperty(sMappedPropertyName)) {
+				const vValue = oPropertyInfo[sMappedPropertyName];
+				if (oControl.getProperty(sPropertyName) !== vValue) {
+					oControl.setProperty(sPropertyName, vValue);
+				}
+			}
+		}
+
+		PropertyInfoValidator.checkMandatoryProperties(oControl);
+
+	};
+
 	return PropertyInfoValidator;
 
 });

@@ -112,10 +112,17 @@ sap.ui.define([
 		// For now we allow for only one action of type navigation.
 		var oAction = oConfig.actions[0];
 
-		if (oAction && oAction.type) { // todo - check if the type is valid
+		if (oAction) {
 			oConfig.action = oAction;
-			this._attachAction(oConfig);
 
+			if (oAction.type) {
+				// Action has a type - attach the full action logic
+				this._attachAction(oConfig);
+			} else if (oConfig.enabledPropertyName && (oConfig.actionControl.isA("sap.m.Button") || oConfig.actionControl.isA("sap.m.Link"))) {
+				// Action has no type but we have Button/Link - handle the enabled state
+				// This applies to ActionsStrip buttons/links, not list items
+				this._setControlEnabledState(oConfig);
+			}
 		}
 	};
 
