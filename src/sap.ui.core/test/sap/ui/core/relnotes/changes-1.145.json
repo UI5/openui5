@@ -53,5 +53,15 @@
         "text": " core/Control: Improve focus restoration for busy indicator"
       }
     ]
+  },
+  "1.145.2": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "0afef15d30117cf7cf1fb2ef111c8167bddb35cd",
+        "type": "FIX",
+        "text": " FESR: Fix excessive interaction recording on livechange events"
+      }
+    ]
   }
 }
