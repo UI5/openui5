@@ -69,9 +69,9 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/util/uid"],
 	 * @param {sap.ui.base.Event} oEvent
 	 * @param {sap.ui.base.EventProvider} oEvent.getSource
 	 * @param {object} oEvent.getParameters
-	 * @param {sap.ui.core.message.Message} oEvent.getParameters.oldMessages
+	 * @param {Array<sap.ui.core.message.Message>} oEvent.getParameters.oldMessages
 	 *            Messages already existing before the <code>messageChange</code> event was fired.
-	 * @param {sap.ui.core.message.Message} oEvent.getParameters.newMessages
+	 * @param {Array<sap.ui.core.message.Message>} oEvent.getParameters.newMessages
 	 *            New messages added by the trigger of the <code>messageChange</code> event.
 	 * @public
 	 */
@@ -123,9 +123,9 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/util/uid"],
 	 *
 	 * @param {object} mParameters
 	 *            Parameters to pass along with the event
-	 * @param {sap.ui.core.message.Message} mParameters.oldMessages
+	 * @param {Array<sap.ui.core.message.Message>} mParameters.oldMessages
 	 *            Messages already existing before the <code>messageChange</code> event was fired.
-	 * @param {sap.ui.core.message.Message} mParameters.newMessages
+	 * @param {Array<sap.ui.core.message.Message>} mParameters.newMessages
 	 *            New messages added by the trigger of the <code>messageChange</code> event.
 	 *
 	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
