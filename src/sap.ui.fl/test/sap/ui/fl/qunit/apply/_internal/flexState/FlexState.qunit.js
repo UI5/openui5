@@ -1737,7 +1737,7 @@ sap.ui.define([
 			const oUpdateStorageResponseSpy = sandbox.spy(StorageUtils, "updateStorageResponse");
 			const oCheckUpdateSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
 
-			FlexState.addNewObjects({
+			const aNewFlexObjects = FlexState.addNewObjects({
 				reference: this.sReference,
 				componentId: this.sComponentId,
 				newData: {
@@ -1771,6 +1771,12 @@ sap.ui.define([
 				}
 			});
 
+			assert.strictEqual(aNewFlexObjects.length, 2, "then two new FlexObjects are returned");
+			assert.deepEqual(
+				aNewFlexObjects.map((oObj) => oObj.getId()),
+				["newChange", "newVariant"],
+				"then the returned FlexObjects match the newly added ones"
+			);
 			assert.strictEqual(oUpdateCachedResponseStub.callCount, 1, "then the loader cache is updated once");
 			assert.strictEqual(oUpdateCachedResponseStub.firstCall.args[0], this.sReference, "then the reference is passed");
 			assert.deepEqual(
@@ -1796,7 +1802,7 @@ sap.ui.define([
 			const oUpdateCachedResponseStub = sandbox.stub(Loader, "updateCachedResponse");
 			const oUpdateStorageResponseSpy = sandbox.spy(StorageUtils, "updateStorageResponse");
 
-			FlexState.addNewObjects({
+			const aNewFlexObjects = FlexState.addNewObjects({
 				reference: this.sReference,
 				componentId: this.sComponentId,
 				newData: {
@@ -1809,12 +1815,155 @@ sap.ui.define([
 				}
 			});
 
+			assert.strictEqual(aNewFlexObjects.length, 0, "then an empty array is returned");
 			assert.strictEqual(oUpdateCachedResponseStub.callCount, 0, "then the loader cache is not updated");
 			assert.strictEqual(oUpdateStorageResponseSpy.callCount, 0, "then storage response is not updated");
 			assert.strictEqual(
 				FlexState.getFlexObjectsDataSelector().get({ reference: this.sReference }).length,
 				1,
 				"then no additional flex object is added"
+			);
+		});
+
+		QUnit.test("when backend response contains comp variants in nested comp structure", function(assert) {
+			const oUpdateCachedResponseStub = sandbox.stub(Loader, "updateCachedResponse").returns("newLoaderCacheKey");
+			const oUpdateStorageResponseSpy = sandbox.spy(StorageUtils, "updateStorageResponse");
+			const oCheckUpdateSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
+
+			const aNewFlexObjects = FlexState.addNewObjects({
+				reference: this.sReference,
+				componentId: this.sComponentId,
+				newData: {
+					comp: {
+						variants: [
+							{
+								fileName: "compVariant1",
+								fileType: "variant",
+								persistencyKey: "testPersistencyKey",
+								layer: Layer.USER,
+								texts: { variantName: { value: "Comp Variant 1" } },
+								reference: this.sReference,
+								support: { user: "USER" }
+							},
+							{
+								fileName: "compVariant2",
+								fileType: "variant",
+								persistencyKey: "testPersistencyKey",
+								layer: Layer.USER,
+								texts: { variantName: { value: "Comp Variant 2" } },
+								reference: this.sReference,
+								support: { user: "USER" }
+							}
+						],
+						changes: [{
+							fileName: "compChange1",
+							fileType: "change",
+							changeType: "defaultVariant",
+							layer: Layer.USER,
+							selector: { persistencyKey: "testPersistencyKey" },
+							reference: this.sReference,
+							support: {}
+						}]
+					}
+				}
+			});
+
+			assert.strictEqual(aNewFlexObjects.length, 3, "then three new FlexObjects are returned");
+			assert.deepEqual(
+				aNewFlexObjects.map((oObj) => oObj.getId()),
+				["compVariant1", "compVariant2", "compChange1"],
+				"then the returned FlexObjects match the newly added comp objects"
+			);
+			assert.strictEqual(oUpdateCachedResponseStub.callCount, 1, "then the loader cache is updated once");
+			assert.deepEqual(
+				oUpdateCachedResponseStub.firstCall.args[1].map((oUpdate) => oUpdate.flexObject.fileName),
+				["compVariant1", "compVariant2", "compChange1"],
+				"then all comp objects are converted into add updates"
+			);
+			assert.strictEqual(oUpdateStorageResponseSpy.callCount, 1, "then storage response is updated once");
+			assert.strictEqual(oCheckUpdateSpy.callCount, 1, "then flex object data selector is invalidated once");
+
+			const aFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: this.sReference });
+			const aCompVariants = aFlexObjects.filter(
+				(oObj) => oObj.isA("sap.ui.fl.apply._internal.flexObjects.CompVariant")
+			);
+			assert.strictEqual(aCompVariants.length, 2, "then two comp variants are added");
+			assert.strictEqual(aCompVariants[0].getName(), "Comp Variant 1", "then the first comp variant has the correct name");
+			assert.strictEqual(aCompVariants[1].getName(), "Comp Variant 2", "then the second comp variant has the correct name");
+			assert.strictEqual(
+				aFlexObjects.length,
+				4,
+				"then three new flex objects are added to the existing one (4 in total)"
+			);
+		});
+
+		QUnit.test("when backend response contains comp variants with duplicates", function(assert) {
+			sandbox.stub(Loader, "updateCachedResponse").returns("newLoaderCacheKey");
+
+			const aFirstResult = FlexState.addNewObjects({
+				reference: this.sReference,
+				componentId: this.sComponentId,
+				newData: {
+					comp: {
+						variants: [{
+							fileName: "compVariantFirst",
+							fileType: "variant",
+							persistencyKey: "testPersistencyKey",
+							layer: Layer.USER,
+							texts: { variantName: { value: "First" } },
+							reference: this.sReference,
+							support: { user: "USER" }
+						}]
+					}
+				}
+			});
+
+			assert.strictEqual(aFirstResult.length, 1, "then one new FlexObject is returned");
+			assert.strictEqual(aFirstResult[0].getId(), "compVariantFirst", "then the returned FlexObject is the new comp variant");
+			assert.strictEqual(
+				FlexState.getFlexObjectsDataSelector().get({ reference: this.sReference }).length,
+				2,
+				"then one comp variant is added (2 in total with existing change)"
+			);
+
+			const aSecondResult = FlexState.addNewObjects({
+				reference: this.sReference,
+				componentId: this.sComponentId,
+				newData: {
+					comp: {
+						variants: [
+							{
+								fileName: "compVariantFirst",
+								fileType: "variant",
+								persistencyKey: "testPersistencyKey",
+								layer: Layer.USER,
+								texts: { variantName: { value: "First" } },
+								reference: this.sReference,
+								support: { user: "USER" }
+							},
+							{
+								fileName: "compVariantSecond",
+								fileType: "variant",
+								persistencyKey: "testPersistencyKey",
+								layer: Layer.USER,
+								texts: { variantName: { value: "Second" } },
+								reference: this.sReference,
+								support: { user: "USER" }
+							}
+						]
+					}
+				}
+			});
+
+			assert.strictEqual(aSecondResult.length, 1, "then only one new FlexObject is returned");
+			assert.strictEqual(
+				aSecondResult[0].getId(), "compVariantSecond",
+				"then only the non-duplicate comp variant is returned"
+			);
+			assert.strictEqual(
+				FlexState.getFlexObjectsDataSelector().get({ reference: this.sReference }).length,
+				3,
+				"then only the new comp variant is added, duplicate is filtered out (3 in total)"
 			);
 		});
 	});

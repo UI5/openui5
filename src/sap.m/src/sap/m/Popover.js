@@ -2684,15 +2684,20 @@ sap.ui.define([
 			}
 
 			if (oCustomHeader) {
-				// if there are titles in the header, add all of them to labels, else use the full header
-				var aTitles = this._getTitles(oHeader);
-
-				if (aTitles.length) {
-					aAriaLabels = aTitles.map(function (oTitle) {
-						return oTitle.getId();
-					});
+				// Special handling for ValueStateHeader - only include in aria-labelledby when it has visible content
+				if (oHeader.isA("sap.m.ValueStateHeader") && !oHeader._hasVisibleContent()) {
+					aAriaLabels = [];
 				} else {
-					aAriaLabels = oHeader.getId();
+					// if there are titles in the header, add all of them to labels, else use the full header
+					var aTitles = this._getTitles(oHeader);
+
+					if (aTitles.length) {
+						aAriaLabels = aTitles.map(function (oTitle) {
+							return oTitle.getId();
+						});
+					} else {
+						aAriaLabels = oHeader.getId();
+					}
 				}
 			} else {
 				aAriaLabels = this.getHeaderTitle().getId();

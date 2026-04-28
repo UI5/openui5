@@ -75,8 +75,8 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter} [vFilter]
 	 *   The new filters for the given filter type
-	 * @param {sap.ui.model.FilterType.Application|sap.ui.model.FilterType.ApplicationBound} [sFilterType=sap.ui.model.FilterType.Application]
-	 *   The type of the application filters to replace
+	 * @param {"Application"|"ApplicationBound"} [sFilterType="Application"]
+	 *   The type of the application filters to replace, see {@link sap.ui.model.FilterType}
 	 * @returns {sap.ui.model.Filter[]|sap.ui.model.Filter|undefined}
 	 *   The new application filters
 	 * @throws {Error}

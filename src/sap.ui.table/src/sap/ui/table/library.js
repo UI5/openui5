@@ -107,19 +107,19 @@ sap.ui.define([
  thisLib.RowActionType = {
 
 	 /**
-	  * Custom defined Row Action.
+	  * Custom-defined row action
 	  * @public
 	  */
 	 Custom: "Custom",
 
 	 /**
-	  * Navigation Row Action.
+	  * Navigation arrow (chevron) is shown
 	  * @public
 	  */
 	 Navigation: "Navigation",
 
 	 /**
-	  * Delete Row Action.
+	  * Row action for deletion
 	  * @public
 	  */
 	 Delete: "Delete"

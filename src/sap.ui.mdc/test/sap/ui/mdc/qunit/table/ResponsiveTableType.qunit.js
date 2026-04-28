@@ -12,7 +12,6 @@ sap.ui.define([
 	"sap/ui/mdc/table/ResponsiveColumnSettings",
 	"sap/ui/mdc/table/RowSettings",
 	"sap/ui/mdc/table/RowActionItem",
-	"sap/ui/mdc/enums/TableRowActionType",
 	"sap/m/Text",
 	"sap/m/Menu",
 	"sap/m/plugins/ColumnResizer",
@@ -21,7 +20,9 @@ sap.ui.define([
 	"sap/ui/core/Icon",
 	"sap/ui/model/Filter",
 	"sap/ui/Device",
+	"sap/ui/base/DataType",
 	"sap/ui/fl/variants/VariantManagement",
+	"sap/ui/thirdparty/jquery",
 	"test-resources/sap/m/qunit/p13n/TestModificationHandler"
 ], function(
 	TableQUnitUtils,
@@ -34,7 +35,6 @@ sap.ui.define([
 	ResponsiveColumnSettings,
 	RowSettings,
 	RowActionItem,
-	RowActionType,
 	Text,
 	Menu,
 	ColumnResizer,
@@ -43,7 +43,9 @@ sap.ui.define([
 	Icon,
 	Filter,
 	Device,
+	DataType,
 	VariantManagement,
+	jQuery,
 	TestModificationHandler
 ) {
 	"use strict";
@@ -1014,13 +1016,11 @@ sap.ui.define([
 				}),
 				models: {
 					namedModel: new JSONModel({
-						testPath: [{
-							type: "Navigation"
-						}, {
-							type: "Navigation", visible: true
-						}, {
-							type: "Navigation", visible: "true"
-						}]
+						testPath: [
+							{type: "Navigation", visible: true},
+							{type: "Delete", visible: true},
+							{type: "Custom", text: "Custom", icon: "sap-icon://action", visible: false}
+						]
 					})
 				},
 				...mSettings
@@ -1033,29 +1033,29 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Row actions with default settings", function(assert) {
-		return this.createTable({
-			rowSettings: new RowSettings({
-				rowActions: [
-					new RowActionItem()
-				]
-			})
-		}).then(() => {
-			assert.ok(false, "Promise should not resolve");
-		}).catch((oError) => {
-			assert.equal(oError.message,
-				"No row action of type 'Navigation' found. ResponsiveTableType only accepts row actions of type 'Navigation'.",
-				"Error message");
-		});
+	QUnit.test("RowActionItem loads TableRowActionType enum transitively", function(assert) {
+		// Do NOT require the enum directly – we are validating transitive availability via RowActionItem
+		const oEnumType = DataType.getType("sap.ui.mdc.enums.TableRowActionType");
+
+		assert.ok(oEnumType, "Enum type is registered when RowActionItem is loaded");
+		assert.ok(oEnumType.isEnumType(), "Registered type is an enum");
+
+		const oItem = new RowActionItem();
+		const oItem2 = new RowActionItem({type: "Navigation"});
+		assert.strictEqual(oItem.getType(), "Custom", "Enum default value 'Custom' is set");
+		assert.strictEqual(oItem2.getType(), "Navigation", "Enum value 'Navigation' is accepted");
+		oItem.destroy();
+		oItem2.destroy();
 	});
 
-	QUnit.test("Row actions with static settings", async function(assert) {
+	QUnit.test("Static row actions: Navigation, Delete, Custom", async function(assert) {
 		await this.createTable({
 			rowSettings: new RowSettings({
 				rowActions: [
-					new RowActionItem(),
+					new RowActionItem({type: "Navigation"}),
+					new RowActionItem({type: "Delete"}),
 					new RowActionItem({
-						type: RowActionType.Navigation,
+						type: "Custom",
 						text: "My custom action",
 						icon: "sap-icon://accept",
 						visible: false
@@ -1064,21 +1064,16 @@ sap.ui.define([
 			})
 		});
 
-		const oInnerTableItemsTemplate = this.oTable._oTable.getBindingInfo("items").template;
+		const oInnerTable = this.oTable._oTable;
+		const oRowTemplate = this.oTable._oRowTemplate;
+		const aActions = oRowTemplate.getActions();
 
-		assert.strictEqual(oInnerTableItemsTemplate.getType(), "Inactive", "Item invisible: Inner table items template 'type' value");
-		assert.notOk(oInnerTableItemsTemplate.isBound("type"), "Item invisible: Inner table items template 'type' not bound");
-
-		this.oTable.getRowSettings().getRowActions()[1].setVisible(true);
-		this.oTable.setRowSettings(this.oTable.getRowSettings());
-		assert.strictEqual(oInnerTableItemsTemplate.getType(), "Navigation", "Item visible: Inner table items template 'type' value");
-		assert.notOk(oInnerTableItemsTemplate.isBound("type"), "Item visible: Inner table items template 'type' not bound");
-
-		assert.throws(() => {
-			this.oTable.getRowSettings().getRowActions()[1].setType();
-			this.oTable.setRowSettings(this.oTable.getRowSettings());
-		}, new Error("No row action of type 'Navigation' found. ResponsiveTableType only accepts row actions of type 'Navigation'."),
-			"Error thrown when setting wrong type");
+		assert.equal(oInnerTable.getItemActionCount(), 3, "Correct action count set on inner table");
+		assert.ok(oRowTemplate.getAggregation("actions").length === 3, "Three actions added to row template");
+		assert.strictEqual(oRowTemplate.getType(), "Inactive", "ListItem type set to 'Inactive'");
+		assert.strictEqual(oRowTemplate.getEffectiveType(), "Navigation", "ListItem effectiveType set to 'Navigation'");
+		assert.notOk(oRowTemplate.isBound("type"), "Inner table items template 'type' not bound");
+		assert.strictEqual(aActions[2].getVisible(), false, "Third actionItem 'visible' property set to false");
 	});
 
 	QUnit.test("Row actions with bound settings", async function(assert) {
@@ -1086,7 +1081,7 @@ sap.ui.define([
 			rowSettings: new RowSettings({
 				rowActions: [
 					new RowActionItem({
-						type: "Navigation",
+						type: "{namedModel>type}",
 						text: "{namedModel>text}",
 						icon: "{namedModel>icon}",
 						visible: "{namedModel>visible}"
@@ -1095,21 +1090,23 @@ sap.ui.define([
 			})
 		});
 
-		const oInnerTableItemsTemplate = this.oTable._oTable.getBindingInfo("items").template;
+		const oRowTemplate = this.oTable._oRowTemplate;
 
 		assert.deepEqual({
-			model: oInnerTableItemsTemplate.getBindingInfo("type").parts[0].model,
-			path: oInnerTableItemsTemplate.getBindingInfo("type").parts[0].path
+			model: oRowTemplate.getActions()[0].getBindingInfo("type").parts[0].model,
+			path: oRowTemplate.getActions()[0].getBindingInfo("type").parts[0].path
 		}, {
 			model: "namedModel",
-			path: "visible"
+			path: "type"
 		}, "'type' property binding");
 
-		// The formatter needs to be tested in the context of the items aggregation.
 		const aItems = this.oTable._oTable.getItems();
-		assert.strictEqual(aItems[0].getType(), "Inactive", "Item 1 type");
-		assert.strictEqual(aItems[1].getType(), "Navigation", "Item 2 type");
-		assert.strictEqual(aItems[2].getType(), "Inactive", "Item 3 type");
+		assert.strictEqual(aItems[0].getEffectiveType(), "Navigation", "Item 1 effectiveType is 'Navigation'");
+		assert.strictEqual(aItems[1].getEffectiveType(), "Inactive", "Item 2 effectiveType is 'Inactive'");
+		assert.strictEqual(aItems[2].getEffectiveType(), "Inactive", "Item 3 effectiveType is 'Inactive'");
+
+		assert.ok(oRowTemplate.getActions()[0].isBound("type"), "Inner table item Action property 'type' is bound");
+		assert.ok(oRowTemplate.getActions()[0].isBound("text"), "Inner table item Action property 'text' is bound");
 	});
 
 	QUnit.test("Row actions with bound settings and custom formatters", async function(assert) {
@@ -1117,13 +1114,13 @@ sap.ui.define([
 			rowSettings: new RowSettings({
 				rowActions: [
 					new RowActionItem({
-						type: "Navigation",
+						type: "{namedModel>type}",
 						text: "{namedModel>text}",
 						icon: "{namedModel>icon}",
 						visible: {
 							path: "namedModel>visible",
 							formatter: function(sValue) {
-								return sValue === "true" ? true : sValue;
+								return sValue;
 							}
 						}
 					})
@@ -1131,21 +1128,19 @@ sap.ui.define([
 			})
 		});
 
-		const oInnerTableItemsTemplate = this.oTable._oTable.getBindingInfo("items").template;
+		const oRowTemplate = this.oTable._oRowTemplate;
 
 		assert.deepEqual({
-			model: oInnerTableItemsTemplate.getBindingInfo("type").parts[0].model,
-			path: oInnerTableItemsTemplate.getBindingInfo("type").parts[0].path
+			model: oRowTemplate.getActions()[0].getBindingInfo("visible").parts[0].model,
+			path: oRowTemplate.getActions()[0].getBindingInfo("visible").parts[0].path
 		}, {
 			model: "namedModel",
 			path: "visible"
-		}, "'type' property binding");
+		}, "'visible' property binding");
 
 		// The formatter needs to be tested in the context of the items aggregation.
 		const aItems = this.oTable._oTable.getItems();
-		assert.strictEqual(aItems[0].getType(), "Inactive", "Item 1 type");
-		assert.strictEqual(aItems[1].getType(), "Navigation", "Item 2 type");
-		assert.strictEqual(aItems[2].getType(), "Navigation", "Item 3 type");
+		assert.strictEqual(aItems[2].getActions()[0].getVisible(), false, "Item 3 action 'visible' is false");
 	});
 
 	QUnit.test("Bound row actions", async function(assert) {
@@ -1164,30 +1159,72 @@ sap.ui.define([
 			})
 		});
 
-		const oInnerTableItemsTemplate = this.oTable._oTable.getBindingInfo("items").template;
+		const oRowTemplate = this.oTable._oRowTemplate;
 
 		assert.deepEqual({
-			model: oInnerTableItemsTemplate.getBindingInfo("type").parts[0].model,
-			path: oInnerTableItemsTemplate.getBindingInfo("type").parts[0].path
+			model: oRowTemplate.getBindingInfo('actions').template.getBindingInfo('type').parts[0].model,
+			path: oRowTemplate.getBindingInfo('actions').template.getBindingInfo('type').parts[0].path
 		}, {
 			model: "namedModel",
-			path: "visible"
+			path: "type"
 		}, "'type' property binding");
 
 		// The formatter needs to be tested in the context of the items aggregation.
 		const aItems = this.oTable._oTable.getItems();
 		assert.strictEqual(aItems[0].getType(), "Inactive", "Item 1 type");
-		assert.strictEqual(aItems[1].getType(), "Navigation", "Item 2 type");
+		assert.strictEqual(aItems[1].getType(), "Inactive", "Item 2 type");
 		assert.strictEqual(aItems[2].getType(), "Inactive", "Item 3 type");
+
+		assert.strictEqual(aItems[0].getEffectiveType(), "Navigation", "Item 1 effectiveType");
+		assert.strictEqual(aItems[1].getEffectiveType(), "Navigation", "Item 2 effectiveType");
+		assert.strictEqual(aItems[2].getEffectiveType(), "Navigation", "Item 3 effectiveType");
+
+		assert.ok(oRowTemplate.getBindingInfo('actions').template.isBound("type"), "Inner table items template 'type' is bound");
+		assert.ok(oRowTemplate.getBindingInfo('actions').template.isBound("text"), "Inner table items template 'text' is bound");
+		assert.ok(oRowTemplate.getBindingInfo('actions').template.isBound("icon"), "Inner table items template 'icon' is bound");
+		assert.ok(oRowTemplate.getBindingInfo('actions').template.isBound("visible"), "Inner table items template 'visible' is bound");
 	});
 
-	QUnit.test("press' event", async function(assert) {
+	QUnit.test("Custom and Edit action types are supported", async function(assert) {
 		await this.createTable({
 			rowSettings: new RowSettings({
 				rowActions: [
+					new RowActionItem({type: "Delete"}),
+					new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"})
+				]
+			})
+		});
+
+		const oRowTemplate = this.oTable._oRowTemplate;
+		const aActions = oRowTemplate.getActions();
+		assert.strictEqual(aActions[0].getType(), "Delete", "Delete action type is set");
+		assert.strictEqual(aActions[1].getType(), "Custom", "Custom action type is set");
+	});
+
+	QUnit.test("Row action press event is fired with correct parameters", async function(assert) {
+		const oRowActionItemPress = sinon.spy();
+		const oRowPress = sinon.spy();
+		const fnRowPress = (oEvent) => {
+			oRowPress(oEvent.getParameters());
+		};
+
+		await this.createTable({
+			rowPress: fnRowPress,
+			rowSettings: new RowSettings({
+				rowActions: [
 					new RowActionItem({
-						id: "myRowActionitem",
-						type: RowActionType.Navigation
+						id: "actionNav",
+						type: "Navigation",
+						press: function(oEvent) {
+							oRowActionItemPress(oEvent);
+						}
+					}),
+					new RowActionItem({
+						id: "actionDel",
+						type: "Delete",
+						press: function(oEvent) {
+							oRowActionItemPress(oEvent);
+						}
 					})
 				]
 			})
@@ -1197,23 +1234,220 @@ sap.ui.define([
 			this.oTable._oTable.attachEventOnce("updateFinished", resolve);
 		});
 
-		this.oTable._oTable.getItems()[1].$().trigger("tap");
-		let oEvent = await new Promise((resolve) => {
-			this.oTable.getRowSettings().getRowActions()[0].attachEventOnce("press", resolve);
-		});
-		assert.deepEqual(oEvent.getParameters(), {
-			id: "myRowActionitem",
-			bindingContext: this.oTable._oTable.getItems()[1].getBindingContext("namedModel")
-		}, "'press' event handler called with the correct parameters");
+		// Simulate press on first row action (Navigation)
+		const oFirstItem = this.oTable._oTable.getItems()[0];
+		oFirstItem.$().trigger("tap");
 
-		this.oTable._oTable.getItems()[2].$().trigger("tap");
-		oEvent = await new Promise((resolve) => {
+		await new Promise((resolve) => {
 			this.oTable.getRowSettings().getRowActions()[0].attachEventOnce("press", resolve);
 		});
-		assert.deepEqual(oEvent.getParameters(), {
-			id: "myRowActionitem",
-			bindingContext: this.oTable._oTable.getItems()[2].getBindingContext("namedModel")
-		}, "'press' event handler called with the correct parameters");
+
+		let oEvent = oRowActionItemPress.getCall(0)?.args[0];
+		assert.ok(oRowPress.called, "rowPress event handler is called");
+		assert.ok(oRowActionItemPress.calledOnce, "Press event handler called once");
+		assert.deepEqual(oEvent?.getParameters(), {
+			id: oEvent.getSource().getId(),
+			bindingContext: oFirstItem.getBindingContext("namedModel")
+		}, "Press event handler called with correct parameters for Navigation action");
+
+		// Simulate press on 'Delete' row action item
+		const oDeleteAction = oFirstItem.getActions().find((oAction) => oAction.getType() === "Delete");
+		jQuery("#" + oDeleteAction.getId() + "-delete").trigger("tap");
+
+		oEvent = oRowActionItemPress.getCall(1)?.args[0];
+		assert.ok(oRowPress.calledOnce, "rowPress event handler is still called once");
+		assert.ok(oRowActionItemPress.calledTwice, "ActionItem 'Press' event handler called twice");
+		assert.deepEqual(oEvent?.getParameters(), {
+			id: oEvent.getSource().getId(),
+			bindingContext: oFirstItem.getBindingContext("namedModel")
+		}, "Press event handler called with correct parameters for Delete action");
+
+		// actionItemPress event should be fired even if rowPress event is not attached
+		this.oTable.detachRowPress(fnRowPress);
+
+		// Simulate press on first row action (Navigation)
+		oFirstItem.$().trigger("tap");
+
+		await new Promise((resolve) => {
+			this.oTable.attachEventOnce("rowPress", resolve);
+		});
+
+		oEvent = oRowActionItemPress.getCall(2)?.args[0];
+		assert.ok(oRowPress.calledOnce, "rowPress event handler is still called once");
+		assert.ok(oRowActionItemPress.calledThrice, "ItemAction 'Press' event handler called thrice");
+		assert.deepEqual(oEvent?.getParameters(), {
+			id: oEvent.getSource().getId(),
+			bindingContext: oFirstItem.getBindingContext("namedModel")
+		}, "Press event handler called with correct parameters for Navigation action when no rowPress is attached");
+	});
+
+	QUnit.test("rowActionCount: overflow button and Navigation visibility", async function(assert) {
+		await this.createTable({
+			rowSettings: new RowSettings({
+				rowActionCount: 1,
+				rowActions: [
+					new RowActionItem({type: "Navigation"}),
+					new RowActionItem({type: "Delete"}),
+					new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"})
+				]
+			})
+		});
+
+		await new Promise((resolve) => {
+			this.oTable._oTable.attachEventOnce("updateFinished", resolve);
+		});
+
+		const oInnerTable = this.oTable._oTable;
+		const oFirstItem = oInnerTable.getItems()[0];
+
+		// rowActionCount = 1: overflow button is rendered because visible actions (3) > itemActionCount (1)
+		assert.strictEqual(oInnerTable.getItemActionCount(), 1, "itemActionCount is 1");
+		assert.ok(oFirstItem.$("overflow").length > 0, "Overflow button is rendered when actions exceed itemActionCount");
+		assert.strictEqual(oFirstItem.getDomRef("actions").childElementCount, 2,
+			"Overflow button and 'Navigation' ActionItem are rendered in the actions cell");
+
+		// rowActionCount = 0: actions area is not rendered, but Navigation type is still effective
+		this.oTable.getRowSettings().setRowActionCount(0);
+		this.oTable.getType().updateRowActions();
+		await nextUIUpdate();
+		assert.strictEqual(oInnerTable.getItemActionCount(), 0, "itemActionCount is 0");
+		assert.notOk(oFirstItem.getDomRef("Actions"), "Actions cell is not rendered at itemActionCount 0");
+		assert.ok(oFirstItem.getDomRef("imgNav"), "Navigation indicator is still rendered");
+		assert.strictEqual(oFirstItem.getEffectiveType(), "Navigation",
+			"effectiveType is still 'Navigation' even with itemActionCount 0");
+	});
+
+	QUnit.test("Static row actions: No accumulation on repeated updateRowActions", async function(assert) {
+		await this.createTable({
+			rowSettings: new RowSettings({
+				rowActions: [
+					new RowActionItem({type: "Delete"}),
+					new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"})
+				]
+			})
+		});
+
+		const oRowTemplate = this.oTable._oRowTemplate;
+		const oType = this.oTable.getType();
+
+		// Initial state: 2 actions
+		const iActionsCount = oRowTemplate.getActions().length;
+		assert.strictEqual(iActionsCount, 2, "Initial: 2 actions added to row template");
+
+		// Call updateRowActions multiple times
+		oType.updateRowActions();
+		await nextUIUpdate();
+		assert.strictEqual(oRowTemplate.getActions().length, iActionsCount,
+			"After first updateRowActions: same number of actions (no accumulation)");
+
+		oType.updateRowActions();
+		await nextUIUpdate();
+		assert.strictEqual(oRowTemplate.getActions().length, iActionsCount,
+			"After second updateRowActions: same number of actions (no accumulation)");
+
+		oType.updateRowActions();
+		await nextUIUpdate();
+		assert.strictEqual(oRowTemplate.getActions().length, iActionsCount,
+			"After third updateRowActions: same number of actions (no accumulation)");
+	});
+
+	QUnit.test("Row actions: Transition from static to bound", async function(assert) {
+		await this.createTable({
+			rowSettings: new RowSettings({
+				rowActions: [
+					new RowActionItem({type: "Delete"}),
+					new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"})
+				]
+			})
+		});
+
+		const oRowTemplate = this.oTable._oRowTemplate;
+		const oType = this.oTable.getType();
+		const oRowSettings = this.oTable.getRowSettings();
+
+		// Initial: 2 static actions
+		assert.strictEqual(oRowTemplate.getActions().length, 2, "Initial: 2 static actions");
+		assert.notOk(oRowTemplate.isBound("actions"), "Initially: actions aggregation not bound");
+
+		// Change to bound actions
+		oRowSettings.bindAggregation("rowActions", {
+			path: "namedModel>/testPath",
+			template: new RowActionItem({
+				type: "{namedModel>type}",
+				visible: "{namedModel>visible}"
+			}),
+			templateShareable: false
+		});
+
+		oType.updateRowActions();
+		await nextUIUpdate();
+
+		// After transition: bound actions are set, old static actions are cleared
+		assert.ok(oRowTemplate.isBound("actions"), "After transition: actions aggregation is bound");
+		assert.ok(oRowTemplate.getBindingInfo("actions").template, "After transition: binding has a template");
+		assert.strictEqual(oRowTemplate.getBindingInfo("actions").model, "namedModel", "After transition: correct binding model");
+		assert.strictEqual(oRowTemplate.getBindingInfo("actions").path, "/testPath", "After transition: correct binding path");
+	});
+
+	QUnit.test("Row actions: Transition from bound to static", async function(assert) {
+		await this.createTable({
+			rowSettings: new RowSettings({
+				rowActions: {
+					path: "namedModel>/testPath",
+					template: new RowActionItem({
+						type: "{namedModel>type}",
+						visible: "{namedModel>visible}"
+					}),
+					templateShareable: false
+				}
+			})
+		});
+
+		const oRowTemplate = this.oTable._oRowTemplate;
+		const oType = this.oTable.getType();
+		const oRowSettings = this.oTable.getRowSettings();
+
+		// Initial: bound actions
+		assert.ok(oRowTemplate.isBound("actions"), "Initially: actions aggregation is bound");
+
+		// Change to static actions
+		oRowSettings.unbindAggregation("rowActions");
+		oRowSettings.addRowAction(new RowActionItem({type: "Delete"}));
+		oRowSettings.addRowAction(new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"}));
+
+		oType.updateRowActions();
+		await nextUIUpdate();
+
+		// After transition: static actions are added, old binding is unbound
+		assert.notOk(oRowTemplate.isBound("actions"), "After transition: actions aggregation is not bound");
+		assert.strictEqual(oRowTemplate.getActions().length, 2, "After transition: 2 static actions added");
+	});
+
+	QUnit.test("Row actions: Removal of all actions", async function(assert) {
+		await this.createTable({
+			rowSettings: new RowSettings({
+				rowActions: [
+					new RowActionItem({type: "Delete"}),
+					new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"})
+				]
+			})
+		});
+
+		const oRowTemplate = this.oTable._oRowTemplate;
+		const oType = this.oTable.getType();
+		const oRowSettings = this.oTable.getRowSettings();
+
+		// Initial: 2 static actions
+		assert.strictEqual(oRowTemplate.getActions().length, 2, "Initial: 2 actions");
+
+		// Remove all actions
+		oRowSettings.destroyRowActions();
+		oType.updateRowActions();
+		await nextUIUpdate();
+
+		// After removal: no actions
+		assert.strictEqual(oRowTemplate.getActions().length, 0, "After removal: no actions");
+		assert.notOk(oRowTemplate.isBound("actions"), "After removal: actions aggregation not bound");
 	});
 
 	QUnit.module("Events", {
@@ -1285,6 +1519,39 @@ sap.ui.define([
 				resolve();
 			});
 			this.oTable._oTable.getItems()[1].$().trigger("tap");
+		});
+
+		assert.ok(oRowPress.calledOnceWithExactly({
+			id: this.oTable.getId(),
+			bindingContext: this.oTable._oTable.getItems()[1].getBindingContext("namedModel")
+		}), "'rowPress' event handler called with the correct parameters");
+	});
+
+	QUnit.test("Table 'rowPress' with non-Navigation row actions: ColumnListItem type is 'Active'", async function(assert) {
+		const oRowPress = sinon.spy();
+
+		await this.createTable({
+			rowPress: (oEvent) => {
+				oRowPress(oEvent.getParameters());
+			},
+			rowSettings: new RowSettings({
+				rowActions: [
+					new RowActionItem({type: "Delete"}),
+					new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"})
+				]
+			})
+		});
+
+		const oRowTemplate = this.oTable._oRowTemplate;
+
+		assert.strictEqual(oRowTemplate.getType(), "Active",
+		"ColumnListItem type is 'Active' when rowPress is attached but no Navigation action exists");
+		assert.strictEqual(oRowTemplate.getEffectiveType(), "Active",
+		"ColumnListItem effectiveType is 'Active' when no Navigation action exists");
+
+		this.oTable._oTable.getItems()[1].$().trigger("tap");
+		await new Promise((resolve) => {
+			this.oTable.attachEventOnce("rowPress", resolve);
 		});
 
 		assert.ok(oRowPress.calledOnceWithExactly({

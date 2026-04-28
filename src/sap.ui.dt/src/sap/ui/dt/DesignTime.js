@@ -1383,7 +1383,7 @@ sap.ui.define([
 			} else {
 				this._addAggregation(oElement, oParentAggregationOverlay);
 			}
-			// When an element is added to an aggregation, the last visible element in the same aggregation should be checked
+			// When you add an element to an aggregation, check the last visible element in the same aggregation.
 			// if the last element is not removable because it was the last element in the aggregation. In this case, the last element
 			// will be set to removable again
 			OverlayUtil.updateLastElementRemovability({

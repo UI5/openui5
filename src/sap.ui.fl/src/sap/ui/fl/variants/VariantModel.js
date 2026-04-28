@@ -149,6 +149,8 @@ sap.ui.define([
 			});
 
 			this.setDefaultBindingMode(BindingMode.OneWay);
+			// Increase the default size limit (100) to allow for large numbers of variants.
+			this.setSizeLimit(10000);
 		}
 	});
 

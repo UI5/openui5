@@ -56,7 +56,46 @@ sap.ui.define([
 				/**
 				 * The navigated state of a row. The navigation indicator is displayed at the end of a row.
 				 */
-				navigated: {type: "boolean", group: "Appearance", defaultValue: false}
+				navigated: {type: "boolean", group: "Appearance", defaultValue: false},
+
+				/**
+				 * Defines the number of row actions to display.
+				 *
+				 * This property is useful for bound row actions where the count
+				 * cannot be determined automatically. If not set, the count is derived from:
+				 * <ul>
+				 *   <li>Bound actions: Defaults to 1 (must be set explicitly if multiple actions exist)</li>
+				 *   <li>Static actions: The length of the <code>rowActions</code> aggregation</li>
+				 * </ul>
+				 *
+				 * <b>Note:</b><br>
+				 * If the <code>rowActionCount</code> property is not explicitly set, the table will automatically determine the number of row actions
+				 * that is displayed based on the configuration of the <code>RowSettings</code> and the underlying table type.
+				 * In this case, the table will check how many actions are configured in the <code>RowSettings</code> and will display as many actions
+				 * as possible up to the maximum number of actions supported by the underlying table type.<br>
+				 *
+				 * If the <code>rowActionCount</code> property is explicitly set,
+				 * its value will be used to determine how many row actions are displayed,
+				 * regardless of the number of actions configured in the <code>RowSettings</code>. However,
+				 * the actual number of displayed actions will
+				 * still be limited by the maximum number of actions supported by the underlying table type.
+				 *
+				 * <b>Example:</b><br>
+				 * If the underlying table type supports a maximum number of 3 row actions,
+				 * and there are 5 actions configured in the <code>RowSettings</code>:
+				 *
+				 * <ul>
+				 *   <li><code>rowActionCount</code> is not set, the table will display 3 actions (the maximum supported).</li>
+				 *   <li><code>rowActionCount</code> is set to 2, the table will display 2 actions (as specified),
+				 *   even though more actions are configured in the <code>RowSettings</code>.</li>
+				 * </ul>
+				 *
+				 * For bound row actions, the <code>rowActionCount</code> must be set explicitly, as the count cannot be determined automatically.
+				 * For static actions, the count defaults to the length of the <code>rowActions</code> aggregation in the <code>RowSettings</code>.
+				 *
+				 * @since 1.148
+				 */
+				rowActionCount: {type: "int", group: "Appearance", defaultValue: -1}
 			},
 			aggregations: {
 				/**
@@ -92,14 +131,15 @@ sap.ui.define([
 			mSettings.highlightText = this.getHighlightText();
 		}
 
+		thisCloned.destroy();
 		return mSettings;
 	};
 
 	RowSettings.prototype.getAllActions = function() {
 		const mSettings = {};
-		const thisCloned = this.clone();
 
 		if (this.isBound("rowActions")) {
+			const thisCloned = this.clone();
 			// Set bindingInfo for items aggregation to bindingInfo of rowActions
 			mSettings.items = thisCloned.getBindingInfo("rowActions");
 			const oTemplate = mSettings.items.template;
@@ -110,19 +150,44 @@ sap.ui.define([
 				icon: oTemplate.isBound("icon") ? oTemplate.getBindingInfo("icon") : oTemplate.getIcon(),
 				visible: oTemplate.isBound("visible") ? oTemplate.getBindingInfo("visible") : oTemplate.getVisible()
 			};
+			thisCloned.destroy();
 		} else {
 			mSettings.items = this.getRowActions();
 		}
 		return mSettings;
 	};
 
-	RowSettings.prototype.getRowActionCount = function() {
+	/**
+	 * Returns the effective number of row actions to display.
+	 *
+	 * Returns the explicitly set <code>rowActionCount</code> if available. Otherwise:
+	 * <ul>
+	 *   <li>For bound actions: Returns 1 (default fallback)</li>
+	 *   <li>For static actions: Returns the aggregation length</li>
+	 * </ul>
+	 *
+	 * <b>Note:</b> When using bound row actions, set <code>rowActionCount</code> explicitly
+	 * if more than one action should be displayed.
+	 *
+	 * @returns {int} The number of row actions
+	 * @private
+	 */
+	RowSettings.prototype.getEffectiveRowActionCount = function() {
+		// 1. If explicitly set, use that value
+		if (!this.isPropertyInitial("rowActionCount") || this.getProperty("rowActionCount") !== -1) {
+			return this.getProperty("rowActionCount");
+		}
+
+		// 2. Fallback to automatic detection
 		let iCount = 0;
 		if (this.isBound("rowActions")) {
+			// Bound actions: Default to 1 (developer should set explicitly)
 			iCount = 1;
 		} else {
+			// Static actions: Use array length
 			iCount = this.getRowActions().length;
 		}
+
 		return iCount;
 	};
 

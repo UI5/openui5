@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/m/MultiComboBox",
 	"sap/m/GroupHeaderListItem",
 	"sap/ui/core/Item",
+	"sap/ui/core/InvisibleText",
 	"sap/ui/test/utils/nextUIUpdate"
 ], function (
 	Device,
@@ -24,6 +25,7 @@ sap.ui.define([
 	MultiComboBox,
 	GroupHeaderListItem,
 	Item,
+	InvisibleText,
 	nextUIUpdate
 ) {
 	"use strict";
@@ -239,4 +241,91 @@ sap.ui.define([
 		// Cleanup
 		oInput.destroy();
 	});
+
+QUnit.module("aria-labelledby with ValueStateHeader", {
+	beforeEach: async function () {
+		this.oInput = new Input({
+			showSuggestion: true,
+			suggestionItems: [
+				new Item({ text: "Item 1" }),
+				new Item({ text: "Item 2" })
+			]
+		});
+		this.oInput.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Ensure suggestions popover is created
+		if (!this.oInput._getSuggestionsPopover()) {
+			this.oInput._createSuggestionsPopover();
+		}
+		this.oSuggestionsPopover = this.oInput._getSuggestionsPopover();
+	},
+	afterEach: function () {
+		this.oInput.destroy();
+	}
+});
+
+QUnit.test("aria-labelledby should not reference ValueStateHeader when it has no visible content", async function (assert) {
+	// Act
+	this.oSuggestionsPopover.getPopover().openBy(this.oInput);
+	await nextUIUpdate();
+
+	// Assert
+	const oPopover = this.oSuggestionsPopover.getPopover();
+	const oValueStateHeader = oPopover.getCustomHeader();
+	const sAriaLabelledBy = oPopover.getDomRef().getAttribute('aria-labelledby') || "";
+
+	// ValueStateHeader ID should NOT be in aria-labelledby
+	assert.notOk(sAriaLabelledBy.includes(oValueStateHeader.getId()), "aria-labelledby should not include empty ValueStateHeader ID");
+});
+
+QUnit.test("aria-labelledby should reference ValueStateHeader when it has visible content", async function (assert) {
+	// Arrange - set value state
+	this.oInput.setValueState("Error");
+	this.oInput.setValueStateText("Error message");
+
+	// Act - open suggestions with value state
+	this.oSuggestionsPopover.getPopover().openBy(this.oInput);
+	await nextUIUpdate();
+
+	// Assert
+	const oPopover = this.oSuggestionsPopover.getPopover();
+	const sAriaLabelledBy = oPopover.getDomRef().getAttribute('aria-labelledby');
+	const oValueStateHeader = oPopover.getCustomHeader();
+
+	assert.ok(sAriaLabelledBy, "aria-labelledby should be set");
+	assert.ok(oValueStateHeader && oValueStateHeader.isA("sap.m.ValueStateHeader"), "Should have ValueStateHeader");
+	assert.ok(sAriaLabelledBy.includes(oValueStateHeader.getId()), "Should include ValueStateHeader ID");
+});
+
+QUnit.test("aria-labelledby should include both ValueStateHeader and other associations", async function (assert) {
+	// Arrange - set value state and add custom aria-labelledby
+	this.oInput.setValueState("Warning");
+	this.oInput.setValueStateText("Warning message");
+
+	const oInvisibleText = new InvisibleText({
+		text: "Additional description"
+	});
+	oInvisibleText.toStatic().placeAt("qunit-fixture");
+	await nextUIUpdate();
+
+	const oPopover = this.oSuggestionsPopover.getPopover();
+	oPopover.addAriaLabelledBy(oInvisibleText);
+
+	// Act - open suggestions
+	oPopover.openBy(this.oInput);
+	await nextUIUpdate();
+
+	// Assert
+	const sAriaLabelledBy = oPopover.getDomRef().getAttribute('aria-labelledby');
+	const oValueStateHeader = oPopover.getCustomHeader();
+
+	assert.ok(sAriaLabelledBy.includes(oValueStateHeader.getId()), "Should include ValueStateHeader");
+	assert.ok(sAriaLabelledBy.includes(oInvisibleText.getId()), "Should include the invisible text");
+	assert.ok(sAriaLabelledBy.indexOf(oValueStateHeader.getId()) < sAriaLabelledBy.indexOf(oInvisibleText.getId()),
+		"ValueStateHeader should come before custom association");
+
+	// Cleanup
+	oInvisibleText.destroy();
+});
 });

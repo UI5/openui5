@@ -302,9 +302,7 @@ sap.ui.define([
 		QUnit.test("When loadVariants() is called and the persistency key is in nonFavoriteVariantsRemoved", async function(assert) {
 			const sPersistencyKey = "myPersistencyKey";
 			this.oControl = new Control("controlId3");
-			this.oControl.getPersonalizableControlPersistencyKey = function() {
-				return sPersistencyKey;
-			};
+			this.oControl.getPersonalizableControlPersistencyKey = () => sPersistencyKey;
 			const oSetCallbackStub = sandbox.stub();
 			this.oControl.setDynamicVariantsLoadedCallback = oSetCallbackStub;
 
@@ -326,9 +324,7 @@ sap.ui.define([
 		QUnit.test("When loadVariants() is called and the persistency key is NOT in nonFavoriteVariantsRemoved", async function(assert) {
 			const sPersistencyKey = "myPersistencyKey";
 			this.oControl = new Control("controlId4");
-			this.oControl.getPersonalizableControlPersistencyKey = function() {
-				return sPersistencyKey;
-			};
+			this.oControl.getPersonalizableControlPersistencyKey = () => sPersistencyKey;
 			const oSetCallbackStub = sandbox.stub();
 			this.oControl.setDynamicVariantsLoadedCallback = oSetCallbackStub;
 
@@ -350,13 +346,12 @@ sap.ui.define([
 			const sPersistencyKey = "myPersistencyKey";
 			const sReference = "sap.ui.core";
 			this.oControl = new Control("controlId5");
-			this.oControl.getPersonalizableControlPersistencyKey = function() {
-				return sPersistencyKey;
-			};
+			this.oControl.getPersonalizableControlPersistencyKey = () => sPersistencyKey;
 			let fnCallback;
-			this.oControl.setDynamicVariantsLoadedCallback = function(fn) {
+			this.oControl.setDynamicVariantsLoadedCallback = (fn) => {
 				fnCallback = fn;
 			};
+			this.oControl.addVariant = () => {};
 
 			sandbox.stub(LrepConnector, "loadFlexData").resolves({});
 			sandbox.stub(Loader, "getCachedFlexData").returns({
@@ -364,11 +359,11 @@ sap.ui.define([
 			});
 			const oLoadAllCompVariantsStub = sandbox.stub(Storage, "loadAllCompVariants").resolves({
 				comp: {
-					variants: [{ fileName: "newVariant1" }],
+					variants: [{ fileType: "variant", fileName: "newVariant1" }],
 					changes: []
 				}
 			});
-			const oAddNewObjectsStub = sandbox.stub(FlexState, "addNewObjects");
+			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
 			const oAddLazyVariantsLoadedStub = sandbox.stub(FlexState, "addLazyVariantsLoaded");
 
 			await FlexState.initialize({ reference: sReference, componentId: "AppComponent21" });
@@ -390,15 +385,15 @@ sap.ui.define([
 				sPersistencyKey,
 				"with the correct persistency key"
 			);
-			assert.ok(oAddNewObjectsStub.calledOnce, "FlexState.addNewObjects was called");
+			assert.ok(oAddNewObjectsSpy.calledOnce, "FlexState.addNewObjects was called");
 			assert.strictEqual(
-				oAddNewObjectsStub.firstCall.args[0].reference,
+				oAddNewObjectsSpy.firstCall.args[0].reference,
 				sReference,
 				"addNewObjects received the correct reference"
 			);
 			assert.deepEqual(
-				oAddNewObjectsStub.firstCall.args[0].newData,
-				{ comp: { variants: [{ fileName: "newVariant1" }], changes: [] } },
+				oAddNewObjectsSpy.firstCall.args[0].newData,
+				{ comp: { variants: [{ fileType: "variant", fileName: "newVariant1" }], changes: [] } },
 				"addNewObjects received the Storage response"
 			);
 			assert.ok(oAddLazyVariantsLoadedStub.calledOnce, "FlexState.addLazyVariantsLoaded was called");
@@ -418,11 +413,9 @@ sap.ui.define([
 			const sPersistencyKey = "myPersistencyKey";
 			const sReference = "sap.ui.core";
 			this.oControl = new Control("controlId6");
-			this.oControl.getPersonalizableControlPersistencyKey = function() {
-				return sPersistencyKey;
-			};
+			this.oControl.getPersonalizableControlPersistencyKey = () => sPersistencyKey;
 			let fnCallback;
-			this.oControl.setDynamicVariantsLoadedCallback = function(fn) {
+			this.oControl.setDynamicVariantsLoadedCallback = (fn) => {
 				fnCallback = fn;
 			};
 

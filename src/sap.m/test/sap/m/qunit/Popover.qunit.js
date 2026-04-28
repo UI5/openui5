@@ -2419,6 +2419,21 @@ sap.ui.define([
 		oValueStateHeader.destroy();
 	});
 
+
+	QUnit.test("aria-labelledby should not reference empty ValueStateHeader", async function (assert) {
+		// Empty ValueStateHeader should not be in aria-labelledby
+		const oValueStateHeader = new ValueStateHeader();
+		this.oPopover.setCustomHeader(oValueStateHeader);
+
+		this.oPopover.openBy(this.oButton);
+		await nextUIUpdate(this.clock);
+
+		const sAriaLabelledBy = this.oPopover.getDomRef().getAttribute('aria-labelledby');
+		assert.strictEqual(sAriaLabelledBy, null, "aria-labelledby should not be set when ValueStateHeader has no content");
+
+		oValueStateHeader.destroy();
+	});
+
 	QUnit.module("Integration");
 
 	QUnit.test("Focus should be taken out of Popover after closed on tablet", async function (assert) {

@@ -33,7 +33,16 @@ sap.ui.define([
 	 *
 	 * @param {string} [sId] Optional ID for the new object; generated automatically if no non-empty ID is given
 	 * @param {object} [mSettings] Initial settings for the new object
-	 * @class The table type info class for the metadata-driven table.
+	 * @class The table type info class for the metadata-driven table.<br>
+	 *
+	 * <b>Important Notes for <code>{@link sap.ui.mdc.table.RowSettings#setRowActionCount rowActionCount}</code>:</b><br>
+	 *
+	 * The <code>rowActionCount</code> property is used to determine the number of row actions that are displayed for each row in the table.
+	 * The actual number of displayed actions can be limited by the underlying table type:
+	 * <ul>
+	 *   <li><code>GridTable</code>: Maximum number of three actions including the overflow button. 0 means no actions are visible.</li>
+	 * </ul>
+	 *
 	 * @extends sap.ui.mdc.table.TableTypeBase
 	 * @author SAP SE
 	 * @public
@@ -443,6 +452,9 @@ sap.ui.define([
 			return;
 		}
 
+		// Clean up existing clones before creating new ones
+		this._cleanupRowActionClones();
+
 		const oRowSettings = this.getTable().getRowSettings();
 
 		this._removeRowActions();
@@ -481,7 +493,9 @@ sap.ui.define([
 		}
 
 		oGridTable.setRowActionTemplate(new InnerRowAction(oRowActions));
-		oGridTable.setRowActionCount(oRowSettings.getRowActionCount());
+
+		const iActionCount = oRowSettings.getEffectiveRowActionCount();
+		oGridTable.setRowActionCount(iActionCount);
 	};
 
 	GridTableType.prototype._removeRowActions = function() {
@@ -500,26 +514,21 @@ sap.ui.define([
 		const oTable = this.getTable();
 		const oInnerRowActionItem = oEvent.getParameter("item");
 		const oRowSettings = oTable.getRowSettings();
-		const oRowActionsInfo = oRowSettings.getAllActions();
+		let oRowActionItem;
 
 		if (oRowSettings.isBound("rowActions")) {
-			const sActionModel = oRowActionsInfo.items.model;
-			const oActionContext = oInnerRowActionItem.getBindingContext(sActionModel);
-
-			// Create a one time clone for the MDC RowAction and 'switch' binding context based on press action
-			if (!this._oRowActionItem) {
-				this._oRowActionItem = oRowActionsInfo.items.template.clone();
-			}
-			this._oRowActionItem.setBindingContext(oActionContext, oRowActionsInfo.items.model);
-
-			// Set model for row settings, as it is not propagated
-			this._oRowActionItem.setModel(this.getModel(sActionModel), sActionModel);
-			oRowSettings.addDependent(this._oRowActionItem);
+			// For bound actions: Use singleton clone (one for all rows)
+			const oTemplate = oRowSettings.getBindingInfo("rowActions").template;
+			oRowActionItem = this.getRowActionClone(oTemplate);
 		} else {
-			this._oRowActionItem = oInnerRowActionItem.data("rowAction");
+			const oOriginalActionItem = oInnerRowActionItem.data("rowAction");
+			oRowActionItem = this.getRowActionClone(oOriginalActionItem);
 		}
 
-		this.callHook("Press", this._oRowActionItem, {
+		// Set model for row settings, as it is not propagated
+		oInnerRowActionItem.addDependent(oRowActionItem);
+
+		this.callHook("Press", oRowActionItem, {
 			bindingContext: oEvent.getParameter("row").getBindingContext(this.getInnerTable().getBindingInfo("rows").model)
 		});
 	}

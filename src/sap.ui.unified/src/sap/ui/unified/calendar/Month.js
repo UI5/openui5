@@ -887,9 +887,6 @@ sap.ui.define([
 			i = 0,
 			oFocusedDate = this.getProperty("_focusedDate"),
 			bSelectionBetween = false,
-			oParent = this.getParent(),
-			iMonths = this._bCalendar && oParent.getMonths(),
-			bDifferentMonthDates,
 			oArrangedDates;
 
 		for (i = 0; i < aSelectedDates.length; i++) {
@@ -903,9 +900,7 @@ sap.ui.define([
 				oEndDate = oArrangedDates.endDate;
 			}
 
-			bDifferentMonthDates = oFocusedDate && oStartDate && iMonths === 1 && oFocusedDate.getMonth() !== oStartDate.getMonth();
-
-			bSelectionBetween = this._isMarkingUnfinishedRangeAllowed() && oFocusedDate && !bDifferentMonthDates &&
+			bSelectionBetween = this._isMarkingUnfinishedRangeAllowed() && oFocusedDate && !this._selectedWithMouse &&
 				(CalendarUtils._isBetween(oDate, oStartDate, oFocusedDate, true) || CalendarUtils._isBetween(oDate, oFocusedDate, oStartDate, true));
 
 			if (oStartDate && !oEndDate && oDate.isSame(oStartDate)) {
@@ -1185,6 +1180,9 @@ sap.ui.define([
 	};
 
 	Month.prototype.onkeydown = function(oEvent){
+		if (this.getIntervalSelection()) {
+			this._selectedWithMouse = false;
+		}
 		if (oEvent.which === KeyCodes.SPACE){
 			this.bSpaceButtonPressed = true;
 		}
@@ -2160,6 +2158,7 @@ sap.ui.define([
 		if (oEvent.type === "mousedown" && this.getIntervalSelection()) {
 			// as in the focus event the month can be changed, store the last target here
 			this._sLastTargetId = oDomRef.id;
+			this._selectedWithMouse = true;
 		}
 
 		if (bFireFocus) {

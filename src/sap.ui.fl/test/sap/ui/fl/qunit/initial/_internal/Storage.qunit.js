@@ -1268,10 +1268,8 @@ sap.ui.define([
 				}
 			]);
 			sandbox.stub(BtpServiceConnector, "loadAllCompVariants").resolves({
-				comp: {
-					variants: [{ fileName: "compVariant1" }, { fileName: "compVariant2" }],
-					changes: [{ fileName: "compChange1" }]
-				}
+				changes: [{ fileName: "compChange1" }],
+				compVariants: [{ fileName: "compVariant1" }, { fileName: "compVariant2" }]
 			});
 			const oResult = await Storage.loadAllCompVariants({
 				reference: sFlexReference, persistencyKey: "persistencyKey1"

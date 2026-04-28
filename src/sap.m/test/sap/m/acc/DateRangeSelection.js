@@ -29,18 +29,10 @@ sap.ui.define([
 	// shortcut for sap.ui.core.TitleLevel
 	var TitleLevel = coreLibrary.TitleLevel;
 
-	var iEvent = 0;
-
 	function handleChange(oEvent) {
 		var oDRS = oEvent.getSource(),
-			sFrom = oEvent.getParameter("from"),
-			sTo = oEvent.getParameter("to"),
 			bValid = oEvent.getParameter("valid");
 
-		iEvent++;
-
-		var oText = Element.getElementById("TextEvent");
-		oText.setText("Event " + iEvent + "\nId: " + oEvent.getSource().getId() + "\nFrom: " + sFrom + "\nTo: " + sTo + "\nvalid: " + bValid);
 		if (bValid) {
 			oDRS.setValueState(ValueState.None);
 		} else {
