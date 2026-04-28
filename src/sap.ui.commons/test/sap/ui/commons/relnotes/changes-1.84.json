@@ -14,5 +14,15 @@
         ]
       }
     ]
+  },
+  "1.84.56": {
+    "date": "April 2026",
+    "notes": [
+      {
+        "id": "c07e2d26e776e503f2d18f671a53cab107ee88d4",
+        "type": "FIX",
+        "text": " sap.ui.commons.Tree: fix unstable test"
+      }
+    ]
   }
 }
