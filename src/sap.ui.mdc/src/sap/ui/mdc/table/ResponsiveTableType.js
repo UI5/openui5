@@ -7,7 +7,6 @@ sap.ui.define([
 	"./ActionLayoutData",
 	"./utils/Personalization",
 	"sap/ui/mdc/enums/TableGrowingMode",
-	"sap/ui/mdc/enums/TableRowActionType",
 	"sap/ui/mdc/enums/TablePopinDisplay",
 	"sap/ui/mdc/enums/TableActionPosition",
 	"sap/m/plugins/ColumnResizer",
@@ -21,7 +20,6 @@ sap.ui.define([
 	ActionLayoutData,
 	PersonalizationUtils,
 	GrowingMode,
-	RowActionType,
 	PopinDisplay,
 	TableActionPosition,
 	ColumnResizer,
@@ -36,13 +34,25 @@ sap.ui.define([
 	let InnerTable;
 	let InnerColumn;
 	let InnerRow;
+	let InnerListItemAction;
 
 	/**
 	 * Constructor for a new <code>ResponsiveTableType</code>.
 	 *
 	 * @param {string} [sId] Optional ID for the new object; generated automatically if no non-empty ID is given
 	 * @param {object} [mSettings] Initial settings for the new object
-	 * @class The table type info class for the metadata-driven table.
+	 * @class The table type info class for the metadata-driven table.<br>
+	 *
+	 * <b>Important Notes for <code>{@link sap.ui.mdc.table.RowSettings#setRowActionCount rowActionCount}</code>:</b><br>
+	 *
+	 * The <code>rowActionCount</code> property is used to determine the number of row actions that are displayed for each row in the table.
+	 * The actual number of displayed actions can be limited by the underlying table type:
+	 *
+	 * <ul>
+	 *   <li><code>ResponsiveTable</code>: Maximum of 2-3 actions depending on configuration (1 navigation action + 2 additional actions)</li>
+	 * 	 <li><code>rowActionCount</code> = 0: navigation action is always visible if it exists</li>
+	 * </ul>
+	 *
 	 * @extends sap.ui.mdc.table.TableTypeBase
 	 * @author SAP SE
 	 * @public
@@ -164,11 +174,15 @@ sap.ui.define([
 		if (!InnerTable) {
 			return new Promise((resolve, reject) => {
 				sap.ui.require([
-					"sap/m/Table", "sap/m/Column", "sap/m/ColumnListItem"
-				], (ResponsiveTable, ResponsiveColumn, ColumnListItem) => {
+					"sap/m/Table",
+					"sap/m/Column",
+					"sap/m/ColumnListItem",
+					"sap/m/ListItemAction"
+				], (ResponsiveTable, ResponsiveColumn, ColumnListItem, ListItemAction) => {
 					InnerTable = ResponsiveTable;
 					InnerColumn = ResponsiveColumn;
 					InnerRow = ColumnListItem;
+					InnerListItemAction = ListItemAction;
 					resolve();
 				}, () => {
 					reject("Failed to load some modules");
@@ -206,21 +220,28 @@ sap.ui.define([
 			noData: oTable._getNoDataText(),
 			headerToolbar: oTable._oToolbar,
 			ariaLabelledBy: [oTable._oTitle],
+			itemPress: [onItemPress, this],
+			itemActionPress: [onListItemActionPress, this],
 			beforeOpenContextMenu: [onBeforeOpenContextMenu, this]
 		};
-
-		if (oTable.hasListeners("rowPress")) {
-			mSettings.itemPress = [onItemPress, this];
-		}
 
 		return mSettings;
 	};
 
+	/**
+	 * Handles the itemPress event of the inner ResponsiveTable.
+	 * This event gets fired when a row is pressed.
+	 *
+	 * @param {sap.ui.base.Event} oEvent The itemPress event object
+	 * @private
+	 */
 	function onItemPress(oEvent) {
 		this.callHook("RowPress", this.getTable(), {
 			bindingContext: oEvent.getParameter("listItem").getBindingContext(this.getInnerTable().getBindingInfo("items").model)
 		});
-		onRowActionPress.call(this, oEvent);
+
+		// Trigger action press handling for Navigation type
+		onListItemActionPress.call(this, oEvent);
 	}
 
 	function onBeforeOpenContextMenu(oEvent) {
@@ -337,78 +358,128 @@ sap.ui.define([
 		this.updateRowActions();
 	};
 
-	// TODO: Reduce complexity
-	// eslint-disable-next-line complexity
+	/**
+	 * Updates the row actions of the responsive table based on the row settings configuration.
+	 *
+	 * This method orchestrates the setup of row actions for the inner sap.m.Table by:
+	 * 1. Cleaning up existing cached clones to prevent memory leaks
+	 * 2. Clearing existing property bindings on the row template
+	 * 3. Setting the itemActionCount on the inner table based on RowSettings
+	 * 4. Delegating to specialized handlers based on whether actions are bound or static
+	 * 5. Falling back to a default row type if no actions are configured
+	 *
+	 * The method differentiates between three scenarios:
+	 * - Bound row actions (template-based): Actions are created from a binding with a template
+	 * - Static row actions: Actions are predefined and added directly to the row template
+	 * - No row actions: Sets the row type to "Active" or "Inactive" based on rowPress listeners
+	 *
+	 * @private
+	 */
 	ResponsiveTableType.prototype.updateRowActions = function() {
 		const oTable = this.getTable();
-		const oRowActionsInfo = this.getRowActionsConfig();
-		const sType = oTable.hasListeners("rowPress") ? "Active" : "Inactive";
 
-		oTable._oRowTemplate.unbindProperty("type");
-
-		if (!oTable.getRowSettings()) {
-			oTable._oRowTemplate.setType(sType);
+		if (!oTable._oRowTemplate) {
 			return;
 		}
 
+		// Clean up existing clones before creating new ones
+		this._cleanupRowActionClones();
+
+		const oRowSettings = oTable.getRowSettings();
+		const oResponsiveTable = this.getInnerTable();
+		const sType = oTable.hasListeners("rowPress") ? "Active" : "Inactive";
+
+		oTable._oRowTemplate.setType(sType);
+
+		if (!oRowSettings) {
+			return;
+		}
+
+		// Clear existing actions
 		if (sType === "Inactive") {
 			// Cleans up itemPress event, if it was attached previously
 			this._detachItemPress();
 		}
 
-		let vRowType;
-		let bVisibleBound;
-		let fnVisibleFormatter;
-		// If templateInfo is given, the rowActions are bound
+		// Set row action count for the responsive table
+		const iActionCount = oRowSettings.getEffectiveRowActionCount();
+		oResponsiveTable.setItemActionCount(iActionCount);
+
+		// Clean up existing actions before setting new ones
+		oTable._oRowTemplate.unbindAggregation("actions");
+		oTable._oRowTemplate.destroyActions();
+
+		const oRowActionsInfo = oRowSettings.getAllActions();
 		if ("templateInfo" in oRowActionsInfo) {
-			const oTemplateInfo = oRowActionsInfo.templateInfo;
-
-			fnVisibleFormatter = oTemplateInfo.visible.formatter;
-			// If visible property is of type object, we know for certain the property is bound (see RowSettings.getAllActions)
-			bVisibleBound = typeof oTemplateInfo.visible === "object";
-			vRowType = oTemplateInfo.visible;
-		} else if (oRowActionsInfo && oRowActionsInfo.items) {
-			if (oRowActionsInfo.items.length === 0) {
-				oTable._oRowTemplate.setType(sType);
-				return;
-			}
-
-			// Check if rowActions are of type Navigation. ResponsiveTable currently only supports RowActionItem<Navigation>
-			const _oRowActionItem = oRowActionsInfo.items.find((oRowAction) => {
-				return oRowAction.getType() === "Navigation";
-			});
-			if (!_oRowActionItem && oRowActionsInfo.items.length > 0) {
-				throw new Error("No row action of type 'Navigation' found. ResponsiveTableType only accepts row actions of type 'Navigation'.");
-			}
-
-			// Associate RowActionItem<Navigation> to template for reference
-			oTable._oRowTemplate.data("rowAction", _oRowActionItem);
-
-			// Check if visible property is bound
-			bVisibleBound = _oRowActionItem.isBound("visible");
-			// Based on whether visible property is bound, either get binding info or the actual property
-			vRowType = bVisibleBound ? Object.assign({}, _oRowActionItem.getBindingInfo("visible")) : _oRowActionItem.getVisible();
-			fnVisibleFormatter = vRowType.formatter;
-		}
-
-		if (bVisibleBound) {
-			vRowType.formatter = (sValue) => {
-				const vVisible = fnVisibleFormatter ? fnVisibleFormatter(sValue) : sValue;
-				const vRowType = vVisible === true ? RowActionType.Navigation : sType;
-				if (vRowType === RowActionType.Navigation) {
-					this._attachItemPress();
-				}
-				return vRowType;
-			};
-			oTable._oRowTemplate.bindProperty("type", vRowType);
-		} else {
-			vRowType = vRowType ? RowActionType.Navigation : sType;
-			oTable._oRowTemplate.setProperty("type", vRowType);
-			if (vRowType === RowActionType.Navigation) {
-				this._attachItemPress();
-			}
+			// Handle bound row actions
+			_handleBoundRowActions(oTable, oRowActionsInfo);
+		} else if (oRowActionsInfo.items.length > 0) {
+			// Handle static row actions
+			_handleStaticRowActions(oTable, oRowActionsInfo);
 		}
 	};
+
+	/**
+	 * Handles the setup of bound (template-based) row actions for the responsive table.
+	 * This is invoked when row actions are bound to a model using a template pattern.
+	 *
+	 * The method:
+	 * 1. Creates a ListItemAction with bound properties (type, visible, icon, text)
+	 * 2. Binds the actions aggregation on the row template to the specified model path
+	 * 3. Uses the provided template for creating action instances per row
+	 *
+	 * @param {sap.ui.mdc.Table} oTable - The MDC table instance
+	 * @param {Object} oTemplateInfo - Configuration object for the action template containing:
+	 * @param {string} oTemplateInfo.type - The type of action (e.g., "Navigation", "Delete")
+	 * @param {boolean|Object} oTemplateInfo.visible - Visibility state or binding info
+	 * @param {string} oTemplateInfo.icon - Icon to display
+	 * @param {string} oTemplateInfo.text - Text to display
+	 * @private
+	 */
+	function _handleBoundRowActions(oTable, oTemplateInfo) {
+		const oRowActions = new InnerListItemAction(oTemplateInfo.templateInfo);
+
+		// Set the row action template
+		oTable._oRowTemplate.bindAggregation("actions", {
+			template: oRowActions,
+			templateShareable: false,
+			model: oTemplateInfo.items.model,
+			path: oTemplateInfo.items.path
+		});
+	}
+
+	/**
+	  * Handles the setup of static (non-bound) row actions for the responsive table.
+	  * This is invoked when row actions are explicitly defined without model binding.
+	  *
+	  * The method:
+	  * 1. Iterates through each RowActionItem in the configuration
+	  * 2. Creates a corresponding ListItemAction for each, preserving any existing bindings
+	  * 3. Stores a reference to the original MDC RowActionItem via custom data for event handling
+	  * 4. Adds each action to the row template's actions aggregation
+	  *
+	  * Static actions remain consistent across all rows. Individual properties (type, visible, icon, text)
+	  * can still be bound to enable conditional visibility or dynamic properties per row.
+	  *
+	  * @param {sap.ui.mdc.Table} oTable - The MDC table instance
+	  * @param {object} oRowActionsInfo - Object containing:
+	  * @param {sap.ui.mdc.table.RowActionItem[]} oRowActionsInfo.items - Array of MDC RowActionItem instances
+	  * @private
+	  */
+	function _handleStaticRowActions(oTable, oRowActionsInfo) {
+		const aItems = oRowActionsInfo.items;
+
+		aItems.forEach((oActionItem) => {
+			const oRowAction = new InnerListItemAction({
+				type: oActionItem.isBound("type") ? oActionItem.getBindingInfo("type") : oActionItem.getType(),
+				visible: oActionItem.isBound("visible") ? oActionItem.getBindingInfo("visible") : oActionItem.getVisible(),
+				icon: oActionItem.isBound("icon") ? oActionItem.getBindingInfo("icon") : oActionItem.getIcon(),
+				text: oActionItem.isBound("text") ? oActionItem.getBindingInfo("text") : oActionItem.getText()
+			});
+
+			oTable._oRowTemplate.addAction(oRowAction);
+		});
+	}
 
 	ResponsiveTableType.prototype.enableColumnResize = function() {
 		const oTable = this.getTable();
@@ -484,7 +555,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Tries to attach the itemPress event to the inner table. If a listener is already attached, this function does nothing.
+	 * Tries to attach the itemPress event to the inner table.
+	 * If a listener is already attached, this function does nothing.
 	 *
 	 * @returns {boolean} whether event was attached or not
 	 * @private
@@ -641,34 +713,60 @@ sap.ui.define([
 		}
 	}
 
-	function onRowActionPress(oEvent) {
+	/**
+	 * Event handler invoked when a ListItemAction is pressed in the responsive table.
+	 * This handler is also triggered when the list item itself is pressed (row press).
+	 *
+	 * The method:
+	 * 1. Retrieves the pressed ListItemAction from the event, or finds the visible Navigation action if triggered by itemPress
+	 * 2. Determines if actions are bound or static
+	 * 3. For bound actions: Creates/reuses a clone of the MDC RowActionItem template and sets its binding context
+	 * 4. For static actions: Extracts the action index from the ListItemAction ID to retrieve the corresponding RowActionItem
+	 * 5. Calls the "Press" hook to notify consumers, passing the MDC RowActionItem and binding context
+	 *
+	 * The distinction between bound and static actions is crucial:
+	 * - Bound: Requires dynamic context switching because the same template is shared across all rows
+	 * - Static: Uses ID-based lookup to avoid memory overhead from storing references in each cloned row
+	 *
+	 * @param {sap.ui.base.Event} oEvent - Event object from either itemActionPress or itemPress
+	 * @private
+	 */
+	function onListItemActionPress(oEvent) {
 		const oTable = this.getTable();
-		const oInnerRow = oEvent.getParameter("listItem");
+		const oRowSettings = oTable.getRowSettings();
+		let oListItemAction = oEvent.getParameter("action");
 
-		if (oInnerRow.getType() !== "Navigation") {
+		// If no explicit action (from itemPress), find the Navigation action
+		if (!oListItemAction) {
+			const oListItem = oEvent.getParameter("listItem");
+			const aActions = oListItem.getActions();
+			oListItemAction = aActions.find((oAction) => {
+				return oAction.getType() === "Navigation" && oAction.getVisible();
+			});
+		}
+
+		if (!oRowSettings || !oListItemAction) {
 			return;
 		}
 
-		const oRowSettings = oTable.getRowSettings();
-		const oRowActionsInfo = oRowSettings.getAllActions();
+		const oListItem = oEvent.getParameter("listItem");
+		let oRowActionItem;
 
 		if (oRowSettings.isBound("rowActions")) {
-			const sActionModel = oRowActionsInfo.items.model;
-			if (!this._oRowActionItem) {
-				this._oRowActionItem = oRowActionsInfo.items.template.clone();
-			}
-
-			// Set model for row settings, as it is not propagated
-			this._oRowActionItem.setModel(oTable.getModel(sActionModel), sActionModel);
-			oRowSettings.addDependent(this._oRowActionItem);
+			// For bound actions: Use singleton clone (one for all rows)
+			const oTemplate = oRowSettings.getBindingInfo("rowActions").template;
+			oRowActionItem = this.getRowActionClone(oTemplate);
 		} else {
-			this._oRowActionItem = oInnerRow.data("rowAction");
+			const iOriginalIndex = oListItemAction.getParent().indexOfAction(oListItemAction);
+			const oOriginalActionItem = oRowSettings.getRowActions()[iOriginalIndex];
+			oRowActionItem = this.getRowActionClone(oOriginalActionItem);
 		}
 
-		// Binding Context cannot be determined for ResponsiveTable, which is why we always assume to have a RowActionItem<Navigation> no matter what
-		this._oRowActionItem.setType("Navigation");
-		this.callHook("Press", this._oRowActionItem, {
-			bindingContext: oInnerRow.getBindingContext(this.getInnerTable().getBindingInfo("items").model)
+		// Set model for row settings, as it is not propagated
+		oListItemAction.addDependent(oRowActionItem);
+
+		this.callHook("Press", oRowActionItem, {
+			bindingContext: oListItem.getBindingContext(this.getInnerTable().getBindingInfo("items").model)
 		});
 	}
 

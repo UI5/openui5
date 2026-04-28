@@ -9,7 +9,6 @@ sap.ui.define([
 	"sap/ui/mdc/table/RowSettings",
 	"sap/ui/mdc/table/RowActionItem",
 	"sap/ui/mdc/enums/TableRowCountMode",
-	"sap/ui/mdc/enums/TableRowActionType",
 	"sap/m/library",
 	"sap/m/Label",
 	"sap/m/Text",
@@ -28,7 +27,6 @@ sap.ui.define([
 	RowSettings,
 	RowActionItem,
 	RowCountMode,
-	RowActionType,
 	MLibrary,
 	Label,
 	Text,
@@ -182,7 +180,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Template", function(assert) {
-		let oInnerColumn = this.oTable._oTable.getColumns()[0];
+		const oInnerTable = this.oTable._oTable;
+		let oInnerColumn = oInnerTable.getColumns()[0];
 		let oInnerTemplate = oInnerColumn.getTemplate();
 		let oInnerCreationTemplate = oInnerColumn.getCreationTemplate();
 
@@ -203,7 +202,7 @@ sap.ui.define([
 			template: new MyControl({text: "NoWrappingProperty"}),
 			creationTemplate: new MyControl({text: "NoWrappingProperty"})
 		}));
-		oInnerColumn = this.oTable._oTable.getColumns()[1];
+		oInnerColumn = oInnerTable.getColumns()[1];
 		oInnerTemplate = oInnerColumn.getTemplate();
 		oInnerCreationTemplate = oInnerColumn.getCreationTemplate();
 
@@ -215,7 +214,7 @@ sap.ui.define([
 
 		// No template
 		this.oTable.addColumn(new Column());
-		oInnerColumn = this.oTable._oTable.getColumns()[2];
+		oInnerColumn = oInnerTable.getColumns()[2];
 		oInnerTemplate = oInnerColumn.getTemplate();
 		oInnerCreationTemplate = oInnerColumn.getCreationTemplate();
 
@@ -244,29 +243,32 @@ sap.ui.define([
 	});
 
 	QUnit.test("Change width", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
 		this.oColumn.setWidth("100px");
-		assert.equal(this.oTable._oTable.getColumns()[0].getWidth(), "100px", "Set 'width': Inner column 'width'");
+		assert.equal(oInnerColumn.getWidth(), "100px", "Set 'width': Inner column 'width'");
 
 		this.oColumn.setWidth();
-		assert.equal(this.oTable._oTable.getColumns()[0].getWidth(), "", "Remove 'width': Inner column 'width'");
+		assert.equal(oInnerColumn.getWidth(), "", "Remove 'width': Inner column 'width'");
 	});
 
 	QUnit.test("Change minWidth", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
 		this.oColumn.setMinWidth(10);
-		assert.equal(this.oTable._oTable.getColumns()[0].getMinWidth(), 10 * parseFloat(MLibrary.BaseFontSize),
+		assert.equal(oInnerColumn.getMinWidth(), 10 * parseFloat(MLibrary.BaseFontSize),
 			"Set 'minWidth': Inner column 'minWidth'");
 
 		this.oColumn.setMinWidth();
-		assert.equal(this.oTable._oTable.getColumns()[0].getMinWidth(), 8 * parseFloat(MLibrary.BaseFontSize),
+		assert.equal(oInnerColumn.getMinWidth(), 8 * parseFloat(MLibrary.BaseFontSize),
 			"Remove 'minWidth': Inner column 'minWidth'");
 	});
 
 	QUnit.test("Change hAlign", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
 		this.oColumn.setHAlign("End");
-		assert.equal(this.oTable._oTable.getColumns()[0].getHAlign(), "End", "Set 'hAlign': Inner column 'hAlign'");
+		assert.equal(oInnerColumn.getHAlign(), "End", "Set 'hAlign': Inner column 'hAlign'");
 
 		this.oColumn.setHAlign();
-		assert.equal(this.oTable._oTable.getColumns()[0].getHAlign(), "Begin", "Remove 'hAlign': Inner column 'hAlign'");
+		assert.equal(oInnerColumn.getHAlign(), "Begin", "Remove 'hAlign': Inner column 'hAlign'");
 	});
 
 	QUnit.test("Change tooltip", function(assert) {
@@ -439,22 +441,24 @@ sap.ui.define([
 	});
 
 	QUnit.test("fixedColumnCount property", function(assert) {
+		const oInnerTable = this.oTable._oTable;
 		assert.equal(this.oTable.getType().getFixedColumnCount(), 1, "fixedColumnCount for type is set to 1");
-		assert.equal(this.oTable._oTable.getFixedColumnCount(), 1, "Inner table has a fixed column count of 1");
+		assert.equal(oInnerTable.getFixedColumnCount(), 1, "Inner table has a fixed column count of 1");
 
 		this.oTable.getType().setFixedColumnCount(2);
 
 		assert.equal(this.oTable.getType().getFixedColumnCount(), 2, "fixedColumnCount for type is set to 2");
-		assert.equal(this.oTable._oTable.getFixedColumnCount(), 2, "Inner table has a fixed column count of 2");
+		assert.equal(oInnerTable.getFixedColumnCount(), 2, "Inner table has a fixed column count of 2");
 
 		this.oTable.getType().setFixedColumnCount(0);
 
 		assert.equal(this.oTable.getType().getFixedColumnCount(), 0, "fixedColumnCount for type is set to 0");
-		assert.equal(this.oTable._oTable.getFixedColumnCount(), 0, "Inner table has a fixed column count of 0");
+		assert.equal(oInnerTable.getFixedColumnCount(), 0, "Inner table has a fixed column count of 0");
 	});
 
 	QUnit.test("State is persisted", async function(assert) {
 		const done = assert.async();
+		const oInnerTable = this.oTable._oTable;
 		const oVariant = new VariantManagement("mdc_test_vm", {
 			"for": ["table_test"]
 		});
@@ -475,8 +479,8 @@ sap.ui.define([
 		await TableQUnitUtils.waitForBinding(this.oTable);
 		await nextUIUpdate();
 
-		this.oTable._oTable.setFixedColumnCount(2);
-		this.oTable._oTable.fireColumnFreeze();
+		oInnerTable.setFixedColumnCount(2);
+		oInnerTable.fireColumnFreeze();
 	});
 
 	QUnit.test("Switch variant (emulation)", async function(assert) {
@@ -675,7 +679,7 @@ sap.ui.define([
 			rowSettings: new RowSettings({
 				rowActions: [
 					new RowActionItem({
-						type: RowActionType.Navigation,
+						type: "Navigation",
 						text: "My custom action",
 						icon: "sap-icon://accept",
 						visible: false
@@ -733,13 +737,14 @@ sap.ui.define([
 			})
 		});
 
-		const oInnerRowAction = this.oTable._oTable.getRowActionTemplate();
+		const oInnerTable = this.oTable._oTable;
+		const oInnerRowAction = oInnerTable.getRowActionTemplate();
 
 		assert.ok(oInnerRowAction, "Inner row action template exists");
 		assert.equal(oInnerRowAction.getItems().length, 0, "Inner row action item count");
 		assert.deepEqual({
-			model: this.oTable._oTable.getRowActionTemplate().getBindingInfo("items").model,
-			path: this.oTable._oTable.getRowActionTemplate().getBindingInfo("items").path
+			model: oInnerTable.getRowActionTemplate().getBindingInfo("items").model,
+			path: oInnerTable.getRowActionTemplate().getBindingInfo("items").path
 		}, {
 			model: "namedModel",
 			path: "/testPath"
@@ -755,43 +760,119 @@ sap.ui.define([
 				rowActions: [
 					new RowActionItem({
 						id: "myRowActionitem",
-						type: RowActionType.Delete,
+						type: "Delete",
 						press: (oEvent) => {
-							oPress(oEvent.getParameters());
+							oPress(oEvent);
 						}
 					}),
 					new RowActionItem({
 						id: "myOtherRowActionitem",
-						type: RowActionType.Navigation,
+						type: "Navigation",
 						press: (oEvent) => {
-							oPress(oEvent.getParameters());
+							oPress(oEvent);
 						}
 					})
 				]
 			})
 		});
 
+		const oInnerTable = this.oTable._oTable;
+
 		await new Promise((resolve) => {
-			this.oTable._oTable.attachEventOnce("rowsUpdated", resolve);
+			oInnerTable.attachEventOnce("rowsUpdated", resolve);
 		});
 
-		let oRowAction = this.oTable._oTable.getRows()[1].getRowAction();
+		let oRowAction = oInnerTable.getRows()[1].getRowAction();
 		let oIcon = Element.closestTo(oRowAction.getDomRef().children[0]);
+
 		oIcon.firePress();
-		assert.ok(oPress.calledOnceWithExactly({
-			id: "myRowActionitem",
-			bindingContext: this.oTable._oTable.getRows()[1].getBindingContext("namedModel")
-		}), "'press' event handler called with the correct parameters");
+		let oEvent = oPress.getCall(0)?.args[0];
+		assert.deepEqual(oEvent?.getParameters(), {
+			id: oEvent.getSource().getId(),
+			bindingContext: oInnerTable.getRows()[1].getBindingContext("namedModel")
+		}, "'press' event handler called with the correct parameters");
 
 		oPress.resetHistory();
 
-		oRowAction = this.oTable._oTable.getRows()[2].getRowAction();
+		oRowAction = oInnerTable.getRows()[2].getRowAction();
 		oIcon = Element.closestTo(oRowAction.getDomRef().children[1]);
 		oIcon.firePress();
-		assert.ok(oPress.calledOnceWithExactly({
-			id: "myOtherRowActionitem",
-			bindingContext: this.oTable._oTable.getRows()[2].getBindingContext("namedModel")
-		}), "'press' event handler called with the correct parameters");
+
+		oEvent = oPress.getCall(0)?.args[0];
+		assert.deepEqual(oEvent?.getParameters(), {
+			id: oEvent.getSource().getId(),
+			bindingContext: oInnerTable.getRows()[2].getBindingContext("namedModel")
+		}, "'press' event handler called with the correct parameters");
+	});
+
+	QUnit.test("rowPress with non-Navigation row actions fires cellClick correctly", async function(assert) {
+		const oRowPress = sinon.spy();
+
+		await this.createTable({
+			rowPress: (oEvent) => {
+				oRowPress(oEvent);
+			},
+			rowSettings: new RowSettings({
+				rowActions: [
+					new RowActionItem({type: "Delete"}),
+					new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"})
+				]
+			})
+		});
+
+		const oInnerTable = this.oTable._oTable;
+
+		await new Promise((resolve) => {
+			oInnerTable.attachEventOnce("rowsUpdated", resolve);
+		});
+
+		assert.ok(oInnerTable.hasListeners("cellClick"), "cellClick listener is attached when rowPress is set");
+		assert.ok(oInnerTable.getRowActionTemplate(), "Row action template exists");
+		assert.strictEqual(oInnerTable.getRowActionTemplate().getItems().length, 2, "Two row action items exist");
+
+		oInnerTable.getRows()[1].getCells()[0].$().trigger("tap");
+
+		const oEvent = oRowPress.getCall(0)?.args[0];
+		assert.deepEqual(oEvent?.getParameters(), {
+			id: oEvent.getSource().getId(),
+			bindingContext: oInnerTable.getRows()[1].getBindingContext("namedModel")
+		}, "'rowPress' event handler called with the correct parameters");
+	});
+
+	QUnit.test("rowActionCount controls row action column visibility", async function(assert) {
+		await this.createTable({
+			rowSettings: new RowSettings({
+				rowActionCount: 1,
+				rowActions: [
+					new RowActionItem({type: "Navigation"}),
+					new RowActionItem({type: "Delete"}),
+					new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"})
+				]
+			})
+		});
+
+		const oInnerTable = this.oTable._oTable;
+
+		await new Promise((resolve) => {
+			oInnerTable.attachEventOnce("rowsUpdated", resolve);
+		});
+
+		// rowActionCount = 1: row action column is visible with small size
+		assert.strictEqual(oInnerTable.getRowActionCount(), 1, "rowActionCount is 1");
+		assert.ok(oInnerTable.getDomRef().classList.contains("sapUiTableRAct"), "Row action column is rendered");
+		assert.ok(oInnerTable.getDomRef().classList.contains("sapUiTableRActS"), "Row action column has small size class (1 action)");
+
+		// rowActionCount = 0: row action column is not rendered
+		this.oTable.getRowSettings().setRowActionCount(0);
+		this.oTable.getType().updateRowActions();
+		await nextUIUpdate();
+		await new Promise((resolve) => {
+			oInnerTable.attachEventOnce("rowsUpdated", resolve);
+		});
+
+		assert.strictEqual(oInnerTable.getRowActionCount(), 0, "rowActionCount is 0");
+		assert.notOk(oInnerTable.getDomRef().classList.contains("sapUiTableRAct"),
+			"Row action column is not rendered when rowActionCount is 0");
 	});
 
 	QUnit.module("Events", {
@@ -842,10 +923,12 @@ sap.ui.define([
 			}
 		});
 
-		this.oTable._oTable.getRows()[1].getCells()[0].$().trigger("tap");
+		const oInnerTable = this.oTable._oTable;
+
+		oInnerTable.getRows()[1].getCells()[0].$().trigger("tap");
 		assert.ok(oRowPress.calledOnceWithExactly({
 			id: this.oTable.getId(),
-			bindingContext: this.oTable._oTable.getRows()[1].getBindingContext("namedModel")
+			bindingContext: oInnerTable.getRows()[1].getBindingContext("namedModel")
 		}), "'rowPress' event handler called with the correct parameters");
 	});
 
@@ -898,22 +981,23 @@ sap.ui.define([
 	});
 
 	QUnit.test("Standard context menu", function(assert) {
+		const oInnerTable = this.oTable._oTable;
 		const oContextMenu = this.oTable.getContextMenu();
 		let oInnerTableEvent;
 
 		this.spy(this.oTable, "_onBeforeOpenContextMenu");
-		this.oTable._oTable.attachBeforeOpenContextMenu((oEvent) => {
+		oInnerTable.attachBeforeOpenContextMenu((oEvent) => {
 			oInnerTableEvent = oEvent;
 		});
 
-		this.oTable._oTable.fireBeforeOpenContextMenu({
+		oInnerTable.fireBeforeOpenContextMenu({
 			rowIndex: 0,
 			columnIndex: 0,
 			contextMenu: oContextMenu
 		});
 		assert.equal(this.oTable._onBeforeOpenContextMenu.callCount, 1, "Table#_onBeforeOpenContextMenu call");
 		sinon.assert.calledWithExactly(this.oTable._onBeforeOpenContextMenu, {
-			bindingContext: this.oTable._oTable.getRows()[0].getBindingContext("namedModel"),
+			bindingContext: oInnerTable.getRows()[0].getBindingContext("namedModel"),
 			column: this.oTable.getColumns()[0],
 			contextMenu: oContextMenu,
 			event: oInnerTableEvent,
@@ -921,14 +1005,14 @@ sap.ui.define([
 		});
 
 		this.oTable._onBeforeOpenContextMenu.resetHistory();
-		this.oTable._oTable.fireBeforeOpenContextMenu({
+		oInnerTable.fireBeforeOpenContextMenu({
 			rowIndex: 0,
 			columnIndex: undefined,
 			contextMenu: oContextMenu
 		});
 		assert.equal(this.oTable._onBeforeOpenContextMenu.callCount, 1, "Table#_onBeforeOpenContextMenu call");
 		sinon.assert.calledWithExactly(this.oTable._onBeforeOpenContextMenu, {
-			bindingContext: this.oTable._oTable.getRows()[0].getBindingContext("namedModel"),
+			bindingContext: oInnerTable.getRows()[0].getBindingContext("namedModel"),
 			column: undefined,
 			contextMenu: oContextMenu,
 			event: oInnerTableEvent,
@@ -937,24 +1021,25 @@ sap.ui.define([
 	});
 
 	QUnit.test("Group header row context menu", function(assert) {
+		const oInnerTable = this.oTable._oTable;
 		const oContextMenu = this.oTable._oTable.getAggregation("groupHeaderRowContextMenu");
 		let oInnerTableEvent;
 
 		assert.ok(oContextMenu.isA("sap.ui.mdc.table.menus.GroupHeaderRowContextMenu"), "GroupHeaderRowContextMenu is set");
 
 		this.spy(this.oTable, "_onBeforeOpenContextMenu");
-		this.oTable._oTable.attachBeforeOpenContextMenu((oEvent) => {
+		oInnerTable.attachBeforeOpenContextMenu((oEvent) => {
 			oInnerTableEvent = oEvent;
 		});
 
-		this.oTable._oTable.fireBeforeOpenContextMenu({
+		oInnerTable.fireBeforeOpenContextMenu({
 			rowIndex: 0,
 			columnIndex: 0,
 			contextMenu: oContextMenu
 		});
 		assert.equal(this.oTable._onBeforeOpenContextMenu.callCount, 1, "Table#_onBeforeOpenContextMenu call");
 		sinon.assert.calledWithExactly(this.oTable._onBeforeOpenContextMenu, {
-			bindingContext: this.oTable._oTable.getRows()[0].getBindingContext("namedModel"),
+			bindingContext: oInnerTable.getRows()[0].getBindingContext("namedModel"),
 			column: this.oTable.getColumns()[0],
 			contextMenu: oContextMenu,
 			event: oInnerTableEvent,
@@ -962,14 +1047,14 @@ sap.ui.define([
 		});
 
 		this.oTable._onBeforeOpenContextMenu.resetHistory();
-		this.oTable._oTable.fireBeforeOpenContextMenu({
+		oInnerTable.fireBeforeOpenContextMenu({
 			rowIndex: 0,
 			columnIndex: undefined,
 			contextMenu: oContextMenu
 		});
 		assert.equal(this.oTable._onBeforeOpenContextMenu.callCount, 1, "Table#_onBeforeOpenContextMenu call");
 		sinon.assert.calledWithExactly(this.oTable._onBeforeOpenContextMenu, {
-			bindingContext: this.oTable._oTable.getRows()[0].getBindingContext("namedModel"),
+			bindingContext: oInnerTable.getRows()[0].getBindingContext("namedModel"),
 			column: undefined,
 			contextMenu: oContextMenu,
 			event: oInnerTableEvent,

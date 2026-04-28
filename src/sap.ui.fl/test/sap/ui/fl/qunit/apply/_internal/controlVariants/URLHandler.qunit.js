@@ -187,6 +187,38 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("when app component is destroyed, the variant model is also destroyed", async function(assert) {
+			stubUShellServices(this.oGetUShellServiceStub, {
+				ShellNavigationInternal: {
+					registerNavigationFilter: sandbox.stub(),
+					unregisterNavigationFilter: sandbox.stub()
+				},
+				URLParsing: { parseShellHash() {} }
+			});
+			sandbox.stub(Utils, "getUshellContainer").returns({});
+
+			// Set the variant model on the component as ComponentLifecycleHooks would
+			this.oAppComponent.setModel(
+				this.oModel,
+				ControlVariantApplyAPI.getVariantModelName()
+			);
+
+			await URLHandler.initialize({
+				flexReference: this.oModel.sFlexReference,
+				appComponent: this.oAppComponent
+			});
+
+			const oModelDestroySpy = sandbox.spy(this.oModel, "destroy");
+
+			this.oAppComponent.destroy();
+			await VariantManagementState.waitForAllVariantSwitches(sFlexReference);
+
+			assert.ok(
+				oModelDestroySpy.calledOnce,
+				"then the variant model's destroy was called"
+			);
+		});
+
 		QUnit.test("when update() is called to update the URL with a hash register update", async function(assert) {
 			const mPropertyBag = {
 				parameters: ["testParam1,testParam2"],

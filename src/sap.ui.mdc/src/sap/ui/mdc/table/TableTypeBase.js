@@ -20,7 +20,7 @@ sap.ui.define([
 	 *
 	 * @param {string} [sId] Optional ID for the new object; generated automatically if no non-empty ID is given
 	 * @param {object} [mSettings] Initial settings for the new object
-	 * @class The table type info base class for the metadata-driven table. Base class with no implementation.
+	 * @class The table type info base class for the metadata-driven table. Base class with no implementation.<br>
 	 * @extends sap.ui.core.Element
 	 * @author SAP SE
 	 * @public
@@ -39,11 +39,17 @@ sap.ui.define([
 	TableTypeBase.prototype.init = function() {
 		Element.prototype.init.apply(this, arguments);
 		this._oManagedObjectModel = new ManagedObjectModel(this);
+
+		// Map to cache cloned RowActionItems: Key = original RowActionItem, Value = clone
+		this._mRowActionItemClones = new Map();
 	};
 
 	TableTypeBase.prototype.exit = function() {
 		this._oManagedObjectModel.destroy();
 		delete this._oManagedObjectModel;
+
+		this._cleanupRowActionClones();
+		delete this._mRowActionItemClones;
 		Element.prototype.exit.apply(this, arguments);
 	};
 
@@ -149,12 +155,6 @@ sap.ui.define([
 		return oRowSettings ? oRowSettings.getAllSettings() : null;
 	};
 
-	TableTypeBase.prototype.getRowActionsConfig = function() {
-		const oTable = this.getTable();
-		const oRowSettings = oTable ? oTable.getRowSettings() : null;
-		return oRowSettings ? oRowSettings.getAllActions() : null;
-	};
-
 	TableTypeBase.prototype._onColumnMove = function(oEvent) {
 		const oTable = this.getTable();
 		const oInnerTable = this.getInnerTable();
@@ -180,6 +180,44 @@ sap.ui.define([
 		this.callHook("Paste", this.getTable(), {
 			data: oEvent.getParameter("data")
 		});
+	};
+
+	/**
+	 * Returns a cached clone of the given RowActionItem, creating one if it doesn't exist yet.
+	 *
+	 * @param {sap.ui.mdc.table.RowActionItem} oRowActionItem The original RowActionItem to clone
+	 * @returns {sap.ui.mdc.table.RowActionItem} The cached clone
+	 * @private
+	 */
+	TableTypeBase.prototype.getRowActionClone = function(oRowActionItem) {
+		if (!this._mRowActionItemClones.has(oRowActionItem)) {
+			this._mRowActionItemClones.set(oRowActionItem, oRowActionItem.clone());
+		}
+		return this._mRowActionItemClones.get(oRowActionItem);
+	};
+
+	/**
+	 * Cleans up all cached RowActionItem clones.
+	 *
+	 * This method:
+	 * 1. Iterates through all cached clones in the Map
+	 * 2. Removes each clone from its parent (if still attached)
+	 * 3. Destroys each clone to prevent memory leaks
+	 * 4. Clears and deletes the Map
+	 *
+	 * Should be called when:
+	 * - The table type is destroyed (exit)
+	 * - The row actions configuration changes (updateRowActions)
+	 *
+	 * @private
+	 */
+	TableTypeBase.prototype._cleanupRowActionClones = function() {
+		if (this._mRowActionItemClones) {
+			this._mRowActionItemClones.forEach((oClone) => {
+				oClone.destroy();
+			});
+			this._mRowActionItemClones.clear();
+		}
 	};
 
 	/**

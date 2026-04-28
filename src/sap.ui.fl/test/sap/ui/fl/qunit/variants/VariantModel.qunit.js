@@ -231,7 +231,7 @@ sap.ui.define([
 				"then URLHandler.initialize() called with the flex reference and app component"
 			);
 
-			var oVMData = this.oModel.getData()[sVMReference];
+			const oVMData = this.oModel.getData()[sVMReference];
 			assert.strictEqual(oVMData.currentVariant, "variant1", "the currentVariant was set");
 			assert.strictEqual(oVMData.defaultVariant, "variant1", "the defaultVariant was set");
 			assert.strictEqual(oVMData.modified, false, "the modified flag was set");
@@ -240,6 +240,12 @@ sap.ui.define([
 				FlexObjectState.getLiveDependencyMap(sReference).mChanges.someControlId.length,
 				1,
 				"then the persisted UI change of the current variant is added to the dependency map"
+			);
+
+			assert.strictEqual(
+				this.oModel.iSizeLimit,
+				10000,
+				"then the size limit is set to 10000"
 			);
 		});
 

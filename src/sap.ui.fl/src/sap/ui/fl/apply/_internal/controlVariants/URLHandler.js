@@ -449,6 +449,13 @@ sap.ui.define([
 			// clean up module-level data for this flex reference
 			delete _mHashData[mPropertyBag.flexReference];
 
+			// The component does not automatically destroy programmatically set models.
+			// The variant model must be explicitly destroyed to reset variant state.
+			const oVariantModel = mPropertyBag.appComponent.getModel("$FlexVariants");
+			if (oVariantModel) {
+				oVariantModel.destroy();
+			}
+
 			const oObserver = mComponentDestroyObservers[mPropertyBag.flexReference];
 			if (oObserver) {
 				oObserver.unobserve(mPropertyBag.appComponent, { destroy: true });

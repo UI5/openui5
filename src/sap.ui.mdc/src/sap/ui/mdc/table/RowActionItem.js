@@ -3,9 +3,12 @@
  */
 
 sap.ui.define([
-	"sap/ui/core/Element"
+	"sap/ui/core/Element",
+	// load for availability
+	"sap/ui/mdc/enums/TableRowActionType"
 ], (
-	Element
+	Element,
+	TableRowActionType
 ) => {
 	"use strict";
 
@@ -36,7 +39,7 @@ sap.ui.define([
 				 * Setting the type ensures default values for the properties <code>icon</code> and <code>text</code>. If an icon or text is set
 				 * explicitly, this setting is used.
 				 */
-				type: {type: "sap.ui.mdc.enums.TableRowActionType"},
+				type: {type: "sap.ui.mdc.enums.TableRowActionType", defaultValue: TableRowActionType.Custom},
 				/**
 				 * Text for the row action item.
 				 *

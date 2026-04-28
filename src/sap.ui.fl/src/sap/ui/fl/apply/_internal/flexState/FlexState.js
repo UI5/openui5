@@ -751,6 +751,16 @@ sap.ui.define([
 			const vValue = oBackendResponse[sKey];
 			if (Array.isArray(vValue)) {
 				oFilteredResponse[sKey] = vValue.filter((oRawFlexObject) => !oExistingIds.has(oRawFlexObject.fileName));
+			} else if (sKey === "comp" && typeof vValue === "object" && vValue !== null) {
+				oFilteredResponse[sKey] = Object.keys(vValue).reduce((oFilteredComp, sCompKey) => {
+					const aCompValue = vValue[sCompKey];
+					if (Array.isArray(aCompValue)) {
+						oFilteredComp[sCompKey] = aCompValue.filter(
+							(oRawFlexObject) => !oExistingIds.has(oRawFlexObject.fileName)
+						);
+					}
+					return oFilteredComp;
+				}, {});
 			}
 			return oFilteredResponse;
 		}, {});
@@ -764,13 +774,18 @@ sap.ui.define([
 	 */
 	function createAddUpdatesFromBackendResponse(oBackendResponse) {
 		const aUpdates = [];
-		Object.values(oBackendResponse).forEach((vValue) => {
+		Object.entries(oBackendResponse).forEach(([sKey, vValue]) => {
 			if (Array.isArray(vValue)) {
 				vValue.forEach((oRawFlexObject) => {
-					aUpdates.push({
-						type: "add",
-						flexObject: oRawFlexObject
-					});
+					aUpdates.push({ type: "add", flexObject: oRawFlexObject });
+				});
+			} else if (sKey === "comp" && typeof vValue === "object" && vValue !== null) {
+				Object.values(vValue).forEach((aCompValue) => {
+					if (Array.isArray(aCompValue)) {
+						aCompValue.forEach((oRawFlexObject) => {
+							aUpdates.push({ type: "add", flexObject: oRawFlexObject });
+						});
+					}
 				});
 			}
 		});
@@ -787,6 +802,7 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.reference - Flex reference of the app
 	 * @param {string} mPropertyBag.componentId - ID of the component
 	 * @param {object} mPropertyBag.newData - The new data from the backend (with the backend response structure)
+	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} The newly created FlexObjects
 	 */
 	FlexState.addNewObjects = function(mPropertyBag) {
 		initializeEmptyStateIfNeeded(mPropertyBag.reference, mPropertyBag.componentId);
@@ -811,6 +827,7 @@ sap.ui.define([
 			});
 			oFlexObjectsDataSelector.checkUpdate({ reference: mPropertyBag.reference }, aFlexObjectUpdates);
 		}
+		return aNewFlexObjects;
 	};
 
 	return FlexState;

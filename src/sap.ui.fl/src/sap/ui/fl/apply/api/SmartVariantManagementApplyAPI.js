@@ -104,21 +104,20 @@ sap.ui.define([
 			const oLoaderData = Loader.getCachedFlexData(sReference);
 			const aControlsWithRemovedVariants = oLoaderData?.parameters?.nonFavoriteVariantsRemoved;
 			if (aControlsWithRemovedVariants?.includes(sPersistencyKey)) {
-				oControl.setDynamicVariantsLoadedCallback(() => {
+				oControl.setDynamicVariantsLoadedCallback(async () => {
 					if (FlexState.getLazyVariantsLoaded(sReference).includes(sPersistencyKey)) {
-						return Promise.resolve();
+						return;
 					}
-					return Storage.loadAllCompVariants({
+					const oResponse = await Storage.loadAllCompVariants({
 						reference: sReference,
 						persistencyKey: sPersistencyKey
-					}).then((oResponse) => {
-						FlexState.addNewObjects({
-							reference: sReference,
-							componentId: mProperties.componentId,
-							newData: oResponse
-						});
-						FlexState.addLazyVariantsLoaded(sReference, sPersistencyKey);
 					});
+					FlexState.addNewObjects({
+						reference: sReference,
+						componentId: mProperties.componentId,
+						newData: oResponse
+					}).forEach((oNewVariant) => oControl.addVariant(oNewVariant));
+					FlexState.addLazyVariantsLoaded(sReference, sPersistencyKey);
 				});
 			}
 
