@@ -117,6 +117,8 @@
 		<sap.ui5.eslint.tools.version>0.0.6</sap.ui5.eslint.tools.version>
 		<!-- ESLint version (for all OpenUI5 projects) -->
 		<sap.openui5.eslintnode.version>7.32.0</sap.openui5.eslintnode.version>
+		<sap.openui5.eslintnode.node.version>24.11.0</sap.openui5.eslintnode.node.version>
+		<sap.openui5.eslintnode.npm.version>11.6.2</sap.openui5.eslintnode.npm.version>
  	</properties>
 
 
@@ -274,10 +276,10 @@
 						<configuration>
 							<version>${sap.openui5.eslintnode.version}</version>
 							<nodeType>SHARED</nodeType>
-							<nodeVersion>${node.version}</nodeVersion>
+							<nodeVersion>${sap.openui5.eslintnode.node.version}</nodeVersion>
 							<nodeLocation>${node.location}</nodeLocation>
 							<npmRegistry>${npm.registry}</npmRegistry>
-							<npmVersion>${npm.version}</npmVersion>
+							<npmVersion>${sap.openui5.eslintnode.npm.version}</npmVersion>
 							<formatters>
 								<formatter>
 									<name>sonar</name>
