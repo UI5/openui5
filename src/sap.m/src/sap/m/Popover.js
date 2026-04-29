@@ -194,6 +194,12 @@ sap.ui.define([
 					contentHeight: {type: "sap.ui.core.CSSSize", group: "Dimension", defaultValue: null},
 
 					/**
+					 * Sets the maximum height of the Popover. When the content exceeds this height, scrolling is enabled. This property applies to the entire Popover, including the header, content, and footer.
+					 * @since 1.148
+					 */
+					maxHeight: {type: "sap.ui.core.CSSSize", group: "Dimension", defaultValue: null},
+
+					/**
 					 * This property indicates if user can scroll vertically inside popover when the content is bigger than the content area. However, when scrollable control (sap.m.ScrollContainer, sap.m.Page) is in the popover, this property needs to be set to false to disable the scrolling in popover in order to make the scrolling in the child control work properly.
 					 * Popover detects if there's sap.m.NavContainer, sap.m.Page, or sap.m.ScrollContainer as direct child added to Popover. If there is, Popover will turn off scrolling by setting this property to false automatically ignoring the existing value of this property.
 					 * @since 1.15.0
@@ -1333,6 +1339,27 @@ sap.ui.define([
 			oEvent.preventDefault();
 			oEvent.stopPropagation();
 
+			// Consider user-defined maxHeight if set
+			const userMaxHeight = this.getMaxHeight();
+			let maxContentHeight = parseFloat(contentDimensions["max-height"]);
+
+			if (userMaxHeight) {
+				// Convert user's maxHeight to pixels if needed and subtract header/footer height
+				const footerHeaderHeight = $popover.height() - contentHeight;
+				let userMaxHeightPx;
+
+				if (userMaxHeight.endsWith('%')) {
+					userMaxHeightPx = (parseFloat(userMaxHeight) / 100) * posParams._fDocumentHeight;
+				} else if (userMaxHeight.endsWith('rem')) {
+					userMaxHeightPx = Rem.toPx(userMaxHeight);
+				} else {
+					userMaxHeightPx = parseFloat(userMaxHeight);
+				}
+
+				const userMaxContentHeight = userMaxHeightPx - footerHeaderHeight;
+				maxContentHeight = Math.min(maxContentHeight, userMaxContentHeight);
+			}
+
 			const initial = {
 				x: oEvent.pageX,
 				y: oEvent.pageY,
@@ -1340,7 +1367,7 @@ sap.ui.define([
 				width: $popover.width(),
 				height: contentHeight,
 				maxWidth: parseFloat(contentDimensions["max-width"]),
-				maxHeight: parseFloat(contentDimensions["max-height"]),
+				maxHeight: maxContentHeight,
 				footerHeaderHeight: $popover.height() - contentHeight,
 				offsetX: this._getActualOffsetX(),
 				offsetY: this._getActualOffsetY(),
@@ -1421,7 +1448,7 @@ sap.ui.define([
 
 			switch (placement) {
 				case PlacementType.Top:
-					height = clamp(initial.height + dy, this._minDimensions.height, maxHeightTopSide);
+					height = clamp(initial.height + dy, this._minDimensions.height, Math.min(maxHeightTopSide, initial.maxHeight));
 
 					if (resizeHandlePlacement === "TopRight") {
 						width = clamp(initial.width + dx, this._minDimensions.width, maxWidthRightSide);
@@ -1434,7 +1461,7 @@ sap.ui.define([
 					this.resizedOffsetX = Math.round(offsetX);
 					break;
 				case PlacementType.Bottom:
-					height = clamp(initial.height - dy, this._minDimensions.height, maxHeightBottomSide);
+					height = clamp(initial.height - dy, this._minDimensions.height, Math.min(maxHeightBottomSide, initial.maxHeight));
 
 					if (resizeHandlePlacement === "BottomRight") {
 						width = clamp(initial.width + dx, this._minDimensions.width, maxWidthRightSide);
@@ -1450,10 +1477,10 @@ sap.ui.define([
 					width = clamp(initial.width - dx, this._minDimensions.width, maxWidthLeftSide);
 
 					if (resizeHandlePlacement === "TopLeft") {
-						height = clamp(initial.height + dy, this._minDimensions.height, maxHeightTopSide);
+						height = clamp(initial.height + dy, this._minDimensions.height, Math.min(maxHeightTopSide, initial.maxHeight));
 						offsetY = Math.min(0, initial.offsetY + (initial.height - height) / 2);
 					} else { // BottomLeft
-						height = clamp(initial.height - dy, this._minDimensions.height, maxHeightBottomSide);
+						height = clamp(initial.height - dy, this._minDimensions.height, Math.min(maxHeightBottomSide, initial.maxHeight));
 						offsetY = Math.max(1, initial.offsetY + (height - initial.height) / 2);
 					}
 
@@ -1463,10 +1490,10 @@ sap.ui.define([
 					width = clamp(initial.width + dx, this._minDimensions.width, maxWidthRightSide);
 
 					if (resizeHandlePlacement === "TopRight") {
-						height = clamp(initial.height + dy, this._minDimensions.height, maxHeightTopSide);
+						height = clamp(initial.height + dy, this._minDimensions.height, Math.min(maxHeightTopSide, initial.maxHeight));
 						offsetY = Math.min(-1, initial.offsetY + (initial.height - height) / 2);
 					}	else { // BottomRight
-						height = clamp(initial.height - dy, this._minDimensions.height, maxHeightBottomSide);
+						height = clamp(initial.height - dy, this._minDimensions.height, Math.min(maxHeightBottomSide, initial.maxHeight));
 						offsetY = Math.max(0, initial.offsetY + (height - initial.height) / 2);
 					}
 

@@ -336,79 +336,95 @@ sap.ui.define([
 	 * Method which will initialize the <code>AdaptationFilterBar</code> and create the required FilterFields
 	 * @returns {Promise} A Promise which resolves once all FilterFields are ready and added to the <code>filterItems</code> aggregation
 	 */
-	AdaptationFilterBar.prototype.createFilterFields = async function() {
-		await this.initializedWithMetadata();
+	AdaptationFilterBar.prototype.createFilterFields = function() {
+		return this.initializedWithMetadata().then(() => {
+			const mConditions = this._getAdaptationControlInstance().getFilterConditions();
 
-		const mConditions = this._getAdaptationControlInstance().getFilterConditions();
-		const pSetXConditions = this._setXConditions(mConditions);
-		const oP13nData = this.getP13nData();
-		const aP13nItems = oP13nData.items || [];
-		const oAdaptationControl = this._getAdaptationControlInstance();
-		const oControlDelegate = oAdaptationControl.getControlDelegate();
-		const oFilterDelegate = this._checkAdvancedParent(oAdaptationControl) ? oControlDelegate : oControlDelegate.getFilterDelegate();
+			this.setFilterConditions(mConditions);
+			const pConditions = this._setXConditions(mConditions);
 
-		//used to store the originals
-		this._mOriginalsForClone = this._mOriginalsForClone || {};
-		this.mFilterFields = this.mFilterFields || {};
+			if (this._bFilterFieldsCreated) {
+				return pConditions.then(() => {
+					this._updateActiveStatus(this.oAdaptationData.items);
+					this._oFilterBarLayout.setP13nData(this.getP13nData());
+					return this;
+				});
+			}
 
-		this.setFilterConditions(mConditions);
+			const oAdaptationControl = this._getAdaptationControlInstance();
+			const oDelegate = oAdaptationControl.getControlDelegate();
+			const oFilterDelegate = this._checkAdvancedParent(oAdaptationControl) ? oDelegate : oDelegate.getFilterDelegate();
 
-		const aNewItems = aP13nItems.filter((oItem) => !this.mFilterFields[oItem.name]);
-		const aFieldPromises = aNewItems.map(async (oItem) => {
-			const oFilterField = await this._checkExisting(oItem, oFilterDelegate);
-			this._getFilterFieldForDialog(oFilterField, oItem, oAdaptationControl);
+			//used to store the originals
+			this._mOriginalsForClone = {};
+			this.mFilterFields = {};
+			const aFieldPromises = [];
+
+			this.getP13nData().items.forEach((oItem, iIndex) => {
+				const oFilterFieldPromise = this._checkExisting(oItem, oFilterDelegate);
+
+				oFilterFieldPromise.then((oFilterField) => {
+
+					let oFieldForDialog;
+
+					//Important: always use clones for the personalization dialog. The "originals" should never be shown in the P13n UI
+					//Currently the IFilter interface is being used to identify if a more complex personalization is required, this is
+					//as of now only part for the sap.ui.mdc.FilterBar, as the AdaptationFilterBar will allow to select FilterFields in advance.
+					//This logic requires a cloning logic, as there is a mix of parent/child filterFields which is not the case if the adaptaitonControl
+					//does only provide Filter capabilities via an inner FilterBar (such as the Table inbuilt filtering)
+					if (this._checkAdvancedParent(oAdaptationControl)) {
+						if (oFilterField._bTemporaryOriginal) {
+							delete oFilterFieldPromise._bTemporaryOriginal;
+							this._mOriginalsForClone[oFilterField.getPropertyKey()] = oFilterField;
+						}
+						oFieldForDialog = oFilterField.clone();
+						if (oAdaptationControl._handleFilterItemChanges) {
+							oFieldForDialog.detachChange(oAdaptationControl._handleFilterItemChanges, oAdaptationControl);
+						}
+						if (oAdaptationControl._handleFilterItemSubmit) {
+							oFieldForDialog.detachSubmit(oAdaptationControl._handleFilterItemSubmit, oAdaptationControl);
+						}
+						oFieldForDialog.setValueState("None");
+						oFieldForDialog.setValueStateText("");
+					} else {
+						oFieldForDialog = oFilterField;
+					}
+
+					this.mFilterFields[oItem.name] = oFieldForDialog;
+
+				});
+
+				aFieldPromises.push(oFilterFieldPromise);
+
+			});
+
+			return Promise.all(aFieldPromises).then(() => {
+				const oP13nData = this.getP13nData();
+				oP13nData.items.forEach((oItem) => {
+					this.addAggregation("filterItems", this.mFilterFields[oItem.name]);
+				});
+				this._attachFields();
+				this._updateActiveStatus(oP13nData.items);
+				this._oFilterBarLayout.setP13nData(oP13nData);
+
+				// Perform validation for AdaptFiltersPanel on dialog open
+				if (this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")) {
+					this._validateAdaptationState();
+				}
+				this._bFilterFieldsCreated = true;
+
+				return this;
+			});
+
 		});
-
-		await Promise.all([pSetXConditions, ...aFieldPromises]);
-
-		// Add filter fields in the original P13n model order (not in promise resolution order)
-		aNewItems.forEach((oItem) => {
-			this.addAggregation("filterItems", this.mFilterFields[oItem.name]);
-		});
-		this._updateActiveStatus(aP13nItems);
-		this._oFilterBarLayout.setP13nData(oP13nData);
-
-		// Perform validation for AdaptFiltersPanel on dialog open
-		if (this._checkIsNewUI() && this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")) {
-			this._validateAdaptationState();
-		}
-
-		return this;
 	};
 
-	AdaptationFilterBar.prototype._getFilterFieldForDialog = function(oFilterField, oItem, oAdaptationControl) {
-		let oFilterFieldForDialog;
-
-		//Important: always use clones for the personalization dialog. The "originals" should never be shown in the P13n UI
-		//Currently the IFilter interface is being used to identify if a more complex personalization is required, this is
-		//as of now only part for the sap.ui.mdc.FilterBar, as the AdaptationFilterBar will allow to select FilterFields in advance.
-		//This logic requires a cloning logic, as there is a mix of parent/child filterFields which is not the case if the adaptaitonControl
-		//does only provide Filter capabilities via an inner FilterBar (such as the Table inbuilt filtering)
-		if (this._checkAdvancedParent(oAdaptationControl)) {
-			if (oFilterField._bTemporaryOriginal) {
-				this._mOriginalsForClone[oFilterField.getPropertyKey()] = oFilterField;
-			}
-			oFilterFieldForDialog = oFilterField.clone();
-			if (oAdaptationControl._handleFilterItemChanges) {
-				oFilterFieldForDialog.detachChange(oAdaptationControl._handleFilterItemChanges, oAdaptationControl);
-			}
-			if (oAdaptationControl._handleFilterItemSubmit) {
-				oFilterFieldForDialog.detachSubmit(oAdaptationControl._handleFilterItemSubmit, oAdaptationControl);
-			}
-
-			oFilterFieldForDialog.setValueState(ValueState.None);
-			oFilterFieldForDialog.setValueStateText();
-		} else {
-			oFilterFieldForDialog = oFilterField;
-		}
-
-		oFilterFieldForDialog.attachChange(() => {
-			this.fireChange();
+	AdaptationFilterBar.prototype._attachFields = function() {
+		this.getFilterItems().forEach((oField) => {
+			oField.attachChange((oEvt) => {
+				this.fireChange();
+			});
 		});
-
-		this.mFilterFields[oItem.name] = oFilterFieldForDialog;
-
-		return oFilterFieldForDialog;
 	};
 
 	/**
@@ -504,9 +520,7 @@ sap.ui.define([
 			this.destroyAggregation("layout", true);
 		}
 
-		// Determine UI mode and pass to container
-		const bUseNewUI = this._checkIsNewUI();
-		this._oFilterBarLayout = this._checkAdvancedParent(oControl) ? new GroupContainer(this.getId() + "-groupContainer", { useNewUI: bUseNewUI }) : new TableContainer(this.getId() + "-tableContainer");
+		this._oFilterBarLayout = this._checkAdvancedParent(oControl) ? new GroupContainer(this.getId() + "-groupContainer") : new TableContainer(this.getId() + "-tableContainer");
 
 		this._oFilterBarLayout.getInner().setParent(this);
 		this.setAggregation("layout", this._oFilterBarLayout, true);
@@ -515,12 +529,9 @@ sap.ui.define([
 			this._oFilterBarLayout.getInner().attachChange((oEvt) => {
 				const sReason = oEvt.getParameter("reason");
 				const oItem = oEvt.getParameter("item");
-
-				if (this._checkIsNewUI()) {
-					if (this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")) {
-						if (sReason === "Show" || sReason === "Hide" || sReason === "Filter" || sReason === "Add") {
-							this._updateFilterItemMessage(oItem);
-						}
+				if (this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")) {
+					if (sReason === "Show" || sReason === "Hide" || sReason === "Filter" || sReason === "Add") {
+						this._updateFilterItemMessage(oItem);
 					}
 				}
 
@@ -580,7 +591,7 @@ sap.ui.define([
 			// Validate items that require validation (visible or visibility was toggled)
 			// or have a filter value set
 			if (this.mFilterFields && this.mFilterFields[oItem.name] && (oItem.requiresValidation || oItem.isFiltered)) {
-				if (this._checkIsNewUI && this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")) {
+				if (this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")) {
 					this._updateFilterItemMessage(oItem);
 				}
 			}
@@ -633,22 +644,6 @@ sap.ui.define([
 		}
 
 		this._setMessageForItem(oItem, sMessage, sMessageType);
-	};
-
-	AdaptationFilterBar.prototype._checkIsNewUI = function() {
-		if (this._bUseNewUI === undefined) {
-			// URL parameter takes precedence (for testing/development)
-			const sUrlParam = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters");
-			if (sUrlParam === "true") {
-				this._bUseNewUI = true;
-			} else if (sUrlParam === "false") {
-				this._bUseNewUI = false;
-			} else {
-				// Default to new UI
-				this._bUseNewUI = true;
-			}
-		}
-		return this._bUseNewUI;
 	};
 
 	AdaptationFilterBar.prototype.onBeforeClose = function() {

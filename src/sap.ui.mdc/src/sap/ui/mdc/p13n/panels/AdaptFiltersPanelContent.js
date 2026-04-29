@@ -40,6 +40,21 @@ sap.ui.define([
 	const { ValueState } = coreLib;
 	const { InvisibleMessageMode } = coreLib;
 
+	// Constants
+	const RENDERING_DELAY_MS = 100; // Time needed for DOM updates and rendering
+	const MODE_EDIT = "edit";
+	const MODE_SORT = "sort";
+
+	//Helper function to get stable id suffix from context
+	function _getIdSuffixFromContext(oContext) {
+		const sKey = oContext.getProperty("key");
+		const sName = oContext.getProperty("name");
+		const sSuffix = sKey || sName;
+		// Remove all characters that are invalid for IDs
+		// Valid characters: A-Z, a-z, 0-9, hyphen (-), underscore (_), colon (:), period (.)
+		return sSuffix.replace(/[^A-Za-z0-9\-_:.]/g, "");
+	}
+
 	const AdaptFiltersPanelContent = QueryPanel.extend("sap.ui.mdc.p13n.panels.AdaptFiltersPanelContent", {
 		metadata: {
 			library: "sap.ui.mdc",
@@ -79,6 +94,9 @@ sap.ui.define([
 		this.setModel(this._oViewModel, this.CONTROL_MODEL);
 
 		this.oInvisibleMessage = InvisibleMessage.getInstance();
+
+		// Initialize label cache to avoid duplicate IDs
+		this._mLabelCache = {};
 	};
 
 	AdaptFiltersPanelContent.prototype.setP13nData = function(aP13nData) {
@@ -92,8 +110,8 @@ sap.ui.define([
 	AdaptFiltersPanelContent.prototype.restoreDefaults = function() {
 		this._oViewModel.setProperty("/grouped", false);
 		this._oViewModel.setProperty("/editable", true);
-		this._updateFilterFieldsEditMode("edit");
-		this._oModeButton.setSelectedKey("edit");
+		this._updateFilterFieldsEditMode(MODE_EDIT);
+		this._oModeButton.setSelectedKey(MODE_EDIT);
 		this._oCurrentViewKey = this.LIST_KEY;
 		this._bindList();
 
@@ -199,14 +217,8 @@ sap.ui.define([
 			keyboardMode: ListKeyboardMode.Edit,
 			headerToolbar: this._getToolbar(),
 			selectionChange: this._onSelectionChange.bind(this),
-			rememberFocus: false
+			rememberFocus: true
 		});
-		// Override to exclude GroupHeaderListItems from keyboard navigation in grouped mode.
-		// Without this, Edit keyboard mode behaves like Navigation mode when GroupHeaders are present,
-		// as GroupHeaders contain no tabbable elements and fallback to item-level focus.
-		oList._skipGroupHeaderFocus = function() {
-			return this._oViewModel?.getProperty("/grouped") || false;
-		}.bind(this);
 
 		return oList;
 	};
@@ -233,14 +245,14 @@ sap.ui.define([
 		if (!this._oModeButton) {
 			this._oModeButton = new SegmentedButton(this.getId() + "-modeButton", {
 				visible: `{=%{${this.CONTROL_MODEL}>/grouped} === false}`,
-				selectedKey: "edit",
+				selectedKey: MODE_EDIT,
 				items: [
 					new SegmentedButtonItem(this.getId() + "-editModeButton", {
-						key: "edit",
+						key: MODE_EDIT,
 						text: this._getResourceText("adaptFiltersPanel.VIEW_MODE_EDIT")
 					}),
 					new SegmentedButtonItem(this.getId() + "-sortModeButton", {
-						key: "sort",
+						key: MODE_SORT,
 						text: this._getResourceText("adaptFiltersPanel.VIEW_MODE_SORT")
 					})
 				],
@@ -256,7 +268,7 @@ sap.ui.define([
 
 		this._updateFilterFieldsEditMode(sKey);
 
-		const bEditable = sKey === "edit";
+		const bEditable = sKey === MODE_EDIT;
 		this._oViewModel.setProperty("/editable", bEditable);
 
 		this._oListControl.setKeyboardMode(bEditable ? "Edit" : "Navigation");
@@ -264,7 +276,7 @@ sap.ui.define([
 
 	/**
 	 * Updates the edit mode of all filter fields in the list
-	 * @param {string} sMode The mode key ("edit" or "sort")
+	 * @param {string} sMode The mode key (MODE_EDIT or MODE_SORT)
 	 * @private
 	 */
 	AdaptFiltersPanelContent.prototype._updateFilterFieldsEditMode = function(sMode) {
@@ -272,16 +284,23 @@ sap.ui.define([
 
 		aItems.forEach((oItem) => {
 			if (oItem.isA("sap.m.CustomListItem")) {
-				const [oControl] = oItem.getContent()[0].getContent()[1].getItems();
+				const oContent = oItem.getContent()?.[0];
+				const oGrid = oContent?.getContent()?.[1];
+				const aGridItems = oGrid?.getItems();
 
-				if (sMode === "sort") {
+				if (!aGridItems || aGridItems.length === 0) {
+					return;
+				}
+
+				const [oControl] = aGridItems;
+
+				if (sMode === MODE_SORT) {
 					if (oControl.isA("sap.ui.mdc.FilterField")) {
 						oControl.setEditMode("Disabled");
 					} else {
 						oControl.setEnabled?.(false);
 					}
-				}
-				if (sMode === "edit") {
+				} else if (sMode === MODE_EDIT) {
 					if (oControl.isA("sap.ui.mdc.FilterField")) {
 						oControl.setEditMode("Editable");
 					} else {
@@ -325,8 +344,8 @@ sap.ui.define([
 
 				this._selectKey(oComboBox);
 
-				// Workaround. If the item is pressed, item title is set despite clearing selection
-				setTimeout(() => oComboBox.clearSelection(), 100);
+				// Workaround: Clear selection after selection to allow re-selecting the same item
+				setTimeout(() => oComboBox.clearSelection(), RENDERING_DELAY_MS);
 			}
 		});
 
@@ -334,9 +353,6 @@ sap.ui.define([
 	};
 
 	AdaptFiltersPanelContent.prototype._updateAddFilterVisibility = function() {
-		// if (!this._oAddFilterSelect) {
-		// 	return;
-		// }
 		const bHasInvisibleItems = this._getP13nModel().getProperty("/items").some((oItem) => {
 			// Only show add filter section if there are items that are not visible AND not required
 			return !oItem[this.PRESENCE_ATTRIBUTE] && !oItem.required;
@@ -415,7 +431,10 @@ sap.ui.define([
 			});
 		}
 
-		this._oListControl.removeAllItems();
+		if (this._mLabelCache) {
+			this._mLabelCache = {};
+		}
+		this._oListControl.destroyItems();
 		this._oListControl.bindItems(oBindingInfo);
 	};
 
@@ -457,7 +476,7 @@ sap.ui.define([
 	};
 
 	AdaptFiltersPanelContent.prototype._groupHeaderFactory = function(oGroup) {
-		const oGroupHeader = new GroupHeaderListItem({
+		return new GroupHeaderListItem({
 			title: oGroup.text,
 			visible: {
 				path: `${this.P13N_MODEL}>/items`,
@@ -472,27 +491,19 @@ sap.ui.define([
 				}
 			}
 		});
-
-		// Override getTabbables to exclude GroupHeaderListItem from keyboard navigation
-		// This ensures that Edit mode keyboard navigation works correctly in grouped view
-		oGroupHeader.getTabbables = () => {
-			return oGroupHeader.$().filter(() => false);
-		};
-
-		return oGroupHeader;
 	};
-
 
 	/**
 	 * Factory for the list items used in the list.
-	 * @param {string} sId id of the item
+	 * @param {string} _sId id of the item
 	 * @param {sap.ui.model.ContextBinding} oContext context of the item
 	 * @returns {sap.m.CustomListItem} the list item for the current context
 	 */
-	AdaptFiltersPanelContent.prototype._getItemFactory = function(sId, oContext) {
+	AdaptFiltersPanelContent.prototype._getItemFactory = function(_sId, oContext) {
 		const oGrid = this._createItemGrid(oContext);
+		const sIdSuffix = _getIdSuffixFromContext(oContext);
 
-		const oRow = new CustomListItem({
+		const oRow = new CustomListItem(_sId + "-list-item-" + sIdSuffix, {
 			content: oGrid,
 			selected: { path: `${this.P13N_MODEL}>${this.PRESENCE_ATTRIBUTE}` },
 			visible: {
@@ -592,11 +603,22 @@ sap.ui.define([
 
 	/**
 	 * Creates the label for a filter item.
-	 * @param {object} oItem item data for the filter
+	 * @param {sap.ui.model.ContextBinding} oContext context of the item
 	 * @returns {sap.m.Label} the label control
 	 */
-	AdaptFiltersPanelContent.prototype._createFilterLabel = function(oItem) {
-		return new Label({
+	AdaptFiltersPanelContent.prototype._createFilterLabel = function(oContext) {
+		const sIdSuffix = _getIdSuffixFromContext(oContext);
+		const sLabelId = this.getId() + "-filterLabel-" + sIdSuffix;
+
+		let oLabel = this._mLabelCache[sLabelId];
+		if (oLabel && !oLabel.bIsDestroyed) {
+			return oLabel;
+		}
+		if (oLabel && oLabel.bIsDestroyed) {
+			delete this._mLabelCache[sLabelId];
+		}
+
+		oLabel = new Label(sLabelId, {
 			text: { path: `${this.P13N_MODEL}>label` },
 			required: { path: `${this.P13N_MODEL}>required` },
 			showColon: true,
@@ -605,6 +627,10 @@ sap.ui.define([
 			wrappingType: "Hyphenated",
 			vAlign: "Middle"
 		}).addStyleClass("sapUiMDCAdaptFiltersPanelFilterLabel");
+
+		this._mLabelCache[sLabelId] = oLabel;
+
+		return oLabel;
 	};
 
 	/**
@@ -678,9 +704,7 @@ sap.ui.define([
 	 * @returns {sap.ui.layout.Grid} the grid layout containing the label and filter control
 	 */
 	AdaptFiltersPanelContent.prototype._createItemGrid = function(oContext) {
-		const oItem = oContext.getObject();
-
-		const oLabel = this._createFilterLabel(oItem);
+		const oLabel = this._createFilterLabel(oContext);
 		const oFilterControl = this._createFilterControl(oContext);
 
 		if (oFilterControl) {
@@ -688,19 +712,7 @@ sap.ui.define([
 			oLabel.setLabelFor(oFilterControl);
 		}
 
-		const oDeleteButton = this._createDeleteAction(oLabel);
-		const oSortButton = this._createSortAction();
-		const oVisibleButton = this._createVisibilityAction(oContext, oLabel);
-
-		const oActionContainer = new Grid({
-			containerQuery: true,
-			hSpacing: 0.25,
-			defaultSpan: "XL6 L6 M6 S6",
-			content: [oVisibleButton, oDeleteButton, oSortButton]
-		}).setLayoutData(new GridData({
-			span: "XL2 L2 M2 S4"
-		}));
-
+		const oActionContainer = this._createActionContainer(oContext, oLabel);
 		oLabel.setLayoutData(new GridData({
 			span: "XL4 L4 M4 S3"
 		}));
@@ -715,12 +727,39 @@ sap.ui.define([
 		}
 		aContent.push(oActionContainer);
 
-		return new Grid({
+		const sIdSuffix = _getIdSuffixFromContext(oContext);
+		const oGrid = new Grid(this.getId() + "-itemGrid-" + sIdSuffix, {
 			containerQuery: true,
 			hSpacing: 0.5,
 			defaultSpan: "XL3 L3 M3 S12",
 			content: aContent
 		});
+		return oGrid;
+	};
+
+	/**
+	 * Creates the action container with all action buttons.
+	 *
+	 * @param {sap.ui.model.ContextBinding} oContext context of the item
+	 * @param {sap.m.Label} oLabel the label associated with the item, used for aria labeling of action buttons
+	 * @returns {sap.ui.layout.Grid} the grid containing action buttons
+	 * @private
+	 */
+	AdaptFiltersPanelContent.prototype._createActionContainer = function(oContext, oLabel) {
+		const oDeleteButton = this._createDeleteAction(oLabel);
+		const oSortButton = this._createSortAction();
+		const oVisibleButton = this._createVisibilityAction(oContext, oLabel);
+
+		const sIdSuffix = _getIdSuffixFromContext(oContext);
+		const oGrid = new Grid(this.getId() + "-actionContainer-" + sIdSuffix, {
+			containerQuery: true,
+			hSpacing: 0.25,
+			defaultSpan: "XL6 L6 M6 S6",
+			content: [oVisibleButton, oDeleteButton, oSortButton]
+		}).setLayoutData(new GridData({
+			span: "XL2 L2 M2 S4"
+		}));
+		return oGrid;
 	};
 
 	/**
@@ -737,12 +776,10 @@ sap.ui.define([
 			ariaLabelledBy: oLabel,
 			visible: {
 				parts: [
-					`${this.P13N_MODEL}>${this.PRESENCE_ATTRIBUTE}`,
 					`${this.P13N_MODEL}>required`,
-					`${this.CONTROL_MODEL}>/editable`,
-					`${this.P13N_MODEL}>position`
+					`${this.CONTROL_MODEL}>/editable`
 				],
-				formatter: (bVisible, bRequired, bEditable, iPosition) => {
+				formatter: (bRequired, bEditable) => {
 					return !bRequired && bEditable;
 				}
 			},
@@ -785,7 +822,18 @@ sap.ui.define([
 		const bHasConditions = oFilterField?.isA("sap.ui.mdc.FilterField") ? oFilterField.getConditions().length != 0 : oFilterField?._bHasConditions;
 
 		const oAction = new ToggleButton({
-			enabled: oItem.required ? bHasConditions : true,
+			enabled: {
+				parts: [
+					`${this.CONTROL_MODEL}>/editable`,
+					`${this.P13N_MODEL}>required`
+				],
+				formatter: (bEditable, bRequired) => {
+					if (!bEditable) {
+						return false;
+					}
+					return bRequired ? bHasConditions : true;
+				}
+			},
 			pressed: oItem.visible,
 			icon: {
 				path: `${this.P13N_MODEL}>${this.PRESENCE_ATTRIBUTE}`,
@@ -933,13 +981,13 @@ sap.ui.define([
 			const oItems = this._oListControl.getItems().filter((oItem) => oItem.getVisible());
 
 			const fnFocusFilterField = (oItem) => {
-				const oMainGrid = oItem.getContent()[0];
+				const [oMainGrid] = oItem.getContent();
 				if (!oMainGrid) {
 					oItem.focus();
 					return;
 				}
 
-				const oFilterControl = oMainGrid.getContent()[1];
+				const [, oFilterControl] = oMainGrid.getContent();
 				if (!oFilterControl) {
 					oItem.focus();
 					return;
@@ -949,7 +997,7 @@ sap.ui.define([
 				if (oFilterControl.isA("sap.ui.mdc.filterbar.p13n.FilterGroupLayout")) {
 					const aItems = oFilterControl.getItems();
 					if (aItems && aItems.length > 0) {
-						oFilterField = aItems[0];
+						[oFilterField] = aItems;
 					}
 				}
 
@@ -963,7 +1011,7 @@ sap.ui.define([
 			} else if (oItems.length > 0) {
 				fnFocusFilterField(oItems[oItems.length - 1]);
 			} else {
-				//if no item is left, focus the add filter ComboBox
+				// If no item is left, focus the add filter ComboBox
 				this._getAddFilterSection().getContent()[1].focus();
 			}
 		};
@@ -1005,15 +1053,17 @@ sap.ui.define([
 		// Timeout is used to ensure that the rendering is done before focusing.
 		setTimeout(() => {
 			const aListItems = this._oListControl.getItems().filter((oItem) => oItem.getVisible());
-			aListItems[iNewIndex - 1].focus();
-		}, 100);
+			if (aListItems[iNewIndex - 1]) {
+				aListItems[iNewIndex - 1].focus();
+			}
+		}, RENDERING_DELAY_MS);
 	};
 
 	AdaptFiltersPanelContent.prototype._selectKey = function(oComboBox) {
 		const sNewKey = oComboBox.getSelectedKey();
-			if (!sNewKey) {
+		if (!sNewKey) {
 			return;
-			}
+		}
 
 		const oItem = this.getP13nData().find((oItem) => oItem.name === sNewKey);
 		if (oItem) {
@@ -1027,12 +1077,10 @@ sap.ui.define([
 			const aItems = this._getP13nModel().getProperty("/items");
 			const oNewItem = aItems.find((oItem) => oItem.name === sNewKey);
 
-			let iLastIndex = -1;
-			aItems.forEach((oItem, iIndex) => {
-				if (oItem[this.PRESENCE_ATTRIBUTE] && oItem.position >= 0 && iIndex > iLastIndex) {
-				iLastIndex = iIndex;
-				}
-			});
+			// Find last visible item index
+			const iLastIndex = aItems.reduce((iMax, oItem, iIndex) => {
+				return (oItem[this.PRESENCE_ATTRIBUTE] && oItem.position >= 0 && iIndex > iMax) ? iIndex : iMax;
+			}, -1);
 
 			// Remove and insert at new position
 			aItems.splice(aItems.indexOf(oNewItem), 1);
@@ -1047,7 +1095,6 @@ sap.ui.define([
 			});
 
 			// Add newly selected item to the Filters of the binding, to ensure it is constantly shown
-			// TODO: Discuss whether the Filter should be appended OR whether the filters should be reset
 			const oBinding = this._oListControl.getBinding("items");
 
 			if (oBinding.getFilters("Control").length > 0) {
@@ -1058,25 +1105,39 @@ sap.ui.define([
 					], false)
 				);
 			}
-			setTimeout(() => setTimeout(() => {
-				const aAllItems = this._oListControl.getItems();
-				const oAddedItem = aAllItems.find((oListItem) => {
-					const oBindingContext = oListItem.getBindingContext(this.P13N_MODEL);
-					if (!oBindingContext) {
-						return false;
-					}
-					const oModelEntry = oBindingContext.getObject();
-					return oModelEntry && oModelEntry.name === sNewKey;
-				});
-				oAddedItem?.getContent()[0].getContent()[1].getItems()[0].focus();
-			}, 0),
-			0);
+
+			// Focus the newly added filter field after rendering completes
+			this._focusNewlyAddedItem(sNewKey);
 		}
-		const sLabel = this.getP13nData().find((oItem) => oItem.name === sNewKey)?.label;
+	};
+
+	/**
+	 * Focuses the newly added filter field after it has been rendered
+	 * @param {string} sKey The key of the newly added item
+	 * @private
+	 */
+	AdaptFiltersPanelContent.prototype._focusNewlyAddedItem = function(sKey) {
+		setTimeout(() => {
+			const aAllItems = this._oListControl.getItems();
+			const oAddedItem = aAllItems.find((oListItem) => {
+				const oBindingContext = oListItem.getBindingContext(this.P13N_MODEL);
+				if (!oBindingContext) {
+					return false;
+				}
+				const oModelEntry = oBindingContext.getObject();
+				return oModelEntry?.name === sKey;
+			});
+
+			if (oAddedItem) {
+				const oFilterField = oAddedItem.getContent()?.[0]?.getContent()?.[1]?.getItems()?.[0];
+				oFilterField?.focus();
+			}
+		}, RENDERING_DELAY_MS);
+		const sLabel = this.getP13nData().find((oItem) => oItem.name === sKey)?.label;
 		this.oInvisibleMessage.announce(this._getResourceText("p13nDialog.ADAPT_FILTER_ADD_ANNOUNCE", [sLabel]), InvisibleMessageMode.Assertive);
 	};
 
-	AdaptFiltersPanelContent.prototype._updatePresence = function(sKey, bAdd, iNewIndex) {
+	AdaptFiltersPanelContent.prototype._updatePresence = function(sKey, bAdd) {
 		const aData = this._getP13nModel().getProperty("/items");
 		const iIndex = aData.findIndex((oItem) => oItem.name === sKey);
 		if (iIndex < 0) {
@@ -1254,19 +1315,41 @@ sap.ui.define([
 		}
 	};
 
-	AdaptFiltersPanelContent.prototype._updateMovement = function(bEnableReorder) {
+	AdaptFiltersPanelContent.prototype._updateMovement = function() {
 		return this;
 	};
 
 	AdaptFiltersPanelContent.prototype.exit = function() {
 		QueryPanel.prototype.exit.apply(this, arguments);
+
+		// Destroy all control instances
 		this._oViewModel?.destroy();
 		this._oListControl?.destroy();
 		this._oAddFilterSelect?.destroy();
+		this._oToolbar?.destroy();
+		this._oModeButton?.destroy();
+		this._oKeySelect?.destroy();
+		this._oInvText?.destroy();
 
+		// Destroy and clear label cache
+		if (this._mLabelCache) {
+			Object.keys(this._mLabelCache).forEach((sKey) => {
+				const oLabel = this._mLabelCache[sKey];
+				if (oLabel && !oLabel.bIsDestroyed) {
+					oLabel.destroy();
+				}
+			});
+			this._mLabelCache = null;
+		}
+
+		// Clear all references
 		this._oViewModel = null;
 		this._oListControl = null;
 		this._oAddFilterSelect = null;
+		this._oToolbar = null;
+		this._oModeButton = null;
+		this._oKeySelect = null;
+		this._oInvText = null;
 	};
 
 	function _getKeyFromContext(oContext) {

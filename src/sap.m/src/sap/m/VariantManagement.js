@@ -2583,6 +2583,8 @@ sap.ui.define([
 				this.oManagementTable.setBusy(true);
 				oResult.finally(function() {
 					this.oManagementTable.setBusy(false);
+					//Rebind table to display refreshed data after lazy loading variants
+					this._rebindVMTable(true);
 				}.bind(this));
 			}
 		}

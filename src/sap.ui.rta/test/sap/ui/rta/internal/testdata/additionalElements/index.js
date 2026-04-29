@@ -4,32 +4,8 @@ window['sap-ui-config'].resourceroots = {
 };
 window['sap-ui-config'].flexibilityServices = '[{"connector": "LocalStorageConnector"}]';
 window['sap-ui-config'].async = 'true';
-document.write('<script src="' + document.location.pathname.match(/(.*)\/test-resources\//)[1] + '/resources/sap-ui-core.js"><' + '/script>');
-
-sap.ui.require([
-	"sap/m/Shell",
-	"sap/ui/core/ComponentContainer",
-	"sap/ui/core/Component",
-	"sap/ui/core/Core"
-], function(Shell, ComponentContainer, Component, Core) {
-	return Core.ready().then(() => {
-		return Component.create({
-			name: "sap.ui.rta.test.additionalElements",
-			componentData: {
-				"showAdaptButton" : true
-			}
-		});
-	}).then((oComponent) => {
-		return new ComponentContainer({
-			height : "100%",
-			component : oComponent,
-			async: true
-		})
-	})
-	.then((oComponentContainer) => {
-		// initialize the UI component
-		return new Shell({
-			app: oComponentContainer
-		}).placeAt("content");
-	})
-});
+window["sap-ui-config"].onInit="module:rta/internal/testdata/additionalElements/standalone_init"
+const basePath = document.location.pathname.match(/(.*)\/test-resources\//)[1];
+const script = document.createElement("script");
+script.src = `${window.location.origin}${basePath}/resources/sap-ui-core.js`;
+document.head.appendChild(script);

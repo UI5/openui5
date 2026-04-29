@@ -4070,4 +4070,57 @@ sap.ui.define([
 		// act
 		oDialog.open();
 	});
+
+	QUnit.module("ScrollContainer inside Dialog with vertical scrolling disabled", {
+		beforeEach: function() {
+			sinon.config.useFakeTimers = false;
+		},
+		afterEach: function() {
+			sinon.config.useFakeTimers = true;
+		}
+	});
+
+	QUnit.test("ScrollContainer content should be scrollable when Dialog scrolling is disabled", function(assert) {
+		const done = assert.async();
+
+		// arrange
+		const oScrollContainer = new ScrollContainer({
+			vertical: true,
+			content: [
+				new Button({ text: "Button", width: "400px" }),
+				new Button({ text: "Button", width: "400px" }),
+				new Button({ text: "Button", width: "400px" }),
+				new Button({ text: "Button", width: "400px" }),
+				new Button({ text: "Button", width: "400px" }),
+				new Button({ text: "Button", width: "400px" }),
+				new Button({ text: "Button", width: "400px" })
+			]
+		});
+
+		const oDialog = new Dialog({
+			title: "My Dialog",
+			contentWidth: "300px",
+			contentHeight: "200px",
+			verticalScrolling: false,
+			horizontalScrolling: false,
+			content: oScrollContainer,
+			beginButton: new Button({ text: "Close" })
+		});
+
+		oDialog.attachAfterOpen(function () {
+			// assert
+			var oScrollContainerDom = oScrollContainer.getDomRef();
+			var oScrollContainerInner = oScrollContainerDom.firstChild;
+
+			assert.ok(oScrollContainerDom.offsetHeight < oScrollContainerInner.scrollHeight, "ScrollContainer has vertical scroll");
+			assert.ok(oScrollContainerDom.offsetWidth < oScrollContainerInner.scrollWidth, "ScrollContainer has horizontal scroll");
+
+			// cleanup
+			oDialog.destroy();
+			done();
+		});
+
+		// act
+		oDialog.open();
+	});
 });

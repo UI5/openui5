@@ -927,6 +927,42 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("toggleOpenState event parameters when collapsing while scrolled to bottom", async function(assert) {
+		const oTable = this.oTable;
+		const iLastRowIndex = oTable._getTotalRowCount() - 1;
+
+		oTable.expand(iLastRowIndex);
+		await oTable.qunit.whenRenderingFinished();
+		assert.strictEqual(oTable._getTotalRowCount(), 9, "Expanded: Total row count");
+		assert.ok(oTable.isExpanded(iLastRowIndex), "Last row is expanded");
+
+		oTable.setFirstVisibleRow(oTable._getMaxFirstRenderedRowIndex());
+		await oTable.qunit.whenRenderingFinished();
+		assert.strictEqual(oTable._getFirstRenderedRowIndex(), 4, "Scrolled to bottom");
+
+		const oExpandedRow = oTable.getRows().find((oRow) => oRow.getIndex() === iLastRowIndex);
+		const oRowContext = oExpandedRow.getBindingContext();
+
+		assert.ok(oExpandedRow, "Found the expanded row");
+		assert.strictEqual(oExpandedRow.getIndex(), iLastRowIndex, "Row index before collapse");
+
+		let oReceivedEvent;
+		oTable.attachToggleOpenState(function(oEvent) {
+			oReceivedEvent = {
+				rowIndex: oEvent.getParameter("rowIndex"),
+				rowContext: oEvent.getParameter("rowContext"),
+				expanded: oEvent.getParameter("expanded")
+			};
+		});
+
+		oExpandedRow.toggleExpandedState();
+
+		assert.ok(oReceivedEvent, "toggleOpenState event was fired");
+		assert.strictEqual(oReceivedEvent.rowIndex, iLastRowIndex, "rowIndex parameter");
+		assert.strictEqual(oReceivedEvent.rowContext, oRowContext, "rowContext parameter");
+		assert.strictEqual(oReceivedEvent.expanded, false, "expanded parameter");
+	});
+
 	QUnit.test("Result of expand/collapse a single row", function(assert) {
 		const that = this;
 

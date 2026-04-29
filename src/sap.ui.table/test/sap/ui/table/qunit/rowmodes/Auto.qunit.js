@@ -612,4 +612,34 @@ sap.ui.define([
 			]);
 		});
 	}
+
+	QUnit.module("Per-instance adjustRowCountToAvailableSpace");
+
+	QUnit.test("Instances do not share the throttled function", function(assert) {
+		const oRowMode1 = new AutoRowMode();
+		const oRowMode2 = new AutoRowMode();
+
+		assert.notStrictEqual(oRowMode1.adjustRowCountToAvailableSpace, oRowMode2.adjustRowCountToAvailableSpace);
+
+		oRowMode1.destroy();
+		oRowMode2.destroy();
+	});
+
+	QUnit.test("Scheduling on one instance does not cancel the other", function(assert) {
+		const done = assert.async();
+		let bCallback1Called = false;
+		let bCallback2Called = false;
+
+		const fnThrottled1 = TableUtils.throttleFrameWise(function() { bCallback1Called = true; });
+		const fnThrottled2 = TableUtils.throttleFrameWise(function() { bCallback2Called = true; });
+
+		fnThrottled1();
+		fnThrottled2();
+
+		window.requestAnimationFrame(function() {
+			assert.ok(bCallback1Called, "First callback executed");
+			assert.ok(bCallback2Called, "Second callback executed");
+			done();
+		});
+	});
 });

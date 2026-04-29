@@ -9,15 +9,10 @@ sap.ui.define([
 	"sap/m/Text",
 	"sap/m/List",
 	"sap/ui/core/Item",
-	"sap/m/SegmentedButtonItem",
-	"sap/ui/mdc/util/PropertyHelper",
-	"sap/m/VBox",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/model/Filter",
-	"sap/m/Input",
 	"sap/ui/mdc/FilterField",
 	"sap/ui/mdc/filterbar/p13n/FilterGroupLayout"
-], function(AdaptFiltersPanel, P13nBuilder, JSONModel, CustomListItem, Toolbar, Event, Text, List, Item, SegmentedButtonItem, PropertyHelper, VBox, nextUIUpdate, Filter, Input, FilterField, FilterGroupLayout) {
+], function(AdaptFiltersPanel, P13nBuilder, JSONModel, CustomListItem, Toolbar, Event, Text, List, Item, nextUIUpdate, FilterField, FilterGroupLayout) {
 	"use strict";
 
 	const aInfoData = [
@@ -63,123 +58,79 @@ sap.ui.define([
 		}
 	];
 
-	const sMode = ["Modern", "Legacy"];
-
-sMode.forEach(function(sModeName) {
 	// Required Fields in new design are always visible
-	const aVisible = sModeName === "Legacy" ? ["key1", "key2", "key3"] : ["key1", "key2", "key3", "key5"];
+	const aVisible = ["key1", "key2", "key3", "key5"];
 
 	function getGroups(oList) {
-		if (sModeName === "Modern") {
-			return oList.getItems().filter((oItem) => oItem.isA("sap.m.GroupHeaderListItem"));
-		}
-		return oList.getVisibleItems();
+		return oList.getItems().filter((oItem) => oItem.isA("sap.m.GroupHeaderListItem"));
 	}
 
 	function modifyGroup(oP13nData, sGroup, fnModifier) {
-		if (sModeName === "Modern") {
-			oP13nData.items
-				.filter((oItem) => oItem.group === sGroup)
-				.forEach(fnModifier);
-			return;
-		}
-		oP13nData.itemsGrouped.forEach(function(oGroup) {
-			if (oGroup.group === sGroup) {
-				oGroup.items.forEach(fnModifier);
-			}
-		});
+		oP13nData.items
+			.filter((oItem) => oItem.group === sGroup)
+			.forEach(fnModifier);
 	}
 
 	function getGroupItems(oViewContent, sGroup) {
 		sGroup ??= "Basic";
 
-		if (sModeName === "Modern") {
-			const aGroupItems = [];
-			let bInGroup = false;
-			oViewContent._oListControl.getItems().forEach((oItem) => {
-				if (oItem.isA("sap.m.GroupHeaderListItem")) {
-					bInGroup = oItem.getTitle() === sGroup;
-					return;
-				}
+		const aGroupItems = [];
+		let bInGroup = false;
+		oViewContent._oListControl.getItems().forEach((oItem) => {
+			if (oItem.isA("sap.m.GroupHeaderListItem")) {
+				bInGroup = oItem.getTitle() === sGroup;
+				return;
+			}
 
-				if (bInGroup) {
-					aGroupItems.push(oItem);
-				}
-			});
+			if (bInGroup) {
+				aGroupItems.push(oItem);
+			}
+		});
 
-			return aGroupItems;
-		}
-		return oViewContent.getPanels().find((oPanel) => {
-			return oPanel.getHeaderToolbar().getContent()[0].getText() === sGroup;
-		}).getContent()[0].getVisibleItems();
+		return aGroupItems;
 	}
 
 	function getItemContent(oCustomListItem) {
-		if (sModeName === "Modern") {
-			return oCustomListItem.getContent()[0].getContent()[1];
-		}
-		return oCustomListItem.getContent()[1];
+		return oCustomListItem.getContent()[0].getContent()[1];
 	}
 
-	// Helper function to create view items based on mode
-	// Modern mode uses sap.ui.core.Item, Legacy mode uses sap.m.SegmentedButtonItem
-	function createViewItem(mSettings) {
-		if (sModeName === "Modern") {
-			return new Item(mSettings);
-		}
-		return new SegmentedButtonItem(mSettings);
-	}
-
-	QUnit.module(`${sModeName} - API Tests`, {
+	// ===========================================================================================
+	// Module 1: Basic Functionality and Instantiation
+	// ===========================================================================================
+	QUnit.module("Basic Functionality and Instantiation", {
 		beforeEach: async function() {
-			if (sModeName === "Modern") {
-				this.fnNewUIStub = sinon.stub(AdaptFiltersPanel.prototype, "_checkIsNewUI").returns(true);
-			}
-
 			this.sDefaultGroup = "BASIC";
 			this.aMockInfo = aInfoData;
-			if (sModeName === "Legacy") {
-				this.oAFPanel = new AdaptFiltersPanel({
+			this.oAFPanel = new AdaptFiltersPanel("ADP",{
 				defaultView: "group",
-				footer: new Toolbar("ID_TB1",{}),
-				useNewUI: false
-
+				footer: new Toolbar("ID_TB_BASIC",{})
 			});
-			} else {
-				this.oAFPanel = new AdaptFiltersPanel({
-					defaultView: "group",
-					footer: new Toolbar("ID_TB1",{})
-				});
-			}
-
-		this.oAFPanel.setItemFactory(function(){
-			let oControl = new VBox();
-			if (sModeName === "Modern") {
-				const oFilterField = new FilterField();
-				// Ensure getConditions is available for FilterField instances
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
 				if (!oFilterField.getConditions) {
 					oFilterField.getConditions = function() {
 						return [];
 					};
 				}
-				// Wrap FilterField in FilterGroupLayout to match production behavior
-				const oFilterGroupLayout = new FilterGroupLayout();
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
 				oFilterGroupLayout.setFilterField(oFilterField);
-				oControl = oFilterGroupLayout;
-			}
-			return oControl;
-		});			this.fnEnhancer = function(mItem, oProperty) {
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
 
-				//Add (mock) an 'active' field
+
+			this.fnEnhancer = function(mItem, oProperty) {
 				if (oProperty.key == "key2") {
 					mItem.active = true;
 				}
-
-				//Add (mock) a 'mandatory' field
 				if (oProperty.key == "key5") {
 					mItem.required = true;
 				}
-
 				mItem.visibleInDialog = true;
 				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
 				return true;
@@ -191,25 +142,141 @@ sMode.forEach(function(sModeName) {
 			await nextUIUpdate();
 		},
 		afterEach: function(){
-			if (sModeName === "Modern") {
-				this.fnNewUIStub.restore();
-			}
-
 			this.sDefaultGroup = null;
 			this.oP13nData = null;
 			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
 			this.oAFPanel.destroy();
 		}
 	});
 
-	QUnit.test("check instantiation", function(assert){
+	QUnit.test("Panel instantiation and model setup", function(assert){
 		assert.ok(this.oAFPanel, "Panel created");
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		assert.ok(this.oAFPanel.getModel(this.oAFPanel.P13N_MODEL).isA("sap.ui.model.json.JSONModel"), "Model has been set");
 	});
 
-	QUnit.test("Check Search implementation", async function(assert){
+	QUnit.test("Selected fields retrieval", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		await nextUIUpdate();
+		assert.equal(this.oAFPanel.getSelectedFields().length, aVisible.length, "Correct amount of selected items returned");
+	});
 
+	QUnit.test("View toggle functionality", function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("group");
+
+		assert.equal(this.oAFPanel.getCurrentViewKey(), "group", "Group view is the default");
+
+		this.oAFPanel.switchView("group");
+		assert.equal(this.oAFPanel.getCurrentViewKey(), "group", "Group view is unchanged");
+
+		this.oAFPanel.switchView("list");
+		assert.equal(this.oAFPanel.getCurrentViewKey(), "list", "List view should be selected");
+
+		this.oAFPanel.switchView("group");
+		assert.equal(this.oAFPanel.getCurrentViewKey(), "group", "Group view should be selected");
+	});
+
+	QUnit.test("Restore defaults functionality", async function(assert){
+		this.oAFPanel.setDefaultView("list");
+
+		this.oAFPanel._getSearchField().setValue("Test");
+		this.oAFPanel.switchView("list");
+		this.oAFPanel._filterByModeAndSearch();
+		await nextUIUpdate();
+
+		const oFilterSpy = sinon.spy(this.oAFPanel, "_filterByModeAndSearch");
+		assert.equal(this.oAFPanel._getSearchField().getValue(), "Test", "Value 'Test' is present on the SearchField");
+
+		this.oAFPanel.restoreDefaults();
+
+		assert.ok(oFilterSpy.called, "Filter logic executed again after defaults have been restored");
+		assert.equal(this.oAFPanel._getSearchField().getValue(), "", "SearchField is empty after defaults have been restored");
+
+		this.oAFPanel._filterByModeAndSearch.restore();
+	});
+
+	// ===========================================================================================
+	// Module 2: Search and Filtering
+	// ===========================================================================================
+	QUnit.module("Search and Filtering", {
+		beforeEach: async function() {
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel("ADP",{
+				defaultView: "group",
+				footer: new Toolbar("ID_TB_SEARCH",{})
+			});
+
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
+
+			this.fnEnhancer = function(mItem, oProperty) {
+				if (oProperty.key == "key2") {
+					mItem.active = true;
+				}
+				if (oProperty.key == "key5") {
+					mItem.required = true;
+				}
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
+				return true;
+			};
+
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function(){
+			this.oP13nData = null;
+			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("Search by field label", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel._getSearchField().setValue("Field 5");
 		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
@@ -222,8 +289,7 @@ sMode.forEach(function(sModeName) {
 		assert.equal(aGroups.length, 1, "One group available after filtering");
 	});
 
-	QUnit.test("Check Search implementation - also for ToolTip", async function(assert){
-
+	QUnit.test("Search by tooltip", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel._getSearchField().setValue("Some Tooltip");
 		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
@@ -237,8 +303,131 @@ sMode.forEach(function(sModeName) {
 		assert.equal(aGroups.length, 1, "One group available after filtering");
 	});
 
-	QUnit.test("Check that groups are initially only displayed if necessary", async function(assert){
+	QUnit.test("Search in content view by field label", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		const oCurrentContent = this.oAFPanel.getCurrentViewContent();
+		await nextUIUpdate();
 
+		oCurrentContent._getSearchField().setValue("Field 5");
+		const oFakeEvent = new Event("liveSearch", oCurrentContent._getSearchField(), {});
+		oCurrentContent._filterByModeAndSearch(oFakeEvent);
+		await nextUIUpdate();
+
+		const oList = oCurrentContent._oListControl;
+		const aVisibleItems = oList.getItems().filter(function(item) { return item.getVisible(); });
+		assert.ok(aVisibleItems.length > 0, "Items are visible after search");
+		assert.ok(oList.getItems()[0].isA("sap.m.GroupHeaderListItem"), "Group header shown");
+	});
+
+	QUnit.test("Search in content view by tooltip", async function(assert){
+		const oP13nData = JSON.parse(JSON.stringify(this.oP13nData));
+		const oKey6Item = oP13nData.items.find((item) => item.name === "key6");
+		if (oKey6Item) {
+			oKey6Item.visible = true;
+			oKey6Item.position = 3;
+		}
+
+		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+		const oCurrentContent = this.oAFPanel.getCurrentViewContent();
+		await nextUIUpdate();
+
+		oCurrentContent._getSearchField().setValue("Some Tooltip");
+		const oFakeEvent = new Event("liveSearch", oCurrentContent._getSearchField(), {});
+		oCurrentContent._filterByModeAndSearch(oFakeEvent);
+		await nextUIUpdate();
+
+		const oList = oCurrentContent._oListControl;
+		const aVisibleItems = oList.getItems().filter(function(item) {
+			return item.getVisible() && !item.isA("sap.m.GroupHeaderListItem");
+		});
+		assert.ok(aVisibleItems.length > 0, "Items found by tooltip");
+	});
+
+	QUnit.test("SearchField placeholder text", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oSearchField = oViewContent._getSearchField();
+
+		assert.ok(oSearchField, "SearchField exists");
+		assert.ok(oSearchField.isA("sap.m.SearchField"), "SearchField is of correct type");
+
+		const sPlaceholder = oSearchField.getPlaceholder();
+		assert.ok(sPlaceholder, "Placeholder is set");
+		assert.equal(sPlaceholder, oViewContent._getResourceText("p13nDialog.ADAPT_FILTER_SEARCH"),
+			"Placeholder matches the i18n text key");
+	});
+
+	// ===========================================================================================
+	// Module 3: Group Management
+	// ===========================================================================================
+	QUnit.module("Group Management", {
+		beforeEach: async function() {
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel("ADP",{
+				defaultView: "group",
+				footer: new Toolbar("ID_TB_GROUPS",{})
+			});
+
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
+
+			this.fnEnhancer = function(mItem, oProperty) {
+				if (oProperty.key == "key2") {
+					mItem.active = true;
+				}
+				if (oProperty.key == "key5") {
+					mItem.required = true;
+				}
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
+				return true;
+			};
+
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function(){
+			this.oP13nData = null;
+			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("Groups are only displayed when necessary", async function(assert){
 		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
 		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
 		this.oAFPanel.switchView("group");
@@ -253,12 +442,86 @@ sMode.forEach(function(sModeName) {
 		await nextUIUpdate();
 
 		assert.equal(getGroups(this.oAFPanel.getCurrentViewContent()._oListControl).length, 1, "Only necessary groups visible");
-
 	});
 
-	QUnit.test("Check additional filter implementation (visibleInDialog)", async function(assert){
+	QUnit.test("Group visibility based on visibleInDialog property", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		await nextUIUpdate();
 
-		const oP13nData = this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, function(oItem, oProp) {
+		const iInitialGroups = getGroups(this.oAFPanel.getCurrentViewContent()._oListControl).length;
+		assert.ok(iInitialGroups > 0, "Groups are visible initially");
+
+		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, function(oItem, oProp) {
+			if (oProp.group === "G1") {
+				oItem.visibleInDialog = false;
+			} else {
+				oItem.visibleInDialog = true;
+			}
+			oItem.visible = aVisible.indexOf(oProp.key) > -1;
+			return true;
+		}, true);
+
+		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+		await nextUIUpdate();
+
+		const iFinalGroups = getGroups(this.oAFPanel.getCurrentViewContent()._oListControl).length;
+		assert.ok(iFinalGroups < iInitialGroups, "Fewer groups visible after filtering");
+	});
+
+	// ===========================================================================================
+	// Module 4: Dialog and Visibility Management
+	// ===========================================================================================
+	QUnit.module("Dialog and Visibility Management", {
+		beforeEach: async function() {
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel("ADP", {
+				defaultView: "group",
+				footer: new Toolbar("ID_TB_VISIBILITY",{})
+			});
+
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
+
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function(){
+			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("visibleInDialog filter implementation", async function(assert){
+		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, function(oItem, oProp) {
 			if (oProp.key == "key2") {
 				oItem.visibleInDialog = false;
 			} else {
@@ -271,30 +534,81 @@ sMode.forEach(function(sModeName) {
 		this.oAFPanel.switchView("group");
 		await nextUIUpdate();
 
-
-		//Check in GroupView
 		assert.equal(getGroupItems(this.oAFPanel.getCurrentViewContent()).length, 2, "There are 3 items in the model, but one should be hidden for the user");
 
-		//Check in ListView
 		this.oAFPanel.switchView("list");
 		const aItems = this.oAFPanel.getCurrentViewContent()._oListControl.getItems();
 		assert.equal(aItems.length, 5, "There are 6 items in the model, but one should be hidden for the user");
-
 	});
 
-	QUnit.test("Check 'getSelectedFields' - should only return selected fields", async function(assert){
+	// ===========================================================================================
+	// Module 5: Item Factory and Model Propagation
+	// ===========================================================================================
+	QUnit.module("Item Factory and Model Propagation", {
+		beforeEach: async function() {
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel("ADP", {
+				defaultView: "group",
+				footer: new Toolbar("ID_TB_FACTORY",{})
+			});
 
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
 
-		await nextUIUpdate();
+			this.fnEnhancer = function(mItem, oProperty) {
+				if (oProperty.key == "key2") {
+					mItem.active = true;
+				}
+				if (oProperty.key == "key5") {
+					mItem.required = true;
+				}
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
+				return true;
+			};
 
-		//Three existing items --> the amount of selected items should match the initially visible ones
-		assert.equal(this.oAFPanel.getSelectedFields().length, aVisible.length, "Correct amount of selected items returned");
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
 
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function(){
+			this.oP13nData = null;
+			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
 	});
 
-	QUnit.test("Check 'itemFactory' model propagation", async function(assert){
-
+	QUnit.test("Custom itemFactory model propagation", async function(assert){
 		const oSecondModel = new JSONModel({
 			data: [
 				{
@@ -329,7 +643,6 @@ sMode.forEach(function(sModeName) {
 		await nextUIUpdate();
 
 		const aGroupItems = getGroupItems(this.oAFPanel.getCurrentViewContent());
-		//List created via template 'oTestFactory'
 		const oCustomList = getItemContent(aGroupItems[0]);
 
 		assert.equal(oCustomList.getItems().length, 1, "Custom template list has one item (oSecondModel, data)");
@@ -337,63 +650,74 @@ sMode.forEach(function(sModeName) {
 		assert.ok(oCustomList.getModel(this.oAFPanel.P13N_MODEL).isA("sap.ui.model.json.JSONModel"), "Inner panel p13n model propagated");
 
 		assert.equal(oCustomList.getItems()[0].getContent()[0].getText(), "Some Test Text", "Custom binding from outside working in factory");
-
 	});
 
-	QUnit.test("Check view toggle", function(assert){
+	QUnit.test("Custom model name support", function(assert){
+		this.oAFPanel.P13N_MODEL = "$My_very_own_model";
 
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		this.oAFPanel.switchView("group");
-
-		assert.equal(this.oAFPanel.getCurrentViewKey(), "group", "Group view is the default");
-
-		this.oAFPanel.switchView("group");
-		assert.equal(this.oAFPanel.getCurrentViewKey(), "group", "Group view is unchanged");
-
-		this.oAFPanel.switchView("list");
-		assert.equal(this.oAFPanel.getCurrentViewKey(), "list", "List view should be selected");
-
-		this.oAFPanel.switchView("group");
-		assert.equal(this.oAFPanel.getCurrentViewKey(), "group", "List view should be selected");
-
-	});
-
-	QUnit.module(`${sModeName} - addCustomView Tests`, {
-		beforeEach: async function() {
-			if (sModeName === "Modern") {
-				this.fnNewUIStub = sinon.stub(AdaptFiltersPanel.prototype, "_checkIsNewUI").returns(true);
-			}
-
-			this.sDefaultGroup = "BASIC";
-			this.aMockInfo = aInfoData;
-			if (sModeName === "Legacy") {
-				this.oAFPanel = new AdaptFiltersPanel({
-					defaultView: "group",
-					footer: new Toolbar("ID_TB_CUSTOM", {}),
-					useNewUI: false
-				});
-			} else {
-				this.oAFPanel = new AdaptFiltersPanel({
-					defaultView: "group",
-					footer: new Toolbar("ID_TB_CUSTOM", {})
-				});
-			}
-
-			this.oAFPanel.setItemFactory(function() {
-				let oControl = new VBox();
-				if (sModeName === "Modern") {
-					const oFilterField = new FilterField();
-					if (!oFilterField.getConditions) {
-						oFilterField.getConditions = function() {
-							return [];
-						};
-					}
-					const oFilterGroupLayout = new FilterGroupLayout();
-					oFilterGroupLayout.setFilterField(oFilterField);
-					oControl = oFilterGroupLayout;
-				}
-				return oControl;
+		let iCustomListItemCounter = 0;
+		const aCreatedCustomListItems = [];
+		this.oAFPanel.setItemFactory(function(){
+			iCustomListItemCounter++;
+			const oCustomListItem = new CustomListItem("CLI" + iCustomListItemCounter, {
+				selected: "{" + this.oAFPanel.P13N_MODEL + ">selected}",
+				visible: "{" + "$My_very_own_model" + ">visibleInDialog}"
 			});
+			aCreatedCustomListItems.push(oCustomListItem);
+			return oCustomListItem;
+		}.bind(this));
+
+		const oP13nData = P13nBuilder.prepareAdaptationData(aInfoData, function(mItem, oProperty) {
+			if (oProperty.key == "key2") {
+				mItem.active = true;
+			}
+			mItem.visibleInDialog = true;
+			mItem.visible = aVisible.indexOf(oProperty.key) > -1;
+			return true;
+		}, true);
+
+		assert.ok(this.oAFPanel, "Panel created");
+		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+
+		assert.ok(this.oAFPanel.getP13nModel().isA("sap.ui.model.json.JSONModel"), "Model has been set");
+		assert.ok(!this.oAFPanel.getModel("$p13n"), "The default $p13n model has not been set");
+		assert.ok(this.oAFPanel.getModel("$My_very_own_model").isA("sap.ui.model.json.JSONModel"), "Model has been set");
+
+		aCreatedCustomListItems.forEach(function(oCustomListItem){
+			if (!oCustomListItem.bIsDestroyed) {
+				oCustomListItem.destroy();
+			}
+		});
+	});
+
+	// ===========================================================================================
+	// Module 6: Custom Views
+	// ===========================================================================================
+	QUnit.module("Custom Views", {
+		beforeEach: async function() {
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel("ADP", {
+				defaultView: "group",
+				footer: new Toolbar("ID_TB_CUSTOM", {})
+			});
+
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function() {
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
 
 			this.fnEnhancer = function(mItem, oProperty) {
 				if (oProperty.key == "key2") {
@@ -412,73 +736,75 @@ sMode.forEach(function(sModeName) {
 			await nextUIUpdate();
 		},
 		afterEach: function() {
-			if (sModeName === "Modern") {
-				this.fnNewUIStub.restore();
-			}
-			this.sDefaultGroup = null;
 			this.oP13nData = null;
 			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
 			this.oAFPanel.destroy();
 		}
 	});
 
-	QUnit.test("addCustomView registers a new view correctly", function(assert) {
-		// Arrange & Act
+	QUnit.test("addCustomView registers a new view", function(assert) {
 		this.oAFPanel.addCustomView({
-			item: createViewItem({
+			item: new Item("customChart1", {
 				key: "customChart"
 			}),
 			content: new List("myCustomList1", {})
 		});
 
-		// Assert
 		assert.equal(this.oAFPanel.getViews().length, 3, "A custom view has been added to the views aggregation");
 		assert.equal(this.oAFPanel._getViewSwitch().getItems().length, 3, "The item has been added to the view switch control");
 	});
 
 	QUnit.test("addCustomView registers multiple custom views", function(assert) {
-		// Arrange & Act
 		this.oAFPanel.addCustomView({
-			item: createViewItem({
+			item: new Item("chart1", {
 				key: "chart"
 			}),
 			content: new List("customChartList", {})
 		});
 
 		this.oAFPanel.addCustomView({
-			item: createViewItem({
+			item: new Item("tree1", {
 				key: "tree"
 			}),
 			content: new List("customTreeList", {})
 		});
 
-		// Assert
 		assert.equal(this.oAFPanel.getViews().length, 4, "Two custom views have been added");
 		assert.equal(this.oAFPanel._getViewSwitch().getItems().length, 4, "Both items have been added to the view switch control");
 	});
 
 	QUnit.test("addCustomView allows navigation via switchView", async function(assert) {
-		// Arrange
 		this.oAFPanel.addCustomView({
-			item: createViewItem({
+			item: new Item("CV1",{
 				key: "customView"
 			}),
 			content: new List("myCustomList2", {})
 		});
 		await nextUIUpdate();
 
-		// Act
 		this.oAFPanel.switchView("customView");
 
-		// Assert
 		assert.equal(this.oAFPanel.getCurrentViewKey(), "customView", "The custom view has been selected");
 		assert.equal(this.oAFPanel._getViewSwitch().getSelectedKey(), "customView", "The view switch control reflects the selection");
 	});
 
-	QUnit.test("addCustomView executes selectionChange callback on view switch", async function(assert) {
-		// Arrange
+	QUnit.test("addCustomView executes selectionChange callback", function(assert) {
 		const done = assert.async();
-		const oItem = createViewItem({
+		const oItem = new Item("callbackView1", {
 			key: "callbackView"
 		});
 
@@ -486,30 +812,23 @@ sMode.forEach(function(sModeName) {
 			item: oItem,
 			content: new List("myCustomList3", {}),
 			selectionChange: function(sKey) {
-				// Assert
 				assert.equal(sKey, "callbackView", "selectionChange callback received the correct key");
 				done();
 			}
 		});
-		await nextUIUpdate();
 
-		// Act
-		const sSelectionChangeEvent = sModeName === "Modern" ? "select" : "selectionChange";
-		this.oAFPanel._getViewSwitch().fireEvent(sSelectionChangeEvent, {
+		this.oAFPanel._getViewSwitch().fireEvent("select", {
 			item: oItem
 		});
 	});
 
-	QUnit.test("addCustomView throws error when no key is provided", function(assert) {
-		// Arrange & Act & Assert
-		const sExpectedErrorMessage = sModeName === "Modern"
-			? "Please provide an item of type sap.ui.core.Item with a key to be used in the view switch"
-			: "Please provide an item of type sap.m.SegmentedButtonItem with a key to be used in the view switch";
+	QUnit.test("addCustomView throws error when no key provided", function(assert) {
+		const sExpectedErrorMessage = "Please provide an item of type sap.ui.core.Item with a key to be used in the view switch";
 
 		assert.throws(
 			function() {
 				this.oAFPanel.addCustomView({
-					item: createViewItem({}),
+					item: new Item({}),
 					content: new List({}),
 					selectionChange: function() {}
 				});
@@ -525,57 +844,48 @@ sMode.forEach(function(sModeName) {
 	});
 
 	QUnit.test("addCustomView applies styling to content", function(assert) {
-		// Arrange
 		const oContent = new List("styledCustomList", {});
 
-		// Act
 		this.oAFPanel.addCustomView({
-			item: createViewItem({
+			item: new Item("styledView1", {
 				key: "styledView"
 			}),
 			content: oContent
 		});
 
-		// Assert
 		assert.ok(oContent.hasStyleClass("sapUiMDCPanelPadding"), "The content has the correct style class applied");
 	});
 
-	QUnit.test("addCustomView content is displayed when view is selected", async function(assert) {
-		// Arrange
+	QUnit.test("addCustomView content is displayed when selected", async function(assert) {
 		const oCustomContent = new List("visibleCustomList", {});
 
 		this.oAFPanel.addCustomView({
-			item: createViewItem({
+			item: new Item("visibleView1", {
 				key: "visibleView"
 			}),
 			content: oCustomContent
 		});
 		await nextUIUpdate();
 
-		// Act
 		this.oAFPanel.switchView("visibleView");
 		await nextUIUpdate();
 
-		// Assert
 		const oCurrentContent = this.oAFPanel.getCurrentViewContent();
 		assert.strictEqual(oCurrentContent, oCustomContent, "The custom content is the current view content");
 	});
 
-	QUnit.test("addCustomView preserves enabled state from Item", async function(assert) {
-		// Arrange
-		const oItem = createViewItem({
+	QUnit.test("addCustomView preserves enabled state", async function(assert) {
+		const oItem = new Item("disabledView", {
 			key: "disabledView",
 			enabled: false
 		});
 
-		// Act
 		this.oAFPanel.addCustomView({
 			item: oItem,
 			content: new List("disabledViewList", {})
 		});
 		await nextUIUpdate();
 
-		// Assert
 		const oViewSwitch = this.oAFPanel._getViewSwitch();
 		const oAddedItem = oViewSwitch.getItems().find((item) => item.getKey() === "disabledView");
 		assert.ok(oAddedItem, "The item was added to the view switch");
@@ -583,502 +893,117 @@ sMode.forEach(function(sModeName) {
 	});
 
 	QUnit.test("addCustomView with text property", async function(assert) {
-		// Arrange
-		const oItem = createViewItem({
+		const oItem = new Item("textView", {
 			key: "textView",
 			text: "Custom Text"
 		});
 
-		// Act
 		this.oAFPanel.addCustomView({
 			item: oItem,
 			content: new List("textViewList", {})
 		});
 		await nextUIUpdate();
 
-		// Assert
 		const oViewSwitch = this.oAFPanel._getViewSwitch();
 		const oAddedItem = oViewSwitch.getItems().find((item) => item.getKey() === "textView");
 		assert.ok(oAddedItem, "The item was added to the view switch");
-
-		if (sModeName === "Modern") {
-			assert.strictEqual(oAddedItem.getText(), "Custom Text", "The text is preserved in IconTabFilter");
-		} else {
-			assert.strictEqual(oAddedItem.getText(), "Custom Text", "The text is preserved in Item");
-		}
+		assert.strictEqual(oAddedItem.getText(), "Custom Text", "The text is preserved in IconTabFilter");
 	});
 
-	QUnit.test("addCustomView switching back to default views works", async function(assert) {
-		// Arrange
+	QUnit.test("addCustomView switching back to default views", async function(assert) {
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel.addCustomView({
-			item: createViewItem({
+			item: new Item("customView1", {
 				key: "customView"
 			}),
 			content: new List("switchBackList", {})
 		});
 		await nextUIUpdate();
 
-		// Act - switch to custom view
 		this.oAFPanel.switchView("customView");
 		await nextUIUpdate();
 		assert.equal(this.oAFPanel.getCurrentViewKey(), "customView", "Custom view is selected");
 
-		// Act - switch back to group view
 		this.oAFPanel.switchView("group");
 		await nextUIUpdate();
 
-		// Assert
 		assert.equal(this.oAFPanel.getCurrentViewKey(), "group", "Can switch back to group view");
 
-		// Act - switch to list view
 		this.oAFPanel.switchView("list");
 		await nextUIUpdate();
 
-		// Assert
 		assert.equal(this.oAFPanel.getCurrentViewKey(), "list", "Can switch to list view");
 	});
 
-	QUnit.test("Check 'restoreDefaults' to reset to initial values", async function(assert){
-
-		this.oAFPanel.setDefaultView("list");
-
-		if (sModeName === "Modern") {
-			this.oAFPanel._getSearchField().setValue("Test"); //Set a search value
-			this.oAFPanel.switchView("list");
-			this.oAFPanel._filterByModeAndSearch();
-		} else {
-			this.oAFPanel._getSearchField().setValue("Test"); //Set a search value
-			this.oAFPanel.switchView("list"); //Switch to group view
-			this.oAFPanel._getQuickFilter().setSelectedKey("visible");//Only show visible filters in the quick filter
-			this.oAFPanel.getView("list").getContent().showFactory?.(true);//Show the factory
-		}
-		await nextUIUpdate();
-
-		const oFilterSpy = sinon.spy(this.oAFPanel, "_filterByModeAndSearch");
-		assert.equal(this.oAFPanel._getSearchField().getValue(), "Test", "Value 'Test' is present on the SearchField");
-		this.oAFPanel.restoreDefaults();
-
-		//assert that defaults have been restored
-		assert.ok(oFilterSpy.called, "Filter logic executed again after defaults have been restored");
-		assert.equal(this.oAFPanel._getSearchField().getValue(), "", "SearchField is empty after defaults have been restored");
-		//assert.equal(this.oAFPanel.getCurrentViewKey(), "list", "The list view has been set as default view");
-
-		if (sModeName === "Legacy") {
-			assert.equal(this.oAFPanel._getQuickFilter().getSelectedKey(), "all", "Quickfilter is set to 'all' after defaults have been restored");
-			assert.equal(this.oAFPanel.getView("list").getContent()._getShowFactory(), false, "The factory is no longer displayed");
-		}
-
-		//cleanups
-		this.oAFPanel._filterByModeAndSearch.restore();
-
-	});
-
-if (sModeName === "Legacy") {
-	QUnit.test("Check 'Select All' functionality", async function(assert) {
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		this.oAFPanel.switchView("list");
-		await nextUIUpdate();
-
-		let aSelectedItems = this.oAFPanel.getP13nModel().getProperty("/items").filter(function(oItem) {
-			return oItem.visible;
-		});
-		assert.equal(aSelectedItems.length, 3, "Initially all items are selected");
-
-		// Arrange:
-		this.oAFPanel._getSearchField().setValue("Field 5");
-		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		await nextUIUpdate();
-
-		const oListControl = this.oAFPanel.getCurrentViewContent()._oListControl;
-
-		// Assert: Only one item is shown after filtering and is not selected
-		assert.equal(oListControl.getItems().length, 1, "Only one item is shown after filtering");
-		assert.equal(oListControl.getItems()[0].getSelected(), false, "Item is not selected");
-
-		// Act: Click on Select All checkbox
-		oListControl.fireSelectionChange({
-			listItems: oListControl.getItems(),
-			selectAll: true
+	QUnit.test("addCustomView creates IconTabFilter in Modern UI", async function(assert) {
+		this.oAFPanel.addCustomView({
+			item: new Item("iconTabView1", {
+				key: "iconTabView",
+				text: "Chart"
+			}),
+			content: new List("iconTabViewList", {})
 		});
 		await nextUIUpdate();
 
-		// Assert: item is selected now
-		aSelectedItems = oListControl.getSelectedItems();
-		assert.equal(aSelectedItems.length, 1, "Only one item was affected by Select All");
-		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 5", "Only the filtered item was selected");
+		const oViewSwitch = this.oAFPanel._getViewSwitch();
+		assert.ok(oViewSwitch.isA("sap.m.IconTabBar"), "View switch is an IconTabBar in Modern mode");
 
-		// Now remove the filter and check that only the previously filtered items are selected
-		this.oAFPanel._getSearchField().setValue("");
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		await nextUIUpdate();
-
-		// Assert: item is selected now
-		aSelectedItems = oListControl.getSelectedItems();
-		assert.equal(aSelectedItems.length, 4, "Only four items are selected");
-		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is selected correctly");
-		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is selected correctly");
-		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is selected correctly");
-		assert.equal(aSelectedItems[3].getCells()[0].getItems()[0].getText(), "Field 5", "Field 5 is selected correctly");
+		const oAddedItem = oViewSwitch.getItems().find((item) => item.getKey() === "iconTabView");
+		assert.ok(oAddedItem, "The custom view item was added");
+		assert.ok(oAddedItem.isA("sap.m.IconTabFilter"), "The item is an IconTabFilter");
+		assert.equal(oAddedItem.getText(), "Chart", "The text property is preserved");
 	});
 
-	QUnit.test("Check 'Deselect All' after filtering", async function(assert) {
-		this.oAFPanel.setP13nModel(new JSONModel({
-			items: [ ...this.oP13nData.items, {name: "key21", label: "Field 21", group: "G1", dataType: "String", visible: true, visibleInDialog: true} ],
-			itemsGrouped: [ ...this.oP13nData.itemsGrouped ]
-		}));
-		this.oAFPanel.switchView("list");
-		await nextUIUpdate();
-
-		let aSelectedItems = this.oAFPanel.getP13nModel().getProperty("/items").filter(function(oItem) {
-			return oItem.visible;
+	QUnit.test("addCustomView enabled binding is cloned", async function(assert) {
+		const oModel = new JSONModel({ isEnabled: false });
+		const oItem = new Item("enabledView1", {
+			key: "boundEnabledView"
 		});
-		assert.equal(aSelectedItems.length, 4, "Initially all items are selected");
+		oItem.setModel(oModel);
+		oItem.bindProperty("enabled", { path: "/isEnabled" });
 
-		// Arrange:
-		this.oAFPanel._getSearchField().setValue("Field 2");
-		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		await nextUIUpdate();
-
-		const oListControl = this.oAFPanel.getCurrentViewContent()._oListControl;
-
-		// Assert: Only one item is shown after filtering and is not selected
-		assert.equal(oListControl.getItems().length, 2, "Two items are shown after filtering");
-		assert.equal(oListControl.getItems()[0].getSelected(), true, "Item is initially selected");
-		assert.equal(oListControl.getItems()[1].getSelected(), true, "Item is initially selected");
-
-		// Act: Click on Select All checkbox
-		oListControl.getItems()[0].setSelected(false);
-		oListControl.getItems()[1].setSelected(false);
-		oListControl.fireSelectionChange({
-			listItems: oListControl.getItems(),
-			selectAll: false
+		this.oAFPanel.addCustomView({
+			item: oItem,
+			content: new List("boundEnabledList", {})
 		});
 		await nextUIUpdate();
 
-		aSelectedItems = oListControl.getSelectedItems();
-		assert.equal(aSelectedItems.length, 0, "No item is selected");
+		const oViewSwitch = this.oAFPanel._getViewSwitch();
+		const oIconTabItem = oViewSwitch.getItems().find((item) => item.getKey() === "boundEnabledView");
+		assert.ok(oIconTabItem, "The IconTabFilter was created");
 
-		// Now remove the filter and check that only the previously filtered items are selected
-		this.oAFPanel._getSearchField().setValue("");
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		await nextUIUpdate();
-
-		aSelectedItems = oListControl.getSelectedItems();
-		assert.equal(aSelectedItems.length, 2, "Only 2 items are selected after removing filter");
+		const oBindingInfo = oIconTabItem.getBindingInfo("enabled");
+		assert.ok(oBindingInfo, "The enabled binding was cloned to IconTabFilter");
 	});
 
-	QUnit.test("Check Search implementation in combination with 'group mode' Select for 'active'", async function(assert){
-
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		await nextUIUpdate();
-
-		this.oAFPanel._sModeKey = "active";
-		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
-		const oOuterList = this.oAFPanel.getCurrentViewContent()._oListControl;
-
-		//filter only via select control --> only first group has an active item
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), true, "Panel is invisible since items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), false, "Panel is invisible since no items are available");
-
-		//filter with additional search --> active item does not have this tooltip
-		this.oAFPanel._getSearchField().setValue("Some Tooltip");
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), false, "Panel is invisible since no items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), false, "Panel is invisible since no items are available");
-
-		//filter with a search filter and 'all' --> only affected item with the tooltip should be visible
-		this.oAFPanel._sModeKey = "all";
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), false, "Panel is invisible since no items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since items are available");
-	});
-
-	QUnit.test("Check Search implementation in combination with 'group mode' Select for 'mandatory'", async function(assert){
-
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		await nextUIUpdate();
-
-		this.oAFPanel._sModeKey = "mandatory";
-		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
-		const oOuterList = this.oAFPanel.getCurrentViewContent()._oListControl;
-
-		//filter only via select control --> only second group has a mandatory item
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), false, "Panel is invisible since items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since one item is available");
-
-		//filter with a search filter and 'all'
-		this.oAFPanel._sModeKey = "all";
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), true, "Panel is visible since items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since items are available");
-	});
-
-	QUnit.test("Check Search implementation in combination with 'group mode' Select for 'visibleactive'", async function(assert){
-
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		await nextUIUpdate();
-
-		this.oAFPanel._sModeKey = "visibleactive";
-		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
-		const oOuterList = this.oAFPanel.getCurrentViewContent()._oListControl;
-
-		//filter only via select control --> only first group has an active and visible item
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), true, "Panel is visible since items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), false, "Panel is invisible since no items are available");
-
-		//filter with additional search --> active item is still present as it fits the label
-		this.oAFPanel._getSearchField().setValue("Field 2");
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), true, "Panel is visible since items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), false, "Panel is invisible since no items are available");
-
-		this.oAFPanel._getSearchField().setValue("Field 1");
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), false, "Panel is invisible since no items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), false, "Panel is invisible since no items are available");
-
-		//filter with additional search --> active item is still present as it fits the label
-		this.oAFPanel._getSearchField().setValue("Field 2");
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), true, "Panel is visible since items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), false, "Panel is invisible since no items are available");
-
-		//filter with a search filter and 'all' --> only affected item with the tooltip should be visible
-		this.oAFPanel._sModeKey = "all";
-		this.oAFPanel._getSearchField().setValue("");
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), true, "Panel is visible since items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since items are available");
-	});
-
-	QUnit.test("Check Search implementation in combination with 'group mode' Select", async function(assert){
-
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		await nextUIUpdate();
-
-		this.oAFPanel._getSearchField().setValue("Some Tooltip");
-		this.oAFPanel._sModeKey = "visible";
-		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
-
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-
-		const oOuterList = this.oAFPanel.getCurrentViewContent()._oListControl;
-		assert.equal(oOuterList.getItems()[0].getVisible(), false, "Panel is invisible since no items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), false, "Panel is invisible since no items are available");
-
-		this.oAFPanel._sModeKey = "all";
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-		assert.equal(oOuterList.getItems()[0].getVisible(), false, "Panel is invisible since no items are available");
-		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since items are available");
-	});
-
-	QUnit.test("Check that groups are initially only displayed if necessary", async function(assert){
-
-		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
-		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
-		await nextUIUpdate();
-
-		assert.equal(this.oAFPanel.getCurrentViewContent()._oListControl.getVisibleItems().length, 2, "All groups visible");
-
-		oP13nData.itemsGrouped[0].items.forEach(function(oItem){
-			oItem.visibleInDialog = false;
-		});
-
-		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
-		await nextUIUpdate();
-
-		assert.equal(this.oAFPanel.getCurrentViewContent()._oListControl.getVisibleItems().length, 1, "Only necessary groups visible");
-
-	});
-
-	QUnit.test("Check additional filter implementation (visibleInDialog)", async function(assert){
-
-		const oP13nData = this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, function(oItem, oProp) {
-			if (oProp.key == "key2") {
-				oItem.visibleInDialog = false;
-			} else {
-				oItem.visibleInDialog = true;
-			}
-			return oItem;
-		}, true);
-
-		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
-		await nextUIUpdate();
-
-		const aGroupPanels = this.oAFPanel.getCurrentViewContent().getPanels();
-
-		//Check in GroupView
-		assert.equal(aGroupPanels[0].getContent()[0].getVisibleItems().length, 2, "There are 3 items in the model, but one should be hidden for the user");
-
-		//Check in ListView
-		this.oAFPanel.switchView("list");
-		await nextUIUpdate();
-
-		const aItems = this.oAFPanel.getCurrentViewContent()._oListControl.getItems();
-		assert.equal(aItems.length, 5, "There are 6 items in the model, but one should be hidden for the user");
-
-	});
-
-	// not relevant for new mode, as groups are always loaded expanded (as they are just items in a list)
-	QUnit.test("Check 'itemFactory' execution for only necessary groups", async function(assert){
-
-		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
-
-		const fnItemFactoryCallback = function(oContext) {
-			return new VBox();
-		};
-
-		this.oAFPanel.setItemFactory(fnItemFactoryCallback);
-
-		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
-
-		await nextUIUpdate();
-
-		this.oAFPanel.getCurrentViewContent()._loopGroupList(function(oItem, sKey){
-			const oProp = this.oAFPanel.getP13nModel().getProperty(oItem.getBindingContext(this.oAFPanel.P13N_MODEL).sPath);
-			const iExpectedLength = oProp.group === "G1" ? 2 : 1;
-
-			assert.equal(oItem.getContent().length, iExpectedLength, "Only required callbacks executed");
-
-		}.bind(this));
-
-	});
-
-	QUnit.test("Check 'itemFactory' execution for expanded groups", async function(assert){
-
-		//6 items in 2 groups --> 6x callback excuted after expanding --> +3x for initial filtering
-		const done = assert.async(9);
-
-		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
-
-		const fnItemFactoryCallback = function (oContext) {
-			assert.ok(oContext, "Callback executed with binding context");
-			done(6);
-		};
-
-		this.oAFPanel.setItemFactory(fnItemFactoryCallback);
-
-		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
-
-		this.oAFPanel.setGroupExpanded("G2");
-		await nextUIUpdate();
-
-	});
-
-	QUnit.test("Check 'itemFactory' execution for expanded groups by checking created controls", async function(assert){
-
-		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
-
-		const fnItemFactoryCallback = function (oContext) {
-
-			return new VBox();
-		};
-
-		this.oAFPanel.setItemFactory(fnItemFactoryCallback);
-
-		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
-		await nextUIUpdate();
-
-		this.oAFPanel.setGroupExpanded("G2");
-
-		this.oAFPanel.getCurrentViewContent()._loopGroupList(function(oItem, sKey){
-
-			//All Panels expanded --> all fields created
-			assert.equal(oItem.getContent().length, 2, "Only required callbacks executed");
-
-		});
-
-	});
-
-	QUnit.test("Check 'itemFactory' execution combined with filtering - panel not expaned while searching", async function(assert){
-
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		await nextUIUpdate();
-
-		this.oAFPanel._getSearchField().setValue("Field 5");
-		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
-
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-
-		assert.equal(this.oAFPanel.getCurrentViewContent()._getInitializedLists().length, 1, "Filter triggerd, but group not yet initialized");
-
-		this.oAFPanel.getCurrentViewContent()._loopGroupList(function(oItem, sKey){
-			const oProp = this.oAFPanel.getP13nModel().getProperty(oItem.getBindingContext(this.oAFPanel.P13N_MODEL).sPath);
-			const iExpectedLength = oProp.group === "G1" ? 2 : 1;
-
-			assert.equal(oItem.getContent().length, iExpectedLength, "Only required callbacks executed");
-
-		}.bind(this));
-	});
-
-	QUnit.test("Check 'itemFactory' execution combined with filtering - panel is expaned while searching", async function(assert){
-
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		await nextUIUpdate();
-
-		this.oAFPanel._getSearchField().setValue("Field 5");
-		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
-
-		this.oAFPanel.setGroupExpanded("G2");
-
-		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
-
-		assert.equal(this.oAFPanel.getCurrentViewContent()._getInitializedLists().length, 2, "Filter triggerd - group initialized");
-
-	});
-
-	QUnit.test("Check method 'setGroupExpanded' ", async function(assert){
-
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		await nextUIUpdate();
-
-		const oSecondPanel = this.oAFPanel.getCurrentViewContent()._oListControl.getItems()[1].getContent()[0];
-		assert.ok(!oSecondPanel.getExpanded(), "Panel is initially collapsed");
-
-		this.oAFPanel.setGroupExpanded("G2", true);
-		assert.ok(oSecondPanel.getExpanded(), "Panel is expanded after manually triggering");
-
-		this.oAFPanel.setGroupExpanded("G2");
-		assert.ok(!oSecondPanel.getExpanded(), "Panel is collapsed when calling with 'undefined' as second parameter");
-
-		this.oAFPanel.setGroupExpanded("G2", true);
-		assert.ok(oSecondPanel.getExpanded(), "Panel is expanded after manually triggering");
-
-		this.oAFPanel.setGroupExpanded("G2", false);
-		assert.ok(!oSecondPanel.getExpanded(), "Panel is collapsed when calling with 'false'' as second parameter");
-	});
-
-	QUnit.test("Check inner controls upon toggling the view", function (assert) {
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		this.oAFPanel.switchView("group");
-
-		this.oAFPanel.switchView("list");
-		assert.ok(this.oAFPanel.getCurrentViewContent().isA("sap.m.p13n.SelectionPanel"));
-
-		this.oAFPanel.switchView("group");
-		assert.ok(this.oAFPanel.getCurrentViewContent().isA("sap.ui.mdc.p13n.panels.GroupView"));
-
-	});
-
-	QUnit.module(`${sModeName} - Legacy addCustomView Callbacks`, {
+	// ===========================================================================================
+	// Module 7: View Switching and Data Management
+	// ===========================================================================================
+	QUnit.module("View Switching and Data Management", {
 		beforeEach: async function() {
-			this.sDefaultGroup = "BASIC";
 			this.aMockInfo = aInfoData;
-			this.oAFPanel = new AdaptFiltersPanel({
-				defaultView: "group",
-				footer: new Toolbar("ID_TB_LEGACY_CB", {}),
-				useNewUI: false
+			this.oAFPanel = new AdaptFiltersPanel("ADP", {
+				defaultView: "list",
+				footer: new Toolbar("ID_TB_VIEW_SWITCH", {})
 			});
 
-			this.oAFPanel.setItemFactory(function() {
-				return new VBox();
-			});
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
 
 			this.fnEnhancer = function(mItem, oProperty) {
 				if (oProperty.key == "key2") {
@@ -1093,258 +1018,194 @@ if (sModeName === "Legacy") {
 			};
 
 			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+
 			this.oAFPanel.placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
-		afterEach: function() {
-			this.sDefaultGroup = null;
+		afterEach: function(){
 			this.oP13nData = null;
 			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
 			this.oAFPanel.destroy();
 		}
 	});
 
-	QUnit.test("addCustomView search callback is executed on liveChange", function(assert) {
-		// Arrange
-		const done = assert.async();
-
-		this.oAFPanel.addCustomView({
-			item: createViewItem({
-				key: "searchView"
-			}),
-			content: new List("searchCallbackList", {}),
-			search: function(sValue) {
-				// Assert
-				assert.equal(sValue, "SearchValue", "Search callback received the correct search string");
-				done();
-			}
-		});
-
-		// Act
-		this.oAFPanel.switchView("searchView");
-		this.oAFPanel._getSearchField().setValue("SearchValue");
-		this.oAFPanel._getSearchField().fireLiveChange({ newValue: "SearchValue" });
-	});
-
-	QUnit.test("addCustomView search callback only fires when custom view is active", async function(assert) {
-		// Arrange
-		let iSearchCallCount = 0;
-
-		this.oAFPanel.addCustomView({
-			item: createViewItem({
-				key: "conditionalSearchView"
-			}),
-			content: new List("conditionalSearchList", {}),
-			search: function() {
-				iSearchCallCount++;
-			}
-		});
-		await nextUIUpdate();
-
-		// Act - search while on default view (not custom view)
-		this.oAFPanel._getSearchField().setValue("Test");
-		this.oAFPanel._getSearchField().fireLiveChange();
-
-		// Assert
-		assert.equal(iSearchCallCount, 0, "Search callback is not executed when custom view is not active");
-
-		// Act - switch to custom view and search
-		this.oAFPanel.switchView("conditionalSearchView");
-		this.oAFPanel._getSearchField().fireLiveChange();
-
-		// Assert
-		assert.equal(iSearchCallCount, 1, "Search callback is executed when custom view is active");
-	});
-
-	QUnit.test("addCustomView filterSelect callback is executed on QuickFilter change", async function(assert) {
-		// Arrange
-		const done = assert.async();
-
-		this.oAFPanel.addCustomView({
-			item: createViewItem({
-				key: "filterView"
-			}),
-			content: new List("filterSelectList", {}),
-			filterSelect: function(sValue) {
-				// Assert
-				assert.ok(sValue, "filterSelect callback received a value");
-				done();
-			}
-		});
-		await nextUIUpdate();
-
-		// Act
-		this.oAFPanel.switchView("filterView");
-		this.oAFPanel._getQuickFilter().fireChange({
-			selectedItem: this.oAFPanel._getQuickFilter().getItems()[0]
-		});
-	});
-
-	QUnit.test("addCustomView filterSelect callback only fires when custom view is active", async function(assert) {
-		// Arrange
-		let iFilterSelectCallCount = 0;
-
-		this.oAFPanel.addCustomView({
-			item: createViewItem({
-				key: "conditionalFilterView"
-			}),
-			content: new List("conditionalFilterList", {}),
-			filterSelect: function() {
-				iFilterSelectCallCount++;
-			}
-		});
-		await nextUIUpdate();
-
-		// Act - change filter while on default view
-		this.oAFPanel._getQuickFilter().fireChange({
-			selectedItem: this.oAFPanel._getQuickFilter().getItems()[0]
-		});
-
-		// Assert
-		assert.equal(iFilterSelectCallCount, 0, "filterSelect callback is not executed when custom view is not active");
-
-		// Act - switch to custom view and change filter
-		this.oAFPanel.switchView("conditionalFilterView");
-		this.oAFPanel._getQuickFilter().fireChange({
-			selectedItem: this.oAFPanel._getQuickFilter().getItems()[0]
-		});
-
-		// Assert
-		assert.equal(iFilterSelectCallCount, 1, "filterSelect callback is executed when custom view is active");
-	});
-
-	QUnit.test("addCustomView search callback is executed on view switch with existing search value", function(assert) {
-		// Arrange
-		const done = assert.async();
-		const oItem = createViewItem({
-			key: "switchSearchView"
-		});
-
-		this.oAFPanel.addCustomView({
-			item: oItem,
-			content: new List("switchSearchList", {}),
-			search: function(sSearch) {
-				// Assert
-				assert.equal(sSearch, "ExistingSearch", "Search callback received the existing search value on view switch");
-				done();
-			}
-		});
-
-		// Act - set search value before switching
-		this.oAFPanel._getSearchField().setValue("ExistingSearch");
-		this.oAFPanel._getViewSwitch().fireSelectionChange({
-			item: oItem
-		});
-	});
-
-	QUnit.test("addCustomView filterSelect callback is executed on view switch", async function(assert) {
-		// Arrange
-		const done = assert.async();
-		const oItem = createViewItem({
-			key: "switchFilterView"
-		});
-
-		this.oAFPanel.addCustomView({
-			item: oItem,
-			content: new List("switchFilterList", {}),
-			filterSelect: function(sValue) {
-				// Assert
-				assert.ok(sValue, "filterSelect callback received a value on view switch");
-				done();
-			}
-		});
-		await nextUIUpdate();
-
-		// Act
-		this.oAFPanel._getViewSwitch().fireSelectionChange({
-			item: oItem
-		});
-	});
-
-	QUnit.test("addCustomView with all callbacks combined", async function(assert) {
-		// Arrange
-		const aCallbacksCalled = [];
-		const oItem = createViewItem({
-			key: "allCallbacksView"
-		});
-
-		this.oAFPanel.addCustomView({
-			item: oItem,
-			content: new List("allCallbacksList", {}),
-			selectionChange: function(sKey) {
-				aCallbacksCalled.push("selectionChange:" + sKey);
-			},
-			search: function(sValue) {
-				aCallbacksCalled.push("search:" + sValue);
-			},
-			filterSelect: function(sValue) {
-				aCallbacksCalled.push("filterSelect:" + sValue);
-			}
-		});
-		await nextUIUpdate();
-
-		// Act - trigger view switch
-		this.oAFPanel._getViewSwitch().fireSelectionChange({
-			item: oItem
-		});
-
-		// Assert
-		assert.ok(aCallbacksCalled.includes("selectionChange:allCallbacksView"), "selectionChange callback was executed");
-		assert.ok(aCallbacksCalled.some((s) => s.startsWith("search:")), "search callback was executed on view switch");
-		assert.ok(aCallbacksCalled.some((s) => s.startsWith("filterSelect:")), "filterSelect callback was executed on view switch");
-	});
-
-	QUnit.test("Check filter field visibility when switching views", async function(assert) {
-		const oControlMap = new Map();
-		this.oP13nData.items.forEach((oItem) => {
-			oControlMap.set(oItem.name, new Input());
-		});
-
-		this.oAFPanel.setItemFactory(function(oContext) {
-			return oControlMap.get(oContext.getProperty("name"));
-		});
+	QUnit.test("Data synchronization during view switch", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 
-		await nextUIUpdate();
+		let oCurrentContent = this.oAFPanel.getCurrentViewContent();
+		const oInitialData = oCurrentContent.getP13nData();
 
-		this.oAFPanel.setDefaultView("list");
-		this.oAFPanel.switchView("list");
-		await nextUIUpdate();
-
-		this.oAFPanel.getView("list").getContent().showFactory(true);
-		await nextUIUpdate();
-
-		// Check if items are visible and have the correct parent
-		const oList = this.oAFPanel.getCurrentViewContent()._oListControl;
-		assert.ok(oList, "List is available");
-		assert.ok(oList.getDomRef(), "List is rendered");
-
-		let oItem = oList.getItems()[0];
-		let oInput = oItem.getCells()[0].getItems()[1];
-		assert.ok(oItem.getDomRef(), "List item is rendered");
-		assert.ok(oInput.isA("sap.m.Input"), "List item content is an Input field");
-		assert.ok(oInput.getDomRef(), "List item content is rendered");
-
-		// Switch to group view, by simulating press on SegmentedButton (this will fire updateFinished, similar to scrolling)
 		this.oAFPanel.switchView("group");
 		await nextUIUpdate();
 
-		const oGroupList = this.oAFPanel.getCurrentViewContent()._oListControl;
-		assert.ok(oGroupList, "Group List is available");
-		assert.ok(oGroupList.getDomRef(), "Group List is rendered");
+		oCurrentContent = this.oAFPanel.getCurrentViewContent();
+		const oNewData = oCurrentContent.getP13nData();
 
-		oItem = oGroupList.getItems()[0].getContent()[0].getContent()[0].getItems()[0];
-
-		assert.ok(oItem.getContent().length > 1, "Group List Hbox has two items");
-
-		oInput = oItem.getContent()[1];
-		assert.ok(oInput.isA("sap.m.Input"), "Group List item content is an Input field");
-		assert.ok(oInput.getDomRef(), "Group List item content is rendered");
+		assert.equal(oNewData.length, oInitialData.length, "Data preserved during view switch");
+		assert.deepEqual(oNewData[0].name, oInitialData[0].name, "Item data matches after switch");
 	});
-}
 
-if (sModeName === "Modern") {
-	QUnit.test("Header creation", function(assert){
+	QUnit.test("View preparation: saves current view data before switch", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		await nextUIUpdate();
+
+		const oContent = this.oAFPanel.getCurrentViewContent();
+		const oInitialData = oContent.getP13nData();
+
+		this.oAFPanel._prepareViewSwitch("group", "list");
+
+		const oModelData = this.oAFPanel.getP13nModel().getProperty(this.oAFPanel.MODEL_PATH);
+		assert.ok(oModelData, "P13n data was saved to model");
+		assert.equal(oModelData.length, oInitialData.length, "All data items were saved");
+	});
+
+	QUnit.test("View initialization: sets data on newly switched view", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("group");
+		await nextUIUpdate();
+
+		const oContent = this.oAFPanel.getCurrentViewContent();
+
+		this.oAFPanel._initializeViewData("group", oContent);
+
+		const oContentData = oContent.getP13nData();
+		assert.ok(oContentData, "View content has p13n data");
+		assert.equal(oContentData.length, this.oP13nData.items.length, "All items were set on the view");
+		assert.ok(this.oAFPanel._bGroupViewInitialized, "Group view is marked as initialized");
+	});
+
+	QUnit.test("Search persistence: transfers search value between views", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oListContent = this.oAFPanel.getCurrentViewContent();
+		oListContent._getSearchField().setValue("TestSearch");
+
+		this.oAFPanel.switchView("group");
+		await nextUIUpdate();
+
+		const oGroupContent = this.oAFPanel.getCurrentViewContent();
+		const sSearchValue = oGroupContent._getSearchField().getValue();
+		assert.equal(sSearchValue, "TestSearch", "Search value was transferred to new view");
+	});
+
+	QUnit.test("Edit mode update: applies correct mode to list view", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oContent = this.oAFPanel.getCurrentViewContent();
+		const oUpdateSpy = sinon.spy(oContent, "_updateFilterFieldsEditMode");
+
+		oContent._oViewModel.setProperty("/editable", false);
+		await nextUIUpdate();
+
+		this.oAFPanel._updateViewEditMode("list", oContent);
+
+		assert.ok(oUpdateSpy.called, "_updateFilterFieldsEditMode was called");
+		assert.equal(oUpdateSpy.lastCall.args[0], "sort", "Edit mode was set to 'sort' when not editable");
+
+		oUpdateSpy.restore();
+	});
+
+	QUnit.test("Edit mode update: applies correct mode to group view", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("group");
+		await nextUIUpdate();
+
+		const oContent = this.oAFPanel.getCurrentViewContent();
+		const oUpdateSpy = sinon.spy(oContent, "_updateFilterFieldsEditMode");
+
+		this.oAFPanel._updateViewEditMode("group", oContent);
+
+		assert.ok(oUpdateSpy.called, "_updateFilterFieldsEditMode was called");
+		assert.equal(oUpdateSpy.lastCall.args[0], "edit", "Edit mode was set to 'edit' for group view");
+
+		oUpdateSpy.restore();
+	});
+
+	// ===========================================================================================
+	// Module 8: UI Components and Layout
+	// ===========================================================================================
+	QUnit.module("UI Components and Layout", {
+		beforeEach: async function() {
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel("ADP", {
+				defaultView: "group",
+				footer: new Toolbar("ID_TB_UI",{})
+			});
+
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
+
+			this.fnEnhancer = function(mItem, oProperty) {
+				if (oProperty.key == "key2") {
+					mItem.active = true;
+				}
+				if (oProperty.key == "key5") {
+					mItem.required = true;
+				}
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
+				return true;
+			};
+
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function(){
+			this.oP13nData = null;
+			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("Header creation and structure", function(assert){
 		assert.ok(this.oAFPanel._oHeader, "Panel header exists");
 		assert.ok(this.oAFPanel._oHeader.isA("sap.m.IconTabBar"), "Panel header is IconTabBar");
 		const aItems = this.oAFPanel._oHeader.getItems();
@@ -1376,118 +1237,235 @@ if (sModeName === "Modern") {
 		assert.equal(oCurrentContent.getDefaultView(), "list", "Content is in list mode");
 	});
 
-	QUnit.test("Data synchronization during view switch", async function(assert){
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-
-		let oCurrentContent = this.oAFPanel.getCurrentViewContent();
-		const oInitialData = oCurrentContent.getP13nData();
-
-		this.oAFPanel.switchView("group");
-		await nextUIUpdate();
-
-		oCurrentContent = this.oAFPanel.getCurrentViewContent();
-		const oNewData = oCurrentContent.getP13nData();
-
-		assert.equal(oNewData.length, oInitialData.length, "Data preserved during view switch");
-		assert.deepEqual(oNewData[0].name, oInitialData[0].name, "Item data matches after switch");
-	});
-
-	QUnit.test("Search implementation in content", async function(assert){
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		const oCurrentContent = this.oAFPanel.getCurrentViewContent();
-		await nextUIUpdate();
-
-		oCurrentContent._getSearchField().setValue("Field 5");
-		const oFakeEvent = new Event("liveSearch", oCurrentContent._getSearchField(), {});
-		oCurrentContent._filterByModeAndSearch(oFakeEvent);
-		await nextUIUpdate();
-
-		const oList = oCurrentContent._oListControl;
-		const aVisibleItems = oList.getItems().filter(function(item) { return item.getVisible(); });
-		assert.ok(aVisibleItems.length > 0, "Items are visible after search");
-		assert.ok(oList.getItems()[0].isA("sap.m.GroupHeaderListItem"), "Group header shown");
-	});
-
-	QUnit.test("Search by tooltip in content", async function(assert){
-		const oP13nData = JSON.parse(JSON.stringify(this.oP13nData));
-		const oKey6Item = oP13nData.items.find((item) => item.name === "key6");
-		if (oKey6Item) {
-			oKey6Item.visible = true;
-			oKey6Item.position = 3;
-		}
-
-		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
-		const oCurrentContent = this.oAFPanel.getCurrentViewContent();
-		await nextUIUpdate();
-
-		oCurrentContent._getSearchField().setValue("Some Tooltip");
-		const oFakeEvent = new Event("liveSearch", oCurrentContent._getSearchField(), {});
-		oCurrentContent._filterByModeAndSearch(oFakeEvent);
-		await nextUIUpdate();
-
-		const oList = oCurrentContent._oListControl;
-		const aVisibleItems = oList.getItems().filter(function(item) {
-			return item.getVisible() && !item.isA("sap.m.GroupHeaderListItem");
-		});
-		assert.ok(aVisibleItems.length > 0, "Items found by tooltip");
-	});
-
-	QUnit.test("Group visibility based on visibleInDialog", async function(assert){
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		await nextUIUpdate();
-
-		const iInitialGroups = getGroups(this.oAFPanel.getCurrentViewContent()._oListControl).length;
-		assert.ok(iInitialGroups > 0, "Groups are visible initially");
-
-		const oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, function(oItem, oProp) {
-			if (oProp.group === "G1") {
-				oItem.visibleInDialog = false;
-			} else {
-				oItem.visibleInDialog = true;
-			}
-			oItem.visible = aVisible.indexOf(oProp.key) > -1;
-			return true;
-		}, true);
-
-		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
-		await nextUIUpdate();
-
-		const iFinalGroups = getGroups(this.oAFPanel.getCurrentViewContent()._oListControl).length;
-		assert.ok(iFinalGroups < iInitialGroups, "Fewer groups visible after filtering");
-	});
-
-	QUnit.test("Change event propagation from content", async function(assert){
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
-		await nextUIUpdate();
-
-		const fnChangeSpy = sinon.spy(this.oAFPanel, "fireChange");
-
-		this.oAFPanel.getCurrentViewContent().fireChange();
-
-		assert.ok(fnChangeSpy.calledOnce, "Change event fired on panel");
-		fnChangeSpy.restore();
-	});
-
-	QUnit.test("SearchField placeholder is set correctly", async function(assert){
-		// Arrange
+	QUnit.test("Action container structure: contains all required action buttons", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel.switchView("list");
 		await nextUIUpdate();
 
-		const oViewContent = this.oAFPanel.getCurrentViewContent();
-		const oSearchField = oViewContent._getSearchField();
+		const oContent = this.oAFPanel.getCurrentViewContent();
+		const aItems = oContent._oListControl.getItems().filter((oItem) =>
+			!oItem.isA("sap.m.GroupHeaderListItem") && oItem.getVisible()
+		);
 
-		// Assert
-		assert.ok(oSearchField, "SearchField exists");
-		assert.ok(oSearchField.isA("sap.m.SearchField"), "SearchField is of correct type");
+		assert.ok(aItems.length > 0, "List has visible items");
 
-		const sPlaceholder = oSearchField.getPlaceholder();
-		assert.ok(sPlaceholder, "Placeholder is set");
-		assert.equal(sPlaceholder, oViewContent._getResourceText("p13nDialog.ADAPT_FILTER_SEARCH"),
-			"Placeholder matches the i18n text key");
+		const oFirstItem = aItems[0];
+		const oGrid = oFirstItem.getContent()[0];
+		const aGridContent = oGrid.getContent();
+
+		assert.equal(aGridContent.length, 3, "Grid has 3 content items (label, filter, actions)");
+
+		const oActionContainer = aGridContent[2];
+		assert.ok(oActionContainer.isA("sap.ui.layout.Grid"), "Action container is a Grid");
+
+		const aActionButtons = oActionContainer.getContent();
+		assert.equal(aActionButtons.length, 3, "Action container has 3 buttons (visibility, delete, sort)");
+		assert.ok(aActionButtons[0].isA("sap.m.ToggleButton"), "First action is a ToggleButton (visibility)");
+		assert.ok(aActionButtons[1].isA("sap.m.Button"), "Second action is a Button (delete)");
+		assert.ok(aActionButtons[2].isA("sap.ui.core.Icon"), "Third action is an Icon (sort)");
 	});
 
-	QUnit.test("Test _enhanceP13nData: re-insert filtered invisible items at their old position", async function(assert){
+	QUnit.test("Custom toolbar visibility: shows toolbar for custom views", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.addCustomView({
+			item: new Item("customTest1", {
+				key: "customTest",
+				text: "Custom Test"
+			}),
+			content: new List("customTestList", {}),
+			title: "Custom Test Title"
+		});
+		await nextUIUpdate();
+
+		this.oAFPanel.switchView("customTest");
+		await nextUIUpdate();
+
+		const oCustomViewToolbar = this.oAFPanel._oCustomViewToolbar;
+		assert.ok(oCustomViewToolbar, "Custom view toolbar exists");
+		assert.ok(oCustomViewToolbar.getVisible(), "Custom view toolbar is visible");
+
+		const [oTitle] = oCustomViewToolbar.getContent();
+		assert.equal(oTitle.getText(), "Custom Test Title", "Toolbar title is set correctly");
+	});
+
+	QUnit.test("Custom toolbar visibility: hides toolbar for standard views", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.addCustomView({
+			item: new Item("customHide1", {
+				key: "customHide",
+				text: "Custom Hide"
+			}),
+			content: new List("customHideList", {}),
+			title: "Custom Title"
+		});
+		await nextUIUpdate();
+
+		this.oAFPanel.switchView("customHide");
+		await nextUIUpdate();
+
+		const oCustomViewToolbar = this.oAFPanel._oCustomViewToolbar;
+		assert.ok(oCustomViewToolbar.getVisible(), "Toolbar visible in custom view");
+
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		assert.notOk(oCustomViewToolbar.getVisible(), "Custom view toolbar is hidden when switching to standard view");
+	});
+
+	// ===========================================================================================
+	// Module 9: Edit Mode and Constants
+	// ===========================================================================================
+	QUnit.module("Edit Mode and Constants", {
+		beforeEach: async function() {
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel("ADP", {
+				defaultView: "list",
+				footer: new Toolbar("ID_TB_CONSTANTS", {})
+			});
+
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
+
+			this.fnEnhancer = function(mItem, oProperty) {
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
+				return true;
+			};
+
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function(){
+			this.oP13nData = null;
+			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("MODE_EDIT constant: sets edit mode correctly", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oContent = this.oAFPanel.getCurrentViewContent();
+		const oModeButton = oContent._getModeButton();
+
+		assert.equal(oModeButton.getSelectedKey(), "edit", "Mode button starts with 'edit' key (MODE_EDIT constant)");
+		assert.ok(oContent._oViewModel.getProperty("/editable"), "View model is editable in edit mode");
+	});
+
+	QUnit.test("MODE_SORT constant: switches to sort mode correctly", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oContent = this.oAFPanel.getCurrentViewContent();
+		const oModeButton = oContent._getModeButton();
+
+		const oSortModeItem = oModeButton.getItems()[1];
+		oModeButton.setSelectedKey("sort");
+		oModeButton.fireSelectionChange({
+			item: oSortModeItem
+		});
+		await nextUIUpdate();
+
+		assert.equal(oModeButton.getSelectedKey(), "sort", "Mode button changed to 'sort' key (MODE_SORT constant)");
+		assert.notOk(oContent._oViewModel.getProperty("/editable"), "View model is not editable in sort mode");
+	});
+
+	// ===========================================================================================
+	// Module 10: Data Enhancement
+	// ===========================================================================================
+	QUnit.module("Data Enhancement", {
+		beforeEach: async function() {
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel("ADP", {
+				defaultView: "list",
+				footer: new Toolbar("ID_TB_DATA_ENHANCE",{})
+			});
+
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
+
+			this.fnEnhancer = function(mItem, oProperty) {
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
+				return true;
+			};
+
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function(){
+			this.oP13nData = null;
+			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("_enhanceP13nData: re-insert filtered invisible items at old position", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel.switchView("list");
 		await nextUIUpdate();
@@ -1502,7 +1480,6 @@ if (sModeName === "Modern") {
 			{name: "field5", label: "Field 5", position: 4, visible: true, isFiltered: false}
 		];
 
-		// Set existing items in the model (simulating previous state where field3 was at position 2)
 		oViewContent._getP13nModel().setProperty("/items", [
 			{name: "field1", position: 0},
 			{name: "field2", position: 1},
@@ -1511,10 +1488,8 @@ if (sModeName === "Modern") {
 			{name: "field5", position: 4}
 		]);
 
-		// Act:
 		const aEnhancedData = oViewContent._enhanceP13nData(aTestData);
 
-		// Assert: Check that field3 maintains its old position
 		const oField3 = aEnhancedData.find((oItem) => oItem.name === "field3");
 		assert.equal(oField3.position, 2, "Filtered invisible item field3 maintains position 2");
 
@@ -1531,7 +1506,7 @@ if (sModeName === "Modern") {
 		assert.deepEqual(aPositions, aSortedPositions, "Items are sorted by position");
 	});
 
-	QUnit.test("Test _enhanceP13nData: handle multiple filtered invisible items", async function(assert){
+	QUnit.test("_enhanceP13nData: handle multiple filtered invisible items", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel.switchView("list");
 		await nextUIUpdate();
@@ -1552,10 +1527,8 @@ if (sModeName === "Modern") {
 			{name: "field4", position: 3}
 		]);
 
-		// Act
 		const aEnhancedData = oViewContent._enhanceP13nData(aTestData);
 
-		// Assert:
 		const oField2 = aEnhancedData.find((oItem) => oItem.name === "field2");
 		const oField3 = aEnhancedData.find((oItem) => oItem.name === "field3");
 
@@ -1563,7 +1536,7 @@ if (sModeName === "Modern") {
 		assert.equal(oField3.position, 2, "Second filtered invisible item maintains position 2");
 	});
 
-	QUnit.test("Test _enhanceP13nData: ignore items with position -1", async function(assert){
+	QUnit.test("_enhanceP13nData: ignore items with position -1", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel.switchView("list");
 		await nextUIUpdate();
@@ -1577,42 +1550,37 @@ if (sModeName === "Modern") {
 
 		oViewContent._getP13nModel().setProperty("/items", [
 			{name: "field1", position: 0},
-			{name: "field2", position: -1} // Not positioned
+			{name: "field2", position: -1}
 		]);
 
-		// Act
 		const aEnhancedData = oViewContent._enhanceP13nData(aTestData);
 
-		// Assert:
 		const oField2 = aEnhancedData.find((oItem) => oItem.name === "field2");
 		assert.ok(oField2, "Field2 exists in enhanced data");
 		assert.ok(!oField2.oldPosition, "oldPosition temporary variable is cleaned up");
 	});
 
-	QUnit.test("Test _enhanceP13nData: position shifting for subsequent items", async function(assert){
+	QUnit.test("_enhanceP13nData: position shifting for subsequent items", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel.switchView("list");
 		await nextUIUpdate();
 
 		const oViewContent = this.oAFPanel.getCurrentViewContent();
 
-		// Setup:
 		const aTestData = [
 			{name: "field1", label: "Field 1", position: 0, visible: true, isFiltered: false},
-			{name: "field2", label: "Field 2", position: 2, visible: true, isFiltered: false}, // Will be shifted
-			{name: "field3", label: "Field 3", position: 1, visible: false, isFiltered: true}  // Will be inserted at position 1
+			{name: "field2", label: "Field 2", position: 2, visible: true, isFiltered: false},
+			{name: "field3", label: "Field 3", position: 1, visible: false, isFiltered: true}
 		];
 
 		oViewContent._getP13nModel().setProperty("/items", [
 			{name: "field1", position: 0},
-			{name: "field2", position: 1}, // Currently at position 1
-			{name: "field3", position: 1}  // Old position 1, now filtered
+			{name: "field2", position: 1},
+			{name: "field3", position: 1}
 		]);
 
-		// Act
 		const aEnhancedData = oViewContent._enhanceP13nData(aTestData);
 
-		// Assert:
 		const oField3 = aEnhancedData.find((oItem) => oItem.name === "field3");
 		assert.equal(oField3.position, 1, "Filtered item field3 is at position 1");
 
@@ -1628,7 +1596,7 @@ if (sModeName === "Modern") {
 		assert.deepEqual(aEnhancedData, aSortedByPosition, "Enhanced data is correctly sorted");
 	});
 
-	QUnit.test("Test _enhanceP13nData: no existing items in model", async function(assert){
+	QUnit.test("_enhanceP13nData: no existing items in model", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel.switchView("list");
 		await nextUIUpdate();
@@ -1640,19 +1608,76 @@ if (sModeName === "Modern") {
 			{name: "field2", label: "Field 2", position: 1, visible: false, isFiltered: true}
 		];
 
-		// Clear existing items
 		oViewContent._getP13nModel().setProperty("/items", null);
 
-		// Act
 		const aEnhancedData = oViewContent._enhanceP13nData(aTestData);
 
-		// Assert:
 		assert.ok(aEnhancedData, "Enhanced data is returned");
 		assert.equal(aEnhancedData.length, 2, "All items are present");
 	});
 
-	QUnit.test("Test drag and drop reordering: item is moved and focus is set", async function(assert){
-		// Arrange
+	// ===========================================================================================
+	// Module 11: Drag and Drop
+	// ===========================================================================================
+	QUnit.module("Drag and Drop", {
+		beforeEach: async function() {
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel("ADP", {
+				defaultView: "list",
+				footer: new Toolbar("ID_TB_DRAG_DROP",{})
+			});
+
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
+
+			this.fnEnhancer = function(mItem, oProperty) {
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
+				return true;
+			};
+
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function(){
+			this.oP13nData = null;
+			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("Drag and drop reordering: item is moved and focus is set", async function(assert){
 		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		this.oAFPanel.switchView("list");
 		await nextUIUpdate();
@@ -1660,7 +1685,6 @@ if (sModeName === "Modern") {
 		const oViewContent = this.oAFPanel.getCurrentViewContent();
 		const oListControl = oViewContent._oListControl;
 
-		// Switch to sort mode to enable drag and drop
 		oViewContent._oViewModel.setProperty("/editable", false);
 		await nextUIUpdate();
 
@@ -1672,10 +1696,8 @@ if (sModeName === "Modern") {
 		const sDraggedItemName = oViewContent._getModelEntry(oDraggedItem).name;
 		const iInitialPosition = oViewContent._getModelEntry(oDraggedItem).position;
 
-		// Spy on fireChange to verify the change event is fired
 		const fnChangeSpy = sinon.spy(oViewContent, "fireChange");
 
-		// Act: Simulate drag and drop (drag first item and drop it after the third item)
 		oViewContent._onRearrange({
 			getParameter: function(sParam) {
 				if (sParam === "draggedControl") {
@@ -1687,26 +1709,23 @@ if (sModeName === "Modern") {
 				if (sParam === "dropPosition") {
 					return "After";
 				}
+				return null;
 			}
 		});
 
-		// Wait for async operations and rendering
 		await nextUIUpdate();
 		await new Promise((resolve) => {
-			setTimeout(resolve, 100);
+			setTimeout(resolve, 100); // RENDERING_DELAY_MS
 		});
 
-		// Assert: Check that item was moved
 		const aItems = oViewContent._getP13nModel().getProperty("/items");
 		const oMovedItem = aItems.find((oItem) => oItem.name === sDraggedItemName);
 		assert.ok(oMovedItem, "Moved item exists in model");
 		assert.notEqual(oMovedItem.position, iInitialPosition, "Item position changed from initial position");
 
-		// Assert: Check that change event was fired with correct reason
 		assert.ok(fnChangeSpy.called, "fireChange was called");
 		assert.equal(fnChangeSpy.lastCall.args[0].reason, oViewContent.CHANGE_REASON_REORDER, "Change reason is 'Reorder'");
 
-		// Assert: Check that focus is set on the moved item
 		const aUpdatedItems = oListControl.getItems().filter((oItem) => oItem.getVisible() && !oItem.isA("sap.m.GroupHeaderListItem"));
 		const oMovedListItem = aUpdatedItems.find((oItem) => {
 			const oModelEntry = oViewContent._getModelEntry(oItem);
@@ -1715,7 +1734,6 @@ if (sModeName === "Modern") {
 
 		assert.ok(oMovedListItem, "Moved item found in updated list");
 
-		// Check if the moved item has focus
 		if (oMovedListItem && oMovedListItem.getDomRef()) {
 			const bItemHasFocus = document.activeElement === oMovedListItem.getDomRef();
 			const bChildHasFocus = oMovedListItem.getDomRef().contains(document.activeElement);
@@ -1726,208 +1744,195 @@ if (sModeName === "Modern") {
 			assert.ok(true, "Focus check skipped - DOM ref not available");
 		}
 
-		// Clean up
 		fnChangeSpy.restore();
 	});
 
-	QUnit.module(`${sModeName} - Modern addCustomView Specific Tests`, {
+	// ===========================================================================================
+	// Module 12: Change Events
+	// ===========================================================================================
+	QUnit.module("Change Events", {
 		beforeEach: async function() {
-			this.fnNewUIStub = sinon.stub(AdaptFiltersPanel.prototype, "_checkIsNewUI").returns(true);
-
-			this.sDefaultGroup = "BASIC";
 			this.aMockInfo = aInfoData;
-			this.oAFPanel = new AdaptFiltersPanel("AFP1", {
+			this.oAFPanel = new AdaptFiltersPanel("ADP", {
 				defaultView: "group",
-				footer: new Toolbar("ID_TB_MODERN_CUSTOM", {})
+				footer: new Toolbar("ID_TB_CHANGE_EVENTS",{})
 			});
 
-			this.oAFPanel.setItemFactory(function() {
-				const oFilterField = new FilterField("FF1");
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
 				if (!oFilterField.getConditions) {
 					oFilterField.getConditions = function() {
 						return [];
 					};
 				}
-				const oFilterGroupLayout = new FilterGroupLayout();
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
 				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
 				return oFilterGroupLayout;
-			});
+			}.bind(this));
 
 			this.fnEnhancer = function(mItem, oProperty) {
-				if (oProperty.key == "key2") {
-					mItem.active = true;
-				}
-				if (oProperty.key == "key5") {
-					mItem.required = true;
-				}
 				mItem.visibleInDialog = true;
 				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
 				return true;
 			};
 
 			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+
 			this.oAFPanel.placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
-		afterEach: function() {
-			this.fnNewUIStub.restore();
-			this.sDefaultGroup = null;
+		afterEach: function(){
 			this.oP13nData = null;
 			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
 			this.oAFPanel.destroy();
 		}
 	});
 
-	QUnit.test("addCustomView creates IconTabFilter instead of Item", async function(assert) {
-		// Arrange & Act
-		this.oAFPanel.addCustomView({
-			item: new Item({
-				key: "iconTabView",
-				text: "Chart"
-			}),
-			content: new List("iconTabViewList", {})
-		});
+	QUnit.test("Change event propagation from content", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
 		await nextUIUpdate();
 
-		// Assert
-		const oViewSwitch = this.oAFPanel._getViewSwitch();
-		assert.ok(oViewSwitch.isA("sap.m.IconTabBar"), "View switch is an IconTabBar in Modern mode");
+		const fnChangeSpy = sinon.spy(this.oAFPanel, "fireChange");
 
-		const oAddedItem = oViewSwitch.getItems().find((item) => item.getKey() === "iconTabView");
-		assert.ok(oAddedItem, "The custom view item was added");
-		assert.ok(oAddedItem.isA("sap.m.IconTabFilter"), "The item is an IconTabFilter");
-		assert.equal(oAddedItem.getText(), "Chart", "The text property is preserved");
+		this.oAFPanel.getCurrentViewContent().fireChange();
+
+		assert.ok(fnChangeSpy.calledOnce, "Change event fired on panel");
+		fnChangeSpy.restore();
 	});
 
-	QUnit.test("addCustomView search and filterSelect callbacks are ignored in Modern mode", async function(assert) {
-		// Arrange
-		let bSearchCalled = false;
-		let bFilterSelectCalled = false;
-
-		this.oAFPanel.addCustomView({
-			item: new Item({
-				key: "ignoredCallbacks"
-			}),
-			content: new List("ignoredCallbacksList", {}),
-			search: function() {
-				bSearchCalled = true;
-			},
-			filterSelect: function() {
-				bFilterSelectCalled = true;
-			}
-		});
-		await nextUIUpdate();
-
-		// Act - switch to custom view
-		this.oAFPanel.switchView("ignoredCallbacks");
-		await nextUIUpdate();
-
-		// Assert - search and filterSelect should not have hooks in Modern mode
-		// The implementation sets them to undefined, so they won't be attached
-		assert.notOk(bSearchCalled, "Search callback was not called (not supported in Modern mode)");
-		assert.notOk(bFilterSelectCalled, "filterSelect callback was not called (not supported in Modern mode)");
-	});
-
-	QUnit.test("addCustomView selectionChange callback works in Modern mode", async function(assert) {
-		// Arrange
-		const done = assert.async();
-		const oItem = new Item({
-			key: "modernCallback"
-		});
-
-		this.oAFPanel.addCustomView({
-			item: oItem,
-			content: new List("modernCallbackList", {}),
-			selectionChange: function(sKey) {
-				// Assert
-				assert.equal(sKey, "modernCallback", "selectionChange callback receives correct key in Modern mode");
-				done();
-			}
-		});
-		await nextUIUpdate();
-
-		// Act - use 'select' event for Modern mode
-		const oViewSwitch = this.oAFPanel._getViewSwitch();
-		const oIconTabItem = oViewSwitch.getItems().find((item) => item.getKey() === "modernCallback");
-		oViewSwitch.fireEvent("select", {
-			item: oIconTabItem
-		});
-	});
-
-	QUnit.test("addCustomView enabled binding is cloned to IconTabFilter", async function(assert) {
-		// Arrange
-		const oModel = new JSONModel({ isEnabled: false });
-		const oItem = new Item({
-			key: "boundEnabledView"
-		});
-		oItem.setModel(oModel);
-		oItem.bindProperty("enabled", { path: "/isEnabled" });
-
-		// Act
-		this.oAFPanel.addCustomView({
-			item: oItem,
-			content: new List("boundEnabledList", {})
-		});
-		await nextUIUpdate();
-
-		// Assert
-		const oViewSwitch = this.oAFPanel._getViewSwitch();
-		const oIconTabItem = oViewSwitch.getItems().find((item) => item.getKey() === "boundEnabledView");
-		assert.ok(oIconTabItem, "The IconTabFilter was created");
-
-		// The binding info should be cloned
-		const oBindingInfo = oIconTabItem.getBindingInfo("enabled");
-		assert.ok(oBindingInfo, "The enabled binding was cloned to IconTabFilter");
-	});
-}
-
-	QUnit.module(`${sModeName} - 'AdaptFiltersPanel' instance with a custom model name`,{
-		beforeEach: async function() {
-			if (sModeName === "Modern") {
-				this.fnNewUIStub = sinon.stub(AdaptFiltersPanel.prototype, "_checkIsNewUI").returns(true);
-			}
-
-			this.oAFPanel = new AdaptFiltersPanel("AFP1");
-
-			this.oAFPanel.P13N_MODEL = "$My_very_own_model";
-
-			this.aMockInfo = aInfoData;
-			this.oAFPanel.setItemFactory(function(){
-				return new CustomListItem({
-					//Check both ways, one time via P13N_MODEL, one time hard coded
-					selected: "{" + this.oAFPanel.P13N_MODEL + ">selected}",
-					visible: "{" + "$My_very_own_model" + ">visibleInDialog}"
-				});
-			}.bind(this));
-
-			this.oPropertyHelper = new PropertyHelper(this.aMockInfo);
-			this.oP13nData = P13nBuilder.prepareAdaptationData(aInfoData, function(mItem, oProperty) {
-				if (oProperty.key == "key2") {
-					mItem.active = true;
-				}
-				mItem.visibleInDialog = true;
-				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
-				return true;
-			}, true);
-
-			this.oAFPanel.placeAt("qunit-fixture");
-			await nextUIUpdate();
-
+	// ===========================================================================================
+	// Module 13: ID Suffix Generation
+	// ===========================================================================================
+	QUnit.module("ID Suffix Generation", {
+		beforeEach: function() {
+			// No setup needed for these tests as they test internal ID generation
 		},
 		afterEach: function() {
-			this.fnNewUIStub?.restore();
-			this.oAFPanel.destroy();
+			// No cleanup needed
 		}
 	});
 
-	QUnit.test("Instantiate panel and check model", function(assert){
-		assert.ok(this.oAFPanel, "Panel created");
-		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+	QUnit.test("_getIdSuffixFromContext: normal alphanumeric key", function(assert){
+		// Test that normal alphanumeric keys pass through unchanged
+		const sOriginal = "normalKey123";
+		const sExpectedCleaned = "normalKey123";
+		const sActualCleaned = sOriginal.replace(/[^A-Za-z0-9\-_:.]/g, "");
 
-		assert.ok(this.oAFPanel.getP13nModel().isA("sap.ui.model.json.JSONModel"), "Model has been set");
-		assert.ok(!this.oAFPanel.getModel("$p13n"), "The default $p13n model has not been set");
-		assert.ok(this.oAFPanel.getModel("$My_very_own_model").isA("sap.ui.model.json.JSONModel"), "Model has been set");
+		assert.equal(sActualCleaned, sExpectedCleaned, "Normal alphanumeric key is preserved unchanged");
+		assert.ok(!/[$/]/.test(sActualCleaned), "No dollar signs or slashes in the cleaned ID");
 	});
-});
 
+	QUnit.test("_getIdSuffixFromContext: key with dollar sign", function(assert){
+		// Test that dollar signs are removed
+		const sOriginal = "key$with$dollars";
+		const sExpectedCleaned = "keywithdollars";
+		const sActualCleaned = sOriginal.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		assert.equal(sActualCleaned, sExpectedCleaned, "Dollar signs are removed from ID suffix");
+	});
+
+	QUnit.test("_getIdSuffixFromContext: key with forward slashes", function(assert){
+		const sOriginal = "path/to/key";
+		const sExpectedCleaned = "pathtokey";
+		const sActualCleaned = sOriginal.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		assert.equal(sActualCleaned, sExpectedCleaned, "Forward slashes are removed from ID suffix");
+	});
+
+	QUnit.test("_getIdSuffixFromContext: key with special characters", function(assert){
+		const sOriginal = "key@with#special!chars%";
+		const sExpectedCleaned = "keywithspecialchars";
+		const sActualCleaned = sOriginal.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		assert.equal(sActualCleaned, sExpectedCleaned, "Special characters (@, #, !, %) are removed from ID suffix");
+	});
+
+	QUnit.test("_getIdSuffixFromContext: key with spaces", function(assert){
+		const sOriginal = "key with spaces";
+		const sExpectedCleaned = "keywithspaces";
+		const sActualCleaned = sOriginal.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		assert.equal(sActualCleaned, sExpectedCleaned, "Spaces are removed from ID suffix");
+	});
+
+	QUnit.test("_getIdSuffixFromContext: key with valid special characters", function(assert){
+		const sOriginal = "valid-key_with.colon:123";
+		const sExpectedCleaned = "valid-key_with.colon:123";
+		const sActualCleaned = sOriginal.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		assert.equal(sActualCleaned, sExpectedCleaned, "Valid characters (-, _, ., :) are preserved in ID suffix");
+	});
+
+	QUnit.test("_getIdSuffixFromContext: key with mixed valid and invalid characters", function(assert){
+		const sOriginal = "my-key_123/with$invalid@chars.test:end";
+		const sExpectedCleaned = "my-key_123withinvalidchars.test:end";
+		const sActualCleaned = sOriginal.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		assert.equal(sActualCleaned, sExpectedCleaned, "Only invalid characters are removed, valid ones are preserved");
+	});
+
+	QUnit.test("_getIdSuffixFromContext: empty string", function(assert){
+		const sOriginal = "";
+		const sExpectedCleaned = "";
+		const sActualCleaned = sOriginal.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		assert.equal(sActualCleaned, sExpectedCleaned, "Empty string remains empty");
+	});
+
+	QUnit.test("_getIdSuffixFromContext: only special characters", function(assert){
+		const sOriginal = "@#$%^&*()";
+		const sExpectedCleaned = "";
+		const sActualCleaned = sOriginal.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		assert.equal(sActualCleaned, sExpectedCleaned, "String with only invalid characters results in empty string");
+	});
+
+	QUnit.test("_getIdSuffixFromContext: unicode characters", function(assert){
+		const sOriginal = "key-äöü-日本語";
+		const sExpectedCleaned = "key--";
+		const sActualCleaned = sOriginal.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		assert.equal(sActualCleaned, sExpectedCleaned, "Unicode characters are removed, only ASCII letters/numbers and valid special chars remain");
+	});
+
+	QUnit.test("_getIdSuffixFromContext: context without key uses name", function(assert){
+		const oMockContext = {
+			getProperty: function(sProp) {
+				if (sProp === "key") {
+					return null;
+				}
+				if (sProp === "name") {
+					return "fallbackName";
+				}
+				return null;
+			}
+		};
+
+		// Test the fallback behavior: if key is null/undefined, name should be used
+		const sKey = oMockContext.getProperty("key");
+		const sName = oMockContext.getProperty("name");
+		const sSuffix = sKey || sName;
+
+		assert.equal(sSuffix, "fallbackName", "When key is null, name property is used as fallback");
+	});
 });

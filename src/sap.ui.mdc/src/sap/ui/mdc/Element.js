@@ -70,7 +70,7 @@ sap.ui.define([
 				}
 			}
 		},
-		renderer: CoreElement.renderer
+		renderer: null // Element has no renderer
 	});
 
 	DelegateMixin.call(Element.prototype);

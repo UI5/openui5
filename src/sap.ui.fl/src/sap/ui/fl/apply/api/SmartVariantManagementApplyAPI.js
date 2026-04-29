@@ -116,7 +116,10 @@ sap.ui.define([
 						reference: sReference,
 						componentId: mProperties.componentId,
 						newData: oResponse
-					}).forEach((oNewVariant) => oControl.addVariant(oNewVariant));
+					})
+					.filter((oNewFlexObject) => oNewFlexObject.getFileType() === "variant")
+					// New variants need to be explicitly added to the control
+					.forEach((oNewVariant) => oControl.addVariant(oNewVariant));
 					FlexState.addLazyVariantsLoaded(sReference, sPersistencyKey);
 				});
 			}

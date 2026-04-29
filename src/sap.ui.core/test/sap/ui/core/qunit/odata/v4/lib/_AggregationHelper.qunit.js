@@ -2123,6 +2123,30 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+[undefined, null].forEach((oAggregation) => {
+	QUnit.test("isAffected: nullish; oAggregation=" + oAggregation, function (assert) {
+		// code under test - not affected if no aggregation and no filter
+		assert.notOk(_AggregationHelper.isAffected(oAggregation, [], ["foo", "bar"]));
+
+		// code under test - wildcard should always affect
+		assert.ok(_AggregationHelper.isAffected(oAggregation, [], ["*"]));
+
+		// code under test - empty string should always affect
+		assert.ok(_AggregationHelper.isAffected(oAggregation, [], [""]));
+
+		// code under test - filter-based affection still works
+		assert.ok(_AggregationHelper.isAffected(oAggregation, [
+			new Filter("foo", FilterOperator.EQ, "bar")
+		], ["foo"]));
+
+		// code under test - no affection when filter and side effects don't match
+		assert.notOk(_AggregationHelper.isAffected(oAggregation, [
+			new Filter("foo", FilterOperator.EQ, "bar")
+		], ["baz"]));
+	});
+});
+
+	//*********************************************************************************************
 	QUnit.test("isAffected", function (assert) {
 		var oAggregation = { // Note: normalized by _AggregationHelper.buildApply before
 				aggregate : {
@@ -2205,6 +2229,75 @@ sap.ui.define([
 			]})
 		], ["foo"]));
 	});
+
+	//*********************************************************************************************
+[
+	// path not contained in orderby
+	["path", undefined, false],
+	["path", null, false],
+	["path", "", false],
+	["path", "other", false],
+	["asc", "path asc", false],
+	// path contained in orderby, asc and desc are ignored
+	["path", "foo asc,path,bar", true],
+	["path", "path asc", true],
+	["path", "path desc", true],
+	// with navigation property/complex type property
+	["path/subPath", "foo,path/subPath asc,bar", true],
+	["path/subPath", "path/subPath desc", true],
+	// no prefix/infix/suffix matches
+	["a", "abc", false],
+	["b", "abc", false],
+	["c", "abc", false],
+	// not parsable orderby item; independent whether property path is contained
+	["path", "length(foo)", true]
+].forEach(([sPropertyPath, sOrderby, bExpected], i) => {
+	QUnit.test("isOrderedBy: " + i + " - " + sPropertyPath + " in " + sOrderby, function (assert) {
+		// code under test
+		assert.strictEqual(_AggregationHelper.isOrderedBy(sPropertyPath, sOrderby), bExpected);
+	});
+});
+
+	//*********************************************************************************************
+[undefined, {}].forEach((mAggregate, i) => {
+	QUnit.test("isUsedForGrandTotal: no aggregate,# " + i, function (assert) {
+		this.mock(_Helper).expects("getMetaPath").exactly(i)
+			.withExactArgs("~path~").returns("~metapath~");
+
+		// code under test
+		assert.notOk(_AggregationHelper.isUsedForGrandTotal("~path~", mAggregate));
+	});
+});
+
+	//*********************************************************************************************
+["NoAggregate", "NoGrandTotal", "WithUnitNoGrandTotal", "Unit1"].forEach((sMetaPath) => {
+	QUnit.test("isUsedForGrandTotal: not used, meta path = " + sMetaPath, function (assert) {
+		const mAggregate = {
+			NoGrandTotal : {},
+			WithUnitNoGrandTotal : {unit : "Unit1"}
+		};
+		const sPath = "(42)/" + sMetaPath;
+		this.mock(_Helper).expects("getMetaPath").withExactArgs(sPath).returns(sMetaPath);
+
+		// code under test
+		assert.notOk(_AggregationHelper.isUsedForGrandTotal(sPath, mAggregate));
+	});
+});
+
+	//*********************************************************************************************
+["WithGrandTotal", "WithUnitWithGrandTotal", "Unit2"].forEach((sMetaPath) => {
+	QUnit.test("isUsedForGrandTotal: used, meta path = " + sMetaPath, function (assert) {
+		const mAggregate = {
+			WithGrandTotal : {grandTotal : true},
+			WithUnitWithGrandTotal : {grandTotal : true, unit : "Unit2"}
+		};
+		const sPath = "(42)/" + sMetaPath;
+		this.mock(_Helper).expects("getMetaPath").withExactArgs(sPath).returns(sMetaPath);
+
+		// code under test
+		assert.ok(_AggregationHelper.isUsedForGrandTotal(sPath, mAggregate));
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("createPlaceholder", function (assert) {

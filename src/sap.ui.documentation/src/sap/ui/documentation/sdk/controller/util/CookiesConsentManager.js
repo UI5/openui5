@@ -288,11 +288,11 @@ sap.ui.define(
                         var oConsetBarElement = this._appendTrustArcConsentBar(),
                             oScript = this._createTrustArcScriptElement();
                         oScript.addEventListener("load", function() {
-                            Log.trace('TrustArc initialization stript loaded successfully');
+                            Log.trace('TrustArc initialization script loaded successfully');
                             resolve();
                         });
                         oScript.addEventListener('error', function(oError) {
-                            Log.error("Error loading TrustArc initialization stript ", oError);
+                            Log.error("Error loading TrustArc initialization script ", oError);
                             reject();
                         });
                         this._appendDOMElementAfter(oScript, oConsetBarElement);
@@ -330,8 +330,7 @@ sap.ui.define(
                 _isTrustArcScriptIncluded: function() {
                     const scripts = document.getElementsByTagName('script');
                     for (let i = 0; i < scripts.length; i++) {
-                        const src = scripts[i].getAttribute('src');
-                        if (src && src.startsWith(TRUST_ARC.BASE_URL)) {
+                        if (scripts[i].src.startsWith(TRUST_ARC.BASE_URL)) {
                             return true;
                         }
                     }

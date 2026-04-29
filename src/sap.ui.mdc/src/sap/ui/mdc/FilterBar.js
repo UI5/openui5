@@ -295,7 +295,7 @@ sap.ui.define([
 				}.bind(this),
 				open: () => {
 					const oAdaptationFilterBar = this.getInbuiltFilter();
-					if (oAdaptationFilterBar && this._checkIsNewUI()) {
+					if (oAdaptationFilterBar) {
 						oAdaptationFilterBar._validateAdaptationState();
 					}
 				}
@@ -388,13 +388,6 @@ sap.ui.define([
 		}
 
 		return oState;
-	};
-
-	FilterBar.prototype._checkIsNewUI = function() {
-		if (this._bUseNewUI === undefined) {
-			this._bUseNewUI = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters") === "true";
-		}
-		return this._bUseNewUI;
 	};
 
 	FilterBar.prototype.exit = function() {

@@ -296,44 +296,21 @@ sap.ui.define([
 			});
 		},
 		iEnterTextInFilterDialog: function(sFilterName, sText, bLive) {
-		this.waitFor({
-			controlType: "sap.ui.mdc.p13n.panels.AdaptFiltersPanel",
-			success: function(aAdaptFiltersPanel) {
-				const oAdaptFiltersPanel = aAdaptFiltersPanel[0];
-				const bIsNewUI = oAdaptFiltersPanel.getUseNewUI();
-				if (bIsNewUI) {
-				return this.waitForP13nItem({
-					itemNameSpace: "sap.m.ListItemBase",
-					columnName: sFilterName,
-					modal: typeof bLive == "boolean" ? !bLive : true,
-					success: function(aItems) {
-						const oFilterField = aItems[0].getContent()[0].getContent()[1].getItems()[0];
-						Opa5.assert.ok(oFilterField, "FilterField found");
-						setTimeout(function() {
-							new EnterText({
-								text: sText
-							}).executeOn(oFilterField);
-						});
-					}
-				});
-				} else {
-					return this.waitForP13nItem({
-						itemNameSpace: "sap.m.ListItemBase",
-						columnName: sFilterName,
-						modal: typeof bLive == "boolean" ? !bLive : true,
-						success: function(aItems) {
-							const oFilterField = aItems.length > 1 ? aItems[1].getContent()[1].getItems()[0] : aItems[0].getCells()[1];
-							Opa5.assert.ok(oFilterField, "FilterField found");
-							setTimeout(function() {
-								new EnterText({
-									text: sText
-								}).executeOn(oFilterField);
-							});
-						}
+			return this.waitForP13nItem({
+				itemNameSpace: "sap.m.ListItemBase",
+				columnName: sFilterName,
+				modal: typeof bLive == "boolean" ? !bLive : true,
+				success: function(aItems) {
+					const oFilterField = aItems[0].getContent()[0].getContent()[1].getItems()[0];
+					Opa5.assert.ok(oFilterField, "FilterField found");
+					setTimeout(function() {
+						new EnterText({
+							text: sText
+						}).executeOn(oFilterField);
 					});
 				}
-			}
-		});
+			});
+
 		},
 
 		iPressOnButtonWithText: function(sText) {

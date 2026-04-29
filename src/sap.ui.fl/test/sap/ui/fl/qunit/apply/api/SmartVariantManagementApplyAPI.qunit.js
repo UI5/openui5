@@ -342,7 +342,7 @@ sap.ui.define([
 			assert.strictEqual(oSetCallbackStub.callCount, 0, "setDynamicVariantsLoadedCallback was not called");
 		});
 
-		QUnit.test("When the dynamicVariantsLoadedCallback is invoked, it loads comp variants", async function(assert) {
+		QUnit.test("When the dynamicVariantsLoadedCallback is invoked, it loads comp variants and changes", async function(assert) {
 			const sPersistencyKey = "myPersistencyKey";
 			const sReference = "sap.ui.core";
 			this.oControl = new Control("controlId5");
@@ -351,7 +351,9 @@ sap.ui.define([
 			this.oControl.setDynamicVariantsLoadedCallback = (fn) => {
 				fnCallback = fn;
 			};
-			this.oControl.addVariant = () => {};
+			this.oControl.addVariant = (oVariant) => {
+				assert.ok(oVariant.getVariantId(), "only variants are added to the control");
+			};
 
 			sandbox.stub(LrepConnector, "loadFlexData").resolves({});
 			sandbox.stub(Loader, "getCachedFlexData").returns({
@@ -360,7 +362,7 @@ sap.ui.define([
 			const oLoadAllCompVariantsStub = sandbox.stub(Storage, "loadAllCompVariants").resolves({
 				comp: {
 					variants: [{ fileType: "variant", fileName: "newVariant1" }],
-					changes: []
+					changes: [{ fileType: "change", fileName: "newVariantChange1" }]
 				}
 			});
 			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
@@ -393,7 +395,10 @@ sap.ui.define([
 			);
 			assert.deepEqual(
 				oAddNewObjectsSpy.firstCall.args[0].newData,
-				{ comp: { variants: [{ fileType: "variant", fileName: "newVariant1" }], changes: [] } },
+				{ comp: {
+					variants: [{ fileType: "variant", fileName: "newVariant1" }],
+					changes: [{ fileType: "change", fileName: "newVariantChange1" }]
+				} },
 				"addNewObjects received the Storage response"
 			);
 			assert.ok(oAddLazyVariantsLoadedStub.calledOnce, "FlexState.addLazyVariantsLoaded was called");

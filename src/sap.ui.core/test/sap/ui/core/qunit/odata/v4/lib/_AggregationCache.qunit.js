@@ -4461,7 +4461,11 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	[false, true].forEach((bWithGrandTotalCopy) => {
-		QUnit.test("readGrandTotal: success, 2 grand totals:" + bWithGrandTotalCopy, function (assert) {
+		[false, true].forEach((bOutdatedInBetween) => {
+			const sTitle = "readGrandTotal: success, 2 grand totals:" + bWithGrandTotalCopy
+				+ ", outdated in between: " + bOutdatedInBetween;
+
+		QUnit.test(sTitle, function (assert) {
 			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {
 				// $expand, $filter, $search, and $select must not be used with grand totals
 				$$filterBeforeAggregate : "~$$filterBeforeAggregate~",
@@ -4477,6 +4481,8 @@ sap.ui.define([
 					}
 				}
 			});
+			const oGrandTotal = {"@$ui5.context.isOutdated" : false}; // grand total is up-to-date
+			oCache.aElements.$byPredicate["()"] = oGrandTotal;
 			this.mock(_AggregationHelper).expects("hasGrandTotal")
 				.withExactArgs(sinon.match.same(oCache.oAggregation.aggregate))
 				.returns(true);
@@ -4497,9 +4503,13 @@ sap.ui.define([
 			this.mock(this.oRequestor).expects("request")
 				.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~", undefined, undefined,
 					undefined, undefined, undefined, undefined, undefined, {/*mMergeableQueryOptions*/})
-				.resolves({value : ["~newGrandTotal~"]});
-			const oGrandTotal = {"@$ui5.context.isOutdated" : false}; // grand total is up-to-date
-			oCache.aElements.$byPredicate["()"] = oGrandTotal;
+				.callsFake(() => {
+					if (bOutdatedInBetween) {
+						// simulate that grand total becomes outdated before the response arrives
+						oGrandTotal["@$ui5.context.isOutdated"] = true;
+					}
+					return Promise.resolve({value : ["~newGrandTotal~"]});
+				});
 			const oHelperMock = this.mock(_Helper);
 			oHelperMock.expects("updateExisting")
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "()",
@@ -4513,12 +4523,14 @@ sap.ui.define([
 			oHelperMock.expects("updateExisting").exactly(bWithGrandTotalCopy ? 1 : 0)
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "~oGrandTotalCopyPredicate~",
 					"~oGrandTotalCopy~", "~newGrandTotal~");
-			this.mock(oCache).expects("setGrandTotalOutdated").withExactArgs(false);
+			this.mock(oCache).expects("setGrandTotalOutdated").exactly(bOutdatedInBetween ? 0 : 1)
+				.withExactArgs(false);
 
 			// code under test
 			return oCache.readGrandTotal(oGroupLock).then((oResult) => {
 				assert.strictEqual(oResult, undefined);
 			});
+		});
 		});
 	});
 
@@ -4603,6 +4615,37 @@ sap.ui.define([
 
 			// code under test
 			oCache.setGrandTotalOutdated("~bOutdated~");
+		});
+	});
+
+	//*********************************************************************************************
+	[false, true].forEach((bUsedForGrandTotal) => {
+		const sTitle = "update: property used for grand total = " + bUsedForGrandTotal;
+
+		QUnit.test(sTitle, async function (assert) {
+			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+				aggregate : {
+					bar : {grandTotal : true}
+				}
+			});
+			const oParameters = {oGroupLock : "~oGroupLock~"};
+			this.mock(_AggregationHelper).expects("isUsedForGrandTotal")
+				.withExactArgs("~sPropertyPath~", sinon.match.same(oCache.oAggregation.aggregate))
+				.returns(bUsedForGrandTotal);
+			this.mock(oCache).expects("readGrandTotal").exactly(bUsedForGrandTotal ? 1 : 0)
+				.withExactArgs("~oGroupLock~")
+				.resolves("a");
+			this.mock(_Cache.prototype).expects("update").on(oCache)
+				.withExactArgs("~sPropertyPath~", "~vValue~", sinon.match.same(oParameters))
+				.resolves("b");
+
+			// code under test
+			const oPromise = oCache.update("~sPropertyPath~", "~vValue~", oParameters);
+
+			assert.ok(oPromise instanceof SyncPromise);
+			assert.ok(oPromise.isPending());
+
+			assert.deepEqual(await oPromise, [bUsedForGrandTotal ? "a" : false, "b"]);
 		});
 	});
 
@@ -6818,8 +6861,9 @@ sap.ui.define([
 	].forEach(function (oFixture) {
 		[false, true].forEach((bCreated) => {
 			[false, true].forEach((bCount) => {
-				const sTitle = `_delete: ${JSON.stringify(oFixture)}, created=${bCreated}`
-					+ `, count=${bCount}`;
+				[false, true].forEach((bGroupLock) => {
+		const sTitle = `_delete: ${JSON.stringify(oFixture)}, created=${bCreated}`
+			+ `, count=${bCount}, w/ oGroupLock=${bGroupLock}`;
 
 		QUnit.test(sTitle, function (assert) {
 			var oCountExpectation, oRemoveExpectation;
@@ -6851,49 +6895,60 @@ sap.ui.define([
 			oHelperMock.expects("getPrivateAnnotation")
 				.withExactArgs(sinon.match.same(oElement), "predicate")
 				.returns("~predicate~");
+			this.mock(this.oRequestor).expects("buildQueryString")
+				.withExactArgs("/Foo", sinon.match.same(oCache.mQueryOptions), true)
+				.returns("?foo=bar");
 			this.mock(oCache).expects("createCountPromise").exactly(bCount ? 1 : 0).withExactArgs();
-			this.mock(this.oRequestor).expects("request")
-				.withExactArgs("DELETE", "~editUrl~", "~oGroupLock~", {
+			const mock = () => {
+				this.mock(oCache.oTreeState).expects("delete")
+					.withExactArgs(sinon.match.same(oElement));
+				this.mock(_Cache).expects("getElementIndex")
+					.withExactArgs(sinon.match.same(oCache.aElements), "~predicate~", 2)
+					.returns(4);
+				oHelperMock.expects("getPrivateAnnotation")
+					.withExactArgs(sinon.match.same(oElement), "rank", 0).returns("~rank~");
+				const oParentCacheMock = this.mock(oParentCache);
+				oRemoveExpectation = oParentCacheMock.expects("removeElement")
+					.withExactArgs("~rank~", "~predicate~").returns("~iIndexInParentCache~");
+				oHelperMock.expects("getPrivateAnnotation")
+					.withExactArgs(sinon.match.same(oElement), "descendants", 0)
+					.returns(oFixture.firstLevel ? 3 : 0);
+				oParentCacheMock.expects("removeElement").exactly(oFixture.firstLevel ? 3 : 0)
+					.withExactArgs("~iIndexInParentCache~");
+				this.mock(oCache).expects("adjustDescendantCount")
+					.exactly(oFixture.firstLevel ? 1 : 0)
+					.withExactArgs(sinon.match.same(oElement), 4, oFixture.firstLevel ? -4 : -1);
+				oCountExpectation = this.mock(oParentCache).expects("getValue")
+					.exactly(oFixture.firstLevel ? 0 : 1)
+					.withExactArgs("$count").returns(oFixture.parentLeaf ? 0 : 5);
+				this.mock(oCache).expects("makeLeaf").exactly(oFixture.parentLeaf ? 1 : 0)
+					.withExactArgs("~oParent~");
+				this.mock(oCache).expects("shiftRank")
+					.withExactArgs(4, oFixture.firstLevel ? -4 : -1);
+				this.mock(oCache).expects("removeElement")
+					.withExactArgs(4, "~predicate~");
+			};
+			if (!bGroupLock) {
+				mock();
+			}
+			this.mock(this.oRequestor).expects("request").exactly(bGroupLock ? 1 : 0)
+				.withExactArgs("DELETE", "~editUrl~?foo=bar", "~oGroupLock~", {
 					"If-Match" : sinon.match.same(oElement)
 				})
 				.callsFake(() => {
-					this.mock(oCache.oTreeState).expects("delete")
-						.withExactArgs(sinon.match.same(oElement));
-					this.mock(_Cache).expects("getElementIndex")
-						.withExactArgs(sinon.match.same(oCache.aElements), "~predicate~", 2)
-						.returns(4);
-					oHelperMock.expects("getPrivateAnnotation")
-						.withExactArgs(sinon.match.same(oElement), "rank", 0).returns("~rank~");
-					const oParentCacheMock = this.mock(oParentCache);
-					oRemoveExpectation = oParentCacheMock.expects("removeElement")
-						.withExactArgs("~rank~", "~predicate~").returns("~iIndexInParentCache~");
-					oHelperMock.expects("getPrivateAnnotation")
-						.withExactArgs(sinon.match.same(oElement), "descendants", 0)
-						.returns(oFixture.firstLevel ? 3 : 0);
-					oParentCacheMock.expects("removeElement").exactly(oFixture.firstLevel ? 3 : 0)
-						.withExactArgs("~iIndexInParentCache~");
-					this.mock(oCache).expects("adjustDescendantCount")
-						.exactly(oFixture.firstLevel ? 1 : 0)
-						.withExactArgs(sinon.match.same(oElement), 4, oFixture.firstLevel ? -4 : -1);
-					oCountExpectation = this.mock(oParentCache).expects("getValue")
-						.exactly(oFixture.firstLevel ? 0 : 1)
-						.withExactArgs("$count").returns(oFixture.parentLeaf ? 0 : 5);
-					this.mock(oCache).expects("makeLeaf").exactly(oFixture.parentLeaf ? 1 : 0)
-						.withExactArgs("~oParent~");
-					this.mock(oCache).expects("shiftRank")
-						.withExactArgs(4, oFixture.firstLevel ? -4 : -1);
-					this.mock(oCache).expects("removeElement")
-						.withExactArgs(4, "~predicate~");
-
+					mock();
 					return Promise.resolve();
 				});
-			this.mock(oCache).expects("readCount").withExactArgs("~oGroupLock~").resolves("n/a");
-			this.mock(oCache).expects("readGrandTotal").withExactArgs("~oGroupLock~").resolves("n/a");
+			this.mock(oCache).expects("readCount").exactly(bGroupLock ? 1 : 0)
+				.withExactArgs("~oGroupLock~").resolves("n/a");
+			this.mock(oCache).expects("readGrandTotal").exactly(bGroupLock ? 1 : 0)
+				.withExactArgs("~oGroupLock~").resolves("n/a");
 
 			// code under test
-			const oDeletePromise = oCache._delete("~oGroupLock~", "~editUrl~", "2", "n/a", fnCallback);
+			const oDeletePromise = oCache._delete(bGroupLock ? "~oGroupLock~" : null, "~editUrl~", "2",
+				"n/a", fnCallback);
 
-			assert.ok(oDeletePromise.isPending(), "a SyncPromise");
+			assert.strictEqual(oDeletePromise.isPending(), bGroupLock, "a SyncPromise");
 
 			return oDeletePromise.then(function () {
 				assert.strictEqual(fnCallback.callCount, 1);
@@ -6903,6 +6958,7 @@ sap.ui.define([
 				}
 			});
 		});
+				});
 			});
 		});
 	});
@@ -6927,9 +6983,12 @@ sap.ui.define([
 				.returns("~sPredicate~");
 			oHelperMock.expects("getPrivateAnnotation").withExactArgs("~oElement~", "parent")
 				.returns("~oParentCache~");
+			this.mock(this.oRequestor).expects("buildQueryString")
+				.withExactArgs("/Foo", sinon.match.same(oCache.mQueryOptions), true)
+				.returns("?foo=bar");
 			this.mock(oCache).expects("createCountPromise").exactly(bCount ? 1 : 0).withExactArgs();
 			this.mock(this.oRequestor).expects("request")
-				.withExactArgs("DELETE", "~editUrl~", "~oGroupLock~", {
+				.withExactArgs("DELETE", "~editUrl~?foo=bar", "~oGroupLock~", {
 					"If-Match" : "~oElement~"
 				})
 				.callsFake(() => {
@@ -6955,8 +7014,11 @@ sap.ui.define([
 		const oElement = {};
 
 		oCache.aElements[2] = oElement;
+		this.mock(this.oRequestor).expects("buildQueryString")
+			.withExactArgs("/Foo", sinon.match.same(oCache.mQueryOptions), true)
+			.returns("?foo=bar");
 		this.mock(this.oRequestor).expects("request")
-			.withExactArgs("DELETE", "~editUrl~", "~oGroupLock~",
+			.withExactArgs("DELETE", "~editUrl~?foo=bar", "~oGroupLock~",
 				{"If-Match" : sinon.match.same(oElement)})
 			.returns(Promise.reject("~error~"));
 		this.mock(oCache).expects("readCount").withExactArgs("~oGroupLock~");
@@ -7000,6 +7062,7 @@ sap.ui.define([
 		this.mock(oParentCache).expects("_delete")
 			.withExactArgs("~oGroupLock~", "~editUrl~", "~transientPredicate~")
 			.returns("~promise~");
+		this.mock(this.oRequestor).expects("buildQueryString").never();
 		this.mock(oCache).expects("readCount").never();
 		this.mock(oCache).expects("readGrandTotal").never();
 
@@ -7022,6 +7085,7 @@ sap.ui.define([
 
 		this.mock(_Helper).expects("getPrivateAnnotation")
 			.withExactArgs(sinon.match.same(oElement), "predicate").returns("(42)");
+		this.mock(this.oRequestor).expects("buildQueryString").never();
 		this.mock(this.oRequestor).expects("request").never();
 		this.mock(oCache).expects("removeElement").never();
 		this.mock(_Helper).expects("updateAll").never();
@@ -7038,6 +7102,7 @@ sap.ui.define([
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
 				hierarchyQualifier : "X"
 			});
+		this.mock(this.oRequestor).expects("buildQueryString").never();
 		this.mock(oCache).expects("removeElement").never();
 		this.mock(_Helper).expects("updateAll").never();
 		this.mock(oCache).expects("readCount").never();

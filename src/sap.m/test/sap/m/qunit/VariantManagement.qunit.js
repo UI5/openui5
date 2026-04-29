@@ -2283,6 +2283,7 @@ sap.ui.define([
 		assert.ok(this.oVM.oManagementTable, "management table should exist");
 
 		const oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+		const oRebindVMTableSpy = sinon.spy(this.oVM, "_rebindVMTable");
 
 		this.oVM.oManagementDialog.attachAfterOpen(function() {
 			// At this point, busy state should be true since promise is not resolved yet
@@ -2298,6 +2299,7 @@ sap.ui.define([
 			}).then(function() {
 				// Verify setBusy was called with false after promise resolved
 				assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called");
+				assert.ok(oRebindVMTableSpy.calledWith(true), "_rebindVMTable should have been called");
 
 				// Verify the order: setBusy(true) should be called before setBusy(false)
 				let bTrueCalledFirst = false;
@@ -2315,6 +2317,7 @@ sap.ui.define([
 				assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy after promise resolves");
 
 				oSetBusySpy.restore();
+				oRebindVMTableSpy.restore();
 				this.oVM.oManagementDialog.close();
 				done();
 			}.bind(this));

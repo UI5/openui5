@@ -2232,7 +2232,9 @@ sap.ui.define([
 		}
 
 		if (sViewKey === PlanningCalendarBuiltInView.Week || bOneMonthViewOnSmallScreen) {
-			oRow = this.getAggregation("table").getInfoToolbar().getContent()[1];
+			oRow = this._oInfoToolbar.getContent().find(function(oControl) {
+				return oControl.isA(aIntervalRepresentatives);
+			});
 
 			if (iFirstDayOfWeek === -1) { // -1 is the default value of firstDayOfWeek property. It means that the Locale information should be used.
 				oFirstUTCDateOfWeek = CalendarUtils.getFirstDateOfWeek(CalendarUtils._createUniversalUTCDate(oPCStart, undefined, true));

@@ -4546,13 +4546,15 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("onDelete: context", function (assert) {
+[false, true].forEach((bOutdated) => {
+	QUnit.test("onDelete: context; w/ #setOutdated = " + bOutdated, function (assert) {
 		var oBinding = new ODataParentBinding({
 				delete : function () {},
 				findContextForCanonicalPath : function () {},
 				oModel : {
 					getDependentBindings : function () {}
-				}
+				},
+				...(bOutdated && {setOutdated : mustBeMocked})
 			}),
 			oContext = {
 				getPath : function () {}
@@ -4581,6 +4583,9 @@ sap.ui.define([
 			.returns([oDependentBinding1, oDependentBinding2]);
 		this.mock(oDependentBinding1).expects("resetChanges").withExactArgs().callsFake(reset);
 		this.mock(oDependentBinding2).expects("resetChanges").withExactArgs().callsFake(reset);
+		if (bOutdated) {
+			this.mock(oBinding).expects("setOutdated").withExactArgs(true);
+		}
 		this.mock(oBinding).expects("delete")
 			.withExactArgs(null, "canonical/path", sinon.match.same(oContext))
 			.callsFake(function () {
@@ -4590,16 +4595,19 @@ sap.ui.define([
 		// code under test
 		oBinding.onDelete("/canonical/path");
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("onDelete: no context", function () {
 		var oBinding = new ODataParentBinding({
-				findContextForCanonicalPath : function () {}
+				findContextForCanonicalPath : function () {},
+				setOutdated : mustBeMocked
 			});
 
 		this.mock(oBinding).expects("findContextForCanonicalPath").withExactArgs("/canonical/path")
 			.returns(undefined);
 		this.mock(oBinding).expects("resetChangesForPath").never();
+		this.mock(oBinding).expects("setOutdated").never();
 
 		// code under test
 		oBinding.onDelete("/canonical/path");

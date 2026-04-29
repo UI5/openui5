@@ -1763,12 +1763,12 @@ sap.ui.define([
 	 * @override
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#doSetProperty
 	 */
-	ODataListBinding.prototype.doSetProperty = function (sPath/*, ...*/) {
+	ODataListBinding.prototype.doSetProperty = function (sPath, _vValue, oGroupLock) {
 		// entities with transient predicates are either inactive, in that case the outdated flags
 		// must not be set, or the outdated flags have been set already while creating the entity;
 		// client-side annotation updates do not influence the outdated flags
 		if (!sPath.startsWith("($uid=") && !sPath.includes("/@$ui5.")) {
-			this.setOutdated(true);
+			this.setOutdated(false, sPath, oGroupLock === null);
 		}
 	};
 
@@ -3489,7 +3489,24 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#getQueryOptionsFromParameters
 	 */
 	ODataListBinding.prototype.getQueryOptionsFromParameters = function () {
-		return this.mQueryOptions;
+		let mQueryOptions = this.mQueryOptions;
+		if (this.oModel.bAutoExpandSelect) {
+			const aGroupPaths = [];
+			this.aSorters.forEach((oSorter) => {
+				const aPaths = oSorter.getGroupPaths();
+				if (aPaths) {
+					aGroupPaths.push(...aPaths);
+				}
+			});
+			if (aGroupPaths.length) {
+				mQueryOptions = {...mQueryOptions};
+				// avoid that this.mQueryOptions.$select is modified
+				mQueryOptions.$select &&= mQueryOptions.$select.slice();
+				_Helper.addToSelect(mQueryOptions, aGroupPaths);
+			}
+		}
+
+		return mQueryOptions;
 	};
 
 	/**
@@ -3744,6 +3761,25 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns whether the binding is filtered by the given (or any) property.
+	 *
+	 * @param {string} [sPropertyPath]
+	 *   The property path; if omitted, any filter counts
+	 * @returns {boolean}
+	 *   Whether the binding is filtered by the given (or any) property
+	 *
+	 * @private
+	 */
+	ODataListBinding.prototype.isFilteredBy = function (sPropertyPath) {
+		if (!sPropertyPath) {
+			return this.aApplicationFilters.length || this.aFilters.length;
+		}
+
+		return _AggregationHelper.isAffected(null, this.aApplicationFilters, [sPropertyPath])
+			|| _AggregationHelper.isAffected(null, this.aFilters, [sPropertyPath]);
+	};
+
+	/**
 	 * Returns whether the overall position of created entries is at the end of the list; this is
 	 * determined by the first call to {@link #create}.
 	 *
@@ -3788,6 +3824,25 @@ sap.ui.define([
 	ODataListBinding.prototype.isLengthFinal = function () {
 		// some controls use .bLengthFinal on list binding instead of calling isLengthFinal
 		return this.bLengthFinal;
+	};
+
+	/**
+	 * Returns whether this binding is sorted by the given (or any) property.
+	 *
+	 * @param {string} [sPropertyPath]
+	 *   A property path; if omitted, any sorter counts
+	 * @returns {boolean}
+	 *   Whether the binding is sorted by the given (or any) property
+	 *
+	 * @private
+	 */
+	ODataListBinding.prototype.isSortedBy = function (sPropertyPath) {
+		if (!sPropertyPath) {
+			return this.aSorters.length || this.mParameters.$orderby;
+		}
+
+		return this.aSorters.some((oSorter) => oSorter.getPath() === sPropertyPath)
+			|| _AggregationHelper.isOrderedBy(sPropertyPath, this.mParameters.$orderby);
 	};
 
 	/**
@@ -5236,26 +5291,37 @@ sap.ui.define([
 	 * Sets the outdated flags at the grand total and the header context considering filters,
 	 * sorters, search, and custom query options.
 	 *
-	 * @param {boolean} bForce
+	 * @param {boolean} [bForce]
 	 *   Whether to force setting the outdated flags at the grand total and the header context
+	 * @param {string} [sPropertyPath]
+	 *   An optional property path relative to the binding that gets updated; if omitted the whole
+	 *   entity / list is affected
+	 * @param {boolean} [bNoRequest]
+	 *   Whether the given property is updated without sending a PATCH request to the server
+	 * @throws {Error}
+	 *   If <code>bNoRequest</code> is set and the header context gets outdated or the property with
+	 *   the given path contributes to the grand total
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.setOutdated = function (bForce) {
+	ODataListBinding.prototype.setOutdated = function (bForce, sPropertyPath, bNoRequest) {
 		if (_Helper.isDataAggregation(this.mParameters)) {
+			const sMetaPath = sPropertyPath && _Helper.getMetaPath(sPropertyPath);
+			const oAggregation = this.mParameters.$$aggregation;
 			const bGrandTotalOutdated = bForce
-				|| this.aFilters.length > 0
-				|| this.aApplicationFilters.length > 0
-				|| this.mParameters.$filter
 				|| this.mParameters.$search
-				|| this.mParameters.$$aggregation.search
-				|| Object.keys(this.mParameters).some((sKey) => sKey[0] !== "$");
+				|| oAggregation.search
+				|| Object.keys(this.mParameters).some((sKey) => sKey[0] !== "$")
+				|| this.isFilteredBy(sMetaPath);
+			const bHeaderContextOutdated = bGrandTotalOutdated || this.isSortedBy(sMetaPath);
+			if (bNoRequest
+					&& (bHeaderContextOutdated
+					|| _AggregationHelper.isUsedForGrandTotal(sMetaPath, oAggregation.aggregate))) {
+				throw new Error("Missing PATCH request when @$ui5.context.isOutdated would be set");
+			}
 			if (bGrandTotalOutdated) {
 				this.oCache.setGrandTotalOutdated?.(true);
 			}
-			const bHeaderContextOutdated = bGrandTotalOutdated
-				|| this.aSorters.length > 0
-				|| this.mParameters.$orderby;
 			if (bHeaderContextOutdated) {
 				this.oHeaderContext.setOutdated(true);
 			}
