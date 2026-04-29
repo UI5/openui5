@@ -226,12 +226,10 @@ sap.ui.define([
 			aLabels.push(sRowId + "-highlighttext");
 		}
 
-		if (!bGroup) {
-			if (iIndex === 4) {
-				aLabels.push(oCell.getId());
-			} else {
-				aLabels.push(sTableId + "-cellacc");
-			}
+		if (iIndex === 4) {
+			aLabels.push(oCell.getId());
+		} else {
+			aLabels.push(sTableId + "-cellacc");
 		}
 
 		if (bFirstTime || bRowChange) {
