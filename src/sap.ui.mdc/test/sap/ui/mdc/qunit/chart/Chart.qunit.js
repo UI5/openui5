@@ -1251,7 +1251,64 @@ sap.ui.define([
 			}.bind(this));
 		});
 
+		QUnit.test("Action Aggregation", function(assert) {
+			const aRemovedActions = this.oMDCChart.removeAllActions();
+			assert.equal(aRemovedActions.length, 1, "One action removed");
 
+			const oAction1 = new ActionToolbarAction("A1", {
+				action: new Button("A1-B", {text: "Test"})
+			});
+			const oAction2 = new Button("A2-B", {text: "Test"});
+			const oAction3 = new ActionToolbarAction("A3", {
+				action: new Button("A3-B", {text: "Test"})
+			});
+			const oAction4 = new Button("A4-B", {text: "Test"});
+
+			this.oMDCChart.addAction(oAction1);
+			let aToolbarActions = this.oMDCChart._getToolbar().getActions();
+			assert.equal(aToolbarActions.length, 1, "Number of ActionToolbar Actions");
+			assert.equal(aToolbarActions[0].getId(), oAction1.getId(), "Action added to toolbar");
+
+			this.oMDCChart.addAction(oAction2);
+			aToolbarActions = this.oMDCChart._getToolbar().getActions();
+			assert.equal(aToolbarActions.length, 2, "Number of ActionToolbar Actions");
+			assert.equal(aToolbarActions[1].getId(), oAction2.getId() + "-action", "New Action created and added to toolbar");
+			assert.equal(aToolbarActions[1].getAction()?.getId(), oAction2.getId(), "Button is content of new Action");
+
+			this.oMDCChart.insertAction(oAction3, 1);
+			aToolbarActions = this.oMDCChart._getToolbar().getActions();
+			assert.equal(aToolbarActions.length, 3, "Number of ActionToolbar Actions");
+			assert.equal(aToolbarActions[1].getId(), oAction3.getId(), "Action insterted into toolbar");
+
+			this.oMDCChart.insertAction(oAction4, 1);
+			aToolbarActions = this.oMDCChart._getToolbar().getActions();
+			assert.equal(aToolbarActions.length, 4, "Number of ActionToolbar Actions");
+			assert.equal(aToolbarActions[1].getId(), oAction4.getId() + "-action", "New Action created and inserted into toolbar");
+			assert.equal(aToolbarActions[1].getAction()?.getId(), oAction4.getId(), "Button is content of new Action");
+
+			assert.equal(this.oMDCChart.indexOfAction(oAction1), 0, "Index of Action1 is correct");
+			assert.equal(this.oMDCChart.indexOfAction(oAction2), 3, "Index of Action2 is correct");
+
+			let oRemovedAction = this.oMDCChart.removeAction(oAction1);
+			aToolbarActions = this.oMDCChart._getToolbar().getActions();
+			assert.equal(oRemovedAction.getId(), oAction1.getId(), "Removed correct Action");
+			assert.equal(aToolbarActions.length, 3, "Number of ActionToolbar Actions");
+
+			oRemovedAction = this.oMDCChart.removeAction(oAction2);
+			aToolbarActions = this.oMDCChart._getToolbar().getActions();
+			assert.equal(oRemovedAction.getId(), oAction2.getId() + "-action", "Removed correct Action");
+			assert.equal(aToolbarActions.length, 2, "Number of ActionToolbar Actions");
+
+			oRemovedAction = this.oMDCChart.removeAction(oAction3.getId());
+			aToolbarActions = this.oMDCChart._getToolbar().getActions();
+			assert.equal(oRemovedAction.getId(), oAction3.getId(), "Removed correct Action");
+			assert.equal(aToolbarActions.length, 1, "Number of ActionToolbar Actions");
+
+			oRemovedAction = this.oMDCChart.removeAction(oAction4.getId());
+			aToolbarActions = this.oMDCChart._getToolbar().getActions();
+			assert.equal(oRemovedAction.getId(), oAction4.getId() + "-action", "Removed correct Action");
+			assert.equal(aToolbarActions.length, 0, "Number of ActionToolbar Actions");
+		});
 
 		QUnit.module("Theming", {
 			before: function() {

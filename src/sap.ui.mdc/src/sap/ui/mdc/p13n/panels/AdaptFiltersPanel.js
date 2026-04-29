@@ -4,33 +4,20 @@
 sap.ui.define([
 	"sap/m/p13n/AbstractContainer",
 	"sap/m/p13n/AbstractContainerItem",
-	"sap/m/p13n/SelectionPanel",
-	"./GroupView",
 	"./AdaptFiltersPanelContent",
 	"sap/ui/core/Lib",
 	"sap/ui/model/Filter",
-	"sap/m/Button",
-	"sap/m/Bar",
 	"sap/m/IconTabBar",
 	"sap/m/IconTabFilter",
 	"sap/m/ToolbarSpacer",
-	"sap/m/Select",
-	"sap/m/SegmentedButton",
-	"sap/m/SegmentedButtonItem",
-	"sap/ui/core/InvisibleText",
 	"sap/m/SearchField",
-	"sap/ui/core/Item",
-	"sap/m/library",
 	"sap/ui/model/json/JSONModel",
 	"sap/base/util/merge",
 	"sap/m/OverflowToolbar",
 	"sap/m/Title",
 	"sap/m/OverflowToolbarLayoutData"
-], (AbstractContainer, AbstractContainerItem, SelectionPanel, GroupView, AdaptFiltersPanelContent, Library, Filter, Button, Bar, IconTabBar, IconTabFilter, ToolbarSpacer, Select, SegmentedButton, SegmentedButtonItem, InvisibleText, SearchField, Item, mLibrary, JSONModel, merge, OverflowToolbar, Title, OverflowToolbarLayoutData) => {
+], (AbstractContainer, AbstractContainerItem, AdaptFiltersPanelContent, Library, Filter, IconTabBar, IconTabFilter, ToolbarSpacer, SearchField, JSONModel, merge, OverflowToolbar, Title, OverflowToolbarLayoutData) => {
 	"use strict";
-
-	// shortcut for sap.m.BarDesign
-	const { BarDesign } = mLibrary;
 
 	/**
 	 * Constructor for a new AdaptFiltersPanel
@@ -60,23 +47,28 @@ sap.ui.define([
 				enableReorder: {
 					type: "boolean",
 					defaultValue: true
-				},
-				/**
-				 * Whether to use the new UI (true) or legacy UI (false)
-				 * Passed from AdaptationFilterBar via GroupContainer
-				 * @private
-				 * @ui5-restricted sap.comp, sap.ui.mdc
-				 */
-				useNewUI: {
-					type: "boolean",
-					defaultValue: true
 				}
 			},
 			events: {
 				/**
 				 * This event is fired if any change has been made within the <code>AdaptFiltersPanel</code> control.
 				 */
-				change: {}
+				change: {
+					parameters: {
+						/**
+						 * The reason why the panel state has changed, for example, filters have been added, removed, hidden, shown, or reordered.
+						 */
+						reason: {
+							type: "string"
+						},
+						/**
+						 * An object containing information about the specific filter item that has been changed.
+						 */
+						item: {
+							type: "object"
+						}
+					}
+				}
 			}
 		},
 		renderer: {
@@ -87,34 +79,7 @@ sap.ui.define([
 	AdaptFiltersPanel.prototype.GROUP_KEY = "group";
 	AdaptFiltersPanel.prototype.LIST_KEY = "list";
 	AdaptFiltersPanel.prototype.P13N_MODEL = "$p13n";
-
-	/**
-	 * Setter for useNewUI property.
-	 * When property is set, check if it differs from what was created in applySettings.
-	 * If so, destroy everything and recreate with correct UI mode.
-	 * @param {boolean} bUseNewUI Whether to use new UI
-	 * @returns {this} Reference to this for chaining
-	 */
-	AdaptFiltersPanel.prototype.setUseNewUI = function(bUseNewUI) {
-		// Set the property
-		this.setProperty("useNewUI", bUseNewUI);
-
-		// Check if views were created with different UI mode
-		if (this._bCreatedWithNewUI !== undefined && this._bCreatedWithNewUI !== bUseNewUI) {
-			// UI mode changed - destroy and recreate everything
-			this._destroyViews();
-			this._createViews();
-
-			// After recreating views, switch to the current/default view
-			// to ensure the container is in a consistent state
-			const sCurrentViewKey = this.getCurrentViewKey() || this.getDefaultView();
-			if (sCurrentViewKey) {
-				this.switchView(sCurrentViewKey);
-			}
-		}
-
-		return this;
-	};
+	AdaptFiltersPanel.prototype.MODEL_PATH = "/items";
 
 	/**
 	 * Destroys all views and header
@@ -130,7 +95,7 @@ sap.ui.define([
 		this.setHeader(null);
 		this.setSubHeader(null);
 
-		// Destroy the header IconTabBar if it exists in new UI mode
+		// Destroy the header IconTabBar if it exists
 		if (this._oHeader) {
 			this._oHeader.destroy();
 		}
@@ -138,62 +103,36 @@ sap.ui.define([
 		// Clear all cached header control references
 		// These are either destroyed by aggregations above or will be recreated
 		this._oHeader = null;
-		this._oViewSwitch = null;
-		this._oShowHideBtn = null;
 		this._oGroupModeSelect = null;
 		this._oSearchField = null;
 		this._oCustomViewToolbar = null;
 		this._oCustomViewSearchField = null;
 
 		// Reset cached values
-		delete this._bCreatedWithNewUI;
-		delete this._bUseNewUI;
 		delete this._bGroupViewInitialized;
 		delete this._bListViewInitialized;
 	};
 
 	/**
-	 * Creates views based on current useNewUI property
+	 * Creates views
 	 * @private
 	 */
 	AdaptFiltersPanel.prototype._createViews = function() {
-		const bUseNewUI = this.getUseNewUI();
-
-		// Remember what UI mode we created with
-		this._bCreatedWithNewUI = bUseNewUI;
-
 		const fnChangeFactory = (sPath) => {
 			return function(oEvt) {
-				if (this._checkIsNewUI()) {
-					this.fireChange(oEvt.getParameters());
-				} else {
-					this.fireChange();
-				}
+				this.fireChange(oEvt.getParameters());
 				this.getP13nModel().setProperty(sPath, oEvt.getSource().getP13nData(), null, true);
 			}.bind(this);
 		};
 
-		let oListContent, oGroupContent;
-		if (bUseNewUI) {
-			oListContent = new AdaptFiltersPanelContent(this.getId() + "-listView", {
-				change: fnChangeFactory("/items")
-			});
+		const oListContent = new AdaptFiltersPanelContent(this.getId() + "-listView", {
+			change: fnChangeFactory(this.MODEL_PATH)
+		});
 
-			oGroupContent = new AdaptFiltersPanelContent(this.getId() + "-groupView", {
-				defaultView: this.GROUP_KEY,
-				change: fnChangeFactory("/items")
-			});
-		} else {
-			// Legacy support
-			oListContent = new SelectionPanel(this.getId() + "-listView", {
-				activeColumn: this._getResourceText("p13nDialog.LIST_VIEW_ACTIVE"),
-				change: fnChangeFactory("/items")
-			});
-
-			oGroupContent = new GroupView(this.getId() + "-groupView", {
-				change: fnChangeFactory("/itemsGrouped")
-			});
-		}
+		const oGroupContent = new AdaptFiltersPanelContent(this.getId() + "-groupView", {
+			defaultView: this.GROUP_KEY,
+			change: fnChangeFactory(this.MODEL_PATH)
+		});
 
 		this.addView(new AbstractContainerItem({
 			key: this.LIST_KEY,
@@ -207,16 +146,6 @@ sap.ui.define([
 
 		this.getView(this.LIST_KEY).getContent().setEnableReorder(this.getEnableReorder());
 		this._createHeader();
-
-		// Reapply item factory if it was already set
-		// This is needed when views are recreated due to UI mode change
-		const fnItemFactory = this.getItemFactory();
-		if (fnItemFactory) {
-			this.getViews().forEach((oView) => {
-				const oPanel = oView.getContent();
-				oPanel.setItemFactory(fnItemFactory);
-			});
-		}
 	};
 
 	/**
@@ -229,8 +158,6 @@ sap.ui.define([
 	};
 
 	AdaptFiltersPanel.prototype.applySettings = function(mSettings) {
-		// Create views with default useNewUI (true)
-		// If different value is set via property, setUseNewUI() will recreate them
 		this._createViews();
 
 		AbstractContainer.prototype.applySettings.apply(this, arguments);
@@ -259,123 +186,151 @@ sap.ui.define([
 	/**
 	 * Can be used to toggle between the different views such as <code>ListView</code> and <code>GroupView</code>
 	 *
-	 * @param {string} sKey
+	 * @param {string} sKey key of the View
 	 */
 	AdaptFiltersPanel.prototype.switchView = function(sKey) {
 		const sPreviousKey = this.getCurrentViewKey();
 
+		// Prepare view switch
+		this._prepareViewSwitch(sKey, sPreviousKey);
+
+		// Perform the actual switch
+		AbstractContainer.prototype.switchView.call(this, sKey);
+
+		// Update the new view
+		const oCurrentViewContent = this.getCurrentViewContent();
+		this._getViewSwitch()?.setSelectedKey(this.getCurrentViewKey());
+
+		// Initialize view data
+		this._initializeViewData(sKey, oCurrentViewContent);
+
+		// Transfer search value between views
+		this._transferSearchValue(sPreviousKey, oCurrentViewContent);
+
+		// Update filtering and layout
+		this._filterByModeAndSearch();
+		this.oLayout.insertContent(this._oHeader, 0);
+
+		// Handle custom view toolbar
+		this._updateCustomViewToolbar(sKey);
+
+		// Update filter fields edit mode
+		this._updateViewEditMode(sKey, oCurrentViewContent);
+	};
+
+	/**
+	 * Prepares the view switch by saving current data and deactivating current view
+	 * @param {string} sKey New view key
+	 * @param {string} sPreviousKey Previous view key
+	 * @private
+	 */
+	AdaptFiltersPanel.prototype._prepareViewSwitch = function(sKey, sPreviousKey) {
 		if (!this._isCustomView(sKey)) {
-			// DINC0615996: "Deactivate" the current view - this will prevent events such as updateFinished to
+			// DINC0615996: "Deactivate" the current view - this will prevent events such as updateFinished
 			this.getCurrentViewContent()._bInactive = true;
 		}
 
-		if (this._checkIsNewUI() && sPreviousKey && !this._isCustomView()) {
+		if (sPreviousKey && !this._isCustomView()) {
 			const oCurrentView = this.getCurrentViewContent();
 			if (oCurrentView) {
 				const aCurrentP13nData = oCurrentView.getP13nData();
 				if (aCurrentP13nData && this.getP13nModel()) {
-					this.getP13nModel().setProperty("/items", aCurrentP13nData, null, true);
+					this.getP13nModel().setProperty(this.MODEL_PATH, aCurrentP13nData, null, true);
 				}
 			}
 		}
+	};
 
-		AbstractContainer.prototype.switchView.call(this, sKey);
-
-		const oCurrentViewContent = this.getCurrentViewContent();
-		if (this._checkIsNewUI()) {
-			this._getViewSwitch()?.setSelectedKey(this.getCurrentViewKey());
-
-			if (oCurrentViewContent && this.getP13nModel() && !this._isCustomView()) {
-				oCurrentViewContent.setP13nData(this.getP13nModel().getProperty("/items"));
-				if (sKey === this.GROUP_KEY) {
-					this._bGroupViewInitialized = true;
-				} else if (sKey === this.LIST_KEY) {
-					this._bListViewInitialized = true;
-				}
-			}
-
-			let sSearch = "";
-			if (sPreviousKey) {
-				if (this._isCustomView(sPreviousKey)) {
-					sSearch = this._getCustomViewSearchField().getValue();
-				} else {
-					sSearch = this.getView(sPreviousKey).getContent()._getSearchField?.()?.getValue() ?? "";
-				}
-			}
-
-			if (this._isCustomView()) {
-				this._getCustomViewSearchField().setValue(sSearch);
-			} else if (oCurrentViewContent._getSearchField) {
-				oCurrentViewContent._getSearchField?.().setValue(sSearch);
-			}
-
-			this._filterByModeAndSearch();
-			this.oLayout.insertContent(this._oHeader, 0);
-
-			if (this._isCustomView()) {
-				const oCustomViewToolbar = this._getCustomViewToolbar();
-				if (this.oLayout.indexOfContent(oCustomViewToolbar) === -1) {
-					this.oLayout.insertContent(oCustomViewToolbar, 1);
-				}
-				oCustomViewToolbar.setVisible(true);
-
-				const [oTitle] = this._oCustomViewToolbar.getContent();
-				if (oTitle) {
-					const sViewName = this._mCustomViewTitles?.[sKey] ?? "";
-					oTitle.setText(sViewName);
-				}
-			} else if (this._oCustomViewToolbar) {
-				this._oCustomViewToolbar.setVisible(false);
-			}
-
+	/**
+	 * Initializes the new view with p13n data
+	 * @param {string} sKey View key
+	 * @param {sap.ui.core.Control} oCurrentViewContent The current view content control
+	 * @private
+	 */
+	AdaptFiltersPanel.prototype._initializeViewData = function(sKey, oCurrentViewContent) {
+		if (oCurrentViewContent && this.getP13nModel() && !this._isCustomView()) {
+			oCurrentViewContent.setP13nData(this.getP13nModel().getProperty(this.MODEL_PATH));
 			if (sKey === this.GROUP_KEY) {
-				if (oCurrentViewContent._updateFilterFieldsEditMode) {
-					oCurrentViewContent._updateFilterFieldsEditMode("edit");
-				}
-			} else if (sKey === this.LIST_KEY) {
-				if (oCurrentViewContent._oViewModel) {
-					const bEditable = oCurrentViewContent._oViewModel.getProperty("/editable");
-					const sMode = bEditable ? "edit" : "sort";
-					oCurrentViewContent._updateFilterFieldsEditMode(sMode);
-				}
-			}
-		} else {
-			//Only allow show/hide non custom view
-			this._getShowHideBtn().setVisible(!this._isCustomView());
-
-			this._getViewSwitch().setSelectedKey(this.getCurrentViewKey());
-
-			// Lazy initialization for legacy UI
-			if (sKey === this.GROUP_KEY && !this._bGroupViewInitialized && this.getP13nModel()) {
-				const sGroupPath = "/itemsGrouped";
-				oCurrentViewContent.setP13nData(this.getP13nModel().getProperty(sGroupPath));
 				this._bGroupViewInitialized = true;
-			} else if (sKey === this.LIST_KEY && !this._bListViewInitialized && this.getP13nModel()) {
-				const sListPath = "/items";
-				oCurrentViewContent.setP13nData(this.getP13nModel().getProperty(sListPath));
+			} else if (sKey === this.LIST_KEY) {
 				this._bListViewInitialized = true;
 			}
+		}
+	};
 
-			//Factory logic should only be executed for non custom panels
-			if (!this._isCustomView(sKey)) {
-				oCurrentViewContent._bInactive = false;
-				this.showFactory(oCurrentViewContent._getShowFactory());
+	/**
+	 * Transfers search value from previous view to current view
+	 * @param {string} sPreviousKey Previous view key
+	 * @param {sap.ui.core.Control} oCurrentViewContent The current view content control
+	 * @private
+	 */
+	AdaptFiltersPanel.prototype._transferSearchValue = function(sPreviousKey, oCurrentViewContent) {
+		let sSearch = "";
+		if (sPreviousKey) {
+			if (this._isCustomView(sPreviousKey)) {
+				sSearch = this._getCustomViewSearchField().getValue();
+			} else {
+				sSearch = this.getView(sPreviousKey).getContent()._getSearchField?.()?.getValue() ?? "";
 			}
-
-			//execute filtering
-			this._filterByModeAndSearch();
 		}
 
+		if (this._isCustomView()) {
+			this._getCustomViewSearchField().setValue(sSearch);
+		} else if (oCurrentViewContent?._getSearchField) {
+			oCurrentViewContent._getSearchField?.().setValue(sSearch);
+		}
+	};
+
+	/**
+	 * Updates custom view toolbar visibility and title
+	 * @param {string} sKey Current view key
+	 * @private
+	 */
+	AdaptFiltersPanel.prototype._updateCustomViewToolbar = function(sKey) {
+		if (this._isCustomView()) {
+			const oCustomViewToolbar = this._getCustomViewToolbar();
+			if (this.oLayout.indexOfContent(oCustomViewToolbar) === -1) {
+				this.oLayout.insertContent(oCustomViewToolbar, 1);
+			}
+			oCustomViewToolbar.setVisible(true);
+
+			const [oTitle] = this._oCustomViewToolbar.getContent();
+			if (oTitle) {
+				const sViewName = this._mCustomViewTitles?.[sKey] ?? "";
+				oTitle.setText(sViewName);
+			}
+		} else if (this._oCustomViewToolbar) {
+			this._oCustomViewToolbar.setVisible(false);
+		}
+	};
+
+	/**
+	 * Updates the edit mode of filter fields in the view
+	 * @param {string} sKey View key
+	 * @param {sap.ui.core.Control} oCurrentViewContent The current view content control
+	 * @private
+	 */
+	AdaptFiltersPanel.prototype._updateViewEditMode = function(sKey, oCurrentViewContent) {
+		if (sKey === this.GROUP_KEY) {
+			if (oCurrentViewContent?._updateFilterFieldsEditMode) {
+				oCurrentViewContent._updateFilterFieldsEditMode("edit");
+			}
+		} else if (sKey === this.LIST_KEY) {
+			if (oCurrentViewContent?._oViewModel) {
+				const bEditable = oCurrentViewContent._oViewModel.getProperty("/editable");
+				const sMode = bEditable ? "edit" : "sort";
+				oCurrentViewContent._updateFilterFieldsEditMode(sMode);
+			}
+		}
 	};
 
 	/**
 	 * Adds custom content to the <code>sap.ui.mdc.p13n.panels.GroupPanelBase</code>
 	 *
-	 * @param {object} mViewSettings the setting for the cutom view
+	 * @param {object} mViewSettings the setting for the custom view
 	 * @param {sap.ui.core.Item} mViewSettings.item the item used in the view switch
 	 * @param {sap.ui.core.Control} mViewSettings.content the content displayed in the custom view
 	 * @param {string} [mViewSettings.title] Title to be displayed in the overflow toolbar for the custom view
-	 * @param {function} [mViewSettings.filterSelect] callback triggered by the combobox in the header area - executed with the selected key as paramter, with new UI not any more needed
 	 * @param {function} [mViewSettings.search] callback triggered by search - executed with the string as parameter
 	 * @param {function} [mViewSettings.selectionChange] callback triggered by selecting a view - executed with the key as parameter
 	 * @param {function} [mViewSettings.reset] callback triggered when restoreDefaults is called - allows custom views to reset their state
@@ -389,19 +344,15 @@ sap.ui.define([
 		const oContent = mViewSettings.content;
 		const fnOnSearch = mViewSettings.search;
 		const fnSelectionChange = mViewSettings.selectionChange;
-		const fnDropDownChange = this._checkIsNewUI() ? undefined : mViewSettings.filterSelect;
 		const fnReset = mViewSettings.reset;
 
-		if (!sKey && this._checkIsNewUI()) {
+		if (!sKey) {
 			throw new Error("Please provide an item of type sap.ui.core.Item with a key to be used in the view switch");
-		} else if (!sKey) {
-			throw new Error("Please provide an item of type sap.m.SegmentedButtonItem with a key to be used in the view switch");
 		}
-
 
 		const oViewSwitch = this._getViewSwitch();
 		if (oViewSwitch) {
-			const sSelectionChangeEvent = this._checkIsNewUI() ? "select" : "selectionChange";
+			const sSelectionChangeEvent = "select";
 
 			oViewSwitch.attachEvent(sSelectionChangeEvent, (oEvt) => {
 				if (fnSelectionChange) {
@@ -412,26 +363,15 @@ sap.ui.define([
 					if (fnOnSearch instanceof Function) {
 						fnOnSearch(this._getSearchField().getValue());
 					}
-					if (fnDropDownChange instanceof Function) {
-						fnDropDownChange(this._getQuickFilter().getSelectedKey());
-					}
 				}
 			});
 		}
 
 		if (fnOnSearch instanceof Function) {
-			const oSearchField = this._checkIsNewUI() ? this._getCustomViewSearchField() : this._getSearchField();
+			const oSearchField = this._getCustomViewSearchField();
 			oSearchField.attachLiveChange((oEvt) => {
 				if (this._isCustomView()) {
 					fnOnSearch(oEvt.getParameter("newValue"));
-				}
-			});
-		}
-
-		if (fnDropDownChange instanceof Function) {
-			this._getQuickFilter().attachChange((oEvt) => {
-				if (this._isCustomView()) {
-					fnDropDownChange(this._getQuickFilter().getSelectedKey());
 				}
 			});
 		}
@@ -450,34 +390,29 @@ sap.ui.define([
 			this._mCustomViewTitles = this._mCustomViewTitles || {};
 			this._mCustomViewTitles[sKey] = mViewSettings.title;
 		}
-
-		if (this._checkIsNewUI()) {
-			let oIconTabFilter;
-			if (oItem.isA("sap.m.IconTabFilter")) {
-				oIconTabFilter = oItem;
-			} else {
-				oIconTabFilter = new IconTabFilter({
-					key: sKey,
-					text: oItem.getText()
-				});
-
-				// Clone the enabled property/binding from oItem to the new IconTabFilter
-				const fnPropertyIsInItem = (sProperty) => oItem && (oItem.getBindingInfo(sProperty) !== undefined || !oItem.isPropertyInitial?.(sProperty));
-				const fnExtractBinding = (sProperty) => oItem?.getBindingInfo(sProperty) ?? ({ value: oItem?.getProperty(sProperty) });
-
-				if (fnPropertyIsInItem("enabled")) {
-					let oBindingCopy = merge({}, fnExtractBinding("enabled"));
-					if (!oBindingCopy.parts) {
-						oBindingCopy = { parts: [merge({}, oBindingCopy)] };
-					}
-					oIconTabFilter.bindProperty("enabled", oBindingCopy);
-				}
-			}
-
-			oViewSwitch.addItem(oIconTabFilter);
+		let oIconTabFilter;
+		if (oItem.isA("sap.m.IconTabFilter")) {
+			oIconTabFilter = oItem;
 		} else {
-			oViewSwitch.addItem(oItem);
+			oIconTabFilter = new IconTabFilter({
+				key: sKey,
+				text: oItem.getText()
+			});
+
+			// Clone the enabled property/binding from oItem to the new IconTabFilter
+			const fnPropertyIsInItem = (sProperty) => oItem && (oItem.getBindingInfo(sProperty) !== undefined || !oItem.isPropertyInitial?.(sProperty));
+			const fnExtractBinding = (sProperty) => oItem?.getBindingInfo(sProperty) ?? ({ value: oItem?.getProperty(sProperty) });
+
+			if (fnPropertyIsInItem("enabled")) {
+				let oBindingCopy = merge({}, fnExtractBinding("enabled"));
+				if (!oBindingCopy.parts) {
+					oBindingCopy = { parts: [merge({}, oBindingCopy)] };
+				}
+				oIconTabFilter.bindProperty("enabled", oBindingCopy);
+			}
 		}
+
+		oViewSwitch.addItem(oIconTabFilter);
 	};
 
 	/**
@@ -500,33 +435,22 @@ sap.ui.define([
 	};
 
 	/**
-	 * @param {string} sGroup Can be used to expand a specific group using the group key
-	 * @param {boolean} bExpand Determines if the group should be expanded or collapsed
-	 */
-	AdaptFiltersPanel.prototype.setGroupExpanded = function(sGroup, bExpand) {
-		this.getView(this.GROUP_KEY).getContent().setGroupExpanded(sGroup, bExpand);
-	};
-
-	/**
 	 * Can be used to provide a JSON model provided by the <code>P13nBuilder</code>
 	 *
-	 * @param {sap.ui.model.json.JSONModel} oModel
+	 * @param {sap.ui.model.json.JSONModel} oModel The JSON model instance
 	 */
 	AdaptFiltersPanel.prototype.setP13nModel = function(oModel) {
 		this.setModel(oModel, this.P13N_MODEL);
 
-		const sListPath = "/items";
 		const sCurrentView = this.getCurrentViewKey() || this.LIST_KEY;
 
 		// Only initialize the default view, the other view will be initialized lazily when switching to it
 		if (sCurrentView === this.GROUP_KEY) {
-			// For legacy UI, GroupView uses "/itemsGrouped", for new UI it uses "/items"
-			const sGroupPath = this._checkIsNewUI() ? "/items" : "/itemsGrouped";
-			this.getView(this.GROUP_KEY).getContent().setP13nData(oModel.getProperty(sGroupPath));
+			this.getView(this.GROUP_KEY).getContent().setP13nData(oModel.getProperty(this.MODEL_PATH));
 			this._bGroupViewInitialized = true;
 			this._bListViewInitialized = false;
 		} else {
-			this.getView(this.LIST_KEY).getContent().setP13nData(oModel.getProperty(sListPath));
+			this.getView(this.LIST_KEY).getContent().setP13nData(oModel.getProperty(this.MODEL_PATH));
 			this._bListViewInitialized = true;
 			this._bGroupViewInitialized = false;
 		}
@@ -538,20 +462,13 @@ sap.ui.define([
 		if (!oP13nModel) {
 			this.setP13nModel(new JSONModel(oP13nData));
 		} else {
-			const sListPath = "/items";
-			let sGroupPath = "/itemsGrouped";
-			if (this._checkIsNewUI()) {
-				sGroupPath = "/items";
-			}
-
 			oP13nModel.setData(oP13nData);
-
 			// Only update views if they were already initialized (lazy loading)
 			if (this._bListViewInitialized) {
-				this.getView(this.LIST_KEY).getContent().setP13nData(oP13nModel.getProperty(sListPath));
+				this.getView(this.LIST_KEY).getContent().setP13nData(oP13nModel.getProperty(this.MODEL_PATH));
 			}
 			if (this._bGroupViewInitialized) {
-				this.getView(this.GROUP_KEY).getContent().setP13nData(oP13nModel.getProperty(sGroupPath));
+				this.getView(this.GROUP_KEY).getContent().setP13nData(oP13nModel.getProperty(this.MODEL_PATH));
 			}
 		}
 	};
@@ -560,33 +477,18 @@ sap.ui.define([
 	 * Restores the default ui state of the <code>AdaptFiltersPanel</code>.
 	 */
 	AdaptFiltersPanel.prototype.restoreDefaults = function() {
-		if (this._checkIsNewUI()) {
-			this.switchView(this.LIST_KEY);
-			this.getView(this.getCurrentViewKey()).getContent().restoreDefaults();
+		this.switchView(this.LIST_KEY);
+		this.getView(this.getCurrentViewKey()).getContent().restoreDefaults();
 
-			if (this._oCustomViewSearchField) {
-				this._oCustomViewSearchField.setValue("");
-			}
-
-			if (this._mCustomViewResetCallbacks) {
-				Object.values(this._mCustomViewResetCallbacks).forEach((fnReset) => {
-					fnReset();
-				});
-			}
-			return;
+		if (this._oCustomViewSearchField) {
+			this._oCustomViewSearchField.setValue("");
 		}
 
-		this._sModeKey = "all";
-		this._getQuickFilter().setSelectedKey(this._sModeKey);
-		this._getSearchField().setValue("");
-
-		this._filterByModeAndSearch();
-
-		if (this.getCurrentViewKey() === this.LIST_KEY) {
-			this._getShowHideBtn().setText(this._getResourceText("filterbar.ADAPT_SHOW_VALUE"));
-			this.showFactory(false);
+		if (this._mCustomViewResetCallbacks) {
+			Object.values(this._mCustomViewResetCallbacks).forEach((fnReset) => {
+				fnReset();
+			});
 		}
-
 	};
 
 	/**
@@ -602,126 +504,36 @@ sap.ui.define([
 			return this._oHeader;
 		}
 
-		if (this._checkIsNewUI()) {
-			this._oHeader = new IconTabBar(this.getId() + "-header", {
-				selectedKey: this.LIST_KEY,
-				applyContentPadding: false,
-				expandable: false,
-				items: [
-					new IconTabFilter(this.getId() + "-listTabFilter", {
-						key: this.LIST_KEY,
-						text: this._getResourceText("adaptFiltersPanel.LIST")
-					}),
-					new IconTabFilter(this.getId() + "-groupTabFilter", {
-						key: this.GROUP_KEY,
-						text: this._getResourceText("adaptFiltersPanel.GROUP")
-					})
-				],
-				select: (oEvent) => {
-					const sKey = oEvent.getParameter("key");
-					this.switchView(sKey);
-				}
-			});
+		this._oHeader = new IconTabBar(this.getId() + "-header", {
+			selectedKey: this.LIST_KEY,
+			applyContentPadding: false,
+			expandable: false,
+			items: [
+				new IconTabFilter(this.getId() + "-listTabFilter", {
+					key: this.LIST_KEY,
+					text: this._getResourceText("adaptFiltersPanel.LIST")
+				}),
+				new IconTabFilter(this.getId() + "-groupTabFilter", {
+					key: this.GROUP_KEY,
+					text: this._getResourceText("adaptFiltersPanel.GROUP")
+				})
+			],
+			select: (oEvent) => {
+				const sKey = oEvent.getParameter("key");
+				this.switchView(sKey);
+			}
+		});
 
-			this.oLayout.insertContent(this._oHeader, 0);
-			this.oLayout.setShowHeader(false);
-		} else {
-			const oQuickFilter = this._getQuickFilter();
-			const oViewSwitch = this._getViewSwitch();
-			const oShowHideBtn = this._getShowHideBtn();
-
-			this._oHeader = new Bar(this.getId() + "-legacyHeader", {
-				contentMiddle: [ oQuickFilter, new ToolbarSpacer(), oShowHideBtn, oViewSwitch ]
-			});
-			this._oHeader.setDesign(BarDesign.SubHeader);
-
-			const oSubHeader = new Bar(this.getId() + "-legacySubHeader", {
-				contentMiddle: [
-					this._getSearchField()
-				]
-			}).addStyleClass("sapUiMDCAdaptFiltersSearchBar");
-			oSubHeader.setDesign(BarDesign.SubHeader);
-			this.setSubHeader(oSubHeader);
-			this.setHeader(this._oHeader);
-			this.oLayout.setShowHeader(true);
-		}
+		this.oLayout.insertContent(this._oHeader, 0);
+		this.oLayout.setShowHeader(false);
 		return this._oHeader;
 	};
 
-	AdaptFiltersPanel.prototype._getShowHideBtn = function() {
-		if (this._checkIsNewUI()) {
-			return;
-		}
-
-		const sShowText = this._getResourceText("filterbar.ADAPT_SHOW_VALUE");
-		const sHideText = this._getResourceText("filterbar.ADAPT_HIDE_VALUE");
-
-		if (!this._oShowHideBtn) {
-			this._oShowHideBtn = new Button(this.getId() + "-showHideBtn", {
-				press: function(oEvt) {
-					this.showFactory(!this.getCurrentViewContent()._getShowFactory());
-					const oBtn = oEvt.oSource;
-					const sNewText = oBtn.getText() === sShowText ? sHideText : sShowText;
-					oBtn.setText(sNewText);
-				}.bind(this)
-			});
-		}
-
-		this._oShowHideBtn.setText(!this._isCustomView() && this.getCurrentViewContent()._getShowFactory() ? sHideText : sShowText);
-		return this._oShowHideBtn;
-	};
-
-	AdaptFiltersPanel.prototype._getQuickFilter = function() {
-
-		if (!this._oGroupModeSelect) {
-			this._oGroupModeSelect = new Select(this.getId() + "-quickFilter", {
-				items: [
-					new Item(this.getId() + "-quickFilter-all", {
-						key: "all",
-						text: this._getResourceText("p13nDialog.GROUPMODE_ALL")
-					}),
-					new Item(this.getId() + "-quickFilter-visible", {
-						key: "visible",
-						text: this._getResourceText("p13nDialog.GROUPMODE_VISIBLE")
-					}),
-					new Item(this.getId() + "-quickFilter-active", {
-						key: "active",
-						text: this._getResourceText("p13nDialog.GROUPMODE_ACTIVE")
-					}),
-					new Item(this.getId() + "-quickFilter-visibleactive", {
-						key: "visibleactive",
-						text: this._getResourceText("p13nDialog.GROUPMODE_VISIBLE_ACTIVE")
-					}),
-					new Item(this.getId() + "-quickFilter-mandatory", {
-						key: "mandatory",
-						text: this._getResourceText("p13nDialog.GROUPMODE_MANDATORY")
-					})
-				],
-				tooltip: this._getResourceText("p13nDialog.QUICK_FILTER"),
-				change: this._onGroupModeChange.bind(this)
-			});
-
-		}
-
-		return this._oGroupModeSelect;
-	};
-
 	AdaptFiltersPanel.prototype._getSearchField = function() {
-		if (this._checkIsNewUI()) {
-			if (this._isCustomView()) {
-				return this._getCustomViewSearchField();
-			}
-			return this.getCurrentViewContent()._getSearchField?.();
+		if (this._isCustomView()) {
+			return this._getCustomViewSearchField();
 		}
-
-		if (!this._oSearchField) {
-			this._oSearchField = new SearchField(this.getId() + "-searchField", {
-				liveChange: [this._filterByModeAndSearch, this],
-				width: "100%"
-			});
-			this._oSearchField.setPlaceholder(this._getResourceText("p13nDialog.ADAPT_FILTER_SEARCH"));
-		}
-		return this._oSearchField;
+		return this.getCurrentViewContent()._getSearchField?.();
 	};
 
 	/**
@@ -786,46 +598,8 @@ sap.ui.define([
 		return this._getSearchField();
 	};
 
-	AdaptFiltersPanel.prototype._onGroupModeChange = function(oEvt) {
-		this._sModeKey = oEvt.getParameters().selectedItem.getKey();
-		this._filterByModeAndSearch();
-	};
-
 	AdaptFiltersPanel.prototype._getViewSwitch = function() {
-		if (this._checkIsNewUI()) {
-			return this._oHeader;
-		}
-
-		if (!this._oViewSwitch) {
-			this._oViewSwitch = new SegmentedButton(this.getId() + "-viewSwitch", {
-				items: [
-					new SegmentedButtonItem(this.getId() + "-listViewButton", {
-						tooltip: this._getResourceText("filterbar.ADAPT_LIST_VIEW"),
-						icon: "sap-icon://list",
-						key: this.LIST_KEY
-					}), new SegmentedButtonItem(this.getId() + "-groupViewButton", {
-						tooltip: this._getResourceText("filterbar.ADAPT_GROUP_VIEW"),
-						icon: "sap-icon://group-2",
-						key: this.GROUP_KEY
-					})
-				],
-				selectionChange: function(oEvt) {
-					if (this.getCurrentViewKey() === this.LIST_KEY) {
-						this.getCurrentViewContent()._removeMoveButtons();
-					}
-					const sKey = oEvt.getParameter("item").getKey();
-					this.switchView(sKey);
-				}.bind(this)
-			});
-
-			this._oInvText = new InvisibleText(this.getId() + "-viewSwitchLabel", {
-				text: this._getResourceText("p13nDialog.VIEW_SWITCH")
-			}).toStatic();
-
-			this._oViewSwitch.addAriaLabelledBy(this._oInvText);
-		}
-
-		return this._oViewSwitch;
+		return this._oHeader;
 	};
 
 	AdaptFiltersPanel.prototype._isCustomView = function(sKey) {
@@ -834,26 +608,7 @@ sap.ui.define([
 	};
 
 	AdaptFiltersPanel.prototype._filterByModeAndSearch = function() {
-		if (this._checkIsNewUI()) {
-			this.getCurrentViewContent()._filterByModeAndSearch?.();
-			return;
-		}
-
-		if (this._isCustomView(this.getCurrentViewKey())) {
-			return;
-		}
-
-		this._sSearchString = this._getSearchField().getValue();
-
-		//Create model filter based on search & mode filter
-		const aFilters = this._createFilterQuery();
-
-		//Update value - necessary due to view switch
-		this._getSearchField().setValue(this._sSearchString);
-
-		this.getCurrentViewContent().filterContent(aFilters);
-
-		return aFilters;
+		this.getCurrentViewContent()._filterByModeAndSearch?.();
 	};
 
 
@@ -861,83 +616,22 @@ sap.ui.define([
 		return Library.getResourceBundleFor("sap.ui.mdc").getText(sKey);
 	};
 
-	//TODO: Renable with refactoring
-	/*
-	function matchTermToSearchRegex(term){
-
-	    if (!term){
-	        return false;
-	    }
-
-	    return term.match(this._oSearchRegex);
-	}*/
-
-	AdaptFiltersPanel.prototype._createFilterQuery = function() {
-		let aFiltersSearch = [],
-			vFilterMode = [],
-			vQueryFilter = [];
-
-		// 1) Check if there is a "search" filtering
-		if (this._sSearchString) {
-			//Match "Any term starting with"
-			//this._oSearchRegex = new RegExp("(?<=^|\\s)" + this._sSearchString + "\\w*", "i");
-			aFiltersSearch = [
-				new Filter("label", "Contains", this._sSearchString), new Filter("tooltip", "Contains", this._sSearchString)
-			];
-			vQueryFilter = new Filter(aFiltersSearch, false);
-		}
-
-		// 2) Check if the filter combobox has been used and append the filter to the previous filters
-		switch (this._sModeKey) {
-			case "visible":
-				vFilterMode = new Filter("visible", "EQ", true);
-				break;
-			case "active":
-				vFilterMode = new Filter("active", "EQ", true);
-				break;
-			case "mandatory":
-				vFilterMode = new Filter("required", "EQ", true);
-				break;
-			case "visibleactive":
-				vFilterMode = new Filter([
-					new Filter("active", "EQ", true), new Filter("visible", "EQ", true)
-				], true);
-				break;
-			default:
-		}
-
-		// 3) always add the 'visibleInDialog' filter to the query
-		const oVisibleInDialogFilter = new Filter("visibleInDialog", "EQ", true);
-
-		return new Filter([].concat(vQueryFilter, vFilterMode, oVisibleInDialogFilter), true);
-	};
-
-	AdaptFiltersPanel.prototype._checkIsNewUI = function() {
-		if (this._bUseNewUI === undefined) {
-			// URL parameter takes precedence (for testing/development)
-			const sUrlParam = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters");
-			if (sUrlParam === "true") {
-				this._bUseNewUI = true;
-			} else if (sUrlParam === "false") {
-				this._bUseNewUI = false;
-			} else {
-				// Use the property value
-				this._bUseNewUI = this.getUseNewUI();
-			}
-		}
-		return this._bUseNewUI;
-	};
-
 	AdaptFiltersPanel.prototype.exit = function() {
 		AbstractContainer.prototype.exit.apply(this, arguments);
-		this._sModeKey = null;
-		this._sSearchString = null;
 
-		if (this._oInvText) {
-			this._oInvText.destroy();
-			this._oInvText = null;
-		}
+		// Destroy all control instances
+		this._oInvText?.destroy();
+		this._oHeader?.destroy();
+		this._oCustomViewToolbar?.destroy();
+		this._oCustomViewSearchField?.destroy();
 
+		// Clear all references
+		this._oInvText = null;
+		this._oHeader = null;
+		this._oCustomViewToolbar = null;
+		this._oCustomViewSearchField = null;
+		this._mCustomViewResetCallbacks = null;
+		this._mCustomViewTitles = null;
 	};
 
 	return AdaptFiltersPanel;

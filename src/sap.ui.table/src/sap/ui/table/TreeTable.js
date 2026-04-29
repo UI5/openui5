@@ -136,23 +136,25 @@ sap.ui.define([
 
 	function expandRow(oRow) {
 		const iIndex = oRow.getIndex();
+		const oRowContext = TableUtils.getBindingContextOfRow(oRow);
 
 		this._oProxy.expand(iIndex);
 		const bIsExpanded = this._oProxy.isExpanded(iIndex);
 
 		if (typeof bIsExpanded === "boolean") {
-			this._onGroupHeaderChanged(oRow, bIsExpanded);
+			this._onGroupHeaderChanged(iIndex, oRowContext, bIsExpanded);
 		}
 	}
 
 	function collapseRow(oRow) {
 		const iIndex = oRow.getIndex();
+		const oRowContext = TableUtils.getBindingContextOfRow(oRow);
 
 		this._oProxy.collapse(iIndex);
 		const bIsExpanded = this._oProxy.isExpanded(iIndex);
 
 		if (typeof bIsExpanded === "boolean") {
-			this._onGroupHeaderChanged(oRow, bIsExpanded);
+			this._onGroupHeaderChanged(iIndex, oRowContext, bIsExpanded);
 		}
 	}
 
@@ -234,10 +236,10 @@ sap.ui.define([
 		return aRowContexts;
 	}
 
-	TreeTable.prototype._onGroupHeaderChanged = function(oRow, bExpanded) {
+	TreeTable.prototype._onGroupHeaderChanged = function(iRowIndex, oRowContext, bExpanded) {
 		this.fireToggleOpenState({
-			rowIndex: oRow.getIndex(),
-			rowContext: TableUtils.getBindingContextOfRow(oRow),
+			rowIndex: iRowIndex,
+			rowContext: oRowContext,
 			expanded: bExpanded
 		});
 	};

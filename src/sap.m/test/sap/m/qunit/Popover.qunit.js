@@ -29,6 +29,7 @@ sap.ui.define([
 	"sap/m/Title",
 	"sap/m/Text",
 	"sap/m/Input",
+	"sap/m/VBox",
 	"sap/m/ValueStateHeader",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/dom/containsOrEquals",
@@ -63,6 +64,7 @@ sap.ui.define([
 	Title,
 	Text,
 	Input,
+	VBox,
 	ValueStateHeader,
 	KeyCodes,
 	containsOrEquals,
@@ -1066,6 +1068,43 @@ sap.ui.define([
 		var $content = this.oPopover.$("cont");
 		assert.ok(this.oPopover.$().width() - 2 <= (jQuery(window).width() * 0.5), "Calculated width " + $content.width() + " should be less or equal than the part of window width " + jQuery(window).width() * 0.5);
 		assert.ok($content.height() <= (jQuery(window).height() * 0.5), "Calculated height " + $content.height() + " should be less or equal than the part of window height " + jQuery(window).height() * 0.5);
+	});
+
+	QUnit.test("set maxHeight", function (assert){
+		this.oPopover.setMaxHeight("250px");
+		this.oButton.firePress();
+		this.clock.tick(100);
+		const $popover = this.oPopover.$();
+		assert.strictEqual($popover.css("max-height"), "250px", "max-height style should be set to 250px on the popover root element");
+	});
+
+	QUnit.test("maxHeight - actual height respects maxHeight and content is scrollable", async function (assert){
+		// Add tall content to test scrolling
+		this.oPopover.removeAllContent();
+		for (let i = 0; i < 30; i++) {
+			this.oPopover.addContent(new Text({
+				text: `Line ${i + 1}: Content line for testing maxHeight scrolling behavior.`
+			}));
+		}
+		this.oPopover.setContentWidth("300px");
+		this.oPopover.setMaxHeight("200px");
+
+		this.oButton.firePress();
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		const $popover = this.oPopover.$();
+		const $content = this.oPopover.$("cont");
+		const actualHeight = $popover.outerHeight();
+
+		// Verify actual height respects maxHeight
+		assert.ok(actualHeight <= 200, `Popover actual height (${actualHeight}px) should not exceed maxHeight (200px)`);
+
+		// Verify content area has scroll capability by checking if content container's scrollHeight exceeds its clientHeight
+		// The content container should have overflow when maxHeight constrains the popover
+		const contentScrollHeight = $content[0].scrollHeight;
+		const contentClientHeight = $content[0].clientHeight;
+		assert.ok(contentScrollHeight > contentClientHeight, `Content should be scrollable - content scrollHeight (${contentScrollHeight}px) should be greater than clientHeight (${contentClientHeight}px)`);
 	});
 
 	QUnit.test("Set enable scrolling (mapped to vertical/horizontal scrolling)", function (assert){

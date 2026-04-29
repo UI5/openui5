@@ -1037,6 +1037,246 @@ function(
         }.bind(this));
     });
 
+    QUnit.test("_updateColoring with pre-wrapped criticality Values", function(assert) {
+        const done = assert.async();
+        const oInnerChartMock = {setColorings: function(){}, setActiveColoring: function(){}};
+
+        const oStub = sandbox.stub(this.oMDCChart, "_getPropertyByNameAsync");
+        oStub.withArgs("Dimension1").returns(Promise.resolve({
+            name: "Dimension1",
+            groupable: true,
+            label: "Label 1",
+            criticality: {
+                "Positive": {
+                    Values: ["1"]
+                },
+                "Critical": {
+                    Values: ["2"]
+                },
+                "Negative": {
+                    Values: ["3"]
+                }
+            }
+
+        }));
+        oStub.withArgs("Measure1").returns(Promise.resolve({
+            name: "Measure1",
+            aggregatable: true,
+            label: "Label 2",
+            datapoint: {
+                criticality : {
+                    DynamicThresholds : {
+                        usedMeasures : ["Measure2"]
+                    }
+                }
+            }
+        }));
+
+        ChartDelegate._setState(this.oMDCChart, { innerChart: oInnerChartMock, aInSettings: [], aColMeasures : [] });
+        const oColorSpy = sinon.spy(oInnerChartMock, "setColorings");
+        const oActiveColorSpy = sinon.spy(oInnerChartMock, "setActiveColoring");
+
+        const oMeas = new Item({propertyKey: "Measure1", type: "aggregatable"});
+        const oDim = new Item({propertyKey: "Dimension1", type: "groupable", label: "Dim1"});
+        this.oMDCChart.addItem(oMeas);
+        this.oMDCChart.addItem(oDim);
+
+        const oCorrectColorConfig = {
+            "Criticality": {
+                "DimensionValues": {
+                    "Dimension1": {
+                        "Positive": {
+                            "Values": [
+                                "1"
+                            ]
+                        },
+                        "Critical": {
+                            "Values": [
+                                "2"
+                            ]
+                        },
+                        "Negative": {
+                            "Values": [
+                                "3"
+                            ]
+                        }
+                    }
+                }
+            }
+        };
+
+        const oCorrectActiveColorConfig = {
+            "coloring": "Criticality",
+            "parameters": {
+                "dimension": "Dimension1"
+            }
+        };
+
+        ChartDelegate._prepareColoringForItem(this.oMDCChart, oMeas).then(function(){
+            ChartDelegate._prepareColoringForItem(this.oMDCChart, oDim).then(function(){
+                ChartDelegate._updateColoring(this.oMDCChart, ["Dimension1"], ["Measure2"]);
+
+                assert.ok(oColorSpy.calledWithExactly(oCorrectColorConfig), "Pre-wrapped criticality Values are used directly without re-wrapping");
+                assert.ok(oActiveColorSpy.calledWithExactly(oCorrectActiveColorConfig), "ActiveColor function called on inner chart");
+                done();
+            }.bind(this));
+        }.bind(this));
+    });
+
+    QUnit.test("_updateColoring with pre-wrapped criticality Values and Legend", function(assert) {
+        const done = assert.async();
+        const oInnerChartMock = {setColorings: function(){}, setActiveColoring: function(){}};
+
+        const oStub = sandbox.stub(this.oMDCChart, "_getPropertyByNameAsync");
+        oStub.withArgs("Dimension1").returns(Promise.resolve({
+            name: "Dimension1",
+            groupable: true,
+            label: "Label 1",
+            criticality: {
+                "Positive": { Values: ["1", "4"], Legend: "Positive" },
+                "Critical": { Values: ["2"], Legend: "Critical" },
+                "Negative": { Values: ["3"], Legend: "Negative" }
+            }
+
+        }));
+        oStub.withArgs("Measure1").returns(Promise.resolve({
+            name: "Measure1",
+            aggregatable: true,
+            label: "Label 2",
+            datapoint: {
+                criticality : {
+                    DynamicThresholds : {
+                        usedMeasures : ["Measure2"]
+                    }
+                }
+            }
+        }));
+
+        ChartDelegate._setState(this.oMDCChart, { innerChart: oInnerChartMock, aInSettings: [], aColMeasures : [] });
+        const oColorSpy = sinon.spy(oInnerChartMock, "setColorings");
+        const oActiveColorSpy = sinon.spy(oInnerChartMock, "setActiveColoring");
+
+        const oMeas = new Item({propertyKey: "Measure1", type: "aggregatable"});
+        const oDim = new Item({propertyKey: "Dimension1", type: "groupable", label: "Dim1"});
+        this.oMDCChart.addItem(oMeas);
+        this.oMDCChart.addItem(oDim);
+
+        const oCorrectColorConfig = {
+            "Criticality": {
+                "DimensionValues": {
+                    "Dimension1": {
+                        "Positive": {
+                            "Values": ["1", "4"],
+                            "Legend": "Positive"
+                        },
+                        "Critical": {
+                            "Values": ["2"],
+                            "Legend": "Critical"
+                        },
+                        "Negative": {
+                            "Values": ["3"],
+                            "Legend": "Negative"
+                        }
+                    }
+                }
+            }
+        };
+
+        const oCorrectActiveColorConfig = {
+            "coloring": "Criticality",
+            "parameters": {
+                "dimension": "Dimension1"
+            }
+        };
+
+        ChartDelegate._prepareColoringForItem(this.oMDCChart, oMeas).then(function(){
+            ChartDelegate._prepareColoringForItem(this.oMDCChart, oDim).then(function(){
+                ChartDelegate._updateColoring(this.oMDCChart, ["Dimension1"], ["Measure2"]);
+
+                assert.ok(oColorSpy.calledWithExactly(oCorrectColorConfig), "Pre-wrapped criticality with Legend properties are passed through directly");
+                assert.ok(oActiveColorSpy.calledWithExactly(oCorrectActiveColorConfig), "ActiveColor function called on inner chart");
+                done();
+            }.bind(this));
+        }.bind(this));
+    });
+
+    QUnit.test("_updateColoring with mixed criticality (pre-wrapped and plain)", function(assert) {
+        const done = assert.async();
+        const oInnerChartMock = {setColorings: function(){}, setActiveColoring: function(){}};
+
+        const oStub = sandbox.stub(this.oMDCChart, "_getPropertyByNameAsync");
+        oStub.withArgs("Dimension1").returns(Promise.resolve({
+            name: "Dimension1",
+            groupable: true,
+            label: "Label 1",
+            criticality: {
+                "Positive": {
+                    Values: ["1"]
+                },
+                "Critical": [
+                    "2"
+                ],
+                "Negative": {
+                    Values: ["3"]
+                }
+            }
+
+        }));
+        oStub.withArgs("Measure1").returns(Promise.resolve({
+            name: "Measure1",
+            aggregatable: true,
+            label: "Label 2",
+            datapoint: {
+                criticality : {
+                    DynamicThresholds : {
+                        usedMeasures : ["Measure2"]
+                    }
+                }
+            }
+        }));
+
+        ChartDelegate._setState(this.oMDCChart, { innerChart: oInnerChartMock, aInSettings: [], aColMeasures : [] });
+        const oColorSpy = sinon.spy(oInnerChartMock, "setColorings");
+
+        const oMeas = new Item({propertyKey: "Measure1", type: "aggregatable"});
+        const oDim = new Item({propertyKey: "Dimension1", type: "groupable", label: "Dim1"});
+        this.oMDCChart.addItem(oMeas);
+        this.oMDCChart.addItem(oDim);
+
+        const oCorrectColorConfig = {
+            "Criticality": {
+                "DimensionValues": {
+                    "Dimension1": {
+                        "Positive": {
+                            "Values": [
+                                "1"
+                            ]
+                        },
+                        "Critical": {
+                            "Values": [
+                                "2"
+                            ]
+                        },
+                        "Negative": {
+                            "Values": [
+                                "3"
+                            ]
+                        }
+                    }
+                }
+            }
+        };
+
+        ChartDelegate._prepareColoringForItem(this.oMDCChart, oMeas).then(function(){
+            ChartDelegate._prepareColoringForItem(this.oMDCChart, oDim).then(function(){
+                ChartDelegate._updateColoring(this.oMDCChart, ["Dimension1"], ["Measure2"]);
+
+                assert.ok(oColorSpy.calledWithExactly(oCorrectColorConfig), "Mixed criticality: pre-wrapped kept as-is, plain arrays wrapped in Values");
+                done();
+            }.bind(this));
+        }.bind(this));
+    });
+
     QUnit.test("_updateColoring only measure", function(assert) {
         const done = assert.async();
         const oInnerChartMock = {setColorings: function(){}, setActiveColoring: function(){}};

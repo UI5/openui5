@@ -126,6 +126,8 @@ sap.ui.define([
 		 * @type {boolean}
 		 */
 		_private(this).bTableIsFlexItem = false;
+
+		this.adjustRowCountToAvailableSpace = TableUtils.throttleFrameWise(adjustRowCountToAvailableSpace);
 	};
 
 	AutoRowMode.prototype.attachEvents = function() {
@@ -353,12 +355,7 @@ sap.ui.define([
 		return iRowCount;
 	};
 
-	/**
-	 * Calculates and applies the row count based on the available vertical space.
-	 *
-	 * @private
-	 */
-	AutoRowMode.prototype.adjustRowCountToAvailableSpace = TableUtils.throttleFrameWise(function() {
+	function adjustRowCountToAvailableSpace() {
 		const oTable = this.getTable();
 		const oTableDomRef = oTable.getDomRef();
 
@@ -379,7 +376,7 @@ sap.ui.define([
 		if (iOldComputedRowCount !== iNewComputedRowCount || this.getHideEmptyRows() && iOldConfiguredRowCount !== this.getConfiguredRowCount()) {
 			this.invalidate();
 		}
-	});
+	}
 
 	/**
 	 * Determines the vertical space available for the rows.

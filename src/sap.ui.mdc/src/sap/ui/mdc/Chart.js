@@ -10,6 +10,7 @@ sap.ui.define([
 	"./chart/ToolbarControlFactory",
 	"sap/ui/mdc/ActionToolbar",
 	"./chart/PropertyHelper",
+	"sap/ui/mdc/mixin/ActionToolbarMixin",
 	"sap/ui/mdc/mixin/FilterIntegrationMixin",
 	"sap/ui/model/base/ManagedObjectModel",
 	"sap/ui/mdc/p13n/subcontroller/ChartItemController",
@@ -17,7 +18,6 @@ sap.ui.define([
 	"sap/ui/mdc/p13n/subcontroller/SortController",
 	"sap/ui/mdc/p13n/subcontroller/ChartTypeController",
 	"sap/ui/base/ManagedObjectObserver",
-	"sap/ui/mdc/actiontoolbar/ActionToolbarAction",
 	"sap/ui/core/library",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/mdc/util/InfoBar",
@@ -40,6 +40,7 @@ sap.ui.define([
 		ToolbarControlFactory,
 		ActionToolbar,
 		PropertyHelper,
+		ActionToolbarMixin,
 		FilterIntegrationMixin,
 		ManagedObjectModel,
 		ChartItemController,
@@ -47,7 +48,6 @@ sap.ui.define([
 		SortController,
 		ChartTypeController,
 		ManagedObjectObserver,
-		ActionToolbarAction,
 		coreLibrary,
 		KeyCodes,
 		InfoBar,
@@ -487,6 +487,7 @@ sap.ui.define([
 		const MDCRb = Library.getResourceBundleFor("sap.ui.mdc");
 		const { ToolbarDesign } = MLibrary;
 
+		ActionToolbarMixin.call(Chart.prototype);
 		FilterIntegrationMixin.call(Chart.prototype);
 
 		/**
@@ -1837,16 +1838,6 @@ sap.ui.define([
 				//This should never happen!
 				Log.error("sap.ui.mdc.Chart: Tried to render overlay on not initiailized chart. This will not work!");
 			}
-		};
-
-		Chart.prototype.addAction = function(oControl) {
-			if (oControl.getMetadata().getName() !== "sap.ui.mdc.actiontoolbar.ActionToolbarAction") {
-				oControl = new ActionToolbarAction(oControl.getId() + "-action", {
-					action: oControl
-				});
-			}
-
-			return Control.prototype.addAggregation.apply(this, ["actions", oControl]);
 		};
 
 		Chart.prototype.setHeader = function(sHeader) {

@@ -2896,6 +2896,41 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("firstDayOfWeek is applied correctly after re-render when singleSelection=false", function(assert) {
+		const fnDone = assert.async();
+
+		const oModel = new JSONModel({ people: [] });
+		const oPC = new PlanningCalendar({
+			viewKey: "Week",
+			startDate: UI5Date.getInstance(2024, 0, 1),
+			firstDayOfWeek: 1,
+			singleSelection: false,
+			showRowHeaders: false,
+			rows: {
+				path: "/people",
+				template: new PlanningCalendarRow({ title: "{name}" })
+			}
+		});
+		oPC.setModel(oModel);
+		oPC.placeAt("bigUiArea");
+
+		setTimeout(async function() {
+			oModel.setProperty("/people", [{ name: "John Doe" }, { name: "Jane Doe" }]);
+			await nextUIUpdate(); // re-render triggered by model change
+
+			oPC.setFirstDayOfWeek(3);
+			await nextUIUpdate();
+
+			const oRow = oPC._oInfoToolbar.getContent().find(function(oControl) {
+				return oControl.isA(["sap.ui.unified.calendar.DatesRow", "sap.ui.unified.calendar.WeeksRow"]);
+			});
+			assert.strictEqual(oRow.getFirstDayOfWeek(), 3, "firstDayOfWeek change is correctly applied to the Week row after data arrives");
+
+			oPC.destroy();
+			fnDone();
+		});
+	});
+
 	QUnit.module("NonWorking Special Dates", {
 		beforeEach: function() {
 			this.oPC = createPlanningCalendar("PCNonWorking", new SearchField(), new Button());

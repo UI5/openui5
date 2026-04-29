@@ -39,7 +39,7 @@ sap.ui.define([
 	"sap/ui/mdc/p13n/subcontroller/ColumnFreezeController",
 	"sap/ui/mdc/p13n/subcontroller/DynamicPropertiesController",
 	"sap/ui/mdc/mixin/DynamicPropertiesMixin",
-	"sap/ui/mdc/actiontoolbar/ActionToolbarAction",
+	"sap/ui/mdc/mixin/ActionToolbarMixin",
 	"sap/ui/mdc/table/menus/QuickActionContainer",
 	"sap/ui/core/theming/Parameters",
 	"sap/base/Log",
@@ -90,7 +90,7 @@ sap.ui.define([
 	ColumnFreezeController,
 	DynamicPropertiesController,
 	DynamicPropertiesMixin,
-	ActionToolbarAction,
+	ActionToolbarMixin,
 	QuickActionContainer,
 	ThemeParameters,
 	Log,
@@ -3118,16 +3118,6 @@ sap.ui.define([
 		Control.prototype.exit.apply(this, arguments);
 	};
 
-	Table.prototype.addAction = function(oControl) {
-		if (oControl.getMetadata().getName() !== "sap.ui.mdc.actiontoolbar.ActionToolbarAction") {
-			oControl = new ActionToolbarAction(oControl.getId() + "-action", {
-				action: oControl
-			});
-		}
-
-		return Control.prototype.addAggregation.apply(this, ["actions", oControl]);
-	};
-
 	/**
 	 * Handler for theme changes
 	 */
@@ -3410,6 +3400,7 @@ sap.ui.define([
 
 	FilterIntegrationMixin.call(Table.prototype);
 	DynamicPropertiesMixin.call(Table.prototype, {aggregation: "columns"});
+	ActionToolbarMixin.call(Table.prototype);
 
 	return Table;
 });

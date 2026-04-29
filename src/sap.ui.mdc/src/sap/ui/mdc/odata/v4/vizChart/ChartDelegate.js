@@ -807,9 +807,13 @@ sap.ui.define([
 					const mCrit = criticality || [];
 
 					for (const sKey in mCrit) {
-						mChartCrit[sKey] = {
-							Values: mCrit[sKey]
-						};
+						if (mCrit[sKey]?.Values) {
+							mChartCrit[sKey] = Object.assign({}, mCrit[sKey]);
+						} else {
+							mChartCrit[sKey] = {
+								Values: mCrit[sKey]
+							};
+						}
 					}
 
 					const sDimName = this.getInternalChartNameFromPropertyNameAndKind(oItem.getPropertyKey(), "groupable", oItem.getParent());

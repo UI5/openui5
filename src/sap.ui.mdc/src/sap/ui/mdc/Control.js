@@ -70,7 +70,7 @@ sap.ui.define([
 				}
 			}
 		},
-		renderer: CoreControl.renderer
+		renderer: null // Control has no renderer
 	});
 
 

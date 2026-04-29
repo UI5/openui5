@@ -70,7 +70,6 @@ sap.ui.define([
 				adaptationControl: this.oTestTable
 			});
 
-			sinon.stub(this.oAdaptationFilterBar, "_checkIsNewUI").returns(false);
 
 			if (FlexUtil.handleChanges.restore){
 				FlexUtil.handleChanges.restore();
@@ -79,9 +78,6 @@ sap.ui.define([
 		},
 
 		afterEach: function () {
-			if (this.oAdaptationFilterBar._checkIsNewUI.restore) {
-				this.oAdaptationFilterBar._checkIsNewUI.restore();
-			}
 			this.oAdaptationFilterBar.destroy();
 			this.oAdaptationFilterBar = undefined;
 			this.oTestTable.destroy();
@@ -349,8 +345,6 @@ sap.ui.define([
 				adaptationControl: this.oParent
 			});
 
-			sinon.stub(oAdaptationFilterBar, "_checkIsNewUI").returns(false);
-
 			//AdaptatationFilterBar expects 'filterConditions' property
 			this.oParent.getFilterConditions = function() {
 				return {};
@@ -412,9 +406,6 @@ sap.ui.define([
 			AggregationBaseDelegate.fetchProperties.restore();
 			delete AggregationBaseDelegate.getFilterDelegate;
 			AggregationBaseDelegate.addItem.restore();
-			if (oAdaptationFilterBar && oAdaptationFilterBar._checkIsNewUI && oAdaptationFilterBar._checkIsNewUI.restore) {
-				oAdaptationFilterBar._checkIsNewUI.restore();
-			}
 			oAdaptationFilterBar.destroy();
 			this.oParent = null;
 			this.aMockProperties = null;
@@ -900,76 +891,6 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("_updateFilterItemMessage should not be called when _checkIsNewUI returns false", function(assert){
-		const done = assert.async();
-		this.prepareTestSetup(true);
-
-		oAdaptationFilterBar._checkIsNewUI.restore();
-		sinon.stub(oAdaptationFilterBar, "_checkIsNewUI").returns(false);
-
-		this.oAddStub.callsFake(this.addItem);
-		this.oParent.getFilterItems = function() {
-			return [];
-		};
-
-		oAdaptationFilterBar.setP13nData({
-			items: [
-				{
-					name: "key1",
-					visible: true
-				},
-				{
-					name: "key2",
-					visible: false
-				}
-			]
-		});
-
-		Promise.all([
-			this.oParent.initPropertyHelper(this.createPropertyHelper()),
-			this.oParent.initControlDelegate()
-		])
-		.then(function(){
-			oAdaptationFilterBar.createFilterFields().then(function(){
-				const oFilterPanel = oAdaptationFilterBar._oFilterBarLayout.getInner();
-				const oUpdateFilterItemMessageSpy = sinon.spy(oAdaptationFilterBar, "_updateFilterItemMessage");
-
-				oFilterPanel.fireChange({
-					item: {
-						name: "key1"
-					},
-					reason: "Show"
-				});
-
-				oFilterPanel.fireChange({
-					item: {
-						name: "key2"
-					},
-					reason: "Hide"
-				});
-
-				oFilterPanel.fireChange({
-					item: {
-						name: "key1"
-					},
-					reason: "Filter"
-				});
-
-				oFilterPanel.fireChange({
-					item: {
-						name: "key2"
-					},
-					reason: "Add"
-				});
-				assert.equal(oUpdateFilterItemMessageSpy.notCalled, true, "_updateFilterItemMessage was not called when _checkIsNewUI returns false");
-
-				// Clean up
-				oUpdateFilterItemMessageSpy.restore();
-				done();
-			});
-		});
-	});
-
 	QUnit.test("Test '_checkFunctionality' - check 'remove' hook executions, but change the selection before", function(assert){
 		const done = assert.async(1);
 		this.prepareTestSetup(true);
@@ -1178,7 +1099,6 @@ sap.ui.define([
 				});
 
 			return this.oParent.retrieveInbuiltFilter().then(function(oInbuiltFilter) {
-				sinon.stub(oInbuiltFilter, "_checkIsNewUI").returns(false);
 				return oInbuiltFilter;
 			});
 			}.bind(this));
@@ -1186,10 +1106,6 @@ sap.ui.define([
 			},
 			afterEach: function(assert) {
 				FBTestDelegate.addItem.restore();
-				const oInbuiltFilter = this.oParent.getInbuiltFilter();
-				if (oInbuiltFilter && oInbuiltFilter._checkIsNewUI && oInbuiltFilter._checkIsNewUI.restore) {
-					oInbuiltFilter._checkIsNewUI.restore();
-				}
 				this.oParent.destroy();
 			}
 			});

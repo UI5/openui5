@@ -1,4 +1,7 @@
-document.write('<script src="' + document.location.pathname.match(/(.*)\/test-resources\//)[1] + '/resources/sap-ui-core.js"><' + '/script>');
+const basePath = document.location.pathname.match(/(.*)\/test-resources\//)[1];
+const script = document.createElement("script");
+script.src = `${window.location.origin}${basePath}/resources/sap-ui-core.js`;
+document.head.appendChild(script);
 window["sap-ui-config"] = window["sap-ui-config"] || {};
 window["sap-ui-config"].onInit = "module:dt/performance/designtimeRegularOverlays/main";
 window["sap-ui-config"].async = "true";

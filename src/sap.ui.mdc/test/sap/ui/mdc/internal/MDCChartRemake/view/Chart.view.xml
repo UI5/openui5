@@ -623,7 +623,7 @@
                     "group": "",
                     "groupLabel": "",
                     "caseSensitive": true,
-					"type": "Edm.String"
+					"dataType": "Edm.String"
             \},
             \{
                 "key": "averagemetricsWords",
@@ -641,7 +641,7 @@
                 "group": "",
                 "groupLabel": "",
                 "caseSensitive": true,
-				"type": "Edm.String"
+				"dataType": "Edm.String"
             \}
             ]'>
 
@@ -728,6 +728,59 @@
 						<mdc:items>
 							<mdcc:Item id="dim1-chart2" type="groupable" propertyKey="title" role="category" label="Title"/>
 							<mdcc:Item id="meas1-chart2" type="aggregatable" propertyKey="maxmetricsWords" role="axis1" label="Words (max)"/>
+						</mdc:items>
+					</mdc:Chart>
+
+					<mdc:Chart id="bookChart-criticality" filter="booksFilterBar" autoBindOnInit="true" noDataText="No data" p13nMode="Item,Sort,Type" delegate='\{
+							"name": "delegates/odata/v4/vizChart/ChartDelegate",
+							"payload": \{
+								"collectionName": "Books"
+							\}
+						\}' chartType="column" header="Chart with Pre-wrapped Criticality Coloring" height="400px" width="100%" propertyInfo='[\{
+                    "key": "language_code",
+                    "path": "language_code",
+                    "label": "Language",
+                    "sortable": true,
+                    "filterable": true,
+                    "groupable": true,
+                    "aggregatable": false,
+                    "maxConditions": -1,
+                    "role": "category",
+                    "criticality": \{
+                        "Positive": \{ "Values": ["en", "es"], "Legend": "Good" \},
+                        "Critical": \{ "Values": ["de", "it"], "Legend": "Warning" \},
+                        "Negative": \{ "Values": ["fr", "ja"], "Legend": "Bad" \}
+                    \},
+                    "textProperty": null,
+                    "visible": true,
+                    "group": "",
+                    "groupLabel": "",
+                    "caseSensitive": true,
+					"dataType": "Edm.String"
+            \},
+            \{
+                "key": "averagemetricsWords",
+                "path": "metricsWords",
+                "label": "Words (average)",
+                "sortable": true,
+                "filterable": true,
+                "groupable": false,
+                "aggregatable": true,
+                "aggregationMethod": "average",
+                "maxConditions": -1,
+                "role": "axis1",
+                "datapoint": null,
+                "visible": true,
+                "group": "",
+                "groupLabel": "",
+                "caseSensitive": true,
+				"dataType": "Edm.String"
+            \}
+            ]'>
+
+						<mdc:items>
+							<mdcc:Item id="dim1-chart-crit" type="groupable" propertyKey="language_code" role="category" label="Languages"/>
+							<mdcc:Item id="meas1-chart-crit" type="aggregatable" propertyKey="averagemetricsWords" role="axis1" label="Words (average)"/>
 						</mdc:items>
 					</mdc:Chart>
 				</VBox>

@@ -4532,6 +4532,42 @@ sap.ui.define([
 		assert.equal(this.oItem1.getEffectiveType(), "Active", "Item effective type is Active again since action of type Navigation is removed");
 	});
 
+	QUnit.test("_getItemActionCount with bUseActionsForNavigation", async function(assert) {
+		const oNavigationAction = new ListItemAction({
+			type: "Navigation"
+		});
+
+		this.oList.setItemActionCount(2);
+		this.oItem1.addAction(oNavigationAction);
+		await nextUIUpdate();
+
+		assert.strictEqual(this.oList._getItemActionCount(), 2,
+			"Without bUseActionsForNavigation flag, Navigation action does not reduce the count");
+
+		this.oList.bUseActionsForNavigation = true;
+		assert.strictEqual(this.oList._getItemActionCount(), 1,
+			"With bUseActionsForNavigation flag, Navigation action reduces the count by 1");
+
+		oNavigationAction.setVisible(false);
+		assert.strictEqual(this.oList._getItemActionCount(), 2,
+			"Hidden Navigation action does not reduce the count");
+
+		oNavigationAction.setVisible(true);
+		this.oList.setItemActionCount(0);
+		assert.strictEqual(this.oList._getItemActionCount(), 0,
+			"itemActionCount=0 is not reduced further (only when > 0)");
+
+		this.oList.setItemActionCount(1);
+		assert.strictEqual(this.oList._getItemActionCount(), 0,
+			"itemActionCount=1 is reduced to 0 with visible Navigation action");
+
+		this.oItem1.removeAction(oNavigationAction);
+		assert.strictEqual(this.oList._getItemActionCount(), 1,
+			"After removing Navigation action, count is not reduced");
+
+		this.oList.bUseActionsForNavigation = false;
+	});
+
 	QUnit.module("rememberFocus", {
 		beforeEach: function() {
 			this.oList = new List();

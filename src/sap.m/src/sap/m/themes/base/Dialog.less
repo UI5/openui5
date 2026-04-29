@@ -145,6 +145,27 @@ html.sap-desktop .sapMDialog {
 	box-sizing: border-box;
 }
 
+.sapMDialog.sapMDialogVerScrollDisabled {
+	.sapMDialogScroll {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+	}
+
+	.sapMDialogScrollCont {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+	}
+
+	.sapMDialogSection {
+		display: flex;
+		flex-direction: column;
+	}
+}
+
 .sapMDialog.sapMDialogVerticalScrollIncluded {
 
 	.sapMDialogScroll {
@@ -157,11 +178,6 @@ html.sap-desktop .sapMDialog {
 		overflow-y: overlay !important;
 		padding-right: 0px !important;
 	}
-}
-
-/* disable scrolling automatically for sap.m.Page sap.m.NavContainer sap.m.ScrollingContainer inside Dialog */
-.sapMDialogVerScrollDisabled .sapMDialogScroll {
-	height: 100%;
 }
 
 /* disable scrolling automatically for sap.m.Page sap.m.NavContainer sap.m.ScrollingContainer inside Dialog */
@@ -283,6 +299,8 @@ html.sap-desktop .sapMDialog {
 			.sapMHeader-CTX,
 			.sapMSubHeader-CTX {
 				height: @_sap_m_Dialog_BarCompactHeight;
+				padding-top: 0.25rem;
+				padding-bottom: 0.25rem;
 				box-sizing: border-box;
 			}
 		}

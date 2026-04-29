@@ -1775,7 +1775,14 @@ function(
 	};
 
 	ListBase.prototype._getItemActionCount = function() {
-		return Math.min(2, Math.max(-1, this.getItemActionCount()));
+		let iItemActionCount = this.getItemActionCount();
+
+		// Navigation actions make list items behave as if their type property were set to "Navigation" therefore they are not counted as item actions
+		if (iItemActionCount > 0 && this.bUseActionsForNavigation && this.getItems().some((oItem) => oItem._hasNavigationAction())) {
+			iItemActionCount--;
+		}
+
+		return Math.min(2, Math.max(-1, iItemActionCount));
 	};
 
 	ListBase.prototype._onItemActionPress = function(oItem, oAction) {

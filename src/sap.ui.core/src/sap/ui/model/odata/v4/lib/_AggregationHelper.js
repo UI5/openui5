@@ -1242,8 +1242,9 @@ sap.ui.define([
 		 * Tells whether a binding with the given aggregation data and filters is affected when
 		 * requesting side effects for the given paths.
 		 *
-		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 * @param {object} [oAggregation]
+		 *   An object holding the information needed for data aggregation, see {@link .buildApply};
+		 *   if omitted, aggregation related checks are skipped
 		 * @param {sap.ui.model.Filter[]} aFilters
 		 *   The binding's current filters
 		 * @param {string[]} aSideEffectPaths
@@ -1276,18 +1277,69 @@ sap.ui.define([
 
 				return sSideEffectPath === "" || sSideEffectPath === "*"
 					|| hasAffectedFilter(aFilters)
-					|| Object.keys(oAggregation.aggregate).some((sAlias) => {
+					|| oAggregation && Object.keys(oAggregation.aggregate).some((sAlias) => {
 						const oDetails = oAggregation.aggregate[sAlias];
 
 						return isAffected(oDetails.name || sAlias)
 							|| oDetails.unit && isAffected(oDetails.unit);
 					})
-					|| Object.keys(oAggregation.group).some((sGroup) => {
+					|| oAggregation && Object.keys(oAggregation.group).some((sGroup) => {
 						return isAffected(sGroup)
 							|| oAggregation.group[sGroup].additionally
 								?.some((sPath) => isAffected(sPath));
 					});
 			});
+		},
+
+		/**
+		 * Tells whether the given property path is used in the given "$orderby" system query
+		 * option.
+		 *
+		 * @param {string} sPropertyPath
+		 *   A property path
+		 * @param {string} [sOrderby]
+		 *   The "$orderby" system query option, or <code>undefined</code>
+		 * @returns {boolean}
+		 *   Whether the given property path is (possibly) used in "$orderby"
+		 *
+		 * @public
+		 */
+		isOrderedBy : function (sPropertyPath, sOrderby) {
+			if (!sOrderby) {
+				return false;
+			}
+
+			return sOrderby.split(rComma).some((sOrderbyItem) => {
+				const aMatches = rOrderbyItem.exec(sOrderbyItem);
+				// handle unparseable items as "used in $orderby"
+				return !aMatches || aMatches[1] === sPropertyPath;
+			});
+		},
+
+		/**
+		 * Tells whether the property with the given path is used to compute the grand total.
+		 *
+		 * @param {string} sPath
+		 *   A property path
+		 * @param {object} [mAggregate]
+		 *   A map from aggregatable property names/aliases to details objects
+		 * @returns {boolean}
+		 *   <code>true</code> if the property with the given path is used to compute the grand
+		 *   total
+		 *
+		 * @public
+		 */
+		isUsedForGrandTotal : function (sPath, mAggregate) {
+			if (mAggregate) {
+				sPath = _Helper.getMetaPath(sPath);
+				for (const [sAlias, oDetails] of Object.entries(mAggregate)) {
+					if (oDetails.grandTotal && (sAlias === sPath || oDetails.unit === sPath)) {
+						return true;
+					}
+				}
+			}
+
+			return false;
 		},
 
 		/**

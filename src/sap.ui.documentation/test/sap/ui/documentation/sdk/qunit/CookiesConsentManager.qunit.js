@@ -128,4 +128,58 @@ function (CookiesConsentManager) {
 			assert.strictEqual(CookiesConsentManager._checkHostnameIsTracked(sHostname), true, "hostname is tracked: " + sHostname);
 		});
 	});
+
+	QUnit.module("_isTrustArcScriptIncluded", {
+		before: function () {
+			this.oConfigStub = sinon.stub(CookiesConsentManager, "_configIncludesUsageTracking").returns(true);
+		},
+		beforeEach: function () {
+			this.oConsentManager = CookiesConsentManager.create();
+			this.sandbox = sinon.createSandbox();
+		},
+		afterEach: function () {
+			this.oConsentManager.destroy();
+			this.oConsentManager = null;
+			this.sandbox.restore();
+		},
+		after: function () {
+			this.oConfigStub.restore();
+		}
+	});
+
+	QUnit.test("returns false when no scripts are present", function (assert) {
+		this.sandbox.stub(document, "getElementsByTagName").returns([]);
+		assert.strictEqual(this.oConsentManager._isTrustArcScriptIncluded(), false,
+			"no TrustArc script found when no scripts are in the DOM");
+	});
+
+	QUnit.test("returns true when a script with the TrustArc HTTPS URL is present", function (assert) {
+		var aScripts = [{ src: "https://consent.trustarc.com/notice?domain=ui5.sap.com&c=teconsent" }];
+		this.sandbox.stub(document, "getElementsByTagName").returns(aScripts);
+		assert.strictEqual(this.oConsentManager._isTrustArcScriptIncluded(), true,
+			"TrustArc script is detected by its HTTPS src property");
+	});
+
+	QUnit.test("returns true when src property resolves to HTTPS but attribute uses a protocol-relative URL", function (assert) {
+		// Regression test: the old code read getAttribute("src") which returned "//consent.trustarc.com/..."
+		// and the startsWith("https://...") check failed. The fixed code reads the .src DOM property,
+		// which browsers resolve to the fully-qualified URL regardless of how the attribute was written.
+		var aScripts = [{
+			src: "https://consent.trustarc.com/notice?domain=ui5.sap.com&c=teconsent",
+			getAttribute: function () { return "//consent.trustarc.com/notice?domain=ui5.sap.com&c=teconsent"; }
+		}];
+		this.sandbox.stub(document, "getElementsByTagName").returns(aScripts);
+		assert.strictEqual(this.oConsentManager._isTrustArcScriptIncluded(), true,
+			"TrustArc script is detected even when the src attribute is protocol-relative");
+	});
+
+	QUnit.test("returns false when only unrelated scripts are present", function (assert) {
+		var aScripts = [
+			{ src: "https://other-library.com/script.js" },
+			{ src: "https://example.com/app.js" }
+		];
+		this.sandbox.stub(document, "getElementsByTagName").returns(aScripts);
+		assert.strictEqual(this.oConsentManager._isTrustArcScriptIncluded(), false,
+			"no TrustArc script detected when only unrelated scripts are present");
+	});
 });

@@ -105,11 +105,30 @@ sap.ui.define([
 			oView.setBusy(true);
 			this.byId("details").getBindingContext().delete().then(() => {
 				MessageToast.show("Booking deleted successfully");
+				this.byId("details").setBindingContext(null);
 			}, (oError) => {
 				MessageBox.error(oError.message);
 			}).finally(() => {
 				oView.setBusy(false);
 			});
+		},
+
+		onDeleteBookingViaModel : function () {
+			const oView = this.getView();
+			oView.setBusy(true);
+			const oContext = this.byId("details").getBindingContext();
+			oContext.getModel()
+				// code under test (JIRA: CPOUI5ODATAV4-3460)
+				// Note: passing oContext is for a different use case!
+				.delete(oContext.getCanonicalPath(), "$single", /*bRejectIfNotFound*/true)
+				.then(() => {
+					MessageToast.show("Booking deleted successfully");
+					this.byId("details").setBindingContext(null);
+				}, (oError) => {
+					MessageBox.error(oError.message);
+				}).finally(() => {
+					oView.setBusy(false);
+				});
 		},
 
 		onDiscard : function () { //TODO: factor out code common w/ onEdit?

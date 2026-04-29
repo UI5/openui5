@@ -8047,6 +8047,62 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+[false, true].forEach(function (bAutoExpandSelect) {
+	[/*no sorter*/undefined, false, true].forEach(function (bHasSorterWithGroupPaths) {
+		[false, true].forEach(function (bHasSelect) {
+	const sTitle = "getQueryOptionsFromParameters: add groupPaths to $select"
+		+ ", autoExpandSelect = " + bAutoExpandSelect
+		+ ", has sorter with groupPaths = " + bHasSorterWithGroupPaths
+		+ ", has $select = " + bHasSelect;
+
+	QUnit.test(sTitle, function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		oBinding.oModel.bAutoExpandSelect = bAutoExpandSelect;
+		if (bHasSorterWithGroupPaths) {
+			oBinding.aSorters = [
+				new Sorter({path : "n/a", groupPaths : ["a"]}),
+				new Sorter({path : "n/a"}),
+				new Sorter({path : "n/a", groupPaths : ["b", "c"]})
+			];
+		} else if (bHasSorterWithGroupPaths === false) {
+			oBinding.aSorters = [new Sorter({path : "n/a"})];
+		}
+		oBinding.mQueryOptions = {$expand : "~expand~"};
+		if (bHasSelect) {
+			oBinding.mQueryOptions.$select = ["~select~"];
+		}
+		const sOriginalQueryOptions = JSON.stringify(oBinding.mQueryOptions);
+		const bExpectAddToSelect = bAutoExpandSelect && bHasSorterWithGroupPaths;
+		this.mock(_Helper).expects("addToSelect").exactly(bExpectAddToSelect ? 1 : 0)
+			.withExactArgs(/*NOT match.same*/oBinding.mQueryOptions, ["a", "b", "c"])
+			.callsFake(function (mQueryOptions0) {
+				if (mQueryOptions0.$select) {
+					mQueryOptions0.$select.push("MODIFIED"); // addToSelect operates on reference
+				} else {
+					mQueryOptions0.$select = "MODIFIED"; // ... and creates $select if not present
+				}
+			});
+
+		// code under test
+		const mResult = oBinding.getQueryOptionsFromParameters();
+
+		if (bExpectAddToSelect) {
+			assert.deepEqual(mResult, {
+				$expand : "~expand~",
+				$select : bHasSelect ? ["~select~", "MODIFIED"] : "MODIFIED"
+			});
+			assert.notStrictEqual(mResult, oBinding.mQueryOptions);
+		} else {
+			assert.strictEqual(mResult, oBinding.mQueryOptions);
+		}
+		assert.strictEqual(JSON.stringify(oBinding.mQueryOptions), sOriginalQueryOptions,
+			"both mQueryOptions and its $select are unchanged");
+	});
+		});
+	});
+});
+
+	//*********************************************************************************************
 	QUnit.test("inheritQueryOptions - binding with parameters", function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES", undefined, undefined, undefined,
 				{$$operationMode : OperationMode.Server}),
@@ -10550,34 +10606,40 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-[true, false].forEach(function (bTransientPredicate) {
-	QUnit.test("doSetProperty: transient predicate=" + bTransientPredicate, function (assert) {
+[
+	"(42)/@$ui5.context.isSelected",
+	"($uid=...)/foo"
+].forEach(function (sPath) {
+	QUnit.test("doSetProperty: not relevant for outdated flags; " + sPath, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
-		this.mock(oBinding).expects("setOutdated").exactly(bTransientPredicate ? 0 : 1)
-			.withExactArgs(true);
+		this.mock(oBinding).expects("setOutdated").never();
 
 		// code under test
-		assert.strictEqual(
-			oBinding.doSetProperty(bTransientPredicate ? "($uid=...)/foo" : "(42)/foo"),
-			undefined);
+		assert.strictEqual(oBinding.doSetProperty(sPath, "~vValue~", "~oGroupLock~"), undefined);
 	});
 });
 
 	//*********************************************************************************************
 [
-	"(42)/@$ui5.context.isSelected",
+	"(42)/foo",
 	"(42)/@$ui5foo", // no dot after /@$ui5
 	"(42)/foo@$ui5.bar", // no slash before @$ui5.
 	"('%2F@$ui5.context.isSelected')/foo", // "/" has to be encoded in a predicate
 	"(42)/foo@any.annotation",
 	"(42)/@$any.annotation"
-].forEach(function (sPath, i) {
-	QUnit.test("doSetProperty: annotations; sPath=" + sPath, function (assert) {
+].forEach(function (sPath) {
+	[true, false].forEach(function (bWithGroupLock) {
+		const sTitle = "doSetProperty: sPath=" + sPath + ", with group lock=" + bWithGroupLock;
+
+	QUnit.test(sTitle, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
-		this.mock(oBinding).expects("setOutdated").exactly(i > 0 ? 1 : 0).withExactArgs(true);
+		this.mock(oBinding).expects("setOutdated").withExactArgs(false, sPath, !bWithGroupLock);
 
 		// code under test
-		assert.strictEqual(oBinding.doSetProperty(sPath), undefined);
+		assert.strictEqual(
+			oBinding.doSetProperty(sPath, "~vValue~", bWithGroupLock ? "~oGroupLock~" : null),
+			undefined);
+	});
 	});
 });
 
@@ -10586,100 +10648,123 @@ sap.ui.define([
 	[false, true].forEach((bWithAggregationCache) => {
 		[undefined, false, true].forEach((bForce) => {
 			[{
-				title : "aFilters",
-				setup : function (oBinding) {
-					oBinding.aFilters = [new Filter("foo", FilterOperator.EQ, "bar")];
-				},
-				bGrandTotal : true,
-				bHeaderContext : true
-			}, {
-				title : "aApplicationFilters",
-				setup : function (oBinding) {
-					oBinding.aApplicationFilters = [new Filter("foo", FilterOperator.EQ, "bar")];
-				},
-				bGrandTotal : true,
-				bHeaderContext : true
-			}, {
-				title : "$filter parameter",
-				setup : function (oBinding) {
-					oBinding.mParameters.$filter = "foo eq 'bar'";
-				},
-				bGrandTotal : true,
-				bHeaderContext : true
-			}, {
 				title : "$search parameter",
 				setup : function (oBinding) {
 					oBinding.mParameters.$search = "~searchterm~";
 				},
-				bGrandTotal : true,
-				bHeaderContext : true
+				grandTotal : true,
+				headerContext : true
 			}, {
 				title : "$$aggregation.search",
 				setup : function (oBinding) {
 					oBinding.mParameters.$$aggregation.search = "~term~";
 				},
-				bGrandTotal : true,
-				bHeaderContext : true
+				grandTotal : true,
+				headerContext : true
 			}, {
 				title : "custom query option",
 				setup : function (oBinding) {
 					oBinding.mParameters.foo = "bar";
 				},
-				bGrandTotal : true,
-				bHeaderContext : true
+				grandTotal : true,
+				headerContext : true
 			}, { // sap-valid-* has to be handled as $search; other sap-* parameters are forbidden
 				title : "sap-valid-... parameter",
 				setup : function (oBinding) {
 					oBinding.mParameters["sap-valid-at"] = "now";
 				},
-				bGrandTotal : true,
-				bHeaderContext : true
+				grandTotal : true,
+				headerContext : true
 			}, {
-				title : "aSorters (header context outdated, not grand total)",
-				setup : function (oBinding) {
-					oBinding.aSorters = [new Sorter("~field~")];
-				},
-				bGrandTotal : false,
-				bHeaderContext : true
+				title : "filter matches",
+				isFilteredByResult : true,
+				grandTotal : true,
+				headerContext : true
 			}, {
-				title : "$orderby (header context outdated, not grand total)",
-				setup : function (oBinding) {
-					oBinding.mParameters.$orderby = "~field~";
-				},
-				bGrandTotal : false,
-				bHeaderContext : true
+				title : "only sorting affected",
+				isFilteredByResult : false,
+				isSortedByResult : true,
+				grandTotal : false,
+				headerContext : true
 			}, {
-				title : "ignore $-parameters",
+				title : "no filter/search/custom query option/sorter matches, but GT relevant",
 				setup : function (oBinding) {
 					oBinding.mParameters.$apply = "~apply~";
 				},
-				bGrandTotal : false,
-				bHeaderContext : false
+				isFilteredByResult : false,
+				isSortedByResult : false,
+				isUsedForGrandTotal : true,
+				grandTotal : false,
+				headerContext : false
+			}, {
+				title : "no filter/search/custom query option/sorter matches, but GT relevant",
+				setup : function (oBinding) {
+					// system query options are ignored
+					oBinding.mParameters.$apply = "~apply~";
+				},
+				isFilteredByResult : false,
+				isSortedByResult : false,
+				isUsedForGrandTotal : false,
+				grandTotal : false,
+				headerContext : false
 			}].forEach((oFixture) => {
+				[false, true].forEach((bWithPath) => {
+					[undefined, false, true].forEach((bNoRequest) => {
 	const sTitle = "setOutdated: bDataAggregation=" + bDataAggregation
 		+ ", bWithAggregationCache=" + bWithAggregationCache + ", bForce=" + bForce
-		+ ", " + oFixture.title;
+		+ ", bWithPath=" + bWithPath + ", bNoRequest=" + bNoRequest + ", " + oFixture.title;
 
 	QUnit.test(sTitle, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
-		oBinding.mParameters.$$aggregation = {};
-		oFixture.setup(oBinding);
+		oBinding.mParameters.$$aggregation = {aggregate : "~aggregate~"};
+		oFixture.setup?.(oBinding);
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation);
-		if (bWithAggregationCache) {
-			oBinding.oCache.setGrandTotalOutdated = mustBeMocked;
-			this.mock(oBinding.oCache).expects("setGrandTotalOutdated")
-				.exactly(bDataAggregation && (bForce || oFixture.bGrandTotal) ? 1 : 0)
-				.withExactArgs(true);
-		}
-		this.mock(oBinding.oHeaderContext).expects("setOutdated")
-			.exactly(bDataAggregation && (bForce || oFixture.bHeaderContext) ? 1 : 0)
-			.withExactArgs(true);
+		this.mock(_Helper).expects("getMetaPath").exactly(bDataAggregation && bWithPath ? 1 : 0)
+			.withExactArgs("~sPropertyPath~")
+			.returns("~metaPath~");
+		this.mock(oBinding).expects("isFilteredBy")
+			.exactly(bDataAggregation && !bForce && "isFilteredByResult" in oFixture ? 1 : 0)
+			.withExactArgs(bWithPath ? "~metaPath~" : undefined)
+			.returns(oFixture.isFilteredByResult);
+		this.mock(oBinding).expects("isSortedBy")
+			.exactly(bDataAggregation && !bForce && "isSortedByResult" in oFixture ? 1 : 0)
+			.withExactArgs(bWithPath ? "~metaPath~" : undefined)
+			.returns(oFixture.isSortedByResult);
+		this.mock(_AggregationHelper).expects("isUsedForGrandTotal")
+			.exactly(bDataAggregation && bNoRequest && !bForce && !oFixture.headerContext ? 1 : 0)
+			.withExactArgs(bWithPath ? "~metaPath~" : undefined, "~aggregate~")
+			.returns(oFixture.isUsedForGrandTotal);
 
-		// code under test
-		assert.strictEqual(oBinding.setOutdated(bForce), undefined);
+		if (bDataAggregation && bNoRequest
+				&& (bForce || oFixture.headerContext || oFixture.isUsedForGrandTotal)) {
+			assert.throws(() => {
+				// code under test
+				oBinding.setOutdated(bForce, bWithPath ? "~sPropertyPath~" : undefined, true);
+			}, new Error("Missing PATCH request when @$ui5.context.isOutdated would be set"));
+		} else {
+			if (bWithAggregationCache) {
+				oBinding.oCache.setGrandTotalOutdated = mustBeMocked;
+				this.mock(oBinding.oCache).expects("setGrandTotalOutdated")
+					.exactly(bDataAggregation && (bForce || oFixture.grandTotal) && !bNoRequest
+						? 1 : 0)
+					.withExactArgs(true);
+			}
+			this.mock(oBinding.oHeaderContext).expects("setOutdated")
+				.exactly(bDataAggregation && !bNoRequest && (bForce || oFixture.headerContext)
+					? 1 : 0)
+				.withExactArgs(true);
+
+			// code under test
+			assert.strictEqual(
+				oBinding.setOutdated(bForce, bWithPath ? "~sPropertyPath~" : undefined,
+					bNoRequest),
+				undefined);
+		}
 	});
+					});
+				});
 			});
 		});
 	});
@@ -12551,6 +12636,105 @@ sap.ui.define([
 
 		// code under test
 		assert.ok(oBinding.isKeepAliveBindingFor("/path"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isFilteredBy: no path", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		this.mock(_AggregationHelper).expects("isAffected").never();
+
+		// code under test
+		assert.notOk(oBinding.isFilteredBy());
+
+		oBinding.aApplicationFilters = [{}];
+
+		// code under test
+		assert.ok(oBinding.isFilteredBy());
+
+		oBinding.aApplicationFilters = [];
+		oBinding.aFilters = [{}];
+
+		// code under test
+		assert.ok(oBinding.isFilteredBy());
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isFilteredBy: with path", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		const oAggregationHelperMock = this.mock(_AggregationHelper);
+		oAggregationHelperMock.expects("isAffected")
+			.withExactArgs(null, sinon.match.same(oBinding.aApplicationFilters), ["~foo~"])
+			.returns(true);
+
+		// code under test
+		assert.ok(oBinding.isFilteredBy("~foo~"));
+
+		oAggregationHelperMock.expects("isAffected")
+			.withExactArgs(null, sinon.match.same(oBinding.aApplicationFilters), ["~foo~"])
+			.returns(false);
+		oAggregationHelperMock.expects("isAffected")
+			.withExactArgs(null, sinon.match.same(oBinding.aFilters), ["~foo~"])
+			.returns(true);
+
+		// code under test
+		assert.ok(oBinding.isFilteredBy("~foo~"));
+
+		oAggregationHelperMock.expects("isAffected")
+			.withExactArgs(null, sinon.match.same(oBinding.aApplicationFilters), ["~foo~"])
+			.returns(false);
+		oAggregationHelperMock.expects("isAffected")
+			.withExactArgs(null, sinon.match.same(oBinding.aFilters), ["~foo~"])
+			.returns(false);
+
+		// code under test - no $filter parameter
+		assert.notOk(oBinding.isFilteredBy("~foo~"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isSortedBy: no path", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		this.mock(_AggregationHelper).expects("isOrderedBy").never();
+
+		// code under test
+		assert.notOk(oBinding.isSortedBy());
+
+		oBinding.aSorters = [{}];
+
+		// code under test
+		assert.ok(oBinding.isSortedBy());
+
+		oBinding.aSorters = [];
+		oBinding.mParameters.$orderby = "~foo~";
+
+		// code under test
+		assert.ok(oBinding.isSortedBy());
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isSortedBy: with path", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		oBinding.aSorters = [new Sorter("~foo~"), new Sorter("~bar~", true)];
+		const oAggregationHelperMock = this.mock(_AggregationHelper);
+		oAggregationHelperMock.expects("isOrderedBy").never();
+
+		// code under test
+		assert.ok(oBinding.isSortedBy("~bar~"));
+
+		oBinding.aSorters = [];
+		oBinding.mParameters.$orderby = "~$orderby~";
+		oAggregationHelperMock.expects("isOrderedBy")
+			.withExactArgs("~sPropertyPath~", "~$orderby~")
+			.returns(true);
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy("~sPropertyPath~"), true);
+
+		oAggregationHelperMock.expects("isOrderedBy")
+			.withExactArgs("~sPropertyPath~", "~$orderby~")
+			.returns(false);
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy("~sPropertyPath~"), false);
 	});
 
 	//*********************************************************************************************

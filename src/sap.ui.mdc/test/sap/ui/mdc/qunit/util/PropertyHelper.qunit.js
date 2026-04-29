@@ -37,7 +37,7 @@ sap.ui.define([
 			}, mAdditionalAttributes));
 		}
 	});
-	const TestControl = MDCControl.extend("sap.ui.mdc.util.test.TestControl");
+	const TestControl = MDCControl.extend("sap.ui.mdc.util.test.TestControl", {metadata: {library: "sap.ui.mdc"}, renderer: null});
 
 	QUnit.module("Validation of property infos");
 

@@ -279,7 +279,7 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					]
 				}
 			},
-			"NEWAdaptFiltersJourneyGeneral": {
+			"AdaptFiltersJourneyGeneral": {
 				group: "FilterBar UI Test",
 				autostart: false,
 				module: "./OpaTests/P13nOpa.qunit",
@@ -289,7 +289,7 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					]
 				}
 			},
-			"NEWPersonalizationFilterBarVariants": {
+			"PersonalizationFilterBarVariants": {
 				group: "FilterBar UI Test - variant based",
 				autostart: false,
 				module: "./OpaTests/P13nOpa.qunit",
@@ -299,7 +299,7 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					]
 				}
 			},
-			"NEWPersonalizationFilterBarRTA": {
+			"PersonalizationFilterBarRTA": {
 				group: "FilterBar UI Test",
 				autostart: false,
 				module: "./OpaTests/P13nOpa.qunit",
@@ -309,7 +309,7 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					]
 				}
 			},
-			"NEWInternalAndExternalFiltering": {
+			"InternalAndExternalFiltering": {
 				group: "FilterBar UI Test",
 				autostart: false,
 				module: "./OpaTests/P13nOpa.qunit",

@@ -1174,6 +1174,8 @@ sap.ui.define([
 	ODataParentBinding.prototype.getQueryOptionsForPath = function (sPath, oContext) {
 		if (!_Helper.isEmptyObject(this.mParameters)) {
 			// binding has parameters -> all query options need to be defined at the binding
+			// Note: this function is always initially called on a ODLB; when delegating to a parent
+			// binding the sPath is never an empty string; as a result $select is not relevant
 			return _Helper.getQueryOptionsForPath(this.getQueryOptionsFromParameters(), sPath);
 		}
 
@@ -1194,6 +1196,9 @@ sap.ui.define([
 	 * Operation bindings directly use these options for the cache. With autoExpandSelect, other
 	 * bindings may later extend these options to support child bindings that are allowed to
 	 * participate in this binding's cache.
+	 *
+	 * For list bindings the caller must take care of handling navigation properties within $select
+	 * and convert them into $expand.
 	 *
 	 * @returns {object} The query options
 	 *
@@ -1322,6 +1327,7 @@ sap.ui.define([
 			this.oModel.getDependentBindings(oContext).forEach(function (oBinding) {
 				oBinding.resetChanges();
 			});
+			this.setOutdated?.(true);
 			this.delete(null, sCanonicalPath.slice(1), oContext);
 		}
 	};

@@ -416,6 +416,68 @@ sap.ui.define([
 	});
 	oButton19.addStyleClass("positioned19");
 
+	const oPopoverMaxHeight = new Popover("popMaxHeight", {
+		title: "Popover with Max Height (20rem)",
+		placement: mLibrary.PlacementType.Auto,
+		resizable: true,
+		maxHeight: "20rem",
+		content: [
+			new List({
+				items: [
+					new StandardListItem({ title: "Item 1", description: "Description 1" }),
+					new StandardListItem({ title: "Item 2", description: "Description 2" }),
+					new StandardListItem({ title: "Item 3", description: "Description 3" }),
+					new StandardListItem({ title: "Item 4", description: "Description 4" }),
+					new StandardListItem({ title: "Item 5", description: "Description 5" }),
+					new StandardListItem({ title: "Item 6", description: "Description 6" }),
+					new StandardListItem({ title: "Item 7", description: "Description 7" }),
+					new StandardListItem({ title: "Item 8", description: "Description 8" }),
+					new StandardListItem({ title: "Item 9", description: "Description 9" }),
+					new StandardListItem({ title: "Item 10", description: "Description 10" })
+				]
+			})
+		]
+	});
+
+	const oButton20 = new Button("btn20", {
+		text: "Popover with Max Height (20rem)",
+		press: function () {
+			oPopoverMaxHeight.openBy(this);
+		}
+	});
+	oButton20.addStyleClass("positioned20");
+
+	const oPopoverMaxHeightPx = new Popover("popMaxHeightPx", {
+		title: "Popover with Max Height (300px)",
+		placement: mLibrary.PlacementType.Auto,
+		resizable: true,
+		maxHeight: "300px",
+		content: [
+			new List({
+				items: [
+					new StandardListItem({ title: "Item 1", description: "Description 1" }),
+					new StandardListItem({ title: "Item 2", description: "Description 2" }),
+					new StandardListItem({ title: "Item 3", description: "Description 3" }),
+					new StandardListItem({ title: "Item 4", description: "Description 4" }),
+					new StandardListItem({ title: "Item 5", description: "Description 5" }),
+					new StandardListItem({ title: "Item 6", description: "Description 6" }),
+					new StandardListItem({ title: "Item 7", description: "Description 7" }),
+					new StandardListItem({ title: "Item 8", description: "Description 8" }),
+					new StandardListItem({ title: "Item 9", description: "Description 9" }),
+					new StandardListItem({ title: "Item 10", description: "Description 10" })
+				]
+			})
+		]
+	});
+
+	const oButton21 = new Button("btn22", {
+		text: "Popover with Max Height (300px)",
+		press: function () {
+			oPopoverMaxHeightPx.openBy(this);
+		}
+	});
+	oButton21.addStyleClass("positioned21");
+
 	var oPopoverNested = new Popover("popNested", {
 		title: "Nested Popovers",
 		placement: mLibrary.PlacementType.Auto,
@@ -583,7 +645,9 @@ sap.ui.define([
 			oButton16,
 			oButton17,
 			oButton18,
-			oButton19
+			oButton19,
+			oButton20,
+			oButton21
 		]
 	}).addStyleClass("sapUiContentPadding");
 

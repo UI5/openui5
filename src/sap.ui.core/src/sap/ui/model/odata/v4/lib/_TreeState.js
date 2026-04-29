@@ -177,7 +177,7 @@ sap.ui.define([
 		 * function is matching.
 		 *
 		 * @param {function(string):boolean} fnFilter - A filter function for the predicates
-		 * @return {string[]} The filter strings
+		 * @returns {string[]} The filter strings
 		 *
 		 * @public
 		 */

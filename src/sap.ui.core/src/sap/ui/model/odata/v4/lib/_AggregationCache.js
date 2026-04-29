@@ -75,8 +75,8 @@ sap.ui.define([
 	/**
 	 * Deletes a node on the server and in the cached data.
 	 *
-	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
-	 *   A lock for the group ID to be used for the DELETE request
+	 * @param {sap.ui.model.odata.v4.lib._GroupLock} [oGroupLock]
+	 *   A lock for the group ID to be used for the DELETE request; w/o a lock, no requests are sent
 	 * @param {string} sEditUrl
 	 *   The node's edit URL to be used for the DELETE request
 	 * @param {string} sIndexOrPredicate
@@ -117,15 +117,16 @@ sap.ui.define([
 				_Helper.getPrivateAnnotation(oElement, "transientPredicate"));
 		}
 
+		sEditUrl += this.oRequestor.buildQueryString(this.sMetaPath, this.mQueryOptions, true);
 		if (this.oCountPromise) {
 			this.createCountPromise();
 		}
 
-		return SyncPromise.all([
+		return SyncPromise.all(oGroupLock ? [
 			this.oRequestor.request("DELETE", sEditUrl, oGroupLock, {"If-Match" : oElement}),
 			this.readCount(oGroupLock),
 			this.readGrandTotal(oGroupLock)
-		]).then(() => {
+		] : []).then(() => {
 			this.oTreeState.delete(oElement);
 			if (this.aElements.length === 0) {
 				return; // concurrent side-effects refresh takes care of cleanup
@@ -2268,7 +2269,10 @@ sap.ui.define([
 						_Helper.getPrivateAnnotation(oGrandTotalCopy, "predicate"), oGrandTotalCopy,
 						oResult.value[0]);
 				}
-				this.setGrandTotalOutdated(false);
+				if (!oGrandTotal["@$ui5.context.isOutdated"]) {
+					// if grand total got outdated in between, update values but keep it outdated
+					this.setGrandTotalOutdated(false);
+				}
 			}, (oError) => {
 				this.setGrandTotalOutdated(true);
 				throw oError;
@@ -2816,6 +2820,18 @@ sap.ui.define([
 	};
 
 	/**
+	 * @override
+	 * @see sap.ui.model.odata.v4.lib._Cache#update
+	 */
+	_AggregationCache.prototype.update = function (sPropertyPath, _vValue, oParameters) {
+		return SyncPromise.all([
+			_AggregationHelper.isUsedForGrandTotal(sPropertyPath, this.oAggregation.aggregate)
+				&& this.readGrandTotal(oParameters.oGroupLock),
+			_Cache.prototype.update.apply(this, arguments)
+		]);
+	};
+
+	/**
 	 * Validates for all nodes which contribute to the ExpandLevels parameter whether they are a
 	 * descendant of the given node. If a node is a descendant, its expand info is deleted.
 	 *
@@ -2823,7 +2839,7 @@ sap.ui.define([
 	 *   An unlocked lock for the group to associate the request with
 	 * @param {object} oGroupNode
 	 *   A collapsed(!) group node
-	 * @return {Promise<void>}
+	 * @returns {Promise<void>}
 	 *   A promise resolving when the expand info objects have been deleted
 	 *
 	 * @private

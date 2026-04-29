@@ -157,16 +157,6 @@ sap.ui.define([
 	});
 	opaTest(`Changes in "Show Values" are correctly reflected`, function (Given, When, Then) {
 		When.onTheMDCFilterBar.iPressOnTheAdaptFiltersButton();
-		Then.waitFor({
-			controlType: "sap.ui.mdc.p13n.panels.AdaptFiltersPanel",
-			success: function(aAdaptFiltersPanel) {
-				const oAdaptFiltersPanel = aAdaptFiltersPanel[0];
-				const bIsNewUI = oAdaptFiltersPanel.getUseNewUI();
-				if (!bIsNewUI) {
-					When.onTheMDCFilterBar.iPressTheAdaptFiltersShowValuesButton();
-				}
-			}
-		});
 		When.onTheApp.iChangeTheSliderValueInTheField(50000, true);
 		When.onTheApp.iChangeTheSegementedButtonValueInTheFilterField("Planning", true);
 

@@ -404,6 +404,7 @@ sap.ui.define([
 		// Set row action count for the responsive table
 		const iActionCount = oRowSettings.getEffectiveRowActionCount();
 		oResponsiveTable.setItemActionCount(iActionCount);
+		oResponsiveTable.bUseActionsForNavigation = true;
 
 		// Clean up existing actions before setting new ones
 		oTable._oRowTemplate.unbindAggregation("actions");
@@ -762,12 +763,15 @@ sap.ui.define([
 			oRowActionItem = this.getRowActionClone(oOriginalActionItem);
 		}
 
-		// Set model for row settings, as it is not propagated
+		// Temporarily add clone as dependent to propagate model context, then remove it to prevent
+		// the clone from being destroyed when the ColumnListItem is destroyed during rebinding.
 		oListItemAction.addDependent(oRowActionItem);
 
 		this.callHook("Press", oRowActionItem, {
 			bindingContext: oListItem.getBindingContext(this.getInnerTable().getBindingInfo("items").model)
 		});
+
+		oListItemAction.removeDependent(oRowActionItem);
 	}
 
 	ResponsiveTableType.prototype.removeToolbar = function() {

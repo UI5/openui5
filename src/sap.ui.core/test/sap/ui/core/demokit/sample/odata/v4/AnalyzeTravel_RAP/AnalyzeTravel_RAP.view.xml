@@ -214,6 +214,8 @@
 						press=".onRefreshFlightPrice" tooltip="Side Effect for Flight Price"/>
 					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://delete"
 						press=".onDeleteBooking" tooltip="Delete"/>
+					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://eraser"
+						press=".onDeleteBookingViaModel" tooltip="Delete (via model)"/>
 				</m:Toolbar>
 			</form:toolbar>
 			<m:Label text="Flight Date"/>

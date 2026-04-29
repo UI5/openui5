@@ -1284,7 +1284,7 @@ sap.ui.define([
 	QUnit.test("rowActionCount: overflow button and Navigation visibility", async function(assert) {
 		await this.createTable({
 			rowSettings: new RowSettings({
-				rowActionCount: 1,
+				rowActionCount: 2,
 				rowActions: [
 					new RowActionItem({type: "Navigation"}),
 					new RowActionItem({type: "Delete"}),
@@ -1300,9 +1300,11 @@ sap.ui.define([
 		const oInnerTable = this.oTable._oTable;
 		const oFirstItem = oInnerTable.getItems()[0];
 
-		// rowActionCount = 1: overflow button is rendered because visible actions (3) > itemActionCount (1)
-		assert.strictEqual(oInnerTable.getItemActionCount(), 1, "itemActionCount is 1");
-		assert.ok(oFirstItem.$("overflow").length > 0, "Overflow button is rendered when actions exceed itemActionCount");
+		// rowActionCount = 2: effective itemActionCount = 1 (Navigation excluded).
+		// Overflow button is rendered because visible non-Navigation actions (2) > effective itemActionCount (1)
+		assert.strictEqual(oInnerTable.getItemActionCount(), 2, "itemActionCount property is 2");
+		assert.strictEqual(oInnerTable._getItemActionCount(), 1, "effective itemActionCount is 1 (Navigation excluded)");
+		assert.ok(oFirstItem.$("overflow").length > 0, "Overflow button is rendered when actions exceed effective itemActionCount");
 		assert.strictEqual(oFirstItem.getDomRef("actions").childElementCount, 2,
 			"Overflow button and 'Navigation' ActionItem are rendered in the actions cell");
 
@@ -1315,6 +1317,41 @@ sap.ui.define([
 		assert.ok(oFirstItem.getDomRef("imgNav"), "Navigation indicator is still rendered");
 		assert.strictEqual(oFirstItem.getEffectiveType(), "Navigation",
 			"effectiveType is still 'Navigation' even with itemActionCount 0");
+	});
+
+	QUnit.test("Effective itemActionCount excludes Navigation action", async function(assert) {
+		await this.createTable({
+			rowSettings: new RowSettings({
+				rowActions: [
+					new RowActionItem({type: "Navigation"}),
+					new RowActionItem({type: "Delete"}),
+					new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"})
+				]
+			})
+		});
+
+		const oInnerTable = this.oTable._oTable;
+
+		assert.ok(oInnerTable.bUseActionsForNavigation, "bUseActionsForNavigation flag is set on the inner table");
+		assert.strictEqual(oInnerTable.getItemActionCount(), 3, "itemActionCount property is 3");
+		assert.strictEqual(oInnerTable._getItemActionCount(), 2,
+			"Effective itemActionCount is 2 (Navigation action excluded)");
+
+		// Without Navigation action, effective count equals property value
+		this.destroyTable();
+		await this.createTable({
+			rowSettings: new RowSettings({
+				rowActions: [
+					new RowActionItem({type: "Delete"}),
+					new RowActionItem({type: "Custom", text: "Custom", icon: "sap-icon://action"})
+				]
+			})
+		});
+
+		const oInnerTable2 = this.oTable._oTable;
+		assert.strictEqual(oInnerTable2.getItemActionCount(), 2, "itemActionCount property is 2");
+		assert.strictEqual(oInnerTable2._getItemActionCount(), 2,
+			"Effective itemActionCount is 2 (no Navigation action, no adjustment)");
 	});
 
 	QUnit.test("Static row actions: No accumulation on repeated updateRowActions", async function(assert) {
@@ -1448,6 +1485,54 @@ sap.ui.define([
 		// After removal: no actions
 		assert.strictEqual(oRowTemplate.getActions().length, 0, "After removal: no actions");
 		assert.notOk(oRowTemplate.isBound("actions"), "After removal: actions aggregation not bound");
+	});
+
+	QUnit.test("Row action clone is not destroyed when ColumnListItem is destroyed", async function(assert) {
+		const oRowActionItemPress = sinon.spy();
+
+		await this.createTable({
+			rowPress: function() {},
+			rowSettings: new RowSettings({
+				rowActions: [
+					new RowActionItem({
+						type: "Navigation",
+						press: function(oEvent) {
+							oRowActionItemPress(oEvent);
+						}
+					})
+				]
+			})
+		});
+
+		await new Promise((resolve) => {
+			this.oTable._oTable.attachEventOnce("updateFinished", resolve);
+		});
+
+		const oType = this.oTable.getType();
+		const oFirstItem = this.oTable._oTable.getItems()[0];
+
+		// Trigger row press to create and cache the RowActionItem clone
+		oFirstItem.$().trigger("tap");
+
+		await new Promise((resolve) => {
+			this.oTable.getRowSettings().getRowActions()[0].attachEventOnce("press", resolve);
+		});
+
+		assert.ok(oRowActionItemPress.calledOnce, "Press event fired on first navigation");
+
+		// Verify clone is cached and not a dependent of the ListItemAction
+		const oCloneMap = oType._mRowActionItemClones;
+		assert.strictEqual(oCloneMap.size, 1, "One clone is cached");
+		const oCachedClone = oCloneMap.values().next().value;
+		assert.notOk(oCachedClone.isDestroyed(), "Clone is not destroyed after first press");
+		assert.notOk(oCachedClone.getParent(), "Clone has no parent after press (was removed as dependent)");
+
+		// Destroy the ColumnListItem (simulates what happens during back-navigation/rebinding)
+		oFirstItem.destroy();
+
+		// Verify the cached clone survived the ColumnListItem destruction
+		assert.notOk(oCachedClone.isDestroyed(), "Clone survives ColumnListItem destruction");
+		assert.strictEqual(oCloneMap.size, 1, "Clone is still in cache");
 	});
 
 	QUnit.module("Events", {

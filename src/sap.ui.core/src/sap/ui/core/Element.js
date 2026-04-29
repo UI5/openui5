@@ -51,6 +51,8 @@ sap.ui.define([
 	) {
 		"use strict";
 
+		_LocalizationHelper.injectJQuery(jQuery);
+
 		/**
 		 * Constructs and initializes a UI Element with the given <code>sId</code> and settings.
 		 *

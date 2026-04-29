@@ -10,5 +10,6 @@ window["sap-ui-config"].resourceroots = {"fl.performance": "./"};
 window["sap-ui-config"].bindingSyntax = "complex";
 window["sap-ui-config"].async = "true";
 window["sap-ui-config"].flexibilityServices = '[{"connector": "ObjectPathConnector", "path": "' + sPath + '"}, {"connector": "SessionStorageConnector"}]';
-
-document.write('<script src="' + __sPathPrefix + '/resources/sap-ui-core.js"><' + '/script>');
+const script = document.createElement("script");
+script.src = `${window.location.origin}${__sPathPrefix}/resources/sap-ui-core.js`;
+document.head.appendChild(script);
