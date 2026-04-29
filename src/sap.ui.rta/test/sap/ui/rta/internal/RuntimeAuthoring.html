@@ -1,34 +1,30 @@
 <!DOCTYPE HTML>
 <html>
-
 <head>
 	<title>RuntimeAuthoring - sap.ui.rta</title>
-
-	<script>
-		const basePath = document.location.pathname.match(/(.*)\/test-resources\//)[1];
-		const script = document.createElement("script");
-		script.src = `${window.location.origin}${basePath}/resources/sap-ui-core.js`;
-		script.id = "sap-ui-bootstrap";
-		script.setAttribute("data-sap-ui-language", "en");
-		script.setAttribute("data-sap-ui-async", "true");
-		script.setAttribute("data-sap-ui-compat-version", "edge");
-		script.setAttribute("data-sap-ui-libs", "sap.m, sap.ui.layout, sap.ui.comp, sap.ui.rta");
-		script.setAttribute("data-sap-ui-xx-bindingSyntax", "complex");
-		script.setAttribute("data-sap-ui-resourceroots", '{"sap.ui.rta.test": "testdata/rta/"}');
-		script.setAttribute("data-sap-ui-flexibilityServices", '[{"connector": "LocalStorageConnector"}]');
-		script.setAttribute("data-sap-ui-onInit", "module:rta/internal/testdata/standalone_init");
-		document.head.appendChild(script);
-	</script>
-
+	<script id="sap-ui-bootstrap"
+		src="../../../../../../../../resources/sap-ui-core.js"
+		data-sap-ui-async="true"
+		data-sap-ui-libs="sap.m, sap.ui.layout, sap.ui.comp, sap.ui.rta"
+		data-sap-ui-theme="sap_horizon"
+		data-sap-ui-language="en"
+		data-sap-ui-compatVersion="edge"
+		data-sap-ui-xx-bindingSyntax="complex"
+		data-sap-ui-flexibility-services='[{"connector": "LocalStorageConnector"}]'
+		data-sap-ui-resource-roots='{
+			"standaloneConfig": "./testdata/",
+			"sap.ui.rta.test": "testdata/rta/"
+		}'
+		data-sap-ui-on-init="module:standaloneConfig/standalone_init"
+	></script>
 	<style>
 		.sapUiRtaMode .sapUiRtaRoot {
 			margin-top: 3rem;
 		}
 	</style>
 </head>
-
 <body class="sapUiBody sapUiSizeCompact">
 	<div id="content"></div>
 </body>
-
 </html>
+

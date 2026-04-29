@@ -4,21 +4,22 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
 
 		<script src="../../../shared-config.js"></script>
-		<script>
-			window["sap-ui-config"].libs = "sap.m, sap.ui.layout, sap.uxap, sap.ui.rta";
-			window["sap-ui-config"].resourceroots = {
+		<script id="sap-ui-bootstrap"
+			src="../../../../../../../../resources/sap-ui-core.js"
+			data-sap-ui-async="true"
+			data-sap-ui-libs="sap.m, sap.ui.layout, sap.uxap, sap.ui.rta"
+			data-sap-ui-theme="sap_horizon"
+			data-sap-ui-language="en"
+			data-sap-ui-compatVersion="edge"
+			data-sap-ui-xx-bindingSyntax="complex"
+			data-sap-ui-no-conflict="true"
+			data-sap-ui-flexibility-services='[{"connector": "LocalStorageConnector"}]'
+			data-sap-ui-resource-roots='{
 				"sap.ui.rta.test.rtaOpenUI5Only": "./"
-			};
-			window["sap-ui-config"].bindingSyntax = "complex";
-			window["sap-ui-config"].flexibilityServices = '[{"connector": "LocalStorageConnector"}]';
-			window["sap-ui-config"].noConflict = "true";
-			window["sap-ui-config"].async = "true";
-			window["sap-ui-config"].onInit="module:rta/internal/testdata/rtaOpenUI5Only/standalone_init"
-			const basePath = document.location.pathname.match(/(.*)\/test-resources\//)[1];
-			const script = document.createElement("script");
-			script.src = `${window.location.origin}${basePath}/resources/sap-ui-core.js`;
-			document.head.appendChild(script);
-		</script>
+			}'
+			data-sap-ui-on-init="module:sap/ui/rta/test/rtaOpenUI5Only/standalone_init"
+		></script>
+
 	</head>
 	<body class="sapUiBody sapUiSizeCompact">
 		<div id="content"></div>

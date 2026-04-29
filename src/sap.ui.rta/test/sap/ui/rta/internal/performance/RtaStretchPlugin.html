@@ -23,23 +23,18 @@
 		</style>
 
 		<script src="../../shared-config.js"></script>
-		<script>
-			window["sap-ui-config"] = window["sap-ui-config"] || {};
-			window["sap-ui-config"].onInit = "module:rta/performance/stretch/main";
-			window["sap-ui-config"].async = "true";
-			window["sap-ui-config"].libs = "sap.ui.rta, sap.ui.dt, sap.m, sap.ui.layout";
-			window["sap-ui-config"].resourceroots = {
+		<script id="sap-ui-bootstrap"
+			src="../../../../../../../../resources/sap-ui-core.js"
+			data-sap-ui-async="true"
+			data-sap-ui-libs="sap.ui.rta, sap.ui.dt, sap.m, sap.ui.layout"
+			data-sap-ui-flexibility-services='[{"connector": "SessionStorageConnector"}]'
+			data-sap-ui-resource-roots='{
 				"rta.performance": "./",
 				"dt.performance": "../../../../../sap/ui/dt/internal/performance/",
 				"test-resources": "../../../../../../test-resources"
-			};
-			window["sap-ui-config"].flexibilityServices = '[{"connector": "SessionStorageConnector"}]';
-			const basePath = document.location.pathname.match(/(.*)\/test-resources\//)[1];
-			const script = document.createElement("script");
-			script.src = `${window.location.origin}${basePath}/resources/sap-ui-core.js`;
-			document.head.appendChild(script);
-		</script>
-
+			}'
+			data-sap-ui-on-init="module:rta/performance/stretch/main"
+		></script>
 		<script src="RtaStretchPlugin.js"></script>
 	</head>
 	<body class="sapUiBody sapUiSizeCompact">

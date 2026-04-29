@@ -2,18 +2,17 @@
 <html>
 	<head>
 		<script src="../shared-config.js"></script>
-		<script>
-			window["sap-ui-config"].async = "true";
-			window["sap-ui-config"].theme = "sap_horizon";
-			window["sap-ui-config"].resourceroots = { "sap.ui.rta.test.additionalElements": "testdata/additionalElements/" };
-			window["sap-ui-config"].libs = "sap.m, sap.ui.comp, sap.ui.layout, sap.uxap, sap.ui.rta";
-			window['sap-ui-config'].flexibilityServices = '[{"connector": "LocalStorageConnector"}]';
-			window["sap-ui-config"].onInit="module:rta/internal/testdata/additionalElements/AdditionalElements"
-			const basePath = document.location.pathname.match(/(.*)\/test-resources\//)[1];
-			const script = document.createElement("script");
-			script.src = `${window.location.origin}${basePath}/resources/sap-ui-core.js`;
-			document.head.appendChild(script);
-		</script>
+		<script id="sap-ui-bootstrap"
+			src="../../../../../../../../resources/sap-ui-core.js"
+			data-sap-ui-async="true"
+			data-sap-ui-libs="sap.m, sap.ui.comp, sap.ui.layout, sap.uxap, sap.ui.rta"
+			data-sap-ui-theme="sap_horizon"
+			data-sap-ui-flexibility-services='[{"connector": "LocalStorageConnector"}]'
+			data-sap-ui-resource-roots='{
+				"sap.ui.rta.test.additionalElements": "testdata/additionalElements/"
+			}'
+			data-sap-ui-on-init="module:sap/ui/rta/test/additionalElements/standalone_init"
+		></script>
 
 	</head>
 	<body class="sapUiBody sapUiSizeCompact">

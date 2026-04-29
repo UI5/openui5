@@ -11,19 +11,16 @@
 			}
 		</style>
 		<script src="../../shared-config.js"></script>
-		<script>
-			const sMeasure = "fl.performance.flexBundleLoad";
-			performance.mark(`${sMeasure}`);
+		<script src="./performanceMark.js"></script>
+		<script id="sap-ui-bootstrap"
+			src="../../../../../../../../resources/sap-ui-core.js"
+			data-sap-ui-async="true"
+			data-sap-ui-resource-roots='{
+				"fl.performance": "./"
+			}'
+			data-sap-ui-on-init="module:fl/performance/flexBundleLoad/withoutFL"
+		></script>
 
-			window["sap-ui-config"] = window["sap-ui-config"] || {};
-			window["sap-ui-config"].onInit = "module:fl/performance/flexBundleLoad/withoutFL";
-			window["sap-ui-config"].resourceroots = {"fl.performance": "./"};
-			window["sap-ui-config"].async = "true";
-			const basePath = document.location.pathname.match(/(.*)\/test-resources\//)[1];
-			const script = document.createElement("script");
-			script.src = `${window.location.origin}${basePath}/resources/sap-ui-core.js`;
-			document.head.appendChild(script);
-		</script>
 	</head>
 	<body class="sapUiBody">
 		<div id="content"></div>
