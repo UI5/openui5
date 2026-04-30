@@ -4387,6 +4387,8 @@ sap.ui.define([
 				sTransientPredicate);
 		this.mock(_Helper).expects("copySelected")
 			.withExactArgs(sinon.match.same(oOldElement), sinon.match.same(oElement));
+		this.mock(_Helper).expects("copyETags")
+			.withExactArgs(sinon.match.same(oElement), sinon.match.same(oOldElement));
 		this.mock(_Helper).expects("restoreUpdatingProperties")
 			.withExactArgs(sinon.match.same(oOldElement), sinon.match.same(oElement));
 		this.mock(_Helper).expects("buildPath")
@@ -4433,9 +4435,12 @@ sap.ui.define([
 			aElements.$byPredicate = {doNotTouch : aElements[0], "('42')" : oOldElement};
 			this.mock(_Helper).expects("copySelected")
 				.withExactArgs(sinon.match.same(oOldElement), sinon.match.same(oNewElement));
+			this.mock(_Helper).expects("copyETags")
+				.withExactArgs(sinon.match.same(oNewElement), sinon.match.same(oOldElement));
 		} else {
 			aElements.$byPredicate = {doNotTouch : aElements[0]};
 			this.mock(_Helper).expects("copySelected").never();
+			this.mock(_Helper).expects("copyETags").never();
 		}
 
 		this.mock(_Cache).expects("getElementIndex").never();

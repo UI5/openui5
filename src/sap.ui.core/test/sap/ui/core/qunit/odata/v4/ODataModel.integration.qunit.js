@@ -14706,6 +14706,101 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	// Scenario: Two subsequent PATCHes in different batches where the first PATCH includes a
+	// refresh for a single line, and the second PATCH modifies a property reached via navigation.
+	// The first PATCH uses the initial ETag. The second PATCH waits for the first to complete
+	// and uses the ETag from the refresh's response.
+	// SNOW: DINC0832432
+	QUnit.test("SNOW: DINC0832432", async function (assert) {
+		const oModel = this.createSalesOrdersModel({autoExpandSelect : true});
+		const sView = `
+<Table id="table" items="{/SalesOrderList}">
+	<Input id="note" value="{Note}"/>
+	<Input id="companyName" value="{SO_2_BP/CompanyName}"/>
+</Table>`;
+
+		this.expectRequest("SalesOrderList?$select=Note,SalesOrderID"
+				+ "&$expand=SO_2_BP($select=BusinessPartnerID,CompanyName)&$skip=0&$top=100", {
+				value : [{
+					"@odata.etag" : "ETag0",
+					Note : "Initial Note",
+					SalesOrderID : "42",
+					SO_2_BP : {
+						"@odata.etag" : "BPETag0",
+						BusinessPartnerID : "0100000000",
+						CompanyName : "ACME#0"
+					}
+				}]
+			})
+			.expectChange("note", ["Initial Note"])
+			.expectChange("companyName", ["ACME#0"]);
+
+		await this.createView(assert, sView, oModel);
+
+		let fnRespond;
+		this.expectChange("note", ["Changed Note"])
+			.expectRequest({
+				batchNo : 2,
+				headers : {"If-Match" : "ETag0"},
+				method : "PATCH",
+				payload : {Note : "Changed Note"},
+				url : "SalesOrderList('42')"
+			}, new Promise(function (resolve) {
+				fnRespond = resolve.bind(null, {
+					"@odata.etag" : "ETag1",
+					Note : "Changed Note#1"
+				});
+			}))
+			.expectRequest({
+					batchNo : 2,
+					url : "SalesOrderList('42')?$select=Messages,Note,SalesOrderID"
+						+ "&$expand=SO_2_BP($select=BusinessPartnerID,CompanyName)"
+			}, {
+				"@odata.etag" : "ETag1",
+				Note : "Changed Note#1",
+				SalesOrderID : "42",
+				SO_2_BP : {
+					"@odata.etag" : "BPETag1",
+					BusinessPartnerID : "0100000000",
+					CompanyName : "ACME#1"
+				}
+			});
+
+		const aCells = this.oView.byId("table").getItems()[0].getCells();
+		aCells[0].getBinding("value").setValue("Changed Note");
+		// code under test
+		const oRefreshPromise = aCells[0].getBindingContext().requestSideEffects([""]);
+
+		await this.waitForChanges(assert);
+
+		this.expectChange("companyName", ["ACME"]);
+
+		aCells[1].getBinding("value").setValue("ACME");
+
+		await this.waitForChanges(assert);
+
+		this.expectChange("companyName", ["ACME#1"])
+			.expectChange("note", ["Changed Note#1"])
+			.expectRequest({
+				headers : {"If-Match" : "BPETag1"},
+				method : "PATCH",
+				payload : {CompanyName : "ACME"},
+				url : "BusinessPartnerList('0100000000')"
+			}, {
+				"@odata.etag" : "BPETag2",
+				CompanyName : "ACME#2"
+			})
+			.expectChange("companyName", ["ACME#2"]);
+
+		fnRespond();
+
+		await Promise.all([
+			oRefreshPromise,
+			this.waitForChanges(assert)
+		]);
+	});
+
+	//*********************************************************************************************
 	// Scenario: While update for entity1 is on the wire (request1), update both entity1 and entity2
 	// in one batch (request2). Then update entity2 (request3).
 	// request2 and request3 wait for request1 to return *and* apply the response to the cache;
