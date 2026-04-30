@@ -65,6 +65,19 @@ sap.ui.define([
 					var oModel = oListBinding.getModel();
 					var aItems = merge([], oModel.getProperty(sItemPath));
 
+					// don't allow to remove date 01.01.0001
+					if (sKeyPath === "date" &&
+						aItems.some((oItem) => {
+							const oDate = oItem.date;
+							return oDate?.getFullYear() === 1 && oDate?.getMonth() === 0 && oDate?.getDate() === 1;
+						}) &&
+						!aConditions.some((oCondition) => {
+							const oDate = oCondition.values[0];
+							return oDate?.getFullYear() === 1 && oDate?.getMonth() === 0 && oDate?.getDate() === 1;
+						})) {
+						return Promise.reject(new Error("Date 01.01.0001 cannot be removed"));
+					}
+
 					// first remove items not longer exist
 					if (aItems.length > aConditions.length) {
 						aItems.splice(aConditions.length);
