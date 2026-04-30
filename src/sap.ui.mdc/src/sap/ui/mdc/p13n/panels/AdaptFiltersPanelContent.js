@@ -495,15 +495,16 @@ sap.ui.define([
 
 	/**
 	 * Factory for the list items used in the list.
-	 * @param {string} _sId id of the item
+	 * @param {string} sId the ID for the list item - not used
 	 * @param {sap.ui.model.ContextBinding} oContext context of the item
 	 * @returns {sap.m.CustomListItem} the list item for the current context
 	 */
-	AdaptFiltersPanelContent.prototype._getItemFactory = function(_sId, oContext) {
+	AdaptFiltersPanelContent.prototype._getItemFactory = function(sId, oContext) {
 		const oGrid = this._createItemGrid(oContext);
+		const sListId = this._oListControl.getId();
 		const sIdSuffix = _getIdSuffixFromContext(oContext);
 
-		const oRow = new CustomListItem(_sId + "-list-item-" + sIdSuffix, {
+		const oRow = new CustomListItem(sListId + "-list-item-" + sIdSuffix, {
 			content: oGrid,
 			selected: { path: `${this.P13N_MODEL}>${this.PRESENCE_ATTRIBUTE}` },
 			visible: {
@@ -608,7 +609,9 @@ sap.ui.define([
 	 */
 	AdaptFiltersPanelContent.prototype._createFilterLabel = function(oContext) {
 		const sIdSuffix = _getIdSuffixFromContext(oContext);
-		const sLabelId = this.getId() + "-filterLabel-" + sIdSuffix;
+		const bGrouped = this._oViewModel.getProperty("/grouped");
+		const sViewKey = bGrouped ? this.GROUP_KEY : this.LIST_KEY;
+		const sLabelId = this.getId() + "-filterLabel-" + sViewKey + "-view-" + sIdSuffix;
 
 		let oLabel = this._mLabelCache[sLabelId];
 		if (oLabel && !oLabel.bIsDestroyed) {
@@ -656,11 +659,13 @@ sap.ui.define([
 			span: "XL8 L8 M8 S8"
 		}));
 
-		const oFilterClone = oFilterControl?.clone();
+		// To difference beetween list and group view
+		const sViewKey = this._oViewModel.getProperty("/grouped") ? this.GROUP_KEY : this.LIST_KEY;
+		const sIdSuffix = sViewKey + "-view";
+		const oFilterClone = oFilterControl?.clone(sIdSuffix);
 		if (oFilterClone.isA("sap.ui.mdc.filterbar.p13n.FilterGroupLayout")) {
 			oFilterClone.setFilterField(oField);
 		}
-
 		return oFilterClone;
 	};
 

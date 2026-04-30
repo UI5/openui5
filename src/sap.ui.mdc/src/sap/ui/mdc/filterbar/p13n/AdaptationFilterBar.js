@@ -377,7 +377,7 @@ sap.ui.define([
 							delete oFilterFieldPromise._bTemporaryOriginal;
 							this._mOriginalsForClone[oFilterField.getPropertyKey()] = oFilterField;
 						}
-						oFieldForDialog = oFilterField.clone();
+						oFieldForDialog = oFilterField.clone("AdaptationFilter");
 						if (oAdaptationControl._handleFilterItemChanges) {
 							oFieldForDialog.detachChange(oAdaptationControl._handleFilterItemChanges, oAdaptationControl);
 						}

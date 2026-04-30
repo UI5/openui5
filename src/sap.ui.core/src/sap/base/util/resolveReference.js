@@ -8,6 +8,46 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 	var oNotFound = Object.create(null);
 
 	/**
+	 * Checks whether the given value or its context is a restricted
+	 * function that must not be resolved.
+	 *
+	 * @param {any} vValue The resolved value to check
+	 * @param {any} [oContext] The parent object from which <code>vValue</code>
+	 *  was retrieved
+	 * @returns {boolean} Whether the value or its context is restricted
+	 */
+	function _isRestricted(vValue, oContext) {
+		return _isBlocklisted(vValue) || _isBlocklisted(oContext)
+			|| _isWindow(oContext);
+	}
+
+	/**
+	 * Checks whether the given value is identical to one of the known
+	 * restricted global functions.
+	 *
+	 * @param {any} vValue The value to check
+	 * @returns {boolean} Whether the value is a restricted function
+	 */
+	function _isBlocklisted(vValue) {
+		// eslint-disable-next-line no-eval
+		return vValue === eval || vValue === setTimeout || vValue === setInterval
+			|| (globalThis.document && (vValue === globalThis.document.write || vValue === globalThis.document.writeln))
+			|| vValue === location.assign || vValue === location.replace
+			|| (globalThis.jQuery && (vValue === globalThis.jQuery.globalEval
+				|| (globalThis.jQuery.sap && vValue === globalThis.jQuery.sap.globalEval)));
+	}
+
+	/**
+	 * Checks whether the given value is a <code>Window</code> object.
+	 *
+	 * @param {any} vValue The value to check
+	 * @returns {boolean} Whether the value is a Window object
+	 */
+	function _isWindow(vValue) {
+		return vValue != null && vValue.window === vValue;
+	}
+
+	/**
 	 * Resolve the path segments under the given root context
 	 *
 	 * @param {array} aParts The path segments
@@ -31,8 +71,13 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 			oContext = aParts.length > 1 ? ObjectPath.get(aParts.slice(0, -1), oRoot) : oRoot;
 			vRef = oContext && oContext[aParts[aParts.length - 1]];
 
-			if (typeof vRef === "function" && mOptions.bindContext) {
-				vRef = vRef.bind(mOptions.rootContext || oContext);
+			if (typeof vRef === "function") {
+				if (_isRestricted(vRef, oContext)) {
+					return oNotFound;
+				}
+				if (mOptions.bindContext) {
+					vRef = vRef.bind(mOptions.rootContext || oContext);
+				}
 			}
 
 			return vRef;
