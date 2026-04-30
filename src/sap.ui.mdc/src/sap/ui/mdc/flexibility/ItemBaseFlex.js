@@ -375,7 +375,7 @@ sap.ui.define([
 
 		/******************************* Public methods *************************************/
 
-		createAddChangeHandler: function() {
+		createAddChangeHandler: function(mSettings) {
 			return Util.createChangeHandler({
 				apply: this._applyAdd.bind(this),
 				revert: this._applyRemove.bind(this),
@@ -384,7 +384,7 @@ sap.ui.define([
 					return this.determineAggregation(mPropertyBag.modifier, oControl)
 						.then((oAggregation) => {
 							return {
-								affectedControl: { idIsLocal: false, id: oChange.getRevertData().item },
+								affectedControl: mSettings?.getAffectedControl?.(oChange) || { idIsLocal: false, id: oChange.getRevertData().item },
 								targetContainer: oChange.getSelector(),
 								targetAggregation: oAggregation.name,
 								classification: CondenserClassification.Create,
@@ -411,7 +411,7 @@ sap.ui.define([
 					return this.determineAggregation(mPropertyBag.modifier, oControl)
 						.then((oAggregation) => {
 							return {
-								affectedControl: { idIsLocal: false, id: oChange.getRevertData().item },
+								affectedControl: mSettings?.getAffectedControl?.(oChange) || { idIsLocal: false, id: oChange.getRevertData().item },
 								targetContainer: oChange.getSelector(),
 								targetAggregation: oAggregation.name,
 								classification: CondenserClassification.Destroy,
@@ -437,7 +437,7 @@ sap.ui.define([
 					return this.determineAggregation(mPropertyBag.modifier, oControl)
 						.then((oAggregation) => {
 							return {
-								affectedControl: { idIsLocal: false, id: oChange.getRevertData().item },
+								affectedControl: mSettings?.getAffectedControl?.(oChange) || { idIsLocal: false, id: oChange.getRevertData().item },
 								targetContainer: oChange.getSelector(),
 								targetAggregation: oAggregation.name,
 								classification: CondenserClassification.Move,
