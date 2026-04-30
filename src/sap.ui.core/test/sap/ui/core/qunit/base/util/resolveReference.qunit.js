@@ -2,7 +2,9 @@
  * ${copyright}
  */
 /*global QUnit */
-sap.ui.define(['sap/base/util/resolveReference'], function(resolveReference) {
+sap.ui.define([
+	'sap/base/util/resolveReference'
+], function(resolveReference) {
 	"use strict";
 
 	QUnit.module("sap/base/util/resolveReference");
@@ -270,6 +272,38 @@ sap.ui.define(['sap/base/util/resolveReference'], function(resolveReference) {
 		// test there's no endless loop
 		var fn = resolveReference(".notExistMethod", {}, {preferDotContext: true});
 		assert.strictEqual(fn, undefined, "correction method was returned");
+	});
+
+	QUnit.test("restricted globals should not be resolved when provided via variables", function(assert) {
+		var oModule = {
+			eval: window.eval, // eslint-disable-line no-eval
+			myTimer: setTimeout
+		};
+
+		assert.strictEqual(resolveReference("module.eval", {"module": oModule}), undefined,
+			"eval from variables should not be resolved");
+		assert.strictEqual(resolveReference("module.myTimer", {"module": oModule}), undefined,
+			"setTimeout from variables should not be resolved");
+
+		// eval.call/apply via variables should also be blocked
+		assert.strictEqual(resolveReference("myEval.call", {"myEval": window.eval}), undefined, // eslint-disable-line no-eval
+			"eval.call from variables should not be resolved");
+		assert.strictEqual(resolveReference("myEval.apply", {"myEval": window.eval}), undefined, // eslint-disable-line no-eval
+			"eval.apply from variables should not be resolved");
+	});
+
+	QUnit.test("variable named 'parent' with regular object should not be blocked", function(assert) {
+		var oContext;
+		var oModule = {
+			method: function() {
+				oContext = this;
+				return "parentMethod";
+			}
+		};
+
+		var fn = resolveReference("parent.method", {"parent": oModule});
+		assert.strictEqual(fn(), "parentMethod", "method from 'parent' variable should be resolved");
+		assert.strictEqual(oContext, oModule, "correct context was bound");
 	});
 
 	QUnit.test("resolve value from loaded module", async function(assert) {
