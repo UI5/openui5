@@ -42,6 +42,8 @@ sap.ui.define([
 	"sap/ui/layout/form/SimpleForm",
 	"sap/ui/layout/Splitter",
 	"sap/m/FlexBox",
+	"sap/f/Card",
+	"sap/f/cards/Header",
 	"sap/ui/thirdparty/jquery"
 ], function (
 	JSONModel,
@@ -87,6 +89,8 @@ sap.ui.define([
 	SimpleForm,
 	Splitter,
 	FlexBox,
+	Card,
+	CardHeader,
 	jQuery
 ) {
 	"use strict";
@@ -1720,6 +1724,34 @@ sap.ui.define([
 		]
 	});
 
+	var oDialogWithDisabledVerticalScrollAndCard = new Dialog({
+		title: "Disabled Vertical Scroll with Card",
+		contentWidth: "400px",
+		contentHeight: "500px",
+		verticalScrolling: false,
+		content: [
+			new Card({
+				header: new CardHeader({
+					title: "Card Title",
+					subtitle: "Card Subtitle"
+				}),
+				content: new List({
+					items: [
+						new StandardListItem({ title: "Item 1" }),
+						new StandardListItem({ title: "Item 2" }),
+						new StandardListItem({ title: "Item 3" })
+					]
+				})
+			})
+		],
+		beginButton: new Button({
+			text: "Close",
+			press: function () {
+				oDialogWithDisabledVerticalScrollAndCard.close();
+			}
+		})
+	});
+
 	//=================================================================
 
 	var page1 = new Page("page1", {
@@ -2225,6 +2257,13 @@ sap.ui.define([
 				width: _buttonWidth,
 				press: function () {
 					oPopoverDialog.open();
+				}
+			}),
+			new Button({
+				text: "Disabled Vertical Scroll with Card",
+				width: _buttonWidth,
+				press: function () {
+					oDialogWithDisabledVerticalScrollAndCard.open();
 				}
 			}),
 

@@ -154,6 +154,11 @@ html.sap-desktop .sapMDialog {
 	}
 
 	.sapMDialogScrollCont {
+		& > * {
+			flex: 1 1 100%;
+			min-height: 0;
+		}
+
 		display: flex;
 		flex-direction: column;
 		flex: 1;

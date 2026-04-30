@@ -35,7 +35,9 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/m/Title",
 	"sap/ui/dom/units/Rem",
-	"sap/m/dialogUtils/PreventKeyboardEvents"
+	"sap/m/dialogUtils/PreventKeyboardEvents",
+	"sap/f/Card",
+	"sap/f/cards/Header"
 ], function(
 	Library,
 	qutils,
@@ -71,7 +73,9 @@ sap.ui.define([
 	KeyCodes,
 	Title,
 	Rem,
-	PreventKeyboardEvents
+	PreventKeyboardEvents,
+	Card,
+	CardHeader
 ) {
 	"use strict";
 
@@ -4179,6 +4183,60 @@ sap.ui.define([
 
 			assert.ok(oScrollContainerDom.offsetHeight < oScrollContainerInner.scrollHeight, "ScrollContainer has vertical scroll");
 			assert.ok(oScrollContainerDom.offsetWidth < oScrollContainerInner.scrollWidth, "ScrollContainer has horizontal scroll");
+
+			// cleanup
+			oDialog.destroy();
+			done();
+		});
+
+		// act
+		oDialog.open();
+	});
+
+	QUnit.module("Card inside Dialog with vertical scrolling disabled", {
+		beforeEach: function() {
+			sinon.config.useFakeTimers = false;
+		},
+		afterEach: function() {
+			sinon.config.useFakeTimers = true;
+		}
+	});
+
+	QUnit.test("Card height should equal Dialog content section height", function(assert) {
+		const done = assert.async();
+
+		// arrange
+		const oCard = new Card({
+			header: new CardHeader({
+				title: "Card Title",
+				subtitle: "Card Subtitle"
+			}),
+			content: new List({
+				items: [
+					new StandardListItem({ title: "Item 1" }),
+					new StandardListItem({ title: "Item 2" }),
+					new StandardListItem({ title: "Item 3" })
+				]
+			})
+		});
+
+		const oDialog = new Dialog({
+			title: "Disabled Vertical Scroll with Card",
+			contentWidth: "400px",
+			contentHeight: "500px",
+			verticalScrolling: false,
+			content: [oCard],
+			beginButton: new Button({ text: "Close" })
+		});
+
+		oDialog.attachAfterOpen(function () {
+			// assert
+			var oDialogContent = oDialog.getDomRef("cont");
+			var oCardDom = oCard.getDomRef();
+
+			assert.ok(oDialogContent, "Dialog content section is rendered");
+			assert.ok(oCardDom, "Card is rendered");
+			assert.strictEqual(oCardDom.offsetHeight, oDialogContent.offsetHeight, "Card height equals Dialog content section height");
 
 			// cleanup
 			oDialog.destroy();
