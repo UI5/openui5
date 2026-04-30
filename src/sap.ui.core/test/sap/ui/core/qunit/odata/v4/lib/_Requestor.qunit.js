@@ -4922,7 +4922,7 @@ sap.ui.define([
 			.withExactArgs(aExpectedMessages[0], "/sServiceUrl/~sRequestUrl~");
 		this.mock(_Helper).expects("matchEndsWithTransientPredicate").withExactArgs(sResourcePath)
 			.returns(["($uid=1-23)"]);
-		this.mock(_Helper).expects("getMetaPath").withExactArgs("~sRequestUrl~")
+		this.mock(_Helper).expects("getMetaPath").withExactArgs(sResourcePath)
 			.returns("~sMetaPath~");
 		this.mock(oRequestor).expects("fetchType")
 			.withExactArgs(sinon.match.object.and(sinon.match((mTypeForMetaPath0) => {
