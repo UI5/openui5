@@ -418,6 +418,7 @@ sap.ui.define([
 				this._adjustStickyContent();
 			}};
 
+		this._iSystemScrollbarWidth = null;
 		this._setAriaRoleDescription(Core.getLibraryResourceBundle("sap.f").getText(DynamicPage.ARIA_ROLE_DESCRIPTION));
 	};
 
@@ -452,6 +453,9 @@ sap.ui.define([
 		}
 
 		this._cacheDomElements();
+		if (this._iSystemScrollbarWidth === null) {
+			this._iSystemScrollbarWidth = getScrollbarSize(true).width;
+		}
 		this._attachResizeHandlers();
 		this._updateMedia(this._getWidth(this));
 		this._attachScrollHandler();
@@ -1416,7 +1420,7 @@ sap.ui.define([
 		if (!bHasScrolling || Device.system.phone) {
 			return 0;
 		}
-		return getScrollbarSize(true).width || DynamicPage.OVERLAY_SCROLLBAR_WIDTH;
+		return this._iSystemScrollbarWidth || DynamicPage.OVERLAY_SCROLLBAR_WIDTH;
 	};
 
 	/**
@@ -1443,7 +1447,7 @@ sap.ui.define([
 	 * @private
 	 */
 	DynamicPage.prototype._hasOverlayScrollbar = function (bHasScrolling) {
-		return bHasScrolling && getScrollbarSize(true).width === 0;
+		return bHasScrolling && this._iSystemScrollbarWidth === 0;
 	};
 
 	/**
@@ -1955,6 +1959,8 @@ sap.ui.define([
 			iCurrentWidth = oEvent.size.width,
 			iCurrentHeight = oEvent.size.height,
 			bHeightChange = iCurrentHeight !== oEvent.oldSize.height;
+
+		this._iSystemScrollbarWidth = getScrollbarSize(true).width;
 
 		this._updateHeaderVisualState(bHeightChange, iCurrentHeight);
 
