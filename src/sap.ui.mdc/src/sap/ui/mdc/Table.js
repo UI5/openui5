@@ -3062,8 +3062,8 @@ sap.ui.define([
 
 		if (!this._bIgnoreChange && this._bAnnounceTableUpdate) {
 			this._bAnnounceTableUpdate = false;
-			// iRowCount is undefined, if this.getShowRowCount() returns false
-			MTableUtil.announceTableUpdate(this.getHeader(), iRowCount);
+			const iCount = this.getRowBinding().getCount();
+			MTableUtil.announceTableUpdate(this.getHeader(), (this.getShowRowCount() || iCount === 0) ? iCount : undefined);
 		}
 	};
 

@@ -4413,6 +4413,7 @@ sap.ui.define([
 	QUnit.test("ACC Announcement of table after a FilterBar search", function(assert) {
 		this.oTable.destroy();
 		this.oTable = new Table({
+			header: "Test Table",
 			delegate: {
 				name: sDelegatePath,
 				payload: {
@@ -4449,6 +4450,7 @@ sap.ui.define([
 		this.oTable.setFilter(oFilter);
 
 		return TableQUnitUtils.waitForBinding(this.oTable).then(function() {
+			const oBinding = this.oTable.getRowBinding();
 			oFilter.fireSearch();
 			assert.ok(true, "Search is triggered.");
 			assert.equal(this.oTable._bAnnounceTableUpdate, true, "Table internal flag _bAnnounceTableUpdate is set to true");
@@ -4458,6 +4460,27 @@ sap.ui.define([
 
 			this.oTable.getRowBinding().fireDataReceived();
 			assert.ok(fnAnnounceTableUpdate.calledOnce, "MTableUtil.announceTableUpdate is not called if the dataReceived is not caused by a filterbar search.");
+
+			fnAnnounceTableUpdate.resetHistory();
+
+			this.oTable.setShowRowCount(false);
+			oFilter.fireSearch();
+			assert.ok(true, "Search is triggered.");
+			assert.equal(this.oTable._bAnnounceTableUpdate, true, "Table internal flag _bAnnounceTableUpdate is set to true");
+			oBinding.fireDataReceived(); // invoke event handler manually since we have a JSONModel
+			assert.ok(fnAnnounceTableUpdate.calledOnceWithExactly("Test Table", undefined),
+				"MTableUtil.announceTableUpdate called with correct parameters when showRowCount is false and row count > 0.");
+			fnAnnounceTableUpdate.resetHistory();
+
+			this.stub(oBinding, "getCount").returns(0);
+			oFilter.fireSearch();
+			assert.ok(true, "Search is triggered.");
+			assert.equal(this.oTable._bAnnounceTableUpdate, true, "Table internal flag _bAnnounceTableUpdate is set to true");
+			oBinding.fireDataReceived(); // invoke event handler manually since we have a JSONModel
+			assert.ok(fnAnnounceTableUpdate.calledOnceWithExactly("Test Table", 0),
+				"MTableUtil.announceTableUpdate called with correct parameters when showRowCount is false and row count = 0.");
+
+			this.oTable.setShowRowCount(true);
 
 			oFilter.fireSearch();
 			assert.ok(true, "Search is triggered.");
