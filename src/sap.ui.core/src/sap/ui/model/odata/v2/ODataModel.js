@@ -5947,6 +5947,7 @@ sap.ui.define([
 	 * @param {sap.ui.model.Context} [mParameters.context] If specified, <code>sPath</code> has to be relative to the path
 	 *   given with the context.
 	 * @param {Object<string,string>} [mParameters.urlParameters] A map containing the parameters that will be passed as query strings
+	 * @param {Object<string,string>} [mParameters.headers] A map of headers for this request
 	 * @param {sap.ui.model.Filter[]} [mParameters.filters] An array of filters to be included in the request URL
 	 * @param {sap.ui.model.Sorter[]} [mParameters.sorters] An array of sorters to be included in the request URL
 	 * @param {function} [mParameters.success] A callback function which is called when the data has
