@@ -92,6 +92,11 @@ In the OpenUI5 **root directory**:
 - You can build **specific** libraries by specifying them in the `OPENUI5_LIBRARIES` environment variable:  
 `OPENUI5_LIBRARIES="sap.m,sap.ui.core" npm run sdk`
 
+##### Using the OpenUI5 JSDoc template (preview version):
+To use the newest JSDoc template (as maintained under lib/jsdoc/ui5), before a UI5 CLI release contains the same
+template version, you can run the `npm run update-jsdoc-template` script before running any of the above `sdk` scripts.
+
+As this patches the currently installed `@ui5/builder` package, you have to rerun the script after an `npm install`.
 
 ### Legacy Setup
 > The legacy Grunt-based setup will be discontinued in the near future. It is recommended to already switch to the setup described above for working with the OpenUI5 repository.

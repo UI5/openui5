@@ -36,20 +36,29 @@ sap.ui.define([
                         controlType: "sap.m.Select",
                         visible: false, // Include controls not currently visible (e.g., in overflow)
                         success(aSelects) {
-                            const oSelect = aSelects[1];
-                            const bIsVisible = oSelect.$().is(":visible");
+                            // Find the first select that is actually rendered and visible
+                            // (handles both: visible in toolbar, or visible as a clone in the open overflow popup)
+                            const oVisibleSelect = aSelects.find((sel) => sel.$().length && sel.$().is(":visible"));
 
-                            if (!bIsVisible) {
-                                // Open the overflow menu
+                            if (oVisibleSelect) {
+                                // Control is visible, perform action directly
+                                oVisibleSelect.setSelectedKey(sSize);
+                                oVisibleSelect.fireChange({ selectedItem: oVisibleSelect.getSelectedItem() });
+                                Opa5.assert.ok(true, "Selected illustration size: " + sSize);
+                            } else {
+                                // No visible select found — it is in the overflow popup, open it first
                                 this.waitFor({
                                     id: /.*overflowButton$/,
                                     actions: new Press(),
                                     success: () => {
                                         Opa5.assert.ok(true, "Opened overflow menu");
 
-                                        // Perform the selection in overflow
+                                        // Intentionally no "visible: false": OPA5 defaults to
+                                        // visible:true, so only the rendered clone in the open
+                                        // popup is matched, not the non-rendered original.
                                         this.waitFor({
-                                            id: oSelect.getId(),
+                                            id: /.*illustrationSizeSelect$/,
+                                            controlType: "sap.m.Select",
                                             actions(oOverflowSelect) {
                                                 oOverflowSelect.setSelectedKey(sSize);
                                                 oOverflowSelect.fireChange({ selectedItem: oOverflowSelect.getSelectedItem() });
@@ -62,11 +71,6 @@ sap.ui.define([
                                     },
                                     errorMessage: "Could not open the overflow menu"
                                 });
-                            } else {
-                                // Control is visible, perform action directly
-                                oSelect.setSelectedKey(sSize);
-                                oSelect.fireChange({ selectedItem: oSelect.getSelectedItem() });
-                                Opa5.assert.ok(true, "Selected illustration size: " + sSize);
                             }
                         },
                         errorMessage: "Could not find the illustration size Select"
@@ -78,20 +82,29 @@ sap.ui.define([
                         controlType: "sap.m.Select",
                         visible: false, // Include controls not currently visible (e.g., in overflow)
                         success(aSelects) {
-                            const oSelect = aSelects[1];
-                            const bIsVisible = oSelect.$().is(":visible");
+                            // Find the first select that is actually rendered and visible
+                            // (handles both: visible in toolbar, or visible as a clone in the open overflow popup)
+                            const oVisibleSelect = aSelects.find((sel) => sel.$().length && sel.$().is(":visible"));
 
-                            if (!bIsVisible) {
-                                // Open the overflow menu
+                            if (oVisibleSelect) {
+                                // Control is visible, perform action directly
+                                oVisibleSelect.setSelectedKey(sSet);
+                                oVisibleSelect.fireChange({ selectedItem: oVisibleSelect.getSelectedItem() });
+                                Opa5.assert.ok(true, "Selected illustration set: " + sSet);
+                            } else {
+                                // No visible select found — it is in the overflow popup, open it first
                                 this.waitFor({
                                     id: /.*overflowButton$/,
                                     actions: new Press(),
                                     success: () => {
                                         Opa5.assert.ok(true, "Opened overflow menu");
 
-                                        // Perform the selection in overflow
+                                        // Intentionally no "visible: false": OPA5 defaults to
+                                        // visible:true, so only the rendered clone in the open
+                                        // popup is matched, not the non-rendered original.
                                         this.waitFor({
-                                            id: oSelect.getId(),
+                                            id: /.*illustrationSetSelect$/,
+                                            controlType: "sap.m.Select",
                                             actions(oOverflowSelect) {
                                                 oOverflowSelect.setSelectedKey(sSet);
                                                 oOverflowSelect.fireChange({ selectedItem: oOverflowSelect.getSelectedItem() });
@@ -104,11 +117,6 @@ sap.ui.define([
                                     },
                                     errorMessage: "Could not open the overflow menu"
                                 });
-                            } else {
-                                // Control is visible, perform action directly
-                                oSelect.setSelectedKey(sSet);
-                                oSelect.fireChange({ selectedItem: oSelect.getSelectedItem() });
-                                Opa5.assert.ok(true, "Selected illustration set: " + sSet);
                             }
                         },
                         errorMessage: "Could not find the illustration set Select"

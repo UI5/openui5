@@ -1,16 +1,22 @@
 <!DOCTYPE HTML>
 <html>
-
 <head><meta charset="utf-8">
 	<title>RuntimeAuthoring - sap.ui.rta</title>
-
-	<script src="./RuntimeAuthoring.js"></script>
-
+	<script id="sap-ui-bootstrap"
+			src="../../../../../../../../resources/sap-ui-core.js"
+			data-sap-ui-flexibility-services='[{"connector": "LocalStorageConnector"}]'
+			data-sap-ui-language="en"
+			data-sap-ui-libs="sap.m, sap.ui.layout, sap.ui.comp, sap.ui.rta"
+			data-sap-ui-on-init="module:standaloneConfig/standalone_init"
+			data-sap-ui-resource-roots='{
+				"standaloneConfig": "./testdata/",
+				"sap.ui.rta.test": "testdata/rta/"
+			}'
+	></script>
 	<link rel="stylesheet" href="./RuntimeAuthoring.css">
 </head>
-
 <body class="sapUiBody sapUiSizeCompact">
 	<div id="content"></div>
 </body>
-
 </html>
+

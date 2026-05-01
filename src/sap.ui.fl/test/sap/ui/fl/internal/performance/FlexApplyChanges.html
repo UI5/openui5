@@ -4,7 +4,18 @@
 		<title>Flex - ApplyChanges</title>
 		<link rel="stylesheet" href="./FlexApplyChanges.css">
 		<script src="../../shared-config.js"></script>
-		<script src="./FlexApplyChanges.js"></script>
+		<script src="./loadFlexApplyChanges.js"></script>
+
+		<script id="sap-ui-bootstrap"
+				src="../../../../../../../../resources/sap-ui-core.js"
+				data-sap-ui-language="en"
+				data-sap-ui-libs="sap.m, sap.ui.layout, sap.ui.fl"
+				data-sap-ui-on-init="module:fl/performance/main"
+				data-sap-ui-resource-roots='{
+					"fl.performance": "./"
+				}'
+		></script>
+
 	</head>
 	<body class="sapUiBody">
 		<div id="content"></div>

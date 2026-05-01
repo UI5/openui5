@@ -54,6 +54,14 @@
 	pointer-events: none;
 }
 
+.sapUxAPObjectPageLayoutNoAnchorBar .sapUxAPObjectPageSection.sapUxAPObjectPageSectionNoTitle:focus {
+	outline: none;
+
+	&::before {
+		top: 1rem;
+	}
+}
+
 .sapUxAPObjectPageSectionHeader,
 .sapUxAPObjectPageSubSectionWithSeeMore .sapUxAPSubSectionSeeMoreContainer {
 	padding-right: 2.25rem;

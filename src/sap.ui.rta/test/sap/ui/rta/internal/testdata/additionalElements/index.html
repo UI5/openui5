@@ -4,7 +4,15 @@
 		
 
 		<script src="../../../shared-config.js"></script>
-		<script src="./index.js"></script>
+		<script id="sap-ui-bootstrap"
+				src="../../../../../../../../resources/sap-ui-core.js"
+				data-sap-ui-flexibility-services='[{"connector": "LocalStorageConnector"}]'
+				data-sap-ui-libs="sap.m, sap.ui.comp, sap.ui.layout, sap.uxap, sap.ui.rta"
+				data-sap-ui-on-init="module:sap/ui/rta/test/additionalElements/standalone_init"
+				data-sap-ui-resource-roots='{
+					"sap.ui.rta.test.additionalElements": "./"
+				}'
+		></script>
 
 	</head>
 	<body class="sapUiBody sapUiSizeCompact">

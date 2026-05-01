@@ -530,7 +530,7 @@ sap.ui.define([
 			assert.strictEqual(this.oFlexStateUpdateSpy.firstCall.args[1].length, 4, "there are 4 updates");
 			// checkUpdate is called for the initial addDirtyChanges, for the update of the saved changes
 			// and for the deletion of the additional changes
-			assert.strictEqual(this.oFlexObjectDSUpdateSpy.callCount, 4, "FlexObjectDataSelector.checkUpdate was called four times");
+			assert.strictEqual(this.oFlexObjectDSUpdateSpy.callCount, 3, "FlexObjectDataSelector.checkUpdate was called three times");
 			assert.strictEqual(this.oDHRemoveFromMapSpy.callCount, 2, "removeChangeFromMap was called twice");
 			assert.strictEqual(this.oDHRemoveFromDependenciesSpy.callCount, 2, "removeChangeFromDependencies was called twice");
 		});
@@ -652,7 +652,7 @@ sap.ui.define([
 			assert.strictEqual(this.oStorageCondenseStub.callCount, 0, "the Storage.condense was not called");
 			assert.strictEqual(this.oDHRemoveFromMapSpy.callCount, 0, "removeChangeFromMap was not called directly");
 			assert.strictEqual(this.oDHRemoveFromDependenciesSpy.callCount, 0, "removeChangeFromDependencies was not called directly");
-			assert.strictEqual(oDeleteStub.callCount, 3, "deleteFlexObjects was called three times");
+			assert.strictEqual(oDeleteStub.callCount, 1, "deleteFlexObjects was called once");
 		});
 
 		QUnit.test("without backend condensing and the condenser returning no changes", async function(assert) {
@@ -670,7 +670,7 @@ sap.ui.define([
 			assert.strictEqual(this.oStorageWriteStub.callCount, 0, "the Storage.write was not called");
 			assert.strictEqual(this.oStorageRemoveStub.callCount, 0, "the Storage.remove was not called");
 			assert.strictEqual(this.oStorageCondenseStub.callCount, 0, "the Storage.condense was not called");
-			assert.strictEqual(oDeleteStub.callCount, 2, "deleteFlexObjects was called twice");
+			assert.strictEqual(oDeleteStub.callCount, 1, "deleteFlexObjects was called once");
 		});
 
 		function removeChangesAndAddDeveloperChanges(oAppComponent) {
