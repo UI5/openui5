@@ -6,7 +6,17 @@
 		<link rel="stylesheet" href="./DesignTimeRegularOverlayTest.css">
 
 		<script src="../../shared-config.js"></script>
-		<script src="./DesignTimeRegularOverlayTest.js"></script>
+		<script id="sap-ui-bootstrap"
+				src="../../../../../../../../resources/sap-ui-core.js"
+				data-sap-ui-flexibility-services='[{"connector": "SessionStorageConnector"}]'
+				data-sap-ui-libs="sap.m, sap.ui.layout, sap.ui.dt, sap.ui.rta"
+				data-sap-ui-on-init="module:dt/performance/designtimeRegularOverlays/main"
+				data-sap-ui-resource-roots='{
+					"dt.performance": "./",
+					"rta.performance": "../../../../../sap/ui/rta/internal/performance/"
+				}'
+		></script>
+
 	</head>
 	<body class="sapUiBody">
 		<div id="content"></div>

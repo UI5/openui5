@@ -807,6 +807,25 @@ sap.ui.define([
 	}
 
 	/**
+	 * Removes the binding info from the "items" aggregation of the given list and returns the
+	 * binding info that can be used to rebind the list again, keeping the existing template.
+	 *
+	 * @param {sap.m.ListBase} oList
+	 *   A list whose "items" binding info is saved before the aggregation binding is removed
+	 * @returns {object}
+	 *   The binding info that can be used to rebind the list again, keeping the existing template
+	 */
+	function removeBindingInfo(oList) {
+		const oBindingInfo = oList.getBindingInfo("items");
+		const oTemplate = oBindingInfo.template;
+		delete oBindingInfo.template;
+		oList.unbindAggregation("items");
+		oBindingInfo.template = oTemplate;
+
+		return oBindingInfo;
+	}
+
+	/**
 	 * Wraps the given XML string into a <View> and creates an XML document for it. Verifies that
 	 * the sap.m.Table does not use <items>, because this is the default aggregation and may be
 	 * omitted. (This ensures that <ColumnListItem> is a direct child.)
@@ -3580,7 +3599,7 @@ sap.ui.define([
 		var sView = '\
 <FlexBox id="form"\
 		binding="{path : \'/TEAMS(\\\'1\\\')\', parameters : {$expand : \'TEAM_2_EMPLOYEES\'}}">\
-	<Table id="table" items="{path : \'TEAM_2_EMPLOYEES\', templateShareable : true}">\
+	<Table id="table" items="{TEAM_2_EMPLOYEES}">\
 		<Text id="age" text="{AGE}"/>\
 		<Text id="name" text="{Name}"/>\
 	</Table>\
@@ -3602,8 +3621,7 @@ sap.ui.define([
 			var oBindingInfo;
 
 			oTable = that.oView.byId("table");
-			oBindingInfo = oTable.getBindingInfo("items");
-			oTable.unbindAggregation("items");
+			oBindingInfo = removeBindingInfo(oTable);
 
 			assert.strictEqual(oTable.getItems().length, 0);
 
@@ -6748,7 +6766,7 @@ sap.ui.define([
 	QUnit.test("SNOW: CS20260011383971", async function (assert) {
 		const oModel = this.createSalesOrdersModel({autoExpandSelect : true});
 		const sView = `
-<Table id="table" items="{path : 'BP_2_SO', templateShareable : true}">
+<Table id="table" items="{BP_2_SO}">
 	<Text text="{Note}"/> <!-- Note is added synchronously to mAggregatedQueryOptions -->
 	<Table items="{path : 'SO_2_SOITEM', templateShareable : false}">
 		<!-- SO_2_SOITEM/ItemPosition is added asynchronously to mAggregatedQueryOptions -->
@@ -6777,9 +6795,11 @@ sap.ui.define([
 		this.oView.setBindingContext(oModel.createBindingContext("/BusinessPartnerList('42')"));
 
 		const oTable = this.oView.byId("table");
+		const oBindingInfo = removeBindingInfo(oTable);
+
 		// code under test - rebinding the table destroys the relative list binding
 		oTable.bindItems({
-			...oTable.getBindingInfo("items"),
+			...oBindingInfo,
 			path : "/BusinessPartnerList('42')/BP_2_SO"
 		});
 
@@ -22912,7 +22932,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				sView = '\
 <Table id="teams" items="{/TEAMS}">\
 	<Text id="team" text="{Team_Id}"/>\
-	<Table items="{path : \'TEAM_2_EMPLOYEES\', templateShareable : true}">\
+	<Table items="{path : \'TEAM_2_EMPLOYEES\', templateShareable : false}">\
 		<Text id="employee" text="{ID}"/>\
 	</Table>\
 </Table>',
@@ -24839,8 +24859,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				$count : true,
 				$orderby : 'LifecycleStatus desc',
 				custom : 'foo'
-			},
-			templateShareable : true}">
+			}}">
 		<Text id="isOutdated" text="{= %{@$ui5.context.isOutdated} }"/>
 		<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>
 		<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>
@@ -25163,6 +25182,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					.expectChange("salesOrderID", [null, null])
 					.expectChange("isOutdatedHeader", undefined); // oHeaderContext is destroyed
 
+				const oBindingInfo = removeBindingInfo(oTable);
 				oTable.bindItems({
 					path : "/SalesOrderList",
 					parameters : {
@@ -25173,7 +25193,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							groupLevels : ["LifecycleStatus", "SalesOrderID"]
 						}
 					},
-					template : oTable.getBindingInfo("items").template
+					template : oBindingInfo.template
 				});
 				oBinding = oTable.getBinding("items");
 
@@ -73425,20 +73445,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <Text id="count1" text="{$count}"/>\
 <Table id="table1" items="{/TEAMS}">\
 	<Text id="name1" text="{Name}"/>\
-	<Table items="{path : \'TEAM_2_EMPLOYEES\', templateShareable : true}">\
+	<Table items="{path : \'TEAM_2_EMPLOYEES\', templateShareable : false}">\
 		<Text id="id1" text="{ID}"/>\
 	</Table>\
 </Table>\
 <Text id="count2" text="{$count}"/>\
 <Table id="table2" items="{/TEAMS}">\
 	<Text id="name2" text="{Name}"/>\
-	<Table items="{path : \'TEAM_2_EMPLOYEES\', templateShareable : true}">\
+	<Table items="{path : \'TEAM_2_EMPLOYEES\', templateShareable : false}">\
 		<Text id="id2" text="{ID}"/>\
 	</Table>\
 </Table>\
 <Table id="table3" items="{/TEAMS}">\
 	<Text id="name3" text="{Name}"/>\
-	<Table items="{path : \'TEAM_2_EMPLOYEES\', templateShareable : true}">\
+	<Table items="{path : \'TEAM_2_EMPLOYEES\', templateShareable : false}">\
 		<Text id="id3" text="{ID}"/>\
 	</Table>\
 </Table>',
@@ -76380,7 +76400,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <Text id="count" text="{$count}"/>\
 <Table id="orders" growing="true" growingThreshold="2" items="{/SalesOrderList}">\
 	<Text id="id" text="{SalesOrderID}"/>\
-	<Table items="{path : \'SO_2_SOITEM\', templateShareable : true}">\
+	<Table items="{path : \'SO_2_SOITEM\', templateShareable : false}">\
 		<Text id="position" text="{ItemPosition}"/>\
 	</Table>\
 </Table>',
@@ -77147,7 +77167,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				sView = '\
 <Table id="orders" items="{/SalesOrderList}">\
 	<Text id="order" text="{SalesOrderID}"/>\
-	<Table items="{path : \'SO_2_SOITEM\', templateShareable : true}">\
+	<Table items="{path : \'SO_2_SOITEM\', templateShareable : false}">\
 		<Input id="note" value="{Note}"/>\
 		<Text id="productId" text="{SOITEM_2_PRODUCT/ProductID}"/>\
 		<Input id="productName" value="{SOITEM_2_PRODUCT/Name}"/>\
@@ -77759,7 +77779,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 </Table>\
 <Table id="employees" items="{path : \'TEAM_2_EMPLOYEES\', parameters : {$$ownRequest : true}}">\
 	<Text id="employeeName" text="{Name}"/>\
-	<List items="{path : \'EMPLOYEE_2_EQUIPMENTS\', templateShareable : true}">\
+	<List items="{path : \'EMPLOYEE_2_EQUIPMENTS\', templateShareable : false}">\
 		<CustomListItem>\
 			<Text id="equipmentName" text="{Name}"/>\
 		</CustomListItem>\
@@ -78326,7 +78346,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const sView = `
 <Table id="teams" items="{/TEAMS}">
 	<Text id="teamId" text="{Team_Id}"/>
-	<List items="{path : 'TEAM_2_EMPLOYEES', templateShareable : true}">
+	<List items="{path : 'TEAM_2_EMPLOYEES', templateShareable : false}">
 		<CustomListItem>
 			<Text text="{ID}"/>
 		</CustomListItem>

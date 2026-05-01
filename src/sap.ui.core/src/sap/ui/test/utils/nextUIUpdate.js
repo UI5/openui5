@@ -51,7 +51,7 @@ sap.ui.define([
      *
      * @function
      * @private
-     * @deprecated as of 1.137, future versions of UI5 won't support synchronous rendering anymore.
+     * @deprecated As of version 2.0, future versions of UI5 won't support synchronous rendering anymore.
      */
     nextUIUpdate.runSync = function() {
         Log.warning("Synchronous rendering forced: Please migrate to asynchronous rendering");

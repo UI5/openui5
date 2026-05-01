@@ -1,7 +1,7 @@
 sap.ui.define([
 	"sap/ui/core/ComponentContainer",
 	"sap/ui/core/Component"
-], async (Shell, ComponentContainer, Component) => {
+], async (ComponentContainer, Component) => {
 	"use strict";
 
 	// initialize the UI component

@@ -13,7 +13,8 @@
 						<PropertyValue Property="CollectionPath" String="H_EPM_PD_CATS_SH_Set" />
 						<PropertyValue Property="Parameters">
 							<Collection>
-								<Record Type="SAP__common.ValueListParameterDisplayOnly">
+								<Record Type="SAP__common.ValueListParameterInOut">
+									<PropertyValue Property="LocalDataProperty" PropertyPath="Category" />
 									<PropertyValue Property="Label" String="Category" />
 									<PropertyValue Property="ValueListProperty" String="CATEGORY" />
 								</Record>
@@ -28,7 +29,8 @@
 						<PropertyValue Property="CollectionPath" String="H_EPM_PD_CATS_SH_Set" />
 						<PropertyValue Property="Parameters">
 							<Collection>
-								<Record Type="SAP__common.ValueListParameterDisplayOnly">
+								<Record Type="SAP__common.ValueListParameterInOut">
+									<PropertyValue Property="LocalDataProperty" PropertyPath="Category" />
 									<PropertyValue Property="ValueListProperty" String="CATEGORY" />
 								</Record>
 							</Collection>

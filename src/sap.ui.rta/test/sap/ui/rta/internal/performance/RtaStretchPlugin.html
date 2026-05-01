@@ -6,8 +6,17 @@
 		<link rel="stylesheet" href="./RtaStretchPlugin.css">
 
 		<script src="../../shared-config.js"></script>
-		<script src="./RtaStretchPlugin-embedded-1.js"></script>
-
+		<script id="sap-ui-bootstrap"
+				src="../../../../../../../../resources/sap-ui-core.js"
+				data-sap-ui-flexibility-services='[{"connector": "SessionStorageConnector"}]'
+				data-sap-ui-libs="sap.ui.rta, sap.ui.dt, sap.m, sap.ui.layout"
+				data-sap-ui-on-init="module:rta/performance/stretch/main"
+				data-sap-ui-resource-roots='{
+					"rta.performance": "./",
+					"dt.performance": "../../../../../sap/ui/dt/internal/performance/",
+					"test-resources": "../../../../../../test-resources"
+				}'
+		></script>
 		<script src="RtaStretchPlugin.js"></script>
 	</head>
 	<body class="sapUiBody sapUiSizeCompact">

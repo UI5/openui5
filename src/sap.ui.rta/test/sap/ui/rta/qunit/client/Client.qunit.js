@@ -172,7 +172,7 @@ function(
 	QUnit.module("Handshake", {
 		before() {
 			QUnit.config.fixture = null;
-			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework").then(function(oIframe) {
+			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html").then(function(oIframe) {
 				this.oIframeWindow = oIframe.contentWindow;
 			}.bind(this));
 		},
@@ -314,10 +314,10 @@ function(
 		before() {
 			QUnit.config.fixture = null;
 			return Promise.all([
-				createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework").then(function(oIframe) {
+				createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html").then(function(oIframe) {
 					this.oIframeWindow1 = oIframe.contentWindow;
 				}.bind(this)),
-				createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework").then(function(oIframe) {
+				createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html").then(function(oIframe) {
 					this.oIframeWindow2 = oIframe.contentWindow;
 				}.bind(this))
 			]);
@@ -618,7 +618,7 @@ function(
 	QUnit.module("API - getService()", {
 		before() {
 			QUnit.config.fixture = null;
-			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework").then(function(oIframe) {
+			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html").then(function(oIframe) {
 				this.oIframeWindow = oIframe.contentWindow;
 			}.bind(this));
 		},
@@ -1047,7 +1047,7 @@ function(
 	QUnit.module("API - Events", {
 		before() {
 			QUnit.config.fixture = null;
-			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework").then(function(oIframe) {
+			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html").then(function(oIframe) {
 				this.oIframeWindow = oIframe.contentWindow;
 			}.bind(this));
 		},

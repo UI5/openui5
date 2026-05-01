@@ -1952,7 +1952,8 @@ sap.ui.define([
 	 * currently running updates or creates this method first waits for them to be processed.
 	 *
 	 * The 'dataRequested' and 'dataReceived' events are not fired unless a binding is refreshed
-	 * completely. Whatever should happen in the event handler attached to...
+	 * completely. In that case, they are fired only at the binding itself, not at the model!
+	 * Whatever should happen in the event handler attached to...
 	 * <ul>
 	 *   <li> 'dataRequested', can instead be done before calling {@link #requestSideEffects}.
 	 *   <li> 'dataReceived', can instead be done once the <code>oPromise</code> returned by

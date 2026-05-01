@@ -117,23 +117,28 @@ sap.ui.define([
 	function updateCacheAndDeleteUnsavedChanges(aAllChanges, aCondensedChanges, bSkipUpdateCache, bAlreadyDeletedViaCondense, sReference, sComponentId) {
 		const aUpdates = aCondensedChanges.map((oDirtyChange) => createStorageUpdate(oDirtyChange, bSkipUpdateCache))
 		.filter(Boolean);
+		const aRemovedChanges = [];
 
 		aAllChanges.filter((oChange) => !aCondensedChanges.some((oCondensedChange) => oChange.getId() === oCondensedChange.getId()))
 		.forEach((oChange) => {
+			aRemovedChanges.push(oChange);
 			if (bAlreadyDeletedViaCondense) {
-				FlexState.removeDirtyFlexObjects(sReference, [oChange]);
 				removeFlexObjectFromDependencyHandler(sReference, oChange);
-
 				// Remove also from Cache if the persisted change is still there (e.g. navigate away and back to the app)
 				aUpdates.push({ type: "delete", flexObject: oChange.convertToFileContent() });
+			}
+		});
+		if (aRemovedChanges.length) {
+			if (bAlreadyDeletedViaCondense) {
+				FlexState.removeDirtyFlexObjects(sReference, aRemovedChanges);
 			} else {
 				FlexObjectManager.deleteFlexObjects({
 					reference: sReference,
 					componentId: sComponentId,
-					flexObjects: [oChange]
+					flexObjects: aRemovedChanges
 				});
 			}
-		});
+		}
 		if (aUpdates.length) {
 			FlexState.getFlexObjectsDataSelector().checkUpdate({ reference: sReference });
 			FlexState.update(sReference, aUpdates);

@@ -5,8 +5,9 @@
 sap.ui.define([
     "sap/ui/documentation/sdk/controller/BaseController",
     "sap/ui/Device",
-    "sap/ui/thirdparty/jquery"
-], function(BaseController, Device, jQuery) {
+    "sap/ui/thirdparty/jquery",
+	"sap/ui/util/openWindow"
+], function(BaseController, Device, jQuery, openWindow) {
 		"use strict";
 
 		var GIT_HUB_URL = "https://github.com/UI5/docs";
@@ -79,7 +80,7 @@ sap.ui.define([
 					link: "download " + this._determinePdfName(),
 					destination: sUrl
 				});
-				window.open(sUrl, "_blank");
+				openWindow(sUrl, "_blank");
 			},
 
 			/**
@@ -87,7 +88,7 @@ sap.ui.define([
 			 * @public
 			 */
 			onGitHubButtonPress: function () {
-				window.open(GIT_HUB_URL, "_blank");
+				openWindow(GIT_HUB_URL, "_blank");
 			},
 
 			/**

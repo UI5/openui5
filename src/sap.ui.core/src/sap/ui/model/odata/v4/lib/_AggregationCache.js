@@ -76,7 +76,8 @@ sap.ui.define([
 	 * Deletes a node on the server and in the cached data.
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} [oGroupLock]
-	 *   A lock for the group ID to be used for the DELETE request; w/o a lock, no requests are sent
+	 *   A lock for the group ID to be used for the DELETE request; w/o it, no requests are sent.
+	 *   For a transient entity, the lock is ignored (use NULL)!
 	 * @param {string} sEditUrl
 	 *   The node's edit URL to be used for the DELETE request
 	 * @param {string} sIndexOrPredicate
