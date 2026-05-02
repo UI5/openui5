@@ -1272,12 +1272,12 @@ sap.ui.define([
 		});
 
 		let oEvent = oRowActionItemPress.getCall(0)?.args[0];
-		assert.ok(oRowPress.called, "rowPress event handler is called");
-		assert.ok(oRowActionItemPress.calledOnce, "Press event handler called once");
+		assert.ok(oRowPress.called, "rowPress event handler is called when clicking on list row with 'Navigation' action");
+		assert.ok(oRowActionItemPress.calledOnce, "ActionItem 'press' event handler is called once");
 		assert.deepEqual(oEvent?.getParameters(), {
 			id: oEvent.getSource().getId(),
 			bindingContext: oFirstItem.getBindingContext("namedModel")
-		}, "Press event handler called with correct parameters for Navigation action");
+		}, "ActionItem 'press' event handler is called with correct parameters for Navigation action");
 
 		// Simulate press on 'Delete' row action item
 		const oDeleteAction = oFirstItem.getActions().find((oAction) => oAction.getType() === "Delete");
@@ -1285,29 +1285,64 @@ sap.ui.define([
 
 		oEvent = oRowActionItemPress.getCall(1)?.args[0];
 		assert.ok(oRowPress.calledOnce, "rowPress event handler is still called once");
-		assert.ok(oRowActionItemPress.calledTwice, "ActionItem 'Press' event handler called twice");
+		assert.ok(oRowActionItemPress.calledTwice, "ActionItem 'press' event handler called twice");
 		assert.deepEqual(oEvent?.getParameters(), {
 			id: oEvent.getSource().getId(),
 			bindingContext: oFirstItem.getBindingContext("namedModel")
 		}, "Press event handler called with correct parameters for Delete action");
 
-		// actionItemPress event should be fired even if rowPress event is not attached
-		this.oTable.detachRowPress(fnRowPress);
+	});
 
-		// Simulate press on first row action (Navigation)
-		oFirstItem.$().trigger("tap");
+	QUnit.test("Row action press without rowPress event attached on table", async function(assert) {
+		const oRowActionItemPress = sinon.spy();
 
-		await new Promise((resolve) => {
-			this.oTable.attachEventOnce("rowPress", resolve);
+		await this.createTable({
+			rowSettings: new RowSettings({
+				rowActions: [
+					new RowActionItem({
+						type: "Navigation",
+						press: function(oEvent) {
+							oRowActionItemPress(oEvent);
+						}
+					})
+				]
+			})
 		});
 
-		oEvent = oRowActionItemPress.getCall(2)?.args[0];
-		assert.ok(oRowPress.calledOnce, "rowPress event handler is still called once");
-		assert.ok(oRowActionItemPress.calledThrice, "ItemAction 'Press' event handler called thrice");
+		await new Promise((resolve) => {
+			this.oTable._oTable.attachEventOnce("updateFinished", resolve);
+		});
+
+		const oFirstItem = this.oTable._oTable.getItems()[0];
+
+		assert.notOk(this.oTable.hasListeners("rowPress"), "Table has no 'rowPress' event listener");
+		assert.strictEqual(oFirstItem.getType(), "Inactive", "Row type is Inactive");
+		assert.strictEqual(oFirstItem.getEffectiveType(), "Navigation", "Row effectiveType is Navigation");
+
+		// Simulate press on first list row item
+		const clock = sinon.useFakeTimers();
+		oFirstItem.$().trigger("tap");
+		clock.tick(1);
+		clock.restore();
+
+		let oEvent = oRowActionItemPress.getCall(0)?.args[0];
+		assert.ok(oRowActionItemPress.calledOnce, "RowActionItem 'press' event is fired via row tap when no rowPress is attached");
 		assert.deepEqual(oEvent?.getParameters(), {
 			id: oEvent.getSource().getId(),
 			bindingContext: oFirstItem.getBindingContext("namedModel")
-		}, "Press event handler called with correct parameters for Navigation action when no rowPress is attached");
+		}, "Press event handler called with correct parameters for row tap");
+
+		oRowActionItemPress.resetHistory();
+
+		// Simulate direct press on Navigation action button (fires itemPress on the list)
+		this.oTable._oTable.fireItemPress({listItem: oFirstItem});
+
+		oEvent = oRowActionItemPress.getCall(0)?.args[0];
+		assert.ok(oRowActionItemPress.calledOnce, "RowActionItem 'press' event is fired via direct Navigation button press");
+		assert.deepEqual(oEvent?.getParameters(), {
+			id: oEvent.getSource().getId(),
+			bindingContext: oFirstItem.getBindingContext("namedModel")
+		}, "Press event handler called with correct parameters for direct Navigation button press");
 	});
 
 	QUnit.test("rowActionCount: overflow button and Navigation visibility", async function(assert) {

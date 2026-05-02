@@ -331,15 +331,11 @@ sap.ui.define([
 	};
 
 	ResponsiveTableType.prototype.prepareRowPress = function() {
-		if (this._attachItemPress()) {
-			this.updateRowActions();
-		}
+		this.updateRowActions();
 	};
 
 	ResponsiveTableType.prototype.cleanupRowPress = function() {
-		if (this._detachItemPress()) {
-			this.updateRowActions();
-		}
+		this.updateRowActions();
 	};
 
 	ResponsiveTableType.prototype.updateRowSettings = function() {
@@ -393,12 +389,6 @@ sap.ui.define([
 
 		if (!oRowSettings) {
 			return;
-		}
-
-		// Clear existing actions
-		if (sType === "Inactive") {
-			// Cleans up itemPress event, if it was attached previously
-			this._detachItemPress();
 		}
 
 		// Set row action count for the responsive table
@@ -553,38 +543,6 @@ sap.ui.define([
 		}
 
 		return oColumnResizer.getColumnResizeInputQuickAction(oColumn.getInnerColumn(), oColumnMenu);
-	};
-
-	/**
-	 * Tries to attach the itemPress event to the inner table.
-	 * If a listener is already attached, this function does nothing.
-	 *
-	 * @returns {boolean} whether event was attached or not
-	 * @private
-	 */
-	ResponsiveTableType.prototype._attachItemPress = function() {
-		const oResponsiveTable = this.getInnerTable();
-		if (oResponsiveTable && !oResponsiveTable.hasListeners("itemPress")) {
-			oResponsiveTable.attachEvent("itemPress", onItemPress, this);
-			return true;
-		}
-		return false;
-	};
-
-	/**
-	 * Tries to detach the itemPress listener on the inner table. If there is no listener, this function does nothing.
-	 *
-	 * @returns {boolean} whether event was detached or not
-	 * @private
-	 */
-	ResponsiveTableType.prototype._detachItemPress = function() {
-		const oTable = this.getTable();
-		const oResponsiveTable = this.getInnerTable();
-		if (!oTable.hasListeners("rowPress") && oResponsiveTable) {
-			oResponsiveTable.detachEvent("itemPress", onItemPress, this);
-			return true;
-		}
-		return false;
 	};
 
 	ResponsiveTableType.prototype.setShowDetailsButton = function(bShowDetailsButton) {
