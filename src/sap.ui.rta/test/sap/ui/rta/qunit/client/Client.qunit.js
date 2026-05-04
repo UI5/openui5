@@ -163,7 +163,7 @@ function (
 	QUnit.module("Handshake", {
 		before: function () {
 			QUnit.config.fixture = null;
-			return createIframe('test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework').then(function (oIframe) {
+			return createIframe('test-resources/sap/ui/rta/qunit/client/iframe.html').then(function (oIframe) {
 				this.oIframeWindow = oIframe.contentWindow;
 			}.bind(this));
 		},

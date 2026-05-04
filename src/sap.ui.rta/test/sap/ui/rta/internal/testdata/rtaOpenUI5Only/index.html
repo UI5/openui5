@@ -1,52 +1,24 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
-
-		<script src="../../../shared-config.js"></script>
-		<script>
-			window['sap-ui-config'].libs = 'sap.m, sap.ui.layout, sap.uxap, sap.ui.rta';
-			window['sap-ui-config'].resourceroots = {
-				'sap.ui.rta.test.rtaOpenUI5Only': './'
-			};
-			window['sap-ui-config'].bindingSyntax = 'complex';
-			window['sap-ui-config'].flexibilityServices = '[{"connector": "LocalStorageConnector"}]';
-			window['sap-ui-config'].noConflict = 'true';
-			window['sap-ui-config'].async = 'true';
-			document.write('<script src="' + document.location.pathname.match(/(.*)\/test-resources\//)[1] + '/resources/sap-ui-core.js"><' + '/script>');
-		</script>
-
-		<script>
-			sap.ui.getCore().attachInit(function () {
-				sap.ui.require([
-					"sap/m/Shell",
-					"sap/ui/core/ComponentContainer",
-					"sap/ui/core/Component"
-				], function (Shell, ComponentContainer, Component) {
-
-					return Component.create({
-						name: "sap.ui.rta.test.rtaOpenUI5Only",
-						componentData: {
-							"showAdaptButton" : true
-						}
-					}).then(function(oComponent) {
-						return new ComponentContainer({
-							height : "100%",
-							component : oComponent,
-							async: true
-						})
-					})
-					.then(function(oComponentContainer) {
-						// initialize the UI component
-						return new Shell({
-							app: oComponentContainer
-						}).placeAt("content");
-					})
-				});
-			});
-		</script>
-	</head>
-	<body class="sapUiBody sapUiSizeCompact">
-		<div id="content"></div>
-	</body>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+	<script src="../../../shared-config.js"></script>
+	<script id="sap-ui-bootstrap"
+		src="../../../../../../../../resources/sap-ui-core.js"
+		data-sap-ui-async="true"
+		data-sap-ui-libs="sap.m, sap.ui.layout, sap.uxap, sap.ui.rta"
+		data-sap-ui-language="en"
+		data-sap-ui-compatVersion="edge"
+		data-sap-ui-xx-bindingSyntax="complex"
+		data-sap-ui-no-conflict="true"
+		data-sap-ui-flexibility-services='[{"connector": "LocalStorageConnector"}]'
+		data-sap-ui-resource-roots='{
+			"sap.ui.rta.test.rtaOpenUI5Only": "./"
+		}'
+		data-sap-ui-on-init="module:sap/ui/rta/test/rtaOpenUI5Only/standalone_init"
+	></script>
+</head>
+<body class="sapUiBody sapUiSizeCompact">
+	<div id="content"></div>
+</body>
 </html>

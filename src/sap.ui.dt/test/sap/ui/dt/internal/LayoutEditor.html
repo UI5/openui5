@@ -31,10 +31,10 @@
 		</style>
 
 		<script src="../shared-config.js"></script>
-		<script>
-			window['sap-ui-config'].libs = "sap.ui.dt";
-			document.write('<script src="' + document.location.pathname.match(/(.*)\/test-resources\//)[1] + '/resources/sap-ui-core.js"><' + '/script>');
-		</script>
+		<script id="sap-ui-bootstrap"
+			src="../../../../../../../../resources/sap-ui-core.js"
+			data-sap-ui-libs="sap.ui.dt"
+		></script>
 
 		<script id="view1" type="sapui5/xmlview">
 			<sap.ui.core.mvc:View
@@ -100,7 +100,6 @@
 							})
 							.on("dragend", function () {
 								oDraggedOverlay.$().trigger("dragend");
-								// TODO: cleanup
 							});
 					}.bind(this));
 			});
