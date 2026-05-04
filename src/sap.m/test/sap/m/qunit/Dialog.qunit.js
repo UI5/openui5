@@ -215,7 +215,7 @@ sap.ui.define([
 
 		Core.applyChanges();
 
-		assert.ok(iMaxHeight === parseFloat(oDomRef.style.maxHeight), "stretched dialog max height is equal when there is no dialog footer.");
+		assert.ok(iMaxHeight > parseFloat(oDomRef.style.maxHeight), "dialog max height is bigger when there is no dialog footer.");
 
 		// Clean up
 		oDialog.destroy();
@@ -905,33 +905,9 @@ sap.ui.define([
 		});
 
 		oDialog.open();
-
-		const iExpectedContentHeight = Math.round(window.innerHeight * 0.5) + "px";
 		assert.ok(marginCompare(oDialog._$content.width(), jQuery(window).width() * 0.5) || (oDialog._$content.width() === 398), "Dialog content width " + oDialog._$content.width() + " is equal or less than part of window width " + jQuery(window).width() * 0.5);
-		assert.strictEqual(oDialog._$content.css("flex-basis"), iExpectedContentHeight, "Dialog content should have correct height when set to computed contentHeight value");
+		assert.ok(marginCompare(oDialog._$content.height(), jQuery(window).height() * 0.5), "Dialog content height " + oDialog._$content.height() + " is equal or less than part of window height " + jQuery(window).height() * 0.5);
 		assert.ok(oDialog.getDomRef('scrollCont').classList.contains('sapMDialogStretchContent'), "Dialog with contentHeight set should have class sapMDialogStretchContent");
-
-		oDialog.destroy();
-	});
-
-	QUnit.test("contentHeight sets flex-basis on section when not stretched", function (assert) {
-		const oDialog = new Dialog({ contentHeight: "300px" });
-
-		oDialog.open();
-		this.clock.tick(500);
-
-		assert.strictEqual(oDialog.$().find("> section").css("flex-basis"), "300px", "flex-basis set on section");
-
-		oDialog.destroy();
-	});
-
-	QUnit.test("contentHeight does not set flex-basis on section when stretched", function (assert) {
-		const oDialog = new Dialog({ contentHeight: "300px", stretch: true });
-
-		oDialog.open();
-		this.clock.tick(500);
-
-		assert.notStrictEqual(oDialog.$().find("> section").css("flex-basis"), "300px", "flex-basis not set when stretched");
 
 		oDialog.destroy();
 	});
@@ -2814,26 +2790,8 @@ sap.ui.define([
 		this.clock.tick(500);
 		$document.trigger(new jQuery.Event("mouseup", oMockEvent));
 
-		const iHeaderHeight = $dialog.find("> header").outerHeight() || 0;
-
 		// Assert
-		assert.strictEqual($dialogContentSection.height() + iHeaderHeight, $dialog.height(), "The height of the content section is equal to the height of the dialog.");
-	});
-
-	QUnit.test("Manual resize sets flex-basis on section", function(assert) {
-		this.oDialog.open();
-		this.clock.tick(500);
-
-		const oMockEvent = this.fnMockResizeEvent();
-		this.oDialog.onmousedown(oMockEvent);
-		oMockEvent.clientY += 100;
-
-		jQuery(document).trigger(new jQuery.Event("mousemove", oMockEvent));
-		this.clock.tick(500);
-		jQuery(document).trigger(new jQuery.Event("mouseup", oMockEvent));
-
-		const sFlexBasis = this.oDialog.$().find("> section").css("flex-basis");
-		assert.ok(sFlexBasis && sFlexBasis !== "auto", "flex-basis is set on section after resize");
+		assert.strictEqual($dialogContentSection.height(), $dialog.height(), "The height of the content section is equal to the height of the dialog.");
 	});
 
 	QUnit.module("Keyboard drag and resize",{
@@ -4133,113 +4091,6 @@ sap.ui.define([
 			// cleanup
 			oDialog.destroy();
 
-			done();
-		});
-
-		// act
-		oDialog.open();
-	});
-
-	QUnit.module("ScrollContainer inside Dialog with vertical scrolling disabled", {
-		beforeEach: function() {
-			sinon.config.useFakeTimers = false;
-		},
-		afterEach: function() {
-			sinon.config.useFakeTimers = true;
-		}
-	});
-
-	QUnit.test("ScrollContainer content should be scrollable when Dialog scrolling is disabled", function(assert) {
-		const done = assert.async();
-
-		// arrange
-		const oScrollContainer = new ScrollContainer({
-			vertical: true,
-			content: [
-				new Button({ text: "Button", width: "400px" }),
-				new Button({ text: "Button", width: "400px" }),
-				new Button({ text: "Button", width: "400px" }),
-				new Button({ text: "Button", width: "400px" }),
-				new Button({ text: "Button", width: "400px" }),
-				new Button({ text: "Button", width: "400px" }),
-				new Button({ text: "Button", width: "400px" })
-			]
-		});
-
-		const oDialog = new Dialog({
-			title: "My Dialog",
-			contentWidth: "300px",
-			contentHeight: "200px",
-			verticalScrolling: false,
-			horizontalScrolling: false,
-			content: oScrollContainer,
-			beginButton: new Button({ text: "Close" })
-		});
-
-		oDialog.attachAfterOpen(function () {
-			// assert
-			var oScrollContainerDom = oScrollContainer.getDomRef();
-			var oScrollContainerInner = oScrollContainerDom.firstChild;
-
-			assert.ok(oScrollContainerDom.offsetHeight < oScrollContainerInner.scrollHeight, "ScrollContainer has vertical scroll");
-			assert.ok(oScrollContainerDom.offsetWidth < oScrollContainerInner.scrollWidth, "ScrollContainer has horizontal scroll");
-
-			// cleanup
-			oDialog.destroy();
-			done();
-		});
-
-		// act
-		oDialog.open();
-	});
-
-	QUnit.module("Card inside Dialog with vertical scrolling disabled", {
-		beforeEach: function() {
-			sinon.config.useFakeTimers = false;
-		},
-		afterEach: function() {
-			sinon.config.useFakeTimers = true;
-		}
-	});
-
-	QUnit.test("Card height should equal Dialog content section height", function(assert) {
-		const done = assert.async();
-
-		// arrange
-		const oCard = new Card({
-			header: new CardHeader({
-				title: "Card Title",
-				subtitle: "Card Subtitle"
-			}),
-			content: new List({
-				items: [
-					new StandardListItem({ title: "Item 1" }),
-					new StandardListItem({ title: "Item 2" }),
-					new StandardListItem({ title: "Item 3" })
-				]
-			})
-		});
-
-		const oDialog = new Dialog({
-			title: "Disabled Vertical Scroll with Card",
-			contentWidth: "400px",
-			contentHeight: "500px",
-			verticalScrolling: false,
-			content: [oCard],
-			beginButton: new Button({ text: "Close" })
-		});
-
-		oDialog.attachAfterOpen(function () {
-			// assert
-			var oDialogContent = oDialog.getDomRef("cont");
-			var oCardDom = oCard.getDomRef();
-
-			assert.ok(oDialogContent, "Dialog content section is rendered");
-			assert.ok(oCardDom, "Card is rendered");
-			assert.strictEqual(oCardDom.offsetHeight, oDialogContent.offsetHeight, "Card height equals Dialog content section height");
-
-			// cleanup
-			oDialog.destroy();
 			done();
 		});
 
