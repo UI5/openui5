@@ -12,12 +12,18 @@
 html.sap-desktop .sapUxAPHierarchicalSelect {
 	border: none;
 	background-color: transparent;
+	box-shadow: none;
 
 	&.sapMSltHoverable {
 		border: none;
 
 		&:hover {
 			background: transparent;
+		}
+		&.sapMSlt.sapMSltIconOnly.sapMSltHoverable:hover:not(.sapMSltState).sapMSltWithIcon,
+		&.sapMSltPressed:not(.sapMSltDisabled):not(.sapMSltState):not(.sapMSltExpanded),
+		&.sapMSltFocused:not(.sapMSltDisabled):not(.sapMSltState):not(.sapMSltExpanded) {
+			box-shadow: none;
 		}
 
 		&.sapMSltIconOnly.sapMSlt.sapMSltFocused  {
