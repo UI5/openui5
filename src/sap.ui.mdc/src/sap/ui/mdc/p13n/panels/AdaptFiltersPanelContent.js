@@ -214,7 +214,7 @@ sap.ui.define([
 			keyboardMode: ListKeyboardMode.Edit,
 			headerToolbar: this._getToolbar(),
 			selectionChange: this._onSelectionChange.bind(this),
-			rememberFocus: true
+			rememberFocus: false
 		});
 
 		return oList;
