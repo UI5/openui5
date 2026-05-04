@@ -1,5 +1,4 @@
 /* global QUnit */
-
 sap.ui.define([
 	"sap/ui/rta/Client",
 	"sap/ui/core/postmessage/Bus",
@@ -11,25 +10,20 @@ function(
 	sinon
 ) {
 	"use strict";
-
 	var sandbox = sinon.createSandbox();
 	var CHANNEL_ID = "sap.ui.rta.service.receiver";
-
 	function createIframe(sSrc) {
 		return new Promise(function(fnResolve) {
 			var oIframe = document.createElement("iframe");
-
 			oIframe.onload = function(oEvent) {
 				fnResolve(oEvent.target);
 			};
 			if (sSrc) {
 				oIframe.src = sSrc;
 			}
-
 			document.getElementById("qunit-fixture").appendChild(oIframe);
 		});
 	}
-
 	function getPostMessageBus(oWindow) {
 		return new Promise(function(resolve) {
 			oWindow.sap.ui.require(["sap/ui/core/postmessage/Bus"], function(oPostMessageBus) {
@@ -37,7 +31,6 @@ function(
 			});
 		});
 	}
-
 	QUnit.module("Initialisation", {
 		beforeEach() {
 			return getPostMessageBus(window)
@@ -168,11 +161,10 @@ function(
 			});
 		});
 	});
-
 	QUnit.module("Handshake", {
 		before() {
 			QUnit.config.fixture = null;
-			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework").then(function(oIframe) {
+			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html").then(function(oIframe) {
 				this.oIframeWindow = oIframe.contentWindow;
 			}.bind(this));
 		},
@@ -181,7 +173,6 @@ function(
 				window: this.oIframeWindow,
 				origin: this.oIframeWindow.location.origin
 			});
-
 			return Promise.all([getPostMessageBus(window), getPostMessageBus(this.oIframeWindow)])
 			.then(function(aPostMessageBus) {
 				[this.oPostMessageBus, this.oPostMessageBusInIframe] = aPostMessageBus;
@@ -213,7 +204,6 @@ function(
 				assert.ok(true);
 				fnDone();
 			});
-
 			this.oPostMessageBusInIframe.publish({
 				target: window,
 				origin: window.location.origin,
@@ -238,7 +228,6 @@ function(
 		});
 		QUnit.test("queued messages are sent after connection is acknowledged", function(assert) {
 			var fnDone = assert.async();
-
 			sandbox.stub(this.oPostMessageBus, "publish")
 			.callThrough()
 			.withArgs(
@@ -258,7 +247,6 @@ function(
 				assert.ok(true);
 				fnDone();
 			});
-
 			this.oRTAClient.getService("foo");
 			this.oRTAClient.getService("bar");
 			this.oPostMessageBusInIframe.publish({
@@ -271,7 +259,6 @@ function(
 		QUnit.test("queued messages are rejected after connection is declined", function(assert) {
 			var fnDone1 = assert.async();
 			var fnDone2 = assert.async();
-
 			sandbox.stub(this.oPostMessageBus, "publish")
 			.withArgs(
 				sinon.match(function(mParameters) {
@@ -291,7 +278,6 @@ function(
 					eventId: PostMessageBus.event.DECLINED
 				});
 			}.bind(this));
-
 			this.oRTAClient.getService("foo").catch(function() {
 				assert.ok(true);
 				fnDone1();
@@ -300,7 +286,6 @@ function(
 				assert.ok(true);
 				fnDone2();
 			});
-
 			this.oPostMessageBusInIframe.publish({
 				target: window,
 				origin: window.location.origin,
@@ -309,15 +294,14 @@ function(
 			});
 		});
 	});
-
 	QUnit.module("Ignore irrelevant events", {
 		before() {
 			QUnit.config.fixture = null;
 			return Promise.all([
-				createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework").then(function(oIframe) {
+				createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html").then(function(oIframe) {
 					this.oIframeWindow1 = oIframe.contentWindow;
 				}.bind(this)),
-				createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework").then(function(oIframe) {
+				createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html").then(function(oIframe) {
 					this.oIframeWindow2 = oIframe.contentWindow;
 				}.bind(this))
 			]);
@@ -327,7 +311,6 @@ function(
 				window: this.oIframeWindow1,
 				origin: this.oIframeWindow1.location.origin
 			});
-
 			return Promise.all([getPostMessageBus(window), getPostMessageBus(this.oIframeWindow1), getPostMessageBus(this.oIframeWindow2)])
 			.then(function(aPostMessageBus) {
 				[this.oPostMessageBus, this.oPostMessageBusInIframe1, this.oPostMessageBusInIframe2] = aPostMessageBus;
@@ -359,14 +342,12 @@ function(
 			.callsFake(function() {
 				throw new Error("this must never be called");
 			});
-
 			this.oPostMessageBusInIframe2.publish({
 				target: window,
 				origin: window.location.origin,
 				channelId: CHANNEL_ID,
 				eventId: PostMessageBus.event.READY
 			});
-
 			// We assume that we subscribe later than the Client does it AND that UI5 calls listeners
 			// in subscription order. If these conditions are not met, then wrap it into setTimeout(function () {}, 20);
 			this.oPostMessageBus.subscribeOnce(CHANNEL_ID, PostMessageBus.event.READY, function() {
@@ -417,9 +398,7 @@ function(
 					});
 				}
 			}.bind(this));
-
 			this.oRTAClient.getService("foo");
-
 			this.oPostMessageBusInIframe1.publish({
 				target: window,
 				origin: window.location.origin,
@@ -430,7 +409,6 @@ function(
 		QUnit.test("DECLINED event from another window is ignored", function(assert) {
 			var fnDone = assert.async();
 			assert.expect(1);
-
 			// Flow:
 			// 1. iframe1 sends READY
 			// 2. current window sends CONNECT to iframe1
@@ -462,11 +440,9 @@ function(
 					eventId: PostMessageBus.event.DECLINED
 				});
 			}.bind(this));
-
 			this.oRTAClient.getService("foo").catch(function() {
 				assert.ok(false, "this must never be called");
 			});
-
 			this.oPostMessageBusInIframe1.publish({
 				target: window,
 				origin: window.location.origin,
@@ -476,7 +452,6 @@ function(
 		});
 		QUnit.test("response events from another window are ignored", function(assert) {
 			var fnDone = assert.async();
-
 			sandbox.stub(this.oPostMessageBus, "publish")
 			.callThrough()
 			.withArgs(
@@ -502,13 +477,11 @@ function(
 						body: true
 					}
 				});
-
 				setTimeout(function() {
 					assert.ok(true);
 					fnDone();
 				}, 20);
 			}.bind(this));
-
 			this.oRTAClient.getService("foo").then(
 				function() {
 					assert.ok(false, "must never be called");
@@ -517,7 +490,6 @@ function(
 					assert.ok(false, "must never be called");
 				}
 			);
-
 			this.oPostMessageBusInIframe1.publish({
 				target: window,
 				origin: window.location.origin,
@@ -599,13 +571,11 @@ function(
 					fnDone();
 				}, 20);
 			}.bind(this));
-
 			this.oRTAClient.getService("foo").then(function(oService) {
 				oService.attachEvent("customEvent", function() {
 					assert.ok(false, "must never be called");
 				});
 			});
-
 			this.oPostMessageBusInIframe1.publish({
 				target: window,
 				origin: window.location.origin,
@@ -614,11 +584,10 @@ function(
 			});
 		});
 	});
-
 	QUnit.module("API - getService()", {
 		before() {
 			QUnit.config.fixture = null;
-			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework").then(function(oIframe) {
+			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html").then(function(oIframe) {
 				this.oIframeWindow = oIframe.contentWindow;
 			}.bind(this));
 		},
@@ -627,7 +596,6 @@ function(
 				window: this.oIframeWindow,
 				origin: this.oIframeWindow.location.origin
 			});
-
 			return Promise.all([getPostMessageBus(window), getPostMessageBus(this.oIframeWindow)])
 			.then(function(aPostMessageBus) {
 				[this.oPostMessageBus, this.oPostMessageBusInIframe] = aPostMessageBus;
@@ -688,7 +656,6 @@ function(
 					});
 				}
 			}.bind(this));
-
 			this.oPostMessageBusInIframe.publish({
 				target: window,
 				origin: window.location.origin,
@@ -698,7 +665,6 @@ function(
 		});
 		QUnit.test("service methods are properly created and wrapped into promises", function(assert) {
 			var fnDone = assert.async();
-
 			sandbox.stub(this.oPostMessageBus, "publish")
 			.callThrough()
 			// getService events
@@ -728,14 +694,12 @@ function(
 					}
 				});
 			}.bind(this));
-
 			this.oRTAClient.getService("foo").then(function(oService) {
 				assert.ok(typeof oService.method1 === "function");
 				assert.ok(typeof oService.method2 === "function");
 				assert.ok(oService.method1("a", "b", "c") instanceof Promise);
 				fnDone();
 			});
-
 			this.oPostMessageBusInIframe.publish({
 				target: window,
 				origin: window.location.origin,
@@ -779,13 +743,11 @@ function(
 					}
 				});
 			}.bind(this));
-
 			this.oRTAClient.getService("foo").then(function(oService) {
 				assert.strictEqual(oService.customProperty1, "value");
 				assert.deepEqual(oService.customProperty2, { foo: "bar" });
 				fnDone();
 			});
-
 			this.oPostMessageBusInIframe.publish({
 				target: window,
 				origin: window.location.origin,
@@ -824,14 +786,12 @@ function(
 					}
 				});
 			}.bind(this));
-
 			this.oRTAClient.getService("foo").then(function(oService) {
 				assert.ok(typeof oService.attachEvent === "function");
 				assert.ok(typeof oService.detachEvent === "function");
 				assert.ok(typeof oService.attachEventOnce === "function");
 				fnDone();
 			});
-
 			this.oPostMessageBusInIframe.publish({
 				target: window,
 				origin: window.location.origin,
@@ -898,14 +858,12 @@ function(
 					}
 				});
 			}.bind(this));
-
 			this.oRTAClient.getService("foo").then(function(oService) {
 				oService.customMethod("a", "b", "c").then(function(vResult) {
 					assert.strictEqual(vResult, true);
 					fnDone();
 				});
 			});
-
 			this.oPostMessageBusInIframe.publish({
 				target: window,
 				origin: window.location.origin,
@@ -972,7 +930,6 @@ function(
 					}
 				});
 			}.bind(this));
-
 			this.oRTAClient.getService("foo").then(function(oService) {
 				oService.customMethod("a", "b", "c").then(
 					function() {
@@ -984,7 +941,6 @@ function(
 					}
 				);
 			});
-
 			this.oPostMessageBusInIframe.publish({
 				target: window,
 				origin: window.location.origin,
@@ -994,7 +950,6 @@ function(
 		});
 		QUnit.test("receiving a message with an incorrect type", function(assert) {
 			var fnDone = assert.async();
-
 			this.oRTAClient.getService("foo").then(
 				function() {
 					assert.ok(false, "must never be called");
@@ -1003,7 +958,6 @@ function(
 					assert.ok(false, "must never be called");
 				}
 			);
-
 			sandbox.stub(this.oPostMessageBus, "publish")
 			.callThrough()
 			// getService events
@@ -1034,7 +988,6 @@ function(
 					fnDone();
 				}, 20);
 			}.bind(this));
-
 			this.oPostMessageBusInIframe.publish({
 				target: window,
 				origin: window.location.origin,
@@ -1043,11 +996,10 @@ function(
 			});
 		});
 	});
-
 	QUnit.module("API - Events", {
 		before() {
 			QUnit.config.fixture = null;
-			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html?loadframework").then(function(oIframe) {
+			return createIframe("test-resources/sap/ui/rta/qunit/client/iframe.html").then(function(oIframe) {
 				this.oIframeWindow = oIframe.contentWindow;
 			}.bind(this));
 		},
@@ -1056,7 +1008,6 @@ function(
 				window: this.oIframeWindow,
 				origin: this.oIframeWindow.location.origin
 			});
-
 			return Promise.all([getPostMessageBus(window), getPostMessageBus(this.oIframeWindow)])
 			.then(function(aPostMessageBus) {
 				[this.oPostMessageBus, this.oPostMessageBusInIframe] = aPostMessageBus;
@@ -1157,7 +1108,6 @@ function(
 				assert.strictEqual(mRequestBody.event, "customEvent");
 				fnDone();
 			});
-
 			this.oService.attachEvent("customEvent", function() {});
 		});
 		QUnit.test("second attachEvent() for the same event must not notify RTA instance again", function(assert) {
@@ -1172,7 +1122,6 @@ function(
 					);
 				}.bind(this))
 			);
-
 			this.oService.attachEvent("customEvent", function() {});
 			this.oService.attachEvent("customEvent", function() {});
 			assert.ok(oPublishStub.calledOnce);
@@ -1253,7 +1202,6 @@ function(
 				assert.strictEqual(mRequestBody.id, "eventHandlerId");
 				fnDone();
 			});
-
 			var fnHandler = function() {};
 			this.oService.attachEvent("customEvent", fnHandler);
 			this.oService.detachEvent("customEvent", fnHandler);
@@ -1287,7 +1235,6 @@ function(
 					}
 				});
 			}.bind(this));
-
 			var oUnsubscribeStub = this.oPublishStub
 			.withArgs(
 				sinon.match(function(mParameters) {
@@ -1299,13 +1246,10 @@ function(
 					);
 				}.bind(this))
 			);
-
 			var fnHandler1 = function() {};
 			var fnHandler2 = function() {};
-
 			this.oService.attachEvent("customEvent", fnHandler1);
 			this.oService.attachEvent("customEvent", fnHandler2);
-
 			setTimeout(function() {
 				this.oService.detachEvent("customEvent", fnHandler1);
 				assert.ok(oUnsubscribeStub.notCalled);
@@ -1358,7 +1302,6 @@ function(
 					}
 				});
 			}.bind(this));
-
 			this.oService.attachEvent("customEvent", function(vData) {
 				assert.deepEqual(vData, { foo: "bar" });
 				fnDone();
@@ -1423,7 +1366,6 @@ function(
 					}
 				});
 			}.bind(this));
-
 			var oSpy = sandbox.spy();
 			var oStub = sandbox.stub()
 			.onFirstCall().returns()
@@ -1436,7 +1378,6 @@ function(
 			this.oService.attachEvent("customEvent", oStub);
 		});
 	});
-
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});
