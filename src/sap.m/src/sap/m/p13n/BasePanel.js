@@ -612,7 +612,7 @@ sap.ui.define([
 		return {
 			mode: ListMode.MultiSelect,
 			rememberSelections: true,
-			rememberFocus: false,
+			formsMode: true,
 			keyboardMode: ListKeyboardMode.Edit,
 			itemPress: [this._onItemPressed, this],
 			selectionChange: [this._onSelectionChange, this],
