@@ -8,5 +8,15 @@
         "text": " sap.ui.commons.ToolbarRightItems: fix unstable tests"
       }
     ]
+  },
+  "1.71.78": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "ada2820dfcf2be6308dc3cb628236f27ba411569",
+        "type": "FIX",
+        "text": " sap.ui.commons.Tree: fix unstable test"
+      }
+    ]
   }
 }
