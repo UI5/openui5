@@ -20,76 +20,21 @@
 			 The sandbox platform is restricted to development or demo use cases and must NOT be used
 			 for productive scenarios.
 		-->
-		<script type="text/javascript">
-			window["sap-ushell-config"] = {
+		<script src="flpSandbox_ushell_config.js"></script>
+		<script src="../../../../../../../../resources/sap/ushell/bootstrap/sandbox2.js" id="sap-ushell-bootstrap"></script>
 
-				defaultRenderer : "fiori2",
-
-				bootstrapPlugins: {
-					"RuntimeAuthoringPlugin" : {
-						"component": "sap.ushell.plugins.rta"
-					},
-					"PersonalizePlugin": {
-						"component": "sap.ushell.plugins.rta-personalize"
-					}
-				},
-				renderers: {
-					fiori2: {
-						componentData: {
-							config: {
-								enableMergeAppAndShellHeaders: true,
-								search: "hidden"
-							}
-						}
-					}
-				},
-				applications: {
-					"masterDetail-display": {
-						"additionalInformation": "SAPUI5.Component=sap.ui.rta.test.variantManagement",
-						"applicationType": "URL",
-						"url": "../",
-						"description": "Variant Management Test App",
-						"title": "UI Flexibility"
-					}
-				},
-				services: {
-					NavTargetResolution: {
-						config: {
-							"runStandaloneAppFolderWhitelist": {
-								"*" : true
-							},
-							"allowTestUrlComponentConfig" : true,
-							"enableClientSideTargetResolution": true
-						}
-					},
-					EndUserFeedback: {
-						adapter: {
-							config: {
-								enabled: true
-							}
-						}
-					}
-				}
-			};
-
-			var __sPathPrefix = document.location.pathname.match(/(.*)\/test-resources\//)[1];
-
-			document.write('<script src="' + __sPathPrefix + '/test-resources/sap/ushell/bootstrap/sandbox.js" id="sap-ushell-bootstrap"><' + '/script>');
-		</script>
-
-		<script>
-			window['sap-ui-config'] = window['sap-ui-config'] || {};
-			window['sap-ui-config'].theme = 'sap_belize';
-			window['sap-ui-config'].libs = 'sap.m,sap.ushell,sap.ui.rta';
-			window['sap-ui-config'].compatVersion = 'edge';
-			window['sap-ui-config'].frameOptions = 'allow';
-
-			document.write('<script src="' + __sPathPrefix + '/resources/sap-ui-core.js"><' + '/script>');
-		</script>
-
-		<script>
-			document.write('<script src="' + __sPathPrefix + '/test-resources/sap/ushell/bootstrap/standalone.js"><' + '/script>');
-		</script>
+		<script id="sap-ui-bootstrap"
+			src="../../../../../../../../resources/sap-ui-core.js"
+			data-sap-ui-async="true"
+			data-sap-ui-libs="sap.m, sap.ui.layout, sap.ui.comp, sap.ui.rta"
+			data-sap-ui-theme="sap_belize"
+			data-sap-ui-language="en"
+			data-sap-ui-xx-bindingSyntax="complex"
+			data-sap-ui-flexibility-services='[{"connector": "LocalStorageConnector"}]'
+			data-sap-ui-resource-roots='{
+				"sap.ui.rta.test.variantManagement": "../"
+			}'
+		></script>
 
 		<script type="text/javascript">
 			sap.ui.getCore().attachInit(function() {

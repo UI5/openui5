@@ -71,13 +71,9 @@
 					}
 				}
 			};
-
-			var __sPathPrefix = document.location.pathname.match(/(.*)\/test-resources\//)[1];
-
-			document.write('<script src="' + __sPathPrefix + '/test-resources/sap/ushell/bootstrap/sandbox.js" id="sap-ushell-bootstrap"><' + '/script>');
+			<script src="../../../../../../../../test-resources/sap/ushell/bootstrap/sandbox.js" id="sap-ushell-bootstrap"/>
 		</script>
 
-		<script>
 			window['sap-ui-config'] = window['sap-ui-config'] || {};
 			window['sap-ui-config'].theme = 'sap_belize';
 			window['sap-ui-config'].libs = 'sap.m,sap.ushell,sap.ui.rta';
@@ -85,12 +81,15 @@
 			window['sap-ui-config'].frameOptions = 'allow';
 			window['sap-ui-config'].flexibilityServices = '[{"connector": "JsObjectConnector"}]';
 
-			document.write('<script src="' + __sPathPrefix + '/resources/sap-ui-core.js"><' + '/script>');
-		</script>
+		<script src="../../../../../../../../resources/sap-ui-core.js"
+		data-sap-ui-theme = "sap_belize"
+		data-sap-ui-libs = "sap.m,sap.ushell,sap.ui.rta"
+		data-sap-ui-compatVersion = "edge"
+		data-sap-ui-frameOptions = "allow"
+		data-sap-ui-flexibilityServices = '[{"connector": "JsObjectConnector"}]'
+		/>
 
-		<script>
-			document.write('<script src="' + __sPathPrefix + '/test-resources/sap/ushell/bootstrap/standalone.js"><' + '/script>');
-		</script>
+		<script src="../../../../../../../../test-resources/sap/ushell/bootstrap/standalone.js"/>
 
 		<script type="text/javascript">
 			sap.ui.getCore().attachInit(function() {

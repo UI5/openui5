@@ -24,15 +24,14 @@
 		</style>
 
 		<script src="../shared-config.js"></script>
-		<script>
-			document.write('<script src="' + document.location.pathname.match(/(.*)\/test-resources\//)[1] + '/resources/sap-ui-core.js"><' + '/script>');
-			window['sap-ui-config'].noConflict = 'true';
-			window['sap-ui-config'].libs = 'sap.ui.dt, sap.m, sap.ui.layout';
-			window['sap-ui-config'].resourceroots = {
-				"dt.performance": "./",
-				"rta.performance": "../../../../sap/ui/rta/internal/performance/"
-			};
-		</script>
+		<script id="sap-ui-bootstrap"
+			src="../../../../../../../../resources/sap-ui-core.js"
+			data-sap-ui-libs="sap.ui.dt, sap.m, sap.ui.layout"
+			data-sap-ui-resourceroots='{"
+			dt.performance": "./",
+			"rta.performance": "../../../../sap/ui/rta/internal/performance/"}'
+			data-sap-ui-noConflict="true"
+		></script>
 
 		<script>
 			sap.ui.getCore().attachInit(function() {
@@ -66,7 +65,7 @@
 			});
 		</script>
 	</head>
-	<body class="sapUiBody" role="application">
+	<body class="sapUiBody">
 		<div id="content"></div>
 	</body>
 </html>

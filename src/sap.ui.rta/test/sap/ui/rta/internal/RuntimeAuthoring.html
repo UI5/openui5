@@ -1,55 +1,28 @@
 <!DOCTYPE HTML>
 <html>
-
 <head>
 	<title>RuntimeAuthoring - sap.ui.rta</title>
-
-	<script>
-		document.write('\
-		<script \
-			id="sap-ui-bootstrap" \
-			data-sap-ui-async="true" \
-			data-sap-ui-theme="sap_belize" \
-			data-sap-ui-resourceroots=\'{"sap.ui.rta.test": "testdata/rta/"}\'\
-			data-sap-ui-libs="sap.m, sap.ui.layout, sap.ui.comp, sap.ui.rta" \
-			src="' +
-			document.location.pathname.match(/(.*)\/test-resources\//)[1] + '/resources/sap-ui-core.js" \
-		><' + '/script>'
-		);
-	</script>
-
-	<script type="text/javascript">
-		sap.ui.getCore().attachInit(function () {
-			sap.ui.require([
-				"sap/ui/core/ComponentContainer"
-			], function (ComponentContainer) {
-
-				return sap.ui.component({
-					name: "sap.ui.rta.test",
-					id: "Comp1",
-					componentData: {
-						"showAdaptButton": true
-					},
-					async: true
-				})
-
-				.then(function (oComponent) {
-					return new ComponentContainer("CompCont1", {
-						component: oComponent,
-						async: true
-					});
-				})
-
-				.then(function (oComponentContainer) {
-					oComponentContainer.placeAt("content");
-				});
-			});
-		});
-	</script>
+	<script id="sap-ui-bootstrap"
+		src="../../../../../../../../resources/sap-ui-core.js"
+		data-sap-ui-async="true"
+		data-sap-ui-libs="sap.m, sap.ui.layout, sap.ui.comp, sap.ui.rta"
+		data-sap-ui-theme="sap_belize"
+		data-sap-ui-language="en"
+		data-sap-ui-compatVersion="edge"
+		data-sap-ui-xx-bindingSyntax="complex"
+		data-sap-ui-flexibility-services='[{"connector": "LocalStorageConnector"}]'
+		data-sap-ui-resource-roots='{
+			"sap.ui.rta.test": "testdata/rta/"
+		}'
+		data-sap-ui-on-init="module:sap/ui/rta/test/standalone_init"
+	></script>
+	<style>
+		.sapUiRtaMode .sapUiRtaRoot {
+			margin-top: 3rem;
+		}
+	</style>
 </head>
-
-<body class="sapUiBody sapUiSizeCompact" role="application">
+<body class="sapUiBody sapUiSizeCompact">
 	<div id="content"></div>
 </body>
-
 </html>
