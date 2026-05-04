@@ -681,7 +681,7 @@ sap.ui.define([
 			});
 		},
 
-		iShouldSeeColumnMenuQuickAction: function(sLabel) {
+		iShouldSeeColumnMenuQuickFreeze: function() {
 			return Util.waitForColumnMenu.call(this, {
 				success: function(oColumnMenu) {
 					this.waitFor({
@@ -690,13 +690,13 @@ sap.ui.define([
 						matchers: [{
 							ancestor: oColumnMenu,
 							properties: {
-								label: sLabel
+								label: Util.getTextFromResourceBundle("sap.ui.table", "TBL_FREEZE")
 							}
 						}],
 						success: function(aQuickActions) {
 							Opa5.assert.equal(aQuickActions.length, 1, "Found column menu QuickAction");
 						},
-						errorMessage: "Column menu QuickAction not found"
+						errorMessage: "Column menu freeze QuickAction not found"
 					});
 				}
 			});
