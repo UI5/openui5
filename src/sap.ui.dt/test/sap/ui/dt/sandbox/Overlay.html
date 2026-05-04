@@ -4,12 +4,16 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<title>Overlay Sandbox</title>
 		<script src="../shared-config.js"></script>
-		<script>
-			window['sap-ui-config'].libs = 'sap.m, sap.ui.dt, sap.ui.layout';
-			window['sap-ui-config'].noConflict = true;
-			document.write('<script src="' + document.location.pathname.match(/(.+)\/test-resources\//)[1] + '/resources/sap-ui-core.js"><' + '/script>');
-		</script>
-		<script src="overlay.js"></script>
+		<script id="sap-ui-bootstrap"
+			src="../../../../../../../../resources/sap-ui-core.js"
+			data-sap-ui-libs="sap.m, sap.ui.dt, sap.ui.layout"
+			data-sap-ui-flexibility-services='[{"connector": "SessionStorageConnector"}]'
+			data-sap-ui-no-conflict="true"
+			data-sap-ui-resource-roots='{
+				"appstart": "./"
+			}'
+			data-sap-ui-on-init="module:appstart/overlay"
+		></script>
 	</head>
 	<body>
 		<div id="content"></div>
