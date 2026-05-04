@@ -120,6 +120,11 @@ sap.ui.define([
 			});
 
 			return sType === "QuickAction" ? aQuickActions : aQuickActions[0];
+		},
+		getFreezeSwitchState: function(iColumnIndex) {
+			const oColumn = this.oTable.getColumns()[iColumnIndex];
+			const oMenu = oColumn.getHeaderMenuInstance();
+			return this.getQuickAction(oMenu, "QuickAction")[1].getContent()[0].getState();
 		}
 	});
 
@@ -376,11 +381,13 @@ sap.ui.define([
 			oColumnFreezeSpy(oEvent.getParameters());
 		});
 
-		await this.openColumnMenu(0);
-		const oColumn = oTable.getColumns()[0];
+		await this.openColumnMenu(1);
+		const oColumn = oTable.getColumns()[1];
 		const oMenu = oColumn.getHeaderMenuInstance();
 		const oQuickFreeze = this.getQuickAction(oMenu, "QuickAction")[1];
 		const oSwitch = oQuickFreeze.getContent()[0];
+
+		assert.notOk(this.getFreezeSwitchState(1), "Switch is OFF when no columns are frozen");
 
 		await new Promise(function(resolve) {
 			oMenu.attachEventOnce("afterClose", function() {
@@ -395,9 +402,26 @@ sap.ui.define([
 			qutils.triggerKeyup(oSwitch.getDomRef(), "SPACE");
 		});
 
+		assert.equal(oTable.getFixedColumnCount(), 2, "fixedColumnCount is set to column index + 1 when freezing");
+
+		// With fixedColumnCount=2, only the last frozen column (column 1) shows the switch ON
+		await this.openColumnMenu(0);
+		assert.notOk(this.getFreezeSwitchState(0), "Switch is OFF for a column that is frozen but not the last frozen column");
+		await this.closeMenu(oTable.getColumns()[0].getHeaderMenuInstance());
+
+		await this.openColumnMenu(1);
+		assert.ok(this.getFreezeSwitchState(1), "Switch is ON for the last frozen column");
+
+		// Unfreezing resets fixedColumnCount to 0, not to the column's index
+		await new Promise(function(resolve) {
+			oMenu.attachEventOnce("afterClose", resolve);
+			qutils.triggerKeyup(oSwitch.getDomRef(), "SPACE");
+		});
+		assert.equal(oTable.getFixedColumnCount(), 0, "fixedColumnCount is set to 0 when unfreezing");
+
 		oTable.setEnableColumnFreeze(false);
 
-		await this.openColumnMenu(0);
+		await this.openColumnMenu(1);
 		assert.ok(this.getQuickAction(oMenu, "QuickAction")[1] === oQuickFreeze, "The QuickFreeze instance is not destroyed");
 		assert.notOk(oQuickFreeze.getVisible(), "The QuickFreeze is not visible");
 	});

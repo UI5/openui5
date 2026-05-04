@@ -379,7 +379,7 @@ sap.ui.define([
 						if (oEvent.getSource().getState()) {
 							oTable.setFixedColumnCount(this._oColumn.getIndex() + 1);
 						} else {
-							oTable.setFixedColumnCount(this._oColumn.getIndex());
+							oTable.setFixedColumnCount(0);
 						}
 					}
 
@@ -390,7 +390,7 @@ sap.ui.define([
 	};
 
 	MobileColumnHeaderMenuAdapter.prototype._updateQuickFreeze = function(oColumn) {
-		const bFixed = oColumn.getIndex() + TableUtils.Column.getHeaderSpan(oColumn) <= oColumn._getTable().getComputedFixedColumnCount();
+		const bFixed = oColumn.getIndex() + TableUtils.Column.getHeaderSpan(oColumn) === oColumn._getTable().getComputedFixedColumnCount();
 		this._oQuickFreeze.getContent()[0].setState(bFixed);
 	};
 
