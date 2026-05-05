@@ -568,6 +568,43 @@ sap.ui.define([
 			assert.strictEqual(this.oStorageWriteStub.callCount, 0, "the Storage.write was not called");
 		});
 
+		QUnit.test("with additional changes in a CUSTOMER layer and variant changes in USER layer", async function(assert) {
+			const aVariantChanges = [
+				FlexObjectFactory.createVariantChange({
+					id: "variantChange1",
+					layer: Layer.USER
+				}),
+				FlexObjectFactory.createVariantChange({
+					id: "variantChange2",
+					layer: Layer.USER
+				}),
+				FlexObjectFactory.createVariantChange({
+					id: "variantChange3",
+					fileType: "ctrl_variant_management_change",
+					layer: Layer.USER
+				})
+			];
+			const oVariant = FlexObjectFactory.createFlVariant({
+				id: "variant1",
+				layer: Layer.CUSTOMER
+			});
+			FlexState.addDirtyFlexObjects(sReference, [...aVariantChanges, oVariant], this.oAppComponent.getId());
+			UIChangeManager.addDirtyChanges(sReference, [
+				{
+					fileName: "notSavedChange1", layer: Layer.CUSTOMER, selector: { id: "control1" }
+				},
+				{
+					fileName: "notSavedChange2", layer: Layer.CUSTOMER, selector: { id: "control1" }
+				}
+			], this.oAppComponent);
+			await FlexObjectManager.saveFlexObjects({
+				selector: this.oAppComponent,
+				layer: Layer.CUSTOMER
+			});
+			assert.strictEqual(this.oCondenserStub.callCount, 1, "the condense was called");
+			assert.strictEqual(this.oCondenserStub.args[0][1].length, 8, "all flex objects were passed");
+		});
+
 		QUnit.test("with additional changes in a different layer and a separate perso connector", async function(assert) {
 			sandbox.stub(Settings.getInstanceOrUndef(), "getHasPersoConnector").returns(true);
 			const aAdditionalChanges = UIChangeManager.addDirtyChanges(sReference, [

@@ -1,5 +1,6 @@
 /*global QUnit, sinon */
 sap.ui.define([
+	"sap/base/Log",
 	"sap/base/strings/formatMessage",
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/routing/Target",
@@ -11,7 +12,7 @@ sap.ui.define([
 	"sap/ui/core/UIComponent",
 	"sap/ui/core/ComponentContainer",
 	"sap/ui/thirdparty/hasher"
-], function(formatMessage, XMLView, Target, Views, JSONModel, App, Panel, Component, UIComponent, ComponentContainer, hasher) {
+], function(Log, formatMessage, XMLView, Target, Views, JSONModel, App, Panel, Component, UIComponent, ComponentContainer, hasher) {
 	"use strict";
 
 	// use sap.m.Panel as a lightweight drop-in replacement for the ux3.Shell
@@ -948,6 +949,55 @@ sap.ui.define([
 		// Cleanup
 		oParentTarget.destroy();
 		oViews.destroy();
+	});
+
+	QUnit.test("Should handle destroy gracefully during pending display", function (assert) {
+		// Arrange
+		var oShell = new ShellSubstitute();
+		var oViews = new Views({async: true});
+		var oTarget = new Target(
+			{
+				name: "myTarget",
+				viewPath: "bar",
+				viewName: "foo",
+				controlAggregation: "content",
+				controlId: oShell.getId(),
+				viewType: "XML",
+				viewId: "baz",
+				_async: true
+			},
+			oViews
+		);
+
+		var oLogSpy = sinon.spy(Log, "warning");
+
+		return createView([
+			'<View xmlns="sap.ui.core.mvc">',
+			'</View>'
+		]).then(function(oView) {
+			sinon.stub(oViews, "_getView").callsFake(function() {
+				return oView;
+			});
+
+			// Act: display then immediately destroy
+			var pDisplayed = oTarget.display();
+			oTarget.destroy();
+
+			return pDisplayed.then(function(oResult) {
+				// Assert
+				assert.strictEqual(oResult, undefined, "Display resolved with undefined");
+				assert.ok(
+					oLogSpy.calledWith(sinon.match(/Target 'myTarget' can't be placed because it's already destroyed/)),
+					"A warning was logged"
+				);
+
+				// Cleanup
+				oLogSpy.restore();
+				oView.destroy();
+				oShell.destroy();
+				oViews.destroy();
+			});
+		});
 	});
 
 });

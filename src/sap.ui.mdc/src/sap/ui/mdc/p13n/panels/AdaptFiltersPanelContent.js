@@ -187,12 +187,17 @@ sap.ui.define([
 	};
 
 	AdaptFiltersPanelContent.prototype._setInnerLayout = function() {
+		this._oModeButtonInvisibleText = new InvisibleText(this.getId() + "-modeButtonInvisibleText", {
+			text: this._getResourceText("p13nDialog.ADAPT_FILTER_MODE_BUTTON_LABEL")
+		});
+
 		const oVBox = new VerticalLayout(this.getId() + "-innerLayout", {
 			width: "100%",
 			content: [
 				this._oListControl,
 				this._getAddFilterSection(),
-				this._oInvText
+				this._oViewSwitchInvisibleText,
+				this._oModeButtonInvisibleText
 			]
 		});
 		this.setAggregation("_content", oVBox);
@@ -217,7 +222,7 @@ sap.ui.define([
 			keyboardMode: ListKeyboardMode.Edit,
 			headerToolbar: this._getToolbar(),
 			selectionChange: this._onSelectionChange.bind(this),
-			rememberFocus: true
+			rememberFocus: false
 		});
 
 		return oList;
@@ -246,6 +251,7 @@ sap.ui.define([
 			this._oModeButton = new SegmentedButton(this.getId() + "-modeButton", {
 				visible: `{=%{${this.CONTROL_MODEL}>/grouped} === false}`,
 				selectedKey: MODE_EDIT,
+				ariaLabelledBy: this.getId() + "-modeButtonInvisibleText",
 				items: [
 					new SegmentedButtonItem(this.getId() + "-editModeButton", {
 						key: MODE_EDIT,
@@ -521,7 +527,7 @@ sap.ui.define([
 			}
 		});
 		const bIsMac = Device.os.macintosh;
-		const oInvisibleTextReordering = new InvisibleText({
+		const oReorderingInvisibleText = new InvisibleText({
 			id: oRow.getId() + "-reorderingInfo",
 			text: {
 				parts: [
@@ -535,8 +541,8 @@ sap.ui.define([
 					return "";
 			}}
 		});
-		oRow.addAriaLabelledBy(oInvisibleTextReordering);
-		oRow.addContent(oInvisibleTextReordering);
+		oRow.addAriaLabelledBy(oReorderingInvisibleText);
+		oRow.addContent(oReorderingInvisibleText);
 		const oEventDelegate = {
 			onsaptop: function(oEvent) {
 				this._handleReorder(oEvent, true);
@@ -846,14 +852,7 @@ sap.ui.define([
 					return bVisible ? "sap-icon://show" : "sap-icon://hide";
 				}
 			},
-			tooltip: {
-				path: `${this.P13N_MODEL}>${this.PRESENCE_ATTRIBUTE}`,
-				formatter: (bVisible) => {
-					return bVisible
-						? this._getResourceText("adaptFiltersPanel.ACTION_VISIBILITY_SHOW")
-						: this._getResourceText("adaptFiltersPanel.ACTION_VISIBILITY_HIDE");
-				}
-			},
+			tooltip: this._getResourceText("adaptFiltersPanel.ACTION_VISIBILITY_SHOW"),
 			ariaLabelledBy: oLabel,
 			press: (oEvent) => {
 				const oButton = oEvent.getSource();
@@ -1335,6 +1334,8 @@ sap.ui.define([
 		this._oModeButton?.destroy();
 		this._oKeySelect?.destroy();
 		this._oInvText?.destroy();
+		this._oModeButtonInvisibleText?.destroy();
+
 
 		// Destroy and clear label cache
 		if (this._mLabelCache) {
@@ -1355,6 +1356,7 @@ sap.ui.define([
 		this._oModeButton = null;
 		this._oKeySelect = null;
 		this._oInvText = null;
+		this._oModeButtonInvisibleText = null;
 	};
 
 	function _getKeyFromContext(oContext) {

@@ -278,14 +278,18 @@ sap.ui.define([
 		if (!this.bDelegateInitialized) {
 			// wait until delegate is loaded
 			this.awaitControlDelegate().then(() => {
-				if (!this.bIsDestroyed) {
-					_updateItems.call(this.getConditions());
+				if (!this.isFieldDestroyed()) {
+					_updateItems.call(this, this.getConditions());
 				}
 			});
 			return;
 		}
 
-		this.getControlDelegate().updateItemsFromConditions(this, aConditions);
+		this.getControlDelegate().updateItemsFromConditions(this, aConditions)?.catch((oError) => {
+			// update failed -> sync conditions with items as not triggered from Binding
+			// let delegate inplementation update valueState as not sure if text in Error is the wanted one
+			_triggerConditionUpdate.call(this);
+		});
 
 	}
 
@@ -294,7 +298,7 @@ sap.ui.define([
 		if (!this.bDelegateInitialized) {
 			// wait until delegate is loaded
 			this.awaitControlDelegate().then(() => {
-				if (!this.bIsDestroyed) {
+				if (!this.isFieldDestroyed()) {
 					_triggerConditionUpdate.call(this);
 				}
 			});
@@ -377,7 +381,7 @@ sap.ui.define([
 
 	Field.prototype.checkCreateInternalContent = function() {
 
-		if (!this.bIsDestroyed && this._oContentFactory.getDataType() && !this.isFieldPropertyInitial("editMode")) {
+		if (!this.isFieldDestroyed() && this._oContentFactory.getDataType() && !this.isFieldPropertyInitial("editMode")) {
 			// If DataType is provided via Binding and EditMode is set the internal control can be created
 			// TODO: no control needed if just template for cloning
 			FieldBase.prototype.checkCreateInternalContent.apply(this, arguments);

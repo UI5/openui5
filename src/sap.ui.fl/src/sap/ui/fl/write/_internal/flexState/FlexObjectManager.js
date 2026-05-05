@@ -8,8 +8,11 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
+	"sap/ui/fl/apply/_internal/flexObjects/VariantChange",
+	"sap/ui/fl/apply/_internal/flexObjects/VariantManagementChange",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/changes/UIChangesState",
+	"sap/ui/fl/apply/_internal/flexState/compVariants/CompVariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
@@ -17,7 +20,6 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/write/_internal/condenser/Condenser",
-	"sap/ui/fl/apply/_internal/flexState/compVariants/CompVariantManagementState",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/_internal/Versions",
 	"sap/ui/fl/Layer",
@@ -29,8 +31,11 @@ sap.ui.define([
 	Reverter,
 	FlexObjectFactory,
 	States,
+	VariantChange,
+	VariantManagementChange,
 	DependencyHandler,
 	UIChangesState,
+	CompVariantManagementState,
 	VariantManagementState,
 	FlexObjectState,
 	FlexState,
@@ -38,7 +43,6 @@ sap.ui.define([
 	Settings,
 	Version,
 	Condenser,
-	CompVariantManagementState,
 	Storage,
 	Versions,
 	Layer,
@@ -95,14 +99,29 @@ sap.ui.define([
 		}
 	}
 
-	function checkIfOnlyOne(aChanges, sFunctionName) {
-		return aChanges
+	function checkIfNotMoreThanOne(aChanges, sFunctionName) {
+		return aChanges.length === 0 || aChanges
 		.map((oChange) => oChange[sFunctionName]())
 		.filter((vValue, iIndex, aArray) => aArray.indexOf(vValue) === iIndex).length === 1;
 	}
 
-	function canGivenChangesBeCondensed(oAppComponent, aChanges, bCondenseAnyLayer) {
-		if (!oAppComponent || !checkIfOnlyOne(aChanges, "getLayer")) {
+	function canGivenChangesBeCondensed(oAppComponent, aFlexObjects, bCondenseAnyLayer) {
+		if (!oAppComponent) {
+			return false;
+		}
+		const aVariantRelatedChanges = [];
+		const aOtherFlexObjects = [];
+		aFlexObjects.forEach((oFlexObject) => {
+			if (oFlexObject instanceof VariantChange || oFlexObject instanceof VariantManagementChange) {
+				aVariantRelatedChanges.push(oFlexObject);
+			} else {
+				aOtherFlexObjects.push(oFlexObject);
+			}
+		});
+
+		// Variant related changes do not interfere with any other kind of flex object, so we can check them individually
+		// with this the save as public view scenario, where a user layer setFavorite change is also created, is also enabled for condensing
+		if (!checkIfNotMoreThanOne(aVariantRelatedChanges, "getLayer") || !checkIfNotMoreThanOne(aOtherFlexObjects, "getLayer")) {
 			return false;
 		}
 
@@ -111,7 +130,7 @@ sap.ui.define([
 			return oUriParameters.get("sap-ui-xx-condense-changes") === "true";
 		}
 
-		return bCondenseAnyLayer || [Layer.CUSTOMER, Layer.PUBLIC, Layer.USER].includes(aChanges[0].getLayer());
+		return bCondenseAnyLayer || [Layer.CUSTOMER, Layer.PUBLIC, Layer.USER].includes(aFlexObjects[0].getLayer());
 	}
 
 	function updateCacheAndDeleteUnsavedChanges(aAllChanges, aCondensedChanges, bSkipUpdateCache, bAlreadyDeletedViaCondense, sReference, sComponentId) {
@@ -280,11 +299,15 @@ sap.ui.define([
 
 		// if there are multiple backends or transport requests, all changes must be saved separately
 		if (
-			checkIfOnlyOne(mPropertyBag.dirtyFlexObjects, "getRequest")
-			&& (Settings.getInstanceOrUndef()?.getHasPersoConnector() ? checkIfOnlyOne(mPropertyBag.dirtyFlexObjects, "getLayer") : true)
+			checkIfNotMoreThanOne(mPropertyBag.dirtyFlexObjects, "getRequest")
+			&& (Settings.getInstanceOrUndef()?.getHasPersoConnector()
+				? checkIfNotMoreThanOne(mPropertyBag.dirtyFlexObjects, "getLayer")
+				: true
+			)
 		) {
-			const aCondensedChanges = canGivenChangesBeCondensed(mPropertyBag.appComponent, aChangesClone, mPropertyBag.condenseAnyLayer) ?
-				await Condenser.condense(mPropertyBag.appComponent, aChangesClone) : aChangesClone;
+			const aCondensedChanges = canGivenChangesBeCondensed(mPropertyBag.appComponent, aChangesClone, mPropertyBag.condenseAnyLayer)
+				? await Condenser.condense(mPropertyBag.appComponent, aChangesClone)
+				: aChangesClone;
 
 			let oResponse;
 			const sRequest = aChangesClone[0].getRequest();

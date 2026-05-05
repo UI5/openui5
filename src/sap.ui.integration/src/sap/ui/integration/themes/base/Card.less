@@ -17,6 +17,20 @@
 		transition: opacity 0.4s, left 0.4s, top 0.4s;
 	}
 
+	.sapMDialogSection,
+	.sapMDialogScroll,
+	.sapMDialogScrollCont,
+	.sapUiIntCard {
+		/* allows scrolling inside the card content instead of dialog content */
+		max-height: inherit;
+	}
+
+	.sapUiIntCard,
+	.sapMDialogScrollCont {
+		/* allows resizing */
+		height: 100%;
+	}
+
 	.sapFCardHeader {
 		box-shadow: var(--sapContent_HeaderShadow);
 		border-radius: var(--sapElement_BorderCornerRadius) var(--sapElement_BorderCornerRadius) 0 0;
@@ -35,7 +49,6 @@
 	}
 
 	.sapUiIntCard {
-		min-height: 2rem;
 		border-radius: 0 0 var(--sapElement_BorderCornerRadius) var(--sapElement_BorderCornerRadius);
 
 		.sapFCardFilterBar {
@@ -65,7 +78,7 @@
 	}
 
 	&.sapMDialog {
-		min-height: 14rem;
+		min-height: 5.5rem; /* 2.75 + 2.75, which is the min-height of the content of the Dialog plus the footer of the Card; */
 	}
 }
 

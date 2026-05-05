@@ -5830,4 +5830,39 @@ sap.ui.define([
 		//Assert
 		assert.strictEqual(oPressSpy.callCount, 0, "Tile press event should not be fired when TextArea is tapped");
 	});
+
+	QUnit.module("GenericTile header text line-height inside Form", {
+		beforeEach: async function () {
+			// Simulate an editable form context by wrapping the tile in a container with the sapUiFormEdit class
+			this.oFormContainer = document.createElement("div");
+			this.oFormContainer.classList.add("sapUiFormEdit");
+			document.getElementById("qunit-fixture").appendChild(this.oFormContainer);
+
+			this.oGenericTile = new GenericTile({
+				header: "Quarterly_Reportergy supply gap",
+				subheader: "Subheader"
+			});
+			this.oGenericTile.placeAt(this.oFormContainer);
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oGenericTile.destroy();
+			this.oGenericTile = null;
+			this.oFormContainer.remove();
+			this.oFormContainer = null;
+		}
+	});
+
+	QUnit.test("line-height of header text should be 'normal' even inside an editable form", function (assert) {
+		// Arrange
+		var oHeaderTextDom = this.oGenericTile.getDomRef().querySelector(".sapMGTHdrContent .sapMGTHdrTxt .sapMText");
+
+		// Assert
+		assert.ok(oHeaderTextDom, "Header text DOM element exists");
+		assert.strictEqual(
+			window.getComputedStyle(oHeaderTextDom).lineHeight,
+			"normal",
+			"line-height of .sapMGTHdrContent .sapMGTHdrTxt .sapMText should be 'normal' and not overridden by .sapUiFormEdit styles"
+		);
+	});
 });

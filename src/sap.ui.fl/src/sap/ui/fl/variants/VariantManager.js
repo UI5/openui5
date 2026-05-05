@@ -337,14 +337,17 @@ sap.ui.define([
 
 	async function handleDirtyChanges(mProperties) {
 		const {
-			dirtyChanges: aDirtyChanges,
+			dirtyChanges: aDirtyFlexObjects,
 			variantManagementReference: sVariantManagementReference,
 			appComponent: oAppComponent,
 			variantManagementControl: oVariantManagementControl,
-			flexReference: sFlexReference
+			flexReference: sFlexReference,
+			layer: sLayer
 		} = mProperties;
 		if (!oVariantManagementControl.getDesignMode()) {
-			const oResponse = await FlexObjectManager.saveFlexObjects({ flexObjects: aDirtyChanges, selector: oAppComponent });
+			const oResponse = await FlexObjectManager.saveFlexObjects({
+				flexObjects: aDirtyFlexObjects, selector: oAppComponent, layer: sLayer
+			});
 			if (oResponse) {
 				const oVariantFlexObject = oResponse.response.find((oFlexObject) => oFlexObject.fileType === "ctrl_variant");
 				const aVariants = VariantManagementState.getVariantsForVariantManagement({
@@ -695,7 +698,8 @@ sap.ui.define([
 				// are also persisted during variant manage save
 				await FlexObjectManager.saveFlexObjects({
 					flexObjects: aChangesOnLayer,
-					selector: oAppComponent
+					selector: oAppComponent,
+					layer: sCurrentLayer
 				});
 			}
 		}
@@ -729,7 +733,8 @@ sap.ui.define([
 				}
 				const oResponse = await FlexObjectManager.saveFlexObjects({
 					flexObjects: aNewVariantDirtyChanges,
-					selector: oAppComponent
+					selector: oAppComponent,
+					layer: oSourceVariant.layer
 				});
 
 				return oResponse;
@@ -791,7 +796,8 @@ sap.ui.define([
 				variantManagementReference: sVMReference,
 				appComponent: oAppComponent,
 				variantManagementControl: oVariantManagementControl,
-				flexReference: sFlexReference
+				flexReference: sFlexReference,
+				layer: sVariantLayer
 			});
 		}, sFlexReference, sVMReference);
 		return aNewVariantDirtyChanges;

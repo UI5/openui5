@@ -49,6 +49,16 @@ sap.ui.define([
 					defaultValue: true
 				}
 			},
+			aggregations: {
+				/**
+				 * Holds filter controls from comp.FilterBar so they can have proper parent.
+				 */
+				_filterControls: {
+					type: "sap.ui.core.Control",
+					multiple: true,
+					visibility: "hidden"
+				}
+			},
 			events: {
 				/**
 				 * This event is fired if any change has been made within the <code>AdaptFiltersPanel</code> control.

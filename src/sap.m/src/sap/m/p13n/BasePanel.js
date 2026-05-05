@@ -26,6 +26,8 @@ sap.ui.define([
 	"sap/m/p13n/MessageStrip",
 	"sap/ui/core/InvisibleText",
 	"sap/m/table/Util"
+
+
 ], (
 	Element,
 	Library,
@@ -45,7 +47,7 @@ sap.ui.define([
 	ShortcutHintsMixin,
 	KeyCodes,
 	Log,
-	library,
+	mlibrary,
 	coreLibrary,
 	MessageStrip,
 	InvisibleText,
@@ -53,11 +55,7 @@ sap.ui.define([
 ) => {
 	"use strict";
 
-	// shortcut for sap.m.ListKeyboardMode
-	const ListKeyboardMode = library.ListKeyboardMode;
-
-	// shortcut for sap.m.ListMode
-	const ListMode = library.ListMode;
+	const { ListMode, ListKeyboardMode } = mlibrary;
 
 	/**
 	 * P13n <code>Item</code> object type.
