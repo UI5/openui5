@@ -1161,7 +1161,9 @@ sap.ui.define([
 		}
 
 		ListBase.prototype.onfocusin.call(this, oEvent);
-		this._setNoColumnsMessageAnnouncement(oTarget);
+		if (oTarget.id === this.getId("nodata")) {
+			this._setNoColumnsMessageAnnouncement(oTarget);
+		}
 	};
 
 	// event listener for theme changed
