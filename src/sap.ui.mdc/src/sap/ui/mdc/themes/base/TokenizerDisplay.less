@@ -28,7 +28,6 @@ html.sap-desktop .sapUiMdcTokenizerDisplay.sapMTokenizer {
 	line-height: @mdctokenizer-small-line-height;
 	height: @mdctokenizer-small-line-height;
 	box-sizing: border-box;
-	padding-top: 0.125rem;
 }
 
 /* hide emptyIndicator for TokenizerDisplay */
@@ -85,17 +84,22 @@ html.sap-desktop .sapUiMdcTokenizerDisplay.sapMTokenizer {
 	}
 }
 
-.sapUiSizeCompact .sapUiFormEdit .sapUiMdcTokenizerDisplay {
-	padding-top: @mdctokenizer-small-padding-topbottom;
-	padding-bottom: @mdctokenizer-small-padding-topbottom;
+.sapUiSizeCompact{
+	 .sapUiFormEdit .sapUiMdcTokenizerDisplay {
+		padding-top: @mdctokenizer-small-padding-topbottom;
+		padding-bottom: @mdctokenizer-small-padding-topbottom;
+	}
+
+	.sapUiForm:not(.sapUiFormEdit) {
+		.sapUiMdcTokenizerDisplay .sapMTokenizerIndicator,
+		.sapUiMdcTokenizerDisplay .sapMEmptyIndicator.sapMEmptyIndicatorAuto {
+			padding-top: 0.0625rem;
+		}
+	}
 }
 
 .sapUiForm:not(.sapUiFormEdit) {
 	.sapUiMdcTokenizerDisplay.sapMTokenizerHeightMargin {
 		margin: 0;
-	}
-	.sapUiMdcTokenizerDisplay .sapMTokenizerIndicator,
-	.sapUiMdcTokenizerDisplay .sapMEmptyIndicator.sapMEmptyIndicatorAuto {
-		padding-top: 0.0625rem;
 	}
 }
