@@ -392,10 +392,14 @@ sap.ui.define([
 
 	});
 
+	let bUpdateFails = false;
 	QUnit.module("user interaction", {
 		beforeEach: async () => {
 			_initModel();
 			sinon.stub(MultiValueFieldDelegate, "updateItemsFromConditions").callsFake((oPayload, aConditions, oMultiValueField) => {
+				if (bUpdateFails) {
+					return Promise.reject("update fails");
+				}
 				const aItems = [];
 				for (let i = 0; i < aConditions.length; i++) {
 					const oCondition = aConditions[i];
@@ -404,6 +408,7 @@ sap.ui.define([
 				}
 				oModel.setProperty("/items", aItems);
 				oModel.checkUpdate(true, false);
+				return null;
 			});
 			const oValueHelp = new ValueHelp("F1-H");
 			oField = new MultiValueField("F1", {
@@ -425,6 +430,7 @@ sap.ui.define([
 			_cleanupModel();
 			_cleanupEvents();
 			MultiValueFieldDelegate.updateItemsFromConditions.restore();
+			bUpdateFails = false;
 		}
 	});
 
@@ -461,6 +467,93 @@ sap.ui.define([
 			fnDone();
 			});
 		}, 0);
+
+	});
+
+	QUnit.test("remove Token", (assert) => {
+
+		const aContent = oField.getAggregation("_content");
+		const oContent = aContent?.length > 0 && aContent[0];
+		const aTokens = oContent.getTokens();
+		const aConditions = oField.getConditions();
+
+		aTokens[0].fireDelete();
+		aConditions.splice(0, 1);
+		assert.ok(MultiValueFieldDelegate.updateItemsFromConditions.calledOnce, "MultiValueFieldDelegate.updateItemsFromConditions called once");
+		assert.ok(MultiValueFieldDelegate.updateItemsFromConditions.calledWith(oField, aConditions), "MultiValueFieldDelegate.updateItemsFromConditions arguments");
+		assert.equal(iCount, 1, "Change event fired once");
+		assert.equal(sId, "F1", "Change event fired on Field");
+		assert.equal(aChangeItems.length, 2, "Change event: items");
+		assert.equal(aChangeItems[0].getKey(), 2, "Change event: item0 key");
+		assert.equal(aChangeItems[1].getKey(), 3, "Change event: item1 key");
+		assert.ok(oPromise, "Promise returned");
+		assert.ok(bValid, "Change event: valid");
+		return oPromise.then((vResult) => {
+			assert.ok(true, "Promise resolved");
+			assert.ok(Array.isArray(vResult), "Result is array");
+			assert.ok(vResult.length, 2, "Two items returned");
+			assert.ok(vResult[0].isA("sap.ui.mdc.field.MultiValueFieldItem"), "MultiItem returned");
+			assert.equal(vResult[0].getKey(), 2, "Result: item0 key");
+			assert.equal(vResult[1].getKey(), 3, "Result: item1 key");
+
+			const aItems = oField.getItems();
+			assert.equal(aItems.length, 2, "Field: items");
+			assert.equal(aItems[0].getKey(), 2, "Field: item0 key");
+			assert.equal(aItems[1].getKey(), 3, "Field: item1 key");
+
+			return new Promise((resolve) => {setTimeout(resolve, 100);}).then(() => { // Conditions are updated async
+				const aConditions = oField.getConditions();
+				assert.equal(aConditions.length, 2, "number of Conditions");
+				assert.equal(aConditions[0].values[0], 2, "Condition0 value0");
+				assert.equal(aConditions[1].values[0], 3, "Condition1 value0");
+			});
+		});
+
+	});
+
+	QUnit.test("remove Token with update error", (assert) => {
+
+		const aContent = oField.getAggregation("_content");
+		const oContent = aContent?.length > 0 && aContent[0];
+		const aTokens = oContent.getTokens();
+		const aConditions = oField.getConditions();
+		bUpdateFails = true;
+
+		aTokens[0].fireDelete();
+		aConditions.splice(0, 1);
+		assert.ok(MultiValueFieldDelegate.updateItemsFromConditions.calledOnce, "MultiValueFieldDelegate.updateItemsFromConditions called once");
+		assert.ok(MultiValueFieldDelegate.updateItemsFromConditions.calledWith(oField, aConditions), "MultiValueFieldDelegate.updateItemsFromConditions arguments");
+		assert.equal(iCount, 1, "Change event fired once");
+		assert.equal(sId, "F1", "Change event fired on Field");
+		assert.equal(aChangeItems.length, 3, "Change event: items");
+		assert.equal(aChangeItems[0].getKey(), 1, "Change event: item0 key");
+		assert.equal(aChangeItems[1].getKey(), 2, "Change event: item1 key");
+		assert.equal(aChangeItems[2].getKey(), 3, "Change event: item2 key");
+		assert.ok(oPromise, "Promise returned");
+		assert.ok(bValid, "Change event: valid");
+		return oPromise.then((vResult) => {
+			assert.ok(true, "Promise resolved");
+			assert.ok(Array.isArray(vResult), "Result is array");
+			assert.ok(vResult.length, 3, "Three items returned");
+			assert.ok(vResult[0].isA("sap.ui.mdc.field.MultiValueFieldItem"), "MultiItem returned");
+			assert.equal(vResult[0].getKey(), 1, "Result: item0 key");
+			assert.equal(vResult[1].getKey(), 2, "Result: item1 key");
+			assert.equal(vResult[2].getKey(), 3, "Result: item2 key");
+
+			const aItems = oField.getItems();
+			assert.equal(aItems.length, 3, "Field: items");
+			assert.equal(aItems[0].getKey(), 1, "Field: item0 key");
+			assert.equal(aItems[1].getKey(), 2, "Field: item1 key");
+			assert.equal(aItems[2].getKey(), 3, "Field: item2 key");
+
+			return new Promise((resolve) => {setTimeout(resolve, 100);}).then(() => { // Conditions are updated async
+				const aConditions = oField.getConditions();
+				assert.equal(aConditions.length, 3, "number of Conditions");
+				assert.equal(aConditions[0].values[0], 1, "Condition0 value0");
+				assert.equal(aConditions[1].values[0], 2, "Condition1 value0");
+				assert.equal(aConditions[2].values[0], 3, "Condition2 value0");
+			});
+		});
 
 	});
 

@@ -439,7 +439,7 @@ sap.ui.define([
 				aLabels.push(sRowId + "-highlighttext");
 			}
 
-			if (!bHidden && oTableInstances.cell) {
+			if (oTableInstances.cell) {
 				oInfo = ACCInfoHelper.getAccInfoOfControl(oTableInstances.cell);
 				aLabels.push(oInfo ? (sTableId + "-cellacc") : oTableInstances.cell.getId());
 			}

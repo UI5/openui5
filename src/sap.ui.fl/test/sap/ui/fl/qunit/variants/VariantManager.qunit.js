@@ -562,6 +562,7 @@ sap.ui.define([
 				oSaveStub.getCall(0).args[0].flexObjects.length, 5,
 				"then five dirty changes were saved (new variant, 3 copied ctrl changes, setDefault change"
 			);
+			assert.strictEqual(oSaveStub.getCall(0).args[0].layer, Layer.USER, "the layer was passed");
 			assert.ok(
 				oDeleteFlexObjectsSpy.calledBefore(oSaveStub),
 				"the changes were deleted from default variant before the copied variant was saved"
@@ -621,18 +622,14 @@ sap.ui.define([
 				oSaveStub.callCount, 1,
 				"then dirty changes were saved"
 			);
+			const oPassedPropertyBag = oSaveStub.lastCall.args[0];
 			assert.strictEqual(
-				oSaveStub.getCall(0).args[0].flexObjects.length, 6,
+				oPassedPropertyBag.flexObjects.length, 6,
 				"then a new variant, 3 copied ctrl changes, setDefault change, setFavorite change were saved"
 			);
-			assert.strictEqual(
-				oSaveStub.getCall(0).args[0].flexObjects[0].getChangeType(), "setFavorite",
-				"then a setFavorite change was added"
-			);
-			assert.strictEqual(
-				oSaveStub.getCall(0).args[0].flexObjects[5].getChangeType(), "setDefault",
-				"the last change was 'setDefault'"
-			);
+			assert.strictEqual(oPassedPropertyBag.flexObjects[0].getChangeType(), "setFavorite", "then a setFavorite change was added");
+			assert.strictEqual(oPassedPropertyBag.flexObjects[5].getChangeType(), "setDefault", "the last change was 'setDefault'");
+			assert.strictEqual(oPassedPropertyBag.layer, Layer.PUBLIC, "the layer was passed");
 			assert.ok(
 				oDeleteFlexObjectsSpy.calledBefore(oSaveStub),
 				"the changes were deleted from default variant before the copied variant was saved"
@@ -670,6 +667,7 @@ sap.ui.define([
 			oSaveStub.getCall(0).args[0].flexObjects.forEach((oChange) => {
 				assert.equal(oChange.getLayer(), Layer.PUBLIC, "layer of dirty change is PUBLIC layer when source variant is PUBLIC");
 			});
+			assert.strictEqual(oSaveStub.firstCall.args[0].layer, Layer.PUBLIC, "then the layer was passed as PUBLIC");
 		});
 
 		QUnit.test("when calling 'handleSaveEvent' on a USER variant with setDefault, executeOnSelect and public boxes checked", async function(assert) {

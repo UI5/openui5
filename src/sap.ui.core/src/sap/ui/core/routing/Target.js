@@ -796,6 +796,10 @@ sap.ui.define([
 				// use a Promise.resovle() to delay the container resolve to occur after the current call stack because the
 				// oOptions.rootView can be available after the current call stack.
 				return Promise.resolve().then(function() {
+					if (this.bIsDestroyed) {
+						return undefined;
+					}
+
 					oParentInfo = oParentInfo || {};
 
 					var oOptions = this._oOptions;
@@ -890,6 +894,10 @@ sap.ui.define([
 			 * @private
 			 */
 			displayPlaceholder: function(oTargetCreateInfo, oContainerControl) {
+				if (this.bIsDestroyed) {
+					return undefined;
+				}
+
 				var oObject,
 					oOptions = this._oOptions,
 					bIsComponentTarget = oOptions.type === "Component",
@@ -1035,6 +1043,10 @@ sap.ui.define([
 								oViewInfo = aArguments[1],
 								oView, oRootControl;
 
+							if (!oViewInfo) {
+								return undefined;
+							}
+
 							oViewInfo.nestedComponentReady = aArguments[0].nestedComponentReady;
 
 							if (bIsComponentTarget) {
@@ -1065,6 +1077,10 @@ sap.ui.define([
 						})
 					// placing the view or component into container
 						.then(function(oViewInfo) {
+							if (!oViewInfo) {
+								return undefined;
+							}
+
 							var oContainerControl = oViewInfo.containerControl,
 								oObject = oViewInfo.object;
 
@@ -1114,6 +1130,11 @@ sap.ui.define([
 				}
 
 				return oSequencePromise.then(function(oParams) {
+					if (!oParams) {
+						Log.warning("Target '" + oOptions._name + "' can't be placed because it's already destroyed", that);
+						return undefined;
+					}
+
 					var pNestedComponentReady = oParams.nestedComponentReady || Promise.resolve();
 					return pNestedComponentReady.then(function() {
 						var oContainerControl = oParams.control,
