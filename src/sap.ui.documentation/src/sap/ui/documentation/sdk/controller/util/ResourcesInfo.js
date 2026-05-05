@@ -20,6 +20,11 @@ sap.ui.define([], function () {
 			"href": "test-resources/sap/m/demokit/iconExplorer/webapp/index.html"
 		},
 		{
+			"id": "illustrationExplorer",
+			"text": "Illustration Explorer",
+			"href": "test-resources/sap/m/demokit/illustrationExplorer/webapp/index.html"
+		},
+		{
 			"id": "accessibilityGuide",
 			"text": "Accessibility Guide",
 			"href": "test-resources/sap/m/demokit/accessibilityGuide/webapp/index.html"

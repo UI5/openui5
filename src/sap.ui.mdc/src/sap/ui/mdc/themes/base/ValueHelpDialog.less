@@ -4,7 +4,7 @@
 /* =========================================== */
 
 .sapMdcValueHelpPanel {
-    background-color: var(--sapBackgroundColor);
+	background-color: var(--sapBackgroundColor);
 }
 
 /* give all panels on the valueHelpPanel a left/right padding */
@@ -15,10 +15,7 @@
 }
 
 .sapMdcTokenizerPanel > .sapMPanelContent {
-	padding-left: 1rem;
-	padding-right: 1rem;
-	padding-top: 0;
-	padding-bottom: 1rem;
+	padding: 0 1rem 1rem 1rem;
 	overflow: hidden;
 }
 
@@ -47,23 +44,23 @@
 
 /* add border to Tokenizer */
 .sapMdcTokenizerPanel .sapMTokenizer {
-    border-width: 1px;
-    border-color: @sapUiFieldBorderColor;
-    border-style: solid;
-    border-radius: @sapUiFieldBorderCornerRadius;
-    padding-top: 1px;
-    padding-left: 5px;
-    padding-right: 2px;
-    display: block;
-    box-sizing: border-box;
-    min-height: 2.25rem;
-    overflow: hidden;
-    background: @sapUiFieldBackground;
+	border-width: 1px;
+	border-color: var(--sapField_BorderColor);
+	border-style: solid;
+	border-radius: var(--sapField_BorderCornerRadius);
+	padding-top: 1px;
+	padding-left: 5px;
+	padding-right: 2px;
+	display: block;
+	box-sizing: border-box;
+	min-height: 2.25rem;
+	overflow: hidden;
+	background: var(--sapField_Background);
 }
 
 .sapUiSizeCompact .sapMdcTokenizerPanel .sapMTokenizer {
-    padding-top: 4px;
-    min-height: 32px;
+	padding-top: 4px;
+	min-height: 32px;
 }
 
 /* make the ITB header height 3rem */
@@ -135,7 +132,7 @@
 	height: 2rem;
 }
 
-.sapUiMdcDefineConditionPanel .sapUiRespGrid > div:last-child > button{
+.sapUiMdcDefineConditionPanel .sapUiRespGrid > div:last-child > button {
 	position: absolute;
 	right: 0.25rem;
 }
@@ -158,7 +155,7 @@
 
 /* makes the title of the used panels smaller */
 .sapMdcValueHelpPanel .sapMPanel .sapMPanelHdr {
-	font-size: @sapMFontHeader5Size;
+	font-size: var(--sapFontHeader5Size);
 }
 
 /* make the title shadows transparent */
@@ -209,7 +206,12 @@
 	max-height: 30rem;
 }
 
-.sapUiMdcDialogTab{
+.sapUiMdcDialogTab {
 	width: 100%;
 	height: 100%;
+}
+
+/* give the title 2rem left margin */
+.sapMdcValueHelpTitle.sapMDialog header .sapMBarPH {
+	padding-left: 2rem;
 }

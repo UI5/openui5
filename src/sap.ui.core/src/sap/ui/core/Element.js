@@ -919,6 +919,9 @@ sap.ui.define([
 			mParameters = mParameters || {};
 			mParameters.id = mParameters.id || this.getId();
 
+			/**
+			 * @deprecated As of version 1.147.0, together with ElementHooks.interceptEvent
+			 */
 			ElementHooks.interceptEvent?.(sEventId, this, mParameters);
 
 			return ManagedObject.prototype.fireEvent.call(this, sEventId, mParameters, bAllowPreventDefault, bEnableEventBubbling);

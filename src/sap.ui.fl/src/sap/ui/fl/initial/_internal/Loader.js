@@ -38,12 +38,7 @@ sap.ui.define([
 	 * 				annotationChanges: [...],
 	 * 				appDescriptorChanges: [...],
 	 * 				changes: [...],
-	 * 				comp: {
-	 * 					variants: [...],
-	 * 					changes: [...],
-	 * 					defaultVariants: [...],
-	 * 					standardVariants: [...]
-	 * 				}
+	 * 				compVariants: [...],
 	 * 				variants: [...],
 	 * 				variantChanges: [...],
 	 * 				variantDependentControlChanges: [...],

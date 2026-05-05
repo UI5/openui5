@@ -308,6 +308,7 @@ sap.ui.define([
 
 		QUnit.test("When parameters are passed to the dialog then they should be imported correctly", function(assert) {
 			this.oAddIFrameDialog.attachOpened(function() {
+				assert.strictEqual(this.oAddIFrameDialog._oJSONModel.iSizeLimit, 1000, "then the JSON model size limit is 1000");
 				const oData = this.oAddIFrameDialog._oJSONModel.getData().parameters.value;
 				const mParameters = this.oDialogSettings.parameters;
 				assert.deepEqual(oData, mParameters, "then all fields are imported");

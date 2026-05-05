@@ -125,7 +125,7 @@ sap.ui.define([
 		sinon.assert.alwaysCalledWithExactly(oGetContextsSpy, 0, 10, oTable.getThreshold());
 	});
 
-	QUnit.test("Scrolling & Binding refresh", async function(assert) {
+	QUnit.test("Scrolling & binding refresh", async function(assert) {
 		const oTable = this.oTable;
 		const oGetContextsSpy = this.oGetContextsSpy;
 
@@ -141,13 +141,6 @@ sap.ui.define([
 		// Mock data contains only 16 rows, so the first visible row index is changed to 6
 		sinon.assert.alwaysCalledWithExactly(oGetContextsSpy, 1, 10, oTable.getScrollThreshold());
 		assert.equal(oTable._bScrolled, false, "Scroll flag was reset");
-
-		oGetContextsSpy.resetHistory();
-		oTable.invalidate();
-
-		await TableQUnitUtils.nextEvent("rowsUpdated", oTable);
-
-		sinon.assert.alwaysCalledWithExactly(oGetContextsSpy, 1, 10, oTable.getThreshold());
 
 		oGetContextsSpy.resetHistory();
 		oTable._getScrollExtension().scrollVertically(true, false);
@@ -169,7 +162,7 @@ sap.ui.define([
 		assert.equal(oTable._bScrolled, false, "Scroll flag was reset");
 	});
 
-	QUnit.test("Scroll & Add row", async function(assert) {
+	QUnit.test("Scroll & add row", async function(assert) {
 		const oTable = this.oTable;
 		const oGetContextsSpy = this.oGetContextsSpy;
 

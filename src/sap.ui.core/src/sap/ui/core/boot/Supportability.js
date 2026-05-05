@@ -52,6 +52,17 @@ sap.ui.define([
 		);
 	}
 
+	// Initialize 2.0 Debugger if debugging tools are enabled (also true for regular debug mode)
+	if (Supportability.isDebugToolsEnabled()) {
+		aSupportModules.push(
+			new Promise((res, rej) => {
+				sap.ui.require(["sap/ui/core/support/debug/DebugLoader"], (DebugLoader) => {
+					res(DebugLoader);
+				}, rej);
+			})
+		);
+	}
+
 	const pReady = aSupportModules.length ? Promise.all(aSupportModules) : Promise.resolve();
 
 	return {

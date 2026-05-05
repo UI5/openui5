@@ -41,7 +41,7 @@ sap.ui.define([
 		assert.ok(this.oTable.setBusy.neverCalledWith(true), "Table not set to busy");
 	});
 
-	QUnit.module("Hide/Show and suspend/resume TreeTable with ODataV4", {
+	QUnit.module("Hidden table with suspended binding", {
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable(TreeTable, {
 				...TableQUnitUtils.createSettingsForHierarchy(),
@@ -57,26 +57,23 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Initialized hidden table with suspended binding", async function(assert) {
+	QUnit.test("Initialization", async function(assert) {
 		await TableQUnitUtils.wait(100);
 		assert.ok(this.fnBindingContextSpy.notCalled, "Binding#getContexts was not called");
-		assert.notOk(this.oTable.getRows()[0].getBindingContext(), "Table has no rows with bindingContext");
 	});
 
-	QUnit.test("Change visibility of table and suspension state of binding", async function(assert) {
+	QUnit.test("Change visibility and suspension state", async function(assert) {
 		this.fnBindingContextSpy.resetHistory();
 		this.oTable.setVisible(true);
 		this.oTable.getBinding().resume();
 		await this.oTable.qunit.whenBindingChange();
 		await this.oTable.qunit.whenRenderingFinished();
 		assert.ok(this.fnBindingContextSpy.called, "Show table and resume binding: Binding#getContexts called");
-		assert.ok(this.oTable.getRows()[0].getBindingContext(), "Show table and resume binding: Table has rows with bindingContext");
 
 		this.fnBindingContextSpy.resetHistory();
 		this.oTable.setVisible(false);
 		this.oTable.getBinding().suspend();
 		await TableQUnitUtils.wait(100);
 		assert.ok(this.fnBindingContextSpy.notCalled, "Hide table and suspend binding: Binding#getContexts not called");
-		assert.notOk(this.oTable.getRows()[0].getBindingContext(), "Hide table and suspend binding: Table doesn't have rows with bindingcontext");
 	});
 });

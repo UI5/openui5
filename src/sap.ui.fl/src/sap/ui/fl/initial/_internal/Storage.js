@@ -229,10 +229,9 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Object with the necessary properties
 	 * @param {string} sMethodName - Name of the connector method to call (loadFlVariant, loadAllFlVariants, loadFlVariantContent, loadAllCompVariants)
-	 * @param {function} [fnTransformResponse] - Optional function to transform each connector response before merging
 	 * @returns {Promise<object>} Resolves with merged variant data
 	 */
-	async function loadVariantDataFromConnectors(mPropertyBag, sMethodName, fnTransformResponse) {
+	async function loadVariantDataFromConnectors(mPropertyBag, sMethodName) {
 		const aConnectors = await StorageUtils.getLoadConnectors();
 		const aResponses = [];
 
@@ -245,8 +244,7 @@ sap.ui.define([
 				};
 				try {
 					const oResponse = await oConnectorConfig.loadConnectorModule[sMethodName](oConnectorSpecificPropertyBag);
-					const oNormalized = oResponse || {};
-					aResponses.push(fnTransformResponse ? fnTransformResponse(oNormalized) : oNormalized);
+					aResponses.push(oResponse || {});
 				} catch (oError) {
 					aResponses.push({});
 				}
@@ -305,18 +303,7 @@ sap.ui.define([
 	 * @returns {Promise<object>} Resolves with merged comp variant data in storage response format
 	 */
 	Storage.loadAllCompVariants = function(mPropertyBag) {
-		// The connector returns { compVariants, changes } but the StorageResultMerger
-		// expects the storage format { comp: { variants, changes } }
-		return loadVariantDataFromConnectors(mPropertyBag, "loadAllCompVariants", (oResponse) => {
-			const { compVariants, changes, ...oRest } = oResponse;
-			return {
-				...oRest,
-				comp: {
-					variants: compVariants || [],
-					changes: changes || []
-				}
-			};
-		});
+		return loadVariantDataFromConnectors(mPropertyBag, "loadAllCompVariants");
 	};
 
 	return Storage;

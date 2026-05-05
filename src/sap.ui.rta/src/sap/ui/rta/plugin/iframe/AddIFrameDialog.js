@@ -196,6 +196,8 @@ sap.ui.define([
 			mSettings?.frameHeight,
 			mSettings?.advancedSettings
 		);
+		// Increase the size limit of the JSON model to allow more parameters for the URL builder
+		this._oJSONModel.setSizeLimit(1000);
 		this._oController = new AddIFrameDialogController(this._oJSONModel, mSettings, oAction);
 		Fragment.load({
 			name: "sap.ui.rta.plugin.iframe.AddIFrameDialog",

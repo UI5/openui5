@@ -425,6 +425,7 @@ sap.ui.define([
 		const oFormatter = this.stub().returns("My Custom Group Header Title");
 
 		this.oPlugin.setGroupHeaderFormatter(oFormatter);
+		this.oTable.getBinding().refresh();
 		await this.oTable.qunit.whenRenderingFinished();
 		this.assertRowState(aRows[1], {
 			type: "GroupHeader",
@@ -460,6 +461,9 @@ sap.ui.define([
 		sinon.assert.calledWithExactly(oFormatter.getCall(3), aRows[4].getBindingContext(), "Region");
 
 		this.oPlugin.setGroupHeaderFormatter(() => "Formatter changed");
+		await aRows[3].getBindingContext().collapse();
+		await this.oTable.qunit.whenRenderingFinished();
+		await aRows[3].getBindingContext().expand();
 		await this.oTable.qunit.whenRenderingFinished();
 		this.assertRowState(aRows[4], {
 			type: "GroupHeader",

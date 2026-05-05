@@ -220,32 +220,27 @@ sap.ui.define([
 		QUnit.test("Get - Given flex objects are present in the CompVariantState + ChangePersistence + invalidateCache is true", async function(assert) {
 			const sPersistencyKey = "persistency.key";
 			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {
-				changes: createTwoChangeDefs(),
-				comp: {
-					variants: [{
-						fileName: "variant1",
-						fileType: "variant",
-						content: {},
-						changeType: "pageVariant",
-						reference: sReference,
+				changes: createTwoChangeDefs().concat([{
+					fileName: "change12",
+					content: {
+						favorite: true
+					},
+					changeType: "updateVariant",
+					selector: {
+						variantId: "variant1",
 						persistencyKey: sPersistencyKey
-					}],
-					changes: [
-						{
-							fileName: "change12",
-							content: {
-								favorite: true
-							},
-							changeType: "updateVariant",
-							selector: {
-								variantId: "variant1",
-								persistencyKey: sPersistencyKey
-							},
-							layer: Layer.USER,
-							reference: sReference
-						}
-					]
-				}
+					},
+					layer: Layer.USER,
+					reference: sReference
+				}]),
+				compVariants: [{
+					fileName: "variant1",
+					fileType: "variant",
+					content: {},
+					changeType: "pageVariant",
+					reference: sReference,
+					persistencyKey: sPersistencyKey
+				}]
 			});
 			const aFlexObjects = await FlexObjectManager.getFlexObjects({
 				selector: this.oAppComponent,
@@ -264,32 +259,29 @@ sap.ui.define([
 		QUnit.test("Get - Given flex objects are present in the CompVariantState + ChangePersistence + invalidateCache is true and setVisible change", async function(assert) {
 			const sPersistencyKey = "persistency.key";
 			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {
-				changes: createTwoChangeDefs(),
-				comp: {
-					variants: [{
-						fileName: "variant1",
-						fileType: "variant",
-						content: {},
-						changeType: "pageVariant",
-						reference: sReference,
-						persistencyKey: sPersistencyKey
-					}],
-					changes: [
-						{
-							fileName: "change12",
-							content: {
-								visible: false
-							},
-							changeType: "updateVariant",
-							selector: {
-								variantId: "variant1",
-								persistencyKey: sPersistencyKey
-							},
-							layer: Layer.USER,
-							reference: sReference
-						}
-					]
-				}
+				changes: createTwoChangeDefs().concat([
+					{
+						fileName: "change12",
+						content: {
+							visible: false
+						},
+						changeType: "updateVariant",
+						selector: {
+							variantId: "variant1",
+							persistencyKey: sPersistencyKey
+						},
+						layer: Layer.USER,
+						reference: sReference
+					}
+				]),
+				compVariants: [{
+					fileName: "variant1",
+					fileType: "variant",
+					content: {},
+					changeType: "pageVariant",
+					reference: sReference,
+					persistencyKey: sPersistencyKey
+				}]
 			});
 			const aFlexObjects = await FlexObjectManager.getFlexObjects({
 				selector: this.oAppComponent,

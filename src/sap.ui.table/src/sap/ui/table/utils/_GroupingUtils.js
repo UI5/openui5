@@ -77,6 +77,11 @@ sap.ui.define([
 
 			if (sCurrentHierarchyMode !== sMode) {
 				TableToHierarchyModeMap.set(oTable, sMode);
+
+				for (const oRow of oTable.getRows()) {
+					oRow._refreshRowState();
+				}
+
 				oTable.invalidate();
 			}
 		},

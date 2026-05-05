@@ -89,12 +89,12 @@ sap.ui.define([
 			initialPreparationFunctionName: "uiChanges",
 			pathInResponse: ["changes"]
 		},
+		compVariants: {
+			pathInResponse: []
+		},
 		variants: {
 			initialPreparationFunctionName: "variants",
 			pathInResponse: ["variants", "variantChanges", "variantDependentControlChanges", "variantManagementChanges"]
-		},
-		comp: {
-			pathInResponse: ["comp.changes", "comp.defaultVariants", "comp.standardVariants", "comp.variants"]
 		}
 	};
 
@@ -108,11 +108,6 @@ sap.ui.define([
 
 	function prepareChangeDefinitions(sStorageResponseKey, vStorageResponsePart) {
 		var fnPreparation = {
-			comp() {
-				return Object.values(vStorageResponsePart).reduce(function(aChangeDefinitions, oChangeDefinition) {
-					return aChangeDefinitions.concat(oChangeDefinition);
-				}, []);
-			},
 			variants() {
 				return vStorageResponsePart.map(function(oVariant) {
 					var bParentVariantExists = (

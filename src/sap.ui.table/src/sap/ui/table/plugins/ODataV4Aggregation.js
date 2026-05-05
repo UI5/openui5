@@ -50,6 +50,9 @@ sap.ui.define([
 				 * property path according to <code>groupLevels</code> in {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}).
 				 * The function must return a string that is used as the title of the group header row.
 				 *
+				 * <b>Note:</b> Setting a new formatter does not immediately update the group header titles. The titles are updated at the next
+				 * binding update.
+				 *
 				 * Function signature: <code>groupHeaderFormatter(oContext: sap.ui.model.odata.v4.Context, sPropertyPath: string): string</code>
 				 *
 				 * @example

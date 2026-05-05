@@ -115,17 +115,7 @@ sap.ui.define([
 		const oTable = this.createTable();
 
 		return oTable.qunit.whenRenderingFinished().then(function() {
-			/*
-			 * During the table initialization, Table._getContexts is called twice.
-			 * Since the calls are throttled, the second call which is triggered by
-			 * TableDelegate.onBeforeRendering, cancels the initial call.
-			 *
-			 * This mechanism behaves differently when the table initalization uses
-			 * nextUIUpdate instead of Core.applyChanges. The initial call is already
-			 * executed before the second call would cancel it. Therefore the function
-			 * is called twice.
-			 */
-			assert.strictEqual(this.oGetContextsSpy.callCount, 2, "Method to get contexts called twice");
+			assert.strictEqual(this.oGetContextsSpy.callCount, 1, "Method to get contexts called once");
 			assert.ok(this.oGetContextsSpy.calledWithExactly(0, 10, 100), "The call considers the row count");
 		}.bind(this));
 	});
@@ -134,18 +124,8 @@ sap.ui.define([
 		const oTable = this.createTable(true);
 
 		return oTable.qunit.whenRenderingFinished().then(function() {
-			/*
-			 * During the table initialization, Table._getContexts is called twice.
-			 * Since the calls are throttled, the second call which is triggered by
-			 * TableDelegate.onBeforeRendering, cancels the initial call.
-			 *
-			 * This mechanism behaves differently when the table initalization uses
-			 * nextUIUpdate instead of Core.applyChanges. The initial call is already
-			 * executed before the second call would cancel it. Therefore the function
-			 * is called twice.
-			 */
 			assert.strictEqual(this.oGetContextsSpy.callCount, 2, "Method to get contexts called twice");
-			assert.ok(this.oGetContextsSpy.calledWithExactly(0, 11, 100), "The call considers the row count");
+			assert.ok(this.oGetContextsSpy.getCall(1).calledWithExactly(0, 11, 100), "The second call considers the row count");
 		}.bind(this));
 	});
 

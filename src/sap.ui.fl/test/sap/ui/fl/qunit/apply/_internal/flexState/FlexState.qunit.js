@@ -359,9 +359,7 @@ sap.ui.define([
 					appDescriptorChanges: [
 						{ appDescriptorChange: true }
 					],
-					comp: {
-						variants: [{ changeType: "variant1" }]
-					}
+					compVariants: [{ changeType: "variant1" }]
 				}
 			});
 			return FlexState.initialize({
@@ -1046,9 +1044,8 @@ sap.ui.define([
 			// The new change gets additional information from storage response (user)
 			mockLoader({
 				changes: {
-					comp: {
-						variants: [],
-						changes: [{
+					changes: [
+						{
 							fileName: "change1",
 							fileType: "change",
 							reference: sReference,
@@ -1058,10 +1055,8 @@ sap.ui.define([
 							support: {
 								user: "supportUser"
 							}
-						}],
-						defaultVariants: [],
-						standardVariants: []
-					}
+						}
+					]
 				}
 			});
 
@@ -1086,31 +1081,28 @@ sap.ui.define([
 			// Get initial comp variant changes
 			mockLoader({
 				changes: {
-					comp: {
-						variants: [],
-						changes: [{
-							fileName: "change1",
-							fileType: "change",
-							selector: {
-								persistencyKey: this.sPersistencyKey
-							},
-							support: {
-								user: "supportUser"
-							}
+					changes: [{
+						fileName: "change1",
+						fileType: "change",
+						selector: {
+							persistencyKey: this.sPersistencyKey
 						},
-						{
-							fileName: "change2",
-							fileType: "change",
-							selector: {
-								persistencyKey: this.sPersistencyKey
-							},
-							support: {
-								user: "supportUser"
-							}
-						}],
-						defaultVariants: [],
-						standardVariants: []
-					}
+						support: {
+							user: "supportUser"
+						}
+					},
+					{
+						fileName: "change2",
+						fileType: "change",
+						selector: {
+							persistencyKey: this.sPersistencyKey
+						},
+						support: {
+							user: "supportUser"
+						}
+					}],
+					defaultVariants: [],
+					standardVariants: []
 				}
 			});
 
@@ -1122,21 +1114,18 @@ sap.ui.define([
 			// Change1 is deleted (no longer in storage response)
 			mockLoader({
 				changes: {
-					comp: {
-						variants: [],
-						changes: [{
-							fileName: "change2",
-							fileType: "change",
-							selector: {
-								persistencyKey: this.sPersistencyKey
-							},
-							support: {
-								user: "supportUser"
-							}
-						}],
-						defaultVariants: [],
-						standardVariants: []
-					}
+					changes: [{
+						fileName: "change2",
+						fileType: "change",
+						selector: {
+							persistencyKey: this.sPersistencyKey
+						},
+						support: {
+							user: "supportUser"
+						}
+					}],
+					defaultVariants: [],
+					standardVariants: []
 				}
 			});
 
@@ -1159,31 +1148,28 @@ sap.ui.define([
 			// Get initial comp variant changes
 			mockLoader({
 				changes: {
-					comp: {
-						variants: [],
-						changes: [{
-							fileName: "change1",
-							fileType: "change",
-							selector: {
-								persistencyKey: this.sPersistencyKey
-							},
-							support: {
-								user: "supportUser"
-							}
+					changes: [{
+						fileName: "change1",
+						fileType: "change",
+						selector: {
+							persistencyKey: this.sPersistencyKey
 						},
-						{
-							fileName: "change2",
-							fileType: "change",
-							selector: {
-								persistencyKey: this.sPersistencyKey
-							},
-							support: {
-								user: "supportUser"
-							}
-						}],
-						defaultVariants: [],
-						standardVariants: []
-					}
+						support: {
+							user: "supportUser"
+						}
+					},
+					{
+						fileName: "change2",
+						fileType: "change",
+						selector: {
+							persistencyKey: this.sPersistencyKey
+						},
+						support: {
+							user: "supportUser"
+						}
+					}],
+					defaultVariants: [],
+					standardVariants: []
 				}
 			});
 
@@ -1372,31 +1358,28 @@ sap.ui.define([
 				// The new change is returned together with an unknown change
 				mockLoader({
 					changes: {
-						comp: {
-							variants: [],
-							changes: [{
-								fileName: "change1",
-								fileType: "change",
-								selector: {
-									persistencyKey: this.sPersistencyKey
-								},
-								support: {
-									user: "supportUser"
-								}
+						changes: [{
+							fileName: "change1",
+							fileType: "change",
+							selector: {
+								persistencyKey: this.sPersistencyKey
 							},
-							{
-								fileName: "change2",
-								fileType: "change",
-								selector: {
-									persistencyKey: this.sPersistencyKey
-								},
-								support: {
-									user: "supportUser"
-								}
-							}],
-							defaultVariants: [],
-							standardVariants: []
-						}
+							support: {
+								user: "supportUser"
+							}
+						},
+						{
+							fileName: "change2",
+							fileType: "change",
+							selector: {
+								persistencyKey: this.sPersistencyKey
+							},
+							support: {
+								user: "supportUser"
+							}
+						}],
+						defaultVariants: [],
+						standardVariants: []
 					}
 				});
 				return FlexState.reinitialize({
@@ -1834,37 +1817,35 @@ sap.ui.define([
 				reference: this.sReference,
 				componentId: this.sComponentId,
 				newData: {
-					comp: {
-						variants: [
-							{
-								fileName: "compVariant1",
-								fileType: "variant",
-								persistencyKey: "testPersistencyKey",
-								layer: Layer.USER,
-								texts: { variantName: { value: "Comp Variant 1" } },
-								reference: this.sReference,
-								support: { user: "USER" }
-							},
-							{
-								fileName: "compVariant2",
-								fileType: "variant",
-								persistencyKey: "testPersistencyKey",
-								layer: Layer.USER,
-								texts: { variantName: { value: "Comp Variant 2" } },
-								reference: this.sReference,
-								support: { user: "USER" }
-							}
-						],
-						changes: [{
-							fileName: "compChange1",
-							fileType: "change",
-							changeType: "defaultVariant",
+					compVariants: [
+						{
+							fileName: "compVariant1",
+							fileType: "variant",
+							persistencyKey: "testPersistencyKey",
 							layer: Layer.USER,
-							selector: { persistencyKey: "testPersistencyKey" },
+							texts: { variantName: { value: "Comp Variant 1" } },
 							reference: this.sReference,
-							support: {}
-						}]
-					}
+							support: { user: "USER" }
+						},
+						{
+							fileName: "compVariant2",
+							fileType: "variant",
+							persistencyKey: "testPersistencyKey",
+							layer: Layer.USER,
+							texts: { variantName: { value: "Comp Variant 2" } },
+							reference: this.sReference,
+							support: { user: "USER" }
+						}
+					],
+					changes: [{
+						fileName: "compChange1",
+						fileType: "change",
+						changeType: "defaultVariant",
+						layer: Layer.USER,
+						selector: { persistencyKey: "testPersistencyKey" },
+						reference: this.sReference,
+						support: {}
+					}]
 				}
 			});
 
@@ -1904,17 +1885,15 @@ sap.ui.define([
 				reference: this.sReference,
 				componentId: this.sComponentId,
 				newData: {
-					comp: {
-						variants: [{
-							fileName: "compVariantFirst",
-							fileType: "variant",
-							persistencyKey: "testPersistencyKey",
-							layer: Layer.USER,
-							texts: { variantName: { value: "First" } },
-							reference: this.sReference,
-							support: { user: "USER" }
-						}]
-					}
+					compVariants: [{
+						fileName: "compVariantFirst",
+						fileType: "variant",
+						persistencyKey: "testPersistencyKey",
+						layer: Layer.USER,
+						texts: { variantName: { value: "First" } },
+						reference: this.sReference,
+						support: { user: "USER" }
+					}]
 				}
 			});
 
@@ -1930,28 +1909,26 @@ sap.ui.define([
 				reference: this.sReference,
 				componentId: this.sComponentId,
 				newData: {
-					comp: {
-						variants: [
-							{
-								fileName: "compVariantFirst",
-								fileType: "variant",
-								persistencyKey: "testPersistencyKey",
-								layer: Layer.USER,
-								texts: { variantName: { value: "First" } },
-								reference: this.sReference,
-								support: { user: "USER" }
-							},
-							{
-								fileName: "compVariantSecond",
-								fileType: "variant",
-								persistencyKey: "testPersistencyKey",
-								layer: Layer.USER,
-								texts: { variantName: { value: "Second" } },
-								reference: this.sReference,
-								support: { user: "USER" }
-							}
-						]
-					}
+					compVariants: [
+						{
+							fileName: "compVariantFirst",
+							fileType: "variant",
+							persistencyKey: "testPersistencyKey",
+							layer: Layer.USER,
+							texts: { variantName: { value: "First" } },
+							reference: this.sReference,
+							support: { user: "USER" }
+						},
+						{
+							fileName: "compVariantSecond",
+							fileType: "variant",
+							persistencyKey: "testPersistencyKey",
+							layer: Layer.USER,
+							texts: { variantName: { value: "Second" } },
+							reference: this.sReference,
+							support: { user: "USER" }
+						}
+					]
 				}
 			});
 
