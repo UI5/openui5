@@ -574,30 +574,26 @@ sap.ui.define([
 			assert.ok(oErrorSpy.notCalled, "no error was logged during condensing");
 		});
 
-		// TODO: Currently the revert data in cases like these is not correctly set. todos#16
-		// This causes issues e.g. when switching variants after condensing, as the revert then does not work correctly.
-		// Once fixed, the tests below can be re-enabled.
-		// QUnit.test("move to another group, then back in a different position", async function(assert) {
-		// 	// Field "Name" is moved from first to second group, then back to first group
-		// 	// [Name, Victim, Code] and [Flexibility, Button35]
-		// 	// -> [Name, Code] and [Victim, Flexibility, Button35]
-		// 	// -> [Name, Code, Victim] and [Flexibility, Button35]
-		// 	await loadApplyCondenseChanges.call(this, "moveToAnotherGroupThenBack.json", 2, 1, assert);
-		// 	const oChangeContent = this.aChanges[0].getContent();
-		// 	assert.strictEqual(oChangeContent.target.selector.id, "idMain1--GeneralLedgerDocument", "the target selector is correct");
-		// 	assert.strictEqual(oChangeContent.movedElements[0].targetIndex, 2, "the target index is correct");
-		// });
+		QUnit.test("move to another group, then back in a different position", async function(assert) {
+			// Field "Name" is moved from first to second group, then back to first group
+			// [Name, Victim, Code] and [Flexibility, Button35]
+			// -> [Name, Code] and [Victim, Flexibility, Button35]
+			// -> [Name, Code, Victim] and [Flexibility, Button35]
+			await loadApplyCondenseChanges.call(this, "moveToAnotherGroupThenBack.json", 2, 1, assert);
+			const oChangeContent = this.aChanges[0].getContent();
+			assert.strictEqual(oChangeContent.target.selector.id, "idMain1--GeneralLedgerDocument", "the target selector is correct");
+			assert.strictEqual(oChangeContent.movedElements[0].targetIndex, 2, "the target index is correct");
+		});
 
-		// QUnit.test("move from one group to another, then move within one group", async function(assert) {
-		// 	// All moves are expected to be condensed into one move to another group
-		// 	// [Name, Victim, Code] and [Flexibility, Button35]
-		// 	// -> [Name, Code] and [Flexibility, Button35, Victim]
-		// 	// -> [Name, Code] and [Flexibility, Victim, Button35]
-		// 	await loadApplyCondenseChanges.call(this, "moveToAnotherGroupThenWithinGroup.json", 2, 1, assert);
-		// 	const oChangeContent = this.aChanges[0].getContent();
-		// 	assert.strictEqual(oChangeContent.source.selector.id, "idMain1--GeneralLedgerDocument", "the source selector is correct");
-		// 	assert.strictEqual(oChangeContent.target.selector.id, "idMain1--Dates", "the target selector is correct");
-		// });
+		QUnit.test("move from one group to another, then move within one group", async function(assert) {
+			// All moves are expected to be condensed into one move to another group
+			// [Name, Victim, Code] and [Flexibility, Button35]
+			// -> [Name, Code] and [Flexibility, Button35, Victim]
+			// -> [Name, Code] and [Flexibility, Victim, Button35]
+			await loadApplyCondenseChanges.call(this, "moveToAnotherGroupThenWithinGroup.json", 2, 1, assert);
+			const oChangeContent = this.aChanges[0].getContent();
+			assert.strictEqual(oChangeContent.target.selector.id, "idMain1--Dates", "the target selector is correct");
+		});
 
 		QUnit.test("move twice within one group, then to another group", async function(assert) {
 			// All moves are expected to be condensed into one move to another group
