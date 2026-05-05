@@ -15,8 +15,8 @@
 
 .sapUiMdcTokenizerDisplay.sapMTokenizer.sapMTokenizerReadonly .sapMToken {
 	padding-left: 0; /* remove left padding of a token. The right padding will be used to show the delimiters */
-	padding-top: 0.125rem;
-	padding-bottom: 0.125rem;
+	padding-top: 0;
+	padding-bottom: 0;
 
 	/* right margin and padding of the token (space for the delimiter) */
 	padding-right: 0.375rem;
@@ -38,8 +38,9 @@
 		margin-right: 0.5rem;
 	}
 
-	.sapUiForm:not(.sapUiFormEdit) .sapUiMdcTokenizerDisplay.sapMTokenizer.sapMTokenizerReadonly .sapMToken {
-		padding-top: 0;
+	.sapUiFormEdit .sapUiMdcTokenizerDisplay.sapMTokenizer.sapMTokenizerReadonly .sapMToken {
+		padding-top: 0.25rem;
+		padding-bottom: 0.25rem;
 	}
 }
 
@@ -82,10 +83,6 @@ html.sap-desktop .sapUiMdcTokenizerDisplay .sapMToken:hover {
 	border: 0;
 }
 
-.sapUiSizeCompact .sapUiMdcTokenizerDisplay.sapMTokenizer .sapMToken {
-	font-size: @sapMFontMediumSize;
-}
-
 .sapUiMdcTokenizerDisplay .sapMTokenText {
 	/* enable selection of scrollcontainer */
     user-select: text;
@@ -96,7 +93,13 @@ html.sap-desktop .sapUiMdcTokenizerDisplay .sapMToken:hover {
 	line-height: @mdctoken-large-line-height;
 }
 
-.sapUiSizeCompact .sapUiForm .sapUiMdcTokenizerDisplay.sapMTokenizer .sapMToken {
-	padding-top: 0.0625rem;
-	padding-bottom: 0.0625rem;
+.sapUiSizeCompact {
+	.sapUiMdcTokenizerDisplay.sapMTokenizer .sapMToken {
+		font-size: @sapMFontMediumSize; /* as set to Small in Tokenizer*/
+	}
+
+	.sapUiForm .sapUiMdcTokenizerDisplay.sapMTokenizer .sapMToken {
+		padding-top: 0.0625rem;
+		padding-bottom: 0.0625rem;
+	}
 }
