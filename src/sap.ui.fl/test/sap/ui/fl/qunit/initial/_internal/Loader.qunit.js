@@ -1033,19 +1033,38 @@ sap.ui.define([
 	QUnit.module("misc", {
 		beforeEach() {
 			this.oFlexDataResponse = {
-				appDescriptorChanges: [{ changeType: "changeType", fileName: "appDescriptorChange1" }, { changeType: "changeType", fileName: "appDescriptorChange$" }],
-				annotationChanges: [{ changeType: "changeType", fileName: "annotationChange1" }, { changeType: "changeType", fileName: "annotationChange%" }],
-				changes: [{ changeType: "changeType", fileName: "change1" }, { changeType: "changeType", fileName: "change&" }],
-				comp: {
-					variants: [{ changeType: "changeType", fileName: "variant1" }, { changeType: "changeType", fileName: "variant@" }],
-					changes: [{ changeType: "changeType", fileName: "compChange1" }, { changeType: "changeType", fileName: "compChange#" }],
-					defaultVariants: [{ changeType: "changeType", fileName: "defaultVariant1" }, { changeType: "changeType", fileName: "defaultVariant$" }],
-					standardVariants: [{ changeType: "changeType", fileName: "standardVariant1" }, { changeType: "changeType", fileName: "standardVariant%" }]
-				},
-				variants: [{ changeType: "changeType", fileName: "variant1" }, { changeType: "changeType", fileName: "variant@" }],
-				variantChanges: [{ changeType: "changeType", fileName: "variantChange1" }, { changeType: "changeType", fileName: "variantChange#" }],
-				variantDependentControlChanges: [{ changeType: "changeType", fileName: "varDepControlChange1" }, { changeType: "changeType", fileName: "varDepControlChange$" }],
-				variantManagementChanges: [{ changeType: "changeType", fileName: "variantManagementChange1" }, { changeType: "changeType", fileName: "variantManagementChange%" }]
+				appDescriptorChanges: [
+					{ changeType: "changeType", fileName: "appDescriptorChange1" },
+					{ changeType: "changeType", fileName: "appDescriptorChange$" }
+				],
+				annotationChanges: [
+					{ changeType: "changeType", fileName: "annotationChange1" },
+					{ changeType: "changeType", fileName: "annotationChange%" }
+				],
+				changes: [
+					{ changeType: "changeType", fileName: "change1" },
+					{ changeType: "changeType", fileName: "change&" }
+				],
+				compVariants: [
+					{ changeType: "changeType", fileName: "variant1" },
+					{ changeType: "changeType", fileName: "variant@" }
+				],
+				variants: [
+					{ changeType: "changeType", fileName: "variant1" },
+					{ changeType: "changeType", fileName: "variant@" }
+				],
+				variantChanges: [
+					{ changeType: "changeType", fileName: "variantChange1" },
+					{ changeType: "changeType", fileName: "variantChange#" }
+				],
+				variantDependentControlChanges: [
+					{ changeType: "changeType", fileName: "varDepControlChange1" },
+					{ changeType: "changeType", fileName: "varDepControlChange$" }
+				],
+				variantManagementChanges: [
+					{ changeType: "changeType", fileName: "variantManagementChange1" },
+					{ changeType: "changeType", fileName: "variantManagementChange%" }
+				]
 			};
 			this.oLoadFlexDataStub = sandbox.stub(Storage, "loadFlexData").resolves(this.oFlexDataResponse);
 			sandbox.stub(ManifestUtils, "getBaseComponentNameFromManifest").returns("baseName");
@@ -1074,9 +1093,7 @@ sap.ui.define([
 			assert.strictEqual(oResult.data.changes.appDescriptorChanges.length, 1, "the appDescriptorChanges are filtered");
 			assert.strictEqual(oResult.data.changes.annotationChanges.length, 1, "the annotationChanges are filtered");
 			assert.strictEqual(oResult.data.changes.changes.length, 1, "the changes are filtered");
-			assert.strictEqual(oResult.data.changes.comp.changes.length, 1, "the comp.changes are filtered");
-			assert.strictEqual(oResult.data.changes.comp.defaultVariants.length, 1, "the comp.defaultVariants are filtered");
-			assert.strictEqual(oResult.data.changes.comp.standardVariants.length, 1, "the comp.standardVariants are filtered");
+			assert.strictEqual(oResult.data.changes.compVariants.length, 1, "the compVariants are filtered");
 			assert.strictEqual(oResult.data.changes.variants.length, 1, "the variants are filtered");
 			assert.strictEqual(oResult.data.changes.variantChanges.length, 1, "the variantChanges are filtered");
 			assert.strictEqual(oResult.data.changes.variantDependentControlChanges.length, 1, "the variantDependentControlChanges are filtered");
@@ -1106,9 +1123,7 @@ sap.ui.define([
 			assert.strictEqual(oResult.data.changes.appDescriptorChanges.length, 0, "the appDescriptorChanges are filtered");
 			assert.strictEqual(oResult.data.changes.annotationChanges.length, 0, "the annotationChanges are filtered");
 			assert.strictEqual(oResult.data.changes.changes.length, 0, "the changes are filtered");
-			assert.strictEqual(oResult.data.changes.comp.changes.length, 0, "the comp.changes are filtered");
-			assert.strictEqual(oResult.data.changes.comp.defaultVariants.length, 1, "the comp.defaultVariants are filtered");
-			assert.strictEqual(oResult.data.changes.comp.standardVariants.length, 1, "the comp.standardVariants are filtered");
+			assert.strictEqual(oResult.data.changes.compVariants.length, 1, "the compVariants are filtered");
 			assert.strictEqual(oResult.data.changes.variants.length, 1, "the variants are filtered");
 			assert.strictEqual(oResult.data.changes.variantChanges.length, 0, "the variantChanges are filtered");
 			assert.strictEqual(oResult.data.changes.variantDependentControlChanges.length, 1, "the variantDependentControlChanges are filtered");
@@ -1199,8 +1214,9 @@ sap.ui.define([
 			// Step 1: add some changes to the cache
 			Loader.updateCachedResponse(sReference, aUpdates);
 			const oCachedData = Loader.getCachedFlexData(sReference).data.changes;
-			assert.strictEqual(oCachedData.changes.length, 1, "one UI change is stored");
+			assert.strictEqual(oCachedData.changes.length, 2, "two UI changes are stored");
 			assert.strictEqual(oCachedData.changes[0].fileName, "uiChange1", "the UI change is stored");
+			assert.strictEqual(oCachedData.changes[1].fileName, "uiChange5", "the comp change is stored");
 			assert.strictEqual(oCachedData.variantDependentControlChanges.length, 1, "one variant dependent UI change is stored");
 			assert.strictEqual(oCachedData.variantDependentControlChanges[0].fileName, "uiChange2", "the variant dependent UI change is stored");
 			assert.strictEqual(oCachedData.variantChanges.length, 1, "one variant change is stored");
@@ -1209,10 +1225,8 @@ sap.ui.define([
 			assert.strictEqual(oCachedData.variantManagementChanges[0].fileName, "uiChange4", "the variant management change is stored");
 			assert.strictEqual(oCachedData.variants.length, 1, "one FL variant is stored");
 			assert.strictEqual(oCachedData.variants[0].fileName, "flVariant1", "the FL variant is stored");
-			assert.strictEqual(oCachedData.comp.variants.length, 1, "one comp variant is stored");
-			assert.strictEqual(oCachedData.comp.variants[0].fileName, "compVariant1", "the comp variant is stored");
-			assert.strictEqual(oCachedData.comp.changes.length, 1, "one comp change is stored");
-			assert.strictEqual(oCachedData.comp.changes[0].fileName, "uiChange5", "the comp change is stored");
+			assert.strictEqual(oCachedData.compVariants.length, 1, "one comp variant is stored");
+			assert.strictEqual(oCachedData.compVariants[0].fileName, "compVariant1", "the comp variant is stored");
 			assert.strictEqual(oCachedData.appDescriptorChanges.length, 1, "one manifest change is stored");
 			assert.strictEqual(oCachedData.appDescriptorChanges[0].fileName, "manifestChange1", "the manifest change is stored");
 			assert.strictEqual(oCachedData.annotationChanges.length, 1, "one annotation change is stored");
@@ -1243,15 +1257,14 @@ sap.ui.define([
 			});
 			Loader.updateCachedResponse(sReference, aSecondUpdates);
 			const oCachedData2 = Loader.getCachedFlexData(sReference).data.changes;
-			assert.strictEqual(oCachedData2.changes.length, 0, "the UI change is deleted");
+			assert.strictEqual(oCachedData2.changes.length, 1, "the comp change is updated, the other UI change is deleted");
+			assert.strictEqual(oCachedData2.changes[0].fileName, "uiChange5", "the comp change is updated");
+			assert.strictEqual(oCachedData2.changes[0].selector.persistencyKey, "bar", "the comp change persistencyKey is updated");
 			assert.strictEqual(oCachedData2.variantDependentControlChanges.length, 0, "the variant dependent UI change is deleted");
 			assert.strictEqual(oCachedData2.variantChanges.length, 0, "the variant change is deleted");
 			assert.strictEqual(oCachedData2.variantManagementChanges.length, 0, "the variant management change is deleted");
 			assert.strictEqual(oCachedData2.variants.length, 1, "the FL variant is still stored");
-			assert.strictEqual(oCachedData2.comp.variants.length, 1, "the comp variant is still stored");
-			assert.strictEqual(oCachedData2.comp.changes.length, 1, "the comp change is updated");
-			assert.strictEqual(oCachedData2.comp.changes[0].fileName, "uiChange5", "the comp change is updated");
-			assert.strictEqual(oCachedData2.comp.changes[0].selector.persistencyKey, "bar", "the comp change persistencyKey is updated");
+			assert.strictEqual(oCachedData2.compVariants.length, 1, "the comp variant is still stored");
 			assert.strictEqual(oCachedData2.appDescriptorChanges.length, 1, "the manifest change is still stored");
 			assert.strictEqual(oCachedData2.annotationChanges.length, 1, "the annotation change is still stored");
 			assert.strictEqual(oCachedData2.ui2personalization, "newData2", "the ui2 data is updated");

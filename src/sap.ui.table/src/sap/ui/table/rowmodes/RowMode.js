@@ -48,6 +48,13 @@ sap.ui.define([
 		 */
 		_private(this).bNoDataDisabled = false;
 
+		/*
+		 * Flag indicating whether the binding contexts of the rows need to be updated.
+		 *
+		 * @type {boolean}
+		 */
+		_private(this).bContextsUpdateRequired = true;
+
 		/**
 		 * Updates the table asynchronously according to the current computed row count.
 		 *
@@ -301,6 +308,7 @@ sap.ui.define([
 	RowMode.prototype._onTableRowsUnbound = function() {
 		clearTimeout(this.getTable()._mTimeouts.refreshRowsCreateRows);
 		_private(this).updateTableAsync.cancel();
+		_private(this).bContextsUpdateRequired = true;
 		this.updateTable(TableUtils.RowsUpdateReason.Unbind);
 	};
 
@@ -313,6 +321,7 @@ sap.ui.define([
 	RowMode.prototype._onTableUpdateRows = function(sReason) {
 		const oTable = this.getTable();
 
+		_private(this).bContextsUpdateRequired = true;
 		clearTimeout(oTable._mTimeouts.refreshRowsCreateRows);
 		if (sReason === TableUtils.RowsUpdateReason.VerticalScroll || sReason === TableUtils.RowsUpdateReason.FirstVisibleRowChange) {
 			_private(this).updateTableAsync(sReason);
@@ -538,6 +547,7 @@ sap.ui.define([
 		// Destroy rows if they are invalid, but keep the DOM in case the table is going to render.
 		// Becomes obsolete with CPOUIFTEAMB-1379
 		if (oTable._bRowAggregationInvalid) {
+			_private(this).bContextsUpdateRequired = true;
 			oTable.destroyAggregation("rows", oTable._bInvalid ? "KeepDom" : undefined);
 			aRows = [];
 		}
@@ -551,6 +561,7 @@ sap.ui.define([
 			oSyncExtension.syncRowCount(iNewNumberOfRows);
 		});
 
+		_private(this).bContextsUpdateRequired = true;
 		updateRowsAggregation(this, iNewNumberOfRows);
 		oTable._bRowAggregationInvalid = false;
 	};
@@ -678,9 +689,11 @@ sap.ui.define([
 	function updateBindingContextsOfRows(oMode, aRows) {
 		const oTable = oMode.getTable();
 
-		if (!oTable || aRows.length === 0) {
+		if (!oTable || aRows.length === 0 || !_private(oMode).bContextsUpdateRequired) {
 			return;
 		}
+
+		_private(oMode).bContextsUpdateRequired = false;
 
 		const aContexts = oMode.getRowContexts(aRows.length);
 

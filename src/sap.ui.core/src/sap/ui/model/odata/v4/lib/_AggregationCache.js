@@ -592,6 +592,8 @@ sap.ui.define([
 		if (this.oAggregation.createInPlace) {
 			return oPromise.then(async () => {
 				_Helper.removeByPath(this.mPostRequests, sTransientPredicate, oEntityData);
+				_Helper.updateTransientPaths(this.mChangeListeners, sTransientPredicate,
+					_Helper.getPrivateAnnotation(oEntityData, "predicate"));
 				delete oEntityData["@$ui5.context.isTransient"];
 				const [iRank] = await Promise.all([
 					this.requestRank(oEntityData, oGroupLock),
@@ -614,8 +616,9 @@ sap.ui.define([
 
 		return oPromise.then(() => {
 			_Helper.removeByPath(this.mPostRequests, sTransientPredicate, oEntityData);
-			aElements.$byPredicate[_Helper.getPrivateAnnotation(oEntityData, "predicate")]
-				= oEntityData;
+			const sPredicate = _Helper.getPrivateAnnotation(oEntityData, "predicate");
+			aElements.$byPredicate[sPredicate] = oEntityData;
+			_Helper.updateTransientPaths(this.mChangeListeners, sTransientPredicate, sPredicate);
 			if (!this.oAggregation.hierarchyQualifier) {
 				return oEntityData;
 			}

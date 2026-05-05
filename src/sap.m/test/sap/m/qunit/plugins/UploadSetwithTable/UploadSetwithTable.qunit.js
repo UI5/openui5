@@ -1631,6 +1631,10 @@ sap.ui.define([
 		const afterDialogOpen = function (oEvent) {
 			oDialog = oEvent.getSource();
 			assert.ok(oDialog?.isOpen(), "File preview dialog is opened with the selected file");
+
+			const oTitleControl = oDialog?.getCustomHeader()?.getContentLeft()[0];
+			assert.strictEqual(oTitleControl?.getDomRef()?.tagName, "H1", "Dialog title is rendered as an H1 element");
+
 			oDialog?.getButtons()[1].firePress();
 			assert.ok(oUploadSetwithTablePluginCarouselPlugin.calledOnce, "DestroyPages is called");
 			assert.strictEqual(oDialog.getContentWidth(), "100%", "FilePreviewDialog dialog contentWidth is set to 100% by default");
@@ -1646,8 +1650,8 @@ sap.ui.define([
 		});
 	});
 
-	// test case to check if associated file preview dialog is opened on file selection
-	QUnit.test("File Preview Dialog opens on file selection", async function (assert) {
+	// test case to check if image-scale style class is applied on image files in file preview dialog
+	QUnit.test("File Preview Dialog applies image-scale style class for image files", async function (assert) {
 		const done = assert.async();
 		var oUploadSetwithTablePluginCarouselPlugin;
 		/**

@@ -1742,11 +1742,14 @@ function(
 			}
 		}
 
-		// set reset buttons state the global reset
-		this._checkResetStatus();
-
 		// fire the reset event. It can be used to set the state of custom tabs.
 		this.fireReset();
+
+		// update the list selections to reflect any changes made in the reset event handler
+		this._updateListSelections();
+
+		// set reset buttons state the global reset
+		this._checkResetStatus();
 
 		//Announce to the screen reader that filters are reset
 		this._oInvisibleMessage.announce(this._rb.getText("VIEWSETTINGS_RESET_BUTTON_ACTION"), InvisibleMessageMode.Assertive);

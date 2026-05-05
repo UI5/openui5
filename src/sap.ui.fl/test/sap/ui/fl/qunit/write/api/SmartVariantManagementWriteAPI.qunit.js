@@ -376,30 +376,23 @@ sap.ui.define([
 				}];
 				sandbox.stub(InitialStorage, "loadFlexData").resolves({
 					...StorageUtils.getEmptyFlexDataResponse(),
-					changes: [],
-					comp: {
-						compVariants: [],
-						variants: [{
-							fileName: "flex_variant_1",
-							fileType: "variant",
-							name: "F Variant",
-							reference: sReference,
-							layer: Layer.VENDOR,
-							content: {},
-							favorite: true,
-							selector: {
-								persistencyKey: sPersistencyKey
-							},
-							texts: {
-								variantName: {
-									value: "A variant"
-								}
+					compVariants: [{
+						fileName: "flex_variant_1",
+						fileType: "variant",
+						name: "F Variant",
+						reference: sReference,
+						layer: Layer.VENDOR,
+						content: {},
+						favorite: true,
+						selector: {
+							persistencyKey: sPersistencyKey
+						},
+						texts: {
+							variantName: {
+								value: "A variant"
 							}
-						}],
-						changes: [],
-						standardVariants: [],
-						defaultVariants: []
-					}
+						}
+					}]
 				});
 
 				await SmartVariantManagementApplyAPI.loadVariants({
@@ -677,31 +670,23 @@ sap.ui.define([
 				}];
 				sandbox.stub(InitialStorage, "loadFlexData").resolves({
 					...StorageUtils.getEmptyFlexDataResponse(),
-					changes: [],
-					comp: {
-						compVariants: [],
-						variants: [{
-							fileName: "flex_variant_1",
-							name: "F Variant",
-							fileType: "variant",
-							reference: sReference,
-							layer: Layer.VENDOR,
-							content: {},
-							favorite: true,
-							selector: {
-								persistencyKey: sPersistencyKey
-							},
-							texts: {
-								variantName: {
-									value: "A variant"
-								}
+					compVariants: [{
+						fileName: "flex_variant_1",
+						name: "F Variant",
+						fileType: "variant",
+						reference: sReference,
+						layer: Layer.VENDOR,
+						content: {},
+						favorite: true,
+						selector: {
+							persistencyKey: sPersistencyKey
+						},
+						texts: {
+							variantName: {
+								value: "A variant"
 							}
-						}],
-						changes: [],
-						standardVariants: [],
-						defaultVariants: []
-					},
-					settings: {}
+						}
+					}]
 				});
 
 				sandbox.stub(ContextBasedAdaptationsAPI, "hasAdaptationsModel").returns(true);
@@ -765,31 +750,24 @@ sap.ui.define([
 
 				sandbox.stub(InitialStorage, "loadFlexData").resolves({
 					...StorageUtils.getEmptyFlexDataResponse(),
-					changes: [],
-					comp: {
-						compVariants: [],
-						variants: [{
-							fileName: "flex_variant_1",
-							fileType: "variant",
-							name: "F Variant",
-							reference: sReference,
-							layer: Layer.VENDOR,
-							packageName: oTestData.packageName,
-							content: {},
-							favorite: true,
-							selector: {
-								persistencyKey: sPersistencyKey
-							},
-							texts: {
-								variantName: {
-									value: "A variant"
-								}
+					compVariants: [{
+						fileName: "flex_variant_1",
+						fileType: "variant",
+						name: "F Variant",
+						reference: sReference,
+						layer: Layer.VENDOR,
+						packageName: oTestData.packageName,
+						content: {},
+						favorite: true,
+						selector: {
+							persistencyKey: sPersistencyKey
+						},
+						texts: {
+							variantName: {
+								value: "A variant"
 							}
-						}],
-						changes: [],
-						standardVariants: [],
-						defaultVariants: []
-					}
+						}
+					}]
 				});
 				sandbox.stub(Settings, "getInstanceOrUndef").returns({
 					getIsVersioningEnabled() {
@@ -1094,14 +1072,7 @@ sap.ui.define([
 				testData.propertyBag.control = oControl;
 				sandbox.stub(InitialStorage, "loadFlexData").resolves({
 					...StorageUtils.getEmptyFlexDataResponse(),
-					changes: [],
-					comp: {
-						variants: [testData.mockedVariant],
-						changes: [],
-						standardVariants: [],
-						defaultVariants: []
-					},
-					settings: {}
+					compVariants: [testData.mockedVariant]
 				});
 
 				return FlexState.initialize({
@@ -1273,29 +1244,23 @@ sap.ui.define([
 			};
 			sandbox.stub(InitialStorage, "loadFlexData").resolves({
 				...StorageUtils.getEmptyFlexDataResponse(),
-				changes: [],
-				comp: {
-					variants: [{
-						fileName: "test_variant",
-						reference: sReference,
-						fileType: "variant",
-						selector: {
-							persistencyKey: sPersistencyKey
-						},
-						content: {
-							executeOnSelection: true,
-							favorite: false
-						},
-						texts: {
-							variantName: {
-								value: ""
-							}
+				compVariants: [{
+					fileName: "test_variant",
+					reference: sReference,
+					fileType: "variant",
+					selector: {
+						persistencyKey: sPersistencyKey
+					},
+					content: {
+						executeOnSelection: true,
+						favorite: false
+					},
+					texts: {
+						variantName: {
+							value: ""
 						}
-					}],
-					changes: [],
-					standardVariants: [],
-					defaultVariants: []
-				}
+					}
+				}]
 			});
 
 			await FlexState.initialize({
@@ -1339,30 +1304,24 @@ sap.ui.define([
 			};
 			sandbox.stub(InitialStorage, "loadFlexData").resolves({
 				...StorageUtils.getEmptyFlexDataResponse(),
-				changes: [],
-				comp: {
-					variants: [{
-						adaptationId: "id12345_123",
-						fileName: "test_variant",
-						reference: sReference,
-						fileType: "variant",
-						selector: {
-							persistencyKey: sPersistencyKey
-						},
-						content: {
-							executeOnSelection: true,
-							favorite: false
-						},
-						texts: {
-							variantName: {
-								value: ""
-							}
+				compVariants: [{
+					adaptationId: "id12345_123",
+					fileName: "test_variant",
+					reference: sReference,
+					fileType: "variant",
+					selector: {
+						persistencyKey: sPersistencyKey
+					},
+					content: {
+						executeOnSelection: true,
+						favorite: false
+					},
+					texts: {
+						variantName: {
+							value: ""
 						}
-					}],
-					changes: [],
-					standardVariants: [],
-					defaultVariants: []
-				}
+					}
+				}]
 			});
 
 			sandbox.stub(ContextBasedAdaptationsAPI, "hasAdaptationsModel").returns(true);

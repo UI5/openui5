@@ -1054,46 +1054,6 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("Disassemble & merge the comp variants", {
-		afterEach() {
-			cleanUp();
-		}
-	}, function() {
-		QUnit.test("Given the first connector provide a comp variant in the changes and the second provides a comp section with a variant", function(assert) {
-			const oResponse1 = StorageUtils.getEmptyFlexDataResponse();
-			delete oResponse1.comp; // simulate legacy response
-			const oVariant1 = {
-				fileName: "variant1",
-				fileType: "variant",
-				layer: Layer.CUSTOMER,
-				creation: "2019-07-22T10:33:19.7491090Z"
-			};
-			oResponse1.changes.push(oVariant1);
-			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(oResponse1);
-			const oResponse2 = StorageUtils.getEmptyFlexDataResponse();
-			const oVariant2 = {
-				fileName: "variant2",
-				fileType: "variant",
-				layer: Layer.CUSTOMER,
-				creation: "2019-07-22T10:34:19.7491091Z"
-			};
-			oResponse2.comp = {
-				variants: [oVariant2]
-			};
-
-			sandbox.stub(LrepConnector, "loadFlexData").resolves(oResponse2);
-
-			const oExpectedResponse = merge({}, StorageUtils.getEmptyFlexDataResponse(), {
-				comp: {
-					variants: [oVariant1, oVariant2]
-				}
-			});
-			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
-				assert.deepEqual(oResult, merge(oExpectedResponse, { cacheKey: null }), "then the expected result is returned");
-			});
-		});
-	});
-
 	QUnit.module("Storage with a custom & broken connector", {
 		beforeEach() {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([{
@@ -1275,14 +1235,9 @@ sap.ui.define([
 				reference: sFlexReference, persistencyKey: "persistencyKey1"
 			});
 			assert.deepEqual(
-				oResult.comp.variants,
+				oResult.compVariants,
 				[{ fileName: "compVariant1" }, { fileName: "compVariant2" }],
 				"the comp variants are correct"
-			);
-			assert.deepEqual(
-				oResult.comp.changes,
-				[{ fileName: "compChange1" }],
-				"the comp changes are correct"
 			);
 			assert.ok(
 				BtpServiceConnector.loadAllCompVariants.calledOnce,

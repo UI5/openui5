@@ -1036,6 +1036,7 @@ sap.ui.define([
 		/**
 		 * Sets the row states and invalidates the table. The row states are applied in the order in which they are provided. The row states are
 		 * reset if no row states are provided.
+		 * Only works in combination with client models.
 		 *
 		 * @param {object[]} [aRowStates] The row states to set.
 		 * @returns {Promise} A promise that resolves after the rendering of the table is finished.
@@ -1045,31 +1046,23 @@ sap.ui.define([
 				if (!oTable.qunit._mSetRowStates) {
 					oTable.qunit._mSetRowStates = {
 						updateRowState: function(oState) {
-							const iIndex = oTable.getFirstVisibleRow() + oTable.qunit._mSetRowStates.currentIndex;
-							Object.assign(oState, oTable.qunit._mSetRowStates.rowStates[iIndex]);
-							oTable.qunit._mSetRowStates.currentIndex++;
-						},
-						resetCounter: function() {
-							oTable.qunit._mSetRowStates.currentIndex = 0;
-						},
-						onBeforeRendering: function() {
-							this.resetCounter();
-						},
-						currentIndex: 0
+							const oBinding = oTable.getBinding();
+							const iDataIndex = oBinding?.getContexts(0, oBinding.getLength()).indexOf(oState.context);
+
+							if (iDataIndex >= 0) {
+								Object.assign(oState, oTable.qunit._mSetRowStates.rowStates[iDataIndex]);
+							}
+						}
 					};
-					oTable.attachRowsUpdated(oTable.qunit._mSetRowStates.resetCounter);
-					oTable.addDelegate(oTable.qunit._mSetRowStates, true, oTable.qunit._mSetRowStates);
 					TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Row.UpdateState, oTable.qunit._mSetRowStates.updateRowState);
 				}
 				oTable.qunit._mSetRowStates.rowStates = aRowStates;
 			} else if (oTable.qunit._mSetRowStates) {
-				oTable.detachRowsUpdated(oTable.qunit._mSetRowStates.resetCounter);
-				oTable.removeEventDelegate(oTable.qunit._mSetRowStates);
 				TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Row.UpdateState, oTable.qunit._mSetRowStates.updateRowState);
 				delete oTable.qunit._mSetRowStates;
 			}
 
-			oTable.invalidate();
+			oTable.getBinding().refresh(true);
 			return oTable.qunit.whenRenderingFinished();
 		};
 	}

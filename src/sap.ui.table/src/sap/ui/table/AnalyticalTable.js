@@ -475,6 +475,13 @@ sap.ui.define([
 		}
 	};
 
+	AnalyticalTable.prototype.onBeforeRendering = function() {
+		Table.prototype.onBeforeRendering.apply(this, arguments);
+
+		// Bypass the optimization in RowMode to avoid regressions. Identified by integration tests of the ODataV2 model (missing request).
+		this._getRowContexts();
+	};
+
 	AnalyticalTable.prototype.refreshRows = function() {
 		Table.prototype.refreshRows.apply(this, arguments);
 		// make sure we have a sum row displayed if necessary

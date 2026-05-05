@@ -31,20 +31,6 @@ function(
 		return aFlexObjects;
 	}
 
-	function isInitialCompSection(oCompSection) {
-		var bInitial = true;
-
-		if (oCompSection) {
-			Object.keys(oCompSection).some(function(sKey) {
-				if (oCompSection[sKey].length) {
-					bInitial = false;
-					return true;
-				}
-			});
-		}
-		return bInitial;
-	}
-
 	/**
 	 * @name sap.ui.fl.initial._internal.storageResultDisassemble
 	 * @function
@@ -78,52 +64,6 @@ function(
 			delete oResponse.variantSection;
 			merge(aDisassembleResponses[0] || {}, oResponse);
 			return aDisassembleResponses;
-		}
-
-		if (isInitialCompSection(oResponse.comp)) {
-			aFlexObjects = oResponse.changes || [];
-			oResponse.comp = {
-				variants: [],
-				changes: [],
-				defaultVariants: [],
-				standardVariants: []
-			};
-
-			// loop over a copy in reverse order to handle deletions accordingly
-			aFlexObjects.slice().reverse().forEach(function(oFlexObject, nIndex, aArray) {
-				var bMoved = false;
-				if (oFlexObject.fileType === "variant") {
-					oResponse.comp.variants.unshift(oFlexObject);
-					bMoved = true;
-				} else {
-					switch (oFlexObject.changeType) {
-						case "addFavorite":
-						case "removeFavorite":
-						case "updateVariant":
-							oResponse.comp.changes.unshift(oFlexObject);
-							bMoved = true;
-
-							break;
-						case "defaultVariant":
-							oResponse.comp.defaultVariants.unshift(oFlexObject);
-							bMoved = true;
-							break;
-						case "standardVariant":
-							oResponse.comp.standardVariants.unshift(oFlexObject);
-							bMoved = true;
-							break;
-						default:
-							// normal UI change which should not be part of the comp section
-							break;
-					}
-				}
-
-				// remove in original by reverse the index
-				if (bMoved) {
-					var nIndexInOriginal = aArray.length - 1 - nIndex;
-					oResponse.changes.splice(nIndexInOriginal, 1);
-				}
-			});
 		}
 
 		return [oResponse];

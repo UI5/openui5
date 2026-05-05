@@ -1,8 +1,10 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/write/_internal/connectors/SupportLocalStorageConnector"
 ], function(
+	StorageUtils,
 	SupportLocalStorageConnector
 ) {
 	"use strict";
@@ -247,8 +249,7 @@ sap.ui.define([
 	};
 
 	const oFlexDataResponse = {
-		appDescriptorChanges: [],
-		annotationChanges: [],
+		...StorageUtils.getEmptyFlexDataResponse(),
 		changes: [
 			{
 				changeType: "addSimpleFormGroup",
@@ -378,18 +379,7 @@ sap.ui.define([
 				},
 				jsOnly: false
 			}
-		],
-		comp: {
-			variants: [],
-			changes: [],
-			defaultVariants: [],
-			standardVariants: []
-		},
-		variants: [],
-		variantChanges: [],
-		variantDependentControlChanges: [],
-		variantManagementChanges: [],
-		ui2personalization: {}
+		]
 	};
 
 	const oFlexFeaturesResponse = {

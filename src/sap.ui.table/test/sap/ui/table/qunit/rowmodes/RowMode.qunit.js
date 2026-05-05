@@ -1,4 +1,4 @@
-/*global QUnit */
+/*global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils",
@@ -14,13 +14,18 @@ sap.ui.define([
 	"use strict";
 
 	const RowModeSubclass = RowMode.extend("sap.ui.table.test.RowModeSubClass", {
+		metadata: {
+			properties: {
+				rowCount: {type: "int", defaultValue: 1}
+			}
+		},
 		getMinRequestLength: function() {
 			return 0;
 		},
 		getComputedRowCounts: function() {
 			return {
-				count: 1,
-				scrollable: 1,
+				count: this.getRowCount(),
+				scrollable: this.getRowCount(),
 				fixedTop: 0,
 				fixedBottom: 0
 			};
@@ -240,4 +245,159 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("Get contexts", {
+		beforeEach: function() {
+			this.oGetContextsSpy = sinon.spy(RowModeSubclass.prototype, "getRowContexts");
+		},
+		afterEach: function() {
+			if (this.oTable) {
+				this.oTable.destroy();
+			}
+			this.oGetContextsSpy.restore();
+		}
+	});
+
+	QUnit.test("Not called on pure rerendering", async function(assert) {
+		this.oTable = TableQUnitUtils.createTable({
+			rowMode: new RowModeSubclass(),
+			rows: "{/}",
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+			columns: [TableQUnitUtils.createTextColumn()]
+		});
+
+		await this.oTable.qunit.whenRenderingFinished();
+		this.oGetContextsSpy.resetHistory();
+
+		this.oTable.invalidate();
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.strictEqual(this.oGetContextsSpy.callCount, 0, "RowMode#getRowContexts was not called on pure rerendering");
+	});
+
+	QUnit.test("Called after binding change", async function(assert) {
+		this.oTable = TableQUnitUtils.createTable({
+			rowMode: new RowModeSubclass(),
+			rows: "{/}",
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+			columns: [TableQUnitUtils.createTextColumn()]
+		});
+
+		await this.oTable.qunit.whenRenderingFinished();
+		this.oGetContextsSpy.resetHistory();
+
+		this.oTable.getModel().setData(new Array(50).fill({}));
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called after binding change");
+	});
+
+	QUnit.test("Called after scroll", async function(assert) {
+		this.oTable = TableQUnitUtils.createTable({
+			rowMode: new RowModeSubclass(),
+			rows: "{/}",
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+			columns: [TableQUnitUtils.createTextColumn()]
+		});
+
+		await this.oTable.qunit.whenRenderingFinished();
+		this.oGetContextsSpy.resetHistory();
+
+		this.oTable.setFirstVisibleRow(10);
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called after scroll");
+	});
+
+	QUnit.test("Not called after unbind", async function(assert) {
+		this.oTable = TableQUnitUtils.createTable({
+			rowMode: new RowModeSubclass(),
+			rows: "{/}",
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+			columns: [TableQUnitUtils.createTextColumn()]
+		});
+
+		await this.oTable.qunit.whenRenderingFinished();
+		this.oGetContextsSpy.resetHistory();
+
+		this.oTable.unbindRows();
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.strictEqual(this.oGetContextsSpy.callCount, 0, "RowMode#getRowContexts was not called after unbind");
+	});
+
+	QUnit.test("Called after unbind when NoData is disabled", async function(assert) {
+		const oRowMode = new RowModeSubclass();
+
+		this.oTable = TableQUnitUtils.createTable({
+			rowMode: oRowMode,
+			rows: "{/}",
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+			columns: [TableQUnitUtils.createTextColumn()]
+		});
+
+		oRowMode.disableNoData();
+		await this.oTable.qunit.whenRenderingFinished();
+		this.oGetContextsSpy.resetHistory();
+
+		this.oTable.unbindRows();
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called after unbind when NoData is disabled");
+	});
+
+	QUnit.test("Called when row count increases", async function(assert) {
+		const oRowMode = new RowModeSubclass({rowCount: 1});
+
+		this.oTable = TableQUnitUtils.createTable({
+			rowMode: oRowMode,
+			rows: "{/}",
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+			columns: [TableQUnitUtils.createTextColumn()]
+		});
+
+		await this.oTable.qunit.whenRenderingFinished();
+		this.oGetContextsSpy.resetHistory();
+
+		oRowMode.setRowCount(3);
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called when rows were added");
+	});
+
+	QUnit.test("Called when row count decreases", async function(assert) {
+		const oRowMode = new RowModeSubclass({rowCount: 3});
+
+		this.oTable = TableQUnitUtils.createTable({
+			rowMode: oRowMode,
+			rows: "{/}",
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+			columns: [TableQUnitUtils.createTextColumn()]
+		});
+
+		await this.oTable.qunit.whenRenderingFinished();
+		this.oGetContextsSpy.resetHistory();
+
+		oRowMode.setRowCount(1);
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called when rows were removed");
+	});
+
+	QUnit.test("Called when row aggregation is invalidated", async function(assert) {
+		this.oTable = TableQUnitUtils.createTable({
+			rowMode: new RowModeSubclass(),
+			rows: "{/}",
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+			columns: [TableQUnitUtils.createTextColumn()]
+		});
+
+		await this.oTable.qunit.whenRenderingFinished();
+		this.oGetContextsSpy.resetHistory();
+
+		this.oTable.invalidateRowsAggregation();
+		this.oTable.invalidate();
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called after row aggregation invalidation");
+	});
 });

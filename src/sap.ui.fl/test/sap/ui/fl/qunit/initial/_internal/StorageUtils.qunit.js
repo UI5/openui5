@@ -27,23 +27,7 @@ sap.ui.define([
 	}
 
 	function getEmptyFlexDataWithIndex(iIndex) {
-		return {
-			appDescriptorChanges: [],
-			annotationChanges: [],
-			index: iIndex,
-			changes: [],
-			comp: {
-				changes: [],
-				variants: [],
-				defaultVariants: [],
-				standardVariants: []
-			},
-			variants: [],
-			variantChanges: [],
-			variantDependentControlChanges: [],
-			variantManagementChanges: [],
-			ui2personalization: {}
-		};
+		return { ...Utils.getEmptyFlexDataResponse(), index: iIndex };
 	}
 
 	function checkModuleName(vDependencies) {
@@ -168,9 +152,8 @@ sap.ui.define([
 				this.oAppDescriptorCustomer, this.oAnnotationChangeCustomer
 			];
 
-			this.oEmptyResponse.USER.changes = [this.oChangeUser];
-			this.oEmptyResponse.USER.comp.variants = [this.oVariantUser];
-			this.oEmptyResponse.USER.comp.changes = [this.oVariantChangeUser1, this.oVariantChangeUser2];
+			this.oEmptyResponse.USER.changes = [this.oChangeUser, this.oVariantChangeUser1, this.oVariantChangeUser2];
+			this.oEmptyResponse.USER.compVariants = [this.oVariantUser];
 			this.oEmptyResponse.USER.variants = [this.oCtrlVariantUserWithVMR];
 			this.oEmptyResponse.USER.variantChanges = [this.oCtrlVariantChangeUser];
 			this.oEmptyResponse.USER.variantDependentControlChanges = [this.oChangeUserWithVMR];
@@ -178,7 +161,7 @@ sap.ui.define([
 
 			this.oEmptyResponse.CUSTOMER.changes = [this.oChangeCustomer];
 			this.oEmptyResponse.CUSTOMER.appDescriptorChanges = [this.oAppDescriptorCustomer];
-			this.oEmptyResponse.CUSTOMER.comp.variants = [this.oVariantCustomer];
+			this.oEmptyResponse.CUSTOMER.compVariants = [this.oVariantCustomer];
 			this.oEmptyResponse.CUSTOMER.variants = [this.oCtrlVariantCustomerWithVMR];
 			this.oEmptyResponse.CUSTOMER.variantChanges = [this.oCtrlVariantChangeCustomer];
 			this.oEmptyResponse.CUSTOMER.variantDependentControlChanges = [this.oChangeCustomerWithVMR];
@@ -203,12 +186,10 @@ sap.ui.define([
 			assert.strictEqual(Utils.filterAndSortResponses(oEmptyResponse1).length, 6, "no response was filtered out");
 
 			var oEmptyResponse2 = merge({}, this.oEmptyResponse);
-			oEmptyResponse2.USER.comp.variants = [this.oChangeUser];
-			oEmptyResponse2.PUBLIC.comp.changes = [this.oAppDescriptorCustomer];
-			oEmptyResponse2.CUSTOMER.comp.defaultVariants = [this.oAppDescriptorCustomer];
-			oEmptyResponse2.CUSTOMER_BASE.comp.standardVariants = [this.oAppDescriptorCustomer];
+			oEmptyResponse2.USER.compVariants = [this.oChangeUser];
+			oEmptyResponse2.PUBLIC.changes = [this.oAppDescriptorCustomer];
 
-			assert.strictEqual(Utils.filterAndSortResponses(oEmptyResponse2).length, 4, "two responses were filtered out");
+			assert.strictEqual(Utils.filterAndSortResponses(oEmptyResponse2).length, 2, "two responses were filtered out");
 		});
 	});
 
@@ -271,8 +252,7 @@ sap.ui.define([
 			});
 		}
 
-		["appDescriptorChanges", "annotationChanges", "changes",
-			"comp.changes", "comp.variants", "comp.defaultVariants", "comp.standardVariants",
+		["appDescriptorChanges", "annotationChanges", "changes", "compVariants",
 			"variants", "variantChanges", "variantDependentControlChanges", "variantManagementChanges"
 		].forEach(testIsStorageResponseFilledForNamespace);
 	});

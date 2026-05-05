@@ -107,9 +107,6 @@ sap.ui.define([
 	function getChangeCategoryPath(oChangeDefinition) {
 		switch (oChangeDefinition.fileType) {
 			case "change":
-				if (oChangeDefinition.selector && oChangeDefinition.selector.persistencyKey) {
-					return ["comp", "changes"];
-				}
 				if (oChangeDefinition.variantReference) {
 					return "variantDependentControlChanges";
 				}
@@ -124,7 +121,7 @@ sap.ui.define([
 			case "ctrl_variant_management_change":
 				return "variantManagementChanges";
 			case "variant":
-				return ["comp", "variants"];
+				return ["compVariants"];
 			case "annotation_change":
 				return "annotationChanges";
 			default:
@@ -238,14 +235,11 @@ sap.ui.define([
 		aResponses = aResponses.filter(function(oResponse) {
 			return oResponse.changes.length > 0
 				|| oResponse.appDescriptorChanges.length > 0
+				|| oResponse.compVariants.length > 0
 				|| oResponse.variants.length > 0
 				|| oResponse.variantChanges.length > 0
 				|| oResponse.variantManagementChanges.length > 0
 				|| oResponse.variantDependentControlChanges.length > 0
-				|| oResponse.comp.variants.length > 0
-				|| oResponse.comp.changes.length > 0
-				|| oResponse.comp.defaultVariants.length > 0
-				|| oResponse.comp.standardVariants.length > 0
 				|| oResponse.annotationChanges.length > 0;
 		});
 
@@ -296,28 +290,14 @@ sap.ui.define([
 			} else if (oFlexObject.fileType === "ctrl_variant_management_change") {
 				mGroupedFlexObjects[sLayer].variantManagementChanges.push(oFlexObject);
 			} else if (oFlexObject.fileType === "variant") {
-				mGroupedFlexObjects[sLayer].comp.variants.push(oFlexObject);
+				mGroupedFlexObjects[sLayer].compVariants.push(oFlexObject);
 			} else if (oFlexObject.fileType === "change") {
 				if (oFlexObject.variantReference) {
 					mGroupedFlexObjects[sLayer].variantDependentControlChanges.push(oFlexObject);
 				} else if (oFlexObject.appDescriptorChange) {
 					mGroupedFlexObjects[sLayer].appDescriptorChanges.push(oFlexObject);
 				} else {
-					switch (oFlexObject.changeType) {
-						case "addFavorite":
-						case "removeFavorite":
-						case "updateVariant":
-							mGroupedFlexObjects[sLayer].comp.changes.push(oFlexObject);
-							break;
-						case "defaultVariant":
-							mGroupedFlexObjects[sLayer].comp.defaultVariants.push(oFlexObject);
-							break;
-						case "standardVariant":
-							mGroupedFlexObjects[sLayer].comp.standardVariants.push(oFlexObject);
-							break;
-						default:
-							mGroupedFlexObjects[sLayer].changes.push(oFlexObject);
-					}
+					mGroupedFlexObjects[sLayer].changes.push(oFlexObject);
 				}
 			}
 		});
@@ -338,12 +318,7 @@ sap.ui.define([
 			appDescriptorChanges: [],
 			annotationChanges: [],
 			changes: [],
-			comp: {
-				variants: [],
-				changes: [],
-				defaultVariants: [],
-				standardVariants: []
-			},
+			compVariants: [],
 			variants: [],
 			variantChanges: [],
 			variantDependentControlChanges: [],
@@ -359,8 +334,7 @@ sap.ui.define([
 	StorageUtils.getAllFlexObjectNamespaces = function() {
 		return [
 			"appDescriptorChanges", "annotationChanges", "changes",
-			"comp.changes", "comp.variants", "comp.defaultVariants", "comp.standardVariants",
-			"variants", "variantChanges", "variantDependentControlChanges", "variantManagementChanges"
+			"compVariants", "variants", "variantChanges", "variantDependentControlChanges", "variantManagementChanges"
 		];
 	};
 

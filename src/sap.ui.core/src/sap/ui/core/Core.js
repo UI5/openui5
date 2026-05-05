@@ -474,6 +474,12 @@ sap.ui.define([
 					}
 				});
 
+				// loading debug tools if configured via configuration (URL parameter)
+				const debugLoader = "sap/ui/core/support/debug/DebugLoader";
+				if (Supportability.isDebugToolsEnabled()) {
+					this.aModules.unshift(debugLoader);
+				}
+
 				// enforce the core library as the first loaded module
 				var i = this.aLibs.indexOf("sap.ui.core");
 				if ( i != 0 ) {

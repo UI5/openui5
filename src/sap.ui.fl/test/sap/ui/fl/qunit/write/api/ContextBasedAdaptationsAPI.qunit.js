@@ -1321,7 +1321,7 @@ sap.ui.define([
 
 		oCompVariantFlexDataResponseForMigration.changes = oCompVariantFlexDataResponseForMigration.changes
 		.filter((oChange) => ["nonVariantAnnotationChange", "nonVariantManifestChange"].includes(oChange.fileName));
-		oCompVariantFlexDataResponseForMigration.comp = {};
+		oCompVariantFlexDataResponseForMigration.compVariants = [];
 
 		[{
 			testName: "when there are control variant changes and no draft exists",
@@ -1332,7 +1332,7 @@ sap.ui.define([
 			],
 			stubVersionModel: 1
 		}, {
-			testName: "when there are comp. variant changes and no draft exists",
+			testName: "when there are comp variant changes and no draft exists",
 			stubResponse: oCompVariantFlexDataResponse,
 			aReturnedVersions: [
 				{ version: "2" },
@@ -1349,7 +1349,7 @@ sap.ui.define([
 			],
 			stubVersionModel: Version.Number.Draft
 		}, {
-			testName: "when there are comp. variant changes and a draft exists",
+			testName: "when there are comp variant changes and a draft exists",
 			stubResponse: oCompVariantFlexDataResponse,
 			aReturnedVersions: [
 				{ version: Version.Number.Draft },
@@ -1954,7 +1954,7 @@ sap.ui.define([
 				url: sap.ui.require.toUrl("test-resources/sap/ui/fl/qunit/testResources/contextBasedAdaptations/testMigrateCompVariants.json"),
 				async: false
 			});
-			oCompVariantFlexDataResponse.comp.variants = [];
+			oCompVariantFlexDataResponse.compVariants = [];
 			await FlQUnitUtils.initializeFlexStateWithData(sandbox, "com.sap.app", oCompVariantFlexDataResponse);
 
 			return ContextBasedAdaptationsAPI.canMigrate(this.mPropertyBag).then(function(bCanMigrate) {
@@ -1981,13 +1981,13 @@ sap.ui.define([
 				url: sap.ui.require.toUrl("test-resources/sap/ui/fl/qunit/testResources/contextBasedAdaptations/testMigrateCompVariants.json"),
 				async: false
 			});
-			oCompVariantFlexDataResponse.comp.variants = oCompVariantFlexDataResponse.comp.variants.filter(function(oCompVariant) {
+			oCompVariantFlexDataResponse.compVariants = oCompVariantFlexDataResponse.compVariants.filter(function(oCompVariant) {
 				if (oCompVariant.contexts.role.length === 0) {
 					return oCompVariant;
 				}
 				return undefined;
 			});
-			oCompVariantFlexDataResponse.comp.changes.forEach(function(oChange) {
+			oCompVariantFlexDataResponse.changes.forEach(function(oChange) {
 				if (oChange.changeType === "updateVariant") {
 					oChange.content.contexts = { role: [] };
 				}

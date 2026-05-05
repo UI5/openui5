@@ -85,13 +85,8 @@ sap.ui.define([
 			appDescriptorChanges: concatFlexObjects(aResponses, "appDescriptorChanges"),
 			annotationChanges: concatFlexObjects(aResponses, "annotationChanges"),
 			changes: concatFlexObjects(aResponses, "changes"),
+			compVariants: concatFlexObjects(aResponses, "compVariants"),
 			ui2personalization: concatUi2personalization(aResponses),
-			comp: {
-				variants: concatFlexObjects(aResponses, "comp.variants"),
-				changes: concatFlexObjects(aResponses, "comp.changes"),
-				defaultVariants: concatFlexObjects(aResponses, "comp.defaultVariants"),
-				standardVariants: concatFlexObjects(aResponses, "comp.standardVariants")
-			},
 			variants: concatFlexObjects(aResponses, "variants"),
 			variantChanges: concatFlexObjects(aResponses, "variantChanges"),
 			variantDependentControlChanges: concatFlexObjects(aResponses, "variantDependentControlChanges"),

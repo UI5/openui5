@@ -46,6 +46,25 @@ sap.ui.define([
 		},
 
 		/**
+		 * Returns whether the debug tools are injected at runtime.
+		 * This is independent of the debug mode, which implies loading of debug sources.
+		 * Enabling the debug tools standalone allows for debugging minified sources.
+		 *
+		 * @returns {boolean} Whether the debug tools are injected, also true if full debug mode is enabled
+		 * @private
+		 * @ui5-restricted sap.ui.core
+		 * @since 1.148.0
+		 */
+		isDebugToolsEnabled() {
+			return BaseConfig.get({
+				name: "sapUiDebugTools",
+				type: BaseConfig.Type.Boolean,
+				defaultValue: false,
+				external: true
+			}) || this.isDebugModeEnabled();
+		},
+
+		/**
 		 * Returns whether the UI5 control inspector is displayed.
 		 * Has only an effect when the sap-ui-debug module has been loaded
 		 * @return {boolean} whether the UI5 control inspector is displayed

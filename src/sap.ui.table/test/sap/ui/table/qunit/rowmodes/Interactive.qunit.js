@@ -55,17 +55,7 @@ sap.ui.define([
 		const oGetContextsSpy = this.oGetContextsSpy;
 
 		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			/*
-			 * During the table initialization, Table._getContexts is called twice.
-			 * Since the calls are throttled, the second call which is triggered by
-			 * TableDelegate.onBeforeRendering, cancels the initial call.
-			 *
-			 * This mechanism behaves differently when the table initalization uses
-			 * nextUIUpdate instead of Core.applyChanges. The initial call is already
-			 * executed before the second call would cancel it. Therefore the function
-			 * is called twice.
-			 */
-			assert.strictEqual(oGetContextsSpy.callCount, 2, "Method to get contexts called twice");
+			assert.strictEqual(oGetContextsSpy.callCount, 1, "Method to get contexts called once");
 			assert.ok(oGetContextsSpy.calledWithExactly(0, 10, 100), "The call considers the rendered row count");
 		});
 	});

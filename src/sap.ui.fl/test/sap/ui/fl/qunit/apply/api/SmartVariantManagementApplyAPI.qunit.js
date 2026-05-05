@@ -360,10 +360,8 @@ sap.ui.define([
 				parameters: { nonFavoriteVariantsRemoved: [sPersistencyKey] }
 			});
 			const oLoadAllCompVariantsStub = sandbox.stub(Storage, "loadAllCompVariants").resolves({
-				comp: {
-					variants: [{ fileType: "variant", fileName: "newVariant1" }],
-					changes: [{ fileType: "change", fileName: "newVariantChange1" }]
-				}
+				compVariants: [{ fileType: "variant", fileName: "newVariant1" }],
+				changes: [{ fileType: "change", fileName: "newVariantChange1" }]
 			});
 			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
 			const oAddLazyVariantsLoadedStub = sandbox.stub(FlexState, "addLazyVariantsLoaded");
@@ -395,10 +393,10 @@ sap.ui.define([
 			);
 			assert.deepEqual(
 				oAddNewObjectsSpy.firstCall.args[0].newData,
-				{ comp: {
-					variants: [{ fileType: "variant", fileName: "newVariant1" }],
+				{
+					compVariants: [{ fileType: "variant", fileName: "newVariant1" }],
 					changes: [{ fileType: "change", fileName: "newVariantChange1" }]
-				} },
+				},
 				"addNewObjects received the Storage response"
 			);
 			assert.ok(oAddLazyVariantsLoadedStub.calledOnce, "FlexState.addLazyVariantsLoaded was called");

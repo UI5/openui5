@@ -4201,6 +4201,34 @@ sap.ui.define([
 		oFocusHandlingSpy.restore();
 	});
 
+	QUnit.test("Reset event handler changes to sortDescending are visually reflected", function(assert) {
+		// Prepare
+		this.oVSD.open();
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Attach a reset handler that changes sortDescending and selectedSortItem
+		this.oVSD.attachReset(function() {
+			this.oVSD.setSortDescending(true);
+			this.oVSD.setSelectedSortItem(this.oVSD.getSortItems()[1]);
+		}.bind(this));
+
+		// Act - press reset
+		this.oVSD._getResetButton().firePress();
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Assert - sortDescending should be visually reflected in the sort order list
+		var oSortOrderList = this.oVSD._sortOrderList;
+		var oSelectedItem = oSortOrderList.getSelectedItem();
+		assert.ok(oSelectedItem, "There is a selected item in the sort order list");
+		assert.strictEqual(oSelectedItem.data("item"), true, "The 'Descending' item is visually selected in the sort order list");
+
+		// Assert - selectedSortItem should also be visually reflected
+		var oSortList = this.oVSD._sortList;
+		var oSelectedSortItem = oSortList.getSelectedItem();
+		assert.ok(oSelectedSortItem, "There is a selected item in the sort list");
+		assert.strictEqual(oSelectedSortItem.data("item"), this.oVSD.getSortItems()[1], "The correct sort item is visually selected");
+	});
+
 	QUnit.module("Title Alignment");
 
 	QUnit.test("setTitleAlignment test", function (assert) {

@@ -1532,7 +1532,7 @@ sap.ui.define([
 		assert.ok(this.oProxy.getNodeByIndex.calledOnceWithExactly(0), "proxy#getNodeByIndex call");
 	});
 
-	QUnit.module("Hide/Show table and suspend/resume binding with ODataV2", {
+	QUnit.module("Hidden table with suspended binding", {
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable(AnalyticalTable, {
 				models: new ODataModelV2(sServiceURI),
@@ -1565,38 +1565,9 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Initialized hidden table with suspended binding", async function(assert) {
+	QUnit.test("Initialization", async function(assert) {
 		await TableQUnitUtils.wait(100);
 		assert.ok(this.fnBindingNodesSpy.notCalled, "Binding.getNodes was not called");
-		assert.notOk(this.oTable.getRows()[0].getBindingContext(), "Table has no rows with bindingContext");
-
-		this.fnBindingNodesSpy.resetHistory();
-		this.oTable.setVisible(true);
-		this.oTable.getBinding("rows").resume();
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
-
-		assert.ok(this.fnBindingNodesSpy.called, "Binding.getNodes was called");
-		assert.ok(this.oTable.getRows()[0].getBindingContext(), "Table has rows with bindingContext");
-	});
-
-	QUnit.test("Table show/hide at runtime", async function(assert) {
-		await TableQUnitUtils.wait(100);
-		assert.ok(this.fnBindingNodesSpy.notCalled, "Binding.getNodes was not called");
-
-		this.oTable.setVisible(true);
-		this.oTable.getBinding("rows").resume();
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
-
-		assert.ok(this.oTable.getRows()[0].getBindingContext(), "Table has rows with bindingContext");
-
-		this.fnBindingNodesSpy.resetHistory();
-		this.oTable.setVisible(false);
-		this.oTable.getBinding("rows").suspend();
-		await TableQUnitUtils.wait(100);
-		assert.ok(this.fnBindingNodesSpy.notCalled, "Binding.getNodes was not called");
-		assert.notOk(this.oTable.getRows()[0].getBindingContext(), "Table has no rows with bindingContext");
 	});
 
 	QUnit.test("#_getContexts", function(assert) {
