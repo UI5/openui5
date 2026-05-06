@@ -187,7 +187,6 @@ sap.ui.define([
 			},
 			noData: oTable._getNoDataText(),
 			headerToolbar: oTable._oToolbar,
-			ariaLabelledBy: [oTable._oTitle],
 			beforeOpenContextMenu: [onBeforeOpenContextMenu, this]
 		};
 

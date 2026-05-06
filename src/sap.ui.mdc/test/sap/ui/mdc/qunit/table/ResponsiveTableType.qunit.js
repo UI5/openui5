@@ -79,7 +79,6 @@ sap.ui.define([
 		assert.equal(oInnerTable.getGrowingThreshold(), 20, "growingThreshold");
 		assert.deepEqual(oInnerTable.getSticky(), ["ColumnHeaders", "GroupHeaders", "HeaderToolbar", "InfoToolbar"], "sticky");
 		assert.equal(oInnerTable.getPopinLayout(), "Block", "popinLayout");
-		assert.deepEqual(oInnerTable.getAriaLabelledBy(), [this.oTable._oTitle.getId()], "ariaLabelledBy");
 		assert.equal(oInnerTable.getHeaderToolbar(), this.oTable._oToolbar, "headerToolbar");
 		assert.equal(oInnerTable.getEnableBusyIndicator(), true, "enableBusyIndicator");
 	});
@@ -104,7 +103,6 @@ sap.ui.define([
 		assert.equal(oInnerTable.getGrowingThreshold(), 30, "growingThreshold");
 		assert.deepEqual(oInnerTable.getSticky(), ["ColumnHeaders", "GroupHeaders", "HeaderToolbar", "InfoToolbar"], "sticky");
 		assert.equal(oInnerTable.getPopinLayout(), "GridSmall", "popinLayout");
-		assert.deepEqual(oInnerTable.getAriaLabelledBy(), [this.oTable._oTitle.getId()], "ariaLabelledBy");
 		assert.equal(oInnerTable.getHeaderToolbar(), this.oTable._oToolbar, "headerToolbar");
 	});
 
