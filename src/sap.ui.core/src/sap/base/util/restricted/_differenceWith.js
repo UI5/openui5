@@ -2,7 +2,7 @@
  * ${copyright}
  */
 /**
- * See {@link https://lodash.com/docs/4.17.23#differenceWith}
+ * See {@link https://lodash.com/docs/4.18.1#differenceWith}
  *
  * @function
  * @alias module:sap/base/util/restricted/_differenceWith
