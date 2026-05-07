@@ -676,14 +676,51 @@ sap.ui.define([
 						layoutData: new FlexItemData({ growFactor: 1, maxWidth: "calc(100% - 2rem)" })
 					});
 
-					this.oTokenizer.onAfterRendering = function() {
-						Tokenizer.prototype.onAfterRendering.apply(this.oTokenizer, arguments);
+					// show right count on more-indicator even not all loaded
+					this.oTokenizer._handleNMoreIndicator = function (iHiddenTokensCount) {
 
-						if (!this.bAddAriaLabelledOnlyOnce) {
-							this.bAddAriaLabelledOnlyOnce = true;
-							this.oTokenizer.addAriaLabelledBy(this.oTokenizerPanel._getLabellingElementId());
-						}
-					}.bind(this);
+						const oBinding = this.getBinding("tokens");
+						const iLength = oBinding.getLength(); // tokens available in binding
+						const iTokensLength = this.getTokens().length;
+						const iMissingTokens = iLength - iTokensLength;
+
+						return Tokenizer.prototype._handleNMoreIndicator.apply(this, [iHiddenTokensCount + iMissingTokens]);
+
+					};
+
+					this.oTokenizer._handleNMoreIndicatorPress = function () {
+
+						_bindAllTokens.call(this); // get all tokens as list has no paging
+
+						return Tokenizer.prototype._handleNMoreIndicatorPress.apply(this, arguments);
+
+					};
+
+					this.oTokenizer.addDelegate({
+						onfocusin: function(oEvent) {
+							if (oEvent.srcControl.isA("sap.m.Token")) { // let first finish the focus on Token or Delete of Token
+								_bindAllTokens.call(this, true); // get all tokens as paging would need support from Tokenizer
+							} else {
+								_bindAllTokens.call(this, false); // get all tokens as paging would need support from Tokenizer
+							}
+						}.bind(this.oTokenizer),
+						onAfterRendering: function() {
+							if (this.oTokenizer._aMDCSelectedIndexes) {
+								const aTokens = this.oTokenizer.getTokens();
+								this.oTokenizer._aMDCSelectedIndexes.forEach((iIndex) => { // normally only one token could be selected (deleting one and select new one)
+									if (aTokens[iIndex]) {
+										aTokens[iIndex].setSelected(true);
+										aTokens[iIndex].focus(); // could only happen after binding update if focus is on Tokenizer
+									}
+								});
+								delete this.oTokenizer._aMDCSelectedIndexes;
+							}
+							if (!this.bAddAriaLabelledOnlyOnce) {
+								this.bAddAriaLabelledOnlyOnce = true;
+								this.oTokenizer.addAriaLabelledBy(this.oTokenizerPanel._getLabellingElementId());
+							}
+						}.bind(this)
+					}, false, this);
 
 					_bindTokenizer.call(this, true);
 
@@ -775,11 +812,50 @@ sap.ui.define([
 					const oFilter = new Filter({ path: 'isEmpty', operator: 'NE', value1: true });
 					this._oConditionType.setFormatOptions(_getConditionFormatOptions.call(this)); // as config might be changed
 					const oTokenTemplate = new Token(this.getId() + "-Token", { text: { path: '$valueHelp>', type: this._oConditionType } });
-					this.oTokenizer.bindAggregation("tokens", { path: '/conditions', model: "$valueHelp", templateShareable: false, template: oTokenTemplate, filters: oFilter, length: 50, startIndex: -50 });
+					this.oTokenizer.bindAggregation("tokens", { path: '/conditions', model: "$valueHelp", templateShareable: false, template: oTokenTemplate, filters: oFilter, length: 50, startIndex: 0 });
 				}
 			} else if (oBindingInfo) { // remove binding if dialog is closed to prevent updated on tokens if conditions are updated. (Suspend would not be enough, as every single binding on token would need to be suspended too.)
 				this.oTokenizer.unbindAggregation("tokens");
 			}
+		}
+
+	}
+
+	function _bindAllTokens(bAsync) {
+
+		const oBindingInfo = this.getBindingInfo("tokens");
+		if (!this._oUpdateBindingTimer && (oBindingInfo.length || oBindingInfo.startIndex)) {
+			const fnUpdate = () => {
+				// store selected token
+				const aSelectedTokens = this.getSelectedTokens();
+				this._aMDCSelectedIndexes = aSelectedTokens.map((oToken) => {
+					return this.indexOfToken(oToken);
+				});
+
+				let oToken = oBindingInfo.template;
+				let bTemplateShareable = true;
+				if (oBindingInfo.templateShareable !== true) {
+					oToken = oToken.clone();
+					bTemplateShareable = false;
+				}
+
+				this.bindAggregation("tokens", { path: oBindingInfo.path, model: oBindingInfo.model, template: oToken, templateShareable: bTemplateShareable });
+			};
+
+			if (bAsync) {
+				// in Token-focus case keep binding stable if there are less Tokens that length. In this case a rebind is not needed (What leads to a re-creation of the Tokens)
+				const oBinding = this.getBinding("tokens");
+				const iLength = oBinding.getLength(); // tokens available in binding
+				if (iLength >= oBindingInfo.length) {
+					this._oUpdateBindingTimer = setTimeout(() => {
+						delete this._oUpdateBindingTimer;
+						fnUpdate();
+					}, 200); // as press event on delete-icon is somehow async
+				}
+			} else {
+				fnUpdate();
+			}
+
 		}
 
 	}

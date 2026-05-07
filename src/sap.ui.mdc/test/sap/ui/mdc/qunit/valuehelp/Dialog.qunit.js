@@ -329,7 +329,7 @@ sap.ui.define([
 			const oTokenizer = aItems[0];
 			const oBindingInfo = oTokenizer.getBindingInfo("tokens");
 			assert.equal(oBindingInfo.length, 50, "Tokens - Bindinginfo length");
-			assert.equal(oBindingInfo.startIndex, -50, "Tokens - Bindinginfo startIndex");
+			assert.equal(oBindingInfo.startIndex, 0, "Tokens - Bindinginfo startIndex");
 			const aTokens = oTokenizer.getTokens();
 			assert.equal(aTokens.length, 1, "number of tokens");
 			assert.equal(aTokens[0].getText(), "Text", "Token text");
@@ -519,7 +519,7 @@ sap.ui.define([
 		if (oPromise) {
 			const fnDone = assert.async();
 			oPromise.then(() => {
-				setTimeout(() => { // wait until open
+				setTimeout(async () => { // wait until open
 					assert.equal(iOpened, 1, "Opened event fired once");
 					const oContainer = oDialog.getAggregation("_container");
 					assert.ok(oContainer.isA("sap.m.Dialog"), "Container is sap.m.Dialog");
@@ -557,8 +557,17 @@ sap.ui.define([
 					};
 					assert.deepEqual(oBindingType.getFormatOptions(), oFormatOptions, "FormatOptions of ConditionType");
 
-					// the inner input element has to been set to transparent.
+					// the inner Tokenizer is rendered
 					assert.ok(oTokenizer.isA("sap.m.Tokenizer"), "Tokenizer is first HBox item");
+
+					oBinding = oTokenizer.getBinding("tokens");
+					sinon.stub(oBinding, "getLength").onFirstCall().returns(51); // to test that there is no limit of 50 tokens
+					aTokens[0].focus(); // to have Focus in Tokenizer
+					await new Promise((resolve) => {setTimeout(resolve, 200);}); // as BindingInfo update is async
+					const oBindingInfo = oTokenizer.getBindingInfo("tokens");
+					assert.notOk(oBindingInfo?.length, "BindingInfo: no limit to create only 50 Tokens");
+					assert.notOk(oBindingInfo?.startIndex, "BindingInfo: no StartIndex set for Tokens");
+					oBinding.getLength.restore();
 
 					// simulate ok-button click
 					const aButtons = oContainer.getButtons();
