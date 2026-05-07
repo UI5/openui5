@@ -550,7 +550,7 @@ sap.ui.define([
 			}
 		}
 
-		TableUtils.loadContexts(oTable.getBinding(), iGetContextsStartIndex, iGetContextsLength).then(function(aContexts) {
+		TableUtils.loadContexts(oTable, iGetContextsStartIndex, iGetContextsLength, true).then((aContexts) => {
 			aContexts.forEach(function(oContext) {
 				if (!isContextSelectable(oContext) || oContext.isSelected()) {
 					return;

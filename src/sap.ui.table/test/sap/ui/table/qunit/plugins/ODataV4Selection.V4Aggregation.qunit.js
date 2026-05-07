@@ -334,7 +334,7 @@ sap.ui.define([
 		this.oTable.setFirstVisibleRow(11);
 		await this.oTable.qunit.whenRenderingFinished();
 
-		(await TableUtils.loadContexts(this.oTable.getBinding(), 0, this.oTable.getBinding().getLength())).filter((oContext) => {
+		(await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength())).filter((oContext) => {
 			const bIsLeaf = oContext.getProperty("@$ui5.node.isExpanded") === undefined;
 			const bIsTotal = oContext.getProperty("@$ui5.node.isTotal");
 			return bIsLeaf && !bIsTotal;
