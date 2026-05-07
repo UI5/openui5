@@ -1295,8 +1295,11 @@ sap.ui.define([
 		 * Tells whether the given property path is used in the given "$orderby" system query
 		 * option.
 		 *
-		 * @param {string} sPropertyPath
-		 *   A property path
+		 * @param {string[]} aPaths
+		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
+		 *   changed due to an update or side effects of a previous update, see
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
 		 * @param {string} [sOrderby]
 		 *   The "$orderby" system query option, or <code>undefined</code>
 		 * @returns {boolean}
@@ -1304,7 +1307,7 @@ sap.ui.define([
 		 *
 		 * @public
 		 */
-		isOrderedBy : function (sPropertyPath, sOrderby) {
+		isOrderedBy : function (aPaths, sOrderby) {
 			if (!sOrderby) {
 				return false;
 			}
@@ -1312,15 +1315,18 @@ sap.ui.define([
 			return sOrderby.split(rComma).some((sOrderbyItem) => {
 				const aMatches = rOrderbyItem.exec(sOrderbyItem);
 				// handle unparseable items as "used in $orderby"
-				return !aMatches || aMatches[1] === sPropertyPath;
+				return !aMatches || aPaths.includes(aMatches[1]);
 			});
 		},
 
 		/**
 		 * Tells whether the property with the given path is used to compute the grand total.
 		 *
-		 * @param {string} sPath
-		 *   A property path
+		 * @param {string[]} aPaths
+		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
+		 *   changed due to an update or side effects of a previous update, see
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
 		 * @param {object} [mAggregate]
 		 *   A map from aggregatable property names/aliases to details objects
 		 * @returns {boolean}
@@ -1329,11 +1335,11 @@ sap.ui.define([
 		 *
 		 * @public
 		 */
-		isUsedForGrandTotal : function (sPath, mAggregate) {
+		isUsedForGrandTotal : function (aPaths, mAggregate) {
 			if (mAggregate) {
-				sPath = _Helper.getMetaPath(sPath);
 				for (const [sAlias, oDetails] of Object.entries(mAggregate)) {
-					if (oDetails.grandTotal && (sAlias === sPath || oDetails.unit === sPath)) {
+					if (oDetails.grandTotal
+						&& (aPaths.includes(sAlias) || aPaths.includes(oDetails.unit))) {
 						return true;
 					}
 				}

@@ -4629,8 +4629,10 @@ sap.ui.define([
 				}
 			});
 			const oParameters = {oGroupLock : "~oGroupLock~"};
+			this.mock(_Helper).expects("getMetaPath").withExactArgs("~sPropertyPath~")
+				.returns("~sMetaPath~");
 			this.mock(_AggregationHelper).expects("isUsedForGrandTotal")
-				.withExactArgs("~sPropertyPath~", sinon.match.same(oCache.oAggregation.aggregate))
+				.withExactArgs(["~sMetaPath~"], sinon.match.same(oCache.oAggregation.aggregate))
 				.returns(bUsedForGrandTotal);
 			this.mock(oCache).expects("readGrandTotal").exactly(bUsedForGrandTotal ? 1 : 0)
 				.withExactArgs("~oGroupLock~")
@@ -4727,10 +4729,13 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	[
-		["~oGroupLock~"],
-		["~oGroupLock~", "~foo~", "~bar~"]
+		["~oGroupLock~", "~aPaths~"],
+		["~oGroupLock~", "~aPaths~", "~anyOtherParameter~"]
 	].forEach((aArguments, i) => {
-		QUnit.test("requestSideEffects: #" + i, function (assert) {
+		[true, false].forEach((bUsedForGrandTotal) => {
+			const sTitle = `requestSideEffects: bUsedForGrandTotal=${bUsedForGrandTotal}, #${i}`;
+
+		QUnit.test(sTitle, function (assert) {
 			const oAggregation = { // filled before by buildApply
 				aggregate : {foo : {grandTotal : true}},
 				groupLevels : [] /* data aggregation always has groupLevels */
@@ -4738,15 +4743,21 @@ sap.ui.define([
 			const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
 			this.mock(oCache.oFirstLevel).expects("requestSideEffects").on(oCache)
 				.withExactArgs(...aArguments).returns("promise0");
-			this.mock(oCache).expects("readGrandTotal").withExactArgs("~oGroupLock~")
+			this.mock(_AggregationHelper).expects("isUsedForGrandTotal")
+				.withExactArgs("~aPaths~", sinon.match.same(oCache.oAggregation.aggregate))
+				.returns(bUsedForGrandTotal);
+			this.mock(oCache).expects("readGrandTotal").exactly(bUsedForGrandTotal ? 1 : 0)
+				.withExactArgs("~oGroupLock~")
 				.returns("promise1");
-			this.mock(SyncPromise).expects("all").withExactArgs(["promise0", "promise1"])
+			this.mock(SyncPromise).expects("all")
+				.withExactArgs(["promise0", bUsedForGrandTotal ? "promise1" : false])
 				.returns("~result~");
 
 			assert.strictEqual(
 				// code under test
 				oCache.requestSideEffects(...aArguments),
 				"~result~", "without a defined result");
+		});
 		});
 	});
 

@@ -2595,12 +2595,13 @@ sap.ui.define([
 	// Additionally the grand total row is refreshed. The resulting promise resolves without a
 	// defined result when the side effects and the grand total are updated; rejects if one of these
 	// requests fails.
-	_AggregationCache.prototype.requestSideEffects = function (oGroupLock/*, ...*/) {
+	_AggregationCache.prototype.requestSideEffects = function (oGroupLock, aPaths/*, ...*/) {
 		// "super" call (like @borrows ...)
 		const fnSuper = this.oFirstLevel.requestSideEffects;
 		return SyncPromise.all([
 			fnSuper.apply(this, arguments),
-			this.readGrandTotal(oGroupLock)
+			_AggregationHelper.isUsedForGrandTotal(aPaths, this.oAggregation.aggregate)
+				&& this.readGrandTotal(oGroupLock)
 		]);
 	};
 
@@ -2829,7 +2830,8 @@ sap.ui.define([
 	 */
 	_AggregationCache.prototype.update = function (sPropertyPath, _vValue, oParameters) {
 		return SyncPromise.all([
-			_AggregationHelper.isUsedForGrandTotal(sPropertyPath, this.oAggregation.aggregate)
+			_AggregationHelper.isUsedForGrandTotal([_Helper.getMetaPath(sPropertyPath)],
+					this.oAggregation.aggregate)
 				&& this.readGrandTotal(oParameters.oGroupLock),
 			_Cache.prototype.update.apply(this, arguments)
 		]);

@@ -1768,7 +1768,7 @@ sap.ui.define([
 		// must not be set, or the outdated flags have been set already while creating the entity;
 		// client-side annotation updates do not influence the outdated flags
 		if (!sPath.startsWith("($uid=") && !sPath.includes("/@$ui5.")) {
-			this.setOutdated(false, sPath, oGroupLock === null);
+			this.setOutdated(false, [_Helper.getMetaPath(sPath)], oGroupLock === null);
 		}
 	};
 
@@ -3763,20 +3763,23 @@ sap.ui.define([
 	/**
 	 * Returns whether the binding is filtered by the given (or any) property.
 	 *
-	 * @param {string} [sPropertyPath]
-	 *   The property path; if omitted, any filter counts
+	 * @param {string[]} [aPaths]
+	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have changed
+	 *   due to an update or side effects of a previous update, see
+	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; if omitted, any filter counts
 	 * @returns {boolean}
 	 *   Whether the binding is filtered by the given (or any) property
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.isFilteredBy = function (sPropertyPath) {
-		if (!sPropertyPath) {
+	ODataListBinding.prototype.isFilteredBy = function (aPaths) {
+		if (!aPaths) {
 			return this.aApplicationFilters.length || this.aFilters.length;
 		}
 
-		return _AggregationHelper.isAffected(null, this.aApplicationFilters, [sPropertyPath])
-			|| _AggregationHelper.isAffected(null, this.aFilters, [sPropertyPath]);
+		return _AggregationHelper.isAffected(null, this.aApplicationFilters, aPaths)
+			|| _AggregationHelper.isAffected(null, this.aFilters, aPaths);
 	};
 
 	/**
@@ -3829,20 +3832,23 @@ sap.ui.define([
 	/**
 	 * Returns whether this binding is sorted by the given (or any) property.
 	 *
-	 * @param {string} [sPropertyPath]
-	 *   A property path; if omitted, any sorter counts
+	 * @param {string[]} [aPaths]
+	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have changed
+	 *   due to an update or side effects of a previous update, see
+	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; if omitted, any sorter counts
 	 * @returns {boolean}
 	 *   Whether the binding is sorted by the given (or any) property
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.isSortedBy = function (sPropertyPath) {
-		if (!sPropertyPath) {
+	ODataListBinding.prototype.isSortedBy = function (aPaths) {
+		if (!aPaths) {
 			return this.aSorters.length || this.mParameters.$orderby;
 		}
 
-		return this.aSorters.some((oSorter) => oSorter.getPath() === sPropertyPath)
-			|| _AggregationHelper.isOrderedBy(sPropertyPath, this.mParameters.$orderby);
+		return this.aSorters.some((oSorter) => aPaths.includes(oSorter.getPath()))
+			|| _AggregationHelper.isOrderedBy(aPaths, this.mParameters.$orderby);
 	};
 
 	/**
@@ -4820,7 +4826,7 @@ sap.ui.define([
 			aPredicates
 				= _Helper.getPredicates(bSingle ? [oContext] : this.keepOnlyVisibleContexts());
 			if (aPredicates) {
-				that.setOutdated();
+				that.setOutdated(false, aPaths);
 				aPromises = this.oCache
 					? [this.oCache.requestSideEffects(this.lockGroup(sGroupId), aPaths, aPredicates,
 						bSingle, /*bWithMessages*/bSingle)]
@@ -5293,30 +5299,33 @@ sap.ui.define([
 	 *
 	 * @param {boolean} [bForce]
 	 *   Whether to force setting the outdated flags at the grand total and the header context
-	 * @param {string} [sPropertyPath]
-	 *   An optional property path relative to the binding that gets updated; if omitted the whole
-	 *   entity / list is affected
+	 * @param {string[]} [aPaths]
+	 *   An optional array of "14.4.1.5 Expression edm:NavigationPropertyPath" or
+	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have changed
+	 *   due to an update or side effects of a previous update, see
+	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; if omitted, the whole entity
+	 *   (collection) is affected
 	 * @param {boolean} [bNoRequest]
-	 *   Whether the given property is updated without sending a PATCH request to the server
+	 *   Whether the properties given in <code>aPaths</code> are updated without sending a PATCH
+	 *   request to the server; if <code>true</code>, <code>aPaths</code> is mandatory
 	 * @throws {Error}
 	 *   If <code>bNoRequest</code> is set and the header context gets outdated or the property with
 	 *   the given path contributes to the grand total
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.setOutdated = function (bForce, sPropertyPath, bNoRequest) {
+	ODataListBinding.prototype.setOutdated = function (bForce, aPaths, bNoRequest) {
 		if (_Helper.isDataAggregation(this.mParameters)) {
-			const sMetaPath = sPropertyPath && _Helper.getMetaPath(sPropertyPath);
 			const oAggregation = this.mParameters.$$aggregation;
 			const bGrandTotalOutdated = bForce
 				|| this.mParameters.$search
 				|| oAggregation.search
 				|| Object.keys(this.mParameters).some((sKey) => sKey[0] !== "$")
-				|| this.isFilteredBy(sMetaPath);
-			const bHeaderContextOutdated = bGrandTotalOutdated || this.isSortedBy(sMetaPath);
+				|| this.isFilteredBy(aPaths);
+			const bHeaderContextOutdated = bGrandTotalOutdated || this.isSortedBy(aPaths);
 			if (bNoRequest
 					&& (bHeaderContextOutdated
-					|| _AggregationHelper.isUsedForGrandTotal(sMetaPath, oAggregation.aggregate))) {
+					|| _AggregationHelper.isUsedForGrandTotal(aPaths, oAggregation.aggregate))) {
 				throw new Error("Missing PATCH request when @$ui5.context.isOutdated would be set");
 			}
 			if (bGrandTotalOutdated) {
