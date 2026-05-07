@@ -1611,7 +1611,7 @@ sap.ui.define([
 			return that.oRequestor.request("DELETE",
 					aResults[0].slice(1) + _Helper.buildQuery(that.mURLParameters),
 					that.lockGroup(sGroupId, that, true, true),
-					{"If-Match" : aResults[1]}
+					aResults[1] ? {"If-Match" : aResults[1]} : null
 			).catch(function (oError) {
 				if (bRejectIfNotFound
 						|| !(oError.status === 404 || bInAllBindings && oError.status === 412)) {

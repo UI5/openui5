@@ -2251,51 +2251,50 @@ sap.ui.define([
 	["c", "abc", false],
 	// not parsable orderby item; independent whether property path is contained
 	["path", "length(foo)", true]
-].forEach(([sPropertyPath, sOrderby, bExpected], i) => {
-	QUnit.test("isOrderedBy: " + i + " - " + sPropertyPath + " in " + sOrderby, function (assert) {
+].forEach(([sPath, sOrderby, bExpected], i) => {
+	QUnit.test("isOrderedBy: " + i + " - " + sPath + " in " + sOrderby, function (assert) {
 		// code under test
-		assert.strictEqual(_AggregationHelper.isOrderedBy(sPropertyPath, sOrderby), bExpected);
+		assert.strictEqual(_AggregationHelper.isOrderedBy([sPath], sOrderby), bExpected);
+
+		// code under test
+		assert.strictEqual(_AggregationHelper.isOrderedBy(["notUsed", sPath], sOrderby), bExpected);
 	});
 });
 
 	//*********************************************************************************************
 [undefined, {}].forEach((mAggregate, i) => {
-	QUnit.test("isUsedForGrandTotal: no aggregate,# " + i, function (assert) {
-		this.mock(_Helper).expects("getMetaPath").exactly(i)
-			.withExactArgs("~path~").returns("~metapath~");
-
+	QUnit.test("isUsedForGrandTotal: no aggregate, # " + i, function (assert) {
 		// code under test
-		assert.notOk(_AggregationHelper.isUsedForGrandTotal("~path~", mAggregate));
+		assert.notOk(_AggregationHelper.isUsedForGrandTotal(["any/path"], mAggregate));
 	});
 });
 
 	//*********************************************************************************************
-["NoAggregate", "NoGrandTotal", "WithUnitNoGrandTotal", "Unit1"].forEach((sMetaPath) => {
-	QUnit.test("isUsedForGrandTotal: not used, meta path = " + sMetaPath, function (assert) {
+["NoAggregate", "NoGrandTotal", "WithUnitNoGrandTotal", "Unit1"].forEach((sPath) => {
+	QUnit.test("isUsedForGrandTotal: not used, path = " + sPath, function (assert) {
 		const mAggregate = {
 			NoGrandTotal : {},
 			WithUnitNoGrandTotal : {unit : "Unit1"}
 		};
-		const sPath = "(42)/" + sMetaPath;
-		this.mock(_Helper).expects("getMetaPath").withExactArgs(sPath).returns(sMetaPath);
 
 		// code under test
-		assert.notOk(_AggregationHelper.isUsedForGrandTotal(sPath, mAggregate));
+		assert.notOk(_AggregationHelper.isUsedForGrandTotal([sPath], mAggregate));
 	});
 });
 
 	//*********************************************************************************************
-["WithGrandTotal", "WithUnitWithGrandTotal", "Unit2"].forEach((sMetaPath) => {
-	QUnit.test("isUsedForGrandTotal: used, meta path = " + sMetaPath, function (assert) {
+["WithGrandTotal", "WithUnitWithGrandTotal", "Unit2"].forEach((sPath) => {
+	QUnit.test("isUsedForGrandTotal: used, path = " + sPath, function (assert) {
 		const mAggregate = {
 			WithGrandTotal : {grandTotal : true},
 			WithUnitWithGrandTotal : {grandTotal : true, unit : "Unit2"}
 		};
-		const sPath = "(42)/" + sMetaPath;
-		this.mock(_Helper).expects("getMetaPath").withExactArgs(sPath).returns(sMetaPath);
 
 		// code under test
-		assert.ok(_AggregationHelper.isUsedForGrandTotal(sPath, mAggregate));
+		assert.ok(_AggregationHelper.isUsedForGrandTotal([sPath], mAggregate));
+
+		// code under test
+		assert.ok(_AggregationHelper.isUsedForGrandTotal(["notUsed", sPath, "n/a"], mAggregate));
 	});
 });
 

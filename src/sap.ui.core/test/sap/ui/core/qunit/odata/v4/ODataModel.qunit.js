@@ -3436,8 +3436,9 @@ sap.ui.define([
 	].forEach(function (oFixture) {
 		[undefined, "group"].forEach(function (sGroupId) {
 			[false, true].forEach(function (bServerOnly) {
-				var sTitle = "delete: " + JSON.stringify(oFixture) + "; groupId=" + sGroupId
-						+ "; server only: " + bServerOnly;
+				[false, true].forEach(function (bETag) {
+		var sTitle = "delete: " + JSON.stringify(oFixture) + "; groupId=" + sGroupId
+				+ "; server only: " + bServerOnly + "; w/ ETag: " + bETag;
 
 		QUnit.test(sTitle, function (assert) {
 			var aAllBindings = [{
@@ -3461,7 +3462,7 @@ sap.ui.define([
 				this.mock(oContext).expects("fetchCanonicalPath").withExactArgs()
 					.returns(SyncPromise.resolve(Promise.resolve(sCanonicalPath)));
 				this.mock(oContext).expects("fetchValue").withExactArgs("@odata.etag", null, true)
-					.returns(SyncPromise.resolve(Promise.resolve("ETag")));
+					.returns(SyncPromise.resolve(Promise.resolve(bETag ? "ETag" : undefined)));
 			}
 			this.mock(_Helper).expects("checkGroupId").withExactArgs(sGroupId, false, true);
 			this.mock(oModel).expects("getUpdateGroupId").exactly(sGroupId ? 0 : 1)
@@ -3475,7 +3476,7 @@ sap.ui.define([
 				.returns("~groupLock~");
 			this.mock(oModel.oRequestor).expects("request")
 				.withExactArgs("DELETE", "Entity('key')?~", "~groupLock~",
-					{"If-Match" : bServerOnly ? "ETag" : "*"})
+					bServerOnly && !bETag ? null : {"If-Match" : bServerOnly ? "ETag" : "*"})
 				.returns(oFixture.iStatus === 204
 					? Promise.resolve()
 					: Promise.reject(oError));
@@ -3500,6 +3501,7 @@ sap.ui.define([
 					assert.strictEqual(oResult, oError);
 				});
 		});
+				});
 			});
 		});
 	});

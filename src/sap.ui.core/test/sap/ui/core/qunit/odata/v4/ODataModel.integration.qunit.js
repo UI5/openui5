@@ -25236,12 +25236,19 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// It is not supported to update a property w/o PATCH which would set any outdated flag or
 	// affect the grand total.
 	// JIRA: CPOUI5ODATAV4-3436
+	//
+	// Handle Context#requestSideEffects with property paths in the same way as Context#setProperty
+	// regarding reading the grand total and setting the outdated flags.
+	// JIRA: CPOUI5ODATAV4-3464
 	[
 		"context refresh",
-		"request properties of a context via side effects",
+		"requestSideEffects-combine calls and request grand total once",
 		"setProperty-GrossAmount",
+		"requestSideEffects-GrossAmount",
 		"setProperty-CurrencyCode",
+		"requestSideEffects-CurrencyCode",
 		"setProperty-LifecycleStatus",
+		"requestSideEffects-LifecycleStatus",
 		"multiple setProperty in one $batch",
 		"multiple setProperty in multiple $batches"
 	].forEach((sScenario) => {
@@ -25388,7 +25395,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				assert.strictEqual(oGrandTotalContext.getProperty("@$ui5.context.isOutdated"),
 					bWithFilter);
 				assert.strictEqual(oGrandTotalContext.isOutdated(), bWithFilter);
-			} else if (sScenario === "request properties of a context via side effects") {
+			} else if (sScenario === "requestSideEffects-combine calls and request grand total once") {
 				this.expectChangeIf(bWithFilter, "isOutdated", [true,,, true])
 					.expectChangeIf(iSorterCase || bWithFilter, "isOutdatedHeader", true)
 					.expectRequest("#2 SalesOrderList('25')?sap-client=123"
@@ -25401,16 +25408,18 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					})
 					.expectChange("lifecycleStatus", [, "Y*"])
 					.expectChange("grossAmount", bWithFilter ? [, "7"] : ["11", "7",, "11"])
-					// requestSideEffects also reads the grand total and the outdated flags of
-					// the grand total rows are set to false (JIRA: CPOUI5ODATAV4-3392)
+					// requestSideEffects also reads the grand total if a grand total related property
+					// is affected and the grand total is not yet marked as outdated. In that case the
+					// outdated flags of the grand total rows are set to false.
+					// (JIRA: CPOUI5ODATAV4-3392, CPOUI5ODATAV4-3481)
 					.expectChangeIf(!bWithFilter, "isOutdated", [false,,, false]);
 
 				await Promise.all([
 					// code under test (JIRA: CPOUI5ODATAV4-3389)
 					oContext25.requestSideEffects(["LifecycleStatus"]),
 					oContext25.requestSideEffects(["GrossAmount", /*ignored:*/"NoteLanguage"]),
-					this.waitForChanges(assert, "without filter the grand total is up-to-date after"
-						+ " Context#requestSideEffects (JIRA: CPOUI5ODATAV4-3392)")
+					this.waitForChanges(assert, sScenario + ", without filter the grand total is"
+						+ " up-to-date after Context#requestSideEffects (JIRA: CPOUI5ODATAV4-3392)")
 				]);
 
 				assert.strictEqual(oGrandTotalContext.getProperty("@$ui5.context.isOutdated"),
@@ -25450,6 +25459,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							assert.strictEqual(oError.message, sNoPatchError);
 						}),
 					this.waitForChanges(assert, "update GrossAmount w/o PATCH always fails")
+				]);
+			} else if (sScenario === "requestSideEffects-GrossAmount") {
+				this.expectRequest("#2 SalesOrderList('25')?sap-client=123&$select=GrossAmount",
+						{GrossAmount : "42"})
+					.expectRequest("#2 " + sGrandTotalURL, {
+						value : [{CurrencyCode : "EUR", GrossAmount : "46"}]
+					})
+					.expectChange("isOutdated", [false,,, false])
+					.expectChange("grossAmount", ["46", "42",, "46"]);
+
+				await Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-3481)
+					oContext25.requestSideEffects(["GrossAmount"]),
+					this.waitForChanges(assert, "update GrossAmount -> grand total is requested")
 				]);
 			} else if (sScenario === "setProperty-CurrencyCode") {
 				this.expectChangeIf(bWithFilter, "isOutdated", [true,,, true])
@@ -25491,6 +25514,23 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						}),
 					this.waitForChanges(assert, "update CurrencyCode w/o PATCH always fails")
 				]);
+			} else if (sScenario === "requestSideEffects-CurrencyCode") {
+				this.expectChangeIf(bWithFilter, "isOutdated", [true,,, true])
+					.expectChangeIf(iSorterCase || bWithFilter, "isOutdatedHeader", true)
+					.expectRequest("#2 SalesOrderList('25')?sap-client=123&$select=CurrencyCode",
+						{CurrencyCode : "EUR*"})
+					.expectChange("currencyCode", [, "EUR*"])
+					.expectRequestIf(!bWithFilter, "#2 " + sGrandTotalURL, {
+						value : [{CurrencyCode : "EUR", GrossAmount : "5"}]
+					})
+					.expectChangeIf(!bWithFilter, "grossAmount", ["5",,, "5"])
+					.expectChangeIf(!bWithFilter, "isOutdated", [false,,, false]);
+
+				await Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-3481)
+					oContext25.requestSideEffects(["CurrencyCode"]),
+					this.waitForChanges(assert, sScenario)
+				]);
 			} else if (sScenario === "setProperty-LifecycleStatus") {
 				this.expectChangeIf(bWithFilter, "isOutdated", [true,,, true])
 					.expectChangeIf(iSorterCase || bWithFilter, "isOutdatedHeader", true)
@@ -25531,6 +25571,18 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						}),
 					this.waitForChanges(assert,
 						"update LifecycleStatus w/o PATCH only fails if used in filter or sorter")
+				]);
+			} else if (sScenario === "requestSideEffects-LifecycleStatus") {
+				this.expectChangeIf(bWithFilter, "isOutdated", [true,,, true])
+					.expectChangeIf(iSorterCase || bWithFilter, "isOutdatedHeader", true)
+					.expectRequest("SalesOrderList('25')?sap-client=123&$select=LifecycleStatus",
+						{LifecycleStatus : "Y*"})
+					.expectChange("lifecycleStatus", [, "Y*"]);
+
+				await Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-3481)
+					oContext25.requestSideEffects(["LifecycleStatus"]),
+					this.waitForChanges(assert, sScenario)
 				]);
 			} else if (sScenario === "multiple setProperty in one $batch") {
 				this.expectChange("grossAmount", [, "42"])
@@ -80508,152 +80560,157 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// the deletion is successful, UI switches to the active version and the draft is deleted also
 	// on the client (as a cleanup). Property bindings on the object page must not become unresolved
 	// in between, because default values would be used by controls then, for example for "visible".
-	//
 	// BCP: 109953 / 2023 (002075129500001099532023)
-	QUnit.test("BCP: 109953 / 2023 - delete context on server only", function (assert) {
-		var oActiveContext,
-			oDraftContext,
-			sMessage1 = "It sure feels fine to see one's name in print",
-			oModel = this.createSpecialCasesModel({autoExpandSelect : true}),
-			sView = '\
+	//
+	// Ensure to use "If-Match" header only if ETags are used (JIRA: CPOUI5ODATAV4-3506)
+	[false, true].forEach((bETag) => {
+		const sTitle = "BCP: 109953 / 2023 - delete context on server only; w/ ETag: " + bETag;
+
+		QUnit.test(sTitle, function (assert) {
+			var oActiveContext,
+				oDraftContext,
+				sMessage1 = "It sure feels fine to see one's name in print",
+				oModel = this.createSpecialCasesModel({autoExpandSelect : true}),
+				sView = '\
 <Text id="artistID" text="{ArtistID}"/>\
 <Text id="isActiveEntity" text="{IsActiveEntity}"/>\
 <Input id="name" value="{Name}"/>',
-			that = this;
+				that = this;
 
-		this.expectChange("artistID")
-			.expectChange("isActiveEntity")
-			.expectChange("name");
+			this.expectChange("artistID")
+				.expectChange("isActiveEntity")
+				.expectChange("name");
 
-		return this.createView(assert, sView, oModel).then(function () {
-			oDraftContext = oModel.getKeepAliveContext(
-				"/Artists(ArtistID='42',IsActiveEntity=false)", /*bRequestMessages*/true);
+			return this.createView(assert, sView, oModel).then(function () {
+				oDraftContext = oModel.getKeepAliveContext(
+					"/Artists(ArtistID='42',IsActiveEntity=false)", /*bRequestMessages*/true);
 
-			that.expectRequest("Artists(ArtistID='42',IsActiveEntity=false)"
-					+ "?$select=ArtistID,IsActiveEntity,Messages,Name", {
-					"@odata.etag" : "ETag",
-					ArtistID : "42",
-					IsActiveEntity : false,
-					Messages : [{
+				that.expectRequest("Artists(ArtistID='42',IsActiveEntity=false)"
+						+ "?$select=ArtistID,IsActiveEntity,Messages,Name", {
+						...(bETag && {"@odata.etag" : "ETag"}),
+						ArtistID : "42",
+						IsActiveEntity : false,
+						Messages : [{
+							message : sMessage1,
+							numericSeverity : 1,
+							target : "Name"
+						}],
+						Name : "Ms. Eliot"
+					})
+					.expectChange("artistID", "42")
+					.expectChange("isActiveEntity", "No")
+					.expectChange("name", "Ms. Eliot")
+					.expectMessages([{
 						message : sMessage1,
-						numericSeverity : 1,
-						target : "Name"
-					}],
-					Name : "Ms. Eliot"
-				})
-				.expectChange("artistID", "42")
-				.expectChange("isActiveEntity", "No")
-				.expectChange("name", "Ms. Eliot")
-				.expectMessages([{
-					message : sMessage1,
-					target : "/Artists(ArtistID='42',IsActiveEntity=false)/Name",
-					type : "Success"
-				}]);
+						target : "/Artists(ArtistID='42',IsActiveEntity=false)/Name",
+						type : "Success"
+					}]);
 
-			that.oView.setBindingContext(oDraftContext);
+				that.oView.setBindingContext(oDraftContext);
 
-			return that.waitForChanges(assert, "show draft");
-		}).then(function () {
-			return that.checkValueState(assert, that.oView.byId("name"), "Success", sMessage1);
-		}).then(function () {
-			var oSiblingEntity = oModel.bindContext("SiblingEntity(...)", oDraftContext,
-					{$$inheritExpandSelect : true});
+				return that.waitForChanges(assert, "show draft");
+			}).then(function () {
+				return that.checkValueState(assert, that.oView.byId("name"), "Success", sMessage1);
+			}).then(function () {
+				var oSiblingEntity = oModel.bindContext("SiblingEntity(...)", oDraftContext,
+						{$$inheritExpandSelect : true});
 
-			that.expectRequest("Artists(ArtistID='42',IsActiveEntity=false)"
-					+ "/SiblingEntity?$select=ArtistID,IsActiveEntity,Messages,Name", {
-					ArtistID : "42",
-					IsActiveEntity : true,
-					Messages : [],
-					Name : "Missy Eliot"
-				});
+				that.expectRequest("Artists(ArtistID='42',IsActiveEntity=false)"
+						+ "/SiblingEntity?$select=ArtistID,IsActiveEntity,Messages,Name", {
+						ArtistID : "42",
+						IsActiveEntity : true,
+						Messages : [],
+						Name : "Missy Eliot"
+					});
 
-			return Promise.all([
-				// code under test
-				oSiblingEntity.invoke("$auto", /*bIgnoreETag*/false,
-					/*fnOnStrictHandlingFailed*/null, /*bReplaceWithRVC*/true),
-				that.waitForChanges(assert, "SiblingEntity")
-			]);
-		}).then(function (aResults) {
-			oActiveContext = aResults[0];
+				return Promise.all([
+					// code under test
+					oSiblingEntity.invoke("$auto", /*bIgnoreETag*/false,
+						/*fnOnStrictHandlingFailed*/null, /*bReplaceWithRVC*/true),
+					that.waitForChanges(assert, "SiblingEntity")
+				]);
+			}).then(function (aResults) {
+				oActiveContext = aResults[0];
 
-			that.expectRequest("DELETE Artists(ArtistID='42',IsActiveEntity=false)", {
-					headers : {"If-Match" : "ETag"}
-				}, undefined, {
-					"sap-messages" : JSON.stringify([{
+				that.expectRequest("DELETE Artists(ArtistID='42',IsActiveEntity=false)", {
+						headers : bETag ? {"If-Match" : "ETag"} : {}
+					}, undefined, {
+						"sap-messages" : JSON.stringify([{
+							code : "foo-42",
+							message : "What a nice name!",
+							numericSeverity : 2,
+							target : "Name"
+						}])
+					})
+					.expectMessages([{
+						message : sMessage1,
+						target : "/Artists(ArtistID='42',IsActiveEntity=false)/Name",
+						type : "Success"
+					}, {
 						code : "foo-42",
 						message : "What a nice name!",
-						numericSeverity : 2,
-						target : "Name"
-					}])
-				})
-				.expectMessages([{
-					message : sMessage1,
-					target : "/Artists(ArtistID='42',IsActiveEntity=false)/Name",
-					type : "Success"
-				}, {
-					code : "foo-42",
-					message : "What a nice name!",
-					persistent : true,
-					target : "/Artists(ArtistID='42',IsActiveEntity=false)/Name",
-					type : "Information"
-				}]);
+						persistent : true,
+						target : "/Artists(ArtistID='42',IsActiveEntity=false)/Name",
+						type : "Information"
+					}]);
 
-			return Promise.all([
-				// code under test
-				oModel.delete(oDraftContext),
-				that.waitForChanges(assert, "delete")
-			]);
-		}).then(function () { // Note: no changes to UI so far!
-			return that.checkValueState(assert, that.oView.byId("name"), "Success", sMessage1);
-		}).then(function () {
-			that.expectChange("isActiveEntity", "Yes")
-				.expectChange("name", "Missy Eliot");
+				return Promise.all([
+					// code under test
+					oModel.delete(oDraftContext),
+					that.waitForChanges(assert, "delete")
+				]);
+			}).then(function () { // Note: no changes to UI so far!
+				return that.checkValueState(assert, that.oView.byId("name"), "Success", sMessage1);
+			}).then(function () {
+				that.expectChange("isActiveEntity", "Yes")
+					.expectChange("name", "Missy Eliot");
 
-			that.oView.setBindingContext(oActiveContext);
+				that.oView.setBindingContext(oActiveContext);
 
-			return that.waitForChanges(assert, "show active");
-		}).then(function () {
-			return that.checkValueState(assert, that.oView.byId("name"), "None", "");
-		}).then(function () {
-			that.oLogMock.expects("error")
-				.withArgs("Failed to delete /Artists(ArtistID='42',IsActiveEntity=false)");
-			that.expectRequest("DELETE Artists(ArtistID='42',IsActiveEntity=false)", {
-					headers : {"If-Match" : "ETag"}
-				}, createErrorInsideBatch({target : "ArtistID"}))
-				.expectMessages([{
-					message : sMessage1,
-					target : "/Artists(ArtistID='42',IsActiveEntity=false)/Name",
-					type : "Success"
-				}, {
-					code : "foo-42",
-					message : "What a nice name!",
-					persistent : true,
-					target : "/Artists(ArtistID='42',IsActiveEntity=false)/Name",
-					type : "Information"
-				}, {
-					code : "CODE",
-					message : "Request intentionally failed",
-					persistent : true,
-					target : "/Artists(ArtistID='42',IsActiveEntity=false)/ArtistID",
-					technical : true,
-					type : "Error"
-				}]);
+				return that.waitForChanges(assert, "show active");
+			}).then(function () {
+				return that.checkValueState(assert, that.oView.byId("name"), "None", "");
+			}).then(function () {
+				that.oLogMock.expects("error")
+					.withArgs("Failed to delete /Artists(ArtistID='42',IsActiveEntity=false)");
+				that.expectRequest("DELETE Artists(ArtistID='42',IsActiveEntity=false)", {
+						headers : bETag ? {"If-Match" : "ETag"} : {}
+					}, createErrorInsideBatch({target : "ArtistID"}))
+					.expectMessages([{
+						message : sMessage1,
+						target : "/Artists(ArtistID='42',IsActiveEntity=false)/Name",
+						type : "Success"
+					}, {
+						code : "foo-42",
+						message : "What a nice name!",
+						persistent : true,
+						target : "/Artists(ArtistID='42',IsActiveEntity=false)/Name",
+						type : "Information"
+					}, {
+						code : "CODE",
+						message : "Request intentionally failed",
+						persistent : true,
+						target : "/Artists(ArtistID='42',IsActiveEntity=false)/ArtistID",
+						technical : true,
+						type : "Error"
+					}]);
 
-			return Promise.all([
-				// code under test
-				oModel.delete(oDraftContext).then(mustFail(assert), function (oError) {
-					assert.strictEqual(oError.message, "Request intentionally failed");
-				}),
-				that.waitForChanges(assert, "delete again")
-			]);
-		}).then(function () {
-			that.expectMessages([]);
+				return Promise.all([
+					// code under test
+					oModel.delete(oDraftContext).then(mustFail(assert), function (oError) {
+						assert.strictEqual(oError.message, "Request intentionally failed");
+					}),
+					that.waitForChanges(assert, "delete again")
+				]);
+			}).then(function () {
+				that.expectMessages([]);
 
-			return Promise.all([
-				// code under test
-				oDraftContext.delete(null),
-				that.waitForChanges(assert, "cleanup")
-			]);
+				return Promise.all([
+					// code under test
+					oDraftContext.delete(null),
+					that.waitForChanges(assert, "cleanup")
+				]);
+			});
 		});
 	});
 

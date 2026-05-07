@@ -9636,7 +9636,7 @@ sap.ui.define([
 			.withExactArgs(bHeader ? "~aContexts~" : [oContext]).returns("~aPredicates~");
 		this.mock(oBinding).expects("lockGroup").exactly(bHasCache ? 1 : 0)
 			.withExactArgs(sGroupId).returns(oGroupLock);
-		this.mock(oBinding).expects("setOutdated").withExactArgs();
+		this.mock(oBinding).expects("setOutdated").withExactArgs(false, sinon.match.same(aPaths));
 		oCacheMock.expects("requestSideEffects").exactly(bHasCache ? 1 : 0)
 			.withExactArgs(sinon.match.same(oGroupLock), sinon.match.same(aPaths), "~aPredicates~",
 				!bHeader, !bHeader)
@@ -10633,7 +10633,9 @@ sap.ui.define([
 
 	QUnit.test(sTitle, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
-		this.mock(oBinding).expects("setOutdated").withExactArgs(false, sPath, !bWithGroupLock);
+		this.mock(_Helper).expects("getMetaPath").withExactArgs(sPath).returns("~metaPath~");
+		this.mock(oBinding).expects("setOutdated")
+			.withExactArgs(false, ["~metaPath~"], !bWithGroupLock);
 
 		// code under test
 		assert.strictEqual(
@@ -10714,6 +10716,10 @@ sap.ui.define([
 		+ ", bWithAggregationCache=" + bWithAggregationCache + ", bForce=" + bForce
 		+ ", bWithPath=" + bWithPath + ", bNoRequest=" + bNoRequest + ", " + oFixture.title;
 
+	if (bNoRequest && !bWithPath) {
+		return; // bNoRequest requires aPaths to be provided
+	}
+
 	QUnit.test(sTitle, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
 		oBinding.mParameters.$$aggregation = {aggregate : "~aggregate~"};
@@ -10721,27 +10727,24 @@ sap.ui.define([
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation);
-		this.mock(_Helper).expects("getMetaPath").exactly(bDataAggregation && bWithPath ? 1 : 0)
-			.withExactArgs("~sPropertyPath~")
-			.returns("~metaPath~");
 		this.mock(oBinding).expects("isFilteredBy")
 			.exactly(bDataAggregation && !bForce && "isFilteredByResult" in oFixture ? 1 : 0)
-			.withExactArgs(bWithPath ? "~metaPath~" : undefined)
+			.withExactArgs(bWithPath ? "~aPaths~" : undefined)
 			.returns(oFixture.isFilteredByResult);
 		this.mock(oBinding).expects("isSortedBy")
 			.exactly(bDataAggregation && !bForce && "isSortedByResult" in oFixture ? 1 : 0)
-			.withExactArgs(bWithPath ? "~metaPath~" : undefined)
+			.withExactArgs(bWithPath ? "~aPaths~" : undefined)
 			.returns(oFixture.isSortedByResult);
 		this.mock(_AggregationHelper).expects("isUsedForGrandTotal")
 			.exactly(bDataAggregation && bNoRequest && !bForce && !oFixture.headerContext ? 1 : 0)
-			.withExactArgs(bWithPath ? "~metaPath~" : undefined, "~aggregate~")
+			.withExactArgs(bWithPath ? "~aPaths~" : undefined, "~aggregate~")
 			.returns(oFixture.isUsedForGrandTotal);
 
 		if (bDataAggregation && bNoRequest
 				&& (bForce || oFixture.headerContext || oFixture.isUsedForGrandTotal)) {
 			assert.throws(() => {
 				// code under test
-				oBinding.setOutdated(bForce, bWithPath ? "~sPropertyPath~" : undefined, true);
+				oBinding.setOutdated(bForce, bWithPath ? "~aPaths~" : undefined, true);
 			}, new Error("Missing PATCH request when @$ui5.context.isOutdated would be set"));
 		} else {
 			if (bWithAggregationCache) {
@@ -10758,8 +10761,7 @@ sap.ui.define([
 
 			// code under test
 			assert.strictEqual(
-				oBinding.setOutdated(bForce, bWithPath ? "~sPropertyPath~" : undefined,
-					bNoRequest),
+				oBinding.setOutdated(bForce, bWithPath ? "~aPaths~" : undefined, bNoRequest),
 				undefined);
 		}
 	});
@@ -12639,7 +12641,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("isFilteredBy: no path", function (assert) {
+	QUnit.test("isFilteredBy: no paths", function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
 		this.mock(_AggregationHelper).expects("isAffected").never();
 
@@ -12659,39 +12661,39 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("isFilteredBy: with path", function (assert) {
+	QUnit.test("isFilteredBy: with paths", function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
 		const oAggregationHelperMock = this.mock(_AggregationHelper);
 		oAggregationHelperMock.expects("isAffected")
-			.withExactArgs(null, sinon.match.same(oBinding.aApplicationFilters), ["~foo~"])
+			.withExactArgs(null, sinon.match.same(oBinding.aApplicationFilters), "~aPaths~")
 			.returns(true);
 
 		// code under test
-		assert.ok(oBinding.isFilteredBy("~foo~"));
+		assert.ok(oBinding.isFilteredBy("~aPaths~"));
 
 		oAggregationHelperMock.expects("isAffected")
-			.withExactArgs(null, sinon.match.same(oBinding.aApplicationFilters), ["~foo~"])
+			.withExactArgs(null, sinon.match.same(oBinding.aApplicationFilters), "~aPaths~")
 			.returns(false);
 		oAggregationHelperMock.expects("isAffected")
-			.withExactArgs(null, sinon.match.same(oBinding.aFilters), ["~foo~"])
+			.withExactArgs(null, sinon.match.same(oBinding.aFilters), "~aPaths~")
 			.returns(true);
 
 		// code under test
-		assert.ok(oBinding.isFilteredBy("~foo~"));
+		assert.ok(oBinding.isFilteredBy("~aPaths~"));
 
 		oAggregationHelperMock.expects("isAffected")
-			.withExactArgs(null, sinon.match.same(oBinding.aApplicationFilters), ["~foo~"])
+			.withExactArgs(null, sinon.match.same(oBinding.aApplicationFilters), "~aPaths~")
 			.returns(false);
 		oAggregationHelperMock.expects("isAffected")
-			.withExactArgs(null, sinon.match.same(oBinding.aFilters), ["~foo~"])
+			.withExactArgs(null, sinon.match.same(oBinding.aFilters), "~aPaths~")
 			.returns(false);
 
 		// code under test - no $filter parameter
-		assert.notOk(oBinding.isFilteredBy("~foo~"));
+		assert.notOk(oBinding.isFilteredBy("~aPaths~"));
 	});
 
 	//*********************************************************************************************
-	QUnit.test("isSortedBy: no path", function (assert) {
+	QUnit.test("isSortedBy: no paths", function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
 		this.mock(_AggregationHelper).expects("isOrderedBy").never();
 
@@ -12711,30 +12713,31 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("isSortedBy: with path", function (assert) {
+	QUnit.test("isSortedBy: with paths", function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
-		oBinding.aSorters = [new Sorter("~foo~"), new Sorter("~bar~", true)];
+		oBinding.aSorters = [new Sorter("path/to/foo"), new Sorter("path/to/bar", true)];
 		const oAggregationHelperMock = this.mock(_AggregationHelper);
 		oAggregationHelperMock.expects("isOrderedBy").never();
 
 		// code under test
-		assert.ok(oBinding.isSortedBy("~bar~"));
+		assert.strictEqual(oBinding.isSortedBy(["path/to/foo"]), true);
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy(["notUsed", "path/to/bar"]), true);
 
 		oBinding.aSorters = [];
 		oBinding.mParameters.$orderby = "~$orderby~";
-		oAggregationHelperMock.expects("isOrderedBy")
-			.withExactArgs("~sPropertyPath~", "~$orderby~")
+		oAggregationHelperMock.expects("isOrderedBy").withExactArgs("~aPaths~", "~$orderby~")
 			.returns(true);
 
 		// code under test
-		assert.strictEqual(oBinding.isSortedBy("~sPropertyPath~"), true);
+		assert.strictEqual(oBinding.isSortedBy("~aPaths~"), true);
 
-		oAggregationHelperMock.expects("isOrderedBy")
-			.withExactArgs("~sPropertyPath~", "~$orderby~")
+		oAggregationHelperMock.expects("isOrderedBy").withExactArgs("~aPaths~", "~$orderby~")
 			.returns(false);
 
 		// code under test
-		assert.strictEqual(oBinding.isSortedBy("~sPropertyPath~"), false);
+		assert.strictEqual(oBinding.isSortedBy("~aPaths~"), false);
 	});
 
 	//*********************************************************************************************
