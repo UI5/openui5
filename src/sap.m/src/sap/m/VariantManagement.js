@@ -3229,11 +3229,6 @@ sap.ui.define([
 				filters: this._getVisibleFilter()
 			});
 
-			if (bHasExternalBinding) {
-				// If an items binding is provided, then visibility should be handled there.
-				delete oBindingInfo.filters;
-			}
-
 			this._sModelName = oBindingInfo.model;
 			this.oManagementTable.bindAggregation("items", oBindingInfo);
 		} else if (!bHasExternalBinding) {
