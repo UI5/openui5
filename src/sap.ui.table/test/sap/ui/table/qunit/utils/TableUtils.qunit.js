@@ -868,16 +868,17 @@ sap.ui.define([
 				fn();
 			}
 		};
+		const oFakeTable = {getBinding: () => oFakeBinding};
 
 		const oGetContextsSpy = sinon.spy(oFakeBinding, "getContexts");
 		const oAttachEventSpy = sinon.spy(oFakeBinding, "attachEventOnce");
 
-		return TableUtils.loadContexts(oFakeBinding, 0, 2).then(function(aContexts) {
+		return TableUtils.loadContexts(oFakeTable, 0, 2).then(function(aContexts) {
 			assert.ok(oGetContextsSpy.calledOnceWithExactly(0, 2, 0, true), "Binding#getContexts is called once with the correct parameters");
 			assert.ok(oAttachEventSpy.notCalled, "requested contexts are available, so no dataReceived event listener is attached");
 			assert.equal(aContexts.length, 2, "the method resolves with 2 contexts");
 			oGetContextsSpy.resetHistory();
-			return TableUtils.loadContexts(oFakeBinding, 0, 7);
+			return TableUtils.loadContexts(oFakeTable, 0, 7);
 		}).then(function(aContexts) {
 			assert.equal(oGetContextsSpy.callCount, 3, "Binding#getContexts is called thrice");
 			assert.ok(oGetContextsSpy.alwaysCalledWith(0, 7, 0, true), "with the correct parameters");
@@ -885,6 +886,52 @@ sap.ui.define([
 				"dataReceived event listener is attached twice");
 			assert.equal(aContexts.length, 7, "the method resolves with 7 contexts");
 		});
+	});
+
+	QUnit.test("loadContexts - busy indicator", async function(assert) {
+		const oFakeBinding = {
+			limit: 2,
+			length: 8,
+			loadedContexts: [],
+			getLength() {
+				return this.length;
+			},
+			getContexts(iStartIndex, iLength) {
+				this.loadedContexts = this.loadedContexts.filter(Boolean);
+				const iLoadedContextsCount = this.loadedContexts.length;
+				for (let j = Math.max(iLoadedContextsCount, iStartIndex); j < Math.min(this.length, iLength); j++) {
+					if (j < iLoadedContextsCount + this.limit) {
+						this.loadedContexts.push({});
+					} else {
+						this.loadedContexts.push(undefined);
+					}
+				}
+				return this.loadedContexts;
+			},
+			attachEventOnce(sEvent, fn) {
+				fn();
+			}
+		};
+		const oFakeTable = {_setBusy: sinon.spy(), getBinding: () => oFakeBinding};
+
+		const pLoad = TableUtils.loadContexts(oFakeTable, 0, 7, true);
+		assert.ok(oFakeTable._setBusy.calledOnceWithExactly(true), "_setBusy(true) called synchronously");
+
+		await pLoad;
+		assert.strictEqual(oFakeTable._setBusy.callCount, 2, "_setBusy called exactly twice");
+		assert.ok(oFakeTable._setBusy.lastCall.calledWithExactly(false), "_setBusy(false) called when promise resolves");
+	});
+
+	QUnit.test("loadContexts - no busy indicator when data is available", async function(assert) {
+		const oFakeBinding = {
+			getLength() { return 2; },
+			getContexts() { return [{}, {}]; },
+			attachEventOnce() {}
+		};
+		const oFakeTable = {_setBusy: sinon.spy(), getBinding: () => oFakeBinding};
+
+		await TableUtils.loadContexts(oFakeTable, 0, 2, true);
+		assert.ok(oFakeTable._setBusy.notCalled, "_setBusy not called when data is cached");
 	});
 
 	QUnit.test("getFocusedItemInfo", function(assert) {

@@ -668,24 +668,36 @@ sap.ui.define([
 		/**
 		 * Loads <code>iLength</code> binding contexts starting from index <code>iStartIndex</code>.
 		 *
-		 * @param {object} oBinding The binding
+		 * @param {sap.ui.table.Table} oTable The table instance
 		 * @param {int} iStartIndex The starting index
 		 * @param {int} iLength The length
+		 * @param {boolean} [bBusy] Whether to show the table's busy indicator during loading
 		 * @returns {Promise<sap.ui.model.Context[]>} Promise that resolves with the row contexts once they are loaded.
 		 */
-		loadContexts: function(oBinding, iStartIndex, iLength) {
+		loadContexts: async function(oTable, iStartIndex, iLength, bBusy = false) {
+			const oBinding = oTable.getBinding();
 			const aContexts = oBinding.getContexts(iStartIndex, iLength, 0, true);
 			const bContextsAvailable = aContexts.length === Math.min(iLength, oBinding.getLength()) && !aContexts.includes(undefined);
 
 			if (bContextsAvailable) {
-				return Promise.resolve(aContexts);
+				return aContexts;
 			}
 
-			return new Promise(function(resolve) {
-				oBinding.attachEventOnce("dataReceived", function() {
-					resolve(this.loadContexts(oBinding, iStartIndex, iLength));
-				}.bind(this));
-			}.bind(this));
+			if (bBusy) {
+				oTable._setBusy(true);
+			}
+
+			await new Promise((resolve) => {
+				oBinding.attachEventOnce("dataReceived", resolve);
+			});
+
+			const aLoadedContexts = await this.loadContexts(oTable, iStartIndex, iLength);
+
+			if (bBusy) {
+				oTable._setBusy(false);
+			}
+
+			return aLoadedContexts;
 		},
 
 		/**
