@@ -296,20 +296,6 @@ sap.ui.define([
 					only: ["sap/ui/rta/command/LocalReset"]
 				}
 			},
-			"command/LREPSerializer": {
-				group: "Command",
-				coverage: {
-					only: ["sap/ui/rta/command/LREPSerializer"]
-				},
-				ui5: {
-					resourceroots: {
-						qunit: "test-resources/sap/ui/rta/qunit/",
-						"sap.ui.rta.qunitrta": "test-resources/sap/ui/rta/internal/testdata/qunit_rta/",
-						"sap.ui.rta.test": "test-resources/sap/ui/rta/internal/testdata/rta/"
-					},
-					flexibilityServices: '[{"connector": "SessionStorageConnector"}]'
-				}
-			},
 			"command/Move": {
 				group: "Command",
 				coverage: {
@@ -413,6 +399,14 @@ sap.ui.define([
 			},
 
 			// Integration tests
+			"integration/ControlVariantLazyLoading": {
+				group: "Integration",
+				ui5: {
+					resourceroots: {
+						qunit: "test-resources/sap/ui/rta/qunit/"
+					}
+				}
+			},
 			"integration/SimpleFormRemove": {
 				group: "Integration",
 				ui5: {
@@ -1070,7 +1064,15 @@ sap.ui.define([
 						}
 					}
 				},
-				"integration/BasicFunctionality": {
+				"integration/CompVariantLazyLoading": {
+					group: "Integration",
+					ui5: {
+						resourceroots: {
+							qunit: "test-resources/sap/ui/rta/qunit/"
+						}
+					}
+				},
+				"integration/ControlVariantRemove": {
 					group: "Integration",
 					ui5: {
 						resourceroots: {
@@ -1081,7 +1083,7 @@ sap.ui.define([
 						flexibilityServices: '[{"connector": "SessionStorageConnector"}]'
 					}
 				},
-				"integration/ControlVariantRemove": {
+				"integration/BasicFunctionality": {
 					group: "Integration",
 					ui5: {
 						resourceroots: {
@@ -1144,6 +1146,20 @@ sap.ui.define([
 						resourceroots: {
 							"sap.ui.rta.test.additionalElements": "test-resources/sap/ui/rta/internal/testdata/additionalElements/"
 						}
+					}
+				},
+				"command/LREPSerializer": {
+					group: "Command",
+					coverage: {
+						only: ["sap/ui/rta/command/LREPSerializer"]
+					},
+					ui5: {
+						resourceroots: {
+							qunit: "test-resources/sap/ui/rta/qunit/",
+							"sap.ui.rta.qunitrta": "test-resources/sap/ui/rta/internal/testdata/qunit_rta/",
+							"sap.ui.rta.test": "test-resources/sap/ui/rta/internal/testdata/rta/"
+						},
+						flexibilityServices: '[{"connector": "SessionStorageConnector"}]'
 					}
 				},
 				"util/changeVisualization/ChangeVisualization": {

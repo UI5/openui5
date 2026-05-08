@@ -14,9 +14,10 @@ sap.ui.define([
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/Util",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
-	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/Loader",
+	"sap/ui/fl/initial/api/InitialFlexAPI",
+	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/ui/fl/write/api/ControlPersonalizationWriteAPI",
@@ -50,9 +51,10 @@ sap.ui.define([
 	DesignTime,
 	DtUtil,
 	FlexRuntimeInfoAPI,
-	Version,
 	FlexInfoSession,
 	Loader,
+	InitialFlexAPI,
+	Version,
 	ChangesWriteAPI,
 	ContextBasedAdaptationsAPI,
 	ControlPersonalizationWriteAPI,
@@ -807,7 +809,7 @@ sap.ui.define([
 			});
 			await ContextBasedAdaptationsAPI.initialize({ control: oComp, layer: "CUSTOMER" });
 			this.oContextBasedAdaptationsAPILoadStub.resolves({ adaptations: [{ id: "12345" }, { id: "67890" }, DEFAULT_ADAPTATION] });
-			sandbox.stub(ReloadManager, "needsAutomaticStart").resolves(true);
+			sandbox.stub(InitialFlexAPI, "isAutomaticRtaStartEnabled").resolves(true);
 
 			await this.oRta.start();
 			assert.strictEqual(this.oContextBasedAdaptationsAPILoadStub.callCount, 1, "CBA Model is not loaded again");

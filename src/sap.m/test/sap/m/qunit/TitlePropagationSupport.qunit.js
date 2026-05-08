@@ -75,14 +75,15 @@ sap.ui.define([
 			this.oTC = new TestControl();
 		},
 		afterEach: function () {
+			this.oSuggestSpy?.restore();
+			this.oSuggestSpy = null;
 			this.oTC.destroy();
 			this.oTC = null;
-
 		},
 		getTitleID: function () {
 			return this.oTC.getTitleId();
 		},
-		getMockedControl: function (sMockedControlType) {
+		getMockedControl: function (sMockedControlType, bSuggestTitleSupported) {
 			// Using sap.ui.core.Control here to not introduce unneeded dependency to another library
 			var oControl = new Control();
 
@@ -92,14 +93,16 @@ sap.ui.define([
 			};
 
 			// Mock _suggestTitleId method on the instance
-			oControl._suggestTitleId = function () {};
+			if (bSuggestTitleSupported) {
+				oControl._suggestTitleId = function () {};
+				this.oSuggestSpy = bSuggestTitleSupported && this.spy(oControl, "_suggestTitleId");
+			}
 
 			return oControl;
 		},
-		assertWithMockControlOfType: function (assert, sType, bNegative) {
+		assertWithMockControlOfType: function (assert, sType, bSuggestTitleSupported, bNegative) {
 			// Arrange
-			var oMockedControl = this.getMockedControl(sType),
-				oSuggestSpy = this.spy(oMockedControl, "_suggestTitleId"),
+			var oMockedControl = this.getMockedControl(sType, bSuggestTitleSupported),
 				sTitleID = this.getTitleID();
 
 			this.oTC.removeAllContent(); // Make sure we don't have any leftover content from the last test
@@ -111,33 +114,31 @@ sap.ui.define([
 
 			// Assert
 			if (!bNegative) {
-				assert.strictEqual(oSuggestSpy.callCount, 1,
+				assert.strictEqual(this.oSuggestSpy.callCount, 1,
 						"Suggest method is called once for control of type " + sType);
-				assert.ok(oSuggestSpy.calledWithMatch({id: sTitleID}),
+				assert.ok(this.oSuggestSpy.calledWithMatch({id: sTitleID}),
 						"Suggest method on " + sType + " is called with object containing the expected title ID: " +
 						sTitleID);
-			} else {
-				assert.strictEqual(oSuggestSpy.callCount, 0,
+			} else if (bSuggestTitleSupported) {
+				assert.strictEqual(this.oSuggestSpy.callCount, 0,
 						"The method should not be called for a control of type " + sType);
 			}
 
 			// Cleanup
-			oSuggestSpy.restore();
 			oMockedControl.destroy();
 		}
 	});
 
 	QUnit.test("propagation to a child control of type", function (assert) {
 		// Assert
-		this.assertWithMockControlOfType(assert, "sap.ui.layout.form.SimpleForm");
-		this.assertWithMockControlOfType(assert, "sap.ui.layout.form.Form");
-		this.assertWithMockControlOfType(assert, "sap.ui.comp.smartform.SmartForm");
-		this.assertWithMockControlOfType(assert, "sap.m.Button", true /* Negative test */);
+		this.assertWithMockControlOfType(assert, "sap.ui.layout.form.SimpleForm", true, false);
+		this.assertWithMockControlOfType(assert, "sap.ui.layout.form.Form", true, false);
+		this.assertWithMockControlOfType(assert, "sap.ui.comp.smartform.SmartForm", true, false);
+		this.assertWithMockControlOfType(assert, "sap.m.Button", false, true /* Negative test */);
 	});
 
 	QUnit.test("_propagateTitleIdToChildControl private method", function (assert) {
-		var oMockedControl = this.getMockedControl("sap.ui.layout.form.SimpleForm"),
-			oSuggestSpy = this.spy(oMockedControl, "_suggestTitleId"),
+		var oMockedControl = this.getMockedControl("sap.ui.layout.form.SimpleForm", true),
 			bResult;
 
 		// Assert
@@ -152,28 +153,27 @@ sap.ui.define([
 		// Assert
 		assert.notOk(bResult,
 				"Method called on a control with content but without a ID should return false");
-		assert.strictEqual(oSuggestSpy.callCount, 0,
+		assert.strictEqual(this.oSuggestSpy.callCount, 0,
 				"Suggest method should not be called when propagate method is called without ID");
 
 		// Act - reset the spy and call suggest method with ID when there is a content in the control
-		oSuggestSpy.resetHistory();
+		this.oSuggestSpy.resetHistory();
 		this.oTC.setReturnTitleId(true); // In this case this.oTC.getTitleId() should return ID
 		bResult = this.oTC._propagateTitleIdToChildControl();
 
 		assert.ok(bResult,
 				"Method called on a control with content and with ID should return true");
-		assert.strictEqual(oSuggestSpy.callCount, 1,
+		assert.strictEqual(this.oSuggestSpy.callCount, 1,
 				"Suggest method should be called once to propagate ID");
 
 		// Cleanup
-		oSuggestSpy.restore();
 		oMockedControl.destroy();
 	});
 
 	QUnit.test("_propagateTitleIdToChildControl private method - ACC mode", function (assert) {
 		// Arrange
 		var oStub = this.stub(ControlBehavior, "isAccessibilityEnabled").returns(true),
-			oMockedControl = this.getMockedControl("sap.ui.layout.form.SimpleForm"),
+			oMockedControl = this.getMockedControl("sap.ui.layout.form.SimpleForm", true),
 			bResult;
 
 		// Act - add content to control and call method

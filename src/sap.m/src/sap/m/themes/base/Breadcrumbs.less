@@ -2,6 +2,7 @@
 /* CSS for control sap.m/Breadcrumbs  */
 /* Base theme                         */
 /* ================================== */
+
 @_sap_m_Breadcrumbs_MinWidth_OFT: 1px;
 
 .sapMBreadcrumbs {
@@ -41,8 +42,8 @@
 		&:hover {
 
 			.sapMSltIcon::before {
-				color: @sapUiLinkHover;
-				border-bottom: 0.0625rem solid @sapUiLinkHover;
+				color: var(--sapLink_Hover_Color);
+				border-bottom: 0.0625rem solid var(--sapLink_Hover_Color);
 			}
 		}
 	}
@@ -52,8 +53,8 @@
 		vertical-align: super;
 		color: var(--sapLinkColor);
 		speak: none;
-		content: "...\e1ef";
-		font-size: @sapMFontMediumSize;
+		content: '...\e1ef';
+		font-size: var(--sapFontSize);
 		padding-bottom: 0.0625rem;
 	}
 
@@ -71,11 +72,10 @@
 	/* set the flex to 1 for the breadcrumbsItem in order for the last item's text to truncate properly, but only if
 	there's two items (the select and the last item in the breadcrumbs) or if there's only one item in the breadcrumbs
 	and no select. In all other cases the texts should not truncate thus leaving the responsiveness to the breadcrumbs
-	mechanism (moving items from the breadcrumbs into the select)*/
+	mechanism (moving items from the breadcrumbs into the select) */
 	.sapMBreadcrumbsSelectItem + .sapMBreadcrumbsItem:last-child:nth-child(2),
 	.sapMBreadcrumbsItem:last-child:nth-child(1) {
 		min-width: 1%;
-		-webkit-box-flex: 1;
 		flex: 1 1 auto;
 	}
 
@@ -99,7 +99,7 @@
 
 	.sapMBreadcrumbsSeparator {
 		padding: 0 0.25rem;
-		font-size: @sapMFontMediumSize;
+		font-size: var(--sapFontSize);
 	}
 
 	.sapMBreadcrumbsItem,
@@ -142,6 +142,7 @@
 /* Breadcrumbs picker with text wrapping */
 .sapMBreadcrumbsPicker-CTX.sapMPickerWrappedItems,
 .sapMBreadcrumbsPicker.sapMPickerWrappedItems {
+
 	.sapMSelectList.sapMSelectListWrappedItems {
 		max-width: 600px;
 		width: auto;
