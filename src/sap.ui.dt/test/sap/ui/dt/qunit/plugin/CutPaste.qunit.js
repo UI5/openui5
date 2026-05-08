@@ -108,28 +108,28 @@ function(
 			Device.os.macintosh = true;
 			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, false, true);
 			assert.ok(this.oButtonOverlay.hasStyleClass("sapUiDtOverlayCutted"), "the button overlay is marked with the correct style");
-			assert.equal(this.oCutPaste.getCuttedOverlay(), this.oButtonOverlay, "then the button overlay is remembered as to be cutted");
+			assert.equal(this.oCutPaste.getElementMover().getMovedOverlay(), this.oButtonOverlay, "then the button overlay is remembered as to be cut");
 		});
 
 		QUnit.test("when cut is triggered on a button overlay, with macintosh device and ctrlKey is pushed", function(assert) {
 			Device.os.macintosh = true;
 			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true, false);
 			assert.notOk(this.oButtonOverlay.hasStyleClass("sapUiDtOverlayCutted"), "the button overlay is marked with the correct style");
-			assert.equal(this.oCutPaste.getCuttedOverlay(), undefined, "then the button overlay is undefined");
+			assert.equal(this.oCutPaste.getElementMover().getMovedOverlay(), undefined, "then the button overlay is undefined");
 		});
 
 		QUnit.test("when cut is triggered on a button overlay, with no macintosh device and ctrlKey is pushed", function(assert) {
 			Device.os.macintosh = false;
 			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true, false);
 			assert.ok(this.oButtonOverlay.hasStyleClass("sapUiDtOverlayCutted"), "the button overlay is marked with the correct style");
-			assert.equal(this.oCutPaste.getCuttedOverlay(), this.oButtonOverlay, "then the button overlay is remembered as to be cutted");
+			assert.equal(this.oCutPaste.getElementMover().getMovedOverlay(), this.oButtonOverlay, "then the button overlay is remembered as to be cut");
 		});
 
 		QUnit.test("when cut is triggered on a button overlay, with no macintosh device and metaKey is pushed", function(assert) {
 			Device.os.macintosh = false;
 			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, false, true);
 			assert.notOk(this.oButtonOverlay.hasStyleClass("sapUiDtOverlayCutted"), "the button overlay is marked with the correct style");
-			assert.equal(this.oCutPaste.getCuttedOverlay(), undefined, "then the button overlay is undefined");
+			assert.equal(this.oCutPaste.getElementMover().getMovedOverlay(), undefined, "then the button overlay is undefined");
 		});
 
 		QUnit.test("when cut is triggered on a button overlay and paste is triggered on the last button overlay", function(assert) {

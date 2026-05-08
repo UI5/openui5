@@ -99,10 +99,7 @@ sap.ui.define(["sap/ui/core/ControlBehavior"],
 
 				// Propagate title ID only to first control in the content
 				oItem = aContent[0];
-				if (oItem && oItem._suggestTitleId && oItem.isA([
-					"sap.ui.layout.form.SimpleForm",
-					"sap.ui.layout.form.Form",
-					"sap.ui.comp.smartform.SmartForm"])) {
+				if (oItem && oItem._suggestTitleId) {
 						oItem._suggestTitleId(oTitleData);
 						return true;
 				}

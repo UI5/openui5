@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/initial/api/InitialFlexAPI",
+	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], (
@@ -16,6 +17,7 @@ sap.ui.define([
 	Settings,
 	StorageUtils,
 	InitialFlexAPI,
+	Layer,
 	Utils,
 	sinon
 ) => {
@@ -24,6 +26,10 @@ sap.ui.define([
 	const sReference = "test.app";
 
 	QUnit.module("InitialFlexAPI", {
+		beforeEach() {
+			window.sessionStorage.removeItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`);
+			window.sessionStorage.removeItem(`sap.ui.rta.restart.${Layer.USER}`);
+		},
 		afterEach() {
 			sandbox.restore();
 			FlexInfoSession.removeByReference(sReference);
@@ -45,6 +51,23 @@ sap.ui.define([
 		QUnit.test("getFlexVersion - no flex info session exists", function(assert) {
 			FlexInfoSession.removeByReference(sReference);
 			assert.strictEqual(InitialFlexAPI.getFlexVersion({ reference: sReference }), undefined, "version doesn't exists");
+		});
+
+		QUnit.test("automaticRtaStartEnabled", function(assert) {
+			assert.notOk(InitialFlexAPI.isAutomaticRtaStartEnabled(), "automatic RTA start is not enabled");
+
+			window.sessionStorage.setItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`, true);
+			assert.ok(InitialFlexAPI.isAutomaticRtaStartEnabled(), "automatic RTA start is enabled");
+
+			window.sessionStorage.removeItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`);
+			assert.notOk(InitialFlexAPI.isAutomaticRtaStartEnabled(), "automatic RTA start is not enabled");
+
+			window.sessionStorage.setItem(`sap.ui.rta.restart.${Layer.USER}`, true);
+			assert.ok(InitialFlexAPI.isAutomaticRtaStartEnabled(Layer.USER), "automatic RTA start is enabled for user layer");
+			assert.notOk(InitialFlexAPI.isAutomaticRtaStartEnabled(Layer.CUSTOMER), "automatic RTA start is not enabled for customer layer");
+
+			window.sessionStorage.removeItem(`sap.ui.rta.restart.${Layer.USER}`);
+			assert.notOk(InitialFlexAPI.isAutomaticRtaStartEnabled(Layer.USER), "automatic RTA start is not enabled for user layer");
 		});
 	});
 

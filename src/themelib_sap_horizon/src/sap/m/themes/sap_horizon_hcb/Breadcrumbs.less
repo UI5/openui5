@@ -19,7 +19,7 @@
 		color: var(--sapTextColor);
 
 		&:focus {
-			outline: 0.125rem dotted @sapUiHcStandardForeground;
+			outline: 0.125rem dotted var(--sapContent_FocusColor);
 			outline-offset: -0.125rem;
 		}
 	}
@@ -52,7 +52,7 @@
 			&::after {
 				content: '\e1ef';
 				font-family: var(--sapContent_IconFontFamily);
-				font-size: @sapMFontMediumSize;
+				font-size: var(--sapFontSize);
 				color: var(--sapLinkColor);
 				speak: none;
 			}
@@ -60,7 +60,7 @@
 
 		&.sapMSltFocused,
 		&:hover {
-			outline: 0.125rem dotted @sapUiHcStandardForeground;
+			outline: 0.125rem dotted var(--sapContent_FocusColor);
 			outline-offset: -0.125rem;
 
 			.sapMSltIcon::before {

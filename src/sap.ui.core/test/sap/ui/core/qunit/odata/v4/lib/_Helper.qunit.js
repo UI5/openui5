@@ -5961,6 +5961,47 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("copyETags", function (assert) {
+		const oSource = {
+			"@odata.etag" : "newETag",
+			Property : "New Value",
+			A : {},
+			B : [{}],
+			C : null,
+			D : {}
+
+		};
+		const sSource = JSON.stringify(oSource);
+		const oTarget = {
+			"@odata.etag" : "oldETag",
+			Property : "Value",
+			A : {},
+			B : [{}],
+			C : {},
+			D : null
+		};
+
+		const oHelperMock = this.mock(_Helper);
+		// inital call
+		oHelperMock.expects("copyETags").withExactArgs(oSource, oTarget).callThrough();
+		oHelperMock.expects("copyETags")
+			.withExactArgs(sinon.match.same(oSource.A), sinon.match.same(oTarget.A));
+
+		// code under test
+		_Helper.copyETags(oSource, oTarget);
+
+		assert.strictEqual(JSON.stringify(oSource), sSource);
+		assert.deepEqual(oTarget, {
+			"@odata.etag" : "newETag",
+			Property : "Value",
+			A : {},
+			B : [{}],
+			C : {},
+			D : null
+		});
+	});
+
+	//*********************************************************************************************
 	QUnit.test("copySelected", function (assert) {
 		let oTarget = {"@$ui5.context.isSelected" : false};
 

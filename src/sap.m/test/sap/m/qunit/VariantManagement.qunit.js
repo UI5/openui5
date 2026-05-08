@@ -1606,7 +1606,8 @@ sap.ui.define([
 	QUnit.test("check binding on items is propagated into dialog", async function(assert) {
 		const oVariantsModel = new JSONModel({variants: [
 			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", author: "A", favorite: true, visible: true},
-			{variantKey: "2", variantTitlePart1: "Two", variantTitlePart2: " and Two", favorite: false, visible: false}
+			{variantKey: "2", variantTitlePart1: "Two", variantTitlePart2: " and Two", favorite: false, visible: true},
+			{variantKey: "3", variantTitlePart1: "Three", variantTitlePart2: " and Three", favorite: false, visible: false}
 		]});
 
 		this.oVM.setModel(oVariantsModel);
@@ -1671,7 +1672,7 @@ sap.ui.define([
 			assert.ok(!aCells[3].getSelected(), "expected default info found");
 			assert.ok(!aCells[4].getSelected(), "expected apply automatically info found");
 			assert.equal(aCells[6].getText(), "Constant Author", "expected author found");
-			assert.notOk(aItems[1].getVisible(), "expected visibility found");
+			assert.ok(aItems[1].getVisible(), "expected visibility found");
 
 			done();
 

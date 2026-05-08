@@ -55,6 +55,10 @@ sap.ui.define([
 		}
 	});
 
+	function isCutEnabled(oElementOverlay) {
+		return OverlayUtil.canBeRemovedFromAggregationOnMove(oElementOverlay, this.getDesignTime());
+	}
+
 	CutPaste.prototype.init = function() {
 		this.setElementMover(new ElementMover());
 	};
@@ -108,11 +112,7 @@ sap.ui.define([
 		return this.setProperty("elementMover", oElementMover);
 	};
 
-	CutPaste.prototype.getCuttedOverlay = function() {
-		return this.getElementMover().getMovedOverlay();
-	};
-
-	CutPaste.prototype.isElementPasteable = function(oTargetOverlay) {
+	CutPaste.prototype.isPasteEnabled = function(oTargetOverlay) {
 		var oTargetZoneAggregation = this._getTargetZoneAggregation(oTargetOverlay);
 		if ((oTargetZoneAggregation) || (OverlayUtil.isInTargetZoneAggregation(oTargetOverlay))) {
 			return true;
@@ -122,24 +122,24 @@ sap.ui.define([
 
 	/**
 	 * @override
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {boolean} - <code>true</code> if the plugin is available
 	 */
-	CutPaste.prototype.isAvailable = function(aElementOverlays) {
-		return aElementOverlays.every(function(oElementOverlay) {
-			return oElementOverlay.isGenerallyMovable();
-		});
+	CutPaste.prototype.isAvailable = function(aElementOverlays, oAction, bSibling) {
+		// the sibling case represents the Cut action in the context menu
+		if (bSibling) {
+			return aElementOverlays.every((oElementOverlay) => oElementOverlay.isGenerallyMovable());
+		}
+		return aElementOverlays.every((oElementOverlay) => this._isEditableByPlugin(oElementOverlay, bSibling));
 	};
 
 	/**
 	 * @override
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {boolean} - <code>true</code> if the plugin is enabled
 	 */
-	CutPaste.prototype.isEnabled = function(aElementOverlays) {
+	CutPaste.prototype.isEnabled = function(aElementOverlays, oMenuItem) {
+		if (oMenuItem?.id === "CTX_PASTE") {
+			return this.isPasteEnabled(aElementOverlays[0]);
+		}
 		if (aElementOverlays.length === 1) {
-			const oElementOverlay = aElementOverlays[0];
-			return OverlayUtil.canBeRemovedFromAggregationOnMove(oElementOverlay, this.getDesignTime());
+			return isCutEnabled.call(this, aElementOverlays[0]);
 		}
 		return false;
 	};
@@ -152,7 +152,7 @@ sap.ui.define([
 
 		if ((oEvent.keyCode === KeyCodes.X) && (oEvent.shiftKey === false) && (oEvent.altKey === false) && (bCtrlKey === true)) {
 			// CTRL+X
-			if (this.isEnabled([oOverlay])) {
+			if (isCutEnabled.call(this, oOverlay)) {
 				this.cut(oOverlay);
 				oEvent.stopPropagation();
 			}
@@ -189,7 +189,7 @@ sap.ui.define([
 	 * there might be steps between the execution and finalization (stopCutAndPaste) of
 	 * paste (for example in the RTA plugin that extends this one).
 	 * @param  {sap.ui.dt.Overlay} oTargetOverlay The Overlay where the element will be pasted
-	 * @return {boolean} Return true if paste was successfully executed
+	 * @returns {boolean} <code>true</code> if paste was successfully executed
 	 */
 	CutPaste.prototype._executePaste = function(oTargetOverlay) {
 		const oCutOverlay = this.getElementMover().getMovedOverlay();

@@ -1,0 +1,10 @@
+<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:svm="sap.ui.comp.smartvariants">
+	<Page title="Comp Variant Management Testapp" id="page">
+		<content>
+			<svm:SmartVariantManagement id="SmartVariantManagement1" persistencyKey="myCompVariantPersistencyKey" />
+		</content>
+	</Page>
+</mvc:View>

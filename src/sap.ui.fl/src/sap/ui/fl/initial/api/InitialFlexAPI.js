@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/_internal/StorageUtils",
+	"sap/ui/fl/Layer",
 	"sap/ui/fl/requireAsync",
 	"sap/ui/fl/Utils"
 ], function(
@@ -16,6 +17,7 @@ sap.ui.define([
 	ManifestUtils,
 	Settings,
 	StorageUtils,
+	Layer,
 	requireAsync,
 	Utils
 ) {
@@ -101,6 +103,16 @@ sap.ui.define([
 		}
 		const FlexObjectState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexObjectState");
 		return FlexObjectState.waitForFlexObjectsToBeApplied(aComplexSelectors, oAppComponent);
+	};
+
+	/**
+	 * Checks if the flag for an automatic key user adaptation start is set.
+	 *
+	 * @param {sap.ui.fl.Layer} [sLayer] - Active layer
+	 * @returns {boolean} <code>true</code> if RTA will be started
+	 */
+	InitialFlexAPI.isAutomaticRtaStartEnabled = function(sLayer) {
+		return !!window.sessionStorage.getItem(`sap.ui.rta.restart.${sLayer || Layer.CUSTOMER}`);
 	};
 
 	return InitialFlexAPI;

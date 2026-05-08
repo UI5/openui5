@@ -5,6 +5,7 @@
 sap.ui.define([
 	"sap/base/util/merge",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/initial/api/InitialFlexAPI",
 	"sap/ui/fl/write/api/ReloadInfoAPI",
 	"sap/ui/fl/write/api/VersionsAPI",
 	"sap/ui/fl/Layer",
@@ -13,6 +14,7 @@ sap.ui.define([
 ], function(
 	merge,
 	FlexRuntimeInfoAPI,
+	InitialFlexAPI,
 	ReloadInfoAPI,
 	VersionsAPI,
 	Layer,
@@ -163,16 +165,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if the flag for an automatic key user adaptation start is set.
-	 *
-	 * @param {sap.ui.fl.Layer} sLayer - Active layer
-	 * @returns {boolean} <code>true</code> if restart is needed
-	 */
-	ReloadManager.needsAutomaticStart = function(sLayer) {
-		return !!window.sessionStorage.getItem(`sap.ui.rta.restart.${sLayer}`);
-	};
-
-	/**
 	 * Triggers the reload of the page. Can either be a soft reload inside the FLP or a hard reload.
 	 *
 	 * @param {object} oReloadInfo - Information needed for the reload
@@ -226,7 +218,7 @@ sap.ui.define([
 	 */
 	ReloadManager.handleReloadOnStart = async function(mProperties) {
 		// if RTA is already starting after a reload, all checks have already been done
-		if (!ReloadManager.needsAutomaticStart(mProperties.layer)) {
+		if (!InitialFlexAPI.isAutomaticRtaStartEnabled(mProperties.layer)) {
 			merge(mProperties, {
 				ignoreMaxLayerParameter: false,
 				includeCtrlVariants: true

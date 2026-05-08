@@ -4,9 +4,11 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
+	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/write/api/FeaturesAPI"
 ], function(
 	Lib,
+	FlexRuntimeInfoAPI,
 	FeaturesAPI
 ) {
 	"use strict";
@@ -24,7 +26,7 @@ sap.ui.define([
 	 * Callback filter function to determine if the feature should be displayed in the dialog
 	 * @typedef {function} sap.ui.rta.util.whatsNew.whatsNewContent.WhatsNewFeatures.isFeatureApplicable
 	 * @param {sap.ui.fl.registry.Settings} oFlexSettings - Flex settings
-	 * @returns {boolean} <code>false</code> if the feature shouldn't be displayed in the dialog
+	 * @returns {boolean|Promise<boolean>} <code>false</code> if the feature shouldn't be displayed in the dialog
 	 */
 
 	/**
@@ -67,6 +69,22 @@ sap.ui.define([
 	 */
 	const aWhatsNewFeaturesContent =
 	[
+		{
+			featureId: "lazyLoadingForVariants",
+			title: oTextResources.getText("TIT_WHATS_NEW_LAZY_LOADING_TITLE"),
+			description: oTextResources.getText("TXT_WHATS_NEW_DIALOG_LAZY_LOADING_DESCRIPTION"),
+			documentationUrls: null,
+			information: [
+				{
+					text: oTextResources.getText("TXT_WHATS_NEW_DIALOG_LAZY_LOADING_TEXT"),
+					image: null
+				}
+			],
+			isFeatureApplicable() {
+				// If a system is returned we are in an S/4HANA ABAP system (todos#18)
+				return !!FlexRuntimeInfoAPI.getSystem();
+			}
+		},
 		{
 			featureId: "ContextBasedAdaptationCF",
 			title: oTextResources.getText("TIT_WHATS_NEW_CBA_CF_TITLE"),

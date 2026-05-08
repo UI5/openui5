@@ -19,6 +19,7 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/initial/api/InitialFlexAPI",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
@@ -68,6 +69,7 @@ sap.ui.define([
 	KeyCodes,
 	FlexRuntimeInfoAPI,
 	ManifestUtils,
+	InitialFlexAPI,
 	Version,
 	CancelError,
 	ContextBasedAdaptationsAPI,
@@ -838,7 +840,7 @@ sap.ui.define([
 	 * @returns {boolean} Returns true if restart is needed
 	 */
 	RuntimeAuthoring.needsRestart = function(sLayer) {
-		return ReloadManager.needsAutomaticStart(sLayer);
+		return InitialFlexAPI.isAutomaticRtaStartEnabled(sLayer);
 	};
 
 	/**
@@ -875,7 +877,7 @@ sap.ui.define([
 	 * @returns {boolean} Returns true if RTA is about to start or starting
 	 */
 	RuntimeAuthoring.willRTAStartAfterReload = function(sLayer) {
-		return ReloadManager.needsAutomaticStart(sLayer || Layer.CUSTOMER);
+		return InitialFlexAPI.isAutomaticRtaStartEnabled(sLayer || Layer.CUSTOMER);
 	};
 
 	/**

@@ -353,11 +353,12 @@ sap.ui.define([
 	};
 
 	/**
-	 * Method used to propagate the <code>Title</code> control ID of a container control
-	 * (like a <code>Dialog</code> control) to use it as aria-label in the <code>Form</code>.
+	 * Method used to propagate the {@link sap.ui.core.Title Title} control ID of a container control
+	 * (like a {@link sap.m.Dialog Dialog} control) to use it as <code>aria-label</code> in the <code>Form</code>.
 	 * So the <code>Form</code> must not have an own title.
-	 * @param {string | object} sTitleID <code>Title</code> control ID or object <code>{ id: string, role?: string }</code> containing title ID and aria role
+	 * @param {string | object} sTitleID {@link sap.ui.core.Title Title} control ID or object <code>{ id: string, role?: string }</code> containing title ID and aria role
 	 * @private
+	 * @ui5-restricted sap.m.TitlePropagationSupport, sap.fe
 	 * @return {this} Reference to <code>this</code> to allow method chaining
 	 */
 	Form.prototype._suggestTitleId = function (sTitleID) {

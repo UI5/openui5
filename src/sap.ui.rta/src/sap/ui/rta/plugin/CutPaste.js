@@ -11,7 +11,7 @@ sap.ui.define([
 	"sap/ui/rta/Utils"
 ], function(
 	Lib,
-	ControlCutPaste,
+	DtCutPaste,
 	DtUtil,
 	Plugin,
 	RTAElementMover,
@@ -37,7 +37,7 @@ sap.ui.define([
 	 * @since 1.30
 	 * @alias sap.ui.rta.plugin.CutPaste
 	 */
-	var CutPaste = ControlCutPaste.extend("sap.ui.rta.plugin.CutPaste", /** @lends sap.ui.rta.plugin.CutPaste.prototype */ {
+	const CutPaste = DtCutPaste.extend("sap.ui.rta.plugin.CutPaste", /** @lends sap.ui.rta.plugin.CutPaste.prototype */ {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -71,111 +71,116 @@ sap.ui.define([
 	 * @override
 	 */
 	CutPaste.prototype.init = function(...aArgs) {
-		ControlCutPaste.prototype.init.apply(this, aArgs);
+		DtCutPaste.prototype.init.apply(this, aArgs);
 		this.setElementMover(new RTAElementMover({ commandFactory: this.getCommandFactory() }));
 	};
 
 	/**
 	 * @override
 	 */
-	CutPaste.prototype._isEditable = function(oOverlay, mPropertyBag) {
-		return this.getElementMover().isEditable(oOverlay, mPropertyBag.onRegistration)
-		.then(function(bEditable) {
-			if (bEditable) {
-				return true;
-			}
-			return this._isPasteEditable(oOverlay);
-		}.bind(this));
+	CutPaste.prototype._isEditable = async function(oOverlay, mPropertyBag) {
+		// asSibling = Cut, asChild = Paste
+		// if cut is editable, paste should also always be editable
+		const bCutEditable = await this._isCutEditable(oOverlay, mPropertyBag);
+		return {
+			asSibling: bCutEditable,
+			asChild: bCutEditable || await this._isPasteEditable(oOverlay)
+		};
 	};
 
-	CutPaste.prototype._isPasteEditable = function(oOverlay) {
-		var oElementMover = this.getElementMover();
+	CutPaste.prototype._isCutEditable = function(oOverlay, mPropertyBag) {
+		return this.getElementMover().isEditable(oOverlay, mPropertyBag.onRegistration);
+	};
+
+	CutPaste.prototype._isPasteEditable = async function(oOverlay) {
+		const oElementMover = this.getElementMover();
 		if (!this.hasStableId(oOverlay)) {
-			return Promise.resolve(false);
+			return false;
 		}
-		return oElementMover.isMoveAvailableOnRelevantContainer(oOverlay)
-		.then(function(bMoveAvailable) {
-			if (!bMoveAvailable) {
-				return false;
-			}
-			return Utils.doIfAllControlsAreAvailable([oOverlay], function() {
-				return oElementMover.isMoveAvailableForChildren(oOverlay);
-			});
+		const bMoveAvailable = await oElementMover.isMoveAvailableOnRelevantContainer(oOverlay);
+		if (!bMoveAvailable) {
+			return false;
+		}
+		return Utils.doIfAllControlsAreAvailable([oOverlay], function() {
+			return oElementMover.isMoveAvailableForChildren(oOverlay);
 		});
 	};
 
 	/**
 	 * @override
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {boolean} - <code>true</code> if the plugin is available
 	 */
-	CutPaste.prototype.isAvailable = function(aElementOverlays) {
+	CutPaste.prototype.isAvailable = function(...args) {
 		// This is required as the rta.cutPaste plugin is extended by both the
 		// dt.CutPaste and rta.Plugin module. See Utils.extendWith in this file.
-		return ControlCutPaste.prototype.isAvailable.apply(this, [aElementOverlays]);
+		return DtCutPaste.prototype.isAvailable.apply(this, args);
 	};
 
 	/**
 	 * @override
-	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
-	 * @return {boolean} - <code>true</code> if the plugin is enabled
 	 */
-	CutPaste.prototype.isEnabled = function(aElementOverlays) {
+	CutPaste.prototype.isEnabled = function(...args) {
 		// This is required as the rta.cutPaste plugin is extended by both the
 		// dt.CutPaste and rta.Plugin module. See Utils.extendWith in this file.
-		return ControlCutPaste.prototype.isEnabled.apply(this, [aElementOverlays]);
+		return DtCutPaste.prototype.isEnabled.apply(this, args);
 	};
 
 	/**
-	 * Register an overlay
-	 * @param  {sap.ui.dt.Overlay} oOverlay overlay object
 	 * @override
 	 */
 	CutPaste.prototype.registerElementOverlay = function(...aArgs) {
-		ControlCutPaste.prototype.registerElementOverlay.apply(this, aArgs);
+		DtCutPaste.prototype.registerElementOverlay.apply(this, aArgs);
 		Plugin.prototype.registerElementOverlay.apply(this, aArgs);
 	};
 
 	/**
-	 * Additionally to super->deregisterOverlay this method detatches the browser events
-	 * @param  {sap.ui.dt.Overlay} oOverlay overlay object
+	 * Additionally to super->deregisterOverlay this method detaches the browser events
+	 * @param {sap.ui.dt.Overlay} oOverlay overlay object
 	 * @override
 	 */
 	CutPaste.prototype.deregisterElementOverlay = function(...aArgs) {
-		ControlCutPaste.prototype.deregisterElementOverlay.apply(this, aArgs);
+		DtCutPaste.prototype.deregisterElementOverlay.apply(this, aArgs);
 		Plugin.prototype.removeFromPluginsList.apply(this, aArgs);
 	};
 
 	/**
 	 * @override
 	 */
-	CutPaste.prototype.paste = function(oTargetOverlay) {
-		this._executePaste(oTargetOverlay);
-
-		DtUtil.waitForSynced(this.getDesignTime())()
-		.then(function() {
-			return this.getElementMover().buildMoveCommand();
-		}.bind(this))
-		.then(function(oMoveCommand) {
-			this.fireElementModified({
-				command: oMoveCommand
-			});
-			this.stopCutAndPaste();
-		}.bind(this))
-		.catch(function(oMessage) {
-			throw DtUtil.createError("CutPaste#paste", oMessage, "sap.ui.rta");
-		});
+	CutPaste.prototype.handler = function(aOverlays, mPropertyBag) {
+		if (mPropertyBag.menuItem.id === "CTX_PASTE") {
+			return this.paste(aOverlays[0]);
+		}
+		return this.cut(aOverlays[0]);
 	};
 
 	/**
 	 * @override
 	 */
-	CutPaste.prototype.cut = function(...aArgs) {
+	CutPaste.prototype.paste = async function(oTargetOverlay) {
+		try {
+			this._executePaste(oTargetOverlay);
+			await DtUtil.waitForSynced(this.getDesignTime())();
+			const oMoveCommand = await this.getElementMover().buildMoveCommand();
+			this.fireElementModified({
+				command: oMoveCommand
+			});
+			this.stopCutAndPaste();
+		} catch (oError) {
+			throw DtUtil.propagateError(
+				oError,
+				"CutPaste#paste",
+				"Error occurred during handler execution",
+				"sap.ui.rta.plugin"
+			);
+		}
+	};
+
+	/**
+	 * @override
+	 */
+	CutPaste.prototype.cut = async function(...aArgs) {
 		const [oOverlay] = aArgs;
-		return ControlCutPaste.prototype.cut.apply(this, aArgs)
-		.then(function() {
-			oOverlay.setSelected(false);
-		});
+		await DtCutPaste.prototype.cut.apply(this, aArgs);
+		oOverlay.setSelected(false);
 	};
 
 	/**
@@ -184,43 +189,34 @@ sap.ui.define([
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
 	 * @return {object[]} - array of the items with required data
 	 */
-	CutPaste.prototype.getMenuItems = function(aElementOverlays) {
-		var aMenuItems = [];
-		var oPasteMenuItem = this.enhanceItemWithResponsibleElement({
-			id: "CTX_PASTE",
+	CutPaste.prototype.getMenuItems = async function(aElementOverlays) {
+		// the action is already checked during the isEditable check, so we don't need to fetch it here again
+		// but we still need to differentiate the two different scenarios, and the _getMenuItems should not fetch the action,
+		// so a dummy action is used.
+		// The two different actions have different editable values, which are differentiated by the bAsSibling value
+		// Cut has the value of bAsSibling=true, since mostly the movable objects are the siblings
+		// Paste has the value bAsSibling=false, since it additionally is available on parents
+		const oPasteMenuItem = (await this._getMenuItems(aElementOverlays, {
+			pluginId: "CTX_PASTE",
 			text: Lib.getResourceBundleFor("sap.ui.rta").getText("CTX_PASTE"),
-			handler: function(aElementOverlays) {
-				return this.paste(aElementOverlays[0]);
-			}.bind(this),
-			enabled: function(aElementOverlays) {
-				return this.isElementPasteable(aElementOverlays[0]);
-			}.bind(this),
+			icon: "sap-icon://paste",
 			rank: this.getRank("CTX_PASTE"),
-			icon: "sap-icon://paste"
-		}, aElementOverlays, ["move"]);
-		var aResponsibleElementOverlays = oPasteMenuItem.responsible || aElementOverlays;
+			action: { dummyAction: true, id: "CTX_PASTE" },
+			bAsSibling: false
+		}))[0];
+		const oCutMenuItem = (await this._getMenuItems(aElementOverlays, {
+			pluginId: "CTX_CUT",
+			text: Lib.getResourceBundleFor("sap.ui.rta").getText("CTX_CUT"),
+			icon: "sap-icon://scissors",
+			rank: this.getRank("CTX_CUT"),
+			action: { dummyAction: true, id: "CTX_CUT" },
+			bAsSibling: true
+		}))[0];
+		return [oCutMenuItem, oPasteMenuItem].filter(Boolean);
+	};
 
-		if (this.isAvailable(aResponsibleElementOverlays)) {
-			var oCutMenuItem = this.enhanceItemWithResponsibleElement({
-				id: "CTX_CUT",
-				text: Lib.getResourceBundleFor("sap.ui.rta").getText("CTX_CUT"),
-				handler: function(aElementOverlays) {
-					return this.cut(aElementOverlays[0]);
-				}.bind(this),
-				enabled: this.isEnabled.bind(this, aElementOverlays),
-				rank: this.getRank("CTX_CUT"),
-				icon: "sap-icon://scissors"
-			}, aElementOverlays, ["move"]);
-			aMenuItems.push(oCutMenuItem, oPasteMenuItem);
-			return aMenuItems;
-		}
-		return this._isPasteEditable(aElementOverlays[0])
-		.then(function(bPasteEditable) {
-			if (bPasteEditable) {
-				aMenuItems.push(oPasteMenuItem);
-			}
-			return aMenuItems;
-		});
+	CutPaste.prototype.getActionName = function() {
+		return "move";
 	};
 
 	return CutPaste;

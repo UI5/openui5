@@ -195,10 +195,16 @@ sap.ui.define([
 				assert.ok(this.oLayoutAggregationOverlay.isTargetZone(), "the valid aggregation is marked as target zone");
 				assert.ok(!this.oObjectHeaderAggregationOverlay.isTargetZone(), "the invalid aggregation is not marked as target zone");
 
-				assert.ok(!this.oLayoutAggregationOverlay.hasStyleClass("sapUiDtOverlayDropZone"), "the valid aggregation overlay has not the additional drop zone style (we cutted!)");
+				assert.ok(
+					!this.oLayoutAggregationOverlay.hasStyleClass("sapUiDtOverlayDropZone"),
+					"the valid aggregation overlay has not the additional drop zone style (we cut!)"
+				);
 
 				assert.ok(this.oButtonOverlay.hasStyleClass("sapUiDtOverlayCutted"), "the button overlay is marked with the correct style");
-				assert.equal(this.oCutPaste.getCuttedOverlay(), this.oButtonOverlay, "then the button overlay is remembered as to be cutted");
+				assert.strictEqual(
+					this.oCutPaste.getElementMover().getMovedOverlay(), this.oButtonOverlay,
+					"then the button overlay is remembered as to be cut"
+				);
 				done();
 			}.bind(this));
 		});
@@ -222,8 +228,8 @@ sap.ui.define([
 			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
 			this.oCutPaste.getElementMover().attachValidTargetZonesActivated(function() {
-				assert.ok(this.oCutPaste.isElementPasteable(this.oLayoutOverlay), "the target overlay of a valid element is pasteable");
-				assert.ok(!this.oCutPaste.isElementPasteable(this.oObjectAttributeOverlay), "the target overlay of an invalid element is not pasteable");
+				assert.ok(this.oCutPaste.isPasteEnabled(this.oLayoutOverlay), "the target overlay of a valid element can be pasted");
+				assert.notOk(this.oCutPaste.isPasteEnabled(this.oObjectAttributeOverlay), "the target overlay of an invalid element cannot be pasted");
 				done();
 			}.bind(this));
 		});
@@ -248,8 +254,8 @@ sap.ui.define([
 				assert.ok(this.oLayoutAggregationOverlay.isTargetZone(), "the valid aggregation (layout) is marked as target zone");
 				assert.ok(this.oObjectHeaderAggregationOverlay.isTargetZone(), "the valid aggregation (objectHeader) is marked as target zone");
 
-				assert.ok(!this.oButtonOverlay.hasStyleClass("sapUiDtOverlayCutted"), "the overlay cut style class is removed from previously cutted overlay");
-				assert.ok(this.oObjectAttributeOverlay.hasStyleClass("sapUiDtOverlayCutted"), "the overlay cut style class is added to the newly cutted overlay");
+				assert.ok(!this.oButtonOverlay.hasStyleClass("sapUiDtOverlayCutted"), "the overlay cut style class is removed from previously cut overlay");
+				assert.ok(this.oObjectAttributeOverlay.hasStyleClass("sapUiDtOverlayCutted"), "the overlay cut style class is added to the newly cut overlay");
 				done();
 			}.bind(this));
 		});
@@ -353,7 +359,7 @@ sap.ui.define([
 			assert.equal(this.oLayout.getContent()[1].getId(), this.oButton.getId(), "nothing happened, button is still at second position");
 		});
 
-		QUnit.test("and object attribute was cutted, when paste is triggered on the layout (control with target zone aggregation), then", function(assert) {
+		QUnit.test("and object attribute was cut, when paste is triggered on the layout (control with target zone aggregation), then", function(assert) {
 			var done = assert.async();
 			triggerKeydown(this.oObjectAttributeOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
@@ -372,7 +378,7 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("and object attribute was cutted, when paste is triggered on the button (control in a target zone aggregation), then", function(assert) {
+		QUnit.test("and object attribute was cut, when paste is triggered on the button (control in a target zone aggregation), then", function(assert) {
 			var done = assert.async();
 			triggerKeydown(this.oObjectAttributeOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
@@ -393,7 +399,7 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("and button was cutted, when paste is triggered on the object attribute (control in an invalid aggregation), then", function(assert) {
+		QUnit.test("and button was cut, when paste is triggered on the object attribute (control in an invalid aggregation), then", function(assert) {
 			var done = assert.async();
 			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
