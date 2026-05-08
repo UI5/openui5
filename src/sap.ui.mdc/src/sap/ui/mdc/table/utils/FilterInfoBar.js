@@ -62,7 +62,6 @@ sap.ui.define([
 			press: () => {
 				const oTable = Element.getElementById(this.getTable());
 				PersonalizationUtils.createClearFiltersChange(oTable);
-				oTable.focus();
 			},
 			icon: "sap-icon://decline",
 			tooltip: Library.getResourceBundleFor("sap.ui.mdc").getText("infobar.REMOVEALLFILTERS")
@@ -84,6 +83,14 @@ sap.ui.define([
 				}
 			});
 		});
+	};
+
+	FilterInfoBar.prototype.onBeforeRendering = function() {
+		// If the filter info bar gets hidden when it, or an element inside it, has the focus,
+		// the focus must move to the table to avoid focus loss.
+		if (!this.getVisible() && this.getDomRef()?.contains(document.activeElement)) {
+			Element.getElementById(this.getTable())?.focus();
+		}
 	};
 
 	FilterInfoBar.prototype.getVisible = function() {
