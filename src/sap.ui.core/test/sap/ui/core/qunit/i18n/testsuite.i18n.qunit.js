@@ -7,6 +7,14 @@ sap.ui.define(function() {
 			ui5: {
 				language: "en-US"
 			},
+			loader: {
+				shim: {
+					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18": {
+						amd: true,
+						exports: "QUnit"
+					}
+				}
+			},
 			qunit: {
 				version : "2.18",
 				versions : {

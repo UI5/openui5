@@ -5,6 +5,12 @@ sap.ui.define(function() {
 		name: "TestSuite for sap.ui.core: GTP testcase CORE/CORE",
 		defaults: {
 			loader:{
+				shim: {
+					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18": {
+						amd: true,
+						exports: "QUnit"
+					}
+				},
 				paths:{
 					"testdata/core": "test-resources/sap/ui/core/qunit/"
 				}

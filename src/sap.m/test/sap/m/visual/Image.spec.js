@@ -15,8 +15,13 @@ describe("sap.m.Image", function() {
 	});
 
 	it("should load the invalid image",function(){
-		element(by.id("invalid_image")).click();
-		expect(takeScreenshot(element(by.id("invalid_image")))).toLookAs("loaded_invalid_image");
+		var oInvalidImage = element(by.id("invalid_image"));
+
+		oInvalidImage.click();
+		oInvalidImage.waitForExist({
+			timeout: 5000
+		});
+		expect(takeScreenshot(oInvalidImage)).toLookAs("loaded_invalid_image");
 	});
 
 	// verify button image has a focus outline

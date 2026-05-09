@@ -65,14 +65,15 @@
 	}
 }
 
-.sapMPanelContent:not(.sapMPanelBGTransparent) {
+.sapMPanelContentWrapper:not(:has(> .sapMPanelBGTransparent)) {
 	border-bottom: none;
 }
 
-.sapMPanelContent {
+.sapMPanelContentWrapper {
 	padding: 0.625rem 1rem;
 	border-bottom-left-radius: inherit;
 	border-bottom-right-radius: inherit;
+	background-color: var(--sapGroup_ContentBackground);
 }
 
 .sapMPanel.sapMPanelExpanded.sapMPanelAnimating {

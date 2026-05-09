@@ -88,7 +88,8 @@ sap.ui.define([
 	}
 
 	/**
-	 * Deletes an entity on the server and in the cached data.
+	 * Deletes an entity on the server and in the cached data (unless <code>fnCallback</code> is
+	 * missing).
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} [oGroupLock]
 	 *   A lock for the group ID to be used for the DELETE request; w/o a lock, no DELETE is sent.
@@ -103,10 +104,11 @@ sap.ui.define([
 	 *   An entity with the ETag of the binding for which the deletion was requested. This is
 	 *   provided if the deletion is delegated from a context binding with empty path to a list
 	 *   binding. W/o a lock, this is ignored.
-	 * @param {function} fnCallback
-	 *  A function which is called immediately when an entity has been deleted from the cache, or
+	 * @param {function} [fnCallback]
+	 *   A function which is called immediately when an entity has been deleted from the cache, or
 	 *   when it was re-inserted; the index of the entity and an offset (-1 for deletion, 1 for
-	 *   re-insertion) are passed as parameter
+	 *   re-insertion) are passed as parameter; mandatory within a deep create; if missing, the
+	 *   entity is not deleted in the cached data
 	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a result in case of success, or rejected with an
 	 *   instance of <code>Error</code> in case of failure
@@ -154,14 +156,14 @@ sap.ui.define([
 				if (Array.isArray(vCacheData)) {
 					iIndex = oDeleted.index;
 					const iDeletedIndex = vCacheData.$deleted.indexOf(oDeleted);
-					if (iIndex !== undefined) {
+					if (iIndex !== undefined && fnCallback) {
 						that.restoreElement(iIndex, oEntity, iDeletedIndex, vCacheData,
 							sParentPath);
 					}
 					vCacheData.$deleted.splice(iDeletedIndex, 1);
 				}
 				if (that.iActiveUsages) {
-					fnCallback(iIndex, 1);
+					fnCallback?.(iIndex, 1);
 				} else if (iIndex === undefined && that.reset) {
 					// an active cache must let the list binding reset to be told about kept-alive
 					// elements, an inactive cache however has no binding and no kept-alive
@@ -197,9 +199,11 @@ sap.ui.define([
 			if (Array.isArray(vCacheData)) {
 				oDeleted = that.addDeleted(vCacheData, iIndex, sKeyPredicate, oGroupLock,
 					!!sTransientPredicate);
-				that.removeElement(iIndex, sKeyPredicate, vCacheData, sParentPath);
+				if (fnCallback) {
+					that.removeElement(iIndex, sKeyPredicate, vCacheData, sParentPath);
+				}
 			}
-			fnCallback(iIndex, -1);
+			fnCallback?.(iIndex, -1);
 			if (oGroupLock) {
 				sGroupId = oGroupLock.getGroupId();
 				// Note: there should be only *one* parked PATCH per entity, but we don't rely on it

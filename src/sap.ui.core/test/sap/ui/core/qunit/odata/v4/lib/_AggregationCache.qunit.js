@@ -85,6 +85,7 @@ sap.ui.define([
 				getModelInterface : mustBeMocked,
 				getServiceUrl : function () { return "/~/"; },
 				getUnlockedAutoCopy : mustBeMocked,
+				lockGroup : mustBeMocked,
 				request : mustBeMocked
 			};
 
@@ -6893,6 +6894,7 @@ sap.ui.define([
 			}
 			const fnCallback = sinon.spy();
 			const oParentCache = {
+				_delete : mustBeMocked,
 				getValue : mustBeMocked,
 				removeElement : mustBeMocked
 			};
@@ -6912,10 +6914,8 @@ sap.ui.define([
 			oHelperMock.expects("getPrivateAnnotation")
 				.withExactArgs(sinon.match.same(oElement), "predicate")
 				.returns("~predicate~");
-			this.mock(this.oRequestor).expects("buildQueryString")
-				.withExactArgs("/Foo", sinon.match.same(oCache.mQueryOptions), true)
-				.returns("?foo=bar");
 			this.mock(oCache).expects("createCountPromise").exactly(bCount ? 1 : 0).withExactArgs();
+			const oParentCacheMock = this.mock(oParentCache);
 			const mock = () => {
 				this.mock(oCache.oTreeState).expects("delete")
 					.withExactArgs(sinon.match.same(oElement));
@@ -6924,7 +6924,6 @@ sap.ui.define([
 					.returns(4);
 				oHelperMock.expects("getPrivateAnnotation")
 					.withExactArgs(sinon.match.same(oElement), "rank", 0).returns("~rank~");
-				const oParentCacheMock = this.mock(oParentCache);
 				oRemoveExpectation = oParentCacheMock.expects("removeElement")
 					.withExactArgs("~rank~", "~predicate~").returns("~iIndexInParentCache~");
 				oHelperMock.expects("getPrivateAnnotation")
@@ -6942,30 +6941,32 @@ sap.ui.define([
 					.withExactArgs("~oParent~");
 				this.mock(oCache).expects("shiftRank")
 					.withExactArgs(4, oFixture.firstLevel ? -4 : -1);
-				this.mock(oCache).expects("removeElement")
-					.withExactArgs(4, "~predicate~");
+				this.mock(oCache).expects("removeElement").withExactArgs(4, "~predicate~")
+					.callsFake(() => {
+						assert.notOk("@$ui5.context.isDeleted" in oElement);
+					});
 			};
 			if (!bGroupLock) {
 				mock();
 			}
-			this.mock(this.oRequestor).expects("request").exactly(bGroupLock ? 1 : 0)
-				.withExactArgs("DELETE", "~editUrl~?foo=bar", "~oGroupLock~", {
-					"If-Match" : sinon.match.same(oElement)
-				})
+			oParentCacheMock.expects("_delete").exactly(bGroupLock ? 1 : 0)
+				.withExactArgs("~oGroupLock~", "~editUrl~", "~predicate~", "~oETagEntity~", null)
 				.callsFake(() => {
 					mock();
+					oElement["@$ui5.context.isDeleted"] = true; // simulate _Cache#_delete
 					return Promise.resolve();
 				});
-			this.mock(oCache).expects("readCount").exactly(bGroupLock ? 1 : 0)
-				.withExactArgs("~oGroupLock~").resolves("n/a");
+			this.mock(this.oRequestor).expects("lockGroup").exactly(bGroupLock ? 0 : 1)
+				.withExactArgs("$auto", oCache).returns("~oGroupLock~");
+			this.mock(oCache).expects("readCount").withExactArgs("~oGroupLock~").resolves("n/a");
 			this.mock(oCache).expects("readGrandTotal").exactly(bGroupLock ? 1 : 0)
 				.withExactArgs("~oGroupLock~").resolves("n/a");
 
 			// code under test
 			const oDeletePromise = oCache._delete(bGroupLock ? "~oGroupLock~" : null, "~editUrl~", "2",
-				"n/a", fnCallback);
+				"~oETagEntity~", fnCallback);
 
-			assert.strictEqual(oDeletePromise.isPending(), bGroupLock, "a SyncPromise");
+			assert.ok(oDeletePromise.isPending(), "a SyncPromise");
 
 			return oDeletePromise.then(function () {
 				assert.strictEqual(fnCallback.callCount, 1);
@@ -6998,16 +6999,14 @@ sap.ui.define([
 			const oHelperMock = this.mock(_Helper);
 			oHelperMock.expects("getPrivateAnnotation").withExactArgs("~oElement~", "predicate")
 				.returns("~sPredicate~");
+			const oParentCache = {
+				_delete : mustBeMocked
+			};
 			oHelperMock.expects("getPrivateAnnotation").withExactArgs("~oElement~", "parent")
-				.returns("~oParentCache~");
-			this.mock(this.oRequestor).expects("buildQueryString")
-				.withExactArgs("/Foo", sinon.match.same(oCache.mQueryOptions), true)
-				.returns("?foo=bar");
+				.returns(oParentCache);
 			this.mock(oCache).expects("createCountPromise").exactly(bCount ? 1 : 0).withExactArgs();
-			this.mock(this.oRequestor).expects("request")
-				.withExactArgs("DELETE", "~editUrl~?foo=bar", "~oGroupLock~", {
-					"If-Match" : "~oElement~"
-				})
+			this.mock(oParentCache).expects("_delete")
+				.withExactArgs("~oGroupLock~", "~editUrl~", "~sPredicate~", "~oETagEntity~", null)
 				.callsFake(() => {
 					this.mock(oCache.oTreeState).expects("delete").withExactArgs("~oElement~");
 					oCache.aElements.length = 0; // => side-effects refresh in progress
@@ -7018,7 +7017,7 @@ sap.ui.define([
 			this.mock(oCache).expects("readGrandTotal").withExactArgs("~oGroupLock~").resolves("n/a");
 
 			// code under test
-			return oCache._delete("~oGroupLock~", "~editUrl~", "2", "n/a", fnCallback);
+			return oCache._delete("~oGroupLock~", "~editUrl~", "2", "~oETagEntity~", fnCallback);
 		});
 	});
 
@@ -7027,22 +7026,23 @@ sap.ui.define([
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
 			hierarchyQualifier : "X"
 		});
-		const fnCallback = sinon.spy();
 		const oElement = {};
 
 		oCache.aElements[2] = oElement;
-		this.mock(this.oRequestor).expects("buildQueryString")
-			.withExactArgs("/Foo", sinon.match.same(oCache.mQueryOptions), true)
-			.returns("?foo=bar");
-		this.mock(this.oRequestor).expects("request")
-			.withExactArgs("DELETE", "~editUrl~?foo=bar", "~oGroupLock~",
-				{"If-Match" : sinon.match.same(oElement)})
+		const oParentCache = {
+			_delete : mustBeMocked
+		};
+		_Helper.setPrivateAnnotation(oElement, "parent", oParentCache);
+		_Helper.setPrivateAnnotation(oElement, "predicate", "~sPredicate~");
+		this.mock(oParentCache).expects("_delete")
+			.withExactArgs("~oGroupLock~", "~editUrl~", "~sPredicate~", "~oETagEntity~", null)
 			.returns(Promise.reject("~error~"));
 		this.mock(oCache).expects("readCount").withExactArgs("~oGroupLock~");
 		this.mock(oCache).expects("readGrandTotal").withExactArgs("~oGroupLock~");
 
 		// code under test
-		const oDeletePromise = oCache._delete("~oGroupLock~", "~editUrl~", "2", "n/a", fnCallback);
+		const oDeletePromise = oCache._delete("~oGroupLock~", "~editUrl~", "2", "~oETagEntity~",
+			/*fnCallback*/mustBeMocked);
 
 		assert.ok(oDeletePromise.isPending(), "a SyncPromise");
 
@@ -7050,7 +7050,6 @@ sap.ui.define([
 			assert.ok(false, "Unexpected success");
 		}, function (oError) {
 			assert.strictEqual(oError, "~error~");
-			assert.strictEqual(fnCallback.callCount, 0);
 		});
 	});
 

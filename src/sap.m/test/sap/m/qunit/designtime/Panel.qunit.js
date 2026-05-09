@@ -1,11 +1,13 @@
 /* global QUnit */
 sap.ui.define([
 	"sap/m/Panel",
+	"sap/m/Text",
 	"sap/m/Toolbar",
 	"sap/ui/dt/enablement/elementDesigntimeTest",
 	"sap/ui/rta/enablement/elementActionTest"
 ], function (
 	Panel,
+	Text,
 	Toolbar,
 	elementDesigntimeTest,
 	elementActionTest
@@ -20,7 +22,8 @@ sap.ui.define([
 				return new Panel({
 					headerText: "Text",
 					headerToolbar: new Toolbar(),
-					infoToolbar: new Toolbar()
+					infoToolbar: new Toolbar(),
+					content: [new Text({ text: "Panel Content" })]
 				});
 			}
 		});

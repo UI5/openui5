@@ -8,9 +8,15 @@
 	displayBlock="true">
 	<App>
 		<NavContainer id="navCon">
-			<Page id="overviewPage" title="ACC Test Page for sap.m.List">
+			<Page
+				id="overviewPage"
+				title="ACC Test Page for sap.m.List"
+				titleLevel="H1">
 				<content>
-					<List id="standardListItemList" headerText="List Overview">
+					<List
+						id="standardListItemList"
+						headerText="List Overview"
+						headerLevel="H2">
 						<items>
 							<StandardListItem title="Standard List with Icon" type="Navigation" wrapping="true" press=".onOverviewListItemPress">
 								<customData>
@@ -54,6 +60,7 @@
 			<Page
 				id="standardListPage"
 				title="Standard List with Icon"
+				titleLevel="H1"
 				showNavButton="true"
 				navButtonPress=".onNavBackButtonPress">
 				<content>
@@ -62,6 +69,7 @@
 						id="standardListIcon"
 						mode="{listConfig>/selectionMode}"
 						headerText="Title"
+						headerLevel="H2"
 						items="{
 							path: 'names>/'
 						}"
@@ -92,6 +100,7 @@
 			<Page
 				id="standardListAvatarPage"
 				title="Standard List with Avatar"
+				titleLevel="H1"
 				showNavButton="true"
 				navButtonPress=".onNavBackButtonPress">
 				<content>
@@ -100,6 +109,7 @@
 						id="standardListAvatar"
 						mode="{listConfig>/selectionMode}"
 						headerText="Employees"
+						headerLevel="H2"
 						itemActionCount="{= ${listConfig>/showRowActions} ? 2 : 0 }"
 						itemActionPress=".onItemActionPress">
 						<items>
@@ -180,11 +190,11 @@
 						</items>
 					</List>
 				</content>
-				
 			</Page>
 			<Page
 				id="groupedListPage"
 				title="Grouped List"
+				titleLevel="H1"
 				showNavButton="true"
 				navButtonPress=".onNavBackButtonPress" >
 				<content>
@@ -192,6 +202,7 @@
 					<List
 						id="groupedList"
 						headerText="Products"
+						headerLevel="H2"
 						items="{
 							path: 'products>/ProductCollection',
 							sorter: {
@@ -218,6 +229,7 @@
 			<Page
 				id="displayListPage"
 				title="Display List"
+				titleLevel="H1"
 				showNavButton="true"
 				navButtonPress=".onNavBackButtonPress" >
 				<content>
@@ -225,7 +237,8 @@
 						id="displayList"
 						binding="{supplier>/SupplierCollection/0}"
 						mode="None"
-						headerText="Address">
+						headerText="Address"
+						headerLevel="H2">
 						<DisplayListItem
 							label="Name"
 							value="{supplier>SupplierName}"/>
@@ -248,15 +261,17 @@
 			<Page
 				id="inputListPage"
 				title="Input List"
+				titleLevel="H1"
 				showNavButton="true"
 				navButtonPress=".onNavBackButtonPress" >
 				<content>
 					<List
 						id="inputList"
 						headerText="Title"
+						headerLevel="H2"
 						mode="None">
 						<InputListItem label="WLAN" wrapping="true">
-							<Switch state="true" />
+							<Switch type="AcceptReject" state="true" />
 						</InputListItem>
 						<InputListItem label="Flight Mode" wrapping="true">
 							<CheckBox selected="true" />
@@ -282,13 +297,13 @@
 								value="Main Rd, Manchester" />
 						</InputListItem>
 						<InputListItem label="Country" wrapping="true">
-							<Select>
-								<core:Item key="GR" text="Greece" />
-								<core:Item key="MX" text="Mexico" />
-								<core:Item key="NO" text="Norway" />
-								<core:Item key="NZ" text="New Zealand" />
-								<core:Item key="NL" text="Netherlands" />
-							</Select>
+						<ComboBox selectedKey="NO">
+							<core:Item key="GR" text="Greece" />
+							<core:Item key="MX" text="Mexico" />
+							<core:Item key="NO" text="Norway" />
+							<core:Item key="NZ" text="New Zealand" />
+							<core:Item key="NL" text="Netherlands" />
+						</ComboBox>
 						</InputListItem>
 						<InputListItem id="volume" label="Volume" wrapping="true">
 							<HBox justifyContent="End">
@@ -297,9 +312,7 @@
 						</InputListItem>
 					</List>
 				</content>
-				
 			</Page>
 		</NavContainer>
-		
 	</App>
 </mvc:View>

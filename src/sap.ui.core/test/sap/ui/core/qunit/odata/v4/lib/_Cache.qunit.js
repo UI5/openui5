@@ -388,9 +388,12 @@ sap.ui.define([
 	{bCreated : false, oEntity : undefined, iStatus : -1, sPath : "", bInactive : true},
 	{bCreated : false, oEntity : {"@odata.etag" : "AnotherETag"}, iStatus : 200, sPath : ""}
 ].forEach(function (oFixture) {
-	QUnit.test("_Cache#_delete: from collection, status: " + oFixture.iStatus
-			+ ", created: " + oFixture.bCreated
-			+ (oFixture.oEntity ? " (ETagEntity)" : ""), function (assert) {
+	[false, true].forEach((bCallback) => {
+		const sTitle = "_Cache#_delete: from collection, status: " + oFixture.iStatus
+			+ ", created: " + oFixture.bCreated + (oFixture.oEntity ? " (ETagEntity)" : "")
+			+ ", w/ callback: " + bCallback;
+
+	QUnit.test(sTitle, function (assert) {
 		var that = this,
 			bAddDeleted = false,
 			mQueryOptions = {foo : "bar"},
@@ -404,7 +407,7 @@ sap.ui.define([
 				},
 				"@odata.etag" : sEtag
 			}, {}],
-			fnCallback = sinon.spy(),
+			fnCallback = bCallback ? sinon.spy() : null,
 			oDeleted = {index : "~insert~"},
 			oError = new Error(""),
 			oGroupLock = {getGroupId : function () {}},
@@ -423,11 +426,13 @@ sap.ui.define([
 		function checkCleanedUp() {
 			assert.notOk("@$ui5.context.isDeleted" in aCacheData[1]);
 			assert.deepEqual(aCacheData.$deleted, ["a", "b", "c"]);
-			if (oFixture.bInactive) {
-				sinon.assert.calledOnceWithExactly(fnCallback, 1, -1);
-			} else {
-				sinon.assert.calledTwice(fnCallback);
-				sinon.assert.calledWithExactly(fnCallback.secondCall, "~insert~", 1);
+			if (bCallback) {
+				if (oFixture.bInactive) {
+					sinon.assert.calledOnceWithExactly(fnCallback, 1, -1);
+				} else {
+					sinon.assert.calledTwice(fnCallback);
+					sinon.assert.calledWithExactly(fnCallback.secondCall, "~insert~", 1);
+				}
 			}
 		}
 
@@ -444,7 +449,8 @@ sap.ui.define([
 				.exactly(oFixture.bMessagesToRestore ? 1 : 0)
 				.withExactArgs(undefined, oFixture.iStatus < 0
 					? [oMessage1, oMessage2] : [oMessage1]);
-			oRestoreExpectation = that.mock(oCache).expects("restoreElement").exactly(iOnFailure)
+			oRestoreExpectation = that.mock(oCache).expects("restoreElement")
+				.exactly(bCallback ? iOnFailure : 0)
 				.withExactArgs("~insert~", sinon.match.same(aCacheData[1]), 2,
 					sinon.match.same(aCacheData), sPath)
 				.callsFake(() => {
@@ -458,7 +464,7 @@ sap.ui.define([
 					oRequestExpectation.args[0][6]();
 
 					assert.strictEqual(oMessageExpectation.called, !!oFixture.bMessagesToRestore);
-					assert.ok(oRestoreExpectation.called);
+					assert.strictEqual(oRestoreExpectation.called, bCallback);
 					checkCleanedUp();
 				}
 				throw oError;
@@ -493,7 +499,7 @@ sap.ui.define([
 				aCacheData.$deleted = ["a", "b", oDeleted, "c"];
 				return oDeleted;
 			});
-		this.mock(oCache).expects("removeElement")
+		this.mock(oCache).expects("removeElement").exactly(bCallback ? 1 : 0)
 			.withExactArgs(1, "('1')", sinon.match.same(aCacheData), sPath)
 			.callsFake(function () {
 				assert.ok(bAddDeleted, "removeElement called after addDeleted");
@@ -519,7 +525,9 @@ sap.ui.define([
 			oFixture.oEntity, fnCallback);
 
 		assert.strictEqual(aCacheData[1]["@$ui5.context.isDeleted"], true);
-		sinon.assert.calledOnceWithExactly(fnCallback, 1, -1);
+		if (bCallback) {
+			sinon.assert.calledOnceWithExactly(fnCallback, 1, -1);
+		}
 
 		return oPromise.then(function () {
 			assert.ok(bSuccess);
@@ -530,6 +538,7 @@ sap.ui.define([
 			assert.strictEqual(oError0, oError);
 			checkCleanedUp();
 		});
+	});
 	});
 });
 

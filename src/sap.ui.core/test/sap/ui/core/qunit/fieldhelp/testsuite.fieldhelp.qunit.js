@@ -36,6 +36,12 @@ sap.ui.define(function () {
 				branchTracking : true
 			},
 			loader : {
+				shim : {
+					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18" : {
+						amd : true,
+						exports : "QUnit"
+					}
+				},
 				paths : {
 					"sap/ui/core/qunit" : "test-resources/sap/ui/core/qunit"
 				}

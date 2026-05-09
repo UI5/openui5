@@ -86,7 +86,12 @@ sap.ui.define([
 	// 3. Attach listener to load debugging tools for libraries that will be loaded in the future
 	Lib.attachLibraryChanged((evt) => {
 		if (evt.getParameter("stereotype") === "library") {
-			loadDebuggingTools(evt.getParameter("metadata"));
+			// Since "libraryChanged" is fired synchronously from within the Lib.init() call,
+			// we need to defer loading the debug tools asynchronously. This ensures that the
+			// execution of the "library.js" module is finished before requiring the debug-tools.
+			// A "debug-tools.js" module can contain dependency cycles back to the "library.js"
+			// module, which would otherwise still be in execution.
+			Promise.resolve().then(loadDebuggingTools.bind(null, evt.getParameter("metadata")));
 		}
 	});
 });

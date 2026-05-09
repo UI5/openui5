@@ -1329,6 +1329,14 @@ sap.ui.define([
 		assert.equal(this.tokenizer.getSelectedTokens().length, 0, "There are no selected tokens");
 	});
 
+	QUnit.test("escape deselects all tokens", function(assert) {
+		assert.equal(this.tokenizer.getSelectedTokens().length, 2, "Initially there are 2 selected tokens");
+
+		qutils.triggerKeydown("t", KeyCodes.ESCAPE);
+
+		assert.equal(this.tokenizer.getSelectedTokens().length, 0, "There are no selected tokens after pressing escape");
+	});
+
 	QUnit.test("Ctrl + C (copy)", function(assert) {
 		// arrange
 		var fnCopySpy = this.spy(this.tokenizer, "_copy");

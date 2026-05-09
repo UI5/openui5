@@ -613,6 +613,7 @@ sap.ui.define([
 		assert.ok(jQuery(".sapMPanelHeadingDiv", $panel).hasClass("sapMPanelStickyHeadingDiv"), "should have sapMPanelStickyHeadingDiv class present on first header");
 	});
 
+
 	QUnit.module("Computed styles", {
 		beforeEach: async function () {
 			this.oPanel = new Panel({
@@ -659,31 +660,31 @@ sap.ui.define([
 
 		await nextUIUpdate();
 
-		var $content = this.oPanel.$().find(".sapMPanelContent");
+		var $content = this.oPanel.$().find(".sapMPanelContentWrapper");
 
 		assert.equal($content.outerHeight(), 100, "should be 100px");
 	});
 
 	QUnit.test("Content height should always be the panel's height ", async function(assert) {
 		// Arrange
-		var oContentDom;
+		var oContentWrapperDom;
 
 		// Act
 		this.oPanel.setHeaderText("");
 		this.oPanel.setHeight("200px");
 
 		await nextUIUpdate();
-		oContentDom = this.oPanel.getDomRef("content");
+		oContentWrapperDom = this.oPanel.getDomRef().querySelector(".sapMPanelContentWrapper");
 
 		// Assert
-		assert.equal(oContentDom.offsetHeight, 200, "Content height should be 200px");
+		assert.equal(oContentWrapperDom.offsetHeight, 200, "Content wrapper height should be 200px");
 
 		// Act
 		this.oPanel.setHeight("50%");
 		await nextUIUpdate();
 
 		// Assert
-		assert.equal(oContentDom.offsetHeight, 500, "Content height should be 500px - the full panel's height (50% of the quinit-fixture container height");
+		assert.equal(oContentWrapperDom.offsetHeight, 500, "Content wrapper height should be 500px - the full panel's height (50% of the quinit-fixture container height");
 	});
 
 	QUnit.test("Content of expandable Panel when expanded",async function(assert) {
@@ -694,7 +695,7 @@ sap.ui.define([
 
 		var $panel = this.oPanel.$();
 
-		assert.strictEqual($panel.find(".sapMPanelContent").css("display"), "block", "should have display:block style present");
+		assert.strictEqual($panel.find(".sapMPanelContentWrapper").css("display"), "block", "should have display:block style present");
 	});
 
 	QUnit.test("Content of expandable Panel when collapsed", async function(assert) {
@@ -705,7 +706,7 @@ sap.ui.define([
 
 		var $panel = this.oPanel.$();
 
-		assert.strictEqual($panel.find(".sapMPanelContent").css("display"), "none", "should have display:none style present");
+		assert.strictEqual($panel.find(".sapMPanelContentWrapper").css("display"), "none", "should have display:none style present");
 	});
 
 	QUnit.test("Expandable panel with headerToolbar - toolbar should not have border", async function(assert) {
@@ -729,6 +730,13 @@ sap.ui.define([
 		assert.equal($firstToolbarChild.css("margin-left"), "0px", "first toolbar child margin-left should be 0px");
 	});
 
+	QUnit.test("Content wrapper should clip overflow, content div should scroll", function(assert) {
+		var oDomRef = this.oPanel.getDomRef();
+
+		assert.strictEqual(getComputedStyle(oDomRef.querySelector(".sapMPanelContentWrapper")).overflow, "hidden", "content wrapper should have overflow:hidden");
+		assert.strictEqual(getComputedStyle(oDomRef.querySelector(".sapMPanelContent")).overflow, "auto", "content div should have overflow:auto");
+	});
+
 	QUnit.test("Container height exception handling", function (assert) {
 		// System under Test + Act
 		var oContainer = new Panel({height: "100px"});
@@ -743,6 +751,90 @@ sap.ui.define([
 		// Cleanup
 		oSpy.restore();
 		oContainer.destroy();
+	});
+
+	QUnit.module("Content focusable", {
+		afterEach: function () {
+			if (this.oPanel) {
+				this.oPanel.destroy();
+				this.oPanel = null;
+			}
+		}
+	});
+
+	QUnit.test("Scrollable content without focusable elements should be focusable", async function(assert) {
+		this.oPanel = new Panel({
+			headerText: "Panel Header",
+			height: "100px",
+			content: [
+				new Text({text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(20)})
+			]
+		});
+		this.oPanel.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oContentWrapper = this.oPanel.getDomRef().querySelector(".sapMPanelContentWrapper");
+		const oContent = this.oPanel.getDomRef("content");
+
+		assert.ok(oContentWrapper.classList.contains("sapMPanelContentFocusable"), "Content wrapper should have sapMPanelContentFocusable class");
+		assert.strictEqual(oContent.getAttribute("tabindex"), "0", "Content should have tabindex=0");
+	});
+
+	QUnit.test("Scrollable content with focusable elements should not be focusable", async function(assert) {
+		this.oPanel = new Panel({
+			headerText: "Panel Header",
+			height: "100px",
+			content: [
+				new Text({text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(10)}),
+				new Button({text: "Click me"}),
+				new Text({text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(10)})
+			]
+		});
+		this.oPanel.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oContentWrapper = this.oPanel.getDomRef().querySelector(".sapMPanelContentWrapper");
+		const oContent = this.oPanel.getDomRef("content");
+
+		assert.notOk(oContentWrapper.classList.contains("sapMPanelContentFocusable"), "Content wrapper should not have sapMPanelContentFocusable class");
+		assert.notOk(oContent.getAttribute("tabindex"), "Content should not have tabindex");
+	});
+
+	QUnit.test("Non-scrollable content should not be focusable", async function(assert) {
+		this.oPanel = new Panel({
+			headerText: "Panel Header",
+			content: [
+				new Text({text: "Short content"})
+			]
+		});
+		this.oPanel.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oContentWrapper = this.oPanel.getDomRef().querySelector(".sapMPanelContentWrapper");
+		const oContent = this.oPanel.getDomRef("content");
+
+		assert.notOk(oContentWrapper.classList.contains("sapMPanelContentFocusable"), "Content wrapper should not have sapMPanelContentFocusable class");
+		assert.notOk(oContent.getAttribute("tabindex"), "Content should not have tabindex");
+	});
+
+	QUnit.test("Expandable panel - scrollable content without focusable elements should be focusable", async function(assert) {
+		this.oPanel = new Panel({
+			headerText: "Panel Header",
+			expandable: true,
+			expanded: true,
+			height: "150px",
+			content: [
+				new Text({text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(20)})
+			]
+		});
+		this.oPanel.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oContentWrapper = this.oPanel.getDomRef().querySelector(".sapMPanelContentWrapper");
+		const oContent = this.oPanel.getDomRef("content");
+
+		assert.ok(oContentWrapper.classList.contains("sapMPanelContentFocusable"), "Content wrapper should have sapMPanelContentFocusable class");
+		assert.strictEqual(oContent.getAttribute("tabindex"), "0", "Content should have tabindex=0");
 	});
 
 	QUnit.module("ARIA attributes", {

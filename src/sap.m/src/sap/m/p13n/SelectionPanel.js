@@ -440,18 +440,25 @@ sap.ui.define([
 		return aSelectedItems;
 	};
 
-	SelectionPanel.prototype._filterList = function(bShowSelected, sSearch, bHideRedundant) {
+	SelectionPanel.prototype._filterList = function(bShowSelectedFilters, sSearch, bHideDescriptionFilters) {
 		const aFilter = [];
 
-		if (bHideRedundant && bShowSelected) {
-			const oFilter1 = new Filter(this.PRESENCE_ATTRIBUTE, "EQ", true);
-			const oFilter2 = new Filter(this.REDUNDANT_ITEMS_ATTRIBUTE, "NE", true);
-			const oRedundantFilter = new Filter({filters: [oFilter1, oFilter2], and: true});
-			aFilter.push(oRedundantFilter);
-		} else if (bShowSelected) {
+		// Filter scenarios:
+		// 1. Both filters active: Show only selected items (visible === true)
+		//    Logic: (visible & !redundant) OR (visible & redundant) = visible
+		// 2. Show selected only: Show all selected items, including redundant ones
+		// 3. Hide descriptions only: Show selected OR non-redundant items (visible OR !redundant)
+
+		if (bHideDescriptionFilters && bShowSelectedFilters) {
+			// Scenario 1: Both active → only selected items
 			const oSelectedFilter = new Filter(this.PRESENCE_ATTRIBUTE, "EQ", true);
 			aFilter.push(oSelectedFilter);
-		} else if (bHideRedundant) {
+		} else if (bShowSelectedFilters) {
+			// Scenario 2: Show selected → all selected items (redundant or not)
+			const oSelectedFilter = new Filter(this.PRESENCE_ATTRIBUTE, "EQ", true);
+			aFilter.push(oSelectedFilter);
+		} else if (bHideDescriptionFilters) {
+			// Scenario 3: Hide descriptions → selected OR non-redundant items
 			const oSelectedFilter = new Filter(this.PRESENCE_ATTRIBUTE, "EQ", true);
 			const oRedundantFilter = new Filter(this.REDUNDANT_ITEMS_ATTRIBUTE, "NE", true);
 			const oFilters = new Filter({filters: [oSelectedFilter, oRedundantFilter], and: false});

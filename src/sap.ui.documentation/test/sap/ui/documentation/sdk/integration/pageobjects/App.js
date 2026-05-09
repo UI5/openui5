@@ -58,18 +58,19 @@ sap.ui.define([
 					});
 				},
 
-				iPressTheAcceptAllCookiesButton: function() {
+				iAcceptAllCookiesIfPresent: function() {
 					var oWindow = Opa5.getWindow();
 
 					return this.waitFor({
 						check: function () {
-							return !!oWindow.document.getElementById("truste-consent-button");
+							return true;
 						},
 						success: function () {
 							var oBtn = oWindow.document.getElementById("truste-consent-button");
-							simulateClick(oBtn);
-						},
-						errorMessage: "Accept All button not found"
+							if (oBtn) {
+								simulateClick(oBtn);
+							}
+						}
 					});
 				}
 

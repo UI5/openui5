@@ -1365,6 +1365,19 @@ sap.ui.define([
 
 		Tokenizer.prototype.onsapshow = Tokenizer.prototype.onsaphide;
 
+		/**
+		 * Handles the escape key press event.
+		 *
+		 * If any tokens are selected, pressing Escape deselects all tokens.
+		 *
+		 * @param {jQuery.Event} oEvent The event object
+		 * @private
+		 */
+		Tokenizer.prototype.onsapescape = function (oEvent) {
+			if (this.getSelectedTokens().length) {
+				this._changeAllTokensSelection(false);
+			}
+		};
 
 		Tokenizer.prototype._shouldPreventModifier = function (oEvent) {
 			var bShouldPreventOnMac = Device.os.macintosh && oEvent.metaKey;

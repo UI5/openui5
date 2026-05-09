@@ -1137,22 +1137,6 @@ sap.ui.define([
 		assert.equal(token3.getSelected(), true, "Token3 got selected using ctrl+a");
 	});
 
-	QUnit.test("esc key", function(assert) {
-
-		this.multiInput1.setValue("123");
-		this.multiInput1.selectText(0, this.multiInput1.getValue().length);
-		var token1 = new Token({selected:true});
-		var token2 = new Token({selected:true});
-		var token3 = new Token({selected:true});
-		this.multiInput1.setTokens([token1, token2, token3]);
-
-		qutils.triggerKeydown(this.multiInput1.getDomRef(), KeyCodes.ESCAPE);
-		assert.equal(token1.getSelected(), false, "Token1 is unselected");
-		assert.equal(token2.getSelected(), false, "Token2 is unselected");
-		assert.equal(token3.getSelected(), false, "Token3 is unselected");
-		assert.equal(this.multiInput1._$input.getSelectedText(), "", "texts get unselected");
-	});
-
 	QUnit.test("onsaphome", async function(assert) {
 
 		var oSpy = this.spy(Tokenizer.prototype, "onsaphome"),

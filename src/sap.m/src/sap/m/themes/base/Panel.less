@@ -73,14 +73,25 @@
 	background-color: var(--sapBackgroundColor);
 }
 
-.sapMPanelContent {
+.sapMPanelContentWrapper {
 	padding: 0.625rem 1rem 1.375rem 1rem;
+	box-sizing: border-box;
+	overflow: hidden;
+
+	/* Focus outline on wrapper when content inside is focused */
+	&.sapMPanelContentFocusable:focus-within {
+		outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+		outline-offset: -0.1875rem;
+	}
+}
+
+.sapMPanelContent {
+	height: 100%;
 	box-sizing: border-box;
 	overflow: auto;
 	white-space: normal;
 
-	/* This is needed in order to remove the additional outline added by tabindex=-1 */
-	&:focus {
+	.sapMPanelContentFocusable > &:focus {
 		outline: none;
 	}
 }
@@ -152,7 +163,7 @@ html.sap-desktop .sapUiFioriObjectPage > section > .sapMPanel {
 }
 
 /* mixin call for creating container content padding classes (arguments: rootContainer, contentSelector) */
-.sapUiContainerContentPadding(~".sapMPanel", ~"> .sapMPanelContent");
+.sapUiContainerContentPadding(~".sapMPanel", ~"> .sapMPanelContentWrapper");
 
 .sapMPanelExpandable .sapMPanelWrappingDiv {
 
@@ -174,6 +185,11 @@ html.sap-desktop .sapUiFioriObjectPage > section > .sapMPanel {
 
 /* On desktop, always show focus outline regardless of input method */
 html.sap-desktop .sapMPanelExpandable .sapMPanelWrappingDiv:focus {
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+	outline-offset: -0.1875rem;
+}
+
+html.sap-desktop .sapMPanelContentWrapper.sapMPanelContentFocusable:focus-within {
 	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	outline-offset: -0.1875rem;
 }

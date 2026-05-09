@@ -4,6 +4,14 @@ sap.ui.define(function() {
 	return {
 		name: "TestSuite for Topic: Messaging Base",
 		defaults: {
+			loader: {
+				shim: {
+					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18": {
+						amd: true,
+						exports: "QUnit"
+					}
+				}
+			},
 			qunit: {
 				version: "2.18",
 				versions: {

@@ -68,6 +68,12 @@ sap.ui.define(function() {
 			Element: {
 				title: "sap.ui.core.Element",
 				loader:{
+					shim: {
+						"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18": {
+							amd: true,
+							exports: "QUnit"
+						}
+					},
 					paths:{
 						"testdata/core": "test-resources/sap/ui/core/qunit/"
 					}

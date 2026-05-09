@@ -37,12 +37,13 @@
 	border: none;
 }
 
-.sapMPanelContent:not(.sapMPanelBGTransparent) {
+.sapMPanelContentWrapper:not(:has(> .sapMPanelBGTransparent)) {
 	border-bottom: @sapGroup_TitleBorderWidth solid @sapUiGroupTitleBorderColor;
 }
 
-.sapMPanelContent {
+.sapMPanelContentWrapper {
 	padding: 0.625rem 1rem;
+	background-color: var(--sapGroup_ContentBackground);
 }
 
 .sapMPanel .sapMPanelHdr {

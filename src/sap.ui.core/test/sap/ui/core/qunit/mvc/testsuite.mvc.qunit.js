@@ -5,6 +5,12 @@ sap.ui.define(["sap/ui/Device"], function(Device) {
 		name: "TestSuite for Topic: View & Controller",
 		defaults: {
 			loader: {
+				shim: {
+					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18": {
+						amd: true,
+						exports: "QUnit"
+					}
+				},
 				paths: {
 					// fragments used in views
 					"testdata/fragments": "test-resources/sap/ui/core/qunit/testdata/fragments/",

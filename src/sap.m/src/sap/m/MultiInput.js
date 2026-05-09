@@ -1170,16 +1170,14 @@ function(
 	};
 
 	/**
-	 * When press ESC, deselect all tokens and all texts
+	 * When press ESC, deselect all texts and close the tokens popup if open.
+	 * Token deselection is handled by the Tokenizer itself.
 	 * @public
 	 * @param {jQuery.Event} oEvent The event object
 	 */
 	MultiInput.prototype.onsapescape = function (oEvent) {
 		var oTokenizer = this.getAggregation("tokenizer"),
 			oPopup = oTokenizer.getTokensPopup();
-
-		//deselect everything
-		this.getAggregation("tokenizer").selectAllTokens(false);
 
 		// Only clear text selection if there actually is one
 		if (this.getFocusDomRef().selectionStart !== this.getFocusDomRef().selectionEnd) {

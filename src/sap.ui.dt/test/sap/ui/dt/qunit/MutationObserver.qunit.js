@@ -331,7 +331,7 @@ sap.ui.define([
 			var fnDone = assert.async();
 			var fnHandlerSpy = sandbox.spy();
 			this.oVerticalLayoutRootOverlay.attachEventOnce("applyStylesRequired", fnHandlerSpy);
-			this.oOutsidePanel.$().find(">.sapMPanelContent").scrollTop(50);
+			this.oOutsidePanel.$().find(">.sapMPanelContentWrapper>.sapMPanelContent").scrollTop(50);
 			window.requestAnimationFrame(function() {
 				assert.equal(fnHandlerSpy.called, false, "then the domchanged callback was not called");
 				fnDone();
@@ -344,7 +344,7 @@ sap.ui.define([
 				assert.strictEqual(oEvent.getParameters().type, "MutationOnScroll", "then a domchanged callback with 'scroll'-type is called");
 				fnDone();
 			});
-			this.oOuterPanel.$().find(">.sapMPanelContent").scrollTop(50);
+			this.oOuterPanel.$().find(">.sapMPanelContentWrapper>.sapMPanelContent").scrollTop(50);
 		});
 
 		QUnit.test("when a panel inside DT is scrolled", function(assert) {
@@ -355,7 +355,7 @@ sap.ui.define([
 				assert.equal(spy.called, false, "then the domchanged callback was not fired");
 				fnDone();
 			});
-			this.Panel0.$().find(">.sapMPanelContent").scrollTop(50);
+			this.Panel0.$().find(">.sapMPanelContentWrapper>.sapMPanelContent").scrollTop(50);
 		});
 	});
 

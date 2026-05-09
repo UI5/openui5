@@ -351,4 +351,25 @@ function(
 		// Assert
 		assert.ok(fnSpy.calledOnce, "Icon is set to pin button when themeChanged event is fired");
 	});
+
+	QUnit.test("Pin button tooltip reflects pinned/unpinned state", function (assert) {
+		// Arrange
+		var oHeader = this.oDynamicPage.getHeader(),
+			oPinButton = oHeader._getPinButton(),
+			oBundle = oFactory.getResourceBundle();
+
+		// Act - pin the header
+		oHeader._togglePinButton(true);
+
+		// Assert
+		assert.strictEqual(oPinButton.getTooltip(), oBundle.getText("UNPIN_HEADER"),
+			"Tooltip shows 'Unpin Header' when header is pinned");
+
+		// Act - unpin the header
+		oHeader._togglePinButton(false);
+
+		// Assert
+		assert.strictEqual(oPinButton.getTooltip(), oBundle.getText("PIN_HEADER"),
+			"Tooltip shows 'Pin Header' when header is unpinned");
+	});
 });

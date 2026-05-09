@@ -12641,24 +12641,26 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("isFilteredBy: no paths", function (assert) {
+[undefined, ["n/a", "*", "n/a"]].forEach((aPaths) => {
+	QUnit.test("isFilteredBy: " + (aPaths ? "aPaths contains '*'" : "no paths"), function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
 		this.mock(_AggregationHelper).expects("isAffected").never();
 
 		// code under test
-		assert.notOk(oBinding.isFilteredBy());
+		assert.notOk(oBinding.isFilteredBy(aPaths));
 
 		oBinding.aApplicationFilters = [{}];
 
 		// code under test
-		assert.ok(oBinding.isFilteredBy());
+		assert.ok(oBinding.isFilteredBy(aPaths));
 
 		oBinding.aApplicationFilters = [];
 		oBinding.aFilters = [{}];
 
 		// code under test
-		assert.ok(oBinding.isFilteredBy());
+		assert.ok(oBinding.isFilteredBy(aPaths));
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("isFilteredBy: with paths", function (assert) {
@@ -12693,24 +12695,26 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("isSortedBy: no paths", function (assert) {
+[undefined, ["n/a", "*", "n/a"]].forEach((aPaths) => {
+	QUnit.test("isSortedBy: " + (aPaths ? "aPaths contains '*'" : "no paths"), function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
 		this.mock(_AggregationHelper).expects("isOrderedBy").never();
 
 		// code under test
-		assert.notOk(oBinding.isSortedBy());
+		assert.notOk(oBinding.isSortedBy(aPaths));
 
 		oBinding.aSorters = [{}];
 
 		// code under test
-		assert.ok(oBinding.isSortedBy());
+		assert.ok(oBinding.isSortedBy(aPaths));
 
 		oBinding.aSorters = [];
 		oBinding.mParameters.$orderby = "~foo~";
 
 		// code under test
-		assert.ok(oBinding.isSortedBy());
+		assert.ok(oBinding.isSortedBy(aPaths));
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("isSortedBy: with paths", function (assert) {
