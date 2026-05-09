@@ -12,7 +12,8 @@ sap.ui.define([
 	'./PanelRenderer',
 	"sap/ui/core/Lib",
 	'sap/m/Button',
-	"sap/ui/events/KeyCodes"
+	"sap/ui/events/KeyCodes",
+	"sap/ui/dom/jquery/Focusable"
 ],
 	function(library, Control, ControlBehavior, IconPool, Device, PanelRenderer, Library, Button, KeyCodes) {
 	"use strict";
@@ -274,10 +275,11 @@ sap.ui.define([
 			sHeight = this.getHeight();
 			oDomRef.style.height = sHeight;
 			if (parseFloat(sHeight) != 0) {
-				oDomRef.querySelector(".sapMPanelContent").style.height = sHeight;
+				oDomRef.querySelector(".sapMPanelContentWrapper").style.height = sHeight;
 			}
 		}
 		this._setContentHeight();
+		this._updateContentFocusable();
 
 		if (this.getExpandable()) {
 			this.getHeaderToolbar() && oPanelContent && this._oExpandButton.$().attr("aria-controls", oPanelContent.id);
@@ -432,16 +434,16 @@ sap.ui.define([
 	Panel.prototype._setContentHeight = function () {
 		var sAdjustedContentHeight,
 		thisDomRef = this.getDomRef(),
-		oPanelContent = thisDomRef && thisDomRef.querySelector(".sapMPanelContent");
+		oPanelContentWrapper = thisDomRef && thisDomRef.querySelector(".sapMPanelContentWrapper");
 
-		if (this.getHeight() === "auto" || !oPanelContent) {
+		if (this.getHeight() === "auto" || !oPanelContentWrapper) {
 			return;
 		}
 
 		// 'offsetTop' measures the vertical space occupied by siblings before this one
 		// Earlier each previous sibling's height was calculated separately and then all height values were summed up
-		sAdjustedContentHeight =  'calc(' + "100%" + ' - ' + oPanelContent.offsetTop + 'px)';
-		oPanelContent.style.height = sAdjustedContentHeight;
+		sAdjustedContentHeight =  'calc(' + "100%" + ' - ' + oPanelContentWrapper.offsetTop + 'px)';
+		oPanelContentWrapper.style.height = sAdjustedContentHeight;
 	};
 
 	Panel.prototype._toggleExpandCollapse = function (fnAnimationComplete) {
@@ -454,6 +456,34 @@ sap.ui.define([
 		}
 
 		this.$().children(".sapMPanelExpandablePart").slideToggle(oOptions);
+	};
+
+	/**
+	 * Updates the focusable state of the content area.
+	 * Content becomes focusable only when it is scrollable and has no focusable children.
+	 * The focusable class is added to the wrapper for styling purposes.
+	 *
+	 * @private
+	 */
+	Panel.prototype._updateContentFocusable = function () {
+		const oPanelContent = this.getDomRef("content"),
+			oContentWrapper = this.getDomRef() && this.getDomRef().querySelector(".sapMPanelContentWrapper");
+
+		if (!oPanelContent || !oContentWrapper) {
+			return;
+		}
+
+		const bIsScrollable = oPanelContent.scrollHeight > oPanelContent.clientHeight ||
+							oPanelContent.scrollWidth > oPanelContent.clientWidth;
+		const bHasFocusableElements = this.$("content").firstFocusableDomRef() !== null;
+
+		if (bIsScrollable && !bHasFocusableElements) {
+			oContentWrapper.classList.add("sapMPanelContentFocusable");
+			oPanelContent.setAttribute("tabindex", "0");
+		} else {
+			oContentWrapper.classList.remove("sapMPanelContentFocusable");
+			oPanelContent.removeAttribute("tabindex");
+		}
 	};
 
 	Panel.prototype._getLabellingElementId = function () {

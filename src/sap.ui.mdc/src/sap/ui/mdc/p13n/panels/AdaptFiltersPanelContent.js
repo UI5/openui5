@@ -49,10 +49,17 @@ sap.ui.define([
 	function _getIdSuffixFromContext(oContext) {
 		const sKey = oContext.getProperty("key");
 		const sName = oContext.getProperty("name");
-		const sSuffix = sKey || sName;
+		let sSuffix = sKey || sName;
+
+		// Replace * or + when ALL or ANY Filter are used
+		sSuffix = sSuffix.replace(/\+/g, "_ALL_");
+		sSuffix = sSuffix.replace(/\*/g, "_ANY_");
+
 		// Remove all characters that are invalid for IDs
-		// Valid characters: A-Z, a-z, 0-9, hyphen (-), underscore (_), colon (:), period (.)
-		return sSuffix.replace(/[^A-Za-z0-9\-_:.]/g, "");
+		// Valid characters: A-Z, a-z, 0-9, hyphen (-), underscore (_), colon (:), period (.
+		sSuffix = sSuffix.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		return sSuffix;
 	}
 
 	const AdaptFiltersPanelContent = QueryPanel.extend("sap.ui.mdc.p13n.panels.AdaptFiltersPanelContent", {
@@ -310,7 +317,9 @@ sap.ui.define([
 					if (oControl.isA("sap.ui.mdc.FilterField")) {
 						oControl.setEditMode("Editable");
 					} else {
-						oControl.setEnabled?.(true);
+						if (!oControl._bDefaultDisabled) {
+							oControl.setEnabled?.(true);
+						}
 					}
 				}
 			}

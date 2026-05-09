@@ -19,7 +19,7 @@ sap.ui.define([
 
 	opaTest("Should accept all cookies and teardown my app", function (Given, When, Then) {
 		// Action
-		When.onTheAppPage.iPressTheAcceptAllCookiesButton();
+		When.onTheAppPage.iAcceptAllCookiesIfPresent();
 		Opa5.assert.expect(0);
 		Then.iTeardownMyApp();
 	});

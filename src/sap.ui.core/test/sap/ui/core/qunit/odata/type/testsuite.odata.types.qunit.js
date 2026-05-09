@@ -6,6 +6,14 @@ sap.ui.define(function () {
 			+ " 'Currency and unit amount in two fields'",
 		defaults : {
 			group : "OData Types",
+			loader : {
+				shim : {
+					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18" : {
+						amd : true,
+						exports : "QUnit"
+					}
+				}
+			},
 			qunit : {
 				versions : {
 					"2.18" : {

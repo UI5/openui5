@@ -4,6 +4,14 @@ sap.ui.define(function () {
 	return {
 		name : "QUnit test suite for Currency and unit amount in two fields",
 		defaults : {
+			loader : {
+				shim : {
+					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18" : {
+						amd : true,
+						exports : "QUnit"
+					}
+				}
+			},
 			qunit : {
 				versions : {
 					"2.18" : {

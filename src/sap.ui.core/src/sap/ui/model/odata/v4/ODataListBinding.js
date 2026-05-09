@@ -3774,7 +3774,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataListBinding.prototype.isFilteredBy = function (aPaths) {
-		if (!aPaths) {
+		if (!aPaths || aPaths.includes("*")) {
 			return this.aApplicationFilters.length || this.aFilters.length;
 		}
 
@@ -3843,7 +3843,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataListBinding.prototype.isSortedBy = function (aPaths) {
-		if (!aPaths) {
+		if (!aPaths || aPaths.includes("*")) {
 			return this.aSorters.length || this.mParameters.$orderby;
 		}
 

@@ -28,7 +28,7 @@
 		color: var(--sapTextColor);
 	}
 
-	.sapMBreadcrumbsItem.sapMBreadcrumbsSelectItem>.sapMSlt.sapMSltIconOnly.sapMSltWithIcon.sapMSltHoverable.sapMSltWithArrow {
+	.sapMBreadcrumbsItem.sapMBreadcrumbsSelectItem>.sapMSlt.sapMSltIconOnly.sapMSltWithIcon.sapMSltWithArrow {
 		background: transparent;
 		border: none;
 
@@ -37,7 +37,7 @@
 			display: flex;
 			align-items: center;
 			gap: 0.2rem;
-			margin-top: 0.1rem;
+			margin-top: -0.125rem;
 
 			&::before,
 			&::after {
@@ -62,6 +62,15 @@
 		&:hover {
 			outline: 0.125rem dotted var(--sapContent_FocusColor);
 			outline-offset: -0.125rem;
+
+			.sapMSltIcon::before {
+				border-bottom: none;
+			}
+		}
+
+		/* Override base theme specificity (.sapMSltHoverable) for border-bottom */
+		&.sapMSltHoverable:hover,
+		&.sapMSltHoverable.sapMSltFocused {
 
 			.sapMSltIcon::before {
 				border-bottom: none;

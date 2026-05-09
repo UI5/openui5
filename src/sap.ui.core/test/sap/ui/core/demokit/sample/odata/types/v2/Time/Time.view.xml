@@ -13,9 +13,14 @@
 			enableFormattedText="true"
 			showIcon="true"
 			text="- This sample uses a JSON model to keep the structure simple. For productive apps,
-				we strongly recommend using the OData V4 model.&lt;br&gt;- OData types can also be
+				we strongly recommend using the OData V4 model with &lt;a target=&quot;_blank&quot;
+				href=&quot;https://ui5.sap.com/#/api/sap.ui.model.odata.type.TimeOfDay%23overview&quot;&gt;sap.ui.model.odata.type.TimeOfDay&lt;/a&gt;
+				or &lt;a target=&quot;_blank&quot;
+				href=&quot;https://ui5.sap.com/#/api/sap.ui.model.odata.type.Duration%23overview&quot;&gt;sap.ui.model.odata.type.Duration&lt;/a&gt;
+				instead, as Edm.Time has no equivalent in OData V4.&lt;br&gt;- OData types can also be
 				used without the OData models. The prerequisite is that the data format matches the
-				expected serialization format of OData."
+				representation as specified by the &lt;a target=&quot;_blank&quot;
+				href=&quot;https://ui5.sap.com/#/api/sap.ui.model.odata.type.Time%23overview&quot;&gt;type&lt;/a&gt;."
 			type="Information" />
 		<form:SimpleForm class="sapUiResponsiveMargin" columnsL="1" columnsM="1" editable="true"
 				labelSpanL="3" labelSpanM="3" layout="ResponsiveGridLayout" width="auto">

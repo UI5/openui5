@@ -1337,9 +1337,11 @@ sap.ui.define([
 		 */
 		isUsedForGrandTotal : function (aPaths, mAggregate) {
 			if (mAggregate) {
+				const bWithWildcard = aPaths.includes("*");
 				for (const [sAlias, oDetails] of Object.entries(mAggregate)) {
 					if (oDetails.grandTotal
-						&& (aPaths.includes(sAlias) || aPaths.includes(oDetails.unit))) {
+						&& (bWithWildcard
+							|| aPaths.includes(sAlias) || aPaths.includes(oDetails.unit))) {
 						return true;
 					}
 				}

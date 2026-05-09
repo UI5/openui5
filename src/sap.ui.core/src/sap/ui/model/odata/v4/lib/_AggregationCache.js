@@ -79,12 +79,12 @@ sap.ui.define([
 	 *   A lock for the group ID to be used for the DELETE request; w/o it, no requests are sent.
 	 *   For a transient entity, the lock is ignored (use NULL)!
 	 * @param {string} sEditUrl
-	 *   The node's edit URL to be used for the DELETE request
+	 *   The node's edit URL to be used for the DELETE request; w/o a lock, this is mostly ignored.
 	 * @param {string} sIndexOrPredicate
 	 *   The node's index or its predicate if it is not in the collection
-	 * @param {object} [_oETagEntity]
-	 *   An entity with the ETag of the binding for which the deletion was requested. Not used and
-	 *   should always be undefined
+	 * @param {object} [oETagEntity]
+	 *   An entity with the ETag of the binding for which the deletion was requested, see
+	 *   {@link sap.ui.model.odata.v4.lib._Cache#_delete}
 	 * @param {function(number,number):void} fnCallback
 	 *   A function which is called immediately with the node's index and offset -1 as parameter
 	 *   when the node has been deleted from the cache; reinsertion does not occur
@@ -98,7 +98,7 @@ sap.ui.define([
 	 */
 	// @override sap.ui.model.odata.v4.lib._Cache#_delete
 	_AggregationCache.prototype._delete = function (oGroupLock, sEditUrl, sIndexOrPredicate,
-			_oETagEntity, fnCallback) {
+			oETagEntity, fnCallback) {
 		let iIndex = parseInt(sIndexOrPredicate);
 		if (isNaN(iIndex)) { // it must be a predicate because the element is not in the collection
 			throw new Error(
@@ -118,16 +118,17 @@ sap.ui.define([
 				_Helper.getPrivateAnnotation(oElement, "transientPredicate"));
 		}
 
-		sEditUrl += this.oRequestor.buildQueryString(this.sMetaPath, this.mQueryOptions, true);
 		if (this.oCountPromise) {
 			this.createCountPromise();
 		}
 
 		return SyncPromise.all(oGroupLock ? [
-			this.oRequestor.request("DELETE", sEditUrl, oGroupLock, {"If-Match" : oElement}),
+			oParentCache._delete(oGroupLock, sEditUrl, sPredicate, oETagEntity, /*fnCallback*/null),
 			this.readCount(oGroupLock),
 			this.readGrandTotal(oGroupLock)
-		] : []).then(() => {
+		] : [
+			this.readCount(this.oRequestor.lockGroup("$auto", this))
+		]).then(() => {
 			this.oTreeState.delete(oElement);
 			if (this.aElements.length === 0) {
 				return; // concurrent side-effects refresh takes care of cleanup
@@ -152,6 +153,7 @@ sap.ui.define([
 			}
 			this.shiftRank(iIndex, -iOffset);
 			// remove in this cache
+			delete oElement["@$ui5.context.isDeleted"]; // @see #removeElement
 			this.removeElement(iIndex, sPredicate);
 			// notify caller
 			fnCallback(iIndex, -1);

@@ -14,6 +14,12 @@ sap.ui.define(function() {
 		defaults : {
 			group : "UI5 Core - Models",
 			loader : {
+				shim : {
+					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18" : {
+						amd : true,
+						exports : "QUnit"
+					}
+				},
 				paths : {
 					"sap/ui/core/qunit" : "test-resources/sap/ui/core/qunit"
 				}

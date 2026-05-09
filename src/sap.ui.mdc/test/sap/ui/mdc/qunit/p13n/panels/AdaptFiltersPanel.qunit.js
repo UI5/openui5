@@ -1935,4 +1935,28 @@ sap.ui.define([
 
 		assert.equal(sSuffix, "fallbackName", "When key is null, name property is used as fallback");
 	});
+
+	QUnit.test("_getIdSuffixFromContext: key with + and * for ALL/ANY filters", function(assert){
+		// Test that + is replaced with _ALL_ and * is replaced with _ANY_
+		const sOriginalPlus = "key+filter";
+		const sOriginalStar = "key*filter";
+		const sOriginalBoth = "key+and*filter";
+
+		// Apply the same transformation as _getIdSuffixFromContext
+		let sCleanedPlus = sOriginalPlus.replace(/\+/g, "_ALL_");
+		sCleanedPlus = sCleanedPlus.replace(/\*/g, "_ANY_");
+		sCleanedPlus = sCleanedPlus.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		let sCleanedStar = sOriginalStar.replace(/\+/g, "_ALL_");
+		sCleanedStar = sCleanedStar.replace(/\*/g, "_ANY_");
+		sCleanedStar = sCleanedStar.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		let sCleanedBoth = sOriginalBoth.replace(/\+/g, "_ALL_");
+		sCleanedBoth = sCleanedBoth.replace(/\*/g, "_ANY_");
+		sCleanedBoth = sCleanedBoth.replace(/[^A-Za-z0-9\-_:.]/g, "");
+
+		assert.equal(sCleanedPlus, "key_ALL_filter", "+ character is replaced with _ALL_");
+		assert.equal(sCleanedStar, "key_ANY_filter", "* character is replaced with _ANY_");
+		assert.equal(sCleanedBoth, "key_ALL_and_ANY_filter", "Both + and * are replaced with _ALL_ and _ANY_");
+	});
 });

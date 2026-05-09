@@ -730,7 +730,7 @@ sap.ui.define([
 				showSelected: true,
 				hideDescriptions: true
 			},
-			resultDelta: -6 // 0 items are selected
+			resultDelta: -3 // 3 items are shown: only selected items (Field 1, 2, 3)
 		},
 		{
 			filter: {
@@ -738,7 +738,7 @@ sap.ui.define([
 				showSelected: true,
 				hideDescriptions: true
 			},
-			resultDelta: -6 // 0 items are selected, because 5 has isRedundant=true
+			resultDelta: -6 // 0 items: Field 5 is not selected, so it doesn't match the filter
 		}
 	];
 
@@ -954,5 +954,31 @@ sap.ui.define([
 		assert.equal(aSelectedItems.length, 2, "Only two items are selected");
 		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
 		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 3", "Field 2 is correctly selected");
+	});
+
+	QUnit.test("Check '_filterList' showSelectedFilters and hideDescriptionFilters are true", function(assert) {
+		// Arrange: Create test data with selected items and redundant items
+		const oTestData = [
+			{ visible: true, name: "key1", label: "Selected Item", isRedundant: false },
+			{ visible: false, name: "key2", label: "Non-Redundant Item", isRedundant: false },
+			{ visible: false, name: "key3", label: "Redundant Item", isRedundant: true },
+			{ visible: true, name: "key4", label: "Selected Redundant Item", isRedundant: true }
+		];
+		this.oSelectionPanel.setP13nData(oTestData);
+
+		this.oSelectionPanel._filterList(true, undefined, true);
+
+		// Assert: When both filters are active, show only selected items (visible === true)
+		// Logic: (visible & !description) OR (visible & description) = visible
+		// This means redundancy status is ignored, only the visible/selected state matters
+		const aVisibleItems = this.oSelectionPanel._oListControl.getItems();
+		assert.equal(aVisibleItems.length, 2, "Two items should be visible (all selected items)");
+
+		// Check that only selected items are shown, regardless of redundancy
+		const aLabels = aVisibleItems.map((item) => item.getCells()[0].getItems()[0].getText());
+		assert.ok(aLabels.includes("Selected Item"), "Selected non-redundant item is visible");
+		assert.ok(!aLabels.includes("Non-Redundant Item"), "Non-selected non-redundant item is hidden");
+		assert.ok(aLabels.includes("Selected Redundant Item"), "Selected redundant item is visible");
+		assert.notOk(aLabels.includes("Redundant Item"), "Non-selected redundant item is hidden");
 	});
 });

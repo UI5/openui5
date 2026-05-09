@@ -8,12 +8,14 @@
 	displayBlock="true">
 	<App>
 		<Page
-			title="ACC Test Page for sap.m.Tree">
+			title="ACC Test Page for sap.m.Tree"
+			titleLevel="H1">
 			<content>
 				<core:Fragment fragmentName="sap.m.acc.tree.fragment.Config" type="XML"/>
 				<Tree
 					id="testTree"
 					headerText="Tree"
+					headerLevel="H2"
 					items="{path: '/'}"
 					mode="{treeConfig>/selectionMode}"
 					itemActionCount="{= ${treeConfig>/showRowActions} ? 2 : 0 }"

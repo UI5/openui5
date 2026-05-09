@@ -2265,36 +2265,36 @@ sap.ui.define([
 [undefined, {}].forEach((mAggregate, i) => {
 	QUnit.test("isUsedForGrandTotal: no aggregate, # " + i, function (assert) {
 		// code under test
-		assert.notOk(_AggregationHelper.isUsedForGrandTotal(["any/path"], mAggregate));
+		assert.strictEqual(_AggregationHelper.isUsedForGrandTotal(["*"], mAggregate),
+			false);
 	});
 });
 
 	//*********************************************************************************************
-["NoAggregate", "NoGrandTotal", "WithUnitNoGrandTotal", "Unit1"].forEach((sPath) => {
-	QUnit.test("isUsedForGrandTotal: not used, path = " + sPath, function (assert) {
+["NoAggregate", "NoGrandTotal", "WithUnitNoGrandTotal", "Unit1", "*"].forEach((sPath) => {
+	QUnit.test("isUsedForGrandTotal: no grand total, path = " + sPath, function (assert) {
 		const mAggregate = {
 			NoGrandTotal : {},
 			WithUnitNoGrandTotal : {unit : "Unit1"}
 		};
 
 		// code under test
-		assert.notOk(_AggregationHelper.isUsedForGrandTotal([sPath], mAggregate));
+		assert.strictEqual(_AggregationHelper.isUsedForGrandTotal([sPath], mAggregate), false);
 	});
 });
 
 	//*********************************************************************************************
-["WithGrandTotal", "WithUnitWithGrandTotal", "Unit2"].forEach((sPath) => {
-	QUnit.test("isUsedForGrandTotal: used, path = " + sPath, function (assert) {
+["NotUsedForGT", "WithGrandTotal", "WithUnitWithGrandTotal", "Unit2", "*"].forEach((sPath) => {
+	QUnit.test("isUsedForGrandTotal: with grand total, path = " + sPath, function (assert) {
 		const mAggregate = {
 			WithGrandTotal : {grandTotal : true},
 			WithUnitWithGrandTotal : {grandTotal : true, unit : "Unit2"}
 		};
 
 		// code under test
-		assert.ok(_AggregationHelper.isUsedForGrandTotal([sPath], mAggregate));
-
-		// code under test
-		assert.ok(_AggregationHelper.isUsedForGrandTotal(["notUsed", sPath, "n/a"], mAggregate));
+		assert.strictEqual(
+			_AggregationHelper.isUsedForGrandTotal(["notUsed", sPath, "n/a"], mAggregate),
+			sPath !== "NotUsedForGT");
 	});
 });
 
