@@ -33,6 +33,10 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18": {
 						amd: true,
 						exports: "QUnit"
+					},
+					"test-resources/sap/ui/core/qunit/thirdparty/sinon-14.0": {
+						amd: true,
+						exports: "sinon"
 					}
 				},
 				paths: {
