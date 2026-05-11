@@ -1794,6 +1794,7 @@ sap.ui.define([
 					assert.deepEqual(oValueHelp.getDelegate(), {name: "sap/ui/mdc/ValueHelpDelegate", payload: {isDefaultHelp: true}}, "base delegate used on ValueHelp");
 					oFieldEditSingle.focus();
 					assert.equal(oPopover.getTitle(), "Test", "title on typeahead");
+					assert.notOk(oContent.isOpen(), "Select is closed");
 
 					// test interaction with Select control
 					oFieldEditSingle.fireChangeEvent = _myFireChange;
@@ -1854,6 +1855,7 @@ sap.ui.define([
 					assert.ok(oValueHelp.toggleOpen.calledWith(true), "open called for Typeahead");
 					assert.equal($FocusDomRef.attr("aria-controls"), "BoolDefaultHelp-content-List", "Opening: aria-controls set");
 					assert.equal($FocusDomRef.attr("aria-activedescendant"), aItems[0].getId(), "Navigation: aria-activedescendant set");
+					assert.ok(oContent.isOpen(), "Select is open");
 					// selecting empty-item on ValueHelp
 					// eslint-disable-next-line require-atomic-updates
 					iCount = 0;
