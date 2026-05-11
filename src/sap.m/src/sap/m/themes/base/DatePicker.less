@@ -1,27 +1,34 @@
-/* ===================================== */
+/* ================================= */
 /* CSS for control sap.m/DatePicker  */
-/* Base theme                            */
-/* ===================================== */
+/* Base theme                        */
+/* ================================= */
 
 [data-sap-ui-popup].sapMRPCalendar {
+
 	&.sapMDialog.sapUiPopupWithPadding:not(.sapUiNoContentPadding) .sapMDialogScrollCont {
 		padding: 0;
 	}
+
 	.sapMDialogScroll,
 	.sapMDialogScrollCont,
 	.sapUiCal {
 		min-height: 100%;
 	}
+
 	&.sapMDialog {
 		padding-bottom: 0;
 	}
+
 	&.sapMDialog.sapMDialogStretched {
 		max-height: none !important; /* the !important is needed to override the inline set of the max-height by the Dialog */
 	}
 }
 
-html.sap-phone, html.sapUiMedia-Std-Phone {
+html.sap-phone,
+html.sapUiMedia-Std-Phone {
+
 	[data-sap-ui-popup] {
+
 		.sapUiCal {
 			width: 100%;
 		}
@@ -33,10 +40,12 @@ html.sap-phone, html.sapUiMedia-Std-Phone {
 }
 
 .sapMInputBase {
+
 	&.sapMDatePickerHiddenInput {
 		display: none;
 	}
-	.sapMInputBaseContentWrapper{
+
+	.sapMInputBaseContentWrapper {
 		display: inline-flex;
 	}
 }
