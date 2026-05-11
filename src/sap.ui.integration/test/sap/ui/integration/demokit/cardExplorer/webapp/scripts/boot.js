@@ -10,7 +10,8 @@ window.addEventListener("load", function () {
 		document.documentElement.style.opacity = "1";
 	}
 
-	var sTargetRoot = document.location.href.substring(0, document.location.href.indexOf("/test-resources")),
+	var iIdx = document.location.pathname.indexOf("/test-resources"),
+		sTargetRoot = iIdx !== -1 ? window.location.origin + document.location.pathname.substring(0, iIdx) : window.location.origin,
 		sWebApp = sTargetRoot + "/test-resources/sap/ui/integration/demokit/cardExplorer/webapp/",
 		sRes = sTargetRoot + "/resources/",
 		aNodes = [],
