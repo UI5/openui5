@@ -23,5 +23,15 @@
         "text": " Table: Remove renderWhitespace restriction"
       }
     ]
+  },
+  "1.136.16": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "c694dcdfc9361c2b2d1a31a81d31b0aec371c3a1",
+        "type": "FIX",
+        "text": " ui.Table: Column Freeze behavior and state"
+      }
+    ]
   }
 }

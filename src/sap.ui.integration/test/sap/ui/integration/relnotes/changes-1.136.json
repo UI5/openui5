@@ -18,5 +18,15 @@
         "text": " Integration Cards: Creation of duplicate SAC widgets is now prevented"
       }
     ]
+  },
+  "1.136.16": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "22f511ba43183eb42970fc4c654d1aa460cbd4be",
+        "type": "FIX",
+        "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
+      }
+    ]
   }
 }

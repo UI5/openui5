@@ -393,5 +393,15 @@
         "text": " sap.base.strings.formatMessage: Accept nullish arguments"
       }
     ]
+  },
+  "1.136.16": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "6100d6a9b95e37c5ea14a0fe47ec0dc998c1e94c",
+        "type": "FIX",
+        "text": " sap.ui.core: Harden script loading in internal bootstrap scripts"
+      }
+    ]
   }
 }

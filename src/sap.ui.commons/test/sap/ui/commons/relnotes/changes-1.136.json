@@ -8,5 +8,15 @@
         "text": " core.Popup: make Popup.Dock enum have identical key and value"
       }
     ]
+  },
+  "1.136.16": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "548ffe7dd973ee5d7144be80536bd2f0b2818587",
+        "type": "FIX",
+        "text": " sap.ui.commons.Tree: fix unstable test"
+      }
+    ]
   }
 }
