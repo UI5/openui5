@@ -1,7 +1,27 @@
 {
   "1.148.0": {
-    "date": "April 2026",
+    "date": "May 2026",
     "notes": [
+      {
+        "id": "2dff50d98865efbd2d88773f7cc5c3afa23853a5",
+        "type": "FIX",
+        "text": " sap.m.Dialog: Revert new flex box calculation"
+      },
+      {
+        "id": "fccb0656270a5cc92c51934a959ffb0fcd221474",
+        "type": "FIX",
+        "text": " p13n.BasePanel: Import enums correctly"
+      },
+      {
+        "id": "1285e98496bfc6e39b8860cba53f509c6db3375b",
+        "type": "FIX",
+        "text": " sap.m.Dialog: Fix layout when no vertical scrolling"
+      },
+      {
+        "id": "dcc1d8b53260ee430f41838a0912849cef3a1595",
+        "type": "FIX",
+        "text": " IllustrationExplorer: Fix unstable OPA tests for size and set selects"
+      },
       {
         "id": "4d9e7b8ff00352c1d839cae1d0f8995e29e7af01",
         "type": "FIX",

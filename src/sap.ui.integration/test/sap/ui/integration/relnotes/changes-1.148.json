@@ -1,7 +1,17 @@
 {
   "1.148.0": {
-    "date": "April 2026",
+    "date": "May 2026",
     "notes": [
+      {
+        "id": "2dff50d98865efbd2d88773f7cc5c3afa23853a5",
+        "type": "FIX",
+        "text": " sap.m.Dialog: Revert new flex box calculation"
+      },
+      {
+        "id": "1285e98496bfc6e39b8860cba53f509c6db3375b",
+        "type": "FIX",
+        "text": " sap.m.Dialog: Fix layout when no vertical scrolling"
+      },
       {
         "id": "4d9e7b8ff00352c1d839cae1d0f8995e29e7af01",
         "type": "FIX",

@@ -1,7 +1,27 @@
 {
   "1.148.0": {
-    "date": "April 2026",
+    "date": "May 2026",
     "notes": [
+      {
+        "id": "14855f630ac3cd5937514e0389c4031fb660725a",
+        "type": "FIX",
+        "text": " ValueHelp: only 50 Tokens are shown"
+      },
+      {
+        "id": "f322f759bce34d8418c1394aeba47f3993cd0cf8",
+        "type": "FIX",
+        "text": " MultiValueField: alignment in display mode"
+      },
+      {
+        "id": "fccb0656270a5cc92c51934a959ffb0fcd221474",
+        "type": "FIX",
+        "text": " p13n.BasePanel: Import enums correctly"
+      },
+      {
+        "id": "5ff99bef691b8e662464040e1574f56ec2f95187",
+        "type": "FIX",
+        "text": " MultiValueField: sync Conditions with Items if update fails"
+      },
       {
         "id": "9e85d08847c2fa38461c40bb4ccdd168964aad0d",
         "type": "FIX",
