@@ -88,5 +88,15 @@
         "text": " FilterBar: Empty, NotEmpty - incorrect result"
       }
     ]
+  },
+  "1.142.9": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "2d03b0b9cc7f0f7405b46c20282ffd406641b90f",
+        "type": "FIX",
+        "text": " FieldBase: fix issue when searching for string including ()."
+      }
+    ]
   }
 }

@@ -343,5 +343,20 @@
         "text": " sap.m.Popover: Prevent shifting of root html element to ensure correct positioning"
       }
     ]
+  },
+  "1.142.9": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "c674cd7bfd144ded08d3cadeaa56b5d19a5aa7fd",
+        "type": "FIX",
+        "text": " IllustrationExplorer: Fix unstable OPA tests for size, set, and checkbox actions"
+      },
+      {
+        "id": "679052dfea056ad5fb82db2419b0f1b5137af570",
+        "type": "FIX",
+        "text": " sap.m.Text: Skip unstable test in Chrome"
+      }
+    ]
   }
 }

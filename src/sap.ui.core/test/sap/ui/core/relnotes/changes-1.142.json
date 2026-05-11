@@ -158,5 +158,20 @@
         "text": " core/Control: Improve focus restoration for busy indicator"
       }
     ]
+  },
+  "1.142.9": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "451d3951efe120b15863df5134552297d2923b57",
+        "type": "FIX",
+        "text": " sap.ui.core: Harden script loading in internal bootstrap scripts"
+      },
+      {
+        "id": "fad2b2447422d3a196825419b3f16ad76f25af78",
+        "type": "FIX",
+        "text": " FESR: Fix excessive interaction recording on livechange events"
+      }
+    ]
   }
 }
