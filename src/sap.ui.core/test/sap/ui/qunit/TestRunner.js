@@ -465,7 +465,6 @@
 						width : "100%",
 						height : "100vh"
 					},
-					sandbox: "allow-scripts",
 					src: "/.ui5/coverage/report/" + oHTMLReport.destination
 				})
 			);
