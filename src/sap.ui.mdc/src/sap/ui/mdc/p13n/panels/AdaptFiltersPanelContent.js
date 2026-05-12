@@ -879,6 +879,11 @@ sap.ui.define([
 					item: oItem
 				});
 
+				setTimeout(() => {
+					const oErrorText = this._getFilterFieldFromItem(oContext).getValueStateText();
+					this.oInvisibleMessage.announce(oErrorText, InvisibleMessageMode.Assertive);
+				}, RENDERING_DELAY_MS);
+
 			}
 		});
 

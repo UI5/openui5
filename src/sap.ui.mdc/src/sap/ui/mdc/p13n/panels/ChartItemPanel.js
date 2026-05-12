@@ -181,7 +181,8 @@ sap.ui.define([
 
 		this._oInnerControl = new VBox({
 			items: [
-				this._oListControl
+				this._oListControl,
+				this._oInvText
 			]
 		});
 
