@@ -1,0 +1,73 @@
+{
+	"sap.app": {
+		"id": "mdc.sample",
+		"type": "application",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"title": "MDC List Features Sample",
+		"description": "MDC List Features Sample Application",
+		"dataSources": {
+			"mountains" : {
+				"uri": "../../table/mockdata/mountains.json",
+				"type": "JSON"
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"config": {
+			"sample": {
+				"files": [
+					"view/ListFeatures.view.xml",
+					"controller/Controller.controller.js",
+					"delegate/JSONListDelegate.js",
+					"delegate/JSONListFilterDelegate.js",
+					"../../table/mockdata/metadata/JSONPropertyInfo.js",
+					"../../table/mockdata/mountains.json",
+					"manifest.json"
+				]
+			}
+		},
+		"flexEnabled": false,
+		"resourceRoots": {
+			"mdc.sample": "./",
+			"mdc.sample.delegate": "./delegate/",
+			"mdc.sample.model": "../../table/mockdata/"
+		},
+		"dependencies": {
+			"minUI5Version": "1.120.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.ui.fl": {},
+				"sap.ui.layout": {},
+				"sap.ui.mdc": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"handleValidation": true,
+		"models": {
+			"mountains": {
+				"type": "sap.ui.model.json.JSONModel",
+				"dataSource": "mountains"
+			}
+		},
+		"rootView": {
+			"viewName": "mdc.sample.view.ListFeatures",
+			"type": "XML",
+			"async": true,
+			"id": "sample"
+		}
+	}
+}

@@ -5,13 +5,16 @@
 sap.ui.define([
 	"./Control",
 	"./ActionToolbar",
-	"./table/TableSettings",
+	"./util/ToolbarSettings",
 	"./table/GridTableType",
 	"./table/TreeTableType",
 	"./table/ResponsiveTableType",
 	"./table/PropertyHelper",
 	"./table/utils/Personalization",
 	"./table/utils/FilterInfoBar",
+	"./util/ExportUtils",
+	"./util/P13nUtils",
+	"./util/Common",
 	"./mixin/FilterIntegrationMixin",
 	"sap/m/Title",
 	"sap/m/table/Title",
@@ -56,13 +59,16 @@ sap.ui.define([
 ], (
 	Control,
 	ActionToolbar,
-	TableSettings,
+	ToolbarSettings,
 	GridTableType,
 	TreeTableType,
 	ResponsiveTableType,
 	PropertyHelper,
 	PersonalizationUtils,
 	FilterInfoBar,
+	ExportUtils,
+	P13nUtils,
+	Common,
 	FilterIntegrationMixin,
 	Title,
 	TableTitle,
@@ -1014,10 +1020,10 @@ sap.ui.define([
 
 		this._oManagedObjectModel = new ManagedObjectModel(this, {
 			hasGrandTotal: false,
-			activeP13nModes: createActiveP13nModesMap(this),
-			toolbarButtonType: TableSettings.getToolbarButtonType()
+			activeP13nModes: createActiveP13nModesMap(this)
 		});
 		this._oManagedObjectModel.setDefaultBindingMode(BindingMode.OneWay);
+		this._oManagedObjectModel.setProperty("/@custom/toolbarButtonType", ToolbarSettings.getToolbarButtonType());
 		this.setModel(this._oManagedObjectModel, "$sap.ui.mdc.Table");
 	};
 
@@ -1025,22 +1031,7 @@ sap.ui.define([
 	 * @inheritDoc
 	 */
 	Table.prototype.applySettings = function(mSettings, oScope) {
-		// Some settings rely on the existence of a (table-)type instance. If the type is applied before other settings, initialization of a
-		// (incorrect) default type instance can be avoided.
-		// The delegate must be part of the early settings, because it can only be applied once (see sap.ui.mdc.mixin.DelegateMixin).
-		if (mSettings && "type" in mSettings) {
-			const mEarlySettings = {type: mSettings.type};
-
-			if ("delegate" in mSettings) {
-				mEarlySettings.delegate = mSettings.delegate;
-				delete mSettings.delegate;
-			}
-
-			delete mSettings.type;
-			Control.prototype.applySettings.call(this, mEarlySettings, oScope);
-		}
-
-		Control.prototype.applySettings.call(this, mSettings, oScope);
+		Common.applySettingsWithEarlyTypeAndDelegate(this, mSettings, oScope, Control.prototype.applySettings);
 		this.initControlDelegate();
 
 		// onModification is not called if changes are applied during XML preprocessing. For the initial validation, this call leads to duplicate log
@@ -2197,14 +2188,14 @@ sap.ui.define([
 		return this.getActiveP13nModes().includes(TableP13nMode.Aggregate);
 	};
 
+	/**
+	 * Returns the P13n modes supported by this table and its current delegate.
+	 *
+	 * @returns {string[]} The supported P13n mode keys
+	 * @private
+	 */
 	Table.prototype.getSupportedP13nModes = function() {
-		let aSupportedP13nModes = Object.keys(TableP13nMode);
-
-		if (this.isControlDelegateInitialized()) {
-			aSupportedP13nModes = getIntersection(aSupportedP13nModes, this.getControlDelegate().getSupportedFeatures(this).p13nModes);
-		}
-
-		return aSupportedP13nModes;
+		return P13nUtils.getSupportedP13nModes(this, Object.keys(TableP13nMode));
 	};
 
 	function createActiveP13nModesMap(oTable) {
@@ -2221,21 +2212,23 @@ sap.ui.define([
 		}, {});
 	}
 
+	/**
+	 * Returns the active P13n modes — the intersection of the enabled modes and the supported modes.
+	 *
+	 * Calls <code>this.getSupportedP13nModes()</code> so that subclass overrides are honored.
+	 *
+	 * @returns {string[]} The active P13n mode keys
+	 * @private
+	 */
 	Table.prototype.getActiveP13nModes = function() {
-		return getIntersection(this.getP13nMode(), this.getSupportedP13nModes());
+		return P13nUtils.getIntersection(this.getP13nMode(), this.getSupportedP13nModes());
 	};
-
-	function getIntersection(aArr1, aArr2) {
-		return aArr1.filter((sValue) => {
-			return aArr2.includes(sValue);
-		});
-	}
 
 	Table.prototype._getP13nButton = function() {
 		if (!this._oP13nButton) {
-			this._oP13nButton = TableSettings.createSettingsButton(this.getId(), [function() {
+			this._oP13nButton = ToolbarSettings.createSettingsButton(this.getId(), [function() {
 				PersonalizationUtils.openSettingsDialog(this);
-			}, this]);
+			}, this], "$sap.ui.mdc.Table");
 		}
 		this._updateP13nButton();
 		return this._oP13nButton;
@@ -2243,23 +2236,19 @@ sap.ui.define([
 
 	Table.prototype._updateP13nButton = function() {
 		if (this._oP13nButton) {
-			const aP13nMode = this.getActiveP13nModes();
-
-			// Note: 'Aggregate' does not have a p13n UI, if only 'Aggregate' is enabled no settings icon is necessary
-			const bAggregateP13nOnly = aP13nMode.length === 1 && aP13nMode[0] === "Aggregate";
-			this._oP13nButton.setVisible(aP13nMode.length > 0 && !bAggregateP13nOnly && !this._bHideP13nButton);
+			this._oP13nButton.setVisible(this._isP13nSettingVisible());
 		}
 	};
 
 	Table.prototype._getCopyButton = function() {
 		if (window.isSecureContext && this.getCopyProvider()) {
-			return TableSettings.createCopyButton(this.getId(), this.getCopyProvider());
+			return ToolbarSettings.createCopyButton(this.getId(), this.getCopyProvider());
 		}
 	};
 
 	Table.prototype._getPasteButton = function() {
 		if (this.getShowPasteButton()) {
-			this._oPasteButton ??= TableSettings.createPasteButton(this.getId());
+			this._oPasteButton ??= ToolbarSettings.createPasteButton(this.getId());
 			return this._oPasteButton;
 		}
 	};
@@ -2296,7 +2285,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Table.prototype._createExportButton = function() {
-		return TableSettings.createExportButton(this.getId(), {
+		return ToolbarSettings.createExportButton(this.getId(), {
 			"default": [
 				function() {
 					this._onExport();
@@ -2307,7 +2296,7 @@ sap.ui.define([
 					this._onExport(true);
 				}, this
 			]
-		});
+		}, "$sap.ui.mdc.Table");
 	};
 
 	/**
@@ -2525,10 +2514,10 @@ sap.ui.define([
 		const {tree: fnTree, node: fnNode, isExpanded: fnIsExpanded} = mConfig;
 
 		if (this.getSelectionMode() === "None" || typeof fnNode !== "function" || typeof fnIsExpanded !== "function") {
-			return TableSettings.createExpandCollapseButton(this.getId(), bIsExpand, () => fnTree(this));
+			return ToolbarSettings.createExpandCollapseButton(this.getId(), bIsExpand, () => fnTree(this));
 		}
 
-		const oMenuButton = TableSettings.createExpandCollapseMenuButton(this.getId(), bIsExpand, {
+		const oMenuButton = ToolbarSettings.createExpandCollapseMenuButton(this.getId(), bIsExpand, {
 			"tree": () => fnTree(this),
 			"node": () => {
 				const aContexts = this.getSelectedContexts();
@@ -2701,15 +2690,7 @@ sap.ui.define([
 			}
 		});
 
-		const bExecuteDefaultAction = this.fireBeforeExport({
-			exportSettings: oEvent.getParameter("exportSettings"),
-			userExportSettings: oEvent.getParameter("userExportSettings"),
-			filterSettings: aFilters
-		});
-
-		if (!bExecuteDefaultAction) {
-			oEvent.preventDefault();
-		}
+		ExportUtils.fireBeforeExport(this, {filterSettings: aFilters}, oEvent);
 	};
 
 	/**
@@ -2822,11 +2803,7 @@ sap.ui.define([
 	};
 
 	Table.prototype._isP13nSettingVisible = function() {
-		const aP13nMode = this.getActiveP13nModes();
-
-		// Note: 'Aggregate' does not have a p13n UI, if only 'Aggregate' is enabled no settings icon is necessary
-		const bAggregateP13nOnly = aP13nMode.length === 1 && aP13nMode[0] === "Aggregate";
-		return aP13nMode.length > 0 && !bAggregateP13nOnly && !this._bHideP13nButton;
+		return P13nUtils.isSettingsButtonVisible(this.getActiveP13nModes(), this._bHideP13nButton, /*bHideIfAggregateOnly*/true);
 	};
 
 	/**
@@ -2845,6 +2822,12 @@ sap.ui.define([
 	};
 
 	Table.prototype._onColumnMove = function(mPropertyBag) {
+		const iCurrentIndex = this.indexOfColumn(mPropertyBag.column);
+
+		if (iCurrentIndex === mPropertyBag.newIndex) {
+			return;
+		}
+
 		PersonalizationUtils.createColumnReorderChange(this, {
 			column: mPropertyBag.column,
 			index: mPropertyBag.newIndex
@@ -3140,7 +3123,7 @@ sap.ui.define([
 	 * Handler for theme changes
 	 */
 	Table.prototype.onThemeChanged = function() {
-		this._oManagedObjectModel.setProperty("/@custom/toolbarButtonType", TableSettings.getToolbarButtonType());
+		this._oManagedObjectModel.setProperty("/@custom/toolbarButtonType", ToolbarSettings.getToolbarButtonType());
 
 		if (this._oToolbar) {
 			const sToolBarDesign = ToolbarDesign[ThemeParameters.get({name: "_sap_ui_mdc_Table_ToolbarDesign"})];

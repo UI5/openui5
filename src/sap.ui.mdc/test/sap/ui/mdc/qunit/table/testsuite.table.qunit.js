@@ -183,7 +183,7 @@ sap.ui.define(function() {
 					libs: ["sap.m", "sap.ui.table", "sap.ui.mdc"]
 				},
 				coverage: {
-					only: ["sap/ui/mdc/table/DragDropConfig"]
+					only: ["sap/ui/mdc/table/DragDropConfig", "sap/ui/mdc/util/DragDropConfigBase"]
 				}
 			}
 		}
