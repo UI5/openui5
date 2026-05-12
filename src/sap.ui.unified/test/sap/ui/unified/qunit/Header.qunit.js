@@ -210,6 +210,52 @@ sap.ui.define([
 			assert.ok(oHeader.getDomRef().querySelector(sHeaderId), "button is rendered");
 		});
 
+		QUnit.test("renders left content only for single month mode", function (assert) {
+			var oHeader = this.oHeader,
+				oDomRef = oHeader.getDomRef(),
+				oLeftContent = oDomRef.querySelector("#" + oHeader.getId() + "-contentLeft"),
+				oRightContent = oDomRef.querySelector("#" + oHeader.getId() + "-contentRight"),
+				oPrevButton = oHeader.$("prev")[0],
+				oNextButton = oHeader.$("next")[0];
+
+			assert.ok(oLeftContent, "left content container is rendered");
+			assert.ok(oLeftContent.classList.contains("sapUiCalHeadContent"), "left content has sapUiCalHeadContent class");
+			assert.ok(oLeftContent.classList.contains("sapUiCalHeadAlignCenter"), "left content has default center alignment");
+			assert.notOk(oRightContent, "right content container is not rendered");
+			assert.strictEqual(oPrevButton.parentNode, oDomRef, "previous button is outside content containers");
+			assert.strictEqual(oNextButton.parentNode, oDomRef, "next button is outside content containers");
+		});
+
+		QUnit.test("renders right content container and alignment classes for two months mode", async function (assert) {
+			var oHeader = this.oHeader,
+				oRenderer = oHeader.getRenderer(),
+				oIsTwoMonthsCalendarStub = this.stub(oRenderer, "_isTwoMonthsCalendar").returns(true),
+				oDomRef,
+				oLeftContent,
+				oRightContent;
+
+			oHeader._setVisibleButton3(true);
+			oHeader._setVisibleButton4(true);
+			oHeader._setTextButton3("March");
+			oHeader._setTextButton4("2024");
+			oHeader.setProperty("_alignLeft", "Start");
+			oHeader.setProperty("_alignRight", "End");
+			await nextUIUpdate();
+
+			oDomRef = oHeader.getDomRef();
+			oLeftContent = oDomRef.querySelector("#" + oHeader.getId() + "-contentLeft");
+			oRightContent = oDomRef.querySelector("#" + oHeader.getId() + "-contentRight");
+
+			assert.ok(oLeftContent.classList.contains("sapUiCalHeadAlignStart"), "left content has start alignment class");
+			assert.ok(oRightContent, "right content container is rendered");
+			assert.ok(oRightContent.classList.contains("sapUiCalHeadContent"), "right content has sapUiCalHeadContent class");
+			assert.ok(oRightContent.classList.contains("sapUiCalHeadAlignEnd"), "right content has end alignment class");
+			assert.ok(oRightContent.querySelector("#" + oHeader.getId() + "-B3"), "button 3 is rendered in right content");
+			assert.ok(oRightContent.querySelector("#" + oHeader.getId() + "-B4"), "button 4 is rendered in right content");
+
+			oIsTwoMonthsCalendarStub.restore();
+		});
+
 		// Fake test to have a root module with at least one test, otherwise qunit-2 will fail
 		QUnit.test("Rendering module starts", function (assert) {
 			assert.ok(true, "assert ok");

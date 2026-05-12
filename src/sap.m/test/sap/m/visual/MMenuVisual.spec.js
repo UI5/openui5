@@ -7,16 +7,16 @@ describe("sap.m.MMenuVisual", function() {
 
 	it('Menu with long menu item texts and submenus', function () {
 		element(by.id("B1")).click();
-		expect(takeScreenshot(element(by.jq(".sapMMenu")))).toLookAs("long_menu_items_submenus");
+		expect(takeScreenshot()).toLookAs("long_menu_items_submenus");
 	});
 
 	it('Menu with long menu item texts without submenus', function () {
 		element(by.id("B2")).click();
-		expect(takeScreenshot(element(by.jq(".sapMMenu")))).toLookAs("long_menu_items_no_submenus");
+		expect(takeScreenshot()).toLookAs("long_menu_items_no_submenus");
 	});
 
 	it('Menu with shortcut texts', function () {
 		element(by.id("B3")).click();
-		expect(takeScreenshot(element(by.jq(".sapMMenu")))).toLookAs("menu_items_shortcuts");
+		expect(takeScreenshot()).toLookAs("menu_items_shortcuts");
 	});
 });

@@ -10,6 +10,7 @@
     "lockFileMaintenance": {
         "enabled": true
     },
+    "ignorePresets": [":pinDevDependencies"],
     "rebaseWhen": "conflicted",
     "osvVulnerabilityAlerts": true,
     "packageRules": [

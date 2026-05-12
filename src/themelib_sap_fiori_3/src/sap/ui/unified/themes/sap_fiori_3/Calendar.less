@@ -20,35 +20,35 @@
 	border-color: var(--sapContent_ForegroundBorderColor);
 }
 
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus,
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadNext:focus,
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadPrev:focus{
+html.sap-desktop .sapUiCalHead .sapUiCalHeadB:focus,
+html.sap-desktop .sapUiCalHead .sapUiCalHeadNext:focus,
+html.sap-desktop .sapUiCalHead .sapUiCalHeadPrev:focus{
 	outline: 0.0625rem dotted var(--sapContent_FocusColor);
 	outline-offset: -0.1875rem;
 }
 
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus:active {
+html.sap-desktop .sapUiCalHead .sapUiCalHeadB:focus:active {
 	outline-color: var(--sapContent_ContrastFocusColor);
 }
 
-html[data-sap-ui-browser^='ff'].sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus {
+html[data-sap-ui-browser^='ff'].sap-desktop .sapUiCalHead .sapUiCalHeadB:focus {
 	outline-offset: 0; /* to hide firefox bug with native outline always displayed */
 }
 
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus:not(:hover):not(:active),
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadNext:focus:not(:hover):not(:active),
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadPrev:focus:not(:hover):not(:active) {
+html.sap-desktop .sapUiCalHead .sapUiCalHeadB:focus:not(:hover):not(:active),
+html.sap-desktop .sapUiCalHead .sapUiCalHeadNext:focus:not(:hover):not(:active),
+html.sap-desktop .sapUiCalHead .sapUiCalHeadPrev:focus:not(:hover):not(:active) {
 	background-color: transparent;
 }
 
-.sapUiCalHead > .sapUiCalHeadB,
+.sapUiCalHead .sapUiCalHeadB,
 .sapUiCalCancel,
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:hover,
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus {
+html.sap-desktop .sapUiCalHead .sapUiCalHeadB:hover,
+html.sap-desktop .sapUiCalHead .sapUiCalHeadB:focus {
 	color: var(--sapButton_Lite_TextColor);
 }
 
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:active {
+html.sap-desktop .sapUiCalHead .sapUiCalHeadB:active {
 	color: var(--sapContent_ContrastTextColor);
 }
 
@@ -284,14 +284,6 @@ html.sap-desktop .sapUiCalItemOtherMonth:not(.sapUiCalItemSel) :not(.sapUiCalWee
 	}
 }
 
-.sapUiCal.sapUiCalMulti.sapUiCalTwoMonthsTwoColumns {
-	.sapUiCalHead.sapUiCalHeaderWithTodayButton {
-		.sapUiCalHeadB1 {
-			margin-left:  calc(~"25% - 6rem");
-		}
-	}
-}
-
 
 .sapUiCalItemSel,
 html.sap-desktop .sapUiCalItemSel:hover,
@@ -418,7 +410,7 @@ html.sap-desktop .sapUiCalItemSelBetween:focus:not(:hover) {
 		line-height: 1.25rem;
 	}
 
-	.sap-phone .sapUiCal[data-sap-ui-popup] .sapUiCalHead > button {
+	.sap-phone .sapUiCal[data-sap-ui-popup] .sapUiCalHead button {
 		height: 100%;
 	}
 
@@ -426,10 +418,6 @@ html.sap-desktop .sapUiCalItemSelBetween:focus:not(:hover) {
 	.sap-phone .sapUiCal[data-sap-ui-popup] .sapUiCalHeadNext {
 		padding-bottom: 0.5rem;
 		box-sizing: border-box;
-	}
-
-	.sap-phone .sapUiCal[data-sap-ui-popup] .sapUiCalHeadNext {
-		right: 5.5rem;
 	}
 
 	.sap-phone .sapUiCal[data-sap-ui-popup] .sapUiCalContent {

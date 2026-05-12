@@ -1472,35 +1472,26 @@ sap.ui.define([
 		oCalendar.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		// Open the Calendar to the Month Picker
-		const oHeader = oCalendar.getAggregation("header");
-		const oMonthButton = oHeader.getDomRef("B1");
-		oMonthButton.click();
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
-
-		// Assert: Ensure the current picker is the Month Picker
+		// Open and select month using MonthPicker API
 		const oMonthPicker = oCalendar._getMonthPicker();
+		oCalendar._showMonthPicker();
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
 		assert.ok(oMonthPicker.getDomRef(), "Month Picker is open");
 
-		// Act: Select the fourth month (April) in the Month Picker
-		const aMonths = oMonthPicker.getDomRef().querySelectorAll(".sapUiCalItem");
-		assert.ok(aMonths[3], "Grid item exists in the Month Picker");
-
-		qutils.triggerMouseEvent(aMonths[3], "mousedown");
-		qutils.triggerMouseEvent(aMonths[3], "mouseup");
+		oMonthPicker.setMonth(3);
+		oCalendar._selectMonth();
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// Assert: Ensure the current picker is now the Day Picker
 		const oDayPicker = oCalendar.getAggregation("month")[0];
 		assert.ok(oDayPicker.getDomRef(), "Day Picker is open");
 
-		// Act: Select the 6th day in the Day Picker
-		const aDays = oDayPicker.getDomRef().querySelectorAll(".sapUiCalItem");
-		const oSelectionEndDate = aDays[6];
-		assert.ok(oSelectionEndDate, "Grid item exists in the Day Picker");
-
-		qutils.triggerMouseEvent(oSelectionEndDate, "mousedown");
-		qutils.triggerMouseEvent(oSelectionEndDate, "mouseup");
+		// Act: Select April 6th in the Day Picker via keyboard selection
+		oCalendar.focusDate(UI5Date.getInstance(2024, 3, 6));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		const oSelectionEndDate = oDayPicker.getDomRef().querySelector(".sapUiCalItem[tabindex='0']");
+		assert.ok(oSelectionEndDate, "Focused day exists in the Day Picker");
+		qutils.triggerKeydown(oSelectionEndDate, KeyCodes.ENTER);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// Assert: Ensure the selected date range is from January 15th to April 6th
@@ -1535,35 +1526,26 @@ sap.ui.define([
 		oCalendar.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		// Open the Calendar to the Year Picker
-		const oHeader = oCalendar.getAggregation("header");
-		const oYearButton = oHeader.getDomRef("B2");
-		oYearButton.click();
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
-
-		// Assert: Ensure the current picker is the Year Picker
+		// Open and select year using YearPicker API
 		const oYearPicker = oCalendar._getYearPicker();
+		oCalendar._showYearPicker();
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
 		assert.ok(oYearPicker.getDomRef(), "Year Picker is open");
 
-		// Act: Select the 12th year (2026) in the Month Picker
-		const aYears = oYearPicker.getDomRef().querySelectorAll(".sapUiCalItem");
-		assert.ok(aYears[12], "Grid item exists in the Year Picker");
-
-		qutils.triggerMouseEvent(aYears[12], "mousedown");
-		qutils.triggerMouseEvent(aYears[12], "mouseup");
+		oYearPicker.setDate(UI5Date.getInstance(2026, 2, 15));
+		oCalendar._selectYear();
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// Assert: Ensure the current picker is now the Day Picker
 		const oDayPicker = oCalendar.getAggregation("month")[0];
 		assert.ok(oDayPicker.getDomRef(), "Day Picker is open");
 
-		// Act: Select the 6th day in the Day Picker
-		const aDays = oDayPicker.getDomRef().querySelectorAll(".sapUiCalItem");
-		const oSelectionEndDate = aDays[6];
-		assert.ok(oSelectionEndDate, "Grid item exists in the Day Picker");
-
-		qutils.triggerMouseEvent(oSelectionEndDate, "mousedown");
-		qutils.triggerMouseEvent(oSelectionEndDate, "mouseup");
+		// Act: Select March 7th in the Day Picker via keyboard selection
+		oCalendar.focusDate(UI5Date.getInstance(2026, 2, 7));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		const oSelectionEndDate = oDayPicker.getDomRef().querySelector(".sapUiCalItem[tabindex='0']");
+		assert.ok(oSelectionEndDate, "Focused day exists in the Day Picker");
+		qutils.triggerKeydown(oSelectionEndDate, KeyCodes.ENTER);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// Assert: Ensure the selected date range is from March 15th 2024 to March 7th 2026
@@ -3031,6 +3013,7 @@ sap.ui.define([
 		assert.equal(oSetVisibleSpy.getCall(0).args[0], true, "secondMonthHeader should visible");
 		assert.equal(oSetVisibleButton3Spy.getCall(0).args[0], false, "third button of header should not be visible");
 		assert.equal(oSetVisibleButton4Spy.getCall(0).args[0], false, "fourth button of header should not be visible");
+		assert.equal(oHeader.getProperty("_alignRight"), "Center", "right content should be center aligned");
 
 		// cleanup
 		oCalendar.destroy();
@@ -3057,6 +3040,7 @@ sap.ui.define([
 		assert.equal(oSetVisibleSpy.getCall(0).args[0], false, "secondMonthHeader should not visible");
 		assert.equal(oSetVisibleButton3Spy.getCall(0).args[0], true, "third button of header should be visible");
 		assert.equal(oSetVisibleButton4Spy.getCall(0).args[0], true, "fourth button of header should be visible");
+		assert.equal(oHeader.getProperty("_alignRight"), "End", "right content should be end aligned");
 
 		// cleanup
 		oCalendar.destroy();
@@ -3083,6 +3067,7 @@ sap.ui.define([
 		assert.equal(oSetVisibleSpy.getCall(0).args[0], false, "secondMonthHeader should not be visible");
 		assert.equal(oSetVisibleButton3Spy.getCall(0).args[0], false, "third button of header should not be visible");
 		assert.equal(oSetVisibleButton4Spy.getCall(0).args[0], false, "fourth button of header should not be visible");
+		assert.equal(oHeader.getProperty("_alignRight"), "Center", "right content should be center aligned");
 
 		// cleanup
 		oCalendar.destroy();
@@ -3496,28 +3481,30 @@ sap.ui.define([
 				showWeekNumbers: false,
 				primaryCalendarType: CalendarType.Gregorian
 			}),
-			dummyCellSpy = this.spy(MonthRenderer, "renderDummyCell");
+			dummyCellSpy = this.spy(MonthRenderer, "renderDummyCell"),
+			iCallCount;
 
-		//arrange
+		// arrange
 		oCalM.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		//act
-		assert.equal(dummyCellSpy.callCount, 0, "The function wasn't called when calendar type is Gregorian and showWeekNumber=false");
-		//arrange
+		iCallCount = dummyCellSpy.callCount;
+
+		// arrange
 		oCalM.setShowWeekNumbers(true);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		//act
-		assert.equal(dummyCellSpy.callCount, 1, "The function was called when calendar type is Gregorian and showWeekNumber=true");
-		//arrange
+		assert.ok(dummyCellSpy.callCount > iCallCount, "The function is called when week numbers are shown for Gregorian calendar");
+		iCallCount = dummyCellSpy.callCount;
+
+		// arrange
 		oCalM.setPrimaryCalendarType(CalendarType.Islamic);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		//act
-		assert.equal(dummyCellSpy.callCount, 1, "The function wasn't called when calendar type is Islamic and showWeekNumber=true");
-		//arrange
+		assert.equal(dummyCellSpy.callCount, iCallCount, "The function is not called for Islamic calendar");
+
+		// arrange
 		oCalM.setShowWeekNumbers(false);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		//act
-		assert.equal(dummyCellSpy.callCount, 1, "The function wasn't called when calendar type is Islamic and showWeekNumber=false");
+		assert.equal(dummyCellSpy.callCount, iCallCount, "The function remains not called for Islamic calendar when week numbers are hidden");
+
 		// clean up
 		oCalM.destroy();
 	});

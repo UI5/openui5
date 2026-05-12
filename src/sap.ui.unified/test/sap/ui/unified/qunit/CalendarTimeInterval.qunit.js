@@ -139,69 +139,93 @@ sap.ui.define([
 	});
 
 	QUnit.test("Header in Japaneese", async function(assert) {
-		var sCurrentLanguage = Localization.getLanguage();
-		Localization.setLanguage("ja_JP");
+		var sCurrentLanguage = Localization.getLanguage(),
+			oCalJ;
 
-		var oCalJ = new CalendarTimeInterval("CalJ",{
-			startDate: UI5Date.getInstance("2015", "7", "13", "8", "57", "10")
-		}).placeAt("qunit-fixture");
-		await nextUIUpdate();
+		try {
+			Localization.setLanguage("ja_JP");
 
-		var oHeader = Element.getElementById("CalJ--Head").$()[0];
-		assert.ok(oHeader.children[1].id, "#CalJ--Head-B2", "Calendar: year button is shown first");
-		assert.ok(oHeader.children[2].id, "#CalJ--Head-B1", "Calendar: month button is shown second");
-		assert.ok(oHeader.children[3].id, "#CalJ--Head-B0", "Calendar: day button is shown third");
+			oCalJ = new CalendarTimeInterval("CalJp",{
+				startDate: UI5Date.getInstance("2015", "7", "13", "8", "57", "10")
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
 
-		assert.equal(jQuery("#CalJ--Head-B0").text(), "13日", "Calendar: 13日 as day shown");
-		assert.equal(jQuery("#CalJ--Head-B1").text(), "8月", "Calendar: 8月 (August) as month shown");
-		assert.equal(jQuery("#CalJ--Head-B2").text(), "2015年", "Calendar: year 2015年  shown");
+			var oHeader = Element.getElementById("CalJp--Head").$()[0],
+				oLeftContent = oHeader.querySelector("#CalJp--Head-contentLeft");
 
-		oCalJ.destroy();
-		Localization.setLanguage(sCurrentLanguage);
+			assert.strictEqual(oLeftContent.children[0].id, "CalJp--Head-B2", "Calendar: year button is shown first");
+			assert.strictEqual(oLeftContent.children[1].id, "CalJp--Head-B1", "Calendar: month button is shown second");
+			assert.strictEqual(oLeftContent.children[2].id, "CalJp--Head-B0", "Calendar: day button is shown third");
+
+			assert.equal(jQuery("#CalJp--Head-B0").text(), "13日", "Calendar: 13日 as day shown");
+			assert.equal(jQuery("#CalJp--Head-B1").text(), "8月", "Calendar: 8月 (August) as month shown");
+			assert.equal(jQuery("#CalJp--Head-B2").text(), "2015年", "Calendar: year 2015年  shown");
+		} finally {
+			if (oCalJ) {
+				oCalJ.destroy();
+			}
+			Localization.setLanguage(sCurrentLanguage);
+		}
 	});
 
 	QUnit.test("Header in Chinese", async function(assert) {
-		var sCurrentLanguage = Localization.getLanguage();
-		Localization.setLanguage("zh_CN");
+		var sCurrentLanguage = Localization.getLanguage(),
+			oCalJ;
 
-		var oCalJ = new CalendarTimeInterval("CalJ",{
-			startDate: UI5Date.getInstance("2015", "7", "13", "8", "57", "10")
-		}).placeAt("qunit-fixture");
-		await nextUIUpdate();
+		try {
+			Localization.setLanguage("zh_CN");
 
-		var oHeader = Element.getElementById("CalJ--Head").$()[0];
-		assert.ok(oHeader.children[1].id, "#CalJ--Head-B2", "Calendar: year button is shown first");
-		assert.ok(oHeader.children[2].id, "#CalJ--Head-B1", "Calendar: month button is shown second");
-		assert.ok(oHeader.children[3].id, "#CalJ--Head-B0", "Calendar: day button is shown third");
+			oCalJ = new CalendarTimeInterval("CalZh",{
+				startDate: UI5Date.getInstance("2015", "7", "13", "8", "57", "10")
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
 
-		assert.equal(jQuery("#CalJ--Head-B0").text(), "13日", "Calendar: 13日 as day shown");
-		assert.equal(jQuery("#CalJ--Head-B1").text(), "八月", "Calendar: 八月 (August) as month shown");
-		assert.equal(jQuery("#CalJ--Head-B2").text(), "2015年", "Calendar: year 2015年  shown");
+			var oHeader = Element.getElementById("CalZh--Head").$()[0],
+				oLeftContent = oHeader.querySelector("#CalZh--Head-contentLeft");
 
-		oCalJ.destroy();
-		Localization.setLanguage(sCurrentLanguage);
+			assert.strictEqual(oLeftContent.children[0].id, "CalZh--Head-B2", "Calendar: year button is shown first");
+			assert.strictEqual(oLeftContent.children[1].id, "CalZh--Head-B1", "Calendar: month button is shown second");
+			assert.strictEqual(oLeftContent.children[2].id, "CalZh--Head-B0", "Calendar: day button is shown third");
+
+			assert.equal(jQuery("#CalZh--Head-B0").text(), "13日", "Calendar: 13日 as day shown");
+			assert.equal(jQuery("#CalZh--Head-B1").text(), "八月", "Calendar: 八月 (August) as month shown");
+			assert.equal(jQuery("#CalZh--Head-B2").text(), "2015年", "Calendar: year 2015年  shown");
+		} finally {
+			if (oCalJ) {
+				oCalJ.destroy();
+			}
+			Localization.setLanguage(sCurrentLanguage);
+		}
 	});
 
 	QUnit.test("Japaneese language none case sensitive test", async function(assert) {
-		var sCurrentLanguage = Localization.getLanguage();
-		Localization.setLanguage("JA");
+		var sCurrentLanguage = Localization.getLanguage(),
+			oCalJ;
 
-		var oCalJ = new CalendarTimeInterval("CalJ",{
-			startDate: UI5Date.getInstance("2015", "7", "13", "8", "57", "10")
-		}).placeAt("qunit-fixture");
-		await nextUIUpdate();
+		try {
+			Localization.setLanguage("JA");
 
-		var oHeader = Element.getElementById("CalJ--Head").$()[0];
-		assert.ok(oHeader.children[1].id, "#CalJ--Head-B2", "Calendar: year button is shown first");
-		assert.ok(oHeader.children[2].id, "#CalJ--Head-B1", "Calendar: month button is shown second");
-		assert.ok(oHeader.children[3].id, "#CalJ--Head-B0", "Calendar: day button is shown third");
+			oCalJ = new CalendarTimeInterval("CalJa",{
+				startDate: UI5Date.getInstance("2015", "7", "13", "8", "57", "10")
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
 
-		assert.equal(jQuery("#CalJ--Head-B0").text(), "13日", "Calendar: 13日 as day shown");
-		assert.equal(jQuery("#CalJ--Head-B1").text(), "8月", "Calendar: 8月 (August) as month shown");
-		assert.equal(jQuery("#CalJ--Head-B2").text(), "2015年", "Calendar: year 2015年  shown");
+			var oHeader = Element.getElementById("CalJa--Head").$()[0],
+				oLeftContent = oHeader.querySelector("#CalJa--Head-contentLeft");
 
-		oCalJ.destroy();
-		Localization.setLanguage(sCurrentLanguage);
+			assert.strictEqual(oLeftContent.children[0].id, "CalJa--Head-B2", "Calendar: year button is shown first");
+			assert.strictEqual(oLeftContent.children[1].id, "CalJa--Head-B1", "Calendar: month button is shown second");
+			assert.strictEqual(oLeftContent.children[2].id, "CalJa--Head-B0", "Calendar: day button is shown third");
+
+			assert.equal(jQuery("#CalJa--Head-B0").text(), "13日", "Calendar: 13日 as day shown");
+			assert.equal(jQuery("#CalJa--Head-B1").text(), "8月", "Calendar: 8月 (August) as month shown");
+			assert.equal(jQuery("#CalJa--Head-B2").text(), "2015年", "Calendar: year 2015年  shown");
+		} finally {
+			if (oCalJ) {
+				oCalJ.destroy();
+			}
+			Localization.setLanguage(sCurrentLanguage);
+		}
 	});
 
 	QUnit.test("width", function(assert) {
