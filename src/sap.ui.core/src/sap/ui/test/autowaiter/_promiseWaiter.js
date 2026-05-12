@@ -200,25 +200,29 @@ sap.ui.define([
 	});
 
 	const fnOriginalWithResolvers = OriginalPromise.withResolvers;
-	WrappedPromise.withResolvers = function () {
-		const { promise, resolve, reject, ...rest } = fnOriginalWithResolvers.apply(this, arguments);
-		const mPendingPromise = _trackPromise(""); // withResolvers API does not take any arguments
-		const fnWrappedResolve = function wrappedResolve () {
-			_untrackPromise(mPendingPromise);
-			resolve.apply(this, arguments);
-		};
-		const fnWrappedReject = function wrappedReject() {
-			_untrackPromise(mPendingPromise);
-			reject.apply(this, arguments);
-		};
+	if (fnOriginalWithResolvers) {
+		WrappedPromise.withResolvers = function () {
+			const { promise, resolve, reject, ...rest } = fnOriginalWithResolvers.apply(this, arguments);
+			const mPendingPromise = _trackPromise(""); // withResolvers API does not take any arguments
+			const fnWrappedResolve = function wrappedResolve () {
+				_untrackPromise(mPendingPromise);
+				resolve.apply(this, arguments);
+			};
+			const fnWrappedReject = function wrappedReject() {
+				_untrackPromise(mPendingPromise);
+				reject.apply(this, arguments);
+			};
 
-		return {
-			promise,
-			resolve: fnWrappedResolve,
-			reject: fnWrappedReject,
-			...rest
+			return {
+				promise,
+				resolve: fnWrappedResolve,
+				reject: fnWrappedReject,
+				...rest
+			};
 		};
-	};
+	} else {
+		oPromiseWaiter._oLogger.warning("Promise.withResolvers is not available in this environment. Consider updating your browser to a version that supports ES2024.");
+	}
 
 	// overwrite the global Promise object
 	window.Promise = WrappedPromise;

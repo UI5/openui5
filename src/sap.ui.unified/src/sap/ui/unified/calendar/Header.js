@@ -199,7 +199,19 @@ sap.ui.define([
 			 * Holds a reference to the currently shown picker. Possible values: month, monthPicker, yearPicker and yearRangePicker.
 			 * @private
 			 */
-			_currentPicker : {type : "string", group : "Appearance", visibility: "hidden"}
+			_currentPicker : {type : "string", group : "Appearance", visibility: "hidden"},
+
+			/**
+			 * Alignment of the left content area. Possible values: "Start", "Center", "End".
+			 * @private
+			 */
+			_alignLeft : {type : "string", defaultValue : "Center", visibility: "hidden"},
+
+			/**
+			 * Alignment of the right content area. Possible values: "Start", "Center", "End".
+			 * @private
+			 */
+			_alignRight : {type : "string", defaultValue : "Center", visibility: "hidden"}
 
 		},
 		events : {
