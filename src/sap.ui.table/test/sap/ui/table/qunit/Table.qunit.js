@@ -4526,6 +4526,83 @@ sap.ui.define([
 		assert.strictEqual(this.oTable._getTotalRowCount(), 0, "Without a binding or binding info the total row count is 0");
 	});
 
+	QUnit.module("Busy Indicator", {
+		beforeEach: async function() {
+			this.oTable = TableQUnitUtils.createTable({
+				rows: "{/}",
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(10),
+				columns: [TableQUnitUtils.createTextColumn()],
+				enableBusyIndicator: true
+			});
+			await this.oTable.qunit.whenRenderingFinished();
+			await TableQUnitUtils.wait(10);
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("_setBusy", async function(assert) {
+		const oTable = this.oTable;
+
+		oTable._setBusy(true);
+		assert.strictEqual(oTable.getBusy(), true, "Table is busy after _setBusy(true)");
+
+		oTable._setBusy(false);
+		await TableQUnitUtils.wait(10);
+		assert.strictEqual(oTable.getBusy(), false, "Table is not busy after _setBusy(false) and timeout");
+	});
+
+	QUnit.test("_setBusy(true) takes precedence over automatic busy indicator", async function(assert) {
+		const oTable = this.oTable;
+
+		oTable._setBusy(true);
+		oTable._onBindingDataRequested();
+		oTable._onBindingDataReceived();
+		await TableQUnitUtils.wait(10);
+		assert.strictEqual(oTable.getBusy(), true, "Table stays busy because _setBusy(true) takes precedence");
+
+		oTable._setBusy(false);
+		await TableQUnitUtils.wait(10);
+		assert.strictEqual(oTable.getBusy(), false, "Table is not busy after _setBusy(false)");
+	});
+
+	QUnit.test("_setBusy(false) does not override automatic busy indicator", async function(assert) {
+		const oTable = this.oTable;
+
+		const oStub = sinon.stub(oTable, "_isWaitingForData").returns(true);
+		oTable._setBusy(true);
+		assert.strictEqual(oTable.getBusy(), true, "Table is busy");
+
+		oTable._setBusy(false);
+		await TableQUnitUtils.wait(10);
+		assert.strictEqual(oTable.getBusy(), true, "Table stays busy because _isWaitingForData is true");
+
+		oStub.restore();
+		oTable._setBusy(false);
+		await TableQUnitUtils.wait(10);
+		assert.strictEqual(oTable.getBusy(), false, "Table is not busy after _isWaitingForData returns false");
+	});
+
+	QUnit.test("_setBusy does nothing if enableBusyIndicator is false", function(assert) {
+		const oTable = this.oTable;
+
+		oTable.setEnableBusyIndicator(false);
+		oTable._setBusy(true);
+		assert.strictEqual(oTable.getBusy(), false, "Table is not busy because enableBusyIndicator is false");
+	});
+
+	QUnit.test("_setBusy takes effect when enableBusyIndicator is enabled after _setBusy(true)", function(assert) {
+		const oTable = this.oTable;
+
+		oTable.setEnableBusyIndicator(false);
+		oTable._setBusy(true);
+		assert.strictEqual(oTable.getBusy(), false, "Table is not busy because enableBusyIndicator is false");
+
+		oTable.setEnableBusyIndicator(true);
+		assert.strictEqual(oTable.getBusy(), true, "Table is busy after enableBusyIndicator is set to true");
+	});
+
 	QUnit.module("Performance", {
 		beforeEach: async function() {
 			await createTable({

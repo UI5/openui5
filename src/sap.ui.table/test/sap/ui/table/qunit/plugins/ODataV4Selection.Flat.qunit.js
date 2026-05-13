@@ -1086,7 +1086,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Limit < Data length; All contexts selected", async function(assert) {
-		const aContexts = await TableUtils.loadContexts(this.oTable.getBinding(), 0, this.oTable.getBinding().getLength());
+		const aContexts = await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength());
 
 		aContexts.forEach((oContext) => {
 			oContext.setSelected(true);
@@ -1270,5 +1270,28 @@ sap.ui.define([
 			src: IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon),
 			title: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
+	});
+
+	QUnit.module("Busy Indicator", {
+		beforeEach: async function() {
+			this.oTable = TableQUnitUtils.createTable({
+				enableBusyIndicator: true
+			});
+			this.oSelectionPlugin = this.oTable.getDependents()[0];
+			await this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			this.oTable?.destroy();
+		}
+	});
+
+	QUnit.test("TableUtils.loadContexts is called with busy=true", async function(assert) {
+		const oLoadContextsSpy = sinon.spy(TableUtils, "loadContexts");
+
+		this.oSelectionPlugin.onHeaderSelectorPress();
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+
+		assert.strictEqual(oLoadContextsSpy.args[0][3], true, "TableUtils.loadContexts called with busy=true");
+		oLoadContextsSpy.restore();
 	});
 });

@@ -142,7 +142,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("All contexts selected", async function(assert) {
-		const aContexts = await TableUtils.loadContexts(this.oTable.getBinding(), 0, this.oTable.getBinding().getLength());
+		const aContexts = await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength());
 
 		aContexts.forEach((oContext) => {
 			oContext.setSelected(true);
