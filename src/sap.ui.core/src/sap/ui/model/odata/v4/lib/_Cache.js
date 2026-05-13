@@ -1871,6 +1871,11 @@ sap.ui.define([
 			mTypeForMetaPath, sPath, bKeepReportedMessagesPath) {
 		var oOldElement, sTransientPredicate;
 
+		// Note: iStart is not needed here because we know we have a key predicate
+		this.visitResponse(oElement, mTypeForMetaPath,
+			_Helper.getMetaPath(_Helper.buildPath(this.sMetaPath, sPath)), sPath + sPredicate,
+			undefined, bKeepReportedMessagesPath);
+
 		if (iIndex === undefined) { // kept-alive element not in the list
 			// might be undefined because it was removed in #refreshSingleWithRemove already
 			oOldElement = aElements.$byPredicate[sPredicate];
@@ -1897,11 +1902,6 @@ sap.ui.define([
 			_Helper.copyETags(oElement, oOldElement);
 		}
 		_Helper.restoreUpdatingProperties(oOldElement, oElement);
-
-		// Note: iStart is not needed here because we know we have a key predicate
-		this.visitResponse(oElement, mTypeForMetaPath,
-			_Helper.getMetaPath(_Helper.buildPath(this.sMetaPath, sPath)), sPath + sPredicate,
-			undefined, bKeepReportedMessagesPath);
 	};
 
 	/**

@@ -4528,6 +4528,17 @@ sap.ui.define([
 		if (bTransient) {
 			aElements.$byPredicate[sTransientPredicate] = oOldElement;
 		}
+		this.mock(_Helper).expects("buildPath")
+			.withExactArgs("/TEAMS", "TEAM_2_EMPLOYEES('23')/EMPLOYEE_2_EQUIPMENTS")
+			.returns("/TEAMS/TEAM_2_EMPLOYEES('23')/EMPLOYEE_2_EQUIPMENTS");
+		this.mock(_Helper).expects("getMetaPath")
+			.withExactArgs("/TEAMS/TEAM_2_EMPLOYEES('23')/EMPLOYEE_2_EQUIPMENTS")
+			.returns("/TEAMS/TEAM_2_EMPLOYEES/EMPLOYEE_2_EQUIPMENTS");
+		const oVisitResponseExpectation = this.mock(oCache).expects("visitResponse")
+			.withExactArgs(sinon.match.same(oElement), sinon.match.same(mTypeForMetaPath),
+				"/TEAMS/TEAM_2_EMPLOYEES/EMPLOYEE_2_EQUIPMENTS",
+				"TEAM_2_EMPLOYEES('23')/EMPLOYEE_2_EQUIPMENTS('42')", undefined,
+				"~bKeepReportedMessagesPath~");
 		this.mock(_Cache).expects("getElementIndex")
 			.withExactArgs(sinon.match.same(aElements), "('42')", 4)
 			.returns(3);
@@ -4540,21 +4551,10 @@ sap.ui.define([
 				sTransientPredicate);
 		this.mock(_Helper).expects("copySelected")
 			.withExactArgs(sinon.match.same(oOldElement), sinon.match.same(oElement));
-		this.mock(_Helper).expects("copyETags")
+		const oCopyETagsExpectation = this.mock(_Helper).expects("copyETags")
 			.withExactArgs(sinon.match.same(oElement), sinon.match.same(oOldElement));
 		this.mock(_Helper).expects("restoreUpdatingProperties")
 			.withExactArgs(sinon.match.same(oOldElement), sinon.match.same(oElement));
-		this.mock(_Helper).expects("buildPath")
-			.withExactArgs("/TEAMS", "TEAM_2_EMPLOYEES('23')/EMPLOYEE_2_EQUIPMENTS")
-			.returns("/TEAMS/TEAM_2_EMPLOYEES('23')/EMPLOYEE_2_EQUIPMENTS");
-		this.mock(_Helper).expects("getMetaPath")
-			.withExactArgs("/TEAMS/TEAM_2_EMPLOYEES('23')/EMPLOYEE_2_EQUIPMENTS")
-			.returns("/TEAMS/TEAM_2_EMPLOYEES/EMPLOYEE_2_EQUIPMENTS");
-		this.mock(oCache).expects("visitResponse")
-			.withExactArgs(sinon.match.same(oElement), sinon.match.same(mTypeForMetaPath),
-				"/TEAMS/TEAM_2_EMPLOYEES/EMPLOYEE_2_EQUIPMENTS",
-				"TEAM_2_EMPLOYEES('23')/EMPLOYEE_2_EQUIPMENTS('42')", undefined,
-				"~bKeepReportedMessagesPath~");
 
 		// code under test
 		oCache.replaceElement(aElements, 4, "('42')", oElement, mTypeForMetaPath,
@@ -4569,6 +4569,7 @@ sap.ui.define([
 		assert.strictEqual(aElements[3]["@$ui5.context.isInactive"],
 			bWasInactive ? false : undefined);
 		assert.strictEqual("@$ui5.context.isInactive" in aElements[3], bWasInactive);
+		sinon.assert.callOrder(oVisitResponseExpectation, oCopyETagsExpectation);
 	});
 	});
 });
@@ -4584,6 +4585,13 @@ sap.ui.define([
 			oOldElement = bHasOldElement ? {a : "0815"} : undefined,
 			mTypeForMetaPath = {};
 
+		this.mock(_Helper).expects("buildPath").withExactArgs("/TEAMS", "~")
+			.returns("~path~");
+		this.mock(_Helper).expects("getMetaPath").withExactArgs("~path~")
+			.returns("~meta~path~");
+		this.mock(oCache).expects("visitResponse")
+			.withExactArgs(sinon.match.same(oNewElement), sinon.match.same(mTypeForMetaPath),
+				"~meta~path~", "~('42')", undefined, undefined);
 		if (bHasOldElement) {
 			aElements.$byPredicate = {doNotTouch : aElements[0], "('42')" : oOldElement};
 			this.mock(_Helper).expects("copySelected")
@@ -4599,13 +4607,6 @@ sap.ui.define([
 		this.mock(_Cache).expects("getElementIndex").never();
 		this.mock(_Helper).expects("restoreUpdatingProperties")
 			.withExactArgs(sinon.match.same(oOldElement), sinon.match.same(oNewElement));
-		this.mock(_Helper).expects("buildPath").withExactArgs("/TEAMS", "~")
-			.returns("~path~");
-		this.mock(_Helper).expects("getMetaPath").withExactArgs("~path~")
-			.returns("~meta~path~");
-		this.mock(oCache).expects("visitResponse")
-			.withExactArgs(sinon.match.same(oNewElement), sinon.match.same(mTypeForMetaPath),
-				"~meta~path~", "~('42')", undefined, undefined);
 
 		// code under test
 		oCache.replaceElement(aElements, undefined, "('42')", oNewElement, mTypeForMetaPath, "~");

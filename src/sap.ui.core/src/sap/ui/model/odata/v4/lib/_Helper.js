@@ -509,8 +509,8 @@ sap.ui.define([
 		},
 
 		/**
-		 * Recursively copies ETags from the source object to the target object. If the source
-		 * object has an <code>"@odata.etag"</code> property, it is copied to the target object.
+		 * Recursively copies ETags from the source object to the target object. Does nothing if
+		 * the key predicates of source and target differ.
 		 *
 		 * @param {object} oSource - The source object containing ETags
 		 * @param {object} oTarget - The target object to receive the ETags
@@ -518,6 +518,10 @@ sap.ui.define([
 		 * @public
 		 */
 		copyETags : function (oSource, oTarget) {
+			if (_Helper.getPrivateAnnotation(oSource, "predicate")
+					!== _Helper.getPrivateAnnotation(oTarget, "predicate")) {
+				return;
+			}
 			oTarget["@odata.etag"] = oSource["@odata.etag"];
 
 			for (const sKey in oSource) {
@@ -2190,6 +2194,28 @@ sap.ui.define([
 			}
 
 			return mResult;
+		},
+
+		/**
+		 * Tells whether the given property path is affected by the given side-effects path.
+		 *
+		 * @param {string} sPropertyPath
+		 *   A property path
+		 * @param {string} sSideEffectsPath
+		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+		 *   "14.4.1.6 Expression edm:PropertyPath" string describing which properties may have
+		 *   changed due to an update or side effects of a previous update, see
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
+		 * @returns {boolean}
+		 *   Whether the given property path is affected by the given side-effects path
+		 *
+		 * @public
+		 */
+		isAffectedBy : function (sPropertyPath, sSideEffectsPath) {
+			// To avoid metadata access, we do not distinguish between properties and
+			// navigation properties, so there is no need to look closely at "/*".
+			return _Helper.hasPathPrefix(sPropertyPath,
+				sSideEffectsPath.endsWith("/*") ? sSideEffectsPath.slice(0, -2) : sSideEffectsPath);
 		},
 
 		/**

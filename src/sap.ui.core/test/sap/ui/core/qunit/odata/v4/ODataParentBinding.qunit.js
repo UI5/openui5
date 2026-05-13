@@ -2300,7 +2300,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 		this.mock(oContext).expects("isAggregated").never();
 		oHelperMock.expects("getMetaPath").never();
-		if (o.sChildPath === "child/path") {
+		if (o.sOldReducedPath) {
 			oHelperMock.expects("getMetaPath").withExactArgs(o.sOldReducedPath).returns("A");
 			oHelperMock.expects("getMetaPath").withExactArgs("/resolved/child/path")
 				.returns(o.bSameMetaPath ? "A" : "B");

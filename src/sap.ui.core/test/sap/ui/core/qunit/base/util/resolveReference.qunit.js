@@ -3,8 +3,9 @@
  */
 /*global QUnit */
 sap.ui.define([
-	'sap/base/util/resolveReference'
-], function(resolveReference) {
+	'sap/base/util/resolveReference',
+	'sap/ui/thirdparty/jquery'
+], function(resolveReference, jQuery) {
 	"use strict";
 
 	QUnit.module("sap/base/util/resolveReference");
@@ -274,6 +275,29 @@ sap.ui.define([
 		assert.strictEqual(fn, undefined, "correction method was returned");
 	});
 
+	QUnit.test("restricted globals should not be resolved from global fallback", function(assert) {
+		assert.strictEqual(resolveReference("eval"), undefined,
+			"eval should not be resolved");
+		assert.strictEqual(resolveReference("setTimeout"), undefined,
+			"setTimeout should not be resolved");
+		assert.strictEqual(resolveReference("setInterval"), undefined,
+			"setInterval should not be resolved");
+		assert.strictEqual(resolveReference("document.write"), undefined,
+			"document.write should not be resolved");
+		assert.strictEqual(resolveReference("document.writeln"), undefined,
+			"document.writeln should not be resolved");
+		assert.strictEqual(resolveReference("location.assign"), undefined,
+			"location.assign should not be resolved");
+		assert.strictEqual(resolveReference("location.replace"), undefined,
+			"location.replace should not be resolved");
+		assert.strictEqual(resolveReference("eval.call"), undefined,
+			"eval.call should not be resolved");
+		assert.strictEqual(resolveReference("eval.apply"), undefined,
+			"eval.apply should not be resolved");
+		assert.strictEqual(resolveReference("setTimeout.call"), undefined,
+			"setTimeout.call should not be resolved");
+	});
+
 	QUnit.test("restricted globals should not be resolved when provided via variables", function(assert) {
 		var oModule = {
 			eval: window.eval, // eslint-disable-line no-eval
@@ -292,6 +316,23 @@ sap.ui.define([
 			"eval.apply from variables should not be resolved");
 	});
 
+	QUnit.test("globals accessed via Window context should not be resolved", function(assert) {
+		assert.strictEqual(resolveReference("parent.eval"), undefined,
+			"parent.eval should not be resolved");
+		assert.strictEqual(resolveReference("top.eval"), undefined,
+			"top.eval should not be resolved");
+		assert.strictEqual(resolveReference("parent.setTimeout"), undefined,
+			"parent.setTimeout should not be resolved");
+		assert.strictEqual(resolveReference("window.eval"), undefined,
+			"window.eval should not be resolved");
+		assert.strictEqual(resolveReference("self.eval"), undefined,
+			"self.eval should not be resolved");
+		assert.strictEqual(resolveReference("frames.eval"), undefined,
+			"frames.eval should not be resolved");
+		assert.strictEqual(resolveReference("globalThis.eval"), undefined,
+			"globalThis.eval should not be resolved");
+	});
+
 	QUnit.test("variable named 'parent' with regular object should not be blocked", function(assert) {
 		var oContext;
 		var oModule = {
@@ -304,6 +345,18 @@ sap.ui.define([
 		var fn = resolveReference("parent.method", {"parent": oModule});
 		assert.strictEqual(fn(), "parentMethod", "method from 'parent' variable should be resolved");
 		assert.strictEqual(oContext, oModule, "correct context was bound");
+	});
+
+	QUnit.test("jQuery.globalEval and jQuery.sap.globalEval should not be resolved", function(assert) {
+		assert.strictEqual(resolveReference("jQuery.globalEval"), undefined,
+			"jQuery.globalEval should not be resolved");
+
+		// jQuery.globalEval provided via variables should also be blocked
+		var oModule = {
+			exec: jQuery.globalEval
+		};
+		assert.strictEqual(resolveReference("module.exec", {"module": oModule}), undefined,
+			"jQuery.globalEval from variables should not be resolved");
 	});
 
 	QUnit.test("resolve value from loaded module", async function(assert) {

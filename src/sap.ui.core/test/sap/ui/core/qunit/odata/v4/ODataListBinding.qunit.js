@@ -12695,9 +12695,32 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("isFilteredBy: integrative test; complex type property filter", function (assert) {
+		this.mock(ODataListBinding.prototype).expects("fetchFilter")
+			.withExactArgs(/*oContext*/undefined, /*$filter*/undefined)
+			.returns(SyncPromise.resolve());
+		const oBinding = this.bindList("/EMPLOYEES", null, [], [
+			new Filter("n/a", FilterOperator.EQ, 42),
+			new Filter("Address/City", FilterOperator.EQ, "Walldorf")
+		], {$$operationMode : OperationMode.Server});
+		// code under test
+		assert.strictEqual(oBinding.isFilteredBy(["Address/City"]), true);
+
+		// code under test
+		assert.strictEqual(oBinding.isFilteredBy(["Address/Street"]), false);
+
+		// code under test
+		assert.strictEqual(oBinding.isFilteredBy(["Address/*"]), true);
+
+		// code under test
+		assert.strictEqual(oBinding.isFilteredBy(["Address"]), true);
+	});
+
+	//*********************************************************************************************
 [undefined, ["n/a", "*", "n/a"]].forEach((aPaths) => {
 	QUnit.test("isSortedBy: " + (aPaths ? "aPaths contains '*'" : "no paths"), function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
+		this.mock(_Helper).expects("isAffectedBy").never();
 		this.mock(_AggregationHelper).expects("isOrderedBy").never();
 
 		// code under test
@@ -12717,31 +12740,74 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("isSortedBy: with paths", function (assert) {
-		const oBinding = this.bindList("/EMPLOYEES");
-		oBinding.aSorters = [new Sorter("path/to/foo"), new Sorter("path/to/bar", true)];
-		const oAggregationHelperMock = this.mock(_AggregationHelper);
-		oAggregationHelperMock.expects("isOrderedBy").never();
-
-		// code under test
-		assert.strictEqual(oBinding.isSortedBy(["path/to/foo"]), true);
-
-		// code under test
-		assert.strictEqual(oBinding.isSortedBy(["notUsed", "path/to/bar"]), true);
-
-		oBinding.aSorters = [];
-		oBinding.mParameters.$orderby = "~$orderby~";
-		oAggregationHelperMock.expects("isOrderedBy").withExactArgs("~aPaths~", "~$orderby~")
-			.returns(true);
-
-		// code under test
-		assert.strictEqual(oBinding.isSortedBy("~aPaths~"), true);
-
-		oAggregationHelperMock.expects("isOrderedBy").withExactArgs("~aPaths~", "~$orderby~")
+	QUnit.test("isSortedBy: with paths and matching sorter", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES", null,
+			[new Sorter("path/foo"), new Sorter("path/bar"), new Sorter("path/baz")],
+			[], {$$operationMode : OperationMode.Server, $orderby : "~$orderby~"});
+		const aPaths = ["notUsed", "path/bar", "n/a"];
+		this.mock(_AggregationHelper).expects("isOrderedBy")
+			.withExactArgs("~$orderby~", sinon.match.same(aPaths))
 			.returns(false);
+		const oHelperMock = this.mock(_Helper);
+		oHelperMock.expects("isAffectedBy").withExactArgs("path/foo", "notUsed").returns(false);
+		oHelperMock.expects("isAffectedBy").withExactArgs("path/foo", "path/bar").returns(false);
+		oHelperMock.expects("isAffectedBy").withExactArgs("path/foo", "n/a").returns(false);
+		oHelperMock.expects("isAffectedBy").withExactArgs("path/bar", "notUsed").returns(false);
+		oHelperMock.expects("isAffectedBy").withExactArgs("path/bar", "path/bar").returns(true);
 
 		// code under test
-		assert.strictEqual(oBinding.isSortedBy("~aPaths~"), false);
+		assert.strictEqual(oBinding.isSortedBy(aPaths), true);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isSortedBy: with paths and matching orderby", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES", null, [new Sorter("path/foo")], [], {
+			$$operationMode : OperationMode.Server,
+			$orderby : "~$orderby~"
+		});
+		const aPaths = ["path"];
+		this.mock(_AggregationHelper).expects("isOrderedBy")
+			.withExactArgs("~$orderby~", sinon.match.same(aPaths))
+			.returns(true);
+		this.mock(_Helper).expects("isAffectedBy").never();
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy(aPaths), true);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isSortedBy: integrative test; complex type property sorter", function (assert) {
+		let oBinding = this.bindList("/EMPLOYEES", null, [new Sorter("Address/City")], [],
+			{$$operationMode : OperationMode.Server});
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy(["Address/City"]), true);
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy(["Address/Street"]), false);
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy(["Address/*"]), true);
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy(["Address"]), true);
+
+		oBinding = this.bindList("/EMPLOYEES", null, [], [], {
+			$$operationMode : OperationMode.Server,
+			$orderby : "Address/City"
+		});
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy(["Address/City"]), true);
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy(["Address/Street"]), false);
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy(["Address/*"]), true);
+
+		// code under test
+		assert.strictEqual(oBinding.isSortedBy(["Address"]), true);
 	});
 
 	//*********************************************************************************************

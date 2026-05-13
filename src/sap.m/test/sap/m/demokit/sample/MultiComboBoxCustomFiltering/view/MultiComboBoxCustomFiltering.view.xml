@@ -8,7 +8,7 @@
 	<l:VerticalLayout
 		class="sapUiContentPadding"
 		width="100%">
-		<Label text="MultiComboBox with &quot;starts with&quot; filtering: enter a search term, e.g. &quot;N&quot;, and see filtering results."/>
+		<Label text="MultiComboBox with &quot;starts with&quot; filtering: enter a search term, e.g. &quot;N&quot;, and see filtering results." labelFor="multiCombo1"/>
 		<MultiComboBox
 			id="multiCombo1"
 			width="500px"
@@ -18,7 +18,7 @@
 			}">
 			<core:Item key="{ProductId}" text="{Name}" />
 		</MultiComboBox>
-		<Label text="MultiComboBox with &quot;contains&quot; filtering: enter a search term, e.g. &quot;40&quot;, and see filtering results."/>
+		<Label text="MultiComboBox with &quot;contains&quot; filtering: enter a search term, e.g. &quot;40&quot;, and see filtering results." labelFor="multiCombo2"/>
 		<MultiComboBox
 				id="multiCombo2"
 				width="500px"

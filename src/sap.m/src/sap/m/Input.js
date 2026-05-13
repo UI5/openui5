@@ -1762,6 +1762,11 @@ function(
 			return;
 		}
 
+		// Reset value help request flag if the user types text in the input field
+		// The flag reset ensures a change event will be triggered properly and the underlying model will be updated with the latest value.
+		if (this.bValueHelpRequested) {
+			this.bValueHelpRequested = false;
+		}
 		var sValue = this.getDOMValue(),
 			oSuggestionsPopover,
 			oList,

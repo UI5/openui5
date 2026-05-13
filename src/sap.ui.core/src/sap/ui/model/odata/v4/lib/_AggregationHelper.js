@@ -1258,11 +1258,7 @@ sap.ui.define([
 			return aSideEffectPaths.some(function (sSideEffectPath) {
 				// returns true if the mandatory property path is affected by the side effect path
 				function isAffected(sPropertyPath) {
-					// To avoid metadata access, we do not distinguish between properties and
-					// navigation properties, so there is no need to look at "/*".
-					return _Helper.hasPathPrefix(sPropertyPath, sSideEffectPath.endsWith("/*")
-							? sSideEffectPath.slice(0, -2)
-							: sSideEffectPath)
+					return _Helper.isAffectedBy(sPropertyPath, sSideEffectPath)
 						|| _Helper.hasPathPrefix(sSideEffectPath, sPropertyPath);
 				}
 
@@ -1292,22 +1288,23 @@ sap.ui.define([
 		},
 
 		/**
-		 * Tells whether the given property path is used in the given "$orderby" system query
-		 * option.
+		 * Tells whether the given "$orderby" system query option is affected by at least one of the
+		 * given side-effects paths.
 		 *
+		 * @param {string} [sOrderby]
+		 *   The "$orderby" system query option, or <code>undefined</code>
 		 * @param {string[]} aPaths
 		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
 		 *   changed due to an update or side effects of a previous update, see
 		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
-		 * @param {string} [sOrderby]
-		 *   The "$orderby" system query option, or <code>undefined</code>
 		 * @returns {boolean}
-		 *   Whether the given property path is (possibly) used in "$orderby"
+		 *   Whether the given "$orderby" system query option is affected by at least one of the
+		 *   given side-effects paths
 		 *
 		 * @public
 		 */
-		isOrderedBy : function (aPaths, sOrderby) {
+		isOrderedBy : function (sOrderby, aPaths) {
 			if (!sOrderby) {
 				return false;
 			}
@@ -1315,12 +1312,14 @@ sap.ui.define([
 			return sOrderby.split(rComma).some((sOrderbyItem) => {
 				const aMatches = rOrderbyItem.exec(sOrderbyItem);
 				// handle unparseable items as "used in $orderby"
-				return !aMatches || aPaths.includes(aMatches[1]);
+				return !aMatches
+					|| aPaths.some((sPath) => _Helper.isAffectedBy(aMatches[1], sPath));
 			});
 		},
 
 		/**
-		 * Tells whether the property with the given path is used to compute the grand total.
+		 * Tells whether any property affected by the given side-effects paths is used to compute
+		 * the grand total.
 		 *
 		 * @param {string[]} aPaths
 		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
@@ -1330,8 +1329,8 @@ sap.ui.define([
 		 * @param {object} [mAggregate]
 		 *   A map from aggregatable property names/aliases to details objects
 		 * @returns {boolean}
-		 *   <code>true</code> if the property with the given path is used to compute the grand
-		 *   total
+		 *   Whether any property affected by the given side-effects paths is used to compute the
+		 *   grand total
 		 *
 		 * @public
 		 */

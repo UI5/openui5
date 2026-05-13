@@ -3761,7 +3761,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns whether the binding is filtered by the given (or any) property.
+	 * Returns whether this binding is filtered by any property affected by the given side-effects
+	 * paths, or by any property if no paths are given.
 	 *
 	 * @param {string[]} [aPaths]
 	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
@@ -3769,7 +3770,8 @@ sap.ui.define([
 	 *   due to an update or side effects of a previous update, see
 	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; if omitted, any filter counts
 	 * @returns {boolean}
-	 *   Whether the binding is filtered by the given (or any) property
+	 *   Whether this binding is filtered by any property affected by the given side-effects paths,
+	 *   or by any property if no paths are given
 	 *
 	 * @private
 	 */
@@ -3830,7 +3832,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns whether this binding is sorted by the given (or any) property.
+	 * Returns whether this binding is sorted by any property affected by the given side-effects
+	 * paths, or by any property if no paths are given.
 	 *
 	 * @param {string[]} [aPaths]
 	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
@@ -3838,7 +3841,8 @@ sap.ui.define([
 	 *   due to an update or side effects of a previous update, see
 	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; if omitted, any sorter counts
 	 * @returns {boolean}
-	 *   Whether the binding is sorted by the given (or any) property
+	 *   Whether this binding is sorted by any property affected by the given side-effects paths, or
+	 *   by any property if no paths are given
 	 *
 	 * @private
 	 */
@@ -3847,8 +3851,10 @@ sap.ui.define([
 			return this.aSorters.length || this.mParameters.$orderby;
 		}
 
-		return this.aSorters.some((oSorter) => aPaths.includes(oSorter.getPath()))
-			|| _AggregationHelper.isOrderedBy(aPaths, this.mParameters.$orderby);
+		return _AggregationHelper.isOrderedBy(this.mParameters.$orderby, aPaths)
+			|| this.aSorters.some((oSorter) => {
+				return aPaths.some((sPath) => _Helper.isAffectedBy(oSorter.getPath(), sPath));
+			});
 	};
 
 	/**

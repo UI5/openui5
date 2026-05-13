@@ -5,7 +5,9 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 	"use strict";
 
 	// indicator if the reference can't be resolved
-	var oNotFound = Object.create(null);
+	const oNotFound = Object.create(null);
+
+	let oJQuery;
 
 	/**
 	 * Checks whether the given value or its context is a restricted
@@ -17,8 +19,7 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 	 * @returns {boolean} Whether the value or its context is restricted
 	 */
 	function _isRestricted(vValue, oContext) {
-		return _isBlocklisted(vValue) || _isBlocklisted(oContext)
-			|| _isWindow(oContext);
+		return _isBlocklisted(vValue) || _isBlocklisted(oContext);
 	}
 
 	/**
@@ -29,22 +30,12 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 	 * @returns {boolean} Whether the value is a restricted function
 	 */
 	function _isBlocklisted(vValue) {
-		// eslint-disable-next-line no-eval
+		oJQuery ??= sap.ui.require("sap/ui/thirdparty/jquery");
+
 		return vValue === eval || vValue === setTimeout || vValue === setInterval
 			|| (globalThis.document && (vValue === globalThis.document.write || vValue === globalThis.document.writeln))
-			|| vValue === location.assign || vValue === location.replace
-			|| (globalThis.jQuery && (vValue === globalThis.jQuery.globalEval
-				|| (globalThis.jQuery.sap && vValue === globalThis.jQuery.sap.globalEval)));
-	}
-
-	/**
-	 * Checks whether the given value is a <code>Window</code> object.
-	 *
-	 * @param {any} vValue The value to check
-	 * @returns {boolean} Whether the value is a Window object
-	 */
-	function _isWindow(vValue) {
-		return vValue != null && vValue.window === vValue;
+			|| (globalThis.location && (vValue === globalThis.location.assign || vValue === globalThis.location.replace))
+			|| (oJQuery && (vValue === oJQuery.globalEval));
 	}
 
 	/**

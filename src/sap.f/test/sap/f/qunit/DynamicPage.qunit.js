@@ -64,7 +64,8 @@ function(
 		oFactory = DynamicPageUtil.oFactory,
 		oUtil = DynamicPageUtil.oUtil,
 		PageBackgroundDesign = mLibrary.PageBackgroundDesign,
-		ToolbarStyle = mLibrary.ToolbarStyle;
+		ToolbarStyle = mLibrary.ToolbarStyle,
+		BackgroundDesign = mLibrary.BackgroundDesign;
 
 	/* --------------------------- DynamicPage API -------------------------------------- */
 	QUnit.module("DynamicPage - API ", {
@@ -239,6 +240,34 @@ function(
 		assert.notOk($oDomRef.hasClass("sapFDynamicPageContentWrapperTransparent"), "Should not have sapFDynamicPageContentWrapperTransparent class");
 		assert.ok($oDomRef.hasClass("sapFDynamicPageContentWrapperStandard"), "Should have sapFDynamicPageContentWrapperStandard class");
 		assert.strictEqual(oDynamicPage.getBackgroundDesign(), PageBackgroundDesign.Standard, "Should have backgroundDesign property = 'Standard', which is default");
+	});
+
+	QUnit.test("DynamicPage - clipPath applied only when title backgroundDesign is Transparent", function(assert) {
+		var oDynamicPage = this.oDynamicPage,
+			oTitle = oDynamicPage.getTitle(),
+			oWrapperElement = oDynamicPage.$wrapper.get(0);
+
+		// assert: initially no transparent background => no clipPath
+		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath should not be set when backgroundDesign is not Transparent");
+		assert.notOk(oDynamicPage._bClipPathApplied, "clipPath tracking flag should be false");
+
+		// act: set title backgroundDesign to Transparent
+		oTitle.setBackgroundDesign(BackgroundDesign.Transparent);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		oDynamicPage._updateTitlePositioning();
+
+		// assert: clipPath should be applied
+		assert.notStrictEqual(oWrapperElement.style.clipPath, "", "clipPath should be set when title backgroundDesign is Transparent");
+		assert.ok(oDynamicPage._bClipPathApplied, "clipPath tracking flag should be true");
+
+		// act: revert title backgroundDesign to Solid
+		oTitle.setBackgroundDesign(BackgroundDesign.Solid);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		oDynamicPage._updateTitlePositioning();
+
+		// assert: clipPath should be cleared
+		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath should be cleared when title backgroundDesign is no longer Transparent");
+		assert.notOk(oDynamicPage._bClipPathApplied, "clipPath tracking flag should be false after reverting");
 	});
 
 	QUnit.module("DynamicPage - API - headerPinned property", {

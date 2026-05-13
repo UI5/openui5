@@ -9,8 +9,8 @@
 		<l:VerticalLayout
 			class="sapUiContentPadding"
 			width="100%">
-			<Label text="MultiComboBox with suggestions and success value state with a a long message:"/>
-			<MultiComboBox class="sapUiSmallMarginBottom"
+			<Label text="MultiComboBox with suggestions and success value state with a a long message:" labelFor="MCBSuccess"/>
+			<MultiComboBox id="MCBSuccess" class="sapUiSmallMarginBottom"
 				maxWidth="500px"
 				valueState="Success"
 				valueStateText="Success message. Extra long text used as a success message. Extra long text used as a success message - 2. Extra long text used as a success message."
@@ -20,8 +20,8 @@
 				}">
 				<core:Item key="{ProductId}" text="{Name}" />
 			</MultiComboBox>
-			<Label text="MultiComboBox with suggestions and information value state with a a long message:"/>
-			<MultiComboBox class="sapUiSmallMarginBottom"
+			<Label text="MultiComboBox with suggestions and information value state with a a long message:" labelFor="MCBInformation"/>
+			<MultiComboBox id="MCBInformation" class="sapUiSmallMarginBottom"
 				maxWidth="500px"
 				valueState="Information"
 				valueStateText="Information message. Extra long text used as a information message. Extra long text used as a information message - 2. Extra long text used as a information message."
@@ -31,8 +31,8 @@
 				}">
 				<core:Item key="{ProductId}" text="{Name}" />
 			</MultiComboBox>
-			<Label text="MultiComboBox with suggestions and an information value state with multiple links:"/>
-			<MultiComboBox class="sapUiSmallMarginBottom"
+			<Label text="MultiComboBox with suggestions and an information value state with multiple links:" labelFor="MCBInformationLinks"/>
+			<MultiComboBox id="MCBInformationLinks" class="sapUiSmallMarginBottom"
 				maxWidth="500px"
 				valueState="Information"
 				items="{
@@ -50,8 +50,8 @@
 					</FormattedText>
 				</formattedValueStateText>
 			</MultiComboBox>
-			<Label text="MultiComboBox with suggestions and warning value state with a a long message:"/>
-			<MultiComboBox class="sapUiSmallMarginBottom"
+			<Label text="MultiComboBox with suggestions and warning value state with a a long message:" labelFor="MCBWarning"/>
+			<MultiComboBox id="MCBWarning" class="sapUiSmallMarginBottom"
 				maxWidth="500px"
 				valueState="Warning"
 				valueStateText="Warning message. Extra long text used as a warning message. Extra long text used as a information message - 2. Extra long text used as a warning message."
@@ -61,8 +61,8 @@
 				}">
 				<core:Item key="{ProductId}" text="{Name}" />
 			</MultiComboBox>
-			<Label text="MultiComboBox with suggestions and a warning value state with a link:"/>
-			<MultiComboBox class="sapUiSmallMarginBottom"
+			<Label text="MultiComboBox with suggestions and a warning value state with a link:" labelFor="MCBWarningLink"/>
+			<MultiComboBox id="MCBWarningLink" class="sapUiSmallMarginBottom"
 				maxWidth="500px"
 				valueState="Warning"
 				valueStateText="Warning message. Extra long text used as a warning message."
@@ -79,8 +79,8 @@
 					</FormattedText>
 				</formattedValueStateText>
 			</MultiComboBox>
-			<Label text="MultiComboBox with suggestions and an error value state with a a long message:"/>
-			<MultiComboBox class="sapUiSmallMarginBottom"
+			<Label text="MultiComboBox with suggestions and an error value state with a a long message:" labelFor="MCBError"/>
+			<MultiComboBox id="MCBError" class="sapUiSmallMarginBottom"
 				maxWidth="500px"
 				valueState="Error"
 				valueStateText="Error message. Extra long text used as a warning message. Extra long text used as an error message - 2. Extra long text used as an error message."

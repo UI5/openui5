@@ -8,7 +8,7 @@
 			class="sapUiContentPadding"
 			width="100%">
 		<l:content>
-			<Label text="Multi Input with grouped suggestions" labelFor="productInputWithList"/>
+			<Label text="Multi Input with grouped suggestions" labelFor="productMIWithList"/>
 			<MultiInput
 					id="productMIWithList"
 					type="Text"
