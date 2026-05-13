@@ -2949,11 +2949,11 @@ sap.ui.define([
 		oSmallColumn.setVisible(false);
 		Core.applyChanges();
 
-		window.setTimeout(function() {
+		window.requestAnimationFrame(function() {
 			assert.ok(this.sut.$().find(".sapMListTblCell:visible").hasClass("sapMTableForcedColumn"), "sapMTableForcedColumn class added to the column");
 			assert.strictEqual(oBigColumn.getDomRef().style.width, "", "column occupies the available width and not bigger than the table");
 			done();
-		}.bind(this), 1);
+		}.bind(this));
 	});
 
 	QUnit.test("sapMTableForcedColumn should be cleared if there are other columns visible", function(assert) {
