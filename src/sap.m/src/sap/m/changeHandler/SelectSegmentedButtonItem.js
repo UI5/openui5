@@ -53,7 +53,9 @@ sap.ui.define([
 				const oRevertData = {
 					originalSelectedItem: oChangeContent.previousItem || "",
 					originalSelectedKey: oChangeContent.previousKey || "",
-					originalSelectedKeyBinding: mSelectedKeyBinding,
+					originalSelectedKeyBinding: mSelectedKeyBinding
+						? { path: mSelectedKeyBinding.path, model: mSelectedKeyBinding.model, parts: mSelectedKeyBinding.parts }
+						: null,
 					bUpdateSelectedKey: oChangeContent.bUpdateSelectedKey
 				};
 				oChange.setRevertData(oRevertData);
@@ -109,75 +111,50 @@ sap.ui.define([
 	 * @param {object} mPropertyBag
 	 * @returns {Promise}
 	 */
-	SelectSegmentedButtonItem.revertChange = function (oChange, oControl, mPropertyBag) {
+	SelectSegmentedButtonItem.revertChange = async function (oChange, oControl, mPropertyBag) {
 		const oModifier = mPropertyBag.modifier;
 		const oView = mPropertyBag.view;
 		const oAppComponent = mPropertyBag.appComponent;
 		const oRevertData = oChange.getRevertData();
 
 		if (!oRevertData) {
-			return Promise.resolve();
+			return;
 		}
 
-		return Promise.resolve()
-			.then(async function () {
-				// restore association
-				if (oRevertData.originalSelectedItem) {
-					// originalSelectedItem might be a selector (string) or id; try to resolve it via modifier
-					return Promise.resolve()
-						.then(oModifier.bySelector ? oModifier.bySelector.bind(oModifier, oRevertData.originalSelectedItem, oAppComponent, oView) : Promise.resolve.bind(Promise, oRevertData.originalSelectedItem))
-						.then(async function (vOriginalItem) {
-							oControl._bUpdateSelectedKey = oRevertData.bUpdateSelectedKey;
-							if (typeof oModifier.setAssociation === "function") {
-								await oModifier.setAssociation(oControl, "selectedItem", vOriginalItem || "", oView);
-							} else if (oControl.setSelectedItem) {
-								oControl.setSelectedItem(vOriginalItem || "", false);
-							}
-							return vOriginalItem;
-						});
-				}
-				// if no original selected item, clear association
-				if (typeof oModifier.setAssociation === "function") {
-					await oModifier.setAssociation(oControl, "selectedItem", "", oView);
-				} else if (oControl.setSelectedItem) {
-					oControl.setSelectedItem("", false);
-				}
-				return Promise.resolve();
-			})
-			.then(async function () {
-				// restore selectedKey binding or value
-				if (oRevertData.originalSelectedKeyBinding) {
-					// attempt to reapply binding using modifier.bindProperty (fallbacks)
-					if (typeof oModifier.bindProperty === "function") {
-						try {
-							await oModifier.bindProperty(oControl, "selectedKey", oRevertData.originalSelectedKeyBinding, oView);
-						} catch (e) {
-							// if bindProperty fails, set raw value as fallback
-							if (typeof oModifier.setProperty === "function") {
-								await oModifier.setProperty(oControl, "selectedKey", oRevertData.originalSelectedKey, oView);
-							} else if (oControl.setSelectedKey) {
-								oControl.setSelectedKey(oRevertData.originalSelectedKey);
-							}
-						}
-					} else {
-						// no bindProperty available on modifier: try public API setSelectedKey as fallback (this will unbind but it's the best we can do)
-						if (oControl.setSelectedKey) {
-							oControl.setSelectedKey(oRevertData.originalSelectedKey);
-						}
-					}
-				} else {
-					// original selectedKey was a plain value -> restore it
-					if (typeof oModifier.setProperty === "function") {
-						await oModifier.setProperty(oControl, "selectedKey", oRevertData.originalSelectedKey, oView);
-					} else if (oControl.setSelectedKey) {
-						oControl.setSelectedKey(oRevertData.originalSelectedKey);
-					}
-				}
-			})
-			.then(function () {
-				// clear revert data
-				oChange.resetRevertData();
-			});
+		// Restore association
+		let vOriginalItem = "";
+		if (oRevertData.originalSelectedItem && oModifier.bySelector) {
+			vOriginalItem = await oModifier.bySelector(oRevertData.originalSelectedItem, oAppComponent, oView) || "";
+		}
+
+		oControl._bUpdateSelectedKey = oRevertData.bUpdateSelectedKey;
+
+		if (typeof oModifier.setAssociation === "function") {
+			await oModifier.setAssociation(oControl, "selectedItem", vOriginalItem, oView);
+		} else if (oControl.setSelectedItem) {
+			oControl.setSelectedItem(vOriginalItem, false);
+		}
+
+		// Restore selectedKey binding or value
+		if (oRevertData.originalSelectedKeyBinding && typeof oModifier.bindProperty === "function") {
+			try {
+				await oModifier.bindProperty(oControl, "selectedKey", oRevertData.originalSelectedKeyBinding, oView);
+			} catch (e) {
+				await this._setSelectedKey(oModifier, oControl, oRevertData.originalSelectedKey, oView);
+			}
+		} else {
+			await this._setSelectedKey(oModifier, oControl, oRevertData.originalSelectedKey, oView);
+		}
+
+		oChange.resetRevertData();
+	};
+
+	SelectSegmentedButtonItem._setSelectedKey = async function (oModifier, oControl, sKey, oView) {
+		if (typeof oModifier.setProperty === "function") {
+			await oModifier.setProperty(oControl, "selectedKey", sKey, oView);
+		} else if (oControl.setSelectedKey) {
+			oControl.setSelectedKey(sKey);
+		}
 	};
 
 	SelectSegmentedButtonItem.completeChangeContent = function () {	};
