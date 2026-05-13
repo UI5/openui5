@@ -3041,6 +3041,107 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("Given a DesignTime with stale overlay detection", {
+		async beforeEach() {
+			this.oButton1 = new Button({ text: "Button1" });
+			this.oButton2 = new Button({ text: "Button2" });
+			this.oInnerLayout = new VerticalLayout("stale-inner", {
+				content: [this.oButton1, this.oButton2]
+			});
+			this.oOuterLayout = new VerticalLayout("stale-outer", {
+				content: [this.oInnerLayout]
+			});
+			this.oOuterLayout.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oOuterLayout]
+			});
+			await DtUtil.waitForSynced(this.oDesignTime)();
+		},
+		afterEach() {
+			this.oDesignTime.destroy();
+			this.oOuterLayout.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when _addAggregation encounters a stale overlay (overlay empty, element has children)", async function(assert) {
+			const oInnerOverlay = OverlayRegistry.getOverlay(this.oInnerLayout);
+
+			const oContentAgg = oInnerOverlay.getAggregationOverlay("content");
+			assert.strictEqual(oContentAgg.getChildren().length, 2, "initially the content agg overlay has 2 children");
+
+			oContentAgg.getChildren().slice().forEach((oChild) => oChild.destroy());
+			assert.strictEqual(oContentAgg.getChildren().length, 0, "after simulation, content agg overlay has 0 children");
+			assert.strictEqual(
+				ElementUtil.getAggregation(this.oInnerLayout, "content").length,
+				2,
+				"but element still has 2 content children"
+			);
+
+			const oOuterOverlay = OverlayRegistry.getOverlay(this.oOuterLayout);
+			const oParentAggOverlay = oOuterOverlay.getAggregationOverlay("content");
+
+			this.oDesignTime._addAggregation(this.oInnerLayout, oParentAggOverlay);
+			await DtUtil.waitForSynced(this.oDesignTime)();
+
+			const oNewOverlay = OverlayRegistry.getOverlay(this.oInnerLayout);
+			assert.ok(oNewOverlay, "then the inner layout has a new overlay");
+			assert.notStrictEqual(oNewOverlay, oInnerOverlay, "then it is a different overlay instance");
+			const oNewContentAgg = oNewOverlay.getAggregationOverlay("content");
+			assert.ok(oNewContentAgg, "then the new content aggregation overlay exists");
+			assert.strictEqual(
+				oNewContentAgg.getChildren().length,
+				2,
+				"then the recreated overlay has both button children"
+			);
+		});
+
+		QUnit.test("when _addAggregation encounters a stale overlay (overlay has children, element is empty)", async function(assert) {
+			const oInnerOverlay = OverlayRegistry.getOverlay(this.oInnerLayout);
+
+			const oContentAgg = oInnerOverlay.getAggregationOverlay("content");
+			assert.strictEqual(oContentAgg.getChildren().length, 2, "initially the content agg overlay has 2 children");
+
+			this.oInnerLayout.removeAllContent();
+			assert.strictEqual(
+				ElementUtil.getAggregation(this.oInnerLayout, "content").length,
+				0,
+				"element has no content children"
+			);
+			assert.strictEqual(oContentAgg.getChildren().length, 2, "but overlay still has 2 children");
+
+			const oOuterOverlay = OverlayRegistry.getOverlay(this.oOuterLayout);
+			const oParentAggOverlay = oOuterOverlay.getAggregationOverlay("content");
+
+			this.oDesignTime._addAggregation(this.oInnerLayout, oParentAggOverlay);
+			await DtUtil.waitForSynced(this.oDesignTime)();
+
+			const oNewOverlay = OverlayRegistry.getOverlay(this.oInnerLayout);
+			assert.ok(oNewOverlay, "then the inner layout has a new overlay");
+			assert.notStrictEqual(oNewOverlay, oInnerOverlay, "then it is a different overlay instance");
+			const oNewContentAgg = oNewOverlay.getAggregationOverlay("content");
+			assert.ok(oNewContentAgg, "then the new content aggregation overlay exists");
+			assert.strictEqual(
+				oNewContentAgg.getChildren().length,
+				0,
+				"then the recreated overlay has no children (matching the element)"
+			);
+		});
+
+		QUnit.test("when _addAggregation encounters a healthy overlay it does not recreate it", async function(assert) {
+			const oInnerOverlay = OverlayRegistry.getOverlay(this.oInnerLayout);
+			const oOuterOverlay = OverlayRegistry.getOverlay(this.oOuterLayout);
+			const oParentAggOverlay = oOuterOverlay.getAggregationOverlay("content");
+
+			this.oDesignTime._addAggregation(this.oInnerLayout, oParentAggOverlay);
+			await DtUtil.waitForSynced(this.oDesignTime)();
+
+			const oCurrentOverlay = OverlayRegistry.getOverlay(this.oInnerLayout);
+			assert.strictEqual(oCurrentOverlay, oInnerOverlay, "then the overlay was not recreated");
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});

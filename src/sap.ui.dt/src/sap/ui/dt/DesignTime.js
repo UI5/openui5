@@ -1386,18 +1386,30 @@ sap.ui.define([
 			// When you add an element to an aggregation, check the last visible element in the same aggregation.
 			// if the last element is not removable because it was the last element in the aggregation. In this case, the last element
 			// will be set to removable again
-			OverlayUtil.updateLastElementRemovability({
-				type: "add",
-				element: oElement,
-				parentElement: oParent,
-				aggregationName: sAggregationName,
-				designTime: this
-			});
+			// Skip removability updates for template elements — the template is
+			// the blueprint for clones and is not directly manipulated by the user.
+			if (!oParentOverlay?.getIsPartOfTemplate()) {
+				OverlayUtil.updateLastElementRemovability({
+					type: "add",
+					element: oElement,
+					parentElement: oParent,
+					aggregationName: sAggregationName,
+					designTime: this
+				});
+			}
 		}
 	};
 
 	DesignTime.prototype._addAggregation = function(oElement, oParentAggregationOverlay) {
 		var oElementOverlay = OverlayRegistry.getOverlay(oElement);
+
+		// When a binding refresh recreates an element with the same ID, the old overlay
+		// survives but its child overlays are destroyed. Detect this stale state and
+		// destroy the overlay so it gets properly recreated with its children.
+		if (oElementOverlay && isOverlayStale(oElementOverlay)) {
+			oElementOverlay.destroy();
+			oElementOverlay = undefined;
+		}
 
 		if (
 			!oElementOverlay
@@ -1492,9 +1504,35 @@ sap.ui.define([
 		}
 	};
 
+	/**
+	 * Checks whether an overlay is stale due to its element being recreated (e.g. by a binding refresh).
+	 * An overlay is considered stale if the number of children in any aggregation overlay
+	 * does not match the number of children in the actual element's aggregation.
+	 * @param {sap.ui.dt.ElementOverlay} oElementOverlay - Overlay to check
+	 * @return {boolean} true if the overlay's children are out of sync with the element
+	 */
+	function isOverlayStale(oElementOverlay) {
+		const oElement = oElementOverlay.getElement();
+		if (!oElement || oElement.bIsDestroyed) {
+			return false;
+		}
+		const aAggregationOverlays = oElementOverlay.getChildren();
+		return aAggregationOverlays.some((oAggregationOverlay) => {
+			const iOverlayChildren = oAggregationOverlay.getChildren().length;
+			const sAggregationName = oAggregationOverlay.getAggregationName();
+			const iActualChildren = ElementUtil.getAggregation(oElement, sAggregationName).length;
+			return iOverlayChildren !== iActualChildren;
+		});
+	}
+
 	DesignTime.prototype._onRemoveAggregation = function(oElementOverlay, oParams) {
 		// When an element is removed from an aggregation, the last visible element in the same aggregation
 		// should be checked if it can be removed. If not, It will be set to not removable
+		// Skip removability updates for template elements — the template is
+		// the blueprint for clones and is not directly manipulated by the user.
+		if (oElementOverlay.getIsPartOfTemplate()) {
+			return;
+		}
 		const oRemovedElement = typeof oParams.value === "object" ? oParams.value : oElementOverlay.getElement();
 		OverlayUtil.updateLastElementRemovability({
 			type: "remove",
@@ -1526,6 +1564,11 @@ sap.ui.define([
 	DesignTime.prototype._onPropertyChanged = function(oElementOverlay, oParams) {
 		// When the visibility of an element has changed, then the last visible element in the same aggregation
 		// should be checked if it can be removed. If not, It will be set to not removable
+		// Skip removability updates for template elements — the template is
+		// the blueprint for clones and is not directly manipulated by the user.
+		if (oElementOverlay.getIsPartOfTemplate()) {
+			return;
+		}
 		const oModifiedElement = oElementOverlay.getElement();
 		const oParentElement = oModifiedElement.getParent();
 		if (oParams.name === "visible") {
