@@ -303,8 +303,7 @@ sap.ui.define([
 			return;
 		}
 
-		const oValueHelp = _getValueHelp.call(this);
-		if (this.isOpenArea(oEvent.target) && oValueHelp?.isOpen()) { // as dropdown should also close on click in field, opening is handled on Field
+		if (this.isOpenArea(oEvent.target) && this.isOpen()) { // as dropdown should also close on click in field, opening is handled on Field
 			this.fireValueHelpRequest();
 		}
 
@@ -423,9 +422,7 @@ sap.ui.define([
 
 	FieldSelect.prototype._addFocusClass = function () {
 
-		const oValueHelp = _getValueHelp.call(this);
-
-		if (!oValueHelp?.isOpen()) { // on open ValueHelp visual focus should be in dropdown
+		if (!this.isOpen()) { // on open ValueHelp visual focus should be in dropdown
 			this.addStyleClass("sapMSltFocused"); // use addStyleClass to have same logoc like Input controls
 		}
 
@@ -434,6 +431,13 @@ sap.ui.define([
 	FieldSelect.prototype._removeFocusClass = function () {
 
 		this.removeStyleClass("sapMSltFocused"); // use removeStyleClass to have same logoc like Input controls
+
+	};
+
+	FieldSelect.prototype.isOpen = function() {
+
+		const oValueHelp = _getValueHelp.call(this);
+		return !!oValueHelp?.isOpen();
 
 	};
 
