@@ -1509,6 +1509,7 @@ sap.ui.define([
 			this._infoDatesFooter = new Toolbar({
 				design: ToolbarDesign.Info,
 				style: ToolbarStyle.Clear,
+				height: "auto",
 				content: [
 					new Label({
 						text: oResourceBundle.getText("DDR_INFO_DATES_EMPTY_HINT")

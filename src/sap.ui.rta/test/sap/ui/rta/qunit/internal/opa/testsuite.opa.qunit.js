@@ -33,6 +33,18 @@ sap.ui.define(function() {
 			},
 			"variantManagement/integration/VariantManagementJourney": {
 				title: "Variant Management Opa Tests"
+			},
+			"Additional Elements App": {
+				group: "App Tests",
+				module: "test-resources/sap/ui/rta/qunit/internal/opa/AdditionalElementsAppJourney.qunit"
+			},
+			"Standalone RuntimeAuthoring App": {
+				group: "App Tests",
+				module: "test-resources/sap/ui/rta/qunit/internal/opa/RuntimeAuthoringTestAppJourney.qunit"
+			},
+			"Embedded Component App": {
+				group: "App Tests",
+				module: "test-resources/sap/ui/rta/qunit/internal/opa/EmbeddedComponentAppJourney.qunit"
 			}
 		}
 	};

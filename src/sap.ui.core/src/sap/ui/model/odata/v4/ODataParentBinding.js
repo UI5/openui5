@@ -848,8 +848,7 @@ sap.ui.define([
 				}
 				// Note: sResolvedChildPath could be "/SalesOrderList('42')/SO_2_SOITEM/0/Note"
 				// w/ index (thus getMetaPath helps), but getStrippedMetaPath makes no difference
-				if (!sChildPath.includes("/")
-					|| _Helper.getMetaPath(sOldReducedPath)
+				if (_Helper.getMetaPath(sOldReducedPath)
 						=== _Helper.getMetaPath(sResolvedChildPath)) {
 					return sResolvedChildPath;
 				}

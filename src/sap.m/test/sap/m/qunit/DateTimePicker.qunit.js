@@ -3,6 +3,8 @@ sap.ui.define([
 	"sap/base/i18n/Localization",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
+	"sap/ui/core/Locale",
+	"sap/ui/core/LocaleData",
 	"sap/ui/core/UIAreaRegistry",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/createAndAppendDiv",
@@ -31,6 +33,8 @@ sap.ui.define([
 	Localization,
 	Element,
 	Library,
+	Locale,
+	LocaleData,
 	UIAreaRegistry,
 	qutils,
 	createAndAppendDiv,
@@ -295,7 +299,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("placeholder", function(assert) {
-		var sPlaceholderPrefix = Library.getResourceBundleFor("sap.ui.core").getText("date.placeholder").split("{")[0];
+		var sPlaceholderPrefix = LocaleData.getInstance(new Locale(Localization.getLanguageTag())).getDatePlaceholder().split("{")[0];
 		if (Device.support.input.placeholder) {
 			assert.ok(jQuery("#DTP1").find("input").attr("placeholder").includes(sPlaceholderPrefix) , "DTP1: placeholder");
 			assert.ok(jQuery("#DTP2").find("input").attr("placeholder").includes(sPlaceholderPrefix), "DTP2: placeholder");

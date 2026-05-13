@@ -53,6 +53,9 @@ sap.ui.define([
 	// shortcut for sap.m.PageBackgroundDesign
 	var PageBackgroundDesign = mLibrary.PageBackgroundDesign;
 
+	// shortcut for sap.m.BackgroundDesign
+	var BackgroundDesign = mLibrary.BackgroundDesign;
+
 	// shortcut for sap.f.DynamicPageMediaRange
 	var DynamicPageMediaRange = library.DynamicPageMediaRange;
 
@@ -1415,6 +1418,8 @@ sap.ui.define([
 			iTitleHeight = this.$titleArea.get(0).getBoundingClientRect().height,
 			iTitleWidth = this._getTitleAreaWidth(),
 			iSpaceForScrollbar = this._getEffectiveScrollbarWidth(bScrollBarNeeded),
+			oTitle = this.getTitle(),
+			bTitleTransparent = oTitle && oTitle.getBackgroundDesign() === BackgroundDesign.Transparent,
 			sClipPath;
 
 		// the top area of the scroll container is reserved for showing the title element,
@@ -1430,16 +1435,22 @@ sap.ui.define([
 		// (2) also make the area underneath the title invisible (using clip-path)
 		// to allow usage of *transparent background* of the title element
 		// (otherwise content from the scroll *overflow* will show underneath the transparent title element)
-		sClipPath = 'polygon(0px ' + Math.floor(iTitleHeight) + 'px, '
-			+ iTitleWidth + 'px ' + Math.floor(iTitleHeight) + 'px, '
-			+ iTitleWidth + 'px 0, 100% 0, 100% 100%, 0 100%)';
+		if (bTitleTransparent) {
+			sClipPath = 'polygon(0px ' + Math.floor(iTitleHeight) + 'px, '
+				+ iTitleWidth + 'px ' + Math.floor(iTitleHeight) + 'px, '
+				+ iTitleWidth + 'px 0, 100% 0, 100% 100%, 0 100%)';
 
-		if (Localization.getRTL()) {
-			sClipPath = 'polygon(0px 0px, ' + iSpaceForScrollbar + 'px 0px, '
-			+ iSpaceForScrollbar + 'px ' + iTitleHeight + 'px, 100% '
-			+ iTitleHeight + 'px, 100% 100%, 0 100%)';
+			if (Localization.getRTL()) {
+				sClipPath = 'polygon(0px 0px, ' + iSpaceForScrollbar + 'px 0px, '
+				+ iSpaceForScrollbar + 'px ' + iTitleHeight + 'px, 100% '
+				+ iTitleHeight + 'px, 100% 100%, 0 100%)';
+			}
+			oWrapperElement.style.clipPath = sClipPath;
+			this._bClipPathApplied = true;
+		} else if (this._bClipPathApplied) {
+			oWrapperElement.style.clipPath = '';
+			this._bClipPathApplied = false;
 		}
-		oWrapperElement.style.clipPath = sClipPath;
 
 		this.toggleStyleClass("sapFDynamicPageWithScroll", bScrollBarNeeded);
 		this._toggleSpaceForScrollbar(bScrollBarNeeded);

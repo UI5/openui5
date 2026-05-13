@@ -8,6 +8,7 @@ sap.ui.define([
 	// initialize the UI component
 	const oComponent = await Component.create({
 		name: "sap.ui.rta.test.additionalElements",
+		id: "application-masterDetail-display-component",
 		componentData: {
 			showAdaptButton: true
 		}

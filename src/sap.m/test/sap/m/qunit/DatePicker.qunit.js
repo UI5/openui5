@@ -4,6 +4,8 @@ sap.ui.define([
 	"sap/base/i18n/Localization",
 	"sap/base/i18n/date/CalendarType",
 	"sap/ui/core/Lib",
+	"sap/ui/core/Locale",
+	"sap/ui/core/LocaleData",
 	"sap/ui/core/UIAreaRegistry",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/createAndAppendDiv",
@@ -50,6 +52,8 @@ sap.ui.define([
 	Localization,
 	CalendarType,
 	Library,
+	Locale,
+	LocaleData,
 	UIAreaRegistry,
 	qutils,
 	createAndAppendDiv,
@@ -3393,7 +3397,8 @@ sap.ui.define([
 			var sOriginalLanguage = Localization.getLanguage();
 			Localization.setLanguage("de");
 
-			var sPlaceholderPrefix = Library.getResourceBundleFor("sap.ui.core").getText("date.placeholder").split("{")[0],
+			var oLocaleData = LocaleData.getInstance(new Locale(Localization.getLanguageTag()));
+			var sPlaceholderPrefix = oLocaleData.getDatePlaceholder().split("{")[0],
 				iFullYear = UI5Date.getInstance().getFullYear(),
 				sExpectedPlaceholder = sPlaceholderPrefix + "31.12." + iFullYear;
 

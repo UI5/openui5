@@ -8,7 +8,10 @@ sap.ui.require([
 		new Shell({
 			app: new ComponentContainer({
 				height: "100%",
-				name: "sap.ui.rta.test.embeddedComponent"
+				name: "sap.ui.rta.test.embeddedComponent",
+				settings: {
+					id: "application-masterDetail-display-component"
+				}
 			})
 		}).placeAt("content");
 	});

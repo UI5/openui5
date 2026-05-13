@@ -402,7 +402,7 @@ sap.ui.define([
 	QUnit.test("Set displayFormat to 'HH:mm'", function (assert) {
 		// Act
 		this.oTimePicker.setDisplayFormat("HH:mm");
-		var sPlaceholderPrefix = Library.getResourceBundleFor("sap.ui.core").getText("date.placeholder").split("{")[0];
+		var sPlaceholderPrefix = LocaleData.getInstance(new Locale(Localization.getLanguageTag())).getDatePlaceholder().split("{")[0];
 		// Assert
 		assert.ok(this.oTimePicker._getPlaceholder().includes(sPlaceholderPrefix), "The placeholder is correct");
 	});
@@ -410,7 +410,7 @@ sap.ui.define([
 	QUnit.test("Set displayFormat to 'short'", function (assert) {
 		// Act
 		this.oTimePicker.setDisplayFormat("short");
-		var sPlaceholderPrefix = Library.getResourceBundleFor("sap.ui.core").getText("date.placeholder").split("{")[0];
+		var sPlaceholderPrefix = LocaleData.getInstance(new Locale(Localization.getLanguageTag())).getDatePlaceholder().split("{")[0];
 		// Assert
 		assert.ok(this.oTimePicker._getPlaceholder().includes(sPlaceholderPrefix), "The placeholder is correct");
 	});

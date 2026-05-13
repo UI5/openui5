@@ -1570,8 +1570,13 @@ function(
 	 * @private
 	 */
 	MultiInput.prototype._onBeforeOpenTokensPicker = function () {
+		var oTokenizer = this.getAggregation("tokenizer"),
+			aLabels = this.getLabels(),
+			sTitle = aLabels.length && aLabels[0].getText ? aLabels[0].getText() : oRb.getText("TOKENIZER_MOBILE_DIALOG_TITLE");
+
 		this._setValueVisible(false);
 		this._manageListsVisibility(true);
+		oTokenizer.getTokensPopup().setTitle(sTitle);
 	};
 
 	/**

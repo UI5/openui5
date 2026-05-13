@@ -63045,6 +63045,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// a creation row, too.
 	// JIRA: CPOUI5UISERVICESV3-1877
 	// JIRA: CPOUI5UISERVICESV3-1942
+	//
+	// Ensure that an ODCB in between does not ruin path reduction when its
+	// mCanUseCachePromiseByChildPath comes into play for a 2nd child with same path.
+	// JIRA: CPOUI5ODATAV4-3489
 	QUnit.test("Reduce path: property in parent cache", function (assert) {
 		var oCreationRowContext,
 			oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
@@ -63059,8 +63063,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox id="creationRow">\
 	<Text id="creationRow::note" text="{Note}"/>\
 </FlexBox>\
-<FlexBox id="valueHelp">\
-	<Input id="valueHelp::currencyCode" value="{SOITEM_2_SO/CurrencyCode}"/>\
+<FlexBox binding="{SOITEM_2_SO}" id="valueHelp">\
+	<Input id="valueHelp::currencyCode0" value="{CurrencyCode}"/>\
+	<Input id="valueHelp::currencyCode1" value="{CurrencyCode}"/>\
 </FlexBox>',
 			that = this;
 
@@ -63078,12 +63083,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			})
 			.expectChange("note", ["Foo"])
 			.expectChange("soCurrencyCode", "EUR")
-			.expectChange("valueHelp::currencyCode");
+			.expectChange("valueHelp::currencyCode0")
+			.expectChange("valueHelp::currencyCode1");
 
 		return this.createView(assert, sView, oModel).then(function () {
 			oTable = that.oView.byId("table");
 
-			that.expectChange("valueHelp::currencyCode", "EUR");
+			that.expectChange("valueHelp::currencyCode0", "EUR")
+				.expectChange("valueHelp::currencyCode1", "EUR");
 
 			// start value help
 			that.oView.byId("valueHelp").setBindingContext(
@@ -63091,7 +63098,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return that.waitForChanges(assert);
 		}).then(function () {
-			that.expectChange("valueHelp::currencyCode", null);
+			that.expectChange("valueHelp::currencyCode0", null)
+				.expectChange("valueHelp::currencyCode1", null);
 
 			// stop value help
 			that.oView.byId("valueHelp").setBindingContext(null);
@@ -63100,7 +63108,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function () {
 			var oCreationRowListBinding, oTableBinding;
 
-			that.expectChange("valueHelp::currencyCode", "EUR");
+			that.expectChange("valueHelp::currencyCode0", "EUR")
+				.expectChange("valueHelp::currencyCode1", "EUR");
 
 			// create and initialize creation row
 			oTableBinding = oTable.getBinding("items");
@@ -63116,14 +63125,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectChange("soCurrencyCode", "USD")
-				.expectChange("valueHelp::currencyCode", "USD");
+				.expectChange("valueHelp::currencyCode0", "USD")
+				.expectChange("valueHelp::currencyCode1", "USD");
 
 			// the PATCH must not be sent!
-			that.oView.byId("valueHelp::currencyCode").getBinding("value").setValue("USD");
+			that.oView.byId("valueHelp::currencyCode0").getBinding("value").setValue("USD");
 
 			return that.waitForChanges(assert);
 		}).then(function () {
-			that.expectChange("valueHelp::currencyCode", null);
+			that.expectChange("valueHelp::currencyCode0", null)
+				.expectChange("valueHelp::currencyCode1", null);
 
 			// delete creation row to avoid errors in destroy
 			checkCanceled(assert, oCreationRowContext.created());

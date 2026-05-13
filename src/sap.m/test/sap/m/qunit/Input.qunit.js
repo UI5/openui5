@@ -587,6 +587,31 @@ sap.ui.define([
 		oInput.destroy();
 	});
 
+	QUnit.test("Input + focusout after value help icon press fires a change event", async function (assert) {
+		var spy = this.spy(),
+			oInput = new Input({
+				showValueHelp: true,
+				valueHelpIconSrc: "sap-icon://show",
+				change: spy
+			});
+
+		// place control
+		oInput.placeAt("content");
+		await nextUIUpdate();
+
+		oInput.focus();
+		qutils.triggerCharacterInput(oInput.getFocusDomRef(), "t");
+		qutils.triggerEvent("input", oInput.getFocusDomRef());
+		oInput.getAggregation("_endIcon")[0].firePress();
+
+		qutils.triggerCharacterInput(oInput.getFocusDomRef(), "a");
+		qutils.triggerEvent("input", oInput.getFocusDomRef());
+		oInput.onsapfocusleave({ relatedControlId: null });
+
+		assert.strictEqual(spy.callCount, 1, "Change event has been fired once");
+		oInput.destroy();
+	});
+
 	QUnit.test("Keyboard Handling", function(assert) {
 		// F4 event check
 		var evt = jQuery.Event("sapshow"),

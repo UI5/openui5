@@ -2233,9 +2233,6 @@ sap.ui.define([
 	//*********************************************************************************************
 [
 	// path not contained in orderby
-	["path", undefined, false],
-	["path", null, false],
-	["path", "", false],
 	["path", "other", false],
 	["asc", "path asc", false],
 	// path contained in orderby, asc and desc are ignored
@@ -2249,17 +2246,52 @@ sap.ui.define([
 	["a", "abc", false],
 	["b", "abc", false],
 	["c", "abc", false],
-	// not parsable orderby item; independent whether property path is contained
-	["path", "length(foo)", true]
+	// wildcard and path prefixes
+	["Address", "Address/City", true],
+	["Address/*", "Address/City", true],
+	["Address", "AddressOffice/City", false],
+	// handling of encoded spaces and comma in orderby
+	["path/*", "foo%2cpath/subPath%20asc%2Cbar", true]
 ].forEach(([sPath, sOrderby, bExpected], i) => {
 	QUnit.test("isOrderedBy: " + i + " - " + sPath + " in " + sOrderby, function (assert) {
 		// code under test
-		assert.strictEqual(_AggregationHelper.isOrderedBy([sPath], sOrderby), bExpected);
-
-		// code under test
-		assert.strictEqual(_AggregationHelper.isOrderedBy(["notUsed", sPath], sOrderby), bExpected);
+		assert.strictEqual(_AggregationHelper.isOrderedBy(sOrderby, ["notUsed", sPath]), bExpected);
 	});
 });
+
+	//*********************************************************************************************
+[undefined, null, ""].forEach((sOrderby) => {
+	QUnit.test("isOrderedBy: no sOrderby - " + sOrderby, function (assert) {
+		this.mock(_Helper).expects("isAffectedBy").never();
+
+		// code under test
+		assert.strictEqual(_AggregationHelper.isOrderedBy(sOrderby, ["n/a"]), false);
+	});
+});
+
+	//*********************************************************************************************
+	QUnit.test("isOrderedBy: not parsable", function (assert) {
+		this.mock(_Helper).expects("isAffectedBy").never();
+
+		// code under test
+		assert.strictEqual(_AggregationHelper.isOrderedBy("length(foo)", ["path"]), true,
+			"handle not parsable orderby item as 'used in $orderby'");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isOrderedBy", function (assert) {
+		const oHelperMock = this.mock(_Helper);
+		oHelperMock.expects("isAffectedBy").withExactArgs("foo", "notUsed").returns(false);
+		oHelperMock.expects("isAffectedBy").withExactArgs("foo", "path").returns(false);
+		oHelperMock.expects("isAffectedBy").withExactArgs("foo", "n/a").returns(false);
+		oHelperMock.expects("isAffectedBy").withExactArgs("path/subPath", "notUsed").returns(false);
+		oHelperMock.expects("isAffectedBy").withExactArgs("path/subPath", "path").returns(true);
+
+		// code under test
+		assert.strictEqual(
+			_AggregationHelper.isOrderedBy("foo,path/subPath asc,bar", ["notUsed", "path", "n/a"]),
+			true);
+	});
 
 	//*********************************************************************************************
 [undefined, {}].forEach((mAggregate, i) => {
