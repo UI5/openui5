@@ -3,10 +3,11 @@
  */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/base/util/extend",
 	"sap/ui/test/autowaiter/_utils",
 	"./WaiterBase"
-], function(extend, _utils, WaiterBase) {
+], function(Log, extend, _utils, WaiterBase) {
 	"use strict";
 
 	var mTimeouts = {};
@@ -165,24 +166,26 @@ sap.ui.define([
 
 	function logTrackedTimeouts(aBlockingTimeoutIds) {
 		var aTimeoutIds = Object.keys(mTimeouts);
-		// log overview of blocking timeouts at debug
-		var sLogMessage = "Found " + aBlockingTimeoutIds.length + " blocking out of " + aTimeoutIds.length + " tracked timeouts";
-		aBlockingTimeoutIds.forEach(function (iTimeoutID) {
-			sLogMessage += createLogForTimeout(iTimeoutID, mTimeouts[iTimeoutID],aBlockingTimeoutIds.some(function(currentValue){
-				return currentValue == iTimeoutID;
-			}),true);
-		});
-		// show the pending timeout details into the timeout message
-		oTimeoutWaiter._oHasPendingLogger.debug(sLogMessage);
 
-		// log all tracked timeouts at trace
-		var sTraceLogMessage = "Tracked timeouts";
-		aTimeoutIds.forEach(function (iTimeoutID) {
-			sTraceLogMessage += createLogForTimeout(iTimeoutID, mTimeouts[iTimeoutID],aBlockingTimeoutIds.some(function(currentValue){
-				return currentValue == iTimeoutID;
-			}),true);
-		});
-		oTimeoutWaiter._oHasPendingLogger.trace(sTraceLogMessage);
+		if (oTimeoutWaiter._oHasPendingLogger.isLoggable(Log.Level.DEBUG)) {
+			var sLogMessage = "Found " + aBlockingTimeoutIds.length + " blocking out of " + aTimeoutIds.length + " tracked timeouts";
+			aBlockingTimeoutIds.forEach(function (iTimeoutID) {
+				sLogMessage += createLogForTimeout(iTimeoutID, mTimeouts[iTimeoutID],aBlockingTimeoutIds.some(function(currentValue){
+					return currentValue == iTimeoutID;
+				}),true);
+			});
+			oTimeoutWaiter._oHasPendingLogger.debug(sLogMessage);
+		}
+
+		if (oTimeoutWaiter._oHasPendingLogger.isLoggable(Log.Level.TRACE)) {
+			var sTraceLogMessage = "Tracked timeouts";
+			aTimeoutIds.forEach(function (iTimeoutID) {
+				sTraceLogMessage += createLogForTimeout(iTimeoutID, mTimeouts[iTimeoutID],aBlockingTimeoutIds.some(function(currentValue){
+					return currentValue == iTimeoutID;
+				}),true);
+			});
+			oTimeoutWaiter._oHasPendingLogger.trace(sTraceLogMessage);
+		}
 	}
 
 	function isBlocking(iID) {
