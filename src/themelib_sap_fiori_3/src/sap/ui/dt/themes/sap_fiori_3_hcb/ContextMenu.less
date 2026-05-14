@@ -3,8 +3,10 @@
 /* Quartz High Contrast Black theme       */
 /* ====================================== */
 
-@_sap_ui_dt_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.375rem */
-@_sap_ui_dt_ContextMenu_OpenSubMenuBackgroundColor: var(--sapSelectedColor); /* #0f5d94 */
+.sapUiDtContextMenu {
+	--_sap_ui_dt_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius);
+	--_sap_ui_dt_ContextMenu_OpenSubMenuBackgroundColor: var(--sapSelectedColor);
+}
 
 .sapUiDtContextMenu.sapMMenu {
 
@@ -13,19 +15,19 @@
 		.sapMMenuItem {
 
 			&.sapMMenuItemDisabled {
-				opacity: @_sap_ui_dt_ContextMenu_EnabledOpacity;
+				opacity: var(--_sap_ui_dt_ContextMenu_EnabledOpacity);
 			}
 
 			&:focus {
-				border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
+				border-radius: var(--_sap_ui_dt_ContextMenu_BorderRadius);
 			}
 
 			&.sapMMenuItemSubMenuOpen {
 				border-bottom: 0.0625rem solid transparent !important; /* remove border */
-				border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
+				border-radius: var(--_sap_ui_dt_ContextMenu_BorderRadius);
 
 				&:not(:hover) {
-					background-color: @_sap_ui_dt_ContextMenu_OpenSubMenuBackgroundColor;
+					background-color: var(--_sap_ui_dt_ContextMenu_OpenSubMenuBackgroundColor);
 				}
 			}
 		}

@@ -794,6 +794,44 @@ sap.ui.define([
 				errorMessage: "The filter " + sFilterName + " is not found in the Adapt Filters dialog"
 
 			});
+		},
+		iShouldSeeComboBoxWithValueState: function(mSettings) {
+			return this.waitFor({
+				searchOpenDialogs: true,
+				controlType: "sap.m.ComboBox",
+				matchers: function(oControl) {
+					if (mSettings.id instanceof RegExp) {
+						return mSettings.id.test(oControl.getId());
+					}
+					return oControl.getId() === mSettings.id;
+				},
+				success: function(aControls) {
+					const oControl = aControls[0];
+					const sActualState = oControl.getValueState();
+					Opa5.assert.equal(sActualState, mSettings.valueState,
+						"Control has ValueState '" + mSettings.valueState + "'");
+				},
+				errorMessage: "Could not find control with id matching '" + mSettings.id + "' and ValueState '" + mSettings.valueState + "'"
+			});
+		},
+		iShouldSeeComboBoxWithValue: function(mSettings) {
+			return this.waitFor({
+				searchOpenDialogs: true,
+				controlType: "sap.m.ComboBox",
+				matchers: function(oControl) {
+					if (mSettings.id instanceof RegExp) {
+						return mSettings.id.test(oControl.getId());
+					}
+					return oControl.getId() === mSettings.id;
+				},
+				success: function(aControls) {
+					const oControl = aControls[0];
+					const sActualValue = oControl.getValue();
+					Opa5.assert.equal(sActualValue, mSettings.value,
+						"Control has value '" + mSettings.value + "'");
+				},
+				errorMessage: "Could not find control with id matching '" + mSettings.id + "'"
+			});
 		}
 	});
 	return Assertion;

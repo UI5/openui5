@@ -3,15 +3,17 @@
 /* Base theme                         */
 /* ================================== */
 
-@_sap_ui_dt_Overlay_FocusBorderColor: var(--sapContent_FocusColor); //#000
-@_sap_ui_dt_Overlay_TargetZoneOutlineColor: var(--sapSelectedColor); //#8fb5ff
-@_sap_ui_dt_Overlay_SelectionOutlineColor: var(--sapSelectedColor); //#8fb5ff
-@_sap_ui_dt_Overlay_CuttedBackgroundColor: var(--sapContent_ImagePlaceholderBackground); // #fff
-@_sap_ui_dt_Overlay_CuttedBorderColor: var(--sapSelectedColor); //#8fb5ff
-@_sap_ui_dt_Overlay_HighlightOutlineColor: var(--sapWarningBorderColor); //ffff00
-@_sap_ui_dt_Overlay_HoverBackgroundColor: fade(@sapUiSelected, 5%); //rgba(143, 181, 255, 0.1);
-@_sap_ui_dt_Overlay_DropZoneBackgroundColor: fade(@sapUiSelected, 10%); //rgba(143, 181, 255, 0.1);
-@_sap_ui_dt_Overlay_BoxShadow: var(--sapContent_Shadow2);
+.sapUiDtOverlay {
+	--_sap_ui_dt_Overlay_FocusBorderColor: var(--sapContent_FocusColor);
+	--_sap_ui_dt_Overlay_TargetZoneOutlineColor: var(--sapSelectedColor);
+	--_sap_ui_dt_Overlay_SelectionOutlineColor: var(--sapSelectedColor);
+	--_sap_ui_dt_Overlay_CuttedBackgroundColor: var(--sapContent_ImagePlaceholderBackground);
+	--_sap_ui_dt_Overlay_CuttedBorderColor: var(--sapSelectedColor);
+	--_sap_ui_dt_Overlay_HighlightOutlineColor: var(--sapWarningBorderColor);
+	--_sap_ui_dt_Overlay_HoverBackgroundColor: ~'hsl(from var(--sapSelectedColor) h s l / .05)';
+	--_sap_ui_dt_Overlay_DropZoneBackgroundColor: ~'hsl(from var(--sapSelectedColor) h s l / .1)';
+	--_sap_ui_dt_Overlay_BoxShadow: var(--sapContent_Shadow2);
+}
 
 #overlay-container {
 	position: absolute;
@@ -49,7 +51,7 @@
 
 		&::before {
 			content: '';
-			border: 0.0625rem dotted @_sap_ui_dt_Overlay_FocusBorderColor; /* 1px */
+			border: 0.0625rem dotted var(--_sap_ui_dt_Overlay_FocusBorderColor); /* 1px */
 		}
 	}
 }
@@ -67,7 +69,7 @@
 	> .sapUiDtOverlayChildren {
 
 		> .sapUiDtOverlayMovable {
-			background: @_sap_ui_dt_Overlay_DropZoneBackgroundColor;
+			background: var(--_sap_ui_dt_Overlay_DropZoneBackgroundColor);
 			/* no "border" */
 			&::after {
 				content: none;
@@ -80,7 +82,7 @@
 
 	&::after {
 		content: '';
-		outline: 0.125rem dashed @_sap_ui_dt_Overlay_TargetZoneOutlineColor; /* 2px */
+		outline: 0.125rem dashed var(--_sap_ui_dt_Overlay_TargetZoneOutlineColor); /* 2px */
 		outline-offset: -0.125rem; /* 2px */
 	}
 }
@@ -89,7 +91,7 @@
 
 	&::after {
 		content: '';
-		outline: 0.125rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 2px */
+		outline: 0.125rem solid var(--_sap_ui_dt_Overlay_SelectionOutlineColor); /* 2px */
 		outline-offset: -0.125rem; /* 2px */
 		border: none;
 	}
@@ -123,9 +125,9 @@
 
 	&::after {
 		content: '';
-		outline: 0.0625rem solid @_sap_ui_dt_Overlay_HighlightOutlineColor; /* 1px */
+		outline: 0.0625rem solid var(--_sap_ui_dt_Overlay_HighlightOutlineColor); /* 1px */
 		outline-offset: -0.0625rem; /* 1px */
-		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
+		box-shadow: var(--_sap_ui_dt_Overlay_BoxShadow);
 	}
 }
 
@@ -139,12 +141,12 @@
 }
 
 .sapUiDtOverlayCutted {
-	background-color: @_sap_ui_dt_Overlay_CuttedBackgroundColor !important;
+	background-color: var(--_sap_ui_dt_Overlay_CuttedBackgroundColor) !important;
 	opacity: 0.5;
 
 	&::after {
 		content: '';
-		outline: 0.063rem solid @_sap_ui_dt_Overlay_CuttedBorderColor; /* 1px */
+		outline: 0.063rem solid var(--_sap_ui_dt_Overlay_CuttedBorderColor); /* 1px */
 		outline-offset: -0.125rem; /* 2px */
 	}
 }
@@ -189,13 +191,13 @@
 
 .sapUiDtOverlayHover {
 	transition: background 0.1s cubic-bezier(1, .01, 1, 0);
-	background: @_sap_ui_dt_Overlay_HoverBackgroundColor;
+	background: var(--_sap_ui_dt_Overlay_HoverBackgroundColor);
 
 	&::after {
 		content: '';
 		transition: box-shadow .25s;
-		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
-		outline: 0.0625rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 1px */
+		box-shadow: var(--_sap_ui_dt_Overlay_BoxShadow);
+		outline: 0.0625rem solid var(--_sap_ui_dt_Overlay_SelectionOutlineColor); /* 1px */
 		outline-offset: -0.0625rem; /* 1px */
 	}
 }

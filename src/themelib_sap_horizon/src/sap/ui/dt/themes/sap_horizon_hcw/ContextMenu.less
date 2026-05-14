@@ -3,8 +3,10 @@
 /* Horizon High Contrast White theme      */
 /* ====================================== */
 
-@_sap_ui_dt_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius); /* .375rem */
-@_sap_ui_dt_ContextMenu_OpenSubMenuBackgroundColor: var(--sapButton_Selected_Background); /* #5c93ff */
+.sapUiDtContextMenu {
+	--_sap_ui_dt_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius);
+	--_sap_ui_dt_ContextMenu_OpenSubMenuBackgroundColor: var(--sapButton_Selected_Background);
+}
 
 .sapUiDtContextMenu.sapMMenu {
 
@@ -24,14 +26,14 @@
 			}
 
 			&:focus {
-				border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
+				border-radius: var(--_sap_ui_dt_ContextMenu_BorderRadius);
 			}
 
 			&.sapMMenuItemSubMenuOpen {
-				border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
+				border-radius: var(--_sap_ui_dt_ContextMenu_BorderRadius);
 
 				&:not(:hover) {
-					background-color: @_sap_ui_dt_ContextMenu_OpenSubMenuBackgroundColor;
+					background-color: var(--_sap_ui_dt_ContextMenu_OpenSubMenuBackgroundColor);
 				}
 			}
 		}

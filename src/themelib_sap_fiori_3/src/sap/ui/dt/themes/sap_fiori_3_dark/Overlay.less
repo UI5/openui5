@@ -3,7 +3,9 @@
 /* Quartz Dark theme                  */
 /* ================================== */
 
-@_sap_ui_dt_Overlay_CuttedBackgroundColor: fade(@sapUiContentImagePlaceholderBackground, 50%); /* rgba(104, 125, 148, 0.5) */
+.sapUiDtOverlay {
+	--_sap_ui_dt_Overlay_CuttedBackgroundColor: ~'hsl(from var(--sapContent_ImagePlaceholderBackground) h s l / .5)';
+}
 
 .sapUiDtOverlayDropZone {
 
@@ -17,6 +19,7 @@
 			}
 
 			&.sapUiDtOverlayHover {
+
 				&::after {
 					content: none;
 				}
@@ -33,6 +36,6 @@
 
 	&::after {
 		transition: box-shadow .25s;
-		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
+		box-shadow: var(--_sap_ui_dt_Overlay_BoxShadow);
 	}
 }

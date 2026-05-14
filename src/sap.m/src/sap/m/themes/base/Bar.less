@@ -3,9 +3,11 @@
 /* Base theme                 */
 /* ========================== */
 
-@_sap_m_Bar_AppHeight: 3333px; /* Ux decision: never show the header, so make this value large enough even for zoom-out cases */
-@_sap_m_Bar_HeaderHeight: 68px; /* should be 4.25rem */
-@_sap_m_Bar_MinHeightForHeader: (@_sap_m_Bar_AppHeight + @_sap_m_Bar_HeaderHeight);
+.sapMBar {
+	--_sap_m_Bar_AppHeight: 3333px; /* Ux decision: never show the header, so make this value large enough even for zoom-out cases */
+	--_sap_m_Bar_HeaderHeight: 68px; /* should be 4.25rem */
+	--_sap_m_Bar_MinHeightForHeader: ~'calc(var(--_sap_m_Bar_AppHeight) + var(--_sap_m_Bar_HeaderHeight))';
+}
 
 .sapMBar {
 	display: block;
@@ -34,7 +36,7 @@
 }
 
 /* fix for ff */
-html[data-sap-ui-browser^="ff"].sap-desktop {
+html[data-sap-ui-browser^='ff'].sap-desktop {
 
 	.sapMBarContainer {
 		display: flex;
@@ -67,12 +69,12 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 }
 
 .sapMBarLeft {
-	left: 0px;
+	left: 0;
 }
 
 .sapMBarRight {
 	text-align: end;
-	right: 0px;
+	right: 0;
 }
 
 .sapMBarPH {
@@ -84,9 +86,9 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 .sapMBarMiddle {
 	text-align: center;
 	width: 100%;
-	height: 0px;
-	top: 0px;
-	left: 0px;
+	height: 0;
+	top: 0;
+	left: 0;
 }
 
 .sapMBar .sapMLabel,
@@ -108,13 +110,14 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 }
 
 /* this "sapMBrandingBar-CTX" CSS class can be set by any container control that comes with its own branding bar, so any pages inside will not display their branding bar */
-.sapMBrandingBar-CTX .sapMBar.sapMPageHeader:before,
+.sapMBrandingBar-CTX .sapMBar.sapMPageHeader::before,
 /* since Shell may run without sap.m and we can run without the shell this selector is currently in our lib */
 .sapUiUfdShell .sapMBar.sapMPageHeader::before {
 	display: none;
 }
 
-@media (min-height: @_sap_m_Bar_MinHeightForHeader) {
+@media (min-height: var(--_sap_m_Bar_MinHeightForHeader)) {
+
 	/* Shell draws its own branding bar */
 	.sap-desktop .sapMShell .sapMBar.sapMPageHeader::before {
 		display: none;
@@ -190,7 +193,7 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 	margin-left: 0;
 }
 
-/*To replace margins, add padding to the containers*/
+/* To replace margins, add padding to the containers */
 .sapMBarRight,
 .sapMBarLeft,
 .sapMBarPH {
@@ -225,6 +228,6 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 	justify-content: flex-start;
 }
 
-html[data-sap-ui-browser^="ff"].sap-desktop .sapMBarTitleAlignStart .sapMBarPH {
+html[data-sap-ui-browser^='ff'].sap-desktop .sapMBarTitleAlignStart .sapMBarPH {
 	justify-content: start;
 }

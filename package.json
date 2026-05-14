@@ -38,8 +38,8 @@
 	"devDependencies": {
 		"@stylistic/stylelint-plugin": "^5.1.0",
 		"@ui5/builder": "^4.1.6",
-		"@ui5/cli": "^4.0.52",
-		"@ui5/project": "^4.0.15",
+		"@ui5/cli": "^4.0.53",
+		"@ui5/project": "^4.0.16",
 		"@ui5/server": "^4.0.15",
 		"async": "^3.2.6",
 		"cheerio": "1.0.0",

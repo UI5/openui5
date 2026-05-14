@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/m/HBox",
 	"sap/ui/model/Filter",
 	"sap/ui/core/ListItem",
+	"sap/m/library",
 	"sap/m/ComboBox",
 	"sap/m/List",
 	"sap/m/CustomListItem",
@@ -29,16 +30,12 @@ sap.ui.define([
 	"sap/ui/core/InvisibleText",
 	"sap/ui/core/InvisibleMessage",
 	"sap/ui/Device",
-	"sap/ui/layout/VerticalLayout",
-	"sap/m/library"
-], (Library, JSONModel, QueryPanel, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, Filter, Item, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, Button, ToggleButton, InvisibleText, InvisibleMessage, Device, VerticalLayout, library) => {
+	"sap/ui/layout/VerticalLayout"
+], (Library, JSONModel, QueryPanel, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, Filter, Item, mLibrary, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, Button, ToggleButton, InvisibleText, InvisibleMessage, Device, VerticalLayout) => {
 	"use strict";
 
-	// shortcut for sap.m.ListKeyboardMode
-	const ListKeyboardMode = library.ListKeyboardMode;
-
-	const { ValueState } = coreLib;
 	const { InvisibleMessageMode } = coreLib;
+	const { ListKeyboardMode } = mLibrary;
 
 	// Constants
 	const RENDERING_DELAY_MS = 100; // Time needed for DOM updates and rendering
@@ -124,6 +121,33 @@ sap.ui.define([
 
 		this._getSearchField().setValue("");
 		this._filterByModeAndSearch();
+
+		// Clear ComboBox error state and value
+		this._clearComboBoxOnClose();
+	};
+
+	/**
+	 * Called before the panel is closed (e.g., dialog close).
+	 * Clears error messages and values from the ComboBox.
+	 * @returns {Promise} A promise that resolves when cleanup is complete
+	 * @private
+	 */
+	AdaptFiltersPanelContent.prototype.onBeforeClose = function() {
+		this._clearComboBoxOnClose();
+		return Promise.resolve();
+	};
+
+	/**
+	 * Clears the ComboBox error state and value when closing the dialog
+	 * @private
+	 */
+	AdaptFiltersPanelContent.prototype._clearComboBoxOnClose = function() {
+		if (this._oKeySelect && this._oKeySelect.getValueState() === coreLib.ValueState.Error) {
+			this._oKeySelect.setValueState(coreLib.ValueState.None);
+			this._oKeySelect.setValueStateText("");
+			this._oKeySelect.setValue("");
+			this._oKeySelect.clearSelection();
+		}
 	};
 
 	AdaptFiltersPanelContent.prototype.setP13nModel = function(oModel) {
@@ -353,14 +377,19 @@ sap.ui.define([
 			placeholder: this._getPlaceholderText(),
 			change: (oEvt) => {
 				const oComboBox = oEvt.getSource();
-				const newValue = oEvt.getParameter("newValue");
+				const sValue = oEvt.getParameter("newValue");
+				const bHasError = sValue && !oComboBox.getSelectedItem();
 
-				oComboBox.setValueState(newValue && !oComboBox.getSelectedItem() ? ValueState.Error : ValueState.None);
-
-				this._selectKey(oComboBox);
-
-				// Workaround: Clear selection after selection to allow re-selecting the same item
-				setTimeout(() => oComboBox.clearSelection(), RENDERING_DELAY_MS);
+				if (bHasError) {
+					oComboBox.setValueState(coreLib.ValueState.Error);
+					oComboBox.setValueStateText(this._getResourceText("adaptFiltersPanel.COMBOBOX_VALUE_NOT_EXIST", [sValue]));
+				} else {
+					oComboBox.setValueState(coreLib.ValueState.None);
+					oComboBox.setValueStateText("");
+					this._selectKey(oComboBox);
+					// Workaround: Clear selection after selection to allow re-selecting the same item
+					setTimeout(() => oComboBox.clearSelection(), RENDERING_DELAY_MS);
+				}
 			}
 		});
 
@@ -889,6 +918,11 @@ sap.ui.define([
 					item: oItem
 				});
 
+				setTimeout(() => {
+					const oErrorText = this._getFilterFieldFromItem(oContext).getValueStateText();
+					this.oInvisibleMessage.announce(oErrorText, InvisibleMessageMode.Assertive);
+				}, RENDERING_DELAY_MS);
+
 			}
 		});
 
@@ -1334,6 +1368,12 @@ sap.ui.define([
 
 	AdaptFiltersPanelContent.prototype.exit = function() {
 		QueryPanel.prototype.exit.apply(this, arguments);
+
+		// Clear error state before destroying
+		if (this._oKeySelect) {
+			this._oKeySelect.setValueState(coreLib.ValueState.None);
+			this._oKeySelect.setValueStateText("");
+		}
 
 		// Destroy all control instances
 		this._oViewModel?.destroy();

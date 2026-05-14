@@ -3,11 +3,13 @@
 /* Base theme                             */
 /* ====================================== */
 
-@_sap_ui_dt_ContextMenu_MnuItemTextColor: var(--sapTextColor); /* #000 */
-@_sap_ui_dt_ContextMenu_MnuItemIconColor: var(--sapContent_NonInteractiveIconColor); /* #111 */
-@_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor: var(--sapList_AlternatingBackground); /* darken(#111, 10); */
-@_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor: var(--sapShell_BorderColor); /* #111 */
-@_sap_ui_dt_ContextMenu_EnabledOpacity: 1;
+.sapUiDtContextMenu {
+	--_sap_ui_dt_ContextMenu_MnuItemTextColor: var(--sapTextColor);
+	--_sap_ui_dt_ContextMenu_MnuItemIconColor: var(--sapContent_NonInteractiveIconColor);
+	--_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor: var(--sapList_AlternatingBackground);
+	--_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor: var(--sapShell_BorderColor);
+	--_sap_ui_dt_ContextMenu_EnabledOpacity: 1;
+}
 
 .sapUiDtContextMenu.sapMMenu {
 
@@ -15,7 +17,7 @@
 
 		.sapMMenuItem {
 
-			.sapMMenuEndContent{
+			.sapMMenuEndContent {
 
 				.sapMBtn {
 
@@ -25,7 +27,7 @@
 					}
 
 					&.sapMBtnDisabled {
-						opacity: @_sap_ui_dt_ContextMenu_EnabledOpacity;
+						opacity: var(--_sap_ui_dt_ContextMenu_EnabledOpacity);
 					}
 
 					&:focus-visible > .sapMFocusable,
@@ -37,14 +39,14 @@
 					}
 
 					.sapUiIcon {
-						color: @_sap_ui_dt_ContextMenu_MnuItemIconColor !important;
+						color: var(--_sap_ui_dt_ContextMenu_MnuItemIconColor) !important;
 					}
 				}
 			}
 
 			/* style for control names */
 			&.sapUiDtContextMenuControlTitle {
-				opacity: @_sap_ui_dt_ContextMenu_EnabledOpacity;
+				opacity: var(--_sap_ui_dt_ContextMenu_EnabledOpacity);
 				height: 2rem;
 
 				.sapMMenuItemIcon {
@@ -53,18 +55,18 @@
 
 				.sapMMenuItemText {
 					font-weight: bold;
-					color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
+					color: var(--_sap_ui_dt_ContextMenu_MnuItemTextColor);
 				}
 			}
 
 			/* Style for title "Extended Actions" */
 			&.sapUiDtContextMenuExtendedActionsTitle {
-				opacity: @_sap_ui_dt_ContextMenu_EnabledOpacity;
+				opacity: var(--_sap_ui_dt_ContextMenu_EnabledOpacity);
 				height: 2.5rem;
 				text-align: center;
-				background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
-				border-top: 0.0625rem solid @_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor;
-				border-bottom: 0.0625rem solid @_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor;
+				background-color: var(--_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor);
+				border-top: 0.0625rem solid var(--_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor);
+				border-bottom: 0.0625rem solid var(--_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor);
 				border-radius: 0;
 
 				.sapMMenuItemIcon {
@@ -72,15 +74,15 @@
 				}
 
 				.sapMMenuItemText {
-					color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
+					color: var(--_sap_ui_dt_ContextMenu_MnuItemTextColor);
 				}
 			}
 
 			/* style for names of propagated controls */
 			&.sapUiDtContextMenuPropagatedControlTitle {
-				opacity: @_sap_ui_dt_ContextMenu_EnabledOpacity;
+				opacity: var(--_sap_ui_dt_ContextMenu_EnabledOpacity);
 				height: 2rem;
-				background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
+				background-color: var(--_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor);
 
 				.sapMMenuItemIcon {
 					display: none;
@@ -88,7 +90,7 @@
 
 				.sapMMenuItemText {
 					font-weight: bold;
-					color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
+					color: var(--_sap_ui_dt_ContextMenu_MnuItemTextColor);
 				}
 			}
 
@@ -96,7 +98,7 @@
 			&.sapUiDtContextMenuPropagatedItem {
 
 				&:not(:hover) {
-					background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
+					background-color: var(--_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor);
 				}
 
 				&.sapMMenuItemDisabled {
@@ -104,12 +106,12 @@
 					.sapMMenuItemIcon,
 					.sapMMenuItemText,
 					.sapMMenuEndContent {
-						color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
+						color: var(--_sap_ui_dt_ContextMenu_MnuItemTextColor);
 						opacity: var(--sapContent_DisabledOpacity);
 					}
 
 					&:hover {
-						background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
+						background-color: var(--_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor);
 					}
 				}
 			}

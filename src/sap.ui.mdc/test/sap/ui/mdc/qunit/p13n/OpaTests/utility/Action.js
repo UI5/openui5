@@ -940,6 +940,28 @@ sap.ui.define([
 				},
 				errorMessage: "No control found with id '" + sControlId + "'"
 			});
+		},
+		iEnterTextInComboBox: function(mSettings) {
+			return this.waitFor({
+				searchOpenDialogs: true,
+				controlType: "sap.m.ComboBox",
+				matchers: function(oControl) {
+					if (mSettings.id instanceof RegExp) {
+						return mSettings.id.test(oControl.getId());
+					}
+					return oControl.getId() === mSettings.id;
+				},
+				actions: new EnterText({
+					text: mSettings.value,
+					pressEnterKey: true,
+					keepFocus: false,
+					clearTextFirst: true
+				}),
+				success: function(aControls) {
+					Opa5.assert.ok(aControls.length > 0, "Text entered in control with id matching '" + mSettings.id + "'");
+				},
+				errorMessage: "Could not find control with id matching '" + mSettings.id + "'"
+			});
 		}
 	});
 

@@ -1959,4 +1959,191 @@ sap.ui.define([
 		assert.equal(sCleanedStar, "key_ANY_filter", "* character is replaced with _ANY_");
 		assert.equal(sCleanedBoth, "key_ALL_and_ANY_filter", "Both + and * are replaced with _ALL_ and _ANY_");
 	});
+
+	// ===========================================================================================
+	// Module 11: ComboBox Validation and Messaging
+	// ===========================================================================================
+	QUnit.module("ComboBox Validation and Messaging", {
+		beforeEach: async function() {
+			this.oAFPanel = new AdaptFiltersPanel();
+
+			// Setup item factory like in other tests
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
+
+			// Create enhancer function
+			this.fnEnhancer = function(mItem, oProperty) {
+				mItem.visibleInDialog = true;
+				mItem.visible = oProperty.key === "key1";
+				return true;
+			};
+
+			const oP13nData = P13nBuilder.prepareAdaptationData(aInfoData, this.fnEnhancer, true);
+
+			this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oViewContent = this.oAFPanel.getCurrentViewContent();
+			this.oComboBox = this.oViewContent._oKeySelect;
+		},
+		afterEach: function() {
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("ComboBox should show error when invalid value is entered", async function(assert) {
+		const sInvalidValue = "NonExistentFilter";
+
+		// Simulate user typing invalid value
+		this.oComboBox.setValue(sInvalidValue);
+		this.oComboBox.fireChange({
+			value: sInvalidValue,
+			newValue: sInvalidValue
+		});
+		await nextUIUpdate();
+
+		// Check ValueState
+		assert.equal(this.oComboBox.getValueState(), "Error", "ComboBox should have Error state");
+		assert.ok(this.oComboBox.getValueStateText().length > 0, "ComboBox should have error message text");
+	});
+
+	QUnit.test("ComboBox error should be cleared when value is cleared", async function(assert) {
+		const sInvalidValue = "NonExistentFilter";
+
+		// Set error state first
+		this.oComboBox.setValue(sInvalidValue);
+		this.oComboBox.fireChange({
+			value: sInvalidValue,
+			newValue: sInvalidValue
+		});
+		await nextUIUpdate();
+
+		assert.equal(this.oComboBox.getValueState(), "Error", "ComboBox should have Error state");
+
+		// Clear the value to remove the error
+		this.oComboBox.setValue("");
+		this.oComboBox.fireChange({
+			value: "",
+			newValue: ""
+		});
+		await nextUIUpdate();
+
+		// Check that error is cleared
+		assert.equal(this.oComboBox.getValueState(), "None", "ComboBox Error state should be cleared");
+		assert.equal(this.oComboBox.getValueStateText(), "", "Error message should be cleared");
+	});
+
+	QUnit.test("ComboBox error should be cleared on dialog close", async function(assert) {
+		const sInvalidValue = "NonExistentFilter";
+
+		// Set error state
+		this.oComboBox.setValue(sInvalidValue);
+		this.oComboBox.fireChange({
+			value: sInvalidValue,
+			newValue: sInvalidValue
+		});
+		await nextUIUpdate();
+
+		assert.equal(this.oComboBox.getValueState(), "Error", "ComboBox should have Error state");
+		assert.ok(this.oComboBox.getValue().length > 0, "ComboBox should have a value");
+
+		// Call onBeforeClose
+		await this.oViewContent.onBeforeClose();
+		await nextUIUpdate();
+
+		// Check that error and value are cleared
+		assert.equal(this.oComboBox.getValueState(), "None", "ComboBox Error state should be cleared");
+		assert.equal(this.oComboBox.getValue(), "", "ComboBox value should be cleared");
+	});
+
+	QUnit.test("ComboBox error should be cleared on restoreDefaults", async function(assert) {
+		const sInvalidValue = "NonExistentFilter";
+
+		// Set error state
+		this.oComboBox.setValue(sInvalidValue);
+		this.oComboBox.fireChange({
+			value: sInvalidValue,
+			newValue: sInvalidValue
+		});
+		await nextUIUpdate();
+
+		assert.equal(this.oComboBox.getValueState(), "Error", "ComboBox should have Error state");
+
+		// Call restoreDefaults
+		this.oViewContent.restoreDefaults();
+		await nextUIUpdate();
+
+		// Check that error and value are cleared
+		assert.equal(this.oComboBox.getValueState(), "None", "ComboBox Error state should be cleared");
+		assert.equal(this.oComboBox.getValue(), "", "ComboBox value should be cleared");
+	});
+
+	QUnit.test("ValueState error should be set and cleared correctly", async function(assert) {
+		const sInvalidValue = "NonExistentFilter";
+
+		// Set error state
+		this.oComboBox.setValue(sInvalidValue);
+		this.oComboBox.fireChange({
+			value: sInvalidValue,
+			newValue: sInvalidValue
+		});
+		await nextUIUpdate();
+
+		// Check that ValueState error was set
+		assert.equal(this.oComboBox.getValueState(), "Error", "ComboBox should have Error ValueState");
+		assert.ok(this.oComboBox.getValueStateText().length > 0, "ComboBox should have error message text");
+
+		// Clear the error by entering valid value (empty)
+		this.oComboBox.setValue("");
+		this.oComboBox.fireChange({
+			value: "",
+			newValue: ""
+		});
+		await nextUIUpdate();
+
+		// Check that error is cleared
+		assert.equal(this.oComboBox.getValueState(), "None", "ComboBox Error state should be cleared");
+		assert.equal(this.oComboBox.getValueStateText(), "", "Error message should be cleared");
+	});
+
+	QUnit.test("ComboBox without error should not be cleared on dialog close", async function(assert) {
+		// No error state, just a value
+		this.oComboBox.setValue("");
+
+		// Call onBeforeClose
+		await this.oViewContent.onBeforeClose();
+		await nextUIUpdate();
+
+		// Check that nothing changed
+		assert.equal(this.oComboBox.getValueState(), "None", "ComboBox should still have None state");
+		assert.equal(this.oComboBox.getValue(), "", "ComboBox value should remain empty");
+	});
 });

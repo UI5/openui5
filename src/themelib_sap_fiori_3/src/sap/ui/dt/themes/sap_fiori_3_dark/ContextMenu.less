@@ -3,53 +3,56 @@
 /* Quartz Dark theme                      */
 /* ====================================== */
 
-@_sap_ui_dt_ContextMenu_MnuItemTextColor: var(--sapList_SelectionBorderColor); /* #91c8f6 */
-@_sap_ui_dt_ContextMenu_MnuItemBackgroundColor: var(--sapList_Background); /* #29313a */
-@_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor: var(--sapList_SelectionBackgroundColor); /* #334b5f */
-@_sap_ui_dt_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.25rem */
-@_sap_ui_dt_ContextMenu_FocusColor: var(--sapList_SelectionBorderColor); /* #91c8f6 */
-@_sap_ui_dt_ContextMenu_MnuItemIconColor: var(--sapList_SelectionBorderColor); /* #91c8f6 */
+.sapUiDtContextMenu {
+	--_sap_ui_dt_ContextMenu_MnuItemTextColor: var(--sapList_SelectionBorderColor);
+	--_sap_ui_dt_ContextMenu_MnuItemBackgroundColor: var(--sapList_Background);
+	--_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor: var(--sapList_SelectionBackgroundColor);
+	--_sap_ui_dt_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius);
+	--_sap_ui_dt_ContextMenu_FocusColor: var(--sapList_SelectionBorderColor);
+	--_sap_ui_dt_ContextMenu_MnuItemIconColor: var(--sapList_SelectionBorderColor);
+}
 
 .sapUiDtContextMenu.sapMMenu {
 
 	.sapMMenuList {
 
 		.sapMMenuItem {
-			color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
+			color: var(--_sap_ui_dt_ContextMenu_MnuItemTextColor);
 
 			.sapMMenuItemIcon {
-				color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
+				color: var(--_sap_ui_dt_ContextMenu_MnuItemTextColor);
 			}
 
 			.sapMMenuItemSubMenu > div::after,
 			.sapMMenuItem:hover .sapMMenuItemSubMenu > div::after {
-				color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
+				color: var(--_sap_ui_dt_ContextMenu_MnuItemTextColor);
 			}
 
 			&:hover {
-				color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
-				background-color: @_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor;
+				color: var(--_sap_ui_dt_ContextMenu_MnuItemTextColor);
+				background-color: var(--_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor);
 
 				.sapMMenuItemIcon {
-					color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
-					background-color: @_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor;
+					color: var(--_sap_ui_dt_ContextMenu_MnuItemTextColor);
+					background-color: var(--_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor);
 				}
 
 				&.sapMMenuItemDisabled {
-					background-color: @_sap_ui_dt_ContextMenu_MnuItemBackgroundColor;
+					background-color: var(--_sap_ui_dt_ContextMenu_MnuItemBackgroundColor);
 
 					.sapMMenuItemIcon {
-						background-color: @_sap_ui_dt_ContextMenu_MnuItemBackgroundColor;
+						background-color: var(--_sap_ui_dt_ContextMenu_MnuItemBackgroundColor);
 					}
 				}
 			}
 
 			&:focus:not(.sapMMenuItemDisabled) {
-				outline: 0.0625rem dotted @_sap_ui_dt_ContextMenu_FocusColor;
-				border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
+				outline: 0.0625rem dotted var(--_sap_ui_dt_ContextMenu_FocusColor);
+				border-radius: var(--_sap_ui_dt_ContextMenu_BorderRadius);
 			}
 
 			&.sapMMenuItemDisabled {
+
 				&:focus {
 					outline: none;
 				}
@@ -58,14 +61,14 @@
 			&.sapUiDtContextMenuExtendedActionsTitle {
 
 				&:hover {
-					background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor!important;
+					background-color: var(--_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor) !important;
 				}
 			}
 
 			&.sapUiDtContextMenuPropagatedControlTitle {
 
 				&:hover {
-					background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor!important;
+					background-color: var(--_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor) !important;
 				}
 			}
 		}

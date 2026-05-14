@@ -3,19 +3,21 @@
 /* Evening Horizon theme              */
 /* ================================== */
 
-@_sap_ui_dt_Overlay_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.5rem */
-@_sap_ui_dt_Overlay_BoxShadow: var(--sapContent_Shadow2);
-@_sap_ui_dt_Overlay_DropZoneBackgroundColor: fade(@sapUiContentImagePlaceholderForegroundColor, 10%); /* rgba(213, 218, 221, 0.1) */
-@_sap_ui_dt_Overlay_HoverBackgroundColor: fade(@sapUiSelected, 20%); /* rgba(77, 177, 255, 0.2) */
-@_sap_ui_dt_Overlay_CuttedBackgroundColor: darken(@sapUiContentImagePlaceholderBackground, 10%); /* #33475b */
+.sapUiDtOverlay {
+	--_sap_ui_dt_Overlay_BorderRadius: var(--sapButton_BorderCornerRadius);
+	--_sap_ui_dt_Overlay_BoxShadow: var(--sapContent_Shadow2);
+	--_sap_ui_dt_Overlay_DropZoneBackgroundColor: ~'hsl(from var(--sapContent_ImagePlaceholderForegroundColor) h s l / .1)';
+	--_sap_ui_dt_Overlay_HoverBackgroundColor: ~'hsl(from var(--sapSelectedColor) h s l / .2)';
+	--_sap_ui_dt_Overlay_CuttedBackgroundColor: ~'hsl(from var(--sapContent_ImagePlaceholderBackground) h s calc(l - 10))';
+}
 
 .sapUiDtOverlayFocusable {
 
 	&:focus {
 
 		&::before {
-			border-radius: @_sap_ui_dt_Overlay_BorderRadius;
-			outline: 0.0625rem dotted @_sap_ui_dt_Overlay_FocusBorderColor;
+			border-radius: var(--_sap_ui_dt_Overlay_BorderRadius);
+			outline: 0.0625rem dotted var(--_sap_ui_dt_Overlay_FocusBorderColor);
 			border: none;
 			outline-offset: -0.125rem;
 		}
@@ -26,25 +28,25 @@
 	box-shadow: none !important;
 
 	&::after {
-		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
+		border-radius: var(--_sap_ui_dt_Overlay_BorderRadius);
 		transition: box-shadow 0.25s;
-		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
+		box-shadow: var(--_sap_ui_dt_Overlay_BoxShadow);
 	}
 }
 
 .sapUiDtOverlayTargetZone {
 
 	&::after {
-		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
+		border-radius: var(--_sap_ui_dt_Overlay_BorderRadius);
 		transition: box-shadow .25s;
-		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
+		box-shadow: var(--_sap_ui_dt_Overlay_BoxShadow);
 	}
 }
 
 .sapUiDtOverlayCutted {
 
 	&::after {
-		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
+		border-radius: var(--_sap_ui_dt_Overlay_BorderRadius);
 	}
 }
 
@@ -52,14 +54,14 @@
 
 	&::after {
 		box-shadow: none;
-		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
+		border-radius: var(--_sap_ui_dt_Overlay_BorderRadius);
 	}
 }
 
 .sapUiDtOverlayHover {
 
 	&::after {
-		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
+		border-radius: var(--_sap_ui_dt_Overlay_BorderRadius);
 		border: none;
 	}
 }

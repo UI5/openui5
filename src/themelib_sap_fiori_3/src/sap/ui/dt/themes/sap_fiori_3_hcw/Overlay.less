@@ -3,21 +3,23 @@
 /* Quartz High Contrast White theme   */
 /* ================================== */
 
-@_sap_ui_dt_Overlay_CuttedBackgroundColor: var(--sapField_PlaceholderTextColor); /* #585858 */
-@_sap_ui_dt_Overlay_HighlightOutlineColor: var(--sapWarningBorderColor); /* #5c5c00 */
-@_sap_ui_dt_Overlay_SelectionOutlineColor: darken(@sapUiSelected, 40%); /* #0042c2 */
-@_sap_ui_dt_Overlay_HoverBorder: fade(@sapUiSelected, 15%);
-@_sap_ui_dt_Overlay_BoxShadowColor: fade(@sapUiContentContrastShadowColor, 60%);
+.sapUiDtOverlay {
+	--_sap_ui_dt_Overlay_CuttedBackgroundColor: var(--sapField_PlaceholderTextColor);
+	--_sap_ui_dt_Overlay_HighlightOutlineColor: var(--sapWarningBorderColor);
+	--_sap_ui_dt_Overlay_SelectionOutlineColor: ~'hsl(from var(--sapSelectedColor) h s calc(l - 40))';
+	--_sap_ui_dt_Overlay_HoverBorder: ~'hsl(from var(--sapSelectedColor) h s l / .15)';
+	--_sap_ui_dt_Overlay_BoxShadowColor: ~'hsl(from var(--sapContent_ContrastShadowColor) h s l / .6)';
+}
 
 .sapUiDtOverlayHighlighted:not(.sapUiDtOverlaySelected)::after {
-    box-shadow: none;
+	box-shadow: none;
 }
 
 .sapUiDtOverlayHover {
 
 	&::after {
-		box-shadow: 0 0 1rem 0 @_sap_ui_dt_Overlay_BoxShadowColor, 0 0 0 0.125rem @_sap_ui_dt_Overlay_HoverBorder;
-		outline: 0.125rem dotted @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 2px */
+		box-shadow: 0 0 1rem 0 var(--_sap_ui_dt_Overlay_BoxShadowColor), 0 0 0 0.125rem var(--_sap_ui_dt_Overlay_HoverBorder);
+		outline: 0.125rem dotted var(--_sap_ui_dt_Overlay_SelectionOutlineColor); /* 2px */
 		outline-offset: -0.125rem; /* 2px */
 	}
 }
@@ -28,7 +30,7 @@
 	&.sapUiDtOverlayHover {
 
 		&::after {
-			border: 0.125rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 2px */
+			border: 0.125rem solid var(--_sap_ui_dt_Overlay_SelectionOutlineColor); /* 2px */
 			outline-offset: -0.25rem; /* 4px */
 			transition: none;
 		}
@@ -41,7 +43,7 @@
 
 		&::before {
 			border: none;
-			outline: 0.125rem dotted @_sap_ui_dt_Overlay_FocusBorderColor; /* 2px */
+			outline: 0.125rem dotted var(--_sap_ui_dt_Overlay_FocusBorderColor); /* 2px */
 			outline-offset: -0.25rem; /* 4px */
 		}
 	}

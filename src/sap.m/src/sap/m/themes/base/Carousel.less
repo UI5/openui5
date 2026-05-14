@@ -3,37 +3,39 @@
 /* Base theme                      */
 /* =============================== */
 
-@_sap_m_Carousel_BackgroundColorSolid: var(--sapGroup_ContentBackground);
-@_sap_m_Carousel_BackgroundColorTransparent: transparent;
-@_sap_m_Carousel_BackgroundColorTranslucent: var(--sapGroup_ContentBackground);
-@_sap_m_Carousel_MinWidth: 11.25rem;
-@_sap_m_Carousel_PageIndicatorBarHeight: 3.5rem;
-@_sap_m_Carousel_BottomArrowsOffset: calc(~'3.5rem + 1px');
-@_sap_m_Carousel_ControlsNoArrowsHeight: 2rem;
-@_sap_m_Carousel_NumericIndicatorTextColor: var(--sapContent_LabelColor);
-@_sap_m_Carousel_PrevAndNextSize: 2rem;
-@_sap_m_Carousel_PrevAndNextPosition: 0.625rem;
-@_sap_m_Carousel_PrevAndNextFocusBorderRadius: unset;
-@_sap_m_Carousel_PageIndicatorContainerPadding: 1rem;
-@_sap_m_Carousel_PageIndicatorWidthSizeS: 12rem;
-@_sap_m_Carousel_PageIndicatorWidthSizeM: 16rem;
-@_sap_m_Carousel_PageIndicatorWidthSizeL: 20rem;
-@_sap_m_Carousel_PageIndicatorWidthSizeXL: 24rem;
-@_sap_m_Carousel_BulletInactiveBackground: var(--sapContent_NonInteractiveIconColor);
-@_sap_m_Carousel_BulletInactiveBorderColor: var(--sapContent_NonInteractiveIconColor);
-@_sap_m_Carousel_BulletActiveBackground: var(--sapSelectedColor);
-@_sap_m_Carousel_BulletActiveBorder: @_sap_m_Carousel_BulletActiveBackground;
-@_sap_m_Carousel_BulletInactiveWidth: 0.25rem;
-@_sap_m_Carousel_BulletInactiveMargin: 0 0.375rem;
-@_sap_m_Carousel_FocusBorderOffsetArrow: -0.125rem;
-@_sap_m_Carousel_ContrastFocusBorder: var(--sapContent_FocusWidth) solid var(--sapContent_ContrastFocusColor);
-@_sap_m_Carousel_FocusBorder: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+.sapMCrsl {
+	--_sap_m_Carousel_BackgroundColorSolid: var(--sapGroup_ContentBackground);
+	--_sap_m_Carousel_BackgroundColorTransparent: transparent;
+	--_sap_m_Carousel_BackgroundColorTranslucent: var(--sapGroup_ContentBackground);
+	--_sap_m_Carousel_MinWidth: 11.25rem;
+	--_sap_m_Carousel_PageIndicatorBarHeight: 3.5rem;
+	--_sap_m_Carousel_BottomArrowsOffset: ~'calc(3.5rem + 1px)';
+	--_sap_m_Carousel_ControlsNoArrowsHeight: 2rem;
+	--_sap_m_Carousel_NumericIndicatorTextColor: var(--sapContent_LabelColor);
+	--_sap_m_Carousel_PrevAndNextSize: 2rem;
+	--_sap_m_Carousel_PrevAndNextPosition: 0.625rem;
+	--_sap_m_Carousel_PrevAndNextFocusBorderRadius: unset;
+	--_sap_m_Carousel_PageIndicatorContainerPadding: 1rem;
+	--_sap_m_Carousel_PageIndicatorWidthSizeS: 12rem;
+	--_sap_m_Carousel_PageIndicatorWidthSizeM: 16rem;
+	--_sap_m_Carousel_PageIndicatorWidthSizeL: 20rem;
+	--_sap_m_Carousel_PageIndicatorWidthSizeXL: 24rem;
+	--_sap_m_Carousel_BulletInactiveBackground: var(--sapContent_NonInteractiveIconColor);
+	--_sap_m_Carousel_BulletInactiveBorderColor: var(--sapContent_NonInteractiveIconColor);
+	--_sap_m_Carousel_BulletActiveBackground: var(--sapSelectedColor);
+	--_sap_m_Carousel_BulletActiveBorder: var(--_sap_m_Carousel_BulletActiveBackground);
+	--_sap_m_Carousel_BulletInactiveWidth: 0.25rem;
+	--_sap_m_Carousel_BulletInactiveMargin: 0 0.375rem;
+	--_sap_m_Carousel_FocusBorderOffsetArrow: -0.125rem;
+	--_sap_m_Carousel_ContrastFocusBorder: var(--sapContent_FocusWidth) solid var(--sapContent_ContrastFocusColor);
+	--_sap_m_Carousel_FocusBorder: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+}
 
 .sapMCrsl {
 	position: relative;
 	overflow: hidden;
 	box-sizing: border-box;
-	min-width: @_sap_m_Carousel_MinWidth;
+	min-width: var(--_sap_m_Carousel_MinWidth);
 }
 
 .sapMCrslList{
@@ -42,15 +44,15 @@
 }
 
 .sapMCrslBackground-Solid {
-	background-color: @_sap_m_Carousel_BackgroundColorSolid;
+	background-color: var(--_sap_m_Carousel_BackgroundColorSolid);
 }
 
 .sapMCrslBackground-Transparent {
-	background-color: @_sap_m_Carousel_BackgroundColorTransparent;
+	background-color: var(--_sap_m_Carousel_BackgroundColorTransparent);
 }
 
 .sapMCrslBackground-Translucent {
-	background-color: @_sap_m_Carousel_BackgroundColorTranslucent;
+	background-color: var(--_sap_m_Carousel_BackgroundColorTranslucent);
 }
 
 .sapMCrslItem:focus {
@@ -74,11 +76,11 @@
 	}
 
 	&::before {
-		border: @_sap_m_Carousel_ContrastFocusBorder;
+		border: var(--_sap_m_Carousel_ContrastFocusBorder);
 	}
 
 	&::after {
-		border: @_sap_m_Carousel_FocusBorder;
+		border: var(--_sap_m_Carousel_FocusBorder);
 	}
 }
 
@@ -197,7 +199,7 @@ Carousel control base styling
 */
 .sapMCrslControls {
 	text-align: center;
-	height: @_sap_m_Carousel_PageIndicatorBarHeight;
+	height: var(--_sap_m_Carousel_PageIndicatorBarHeight);
 	display: flex;
 	justify-content: center;
 	width: 100%;
@@ -205,7 +207,7 @@ Carousel control base styling
 
 .sapMCrslControlsNoArrows {
 	text-align: center;
-	height: @_sap_m_Carousel_ControlsNoArrowsHeight;
+	height: var(--_sap_m_Carousel_ControlsNoArrowsHeight);
 	display: flex;
 	justify-content: center;
 	width: 100%;
@@ -233,8 +235,8 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 
 .sapMCrslPrev,
 .sapMCrslNext {
-	width: @_sap_m_Carousel_PrevAndNextSize;
-	height: @_sap_m_Carousel_PrevAndNextSize;
+	width: var(--_sap_m_Carousel_PrevAndNextSize);
+	height: var(--_sap_m_Carousel_PrevAndNextSize);
 	padding: 0;
 	text-decoration: none;
 	border-radius: 50%;
@@ -245,7 +247,6 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 	color: var(--sapButton_IconColor);
 	cursor: pointer;
 	-webkit-user-select: none;
-	-moz-user-select: -moz-none;
 	user-select: none;
 	user-drag: none;
 
@@ -264,7 +265,7 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 }
 
 .sapMCrslHudMiddle .sapMCrslArrow {
-	top: calc(~'50% - 1rem');
+	top: ~'calc(50% - 1rem)';
 }
 
 .sapMCrslHudTop,
@@ -279,7 +280,7 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 .sapMCrslHudOverContentBottom {
 
 	.sapMCrslArrow {
-		top: calc(~'50% - 2rem');
+		top: ~'calc(50% - 2rem)';
 	}
 }
 
@@ -289,40 +290,40 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 	text-decoration: none;
 	overflow: hidden;
 	display: inline-block;
-	width: @_sap_m_Carousel_BulletInactiveWidth;
-	height: @_sap_m_Carousel_BulletInactiveWidth;
-	margin: @_sap_m_Carousel_BulletInactiveMargin;
+	width: var(--_sap_m_Carousel_BulletInactiveWidth);
+	height: var(--_sap_m_Carousel_BulletInactiveWidth);
+	margin: var(--_sap_m_Carousel_BulletInactiveMargin);
 	transition: background-color 0.1s ease-in;
 	border-radius: 50%;
 	align-self: center;
 	box-sizing: border-box;
-	background-color: @_sap_m_Carousel_BulletInactiveBackground;
-	border: 1px solid @_sap_m_Carousel_BulletInactiveBorderColor;
+	background-color: var(--_sap_m_Carousel_BulletInactiveBackground);
+	border: 1px solid var(--_sap_m_Carousel_BulletInactiveBorderColor);
 }
 
 /* Page indicator at the top */
 .sapMCrslTopOffset {
 
 	.sapMCrslItem {
-		padding-top: calc(@_sap_m_Carousel_ControlsNoArrowsHeight ~'+' 1px);
+		padding-top: ~'calc(var(--_sap_m_Carousel_ControlsNoArrowsHeight) + 1px)';
 
 		&:focus {
 
 			&::before,
 			&::after {
-				top: calc(@_sap_m_Carousel_ControlsNoArrowsHeight ~'+' 1px);
+				top:  ~'calc(var(--_sap_m_Carousel_ControlsNoArrowsHeight) + 1px)';
 			}
 		}
 	}
 
 	&.sapMCrslTopArrowsOffset .sapMCrslItem {
-		padding-top: @_sap_m_Carousel_BottomArrowsOffset;
+		padding-top: var(--_sap_m_Carousel_BottomArrowsOffset);
 
 		&:focus {
 
 			&::before,
 			&::after {
-				top: @_sap_m_Carousel_BottomArrowsOffset;
+				top: var(--_sap_m_Carousel_BottomArrowsOffset);
 			}
 		}
 	}
@@ -332,25 +333,25 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 .sapMCrslBottomOffset {
 
 	.sapMCrslItem {
-		padding-bottom: calc(@_sap_m_Carousel_ControlsNoArrowsHeight ~'+' 1px);
+		padding-bottom: ~'calc(var(--_sap_m_Carousel_ControlsNoArrowsHeight) + 1px)';
 
 		&:focus {
 
 			&::before,
 			&::after {
-				bottom: calc(@_sap_m_Carousel_ControlsNoArrowsHeight ~'+' 1px);
+				bottom: ~'calc(var(--_sap_m_Carousel_ControlsNoArrowsHeight) + 1px)';
 			}
 		}
 	}
 
 	&.sapMCrslBottomArrowsOffset .sapMCrslItem {
-		padding-bottom: @_sap_m_Carousel_BottomArrowsOffset;
+		padding-bottom: var(--_sap_m_Carousel_BottomArrowsOffset);
 
 		&:focus {
 
 			&::before,
 			&::after {
-				bottom: @_sap_m_Carousel_BottomArrowsOffset;
+				bottom: var(--_sap_m_Carousel_BottomArrowsOffset);
 			}
 		}
 	}
@@ -472,11 +473,11 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 
 .sapMCrslBulleted,
 .sapMCrslNumeric {
-	padding-left: @_sap_m_Carousel_PageIndicatorContainerPadding;
-	padding-right: @_sap_m_Carousel_PageIndicatorContainerPadding;
+	padding-left: var(--_sap_m_Carousel_PageIndicatorContainerPadding);
+	padding-right: var(--_sap_m_Carousel_PageIndicatorContainerPadding);
 	height: 2rem;
 	bottom: 1.0625rem;
-	max-width: calc(~'100% - 6.5rem');
+	max-width: ~'calc(100% - 6.5rem)';
 	display: flex;
 	justify-content: center;
 	align-self: center;
@@ -519,7 +520,7 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 
 	 .sapMCrslBulleted,
 	 .sapMCrslNumeric {
-		width: @_sap_m_Carousel_PageIndicatorWidthSizeS;
+		width: var(--_sap_m_Carousel_PageIndicatorWidthSizeS);
 	 }
 }
 
@@ -528,7 +529,7 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 
 	 .sapMCrslBulleted,
 	 .sapMCrslNumeric {
-		width: @_sap_m_Carousel_PageIndicatorWidthSizeM;
+		width: var(--_sap_m_Carousel_PageIndicatorWidthSizeM);
 	 }
 }
 
@@ -537,7 +538,7 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 
 	 .sapMCrslBulleted,
 	 .sapMCrslNumeric {
-		width: @_sap_m_Carousel_PageIndicatorWidthSizeL;
+		width: var(--_sap_m_Carousel_PageIndicatorWidthSizeL);
 	 }
 }
 
@@ -546,7 +547,7 @@ html.sap-desktop .sapMCrslHud .sapMCrslArrow {
 
 	 .sapMCrslBulleted,
 	 .sapMCrslNumeric {
-		width: @_sap_m_Carousel_PageIndicatorWidthSizeXL;
+		width: var(--_sap_m_Carousel_PageIndicatorWidthSizeXL);
 	 }
 }
 
@@ -578,9 +579,9 @@ html[data-sap-ui-animation='off'] .sapMCrslItem {
    ====================================================================== */
 .sapMCrslNumeric span {
 	font-family: var(--sapFontFamily);
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 	font-weight: normal;
-	color: @_sap_m_Carousel_NumericIndicatorTextColor;
+	color: var(--_sap_m_Carousel_NumericIndicatorTextColor);
 	white-space: nowrap;
 	overflow: hidden;
 	text-align: left;
@@ -596,8 +597,8 @@ html[data-sap-ui-animation='off'] .sapMCrslItem {
 }
 
 .sapMCrslBulleted > span.sapMCrslActive {
-	background-color: @_sap_m_Carousel_BulletActiveBackground;
-	border: 1px solid @_sap_m_Carousel_BulletActiveBorder;
+	background-color: var(--_sap_m_Carousel_BulletActiveBackground);
+	border: 1px solid var(--_sap_m_Carousel_BulletActiveBorder);
 	width: 0.5rem;
 	height: 0.5rem;
 	margin: 0 0.25rem;
@@ -626,11 +627,11 @@ html[data-sap-ui-animation='off'] .sapMCrslItem {
 }
 
 .sapMCrslHud .sapMCrslPrev {
-	left: @_sap_m_Carousel_PrevAndNextPosition;
+	left: var(--_sap_m_Carousel_PrevAndNextPosition);
 }
 
 .sapMCrslHud .sapMCrslNext {
-	right: @_sap_m_Carousel_PrevAndNextPosition;
+	right: var(--_sap_m_Carousel_PrevAndNextPosition);
 }
 
 /* extra bits */
@@ -639,11 +640,11 @@ html[data-sap-ui-animation='off'] .sapMCrslItem {
 }
 
 .sapMCrslControlsBackground-Translucent {
-	background: @_sap_m_Carousel_BackgroundColorTranslucent;
+	background: var(--_sap_m_Carousel_BackgroundColorTranslucent);
 }
 
 .sapMCrslControlsBackground-Transparent {
-	background: @_sap_m_Carousel_BackgroundColorTransparent;
+	background: var(--_sap_m_Carousel_BackgroundColorTransparent);
 }
 
 .sapMCrslControlsBorder-Solid.sapMCrslControlsTop {
@@ -682,20 +683,20 @@ html.sap-desktop {
 			&::after {
 				content: '';
 				position: absolute;
-				top: @_sap_m_Carousel_FocusBorderOffsetArrow;
-				right: @_sap_m_Carousel_FocusBorderOffsetArrow;
-				bottom: @_sap_m_Carousel_FocusBorderOffsetArrow;
-				left: @_sap_m_Carousel_FocusBorderOffsetArrow;
+				top: var(--_sap_m_Carousel_FocusBorderOffsetArrow);
+				right: var(--_sap_m_Carousel_FocusBorderOffsetArrow);
+				bottom: var(--_sap_m_Carousel_FocusBorderOffsetArrow);
+				left: var(--_sap_m_Carousel_FocusBorderOffsetArrow);
 				pointer-events: none;
-				border-radius: @_sap_m_Carousel_PrevAndNextFocusBorderRadius;
+				border-radius: var(--_sap_m_Carousel_PrevAndNextFocusBorderRadius);
 			}
 
 			&::before {
-				border: @_sap_m_Carousel_ContrastFocusBorder;
+				border: var(--_sap_m_Carousel_ContrastFocusBorder);
 			}
 
 			&::after {
-				border: @_sap_m_Carousel_FocusBorder;
+				border: var(--_sap_m_Carousel_FocusBorder);
 			}
 		}
 	}
