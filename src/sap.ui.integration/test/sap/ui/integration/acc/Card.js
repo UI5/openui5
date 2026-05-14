@@ -1,11 +1,11 @@
 sap.ui.define([
 	"sap/ui/integration/widgets/Card",
-	"sap/m/List",
-	"sap/m/CustomListItem",
+	"sap/m/VBox",
+	"sap/ui/core/HTML",
 	"sap/m/Page",
 	"sap/m/App",
 	"sap/ui/integration/ActionDefinition"
-], function(Card, List, CustomListItem, Page, App, ActionDefinition) {
+], function(Card, VBox, HTML, Page, App, ActionDefinition) {
 	"use strict";
 
 	var oListCardInteractive_Manifest = {
@@ -650,7 +650,8 @@ sap.ui.define([
 				}
 			}
 		},
-		width: "300px"
+		width: "300px",
+		semanticRole: "ListItem"
 	});
 
 	var oSecondListCard = new Card({
@@ -678,21 +679,19 @@ sap.ui.define([
 				}
 			}
 		},
-		width: "300px"
+		width: "300px",
+		semanticRole: "ListItem"
 	});
 
-	var oList = new List({
-		width: "300px",
-		items: [
-			new CustomListItem({
-				content: [oFirstListCard],
-				role: "listitem"
-			}),
-			new CustomListItem({
-				content: [oSecondListCard],
-				role: "listitem"
-			})
-		]
+	const oCardContainer = new HTML("cardList", {
+		content: '<ul role="list" class="sapUiSmallMargin" id="cardList" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;"></ul>',
+		afterRendering: function() {
+			var oList = document.getElementById("cardList");
+			if (oList) {
+				oFirstListCard.placeAt(oList);
+				oSecondListCard.placeAt(oList);
+			}
+		}
 	});
 
 	var oListCardInteractive = new Card({
@@ -766,7 +765,7 @@ sap.ui.define([
 			oNumericHeaderListCardWithIndicators,
 			oNumericHeaderCardWithInfoSection,
 			oCardWithCustomButton,
-			oList
+			oCardContainer
 		]
 	}),
 		oApp = new App("myApp", {

@@ -3,7 +3,9 @@
 /* Quartz Light theme                 */
 /* ================================== */
 
-@_sap_ui_dt_Overlay_DropZoneBackgroundColor: fade(@sapUiSelected, 5%); /* RGBA(8,84,160,0.05) */
+.sapUiDtOverlay {
+	--_sap_ui_dt_Overlay_DropZoneBackgroundColor: ~'hsl(from var(--sapSelectedColor) h s l / .05)';
+}
 
 .sapUiDtOverlayDropZone {
 
@@ -17,6 +19,7 @@
 			}
 
 			&.sapUiDtOverlayHover {
+
 				&::after {
 					content: none;
 				}
@@ -33,6 +36,6 @@
 
 	&::after {
 		transition: box-shadow .25s;
-		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
+		box-shadow: var(--_sap_ui_dt_Overlay_BoxShadow);
 	}
 }

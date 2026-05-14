@@ -4,13 +4,11 @@
 /* ===================================== */
 
 .sapMALI {
-	display: -webkit-box;
 	display: flex;
 	height: 2.75rem;
 }
 
 .sapMALIText {
-	-webkit-box-flex: 1;
 	flex: auto;
 	white-space: nowrap;
 	overflow: hidden;
@@ -18,13 +16,11 @@
 	min-width: 3rem;
 	display: block;
 	text-align: center;
-	color: @sapUiButtonTextColor;
+	color: var(--sapButton_TextColor);
 }
 
 .sapMALI > .sapMLIBContent {
-	display: -webkit-box;
 	display: flex;
-	-webkit-box-pack: center;
 	justify-content: center;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -37,19 +33,19 @@
 	display: none;
 }
 
-/*The active indicator of the list is not specific enough to overwrite this style*/
+/* The active indicator of the list is not specific enough to overwrite this style */
 .sapMList .sapMLIB.sapMALI:not(.sapMLIBActive) {
-	background: @sapUiButtonActionSelectBackground;
-	border-color: @sapUiButtonActionSelectBorderColor;
+	background: var(--sapList_Background);
+	border-color: var(--sapList_BorderColor);
 }
 
 html.sap-desktop .sapMList .sapMLIB.sapMALI:not(.sapMLIBActive) {
-	background: @sapUiButtonActionSelectBackground;
-	border-color: @sapUiButtonActionSelectBorderColor;
+	background: var(--sapList_Background);
+	border-color: var(--sapList_BorderColor);
 }
 
 html.sap-desktop .sapMList .sapMLIB.sapMALI:hover:not(.sapMLIBActive) > .sapMLIBContent {
-	background: @sapUiButtonLiteActionSelectHoverBackground;
+	background: var(--sapList_Hover_Background);
 }
 
 /* Compact size */
@@ -62,5 +58,5 @@ html.sap-desktop .sapMList .sapMLIB.sapMALI:hover:not(.sapMLIBActive) > .sapMLIB
 }
 
 .sapUiSizeCompact .sapMALIText {
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 }
