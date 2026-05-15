@@ -47,7 +47,7 @@ describe("sap.m.Panel", function() {
 
 	it("should show expanded Panel with header and info toolbar", function() {
 		element(by.id("panel4-expandButton")).click();
-		expect(takeScreenshot(element(by.id("panel4")))).toLookAs("panel-expanded-info-toolbar");
+		expect(takeScreenshot()).toLookAs("panel-expanded-info-toolbar");
 	});
 
 	it("should show Panel with header and info toolbar expanded", function() {
@@ -66,5 +66,12 @@ describe("sap.m.Panel", function() {
 
 	it("should show Panel with a button not expanded", function() {
 		expect(takeScreenshot(element(by.id("panel16")))).toLookAs("panel-not-expanded2");
+	});
+
+	it("should show Panel with fixed height and scrollable content", function() {
+		browser.executeScript('document.getElementById("panelScrollTest").scrollIntoView()').then(function() {
+			element(by.id("panelScrollTest-content")).click();
+			expect(takeScreenshot(element(by.id("panelScrollTest")))).toLookAs("panel_content_focused");
+		});
 	});
 });

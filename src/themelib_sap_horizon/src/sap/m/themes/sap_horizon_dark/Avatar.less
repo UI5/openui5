@@ -3,11 +3,13 @@
 /* Evening Horizon theme         */
 /* ============================= */
 
-@_sap_m_Avatar_Font_Size_XL: 3rem;
-@_sap_m_Avatar_Font_Size_L: 2.25rem;
-@_sap_m_Avatar_Font_Size_M: 1.5rem;
-@_sap_m_Avatar_Font_Size_S: 1.125rem;
-@_sap_m_Avatar_Font_Size_XS: 1rem;
+.sapFAvatar {
+	--_sap_m_Avatar_Font_Size_XL: 3rem;
+	--_sap_m_Avatar_Font_Size_L: 2.25rem;
+	--_sap_m_Avatar_Font_Size_M: 1.5rem;
+	--_sap_m_Avatar_Font_Size_S: 1.125rem;
+	--_sap_m_Avatar_Font_Size_XS: 1rem;
+}
 
 .sapFAvatarSquare {
 	border-radius: var(--sapElement_BorderCornerRadius);
@@ -75,7 +77,7 @@
 		&.sapFAvatarImage.sapFAvatarFocusable:not(.sapMAvatarPressed):not(.sapMAvatarDisabled):hover,
 		&.sapFAvatarFocusable:not(.sapMAvatarPressed):not(.sapMAvatarDisabled):hover {
 			background-color: @@hover-color;
-			box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapAvatar_Hover_BorderColor);
+			box-shadow: var(--_sap_m_Avatar_Hover_Box_Shadow_Offset) var(--sapAvatar_Hover_BorderColor);
 		}
 	}
 

@@ -227,7 +227,7 @@
 		},
 		{
 			"control": "sap.m.Label",
-			"url": "../Label.html",
+			"url": "Label.html",
 			"appComponent": "CA-UI5-CTR-ROD"
 		},
 		{
@@ -597,17 +597,6 @@
 			}
 		},
 		{
-			"control": "sap.m.SuggestionsList",
-			"url": "../SearchField_Suggestions.html",
-			"desc": "Suggestions list of the Search Field",
-			"appComponent": "CA-UI5-CTR-ROD",
-			"accTest": {
-				"name": "sap.m.SuggestionsList",
-				"title": "ACC test for sap.m.SuggestionsList",
-				"module": "./suggestionslist.qunit"
-			}
-		},
-		{
 			"control": "sap.m.Switch",
 			"url": "./Switch.html",
 			"appComponent": "CA-UI5-CTR-BAL"
@@ -639,7 +628,7 @@
 		},
 		{
 			"control": "sap.m.Text",
-			"url": "../Text.html",
+			"url": "Text.html",
 			"appComponent": "CA-UI5-CTR-ROD"
 		},
 		{

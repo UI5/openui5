@@ -453,6 +453,59 @@ sap.ui.define([
 		}
 	});
 
+	// Rename section from anchor bar button when useIconTabBar=true
+	elementActionTest("Checking the rename action for a Section from the anchor bar button when useIconTabBar is true", {
+		xmlView:'<mvc:View xmlns:mvc="sap.ui.core.mvc" ' +
+			'xmlns:m="sap.m" xmlns:uxap="sap.uxap" >' +
+				'<uxap:ObjectPageLayout id="layout" useIconTabBar="true">' +
+					'<uxap:sections>' +
+						'<uxap:ObjectPageSection id="section" title="Title 1">' +
+							'<uxap:subSections>' +
+								'<uxap:ObjectPageSubSection id="subSection1">' +
+									'<m:Button text="Subsection UI adaptation" />' +
+								'</uxap:ObjectPageSubSection>' +
+								'<uxap:ObjectPageSubSection id="subSection2">' +
+									'<m:Button text="Subsection UI adaptation" />' +
+								'</uxap:ObjectPageSubSection>' +
+							'</uxap:subSections>' +
+						'</uxap:ObjectPageSection>' +
+						'<uxap:ObjectPageSection id="section2">' +
+							'<uxap:subSections>' +
+								'<uxap:ObjectPageSubSection id="subSection3" title="Subsection3 with button">' +
+									'<m:Button text="Button2" />' +
+								'</uxap:ObjectPageSubSection>' +
+							'</uxap:subSections>' +
+						'</uxap:ObjectPageSection>' +
+					'</uxap:sections>' +
+				'</uxap:ObjectPageLayout>' +
+			'</mvc:View>'
+		,
+		action: {
+			name: "rename",
+			control: function(oView) {
+				return oView.byId("layout").getAggregation("_anchorBar").getItems()[0];
+			},
+			parameter: function (oView) {
+				return {
+					newValue: 'Title 2',
+					renamedElement: oView.byId("layout").getAggregation("_anchorBar").getItems()[0]
+				};
+			}
+		},
+		afterAction: fnConfirmSectionRenamedWithNewValue,
+		afterUndo: fnConfirmSectionIsRenamedWithOldValue,
+		afterRedo: fnConfirmSectionRenamedWithNewValue,
+		changeVisualization: function(oView) {
+			return {
+				displayElementId: "section",
+				info: {
+					affectedControls: ["section"],
+					displayControls: ["section", oView.byId("layout").getAggregation("_anchorBar").getItems()[0].getId()]
+				}
+			};
+		}
+	});
+
 	// Rename action of section with one subsection with NO title
 	elementActionTest("Checking the rename action for a Section, with one SubSection, without title ", {
 		xmlView:'<mvc:View xmlns:mvc="sap.ui.core.mvc" ' +

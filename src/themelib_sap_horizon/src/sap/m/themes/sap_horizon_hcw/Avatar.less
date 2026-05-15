@@ -3,12 +3,14 @@
 /* Horizon High Contrast White theme  */
 /* ================================== */
 
-@_sap_m_Avatar_Font_Size_XL: 3rem;
-@_sap_m_Avatar_Font_Size_L: 2.25rem;
-@_sap_m_Avatar_Font_Size_M: 1.5rem;
-@_sap_m_Avatar_Font_Size_S: 1.125rem;
-@_sap_m_Avatar_Font_Size_XS: 1rem;
-@_sap_m_Avatar_Hover_Box_Shadow_Offset: 0px;
+.sapFAvatar {
+	--_sap_m_Avatar_Font_Size_XL: 3rem;
+	--_sap_m_Avatar_Font_Size_L: 2.25rem;
+	--_sap_m_Avatar_Font_Size_M: 1.5rem;
+	--_sap_m_Avatar_Font_Size_S: 1.125rem;
+	--_sap_m_Avatar_Font_Size_XS: 1rem;
+	--_sap_m_Avatar_Hover_Box_Shadow_Offset: 0;
+}
 
 .sapFAvatarImageContain,
 .sapFAvatarIcon,
@@ -62,19 +64,19 @@
 }
 
 .generateColor (@accentIndex) {
-	@css-selector: ~"sapFAvatarColorAccent@{accentIndex}"; // Create the css selector string
-	@background-param: ~"sapUiAvatar@{accentIndex}Background"; // Build the color param which is a sapUiAccent
+	@css-selector: ~"sapFAvatarColorAccent@{accentIndex}"; /* Create the css selector string */
+	@background-param: ~"sapUiAvatar@{accentIndex}Background"; /* Build the color param which is a sapUiAccent */
 	@color-param: ~"sapUiAvatar@{accentIndex}TextColor";
 	@hover-color: ~"sapUiAvatar@{accentIndex}HoverBackground";
 
-	// Build the real CSS selector.
-	// The output would be something like this: .sapFAvatar.sapFAvatarColorAccent6 {background-color: #0092d1;}
+	/* Build the real CSS selector. */
+	/* The output would be something like this: .sapFAvatar.sapFAvatarColorAccent6 {background-color: #0092d1;} */
 	.@{css-selector} {
 		background-color: @@background-param;
 		&.sapFAvatarImage.sapFAvatarFocusable:not(.sapMAvatarPressed):not(.sapMAvatarDisabled):hover,
 		&.sapFAvatarFocusable:not(.sapMAvatarPressed):not(.sapMAvatarDisabled):hover {
 			background-color: @@hover-color;
-			box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapAvatar_Hover_BorderColor);
+			box-shadow: var(--_sap_m_Avatar_Hover_Box_Shadow_Offset) var(--sapAvatar_Hover_BorderColor);
 		}
 	}
 
