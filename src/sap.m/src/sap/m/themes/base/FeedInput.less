@@ -23,7 +23,8 @@
 	opacity: 0.5;
 }
 
-/*hide the icon if the width of the screen <=25rem */
+/* hide the icon if the width of the screen <=25rem */
+
 @media (max-width: 25rem) {
 
 	.sapMFeedInFigure {
@@ -130,12 +131,9 @@
 }
 
 .sapMFeedIn > .sapMFeedInContainer > .sapMTextArea > .sapMInputBaseInner {
-	border-bottom-style: hidden;
-	border-top-style: hidden;
-	border-left-style: hidden;
-	border-right-style: hidden;
+	border-style: hidden;
 	font-family: var(--sapFontFamily);
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 	font-style: normal;
 	font-weight: normal;
 	color: var(--sapField_TextColor);
@@ -159,7 +157,7 @@
 	border-width: var(--sapButton_BorderWidth);
 	border-radius: var(--sapButton_BorderCornerRadius);
 	background-color: var(--sapGroup_ContentBackground);
-	font-size: @sapFontSize;
+	font-size: var(--sapFontSize);
 	font-family: var(--sapFontSemiboldDuplexFamily);
 }
 
@@ -202,7 +200,7 @@
 .sapMFeedIn .sapMInputBase .sapMTextArea {
 	width: 100%;
 	min-width: 6rem;
-	min-height:2.25rem;
+	min-height: 2.25rem;
 	padding: 0 0.625rem;
 	margin: 0.25rem 0;
 	padding-top: 0.5rem;
@@ -221,8 +219,8 @@
 	right: 2.75rem;
 }
 
-.sapMFeedIn > .sapMFeedInContainer.sapMFeedInAcitonButtonContainer > .sapMBtn {	
+.sapMFeedIn > .sapMFeedInContainer.sapMFeedInAcitonButtonContainer > .sapMBtn {
 	width: 2.75rem;
-	margin: 0.125rem 0rem 0.125rem 0rem;
+	margin: 0.125rem 0 0.125rem 0;
 	padding-left: 0.5rem;
 }
