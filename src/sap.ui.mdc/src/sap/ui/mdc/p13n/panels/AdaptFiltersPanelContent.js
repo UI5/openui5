@@ -716,14 +716,14 @@ sap.ui.define([
 
 		const oActionContainer = this._createActionContainer(oContext, oLabel);
 		oLabel.setLayoutData(new GridData({
-			span: "XL4 L4 M4 S3"
+			span: "XL4 L4 M4 S12",
+			linebreakS: true
 		}));
 
 		const aContent = [oLabel];
 		if (oFilterControl) {
 			oFilterControl.setLayoutData(new GridData({
-				span: "XL6 L6 M6 S8",
-				linebreakS: true
+				span: "XL6 L6 M6 S8"
 			}));
 			aContent.push(oFilterControl);
 		}
