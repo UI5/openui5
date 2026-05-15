@@ -3,8 +3,6 @@ sap.ui.define([
 	"sap/m/Bar",
 	"sap/m/Button",
 	"sap/m/Dialog",
-	"sap/m/FlexItemData",
-	"sap/m/HBox",
 	"sap/m/Label",
 	"sap/m/library",
 	"sap/m/Page",
@@ -14,7 +12,7 @@ sap.ui.define([
 	"sap/ui/core/HTML",
 	"sap/ui/core/Icon",
 	"sap/ui/core/library"
-], function(App, Bar, Button, Dialog, FlexItemData, HBox, Label, mobileLibrary, Page, SearchField, MText, Title, HTML, Icon, coreLibrary) {
+], function(App, Bar, Button, Dialog, Label, mobileLibrary, Page, SearchField, MText, Title, HTML, Icon, coreLibrary) {
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
@@ -22,9 +20,6 @@ sap.ui.define([
 
 	// shortcut for sap.m.DialogType
 	var DialogType = mobileLibrary.DialogType;
-
-	// shortcut for sap.m.FlexRendertype
-	var FlexRendertype = mobileLibrary.FlexRendertype;
 
 	var _buttonWidth = "200px",
 		oSimpleDialog = new Dialog({
@@ -146,22 +141,7 @@ sap.ui.define([
 			title: "Dialog with Search Field",
 			subHeader: new Bar({
 				contentMiddle: [
-					new HBox({
-						width: "100%",
-						renderType: FlexRendertype.Bare,
-						items: [
-							new Label({
-								text: "Search Text:",
-								labelFor: "sf1",
-								width: "100px"
-							}).addStyleClass("sapUiTinyMarginEnd"),
-							new SearchField("sf1", {
-								layoutData: new FlexItemData({
-									growFactor: 1
-								})
-							})
-						]
-					})
+					new SearchField("sf1")
 				]
 			}),
 			content: new HTML("txt", {
@@ -211,7 +191,7 @@ sap.ui.define([
 				}
 			}),
 			ariaLabelledBy: ["resizableDialogText"]
-		}),
+		}).addStyleClass("sapUiResponsivePadding--content sapUiResponsivePadding--header sapUiResponsivePadding--footer sapUiResponsivePadding--subHeader"),
 		oDraggableDialog = new Dialog({
 			title: "Hello World",
 			draggable: true,
@@ -224,7 +204,7 @@ sap.ui.define([
 				}
 			}),
 			ariaLabelledBy: ["draggableDialogText"]
-		}),
+		}).addStyleClass("sapUiResponsivePadding--content sapUiResponsivePadding--header sapUiResponsivePadding--footer sapUiResponsivePadding--subHeader"),
 		oResizableDraggableDialog = new Dialog({
 			title: "Hello world",
 			resizable: true,
@@ -241,7 +221,7 @@ sap.ui.define([
 				}
 			}),
 			ariaLabelledBy: ["resizableDraggableDialogText"]
-		}),
+		}).addStyleClass("sapUiResponsivePadding--content sapUiResponsivePadding--header sapUiResponsivePadding--footer sapUiResponsivePadding--subHeader"),
 		oResizableDraggableCustomHeaderDialog = new Dialog({
 			resizable: true,
 			draggable: true,
@@ -272,7 +252,7 @@ sap.ui.define([
 				}
 			}),
 			ariaLabelledBy: ["customHeaderResizableDraggableText"]
-		});
+		}).addStyleClass("sapUiResponsivePadding--content sapUiResponsivePadding--header sapUiResponsivePadding--footer sapUiResponsivePadding--subHeader");
 
 	var page = new Page("page", {
 		title: "Dialog Accessibility Test Page",
@@ -294,7 +274,7 @@ sap.ui.define([
 			}),
 			new HTML({content: "<br>"}),
 			new Button('cutomHeaderDialogButton', {
-				text: "With Custom Header",
+				text: "Custom Header",
 				width: _buttonWidth,
 				press: function () {
 					oCustomHeaderDialog.open();
@@ -326,7 +306,7 @@ sap.ui.define([
 			}),
 			new HTML({content: "<br>"}),
 			new Button('searchFieldInDialogButton', {
-				text: "SearchField in Dialog",
+				text: "SearchField Dialog",
 				width: _buttonWidth,
 				press: function () {
 					oSearchFieldDialog.open();
@@ -334,7 +314,7 @@ sap.ui.define([
 			}),
 			new HTML({content: "<br>"}),
 			new Button('subtitleDialogButton', {
-				text: "subtitle in Dialog",
+				text: "Subtitle Dialog",
 				width: _buttonWidth,
 				press: function () {
 					oSubtitledDialog.open();
@@ -342,7 +322,7 @@ sap.ui.define([
 			}),
 			new HTML({content: "<br>"}),
 			new Button('resizableDialogButton', {
-				text: "Resizable Dialog",
+				text: "Resize Dialog",
 				width: _buttonWidth,
 				press: function () {
 					oResizableDialog.open();
@@ -350,7 +330,7 @@ sap.ui.define([
 			}),
 			new HTML({content: "<br>"}),
 			new Button('draggableDialogButton', {
-				text: "Draggable Dialog",
+				text: "Drag Dialog",
 				width: _buttonWidth,
 				press: function () {
 					oDraggableDialog.open();
@@ -358,7 +338,7 @@ sap.ui.define([
 			}),
 			new HTML({content: "<br>"}),
 			new Button('resizableDraggableDialogButton', {
-				text: "Resizable & Draggable Dialog",
+				text: "Resize & Drag",
 				width: _buttonWidth,
 				press: function () {
 					oResizableDraggableDialog.open();
@@ -366,7 +346,7 @@ sap.ui.define([
 			}),
 			new HTML({content: "<br>"}),
 			new Button('resizableDraggableCustomHeaderDialogButton', {
-				text: "Resizable & Draggable with Custom Header",
+				text: "Resize & Drag Custom",
 				width: _buttonWidth,
 				press: function () {
 					oResizableDraggableCustomHeaderDialog.open();

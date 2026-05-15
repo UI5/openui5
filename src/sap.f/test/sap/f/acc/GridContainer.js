@@ -3,8 +3,9 @@ sap.ui.define([
 	"sap/f/GridContainerItemLayoutData",
 	"sap/m/App",
 	"sap/m/Page",
+	"sap/m/Title",
 	"sap/ui/integration/widgets/Card"
-], function(GridContainer, GridContainerItemLayoutData, App, Page, Card) {
+], function(GridContainer, GridContainerItemLayoutData, App, Page, Title, Card) {
 	"use strict";
 
 	var oListCardInteractive_Manifest = {
@@ -141,7 +142,12 @@ sap.ui.define([
 		layoutData: new GridContainerItemLayoutData({ minRows: 2, columns: 3 })
 	});
 
+	var oGridContainerTitle = new Title("gridContainerTitle", {
+		text: "Grid Container"
+	});
+
 	var oGridContainer = new GridContainer({
+		ariaLabelledBy: oGridContainerTitle,
 		items: [
 			oListCardInteractive,
 			oListCard
@@ -153,6 +159,7 @@ sap.ui.define([
 		pages: [
 			new Page("myPage", {
 				content: [
+					oGridContainerTitle,
 					oGridContainer
 				]
 			})

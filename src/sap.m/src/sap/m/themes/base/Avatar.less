@@ -3,13 +3,15 @@
 /* Base theme                    */
 /* ============================= */
 
-@_sap_m_Avatar_Font_Size_XL: 3rem;
-@_sap_m_Avatar_Font_Size_L: 2.5rem;
-@_sap_m_Avatar_Font_Size_M: 2rem;
-@_sap_m_Avatar_Font_Size_S: 1.5rem;
-@_sap_m_Avatar_Font_Size_XS: 1rem;
-@_sap_m_Avatar_Hover_Box_Shadow_Offset: 0 0 0 0.0625rem;
-@_sap_m_Avatar_Badge_Icon_Box_Shadow: 0 0 0 0.0625rem;
+.sapFAvatar {
+	--_sap_m_Avatar_Font_Size_XL: 3rem;
+	--_sap_m_Avatar_Font_Size_L: 2.5rem;
+	--_sap_m_Avatar_Font_Size_M: 2rem;
+	--_sap_m_Avatar_Font_Size_S: 1.5rem;
+	--_sap_m_Avatar_Font_Size_XS: 1rem;
+	--_sap_m_Avatar_Hover_Box_Shadow_Offset: 0 0 0 0.0625rem;
+	--_sap_m_Avatar_Badge_Icon_Box_Shadow: 0 0 0 0.0625rem;
+}
 
 .sapFAvatar {
 	display: inline-block;
@@ -25,32 +27,32 @@
 	}
 }
 
-// Define a loop and go trough 10 color sets
+/* Define a loop and go trough 10 color sets */
 .loop-colors(@i: 1) when (@i =< 10) {
 
 	.generateColor(@i);
 
-	.loop-colors(@i + 1); // Execute next loop iteration
+	.loop-colors(@i + 1); /* Execute next loop iteration */
 }
 
-// Execute Loop through color sets
+/* Execute Loop through color sets */
 .loop-colors(1);
 
-// Create classes which would just set background color of Avatar
+/* Create classes which would just set background color of Avatar */
 .generateColor (@accentIndex) {
 
-	@css-selector: ~"sapFAvatarColorAccent@{accentIndex}"; // Create the css selector string
-	@color-param: ~"sapUiAccent@{accentIndex}"; // Build the color param which is a sapUiAccent
-	@border-param: ~"sapAvatar_@{accentIndex}_TextColor"; // Build the border param
+	@css-selector: ~"sapFAvatarColorAccent@{accentIndex}"; /* Create the css selector string */
+	@color-param: ~"sapUiAccent@{accentIndex}"; /* Build the color param which is a sapUiAccent */
+	@border-param: ~"sapAvatar_@{accentIndex}_TextColor"; /* Build the border param */
 
-	// Build the real CSS selector.
-	// The output would be something like this: .sapFAvatar.sapFAvatarColorAccent6 {background-color: #0092d1;}
+	/* Build the real CSS selector. */
+	/* The output would be something like this: .sapFAvatar.sapFAvatarColorAccent6 {background-color: #0092d1;} */
 	.@{css-selector} {
 
 		background-color: @@color-param;
 
 		&.sapFAvatarFocusable:not(.sapMAvatarPressed):not(.sapMAvatarDisabled):hover {
-			box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset @@border-param;
+			box-shadow: var(--_sap_m_Avatar_Hover_Box_Shadow_Offset) @@border-param;
 		}
 	}
 }
@@ -80,7 +82,7 @@
 	}
 
 	&.sapFAvatarFocusable:not(.sapMAvatarPressed):not(.sapMAvatarDisabled):hover {
-		box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapContent_IconColor);
+		box-shadow: var(--_sap_m_Avatar_Hover_Box_Shadow_Offset) var(--sapContent_IconColor);
 	}
 }
 
@@ -88,7 +90,7 @@
 	background-color: var(--sapTile_IconColor);
 
 	&.sapFAvatarFocusable:not(.sapMAvatarPressed):not(.sapMAvatarDisabled):hover {
-		box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapTile_IconColor);
+		box-shadow: var(--_sap_m_Avatar_Hover_Box_Shadow_Offset) var(--sapTile_IconColor);
 	}
 }
 
@@ -96,7 +98,7 @@
 	background-color: var(--sapContent_ImagePlaceholderBackground);
 
 	&.sapFAvatarFocusable:not(.sapMAvatarPressed):not(.sapMAvatarDisabled):hover {
-		box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapContent_ImagePlaceholderForegroundColor);
+		box-shadow: var(--_sap_m_Avatar_Hover_Box_Shadow_Offset) var(--sapContent_ImagePlaceholderForegroundColor);
 	}
 }
 
@@ -116,7 +118,7 @@
 	}
 
 	&.sapFAvatarFocusable:not(.sapMAvatarPressed):not(.sapMAvatarDisabled):hover {
-		box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapAvatar_10_TextColor);
+		box-shadow: var(--_sap_m_Avatar_Hover_Box_Shadow_Offset) var(--sapAvatar_10_TextColor);
 	}
 }
 
@@ -154,7 +156,7 @@
 .sapFAvatarXS {
 	height: 2rem;
 	width: 2rem;
-	font-size: @_sap_m_Avatar_Font_Size_XS;
+	font-size: var(--_sap_m_Avatar_Font_Size_XS);
 
 	.sapFAvatarInitialsHolder {
 		font-size: 0.75rem;
@@ -164,7 +166,7 @@
 .sapFAvatarS {
 	height: 3rem;
 	width: 3rem;
-	font-size: @_sap_m_Avatar_Font_Size_S;
+	font-size: var(--_sap_m_Avatar_Font_Size_S);
 
 	.sapFAvatarInitialsHolder {
 		font-size: 1.125rem;
@@ -174,7 +176,7 @@
 .sapFAvatarM {
 	height: 4rem;
 	width: 4rem;
-	font-size: @_sap_m_Avatar_Font_Size_M;
+	font-size: var(--_sap_m_Avatar_Font_Size_M);
 
 	.sapFAvatarInitialsHolder {
 		font-size: 1.625rem;
@@ -184,7 +186,7 @@
 .sapFAvatarL {
 	height: 5rem;
 	width: 5rem;
-	font-size: @_sap_m_Avatar_Font_Size_L;
+	font-size: var(--_sap_m_Avatar_Font_Size_L);
 
 	.sapFAvatarInitialsHolder {
 		font-size: 2rem;
@@ -194,7 +196,7 @@
 .sapFAvatarXL {
 	height: 7rem;
 	width: 7rem;
-	font-size: @_sap_m_Avatar_Font_Size_XL;
+	font-size: var(--_sap_m_Avatar_Font_Size_XL);
 
 	.sapFAvatarInitialsHolder {
 		font-size: 2.75rem;
@@ -232,11 +234,11 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 	color: var(--sapContent_ImagePlaceholderForegroundColor);
 }
 
-// Apply LightBox Magnifying glass mixin to control
+/* Apply LightBox Magnifying glass mixin to control */
 .lightBoxMagnifyingGlassMixing(~'.sapFAvatar', ~'.sapFAvatarMagnifyingGlass');
 
 
-//restrinct inner elements of blocking press event of the whole control
+/* restrinct inner elements of blocking press event of the whole control */
 .sapFAvatar * {
 	pointer-events: none;
 }
@@ -286,9 +288,10 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 	@background: 'sapAccentBackgroundColor@{i}';
 
 	.sapFAvatarBadgeColorAccent@{i} .sapFAvatarBadgeIcon {
-		box-shadow: @_sap_m_Avatar_Badge_Icon_Box_Shadow @@color;
+		box-shadow: var(--_sap_m_Avatar_Badge_Icon_Box_Shadow) @@color;
 		background-color: @@background;
 		border: 0;
+
 		> .sapUiIcon {
 			color: @@color;
 		}
@@ -308,6 +311,7 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 		background-color: var(~'@{background}');
 		box-shadow: var(--sapContent_Shadow1);
 		border: var(~'@{border}');
+
 		> .sapUiIcon {
 			color: var(~'@{color}');
 		}
@@ -319,7 +323,7 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 
 .sapFAvatarWarning .sapFAvatarBadgeIcon {
 	background-color: var(--sapWarningBackground);
-	box-shadow: @_sap_m_Avatar_Badge_Icon_Box_Shadow var(--sapWarningBorderColor);
+	box-shadow: var(--_sap_m_Avatar_Badge_Icon_Box_Shadow) var(--sapWarningBorderColor);
 	border: 0;
 
 	> .sapUiIcon {
@@ -329,7 +333,7 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 
 .sapFAvatarError .sapFAvatarBadgeIcon {
 	background-color: var(--sapErrorBackground);
-	box-shadow: @_sap_m_Avatar_Badge_Icon_Box_Shadow var(--sapErrorBorderColor);
+	box-shadow: var(--_sap_m_Avatar_Badge_Icon_Box_Shadow) var(--sapErrorBorderColor);
 	border: 0;
 
 	> .sapUiIcon {
@@ -339,7 +343,7 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 
 .sapFAvatarInformation .sapFAvatarBadgeIcon {
 	background-color: var(--sapInformationBackground);
-	box-shadow: @_sap_m_Avatar_Badge_Icon_Box_Shadow var(--sapInformationBorderColor);
+	box-shadow: var(--_sap_m_Avatar_Badge_Icon_Box_Shadow) var(--sapInformationBorderColor);
 	border: 0;
 
 	> .sapUiIcon {
@@ -349,7 +353,7 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 
 .sapFAvatarSuccess .sapFAvatarBadgeIcon {
 	background-color: var(--sapSuccessBackground);
-	box-shadow: @_sap_m_Avatar_Badge_Icon_Box_Shadow var(--sapSuccessBorderColor);
+	box-shadow: var(--_sap_m_Avatar_Badge_Icon_Box_Shadow) var(--sapSuccessBorderColor);
 	border: 0;
 
 	> .sapUiIcon {
@@ -362,14 +366,14 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 	box-sizing: border-box;
 	position: absolute;
 	bottom: 0;
-	right:  0;
+	right: 0;
 	width: 1.125rem;
 	height: 1.125rem;
 	border-radius: 50%;
 	font-size: 0.75rem;
 	text-align: center;
 	background-color: var(--sapButton_Emphasized_Background);
-	box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapButton_Emphasized_BorderColor);
+	box-shadow: var(--_sap_m_Avatar_Hover_Box_Shadow_Offset) var(--sapButton_Emphasized_BorderColor);
 
 	> .sapUiIcon {
 		vertical-align: middle;

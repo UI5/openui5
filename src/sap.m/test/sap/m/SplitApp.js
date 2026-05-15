@@ -7,13 +7,13 @@ sap.ui.define([
 	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/library",
 	"sap/ui/core/library",
-	"sap/m/Bar",
+	"sap/m/OverflowToolbar",
 	"sap/m/List",
 	"sap/m/StandardListItem",
 	"sap/m/SplitApp",
 	"sap/ui/Device",
 	"sap/base/Log"
-], function(App, Input, Label, Button, Page, PageAccessibleLandmarkInfo, mobileLibrary, library, Bar, List, StandardListItem, SplitApp, Device, Log) {
+], function(App, Input, Label, Button, Page, PageAccessibleLandmarkInfo, mobileLibrary, library, OverflowToolbar, List, StandardListItem, SplitApp, Device, Log) {
 	"use strict";
 
 	// shortcut for sap.m.ListType
@@ -48,20 +48,6 @@ sap.ui.define([
 		return aContent;
 	}
 
-	function createIconCompetitorsButtons() {
-		var buttonCount = 4;
-		var content = [];
-
-		for (var number = 0; number < buttonCount; number += 1) {
-			content.push(new Button({
-				icon: "images/iconCompetitors.png",
-				tooltip: "Competitors icon " + ++number
-			}));
-		}
-
-		return content;
-	}
-
 	// create first detail page
 	var oDetailPage = new Page("detail", {
 		title: "Detail 1",
@@ -83,8 +69,8 @@ sap.ui.define([
 		navButtonPress: function() {
 			oSplitApp.backDetail();
 		},
-		subHeader: new Bar({
-			contentMiddle: [
+		subHeader: new OverflowToolbar({
+			content: [
 				new Button("saShowHideMasterMode", {
 					text: "show/hide",
 					press: function() {
@@ -108,24 +94,20 @@ sap.ui.define([
 				})
 			]
 		}),
-		footer: new Bar({
+		footer: new OverflowToolbar({
 			id: "detail-footer",
-			contentMiddle: [
+			content: [
 				new Button({
-					icon: "images/iconCompetitors.png",
-					tooltip: "Competitors icon detail 1"
+					text: "Action 1"
 				}),
 				new Button({
-					icon: "images/iconCompetitors.png",
-					tooltip: "Competitors icon detail 2"
+					text: "Action 2"
 				}),
 				new Button({
-					icon: "images/iconCompetitors.png",
-					tooltip: "Competitors icon detail 3"
+					text: "Action 3"
 				}),
 				new Button({
-					icon: "images/iconCompetitors.png",
-					tooltip: "Competitors icon detail 4"
+					text: "Action 4"
 				})
 			]
 		})
@@ -147,8 +129,8 @@ sap.ui.define([
 		navButtonPress: function() {
 			oSplitApp.backDetail();
 		},
-		subHeader: new Bar({
-			contentMiddle: [
+		subHeader: new OverflowToolbar({
+			content: [
 				new Button({
 					text: "show/hide",
 					press: function() {
@@ -181,7 +163,8 @@ sap.ui.define([
 		showNavButton: true,
 		landmarkInfo: new PageAccessibleLandmarkInfo({
 			rootLabel: "Detail 2",
-			headerLabel: "Detail 2 Header"
+			headerLabel: "Detail 2 Header",
+			footerLabel: "Detail 2 Footer"
 		}),
 		navButtonPress: function() {
 			oSplitApp.backDetail();
@@ -189,13 +172,24 @@ sap.ui.define([
 		content: [
 			generateDetailPage2Content()
 		],
-		subHeader: new Bar({
-			contentMiddle: []
+		subHeader: new OverflowToolbar({
+			content: []
 		}),
-		footer: new Bar({
+		footer: new OverflowToolbar({
 			id: "detai2l-footer",
-			contentMiddle: [
-				createIconCompetitorsButtons()
+			content: [
+				new Button({
+					text: "Action 1"
+				}),
+				new Button({
+					text: "Action 2"
+				}),
+				new Button({
+					text: "Action 3"
+				}),
+				new Button({
+					text: "Action 4"
+				})
 			]
 		})
 	}).addStyleClass("pageWithPadding");
@@ -223,42 +217,23 @@ sap.ui.define([
 				]
 			})
 		],
-		footer: new Bar({
+		footer: new OverflowToolbar({
 			id: "master-footer",
-			contentMiddle: [
+			content: [
 				new Button({
-					icon: "images/iconCompetitors.png",
-					tooltip: "Competitors icon master 1"
+					text: "Action 1"
 				}),
 				new Button({
-					icon: "images/iconCompetitors.png",
-					tooltip: "Competitors icon master 2"
+					text: "Action 2"
 				}),
 				new Button({
-					icon: "images/iconCompetitors.png",
-					tooltip: "Competitors icon master 3"
+					text: "Action 3"
 				}),
 				new Button({
-					icon: "images/iconCompetitors.png",
-					tooltip: "Competitors icon master 4"
+					text: "Action 4"
 				})
 			]
 		})
-	});
-
-	var iDetailPage2Length = oDetailPage2.getContent().length;
-	var oButtonToLast = new Button({
-		text: "Scroll to last input",
-		press: function() {
-			oDetailPage2.scrollToElement( oDetailPage2.getContent()[iDetailPage2Length - 1], 1000 );
-		}
-	});
-
-	var oButtonToFirst = new Button({
-		text: "Scroll to first input",
-		press: function() {
-			oDetailPage2.scrollToElement( oDetailPage2.getContent()[1], 1000 );
-		}
 	});
 
 	//create second master page
@@ -279,14 +254,8 @@ sap.ui.define([
 				mode: Device.system.phone ? ListMode.None : ListMode.SingleSelectMaster,
 				selectionChange: function(oEv) {
 					if (oEv.getParameter("listItem").getId() == "listDetail2") {
-						oMasterPage2.addContent(oButtonToLast);
-						oMasterPage2.addContent(oButtonToFirst);
-
 						oSplitApp.toDetail("detail2");
 					} else {
-						oMasterPage2.removeContent(oButtonToLast);
-						oMasterPage2.removeContent(oButtonToFirst);
-
 						oSplitApp.toDetail("detail");
 					}
 				},
@@ -308,10 +277,21 @@ sap.ui.define([
 				]
 			})
 		],
-		footer: new Bar({
+		footer: new OverflowToolbar({
 			id: "master2-footer",
-			contentMiddle: [
-				createIconCompetitorsButtons()
+			content: [
+				new Button({
+					text: "Action 1"
+				}),
+				new Button({
+					text: "Action 2"
+				}),
+				new Button({
+					text: "Action 3"
+				}),
+				new Button({
+					text: "Action 4"
+				})
 			]
 		})
 	});
@@ -337,6 +317,10 @@ sap.ui.define([
 	var oPage = new Page("page", {
 		title: "SplitApp Test Page",
 		titleLevel: library.TitleLevel.H1,
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootLabel: "SplitApp Test Page",
+			headerLabel: "SplitApp Test Page Header"
+		}),
 		content: oSplitApp
 	});
 

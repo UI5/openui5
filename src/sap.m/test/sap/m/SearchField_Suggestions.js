@@ -184,7 +184,7 @@ sap.ui.define([
 		customHeader: new Bar("P1Header", {
 			contentLeft: [
 				new Button('dialogButton', {
-					text: "Open a Dialog",
+					text: "Dialog",
 					press : function() {
 						oDialog.open();
 					}

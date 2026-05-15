@@ -172,7 +172,7 @@ sap.ui.define([
 	});
 
 	var oButton3 = new Button("Button3", {
-		text: "Open TableSelectDialog with destroy call in close event & late binding",
+		text: "Destroy on Close",
 		press: function (evt) {
 			oTableSelectDialog3.open();
 
@@ -201,7 +201,7 @@ sap.ui.define([
 	});
 
 	var oButton11 = new Button("Button11", {
-		text: "Open TableSelectDialog with property growing false",
+		text: "No Growing",
 		press: function () {
 			oTableSelectDialog11.open();
 			// then set model & bind Aggregation

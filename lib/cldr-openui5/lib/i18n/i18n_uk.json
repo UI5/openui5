@@ -26,7 +26,7 @@
     },
     "Kilobyte": {
       "comment": "YMSG,20: File Size Unit Kilobyte (short)",
-      "text": "{0} КБ"
+      "text": "{0} кБ"
     },
     "Megabyte": {
       "comment": "YMSG,20: File Size Unit Megabyte (short)",
