@@ -3,9 +3,11 @@
 /* Base theme                            */
 /* ===================================== */
 
-@_sap_ui_rta_AddIFrame_BorderColor: var(--sapGroup_ContentBorderColor); /* #000 */
-@_sap_ui_rta_AddIFrame_PreviewBackgroundColor: var(--sapContent_ImagePlaceholderBackground); /* #fff */
-@_sap_ui_rta_AddIFrame_PreviewTextColor: var(--sapContent_ForegroundTextColor); /* #000 */
+.sapUiRtaMode {
+	--_sap_ui_rta_AddIFrame_BorderColor: var(--sapGroup_ContentBorderColor);
+	--_sap_ui_rta_AddIFrame_PreviewBackgroundColor: var(--sapContent_ImagePlaceholderBackground);
+	--_sap_ui_rta_AddIFrame_PreviewTextColor: var(--sapContent_ForegroundTextColor);
+}
 
 .sapUiRtaMode {
 
@@ -27,19 +29,20 @@
 			}
 
 			.sapUiRtaAddIFrameDialogHideParametersButton {
-				margin-top: ~"calc(-1 * var(--sapContent_Space_Small))";
+				margin-top: ~'calc(-1 * var(--sapContent_Space_Small))';
 			}
 
 			.sapUiRtaAddIFrameParametersHeader {
-				margin-bottom: ~"calc(-1 * var(--sapContent_Space_Tiny))";
+				margin-bottom: ~'calc(-1 * var(--sapContent_Space_Tiny))';
+
 				.sapUiRtaAddIFrameDialogParametersLabel {
-					// avoid label beeing too long
+					/* avoid label beeing too long */
 					max-width: 20.5rem;
 				}
 			}
 
 			.sapUiRtaAddIFrameDialogSizeVBox {
-				margin-top: ~"calc(-1 * var(--sapContent_Space_Small))";
+				margin-top: ~'calc(-1 * var(--sapContent_Space_Small))';
 			}
 
 			.sapUiRtaAddIFrameDialogEditGrid {
@@ -48,7 +51,7 @@
 				.sapUiRtaAddIFrameDialogParameters {
 
 					.sapMScrollCont {
-						border: 0.0625rem solid @_sap_ui_rta_AddIFrame_BorderColor; /* 1px */
+						border: 0.0625rem solid var(--_sap_ui_rta_AddIFrame_BorderColor); /* 1px */
 					}
 				}
 
@@ -72,6 +75,7 @@
 					.sapMPanelWrappingDivTb {
 						border-radius: 0;
 					}
+
 					.sapUiRtaAddIFrameDialogAdvancedSettingsToolbar {
 						height: 2rem !important;
 						padding-right: 0;
@@ -86,8 +90,8 @@
 			.sapUiRtaAddIFrameDialogPreviewGrid {
 				padding: 0;
 				margin: 0 var(--sapContent_Space_Small) var(--sapContent_Space_Small);
-				background: @_sap_ui_rta_AddIFrame_PreviewBackgroundColor;
-				border: 0.0625rem solid @_sap_ui_rta_AddIFrame_BorderColor; /* 1px */
+				background: var(--_sap_ui_rta_AddIFrame_PreviewBackgroundColor);
+				border: 0.0625rem solid var(--_sap_ui_rta_AddIFrame_BorderColor); /* 1px */
 				overflow: auto;
 				height: 230px;
 			}
@@ -100,10 +104,12 @@
 	.sapUiRtaAddIFrameDialog {
 
 		.sapUiRtaAddIFrameDialogVlWrapper {
+
 			.sapUiRtaAddIFrameDialogHideParametersButton {
 				position: relative;
 				top: -0.3125rem;
 			}
+
 			.sapUiRtaAddIFrameParametersHeader {
 				margin-bottom: var(--sapContent_Space_Small);
 			}
