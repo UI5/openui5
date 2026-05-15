@@ -363,7 +363,7 @@
         <lib name="bignumber" displayName="bignumber.js" homepage="https://github.com/MikeMcl/bignumber.js">
             <license url="https://github.com/MikeMcl/bignumber.js/blob/master/LICENCE" type="MIT License" file="../thirdparty/licenses/bignumber-MIT-LICENSE.txt" />
         </lib>
-        <lib name="lodash" displayName="lodash" homepage="https://github.com/lodash/lodash">
+        <lib name="lodash" displayName="lodash" version="4.18.1" homepage="https://github.com/lodash/lodash">
             <license url="https://github.com/lodash/lodash/blob/master/LICENSE" type="MIT License" file="../thirdparty/licenses/lodash-MIT-LICENSE.txt" />
         </lib>
         <lib name="hyphenopoly" displayName="Hyphenopoly" homepage="https://github.com/mnater/Hyphenopoly">

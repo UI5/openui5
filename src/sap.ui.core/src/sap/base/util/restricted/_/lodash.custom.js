@@ -20,7 +20,7 @@ sap.ui.define(function() {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.23';
+  var VERSION = '4.18.1';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -1298,7 +1298,7 @@ sap.ui.define(function() {
    * @name has
    * @memberOf SetCache
    * @param {*} value The value to search for.
-   * @returns {number} Returns `true` if `value` is found, else `false`.
+   * @returns {boolean} Returns `true` if `value` is found, else `false`.
    */
   function setCacheHas(value) {
     return this.__data__.has(value);
@@ -2544,7 +2544,9 @@ sap.ui.define(function() {
   function baseUnset(object, path) {
     path = castPath(path, object);
 
-    // Prevent prototype pollution, see: https://github.com/lodash/lodash/security/advisories/GHSA-xxjr-mmjv-4gpg
+    // Prevent prototype pollution:
+    // https://github.com/lodash/lodash/security/advisories/GHSA-xxjr-mmjv-4gpg
+    // https://github.com/lodash/lodash/security/advisories/GHSA-f23m-r3pf-42rh
     var index = -1,
         length = path.length;
 
@@ -2552,32 +2554,17 @@ sap.ui.define(function() {
       return true;
     }
 
-    var isRootPrimitive = object == null || (typeof object !== 'object' && typeof object !== 'function');
-
     while (++index < length) {
-      var key = path[index];
-
-      // skip non-string keys (e.g., Symbols, numbers)
-      if (typeof key !== 'string') {
-        continue;
-      }
+      var key = toKey(path[index]);
 
       // Always block "__proto__" anywhere in the path if it's not expected
       if (key === '__proto__' && !hasOwnProperty.call(object, '__proto__')) {
         return false;
       }
 
-      // Block "constructor.prototype" chains
-      if (key === 'constructor' &&
-          (index + 1) < length &&
-          typeof path[index + 1] === 'string' &&
-          path[index + 1] === 'prototype') {
-
-        // Allow ONLY when the path starts at a primitive root, e.g., _.unset(0, 'constructor.prototype.a')
-        if (isRootPrimitive && index === 0) {
-          continue;
-        }
-
+      // Block constructor/prototype as non-terminal traversal keys to prevent
+      // escaping the object graph into built-in constructors and prototypes.
+      if ((key === 'constructor' || key === 'prototype') && index < length - 1) {
         return false;
       }
     }
