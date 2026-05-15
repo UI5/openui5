@@ -2490,18 +2490,18 @@ sap.ui.define([
 		oCal.destroy();
 	});
 
-	QUnit.test("interval selection when start date is in different month", function(assert) {
+	QUnit.test("interval selection when start date is in different month and interaction is with mouse", function(assert) {
 		//arrange
-		var oCal = new Calendar({
+		const oCal = new Calendar({
 				intervalSelection: true,
 				months: 1
-			}),
-			oMonth;
+			});
 
-		oCal.displayDate(UI5Date.getInstance(2022, 10, 1)); //2017, July 19
+		oCal.displayDate(UI5Date.getInstance(2022, 10, 1));
 		oCal.placeAt("qunit-fixture");
 		oCore.applyChanges();
-		oMonth = oCal.getAggregation("month")[0];
+		const oMonth = oCal.getAggregation("month")[0];
+		oMonth._selectedWithMouse = true;
 
 		// simulate focusing of a date in current month (focusedDate = 2022-11-24)
 		oMonth.setProperty("_focusedDate", new CalendarDate(2022, 10, 24));
@@ -2519,6 +2519,34 @@ sap.ui.define([
 
 		//assert - check if a date between focusedDate and startDate is eligible for marking as "between" date (for example 2022-11-26)
 		assert.equal(oMonth._checkDateSelected(new CalendarDate(2022, 10, 26)), 0, "date between focusedDate and startDate is not marked as any kind of selected");
+
+		//clean
+		oCal.destroy();
+	});
+
+	QUnit.test("interval selection when start date is in different month and interaction is with keyboard", function(assert) {
+		//arrange
+		const oCal = new Calendar("cal", {
+				intervalSelection: true,
+				months: 1
+			});
+
+		oCal.displayDate(UI5Date.getInstance(2022, 10, 1));
+		oCal.placeAt("qunit-fixture");
+		oCore.applyChanges();
+		const oMonth = oCal.getAggregation("month")[0];
+		const $selectedDate = jQuery("#" + oMonth.getId() + "-20221130");
+
+		// act
+		$selectedDate.trigger("focus");
+		oCore.applyChanges();
+		qutils.triggerKeydown($selectedDate, KeyCodes.ENTER);
+		oCore.applyChanges();
+		qutils.triggerKeydown($selectedDate, KeyCodes.ARROW_RIGHT);
+		oCore.applyChanges();
+
+		//assert - check if a date between focusedDate and startDate is eligible for marking as "between" date
+		assert.equal(oMonth._checkDateSelected(new CalendarDate(2022, 11, 1)), 4, "date is marked as 'between' date");
 
 		//clean
 		oCal.destroy();
