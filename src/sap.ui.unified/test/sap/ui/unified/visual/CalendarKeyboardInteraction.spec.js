@@ -36,17 +36,21 @@ describe("sap.ui.unified.CalendarKeyboardInteraction", function() {
 
 			var sShiftTab = protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.TAB);
 
+			browser.actions().sendKeys(sShiftTab).perform();
 			browser.actions().sendKeys(sShiftTab).perform(); // focus on year
 			expect(takeScreenshot(oCal)).toLookAs("020_keyboard_Shift_Tab1");
 			browser.actions().sendKeys(sShiftTab).perform(); // focus on month
 			expect(takeScreenshot(oCal)).toLookAs("021_keyboard_Shift_Tab2");
+			browser.actions().sendKeys(sShiftTab).perform();
 			browser.actions().sendKeys(sShiftTab).perform(); // focus leaves calendar
 			expect(takeScreenshot(oCal)).toLookAs("022_keyboard_Shift_Tab3");
 
+			browser.actions().sendKeys(protractor.Key.TAB).perform();
 			browser.actions().sendKeys(protractor.Key.TAB).perform(); // focus on month
 			expect(takeScreenshot(oCal)).toLookAs("023_keyboard_Tab1");
 			browser.actions().sendKeys(protractor.Key.TAB).perform(); // focus on year
 			expect(takeScreenshot(oCal)).toLookAs("024_keyboard_Tab2");
+			browser.actions().sendKeys(protractor.Key.TAB).perform();
 			browser.actions().sendKeys(protractor.Key.TAB).perform(); // focus on 30
 			expect(takeScreenshot(oCal)).toLookAs("025_keyboard_Tab3");
 		}
@@ -59,6 +63,7 @@ describe("sap.ui.unified.CalendarKeyboardInteraction", function() {
 			var sShiftTab = protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.TAB);
 			browser.actions().sendKeys(sShiftTab).perform();
 			browser.actions().sendKeys(sShiftTab).perform();
+			browser.actions().sendKeys(sShiftTab).perform();
 			browser.actions().sendKeys(protractor.Key.SPACE).perform(); // month picker open, focus on December
 			expect(takeScreenshot(oCal)).toLookAs("026_keyboard_Month_Space");
 			browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform(); // focus on March 2015
@@ -68,6 +73,7 @@ describe("sap.ui.unified.CalendarKeyboardInteraction", function() {
 			browser.actions().sendKeys(protractor.Key.SPACE).perform(); // Month Picker closed, April displayed, focus on 30
 			expect(takeScreenshot(oCal)).toLookAs("029_keyboard_MonthPicker_Space");
 
+			browser.actions().sendKeys(sShiftTab).perform();
 			browser.actions().sendKeys(sShiftTab).perform();
 			browser.actions().sendKeys(sShiftTab).perform();
 			browser.actions().sendKeys(protractor.Key.ENTER).perform(); // month picker open, focus on April
@@ -85,6 +91,7 @@ describe("sap.ui.unified.CalendarKeyboardInteraction", function() {
 			// only on desktop and not in Safari (sendKeys needs an Element in Safari, so test makes no sense there)
 			var sShiftTab = protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.TAB);
 			browser.actions().sendKeys(sShiftTab).perform();
+			browser.actions().sendKeys(sShiftTab).perform();
 			browser.actions().sendKeys(protractor.Key.SPACE).perform(); // year Picker open, focus on 2015
 			expect(takeScreenshot(oCal)).toLookAs("033_keyboard_Year_Space");
 			browser.actions().sendKeys(protractor.Key.ARROW_UP).perform(); // focus on 2011
@@ -100,6 +107,7 @@ describe("sap.ui.unified.CalendarKeyboardInteraction", function() {
 			browser.actions().sendKeys(protractor.Key.SPACE).perform(); // Year Picker closed, April 1995 displayed, focus on 30
 			expect(takeScreenshot(oCal)).toLookAs("039_keyboard_YearPicker_Space");
 
+			browser.actions().sendKeys(sShiftTab).perform();
 			browser.actions().sendKeys(sShiftTab).perform();
 			browser.actions().sendKeys(protractor.Key.ENTER).perform(); // year Picker open, focus on 1995 (selected)
 			expect(takeScreenshot(oCal)).toLookAs("040_keyboard_Year_ENTER");

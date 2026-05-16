@@ -15,7 +15,10 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/test/utils/nextUIUpdate",
 	// provides jQuery.fn.cursorPos
-	"sap/ui/dom/jquery/cursorPos"
+	"sap/ui/dom/jquery/cursorPos",
+	"sap/m/FormattedText",
+	"sap/m/Link",
+	"sap/ui/core/Lib"
 ], function(
 	Localization,
 	qutils,
@@ -30,12 +33,18 @@ sap.ui.define([
 	Device,
 	coreLibrary,
 	KeyCodes,
-	nextUIUpdate
+	nextUIUpdate,
+	cursorPos,
+	FormattedText,
+	Link,
+	Library
 ) {
 	"use strict";
 
 	// shortcut for sap.ui.core.TextDirection
 	var TextDirection = coreLibrary.TextDirection;
+	// shortcut for sap.ui.core.ValueState
+	var ValueState = coreLibrary.ValueState;
 
 	createAndAppendDiv("content");
 
@@ -1352,6 +1361,152 @@ sap.ui.define([
 		assert.strictEqual(sCustomRole, "Masked Edit", "Proper aria-roledescription is added");
 	});
 
+	QUnit.test("Testing aria describedby when value state is not Error", async function (assert) {
+		const oResourceBundle = Library.getResourceBundleFor("sap.m");
+		const sInvisiblemesageId = this.oMaskInput.getValueStateLinksShortcutsId();
+		let oFormattedValueStateText = new FormattedText({
+			htmlText: "Value state message containing %%0 %%1",
+			controls: [new Link({
+				text: "multiple",
+				href: "#"
+			}),
+			new Link({
+				text: "links",
+				href: "#"
+			})]
+		});
+		this.oMaskInput.setValueState(ValueState.Warning);
+		this.oMaskInput.setFormattedValueStateText(oFormattedValueStateText);
+		await nextUIUpdate(this.clock);
+
+		let oAccDomRef = document.getElementById(sInvisiblemesageId);
+		let aDescribedBy = this.oMaskInput.getFocusDomRef().getAttribute("aria-describedby").split(' ');
+		let bDescribedByContainsAccForLinks = aDescribedBy.some(function (sId) {
+			return sId === sInvisiblemesageId;
+		});
+
+		const sLinksTextId = Device.os.macintosh ?  "INPUTBASE_VALUE_STATE_LINKS_MAC" : "INPUTBASE_VALUE_STATE_LINKS";
+		const sMultipleLinksText = oResourceBundle.getText(sLinksTextId);
+
+		//Assert
+		assert.ok(this.oMaskInput.getDomRef().contains(oAccDomRef), "Accessibility DOM for links shortcuts announcement is created");
+		assert.strictEqual(oAccDomRef.innerText, sMultipleLinksText, "Links shortcuts announcement is as expected" );
+		assert.ok(bDescribedByContainsAccForLinks, "Area-describedby for input contains the links shortcuts element ID");
+
+		oFormattedValueStateText = new FormattedText({
+			htmlText: "Value state message containing %%0",
+			controls: [new Link({
+				text: "links",
+				href: "#"
+			})]
+		});
+		this.oMaskInput.setFormattedValueStateText(oFormattedValueStateText);
+		await nextUIUpdate(this.clock);
+
+		oAccDomRef = document.getElementById(sInvisiblemesageId);
+		aDescribedBy = this.oMaskInput.getFocusDomRef().getAttribute("aria-describedby")?.split(' ');
+		bDescribedByContainsAccForLinks = aDescribedBy?.some(function (sId) {
+			return sId === sInvisiblemesageId;
+		});
+		const sLinkTextId = Device.os.macintosh ?  "INPUTBASE_VALUE_STATE_LINK_MAC" : "INPUTBASE_VALUE_STATE_LINK";
+		const sSingleLink = Library.getResourceBundleFor("sap.m").getText(sLinkTextId);
+
+		//Assert
+		assert.ok(this.oMaskInput.getDomRef().contains(oAccDomRef), "Accessibility DOM for links shortcuts announcement is created");
+		assert.strictEqual(oAccDomRef.innerText, sSingleLink, "Links shortcuts announcement is as expected" );
+		assert.ok(bDescribedByContainsAccForLinks, "Area-describedby for input contains the link shortcuts element ID");
+
+		// Remove formatted value state with link(s)
+		this.oMaskInput.setFormattedValueStateText(null);
+		await nextUIUpdate(this.clock);
+
+		oAccDomRef = document.getElementById(sInvisiblemesageId);
+		aDescribedBy = this.oMaskInput.getFocusDomRef().getAttribute("aria-describedby")?.split(' ');
+		bDescribedByContainsAccForLinks = aDescribedBy?.some(function (sId) {
+			return sId === sInvisiblemesageId;
+		});
+
+		assert.notOk(this.oMaskInput.getDomRef().contains(oAccDomRef), "No acc DOM for links is created");
+		assert.notOk(bDescribedByContainsAccForLinks, "Area-describedby for input does not contain links shortcuts element ID");
+
+		//Clean up
+		oFormattedValueStateText.destroy();
+	});
+
+	QUnit.test("Testing aria describedby when value state is Error", async function (assert) {
+		const oResourceBundle = Library.getResourceBundleFor("sap.m");
+		const sInvisiblemesageId = this.oMaskInput.getValueStateLinksShortcutsId();
+
+		this.oMaskInput.setValueState(ValueState.Error);
+		let oFormattedValueStateText = new FormattedText({
+			htmlText: "Value state message containing %%0 %%1",
+			controls: [new Link({
+				text: "multiple",
+				href: "#"
+			}),
+			new Link({
+				text: "links",
+				href: "#"
+			})]
+		});
+
+		this.oMaskInput.setFormattedValueStateText(oFormattedValueStateText);
+		await nextUIUpdate(this.clock);
+
+		let oAccDomRef = document.getElementById(sInvisiblemesageId);
+		let aDescribedBy = this.oMaskInput.getFocusDomRef().getAttribute("aria-describedby")?.split(' ');
+		let bDescribedByContainsAccForLinks = aDescribedBy?.some(function (sId) {
+			return sId === sInvisiblemesageId;
+		});
+
+		const sLinksTextId = Device.os.macintosh ? "INPUTBASE_VALUE_STATE_LINKS_MAC" : "INPUTBASE_VALUE_STATE_LINKS";
+		const sMultipleLinksText = oResourceBundle.getText(sLinksTextId);
+
+		// Assert — shortcuts span rendered and in describedby; error message node is in aria-errormessage
+		assert.ok(this.oMaskInput.getDomRef().contains(oAccDomRef), "Accessibility DOM for links shortcuts announcement is created");
+		assert.strictEqual(oAccDomRef.innerText, sMultipleLinksText, "Links shortcuts announcement is as expected");
+		assert.ok(bDescribedByContainsAccForLinks, "aria-describedby for input contains the links shortcuts element ID");
+		assert.ok(this.oMaskInput.getFocusDomRef().getAttribute("aria-errormessage"), "aria-errormessage is set for Error value state");
+
+		oFormattedValueStateText = new FormattedText({
+			htmlText: "Value state message containing %%0",
+			controls: [new Link({
+				text: "link",
+				href: "#"
+			})]
+		});
+		this.oMaskInput.setFormattedValueStateText(oFormattedValueStateText);
+		await nextUIUpdate(this.clock);
+
+		oAccDomRef = document.getElementById(sInvisiblemesageId);
+		aDescribedBy = this.oMaskInput.getFocusDomRef().getAttribute("aria-describedby")?.split(' ');
+		bDescribedByContainsAccForLinks = aDescribedBy?.some(function (sId) {
+			return sId === sInvisiblemesageId;
+		});
+		const sLinkTextId = Device.os.macintosh ? "INPUTBASE_VALUE_STATE_LINK_MAC" : "INPUTBASE_VALUE_STATE_LINK";
+		const sSingleLink = oResourceBundle.getText(sLinkTextId);
+
+		assert.ok(this.oMaskInput.getDomRef().contains(oAccDomRef), "Accessibility DOM for links shortcuts announcement is created");
+		assert.strictEqual(oAccDomRef.innerText, sSingleLink, "Links shortcuts announcement is as expected");
+		assert.ok(bDescribedByContainsAccForLinks, "aria-describedby for input contains the link shortcuts element ID");
+
+		// Remove formatted value state with link(s)
+		this.oMaskInput.setFormattedValueStateText(null);
+		await nextUIUpdate(this.clock);
+
+		oAccDomRef = document.getElementById(sInvisiblemesageId);
+		aDescribedBy = this.oMaskInput.getFocusDomRef().getAttribute("aria-describedby")?.split(' ');
+		bDescribedByContainsAccForLinks = aDescribedBy?.some(function (sId) {
+			return sId === sInvisiblemesageId;
+		});
+
+		assert.notOk(this.oMaskInput.getDomRef().contains(oAccDomRef), "No acc DOM for links is created");
+		assert.notOk(bDescribedByContainsAccForLinks, "aria-describedby for input does not contain links shortcuts element ID");
+
+		//Clean up
+		oFormattedValueStateText.destroy();
+	});
+
 	QUnit.module("Clear Icon", {
 		beforeEach: async function () {
 			this.oMaskInput = new MaskInput({
@@ -1501,8 +1656,86 @@ sap.ui.define([
 		spyLiveChange = null;
 	});
 
+	QUnit.module("Value State Mesage interactions",  {
+		beforeEach: async function () {
+			this.clock = sinon.useFakeTimers();
+			this.oMaskInput = new MaskInput({
+				valueState: "Error",
+				formattedValueStateText: new FormattedText({
+					htmlText: "Value state message containing a %%0",
+					controls: new Link({
+						text: "link",
+						href: "#"
+					})
+				})
+			});
+			this.oMaskInput.placeAt("content");
+			await nextUIUpdate(this.clock);
+		},
+		afterEach: function () {
+			// cleanup
+			this.oMaskInput.destroy();
+			runAllTimersAndRestore(this.clock);
+		}
+	});
+
+	QUnit.test("Ctrl+Alt+F8 moves focus from the input tho the first value state message link", function(assert){
+		this.oMaskInput.focus();
+		this.clock.tick(300);
+
+		qutils.triggerKeydown(this.oMaskInput.getFocusDomRef(), KeyCodes.F8, false, true, true);
+		this.clock.tick(300);
+
+		const aLink = this.oMaskInput._getValueStateLinks();
+
+		assert.strictEqual(aLink.length, 1, "One link is rendered in the value state message");
+		assert.strictEqual(document.activeElement, aLink[0].getDomRef(), "Focus is on the first link in the value state message popup");
+	});
+
+	QUnit.test("Pressing SHIFT+TAB moves focus from the value state link to the input", function(assert){
+		this.oMaskInput.focus();
+		this.clock.tick(300);
+
+		qutils.triggerKeydown(this.oMaskInput.getFocusDomRef(), KeyCodes.F8, false, true, true);
+		this.clock.tick(500);
+
+		qutils.triggerKeydown(document.activeElement, KeyCodes.TAB, true);
+		this.clock.tick(500);
+
+		// assert
+		assert.strictEqual(document.activeElement, this.oMaskInput.getFocusDomRef(), "Focus is on the input");
+	});
+
+	QUnit.test("Pressing TAB from the value state link closes the value state message and moves the focus", function(assert){
+		var fnValueStateCloseSpy = this.spy(this.oMaskInput, "closeValueStateMessage");
+
+		this.oMaskInput.focus();
+		this.clock.tick(300);
+
+		qutils.triggerKeydown(this.oMaskInput.getFocusDomRef(), KeyCodes.F8, false, true, true);
+		this.clock.tick(500);
+
+		qutils.triggerKeydown(document.activeElement, KeyCodes.TAB);
+		this.clock.tick(500);
+
+		const aLinks = this.oMaskInput._getValueStateLinks();
+
+		// assert
+		assert.strictEqual(fnValueStateCloseSpy.callCount, 1, "Value state message is closed");
+		assert.notStrictEqual(document.activeElement, aLinks[0].getDomRef(), "Focus is not on the link in the value state message popup");
+	});
+
 
 	// Helper functions
+
+	function runAllTimersAndRestore(oClock) {
+		if (!oClock) {
+			return;
+		}
+
+		oClock.runAll();
+		oClock.restore();
+	}
 
 	function checkForDeleteAndBackspace() {
 		var oRule = new MaskInputRule();

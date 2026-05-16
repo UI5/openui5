@@ -979,4 +979,73 @@ sap.ui.define([
 			fnDone();
 		}, 400);
 	});
+
+	QUnit.module("timeoutWaiter - log level guard", {
+		beforeEach: function () {
+			this.defaultLogLevel = _OpaLogger.getLevel();
+		},
+		afterEach: function () {
+			_OpaLogger.setLevel(this.defaultLogLevel);
+		}
+	});
+
+	QUnit.test("Should not call debug() when log level is below DEBUG", function (assert) {
+		var fnDone = assert.async();
+		_OpaLogger.setLevel("ERROR");
+		var oDebugSpy = sinon.spy(timeoutWaiter._oHasPendingLogger, "debug");
+
+		fnSetTimeout(function () {}, 50);
+
+		fnSetTimeout(function () {
+			timeoutWaiter.hasPending();
+			assert.ok(oDebugSpy.notCalled, "debug() should not be called at ERROR level");
+			oDebugSpy.restore();
+			fnDone();
+		}, 10);
+	});
+
+	QUnit.test("Should call debug() when log level is DEBUG", function (assert) {
+		var fnDone = assert.async();
+		_OpaLogger.setLevel("DEBUG");
+		var oDebugSpy = sinon.spy(timeoutWaiter._oHasPendingLogger, "debug");
+
+		fnSetTimeout(function () {}, 50);
+
+		fnSetTimeout(function () {
+			timeoutWaiter.hasPending();
+			assert.ok(oDebugSpy.calledOnce, "debug() should be called at DEBUG level");
+			oDebugSpy.restore();
+			fnDone();
+		}, 10);
+	});
+
+	QUnit.test("Should not call trace() when log level is DEBUG", function (assert) {
+		var fnDone = assert.async();
+		_OpaLogger.setLevel("DEBUG");
+		var oTraceSpy = sinon.spy(timeoutWaiter._oHasPendingLogger, "trace");
+
+		fnSetTimeout(function () {}, 50);
+
+		fnSetTimeout(function () {
+			timeoutWaiter.hasPending();
+			assert.ok(oTraceSpy.notCalled, "trace() should not be called at DEBUG level");
+			oTraceSpy.restore();
+			fnDone();
+		}, 10);
+	});
+
+	QUnit.test("Should call trace() when log level is TRACE", function (assert) {
+		var fnDone = assert.async();
+		_OpaLogger.setLevel("TRACE");
+		var oTraceSpy = sinon.spy(timeoutWaiter._oHasPendingLogger, "trace");
+
+		fnSetTimeout(function () {}, 50);
+
+		fnSetTimeout(function () {
+			timeoutWaiter.hasPending();
+			assert.ok(oTraceSpy.calledOnce, "trace() should be called at TRACE level");
+			oTraceSpy.restore();
+			fnDone();
+		}, 10);
+	});
 });
