@@ -27,6 +27,15 @@ sap.ui.define(["sap/ui/core/Lib", 'sap/ui/core/Renderer', './InputBaseRenderer']
 
 		mAccessibilityState["roledescription"] = sCustomRole;
 
+		if (oControl.getValueStateLinksForAcc().length) {
+			const sInvisibleMessageid = oControl.getValueStateLinksShortcutsId();
+			const sExisting = mAccessibilityState["describedby"] && mAccessibilityState["describedby"].value;
+			mAccessibilityState["describedby"] = {
+				value: sExisting ? sExisting + " " + sInvisibleMessageid : sInvisibleMessageid,
+				append: true
+			};
+		}
+
 		return mAccessibilityState;
 	};
 

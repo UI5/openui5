@@ -176,6 +176,49 @@ sap.ui.define(['./InputBase', './MaskEnabler', './MaskInputRenderer'], function(
 		this._setCursorPosition(Math.max(this._iUserInputStartPosition, iStart));
 	};
 
+	MaskInput.prototype.getValueStateLinksForAcc = function(){
+		const oFormattedText = this.getFormattedValueStateText();
+		if (!oFormattedText){
+			return [];
+		}
+		return oFormattedText.getControls();
+	};
+
+	MaskInput.prototype.onkeydown = function(oEvent) {
+		// Handle keyboard shortcut for value state link navigation first
+		if (this.areHotKeysPressed(oEvent)) {
+			this._handleValueStateLinkNav();
+			return;
+		}
+
+		// Let MaskEnabler handle all other keys
+		MaskEnabler.onkeydown.apply(this, arguments);
+	};
+
+
+	MaskInput.prototype.onfocusout = function (oEvent) {
+		// Call MaskEnabler's onfocusout but prevent it from closing value state message
+		// if focus is moving to a value state link
+		if (this._isMaskEnabled()) {
+			this.bFocusoutDueRendering = this.bRenderingPhase;
+			this.removeStyleClass("sapMFocus");
+
+			if (this.bRenderingPhase) {
+				return;
+			}
+
+			// Don't close the ValueStateMessage on focusout if it contains links and we're navigating to one
+			if (!this._bClickOnValueStateLink(oEvent)) {
+				this.closeValueStateMessage();
+			}
+			this._inputCompletedHandler();
+		} else {
+			this._inputCompletedHandlerNoMask();
+			InputBase.prototype.onfocusout.apply(this, arguments);
+		}
+	};
+
+
 	MaskInput.prototype.onsapenter = function(oEvent) {
 		const bFireSubmit = this.getEnabled() && this.getEditable();
 
