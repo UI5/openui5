@@ -83,6 +83,10 @@ sap.ui.define(["sap/ui/core/Lib", "sap/uxap/library", "sap/ui/fl/designtime/util
 				actions : {
 					move: {
 						changeType: "moveControls"
+					},
+					addIFrame: {
+						changeType: "addIFrame",
+						text: Library.getResourceBundleFor("sap.uxap").getText("ADD_IFRAME_AS_SUBSECTION")
 					}
 				}
 			}

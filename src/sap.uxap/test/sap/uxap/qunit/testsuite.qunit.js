@@ -208,6 +208,21 @@ sap.ui.define(function () {
 				}
 			},
 
+			"changeHandler/AddIFrameObjectPageSection": {
+				group: "ChangeHandler",
+				sinon: {
+					version: 1 // sinon-qunit-bridge does not support nested QUnit modules
+				},
+				coverage: {
+					only: ["sap/uxap/changeHandler/AddIFrameObjectPageSection"]
+				},
+				ui5: {
+					resourceroots: {
+						testComponent: "test-resources/sap/ui/fl/qunit/testComponent"
+					}
+				}
+			},
+
 			// -------------------------------------------------------------------------------
 			// Designtime tests:
 			// -------------------------------------------------------------------------------

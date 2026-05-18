@@ -842,4 +842,58 @@ sap.ui.define([
 		afterUndo: fnConfirmSubSectionIsRenamedLayoutParameterOldValue,
 		afterRedo: fnConfirmSubSectionRenamedLayoutParameterNewValue
 	});
+
+	// Add IFrame as subsection
+	function fnConfirmIFrameSubSectionWasAdded(oAppComponent, oViewAfterAction, assert) {
+		var aSubSections = oViewAfterAction.byId("section").getSubSections();
+		assert.strictEqual(aSubSections.length, 2, "then a new sub section was added");
+		var oNewSubSection = aSubSections[0];
+		assert.ok(oNewSubSection.getId().indexOf("iFrameSubSection") > -1, "the new sub section has the expected id");
+		var aBlocks = oNewSubSection.getBlocks();
+		assert.strictEqual(aBlocks.length, 1, "the new sub section contains one block");
+		assert.strictEqual(aBlocks[0].getMetadata().getName(), "sap.ui.fl.util.IFrame", "the block is an IFrame");
+	}
+
+	function fnConfirmIFrameSubSectionWasRemoved(oAppComponent, oViewAfterAction, assert) {
+		var aSubSections = oViewAfterAction.byId("section").getSubSections();
+		assert.strictEqual(aSubSections.length, 1, "then the iFrame sub section was removed");
+		assert.strictEqual(aSubSections[0].getId(), oViewAfterAction.createId("subSection1"),
+			"the remaining sub section is the original one");
+	}
+
+	elementActionTest("Checking the addIFrame action for a sap.uxap.ObjectPageSection control (as subsection)", {
+		xmlView:
+		'<mvc:View xmlns:mvc="sap.ui.core.mvc" ' +
+		'xmlns:m="sap.m" xmlns:uxap="sap.uxap" >' +
+			'<uxap:ObjectPageLayout id="op">' +
+				'<uxap:sections>' +
+					'<uxap:ObjectPageSection id="section" title="Section Title">' +
+						'<uxap:subSections>' +
+							'<uxap:ObjectPageSubSection id="subSection1" title="Subsection with button">' +
+								'<m:Button text="Subsection UI adaptation" />' +
+							'</uxap:ObjectPageSubSection>' +
+						'</uxap:subSections>' +
+					'</uxap:ObjectPageSection>' +
+				'</uxap:sections>' +
+			'</uxap:ObjectPageLayout>' +
+		'</mvc:View>',
+		action: {
+			name: "addIFrame",
+			controlId: "section",
+			parameter: function(oView) {
+				return {
+					baseId: oView.createId("iFrameSubSection"),
+					targetAggregation: "subSections",
+					index: 0,
+					url: "someUrl",
+					width: "10px",
+					height: "11px"
+				};
+			}
+		},
+		layer: "VENDOR",
+		afterAction: fnConfirmIFrameSubSectionWasAdded,
+		afterUndo: fnConfirmIFrameSubSectionWasRemoved,
+		afterRedo: fnConfirmIFrameSubSectionWasAdded
+	});
 });
