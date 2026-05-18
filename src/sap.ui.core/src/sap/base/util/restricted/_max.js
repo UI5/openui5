@@ -2,7 +2,7 @@
  * ${copyright}
  */
 /**
- * See {@link https://lodash.com/docs/4.17.23#max}
+ * See {@link https://lodash.com/docs/4.18.1#max}
  *
  * @function
  * @alias module:sap/base/util/restricted/_max
