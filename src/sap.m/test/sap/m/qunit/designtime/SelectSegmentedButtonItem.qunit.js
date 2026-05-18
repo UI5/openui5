@@ -88,4 +88,108 @@ sap.ui.define([
 		oItem1.destroy();
 		oItem2.destroy();
 	});
+
+	QUnit.test("revertData does not contain circular structures (only serializable data)", async function (assert) {
+		const oSB = new SegmentedButton("sb2", { selectedKey: "x" });
+		const oItem1 = new SegmentedButtonItem("itemX", { key: "x", text: "X" });
+		const oItem2 = new SegmentedButtonItem("itemY", { key: "y", text: "Y" });
+		oSB.addItem(oItem1);
+		oSB.addItem(oItem2);
+
+		const mRegistry = {
+			sb2: oSB, itemX: oItem1, itemY: oItem2,
+			[oItem1.getId()]: oItem1, [oItem2.getId()]: oItem2
+		};
+
+		const oChange = {
+			_getContent: {
+				selectedItem: oItem2.getId(),
+				previousItem: oItem1.getId(),
+				previousKey: "x",
+				bUpdateSelectedKey: true
+			},
+			getContent: function () { return this._getContent; },
+			setRevertData: function (d) { this._revert = d; },
+			getRevertData: function () { return this._revert; },
+			resetRevertData: function () { this._revert = null; }
+		};
+
+		const oModifier = {
+			targets: "jsControlTree",
+			bySelector: function (vSelector) {
+				if (typeof vSelector === "string") {
+					return Promise.resolve(mRegistry[vSelector] || mRegistry[vSelector.replace(/^.*#/, "")] || null);
+				}
+				return Promise.resolve(vSelector || null);
+			},
+			getPropertyBinding: function (oControl, sProp) {
+				if (sProp === "selectedKey") {
+					return Promise.resolve({ path: "/SelectedKey", model: "settings", parts: [{ path: "/SelectedKey", model: "settings" }] });
+				}
+				return Promise.resolve(null);
+			},
+			getProperty: function (oControl, sProp) {
+				if (!oControl) {
+					return Promise.resolve(null);
+				}
+				if (sProp === "selectedKey" && typeof oControl.getKey === "function") {
+					return Promise.resolve(oControl.getKey());
+				}
+				return Promise.resolve(null);
+			},
+			setAssociation: function (oControl, sAssociation, vTarget) {
+				oControl.setSelectedItem(vTarget || "", false);
+				return Promise.resolve();
+			},
+			setProperty: function (oControl, sProp, vValue) {
+				if (sProp === "selectedKey" && typeof oControl.setSelectedKey === "function") {
+					oControl.setSelectedKey(vValue);
+				}
+				return Promise.resolve();
+			},
+			bindProperty: function (oControl, sProp, oBindingInfo) {
+				if (sProp === "selectedKey" && oBindingInfo && oBindingInfo.path) {
+					oControl.bindProperty("selectedKey", oBindingInfo);
+				}
+				return Promise.resolve();
+			}
+		};
+
+		const mPropertyBag = { modifier: oModifier, view: null, appComponent: null };
+
+		await SelectSegmentedButtonItem.applyChange(oChange, oSB, mPropertyBag);
+
+		// Verify revert data is set, serializable, and contains binding info
+		const oRevertData = oChange.getRevertData();
+		assert.ok(oRevertData, "revertData is set after applyChange");
+		assert.ok(oRevertData.originalSelectedKeyBinding, "originalSelectedKeyBinding is populated");
+		assert.strictEqual(oRevertData.originalSelectedKeyBinding.path, "/SelectedKey", "binding path is preserved");
+		assert.strictEqual(oRevertData.originalSelectedKeyBinding.model, "settings", "binding model is preserved");
+
+		let bSerializable = true;
+		try {
+			JSON.stringify(oRevertData);
+		} catch (e) {
+			bSerializable = false;
+		}
+		assert.ok(bSerializable, "revertData does not contain circular structures and is JSON-serializable");
+		// Verify revert data contains only primitive values or plain objects
+		Object.keys(oRevertData).forEach(function (sKey) {
+			const vValue = oRevertData[sKey];
+			const bAllowed = vValue === null || vValue === undefined
+				|| typeof vValue === "string" || typeof vValue === "boolean" || typeof vValue === "number"
+				|| (typeof vValue === "object" && vValue.constructor === Object);
+			assert.ok(
+				bAllowed,
+				"revertData." + sKey + " is a primitive or plain object (type: " + typeof vValue + "), not a control reference"
+			);
+		});
+
+		// Revert should still work correctly
+		await SelectSegmentedButtonItem.revertChange(oChange, oSB, mPropertyBag);
+
+		oSB.destroy();
+		oItem1.destroy();
+		oItem2.destroy();
+	});
 });
