@@ -677,22 +677,22 @@ sap.ui.define([
 			})
 			.then(function() {
 				assert.strictEqual(this.oIsLayerFilteringRequiredStub.callCount, 1, "the filtering is done during initialization");
-				assert.strictEqual(this.oGetFlexInfoSessionStub.callCount, 3, "get flex info session during initialization");
+				assert.strictEqual(this.oGetFlexInfoSessionStub.callCount, 5, "get flex info session during initialization");
 
 				assert.deepEqual(FlexState.getAppDescriptorChanges(sReference), [], "the correct map is returned");
 				assert.strictEqual(this.oIsLayerFilteringRequiredStub.callCount, 1, "the filtering was not triggered again");
-				assert.strictEqual(this.oGetFlexInfoSessionStub.callCount, 3, "get flex info session was not triggered again");
+				assert.strictEqual(this.oGetFlexInfoSessionStub.callCount, 5, "get flex info session was not triggered again");
 				assert.deepEqual(FlexState.getAppDescriptorChanges(sReference), [], "the correct map is returned");
 				assert.strictEqual(this.oCallPrepareFunctionStub.callCount, 0, "the prepare function was not called again");
 				assert.strictEqual(this.oIsLayerFilteringRequiredStub.callCount, 1, "the filtering was not triggered again");
-				assert.strictEqual(this.oGetFlexInfoSessionStub.callCount, 3, "get flex info session was not triggered again");
+				assert.strictEqual(this.oGetFlexInfoSessionStub.callCount, 5, "get flex info session was not triggered again");
 
 				assert.strictEqual(FlexState.getCompVariantsMap(sReference), "compVariants", "the correct map is returned");
 				assert.strictEqual(this.oCallPrepareFunctionStub.callCount, 1, "the prepare function was called once for the CompVariants");
 				assert.strictEqual(FlexState.getCompVariantsMap(sReference), "compVariants", "the correct map is returned");
 				assert.strictEqual(this.oCallPrepareFunctionStub.callCount, 1, "the prepare function was not called again");
 				assert.strictEqual(this.oIsLayerFilteringRequiredStub.callCount, 1, "the filtering was not triggered again");
-				assert.strictEqual(this.oGetFlexInfoSessionStub.callCount, 3, "get flex info session was not triggered again");
+				assert.strictEqual(this.oGetFlexInfoSessionStub.callCount, 5, "get flex info session was not triggered again");
 			}.bind(this));
 		});
 
@@ -784,7 +784,7 @@ sap.ui.define([
 			.then(function() {
 				FlexState.getAppDescriptorChanges(sReference);
 				assert.equal(this.oIsLayerFilteringRequiredStub.callCount, 1, "the check was made once");
-				assert.equal(this.oGetFlexInfoSessionStub.callCount, 3, "get flex info session");
+				assert.equal(this.oGetFlexInfoSessionStub.callCount, 5, "get flex info session");
 			}.bind(this))
 			.then(FlexState.initialize.bind(null, {
 				reference: sReference,
@@ -803,7 +803,7 @@ sap.ui.define([
 			});
 			FlexState.getAppDescriptorChanges(sReference);
 			assert.equal(this.oIsLayerFilteringRequiredStub.callCount, 1, "the check was made once");
-			assert.equal(this.oGetFlexInfoSessionStub.callCount, 3, "get flex info session");
+			assert.equal(this.oGetFlexInfoSessionStub.callCount, 5, "get flex info session");
 
 			FlexState.rebuildFilteredResponse(sReference);
 			await FlexState.initialize({
@@ -813,7 +813,7 @@ sap.ui.define([
 
 			FlexState.getAppDescriptorChanges(sReference);
 			assert.equal(this.oIsLayerFilteringRequiredStub.callCount, 2, "the check was made again");
-			assert.equal(this.oGetFlexInfoSessionStub.callCount, 6, "get flex info session again");
+			assert.equal(this.oGetFlexInfoSessionStub.callCount, 8, "get flex info session again");
 		});
 	});
 
@@ -910,6 +910,148 @@ sap.ui.define([
 				allContextsProvided: true
 			});
 			assert.strictEqual(this.oLoadFlexDataStub.callCount, 3, "the data is requested again");
+		});
+
+		QUnit.test("when allContextsProvided is returned in the flex/data response info, a subsequent initialize does not trigger a reinit", async function(assert) {
+			// Before the fix: enhancePropertyBag ran before loadFlexData so the session was still empty;
+			// the instance was created with allContextsProvided: undefined even though the response had false.
+			// storeInfoInSession then wrote false into the session. The next initialize compared
+			// undefined (instance) !== false (session via enhancePropertyBag) and triggered an unwanted reinit.
+			// After the fix: loadFlexData refreshes mPropertyBag.allContextsProvided from the session after
+			// storeInfoInSession, so the instance is correctly created with false and no reinit happens.
+			this.oLoadFlexDataStub.resolves(merge({}, mEmptyResponse, {
+				changes: { info: { allContextsProvided: false } }
+			}));
+
+			await FlexState.initialize({ reference: sReference, componentId: sComponentId });
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "data is requested once on first initialize");
+
+			await FlexState.initialize({ reference: sReference, componentId: sComponentId });
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "data is NOT requested again — no unwanted reinit");
+		});
+
+		QUnit.test("when a stale FlexInfoSession exists and the response info repopulates allContextsProvided, no flip-flop reinit occurs", async function(assert) {
+			// The enhancePropertyBag captured the session value before loadFlexData ran,
+			// so when the response's info.allContextsProvided repopulated the session, the instance was
+			// still written with the stale (undefined) propertyBag value. Every subsequent initialize
+			// then saw instance !== session and triggered an unnecessary backend reload.
+			// The fix resyncs mPropertyBag from the session inside loadFlexData after storeInfoInSession.
+			FlexInfoSession.setByReference({ allContextsProvided: true }, sReference);
+			this.oLoadFlexDataStub.resolves(merge({}, mEmptyResponse, {
+				changes: { info: { allContextsProvided: true } }
+			}));
+
+			await FlexState.initialize({ reference: sReference, componentId: sComponentId });
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "data is requested once on first initialize");
+			assert.strictEqual(
+				FlexInfoSession.getByReference(sReference).allContextsProvided,
+				true,
+				"the session was repopulated by the response info"
+			);
+
+			await FlexState.initialize({ reference: sReference, componentId: sComponentId });
+			assert.strictEqual(
+				this.oLoadFlexDataStub.callCount,
+				1,
+				"data is NOT requested again — instance and session stay in sync, no flip-flop"
+			);
+		});
+
+		QUnit.test("when initialize is called with no sap.ui.rta.restart, saveChangeKeepSession not set and no existing FlexState instance", async function(assert) {
+			const sVersionID = "versionID";
+			FlexInfoSession.setByReference({
+				allContextsProvided: false,
+				version: sVersionID
+			}, sReference);
+
+			let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.allContextsProvided, false, "the FlexInfoSession is set before initialize");
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession version is set before initialize");
+
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the flex data is requested once");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].version, undefined, "the stale version is not passed to loadFlexData");
+			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.deepEqual(oFlexInfoSession, {}, "the FlexInfoSession is cleared before the load");
+		});
+
+		QUnit.test("when initialize is called with no sap.ui.rta.restart, saveChangeKeepSession not set and an existing FlexState instance", async function(assert) {
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+
+			const sVersionID = "versionID";
+			FlexInfoSession.setByReference({
+				allContextsProvided: false,
+				version: sVersionID
+			}, sReference);
+
+			let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession version is set before re-initialize");
+
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId,
+				reInitialize: true
+			});
+
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 2, "the flex data is requested again");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(1).args[0].version, sVersionID, "the session version is passed to loadFlexData when an instance already exists");
+			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession is not cleared");
+		});
+
+		QUnit.test("when initialize is called with sap.ui.rta.restart set, saveChangeKeepSession not set and no existing FlexState instance", async function(assert) {
+			const sVersionID = "versionID";
+			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", "true");
+			FlexInfoSession.setByReference({
+				allContextsProvided: false,
+				version: sVersionID
+			}, sReference);
+
+			let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.allContextsProvided, false, "the FlexInfoSession is set before initialize");
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession version is set before initialize");
+
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the flex data is requested once");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].version, sVersionID, "the session version is passed to loadFlexData when RTA is restarting");
+			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession is not cleared when RTA is restarting");
+			window.sessionStorage.removeItem("sap.ui.rta.restart.CUSTOMER");
+		});
+
+		QUnit.test("when initialize is called with no sap.ui.rta.restart, saveChangeKeepSession set and no existing FlexState instance", async function(assert) {
+			const sVersionID = "versionID";
+			FlexInfoSession.setByReference({
+				allContextsProvided: false,
+				version: sVersionID,
+				saveChangeKeepSession: true
+			}, sReference);
+
+			let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.allContextsProvided, false, "the FlexInfoSession is set before initialize");
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession version is set before initialize");
+			assert.strictEqual(oFlexInfoSession.saveChangeKeepSession, true, "the FlexInfoSession saveChangeKeepSession is set before initialize");
+
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the flex data is requested once");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].version, sVersionID, "the session version is passed to loadFlexData when saveChangeKeepSession is set");
+			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession is not cleared when saveChangeKeepSession is set");
 		});
 	});
 
