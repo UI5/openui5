@@ -83,5 +83,15 @@
         "text": " Integration cards: Fixed pagination with microcharts"
       }
     ]
+  },
+  "1.120.45": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "984b929810915468429996ddff799db7f4894200",
+        "type": "FIX",
+        "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
+      }
+    ]
   }
 }

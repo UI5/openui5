@@ -1486,5 +1486,20 @@
         "text": " sap.m.Avatar: prevent event bubbling when LightBox is present"
       }
     ]
+  },
+  "1.120.45": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "984b929810915468429996ddff799db7f4894200",
+        "type": "FIX",
+        "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
+      },
+      {
+        "id": "97cf3be030cd6011b14bf5e4e1a379b8b938c85f",
+        "type": "FIX",
+        "text": " sap.m.Text: Skip unstable test in Chrome"
+      }
+    ]
   }
 }

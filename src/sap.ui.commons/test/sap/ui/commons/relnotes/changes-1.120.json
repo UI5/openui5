@@ -1,0 +1,12 @@
+{
+  "1.120.45": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "cea2470c70ff9e6b3aeca66fe5672dfff86d5a60",
+        "type": "FIX",
+        "text": " sap.ui.commons.Tree: fix unstable test"
+      }
+    ]
+  }
+}

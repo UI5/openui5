@@ -219,5 +219,15 @@
         "text": " sap.ui.unified.CalendarDateInterval: shows correct year"
       }
     ]
+  },
+  "1.120.45": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "ebf9d255669f136b03771b5a4fcfd4102d66d1b5",
+        "type": "FIX",
+        "text": " sap.m.DateRangeSelection: selection via keyboard is working"
+      }
+    ]
   }
 }

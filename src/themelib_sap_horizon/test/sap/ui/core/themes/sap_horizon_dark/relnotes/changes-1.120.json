@@ -351,5 +351,15 @@
         "text": " sap.m.Button: focus is visible on mobile"
       }
     ]
+  },
+  "1.120.45": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "3587f1a07d794e4b8f534d8f87fec52ca10fe9d6",
+        "type": "FIX",
+        "text": " Hierarchical Select: Fix styles Horizon"
+      }
+    ]
   }
 }
