@@ -19,51 +19,47 @@ function (ComponentContainer, Shell, Core, BlockBase, ObjectPageLayout, ObjectPa
 	QUnit.module("BlockBase");
 
 	QUnit.test("Owner component propagated to views", function (assert) {
-		var oComponentContainer,
-			oComponent,
-			oMainView,
-			oMainController,
-			oObjectPage,
-			oBlock,
-			oBlockView,
-			oBlockViewController,
-			done = assert.async();
+		var done = assert.async();
 
 		assert.expect(5);
 
-		new Shell("Shell", {
-			app: new ComponentContainer("myComponentContainer", {
-				name: 'blockbasetest',
-				height: "100%"
-			})
-		}).placeAt('qunit-fixture');
+		var oComponentContainer = new ComponentContainer("myComponentContainer", {
+			name: 'blockbasetest',
+			height: "100%"
+		});
 
-		Core.applyChanges();
-
-		setTimeout(function () {
-			oComponentContainer = Core.byId("myComponentContainer");
-			oComponent = oComponentContainer.getComponentInstance();
+		oComponentContainer.attachComponentCreated(function () {
+			var oComponent = oComponentContainer.getComponentInstance();
 
 			assert.ok(oComponent && oComponent.getMetadata().getName() === "blockbasetest.Component", "The component was successfully created");
 
-			oMainView = oComponent.getRootControl();
-			oMainController = oMainView.getController();
+			var oMainView = oComponent.getRootControl();
+			var oMainController = oMainView.getController();
 
 			assert.ok(oMainView && oMainController, "The main view and controller were successfully created");
 
-			oObjectPage = oMainView.byId("ObjectPageLayout");
-			oBlock = oObjectPage.getSections()[0].getSubSections()[0].getBlocks()[0];
+			var oObjectPage = oMainView.byId("ObjectPageLayout");
+			var oBlock = oObjectPage.getSections()[0].getSubSections()[0].getBlocks()[0];
 
 			assert.ok(oBlock, "The block was successfully created");
-			oBlockView = oBlock.getAggregation("_views")[0];
-			oBlockViewController = oBlockView.getController();
 
-			assert.ok(oBlockView && oBlockViewController, "The block view and its controller were successfully created");
+			oBlock.attachEventOnce("viewInit", function (oEvent) {
+				var oBlockView = oEvent.getParameter("view");
+				var oBlockViewController = oBlockView.getController();
 
-			assert.strictEqual(oBlockViewController.getOwnerComponent(), oMainController.getOwnerComponent(), "The block view is owned by the component");
+				assert.ok(oBlockView && oBlockViewController, "The block view and its controller were successfully created");
 
-			done();
-		}, 200);
+				assert.strictEqual(oBlockViewController.getOwnerComponent(), oMainController.getOwnerComponent(), "The block view is owned by the component");
+
+				done();
+			});
+		});
+
+		new Shell("Shell", {
+			app: oComponentContainer
+		}).placeAt('qunit-fixture');
+
+		Core.applyChanges();
 	});
 
 	QUnit.test("blocks are target of lazy loading feature", function (assert) {
