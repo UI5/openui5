@@ -805,6 +805,106 @@
 		strictEqual(oIcon.getColor(), "1", "one time binding -> value unchanged");
 	});
 
+	test("Restricted globals must not be resolved as formatter (global lookup)", function() {
+		var aRestricted = [
+			"eval",
+			"setTimeout",
+			"setInterval",
+			"document.write",
+			"document.writeln",
+			"location.assign",
+			"location.replace",
+			"jQuery.globalEval",
+			"jQuery.sap.globalEval"
+		];
+		var oLogMock = this.mock(jQuery.sap.log);
+		oLogMock.expects("error").exactly(aRestricted.length);
+
+		aRestricted.forEach(function(sName) {
+			var o = parse("{path:'something', formatter:'" + sName + "'}");
+			strictEqual(typeof o.formatter, "undefined",
+				sName + " must not be resolved as formatter");
+		});
+	});
+
+	test("Restricted globals must not be resolved via context variables", function() {
+		var oContext = {
+			myEval: window.eval,
+			myTimer: window.setTimeout,
+			myGlobalEval: jQuery.globalEval
+		};
+		var oLogMock = this.mock(jQuery.sap.log);
+		oLogMock.expects("error").exactly(3);
+
+		var o1 = parse("{path:'something', formatter:'.myEval'}", oContext);
+		strictEqual(typeof o1.formatter, "undefined",
+			"eval via context variable must not be resolved");
+
+		var o2 = parse("{path:'something', formatter:'.myTimer'}", oContext);
+		strictEqual(typeof o2.formatter, "undefined",
+			"setTimeout via context variable must not be resolved");
+
+		var o3 = parse("{path:'something', formatter:'.myGlobalEval'}", oContext);
+		strictEqual(typeof o3.formatter, "undefined",
+			"jQuery.globalEval via context variable must not be resolved");
+	});
+
+	test("Globals accessed via Window context must not be resolved", function() {
+		var aWindowPaths = [
+			"parent.eval",
+			"top.eval",
+			"parent.setTimeout",
+			"window.eval",
+			"self.eval",
+			"frames.eval",
+			"globalThis.eval"
+		];
+		var oLogMock = this.mock(jQuery.sap.log);
+		oLogMock.expects("error").exactly(aWindowPaths.length);
+
+		aWindowPaths.forEach(function(sPath) {
+			var o = parse("{path:'something', formatter:'" + sPath + "'}");
+			strictEqual(typeof o.formatter, "undefined",
+				sPath + " must not be resolved (Window as parent)");
+		});
+	});
+
+	test("Safe globals are still resolved as formatter", function() {
+		this.mock(jQuery.sap.log).expects("error").never();
+
+		var o1 = parse("{path:'something', formatter:'Global.formatter'}");
+		strictEqual(o1.formatter, Global.formatter, "Global.formatter resolved");
+
+		var o2 = parse("{path:'something', formatter:'.myformatter'}", oController);
+		strictEqual(o2.formatter.guid, oController.myformatter.guid,
+			"controller-local formatter resolved");
+
+		var o3 = parse("{path:'something', formatter:'parseInt'}");
+		strictEqual(o3.formatter, parseInt, "parseInt resolved as formatter");
+
+		var o4 = parse("{path:'something', formatter:'decodeURI'}");
+		strictEqual(o4.formatter, decodeURI, "decodeURI resolved as formatter");
+
+		var o5 = parse("{path:'something', formatter:'encodeURIComponent'}");
+		strictEqual(o5.formatter, encodeURIComponent, "encodeURIComponent resolved as formatter");
+
+		var o6 = parse("{path:'something', formatter:'isNaN'}");
+		strictEqual(o6.formatter, isNaN, "isNaN resolved as formatter");
+	});
+
+	test("Variable named 'parent' with regular object must still resolve", function() {
+		this.mock(jQuery.sap.log).expects("error").never();
+
+		var oContext = {
+			parent: {
+				method: function() { return "ok"; }
+			}
+		};
+		var o = parse("{path:'something', formatter:'.parent.method'}", oContext);
+		strictEqual(typeof o.formatter, "function",
+			"method on plain 'parent' object must still resolve");
+	});
+
 	</script>
 
 	<title>QUnit tests: Data binding Calculated Fields</title>

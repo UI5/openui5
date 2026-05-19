@@ -18,6 +18,36 @@ sap.ui.define(['jquery.sap.global', './ExpressionParser', 'sap/ui/model/BindingM
 		};
 
 	/**
+	 * Checks whether the given value is identical to one of the known
+	 * restricted global functions.
+	 *
+	 * @param {any} vValue The value to check
+	 * @returns {boolean} Whether the value is a restricted function
+	 */
+	function _isBlocklisted(vValue) {
+		// eslint-disable-next-line no-eval
+		return vValue === eval || vValue === setTimeout || vValue === setInterval
+			|| vValue === document.write || vValue === document.writeln
+			|| vValue === window.location.assign || vValue === window.location.replace
+			|| vValue === jQuery.globalEval
+			|| vValue === jQuery.sap.globalEval;
+	}
+
+	/**
+	 * Checks whether the given value or its context is a restricted
+	 * function that must not be resolved.
+	 *
+	 * @param {any} vValue The resolved value to check
+	 * @param {any} [oContext] The parent object from which <code>vValue</code> was retrieved
+	 * @returns {boolean} Whether the value or its context is restricted
+	 */
+	function _isRestricted(vValue, oContext) {
+		// oContext is a Window object when its 'window' self-reference points to itself
+		return (oContext != null && oContext.window == oContext)
+			|| _isBlocklisted(vValue) || _isBlocklisted(oContext);
+	}
+
+	/**
 	 * Regular expression to check for a (new) object literal
 	 */
 	var rObject = /^\{\s*[a-zA-Z$_][a-zA-Z0-9$_]*\s*:/;
@@ -171,13 +201,26 @@ sap.ui.define(['jquery.sap.global', './ExpressionParser', 'sap/ui/model/BindingM
 
 		function resolveRef(o,sProp) {
 			if ( typeof o[sProp] === "string" ) {
-				var fn, sName = o[sProp];
-				if ( jQuery.sap.startsWith(o[sProp], ".") ) {
-					fn = jQuery.sap.getObject(o[sProp].slice(1), undefined, oEnv.oContext);
-					o[sProp] = oEnv.bStaticContext ? fn : jQuery.proxy(fn, oEnv.oContext);
+				var fn, oParent,
+					sName = o[sProp],
+					bLocal = jQuery.sap.startsWith(sName, "."),
+					sPath = bLocal ? sName.slice(1) : sName,
+					aParts = sPath.split("."),
+					oRoot = bLocal ? oEnv.oContext : undefined;
+
+				if (aParts.length > 1) {
+					oParent = jQuery.sap.getObject(aParts.slice(0, -1).join("."), undefined, oRoot);
+					fn = oParent != null ? oParent[aParts[aParts.length - 1]] : undefined;
 				} else {
-					o[sProp] = jQuery.sap.getObject(o[sProp]);
+					fn = jQuery.sap.getObject(sPath, undefined, oRoot);
 				}
+
+				if (_isRestricted(fn, oParent)) {
+					fn = undefined;
+				}
+
+				o[sProp] = bLocal && !oEnv.bStaticContext && fn ? jQuery.proxy(fn, oEnv.oContext) : fn;
+
 				if (typeof (o[sProp]) !== "function") {
 					if (oEnv.bTolerateFunctionsNotFound) {
 						oEnv.aFunctionsNotFound = oEnv.aFunctionsNotFound || [];
