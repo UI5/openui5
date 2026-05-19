@@ -651,21 +651,22 @@ sap.ui.define([
 			const aChangesToRevert = aFlexObjects.filter((oChange) => {
 				return aFileNames.indexOf(oChange.getId()) !== -1;
 			});
+			if (!aChangesToRevert.length) {
+				return;
+			}
 			FlexState.update(sReference, aChangesToRevert.map((oFlexObject) => {
 				return { flexObject: oFlexObject.convertToFileContent(), type: "delete" };
 			}));
 
-			if (aChangesToRevert.length) {
-				await Reverter.revertMultipleChanges(
-					// Always revert changes in reverse order
-					[...aChangesToRevert].reverse(),
-					{
-						appComponent: mPropertyBag.appComponent,
-						modifier: JsControlTreeModifier,
-						reference: sReference
-					}
-				);
-			}
+			await Reverter.revertMultipleChanges(
+				// Always revert changes in reverse order
+				[...aChangesToRevert].reverse(),
+				{
+					appComponent: mPropertyBag.appComponent,
+					modifier: JsControlTreeModifier,
+					reference: sReference
+				}
+			);
 		}
 	};
 

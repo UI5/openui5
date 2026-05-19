@@ -180,7 +180,6 @@ sap.ui.define([
 				} else if (mPropertyBag.cacheKey) {
 					oResponse.cacheKey = mPropertyBag.cacheKey;
 				}
-				oResponse.changes = oResponse.changes.concat(oResponse.compVariants || []);
 				if (oResponse.settings) {
 					this.settings = oResponse.settings;
 					this.settings.isVariantAdaptationEnabled = !!this.settings.isPublicLayerAvailable;

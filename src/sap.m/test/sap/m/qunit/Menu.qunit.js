@@ -1077,6 +1077,25 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("MenuWrapper's _handleSubmenusAppearance clears stale oOpenedSubmenuParent reference", async function (assert) {
+		const oMenuWrapper = this.oMenu._getMenuWrapper();
+
+		this.oMenu.openBy(document.body);
+		await nextUIUpdate(this.clock);
+
+		const oStaleItem = new MenuItem({ text: "stale", items: [new MenuItem({ text: "sub" })] });
+		oMenuWrapper.oOpenedSubmenuParent = oStaleItem;
+
+		const oCurrentItem = this.oMenu.getItems()[0];
+
+		oMenuWrapper._handleSubmenusAppearance(oCurrentItem, false, false);
+
+		assert.strictEqual(oMenuWrapper.oOpenedSubmenuParent, null,
+			"Stale oOpenedSubmenuParent is cleared when item is no longer among current items");
+
+		oStaleItem.destroy();
+	});
+
 	QUnit.test("MenuWrapper respects sapUiSizeCompact class", async function (assert) {
 		var _bSetCompact = false;
 
@@ -1469,6 +1488,297 @@ sap.ui.define([
 		oMenu.destroy();
 		oButton.destroy();
 		oEndContentButton.destroy();
+	});
+
+	QUnit.test("MenuItem ariaDescribedBy renders aria-describedby attribute on the DOM element", async function(assert) {
+		// Arrange
+		const oDescribingLabel = new Label({ text: "Description text" }).placeAt("qunit-fixture"),
+			oButton = new Button({ text: "Open Menu" }).placeAt("qunit-fixture"),
+			oMenu = new Menu({
+				items: [
+					new MenuItem({ text: "Item with description" })
+				]
+			});
+
+		await nextUIUpdate(this.clock);
+
+		const oItem = oMenu.getItems()[0];
+		oItem.addAriaDescribedBy(oDescribingLabel);
+
+		oMenu.openBy(oButton);
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(
+			oItem.getDomRef().getAttribute("aria-describedby"),
+			oDescribingLabel.getId(),
+			"aria-describedby attribute is rendered with the associated label's ID"
+		);
+
+		// Cleanup
+		oMenu.destroy();
+		oButton.destroy();
+		oDescribingLabel.destroy();
+	});
+
+	QUnit.test("MenuItem ariaDescribedBy with multiple controls renders all IDs in aria-describedby", async function(assert) {
+		// Arrange
+		const oLabel1 = new Label({ text: "First description" }).placeAt("qunit-fixture"),
+			oLabel2 = new Label({ text: "Second description" }).placeAt("qunit-fixture"),
+			oButton = new Button({ text: "Open Menu" }).placeAt("qunit-fixture"),
+			oMenu = new Menu({
+				items: [
+					new MenuItem({
+						text: "Item with multiple descriptions",
+						ariaDescribedBy: [oLabel1, oLabel2]
+					})
+				]
+			});
+
+		await nextUIUpdate(this.clock);
+
+		oMenu.openBy(oButton);
+		await nextUIUpdate(this.clock);
+
+		const oItem = oMenu.getItems()[0];
+		const sDescribedBy = oItem.getDomRef().getAttribute("aria-describedby") || "";
+
+		// Assert
+		assert.ok(sDescribedBy.includes(oLabel1.getId()), "First label's ID is included in aria-describedby");
+		assert.ok(sDescribedBy.includes(oLabel2.getId()), "Second label's ID is included in aria-describedby");
+
+		// Cleanup
+		oMenu.destroy();
+		oButton.destroy();
+		oLabel1.destroy();
+		oLabel2.destroy();
+	});
+
+	QUnit.test("F2 on menu item focuses the first focusable endContent item", async function(assert) {
+		// Arrange
+		const oMenu = new Menu({
+				items: [
+					new MenuItem({
+						text: "Item with EndContent",
+						endContent: [
+							new Button({ icon: "sap-icon://accept" })
+						]
+					})
+				]
+			}),
+			oButton = new Button({ text: "Open Menu" }).placeAt("qunit-fixture");
+
+		await nextUIUpdate(this.clock);
+
+		oMenu.openBy(oButton);
+		await nextUIUpdate(this.clock);
+
+		const oItem = oMenu.getItems()[0];
+		const oEndContentButton = oItem.getEndContent()[0];
+
+		// Focus the menu item
+		oItem.getDomRef().focus();
+		await nextUIUpdate(this.clock);
+
+		// Press F2 on the menu item to enter endContent
+		oItem.$().trigger({ type: "keydown", keyCode: KeyCodes.F2 });
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(document.activeElement, oEndContentButton.getDomRef(), "F2 on menu item moves focus to the first focusable endContent item");
+
+		// Cleanup
+		oMenu.destroy();
+		oButton.destroy();
+	});
+
+	QUnit.test("Right Arrow navigates between endContent items", async function(assert) {
+		// Arrange
+		const oMenu = new Menu({
+				items: [
+					new MenuItem({
+						text: "Item with multiple endContent",
+						endContent: [
+							new Button({ icon: "sap-icon://accept" }),
+							new Button({ icon: "sap-icon://decline" })
+						]
+					})
+				]
+			}),
+			oButton = new Button({ text: "Open Menu" }).placeAt("qunit-fixture");
+
+		await nextUIUpdate(this.clock);
+
+		oMenu.openBy(oButton);
+		await nextUIUpdate(this.clock);
+
+		const oItem = oMenu.getItems()[0];
+		const aEndContent = oItem.getEndContent();
+
+		// Focus menu item and navigate to first endContent
+		oItem.getDomRef().focus();
+		oItem.$().trigger({ type: "keydown", keyCode: KeyCodes.ARROW_RIGHT });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, aEndContent[0].getDomRef(), "Right Arrow from menu item focuses the first endContent item");
+
+		// Navigate to second endContent item
+		jQuery(aEndContent[0].getDomRef()).trigger({ type: "keydown", keyCode: KeyCodes.ARROW_RIGHT });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, aEndContent[1].getDomRef(), "Right Arrow moves focus to the next endContent item");
+
+		// Right Arrow on last item should not move focus
+		jQuery(aEndContent[1].getDomRef()).trigger({ type: "keydown", keyCode: KeyCodes.ARROW_RIGHT });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, aEndContent[1].getDomRef(), "Right Arrow on the last endContent item keeps focus on that item");
+
+		// Cleanup
+		oMenu.destroy();
+		oButton.destroy();
+	});
+
+	QUnit.test("Left Arrow in endContent moves focus backward or returns to the menu item", async function(assert) {
+		// Arrange
+		const oMenu = new Menu({
+				items: [
+					new MenuItem({
+						text: "Item with multiple endContent",
+						endContent: [
+							new Button({ icon: "sap-icon://accept" }),
+							new Button({ icon: "sap-icon://decline" })
+						]
+					})
+				]
+			}),
+			oButton = new Button({ text: "Open Menu" }).placeAt("qunit-fixture");
+
+		await nextUIUpdate(this.clock);
+
+		oMenu.openBy(oButton);
+		await nextUIUpdate(this.clock);
+
+		const oItem = oMenu.getItems()[0];
+		const aEndContent = oItem.getEndContent();
+
+		// Navigate to first endContent, then Right Arrow to second
+		oItem.getDomRef().focus();
+		oItem.$().trigger({ type: "keydown", keyCode: KeyCodes.ARROW_RIGHT });
+		await nextUIUpdate(this.clock);
+
+		jQuery(aEndContent[0].getDomRef()).trigger({ type: "keydown", keyCode: KeyCodes.ARROW_RIGHT });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, aEndContent[1].getDomRef(), "Focus is on second endContent item");
+
+		// Left Arrow from second goes back to first
+		jQuery(aEndContent[1].getDomRef()).trigger({ type: "keydown", keyCode: KeyCodes.ARROW_LEFT });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, aEndContent[0].getDomRef(), "Left Arrow moves focus to the previous endContent item");
+
+		// Left Arrow from first returns focus to the menu item
+		jQuery(aEndContent[0].getDomRef()).trigger({ type: "keydown", keyCode: KeyCodes.ARROW_LEFT });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, oItem.getDomRef(), "Left Arrow on the first endContent item returns focus to the menu item");
+
+		// Cleanup
+		oMenu.destroy();
+		oButton.destroy();
+	});
+
+	QUnit.test("Tab key cycles forward through endContent items", async function(assert) {
+		// Arrange
+		const oMenu = new Menu({
+				items: [
+					new MenuItem({
+						text: "Item with multiple endContent",
+						endContent: [
+							new Button({ icon: "sap-icon://accept" }),
+							new Button({ icon: "sap-icon://decline" })
+						]
+					})
+				]
+			}),
+			oButton = new Button({ text: "Open Menu" }).placeAt("qunit-fixture");
+
+		await nextUIUpdate(this.clock);
+
+		oMenu.openBy(oButton);
+		await nextUIUpdate(this.clock);
+
+		const oItem = oMenu.getItems()[0];
+		const aEndContent = oItem.getEndContent();
+
+		// Navigate to first endContent via Right Arrow
+		oItem.getDomRef().focus();
+		oItem.$().trigger({ type: "keydown", keyCode: KeyCodes.ARROW_RIGHT });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, aEndContent[0].getDomRef(), "Focus is on first endContent item");
+
+		// Tab moves to second endContent item
+		jQuery(aEndContent[0].getDomRef()).trigger({ type: "keydown", keyCode: KeyCodes.TAB });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, aEndContent[1].getDomRef(), "Tab moves focus to the next endContent item");
+
+		// Tab from last item wraps to first
+		jQuery(aEndContent[1].getDomRef()).trigger({ type: "keydown", keyCode: KeyCodes.TAB });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, aEndContent[0].getDomRef(), "Tab from the last endContent item wraps focus back to the first");
+
+		// Cleanup
+		oMenu.destroy();
+		oButton.destroy();
+	});
+
+	QUnit.test("Shift+Tab key cycles backward through endContent items", async function(assert) {
+		// Arrange
+		const oMenu = new Menu({
+				items: [
+					new MenuItem({
+						text: "Item with multiple endContent",
+						endContent: [
+							new Button({ icon: "sap-icon://accept" }),
+							new Button({ icon: "sap-icon://decline" })
+						]
+					})
+				]
+			}),
+			oButton = new Button({ text: "Open Menu" }).placeAt("qunit-fixture");
+
+		await nextUIUpdate(this.clock);
+
+		oMenu.openBy(oButton);
+		await nextUIUpdate(this.clock);
+
+		const oItem = oMenu.getItems()[0];
+		const aEndContent = oItem.getEndContent();
+
+		// Navigate to first endContent
+		oItem.getDomRef().focus();
+		oItem.$().trigger({ type: "keydown", keyCode: KeyCodes.ARROW_RIGHT });
+		await nextUIUpdate(this.clock);
+
+		// Shift+Tab from first item wraps to last
+		jQuery(aEndContent[0].getDomRef()).trigger({ type: "keydown", keyCode: KeyCodes.TAB, shiftKey: true });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, aEndContent[1].getDomRef(), "Shift+Tab from the first endContent item wraps focus to the last");
+
+		// Shift+Tab from last goes to first
+		jQuery(aEndContent[1].getDomRef()).trigger({ type: "keydown", keyCode: KeyCodes.TAB, shiftKey: true });
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(document.activeElement, aEndContent[0].getDomRef(), "Shift+Tab moves focus to the previous endContent item");
+
+		// Cleanup
+		oMenu.destroy();
+		oButton.destroy();
 	});
 
 });

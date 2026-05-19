@@ -462,6 +462,27 @@ sap.ui.define([
 		assert.strictEqual(this.oQuickView._oPopover.$().attr("aria-labelledby"), this.oQuickView._oNavContainer.getCurrentPage().getCustomHeader().getContentMiddle()[0].getId(), "aria-labelledby is correctly set");
 	});
 
+	QUnit.test("aria-labelledby contains only valid IDs after reopening", function (assert) {
+		// Open QuickView
+		this.oButton.firePress();
+		this.clock.tick(500);
+
+		var sFirstId = this.oQuickView._oNavContainer.getCurrentPage().getCustomHeader().getContentMiddle()[0].getId();
+		assert.strictEqual(this.oQuickView._oPopover.$().attr("aria-labelledby"), sFirstId, "aria-labelledby has single valid ID on first open");
+
+		// Close and reopen
+		this.oQuickView._oPopover.close();
+		this.clock.tick(500);
+		this.oButton.firePress();
+		this.clock.tick(500);
+
+		var sAriaLabelledBy = this.oQuickView._oPopover.$().attr("aria-labelledby");
+		var sCurrentId = this.oQuickView._oNavContainer.getCurrentPage().getCustomHeader().getContentMiddle()[0].getId();
+
+		assert.strictEqual(sAriaLabelledBy, sCurrentId, "aria-labelledby contains only the current page title ID after reopening");
+		assert.ok(sAriaLabelledBy.split(" ").length === 1, "aria-labelledby does not accumulate stale IDs");
+	});
+
 	QUnit.test("Value is not provided and hyphen is rendered", function (assert) {
 		this.oButton.firePress();
 		this.clock.tick(500);

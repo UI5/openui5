@@ -66,7 +66,7 @@ sap.ui.define([
 		QUnit.test("loadFlexData trigger the correct request to back end" +
 			"- store token value" +
 			"- return cacheKey value" +
-			"- merges the compVariants in the changes", function(assert) {
+			"- keeps compVariants separate from changes", function(assert) {
 			var mPropertyBag = {
 				url: "/flexPersonalization",
 				reference: "reference"
@@ -91,9 +91,9 @@ sap.ui.define([
 				assert.equal(oStubSendRequest.getCall(0).args[0], sExpectedUrl, "with correct url");
 				assert.equal(oStubSendRequest.getCall(0).args[1], "GET", "with correct method");
 				assert.deepEqual(oStubSendRequest.getCall(0).args[2].xsrfToken, undefined, "with correct token");
-				assert.equal(oFlexData.changes.length, 2, "two entries are in the change section");
+				assert.equal(oFlexData.changes.length, 1, "one entry is in the change section");
 				assert.equal(oFlexData.changes[0], 1, "the change entry is contained");
-				assert.equal(oFlexData.changes[1], 2, "the compVariant entry is contained");
+				assert.deepEqual(oFlexData.compVariants, [2], "compVariants are kept separate");
 				assert.equal(oFlexData.cacheKey, "abc123", "the cacheKey value is returned");
 			});
 		});

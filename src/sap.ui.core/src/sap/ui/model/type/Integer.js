@@ -16,6 +16,19 @@ sap.ui.define([
 	"use strict";
 
 	/**
+	 * @typedef {sap.ui.core.format.NumberFormat.IntegerFormatOptions} sap.ui.model.type.IntegerTypeFormatOptions
+	 *
+	 * The format options of the {@link sap.ui.model.type.Integer} type.
+	 *
+	 * @property {Object<string, any>} [source]
+	 *   Additional set of format options to be used if the property in the model is not of type
+	 *   string and needs formatting as well.
+	 *   If an empty object is given, the grouping is disabled and a dot is used as decimal separator.
+	 *
+	 * @public
+	 */
+
+	/**
 	 * Constructor for an Integer type.
 	 *
 	 * @class
@@ -27,10 +40,24 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @public
-	 * @param {object} [oFormatOptions]
-	 *   Format options as defined in {@link sap.ui.core.format.NumberFormat.getIntegerInstance}
-	 * @param {object} [oFormatOptions.source] Additional set of format options to be used if the property in the model is not of type string and needs formatting as well.
-	 * 										   If an empty object is given, the grouping is disabled and a dot is used as decimal separator.
+	 * @param {sap.ui.model.type.IntegerTypeFormatOptions} [oFormatOptions={
+	 *     emptyString: NaN,
+	 *     groupingBaseSize: 3,
+	 *     groupingEnabled: false,
+	 *     groupingSize: 3,
+	 *     maxFractionDigits: 0,
+	 *     maxIntegerDigits: 99,
+	 *     minFractionDigits: 0,
+	 *     minIntegerDigits: 1,
+	 *     parseAsString: false,
+	 *     preserveDecimals: false,
+	 *     roundingMode: "TOWARDS_ZERO",
+	 *     showScale: true,
+	 *     strictGroupingValidation: false,
+	 *     style: "standard"
+	 *   }]
+ 	 *   The option object, which supports the following parameters.
+	 *   If no options are given, default values according to the type and locale settings are used.
 	 * @param {object} [oConstraints] Value constraints
 	 * @param {int} [oConstraints.minimum] Smallest value allowed for this type
 	 * @param {int} [oConstraints.maximum] Largest value allowed for this type

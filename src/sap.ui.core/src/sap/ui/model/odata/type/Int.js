@@ -52,6 +52,18 @@ sap.ui.define([
 	}
 
 	/**
+	 * @typedef {sap.ui.core.format.NumberFormat.IntegerFormatOptions} sap.ui.model.odata.type.IntTypeFormatOptions
+	 *
+	 * The format options of the {@link sap.ui.model.odata.type.Int Int} based OData types.
+	 *
+	 * @property {boolean} [parseEmptyValueToZero]
+	 *   Whether the empty string and <code>null</code> are parsed to <code>0</code> if the <code>nullable</code>
+	 *   constraint is set to <code>false</code>; see {@link #parseValue parseValue}; since 1.115.0
+	 *
+	 * @public
+	 */
+
+	/**
 	 * Constructor for a new <code>Int</code>.
 	 *
 	 * @class This is an abstract base class for integer-based OData primitive types like
@@ -70,11 +82,24 @@ sap.ui.define([
 	 *
 	 * @abstract
 	 * @alias sap.ui.model.odata.type.Int
-	 * @param {object} [oFormatOptions]
+	 * @param {sap.ui.model.odata.type.IntTypeFormatOptions} [oFormatOptions={
+	 *     emptyString: NaN,
+	 *     groupingBaseSize: 3,
+	 *     groupingEnabled: false,
+	 *     groupingSize: 3,
+	 *     maxFractionDigits: 0,
+	 *     maxIntegerDigits: 99,
+	 *     minFractionDigits: 0,
+	 *     minIntegerDigits: 1,
+	 *     parseAsString: false,
+	 *     parseEmptyValueToZero: false,
+	 *     preserveDecimals: false,
+	 *     roundingMode: "TOWARDS_ZERO",
+	 *     showScale: true,
+	 *     strictGroupingValidation: false,
+	 *     style: "standard"
+	 *   }]
 	 *   type-specific format options; see subtypes
-	 * @param {boolean} [oFormatOptions.parseEmptyValueToZero=false]
-	 *   Whether the empty string and <code>null</code> are parsed to <code>0</code> if the <code>nullable</code>
-	 *   constraint is set to <code>false</code>; see {@link #parseValue parseValue}; since 1.115.0
 	 * @param {object} [oConstraints]
 	 *   constraints; {@link #validateValue validateValue} throws an error if any constraint is
 	 *   violated

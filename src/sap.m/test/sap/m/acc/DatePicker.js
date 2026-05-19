@@ -45,7 +45,7 @@ sap.ui.define([
 			}),
 			new Label({
 				text: "Deadline",
-				labelFor: "DP1",
+				labelFor: "DP2",
 				wrapping: true
 			}),
 			new DatePicker("DP2", {
