@@ -1,6 +1,7 @@
 /*!
  * ${copyright}
  */
+/*global URL */
 
 /**
  * @typedef {object} EventListener
@@ -139,31 +140,79 @@ sap.ui.define([
 	};
 
 	/**
-	 * validate messages published from external window to application window (i.e. from tool frame to opener window)
-	 * no validation needed the other way (i.e. from opener window to tool frame)
+	 * Compare the origins of two URLs. Returns false if either value is not a valid URL.
+	 * @private
+	 * @param {string} sOriginA First URL string
+	 * @param {string} sOriginB Second URL string
+	 * @returns {boolean} true if both URLs have the same origin
+	 */
+	WindowCommunicationBus._compareOrigins = function (sOriginA, sOriginB) {
+		try {
+			return new URL(sOriginA).origin === new URL(sOriginB).origin;
+		} catch (e) {
+			return false;
+		}
+	};
+
+	/**
+	 * Validate messages received from external windows.
+	 * Both directions are validated:
+	 * - Tool frame: validates origin of messages from opener window
+	 * - Application window: validates origin, frame identifier, and URL path of messages from tool frame
 	 * @private
 	 * @method
 	 * @param {EventListener} eMessage Event fired by the channels attached to the WindowCommunicationBus
 	 * @returns {boolean} true if the message is valid
 	 */
 	WindowCommunicationBus.prototype._validate = function (eMessage) {
+		// 1. Validate origin
+		// tool frame: validate against the configured opener origin
 		if (jQuery.isEmptyObject(this._frame)) {
-			// there are no channels associated with this bus, or
-			// when loaded in a tool frame, the CommumnicationBus class will always have an empty 'frame' object.
-			// in this case, a message is sent from the opener to the tool frame and no validation is necessary
+			var sExpectedOrigin = this._oConfig.getOrigin();
+
+			if (sExpectedOrigin) {
+				return WindowCommunicationBus._compareOrigins(eMessage.origin, sExpectedOrigin);
+			}
+
 			return true;
 		}
 
-		// when a message is sent from a tool frame to the application (opener) window,
-		// the message should have the correct details, validating that it comes from a known tool frame
-		var bMatchOrigin = eMessage.origin === this._frame.origin;
-		var bMatchIdentifier = eMessage.data._frameIdentifier === this._frame.identifier;
-		// remove relative paths (if the frame src is relative to the parent)
-		var iFrameUrlQuery = this._frame.url.indexOf("?");
-		var sFrameUrl = this._frame.url.substr(0, iFrameUrlQuery).replace(/\.\.\//g, "") + this._frame.url.substr(iFrameUrlQuery);
-		var bMatchUrl = eMessage.data._origin.indexOf(sFrameUrl) > -1;
+		// application window: validate against the known tool frame origin
+		if (!WindowCommunicationBus._compareOrigins(eMessage.origin, this._frame.origin)) {
+			return false;
+		}
 
-		return bMatchOrigin && bMatchIdentifier && bMatchUrl;
+		// 2. Validate frame identifier
+		if (eMessage.data._frameIdentifier !== this._frame.identifier) {
+			return false;
+		}
+
+		// 3. Validate URL path
+		// Compare parsed pathnames to avoid substring-matching attacks.
+		// The frame URL may be absolute or relative — strip query string and relative segments
+		// to extract the path portion, then verify the message origin's pathname ends with it.
+		try {
+			var oOriginUrl = new URL(eMessage.data._origin);
+			var iFrameUrlQuery = this._frame.url.indexOf("?");
+			var sFrameUrlWithoutQuery = this._frame.url.substring(0, iFrameUrlQuery).replace(/\.\.\//g, "").replace(/\.\//g, "");
+
+			// extract just the pathname: parse as URL if absolute, otherwise use the cleaned string as-is
+			var sFramePath;
+			try {
+				sFramePath = new URL(sFrameUrlWithoutQuery).pathname;
+			} catch (e) {
+				// relative URL — use cleaned string directly as a path suffix
+				sFramePath = sFrameUrlWithoutQuery;
+			}
+
+			if (!oOriginUrl.pathname.endsWith(sFramePath)) {
+				return false;
+			}
+		} catch (e) {
+			return false;
+		}
+
+		return true;
 	};
 
 	WindowCommunicationBus.prototype._getFrameIdentifier = function () {
