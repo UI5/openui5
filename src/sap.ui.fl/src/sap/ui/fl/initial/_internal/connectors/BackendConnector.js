@@ -86,10 +86,7 @@ sap.ui.define([
 		 */
 		loadFlexData(mPropertyBag) {
 			mPropertyBag.cacheable = true;
-			return this.sendRequest(mPropertyBag).then(function(oResponse) {
-				oResponse.changes = oResponse.changes.concat(oResponse.compVariants || []);
-				return oResponse;
-			});
+			return this.sendRequest(mPropertyBag);
 		}
 	});
 

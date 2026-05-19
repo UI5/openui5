@@ -41,9 +41,6 @@ sap.ui.define([
 		loadFlexData(mPropertyBag) {
 			mPropertyBag.cacheable = true;
 			return BackendConnector.sendRequest.call(this, mPropertyBag).then(function(oResult) {
-				oResult.contents.map(function(oContent, iIndex, oResult) {
-					oResult[iIndex].changes = (oContent.changes || []).concat(oContent.compVariants);
-				});
 				oResult.contents[0].cacheKey = oResult.cacheKey;
 				return oResult.contents;
 			});

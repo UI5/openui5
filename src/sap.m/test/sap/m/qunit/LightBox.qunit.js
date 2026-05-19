@@ -710,5 +710,177 @@ sap.ui.define([
 
 			}.bind(this), 100);
 		});
-	}
+
+	QUnit.module('Focus Trap', {
+		beforeEach: function() {
+			this.LightBox = new LightBox({
+				imageContent : [
+					new LightBoxItem({
+						title: "Title",
+						subtitle: "Subtitle"
+					})
+				]
+			});
+		},
+		afterEach: function() {
+			this.LightBox.close();
+			this.LightBox.destroy();
+		}
+	});
+
+	QUnit.test('Focus trap elements are rendered', async function(assert) {
+		// Arrange
+		const done = assert.async();
+		const oImageContent = this.LightBox.getImageContent()[0];
+		const sImageSource = IMAGE_PATH + 'demo/nature/elephant.jpg';
+
+		oImageContent.setImageSrc(sImageSource);
+		await nextUIUpdate();
+
+		// Act
+		this.LightBox.open();
+
+		// Assert
+		setTimeout(function () {
+			const oLightBoxDomRef = this.LightBox.getDomRef();
+			const oFirstFE = oLightBoxDomRef.querySelector("#" + this.LightBox.getId() + "-firstfe");
+			const oLastFE = oLightBoxDomRef.querySelector("#" + this.LightBox.getId() + "-lastfe");
+
+			assert.ok(oFirstFE, 'First focus trap element is rendered');
+			assert.ok(oLastFE, 'Last focus trap element is rendered');
+			assert.strictEqual(oFirstFE.getAttribute('tabindex'), '0', 'First focus trap element has tabindex 0');
+			assert.strictEqual(oLastFE.getAttribute('tabindex'), '0', 'Last focus trap element has tabindex 0');
+			assert.strictEqual(oFirstFE.getAttribute('role'), 'none', 'First focus trap element has role none');
+			assert.strictEqual(oLastFE.getAttribute('role'), 'none', 'Last focus trap element has role none');
+			assert.ok(oFirstFE.classList.contains('sapUiSkipFocusFail'), 'First focus trap element has sapUiSkipFocusFail class');
+			assert.ok(oLastFE.classList.contains('sapUiSkipFocusFail'), 'Last focus trap element has sapUiSkipFocusFail class');
+
+			done();
+		}.bind(this), LIGHTBOX_OPEN_TIME);
+	});
+
+	QUnit.test('Focus stays trapped when tabbing backwards from close button', async function(assert) {
+		// Arrange
+		const done = assert.async();
+		const oImageContent = this.LightBox.getImageContent()[0];
+		const sImageSource = IMAGE_PATH + 'demo/nature/elephant.jpg';
+
+		oImageContent.setImageSrc(sImageSource);
+		await nextUIUpdate();
+
+		// Act
+		this.LightBox.open();
+
+		// Assert
+		setTimeout(function () {
+			const oCloseButton = this.LightBox.getAggregation("_closeButton");
+			const oCloseButtonDomRef = oCloseButton.getDomRef();
+
+			assert.ok(oCloseButtonDomRef === document.activeElement, 'Close button is initially focused');
+
+			const oFirstFE = this.LightBox.getDomRef().querySelector("#" + this.LightBox.getId() + "-firstfe");
+			oFirstFE.focus();
+
+			setTimeout(function() {
+				const oActiveElement = document.activeElement;
+				assert.ok(oActiveElement, 'An element is focused after focus trap activation');
+				assert.strictEqual(oActiveElement.id, oCloseButtonDomRef.id, 'Focus is redirected back to close button');
+
+				done();
+			}, 100);
+		}.bind(this), 2 * LIGHTBOX_OPEN_TIME);
+	});
+
+	QUnit.test('Focus stays trapped when tabbing forward from close button', async function(assert) {
+		// Arrange
+		const done = assert.async();
+		const oImageContent = this.LightBox.getImageContent()[0];
+		const sImageSource = IMAGE_PATH + 'demo/nature/elephant.jpg';
+
+		oImageContent.setImageSrc(sImageSource);
+		await nextUIUpdate();
+
+		// Act
+		this.LightBox.open();
+
+		// Assert
+		setTimeout(function () {
+			const oCloseButton = this.LightBox.getAggregation("_closeButton");
+			const oCloseButtonDomRef = oCloseButton.getDomRef();
+
+			assert.ok(oCloseButtonDomRef === document.activeElement, 'Close button is initially focused');
+
+			const oLastFE = this.LightBox.getDomRef().querySelector("#" + this.LightBox.getId() + "-lastfe");
+			oLastFE.focus();
+
+			setTimeout(function() {
+				const oActiveElement = document.activeElement;
+				assert.ok(oActiveElement, 'An element is focused after focus trap activation');
+				assert.strictEqual(oActiveElement.id, oCloseButtonDomRef.id, 'Focus is redirected back to close button');
+
+				done();
+			}, 100);
+		}.bind(this), 2 * LIGHTBOX_OPEN_TIME);
+	});
+
+	QUnit.test('Focus trap works with error state', async function(assert) {
+		// Arrange
+		const done = assert.async();
+		const oImageContent = this.LightBox.getImageContent()[0];
+		const sImageSource = IMAGE_PATH + 'fakepath';
+
+		oImageContent.setImageSrc(sImageSource);
+		await nextUIUpdate();
+
+		// Act
+		this.LightBox.open();
+
+		// Assert
+		setTimeout(function () {
+			assert.ok(this.LightBox.getAggregation("_errorMessage"), 'Error message is displayed');
+
+			const oFirstFE = this.LightBox.getDomRef().querySelector("#" + this.LightBox.getId() + "-firstfe");
+			oFirstFE.focus();
+
+			setTimeout(function() {
+				const oActiveElement = document.activeElement;
+				assert.ok(oActiveElement, 'An element is focused after focus trap activation');
+
+				const oLightBoxDomRef = this.LightBox.getDomRef();
+				assert.ok(oLightBoxDomRef.contains(oActiveElement), 'Focus remains within LightBox dialog');
+
+				this.LightBox.close();
+				done();
+			}.bind(this), 100);
+		}.bind(this), 500);
+	});
+
+	QUnit.test('onfocusin handler only responds to focus trap elements', async function(assert) {
+		// Arrange
+		const done = assert.async();
+		const oImageContent = this.LightBox.getImageContent()[0];
+		const sImageSource = IMAGE_PATH + 'demo/nature/elephant.jpg';
+
+		oImageContent.setImageSrc(sImageSource);
+		await nextUIUpdate();
+
+		// Act
+		this.LightBox.open();
+
+		// Assert
+		setTimeout(function () {
+			const oCloseButton = this.LightBox.getAggregation("_closeButton");
+			const oCloseButtonDomRef = oCloseButton.getDomRef();
+
+			oCloseButtonDomRef.focus();
+
+			setTimeout(function() {
+				const oActiveElement = document.activeElement;
+				assert.strictEqual(oActiveElement.id, oCloseButtonDomRef.id, 'Focus remains on close button when directly focused');
+
+				done();
+			}, 100);
+		}.bind(this), 2 * LIGHTBOX_OPEN_TIME);
+	});
+}
 );

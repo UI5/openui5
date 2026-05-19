@@ -118,7 +118,7 @@ sap.ui.define([
 		QUnit.test("loadFlexData trigger the correct request to back end then:" +
 			"- store the token and settings values" +
 			"- return cacheKey value" +
-			"- merges the compVariants in the changes", function(assert) {
+			"- keeps compVariants separate from changes", function(assert) {
 			var mPropertyBag = {
 				url: "/flexKeyuser",
 				reference: "reference",
@@ -160,11 +160,10 @@ sap.ui.define([
 				assert.equal(oStubSendRequest.getCall(0).args[2].xsrfToken, undefined, "with correct token");
 				assert.equal(oStubSendRequest.getCall(0).args[2].cacheable, true, "with correct cacheable value");
 				assert.deepEqual(KeyUserConnector.settings, { isKeyUser: true, isVariantSharingEnabled: true }, "new settings is stored");
-				assert.equal(oFlexData[0].changes.length, 2, "two entries are in the customer change section");
+				assert.equal(oFlexData[0].changes.length, 1, "one entry is in the customer change section");
 				assert.equal(oFlexData[0].changes[0], 1, "the change entry is contained");
-				assert.equal(oFlexData[0].changes[1], 3, "the compVariant entry is contained");
-				assert.equal(oFlexData[1].changes.length, 1, "one entries are in the public change section");
-				assert.equal(oFlexData[1].changes[0], 2, "the compVariant entry is contained");
+				assert.deepEqual(oFlexData[0].compVariants, [3], "compVariants are kept separate");
+				assert.deepEqual(oFlexData[1].compVariants, [2], "compVariants in second content are kept separate");
 				assert.equal(oFlexData[0].cacheKey, "abc123", "the cacheKey value is returned in a sub content");
 			});
 		});

@@ -1247,6 +1247,21 @@ sap.ui.define([
 			assert.strictEqual(this.oReverterStub.callCount, 1, "then the revertMultipleChanges function is called once");
 			assert.strictEqual(this.oReverterStub.firstCall.args[0][0].getId(), "change3", "then the order is correct");
 		});
+
+		QUnit.test("when resetting but no local changes exist", async function(assert) {
+			this.oStorageStub.resolves({
+				response: []
+			});
+			await FlexObjectManager.resetFlexObjects({
+				reference: sReference,
+				selector: this.oAppComponent,
+				layer: Layer.USER,
+				selectorIds: ["control1"]
+			});
+			assert.strictEqual(this.oStorageStub.callCount, 1, "then the Storage.reset function is called once");
+			assert.strictEqual(this.oUpdateStorageResponse.callCount, 0, "then FlexState.update is not called");
+			assert.strictEqual(this.oReverterStub.callCount, 0, "then the Reverter.revertMultipleChanges function is not called");
+		});
 	});
 
 	QUnit.module("deleteFlexObjects", {

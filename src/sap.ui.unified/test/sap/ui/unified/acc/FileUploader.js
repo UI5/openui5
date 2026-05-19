@@ -87,7 +87,14 @@ sap.ui.define([
 		sendXHR: true,
 		value: "",
 		additionalData: "abc=123&test=456",
-		valueState: ValueState.Error
+		valueState: ValueState.Error,
+		uploadOnChange: true,
+		uploadComplete: function(oEvent) {
+			const iStatus = oEvent.getParameter("status");
+			if (iStatus === 200 || iStatus === 404) {
+				oEvent.getSource().setValueState(ValueState.None);
+			}
+		}
 	});
 
 	var oLabel8 = new Label({text: "FileUploader with Placeholder", labelFor: "FU8", wrapping: true});

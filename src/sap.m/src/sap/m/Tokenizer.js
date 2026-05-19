@@ -1260,9 +1260,7 @@ sap.ui.define([
 		 * @param {string} sDeletionType Type of deletion: "backspace" or "delete"
 		 */
 		Tokenizer.prototype._handleKeyboardDeletion = function(oEvent, sDeletionType) {
-			var oFocusedToken = this.getTokens().filter(function (oToken) {
-				return oToken.getFocusDomRef() === document.activeElement;
-			})[0];
+			var oFocusedToken = this._getFocusedToken();
 
 			if (!oFocusedToken) {
 				return;
@@ -1334,15 +1332,21 @@ sap.ui.define([
 
 			// ctrl/meta + c OR ctrl/meta + Insert
 			if ((oEvent.ctrlKey || oEvent.metaKey) && (oEvent.which === KeyCodes.C || oEvent.which === KeyCodes.INSERT)) {
-				this._copy();
+				if (this._copy()) {
+					oEvent.preventDefault();
+				}
 			}
 
 			// ctr/meta + x OR Shift + Delete
 			if (((oEvent.ctrlKey || oEvent.metaKey) && oEvent.which === KeyCodes.X) || (oEvent.shiftKey && oEvent.which === KeyCodes.DELETE)) {
 				if (this.getEditable()) {
-					this._cut();
+					if (this._cut()) {
+						oEvent.preventDefault();
+					}
 				} else {
-					this._copy();
+					if (this._copy()) {
+						oEvent.preventDefault();
+					}
 				}
 			}
 
@@ -1524,11 +1528,30 @@ sap.ui.define([
 		 * @private
 		 */
 		Tokenizer.prototype._copy = function() {
-			this._fillClipboard("copy");
+			return this._fillClipboard("copy");
+		};
+
+		Tokenizer.prototype._getFocusedToken = function () {
+			return this.getTokens().filter(function (oToken) {
+				return oToken.getFocusDomRef() === document.activeElement;
+			})[0];
 		};
 
 		Tokenizer.prototype._fillClipboard = function (sShortcutName) {
 			var aSelectedTokens = this.getSelectedTokens();
+
+			if (!aSelectedTokens.length) {
+				var oFocusedToken = this._getFocusedToken();
+
+				if (oFocusedToken) {
+					aSelectedTokens = [oFocusedToken];
+				}
+			}
+
+			if (!aSelectedTokens.length) {
+				return false;
+			}
+
 			var sTokensTexts = aSelectedTokens.map(function(oToken) {
 				return oToken.getText();
 			}).join("\r\n");
@@ -1537,7 +1560,7 @@ sap.ui.define([
 			// Async clipboard API (works in secure contexts - HTTPS/localhost)
 			if (navigator.clipboard?.writeText && window.isSecureContext) {
 				navigator.clipboard.writeText(sTokensTexts);
-				return;
+				return true;
 			}
 
 			/* fill clipboard with tokens' texts so parent can handle creation */
@@ -1555,6 +1578,7 @@ sap.ui.define([
 			document.execCommand(sShortcutName);
 			document.removeEventListener(sShortcutName, cutToClipboard);
 
+			return true;
 		};
 
 		/**
@@ -1564,11 +1588,26 @@ sap.ui.define([
 		 */
 		Tokenizer.prototype._cut = function() {
 			var aSelectedTokens = this.getSelectedTokens();
+
+			if (!aSelectedTokens.length) {
+				var oFocusedToken = this._getFocusedToken();
+
+				if (oFocusedToken) {
+					aSelectedTokens = [oFocusedToken];
+				}
+			}
+
+			if (!aSelectedTokens.length) {
+				return false;
+			}
+
 			this._fillClipboard("cut");
 
 			this.fireTokenDelete({
 				tokens: aSelectedTokens
 			});
+
+			return true;
 		};
 
 		/**

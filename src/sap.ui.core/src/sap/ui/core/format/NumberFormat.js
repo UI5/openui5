@@ -18,6 +18,121 @@ sap.ui.define([
 	function(Formatting, Localization, BaseObject, Locale, LocaleData, Supportability, FormatUtils, Log, assert, extend) {
 	"use strict";
 
+	/**
+	 * @typedef {object} sap.ui.core.format.NumberFormat.FormatOptions
+	 *
+	 * The base type for the numeric format options.
+	 *
+	 * @property {int} [decimals]
+	 *   The number of decimal digits.
+	 * @property {string} [decimalSeparator]
+	 *   The character used as decimal separator.
+	 *   If none given, the locale specific decimal separator is used.
+	 *   Note: <code>decimalSeparator</code> must always be different from <code>groupingSeparator</code>.
+	 * @property {null|number|string} [emptyString]
+	 *   Since 1.130.0, defines what an empty string is parsed as, and what is formatted as an empty string.
+	 *   The {@link #format} and {@link #parse} functions are done in a symmetric way.
+	 *   For example, when this parameter is set to <code>NaN</code>, an empty string is parsed as <code>NaN</code>,
+	 *   and <code>NaN</code> is formatted as an empty string.
+	 * @property {int} [groupingBaseSize]
+	 *   The grouping base size in digits if it is different from the grouping size (e.g. Indian grouping).
+	 * @property {boolean} [groupingEnabled]
+	 *   Whether grouping is enabled (grouping separators are shown).
+	 *   <b>Note:</b> Grouping is disabled if the <code>groupingSize</code> format option is set to
+	 *   a non-positive value.
+	 * @property {string} [groupingSeparator]
+	 *   The character used as grouping separator.
+	 * 	 If none given, the locale specific grouping separator is used.
+	 *   Note: <code>groupingSeparator</code> must always be different from <code>decimalSeparator</code>.
+	 * @property {int} [groupingSize]
+	 *   The grouping size in digits.
+	 *   <b>Note:</b> If this format option is set to a non-positive value, grouping will be disabled entirely.
+	 * @property {int} [maxFractionDigits]
+	 *   The maximum number of decimal digits.
+	 * @property {int} [maxIntegerDigits]
+	 *   The maximum number of non-decimal digits.
+	 * @property {int} [minIntegerDigits]
+	 *   The minimal number of non-decimal digits.
+	 * @property {string} [minusSign]
+	 *   The used minus symbol.
+	 *   If none given, the locale specific minus sign is used.
+	 * @property {boolean} [parseAsString]
+	 *   Since 1.28.2, whether to parse the number as a string in order to keep the precision for big numbers. Numbers
+	 *   in scientific notation are parsed back to standard notation.
+	 *   For example, <code>5e-3</code> is parsed to <code>0.005</code>.
+	 * @property {string} [pattern]
+	 *   CLDR number pattern which is used to format the number.
+	 *   If none given, the default pattern for the locale and type is used.
+	 * @property {string} [plusSign]
+	 *    The used plus symbol.
+	 *    If none given, the locale specific plus sign is used.
+	 * @property {boolean} [preserveDecimals]
+	 *   Whether {@link #format} preserves decimal digits except trailing zeros in case there are more decimals than the
+	 *   <code>maxFractionDigits</code> format option allows.
+	 *   If decimals are not preserved, the formatted number is rounded to <code>maxFractionDigits</code>.
+	 * @property {sap.ui.core.format.NumberFormat.RoundingMode|function} [roundingMode]
+	 *   Specifies the rounding behavior for discarding the digits after the maximum fraction digits defined by
+	 *   <code>maxFractionDigits</code>.
+	 *   The rounding behavior of the formatter can be defined by...
+	 *   <ul>
+	 *     <li>...setting this format option to a value from the
+	 *         {@link sap.ui.core.format.NumberFormat.RoundingMode RoundingMode} enum</li>
+	 *     <li>...setting this format option to a function that is used for rounding the number.
+	 *         The function must take two parameters: the number itself, and the number of decimal digits
+	 *         that should be reserved. String based numbers are not rounded via this custom function.
+	 *         <b>Deprecated as of version 1.121.0; you can only apply rounding by specifying the rounding mode.</b>
+	 *     </li>
+	 *   </ul>
+	 * @property {int} [shortDecimals]
+	 *   The number of decimals in the shortened format string.
+	 *   If this option isn't specified, the <code>decimals</code> option is used instead.
+	 * @property {int} [shortLimit]
+	 *   A limit above which only short number formatting is used.
+	 * @property {int} [shortRefNumber]
+	 *   Since 1.40, specifies a number from which the scale factor for the <code>short</code> or <code>long</code>
+	 *   style format is generated.
+	 *   The generated scale factor is used for all numbers which are formatted with this format instance.
+	 *   This option only takes effect when the <code>style</code> option is set to <code>short</code> or
+	 *   <code>long</code>.
+	 *   This option is set to <code>undefined</code> by default, which means that the scale factor is selected
+	 *   automatically for each number being formatted.
+	 * @property {boolean} [showScale]
+	 *   Since 1.40, specifies whether the scale factor is shown in the formatted number.
+	 *   This option takes effect only when the <code>style</code> option is set to either
+	 *   <code>short</code> or <code>long</code>.
+	 * @property {boolean} [strictGroupingValidation]
+	 *   Whether the positions of grouping separators are validated. Space characters used as grouping
+	 *   separators are not validated.
+	 *
+	 * @public
+	 */
+
+	/**
+	 * @typedef {sap.ui.core.format.NumberFormat.FormatOptions} sap.ui.core.format.NumberFormat.IntegerFormatOptions
+	 *
+	 * The format options for integer numbers.
+	 *
+	 * @property {int} [minFractionDigits]
+	 *   The minimal number of decimal digits.
+	 * @property {int} [precision]
+	 *   <b>Note:</b> Only considered if the number format leads to a
+	 *   representation with decimal places, e.g. if the option <code>style: "short"</code> is set.
+	 *   The maximum number of digits in the formatted representation of a number; if the <code>precision</code> is
+	 *   less than the overall length of the number, its fractional part is truncated through rounding.
+	 *   As the <code>precision</code> only affects the rounding of a number, its integer part can retain more digits
+	 *   than defined by this parameter.
+	 *   <b>Example:</b> With a <code>precision</code> of 2 and <code>style: "short"</code>,
+	 *   <code>234567</code> is formatted to <code>"235K"</code>.
+	 * @property {"short"|"long"|"standard"} [style]
+	 *   The style of format.
+	 *   Valid values are based on the CLDR <code>decimalFormat</code>. When set to
+	 *   <code>short</code> or <code>long</code>, numbers are formatted into compact forms.
+	 *   When this option is set, the default value of the <code>precision</code> option is set to <code>2</code>.
+	 *   This can be changed by setting either <code>min/maxFractionDigits</code>,
+	 *   <code>decimals</code>, <code>shortDecimals</code>, or the <code>precision</code> option itself.
+	 *
+	 * @public
+	 */
 
 	/**
 	 * Format classes
@@ -684,76 +799,24 @@ sap.ui.define([
 	 * oFormat.format(1234); // "1.234"
 	 * </pre>
 	 *
-	 * @param {object} [oFormatOptions] The option object, which supports the following parameters.
+	 * @param {sap.ui.core.format.NumberFormat.IntegerFormatOptions} [oFormatOptions={
+	 *     emptyString: NaN,
+	 *     groupingBaseSize: 3,
+	 *     groupingEnabled: false,
+	 *     groupingSize: 3,
+	 *     maxFractionDigits: 0,
+	 *     maxIntegerDigits: 99,
+	 *     minFractionDigits: 0,
+	 *     minIntegerDigits: 1,
+	 *     parseAsString: false,
+	 *     preserveDecimals: false,
+	 *     roundingMode: "TOWARDS_ZERO",
+	 *     showScale: true,
+	 *     strictGroupingValidation: false,
+	 *     style: "standard"
+	 *   }]
+	 *   The option object, which supports the following parameters.
 	 *   If no options are given, default values according to the type and locale settings are used.
-	 * @param {int} [oFormatOptions.decimalPadding] Not supported.
-	 * @param {int} [oFormatOptions.decimals] defines the number of decimal digits
-	 * @param {string} [oFormatOptions.decimalSeparator] defines the character used as decimal separator.
-	 *   Note: <code>decimalSeparator</code> must always be different from <code>groupingSeparator</code>.
-	 * @param {null|number|string} [oFormatOptions.emptyString=NaN] since 1.30.0 defines what an empty string
-	 *   is parsed as, and what is formatted as an empty string. The allowed values are "" (empty string)
-	 *   NaN, <code>null</code>, or 0.
-	 *   The 'format' and 'parse' functions are done in a symmetric way. For example, when this
-	 *   parameter is set to NaN, an empty string is parsed as NaN, and NaN is formatted as an empty
-	 *   string.
-	 * @param {int} [oFormatOptions.groupingBaseSize=3] defines the grouping base size in digits if
-	 *   it is different from the grouping size (e.g. Indian grouping)
-	 * @param {boolean} [oFormatOptions.groupingEnabled=false] defines whether grouping is enabled
-	 *   (grouping separators are shown).
-	 *   <b>Note:</b> Grouping is disabled if the <code>groupingSize</code> format option is set to
-	 *   a non-positive value.
-	 * @param {string} [oFormatOptions.groupingSeparator] defines the character used as grouping separator.
-	 *   Note: <code>groupingSeparator</code> must always be different from <code>decimalSeparator</code>.
-	 * @param {int} [oFormatOptions.groupingSize=3] defines the grouping size in digits; the default
-	 *   is <code>3</code>.
-	 *   <b>Note:</b> If this format option is set to a non-positive value, grouping will be disabled entirely.
-	 * @param {int} [oFormatOptions.maxFractionDigits=0] defines the maximum number of decimal digits
-	 * @param {int} [oFormatOptions.maxIntegerDigits=99] defines the maximum number of non-decimal digits.
-	 *   If the number exceeds this maximum, e.g. 1e+120, "?" characters are shown instead of digits.
-	 * @param {int} [oFormatOptions.minFractionDigits=0] defines the minimal number of decimal digits
-	 * @param {int} [oFormatOptions.minIntegerDigits=1] defines the minimal number of non-decimal digits
-	 * @param {string} [oFormatOptions.minusSign] defines the used minus symbol
-	 * @param {boolean} [oFormatOptions.parseAsString=false] since 1.28.2 defines whether to output
-	 *   the string from the parse function in order to keep the precision for big numbers. Numbers
-	 *   in scientific notation are parsed back to standard notation. For example, "5e+3" is parsed
-	 *   to "5000".
-	 * @param {string} [oFormatOptions.pattern] CLDR number pattern which is used to format the number
-	 * @param {string} [oFormatOptions.plusSign] defines the used plus symbol
-	 * @param {int} [oFormatOptions.precision] <b>Note:</b> Only considered if the number format leads to a
-	 *   representation with decimal places, e.g. if the option <code>style: "short"</code> is set.
-	 *   The maximum number of digits in the formatted representation of a number; if the <code>precision</code> is
-	 *   less than the overall length of the number, its fractional part is truncated through rounding.
-	 *   As the <code>precision</code> only affects the rounding of a number, its integer part can retain more digits
-	 *   than defined by this parameter.
-	 *   <b>Example:</b> With a <code>precision</code> of 2 and <code>style: "short"</code>,
-	 *   <code>234567</code> is formatted to <code>"235K"</code>.
-	 *   <b>Note:</b> The formatted output may differ depending on locale.
-	 * @param {boolean} [oFormatOptions.preserveDecimals=false] Whether {@link #format} preserves
-	 *   decimal digits except trailing zeros in case there are more decimals than the
-	 *   <code>maxFractionDigits</code> format option allows.
-	 *   If decimals are not preserved, the formatted number is rounded to <code>maxFractionDigits</code>.
-	 * @param {sap.ui.core.format.NumberFormat.RoundingMode} [oFormatOptions.roundingMode=TOWARDS_ZERO]
-	 *   Specifies the rounding behavior for discarding the digits after the maximum fraction digits
-	 *   defined by <code>maxFractionDigits</code>.
-	 *   This can be assigned
-	 *   <ul>
-	 *     <li>by value in {@link sap.ui.core.format.NumberFormat.RoundingMode RoundingMode},</li>
-	 *     <li>via a function that is used for rounding the number and takes two parameters: the number itself, and the
-	 *         number of decimal digits that should be reserved. <b>Using a function is deprecated since 1.121.0</b>;
-	 *         string based numbers are not rounded via this custom function.</li>
-	 *   </ul>
-	 * @param {int} [oFormatOptions.shortDecimals] defines the number of decimal in the shortened format string. If this isn't specified, the 'decimals' options is used
-	 * @param {int} [oFormatOptions.shortLimit] only use short number formatting for values above this limit
-	 * @param {int} [oFormatOptions.shortRefNumber] since 1.40 specifies a number from which the scale factor for 'short' or 'long' style format is generated. The generated scale factor is
-	 *  used for all numbers which are formatted with this format instance. This option has effect only when the option 'style' is set to 'short' or 'long'. This option is by default set
-	 *  with <code>undefined</code> which means the scale factor is selected automatically for each number being formatted.
-	 * @param {boolean} [oFormatOptions.showScale=true] since 1.40 specifies whether the scale factor is shown in the formatted number. This option takes effect only when the 'style' options is set to either 'short' or 'long'.
-	 * @param {boolean} [oFormatOptions.strictGroupingValidation=false] whether the positions of grouping separators are validated. Space characters used as grouping separators are not validated.
-	 * @param {string} [oFormatOptions.style=standard] defines the style of format. Valid values are
-	 *   'short, 'long' or 'standard' (based on the CLDR decimalFormat). When set to 'short' or 'long',
-	 *   numbers are formatted into compact forms. When this option is set, the default value of the
-	 *   'precision' option is set to 2. This can be changed by setting either min/maxFractionDigits,
-	 *   decimals, shortDecimals, or the 'precision' option itself.
 	 * @param {sap.ui.core.Locale} [oLocale]
 	 *   The locale to get the formatter for; if no locale is given, a locale for the currently configured language is
 	 *   used; see {@link module:sap/base/i18n/Formatting.getLanguageTag Formatting.getLanguageTag}

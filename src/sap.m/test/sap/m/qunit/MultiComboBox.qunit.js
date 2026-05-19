@@ -3011,6 +3011,155 @@ sap.ui.define([
 		oMultiComboBox.destroy();
 	});
 
+	QUnit.test("Dialog should NOT close when invalid input is entered on mobile", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+		this.stub(Device, "system").value({
+			desktop: false,
+			phone: true,
+			tablet: false
+		});
+
+		const oMultiComboBox = new MultiComboBox({
+			items: [
+				new Item({ key: "DZ", text: "Algeria" }),
+				new Item({ key: "AR", text: "Argentina" })
+			]
+		});
+
+		oMultiComboBox.placeAt("MultiComboBoxContent");
+		await nextUIUpdate(this.clock);
+
+		oMultiComboBox.focus();
+		oMultiComboBox.open();
+		this.clock.tick(500);
+
+		assert.ok(oMultiComboBox.isOpen(), "Picker should be open");
+		assert.ok(oMultiComboBox.isPickerDialog(), "Picker should be a dialog on mobile");
+
+		const oPickerTextField = oMultiComboBox.getPickerTextField();
+		const oValueStateHeader = oMultiComboBox._getSuggestionsPopover()._getValueStateHeader();
+		const oFakeEvent = {
+			target: { value: "InvalidText" },
+			setMarked: function () {},
+			srcControl: oPickerTextField,
+			isMarked: function() { return false; }
+		};
+
+		oPickerTextField.setValue("InvalidText");
+		oMultiComboBox.handleInputValidation(oFakeEvent, false);
+		this.clock.tick(500);
+
+		assert.ok(oMultiComboBox.isOpen(), "Dialog should stay open when invalid input is entered on mobile");
+		assert.ok(oMultiComboBox._bIsValueInvalid, "Invalid value flag should be set");
+		assert.strictEqual(oValueStateHeader.getValueState(), ValueState.Error, "Value state header should show Error");
+
+		oMultiComboBox.destroy();
+	});
+
+	QUnit.test("Error state should be cleared when value is corrected on mobile", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+		this.stub(Device, "system").value({
+			desktop: false,
+			phone: true,
+			tablet: false
+		});
+
+		const oMultiComboBox = new MultiComboBox({
+			items: [
+				new Item({ key: "DZ", text: "Algeria" }),
+				new Item({ key: "AR", text: "Argentina" })
+			]
+		});
+
+		oMultiComboBox.placeAt("MultiComboBoxContent");
+		await nextUIUpdate(this.clock);
+
+		oMultiComboBox.focus();
+		oMultiComboBox.open();
+		this.clock.tick(500);
+
+		const oPickerTextField = oMultiComboBox.getPickerTextField();
+		const oValueStateHeader = oMultiComboBox._getSuggestionsPopover()._getValueStateHeader();
+
+		oPickerTextField.setValue("InvalidText");
+		oMultiComboBox.handleInputValidation({
+			target: { value: "InvalidText" },
+			setMarked: function () {},
+			srcControl: oPickerTextField,
+			isMarked: function() { return false; }
+		}, false);
+		this.clock.tick(100);
+
+		assert.ok(oMultiComboBox._bIsValueInvalid, "Invalid value flag should be set after invalid input");
+		assert.strictEqual(oValueStateHeader.getValueState(), ValueState.Error, "Value state header should show Error");
+
+		oPickerTextField.setValue("Alg");
+		oMultiComboBox.oninput({
+			target: { value: "Alg" },
+			setMarked: function () {},
+			srcControl: oPickerTextField,
+			isMarked: function() { return false; }
+		});
+		this.clock.tick(100);
+
+		assert.notOk(oMultiComboBox._bIsValueInvalid, "Invalid value flag should be cleared when input becomes valid");
+		assert.strictEqual(oValueStateHeader.getValueState(), ValueState.None, "Value state header should be reset to None");
+
+		oMultiComboBox.destroy();
+	});
+
+	QUnit.test("Error state should be cleared when value is emptied on mobile", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+		this.stub(Device, "system").value({
+			desktop: false,
+			phone: true,
+			tablet: false
+		});
+
+		const oMultiComboBox = new MultiComboBox({
+			items: [
+				new Item({ key: "DZ", text: "Algeria" }),
+				new Item({ key: "AR", text: "Argentina" })
+			]
+		});
+
+		oMultiComboBox.placeAt("MultiComboBoxContent");
+		await nextUIUpdate(this.clock);
+
+		oMultiComboBox.focus();
+		oMultiComboBox.open();
+		this.clock.tick(500);
+
+		const oPickerTextField = oMultiComboBox.getPickerTextField();
+		const oValueStateHeader = oMultiComboBox._getSuggestionsPopover()._getValueStateHeader();
+
+		oPickerTextField.setValue("InvalidText");
+		oMultiComboBox.handleInputValidation({
+			target: { value: "InvalidText" },
+			setMarked: function () {},
+			srcControl: oPickerTextField,
+			isMarked: function() { return false; }
+		}, false);
+		this.clock.tick(100);
+
+		assert.ok(oMultiComboBox._bIsValueInvalid, "Invalid value flag should be set after invalid input");
+		assert.strictEqual(oValueStateHeader.getValueState(), ValueState.Error, "Value state header should show Error");
+
+		oPickerTextField.setValue("");
+		oMultiComboBox.oninput({
+			target: { value: "" },
+			setMarked: function () {},
+			srcControl: oPickerTextField,
+			isMarked: function() { return false; }
+		});
+		this.clock.tick(100);
+
+		assert.notOk(oMultiComboBox._bIsValueInvalid, "Invalid value flag should be cleared when input is emptied");
+		assert.strictEqual(oValueStateHeader.getValueState(), ValueState.None, "Value state header should be reset to None");
+
+		oMultiComboBox.destroy();
+	});
+
 	QUnit.test("Scenario 'EVENT_VALUE_PASTE': CTRL+V 'Algeria' ", async function(assert) {
 		// system under test
 		var oMultiComboBox = new MultiComboBox({
@@ -3627,7 +3776,7 @@ sap.ui.define([
 
 		// assertions
 		assert.deepEqual(oMultiComboBox.getSelectedItems(), [], "should not select anything");
-		assert.strictEqual(oMultiComboBox.getValue(), "al", "Value should not be deleted");
+		assert.strictEqual(oMultiComboBox.getValue(), "", "Value should be deleted");
 
 		// cleanup
 		qutils.triggerKeydown(oMultiComboBox.getFocusDomRef(), KeyCodes.ESCAPE);
@@ -4972,7 +5121,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// assert
-		assert.strictEqual(oMultiComboBox.getValue(), "test1", "Value should persist");
+		assert.strictEqual(oMultiComboBox.getValue(), "", "Value should be cleared");
 
 		// clean up
 		oFakeInput = null;
@@ -5239,15 +5388,7 @@ sap.ui.define([
 		oMultiComboBox.onfocusout(oFakeEvent);
 
 		// assert
-		assert.notOk(oStub.called, "change should not be called when value is not changed");
-
-		// act
-		qutils.triggerCharacterInput(oMultiComboBox.getFocusDomRef(), "bc");
-
-		oMultiComboBox.onfocusout(oFakeEvent);
-
-		// assertions
-		assert.ok(oStub.calledWith("Abc", { value: "Abc" }), "change should be called");
+		assert.ok(oStub.called, "change should be called when value is cleared");
 
 		// cleanup
 		oMultiComboBox.destroy();
@@ -5503,7 +5644,7 @@ sap.ui.define([
 		oMultiComboBox._handlePopupOpenAndItemsLoad(true); // Icon press
 		this.clock.tick(300);
 
-		assert.strictEqual(oMultiComboBox.getValue(), "Item2", "The value should not be cleared when closing the picker with icon press");
+		assert.strictEqual(oMultiComboBox.getValue(), "", "The value should  be cleared when closing the picker with icon press");
 
 		// clean
 		oMultiComboBox.destroy();
@@ -8700,7 +8841,7 @@ sap.ui.define([
 		// assert
 		assert.notEqual(document.activeElement, this.oMultiComboBox.getFocusDomRef(), "Focus is not in the input field");
 		assert.strictEqual(this.oMultiComboBox.getValueState(), ValueState.Success, "The value state is reset");
-		assert.strictEqual(this.oMultiComboBox.getValue(), "Brussel", "The input value is not deleted");
+		assert.strictEqual(this.oMultiComboBox.getValue(), "", "The input value is cleared on focus out");
 	});
 
 	QUnit.test("onfocusout value should be cleared", async function(assert) {
@@ -8722,7 +8863,82 @@ sap.ui.define([
 
 		// assert
 		assert.notEqual(document.activeElement, this.oMultiComboBox.getFocusDomRef(), "Focus is not in the input field");
-		assert.strictEqual(this.oMultiComboBox.getValue(), "Brussel", "The input value is not deleted");
+		assert.strictEqual(this.oMultiComboBox.getValue(), "", "The input value is cleared on focus out");
+	});
+
+	QUnit.test("onfocusout should not affect existing selected tokens", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+		var aInitialSelectedItems = this.oMultiComboBox.getSelectedItems();
+		var oTokenizer = this.oMultiComboBox.getAggregation("tokenizer");
+		var iInitialTokenCount = oTokenizer.getTokens().length;
+
+		// act - type invalid value and focus out
+		this.oMultiComboBox.focus();
+		await nextUIUpdate(this.clock);
+		this.clock.tick(100);
+
+		qutils.triggerCharacterInput(this.oMultiComboBox.getFocusDomRef(), "InvalidValue");
+		this.clock.tick(100);
+
+		this.oMultiComboBox.getFocusDomRef().blur();
+		this.clock.tick(500);
+
+		// assert
+		assert.strictEqual(this.oMultiComboBox.getValue(), "", "Invalid input value is cleared");
+		assert.strictEqual(this.oMultiComboBox.getSelectedItems().length, aInitialSelectedItems.length, "Selected items count is unchanged");
+		assert.strictEqual(oTokenizer.getTokens().length, iInitialTokenCount, "Token count is unchanged");
+		assert.deepEqual(this.oMultiComboBox.getSelectedItems(), aInitialSelectedItems, "Selected items are the same");
+	});
+
+	QUnit.test("onsapfocusleave should clear value when focus moves outside the control", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+
+		// arrange - remove pre-selected item
+		this.oMultiComboBox.setSelectedItems([]);
+		await nextUIUpdate(this.clock);
+
+		// act
+		this.oMultiComboBox.focus();
+		await nextUIUpdate(this.clock);
+		this.clock.tick(100);
+
+		qutils.triggerCharacterInput(this.oMultiComboBox.getFocusDomRef(), "Test");
+		this.clock.tick(100);
+
+		// simulate focus leaving the entire control via onsapfocusleave
+		var oFakeEvent = {
+			relatedControlId: null
+		};
+		this.oMultiComboBox.onsapfocusleave(oFakeEvent);
+		this.clock.tick(500);
+
+		// assert
+		assert.strictEqual(this.oMultiComboBox.getValue(), "", "Value is cleared when focus leaves control");
+	});
+
+	QUnit.test("onsapfocusleave should NOT clear value when focus moves to a token in the tokenizer", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+
+		// arrange - ensure there's a selected item (token)
+		await nextUIUpdate(this.clock);
+
+		// act
+		this.oMultiComboBox.focus();
+		await nextUIUpdate(this.clock);
+		this.clock.tick(100);
+
+		qutils.triggerCharacterInput(this.oMultiComboBox.getFocusDomRef(), "Test");
+		this.clock.tick(100);
+
+		var oToken = this.oMultiComboBox.getAggregation("tokenizer").getTokens()[0];
+		var oFakeEvent = {
+			relatedControlId: oToken.getId()
+		};
+		this.oMultiComboBox.onsapfocusleave(oFakeEvent);
+		this.clock.tick(500);
+
+		// assert
+		assert.strictEqual(this.oMultiComboBox.getValue(), "Test", "Value is NOT cleared when focus moves to a token");
 	});
 
 	QUnit.module("Value State Containing links", {

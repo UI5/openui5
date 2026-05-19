@@ -1641,6 +1641,14 @@ sap.ui.define([
 				"then the content of the runtime persistence object is also updated"
 			);
 		});
+
+		QUnit.test("does nothing when called with an empty updates array", function(assert) {
+			const oUpdateCachedResponseStub = sandbox.stub(Loader, "updateCachedResponse");
+			const oUpdateStorageResponseSpy = sandbox.spy(StorageUtils, "updateStorageResponse");
+			FlexState.update(sReference, []);
+			assert.strictEqual(oUpdateCachedResponseStub.callCount, 0, "then Loader.updateCachedResponse is not called");
+			assert.strictEqual(oUpdateStorageResponseSpy.callCount, 0, "then StorageUtils.updateStorageResponse is not called");
+		});
 	});
 
 	QUnit.module("Lazy variants loaded", {

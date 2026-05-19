@@ -527,6 +527,9 @@ sap.ui.define([
 	 * @param {object[]} aUpdates - All new FlexObjects in JSON format
 	 */
 	FlexState.update = function(sReference, aUpdates) {
+		if (!aUpdates.length) {
+			return;
+		}
 		const aFlexObjectUpdates = [];
 		StorageUtils.updateStorageResponse(_mInstances[sReference].storageResponse, aUpdates);
 		const sNewLoaderCacheKey = Loader.updateCachedResponse(sReference, aUpdates);

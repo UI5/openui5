@@ -682,7 +682,9 @@ function(
 			oControl = Element.getElementById(oEvent.relatedControlId),
 			oFocusDomRef = oControl && oControl.getFocusDomRef(),
 			oPicker = this.getPicker(),
-			oTokenizer = this.getAggregation("tokenizer");
+			oTokenizer = this.getAggregation("tokenizer"),
+			bFocusGoingToTokenizer = oControl && oControl.isA("sap.m.Token") && oTokenizer.getTokens().indexOf(oControl) > -1,
+			bFocusLeavingControl = !oControl || (!(this.getDomRef() !== oFocusDomRef && this.getDomRef().contains(oFocusDomRef)) && !bFocusGoingToTokenizer);
 
 		// If focus target is outside of picker and the picker is fully opened
 		if (!this._bPickerIsOpening && (!oPicker || !oPicker.getFocusDomRef() || !oFocusDomRef || !(oPicker.getFocusDomRef() !== oFocusDomRef && oPicker.getFocusDomRef().contains(oFocusDomRef)))) {
@@ -691,6 +693,24 @@ function(
 			// if the focus is outside the MultiComboBox, the tokenizer should be collapsed
 			if (!(this.getDomRef() !== document.activeElement && this.getDomRef().contains(document.activeElement))) {
 				oTokenizer.setRenderMode(TokenizerRenderMode.Narrow);
+			}
+
+			// Clear invalid/incomplete input when focus leaves the control
+			if (bFocusLeavingControl) {
+				var sCurrentValue = this.getValue();
+				if (sCurrentValue) {
+					this.updateDomValue("");
+					this.setProperty("value", "", true);
+					this.setLastValue("");
+					this._sOldInput = "";
+					this._sOldValue = "";
+
+					if (this.getValueState() === ValueState.Error && this._bIsValueInvalid) {
+						this._bIsValueInvalid = false;
+						this.setValueState(this._sInitialValueState);
+						this.setValueStateText(this._sInitialValueStateText || "");
+					}
+				}
 			}
 		}
 
@@ -701,7 +721,6 @@ function(
 				this.focus();
 			}
 		}
-
 	};
 
 	/**
@@ -930,8 +949,10 @@ function(
 		var oInput = oEvent.srcControl,
 			bIsPickerDialog = this.isPickerDialog(),
 			oInputField = bIsPickerDialog ? this.getPickerTextField() : this,
-			sValueState = oInputField.getValueState(),
-			sValue = oEvent.target.value;
+			sValueState = bIsPickerDialog ? this.getValueState() : oInputField.getValueState(),
+			sValue = oEvent.target.value,
+			bIsValueValid = this.isValueValid(sValue),
+			oSuggestionsPopover = this._getSuggestionsPopover();
 
 		// reset the value state
 		if (sValueState === ValueState.Error && this._bAlreadySelected) {
@@ -940,11 +961,15 @@ function(
 				this._bAlreadySelected = false;
 		}
 
-		// Clear error state when user types valid input
-		if (sValueState === ValueState.Error && this.isValueValid(sValue)) {
+		// Clear error state when user types valid input or clears the value
+		if (this._bIsValueInvalid && (bIsValueValid || sValue === "")) {
 			this._bIsValueInvalid = false;
-			oInputField.setValueState(this._sInitialValueState);
-			oInputField.setValueStateText(this._sInitialValueStateText || "");
+			if (bIsPickerDialog && oSuggestionsPopover) {
+				oSuggestionsPopover.updateValueState(this._sInitialValueState, this._sInitialValueStateText || "", true);
+			} else {
+				oInputField.setValueState(this._sInitialValueState);
+				oInputField.setValueStateText(this._sInitialValueStateText || "");
+			}
 		}
 
 		if (!this.getEnabled() || !this.getEditable()) {
@@ -1019,6 +1044,8 @@ function(
 		if (sInitialValueState === ValueState.Error) {
 			return;
 		}
+
+		this._bIsValueInvalid = true;
 
 		if (oSuggestionsPopover) {
 			oSuggestionsPopover.updateValueState(ValueState.Error, sInvalidEntry, true);
@@ -1297,7 +1324,7 @@ function(
 			this.iFocusedIndex = iFocusedIndex;
 
 			// save focused index, and re-apply after rendering of the list
-			if (oList.getItemNavigation()) {
+			if (oList.getItemNavigation() && (oList.getDomRef() !== document.activeElement && oList.getDomRef().contains(document.activeElement))) {
 				this._iFocusedIndex = oList.getItemNavigation().getFocusedIndex();
 			}
 		}
@@ -1434,10 +1461,13 @@ function(
 	 * @private
 	 */
 	MultiComboBox.prototype.onAfterClose = function() {
-		var bUseNarrow = (this.getDomRef() && !(this.getDomRef() !== document.activeElement && this.getDomRef().contains(document.activeElement))) || this.isPickerDialog(),
-			oDomRef = this.getFocusDomRef();
+		var oDomRef = this.getDomRef(),
+			bFocusInControl = oDomRef && (oDomRef !== document.activeElement && oDomRef.contains(document.activeElement)),
+			bUseNarrow = !bFocusInControl || this.isPickerDialog(),
+			oFocusDomRef = this.getFocusDomRef(),
+			sCurrentValue = this.getValue();
 
-		oDomRef && this.getFocusDomRef().setAttribute("aria-expanded", "false");
+		oFocusDomRef && oFocusDomRef.setAttribute("aria-expanded", "false");
 
 		// remove the active state of the MultiComboBox's field
 		this.toggleIconPressedStyle(false);
@@ -1454,9 +1484,19 @@ function(
 		this._getSuggestionsPopover()._sTypedInValue = "";
 
 		if (this.isPickerDialog()) {
-			// reset the value state after the dialog is closed
 			this.getPickerTextField().setValue("");
 			this.getFilterSelectedButton() && this.getFilterSelectedButton().setPressed(false);
+		}
+
+		if (!bFocusInControl && sCurrentValue) {
+			this.setValue(null);
+			this.fireChangeEvent("", { value: sCurrentValue });
+
+			if (this.getValueState() === ValueState.Error && this._bIsValueInvalid) {
+				this._bIsValueInvalid = false;
+				this.setValueState(this._sInitialValueState);
+				this.setValueStateText(this._sInitialValueStateText || "");
+			}
 		}
 
 		this.fireSelectionFinish({
@@ -2306,6 +2346,10 @@ function(
 	 * @private
 	 */
 	MultiComboBox.prototype.onfocusout = function(oEvent) {
+		var sOldValue = this.getValue();
+		var oPicker = this.getPicker();
+		var oFocusTarget = oEvent.relatedTarget;
+
 		// if the focus switches from the picker to the dropdown
 		// update the input value with the last typed in input from the user
 		this.isOpen() && this._handleInputFocusOut(oEvent);
@@ -2319,17 +2363,20 @@ function(
 
 		ComboBoxBase.prototype.onfocusout.apply(this, arguments);
 
-		var oPicker = this.getPicker(),
-			oFocusTarget = oEvent.relatedTarget;
-
-		// If focus target is outside of picker and the control, fire change event if value has changed
+		// If focus target is outside of picker and the picker is fully opened
 		if (!containsOrEquals(oPicker?.getDomRef(), oFocusTarget) && !containsOrEquals(this.getDomRef(), oFocusTarget)) {
-			var sCurrentValue = this.getValue();
-			var sLastValue = this.getLastValue();
+			this.setValue(null);
 
-			if (sCurrentValue !== sLastValue) {
-				this.fireChangeEvent(sCurrentValue, { value: sCurrentValue });
-				this.setLastValue(sCurrentValue);
+			// fire change event only if the value of the MCB is not empty
+			if (sOldValue) {
+				this.fireChangeEvent("", { value: sOldValue });
+
+				// Reset value state if it was set due to invalid input
+				if (this.getValueState() === ValueState.Error && this._bIsValueInvalid) {
+					this._bIsValueInvalid = false;
+					this.setValueState(this._sInitialValueState);
+					this.setValueStateText(this._sInitialValueStateText || "");
+				}
 			}
 		}
 	};
@@ -3214,7 +3261,7 @@ function(
 
 		if (!bValidInputValue && sValue !== "" && !bCompositionEvent) {
 			this._handleFieldValidationState(oInput);
-			if (this.isOpen()) {
+			if (this.isOpen() && !this.isPickerDialog()) {
 				this.close();
 			}
 			return;
@@ -3851,7 +3898,6 @@ function(
 	 * @private
 	 */
 	MultiComboBox.prototype._handleFieldValidationState = function (oInput) {
-		this._bIsValueInvalid = true;
 		this._showWrongValueVisualEffect();
 	};
 

@@ -69,9 +69,6 @@ sap.ui.define([
 			let oFlexData;
 			const oFlexBundle = await getBundle(sComponentName, mPropertyBag.legacyBundleHandling, "flexibility-bundle");
 			if (oFlexBundle) {
-				// TODO: remove as soon as the client also does the separation of compVariants and changes
-				oFlexBundle.changes = oFlexBundle.changes.concat(oFlexBundle.compVariants);
-				delete oFlexBundle.compVariants;
 				oFlexData = oFlexBundle;
 			} else {
 				const oChangesBundle = getBundle(sComponentName, true, "changes-bundle");

@@ -475,6 +475,9 @@ sap.ui.define([
 			vFilter = new Filter(aFilter, true);
 		}
 		this._oListControl.getBinding("items").filter(vFilter);
+
+		// Update the visible items count after filtering
+		this._updateVisibleItemsCount();
 	};
 
 	SelectionPanel.prototype._onSearchFieldLiveChange = function(oEvent) {
@@ -600,6 +603,10 @@ sap.ui.define([
 			this._oListControl.removeSelections();
 		}
 		BasePanel.prototype.setP13nData.call(this, aP13nData);
+
+		// Initialize visible items count with total items count
+		this._getP13nModel().setProperty("/visibleItems", aP13nData.length);
+
 		this._updateCount();
 
 		//After explicitly updating the data (e.g. outer influences by the p13n.Popup such as reset, open & update)
@@ -623,10 +630,30 @@ sap.ui.define([
 		BasePanel.prototype.onReset.apply(this, arguments);
 		this._sSearch = "";
 		this.getModel(this.P13N_MODEL).setProperty("/showSelected", false);
+
+		// Reset visible items count to total items count when filters are cleared
+		const aItems = this._getP13nModel().getProperty("/items");
+		this._getP13nModel().setProperty("/visibleItems", aItems ? aItems.length : 0);
+	};
+
+	/**
+	 * Updates the visible items count in the model based on currently displayed items.
+	 * This should be called whenever filters change to reflect the filtered item count.
+	 * @private
+	 * @since 1.148
+	 */
+	SelectionPanel.prototype._updateVisibleItemsCount = function() {
+		const iVisibleItems = this._oListControl.getItems().length;
+		this._getP13nModel().setProperty("/visibleItems", iVisibleItems);
 	};
 
 	SelectionPanel.prototype._updateCount = function() {
-		this._getP13nModel().setProperty("/selectedItems", this._oListControl.getSelectedContexts(true).length);
+		// Count only selected items that are currently visible
+		const aVisibleItems = this._oListControl.getItems();
+		const iVisibleSelected = aVisibleItems.filter((oItem) => oItem.getSelected()).length;
+
+		this._getP13nModel().setProperty("/selectedItems", iVisibleSelected);
+		this._updateVisibleItemsCount();
 	};
 
 	SelectionPanel.prototype._selectTableItem = function(oTableItem, bSelectAll) {
@@ -687,11 +714,11 @@ sap.ui.define([
 						parts: [{
 							path: this.P13N_MODEL + '>/selectedItems'
 						}, {
-							path: this.P13N_MODEL + '>/items'
+							path: this.P13N_MODEL + '>/visibleItems'
 						}],
-						formatter: (iSelected, aAll) => {
+						formatter: (iSelected, iVisible) => {
 							return this._sText + " " + this._getResourceText('p13n.HEADER_COUNT', [
-								iSelected, aAll instanceof Array ? aAll.length : 0
+								iSelected, iVisible || 0
 							]);
 						}
 					}
@@ -729,6 +756,8 @@ sap.ui.define([
 				this._removeFactoryControl();
 			},
 			updateFinished: () => {
+				// Update visible items count after table rendering completes
+				this._updateVisibleItemsCount();
 				if (this._getShowFactory() && !this._bInactive) {
 					this._addFactoryControl();
 				}

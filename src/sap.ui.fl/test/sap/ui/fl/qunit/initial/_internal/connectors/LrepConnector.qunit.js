@@ -376,6 +376,22 @@ sap.ui.define([
 			}.bind(this));
 		});
 
+		QUnit.test("when loading flex data with compVariants in the response, they are kept separate from changes", function(assert) {
+			const oResponse = {
+				changes: [{ fileName: "change1", fileType: "change" }],
+				compVariants: [{ fileName: "variant1", fileType: "variant" }],
+				loadModules: false
+			};
+			mockResponse.call(this, JSON.stringify(oResponse));
+
+			return LrepConnector.loadFlexData({ url: "/sap/bc/lrep", reference: "reference" }).then(function(oResult) {
+				assert.equal(oResult.changes.length, 1, "changes contains only the change");
+				assert.equal(oResult.changes[0].fileName, "change1", "the change is in changes");
+				assert.equal(oResult.compVariants.length, 1, "compVariants contains only the comp variant");
+				assert.equal(oResult.compVariants[0].fileName, "variant1", "the comp variant is in compVariants");
+			});
+		});
+
 		QUnit.test("when loadAllFlVariants is triggered", function(assert) {
 			mockResponse.call(this, JSON.stringify(oFLVariantServerResponse));
 			const mPropertyBag = { url: "/sap/bc/lrep", reference: "test.app", vmReference: "vmControl1" };

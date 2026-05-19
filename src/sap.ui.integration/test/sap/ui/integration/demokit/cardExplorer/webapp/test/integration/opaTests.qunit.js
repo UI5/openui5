@@ -7,7 +7,8 @@ sap.ui.define([
 	"./DownloadJourney",
 	"./NavigationJourney",
 	"./SampleJourney",
-	"./SchemaVersionJourney"
+	"./SchemaVersionJourney",
+	"./TopicJourney"
 ], function (Opa5, Startup) {
 	"use strict";
 

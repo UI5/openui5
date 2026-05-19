@@ -128,10 +128,10 @@ sap.ui.define([
 
 		QUnit.test("given only a static flexibility-bundle.json with dummy data placed for 'test.app4' resource roots, when loading flex data", function(assert) {
 			return StaticFileConnector.loadFlexData({ reference: "test.app2", legacyBundleHandling: true }).then(function(oResult) {
-				assert.equal(oResult.changes.length, 2, "two entries are in the changes property");
+				assert.equal(oResult.changes.length, 1, "one entry is in the changes property");
 				assert.equal(oResult.changes[0].dummy1, true, "the change dummy data is correctly loaded");
-				assert.equal(oResult.changes[1].dummy2, true, "the compVariant dummy data is correctly loaded and merged into the changes");
-				assert.equal(oResult.compVariants, undefined, "the compVariants section was removed");
+				assert.equal(oResult.compVariants.length, 1, "one entry is in the compVariants property");
+				assert.equal(oResult.compVariants[0].dummy2, true, "the compVariant dummy data is correctly loaded");
 				assert.equal(oResult.variantChanges[0].dummy3, true, "the variantChange dummy data is correctly loaded");
 				assert.equal(oResult.variantDependentControlChanges[0].dummy4, true, "the variantDependentControlChange dummy data is correctly loaded");
 				assert.equal(oResult.variantManagementChanges[0].dummy5, true, "the variantManagementChange dummy data is correctly loaded");
