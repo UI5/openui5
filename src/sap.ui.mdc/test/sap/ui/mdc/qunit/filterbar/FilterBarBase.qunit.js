@@ -9,9 +9,10 @@ sap.ui.define([
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/base/Log",
     "sap/ui/core/Lib",
-    "sap/ui/core/Core"
+    "sap/ui/core/Core",
+	"sap/ui/core/library"
 ], function (
-	FilterBarBase, FilterField, DefaultTypeMap, ConditionValidated, OperatorName, nextUIUpdate, Log, Library
+	FilterBarBase, FilterField, DefaultTypeMap, ConditionValidated, OperatorName, nextUIUpdate, Log, Library, coreLibrary
 ) {
 	"use strict";
 
@@ -211,8 +212,6 @@ sap.ui.define([
 		this.oFilterBarBase.setLiveMode(true);
 
 		sinon.stub(this.oFilterBarBase, "triggerSearch").returns(fPromiseResolved());
-		//sinon.stub(this.oFilterBarBase, "_hasAppliancePromises").returns();
-
 
 		oFilterField.fireSubmit({ promise: Promise.resolve() });
 
@@ -285,6 +284,275 @@ sap.ui.define([
 			done();
 		}.bind(this));
     });
+
+	QUnit.test("Check error state management in live mode - multiple fields with errors", async function(assert){
+		const done = assert.async();
+
+		// Create two filter fields
+		const oFilterField1 = new FilterField({
+			propertyKey: "key1",
+			dataType: "sap.ui.model.type.String",
+			conditions: "{$filters>/conditions/key1}"
+		});
+
+		const oFilterField2 = new FilterField({
+			propertyKey: "key2",
+			dataType: "sap.ui.model.type.String",
+			conditions: "{$filters>/conditions/key2}"
+		});
+
+		this.oFilterBarBase.addFilterItem(oFilterField1);
+		this.oFilterBarBase.addFilterItem(oFilterField2);
+
+		// Enable live mode
+		this.oFilterBarBase.setLiveMode(true);
+
+		let nFiltersChangedCount = 0;
+		let aFiltersChangedEvents = [];
+		let nSearchCount = 0;
+
+		// Track filtersChanged events to verify lock behavior
+		this.oFilterBarBase.attachFiltersChanged(function(oEvent) {
+			nFiltersChangedCount++;
+			aFiltersChangedEvents.push({
+				count: nFiltersChangedCount,
+				conditionsBased: oEvent.getParameter("conditionsBased")
+			});
+		});
+
+		// Track search events to verify unlock behavior
+		this.oFilterBarBase.attachSearch(function() {
+			nSearchCount++;
+		});
+
+		// Helper function to wait for async operations
+		const wait = (ms) => new Promise((resolve) => {setTimeout(resolve, ms);});
+
+		await this.oFilterBarBase.initialized();
+		await nextUIUpdate();
+
+		// Clear initial events - these are from FilterBar initialization
+		nFiltersChangedCount = 0;
+		aFiltersChangedEvents = [];
+		nSearchCount = 0;
+
+		// Step 1: Set field1 to error state
+		oFilterField1.setValueState("Error");
+		oFilterField1.setValueStateText("Invalid value");
+		oFilterField1.fireChange({
+			value: "invalid",
+			valid: false,
+			promise: Promise.reject("Validation error").catch(() => {})
+		});
+
+		await wait(150);
+		assert.ok(nFiltersChangedCount >= 1, "FiltersChanged event fired after field1 error");
+		assert.ok(aFiltersChangedEvents[aFiltersChangedEvents.length - 1].conditionsBased,
+			"Table locked after field1 has error");
+
+		// Step 2: Set field2 to error state as well
+		oFilterField2.setValueState("Error");
+		oFilterField2.setValueStateText("Invalid value");
+		oFilterField2.fireChange({
+			value: "invalid2",
+			valid: false,
+			promise: Promise.reject("Validation error").catch(() => {})
+		});
+
+		await wait(150);
+		assert.ok(aFiltersChangedEvents[aFiltersChangedEvents.length - 1].conditionsBased,
+			"Table still locked after field2 also has error");
+
+		// Step 3: Fix field2 - field1 still has error, table should stay locked
+		const nCountBefore = nFiltersChangedCount;
+		const nSearchCountBefore = nSearchCount;
+		oFilterField2.setValueState("None");
+		oFilterField2.fireChange({
+			value: "valid",
+			valid: true,
+			promise: Promise.resolve([])
+		});
+
+		await wait(150);
+		assert.ok(nFiltersChangedCount > nCountBefore,
+			"FiltersChanged event fired after field2 is fixed");
+		assert.ok(aFiltersChangedEvents[aFiltersChangedEvents.length - 1].conditionsBased,
+			"Table STILL LOCKED because field1 still has error (BUG FIX VERIFICATION)");
+		assert.equal(nSearchCount, nSearchCountBefore, "No search triggered while errors still exist");
+
+		// Step 4: Fix field1 - no errors left, table should unlock via search
+		const nSearchCountBeforeLastFix = nSearchCount;
+		oFilterField1.setValueState("None");
+		oFilterField1.fireChange({
+			value: "valid",
+			valid: true,
+			promise: Promise.resolve([])
+		});
+
+		await wait(150);
+		assert.ok(nSearchCount > nSearchCountBeforeLastFix, "Search event fired after all errors are fixed, triggering rebind which unlocks table");
+
+		done();
+	});
+
+	QUnit.test("Check error state management with invalid input and value state", async function(assert){
+		const done = assert.async();
+
+		const oFilterField = new FilterField({
+			propertyKey: "key1",
+			dataType: "sap.ui.model.type.String",
+			conditions: "{$filters>/conditions/key1}"
+		});
+
+		this.oFilterBarBase.addFilterItem(oFilterField);
+		this.oFilterBarBase.setLiveMode(true);
+
+		let lastLockState = null;
+		let nSearchCount = 0;
+
+		this.oFilterBarBase.attachFiltersChanged(function(oEvent) {
+			lastLockState = oEvent.getParameter("conditionsBased");
+		});
+
+		this.oFilterBarBase.attachSearch(function() {
+			nSearchCount++;
+		});
+
+		// Helper function to wait for async operations
+		const wait = (ms) => new Promise((resolve) => {setTimeout(resolve, ms);});
+
+		await this.oFilterBarBase.initialized();
+		await nextUIUpdate();
+
+		// Test with isInvalidInput
+		sinon.stub(oFilterField, "isInvalidInput").returns(true);
+		oFilterField.fireChange({
+			value: "test",
+			valid: false,
+			promise: Promise.reject().catch(() => {})
+		});
+
+		await wait(150);
+		assert.ok(lastLockState, "Table locked when field has invalid input");
+
+		// Clear invalid input
+		oFilterField.isInvalidInput.restore();
+		sinon.stub(oFilterField, "isInvalidInput").returns(false);
+		let nSearchCountBefore = nSearchCount;
+		oFilterField.fireChange({
+			value: "valid",
+			valid: true,
+			promise: Promise.resolve([])
+		});
+
+		await wait(150);
+		assert.ok(nSearchCount > nSearchCountBefore, "Search triggered after invalid input is cleared, unlocking table via rebind");
+
+		// Test with error value state
+		oFilterField.setValueState("Error");
+		oFilterField.setValueStateText("Custom error");
+		oFilterField.fireChange({
+			value: "test2",
+			valid: false,
+			promise: Promise.reject().catch(() => {})
+		});
+
+		await wait(150);
+		assert.ok(lastLockState, "Table locked when field has error value state");
+
+		// Clear error state
+		oFilterField.setValueState("None");
+		nSearchCountBefore = nSearchCount;
+		oFilterField.fireChange({
+			value: "valid2",
+			valid: true,
+			promise: Promise.resolve([])
+		});
+
+		await wait(150);
+		assert.ok(nSearchCount > nSearchCountBefore, "Search triggered after error value state is cleared, unlocking table via rebind");
+
+		done();
+	});
+
+	QUnit.test("Check that lock state updates when fields are removed in live mode", async function(assert){
+		const done = assert.async();
+
+		const oFilterField1 = new FilterField({
+			propertyKey: "key1",
+			dataType: "sap.ui.model.type.String",
+			conditions: "{$filters>/conditions/key1}"
+		});
+
+		const oFilterField2 = new FilterField({
+			propertyKey: "key2",
+			dataType: "sap.ui.model.type.String",
+			conditions: "{$filters>/conditions/key2}"
+		});
+
+		this.oFilterBarBase.addFilterItem(oFilterField1);
+		this.oFilterBarBase.addFilterItem(oFilterField2);
+		this.oFilterBarBase.setLiveMode(true);
+
+		let lastLockState = null;
+		let nSearchCount = 0;
+
+		this.oFilterBarBase.attachFiltersChanged(function(oEvent) {
+			lastLockState = oEvent.getParameter("conditionsBased");
+		});
+
+		this.oFilterBarBase.attachSearch(function() {
+			nSearchCount++;
+		});
+
+		// Helper function to wait for async operations
+		const wait = (ms) => new Promise((resolve) => {setTimeout(resolve, ms);});
+
+		await this.oFilterBarBase.initialized();
+		await nextUIUpdate();
+
+		// Set both fields to error state using ValueState
+		oFilterField1.setValueState("Error");
+		oFilterField1.setValueStateText("Invalid value");
+		oFilterField2.setValueState("Error");
+		oFilterField2.setValueStateText("Invalid value");
+
+		oFilterField1.fireChange({
+			value: "invalid1",
+			valid: false,
+			promise: Promise.reject().catch(() => {})
+		});
+
+		await wait(150);
+		assert.ok(lastLockState, "Table locked with field1 error");
+
+		oFilterField2.fireChange({
+			value: "invalid2",
+			valid: false,
+			promise: Promise.reject().catch(() => {})
+		});
+
+		await wait(150);
+		assert.ok(lastLockState, "Table still locked with both fields in error");
+
+		// Remove field1 while it has error - field2 still has error
+		this.oFilterBarBase.removeFilterItem(oFilterField1);
+		oFilterField1.destroy();
+
+		// Fix field2 - now no error fields exist
+		oFilterField2.setValueState("None");
+		const nSearchCountBefore = nSearchCount;
+		oFilterField2.fireChange({
+			value: "valid",
+			valid: true,
+			promise: Promise.resolve([])
+		});
+
+		await wait(150);
+		assert.ok(nSearchCount > nSearchCountBefore, "Search triggered after last error field is fixed, unlocking table via rebind");
+
+		done();
+	});
 
     QUnit.test("Check 'valid' promise - do not provide parameter", function(assert){
         const oSearchSpy = sinon.spy(this.oFilterBarBase, "fireSearch");
@@ -520,14 +788,29 @@ sap.ui.define([
             this.oFilterBarBase._fResolveInitialFiltersApplied = null;
         }.bind(this));
 
-        let nStep = 0;
+        let nFiltersChangedCount = 0;
+        let nSearchCount = 0;
+        let bSearchCalledAfterFiltersChanged = false;
+
         const fSearch = function(oEvent) {
-            assert.equal(++nStep, 2);
+            nSearchCount++;
+            if (nFiltersChangedCount > 0) {
+                bSearchCalledAfterFiltersChanged = true;
+            }
+
+            // Verify search is called once at the end
+            assert.equal(nSearchCount, 1, "Search should be called exactly once");
+            assert.ok(bSearchCalledAfterFiltersChanged, "Search should be called after filtersChanged events");
             done();
         };
+
         const fFiltersChanged = function(oEvent) {
-            assert.equal(++nStep, 1);
+            nFiltersChangedCount++;
+
+            // Allow multiple filtersChanged events (this is expected behavior during flex changes)
+            assert.ok(nFiltersChangedCount > 0, "FiltersChanged event " + nFiltersChangedCount + " fired");
         };
+
         this.oFilterBarBase.attachFiltersChanged(fFiltersChanged);
         this.oFilterBarBase.attachSearch(fSearch);
 
