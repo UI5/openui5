@@ -7,9 +7,10 @@ sap.ui.define([
 	"sap/m/MessageToast",
 	"sap/m/Table",
 	"sap/m/Text",
+	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/util/Mobile"
-], function(Column, ColumnListItem, Input, Label, MessageToast, Table, Text, nextUIUpdate, Mobile) {
+], function(Column, ColumnListItem, Input, Label, MessageToast, Table, Text, qutils, nextUIUpdate, Mobile) {
 	"use strict";
 
 	Mobile.init();
@@ -517,6 +518,34 @@ sap.ui.define([
 		assert.equal(document.activeElement, oListItem.getCells()[0].getFocusDomRef(), "focus is not change and still on the input");
 
 		table.destroy();
+	});
+
+	QUnit.test("Focus forwarding on mousedown should not scroll the table", async function(assert) {
+		const oListItem = new ColumnListItem({
+			cells: [new Text({text: "Cell1"}), new Text({text: "Cell2"})]
+		});
+		const oTable = new Table({
+			columns: [
+				new Column({header: new Text({text: "Header1"}), demandPopin: true, minScreenWidth: "48000px"}),
+				new Column({header: new Text({text: "Header2"})})
+			],
+			items: [oListItem]
+		});
+		oTable.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oPopinDomRef = oListItem.getDomRef("subcont");
+		assert.ok(oPopinDomRef?.classList.contains("sapMListTblSubCnt"), "popin sub-content area is rendered");
+
+		const fnFocusSpy = sinon.spy(HTMLElement.prototype, "focus");
+
+		qutils.triggerMouseEvent(oPopinDomRef, "mousedown");
+		oPopinDomRef.focus();
+		const oRowDomRef = oListItem.getDomRef();
+		assert.ok(fnFocusSpy.withArgs({ preventScroll: true }).calledOn(oRowDomRef), "focus is forwarded to the row with preventScroll=true");
+
+		fnFocusSpy.restore();
+		oTable.destroy();
 	});
 
 	QUnit.module("FieldHelp support", {

@@ -738,7 +738,9 @@ sap.ui.define([
 			oEvent.preventDefault();
 			oUI5Event.preventDefault();
 			oItemNavigation.setFocusedIndex(iForwardIndex);
-			oItemNavigation.getItemDomRefs()[iForwardIndex].focus();
+			oItemNavigation.getItemDomRefs()[iForwardIndex].focus({
+				preventScroll: this._bMouseDown // avoid scroll jump when focus is forwarded due to a mouse click
+			});
 			iFocusedIndex && oItemNavigation.setFocusedIndex(iFocusedIndex);
 		}
 	};
