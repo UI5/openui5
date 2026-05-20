@@ -91,6 +91,11 @@ sap.ui.define([
 		 "sap.ui.unified.MenuItemGroup",
 		 "sap.ui.unified.MenuTextFieldItem",
 		 "sap.ui.unified.NonWorkingPeriod",
+		 "sap.ui.unified.RecurrenceRule",
+		 "sap.ui.unified.MonthlyRecurrenceRule",
+		 "sap.ui.unified.WeeklyRecurrenceRule",
+		 "sap.ui.unified.YearlyRecurrenceRule",
+		 "sap.ui.unified.RecurringCalendarAppointment",
 		 "sap.ui.unified.RecurringNonWorkingPeriod",
 		 "sap.ui.unified.TimeRange"
 		],
@@ -382,6 +387,72 @@ sap.ui.define([
 	};
 
 	DataType.registerEnum("sap.ui.unified.RecurrenceType", thisLib.RecurrenceType);
+
+	/**
+	 * Types of recurrence rule pattern.
+	 *
+	 * @enum {string}
+	 * @public
+	 * @since 1.127.0
+	 */
+	thisLib.RecurrenceRuleType = {
+		/**
+		 * Recurrence based on a specific day of the month (e.g., the 15th).
+		 *
+		 * @since 1.127.0
+		 */
+		DayOfMonth: "DayOfMonth",
+		/**
+		 * Recurrence based on a specific day of the week (e.g., second Tuesday).
+		 *
+		 * @since 1.127.0
+		 */
+		DayOfWeek: "DayOfWeek"
+	};
+
+	DataType.registerEnum("sap.ui.unified.RecurrenceRuleType", thisLib.RecurrenceRuleType);
+
+	/**
+	 * Week order within a month for recurrence rules.
+	 *
+	 * @enum {string}
+	 * @public
+	 * @since 1.127.0
+	 */
+	thisLib.WeekOfMonth = {
+		/**
+		 * First occurrence in the month.
+		 *
+		 * @since 1.127.0
+		 */
+		First: "First",
+		/**
+		 * Second occurrence in the month.
+		 *
+		 * @since 1.127.0
+		 */
+		Second: "Second",
+		/**
+		 * Third occurrence in the month.
+		 *
+		 * @since 1.127.0
+		 */
+		Third: "Third",
+		/**
+		 * Fourth occurrence in the month.
+		 *
+		 * @since 1.127.0
+		 */
+		Fourth: "Fourth",
+		/**
+		 * Last occurrence in the month.
+		 *
+		 * @since 1.127.0
+		 */
+		Last: "Last"
+	};
+
+	DataType.registerEnum("sap.ui.unified.WeekOfMonth", thisLib.WeekOfMonth);
 
 	/**
 	 * Types of a calendar appointment display mode

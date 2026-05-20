@@ -267,17 +267,10 @@ sap.ui.define([
 	};
 
 	CalendarTimeInterval.prototype._initializeHeader = function() {
-		var oHeader = new Header(this.getId() + "--Head"),
-			oResourceBundle = Library.getResourceBundleFor("sap.m");
+		var oHeader = new Header(this.getId() + "--Head");
 		oHeader.attachEvent("pressPrevious", this._handlePrevious, this);
 		oHeader.attachEvent("pressNext", this._handleNext, this);
 		this.setAggregation("header", oHeader);
-
-		if (oHeader) {
-			oHeader.setAriaLabelButton0(oResourceBundle.getText("DATETIMEPICKER_DATE"));
-			oHeader.setAriaLabelButton1(oResourceBundle.getText("MOBISCROLL_MONTH"));
-			oHeader.setAriaLabelButton2(oResourceBundle.getText("MOBISCROLL_YEAR"));
-		}
 	};
 
 	CalendarTimeInterval.prototype._initializeTimesRow = function() {
@@ -1573,21 +1566,25 @@ sap.ui.define([
 
 		var iMonth = oStartDate.getUTCMonth();
 		sText = aMonthNames[iMonth];
-		if (bShort) {
-			sAriaLabel = aMonthNamesWide[aMonthNames[iMonth]];
-		}
 
+		var oResourceBundle = Library.getResourceBundleFor("sap.m");
 		if (!this.getPickerPopup()) {
+			var iYear = this._oYearFormat.format(oStartDate, true);
 			oHeader.setTextButton0(aDay);
 			oHeader.setTextButton1(sText);
-			oHeader.setTextButton2(this._oYearFormat.format(oStartDate, true));
+			oHeader.setTextButton2(iYear);
+			oHeader.setAriaLabelButton0(`${oResourceBundle.getText("DATETIMEPICKER_DATE")} ${aDay}`);
+			oHeader.setAriaLabelButton1(`${oResourceBundle.getText("MOBISCROLL_MONTH")} ${sText}`);
+			oHeader.setAriaLabelButton2(`${oResourceBundle.getText("MOBISCROLL_YEAR")} ${iYear}`);
 		} else {
 			oDateFormat = DateFormat.getInstance({style: "long", strictParsing: true, relative: bRelative}, oLocaleData.oLocale);
 			sAriaLabel = aDay = oDateFormat.format(CalendarUtils._createLocalDate(oStartDate, true));
 			oHeader.setTextButton1(aDay);
+			oHeader.setAriaLabelButton1(sAriaLabel);
 		}
 
 		if (bShort) {
+			sAriaLabel = aMonthNamesWide[aMonthNames[iMonth]];
 			oHeader.setAriaLabelButton1(sAriaLabel);
 		}
 	}

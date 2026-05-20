@@ -66,6 +66,30 @@ sap.ui.define([
 
 	});
 
+	// ─────────────────────────────────────────────────────────────────
+	// isRecurring
+	// Bug: isRecurring() always returns true, ignoring recurrenceType.
+	// ─────────────────────────────────────────────────────────────────
+	QUnit.test("isRecurring returns false without recurrenceType", function (assert) {
+		const oPeriod = new RecurringNonWorkingPeriod({
+			date: UI5Date.getInstance(2025, 0, 1),
+			timeRange: new TimeRange({start: "09:00", end: "10:00", valueFormat: "HH:mm"})
+		});
+		assert.notOk(oPeriod.isRecurring(), "isRecurring() should be false without recurrenceType");
+		oPeriod.destroy();
+	});
+
+	QUnit.test("isRecurring returns true when recurrenceType is set", function (assert) {
+		const oPeriod = new RecurringNonWorkingPeriod({
+			recurrenceType: RecurrenceType.Daily,
+			recurrencePattern: 1,
+			date: UI5Date.getInstance(2025, 0, 1),
+			timeRange: new TimeRange({start: "09:00", end: "10:00", valueFormat: "HH:mm"})
+		});
+		assert.ok(oPeriod.isRecurring(), "isRecurring() should be true with recurrenceType");
+		oPeriod.destroy();
+	});
+
 	QUnit.module("RecurrenceUtils");
 
 	QUnit.test("hasOccurrenceOnDate from RecurrenceUtils", function (assert) {

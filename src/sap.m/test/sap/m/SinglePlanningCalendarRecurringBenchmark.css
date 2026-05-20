@@ -1,0 +1,20 @@
+body { font-family: "72", Arial, sans-serif; margin: 20px; }
+.benchmark-panel { border: 1px solid #ccc; border-radius: 8px; padding: 20px; margin: 10px 0; }
+.benchmark-header { font-size: 18px; font-weight: bold; margin-bottom: 12px; }
+.result-row { display: flex; gap: 20px; margin: 6px 0; align-items: center; }
+.result-label { width: 260px; color: #555; }
+.result-value { font-weight: bold; font-size: 15px; }
+.winner { color: #107e3e; }
+.loser { color: #bb0000; }
+.neutral { color: #0070b1; }
+table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: right; }
+th { background: #f5f5f5; text-align: left; }
+td:first-child, th:first-child { text-align: left; }
+.controls { margin: 16px 0; display: flex; gap: 12px; align-items: center; }
+button { padding: 8px 20px; font-size: 14px; cursor: pointer; border: 1px solid #0070b1; background: #0070b1; color: white; border-radius: 4px; }
+button:hover { background: #005a8e; }
+button:disabled { background: #ccc; border-color: #ccc; cursor: default; }
+select, input { padding: 6px 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
+#status { margin: 12px 0; color: #555; font-style: italic; }
+.summary { background: #f0f7ff; padding: 16px; border-radius: 8px; margin: 20px 0; }

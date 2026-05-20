@@ -456,13 +456,18 @@ sap.ui.define([
 				this._oItemNavigation.destroy();
 				delete this._oItemNavigation;
 			}
+			if (this._aOccurrenceClones) {
+				this._aOccurrenceClones.forEach((oClone) => oClone.destroy());
+				delete this._aOccurrenceClones;
+			}
 		};
 
 		SinglePlanningCalendarGrid.prototype.onBeforeRendering = function () {
-			var oAppointmentsMap = this._createAppointmentsMap(this.getAppointments()),
-				oStartDate = this.getStartDate(),
+			var oStartDate = this.getStartDate(),
 				oCalStartDate = CalendarDate.fromLocalJSDate(oStartDate),
 				iColumns = this._getColumns();
+
+			var oAppointmentsMap = this._createAppointmentsMap(this.getAppointments(), oStartDate, iColumns);
 
 			this._oVisibleAppointments = this._calculateVisibleAppointments(oAppointmentsMap.appointments, this.getStartDate(), iColumns);
 			this._oAppointmentsToRender = this._calculateAppointmentsLevelsAndWidth(this._oVisibleAppointments);
@@ -1804,25 +1809,58 @@ sap.ui.define([
 		 * @returns {object} a map with separated regular appointments and all-day appointments (blockers)
 		 * @private
 		 */
-		SinglePlanningCalendarGrid.prototype._createAppointmentsMap = function (aAppointments) {
-			var that = this;
+		SinglePlanningCalendarGrid.prototype._createAppointmentsMap = function (aAppointments, oStartDate, iColumns) {
+			// Destroy previously created occurrence clones to prevent memory leaks
+			if (this._aOccurrenceClones) {
+				this._aOccurrenceClones.forEach((oClone) => oClone.destroy());
+			}
+			this._aOccurrenceClones = [];
 
-			return aAppointments.reduce(function (oMap, oAppointment) {
-				var oAppStartDate = oAppointment.getStartDate(),
-					oAppEndDate = oAppointment.getEndDate();
+			// Calculate the range end date based on columns
+			const oRangeStart = UI5Date.getInstance(oStartDate);
+			const oRangeEnd = UI5Date.getInstance(oStartDate);
+			oRangeEnd.setDate(oRangeEnd.getDate() + iColumns - 1);
+			oRangeEnd.setHours(23, 59, 59, 999);
+
+			return aAppointments.reduce((oMap, oAppointment) => {
+				const oAppStartDate = oAppointment.getStartDate();
+				const oAppEndDate = oAppointment.getEndDate();
 
 				if (!oAppStartDate || !oAppEndDate) {
 					return oMap;
 				}
 
-				if (that.isAllDayAppointment(oAppStartDate, oAppEndDate)) {
-					oMap.blockers.push(oAppointment);
-				} else {
-					oMap.appointments.push(oAppointment);
-				}
+				// Check if this is a recurring appointment
+				const bIsRecurring = oAppointment.getRecurrenceType && oAppointment.getRecurrenceType();
+				const aAppointmentList = bIsRecurring
+					? this._cloneRecurringAppointment(oAppointment, oRangeStart, oRangeEnd)
+					: [oAppointment];
+
+				aAppointmentList.forEach((oApp) => {
+					if (this.isAllDayAppointment(oApp.getStartDate(), oApp.getEndDate())) {
+						oMap.blockers.push(oApp);
+					} else {
+						oMap.appointments.push(oApp);
+					}
+				});
 
 				return oMap;
 			}, { appointments: [], blockers: []});
+		};
+
+		/**
+		 * Creates CalendarAppointment clones for each occurrence of a recurring appointment within a date range.
+		 *
+		 * @param {sap.ui.unified.CalendarAppointment} oAppointment the recurring appointment
+		 * @param {Date} oRangeStart the start of the visible range
+		 * @param {Date} oRangeEnd the end of the visible range
+		 * @returns {sap.ui.unified.CalendarAppointment[]} array of cloned appointments for each occurrence
+		 * @private
+		 */
+		SinglePlanningCalendarGrid.prototype._cloneRecurringAppointment = function (oAppointment, oRangeStart, oRangeEnd) {
+			const aClones = oAppointment.createOccurrenceClones(oRangeStart, oRangeEnd);
+			this._aOccurrenceClones = this._aOccurrenceClones.concat(aClones);
+			return aClones;
 		};
 
 		/**

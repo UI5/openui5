@@ -13,6 +13,8 @@ sap.ui.define([
 	"sap/ui/unified/DateRange",
 	"sap/ui/unified/calendar/CalendarDate",
 	"sap/ui/events/KeyCodes",
+	"sap/ui/unified/RecurringCalendarAppointment",
+	"sap/ui/unified/RecurrenceRule",
 	"sap/base/i18n/Localization",
 	"sap/ui/qunit/utils/createAndAppendDiv",
 	"sap/ui/core/CustomData"
@@ -30,6 +32,8 @@ sap.ui.define([
 	DateRange,
 	CalendarDate,
 	KeyCodes,
+	RecurringCalendarAppointment,
+	RecurrenceRule,
 	Localization,
 	createAndAppendDiv,
 	CustomData
@@ -1504,4 +1508,67 @@ sap.ui.define([
 			// clean
 			oGrid.destroy();
 		});
+
+		QUnit.module("Monthly recurring appointments — _calculateAppointmentsNodes across 3 years", {
+			beforeEach: function() {
+				this.oGrid = new SinglePlanningCalendarMonthGrid({
+					startDate: UI5Date.getInstance(2024, 0, 1),
+					firstDayOfWeek: 1
+				});
+				this.oGrid.addAppointment(new RecurringCalendarAppointment({
+					recurrenceType: "Monthly",
+					recurrencePattern: 1,
+					recurrenceEndDate: UI5Date.getInstance(2026, 11, 31),
+					startDate: UI5Date.getInstance(2024, 0, 10, 9, 0),
+					endDate:   UI5Date.getInstance(2024, 0, 10, 10, 0),
+					recurrenceRule: new RecurrenceRule({ type: "DayOfMonth", dayOfMonth: 10 })
+				}));
+				this.oGrid.placeAt("qunit-fixture");
+			},
+			afterEach: function() {
+				this.oGrid.destroy();
+			}
+		});
+
+		QUnit.test("Day 10 found in January 2024 (year 1)", function(assert) {
+			const aNodes = this.oGrid._calculateAppointmentsNodes(UI5Date.getInstance(2024, 0, 1));
+			const oDay10 = new CalendarDate(2024, 0, 10);
+			const bFound = aNodes.some(function(n) { return n.start.valueOf() === oDay10.valueOf(); });
+			assert.ok(bFound, "Jan 10, 2024 occurrence found");
+		});
+
+		QUnit.test("Day 10 found in March 2025 (year 2)", function(assert) {
+			const aNodes = this.oGrid._calculateAppointmentsNodes(UI5Date.getInstance(2025, 2, 1));
+			const oDay10 = new CalendarDate(2025, 2, 10);
+			const bFound = aNodes.some(function(n) { return n.start.valueOf() === oDay10.valueOf(); });
+			assert.ok(bFound, "Mar 10, 2025 occurrence found");
+		});
+
+		QUnit.test("Day 10 found in October 2026 (year 3)", function(assert) {
+			const aNodes = this.oGrid._calculateAppointmentsNodes(UI5Date.getInstance(2026, 9, 1));
+			const oDay10 = new CalendarDate(2026, 9, 10);
+			const bFound = aNodes.some(function(n) { return n.start.valueOf() === oDay10.valueOf(); });
+			assert.ok(bFound, "Oct 10, 2026 occurrence found");
+		});
+
+		QUnit.test("_getAppointmetsForADay finds day 10 in all 36 months", function(assert) {
+			// Populate _oAppointmentsToRender by running calculateAppointmentsNodes for each month
+			// then verify _getAppointmetsForADay returns the appointment for each day-10
+			let iFound = 0;
+			for (let iYear = 2024; iYear <= 2026; iYear++) {
+				for (let iMonth = 0; iMonth <= 11; iMonth++) {
+					const oMonthStart = UI5Date.getInstance(iYear, iMonth, 1);
+					this.oGrid._oAppointmentsToRender = this.oGrid._calculateAppointmentsNodes(oMonthStart);
+					const oDay10 = new CalendarDate(iYear, iMonth, 10);
+					const aApps = this.oGrid._getAppointmetsForADay(oDay10);
+					if (aApps.length > 0) {
+						iFound++;
+					} else {
+						assert.ok(false, iYear + "-" + (iMonth + 1) + "-10 not found via _getAppointmetsForADay");
+					}
+				}
+			}
+			assert.strictEqual(iFound, 36, "All 36 months have a day-10 occurrence");
+		});
+
 	});
