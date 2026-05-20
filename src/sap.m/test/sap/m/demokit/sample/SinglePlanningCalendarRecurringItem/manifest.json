@@ -32,6 +32,7 @@
 				"files": [
 					"Page.view.xml",
 					"Page.controller.js",
+					"CreateAppointmentDialog.fragment.xml",
 					"manifest.json"
 				]
 			}

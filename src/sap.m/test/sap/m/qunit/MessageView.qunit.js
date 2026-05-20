@@ -1602,6 +1602,33 @@ sap.ui.define([
 		assert.ok(oValueStateTextDom.classList.contains("sapUiInvisibleText"), "Should have sapUiInvisibleText class");
 	});
 
+	QUnit.test("Details page icon should have role 'img' and aria-label with message type", async function (assert) {
+		var oBundle = Library.getResourceBundleFor("sap.m");
+		var oListItem = this.oMessageView._oLists.all.getItems()[0];
+
+		this.oMessageView._fnHandleForwardNavigation(oListItem, "show");
+		await nextUIUpdate();
+
+		var oIcon = this.oMessageView._oMessageIcon;
+		var oIconDom = oIcon.getDomRef();
+
+		assert.strictEqual(oIconDom.getAttribute("role"), "img", "Icon should have role 'img'");
+		assert.strictEqual(oIconDom.getAttribute("aria-label"), oBundle.getText("LIST_ITEM_STATE_ERROR"), "Icon should have aria-label 'Error'");
+	});
+
+	QUnit.test("Details page announcement should include the message type", function (assert) {
+		var oBundle = Library.getResourceBundleFor("sap.m");
+		var oSpy = this.spy(this.oMessageView._oInvisibleMessage, "announce");
+		var oListItem = this.oMessageView._oLists.all.getItems()[1]; // Warning item
+
+		this.oMessageView._fnHandleForwardNavigation(oListItem, "show");
+
+		var sExpectedType = oBundle.getText("LIST_ITEM_STATE_WARNING");
+		var sAnnouncement = oSpy.getCall(0).args[0];
+
+		assert.ok(sAnnouncement.indexOf(sExpectedType) === 0, "Announcement should start with message type: " + sAnnouncement);
+	});
+
 	QUnit.module("Filtering");
 
 	QUnit.test("Filter message & model change integration", async function (assert) {

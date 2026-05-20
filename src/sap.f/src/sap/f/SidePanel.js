@@ -9,7 +9,6 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/Icon",
 	"sap/ui/core/Lib",
-	"sap/ui/core/Popup",
 	"sap/ui/core/ResizeHandler",
 	"sap/ui/core/delegate/ScrollEnablement",
 	'sap/ui/core/delegate/ItemNavigation',
@@ -23,6 +22,7 @@ sap.ui.define([
 	"./SidePanelRenderer",
 	"./library",
 	"sap/ui/core/library",
+	"sap/m/library",
 	"sap/ui/events/F6Navigation",
 	"sap/base/i18n/Localization",
 	"sap/ui/thirdparty/jquery",
@@ -33,7 +33,6 @@ sap.ui.define([
 	Element,
 	Icon,
 	Library,
-	Popup,
 	ResizeHandler,
 	ScrollEnablement,
 	ItemNavigation,
@@ -47,6 +46,7 @@ sap.ui.define([
 	SidePanelRenderer,
 	library,
 	coreLibrary,
+	mLibrary,
 	F6Navigation,
 	Localization,
 	jQuery,
@@ -57,7 +57,8 @@ sap.ui.define([
 	// Resource Bundle
 	var oResourceBundle = Library.getResourceBundleFor("sap.f"),
 		InvisibleMessageMode = coreLibrary.InvisibleMessageMode,
-		SidePanelPosition = library.SidePanelPosition;
+		SidePanelPosition = library.SidePanelPosition,
+		PlacementType = mLibrary.PlacementType;
 
 	// Resize positions
 	var SIDE_PANEL_POSITION_MIN_WIDTH = 0,	// Minimum width
@@ -331,6 +332,25 @@ sap.ui.define([
 
 				}.bind(this)
 			}).addStyleClass("sapFSPOverflowMenu");
+
+			// Position the overflow menu to the left of the opener, bottom-aligned.
+			// HorizontalPreferredLeft corresponds to index 3 (Left) in the Popover._placements array.
+			// _adaptPositionParams resets _myPositions on every openBy(), so patch it on the instance.
+			var oResponsivePopover = oMenu._getPopover(),
+				oInnerPopover = oResponsivePopover._oControl,
+				fnAdaptPositionParams = oInnerPopover._adaptPositionParams;
+
+			oResponsivePopover.setPlacement(PlacementType.HorizontalPreferredLeft);
+			oInnerPopover._adaptPositionParams = function() {
+				fnAdaptPositionParams.call(this);
+				this._myPositions[3] = "end bottom";
+				this._atPositions[3] = "begin bottom";
+			};
+
+			// Add the keyboard navigation delegate once (popover is created eagerly in Menu.init)
+			oResponsivePopover.addEventDelegate({
+				onkeydown: this._overflowMenuOnkeydown.bind(this)
+			});
 
 			this.setAggregation("_overflowMenu", oMenu);
 		}
@@ -1034,10 +1054,7 @@ sap.ui.define([
 	};
 
 	SidePanel.prototype._toggleOverflowMenu = function(oDomRef) {
-		var oOverflowMenu = this.getAggregation("_overflowMenu"),
-			oDelegate = {
-				onkeydown: this._overflowMenuOnkeydown.bind(this)
-			};
+		var oOverflowMenu = this.getAggregation("_overflowMenu");
 
 		if (!oDomRef) {
 			if (this._bOverflowMenuOpened) {
@@ -1052,10 +1069,8 @@ sap.ui.define([
 		} else {
 			this._setOverflowItemSelection(true);
 			setTimeout(function() {
-				var bNoMenu = !oOverflowMenu.getAggregation("_menu");
-				oOverflowMenu.openBy(oDomRef, false, Popup.Dock.BeginBottom, Popup.Dock.EndBottom, "3 0");
-				oOverflowMenu._getMenu().getPopup().setExtraContent([this.getAggregation("_overflowItem")]);
-				bNoMenu && oOverflowMenu.getAggregation("_menu").addEventDelegate(oDelegate);
+				oOverflowMenu.openBy(oDomRef);
+				oOverflowMenu._setExtraContent(this.getAggregation("_overflowItem"));
 			}.bind(this), 0);
 		}
 	};

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>SinglePlanningCalendar - Recurring Appointments Benchmark</title>
+	<link rel="stylesheet" href="./SinglePlanningCalendarRecurringBenchmark.css">
+	<script src="shared-config.js"></script>
+	<script id="sap-ui-bootstrap"
+			src="../../../resources/sap-ui-core.js"
+			data-sap-ui-language="en_US"
+			data-sap-ui-libs="sap.m, sap.ui.unified"
+			data-sap-ui-on-init="module:local/SinglePlanningCalendarRecurringBenchmark"
+			data-sap-ui-resource-roots='{
+				"local": "./"
+			}'
+	>
+	</script>
+	
+</head>
+<body>
+	<h1>SinglePlanningCalendar — Rendering Benchmark</h1>
+	<p>Compares rendering performance: <strong>expanded</strong> (one CalendarAppointment per occurrence) vs <strong>recurring</strong> (one RecurringCalendarAppointment per series).</p>
+
+	<div class="controls">
+		<label>Series: <input type="number" id="seriesCount" value="20" min="1" max="200" style="width:60px"></label>
+		<label>Months: <input type="number" id="monthSpan" value="12" min="1" max="60" style="width:60px"></label>
+		<label>Iterations: <input type="number" id="iterations" value="5" min="1" max="20" style="width:60px"></label>
+		<label>View:
+			<select id="viewSelect">
+				<option value="week" selected>Week</option>
+				<option value="work">Work Week</option>
+				<option value="day">Day</option>
+				<option value="month">Month</option>
+			</select>
+		</label>
+		<button id="btnRun" onclick="runBenchmark()">Run Benchmark</button>
+	</div>
+
+	<div id="status">Ready. Click "Run Benchmark" to start.</div>
+	<div id="results"></div>
+	<div id="canvasLabel" style="font-size:16px; font-weight:bold; color:#0070b1; margin:12px 0 4px;"></div>
+	<div id="benchCanvas" style="display:none; border:1px solid #e0e0e0; border-radius:8px; padding:8px; margin-bottom:20px;"></div>
+</body>
+</html>

@@ -3,6 +3,7 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/Lib",
+	"sap/m/library",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/createAndAppendDiv",
 	"sap/m/Title",
@@ -15,6 +16,7 @@ sap.ui.define([
 	Element,
 	XMLView,
 	Library,
+	mLibrary,
 	qutils,
 	createAndAppendDiv,
 	Title,
@@ -25,6 +27,8 @@ sap.ui.define([
 	jQuery
 ) {
 	"use strict";
+
+	var PlacementType = mLibrary.PlacementType;
 
 	var aItems = [
 		{
@@ -480,6 +484,45 @@ sap.ui.define([
 		assert.ok(oOverflowItemDomRef, "Overflow item exists");
 		assert.strictEqual(this.oSP.getItems().length - iVisibleItems, iOverflowMenuItems, "All invisible action items are added as overflow menu items");
 		assert.strictEqual(window.getComputedStyle(oOverflowItemDomRef)["visibility"], "visible", "Overflow item is visible");
+	});
+
+	QUnit.test("Overflow menu opens left of opener and bottom-aligned", async function (assert) {
+		var oOverflowMenu,
+			oOverflowItemDomRef,
+			oOverflowItem,
+			oResponsivePopover,
+			oInnerPopover,
+			oPopoverDomRef,
+			sInitialOverflowText;
+
+		addItems(this.oSP);
+		await nextUIUpdate();
+
+		oOverflowMenu = this.oSP.getAggregation("_overflowMenu");
+		oOverflowItem = this.oSP.getAggregation("_overflowItem");
+		oOverflowItemDomRef = this.oSP.getAggregation("_overflowItem").getDomRef();
+		sInitialOverflowText = oOverflowItem.getText();
+		oResponsivePopover = oOverflowMenu._getPopover();
+		oInnerPopover = oResponsivePopover._oControl;
+
+		assert.strictEqual(oResponsivePopover.getPlacement(), PlacementType.HorizontalPreferredLeft, "Overflow menu popover is configured to prefer left placement");
+
+		this.oSP._toggleOverflowMenu(oOverflowItemDomRef);
+		await new Promise(function(resolve) {
+			setTimeout(resolve, 0);
+		});
+		await nextUIUpdate();
+
+		oPopoverDomRef = oResponsivePopover.getDomRef();
+		assert.ok(oPopoverDomRef, "Overflow menu popover is opened");
+		assert.strictEqual(oInnerPopover._myPositions[3], "end bottom", "Left placement anchor on menu side is bottom-right");
+		assert.strictEqual(oInnerPopover._atPositions[3], "begin bottom", "Left placement anchor on opener side is bottom-left");
+		assert.ok(oOverflowMenu.isOpen(), "Overflow menu is open after toggle");
+		assert.ok(this.oSP._bOverflowMenuOpened, "SidePanel marks overflow menu as opened");
+		assert.notStrictEqual(oOverflowItem.getText(), sInitialOverflowText, "Overflow item text changes when menu opens");
+
+		oOverflowMenu.close();
+		await nextUIUpdate();
 	});
 
 	QUnit.test("Resize bar when side panel is resizable", async function (assert) {

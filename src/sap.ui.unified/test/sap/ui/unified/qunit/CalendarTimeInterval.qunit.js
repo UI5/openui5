@@ -15,8 +15,9 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/date/UI5Date",
-	"sap/ui/test/utils/nextUIUpdate"
-], function(Formatting, Localization, Element, qutils, CalendarTimeInterval, CalendarLegend, CalendarLegendItem, DateRange, DateTypeRange, unifiedLibrary, DateFormat, KeyCodes, jQuery, UI5Date, nextUIUpdate) {
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/core/Lib"
+], function(Formatting, Localization, Element, qutils, CalendarTimeInterval, CalendarLegend, CalendarLegendItem, DateRange, DateTypeRange, unifiedLibrary, DateFormat, KeyCodes, jQuery, UI5Date, nextUIUpdate, Library) {
 	"use strict";
 
 	// set language to en-US, since we have specific language strings tested
@@ -130,12 +131,49 @@ sap.ui.define([
 	});
 
 	QUnit.test("Header", function(assert) {
-		assert.ok(jQuery("#Cal1--Head-B0").get(0), "Calendar1: day button shown");
-		assert.ok(jQuery("#Cal1--Head-B1").get(0), "Calendar1: month button shown");
-		assert.ok(jQuery("#Cal1--Head-B2").get(0), "Calendar1: year button shown");
-		assert.equal(jQuery("#Cal2--Head-B0").text(), "13", "Calendar2: 13 as day shown");
-		assert.equal(jQuery("#Cal2--Head-B1").text(), "August", "Calendar2: August as month shown");
-		assert.equal(jQuery("#Cal2--Head-B2").text(), "2015", "Calendar2: year 2015 shown");
+		const oLocalDate = this.oCal1._getLocaleData();
+		const oCal1StartDate = this.oCal1._getFocusedDate();
+		const oCal1StartDateMonth = oLocalDate.getMonthsStandAlone("wide")[oCal1StartDate.getUTCMonth()];
+		const oCal1StartDateYear = this.oCal1._oYearFormat.format(oCal1StartDate, true);
+		const oCal1Date = oCal1StartDate.getUTCDate().toString();
+		const oResourceBundle = Library.getResourceBundleFor("sap.m");
+		const oCall1Button0 = jQuery("#Cal1--Head-B0");
+		const oCall1Button1 = jQuery("#Cal1--Head-B1");
+		const oCall1Button2 = jQuery("#Cal1--Head-B2");
+		const oCall2Button0 = jQuery("#Cal2--Head-B0");
+		const oCall2Button1 = jQuery("#Cal2--Head-B1");
+		const oCall2Button2 = jQuery("#Cal2--Head-B2");
+
+		assert.ok(oCall1Button0.get(0), "Calendar1: day button shown");
+		assert.equal(oCall1Button0.attr("aria-label"), `${oResourceBundle.getText("DATETIMEPICKER_DATE")} ${oCal1Date}`, "Calendar1: day button aria-label");
+		assert.ok(oCall1Button1.get(0), "Calendar1: month button shown");
+		assert.equal(oCall1Button1.attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_MONTH")} ${oCal1StartDateMonth}`, "Calendar1: month button aria-label");
+		assert.ok(oCall1Button2.get(0), "Calendar1: year button shown");
+		assert.equal(oCall1Button2.attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_YEAR")} ${oCal1StartDateYear}`, "Calendar1: year button aria-label");
+		assert.equal(oCall2Button0.text(), "13", "Calendar2: 13 as day shown");
+		assert.equal(oCall2Button0.attr("aria-label"), `${oResourceBundle.getText("DATETIMEPICKER_DATE")} 13`, "Calendar2: day button aria-label");
+		assert.equal(oCall2Button1.text(), "August", "Calendar2: August as month shown");
+		assert.equal(oCall2Button1.attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_MONTH")} August`, "Calendar2: month button aria-label");
+		assert.equal(oCall2Button2.text(), "2015", "Calendar2: year 2015 shown");
+		assert.equal(oCall2Button2.attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_YEAR")} 2015`, "Calendar2: year button aria-label");
+	});
+
+	QUnit.test("Header aria-labels update when startDate changes", async function(assert) {
+		const oResourceBundle = Library.getResourceBundleFor("sap.m");
+
+		// Arrange: Cal2 starts on Aug 13, 2015
+		assert.equal(jQuery("#Cal2--Head-B0").attr("aria-label"), `${oResourceBundle.getText("DATETIMEPICKER_DATE")} 13`, "Before change: day button aria-label is 13");
+		assert.equal(jQuery("#Cal2--Head-B1").attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_MONTH")} August`, "Before change: month button aria-label is August");
+		assert.equal(jQuery("#Cal2--Head-B2").attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_YEAR")} 2015`, "Before change: year button aria-label is 2015");
+
+		// Act: change startDate to March 5, 2020
+		this.oCal2.setStartDate(UI5Date.getInstance("2020", "2", "5", "0", "0", "0"));
+		await nextUIUpdate();
+
+		// Assert: aria-labels reflect the new date
+		assert.equal(jQuery("#Cal2--Head-B0").attr("aria-label"), `${oResourceBundle.getText("DATETIMEPICKER_DATE")} 5`, "After change: day button aria-label is 5");
+		assert.equal(jQuery("#Cal2--Head-B1").attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_MONTH")} March`, "After change: month button aria-label is March");
+		assert.equal(jQuery("#Cal2--Head-B2").attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_YEAR")} 2020`, "After change: year button aria-label is 2020");
 	});
 
 	QUnit.test("Header in Japaneese", async function(assert) {
@@ -160,6 +198,11 @@ sap.ui.define([
 			assert.equal(jQuery("#CalJp--Head-B0").text(), "13日", "Calendar: 13日 as day shown");
 			assert.equal(jQuery("#CalJp--Head-B1").text(), "8月", "Calendar: 8月 (August) as month shown");
 			assert.equal(jQuery("#CalJp--Head-B2").text(), "2015年", "Calendar: year 2015年  shown");
+
+			const oResourceBundle = Library.getResourceBundleFor("sap.m");
+			assert.equal(jQuery("#CalJp--Head-B0").attr("aria-label"), `${oResourceBundle.getText("DATETIMEPICKER_DATE")} 13日`, "Calendar: day button aria-label includes formatted day");
+			assert.equal(jQuery("#CalJp--Head-B1").attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_MONTH")} 8月`, "Calendar: month button aria-label includes month name");
+			assert.equal(jQuery("#CalJp--Head-B2").attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_YEAR")} 2015年`, "Calendar: year button aria-label includes formatted year");
 		} finally {
 			if (oCalJ) {
 				oCalJ.destroy();
@@ -190,6 +233,11 @@ sap.ui.define([
 			assert.equal(jQuery("#CalZh--Head-B0").text(), "13日", "Calendar: 13日 as day shown");
 			assert.equal(jQuery("#CalZh--Head-B1").text(), "八月", "Calendar: 八月 (August) as month shown");
 			assert.equal(jQuery("#CalZh--Head-B2").text(), "2015年", "Calendar: year 2015年  shown");
+
+			const oResourceBundle = Library.getResourceBundleFor("sap.m");
+			assert.equal(jQuery("#CalZh--Head-B0").attr("aria-label"), `${oResourceBundle.getText("DATETIMEPICKER_DATE")} 13日`, "Calendar: day button aria-label includes formatted day");
+			assert.equal(jQuery("#CalZh--Head-B1").attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_MONTH")} 八月`, "Calendar: month button aria-label includes month name");
+			assert.equal(jQuery("#CalZh--Head-B2").attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_YEAR")} 2015年`, "Calendar: year button aria-label includes formatted year");
 		} finally {
 			if (oCalJ) {
 				oCalJ.destroy();
@@ -220,6 +268,11 @@ sap.ui.define([
 			assert.equal(jQuery("#CalJa--Head-B0").text(), "13日", "Calendar: 13日 as day shown");
 			assert.equal(jQuery("#CalJa--Head-B1").text(), "8月", "Calendar: 8月 (August) as month shown");
 			assert.equal(jQuery("#CalJa--Head-B2").text(), "2015年", "Calendar: year 2015年  shown");
+
+			const oResourceBundle = Library.getResourceBundleFor("sap.m");
+			assert.equal(jQuery("#CalJa--Head-B0").attr("aria-label"), `${oResourceBundle.getText("DATETIMEPICKER_DATE")} 13日`, "Calendar: day button aria-label includes formatted day");
+			assert.equal(jQuery("#CalJa--Head-B1").attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_MONTH")} 8月`, "Calendar: month button aria-label includes month name");
+			assert.equal(jQuery("#CalJa--Head-B2").attr("aria-label"), `${oResourceBundle.getText("MOBISCROLL_YEAR")} 2015年`, "Calendar: year button aria-label includes formatted year");
 		} finally {
 			if (oCalJ) {
 				oCalJ.destroy();

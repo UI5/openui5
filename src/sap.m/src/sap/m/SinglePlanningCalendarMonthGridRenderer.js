@@ -306,7 +306,7 @@ sap.ui.define([
 			bHasCustomContent = !!aCustomContent.length,
 			bIsFullDay = !oEndDate || oControl._isAllDayAppointment(oStartDate, oEndDate),
 			oValue = bIsFullDay ? InvisibleText.getStaticId("sap.ui.unified", "CALENDAR_ALL_DAY_PREFIX") : InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT"),
-			bDraggable = oAppointment.getParent().getEnableAppointmentsDragAndDrop(),
+			bDraggable = oControl.getEnableAppointmentsDragAndDrop(),
 			oToday = oDay && oDay.isSame(CalendarDate.fromLocalJSDate(UI5Date.getInstance())),
 			mAccProps = {
 				role: "listitem",

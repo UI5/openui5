@@ -413,6 +413,13 @@ sap.ui.define([
 				delete this._oItemNavigation;
 			}
 
+			if (this._aOccurrenceClones) {
+				this._aOccurrenceClones.forEach(function(oClone) {
+					oClone.destroy();
+				});
+				delete this._aOccurrenceClones;
+			}
+
 			this._aLinks.forEach((oLink) => oLink.destroy());
 
 			delete this._aLinks;
@@ -1104,8 +1111,37 @@ sap.ui.define([
 			var aVisibleDays = this._getVisibleDays(oStartDate),
 				oFirstVisibleDay = aVisibleDays[0],
 				oLastVisibleDay = aVisibleDays[aVisibleDays.length - 1],
-					// We do not need appointments without start and end dates
-				aApps = this.getAppointments().filter(function(app) {
+				oRangeStart = oFirstVisibleDay?.toLocalJSDate(),
+				oRangeEnd = oLastVisibleDay?.toLocalJSDate();
+
+			oRangeEnd?.setHours(23, 59, 59, 999);
+
+			// Destroy previously created occurrence clones to prevent memory leaks
+			if (this._aOccurrenceClones) {
+				this._aOccurrenceClones.forEach(function(oClone) {
+					oClone.destroy();
+				});
+			}
+			this._aOccurrenceClones = [];
+
+			// Build a combined list of original + expanded recurring appointments
+			var aAllAppointments = [];
+			var that = this;
+			this.getAppointments().forEach(function(oAppointment) {
+				var bIsRecurring = oAppointment.getRecurrenceType && oAppointment.getRecurrenceType();
+				if (bIsRecurring) {
+					if (!oAppointment.getStartDate() || !oAppointment.getEndDate()) {
+						return;
+					}
+					var aClones = that._cloneRecurringAppointment(oAppointment, oRangeStart, oRangeEnd);
+					aAllAppointments = aAllAppointments.concat(aClones);
+				} else {
+					aAllAppointments.push(oAppointment);
+				}
+			});
+
+				// We do not need appointments without start and end dates
+			var aApps = aAllAppointments.filter(function(app) {
 					var bValid = app.getStartDate() && app.getEndDate();
 					if (!bValid) {
 						Log.warning("Appointment " + app.getId() + " has no start or no end date. It is ignored.");
@@ -1227,6 +1263,21 @@ sap.ui.define([
 			this._aAppsLevelsPerDay = aVisibleDaysLevels;
 
 			return aApps;
+		};
+
+		/**
+		 * Creates CalendarAppointment clones for each occurrence of a recurring appointment within a date range.
+		 *
+		 * @param {sap.ui.unified.CalendarAppointment} oAppointment the recurring appointment
+		 * @param {Date} oRangeStart the start of the visible range
+		 * @param {Date} oRangeEnd the end of the visible range
+		 * @returns {sap.ui.unified.CalendarAppointment[]} array of cloned appointments for each occurrence
+		 * @private
+		 */
+		SinglePlanningCalendarMonthGrid.prototype._cloneRecurringAppointment = function (oAppointment, oRangeStart, oRangeEnd) {
+			var aClones = oAppointment.createOccurrenceClones(oRangeStart, oRangeEnd);
+			this._aOccurrenceClones = this._aOccurrenceClones.concat(aClones);
+			return aClones;
 		};
 
 		SinglePlanningCalendarMonthGrid.prototype._findStartDateIndex = function (aDays, oApp) {

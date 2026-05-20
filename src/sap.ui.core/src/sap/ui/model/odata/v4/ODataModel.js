@@ -2257,9 +2257,11 @@ sap.ui.define([
 	 *
 	 * @param {string} sGroupId
 	 *   The group ID
-	 * @returns {boolean|undefined} Whether it is an API group
+	 * @returns {boolean} Whether it is an API group
 	 *
 	 * @private
+	 * @since 1.149.0
+	 * @ui5-restricted sap.fe
 	 */
 	ODataModel.prototype.isApiGroup = function (sGroupId) {
 		return this.getGroupProperty(sGroupId, "submit") === SubmitMode.API;

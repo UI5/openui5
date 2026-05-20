@@ -513,7 +513,8 @@ function(
 					decorative: !Device.support.touch || Device.system.desktop ? true : false,
 					press: this._handleButtonPress.bind(this, 1),
 					useIconTooltip: false,
-					alt: StepInput.STEP_INPUT_INCREASE_BTN_TOOLTIP
+					alt: StepInput.STEP_INPUT_INCREASE_BTN_TOOLTIP,
+					tooltip: StepInput.STEP_INPUT_INCREASE_BTN_TOOLTIP
 				});
 
 			oIcon.getEnabled = function () {
@@ -547,7 +548,8 @@ function(
 					decorative: !Device.support.touch || Device.system.desktop ? true : false,
 					press: this._handleButtonPress.bind(this, -1),
 					useIconTooltip: false,
-					alt: StepInput.STEP_INPUT_DECREASE_BTN_TOOLTIP
+					alt: StepInput.STEP_INPUT_DECREASE_BTN_TOOLTIP,
+					tooltip: StepInput.STEP_INPUT_DECREASE_BTN_TOOLTIP
 				});
 
 			oIcon.getEnabled = function () {

@@ -8,6 +8,8 @@ sap.ui.define([
 	"sap/m/MenuButton",
 	"sap/m/Button",
 	"sap/m/MessageToast",
+	"sap/m/List",
+	"sap/m/StandardListItem",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/core/library"
@@ -21,6 +23,8 @@ sap.ui.define([
 	MenuButton,
 	Button,
 	MessageToast,
+	List,
+	StandardListItem,
 	VerticalLayout,
 	JSONModel,
 	coreLibrary
@@ -474,18 +478,23 @@ sap.ui.define([
 		]
 	});
 
-	var oContextArea = new Button("contextArea", {
-		text: "Right-click me for context menu",
-		width: "300px",
-		press: function(oEvent) {
-			MessageToast.show("Use right-click for context menu");
-		}
-	});
-
-	// Attach context menu to the button
-	oContextArea.attachBrowserEvent("contextmenu", function(oEvent) {
-		oEvent.preventDefault();
-		oContextMenu.openAsContextMenu(oEvent, oContextArea);
+	var oContextList = new List("contextArea", {
+		headerText: "Right-click an item for context menu",
+		contextMenu: oContextMenu,
+		items: [
+			new StandardListItem({
+				title: "Document 1",
+				icon: "sap-icon://document"
+			}),
+			new StandardListItem({
+				title: "Document 2",
+				icon: "sap-icon://document"
+			}),
+			new StandardListItem({
+				title: "Document 3",
+				icon: "sap-icon://document"
+			})
+		]
 	});
 
 	// Menu with mixed groups and regular items
@@ -563,10 +572,10 @@ sap.ui.define([
 			oButton5,
 			new Label({text: "Menu items with interactive end content buttons", wrapping: true, labelFor: "button6"}),
 			oButton6,
-			new Label({text: "Right-click context menu demonstration", wrapping: true, labelFor: "contextArea"}),
-			oContextArea,
 			new Label({text: "Mixed groups with different selection modes", wrapping: true, labelFor: "button7"}),
-			oButton7
+			oButton7,
+			new Label({text: "Right-click context menu demonstration", wrapping: true, labelFor: "contextArea"}),
+			oContextList
 		]
 	}).addStyleClass("sapUiContentPadding");
 

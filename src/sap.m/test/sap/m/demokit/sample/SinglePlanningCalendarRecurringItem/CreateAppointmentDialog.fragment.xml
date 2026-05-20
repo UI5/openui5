@@ -1,0 +1,138 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:form="sap.ui.layout.form">
+	<Dialog title="Create Appointment" contentWidth="500px">
+		<customData>
+			<core:CustomData key="model" />
+		</customData>
+		<content>
+			<form:SimpleForm editable="true" layout="ResponsiveGridLayout"
+				labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+				emptySpanXL="0" emptySpanL="0" emptySpanM="0"
+				columnsXL="1" columnsL="1" columnsM="1">
+				<form:title>
+					<core:Title text="General" />
+				</form:title>
+				<Label text="Title" required="true" />
+				<Input value="{create>/title}" placeholder="Appointment title" />
+				<Label text="Description" />
+				<Input value="{create>/text}" placeholder="Optional description" />
+				<Label text="Type" />
+				<Select selectedKey="{create>/type}">
+					<core:Item key="Type01" text="Type 01" />
+					<core:Item key="Type02" text="Type 02" />
+					<core:Item key="Type03" text="Type 03" />
+					<core:Item key="Type04" text="Type 04" />
+					<core:Item key="Type05" text="Type 05" />
+					<core:Item key="Type06" text="Type 06" />
+					<core:Item key="Type07" text="Type 07" />
+					<core:Item key="Type08" text="Type 08" />
+					<core:Item key="Type09" text="Type 09" />
+				</Select>
+
+				<form:title>
+					<core:Title text="Date &amp; Time" />
+				</form:title>
+				<Label text="Start" />
+				<DateTimePicker value="{
+					path: 'create>/startDate',
+					type: 'sap.ui.model.type.DateTime',
+					formatOptions: { pattern: 'yyyy-MM-dd HH:mm' }
+				}" />
+				<Label text="End" />
+				<DateTimePicker value="{
+					path: 'create>/endDate',
+					type: 'sap.ui.model.type.DateTime',
+					formatOptions: { pattern: 'yyyy-MM-dd HH:mm' }
+				}" />
+
+				<form:title>
+					<core:Title text="Recurrence (optional)" />
+				</form:title>
+				<Label text="Repeat" />
+				<Select selectedKey="{create>/recurrenceType}" change="onRecurrenceTypeChange">
+					<core:Item key="" text="Does not repeat" />
+					<core:Item key="Daily" text="Daily" />
+					<core:Item key="Weekly" text="Weekly" />
+					<core:Item key="Monthly" text="Monthly" />
+					<core:Item key="Yearly" text="Yearly" />
+				</Select>
+				<Label text="Every" visible="{= ${create>/recurrenceType} !== '' }" />
+				<HBox alignItems="Center" visible="{= ${create>/recurrenceType} !== '' }">
+					<Input value="{create>/recurrencePattern}" type="Number" width="60px" placeholder="1" />
+					<Text text="{= ${create>/recurrenceType} === 'Daily' ? 'day(s)' : ${create>/recurrenceType} === 'Weekly' ? 'week(s)' : ${create>/recurrenceType} === 'Monthly' ? 'month(s)' : 'year(s)' }" class="sapUiSmallMarginBegin" />
+				</HBox>
+				<Label text="On" visible="{= ${create>/recurrenceType} === 'Weekly' }" />
+				<MultiComboBox selectedKeys="{create>/recurrenceDay}"
+					visible="{= ${create>/recurrenceType} === 'Weekly' }">
+					<core:Item key="0" text="Sunday" />
+					<core:Item key="1" text="Monday" />
+					<core:Item key="2" text="Tuesday" />
+					<core:Item key="3" text="Wednesday" />
+					<core:Item key="4" text="Thursday" />
+					<core:Item key="5" text="Friday" />
+					<core:Item key="6" text="Saturday" />
+				</MultiComboBox>
+				<Label text="Repeat on" visible="{= ${create>/recurrenceType} === 'Monthly' || ${create>/recurrenceType} === 'Yearly' }" />
+				<Select selectedKey="{create>/ruleType}"
+					visible="{= ${create>/recurrenceType} === 'Monthly' || ${create>/recurrenceType} === 'Yearly' }">
+					<core:Item key="DayOfMonth" text="A specific day of the month" />
+					<core:Item key="DayOfWeek" text="A specific day of the week" />
+				</Select>
+				<Label text="On day" visible="{= (${create>/recurrenceType} === 'Monthly' || ${create>/recurrenceType} === 'Yearly') &amp;&amp; ${create>/ruleType} === 'DayOfMonth' }" />
+				<Input value="{create>/ruleDayOfMonth}" type="Number" width="80px"
+					visible="{= (${create>/recurrenceType} === 'Monthly' || ${create>/recurrenceType} === 'Yearly') &amp;&amp; ${create>/ruleType} === 'DayOfMonth' }"
+					placeholder="e.g. 15" />
+				<Label text="On the" visible="{= (${create>/recurrenceType} === 'Monthly' || ${create>/recurrenceType} === 'Yearly') &amp;&amp; ${create>/ruleType} === 'DayOfWeek' }" />
+				<HBox alignItems="Center"
+					visible="{= (${create>/recurrenceType} === 'Monthly' || ${create>/recurrenceType} === 'Yearly') &amp;&amp; ${create>/ruleType} === 'DayOfWeek' }">
+					<Select selectedKey="{create>/ruleWeekOfMonth}">
+						<core:Item key="First" text="First" />
+						<core:Item key="Second" text="Second" />
+						<core:Item key="Third" text="Third" />
+						<core:Item key="Fourth" text="Fourth" />
+						<core:Item key="Last" text="Last" />
+					</Select>
+					<Select selectedKey="{create>/ruleDayOfWeek}" class="sapUiSmallMarginBegin">
+						<core:Item key="0" text="Sunday" />
+						<core:Item key="1" text="Monday" />
+						<core:Item key="2" text="Tuesday" />
+						<core:Item key="3" text="Wednesday" />
+						<core:Item key="4" text="Thursday" />
+						<core:Item key="5" text="Friday" />
+						<core:Item key="6" text="Saturday" />
+					</Select>
+				</HBox>
+				<Label text="In" visible="{= ${create>/recurrenceType} === 'Yearly' }" />
+				<Select selectedKey="{create>/ruleMonth}"
+					visible="{= ${create>/recurrenceType} === 'Yearly' }">
+					<core:Item key="0" text="January" />
+					<core:Item key="1" text="February" />
+					<core:Item key="2" text="March" />
+					<core:Item key="3" text="April" />
+					<core:Item key="4" text="May" />
+					<core:Item key="5" text="June" />
+					<core:Item key="6" text="July" />
+					<core:Item key="7" text="August" />
+					<core:Item key="8" text="September" />
+					<core:Item key="9" text="October" />
+					<core:Item key="10" text="November" />
+					<core:Item key="11" text="December" />
+				</Select>
+				<Label text="Until" visible="{= ${create>/recurrenceType} !== '' }" />
+				<DatePicker visible="{= ${create>/recurrenceType} !== '' }" value="{
+					path: 'create>/recurrenceEndDate',
+					type: 'sap.ui.model.type.Date',
+					formatOptions: { pattern: 'yyyy-MM-dd' }
+				}" />
+			</form:SimpleForm>
+		</content>
+		<beginButton>
+			<Button text="Create" type="Emphasized" press="onCreateDialogSave" />
+		</beginButton>
+		<endButton>
+			<Button text="Cancel" press="onCreateDialogCancel" />
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>
