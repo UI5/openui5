@@ -21,7 +21,7 @@
 	</script>
 
 	<script>
-	jQuery.fn.filterByText = function(textbox) {
+	jQuery.fn.filterByText = function($textbox) {
 		return this.each(function() {
 			var selectbox = this;
 			var options = [];
@@ -30,7 +30,10 @@
 			});
 			jQuery(selectbox).data("options", options);
 
-			jQuery(textbox).on("change keyup", function() {
+			// jQuery object or a selector
+			// (https://codeql.github.com/codeql-query-help/javascript/js-unsafe-jquery-plugin/)
+			$textbox = ($textbox instanceof jQuery) ? $textbox : jQuery(jQuery.find($textbox));
+			$textbox.on("change keyup", function() {
 				var options = jQuery(selectbox).empty().data("options");
 				var search = jQuery(this).val().trim();
 				var regex = new RegExp(search, "gi");
@@ -145,9 +148,10 @@
 				sap.ui.qunit.TestRunner.runTests(aTests, nStep).then(function(oResult) {
 					$this.val("Run");
 					jQuery("#stop").toggle();
-					if (sap.ui.qunit.TestRunner.hasCoverage() && window.blanket) {
-						window.blanket.report({});
-						jQuery("div.test-coverage").toggle();
+					if (sap.ui.qunit.TestRunner.hasCoverage()) {
+						var $testCoverage = jQuery("div.test-coverage");
+						$testCoverage.toggle();
+						sap.ui.qunit.TestRunner.reportCoverage( $testCoverage[0] );
 					}
 				}).then(function() {
 					$this.val("Run");
