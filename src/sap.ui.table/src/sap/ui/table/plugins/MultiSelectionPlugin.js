@@ -385,7 +385,7 @@ sap.ui.define([
 			}
 		}
 
-		return TableUtils.loadContexts(oPlugin.getControl().getBinding(), iGetContextsStartIndex, iGetContextsLength).then(function(aContexts) {
+		return TableUtils.loadContexts(oPlugin.getControl(), iGetContextsStartIndex, iGetContextsLength, true).then((aContexts) => {
 			if (!oPlugin._bLimitDisabled && aContexts.length < iLimit) {
 				oPlugin.setLimitReached(false);
 				if (bReverse) {

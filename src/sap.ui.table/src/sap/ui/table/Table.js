@@ -2139,6 +2139,7 @@ sap.ui.define([
 		oTable._bRowsBeingBound = false;
 		oTable._bContextsAvailable = false;
 		_private(oTable).iPendingRequests = 0;
+		delete _private(oTable).bBusy;
 		oTable._iBindingLength = null;
 	}
 
@@ -2482,7 +2483,6 @@ sap.ui.define([
 		}
 
 		if (typeof aContexts.bExpectMore === 'boolean') {
-
 			// Store the bExpectMore flag in the internal state of the table to prevent
 			// multiple busyStateChange events.
 			_private(this).bIsWaitingForData = aContexts.bExpectMore;
@@ -4023,6 +4023,15 @@ sap.ui.define([
 		updateAutomaticBusyIndicator(this);
 	};
 
+	/**
+	 * @param {boolean} bBusy Whether the table should be busy
+	 * @private
+	 */
+	Table.prototype._setBusy = function(bBusy) {
+		_private(this).bBusy = bBusy;
+		updateAutomaticBusyIndicator(this);
+	};
+
 	Table.prototype._isWaitingForData = function() {
 		const oState = _private(this);
 
@@ -4036,12 +4045,12 @@ sap.ui.define([
 
 		clearHideBusyIndicatorTimeout(oTable);
 
-		if (oTable._isWaitingForData()) {
+		if (_private(oTable).bBusy || oTable._isWaitingForData()) {
 			oTable.setBusy(true);
 		} else {
 			// This timer should avoid flickering of the busy indicator and unnecessary updates of NoData in case a request will be sent
 			// (dataRequested) immediately after the last response was received (dataReceived).
-			_private(oTable).hideBusyIndicatorTimeoutId = setTimeout(function() {
+			_private(oTable).hideBusyIndicatorTimeoutId = setTimeout(() => {
 				oTable.setBusy(false);
 				clearHideBusyIndicatorTimeout(oTable);
 			}, 10); // BCP: 2270133571 - In V4 there can be asynchronous sequential requests where a timeout of 0 is insufficient to avoid flickering.

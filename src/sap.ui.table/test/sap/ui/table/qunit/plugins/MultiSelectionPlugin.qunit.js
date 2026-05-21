@@ -1556,4 +1556,28 @@ sap.ui.define([
 		oClearSelectionSpy.reset();
 		oSelectAllSpy.reset();
 	});
+
+	QUnit.module("Busy Indicator", {
+		beforeEach: function() {
+			this.oTable = TableQUnitUtils.createTable({
+				dependents: [new MultiSelectionPlugin()],
+				rows: "{/}",
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(16)
+			});
+			return this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("TableUtils.loadContexts is called with busy=true", async function(assert) {
+		const oLoadContextsSpy = sinon.spy(TableUtils, "loadContexts");
+		const oPlugin = this.oTable._getSelectionPlugin();
+
+		await oPlugin.addSelectionInterval(0, 4);
+		assert.strictEqual(oLoadContextsSpy.args[0][3], true, "TableUtils.loadContexts called with busy=true");
+
+		oLoadContextsSpy.restore();
+	});
 });
