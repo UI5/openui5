@@ -60,6 +60,16 @@ sap.ui.define([
 			return oPromise;
 		}
 
+		if (oContainer.isTypeahead()) {
+			const oField = oValueHelp.getControl();
+			const oTable = oContent.getTable();
+			if (oField && oTable.isPropertyInitial("width")) {
+				// initialize with with popovers with
+				const oDomRef = oField.getDomRef();
+				oTable.setWidth(oDomRef.clientWidth + "px");
+			}
+		}
+
 		return Promise.resolve();
 
 	};

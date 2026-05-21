@@ -64,23 +64,23 @@
 										descriptionPath="Text"
 										caseSensitive="true"
 										useAsValueHelp="false">
-										<m:Table id="VH-Material-Pop-Table" items="{path: '/MaterialCollection'}" width="26rem" mode="SingleSelectMaster">
+										<m:Table id="VH-Material-Pop-Table" items="{path: '/MaterialCollection'}" mode="SingleSelectMaster">
 											<m:columns>
-												<m:Column>
-													<m:Label text="{/#Material/MatrId/@sap:label}"/>
+												<m:Column id="VH-Material-Pop-Table-MatrId" width="3rem">
+													<m:Label id="VH-Material-Pop-Table-MatrId-Label" wrapping="true" text="{/#Material/MatrId/@sap:label}"/>
 												</m:Column>
-												<m:Column>
-													<m:Label text="{/#Material/Text/@sap:label}"/>
+												<m:Column id="VH-Material-Pop-Table-Text">
+													<m:Label id="VH-Material-Pop-Table-Text-Label" wrapping="true" text="{/#Material/Text/@sap:label}"/>
 												</m:Column>
-												<m:Column>
-													<m:Label text="{/#Material/defaultUnit/@sap:label}"/>
+												<m:Column id="VH-Material-Pop-Table-DefaultUnit">
+													<m:Label id="VH-Material-Pop-Table-DefaultUnit-Label" wrapping="true" text="{/#Material/defaultUnit/@sap:label}"/>
 												</m:Column>
 											</m:columns>
 											<m:items>
-												<m:ColumnListItem type="Active">
-													<m:Text text="{path: 'MatrId', type:'sap.ui.model.odata.type.String', constraints: {maxLength: 1, nullable: false}, formatOptions:{'parseKeepsEmptyString': true}}"/>
-													<m:Text text="{Text}"/>
-													<m:Text text="{defaultUnit}"/>
+												<m:ColumnListItem id="VH-Material-Pop-Table-Item" type="Active">
+													<m:Text id="VH-Material-Pop-Table-Item-MatrId" text="{path: 'MatrId', type:'sap.ui.model.odata.type.String', constraints: {maxLength: 1, nullable: false}, formatOptions:{'parseKeepsEmptyString': true}}"/>
+													<m:Text id="VH-Material-Pop-Table-Item-Text" text="{Text}"/>
+													<m:Text id="VH-Material-Pop-Table-Item-DefaultUnit" text="{defaultUnit}"/>
 												</m:ColumnListItem>
 											</m:items>
 										</m:Table>
@@ -96,21 +96,21 @@
 										caseSensitive="true">
 										<m:Table id="VH-Material-Dialog-Table" items="{path: '/MaterialCollection'}" mode="SingleSelectMaster">
 											<m:columns>
-												<m:Column>
-													<m:Label text="{/#Material/MatrId/@sap:label}"/>
+												<m:Column id="VH-Material-Dialog-Table-MatrId" width="3rem">
+													<m:Label id="VH-Material-Dialog-Table-MatrId-Label" wrapping="true" text="{/#Material/MatrId/@sap:label}"/>
 												</m:Column>
-												<m:Column>
-													<m:Label text="{/#Material/Text/@sap:label}"/>
+												<m:Column id="VH-Material-Dialog-Table-Text">
+													<m:Label id="VH-Material-Dialog-Table-Text-Label" wrapping="true" text="{/#Material/Text/@sap:label}"/>
 												</m:Column>
-												<m:Column>
-													<m:Label text="{/#Material/defaultUnit/@sap:label}"/>
+												<m:Column id="VH-Material-Dialog-Table-DefaultUnit">
+													<m:Label id="VH-Material-Dialog-Table-DefaultUnit-Label" wrapping="true" text="{/#Material/defaultUnit/@sap:label}"/>
 												</m:Column>
 											</m:columns>
 											<m:items>
-												<m:ColumnListItem type="Active">
-													<m:Text text="{path: 'MatrId', type:'sap.ui.model.odata.type.String', constraints: {maxLength: 1, nullable: false}, formatOptions:{'parseKeepsEmptyString': true}}"/>
-													<m:Text text="{Text}"/>
-													<m:Text text="{defaultUnit}"/>
+												<m:ColumnListItem id="VH-Material-Dialog-Table-Item" type="Active">
+													<m:Text id="VH-Material-Dialog-Table-Item-MatrId" text="{path: 'MatrId', type:'sap.ui.model.odata.type.String', constraints: {maxLength: 1, nullable: false}, formatOptions:{'parseKeepsEmptyString': true}}"/>
+													<m:Text id="VH-Material-Dialog-Table-Item-Text" text="{Text}"/>
+													<m:Text id="VH-Material-Dialog-Table-Item-DefaultUnit" text="{defaultUnit}"/>
 												</m:ColumnListItem>
 											</m:items>
 										</m:Table>
@@ -138,23 +138,23 @@
 										descriptionPath="text"
 										caseSensitive="true"
 										useAsValueHelp="false">
-										<m:Table id="VH-Quantity-Pop-Table" items="{/weightODataUnits}" width="16rem" mode="SingleSelectMaster">
+										<m:Table id="VH-Quantity-Pop-Table" items="{/weightODataUnits}" mode="SingleSelectMaster">
 											<m:columns>
-												<m:Column width="6rem">
-													<m:Label text="{/#ODataUnits/MatrId/@sap:label}"/>
+												<m:Column id="VH-Quantity-Pop-Table-MatrId" width="6rem">
+													<m:Label  id="VH-Quantity-Pop-Table-MatrId-Label" text="{/#ODataUnits/MatrId/@sap:label}" wrapping="true"/>
 												</m:Column>
-												<m:Column width="3rem">
-													<m:Label text="{/#ODataUnits/unit/@sap:label}"/>
+												<m:Column id="VH-Quantity-Pop-Table-Unit" width="3rem">
+													<m:Label id="VH-Quantity-Pop-Table-Unit-Label" text="{/#ODataUnits/unit/@sap:label}" wrapping="true"/>
 												</m:Column>
-												<m:Column >
-													<m:Label text="{/#ODataUnits/text/@sap:label}"/>
+												<m:Column id="VH-Quantity-Pop-Table-Text">
+													<m:Label id="VH-Quantity-Pop-Table-Text-Label" text="{/#ODataUnits/text/@sap:label}" wrapping="true"/>
 												</m:Column>
 											</m:columns>
 											<m:items>
-												<m:ColumnListItem type="Active">
-													<m:Text text="{path: 'MatrId', type:'sap.ui.model.odata.type.String', constraints: {maxLength: 1, nullable: false}, formatOptions:{'parseKeepsEmptyString': true}}"/>
-													<m:Text text="{unit}"/>
-													<m:Text text="{text}"/>
+												<m:ColumnListItem id="VH-Quantity-Pop-Table-Item" type="Active">
+													<m:Text id="VH-Quantity-Pop-Table-Item-MatrId" text="{path: 'MatrId', type:'sap.ui.model.odata.type.String', constraints: {maxLength: 1, nullable: false}, formatOptions:{'parseKeepsEmptyString': true}}"/>
+													<m:Text id="VH-Quantity-Pop-Table-Item-Unit" text="{unit}"/>
+													<m:Text id="VH-Quantity-Pop-Table-Item-Text" text="{text}"/>
 												</m:ColumnListItem>
 											</m:items>
 										</m:Table>
@@ -169,21 +169,21 @@
 										caseSensitive="true">
 										<m:Table id="VH-Quantity-Dialog-Table" items="{/weightODataUnits}" mode="SingleSelectMaster">
 											<m:columns>
-												<m:Column width="10rem">
-													<m:Label text="{/#ODataUnits/MatrId/@sap:label}"/>
+												<m:Column id="VH-Quantity-Dialog-Table-MatrId" width="6rem">
+													<m:Label id="VH-Quantity-Dialog-Table-MatrId-Label" text="{/#ODataUnits/MatrId/@sap:label}" wrapping="true"/>
 												</m:Column>
-												<m:Column width="3rem">
-													<m:Label text="{/#ODataUnits/unit/@sap:label}"/>
+												<m:Column id="VH-Quantity-Dialog-Table-Unit" width="3rem">
+													<m:Label id="VH-Quantity-Dialog-Table-Unit-Label" text="{/#ODataUnits/unit/@sap:label}" wrapping="true"/>
 												</m:Column>
-												<m:Column >
-													<m:Label text="{/#ODataUnits/text/@sap:label}"/>
+												<m:Column id="VH-Quantity-Dialog-Table-Text">
+													<m:Label id="VH-Quantity-Dialog-Table-Text-Label" text="{/#ODataUnits/text/@sap:label}" wrapping="true"/>
 												</m:Column>
 											</m:columns>
 											<m:items>
-												<m:ColumnListItem type="Active">
-													<m:Text text="{path: 'MatrId', type:'sap.ui.model.odata.type.String', constraints: {maxLength: 1, nullable: false}, formatOptions:{'parseKeepsEmptyString': true}}"/>
-													<m:Text text="{unit}"/>
-													<m:Text text="{text}"/>
+												<m:ColumnListItem id="VH-Quantity-Dialog-Table-Item" type="Active">
+													<m:Text id="VH-Quantity-Dialog-Table-Item-MatrId" text="{path: 'MatrId', type:'sap.ui.model.odata.type.String', constraints: {maxLength: 1, nullable: false}, formatOptions:{'parseKeepsEmptyString': true}}"/>
+													<m:Text id="VH-Quantity-Dialog-Table-Item-Unit" text="{unit}"/>
+													<m:Text id="VH-Quantity-Dialog-Table-Item-Text" text="{text}"/>
 												</m:ColumnListItem>
 											</m:items>
 										</m:Table>

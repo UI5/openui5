@@ -252,13 +252,8 @@ sap.ui.define([
 
 		let oFlexData;
 		let oAuthors;
-		let bPreviouslyFilledData = false;
 		const sComponentName = ManifestUtils.getBaseComponentNameFromManifest(mPropertyBag.manifest);
 		if (bRequiresNewLoadRequest) {
-			// If relevant data was previously cached, initializing is still required to clean up the state
-			// e.g. when discarding a draft that contained all existing changes
-			bPreviouslyFilledData = _mCachedFlexData[sReference]
-				&& StorageUtils.isStorageResponseFilled(_mCachedFlexData[sReference].data.changes);
 			_mAsyncHintsCacheBusterTokens[sReference] ||= ManifestUtils.getCacheKeyFromAsyncHints(sReference, mPropertyBag.asyncHints);
 
 			oFlexData = await Storage.loadFlexData({
@@ -276,7 +271,6 @@ sap.ui.define([
 			const oSettings = await Settings.getInstance();
 			oAuthors = oSettings.getIsVariantAuthorNameAvailable() ? await Storage.loadVariantsAuthors(sReference) : {};
 		} else if (bRequiresOnlyCompletion) {
-			bPreviouslyFilledData = _mCachedFlexData[sReference].parameters.previouslyFilledData;
 			oFlexData = await Storage.completeFlexData({
 				reference: sReference,
 				componentName: sComponentName,
@@ -319,7 +313,6 @@ sap.ui.define([
 				allContextsProvided: oFlexInfoSession.allContextsProvided,
 				adaptationId: oFlexInfoSession.displayedAdaptationId,
 				loaderCacheKey: oFlexDataCopy.cacheKey || uid(),
-				previouslyFilledData: bPreviouslyFilledData,
 				nonFavoriteVariantsRemoved: aNonFavoriteVariantsRemoved
 			}
 		};

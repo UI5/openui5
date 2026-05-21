@@ -117,7 +117,9 @@ sap.ui.define([
 
 		// write icon
 		if (oItem.getIcon()) {
-			oRm.renderControl(oItem._getImage());
+			const oImage = oItem._getImage();
+			oImage.setTooltip(oItem.getIconTooltip());
+			oRm.renderControl(oImage);
 		}
 
 		oRm.openStart("div"); // Start texts container

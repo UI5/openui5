@@ -195,7 +195,6 @@ sap.ui.define([
 	QUnit.test("GridTable", function(assert) {
 		return this.initTable().then(function(oTable) {
 			assert.ok(PluginBase.getPlugin(oTable._oTable, "sap.ui.table.plugins.ODataV4Aggregation"), "ODataV4Aggregation plugin in inner table");
-			assert.ok(oTable._oTableTitle.getShowExtendedView(), "getShowExtendedView of TableTitle is true");
 			this.assertFetchPropertyCalls(assert, 1);
 		}.bind(this));
 	});
@@ -218,6 +217,70 @@ sap.ui.define([
 			assert.ok(oTable._oTableTitle.getShowExtendedView(), "getShowExtendedView of TableTitle is true");
 			this.assertFetchPropertyCalls(assert, 1);
 		}.bind(this));
+	});
+
+	QUnit.module("showExtendedView", {
+		afterEach: function() {
+			this.oTable.destroy();
+		},
+		initTable: async function(mSettings, oDelegatePayload) {
+			this.oTable = new Table(Object.assign({
+				delegate: {
+					name: "odata.v4.TestDelegate",
+					payload: {
+						collectionPath: "/Products",
+						propertyInfo: [{
+							key: "Name",
+							path: "Name",
+							label: "Name",
+							dataType: "String"
+						}],
+						...oDelegatePayload
+					}
+				},
+				columns: [
+					new Column({
+						propertyKey: "Name",
+						header: new Text({text: "Name"}),
+						template: new Text({text: "{Name}"})
+					})
+				],
+				models: new ODataModel({
+					serviceUrl: "/MyService/",
+					operationMode: "Server"
+				})
+			}, mSettings));
+			this.oTable.placeAt("qunit-fixture");
+			await this.oTable._fullyInitialized();
+			await new Promise((resolve) => {
+				this.oTable.attachEventOnce("_bindingChange", resolve);
+			});
+			return this.oTable;
+		}
+	});
+
+	QUnit.test("GridTable without $$clearSelectionOnFilter", async function(assert) {
+		const oTable = await this.initTable();
+		assert.ok(oTable._oTableTitle.getShowExtendedView(), "showExtendedView is true when $$clearSelectionOnFilter is not set");
+	});
+
+	QUnit.test("GridTable with $$clearSelectionOnFilter=true", async function(assert) {
+		const oTable = await this.initTable({}, {
+			bindingParameters: {$$clearSelectionOnFilter: true}
+		});
+		assert.notOk(oTable._oTableTitle.getShowExtendedView(), "showExtendedView is false when $$clearSelectionOnFilter is true");
+	});
+
+	QUnit.test("ResponsiveTable without $$clearSelectionOnFilter", async function(assert) {
+		const oTable = await this.initTable({type: new ResponsiveTableType()});
+		assert.ok(oTable._oTableTitle.getShowExtendedView(), "showExtendedView is true when $$clearSelectionOnFilter is not set");
+	});
+
+	QUnit.test("ResponsiveTable with $$clearSelectionOnFilter=true", async function(assert) {
+		const oTable = await this.initTable({type: new ResponsiveTableType()}, {
+			bindingParameters: {$$clearSelectionOnFilter: true}
+		});
+		assert.notOk(oTable._oTableTitle.getShowExtendedView(), "showExtendedView is false when $$clearSelectionOnFilter is true");
 	});
 
 	QUnit.module("Column header menu", {
