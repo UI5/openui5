@@ -10956,6 +10956,7 @@ sap.ui.define([
 					var iExpectedByPredicateLength,
 						oGroupLock = {},
 						oHelperMock = that.mock(_Helper),
+						mMergeableQueryOptions,
 						mMergedQueryOptions = {
 							$apply : "A.P.P.L.E.", // must be kept
 							$count : true, // dropped
@@ -11059,25 +11060,39 @@ sap.ui.define([
 						oHelperMock.expects("updateSelected")
 							.withExactArgs(sinon.match.same(oCache.mChangeListeners), sPredicate,
 								sinon.match.same(oCache.aElements.$byPredicate[sPredicate]),
-								sinon.match.same(oFixture.aValues[i]), sinon.match.same(aPaths),
+								sinon.match.same(oFixture.aValues[i]), "~aUsedPaths~",
 								sinon.match.func);
 					}
 					if (iReceivedLength > 0) { // expect a GET iff. there is s.th. to do
 						if (oFixture.aValues.length > 1) {
 							mQueryOptions0.$top = mQueryOptions1.$top = oFixture.aValues.length;
 						}
-						that.mock(_Helper).expects("extractMergeableQueryOptions")
+						const oExtractMergeableQueryOptionsExpectation = that.mock(_Helper)
+							.expects("extractMergeableQueryOptions")
 							.withExactArgs(mQueryOptions0).callThrough();
+						that.mock(_Helper).expects("getUsedPaths")
+							.withExactArgs(sinon.match.same(aPaths), sinon.match.object)
+							.callsFake((_aPaths, mMergeableQueryOptions0) => {
+								mMergeableQueryOptions = mMergeableQueryOptions0;
+								assert.strictEqual(mMergeableQueryOptions,
+									oExtractMergeableQueryOptionsExpectation.returnValues[0]);
+								assert.deepEqual(mMergeableQueryOptions, {
+										$expand : {expand : null},
+										$select : ["Name"]
+									});
+								return "~aUsedPaths~";
+							});
 						that.mock(that.oRequestor).expects("buildQueryString")
 							.withExactArgs("/TEAMS/Foo", mQueryOptions1, false, true)
 							.returns("?bar");
 						that.oRequestorMock.expects("request").withExactArgs("GET",
 								"TEAMS('42')/Foo?bar", sinon.match.same(oGroupLock), undefined,
 								undefined, undefined, undefined, oCache.sMetaPath, undefined, false,
-								{
-									$expand : {expand : null},
-									$select : ["Name"]
-								}, sinon.match.same(oCache), sinon.match.func)
+								sinon.match((mMergeableQueryOptions0) => {
+									assert.strictEqual(mMergeableQueryOptions0,
+										mMergeableQueryOptions);
+									return true;
+								}), sinon.match.same(oCache), sinon.match.func)
 							.resolves(oResult);
 						oCacheMock.expects("visitResponse").withExactArgs(
 								sinon.match.same(oResult), sinon.match.same(mTypeForMetaPath),
@@ -11283,6 +11298,9 @@ sap.ui.define([
 		const oExtractMergeableQueryOptionsExpectation
 			 = this.mock(_Helper).expects("extractMergeableQueryOptions")
 				.withExactArgs(mExpectedQueryOptions).returns("~mMergeableQueryOptions~");
+		this.mock(_Helper).expects("getUsedPaths")
+			.withExactArgs("~aPaths~", "~mMergeableQueryOptions~")
+			.returns("~aUsedPaths~");
 		const oBuildQueryStringExpectation = this.mock(this.oRequestor).expects("buildQueryString")
 			.withExactArgs("/TEAMS/Foo", mExpectedQueryOptions, false, true).returns("?bar");
 		this.oRequestorMock.expects("request").withExactArgs("GET", "TEAMS('42')/Foo('a')?bar",
@@ -11299,7 +11317,7 @@ sap.ui.define([
 		oCache.aElements.$byPredicate["('a')"] = "~oOldElement~";
 		this.mock(_Helper).expects("updateSelected")
 			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "('a')", "~oOldElement~",
-				"~oResult~", "~aPaths~", sinon.match.func);
+				"~oResult~", "~aUsedPaths~", sinon.match.func);
 
 		// code under test
 		await oCache.requestSideEffects("~oGroupLock~", "~aPaths~", ["('a')", "n/a"],
@@ -11450,6 +11468,7 @@ sap.ui.define([
 				}
 			},
 			aPaths = ["n/a", "EMPLOYEE_2_TEAM", "EMPLOYEE"],
+			aUsedPaths = aPaths.slice(),
 			mQueryOptions = {},
 			sResourcePath = "TEAMS('42')/Foo",
 			oCache = this.createCache(sResourcePath),
@@ -11482,6 +11501,10 @@ sap.ui.define([
 				const mExpectedQueryOptions = bSingle ? {} : {$filter : "~key_filter~"};
 				that.mock(_Helper).expects("extractMergeableQueryOptions")
 					.withExactArgs(mExpectedQueryOptions).returns(mMergeableQueryOptions);
+				that.mock(_Helper).expects("getUsedPaths")
+					.withExactArgs(sinon.match.same(aPaths),
+						sinon.match.same(mMergeableQueryOptions))
+					.returns(aUsedPaths);
 				that.mock(that.oRequestor).expects("buildQueryString")
 					.withExactArgs("/TEAMS/Foo", mExpectedQueryOptions, false, true)
 					.returns("?bar");
@@ -11496,7 +11519,7 @@ sap.ui.define([
 				oHelperMock.expects("updateSelected")
 					.withExactArgs(sinon.match.same(oCache.mChangeListeners), "('c')",
 						sinon.match.same(oCache.aElements[2]), sinon.match.same(oNewValue),
-						sinon.match.same(aPaths), sinon.match.func)
+						sinon.match.same(aUsedPaths), sinon.match.func)
 					.callsFake(function (_mChangeListeners, _sPath, _oTarget, _oSource, _aPaths,
 						fnCheckKeyPredicate) {
 							if (fnCheckKeyPredicate("('c')/" + oFixture.path)) {
@@ -11562,6 +11585,10 @@ sap.ui.define([
 						.returns("~key_filter~");
 					that.mock(_Helper).expects("extractMergeableQueryOptions")
 						.withExactArgs({$filter : "~key_filter~"}).returns(mMergeableQueryOptions);
+					that.mock(_Helper).expects("getUsedPaths")
+						.withExactArgs(sinon.match.same(aPaths),
+							sinon.match.same(mMergeableQueryOptions))
+						.returns("~aUsedPaths~");
 					that.mock(that.oRequestor).expects("buildQueryString")
 						.withExactArgs("/TEAMS/Foo", {$filter : "~key_filter~"}, false, true)
 						.returns("?bar");
@@ -11616,6 +11643,7 @@ sap.ui.define([
 				oResult = bSingle ? oNewValue : {value : [oNewValue]},
 				mTypeForMetaPath = {"/TEAMS/Foo" : "~type~"},
 				oUpdateSelectedExpectation,
+				aUsedPaths = aPaths.slice(),
 				oVisitResponseExpectation,
 				oCache = this.createCache("TEAMS('42')/Foo");
 
@@ -11643,6 +11671,9 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(mIntersectedQueryOptions), "~type~");
 			this.mock(_Helper).expects("extractMergeableQueryOptions")
 				.withExactArgs(mQueryOptionsForExtract).returns(mMergeableQueryOptions);
+			this.mock(_Helper).expects("getUsedPaths")
+				.withExactArgs(sinon.match.same(aPaths), sinon.match.same(mMergeableQueryOptions))
+				.returns(aUsedPaths);
 			this.mock(this.oRequestor).expects("buildQueryString")
 				.withExactArgs("/TEAMS/Foo", mQueryOptionsForExtract, false, true)
 				.returns("?bar");
@@ -11653,7 +11684,7 @@ sap.ui.define([
 					sinon.match.same(oCache), sinon.match.func)
 				.callsFake(function () {
 					if (bSkip === true) {
-						assert.deepEqual(arguments[12](), aPaths,
+						assert.strictEqual(arguments[12](), aUsedPaths,
 							"arguments[12]: fnMergeRequests; returns its own paths");
 					} else if (bSkip === undefined) {
 						assert.strictEqual(arguments[12](["~another~", "~path~"]), undefined,
@@ -11672,7 +11703,7 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "('c')",
 					sinon.match.same(oElement), sinon.match.same(oNewValue),
 					bSkip === undefined ? ["EMPLOYEE", "~another~", "~path~"]
-						: sinon.match.same(aPaths),
+						: sinon.match.same(aUsedPaths),
 					sinon.match.func)
 				.callThrough();
 			if (bSkip === true) {
@@ -12968,6 +12999,7 @@ sap.ui.define([
 				oCacheMock = this.mock(oCache),
 				oGetRelativePathExpectation,
 				oGroupLock = {},
+				mMergeableQueryOptions,
 				mMergedQueryOptions = {
 					"sap-client" : "123",
 					$expand : {expand : null},
@@ -12980,6 +13012,7 @@ sap.ui.define([
 				mQueryOptions = {},
 				mTypeForMetaPath = {},
 				oUpdateSelectedExpectation,
+				aUsedPaths = aPaths.slice(),
 				oVisitResponseExpectation;
 
 			oCache.oPromise = SyncPromise.resolve(oOldValue); // from previous #fetchValue
@@ -12994,9 +13027,22 @@ sap.ui.define([
 					sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata),
 					"/Employees")
 				.returns(mMergedQueryOptions);
-			this.mock(_Helper).expects("extractMergeableQueryOptions")
+			const oExtractMergeableQueryOptionsExpectation = this.mock(_Helper)
+				.expects("extractMergeableQueryOptions")
 				.withExactArgs(sinon.match.same(mMergedQueryOptions))
 				.callThrough();
+			this.mock(_Helper).expects("getUsedPaths")
+				.withExactArgs(sinon.match.same(aPaths), sinon.match.object)
+				.callsFake((_aPaths, mMergeableQueryOptions0) => {
+					mMergeableQueryOptions = mMergeableQueryOptions0;
+					assert.strictEqual(mMergeableQueryOptions,
+						oExtractMergeableQueryOptionsExpectation.returnValues[0]);
+					assert.deepEqual(mMergeableQueryOptions, {
+							$expand : {expand : null},
+							$select : ["ROOM_ID"]
+						});
+					return aUsedPaths;
+				});
 			this.oRequestorMock.expects("buildQueryString")
 				.withExactArgs("/Employees", {
 						"sap-client" : "123",
@@ -13007,13 +13053,14 @@ sap.ui.define([
 			this.oRequestorMock.expects("request")
 				.withExactArgs("GET", (sReadPath || sResourcePath) + "?~",
 					sinon.match.same(oGroupLock), undefined, undefined, undefined, undefined,
-					oCache.sMetaPath, undefined, false, {
-						$expand : {expand : null},
-						$select : ["ROOM_ID"]
-					}, sinon.match.same(oCache), sinon.match.func)
+					oCache.sMetaPath, undefined, false,
+					sinon.match((mMergedQueryOptions0) => {
+						assert.strictEqual(mMergedQueryOptions0, mMergeableQueryOptions);
+						return true;
+					}), sinon.match.same(oCache), sinon.match.func)
 				.callsFake(function () {
 					if (bSkip === true) {
-						assert.deepEqual(arguments[12](), aPaths,
+						assert.deepEqual(arguments[12](), aUsedPaths,
 							"arguments[12]: fnMergeRequests; returns its own paths");
 					} else if (bSkip === undefined) {
 						assert.strictEqual(arguments[12](["~another~", "~path~"]), undefined,
@@ -13035,7 +13082,7 @@ sap.ui.define([
 				.exactly(bSkip ? 0 : 1)
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "",
 					sinon.match.same(oOldValue), sinon.match.same(oNewValue),
-					bSkip !== undefined ? sinon.match.same(aPaths)
+					bSkip !== undefined ? sinon.match.same(aUsedPaths)
 						: ["ROOM_ID", "~another~", "~path~"],
 					sinon.match.func)
 				.callThrough();
@@ -13111,7 +13158,8 @@ sap.ui.define([
 			},
 			aPaths = ["n/a", "EMPLOYEE_2_TEAM", "EMPLOYEE"],
 			mQueryOptions = {},
-			mTypeForMetaPath = {};
+			mTypeForMetaPath = {},
+			aUsedPaths = aPaths.slice();
 
 		oCache.oPromise = SyncPromise.resolve({}); // from previous #fetchValue*
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
@@ -13125,6 +13173,9 @@ sap.ui.define([
 			.returns(mMergedQueryOptions);
 		this.mock(_Helper).expects("extractMergeableQueryOptions")
 			.withExactArgs(sinon.match.same(mMergedQueryOptions)).returns(mMergeableQueryOptions);
+		this.mock(_Helper).expects("getUsedPaths")
+			.withExactArgs(sinon.match.same(aPaths), sinon.match.same(mMergeableQueryOptions))
+			.returns(aUsedPaths);
 		this.oRequestorMock.expects("buildQueryString")
 			.withExactArgs("/Employees", sinon.match.same(mMergedQueryOptions), false, true)
 			.returns("?~");
@@ -13143,8 +13194,8 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oNewValue), sinon.match.same(mTypeForMetaPath));
 		this.mock(_Helper).expects("updateSelected")
 			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "",
-				sinon.match.same(oOldValue), sinon.match.same(oNewValue), sinon.match.same(aPaths),
-				sinon.match.func)
+				sinon.match.same(oOldValue), sinon.match.same(oNewValue),
+				sinon.match.same(aUsedPaths), sinon.match.func)
 			.callsFake(function (_mChangeListeners, _sPath, _oTarget, _oSource, _aPaths,
 				fnCheckKeyPredicate) {
 					if (fnCheckKeyPredicate(oFixture.path)) {
@@ -13234,6 +13285,9 @@ sap.ui.define([
 			.returns(mMergedQueryOptions);
 		this.mock(_Helper).expects("extractMergeableQueryOptions")
 			.withExactArgs(sinon.match.same(mMergedQueryOptions)).returns(mMergeableQueryOptions);
+		this.mock(_Helper).expects("getUsedPaths")
+			.withExactArgs(sinon.match.same(aPaths), sinon.match.same(mMergeableQueryOptions))
+			.returns("~aUsedPaths~");
 		this.oRequestorMock.expects("buildQueryString")
 			.withExactArgs("/Employees", sinon.match.same(mMergedQueryOptions), false, true)
 			.returns("?~");
