@@ -256,7 +256,12 @@ sap.ui.define([
 			const oLatestApplyFiltersPromise = this._retrievePromise("applyFilters");
 			oLatestApplyFiltersPromise?.getInternalPromise().then((bApplyFilters) => {
 				if (!this._bNavigateInitialize) {
-					const oBindingContext = this.getValueHelpDelegate().getFirstMatch(this.getValueHelpInstance(), this);
+					const oBindingContext = this.getValueHelpDelegate().getFirstMatch(this.getValueHelpInstance(), this, {
+							value: this.getFilterValue(),
+							checkDescription: !!this.getDescriptionPath(),
+							control: this.getControl(),
+							caseSensitive: this.getCaseSensitive()
+						});
 					this._oFirstItemResult = {
 						result: this.getItemFromContext(oBindingContext),
 						filterValue: this.getFilterValue(),

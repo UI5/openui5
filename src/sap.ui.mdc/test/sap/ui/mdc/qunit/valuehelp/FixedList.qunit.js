@@ -58,6 +58,16 @@ sap.ui.define([
 		invalidate: function () {},
 		getValueHelpDelegate: function () {
 			return ValueHelpDelegate;
+		},
+		getControl: function () {
+			return undefined;
+		},
+		getValueHelp: function () {
+			return {
+				getDisplay: function () {
+					return "DescriptionValue";
+				}
+			};
 		}
 	};
 

@@ -10,7 +10,8 @@ sap.ui.define([
 	'sap/ui/mdc/enums/ValueHelpSelectionType',
 	'sap/ui/model/base/ManagedObjectModel',
 	'sap/ui/base/ManagedObjectObserver',
-	'sap/ui/mdc/enums/ValueHelpPropagationReason'
+	'sap/ui/mdc/enums/ValueHelpPropagationReason',
+	'sap/ui/mdc/enums/FieldDisplay'
 ], function(
 	Element,
 	PromiseMixin,
@@ -19,7 +20,8 @@ sap.ui.define([
 	ValueHelpSelectionType,
 	ManagedObjectModel,
 	ManagedObjectObserver,
-	ValueHelpPropagationReason
+	ValueHelpPropagationReason,
+	FieldDisplay
 ) {
 	"use strict";
 
@@ -889,7 +891,7 @@ sap.ui.define([
 	};
 
 	ValueHelp.prototype.getDisplay = function() { // ? currently necessary to determine how to render the tokens in valuehelp
-
+		return this.getProperty("_config")?.display || FieldDisplay.Value;
 	};
 
 	ValueHelp.prototype.getDataType = function() { // should only be of interest for content in the future, maybe provide such infos in an abstract way? (interface?)

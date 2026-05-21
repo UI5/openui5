@@ -651,5 +651,13 @@ sap.ui.define([
 		});
 	};
 
+	FixedList.prototype.getKeyPath = function () {
+		return "key";
+	};
+
+	FixedList.prototype.getDescriptionPath = function () {
+		return "text";
+	};
+
 	return FixedList;
 });
