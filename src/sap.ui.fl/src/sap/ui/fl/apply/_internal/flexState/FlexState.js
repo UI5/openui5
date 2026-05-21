@@ -157,12 +157,24 @@ sap.ui.define([
 		return Array.isArray(vStorageResponsePart) ? vStorageResponsePart : [];
 	}
 
+	function needToDeleteFlexInfoSession(oFlexInfoSession, sReference) {
+		const bIsRtaStarting = !!Object.keys(window.sessionStorage).some(
+			(sKey) => sKey.startsWith("sap.ui.rta.restart.")
+		);
+		return !bIsRtaStarting && !oFlexInfoSession.saveChangeKeepSession && !_mInstances[sReference];
+	}
+
 	function enhancePropertyBag(mPropertyBag) {
 		var oComponent = Component.getComponentById(mPropertyBag.componentId);
 		mPropertyBag.componentData ||= (oComponent && oComponent.getComponentData()) || {};
 		mPropertyBag.manifest ||= mPropertyBag.rawManifest || (oComponent && oComponent.getManifestObject()) || {};
 		mPropertyBag.reference ||= ManifestUtils.getFlexReference(mPropertyBag);
-		const oFlexInfoSession = FlexInfoSession.getByReference(mPropertyBag.reference);
+
+		let oFlexInfoSession = FlexInfoSession.getByReference(mPropertyBag.reference);
+		if (needToDeleteFlexInfoSession(oFlexInfoSession, mPropertyBag.reference)) {
+			FlexInfoSession.removeByReference(mPropertyBag.reference);
+			oFlexInfoSession = FlexInfoSession.getByReference(mPropertyBag.reference);
+		}
 		mPropertyBag.version ||= oFlexInfoSession.version;
 		mPropertyBag.adaptationId ||= oFlexInfoSession.displayedAdaptationId;
 		mPropertyBag.allContextsProvided ||= oFlexInfoSession.allContextsProvided;
@@ -405,6 +417,11 @@ sap.ui.define([
 			mResponse.authors = isVariantsAuthorsDataRequired(mResponse?.changes) ? await Loader.loadVariantsAuthors(mPropertyBag.reference) : {};
 		}
 		storeInfoInSession(mPropertyBag.reference, mResponse);
+
+		// Response info may have updated the session (e.g. allContextsProvided, version).
+		// Resync the property bag so the values written to the instance match the session.
+		const oRefreshedSession = FlexInfoSession.getByReference(mPropertyBag.reference);
+		mPropertyBag.allContextsProvided ??= oRefreshedSession.allContextsProvided;
 
 		return mResponse;
 	}
