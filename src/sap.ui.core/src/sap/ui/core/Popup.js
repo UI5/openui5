@@ -839,10 +839,13 @@ sap.ui.define([
 	Popup.prototype._getDomRefToFocus = function() {
 		var $Ref = this._$(/* bForceReRender */false, /* bGetOnly */true),
 			oDomRefToFocus,
-			oControl;
+			oControl,
+			oContent = this.getContent();
 
 		if (this._shouldGetFocusAfterOpen()) {
-			if (this._sInitialFocusId) {
+			if (oContent instanceof Control && oContent.isBusy()) {
+				oDomRefToFocus = oContent.getDomRef();
+			} else if (this._sInitialFocusId) {
 				oControl = Element.getElementById(this._sInitialFocusId);
 
 				if (oControl) {

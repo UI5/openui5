@@ -864,29 +864,99 @@ sap.ui.define([
 				if (iDelay) {
 					this._busyIndicatorDelayedCallId = setTimeout(fnAppendBusyIndicator.bind(this), iDelay);
 				} else {
-					// To win against the focus restoration from RenderManager, we have to set focus asynchronously.
-					fnAppendBusyIndicator.call(this, /* bAsyncFocus */ true);
+					// Append the BusyIndicator synchronously. The busy indicator
+					// setup wraps getFocusDomRef to return the block layer, so
+					// the RenderManager's focus restoration via applyFocusInfo
+					// targets the block layer directly — no async workaround needed.
+					fnAppendBusyIndicator.call(this);
 				}
 			}
 		}
 	};
 
+	/**
+	 * Redirects focus onto the busy indicator if focus was inside the busy control's DOM
+	 * before the block layer was created and inert was applied.
+	 * @private
+	 */
 	function checkAndFocusBlockLayer() {
-		if (this._oBusyBlockState && this.getDomRef(this._sBusySection)?.contains(document.activeElement)) {
-			// Move focus to the busy indicator if the focus is currently within the busy control's DOM.
-			this._oBusyBlockState.lastFocusPosition = document.activeElement;
+		if (this._oLastFocusBeforeBusy && this._oBusyBlockState) {
 			this._oBusyBlockState.$blockLayer.get(0).focus({ preventScroll: true });
 		}
 	}
 
 	/**
-	 * Add busy indicator to DOM
+	 * Creates method overrides for a control while it is busy.
 	 *
-	 * @param {boolean} [asyncFocus=false] whether focus should be set asynchronously.
-	 * This is need to set the focus after the restoration from RenderManager
+	 * Two methods are wrapped on the control instance:
+	 * <ul>
+	 *   <li><code>getFocusDomRef</code> — returns the block layer so that framework
+	 *       focus handling targets it directly instead of bouncing via redirectFocus.</li>
+	 *   <li><code>getPopupAnchorDomRef</code> — returns the <em>original</em>
+	 *       getFocusDomRef result so that Popover uses a stable anchor that survives
+	 *       setBusy(false). Only installed if the control does not already define
+	 *       its own getPopupAnchorDomRef.</li>
+	 * </ul>
+	 *
+	 * Call <code>restore()</code> on the returned object to undo all overrides at once.
+	 *
+	 * @param {sap.ui.core.Control} oControl The control to wrap
+	 * @returns {{restore: function, getOriginalGetFocusDomRef: function}} Override handle
 	 * @private
 	 */
-	function fnAppendBusyIndicator(bAsyncFocus) {
+	function createBusyMethodOverrides(oControl) {
+		var mOriginals = {};
+
+		// --- getFocusDomRef ---
+		mOriginals.getFocusDomRef = oControl.getFocusDomRef;
+		oControl.getFocusDomRef = function () {
+			if (oControl.getBusy() && oControl._oBusyBlockState) {
+				return oControl._oBusyBlockState.$blockLayer.get(0) || null;
+			}
+			return mOriginals.getFocusDomRef.apply(oControl, arguments);
+		};
+
+		// --- getPopupAnchorDomRef (only if not already defined by the control) ---
+		if (!oControl.getPopupAnchorDomRef) {
+			mOriginals.getPopupAnchorDomRef = undefined; // marker: no original existed
+			oControl.getPopupAnchorDomRef = function () {
+				return mOriginals.getFocusDomRef.apply(oControl, arguments);
+			};
+		}
+
+		return {
+			/**
+			 * Returns the original getFocusDomRef before wrapping,
+			 * e.g. for focus restoration after busy ends.
+			 * @returns {function} The original getFocusDomRef
+			 */
+			getOriginalGetFocusDomRef: function () {
+				return mOriginals.getFocusDomRef;
+			},
+
+			/**
+			 * Restores all overridden methods to their original values.
+			 * Safe to call multiple times (subsequent calls are no-ops).
+			 */
+			restore: function () {
+				if (!mOriginals) {
+					return; // already restored
+				}
+				oControl.getFocusDomRef = mOriginals.getFocusDomRef;
+				if ("getPopupAnchorDomRef" in mOriginals) {
+					delete oControl.getPopupAnchorDomRef;
+				}
+				mOriginals = null;
+			}
+		};
+	}
+
+	/**
+	 * Add busy indicator to DOM
+	 *
+	 * @private
+	 */
+	function fnAppendBusyIndicator() {
 
 		// Only append if busy state is still set
 		if (!this.getBusy()) {
@@ -908,6 +978,15 @@ sap.ui.define([
 			return;
 		}
 
+		// Capture the focused element right before inert is applied. This is the
+		// single capture point: it always reflects the latest focused element,
+		// whether setBusy(true) was just called or a re-render of an already-busy
+		// control is happening (possibly after a busyIndicatorDelay).
+		var oBusySectionDom = this.getDomRef(this._sBusySection) || this.getDomRef();
+		if (oBusySectionDom && oBusySectionDom.contains(document.activeElement)) {
+			this._oLastFocusBeforeBusy = document.activeElement;
+		}
+
 		if (this._sBlockSection === this._sBusySection) {
 			if (this._oBlockState) {
 				BusyIndicatorUtils.addHTML(this._oBlockState, this.getBusyIndicatorSize());
@@ -925,11 +1004,22 @@ sap.ui.define([
 			fnAddStandaloneBusyIndicator.call(this);
 		}
 
-		if (bAsyncFocus) {
-			setTimeout(checkAndFocusBlockLayer.bind(this), 0);
-		} else {
-			checkAndFocusBlockLayer.call(this);
+		// Install method overrides while busy:
+		// - getFocusDomRef → returns the block layer so framework focus handling
+		//   (FocusHandler.restoreFocus, Element.focus(), …) targets it directly
+		//   instead of landing on the control root and bouncing via redirectFocus.
+		// - getPopupAnchorDomRef → returns the *original* getFocusDomRef result so
+		//   Popover._getOpenByDomRef() uses a stable anchor instead of the block
+		//   layer (which vanishes on setBusy(false) and triggers Popup.checkDocking
+		//   to close the Popover).
+		// All overrides are restored via a single restore() call in
+		// fnRemoveBusyIndicator / fnRemoveAllBlockLayers.
+		if (!this._oBusyMethodOverrides) {
+			this._oBusyMethodOverrides = createBusyMethodOverrides(this);
 		}
+
+		// Redirect focus onto the busy indicator if focus was captured above.
+		checkAndFocusBlockLayer.call(this);
 	}
 
 	/**
@@ -967,6 +1057,12 @@ sap.ui.define([
 
 		delete this._oBlockState;
 		delete this._oBusyBlockState;
+
+		// Restore method overrides installed by fnAppendBusyIndicator
+		if (this._oBusyMethodOverrides) {
+			this._oBusyMethodOverrides.restore();
+			delete this._oBusyMethodOverrides;
+		}
 	}
 
 	/**
@@ -981,28 +1077,25 @@ sap.ui.define([
 			return;
 		}
 
-		// Restore focus on last focus position, if possible
-		let oLastFocusedElement;
-		if (this._oBusyBlockState) {
-			const oBlockLayerDOM = this._oBusyBlockState.$blockLayer.get(0);
-
-			// Focus might be moved from the busy indicator
-			// If it is still on the busy indicator, we restore the focus. Otherwise do nothing.
-			if (oBlockLayerDOM === document.activeElement) {
-				// Check if last focused DOM element is still available, restore focus on the DOM element
-				// Otherwise, move focus to the control's DOM Ref
-				if (jQuery(this._oBusyBlockState.lastFocusPosition).is(":sapFocusable")) {
-					oLastFocusedElement = this._oBusyBlockState.lastFocusPosition;
-				} else {
-					oLastFocusedElement = Element.closestTo(this._oBusyBlockState.lastFocusPosition) || this;
-				}
-				oLastFocusedElement.focus();
-			}
-		}
+		// Capture the last focused element for restoration below
+		var oLastFocused = this._oLastFocusBeforeBusy;
+		delete this._oLastFocusBeforeBusy;
 
 		const $this = this.$(this._sBusySection);
 		$this.removeClass('sapUiLocalBusy');
-		$this.removeAttr("aria-busy");
+
+		// Restore ARIA: remove aria-busy from the busy region (progressbar attributes live on the
+		// busy indicator DOM, which is removed together with the block layer on unblock)
+		if (this._oBusyBlockState) {
+			BusyIndicatorUtils.removeAriaAttributes(this._oBusyBlockState);
+		}
+
+		// Capture the busy indicator DOM before unblock/delete for focus restoration below
+		var oBusyIndicatorDom = this._oBusyBlockState?.$blockLayer.get(0);
+
+		// Check focus position before unblock removes the block layer from the DOM.
+		// Once unblock() runs, the block layer is gone and activeElement falls to <body>.
+		var bFocusWasOnBusyIndicator = oBusyIndicatorDom && document.activeElement === oBusyIndicatorDom;
 
 		if (this._sBlockSection === this._sBusySection) {
 			if (!this.getBlocked() && !this.getBusy()) {
@@ -1025,6 +1118,39 @@ sap.ui.define([
 			BlockLayerUtils.unblock(this._oBusyBlockState);
 
 			delete this._oBusyBlockState;
+		}
+
+		// Restore focus if it was on the busy indicator while busy.
+		// Only restore if the user hasn't moved focus to a different location.
+		if (bFocusWasOnBusyIndicator) {
+			if (oLastFocused && oLastFocused.isConnected && jQuery(oLastFocused).is(":sapFocusable")) {
+				oLastFocused.focus({ preventScroll: true });
+			} else {
+				// _oLastFocusBeforeBusy was not captured (e.g. focus was outside the busy
+				// section when fnAppendBusyIndicator ran). The inert attribute has already been
+				// removed by unblock() above, so the control's content is focusable again.
+				// Move focus to the first focusable element inside the control so that it
+				// does not jump to <body> and cause unintended side-effects such as auto-close
+				// of popups.
+				var oBusySectionDom = this.getDomRef(this._sBusySection) || this.getDomRef();
+				if (oBusySectionDom) {
+					var oFirstFocusable = jQuery(oBusySectionDom).firstFocusableDomRef();
+					if (oFirstFocusable) {
+						oFirstFocusable.focus({ preventScroll: true });
+					} else {
+						// Fallback: no focusable element found (e.g. all content is still
+						// non-focusable). Focus the busy section root itself to keep focus
+						// inside the control and prevent side-effects like popup auto-close.
+						oBusySectionDom.focus({ preventScroll: true });
+					}
+				}
+			}
+		}
+
+		// Restore method overrides installed by fnAppendBusyIndicator
+		if (this._oBusyMethodOverrides) {
+			this._oBusyMethodOverrides.restore();
+			delete this._oBusyMethodOverrides;
 		}
 	}
 

@@ -106,7 +106,7 @@ sap.ui.define([
 
 		$Tabbables = jQuery.uniqueSort($Tabbables);
 		return $Tabbables.filter(function() {
-			return isContained(aScopes, this);
+			return this !== oRef && isContained(aScopes, this) && !this.closest("[inert]");
 		});
 	}
 
@@ -4265,7 +4265,7 @@ sap.ui.define([
 		const oTable = this.oTable;
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		simulateTabEvent(oElem, false);
-		// Due to changed BusyIndicator handling - BusyIndicator is now tabbable
+		// The busy indicator (block layer) is the tab stop, so Tab lands on it.
 		oElem = oTable.getDomRef("busyIndicator");
 		TableQUnitUtils.assertFocus(assert, oElem);
 		simulateTabEvent(oElem, false);
@@ -4276,7 +4276,7 @@ sap.ui.define([
 		const oTable = this.oTable;
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus2");
 		simulateTabEvent(oElem, true);
-		// Due to changed BusyIndicator handling - BusyIndicator is now tabbable
+		// The busy indicator (block layer) is the tab stop, so Shift+Tab lands on it.
 		oElem = oTable.getDomRef("busyIndicator");
 		TableQUnitUtils.assertFocus(assert, oElem);
 		simulateTabEvent(oElem, true);
