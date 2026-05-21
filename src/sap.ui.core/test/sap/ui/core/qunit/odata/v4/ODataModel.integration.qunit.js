@@ -4886,6 +4886,11 @@ sap.ui.define([
 	// in a nested $expand. Side effects affect this nested $expand. Expect no error message about
 	// changed key predicate for TEAM_2_MANAGER.
 	// JIRA: CPOUI5ODATAV4-362
+	//
+	// If requestSideEffects is called with a navigation property that is not yet used on the UI,
+	// the navigation property is not requested. If the navigation property is later used e.g. on a
+	// details page (simulated by requestProperty), missing properties are requested on demand.
+	// SNOW: DINC0885373
 	QUnit.test("ODCB: requestSideEffects for nested expand", function (assert) {
 		var oModel = this.createTeaBusiModel({autoExpandSelect : true}),
 			sView = '\
@@ -4922,10 +4927,25 @@ sap.ui.define([
 			return Promise.all([
 				// code under test
 				that.oView.byId("form").getBindingContext().requestSideEffects([
-					{$NavigationPropertyPath : "EMPLOYEE_2_EQUIPMENT"}, // must be ignored
+					{$NavigationPropertyPath : "EMPLOYEE_2_MANAGER"}, // ignored
 					{$NavigationPropertyPath : "EMPLOYEE_2_TEAM"}
 				]),
 				that.waitForChanges(assert)
+			]);
+		}).then(function () {
+			that.expectRequest("EMPLOYEES('1')?$select=EMPLOYEE_2_MANAGER"
+					+ "&$expand=EMPLOYEE_2_MANAGER($select=ID,TEAM_ID)", {
+					EMPLOYEE_2_MANAGER : {ID : "4", TEAM_ID : "5"}
+				});
+
+			return Promise.all([
+				// code under test (SNOW: DINC0885373)
+				that.oView.byId("form").getBindingContext()
+					.requestProperty("EMPLOYEE_2_MANAGER/TEAM_ID")
+					.then(function (sTeamId) {
+						assert.strictEqual(sTeamId, "5");
+					}),
+				that.waitForChanges(assert, "SNOW: DINC0885373")
 			]);
 		});
 	});
@@ -59027,6 +59047,11 @@ make root = ${bMakeRoot}`;
 	//     server
 	// Load side effects for the complete table using the header context.
 	// JIRA: CPOUI5UISERVICESV3-1765
+	//
+	// If requestSideEffects is called with a navigation property that is not yet used on the UI,
+	// the navigation property is not requested. If the navigation property is later used e.g. on a
+	// details page (simulated by requestProperty), missing properties are requested on demand.
+	// SNOW: DINC0885373
 	QUnit.test("requestSideEffects on context of a list binding", function (assert) {
 		var oCreatedContext0,
 			oModel = this.createSpecialCasesModel({
@@ -59085,9 +59110,29 @@ make root = ${bMakeRoot}`;
 
 			return Promise.all([
 				// code under test: request side effects on "not-created" entity from server
-				oTable.getRows()[1].getBindingContext().requestSideEffects(["Price"]),
+				oTable.getRows()[1].getBindingContext()
+					.requestSideEffects(["Price", /*ignored:*/"DraftAdministrativeData"]),
 				oModel.submitBatch("update"),
 				that.waitForChanges(assert)
+			]);
+		}).then(function () {
+			that.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)/_Publication('42-1')"
+					+ "?$select=DraftAdministrativeData"
+					+ "&$expand=DraftAdministrativeData($select=DraftID,InProcessByUser)", {
+					DraftAdministrativeData : {
+						DraftID : "123",
+						InProcessByUser : "user0"
+					}
+				});
+
+			return Promise.all([
+				// code under test (SNOW: DINC0885373)
+				oTable.getRows()[1].getBindingContext()
+					.requestProperty("DraftAdministrativeData/InProcessByUser")
+					.then(function (sInProcessByUser) {
+						assert.strictEqual(sInProcessByUser, "user0");
+					}),
+				that.waitForChanges(assert, "SNOW: DINC0885373")
 			]);
 		}).then(function () {
 			that.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)/_Publication('New 1')"
