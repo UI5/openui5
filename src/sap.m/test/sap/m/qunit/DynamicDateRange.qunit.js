@@ -734,6 +734,26 @@ sap.ui.define([
 		assert.ok(oValidateValueHelpUISpy.returned(true), "validation succeeded");
 	});
 
+	QUnit.test("TODAYFROMTO integer controls have negative minimum; other operators start at 1", function(assert) {
+		this.ddr.addStandardOption("TODAYFROMTO");
+		var oOptionTodayFromTo = new StandardDynamicDateOption({ key: "TODAYFROMTO" }),
+			aControls = oOptionTodayFromTo.createValueHelpUI(this.ddr, this.ddr._updateInternalControls.bind(this.ddr)),
+			aStepInputs = aControls.filter(function(oCtrl) { return oCtrl.isA("sap.m.StepInput"); });
+
+		assert.strictEqual(aStepInputs.length, 2, "TODAYFROMTO has two integer controls");
+		assert.strictEqual(aStepInputs[0].getMin(), -6000, "First step input minimum is -MAX_VALUE_HELP_INTEGER (-6000)");
+		assert.strictEqual(aStepInputs[1].getMin(), -6000, "Second step input minimum is -MAX_VALUE_HELP_INTEGER (-6000)");
+
+		var oOptionLastDays = new StandardDynamicDateOption({ key: "LASTDAYS" }),
+			aLastDaysControls = oOptionLastDays.createValueHelpUI(this.ddr, this.ddr._updateInternalControls.bind(this.ddr)),
+			aLastDaysStepInputs = aLastDaysControls.filter(function(oCtrl) { return oCtrl.isA("sap.m.StepInput"); });
+
+		assert.strictEqual(aLastDaysStepInputs[0].getMin(), 1, "LASTDAYS step input minimum is MIN_VALUE_HELP_INTEGER (1)");
+
+		oOptionTodayFromTo.destroy();
+		oOptionLastDays.destroy();
+	});
+
 	QUnit.test("today -x/+y maintaining negative and zero values in the step inputs", function(assert) {
 		var oDDR = new DynamicDateRange(),
 			oValue = {
