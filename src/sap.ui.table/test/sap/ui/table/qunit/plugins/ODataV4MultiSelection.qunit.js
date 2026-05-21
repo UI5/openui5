@@ -1133,7 +1133,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Limit < Data length; All contexts selected", async function(assert) {
-		const aContexts = await TableUtils.loadContexts(this.oTable.getBinding(), 0, this.oTable.getBinding().getLength());
+		const aContexts = await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength());
 
 		aContexts.forEach((oContext) => {
 			oContext.setSelected(true);
@@ -1322,7 +1322,7 @@ sap.ui.define([
 	QUnit.test("Hierarchy; All Contexts selected", async function(assert) {
 		await this.createTableWithHierarchy();
 
-		const aContexts = await TableUtils.loadContexts(this.oTable.getBinding(), 0, this.oTable.getBinding().getLength());
+		const aContexts = await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength());
 
 		aContexts.forEach((oContext) => {
 			oContext.setSelected(true);
@@ -1362,7 +1362,7 @@ sap.ui.define([
 		await this.createTableWithDataAggregation();
 		await TableQUnitUtils.expandAndScrollTableWithDataAggregation(this.oTable);
 
-		(await TableUtils.loadContexts(this.oTable.getBinding(), 0, this.oTable.getBinding().getLength())).filter((oContext) => {
+		(await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength())).filter((oContext) => {
 			const bIsLeaf = oContext.getProperty("@$ui5.node.isExpanded") === undefined;
 			const bIsTotal = oContext.getProperty("@$ui5.node.isTotal");
 			return bIsLeaf && !bIsTotal;
@@ -1435,5 +1435,29 @@ sap.ui.define([
 			src: IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon),
 			title: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
+	});
+
+	QUnit.module("Busy Indicator", {
+		beforeEach: async function() {
+			this.oTable = TableQUnitUtils.createTable({
+				...TableQUnitUtils.createSettingsForList(),
+				enableBusyIndicator: true
+			});
+			this.oSelectionPlugin = this.oTable.getDependents()[0];
+			await this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			this.oTable?.destroy();
+		}
+	});
+
+	QUnit.test("TableUtils.loadContexts is called with busy=true", async function(assert) {
+		const oLoadContextsSpy = sinon.spy(TableUtils, "loadContexts");
+
+		this.oSelectionPlugin.onHeaderSelectorPress();
+		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
+
+		assert.strictEqual(oLoadContextsSpy.args[0][3], true, "TableUtils.loadContexts called with busy=true");
+		oLoadContextsSpy.restore();
 	});
 });
