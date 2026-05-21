@@ -58,6 +58,7 @@ sap.ui.define([
 		}
 		Loader.clearCache();
 		ComponentLifecycleHooks._embeddedComponents = {};
+		ComponentLifecycleHooks._mWasFilledOnLastCheck = {};
 		sandbox.restore();
 	}
 
@@ -1032,7 +1033,8 @@ sap.ui.define([
 
 		QUnit.test("hook gets called, storage response is empty and flexData was previously filled", async function(assert) {
 			this.oChangesAvailableStub.returns(false);
-			this.oLoaderInitStub.resolves({ data: {}, parameters: { previouslyFilledData: true } });
+			ComponentLifecycleHooks._mWasFilledOnLastCheck[sReference] = true;
+			this.oLoaderInitStub.resolves({ data: {}, parameters: {} });
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel1,
 				modelId: "someModelId",
@@ -1046,7 +1048,7 @@ sap.ui.define([
 
 		QUnit.test("hook gets called, storage response is empty and flexData was not previously filled", async function(assert) {
 			this.oChangesAvailableStub.returns(false);
-			this.oLoaderInitStub.resolves({ data: {}, parameters: { previouslyFilledData: false } });
+			this.oLoaderInitStub.resolves({ data: {}, parameters: {} });
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel1,
 				modelId: "someModelId",

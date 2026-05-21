@@ -42,8 +42,15 @@ sap.ui.define([
 		}
 	};
 
+	function removeAllRtaRestartKeys() {
+		Object.keys(window.sessionStorage)
+		.filter((sKey) => sKey.startsWith("sap.ui.rta.restart."))
+		.forEach((sKey) => window.sessionStorage.removeItem(sKey));
+	}
+
 	QUnit.module("Loader", {
 		beforeEach() {
+			removeAllRtaRestartKeys();
 			this.oRawManifest = {
 				_version: "2.0.0",
 				property: "value",
@@ -149,7 +156,7 @@ sap.ui.define([
 			Loader.clearCache(sReference);
 			sandbox.restore();
 			FlexInfoSession.removeByReference(sReference);
-			window.sessionStorage.removeItem("sap.ui.rta.restart.CUSTOMER");
+			removeAllRtaRestartKeys();
 		}
 	}, function() {
 		QUnit.test("when getFlexData is called with all information", async function(assert) {
@@ -270,7 +277,6 @@ sap.ui.define([
 			});
 			assert.deepEqual(oFlexData2.data.changes, this.oExpectedFlexDataResponse, "the Loader loads data");
 			assert.strictEqual(this.oLoadFlexDataStub.callCount, 2, "the Storage.loadFlexData was called again");
-			assert.ok(oFlexData2.parameters.previouslyFilledData, "the previouslyFilledData parameter is true");
 		});
 
 		QUnit.test("when getFlexData is called twice for the same component without skipLoadBundle", async function(assert) {
@@ -879,29 +885,6 @@ sap.ui.define([
 				componentData: oComponentData
 			});
 			assert.deepEqual(oResult.data.authors, {}, "the authors are empty");
-		});
-
-		QUnit.test("check previouslyFilledData parameter persists when new request is not needed", async function(assert) {
-			await Loader.getFlexData({
-				manifest: this.oManifest,
-				reference: sReference,
-				componentData: oComponentData
-			});
-
-			await Loader.getFlexData({
-				manifest: this.oManifest,
-				reference: sReference,
-				componentData: oComponentData,
-				reInitialize: true
-			});
-
-			const oFlexData2 = await Loader.getFlexData({
-				manifest: this.oManifest,
-				reference: sReference,
-				componentData: oComponentData
-			});
-			assert.deepEqual(oFlexData2.data.changes, this.oExpectedCompleteFlexDataResponse, "the Loader loads data");
-			assert.ok(oFlexData2.parameters.previouslyFilledData, "the previouslyFilledData parameter is true");
 		});
 
 		QUnit.test("when getFlexData is called twice with flexBundle 'true' in the manifest", async function(assert) {

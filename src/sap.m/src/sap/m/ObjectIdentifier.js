@@ -248,7 +248,6 @@ function(
 			// Lazy initialization
 			if (this.getProperty("titleActive")) {
 				addAriaLabelledBy = this.getAriaLabelledBy().slice();
-				addAriaLabelledBy.push(InvisibleText.getStaticId("sap.m", "OI_ARIA_ROLE"));
 				oTitleControl = new Link({
 					id : sId + "-link",
 					text: sTitle,
@@ -256,7 +255,6 @@ function(
 					//Add a custom hidden role "ObjectIdentifier" with hidden text
 					ariaLabelledBy: addAriaLabelledBy
 				});
-				oTitleControl.addAriaLabelledBy(sId + "-text");
 			} else {
 				oTitleControl = new Text({
 					id : sId + "-txt",
@@ -425,7 +423,14 @@ function(
 		ObjectIdentifier.prototype._handlePress.apply(this, arguments);
 	};
 
-
+	ObjectIdentifier.prototype.enhanceAccessibilityState = function (oElement, mAriaProps) {
+		if (oElement === this.getAggregation("_titleControl")) {
+			const sId = this.getId();
+			const sControlId = `${sId}-link`;
+			const sCurrentAriaLabelledBy = mAriaProps["labelledby"] || "";
+			mAriaProps["labelledby"] = `${sCurrentAriaLabelledBy.replace(sControlId, "")} ${InvisibleText.getStaticId("sap.m", "OI_ARIA_ROLE")} ${sControlId} ${sId}-text`;
+		}
+	};
 	ObjectIdentifier.prototype.addAssociation = function(sAssociationName, sId, bSuppressInvalidate) {
 		var oTitle = this.getAggregation("_titleControl");
 

@@ -12,6 +12,7 @@ sap.ui.define([
 	return Controller.extend("sap.ui.mdc.acc.filterbar.controller.FilterbarTypes", {
 		formatter: formatter,
 		onInit: function() {
+			this.getOwnerComponent().getModel("mountains").setSizeLimit(1000);
 			const oModel = new JSONModel({
 				conditionsText: "",
 				editorHeight: 400

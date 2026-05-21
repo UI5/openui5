@@ -85,7 +85,6 @@
 								<mdc:Table id="VHRange-Dialog-mdctable1-table"
 									autoBindOnInit="false"
 									width="100%"
-									p13nMode="Sort"
 									delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONTableDelegate", "payload": \{"bindingPath": "mountains>/ranges", "searchKeys": ["range"]\}\}'
 									threshold="50"
 									enableAutoColumnWidth="true">
@@ -113,7 +112,6 @@
 								<mdc:Table id="VHRange-Dialog-mdctable2-table"
 									autoBindOnInit="false"
 									width="100%"
-									p13nMode="Sort"
 									delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONTableDelegate", "payload": \{"bindingPath": "mountains>/ranges", "searchKeys": ["range"]\}\}'
 									threshold="50"
 									enableAutoColumnWidth="true">
@@ -171,7 +169,6 @@
 									autoBindOnInit="false"
 									width="100%"
 									selectionMode="Multi"
-									p13nMode="Column,Sort"
 									delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONTableDelegate", "payload": \{"bindingPath": "mountains>/countries", "searchKeys": ["code", "name"]\}\}'
 									threshold="50"
 									enableAutoColumnWidth="true">

@@ -92,6 +92,7 @@ sap.ui.define([
 				"CurrencyCode": "EUR"
 			},
 			{
+				"Name": "Projector FX",
 				"icon": "sap-icon://notes",
 				"Category": "Projector",
 				"SupplierName": "",
@@ -106,7 +107,6 @@ sap.ui.define([
 		name: "{Name}",
 		additionalText: "{SupplierName}",
 		icon: "{icon}",
-		iconTooltip: "{Category}",
 		modified: "{modified}",
 		content: new ObjectPageLayout({
 			headerTitle: new ObjectPageHeader({

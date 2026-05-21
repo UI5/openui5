@@ -47,16 +47,22 @@ sap.ui.define([
 	// if the same instance is initialized twice the promise is replaced
 	ComponentLifecycleHooks._componentInstantiationPromises = new WeakMap();
 	ComponentLifecycleHooks._embeddedComponents = {};
+	// Tracks per reference whether the last call to isInitializeRelevant saw filled flex data.
+	// Used to detect a filled-to-empty transition (e.g. when discarding a draft that contained all
+	// existing changes), so the FlexState gets re-initialized to clean up the stale state.
+	ComponentLifecycleHooks._mWasFilledOnLastCheck = {};
 
-	// only initialize FlexState if there are any changes or if the data was previously filled,
-	// meaning it potentially needs to be cleaned up (e.g. when discarding a draft that contained all existing changes).
-	function isInitializeRelevant(oFlexData) {
-		// TODO: Rework logic so that previouslyFilledData is not needed anymore, todos#15
-		return StorageUtils.isStorageResponseFilled(oFlexData.data.changes) || oFlexData.parameters.previouslyFilledData;
+	// Initializing the FlexState is relevant if there are any changes now, or if the last call
+	// for this reference saw changes (which means a cleanup is required).
+	function isInitializeRelevant(sReference, oFlexData) {
+		const bFilled = StorageUtils.isStorageResponseFilled(oFlexData.data.changes);
+		const bRelevant = bFilled || !!ComponentLifecycleHooks._mWasFilledOnLastCheck[sReference];
+		ComponentLifecycleHooks._mWasFilledOnLastCheck[sReference] = bFilled;
+		return bRelevant;
 	}
 
-	async function checkForChangesAndInitializeFlexState(oConfig, oFlexData) {
-		if (isInitializeRelevant(oFlexData)) {
+	async function checkForChangesAndInitializeFlexState(sReference, oConfig, oFlexData) {
+		if (isInitializeRelevant(sReference, oFlexData)) {
 			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
 			await FlexState.initialize(oConfig);
 		}
@@ -136,7 +142,7 @@ sap.ui.define([
 			reference: sReference
 		});
 		const sComponentId = oComponent.getId();
-		if (isInitializeRelevant(oFlexData)) {
+		if (isInitializeRelevant(sReference, oFlexData)) {
 			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
 			await FlexState.initialize({
 				componentId: sComponentId,
@@ -220,9 +226,11 @@ sap.ui.define([
 				componentData: oConfig.componentData || (oConfig.settings?.componentData),
 				asyncHints: oConfig.asyncHints
 			};
+			const sReference = ManifestUtils.getFlexReference(mPropertyBag);
 			const oFlexData = await Loader.getFlexData(mPropertyBag);
 
 			await checkForChangesAndInitializeFlexState(
+				sReference,
 				{
 					...mPropertyBag,
 					componentId: oConfig.id
@@ -290,7 +298,7 @@ sap.ui.define([
 			};
 			const oFlexData = await Loader.getFlexData(mProperties);
 
-			if (!isInitializeRelevant(oFlexData)) {
+			if (!isInitializeRelevant(sReference, oFlexData)) {
 				return [];
 			}
 
@@ -370,8 +378,8 @@ sap.ui.define([
 			skipLoadBundle: true
 		});
 
-		if (isInitializeRelevant(oFlexData)) {
-			await checkForChangesAndInitializeFlexState({
+		if (isInitializeRelevant(sReference, oFlexData)) {
+			await checkForChangesAndInitializeFlexState(sReference, {
 				...oConfig,
 				manifest: oManifest,
 				componentId: oConfig.id,

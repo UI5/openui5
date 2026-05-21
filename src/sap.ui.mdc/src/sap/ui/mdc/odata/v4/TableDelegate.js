@@ -5,7 +5,6 @@
 sap.ui.define([
 	"../../TableDelegate",
 	"../../table/ODataV4PropertyHelper",
-	"sap/ui/mdc/Table",
 	"sap/ui/mdc/enums/TableP13nMode",
 	"sap/ui/mdc/enums/TableType",
 	"sap/ui/mdc/enums/TableSelectionMode",
@@ -18,7 +17,6 @@ sap.ui.define([
 ], (
 	TableDelegate,
 	ODataV4PropertyHelper,
-	Table,
 	P13nMode,
 	TableType,
 	SelectionMode,
@@ -283,6 +281,9 @@ sap.ui.define([
 	 * @override
 	 */
 	Delegate.updateBinding = function(oTable, oBindingInfo, oBinding, mSettings) {
+		// Use compact selection counter when selections are cleared on filter, as they can never exceed the visible count.
+		oTable._oTableTitle?.setShowExtendedView(!oBindingInfo.parameters?.$$clearSelectionOnFilter);
+
 		// Custom $$aggregation is not supported if data aggregation is enabled.
 		if (isDataAggregationEnabled(oTable)) {
 			updateAggregation(oTable, oBindingInfo);
@@ -537,7 +538,6 @@ sap.ui.define([
 		await TableDelegate.initializeContent.apply(this, arguments);
 
 		if (oTable._isOfType(TableType.Table)) {
-			oTable._oTableTitle.setShowExtendedView(true);
 			await configureGridTable(oTable);
 		}
 	};

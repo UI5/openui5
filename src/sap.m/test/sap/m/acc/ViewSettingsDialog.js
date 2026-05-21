@@ -1,5 +1,4 @@
 sap.ui.define([
-	"sap/m/MessageToast",
 	"sap/m/ViewSettingsDialog",
 	"sap/m/ViewSettingsItem",
 	"sap/m/ViewSettingsFilterItem",
@@ -8,23 +7,16 @@ sap.ui.define([
 	"sap/m/Page",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/core/library"
-], function(MessageToast, ViewSettingsDialog, ViewSettingsItem, ViewSettingsFilterItem, Button, App, Page, VerticalLayout, coreLibrary) {
+], function(ViewSettingsDialog, ViewSettingsItem, ViewSettingsFilterItem, Button, App, Page, VerticalLayout, coreLibrary) {
 	"use strict";
 
 	// shortcut for sap.ui.core.TitleLevel
 	var TitleLevel = coreLibrary.TitleLevel;
 
-	function handleConfirm(oEvent) {
-		if (oEvent.getParameters().filterString) {
-			MessageToast.show(oEvent.getParameter("filterString"));
-		}
-	}
-
 	function handleViewSettingsButtonPress() {
 		if (!window.oViewSettingsDialog) {
 			window.oViewSettingsDialog = new ViewSettingsDialog({
 				title: "Some title",
-				confirm: handleConfirm,
 				sortItems: [
 					new ViewSettingsItem({
 						text: "Sort Field 1",

@@ -1029,8 +1029,21 @@ sap.ui.define([
 		assert.notOk(oObjectIdentifier.$().attr("aria-labelledby"), "There is no aria-labelledby on the root element");
 		assert.ok(oInternalLink.$().attr("aria-labelledby"), "The aria-labelledby is placed on the internal link instead");
 
+		var aAriaLabelledBy = oInternalLink.$().attr("aria-labelledby").split(" ");
+		assert.strictEqual(aAriaLabelledBy[0], oLabel.getId(), "The internal link's the first reference in aria-labelledby is from the API");
+
+		var oLabel2 = new Label({ text: "The second label" });
+		oLabel2.placeAt("qunit-fixture");
+		oObjectIdentifier.addAssociation("ariaLabelledBy", oLabel2);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		aAriaLabelledBy = oInternalLink.$().attr("aria-labelledby").split(" ");
+		assert.strictEqual(aAriaLabelledBy[0], oLabel.getId(), "The first reference in aria-labelledby is still the first label");
+		assert.strictEqual(aAriaLabelledBy[1], oLabel2.getId(), "The second reference in aria-labelledby is the second label");
+
 		// Cleanup
 		oLabel.destroy();
+		oLabel2.destroy();
 		oObjectIdentifier.destroy();
 	});
 

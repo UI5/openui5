@@ -147,15 +147,15 @@
 					<PropertyRef Name="MatrId" />
 				</Key>
 				<Property Name="MatrId" Type="Edm.String" Nullable="false"
-					MaxLength="2" sap:aggregation-role="dimension" sap:label="Matr ID"
+					MaxLength="2" sap:aggregation-role="dimension" sap:label="ID"
 					sap:sortable="true"
 					sap:filterable="true" />
 				<Property Name="Text" Type="Edm.String" Nullable="false"
-					MaxLength="20" sap:aggregation-role="dimension" sap:label="Matr Name"
+					MaxLength="20" sap:aggregation-role="dimension" sap:label="Name"
 					sap:sortable="true"
 					sap:filterable="true" />
 				<Property Name="defaultUnit" Type="Edm.String" Nullable="false"
-					MaxLength="20" sap:aggregation-role="dimension" sap:label="Matr def. Unit"
+					MaxLength="20" sap:aggregation-role="dimension" sap:label="Default Unit"
 					sap:sortable="true"
 					sap:filterable="true" />
 			</EntityType>

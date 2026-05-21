@@ -825,7 +825,8 @@ sap.ui.define([
 			additionalText: "dummy additional text"
 		}));
 		this.sut.addItem(new TabStripItem({
-			icon: "sap-icon://notes"
+			icon: "sap-icon://notes",
+			iconTooltip: "Notes"
 		}));
 		await nextUIUpdate(this.clock);
 
@@ -833,6 +834,7 @@ sap.ui.define([
 
 		assert.ok(aTabs[3].getAggregation("_image").getDecorative(), "TabStripItem has a decorative icon");
 		assert.notOk(aTabs[4].getAggregation("_image").getDecorative(), "TabStripItem has a non-decorative icon");
+		assert.equal(aTabs[4].getAggregation("_image").getTooltip(), "Notes", "TabStripItem icon has tooltip");
 	});
 
 	QUnit.module("TabSelect PHONE", {

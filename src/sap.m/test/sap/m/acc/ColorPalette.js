@@ -3,7 +3,6 @@ sap.ui.define([
 	"sap/m/ColorPalette",
 	"sap/m/ColorPalettePopover",
 	"sap/m/Label",
-	"sap/m/MessageToast",
 	"sap/ui/layout/VerticalLayout",
 	"sap/m/Page",
 	"sap/m/App",
@@ -13,7 +12,6 @@ sap.ui.define([
 	ColorPalette,
 	ColorPalettePopover,
 	Label,
-	MessageToast,
 	VerticalLayout,
 	Page,
 	App,
@@ -24,14 +22,7 @@ sap.ui.define([
 	// shortcut for sap.ui.core.TitleLevel
 	var TitleLevel = coreLibrary.TitleLevel;
 
-	function handleColorSelect(oEvent) {
-		MessageToast.show("value: " + oEvent.getParameter("value") +
-			", \n defaultAction: " + oEvent.getParameter("defaultAction"));
-	}
-
-	var oColorPalettePopover = new ColorPalettePopover("oCPPop", {
-		colorSelect: handleColorSelect
-	});
+	var oColorPalettePopover = new ColorPalettePopover("oCPPop");
 
 	var oPageLayout = new VerticalLayout({
 		content: [
@@ -40,9 +31,7 @@ sap.ui.define([
 				labelFor: "CP1",
 				wrapping: true
 			}),
-			new ColorPalette("CP1", {
-				colorSelect: handleColorSelect
-			}),
+			new ColorPalette("CP1"),
 			new Label({
 				text: "Color Palette popover mode, select a color",
 				labelFor: "btn1",
