@@ -676,9 +676,13 @@ sap.ui.define([
 	 */
 	OverlayUtil.canBeRemovedFromAggregationOnMove = function(oElementOverlay, oDesignTime) {
 		const oElement = oElementOverlay.getElement();
+		const oParent = oElement?.getParent();
+		if (!oParent) {
+			return false;
+		}
 		const aSourceParentAggregationElements = ElementUtil.getAggregation(
-			oElement?.getParent(),
-			oElement?.sParentAggregationName
+			oParent,
+			oElement.sParentAggregationName
 		);
 		const aVisibleSourceParentAggregationElements = aSourceParentAggregationElements?.filter(
 			(oSourceParentAggregationElement) => oSourceParentAggregationElement.getVisible?.() === true

@@ -538,30 +538,34 @@ CalendarRowRenderer.renderAppointment = function(oRm, oRow, oAppointmentInfo, aT
 	var sId = oAppointment.getId();
 	var bReducedHeight = oRow._getAppointmentReducedHeight(oAppointmentInfo);
 	var bAppointmentSelected = oAppointment.getSelected();
-	var mAccProps = {
-		role: "listitem",
-		labelledby: {
-			value: `${InvisibleText.getStaticId("sap.m", "ACC_CTR_TYPE_LISTITEM")} ${InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT")} ${sId.concat("-Descr")}`,
-			append: true
-		},
-		describedby: {value: bAppointmentSelected ? InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT_SELECTED") : "", append: true},
-		selected: null
-	};
+	var bHasCustomContent = !!oAppointment.getCustomContent().length;
+
+	var aLabelledByIds = [InvisibleText.getStaticId("sap.m", "ACC_CTR_TYPE_LISTITEM"), InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT")];
+
+	if (sTitle && !bHasCustomContent) {
+		aLabelledByIds.push(`${sId}-Title`);
+	}
+
+	aLabelledByIds.push(`${sId}-Descr`);
+
+	if (sText && !bHasCustomContent) {
+		aLabelledByIds.push(`${sId}-Text`);
+	}
+
 	var iRowCount = oRow._getAppointmentRowCount(oAppointmentInfo, bReducedHeight);
 	var aAriaLabels = oRow.getAriaLabelledBy();
 
 	var oArrowValues = oRow._calculateAppoitnmentVisualCue(oAppointment);
 	if (aAriaLabels.length > 0) {
-		mAccProps["labelledby"].value = mAccProps["labelledby"].value + " " + aAriaLabels.join(" ");
+		aLabelledByIds = aLabelledByIds.concat(aAriaLabels);
 	}
 
-	if (sTitle && !oAppointment.getCustomContent().length) {
-		mAccProps["labelledby"].value = mAccProps["labelledby"].value + " " + sId + "-Title";
-	}
-
-	if (sText && !oAppointment.getCustomContent().length) {
-		mAccProps["labelledby"].value = mAccProps["labelledby"].value + " " + sId + "-Text";
-	}
+	var mAccProps = {
+		role: "listitem",
+		labelledby: { value: aLabelledByIds.join(" "), append: true },
+		describedby: { value: bAppointmentSelected ? InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT_SELECTED") : "", append: true },
+		selected: null
+	};
 
 	oRm.openStart("div", oAppointment);
 	oRm.class("sapUiCalendarApp");
@@ -573,7 +577,8 @@ CalendarRowRenderer.renderAppointment = function(oRm, oRow, oAppointmentInfo, aT
 
 	if (oAppointment.getTentative()) {
 		oRm.class("sapUiCalendarAppTent");
-		mAccProps["labelledby"].value = mAccProps["labelledby"].value + " " + InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT_TENTATIVE");
+		aLabelledByIds.push(InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT_TENTATIVE"));
+		mAccProps["labelledby"].value = aLabelledByIds.join(" ");
 	}
 
 	if (iRowCount === 1) {

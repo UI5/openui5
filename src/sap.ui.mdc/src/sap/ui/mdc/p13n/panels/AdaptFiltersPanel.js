@@ -136,12 +136,14 @@ sap.ui.define([
 		};
 
 		const oListContent = new AdaptFiltersPanelContent(this.getId() + "-listView", {
-			change: fnChangeFactory(this.MODEL_PATH)
+			change: fnChangeFactory(this.MODEL_PATH),
+			tabFilterId: this.getId() + "-listTabFilter"
 		});
 
 		const oGroupContent = new AdaptFiltersPanelContent(this.getId() + "-groupView", {
 			defaultView: this.GROUP_KEY,
-			change: fnChangeFactory(this.MODEL_PATH)
+			change: fnChangeFactory(this.MODEL_PATH),
+			tabFilterId: this.getId() + "-groupTabFilter"
 		});
 
 		this.addView(new AbstractContainerItem({

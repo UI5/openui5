@@ -6,20 +6,19 @@ sap.ui.define([
 	"sap/ui/mdc/chart/Item",
 	"sap/ui/mdc/enums/ChartItemRoleType",
 	"sap/ui/mdc/p13n/panels/ChartItemPanel",
-	"sap/ui/model/Sorter",
 	"sap/ui/mdc/FilterField",
+	"sap/ui/model/Sorter",
 	"sap/ui/core/Element"
-], function(
+], function (
 	BaseDelegate,
 	ChartWrapper,
 	ChartJSPropertyHelper,
 	ChartItem,
 	ChartItemRoleType,
 	ChartItemPanel,
-	Sorter,
 	FilterField,
-	Element
-) {
+	Sorter,
+	Element) {
 	"use strict";
 	const ChartDelegate = Object.assign({}, BaseDelegate);
 	const mStateMap = new window.WeakMap();
@@ -143,7 +142,7 @@ sap.ui.define([
 				aDrillStack.push(oItem.getPropertyKey());
 			}
 		});
-		return [{ dimension: aDrillStack }]; //TODO Why is it added to dimensions?
+		return [{ dimension: aDrillStack }];
 	};
 	//all dimensions used to fill the View By/drill down popover. This is not required when the View By is not used.
 	ChartDelegate.getSortedDimensions = function (oChart) {
@@ -264,26 +263,63 @@ sap.ui.define([
 	};
 	ChartDelegate._rebind = function (oChart, oBindingInfo) {
 		const oPayload = oChart.getDelegate().payload;
-		const oDataBindingInfo = Object.assign({}, oBindingInfo);
-		oDataBindingInfo.path = oPayload.model;
-		oDataBindingInfo.factory = function(s, oContext) {
-			return new Element();
-		};
-		this._getInnerChart(oChart).bindData(oDataBindingInfo);
-		const aProductsModelData = [];
-		const aProductsModelDataAll = oChart.getModel(oPayload.model.substring(0, oPayload.model.length - 2)).getData();
-		this._getInnerChart(oChart).getData().forEach( function(oWrapper) {
-			const index = oWrapper.oBindingContexts.products.sPath.substring(1);
-			aProductsModelData.push(aProductsModelDataAll[index]);
+		const sModelName = oPayload.model.substring(0, oPayload.model.length - 2); // "products>/" → "products"
+		const aAllData = oChart.getModel(sModelName).getData();
+
+		// Read active conditions directly from the FilterBar's ConditionModel
+		const sFilterId = oChart.getFilter();
+		const oFilterBar = sFilterId && Element.getElementById(sFilterId);
+		const mConditions = oFilterBar && oFilterBar._getConditionModel ? oFilterBar._getConditionModel().getAllConditions() : {};
+
+		// Apply conditions as simple equality / range filters on the raw JSON data
+		const aProductsModelData = aAllData.filter(function(oProduct) {
+			for (const sKey in mConditions) {
+				if (sKey === "$search") { continue; }
+				const aKeyConditions = mConditions[sKey];
+				if (!aKeyConditions || aKeyConditions.length === 0) {
+					continue;
+				}
+				// Multi-condition for same key: product must match at least one (OR within field, AND across fields)
+				const bAnyMatch = aKeyConditions.some(function(oCondition) {
+					const sOp = oCondition.operator;
+					const vVal = oCondition.values[0];
+					const vProductVal = oProduct[sKey];
+					if (sOp === "EQ") {
+						// Case-insensitive string comparison or numeric equality
+						return String(vProductVal).toLowerCase() === String(vVal).toLowerCase();
+					}
+					if (sOp === "BT") {
+						const nLow = parseFloat(oCondition.values[0]);
+						const nHigh = parseFloat(oCondition.values[1]);
+						const nVal = parseFloat(vProductVal);
+						return nVal >= nLow && nVal <= nHigh;
+					}
+					const nProductVal = parseFloat(vProductVal);
+					const nVal = parseFloat(vVal);
+					if (sOp === "GT") { return nProductVal > nVal; }
+					if (sOp === "GE") { return nProductVal >= nVal; }
+					if (sOp === "LT") { return nProductVal < nVal; }
+					if (sOp === "LE") { return nProductVal <= nVal; }
+					if (sOp === "Contains") {
+						return String(vProductVal).toLowerCase().indexOf(String(vVal).toLowerCase()) >= 0;
+					}
+					return true;
+				});
+				if (!bAnyMatch) {
+					return false;
+				}
+			}
+			return true;
 		});
+
 		const oResult = bindingFormatter(oChart, aProductsModelData);
 		this._getInnerChart(oChart).setDatasets(oResult.datasets);
 		this._getInnerChart(oChart).setLabels(oResult.labels);
 		this._getInnerChart(oChart).setScales(oResult.scales);
+		this._getInnerChart(oChart)._aCurrentData = aProductsModelData;
 	};
 	// Returns the information whether the inner chart is currently bound.
 	ChartDelegate.getInnerChartBound = function (oChart) {
-		// why is this important for the chart?
 		return true;
 	};
 	ChartDelegate.getPropertyHelperClass = function () {
@@ -296,7 +332,7 @@ sap.ui.define([
 	};
 	// connect the SelectionDetails button with the inner chart to show details on selected DataPoints
 	ChartDelegate.getInnerChartSelectionHandler = function (oChart) {
-        return {}; //{eventId: "_selectionDetails", listener: this._getInnerChart(oChart)};
+        return {eventId: "_selectionDetails", listener: this._getInnerChart(oChart)};
     };
 	// This function is used by <code>P13n</code> to determine which chart type supports which layout options.
 	// There might be chart types that do not support certain layout options (for example, "Axis3").
@@ -352,8 +388,8 @@ sap.ui.define([
 		let aSorters;
 		const aSorterProperties = oChart.getSortConditions() ? oChart.getSortConditions().sorters : [];
 		aSorterProperties.forEach((oSortProperty) => {
-			const oItem = oChart.getItems().find((oItem) => {
-				return oItem.getPropertyKey() === oSortProperty.key;
+			const oItem = oChart.getItems().find((oChartItem) => {
+				return oChartItem.getPropertyKey() === oSortProperty.key;
 			});
 			//Ignore not visible Items
 			if (!oItem) {

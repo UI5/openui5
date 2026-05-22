@@ -1469,8 +1469,8 @@ sap.ui.define([
 		assert.strictEqual($segmentedButton.attr("aria-multiselectable"), "false", "aria-multiselectable is set to 'false'");
 		assert.strictEqual($segmentedButton.attr("aria-roledescription"), oResourceBundle.getText("SEGMENTEDBUTTON_NAME"),
 			"Additional description for control's role is added");
-		assert.strictEqual($segmentedButton.attr("aria-describedby"), InvisibleText.getStaticId("sap.m", "SEGMENTEDBUTTON_SELECTION"),
-			"Tutor message for selection is added");
+		assert.notOk($segmentedButton.attr("aria-describedby"),
+			"Tutor message is not placed on the root listbox to avoid JAWS double announcement");
 		assert.strictEqual($segmentedButton.attr("aria-orientation"), "horizontal", "aria-orientation is set to 'horizontal'");
 
 		oSegmentedButton.destroy();
@@ -1503,6 +1503,11 @@ sap.ui.define([
 
 		assert.notOk($innerButton.attr("aria-disabled"), "Non-disabled buttons aren't marked as disabled");
 		assert.strictEqual($innerDisabledButton.attr("aria-disabled"), "true", "Disabled buttons have aria-disabled");
+
+		assert.ok($innerButton.attr("aria-describedby").includes(InvisibleText.getStaticId("sap.m", "SEGMENTEDBUTTON_SELECTION")),
+			"Tutor message for selection is present on the enabled option");
+		assert.ok($innerDisabledButton.attr("aria-describedby").includes(InvisibleText.getStaticId("sap.m", "SEGMENTEDBUTTON_SELECTION")),
+			"Tutor message for selection is present on the disabled option");
 
 		oSegmentedButton.destroy();
 		await nextUIUpdate(this.clock);

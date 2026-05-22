@@ -1,18 +1,18 @@
 sap.ui.loader.config({
-    paths: {
-        "custom/Chart": sap.ui.require.toUrl("sap/ui/mdc/demokit/sample/Chart/ChartJS/control/ChartJS"),
+	paths: {
+		"custom/Chart": sap.ui.require.toUrl("sap/ui/mdc/demokit/sample/Chart/ChartJS/control/ChartJS"),
 		"custom/Hammer": sap.ui.require.toUrl("sap/ui/mdc/demokit/sample/Chart/ChartJS/control/hammerjs"),
 		"custom/ChartZoom": sap.ui.require.toUrl("sap/ui/mdc/demokit/sample/Chart/ChartJS/control/chartjs-plugin-zoom")
-    },
-    shim: {
-        "custom/Chart": {
-            amd: true,
-            exports: "Chart"
-        },
+	},
+	shim: {
+		"custom/Chart": {
+			amd: true,
+			exports: "Chart"
+		},
 		"custom/Hammer": {
-            amd: true,
-            exports: "Hammer"
-        },
+			amd: true,
+			exports: "Hammer"
+		},
 		"custom/ChartZoom": {
 			amd: true,
 			deps: [
@@ -20,7 +20,7 @@ sap.ui.loader.config({
 			],
 			exports: "ChartZoom"
 		}
-    }
+	}
 });
 
 sap.ui.define([

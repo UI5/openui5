@@ -995,6 +995,23 @@ sap.ui.define([
 				"then it returns false when no Remove plugin is found"
 			);
 		});
+
+		QUnit.test("when the element has no parent", function(assert) {
+			const oOrphanButton = new Button("orphanButton");
+			const oOverlayStub = {
+				getElement() {
+					return oOrphanButton;
+				}
+			};
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnMove(oOverlayStub, this.oDesignTime),
+				false,
+				"then it returns false without throwing"
+			);
+
+			oOrphanButton.destroy();
+		});
 	});
 
 	QUnit.module("Given that updateLastElementRemovability is called", {

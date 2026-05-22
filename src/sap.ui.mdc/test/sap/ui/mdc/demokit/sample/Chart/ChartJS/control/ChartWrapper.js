@@ -1,8 +1,9 @@
 
 sap.ui.define([
 	"sap/ui/core/Control",
-	"./ChartWrapperRenderer"
-], function (Control, ChartWrapperRenderer) {
+	"./ChartWrapperRenderer",
+	"custom/Chart"
+], function (Control, ChartWrapperRenderer, ChartJS) {
 	"use strict";
 	const ChartWrapper = Control.extend("sap.ui.mdc.demokit.sample.Chart.ChartJS.control.ChartWrapper", {
 		metadata: {
@@ -44,15 +45,17 @@ sap.ui.define([
 				data: {type: "sap.ui.core.Element", multiple: true, bindable: "bindable"}
 			},
 			events: {
+				_selectionDetails: {
+					parameters: {
+						data: { type: "object[]" }
+					}
+				}
 			}
-		},
-		init: function () {
 		},
 		onAfterRendering: function () {
 			if (!this.chart) {
 				const ctx = document.getElementById(this.getId() + "--canvas");
-				/* eslint-disable no-undef */
-				this.chart = new Chart(ctx, this._getConfig());
+				this.chart = new ChartJS(ctx, this._getConfig());
 			}
 		},
 		renderer: ChartWrapperRenderer
@@ -95,7 +98,7 @@ sap.ui.define([
 		const config = this._getConfig();
 		config.type = sChartType;
 		this.setProperty("chartType", sChartType, true);
-		this.chart = new Chart(ctx, config);
+		this.chart = new ChartJS(ctx, config);
 
 		return this;
 	};
@@ -166,6 +169,7 @@ sap.ui.define([
 		this.chart.zoom(oZoom);
 	};
 	ChartWrapper.prototype._getConfig = function () {
+		const that = this;
 		return {
 			type: this.getChartType(),
 			data: {
@@ -173,6 +177,30 @@ sap.ui.define([
 				datasets: this.getDatasets()
 			},
 			options: {
+				onClick: function (evt) {
+					const points = that.chart.getElementsAtEventForMode(evt, "nearest", { intersect: true }, true);
+					if (points.length) {
+						const aSelectionData = points.map(function (point) {
+							const datasetIndex = point.datasetIndex;
+							const index = point.index;
+							const dataset = that.chart.data.datasets[datasetIndex];
+							const oProduct = that._aCurrentData && that._aCurrentData[index];
+							const aDisplayData = [];
+							if (oProduct) {
+								Object.keys(oProduct).forEach(function (sKey) {
+									aDisplayData.push({ label: sKey, value: String(oProduct[sKey]) });
+								});
+							} else {
+								aDisplayData.push({ label: that.chart.data.labels[index], value: String(dataset.data[index]) });
+							}
+							return {
+								displayData: aDisplayData,
+								data: oProduct || { label: that.chart.data.labels[index], value: dataset.data[index], datasetLabel: dataset.label }
+							};
+						});
+						that.fireEvent("_selectionDetails", { data: aSelectionData });
+					}
+				},
 				indexAxis: "x", // y: horizontal bar or line charts
 				responsive: true,
 				maintainAspectRatio: false,

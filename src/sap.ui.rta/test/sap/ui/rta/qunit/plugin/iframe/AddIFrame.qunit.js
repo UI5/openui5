@@ -308,7 +308,10 @@ sap.ui.define([
 
 			await DtUtil.waitForSynced(this.oDesignTime)();
 			assert.strictEqual(this.oAddIFrame.isAvailable([this.oButtonOverlay], {}, true), true, "then isAvailable returns true as a sibling");
-			assert.strictEqual(this.oAddIFrame.isAvailable([this.oButtonOverlay], {}, false), false, "then isAvailable returns false when it's not a sibling");
+			assert.strictEqual(
+				this.oAddIFrame.isAvailable([this.oButtonOverlay], {}, false), true,
+				"then isAvailable returns true for child since responsible element has addIFrame on subSections"
+			);
 
 			let bAvailable = true;
 			sandbox.stub(this.oAddIFrame, "isAvailable").callsFake((aElementOverlays, oAction, bSibling) => {
@@ -325,7 +328,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when an overlay has an addIFrame action in designTimeMetadata, and isEnabled property is a function", async function(assert) {
-			assert.expect(9);
+			assert.expect(11);
 			const oAction = {
 				changeType: "addIFrame",
 				isEnabled(oElement) {
@@ -377,10 +380,13 @@ sap.ui.define([
 			aMenuItems[0].enabled([this.oObjectPageLayoutOverlay], { menuItem: aMenuItems[0] });
 
 			aMenuItems = await getMenuItems.call(this, this.oNewObjectPageSectionOverlay);
-			assert.strictEqual(aMenuItems.length, 1, "Only one menu item is returned");
+			assert.strictEqual(aMenuItems.length, 2, "Two menu items are returned (sibling and child)");
 			assert.equal(aMenuItems[0].id, "CTX_CREATE_SIBLING_IFRAME", "there is an entry for create sibling section");
+			assert.equal(aMenuItems[1].id, "CTX_CREATE_CHILD_IFRAME_SUBSECTIONS", "there is an entry for create child subsection");
 			aMenuItems[0].handler([this.oNewObjectPageSectionOverlay], { menuItem: aMenuItems[0] });
 			aMenuItems[0].enabled([this.oNewObjectPageSectionOverlay], { menuItem: aMenuItems[0] });
+			aMenuItems[1].handler([this.oNewObjectPageSectionOverlay], { menuItem: aMenuItems[1] });
+			aMenuItems[1].enabled([this.oNewObjectPageSectionOverlay], { menuItem: aMenuItems[1] });
 		});
 
 		QUnit.test("when the action is triggered, but the dialog is cancelled", async function(assert) {
