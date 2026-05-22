@@ -622,6 +622,101 @@ sap.ui.define([
 		oLink.destroy();
 	});
 
+	QUnit.test("Tooltip is announced via aria-describedby when link is emphasized", async function (assert) {
+		var sTooltipText = "Opens in a new tab",
+			oLink = new Link({
+				text: "Link",
+				href: "https://www.sap.com",
+				tooltip: sTooltipText,
+				emphasized: true
+			});
+
+		oLink.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var sTooltipSpanId = oLink.getId() + "-tooltip",
+			oLinkDomRef = oLink.getDomRef(),
+			oTooltipSpan = document.getElementById(sTooltipSpanId);
+
+		assert.ok(oTooltipSpan, "Tooltip span is rendered inside <a>");
+		assert.strictEqual(oTooltipSpan.textContent, sTooltipText, "Tooltip span contains the tooltip text");
+		assert.ok(oLinkDomRef.getAttribute("aria-describedby").includes(sTooltipSpanId), "aria-describedby includes the tooltip span ID");
+		assert.strictEqual(oLinkDomRef.getAttribute("title"), sTooltipText, "title attribute is still present for visual hover");
+
+		oLink.destroy();
+	});
+
+	QUnit.test("Tooltip on non-emphasized link preserves existing behavior", async function (assert) {
+		var sTooltipText = "Opens in a new tab",
+			oLink = new Link({
+				text: "Link",
+				href: "https://www.sap.com",
+				tooltip: sTooltipText
+			});
+
+		oLink.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var oLinkDomRef = oLink.getDomRef();
+
+		assert.notOk(document.getElementById(oLink.getId() + "-tooltip"), "No tooltip span for non-emphasized link");
+		assert.notOk(oLinkDomRef.getAttribute("aria-describedby"), "No aria-describedby for non-emphasized link with tooltip only");
+		assert.strictEqual(oLinkDomRef.getAttribute("title"), sTooltipText, "title attribute present (tooltip via title fallback)");
+
+		oLink.destroy();
+	});
+
+	QUnit.test("Tooltip is announced via aria-describedby when link is subtle", async function (assert) {
+		var sTooltipText = "Opens in a new tab",
+			oLink = new Link({
+				text: "Link",
+				href: "https://www.sap.com",
+				tooltip: sTooltipText,
+				subtle: true
+			});
+
+		oLink.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var sTooltipSpanId = oLink.getId() + "-tooltip",
+			oLinkDomRef = oLink.getDomRef(),
+			oTooltipSpan = document.getElementById(sTooltipSpanId);
+
+		assert.ok(oTooltipSpan, "Tooltip span is rendered inside <a>");
+		assert.strictEqual(oTooltipSpan.textContent, sTooltipText, "Tooltip span contains the tooltip text");
+		assert.ok(oLinkDomRef.getAttribute("aria-describedby").includes(sTooltipSpanId), "aria-describedby includes the tooltip span ID");
+		assert.strictEqual(oLinkDomRef.getAttribute("title"), sTooltipText, "title attribute is still present for visual hover");
+
+		oLink.destroy();
+	});
+
+	QUnit.test("Tooltip does not overwrite existing ariaDescribedBy when link is emphasized", async function (assert) {
+		var sTooltipText = "Opens in a new tab",
+			oDescr = new Text({ text: "Custom description" }),
+			oLink = new Link({
+				text: "Link",
+				href: "https://www.sap.com",
+				tooltip: sTooltipText,
+				emphasized: true,
+				ariaDescribedBy: oDescr
+			});
+
+		oDescr.placeAt("qunit-fixture");
+		oLink.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var sTooltipSpanId = oLink.getId() + "-tooltip",
+			oLinkDomRef = oLink.getDomRef(),
+			sDescribedBy = oLinkDomRef.getAttribute("aria-describedby");
+
+		assert.ok(sDescribedBy.includes(oDescr.getId()), "Custom description text ID is present");
+		assert.ok(sDescribedBy.includes(sTooltipSpanId), "Tooltip span ID is present");
+		assert.ok(document.getElementById(sTooltipSpanId), "Tooltip span element exists in DOM");
+
+		oDescr.destroy();
+		oLink.destroy();
+	});
+
 	QUnit.test("drag and drop", async function(assert) {
 		var oLink = new Link({
 			dragDropConfig: new DragInfo({
