@@ -98,6 +98,17 @@ sap.ui.define(
 							group: "Appearance",
 							defaultValue: false,
 							visibility: "hidden"
+						},
+
+						/**
+						 * Internal property to bind the text of the Show Filters button including the active filter count.<br>
+						 * @since 1.149
+						 */
+						_showFiltersCount: {
+							type: "string",
+							group: "Appearance",
+							defaultValue: "",
+							visibility: "hidden"
 						}
 					},
 					aggregations: {}
@@ -121,10 +132,15 @@ sap.ui.define(
 				press: this._onToggleFilters.bind(this)
 			});
 			this._oBtnFilters.bindProperty("text", {
-				model: FilterBarBase.INNER_MODEL_NAME,
-				path: "/expandFilterFields",
-				formatter: function(bExpandFilterFields) {
-					return this._oRb.getText("valuehelp." + (bExpandFilterFields ? "HIDE" : "SHOW") + "ADVSEARCH");
+				parts: [
+					{ path: "/expandFilterFields", model: FilterBarBase.INNER_MODEL_NAME },
+					{ path: "/_showFiltersCount", model: FilterBarBase.INNER_MODEL_NAME }
+				],
+				formatter: function(bExpandFilterFields, sShowFiltersCount) {
+					if (bExpandFilterFields) {
+						return this._oRb.getText("valuehelp.HIDEADVSEARCH");
+					}
+					return sShowFiltersCount || this._oRb.getText("valuehelp.SHOWADVSEARCH");
 				}.bind(this)
 			});
 			this._oBtnFilters.bindProperty("visible", {
@@ -136,7 +152,9 @@ sap.ui.define(
 			});
 
 			this._oFilterBarLayout.addControl(
-				this._getSearchButton().bindProperty("visible", {
+				this._getSearchButton()
+				.setType(ButtonType.Ghost)
+				.bindProperty("visible", {
 					parts: [{
 						path: '/showGoButton',
 						model: FilterBarBase.INNER_MODEL_NAME
@@ -168,6 +186,8 @@ sap.ui.define(
 			});
 
 			this._oFilterBarLayout.addControl(this._oShowAllFiltersBtn);
+
+			this.setProperty("_showFiltersCount", this._oRb.getText("valuehelp.SHOWADVSEARCH"), false);
 		};
 
 
@@ -194,6 +214,34 @@ sap.ui.define(
 
 		FilterBar.prototype._onShowAllFilters = function(oEvent) {
 			this._oFilterBarLayout._updateFilterBarLayout(true);
+		};
+
+		/**
+		 * Returns the text to be shown on the Show Filters button based on the active filter count.
+		 * @param {int} iFilterCount number of active filter conditions
+		 * @returns {string} button text
+		 * @override
+		 * @since 1.149
+		 */
+		FilterBar.prototype.getAdaptFiltersButtonText = function(iFilterCount) {
+			return this._oRb.getText(
+				iFilterCount ? "valuehelp.SHOWADVSEARCH_NONZERO" : "valuehelp.SHOWADVSEARCH",
+				[iFilterCount]
+			);
+		};
+
+		/**
+		 * Updates the Show Filters button text with the current active filter count.
+		 * @param {boolean} bFiltersAggregationChanged whether the change is due to filter items being added/removed
+		 * @override
+		 */
+		FilterBar.prototype._handleAssignedFilterNames = function(bFiltersAggregationChanged) {
+			if (!bFiltersAggregationChanged && this._oBtnFilters) {
+				const aFilterNames = this.getAssignedFilterNames();
+				const sText = this.getAdaptFiltersButtonText(aFilterNames ? aFilterNames.length : 0);
+				this.setProperty("_showFiltersCount", sText, false);
+			}
+			FilterBarBase.prototype._handleAssignedFilterNames.apply(this, arguments);
 		};
 
 		/**

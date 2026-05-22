@@ -393,19 +393,19 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @since 1.127.0
+	 * @since 1.149.0
 	 */
 	thisLib.RecurrenceRuleType = {
 		/**
 		 * Recurrence based on a specific day of the month (e.g., the 15th).
 		 *
-		 * @since 1.127.0
+		 * @since 1.149.0
 		 */
 		DayOfMonth: "DayOfMonth",
 		/**
 		 * Recurrence based on a specific day of the week (e.g., second Tuesday).
 		 *
-		 * @since 1.127.0
+		 * @since 1.149.0
 		 */
 		DayOfWeek: "DayOfWeek"
 	};
@@ -417,37 +417,37 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @since 1.127.0
+	 * @since 1.149.0
 	 */
 	thisLib.WeekOfMonth = {
 		/**
 		 * First occurrence in the month.
 		 *
-		 * @since 1.127.0
+		 * @since 1.149.0
 		 */
 		First: "First",
 		/**
 		 * Second occurrence in the month.
 		 *
-		 * @since 1.127.0
+		 * @since 1.149.0
 		 */
 		Second: "Second",
 		/**
 		 * Third occurrence in the month.
 		 *
-		 * @since 1.127.0
+		 * @since 1.149.0
 		 */
 		Third: "Third",
 		/**
 		 * Fourth occurrence in the month.
 		 *
-		 * @since 1.127.0
+		 * @since 1.149.0
 		 */
 		Fourth: "Fourth",
 		/**
 		 * Last occurrence in the month.
 		 *
-		 * @since 1.127.0
+		 * @since 1.149.0
 		 */
 		Last: "Last"
 	};

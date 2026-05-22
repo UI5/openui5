@@ -7,7 +7,8 @@ sap.ui.define([
 	"sap/ui/mdc/valuehelp/CollectiveSearchSelect",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
-	"sap/ui/model/json/JSONModel"
+	"sap/ui/model/json/JSONModel",
+	"sap/m/library"
 ], (
 	FilterBar,
 	FilterBarBase,
@@ -15,11 +16,13 @@ sap.ui.define([
 	CollectiveSearchSelect,
 	Element,
 	Library,
-	JSONModel
+	JSONModel,
+	mLibrary
 ) => {
 	"use strict";
 
 	const mdcMessageBundle = Library.getResourceBundleFor("sap.ui.mdc");
+	const { ButtonType } = mLibrary;
 	let oFilterBar;
 
 	QUnit.module("FilterBar", {
@@ -62,6 +65,7 @@ sap.ui.define([
 		assert.notOk(oFilterBar._oBtnFilters.getVisible(), "showFilters button is not visible");
 
 		assert.ok(oButton);
+		assert.equal(oButton.getType(), ButtonType.Ghost, "Search/Go button is rendered with Ghost styling so that the dialog's OK button remains the only emphasized action");
 
 		oFilterBar.setBasicSearchField(new FilterField("BS1", {
 			conditions: "{$filters>/conditions/$search}",
@@ -305,5 +309,184 @@ sap.ui.define([
 
 		oFilterBar.setBasicSearchField(null);
 		assert.ok(!Element.getElementById(sAriaLabelId), "Aria label elements removed when Search field is removed");
+	});
+
+	QUnit.test("Show Filters button text - no active conditions", (assert) => {
+		const oButton = oFilterBar._oBtnFilters;
+
+		oFilterBar.setExpandFilterFields(false);
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH"),
+			"Button shows plain 'Show Filters' when no conditions are active");
+	});
+
+	QUnit.test("Show Filters button text - with active conditions", (assert) => {
+		const oButton = oFilterBar._oBtnFilters;
+		oFilterBar.setExpandFilterFields(false);
+
+		const fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1"]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [1]),
+			"Button shows 'Show Filters (1)' with one active condition");
+	});
+
+	QUnit.test("Show Filters button text - count reflects multiple active conditions", (assert) => {
+		const oButton = oFilterBar._oBtnFilters;
+		oFilterBar.setExpandFilterFields(false);
+
+		const fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1", "ff2", "ff3"]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [3]),
+			"Button shows 'Show Filters (3)' with three active conditions");
+	});
+
+	QUnit.test("Show Filters button text - count updates dynamically as conditions are added and removed", (assert) => {
+		const oButton = oFilterBar._oBtnFilters;
+		oFilterBar.setExpandFilterFields(false);
+
+		// 0 conditions
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH"),
+			"Starts with plain 'Show Filters'");
+
+		// Add 1
+		let fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1"]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [1]),
+			"Shows 'Show Filters (1)' after adding one condition");
+
+		// Add 2 more
+		fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1", "ff2", "ff3"]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [3]),
+			"Shows 'Show Filters (3)' after adding two more conditions");
+
+		// Remove 2
+		fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1"]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [1]),
+			"Shows 'Show Filters (1)' after removing two conditions");
+
+		// Remove last
+		fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns([]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH"),
+			"Reverts to plain 'Show Filters' when all conditions cleared");
+	});
+
+	QUnit.test("Show Filters button text - count is hidden when zero (no brackets)", (assert) => {
+		const oButton = oFilterBar._oBtnFilters;
+		oFilterBar.setExpandFilterFields(false);
+
+		// Set a count first
+		let fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1"]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+
+		// Clear back to zero
+		fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns([]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+
+		const sText = oButton.getText();
+		assert.equal(sText, mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH"),
+			"Button text is plain 'Show Filters' without brackets when count is zero");
+		assert.notOk(sText.includes("("), "Button text contains no opening bracket");
+		assert.notOk(sText.includes(")"), "Button text contains no closing bracket");
+	});
+
+	QUnit.test("Show Filters button text - count shown in liveMode", (assert) => {
+		const oButton = oFilterBar._oBtnFilters;
+		oFilterBar.setLiveMode(true);
+		oFilterBar.setExpandFilterFields(false);
+
+		const fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1", "ff2"]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [2]),
+			"Count is shown in liveMode");
+	});
+
+	QUnit.test("Show Filters button text - count shown when liveMode is off", (assert) => {
+		const oButton = oFilterBar._oBtnFilters;
+		oFilterBar.setLiveMode(false);
+		oFilterBar.setExpandFilterFields(false);
+
+		const fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1", "ff2"]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [2]),
+			"Count is shown regardless of liveMode");
+	});
+
+	QUnit.test("Show Filters button text - expanded state shows Hide Filters regardless of count", (assert) => {
+		const oButton = oFilterBar._oBtnFilters;
+		oFilterBar.setExpandFilterFields(true);
+
+		const fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1"]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.HIDEADVSEARCH"),
+			"Button shows 'Hide Filters' when filter bar is expanded, even with active conditions");
+	});
+
+	QUnit.test("Show Filters button text - getAdaptFiltersButtonText uses VH-specific i18n keys", (assert) => {
+		assert.equal(
+			oFilterBar.getAdaptFiltersButtonText(0),
+			mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH"),
+			"Returns 'Show Filters' for zero count"
+		);
+		assert.equal(
+			oFilterBar.getAdaptFiltersButtonText(1),
+			mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [1]),
+			"Returns 'Show Filters (1)' for count 1"
+		);
+		assert.equal(
+			oFilterBar.getAdaptFiltersButtonText(5),
+			mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [5]),
+			"Returns 'Show Filters (5)' for count 5"
+		);
+	});
+
+	QUnit.test("Show Filters button text - bFiltersAggregationChanged suppresses count update", (assert) => {
+		const oButton = oFilterBar._oBtnFilters;
+		oFilterBar.setExpandFilterFields(false);
+
+		// Set count to 1
+		let fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1"]);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [1]),
+			"Count is 1 before filter item change");
+
+		// Simulate a filter item being added/removed (bFiltersAggregationChanged=true)
+		fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(["ff1", "ff2"]);
+		oFilterBar._handleAssignedFilterNames(true);
+		fnStub.restore();
+
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH_NONZERO", [1]),
+			"Count is NOT updated when called with bFiltersAggregationChanged=true (filter item added/removed, not condition changed)");
+	});
+
+	QUnit.test("Show Filters button text - null return from getAssignedFilterNames is handled safely", (assert) => {
+		const oButton = oFilterBar._oBtnFilters;
+		oFilterBar.setExpandFilterFields(false);
+
+		// Simulate condition model not yet initialized (getAssignedFilterNames returns null)
+		const fnStub = sinon.stub(oFilterBar, "getAssignedFilterNames").returns(null);
+		oFilterBar._handleAssignedFilterNames(false);
+		fnStub.restore();
+
+		assert.equal(oButton.getText(), mdcMessageBundle.getText("valuehelp.SHOWADVSEARCH"),
+			"Falls back to 'Show Filters' (count 0) when condition model not initialized");
 	});
 });

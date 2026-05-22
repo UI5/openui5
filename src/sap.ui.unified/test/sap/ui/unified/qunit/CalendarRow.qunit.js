@@ -1373,6 +1373,59 @@ QUnit.test("_oFormatAria correctly localized and translated", function (assert) 
 	oCalendarRow.destroy();
 });
 
+QUnit.test("Appointment aria-labelledby: title comes first when title is set", async function(assert) {
+	// Prepare
+	var oAppointment = new CalendarAppointment("TestApp-WithTitle", {
+		startDate: UI5Date.getInstance(2017, 3, 1, 9, 0, 0),
+		endDate: UI5Date.getInstance(2017, 3, 1, 10, 0, 0),
+		title: "My Title",
+		text: "My Text"
+	});
+	var oRow = new CalendarRow({
+		startDate: UI5Date.getInstance(2017, 3, 1, 0, 0, 0),
+		appointments: [oAppointment]
+	}).placeAt("qunit-fixture");
+	await nextUIUpdate();
+
+	var sLabelledBy = jQuery("#TestApp-WithTitle").attr("aria-labelledby");
+	var iTitlePos = sLabelledBy.indexOf("TestApp-WithTitle-Title");
+	var iListitemPos = sLabelledBy.indexOf(InvisibleText.getStaticId("sap.m", "ACC_CTR_TYPE_LISTITEM"));
+	var iDescrPos = sLabelledBy.indexOf("TestApp-WithTitle-Descr");
+	var iTextPos = sLabelledBy.indexOf("TestApp-WithTitle-Text");
+
+	// Assert - order: listitem → APPOINTMENT → Title → Descr → Text
+	assert.ok(iTitlePos > -1, "Title id is present in aria-labelledby");
+	assert.ok(iListitemPos < iTitlePos, "listitem token comes before Title");
+	assert.ok(iTitlePos < iDescrPos, "Title comes before -Descr");
+	assert.ok(iTextPos > iDescrPos, "-Text comes after -Descr");
+
+	// Cleanup
+	oRow.destroy();
+});
+
+QUnit.test("Appointment aria-labelledby: title absent when title is not set", async function(assert) {
+	// Prepare
+	var oAppointment = new CalendarAppointment("TestApp-NoTitle", {
+		startDate: UI5Date.getInstance(2017, 3, 1, 9, 0, 0),
+		endDate: UI5Date.getInstance(2017, 3, 1, 10, 0, 0),
+		text: "My Text"
+	});
+	var oRow = new CalendarRow({
+		startDate: UI5Date.getInstance(2017, 3, 1, 0, 0, 0),
+		appointments: [oAppointment]
+	}).placeAt("qunit-fixture");
+	await nextUIUpdate();
+
+	var sLabelledBy = jQuery("#TestApp-NoTitle").attr("aria-labelledby");
+
+	// Assert - no title id when title is empty
+	assert.ok(sLabelledBy.indexOf("TestApp-NoTitle-Title") === -1, "Title id is absent when no title is set");
+	assert.ok(sLabelledBy.indexOf(InvisibleText.getStaticId("sap.m", "ACC_CTR_TYPE_LISTITEM")) > -1, "listitem token is present");
+
+	// Cleanup
+	oRow.destroy();
+});
+
 QUnit.module("Pure unit testing");
 	QUnit.test("CalendarRowRender.getAriaTextForType", function (assert) {
 		//Prepare

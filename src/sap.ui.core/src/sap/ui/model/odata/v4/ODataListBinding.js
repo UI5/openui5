@@ -129,6 +129,9 @@ sap.ui.define([
 		this.sChangeReason = oModel.bAutoExpandSelect && !_Helper.isDataAggregation(mParameters)
 			? "AddVirtualContext"
 			: undefined;
+		// an optional change reason to be used for the next event after RemoveVirtualContext
+		// Note: must only be used in combination with this.sChangeReason set to "AddVirtualContext"
+		this.sChangeReasonAfterRemoveVirtualContext = undefined;
 		// Note: this.aContexts[i].iIndex + this.iCreatedContexts === i
 		// BEWARE: #doReplaceWith can insert a context w/ negative index, but w/o #created promise
 		// into aContexts' area of "created contexts"! And via "keep alive" or selection, we may
@@ -2869,7 +2872,8 @@ sap.ui.define([
 							detailedReason : "RemoveVirtualContext",
 							reason : ChangeReason.Change
 						});
-						that.reset(ChangeReason.Refresh);
+						that.reset(
+							that.sChangeReasonAfterRemoveVirtualContext ?? ChangeReason.Refresh);
 					}
 				});
 			}, true);
@@ -2915,9 +2919,11 @@ sap.ui.define([
 						iLength : iLength
 					};
 				}
+				const sWhy = that.sChangeReasonAfterRemoveVirtualContext ?? sChangeReason;
+				that.sChangeReasonAfterRemoveVirtualContext = undefined;
 				if (bFireChange) {
 					if (bChanged || (that.oDiff && that.oDiff.aDiff?.length)) {
-						that._fireChange({reason : sChangeReason});
+						that._fireChange({reason : sWhy});
 					} else { // we cannot keep a diff if we do not tell the control to fetch it!
 						that.oDiff = undefined;
 					}
@@ -4871,10 +4877,14 @@ sap.ui.define([
 	 *   within the same $batch as the GET for the side-effects refresh.
 	 * @param {string} [sGroupId]
 	 *   The group ID to be used for refresh; used only in case <code>bDrop === false</code>
+	 * @param {boolean} [bRestartAutoExpandSelect]
+	 *   Whether to restart auto-$expand/$select; requires <code>sChangeReason</code>. Ignored for
+	 *   an unresolved binding.
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.reset = function (sChangeReason, bDrop, sGroupId) {
+	ODataListBinding.prototype.reset = function (sChangeReason, bDrop, sGroupId,
+			bRestartAutoExpandSelect) {
 		var iCreated = 0, // index (and finally number) of created elements that we keep
 			bEmpty = this.iCurrentEnd === 0,
 			bKeepTransient = sGroupId && sGroupId !== this.getUpdateGroupId(),
@@ -4924,8 +4934,20 @@ sap.ui.define([
 		// Note: the binding's length can be greater than this.iMaxLength due to iCreatedContexts!
 		this.iMaxLength = Infinity;
 		this.bLengthFinal = false;
-		if (sChangeReason && !(bEmpty && sChangeReason === ChangeReason.Change)
-				&& this.isResolved()) {
+		if (!this.isResolved()) {
+			return;
+		}
+		if (bRestartAutoExpandSelect && this.oModel.bAutoExpandSelect) {
+			this.mAggregatedQueryOptions = {};
+			this.bAggregatedQueryOptionsInitial = true;
+			this.mCanUseCachePromiseByChildPath = {};
+			this.sChangeReason = "AddVirtualContext";
+			this.sChangeReasonAfterRemoveVirtualContext = sChangeReason;
+			this._fireChange({
+				detailedReason : "AddVirtualContext",
+				reason : ChangeReason.Change
+			});
+		} else if (sChangeReason && !(bEmpty && sChangeReason === ChangeReason.Change)) {
 			this.sChangeReason = sChangeReason;
 			this._fireRefresh({reason : sChangeReason});
 		}
@@ -5441,7 +5463,10 @@ sap.ui.define([
 		this.createReadGroupLock(this.getGroupId(), true);
 		this.removeCachesAndMessages("");
 		this.fetchCache(this.oContext);
-		this.reset(ChangeReason.Sort);
+		const bRestartAutoExpandSelect = aSorters.some(
+			(oSorter) => oSorter.getGroupPaths()?.length);
+		this.reset(ChangeReason.Sort, /*bDrop*/undefined, /*sGroupId*/undefined,
+			bRestartAutoExpandSelect);
 		if (this.oHeaderContext) {
 			// Update after the refresh event, otherwise $count is fetched before the request
 			this.oHeaderContext.checkUpdate();

@@ -196,6 +196,7 @@ sap.ui.define([
 		assert.strictEqual(oBinding.iActiveContexts, 0);
 		assert.ok(oBinding.hasOwnProperty("aApplicationFilters"));
 		assert.ok(oBinding.hasOwnProperty("sChangeReason"));
+		assert.ok(oBinding.hasOwnProperty("sChangeReasonAfterRemoveVirtualContext"));
 		assert.ok(oBinding.hasOwnProperty("aContexts"));
 		assert.strictEqual(oBinding.iCreatedContexts, 0);
 		assert.ok(oBinding.hasOwnProperty("iCurrentBegin"));
@@ -354,6 +355,7 @@ sap.ui.define([
 
 		assert.strictEqual(oBinding.aApplicationFilters, aFilters);
 		assert.strictEqual(oBinding.sChangeReason, undefined);
+		assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext, undefined);
 		assert.strictEqual(oBinding.oDiff, undefined);
 		assert.deepEqual(oBinding.aFilters, []);
 		assert.strictEqual(oBinding.sGroupId, "group");
@@ -1333,14 +1335,28 @@ sap.ui.define([
 	QUnit.test("reset with change reason, unresolved binding", function (assert) {
 		var oBinding = this.bindList("EMPLOYEES");
 
+		this.oModel.bAutoExpandSelect = true;
+		oBinding.mAggregatedQueryOptions = "~mAggregatedQueryOptions~";
+		oBinding.bAggregatedQueryOptionsInitial = "~bAggregatedQueryOptionsInitial~";
+		oBinding.mCanUseCachePromiseByChildPath = "~mCanUseCachePromiseByChildPath~";
 		oBinding.sChangeReason = "~sChangeReason~";
+		oBinding.sChangeReasonAfterRemoveVirtualContext
+			= "~sChangeReasonAfterRemoveVirtualContext~";
 		this.mock(oBinding).expects("getUpdateGroupId").never();
+		this.mock(oBinding).expects("_fireChange").never();
 		this.mock(oBinding).expects("_fireRefresh").never();
 
 		// code under test
-		oBinding.reset("n/a");
+		oBinding.reset("n/a", undefined, undefined, /*bRestartAutoExpandSelect*/true);
 
+		assert.strictEqual(oBinding.mAggregatedQueryOptions, "~mAggregatedQueryOptions~");
+		assert.strictEqual(oBinding.bAggregatedQueryOptionsInitial,
+			"~bAggregatedQueryOptionsInitial~");
+		assert.strictEqual(oBinding.mCanUseCachePromiseByChildPath,
+			"~mCanUseCachePromiseByChildPath~");
 		assert.strictEqual(oBinding.sChangeReason, "~sChangeReason~");
+		assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
+			"~sChangeReasonAfterRemoveVirtualContext~");
 	});
 
 	//*********************************************************************************************
@@ -1357,6 +1373,54 @@ sap.ui.define([
 
 		assert.strictEqual(oBinding.sChangeReason, ChangeReason.Change);
 	});
+
+	//*********************************************************************************************
+[false, true].forEach(function (bRestartAutoExpandSelect) {
+	[false, true].forEach(function (bAutoExpandSelect) {
+		const sTitle = "reset: fired events and change reason"
+			+ ", bRestartAutoExpandSelect=" + bRestartAutoExpandSelect
+			+ ", oModel.bAutoExpandSelect=" + bAutoExpandSelect;
+
+	QUnit.test(sTitle, function (assert) {
+		this.oModel.bAutoExpandSelect = bAutoExpandSelect;
+		const oBinding = this.bindList("/EMPLOYEES");
+		oBinding.mAggregatedQueryOptions = "~mAggregatedQueryOptions~";
+		oBinding.bAggregatedQueryOptionsInitial = "~bAggregatedQueryOptionsInitial~";
+		oBinding.mCanUseCachePromiseByChildPath = "~mCanUseCachePromiseByChildPath~";
+		oBinding.sChangeReason = "~sOldChangeReason~";
+		oBinding.sChangeReasonAfterRemoveVirtualContext
+			= "~sChangeReasonAfterRemoveVirtualContext~";
+		const bExpectRestartAutoExpandSelect = bRestartAutoExpandSelect && bAutoExpandSelect;
+		this.mock(oBinding).expects("_fireChange").exactly(bExpectRestartAutoExpandSelect ? 1 : 0)
+			.withExactArgs({reason : ChangeReason.Change, detailedReason : "AddVirtualContext"})
+			.callsFake(function () {
+				assert.deepEqual(oBinding.mAggregatedQueryOptions, {});
+				assert.strictEqual(oBinding.bAggregatedQueryOptionsInitial, true);
+				assert.deepEqual(oBinding.mCanUseCachePromiseByChildPath, {});
+				assert.strictEqual(oBinding.sChangeReason, "AddVirtualContext");
+				assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
+					"~sNewChangeReason~");
+			});
+		this.mock(oBinding).expects("_fireRefresh").exactly(bExpectRestartAutoExpandSelect ? 0 : 1)
+			.withExactArgs({reason : "~sNewChangeReason~"});
+
+		// code under test
+		oBinding.reset("~sNewChangeReason~", undefined, "n/a", bRestartAutoExpandSelect);
+
+		if (!bExpectRestartAutoExpandSelect) {
+			assert.strictEqual(oBinding.sChangeReason, "~sNewChangeReason~");
+			// others remain unchanged
+			assert.strictEqual(oBinding.mAggregatedQueryOptions, "~mAggregatedQueryOptions~");
+			assert.strictEqual(oBinding.bAggregatedQueryOptionsInitial,
+				"~bAggregatedQueryOptionsInitial~");
+			assert.strictEqual(oBinding.mCanUseCachePromiseByChildPath,
+				"~mCanUseCachePromiseByChildPath~");
+			assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
+				"~sChangeReasonAfterRemoveVirtualContext~");
+		}
+	});
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("bindList with OData query options", function (assert) {
@@ -1968,10 +2032,12 @@ sap.ui.define([
 [false, true].forEach(function (bAsync) {
 	[false, true].forEach(function (bChanged) {
 		[undefined, true].forEach(function (bKeepCurrent) {
-			var sTitle = "getContexts: async=" + bAsync + ", changed=" + bChanged
-					+ ", bKeepCurrent=" + bKeepCurrent;
+			[undefined, "anotherReason"].forEach(function (sChangeReasonAfterRemoveVirtualContext) {
+	const sTitle = "getContexts: async=" + bAsync + ", changed=" + bChanged
+		+ ", bKeepCurrent=" + bKeepCurrent
+		+ ", sChangeReasonAfterRemoveVirtualContext=" + sChangeReasonAfterRemoveVirtualContext;
 
-	QUnit.test(sTitle, function (assert) {
+	QUnit.test(sTitle, async function (assert) {
 		var oBinding = this.bindList("n/a"),
 			aContexts = [],
 			oFetchContextsPromise = bAsync
@@ -1980,6 +2046,7 @@ sap.ui.define([
 			iMaximumPrefetchSize = bKeepCurrent ? 0 : 100,
 			aResults;
 
+		oBinding.sChangeReasonAfterRemoveVirtualContext = sChangeReasonAfterRemoveVirtualContext;
 		oBinding.bLengthFinal = true;
 		oBinding.oReadGroupLock = "~oReadGroupLock~";
 		oBinding.iCurrentBegin = 2;
@@ -2008,7 +2075,10 @@ sap.ui.define([
 			.returns("~bExpectMore~");
 		this.mock(oBinding).expects("_fireChange")
 			.exactly(bAsync && bChanged ? 1 : 0)
-			.withExactArgs({reason : ChangeReason.Change});
+			.withExactArgs({reason : sChangeReasonAfterRemoveVirtualContext ?? ChangeReason.Change})
+			.callsFake(function () {
+				assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext, undefined);
+			});
 
 		// code under test
 		aResults = oBinding.getContexts(5, 10, iMaximumPrefetchSize, bKeepCurrent);
@@ -2020,10 +2090,17 @@ sap.ui.define([
 		assert.strictEqual(oBinding.iCurrentEnd, bKeepCurrent ? 7 : 15);
 		if (bAsync) {
 			sinon.assert.callOrder(oCreateExpectation, oGetContextsExpectation);
+			assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
+				sChangeReasonAfterRemoveVirtualContext);
+		} else {
+			assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext, undefined);
 		}
 
-		return oFetchContextsPromise;
+		await oFetchContextsPromise;
+
+		assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext, undefined);
 	});
+			});
 		});
 	});
 });
@@ -2146,8 +2223,10 @@ sap.ui.define([
 	//*********************************************************************************************
 [false, /*see strictEqual below*/"true"].forEach(function (bUseExtendedChangeDetection) {
 	[/*destroyed early*/undefined, false, /*destroyed late*/0, true].forEach(function (bSuspend) {
-		var sTitle = "getContexts: AddVirtualContext, suspend:" + bSuspend
-				+ ", use extended change detection:" + bUseExtendedChangeDetection;
+		[undefined, "anotherReason"].forEach(function (sChangeReasonAfterRemoveVirtualContext) {
+	const sTitle = "getContexts: AddVirtualContext, suspend: " + bSuspend
+		+ ", use extended change detection: " + bUseExtendedChangeDetection
+		+ ", sChangeReasonAfterRemoveVirtualContext: " + sChangeReasonAfterRemoveVirtualContext;
 
 	QUnit.test(sTitle, function (assert) {
 		var oContext = Context.create({/*oModel*/}, oParentBinding, "/TEAMS('1')"),
@@ -2161,6 +2240,7 @@ sap.ui.define([
 
 		oBinding.bUseExtendedChangeDetection = bUseExtendedChangeDetection;
 		oBinding.sChangeReason = "AddVirtualContext";
+		oBinding.sChangeReasonAfterRemoveVirtualContext = sChangeReasonAfterRemoveVirtualContext;
 		oBindingMock.expects("checkSuspended").withExactArgs();
 		oBindingMock.expects("isResolved").withExactArgs().returns(true);
 		oAddTask0 = oModelMock.expects("addPrerenderingTask").withExactArgs(sinon.match.func, true);
@@ -2224,12 +2304,17 @@ sap.ui.define([
 				}).callsFake(function () {
 					assert.strictEqual(oBinding.sChangeReason, "RemoveVirtualContext");
 				});
-			oBindingMock.expects("reset").withExactArgs(ChangeReason.Refresh);
+			oBindingMock.expects("reset")
+				.withExactArgs(sChangeReasonAfterRemoveVirtualContext ?? ChangeReason.Refresh);
 		}
 
 		// code under test - call the 2nd prerendering task
 		oAddTask1.args[0][0]();
+
+		assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
+			sChangeReasonAfterRemoveVirtualContext, "unchanged");
 	});
+		});
 	});
 });
 
@@ -3739,15 +3824,18 @@ sap.ui.define([
 		{
 			mParameters : {$$operationMode : OperationMode.Server},
 			queryOptions : {"sap-client" : "111"},
-			vSorters : undefined
+			vSorters : undefined,
+			bSorterHasGroupPaths : false
 		}, {
 			mParameters : {$$operationMode : OperationMode.Server},
 			queryOptions : {$orderby : "foo", "sap-client" : "111"},
-			vSorters : new Sorter("foo")
+			vSorters : new Sorter("foo"),
+			bSorterHasGroupPaths : true
 		}, {
 			mParameters : {$$operationMode : OperationMode.Server, $orderby : "bar"},
 			queryOptions : {$orderby : "foo,bar", "sap-client" : "111"},
-			vSorters : [new Sorter("foo")]
+			vSorters : [new Sorter("foo")],
+			bSorterHasGroupPaths : false
 		}, {
 			oModel : new ODataModel({
 				operationMode : OperationMode.Server,
@@ -3755,7 +3843,8 @@ sap.ui.define([
 			}),
 			mParameters : {$orderby : "bar"},
 			queryOptions : {$orderby : "foo,bar", "sap-client" : "111"},
-			vSorters : [new Sorter("foo")]
+			vSorters : [new Sorter("foo")],
+			bSorterHasGroupPaths : false
 		}
 	].forEach(function (oFixture) {
 		[false, true].forEach(function (bSuspended) {
@@ -3768,7 +3857,12 @@ sap.ui.define([
 					oHelperMock = this.mock(_Helper),
 					oModel = oFixture.oModel || this.oModel,
 					oContext = Context.createNewContext(oModel, oParentBinding, "/TEAMS"),
-					aSorters = [];
+					aSorters = [new Sorter("foo")];
+
+				if (oFixture.bSorterHasGroupPaths) {
+					aSorters.push(new Sorter({path : "bar", groupPaths : ["~path~"]}));
+					aSorters.push(new Sorter("baz"));
+				}
 
 				oBinding = oModel.bindList("TEAM_2_EMPLOYEES", undefined, undefined, undefined,
 					oFixture.mParameters);
@@ -3802,7 +3896,8 @@ sap.ui.define([
 						this.oCachePromise = SyncPromise.resolve(this.oCache);
 					});
 				this.mock(oBinding).expects("reset").exactly(bSuspended ? 0 : 1)
-					.withExactArgs(ChangeReason.Sort);
+					.withExactArgs(ChangeReason.Sort, undefined, undefined,
+						/*bRestartAutoExpandSelect*/oFixture.bSorterHasGroupPaths);
 				this.mock(oBinding.oHeaderContext).expects("checkUpdate")
 					.exactly(bSuspended ? 0 : 1).withExactArgs();
 
@@ -8056,8 +8151,8 @@ sap.ui.define([
 		+ ", has $select = " + bHasSelect;
 
 	QUnit.test(sTitle, function (assert) {
+		this.oModel.bAutoExpandSelect = bAutoExpandSelect;
 		const oBinding = this.bindList("/EMPLOYEES");
-		oBinding.oModel.bAutoExpandSelect = bAutoExpandSelect;
 		if (bHasSorterWithGroupPaths) {
 			oBinding.aSorters = [
 				new Sorter({path : "n/a", groupPaths : ["a"]}),

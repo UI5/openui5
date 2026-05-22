@@ -21,7 +21,7 @@
 			if (document.querySelector("script[data-require-ui5-init]") || document.querySelector("script[data-require-ui5-noinit]")) {
 				const oScript = document.createElement("script");
 				oScript.setAttribute("id", "sap-ui-bootstrap");
-				oScript.setAttribute("src", sRes + "/sap-ui-integration.js");
+				oScript.setAttribute("src", sRes + "sap-ui-integration.js");
 				oScript.setAttribute("data-sap-ui-theme", "sap_horizon");
 				oScript.setAttribute("data-sap-ui-compatVersion", "edge");
 				oScript.setAttribute("data-sap-ui-async", "true");

@@ -23,6 +23,17 @@
 		"role": "category"
 	},
 	{
+		"key": "Category",
+		"path": "Category",
+		"dataType": "sap.ui.model.type.String",
+		"label": "Category",
+	 	"sortable": true,
+		"filterable": true,
+		"aggregatable": false,
+		"groupable": true,
+		"role": "category"
+	},
+	{
 		"key": "Price",
 		"path": "Price",
 		"dataType": "sap.ui.model.type.Float",
@@ -54,5 +65,27 @@
 		"aggregatable": true,
 		"groupable": false,
 		"role": "axis1"
+	},
+	{
+		"key": "Status",
+		"path": "Status",
+		"dataType": "sap.ui.model.type.String",
+		"label": "Status",
+		"sortable": true,
+		"filterable": true,
+		"aggregatable": false,
+		"groupable": true,
+		"role": "category"
+	},
+	{
+		"key": "SupplierName",
+		"path": "SupplierName",
+		"dataType": "sap.ui.model.type.String",
+		"label": "Supplier",
+		"sortable": true,
+		"filterable": true,
+		"aggregatable": false,
+		"groupable": true,
+		"role": "category"
 	}
 ]

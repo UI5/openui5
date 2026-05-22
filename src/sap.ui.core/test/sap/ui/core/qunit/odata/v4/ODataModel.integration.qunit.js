@@ -2422,18 +2422,23 @@ sap.ui.define([
 		 *
 		 * @param {object} assert
 		 *   The QUnit assert object
-		 * @param {object|string} vExpectedEventSourcePrefix
-		 *   Expected prefix of event source's <code>this.toString()</code> representation; an
-		 *   object is transformed into a string
+		 * @param {sap.ui.model.Binding|string} vExpectedEventSourcePrefix
+		 *   Expected prefix of event source's <code>this.toString()</code> representation; a
+		 *   binding is transformed into a string
 		 * @param {object[]} aExpectedEvents
 		 *   Expected events, each as <code>[this.toString(), sEventId, mParameters]</code> from the
 		 *   perspective of {@link sap.ui.base.EventProvider#fireEvent}. For convenience,
 		 *   <code>this.toString()</code> may omit <code>sExpectedEventSourcePrefix</code> and even
 		 *   be undefined. <code>undefined</code> need not be explicitly specified for event
 		 *   parameters.
+		 * @param {boolean} [bExactBinding]
+		 *   Whether to expect only events for the exact binding given in
+		 *   <code>vExpectedEventSourcePrefix</code>; must not be used if it is a string prefix
+		 *   which targets multiple bindings
 		 * @returns {object} The test instance for chaining
 		 */
-		expectEvents : function (assert, vExpectedEventSourcePrefix, aExpectedEvents) {
+		expectEvents : function (assert, vExpectedEventSourcePrefix, aExpectedEvents,
+				bExactBinding) {
 			var sExpectedEventSourcePrefix = String(vExpectedEventSourcePrefix),
 				that = this;
 
@@ -2441,7 +2446,9 @@ sap.ui.define([
 				var aDetails,
 					sThis = this.toString();
 
-				if (sThis.startsWith(sExpectedEventSourcePrefix)) {
+				if (bExactBinding
+						? sThis === sExpectedEventSourcePrefix
+						: sThis.startsWith(sExpectedEventSourcePrefix)) {
 					aDetails = [sThis, sEventId, mParameters];
 
 					assert.deepEqual(aDetails, that.aExpectedEvents.shift(),
@@ -3936,6 +3943,10 @@ sap.ui.define([
 	// BCP: 2080228141
 	//
 	// Call some APIs before resolving the ODLB (JIRA: CPOUI5ODATAV4-2408)
+	//
+	// A Sorter with groupPaths which is set while the binding is unresolved does not influence the
+	// sent events.
+	// JIRA: CPOUI5ODATAV4-3490
 	QUnit.test("BCP: 2080228141 - autoExpandSelect & late ODLB#setContext", function (assert) {
 		var oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
 			sView = '\
@@ -3954,7 +3965,7 @@ sap.ui.define([
 			var oBinding = that.oView.byId("table").getBinding("rows");
 
 			oBinding.filter(new Filter("SalesOrderID", FilterOperator.NE, "00"));
-			oBinding.sort(new Sorter("SalesOrderID"));
+			oBinding.sort(new Sorter({groupPaths : ["Note"], path : "SalesOrderID"}));
 			oBinding.changeParameters({$count : true, custom : "foo"});
 
 			that.expectEvents(assert, "sap.ui.model.odata.v4.ODataListBinding: /SalesOrderList|", [
@@ -3965,8 +3976,8 @@ sap.ui.define([
 					[, "change", {reason : "change"}],
 					[, "dataReceived", {data : {}}]
 				])
-				.expectRequest("SalesOrderList?$count=true&custom=foo&$orderby=SalesOrderID"
-					+ "&$filter=SalesOrderID ne '00'&$select=Note,SalesOrderID&$skip=0&$top=3", {
+				.expectRequest("SalesOrderList?$count=true&custom=foo&$select=Note,SalesOrderID"
+					+ "&$orderby=SalesOrderID&$filter=SalesOrderID ne '00'&$skip=0&$top=3", {
 					"@odata.count" : "3",
 					value : [
 						{SalesOrderID : "01", Note : "Note 1"},
@@ -7017,6 +7028,8 @@ sap.ui.define([
 	// * Select a sales order and see that sales order details are fitting to the selected sales
 	//   order
 	// This test is a simplification of that scenario with a different service.
+	//
+	// Without autoExpandSelect the Sorter's groupPaths are not evaluated (JIRA: CPOUI5ODATAV4-3490)
 	QUnit.test("Absolute ODLB with sort, relative ODCB resolved on selection", function (assert) {
 		var oForm,
 			oTable,
@@ -7043,7 +7056,13 @@ sap.ui.define([
 			oTable = that.oView.byId("table");
 			oTableBinding = oTable.getBinding("items");
 
-			that.expectRequest("EMPLOYEES?$expand=EMPLOYEE_2_MANAGER&$orderby=Name"
+			that.expectEvents(assert, oTableBinding, [
+					[, "refresh", {reason : "sort"}],
+					[, "dataRequested"],
+					[, "change", {reason : "sort"}],
+					[, "dataReceived", {data : {}}]
+				], true)
+				.expectRequest("EMPLOYEES?$expand=EMPLOYEE_2_MANAGER&$orderby=Name"
 					+ "&$skip=0&$top=100", {
 					value : [
 						{Name : "Frederic Fall", EMPLOYEE_2_MANAGER : {ID : "1"}},
@@ -7053,7 +7072,7 @@ sap.ui.define([
 				.expectChange("name", ["Frederic Fall", "Jonathan Smith"]);
 
 			// code under test
-			oTableBinding.sort(new Sorter("Name"));
+			oTableBinding.sort(new Sorter({groupPaths : ["ID"], path : "Name"}));
 
 			return that.waitForChanges(assert);
 		}).then(function () {
@@ -67617,7 +67636,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// If the nested list binding uses E.C.D., addt'l issues have to be avoided.
 	// BCP: 360698 / 2021
 	//
-	// $select/$expand are enriched by the Sorter's groupPaths (JIRA: CPOUI5ODATAV4-3151)
+	// If Sorters are given in the ODLB constructor, $select/$expand are enriched by the Sorter's
+	// groupPaths.
+	// JIRA: CPOUI5ODATAV4-3151
+	//
+	// When using ODLB#sort API, $select/$expand are updated and only the new groupPaths are taken
+	// into account. Observe the binding's events to see the proper change reasons are used.
+	// JIRA: CPOUI5ODATAV4-3490
 	[
 		undefined,
 		"AGE",
@@ -67636,10 +67661,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						// ]});
 					}
 				},
+				oItemsBinding,
 				oModel = this.createTeaBusiModel({autoExpandSelect : true}),
 				oTable,
 				sView = `
-	<Table growing="true" id="table" items="{
+	<Table growing="true" growingThreshold="3" id="table" items="{
 			groupHeaderFactory : '.getGroupHeader',
 			path : '/EMPLOYEES',
 			sorter : {group : true, path : 'AGE', groupPaths : ['STATUS', 'EMPLOYEE_2_TEAM/Name']}
@@ -67673,7 +67699,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			this.expectRequest("EMPLOYEES?$select=AGE,ID,Name,STATUS"
 					+ "&$expand=EMPLOYEE_2_EQUIPMENTS($select=Category,ID)"
-					+ ",EMPLOYEE_2_TEAM($select=Name,Team_Id)&$orderby=AGE&$skip=0&$top=20", {
+					+ ",EMPLOYEE_2_TEAM($select=Name,Team_Id)&$orderby=AGE&$skip=0&$top=3", {
 					value : [{
 						AGE : 23,
 						EMPLOYEE_2_EQUIPMENTS : [{Category : "F1", ID : 21}],
@@ -67706,8 +67732,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("name", ["Frederic Fall", "Jonathan Smith", "Peter Burke"]);
 
 			return this.createView(assert, sView, oModel, oController).then(function () {
-				var oItemsBinding;
-
 				oTable = that.oView.byId("table");
 				oItemsBinding = oTable.getBinding("items");
 				checkItems(oTable.getItems(), [
@@ -67731,7 +67755,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				that.expectRequest("EMPLOYEES?$select=AGE,ID,Name,STATUS"
 						+ "&$expand=EMPLOYEE_2_EQUIPMENTS($select=Category,ID)"
-						+ ",EMPLOYEE_2_TEAM($select=Name,Team_Id)&$orderby=AGE&$skip=0&$top=20", {
+						+ ",EMPLOYEE_2_TEAM($select=Name,Team_Id)&$orderby=AGE&$skip=0&$top=3", {
 						value : [{
 							AGE : 42, // surprise!
 							EMPLOYEE_2_EQUIPMENTS : [{Category : "F1*", ID : 21}],
@@ -67781,13 +67805,89 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oItemsBinding.refresh();
 
 				return that.waitForChanges(assert);
-			}).then(function () {
+			}).then(async function () {
 				checkItems(oTable.getItems(), [
 					"sap.m.GroupHeaderListItem",
 					"sap.m.ColumnListItem",
 					"sap.m.ColumnListItem",
 					"sap.m.ColumnListItem"
 				], ["42", "42,F1*,Frederic Fall", "42,,Jonathan Smith", "42,P1,P2,Peter Burke"]);
+
+				if (vKey) {
+					return; // E.C.D. not relevant for the following tests
+				}
+
+				that.expectEvents(assert, oItemsBinding, [
+						[, "change", {detailedReason : "AddVirtualContext", reason : "change"}],
+						[, "dataRequested"],
+						[, "change", {detailedReason : "RemoveVirtualContext", reason : "change"}],
+						[, "refresh", {reason : "sort"}],
+						[, "change", {reason : "sort"}],
+						[, "dataReceived", {data : {}}]
+					], true)
+					.expectRequest("EMPLOYEES?$select=AGE,ID,Name,TEAM_ID"
+						+ "&$expand=EMPLOYEE_2_EQUIPMENTS($select=Category,EmployeeId,ID,Name)"
+						+ "&$orderby=AGE,ID&$skip=0&$top=3", {
+						value : [{
+							AGE : 42,
+							EMPLOYEE_2_EQUIPMENTS : [
+								{Category : "F1*", EmployeeId : "007", ID : 21, Name : "n/a"}
+							],
+							ID : "2",
+							Name : "Frederic Fall",
+							TEAM_ID : "TEAM_01"
+						}, {
+							AGE : 42,
+							EMPLOYEE_2_EQUIPMENTS : [],
+							ID : "3",
+							Name : "Jonathan Smith",
+							TEAM_ID : "TEAM_01"
+						}, {
+							AGE : 42,
+							EMPLOYEE_2_EQUIPMENTS : [
+								{Category : "P1", EmployeeId : "007", ID : 41, Name : "n/a"},
+								{Category : "P2", EmployeeId : "007", ID : 42, Name : "n/a"}
+							],
+							ID : "4",
+							Name : "Peter Burke",
+							TEAM_ID : "TEAM_01"
+						}]
+					})
+					.expectChange("age", ["42", "42", "42"])
+					.expectChange("name", ["Frederic Fall", "Jonathan Smith", "Peter Burke"])
+					.expectChange("category", ["P1", "P2"])
+					.expectChange("category", ["F1*"]);
+
+				// code under test (JIRA: CPOUI5ODATAV4-3490)
+				oItemsBinding.sort([
+					new Sorter({groupPaths : ["EMPLOYEE_2_EQUIPMENTS/EmployeeId"], path : "AGE"}),
+					new Sorter({groupPaths : ["TEAM_ID", "EMPLOYEE_2_EQUIPMENTS/Name"], path : "ID"})
+				]);
+
+				await that.waitForChanges(assert);
+
+				that.expectEvents(assert, oItemsBinding, [
+						[, "dataRequested"],
+						[, "change", {reason : "change"}],
+						[, "dataReceived", {data : {}}]
+					], true)
+					.expectRequest("EMPLOYEES?$select=AGE,ID,Name,TEAM_ID"
+						+ "&$expand=EMPLOYEE_2_EQUIPMENTS($select=Category,EmployeeId,ID,Name)"
+						+ "&$orderby=AGE,ID&$skip=3&$top=1", {
+						value : [{
+							AGE : 42,
+							EMPLOYEE_2_EQUIPMENTS : [],
+							ID : "5",
+							Name : "Carla Blue",
+							TEAM_ID : "TEAM_01"
+						}]
+					})
+					.expectChange("age", [,,, "42"])
+					.expectChange("name", [,,, "Carla Blue"]);
+
+				oTable.requestItems(1);
+
+				return that.waitForChanges(assert);
 			});
 		});
 	});

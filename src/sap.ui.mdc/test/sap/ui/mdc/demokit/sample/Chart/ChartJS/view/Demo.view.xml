@@ -6,56 +6,179 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:mdc="sap.ui.mdc"
 	xmlns:mdcc="sap.ui.mdc.chart"
+	xmlns:mdcvh="sap.ui.mdc.valuehelp"
+	xmlns:mdcvc="sap.ui.mdc.valuehelp.content"
 	xmlns:variants="sap.ui.fl.variants"
+	xmlns:mdcat="sap.ui.mdc.actiontoolbar"
 	xmlns="sap.m">
 	<App id="app">
-		<Page>
-			<customHeader>
-				<Toolbar>
-					<Text text=" This sample is provided as a demo and is not officially supported. Please, use it for reference only." class="sapUiSmallMarginBottom" />
-					<ToolbarSpacer/>
-				</Toolbar>
-			</customHeader>
-			<mdc:Chart id="chart"
-					   autoBindOnInit="true"
-					   noDataText="Oops, something went wrong..."
-					   p13nMode="Type,Item,Sort,Filter"
-					   showChartTooltip="true"
-					   showSelectionDetails="false"
-					   legendVisible="true"
-					   delegate="{
-				'name': 'sap/ui/mdc/demokit/sample/Chart/ChartJS/delegate/ChartJSDelegate',
-				'payload': {
-					model: 'products>/',
-					infomodel: 'propertyinfos'
-				}
-			}"
-					   chartType="bar"
-					   header="Products"
-					   height="100%"
-					   width="100%"
-					   ignoreToolbarActions= "DrillDownUp">
-<!--				<mdc:chartActions>-->
-<!--					<SegmentedButton selectedKey="chart">-->
-<!--						<items>-->
-<!--							<SegmentedButtonItem icon="sap-icon://chart-table-view" key="chart-table"/>-->
-<!--							<SegmentedButtonItem icon="sap-icon://bar-chart" key="chart"/>-->
-<!--							<SegmentedButtonItem icon="sap-icon://table-view" key="table"/>-->
-<!--						</items>-->
-<!--						<layoutData>-->
-<!--							<mdcc:ActionLayoutData position="PersonalizationActionsDrillDown"/>-->
-<!--						</layoutData>-->
-<!--					</SegmentedButton>-->
-<!--				</mdc:chartActions>-->
-				<mdc:variant>
-					<variants:VariantManagement id="IDVariantManagementOfChart" for="chart"/>
-				</mdc:variant>
-				<mdc:items>
-					<mdcc:Item propertyKey="Name" type="groupable" label="Name" role="category" />
-					<mdcc:Item propertyKey="Price" type="aggregatable" role="axis1" label="Price"/>
-					<mdcc:Item propertyKey="Quantity" type="aggregatable" role="axis1" label="Quantity"/>
-				</mdc:items>
-			</mdc:Chart>
+		<Page title="Filterable Product Chart" titleLevel="H1">
+			<content>
+				<mdc:FilterBar id="productsFilterBar"
+					class="sapUiSmallMarginBottom sapUiSmallMarginBegin sapUiSmallMarginEnd"
+					filtersChanged=".onFiltersChanged"
+					delegate="{
+						'name': 'sap/ui/mdc/demokit/sample/Chart/ChartJS/delegate/FilterBarDelegate',
+						'payload': {
+							model: 'products>/',
+							infomodel: 'propertyinfos'
+						}
+					}">
+						<mdc:filterItems>
+							<mdc:FilterField
+								id="productsFilterBar--filter--Name"
+								propertyKey="Name"
+								label="Name"
+								dataType="sap.ui.model.type.String"
+								conditions="{$filters>/conditions/Name}"
+								operators="EQ"
+								maxConditions="-1"
+								valueHelp="VH-Name"
+								delegate="{name: 'sap/ui/mdc/field/FieldBaseDelegate'}"/>
+							<mdc:FilterField
+								id="productsFilterBar--filter--Category"
+								propertyKey="Category"
+								label="Category"
+								dataType="sap.ui.model.type.String"
+								conditions="{$filters>/conditions/Category}"
+								operators="EQ"
+								maxConditions="-1"
+								valueHelp="VH-Category"
+								delegate="{name: 'sap/ui/mdc/field/FieldBaseDelegate'}"/>
+							<mdc:FilterField
+								id="productsFilterBar--filter--Status"
+								propertyKey="Status"
+								label="Status"
+								dataType="sap.ui.model.type.String"
+								conditions="{$filters>/conditions/Status}"
+								operators="EQ"
+								maxConditions="-1"
+								valueHelp="VH-Status"
+								delegate="{name: 'sap/ui/mdc/field/FieldBaseDelegate'}"/>
+							<mdc:FilterField
+								id="productsFilterBar--filter--SupplierName"
+								propertyKey="SupplierName"
+								label="Supplier"
+								dataType="sap.ui.model.type.String"
+								conditions="{$filters>/conditions/SupplierName}"
+								operators="EQ"
+								maxConditions="-1"
+								valueHelp="VH-SupplierName"
+								delegate="{name: 'sap/ui/mdc/field/FieldBaseDelegate'}"/>
+							<mdc:FilterField
+								propertyKey="Price"
+								label="Price"
+								dataType="sap.ui.model.type.Float"
+								conditions="{$filters>/conditions/Price}"
+								maxConditions="-1"
+								delegate="{name: 'sap/ui/mdc/field/FieldBaseDelegate'}"/>
+							<mdc:FilterField
+								propertyKey="Quantity"
+								label="Quantity"
+								dataType="sap.ui.model.type.Float"
+								conditions="{$filters>/conditions/Quantity}"
+								maxConditions="-1"
+								delegate="{name: 'sap/ui/mdc/field/FieldBaseDelegate'}"/>
+						</mdc:filterItems>
+
+						<mdc:dependents>
+							<!-- Value Help: Name -->
+							<mdc:ValueHelp id="VH-Name"
+								delegate="{name: 'sap/ui/mdc/demokit/sample/Chart/ChartJS/delegate/JSONValueHelpDelegate', payload: {collectionPath: 'products>/', searchKeys: ['Name'], columns: [{header: 'Name', path: 'Name'}, {header: 'Category', path: 'Category'}, {header: 'Supplier', path: 'SupplierName'}], keyPath: 'Name', descriptionPath: 'Name'}}">
+								<mdc:typeahead>
+									<mdcvh:Popover id="VH-Name-pop" title="Select Name">
+										<mdcvc:MTable id="VH-Name-pop-mt" keyPath="Name" descriptionPath="Name"/>
+									</mdcvh:Popover>
+								</mdc:typeahead>
+								<mdc:dialog>
+									<mdcvh:Dialog id="VH-Name-dlg" title="Select Product Name">
+										<mdcvc:MTable id="VH-Name-dlg-mt" keyPath="Name" descriptionPath="Name"/>
+									</mdcvh:Dialog>
+								</mdc:dialog>
+							</mdc:ValueHelp>
+
+							<!-- Value Help: Category -->
+							<mdc:ValueHelp id="VH-Category"
+								delegate="{name: 'sap/ui/mdc/demokit/sample/Chart/ChartJS/delegate/JSONValueHelpDelegate', payload: {collectionPath: 'products>/', searchKeys: ['Category'], columns: [{header: 'Category', path: 'Category'}], keyPath: 'Category', descriptionPath: 'Category'}}">
+								<mdc:typeahead>
+									<mdcvh:Popover id="VH-Category-pop" title="Select Category">
+										<mdcvc:MTable id="VH-Category-pop-mt" keyPath="Category" descriptionPath="Category"/>
+									</mdcvh:Popover>
+								</mdc:typeahead>
+								<mdc:dialog>
+									<mdcvh:Dialog id="VH-Category-dlg" title="Select Category">
+										<mdcvc:MTable id="VH-Category-dlg-mt" keyPath="Category" descriptionPath="Category"/>
+									</mdcvh:Dialog>
+								</mdc:dialog>
+							</mdc:ValueHelp>
+
+							<!-- Value Help: Status -->
+							<mdc:ValueHelp id="VH-Status"
+								delegate="{name: 'sap/ui/mdc/demokit/sample/Chart/ChartJS/delegate/JSONValueHelpDelegate', payload: {collectionPath: 'products>/', searchKeys: ['Status'], columns: [{header: 'Status', path: 'Status'}], keyPath: 'Status', descriptionPath: 'Status'}}">
+								<mdc:typeahead>
+									<mdcvh:Popover id="VH-Status-pop" title="Select Status">
+										<mdcvc:MTable id="VH-Status-pop-mt" keyPath="Status" descriptionPath="Status"/>
+									</mdcvh:Popover>
+								</mdc:typeahead>
+								<mdc:dialog>
+									<mdcvh:Dialog id="VH-Status-dlg" title="Select Status">
+										<mdcvc:MTable id="VH-Status-dlg-mt" keyPath="Status" descriptionPath="Status"/>
+									</mdcvh:Dialog>
+								</mdc:dialog>
+							</mdc:ValueHelp>
+
+							<!-- Value Help: SupplierName -->
+							<mdc:ValueHelp id="VH-SupplierName"
+								delegate="{name: 'sap/ui/mdc/demokit/sample/Chart/ChartJS/delegate/JSONValueHelpDelegate', payload: {collectionPath: 'products>/', searchKeys: ['SupplierName'], columns: [{header: 'Supplier', path: 'SupplierName'}], keyPath: 'SupplierName', descriptionPath: 'SupplierName'}}">
+								<mdc:typeahead>
+									<mdcvh:Popover id="VH-SupplierName-pop" title="Select Supplier">
+										<mdcvc:MTable id="VH-SupplierName-pop-mt" keyPath="SupplierName" descriptionPath="SupplierName"/>
+									</mdcvh:Popover>
+								</mdc:typeahead>
+								<mdc:dialog>
+									<mdcvh:Dialog id="VH-SupplierName-dlg" title="Select Supplier">
+										<mdcvc:MTable id="VH-SupplierName-dlg-mt" keyPath="SupplierName" descriptionPath="SupplierName"/>
+									</mdcvh:Dialog>
+								</mdc:dialog>
+							</mdc:ValueHelp>
+						</mdc:dependents>
+					</mdc:FilterBar>
+				<mdc:Chart id="chart"
+					autoBindOnInit="true"
+					filter="productsFilterBar"
+					noDataText="Oops, something went wrong..."
+					p13nMode="Type,Item,Sort,Filter"
+					showChartTooltip="true"
+					showSelectionDetails="true"
+					legendVisible="true"
+					delegate="{
+						'name': 'sap/ui/mdc/demokit/sample/Chart/ChartJS/delegate/ChartJSDelegate',
+						'payload': {
+							model: 'products>/',
+							infomodel: 'propertyinfos'
+						}
+					}"
+					chartType="bar"
+					header="Products"
+					height="60vh"
+					width="100%"
+					ignoreToolbarActions="DrillDownUp">
+					<mdc:variant>
+						<variants:VariantManagement id="IDVariantManagementOfChart" for="chart"/>
+					</mdc:variant>
+					<mdc:actions>
+						<mdcat:ActionToolbarAction id="chartAction-begin-1"
+							layoutInformation="{aggregationName: 'end', alignment: 'Begin'}">
+							<Button id="chartBtn-export" icon="sap-icon://download" tooltip="Download as PNG" press=".onExportChartPress"/>
+						</mdcat:ActionToolbarAction>
+					</mdc:actions>
+					<mdc:items>
+						<mdcc:Item propertyKey="Name" type="groupable" label="Name" role="category" />
+						<mdcc:Item propertyKey="Price" type="aggregatable" role="axis1" label="Price"/>
+						<mdcc:Item propertyKey="Quantity" type="aggregatable" role="axis1" label="Quantity"/>
+					</mdc:items>
+				</mdc:Chart>
+			</content>
 		</Page>
 	</App>
 </mvc:View>

@@ -34,8 +34,8 @@ sap.ui.define([
 	 * @alias sap.ui.model.analytics.odata4analytics
 	 * @protected
 	 */
-	var odata4analytics = odata4analytics || {},
-		rOnlyDigits = /^\d+$/;
+	const odata4analytics = {};
+	const rOnlyDigits = /^\d+$/;
 
 	odata4analytics.constants = {};
 	odata4analytics.constants["SAP_NAMESPACE"] = "http://www.sap.com/Protocols/SAPData";

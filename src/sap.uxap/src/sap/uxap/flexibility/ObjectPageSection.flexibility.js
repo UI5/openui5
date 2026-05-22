@@ -3,9 +3,11 @@
  */
 
 sap.ui.define([
+	'sap/uxap/changeHandler/AddIFrameObjectPageSection',
 	'sap/uxap/changeHandler/RenameObjectPageSection',
 	'sap/uxap/changeHandler/UnstashObjectPageSection'
 ], function (
+	AddIFrameObjectPageSection,
 	RenameObjectPageSection,
 	UnstashObjectPageSection
 ) {
@@ -14,6 +16,9 @@ sap.ui.define([
 	return {
 		"rename": RenameObjectPageSection,
 		"moveControls": "default",
+		"addIFrame": {
+			"changeHandler": AddIFrameObjectPageSection
+		},
 		"hideControl": {
 			"changeHandler": "default",
 			"layers": {

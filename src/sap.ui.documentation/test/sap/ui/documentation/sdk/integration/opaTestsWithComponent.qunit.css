@@ -1,3 +1,4 @@
 .sapUiOpaComponent {
 	position: relative;
+	min-width: 1024px;
 }
