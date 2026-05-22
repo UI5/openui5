@@ -41,8 +41,10 @@
 									class="sapUxAPObjectPageSubSectionAlignContent"
 									width="auto">
 									<layout:VerticalLayout content="{path: 'notes', templateShareable: false}" width="100%">
-										<m:Text visible="{= !${versionData>/isOpenUI5} }" width="100%" text="[{type}] {text} (included in {version})"/>
-										<m:Text visible="{versionData>/isOpenUI5}" width="100%" text="[{type}] {text}"/>
+										<m:VBox width="100%">
+											<m:Text visible="{= !${versionData>/isOpenUI5} }" width="100%" text="[{type}] {text} (included in {version})"/>
+											<m:Text visible="{versionData>/isOpenUI5}" width="100%" text="[{type}] {text}"/>
+										</m:VBox>
 									</layout:VerticalLayout>
 								</m:Panel>
 							</layout:VerticalLayout>
