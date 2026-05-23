@@ -205,6 +205,11 @@ sap.ui.define([
 		this._sWidth = this._sHeight = undefined;
 		this._iCurrentTile = this._iPreviousTile = undefined;
 
+		if (this._fnResizeHandler) {
+			jQuery(window).off("resize", this._fnResizeHandler);
+			this._fnResizeHandler = null;
+		}
+
 		//Applies new dimensions for the SlideTile if it is inscribed inside a GridContainer
 		if (this.getParent() && this.getParent().isA("sap.f.GridContainer")){
 			this._applyNewDim();
@@ -279,6 +284,10 @@ sap.ui.define([
 	 */
 	SlideTile.prototype.exit = function () {
 		this._stopAnimation();
+		if (this._fnResizeHandler) {
+			jQuery(window).off("resize", this._fnResizeHandler);
+			this._fnResizeHandler = null;
+		}
 		if (this._oMoreIcon) {
 			this._oMoreIcon.destroy();
 		}
@@ -453,33 +462,46 @@ sap.ui.define([
 
 	/* --- Helpers --- */
 	/**
+	 * Sets up a window resize handler that adjusts size-related CSS classes and background image placement
+	 * based on the current tile width. Stores the handler as <code>this._fnResizeHandler</code> so it can
+	 * be deregistered in <code>onBeforeRendering</code> and <code>exit</code> to prevent listener accumulation
+	 * across rerenders.
 	 * @private
 	 */
 	SlideTile.prototype._setupResizeClassHandler = function () {
-		var fnCheckMedia = function () {
+		// Deregister any previously stored handler to prevent accumulation across rerenders.
+		if (this._fnResizeHandler) {
+			jQuery(window).off("resize", this._fnResizeHandler);
+		}
+
+		this._fnResizeHandler = function () {
 			var oParent = this.getParent();
 			if (oParent && oParent.isA("sap.f.GridContainer")) {
 				this._applyNewDim();
 			}
-			if (this.getSizeBehavior() === TileSizeBehavior.Small || window.matchMedia("(max-width: 374px)").matches || this._hasStretchTiles()){
+			if (this.getSizeBehavior() === TileSizeBehavior.Small || window.matchMedia("(max-width: 374px)").matches || this._hasStretchTiles()) {
 				this.$().addClass("sapMTileSmallPhone");
 			} else {
 				this.$().removeClass("sapMTileSmallPhone");
 			}
 			/* Slide Tile content gets adjusted dynamically with 100% width, articleType and frameType as Stretch for more than 800px */
-            var bIsScreenLarge = this.getDomRef()?.offsetWidth >= 800;
-            this.toggleStyleClass("sapMSTLargeScreen", bIsScreenLarge);
-            if (bIsScreenLarge) {
-                this.getTiles().forEach((oTile) => oTile._setHeaderContentBackgroundImage());
-            }
-            /* Apply 4px padding between the title and the image of the slide tile when height is less than 180px */
-            if (this.getDomRef()?.offsetHeight < 180) {
-                this.addStyleClass("sapMSTSmallScreen");
-            }
+			var bIsScreenLarge = this.getDomRef()?.offsetWidth >= 800;
+			this.toggleStyleClass("sapMSTLargeScreen", bIsScreenLarge);
+			if (bIsScreenLarge) {
+				// Large screen: move background-image from root → hdrContent for right-side image layout.
+				this.getTiles().forEach((oTile) => oTile._setHeaderContentBackgroundImage());
+			} else {
+				// Small screen: restore background-image to root so CSS can render it inline.
+				this.getTiles().forEach((oTile) => oTile._resetHeaderContentBackgroundImage());
+			}
+			/* Apply 4px padding between the title and the image of the slide tile when height is less than 180px */
+			if (this.getDomRef()?.offsetHeight < 180) {
+				this.addStyleClass("sapMSTSmallScreen");
+			}
 		}.bind(this);
 
-		jQuery(window).on("resize", fnCheckMedia);
-		fnCheckMedia();
+		jQuery(window).on("resize", this._fnResizeHandler);
+		this._fnResizeHandler();
 	};
 
 	/**

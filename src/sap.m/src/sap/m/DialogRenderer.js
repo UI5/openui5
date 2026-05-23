@@ -19,6 +19,9 @@ sap.ui.define([
 	// shortcut for sap.ui.core.ValueState
 	var ValueState = coreLibrary.ValueState;
 
+	// shortcut for library resource bundle
+	const oResourceBundle = Library.getResourceBundleFor("sap.m");
+
 	/**
 	 * Dialog renderer.
 	 *
@@ -200,8 +203,12 @@ sap.ui.define([
 		}
 
 		if (oHeader || oSubHeader) {
-			oRM.openStart("header")
+			oRM.openStart("div")
+				.attr("role", "region")
+				.attr("aria-label", oResourceBundle.getText("DIALOG_REGION_HEADER"))
+				.class("sapMDialogHeader")
 				.openEnd();
+
 			if (oHeader) {
 				if (oHeader._applyContextClassFor) {
 					oHeader._applyContextClassFor("header");
@@ -225,7 +232,7 @@ sap.ui.define([
 					.renderControl(oSubHeader)
 					.close("div");
 			}
-			oRM.close("header");
+			oRM.close("div");
 
 		}
 
@@ -233,7 +240,9 @@ sap.ui.define([
 			oRM.renderControl(oValueStateText);
 		}
 
-		oRM.openStart("section", sId + "-cont")
+		oRM.openStart("div", sId + "-cont")
+			.attr("role", "region")
+			.attr("aria-label", oResourceBundle.getText("DIALOG_REGION_CONTENT"))
 			.class("sapMDialogSection")
 			.openEnd();
 
@@ -254,12 +263,15 @@ sap.ui.define([
 
 		oRM.close("div")
 			.close("div")
-			.close("section");
+			.close("div");
 
 		if (hasFooter) {
-			oRM.openStart("footer")
+			oRM.openStart("div")
+				.attr("role", "region")
+				.attr("aria-label", oResourceBundle.getText("DIALOG_REGION_FOOTER"))
 				.class("sapMDialogFooter")
 				.openEnd();
+
 			if (oFooter) {
 				if (oFooter._applyContextClassFor) {
 					oFooter._applyContextClassFor("footer");
@@ -271,7 +283,7 @@ sap.ui.define([
 				}
 				oRM.renderControl(oDialog._oToolbar);
 			}
-			oRM.close("footer");
+			oRM.close("div");
 		}
 
 		if (Device.system.desktop) {

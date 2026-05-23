@@ -112,7 +112,9 @@ sap.ui.define([
 	function checkAndUpdateURLParameters(sFlexReference, oAppComponent, sHash) {
 		const oURLParsingService = getUShellService("URLParsing");
 		const oParsedHash = oURLParsingService?.parseShellHash(sHash || hasher.getHash());
-		let vRelevantParameters = ObjectPath.get(["params", VariantUtil.VARIANT_TECHNICAL_PARAMETER], oParsedHash);
+		let vRelevantParameters = oParsedHash
+			? ObjectPath.get(["params", VariantUtil.VARIANT_TECHNICAL_PARAMETER], oParsedHash)
+			: undefined;
 		// In legacy urls the parameter was present multiple times
 		if (Array.isArray(vRelevantParameters) && vRelevantParameters.length === 1) {
 			vRelevantParameters = vRelevantParameters[0].split(",");

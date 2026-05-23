@@ -24,6 +24,8 @@ sap.ui.define([
 	"sap/ui/model/FilterType",
 	"sap/ui/model/FilterOperator",
 	"sap/ui/model/Sorter",
+	"sap/ui/model/type/String",
+	"sap/ui/model/type/Date",
 	"sap/m/library",
 	"sap/m/Table",
 	"sap/m/Column",
@@ -59,6 +61,8 @@ sap.ui.define([
 	FilterType,
 	FilterOperator,
 	Sorter,
+	StringType,
+	DateType,
 	mLibrary,
 	Table,
 	Column,
@@ -163,17 +167,18 @@ sap.ui.define([
 	const _init = (bTypeahead) => {
 		oModel = new JSONModel({
 			items: [
-				{ text: "Item 1", key: "I1", additionalText: "Text 1", inValue: "" },
-				{ text: "Item 2", key: "I2", additionalText: "Text 2", inValue: null },
-				{ text: "X-Item 3", key: "I3", additionalText: "Text 3", inValue: "3" }
+				{ text: "Item 1", key: "I1", additionalText: "Text 1", inValue: "", date: new Date(2026, 4, 12) },
+				{ text: "Item 2", key: "I2", additionalText: "Text 2", inValue: null, date: null },
+				{ text: "X-Item 3", key: "I3", additionalText: "Text 3", inValue: "3", date: new Date(2026, 4, 12) }
 			]
 		});
 
 		oItemTemplate = new ColumnListItem("MyItem", {
 			type: "Active",
-			cells: [new Text({text: "{key}"}),
-					new Text({text: "{text}"}),
-					new Text({text: "{additionalText}"})]
+			cells: [new Text({text: {path: "key", type: new StringType({}, {maxLength: 2})}}),
+					new Text({text: {path: "text", type: new StringType()}}),
+					new Text({text: {path: "additionalText", type: new StringType()}}),
+					new Text({text: {path: "date", type: new DateType({style: "short"})}})]
 		});
 
 		oTable = new Table("T1", {
@@ -181,7 +186,8 @@ sap.ui.define([
 			mode: bTypeahead ? ListMode.SingleSelectMaster : ListMode.MultiSelect,
 			columns: [ new Column({header: new Label({text: "Id"})}),
 					   new Column({header: new Label({text: "Text"})}),
-					   new Column({header: new Label({text: "Info"})})],
+					   new Column({header: new Label({text: "Info"})}),
+					new Column({header: new Label({text: "Date"})})],
 			items: {path: "/items", template: oItemTemplate, templateShareable: false}
 		});
 
@@ -2154,9 +2160,20 @@ sap.ui.define([
 		const oListBinding = oTable.getBinding("items");
 		sinon.stub(ValueHelpDelegate, "isSearchSupported").returns(true);
 
-		const oFilterBar = new FilterBar("FB1");
+		const oFilterBar = new FilterBar("FB1", {
+			propertyInfo:
+				[
+					{"key": "key", "dataType":"sap.ui.model.type.String", "constraints": {"maxLength": 2}, "maxConditions": -1, "required": false, "label": "Id"},
+					{"key": "text", "dataType":"sap.ui.model.type.String", "maxConditions": -1, "required": false, "label": "Text"},
+					{"key": "additionalText", "dataType":"sap.ui.model.type.String", "maxConditions": -1, "required": false, "label": "Info"},
+					{"key": "inValue", "dataType":"sap.ui.model.type.String", "maxConditions": -1, "required": false, "label": "In Value"},
+					{"key": "date", "dataType":"sap.ui.model.type.Date", "formatOptions": {style: "short"}, "maxConditions": -1, "required": false, "label": "Date"}
+				]
+		});
 		sinon.stub(oFilterBar, "getConditions").returns({
-			additionalText: [Condition.createCondition(OperatorName.Contains, "2")]
+			additionalText: [Condition.createCondition(OperatorName.Contains, ["3"])],
+			date: [Condition.createCondition(OperatorName.LE, ["2026-05-12"])],
+			inValue: [Condition.createCondition(OperatorName.EQ, ["3"])]
 		});
 
 		oMTable.setFilterBar(oFilterBar);
@@ -2170,13 +2187,21 @@ sap.ui.define([
 			assert.equal(oListBinding.filter.args.length, 1, "ListBinding filter called once");
 			assert.equal(oListBinding.filter.args[0].length, 2, "ListBinding filter number of arguments");
 			assert.equal(oListBinding.filter.args[0][0].length, 1, "ListBinding filter is array with one filter");
-			assert.equal(oListBinding.filter.args[0][0][0].sPath, "additionalText", "ListBinding filter1 path");
-			assert.equal(oListBinding.filter.args[0][0][0].sOperator, FilterOperator.Contains, "ListBinding filter1 operator");
-			assert.equal(oListBinding.filter.args[0][0][0].oValue1, "2", "ListBinding filter1 value1");
+			assert.notOk(oListBinding.filter.args[0][0][0].sPath, "ListBinding filter no path");
+			assert.equal(oListBinding.filter.args[0][0][0].aFilters.length, 3, "ListBinding filter contains 3 filters");
+			assert.equal(oListBinding.filter.args[0][0][0].aFilters[0].sPath, "additionalText", "ListBinding filter1 path");
+			assert.equal(oListBinding.filter.args[0][0][0].aFilters[0].sOperator, FilterOperator.Contains, "ListBinding filter1 operator");
+			assert.equal(oListBinding.filter.args[0][0][0].aFilters[0].oValue1, "3", "ListBinding filter1 value1");
+			assert.equal(oListBinding.filter.args[0][0][0].aFilters[1].sPath, "date", "ListBinding filter2 path");
+			assert.equal(oListBinding.filter.args[0][0][0].aFilters[1].sOperator, FilterOperator.LE, "ListBinding filter2 operator");
+			assert.deepEqual(oListBinding.filter.args[0][0][0].aFilters[1].oValue1, new Date(2026, 4, 12), "ListBinding filter2 value1");
+			assert.equal(oListBinding.filter.args[0][0][0].aFilters[2].sPath, "inValue", "ListBinding filter3 path");
+			assert.equal(oListBinding.filter.args[0][0][0].aFilters[2].sOperator, FilterOperator.EQ, "ListBinding filter3 operator");
+			assert.equal(oListBinding.filter.args[0][0][0].aFilters[2].oValue1, "3", "ListBinding filter3 value1");
 			assert.equal(oListBinding.filter.args[0][1], FilterType.Application, "ListBinding filter type");
 			let aItems = oTable.getItems();
 			assert.equal(aItems.length, 1, "number of items");
-			assert.equal(aItems[0].getCells()[0].getText(), "I2", "Key of item");
+			assert.equal(aItems[0].getCells()[0].getText(), "I3", "Key of item");
 
 			// removed FilterBar should not trigger filtering
 			oMTable.onHide();

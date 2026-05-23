@@ -5851,7 +5851,7 @@ sap.ui.define([
 	 *   ignored, use <code>mParameters.urlParameters</code> instead
 	 * @param {Object<string, any>} [mParameters] Optional parameter map containing any of the following properties:
 	 * @param {boolean} [mParameters.canonicalRequest=false] Whether to calculate a canonical URL to request the data.
-	 *   See, {@link sap.ui.model.odata.v2.ODataModel#constructor mParameters.canonicalRequests}
+	 *   See {@link sap.ui.model.odata.v2.ODataModel#constructor mParameters.canonicalRequests}
 	 *   for details.
 	 * @param {sap.ui.model.Context} [mParameters.context] If specified, <code>sPath</code> has to be relative to the path
 	 *   given with the context.

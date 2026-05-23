@@ -323,7 +323,7 @@ sap.ui.define([
 	}
 
 	function getRepresentedBindingPaths(oElement, mAction, sModelName, sAggregationName) {
-		const bHasDelegateAndGetRepresentedProperties = !!ObjectPath.get("delegateInfo.delegate.getRepresentedProperties", mAction);
+		const bHasDelegateAndGetRepresentedProperties = !!(mAction && ObjectPath.get("delegateInfo.delegate.getRepresentedProperties", mAction));
 
 		if (bHasDelegateAndGetRepresentedProperties) {
 			return getRepresentedBindingPathsFromDelegateOrBinding(oElement, mAction, sModelName, sAggregationName);
@@ -357,7 +357,7 @@ sap.ui.define([
 	}
 
 	function getRepresentedBindingPathsFromDelegateIfAvailable(mAction, sAggregationName) {
-		const bHasDelegateAndGetRepresentedProperties = !!ObjectPath.get("delegateInfo.delegate.getRepresentedProperties", mAction);
+		const bHasDelegateAndGetRepresentedProperties = !!(mAction && ObjectPath.get("delegateInfo.delegate.getRepresentedProperties", mAction));
 
 		if (bHasDelegateAndGetRepresentedProperties) {
 			return getRepresentedPropertiesFromDelegate(mAction, sAggregationName);
@@ -442,7 +442,7 @@ sap.ui.define([
 	function getModelName(mAddViaDelegate) {
 		// ManagedObject jsdoc tells to use undefined for default model, therefore it
 		// is necessary to return undefined if modelName or whole delegateInfo is missing
-		return ObjectPath.get("delegateInfo.payload.modelName", mAddViaDelegate);
+		return mAddViaDelegate ? ObjectPath.get("delegateInfo.payload.modelName", mAddViaDelegate) : undefined;
 	}
 
 	const oAnalyzer = {

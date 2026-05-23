@@ -67,7 +67,7 @@ sap.ui.define([
 	const oTextResources = Lib.getResourceBundleFor("sap.ui.dt");
 
 	ContextMenu.prototype.init = function() {
-		this.oContextMenuControl = new Menu();
+		this.oContextMenuControl = new Menu(`${this.getId()}-menu`);
 		this.oContextMenuControl.attachItemSelected(this._onItemSelected, this);
 		this.oContextMenuControl.attachClosed(this._contextMenuClosed, this);
 		this.oContextMenuControl.addStyleClass(sMainStyleClass);
@@ -75,6 +75,7 @@ sap.ui.define([
 		this._aGroupedItems = [];
 		this._bHasPropagatedMenuItems = false;
 		this._aSubMenus = [];
+		this._sMenuIdPrefix = `${this.oContextMenuControl.getId()}-`;
 	};
 
 	ContextMenu.prototype.exit = function() {
@@ -206,7 +207,7 @@ sap.ui.define([
 						this.bHasExtendedActionsTitleSet = true;
 						const oExtendedActionsItem = new MenuItem({
 							key: "CTX_EXTENDED_MENU_TITLE",
-							id: "CTX_EXTENDED_MENU_TITLE",
+							id: `${this._sMenuIdPrefix}CTX_EXTENDED_MENU_TITLE`,
 							text: sExtendedMenuTitle,
 							enabled: false
 						});
@@ -221,7 +222,7 @@ sap.ui.define([
 					const sId = `CTX_PROPAGATED_CONTROL_NAME_${sPropagatedControlName.replace(/[\.\s]/g, "_").toUpperCase()}`;
 					const oTitleMenuItem = new MenuItem({
 						key: sId,
-						id: sId,
+						id: `${this._sMenuIdPrefix}${sId}`,
 						text: sPropagatedControlName,
 						enabled: false
 					});
@@ -239,9 +240,11 @@ sap.ui.define([
 						: oMenuItem.enabled;
 					const oMenuItemInstance = new MenuItem({
 						key: oMenuItem.id,
+						id: `${this._sMenuIdPrefix}${oMenuItem.id}`,
 						icon: oMenuItem.icon,
 						text: sText,
-						enabled: bEnabled
+						enabled: bEnabled,
+						press: () => {} // enables FESR tracking on menu item level
 					});
 
 					if (!bAddAsNormalActions) {
@@ -260,7 +263,7 @@ sap.ui.define([
 				if (!bIsSubMenu) {
 					const oTitleMenuItem = new MenuItem({
 						key: "CTX_CONTROL_NAME",
-						id: "CTX_CONTROL_NAME",
+						id: `${this._sMenuIdPrefix}CTX_CONTROL_NAME`,
 						text: this.sSelectedControlName,
 						enabled: false
 					});
@@ -274,12 +277,17 @@ sap.ui.define([
 					const bEnabled = typeof oMenuItem.enabled === "function"
 						? oMenuItem.enabled(aTargetSelectedOverlays, oMenuItem)
 						: oMenuItem.enabled;
-					const oMenuItemInstance = new MenuItem({
+					const mMenuItemSettings = {
 						key: oMenuItem.id,
 						icon: oMenuItem.icon,
 						text: sText,
-						enabled: bEnabled
-					});
+						enabled: bEnabled,
+						press: () => {} // enables FESR tracking on menu item level
+					};
+					if (!bIsSubMenu) {
+						mMenuItemSettings.id = `${this._sMenuIdPrefix}${oMenuItem.id}`;
+					}
+					const oMenuItemInstance = new MenuItem(mMenuItemSettings);
 
 					oMenu.addItem(oMenuItemInstance);
 
@@ -326,7 +334,6 @@ sap.ui.define([
 			return !mMenuItemEntry.fromPlugin;
 		});
 
-		// Remove all previous entries retrieved by plugins (the list should always be rebuilt)
 		this.oContextMenuControl.destroyItems();
 
 		let oPromise = Promise.resolve();

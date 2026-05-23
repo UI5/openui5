@@ -908,7 +908,8 @@ sap.ui.define([
 					oElementOverlay.attachEvent("editableChange", this._onEditableChanged, this);
 					oElementOverlay.attachEvent("applyStylesRequired", this._onApplyStylesRequired, this);
 
-					if (ObjectPath.get(["actions", "actionsFromResponsibleElement"], oElementOverlay.getDesignTimeMetadata().getData())) {
+					const mDTMetadataData = oElementOverlay.getDesignTimeMetadata().getData();
+					if (mDTMetadataData && ObjectPath.get(["actions", "actionsFromResponsibleElement"], mDTMetadataData)) {
 						var mConnectedElements = this.getSelectionManager().getConnectedElements();
 						var oElement = oElementOverlay.getElement();
 						var oResponsibleElement = oElementOverlay.getDesignTimeMetadata().getResponsibleElement(oElement);

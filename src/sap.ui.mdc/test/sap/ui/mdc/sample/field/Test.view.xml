@@ -760,6 +760,31 @@
 												</m:ColumnListItem>
 											</m:items>
 										</m:Table>
+										<mdcValueHelpContent:filterBar>
+											<mdcvh:FilterBar id="VH-DateAsDescription-Dialog-FB" liveMode= "false"
+												delegate='\{"name": "delegates/GenericVhFilterBarDelegate", "payload": \{"collectionName": ""\}\}'
+												propertyInfo='[\{"key": "ProductId", "dataType":"sap.ui.model.type.String", "constraints": \{"maxLength": 20\}, "maxConditions": -1, "required": false, "label": "Product ID"\},
+																\{"key": "Name", "dataType":"sap.ui.model.type.String", "constraints": \{"maxLength": 100\}, "maxConditions": -1, "required": false, "label": "Name"\},
+																\{"key": "Date", "dataType":"sap.ui.model.odata.type.DateTime", "formatOptions": \{"style": "long"\}, "constraints": \{"displayFormat": "Date"\}, "maxConditions": -1, "required": false, "label": "Date"\}
+															]'
+												>
+												<mdc:FilterField
+													id="VH-DateAsDescription-Dialog-FF-ProductId"
+													propertyKey="ProductId"
+													delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
+													width="100%"/>
+												<mdc:FilterField
+													id="VH-DateAsDescription-Dialog-FF-Name"
+													propertyKey="Name"
+													delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
+													width="100%"/>
+												<mdc:FilterField
+													id="VH-DateAsDescription-Dialog-FF-Date"
+													propertyKey="Date"
+													delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
+													width="100%"/>
+											</mdcvh:FilterBar>
+										</mdcValueHelpContent:filterBar>
 									</mdcValueHelpContent:MTable>
 								</mdcvh:Dialog>
 							</mdc:dialog>

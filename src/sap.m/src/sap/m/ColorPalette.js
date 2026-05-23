@@ -351,6 +351,10 @@ sap.ui.define([
 		};
 
 		ColorPalette.prototype.onsaptabnext = ColorPalette.prototype.onsaptabprevious = function (oEvent) {
+			if (!this.getProperty("_isInPopover")) {
+				return;
+			}
+
 			var oElementInfo = this._getElementInfo(oEvent.target);
 
 			if (oElementInfo.bIsMoreColorsButton) {

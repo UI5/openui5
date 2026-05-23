@@ -174,7 +174,7 @@ sap.ui.define([
 		if (sSubAction) {
 			aActionPath.push(sSubAction);
 		}
-		return evaluateAction(ObjectPath.get(aActionPath, mData), oElement);
+		return evaluateAction(mData ? ObjectPath.get(aActionPath, mData) : undefined, oElement);
 	};
 
 	/**
@@ -305,7 +305,7 @@ sap.ui.define([
 	 */
 	DesignTimeMetadata.prototype.getResponsibleElement = function(oElement) {
 		var mData = this.getData();
-		var fnResponsibleElement = ObjectPath.get(["actions", "getResponsibleElement"], mData);
+		const fnResponsibleElement = mData ? ObjectPath.get(["actions", "getResponsibleElement"], mData) : undefined;
 		if (fnResponsibleElement) {
 			return fnResponsibleElement(oElement);
 		}
@@ -320,7 +320,7 @@ sap.ui.define([
 	 */
 	DesignTimeMetadata.prototype.isResponsibleActionAvailable = function(sActionName) {
 		var mData = this.getData();
-		var aActionsFromResponsibleElement = ObjectPath.get(["actions", "actionsFromResponsibleElement"], mData);
+		const aActionsFromResponsibleElement = mData ? ObjectPath.get(["actions", "actionsFromResponsibleElement"], mData) : undefined;
 		if (aActionsFromResponsibleElement) {
 			return aActionsFromResponsibleElement.includes(sActionName);
 		}

@@ -13,10 +13,12 @@
 				text="{i18n>BTN_TRANSLATE}" >
 			<items>
 				<MenuItem
+						id="sapUiRta_downloadTranslation"
 						text="{i18n>BTN_OPEN_DOWNLOAD_TRANSLATION}"
 						press=".openDownloadTranslationDialog"
 						icon="sap-icon://download"/>
 				<MenuItem
+						id="sapUiRta_uploadTranslation"
 						text="{i18n>BTN_OPEN_UPLOAD_TRANSLATION}"
 						press=".openUploadTranslationDialog"
 						enabled="{= ${translation>/sourceLanguages}.length > 0}"

@@ -202,7 +202,9 @@ sap.ui.define([
 		.then(_getConnectorConfigByLayer.bind(undefined, mPropertyBag.layer))
 		.then(function(oConnectorConfig) {
 			mPropertyBag.url = oConnectorConfig.url;
-			var oConnector = ObjectPath.get(sActionName, oConnectorConfig.writeConnectorModule);
+			const oConnector = oConnectorConfig.writeConnectorModule
+				? ObjectPath.get(sActionName, oConnectorConfig.writeConnectorModule)
+				: undefined;
 			return oConnector.call(oConnectorConfig.writeConnectorModule, mPropertyBag);
 		});
 	}

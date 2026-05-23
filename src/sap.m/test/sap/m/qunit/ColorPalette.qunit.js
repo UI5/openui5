@@ -647,6 +647,64 @@ sap.ui.define([
 			});
 		});
 
+		QUnit.module("Tab key - selection behaviour depending on context", function (hooks) {
+			hooks.beforeEach(function () {
+				var oTarget = document.createElement("DIV");
+				oTarget.classList.add("sapMColorPaletteSquare");
+				oTarget.setAttribute("data-sap-ui-color", "red");
+				oTarget.setAttribute("data-sap-ui-region", "main-colors-palette");
+
+				this.oTarget = oTarget;
+			});
+
+			hooks.afterEach(function () {
+				this.oCP.destroy();
+			});
+
+			QUnit.test("Tab from a swatch should NOT fire colorSelect when palette is embedded (not in popover)", function (assert) {
+				// Arrange
+				this.oCP = new ColorPalette();
+				var oOntapStub = this.stub(ColorPalette.prototype, "ontap");
+				this.stub(this.oCP, "_getElementInfo").returns({
+					bIsDefaultColorButton: false,
+					bIsMoreColorsButton: false,
+					bIsASwatch: true,
+					bIsRecentColorSwatch: false
+				});
+
+				// Act
+				this.oCP.onsaptabnext({ target: this.oTarget });
+				this.oCP.onsaptabprevious({ target: this.oTarget });
+
+				// Assert
+				assert.equal(oOntapStub.callCount, 0,
+					"ontap must not be called when tabbing out of an embedded palette");
+			});
+
+			QUnit.test("Tab from a swatch should fire colorSelect when palette is inside a ColorPalettePopover", function (assert) {
+				// Arrange
+				var oCPP = new ColorPalettePopover();
+				this.oCP = oCPP._getPalette();
+				var oOntapStub = this.stub(ColorPalette.prototype, "ontap");
+				this.stub(this.oCP, "_getElementInfo").returns({
+					bIsDefaultColorButton: false,
+					bIsMoreColorsButton: false,
+					bIsASwatch: true,
+					bIsRecentColorSwatch: false
+				});
+
+				// Act
+				this.oCP.onsaptabnext({ target: this.oTarget });
+
+				// Assert
+				assert.equal(oOntapStub.callCount, 1,
+					"ontap must be called (triggering color selection) when tabbing out of a palette inside a popover");
+
+				// Cleanup
+				oCPP.destroy();
+			});
+		});
+
 		QUnit.test("ColorPalette.prototype.onsapspace should prevent default", function (assert) {
 			// Prepare
 			var oCP = new ColorPalette(),

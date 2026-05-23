@@ -279,7 +279,9 @@ sap.ui.define([
 		if (oCondenserInfo && oCondenserInfo.updateControl) {
 			const sUpdateControlId = oCondenserInfo.updateControl;
 			const aPath = [CondenserUtils.NOT_INDEX_RELEVANT, CondenserClassification.Update, oCondenserInfo.uniqueKey];
-			const oUpdateCondenserInfo = ObjectPath.get(aPath, mReducedChanges[sUpdateControlId]);
+			const oUpdateCondenserInfo = mReducedChanges[sUpdateControlId]
+				? ObjectPath.get(aPath, mReducedChanges[sUpdateControlId])
+				: undefined;
 			if (oUpdateCondenserInfo) {
 				ObjectPath.set(aPath, oUpdateCondenserInfo, mReducedChanges[sIdForCondensing]);
 				delete mReducedChanges[sUpdateControlId][CondenserUtils.NOT_INDEX_RELEVANT]
@@ -386,7 +388,7 @@ sap.ui.define([
 	 */
 	function condenseUpdateChange(mTypes, oCondenserInfo, oChange) {
 		const aPath = [CondenserUtils.NOT_INDEX_RELEVANT, CondenserClassification.Update, oCondenserInfo.uniqueKey];
-		const oUpdateCondenserInfo = ObjectPath.get(aPath, mTypes);
+		const oUpdateCondenserInfo = mTypes ? ObjectPath.get(aPath, mTypes) : undefined;
 		if (oUpdateCondenserInfo) {
 			oUpdateCondenserInfo.change.condenserState = "delete";
 			if (oChange.condenserState === "delete") {

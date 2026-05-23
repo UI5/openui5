@@ -250,8 +250,7 @@ sap.ui.define([
 	var sOldDescription;
 
 	var busyDialog = new BusyDialog({
-			text:"Please wait, data is loading..",
-			title: "Loading..",
+			title: "Loading new items..",
 			showCancelButton: true,
 			close: function(oEvent){
 				if (oTimeout){

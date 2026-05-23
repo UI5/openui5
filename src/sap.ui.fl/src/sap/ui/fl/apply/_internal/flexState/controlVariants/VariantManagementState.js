@@ -65,10 +65,10 @@ sap.ui.define([
 
 	function getInitialCurrentVariant(sReference, aCtrlVariantManagementChanges, aVariants) {
 		var oComponentData = FlexState.getComponentData(sReference);
-		var aVariantReferencesFromUrl = ObjectPath.get(
+		let aVariantReferencesFromUrl = (oComponentData && ObjectPath.get(
 			["technicalParameters", VariantsApplyUtil.VARIANT_TECHNICAL_PARAMETER],
 			oComponentData
-		) || [];
+		)) || [];
 
 		// Only visible variants can be current
 		var aVariantKeys = aVariants.filter((oVariant) => {

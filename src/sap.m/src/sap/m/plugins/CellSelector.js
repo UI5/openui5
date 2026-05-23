@@ -972,6 +972,10 @@ sap.ui.define([
 				}
 			}
 		}
+
+		if (this._oSession.cellRefs.length) {
+			this.getConfig("onDrawSelection", this.getControl(), this);
+		}
 	};
 
 	CellSelector.prototype._updateResizers = function(mBounds, iPositionX, iPositionY) {
@@ -1078,6 +1082,8 @@ sap.ui.define([
 		var oResizer = this._getResizer();
 		oResizer.style.left = "-10000px";
 		oResizer.style.top = "-10000px";
+
+		this.getConfig("onClearSelection", this.getControl(), this);
 	};
 
 	/**
@@ -1444,12 +1450,32 @@ sap.ui.define([
 			onDeactivate: function(oTable, oPlugin) {
 				oTable.detachEvent("_change", this._onPropertyChange);
 				oTable.detachEvent("EventHandlerChange", this._onEventHandlerChange);
+				oTable.detachEvent("afterItemRendering", this._onAfterItemRendering);
+			},
+			onDrawSelection: function(oTable, oPlugin) {
+				oTable.attachEvent("afterItemRendering", oPlugin, this._onAfterItemRendering);
+			},
+			onClearSelection: function(oTable, oPlugin) {
+				oTable.detachEvent("afterItemRendering", this._onAfterItemRendering);
 			},
 			_onPropertyChange: function(oEvent, oPlugin) {
 				oEvent.getParameter("name") == "mode" && oPlugin._onSelectableChange();
 			},
 			_onEventHandlerChange: function(oEvent, oPlugin) {
 				oEvent.getParameter("EventId") == "itemPress" && oPlugin._onSelectableChange();
+			},
+			_onAfterItemRendering: function(oEvent, oPlugin) {
+				var mSelectionRange = oPlugin.getSelectionRange();
+				if (mSelectionRange) {
+					const oTable = oEvent.getSource();
+					const oItem = oEvent.getParameter("listItem");
+					const iItemIndex = oTable.getVisibleItems().indexOf(oItem);
+					const iSelectionStartedFrom = mSelectionRange.from.rowIndex;
+					const iSelectionEndedAt = mSelectionRange.to.rowIndex;
+					if (iItemIndex >= iSelectionStartedFrom && iItemIndex <= iSelectionEndedAt) {
+						oPlugin._selectCells();
+					}
+				}
 			},
 			_getVisibleItems: function(oTable) {
 				return oTable.getVisibleItems();

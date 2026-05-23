@@ -425,13 +425,14 @@ sap.ui.define([
 			getValue() {
 				var vCurrentValue = deepClone(fnGetter());
 				if (aInstanceParts.length > 0) {
-					return ObjectPath.get(aInstanceParts, vCurrentValue);
+					return vCurrentValue ? ObjectPath.get(aInstanceParts, vCurrentValue) : undefined;
 				}
 				return vCurrentValue;
 			},
 			setValue: function(vValue) {
 				var vPropertyValue = deepClone(fnGetter());
 				if (aInstanceParts.length > 0) {
+					vPropertyValue ||= {};
 					ObjectPath.set(aInstanceParts, vValue, vPropertyValue);
 				} else {
 					vPropertyValue = vValue;
