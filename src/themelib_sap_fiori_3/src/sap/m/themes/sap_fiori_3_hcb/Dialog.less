@@ -19,11 +19,11 @@
 	box-sizing: border-box;
 }
 
-.sapMDialog > header .sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
+.sapMDialog > .sapMDialogHeader .sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
 	font-size: 1rem;
 }
 
-.sapMDialogInformation > header .sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
+.sapMDialogInformation > .sapMDialogHeader .sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
 	color: var(--sapInformativeElementColor);
 }
 
@@ -38,7 +38,7 @@
 /* buttons on phone must be to the right side (in LTR mode) */
 html.sap-phone .sapMDialog {
 
-	& > footer .sapMFooter-CTX {
+	& > .sapMDialogFooter .sapMFooter-CTX {
 		justify-content: flex-end;
 	}
 }
@@ -49,18 +49,18 @@ html.sap-phone .sapMDialog {
 
 .sapMDialog {
 
-	header .sapMBarLeft,
-	header .sapMBarPH {
+	.sapMDialogHeader .sapMBarLeft,
+	.sapMDialogHeader .sapMBarPH {
 		padding-left: 1rem;
 	}
 
-	header .sapMBarRight,
-	header .sapMBarPH {
+	.sapMDialogHeader .sapMBarRight,
+	.sapMDialogHeader .sapMBarPH {
 		padding-right: 1rem;
 	}
 
-	header .sapMTB,
-	footer .sapMTB {
+	.sapMDialogHeader .sapMTB,
+	.sapMDialogFooter .sapMTB {
 		padding: 0 1rem;
 	}
 }

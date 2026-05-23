@@ -132,6 +132,8 @@ sap.ui.define([
 		if (this.bOutput !== false && document.activeElement.id === this.getId()) {
 			this.getTable()?._setFirstLastVisibleCells(document.activeElement);
 		}
+
+		this.informList("AfterRendering");
 	};
 
 	ColumnListItem.prototype.exit = function() {

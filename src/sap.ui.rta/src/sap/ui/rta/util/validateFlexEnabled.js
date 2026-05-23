@@ -50,7 +50,9 @@ sap.ui.define([
 
 		function isValidApp(oComponent) {
 			const oManifest = oComponent.getManifest();
-
+			if (!oManifest) {
+				return false;
+			}
 			return (
 				ObjectPath.get(["sap.app", "id"], oManifest) !== "sap.ui.documentation.sdk"
 				&& !(ObjectPath.get(["sap.app", "id"], oManifest) || "").startsWith("sap.ui.rta") // all rta test apps

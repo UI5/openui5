@@ -794,6 +794,35 @@ sap.ui.define([
 		qutils.triggerKeydown(oCell, KeyCodes.SPACE, true, false);
 	});
 
+	QUnit.test("Selection classes preserved after single item re-render", async function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+
+		const oCell = getCell(oTable, 1, 0);
+		qutils.triggerKeydown(oCell, KeyCodes.SPACE);
+		qutils.triggerKeyup(oCell, KeyCodes.SPACE);
+
+		qutils.triggerKeydown(oCell, KeyCodes.ARROW_RIGHT, true, false, false);
+		qutils.triggerKeyup(oCell, KeyCodes.ARROW_RIGHT, true, false, false);
+
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 1}}, "Selection range is correct");
+
+		let oCell1 = getCell(oTable, 1, 0);
+		let oCell2 = getCell(oTable, 1, 1);
+		assert.ok(oCell1.classList.contains("sapMPluginsCellSelectorSelected"), "First cell has selection class before re-render");
+		assert.ok(oCell2.classList.contains("sapMPluginsCellSelectorSelected"), "Second cell has selection class before re-render");
+
+		oTable.getItems()[1].setNavigated(true);
+		await nextUIUpdate();
+
+		oCell1 = getCell(oTable, 1, 0);
+		oCell2 = getCell(oTable, 1, 1);
+		assert.ok(oCell1.classList.contains("sapMPluginsCellSelectorSelected"), "First cell has selection class after re-render");
+		assert.ok(oCell2.classList.contains("sapMPluginsCellSelectorSelected"), "Second cell has selection class after re-render");
+		assert.ok(oCell1.classList.contains("sapMPluginsCellSelectorLeft"), "First cell has left border class after re-render");
+		assert.ok(oCell2.classList.contains("sapMPluginsCellSelectorRight"), "Second cell has right border class after re-render");
+	});
+
 	QUnit.module("Dialog Behavior", {
 		beforeEach: async function() {
 			this.oMockServer = new MockServer({ rootUri : sServiceURI });

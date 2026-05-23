@@ -23,7 +23,7 @@ sap.ui.define([
 	 */
 	function concatFlexObjects(aResponses, sPath) {
 		var aFlexObjects = aResponses.reduce(function(aFlexObjects, oResponse) {
-			if (ObjectPath.get(sPath, oResponse)) {
+			if (oResponse && ObjectPath.get(sPath, oResponse)) {
 				return aFlexObjects.concat(ObjectPath.get(sPath, oResponse));
 			}
 			return aFlexObjects;

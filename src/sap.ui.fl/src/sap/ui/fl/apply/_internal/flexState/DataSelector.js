@@ -165,7 +165,8 @@ sap.ui.define([
 		if (aParameterValues.length === 0) {
 			return this.getCachedResult();
 		}
-		return ObjectPath.get(aParameterValues, this.getCachedResult());
+		const oCachedResult = this.getCachedResult();
+		return oCachedResult ? ObjectPath.get(aParameterValues, oCachedResult) : undefined;
 	};
 
 	DataSelector.prototype._setParameterizedCachedResult = function(mParameters, vValue) {

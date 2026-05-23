@@ -23,6 +23,7 @@
         </List>
         <List id="originalVersionList">
             <FeedListItem
+                id="sapUiRta_originalVersionItem"
                 text="{i18n>TIT_ORIGINAL_APP}"
                 type="Active"
                 press=".versionSelected"

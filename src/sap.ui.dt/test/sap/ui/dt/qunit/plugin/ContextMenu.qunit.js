@@ -371,7 +371,7 @@ sap.ui.define([
 					return oItem.getText() === "Rename for button 1";
 				});
 				const oExtendedMenuTitleItem = aItems.find((oItem) => {
-					return oItem.getId() === "CTX_EXTENDED_MENU_TITLE";
+					return oItem.getId().endsWith("CTX_EXTENDED_MENU_TITLE");
 				});
 				const aExtendedMenuControlNameItems = aItems.filter((oItem) => {
 					return oItem.getId().includes("CTX_PROPAGATED_CONTROL_NAME");
@@ -453,7 +453,7 @@ sap.ui.define([
 					return oItem.getText() === "Rename for button 1";
 				});
 				const oExtendedMenuTitleItem = aItems.find((oItem) => {
-					return oItem.getId() === "CTX_EXTENDED_MENU_TITLE";
+					return oItem.getId().endsWith("CTX_EXTENDED_MENU_TITLE");
 				});
 				const aExtendedMenuControlNameItems = aItems.filter((oItem) => {
 					return oItem.getId().includes("CTX_PROPAGATED_CONTROL_NAME");
@@ -511,7 +511,7 @@ sap.ui.define([
 					return oItem.getText() === "Rename for button 1";
 				});
 				const oExtendedMenuTitleItem = aItems.find((oItem) => {
-					return oItem.getId() === "CTX_EXTENDED_MENU_TITLE";
+					return oItem.getId().endsWith("CTX_EXTENDED_MENU_TITLE");
 				});
 				const aExtendedMenuControlNameItems = aItems.filter((oItem) => {
 					return oItem.getId().includes("CTX_PROPAGATED_CONTROL_NAME");
@@ -586,7 +586,7 @@ sap.ui.define([
 				const { oContextMenuControl } = oEvent.getSource();
 				const aItems = oContextMenuControl.getItems();
 				const oControlTitleItem = aItems.find((oItem) => {
-					return oItem.getId() === "CTX_CONTROL_NAME";
+					return oItem.getId().endsWith("CTX_CONTROL_NAME");
 				});
 				const aExtendedMenuControlNameItems = aItems.filter((oItem) => {
 					return oItem.getId().includes("CTX_PROPAGATED_CONTROL_NAME");

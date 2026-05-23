@@ -123,6 +123,7 @@
 								<avatar>
 									<Avatar
 										src="../../images/Alain_Chevalier.png"
+										badgeTooltip="Alain Chevalier"
 										displayShape="Square"
 										imageFitType="Cover"
 										showBorder="true"
@@ -143,6 +144,7 @@
 								<avatar>
 									<Avatar
 										src="../../images/Donna_Moore.png"
+										badgeTooltip="Donna Moore"
 										displayShape="Square"
 										showBorder="true"
 										press=".onAvatarPress"/>
@@ -161,6 +163,7 @@
 								<avatar>
 									<Avatar
 										src="../../images/Elena_Petrova.png"
+										badgeTooltip="Elena Petrova"
 										displayShape="Square"
 										showBorder="true"
 										press=".onAvatarPress"/>

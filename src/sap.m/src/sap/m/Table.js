@@ -639,6 +639,13 @@ sap.ui.define([
 		ListBase.prototype.onItemSelectedChange.apply(this, arguments);
 	};
 
+	// this gets called when item's rendering is completed
+	Table.prototype.onItemAfterRendering = function(oItem) {
+		if (this.hasListeners("afterItemRendering")) {
+			this.fireEvent("afterItemRendering", {listItem: oItem});
+		}
+	};
+
 	/*
 	 * Returns the <table> DOM reference
 	 * @protected

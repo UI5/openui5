@@ -6,17 +6,20 @@
 		showHeader="false"
 		placement="Bottom"
 		id="popover">
-		<SegmentedButton selectedKey="{visualizationModel>/changeState}" width="420px" selectionChange=".onVersioningCategoryChange">
+		<SegmentedButton id="sapUiRta_changeStateSelector" selectedKey="{visualizationModel>/changeState}" width="420px" selectionChange=".onVersioningCategoryChange">
 			<items>
 				<SegmentedButtonItem
+					id="sapUiRta_changeStateAll"
 					text="{i18n>BUT_CHANGEVISUALIZATION_VERSIONING_ALL}"
 					key="all"/>
 				<SegmentedButtonItem
+					id="sapUiRta_changeStateDraft"
 					text="{i18n>BUT_CHANGEVISUALIZATION_VERSIONING_DRAFT}"
 					key="draft"
 					visible="{visualizationModel>/versioningAvailable}"
 					enabled="{= ${visualizationModel>/hasDraftChanges} ||  ${visualizationModel>/hasDirtyChanges}}"/>
 				<SegmentedButtonItem
+					id="sapUiRta_changeStateDirty"
 					text="{i18n>BUT_CHANGEVISUALIZATION_VERSIONING_DIRTY}"
 					key="dirty"
 					enabled="{visualizationModel>/hasDirtyChanges}"/>
@@ -26,6 +29,7 @@
 			class="sapUiRtaChangesList"
 			items="{visualizationModel>/changeCategories/}">
 			<StandardListItem
+				id="sapUiRta_changeCategoryItem"
 				title="{visualizationModel>title}"
 				counter="{visualizationModel>count}"
 				type="{= ${visualizationModel>count} > 0 ? 'Active' : 'Inactive'}"
@@ -38,7 +42,8 @@
 			showIcon="true"
 			visible="{= ${visualizationModel>/sortedChanges/relevantHiddenChanges}.length > 0 }">
 			<link>
-				<Link text="{i18n>BUT_CHANGEVISUALIZATION_LEARNMORE}"
+				<Link id="sapUiRta_hiddenChangesLearnMore"
+					text="{i18n>BUT_CHANGEVISUALIZATION_LEARNMORE}"
 					target="_blank"
 					href="https://ui5.sap.com/#/topic/35274280504f42cd87cc4fd3d403ca91.html#loio35274280504f42cd87cc4fd3d403ca91/visualization"/>
 			</link>

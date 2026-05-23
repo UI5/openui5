@@ -35,14 +35,12 @@ html.sap-desktop .sapMObjectNumberActive:focus {
 		left: 1px;
 		bottom: -1px;
 		right: 1px;
-		outline: 2px dotted var(--sapContent_FocusColor);
+		outline: 0.125rem dotted var(--sapContent_FocusColor);
 	}
 
 	&.sapMObjectNumberInverted .sapMObjectNumberInner::after {
+		outline-offset: -0.125rem;
 		top: 0.125rem;
-		left: 0.125rem;
-		bottom: 0.0625rem;
-		right: 0.125rem;
 		outline: 0.125rem dotted var(--sapContent_FocusColor);
 	}
 
@@ -56,11 +54,11 @@ html.sap-desktop .sapMObjectNumberActive:focus {
 		}
 
 		&.sapMObjectNumberInverted .sapMObjectNumberInner::after {
-			top: 3px;
-			left: 3px;
+			top: 2px;
+			left: 2px;
 			bottom: 3px;
-			right: 3px;
-			outline: 2px dotted var(--sapContent_ContrastFocusColor);
+			right: 2px;
+			outline: 0.125rem dotted var(--sapContent_ContrastFocusColor);
 		}
 	}
 }

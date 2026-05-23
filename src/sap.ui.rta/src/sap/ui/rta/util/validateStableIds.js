@@ -17,7 +17,9 @@ sap.ui.define([
 
 	function isFioriElementsApp(oComponent) {
 		const mManifest = oComponent.getManifest();
-
+		if (!mManifest) {
+			return false;
+		}
 		const isV4 = !!ObjectPath.get(["sap.ui5", "dependencies", "libs", "sap.fe.templates"], mManifest);
 		const isV2 = !!ObjectPath.get(["sap.ui.generic.app"], mManifest);
 		const isOVP = !!ObjectPath.get(["sap.ovp"], mManifest);

@@ -84,11 +84,11 @@ html.sap-phone .sapMDialog.sapMDialogStretched {
 
 html:not(.sap-phone) .sapMDialog {
 
-	header .sapMHeader-CTX {
+	.sapMDialogHeader .sapMHeader-CTX {
 		border-radius: var(--sapElement_BorderCornerRadius) var(--sapElement_BorderCornerRadius) 0 0;
 	}
 
-	&.sapMDialog-NoHeader header .sapMSubHeader-CTX {
+	&.sapMDialog-NoHeader .sapMDialogHeader .sapMSubHeader-CTX {
 		border-radius: var(--sapElement_BorderCornerRadius) var(--sapElement_BorderCornerRadius) 0 0;
 	}
 
@@ -97,7 +97,7 @@ html:not(.sap-phone) .sapMDialog {
 		border-top-left-radius: var(--sapElement_BorderCornerRadius);
 	}
 
-	footer .sapMFooter-CTX {
+	.sapMDialogFooter .sapMFooter-CTX {
 		border-radius: 0 0 var(--sapElement_BorderCornerRadius) var(--sapElement_BorderCornerRadius);
 	}
 
@@ -111,7 +111,7 @@ html.sap-phone .sapMDialog {
 	min-width: 18rem;
 	overflow: hidden;
 
-	& > footer .sapMFooter-CTX {
+	& > .sapMDialogFooter .sapMFooter-CTX {
 		display: flex;
 		padding: 0 0.25rem;
 	}
@@ -208,7 +208,7 @@ html.sap-desktop .sapMDialog {
 }
 
 /* mixin call for creating container content padding classes (arguments: rootContainer, contentSelector) */
-.sapUiContainerContentPadding(~".sapMDialog", ~"> section > .sapMDialogScroll > .sapMDialogScrollCont");
+.sapUiContainerContentPadding(~".sapMDialog", ~"> .sapMDialogSection > .sapMDialogScroll > .sapMDialogScrollCont");
 
 /* ====================================================== */
 
@@ -216,8 +216,8 @@ html.sap-desktop .sapMDialog {
 	font-size: 0.875rem;
 }
 
-.sapMDialog > header .sapMDialogTitleGroup,
-.sapMDialog > header .sapMDialogSubHeader {
+.sapMDialog > .sapMDialogHeader .sapMDialogTitleGroup,
+.sapMDialog > .sapMDialogHeader .sapMDialogSubHeader {
 	font-size: 1rem;
 }
 
@@ -234,24 +234,24 @@ html.sap-desktop .sapMDialog {
 	border-top: none;
 }
 
-.sapMMessageDialog.sapMPopup-CTX > header .sapMDialogTitleGroup {
+.sapMMessageDialog.sapMPopup-CTX > .sapMDialogHeader .sapMDialogTitleGroup {
 	background-image: none;
 	filter: none;
 }
 
-.sapMDialog > header .sapMDialogTitleGroup .sapMTitle {
+.sapMDialog > .sapMDialogHeader .sapMDialogTitleGroup .sapMTitle {
 	color: var(--sapPageHeader_TextColor);
 	vertical-align: middle;
 }
 
-.sapMDialog > header .sapMDialogTitleGroup .sapMImg {
+.sapMDialog > .sapMDialogHeader .sapMDialogTitleGroup .sapMImg {
 	height: 2.25rem;
 	margin-right: 0.625rem;
 	vertical-align: middle;
 	width: 2.25rem;
 }
 
-.sapMDialog > header .sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
+.sapMDialog > .sapMDialogHeader .sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
 	font-size: 1.25rem;
 	vertical-align: middle;
 }
@@ -294,7 +294,7 @@ html.sap-desktop .sapMDialog {
 			min-height: @_sap_m_Dialog_BarCompactHeight;
 		}
 
-		& > footer {
+		& > .sapMDialogFooter {
 			height: @_sap_m_Dialog_BarCompactHeight;
 
 			.sapMFooter-CTX {
@@ -341,7 +341,7 @@ html.sap-desktop .sapMDialog {
 	min-height: @_sap_m_Dialog_BarHeight;
 	padding-bottom: @_sap_m_Dialog_BarHeight;
 
-	footer {
+	.sapMDialogFooter {
 
 		.sapMTB.sapMFooter-CTX {
 			border-bottom: none;
@@ -399,7 +399,7 @@ html.sap-desktop .sapMDialog {
 		min-height: @_sap_m_Dialog_BarHeight;
 	}
 
-	& > footer {
+	& > .sapMDialogFooter {
 		bottom: 0;
 		height: @_sap_m_Dialog_BarHeight;
 		left: 0;
@@ -407,7 +407,7 @@ html.sap-desktop .sapMDialog {
 		right: 0;
 	}
 
-	&.sapMDialogDraggable > header {
+	&.sapMDialogDraggable > .sapMDialogHeader {
 		cursor: move;
 	}
 
@@ -431,11 +431,11 @@ html[data-sap-ui-animation='off'] .sapMDialog {
 	box-shadow: none;
 }
 
-.sapMDialog > header:last-of-type .sapMIBar {
+.sapMDialog > .sapMDialogHeader > div:last-of-type .sapMIBar {
 	box-shadow: @_sap_m_Dialog_NoStateHeaderShadow;
 }
 
-.sapMDialogWarning > header {
+.sapMDialogWarning > .sapMDialogHeader {
 
 	.sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
 		color: var(--sapCriticalElementColor);
@@ -446,7 +446,7 @@ html[data-sap-ui-animation='off'] .sapMDialog {
 	}
 }
 
-.sapMDialogError > header {
+.sapMDialogError > .sapMDialogHeader {
 
 	.sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
 		color: var(--sapNegativeElementColor);
@@ -457,7 +457,7 @@ html[data-sap-ui-animation='off'] .sapMDialog {
 	}
 }
 
-.sapMDialogSuccess > header {
+.sapMDialogSuccess > .sapMDialogHeader {
 
 	.sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
 		color: var(--sapPositiveElementColor);
@@ -468,7 +468,7 @@ html[data-sap-ui-animation='off'] .sapMDialog {
 	}
 }
 
-.sapMDialogInformation > header {
+.sapMDialogInformation > .sapMDialogHeader {
 
 	.sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
 		color: var(--sapInformativeElementColor);

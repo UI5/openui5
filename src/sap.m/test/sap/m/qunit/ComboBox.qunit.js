@@ -9038,6 +9038,7 @@ sap.ui.define([
 
 		// cleanup
 		oComboBox.destroy();
+		this.clock.restore();
 	});
 
 	QUnit.test("onChange is fired after the value changes by pressing arrow down key and enter", async function (assert) {
@@ -9187,6 +9188,7 @@ sap.ui.define([
 
 		// cleanup
 		oComboBox.destroy();
+		this.clock.restore();
 	});
 
 	QUnit.test("onChange is fired after the value changes by pressing Home key and enter", async function (assert) {
@@ -9264,6 +9266,7 @@ sap.ui.define([
 
 		// cleanup
 		oComboBox.destroy();
+		this.clock.restore();
 	});
 
 	QUnit.test("onChange is fired after the value changes by pressing End key and enter", async function (assert) {
@@ -9345,6 +9348,7 @@ sap.ui.define([
 
 		// cleanup
 		oComboBox.destroy();
+		this.clock.restore();
 	});
 
 	QUnit.test("onChange is fired after the value changes by pressing pagedown key and enter", async function (assert) {
@@ -9430,6 +9434,7 @@ sap.ui.define([
 
 		// cleanup
 		oComboBox.destroy();
+		this.clock.restore();
 	});
 
 	QUnit.test("onChange is fired after the value changes by pressing pageup key and enter", async function (assert) {
@@ -9499,6 +9504,7 @@ sap.ui.define([
 
 		// cleanup
 		oComboBox.destroy();
+		this.clock.restore();
 	});
 
 	// BCP 1570522570
@@ -9806,6 +9812,7 @@ sap.ui.define([
 
 		// cleanup
 		oComboBox.destroy();
+		this.clock.restore();
 	});
 
 	QUnit.test("onChange it should update the value of the comboBox as expected when search in both columns is enabled test case 2", async function (assert) {
@@ -9857,6 +9864,7 @@ sap.ui.define([
 
 		// cleanup
 		oComboBox.destroy();
+		this.clock.restore();
 	});
 
 	QUnit.test("onChange should leave the Input value as is if no match is found", async function (assert) {
@@ -9891,6 +9899,7 @@ sap.ui.define([
 
 		// cleanup
 		oComboBox.destroy();
+		this.clock.restore();
 	});
 
 	QUnit.test('onSelectionChange should pass in the "itemPressed" parameter to the change event handle', async function (assert) {

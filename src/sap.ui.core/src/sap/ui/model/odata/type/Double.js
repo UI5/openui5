@@ -60,6 +60,19 @@ sap.ui.define([
 	}
 
 	/**
+	 * @typedef {sap.ui.core.format.NumberFormat.FloatFormatOptions} sap.ui.model.odata.type.FloatTypeFormatOptions
+	 *
+	 * The format options of the OData floating point number types, {@link sap.ui.model.odata.type.Double} and
+	 * {@link sap.ui.model.odata.type.Single}.
+	 *
+	 * @property {boolean} [parseEmptyValueToZero]
+	 *   Whether the empty string and <code>null</code> are parsed to <code>0</code> if the <code>nullable</code>
+	 *   constraint is set to <code>false</code>; see {@link #parseValue parseValue}; since 1.115.0
+	 *
+	 * @public
+	 */
+
+	/**
 	 * Constructor for a primitive type <code>Edm.Double</code>.
 	 *
 	 * @class This class represents the OData primitive type <code>Edm.Double</code>, see
@@ -79,15 +92,24 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @alias sap.ui.model.odata.type.Double
-	 * @param {object} [oFormatOptions]
+	 * @param {sap.ui.model.odata.type.FloatTypeFormatOptions} [oFormatOptions={
+	 *     emptyString: NaN,
+	 *     groupingBaseSize: 3,
+	 *     groupingEnabled: true,
+	 *     groupingSize: 3,
+	 *     maxFractionDigits: 99,
+	 *     maxIntegerDigits: 99,
+	 *     minFractionDigits: 0,
+	 *     minIntegerDigits: 1,
+	 *     parseAsString: false,
+	 *     parseEmptyValueToZero: false,
+	 *     preserveDecimals: true,
+	 *     roundingMode: "HALF_AWAY_FROM_ZERO",
+	 *     showScale: true,
+	 *     strictGroupingValidation: false,
+	 *     style: "standard"
+	 *   }]
 	 *   Format options as defined in {@link sap.ui.core.format.NumberFormat.getFloatInstance}.
-	 *   In contrast to NumberFormat <code>groupingEnabled</code> defaults to <code>true</code>.
-	 * @param {boolean} [oFormatOptions.parseEmptyValueToZero=false]
-	 *   Whether the empty string and <code>null</code> are parsed to <code>0</code> if the <code>nullable</code>
-	 *   constraint is set to <code>false</code>; see {@link #parseValue parseValue}; since 1.115.0
-	 * @param {boolean} [oFormatOptions.preserveDecimals=true]
-	 *   by default decimals are preserved, unless <code>oFormatOptions.style</code> is given as
-	 *   "short" or "long"; since 1.89.0
 	 * @param {object} [oConstraints]
 	 *   constraints; {@link #validateValue validateValue} throws an error if any constraint is
 	 *   violated

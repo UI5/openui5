@@ -179,7 +179,7 @@ sap.ui.define([
 				commandFactory: this._oCommandFactory
 			});
 
-			this._mDefaultPlugins.contextMenu = new ContextMenuPlugin();
+			this._mDefaultPlugins.contextMenu = new ContextMenuPlugin(`${this.getId()}-contextMenuPlugin`);
 
 			this._mDefaultPlugins.stretch = new StretchPlugin();
 

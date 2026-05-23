@@ -112,16 +112,15 @@ sap.ui.define([
 					parentSelector: oChangeContent.parentId
 				}, mPropertyBag);
 				const oDelegate = mDelegate.instance;
-				let mLayoutControlInfo;
 				if (
 					isFunction(oDelegate.createLayout)
 						&& !skipCreateLayout(oChangeODataInformation)
 				) {
-					mLayoutControlInfo = await oDelegate.createLayout(mDelegatePropertyBag);
-				}
-				if (ObjectPath.get("control", mLayoutControlInfo)) {
-					mLayoutControlInfo.layoutControl = true;
-					return mLayoutControlInfo;
+					const mLayoutControlInfo = await oDelegate.createLayout(mDelegatePropertyBag);
+					if (mLayoutControlInfo && ObjectPath.get("control", mLayoutControlInfo)) {
+						mLayoutControlInfo.layoutControl = true;
+						return mLayoutControlInfo;
+					}
 				}
 				return getDelegateControlForPropertyAndLabel(oChangeODataInformation, mDelegatePropertyBag, oDelegate);
 			}

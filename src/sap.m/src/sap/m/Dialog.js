@@ -448,7 +448,7 @@ function(
 	 */
 
 	ResponsivePaddingsEnablement.call(Dialog.prototype, {
-		header: {suffix: "header"},
+		header: {selector: ".sapMDialogHeader .sapMIBar"},
 		subHeader: {selector: ".sapMDialogSubHeader .sapMIBar"},
 		content: {selector: ".sapMDialogScrollCont"},
 		footer: {selector: ".sapMDialogFooter .sapMIBar"}
@@ -933,7 +933,7 @@ function(
 					includeSelf: true,
 					includeScroller: true
 				}) ||
-				this.$("footer").firstFocusableDomRef();
+				this.$().find(".sapMDialogFooter").firstFocusableDomRef();
 
 			if (oFirstFocusableDomRef) {
 				oFirstFocusableDomRef.focus();
@@ -1261,7 +1261,7 @@ function(
 		//In Chrome when the dialog is stretched the footer is not rendered in the right position;
 		if (window.navigator.userAgent.toLowerCase().indexOf("chrome") !== -1 && this.getStretch()) {
 			//forcing repaint
-			$this.find('> footer').css({bottom: '0.001px'});
+			$this.find('> .sapMDialogFooter').css({bottom: '0.001px'});
 		}
 	};
 
@@ -1410,7 +1410,7 @@ function(
 			$this = this.$(),
 			iHeaderHeight = $this.find(".sapMDialogTitleGroup").height() || 0,
 			iSubHeaderHeight = $this.find(".sapMDialogSubHeader").height() || 0,
-			iFooterHeight = $this.find("> footer").height() || 0,
+			iFooterHeight = $this.find("> .sapMDialogFooter").height() || 0,
 			iHeightAsPadding = iHeaderHeight + iSubHeaderHeight + iFooterHeight,
 			iMaxHeight,
 			iMaxWidth;
@@ -1911,7 +1911,7 @@ function(
 			this._oToolbar.addDelegate({
 				onAfterRendering: function () {
 					if (this.getType() === DialogType.Message) {
-						this.$("footer").removeClass("sapContrast sapContrastPlus");
+						this.$().find(".sapMDialogFooter .sapMIBar").removeClass("sapContrast sapContrastPlus");
 					}
 				}
 			}, false, this);

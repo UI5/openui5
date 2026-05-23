@@ -142,7 +142,7 @@ sap.ui.define([
 		this.clock.tick(500);
 
 		// Assert
-		assert.strictEqual(oDialog.$().find("footer").length, 0, "Footer is not rendered when not visible");
+		assert.strictEqual(oDialog.$().find(".sapMDialogFooter").length, 0, "Footer is not rendered when not visible");
 
 		// Clean up
 		oDialog.destroy();
@@ -507,7 +507,7 @@ sap.ui.define([
 		var $Dialog = jQuery("#dialog"),
 			$ScrollDiv = this.oDialog.$("scroll"),
 			oTitleDom = this.oDialog.getDomRef("title"),
-			oSubHeaderDom = $Dialog.children("header").children(".sapMDialogSubHeader")[0],
+			oSubHeaderDom = $Dialog.children(".sapMDialogHeader").children(".sapMDialogSubHeader")[0],
 			oIconDom = this.oDialog.getDomRef("icon"),
 			oSearchField = Element.getElementById("__field0").getFocusDomRef();
 		assert.ok(document.getElementById("dialog"), "dialog is rendered after it's opened.");
@@ -1214,7 +1214,7 @@ sap.ui.define([
 		this.clock.tick(500);
 
 		// Assert
-		var dialogTitleId = oDialog.$().find('header .sapMDialogTitleGroup > .sapMBar .sapMTitle').attr('id');
+		var dialogTitleId = oDialog.$().find('.sapMDialogHeader .sapMDialogTitleGroup > .sapMBar .sapMTitle').attr('id');
 		var subHeaderId = oDialog.$().find('.sapMDialogSubHeader > .sapMBar .sapMTitle').attr('id');
 		var dialogAriaLabelledBy = oDialog.getAriaLabelledBy();
 		assert.strictEqual(oDialog.getDomRef().getAttribute('aria-labelledby'), dialogTitleId + ' ' + TEXT_ID);
@@ -1601,7 +1601,7 @@ sap.ui.define([
 	QUnit.test("Container Padding Classes", function (assert) {
 		// System under Test + Act
 		var oContainer = new Dialog(),
-			sContentSelector = "section > .sapMDialogScroll > .sapMDialogScrollCont",
+			sContentSelector = ".sapMDialogSection > .sapMDialogScroll > .sapMDialogScrollCont",
 			sResponsiveSize = (Device.resize.width <= 599 ? "0" : (Device.resize.width <= 1023 ? "16px" : "16px 32px")), // eslint-disable-line no-nested-ternary
 			aResponsiveSize = sResponsiveSize.split(" "),
 			$containerContent;
@@ -1980,7 +1980,7 @@ sap.ui.define([
 		this.clock.tick(500);
 
 		// assert
-		var dialogTitleId = oDialog.$().find('header .sapMDialogTitleGroup > .sapMBar .sapMTitle').attr('id');
+		var dialogTitleId = oDialog.$().find('.sapMDialogHeader .sapMDialogTitleGroup > .sapMBar .sapMTitle').attr('id');
 		var titleInSubHeaderId = oDialog.$().find('.sapMDialogSubHeader > .sapMBar .sapMTitle').attr('id');
 		assert.strictEqual(oDialog.getDomRef().getAttribute('aria-labelledby'), dialogTitleId + ' ' + titleInSubHeaderId);
 
@@ -2019,8 +2019,8 @@ sap.ui.define([
 		this.clock.tick(500);
 
 		// assert
-		assert.notOk(oDialog.$().find('header .sapMDialogTitleGroup').attr('aria-roledescription'), "Aria-roledescription attribute is not set");
-		assert.notOk(oDialog.$().find('header .sapMDialogTitleGroup').attr('aria-describedby'), "Aria-describedby attribute is not set");
+		assert.notOk(oDialog.$().find('.sapMDialogHeader .sapMDialogTitleGroup').attr('aria-roledescription'), "Aria-roledescription attribute is not set");
+		assert.notOk(oDialog.$().find('.sapMDialogHeader .sapMDialogTitleGroup').attr('aria-describedby'), "Aria-describedby attribute is not set");
 
 		// cleanup
 		oDialog.destroy();
@@ -2039,12 +2039,204 @@ sap.ui.define([
 		this.clock.tick(500);
 
 		// assert
-		var sAriaDescribedbyText = oDialog.$().find('header .sapMDialogTitleGroup > #' + oDialog.getId() + '-ariaDescribedbyText').attr('id');
+		var sAriaDescribedbyText = oDialog.$().find('.sapMDialogHeader .sapMDialogTitleGroup > #' + oDialog.getId() + '-ariaDescribedbyText').attr('id');
 		assert.ok(oDialog.$().find('.sapMDialogDragAndResizeHandler').attr('aria-describedby'), "The aria-describedby attribute is present on a draggable/resizable dialog");
-		assert.strictEqual(oDialog.$().find('header .sapMDialogTitleGroup').attr('aria-describedby'), sAriaDescribedbyText, "The aria-describedby attrbute points to the correct span");
+		assert.strictEqual(oDialog.$().find('.sapMDialogHeader .sapMDialogTitleGroup').attr('aria-describedby'), sAriaDescribedbyText, "The aria-describedby attrbute points to the correct span");
 
 		// cleanup
 		oDialog.destroy();
+	});
+
+	QUnit.module("Accessibility - Region Structure", {
+		beforeEach: function() {
+			this.oResourceBundle = Library.getResourceBundleFor("sap.m");
+		},
+		afterEach: function() {
+			if (this.oDialog) {
+				this.oDialog.destroy();
+			}
+		}
+	});
+
+	QUnit.test("Dialog header should have correct role and aria-label", function(assert) {
+		// Arrange
+		this.oDialog = new Dialog({
+			title: "Test Dialog Title",
+			content: [new Text({text: "Test content"})]
+		});
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		const oHeaderDiv = this.oDialog.$().find(".sapMDialogHeader")[0];
+		assert.ok(oHeaderDiv, "Header div is rendered");
+		assert.strictEqual(oHeaderDiv.getAttribute("role"), "region", "Header has correct role='region'");
+		assert.strictEqual(oHeaderDiv.getAttribute("aria-label"), this.oResourceBundle.getText("DIALOG_REGION_HEADER"), "Header has correct aria-label");
+	});
+
+	QUnit.test("Dialog content should have correct role and aria-label", function(assert) {
+		// Arrange
+		this.oDialog = new Dialog({
+			title: "Test Dialog",
+			content: [new Text({text: "Test content"})]
+		});
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		const oContentDiv = this.oDialog.$().find(".sapMDialogSection")[0];
+		assert.ok(oContentDiv, "Content div is rendered");
+		assert.strictEqual(oContentDiv.getAttribute("role"), "region", "Content has correct role='region'");
+		assert.strictEqual(oContentDiv.getAttribute("aria-label"), this.oResourceBundle.getText("DIALOG_REGION_CONTENT"), "Content has correct aria-label");
+	});
+
+	QUnit.test("Dialog footer should have correct role and aria-label when buttons are present", function(assert) {
+		// Arrange
+		this.oDialog = new Dialog({
+			title: "Test Dialog",
+			content: [new Text({text: "Test content"})],
+			beginButton: new Button({text: "OK"}),
+			endButton: new Button({text: "Cancel"})
+		});
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		const oFooterDiv = this.oDialog.$().find(".sapMDialogFooter")[0];
+		assert.ok(oFooterDiv, "Footer div is rendered");
+		assert.strictEqual(oFooterDiv.getAttribute("role"), "region", "Footer has correct role='region'");
+		assert.strictEqual(oFooterDiv.getAttribute("aria-label"), this.oResourceBundle.getText("DIALOG_REGION_FOOTER"), "Footer has correct aria-label");
+	});
+
+	QUnit.test("Dialog footer should have correct role and aria-label with custom footer", function(assert) {
+		// Arrange
+		this.oDialog = new Dialog({
+			title: "Test Dialog",
+			content: [new Text({text: "Test content"})],
+			footer: new Toolbar({
+					content: [new Button({text: "Custom Footer Button"})]
+			})
+		});
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		const oFooterDiv = this.oDialog.$().find(".sapMDialogFooter")[0];
+		assert.ok(oFooterDiv, "Footer div is rendered");
+		assert.strictEqual(oFooterDiv.getAttribute("role"), "region", "Footer has correct role='region'");
+		assert.strictEqual(oFooterDiv.getAttribute("aria-label"), this.oResourceBundle.getText("DIALOG_REGION_FOOTER"), "Footer has correct aria-label");
+	});
+
+	QUnit.test("Dialog with custom header should have correct role and aria-label", function(assert) {
+		// Arrange
+		this.oDialog = new Dialog({
+			customHeader: new Bar({
+					contentMiddle: [new Title({text: "Custom Header Title"})]
+			}),
+			content: [new Text({text: "Test content"})]
+		});
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		const oHeaderDiv = this.oDialog.$().find(".sapMDialogHeader")[0];
+		assert.ok(oHeaderDiv, "Header div is rendered");
+		assert.strictEqual(oHeaderDiv.getAttribute("role"), "region", "Header has correct role='region'");
+		assert.strictEqual(oHeaderDiv.getAttribute("aria-label"), this.oResourceBundle.getText("DIALOG_REGION_HEADER"), "Header has correct aria-label");
+	});
+
+	QUnit.test("Dialog with subheader should have header region containing both title and subheader", function(assert) {
+		// Arrange
+		this.oDialog = new Dialog({
+			title: "Main Title",
+			subHeader: new Bar({
+					contentMiddle: [new Text({text: "Subtitle"})]
+			}),
+			content: [new Text({text: "Test content"})]
+		});
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		const oHeaderDiv = this.oDialog.$().find(".sapMDialogHeader")[0];
+		assert.ok(oHeaderDiv, "Header div is rendered");
+		assert.strictEqual(oHeaderDiv.getAttribute("role"), "region", "Header has correct role='region'");
+		assert.strictEqual(oHeaderDiv.getAttribute("aria-label"), this.oResourceBundle.getText("DIALOG_REGION_HEADER"), "Header has correct aria-label");
+
+		// Check that both title group and subheader are within the header region
+		const oTitleGroup = this.oDialog.$().find(".sapMDialogTitleGroup")[0];
+		const oSubHeader = this.oDialog.$().find(".sapMDialogSubHeader")[0];
+		assert.ok(oHeaderDiv.contains(oTitleGroup), "Title group is within header region");
+		assert.ok(oHeaderDiv.contains(oSubHeader), "Subheader is within header region");
+	});
+
+	QUnit.test("Dialog without header should not render header region", function(assert) {
+		// Arrange
+		this.oDialog = new Dialog({
+			showHeader: false,
+			content: [new Text({text: "Test content"})]
+		});
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		const oHeaderDiv = this.oDialog.$().find(".sapMDialogHeader")[0];
+		assert.notOk(oHeaderDiv, "Header div should not be rendered when showHeader is false");
+	});
+
+	QUnit.test("Dialog without footer should not render footer region", function(assert) {
+		// Arrange
+		this.oDialog = new Dialog({
+			title: "Test Dialog",
+			content: [new Text({text: "Test content"})]
+		});
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		const oFooterDiv = this.oDialog.$().find(".sapMDialogFooter")[0];
+		assert.notOk(oFooterDiv, "Footer div should not be rendered when no buttons or footer are set");
+	});
+
+	QUnit.test("Dialog regions should maintain proper document order", function(assert) {
+		// Arrange
+		this.oDialog = new Dialog({
+			title: "Test Dialog",
+			subHeader: new Bar({
+					contentMiddle: [new Text({text: "Subtitle"})]
+			}),
+			content: [new Text({text: "Test content"})],
+			beginButton: new Button({text: "OK"})
+		});
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		const aRegions = this.oDialog.$().find('[role="region"]');
+		assert.strictEqual(aRegions.length, 3, "Three regions should be present");
+
+		// Check order: header, content, footer
+		assert.ok(aRegions[0].classList.contains("sapMDialogHeader"), "First region should be header");
+		assert.ok(aRegions[1].classList.contains("sapMDialogSection"), "Second region should be content");
+		assert.ok(aRegions[2].classList.contains("sapMDialogFooter"), "Third region should be footer");
 	});
 
 	QUnit.module("Dragging");
@@ -2725,8 +2917,10 @@ sap.ui.define([
 		this.clock.tick(500);
 		$document.trigger(new jQuery.Event("mouseup", oMockEvent));
 
+		const iHeaderHeight = $dialog.find("> .sapMDialogHeader").outerHeight() || 0;
+
 		// Assert
-		assert.strictEqual($dialogContentSection.height(), $dialog.height(), "The height of the content section is equal to the height of the dialog.");
+		assert.strictEqual($dialogContentSection.height() + iHeaderHeight, $dialog.height(), "The height of the content section is equal to the height of the dialog.");
 	});
 
 	QUnit.module("Keyboard drag and resize",{
