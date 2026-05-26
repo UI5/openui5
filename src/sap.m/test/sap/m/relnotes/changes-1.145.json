@@ -288,5 +288,35 @@
         "text": " core/Control: Improve focus restoration for busy indicator"
       }
     ]
+  },
+  "1.145.3": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "56b362a7c2cabddff14f5ddc0149f89559697a36",
+        "type": "FIX",
+        "text": " We've now fixed an issue where the image on the slide tile was disappearing on browser window resize"
+      },
+      {
+        "id": "8a553f16f9f29e5fa5a0e75dff413259ee4c9d77",
+        "type": "FIX",
+        "text": " sap.m.StandardDynamicDateOption: Fix default value for TODAYFROMTO operator"
+      },
+      {
+        "id": "8867b9dc2b7245cdba7d65542428149cf587a4a5",
+        "type": "FIX",
+        "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
+      },
+      {
+        "id": "c191ba5cf96cf850ff1626bbb6058ed56bb62e2f",
+        "type": "FIX",
+        "text": " IllustrationExplorer: Fix unstable OPA tests for size, set, and checkbox actions"
+      },
+      {
+        "id": "d6784855091198c15c0da190e6e8a0c92f37eea2",
+        "type": "FIX",
+        "text": " sap.m.Text: Skip unstable test in Chrome"
+      }
+    ]
   }
 }

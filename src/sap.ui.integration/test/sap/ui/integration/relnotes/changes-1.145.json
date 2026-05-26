@@ -28,5 +28,15 @@
         "text": " Integration Cards: Fix reported console errors in Card Explorer"
       }
     ]
+  },
+  "1.145.3": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "8867b9dc2b7245cdba7d65542428149cf587a4a5",
+        "type": "FIX",
+        "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
+      }
+    ]
   }
 }

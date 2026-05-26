@@ -23,5 +23,15 @@
         "text": " rowmodes.Auto: Automatic row count adjustment"
       }
     ]
+  },
+  "1.145.3": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "be7e79190bf56e9e5f077d51b0d4a06bd2a69284",
+        "type": "FIX",
+        "text": " Table: Show busy indicator when selection plugins load data"
+      }
+    ]
   }
 }

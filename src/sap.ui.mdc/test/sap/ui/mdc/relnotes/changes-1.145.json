@@ -78,5 +78,20 @@
         "text": " Field: initial Timezone leads to error"
       }
     ]
+  },
+  "1.145.3": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "832381e877505129842273cc38421964b7223cc6",
+        "type": "FIX",
+        "text": " ValueHelp: only 50 Tokens are shown"
+      },
+      {
+        "id": "ba35aa178177c17a1e6165ad538b325086b8d34a",
+        "type": "FIX",
+        "text": " FieldBase: fix issue when searching for string including ()."
+      }
+    ]
   }
 }
