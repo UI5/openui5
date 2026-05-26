@@ -9,8 +9,9 @@ sap.ui.define([
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/m/library",
 	"sap/ui/events/KeyCodes",
-	"sap/ui/model/BindingMode"
-], function(VariantItem, VariantManagement, Element, ContextSharingAPI, QUnitUtils, JSONModel, nextUIUpdate, mobileLibrary, KeyCodes, BindingMode) {
+	"sap/ui/model/BindingMode",
+	"sap/base/Log"
+], function(VariantItem, VariantManagement, Element, ContextSharingAPI, QUnitUtils, JSONModel, nextUIUpdate, mobileLibrary, KeyCodes, BindingMode, Log) {
 	"use strict";
 
 	// shortcut for sap.m.Sticky
@@ -1603,6 +1604,17 @@ sap.ui.define([
 		this.oVM._openManagementDialog();
 	}
 
+	QUnit.module("VariantManagement Manage dialog with external items binding", {
+		beforeEach: async function() {
+			this.oVM = new VariantManagement("VM1");
+			this.oVM.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oVM.destroy();
+		}
+	});
+
 	QUnit.test("check binding on items is propagated into dialog", async function(assert) {
 		const oVariantsModel = new JSONModel({variants: [
 			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", author: "A", favorite: true, visible: true},
@@ -1802,6 +1814,475 @@ sap.ui.define([
 			assert.equal(oBinding.getBindingMode(), BindingMode.OneWay, "OneWay binding expected");
 
 			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("search filters by 'title' on the path resolved from the items template", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantName: "Standard", createdBy: "A", visible: true},
+			{variantKey: "2", variantName: "Custom View", createdBy: "B", visible: true},
+			{variantKey: "3", variantName: "Other", createdBy: "C", visible: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: "{variantName}",
+				author: "{createdBy}",
+				visible: "{visible}"
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			const oManagementTable = this.oVM.oManagementTable;
+			assert.equal(oManagementTable.getItems().length, 3, "all three rows visible before search");
+
+			this.oVM._triggerSearchInManageDialogByValue("Custom", oManagementTable);
+			assert.equal(oManagementTable.getItems().length, 1, "search by title via 'variantName' path matches one row");
+			assert.equal(oManagementTable.getItems()[0].getCells()[1].getValue(), "Custom View", "matched row shows the expected title");
+
+			this.oVM._triggerSearchInManageDialogByValue("", oManagementTable);
+			assert.equal(oManagementTable.getItems().length, 3, "clearing the search restores all rows");
+
+			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("search filters by 'title' via the 'text' fallback when only 'text' is bound", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantName: "Standard", createdBy: "A", visible: true},
+			{variantKey: "2", variantName: "Custom View", createdBy: "B", visible: true},
+			{variantKey: "3", variantName: "Other", createdBy: "C", visible: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				text: "{variantName}",
+				author: "{createdBy}",
+				visible: "{visible}"
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			const oManagementTable = this.oVM.oManagementTable;
+			assert.equal(oManagementTable.getItems().length, 3, "all three rows visible before search");
+
+			this.oVM._triggerSearchInManageDialogByValue("Custom", oManagementTable);
+			assert.equal(oManagementTable.getItems().length, 1, "search by title falls back to the 'text' binding path");
+			assert.equal(oManagementTable.getItems()[0].getCells()[1].getValue(), "Custom View", "matched row shows the expected title");
+
+			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("search filters by 'author' on the path resolved from the items template", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantName: "Standard", createdBy: "Alice", visible: true},
+			{variantKey: "2", variantName: "Custom View", createdBy: "Bob", visible: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: "{variantName}",
+				author: "{createdBy}",
+				visible: "{visible}"
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			const oManagementTable = this.oVM.oManagementTable;
+			this.oVM._triggerSearchInManageDialogByValue("Bob", oManagementTable);
+			assert.equal(oManagementTable.getItems().length, 1, "search by author via 'createdBy' path matches one row");
+			assert.equal(oManagementTable.getItems()[0].getCells()[6].getText(), "Bob", "matched row shows the expected author");
+
+			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("static 'visible: true' on the template shows all rows in the manage dialog", async function(assert) {
+		// Model deliberately does not contain a 'visible' field — visibility is fixed via the template constant.
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantName: "Standard", createdBy: "A"},
+			{variantKey: "2", variantName: "Custom View", createdBy: "B"}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: "{variantName}",
+				author: "{createdBy}",
+				visible: true
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			const aItems = this.oVM.oManagementTable.getItems();
+			assert.equal(aItems.length, 2, "both rows are shown when 'visible' is a constant true on the template");
+
+			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("static 'visible: false' on the template results in an empty manage dialog table", async function(assert) {
+		// Model has "visible: true" everywhere but the constant 'false' on the template wins and the table must be empty.
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantName: "Standard", createdBy: "A", visible: true},
+			{variantKey: "2", variantName: "Custom View", createdBy: "B", visible: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: "{variantName}",
+				author: "{createdBy}",
+				visible: false
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			assert.equal(this.oVM.oManagementTable.getItems().length, 0, "no rows are shown when 'visible' is a constant false on the template");
+
+			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("complex (formatter) 'title' binding: search uses the formatted value", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", createdBy: "A", visible: true},
+			{variantKey: "2", variantTitlePart1: "Two", variantTitlePart2: " and Two", createdBy: "B", visible: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: {parts: [{path: "variantTitlePart1"}, {path: "variantTitlePart2"}], formatter: (a, b) => `Title: ${a}${b}`},
+				author: "{createdBy}",
+				visible: "{visible}"
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			const oManagementTable = this.oVM.oManagementTable;
+			const oWarning = sinon.spy(Log, "warning");
+
+			// "Title: Two" only appears in the *formatted* title of row 2 — neither raw part contains it.
+			// This proves the search evaluates the formatter rather than filtering on a part path.
+			this.oVM._triggerSearchInManageDialogByValue("Title: Two", oManagementTable);
+			assert.equal(oManagementTable.getItems().length, 1, "complex title binding: formatter is evaluated for search");
+			assert.equal(oManagementTable.getItems()[0].getCells()[1].getValue(), "Title: Two and Two", "matched row shows the expected formatted title");
+			assert.notOk(oWarning.called, "no warning is logged for client-side complex bindings");
+
+			oWarning.restore();
+			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("complex (formatter) 'title' binding: consecutive searches see the full data set", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", createdBy: "A", visible: true},
+			{variantKey: "2", variantTitlePart1: "Two", variantTitlePart2: " and Two", createdBy: "B", visible: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: {parts: [{path: "variantTitlePart1"}, {path: "variantTitlePart2"}], formatter: (a, b) => `Title: ${a}${b}`},
+				author: "{createdBy}",
+				visible: "{visible}"
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			const oManagementTable = this.oVM.oManagementTable;
+
+			// First search narrows the table to row 1.
+			this.oVM._triggerSearchInManageDialogByValue("Title: One", oManagementTable);
+			assert.equal(oManagementTable.getItems().length, 1, "first search matches row 1 only");
+
+			// Second search (replacing the query without clearing) must still see row 2,
+			// even though the previous filter narrowed the binding to row 1.
+			this.oVM._triggerSearchInManageDialogByValue("Title: Two", oManagementTable);
+			assert.equal(oManagementTable.getItems().length, 1, "second search matches row 2 only");
+			assert.equal(oManagementTable.getItems()[0].getCells()[1].getValue(), "Title: Two and Two", "second search returns the row that was filtered out by the first search");
+
+			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("reopening the manage dialog resets search and filter", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", createdBy: "A", visible: true},
+			{variantKey: "2", variantTitlePart1: "Two", variantTitlePart2: " and Two", createdBy: "B", visible: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: {parts: [{path: "variantTitlePart1"}, {path: "variantTitlePart2"}], formatter: (a, b) => `Title: ${a}${b}`},
+				author: "{createdBy}",
+				visible: "{visible}"
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+		let nOpenCount = 0;
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+			nOpenCount++;
+
+			const oManagementTable = this.oVM.oManagementTable;
+
+			if (nOpenCount === 1) {
+				// First open: narrow the table via search, then close and reopen.
+				this.oVM._triggerSearchInManageDialogByValue("Title: One", oManagementTable);
+				assert.equal(oManagementTable.getItems().length, 1, "first open: search narrows the table");
+
+				this.oVM.oManagementDialog.close();
+				this.oVM._openManagementDialog();
+			} else if (nOpenCount === 2) {
+				assert.equal(this.oVM._oSearchFieldOnMgmtDialog.getValue(), "", "reopen: search field is empty");
+				assert.equal(oManagementTable.getItems().length, 2, "reopen: table shows all rows");
+				done();
+			}
 
 		}.bind(this));
 
