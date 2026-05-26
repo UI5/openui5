@@ -482,8 +482,8 @@ sap.ui.define([
 		var oRB = Library.getResourceBundleFor("sap.m");
 		var sTextFirstColumn = this.oSelectionPanel._oListControl.getColumns()[0].getHeader().getText();
 
-		//Note: this test serves to check that also filtered lists still "remember" the complete selection state
-		assert.equal(sTextFirstColumn, "Fields " + oRB.getText("p13n.HEADER_COUNT", [4, 6]), "The text has been enhanced with a count (4 are selected, 6 are available)");
+		//Note: Count shows only visible selected items out of total visible items (filter is still active)
+		assert.equal(sTextFirstColumn, "Fields " + oRB.getText("p13n.HEADER_COUNT", [1, 1]), "The text shows count (1 visible selected item out of 1 visible item after filter)");
 	});
 
 	QUnit.test("Check selection count after filtering and resetting the p13n data", function(assert) {
@@ -513,7 +513,7 @@ sap.ui.define([
 		var oRB = Library.getResourceBundleFor("sap.m");
 		var sTextFirstColumn = this.oSelectionPanel._oListControl.getColumns()[0].getHeader().getText();
 
-		assert.equal(sTextFirstColumn, "Fields " + oRB.getText("p13n.HEADER_COUNT", [3, 6]), "3 are selected, 6 are available");
+		assert.equal(sTextFirstColumn, "Fields " + oRB.getText("p13n.HEADER_COUNT", [3, 3]), "3 are selected, 3 are visible (filter still active)");
 	});
 
 	QUnit.test("Check reset of hover logic on data update", function(assert){
