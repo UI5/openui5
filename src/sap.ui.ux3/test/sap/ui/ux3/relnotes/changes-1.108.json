@@ -1,0 +1,12 @@
+{
+  "1.108.51": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "566d3f50ad3b2074f3f0ae506228ba5a02236249",
+        "type": "FIX",
+        "text": " sap.ui.ux3.ThingInspector: stabilize tests"
+      }
+    ]
+  }
+}

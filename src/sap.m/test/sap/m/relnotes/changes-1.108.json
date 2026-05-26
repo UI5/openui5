@@ -2002,5 +2002,20 @@
         "text": " sap.m.Button: Press event is fired correctly on pressing SPACE"
       }
     ]
+  },
+  "1.108.51": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "b506bf4fdcf8cae26e3f6d28f154b8f417c8cdff",
+        "type": "FIX",
+        "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
+      },
+      {
+        "id": "865c28638435c523f04c222c9fa75b1256837b1d",
+        "type": "FIX",
+        "text": " sap.m.Text: Skip unstable test in Chrome"
+      }
+    ]
   }
 }

@@ -315,5 +315,15 @@
         "text": " sap.f.DynamicPageTitle: Fix flaky focus test in Safari"
       }
     ]
+  },
+  "1.108.51": {
+    "date": "May 2026",
+    "notes": [
+      {
+        "id": "603274b2d417079caea77a6e289917267f10cbee",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Cache scrollbar width to avoid excessive style recalculations"
+      }
+    ]
   }
 }
