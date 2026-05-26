@@ -1508,6 +1508,30 @@ var FrameType = library.FrameType;
 		assert.strictEqual(oSpy.callCount, 1, "_setHeaderContentBackgroundImage has been called");
 	});
 
+	QUnit.test("Background image moves to hdrContent on large screen and back to root on small screen", async function (assert) {
+		// Arrange: large screen (>= 800px)
+		this.oSlideTile = this.createSlideTile(false, true).placeAt("qunit-fixture");
+		this.oSlideTile.setWidth("900px");
+		await nextUIUpdate();
+
+		var oTile = this.oSlideTile.getTiles()[0];
+		var oRoot = oTile.getDomRef();
+		var oHdrContent = oTile.getDomRef("hdrContent");
+
+		// Assert: large screen — image must be on hdrContent, not on root
+		assert.ok(oHdrContent.style.backgroundImage, "Large screen: background-image is on hdrContent");
+		assert.notOk(oRoot.style.backgroundImage, "Large screen: background-image is absent from root element");
+
+		// Act: shrink to small screen (< 800px)
+		this.oSlideTile.setWidth("400px");
+		await nextUIUpdate();
+		this.oSlideTile._fnResizeHandler();
+
+		// Assert: small screen — image must be back on root, hdrContent cleared
+		assert.ok(oRoot.style.backgroundImage, "Small screen: background-image is restored on root element");
+		assert.notOk(oHdrContent.style.backgroundImage, "Small screen: background-image is absent from hdrContent");
+	});
+
 	// Checks whether the given DomRef is contained or equals (in) one of the given container
 	function isContained(aContainers, oRef) {
 		for (var i = 0; i < aContainers.length; i++) {
