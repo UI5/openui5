@@ -333,6 +333,23 @@ sap.ui.define([
 		assert.equal(this.oHeaderContainer._getScrollValue(false), -100);
 	});
 
+	QUnit.test("Single item wider than container falls back to scrollStep pixels", async function (assert) {
+		var oContainer = new HeaderContainer({
+			width: "250px",
+			height: "150px",
+			content: [new FlexBox({ width: "400px", height: "120px" })]
+		});
+		oContainer.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.strictEqual(oContainer._getScrollValue(true), oContainer.getScrollStep(),
+			"Forward scroll falls back to getScrollStep() when item-math yields 0");
+		assert.strictEqual(oContainer._getScrollValue(false), 0,
+			"Backward scroll returns 0 at start (item-math result is preserved)");
+
+		oContainer.destroy();
+	});
+
 	QUnit.test("Shifting content to the left", function (assert) {
 		var done = assert.async();
 		setTimeout(function () {
