@@ -3345,6 +3345,37 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("copy single token", async (assert) => {
+
+		ClipboardUtils.stub();
+		oField.setDisplay(FieldDisplay.DescriptionValue);
+		oField.setConditions([Condition.createItemCondition(1, "Test"), Condition.createCondition(OperatorName.LT, [10])]);
+		await nextUIUpdate();
+
+		const aContent = oField.getAggregation("_content");
+		const oContent = aContent?.length > 0 && aContent[0];
+		const oTokenizer = oContent?.getAggregation("tokenizer");
+		const aTokens = oTokenizer?.getTokens();
+		const oToken = aTokens?.[0];
+
+		oToken.focus();
+		qutils.triggerKeydown(oToken.getFocusDomRef().id, KeyCodes.C, false, false, true);
+		ClipboardUtils.triggerCopy(oToken.getFocusDomRef());
+
+		await new Promise((resolve) => {setTimeout(resolve,0);});
+		const aClipboardContents = await navigator.clipboard.read();
+		let oBlob = await aClipboardContents[0]?.getType("text/plain");
+		let sText = await oBlob.text();
+		assert.equal(sText, "1\tTest", "Clipboard filled");
+
+		oBlob = await aClipboardContents[0]?.getType("text/html");
+		sText = await oBlob.text();
+		assert.equal(sText, "<table><tr><td>Test (1)</td></tr></table>", "Clipboard filled for HTML");
+
+		ClipboardUtils.restore();
+
+	});
+
 	QUnit.test("check for user interaction", async (assert) => {
 
 		const oIcon = new Icon("I1", { src: "sap-icon://sap-ui5", decorative: false, press: (oEvent) => {} }).placeAt("content");
@@ -4732,16 +4763,16 @@ sap.ui.define([
 		assert.ok(oContent.onsapdown.notCalled, "onsapdown not called on content control");
 
 		qutils.triggerKeydown(oField.getFocusDomRef().id, KeyCodes.HOME, false, false, false);
-		assert.ok(oContent.onsaphome.notCalled, "onsaphome not called on content control");
+		assert.ok(oContent.onsaphome.called, "onsaphome called on content control");
 
 		qutils.triggerKeydown(oField.getFocusDomRef().id, KeyCodes.END, false, false, false);
-		assert.ok(oContent.onsapend.notCalled, "onsapend not called on content control");
+		assert.ok(oContent.onsapend.called, "onsapend called on content control");
 
 		qutils.triggerKeydown(oField.getFocusDomRef().id, KeyCodes.PAGE_UP, false, false, false);
-		assert.ok(oContent.onsappageup.notCalled, "onsappageup not called on content control");
+		assert.ok(oContent.onsappageup.called, "onsappageup called on content control");
 
 		qutils.triggerKeydown(oField.getFocusDomRef().id, KeyCodes.PAGE_DOWN, false, false, false);
-		assert.ok(oContent.onsappagedown.notCalled, "onsappagedown not called on content control");
+		assert.ok(oContent.onsappagedown.called, "onsappagedown called on content control");
 
 		qutils.triggerKeydown(oField.getFocusDomRef().id, KeyCodes.BACKSPACE, false, false, false);
 		assert.ok(oContent.onsapbackspace.called, "onsapbackspace called on content control");
