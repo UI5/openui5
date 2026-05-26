@@ -353,8 +353,10 @@ sap.ui.define([
 			_oWatermark: {
 				groupID: "~groupID/watermark/node"
 			},
+			aBatchRequestQueue: [],
 			bCollapseRecursive: true,
 			_autoExpandPaging() {},
+			_fireChange() {},
 			_getIndexBeforeFirstMissingNode() {},
 			_isRunningInAutoExpand() {},
 			_updateTreeState() {},
@@ -379,6 +381,8 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(bHasSibling ? "~sibling node" : oNode))
 			.returns("~lastWatermarkNodeIndex");
 		this.mock(oBinding).expects("_autoExpandPaging").withExactArgs();
+		// queue stays empty -> no real request fired -> change event must be sent
+		this.mock(oBinding).expects("_fireChange").withExactArgs({reason: "collapse"});
 
 
 		// code under test
@@ -387,4 +391,42 @@ sap.ui.define([
 		assert.strictEqual(oNode.nodeState.selectAllMode, false);
 	});
 });
+
+	//*********************************************************************************************
+	QUnit.test("collapse: suppresses change event only if autoExpandPaging queues a request", function (assert) {
+		const aBatchRequestQueue = [];
+		const oBinding = {
+			_mTreeState: {expanded: {}, selected: {}},
+			_oWatermark: {
+				groupID: "~groupID/watermark/node"
+			},
+			aBatchRequestQueue,
+			bCollapseRecursive: true,
+			_autoExpandPaging() {},
+			_fireChange() {},
+			_getIndexBeforeFirstMissingNode() {},
+			_isRunningInAutoExpand() {},
+			_updateTreeState() {},
+			findNode() {}
+		};
+		const oParentNode = {children: [{/*child node*/}]};
+		const oNode = {
+			nodeState: {groupID: "~groupID"},
+			parent: oParentNode,
+			positionInParent: 1
+		};
+		oParentNode.children.push(oNode);
+		this.mock(oBinding).expects("findNode").withExactArgs(42).returns(oNode);
+		this.mock(oBinding).expects("_updateTreeState").withExactArgs({groupID: "~groupID", expanded: false});
+		this.mock(oBinding).expects("_isRunningInAutoExpand").withExactArgs(TreeAutoExpandMode.Bundled).returns(true);
+		this.mock(oBinding).expects("_getIndexBeforeFirstMissingNode").returns("~lastWatermarkNodeIndex");
+		this.mock(oBinding).expects("_autoExpandPaging").withExactArgs()
+			.callsFake(() => aBatchRequestQueue.push("~queuedRequest"));
+		this.mock(oBinding).expects("_fireChange").never();
+
+		// code under test
+		AnalyticalTreeBindingAdapter.prototype.collapse.call(oBinding, 42);
+
+		assert.strictEqual(aBatchRequestQueue.length, 1);
+	});
 });

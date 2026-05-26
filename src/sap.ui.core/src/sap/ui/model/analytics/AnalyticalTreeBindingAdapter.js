@@ -677,8 +677,9 @@ sap.ui.define([
 					};
 				}
 
+				const iQueueLengthBefore = this.aBatchRequestQueue.length;
 				this._autoExpandPaging();
-				bAutoExpandRequestTriggered = true;
+				bAutoExpandRequestTriggered = this.aBatchRequestQueue.length > iQueueLengthBefore;
 			}
 
 			// Collapse all subsequent child nodes, this is determined by a common groupID prefix, e.g.: "/A100-50/" is the parent of "/A100-50/Finance/"
