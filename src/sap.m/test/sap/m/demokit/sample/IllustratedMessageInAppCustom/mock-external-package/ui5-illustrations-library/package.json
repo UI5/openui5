@@ -13,7 +13,7 @@
 	],
 	"author": "SAP SE",
 	"dependencies": {
-	  "dompurify": "^3.2.4",
+	  "dompurify": "^3.4.1",
 	  "jsdom": "^19.0.0",
 	  "xmldom": "^0.6.0"
 	}

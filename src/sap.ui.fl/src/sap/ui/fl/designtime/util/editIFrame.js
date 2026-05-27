@@ -36,6 +36,7 @@ sap.ui.define([
 			title: oInitialSettings.title,
 			asContainer: !!oInitialSettings.title,
 			advancedSettings: deepClone(oInitialSettings.advancedSettings),
+			allowFocusWithoutUserActivation: oInitialSettings.allowFocusWithoutUserActivation ?? true,
 			updateMode: true
 		};
 		const mSettings = await oAddIFrameDialog.open(mDialogSettings, oIFrame);
@@ -50,6 +51,14 @@ sap.ui.define([
 			width: oInitialSettings.width,
 			advancedSettings: oInitialSettings.advancedSettings
 		};
+		// The dialog only returns allowFocusWithoutUserActivation when the browser supports
+		// the Permissions Policy. When the value is missing, leave the existing setting
+		// untouched: legacy iframes keep the implicit default (true) and iframes that already
+		// have a persisted value keep that value. Only seed and compare the property when the
+		// dialog actually returned it.
+		if (mSettings.allowFocusWithoutUserActivation !== undefined) {
+			oNewContent.allowFocusWithoutUserActivation = oInitialSettings.allowFocusWithoutUserActivation ?? true;
+		}
 
 		if (mSettings.frameHeight + mSettings.frameHeightUnit !== oInitialSettings.height) {
 			bContentChanged = true;
@@ -66,6 +75,13 @@ sap.ui.define([
 		if (!_isEqual(mSettings.advancedSettings, oInitialSettings.advancedSettings)) {
 			bContentChanged = true;
 			oNewContent.advancedSettings = mSettings.advancedSettings;
+		}
+		if (
+			mSettings.allowFocusWithoutUserActivation !== undefined
+			&& (mSettings.allowFocusWithoutUserActivation ?? true) !== (oInitialSettings.allowFocusWithoutUserActivation ?? true)
+		) {
+			bContentChanged = true;
+			oNewContent.allowFocusWithoutUserActivation = mSettings.allowFocusWithoutUserActivation;
 		}
 
 		if (bContentChanged) {

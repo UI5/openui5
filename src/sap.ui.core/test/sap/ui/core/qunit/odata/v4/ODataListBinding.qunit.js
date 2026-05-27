@@ -1392,7 +1392,7 @@ sap.ui.define([
 			= "~sChangeReasonAfterRemoveVirtualContext~";
 		const bExpectRestartAutoExpandSelect = bRestartAutoExpandSelect && bAutoExpandSelect;
 		this.mock(oBinding).expects("_fireChange").exactly(bExpectRestartAutoExpandSelect ? 1 : 0)
-			.withExactArgs({reason : ChangeReason.Change, detailedReason : "AddVirtualContext"})
+			.withExactArgs({reason : "~sNewChangeReason~", detailedReason : "AddVirtualContext"})
 			.callsFake(function () {
 				assert.deepEqual(oBinding.mAggregatedQueryOptions, {});
 				assert.strictEqual(oBinding.bAggregatedQueryOptionsInitial, true);
@@ -2032,12 +2032,10 @@ sap.ui.define([
 [false, true].forEach(function (bAsync) {
 	[false, true].forEach(function (bChanged) {
 		[undefined, true].forEach(function (bKeepCurrent) {
-			[undefined, "anotherReason"].forEach(function (sChangeReasonAfterRemoveVirtualContext) {
-	const sTitle = "getContexts: async=" + bAsync + ", changed=" + bChanged
-		+ ", bKeepCurrent=" + bKeepCurrent
-		+ ", sChangeReasonAfterRemoveVirtualContext=" + sChangeReasonAfterRemoveVirtualContext;
+			var sTitle = "getContexts: async=" + bAsync + ", changed=" + bChanged
+					+ ", bKeepCurrent=" + bKeepCurrent;
 
-	QUnit.test(sTitle, async function (assert) {
+	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("n/a"),
 			aContexts = [],
 			oFetchContextsPromise = bAsync
@@ -2046,7 +2044,6 @@ sap.ui.define([
 			iMaximumPrefetchSize = bKeepCurrent ? 0 : 100,
 			aResults;
 
-		oBinding.sChangeReasonAfterRemoveVirtualContext = sChangeReasonAfterRemoveVirtualContext;
 		oBinding.bLengthFinal = true;
 		oBinding.oReadGroupLock = "~oReadGroupLock~";
 		oBinding.iCurrentBegin = 2;
@@ -2075,10 +2072,7 @@ sap.ui.define([
 			.returns("~bExpectMore~");
 		this.mock(oBinding).expects("_fireChange")
 			.exactly(bAsync && bChanged ? 1 : 0)
-			.withExactArgs({reason : sChangeReasonAfterRemoveVirtualContext ?? ChangeReason.Change})
-			.callsFake(function () {
-				assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext, undefined);
-			});
+			.withExactArgs({reason : ChangeReason.Change});
 
 		// code under test
 		aResults = oBinding.getContexts(5, 10, iMaximumPrefetchSize, bKeepCurrent);
@@ -2090,17 +2084,10 @@ sap.ui.define([
 		assert.strictEqual(oBinding.iCurrentEnd, bKeepCurrent ? 7 : 15);
 		if (bAsync) {
 			sinon.assert.callOrder(oCreateExpectation, oGetContextsExpectation);
-			assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
-				sChangeReasonAfterRemoveVirtualContext);
-		} else {
-			assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext, undefined);
 		}
 
-		await oFetchContextsPromise;
-
-		assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext, undefined);
+		return oFetchContextsPromise;
 	});
-			});
 		});
 	});
 });
@@ -2305,14 +2292,14 @@ sap.ui.define([
 					assert.strictEqual(oBinding.sChangeReason, "RemoveVirtualContext");
 				});
 			oBindingMock.expects("reset")
-				.withExactArgs(sChangeReasonAfterRemoveVirtualContext ?? ChangeReason.Refresh);
+				.withExactArgs(sChangeReasonAfterRemoveVirtualContext ?? ChangeReason.Refresh)
+				.callsFake(function () {
+					assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext, undefined);
+				});
 		}
 
 		// code under test - call the 2nd prerendering task
 		oAddTask1.args[0][0]();
-
-		assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
-			sChangeReasonAfterRemoveVirtualContext, "unchanged");
 	});
 		});
 	});

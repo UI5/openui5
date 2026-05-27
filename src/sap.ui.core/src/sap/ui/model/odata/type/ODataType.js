@@ -195,15 +195,23 @@ sap.ui.define([
 
 	/**
 	 * Returns a language-dependent placeholder text such as "e.g. <sample value>" where <sample value> is formatted
-	 * using this type.
+	 * using this type. The <code>oMinimum</code> and <code>oMaximum</code> parameters are supported since 1.149.0 and
+	 * only by types that use {@link sap.ui.core.format.DateFormat} for formatting
+	 * ({@link sap.ui.model.odata.type.Date}, {@link sap.ui.model.odata.type.DateTime},
+	 * {@link sap.ui.model.odata.type.DateTimeOffset}, {@link sap.ui.model.odata.type.DateTimeWithTimezone},
+	 * {@link sap.ui.model.odata.type.Time}, and {@link sap.ui.model.odata.type.TimeOfDay}). The default sample date
+	 * is used if it is valid. Otherwise, the closest valid year end, highest valid month end, or highest valid date
+	 * is used.
 	 *
+	 * @param {module:sap/ui/core/date/UI5Date} [oMinimum] The minimum date
+	 * @param {module:sap/ui/core/date/UI5Date} [oMaximum] The maximum date
 	 * @returns {string|undefined}
 	 *   The language-dependent placeholder text or <code>undefined</code> if the type does not offer a placeholder
 	 *
 	 * @public
 	 */
-	ODataType.prototype.getPlaceholderText = function () {
-		return this.getFormat && this.getFormat().getPlaceholderText && this.getFormat().getPlaceholderText();
+	ODataType.prototype.getPlaceholderText = function (oMinimum, oMaximum) {
+		return this.getFormat?.().getPlaceholderText?.(oMinimum, oMaximum);
 	};
 
 	/**

@@ -116,6 +116,14 @@
 		.sapMBtnInner {
 			min-width: 2rem;
 		}
+
+		.sapMBtnIcon {
+			transition: transform 0.4s ease-in-out;
+		}
+	}
+
+	> .sapMBtn.sapMPanelExpandBtnRotated .sapMBtnIcon {
+		transform: rotate(90deg);
 	}
 }
 
@@ -130,6 +138,23 @@
 	font-size: 1rem;
 	cursor: inherit;
 	color: var(--sapContent_IconColor);
+	transition: transform 0.4s ease-in-out;
+}
+
+.sapMPanelWrappingDiv .sapUiIcon.sapMPanelExpandIconRotated {
+	transform: translateY(-50%) rotate(90deg);
+}
+
+html[data-sap-ui-animation-mode="none"],
+html[data-sap-ui-animation-mode="minimal"] {
+	.sapMPanelWrappingDiv .sapUiIcon {
+		transition: none;
+	}
+
+	.sapMPanelWrappingDiv > .sapMBtn .sapMBtnIcon,
+	.sapMPanelWrappingDivTb > .sapMBtn .sapMBtnIcon {
+		transition: none;
+	}
 }
 
 /* if Panel is expandable, we do not wish toolbar to come with own border */

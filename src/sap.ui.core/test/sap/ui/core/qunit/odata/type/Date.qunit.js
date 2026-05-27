@@ -425,13 +425,22 @@ sap.ui.define([
 	QUnit.test("getPlaceholderText", function (assert) {
 		var oType = new DateType();
 
-		this.mock(DateFormat.prototype).expects("getPlaceholderText").withExactArgs().callsFake(function () {
-			assert.strictEqual(this, oType.oFormat);
-			return "~placeholder";
-		});
+		this.mock(DateFormat.prototype).expects("getPlaceholderText")
+			.withExactArgs(undefined, undefined).callsFake(function () {
+				assert.strictEqual(this, oType.oFormat);
+				return "~placeholder";
+			});
 
 		// code under test
 		assert.strictEqual(oType.getPlaceholderText(), "~placeholder");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getPlaceholderText: w/ oMin, oMax", function (assert) {
+		const oType = new DateType();
+
+		// code under test
+		assert.strictEqual(oType.getPlaceholderText(UI5Date.getInstance("2040-01-01"), undefined), "e.g. Dec 31, 2040");
 	});
 
 	//*********************************************************************************************

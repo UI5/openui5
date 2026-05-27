@@ -353,33 +353,55 @@
 									height="3rem"
 									style="Clear">
 								<Title
+									id="sapUiRtaAddIFrameDialog_AdvancedSettingsTitle"
 									class="sapUiRtaAddIFrameDialogAdvancedSettingsTitle"
-									text="{i18n>IFRAME_ADDIFRAME_SANDBOX_PARAMETERS}" />
+									text="{= ${dialogInfo>/focusPolicySupported/value} ? ${i18n>IFRAME_ADDIFRAME_ADVANCED_SETTINGS} : ${i18n>IFRAME_ADDIFRAME_SANDBOX_PARAMETERS} }" />
 								<ToolbarSpacer />
 							</OverflowToolbar>
 						</headerToolbar>
 						<content>
-							<MessageStrip
-								id="sapUiRtaAddIFrameDialog_SecurityWarningMessage"
-								text="{i18n>IFRAME_ADDIFRAME_ADDITIONAL_PARAMETERS_SECURITY_WARNING_TEXT}"
-								type="Warning"
-								showIcon="true"
-								class="sapUiSmallMarginBottom">
-								<link>
-									<Link text="{i18n>IFRAME_ADDIFRAME_ADDITIONAL_PARAMETERS_WARNING_MORE_INFO_TEXT}"
-										target="_blank"
-										href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#sandbox"/>
-								</link>
-							</MessageStrip>
-							<layout:Grid
-								id="sapUiRtaAddIFrameDialog_SandboxPropertiesGrid"
-								defaultSpan="XL6 L6 M6 S12"
-								hSpacing="1"
-								vSpacing="1"
-								content="{
-									path: 'dialogInfo>/advancedSettingsConfig',
-									factory: '.createAdvancedSettingsControl'
-								}"/>
+							<Panel
+								id="sapUiRtaAddIFrameDialog_SandboxParametersPanel"
+								headerText="{= ${dialogInfo>/focusPolicySupported/value} ? ${i18n>IFRAME_ADDIFRAME_SANDBOX_PARAMETERS} : '' }"
+								class="sapUiRtaAddIFrameDialogSandboxParametersPanel">
+								<content>
+									<MessageStrip
+										id="sapUiRtaAddIFrameDialog_SecurityWarningMessage"
+										text="{i18n>IFRAME_ADDIFRAME_ADDITIONAL_PARAMETERS_SECURITY_WARNING_TEXT}"
+										type="Warning"
+										showIcon="true"
+										class="sapUiSmallMarginBottom">
+										<link>
+											<Link text="{i18n>IFRAME_ADDIFRAME_ADDITIONAL_PARAMETERS_WARNING_MORE_INFO_TEXT}"
+												target="_blank"
+												href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#sandbox"/>
+										</link>
+									</MessageStrip>
+									<layout:Grid
+										id="sapUiRtaAddIFrameDialog_SandboxPropertiesGrid"
+										defaultSpan="XL6 L6 M6 S12"
+										hSpacing="1"
+										vSpacing="1"
+										content="{
+											path: 'dialogInfo>/advancedSettingsConfig',
+											factory: '.createAdvancedSettingsControl'
+										}"/>
+								</content>
+							</Panel>
+							<Panel
+								id="sapUiRtaAddIFrameDialog_FocusControlPanel"
+								headerText="{i18n>IFRAME_ADDIFRAME_FOCUS_CONTROL}"
+								class="sapUiRtaAddIFrameDialogFocusControlPanel"
+								visible="{dialogInfo>/focusPolicySupported/value}">
+								<content>
+									<CheckBox
+										id="sapUiRtaAddIFrameDialog_AllowFocusCheckBox"
+										selected="{dialogInfo>/allowFocusWithoutUserActivation/value}"
+										select=".onAllowFocusChange"
+										text="{i18n>IFRAME_ADDIFRAME_ALLOW_FOCUS_WITHOUT_USER_ACTIVATION}"
+									/>
+								</content>
+							</Panel>
 						</content>
 					</Panel>
 				</layout:Grid>

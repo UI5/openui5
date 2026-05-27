@@ -224,13 +224,15 @@ sap.ui.define([
 	 * Returns a language-dependent placeholder text such as "e.g. <sample value>" where <sample value> is formatted
 	 * using this type.
 	 *
+	 * @param {sap.ui.core.date.UI5Date} [oMinimum] The minimum date
+	 * @param {sap.ui.core.date.UI5Date} [oMaximum] The maximum date
 	 * @returns {string|undefined}
 	 *   The language-dependent placeholder text or <code>undefined</code> if the type does not offer a placeholder
 	 *
 	 * @public
 	 */
-	DateTimeWithTimezone.prototype.getPlaceholderText = function () {
-		return this.getFormat().getPlaceholderText();
+	DateTimeWithTimezone.prototype.getPlaceholderText = function (oMinimum, oMaximum) {
+		return this.getFormat().getPlaceholderText(oMinimum, oMaximum);
 	};
 
 	/**

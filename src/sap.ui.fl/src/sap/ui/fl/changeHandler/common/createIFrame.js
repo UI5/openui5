@@ -36,6 +36,11 @@ sap.ui.define([], function() {
 			mIFrameSettings._settings.advancedSettings = oChangeContent?.advancedSettings;
 		}
 
+		if (oChangeContent?.allowFocusWithoutUserActivation !== undefined) {
+			mIFrameSettings.allowFocusWithoutUserActivation = oChangeContent.allowFocusWithoutUserActivation;
+			mIFrameSettings._settings.allowFocusWithoutUserActivation = oChangeContent.allowFocusWithoutUserActivation;
+		}
+
 		if (mRenameInfo) {
 			mIFrameSettings.renameInfo = mRenameInfo;
 			mIFrameSettings.asContainer = true;

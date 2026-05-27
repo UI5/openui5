@@ -13,6 +13,7 @@ sap.ui.define([
 	"sap/ui/core/ComponentContainer",
 	"sap/ui/core/Element",
 	"sap/ui/core/Popup",
+	"sap/ui/core/StaticArea",
 	"sap/ui/core/UIComponent",
 	"sap/ui/dt/util/ZIndexManager",
 	"sap/ui/dt/Overlay",
@@ -34,6 +35,7 @@ sap.ui.define([
 	ComponentContainer,
 	Element,
 	Popup,
+	StaticArea,
 	UIComponent,
 	ZIndexManager,
 	Overlay,
@@ -160,6 +162,7 @@ sap.ui.define([
 					contentHeight: "800px",
 					contentWidth: "1000px"
 				});
+				oView.addDependent(this.oDialog);
 			}.bind(this));
 			this.oDialog.attachAfterOpen(function() {
 				return this.oRta.start().then(function() {
@@ -294,6 +297,7 @@ sap.ui.define([
 					contentHeight: "800px",
 					contentWidth: "1000px"
 				});
+				oView.addDependent(oDialogNotAllowed);
 			});
 			oDialogNotAllowed.attachAfterOpen(function() {
 				assert.ok(oPopupManager._isPopupAdaptable(oDialogNotAllowed), "then true returned when isPopupAdaptationAllowed function doesn't exist for dialog");
@@ -341,6 +345,38 @@ sap.ui.define([
 				done();
 			});
 			oInnerDialog.open();
+		});
+
+		QUnit.test("when _isPopupAdaptable is called with a popover rooted in the static UIArea", function(assert) {
+			const oPopupManager = this.oRta.getPopupManager();
+			const oPopover = new Popover("popoverFromStaticArea");
+			StaticArea.getUIArea().addContent(oPopover);
+			assert.notOk(
+				oPopupManager._isPopupAdaptable(oPopover),
+				"then false is returned because the popover is rooted in the static UIArea (i.e. not part of the app's element tree)"
+			);
+			oPopover.destroy();
+		});
+
+		QUnit.test("when _isPopupAdaptable is called with a popover that has no openBy control", function(assert) {
+			const oPopupManager = this.oRta.getPopupManager();
+			const oPopover = new Popover("popoverWithoutOpenBy");
+			assert.notOk(
+				oPopupManager._isPopupAdaptable(oPopover),
+				"then false is returned because the popover is not part of the RTA app's element tree"
+			);
+			oPopover.destroy();
+		});
+
+		QUnit.test("when _isPopupAdaptable is called with a dialog parented to the static UIArea", function(assert) {
+			const oPopupManager = this.oRta.getPopupManager();
+			const oDialogInStaticArea = new Dialog("dialogInStaticArea");
+			StaticArea.getUIArea().addContent(oDialogInStaticArea);
+			assert.notOk(
+				oPopupManager._isPopupAdaptable(oDialogInStaticArea),
+				"then false is returned because the dialog is rooted directly in the static UIArea (e.g. RTA's RenameDialog)"
+			);
+			oDialogInStaticArea.destroy();
 		});
 
 		QUnit.test("when _overrideRemovePopupInstance for dialog is called", function(assert) {

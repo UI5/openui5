@@ -58,7 +58,7 @@ sap.ui.define([
 		} else {
 			sHeight = "100%";
 		}
-		return this.getCommandFactory().getCommandFor(oModifiedElement, "addIFrame", {
+		const mCommandContent = {
 			targetAggregation: mSettings.aggregation,
 			baseId: sBaseId,
 			index: mSettings.index,
@@ -67,7 +67,17 @@ sap.ui.define([
 			height: sHeight,
 			title: mSettings.title,
 			advancedSettings: mSettings.advancedSettings
-		}, oDesignTimeMetadata, sVariantManagementKey);
+		};
+		// Only forward allowFocusWithoutUserActivation when the dialog returned it (i.e. the
+		// browser supports the Permissions Policy). Otherwise leave it absent so newly created
+		// iframes keep the control's default behavior and don't silently activate focus blocking
+		// once the browser gains support.
+		if (mSettings.allowFocusWithoutUserActivation !== undefined) {
+			mCommandContent.allowFocusWithoutUserActivation = mSettings.allowFocusWithoutUserActivation;
+		}
+		return this.getCommandFactory().getCommandFor(
+			oModifiedElement, "addIFrame", mCommandContent, oDesignTimeMetadata, sVariantManagementKey
+		);
 	}
 
 	/**

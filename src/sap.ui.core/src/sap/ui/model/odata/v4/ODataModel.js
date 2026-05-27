@@ -854,9 +854,8 @@ sap.ui.define([
 	 *   The context which is required as base for a relative path
 	 * @param {sap.ui.model.Sorter|sap.ui.model.Sorter[]} [vSorters=[]]
 	 *   The dynamic sorters to be used initially. Call
-	 *   {@link sap.ui.model.odata.v4.ODataListBinding#sort} to replace them. Static sorters, as
-	 *   defined in the '$orderby' binding parameter, are always applied after the dynamic sorters.
-	 *   Supported since 1.39.0.
+	 *   {@link sap.ui.model.odata.v4.ODataListBinding#sort} to replace them, see there for more
+	 *   details. Supported since 1.39.0.
 	 * @param {sap.ui.model.Filter|sap.ui.model.Filter[]} [vFilters=[]]
 	 *   The dynamic {@link sap.ui.model.FilterType.Application application} filters to be used
 	 *   initially. Call {@link sap.ui.model.odata.v4.ODataListBinding#filter} to replace them.

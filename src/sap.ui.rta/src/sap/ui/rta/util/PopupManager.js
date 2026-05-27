@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/m/InstanceManager",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/core/Component",
+	"sap/ui/core/StaticArea",
 	"sap/ui/dt/util/ZIndexManager",
 	"sap/ui/dt/Overlay",
 	"sap/ui/dt/OverlayRegistry",
@@ -16,6 +17,7 @@ sap.ui.define([
 	InstanceManager,
 	ManagedObject,
 	Component,
+	StaticArea,
 	ZIndexManager,
 	Overlay,
 	OverlayRegistry,
@@ -27,47 +29,6 @@ sap.ui.define([
 		add: "_activateFocusHandle",
 		remove: "_deactivateFocusHandle"
 	};
-
-	// TODO harmonize with FlUtils.getAppComponentForControl, todos#9
-	function getAppComponentForControl(oControl) {
-		let oComponent;
-		let oAppComponent;
-
-		if (oControl.isA("sap.ui.core.Component")) {
-			oComponent = oControl;
-		} else {
-			oComponent = getComponentForControl(oControl);
-		}
-
-		if (oComponent) {
-			oAppComponent = FlUtils.getAppComponentForControl(oComponent);
-		}
-		return oAppComponent;
-	}
-
-	function getComponentForControl(oControl) {
-		let oComponent;
-		let oRootComponent;
-		let oParentControl;
-		if (oControl) {
-			oComponent = Component.getOwnerComponentFor(oControl);
-			if (
-				!oComponent
-				&& typeof oControl.getParent === "function"
-				&& oControl.getParent()?.isA("sap.ui.core.Element")
-			) {
-				oParentControl = oControl.getParent();
-			} else if (oComponent) {
-				oParentControl = oComponent;
-			}
-
-			if (oParentControl) {
-				oRootComponent = getComponentForControl(oParentControl);
-			}
-		}
-
-		return oRootComponent || oComponent;
-	}
 
 	/**
 	 * Constructor for a new sap.ui.rta.util.PopupManager
@@ -209,7 +170,7 @@ sap.ui.define([
 			? oPopup.getContent().some(
 				function(oContent) {
 					if (oContent.isA("sap.ui.core.ComponentContainer")) {
-						return this.oRtaRootAppComponent === getAppComponentForControl(Component.getComponentById(oContent.getComponent()));
+						return this.oRtaRootAppComponent === FlUtils.getAppComponentForControl(Component.getComponentById(oContent.getComponent()));
 					}
 					return undefined;
 				}.bind(this))
@@ -237,7 +198,7 @@ sap.ui.define([
 		if (oRta && oRta._oDesignTime) {
 			this.setProperty("rta", oRta);
 			const oRootControl = oRta.getRootControlInstance();
-			this.oRtaRootAppComponent = getAppComponentForControl(oRootControl);
+			this.oRtaRootAppComponent = FlUtils.getAppComponentForControl(oRootControl);
 			// listener for RTA mode change
 			const fnModeChange = this._onModeChange.bind(this);
 			oRta.attachModeChanged(fnModeChange);
@@ -574,6 +535,18 @@ sap.ui.define([
 		return false;
 	}
 
+	function isRootedInStaticArea(oElement) {
+		const oStaticUIArea = StaticArea.getUIArea();
+		let oCurrent = oElement;
+		while (oCurrent) {
+			if (oCurrent === oStaticUIArea) {
+				return true;
+			}
+			oCurrent = oCurrent.getParent?.();
+		}
+		return false;
+	}
+
 	PopupManager.prototype._isPopupAdaptable = function(oPopupElement) {
 		if (oPopupElement.isPopupAdaptationAllowed) {
 			return oPopupElement.isPopupAdaptationAllowed();
@@ -583,7 +556,17 @@ sap.ui.define([
 			return false;
 		}
 
-		const oPopupAppComponent = getAppComponentForControl(oPopupElement);
+		// A popup that is not part of the RTA app's element tree must not be treated
+		// as adaptable, since RTA's propagation listener cannot reach it and changes
+		// on it cannot be applied. By the time _isPopupAdaptable runs from the
+		// InstanceManager override, the popup has already been opened and Popup has
+		// re-parented standalone content to the static UIArea. So a popup rooted in
+		// the static UIArea (e.g. RTA's own RenameDialog/AddElementsDialog, message
+		// boxes, or popovers opened from RTA's toolbar) does not belong to the app.
+		if (isRootedInStaticArea(oPopupElement)) {
+			return false;
+		}
+		const oPopupAppComponent = FlUtils.getAppComponentForControl(oPopupElement);
 		if (
 			(oPopupAppComponent && this.oRtaRootAppComponent === oPopupAppComponent)
 			|| this._isComponentInsidePopup(oPopupElement)

@@ -1,4 +1,4 @@
-/*global QUnit */
+/*global QUnit, sinon */
 sap.ui.define([
 	"sap/ui/qunit/utils/createAndAppendDiv",
 	"sap/ui/test/utils/nextUIUpdate",
@@ -181,14 +181,22 @@ sap.ui.define([
 		var done = assert.async();
 		assert.expect(2);
 
+		subscribeToScrollEnd(checkScrollPosition);
 		page1.scrollTo(50, 100);
 
-		window.setTimeout(function(){
+		function checkScrollPosition() {
 			assert.equal(getScrollPos(), -50, "Page should be scrolled to position 50");
 			assert.equal(Math.round(page1.getScrollDelegate().getScrollTop()), 50, "Internally stored y scrolling position should be 50");
-
 			done();
-		}, 150);
+		}
+
+		function subscribeToScrollEnd(fnCallback) {
+			var oScroller = page1.getScrollDelegate();
+			var oStub = sinon.stub(oScroller, "scrollTo").callsFake(function(x, y, time) {
+				oStub.restore();
+				oStub.wrappedMethod.call(oScroller, x, y, time, fnCallback);
+			});
+		}
 	});
 
 

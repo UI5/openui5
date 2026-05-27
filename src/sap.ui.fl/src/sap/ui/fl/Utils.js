@@ -143,11 +143,9 @@ sap.ui.define([
 			function getComponentIdForControl(oControl) {
 				const sComponentId = Component.getOwnerIdFor(oControl);
 				if (!sComponentId) {
-					if (typeof oControl?.getParent === "function") {
-						const oParent = oControl.getParent();
-						if (oParent) {
-							return getComponentIdForControl(oParent);
-						}
+					const oParent = oControl?.getParent?.();
+					if (oParent) {
+						return getComponentIdForControl(oParent);
 					}
 				}
 				return sComponentId || "";

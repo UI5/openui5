@@ -746,15 +746,19 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("getPlaceholderText", function (assert) {
-		var oType = new DateTimeWithTimezone();
+		const oType = new DateTimeWithTimezone();
+		const oMinimum = {};
+		const oMaximum = {};
 
-		this.mock(DateFormat.prototype).expects("getPlaceholderText").withExactArgs().callsFake(function () {
-			assert.strictEqual(this, oType.oFormat);
-			return "~placeholder";
-		});
+		this.mock(DateFormat.prototype).expects("getPlaceholderText")
+			.withExactArgs(sinon.match.same(oMinimum), sinon.match.same(oMaximum))
+			.callsFake(function () {
+				assert.strictEqual(this, oType.oFormat);
+				return "~placeholder";
+			});
 
 		// code under test
-		assert.strictEqual(oType.getPlaceholderText(), "~placeholder");
+		assert.strictEqual(oType.getPlaceholderText(oMinimum, oMaximum), "~placeholder");
 	});
 
 	//*********************************************************************************************

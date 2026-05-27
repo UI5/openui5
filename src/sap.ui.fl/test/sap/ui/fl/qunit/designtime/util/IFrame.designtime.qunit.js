@@ -64,8 +64,8 @@ sap.ui.define([
 						allowScripts: true,
 						allowModals: true,
 						allowSameOrigin: true
-					}
-
+					},
+					allowFocusWithoutUserActivation: true
 				},
 				updateContent: {
 					url: "newUrl",
@@ -78,7 +78,8 @@ sap.ui.define([
 						allowScripts: true,
 						allowModals: true,
 						allowSameOrigin: true
-					}
+					},
+					allowFocusWithoutUserActivation: true
 				},
 				renameContent: {
 					value: "myNewTitle"
@@ -116,7 +117,8 @@ sap.ui.define([
 						allowForms: true,
 						allowScript: true,
 						allowSameOrigin: true
-					}
+					},
+					allowFocusWithoutUserActivation: true
 				},
 				updateContent: {
 					url: "https://example.com",
@@ -126,7 +128,8 @@ sap.ui.define([
 						allowForms: true,
 						allowScript: true,
 						allowSameOrigin: true
-					}
+					},
+					allowFocusWithoutUserActivation: true
 				}
 			},
 			{
@@ -142,7 +145,8 @@ sap.ui.define([
 						allowForms: true,
 						allowScript: true,
 						allowSameOrigin: true
-					}
+					},
+					allowFocusWithoutUserActivation: true
 				},
 				updateContent: {
 					url: "https://example.com",
@@ -152,7 +156,8 @@ sap.ui.define([
 						allowForms: true,
 						allowScript: true,
 						allowSameOrigin: true
-					}
+					},
+					allowFocusWithoutUserActivation: true
 				}
 			},
 			{
@@ -171,7 +176,8 @@ sap.ui.define([
 						allowScripts: true,
 						allowModals: true,
 						allowSameOrigin: true
-					}
+					},
+					allowFocusWithoutUserActivation: true
 				},
 				updateContent: {
 					url: "https://example.com",
@@ -184,7 +190,8 @@ sap.ui.define([
 						allowScripts: true,
 						allowModals: true,
 						allowSameOrigin: true
-					}
+					},
+					allowFocusWithoutUserActivation: true
 				}
 			},
 			{
@@ -206,6 +213,48 @@ sap.ui.define([
 			{
 				testTitle: "cancel was pressed",
 				dialogReturn: undefined
+			},
+			{
+				testTitle: "policy unsupported (dialog omits allowFocusWithoutUserActivation), URL changed",
+				dialogReturn: {
+					frameWidth: "100",
+					frameWidthUnit: "px",
+					frameHeight: "100",
+					frameHeightUnit: "px",
+					frameUrl: "newUrl",
+					title: "myInitialTitle",
+					advancedSettings: {
+						allowForms: true,
+						allowScript: true,
+						allowSameOrigin: true
+					}
+				},
+				updateContent: {
+					url: "newUrl",
+					width: "100px",
+					height: "100px",
+					advancedSettings: {
+						allowForms: true,
+						allowScript: true,
+						allowSameOrigin: true
+					}
+				}
+			},
+			{
+				testTitle: "policy unsupported (dialog omits allowFocusWithoutUserActivation), nothing else changed",
+				dialogReturn: {
+					frameWidth: "100",
+					frameWidthUnit: "px",
+					frameHeight: "100",
+					frameHeightUnit: "px",
+					frameUrl: "https://example.com",
+					title: "myInitialTitle",
+					advancedSettings: {
+						allowForms: true,
+						allowScript: true,
+						allowSameOrigin: true
+					}
+				}
 			}
 		].forEach(function(oTestInput) {
 			QUnit.test(oTestInput.testTitle, function(assert) {

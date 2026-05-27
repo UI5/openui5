@@ -284,6 +284,8 @@ sap.ui.define([
 		if (this.getExpandable()) {
 			this.getHeaderToolbar() && oPanelContent && this._oExpandButton.$().attr("aria-controls", oPanelContent.id);
 
+			this._toggleButtonIcon(this.getExpanded());
+
 			if (!this.getExpanded()) {
 				// hide those parts which are collapsible (w/o animation, otherwise initial loading doesn't look good ...)
 				$this.children(".sapMPanelExpandablePart").css("display", "none");
@@ -387,7 +389,7 @@ sap.ui.define([
 
 	Panel.prototype._createExpandButton = function () {
 		var that = this,
-			sIconURI = this.getExpanded() ? IconPool.getIconURI("slim-arrow-down") : IconPool.getIconURI("slim-arrow-right"),
+			sIconURI = IconPool.getIconURI("slim-arrow-right"),
 			sTooltipBundleText = Library.getResourceBundleFor("sap.m").getText("PANEL_ICON"),
 			oButton;
 
@@ -418,16 +420,17 @@ sap.ui.define([
 	};
 
 	Panel.prototype._toggleButtonIcon = function (bIsExpanded) {
-		var sIconURI = bIsExpanded ? IconPool.getIconURI("slim-arrow-down") : IconPool.getIconURI("slim-arrow-right");
+		var oIconDomRef;
 
 		if (!this._oExpandButton) {
 			return;
 		}
 
 		if (this.getHeaderToolbar()) {
-			this._oExpandButton.setIcon(sIconURI);
+			this._oExpandButton.toggleStyleClass("sapMPanelExpandBtnRotated", bIsExpanded);
 		} else {
-			this._oExpandButton.setSrc(sIconURI);
+			oIconDomRef = this._oExpandButton.getDomRef();
+			oIconDomRef && oIconDomRef.classList.toggle("sapMPanelExpandIconRotated", bIsExpanded);
 		}
 	};
 

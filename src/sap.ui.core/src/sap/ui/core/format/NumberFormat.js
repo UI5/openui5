@@ -27,10 +27,11 @@ sap.ui.define([
 	 *   The number of decimal digits.
 	 * @property {string} [decimalSeparator]
 	 *   The character used as decimal separator.
-	 *   If none given, the locale specific decimal separator is used.
-	 *   Note: <code>decimalSeparator</code> must always be different from <code>groupingSeparator</code>.
+	 *   If none is given, the locale-specific decimal separator is used.
+	 *   <b>Note:</b> <code>decimalSeparator</code> must always be different from <code>groupingSeparator</code>.
 	 * @property {null|number|string} [emptyString]
-	 *   Since 1.130.0, defines what an empty string is parsed as, and what is formatted as an empty string.
+	 *   Since 1.130.0. Defines what value an empty string is parsed into and what value is formatted as an empty
+	 *   string.
 	 *   The {@link #format} and {@link #parse} functions are done in a symmetric way.
 	 *   For example, when this parameter is set to <code>NaN</code>, an empty string is parsed as <code>NaN</code>,
 	 *   and <code>NaN</code> is formatted as an empty string.
@@ -42,11 +43,11 @@ sap.ui.define([
 	 *   a non-positive value.
 	 * @property {string} [groupingSeparator]
 	 *   The character used as grouping separator.
-	 * 	 If none given, the locale specific grouping separator is used.
-	 *   Note: <code>groupingSeparator</code> must always be different from <code>decimalSeparator</code>.
+	 *   If none is given, the locale-specific grouping separator is used.
+	 *   <b>Note:</b> <code>groupingSeparator</code> must always be different from <code>decimalSeparator</code>.
 	 * @property {int} [groupingSize]
 	 *   The grouping size in digits.
-	 *   <b>Note:</b> If this format option is set to a non-positive value, grouping will be disabled entirely.
+	 *   <b>Note:</b> Grouping is disabled if this format option is set to a non-positive value.
 	 * @property {int} [maxFractionDigits]
 	 *   The maximum number of decimal digits.
 	 * @property {int} [maxIntegerDigits]
@@ -54,33 +55,33 @@ sap.ui.define([
 	 * @property {int} [minIntegerDigits]
 	 *   The minimal number of non-decimal digits.
 	 * @property {string} [minusSign]
-	 *   The used minus symbol.
-	 *   If none given, the locale specific minus sign is used.
+	 *   The symbol for the minus sign.
+	 *   If none is given, the locale-specific minus sign is used.
 	 * @property {boolean} [parseAsString]
 	 *   Since 1.28.2, whether to parse the number as a string in order to keep the precision for big numbers. Numbers
 	 *   in scientific notation are parsed back to standard notation.
 	 *   For example, <code>5e-3</code> is parsed to <code>0.005</code>.
 	 * @property {string} [pattern]
-	 *   CLDR number pattern which is used to format the number.
-	 *   If none given, the default pattern for the locale and type is used.
+	 *   The CLDR number pattern which is used to format a number.
+	 *   If none is given, the default pattern for the locale and type is used.
 	 * @property {string} [plusSign]
-	 *    The used plus symbol.
-	 *    If none given, the locale specific plus sign is used.
+	 *    The symbol for the plus sign.
+	 *    If none is given, the locale-specific plus sign is used.
 	 * @property {boolean} [preserveDecimals]
-	 *   Whether {@link #format} preserves decimal digits except trailing zeros in case there are more decimals than the
+	 *   Whether {@link #format} preserves decimal digits except trailing zeros if there are more decimals than the
 	 *   <code>maxFractionDigits</code> format option allows.
 	 *   If decimals are not preserved, the formatted number is rounded to <code>maxFractionDigits</code>.
 	 * @property {sap.ui.core.format.NumberFormat.RoundingMode|function} [roundingMode]
-	 *   Specifies the rounding behavior for discarding the digits after the maximum fraction digits defined by
+	 *   Defines how numbers are rounded when the number of fraction digits exceeds the value of
 	 *   <code>maxFractionDigits</code>.
-	 *   The rounding behavior of the formatter can be defined by...
+	 *   The rounding behavior of the formatter can be defined in the following ways:
 	 *   <ul>
-	 *     <li>...setting this format option to a value from the
-	 *         {@link sap.ui.core.format.NumberFormat.RoundingMode RoundingMode} enum</li>
-	 *     <li>...setting this format option to a function that is used for rounding the number.
+	 *     <li>Setting this format option to a value from the
+	 *       {@link sap.ui.core.format.NumberFormat.RoundingMode RoundingMode} enum</li>
+	 *     <li>Setting this format option to a function used for rounding the number.
 	 *         The function must take two parameters: the number itself, and the number of decimal digits
-	 *         that should be reserved. String based numbers are not rounded via this custom function.
-	 *         <b>Deprecated as of version 1.121.0; you can only apply rounding by specifying the rounding mode.</b>
+	 *         that should be preserved. String-based numbers are not rounded by this custom function.
+	 *         <b>Deprecated as of version 1.121.0; apply rounding by specifying a rounding mode instead.</b>
 	 *     </li>
 	 *   </ul>
 	 * @property {int} [shortDecimals]
@@ -94,7 +95,7 @@ sap.ui.define([
 	 *   The generated scale factor is used for all numbers which are formatted with this format instance.
 	 *   This option only takes effect when the <code>style</code> option is set to <code>short</code> or
 	 *   <code>long</code>.
-	 *   This option is set to <code>undefined</code> by default, which means that the scale factor is selected
+	 *   It is set to <code>undefined</code> by default, which means that the scale factor is selected
 	 *   automatically for each number being formatted.
 	 * @property {boolean} [showScale]
 	 *   Since 1.40, specifies whether the scale factor is shown in the formatted number.
@@ -140,7 +141,7 @@ sap.ui.define([
 	 * The format options for floating-point numbers.
 	 *
 	 * @property {int} [decimalPadding]
-	 * 	 The target length of places after the decimal separator; if the number has fewer decimal places than given in
+	 *   The target length of places after the decimal separator; if the number has fewer decimal places than given in
 	 *   this option, it is padded with whitespaces at the end up to the target length. An additional whitespace
 	 *   character for the decimal separator is added for a number without any decimals.
 	 *   <b>Note:</b> This format option is only allowed if the following conditions apply:

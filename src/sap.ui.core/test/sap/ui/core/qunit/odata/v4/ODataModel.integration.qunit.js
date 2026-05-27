@@ -67818,11 +67818,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				}
 
 				that.expectEvents(assert, oItemsBinding, [
-						[, "change", {detailedReason : "AddVirtualContext", reason : "change"}],
+						[, "change", {detailedReason : "AddVirtualContext", reason : "sort"}],
 						[, "dataRequested"],
 						[, "change", {detailedReason : "RemoveVirtualContext", reason : "change"}],
 						[, "refresh", {reason : "sort"}],
-						[, "change", {reason : "sort"}],
+						[, "change", {reason : "change"}],
 						[, "dataReceived", {data : {}}]
 					], true)
 					.expectRequest("EMPLOYEES?$select=AGE,ID,Name,TEAM_ID"

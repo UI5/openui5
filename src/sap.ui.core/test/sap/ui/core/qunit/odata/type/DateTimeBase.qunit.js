@@ -468,10 +468,11 @@ sap.ui.define([
 	QUnit.test("getPlaceholderText", function (assert) {
 		var oType = new DateTimeBase();
 
-		this.mock(DateFormat.prototype).expects("getPlaceholderText").withExactArgs().callsFake(function () {
-			assert.strictEqual(this, oType.oFormat);
-			return "~placeholder";
-		});
+		this.mock(DateFormat.prototype).expects("getPlaceholderText")
+			.withExactArgs(undefined, undefined).callsFake(function () {
+				assert.strictEqual(this, oType.oFormat);
+				return "~placeholder";
+			});
 
 		// code under test
 		assert.strictEqual(oType.getPlaceholderText(), "~placeholder");
@@ -518,6 +519,15 @@ sap.ui.define([
 			oType = new DateTime({}, oFixture.i);
 			assert.deepEqual(oType.oConstraints, oFixture.o);
 		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getPlaceholderText: w/ oMin, oMax", function (assert) {
+		const oType = new DateTime({UTC : true});
+
+		// code under test
+		assert.strictEqual(oType.getPlaceholderText(UI5Date.getInstance("2040-01-01"), undefined),
+			"e.g. Dec 31, 2040, 11:59:58\u202FPM");
 	});
 
 	//*********************************************************************************************
@@ -762,6 +772,15 @@ sap.ui.define([
 	module(DateTimeOffset);
 
 	dateTime(DateTimeOffset);
+
+	//*********************************************************************************************
+	QUnit.test("getPlaceholderText: w/ oMin, oMax", function (assert) {
+		const oType = new DateTimeOffset({UTC : true});
+
+		// code under test
+		assert.strictEqual(oType.getPlaceholderText(UI5Date.getInstance("2040-01-01"), undefined),
+			"e.g. Dec 31, 2040, 11:59:58\u202FPM");
+	});
 
 	//*********************************************************************************************
 	[

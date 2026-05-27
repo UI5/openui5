@@ -542,14 +542,16 @@ sap.ui.define([
 		var oButton = this.oPanel._oExpandButton;
 
 		// Assert
-		assert.strictEqual(oButton.getSrc(), "sap-icon://slim-arrow-down", "should have sapMPanelExpandableButton class present once");
+		assert.strictEqual(oButton.getSrc(), "sap-icon://slim-arrow-right", "icon should always be slim-arrow-right");
+		assert.ok(oButton.$().hasClass("sapMPanelExpandIconRotated"), "icon should have rotated class when expanded");
 
 		// Act
 		this.oPanel.setExpanded(false);
 		await nextUIUpdate();
 
 		// Assert
-		assert.strictEqual(oButton.getSrc(), "sap-icon://slim-arrow-right", "should have sapMPanelExpandableButton class present once");
+		assert.strictEqual(oButton.getSrc(), "sap-icon://slim-arrow-right", "icon should always be slim-arrow-right");
+		assert.notOk(oButton.$().hasClass("sapMPanelExpandIconRotated"), "icon should not have rotated class when collapsed");
 	});
 
 	QUnit.test("Panel with solid backgroundDesign", async function(assert) {
