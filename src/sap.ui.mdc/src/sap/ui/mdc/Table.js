@@ -31,6 +31,7 @@ sap.ui.define([
 	"sap/base/strings/capitalize",
 	"sap/base/util/deepEqual",
 	"sap/base/util/Deferred",
+	"sap/ui/core/Element",
 	"sap/ui/core/InvisibleText",
 	"sap/ui/mdc/p13n/subcontroller/ColumnController",
 	"sap/ui/mdc/p13n/subcontroller/SortController",
@@ -81,6 +82,7 @@ sap.ui.define([
 	capitalize,
 	deepEqual,
 	Deferred,
+	Element,
 	InvisibleText,
 	ColumnController,
 	SortController,
@@ -1545,6 +1547,13 @@ sap.ui.define([
 		});
 
 		internal(oTable).oFilterInfoBar = oFilterInfoToolbar;
+		oFilterInfoToolbar.addEventDelegate({ onBeforeRendering: function() {
+			// If the filter info bar gets hidden when it, or an element inside it, has the focus,
+			// the focus must move to the table to avoid focus loss.
+			if (!this.getVisible() && this.getDomRef()?.contains(document.activeElement)) {
+				Element.getElementById(oTable.getId())?.focus();
+			}
+		}}, oFilterInfoToolbar);
 		updateFilterInfoBar(oTable);
 
 		return oFilterInfoToolbar;
