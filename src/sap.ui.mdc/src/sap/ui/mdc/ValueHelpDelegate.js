@@ -11,17 +11,28 @@ sap.ui.define([
 	"sap/ui/model/FilterType",
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
+	"sap/ui/mdc/enums/FieldDisplay",
 	'sap/ui/mdc/condition/Condition',
-	'sap/ui/mdc/condition/FilterConverter'
+	'sap/ui/mdc/condition/FilterConverter',
+	'sap/ui/model/Filter',
+	'sap/ui/model/FilterOperator',
+	'sap/ui/model/FilterProcessor'
 ], function(
 	BaseDelegate,
 	FilterType,
 	ConditionValidated,
 	OperatorName,
+	FieldDisplay,
 	Condition,
-	FilterConverter
+	FilterConverter,
+	Filter,
+	FilterOperator,
+	FilterProcessor
 ) {
 	"use strict";
+
+	const _applyFilters = (aItems, oFilter) => FilterProcessor.apply(aItems, oFilter, (oBindingContext, sPath) => oBindingContext && oBindingContext.getProperty(sPath))?.[0];
+
 
 	/**
 	 * Delegate for {@link sap.ui.mdc.ValueHelp ValueHelp}.<br>
@@ -367,6 +378,19 @@ sap.ui.define([
 	 * Returns the content that is used for the autocomplete feature and for user input, if the entered text
 	 * leads to more than one filter result.
 	 *
+	 * By default, this method searches and returns an entry from a set of relevant contexts of the given {@link sap.ui.mdc.valuehelp.base.ListContent ListContent}.
+	 *
+	 * To determine which columns are relevant for the search, the currently active displayMode {@link sap.ui.mdc.enums.FieldDisplay Display} of the connected control will be used.
+	 * While a 'Value' configuration will lead to a 'key'-only search, 'DescriptionValue' leads to searching 'description' first and 'key' afterwards. Other modes work accordingly.
+	 *
+	 * For each relevant column all items are searched for an exact match first and again with a startsWith filter afterwards, if necessary.
+	 *
+	 * If the caseSensitive property is disabled, the letter case of the user's input and the corresponding column value are completely ignored. Whichever entry comes first, wins.
+	 *
+	 *
+	 *
+	 * {@link sap.ui.mdc.valuehelp.base.ListContent ListContent}
+	 *
 	 * @param {sap.ui.mdc.ValueHelp} oValueHelp The <code>ValueHelp</code> control instance
 	 * @param {sap.ui.mdc.valuehelp.base.ListContent} oContent <code>ValueHelp</code> content instance
 	 * @param {sap.ui.mdc.valuehelp.base.ItemForValueConfiguration} oConfig Configuration
@@ -374,8 +398,49 @@ sap.ui.define([
 	 * @public
 	 * @since 1.120.0
 	 */
-	ValueHelpDelegate.getFirstMatch = function(oValueHelp, oContent, oConfig) {
-		return oContent.getRelevantContexts(oConfig)[0];
+	ValueHelpDelegate.getFirstMatch = function (oValueHelp, oContent, oConfig) {
+
+		let oResult;
+		const aRelevantContexts = oContent.getListBinding(oConfig)?.getCurrentContexts();
+		const sInputValue = oConfig.value;
+
+		if (sInputValue && aRelevantContexts?.length) {
+			const bCaseSensitive = oConfig.hasOwnProperty("caseSensitive") ? oConfig.caseSensitive : oContent.getCaseSensitive();
+			const sKeyPath = oContent.getKeyPath();
+			const sDescriptionPath = oConfig.checkDescription && oContent.getDescriptionPath();
+
+			let aSearchFields;
+			switch (oValueHelp.getDisplay()) {
+				case FieldDisplay.Description:
+					aSearchFields = [sDescriptionPath];
+					break;
+				case FieldDisplay.DescriptionValue:
+					aSearchFields = [sDescriptionPath, sKeyPath];
+					break;
+				case FieldDisplay.ValueDescription:
+					aSearchFields = [sKeyPath, sDescriptionPath];
+					break;
+				default:
+					aSearchFields = [sKeyPath];
+					break;
+			}
+			aSearchFields = aSearchFields.filter((oEntry) => !!oEntry);
+
+			for (const sPath of aSearchFields) {
+					const aFilters = [
+						new Filter({ path: sPath, operator: FilterOperator.EQ, value1: sInputValue, caseSensitive: bCaseSensitive }),
+						new Filter({ path: sPath, operator: FilterOperator.StartsWith, value1: sInputValue, caseSensitive: bCaseSensitive })
+					];
+					for (const oFilter of aFilters) {
+						oResult = _applyFilters(aRelevantContexts, oFilter);
+						if (oResult) {
+							return oResult;
+						}
+					}
+			}
+		}
+
+		return oResult;
 	};
 
 	return ValueHelpDelegate;
