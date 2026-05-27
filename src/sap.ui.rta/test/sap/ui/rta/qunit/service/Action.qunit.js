@@ -1,88 +1,57 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/ui/rta/RuntimeAuthoring",
-	"sap/ui/rta/plugin/Plugin",
-	"sap/ui/core/UIComponent",
-	"sap/ui/core/ComponentContainer",
-	"sap/m/Page",
+	"sap/base/util/deepEqual",
 	"sap/m/Button",
+	"sap/m/Page",
+	"sap/ui/core/ComponentContainer",
+	"sap/ui/core/Element",
+	"sap/ui/core/UIComponent",
 	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/rta/plugin/Plugin",
+	"sap/ui/rta/plugin/Remove",
+	"sap/ui/rta/RuntimeAuthoring",
 	"sap/ui/thirdparty/sinon-4",
-	"sap/ui/qunit/utils/nextUIUpdate"
-],
-function(
-	RuntimeAuthoring,
-	BasePlugin,
-	UIComponent,
-	ComponentContainer,
-	Page,
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
+], function(
+	deepEqual,
 	Button,
+	Page,
+	ComponentContainer,
+	Element,
+	UIComponent,
 	OverlayRegistry,
+	BasePlugin,
+	Remove,
+	RuntimeAuthoring,
 	sinon,
-	nextUIUpdate
+	RtaQunitUtils
 ) {
 	"use strict";
 
-	var sandbox = sinon.createSandbox();
+	const sandbox = sinon.createSandbox();
 
 	QUnit.module("basic functionality", {
 		async before() {
 			QUnit.config.fixture = null;
-			var FixtureComponent = UIComponent.extend("fixture.UIComponent", {
-				metadata: {
-					manifest: {
-						"sap.app": {
-							id: "fixture.application"
-						}
-					}
-				},
-				createContent() {
-					return new Page("page", {
-						content: [
-							new Button("button")
-						]
-					});
-				}
-			});
-
-			this.oComponent = new FixtureComponent();
-			this.oPage = this.oComponent.getRootControl();
-			[this.oButton] = this.oPage.getContent();
-
-			this.oComponentContainer = new ComponentContainer("CompCont1", {
-				component: this.oComponent
-			});
-			this.oComponentContainer.placeAt("qunit-fixture");
-			await nextUIUpdate();
-
-			sandbox.stub(BasePlugin.prototype, "hasChangeHandler").resolves(true);
+			this.oComponentContainer = await RtaQunitUtils.renderTestAppAtAsync("qunit-fixture");
+			this.oComponent = this.oComponentContainer.getComponentInstance();
+			const oView = Element.getElementById("Comp1---idMain1");
+			await oView.getController().isDataReady();
 		},
-		beforeEach() {
+		async beforeEach() {
 			this.oRta = new RuntimeAuthoring({
 				showToolbars: false,
-				rootControl: this.oPage
+				rootControl: this.oComponent
 			});
 
-			return this.oRta.start().then(function() {
-				return this.oRta.getService("action").then(function(oActionService) {
-					this.oActionService = oActionService;
-					this.oButtonOverlay = OverlayRegistry.getOverlay(this.oButton);
-					this.oButtonOverlay.setDesignTimeMetadata({
-						...this.oButtonOverlay.getDesignTimeMetadata().getData(),
-						actions: {
-							remove: {
-								changeType: "hideControl"
-							}
-						}
-					});
-					var oRemovePlugin = this.oRta.getDefaultPlugins().remove;
-					oRemovePlugin.evaluateEditable([this.oButtonOverlay], { onRegistration: false });
-				}.bind(this));
-			}.bind(this));
+			await this.oRta.start();
+			this.oActionService = await this.oRta.getService("action");
+			this.oGroupOverlay = OverlayRegistry.getOverlay("Comp1---idMain1--GeneralLedgerDocument");
 		},
 		afterEach() {
 			this.oRta.destroy();
+			sandbox.restore();
 		},
 		after() {
 			QUnit.config.fixture = "";
@@ -91,14 +60,20 @@ function(
 		}
 	}, function() {
 		QUnit.test("get()", function(assert) {
-			return this.oActionService.get(this.oButtonOverlay.getId()).then(function(aActions) {
+			return this.oActionService.get(this.oGroupOverlay.getId()).then(function(aActions) {
 				assert.ok(Array.isArray(aActions));
-				assert.strictEqual(aActions.length, 1);
-				assert.strictEqual(aActions[0].id, "CTX_REMOVE");
+				assert.strictEqual(aActions.length, 6, "6 actions are available for the given control");
+				assert.strictEqual(aActions[0].id, "CTX_RENAME", "the first action is the rename action");
+				assert.strictEqual(aActions[1].id, "CTX_ADD_ELEMENTS_AS_CHILD", "the second action is the add action");
+				assert.strictEqual(aActions[2].id, "CTX_CREATE_SIBLING_CONTAINER", "the third action is the create container action");
+				assert.strictEqual(aActions[3].id, "CTX_REMOVE", "the fourth action is the remove action");
+				assert.strictEqual(aActions[4].id, "CTX_CUT", "the fifth action is the cut action");
+				assert.strictEqual(aActions[5].id, "CTX_PASTE", "the sixth action is the paste action");
 			});
 		});
+
 		QUnit.test("get() with non-existent control/non under RTA control", function(assert) {
-			return this.oActionService.get([this.oButtonOverlay.getId(), "fakeControl"]).then(
+			return this.oActionService.get([this.oGroupOverlay.getId(), "fakeControl"]).then(
 				function() {
 					assert.ok(false, "this must never be called");
 				},
@@ -107,13 +82,17 @@ function(
 				}
 			);
 		});
-		QUnit.test("execute()", function(assert) {
-			return this.oActionService.execute(this.oButtonOverlay.getId(), "CTX_REMOVE").then(function() {
-				assert.ok(true);
-			});
+
+		QUnit.test("execute()", async function(assert) {
+			const oHandlerStub = sandbox.stub(Remove.prototype, "handler").resolves();
+			await this.oActionService.execute(this.oGroupOverlay.getId(), "CTX_REMOVE");
+			assert.ok(oHandlerStub.calledOnce, "the handler of the remove action was called");
+			assert.strictEqual(oHandlerStub.firstCall.args[0][0], this.oGroupOverlay, "the handler was called with the correct overlay");
+			assert.strictEqual(oHandlerStub.firstCall.args[1].menuItem.id, "CTX_REMOVE", "the handler was called with the remove item");
 		});
+
 		QUnit.test("execute() with non-existent control/non under RTA control", function(assert) {
-			return this.oActionService.execute([this.oButtonOverlay.getId(), "fakeControl"], "CTX_REMOVE").then(
+			return this.oActionService.execute([this.oGroupOverlay.getId(), "fakeControl"], "CTX_REMOVE").then(
 				function() {
 					assert.ok(false, "this must never be called");
 				},
@@ -122,8 +101,9 @@ function(
 				}
 			);
 		});
+
 		QUnit.test("execute() with non-existent action", function(assert) {
-			return this.oActionService.execute(this.oButtonOverlay.getId(), "fakeAction").then(
+			return this.oActionService.execute(this.oGroupOverlay.getId(), "fakeAction").then(
 				function() {
 					assert.ok(false, "this must never be called");
 				},
