@@ -207,7 +207,8 @@
 					oFrameEl.style.border = "none";
 					oFrameEl.style.width = "100%";
 					oFrameEl.style.height = "100vh";
-					oFrameEl.sandbox = "allow-scripts";
+					// oFrameEl.sandbox = "allow-scripts";
+					oFrameEl.sandbox = "allow-scripts allow-same-origin";
 
 					body.appendChild(oFrameEl);
 				});
