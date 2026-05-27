@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/fl/util/IFrame",
+	"sap/ui/fl/util/FocusPolicy",
 	"sap/ui/fl/Utils",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/test/utils/nextUIUpdate",
@@ -14,6 +15,7 @@ sap.ui.define([
 	Log,
 	XMLView,
 	IFrame,
+	FocusPolicy,
 	Utils,
 	JSONModel,
 	nextUIUpdate,
@@ -112,6 +114,50 @@ sap.ui.define([
 				this.oIFrame.getIFrameDomRef().sandbox.value,
 				"allow-forms allow-popups allow-scripts allow-modals allow-same-origin",
 				"then the default sandbox attributes are set correctly"
+			);
+		});
+
+		QUnit.test("when iframe is created with default allowFocusWithoutUserActivation and policy is supported, no allow attribute is set", async function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(true);
+			this.oIFrame.invalidate();
+			await nextUIUpdate();
+			assert.strictEqual(
+				this.oIFrame.getIFrameDomRef().getAttribute("allow"),
+				null,
+				"then no permission policy attribute is rendered (legacy default allows focus stealing)"
+			);
+		});
+
+		QUnit.test("when allowFocusWithoutUserActivation is false and policy is supported, the focus-without-user-activation permission policy is set", async function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(true);
+			this.oIFrame.setAllowFocusWithoutUserActivation(false);
+			await nextUIUpdate();
+			assert.strictEqual(
+				this.oIFrame.getIFrameDomRef().getAttribute("allow"),
+				"focus-without-user-activation 'none'",
+				"then the permission policy preventing focus stealing is set"
+			);
+		});
+
+		QUnit.test("when iframe is created and browser does not support the policy, no allow attribute is set", async function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(false);
+			this.oIFrame.setAllowFocusWithoutUserActivation(false);
+			await nextUIUpdate();
+			assert.strictEqual(
+				this.oIFrame.getIFrameDomRef().getAttribute("allow"),
+				null,
+				"then no permission policy attribute is rendered"
+			);
+		});
+
+		QUnit.test("when allowFocusWithoutUserActivation is enabled, no permission policy is set", async function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(true);
+			this.oIFrame.setAllowFocusWithoutUserActivation(true);
+			await nextUIUpdate();
+			assert.strictEqual(
+				this.oIFrame.getIFrameDomRef().getAttribute("allow"),
+				null,
+				"then no permission policy restricting focus is set"
 			);
 		});
 

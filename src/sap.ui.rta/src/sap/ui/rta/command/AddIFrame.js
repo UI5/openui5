@@ -57,6 +57,14 @@ sap.ui.define([
 					defaultValue: {},
 					group: "content"
 				},
+				// This setting must be default true because the feature that allows this to be false is not
+				// yet available in all browsers.
+				// For the end user, when the feature is available, the property will be false by default on the dialog.
+				allowFocusWithoutUserActivation: {
+					type: "boolean",
+					defaultValue: true,
+					group: "content"
+				},
 				changeType: {
 					type: "string",
 					defaultValue: "addIFrame"
@@ -84,6 +92,13 @@ sap.ui.define([
 	AddIFrame.prototype._getChangeSpecificData = function() {
 		const mChangeSpecificData = FlexCommand.prototype._getChangeSpecificData.call(this);
 		const { title: sTitle, ...oContent } = mChangeSpecificData.content;
+		// When the browser does not support the Permissions Policy, the dialog never sets this
+		// property. Persisting the metadata default in that case would silently start blocking
+		// focus once the browser gains support, so we strip it from the change content unless
+		// it was explicitly set on the command.
+		if (this.isPropertyInitial("allowFocusWithoutUserActivation")) {
+			delete oContent.allowFocusWithoutUserActivation;
+		}
 		return {
 			changeType: mChangeSpecificData.changeType,
 			content: oContent,

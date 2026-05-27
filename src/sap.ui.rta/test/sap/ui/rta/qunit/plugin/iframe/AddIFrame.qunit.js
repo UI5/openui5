@@ -595,6 +595,83 @@ sap.ui.define([
 			const oMenuItems = await this.oAddIFrame.getMenuItems([this.oObjectPageSectionOverlay]);
 			oMenuItems[0].handler([this.oObjectPageSectionOverlay], { menuItem: oMenuItems[0] });
 		});
+		QUnit.test("when the dialog returns without allowFocusWithoutUserActivation (unsupported policy)", async function(assert) {
+			const fnDone = assert.async();
+			this.oOpenStub.callsFake(() => Promise.resolve({
+				frameUrl: TEST_URL,
+				title: "myTitle"
+			}));
+
+			this.oObjectPageLayoutOverlay.setDesignTimeMetadata({
+				aggregations: {
+					sections: {
+						actions: {
+							addIFrame: {
+								changeType: "addIFrame",
+								text: "foo"
+							}
+						}
+					}
+				}
+			});
+			this.oAddIFrame.deregisterElementOverlay(this.oObjectPageLayoutOverlay);
+			this.oAddIFrame.registerElementOverlay(this.oObjectPageLayoutOverlay);
+
+			const oGetCommandSpy = sandbox.spy(this.oAddIFrame.getCommandFactory(), "getCommandFor");
+
+			this.oAddIFrame.attachEventOnce("elementModified", () => {
+				const mPassedSettings = oGetCommandSpy.lastCall.args[2];
+				assert.notOk(
+					"allowFocusWithoutUserActivation" in mPassedSettings,
+					"then the property is not forwarded to the command factory"
+				);
+				fnDone();
+			});
+
+			await DtUtil.waitForSynced(this.oDesignTime)();
+			const aMenuItems = await this.oAddIFrame.getMenuItems([this.oObjectPageLayoutOverlay]);
+			aMenuItems[0].handler([this.oObjectPageLayoutOverlay], { menuItem: aMenuItems[0] });
+		});
+
+		QUnit.test("when the dialog returns with allowFocusWithoutUserActivation=false (supported policy)", async function(assert) {
+			const fnDone = assert.async();
+			this.oOpenStub.callsFake(() => Promise.resolve({
+				frameUrl: TEST_URL,
+				title: "myTitle",
+				allowFocusWithoutUserActivation: false
+			}));
+
+			this.oObjectPageLayoutOverlay.setDesignTimeMetadata({
+				aggregations: {
+					sections: {
+						actions: {
+							addIFrame: {
+								changeType: "addIFrame",
+								text: "foo"
+							}
+						}
+					}
+				}
+			});
+			this.oAddIFrame.deregisterElementOverlay(this.oObjectPageLayoutOverlay);
+			this.oAddIFrame.registerElementOverlay(this.oObjectPageLayoutOverlay);
+
+			const oGetCommandSpy = sandbox.spy(this.oAddIFrame.getCommandFactory(), "getCommandFor");
+
+			this.oAddIFrame.attachEventOnce("elementModified", () => {
+				const mPassedSettings = oGetCommandSpy.lastCall.args[2];
+				assert.strictEqual(
+					mPassedSettings.allowFocusWithoutUserActivation,
+					false,
+					"then the property value is forwarded to the command factory"
+				);
+				fnDone();
+			});
+
+			await DtUtil.waitForSynced(this.oDesignTime)();
+			const aMenuItems = await this.oAddIFrame.getMenuItems([this.oObjectPageLayoutOverlay]);
+			aMenuItems[0].handler([this.oObjectPageLayoutOverlay], { menuItem: aMenuItems[0] });
+		});
 	});
 
 	QUnit.done(function() {

@@ -129,7 +129,7 @@ sap.ui.define([
 		this.sChangeReason = oModel.bAutoExpandSelect && !_Helper.isDataAggregation(mParameters)
 			? "AddVirtualContext"
 			: undefined;
-		// an optional change reason to be used for the next event after RemoveVirtualContext
+		// optional change reason to be used for the next refresh event after RemoveVirtualContext
 		// Note: must only be used in combination with this.sChangeReason set to "AddVirtualContext"
 		this.sChangeReasonAfterRemoveVirtualContext = undefined;
 		// Note: this.aContexts[i].iIndex + this.iCreatedContexts === i
@@ -2872,8 +2872,10 @@ sap.ui.define([
 							detailedReason : "RemoveVirtualContext",
 							reason : ChangeReason.Change
 						});
-						that.reset(
-							that.sChangeReasonAfterRemoveVirtualContext ?? ChangeReason.Refresh);
+						const sWhy
+							= that.sChangeReasonAfterRemoveVirtualContext ?? ChangeReason.Refresh;
+						that.sChangeReasonAfterRemoveVirtualContext = undefined;
+						that.reset(sWhy);
 					}
 				});
 			}, true);
@@ -2919,11 +2921,9 @@ sap.ui.define([
 						iLength : iLength
 					};
 				}
-				const sWhy = that.sChangeReasonAfterRemoveVirtualContext ?? sChangeReason;
-				that.sChangeReasonAfterRemoveVirtualContext = undefined;
 				if (bFireChange) {
 					if (bChanged || (that.oDiff && that.oDiff.aDiff?.length)) {
-						that._fireChange({reason : sWhy});
+						that._fireChange({reason : sChangeReason});
 					} else { // we cannot keep a diff if we do not tell the control to fetch it!
 						that.oDiff = undefined;
 					}
@@ -4945,7 +4945,7 @@ sap.ui.define([
 			this.sChangeReasonAfterRemoveVirtualContext = sChangeReason;
 			this._fireChange({
 				detailedReason : "AddVirtualContext",
-				reason : ChangeReason.Change
+				reason : sChangeReason
 			});
 		} else if (sChangeReason && !(bEmpty && sChangeReason === ChangeReason.Change)) {
 			this.sChangeReason = sChangeReason;
@@ -5410,7 +5410,11 @@ sap.ui.define([
 	 *   The dynamic sorters to be used; they replace the dynamic sorters given in
 	 *   {@link sap.ui.model.odata.v4.ODataModel#bindList}. A nullish or missing value is treated as
 	 *   an empty array and thus removes all dynamic sorters. Static sorters, as defined in the
-	 *   '$orderby' binding parameter, are always applied after the dynamic sorters.
+	 *   '$orderby' binding parameter, are always applied after the dynamic sorters. Since 1.149.0,
+	 *   if any sorter has {@link sap.ui.model.Sorter#getGroupPaths group paths} and the
+	 *   {@link sap.ui.model.odata.v4.ODataModel model}'s <code>autoExpandSelect</code> parameter is
+	 *   set, those paths contribute to <code>$select</code> and <code>$expand</code>; not supported
+	 *   for {@link #setAggregation data aggregation}.
 	 * @returns {this}
 	 *   <code>this</code> to facilitate method chaining
 	 * @throws {Error} If

@@ -22,7 +22,7 @@ sap.ui.define([
 	 */
 	const UpdateIFrame = {};
 
-	const aUpdatableProperties = ["width", "height", "url", "_settings", "advancedSettings"];
+	const aUpdatableProperties = ["width", "height", "url", "_settings", "advancedSettings", "allowFocusWithoutUserActivation"];
 
 	/**
 	 * Extract an IFrame control settings.

@@ -16,37 +16,36 @@ sap.ui.define([
 
 	var oPageLayout = new VerticalLayout({
 		content: [
-			new Label({labelFor: "I1", text: "value = 1.32567, displayValuePrecision = 3", wrapping: true}),
+			new Label({labelFor: "I1", text: "Product quantity", wrapping: true}),
 			new StepInput("I1", {
 				value: 1.32567,
 				displayValuePrecision: 3
 			}),
-			new Label({labelFor: "I2", text: "value = 1.32, displayValuePrecision = 0", wrapping: true}),
+			new Label({labelFor: "I2", text: "Number of guests", wrapping: true}),
 			new StepInput("I2", {
 				value: 1.32,
 				displayValuePrecision: 0
 			}),
-			new Label({labelFor: "I3", text: "value = 1.32, displayValuePrecision = 3, step = 0.05", wrapping: true}),
+			new Label({labelFor: "I3", text: "Discount percentage", wrapping: true}),
 			new StepInput("I3",{
 				value: 1.32,
 				displayValuePrecision: 3,
 				step: 0.05
 			}),
-			new Label({labelFor: "I4", text: "Step = 1 (default behavior); value = 6, min = 5, max = 15", wrapping: true}),
+			new Label({labelFor: "I4", text: "Room number (min 6, max 15)", wrapping: true}),
 			new StepInput("I4",{
-				min: 6,
-				value: 5
+				min: 6
 			}),
-			new Label({labelFor: "I5", text: "Step = 1.1, displayValuePrecision = 1", wrapping: true}),
+			new Label({labelFor: "I5", text: "Temperature (°C)", wrapping: true}),
 			new StepInput("I5", {
 				step: 1.1,
 				displayValuePrecision: 1
 			}),
-			new Label({labelFor: "I6", text: "Input with initial state", wrapping: true}),
+			new Label({labelFor: "I6", text: "Order amount", wrapping: true}),
 			new StepInput("I6", {
 				valueState: ValueState.Error
 			}),
-			new Label({labelFor: "I7", text: "Input with initial state", wrapping: true}),
+			new Label({labelFor: "I7", text: "Preparation time", wrapping: true}),
 			new StepInput("I7", {
 				valueState: ValueState.Warning
 			})

@@ -22,7 +22,7 @@ sap.ui.define([
 	 *
 	 * @property {Object<string, any>} [source]
 	 *   Additional set of format options to be used if the property in the model is not of type
-	 *   string and needs formatting as well.
+	 *   <code>string</code> and needs formatting as well.
 	 *   If an empty object is given, the grouping is disabled and a dot is used as decimal separator.
 	 *
 	 * @public
@@ -56,7 +56,7 @@ sap.ui.define([
 	 *     strictGroupingValidation: false,
 	 *     style: "standard"
 	 *   }]
- 	 *   The option object, which supports the following parameters.
+	 *   The option object, which supports the following parameters.
 	 *   If no options are given, default values according to the type and locale settings are used.
 	 * @param {object} [oConstraints] Value constraints
 	 * @param {int} [oConstraints.minimum] Smallest value allowed for this type

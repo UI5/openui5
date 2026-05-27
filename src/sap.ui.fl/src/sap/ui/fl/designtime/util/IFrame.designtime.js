@@ -48,6 +48,9 @@ sap.ui.define([
 			advancedSettings: {
 				ignore: true
 			},
+			allowFocusWithoutUserActivation: {
+				ignore: true
+			},
 			_settings: {
 				ignore: true
 			}

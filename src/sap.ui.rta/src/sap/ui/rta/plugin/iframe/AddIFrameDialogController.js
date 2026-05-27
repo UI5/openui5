@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
+	"sap/ui/fl/util/FocusPolicy",
 	"sap/ui/fl/util/IFrame",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
@@ -32,6 +33,7 @@ sap.ui.define([
 	Element,
 	Lib,
 	coreLibrary,
+	FocusPolicy,
 	IFrame,
 	Filter,
 	FilterOperator,
@@ -48,7 +50,9 @@ sap.ui.define([
 	const _aTextInputFields = ["frameUrl", "title"];
 	const _aNumericInputFields = ["frameWidth", "frameHeight"];
 	const _aUnitInputFields = ["frameWidthUnit", "frameHeightUnit"];
-	const _aAllConfigFields = _aTextInputFields.concat(_aNumericInputFields, _aUnitInputFields, ["advancedSettings"]);
+	const _aAllConfigFields = _aTextInputFields.concat(
+		_aNumericInputFields, _aUnitInputFields, ["advancedSettings", "allowFocusWithoutUserActivation"]
+	);
 
 	function isValidUrl(sUrl) {
 		if (
@@ -153,6 +157,10 @@ sap.ui.define([
 		onSwitchChange() {
 			this._checkIfSaveIsEnabled(true);
 			this._oJSONModel.setProperty("/settingsUpdate/value", true);
+		},
+
+		onAllowFocusChange() {
+			this._checkIfSaveIsEnabled(true);
 		},
 
 		/**
@@ -548,7 +556,15 @@ sap.ui.define([
 		_buildReturnedSettings() {
 			const mSettings = {};
 			const oData = this._oJSONModel.getData();
+			// Don't persist allowFocusWithoutUserActivation when the browser does not support
+			// the Permissions Policy: the dialog panel was hidden, the user never made a choice,
+			// and persisting a value here would silently activate focus blocking once the browser
+			// gains support.
+			const bSkipAllowFocus = !FocusPolicy.isFocusPolicySupported();
 			_aAllConfigFields.forEach((sFieldName) => {
+				if (sFieldName === "allowFocusWithoutUserActivation" && bSkipAllowFocus) {
+					return;
+				}
 				let sValue = oData[sFieldName].value;
 				if (sFieldName === "frameUrl") {
 					sValue = urlCleaner(sValue);

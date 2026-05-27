@@ -1651,7 +1651,8 @@ sap.ui.define([
 				content: [
 					oLabelName, this.oInputName, oSaveAsDialogOptionsGrid
 				],
-				stretch: Device.system.phone
+				stretch: Device.system.phone,
+				busyIndicatorDelay: 0
 			});
 
 			this.oSaveAsDialog.isPopupAdaptationAllowed = function() {
@@ -1893,6 +1894,11 @@ sap.ui.define([
 
 		if (this.oVariantPopOver) {
 			this.oVariantPopOver.close();
+		}
+
+		//Lazy loading of variants
+		if (!this.oSaveAsDialog.isOpen()){
+			this._executeDynamicVariantsLoadedCallback(this.oSaveAsDialog);
 		}
 
 		if (!bDoNotOpen) {
@@ -2245,7 +2251,8 @@ sap.ui.define([
 					}), new Column(this.getId() + "-managementTable-col-last", {
 						visible: false
 					})
-				]
+				],
+				busyIndicatorDelay: 0
 			});
 
 			this.oManagementSave = new Button(this.getId() + "-managementsave", {
@@ -2609,6 +2616,14 @@ sap.ui.define([
 		this._clearRenamedItems();
 		this._createManagementDialog();
 
+		//Lazy loading of variants
+		if (!this.oManagementDialog.isOpen()){
+			this._executeDynamicVariantsLoadedCallback(this.oManagementTable, function() {
+				//Rebind table to display refreshed data after lazy loading variants
+				this._rebindVMTable(true);
+			}.bind(this));
+		}
+
 		this.oManagementDialog.open();
 
 		if (this.oVariantPopOver) {
@@ -2641,17 +2656,28 @@ sap.ui.define([
 		if (this.oManagementTable.getItems().length < 1) {
 			this.oManagementTable.setNoData(this._oNoDataIllustratedMessage);
 		}
-		//Lazy loading of variants
+	};
+
+	/**
+	 * Executes the <code>dynamicVariantsLoadedCallback</code> if provided, managing the busy state of the given control.
+	 * The control will be set to busy until the returned <code>Promise</code> is settled.
+	 *
+	 * @param {sap.ui.core.Control} oControl - The control to set busy during loading
+	 * @param {function} [fnAfterLoad] - Optional callback to execute after the promise is settled
+	 * @private
+	 */
+	VariantManagement.prototype._executeDynamicVariantsLoadedCallback = function(oControl, fnAfterLoad) {
 		const fnCallback = this.getDynamicVariantsLoadedCallback();
 		if (typeof fnCallback === "function") {
 			const oResult = fnCallback();
-			if (oResult instanceof Promise) {
-				this.oManagementTable.setBusy(true);
+			if (oResult instanceof Promise && !oControl.isDestroyed()) {
+				oControl.setBusy(true);
 				oResult.finally(function() {
-					this.oManagementTable.setBusy(false);
-					//Rebind table to display refreshed data after lazy loading variants
-					this._rebindVMTable(true);
-				}.bind(this));
+					oControl.setBusy(false);
+					if (fnAfterLoad) {
+						fnAfterLoad();
+					}
+				});
 			}
 		}
 	};

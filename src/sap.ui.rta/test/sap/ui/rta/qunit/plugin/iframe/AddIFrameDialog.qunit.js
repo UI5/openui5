@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/ui/core/library",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/util/FocusPolicy",
 	"sap/ui/fl/Utils",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/odata/v4/ODataModel",
@@ -24,6 +25,7 @@ sap.ui.define([
 	coreLibrary,
 	KeyCodes,
 	FlexRuntimeInfoAPI,
+	FocusPolicy,
 	FlUtils,
 	JSONModel,
 	ODataModel,
@@ -1246,6 +1248,139 @@ sap.ui.define([
 				clickOnCancel();
 			}, this);
 			return this.oAddIFrameDialog.open(mDefaultSettings, oReferenceControl);
+		});
+
+		QUnit.test("When the allow focus checkbox is toggled and reverted", function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(true);
+			this.oAddIFrameDialog.attachOpened(async function() {
+				const oSaveButton = Element.getElementById("sapUiRtaAddIFrameDialogSaveButton");
+				const oCheckBox = Element.getElementById("sapUiRtaAddIFrameDialog_AllowFocusCheckBox");
+				assert.strictEqual(oSaveButton.getEnabled(), false, "Save button is initially disabled");
+				assert.strictEqual(oCheckBox.getSelected(), false, "Checkbox is unchecked by default for new iframes");
+
+				oCheckBox.setSelected(true);
+				oCheckBox.fireSelect({ selected: true });
+				await nextUIUpdate();
+				assert.strictEqual(oSaveButton.getEnabled(), true, "Save button is enabled after checking the checkbox");
+
+				oCheckBox.setSelected(false);
+				oCheckBox.fireSelect({ selected: false });
+				await nextUIUpdate();
+				assert.strictEqual(oSaveButton.getEnabled(), false, "Save button is disabled after unchecking the checkbox");
+				clickOnCancel();
+			}, this);
+			return this.oAddIFrameDialog.open(mDefaultSettings, oReferenceControl);
+		});
+
+		QUnit.test("When the allow focus checkbox is checked and saved, the returned settings carry the value", async function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(true);
+			this.oAddIFrameDialog.attachOpened(async function() {
+				const oCheckBox = Element.getElementById("sapUiRtaAddIFrameDialog_AllowFocusCheckBox");
+				oCheckBox.setSelected(true);
+				oCheckBox.fireSelect({ selected: true });
+				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "new_url");
+				clickOnSave();
+			}, this);
+			const oResponse = await this.oAddIFrameDialog.open(mDefaultSettings, oReferenceControl);
+			assert.strictEqual(
+				oResponse.allowFocusWithoutUserActivation,
+				true,
+				"then the resolved settings include allowFocusWithoutUserActivation=true"
+			);
+		});
+
+		QUnit.test("When dialog is opened in update mode for a legacy iframe (allowFocusWithoutUserActivation defaults to true)", function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(true);
+			this.oAddIFrameDialog.attachOpened(function() {
+				const oCheckBox = Element.getElementById("sapUiRtaAddIFrameDialog_AllowFocusCheckBox");
+				assert.strictEqual(
+					oCheckBox.getSelected(),
+					true,
+					"Checkbox is checked because legacy iframes (no persisted value) resolve to true in update mode"
+				);
+				clickOnCancel();
+			}, this);
+			return this.oAddIFrameDialog.open(
+				{ ...mDefaultSettings, updateMode: true },
+				oReferenceControl
+			);
+		});
+
+		QUnit.test("When dialog is opened in update mode for an iframe with focus blocking enabled", function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(true);
+			this.oAddIFrameDialog.attachOpened(function() {
+				const oCheckBox = Element.getElementById("sapUiRtaAddIFrameDialog_AllowFocusCheckBox");
+				assert.strictEqual(
+					oCheckBox.getSelected(),
+					false,
+					"Checkbox is unchecked because the iframe was persisted with allowFocusWithoutUserActivation=false"
+				);
+				clickOnCancel();
+			}, this);
+			return this.oAddIFrameDialog.open(
+				{ ...mDefaultSettings, updateMode: true, allowFocusWithoutUserActivation: false },
+				oReferenceControl
+			);
+		});
+
+		QUnit.test("When the policy is supported, the Focus Control sub-panel is visible", function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(true);
+			this.oAddIFrameDialog.attachOpened(function() {
+				const oFocusPanel = Element.getElementById("sapUiRtaAddIFrameDialog_FocusControlPanel");
+				const oSandboxPanel = Element.getElementById("sapUiRtaAddIFrameDialog_SandboxParametersPanel");
+				const oAdvancedPanel = Element.getElementById("sapUiRtaAddIFrameDialog_AdvancedSettingsPanel");
+				const oAdvancedTitle = Element.getElementById("sapUiRtaAddIFrameDialog_AdvancedSettingsTitle");
+				assert.ok(oAdvancedPanel, "Advanced Settings panel exists");
+				assert.ok(oSandboxPanel, "Sandbox Parameters sub-panel exists");
+				assert.strictEqual(oFocusPanel.getVisible(), true, "Focus Control sub-panel is visible");
+				assert.strictEqual(
+					oAdvancedTitle.getText(),
+					oTextResources.getText("IFRAME_ADDIFRAME_ADVANCED_SETTINGS"),
+					"Outer panel title is 'Advanced Settings'"
+				);
+				assert.strictEqual(
+					oSandboxPanel.getHeaderText(),
+					oTextResources.getText("IFRAME_ADDIFRAME_SANDBOX_PARAMETERS"),
+					"Sandbox Parameters sub-panel renders its own header"
+				);
+				clickOnCancel();
+			}, this);
+			return this.oAddIFrameDialog.open(mDefaultSettings, oReferenceControl);
+		});
+
+		QUnit.test("When the policy is not supported, the Focus Control sub-panel is hidden", function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(false);
+			this.oAddIFrameDialog.attachOpened(function() {
+				const oFocusPanel = Element.getElementById("sapUiRtaAddIFrameDialog_FocusControlPanel");
+				const oSandboxPanel = Element.getElementById("sapUiRtaAddIFrameDialog_SandboxParametersPanel");
+				const oAdvancedTitle = Element.getElementById("sapUiRtaAddIFrameDialog_AdvancedSettingsTitle");
+				assert.strictEqual(oFocusPanel.getVisible(), false, "Focus Control sub-panel is hidden");
+				assert.strictEqual(
+					oAdvancedTitle.getText(),
+					oTextResources.getText("IFRAME_ADDIFRAME_SANDBOX_PARAMETERS"),
+					"Outer panel title falls back to 'Sandbox Parameters' when the focus policy is unsupported"
+				);
+				assert.strictEqual(
+					oSandboxPanel.getHeaderText(),
+					"",
+					"Sandbox Parameters sub-panel renders no header to avoid a redundant nested heading"
+				);
+				clickOnCancel();
+			}, this);
+			return this.oAddIFrameDialog.open(mDefaultSettings, oReferenceControl);
+		});
+
+		QUnit.test("When the policy is not supported and the dialog is saved, the returned settings omit allowFocusWithoutUserActivation", async function(assert) {
+			sandbox.stub(FocusPolicy, "isFocusPolicySupported").returns(false);
+			this.oAddIFrameDialog.attachOpened(async function() {
+				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "new_url");
+				clickOnSave();
+			}, this);
+			const oResponse = await this.oAddIFrameDialog.open(mDefaultSettings, oReferenceControl);
+			assert.notOk(
+				"allowFocusWithoutUserActivation" in oResponse,
+				"then the resolved settings do not include allowFocusWithoutUserActivation"
+			);
 		});
 
 		QUnit.test("When the title is changed and reverted", function(assert) {

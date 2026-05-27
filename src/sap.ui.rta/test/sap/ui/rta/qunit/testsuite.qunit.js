@@ -651,7 +651,11 @@ sap.ui.define([
 					only: ["sap/ui/rta/service/Action"]
 				},
 				ui5: {
-					flexibilityServices: '[{"connector": "LocalStorageConnector"}]'
+					flexibilityServices: '[{"connector": "LocalStorageConnector"}]',
+					resourceroots: {
+						"sap.ui.rta.qunitrta": "test-resources/sap/ui/rta/internal/testdata/qunit_rta/",
+						"sap.ui.rta.test": "test-resources/sap/ui/rta/internal/testdata/rta/"
+					}
 				}
 			},
 			"service/ControllerExtension": {

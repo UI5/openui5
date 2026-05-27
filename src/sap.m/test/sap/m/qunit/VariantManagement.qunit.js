@@ -3251,4 +3251,259 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("VariantManagement SaveAs dialog lazy loading with dynamicVariantsLoadedCallback", {
+		beforeEach: async function() {
+			this.oVM = new VariantManagement("VM1");
+			this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+			this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
+			this.oVM.setSelectedKey("2");
+			this.oVM.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oVM.destroy();
+		}
+	});
+
+	QUnit.test("check SaveAs dialog busy state is set and cleared when callback returns a promise", function(assert) {
+		const done = assert.async();
+
+		let fnResolvePromise;
+		const oPromise = new Promise(function(resolve) {
+			fnResolvePromise = resolve;
+		});
+
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			return oPromise;
+		});
+
+		this.oVM._createSaveAsDialog();
+		assert.ok(this.oVM.oSaveAsDialog, "SaveAs dialog should exist");
+
+		const oSetBusySpy = sinon.spy(this.oVM.oSaveAsDialog, "setBusy");
+
+		this.oVM.oSaveAsDialog.attachAfterOpen(function() {
+			// At this point, busy state should be true since promise is not resolved yet
+			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called on SaveAs dialog");
+			assert.ok(this.oVM.oSaveAsDialog.getBusy(), "SaveAs dialog should be busy while promise is pending");
+
+			// Now resolve the promise
+			fnResolvePromise();
+
+			// Wait for promise to resolve and busy state to clear
+			oPromise.then(function() {
+				return new Promise(function(resolve) { setTimeout(resolve, 10); });
+			}).then(function() {
+				assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called on SaveAs dialog");
+				assert.ok(!this.oVM.oSaveAsDialog.getBusy(), "SaveAs dialog should not be busy after promise resolves");
+
+				oSetBusySpy.restore();
+				this.oVM.oSaveAsDialog.close();
+				done();
+			}.bind(this));
+		}.bind(this));
+
+		this.oVM._openSaveAsDialog();
+	});
+
+	QUnit.test("check SaveAs dialog is not set busy when callback does not return a promise", function(assert) {
+		const done = assert.async();
+
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			return undefined; // not a promise
+		});
+
+		this.oVM._createSaveAsDialog();
+		assert.ok(this.oVM.oSaveAsDialog, "SaveAs dialog should exist");
+
+		const oSetBusySpy = sinon.spy(this.oVM.oSaveAsDialog, "setBusy");
+
+		this.oVM.oSaveAsDialog.attachAfterOpen(function() {
+			assert.ok(!oSetBusySpy.called, "setBusy should not have been called when callback does not return a promise");
+			assert.ok(!this.oVM.oSaveAsDialog.getBusy(), "SaveAs dialog should not be busy");
+
+			oSetBusySpy.restore();
+			this.oVM.oSaveAsDialog.close();
+			done();
+		}.bind(this));
+
+		this.oVM._openSaveAsDialog();
+	});
+
+	QUnit.test("check SaveAs dialog busy state is cleared when promise rejects", function(assert) {
+		const done = assert.async();
+
+		let fnRejectPromise;
+		const oPromise = new Promise(function(resolve, reject) {
+			fnRejectPromise = reject;
+		});
+
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			return oPromise;
+		});
+
+		this.oVM._createSaveAsDialog();
+		assert.ok(this.oVM.oSaveAsDialog, "SaveAs dialog should exist");
+
+		const oSetBusySpy = sinon.spy(this.oVM.oSaveAsDialog, "setBusy");
+
+		this.oVM.oSaveAsDialog.attachAfterOpen(function() {
+			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called on SaveAs dialog");
+			assert.ok(this.oVM.oSaveAsDialog.getBusy(), "SaveAs dialog should be busy while promise is pending");
+
+			// Reject the promise
+			fnRejectPromise("error");
+
+			// Wait for promise to settle and busy state to clear (.finally is used in implementation)
+			oPromise.catch(function() {}).then(function() {
+				return new Promise(function(resolve) { setTimeout(resolve, 10); });
+			}).then(function() {
+				assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called after promise rejection");
+				assert.ok(!this.oVM.oSaveAsDialog.getBusy(), "SaveAs dialog should not be busy after promise rejects");
+
+				oSetBusySpy.restore();
+				this.oVM.oSaveAsDialog.close();
+				done();
+			}.bind(this));
+		}.bind(this));
+
+		this.oVM._openSaveAsDialog();
+	});
+
+	QUnit.module("VariantManagement Manage dialog lazy loading - additional scenarios", {
+		beforeEach: async function() {
+			this.oVM = new VariantManagement("VM1");
+			this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+			this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
+			this.oVM.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oVM.destroy();
+		}
+	});
+
+	QUnit.test("check management table is not set busy when no callback is provided", function(assert) {
+		const done = assert.async();
+
+		// No dynamicVariantsLoadedCallback set
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		const oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			assert.ok(!oSetBusySpy.called, "setBusy should not have been called when no callback is provided");
+			assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy");
+
+			oSetBusySpy.restore();
+			this.oVM.oManagementDialog.close();
+			done();
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check management table is not set busy when callback does not return a promise", function(assert) {
+		const done = assert.async();
+
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			return undefined; // not a promise
+		});
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		const oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			assert.ok(!oSetBusySpy.called, "setBusy should not have been called when callback does not return a promise");
+			assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy");
+
+			oSetBusySpy.restore();
+			this.oVM.oManagementDialog.close();
+			done();
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check management table busy state is cleared and table is rebound when promise rejects", function(assert) {
+		const done = assert.async();
+
+		let fnRejectPromise;
+		const oPromise = new Promise(function(resolve, reject) {
+			fnRejectPromise = reject;
+		});
+
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			return oPromise;
+		});
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		const oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+		const oRebindVMTableSpy = sinon.spy(this.oVM, "_rebindVMTable");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called");
+			assert.ok(this.oVM.oManagementTable.getBusy(), "table should be busy while promise is pending");
+
+			// Reject the promise
+			fnRejectPromise("error");
+
+			// Wait for promise to settle (.finally is used in implementation)
+			oPromise.catch(function() {}).then(function() {
+				return new Promise(function(resolve) { setTimeout(resolve, 10); });
+			}).then(function() {
+				assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called after promise rejection");
+				assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy after promise rejects");
+				assert.ok(oRebindVMTableSpy.calledWith(true), "_rebindVMTable(true) should have been called after promise settles");
+
+				oSetBusySpy.restore();
+				oRebindVMTableSpy.restore();
+				this.oVM.oManagementDialog.close();
+				done();
+			}.bind(this));
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check callback is invoked each time management dialog opens", function(assert) {
+		const done = assert.async();
+
+		let nCallbackCount = 0;
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			nCallbackCount++;
+			return Promise.resolve();
+		});
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		let nOpenCount = 0;
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			nOpenCount++;
+
+			if (nOpenCount === 1) {
+				assert.equal(nCallbackCount, 1, "callback should have been called once after first open");
+
+				// Close and reopen the dialog
+				this.oVM.oManagementDialog.attachEventOnce("afterClose", function() {
+					this.oVM._openManagementDialog();
+				}.bind(this));
+				this.oVM.oManagementDialog.close();
+			} else {
+				assert.equal(nCallbackCount, 2, "callback should have been called twice after second open");
+				this.oVM.oManagementDialog.close();
+				done();
+			}
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
 });

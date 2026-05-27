@@ -539,6 +539,13 @@ sap.ui.define([
 				}
 			},
 
+			"util/FocusPolicy": {
+				group: "Util - FocusPolicy",
+				coverage: {
+					only: ["sap/ui/fl/util/FocusPolicy"]
+				}
+			},
+
 			"apply/_internal/connectors/ObjectStorageUtils": {
 				group: "Apply Internal",
 				coverage: {

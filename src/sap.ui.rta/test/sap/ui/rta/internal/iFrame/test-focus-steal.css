@@ -1,0 +1,17 @@
+body {
+	font-family: sans-serif;
+	padding: 20px;
+	background: #f0f8ff;
+}
+input {
+	font-size: 16px;
+	padding: 8px;
+	margin: 10px 0;
+	width: 300px;
+}
+.status {
+	margin-top: 10px;
+	padding: 10px;
+	background: #ffe0e0;
+	border-radius: 4px;
+}

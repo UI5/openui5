@@ -495,7 +495,8 @@ sap.ui.define([
 	QUnit.test("getPlaceholderText", function (assert) {
 		var oType = new TimeOfDay();
 
-		this.mock(DateFormat.prototype).expects("getPlaceholderText").withExactArgs().callsFake(function () {
+		this.mock(DateFormat.prototype).expects("getPlaceholderText")
+			.withExactArgs(undefined, undefined).callsFake(function () {
 			assert.strictEqual(this, oType.oFormat);
 			return "~placeholder";
 		});

@@ -3,9 +3,11 @@
  */
 
 sap.ui.define([
-	"sap/base/util/uid"
+	"sap/base/util/uid",
+	"sap/ui/fl/util/FocusPolicy"
 ], function(
-	uid
+	uid,
+	FocusPolicy
 ) {
 	"use strict";
 
@@ -15,7 +17,7 @@ sap.ui.define([
 		}
 	}
 
-	 function createsSandboxAttributesString(oAdvancedSettings) {
+	function createsSandboxAttributesString(oAdvancedSettings) {
 		return Object.keys(oAdvancedSettings)
 		.filter((sKey) => oAdvancedSettings[sKey])
 		.map((sKey) => sKey.replace(/[A-Z]/g, "-$&").toLowerCase())
@@ -64,6 +66,9 @@ sap.ui.define([
 			oRm.attr("title", sTitle);
 		}
 		oRm.attr("sandbox", sCombinedSandboxAttributes);
+		if (FocusPolicy.isFocusPolicySupported() && !oIFrame.getAllowFocusWithoutUserActivation()) {
+			oRm.attr("allow", "focus-without-user-activation 'none'");
+		}
 		oRm.openEnd();
 		oRm.close("iframe");
 		oRm.close("div");

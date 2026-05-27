@@ -16,7 +16,8 @@ sap.ui.define([
 		height: "myFancyHeight",
 		advancedSettings: {
 			additionalSandboxParameters: []
-		}
+		},
+		allowFocusWithoutUserActivation: false
 	};
 
 	basicCommandTest({
@@ -48,6 +49,21 @@ sap.ui.define([
 	}, {
 		changeType: "addIFrame",
 		content: { ...mProperties },
+		texts: {}
+	});
+
+	const mPropertiesWithoutAllowFocus = { ...mProperties };
+	delete mPropertiesWithoutAllowFocus.allowFocusWithoutUserActivation;
+	basicCommandTest({
+		moduleName: "When the policy is unsupported (allowFocusWithoutUserActivation omitted)",
+		commandName: "addIFrame",
+		designtimeActionStructure: "addIFrame"
+	}, {
+		...mPropertiesWithoutAllowFocus,
+		changeType: "addIFrame"
+	}, {
+		changeType: "addIFrame",
+		content: { ...mPropertiesWithoutAllowFocus },
 		texts: {}
 	});
 

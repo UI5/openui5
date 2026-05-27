@@ -71,6 +71,8 @@ sap.ui.define([
 	 * On tablets and desktop the action sheet is displayed in a {@link sap.m.Popover popover}.
 	 *
 	 * When an action is triggered, the action sheet closes and you can display a confirmation as a {@link sap.m.MessageToast message toast}.
+	 *
+	 * <b>Note</b>: As of version 1.149, the control is deprecated. Use {@link sap.m.Menu} / {@link sap.m.MenuItem} instead.
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
@@ -81,6 +83,7 @@ sap.ui.define([
 	 * @since 1.9.1
 	 * @alias sap.m.ActionSheet
 	 * @see {@link fiori:https://experience.sap.com/fiori-design-web/action-sheet/ Action Sheet}
+	 * @deprecated As of version 1.149, use sap.m.Menu / sap.m.MenuItem instead.
 	 */
 	var ActionSheet = Control.extend("sap.m.ActionSheet", /** @lends sap.m.ActionSheet.prototype */ {
 		metadata : {

@@ -9,6 +9,7 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
 	"sap/ui/fl/util/getContainerUserInfo",
+	"sap/ui/fl/util/FocusPolicy",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/resource/ResourceModel",
 	"sap/ui/rta/plugin/iframe/AddIFrameDialogController",
@@ -21,6 +22,7 @@ sap.ui.define([
 	Lib,
 	coreLibrary,
 	getContainerUserInfo,
+	FocusPolicy,
 	JSONModel,
 	ResourceModel,
 	AddIFrameDialogController,
@@ -43,7 +45,15 @@ sap.ui.define([
 		{ key: "additionalSandboxParameters", isMultiInput: true }
 	];
 
-	function createJSONModel(bSetUpdateTitle, bAsContainer, sFrameWidthValue, sFrameHeightValue, oAdvancedSettings) {
+	function createJSONModel(mOptions) {
+		const {
+			updateMode: bUpdateMode,
+			asContainer: bAsContainer,
+			frameWidth: sFrameWidthValue,
+			frameHeight: sFrameHeightValue,
+			advancedSettings: oAdvancedSettings,
+			allowFocusWithoutUserActivation: bAllowFocusWithoutUserActivation
+		} = mOptions;
 		var sSelectAdditionalTextPercent = bAsContainer
 			? _oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_SELECT_ADDITIONAL_TEXT_PERCENT_SECTION")
 			: _oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_SELECT_ADDITIONAL_TEXT_PERCENT_HEADER");
@@ -55,7 +65,7 @@ sap.ui.define([
 		};
 
 		return new JSONModel({
-			dialogTitle: bSetUpdateTitle ?
+			dialogTitle: bUpdateMode ?
 				_oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_UPDATE_TITLE") :
 				_oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_TITLE"),
 			documentationUrl: {
@@ -139,6 +149,17 @@ sap.ui.define([
 			},
 			showParameters: {
 				value: false
+			},
+			allowFocusWithoutUserActivation: {
+				// In update mode, fall back to true to preserve the legacy default for iframes
+				// persisted before this property existed; in add mode, fall back to false so newly
+				// created iframes adopt the safer no-focus-stealing default where the browser
+				// supports the Permissions Policy (on unsupported browsers the value is still
+				// persisted but has no runtime effect).
+				value: bAllowFocusWithoutUserActivation ?? bUpdateMode
+			},
+			focusPolicySupported: {
+				value: FocusPolicy.isFocusPolicySupported()
 			}
 		});
 	}
@@ -189,13 +210,14 @@ sap.ui.define([
 	 * @private
 	 */
 	AddIFrameDialog.prototype._createDialog = function(mSettings, oReferenceControl, oAction) {
-		this._oJSONModel = createJSONModel(
-			!!mSettings?.updateMode,
-			!!mSettings?.asContainer,
-			mSettings?.frameWidth,
-			mSettings?.frameHeight,
-			mSettings?.advancedSettings
-		);
+		this._oJSONModel = createJSONModel({
+			updateMode: !!mSettings?.updateMode,
+			asContainer: !!mSettings?.asContainer,
+			frameWidth: mSettings?.frameWidth,
+			frameHeight: mSettings?.frameHeight,
+			advancedSettings: mSettings?.advancedSettings,
+			allowFocusWithoutUserActivation: mSettings?.allowFocusWithoutUserActivation
+		});
 		// Increase the size limit of the JSON model to allow more parameters for the URL builder
 		this._oJSONModel.setSizeLimit(1000);
 		this._oController = new AddIFrameDialogController(this._oJSONModel, mSettings, oAction);

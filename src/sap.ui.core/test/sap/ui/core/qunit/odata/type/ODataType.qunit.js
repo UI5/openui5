@@ -56,8 +56,9 @@ sap.ui.define([
 		assert.strictEqual(oType.getPlaceholderText(), undefined);
 
 		var oFormat = {getPlaceholderText: function () {}};
-		oTypeMock.expects("getFormat").withExactArgs().twice().returns(oFormat);
-		this.mock(oFormat).expects("getPlaceholderText").withExactArgs().returns("~placeholder");
+		oTypeMock.expects("getFormat").withExactArgs().returns(oFormat);
+		this.mock(oFormat).expects("getPlaceholderText")
+			.withExactArgs(undefined, undefined).returns("~placeholder");
 
 		// code under test
 		assert.strictEqual(oType.getPlaceholderText(), "~placeholder");

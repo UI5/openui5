@@ -3436,30 +3436,45 @@ sap.ui.define([
 
 	/**
 	 * Returns a language-dependent placeholder text according to this instance's format options, for example
-	 * "e.g. 12/31/2023".
+	 * "e.g. 12/31/2023". If <code>oMinimum</code> and/or <code>oMaximum</code> are given, a valid sample date
+	 * within the given range is used; see {@link #getSampleValue} for the exact algorithm.
 	 *
+	 * @param {module:sap/ui/core/date/UI5Date} [oMinimum] The minimum date
+	 * @param {module:sap/ui/core/date/UI5Date} [oMaximum] The maximum date
 	 * @returns {string} The language-dependent placeholder text
 	 *
 	 * @private
 	 * @ui5-restricted sap.m
 	 */
-	DateFormat.prototype.getPlaceholderText = function() {
+	DateFormat.prototype.getPlaceholderText = function(oMinimum, oMaximum) {
 		const sPlaceholder = this.oLocaleData.getDatePlaceholder();
 
-		return sPlaceholder.replace("{0}", this.format.apply(this, this.getSampleValue()));
+		return sPlaceholder.replace("{0}", this.format.apply(this, this.getSampleValue(oMinimum, oMaximum)));
 	};
 
 	/**
-	 * Returns a sample date value.
+	 * Returns a sample date value. If <code>oMinimum</code> and/or <code>oMaximum</code> are given, the returned
+	 * value lies within the valid range. The end date is chosen by the following rules in order:
+	 * <ol>
+	 *   <li>If the default sample year (current year) is within [min year, max year], use Dec 31 of the current
+	 *       year.</li>
+	 *   <li>If <code>oMinimum</code> and <code>oMaximum</code> span different years, or only one bound is given,
+	 *       use the Dec 31 year-end closest to <code>oMaximum</code> (or closest to <code>oMinimum</code> if only
+	 *       the minimum is given).</li>
+	 *   <li>If they span different months in the same year, use the highest month-end within the range.</li>
+	 *   <li>Otherwise use <code>oMaximum</code> directly.</li>
+	 * </ol>
+	 * For interval formats, the start date is nine days before the end date, clamped to <code>oMinimum</code>.
 	 *
-	 * @returns {array}
+	 * @param {module:sap/ui/core/date/UI5Date} [oMinimum]  The minimum date
+	 * @param {module:sap/ui/core/date/UI5Date} [oMaximum] The maximum date
+	 * @returns {Array}
 	 *   A sample date value as an array of parameter values as expected by {@link #format}
 	 *
 	 * @private
 	 */
-	DateFormat.prototype.getSampleValue = function() {
-		var oDate,
-			iFullYear = UI5Date.getInstance().getFullYear(),
+	DateFormat.prototype.getSampleValue = function(oMinimum, oMaximum) {
+		var iFullYear = UI5Date.getInstance().getFullYear(),
 			bUTC = this.oFormatOptions.UTC;
 
 		function getDate(iYear, iMonth, iDay, iHours, iMinutes, iSeconds, iMilliseconds) {
@@ -3468,17 +3483,49 @@ sap.ui.define([
 				: UI5Date.getInstance(iYear, iMonth, iDay, iHours, iMinutes, iSeconds, iMilliseconds);
 		}
 
-		oDate = getDate(iFullYear, 11, 31, 23, 59, 58, 123);
+		function yearEnd(iYear) {
+			return getDate(iYear, 11, 31, 23, 59, 58, 123);
+		}
+
+		const oDefault = yearEnd(iFullYear);
+		const bDefaultInRange = (!oMinimum || oDefault >= oMinimum) && (!oMaximum || oDefault <= oMaximum);
+
+		let oEnd;
+
+		if (bDefaultInRange) {
+			// R1: use default
+			oEnd = oDefault;
+		} else if (oMinimum == null || oMaximum == null || oMinimum.getFullYear() !== oMaximum.getFullYear()) {
+			// R2: different years or only one bound
+			if (oMaximum) {
+				const oYearEnd = yearEnd(oMaximum.getFullYear());
+				oEnd = oYearEnd <= oMaximum ? oYearEnd : yearEnd(oMaximum.getFullYear() - 1);
+			} else {
+				const oYearEnd = yearEnd(oMinimum.getFullYear());
+				oEnd = oYearEnd >= oMinimum ? oYearEnd : yearEnd(oMinimum.getFullYear() + 1);
+			}
+		} else if (oMinimum.getMonth() !== oMaximum.getMonth()) {
+			// R3: same year, different months
+			const iYear = oMaximum.getFullYear();
+			const iMaxMonth = oMaximum.getMonth();
+			const oMaxMonthEnd = getDate(iYear, iMaxMonth + 1, 0, 23, 59, 58, 123);
+			oEnd = oMaxMonthEnd <= oMaximum ? oMaxMonthEnd : getDate(iYear, iMaxMonth, 0, 23, 59, 58, 123);
+		} else {
+			// R4: same year and month
+			oEnd = oMaximum;
+		}
 
 		if (this.type === mDateFormatTypes.DATETIME_WITH_TIMEZONE) {
-			return [oDate, Localization.getTimezone()];
+			return [oEnd, Localization.getTimezone()];
 		}
-
 		if (this.oFormatOptions.interval) {
-			return [[getDate(iFullYear, 11, 22, 9, 12, 34, 567), oDate]];
+			const iEndYear = bUTC ? oEnd.getUTCFullYear() : oEnd.getFullYear();
+			const iEndMonth = bUTC ? oEnd.getUTCMonth() : oEnd.getMonth();
+			const iEndDay = bUTC ? oEnd.getUTCDate() : oEnd.getDate();
+			const oStart = getDate(iEndYear, iEndMonth, iEndDay - 9, 9, 12, 34, 567);
+			return [[oMinimum && oStart < oMinimum ? oMinimum : oStart, oEnd]];
 		}
-
-		return [oDate];
+		return [oEnd];
 	};
 
 	return DateFormat;

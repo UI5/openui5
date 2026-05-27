@@ -56,9 +56,9 @@ sap.ui.define([
 	*/
 
 	return function(oRta) {
-		function invoke(vValue, oOverlay) {
+		function invoke(vValue, oOverlay, oMenuItem) {
 			return typeof vValue === "function"
-				? vValue(oOverlay)
+				? vValue(oOverlay, oMenuItem)
 				: vValue;
 		}
 
@@ -78,7 +78,7 @@ sap.ui.define([
 				.map(function(mMenuItem) {
 					return {
 						...mMenuItem,
-						enabled: invoke(mMenuItem.enabled, aElementOverlays),
+						enabled: invoke(mMenuItem.enabled, aElementOverlays, mMenuItem),
 						text: invoke(mMenuItem.text, aElementOverlays[0])
 					};
 				});
@@ -126,7 +126,7 @@ sap.ui.define([
 				if (!mAction) {
 					throw new Error("No action found by specified ID");
 				} else {
-					return mAction.handler(aElementOverlays, {});
+					return mAction.handler(aElementOverlays, { menuItem: mAction });
 				}
 			});
 		}

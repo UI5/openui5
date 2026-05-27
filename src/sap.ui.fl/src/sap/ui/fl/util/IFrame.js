@@ -89,6 +89,16 @@ sap.ui.define([
 				renameInfo: { type: "object", group: "Data", defaultValue: null },
 
 				/**
+				 * Whether to allow embedded content to take focus without user activation.
+				 *
+				 * @since 1.149
+				 */
+				allowFocusWithoutUserActivation: {
+					type: "boolean",
+					defaultValue: true
+				},
+
+				/**
 				 * Contains the Iframe sandbox attributes
 				 */
 				advancedSettings: {
