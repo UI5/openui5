@@ -811,8 +811,7 @@ sap.ui.define([
 
 	SelectionController.prototype.arrayToMap = (aArray) => {
 		return aArray.reduce((mMap, oProp, iIndex) => {
-			mMap[oProp.key] = oProp;
-			mMap[oProp.key].position = iIndex;
+			mMap[oProp.key] = {...oProp, position: iIndex};
 			return mMap;
 		}, {});
 	};

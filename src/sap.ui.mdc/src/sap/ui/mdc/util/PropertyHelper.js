@@ -563,6 +563,31 @@ sap.ui.define([
 		mPrivate.aProperties = aClonedPropertiesWithAliases;
 		mPrivate.mProperties = mNextPropertyMap;
 		mPrivate.aPreviousRawProperties = merge([], aProperties);
+		mPrivate.bHasDynamicProperties = aClonedPropertiesWithAliases.some((oProperty) => oProperty.isActive !== undefined);
+		mPrivate.oCachedXConfig = null;
+		mPrivate.aActiveProperties = null;
+		mPrivate.mActiveProperties = null;
+	}
+
+	/**
+	 * Drops the active properties caches if xConfig was committed since they were built.
+	 * No-op if there are no dynamic properties or when no parent is set.
+	 *
+	 * @param {sap.ui.mdc.util.PropertyHelper} oPropertyHelper The instance of the PropertyHelper.
+	 */
+	function resetActivePropertiesCacheIfStale(oPropertyHelper) {
+		const oPrivate = _private.get(oPropertyHelper);
+
+		if (!oPrivate.bHasDynamicProperties || !oPrivate.oParent) {
+			return;
+		}
+
+		const oCurrentXConfig = oPrivate.oParent.getEngine().readXConfig(oPrivate.oParent);
+		if (oCurrentXConfig !== oPrivate.oCachedXConfig) {
+			oPrivate.oCachedXConfig = oCurrentXConfig;
+			oPrivate.aActiveProperties = null;
+			oPrivate.mActiveProperties = null;
+		}
 	}
 
 	/**
@@ -953,11 +978,15 @@ sap.ui.define([
 			return [];
 		}
 
-		if (bIncludeInactive) {
+		if (bIncludeInactive || !oPrivate.bHasDynamicProperties) {
 			return oPrivate.aProperties;
-		} else {
-			return Object.freeze(oPrivate.aProperties.filter((oProperty) => oProperty.isActive !== false));
 		}
+
+		resetActivePropertiesCacheIfStale(this);
+		if (!oPrivate.aActiveProperties) {
+			oPrivate.aActiveProperties = Object.freeze(oPrivate.aProperties.filter((oProperty) => oProperty.isActive !== false));
+		}
+		return oPrivate.aActiveProperties;
 	};
 
 	/**
@@ -974,15 +1003,19 @@ sap.ui.define([
 			return {};
 		}
 
-		if (bIncludeInactive) {
-			return Object.freeze({...oPrivate.mProperties});
-		} else {
-			return Object.freeze(
+		if (bIncludeInactive || !oPrivate.bHasDynamicProperties) {
+			return oPrivate.mProperties;
+		}
+
+		resetActivePropertiesCacheIfStale(this);
+		if (!oPrivate.mActiveProperties) {
+			oPrivate.mActiveProperties = Object.freeze(
 				Object.fromEntries(
 					Object.entries(oPrivate.mProperties).filter(([sPropertyKey, oProperty]) => oProperty.isActive !== false)
 				)
 			);
 		}
+		return oPrivate.mActiveProperties;
 	};
 
 	/**
