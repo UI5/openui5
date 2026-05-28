@@ -25,7 +25,7 @@ sap.ui.define([
 		return oODataProps.then(function (aProperties) {
 
 			aProperties.forEach(function(oPropertyInfo){
-				if (oPropertyInfo.typeConfig.className === "Edm.Guid") {
+				if (oPropertyInfo.typeConfig && oPropertyInfo.typeConfig.className === "Edm.Guid") {
 					oPropertyInfo.visualSettings = {widthCalculation: {minWidth: 18}}; // auto width seems not to work for GUID
 				}
 			});

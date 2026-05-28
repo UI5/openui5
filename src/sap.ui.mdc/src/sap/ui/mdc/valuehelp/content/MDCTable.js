@@ -17,7 +17,8 @@ sap.ui.define([
 	'sap/base/util/restricted/_throttle',
 	'sap/ui/mdc/util/Common',
 	"sap/base/Log",
-	"sap/ui/mdc/util/DensityHelper"
+	"sap/ui/mdc/util/DensityHelper",
+	"sap/ui/core/Element"
 ], function(
 	FilterableListContent,
 	loadModules,
@@ -33,7 +34,8 @@ sap.ui.define([
 	throttle,
 	Common,
 	Log,
-	DensityHelper
+	DensityHelper,
+	Element
 ) {
 	"use strict";
 
@@ -162,8 +164,17 @@ sap.ui.define([
 				}.bind(this),
 				modifySelection: function (oItem, bSelected) {
 					var oContext = this._getListItemBindingContext(oItem);
+					return MDCTableHelperConfig["Table"].modifyContextSelection.call(this, oContext, bSelected);
+				},
+				modifyContextSelection: function (oContext, bSelected) {
+					if (!oContext) {
+						return;
+					}
                                         //SNOW: CS20250011089825 - odata/v4/Context/getIndex provides the necessary model index in large dataset scenarios
 					var iContextIndex = oContext.getIndex ? oContext.getIndex() : MDCTableHelperConfig["Table"].getContexts().indexOf(oContext);
+					if (iContextIndex < 0) {
+						return;
+					}
 					var bInSelectedIndices = _getUITableSelectionHandler().getSelectedIndices().indexOf(iContextIndex) >= 0;
 					if (bSelected && !bInSelectedIndices) {
 						return this._isSingleSelect() ? _getUITableSelectionHandler().setSelectedIndex(iContextIndex) : _getUITableSelectionHandler().addSelectionInterval(iContextIndex,iContextIndex);
@@ -179,25 +190,26 @@ sap.ui.define([
 						return;
 					}
 
+					// Operate on all changed indices (not just rendered rows) so that range selections
+					// spanning beyond the current viewport are reflected in the conditions.
 					var aRowIndices = oEvent.getParameter("rowIndices"); // rowIndices are actually context indices
-					var aContexts = aRowIndices.map(function (iIndex) {
-						return oInnerTable.getContextByIndex(iIndex);
-					});
-					var aRows = MDCTableHelperConfig["Table"].getItems().filter(function (oRow, iIndex) {
-						return aContexts.indexOf(this._getListItemBindingContext(oRow)) >= 0;
-					}.bind(this));
-					var aAddConditions = [], aRemoveConditions = [];
-					var aSelectedRows = MDCTableHelperConfig["Table"].getSelectedItems();
+					var aSelectedIndicesNow = _getUITableSelectionHandler().getSelectedIndices();
 					var aCurrentConditions = this.getConditions();
-					aRows.forEach(function (oRow, i) {
-						var bIsInSelectedConditions = this._isItemSelected(oRow, aCurrentConditions);
-						var bIsRowSelected = aSelectedRows.indexOf(oRow) !== -1;
-						if (bIsInSelectedConditions !== bIsRowSelected) {
-							var aBucket = aSelectedRows.indexOf(oRow) !== -1 ? aAddConditions : aRemoveConditions;
-							var oRowBindingContext = this._getListItemBindingContext(oRow);
-							var oValues = this._getItemFromContext(oRowBindingContext);
+					var aAddConditions = [], aRemoveConditions = [];
+
+					aRowIndices.forEach(function (iIndex) {
+						var oContext = oInnerTable.getContextByIndex(iIndex);
+						if (!oContext) {
+							return;
+						}
+						var bIsInSelectedConditions = this._isContextSelected(oContext, aCurrentConditions);
+						var bIsContextSelected = aSelectedIndicesNow.indexOf(iIndex) !== -1;
+						if (bIsInSelectedConditions !== bIsContextSelected) {
+							var oValues = this._getItemFromContext(oContext);
 							var oCondition = oValues && this._createCondition(oValues.key, oValues.description, oValues.payload);
-							aBucket.push(oCondition);
+							if (oCondition) {
+								(bIsContextSelected ? aAddConditions : aRemoveConditions).push(oCondition);
+							}
 						}
 					}.bind(this));
 
@@ -252,13 +264,24 @@ sap.ui.define([
 	function _updateSelection () {
 		if (this._oTableHelper && !this._bSelectionIsUpdating) {
 			this._bSelectionIsUpdating = true;
-			var aItems = this._oTableHelper.getItems();
 			var aConditions = this.getConditions();
 			var aModifications = [];
-			for (var iId in aItems) {
-				var oItem = aItems[iId];
-				var bSelected = this._isItemSelected(oItem, aConditions);
-				aModifications.push(this._oTableHelper.modifySelection.call(this, oItem, bSelected));
+			if (this._sTableType === "Table" && this._oTableHelper.modifyContextSelection) {
+				// Reconcile selection against ALL currently loaded contexts (not just rendered rows),
+				// so that range selections spanning beyond the viewport are not lost on re-render.
+				var aContexts = this._oTableHelper.getContexts.call(this) || [];
+				for (var i = 0; i < aContexts.length; i++) {
+					var oContext = aContexts[i];
+					var bSelected = this._isContextSelected(oContext, aConditions);
+					aModifications.push(this._oTableHelper.modifyContextSelection.call(this, oContext, bSelected));
+				}
+			} else {
+				var aItems = this._oTableHelper.getItems();
+				for (var iId in aItems) {
+					var oItem = aItems[iId];
+					var bItemSelected = this._isItemSelected(oItem, aConditions);
+					aModifications.push(this._oTableHelper.modifySelection.call(this, oItem, bItemSelected));
+				}
 			}
 			Promise.all(aModifications).then(function() {
 				this._bSelectionIsUpdating = false;
@@ -613,6 +636,29 @@ sap.ui.define([
 	MDCTable.prototype._handleSelectionChange = function (oEvent) {
 		if (!this._bSelectionIsUpdating) {
 			this._oTableHelper.handleSelectionChange.call(this, oEvent);
+		}
+	};
+
+	// Determines, based purely on a binding context, whether it represents a currently selected condition.
+	// Mirrors _isItemSelected but without requiring a list item; needed to reconcile selection for
+	// contexts that are loaded in the binding but not currently rendered as rows.
+	MDCTable.prototype._isContextSelected = function (oContext, aConditions) {
+		if (!oContext) {
+			return false;
+		}
+		var oListBindingInfo = this._getListBindingInfo();
+		var sModelName = oListBindingInfo && oListBindingInfo.model;
+		var oDummyItem = new Element();
+		// Set under both the named model (default delegate calls getBindingContext(sModelName))
+		// and the unnamed model (FE delegate calls getBindingContext() with no args).
+		oDummyItem.setBindingContext(oContext, sModelName);
+		if (sModelName) {
+			oDummyItem.setBindingContext(oContext);
+		}
+		try {
+			return this._isItemSelected(oDummyItem, aConditions);
+		} finally {
+			oDummyItem.destroy();
 		}
 	};
 

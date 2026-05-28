@@ -399,6 +399,41 @@ sap.ui.define([
 		});
 	});
 
+	// Regression test for CS20260011787397
+	QUnit.test("handleSelectionChange - range selection covers virtualized rows", function(assert) {
+		_init(false, "Table", "Multi");
+		var aManyItems = [];
+		for (var i = 1; i <= 50; i++) {
+			aManyItems.push({ key: "I" + i, text: "Item " + i, additionalText: "T" + i, inValue: "" });
+		}
+		oModel.setProperty("/items", aManyItems);
+		oTable.getType().setRowCount(5); // most rows are virtualized
+
+		sinon.spy(oMdcTableWrapper, "_fireSelect");
+
+		return oMdcTableWrapper.getContent().then(function () {
+			return oMdcTableWrapper.onBeforeShow();
+		}).then(function () {
+			return oMdcTableWrapper._retrievePromise("listBinding").then(function () {
+				var oSelectionPlugin = oTable._oTable._getSelectionPlugin();
+				return oSelectionPlugin.addSelectionInterval(1, 8).then(function () {
+					assert.ok(oMdcTableWrapper._fireSelect.called, "_fireSelect was called");
+					var aConditions = oMdcTableWrapper._fireSelect.lastCall.args[0].conditions;
+					var aKeys = aConditions.map(function (oCondition) { return oCondition.values[0]; });
+					// I2 is already in initial conditions, so the Add event covers I3..I9.
+					["I3", "I4", "I5", "I6", "I7", "I8", "I9"].forEach(function (sKey) {
+						assert.ok(aKeys.indexOf(sKey) >= 0, "Conditions include " + sKey + " (covers virtualized rows)");
+					});
+
+					var aSelectedIndices = oSelectionPlugin.getSelectedIndices();
+					[1, 2, 3, 4, 5, 6, 7, 8].forEach(function (iIndex) {
+						assert.ok(aSelectedIndices.indexOf(iIndex) >= 0, "Plugin selection retains index " + iIndex);
+					});
+				});
+			});
+		});
+	});
+
 	QUnit.test("handleSelectionChange - noop", function(assert) {
 		_init(false, "Table", "Single");
 		var oContentPromise = oMdcTableWrapper.getContent();
