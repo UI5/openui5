@@ -4,6 +4,7 @@ sap.ui.define([
 	"sap/ui/mdc/filterbar/FilterBarBase",
 	"sap/ui/mdc/FilterField",
 	"sap/ui/mdc/DefaultTypeMap",
+	"sap/ui/mdc/condition/Condition",
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/test/utils/nextUIUpdate",
@@ -12,7 +13,7 @@ sap.ui.define([
     "sap/ui/core/message/MessageType",
 	"sap/ui/core/library"
 ], function (
-	FilterBarBase, FilterField, DefaultTypeMap, ConditionValidated, OperatorName, nextUIUpdate, Log, Library, MessageType, coreLibrary
+	FilterBarBase, FilterField, DefaultTypeMap, Condition, ConditionValidated, OperatorName, nextUIUpdate, Log, Library, MessageType, coreLibrary
 ) {
 	"use strict";
 
@@ -1478,5 +1479,65 @@ sap.ui.define([
         assert.ok(oDescription, "Description InvisibleText available");
         assert.equal(oDescription.getText(), sExpectedDescription, "Description InvisibleText has correct text");
     });
+
+	QUnit.module("DefaultValues", {
+		beforeEach: function () {
+			this.oFilterBarBase = new FilterBarBase("FB1", {
+				delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } }
+            });
+		},
+		afterEach: function () {
+			this.oFilterBarBase.destroy();
+            this.oFilterBarBase = undefined;
+            this.oProperty1 = null;
+		}
+	});
+
+    QUnit.test("In Engine (State) no real default values must be used", function(assert){
+
+        const oEngine = this.oFilterBarBase.getEngine();
+        sinon.stub(oEngine, "createChanges").returns(null); // no real change handler exist
+
+        return this.oFilterBarBase.initialized().then(() => {
+            const oExternalCondition = Condition.createCondition(OperatorName.DefaultValues, [], undefined, undefined, ConditionValidated.NotValidated);
+            delete oExternalCondition.isEmpty;
+            const mExtrenalConditions = {key1: [oExternalCondition]};
+            const oInternalCondition = Condition.createCondition(OperatorName.DefaultValues, [[Condition.createCondition(OperatorName.EQ, ["Test"], undefined, undefined, ConditionValidated.NotValidated)]], undefined, undefined, ConditionValidated.NotValidated);
+
+            sinon.stub(this.oFilterBarBase, "_getPropertyByName").returns({key: "key1", typeConfig: this.oFilterBarBase.getTypeMap().getTypeConfig("sap.ui.model.type.String")});
+
+            this.oFilterBarBase._getConditionModel().addCondition("key1", oInternalCondition);
+
+            assert.ok(oEngine.createChanges.calledOnce, "Engine create Changes called with external condition");
+            assert.deepEqual(oEngine.createChanges.args[0][0].state, mExtrenalConditions, "External condition used for engine");
+            oEngine.createChanges.restore();
+        });
+
+    });
+
+    QUnit.test("In ConditionModel real default values must be stored", function(assert){
+
+        return this.oFilterBarBase.initialized().then(() => {
+            const aDefaultValues = [Condition.createCondition(OperatorName.EQ, ["Test"], undefined, undefined, ConditionValidated.NotValidated)];
+            const oDelegate = this.oFilterBarBase.getControlDelegate();
+            sinon.stub(oDelegate, "getDefaultValues").withArgs(this.oFilterBarBase, "key1").returns(aDefaultValues);
+            oDelegate.getDefaultValues.callThrough();
+
+            const oExternalCondition = Condition.createCondition(OperatorName.DefaultValues, [], undefined, undefined, ConditionValidated.NotValidated);
+            delete oExternalCondition.isEmpty;
+            const mExtrenalConditions = {key1: [oExternalCondition]};
+            const oInternalCondition = Condition.createCondition(OperatorName.DefaultValues, [aDefaultValues], undefined, undefined, ConditionValidated.NotValidated);
+            oInternalCondition.isEmpty = false;
+
+            sinon.stub(this.oFilterBarBase, "_getPropertyByName").returns({key: "key1", typeConfig: this.oFilterBarBase.getTypeMap().getTypeConfig("sap.ui.model.type.String")});
+
+            return this.oFilterBarBase._setXConditions(mExtrenalConditions).then(function(){
+                assert.deepEqual(this.oFilterBarBase.getInternalConditions()["key1"][0], oInternalCondition, "internal condition in ConditionModel");
+                oDelegate.getDefaultValues.restore();
+			}.bind(this));
+        });
+
+    });
+
 
 });

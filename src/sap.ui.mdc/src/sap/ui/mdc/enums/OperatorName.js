@@ -752,7 +752,17 @@ sap.ui.define(() => {
 		 * @since 1.131.0
 		 * @public
 		 */
-		NEXTYEARSINCLUDED: "NEXTYEARSINCLUDED"
+		NEXTYEARSINCLUDED: "NEXTYEARSINCLUDED",
+
+		/**
+		 * "Default values" operator is using user-specific default values.
+		 * The values themselves are not stored in variants.
+		 *
+		 * The operator is available for all types.
+		 * @since 1.149.0
+		 * @public
+		 */
+		DefaultValues: "DefaultValues"
 	};
 
 	return OperatorName;

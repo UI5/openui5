@@ -7,10 +7,11 @@ sap.ui.define([
 		'sap/ui/model/Filter',
 		'sap/ui/model/ValidateException',
 		'sap/base/Log',
-		'sap/ui/mdc/enums/FieldDisplay',
-		'sap/ui/mdc/enums/OperatorName',
+		'sap/base/strings/escapeRegExp',
 		'./Operator',
 		'./RangeOperator',
+		'sap/ui/mdc/enums/FieldDisplay',
+		'sap/ui/mdc/enums/OperatorName',
 		'sap/ui/mdc/enums/BaseType',
 		'sap/ui/mdc/enums/ConditionValidated',
 		'sap/ui/mdc/enums/OperatorValueType',
@@ -30,10 +31,11 @@ sap.ui.define([
 	Filter,
 	ValidateException,
 	Log,
-	FieldDisplay,
-	OperatorName,
+	escapeRegExp,
 	Operator,
 	RangeOperator,
+	FieldDisplay,
+	OperatorName,
 	BaseType,
 	ConditionValidated,
 	OperatorValueType,
@@ -1600,8 +1602,20 @@ sap.ui.define([
 					oResultValues[0] = UniversalDate.getInstance(UI5Date.getInstance());
 					return oResultValues;
 				}
+			}),
+			/*
+			 * "Default values" operator
+			 */
+			defaultValues: new Operator({
+				name: OperatorName.DefaultValues,
+				filterOperator: null,
+				tokenText: _getText(OperatorName.DefaultValues, false),
+				longText: _getText(OperatorName.DefaultValues, true),
+				tokenTest: escapeRegExp(_getText(OperatorName.DefaultValues, false)).replace(/\\{0\\}/g, "(.*)"),
+				valueTypes: [OperatorValueType.Conditions],
+				group: {id: "0", text: oMessageBundle.getText("VALUEHELP.OPERATOR.GROUP0", undefined, true)},
+				useDefaultValues: true
 			})
-
 		},
 
 		_mDefaultOpsForType: {}, // defines default operators for types

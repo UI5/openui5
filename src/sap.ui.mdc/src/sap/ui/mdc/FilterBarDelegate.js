@@ -192,5 +192,24 @@ sap.ui.define([
 		}
 	};
 
+	/**
+	 * Returns default values for a property.
+	 *
+	 * This function is called when a user adds a condition representing default values or a variant using such a condition is applied.
+	 *
+	 * As this function might be called multiple times, the default values should be cached and not be determined again for each call.
+	 *
+	 * @param {sap.ui.mdc.filterbar.FilterBarBase} oFilterBar Instance of the {@link sap.ui.mdc.filterbar.FilterBarBase FilterBar} control
+	 * @param {string} sPropertyKey Property key of the filter field
+	 * @returns {sap.ui.mdc.condition.ConditionObject[]} Array of default value conditions in external format
+	 * @public
+	 * @since 1.149
+	 */
+	FilterBarDelegate.getDefaultValues = function(oFilterBar, sPropertyKey) {
+
+		return [];
+
+	};
+
 	return FilterBarDelegate;
 });

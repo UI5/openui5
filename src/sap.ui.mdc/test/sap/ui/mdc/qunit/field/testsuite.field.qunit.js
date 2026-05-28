@@ -38,13 +38,16 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
                 page: "test-resources/sap/ui/mdc/qunit/field/content/testsuite.fieldcontent.qunit.html"
             },
             "ConditionType": {
-                module: "./ConditionType.qunit"
+                module: "./ConditionType.qunit",
+				sinon: true
 			},
 			"ConditionsType": {
-				module: "./ConditionsType.qunit"
+				module: "./ConditionsType.qunit",
+				sinon: true
 			},
 			"DynamicDateRangeConditionsType": {
-				module: "./DynamicDateRangeConditionsType.qunit"
+				module: "./DynamicDateRangeConditionsType.qunit",
+				sinon: true
 			},
 			"Field": {
 				module: "./Field.qunit",

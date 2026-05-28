@@ -11,6 +11,7 @@
 	--_sap_m_Avatar_Font_Size_XS: 1rem;
 	--_sap_m_Avatar_Hover_Box_Shadow_Offset: 0 0 0 0.0625rem;
 	--_sap_m_Avatar_Badge_Icon_Box_Shadow: 0 0 0 0.0625rem;
+	--_sap_m_Avatar_Focus_Margin: ~"calc(var(--sapContent_FocusWidth) * 2)";
 }
 
 .sapFAvatar {
@@ -201,6 +202,10 @@
 	.sapFAvatarInitialsHolder {
 		font-size: 2.75rem;
 	}
+}
+
+.sapFAvatarFocusable {
+	margin: var(--_sap_m_Avatar_Focus_Margin);
 }
 
 .sapFAvatarFocusable.sapMAvatarPressed {

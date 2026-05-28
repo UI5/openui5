@@ -162,7 +162,8 @@ sap.ui.define([
 				description: oAction.description,
 				singleRename: oAction.singleRename,
 				controlBasedRenameChangeType: oAction.controlBasedRenameChangeType,
-				featureKey: oAction.featureKey
+				featureKey: oAction.featureKey,
+				validators: oAction.validators
 			});
 
 			if (aAnnotationChanges.length) {

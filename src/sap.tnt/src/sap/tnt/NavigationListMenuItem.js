@@ -79,7 +79,39 @@ sap.ui.define([
 				 * The icon for external links.
 				 * @since 1.121
 				 */
-				_externalLinkIcon: { type: "sap.ui.core.Icon", multiple: false, visibility: "hidden"}
+				_externalLinkIcon: { type: "sap.ui.core.Icon", multiple: false, visibility: "hidden"},
+
+				/**
+				 * A tag that uses Indication states to visually mark a navigation item.
+				 *
+				 * Use tags to display status information, counters, or metadata that helps users
+				 * quickly identify the state or importance of a navigation item.
+				 *
+				 * Tags can be added to:
+				 * <ul>
+				 * <li>Single-click items without children</li>
+				 * <li>Two-click items with children and expander arrow</li>
+				 * <li>Child items nested under a parent item</li>
+				 * </ul>
+				 *
+				 * <b>Note:</b> Tags are visible only when the <code>NavigationList</code> is in expanded mode, and hidden when collapsed.
+				 *
+				 * <h3>Usage</h3>
+				 * Common use cases include:
+				 * <ul>
+				 * <li>Status indicators: "Beta", "New", "Deprecated"</li>
+				 * <li>Counters: "5 Pending", "12 Items"</li>
+				 * <li>Versions: "v2.0"</li>
+				 * <li>Alerts: "Low Stock", "Critical"</li>
+				 * </ul>
+				 *
+				 * The <code>inverted</code> property is automatically set to <code>true</code>.
+				 * Use Indication states (<code>Indication15</code> – <code>Indication20</code>) for consistent theming.
+				 * Tags are interactive by default and can trigger events when clicked.
+				 *
+				 * @since 1.149
+				 */
+				tag: { type: "sap.m.ObjectStatus", multiple: false }
 			}
 		},
 

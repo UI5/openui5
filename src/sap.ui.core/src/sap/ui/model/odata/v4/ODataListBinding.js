@@ -3654,9 +3654,7 @@ sap.ui.define([
 		if (this.isResolved()) {
 			this.checkDataState();
 			if (this.isRootBindingSuspended()) {
-				this.sResumeChangeReason = this.sChangeReason === "AddVirtualContext"
-					? ChangeReason.Change
-					: ChangeReason.Refresh;
+				this.sResumeChangeReason = ChangeReason.Refresh;
 			} else if (this.sChangeReason === "AddVirtualContext") {
 				this._fireChange({
 					detailedReason : "AddVirtualContext",
@@ -5039,6 +5037,10 @@ sap.ui.define([
 				!!sResumeChangeReason && !oDependentBinding.oContext.isEffectivelyKeptAlive());
 		});
 		if (this.sChangeReason === "AddVirtualContext") {
+			this.mAggregatedQueryOptions = {};
+			this.bAggregatedQueryOptionsInitial = true;
+			this.mCanUseCachePromiseByChildPath = {};
+			this.sChangeReasonAfterRemoveVirtualContext = sResumeChangeReason;
 			// In a refresh event the table would ignore the result -> no virtual context -> no
 			// auto-$expand/$select. The refresh event is sent later after the change event with
 			// reason "RemoveVirtualContext".
@@ -5459,16 +5461,19 @@ sap.ui.define([
 		this.oQueryOptionsPromise = undefined;
 		this.setResetViaSideEffects(true);
 
+		const bRestartAutoExpandSelect = aSorters.some(
+			(oSorter) => oSorter.getGroupPaths()?.length);
 		if (this.isRootBindingSuspended()) {
 			this.setResumeChangeReason(ChangeReason.Sort);
+			if (bRestartAutoExpandSelect && this.oModel.bAutoExpandSelect) {
+				this.sChangeReason = "AddVirtualContext";
+			}
 			return this;
 		}
 
 		this.createReadGroupLock(this.getGroupId(), true);
 		this.removeCachesAndMessages("");
 		this.fetchCache(this.oContext);
-		const bRestartAutoExpandSelect = aSorters.some(
-			(oSorter) => oSorter.getGroupPaths()?.length);
 		this.reset(ChangeReason.Sort, /*bDrop*/undefined, /*sGroupId*/undefined,
 			bRestartAutoExpandSelect);
 		if (this.oHeaderContext) {

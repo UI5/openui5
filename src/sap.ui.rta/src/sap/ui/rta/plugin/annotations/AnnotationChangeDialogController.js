@@ -13,7 +13,8 @@ sap.ui.define([
 	"sap/ui/layout/form/FormElement",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"sap/ui/rta/plugin/annotations/AnnotationTypes"
+	"sap/ui/rta/plugin/annotations/AnnotationTypes",
+	"sap/ui/rta/util/validateText"
 ], function(
 	Input,
 	Label,
@@ -25,7 +26,8 @@ sap.ui.define([
 	FormElement,
 	Filter,
 	FilterOperator,
-	AnnotationTypes
+	AnnotationTypes,
+	validateText
 ) {
 	"use strict";
 
@@ -116,6 +118,54 @@ sap.ui.define([
 		this._fnResolveAfterClose([]);
 	};
 
+	AnnotationChangeDialogController.prototype._validateInput = function(oInput, sNewValue, sOldValue) {
+		const oModel = oInput.getModel();
+		if (!oModel) {
+			return false;
+		}
+		const aValidators = oModel.getProperty("/validators");
+		const bSingleRename = oModel.getProperty("/singleRename");
+		let bHasError = false;
+		try {
+			// Run other validators first (passing null as old value skips the sameTextError check).
+			// Only surface sameTextError as a field-level error in single-rename mode — with multiple
+			// input fields, an unchanged value must not be marked as error on the input itself.
+			validateText(sNewValue, null, { validators: aValidators });
+			if (bSingleRename) {
+				validateText(sNewValue, sOldValue, { validators: aValidators });
+			}
+			oInput.setValueState("None");
+			oInput.setValueStateText("");
+		} catch (oError) {
+			oInput.setValueState("Error");
+			oInput.setValueStateText(oError.message);
+			bHasError = true;
+		}
+		return bHasError;
+	};
+
+	AnnotationChangeDialogController.prototype._updateSaveEnabled = function(oModel, mPropertyBag) {
+		const [bWasError, bHasError, bWasChanged, bIsChanged] = [
+			mPropertyBag.wasError,
+			mPropertyBag.hasError,
+			mPropertyBag.wasChanged,
+			mPropertyBag.isChanged
+		];
+		// avoid counting existing errors multiple times
+		if (bHasError !== bWasError) {
+			oModel.setProperty("/errorCount", oModel.getProperty("/errorCount") + (bHasError ? 1 : -1));
+		}
+		// track changed-vs-original transitions so we can disable save in multi-rename mode
+		// when nothing actually differs from the original values
+		if (bIsChanged !== bWasChanged) {
+			oModel.setProperty("/changedCount", oModel.getProperty("/changedCount") + (bIsChanged ? 1 : -1));
+		}
+		const bNoErrors = oModel.getProperty("/errorCount") === 0;
+		const bSingleRename = oModel.getProperty("/singleRename");
+		const bHasChanges = bSingleRename || oModel.getProperty("/changedCount") > 0;
+		oModel.setProperty("/isSaveEnabled", bNoErrors && bHasChanges);
+	};
+
 	function createEditorField(sValueType) {
 		if (sValueType === AnnotationTypes.ValueListType) {
 			const oSelect = new Select({
@@ -140,9 +190,19 @@ sap.ui.define([
 			return new Input({
 				value: "{currentValue}",
 				liveChange: (oEvent) => {
-					const sValue = oEvent.getParameter("newValue");
-					const oContext = oEvent.getSource().getBindingContext();
-					oEvent.getSource().getModel().setProperty("currentValue", sValue, oContext);
+					const oSource = oEvent.getSource();
+					const oContext = oSource.getBindingContext();
+					const oModel = oSource.getModel();
+					const sInputValue = oEvent.getParameter("newValue").trim();
+					const sNewText = sInputValue.length ? sInputValue : "\xa0";
+					const sOriginalValue = oContext.getProperty("originalValue");
+					const mPropertyBag = {};
+					mPropertyBag.wasChanged = oContext.getProperty("currentValue") !== sOriginalValue;
+					oModel.setProperty("currentValue", sNewText, oContext);
+					mPropertyBag.isChanged = sNewText !== sOriginalValue;
+					mPropertyBag.wasError = oSource.getValueState() === "Error";
+					mPropertyBag.hasError = this._validateInput(oSource, sNewText, sOriginalValue);
+					this._updateSaveEnabled(oModel, mPropertyBag);
 				}
 			});
 		}

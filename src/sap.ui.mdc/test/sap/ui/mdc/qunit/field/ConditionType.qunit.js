@@ -3285,4 +3285,112 @@ sap.ui.define([
 
 	});
 
+	QUnit.module("DefaultValues", {
+		beforeEach() {
+			sinon.stub(FieldBaseDelegate, "getDefaultValues").returns([
+				Condition.createCondition(OperatorName.EQ, ["Test 1"], undefined, undefined, ConditionValidated.NotValidated),
+				Condition.createCondition(OperatorName.NE, ["Test 2"], undefined, undefined, ConditionValidated.NotValidated),
+				Condition.createCondition(OperatorName.BT, ["Test 3", "Test 4"], undefined, undefined, ConditionValidated.NotValidated)
+			]);
+			oValueType = new StringType({}, {nullable: false});
+			oConditionType = new ConditionType({
+				valueType: oValueType,
+				fieldPath: "X",
+				operators: [OperatorName.EQ, OperatorName.NE, OperatorName.BT, OperatorName.DefaultValues],
+				control: {id: "myControl"}
+			});
+		},
+		afterEach() {
+			oConditionType.destroy();
+			oConditionType = undefined;
+			oValueType.destroy();
+			oValueType = undefined;
+			FieldBaseDelegate.getDefaultValues.restore();
+		}
+	});
+
+	QUnit.test("Formatting", (assert) => {
+
+		let oCondition = Condition.createCondition(OperatorName.DefaultValues, [], undefined, undefined, ConditionValidated.NotValidated);
+		let sResult = oConditionType.formatValue(oCondition);
+		let sTestText = oResourceBundle.getText("operators.DefaultValues.tokenText", [""]);
+		assert.equal(sResult, sTestText, "Result of formatting");
+		assert.notOk(FieldBaseDelegate.getDefaultValues.called, "getDefaultValues not called");
+
+		oCondition = Condition.createCondition(OperatorName.DefaultValues, [[
+			Condition.createCondition(OperatorName.EQ, ["Test 1"], undefined, undefined, ConditionValidated.NotValidated),
+			Condition.createCondition(OperatorName.NE, ["Test 2"], undefined, undefined, ConditionValidated.NotValidated),
+			Condition.createCondition(OperatorName.BT, ["Test 3", "Test 4"], undefined, undefined, ConditionValidated.NotValidated)
+		]], undefined, undefined, ConditionValidated.NotValidated);
+		sResult = oConditionType.formatValue(oCondition);
+		sTestText = oResourceBundle.getText("operators.DefaultValues.tokenText", ["=Test 1, !(=Test 2), Test 3...Test 4"]);
+		assert.equal(sResult, sTestText, "Result of formatting");
+		assert.notOk(FieldBaseDelegate.getDefaultValues.called, "getDefaultValues not called");
+
+	});
+
+	QUnit.test("Parsing", (assert) => {
+
+		const aTestConditions = [
+			Condition.createCondition(OperatorName.EQ, ["Test 1"], undefined, undefined, ConditionValidated.NotValidated),
+			Condition.createCondition(OperatorName.NE, ["Test 2"], undefined, undefined, ConditionValidated.NotValidated),
+			Condition.createCondition(OperatorName.BT, ["Test 3", "Test 4"], undefined, undefined, ConditionValidated.NotValidated)
+		];
+		let oCondition = oConditionType.parseValue(oResourceBundle.getText("operators.DefaultValues.tokenText", [""]));
+		assert.ok(oCondition, "Result returned");
+		assert.equal(typeof oCondition, "object", "Result is object");
+		assert.equal(oCondition.operator, OperatorName.DefaultValues, "Operator");
+		assert.ok(Array.isArray(oCondition.values), "values are array");
+		assert.equal(oCondition.values.length, 1, "Values length");
+		assert.deepEqual(oCondition.values[0], aTestConditions, "Values entry");
+		assert.ok(FieldBaseDelegate.getDefaultValues.calledOnce, "getDefaultValues called");
+		assert.ok(FieldBaseDelegate.getDefaultValues.calledWith({id: "myControl"}), "getDefaultValues called with Control");
+		FieldBaseDelegate.getDefaultValues.resetHistory();
+
+		oCondition = oConditionType.parseValue(oResourceBundle.getText("operators.DefaultValues.tokenText", ["=Test 1"])); // text must not be parsed
+		assert.ok(oCondition, "Result returned");
+		assert.equal(typeof oCondition, "object", "Result is object");
+		assert.equal(oCondition.operator, OperatorName.DefaultValues, "Operator");
+		assert.ok(Array.isArray(oCondition.values), "values are array");
+		assert.equal(oCondition.values.length, 1, "Values length");
+		assert.deepEqual(oCondition.values[0], aTestConditions, "Values entry");
+		assert.ok(FieldBaseDelegate.getDefaultValues.calledOnce, "getDefaultValues called");
+		assert.ok(FieldBaseDelegate.getDefaultValues.calledWith({id: "myControl"}), "getDefaultValues called with Control");
+
+	});
+
+	QUnit.test("Validating", (assert) => {
+
+		let oCondition = Condition.createCondition(OperatorName.DefaultValues, [], undefined, undefined, ConditionValidated.NotValidated);
+		let oException;
+		sinon.spy(oValueType, "validateValue");
+
+		try {
+			oConditionType.validateValue(oCondition);
+		} catch (e) {
+			oException = e;
+		}
+
+		assert.notOk(oException, "no exception fired");
+		assert.notOk(oValueType.validateValue.called, "validateValue of ValueType not called");
+
+		oCondition = Condition.createCondition(OperatorName.DefaultValues, [[
+			Condition.createCondition(OperatorName.EQ, ["Test 1"], undefined, undefined, ConditionValidated.NotValidated),
+			Condition.createCondition(OperatorName.NE, ["Test 2"], undefined, undefined, ConditionValidated.NotValidated),
+			Condition.createCondition(OperatorName.BT, ["Test 3", "Test 4"], undefined, undefined, ConditionValidated.NotValidated)
+		]], undefined, undefined, ConditionValidated.NotValidated);
+		oException = undefined;
+		oValueType.validateValue.reset();
+
+		try {
+			oConditionType.validateValue(oCondition);
+		} catch (e) {
+			oException = e;
+		}
+
+		assert.notOk(oException, "no exception fired");
+		assert.notOk(oValueType.validateValue.called, "validateValue of ValueType not called");
+
+	});
+
 });

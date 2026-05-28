@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	'sap/m/Text',
 	'sap/m/Dialog',
+	'sap/m/ObjectStatus',
 	'sap/tnt/NavigationList',
 	'sap/tnt/NavigationListItem',
 	'sap/tnt/NavigationListGroup',
@@ -27,6 +28,7 @@ sap.ui.define([
 	jQuery,
 	Text,
 	Dialog,
+	ObjectStatus,
 	NavigationList,
 	NavigationListItem,
 	NavigationListGroup,
@@ -2191,6 +2193,435 @@ sap.ui.define([
 		this.clock.tick(50);
 
 		assert.strictEqual(oItem.getExpanded(), true, "Item remains expanded after ENTER key (not selectable)");
+	});
+
+	QUnit.module("Tag aggregation", {
+		beforeEach: function() {
+			this.navigationList = new NavigationList({
+				items: [
+					new NavigationListItem({
+						text: "Item with tag",
+						icon: "sap-icon://employee",
+						tag: new ObjectStatus({
+							text: "Beta",
+							state: "Indication15",
+							inverted: true
+						})
+					}),
+					new NavigationListItem({
+						text: "Item without tag",
+						icon: "sap-icon://home"
+					})
+				]
+			});
+			this.navigationList.placeAt("qunit-fixture");
+		},
+		afterEach: function() {
+			this.navigationList.destroy();
+		}
+	});
+
+	QUnit.test("Tag renders correctly", async function(assert) {
+		await nextUIUpdate();
+		const oItem = this.navigationList.getItems()[0];
+		const oTag = oItem.getTag();
+
+		assert.ok(oTag, "One tag aggregated");
+		assert.ok(oItem.getDomRef().querySelector(".sapTntNLITagContainer"), "Tag container rendered");
+		assert.ok(oItem.getDomRef().querySelector(".sapMObjStatus"), "ObjectStatus rendered");
+		assert.ok(oItem.getDomRef().querySelector(".sapMObjStatus").textContent.includes("Beta"), "Tag text includes 'Beta'");
+	});
+
+	QUnit.test("Tag can be replaced", async function(assert) {
+		await nextUIUpdate();
+		const oItem = this.navigationList.getItems()[0];
+		const oNewTag = new ObjectStatus({ text: "New", state: "Indication16", inverted: true });
+
+		oItem.setTag(oNewTag);
+
+		await nextUIUpdate();
+		assert.strictEqual(oItem.getTag(), oNewTag, "Tag replaced successfully");
+
+		const aTagElements = oItem.getDomRef().querySelectorAll(".sapMObjStatus");
+		assert.strictEqual(aTagElements.length, 1, "Only one tag rendered");
+		assert.ok(aTagElements[0].textContent.includes("New"), "New tag text includes 'New'");
+	});
+
+	QUnit.test("Tag hidden in collapsed mode", async function(assert) {
+		await nextUIUpdate();
+		this.navigationList.setExpanded(false);
+		await nextUIUpdate();
+
+		const oTagContainer = this.navigationList.getDomRef().querySelector(".sapTntNLITagContainer");
+		const computedStyle = window.getComputedStyle(oTagContainer);
+		assert.strictEqual(computedStyle.display, "none", "Tag hidden when collapsed");
+	});
+
+	QUnit.test("Item without tag doesn't render tag container", async function(assert) {
+		await nextUIUpdate();
+		const oItem = this.navigationList.getItems()[1];
+		const oTag = oItem.getTag();
+
+		assert.notOk(oTag, "No tag aggregated");
+		assert.notOk(oItem.getDomRef().querySelector(".sapTntNLITagContainer"), "Tag container not rendered");
+	});
+
+	QUnit.test("Tag aggregation methods work correctly", async function(assert) {
+		await nextUIUpdate();
+		const oItem = this.navigationList.getItems()[0];
+		const oOriginalTag = oItem.getTag();
+		const oNewTag = new ObjectStatus({ text: "Updated", state: "Indication17", inverted: true });
+
+		assert.ok(oOriginalTag, "Original tag exists");
+
+		oItem.setTag(oNewTag);
+		assert.strictEqual(oItem.getTag(), oNewTag, "Tag set successfully");
+
+		oItem.setTag(null);
+		assert.notOk(oItem.getTag(), "Tag destroyed");
+	});
+
+	QUnit.test("Tag cloned in popover for parent item", async function(assert) {
+		// Create a NavigationList with parent item with tag and children
+		const oNavigationList = new NavigationList({
+			expanded: false,
+			items: [
+				new NavigationListItem({
+					text: "Parent Item",
+					icon: "sap-icon://home",
+					tag: new ObjectStatus({
+						text: "Beta",
+						state: "Indication15",
+						inverted: true
+					}),
+					items: [
+						new NavigationListItem({
+							text: "Child 1"
+						}),
+						new NavigationListItem({
+							text: "Child 2"
+						})
+					]
+				})
+			]
+		});
+
+		oNavigationList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oParentItem = oNavigationList.getItems()[0];
+		const oOriginalTag = oParentItem.getTag();
+
+		assert.ok(oOriginalTag, "Parent item has tag");
+		assert.strictEqual(oOriginalTag.getText(), "Beta", "Original tag text is 'Beta'");
+
+		// Create popover list
+		const oPopoverList = oParentItem.createListForPopup();
+		const oPopoverParentItem = oPopoverList.getItems()[0];
+		const oClonedTag = oPopoverParentItem.getTag();
+
+		assert.ok(oClonedTag, "Tag cloned in popover");
+		assert.strictEqual(oClonedTag.getText(), "Beta", "Cloned tag has same text");
+		assert.strictEqual(oClonedTag.getState(), "Indication15", "Cloned tag has same state");
+		assert.strictEqual(oClonedTag.getInverted(), true, "Cloned tag has same inverted property");
+		assert.notStrictEqual(oClonedTag.getId(), oOriginalTag.getId(), "Cloned tag has different ID");
+
+		oPopoverList.destroy();
+		oNavigationList.destroy();
+	});
+
+	QUnit.test("Tag cloned in popover for child items", async function(assert) {
+		// Create a NavigationList with parent item and child with tag
+		const oNavigationList = new NavigationList({
+			expanded: false,
+			items: [
+				new NavigationListItem({
+					text: "Parent Item",
+					icon: "sap-icon://home",
+					items: [
+						new NavigationListItem({
+							text: "Child with Tag",
+							tag: new ObjectStatus({
+								text: "New",
+								state: "Indication16",
+								inverted: true
+							})
+						}),
+						new NavigationListItem({
+							text: "Child without Tag"
+						})
+					]
+				})
+			]
+		});
+
+		oNavigationList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oParentItem = oNavigationList.getItems()[0];
+		const oChildItem = oParentItem.getItems()[0];
+		const oOriginalTag = oChildItem.getTag();
+
+		assert.ok(oOriginalTag, "Child item has tag");
+		assert.strictEqual(oOriginalTag.getText(), "New", "Original tag text is 'New'");
+
+		// Create popover list
+		const oPopoverList = oParentItem.createListForPopup();
+		const oPopoverParentItem = oPopoverList.getItems()[0];
+		const oPopoverChildItem = oPopoverParentItem.getItems()[0];
+		const oClonedTag = oPopoverChildItem.getTag();
+
+		assert.ok(oClonedTag, "Tag cloned in popover for child item");
+		assert.strictEqual(oClonedTag.getText(), "New", "Cloned tag has same text");
+		assert.strictEqual(oClonedTag.getState(), "Indication16", "Cloned tag has same state");
+		assert.strictEqual(oClonedTag.getInverted(), true, "Cloned tag has same inverted property");
+		assert.notStrictEqual(oClonedTag.getId(), oOriginalTag.getId(), "Cloned tag has different ID");
+
+		oPopoverList.destroy();
+		oNavigationList.destroy();
+	});
+
+	QUnit.test("Tag not cloned when parent has no tag", async function(assert) {
+		// Create a NavigationList with parent item without tag
+		const oNavigationList = new NavigationList({
+			expanded: false,
+			items: [
+				new NavigationListItem({
+					text: "Parent Item",
+					icon: "sap-icon://home",
+					items: [
+						new NavigationListItem({
+							text: "Child 1"
+						})
+					]
+				})
+			]
+		});
+
+		oNavigationList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oParentItem = oNavigationList.getItems()[0];
+		const oOriginalTag = oParentItem.getTag();
+
+		assert.notOk(oOriginalTag, "Parent item has no tag");
+
+		// Create popover list
+		const oPopoverList = oParentItem.createListForPopup();
+		const oPopoverParentItem = oPopoverList.getItems()[0];
+		const oClonedTag = oPopoverParentItem.getTag();
+
+		assert.notOk(oClonedTag, "No tag in popover when parent has no tag");
+
+		oPopoverList.destroy();
+		oNavigationList.destroy();
+	});
+
+	QUnit.test("Tags visible in popover when rendered", async function(assert) {
+		// Create a NavigationList with tags
+		const oNavigationList = new NavigationList({
+			expanded: false,
+			items: [
+				new NavigationListItem({
+					text: "Parent Item",
+					icon: "sap-icon://home",
+					tag: new ObjectStatus({
+						text: "Beta",
+						state: "Indication15",
+						inverted: true
+					}),
+					items: [
+						new NavigationListItem({
+							text: "Child Item",
+							tag: new ObjectStatus({
+								text: "New",
+								state: "Indication16",
+								inverted: true
+							})
+						})
+					]
+				})
+			]
+		});
+
+		oNavigationList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oParentItem = oNavigationList.getItems()[0];
+		const oPopoverList = oParentItem.createListForPopup();
+
+		oPopoverList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oPopoverParentItem = oPopoverList.getItems()[0];
+		const oPopoverChildItem = oPopoverParentItem.getItems()[0];
+
+		// Check parent item tag in popover
+		const oParentTagContainer = oPopoverParentItem.getDomRef().querySelector(".sapTntNLITagContainer");
+		assert.ok(oParentTagContainer, "Parent tag container rendered in popover");
+
+		const oParentTagElement = oPopoverParentItem.getDomRef().querySelector(".sapMObjStatus");
+		assert.ok(oParentTagElement, "Parent tag element rendered in popover");
+		assert.ok(oParentTagElement.textContent.includes("Beta"), "Parent tag text visible in popover");
+
+		// Check child item tag in popover
+		const oChildTagContainer = oPopoverChildItem.getDomRef().querySelector(".sapTntNLITagContainer");
+		assert.ok(oChildTagContainer, "Child tag container rendered in popover");
+
+		const oChildTagElement = oPopoverChildItem.getDomRef().querySelector(".sapMObjStatus");
+		assert.ok(oChildTagElement, "Child tag element rendered in popover");
+		assert.ok(oChildTagElement.textContent.includes("New"), "Child tag text visible in popover");
+
+		oPopoverList.destroy();
+		oNavigationList.destroy();
+	});
+
+	QUnit.test("Tag aria attributes - expanded mode", async function(assert) {
+		await nextUIUpdate();
+		const oItem = this.navigationList.getItems()[0];
+		const oAnchor = oItem.getDomRef().querySelector("a");
+		const oTagContainer = oItem.getDomRef().querySelector(".sapTntNLITagContainer");
+		const oInvText = oItem.getDomRef().querySelector(".sapUiInvisibleText");
+
+		assert.ok(oInvText, "Invisible text element exists");
+		assert.ok(oInvText.textContent.includes("Beta"), "Invisible text includes tag text");
+
+		const sDescribedBy = oAnchor.getAttribute("aria-describedby");
+		assert.ok(sDescribedBy, "Anchor has aria-describedby");
+		assert.ok(sDescribedBy.includes(oInvText.id), "Aria-describedby references invisible text");
+
+		assert.ok(oTagContainer, "Tag container element exists");
+	});
+
+	QUnit.test("Tag aria attributes - collapsed mode", async function(assert) {
+		await nextUIUpdate();
+		this.navigationList.setExpanded(false);
+		await nextUIUpdate();
+
+		const oItem = this.navigationList.getItems()[0];
+		const oAnchor = oItem.getDomRef().querySelector("a");
+
+		const sDescribedBy = oAnchor.getAttribute("aria-describedby");
+		assert.ok(sDescribedBy, "Anchor still has aria-describedby in collapsed mode");
+		assert.ok(sDescribedBy.includes("tag-inv-text"), "Aria-describedby still references invisible text");
+	});
+
+	QUnit.test("Tag aria attributes - parent item with children", async function(assert) {
+		const oNavigationList = new NavigationList({
+			expanded: true,
+			items: [
+				new NavigationListItem({
+					text: "Parent with Tag",
+					icon: "sap-icon://home",
+					expanded: true,
+					tag: new ObjectStatus({
+						text: "Beta",
+						state: "Indication15",
+						inverted: true
+					}),
+					items: [
+						new NavigationListItem({
+							text: "Child 1"
+						}),
+						new NavigationListItem({
+							text: "Child 2",
+							tag: new ObjectStatus({
+								text: "New",
+								state: "Indication16",
+								inverted: true
+							})
+						})
+					]
+				})
+			]
+		});
+
+		oNavigationList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oParentItem = oNavigationList.getItems()[0];
+		const oParentAnchor = oParentItem.getDomRef().querySelector("a");
+		const oParentInvText = oParentItem.getDomRef().querySelector(".sapUiInvisibleText");
+
+		const sParentDescribedBy = oParentAnchor.getAttribute("aria-describedby");
+		assert.ok(sParentDescribedBy, "Parent anchor has aria-describedby");
+		assert.ok(sParentDescribedBy.includes(oParentInvText.id), "Parent aria-describedby includes invisible text");
+
+		const oChildItem = oParentItem.getItems()[1];
+		const oChildAnchor = oChildItem.getDomRef().querySelector("a");
+		const oChildInvText = oChildItem.getDomRef().querySelector(".sapUiInvisibleText");
+
+		const sChildDescribedBy = oChildAnchor.getAttribute("aria-describedby");
+		assert.ok(sChildDescribedBy, "Child anchor has aria-describedby");
+		assert.ok(sChildDescribedBy.includes(oChildInvText.id), "Child aria-describedby includes invisible text");
+
+		oNavigationList.destroy();
+	});
+
+	QUnit.test("Tag aria attributes in popover", async function(assert) {
+		const oNavigationList = new NavigationList({
+			expanded: false,
+			items: [
+				new NavigationListItem({
+					text: "Parent Item",
+					icon: "sap-icon://home",
+					tag: new ObjectStatus({
+						text: "Beta",
+						state: "Indication15",
+						inverted: true
+					}),
+					items: [
+						new NavigationListItem({
+							text: "Child Item",
+							tag: new ObjectStatus({
+								text: "New",
+								state: "Indication16",
+								inverted: true
+							})
+						})
+					]
+				})
+			]
+		});
+
+		oNavigationList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oParentItem = oNavigationList.getItems()[0];
+		const oPopoverList = oParentItem.createListForPopup();
+
+		oPopoverList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oPopoverParentItem = oPopoverList.getItems()[0];
+		const oPopoverChildItem = oPopoverParentItem.getItems()[0];
+
+		const oParentAnchor = oPopoverParentItem.getDomRef().querySelector("a");
+		const oParentTagContainer = oPopoverParentItem.getDomRef().querySelector(".sapTntNLITagContainer");
+		const oParentInvText = oPopoverParentItem.getDomRef().querySelector(".sapUiInvisibleText");
+
+		assert.ok(oParentTagContainer, "Parent tag container rendered in popover");
+		assert.ok(oParentInvText, "Parent invisible text exists in popover");
+		assert.ok(oParentInvText.textContent.includes("Beta"), "Parent invisible text includes tag text in popover");
+
+		const sParentDescribedBy = oParentAnchor.getAttribute("aria-describedby");
+		assert.ok(sParentDescribedBy, "Parent anchor has aria-describedby in popover");
+		assert.ok(sParentDescribedBy.includes(oParentInvText.id), "Parent aria-describedby includes invisible text in popover");
+
+		const oChildAnchor = oPopoverChildItem.getDomRef().querySelector("a");
+		const oChildTagContainer = oPopoverChildItem.getDomRef().querySelector(".sapTntNLITagContainer");
+		const oChildInvText = oPopoverChildItem.getDomRef().querySelector(".sapUiInvisibleText");
+
+		assert.ok(oChildTagContainer, "Child tag container rendered in popover");
+		assert.ok(oChildInvText, "Child invisible text exists in popover");
+		assert.ok(oChildInvText.textContent.includes("New"), "Child invisible text includes tag text in popover");
+
+		const sChildDescribedBy = oChildAnchor.getAttribute("aria-describedby");
+		assert.ok(sChildDescribedBy, "Child anchor has aria-describedby in popover");
+		assert.ok(sChildDescribedBy.includes(oChildInvText.id), "Child aria-describedby includes invisible text in popover");
+
+		oPopoverList.destroy();
+		oNavigationList.destroy();
 	});
 
 	return waitForThemeApplied();

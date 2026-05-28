@@ -13,6 +13,7 @@ sap.ui.define([
 	"sap/ui/mdc/enums/BaseType",
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/FieldDisplay",
+	"sap/ui/mdc/enums/FieldEditMode",
 	"sap/ui/mdc/enums/OperatorValueType",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/model/Filter",
@@ -38,6 +39,7 @@ sap.ui.define([
 	BaseType,
 	ConditionValidated,
 	FieldDisplay,
+	FieldEditMode,
 	OperatorValueType,
 	OperatorName,
 	Filter,
@@ -1870,6 +1872,34 @@ sap.ui.define([
 						filter: {path: "test", operator: FilterOperator.NE, value1: null}
 					}
 				],
+				[OperatorName.DefaultValues]: [{
+						formatArgs: [Condition.createCondition(OperatorName.DefaultValues, [])],
+						formatValue: mdcMessageBundle.getText("operators.DefaultValues.tokenText", [""]),
+						parseArgs: [mdcMessageBundle.getText("operators.DefaultValues.tokenText", [""])],
+						parsedValue: "",
+						condition: Condition.createCondition(OperatorName.DefaultValues, [], undefined, undefined, ConditionValidated.NotValidated),
+						isEmpty: false,
+						valid: true,
+						oType: new StringType({}, {nullable: false}),
+						baseType: BaseType.String,
+						// filter: null,
+						isSingleValue: true,
+						longText: mdcMessageBundle.getText("operators.DefaultValues.longText"),
+						tokenText: mdcMessageBundle.getText("operators.DefaultValues.tokenText"),
+						group: {id: "0", text: mdcMessageBundle.getText("VALUEHELP.OPERATOR.GROUP0")}
+					},
+					{
+						formatArgs: [Condition.createCondition(OperatorName.DefaultValues, [[Condition.createCondition(OperatorName.EQ, ["Test"]), Condition.createCondition(OperatorName.NE, ["A"])]]), oStringType, FieldDisplay.Value, false],
+						formatValue: mdcMessageBundle.getText("operators.DefaultValues.tokenText", ["=Test, !(=A)"]),
+						parsedValue: "",
+						condition: Condition.createCondition(OperatorName.DefaultValues, [], undefined, undefined, ConditionValidated.NotValidated),
+						isEmpty: false,
+						valid: true,
+						oType: oStringType,
+						baseType: BaseType.String
+						// filter: null,
+					}
+				],
 				"MyOperator": [{
 					formatArgs: [Condition.createCondition("MyOperator", ["MyOperator"])],
 					formatValue: "Hello",
@@ -2784,12 +2814,14 @@ sap.ui.define([
 					"sap/ui/mdc/ValueHelp",
 					"sap/ui/mdc/valuehelp/Popover",
 					"sap/ui/core/Control"], (Field, BindingMode, Element, FixedList, FixedListItem, ValueHelp, Popover, Control) => {
-				const oOperator = FilterOperatorUtil.getOperator("SPECIFICMONTH");
+				const oOperator = FilterOperatorUtil.getOperator(OperatorName.SPECIFICMONTH);
 				const oType = new IntegerType();
 				const oControl = oOperator.createControl(oType, "myPath", 0, "myId");
 
 				_checkMonthField(assert, oControl, oType, Field, BindingMode, Element, ValueHelp, Popover, FixedList, FixedListItem);
 
+				oControl.destroy();
+				oType.destroy();
 				resolve();
 			});
 		});
@@ -2807,12 +2839,13 @@ sap.ui.define([
 					"sap/ui/mdc/ValueHelp",
 					"sap/ui/mdc/valuehelp/Popover",
 					"sap/ui/core/Control"], (Field, BindingMode, Element, FixedList, FixedListItem, ValueHelp, Popover, Control) => {
-				const oOperator = FilterOperatorUtil.getOperator("SPECIFICMONTHINYEAR");
+				const oOperator = FilterOperatorUtil.getOperator(OperatorName.SPECIFICMONTHINYEAR);
 				const oType = new IntegerType();
 				let oControl = oOperator.createControl(oType, "myPath", 0, "myId");
 
 				_checkMonthField(assert, oControl, oType, Field, BindingMode, Element, ValueHelp, Popover, FixedList, FixedListItem);
 
+				oControl.destroy();
 				oControl = oOperator.createControl(oType, "myPath", 1, "myId");
 				assert.ok(oControl, "Control created");
 				assert.ok(oControl instanceof Field, "Control is Field");
@@ -2827,6 +2860,31 @@ sap.ui.define([
 				assert.equal(oBindingInfo?.mode || oBindingInfo.parts?.[0].mode, BindingMode.TwoWay, "BindingInfo path");
 				assert.equal(oBindingInfo?.targetType || oBindingInfo.parts?.[0].targetType, "raw", "BindingInfo targetType");
 
+				oControl.destroy();
+				oType.destroy();
+				resolve();
+			});
+		});
+
+	});
+
+	QUnit.test("createControl: DefaultValues", function(assert) {
+
+		return new Promise((resolve) => {
+			sap.ui.require(["sap/ui/mdc/FilterField"], (FilterField) => {
+				const oOperator = FilterOperatorUtil.getOperator(OperatorName.DefaultValues);
+				const oType = new StringType({parseKeepsEmptyString: true}, {nullable: false});
+				const oControl = oOperator.createControl(oType, "myPath", 0, "myId");
+
+				assert.ok(oControl.isA("sap.ui.mdc.FilterField"), "Field is FilterField");
+				assert.equal(oControl.getEditMode(), FieldEditMode.ReadOnly, "Field is in read only mode");
+				assert.equal(oControl.getDataType(), "sap.ui.model.odata.type.String", "Field has correct data type");
+				assert.deepEqual(oControl.getDataTypeFormatOptions(), {parseKeepsEmptyString: true}, "Field has correct data type format options");
+				assert.deepEqual(oControl.getDataTypeConstraints(), {nullable: false}, "Field has correct data type constraints");
+				assert.equal(oControl.getDisplay(), FieldDisplay.Value, "Field shows Value");
+
+				oControl.destroy();
+				oType.destroy();
 				resolve();
 			});
 		});

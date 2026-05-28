@@ -52,6 +52,7 @@
 				"since": "1.34",
 				"samples": [
 					"sap.tnt.sample.SideNavigation",
+					"sap.tnt.sample.SideNavigationWithTags",
 					"sap.tnt.sample.SideNavigationUnselectableParents",
 					"sap.tnt.sample.SideNavigationActions",
 					"sap.tnt.sample.SideNavigationOverlayMode",
@@ -106,6 +107,11 @@
 				"id": "sap.tnt.sample.SideNavigation",
 				"name": "Side Navigation",
 				"description": "SideNavigation in container with fixed width."
+			},
+			{
+				"id": "sap.tnt.sample.SideNavigationWithTags",
+				"name": "Side Navigation - Tags",
+				"description": "SideNavigation with tags for status indicators and metadata."
 			},
 			{
 				"id": "sap.tnt.sample.SideNavigationUnselectableParents",

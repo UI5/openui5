@@ -14,6 +14,9 @@
 
 	<m:App id="MyApp" defaultTransitionName="show">
 		<m:Page id="P0" title="FilterField" titleLevel="H1">
+			<m:headerContent>
+				<m:ToggleButton pressed="false" press=".onDefaultValuesPress" text="enable default values" />
+			</m:headerContent>
 			<m:ScrollContainer vertical="true" height="67%">
 				<form:SimpleForm id="Form1" layout="ColumnLayout" editable="true"
 					columnsXL="4" columnsL="3" columnsM="2">
@@ -141,7 +144,7 @@
 						propertyKey="Description"
 						dataType="sap.ui.model.odata.type.String"
 						dataTypeConstraints='\{"nullable": false\}'
-						delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate"\}'
+						delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
 						maxConditions="3"
 						placeholder="{/#Product/Description/@sap:label}"
 						label="{/#Product/Description/@sap:label}"
@@ -279,6 +282,7 @@
 					<mdc:FilterField id="FF9"
 						conditions="{cm>/conditions/Status}"
 						propertyKey="Status"
+						delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
 						display="Description"
 						maxConditions="1"
 						placeholder="{/#Product/Status/@sap:label}"
@@ -303,6 +307,7 @@
 					<mdc:FilterField id="FF17"
 						conditions="{cm>/conditions/Status}"
 						propertyKey="Status"
+						delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}'
 						display="Description"
 						maxConditions="1"
 						placeholder="{/#Product/Status/@sap:label}"

@@ -27,6 +27,7 @@ sap.ui.define([
 	NavigationListMenuItemRenderer.render = function(oRm, oItem) {
 		const bHasSubmenu = !!oItem._getVisibleItems().length;
 		const bIsExternalLink = oItem.getHref() && oItem.getTarget() === "_blank";
+		const bHasTag = !!oItem.getTag();
 
 		oRm.openStart("li", oItem);
 
@@ -47,6 +48,11 @@ sap.ui.define([
 		if (oItem?._navItem?.getSelectable() && bHasSubmenu) {
 			oRm.attr("aria-description", Lib.getResourceBundleFor("sap.tnt").getText("NAVIGATION_LIST_DUAL_CLICK_MENU_ITEM_DESCRIPTION"));
 		}
+
+		if (bHasTag) {
+			oRm.attr("aria-describedby", oItem.getId() + "-tag-inv-text");
+		}
+
 		oRm.openEnd();
 
 		// External link "a" tag
@@ -58,6 +64,8 @@ sap.ui.define([
 		this.renderIcon(oRm, oItem);
 		// Text column
 		this.renderText(oRm, oItem);
+		// Tag column
+		this.renderTag(oRm, oItem);
 
 		if (bHasSubmenu) {
 			// Submenu arrow column
@@ -90,6 +98,7 @@ sap.ui.define([
 	 * Renders opening tag of anchor element.
 	 *
 	 * @param {sap.ui.core.RenderManager} oRm renderer instance
+	 * @param {sap.tnt.NavigationListMenuItem} oItem menu item instance
 	 * @private
 	 */
 	NavigationListMenuItemRenderer._renderLinkTag = function (oRm, oItem) {
@@ -119,6 +128,37 @@ sap.ui.define([
 		}
 
 		oRm.openEnd();
+	};
+
+	/**
+	 * Renders the tag aggregation.
+	 *
+	 * @param {sap.ui.core.RenderManager} oRm renderer instance
+	 * @param {sap.tnt.NavigationListMenuItem} oItem menu item instance
+	 * @private
+	 */
+	NavigationListMenuItemRenderer.renderTag = function (oRm, oItem) {
+		const oTag = oItem.getTag();
+		if (oTag) {
+			const sTagText = oTag.getText();
+			const sAccessibleName = Lib.getResourceBundleFor("sap.tnt").getText("NAVIGATION_LIST_ITEM_TAG_TEXT", [sTagText]);
+
+			oRm.openStart("span")
+				.class("sapTntNLMenuItemTagContainer")
+				.attr("aria-hidden", "true")
+				.openEnd();
+
+			oRm.renderControl(oTag);
+
+			oRm.openStart("span", oItem.getId() + "-tag-inv-text")
+				.class("sapUiInvisibleText")
+				.attr("aria-hidden", "true")
+				.openEnd()
+				.text(sAccessibleName)
+				.close("span");
+
+			oRm.close("span");
+		}
 	};
 
 	return NavigationListMenuItemRenderer;

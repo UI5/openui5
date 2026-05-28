@@ -1,0 +1,72 @@
+<mvc:View
+	controllerName="sap.tnt.sample.SideNavigationWithTags.C"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:tnt="sap.tnt"
+	height="100%">
+	<VBox renderType="Bare" alignItems="Start" height="100%">
+		<Button
+			text="Toggle Collapse/Expand"
+			icon="sap-icon://menu2"
+			press=".onCollapseExpandPress" />
+
+		<tnt:SideNavigation id="sideNavigation" selectedKey="myAccounts" expanded="true">
+			<tnt:NavigationList>
+				<tnt:NavigationListItem text="Dashboard" icon="sap-icon://home" />
+				<tnt:NavigationListItem text="Favorites" icon="sap-icon://favorite" expanded="true" selectable="false">
+					<tnt:tag>
+						<ObjectStatus text="3 Items" state="Indication17" inverted="true" />
+					</tnt:tag>
+					<tnt:NavigationListItem text="My Accounts" id="myAccounts" />
+					<tnt:NavigationListItem text="My Orders">
+						<tnt:tag>
+							<ObjectStatus text="5 Pending" state="Indication20" inverted="true" />
+						</tnt:tag>
+					</tnt:NavigationListItem>
+					<tnt:NavigationListItem text="My Reports" />
+				</tnt:NavigationListItem>
+				<tnt:NavigationListGroup text="Business Operations">
+					<tnt:NavigationListItem text="Inventory" icon="sap-icon://product">
+						<tnt:tag>
+							<ObjectStatus text="Low Stock" state="Indication18" inverted="true" />
+						</tnt:tag>
+					</tnt:NavigationListItem>
+					<tnt:NavigationListItem text="Analytics" icon="sap-icon://bar-chart" />
+				</tnt:NavigationListGroup>
+				<tnt:NavigationListItem text="API Explorer" icon="sap-icon://explorer">
+					<tnt:tag>
+						<ObjectStatus text="Beta" state="Indication15" inverted="true" />
+					</tnt:tag>
+				</tnt:NavigationListItem>
+				<tnt:NavigationListItem text="Projects" icon="sap-icon://project-definition-triangle" expanded="true">
+					<tnt:tag>
+						<ObjectStatus text="2 Active" state="Indication16" inverted="true" />
+					</tnt:tag>
+					<tnt:NavigationListItem text="Project Alpha" />
+					<tnt:NavigationListItem text="Project Beta">
+						<tnt:tag>
+						    <ObjectStatus text="Experimental" state="Indication19" inverted="true" />
+						</tnt:tag>
+					</tnt:NavigationListItem>
+				</tnt:NavigationListItem>
+				<tnt:NavigationListItem text="Documentation" icon="sap-icon://sys-help" />
+				<tnt:NavigationListItem text="Sandbox" icon="sap-icon://lab" />
+				<tnt:NavigationListItem text="Notifications" icon="sap-icon://bell">
+					<tnt:tag>
+						<ObjectStatus text="8 New" state="Indication18" inverted="true" />
+					</tnt:tag>
+				</tnt:NavigationListItem>
+			</tnt:NavigationList>
+			<tnt:fixedItem>
+				<tnt:NavigationList>
+					<tnt:NavigationListItem text="Support" icon="sap-icon://sys-help-2">
+						<tnt:tag>
+							<ObjectStatus text="24/7" state="Indication16" inverted="true" />
+						</tnt:tag>
+					</tnt:NavigationListItem>
+					<tnt:NavigationListItem text="Settings" icon="sap-icon://action-settings" />
+				</tnt:NavigationList>
+			</tnt:fixedItem>
+		</tnt:SideNavigation>
+	</VBox>
+</mvc:View>

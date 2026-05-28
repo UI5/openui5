@@ -2,6 +2,7 @@ sap.ui.define([
 	"sap/m/App",
 	"sap/m/Page",
 	"sap/m/Button",
+	"sap/m/ObjectStatus",
     "sap/tnt/NavigationList",
     "sap/tnt/NavigationListItem"
 ],
@@ -9,6 +10,7 @@ sap.ui.define([
         App,
         Page,
         Button,
+        ObjectStatus,
         NavigationList,
         NavigationListItem
     ){
@@ -277,6 +279,109 @@ sap.ui.define([
 			]
 		});
 
+		var oNavigationListWithStatuses = new NavigationList("navLiWithStatuses", {
+			width: '420px',
+			expanded: true,
+			items: [
+				new NavigationListItem({
+					text: 'Overview',
+					icon: 'sap-icon://home',
+					tag: new ObjectStatus({
+						text: "Beta",
+						state: "Indication15",
+						inverted: true
+					})
+				}),
+				new NavigationListItem({
+					text: 'Features',
+					icon: 'sap-icon://activity-items',
+					expanded: true,
+					tag: new ObjectStatus({
+						text: "New",
+						state: "Indication16",
+						inverted: true
+					}),
+					items: [
+						new NavigationListItem({
+							text: 'Feature A',
+							tag: new ObjectStatus({
+									text: "Beta",
+									state: "Indication15",
+									inverted: true
+								})
+						}),
+						new NavigationListItem({
+							text: 'Feature B',
+							tag: new ObjectStatus({
+									text: "Deprecated",
+									state: "Indication18",
+									inverted: true
+								})
+						}),
+						new NavigationListItem({
+							text: 'Feature C'
+						})
+					]
+				}),
+				new NavigationListItem({
+					text: 'Documentation',
+					icon: 'sap-icon://sys-help',
+					tag: new ObjectStatus({
+							text: "Updated",
+							state: "Indication16",
+							inverted: true
+						})
+				}),
+				new NavigationListItem({
+					text: 'Settings',
+					icon: 'sap-icon://action-settings'
+				}),
+				new NavigationListItem({
+					text: 'Analytics',
+					icon: 'sap-icon://bar-chart',
+					tag: new ObjectStatus({
+						text: "Nightly",
+						state: "Indication17",
+						inverted: true
+					})
+				}),
+				new NavigationListItem({
+					text: 'Preview',
+					icon: 'sap-icon://show',
+					tag: new ObjectStatus({
+							text: "Experimental",
+							state: "Indication19",
+							inverted: true
+						})
+				}),
+				new NavigationListItem({
+					text: 'Reports',
+					icon: 'sap-icon://document',
+					tag: new ObjectStatus({
+						text: "Updated",
+						state: "Indication20",
+						inverted: true
+					})
+				}),
+				new NavigationListItem({
+					text: 'Administration',
+					icon: 'sap-icon://settings',
+					tag: new ObjectStatus({
+						text: "Long tag Long tag",
+						state: "Indication17",
+						inverted: true
+					})
+				})
+			]
+		});
+
+		var menuButtonStatuses = new Button({
+			text: 'Toggle Expand/Collapse',
+			press: function () {
+				oNavigationListWithStatuses.setExpanded(!oNavigationListWithStatuses.getExpanded());
+			}
+		});
+
 		var oApp = new App({
 			pages: [
 				new Page("page1", {
@@ -286,6 +391,12 @@ sap.ui.define([
 							text: "Go to Page2",
 							press: function () {
 								oApp.to("page2");
+							}
+						}),
+						new Button("toPage3", {
+							text: "Go to Tags Demo",
+							press: function () {
+								oApp.to("page3");
 							}
 						})
 					],
@@ -302,6 +413,24 @@ sap.ui.define([
 						})
 					],
 					content: [oNavigationListWithoutIcons]
+				}),
+				new Page("page3", {
+					title: "NavigationList with Status Indicators (New Feature)",
+					headerContent: [
+						new Button({
+							text: "Go to Page1",
+							press: function () {
+								oApp.to("page1");
+							}
+						}),
+						new Button({
+							text: "Go to Page2",
+							press: function () {
+								oApp.to("page2");
+							}
+						})
+					],
+					content: [menuButtonStatuses, oNavigationListWithStatuses]
 				})
 			]
 		});

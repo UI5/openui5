@@ -100,6 +100,8 @@ sap.ui.define([
 	 * @author SAP SE
 	 * @class Tree binding implementation for the {@link sap.ui.model.odata.v2.ODataModel}. Use
 	 *   {@link sap.ui.model.odata.v2.ODataModel#bindTree} for creating an instance.
+	 * @deprecated As of version 1.150.0, will be replaced by OData V4 hierarchy functionality, see
+	 *   {@link topic:7d914317c0b64c23824bf932cc8a4ae1/section_RCH Recursive Hierarchy}
 	 * @extends sap.ui.model.TreeBinding
 	 * @hideconstructor
 	 * @public

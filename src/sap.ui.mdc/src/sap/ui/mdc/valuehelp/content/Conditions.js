@@ -167,6 +167,10 @@ sap.ui.define([
 		});
 	};
 
+	Conditions.prototype.onBeforeShow = function(bInitial) {
+		this._oDefineConditionPanel.setControl(this.getControl());
+	};
+
 	Conditions.prototype.getCount = function(aConditions) {
 		let iCount = 0;
 

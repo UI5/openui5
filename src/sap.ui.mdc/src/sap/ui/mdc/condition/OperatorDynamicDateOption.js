@@ -189,7 +189,7 @@ sap.ui.define([
 					this._aUITypes.push(new DynamicDateValueHelpUIType({
 						type: sType
 					}));
-				} else if (!vType || vType === OperatorValueType.Static) {
+				} else if (!vType || vType === OperatorValueType.Static || oOperator.useDefaultValues) {
 					continue;
 				} else {
 					oType = oOperator._createLocalType(vType, oType);
@@ -378,7 +378,7 @@ sap.ui.define([
 		const sControlId = oControl.getId();
 
 		for (let i = 0; i < oOperator.valueTypes.length; i++) {
-			if (!oOperator.valueTypes[i] || oOperator.valueTypes[i] === OperatorValueType.Static) {
+			if (!oOperator.valueTypes[i] || oOperator.valueTypes[i] === OperatorValueType.Static || oOperator.useDefaultValues) {
 				continue;
 			}
 			const oInputControl = oControl.aControlsByParameters[sKey][i];
@@ -467,6 +467,8 @@ sap.ui.define([
 				aRange.push(aRange[0]);
 			}
 			// TODO How to convert GT or GE.....
+		} else if (oOperator.useDefaultValues) {
+			aRange = [];
 		} else if ([OperatorValueType.Self, OperatorValueType.Static].indexOf(oOperator.valueTypes[0]) === -1) {
 			throw new Error("Cannot convert to date, use RangeOperator");
 		}

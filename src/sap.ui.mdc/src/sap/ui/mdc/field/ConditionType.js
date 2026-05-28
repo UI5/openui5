@@ -547,6 +547,11 @@ sap.ui.define([
 						}
 
 						if (oCondition) {
+							if (oOperator.useDefaultValues) {
+								const oDelegate = this._getDelegate();
+								const oField = this.oFormatOptions.control;
+								oCondition.values.push(oDelegate.getDefaultValues(oField));
+							}
 							return _returnResult.call(this, oCondition, undefined, iCallCount, false, oType);
 						}
 					}

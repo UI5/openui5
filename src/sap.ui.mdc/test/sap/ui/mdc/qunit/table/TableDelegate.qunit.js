@@ -20,6 +20,7 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/core/Lib",
 	"sap/ui/core/message/MessageType",
+	"sap/ui/core/Element",
 	"sap/ui/model/Filter",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/Sorter",
@@ -46,6 +47,7 @@ sap.ui.define([
 	nextUIUpdate,
 	Library,
 	MessageType,
+	Element,
 	Filter,
 	JSONModel,
 	Sorter,
@@ -216,6 +218,82 @@ sap.ui.define([
 			TableDelegate.updateBindingInfo(oTable, oBindingInfo);
 			assert.deepEqual(oBindingInfo, {parameters: {}, sorter: aSorter, filters: aExpectedFilter, path: "/foo"});
 			oStub.restore();
+		});
+	});
+
+	QUnit.test("updateBindingInfo from external filter", function(assert) {
+		const oTable = this.oTable;
+		const oMyFilter = { // fake FilterBar
+			getId: () => "myFilter",
+			getConditions: () => {
+				return {
+					Name: [
+						{
+							isEmpty: null,
+							operator: OperatorName.EQ,
+							validated: ConditionValidated.NotValidated,
+							values: ["test"]
+						},
+						{
+							isEmpty: null,
+							operator: OperatorName.DefaultValues,
+							validated: ConditionValidated.NotValidated,
+							values: []
+						}
+					]
+				};
+			},
+			validate: () => { return Promise.resolve(); },
+			isA: (sName) => {
+				if (sName === "sap.ui.mdc.IFilter") {
+					return true;
+				}
+				return false;
+			},
+			attachSearch: () => {},
+			getPropertyHelper: () => { return oTable.getPropertyHelper(); },
+			getDefaultValues: (sFieldPath) => {
+				if (sFieldPath === "Name") {
+					return [{
+							isEmpty: null,
+							operator: OperatorName.NE,
+							validated: ConditionValidated.NotValidated,
+							values: ["X"]
+					}];
+				}
+				return [];
+			}
+		};
+		sinon.stub(Element, "getElementById").withArgs("myFilter").returns(oMyFilter);
+		Element.getElementById.callThrough();
+		oTable.setP13nMode(["Filter"]);
+		oTable.setFilter("myFilter");
+		const oTestConditions = {
+			Name: [
+				{
+					isEmpty: null,
+					operator: OperatorName.EQ,
+					validated: ConditionValidated.NotValidated,
+					values: ["test"]
+				},
+				{
+					isEmpty: null,
+					operator: OperatorName.NE,
+					validated: ConditionValidated.NotValidated,
+					values: ["X"]
+				}
+			]
+		};
+
+		return TableQUnitUtils.waitForBindingInfo(oTable).then(function() {
+			const aExpectedFilter = [
+				FilterUtil.getFilterInfo(oTable.getControlDelegate().getTypeMap(),
+				oTestConditions, oTable.getPropertyHelper().getProperties()).filters
+			];
+			const oBindingInfo = {};
+
+			TableDelegate.updateBindingInfo(oTable, oBindingInfo);
+			assert.deepEqual(oBindingInfo, {parameters: {}, sorter: [], filters: aExpectedFilter, path: "/foo"});
 		});
 	});
 

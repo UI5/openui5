@@ -216,8 +216,8 @@ sap.ui.define([
 				);
 				assert.strictEqual(
 					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
-					true,
-					"then the save button is enabled"
+					false,
+					"then the save button is disabled initially"
 				);
 				assert.strictEqual(aFormElements.length, 3, "then for each property a form element is created");
 				assert.strictEqual(aFormElements[0].getLabel().getText(), "My First Test Label", "then the properties are properly sorted");
@@ -240,8 +240,8 @@ sap.ui.define([
 				oSelect.fireChange({ selectedItem: oListItem });
 				assert.strictEqual(
 					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
-					true,
-					"then the save button is enabled"
+					false,
+					"then the save button stays disabled (Select changes do not update save state)"
 				);
 
 				Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").firePress();
@@ -347,8 +347,8 @@ sap.ui.define([
 				oSelect.fireChange({ selectedItem: oFirstListItem });
 				assert.strictEqual(
 					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
-					true,
-					"then the save button is enabled"
+					false,
+					"then the save button stays disabled (Select changes do not update save state)"
 				);
 				const oSaveButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton");
 				oSaveButton.firePress();
@@ -581,7 +581,6 @@ sap.ui.define([
 				assert.strictEqual(oInput.getValue(), "Hello", "then the correct value is set");
 				assert.ok(oInput.isA("sap.m.Input"), "then the input field for the string type is an input");
 
-				oInput.setValue("Bye");
 				oInput.fireLiveChange({ newValue: "Bye" });
 				const oSaveButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton");
 				assert.ok(
@@ -733,6 +732,534 @@ sap.ui.define([
 				assert.notOk(oSearchField.getEnabled(), "then the search field is disabled");
 				const oSwitch = Element.getElementById("sapUiRtaChangeAnnotationDialog_toggleShowAllPropertiesSwitch");
 				assert.notOk(oSwitch.getEnabled(), "then the switch is disabled");
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+	});
+
+	QUnit.module("Validation", {
+		beforeEach() {
+			this.oDialog = new AnnotationChangeDialog();
+			this.oTestControl = new Control("testControl");
+			this.oComponent = RtaQunitUtils.createAndStubAppComponent(sandbox);
+			sandbox.stub(RtaUtils, "getSystemSpecificDocumentationUrl");
+		},
+		afterEach() {
+			this.oDialog.destroy();
+			this.oComponent.destroy();
+			this.oTestControl.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when binding syntax is entered in a string input", async function(assert) {
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = aFormElements[1].getFields().filter((oField) => oField.getVisible())[0];
+
+				oInput.setValue("{binding}");
+				oInput.fireLiveChange({ newValue: "{binding}" });
+
+				assert.strictEqual(oInput.getValueState(), "Error", "then the input has error state");
+				assert.ok(oInput.getValueStateText().length > 0, "then a validation error text is shown");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is disabled"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when a custom validator rejects the input", async function(assert) {
+			const sCustomError = "Custom validation error";
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				validators: [{
+					validatorFunction(sText) {
+						return sText !== "forbidden";
+					},
+					errorMessage: sCustomError
+				}]
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = aFormElements[0].getFields().filter((oField) => oField.getVisible())[0];
+
+				oInput.setValue("forbidden");
+				oInput.fireLiveChange({ newValue: "forbidden" });
+
+				assert.strictEqual(oInput.getValueState(), "Error", "then the input has error state");
+				assert.strictEqual(oInput.getValueStateText(), sCustomError, "then the custom error message is shown");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is disabled"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when a valid value is entered after an invalid one", async function(assert) {
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = aFormElements[0].getFields().filter((oField) => oField.getVisible())[0];
+
+				// Enter invalid value
+				oInput.fireLiveChange({ newValue: "{binding}" });
+				assert.strictEqual(oInput.getValueState(), "Error", "then the input initially has error state");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is initially disabled"
+				);
+
+				// Fix the value
+				oInput.fireLiveChange({ newValue: "Valid Text" });
+				assert.strictEqual(oInput.getValueState(), "None", "then the error state is cleared");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					true,
+					"then the save button is re-enabled"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when one of multiple inputs is invalid, save is disabled", async function(assert) {
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oFirstInput = aFormElements[0].getFields().filter((oField) => oField.getVisible())[0];
+				const oSecondInput = aFormElements[1].getFields().filter((oField) => oField.getVisible())[0];
+
+				// Set a valid value on the first input
+				oFirstInput.fireLiveChange({ newValue: "New Valid Text" });
+				assert.strictEqual(oFirstInput.getValueState(), "None", "then the first input is valid");
+
+				// Set an invalid value on the second input
+				oSecondInput.fireLiveChange({ newValue: "{bad}" });
+				assert.strictEqual(oSecondInput.getValueState(), "Error", "then the second input has error state");
+
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is disabled because one input is invalid"
+				);
+
+				// Fix the second input
+				oSecondInput.fireLiveChange({ newValue: "Fixed" });
+				assert.strictEqual(oSecondInput.getValueState(), "None", "then the second input error is cleared");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					true,
+					"then the save button is re-enabled after fixing the input"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when the same text as the original value is entered, no error is shown", async function(assert) {
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = aFormElements[1].getFields().filter((oField) => oField.getVisible())[0];
+
+				// Change value and then change back to original
+				oInput.fireLiveChange({ newValue: "Changed" });
+				oInput.fireLiveChange({ newValue: "Hello" });
+
+				assert.strictEqual(oInput.getValueState(), "None", "then no error is shown for same text");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is disabled because the value matches the original again"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when the noEmptyText validator is used and empty text is entered", async function(assert) {
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				validators: ["noEmptyText"]
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = aFormElements[0].getFields().filter((oField) => oField.getVisible())[0];
+
+				oInput.fireLiveChange({ newValue: "" });
+
+				assert.strictEqual(oInput.getValueState(), "Error", "then the input has error state");
+				assert.ok(oInput.getValueStateText().length > 0, "then an error message is shown");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is disabled"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when the dialog is opened with an initially invalid value, save is disabled immediately", async function(assert) {
+			const oTestDelegate = {
+				getAnnotationsChangeInfo: () => ({
+					serviceUrl: "testServiceUrl",
+					properties: [{
+						propertyName: "My Test Label",
+						annotationPath: "path/to/test/label",
+						currentValue: "",
+						label: "My Test Label"
+					}]
+				})
+			};
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				validators: ["noEmptyText"]
+			};
+			const fnAfterOpen = () => {
+				const [oFormElement] = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = oFormElement.getFields().filter((oField) => oField.getVisible())[0];
+
+				// Trigger validation against the (invalid) initial value
+				oInput.fireLiveChange({ newValue: oInput.getValue() });
+
+				assert.strictEqual(oInput.getValueState(), "Error", "then the input has error state on open");
+				assert.ok(oInput.getValueStateText().length > 0, "then an error message is shown");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is disabled on open"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when a custom validator rejects the initial value, save is disabled immediately", async function(assert) {
+			const sCustomError = "Custom validation error";
+			const oTestDelegate = {
+				getAnnotationsChangeInfo: () => ({
+					serviceUrl: "testServiceUrl",
+					properties: [{
+						propertyName: "My Test Label",
+						annotationPath: "path/to/test/label",
+						currentValue: "forbidden",
+						label: "My Test Label"
+					}]
+				})
+			};
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				validators: [{
+					validatorFunction(sText) {
+						return sText !== "forbidden";
+					},
+					errorMessage: sCustomError
+				}]
+			};
+			const fnAfterOpen = () => {
+				const [oFormElement] = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = oFormElement.getFields().filter((oField) => oField.getVisible())[0];
+
+				// Trigger validation against the (invalid) initial value
+				oInput.fireLiveChange({ newValue: oInput.getValue() });
+
+				assert.strictEqual(oInput.getValueState(), "Error", "then the input has error state on open");
+				assert.strictEqual(oInput.getValueStateText(), sCustomError, "then the custom error message is shown");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is disabled on open"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when typing back to the original value which fails validation, the error is re-shown", async function(assert) {
+			const oTestDelegate = {
+				getAnnotationsChangeInfo: () => ({
+					serviceUrl: "testServiceUrl",
+					properties: [{
+						propertyName: "My Test Label",
+						annotationPath: "path/to/test/label",
+						currentValue: "",
+						label: "My Test Label"
+					}]
+				})
+			};
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				validators: ["noEmptyText"]
+			};
+			const fnAfterOpen = () => {
+				const [oFormElement] = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = oFormElement.getFields().filter((oField) => oField.getVisible())[0];
+
+				oInput.fireLiveChange({ newValue: "Valid Text" });
+				assert.strictEqual(oInput.getValueState(), "None", "then the error state is cleared after valid input");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					true,
+					"then the save button is enabled after valid input"
+				);
+
+				oInput.fireLiveChange({ newValue: "" });
+				assert.strictEqual(oInput.getValueState(), "Error", "then the error is re-shown for the invalid original value");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is disabled again"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when a regular validator and sameText would both fail in single rename mode, the validator error wins", async function(assert) {
+			// This guards the validator-order change: standard validators run before the
+			// sameText check, so sameTextError can no longer mask a real validation error.
+			const oTestDelegate = {
+				getAnnotationsChangeInfo: () => ({
+					serviceUrl: "testServiceUrl",
+					properties: [{
+						propertyName: "My Test Label",
+						annotationPath: "path/to/test/label",
+						currentValue: "",
+						label: "My Test Label"
+					}]
+				})
+			};
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename",
+				validators: ["noEmptyText"]
+			};
+			const fnAfterOpen = () => {
+				const [oFormElement] = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = oFormElement.getFields().filter((oField) => oField.getVisible())[0];
+
+				// Re-fire liveChange with the same (original, invalid) value: both sameTextError
+				// and noEmptyText apply. The validator error must win, not "no change".
+				oInput.fireLiveChange({ newValue: "" });
+				assert.strictEqual(oInput.getValueState(), "Error", "then the input has error state");
+				assert.strictEqual(
+					oInput.getValueStateText(),
+					oResourceBundle.getText("RENAME_EMPTY_ERROR_TEXT"),
+					"then the validator error message wins over sameTextError"
+				);
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is disabled"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("in single rename mode, sameText disables save and shows the sameText field error", async function(assert) {
+			// In single rename mode, reverting to the original means there is nothing to save.
+			// The sameText error is surfaced on the input and Save is disabled.
+			const oTestDelegate = createStringTestDelegate("path/to/test/label");
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			sandbox.stub(ElementUtil, "getLabelForElement").returns("Hello");
+			const fnAfterOpen = () => {
+				const [oFormElement] = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = oFormElement.getFields().filter((oField) => oField.getVisible())[0];
+
+				oInput.fireLiveChange({ newValue: "Changed" });
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					true,
+					"then the save button is enabled after a real change"
+				);
+
+				oInput.fireLiveChange({ newValue: "Hello" });
+				assert.strictEqual(oInput.getValueState(), "Error", "then the sameText error is shown on the field");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is disabled when the value is back to the original"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("in multi rename mode, reverting the only changed field disables save without an error", async function(assert) {
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = aFormElements[0].getFields().filter((oField) => oField.getVisible())[0];
+				const oSaveButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton");
+				const sOriginal = oInput.getBindingContext().getProperty("originalValue");
+
+				oInput.fireLiveChange({ newValue: "Changed" });
+				assert.strictEqual(oSaveButton.getEnabled(), true, "then the save button is enabled after a real change");
+
+				oInput.fireLiveChange({ newValue: sOriginal });
+				assert.strictEqual(oInput.getValueState(), "None", "then reverting shows no error on the field");
+				assert.strictEqual(
+					oSaveButton.getEnabled(),
+					false,
+					"then the save button is disabled because no field differs from its original anymore"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("in multi rename mode, reverting one field while another is changed keeps save enabled", async function(assert) {
+			// Guards the changedCount counter against double-counting and stale state across
+			// multiple inputs: editing A, reverting A, editing B must leave save enabled.
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oFirstInput = aFormElements[0].getFields().filter((oField) => oField.getVisible())[0];
+				const oSecondInput = aFormElements[1].getFields().filter((oField) => oField.getVisible())[0];
+				const oSaveButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton");
+				const sFirstOriginal = oFirstInput.getBindingContext().getProperty("originalValue");
+				const sSecondOriginal = oSecondInput.getBindingContext().getProperty("originalValue");
+
+				oFirstInput.fireLiveChange({ newValue: "First Changed" });
+				oSecondInput.fireLiveChange({ newValue: "Second Changed" });
+				assert.strictEqual(oSaveButton.getEnabled(), true, "then the save button is enabled after editing both inputs");
+
+				oFirstInput.fireLiveChange({ newValue: sFirstOriginal });
+				assert.strictEqual(
+					oSaveButton.getEnabled(),
+					true,
+					"then the save button stays enabled because the second input is still changed"
+				);
+
+				oSecondInput.fireLiveChange({ newValue: sSecondOriginal });
+				assert.strictEqual(
+					oSaveButton.getEnabled(),
+					false,
+					"then the save button is disabled once both inputs are back to their originals"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("in multi rename mode, repeated edits to the same field do not double-count changes", async function(assert) {
+			// Guards against a counter bug where every keystroke would treat the field as a
+			// new change. After typing several values and reverting, save must be disabled.
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = aFormElements[0].getFields().filter((oField) => oField.getVisible())[0];
+				const oSaveButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton");
+				const sOriginal = oInput.getBindingContext().getProperty("originalValue");
+
+				oInput.fireLiveChange({ newValue: "First Edit" });
+				oInput.fireLiveChange({ newValue: "Second Edit" });
+				oInput.fireLiveChange({ newValue: "Third Edit" });
+				assert.strictEqual(oSaveButton.getEnabled(), true, "then the save button is enabled while edits are in progress");
+
+				oInput.fireLiveChange({ newValue: sOriginal });
+				assert.strictEqual(
+					oSaveButton.getEnabled(),
+					false,
+					"then the save button is disabled exactly once when the value returns to the original"
+				);
+
 				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
 				oCancelButton.firePress();
 			};

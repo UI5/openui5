@@ -120,6 +120,36 @@ sap.ui.define([
 	});
 
 
+	QUnit.test("testing multiple include and exclude conditions as default values", function(assert) {
+		oCM.addCondition("fieldPath1/foo", Condition.createCondition(OperatorName.DefaultValues, [[Condition.createCondition(OperatorName.EQ, ["FOO"]), Condition.createCondition(OperatorName.EQ, ["BAR"]), Condition.createCondition(OperatorName.NE, ["X"]), Condition.createCondition(OperatorName.NE, ["Y"])]]));
+
+		const oFilter = FilterConverter.createFilters( oCM.getAllConditions(), oConditionTypes);
+
+		const result = FilterConverter.prettyPrintFilters(oFilter);
+		assert.ok(oFilter.bAnd, "exclude filters must be connected via AND");
+		assert.notOk(oFilter.aFilters[0].bAnd, "multiple non-exclude filters on same path are unaffected by AND grouping");
+		assert.strictEqual(result, "((fieldPath1/foo EQ 'FOO' or fieldPath1/foo EQ 'BAR') and fieldPath1/foo NE 'X' and fieldPath1/foo NE 'Y')", "result filter has the expected format");
+
+	});
+
+
+	QUnit.test("testing multiple include and exclude conditions combined with Default values", function(assert) {
+		oCM.addCondition("fieldPath1/foo", Condition.createCondition(OperatorName.EQ, ["FOO"]));
+		oCM.addCondition("fieldPath1/foo", Condition.createCondition(OperatorName.EQ, ["BAR"]));
+		oCM.addCondition("fieldPath1/foo", Condition.createCondition(OperatorName.NE, ["X"]));
+		oCM.addCondition("fieldPath1/foo", Condition.createCondition(OperatorName.NE, ["Y"]));
+		oCM.addCondition("fieldPath1/foo", Condition.createCondition(OperatorName.DefaultValues, [[Condition.createCondition(OperatorName.EQ, ["A"]), Condition.createCondition(OperatorName.EQ, ["B"]), Condition.createCondition(OperatorName.NE, ["C"]), Condition.createCondition(OperatorName.NE, ["D"])]]));
+
+		const oFilter = FilterConverter.createFilters( oCM.getAllConditions(), oConditionTypes);
+
+		const result = FilterConverter.prettyPrintFilters(oFilter);
+		assert.ok(oFilter.bAnd, "exclude filters must be connected via AND");
+		assert.notOk(oFilter.aFilters[0].bAnd, "multiple non-exclude filters on same path are unaffected by AND grouping");
+		assert.strictEqual(result, "((fieldPath1/foo EQ 'FOO' or fieldPath1/foo EQ 'BAR' or fieldPath1/foo EQ 'A' or fieldPath1/foo EQ 'B') and fieldPath1/foo NE 'X' and fieldPath1/foo NE 'Y' and fieldPath1/foo NE 'C' and fieldPath1/foo NE 'D')", "result filter has the expected format");
+
+	});
+
+
 	QUnit.test("testing multiple include and exclude conditions for different fieldPath", function(assert) {
 		oCM.addCondition("fieldPath1/foo", Condition.createCondition(OperatorName.BT, ["A", "Z"]));
 		oCM.addCondition("fieldPath1/foo", Condition.createCondition(OperatorName.NE, ["X"]));

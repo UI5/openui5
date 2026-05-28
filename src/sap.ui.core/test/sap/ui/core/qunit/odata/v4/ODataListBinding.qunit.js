@@ -230,14 +230,11 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-[undefined, "AddVirtualContext"].forEach(function (sChangeReason) {
-	var sTitle = "initialize: resolved, suspended; sChangeReason = " + sChangeReason;
-
-	QUnit.test(sTitle, function (assert) {
+	QUnit.test("initialize: resolved, suspended", function (assert) {
 		var oBinding = this.bindList("n/a");
 
 		assert.strictEqual(oBinding.bInitial, true);
-		oBinding.sChangeReason = sChangeReason;
+		oBinding.sChangeReason = "AddVirtualContext";
 		this.mock(oBinding).expects("isResolved").withExactArgs().returns(true);
 		this.mock(oBinding).expects("checkDataState").withExactArgs();
 		this.mock(oBinding).expects("isRootBindingSuspended").withExactArgs().returns(true);
@@ -248,11 +245,9 @@ sap.ui.define([
 		oBinding.initialize();
 
 		assert.strictEqual(oBinding.bInitial, false);
-		assert.strictEqual(oBinding.sChangeReason, sChangeReason);
-		assert.strictEqual(oBinding.sResumeChangeReason,
-			sChangeReason ? ChangeReason.Change : ChangeReason.Refresh);
+		assert.strictEqual(oBinding.sChangeReason, "AddVirtualContext");
+		assert.strictEqual(oBinding.sResumeChangeReason, ChangeReason.Refresh);
 	});
-});
 
 	//*********************************************************************************************
 	QUnit.test("initialize: resolved, refresh", function (assert) {
@@ -3896,6 +3891,41 @@ sap.ui.define([
 			});
 		});
 	});
+
+	//*********************************************************************************************
+[false, true].forEach(function (bHasGroupPaths) {
+	[false, true].forEach(function (bAutoExpandSelect) {
+		const sTitle = "sort: suspended, bHasGroupPaths=" + bHasGroupPaths
+			+ ", oModel.bAutoExpandSelect=" + bAutoExpandSelect;
+
+	QUnit.test(sTitle, function (assert) {
+		this.oModel.bAutoExpandSelect = bAutoExpandSelect;
+		const oBinding = this.oModel.bindList("TEAM_2_EMPLOYEES", null, null, null,
+			{$$operationMode : OperationMode.Server});
+		oBinding.sChangeReason = "~sChangeReason~";
+		const oSorter = new Sorter({
+			path : "foo",
+			groupPaths : bHasGroupPaths ? ["~groupPath~"] : undefined
+		});
+
+		this.mock(oBinding).expects("checkTransient").withExactArgs();
+		this.mock(oBinding).expects("hasPendingChanges").withExactArgs(true).returns(false);
+		this.mock(oBinding).expects("setResetViaSideEffects").withExactArgs(true);
+		this.mock(oBinding).expects("isRootBindingSuspended").withExactArgs().returns(true);
+		this.mock(oBinding).expects("setResumeChangeReason").withExactArgs(ChangeReason.Sort);
+		this.mock(oBinding).expects("createReadGroupLock").never();
+		this.mock(oBinding).expects("removeCachesAndMessages").never();
+		this.mock(oBinding).expects("fetchCache").never();
+		this.mock(oBinding).expects("reset").never();
+
+		// code under test
+		assert.strictEqual(oBinding.sort(oSorter), oBinding);
+
+		assert.strictEqual(oBinding.sChangeReason,
+			bHasGroupPaths && bAutoExpandSelect ? "AddVirtualContext" : "~sChangeReason~");
+	});
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("sort: unresolved binding", function () {
@@ -9170,13 +9200,25 @@ sap.ui.define([
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oBindingMock = this.mock(oBinding);
 
+		oBinding.mAggregatedQueryOptions = "~mAggregatedQueryOptions~";
+		oBinding.bAggregatedQueryOptionsInitial = "~bAggregatedQueryOptionsInitial~";
+		oBinding.mCanUseCachePromiseByChildPath = "~mCanUseCachePromiseByChildPath~";
+		oBinding.sChangeReasonAfterRemoveVirtualContext
+			= "~sChangeReasonAfterRemoveVirtualContext~";
 		oBinding.sResumeChangeReason = "~sResumeChangeReason~";
 		if (bAutoExpandSelect) {
 			oBinding.sChangeReason = "AddVirtualContext";
 			oBindingMock.expects("_fireChange").withExactArgs({
-				detailedReason : "AddVirtualContext",
-				reason : "~sResumeChangeReason~"
-			});
+					detailedReason : "AddVirtualContext",
+					reason : "~sResumeChangeReason~"
+				})
+				.callsFake(function () {
+					assert.deepEqual(oBinding.mAggregatedQueryOptions, {});
+					assert.strictEqual(oBinding.bAggregatedQueryOptionsInitial, true);
+					assert.deepEqual(oBinding.mCanUseCachePromiseByChildPath, {});
+					assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
+						"~sResumeChangeReason~");
+				});
 		} else {
 			oBindingMock.expects("_fireRefresh").withExactArgs({reason : "~sResumeChangeReason~"});
 		}

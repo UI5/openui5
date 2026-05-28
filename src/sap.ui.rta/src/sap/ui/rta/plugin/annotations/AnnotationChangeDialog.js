@@ -160,7 +160,8 @@ sap.ui.define([
 			annotation: sAnnotation,
 			description: sAnnotationDescription,
 			singleRename: bSingleRename,
-			featureKey: sFeatureKey
+			featureKey: sFeatureKey,
+			validators: aValidators
 		} = mPropertyBag;
 		const {
 			serviceUrl: sServiceUrl,
@@ -229,7 +230,11 @@ sap.ui.define([
 			possibleValues: aPossibleValues,
 			valueType: sAnnotationValueType,
 			serviceUrl: sServiceUrl,
-			documentationUrl: getDocumentationUrl(sFeatureKey)
+			documentationUrl: getDocumentationUrl(sFeatureKey),
+			validators: aValidators || [],
+			errorCount: 0,
+			changedCount: 0,
+			isSaveEnabled: false
 		});
 		if (sFilterText) {
 			this._oController.filterProperties(sFilterText, !!bSingleRename);
