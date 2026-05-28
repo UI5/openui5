@@ -393,5 +393,33 @@ sap.ui.define([
 
 	};
 
+	/**
+	 * Returns default values for a {@link sap.ui.mdc.FilterField FilterField}.
+	 *
+	 * This function is called when a user adds a condition representing default values.
+	 *
+	 * @param {sap.ui.mdc.field.FieldBase} oField <code>Field</code> control instance
+	 * @returns {sap.ui.mdc.condition.ConditionObject[]} Array of default value conditions in internal format
+	 * @private
+	 * @ui5-restricted sap.ui.mdc.FilterField, sap.ui.mdc.valuehelp.base.DefineConditionPanel, sap.ui.mdc.field.ConditionType
+	 * @since 1.149
+	 */
+	FieldBaseDelegate.getDefaultValues = function(oField) {
+
+		// Use FilterBar to provide default values
+		const oFilterBar = oField.getParent();
+		if (oFilterBar.isA("sap.ui.mdc.filterbar.FilterBarBase")) {
+			const sPropertyKey = oField.getPropertyKey();
+			const aConditions = oFilterBar.getDefaultValues(sPropertyKey); // FilterBar Delegate must be loaded before FilterFields are rendered
+			const mConditions = {};
+			mConditions[sPropertyKey] = aConditions;
+			const mConditionsInternal = oFilterBar._internalizeConditions(mConditions); // TODO: make API resticted to allow usage or let oFilterBar.getDefaultValues return internal format
+			return mConditionsInternal[sPropertyKey] || [];
+		}
+
+		return [];
+
+	};
+
 	return FieldBaseDelegate;
 });

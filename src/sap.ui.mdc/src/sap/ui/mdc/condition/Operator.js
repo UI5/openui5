@@ -7,6 +7,7 @@ sap.ui.define([
 	'sap/ui/model/Filter',
 	'sap/ui/model/FilterOperator',
 	'sap/ui/model/ParseException',
+	'sap/ui/model/BindingMode',
 	'sap/base/Log',
 	'sap/base/util/merge',
 	'sap/base/util/deepEqual',
@@ -16,6 +17,7 @@ sap.ui.define([
 	'sap/ui/mdc/enums/BaseType',
 	'sap/ui/mdc/enums/ConditionValidated',
 	'sap/ui/mdc/enums/FieldDisplay',
+	'sap/ui/mdc/enums/FieldEditMode',
 	'sap/ui/mdc/enums/OperatorOverwrite',
 	'sap/ui/mdc/enums/OperatorValueType'
 ], (
@@ -24,6 +26,7 @@ sap.ui.define([
 	Filter,
 	FilterOperator,
 	ParseException,
+	BindingMode,
 	Log,
 	merge,
 	deepEqual,
@@ -33,6 +36,7 @@ sap.ui.define([
 	BaseType,
 	ConditionValidated,
 	FieldDisplay,
+	FieldEditMode,
 	OperatorOverwrite,
 	OperatorValueType
 ) => {
@@ -140,6 +144,7 @@ sap.ui.define([
 	 * @param {string} [oConfiguration.group.text] Group title for the operator. When used a new group with this title will be added.
 	 * @param {object} [oConfiguration.groupsForTypes] Additional group settings for the operator depending on the type. For every type, a group object can be defined.
 	 * @param {function} [oConfiguration.getTextForCopy] Function to determine the text copied into clipboard
+	 * @param {boolean} [oConfiguration.useDefaultValues] If set, the operator handles default values. The values are used for display and to create filters, but cannot be set manually.
 	 * @constructor
 	 * @author SAP SE
 	 * @version ${version}
@@ -158,7 +163,7 @@ sap.ui.define([
 			if (!oConfiguration.name) {
 				Log.warning("Operator configuration expects a name property");
 			}
-			if (!oConfiguration.filterOperator && !oConfiguration.getModelFilter) {
+			if (!oConfiguration.filterOperator && !oConfiguration.getModelFilter && !oConfiguration.useDefaultValues) {
 				throw new Error("Operator configuration for " + oConfiguration.name + " needs a default filter operator from sap.ui.model.FilterOperator or the function getModelFilter");
 			}
 
@@ -250,6 +255,7 @@ sap.ui.define([
 			}
 
 			this.symbol = oConfiguration.symbol;
+			this.useDefaultValues = !!oConfiguration.useDefaultValues;
 		},
 		destroy: function() {
 			this._oMethodOverwrites = null;
@@ -300,6 +306,12 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.mdc, sap.fe
 	 */
 	Operator.prototype.getModelFilter = function(oCondition, sFieldPath, oType, bCaseSensitive, sBaseType) {
+
+		if (this.useDefaultValues) {
+			// normally the condititons of the the default values needs to be added to the condition of the whole field.
+			// So this should not be called for this operator.
+			throw new Error("Operator.getModelFilter: This must not be called for the default values operator. Add the conditions to the other conditions of this FilterField to create model Filter");
+		}
 
 		let vValue = oCondition.values[0];
 		let oFilter;
@@ -368,7 +380,7 @@ sap.ui.define([
 
 		if (oCondition) {
 			for (let i = 0; i < this.valueTypes.length; i++) {
-				if (this.valueTypes[i] !== OperatorValueType.Static) {
+				if ([OperatorValueType.Static, OperatorValueType.Conditions].indexOf(this.valueTypes[i]) === -1) { // static and conditions value types are never empty
 					const vValue = oCondition.values[i];
 					if (vValue === null || vValue === undefined || vValue === "") { //TODO:  empty has to use the oType information
 						isEmpty = true;
@@ -409,7 +421,21 @@ sap.ui.define([
 		for (let i = 0; i < iCount; i++) {
 			let oUseType;
 			let aUseCompositeTypes;
-			if (this.valueTypes[i] !== OperatorValueType.Static) {
+			if (this.valueTypes[i] === OperatorValueType.Conditions) { // used for DefaultValues
+				const aConditions = aValues[i] || [];
+
+				if (!Array.isArray(aConditions)) { // could happen in DefineConditionPanel while switching operator
+					return "";
+				}
+
+				const FilterOperatorUtil = sap.ui.require("sap/ui/mdc/condition/FilterOperatorUtil"); // must be loaded as Operator defined or added in FilterOperatorUtil (prevent cyclic dependencies)
+				const aFormattedConditions = aConditions.map((oCondition) => {
+					const oOperator = FilterOperatorUtil?.getOperator(oCondition.operator);
+					return oOperator?.format(oCondition, oType, sDisplay, bHideOperator, aCompositeTypes, oAdditionalType, aAdditionalCompositeTypes, sCustomFormat, sBaseType);
+				});
+				const sFormattedConditions = aFormattedConditions.join(", ");
+				return sTokenText.replace("{0}", sFormattedConditions);
+			} else if (this.valueTypes[i] !== OperatorValueType.Static) {
 				if (this.valueTypes[i] === OperatorValueType.Self) {
 					oUseType = oType;
 					aUseCompositeTypes = aCompositeTypes;
@@ -504,7 +530,9 @@ sap.ui.define([
 			for (let i = 0; i < this.valueTypes.length; i++) {
 				let oUseType;
 				let aUseCompositeTypes;
-				if (this.valueTypes[i] === OperatorValueType.Self) {
+				if (this.valueTypes[i] === OperatorValueType.Conditions) { // If Condition-Operator needs parsing with creation of inner Conditions this needs to be implemented in the special Operator
+					continue; // for defaultValues conditions needs to be determined via Delegate outside of Operator
+				} else if (this.valueTypes[i] === OperatorValueType.Self) {
 					oUseType = oType;
 					aUseCompositeTypes = aCompositeTypes;
 				} else if (this.valueTypes[i] === null) { // description
@@ -597,13 +625,13 @@ sap.ui.define([
 	 */
 	Operator.prototype.validate = function(aValues, oType, aCompositeTypes, iCompositePart, oAdditionalType, aAdditionalCompositeTypes) {
 
-		const iCount = this.valueTypes.length;
-
-		for (let i = 0; i < iCount; i++) {
+		for (let i = 0; i < this.valueTypes.length; i++) {
 			if ((this.valueTypes[i] || this.valueTypes[i] === null) && this.valueTypes[i] !== OperatorValueType.Static) { // do not validate Description in EQ case
 				let oUseType;
 				let aUseCompositeTypes;
-				if (this.valueTypes[i] === OperatorValueType.Self) {
+				if (this.valueTypes[i] === OperatorValueType.Conditions) {
+					continue; // validation of conditions needs to be implementes in corresponding operator
+				} else if (this.valueTypes[i] === OperatorValueType.Self) {
 					oUseType = oType;
 					aUseCompositeTypes = aCompositeTypes;
 				} else if (this.valueTypes[i] === null) { // description
@@ -701,7 +729,7 @@ sap.ui.define([
 		let oConstraints;
 		let oUsedType;
 
-		if (vType === OperatorValueType.SelfNoParse) {
+		if ([OperatorValueType.SelfNoParse, OperatorValueType.Conditions].indexOf(vType) >= 0) {
 			// create "clone" of original type but do not change value in parse or format
 			sType = oType.getMetadata().getName(); // type is already loaded because instance is provided
 			oFormatOptions = merge({}, oType.getFormatOptions());
@@ -780,6 +808,10 @@ sap.ui.define([
 	 */
 	Operator.prototype.getValues = function(sText, sDisplayFormat, bDefaultOperator, bHideOperator, sBaseType) {
 
+		if (this.useDefaultValues) {
+			return [];
+		}
+
 		const regExp = bHideOperator ? this.hiddenOperatorRegExp : this.getTokenParseRegExp(sBaseType); // if operator symbol is not used -> use complete text
 		let aMatch = sText.match(regExp); // as RegExp might be complex and return longer arry we take the last value(s)
 		let aValues;
@@ -822,7 +854,7 @@ sap.ui.define([
 
 		if (this.test(sText, sBaseType) || ((bDefaultOperator || bHideOperator) && sText && this.hasRequiredValues())) {
 			const aValues = this.parse(sText, oType, sDisplayFormat, bDefaultOperator, aCompositeTypes, oAdditionalType, aAdditionalCompositeTypes, bHideOperator, sBaseType);
-			if ((aValues && aValues.length === this.valueTypes.length) || this.valueTypes[0] === OperatorValueType.Static ||
+			if ((aValues && aValues.length === this.valueTypes.length) || this.valueTypes[0] === OperatorValueType.Static || this.useDefaultValues ||
 				(aValues && aValues.length === 1 && this.valueTypes.length === 2 && !this.valueTypes[1])) { // EQ also valid without description
 				const oCondition = Condition.createCondition(this.name, aValues);
 				this.checkValidated(oCondition);
@@ -984,6 +1016,9 @@ sap.ui.define([
 			});
 			if (oConfiguration && oConfiguration[sMethodName]) {
 				this._oMethodOverwrites[sMethodName] = oConfiguration[sMethodName];
+			} else if (sMethodName === "createControl" && oConfiguration?.useDefaultValues) {
+				// use default implemention for DefaultValues
+				this._oMethodOverwrites.createControl = _createControlForDefaultValues;
 			}
 		});
 	};
@@ -1117,6 +1152,26 @@ sap.ui.define([
 		return this.group; // use default one
 
 	};
+
+	function _createControlForDefaultValues(oType, sPath, iIndex, sId) {
+		const FilterField = sap.ui.require("sap/ui/mdc/FilterField"); // should already be loaded as DefineConditionPanel is opened from FilterField
+		if (FilterField) {
+			const oFilterField = new FilterField(sId, {
+				editMode: FieldEditMode.ReadOnly,
+				display: FieldDisplay.Value, // TODO: do we need display mode from Config?
+				dataType: oType.getMetadata().getName(),
+				dataTypeFormatOptions: oType.getFormatOptions(),
+				dataTypeConstraints: oType.getConstraints(),
+				conditions: { path: sPath, mode: BindingMode.OneWay },
+				width: "100%"
+			});
+
+			return oFilterField;
+		} else {
+			Log.warning("Operator.createControl", "not able to create the control for the operator " + this.name);
+			return null;
+		}
+	}
 
 	return Operator;
 });

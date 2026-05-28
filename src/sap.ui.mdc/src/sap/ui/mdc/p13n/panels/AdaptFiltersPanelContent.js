@@ -249,7 +249,8 @@ sap.ui.define([
 				this._oListControl,
 				this._getAddFilterSection(),
 				this._oViewSwitchInvisibleText,
-				this._oModeButtonInvisibleText
+				this._oModeButtonInvisibleText,
+				this._oInvText
 			]
 		});
 		this.setAggregation("_content", oVBox);

@@ -9265,7 +9265,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		return this.createView(assert, sView, oModel).then(function () {
 			var oBinding = that.oView.byId("table").getBinding("rows");
 
-			that.expectRequest("EMPLOYEES?$select=AGE,ID,Name&$filter=AGE lt 42&$skip=0&$top=3", {
+			that.expectEvents(assert, oBinding, [
+					[, "refresh", {reason : "filter"}],
+					[, "dataRequested"],
+					[, "change", {reason : "change"}],
+					[, "dataReceived", {data : {}}]
+				])
+				.expectRequest("EMPLOYEES?$select=AGE,ID,Name&$filter=AGE lt 42&$skip=0&$top=3", {
 					value : []
 				});
 
@@ -17313,7 +17319,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			return oModel.getMetaModel().requestObject("/");
 		}).then(function () {
 			that.expectEvents(assert, "sap.ui.model.odata.v4.ODataListBinding: /EMPLOYEES", [
-					[, "change", {detailedReason : "AddVirtualContext", reason : "change"}],
+					[, "change", {detailedReason : "AddVirtualContext", reason : "refresh"}],
 					[, "dataRequested"],
 					[, "change", {detailedReason : "RemoveVirtualContext", reason : "change"}],
 					[, "refresh", {reason : "refresh"}],
@@ -21383,7 +21389,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					[, "change", {reason : "add"}], //TODO: does this really work as expected?
 					[, "dataRequested"],
 					[, "change", {detailedReason : "RemoveVirtualContext", reason : "change"}],
-					[, "refresh", {reason : "refresh"}],
+					[, "refresh", {reason : "filter"}],
 					[, "change", {reason : "change"}],
 					[, "dataReceived", {data : {}}]
 				])
@@ -21543,7 +21549,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				[, "change", {detailedReason : "AddVirtualContext", reason : "filter"}],
 				[, "dataRequested"],
 				[, "change", {detailedReason : "RemoveVirtualContext", reason : "change"}],
-				[, "refresh", {reason : "refresh"}],
+				[, "refresh", {reason : "filter"}],
 				[, "change", {reason : "change"}],
 				[, "dataReceived", {data : {}}]
 			])
@@ -67642,6 +67648,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// When using ODLB#sort API, $select/$expand are updated and only the new groupPaths are taken
 	// into account. Observe the binding's events to see the proper change reasons are used.
+	// The same applies if #sort is called within suspend/resume.
 	// JIRA: CPOUI5ODATAV4-3490
 	[
 		undefined,
@@ -67887,7 +67894,39 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				oTable.requestItems(1);
 
-				return that.waitForChanges(assert);
+				await that.waitForChanges(assert);
+
+				that.expectEvents(assert, oItemsBinding, [
+						[, "change", {detailedReason : "AddVirtualContext", reason : "filter"}],
+						[, "change", {detailedReason : "RemoveVirtualContext", reason : "change"}],
+						[, "refresh", {reason : "filter"}],
+						[, "dataRequested"],
+						[, "change", {reason : "change"}],
+						[, "dataReceived", {data : {}}]
+					], true)
+					.expectRequest("EMPLOYEES?$select=AGE,ID,Name,TEAM_ID"
+						+ "&$orderby=AGE&$filter=ID eq '2'"
+						+ "&$expand=EMPLOYEE_2_EQUIPMENTS($select=Category,ID)"
+						+ "&$skip=0&$top=3", {
+						value : [{
+							AGE : 42,
+							EMPLOYEE_2_EQUIPMENTS : [{Category : "F1*", ID : 21}],
+							ID : "2",
+							Name : "Frederic Fall",
+							TEAM_ID : "TEAM_01"
+						}]
+					});
+
+				// code under test (JIRA: CPOUI5ODATAV4-3490)
+				oItemsBinding.suspend();
+				// Note: ChangeReason.Filter has precedence over ChangeReason.Sort
+				oItemsBinding.filter(new Filter("ID", FilterOperator.EQ, "2"));
+				oItemsBinding.sort([new Sorter({groupPaths : ["TEAM_ID"], path : "AGE"})]);
+
+				await Promise.all([
+					oItemsBinding.resumeAsync(),
+					that.waitForChanges(assert)
+				]);
 			});
 		});
 	});

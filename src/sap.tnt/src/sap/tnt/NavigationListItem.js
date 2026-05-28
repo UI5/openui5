@@ -45,6 +45,8 @@ sap.ui.define([
 	const EXPAND_ICON_SRC = "sap-icon://navigation-right-arrow";
 	const COLLAPSE_ICON_SRC = "sap-icon://navigation-down-arrow";
 
+	const TagInvTextSuffix = "-tag-inv-text";
+
 	/**
 	 * Constructor for a new NavigationListItem.
 	 *
@@ -142,7 +144,42 @@ sap.ui.define([
 				/**
 				 * The sub items.
 				 */
-				items: { type: "sap.tnt.NavigationListItem", multiple: true, singularName: "item" }
+				items: { type: "sap.tnt.NavigationListItem", multiple: true, singularName: "item" },
+
+				/**
+				 * A tag that uses Indication states to visually mark a navigation item.
+				 *
+				 * Use tags to display status information, counters, or metadata that helps users
+				 * quickly identify the state or importance of a navigation item.
+				 *
+				 * Tags can be added to:
+				 * <ul>
+				 * <li>Single-click items without children</li>
+				 * <li>Two-click items with children and expander arrow</li>
+				 * <li>Child items nested under a parent item</li>
+				 * </ul>
+				 *
+				 * <b>Note:</b> Tags are visible when the <code>NavigationList</code> is in expanded mode,
+				 * and hidden when collapsed, but they are visible in the overflow of the collapsed mode.
+				 *
+				 * <h3>Usage</h3>
+				 * Common use cases include:
+				 * <ul>
+				 * <li>Status indicators: "Beta", "New", "Deprecated"</li>
+				 * <li>Counters: "5 Pending", "12 Items"</li>
+				 * <li>Versions: "v2.0"</li>
+				 * <li>Alerts: "Low Stock", "Critical"</li>
+				 * </ul>
+				 *
+				 * <b>Important:</b> Always set the <code>inverted</code> property to <code>true</code> for consistent styling.
+				 * Use Indication states (<code>Indication15</code> – <code>Indication20</code>) for consistent theming.
+				 *
+				 * <b>Important:</b> The <code>ObjectStatus</code> must never be interactive (i.e., <code>active</code> must not be set to <code>true</code>),
+				 * as this would lead to nesting of interactive elements, which is not allowed.
+				 *
+				 * @since 1.149
+				 */
+				tag: { type: "sap.m.ObjectStatus", multiple: false }
 			},
 			events: {
 				/**
@@ -179,7 +216,6 @@ sap.ui.define([
 		return this._invisibleDescriptionLinkText;
 	};
 
-
 	NavigationListItem.prototype.exit = function () {
 		if (this._invisibleDescriptionLinkText) {
 			this._invisibleDescriptionLinkText.destroy();
@@ -188,6 +224,7 @@ sap.ui.define([
 
 		NavigationListItemBase.prototype.exit.apply(this, arguments);
 	};
+
 	/**
 	 * Creates a popup list.
 	 *
@@ -212,7 +249,8 @@ sap.ui.define([
 					selectable: oItem.getSelectable(),
 					href: oItem.getHref(),
 					target: oItem.getTarget(),
-					tooltip: oItem.getTooltip()
+					tooltip: oItem.getTooltip(),
+					tag: oItem.getTag()?.clone()
 				});
 
 				if (oSelectedItem === oItem) {
@@ -233,6 +271,7 @@ sap.ui.define([
 			href: this.getHref(),
 			target: this.getTarget(),
 			tooltip: this.getTooltip(),
+			tag: this.getTag()?.clone(),
 			items: aClonedSubItems
 		});
 
@@ -503,7 +542,9 @@ sap.ui.define([
 			oRM.class("sapTntNLITwoClickAreas");
 		}
 
-		const oLinkAriaProps = {};
+		const oLinkAriaProps = {
+			labelledby: `${this.getId()}-text`
+		};
 
 		if (this.getAriaHasPopup() !== AriaHasPopup.None) {
 			oLinkAriaProps.haspopup = this.getAriaHasPopup();
@@ -540,10 +581,24 @@ sap.ui.define([
 				oLinkAriaProps.selected = false;
 			}
 
+			if (this.getTag()) {
+				oLinkAriaProps.describedby = this.getId() + TagInvTextSuffix;
+			}
+
 			oLinkAriaProps.roledescription = this._resourceBundleTnt.getText("NAVIGATION_LIST_ITEM_ROLE_DESCRIPTION_MENUITEM");
 		} else {
+			const aDescribedBy = [];
+
 			if (this.getSelectable() && this.getItems().length) {
-				oLinkAriaProps.describedby = this._getInvisibleDescriptionLinkText().getId();
+				aDescribedBy.push(this._getInvisibleDescriptionLinkText().getId());
+			}
+
+			if (this.getTag()) {
+				aDescribedBy.push(this.getId() + TagInvTextSuffix);
+			}
+
+			if (aDescribedBy.length) {
+				oLinkAriaProps.describedby = aDescribedBy.join(" ");
 			}
 
 			oLinkAriaProps.role = "treeitem";
@@ -571,6 +626,8 @@ sap.ui.define([
 		this._renderIcon(oRM);
 
 		this._renderText(oRM);
+
+		this._renderTag(oRM);
 
 		if (bExternalLink) {
 			this._renderExternalLinkIcon(oRM);
@@ -634,11 +691,19 @@ sap.ui.define([
 		const oLinkAriaProps = {
 			role: "treeitem",
 			current: this._isListExpanded() && bSelected ? "page" : undefined,
-			selected: bSelected
+			selected: bSelected,
+			labelledby: `${this.getId()}-text`
 		};
+
+		if (this.getTag()) {
+			oLinkAriaProps.describedby = this.getId() + TagInvTextSuffix;
+		}
+
 		this._renderStartLink(oRM, oLinkAriaProps, bDisabled);
 
 		this._renderText(oRM);
+
+		this._renderTag(oRM);
 
 		if (bExternalLink) {
 			this._renderExternalLinkIcon(oRM);
@@ -742,7 +807,7 @@ sap.ui.define([
 	 * @private
 	 */
 	NavigationListItem.prototype._renderText = function (oRM) {
-		oRM.openStart("span")
+		oRM.openStart("span", `${this.getId()}-text`)
 			.class("sapMText")
 			.class("sapTntNLIText");
 
@@ -921,6 +986,36 @@ sap.ui.define([
 		if (oMainRef && (this === oNavList.getSelectedItem() || oSubItemSelected)) {
 			oMainRef.classList.add("sapTntNLINoHoverEffect");
 		}
+	};
+
+	/**
+	 * Renders the tag aggregation.
+	 *
+	 * @param {sap.ui.core.RenderManager} oRM renderer instance
+	 * @private
+	 */
+	NavigationListItem.prototype._renderTag = function (oRM) {
+		const oTag = this.getTag();
+		if (!oTag) {
+			return;
+		}
+		const sTagText = oTag.getText();
+		const sAccessibleName = this._resourceBundleTnt.getText("NAVIGATION_LIST_ITEM_TAG_TEXT", [sTagText]);
+
+		oRM.openStart("span")
+			.class("sapTntNLITagContainer")
+			.openEnd();
+
+		oRM.renderControl(oTag);
+
+		oRM.openStart("span", this.getId() + TagInvTextSuffix)
+			.class("sapUiInvisibleText")
+			.attr("aria-hidden", "true")
+			.openEnd()
+			.text(sAccessibleName)
+			.close("span");
+
+		oRM.close("span");
 	};
 
 	/**

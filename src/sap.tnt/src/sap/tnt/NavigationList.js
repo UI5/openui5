@@ -410,7 +410,8 @@ sap.ui.define([
 				visible: item.getVisible(),
 				enabled: item.getEnabled(),
 				href: item.getHref(),
-				target: item.getTarget()
+				target: item.getTarget(),
+				tag: item.getTag()?.clone()
 			});
 			menuItem._navItem = item;
 			menuItem._oMenu = oMenu;
@@ -421,7 +422,8 @@ sap.ui.define([
 					text: item.getText(),
 					enabled: item.getEnabled(),
 					href: item.getHref(),
-					target: item.getTarget()
+					target: item.getTarget(),
+					tag: item.getTag()?.clone()
 				});
 
 				subMenuParentItem._navItem = item;
@@ -437,7 +439,8 @@ sap.ui.define([
 					visible: subItem.getVisible(),
 					enabled: subItem.getEnabled(),
 					href: subItem.getHref(),
-					target: subItem.getTarget()
+					target: subItem.getTarget(),
+					tag: subItem.getTag()?.clone()
 				});
 				subMenuItem._navItem = subItem;
 				subMenuItem._oMenu = oMenu;

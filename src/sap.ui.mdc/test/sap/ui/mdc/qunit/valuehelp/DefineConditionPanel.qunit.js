@@ -8,6 +8,12 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/mdc/valuehelp/base/DefineConditionPanel",
+	// don't want to test async loading in Field here
+	"sap/ui/mdc/valuehelp/Dialog",
+	// don't want to test async loading in Field here
+	"sap/ui/mdc/valuehelp/content/Conditions",
+	// don't want to test async loading in Field here
+	"sap/ui/mdc/valuehelp/RequestShowContainerDefault",
 	"sap/ui/mdc/condition/Condition",
 	"sap/ui/mdc/condition/FilterOperatorUtil",
 	"sap/ui/mdc/condition/Operator",
@@ -16,9 +22,13 @@ sap.ui.define([
 	"sap/ui/mdc/ValueHelpDelegate",
 	// don't want to test async loading in Field here
 	"sap/ui/mdc/field/FieldInput",
+	// don't want to test async loading in Field here
+	"sap/ui/mdc/field/FieldMultiInput",
+	"sap/ui/mdc/FilterField", // needed for default values
 	"sap/ui/mdc/enums/BaseType",
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/FieldEditMode",
+	"sap/ui/mdc/enums/FieldDisplay",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/mdc/enums/OperatorValueType",
 	"sap/ui/model/json/JSONModel",
@@ -62,15 +72,21 @@ sap.ui.define([
 	jQuery,
 	qutils,
 	DefineConditionPanel,
+	Dialog,
+	Conditions,
+	RequestShowContainerDefault,
 	Condition,
 	FilterOperatorUtil,
 	Operator,
 	FieldBaseDelegate,
 	ValueHelpDelegate,
 	FieldInput,
+	FieldMultiInput,
+	FilterField,
 	BaseType,
 	ConditionValidated,
 	FieldEditMode,
+	FieldDisplay,
 	OperatorName,
 	OperatorValueType,
 	JSONModel,
@@ -1938,4 +1954,155 @@ sap.ui.define([
 			fnDone();
 		}, 0);
 	});
+
+	let oControl;
+	let iConditionProcessed = 0;
+	QUnit.module("Default Values", {
+		beforeEach: async () => {
+			oDataType = new StringType({parseKeepsEmptyString: true}, {nullable: false});
+
+			oConfig = {
+					dataType: oDataType,
+					maxConditions: -1,
+					delegate: FieldBaseDelegate,
+					delegateName: "sap/ui/mdc/field/FieldBaseDelegate",
+					operators: [OperatorName.EQ, OperatorName.NE, OperatorName.BT, OperatorName.DefaultValues]
+			};
+
+			oModel = new JSONModel({conditions: [
+				Condition.createCondition(OperatorName.EQ, ["Test 1"], undefined, undefined, ConditionValidated.NotValidated),
+				Condition.createCondition(OperatorName.NE, ["Test 2"], undefined, undefined, ConditionValidated.NotValidated)
+			]});
+
+			sinon.stub(FieldBaseDelegate, "getDefaultValues").returns([
+				Condition.createCondition(OperatorName.EQ, ["Test 3"], undefined, undefined, ConditionValidated.NotValidated),
+				Condition.createCondition(OperatorName.NE, ["Test 4"], undefined, undefined, ConditionValidated.NotValidated)
+			]);
+
+			oDefineConditionPanel = new DefineConditionPanel("DCP1", {
+				conditions: '{cm>/conditions}',
+				config: oConfig,
+				conditionProcessed: (oEvent) => {iConditionProcessed++;},
+				models: {
+				"cm": oModel
+				}
+			}).placeAt("content");
+
+			oControl = {
+				id: "myControl"
+			};
+			oDefineConditionPanel.setControl(oControl);
+
+			await nextUIUpdate();
+		},
+		afterEach: () => {
+			_teardown();
+			oControl = undefined;
+			FieldBaseDelegate.getDefaultValues.restore();
+			iConditionProcessed = 0;
+		}
+	});
+
+	QUnit.test("rendered FilterField", async (assert) => {
+
+		const oOperatorField = Element.getElementById("DCP1--0-operator");
+		const oContent = oOperatorField.getAggregation("_content")[0];
+
+		oContent.focus();
+		oOperatorField.setValue(OperatorName.DefaultValues);
+		oOperatorField.fireChange({value: OperatorName.DefaultValues, valid: true, promise: Promise.resolve(OperatorName.DefaultValues)}); // fake item select
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // creating new Field
+		const oField = Element.getElementById("DCP1--0-values0");
+		assert.ok(oField.isA("sap.ui.mdc.FilterField"), "Field is FilterField");
+		assert.equal(oField.getEditMode(), FieldEditMode.ReadOnly, "Field is in read only mode");
+		assert.equal(oField.getDataType(), "sap.ui.model.type.String", "Field has correct data type");
+		assert.deepEqual(oField.getDataTypeFormatOptions(), {parseKeepsEmptyString: true}, "Field has correct data type format options");
+		assert.deepEqual(oField.getDataTypeConstraints(), {nullable: false}, "Field has correct data type constraints");
+		assert.equal(oField.getDisplay(), FieldDisplay.Value, "Field shows Value");
+		assert.ok(FieldBaseDelegate.getDefaultValues.calledWith(oControl), "getDefaultValues called with control");
+
+		const aTestConditions = [
+			Condition.createCondition(OperatorName.EQ, ["Test 3"], undefined, undefined, ConditionValidated.NotValidated),
+			Condition.createCondition(OperatorName.NE, ["Test 4"], undefined, undefined, ConditionValidated.NotValidated)
+		];
+		const aConditions = oDefineConditionPanel.getConditions();
+		assert.equal(aConditions.length, 2, "Two conditions exist");
+		assert.equal(aConditions[0].operator, OperatorName.DefaultValues, "First condition operator");
+		assert.deepEqual(aConditions[0].values[0], aTestConditions, "First condition value");
+		assert.equal(aConditions[1].operator, OperatorName.NE, "Second condition operator");
+		assert.equal(aConditions[1].values[0], "Test 2", "Second condition value");
+		assert.deepEqual(oField.getConditions(), aTestConditions, "Default conditions set on field");
+		assert.equal(iConditionProcessed, 1, "ConditionProcessed fired");
+
+	});
+
+	QUnit.test("available operators", async (assert) => {
+
+		const oOperatorField1 = Element.getElementById("DCP1--0-operator");
+		const oContent1 = oOperatorField1.getAggregation("_content")[0];
+		const oOperatorField2 = Element.getElementById("DCP1--1-operator");
+		const oContent2 = oOperatorField2.getAggregation("_content")[0];
+		const sFixedListId = oDefineConditionPanel._sOperatorHelpId + "-pop-fl";
+		const oFixedList = Element.getElementById(sFixedListId);
+
+		oContent1.focus();
+		qutils.triggerKeydown(oContent1.getFocusDomRef(), KeyCodes.F4, false, false, false);
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening (need 3 Timeouts as some Promises and Models are involved)
+		let aItems = oFixedList.getItems();
+		assert.equal(aItems.length, 4, "4 operators in list");
+		assert.equal(aItems[0].getKey(), OperatorName.EQ, "First operator is EQ");
+		assert.equal(aItems[1].getKey(), OperatorName.NE, "Second operator is NE");
+		assert.equal(aItems[2].getKey(), OperatorName.BT, "Third operator is BT");
+		assert.equal(aItems[3].getKey(), OperatorName.DefaultValues, "Fourth operator is DefaultValues");
+
+		oContent2.focus();
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing (need 3 Timeouts as some Promises and Models are involved)
+		qutils.triggerKeydown(oContent2.getFocusDomRef(), KeyCodes.F4, false, false, false);
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening (need 3 Timeouts as some Promises and Models are involved)
+		aItems = oFixedList.getItems();
+		assert.equal(aItems.length, 4, "4 operators in list");
+		assert.equal(aItems[0].getKey(), OperatorName.EQ, "First operator is EQ");
+		assert.equal(aItems[1].getKey(), OperatorName.NE, "Second operator is NE");
+		assert.equal(aItems[2].getKey(), OperatorName.BT, "Third operator is BT");
+		assert.equal(aItems[3].getKey(), OperatorName.DefaultValues, "Fourth operator is DefaultValues");
+
+		qutils.triggerKeydown(oContent2.getFocusDomRef(), KeyCodes.F4, false, false, false); // to close
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing (need 3 Timeouts as some Promises and Models are involved)
+		oOperatorField2.setValue(OperatorName.DefaultValues);
+		oOperatorField2.fireChange({value: OperatorName.DefaultValues, valid: true, promise: Promise.resolve(OperatorName.DefaultValues)}); // fake item select
+		qutils.triggerKeydown(oContent2.getFocusDomRef(), KeyCodes.F4, false, false, false);
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening (need 3 Timeouts as some Promises and Models are involved)
+		aItems = oFixedList.getItems();
+		assert.equal(aItems.length, 4, "4 operators in list");
+		assert.equal(aItems[0].getKey(), OperatorName.EQ, "First operator is EQ");
+		assert.equal(aItems[1].getKey(), OperatorName.NE, "Second operator is NE");
+		assert.equal(aItems[2].getKey(), OperatorName.BT, "Third operator is BT");
+		assert.equal(aItems[3].getKey(), OperatorName.DefaultValues, "Fourth operator is DefaultValues");
+
+		oContent1.focus();
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing (need 3 Timeouts as some Promises and Models are involved)
+		qutils.triggerKeydown(oContent1.getFocusDomRef(), KeyCodes.F4, false, false, false);
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening (need 3 Timeouts as some Promises and Models are involved)
+		aItems = oFixedList.getItems();
+		assert.equal(aItems.length, 3, "3 operators in list");
+		assert.equal(aItems[0].getKey(), OperatorName.EQ, "First operator is EQ");
+		assert.equal(aItems[1].getKey(), OperatorName.NE, "Second operator is NE");
+		assert.equal(aItems[2].getKey(), OperatorName.BT, "Third operator is BT");
+
+	});
+
 });

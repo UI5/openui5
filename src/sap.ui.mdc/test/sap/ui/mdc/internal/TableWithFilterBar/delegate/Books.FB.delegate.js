@@ -10,6 +10,9 @@ sap.ui.define([
 	"delegates/odata/v4/FilterBarDelegate",
 	"sap/ui/fl/Utils",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
+	'sap/ui/mdc/condition/Condition',
+	"sap/ui/mdc/condition/FilterOperatorUtil",
+	'sap/ui/mdc/enums/BaseType',
 	"sap/ui/mdc/enums/FieldDisplay",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/mdc/field/ConditionsType",
@@ -17,7 +20,7 @@ sap.ui.define([
 	"sap/ui/mdc/enums/FilterBarValidationStatus",
 	"sap/ui/core/message/MessageType",
 	"sap/ui/core/library"
-], function (FilterBarDelegate, FlUtils, JsControlTreeModifier, FieldDisplay, OperatorName, ConditionsType, DelegateCache, FilterBarValidationStatus, MessageType, coreLibrary) {
+], function (FilterBarDelegate, FlUtils, JsControlTreeModifier, Condition, FilterOperatorUtil, BaseType, FieldDisplay, OperatorName, ConditionsType, DelegateCache, FilterBarValidationStatus, MessageType, coreLibrary) {
 	"use strict";
 
 	var FilterBarBooksSampleDelegate = Object.assign({}, FilterBarDelegate);
@@ -77,7 +80,13 @@ sap.ui.define([
 				});
 			}
 
+			const aIDOperators = FilterOperatorUtil.getOperatorsForType(BaseType.Numeric);
+			aIDOperators.push(OperatorName.DefaultValues);
+			const aModifiedAtOperators = FilterOperatorUtil.getOperatorsForType(BaseType.DateTime);
+			aModifiedAtOperators.push(OperatorName.DefaultValues);
+
 			DelegateCache.add(oFilterBar.originalNode || oFilterBar, {
+				"ID": { "operators": aIDOperators },
 				"stock": { "operators": [OperatorName.BT] },
 				"author_ID": { "valueHelp": "FH1", "display": FieldDisplay.Description, "delegate": {"name": "sap/ui/v4demo/delegate/FieldBase.delegate", "payload": {}}},
 				"title": { "valueHelp": "FH4", "delegate": {"name": "sap/ui/v4demo/delegate/FieldBase.delegate", "payload": {}}},
@@ -88,7 +97,8 @@ sap.ui.define([
 				"subgenre_code": { "valueHelp": "FHSubGenre", "display": FieldDisplay.Description },
 				"detailgenre_code": { "valueHelp": "FHDetailGenre", "display": FieldDisplay.Description},
 				"currency_code": { "valueHelp": "FH-Currency", "display": FieldDisplay.Value, "operators": [OperatorName.EQ], "delegate": {"name": "sap/ui/v4demo/delegate/FieldBase.delegate", "payload": {"autoCompleteCaseSensitive": "description"}}},
-				"createdAt": { "operators": ["MYDATE", "MYDATERANGE", OperatorName.EQ, OperatorName.GE, OperatorName.LE, OperatorName.BT, OperatorName.LT, OperatorName.TODAY, OperatorName.YESTERDAY, OperatorName.TOMORROW, OperatorName.LASTDAYS, "MYNEXTDAYS", OperatorName.THISWEEK, OperatorName.THISMONTH, OperatorName.THISQUARTER, OperatorName.THISYEAR, OperatorName.NEXTHOURS, OperatorName.NEXTMINUTES, OperatorName.LASTHOURS, OperatorName.NEXTMINUTESINCLUDED, OperatorName.LASTMINUTESINCLUDED, OperatorName.LASTHOURSINCLUDED] }
+				"createdAt": { "operators": ["MYDATE", "MYDATERANGE", OperatorName.EQ, OperatorName.GE, OperatorName.LE, OperatorName.BT, OperatorName.LT, OperatorName.TODAY, OperatorName.YESTERDAY, OperatorName.TOMORROW, OperatorName.LASTDAYS, "MYNEXTDAYS", OperatorName.THISWEEK, OperatorName.THISMONTH, OperatorName.THISQUARTER, OperatorName.THISYEAR, OperatorName.NEXTHOURS, OperatorName.NEXTMINUTES, OperatorName.LASTHOURS, OperatorName.NEXTMINUTESINCLUDED, OperatorName.LASTMINUTESINCLUDED, OperatorName.LASTHOURSINCLUDED] },
+				"modifiedAt": { operators: aModifiedAtOperators }
 			}, "$Filters");
 
 			return aProperties;
@@ -170,6 +180,21 @@ sap.ui.define([
 		}
 
 		return oFilterBar.checkFilters();
+	};
+
+	FilterBarBooksSampleDelegate.getDefaultValues = function(oFilterBar, sPropertyKey) {
+
+		switch (sPropertyKey) {
+			case "ID":
+				return [Condition.createCondition(OperatorName.LT, [10])];
+
+			case "modifiedAt":
+				return [Condition.createCondition(OperatorName.LT, ["2010-12-31T23:59:59.0000000+01:00"])];
+
+			default:
+				return [];
+		}
+
 	};
 
 	return FilterBarBooksSampleDelegate;

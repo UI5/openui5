@@ -2214,6 +2214,8 @@ sap.ui.define([
 	 *
 	 * @returns {sap.ui.model.odata.v2.ODataTreeBinding}
 	 *   The new tree binding
+	 * @deprecated As of version 1.150.0, will be replaced by OData V4 hierarchy functionality, see
+	 *   {@link topic:7d914317c0b64c23824bf932cc8a4ae1/section_RCH Recursive Hierarchy}
 	 * @public
 	 * @see {@link http://www.sap.com/protocols/SAPData "SAP Annotations for OData Version 2.0" Specification}
 	 */

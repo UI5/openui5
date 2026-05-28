@@ -73,6 +73,14 @@ sap.ui.define([
 		},
 		after() {
 			QUnit.config.testTimeout = this.defaultTestTimeout;
+		},
+		afterEach() {
+			// If the OPA queue was rejected (e.g. timeout), iTeardownMyApp in the queue was skipped.
+			// Tear down the iFrame here so the next test can start a fresh one.
+			var oOpa = new Opa5();
+			if (oOpa.hasAppStartedInAFrame()) {
+				oOpa.iTeardownMyAppFrame();
+			}
 		}
 	});
 
@@ -191,6 +199,8 @@ sap.ui.define([
 	});
 
 	opaTest("Should log exceptions in callbacks currectly", function (oOpa) {
+		// Timeouts module has 7 tests — iTestIndex must start at 7 regardless of how the previous test ended
+		iTestIndex = 7;
 		oOpa.iStartMyAppInAFrame({
 			source: FAILING_OPA_TEST_URL + "?sap-ui-qunittimeout=4000&module=Exceptions",
 			autoWait: true
@@ -253,6 +263,8 @@ sap.ui.define([
 	});
 
 	opaTest("Should write log messages from an iFrame startup", function (oOpa) {
+		// Timeouts module has 7 tests + Exceptions module has 5 tests — iTestIndex must start at 12
+		iTestIndex = 12;
 		oOpa.iStartMyAppInAFrame({
 			source: FAILING_OPA_TEST_URL + "?sap-ui-qunittimeout=90000&module=IFrame",
 			autoWait: true

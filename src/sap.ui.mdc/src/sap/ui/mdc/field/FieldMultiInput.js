@@ -131,6 +131,7 @@ sap.ui.define([
 
 		if (oEvent.target.classList.contains("sapMTokenizerIndicator")) {
 			oEvent.setMark("tokenizerMoreIndicatorTap");
+			_bindAllTokens.call(this, false); // get all tokens as paging would need support from Tokenizer (On click on "more" no focus event is triggered.)
 		}
 
 		MultiInput.prototype.ontap.apply(this, arguments);

@@ -10,7 +10,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	const sEmptyTextKey = "\xa0";
+	const sEmptyTextKey = "\xa0"; // &nbsp; in Unicode
 	const oValidators = {
 		noEmptyText: {
 			validatorFunction(sNewText) {

@@ -1,10 +1,16 @@
 
 sap.ui.define([
     "sap/ui/mdc/field/FieldBaseDelegate",
-    'sap/ui/mdc/odata/TypeMap'
+    "sap/ui/mdc/odata/TypeMap",
+    "sap/ui/mdc/condition/Condition",
+	"sap/ui/mdc/enums/ConditionValidated",
+	"sap/ui/mdc/enums/OperatorName"
 ], function(
     MDCFieldBaseDelegate,
-    ODataTypeMap
+    ODataTypeMap,
+    Condition,
+    ConditionValidated,
+    OperatorName
 ) {
     "use strict";
 
@@ -27,6 +33,51 @@ sap.ui.define([
 		}
 
 		return MDCFieldBaseDelegate.isInputMatchingText.apply(this, arguments);
+
+	};
+
+	FieldBaseDelegate.getDefaultValues = function(oField) {
+
+        if (oField?.isA("sap.ui.mdc.FilterField")) {
+            switch (oField.getPropertyKey()) {
+                case "ProductId":
+                    return [
+                        Condition.createCondition(OperatorName.EQ, ["214-121-828"], undefined, undefined, ConditionValidated.NotValidated)
+                    ];
+                case "Name":
+                    return [
+                        Condition.createCondition(OperatorName.EQ, ["Webcam"], undefined, undefined, ConditionValidated.NotValidated),
+                        Condition.createCondition(OperatorName.NE, ["Laptop Case"], undefined, undefined, ConditionValidated.NotValidated),
+                        Condition.createCondition(OperatorName.BT, ["A", "Z"], undefined, undefined, ConditionValidated.NotValidated)
+                    ];
+                case "Description":
+                    return [
+                        Condition.createCondition(OperatorName.EQ, ["Test Description"], undefined, undefined, ConditionValidated.NotValidated),
+                        Condition.createCondition(OperatorName.NE, ["Invalid Description"], undefined, undefined, ConditionValidated.NotValidated),
+                        Condition.createCondition(OperatorName.BT, ["A", "Z"], undefined, undefined, ConditionValidated.NotValidated)
+                    ];
+                case "DateTime":
+                    return [
+                        Condition.createCondition(OperatorName.EQ, [new Date()], undefined, undefined, ConditionValidated.NotValidated)
+                    ];
+                case "Date":
+                    return [
+                        Condition.createCondition(OperatorName.EQ, [new Date()], undefined, undefined, ConditionValidated.NotValidated)
+                    ];
+                case "Status":
+                    return [
+                        Condition.createCondition(OperatorName.EQ, ["S1"], undefined, undefined, ConditionValidated.NotValidated)
+                    ];
+                case "Quantity":
+                    return [
+                        Condition.createCondition(OperatorName.EQ, [100], undefined, undefined, ConditionValidated.NotValidated)
+                    ];
+                default:
+                    break;
+            }
+        }
+
+		return [];
 
 	};
 

@@ -28,6 +28,8 @@ sap.ui.define([
 	 *
 	 * @alias sap.ui.model.odata.ODataTreeBindingFlat
 	 * @function
+	 * @deprecated As of version 1.150.0, will be replaced by OData V4 hierarchy functionality, see
+	 *    {@link topic:7d914317c0b64c23824bf932cc8a4ae1/section_RCH Recursive Hierarchy}
 	 *
 	 * @public
 	 */

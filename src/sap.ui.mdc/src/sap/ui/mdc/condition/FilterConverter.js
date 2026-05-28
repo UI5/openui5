@@ -4,12 +4,14 @@
 sap.ui.define([
 		"sap/ui/mdc/condition/FilterOperatorUtil",
 		"sap/ui/mdc/enums/BaseType",
+		'sap/ui/mdc/enums/OperatorValueType',
 		"sap/ui/model/Filter",
 		"sap/ui/model/FilterOperator",
 		"sap/base/Log"
 	], (
 	FilterOperatorUtil,
 	BaseType,
+	OperatorValueType,
 	Filter,
 	FilterOperator,
 	Log
@@ -82,7 +84,6 @@ sap.ui.define([
 		 * @ui5-restricted sap.ui.mdc
 		 */
 		createFilters: function(oConditions, oConditionTypes, fConvert2FilterCallback, bCaseSensitive) {
-			let i, aLocalIncludeFilters, aLocalExcludeFilters, oOperator, oFilter, oNewFilter, oCondition;
 			const aOverallFilters = [];
 
 			const convertAnyAllFilter = function(oFilter, sFieldPath, sPropertyPath) {
@@ -174,16 +175,55 @@ sap.ui.define([
 				return aFilters; // just use unchanged Filter
 			};
 
+			const fnFillFilterForCondition = function(oCondition, sFieldPath, oOperator, oDataType, bCaseSensitiveType, sBaseType, aLocalIncludeFilters, aLocalExcludeFilters) {
+					oOperator = oOperator || FilterOperatorUtil.getOperator(oCondition.operator);
+					if (!oOperator) {
+						return; // ignore unknown operators
+					}
+
+					let oFilter;
+
+					try {
+						oFilter = oOperator.getModelFilter(oCondition, sFieldPath, oDataType, bCaseSensitiveType, sBaseType);
+					} catch (error) {
+						Log.error("FilterConverter", error || "Not able to convert the condition for path '" + sFieldPath + "' into a filter! The type is missing!");
+						return;
+					}
+
+					if (!oOperator.exclude) {
+						if (oFilter.sPath === "$search") {
+							//ignore the $search conditions
+							return;
+						}
+
+						// basic search condition handling split the oFilter with sPath == "*xxx,yyy*" into multiple filter
+						// e.g. fieldPath "*title,year*" - such fieldPath only works with type string and an operation with a single value (e.g. contains)
+						//TODO this should be removed. Only $search will be supported as sPath. This mapping of a *fieldPath1,FieldPath2* is currently only used on the mockServer
+						const $searchfilters = /^\*(.+)\*$/.exec(oFilter.sPath);
+						if ($searchfilters) {
+							// $search mapping
+							const aFieldPath = $searchfilters[1].split(',');
+							for (let j = 0; j < aFieldPath.length; j++) {
+								aLocalIncludeFilters.push(new Filter({ path: aFieldPath[j], operator: oFilter.sOperator, value1: oFilter.oValue1, caseSensitive: bCaseSensitive }));
+							}
+							return;
+						}
+
+						aLocalIncludeFilters.push(oFilter);
+					} else {
+						aLocalExcludeFilters.push(oFilter);
+					}
+			};
+
 			// OR-combine filters for each property
 			for (const sFieldPath in oConditions) {
-				aLocalIncludeFilters = [];
-				aLocalExcludeFilters = [];
-				const aConditions = oConditions[sFieldPath];
-
 				if (sFieldPath === "$search") {
 					continue;
 				}
 
+				const aConditions = oConditions[sFieldPath];
+				let aLocalIncludeFilters = [];
+				let aLocalExcludeFilters = [];
 				let oDataType;
 				let bCaseSensitiveType = true;
 				let sBaseType = BaseType.String; // String is always default
@@ -201,49 +241,18 @@ sap.ui.define([
 					}
 				}
 
-				for (i = 0; i < aConditions.length; i++) {
-					oCondition = aConditions[i];
+				for (let i = 0; i < aConditions.length; i++) {
+					const oCondition = aConditions[i];
+					const oOperator = FilterOperatorUtil.getOperator(oCondition.operator);
 
-					oOperator = FilterOperatorUtil.getOperator(oCondition.operator);
-					if (!oOperator) {
-						continue; // ignore unknown operators
-					}
-
-					try {
-						oFilter = oOperator.getModelFilter(oCondition, sFieldPath, oDataType, bCaseSensitiveType, sBaseType);
-					} catch (error) {
-						if (error) {
-							Log.error("FilterConverter", error);
-						} else {
-							// in case the getModelFilter fails - because the oDataType is missing - we show a console error.
-							Log.error("FilterConverter", "Not able to convert the condition for path '" + sFieldPath + "' into a filter! The type is missing!");
+					if (oOperator?.valueTypes[0] === OperatorValueType.Conditions) {
+						// add filters of conditions
+						const aConditions = oCondition.values[0] || [];
+						for (let j = 0; j < aConditions.length; j++) {
+							fnFillFilterForCondition(aConditions[j], sFieldPath, undefined, oDataType, bCaseSensitiveType, sBaseType, aLocalIncludeFilters, aLocalExcludeFilters);
 						}
-						continue;
-					}
-
-					if (!oOperator.exclude) {
-
-						if (oFilter.sPath === "$search") {
-							//ignore the $search conditions
-							continue;
-						}
-
-						// basic search condition handling split the oFilter with sPath == "*xxx,yyy*" into multiple filter
-						// e.g. fieldPath "*title,year*" - such fieldPath only works with type string and an operation with a single value (e.g. contains)
-						//TODO this should be removed. Only $search will be supported as sPath. This mapping of a *fieldPath1,FieldPath2* is currently only used on the mockServer
-						const $searchfilters = /^\*(.+)\*$/.exec(oFilter.sPath);
-						if ($searchfilters) {
-							// $search mapping
-							const aFieldPath = $searchfilters[1].split(',');
-							for (let j = 0; j < aFieldPath.length; j++) {
-								aLocalIncludeFilters.push(new Filter({ path: aFieldPath[j], operator: oFilter.sOperator, value1: oFilter.oValue1, caseSensitive: bCaseSensitive }));
-							}
-							continue;
-						}
-
-						aLocalIncludeFilters.push(oFilter);
-					} else {
-						aLocalExcludeFilters.push(oFilter);
+					} else if (oOperator) { // ignore unknown operators
+						fnFillFilterForCondition(oCondition, sFieldPath, oOperator, oDataType, bCaseSensitiveType, sBaseType, aLocalIncludeFilters, aLocalExcludeFilters);
 					}
 				}
 
@@ -253,7 +262,7 @@ sap.ui.define([
 				aLocalExcludeFilters = convertToAnyOrAllFilter(aLocalExcludeFilters, sFieldPath, true);
 
 				// take the single Filter or combine all with OR
-				oFilter = undefined;
+				let oFilter;
 				if (aLocalIncludeFilters.length === 1) {
 					oFilter = aLocalIncludeFilters[0]; // could omit this and have an OR-ed array with only one filter, but it's nice this way.
 				} else if (aLocalIncludeFilters.length > 1) {
@@ -265,7 +274,7 @@ sap.ui.define([
 					aLocalExcludeFilters.unshift(oFilter); // add include-filters to the beginning (better to read)
 				}
 
-				oNewFilter = undefined;
+				let oNewFilter;
 				if (aLocalExcludeFilters.length === 1) {
 					oNewFilter = aLocalExcludeFilters[0];
 				} else if (aLocalExcludeFilters.length > 1) {
@@ -279,12 +288,11 @@ sap.ui.define([
 			}
 
 			// AND-combine filters for different properties and apply filters
+			let oFilter = null;
 			if (aOverallFilters.length === 1) {
 				oFilter = aOverallFilters[0]; // could omit this and have an ORed array with only one filter, but it's nice this way.
 			} else if (aOverallFilters.length > 1) {
 				oFilter = new Filter({ filters: aOverallFilters, and: true });
-			} else { // no filters
-				oFilter = null;
 			}
 
 			Log.info("FilterConverter", FilterConverter.prettyPrintFilters(oFilter));

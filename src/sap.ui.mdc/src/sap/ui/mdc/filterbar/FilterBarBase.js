@@ -15,6 +15,7 @@ sap.ui.define([
 		'sap/ui/mdc/condition/ConditionModel',
 		'sap/ui/mdc/condition/Condition',
 		'sap/ui/mdc/condition/ConditionConverter',
+		'sap/ui/mdc/condition/FilterOperatorUtil',
 		'sap/ui/mdc/util/IdentifierUtil',
 		'sap/ui/mdc/util/FilterUtil',
 		"sap/ui/mdc/filterbar/PropertyHelper",
@@ -45,6 +46,7 @@ sap.ui.define([
 		ConditionModel,
 		Condition,
 		ConditionConverter,
+		FilterOperatorUtil,
 		IdentifierUtil,
 		FilterUtil,
 		PropertyHelper,
@@ -784,7 +786,13 @@ sap.ui.define([
 
 		FilterBarBase.prototype._toExternal = function(oProperty, oCondition) {
 			let oConditionExternal = merge({}, oCondition);
-			oConditionExternal = ConditionConverter.toString(oConditionExternal, oProperty.typeConfig.typeInstance, this.getTypeMap());
+			const oOperator = FilterOperatorUtil.getOperator(oCondition.operator);
+
+			if (oOperator?.useDefaultValues) {
+				oConditionExternal.values = [];
+			} else {
+				oConditionExternal = ConditionConverter.toString(oConditionExternal, oProperty.typeConfig.typeInstance, this.getTypeMap());
+			}
 
 			this._cleanupCondition(oConditionExternal);
 
@@ -796,8 +804,19 @@ sap.ui.define([
 
 		FilterBarBase.prototype._toInternal = function(oProperty, oCondition) {
 			let oConditionInternal = merge({}, oCondition);
+			const oOperator = FilterOperatorUtil.getOperator(oCondition.operator);
+			const oTypeMap = this.getTypeMap();
 
-			oConditionInternal = ConditionConverter.toType(oConditionInternal, oProperty.typeConfig.typeInstance, this.getTypeMap());
+			if (oOperator?.useDefaultValues) {
+				const aDefaultConditions = this.getDefaultValues(oProperty.key);
+				oConditionInternal.values.push([]);
+				aDefaultConditions.forEach((oDefaultCondition) => {
+					oDefaultCondition = ConditionConverter.toType(oDefaultCondition, oProperty.typeConfig.typeInstance, oTypeMap);
+					oConditionInternal.values[0].push(oDefaultCondition);
+				});
+			} else {
+				oConditionInternal = ConditionConverter.toType(oConditionInternal, oProperty.typeConfig.typeInstance, oTypeMap);
+			}
 
 			this._convertInOutParameters(oCondition, oConditionInternal, "inParameters", ConditionConverter.toType);
 			this._convertInOutParameters(oCondition, oConditionInternal, "outParameters", ConditionConverter.toType);
@@ -2452,6 +2471,26 @@ sap.ui.define([
 			if (!bHasErrors && this.getLiveMode()) {
 				this.triggerSearch();
 			}
+		};
+
+		/**
+		 * Returns default values for a property.
+		 *
+		 * This function is called when a user adds a condition representing default values or a variant using such a condition is applied.
+		 *
+		 * As this function might be called multiple times, the default values should be cached and not be determined again for each call.
+		 *
+		 * @param {string} sPropertyKey Property key of the filter field
+		 * @returns {sap.ui.mdc.condition.ConditionObject[]} Array of default value conditions in external format
+		 * @private
+		 * @ui5-restricted sap.ui.mdc
+		 * @since 1.149
+		 */
+		FilterBarBase.prototype.getDefaultValues = function(sPropertyKey) {
+
+			const oDelegate = this.getControlDelegate();
+			return oDelegate.getDefaultValues(this, sPropertyKey);
+
 		};
 
 		return FilterBarBase;

@@ -4,15 +4,36 @@
 
 // module:sap/ui/mdc/mixin/delegate/FilterIntegrationDefault
 sap.ui.define([
-	"sap/ui/mdc/util/FilterUtil", "sap/ui/core/Element", "sap/ui/model/Filter"
+	"sap/ui/mdc/util/FilterUtil", "sap/ui/mdc/condition/FilterOperatorUtil", "sap/ui/core/Element", "sap/ui/model/Filter"
 ], (
 	FilterUtil,
+	FilterOperatorUtil,
 	Element,
 	Filter) => {
 	"use strict";
 
 	function _createFilterFromExternalConditions(oControl, oTypeMap) {
-		return FilterUtil.getFilterInfo(oTypeMap, oControl?.getConditions() || {}, oControl?.getPropertyHelper?.()?.getProperties(true) || [])?.filters;
+		const mConditions = oControl?.getConditions() || {};
+		// if default values are used, exchange with real default-conditions
+		if (oControl?.getDefaultValues) { // currently default values are only supported for FilterBar
+			for (const sFieldPath in mConditions) {
+				const aConditions = mConditions[sFieldPath];
+				const aFilterConditions = [];
+				for (let i = 0; i < aConditions.length; i++) {
+					const oCondition = aConditions[i];
+					const oOperator = FilterOperatorUtil.getOperator(oCondition.operator);
+					if (oOperator?.useDefaultValues) {
+						const aDefaultConditions = oControl.getDefaultValues(sFieldPath);
+						aFilterConditions.push(...aDefaultConditions);
+					} else {
+						aFilterConditions.push(oCondition);
+					}
+				}
+				mConditions[sFieldPath] = aFilterConditions;
+			}
+		}
+
+		return FilterUtil.getFilterInfo(oTypeMap, mConditions, oControl?.getPropertyHelper?.()?.getProperties(true) || [])?.filters;
 	}
 
 	function _createInnerFilter(oControl, oTypeMap) {

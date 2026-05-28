@@ -98,6 +98,7 @@
 				text="{i18n>ANNOTATION_CHANGE_DIALOG_CONFIRM}"
 				press=".onSave"
 				visible="{= ${/properties}.length > 0}"
+				enabled="{/isSaveEnabled}"
 			/>
 		</beginButton>
 		<endButton>

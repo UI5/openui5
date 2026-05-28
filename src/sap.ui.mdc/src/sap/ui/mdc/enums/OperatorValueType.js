@@ -34,7 +34,15 @@ sap.ui.define(["sap/ui/base/DataType"], (DataType) => {
 		 *
 		 * @public
 		 */
-		SelfNoParse: "SelfNoParse"
+		SelfNoParse: "SelfNoParse",
+
+		/**
+		 * The condition contains conditions as values. This is used to display the default values of a <code>FilterField</code>
+		 *
+		 * @since 1.149
+		 * @private
+		 */
+		Conditions: "Conditions"
 	};
 
 	DataType.registerEnum("sap.ui.mdc.enums.OperatorValueType", OperatorValueType);

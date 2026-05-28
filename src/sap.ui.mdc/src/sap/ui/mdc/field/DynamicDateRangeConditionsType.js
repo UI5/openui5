@@ -188,7 +188,11 @@ sap.ui.define([
 
 					for (let i = 0; i < oOperator.valueTypes.length; i++) {
 						if (oOperator.valueTypes[i] && oOperator.valueTypes[i] !== OperatorValueType.Static) {
-							if (mLibrary.StandardDynamicDateRangeKeys[sOption]) { // only for standard operators (dates are returned as local dates)
+							if (oOperator.useDefaultValues) {
+								const oDelegate = this._getDelegate();
+								const oField = this.oFormatOptions.control;
+								aValues.push(oDelegate.getDefaultValues(oField));
+							} else if (mLibrary.StandardDynamicDateRangeKeys[sOption]) { // only for standard operators (dates are returned as local dates)
 								if (oOperator.valueTypes[i] === OperatorValueType.Self) {
 									aValues.push(DateUtil.dateToType(oValue.values[i], oType, sBaseType));
 								} else {

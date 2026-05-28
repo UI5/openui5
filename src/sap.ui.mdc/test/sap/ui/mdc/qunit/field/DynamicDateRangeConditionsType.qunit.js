@@ -1,4 +1,4 @@
-/* global QUnit */
+/* global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/mdc/field/DynamicDateRangeConditionsType",
@@ -251,6 +251,20 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("DefaultValues", (assert) => {
+
+		sinon.spy(FieldBaseDelegate, "getDefaultValues");
+		oDynamicDateRangeConditionsType.setFormatOptions({valueType: oType, maxConditions: 1, delegate: FieldBaseDelegate, payload: {}, operators: [OperatorName.DefaultValues, OperatorName.EQ, OperatorName.NE, OperatorName.BT]});
+		const oCondition = Condition.createCondition(OperatorName.DefaultValues, [[
+			Condition.createCondition(OperatorName.EQ, ["2026-05-07"], undefined, undefined, ConditionValidated.NotValidated)
+		]], undefined, undefined, ConditionValidated.NotValidated);
+		const oResult = oDynamicDateRangeConditionsType.formatValue([oCondition]);
+		assert.deepEqual(oResult, {operator: "Date-" + OperatorName.DefaultValues, values: oCondition.values}, "Result of formatting: ");
+		assert.notOk(FieldBaseDelegate.getDefaultValues.called, "getDefaultValues not called");
+		FieldBaseDelegate.getDefaultValues.restore();
+
+	});
+
 	QUnit.module("Formatting DateTime", {
 		beforeEach: fnInitDateTime,
 		afterEach: fnTeardown
@@ -414,6 +428,19 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("DefaultValues", (assert) => {
+
+		sinon.stub(FieldBaseDelegate, "getDefaultValues").returns([
+			Condition.createCondition(OperatorName.EQ, ["2026-05-08"], undefined, undefined, ConditionValidated.NotValidated)
+		]);
+		oDynamicDateRangeConditionsType.setFormatOptions({valueType: oType, maxConditions: 1, delegate: FieldBaseDelegate, payload: {}, operators: [OperatorName.DefaultValues, OperatorName.EQ, OperatorName.NE, OperatorName.BT]});
+		const oCondition = _createCondition(OperatorName.DefaultValues, [[Condition.createCondition(OperatorName.EQ, ["2026-05-08"], undefined, undefined, ConditionValidated.NotValidated)]]);
+		const aConditions = oDynamicDateRangeConditionsType.parseValue({operator: "Date-" + OperatorName.DefaultValues, values: []});
+		assert.deepEqual(aConditions, [oCondition], "Result of parsing: " + oCondition.operator); // original value is used as type is used formatting and parsing
+		FieldBaseDelegate.getDefaultValues.restore();
+
+	});
+
 	QUnit.test("invalid Operator", (assert) => {
 
 		let oException;
@@ -574,6 +601,21 @@ sap.ui.define([
 
 		let oException;
 		const oCondition = _createCondition(OperatorName.SPECIFICMONTH, [2]);
+
+		try {
+			oDynamicDateRangeConditionsType.validateValue([oCondition]);
+		} catch (e) {
+			oException = e;
+		}
+		assert.notOk(oException, "no exception fired");
+
+	});
+
+	QUnit.test("DefaultValues", (assert) => {
+
+		oDynamicDateRangeConditionsType.setFormatOptions({valueType: oType, maxConditions: 1, delegate: FieldBaseDelegate, payload: {}, operators: [OperatorName.DefaultValues, OperatorName.EQ, OperatorName.NE, OperatorName.BT]});
+		let oException;
+		const oCondition = _createCondition(OperatorName.DefaultValues, [[Condition.createCondition(OperatorName.EQ, ["2026-05-08"], undefined, undefined, ConditionValidated.NotValidated)]]);
 
 		try {
 			oDynamicDateRangeConditionsType.validateValue([oCondition]);

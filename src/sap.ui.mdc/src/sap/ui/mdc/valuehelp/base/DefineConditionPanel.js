@@ -30,6 +30,7 @@ sap.ui.define([
 	'sap/ui/model/resource/ResourceModel',
 	'sap/ui/model/type/String',
 	'sap/ui/model/ParseException',
+	'sap/ui/model/Filter',
 	'sap/ui/core/library',
 	'sap/ui/core/InvisibleText',
 	'sap/ui/layout/Grid',
@@ -73,6 +74,7 @@ sap.ui.define([
 	ResourceModel,
 	StringType,
 	ParseException,
+	Filter,
 	coreLibrary,
 	InvisibleText,
 	Grid,
@@ -146,7 +148,7 @@ sap.ui.define([
 				},
 
 				/**
-				 * Internal configuration
+				 * Internal configuration, see {@link sap.ui.mdc.valuehelp.base.ConnectConfig}.
 				 *
 				 * <b>Note:</b> This property must not be set from outside, it used to forward the configuration of the <code>ValueHelp</code>
 				 * @since 1.115.0
@@ -665,8 +667,8 @@ sap.ui.define([
 						FilterOperatorUtil.checkConditionsEmpty(oCondition, _getOperators.call(this));
 						this.setProperty("conditions", aConditions, true); // do not invalidate whole DefineConditionPanel
 					}
-					if (!oCondition.invalid && ((oOperator.valueTypes.length === 0 || oOperator.valueTypes[0] === OperatorValueType.Static) || (oOperatorOld.valueTypes.length === 0 || oOperatorOld.valueTypes[0] === OperatorValueType.Static))) {
-						// static condition added oe removed, it is ready to use -> fire event
+					if (!oCondition.invalid && ((oOperator.valueTypes.length === 0 || oOperator.valueTypes[0] === OperatorValueType.Static) || (oOperatorOld.valueTypes.length === 0 || oOperatorOld.valueTypes[0] === OperatorValueType.Static || oOperatorOld.useDefaultValues))) {
+						// static condition added or removed, it is ready to use -> fire event
 						this.fireConditionProcessed();
 					}
 				}
@@ -771,6 +773,18 @@ sap.ui.define([
 			const aContent = oGrid.getContent();
 			const oCtrl = aContent[2] ? aContent[2] : aContent[0]; // If value field exist take it, otherwise operator
 			return oCtrl;
+		},
+
+		/**
+		 * Sets the Control the value help is connected to
+		 *
+		 * @param {sap.ui.core.Control} oControl the value help is connected to
+		 *
+		 * @private
+		 * @ui5-restricted sap.ui.mdc
+		 */
+		setControl: function(oControl) {
+			this._oControl = oControl;
 		}
 	});
 
@@ -1183,7 +1197,27 @@ sap.ui.define([
 			} else {
 				oTemplate = new FixedListItem({ key: "{om>key}", text: "{om>text}", additionalText: "{om>additionalText}" });
 			}
-			oFixedList.bindAggregation("items", { path: 'om>/', templateShareable: false, template: oTemplate });
+
+			const oFilter = new Filter({
+				path: "key",
+				caseSensitive: true,
+				test: function (sOperator) {
+					const oOperator = FilterOperatorUtil.getOperator(sOperator);
+
+					if (oOperator.useDefaultValues) {
+						const oField = this.getControl();
+						const sCurrentOperator = oField?.getValue();
+						const aConditions = oField?.getModel("$this").getProperty("/conditions");
+						const bDefaultUsed = aConditions?.some((oCondition) => {
+							return oCondition.operator === oOperator.name;
+						});
+						return !bDefaultUsed || sCurrentOperator === sOperator; // hide "default values" if already used in another condition
+					}
+					return true;
+				}.bind(oFixedList) // to get current connected Field
+			});
+
+			oFixedList.bindAggregation("items", { path: 'om>/', templateShareable: false, template: oTemplate, filters: oFilter });
 			oFixedList.setGroupable(bHasMultipleGroups);
 		}
 
@@ -1279,11 +1313,12 @@ sap.ui.define([
 		// for static operators add static text as value to render text control
 		const oDataType = _getType.call(this);
 		const aUpdate = [];
+		let bFireProcessed = false;
 		let i = 0;
 		for (i = 0; i < aConditions.length; i++) {
 			const oCondition = aConditions[i];
 			const oOperator = FilterOperatorUtil.getOperator(oCondition.operator);
-			if (oOperator && oOperator.valueTypes[0] === OperatorValueType.Static && (oCondition.values.length === 0 || bTypeChange)) {
+			if (oOperator?.valueTypes[0] === OperatorValueType.Static && (oCondition.values.length === 0 || bTypeChange)) {
 				// if type changed the text needs to be new formatted (setting of type and conditions might be async.)
 				if (oOperator.getStaticText) {
 					const sText = oOperator.getStaticText(oDataType, _getBaseType.call(this, oDataType));
@@ -1294,11 +1329,19 @@ sap.ui.define([
 					}
 					aUpdate.push(i);
 				}
+			} else if (oOperator?.useDefaultValues && !oCondition.values[0]) {
+				const oDelegate = this.getConfig().delegate;
+				oCondition.values[0] = oDelegate?.getDefaultValues(this._oControl);
+				aUpdate.push(i);
+				bFireProcessed = true;
 			}
 		}
 
 		if (bUpdateProperty && aUpdate.length > 0) {
 			this.setProperty("conditions", aConditions, true); // do not invalidate whole DefineConditionPanel
+			if (bFireProcessed) {
+				this.fireConditionProcessed(); // to update Tokenizer
+			}
 		}
 
 	}
@@ -1396,7 +1439,10 @@ sap.ui.define([
 						filterList: false,
 						useFirstMatch: true
 					})]
-				})
+				}),
+				open: (oEvent) => {
+					this.oOperatorModel.checkUpdate(true); // to trigger filtering
+				}
 			})
 		);
 

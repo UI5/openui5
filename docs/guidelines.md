@@ -338,7 +338,7 @@ After that, describe the technical details of what you changed. It is important 
 The data section consists of name-value pairs
 -   `Fixes: https://github.com/UI5/openui5/issues/(issueNumber)` if the change fixes a GitHub-reported bug
 -   `Closes: https://github.com/UI5/openui5/pull/(pullRequestNumber)` if the change comes from a pull request. This is usually added by the OpenUI5 committer handling the pull request
--   Further internal information - like `BCP` (for customer and internal messages reported at SAP and new internal bug reports), a mandatory `Change-Id` for Gerrit, and the `CR-Id` ("Change Request ID", mandatory for maintenance codelines) - is added by SAP developers if required
+-   Further internal information - like `JIRA` (for internal BLIs/tasks), `SNOW` (for customer and internal messages reported at SAP and new internal bug reports), a mandatory `Change-Id` for Gerrit, and the `CR-Id` ("Change Request ID", mandatory for maintenance codelines) - is added by SAP developers if required
 -   A commit message can thus look like this:
 
     ``` wiki

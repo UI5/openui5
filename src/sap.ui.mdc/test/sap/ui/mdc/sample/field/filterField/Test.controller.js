@@ -253,6 +253,22 @@ sap.ui.define([
 			var oForm = oView.byId("Form1");
 			var oCM = oForm.getModel("cm");
 			oCM.removeAllConditions();
+		},
+		onDefaultValuesPress: function(oEvent) {
+			const bPressed = oEvent.getParameter("pressed");
+			const oView = this.getView();
+			const oForm = oView.byId("Form1");
+			const aContent = oForm.getContent();
+			for (let i = 0; i < aContent.length; i++) {
+				const oControl = aContent[i];
+				if (oControl.isA("sap.ui.mdc.FilterField")) {
+					if (bPressed) {
+						oControl.addOperator(OperatorName.DefaultValues);
+					} else {
+						oControl.removeOperator(OperatorName.DefaultValues);
+					}
+				}
+			}
 		}
 	});
 });
