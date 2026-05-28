@@ -1963,4 +1963,53 @@ sap.ui.define([
 
 		oTable.destroy();
 	});
+
+	QUnit.test("Remove column with grouped items", async function(assert) {
+		const oTable = new Table({
+			delegate: {
+				name: sDelegatePath,
+				payload: {
+					collectionPath: "/testPath",
+					propertyInfo: [{
+						key: "col0",
+						path: "col0",
+						label: "Column 0",
+						dataType: "String"
+					}, {
+						key: "col1",
+						path: "col1",
+						label: "Column 1",
+						dataType: "String"
+					}]
+				}
+			},
+			type: new ResponsiveTableType(),
+			columns: [
+				new Column({header: "Col0", template: new Text({text: "{col0}"}), propertyKey: "col0"}),
+				new Column({header: "Col1", template: new Text({text: "{col1}"}), propertyKey: "col1"})
+			],
+			models: new JSONModel({
+				testPath: new Array(10).fill({col0: "a", col1: "b"})
+			})
+		});
+
+		await oTable._fullyInitialized();
+		oTable.setGroupConditions({groupLevels: [{name: "col0"}]});
+		await TableQUnitUtils.waitForBindingInfo(oTable);
+
+		const aItems = oTable._oTable.getItems();
+		assert.ok(aItems.some((oItem) => oItem.isA("sap.m.GroupHeaderListItem")), "Inner table contains a GroupHeaderListItem");
+
+		const oRowTemplate = oTable._oRowTemplate;
+		const iCellsBefore = oRowTemplate.getCells().length;
+		const oColumn1 = oTable.getColumns()[1];
+
+		oTable.removeColumn(oColumn1);
+
+		assert.strictEqual(oRowTemplate.getCells().length, iCellsBefore - 1, "Cell removed from row template");
+		assert.strictEqual(oTable._oTable.getColumns().length, 1, "Inner table column count updated");
+
+		oColumn1.destroy();
+		oTable.destroy();
+	});
 });
