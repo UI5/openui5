@@ -5143,15 +5143,15 @@ sap.ui.define([
 		const oExpected = getDate(Date.UTC(2026, 11, 31, 23, 59, 58, 123));
 
 		// code under test
-		assert.deepEqual(getSample(getDate("2020-01-01Z"), undefined), [oExpected]);
+		assert.deepEqual(getSample(getDate("2020-01-01T00:00:00Z"), undefined), [oExpected]);
 		// code under test
-		assert.deepEqual(getSample(undefined, getDate("2030-06-15Z")), [oExpected]);
+		assert.deepEqual(getSample(undefined, getDate("2030-06-15T00:00:00Z")), [oExpected]);
 		// code under test
-		assert.deepEqual(getSample(getDate("2020-01-01Z"), getDate("2030-01-01Z")), [oExpected]);
+		assert.deepEqual(getSample(getDate("2020-01-01T00:00:00Z"), getDate("2030-01-01T00:00:00Z")), [oExpected]);
 
 		// current-year default falls outside the constraint range -> R1 must NOT apply
 		// code under test- oMaximum is in current year but before Dec 31 -> R2 applies
-		assert.notDeepEqual(getSample(undefined, getDate("2026-01-05Z")), [oExpected]);
+		assert.notDeepEqual(getSample(undefined, getDate("2026-01-05T00:00:00Z")), [oExpected]);
 		// code under test - oMinimum is in current year but after Dec 31 23:59:58.123 -> R2 applies
 		assert.notDeepEqual(getSample(getDate("2026-12-31T23:59:59Z"), undefined), [oExpected]);
 	});
@@ -5161,18 +5161,18 @@ sap.ui.define([
 		const oYearEnd = (iYear) => getDate(Date.UTC(iYear, 11, 31, 23, 59, 58, 123));
 
 		// code under test
-		assert.deepEqual(getSample(getDate("2040-01-01Z"), undefined), [oYearEnd(2040)]);
+		assert.deepEqual(getSample(getDate("2040-01-01T00:00:00Z"), undefined), [oYearEnd(2040)]);
 		// code under test
 		assert.deepEqual(getSample(getDate("2040-12-31T23:59:59Z"), undefined), [oYearEnd(2041)]);
 		// code under test
-		assert.deepEqual(getSample(undefined, getDate("2020-06-15Z")), [oYearEnd(2019)]);
+		assert.deepEqual(getSample(undefined, getDate("2020-06-15T00:00:00Z")), [oYearEnd(2019)]);
 		// code under test
 		assert.deepEqual(getSample(undefined, getDate("2020-12-31T23:59:59.999Z")), [oYearEnd(2020)]);
 
 		// code under test - both, different years
-		assert.deepEqual(getSample(getDate("2038-06-01Z"), getDate("2040-03-15Z")), [oYearEnd(2039)]);
+		assert.deepEqual(getSample(getDate("2038-06-01T00:00:00Z"), getDate("2040-03-15T00:00:00Z")), [oYearEnd(2039)]);
 		// code under test - both, different years
-		assert.deepEqual(getSample(getDate("2038-06-01Z"), getDate("2040-12-31T23:59:59Z")), [oYearEnd(2040)]);
+		assert.deepEqual(getSample(getDate("2038-06-01T00:00:00Z"), getDate("2040-12-31T23:59:59Z")), [oYearEnd(2040)]);
 	});
 
 	//*****************************************************************************************************************
@@ -5180,17 +5180,17 @@ sap.ui.define([
 		const oMonthEnd = (iYear, iMonth, iDay) => getDate(Date.UTC(iYear, iMonth, iDay, 23, 59, 58, 123));
 
 		// code under test
-		assert.deepEqual(getSample(getDate("2040-01-01Z"), getDate("2040-06-15Z")), [oMonthEnd(2040, 4, 31)]);
+		assert.deepEqual(getSample(getDate("2040-01-01T00:00:00Z"), getDate("2040-06-15T00:00:00Z")), [oMonthEnd(2040, 4, 31)]);
 		// code under test
-		assert.deepEqual(getSample(getDate("2040-01-01Z"), getDate("2040-06-30T23:59:59Z")), [oMonthEnd(2040, 5, 30)]);
+		assert.deepEqual(getSample(getDate("2040-01-01T00:00:00Z"), getDate("2040-06-30T23:59:59Z")), [oMonthEnd(2040, 5, 30)]);
 	});
 
 	//*****************************************************************************************************************
 	QUnit.test("getSampleValue: R4 - same year and month - use max", function (assert) {
-		const oMax = getDate("2040-05-21Z");
+		const oMax = getDate("2040-05-21T00:00:00Z");
 
 		// code under test
-		assert.deepEqual(getSample(getDate("2040-05-09Z"), oMax), [oMax]);
+		assert.deepEqual(getSample(getDate("2040-05-09T00:00:00Z"), oMax), [oMax]);
 	});
 
 	//*****************************************************************************************************************
@@ -5199,16 +5199,16 @@ sap.ui.define([
 			.getSampleValue(oMin, oMax);
 
 		// code under test: normal: start = end - 9 days, no clamping
-		assert.deepEqual(getIntervall(getDate("2040-01-01Z"), getDate("2040-06-30T23:59:59Z")),
+		assert.deepEqual(getIntervall(getDate("2040-01-01T00:00:00Z"), getDate("2040-06-30T23:59:59Z")),
 			[[getDate(Date.UTC(2040, 5, 21, 9, 12, 34, 567)), getDate(Date.UTC(2040, 5, 30, 23, 59, 58, 123))]]);
 
-		const oMin = getDate("2040-12-25Z");
+		const oMin = getDate("2040-12-25T00:00:00Z");
 		// code under test: start clamped to min
 		assert.deepEqual(getIntervall(oMin, undefined), [[oMin, getDate(Date.UTC(2040, 11, 31, 23, 59, 58, 123))]]);
 
 		//  code under test: more than 10 days apart
-		assert.deepEqual(getIntervall(getDate("2040-05-09Z"), getDate("2040-05-12Z")),
-			[[getDate("2040-05-09Z"), getDate("2040-05-12Z")]]);
+		assert.deepEqual(getIntervall(getDate("2040-05-09T00:00:00Z"), getDate("2040-05-12T00:00:00Z")),
+			[[getDate("2040-05-09T00:00:00Z"), getDate("2040-05-12T00:00:00Z")]]);
 	});
 
 	//*****************************************************************************************************************
