@@ -10,6 +10,8 @@ sap.ui.define([
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
 	"sap/m/Select",
+	"sap/m/Tokenizer",
+	"sap/m/Token",
 	"sap/ui/core/Item",
 	"sap/m/Title",
 	"sap/m/Input",
@@ -19,6 +21,7 @@ sap.ui.define([
 	"sap/m/MenuButton",
 	"sap/m/Menu",
 	"sap/m/MenuItem",
+	"sap/m/MultiComboBox",
 	"sap/ui/core/Control",
 	"sap/ui/events/KeyCodes",
 	"sap/m/SearchField",
@@ -41,6 +44,8 @@ sap.ui.define([
 	SegmentedButton,
 	SegmentedButtonItem,
 	Select,
+	Tokenizer,
+	Token,
 	Item,
 	Title,
 	Input,
@@ -50,6 +55,7 @@ sap.ui.define([
 	MenuButton,
 	Menu,
 	MenuItem,
+	MultiComboBox,
 	Control,
 	KeyCodes,
 	SearchField,
@@ -775,10 +781,11 @@ sap.ui.define([
 	QUnit.test("tests left/right arrow key navigation", function(assert) {
 		var oLabel = new Label({text : "text"}),
 			oButton = new Button({text : "text"}),
+			oMenuButton = new MenuButton({ text : "text", menu : new Menu({items: [new MenuItem({text: "item1"}), new MenuItem({text: "item2"})]}) }),
 			oLink = new Link({text : "text"}),
 			oTB = createToolbar({
 				Toolbar : {
-					content : [oLink, oLabel, oButton]
+					content : [oLink, oMenuButton, oLabel, oButton]
 				}
 			}),
 			oArrowRightEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_RIGHT }),
@@ -789,7 +796,15 @@ sap.ui.define([
 
 		oTB._moveFocus("forward", oArrowRightEvent);
 
+		assert.strictEqual(document.activeElement, oMenuButton._getButtonControl().getDomRef(), "The next interactive element inside the toolbar is focused on arrow right");
+
+		oTB._moveFocus("forward", oArrowRightEvent);
+
 		assert.strictEqual(document.activeElement, oButton.getDomRef(), "The next interactive element inside the toolbar is focused on arrow right");
+
+		oTB._moveFocus("backward", oArrowLeftEvent);
+
+		assert.strictEqual(document.activeElement, oMenuButton._getButtonControl().getDomRef(), "The previous interactive element inside the toolbar is focused on arrow left");
 
 		oTB._moveFocus("backward", oArrowLeftEvent);
 
@@ -797,6 +812,7 @@ sap.ui.define([
 
 		// Cleanup
 		oLabel.destroy();
+		oMenuButton.destroy();
 		oButton.destroy();
 		oLink.destroy();
 		oTB.destroy();
@@ -884,6 +900,42 @@ sap.ui.define([
 		assert.ok(oDefaultBehaviorSpy.calledOnce, "Default behavior is allowed on arrow down");
 		assert.ok(oDefaultBehaviorSpy.returned(true), "Default behavior is allowed on arrow down");
 		assert.ok(oDefaultBehaviorSpy.getCall(0).args[1].isA("custom.SelectWrapper"), "The default behavior is called with the correct control type");
+
+		// Cleanup
+		oTB.destroy();
+	});
+
+	QUnit.test("_shouldAllowDefaultBehavior on up/down arrow key navigation", function(assert) {
+		var oTokenizer = new Tokenizer({tokens : [new Token({text: "Token 1"}), new Token({text: "Token 2"})]}),
+			oMultiComboBox = new MultiComboBox({items: [new Item({text: "Item 1"}), new Item({text: "Item 2"})]}),
+			oSearchField = new SearchField({enableSuggestions: true}),
+			oTB = createToolbar({
+				Toolbar : {
+					content : [oTokenizer, oMultiComboBox, oSearchField]
+				}
+			}),
+			oArrowUpEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_UP }),
+			oArrowDownEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_DOWN });
+
+		// Test controls array
+		var aControls = [
+			{ control: oTokenizer, name: "tokenizer" },
+			{ control: oMultiComboBox, name: "multiComboBox" },
+			{ control: oSearchField, name: "searchField" }
+		];
+
+		// Iterate through both controls
+		aControls.forEach(function(oControlInfo) {
+			var oControl = oControlInfo.control;
+			var sControlName = oControlInfo.name;
+			var oActiveDomElement = oControl.getFocusDomRef();
+
+			var bShouldAllowOnArrowUp = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oControl, oArrowUpEvent);
+			assert.ok(bShouldAllowOnArrowUp, "The " + sControlName + " should allow default behavior on arrow up");
+
+			var bShouldAllowOnArrowDown = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oControl, oArrowDownEvent);
+			assert.ok(bShouldAllowOnArrowDown, "The " + sControlName + " should allow default behavior on arrow down");
+		});
 
 		// Cleanup
 		oTB.destroy();
