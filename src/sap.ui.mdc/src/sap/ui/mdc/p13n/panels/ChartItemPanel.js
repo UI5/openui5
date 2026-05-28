@@ -768,11 +768,11 @@ sap.ui.define([
 	ChartItemPanel.prototype.removeMoveButtons = function() {
 		const oMoveButtonBox = this._getMoveButtonContainer();
 
-		if (oMoveButtonBox) {
-			oMoveButtonBox.removeItem(this._getMoveBottomButton());
-			oMoveButtonBox.removeItem(this._getMoveDownButton());
-			oMoveButtonBox.removeItem(this._getMoveUpButton());
-			oMoveButtonBox.removeItem(this._getMoveTopButton());
+		if (oMoveButtonBox) { // remove from layout and add as dependent again
+			this.addDependent(oMoveButtonBox.removeItem(this._getMoveBottomButton()));
+			this.addDependent(oMoveButtonBox.removeItem(this._getMoveDownButton()));
+			this.addDependent(oMoveButtonBox.removeItem(this._getMoveUpButton()));
+			this.addDependent(oMoveButtonBox.removeItem(this._getMoveTopButton()));
 		}
 
 	};
@@ -961,7 +961,6 @@ sap.ui.define([
 	};
 
 	ChartItemPanel.prototype.onChangeOfTemplateName = function(oEvent) {
-
 		const sSelectedName = oEvent.getSource().getSelectedKey();
 
 		const oSelectedItem = this._getCleanP13nItems().find((it) => { return it.name === sSelectedName; });
@@ -1001,6 +1000,20 @@ sap.ui.define([
 		if (this.getMessageStrip()) {
 			this._setMessageStrip();
 		}
+		//set focus to newly added item
+		setTimeout(() => {
+			if (!this._oListControl || this._oListControl.isDestroyed()) {
+				return;
+			}
+			const oListItems = this._oListControl.getItems();
+			const oAddedItem = oListItems.find((oItem) => {
+				const oContext = oItem.getBindingContext(this.P13N_MODEL);
+				return oContext && oContext.getProperty("name") === sSelectedName && oContext.getProperty("kind") === oSelectedItem.kind;
+			});
+			if (oAddedItem) {
+				oAddedItem.getCells()[0].focus();
+			}
+		}, 0);
 	};
 
 	ChartItemPanel.prototype._refreshP13nModel = function() {
