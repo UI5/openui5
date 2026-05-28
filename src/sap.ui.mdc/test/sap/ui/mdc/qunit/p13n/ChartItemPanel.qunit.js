@@ -59,7 +59,7 @@ sap.ui.define([
 				}
 			];
 
-			this.oChartItemPanel = new ChartItemPanel({panelConfig: oChartConfig, errorConfig: oErrorConfig});
+			this.oChartItemPanel = new ChartItemPanel("CIP", {panelConfig: oChartConfig, errorConfig: oErrorConfig});
 			this.oChartItemPanel.setP13nData(aItems);
 			this.oChartItemPanel.placeAt("qunit-fixture");
 		}.bind(this),
@@ -573,7 +573,7 @@ sap.ui.define([
 
 	QUnit.module("IllustratedMessage related errors", {
 		beforeEach: function(){
-			this.oChartItemPanel = new ChartItemPanel();
+			this.oChartItemPanel = new ChartItemPanel("CIP");
 			this.oChartItemPanel.placeAt("qunit-fixture");
 		}.bind(this),
 		afterEach: function(){
@@ -956,7 +956,7 @@ sap.ui.define([
 
 	QUnit.module("SortPanel API only tests", {
 		beforeEach: function(){
-			this.oChartItemPanel = new ChartItemPanel();
+			this.oChartItemPanel = new ChartItemPanel("CIP");
 			this.oChartItemPanel.placeAt("qunit-fixture");
 		}.bind(this),
 		afterEach: function(){
@@ -983,7 +983,7 @@ sap.ui.define([
 		this.oChartItemPanel.onChangeOfTemplateName(mockEvent);
 		assert.equal(oComboBox.getValueState(), ValueState.None, "Error state is reset");
 
-
+		oComboBox.destroy();
 	}.bind(this));
 
 	QUnit.test("_createListItem", function(assert){
@@ -1083,7 +1083,7 @@ sap.ui.define([
 				}
 			];
 
-			this.oChartItemPanel = new ChartItemPanel({panelConfig: oChartConfig, errorConfig: oErrorConfig});
+			this.oChartItemPanel = new ChartItemPanel("CIP", {panelConfig: oChartConfig, errorConfig: oErrorConfig});
 			this.oChartItemPanel.setP13nData(aItems);
 			this.oChartItemPanel.placeAt("qunit-fixture");
 		}.bind(this),
@@ -1202,4 +1202,86 @@ sap.ui.define([
 		oSpyUpdateButtons.restore();
 	}.bind(this));
 
+	QUnit.module("Accessibility - Focus Management", {
+		beforeEach: async function(){
+			await nextUIUpdate();
+
+			const aItems = [
+				{
+					label: "Test",
+					name: "test",
+					visible: true,
+					kind: "Dimension",
+					role: "category"
+				},
+				{
+					label: "Test2",
+					name: "test2",
+					visible: true,
+					kind: "Measure",
+					role: "axis1"
+				},
+				{
+					label: "Test4",
+					name: "test4",
+					visible: false,
+					kind: "Measure",
+					role: "axis1"
+				}
+			];
+
+			this.oChartItemPanel = new ChartItemPanel("CIP", {panelConfig: oChartConfig, errorConfig: oErrorConfig});
+			this.oChartItemPanel.setP13nData(aItems);
+			this.oChartItemPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		}.bind(this),
+		afterEach: function(){
+			this.oChartItemPanel?.destroy();
+			this.oChartItemPanel = null;
+		}.bind(this)
+	});
+
+	QUnit.test("Focus is set on newly added item after ComboBox selection", function(assert){
+		// Arrange
+		const done = assert.async();
+
+		// Get existing ComboBox from map or let the panel create it
+		let oComboBox = this.oChartItemPanel._mTemplatesMap.get("Measure");
+		if (!oComboBox) {
+			oComboBox = this.oChartItemPanel._getTemplateComboBox("Measure");
+		}
+
+		const oMockEvent = {
+			getSource: function() {
+				return oComboBox;
+			}
+		};
+
+		// Stub to simulate selecting an item
+		sinon.stub(oComboBox, "getSelectedKey").returns("test4");
+
+		// Act
+		this.oChartItemPanel.onChangeOfTemplateName(oMockEvent);
+
+		// Assert - Check focus after setTimeout completes
+		setTimeout(function() {
+			const oListItems = this.oChartItemPanel._oListControl.getItems();
+			const oAddedItem = oListItems.find((oItem) => {
+				const oContext = oItem.getBindingContext(this.oChartItemPanel.P13N_MODEL);
+				return oContext && oContext.getProperty("name") === "test4";
+			});
+
+			assert.ok(oAddedItem, "Added item was found in list");
+			const oFocusedElement = document.activeElement;
+			const oFirstCell = oAddedItem.getCells()[0];
+
+			// Check if focus is on the first cell or its inner control
+			assert.ok(
+				oFocusedElement === oFirstCell.getDomRef() || oFirstCell.getDomRef().contains(oFocusedElement),
+				"Focus is set on the first cell of the newly added item"
+			);
+
+			done();
+		}.bind(this), 50);
+	}.bind(this));
 });
