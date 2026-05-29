@@ -351,8 +351,11 @@ sap.ui.define([
 			this.oControl.setDynamicVariantsLoadedCallback = (fn) => {
 				fnCallback = fn;
 			};
-			this.oControl.addVariant = (oVariant) => {
-				assert.ok(oVariant.getVariantId(), "only variants are added to the control");
+			this.oControl.addVariants = (aVariants) => {
+				assert.ok(Array.isArray(aVariants), "addVariants is called with an array");
+				aVariants.forEach((oVariant) => {
+					assert.ok(oVariant.getVariantId(), "only variants are added to the control");
+				});
 			};
 
 			sandbox.stub(LrepConnector, "loadFlexData").resolves({});

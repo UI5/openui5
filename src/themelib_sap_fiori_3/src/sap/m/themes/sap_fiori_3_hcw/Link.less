@@ -17,10 +17,12 @@
 	color: var(--sapLinkColor);
 }
 
-.sapMLnkSubtle:focus {
+.sapMLnkSubtle:focus,
+.sapMLnkSubtle:focus-visible {
 	color: var(--sapContent_FocusColor);
 }
 
+.sapMLnk:focus-visible:not(.sapMLnkDsbl),
 html.sap-desktop .sapMLnk:focus:not(.sapMLnkDsbl) {
 	outline: 0.125rem dotted var(--sapContent_FocusColor);
 }
@@ -30,6 +32,7 @@ html.sap-desktop .sapMLnk:hover:not(.sapMLnkDsbl) {
 }
 
 .sapMLnk:hover.sapMLnkDsbl,
+.sapMLnk:focus-visible.sapMLnkDsbl,
 .sapMLnk:focus.sapMLnkDsbl {
 	outline: none;
 }

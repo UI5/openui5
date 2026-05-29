@@ -1,0 +1,24 @@
+/* Strip the Page's own content padding — every section manages its own */
+.demoApp .sapMPageEnableScrolling {
+	padding: 0;
+}
+
+/* Standard section: full padding on all sides + top border as divider */
+.demoSection {
+	padding: 1rem;
+	border-top: 0.0625rem solid var(--sapGroup_TitleBorderColor);
+}
+.demoSection:first-child {
+	border-top: none;
+}
+
+/* Scenario 5 heading row: normal padding */
+.demoSection5Head {
+	padding: 1rem 1rem 0.5rem;
+	border-top: 0.0625rem solid var(--sapGroup_TitleBorderColor);
+}
+
+/* Scenario 5 avatar row: no left padding so the Avatar starts at x = 0 */
+.demoSection5Edge {
+	padding: 0 1rem 1rem 0;
+}

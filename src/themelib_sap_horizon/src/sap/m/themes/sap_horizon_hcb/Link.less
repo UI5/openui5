@@ -43,6 +43,9 @@ html.sap-desktop .sapMLnk:not(.sapMLnkDsbl) {
 
 .sapMLnk:not(.sapMLnkDsbl) {
 	text-shadow: var(--sapContent_TextShadow);
+	&:focus-visible {
+		outline: 0.125rem dotted var(--sapContent_FocusColor);
+	}
 }
 
 /* align Link in Form with Label */

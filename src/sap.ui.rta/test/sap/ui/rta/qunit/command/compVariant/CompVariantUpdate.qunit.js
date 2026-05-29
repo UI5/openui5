@@ -98,7 +98,7 @@ sap.ui.define([
 			var oRemoveControlStub = sandbox.stub();
 			this.oControl.removeVariant = oRemoveControlStub;
 			var oAddControlStub = sandbox.stub();
-			this.oControl.addVariant = oAddControlStub;
+			this.oControl.addVariants = oAddControlStub;
 			var oSetDefaultControlStub = sandbox.stub();
 			this.oControl.setDefaultVariantId = oSetDefaultControlStub;
 			var oSetModifiedStub = sandbox.stub();
@@ -198,10 +198,13 @@ sap.ui.define([
 				assert.equal(oRevertFlAPIStub.getCall(2).args[0].id, "variant3", "the correct variant id was passed 3");
 
 				assert.equal(oRevertDefaultFlAPIStub.callCount, 1, "the revertSetDefaultVariantId function was called once");
-				assert.equal(oAddControlStub.lastCall.args[0].getId(), "variant1", "the correct variant was added");
 
-				assert.equal(oAddControlStub.callCount, 1, "the addVariant function on the control was called once");
-				assert.equal(oAddControlStub.lastCall.args[0].getId(), "variant1", "the correct variant was added");
+				assert.equal(oAddControlStub.callCount, 1, "the addVariants function on the control was called once");
+				assert.deepEqual(
+					oAddControlStub.lastCall.args[0].map((oVariant) => oVariant.getId()),
+					["variant1"],
+					"with the deleted variants array containing the reverted variant"
+				);
 
 				assert.equal(oUpdateControlStub.callCount, 4, "the updateVariant function on the control was called twice");
 				assert.equal(oUpdateControlStub.getCall(2).args[0].getId(), "variant2", "the correct variant was updated 1");

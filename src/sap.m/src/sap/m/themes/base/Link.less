@@ -54,7 +54,6 @@
 }
 
 html.sap-desktop .sapMLnk:not(.sapMLnkDsbl) {
-
 	&:focus {
 		outline: 1px dotted var(--sapContent_FocusColor);
 		outline-offset: -1px;
@@ -65,6 +64,12 @@ html.sap-desktop .sapMLnk:not(.sapMLnkDsbl) {
 		color: var(--sapLink_Hover_Color);
 		text-decoration: var(--sapLink_Hover_TextDecoration);
 	}
+}
+
+.sapMLnk:not(.sapMLnkDsbl):focus-visible {
+	outline: 1px dotted var(--sapContent_FocusColor);
+	outline-offset: -1px;
+	text-decoration: underline;
 }
 
 .sapUiInverted-CTX .sapUiLnk {
@@ -114,6 +119,10 @@ html.sap-desktop .sapUiSizeCondensed .sapUiTableCell {
 		padding-left: 2.5px;
 		padding-right: 2.5px;
 	}
+}
+
+.sapUiSizeCondensed .sapUiTableCell.sapMLnk:focus-visible:not(.sapMLnkDsbl) {
+	outline-offset: -2.5px;
 }
 
 .sapUiForm .sapMLnk {

@@ -792,6 +792,19 @@ sap.ui.define([
 					fnEnsureAtLeastOneItemMove();
 				}
 
+				if (iScrollSize === 0) {
+					var oScrollDom = $scrollContainer[0];
+					var iPos = bHorizontal ? oScrollDom.scrollLeft : oScrollDom.scrollTop;
+					var iVisible = bHorizontal ? oScrollDom.clientWidth : oScrollDom.clientHeight;
+					var iTotal = bHorizontal ? oScrollDom.scrollWidth : oScrollDom.scrollHeight;
+					if (bForward && iPos + iVisible < iTotal) {
+						return this.getScrollStep();
+					}
+					if (!bForward && iPos > 0) {
+						return -this.getScrollStep();
+					}
+				}
+
 				return iScrollSize;
 			}
 
