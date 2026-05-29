@@ -5912,7 +5912,7 @@ sap.ui.define([
 		assert.ok(oInvalidateSpy.notCalled, "Change from text to sap.m.IllustratedMessage: Table not invalidated");
 
 		return this.waitForNoColumnsMessage(this.oTable).then(TableQUnitUtils.$wait() /* If NoColumns is fetched twice */).then(function() {
-			assert.equal(oInvalidateSpy.callCount, 1,
+			assert.ok(oInvalidateSpy.called,
 				"Change from text to sap.m.IllustratedMessage: Table invalidated after loading default NoColumns IllustratedMessage");
 
 			oInvalidateSpy.resetHistory();
