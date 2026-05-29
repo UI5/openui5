@@ -1397,9 +1397,7 @@ sap.ui.define([
 			const bIsSelected = oRow._isSelected();
 
 			if ($Ref.row) {
-				$Ref.row.not($Ref.rowHeaderPart).not($Ref.rowActionPart).add(
-					$Ref.row.children(".sapUiTableCell")
-				).attr("aria-selected", bIsSelected ? "true" : "false");
+				$Ref.row.not($Ref.rowHeaderPart).not($Ref.rowActionPart).attr("aria-selected", bIsSelected ? "true" : "false");
 			}
 		}
 	};
