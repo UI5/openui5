@@ -531,6 +531,11 @@ sap.ui.define([
 
 		//Don't handle focus on button presses as this messes up event propagation
 		if (oTarget instanceof Button){
+			// But we still need to handle focus on the remove button to show move buttons when navigating backwards
+			const oListItem = oTarget.getParent().getParent?.();
+			if (oListItem?.isA("sap.m.ColumnListItem")) {
+				this._handleActivated(oListItem);
+			}
 			return;
 		}
 
@@ -539,14 +544,19 @@ sap.ui.define([
 
 	ChartItemPanel.prototype._handleActivated = function(oHoveredItem) {
 		const oItem = this._getModelItemByTableItem(oHoveredItem);
-		if (oItem && oItem.template) {
+		if (this._oHoveredItem !== oHoveredItem || (oItem && oItem.template)) {
 			this.removeMoveButtons();
+		}
+		if (this._oHoveredItem === oHoveredItem) {
+			return;
 		}
 
 		this._oHoveredItem = oHoveredItem;
-		this._updateEnableOfMoveButtons(oHoveredItem, false);
-		this._addMoveButtons(oHoveredItem);
-		this._setMoveButtonVisibility(true);
+		if (!oItem || !oItem.template) {
+			this._addMoveButtons(oHoveredItem);
+			this._setMoveButtonVisibility(true);
+			this._updateEnableOfMoveButtons(oHoveredItem, false);
+		}
 
 	};
 
@@ -609,10 +619,10 @@ sap.ui.define([
 		const oMoveButtonBox = this._getMoveButtonContainer();
 
 		if (oMoveButtonBox){
-			oMoveButtonBox.removeItem(this._getMoveBottomButton());
-			oMoveButtonBox.removeItem(this._getMoveDownButton());
-			oMoveButtonBox.removeItem(this._getMoveUpButton());
-			oMoveButtonBox.removeItem(this._getMoveTopButton());
+			this.addDependent(oMoveButtonBox.removeItem(this._getMoveBottomButton()));
+			this.addDependent(oMoveButtonBox.removeItem(this._getMoveDownButton()));
+			this.addDependent(oMoveButtonBox.removeItem(this._getMoveUpButton()));
+			this.addDependent(oMoveButtonBox.removeItem(this._getMoveTopButton()));
 		}
 
 	};
@@ -648,13 +658,13 @@ sap.ui.define([
 
 		if (oTableItem.getCells() && (oTableItem.getCells().length === 2 || oTableItem.getCells().length === 3) && !bIgnore){
 			if (this._bMobileMode){
-				oTableItem.getCells()[1].insertItem(this._getMoveDownButton(), 0);
 				oTableItem.getCells()[1].insertItem(this._getMoveUpButton(), 0);
+				oTableItem.getCells()[1].insertItem(this._getMoveDownButton(), 1);
 			} else {
-				oTableItem.getCells()[2].insertItem(this._getMoveBottomButton(), 0);
-				oTableItem.getCells()[2].insertItem(this._getMoveDownButton(), 0);
-				oTableItem.getCells()[2].insertItem(this._getMoveUpButton(), 0);
 				oTableItem.getCells()[2].insertItem(this._getMoveTopButton(), 0);
+				oTableItem.getCells()[2].insertItem(this._getMoveUpButton(), 1);
+				oTableItem.getCells()[2].insertItem(this._getMoveDownButton(), 2);
+				oTableItem.getCells()[2].insertItem(this._getMoveBottomButton(), 3);
 			}
 
 		}
@@ -819,6 +829,21 @@ sap.ui.define([
 
 			this._mInvalidMap.delete(oEvent.getSource().getValue());
 			this._updateVisibleIndexes();
+
+			//set focus to newly added item
+			setTimeout(() => {
+				if (!this._oListControl || this._oListControl.isDestroyed()) {
+					return;
+				}
+				const oListItems = this._oListControl.getItems();
+				const oAddedItem = oListItems.find((oItem) => {
+					const oContext = oItem.getBindingContext(this.P13N_MODEL);
+					return oContext && oContext.getProperty("name") === sSelectedName && oContext.getProperty("kind") === oSelectedItem.kind;
+				});
+				if (oAddedItem) {
+					oAddedItem.getCells()[0].focus();
+				}
+			}, 0);
 		} else if (oEvent.getSource() && oEvent.getSource() instanceof ComboBox) {
 
 			if (oEvent.getSource().getValue() != "") {
