@@ -20,6 +20,7 @@
 	text-decoration: none;
 }
 
+.sapMLnkSubtle:focus-visible,
 .sapMLnkSubtle:focus {
 	color: var(--sapContent_FocusColor);
 }
@@ -33,7 +34,8 @@
 }
 
 .sapMLnk:active:not(.sapMLnkDsbl),
-.sapMLnk:focus:not(.sapMLnkDsbl) {
+.sapMLnk:focus:not(.sapMLnkDsbl)
+.sapMLnk:focus-visible:not(.sapMLnkDsbl) {
 	color: var(--sapLink_Active_Color);
 }
 

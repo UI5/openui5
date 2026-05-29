@@ -121,10 +121,18 @@ sap.ui.define([
 			callFlAPIFunction.call(this, "revert", sVariantId, {});
 			this.getElement().setModified(this.getIsModifiedBefore());
 		} else {
+			const aRevertedEntries = [];
+			const aDeletedVariants = [];
 			each(this.getNewVariantProperties(), (sVariantId, oValue) => {
 				const oVariant = callFlAPIFunction.call(this, "revert", sVariantId, {});
+				aRevertedEntries.push({ id: sVariantId, value: oValue, variant: oVariant });
 				if (oValue.deleted) {
-					this.getElement().addVariant(oVariant);
+					aDeletedVariants.push(oVariant);
+				}
+			});
+			this.getElement().addVariants(aDeletedVariants);
+			aRevertedEntries.forEach(({ id: sVariantId, value: oValue, variant: oVariant }) => {
+				if (oValue.deleted) {
 					// If the current selected variant is deleted, the undo action should reactivate it
 					if (this.getOldSelectedVariantId() === sVariantId) {
 						this.getElement().activateVariant(sVariantId);

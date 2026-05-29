@@ -1570,4 +1570,17 @@ sap.ui.define([
 		assert.notOk(oAvatar._bSpacePressed, "Space key is unmarked as pressed");
 		assert.notOk(oAvatar._bShouldInterupt, sKey + " key is unmarked as pressed");
 	}
+
+	QUnit.module("IFormContent", {
+		beforeEach: setupFunction,
+		afterEach: teardownFunction
+	});
+
+	QUnit.test("Implements sap.ui.core.IFormContent interface", function(assert) {
+		assert.ok(this.oAvatar.isA("sap.ui.core.IFormContent"), "Avatar implements IFormContent interface");
+	});
+
+	QUnit.test("Method 'getFormDoNotAdjustWidth' always returns true", function(assert) {
+		assert.equal(this.oAvatar.getFormDoNotAdjustWidth(), true, "The method returns true");
+	});
 });
