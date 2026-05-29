@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/ui/table/library",
 	"sap/ui/table/RowSettings",
 	"sap/ui/core/Control",
+	"sap/ui/core/Lib",
 	"sap/ui/core/Theming",
 	"sap/ui/core/InvisibleMessage",
 	"sap/ui/core/message/MessageType",
@@ -31,6 +32,7 @@ sap.ui.define([
 	TableLibrary,
 	RowSettings,
 	Control,
+	Lib,
 	Theming,
 	InvisibleMessage,
 	MessageType,
@@ -790,6 +792,7 @@ sap.ui.define([
 	QUnit.test("showNotificationPopoverAtIndex", async function(assert) {
 		const oAfterOpenSpy = sinon.spy();
 		const fnInvisibleMessageAnnounce = sinon.spy(InvisibleMessage.prototype, "announce");
+		const sWarning = Lib.getResourceBundleFor("sap.m").getText("SEMANTIC_COLOR_CRITICAL");
 		let sMessage;
 
 		assert.notOk(oTable._oNotificationPopover, "the notification popover is not initialized");
@@ -803,7 +806,7 @@ sap.ui.define([
 		const oOpenSpy = sinon.spy(oTable._oNotificationPopover, "openBy");
 		const oCloseSpy = sinon.spy(oTable._oNotificationPopover, "close");
 		oTable._oNotificationPopover.attachAfterOpen(oAfterOpenSpy);
-		assert.ok(fnInvisibleMessageAnnounce.calledOnceWith(sMessage), "The message text is announced");
+		assert.ok(fnInvisibleMessageAnnounce.calledOnceWith(sWarning + ". " + sMessage), "The message text is announced");
 		oTable.fireFirstVisibleRowChanged({firstVisibleRow: 1});
 		assert.ok(oCloseSpy.calledOnce, "the popover closes on scroll");
 		fnInvisibleMessageAnnounce.resetHistory();
@@ -814,7 +817,7 @@ sap.ui.define([
 			"the notification message is correct");
 		oOpenSpy.calledOnceWithExactly(oTable.getRows()[1].getDomRefs().rowSelector, "the popover is opened by the correct element");
 		assert.ok(oAfterOpenSpy.calledOnce, "the afterOpen event is fired");
-		assert.ok(fnInvisibleMessageAnnounce.calledOnceWith(sMessage), "The message text is announced");
+		assert.ok(fnInvisibleMessageAnnounce.calledOnceWith(sWarning + ". " + sMessage), "The message text is announced");
 
 		oTable._oNotificationPopover.close();
 		oAfterOpenSpy.resetHistory();
@@ -827,7 +830,7 @@ sap.ui.define([
 			"the notification message is correct");
 		oOpenSpy.calledOnceWithExactly(oTable.getRows()[2].getDomRefs().rowSelector);
 		assert.ok(oAfterOpenSpy.calledOnce, "the popover is opened by the correct element");
-		assert.ok(fnInvisibleMessageAnnounce.calledOnceWith(sMessage), "The message text is announced");
+		assert.ok(fnInvisibleMessageAnnounce.calledOnceWith(sWarning + ". " + sMessage), "The message text is announced");
 
 		oTable._oNotificationPopover.close();
 		oAfterOpenSpy.resetHistory();
