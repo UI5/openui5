@@ -29,6 +29,9 @@ sap.ui.define([
 		oMockServer2.start();
 
 		assert.notStrictEqual(oMockServer1._oDraftMetadata, oMockServer2._oDraftMetadata);
+
+		oMockServer1.destroy();
+		oMockServer2.destroy();
 	});
 
 	QUnit.test("mock data generation", function (assert) {

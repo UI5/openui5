@@ -133,7 +133,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("create: no aggregation? no $$filterOnAggregate!", function (assert) {
+	QUnit.test("create: no aggregation? no oFirstLevel/$$filterOnAggregate!", function (assert) {
 		this.mock(_AggregationHelper).expects("hasGrandTotal").never();
 		this.mock(_AggregationHelper).expects("hasMinOrMax").never();
 		this.mock(_MinMaxHelper).expects("createCache").never();
@@ -141,6 +141,13 @@ sap.ui.define([
 		const mQueryOptions = {
 			$$filterOnAggregate : "" // even falsy values not allowed...
 		};
+
+		assert.throws(function () {
+			// code under test
+			_AggregationCache.create("~requestor~", "resource/path", "deep/resource/path",
+				mQueryOptions, /*oAggregation*/null, "~sortExpandSelect~", "~sharedRequest~",
+				/*bIsGrouped*/"n/a", "~oFirstLevel~");
+		}, new Error("Unsupported oFirstLevel"));
 
 		assert.throws(function () {
 			// code under test
@@ -233,6 +240,10 @@ sap.ui.define([
 		message : "Unsupported recursive hierarchy together with min/max"
 	}, {
 		hasMinOrMax : true,
+		message : "Unsupported oFirstLevel together with min/max",
+		oFirstLevel : "~oFirstLevel~"
+	}, {
+		hasMinOrMax : true,
 		message : "Unsupported $$sharedRequest together with min/max",
 		bSharedRequest : true
 	}, {
@@ -297,7 +308,7 @@ sap.ui.define([
 			assert.throws(function () {
 				// code under test
 				_AggregationCache.create(this.oRequestor, "Foo", "", mQueryOptions, oAggregation,
-					false, oFixture.bSharedRequest, oFixture.bIsGrouped);
+					false, oFixture.bSharedRequest, oFixture.bIsGrouped, oFixture.oFirstLevel);
 			}, new Error(oFixture.message));
 		});
 	});
@@ -373,9 +384,11 @@ sap.ui.define([
 	}, { // recursive hierarchy
 		hierarchyQualifier : "X"
 	}].forEach(function (oAggregation, i) {
-		QUnit.test("create: #" + i, function (assert) {
+		[false, true].forEach(function (bFirstLevel) {
+		QUnit.test("create: #" + i + " w/ oFirstLevel: " + bFirstLevel, function (assert) {
 			var oCache,
 				oDoResetExpectation,
+				oFirstLevel = bFirstLevel ? {mChangeRequests : "~mChangeRequests~"} : undefined,
 				bHasGrandTotal = i === 0,
 				// Note: $expand/$select and $filter only allowed for recursive hierarchy
 				mQueryOptions = oAggregation.hierarchyQualifier ? {
@@ -396,7 +409,8 @@ sap.ui.define([
 			this.mock(_MinMaxHelper).expects("createCache").never();
 			this.mock(_Cache).expects("create").never();
 			oDoResetExpectation = this.mock(_AggregationCache.prototype).expects("doReset")
-				.withExactArgs(sinon.match.same(oAggregation), bHasGrandTotal)
+				.withExactArgs(sinon.match.same(oAggregation), bHasGrandTotal,
+					sinon.match.same(oFirstLevel))
 				.callsFake(function () {
 					this.oFirstLevel = {
 						addKeptElement : "~addKeptElement~",
@@ -409,7 +423,7 @@ sap.ui.define([
 
 			// code under test
 			oCache = _AggregationCache.create(this.oRequestor, "resource/path", "~n/a~", mQueryOptions,
-				oAggregation);
+				oAggregation, false, false, false, oFirstLevel);
 
 			// "super" call
 			assert.ok(oCache instanceof _AggregationCache, "module value is c'tor function");
@@ -434,7 +448,13 @@ sap.ui.define([
 			assert.strictEqual(oCache.isDeletingInOtherGroup(), false); // <-- code under test
 			assert.ok(oCache.oTreeState instanceof _TreeState);
 			assert.strictEqual(oCache.oTreeState.sNodeProperty, i === 2 ? "node/property" : undefined);
-			assert.strictEqual(oCache.bUnifiedCache, false);
+			assert.strictEqual(oCache.bUnifiedCache, bFirstLevel);
+			assert.strictEqual(oCache.bKeptFirstLevel, bFirstLevel);
+			if (bFirstLevel) {
+				assert.strictEqual(oCache.mChangeRequests, "~mChangeRequests~");
+			} else {
+				assert.deepEqual(oCache.mChangeRequests, {});
+			}
 
 			this.mock(oCache).expects("getTypes").withExactArgs().returns("~types~");
 			this.mock(_Helper).expects("getKeyFilter")
@@ -442,6 +462,7 @@ sap.ui.define([
 
 			// code under test: callback function provided for _TreeState c'tor
 			assert.strictEqual(oCache.oTreeState.fnGetKeyFilter("~node~"), "~filter~");
+		});
 		});
 	});
 
@@ -615,9 +636,15 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	[undefined, {}].forEach(function (oParentGroupNode, i) {
-		QUnit.test("createGroupLevelCache: recursive hierarchy, #" + i, function (assert) {
+		[false, true].forEach(function (bReuse) {
+			const sTitle = "createGroupLevelCache: recursive hierarchy, #" + i
+				+ ", w/ cache to reuse: " + bReuse;
+
+		QUnit.test(sTitle, function (assert) {
 			var oAggregation = {hierarchyQualifier : "X"},
-				oCache = {},
+				oCache = {
+					setQueryOptions : mustBeMocked
+				},
 				mCacheQueryOptions = {},
 				iLevel = oParentGroupNode ? 3 : 1,
 				mQueryOptions = {
@@ -648,12 +675,15 @@ sap.ui.define([
 					})),
 					iLevel) // actually, we currently do not care about this level for RH...
 				.returns(mCacheQueryOptions);
-			this.mock(_Cache).expects("create")
+			const oCacheQueryOptionsMatcher = sinon.match(function (o) {
+				// Note: w/o grand total, buildApply determines the query options to be used!
+				return o.$count && o === mCacheQueryOptions;
+			});
+			this.mock(oCache).expects("setQueryOptions").exactly(bReuse ? 1 : 0)
+				.withExactArgs(oCacheQueryOptionsMatcher);
+			this.mock(_Cache).expects("create").exactly(bReuse ? 0 : 1)
 				.withExactArgs(sinon.match.same(oAggregationCache.oRequestor), "Foo",
-					sinon.match(function (o) {
-						// Note: w/o grand total, buildApply determines the query options to be used!
-						return o.$count && o === mCacheQueryOptions;
-					}), true)
+					oCacheQueryOptionsMatcher, true)
 				.returns(oCache);
 			// This must be done before calling createGroupLevelCache, so that bind grabs the mock
 			this.mock(_AggregationCache).expects("calculateKeyPredicate").never();
@@ -664,7 +694,8 @@ sap.ui.define([
 
 			assert.strictEqual(
 				// code under test
-				oAggregationCache.createGroupLevelCache(oParentGroupNode, false),
+				oAggregationCache.createGroupLevelCache(oParentGroupNode, false,
+					bReuse ? oCache : undefined),
 				oCache
 			);
 
@@ -679,6 +710,7 @@ sap.ui.define([
 			} else {
 				assert.notOk("$parentFilter" in oCache);
 			}
+		});
 		});
 	});
 
@@ -725,7 +757,7 @@ sap.ui.define([
 			this.mock(oCache).expects("setQueryOptions").exactly(bCount && i > 1 ? 1 : 0)
 				.withExactArgs({$count : true, $$leaves : true});
 			this.mock(oCache).expects("createGroupLevelCache").exactly(bHasFirstLevel ? 0 : 1)
-				.withExactArgs(null, bHasGrandTotal || bCountLeaves)
+				.withExactArgs(null, bHasGrandTotal || bCountLeaves, "~oFirstLevel~")
 				.returns("~oFirstLevelCache~");
 			let fnLeaves;
 			let fnGrandTotal;
@@ -756,7 +788,7 @@ sap.ui.define([
 			oCache.mQueryOptions = mQueryOptions;
 
 			// code under test
-			oCache.doReset(oNewAggregation, bHasGrandTotal);
+			oCache.doReset(oNewAggregation, bHasGrandTotal, "~oFirstLevel~");
 
 			assert.strictEqual(oCache.oAggregation, oNewAggregation);
 			assert.strictEqual(oCache.sToString, "~sDownloadUrl~");
@@ -4926,12 +4958,14 @@ sap.ui.define([
 		[false, true].forEach(function (bHasGrandTotal) {
 			[false, true].forEach(function (bDataAggregation) {
 				[false, true].forEach(function (bHasCreated) {
+					[false, true].forEach(function (bKeptFirstLevel) {
 		var sTitle = "reset: sGroupId = " + sGroupId + ", has grand total = " + bHasGrandTotal
-				+ ", data aggregation = " + bDataAggregation + ", has $created = " + bHasCreated;
+				+ ", data aggregation = " + bDataAggregation + ", has $created = " + bHasCreated
+				+ ", has kept oFirstLevel = " + bKeptFirstLevel;
 
 		QUnit.test(sTitle, function (assert) {
 			var oCache = _AggregationCache.create(this.oRequestor, "~", "", {},
-				bDataAggregation ? {groupLevels : ["foo"]} : {hierarchyQualifier : "X"}),
+					bDataAggregation ? {groupLevels : ["foo"]} : {hierarchyQualifier : "X"}),
 				oFirstLevel = oCache.oFirstLevel,
 				mKeptElementPredicates = {foo : true, bar : true},
 				oNewAggregation = bDataAggregation
@@ -4948,7 +4982,8 @@ sap.ui.define([
 					foo : "bar",
 					"sap-client" : "123"
 				},
-				sQueryOptions = JSON.stringify(mQueryOptions);
+				sQueryOptions = JSON.stringify(mQueryOptions),
+				bReuse = bDataAggregation && bHasCreated || bKeptFirstLevel;
 
 			oCache.aElements.$byPredicate = {
 				bar : {
@@ -4975,10 +5010,11 @@ sap.ui.define([
 			};
 			oCache.oCountPromise = "~oCountPromise~";
 			oCache.bUnifiedCache = "~bUnifiedCache~";
+			oCache.bKeptFirstLevel = bKeptFirstLevel;
 			oCache.oGrandTotalPromise = "~oGrandTotalPromise~";
 			assert.strictEqual(oCache.aElements.$created, 0);
 			const oFirstLevelMock = this.mock(oCache.oFirstLevel);
-			oFirstLevelMock.expects("getCreated").exactly(bDataAggregation ? 2 : 0).withExactArgs()
+			oFirstLevelMock.expects("getCreated").exactly(bDataAggregation ? 1 : 0).withExactArgs()
 				.returns(bHasCreated ? "~$created~" : 0);
 			const oResetExpectation = oFirstLevelMock.expects("reset").on(oCache)
 				.withExactArgs(sinon.match.same(mKeptElementPredicates), sGroupId,
@@ -4995,7 +5031,7 @@ sap.ui.define([
 			this.mock(_AggregationHelper).expects("hasGrandTotal").withExactArgs("~aggregate~")
 				.returns(bHasGrandTotal);
 			const oResetFirstExpectation = oFirstLevelMock.expects("reset").on(oCache.oFirstLevel)
-				.exactly(bDataAggregation && bHasCreated ? 1 : 0)
+				.exactly(bReuse ? 1 : 0)
 				.withExactArgs(sinon.match.same(mKeptElementPredicates), sGroupId, {
 					$$filterBeforeAggregate : "filterBeforeAggregate",
 					$apply : "A.P.P.L.E.",
@@ -5006,7 +5042,7 @@ sap.ui.define([
 				});
 			const oDoResetExpectation = this.mock(oCache).expects("doReset")
 				.withExactArgs(Object.assign({}, oNewAggregation, {$ExpandLevels : "~sExpandLevels~"}),
-					bHasGrandTotal);
+					bHasGrandTotal, bReuse ? oFirstLevel : undefined);
 
 			// code under test
 			oCache.reset(mKeptElementPredicates, sGroupId, mQueryOptions, oNewAggregation);
@@ -5015,7 +5051,7 @@ sap.ui.define([
 				sinon.assert.callOrder(oTreeStateResetExpectation, oGetExpandLevelsExpectation);
 			}
 			sinon.assert.callOrder(oResetExpectation, oGetExpandLevelsExpectation, oDoResetExpectation);
-			if (bDataAggregation && bHasCreated) {
+			if (bReuse) {
 				sinon.assert.callOrder(oResetExpectation, oResetFirstExpectation, oDoResetExpectation);
 				// Note: no order for oGetExpandLevelsExpectation vs. oResetFirstExpectation
 			}
@@ -5039,7 +5075,7 @@ sap.ui.define([
 				}
 			});
 			if (sGroupId) {
-				const oExpectedBackupFirstLevel = bDataAggregation && bHasCreated ? null : oFirstLevel;
+				const oExpectedBackupFirstLevel = bReuse ? null : oFirstLevel;
 				assert.deepEqual(oCache.oBackup, {
 					oCountPromise : "~oCountPromise~",
 					oFirstLevel : oExpectedBackupFirstLevel,
@@ -5047,15 +5083,16 @@ sap.ui.define([
 					bUnifiedCache : "~bUnifiedCache~"
 				});
 				assert.strictEqual(oCache.oBackup.oFirstLevel, oExpectedBackupFirstLevel);
-				assert.strictEqual(oCache.bUnifiedCache, !bDataAggregation);
+				assert.strictEqual(oCache.bUnifiedCache, bKeptFirstLevel || !bDataAggregation);
 			} else {
 				assert.strictEqual(oCache.oBackup, null);
+				assert.strictEqual(oCache.bUnifiedCache, "~bUnifiedCache~");
 			}
 			assert.strictEqual(JSON.stringify(oNewAggregation), sNewAggregation, "unchanged");
-			assert.strictEqual(oCache.oFirstLevel,
-				bDataAggregation && bHasCreated ? oFirstLevel : null);
+			assert.strictEqual(oCache.oFirstLevel, null);
 			assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptions, "unchanged");
 		});
+					});
 				});
 			});
 		});

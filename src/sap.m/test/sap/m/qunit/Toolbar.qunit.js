@@ -1012,9 +1012,10 @@ sap.ui.define([
 	QUnit.test("_shouldAllowDefaultBehavior on up/down arrow key navigation", function(assert) {
 		var oTokenizer = new Tokenizer({tokens : [new Token({text: "Token 1"}), new Token({text: "Token 2"})]}),
 			oMultiComboBox = new MultiComboBox({items: [new Item({text: "Item 1"}), new Item({text: "Item 2"})]}),
+			oSearchField = new SearchField({enableSuggestions: true}),
 			oTB = createToolbar({
 				Toolbar : {
-					content : [oTokenizer, oMultiComboBox]
+					content : [oTokenizer, oMultiComboBox, oSearchField]
 				}
 			}),
 			oArrowUpEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_UP }),
@@ -1023,7 +1024,8 @@ sap.ui.define([
 		// Test controls array
 		var aControls = [
 			{ control: oTokenizer, name: "tokenizer" },
-			{ control: oMultiComboBox, name: "multiComboBox" }
+			{ control: oMultiComboBox, name: "multiComboBox" },
+			{ control: oSearchField, name: "searchField" }
 		];
 
 		// Iterate through both controls

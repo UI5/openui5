@@ -1379,6 +1379,9 @@ sap.ui.define([
 	 * @param {sap.ui.model.odata.v4.Context} [oContext]
 	 *   The context for which to request side effects; if this parameter is missing or if it is the
 	 *   header context of a list binding, the whole binding is affected
+	 * @param {boolean} [bSkipKeptElements]
+	 *   If <code>true</code>, kept elements are not refreshed (in case of an empty path affecting
+	 *   the whole binding)
 	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result, or rejected with an error if loading
 	 *   of side effects fails

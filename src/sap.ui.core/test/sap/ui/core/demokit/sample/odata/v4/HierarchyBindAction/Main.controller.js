@@ -25,11 +25,27 @@ sap.ui.define([
 			}
 		},
 
+		onCall(_oEvent) {
+			const oContext = this.getView().getModel()
+				.getKeepAliveContext(
+					"/I_SADL_BHV_HIER_BIND_DIRECTORY('1')/_Hierarchy(Hierarchy='1',Id='1.2.3')",
+					/*bRequestMessages*/true, {
+						$$groupId : "$auto.hero",
+						$$patchWithoutSideEffects : true
+					});
+			this.byId("details").setBindingContext(oContext); // @see #onShowDetails
+		},
+
+		onChange4Save(oEvent) {
+			oEvent.getSource().getBindingContext()
+				.setProperty("Description", ("" + new Date()).slice(0, 40), "save");
+		},
+
 		onChangeHierarchy(oEvent) {
 			const oSource = oEvent.getSource();
 			const oContext = oSource.toString().includes("ODataListBinding")
-				? oSource.getAllCurrentContexts()[0]
-				: oSource.getSelectedItem().getBindingContext();
+				? oSource.getAllCurrentContexts()[0] // ODLB's dataReceived
+				: oSource.getSelectedItem().getBindingContext(); // Select's change
 			const oTreeTable = this.byId("table");
 			oTreeTable.setBindingContext(oContext);
 
@@ -111,8 +127,22 @@ sap.ui.define([
 					this._oAggregation.createInPlace = true;
 				}
 
-				this.byId("selectHierarchy").getBinding("items")
-					.attachEventOnce("dataReceived", this.onChangeHierarchy.bind(this));
+				const sHero = oURLSearchParams.get("hero");
+				if (sHero) { // 1st show hero content, but not yet table
+					const [sHierarchy, sId] = sHero.split(",");
+					const sPath = "/I_SADL_BHV_HIER_BIND_DIRECTORY('" + sHierarchy
+						+ "')/_Hierarchy(Hierarchy='" + sHierarchy + "',Id='" + sId + "')";
+					const oContext = this.getView().getModel()
+						.getKeepAliveContext(sPath, /*bRequestMessages*/true, {
+							$$groupId : "$auto.hero",
+							$$patchWithoutSideEffects : true
+						});
+					this.byId("details").setBindingContext(oContext); // @see #onShowDetails
+					this.byId("selectHierarchy").setForceSelection(false); // wait for user
+				} else { // automatically show 1st hierarchy directory
+					this.byId("selectHierarchy").getBinding("items")
+						.attachEventOnce("dataReceived", this.onChangeHierarchy.bind(this));
+				}
 
 				this.byId("table").getBinding("rows").filter(
 					new Filter("Description", FilterOperator.NotStartsWith, "Out"),
@@ -280,6 +310,10 @@ sap.ui.define([
 
 		onRefreshRow(oEvent) {
 			oEvent.getSource().getBindingContext().requestSideEffects([""]);
+		},
+
+		onSave(_oEvent) {
+			this.getView().getModel().submitBatch("save");
 		},
 
 		/**
