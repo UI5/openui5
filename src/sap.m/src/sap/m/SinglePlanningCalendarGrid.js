@@ -1796,6 +1796,10 @@ sap.ui.define([
 
 			$domRef.find(".sapMSinglePCRowHeader").removeClass("sapMSinglePCRowHeaderHidden");
 
+			if (!this._isNowMarkerInView(UI5Date.getInstance())) {
+				return;
+			}
+
 			if (this._shouldHideRowHeader(iCurrentHour)) {
 				$domRef.find(".sapMSinglePCRowHeader" + iCurrentHour).addClass("sapMSinglePCRowHeaderHidden");
 			} else if (this._shouldHideRowHeader(iNextHour)) {

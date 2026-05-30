@@ -1372,6 +1372,7 @@ sap.ui.define([
 					}
 				}
 			});
+			await this.oControl.awaitPendingModification();
 			assert.ok(aChanges.length >= 1, "At least 1 change created");
 			assert.strictEqual(aChanges[0].getChangeType(), "setPropertyAttribute", "Change type");
 
@@ -1401,6 +1402,7 @@ sap.ui.define([
 					}
 				}
 			});
+			await this.oControl.awaitPendingModification();
 			assert.ok(aChanges.length >= 1, "At least 1 change created");
 
 			const oRetrievedState = await StateUtil.retrieveExternalState(this.oControl);
@@ -1527,6 +1529,7 @@ sap.ui.define([
 					}
 				}
 			});
+			await this.oControl.awaitPendingModification();
 
 			const oRetrievedStateAfterDeactivation = await StateUtil.retrieveExternalState(this.oControl);
 			assert.strictEqual(oRetrievedStateAfterDeactivation.supplementaryConfig.propertyInfo.dynamicActive.isActive, false,
@@ -1551,6 +1554,7 @@ sap.ui.define([
 					}
 				}
 			});
+			await this.oControl.awaitPendingModification();
 
 			const oRetrievedStateAfterReactivation = await StateUtil.retrieveExternalState(this.oControl);
 			assert.strictEqual(oRetrievedStateAfterReactivation.supplementaryConfig.propertyInfo.dynamicActive.isActive, true,
@@ -1573,6 +1577,7 @@ sap.ui.define([
 			const aChanges = await StateUtil.applyExternalState(this.oControl, {
 				items: [{name: "newProp", position: 0}]
 			});
+			await this.oControl.awaitPendingModification();
 			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;}), "add change created");
 
 			const oAddChange = aChanges.find(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;});
@@ -1596,6 +1601,7 @@ sap.ui.define([
 			const aChanges = await StateUtil.applyExternalState(this.oControl, {
 				items: [{name: "staticProp1", position: 2}]
 			});
+			await this.oControl.awaitPendingModification();
 			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.moveItemChangeType;}), "move change created");
 
 			const oMoveChange = aChanges.find(function(oChange) {return oChange.getChangeType() === oConfig.moveItemChangeType;});
@@ -1619,6 +1625,7 @@ sap.ui.define([
 			const aRemoveChanges = await StateUtil.applyExternalState(this.oControl, {
 				items: [{name: "staticProp1", visible: false}]
 			});
+			await this.oControl.awaitPendingModification();
 			assert.ok(aRemoveChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.removeItemChangeType;}), "remove change created");
 
 			assert.deepEqual(
@@ -1636,6 +1643,7 @@ sap.ui.define([
 			const aAddChanges = await StateUtil.applyExternalState(this.oControl, {
 				items: [{name: "staticProp1", position: 0}]
 			});
+			await this.oControl.awaitPendingModification();
 			assert.ok(aAddChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;}), "add change created for re-add");
 
 			const oReAddChange = aAddChanges.find(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;});
@@ -1738,6 +1746,7 @@ sap.ui.define([
 				},
 				items: [{name: "dynamicNotInShadow", position: 0}]
 			});
+			await this.oControl.awaitPendingModification();
 
 			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;}),
 				oConfig.addItemChangeType + " change created"
@@ -1767,6 +1776,7 @@ sap.ui.define([
 				},
 				items: [{name: "dynamicNotInShadow", visible: false}]
 			});
+			await this.oControl.awaitPendingModification();
 			await this.oControl.finalizePropertyHelper();
 
 			aChanges = await StateUtil.applyExternalState(this.oControl, {
@@ -1777,6 +1787,7 @@ sap.ui.define([
 				},
 				items: [{name: "dynamicNotInShadow", position: 0}]
 			});
+			await this.oControl.awaitPendingModification();
 
 			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;}),
 				oConfig.addItemChangeType + " change created (PropertyInfo finalized)"

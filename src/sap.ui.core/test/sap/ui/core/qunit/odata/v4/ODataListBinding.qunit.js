@@ -3098,13 +3098,15 @@ sap.ui.define([
 	[false, true].forEach(function (bKeepCacheOnError) {
 		[false, true].forEach(function (bRelative) {
 			[false, true].forEach(function (bRestore) {
-			var sTitle = "refreshInternal: bAsync=" + bAsync
-				+ ", bKeepCacheOnError=" + bKeepCacheOnError
-				+ ", bRelative=" + bRelative + ", cache can be restored: " + bRestore;
+				[false, true].forEach(function (bSkipKeptElements) {
+	var sTitle = "refreshInternal: bAsync=" + bAsync
+		+ ", bKeepCacheOnError=" + bKeepCacheOnError
+		+ ", bRelative=" + bRelative + ", cache can be restored: " + bRestore
+		+ ", bSkipKeptElements=" + bSkipKeptElements;
 
-			if (bRestore && !bKeepCacheOnError) {
-				return;
-			}
+	if (bRestore && !bKeepCacheOnError) {
+		return;
+	}
 
 	QUnit.test(sTitle, function (assert) {
 		var oContext = bRelative
@@ -3201,7 +3203,7 @@ sap.ui.define([
 					oBinding.oCachePromise = SyncPromise.resolve(oBinding.oCache);
 				}
 			});
-		this.mock(oBinding).expects("refreshKeptElements")
+		this.mock(oBinding).expects("refreshKeptElements").exactly(bSkipKeptElements ? 0 : 1)
 			.withExactArgs("myGroup", bKeepCacheOnError)
 			.returns(SyncPromise.resolve());
 		this.mock(oBinding).expects("reset").exactly(iNoOfCalls)
@@ -3223,12 +3225,13 @@ sap.ui.define([
 		this.mock(oBinding).expects("getDependentBindings").exactly(iNoOfCalls).withExactArgs()
 			.returns([oDependentBinding]);
 		this.mock(oDependentBinding).expects("refreshInternal").exactly(iNoOfCalls)
-			.withExactArgs("", "myGroup", false, bKeepCacheOnError, "~bSync~")
+			.withExactArgs("", "myGroup", false, bKeepCacheOnError, "~bSync~", bSkipKeptElements)
 			.resolves();
 
 		aPromises.push(
 			// code under test
-			oBinding.refreshInternal("", "myGroup", false, bKeepCacheOnError, "~bSync~")
+			oBinding.refreshInternal("", "myGroup", false, bKeepCacheOnError, "~bSync~",
+					bSkipKeptElements)
 				.then(function () {
 					assert.ok(false, "Unexpected success");
 				}, function (oReturnedError) {
@@ -3237,7 +3240,8 @@ sap.ui.define([
 		if (bAsync) { //TODO: in the sync case, the wrong cache would be restored :-(
 			aPromises.push(
 				// code under test
-				oBinding.refreshInternal("", "myGroup", false, bKeepCacheOnError, "~bSync~")
+				oBinding.refreshInternal("", "myGroup", false, bKeepCacheOnError, "~bSync~",
+						bSkipKeptElements)
 					.then(function () {
 						assert.ok(false, "Unexpected success");
 					}, function (oReturnedError) {
@@ -3251,6 +3255,7 @@ sap.ui.define([
 
 		return Promise.all(aPromises);
 	});
+				});
 			});
 		});
 	});
@@ -3452,7 +3457,8 @@ sap.ui.define([
 			this.mock(oBinding).expects("getDependentBindings").withExactArgs()
 				.returns([oChild0, oChild1, oChild2, oChild3, oChild4]);
 			this.mock(oChild0).expects("refreshInternal")
-				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~")
+				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~",
+					"~bSkipKeptElements~")
 				.returns(new Promise(function (resolve) {
 					setTimeout(function () {
 						oChild0Refreshed = true;
@@ -3460,7 +3466,8 @@ sap.ui.define([
 					});
 				}));
 			this.mock(oChild1).expects("refreshInternal")
-				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~")
+				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~",
+					"~bSkipKeptElements~")
 				.returns(new Promise(function (resolve) {
 					setTimeout(function () {
 						oChild1Refreshed = true;
@@ -3468,7 +3475,8 @@ sap.ui.define([
 					});
 				}));
 			this.mock(oChild2).expects("refreshInternal")
-				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~")
+				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~",
+					"~bSkipKeptElements~")
 				.returns(new Promise(function (resolve) {
 					setTimeout(function () {
 						oChild2Refreshed = true;
@@ -3476,7 +3484,8 @@ sap.ui.define([
 					});
 				}));
 			this.mock(oChild3).expects("refreshInternal").exactly(bSuspended ? 1 : 0)
-				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~")
+				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~",
+					"~bSkipKeptElements~")
 				.returns(new Promise(function (resolve) {
 					setTimeout(function () {
 						oChild3RefreshedIfSuspended = true;
@@ -3487,7 +3496,7 @@ sap.ui.define([
 
 			// code under test
 			oRefreshResult = oBinding.refreshInternal(sResourcePathPrefix, "myGroup", undefined,
-				undefined, "~bSync~");
+				undefined, "~bSync~", "~bSkipKeptElements~");
 			if (bSuspended) {
 				assert.strictEqual(oBinding.bRefreshKeptElements, !bShared);
 				assert.strictEqual(oBinding.sResumeAction, bShared ? "resetCache" : undefined);
@@ -7964,7 +7973,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(this.oModel.oRequestor), "resource/path",
 				"deep/resource/path", "~mInheritedQueryOptions~",
 				sinon.match.same(oBinding.mParameters.$$aggregation),
-				this.oModel.bAutoExpandSelect, false, "~isGrouped~")
+				this.oModel.bAutoExpandSelect, false, "~isGrouped~", undefined)
 			.returns("~oNewCache~");
 
 		assert.strictEqual(
@@ -7982,16 +7991,19 @@ sap.ui.define([
 	[false, true].forEach(function (bFromModel) {
 		[false, true].forEach(function (bShared) {
 			[false, true].forEach(function (bAggregation) {
-				var sTitle = (bWithOld
-						? "doCreateCache w/ old cache, but w/o kept-alive elements"
-						: "doCreateCache w/o old cache")
-					+ ", bFromModel=" + bFromModel
-					+ ", bShared=" + bShared
-					+ ", bAggregation=" + bAggregation;
+				[false, true].forEach(function (bHasPendingChanges) {
+	var sTitle = (bWithOld
+			? "doCreateCache w/ old cache, but w/o kept-alive elements"
+			: "doCreateCache w/o old cache")
+		+ ", got temporary cache from model=" + bFromModel
+		+ ", bShared=" + bShared
+		+ ", bAggregation=" + bAggregation
+		+ ", old cache has pending changes=" + bHasPendingChanges;
 
-				if (bAggregation && (!bFromModel || bShared)) {
-					return;
-				}
+	if (bAggregation && (!bFromModel || bShared)
+		|| bHasPendingChanges && !(bFromModel && bAggregation)) {
+		return;
+	}
 
 	QUnit.test(sTitle, function (assert) {
 		var oAggregationCache = {
@@ -8002,6 +8014,7 @@ sap.ui.define([
 			oBindingMock = this.mock(oBinding),
 			oCache = { // #setLateQueryOptions must not be called
 				getValue : mustBeMocked,
+				hasPendingChangesForPath : mustBeMocked,
 				registerChangeListener : function () {},
 				setActive : mustBeMocked,
 				setSeparate : mustBeMocked
@@ -8038,7 +8051,10 @@ sap.ui.define([
 				.returns({"(1)" : true, "(3)" : true});
 			oCacheMock.expects("getValue").withExactArgs("(1)").returns("~1~");
 			oCacheMock.expects("getValue").withExactArgs("(3)").returns("~3~");
-			oCacheMock.expects("setActive").withExactArgs(false);
+			oCacheMock.expects("hasPendingChangesForPath").withExactArgs("")
+				.returns(bHasPendingChanges);
+			oCacheMock.expects("setActive").exactly(bHasPendingChanges ? 0 : 1)
+				.withExactArgs(false);
 			oAggregationCacheMock.expects("addKeptElement").withExactArgs("~1~");
 			oAggregationCacheMock.expects("addKeptElement").withExactArgs("~3~");
 		}
@@ -8048,7 +8064,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(this.oModel.oRequestor), "resource/path",
 				"deep/resource/path", "~mergedQueryOptions~",
 				sinon.match.same(oBinding.mParameters.$$aggregation), "~autoExpandSelect~", bShared,
-				"~isGrouped~")
+				"~isGrouped~", bHasPendingChanges ? oCache : undefined)
 			.returns(bAggregation ? oAggregationCache : oCache);
 		oCacheMock.expects("setSeparate").exactly(bAggregation ? 0 : 1).withExactArgs("~separate~");
 		oCacheMock.expects("registerChangeListener").exactly(bShared ? 1 : 0)
@@ -8064,6 +8080,7 @@ sap.ui.define([
 			sinon.assert.callOrder(oMoveExpectation, oGetExpectation);
 		}
 	});
+				});
 			});
 		});
 	});
@@ -8098,7 +8115,7 @@ sap.ui.define([
 		this.mock(_AggregationCache).expects("create")
 			.withExactArgs(sinon.match.same(this.oModel.oRequestor), "resource/path",
 				"deep/resource/path", "~mergedQueryOptions~", /*$$aggregation*/undefined,
-				"~autoExpandSelect~", "~sharedRequest~", "~isGrouped~")
+				"~autoExpandSelect~", "~sharedRequest~", "~isGrouped~", undefined)
 			.returns(oCache);
 		this.mock(oCache).expects("setSeparate").withExactArgs("~$$separate~");
 
@@ -8138,7 +8155,7 @@ sap.ui.define([
 		this.mock(_AggregationCache).expects("create")
 			.withExactArgs(sinon.match.same(this.oModel.oRequestor), "resource/path",
 				"deep/resource/path", "~mergedQueryOptions~", /*$$aggregation*/undefined,
-				oFixture.sortExpandSelect, "~sharedRequest~", "~isGrouped~")
+				oFixture.sortExpandSelect, "~sharedRequest~", "~isGrouped~", undefined)
 			.returns(oCache);
 		this.mock(oCache).expects("setSeparate").withExactArgs(oFixture.separate);
 
@@ -9531,11 +9548,12 @@ sap.ui.define([
 		this.mock(oBinding).expects("lockGroup").never();
 		this.mock(oBinding).expects("setOutdated").never();
 		oCacheMock.expects("requestSideEffects").never();
-		this.mock(oBinding).expects("refreshInternal").withExactArgs("", sGroupId, false, true)
-			.rejects(oError);
+		this.mock(oBinding).expects("refreshInternal")
+			.withExactArgs("", sGroupId, false, true, false, "~bSkipKeptElements~").rejects(oError);
 
 		// code under test
-		return oBinding.requestSideEffects(sGroupId, ["n/a", ""], oContext).then(function () {
+		return oBinding.requestSideEffects(sGroupId, ["n/a", ""], oContext, "~bSkipKeptElements~")
+		.then(function () {
 			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError0, oError);
@@ -9573,7 +9591,8 @@ sap.ui.define([
 			.rejects(oError);
 
 		// code under test
-		return oBinding.requestSideEffects("group", ["n/a", ""], oContext).then(function () {
+		return oBinding.requestSideEffects("group", ["n/a", ""], oContext, "~bSkipKeptElements~")
+		.then(function () {
 			assert.ok(false, "Unexpected success");
 		}, function (oError0) {
 			assert.strictEqual(oError0, oError);
@@ -9604,7 +9623,7 @@ sap.ui.define([
 
 		// code under test
 		assert.throws(function () {
-			oBinding.requestSideEffects("group", ["n/a", ""], oContext);
+			oBinding.requestSideEffects("group", ["n/a", ""], oContext, "~bSkipKeptElements~");
 		}, new Error("Must not request side effects when there is a pending delete in a different "
 			+ "batch group"));
 	});
@@ -9635,7 +9654,7 @@ sap.ui.define([
 			.returns(oPendingRequestsPromise);
 
 		// code under test
-		oPromise = oBinding.requestSideEffects("group", ["A"], oContext);
+		oPromise = oBinding.requestSideEffects("group", ["A"], oContext, "~bSkipKeptElements~");
 
 		assert.strictEqual(oPromise.isPending(), true);
 
@@ -9667,11 +9686,13 @@ sap.ui.define([
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		this.mock(oBinding).expects("setOutdated").never();
 		this.mock(oBinding).expects("refreshSingle").never();
-		this.mock(oBinding).expects("refreshInternal").withExactArgs("", "group", false, true)
+		this.mock(oBinding).expects("refreshInternal")
+			.withExactArgs("", "group", false, true, false, "~bSkipKeptElements~")
 			.resolves(oResult);
 
 		// code under test
-		return oBinding.requestSideEffects("group", [""], oContext).then(function (oResult0) {
+		return oBinding.requestSideEffects("group", [""], oContext, "~bSkipKeptElements~")
+		.then(function (oResult0) {
 			assert.strictEqual(oResult0, oResult);
 		});
 	});
@@ -9696,7 +9717,8 @@ sap.ui.define([
 		this.mock(oBinding).expects("refreshInternal").never();
 
 		// code under test
-		return oBinding.requestSideEffects("group", [""], oContext).then(function (oResult0) {
+		return oBinding.requestSideEffects("group", [""], oContext, "~bSkipKeptElements~")
+		.then(function (oResult0) {
 			assert.strictEqual(oResult0, oResult);
 		});
 	});
@@ -9781,7 +9803,7 @@ sap.ui.define([
 		this.mock(oBinding).expects("refreshInternal").never();
 
 		// code under test
-		oResult = oBinding.requestSideEffects(sGroupId, aPaths, oContext);
+		oResult = oBinding.requestSideEffects(sGroupId, aPaths, oContext, "~bSkipKeptElements~");
 
 		assert.ok(oResult.isPending(), "instanceof SyncPromise");
 
@@ -9822,11 +9844,12 @@ sap.ui.define([
 		this.mock(oBinding).expects("lockGroup").never();
 		this.mock(oBinding).expects("setOutdated").never();
 		oCacheMock.expects("requestSideEffects").never();
-		this.mock(oBinding).expects("refreshInternal").withExactArgs("", sGroupId, false, true)
-			.rejects(oError);
+		this.mock(oBinding).expects("refreshInternal")
+			.withExactArgs("", sGroupId, false, true, false, "~bSkipKeptElements~").rejects(oError);
 
 		// code under test
-		return oBinding.requestSideEffects(sGroupId, ["A"]).then(function () {
+		return oBinding.requestSideEffects(sGroupId, ["A"], null, "~bSkipKeptElements~")
+			.then(function () {
 				assert.ok(false, "Unexpected success");
 			}, function (oError0) {
 				assert.strictEqual(oError0, oError);
@@ -9857,7 +9880,7 @@ sap.ui.define([
 
 		assert.strictEqual(
 			// code under test
-			oBinding.requestSideEffects("group", ["n/a", ""]),
+			oBinding.requestSideEffects("group", ["n/a", ""], null, "~bSkipKeptElements~"),
 			SyncPromise.resolve()
 		);
 	});
@@ -11303,7 +11326,7 @@ sap.ui.define([
 						.withExactArgs().returns("~group~");
 					that.mock(oBinding).expects("requestSideEffects")
 						.exactly(iCount < 0 ? 1 : 0)
-						.withExactArgs("~group~", [""])
+						.withExactArgs("~group~", [""], null, true)
 						.resolves("~requestSideEffects~");
 					oDataReceivedCall = that.mock(oBinding).expects("fireDataReceived")
 						.exactly(bDataRequested ? 1 : 0).withExactArgs({});

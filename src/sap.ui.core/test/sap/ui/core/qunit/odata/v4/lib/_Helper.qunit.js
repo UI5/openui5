@@ -5994,7 +5994,7 @@ sap.ui.define([
 		};
 
 		const oHelperMock = this.mock(_Helper);
-		// inital call
+		// initial call
 		oHelperMock.expects("copyETags").withExactArgs(oSource, oTarget).callThrough();
 		// missing key predicates are considered equal and do not stop ETag copying
 		oHelperMock.expects("getPrivateAnnotation")
@@ -6021,6 +6021,7 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("copyETags: do not copy if key predicate has changed", function (assert) {
 		const oSource = {"@odata.etag" : "ETag1"};
+		const sSource = JSON.stringify(oSource);
 		const oTarget = {"@odata.etag" : "ETag0"};
 		const oHelperMock = this.mock(_Helper);
 		oHelperMock.expects("getPrivateAnnotation")
@@ -6032,7 +6033,75 @@ sap.ui.define([
 		_Helper.copyETags(oSource, oTarget);
 
 		assert.deepEqual(oTarget, {"@odata.etag" : "ETag0"});
+		assert.strictEqual(JSON.stringify(oSource), sSource);
 	});
+
+	//*********************************************************************************************
+	QUnit.test("copyETags: array with $byPredicate", function (assert) {
+		const oSourceItem1 = {"@odata.etag" : "ItemETag1", ID : "1"};
+		const oSourceItem2 = {"@odata.etag" : "ItemETag2", ID : "2"};
+		const oSourceItem3 = {"@odata.etag" : "ItemETag3", ID : "3"};
+		const oTargetItem1 = {"@odata.etag" : "OldItemETag1", ID : "1"};
+		const oTargetItem2 = {"@odata.etag" : "OldItemETag2", ID : "2"};
+		const oSource = {
+			aItems : [oSourceItem2, oSourceItem1, oSourceItem3]
+		};
+		const sSource = JSON.stringify(oSource);
+		const oTarget = {
+			aItems : [oTargetItem1, oTargetItem2]
+		};
+
+		oTarget.aItems.$byPredicate = {
+			"('1')" : oTargetItem1,
+			"('2')" : oTargetItem2
+		};
+
+		const oHelperMock = this.mock(_Helper);
+		// initial call
+		oHelperMock.expects("copyETags").withExactArgs(oSource, oTarget).callThrough();
+		// missing key predicates are considered equal and do not stop ETag copying
+		oHelperMock.expects("getPrivateAnnotation")
+			.withExactArgs(sinon.match.same(oSource), "predicate").returns();
+		oHelperMock.expects("getPrivateAnnotation")
+			.withExactArgs(sinon.match.same(oTarget), "predicate").returns();
+		oHelperMock.expects("getPrivateAnnotation")
+			.withExactArgs(sinon.match.same(oSourceItem2), "predicate").returns("('2')");
+		oHelperMock.expects("copyETags")
+			.withExactArgs(sinon.match.same(oSourceItem2), sinon.match.same(oTargetItem2));
+		oHelperMock.expects("getPrivateAnnotation")
+			.withExactArgs(sinon.match.same(oSourceItem1), "predicate").returns("('1')");
+		oHelperMock.expects("copyETags")
+			.withExactArgs(sinon.match.same(oSourceItem1), sinon.match.same(oTargetItem1));
+		oHelperMock.expects("getPrivateAnnotation")
+			.withExactArgs(sinon.match.same(oSourceItem3), "predicate").returns("('3')");
+
+		// code under test
+		_Helper.copyETags(oSource, oTarget);
+
+		assert.strictEqual(JSON.stringify(oSource), sSource);
+	});
+
+	//*********************************************************************************************
+[[], [null], [{}]].forEach((aData, i) => {
+	const sTitle = "copyETags: Collection of complex types: " + i;
+
+	QUnit.test(sTitle, function (assert) {
+		const oSource = {
+			ComplexCollection : aData
+		};
+		const sJSON = JSON.stringify(oSource);
+		const oTarget = JSON.parse(sJSON); // same structure
+
+		// initial call - no recursion happens!
+		this.mock(_Helper).expects("copyETags").withExactArgs(oSource, oTarget).callThrough();
+
+		// code under test
+		_Helper.copyETags(oSource, oTarget);
+
+		assert.strictEqual(JSON.stringify(oSource), sJSON);
+		assert.strictEqual(JSON.stringify(oTarget), sJSON);
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("copySelected", function (assert) {

@@ -1303,6 +1303,8 @@ sap.ui.define([
 	 *   If <code>true</code>, the cache is created synchronously; cannot be combined with the
 	 *   ODataModel's <code>sharedRequests</code> constructor parameter or with the
 	 *   ODataListBinding's <code>$$sharedRequest</code> binding parameter
+	 * @param {boolean} [bSkipKeptElements]
+	 *   If <code>true</code>, kept elements are not refreshed
 	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result when the refresh is finished, or
 	 *   rejected when the refresh fails; the promise is resolved immediately on a suspended binding

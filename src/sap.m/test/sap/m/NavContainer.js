@@ -36,42 +36,42 @@ sap.ui.define([
 			text : "[default] to Page 2",
 			press : function() {
 				app.to("page2");
-				MessageToast.show("Navigate to Page 2");
+				MessageToast.show("Navigating to Page 2 using the default transition");
 			}
 		}),
 			new Button({
 				text : "SLIDE to Page 2",
 				press : function() {
 					app.to("page2", "slide");
-					MessageToast.show("SLIDE to Page 2");
+					MessageToast.show("Navigating to Page 2 using the Slide transition");
 				}
 			}),
 			new Button({
 				text : "FADE to Page 2",
 				press : function() {
 					app.to("page2", "fade");
-					MessageToast.show("FADE to Page 2");
+					MessageToast.show("Navigating to Page 2 using the Fade transition");
 				}
 			}),
 			new Button({
 				text : "FLIP to Page 2",
 				press : function() {
 					app.to("page2", "flip");
-					MessageToast.show("FLIP to Page 2");
+					MessageToast.show("Navigating to Page 2 using the Flip transition");
 				}
 			}),
 			new Button({
 				text : "DOOR to Page 2",
 				press : function() {
 					app.to("page2", "door");
-					MessageToast.show("DOOR to Page 2");
+					MessageToast.show("Navigating to Page 2 using the Door transition");
 				}
 			}),
 			new Button({
 				text : "SHOW to Page 2",
 				press : function() {
 					app.to("page2", "show");
-					MessageToast.show("SHOW to Page 2");
+					MessageToast.show("Navigating to Page 2 using the Show transition (no animation)");
 				}
 			}),
 			new Button({
@@ -79,7 +79,7 @@ sap.ui.define([
 				press : function() {
 					var value = Element.getElementById("p1input").getValue();
 					app.to("page2", {payloadInfo:value});
-					MessageToast.show("SLIDE to Page 2 ");
+					MessageToast.show("Navigating to Page 2 using the Slide transition with data transfer");
 				}
 			}),
 			new HBox({
@@ -113,28 +113,28 @@ sap.ui.define([
 		showNavButton: true,
 		navButtonPress: function() {
 			app.back();
-			MessageToast.show("Navigate to Page 1");
+			MessageToast.show("Navigating back to Page 1");
 		},
 		enableScrolling: false,
 		content : [ new Button({
 			text : "SLIDE to Page 3",
 			press : function() {
 				app.to("page3", "slide");
-				MessageToast.show("SLIDE to Page 3");
+				MessageToast.show("Navigating to Page 3 using the Slide transition");
 			}
 		}),
 			new Button({
 				text : "FADE to Page 3",
 				press : function() {
 					app.to("page3", "fade");
-					MessageToast.show("FADE to Page 3");
+					MessageToast.show("Navigating to Page 3 using the Fade transition");
 				}
 			}),
 			new Button({
 				text : "SHOW to Page 3",
 				press : function() {
 					app.to("page3", "show");
-					MessageToast.show("SHOW to Page 3");
+					MessageToast.show("Navigating to Page 3 using the Show transition (no animation)");
 				}
 			}),
 			new HBox({
@@ -179,12 +179,12 @@ sap.ui.define([
 		showNavButton: true,
 		navButtonPress: function() {
 			app.backToTop();
-			MessageToast.show("Navigate to Page 1");
+			MessageToast.show("Navigating back to Page 1 (top of stack)");
 		},
 		content : [
 			new Button({text : "Back to Page 2", press:function(){
 				app.back({myBackPayload:Element.getElementById("p3input").getValue()});
-				MessageToast.show("Navigate to Page 2");
+				MessageToast.show("Navigating back to Page 2");
 			}}),
 			new HBox({
 				alignItems: FlexAlignItems.Center,

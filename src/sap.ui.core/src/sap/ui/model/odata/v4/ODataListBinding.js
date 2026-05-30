@@ -1617,6 +1617,7 @@ sap.ui.define([
 	ODataListBinding.prototype.doCreateCache = function (sResourcePath, mQueryOptions, oContext,
 			sDeepResourcePath, sGroupId, bSideEffectsRefresh, oOldCache) {
 		var oCache,
+			oFirstLevel,
 			mKeptElementsByPredicate,
 			bResetViaSideEffects = this.bResetViaSideEffects;
 
@@ -1656,13 +1657,17 @@ sap.ui.define([
 			for (const sPredicate in mKeptElementsByPredicate) {
 				mKeptElementsByPredicate[sPredicate] = oCache.getValue(sPredicate);
 			}
-			oCache.setActive(false);
+			if (oCache.hasPendingChangesForPath("")) {
+				oFirstLevel = oCache;
+			} else {
+				oCache.setActive(false);
+			}
 			oCache = undefined; // create _AggregationCache instead of _CollectionCache
 		}
 		oCache ??= _AggregationCache.create(this.oModel.oRequestor, sResourcePath,
 			sDeepResourcePath, mQueryOptions, this.mParameters.$$aggregation,
 			this.oModel.bAutoExpandSelect || "$$separate" in this.mParameters,
-			this.bSharedRequest, this.isGrouped());
+			this.bSharedRequest, this.isGrouped(), oFirstLevel);
 		oCache.setSeparate?.(this.mParameters.$$separate);
 		if (mKeptElementsByPredicate) {
 			for (const sPredicate in mKeptElementsByPredicate) {
@@ -1824,8 +1829,8 @@ sap.ui.define([
 				this.fireDataRequested();
 			}
 		).then((iCount) => {
-			if (iCount < 0) { // side-effects expand
-				return this.requestSideEffects(this.getGroupId(), [""]);
+			if (iCount < 0) { // side-effects expand - do not refresh kept elements
+				return this.requestSideEffects(this.getGroupId(), [""], null, true);
 			}
 			if (iCount) {
 				this.insertGap(this.getModelIndex(oContext), iCount);
@@ -4180,7 +4185,7 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.ODataBinding#refreshInternal
 	 */
 	ODataListBinding.prototype.refreshInternal = function (sResourcePathPrefix, sGroupId,
-			_bCheckUpdate, bKeepCacheOnError, bSync) {
+			_bCheckUpdate, bKeepCacheOnError, bSync, bSkipKeptElements) {
 		var that = this;
 
 		// calls refreshInternal on all given bindings and returns an array of promises
@@ -4197,7 +4202,7 @@ sap.ui.define([
 				// another update request in createContexts, when the context for the row is
 				// reused.
 				return oBinding.refreshInternal(sResourcePathPrefix, sGroupId, false,
-					bKeepCacheOnError, bSync);
+					bKeepCacheOnError, bSync, bSkipKeptElements);
 			});
 		}
 
@@ -4229,8 +4234,10 @@ sap.ui.define([
 				} else {
 					that.fetchCache(that.oContext, false, /*bKeepQueryOptions*/true,
 						sGroupId, bKeepCacheOnError, bSync);
-					oKeptElementsPromise = that.refreshKeptElements(sGroupId,
-						/*bIgnorePendingChanges*/ bKeepCacheOnError);
+					if (!bSkipKeptElements) {
+						oKeptElementsPromise = that.refreshKeptElements(sGroupId,
+							/*bIgnorePendingChanges*/ bKeepCacheOnError);
+					}
 					if (that.iCurrentEnd > 0) {
 						oPromise = that.createRefreshPromise(
 							/*bPreventBubbling*/bKeepCacheOnError
@@ -4779,7 +4786,8 @@ sap.ui.define([
 	 * @override
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#requestSideEffects
 	 */
-	ODataListBinding.prototype.requestSideEffects = function (sGroupId, aPaths, oContext) {
+	ODataListBinding.prototype.requestSideEffects = function (sGroupId, aPaths, oContext,
+			bSkipKeptElements) {
 		var oModel = this.oModel,
 			aPredicates,
 			aPromises,
@@ -4857,7 +4865,7 @@ sap.ui.define([
 		if (this.iCurrentEnd === 0) {
 			return SyncPromise.resolve();
 		}
-		return this.refreshInternal("", sGroupId, false, true);
+		return this.refreshInternal("", sGroupId, false, true, false, bSkipKeptElements);
 	};
 
 	/**

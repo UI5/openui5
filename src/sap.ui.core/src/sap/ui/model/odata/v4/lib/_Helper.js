@@ -510,7 +510,8 @@ sap.ui.define([
 
 		/**
 		 * Recursively copies ETags from the source object to the target object. Does nothing if
-		 * the key predicates of source and target differ.
+		 * the key predicates of source and target differ. For arrays, ETags are copied to
+		 * matching items identified by their key predicate using the $byPredicate lookup.
 		 *
 		 * @param {object} oSource - The source object containing ETags
 		 * @param {object} oTarget - The target object to receive the ETags
@@ -528,9 +529,22 @@ sap.ui.define([
 				const vSourceProperty = oSource[sKey];
 				const vTargetProperty = oTarget[sKey];
 
-				if (vSourceProperty && vTargetProperty && typeof vSourceProperty === "object"
-						&& !Array.isArray(vSourceProperty)) {
-					_Helper.copyETags(vSourceProperty, vTargetProperty);
+				if (vSourceProperty && vTargetProperty) {
+					if (Array.isArray(vSourceProperty)) {
+						// Note: $byPredicate is not available for collections of complex types
+						if (vTargetProperty.$byPredicate) {
+							vSourceProperty.forEach(function (oSourceElement) {
+								const sPredicate
+									= _Helper.getPrivateAnnotation(oSourceElement, "predicate");
+								const oTargetElement = vTargetProperty.$byPredicate[sPredicate];
+								if (oTargetElement) {
+									_Helper.copyETags(oSourceElement, oTargetElement);
+								}
+							});
+						}
+					} else if (typeof vSourceProperty === "object") {
+						_Helper.copyETags(vSourceProperty, vTargetProperty);
+					}
 				}
 			}
 		},

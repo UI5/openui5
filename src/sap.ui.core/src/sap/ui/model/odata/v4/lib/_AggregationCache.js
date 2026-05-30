@@ -39,6 +39,8 @@ sap.ui.define([
 	 *   A map of key-value pairs representing the query string (requires "copy on write"!)
 	 * @param {boolean} bHasGrandTotal
 	 *   Whether a grand total is needed
+	 * @param {sap.ui.model.odata.v4.lib._CollectionCache} [oFirstLevel]
+	 *   An optional collection cache to be used as this aggregation cache's first (and only) level
 	 *
 	 * @alias sap.ui.model.odata.v4.lib._AggregationCache
 	 * @borrows sap.ui.model.odata.v4.lib._CollectionCache#addKeptElement as #addKeptElement
@@ -48,7 +50,7 @@ sap.ui.define([
 	 * @private
 	 */
 	function _AggregationCache(oRequestor, sResourcePath, oAggregation, mQueryOptions,
-			bHasGrandTotal) {
+			bHasGrandTotal, oFirstLevel) {
 		_Cache.call(this, oRequestor, sResourcePath, mQueryOptions, true);
 
 		this.aElements = [];
@@ -56,16 +58,20 @@ sap.ui.define([
 		this.aElements.$created = 0; // required for _Cache#drillDown (see _Cache.from$skip)
 		this.iReadLength = undefined;
 		this.iResetCount = 0;
+		this.bKeptFirstLevel = !!oFirstLevel;
 		// Whether this cache is a unified cache, using oFirstLevel with ExpandLevels instead of
 		// separate group level caches
-		this.bUnifiedCache = oAggregation.expandTo >= Number.MAX_SAFE_INTEGER
-			|| !!oAggregation.createInPlace;
+		this.bUnifiedCache = this.bKeptFirstLevel || !!oAggregation.createInPlace
+			|| oAggregation.expandTo >= Number.MAX_SAFE_INTEGER;
 
-		this.doReset(oAggregation, bHasGrandTotal);
+		this.doReset(oAggregation, bHasGrandTotal, oFirstLevel);
 		this.addKeptElement = this.oFirstLevel.addKeptElement; // @borrows ...
 		this.removeKeptElement = this.oFirstLevel.removeKeptElement; // @borrows ...
 		this.oTreeState = new _TreeState(oAggregation.$NodeProperty,
 			(oNode) => _Helper.getKeyFilter(oNode, this.sMetaPath, this.getTypes()));
+		if (oFirstLevel) {
+			this.mChangeRequests = oFirstLevel.mChangeRequests;
+		}
 	}
 
 	// make _AggregationCache a _Cache, but actively disinherit some critical methods
@@ -675,21 +681,25 @@ sap.ui.define([
 
 	/**
 	 * Creates a cache for the children (next group level or leaves) of the given group node.
-	 * Creates the first level cache if there is no group node.
+	 * Creates the first level cache if there is no group node. Reuses a given cache.
 	 *
 	 * @param {object} [oGroupNode]
 	 *   The group node or <code>undefined</code> for the first level cache
 	 * @param {boolean} [bHasConcatHelper]
 	 *   Whether the _ConcatHelper is involved (use only for the first level cache!)
+	 * @param {sap.ui.model.odata.v4.lib._CollectionCache} [oCache]
+	 *   An optional collection cache to be reused; must already be
+	 *   {@link sap.ui.model.odata.v4.lib._CollectionCache#reset reset}
 	 * @returns {sap.ui.model.odata.v4.lib._CollectionCache}
 	 *   The group level cache
 	 *
 	 * @private
 	 */
-	_AggregationCache.prototype.createGroupLevelCache = function (oGroupNode, bHasConcatHelper) {
+	_AggregationCache.prototype.createGroupLevelCache = function (oGroupNode, bHasConcatHelper,
+			oCache) {
 		var oAggregation = this.oAggregation,
 			iLevel = oGroupNode ? oGroupNode["@$ui5.node.level"] + 1 : 1,
-			aAllProperties, oCache, aGroupBy, bLeaf, sParentFilter, mQueryOptions, bTotal;
+			aAllProperties, aGroupBy, bLeaf, sParentFilter, mQueryOptions, bTotal;
 
 		if (oAggregation.hierarchyQualifier) {
 			mQueryOptions = Object.assign({}, this.mQueryOptions);
@@ -721,7 +731,11 @@ sap.ui.define([
 			mQueryOptions = _AggregationHelper.buildApply(oAggregation, mQueryOptions, iLevel);
 		}
 		mQueryOptions.$count = true;
-		oCache = _Cache.create(this.oRequestor, this.sResourcePath, mQueryOptions, true);
+		if (oCache) {
+			oCache.setQueryOptions(mQueryOptions); // Note: no bForce needed after #reset
+		} else {
+			oCache = _Cache.create(this.oRequestor, this.sResourcePath, mQueryOptions, true);
+		}
 		oCache.calculateKeyPredicate = oAggregation.hierarchyQualifier
 			? _AggregationCache.calculateKeyPredicateRH.bind(null, oGroupNode, oAggregation)
 			: _AggregationCache.calculateKeyPredicate.bind(null, oGroupNode, aGroupBy,
@@ -749,10 +763,13 @@ sap.ui.define([
 	 *   {@link _AggregationHelper.buildApply}
 	 * @param {boolean} bHasGrandTotal
 	 *   Whether a grand total is needed
+	 * @param {sap.ui.model.odata.v4.lib._CollectionCache} [oFirstLevel]
+	 *   An optional collection cache to be used as this aggregation cache's first (and only) level;
+	 *   must already be {@link sap.ui.model.odata.v4.lib._CollectionCache#reset reset}
 	 *
 	 * @private
 	 */
-	_AggregationCache.prototype.doReset = function (oAggregation, bHasGrandTotal) {
+	_AggregationCache.prototype.doReset = function (oAggregation, bHasGrandTotal, oFirstLevel) {
 		this.oAggregation = oAggregation;
 		// early call of _AggregationHelper.buildApply to determine $NodeProperty etc.
 		this.sToString = this.getDownloadUrl("");
@@ -786,7 +803,7 @@ sap.ui.define([
 			: undefined;
 
 		const bHasConcatHelper = aAdditionalRowHandlers.length > 0;
-		this.oFirstLevel ??= this.createGroupLevelCache(null, bHasConcatHelper);
+		this.oFirstLevel ??= this.createGroupLevelCache(null, bHasConcatHelper, oFirstLevel);
 		if (bHasConcatHelper) {
 			// no specific handling needed for "UI5__count" here
 			aAdditionalRowHandlers.push(function () {});
@@ -2630,8 +2647,9 @@ sap.ui.define([
 
 		// "super" call (like @borrows ...)
 		const fnSuper = this.oFirstLevel.reset;
+		let iCreated;
 		if (!this.oAggregation.hierarchyQualifier) {
-			this.aElements.$created = this.oFirstLevel.getCreated();
+			iCreated = this.aElements.$created = this.oFirstLevel.getCreated();
 		}
 		fnSuper.call(this, mKeptElementPredicates, sGroupId, mQueryOptions);
 		if (sGroupId) { // sGroupId means we are in a side-effects refresh
@@ -2639,14 +2657,15 @@ sap.ui.define([
 			this.oBackup.oFirstLevel = this.oFirstLevel;
 			this.oBackup.oGrandTotalPromise = this.oGrandTotalPromise;
 			this.oBackup.bUnifiedCache = this.bUnifiedCache;
-			this.bUnifiedCache = !!oAggregation.hierarchyQualifier;
+			this.bUnifiedCache = this.bKeptFirstLevel || !!oAggregation.hierarchyQualifier;
 		} else {
 			this.oTreeState.reset();
 		}
 		oAggregation = Object.assign({}, oAggregation);
 		oAggregation.$ExpandLevels = this.oTreeState.getExpandLevels();
 
-		if (!this.oAggregation.hierarchyQualifier && this.oFirstLevel.getCreated()) {
+		let oFirstLevel;
+		if (this.bKeptFirstLevel || iCreated) {
 			this.oFirstLevel.reset(mKeptElementPredicates, sGroupId, {
 				...mQueryOptions,
 				$count : true
@@ -2654,10 +2673,11 @@ sap.ui.define([
 			if (sGroupId) {
 				this.oBackup.oFirstLevel = null;
 			}
-		} else {
-			this.oFirstLevel = null; // we need a new one ;-)
+			oFirstLevel = this.oFirstLevel; // reuse via #createGroupLevelCache (#reset done before)
 		}
-		this.doReset(oAggregation, _AggregationHelper.hasGrandTotal(oAggregation.aggregate));
+		this.oFirstLevel = null;
+		this.doReset(oAggregation, _AggregationHelper.hasGrandTotal(oAggregation.aggregate),
+			oFirstLevel);
 	};
 
 	/**
@@ -3071,6 +3091,9 @@ sap.ui.define([
 	 *   error.
 	 * @param {boolean} [bIsGrouped]
 	 *   Whether the list binding is grouped via its first sorter
+	 * @param {sap.ui.model.odata.v4.lib._CollectionCache} [oFirstLevel]
+	 *   An optional collection cache to be used as the new aggregation cache's first (and only)
+	 *   level
 	 * @returns {sap.ui.model.odata.v4.lib._Cache}
 	 *   The cache
 	 * @throws {Error}
@@ -3080,12 +3103,14 @@ sap.ui.define([
 	 *   "$expand" or "$select" are combined with pure data aggregation (no recursive hierarchy), or
 	 *   if the system query option "$search" is combined with grand totals or group levels or a
 	 *   recursive hierarchy, or if shared requests are combined with min/max or with grand totals
-	 *   or group levels or recursive hierarchy
+	 *   or group levels or recursive hierarchy, or if a first level cache is given but no
+	 *   aggregation cache needs to be created
 	 *
 	 * @public
 	 */
 	_AggregationCache.create = function (oRequestor, sResourcePath, sDeepResourcePath,
-			mQueryOptions, oAggregation, bSortExpandSelect, bSharedRequest, bIsGrouped) {
+			mQueryOptions, oAggregation, bSortExpandSelect, bSharedRequest, bIsGrouped,
+			oFirstLevel) {
 		var bHasGrandTotal, bHasGroupLevels;
 
 		function checkExpandSelect() {
@@ -3114,6 +3139,9 @@ sap.ui.define([
 				if (bSharedRequest) {
 					throw new Error("Unsupported $$sharedRequest together with min/max");
 				}
+				if (oFirstLevel) {
+					throw new Error("Unsupported oFirstLevel together with min/max");
+				}
 				checkExpandSelect();
 
 				return _MinMaxHelper.createCache(oRequestor, sResourcePath, oAggregation,
@@ -3141,10 +3169,13 @@ sap.ui.define([
 				}
 
 				return new _AggregationCache(oRequestor, sResourcePath, oAggregation, mQueryOptions,
-						bHasGrandTotal);
+						bHasGrandTotal, oFirstLevel);
 			}
 		}
 
+		if (oFirstLevel) {
+			throw new Error("Unsupported oFirstLevel");
+		}
 		if ("$$filterOnAggregate" in mQueryOptions) {
 			throw new Error("Unsupported $$filterOnAggregate");
 		}

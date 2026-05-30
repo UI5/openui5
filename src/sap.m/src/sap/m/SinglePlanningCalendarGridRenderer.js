@@ -438,7 +438,7 @@ sap.ui.define([
 			oRm.class("sapMSinglePCRowHeader");
 			oRm.class("sapMSinglePCRowHeader" + i);
 
-			if (oControl._shouldHideRowHeader(i)) {
+			if (oControl._shouldHideRowHeader(i) && oControl._isNowMarkerInView(UI5Date.getInstance())) {
 				oRm.class("sapMSinglePCRowHeaderHidden");
 			}
 
