@@ -794,6 +794,42 @@ sap.ui.define([
 			});
 		});
 
+		QUnit.test("when getting invisible elements of a bound group containing a removed field "
+			+ "whose binding context is a descendant of the group's binding context (e.g. a navigation property)",
+		async function(assert) {
+			const oGroup = this.oView.byId("OtherGroup");
+			const oGroupElement1 = this.oView.byId("NavForm.EntityType01.Prop1");
+			oGroupElement1.setVisible(false);
+			await nextUIUpdate();
+
+			const oActionsObject = {
+				aggregation: "formElements",
+				reveal: {
+					elements: [{
+						element: oGroupElement1,
+						action: {} // not relevant for test
+					}]
+				},
+				addViaDelegate: {
+					delegateInfo: {
+						delegate: this.oDelegate
+					}
+				}
+			};
+
+			// Simulate a sap.fe-style sub-form where the FormElement is bound to a navigation property of the group's entity:
+			// the invisible element's binding context starts with the group's binding context.
+			this.sandbox.stub(oGroup, "getBindingContext").returns({ getPath() { return "/fake/binding/path/group"; } });
+			this.sandbox.stub(oGroupElement1, "getBindingContext")
+			.returns({ getPath() { return "/fake/binding/path/group/_NavProp"; } });
+			// getBindings would otherwise trigger the BCP 1880498671 exclusion branch.
+			this.sandbox.stub(BindingsExtractor, "getBindings").returns(["fakeBinding"]);
+
+			const aAdditionalElements = await AdditionalElementsAnalyzer.enhanceInvisibleElements(oGroup, oActionsObject);
+			assert.ok(aAdditionalElements.some(TestUtils.isFieldPresent.bind(null, oGroupElement1)),
+				"then the field is available on the dialog");
+		});
+
 		QUnit.test("when getting invisible elements of a bound group containing a field with the same property name as the one of an invisible field in a different entity", function(assert) {
 			var oGroup = this.oView.byId("GroupEntityType01");
 			var oGroupElement1 = this.oView.byId("EntityType02.CommonProperty");

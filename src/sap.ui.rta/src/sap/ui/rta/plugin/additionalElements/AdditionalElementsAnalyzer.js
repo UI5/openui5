@@ -411,6 +411,15 @@ sap.ui.define([
 		return !bHasAddViaDelegate;
 	}
 
+	// Descendant case covers sap.fe sub-forms where a FormElement binds to a
+	// navigation property of the container's entity (e.g. "/Root" vs "/Root/_NavProp").
+	function isSameOrDescendantBindingContext(sContainerCtx, sInvisibleCtx) {
+		if (!sContainerCtx || !sInvisibleCtx) {
+			return false;
+		}
+		return sContainerCtx === sInvisibleCtx || sInvisibleCtx.startsWith(`${sContainerCtx}/`);
+	}
+
 	function enhanceByMetadata(oElement, sAggregationName, mInvisibleElement, mActions, aRepresentedProperties, aProperties) {
 		const mAddViaDelegate = mActions.addViaDelegate;
 		const sModelName = getModelName(mAddViaDelegate);
@@ -422,8 +431,12 @@ sap.ui.define([
 
 		if (aRepresentedProperties) {
 			aBindingPaths = getRepresentedBindingPathsOfInvisibleElement(oInvisibleElement, aRepresentedProperties);
-		// BCP: 1880498671
-		} else if (getBindingContextPath(oElement, sAggregationName, sModelName) === getBindingContextPath(oInvisibleElement, sAggregationName, sModelName)) {
+		// Reject invisible elements bound to a foreign entity, but keep
+		// elements bound to a navigation property of the container's entity.
+		} else if (isSameOrDescendantBindingContext(
+			getBindingContextPath(oElement, sAggregationName, sModelName),
+			getBindingContextPath(oInvisibleElement, sAggregationName, sModelName)
+		)) {
 			aBindingPaths = BindingsExtractor.collectBindingPaths(oInvisibleElement, oModel, null, iDepth).bindingPaths;
 		} else if (mAddViaDelegate && BindingsExtractor.getBindings({
 			element: oInvisibleElement,
