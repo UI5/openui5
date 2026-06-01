@@ -33,5 +33,15 @@
         "text": " ui.Table: Column Freeze behavior and state"
       }
     ]
+  },
+  "1.136.17": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "e9274f18fd23f5662abdbb088187115a15c3b20e",
+        "type": "FIX",
+        "text": " Table: Show busy indicator when selection plugins load data"
+      }
+    ]
   }
 }

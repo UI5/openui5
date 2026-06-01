@@ -678,5 +678,35 @@
         "text": " sap.m.Text: Skip unstable test in Chrome"
       }
     ]
+  },
+  "1.136.17": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "98eb44dd5ef38780faee0237ef28e570a4bf977d",
+        "type": "FIX",
+        "text": " We've now fixed an issue where the image on the slide tile was disappearing on browser window resize"
+      },
+      {
+        "id": "a9743dd46f585ad45a9697fb7e9e0a26895870ec",
+        "type": "FIX",
+        "text": " p13n.SelectionPanel: Fix item count"
+      },
+      {
+        "id": "4ce0211ebc6acb50a15b8af88ec340ecf0572d0c",
+        "type": "FIX",
+        "text": " We've now fixed an issue where the slide tile content was not adjusting dynamically to the screen size"
+      },
+      {
+        "id": "9ac1a642f5b405c1fcdf86609ccc183a2e5cadb3",
+        "type": "FIX",
+        "text": " m.Table: avoid scroll jump when focus is forwarded on mouse click"
+      },
+      {
+        "id": "ca0174384579a89e5b470f0d76dc22f1d514d96d",
+        "type": "FIX",
+        "text": " sap.m.DateRangeSelection: selection via keyboard is working"
+      }
+    ]
   }
 }

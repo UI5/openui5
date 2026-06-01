@@ -403,5 +403,15 @@
         "text": " sap.ui.core: Harden script loading in internal bootstrap scripts"
       }
     ]
+  },
+  "1.136.17": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "85a5e41a46c64aa5b734df0cb116b4807d213877",
+        "type": "FIX",
+        "text": " sap.ui.test.autowaiter._timeoutWaiter: Guard log construction with level check"
+      }
+    ]
   }
 }

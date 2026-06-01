@@ -63,5 +63,15 @@
         "text": "sap.ui.unified.CalendarRow: Corrected rendering of non-working periods"
       }
     ]
+  },
+  "1.136.17": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "ca0174384579a89e5b470f0d76dc22f1d514d96d",
+        "type": "FIX",
+        "text": " sap.m.DateRangeSelection: selection via keyboard is working"
+      }
+    ]
   }
 }
