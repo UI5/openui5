@@ -2817,86 +2817,93 @@ sap.ui.define([
 		oGetMaskModeStub.restore();
 	});
 
-	QUnit.test("onfocusin event should add aria-description attribute if maskMode is different than 'Off'", function (assert) {
+	QUnit.test("onfocusin event should add aria-description attribute when mask is enabled and value is empty", function (assert) {
 		// prepare
-		var oGetMaskModeStub = this.stub(this.oTp, "getMaskMode").callsFake(function () { return TimePickerMaskMode.On; });
+		var oIsMaskEnabledStub = this.stub(this.oTp, "_isMaskEnabled").returns(true);
 
 		// act
 		this.oTp.onfocusin({ target: this.oTp.getDomRef() });
 
 		// assert
-		assert.ok(this.oTp.$("inner").attr("aria-description"), this.oTp._getPlaceholder() ,"aria-description attribute is present");
+		assert.strictEqual(this.oTp.$("inner").attr("aria-description"), this.oTp._getPlaceholder(), "aria-description attribute equals the placeholder when mask is enabled");
 
 		// cleanup
-		oGetMaskModeStub.restore();
+		oIsMaskEnabledStub.restore();
+	});
 
+	QUnit.test("onfocusin event should not add aria-description attribute when mask is not enabled", function (assert) {
 		// prepare
-		oGetMaskModeStub = this.stub(this.oTp, "getMaskMode").callsFake(function () { return TimePickerMaskMode.Enforce; });
+		var oIsMaskEnabledStub = this.stub(this.oTp, "_isMaskEnabled").returns(false);
 
 		// act
 		this.oTp.onfocusin({ target: this.oTp.getDomRef() });
 
 		// assert
-		assert.ok(this.oTp.$("inner").attr("aria-description"), this.oTp._getPlaceholder() ,"aria-description attribute is present");
+		assert.strictEqual(this.oTp.$("inner").attr("aria-description"), undefined, "aria-description attribute is not added when mask is not enabled");
 
 		// cleanup
-		oGetMaskModeStub.restore();
-
-		// prepare
-		oGetMaskModeStub = this.stub(this.oTp, "getMaskMode").callsFake(function () { return TimePickerMaskMode.Off; });
-
-		// act
-		this.oTp.onfocusin({ target: this.oTp.getDomRef() });
-
-		// assert
-		assert.ok(this.oTp.$("inner").attr("aria-description"), undefined ,"aria-description attribute is not present");
-
-		// cleanup
-		oGetMaskModeStub.restore();
+		oIsMaskEnabledStub.restore();
 	});
 
 	QUnit.test("onfocusin event should not add aria-description attribute when value is entered", function (assert) {
 		// prepare
-		var oGetMaskModeStub = this.stub(this.oTp, "getMaskMode").callsFake(function () { return TimePickerMaskMode.On; }),
-			oGetValueStub = this.stub(this.oTp, "getValue").callsFake(function () { return "10:30 AM"; });
+		var oIsMaskEnabledStub = this.stub(this.oTp, "_isMaskEnabled").returns(true),
+			oGetValueStub = this.stub(this.oTp, "getValue").returns("10:30 AM");
 
 		// act
 		this.oTp.onfocusin({ target: this.oTp.getDomRef() });
 
 		// assert
-		assert.ok(!this.oTp.$("inner").attr("aria-description"), "aria-description attribute is not present when value is entered");
+		assert.strictEqual(this.oTp.$("inner").attr("aria-description"), undefined, "aria-description attribute is not added when a value is already entered");
 
 		// cleanup
-		oGetMaskModeStub.restore();
+		oIsMaskEnabledStub.restore();
 		oGetValueStub.restore();
 	});
 
-	QUnit.test("onfocusout event should remove aria-description attribute if maskMode is different than 'Off'", function (assert) {
+	QUnit.test("onfocusin event should not add aria-description attribute on mobile devices", function (assert) {
 		// prepare
-		var oGetMaskModeStub = this.stub(this.oTp, "getMaskMode").callsFake(function () { return TimePickerMaskMode.On; });
+		var oIsMobileDeviceStub = this.stub(this.oTp, "_isMobileDevice").returns(true);
 
 		// act
 		this.oTp.onfocusin({ target: this.oTp.getDomRef() });
-		this.oTp.onfocusout({ target: this.oTp.getDomRef() });
 
 		// assert
-		assert.ok(!this.oTp.$("inner").attr("aria-description"), "aria-description attribute is removed on focusout");
+		assert.strictEqual(this.oTp.$("inner").attr("aria-description"), undefined, "aria-description attribute is not added on mobile devices");
 
 		// cleanup
-		oGetMaskModeStub.restore();
+		oIsMobileDeviceStub.restore();
+	});
 
+	QUnit.test("onfocusout event should remove aria-description attribute", function (assert) {
 		// prepare
-		oGetMaskModeStub = this.stub(this.oTp, "getMaskMode").callsFake(function () { return TimePickerMaskMode.Enforce; });
+		var oIsMaskEnabledStub = this.stub(this.oTp, "_isMaskEnabled").returns(true);
+		this.oTp.onfocusin({ target: this.oTp.getDomRef() });
+		assert.strictEqual(this.oTp.$("inner").attr("aria-description"), this.oTp._getPlaceholder(), "aria-description is set after focusin");
 
 		// act
-		this.oTp.onfocusin({ target: this.oTp.getDomRef() });
 		this.oTp.onfocusout({ target: this.oTp.getDomRef() });
 
 		// assert
-		assert.ok(!this.oTp.$("inner").attr("aria-description"), "aria-description attribute is removed on focusout");
+		assert.strictEqual(this.oTp.$("inner").attr("aria-description"), undefined, "aria-description attribute is removed on focusout");
 
 		// cleanup
-		oGetMaskModeStub.restore();
+		oIsMaskEnabledStub.restore();
+	});
+
+	QUnit.test("onfocusout event should remove a stale aria-description attribute even when mask is not enabled", function (assert) {
+		// prepare
+		var oIsMaskEnabledStub = this.stub(this.oTp, "_isMaskEnabled").returns(false);
+		this.oTp.$("inner").attr("aria-description", "stale value");
+
+		// act
+		this.oTp.onfocusout({ target: this.oTp.getDomRef() });
+
+		// assert
+		assert.strictEqual(this.oTp.$("inner").attr("aria-description"), undefined, "stale aria-description attribute is removed on focusout");
+
+		// cleanup
+		oIsMaskEnabledStub.restore();
 	});
 
 	QUnit.test("onfocusin event should call MaskEnabler's onfocusin if maskMode is 'Off'", function (assert) {
