@@ -88,10 +88,6 @@ sap.ui.define([
 			_writeAccText(oRm, sTableId, "ariagrandtotallabel", TableUtils.getResourceText("TBL_GRAND_TOTAL_ROW"));
 			// aria label for group total sums
 			_writeAccText(oRm, sTableId, "ariagrouptotallabel", TableUtils.getResourceText("TBL_GROUP_TOTAL_ROW"));
-			// aria description for table row count
-			_writeAccText(oRm, sTableId, "rownumberofrows");
-			// aria description for table column count
-			_writeAccText(oRm, sTableId, "colnumberofcols");
 			// aria description for table cell content
 			_writeAccText(oRm, sTableId, "cellacc");
 			// aria description for column menu

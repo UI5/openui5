@@ -166,40 +166,6 @@ sap.ui.define([
 		},
 
 		/*
-		 * Returns the IDs of the column headers which are relevant for the given column (esp. in multi header case).
-		 */
-		getRelevantColumnHeaders: function(oTable, oColumn) {
-			var aLabels = [];
-
-			if (!oTable || !oColumn || !oTable.getColumnHeaderVisible()) {
-				return aLabels;
-			}
-
-			var iHeaderRowCount = TableUtils.getHeaderRowCount(oTable);
-
-			if (iHeaderRowCount > 0) {
-				var sColumnId = oColumn.getId();
-				aLabels.push(sColumnId);
-
-				for (var i = 1; i < iHeaderRowCount; i++) {
-					aLabels.push(sColumnId + "_" + i);
-				}
-
-				var aSpans = TableUtils.Column.getParentSpannedColumns(oTable, sColumnId);
-
-				if (aSpans && aSpans.length) {
-					for (var j = 0; j < aSpans.length; j++) {
-						var iLevel = aSpans[j].level;
-						var sParentId = aSpans[j].column.getId();
-						aLabels[iLevel] = iLevel === 0 ? sParentId : (sParentId + "_" + iLevel);
-					}
-				}
-			}
-
-			return aLabels;
-		},
-
-		/*
 		 * Returns whether the given cell is hidden
 		 */
 		isHiddenCell: function($Cell, oCell) {
@@ -304,8 +270,6 @@ sap.ui.define([
 				bIsRowChanged = oExtension._iLastRowNumber != iRowNumber || (oExtension._iLastRowNumber == iRowNumber && oExtension._iLastColumnNumber == iColumnNumber);
 				bIsColChanged = oExtension._iLastColumnNumber != iColumnNumber;
 				bIsInitial = oExtension._iLastRowNumber == null && oExtension._iLastColumnNumber == null;
-				oTable.$("rownumberofrows").text(bIsRowChanged && iRowNumber > 0 ? TableUtils.getResourceText("TBL_ROW_ROWCOUNT", [iRowNumber, mGridSize.rowCount]) : ".");
-				oTable.$("colnumberofcols").text(bIsColChanged ? TableUtils.getResourceText("TBL_COL_COLCOUNT", [iColumnNumber, mGridSize.columnCount]) : ".");
 				oTable.$("ariacount").text(bIsInitial ? TableUtils.getResourceText("TBL_DATA_ROWS_COLS", [mGridSize.rowCount, mGridSize.columnCount]) : ".");
 
 				oExtension._iLastRowNumber = iRowNumber;
@@ -419,7 +383,7 @@ sap.ui.define([
 						fixed: TableUtils.isFixedColumn(oTable, iCol)
 					})["aria-labelledby"] || [],
 				aDescriptions = [],
-				aLabels = [sTableId + "-rownumberofrows", sTableId + "-colnumberofcols"],
+				aLabels = [],
 				bIsGroupHeader = oRow.isGroupHeader(),
 				bIsSummary = oRow.isSummary();
 
@@ -461,7 +425,7 @@ sap.ui.define([
 			ExtensionHelper.performCellModifications(this, $Cell, aDefaultLabels, null, aLabels, aDescriptions, sText,
 				function(aLabels, aDescriptions, bRowChange, bColChange) {
 					if (bIsGroupHeader && bRowChange) {
-						aLabels.splice(3, 0, sRowId + "-groupHeader");
+						aLabels.splice(1, 0, sRowId + "-groupHeader");
 					}
 					var bContainsTreeIcon = $Cell.find(".sapUiTableTreeIcon").not(".sapUiTableTreeIconLeaf").length == 1;
 
@@ -485,7 +449,7 @@ sap.ui.define([
 			var oRow = oTable.getRows()[oCellInfo.rowIndex];
 			var sRowId = oRow.getId();
 			var aDefaultLabels = ExtensionHelper.getAriaAttributesFor(this, AccExtension.ELEMENTTYPES.ROWHEADER)["aria-labelledby"] || [];
-			var aLabels = aDefaultLabels.concat([sTableId + "-rownumberofrows", sTableId + "-colnumberofcols"]);
+			var aLabels = [].concat(aDefaultLabels);
 
 			if (!oRow.isSummary() && !oRow.isGroupHeader() && !oRow.isContentHidden()) {
 				aLabels.push(sRowId + "-rowselecttext");
@@ -525,7 +489,7 @@ sap.ui.define([
 					index: $Cell.attr("data-sap-ui-colindex")
 				});
 			var sText = ExtensionHelper.getColumnTooltip(oColumn);
-			var aLabels = [oTable.getId() + "-colnumberofcols"].concat(mAttributes["aria-labelledby"]);
+			var aLabels = [].concat(mAttributes["aria-labelledby"]);
 			var iSpan = oCellInfo.columnSpan;
 
 			if (oColumnLabel?.getRequired?.()) {
@@ -564,7 +528,7 @@ sap.ui.define([
 				this, AccExtension.ELEMENTTYPES.COLUMNROWHEADER,
 				{enabled: bEnabled, checked: bEnabled && !oTable.$().hasClass("sapUiTableSelAll")}
 			);
-			var aLabels = [oTable.getId() + "-colnumberofcols"].concat(mAttributes["aria-labelledby"]);
+			var aLabels = [].concat(mAttributes["aria-labelledby"]);
 			ExtensionHelper.performCellModifications(this, $Cell, mAttributes["aria-labelledby"], mAttributes["aria-describedby"],
 				aLabels, mAttributes["aria-describedby"], null
 			);
@@ -582,7 +546,7 @@ sap.ui.define([
 			var sRowId = oRow.getId();
 			var bHidden = ExtensionHelper.isHiddenCell($Cell);
 			var aDefaultLabels = ExtensionHelper.getAriaAttributesFor(this, AccExtension.ELEMENTTYPES.ROWACTION)["aria-labelledby"] || [];
-			var aLabels = [sTableId + "-rownumberofrows", sTableId + "-colnumberofcols"].concat(aDefaultLabels);
+			var aLabels = [].concat(aDefaultLabels);
 			var aDescriptions = [];
 			var bIsGroupHeader = oRow.isGroupHeader();
 
@@ -700,17 +664,8 @@ sap.ui.define([
 
 					mAttributes["role"] = "columnheader";
 					mAttributes["aria-colindex"] = mParams.index + 1 + (TableUtils.hasRowHeader(oTable) ? 1 : 0);
-					var aLabels = [];
 
-					if (mParams && mParams.headerId) {
-						var aHeaders = ExtensionHelper.getRelevantColumnHeaders(oTable, oColumn);
-						var iIdx = aHeaders.indexOf(mParams.headerId);
-						aLabels = iIdx > 0 ? aHeaders.slice(0, iIdx + 1) : [mParams.headerId];
-					}
-					for (var i = 0; i < aLabels.length; i++) {
-						aLabels[i] = aLabels[i] + "-inner";
-					}
-					mAttributes["aria-labelledby"] = aLabels;
+					mAttributes["aria-labelledby"] = [];
 
 					if (mParams && (mParams.index < oTable.getComputedFixedColumnCount())) {
 						mAttributes["aria-labelledby"].push(sTableId + "-ariafixedcolumn");
@@ -746,11 +701,7 @@ sap.ui.define([
 					mAttributes["aria-colindex"] = mParams.index + 1 + (TableUtils.hasRowHeader(oTable) ? 1 : 0);
 
 					if (mParams.column) {
-						var aLabels = ExtensionHelper.getRelevantColumnHeaders(oTable, mParams.column);
-
-						for (var i = 0; i < aLabels.length; i++) {
-							aLabels[i] = aLabels[i] + "-inner";
-						}
+						var aLabels = [];
 
 						if (mParams && mParams.fixed) {
 							aLabels.push(sTableId + "-ariafixedcolumn");
@@ -833,7 +784,22 @@ sap.ui.define([
 					break;
 
 				case AccExtension.ELEMENTTYPES.COLUMNHEADER_ROW: //The area which contains the column headers
-					mAttributes["role"] = "row";
+					mAttributes = {"role": "row"};
+
+					mAttributes["aria-rowindex"] = ["1"];
+					mAttributes["aria-owns"] = [];
+					if (TableUtils.hasRowHeader(oTable)) {
+						mAttributes["aria-owns"].push(sTableId + "-rowcolhdr");
+					}
+
+					for (let j = 0; j < TableUtils.getVisibleColumnCount(oTable); j++) {
+						mAttributes["aria-owns"].push(oTable._getVisibleColumns()[j].getId());
+					}
+
+					if (TableUtils.hasRowActions(oTable)) {
+						mAttributes["aria-owns"].push(sTableId + "-rowacthdr");
+					}
+
 					addAriaForOverlayOrNoData(oTable, mAttributes, true, false);
 					break;
 
