@@ -239,6 +239,8 @@ sap.ui.define([
 					delete oColumn.hAlign;
 					delete oColumn.visible;
 					delete oColumn.identifier;
+					delete oColumn.importance;
+					delete oColumn.autoPopinWidth;
 
 					if (oColumn.icon && oColumn.icon.src) {
 						oColumn.icon.src = this._oIconFormatter.formatSrc(oColumn.icon.src);
@@ -265,6 +267,18 @@ sap.ui.define([
 					rows: aResolvedRows
 				}
 			];
+		}
+
+		if (oConfiguration.autoPopinMode !== undefined) {
+			oStaticConfiguration.autoPopinMode = BindingResolver.resolveValue(oConfiguration.autoPopinMode, this, this.getBindingContext().getPath());
+		}
+
+		if (oConfiguration.hiddenInPopin !== undefined) {
+			oStaticConfiguration.hiddenInPopin = BindingResolver.resolveValue(oConfiguration.hiddenInPopin, this, this.getBindingContext().getPath());
+		}
+
+		if (oConfiguration.popinLayout !== undefined) {
+			oStaticConfiguration.popinLayout = BindingResolver.resolveValue(oConfiguration.popinLayout, this, this.getBindingContext().getPath());
 		}
 
 		return oStaticConfiguration;

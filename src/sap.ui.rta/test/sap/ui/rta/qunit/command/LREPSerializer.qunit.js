@@ -5,8 +5,10 @@ sap.ui.define([
 	"sap/m/Input",
 	"sap/m/Panel",
 	"sap/ui/dt/DesignTimeMetadata",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/variants/VariantManagement",
+	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
@@ -15,14 +17,16 @@ sap.ui.define([
 	"sap/ui/rta/command/LREPSerializer",
 	"sap/ui/rta/command/Stack",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/fl/api/FlexTestAPI"
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	RtaQunitUtils,
 	Input,
 	Panel,
 	DesignTimeMetadata,
+	FlexState,
 	Version,
 	VariantManagement,
+	VariantModel,
 	ChangesWriteAPI,
 	PersistenceWriteAPI,
 	Layer,
@@ -31,7 +35,7 @@ sap.ui.define([
 	CommandSerializer,
 	CommandStack,
 	sinon,
-	FlexTestAPI
+	FlQUnitUtils
 ) {
 	"use strict";
 
@@ -62,9 +66,15 @@ sap.ui.define([
 
 	QUnit.module("Given a command serializer loaded with an RTA command stack", {
 		async before() {
-			this.oModel = await FlexTestAPI.createVariantModel({
-				data: oData,
-				appComponent: oMockedAppComponent
+			sandbox.stub(VariantManagement.prototype, "_createOwnModel");
+			this.oVM = new VariantManagement("variantMgmtId1");
+			await FlQUnitUtils.initializeFlexStateWithData(
+				sandbox, COMPONENT_NAME, {}, oMockedAppComponent.getId()
+			);
+			this.oModel = new VariantModel(oData, {
+				appComponent: oMockedAppComponent,
+				vmReference: "variantMgmtId1",
+				vmControl: this.oVM
 			});
 		},
 		beforeEach() {
@@ -78,7 +88,6 @@ sap.ui.define([
 				id: "panel",
 				content: [this.oInput1, this.oInput2]
 			});
-			this.oVM = new VariantManagement("variantMgmtId1");
 
 			this.oInputDesignTimeMetadata = new DesignTimeMetadata({
 				data: {
@@ -102,13 +111,14 @@ sap.ui.define([
 			this.oPanel.destroy();
 			this.oInput1.destroy();
 			this.oInput2.destroy();
-			this.oVM.destroy();
 			this.oInputDesignTimeMetadata.destroy();
 			sandbox.restore();
 			await RtaQunitUtils.clear(oMockedAppComponent);
 		},
 		after() {
+			this.oVM.destroy();
 			this.oModel.destroy();
+			FlexState.clearState();
 		}
 	}, function() {
 		QUnit.test("when two commands get undone, redone and saved while the element of one command is not available", function(assert) {

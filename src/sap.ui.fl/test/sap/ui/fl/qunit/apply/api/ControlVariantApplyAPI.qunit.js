@@ -1,7 +1,6 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/base/util/restricted/_omit",
 	"sap/base/Log",
 	"sap/m/App",
 	"sap/m/Button",
@@ -9,7 +8,7 @@ sap.ui.define([
 	"sap/ui/core/ComponentContainer",
 	"sap/ui/core/UIComponent",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
-	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
+	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
@@ -26,7 +25,6 @@ sap.ui.define([
 	"sap/ui/thirdparty/hasher",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
-	_omit,
 	Log,
 	App,
 	Button,
@@ -34,7 +32,7 @@ sap.ui.define([
 	ComponentContainer,
 	Component,
 	Reverter,
-	URLHandler,
+	VariantUtil,
 	FlexObjectFactory,
 	VariantManagementState,
 	VariantManagerApply,
@@ -120,7 +118,7 @@ sap.ui.define([
 				}
 			};
 
-			this.oDummyControl = new VariantManagement("variantMgmtId1");
+			this.oDummyControl = new VariantManagement("variantMgmtId1", { updateVariantInURL: true });
 
 			this.oAppComponent = new Component("AppComponent");
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("myReference");
@@ -128,11 +126,6 @@ sap.ui.define([
 			.withArgs("myReference", "variant1").returns("variantMgmtId1");
 			sandbox.stub(this.oDummyControl, "waitForInit").resolves();
 			this.oUpdateCurrentVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
-
-			this.oModel = new VariantModel(this.oData, {
-				appComponent: this.oAppComponent
-			});
-			sandbox.spy(URLHandler, "update");
 			sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
 				return mParams.vmReference === "variantMgmtId1" && mParams.vReference === "variant1"
 					? { simulate: "foundVariant" }
@@ -141,8 +134,15 @@ sap.ui.define([
 			sandbox.stub(hasher, "replaceHash");
 			sandbox.stub(hasher, "getHash").returns("");
 			stubUshellServices.call(this);
-			await this.oModel.initialize();
-			this.oAppComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+
+			this.oModel = new VariantModel(this.oData, {
+				appComponent: this.oAppComponent,
+				vmReference: "variantMgmtId1",
+				vmControl: this.oDummyControl
+			});
+			this.oDummyControl.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oModel.initializeURLHandler();
+			this.oURLHandlerUpdateSpy = sandbox.spy(this.oModel._getURLHandler(), "update");
 			this.oComponent = new Component("EmbeddedComponent");
 			sandbox.stub(Utils, "getAppComponentForControl")
 			.callThrough()
@@ -162,7 +162,7 @@ sap.ui.define([
 			this.fnParseShellHashStub.reset();
 			this.fnParseShellHashStub.returns({
 				params: {
-					[URLHandler.variantTechnicalParameterName]: aUrlTechnicalParameters
+					[VariantUtil.VARIANT_TECHNICAL_PARAMETER]: aUrlTechnicalParameters
 				}
 			});
 
@@ -173,12 +173,51 @@ sap.ui.define([
 				2,
 				"then variant parameter values were requested; once for read and write each"
 			);
-			assert.deepEqual(_omit(URLHandler.update.getCall(0).args[0], ["flexReference", "appComponent"]), {
+			assert.deepEqual(this.oURLHandlerUpdateSpy.getCall(0).args[0], {
 				parameters: [aUrlTechnicalParameters[0]],
 				updateURL: true,
-				updateHashEntry: true,
 				silent: false
 			}, "then URLHandler.update called with the desired arguments");
+		});
+
+		QUnit.test("when calling 'clearVariantParameterInURL' before the VM control is initialized", async function(assert) {
+			let fnResolveInit;
+			this.oDummyControl.waitForInit.restore();
+			sandbox.stub(this.oDummyControl, "waitForInit").returns(new Promise((resolve) => {
+				fnResolveInit = resolve;
+			}));
+			this.fnParseShellHashStub.reset();
+			this.fnParseShellHashStub.returns({
+				params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["variant1"] }
+			});
+
+			const oPromise = ControlVariantApplyAPI.clearVariantParameterInURL({ control: this.oDummyControl });
+
+			assert.strictEqual(
+				this.oURLHandlerUpdateSpy.callCount,
+				0,
+				"the URLHandler is not touched while the VM control is still initializing"
+			);
+
+			fnResolveInit();
+			await oPromise;
+
+			assert.strictEqual(
+				this.oURLHandlerUpdateSpy.callCount,
+				1,
+				"the URLHandler is updated only after waitForInit resolves"
+			);
+		});
+
+		QUnit.test("when calling 'clearVariantParameterInURL' on a control without a VariantModel", async function(assert) {
+			const oVMWithoutModel = new VariantManagement("noModelVM");
+			sandbox.stub(oVMWithoutModel, "waitForInit").resolves();
+
+			await ControlVariantApplyAPI.clearVariantParameterInURL({ control: oVMWithoutModel });
+
+			assert.ok(true, "the call resolves without throwing when no model is available");
+
+			oVMWithoutModel.destroy();
 		});
 
 		QUnit.test("when calling 'activateVariant' with a control id", function(assert) {
@@ -377,19 +416,20 @@ sap.ui.define([
 
 				this.oComp = new MockComponent({ id: "testComponent" });
 				this.oView = oView;
-				this.oVariantModel = new VariantModel({}, {
-					appComponent: this.oComp
-				});
 				await stubUshellServices.call(this);
 				this.fnParseShellHashStub.returns({
 					params: {}
 				});
-				return this.oVariantModel.initialize();
-			}.bind(this)).then(async function() {
-				this.oComp.setModel(this.oVariantModel, ControlVariantApplyAPI.getVariantModelName());
 				this.sVMReference = "mockview--VariantManagement1";
 				this.sVMControlId = "testComponent---mockview--VariantManagement1";
-				this.oVMControl = this.oView.byId(this.sVMControlId);
+				this.oVMControl = oView.byId("VariantManagement1");
+				this.oVariantModel = new VariantModel({}, {
+					appComponent: this.oComp,
+					vmReference: this.sVMReference,
+					vmControl: this.oVMControl
+				});
+			}.bind(this)).then(async function() {
+				this.oVMControl.setModel(this.oVariantModel, ControlVariantApplyAPI.getVariantModelName());
 
 				const oData = this.oVariantModel.getData();
 				oData[this.sVMReference].defaultVariant = "variant1";

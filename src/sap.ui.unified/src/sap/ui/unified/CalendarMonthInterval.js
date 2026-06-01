@@ -1216,6 +1216,10 @@ sap.ui.define([
 		var oDate = CalendarDate.fromLocalJSDate(oEvent.getParameter("date"));
 		var bNotVisible = oEvent.getParameter("notVisible");
 
+		if (this.getIntervalSelection()) {
+			this.getAggregation("monthsRow").setProperty("_focusedDate", oDate.toLocalJSDate());
+		}
+
 		_focusDate.call(this, oDate, bNotVisible);
 
 	}

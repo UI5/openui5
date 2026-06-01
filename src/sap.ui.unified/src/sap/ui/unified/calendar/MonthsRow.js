@@ -21,7 +21,8 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/unified/DateRange",
 	"sap/ui/core/date/UI5Date",
-	'sap/ui/core/InvisibleText'
+	'sap/ui/core/InvisibleText',
+	'sap/ui/Device'
 ], function(
 	Formatting,
 	_CalendarType, // type of `primaryCalendarType` and `secondaryCalendarType`
@@ -40,7 +41,8 @@ sap.ui.define([
 	jQuery,
 	DateRange,
 	UI5Date,
-	InvisibleText
+	InvisibleText,
+	Device
 ) {
 	"use strict";
 
@@ -143,7 +145,13 @@ sap.ui.define([
 			 *
 			 * @since 1.145.0
 			 */
-			showWeekNumbers : {type : "boolean", group : "Appearance", defaultValue : false}
+			showWeekNumbers : {type : "boolean", group : "Appearance", defaultValue : false},
+
+			/**
+			 * The focused date for keyboard interval selection preview.
+			 * @private
+			 */
+			_focusedDate : {type : "object", group : "Data", visibility: "hidden", defaultValue: null}
 		},
 		aggregations : {
 
@@ -210,7 +218,7 @@ sap.ui.define([
 		this._oFormatYyyymm = DateFormat.getInstance({pattern: "yyyyMMdd", calendarType: sCalendarType});
 		this._oFormatOnlyYearLong = DateFormat.getInstance({pattern: "yyyy", calendarType: sCalendarType});
 		this._oFormatLong = DateFormat.getInstance({pattern: "MMMM y", calendarType: sCalendarType});
-		this._mouseMoveProxy = jQuery.proxy(this._handleMouseMove, this);
+		this._mouseMoveProxy = this._handleMouseMove.bind(this);
 		this._rb = Library.getResourceBundleFor("sap.ui.unified");
 	};
 
@@ -276,11 +284,15 @@ sap.ui.define([
 
 		if (!oEvent.relatedControlId || !containsOrEquals(this.getDomRef(), Element.getElementById(oEvent.relatedControlId).getFocusDomRef())) {
 			if (this._bMouseMove) {
-				_unbindMousemove.call(this, true);
+				this._unbindMousemove(true);
 
-				_selectMonth.call(this, this._getDate());
+				var bSelected = _selectMonth.call(this, this._getDate());
+				if (!bSelected && this._oMoveSelectedDate) {
+					_selectMonth.call(this, this._oMoveSelectedDate);
+				}
 				this._bMoveChange = false;
 				this._bMousedownChange = false;
+				this._oMoveSelectedDate = undefined;
 				_fireSelect.call(this);
 			}
 
@@ -669,7 +681,9 @@ sap.ui.define([
 			sCalendarType = this.getProperty("primaryCalendarType"),
 			i,
 			aSelectedDates,
-			oMyDate;
+			oMyDate,
+			oFocusedDate = this.getProperty("_focusedDate"),
+			bSelectionBetween = false;
 
 		CalendarUtils._checkCalendarDate(oDate);
 
@@ -696,6 +710,14 @@ sap.ui.define([
 				oEndTimeStamp = oEndDate.toUTCJSDate().getTime();
 			}
 
+			if (oFocusedDate) {
+				oFocusedDate = CalendarDate.fromLocalJSDate(oFocusedDate, sCalendarType);
+				oFocusedDate.setDate(1);
+			}
+
+			bSelectionBetween = this._isMarkingUnfinishedRangeAllowed() && oFocusedDate && !this._selectedWithMouse &&
+				(CalendarUtils._isBetween(oMyDate, oStartDate, oFocusedDate, true) || CalendarUtils._isBetween(oMyDate, oFocusedDate, oStartDate, true));
+
 			if (oTimeStamp == oStartTimeStamp && !oEndDate ) {
 				iSelected = 1; // single day selected
 				break;
@@ -709,7 +731,7 @@ sap.ui.define([
 			} else if (oEndDate && oTimeStamp == oEndTimeStamp) {
 				iSelected = 3; // interval end
 				break;
-			} else if (oEndDate && oTimeStamp > oStartTimeStamp && oTimeStamp < oEndTimeStamp) {
+			} else if ((oEndDate && oTimeStamp > oStartTimeStamp && oTimeStamp < oEndTimeStamp) || bSelectionBetween) {
 				iSelected = 4; // interval between
 				break;
 			}
@@ -796,11 +818,44 @@ sap.ui.define([
 
 	};
 
+	MonthsRow.prototype.onmousedown = function(oEvent) {
+		this._oMousedownPosition = {
+			clientX: oEvent.clientX,
+			clientY: oEvent.clientY
+		};
+	};
+
+	MonthsRow.prototype._isValueInThreshold = function(iReference, iValue, iThreshold) {
+		var iLowerThreshold = iReference - iThreshold,
+			iUpperThreshold = iReference + iThreshold;
+
+		return iValue >= iLowerThreshold && iValue <= iUpperThreshold;
+	};
+
+	MonthsRow.prototype._areMouseEventCoordinatesInThreshold = function(clientX, clientY, iThreshold) {
+		return this._oMousedownPosition
+			&& this._isValueInThreshold(this._oMousedownPosition.clientX, clientX, iThreshold)
+			&& this._isValueInThreshold(this._oMousedownPosition.clientY, clientY, iThreshold)
+			? true : false;
+	};
+
+	MonthsRow.prototype._getSelectedDateFromEvent = function(oEvent) {
+		var oTarget = oEvent.target,
+			sExtractedMonth, oParsedDate;
+
+		sExtractedMonth = oTarget.getAttribute("data-sap-month") || oTarget.parentNode.getAttribute("data-sap-month");
+
+		oParsedDate = sExtractedMonth ? this._oFormatYyyymm.parse(sExtractedMonth, this.getProperty("primaryCalendarType")) : null;
+
+		return oParsedDate ? CalendarDate.fromLocalJSDate(oParsedDate, this.getProperty("primaryCalendarType")) : null;
+	};
+
 	MonthsRow.prototype._handleMouseMove = function(oEvent){
 
 		if (!this.$().is(":visible")) {
 			// calendar was closed -> remove mousemove handler
-			_unbindMousemove.call(this, true);
+			this._unbindMousemove(true);
+			return;
 		}
 
 		var $Target = jQuery(oEvent.target);
@@ -809,26 +864,104 @@ sap.ui.define([
 			$Target = $Target.parent();
 		}
 
-		if ($Target.hasClass("sapUiCalItem")) {
-			var oOldFocusedDate = this._getDate();
-			var oFocusedDate = CalendarDate.fromLocalJSDate(this._oFormatYyyymm.parse($Target.attr("data-sap-month"), this.getProperty("primaryCalendarType")));
-			oFocusedDate.setDate(1);
+		if (this._sLastTargetId && this._sLastTargetId === $Target.attr("id")) {
+			// mouse move at same month -> do nothing
+			return;
+		}
+		this._sLastTargetId = $Target.attr("id");
 
-			if (!oFocusedDate.isSame(oOldFocusedDate)) {
-				this.setDate(oFocusedDate.toLocalJSDate());
-				_selectMonth.call(this, oFocusedDate, true);
-				this._bMoveChange = true;
-			}
+		if (!$Target.hasClass("sapUiCalItem") || !containsOrEquals(this.getDomRef(), oEvent.target)) {
+			return;
 		}
 
+		var oOldFocusedDate = this._getDate();
+		var oFocusedDate = CalendarDate.fromLocalJSDate(this._oFormatYyyymm.parse($Target.attr("data-sap-month"), this.getProperty("primaryCalendarType")));
+		oFocusedDate.setDate(1);
+
+		if (!oFocusedDate.isSame(oOldFocusedDate)) {
+			this.setDate(oFocusedDate.toLocalJSDate());
+			var bSelected = _selectMonth.call(this, oFocusedDate, true);
+			if (bSelected) {
+				this._oMoveSelectedDate = new CalendarDate(oFocusedDate, this.getProperty("primaryCalendarType"));
+			}
+			this._bMoveChange = true;
+		}
+	};
+
+	MonthsRow.prototype.onmouseover = function(oEvent) {
+		var $Target = jQuery(oEvent.target),
+			oSelectedDateRange = this.getSelectedDates()[0],
+			iMonth1,
+			iMonth2;
+
+		if (!this._isMarkingUnfinishedRangeAllowed()) {
+			return;
+		}
+
+		if (!$Target.hasClass("sapUiCalItemText") && !$Target.hasClass("sapUiCalItem")) {
+			return;
+		}
+
+		if ($Target.hasClass("sapUiCalItemText")) {
+			$Target = $Target.parent();
+		}
+
+		iMonth1 = parseInt(this._oFormatYyyymm.format(CalendarDate.fromLocalJSDate(oSelectedDateRange.getStartDate(), this.getProperty("primaryCalendarType")).toUTCJSDate(), true));
+		iMonth2 = parseInt($Target.attr("data-sap-month"));
+
+		if (this.hasListeners("datehovered")) {
+			this.fireEvent("datehovered", { date1: iMonth1, date2: iMonth2 });
+		} else {
+			this._markMonthsBetweenStartAndHoveredMonth(iMonth1, iMonth2);
+		}
+	};
+
+	MonthsRow.prototype._markMonthsBetweenStartAndHoveredMonth = function(iMonth1, iMonth2) {
+		const aDomRefs = this.$().find(".sapUiCalItem");
+
+		// swap if necessary
+		if (iMonth1 > iMonth2) {
+			[iMonth1, iMonth2] = [iMonth2, iMonth1];
+		}
+
+		[...aDomRefs].forEach((elem) => {
+			const $CheckRef = jQuery(elem);
+			const iCheckMonth = parseInt($CheckRef.attr("data-sap-month"));
+
+			if (iCheckMonth > iMonth1 && iCheckMonth < iMonth2 && this._isMonthInAllowedRange(iCheckMonth)) {
+				$CheckRef.addClass("sapUiCalItemSelBetween");
+			} else {
+				$CheckRef.removeClass("sapUiCalItemSelBetween");
+				if (iCheckMonth !== iMonth1 && iCheckMonth !== iMonth2) {
+					$CheckRef.removeClass("sapUiCalItemSel");
+				}
+			}
+		});
+	};
+
+	MonthsRow.prototype._isMonthInAllowedRange = function(iCheckMonth) {
+		const oCheckDate = this._oFormatYyyymm.parse(String(iCheckMonth));
+		const oCalDate = CalendarDate.fromLocalJSDate(oCheckDate, this.getProperty("primaryCalendarType"));
+
+		return this._checkMonthEnabled(oCalDate);
+	};
+
+	MonthsRow.prototype._isMarkingUnfinishedRangeAllowed = function() {
+		var oSelectedRange = this.getSelectedDates()[0],
+			bValidRangeForMarking = !!(oSelectedRange && oSelectedRange.getStartDate() && !oSelectedRange.getEndDate());
+
+		return this.getIntervalSelection() && bValidRangeForMarking;
 	};
 
 	MonthsRow.prototype.onmouseup = function(oEvent){
+		// BCP: 1980116734
+		// on a combi device right mouse button resulted in a selection
+		var bNotRightMouseButton = oEvent.button !== 2;
 
 		if (this._bMouseMove) {
-			_unbindMousemove.call(this, true);
+			this._unbindMousemove(true);
 
-			// focus now selected day
+			// focus now selected month
 			var oFocusedDate = this._getDate();
 			var aDomRefs = this._oItemNavigation.getItemDomRefs();
 
@@ -842,20 +975,13 @@ sap.ui.define([
 
 			if (this._bMoveChange) {
 				// selection was changed -> make it final
-				var $Target = jQuery(oEvent.target);
-
-				if ($Target.hasClass("sapUiCalItemText")) {
-					$Target = $Target.parent();
+				var bSelected = _selectMonth.call(this, oFocusedDate);
+				if (!bSelected && this._oMoveSelectedDate) {
+					_selectMonth.call(this, this._oMoveSelectedDate);
 				}
-
-				if ($Target.hasClass("sapUiCalItem")) {
-					oFocusedDate = CalendarDate.fromLocalJSDate(this._oFormatYyyymm.parse($Target.attr("data-sap-month")));
-					oFocusedDate.setDate(1);
-				}
-
-				_selectMonth.call(this, oFocusedDate);
 				this._bMoveChange = false;
 				this._bMousedownChange = false;
+				this._oMoveSelectedDate = undefined;
 				_fireSelect.call(this);
 			}
 		}
@@ -863,8 +989,23 @@ sap.ui.define([
 		if (this._bMousedownChange) {
 			this._bMousedownChange = false;
 			_fireSelect.call(this);
+		} else if (Device.support.touch && bNotRightMouseButton && this._areMouseEventCoordinatesInThreshold(oEvent.clientX, oEvent.clientY, 10)) {
+			var classList = oEvent.target.classList,
+				bIsMonthSelected = classList.contains("sapUiCalItemText") || classList.contains("sapUiCalItem"),
+				oSelectedDate = this._getSelectedDateFromEvent(oEvent);
+
+			if (bIsMonthSelected && oSelectedDate) {
+				_selectMonth.call(this, oSelectedDate, false);
+				_fireSelect.call(this);
+			}
 		}
 
+	};
+
+	MonthsRow.prototype.onkeydown = function(oEvent){
+		if (this.getIntervalSelection()) {
+			this._selectedWithMouse = false;
+		}
 	};
 
 	MonthsRow.prototype.onsapselect = function(oEvent){
@@ -1063,7 +1204,14 @@ sap.ui.define([
 
 		if (oEvent.type == "mousedown") {
 			// as no click event is fired in some cases, e.g. if DOM changed select the month on mousedown
+			if (this.getIntervalSelection()) {
+				this._sLastTargetId = aDomRefs[iIndex].id;
+				this._selectedWithMouse = true;
+			}
 			_handleMousedown.call(this, oEvent, oFocusedDate, iIndex);
+		} else if (this.getIntervalSelection()) {
+			this.setProperty("_focusedDate", oFocusedDate.toLocalJSDate(), true);
+			this.invalidate();
 		}
 
 	}
@@ -1080,6 +1228,11 @@ sap.ui.define([
 		if (oEvent.type == "mousedown") {
 			// as no click event is fired in some cases, e.g. if DOM has changed select the day on mousedown
 			var oFocusedDate = this._getDate();
+			if (this.getIntervalSelection()) {
+				var aDomRefs = this._oItemNavigation.getItemDomRefs();
+				this._sLastTargetId = aDomRefs[iIndex].id;
+				this._selectedWithMouse = true;
+			}
 			_handleMousedown.call(this, oEvent, oFocusedDate, iIndex);
 		}
 
@@ -1135,8 +1288,8 @@ sap.ui.define([
 	*/
 	function _handleMousedown(oEvent, oFocusedDate, iIndex){
 
-		if (oEvent.button) {
-			// only use left mouse button
+		if (oEvent.button || Device.support.touch) {
+			// only use left mouse button; on touch devices avoid selection during scrolling
 			return;
 		}
 
@@ -1147,11 +1300,13 @@ sap.ui.define([
 
 		if (this._bMouseMove) {
 			// a mouseup must be happened outside of control -> just end move
-			_unbindMousemove.call(this, true);
+			this._unbindMousemove(true);
 			this._bMoveChange = false;
+			this._oMoveSelectedDate = undefined;
 		} else if (bSelected && this.getIntervalSelection() && this.$().is(":visible")) {
 			// if closed in select event, do not add mousemove handler
-			_bindMousemove.call(this, true);
+			this._bindMousemove(true);
+			this._oMoveSelectedDate = new CalendarDate(oFocusedDate, this.getProperty("primaryCalendarType"));
 		}
 
 		oEvent.preventDefault();
@@ -1317,7 +1472,7 @@ sap.ui.define([
 
 		if (this._bMouseMove) {
 			// detach mouse move handler because calendar might be losed in select event handler
-			_unbindMousemove.call(this, true);
+			this._unbindMousemove(true);
 		}
 
 		this.fireSelect();
@@ -1389,19 +1544,20 @@ sap.ui.define([
 		}
 	}
 
-	function _bindMousemove(){
+	MonthsRow.prototype._bindMousemove = function(){
 
 		jQuery(window.document).on('mousemove', this._mouseMoveProxy);
 		this._bMouseMove = true;
 
-	}
+	};
 
-	function _unbindMousemove(){
+	MonthsRow.prototype._unbindMousemove = function(){
 
 		jQuery(window.document).off('mousemove', this._mouseMoveProxy);
 		this._bMouseMove = undefined;
+		this._sLastTargetId = undefined;
 
-	}
+	};
 
 	return MonthsRow;
 

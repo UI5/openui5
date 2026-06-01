@@ -10084,7 +10084,14 @@ sap.ui.define([], () => {
 
 	jQuery.ajaxSettings.xhr = function() {
 		try {
-			return new window.XMLHttpRequest();
+			// ##### BEGIN: MODIFIED BY SAP
+			// Use bracket notation with string concatenation to prevent Safari/WebKit from
+			// statically optimizing the property access. Safari may cache window.XMLHttpRequest
+			// at compile time, causing it to miss runtime replacements (e.g., when Sinon's
+			// FakeXMLHttpRequest is installed/restored during test runs).
+			// See: DINC0909467
+			return new window["XML"+"HttpRequest"]();
+			// ##### END: MODIFIED BY SAP
 		} catch ( e ) {}
 	};
 

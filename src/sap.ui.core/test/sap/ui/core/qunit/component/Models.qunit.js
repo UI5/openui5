@@ -28,11 +28,6 @@ sap.ui.define([
 	"use strict";
 	/*global sinon, QUnit*/
 
-	// Re-assigning the 'XMLHttpRequest' property on the window in this strange way prevents Safari 12/13 (or WebKit)
-	// from wrongly optimizing access. As the sinon fake server is only used in some parts of this test module Safari
-	// might wrongly optimize the access (e.g. within jQuery) to override the fake server which fails those tests.
-	window.XMLHttpRequest = window["XML" + "HttpRequest"];
-
 	var privateLoaderAPI = sap.ui.loader._;
 
 

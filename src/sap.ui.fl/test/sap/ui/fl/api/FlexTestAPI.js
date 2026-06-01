@@ -4,23 +4,19 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
-	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/_internal/connectors/LocalStorageConnector",
 	"sap/ui/fl/write/_internal/connectors/SessionStorageConnector",
 	"sap/ui/fl/write/_internal/Versions",
-	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/Layer"
 ], function(
 	FlexObjectState,
-	FlexState,
 	FlexRuntimeInfoAPI,
 	ChangesWriteAPI,
 	LocalStorageConnector,
 	SessionStorageConnector,
 	Versions,
-	VariantModel,
 	Layer
 ) {
 	"use strict";
@@ -41,7 +37,6 @@ sap.ui.define([
 	 */
 	FlexTestAPI.reset = function() {
 		Versions.clearInstances();
-		FlexState.clearState();
 	};
 
 	/**
@@ -55,34 +50,6 @@ sap.ui.define([
 	FlexTestAPI.getDirtyChanges = function(mPropertyBag) {
 		const sReference = FlexRuntimeInfoAPI.getFlexReference({ element: mPropertyBag.selector });
 		return FlexObjectState.getDirtyFlexObjects(sReference);
-	};
-
-	/**
-	 * Returns a VariantModel instance for testing for the passed application component and with the passed data set.
-	 *
-	 * @param {object} mPropertyBag - Object with additional information
-	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - application component owning the VariantModel
-	 * @param {object} mPropertyBag.data - Preset data
-	 * @param {boolean} mPropertyBag.initFlexState - Flag to indicate whether additionally the FlexState should be initialized
-	 * @returns {Promise<sap.ui.fl.variants.VariantModel>} Resolving to the initialized variant model
-	 * @ui5-restricted sap.ui.fl, sap.ui.rta
-	 */
-	FlexTestAPI.createVariantModel = function(mPropertyBag) {
-		var oInitPromise = Promise.resolve();
-		if (mPropertyBag.initFlexState) {
-			oInitPromise = FlexState.initialize({
-				componentId: mPropertyBag.appComponent.getId()
-			});
-		}
-		return oInitPromise.then(function() {
-			var oModel = new VariantModel(mPropertyBag.data, {
-				appComponent: mPropertyBag.appComponent
-			});
-			return oModel.initialize()
-			.then(function() {
-				return oModel;
-			});
-		});
 	};
 
 	/**

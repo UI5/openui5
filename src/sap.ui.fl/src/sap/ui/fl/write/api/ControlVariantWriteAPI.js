@@ -6,7 +6,8 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/variants/VariantManager",
-	"sap/ui/fl/write/_internal/flexState/FlexObjectManager"
+	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
+	"sap/ui/fl/write/_internal/init"
 ], function(
 	VariantManagementState,
 	ManifestUtils,

@@ -187,6 +187,53 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 	});
 
+	QUnit.test("applyFocusInfo: focus returns to appointment after closing popover when appointment is deselected on second click", async function(assert) {
+		// prepare
+		var oAppointment = new CalendarAppointment({
+				startDate: UI5Date.getInstance(2018, 6, 14, 5),
+				endDate: UI5Date.getInstance(2018, 6, 14, 6),
+				selected: false
+			}),
+			oGrid = new SinglePlanningCalendarGrid({
+				startDate: UI5Date.getInstance(2018, 6, 8),
+				appointments: [oAppointment]
+			}),
+			oPopover = new ResponsivePopover({
+				placement: PlacementType.Auto
+			});
+
+		oGrid.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// first click: select, open popover, close
+		oAppointment.getDomRef().focus();
+		oGrid._toggleAppointmentSelection(oAppointment, true);
+		oPopover.openBy(oAppointment);
+		this.clock.tick(500);
+		oPopover.close();
+		this.clock.tick(500);
+
+		// second click: deselect — setProperty triggers re-render of the appointment
+		// which moves focus to body before openBy captures _oPreviousFocus
+		oAppointment.getDomRef().focus();
+		oGrid._toggleAppointmentSelection(oAppointment, true);
+		await nextUIUpdate(this.clock); // appointment re-renders → focus moves to body
+		oPopover.openBy(oAppointment);
+		this.clock.tick(500);
+
+		assert.ok(oPopover.isOpen(), "The popover is opened");
+
+		oPopover.close();
+		this.clock.tick(500);
+
+		// assert
+		assert.strictEqual(oAppointment.getDomRef().id, document.activeElement.id, "Focus is back on the appointment even when it is deselected");
+
+		// cleanup
+		oGrid.destroy();
+		await nextUIUpdate(this.clock);
+	});
+
 	QUnit.test("_calculateVisibleAppointments returns the correct appointments", function (assert) {
 		// Arrange
 		const aAppointments = [

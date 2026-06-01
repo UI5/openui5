@@ -83,14 +83,19 @@ sap.ui.define([
 				manifest: {}
 			});
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves();
-			sandbox.stub(URLHandler, "registerControl");
+			sandbox.stub(URLHandler.prototype, "registerControl");
 			sandbox.stub(VariantManagementState, "getInitialUIChanges").returns([]);
 			sandbox.stub(FlexObjectState, "waitForFlexObjectsToBeApplied").resolves();
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: [this.sVMReference] }
+			});
 
 			this.oModel = new VariantModel({}, {
-				appComponent: this.oComponent
+				appComponent: this.oComponent,
+				vmReference: this.sVMReference,
+				vmControl: this.oVariantManagement
 			});
-			await this.oModel.initialize();
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 		},
 		afterEach() {
 			sandbox.restore();
@@ -104,15 +109,10 @@ sap.ui.define([
 			const oVMControl = this.oVariantManagement;
 
 			// --- Step 1: Verify initial state with Standard variant only ---
-			// Stub Loader so that registerToModel sets the lazy loading callback
-			sandbox.stub(Loader, "getCachedFlexData").returns({
-				parameters: { nonFavoriteVariantsRemoved: [this.sVMReference] }
-			});
-
 			const oSetCallbackSpy = sandbox.spy(oVMControl, "setDynamicVariantsLoadedCallback");
 			const oLoadAllVariantsForVMSpy = sandbox.spy(VariantManagerApply, "loadAllVariantsForVM");
 
-			oVMControl.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			this.oModel.registerToModel();
 			await VariantManagementState.waitForVariantSwitch(sReference, this.sVMReference);
 
 			// Verify the VariantModel's registerToModel set the callback

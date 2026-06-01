@@ -4,7 +4,6 @@ sap.ui.define([
 	"sap/base/util/LoaderExtensions",
 	"sap/ui/core/Control",
 	"sap/ui/core/Lib",
-	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/Loader",
@@ -12,6 +11,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/variants/VariantModel",
+	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/_internal/Versions",
@@ -28,7 +28,6 @@ sap.ui.define([
 	LoaderExtensions,
 	Control,
 	Lib,
-	URLHandler,
 	VariantManagementState,
 	FlexState,
 	Loader,
@@ -36,6 +35,7 @@ sap.ui.define([
 	Version,
 	Settings,
 	VariantModel,
+	VariantManagement,
 	FlexObjectManager,
 	Storage,
 	Versions,
@@ -1909,9 +1909,11 @@ sap.ui.define([
 			this.oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, "com.sap.app");
 			sandbox.stub(ManifestUtils, "getFlexReference").returns("com.sap.app");
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("com.sap.app");
-			sandbox.stub(URLHandler, "attachHandlers");
+			this.oVMControl = new VariantManagement("variantManagementId");
 			this.oModel = new VariantModel({}, {
-				appComponent: this.oAppComponent
+				appComponent: this.oAppComponent,
+				vmReference: "variantManagementId",
+				vmControl: this.oVMControl
 			});
 			// The VariantModel initializes an empty FlexState if not already initialized
 			// Since the tests want to have a clean FlexState, we clear it here
@@ -1939,11 +1941,12 @@ sap.ui.define([
 			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({ adaptations: [{ id: "DEFAULT", type: "DEFAULT" }] });
 			this.oOnAllChangesSavedStub = sandbox.stub(Versions, "onAllChangesSaved");
 
-			return Promise.all([ContextBasedAdaptationsAPI.initialize(this.mPropertyBag), this.oModel.initialize()]);
+			return ContextBasedAdaptationsAPI.initialize(this.mPropertyBag);
 		},
 		afterEach() {
 			FlexState.clearState();
 			ContextBasedAdaptationsAPI.clearInstances(this.mPropertyBag);
+			this.oVMControl.destroy();
 			this.oAppComponent.destroy();
 			sandbox.restore();
 		}

@@ -4,32 +4,19 @@
 
 // Provides the Design Time Metadata for the sap.ui.fl.variants.VariantManagement control.
 sap.ui.define([
-	"sap/ui/core/Lib",
-	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
-	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
-	"sap/ui/fl/Utils"
+	"sap/ui/core/Lib"
 ], function(
-	Lib,
-	URLHandler,
-	ControlVariantApplyAPI,
-	flUtils
+	Lib
 ) {
 	"use strict";
 
 	async function fnSetControlAttributes(oVariantManagement, bDesignTimeMode) {
-		var oAppComponent = flUtils.getAppComponentForControl(oVariantManagement);
-		var sControlId = oVariantManagement.getId();
-		var oModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
-		var sVariantManagementReference = oAppComponent.getLocalId(sControlId) || sControlId;
-
-		if (!oModel) {
-			return;
-		}
+		const oModel = oVariantManagement.getVariantModel();
 
 		if (bDesignTimeMode) {
 			await oVariantManagement.waitForInit();
 		}
-		oModel.setModelPropertiesForControl(sVariantManagementReference, bDesignTimeMode, oVariantManagement);
+		oModel.setModelPropertiesForControl(bDesignTimeMode);
 		oModel.checkUpdate(true);
 	}
 
@@ -70,13 +57,12 @@ sap.ui.define([
 		customData: {},
 		tool: {
 			start(oVariantManagement) {
-				// In personalization mode the variant management overlay cannot be selected
-				URLHandler.setDesigntimeMode(true);
+				oVariantManagement.getVariantModel()._getURLHandler()?.setDesigntimeMode(true);
 				fnSetControlAttributes(oVariantManagement, true);
 				oVariantManagement.enteringDesignMode();
 			},
 			stop(oVariantManagement) {
-				URLHandler.setDesigntimeMode(false);
+				oVariantManagement.getVariantModel()._getURLHandler()?.setDesigntimeMode(false);
 				fnSetControlAttributes(oVariantManagement, false);
 				oVariantManagement.leavingDesignMode();
 			}
