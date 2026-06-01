@@ -1,6 +1,7 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/base/i18n/Localization",
 	"sap/m/App",
 	"sap/m/Input",
@@ -35,6 +36,7 @@ sap.ui.define([
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
+	Log,
 	Localization,
 	App,
 	Input,
@@ -166,7 +168,9 @@ sap.ui.define([
 					appComponent: {
 						getId: () => "componentId",
 						byId: () => null
-					}
+					},
+					vmReference: "One",
+					vmControl: this.oVariantManagement
 				}
 			);
 
@@ -177,8 +181,6 @@ sap.ui.define([
 			});
 
 			sandbox.stub(VariantManager, "handleSaveEvent");
-
-			return this.oModel.initialize();
 		},
 		afterEach() {
 			FlexState.clearState(sFlexReference);
@@ -193,11 +195,33 @@ sap.ui.define([
 			assert.ok(this.oVariantManagement);
 		});
 
-		QUnit.test("Check property 'updateVariantInURL'", function(assert) {
+		QUnit.test("Check property 'updateVariantInURL'", async function(assert) {
 			assert.ok(!this.oVariantManagement.getUpdateVariantInURL());
+
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
+			const oInitializeURLHandlerStub = sandbox.stub(this.oModel, "initializeURLHandler");
 
 			this.oVariantManagement.setUpdateVariantInURL(true);
 			assert.ok(this.oVariantManagement.getUpdateVariantInURL());
+			assert.strictEqual(
+				oInitializeURLHandlerStub.callCount, 1,
+				"then initializeURLHandler was called on the model"
+			);
+		});
+
+		QUnit.test("Check property 'updateVariantInURL' set to false does not trigger URL handler initialization", async function(assert) {
+			this.oVariantManagement.setUpdateVariantInURL(true);
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
+			const oInitializeURLHandlerStub = sandbox.stub(this.oModel, "initializeURLHandler");
+
+			this.oVariantManagement.setUpdateVariantInURL(false);
+			assert.ok(!this.oVariantManagement.getUpdateVariantInURL());
+			assert.strictEqual(
+				oInitializeURLHandlerStub.callCount, 0,
+				"then initializeURLHandler was not called"
+			);
 		});
 
 		QUnit.test("Shall be destroyable", function(assert) {
@@ -296,6 +320,7 @@ sap.ui.define([
 
 		QUnit.test("Check title", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this.oVariantManagement.setCurrentVariantKey("v2");
 			await nextUIUpdate();
@@ -321,6 +346,7 @@ sap.ui.define([
 			assert.equal(aItems.length, 0);
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 			await nextUIUpdate();
 
 			aItems = this.oVariantManagement.getVariants();
@@ -333,7 +359,7 @@ sap.ui.define([
 			assert.equal(aItems[2].getKey(), "v2");
 		});
 
-		QUnit.test("Check acc text", function(assert) {
+		QUnit.test("Check acc text", async function(assert) {
 			const sLanguage = Localization.getLanguage();
 
 			Localization.setLanguage("en_EN");
@@ -341,6 +367,7 @@ sap.ui.define([
 			this.oVariantManagement._oRb = Lib.getResourceBundleFor("sap.m");
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			const oFLRB = Lib.getResourceBundleFor("sap.ui.fl");
 			const sStandardText = oFLRB.getText("STANDARD_VARIANT_TITLE");
@@ -358,19 +385,21 @@ sap.ui.define([
 			Localization.setLanguage(sLanguage);
 		});
 
-		QUnit.test("Check 'initialized' event", function(assert) {
+		QUnit.test("Check 'initialized' event", async function(assert) {
 			var bInitialized = false;
 
 			this.oVariantManagement.attachInitialized(function() {
 				bInitialized = true;
 			});
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			assert.ok(bInitialized);
 		});
 
-		QUnit.test("Check setDefaultVariantKey", function(assert) {
+		QUnit.test("Check setDefaultVariantKey", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			assert.equal(this.oVariantManagement.getDefaultVariantKey(), "One");
 
@@ -379,10 +408,11 @@ sap.ui.define([
 			assert.equal(this.oVariantManagement.getDefaultVariantKey(), "3");
 		});
 
-		QUnit.test("Check _checkVariantNameConstraints", function(assert) {
+		QUnit.test("Check _checkVariantNameConstraints", async function(assert) {
 			var oInput = new Input();
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			oInput.setValue("New");
 			this._oVM._checkVariantNameConstraints(oInput, "v1");
@@ -403,6 +433,7 @@ sap.ui.define([
 
 		QUnit.test("Create Variants List", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			assert.notOk(this._oVM.oVariantPopOver);
 			this._oVM._createVariantList();
@@ -470,6 +501,7 @@ sap.ui.define([
 
 		QUnit.test("Current variant reference handling during switch with asynchronous steps (revert of changes)", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 			const oHandleSelectVariantPromise = RtaQunitUtils.waitForMethodCall(sandbox, VariantManagerApply, "handleSelectVariant");
 			// Simulate one change existing on variant "One" - the revert is asynchronous
 			sandbox.stub(VariantManagementState, "getControlChangesForVariant")
@@ -506,8 +538,9 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("Create Variants List with favorited Standard", function(assert) {
+		QUnit.test("Create Variants List with favorited Standard", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			assert.ok(!this._oVM.oVariantPopOver);
 			this._oVM._createVariantList();
@@ -527,10 +560,11 @@ sap.ui.define([
 			assert.equal(aFilters[1].sPath, "favorite");
 		});
 
-		QUnit.test("Create Variants List with non favorited Standard", function(assert) {
+		QUnit.test("Create Variants List with non favorited Standard", async function(assert) {
 			this.oModel.oData.One.variants[0].favorite = false;
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			assert.ok(!this._oVM.oVariantPopOver);
 			this._oVM._createVariantList();
@@ -557,8 +591,9 @@ sap.ui.define([
 			assert.ok(this._oVM._openVariantList.called);
 		});
 
-		QUnit.test("Check 'variantsEditable'", function(assert) {
+		QUnit.test("Check 'variantsEditable'", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 			this._oVM._openVariantList();
 
 			assert.ok(this._oVM.oVariantSelectionPage.getShowFooter());
@@ -571,10 +606,11 @@ sap.ui.define([
 			assert.ok(!this._oVM.oVariantSelectionPage.getShowFooter());
 		});
 
-		QUnit.test("Check 'editable'", function(assert) {
+		QUnit.test("Check 'editable'", async function(assert) {
 			assert.ok(this.oVariantManagement.getEditable());
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 			this._oVM._openVariantList();
 
 			assert.ok(this._oVM.oVariantSelectionPage.getShowFooter());
@@ -673,9 +709,10 @@ sap.ui.define([
 			assert.ok(this._oVM.oSaveAsDialog.hasStyleClass(sSyleClassName), "then save as dialog is extended by the rta styleclass");
 		});
 
-		QUnit.test("Checking _handleVariantSaveAs", function(assert) {
+		QUnit.test("Checking _handleVariantSaveAs", async function(assert) {
 			const fnDone = assert.async();
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this.oVariantManagement.attachEventOnce("save", function(oEvent) {
 				assert.ok(!oEvent.getParameter("public"));
@@ -702,8 +739,9 @@ sap.ui.define([
 			this._oVM._handleVariantSaveAs("1");
 		});
 
-		QUnit.test("Checking _handleVariantSaveAs with cancel", function(assert) {
+		QUnit.test("Checking _handleVariantSaveAs with cancel", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			var bCalled = false;
 			this.oVariantManagement.attachCancel(function() {
@@ -721,9 +759,10 @@ sap.ui.define([
 			assert.ok(bCalled);
 		});
 
-		QUnit.test("Checking _handleVariantSave", function(assert) {
+		QUnit.test("Checking _handleVariantSave", async function(assert) {
 			const fnDone = assert.async();
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this.oVariantManagement.attachSave(function() {
 				assert.ok(true, "save event called");
@@ -762,16 +801,18 @@ sap.ui.define([
 			assert.equal(this._oVM.oManagementDialog, undefined);
 		});
 
-		QUnit.test("Checking create management dialog", function(assert) {
+		QUnit.test("Checking create management dialog", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this._oVM._createManagementDialog();
 
 			openDialogAndCheckContent(this._oVM, assert);
 		});
 
-		QUnit.test("Checking create management dialog, when dialog already exists", function(assert) {
+		QUnit.test("Checking create management dialog, when dialog already exists", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this._oVM._createManagementDialog();
 
@@ -782,6 +823,7 @@ sap.ui.define([
 
 		QUnit.test("Checking create management dialog, when dialog is already destroyed", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this._oVM._createManagementDialog();
 
@@ -819,8 +861,9 @@ sap.ui.define([
 			oIcon.destroy();
 		});
 
-		QUnit.test("Checking _handleManageDefaultVariantChange, ensure favorites are flagged for default variant", function(assert) {
+		QUnit.test("Checking _handleManageDefaultVariantChange, ensure favorites are flagged for default variant", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			var oItem = this._oVM._getItemByKey("v1");
 
@@ -856,8 +899,9 @@ sap.ui.define([
 			oIcon.destroy();
 		});
 
-		QUnit.test("Checking _handleManageCancelPressed", function(assert) {
+		QUnit.test("Checking _handleManageCancelPressed", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			var oItemDel = this._oVM._getItemByKey("v1");
 			var oItemRen = this._oVM._getItemByKey("v3");
@@ -908,6 +952,7 @@ sap.ui.define([
 		QUnit.test("Checking _handleManageSavePressed; deleted item is NOT selected", async function(assert) {
 			const fnDone = assert.async();
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves();
 
 			this.oVariantManagement.attachManage(function(oEvent) {
@@ -950,12 +995,13 @@ sap.ui.define([
 			assert.ok(!this._oVM.bFireSelect);
 		});
 
-		QUnit.test("Checking _handleManageSavePressed: deleted after search", function(assert) {
+		QUnit.test("Checking _handleManageSavePressed: deleted after search", async function(assert) {
 			var oEvent = {
 				getParameters() { return { newValue: "One" }; }
 			};
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this._oVM._createManagementDialog();
 			assert.ok(this._oVM.oManagementDialog);
@@ -1002,6 +1048,7 @@ sap.ui.define([
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves();
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this.oVariantManagement.attachManage((oEvent) => {
 				const oData = oEvent.getParameters();
@@ -1056,7 +1103,7 @@ sap.ui.define([
 			this._oVM._handleManageSavePressed();
 		});
 
-		QUnit.test("Checking _triggerSearch", function(assert) {
+		QUnit.test("Checking _triggerSearch", async function(assert) {
 			var oEvent = {
 				params: {
 					newValue: "e"
@@ -1067,6 +1114,7 @@ sap.ui.define([
 			};
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 			this._oVM._createVariantList();
 			var aItems = this._oVM.oVariantList.getItems();
 			assert.ok(aItems);
@@ -1177,8 +1225,9 @@ sap.ui.define([
 			this._oVM.oErrorVariantPopOver = null;
 		});
 
-		QUnit.test("Checking _triggerSearchInManageDialog", function(assert) {
+		QUnit.test("Checking _triggerSearchInManageDialog", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			assert.ok(!this._oVM._bRebindRequired);
 
@@ -1200,12 +1249,13 @@ sap.ui.define([
 			assert.ok(this._oVM._bRebindRequired);
 		});
 
-		QUnit.test("Checking _handleManageDeletePressed; deleted item is default variant and Standard marked as non favorite", function(assert) {
+		QUnit.test("Checking _handleManageDeletePressed; deleted item is default variant and Standard marked as non favorite", async function(assert) {
 			this.oModel.oData.One.variants[0].favorite = false;
 			this.oModel.oData.One.currentVariant = "v1";
 			this.oModel.oData.One.defaultVariant = "v1";
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this._oVM._createManagementDialog();
 			assert.ok(this._oVM.oManagementDialog);
@@ -1268,6 +1318,7 @@ sap.ui.define([
 			this.oModel.oData.One.defaultVariant = "v1";
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this._oVM._createManagementDialog();
 			assert.ok(this._oVM.oManagementDialog);
@@ -1323,12 +1374,13 @@ sap.ui.define([
 			assert.ok(!this.oVariantManagement.getDisplayTextForExecuteOnSelectionForStandardVariant());
 		});
 
-		QUnit.test("Checking the sharing text", function(assert) {
+		QUnit.test("Checking the sharing text", async function(assert) {
 			var sLanguage = Localization.getLanguage();
 
 			Localization.setLanguage("en_EN");
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this._oVM._openManagementDialog();
 			var aRows = this._oVM.oManagementTable.getItems();
@@ -1349,8 +1401,9 @@ sap.ui.define([
 			Localization.setLanguage(sLanguage);
 		});
 
-		QUnit.test("Checking the apply automatic text for standard", function(assert) {
+		QUnit.test("Checking the apply automatic text for standard", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			this.oVariantManagement.setDisplayTextForExecuteOnSelectionForStandardVariant("TEST");
 
@@ -1364,11 +1417,12 @@ sap.ui.define([
 			assert.equal(aCells[4].getText(), "TEST");
 		});
 
-		QUnit.test("check getApplyAutomaticallyOnVariant method", function(assert) {
+		QUnit.test("check getApplyAutomaticallyOnVariant method", async function(assert) {
 			var nCount = 0;
 			var fCallBack = function(oVariant) { assert.ok(oVariant); nCount++; return true; };
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			assert.equal(nCount, 0);
 			var oStdVariant = this.oVariantManagement._getInnerItemByKey("One");
@@ -1390,8 +1444,9 @@ sap.ui.define([
 			assert.equal(nCount, 1);
 		});
 
-		QUnit.test("Checking management dialog with roles component", function(assert) {
+		QUnit.test("Checking management dialog with roles component", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			var done = assert.async();
 
@@ -1455,8 +1510,9 @@ sap.ui.define([
 			this.oVariantManagement.openManagementDialog(false, "KUStyle", oComponentPromise);
 		});
 
-		QUnit.test("Checking save as dialog with roles component", function(assert) {
+		QUnit.test("Checking save as dialog with roles component", async function(assert) {
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
 
 			var done = assert.async();
 
@@ -1591,11 +1647,6 @@ sap.ui.define([
 			const sVMReference = oAnotherVariantManagement.getVariantManagementReference();
 			assert.equal(sVMReference, "appComponentId-AnotherTestVM", "Local ID is returned when app component is found");
 
-			this.oGetAppComponentForControlStub.resetHistory();
-			const sVMReferenceAgain = oAnotherVariantManagement.getVariantManagementReference();
-			assert.equal(sVMReferenceAgain, "appComponentId-AnotherTestVM", "Local ID is returned from cache on subsequent calls");
-			assert.ok(this.oGetAppComponentForControlStub.notCalled, "App component lookup not called again due to caching");
-
 			oVariantManagement.destroy();
 			oAnotherVariantManagement.destroy();
 		});
@@ -1634,25 +1685,8 @@ sap.ui.define([
 			});
 
 			this.oComp = new MockComponent({ id: sFlexReference });
-			this.oVariantModel = new VariantModel({}, {
-				appComponent: this.oComp
-			});
-			await this.oVariantModel.initialize();
-			this.oComp.setModel(this.oVariantModel, ControlVariantApplyAPI.getVariantModelName());
 			this.sVMReference = "mockview--VariantManagement1";
 
-			this.oUpdateCurrentVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
-			sandbox.stub(VariantManagementState, "getCurrentVariantReference").returns("variant1");
-			sandbox.stub(VariantManagementState, "getControlChangesForVariant").returns([]);
-			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
-			this.oGetDirtyFlexObjectsStub = sandbox.stub(FlexObjectState, "getDirtyFlexObjects");
-			sandbox.stub(Reverter, "revertMultipleChanges").resolves();
-
-			this.oCompContainer = new ComponentContainer("ComponentContainer", {
-				component: this.oComp
-			}).placeAt("qunit-fixture");
-			await nextUIUpdate();
-			this.oVMControl = Element.getElementById(this.oComp.createId(this.sVMReference));
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				FlexObjectFactory.createFlVariant({
 					reference: sFlexReference,
@@ -1669,6 +1703,27 @@ sap.ui.define([
 					layer: Layer.CUSTOMER
 				})
 			]);
+
+			this.oUpdateCurrentVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
+			sandbox.stub(VariantManagementState, "getCurrentVariantReference").returns("variant1");
+			sandbox.stub(VariantManagementState, "getControlChangesForVariant").returns([]);
+			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
+			this.oGetDirtyFlexObjectsStub = sandbox.stub(FlexObjectState, "getDirtyFlexObjects");
+			sandbox.stub(Reverter, "revertMultipleChanges").resolves();
+
+			this.oCompContainer = new ComponentContainer("ComponentContainer", {
+				component: this.oComp
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+			this.oVMControl = Element.getElementById(this.oComp.createId(this.sVMReference));
+
+			this.oVariantModel = new VariantModel({}, {
+				appComponent: this.oComp,
+				vmReference: this.sVMReference,
+				vmControl: this.oVMControl
+			});
+
+			this.oVMControl.setModel(this.oVariantModel, ControlVariantApplyAPI.getVariantModelName());
 		},
 		afterEach() {
 			this.oCompContainer.destroy();
@@ -1722,6 +1777,198 @@ sap.ui.define([
 			clickOnVMControl(this.oVMControl);
 
 			selectTargetVariant(this.oVMControl, 0);
+		});
+	});
+
+	QUnit.module("_setBindingContext / _createOwnModel", {
+		beforeEach() {
+			sandbox.stub(flSettings, "getInstance").resolves({
+				getIsVariantPersonalizationEnabled() { return true; },
+				getIsPublicFlVariantEnabled() { return true; }
+			});
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
+			this.oAppComponent = {
+				getLocalId: (sControlId) => sControlId,
+				getId: () => "componentId",
+				createId: (sId) => `componentId---${sId}`,
+				byId: () => null,
+				getModel: () => null
+			};
+			sandbox.stub(Utils, "getAppComponentForControl").returns(this.oAppComponent);
+			sandbox.stub(FlexState, "waitForInitialization").resolves();
+		},
+		afterEach() {
+			FlexState.clearState(sFlexReference);
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("creates the model and sets it on the control", async function(assert) {
+			const sVMId = "createOwnModelVM1";
+
+			FlexState.addDirtyFlexObjects(sFlexReference, [
+				FlexObjectFactory.createFlVariant({
+					id: sVMId,
+					variantName: "Standard",
+					variantManagementReference: sVMId,
+					user: "A",
+					layer: Layer.VENDOR
+				})
+			], "componentId");
+
+			const oVM = new VariantManagement(sVMId);
+			await oVM._createOwnModel(this.oAppComponent, sVMId);
+
+			const oModel = oVM.getModel(oVM.getModelName());
+			assert.ok(oModel, "the VariantModel was created");
+			assert.ok(oModel.isA("sap.ui.fl.variants.VariantModel"), "model is a VariantModel instance");
+			assert.ok(oModel.getData()[sVMId], "the model contains data for the VM reference");
+
+			oVM.destroy();
+		});
+
+		QUnit.test("creates the model without initial changes", async function(assert) {
+			const sVMId = "createOwnModelVM2";
+
+			FlexState.addDirtyFlexObjects(sFlexReference, [
+				FlexObjectFactory.createFlVariant({
+					id: sVMId,
+					variantName: "Standard",
+					variantManagementReference: sVMId,
+					user: "A",
+					layer: Layer.VENDOR
+				})
+			], "componentId");
+
+			const oVM = new VariantManagement(sVMId);
+			await oVM._createOwnModel(this.oAppComponent, sVMId);
+
+			const oModel = oVM.getModel(oVM.getModelName());
+			assert.ok(oModel, "the VariantModel was created even without initial changes");
+
+			oVM.destroy();
+		});
+
+		QUnit.test("does not bind when the control has an unstable ID", async function(assert) {
+			const oCheckControlIdStub = sandbox.stub(Utils, "checkControlId").returns(false);
+			const oLogErrorStub = sandbox.stub(Log, "error");
+
+			const oVM = new VariantManagement("unstableIdVM");
+			await oVM._setBindingContext();
+
+			assert.ok(oCheckControlIdStub.calledOnce, "checkControlId was called");
+			assert.notOk(oVM.oContext, "no binding context was set");
+			assert.notOk(oVM.getModel(oVM.getModelName()), "no VariantModel was created");
+			assert.ok(oLogErrorStub.calledOnce, "an error was logged");
+			assert.ok(
+				oLogErrorStub.firstCall.args[0].includes("is not stable"),
+				"the log message mentions the unstable ID"
+			);
+
+			await oVM.waitForInit().then(() => {
+				assert.ok(false, "waitForInit must not resolve when the ID is unstable");
+			}, (oError) => {
+				assert.ok(oError instanceof Error, "waitForInit rejects with an Error");
+				assert.ok(oError.message.includes("is not stable"), "the rejection message mentions the unstable ID");
+			});
+
+			oVM.destroy();
+		});
+
+		QUnit.test("rejects waitForInit when no app component can be determined", async function(assert) {
+			Utils.getAppComponentForControl.restore();
+			sandbox.stub(Utils, "getAppComponentForControl").returns(null);
+			const oLogErrorStub = sandbox.stub(Log, "error");
+
+			const oVM = new VariantManagement("noAppComponentVM");
+			await oVM._setBindingContext();
+
+			assert.notOk(oVM.oContext, "no binding context was set");
+			assert.ok(oLogErrorStub.calledOnce, "an error was logged");
+			assert.ok(
+				oLogErrorStub.firstCall.args[0].includes("no app component"),
+				"the log message mentions the missing app component"
+			);
+
+			await oVM.waitForInit().then(() => {
+				assert.ok(false, "waitForInit must not resolve when no app component exists");
+			}, (oError) => {
+				assert.ok(oError instanceof Error, "waitForInit rejects with an Error");
+				assert.ok(
+					oError.message.includes("no app component"),
+					"the rejection message mentions the missing app component"
+				);
+			});
+
+			oVM.destroy();
+		});
+
+		QUnit.test("rejects waitForInit when destroyed before initialization", async function(assert) {
+			const oVM = new VariantManagement("destroyBeforeInitVM");
+			const oInitPromise = oVM.waitForInit();
+			oVM.destroy();
+
+			await oInitPromise.then(() => {
+				assert.ok(false, "waitForInit must not resolve after destroy");
+			}, (oError) => {
+				assert.ok(oError instanceof Error, "waitForInit rejects with an Error");
+				assert.ok(
+					oError.message.includes("destroyed before initialization"),
+					"the rejection message mentions the early destroy"
+				);
+			});
+		});
+
+		QUnit.test("resolves waitForInit once the initialized event fires", async function(assert) {
+			const sVMId = "resolveInitVM";
+
+			FlexState.addDirtyFlexObjects(sFlexReference, [
+				FlexObjectFactory.createFlVariant({
+					id: sVMId,
+					variantName: "Standard",
+					variantManagementReference: sVMId,
+					user: "A",
+					layer: Layer.VENDOR
+				})
+			], "componentId");
+
+			const oVM = new VariantManagement(sVMId);
+			oVM.fireEvent("initialized");
+
+			await oVM.waitForInit();
+			assert.ok(true, "waitForInit resolved after the initialized event was fired");
+
+			oVM.destroy();
+		});
+
+		QUnit.test("aborts initialization when the control is destroyed during _createOwnModel", async function(assert) {
+			FlexState.waitForInitialization.restore();
+			let fnResolveFlexInit;
+			sandbox.stub(FlexState, "waitForInitialization").returns(new Promise((resolve) => {
+				fnResolveFlexInit = resolve;
+			}));
+
+			const sVMId = "destroyDuringCreateOwnModelVM";
+			const oVM = new VariantManagement(sVMId);
+			const oFireInitializedSpy = sandbox.spy(oVM, "fireInitialized");
+
+			const oBindingPromise = oVM._setBindingContext();
+			oVM.destroy();
+			fnResolveFlexInit();
+			await oBindingPromise;
+
+			assert.notOk(oVM.oContext, "no binding context was set");
+			assert.notOk(oVM.getModel(oVM.getModelName()), "no VariantModel was attached");
+			assert.ok(oFireInitializedSpy.notCalled, "fireInitialized was not called");
+
+			await oVM.waitForInit().then(() => {
+				assert.ok(false, "waitForInit must not resolve after destroy");
+			}, (oError) => {
+				assert.ok(oError instanceof Error, "waitForInit rejects with an Error");
+				assert.ok(
+					oError.message.includes("destroyed before initialization"),
+					"the rejection message mentions the early destroy"
+				);
+			});
 		});
 	});
 

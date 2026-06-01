@@ -1740,6 +1740,220 @@ sap.ui.define([
 			});
 	});
 
+	QUnit.test("Table with popin properties", function (assert) {
+		const oManifest = {
+			"sap.app": {
+				"id": "manifestResolver.test.card",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Table",
+				"content": {
+					"autoPopinMode": true,
+					"hiddenInPopin": ["Low", "None"],
+					"popinLayout": "GridLarge",
+					"data": {
+						"json": [
+							{
+								"FirstName": "Donna",
+								"LastName": "Moore"
+							}
+						]
+					},
+					"row": {
+						"columns": [
+							{
+								"title": "First Name",
+								"value": "{FirstName}",
+								"importance": "High"
+							},
+							{
+								"title": "Last Name",
+								"value": "{LastName}",
+								"importance": "Low"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/manifestResolver/"
+		});
+
+		// Act
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oRes) {
+				const oExpectedResult = {
+					"autoPopinMode": true,
+					"hiddenInPopin": ["Low", "None"],
+					"popinLayout": "GridLarge",
+					"headers": [
+						{
+							"title": "First Name",
+							"importance": "High"
+						},
+						{
+							"title": "Last Name",
+							"importance": "Low"
+						}
+					],
+					"groups": [
+						{
+							"rows": [
+								{
+									"columns": [
+										{
+											"value": "Donna"
+										},
+										{
+											"value": "Moore"
+										}
+									]
+								}
+							]
+						}
+					]
+				};
+
+				// Assert
+				assert.deepEqual(oRes["sap.card"].content, oExpectedResult, "table with popin properties is resolved correctly");
+
+				oCard.destroy();
+			});
+	});
+
+	QUnit.test("Table with popin properties - bindings", function (assert) {
+		const oManifest = {
+			"sap.app": {
+				"id": "manifestResolver.test.card",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Table",
+				"configuration": {
+					"parameters": {
+						"enableAutoPopin": {
+							"value": true
+						},
+						"popinLayoutType": {
+							"value": "Grid"
+						},
+						"hidePriorities": {
+							"value": ["Low", "None"]
+						}
+					}
+				},
+				"content": {
+					"autoPopinMode": "{parameters>/enableAutoPopin/value}",
+					"hiddenInPopin": "{parameters>/hidePriorities/value}",
+					"popinLayout": "{parameters>/popinLayoutType/value}",
+					"data": {
+						"json": [
+							{
+								"FirstName": "Donna",
+								"LastName": "Moore",
+								"Department": "IT"
+							},
+							{
+								"FirstName": "John",
+								"LastName": "Miller",
+								"Department": "Sales"
+							}
+						]
+					},
+					"row": {
+						"columns": [
+							{
+								"title": "First Name",
+								"value": "{FirstName}",
+								"importance": "High"
+							},
+							{
+								"title": "Last Name",
+								"value": "{LastName}",
+								"importance": "Low"
+							},
+							{
+								"title": "Department",
+								"value": "{Department}",
+								"importance": "None"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/manifestResolver/"
+		});
+
+		// Act
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oRes) {
+				const oExpectedResult = {
+					"autoPopinMode": true,
+					"hiddenInPopin": ["Low", "None"],
+					"popinLayout": "Grid",
+					"headers": [
+						{
+							"title": "First Name",
+							"importance": "High"
+						},
+						{
+							"title": "Last Name",
+							"importance": "Low"
+						},
+						{
+							"title": "Department",
+							"importance": "None"
+						}
+					],
+					"groups": [
+						{
+							"rows": [
+								{
+									"columns": [
+										{
+											"value": "Donna"
+										},
+										{
+											"value": "Moore"
+										},
+										{
+											"value": "IT"
+										}
+									]
+								},
+								{
+									"columns": [
+										{
+											"value": "John"
+										},
+										{
+											"value": "Miller"
+										},
+										{
+											"value": "Sales"
+										}
+									]
+								}
+							]
+						}
+					]
+				};
+
+				// Assert
+				assert.deepEqual(oRes["sap.card"].content, oExpectedResult, "table with bound popin properties is resolved correctly");
+
+				oCard.destroy();
+			});
+	});
+
 	QUnit.test("Timeline item template", function (assert) {
 		return Library.load("sap.suite.ui.commons").then(function () {
 			var oManifest = {

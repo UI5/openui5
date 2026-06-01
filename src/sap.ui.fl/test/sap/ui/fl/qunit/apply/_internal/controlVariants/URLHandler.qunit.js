@@ -2,17 +2,14 @@
 
 sap.ui.define([
 	"sap/base/Log",
-	"sap/ui/base/ManagedObjectObserver",
-	"sap/ui/core/UIComponent",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
+	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/hasher",
@@ -20,17 +17,14 @@ sap.ui.define([
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	Log,
-	ManagedObjectObserver,
-	UIComponent,
 	URLHandler,
+	VariantUtil,
 	FlexObjectFactory,
 	VariantManagementState,
 	VariantManagerApply,
 	FlexState,
-	ControlVariantApplyAPI,
 	ManifestUtils,
 	VariantManagement,
-	VariantModel,
 	Layer,
 	Utils,
 	hasher,
@@ -38,740 +32,650 @@ sap.ui.define([
 	FlQUnitUtils
 ) {
 	"use strict";
+
 	document.getElementById("qunit-fixture").style.display = "none";
+
 	const sandbox = sinon.createSandbox();
 	const sFlexReference = "someReference";
+	const sVMReference = "variantMgmtId1";
 
-	function stubUShellServices(oStub, mServices) {
-		oStub.callsFake((sServiceName) => Promise.resolve(mServices[sServiceName]));
+	function createURLHandlerWithServices(sandbox, mServices, mConstructorBag) {
+		const oRegisterNavigationFilterStub = sandbox.stub();
+		const oUnregisterNavigationFilterStub = sandbox.stub();
+		const oParseShellHashStub = sandbox.stub().returns({ params: {} });
+		const oNavigateStub = sandbox.stub();
+
+		const mDefaultServices = {
+			ShellNavigationInternal: {
+				registerNavigationFilter: oRegisterNavigationFilterStub,
+				unregisterNavigationFilter: oUnregisterNavigationFilterStub,
+				NavigationFilterStatus: { Continue: "Continue" }
+			},
+			URLParsing: { parseShellHash: oParseShellHashStub },
+			Navigation: { navigate: oNavigateStub }
+		};
+
+		const mResolvedServices = { ...mDefaultServices, ...mServices };
+
+		sandbox.stub(Utils, "getUShellService").callsFake(
+			(sServiceName) => Promise.resolve(mResolvedServices[sServiceName])
+		);
+		sandbox.stub(Utils, "getUshellContainer").returns({});
+
+		const oAppComponent = {
+			getId() { return "testAppComponent"; },
+			getComponentData() { return null; }
+		};
+
+		const oURLHandler = new URLHandler({
+			vmReference: sVMReference,
+			flexReference: sFlexReference,
+			appComponent: oAppComponent,
+			...mConstructorBag
+		});
+
+		return {
+			oURLHandler,
+			oAppComponent,
+			oRegisterNavigationFilterStub,
+			oUnregisterNavigationFilterStub,
+			oParseShellHashStub,
+			oNavigateStub
+		};
 	}
 
-	QUnit.module("Given an instance of VariantModel", {
-		beforeEach() {
-			this.oAppComponent = new UIComponent("appComponent");
-			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
-			this.oModel = new VariantModel({}, { appComponent: this.oAppComponent });
-			this.fnDestroyObserverSpy = sandbox.spy(ManagedObjectObserver.prototype, "observe");
-			this.fnDestroyUnobserverSpy = sandbox.spy(ManagedObjectObserver.prototype, "unobserve");
-			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService");
-		},
-		async afterEach() {
-			if (this.oAppComponent instanceof UIComponent) {
-				this.oAppComponent.destroy();
-			}
-			// Variant switch promise is awaited in the observerHandler before deregistering
-			await VariantManagementState.waitForAllVariantSwitches(sFlexReference);
-			URLHandler._reset();
-			sandbox.restore();
-		}
-	}, function() {
-		QUnit.test("when initialize() is called, followed by a getStoredHashParams() call", async function(assert) {
-			const oRegisterNavigationFilterStub = sandbox.stub();
-			const oUnregisterNavigationFilterStub = sandbox.stub();
-			stubUShellServices(this.oGetUShellServiceStub, {
-				ShellNavigationInternal: {
-					registerNavigationFilter: oRegisterNavigationFilterStub,
-					unregisterNavigationFilter: oUnregisterNavigationFilterStub
-				},
-				URLParsing: { parseShellHash() {} }
-			});
-			sandbox.stub(Utils, "getUshellContainer").returns({});
-
-			sandbox.spy(URLHandler, "attachHandlers");
-			const mPropertyBag = { flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent };
-			await URLHandler.initialize(mPropertyBag);
-
-			assert.ok(URLHandler.attachHandlers.calledWith(mPropertyBag), "then required handlers and observers were subscribed");
-
-			// Update hash params via URLHandler.update
-			await URLHandler.update({
-				parameters: ["expectedParameter1", "expectedParameter2"],
-				updateHashEntry: true,
-				flexReference: this.oModel.sFlexReference
-			});
-			assert.strictEqual(oRegisterNavigationFilterStub.callCount, 1, "then a navigation filter was registered");
-			assert.strictEqual(typeof oRegisterNavigationFilterStub.firstCall.args[0], "function");
-			assert.ok(oUnregisterNavigationFilterStub.notCalled, "then the navigation filter is not unregistered");
-			assert.deepEqual(
-				URLHandler.getStoredHashParams({ flexReference: this.oModel.sFlexReference }),
-				["expectedParameter1", "expectedParameter2"],
-				"then expected parameters are returned"
-			);
-		});
-
-		QUnit.test("when registerControl is called for a variant management control's local id", async function(assert) {
-			const sVariantManagementReference = "sLocalControlId";
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-			URLHandler.registerControl({ vmReference: sVariantManagementReference, updateURL: true, flexReference: this.oModel.sFlexReference });
-			const aCallArgs = this.fnDestroyObserverSpy.getCall(0).args;
-			assert.deepEqual(aCallArgs[0], this.oAppComponent, "then ManagedObjectObserver observers the AppComponent");
-			assert.strictEqual(aCallArgs[1].destroy, true, "then ManagedObjectObserver observers the destroy() method");
-
-			assert.strictEqual(
-				URLHandler.getStoredHashParams({ flexReference: this.oModel.sFlexReference }).length,
-				0,
-				"then the rendered control's local id was added to URLHandler's hash register"
-			);
-		});
-
-		QUnit.test("when attachHandlers() is called", async function(assert) {
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-
-			// first call
-			URLHandler.attachHandlers({ vmReference: "mockControlId1", updateURL: false, flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-			const aCallArgs = this.fnDestroyObserverSpy.getCall(0).args;
-			assert.deepEqual(aCallArgs[0], this.oAppComponent, "then ManagedObjectObserver observers the AppComponent");
-			assert.strictEqual(aCallArgs[1].destroy, true, "then ManagedObjectObserver observers the destroy() method");
-
-			// second call
-			URLHandler.attachHandlers({ vmReference: "mockControlId2", updateURL: false, flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-			assert.ok(this.fnDestroyObserverSpy.calledOnce, "then no new observers were listening to Component.destroy()");
-		});
-
-		QUnit.test("when app component is destroyed after attachHandlers() was already called", async function(assert) {
-			const sVariantManagementReference = "sLocalControlId";
-
-			const oRegisterNavigationFilterStub = sandbox.stub();
-			const oUnregisterNavigationFilterStub = sandbox.stub();
-			stubUShellServices(this.oGetUShellServiceStub, {
-				ShellNavigationInternal: {
-					registerNavigationFilter: oRegisterNavigationFilterStub,
-					unregisterNavigationFilter: oUnregisterNavigationFilterStub
-				},
-				URLParsing: { parseShellHash() {} }
-			});
-			sandbox.stub(Utils, "getUshellContainer").returns({});
-
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-
-			this.oModel.destroy = sandbox.stub();
-			URLHandler.attachHandlers(
-				{ vmReference: sVariantManagementReference, updateURL: true, flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent }
-			); // app component's destroy handlers are attached here
-
-			const fnVariantSwitchPromiseStub = sandbox.stub();
-			VariantManagementState.setVariantSwitchPromise(
-				sFlexReference,
-				sVariantManagementReference,
-				new Promise((resolve) => {
-					setTimeout(() => {
-						resolve();
-					}, 0);
-				}).then(fnVariantSwitchPromiseStub)
-			);
-
-			this.oAppComponent.destroy();
-
-			await VariantManagementState.waitForAllVariantSwitches(sFlexReference);
-			const aCallArgs = this.fnDestroyUnobserverSpy.getCall(0).args;
-			assert.deepEqual(
-				aCallArgs[0],
-				this.oAppComponent,
-				"then ManagedObjectObserver unobserve() was called for the AppComponent"
-			);
-			assert.ok(oRegisterNavigationFilterStub.calledOnce, "then a navigation filter was registered");
-			assert.ok(oUnregisterNavigationFilterStub.calledOnce, "then the navigation filter was deregistered");
-			assert.strictEqual(
-				oRegisterNavigationFilterStub.firstCall.args[0],
-				oUnregisterNavigationFilterStub.firstCall.args[0],
-				"then the same filter that was added is removed"
-			);
-			assert.strictEqual(
-				aCallArgs[1].destroy,
-				true,
-				"then ManagedObjectObserver unobserve() was called for the destroy() method"
-			);
-			assert.ok(
-				fnVariantSwitchPromiseStub.calledBefore(this.fnDestroyUnobserverSpy),
-				"then first variant switch was resolved and then component's destroy callback was called"
-			);
-		});
-
-		QUnit.test("when app component is destroyed, the variant model is also destroyed", async function(assert) {
-			stubUShellServices(this.oGetUShellServiceStub, {
-				ShellNavigationInternal: {
-					registerNavigationFilter: sandbox.stub(),
-					unregisterNavigationFilter: sandbox.stub()
-				},
-				URLParsing: { parseShellHash() {} }
-			});
-			sandbox.stub(Utils, "getUshellContainer").returns({});
-
-			// Set the variant model on the component as ComponentLifecycleHooks would
-			this.oAppComponent.setModel(
-				this.oModel,
-				ControlVariantApplyAPI.getVariantModelName()
-			);
-
-			await URLHandler.initialize({
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oAppComponent
-			});
-
-			const oModelDestroySpy = sandbox.spy(this.oModel, "destroy");
-
-			this.oAppComponent.destroy();
-			await VariantManagementState.waitForAllVariantSwitches(sFlexReference);
-
-			assert.ok(
-				oModelDestroySpy.calledOnce,
-				"then the variant model's destroy was called"
-			);
-		});
-
-		QUnit.test("when update() is called to update the URL with a hash register update", async function(assert) {
-			const mPropertyBag = {
-				parameters: ["testParam1,testParam2"],
-				updateHashEntry: true,
-				updateURL: true,
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			};
-
-			const oNavigateStub = sandbox.stub();
-			stubUShellServices(this.oGetUShellServiceStub, {
-				URLParsing: { parseShellHash: () => ({ params: {} }) },
-				Navigation: { navigate: oNavigateStub }
-			});
-			sandbox.stub(Utils, "getUshellContainer").returns({});
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-
-			await URLHandler.update(mPropertyBag);
-			assert.deepEqual(
-				oNavigateStub.firstCall.args[0].params[URLHandler.variantTechnicalParameterName],
-				mPropertyBag.parameters,
-				"then correct parameters were passed to be set for the URL hash"
-			);
-			assert.deepEqual(
-				URLHandler.getStoredHashParams({ flexReference: this.oModel.sFlexReference }),
-				mPropertyBag.parameters,
-				"then hash register was updated"
-			);
-		});
-
-		QUnit.test("when update() is called to update the URL without a hash register update", async function(assert) {
-			const mPropertyBag = {
-				parameters: ["testParam1,testParam2"],
-				updateHashEntry: false,
-				updateURL: true,
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			};
-
-			const oNavigateStub = sandbox.stub();
-			stubUShellServices(this.oGetUShellServiceStub, {
-				URLParsing: { parseShellHash: () => ({ params: {} }) },
-				Navigation: { navigate: oNavigateStub }
-			});
-			sandbox.stub(Utils, "getUshellContainer").returns({});
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-
-			await URLHandler.update(mPropertyBag);
-			assert.deepEqual(
-				oNavigateStub.firstCall.args[0].params[URLHandler.variantTechnicalParameterName],
-				mPropertyBag.parameters,
-				"then correct parameters were passed to be set for the URL hash"
-			);
-			assert.strictEqual(
-				URLHandler.getStoredHashParams({ flexReference: this.oModel.sFlexReference }).length,
-				0,
-				"then hash register was not updated"
-			);
-		});
-
-		QUnit.test("when update() is called without a component", async function(assert) {
-			this.oAppComponent.destroy();
-			const mPropertyBag = {
-				parameters: ["testParam1,testParam2"],
-				updateURL: true,
-				flexReference: this.oModel.sFlexReference,
-				appComponent: undefined
-			};
-
-			const oNavigateStub = sandbox.stub();
-			stubUShellServices(this.oGetUShellServiceStub, {
-				URLParsing: { parseShellHash: () => ({ params: {} }) },
-				Navigation: { navigate: oNavigateStub }
-			});
-			sandbox.stub(Utils, "getUshellContainer").returns({});
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-
-			await URLHandler.update(mPropertyBag);
-			assert.deepEqual(
-				oNavigateStub.firstCall.args[0].params[URLHandler.variantTechnicalParameterName],
-				mPropertyBag.parameters,
-				"then correct parameters were passed to be set for the URL hash"
-			);
-		});
-
-		QUnit.test("when update() is called to update hash register without a URL update", async function(assert) {
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-			const mPropertyBag = {
-				parameters: ["testParam1,testParam2"],
-				updateHashEntry: true,
-				flexReference: this.oModel.sFlexReference
-			};
-
-			await URLHandler.update(mPropertyBag);
-			assert.deepEqual(
-				URLHandler.getStoredHashParams({ flexReference: this.oModel.sFlexReference }),
-				mPropertyBag.parameters,
-				"then hash register was updated"
-			);
-		});
-
-		QUnit.test("when update() is called to update hash register with a URL update, but the parameters didn't change", async function(assert) {
-			const mPropertyBag = {
-				parameters: ["testParam1,testParam2"],
-				updateHashEntry: true,
-				updateURL: true,
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			};
-
-			const oReturnObject = { params: {} };
-			oReturnObject.params[URLHandler.variantTechnicalParameterName] = ["testParam1,testParam2"];
-			stubUShellServices(this.oGetUShellServiceStub, {
-				URLParsing: { parseShellHash: () => oReturnObject },
-				Navigation: { navigate() { assert.ok(false, "but 'navigate' should not be called"); } }
-			});
-			sandbox.stub(Utils, "getUshellContainer").returns({});
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-
-			await URLHandler.update(mPropertyBag);
-			assert.ok(true, "update is called");
-		});
-	});
-
-	function stubParseShellHash(aParameterValues) {
-		const mParameters = {};
-		if (aParameterValues) {
-			mParameters[URLHandler.variantTechnicalParameterName] = aParameterValues;
-		}
-		this.oParseShellHashStub.returns({ params: mParameters });
-	}
-
-	QUnit.module("Given multiple variant management controls", {
+	QUnit.module("URLHandler instance lifecycle", {
 		async beforeEach() {
-			this.oAppComponent = new UIComponent("appComponent");
-			this.oRegisterNavigationFilterStub = sandbox.stub();
-			this.oUnregisterNavigationFilterStub = sandbox.stub();
-			this.oManagedObjectObserverSpy = sandbox.spy(ManagedObjectObserver.prototype, "observe");
 			sandbox.stub(hasher, "getHash").returns("");
-
-			this.sDefaultStatus = "Continue";
-
-			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
-			await FlexState.initialize({
-				reference: sFlexReference,
-				componentId: "appComponent",
-				componentData: {},
-				manifest: {}
-			});
-
-			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
-				// VM1: standard variant + variant1, default set to variant1
-				FlexObjectFactory.createFlVariant({
-					id: "variantMgmtId1",
-					variantName: "Standard",
-					variantManagementReference: "variantMgmtId1",
-					reference: sFlexReference,
-					layer: Layer.VENDOR
-				}),
-				FlexObjectFactory.createFlVariant({
-					id: "variant1",
-					variantName: "variant1",
-					variantManagementReference: "variantMgmtId1",
-					variantReference: "variantMgmtId1",
-					reference: sFlexReference,
-					layer: Layer.VENDOR
-				}),
-				FlexObjectFactory.createVariantManagementChange({
-					id: "setDefault_vm1",
-					layer: Layer.VENDOR,
-					changeType: "setDefault",
-					fileType: "ctrl_variant_management_change",
-					selector: { id: "variantMgmtId1" },
-					content: { defaultVariant: "variant1" }
-				}),
-
-				// VM2: standard variant + variant2
-				FlexObjectFactory.createFlVariant({
-					id: "variantMgmtId2",
-					variantName: "Standard",
-					variantManagementReference: "variantMgmtId2",
-					reference: sFlexReference,
-					layer: Layer.VENDOR
-				}),
-				FlexObjectFactory.createFlVariant({
-					id: "variant2",
-					variantName: "variant2",
-					variantManagementReference: "variantMgmtId2",
-					variantReference: "variantMgmtId2",
-					reference: sFlexReference,
-					layer: Layer.VENDOR
-				}),
-
-				// VM3: standard variant + variant3
-				FlexObjectFactory.createFlVariant({
-					id: "variantMgmtId3",
-					variantName: "Standard",
-					variantManagementReference: "variantMgmtId3",
-					reference: sFlexReference,
-					layer: Layer.VENDOR
-				}),
-				FlexObjectFactory.createFlVariant({
-					id: "variant3",
-					variantName: "variant3",
-					variantManagementReference: "variantMgmtId3",
-					variantReference: "variantMgmtId3",
-					reference: sFlexReference,
-					layer: Layer.VENDOR
-				})
-			]);
-
-			// VM1: default=variant1, current=variantMgmtId1 (standard)
-			VariantManagementState.setCurrentVariant({
-				reference: sFlexReference,
-				vmReference: "variantMgmtId1",
-				newVReference: "variantMgmtId1"
-			});
-			// VM2: default=variantMgmtId2 (standard), current=variant2
-			VariantManagementState.setCurrentVariant({
-				reference: sFlexReference,
-				vmReference: "variantMgmtId2",
-				newVReference: "variant2"
-			});
-			// VM3: default=variantMgmtId3 (standard), current=variantMgmtId3
-
-			this.oModel = new VariantModel({}, { appComponent: this.oAppComponent });
-
-			this.oParseShellHashStub = sandbox.stub().returns({ params: {} });
-			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService");
-			stubUShellServices(this.oGetUShellServiceStub, {
-				ShellNavigationInternal: {
-					NavigationFilterStatus: { Continue: this.sDefaultStatus },
-					registerNavigationFilter: this.oRegisterNavigationFilterStub,
-					unregisterNavigationFilter: this.oUnregisterNavigationFilterStub
-				},
-				URLParsing: { parseShellHash: this.oParseShellHashStub }
-			});
-			sandbox.stub(Utils, "getUshellContainer").returns({});
-
-			await this.oModel.initialize();
-			this.oSwitchToDefaultVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant");
-
-			// variant management controls
-			this.oVariantManagement1 = new VariantManagement("variantMgmtId1", { updateVariantInURL: true });
-			this.oVariantManagement1.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-			this.oVariantManagement2 = new VariantManagement("variantMgmtId2", { updateVariantInURL: true });
-			this.oVariantManagement2.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-			this.oVariantManagement3 = new VariantManagement("variantMgmtId3", { updateVariantInURL: true });
-			this.oVariantManagement3.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-
-			// mock property bag for URLHandler.update
-			this.mPropertyBag = {
-				parameters: ["testParam1,testParam2"],
-				updateHashEntry: true,
-				updateURL: true
-			};
+			const mResult = createURLHandlerWithServices(sandbox);
+			this.oURLHandler = mResult.oURLHandler;
+			this.oRegisterNavigationFilterStub = mResult.oRegisterNavigationFilterStub;
+			this.oUnregisterNavigationFilterStub = mResult.oUnregisterNavigationFilterStub;
+			await this.oURLHandler.initialize();
 		},
-		async afterEach() {
-			this.oVariantManagement1.destroy();
-			this.oVariantManagement2.destroy();
-			this.oVariantManagement3.destroy();
-			if (this.oAppComponent instanceof UIComponent) {
-				this.oAppComponent.destroy();
-			}
-			await VariantManagementState.waitForAllVariantSwitches(sFlexReference);
-			URLHandler._reset();
-			FlexState.clearState();
-			VariantManagementState.resetCurrentVariantReference(sFlexReference);
+		afterEach() {
+			this.oURLHandler.destroy();
+			this.oVM?.destroy();
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when 3 variant management controls are rendered", function(assert) {
-			assert.ok(this.oVariantManagement1.getResetOnContextChange(), "then by default 'resetOnContextChange' is set to true");
+		QUnit.test("initialize resolves services and registerControl registers the navigation filter", function(assert) {
+			assert.deepEqual(this.oURLHandler.getStoredHashParams(), [], "initially has no stored hash params");
+			assert.strictEqual(this.oRegisterNavigationFilterStub.callCount, 0, "navigation filter is not yet registered");
+
+			this.oURLHandler.registerControl();
+
+			assert.strictEqual(this.oRegisterNavigationFilterStub.callCount, 1, "navigation filter was registered once");
 			assert.strictEqual(
-				this.oManagedObjectObserverSpy.getCalls()
-				.filter((oCall) => oCall.args[1].properties?.includes("resetOnContextChange")).length,
-				3,
-				"then an observer for 'resetOnContextChange' was added for each control"
+				typeof this.oRegisterNavigationFilterStub.firstCall.args[0],
+				"function",
+				"a function was registered as navigation filter"
 			);
 		});
 
-		QUnit.test("when event 'modelContextChange' is fired on a control rendered at position 1, out of 3 controls", function(assert) {
-			const fnDone = assert.async();
-			// Make updateCurrentVariant call the done after all expected calls
-			this.oSwitchToDefaultVariantStub.callsFake(() => {
-				if (this.oSwitchToDefaultVariantStub.callCount === 3) {
-					assert.strictEqual(
-						this.oSwitchToDefaultVariantStub.args[0][0].newVariantReference,
-						"variant1",
-						"then the first VM control was reset to default variant"
-					);
-					assert.strictEqual(
-						this.oSwitchToDefaultVariantStub.args[1][0].newVariantReference,
-						"variantMgmtId2",
-						"then the second VM control was reset to default variant"
-					);
-					assert.strictEqual(
-						this.oSwitchToDefaultVariantStub.args[2][0].newVariantReference,
-						"variantMgmtId3",
-						"then the third VM control was reset to default variant"
-					);
-					fnDone();
-				}
-			});
-			this.oVariantManagement1.fireEvent("modelContextChange");
+		QUnit.test("destroy deregisters the navigation filter", function(assert) {
+			this.oURLHandler.registerControl();
+
+			this.oURLHandler.destroy();
+
+			assert.strictEqual(this.oUnregisterNavigationFilterStub.callCount, 1, "navigation filter was unregistered");
+			assert.strictEqual(
+				this.oRegisterNavigationFilterStub.firstCall.args[0],
+				this.oUnregisterNavigationFilterStub.firstCall.args[0],
+				"the same filter function was unregistered that was registered"
+			);
 		});
 
-		QUnit.test("when event 'modelContextChange' is fired on a control rendered at position 1 with a URL parameter, out of 3 controls", function(assert) {
-			const fnDone = assert.async();
-			stubParseShellHash.call(this, [this.oVariantManagement1.getId()]);
+		QUnit.test("destroy cleans up the control property observer", function(assert) {
+			this.oVM = new VariantManagement(sVMReference);
+			this.oURLHandler.registerControl();
+			this.oURLHandler.handleModelContextChange(this.oVM);
 
-			sandbox.stub(VariantManagementState, "getVariant").callsFake((mPropertyBag) => {
-				if (
-					mPropertyBag.vmReference === this.oVariantManagement1.getId()
-					&& mPropertyBag.vReference === this.oVariantManagement1.getId()
-				) {
-					return { simulate: "foundVariant" };
-				}
-				return undefined;
-			});
+			this.oURLHandler.destroy();
 
-			// Make updateCurrentVariant call done after all expected calls
-			this.oSwitchToDefaultVariantStub.callsFake(() => {
-				if (this.oSwitchToDefaultVariantStub.callCount === 2) {
-					assert.strictEqual(
-						this.oSwitchToDefaultVariantStub.args[0][0].newVariantReference,
-						"variantMgmtId2",
-						"then the second VM control was reset to default variant"
-					);
-					assert.strictEqual(
-						this.oSwitchToDefaultVariantStub.args[1][0].newVariantReference,
-						"variantMgmtId3",
-						"then the third VM control was reset to default variant"
-					);
-					fnDone();
-				}
-			});
-
-			this.oVariantManagement1.fireEvent("modelContextChange");
+			assert.ok(true, "destroy completes without error after observer was set up");
 		});
 
-		QUnit.test("when event 'modelContextChange' is fired on a control rendered at position 2, out of 3 controls", function(assert) {
-			const fnDone = assert.async();
-			assert.ok(this.oVariantManagement1.getResetOnContextChange(), "then by default 'resetOnContextChange' is set to true");
-
-			// Make updateCurrentVariant call done after all expected calls
-			this.oSwitchToDefaultVariantStub.callsFake(() => {
-				if (this.oSwitchToDefaultVariantStub.callCount === 2) {
-					assert.strictEqual(
-						this.oSwitchToDefaultVariantStub.args[0][0].newVariantReference,
-						"variantMgmtId2",
-						"then the second VM control was reset to default variant"
-					);
-					assert.strictEqual(
-						this.oSwitchToDefaultVariantStub.args[1][0].newVariantReference,
-						"variantMgmtId3",
-						"then the third VM control was reset to default variant"
-					);
-					fnDone();
-				}
+		QUnit.test("getStoredHashParams reads variant params live from the URL hash", async function(assert) {
+			sandbox.restore();
+			hasher.getHash.restore?.();
+			const oHasherStub = sandbox.stub(hasher, "getHash").returns("");
+			const oParseShellHashStub = sandbox.stub();
+			const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+				URLParsing: { parseShellHash: oParseShellHashStub }
 			});
+			await oURLHandler.initialize();
 
-			this.oVariantManagement2.fireEvent("modelContextChange");
+			oParseShellHashStub.returns({ params: {} });
+			assert.deepEqual(oURLHandler.getStoredHashParams(), [], "returns empty array when hash has no variant params");
+
+			oParseShellHashStub.returns({
+				params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["v1,v2"] }
+			});
+			oHasherStub.returns("#hash");
+			assert.deepEqual(
+				oURLHandler.getStoredHashParams(),
+				["v1", "v2"],
+				"splits comma-separated params from the live hash"
+			);
+
+			oParseShellHashStub.returns({
+				params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["v1", "v2"] }
+			});
+			assert.deepEqual(
+				oURLHandler.getStoredHashParams(),
+				["v1", "v2"],
+				"returns array params from the live hash"
+			);
+
+			const aParams = oURLHandler.getStoredHashParams();
+			aParams.push("rogue");
+			assert.deepEqual(
+				oURLHandler.getStoredHashParams(),
+				["v1", "v2"],
+				"returns a copy so external mutation does not affect the URL state"
+			);
+
+			oURLHandler.destroy();
 		});
 
-		QUnit.test("when event 'modelContextChange' is fired on a control rendered at position 3, out of 3 controls", function(assert) {
-			const fnDone = assert.async();
-
-			// Make updateCurrentVariant call done after all expected calls
-			this.oSwitchToDefaultVariantStub.callsFake(() => {
-				assert.strictEqual(
-					this.oSwitchToDefaultVariantStub.callCount,
-					1,
-					"then the variant switch is called once"
-				);
-				assert.strictEqual(
-					this.oSwitchToDefaultVariantStub.args[0][0].newVariantReference,
-					"variantMgmtId3",
-					"then the third VM control was reset to default variant"
-				);
-				fnDone();
-			});
-
-			this.oVariantManagement3.fireEvent("modelContextChange");
-		});
-
-		QUnit.test("when event 'resetOnContextChange' is changed to false from true(default)", function(assert) {
-			const done = assert.async();
-			assert.ok(this.oVariantManagement1.getResetOnContextChange(), "then initially 'resetOnContextChange' is set to true");
-			sandbox.stub(this.oVariantManagement1, "detachEvent").callsFake((sEventName, fnCallBack) => {
-				if (sEventName === "modelContextChange") {
-					assert.ok(typeof fnCallBack === "function", "then the event handler was detached from 'modelContextChange'");
-					done();
-				}
-			});
-			this.oVariantManagement1.setResetOnContextChange(false);
-		});
-
-		QUnit.test("when property 'resetOnContextChange' is changed to true from false", function(assert) {
-			const fnDone = assert.async();
-			this.oVariantManagement1.setResetOnContextChange(false);
-			assert.notOk(this.oVariantManagement1.getResetOnContextChange(), "then initially 'resetOnContextChange' is set to false");
-			sandbox.stub(this.oVariantManagement1, "attachEvent").callsFake((sEventName, mParameters, fnCallBack) => {
-				if (sEventName === "modelContextChange") {
-					assert.deepEqual(
-						mParameters.flexReference,
-						sFlexReference,
-						"then the correct parameters were passed for the event handler"
-					);
-					assert.ok(typeof fnCallBack === "function", "then the event handler was attached to 'modelContextChange'");
-					fnDone();
-				}
-			});
-			this.oVariantManagement1.setResetOnContextChange(true);
-		});
-
-		QUnit.test("when the registered navigationFilter function is called and there is an error in hash parsing", async function(assert) {
-			this.oParseShellHashStub.throws("Service Error");
+		QUnit.test("initialize logs error when a UShell service is unavailable", async function(assert) {
+			sandbox.restore();
+			sandbox.stub(hasher, "getHash").returns("");
 			const oLogErrorStub = sandbox.stub(Log, "error");
-			const fnVariantIdChangeHandler = this.oRegisterNavigationFilterStub.getCall(0).args[0];
-			const sResult = await fnVariantIdChangeHandler();
-			assert.strictEqual(sResult, this.sDefaultStatus, "then the default navigation filter status was returned");
-			assert.strictEqual(oLogErrorStub.callCount, 1, "then the error was logged");
-		});
-
-		QUnit.test("when the registered navigationFilter function is called and there is a variant parameter, belonging to no variant", async function(assert) {
-			sandbox.stub(URLHandler, "update").callsFake(() => {
-				assert.notOk(true, "then update is incorrectly called");
+			sandbox.stub(Utils, "getUShellService").callsFake((sServiceName) => {
+				if (sServiceName === "Navigation") {
+					return Promise.reject(new Error("Service Error"));
+				}
+				return Promise.resolve({});
 			});
+			sandbox.stub(Utils, "getUshellContainer").returns({});
 
-			const fnVariantIdChangeHandler = this.oRegisterNavigationFilterStub.getCall(0).args[0];
-			stubParseShellHash.call(this, ["nonExistingVariant"]);
-			const sResult = await fnVariantIdChangeHandler("DummyHash");
-			assert.strictEqual(
-				sResult,
-				this.sDefaultStatus,
-				"then the default navigation filter status was returned"
-			);
-		});
-
-		QUnit.test("when the registered navigationFilter function is called and there is an unchanged variant URL parameter", async function(assert) {
-			const aParameterValues = [this.oModel.oData.variantMgmtId1.currentVariant, "paramValue2"];
-			stubParseShellHash.call(this, aParameterValues);
-			sandbox.stub(URLHandler, "update").callsFake(() => {
-				assert.notOk(true, "then update is called incorrectly");
+			this.oURLHandler = new URLHandler({
+				vmReference: sVMReference,
+				flexReference: sFlexReference,
+				appComponent: {}
 			});
-			const fnVariantIdChangeHandler = this.oRegisterNavigationFilterStub.getCall(0).args[0];
-			const sResult = await fnVariantIdChangeHandler("DummyHash");
-			assert.strictEqual(
-				sResult,
-				this.sDefaultStatus,
-				"then the default navigation filter status was returned"
-			);
-		});
+			await this.oURLHandler.initialize();
 
-		QUnit.test("when the registered navigationFilter function is called and there are unchanged variant URL parameters for two different variant managements", async function(assert) {
-			const aParameterValues = [
-				this.oModel.oData.variantMgmtId1.currentVariant,
-				this.oModel.oData.variantMgmtId2.currentVariant,
-				"otherParamValue"
-			];
-
-			stubParseShellHash.call(this, aParameterValues);
-
-			sandbox.stub(URLHandler, "update").callsFake(() => {
-				assert.notOk(true, "then update is called incorrectly");
-			});
-
-			const fnVariantIdChangeHandler = this.oRegisterNavigationFilterStub.getCall(0).args[0];
-			const sResult = await fnVariantIdChangeHandler("DummyHash");
-			assert.strictEqual(
-				sResult,
-				this.sDefaultStatus,
-				"then the default navigation filter status was returned"
-			);
-		});
-
-		QUnit.test("when the registered navigationFilter function is called and there are changed variant URL parameters", async function(assert) {
-			const aParameterValues = [
-				this.oModel.oData.variantMgmtId1.defaultVariant,
-				this.oModel.oData.variantMgmtId2.defaultVariant,
-				"otherParamValue"
-			];
-
-			stubParseShellHash.call(this, aParameterValues);
-
-			const mExpectedPropertyBag = {
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent,
-				updateURL: true,
-				updateHashEntry: true,
-				parameters: [
-					this.oModel.oData.variantMgmtId1.currentVariant,
-					this.oModel.oData.variantMgmtId2.currentVariant,
-					"otherParamValue"
-				]
-			};
-			const oUpdateStub = sandbox.stub(URLHandler, "update");
-
-			const fnVariantIdChangeHandler = this.oRegisterNavigationFilterStub.getCall(0).args[0];
-			const sResult = await fnVariantIdChangeHandler("DummyHash");
-			assert.deepEqual(
-				oUpdateStub.firstCall.args[0],
-				mExpectedPropertyBag,
-				"then URLHandler.update() was called with right parameters"
-			);
-			assert.strictEqual(
-				sResult,
-				this.sDefaultStatus,
-				"then the default navigation filter status was returned"
-			);
-		});
-
-		QUnit.test("when the registered navigationFilter function is called in UI Adaptation mode and there is a changed variant parameter, belonging to a variant", async function(assert) {
-			const aParameterValues = [
-				this.oModel.oData.variantMgmtId1.defaultVariant,
-				this.oModel.oData.variantMgmtId2.defaultVariant,
-				"otherParamValue"
-			];
-			URLHandler.setDesigntimeMode(true);
-			const mExpectedPropertyBagToUpdate = {
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent,
-				updateURL: false,
-				updateHashEntry: true,
-				parameters: [
-					this.oModel.oData.variantMgmtId1.currentVariant,
-					this.oModel.oData.variantMgmtId2.currentVariant,
-					"otherParamValue"
-				]
-			};
-			const oUpdateStub = sandbox.stub(URLHandler, "update");
-
-			stubParseShellHash.call(this, aParameterValues);
-
-			const fnVariantIdChangeHandler = this.oRegisterNavigationFilterStub.getCall(0).args[0];
-			const sResult = await fnVariantIdChangeHandler("DummyHash");
-			assert.deepEqual(
-				oUpdateStub.firstCall.args[0],
-				mExpectedPropertyBagToUpdate,
-				"then URLHandler.update() was called with right parameters to update hash register"
-			);
-			assert.strictEqual(
-				sResult,
-				this.sDefaultStatus,
-				"then the default navigation filter status was returned"
+			assert.strictEqual(oLogErrorStub.callCount, 1, "an error was logged");
+			assert.ok(
+				oLogErrorStub.firstCall.args[0].includes("Navigation"),
+				"the error message mentions the failed service"
 			);
 		});
 	});
 
-	QUnit.module("Given URLHandler.updateVariantInURL() to update a new variant parameter in the URL", {
-		async beforeEach() {
+	QUnit.module("URLHandler URL parameter management", {
+		beforeEach() {
+			sandbox.stub(hasher, "getHash").returns("");
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
+		},
+		afterEach() {
+			this.oURLHandler?.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("update() with updateURL=true calls navigate only when params changed", async function(assert) {
+			const oNavigateStub = sandbox.stub();
+			const oParseShellHashStub = sandbox.stub().returns({
+				semanticObject: "SO",
+				action: "action",
+				contextRaw: "ctx",
+				params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["testParam"] },
+				appSpecificRoute: "route",
+				writeHistory: false
+			});
+			const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+				URLParsing: { parseShellHash: oParseShellHashStub },
+				Navigation: { navigate: oNavigateStub }
+			});
+			this.oURLHandler = oURLHandler;
+			await oURLHandler.initialize();
+
+			oURLHandler.update({ parameters: ["testParam"], updateURL: true });
+			assert.strictEqual(oNavigateStub.callCount, 0, "navigate not called when params are unchanged");
+
+			oParseShellHashStub.returns({
+				semanticObject: "SO",
+				action: "action",
+				contextRaw: "ctx",
+				params: {},
+				appSpecificRoute: "route",
+				writeHistory: false
+			});
+			oURLHandler.update({ parameters: ["testParam"], updateURL: true });
+			assert.strictEqual(oNavigateStub.callCount, 1, "navigate called when params changed");
+			assert.deepEqual(
+				oNavigateStub.firstCall.args[0].params[VariantUtil.VARIANT_TECHNICAL_PARAMETER],
+				["testParam"],
+				"correct parameter passed to navigate"
+			);
+		});
+
+		QUnit.test("update() with silent=true uses hasher.replaceHash()", async function(assert) {
+			const sConstructedHash = "constructedHash";
+			const oConstructShellHashStub = sandbox.stub().callsFake(() => {
+				assert.notOk(hasher.changed.active, "hasher changed events are deactivated during silent update");
+				return sConstructedHash;
+			});
+			const oReplaceHashStub = sandbox.stub(hasher, "replaceHash");
+			const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+				URLParsing: {
+					getHash: () => "",
+					parseShellHash: sandbox.stub().returns({
+						params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["oldParam"] }
+					}),
+					constructShellHash: oConstructShellHashStub
+				}
+			});
+			this.oURLHandler = oURLHandler;
+			await oURLHandler.initialize();
+
+			oURLHandler.update({ parameters: ["newParam"], updateURL: true, silent: true });
+
+			assert.deepEqual(
+				oConstructShellHashStub.firstCall.args[0].params[VariantUtil.VARIANT_TECHNICAL_PARAMETER],
+				["newParam"],
+				"constructShellHash was called with the new parameters"
+			);
+			assert.ok(oReplaceHashStub.calledWith(sConstructedHash), "hasher.replaceHash was called with constructed hash");
+			assert.ok(hasher.changed.active, "hasher changed events are re-activated after silent update");
+		});
+
+		QUnit.test("update() without a valid app component logs a warning", async function(assert) {
+			const oWarnStub = sandbox.stub(Log, "warning");
+			const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+				URLParsing: {
+					parseShellHash: sandbox.stub().returns({
+						semanticObject: "SO",
+						action: "action",
+						params: {},
+						appSpecificRoute: "",
+						writeHistory: false
+					})
+				},
+				Navigation: { navigate: sandbox.stub() }
+			});
+			this.oURLHandler = oURLHandler;
+			await oURLHandler.initialize();
+
+			oURLHandler.update({ parameters: ["p1"], updateURL: true });
+
+			assert.ok(
+				oWarnStub.calledWith(
+					"Component instance not provided, so technical parameters in component data and browser history remain unchanged"
+				),
+				"a warning was logged for missing component data"
+			);
+		});
+
+		QUnit.test("update() with silent=true and valid component updates technical parameters", async function(assert) {
+			const sTechParamKey = VariantUtil.VARIANT_TECHNICAL_PARAMETER;
+			const oTechnicalParameters = { [sTechParamKey]: "oldParam" };
+			const oAppComponent = {
+				getId() { return "testApp"; },
+				getComponentData() {
+					return { technicalParameters: oTechnicalParameters };
+				}
+			};
+
+			const sConstructedHash = "constructedHash";
+			const oReplaceHashStub = sandbox.stub(hasher, "replaceHash");
+			const oConstructShellHashStub = sandbox.stub().returns(sConstructedHash);
+			const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+				URLParsing: {
+					getHash: () => "",
+					parseShellHash: sandbox.stub().returns({
+						params: { [sTechParamKey]: ["oldParam"] }
+					}),
+					constructShellHash: oConstructShellHashStub
+				}
+			}, { appComponent: oAppComponent });
+			this.oURLHandler = oURLHandler;
+			await oURLHandler.initialize();
+
+			oURLHandler.update({ parameters: ["newParam1", "newParam2"], updateURL: true, silent: true });
+
+			assert.deepEqual(
+				oAppComponent.getComponentData().technicalParameters[sTechParamKey],
+				["newParam1,newParam2"],
+				"component technical parameters were updated"
+			);
+			assert.ok(oReplaceHashStub.calledWith(sConstructedHash), "hasher.replaceHash was called");
+		});
+
+		QUnit.test("clearAllVariantURLParameters() calls update only when variant params are present", async function(assert) {
+			const oParseShellHashStub = sandbox.stub().returns({ params: { otherParam: "foo" } });
+			const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+				URLParsing: { parseShellHash: oParseShellHashStub },
+				Navigation: { navigate: sandbox.stub() }
+			});
+			this.oURLHandler = oURLHandler;
+			await oURLHandler.initialize();
+
+			const oUpdateSpy = sandbox.spy(oURLHandler, "update");
+			oURLHandler.clearAllVariantURLParameters();
+			assert.strictEqual(oUpdateSpy.callCount, 0, "update not called when no variant params in URL");
+
+			oParseShellHashStub.returns({
+				params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["someVariant"] }
+			});
+			oURLHandler.clearAllVariantURLParameters();
+			assert.strictEqual(oUpdateSpy.callCount, 1, "update called when variant params are present");
+			assert.deepEqual(
+				oUpdateSpy.firstCall.args[0],
+				{ updateURL: true, parameters: [] },
+				"update called with empty parameters"
+			);
+		});
+
+		QUnit.test("removeURLParameterForVariantManagement() returns index -1 and empty params when no params exist", async function(assert) {
+			const { oURLHandler } = createURLHandlerWithServices(sandbox);
+			this.oURLHandler = oURLHandler;
+			await oURLHandler.initialize();
+
+			const oResult = oURLHandler.removeURLParameterForVariantManagement();
+
+			assert.strictEqual(oResult.index, -1, "index is -1 when no URL params exist");
+			assert.deepEqual(oResult.parameters, [], "parameters is empty array");
+		});
+
+		QUnit.test("update() with silent=true and empty params deletes technical parameters from component", async function(assert) {
+			const sTechParamKey = VariantUtil.VARIANT_TECHNICAL_PARAMETER;
+			const oTechnicalParameters = { [sTechParamKey]: ["oldParam"] };
+			const oAppComponent = {
+				getId() { return "testApp"; },
+				getComponentData() {
+					return { technicalParameters: oTechnicalParameters };
+				}
+			};
+
+			const oReplaceHashStub = sandbox.stub(hasher, "replaceHash");
+			const oConstructShellHashStub = sandbox.stub().returns("emptyHash");
+			const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+				URLParsing: {
+					getHash: () => "",
+					parseShellHash: sandbox.stub().returns({
+						params: { [sTechParamKey]: ["oldParam"] }
+					}),
+					constructShellHash: oConstructShellHashStub
+				}
+			}, { appComponent: oAppComponent });
+			this.oURLHandler = oURLHandler;
+			await oURLHandler.initialize();
+
+			oURLHandler.update({ parameters: [], updateURL: true, silent: true });
+
+			assert.strictEqual(
+				oAppComponent.getComponentData().technicalParameters[sTechParamKey],
+				undefined,
+				"technical parameter was deleted from component data"
+			);
+			assert.ok(oReplaceHashStub.calledWith("emptyHash"), "hasher.replaceHash was called");
+		});
+
+		QUnit.test("updateVariantInURL() returns early when URLParsing service is unavailable", async function(assert) {
+			sandbox.stub(Utils, "getUShellService").callsFake(() => Promise.resolve(undefined));
+			sandbox.stub(Utils, "getUshellContainer").returns({});
+
+			this.oURLHandler = new URLHandler({
+				vmReference: sVMReference,
+				flexReference: sFlexReference,
+				appComponent: {}
+			});
+			await this.oURLHandler.initialize();
+
+			this.oURLHandler.updateVariantInURL("someVariant");
+
+			assert.ok(true, "updateVariantInURL completes without error when service is unavailable");
+		});
+
+		QUnit.module("updateVariantInURL()", {
+			async beforeEach() {
+				await FlexState.initialize({
+					reference: sFlexReference,
+					componentId: "testid",
+					componentData: {},
+					manifest: {}
+				});
+
+				FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
+					FlexObjectFactory.createFlVariant({
+						id: sVMReference,
+						variantName: "Standard",
+						variantManagementReference: sVMReference,
+						reference: sFlexReference,
+						layer: Layer.VENDOR
+					}),
+					FlexObjectFactory.createFlVariant({
+						id: "variant0",
+						variantName: "variant A",
+						variantManagementReference: sVMReference,
+						variantReference: sVMReference,
+						reference: sFlexReference,
+						layer: Layer.CUSTOMER
+					}),
+					FlexObjectFactory.createFlVariant({
+						id: "variant1",
+						variantName: "variant B",
+						variantManagementReference: sVMReference,
+						variantReference: sVMReference,
+						reference: sFlexReference,
+						layer: Layer.CUSTOMER
+					}),
+					FlexObjectFactory.createVariantManagementChange({
+						id: "setDefault_vm1",
+						layer: Layer.CUSTOMER,
+						changeType: "setDefault",
+						fileType: "ctrl_variant_management_change",
+						selector: { id: sVMReference },
+						content: { defaultVariant: "variant1" }
+					})
+				]);
+			},
+			afterEach() {
+				this.oURLHandler?.destroy();
+				FlexState.clearState();
+				VariantManagementState.resetCurrentVariantReference(sFlexReference, sVMReference);
+			}
+		}, function() {
+			QUnit.test("adds new variant or replaces existing one at the correct index", async function(assert) {
+				const oParseShellHashStub = sandbox.stub().returns({ params: {} });
+				const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+					URLParsing: { parseShellHash: oParseShellHashStub },
+					Navigation: { navigate: sandbox.stub() }
+				});
+				this.oURLHandler = oURLHandler;
+				await oURLHandler.initialize();
+				const oUpdateSpy = sandbox.spy(oURLHandler, "update");
+
+				oURLHandler.updateVariantInURL("variant0");
+
+				assert.ok(oUpdateSpy.calledOnce, "update called for non-default variant");
+				assert.deepEqual(oUpdateSpy.firstCall.args[0].parameters, ["variant0"], "variant added to empty params");
+				assert.strictEqual(oUpdateSpy.firstCall.args[0].updateURL, true, "updateURL is true");
+
+				oUpdateSpy.resetHistory();
+				oParseShellHashStub.returns({
+					params: {
+						[VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["otherParam", sVMReference].map(encodeURIComponent)
+					}
+				});
+				oURLHandler.updateVariantInURL("variant0");
+
+				assert.deepEqual(
+					oUpdateSpy.firstCall.args[0].parameters,
+					["otherParam", "variant0"],
+					"existing param for the VM was replaced with the new variant"
+				);
+			});
+
+			QUnit.test("for default variant removes entry or skips update when not in URL", async function(assert) {
+				const oParseShellHashStub = sandbox.stub().returns({ params: {} });
+				const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+					URLParsing: { parseShellHash: oParseShellHashStub },
+					Navigation: { navigate: sandbox.stub() }
+				});
+				this.oURLHandler = oURLHandler;
+				await oURLHandler.initialize();
+				const oUpdateSpy = sandbox.spy(oURLHandler, "update");
+
+				oURLHandler.updateVariantInURL("variant1");
+				assert.strictEqual(oUpdateSpy.callCount, 0, "update not called for default variant with no params");
+
+				oParseShellHashStub.returns({
+					params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["Dummy", sVMReference, "Dummy1"] }
+				});
+				oURLHandler.updateVariantInURL("variant1");
+
+				assert.strictEqual(oUpdateSpy.callCount, 1, "update called to remove default variant entry");
+				assert.deepEqual(
+					oUpdateSpy.firstCall.args[0].parameters,
+					["Dummy", "Dummy1"],
+					"the default variant's entry was removed from the parameters"
+				);
+			});
+
+			QUnit.test("in design time mode reads URL params and sets updateURL=false", async function(assert) {
+				const oParseShellHashStub = sandbox.stub().returns({
+					params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["Dummy", sVMReference, "Dummy1"] }
+				});
+				const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+					URLParsing: { parseShellHash: oParseShellHashStub }
+				});
+				this.oURLHandler = oURLHandler;
+				await oURLHandler.initialize();
+				oURLHandler.setDesigntimeMode(true);
+				const oUpdateSpy = sandbox.spy(oURLHandler, "update");
+
+				oURLHandler.updateVariantInURL("variant0");
+
+				assert.ok(oUpdateSpy.calledOnce, "update was called");
+				assert.deepEqual(
+					oUpdateSpy.firstCall.args[0].parameters,
+					["Dummy", "variant0", "Dummy1"],
+					"the URL params were read and the variant was replaced"
+				);
+				assert.strictEqual(oUpdateSpy.firstCall.args[0].updateURL, false, "updateURL=false in design time mode");
+
+				oUpdateSpy.restore();
+				oParseShellHashStub.returns({ params: {} });
+				const oUpdateSpy2 = sandbox.spy(oURLHandler, "update");
+
+				oURLHandler.updateVariantInURL("variant0");
+
+				assert.deepEqual(
+					oUpdateSpy2.firstCall.args[0].parameters,
+					["variant0"],
+					"variant appended to empty URL params"
+				);
+				assert.strictEqual(oUpdateSpy2.firstCall.args[0].updateURL, false, "updateURL=false");
+			});
+
+			QUnit.test("setDesigntimeMode(false) syncs current variant to URL after design time", async function(assert) {
+				const oParseShellHashStub = sandbox.stub().returns({ params: {} });
+				const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+					URLParsing: { parseShellHash: oParseShellHashStub },
+					Navigation: { navigate: sandbox.stub() }
+				});
+				this.oURLHandler = oURLHandler;
+				await oURLHandler.initialize();
+				oURLHandler.registerControl();
+				VariantManagementState.setCurrentVariant({
+					reference: sFlexReference,
+					vmReference: sVMReference,
+					newVReference: "variant0"
+				});
+
+				oURLHandler.setDesigntimeMode(true);
+				const oUpdateSpy = sandbox.spy(oURLHandler, "update");
+
+				oURLHandler.setDesigntimeMode(false);
+
+				assert.ok(oUpdateSpy.calledOnce, "update was called when leaving design time mode");
+				assert.deepEqual(
+					oUpdateSpy.firstCall.args[0].parameters,
+					["variant0"],
+					"the current variant is written to the URL"
+				);
+				assert.strictEqual(oUpdateSpy.firstCall.args[0].updateURL, true, "updateURL=true outside design time mode");
+			});
+
+			QUnit.test("setDesigntimeMode(false) skips URL sync when current variant is the default", async function(assert) {
+				const oParseShellHashStub = sandbox.stub().returns({ params: {} });
+				const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+					URLParsing: { parseShellHash: oParseShellHashStub },
+					Navigation: { navigate: sandbox.stub() }
+				});
+				this.oURLHandler = oURLHandler;
+				await oURLHandler.initialize();
+				oURLHandler.registerControl();
+				// variant1 is the default (see beforeEach setDefault change)
+				VariantManagementState.setCurrentVariant({
+					reference: sFlexReference,
+					vmReference: sVMReference,
+					newVReference: "variant1"
+				});
+
+				oURLHandler.setDesigntimeMode(true);
+				const oUpdateSpy = sandbox.spy(oURLHandler, "update");
+
+				oURLHandler.setDesigntimeMode(false);
+
+				assert.strictEqual(oUpdateSpy.callCount, 0, "update is not called for the default variant on empty URL");
+			});
+
+			QUnit.test("setDesigntimeMode(false) does nothing when control was not registered", async function(assert) {
+				const oParseShellHashStub = sandbox.stub().returns({ params: {} });
+				const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+					URLParsing: { parseShellHash: oParseShellHashStub },
+					Navigation: { navigate: sandbox.stub() }
+				});
+				this.oURLHandler = oURLHandler;
+				await oURLHandler.initialize();
+				VariantManagementState.setCurrentVariant({
+					reference: sFlexReference,
+					vmReference: sVMReference,
+					newVReference: "variant0"
+				});
+
+				oURLHandler.setDesigntimeMode(true);
+				const oUpdateSpy = sandbox.spy(oURLHandler, "update");
+
+				oURLHandler.setDesigntimeMode(false);
+
+				assert.strictEqual(oUpdateSpy.callCount, 0, "update is not called when control was never registered");
+			});
+
+			QUnit.test("setDesigntimeMode(false) is a no-op when not previously in design time mode", async function(assert) {
+				const oParseShellHashStub = sandbox.stub().returns({ params: {} });
+				const { oURLHandler } = createURLHandlerWithServices(sandbox, {
+					URLParsing: { parseShellHash: oParseShellHashStub },
+					Navigation: { navigate: sandbox.stub() }
+				});
+				this.oURLHandler = oURLHandler;
+				await oURLHandler.initialize();
+				oURLHandler.registerControl();
+				VariantManagementState.setCurrentVariant({
+					reference: sFlexReference,
+					vmReference: sVMReference,
+					newVReference: "variant0"
+				});
+				const oUpdateSpy = sandbox.spy(oURLHandler, "update");
+
+				oURLHandler.setDesigntimeMode(false);
+
+				assert.strictEqual(oUpdateSpy.callCount, 0, "update is not called if design time mode was never entered");
+			});
+		});
+	});
+
+	QUnit.module("URLHandler navigation filter and context change", {
+		async beforeEach() {
+			sandbox.stub(hasher, "getHash").returns("");
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
+
 			await FlexState.initialize({
 				reference: sFlexReference,
 				componentId: "testid",
@@ -780,462 +684,283 @@ sap.ui.define([
 			});
 
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
-				// VM1: standard + variant0 (CUSTOMER) + variant1 (CUSTOMER, default)
 				FlexObjectFactory.createFlVariant({
-					id: "variantMgmtId1",
+					id: sVMReference,
 					variantName: "Standard",
-					variantManagementReference: "variantMgmtId1",
+					variantManagementReference: sVMReference,
 					reference: sFlexReference,
 					layer: Layer.VENDOR
-				}),
-				FlexObjectFactory.createFlVariant({
-					id: "variant0",
-					variantName: "variant A",
-					variantManagementReference: "variantMgmtId1",
-					variantReference: "variantMgmtId1",
-					reference: sFlexReference,
-					layer: "CUSTOMER",
-					user: "Me"
 				}),
 				FlexObjectFactory.createFlVariant({
 					id: "variant1",
-					variantName: "variant B",
-					variantManagementReference: "variantMgmtId1",
-					variantReference: "variantMgmtId1",
-					reference: sFlexReference,
-					layer: "CUSTOMER",
-					user: "Me"
-				}),
-				FlexObjectFactory.createVariantManagementChange({
-					id: "setDefault_vm1",
-					layer: "CUSTOMER",
-					changeType: "setDefault",
-					fileType: "ctrl_variant_management_change",
-					selector: { id: "variantMgmtId1" },
-					content: { defaultVariant: "variant1" }
-				}),
-
-				// VM2: standard + variant20 (CUSTOMER) + variant21 (CUSTOMER, default)
-				FlexObjectFactory.createFlVariant({
-					id: "variantMgmtId2",
-					variantName: "Standard",
-					variantManagementReference: "variantMgmtId2",
+					variantName: "variant1",
+					variantManagementReference: sVMReference,
+					variantReference: sVMReference,
 					reference: sFlexReference,
 					layer: Layer.VENDOR
 				}),
-				FlexObjectFactory.createFlVariant({
-					id: "variant20",
-					variantName: "variant A",
-					variantManagementReference: "variantMgmtId2",
-					variantReference: "variantMgmtId2",
-					reference: sFlexReference,
-					layer: "CUSTOMER",
-					user: "Me"
-				}),
-				FlexObjectFactory.createFlVariant({
-					id: "variant21",
-					variantName: "variant B",
-					variantManagementReference: "variantMgmtId2",
-					variantReference: "variantMgmtId2",
-					reference: sFlexReference,
-					layer: "CUSTOMER",
-					user: "Me"
-				}),
 				FlexObjectFactory.createVariantManagementChange({
-					id: "setDefault_vm2",
-					layer: "CUSTOMER",
+					id: "setDefault_vm1",
+					layer: Layer.VENDOR,
 					changeType: "setDefault",
 					fileType: "ctrl_variant_management_change",
-					selector: { id: "variantMgmtId2" },
-					content: { defaultVariant: "variant21" }
+					selector: { id: sVMReference },
+					content: { defaultVariant: "variant1" }
 				})
 			]);
 
-			this.oModel = new VariantModel({}, {
-				appComponent: { getId() { return "testid"; }, byId() { return undefined; } }
+			VariantManagementState.setCurrentVariant({
+				reference: sFlexReference,
+				vmReference: sVMReference,
+				newVReference: sVMReference
 			});
 
 			this.oParseShellHashStub = sandbox.stub().returns({ params: {} });
-			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService");
-			stubUShellServices(this.oGetUShellServiceStub, {
-				URLParsing: { parseShellHash: this.oParseShellHashStub }
+			this.oRegisterNavigationFilterStub = sandbox.stub();
+			this.oUnregisterNavigationFilterStub = sandbox.stub();
+
+			sandbox.stub(Utils, "getUShellService").callsFake((sServiceName) => {
+				const mServices = {
+					ShellNavigationInternal: {
+						registerNavigationFilter: this.oRegisterNavigationFilterStub,
+						unregisterNavigationFilter: this.oUnregisterNavigationFilterStub,
+						NavigationFilterStatus: { Continue: "Continue" }
+					},
+					URLParsing: { parseShellHash: this.oParseShellHashStub }
+				};
+				return Promise.resolve(mServices[sServiceName]);
 			});
 			sandbox.stub(Utils, "getUshellContainer").returns({});
 
-			await this.oModel.initialize();
-			sandbox.stub(URLHandler, "update");
+			this.oURLHandler = new URLHandler({
+				vmReference: sVMReference,
+				flexReference: sFlexReference,
+				appComponent: {}
+			});
+			await this.oURLHandler.initialize();
+			this.oURLHandler.registerControl();
 		},
 		afterEach() {
-			URLHandler._reset();
-			sandbox.restore();
-			this.oModel.destroy();
+			this.oURLHandler.destroy();
+			this.oVM?.destroy();
 			FlexState.clearState();
-			VariantManagementState.resetCurrentVariantReference(sFlexReference);
-		}
-	}, function() {
-		QUnit.test("when called with no variant URL parameter", async function(assert) {
-			this.oParseShellHashStub.returns({ params: {} });
-			const aModifiedUrlTechnicalParameters = ["variant0"];
-			sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
-				return mParams.vmReference === "variantMgmtId1" && mParams.vReference === "variantMgmtId1"
-					? { simulate: "foundVariant" }
-					: undefined;
-			});
-			sandbox.spy(URLHandler, "removeURLParameterForVariantManagement");
-
-			await URLHandler.updateVariantInURL({
-				vmReference: "variantMgmtId1",
-				newVReference: "variant0",
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			});
-			assert.ok(this.oGetUShellServiceStub.called, "then url parameters requested");
-			const oRemoveResult = await URLHandler.removeURLParameterForVariantManagement.returnValues[0];
-			assert.deepEqual(oRemoveResult, {
-				parameters: [],
-				index: -1
-			}, "then URLHandler.removeURLParameterForVariantManagement() returns the correct parameters and index");
-			assert.ok(URLHandler.update.calledWithExactly({
-				parameters: aModifiedUrlTechnicalParameters,
-				updateURL: true,
-				updateHashEntry: true,
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			}), "then URLHandler.update() called with the correct object as parameter");
-		});
-
-		QUnit.test("when called with encoded variant URL parameter for the same variant management", async function(assert) {
-			const aExistingParameters = ["Dummy::'123'/'456'", "variantMgmtId1"];
-			const oReturnObject = {
-				params: {
-					[URLHandler.variantTechnicalParameterName]: aExistingParameters
-					.map((sParam) => { return encodeURIComponent(sParam); })
-				}
-			};
-
-			sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
-				return mParams.vmReference === "variantMgmtId1" && mParams.vReference === "variantMgmtId1"
-					? { simulate: "foundVariant" }
-					: undefined;
-			});
-			this.oParseShellHashStub.returns(oReturnObject);
-			sandbox.spy(URLHandler, "removeURLParameterForVariantManagement");
-
-			await URLHandler.updateVariantInURL({
-				vmReference: "variantMgmtId1",
-				newVReference: "variant0",
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			});
-			assert.ok(this.oGetUShellServiceStub.called, "then url parameters requested");
-			const oRemoveResult = await URLHandler.removeURLParameterForVariantManagement.returnValues[0];
-			assert.deepEqual(oRemoveResult, {
-				parameters: [aExistingParameters[0]],
-				index: 1
-			}, "then URLHandler.removeURLParameterForVariantManagement() returns the correct parameters and index");
-			assert.deepEqual(
-				URLHandler.update.firstCall.args[0], {
-					parameters: [aExistingParameters[0], "variant0"],
-					updateURL: true,
-					updateHashEntry: true,
-					flexReference: this.oModel.sFlexReference,
-					appComponent: this.oModel.oAppComponent
-				},
-				"then URLHandler.update() called with the correct object as parameter"
-			);
-		});
-
-		QUnit.test("when called in standalone mode (without a ushell container)", async function(assert) {
-			this.oParseShellHashStub.returns({});
-			sandbox.spy(URLHandler, "removeURLParameterForVariantManagement");
-
-			await URLHandler.updateVariantInURL({
-				vmReference: "variantMgmtId1",
-				newVReference: "variant0",
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			});
-
-			assert.ok(this.oGetUShellServiceStub.called, "then url parameters requested");
-			const oRemoveResult = await URLHandler.removeURLParameterForVariantManagement.returnValues[0];
-			assert.deepEqual(oRemoveResult, {
-				index: -1
-			}, "then URLHandler.removeURLParameterForVariantManagement() returns the correct parameters and index");
-			assert.strictEqual(URLHandler.update.callCount, 0, "then URLHandler.update() not called");
-		});
-
-		QUnit.test("when called for the default variant with no variant URL parameters", async function(assert) {
-			this.oParseShellHashStub.returns({});
-
-			await URLHandler.updateVariantInURL({
-				vmReference: "variantMgmtId1",
-				newVReference: "variant1",
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			}); // default variant
-
-			assert.strictEqual(URLHandler.update.callCount, 0, "then URLHandler.update() not called");
-		});
-
-		QUnit.test("when called for the default variant with a valid variant URL parameter for the same variant management", async function(assert) {
-			const oReturnObject = { params: {} };
-			oReturnObject.params[URLHandler.variantTechnicalParameterName] = ["Dummy", "variantMgmtId1", "Dummy1"];
-			this.oParseShellHashStub.returns(oReturnObject);
-
-			sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
-				return mParams.vmReference === "variantMgmtId1" && mParams.vReference === "variantMgmtId1"
-					? { simulate: "foundVariant" }
-					: undefined;
-			});
-
-			await URLHandler.updateVariantInURL({
-				vmReference: "variantMgmtId1",
-				newVReference: "variant1",
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			}); // default variant
-
-			assert.ok(URLHandler.update.calledWith({
-				parameters: ["Dummy", "Dummy1"],
-				updateURL: true,
-				updateHashEntry: true,
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			}), "then URLHandler.update() called with the correct object with a parameter list excluding default variant");
-		});
-
-		QUnit.test("when called while in adaptation mode with variant parameters present in the hash register", async function(assert) {
-			// return parameters saved at the current index of the hash register
-			sandbox.stub(URLHandler, "getStoredHashParams").returns(["Dummy", "variantMgmtId1", "Dummy1"]);
-			sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
-				return mParams.vmReference === "variantMgmtId1" && mParams.vReference === "variantMgmtId1"
-					? { simulate: "foundVariant" }
-					: undefined;
-			});
-			URLHandler.setDesigntimeMode(true);
-
-			await URLHandler.updateVariantInURL({
-				vmReference: "variantMgmtId1",
-				newVReference: "variant0",
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			});
-
-			assert.ok(URLHandler.update.calledWith({
-				parameters: ["Dummy", "variant0", "Dummy1"],
-				updateURL: false,
-				updateHashEntry: true,
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			}), "then URLHandler.update() called with the update parameter list but the url is not updated");
-		});
-
-		QUnit.test("when called while in adaptation mode and there are no variant parameters saved in the hash register", async function(assert) {
-			URLHandler.setDesigntimeMode(true);
-
-			await URLHandler.updateVariantInURL({
-				vmReference: "variantMgmtId1",
-				newVReference: "variant0",
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			});
-
-			assert.ok(URLHandler.update.calledWith({
-				parameters: ["variant0"],
-				updateURL: false,
-				updateHashEntry: true,
-				flexReference: this.oModel.sFlexReference,
-				appComponent: this.oModel.oAppComponent
-			}), "then URLHandler.update() called with the correct object with an empty parameter list");
-		});
-	});
-
-	QUnit.module("Given URLHandler.update to update hash parameters in URL", {
-		beforeEach() {
-			sandbox.stub(Log, "warning");
-			sandbox.stub(hasher, "replaceHash");
-			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService");
-			sandbox.stub(Utils, "getUshellContainer").returns({});
-
-			this.oAppComponent = new UIComponent("appComponent");
-			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
-			this.oModel = new VariantModel({}, { appComponent: this.oAppComponent });
-		},
-		afterEach() {
-			this.oAppComponent.destroy();
-			URLHandler._reset();
+			VariantManagementState.resetCurrentVariantReference(sFlexReference, sVMReference);
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when called to process silently, with an invalid component and some parameter values", async function(assert) {
-			const aNewParamValues = ["testValue1, testValue2"];
-			const oParameters = {};
-			const sParamValue = "testValue";
-			const sConstructedHashValue = "hashValue";
-			oParameters[URLHandler.variantTechnicalParameterName] = [sParamValue];
-
-			const oConstructShellHashStub = sandbox.stub().callsFake(() => {
-				assert.notOk(hasher.changed.active, "then the hasher changed events are deactivated");
-				return sConstructedHashValue;
-			});
-			stubUShellServices(this.oGetUShellServiceStub, {
-				URLParsing: {
-					getHash: () => "",
-					parseShellHash: () => ({ params: oParameters }),
-					constructShellHash: oConstructShellHashStub
-				}
-			});
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-
-			await URLHandler.update({
-				flexReference: sFlexReference,
-				appComponent: undefined,
-				parameters: aNewParamValues,
-				updateURL: true,
-				silent: true
-			});
-
-			assert.deepEqual(
-				oConstructShellHashStub.firstCall.args[0].params[URLHandler.variantTechnicalParameterName],
-				aNewParamValues,
-				"then the new shell hash is created with the passed parameters"
-			);
-			assert.ok(hasher.replaceHash.calledWith(sConstructedHashValue), "then hasher.replaceHash is called with the correct hash");
-			assert.ok(Log.warning.calledWith(
-				"Component instance not provided, so technical parameters in component data and browser history remain unchanged"
-			), "then warning produced as component is invalid");
-			assert.ok(hasher.changed.active, "then the hasher changed events are activated again");
+		QUnit.test("navigation filter is called and returns Continue status", function(assert) {
+			const fnNavigationFilter = this.oRegisterNavigationFilterStub.firstCall.args[0];
+			const sResult = fnNavigationFilter("DummyHash");
+			assert.strictEqual(sResult, "Continue", "navigation filter returns Continue status");
 		});
 
-		QUnit.test("when called to process silently, with a valid component and some parameter values", async function(assert) {
-			const aNewParamValues = ["testValue1, testValue2"];
-			const oParameters = {};
-			const sParamValue = "testValue";
-			const sConstructedHashValue = "hashValue";
-			oParameters[URLHandler.variantTechnicalParameterName] = [sParamValue];
+		QUnit.test("navigation filter with hash parse error logs error and returns Continue", function(assert) {
+			const oLogErrorStub = sandbox.stub(Log, "error");
+			this.oParseShellHashStub.throws(new Error("Service Error"));
 
-			const oTechnicalParameters = {};
-			oTechnicalParameters[URLHandler.variantTechnicalParameterName] = sParamValue;
-			const oAppComponent = {
-				oComponentData: {
-					technicalParameters: oTechnicalParameters
-				},
-				getComponentData() {
-					return this.oComponentData;
-				}
-			};
+			const fnNavigationFilter = this.oRegisterNavigationFilterStub.firstCall.args[0];
+			const sResult = fnNavigationFilter("DummyHash");
 
-			const oConstructShellHashStub = sandbox.stub().callsFake(() => {
-				assert.notOk(hasher.changed.active, "then the hasher changed events are deactivated");
-				return sConstructedHashValue;
-			});
-			stubUShellServices(this.oGetUShellServiceStub, {
-				URLParsing: {
-					getHash: () => "",
-					parseShellHash: () => ({ params: oParameters }),
-					constructShellHash: oConstructShellHashStub
-				}
-			});
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-
-			await URLHandler.update({
-				flexReference: sFlexReference,
-				appComponent: oAppComponent,
-				parameters: aNewParamValues,
-				updateURL: true,
-				silent: true
-			});
-
-			assert.deepEqual(
-				oConstructShellHashStub.firstCall.args[0].params[URLHandler.variantTechnicalParameterName],
-				aNewParamValues,
-				"then the new shell hash is created with the passed parameters"
-			);
-			assert.ok(hasher.replaceHash.calledWith(sConstructedHashValue), "then hasher.replaceHash is called with the correct hash");
-			assert.deepEqual(
-				oAppComponent.getComponentData().technicalParameters[URLHandler.variantTechnicalParameterName],
-				aNewParamValues,
-				"then new parameter values were set as component's technical parameters"
-			);
-			assert.ok(Log.warning.notCalled, "then no warning for invalid component was produced");
-			assert.ok(hasher.changed.active, "then the hasher changed events are activated again");
+			assert.strictEqual(sResult, "Continue", "Continue status is returned even after error");
+			assert.strictEqual(oLogErrorStub.callCount, 1, "the error was logged");
 		});
 
-		QUnit.test("when called without the silent parameter set, with a valid component and some parameter values", async function(assert) {
-			const aNewParamValues = ["testValue1, testValue2"];
-			const oParameters = {};
-			const sParamValue = "testValue";
-			oParameters[URLHandler.variantTechnicalParameterName] = [sParamValue];
-
-			const oTechnicalParameters = {};
-			oTechnicalParameters[URLHandler.variantTechnicalParameterName] = sParamValue;
-			const oAppComponent = {
-				oComponentData: {
-					technicalParameters: oTechnicalParameters
-				},
-				getComponentData() {
-					return this.oComponentData;
-				}
-			};
-
-			const oUshellNav = {
-				navigate: sandbox.stub()
-			};
-
-			const oMockParsedHash = {
-				semanticObject: "semanticObject",
-				action: "action",
-				contextRaw: "context",
-				params: oParameters,
-				appSpecificRoute: "appSpecificRoute",
-				writeHistory: false
-			};
-
-			stubUShellServices(this.oGetUShellServiceStub, {
-				URLParsing: { parseShellHash: () => oMockParsedHash },
-				Navigation: oUshellNav
+		QUnit.test("navigation filter with a variant parameter belonging to no variant does not update", function(assert) {
+			this.oParseShellHashStub.returns({
+				params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["nonExistingVariant"] }
 			});
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
-			const oExpectedResult = {
-				target: {
-					semanticObject: oMockParsedHash.semanticObject,
-					action: oMockParsedHash.action,
-					context: oMockParsedHash.contextRaw
-				},
-				params: {},
-				appSpecificRoute: oMockParsedHash.appSpecificRoute,
-				writeHistory: false
-			};
-			oExpectedResult.params[URLHandler.variantTechnicalParameterName] = aNewParamValues;
+			const oUpdateSpy = sandbox.spy(this.oURLHandler, "update");
 
-			await URLHandler.update({
-				flexReference: sFlexReference,
-				appComponent: oAppComponent,
-				parameters: aNewParamValues,
-				updateURL: true
+			const fnNavigationFilter = this.oRegisterNavigationFilterStub.firstCall.args[0];
+			const sResult = fnNavigationFilter("DummyHash");
+
+			assert.strictEqual(sResult, "Continue", "Continue status is returned");
+			assert.strictEqual(oUpdateSpy.callCount, 0, "update() was not called for unknown variant");
+		});
+
+		QUnit.test("navigation filter with unchanged variant URL parameter does not call update", function(assert) {
+			const sCurrentVariant = VariantManagementState.getCurrentVariantReference({
+				vmReference: sVMReference,
+				reference: sFlexReference
 			});
+			this.oParseShellHashStub.returns({
+				params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: [sCurrentVariant] }
+			});
+			const oUpdateSpy = sandbox.spy(this.oURLHandler, "update");
 
+			const fnNavigationFilter = this.oRegisterNavigationFilterStub.firstCall.args[0];
+			const sResult = fnNavigationFilter("DummyHash");
+
+			assert.strictEqual(sResult, "Continue", "Continue status is returned");
+			assert.strictEqual(oUpdateSpy.callCount, 0, "update() was not called when params are unchanged");
+		});
+
+		QUnit.test("navigation filter with changed variant params calls update", function(assert) {
+			const sDefaultVariant = VariantManagementState.getDefaultVariantReference({
+				vmReference: sVMReference,
+				reference: sFlexReference
+			});
+			const sCurrentVariant = VariantManagementState.getCurrentVariantReference({
+				vmReference: sVMReference,
+				reference: sFlexReference
+			});
+			this.oParseShellHashStub.returns({
+				params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: [sDefaultVariant, "otherParam"] }
+			});
+			const oUpdateSpy = sandbox.spy(this.oURLHandler, "update");
+
+			const fnNavigationFilter = this.oRegisterNavigationFilterStub.firstCall.args[0];
+			fnNavigationFilter("DummyHash");
+
+			assert.strictEqual(oUpdateSpy.callCount, 1, "update() was called");
 			assert.deepEqual(
-				oAppComponent.getComponentData().technicalParameters[URLHandler.variantTechnicalParameterName],
-				aNewParamValues,
-				"then new parameter values were set as component's technical parameters"
+				oUpdateSpy.firstCall.args[0].parameters,
+				[sCurrentVariant, "otherParam"],
+				"parameters were replaced with current variant references"
 			);
-			assert.ok(Log.warning.notCalled, "then no warning for invalid component was produced");
+			assert.strictEqual(oUpdateSpy.firstCall.args[0].updateURL, true, "updateURL is true");
+		});
+
+		QUnit.test("navigation filter in design time mode sets updateURL=false", function(assert) {
+			const sDefaultVariant = VariantManagementState.getDefaultVariantReference({
+				vmReference: sVMReference,
+				reference: sFlexReference
+			});
+			this.oParseShellHashStub.returns({
+				params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: [sDefaultVariant] }
+			});
+			this.oURLHandler.setDesigntimeMode(true);
+			const oUpdateSpy = sandbox.spy(this.oURLHandler, "update");
+
+			const fnNavigationFilter = this.oRegisterNavigationFilterStub.firstCall.args[0];
+			fnNavigationFilter("DummyHash");
+
+			assert.strictEqual(oUpdateSpy.callCount, 1, "update() was called");
+			assert.strictEqual(oUpdateSpy.firstCall.args[0].updateURL, false, "updateURL is false in design time mode");
+		});
+
+		QUnit.test("navigation filter with empty/falsy variant parameter in URL does not cause error", function(assert) {
+			this.oParseShellHashStub.returns({
+				params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: [""] }
+			});
+			const oUpdateSpy = sandbox.spy(this.oURLHandler, "update");
+
+			const fnNavigationFilter = this.oRegisterNavigationFilterStub.firstCall.args[0];
+			const sResult = fnNavigationFilter("DummyHash");
+
+			assert.strictEqual(sResult, "Continue", "Continue is returned");
+			assert.strictEqual(oUpdateSpy.callCount, 0, "update not called for empty param");
+		});
+
+		QUnit.test("handleModelContextChange sets up resetOnContextChange observer and attaches modelContextChange", function(assert) {
+			this.oVM = new VariantManagement(sVMReference);
+
+			this.oURLHandler.handleModelContextChange(this.oVM);
+
 			assert.ok(
-				oUshellNav.navigate.calledWithExactly(oExpectedResult),
-				"then the ushell navigation service was called with the correct parameters"
+				this.oVM.hasListeners("modelContextChange"),
+				"modelContextChange event listener was attached (resetOnContextChange defaults to true)"
 			);
 		});
 
-		QUnit.test("when clearAllVariantURLParameters is called without variants in the url", async function(assert) {
-			stubUShellServices(this.oGetUShellServiceStub, {
-				URLParsing: { parseShellHash: () => ({ params: { myFancyParameter: "foo" } }) }
-			});
-			await URLHandler.initialize({ flexReference: this.oModel.sFlexReference, appComponent: this.oAppComponent });
+		QUnit.test(
+			"handleModelContextChange fires default variant switch on modelContextChange when variant not in URL",
+			function(assert) {
+				this.oVM = new VariantManagement(sVMReference);
+				const oSwitchToDefaultStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant");
+				this.oURLHandler.handleModelContextChange(this.oVM);
 
-			const oUpdateStub = sandbox.stub(URLHandler, "update");
-			await URLHandler.clearAllVariantURLParameters({ flexReference: sFlexReference, appComponent: {} });
-			assert.strictEqual(oUpdateStub.callCount, 0, "the update function was not called");
-		});
+				this.oParseShellHashStub.returns({ params: {} });
+				this.oVM.fireEvent("modelContextChange");
+
+				assert.strictEqual(oSwitchToDefaultStub.callCount, 1, "updateCurrentVariant was called");
+				assert.strictEqual(
+					oSwitchToDefaultStub.firstCall.args[0].newVariantReference,
+					this.oVM.getDefaultVariantKey(),
+					"switch was called with the default variant"
+				);
+			}
+		);
+
+		QUnit.test(
+			"handleModelContextChange does not switch variant when variant is found in URL",
+			function(assert) {
+				this.oVM = new VariantManagement(sVMReference);
+				const oSwitchToDefaultStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant");
+				this.oURLHandler.handleModelContextChange(this.oVM);
+
+				this.oParseShellHashStub.returns({
+					params: {
+						[VariantUtil.VARIANT_TECHNICAL_PARAMETER]: [sVMReference]
+					}
+				});
+				sandbox.stub(VariantManagementState, "getVariant").callsFake((mParams) => {
+					return mParams.vmReference === sVMReference && mParams.vReference === sVMReference
+						? { simulate: "foundVariant" }
+						: undefined;
+				});
+
+				this.oVM.fireEvent("modelContextChange");
+
+				assert.strictEqual(oSwitchToDefaultStub.callCount, 0, "updateCurrentVariant was not called");
+			}
+		);
+
+		QUnit.test(
+			"handleModelContextChange does nothing on modelContextChange when registerControl was not called",
+			async function(assert) {
+				const oURLHandler = new URLHandler({
+					vmReference: sVMReference,
+					flexReference: sFlexReference,
+					appComponent: {}
+				});
+				await oURLHandler.initialize();
+				this.oVM = new VariantManagement(sVMReference);
+				const oSwitchToDefaultStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant");
+
+				oURLHandler.handleModelContextChange(this.oVM);
+
+				this.oVM.fireEvent("modelContextChange");
+
+				assert.strictEqual(
+					oSwitchToDefaultStub.callCount, 0, "updateCurrentVariant was not called when registerControl was not called"
+				);
+
+				oURLHandler.destroy();
+			}
+		);
+
+		QUnit.test(
+			"handleModelContextChange detaches modelContextChange handler when resetOnContextChange changes to false",
+			function(assert) {
+				assert.expect(1);
+				this.oVM = new VariantManagement(sVMReference);
+				this.oURLHandler.handleModelContextChange(this.oVM);
+
+				sandbox.stub(this.oVM, "detachEvent").callsFake((sEventName, fnCallback) => {
+					if (sEventName === "modelContextChange") {
+						assert.ok(typeof fnCallback === "function", "the event handler was detached from modelContextChange");
+					}
+				});
+				this.oVM.setResetOnContextChange(false);
+			}
+		);
+
+		QUnit.test(
+			"handleModelContextChange re-attaches modelContextChange handler when resetOnContextChange changes to true",
+			function(assert) {
+				assert.expect(1);
+				this.oVM = new VariantManagement(sVMReference);
+				this.oVM.setResetOnContextChange(false);
+				this.oURLHandler.handleModelContextChange(this.oVM);
+
+				sandbox.stub(this.oVM, "attachEvent").callsFake((sEventName, fnCallback) => {
+					if (sEventName === "modelContextChange") {
+						assert.ok(typeof fnCallback === "function", "the event handler was re-attached to modelContextChange");
+					}
+				});
+				this.oVM.setResetOnContextChange(true);
+			}
+		);
 	});
 });

@@ -63,9 +63,11 @@ sap.ui.define([
 		beforeEach() {
 			this.oVMControl = new VariantManagement(sVMReference);
 			this.oModel = new VariantModel({}, {
-				appComponent: oAppComponent
+				appComponent: oAppComponent,
+				vmReference: sVMReference,
+				vmControl: this.oVMControl
 			});
-			oAppComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			this.oVMControl.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 		},
 		afterEach() {
 			sandbox.restore();

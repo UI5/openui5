@@ -126,19 +126,21 @@ sap.ui.define([
 			this.oApplyStub = sandbox.stub(Applier, "applyMultipleChanges").resolves();
 			this.oAddRuntimeChangeToMapSpy = sandbox.spy(DependencyHandler, "addRuntimeChangeToMap");
 			this.oSetCurrentVariantSpy = sandbox.spy(VariantManagementState, "setCurrentVariant");
-			this.oSetVariantSwitchPromiseSpy = sandbox.spy(VariantManagementState, "setVariantSwitchPromise");
 
 			this.oVMControl = new VariantManagement(sVMReference);
 			this.oCallVariantSwitchListenersSpy = sandbox.spy(this.oVMControl, "_executeAllVariantAppliedListeners");
 			this.oModel = new VariantModel({}, {
-				appComponent: oComponent
+				appComponent: oComponent,
+				vmReference: sVMReference,
+				vmControl: this.oVMControl
 			});
-			oComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			this.oVMControl.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			await FlexState.initialize({
 				reference: sReference,
 				componentId: sReference
 			});
-			await this.oModel.initialize();
+			// Don't spy on the first "setModel" call during initialization
+			this.oSetVariantSwitchPromiseSpy = sandbox.spy(VariantManagementState, "setVariantSwitchPromise");
 
 			this.mPropertyBag = {
 				reference: sReference,
@@ -420,17 +422,27 @@ sap.ui.define([
 			this.oVMControl.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 
 			const oVariantManagement2 = new VariantManagement(sVMReference2);
-			oVariantManagement2.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			const oModel2 = new VariantModel({}, {
+				appComponent: oComponent,
+				vmReference: sVMReference2,
+				vmControl: oVariantManagement2
+			});
+			oVariantManagement2.setModel(oModel2, ControlVariantApplyAPI.getVariantModelName());
 
 			await oVariantManagement2.waitForInit();
 			await VariantManagerApply.updateCurrentVariant({
 				newVariantReference: "variant0",
-				appComponent: this.oModel.oAppComponent,
+				appComponent: oComponent,
 				vmControl: oVariantManagement2
 			});
 
 			const oVariantManagement3 = new VariantManagement(sVMReference3);
-			oVariantManagement3.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			const oModel3 = new VariantModel({}, {
+				appComponent: oComponent,
+				vmReference: sVMReference3,
+				vmControl: oVariantManagement3
+			});
+			oVariantManagement3.setModel(oModel3, ControlVariantApplyAPI.getVariantModelName());
 
 			await VariantManagementState.waitForAllVariantSwitches(sReference);
 			assert.ok(true, "the variant switch promise was resolved");

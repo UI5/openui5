@@ -6,11 +6,9 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/Component",
 	"sap/ui/core/Lib",
-	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/StorageUtils",
-	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/requireAsync",
 	"sap/ui/fl/Utils",
@@ -20,11 +18,9 @@ sap.ui.define([
 	Log,
 	Component,
 	Lib,
-	ControlVariantApplyAPI,
 	Loader,
 	ManifestUtils,
 	StorageUtils,
-	VariantModel,
 	Layer,
 	requireAsync,
 	Utils,
@@ -43,10 +39,6 @@ sap.ui.define([
 	 */
 	const ComponentLifecycleHooks = {};
 
-	// in this object a promise is stored for every application component instance
-	// if the same instance is initialized twice the promise is replaced
-	ComponentLifecycleHooks._componentInstantiationPromises = new WeakMap();
-	ComponentLifecycleHooks._embeddedComponents = {};
 	// Tracks per reference whether the last call to isInitializeRelevant saw filled flex data.
 	// Used to detect a filled-to-empty transition (e.g. when discarding a draft that contained all
 	// existing changes), so the FlexState gets re-initialized to clean up the stale state.
@@ -133,55 +125,6 @@ sap.ui.define([
 		oAppComponent.addPropagationListener(fnPropagationListener);
 	}
 
-	async function handleAppComponentInstanceCreated(oComponent, vConfig) {
-		const sReference = ManifestUtils.getFlexReferenceForControl(oComponent);
-		const oFlexData = await Loader.getFlexData({
-			componentData: oComponent.getComponentData(),
-			asyncHints: vConfig.asyncHints,
-			manifest: oComponent.getManifestObject(),
-			reference: sReference
-		});
-		const sComponentId = oComponent.getId();
-		if (isInitializeRelevant(sReference, oFlexData)) {
-			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
-			await FlexState.initialize({
-				componentId: sComponentId,
-				asyncHints: vConfig.asyncHints
-			});
-			await propagateChangesForAppComponent(oComponent, sReference);
-			createVendorTranslationModelIfNecessary(oComponent, oFlexData.data.changes);
-		}
-
-		const oVariantModel = ComponentLifecycleHooks._createVariantModel(oComponent);
-		await oVariantModel.initialize();
-		oComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
-
-		if (ComponentLifecycleHooks._embeddedComponents[sComponentId]) {
-			ComponentLifecycleHooks._embeddedComponents[sComponentId].forEach(function(oEmbeddedComponent) {
-				const oVariantModel = oComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
-				oEmbeddedComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
-			});
-			delete ComponentLifecycleHooks._embeddedComponents[sComponentId];
-		}
-		// if there are only changes in the draft, RTA restart is relevant even without changes in the current storage response
-		await checkForRtaStartOnDraftAndReturnResult(oComponent);
-
-		// initialize the Support Message Client (Message Broker Communication) only in debug mode
-		// used window["sap-ui-debug"] because sap.ui.core.Supportability.isDebugModeEnabled() does not recognize the debug mode
-		// if it is activated only for some libraries
-		if (window["sap-ui-debug"]) {
-			const SupportAPI = await requireAsync("sap/ui/fl/support/api/SupportAPI");
-			SupportAPI.initializeMessageBrokerForComponent();
-		}
-	}
-
-	// the current sinon version used in UI5 does not support stubbing the constructor
-	ComponentLifecycleHooks._createVariantModel = function(oAppComponent) {
-		return new VariantModel({}, {
-			appComponent: oAppComponent
-		});
-	};
-
 	/**
 	 * Gets the changes and in case of existing changes, prepare the applyChanges function already with the changes.
 	 *
@@ -190,22 +133,37 @@ sap.ui.define([
 	 * @returns {Promise} Resolves when all relevant tasks for changes propagation have been processed
 	 */
 	ComponentLifecycleHooks.instanceCreatedHook = async function(oComponent, vConfig) {
-		if (Utils.isApplicationComponent(oComponent)) {
-			const oReturnPromise = await handleAppComponentInstanceCreated(oComponent, vConfig);
-			ComponentLifecycleHooks._componentInstantiationPromises.set(oComponent, oReturnPromise);
-			return oReturnPromise;
-		} else if (Utils.isEmbeddedComponent(oComponent)) {
-			const oAppComponent = Utils.getAppComponentForControl(oComponent);
-			// once the VModel is set to the outer component it also has to be set to any embedded component
-			if (ComponentLifecycleHooks._componentInstantiationPromises.has(oAppComponent)) {
-				await ComponentLifecycleHooks._componentInstantiationPromises.get(oAppComponent);
-				const oVariantModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
-				oComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
-			}
-			ComponentLifecycleHooks._embeddedComponents[oAppComponent.getId()] ||= [];
-			ComponentLifecycleHooks._embeddedComponents[oAppComponent.getId()].push(oComponent);
+		if (!Utils.isApplicationComponent(oComponent)) {
+			return;
 		}
-		return undefined;
+		const sReference = ManifestUtils.getFlexReferenceForControl(oComponent);
+		const oFlexData = await Loader.getFlexData({
+			componentData: oComponent.getComponentData(),
+			asyncHints: vConfig.asyncHints,
+			manifest: oComponent.getManifestObject(),
+			reference: sReference
+		});
+		if (isInitializeRelevant(sReference, oFlexData)) {
+			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
+			await FlexState.initialize({
+				componentId: oComponent.getId(),
+				asyncHints: vConfig.asyncHints
+			});
+			await propagateChangesForAppComponent(oComponent, sReference);
+			createVendorTranslationModelIfNecessary(oComponent, oFlexData.data.changes);
+		}
+
+		await checkForRtaStartOnDraftAndReturnResult(oComponent);
+
+		if (window["sap-ui-debug"]) {
+			const SupportAPI = await requireAsync("sap/ui/fl/support/api/SupportAPI");
+			SupportAPI.initializeMessageBrokerForComponent();
+		}
+
+		// todos#19: Temporary workaround - force URLParsing to be loaded
+		// so the hpa.cei.campaign test doesn't fail in the SafetyNet
+		// Remove as soon as the app is fixed to not rely on the side effect of URLParsing being loaded here
+		await Utils.getUShellService("URLParsing");
 	};
 
 	/**

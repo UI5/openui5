@@ -428,12 +428,15 @@ sap.ui.define([
 	};
 
 	/**
-	 * Removes the saved current variant from the internal map for the given reference
+	 * Removes the saved current variant for the given variant management reference.
 	 *
 	 * @param {string} sReference - Flex Reference of the app
+	 * @param {string} sVMReference - Variant management reference to reset
 	 */
-	VariantManagementState.resetCurrentVariantReference = function(sReference) {
-		delete mCurrentVariantReferences[sReference];
+	VariantManagementState.resetCurrentVariantReference = function(sReference, sVMReference) {
+		if (mCurrentVariantReferences[sReference]) {
+			delete mCurrentVariantReferences[sReference][sVMReference];
+		}
 		oVariantManagementMapDataSelector.checkUpdate({
 			reference: sReference
 		});
@@ -455,10 +458,10 @@ sap.ui.define([
 	 * @param {string} sReference - Flex reference of the app
 	 * @param {string} sComponentId - ID of the component
 	 * @param {object} oFlexObject - Flex object to be added as runtime-steady
-	 *
+	 * @param {string} [sKey] - Optional key to group objects; used by clearRuntimeSteadyObjects to clear by key
 	 */
-	VariantManagementState.addRuntimeSteadyObject = function(sReference, sComponentId, oFlexObject) {
-		FlexState.addRuntimeSteadyObject(sReference, sComponentId, oFlexObject);
+	VariantManagementState.addRuntimeSteadyObject = function(sReference, sComponentId, oFlexObject, sKey) {
+		FlexState.addRuntimeSteadyObject(sReference, sComponentId, oFlexObject, sKey);
 	};
 
 	/**
@@ -466,15 +469,17 @@ sap.ui.define([
 	 *
 	 * @param {string} sReference - Flex reference of the app
 	 * @param {string} sComponentId - ID of the component
+	 * @param {string} [sKey] - Optional key to clear only objects stored under that key
 	 */
-	VariantManagementState.clearRuntimeSteadyObjects = function(sReference, sComponentId) {
-		FlexState.clearRuntimeSteadyObjects(sReference, sComponentId);
+	VariantManagementState.clearRuntimeSteadyObjects = function(sReference, sComponentId, sKey) {
+		FlexState.clearRuntimeSteadyObjects(sReference, sComponentId, sKey);
 	};
 
 	/**
 	 * Adds all passed flex objects to the runtime-only data of the FlexState.
 	 *
 	 * @param {string} sReference - Flex reference of the app
+	 * @param {string} sComponentId - ID of the component
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} aFlexObjects - Flex objects to be added as runtime-only
 	 */
 	VariantManagementState.addRuntimeOnlyFlexObjects = function(sReference, sComponentId, aFlexObjects) {

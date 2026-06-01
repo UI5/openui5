@@ -2,7 +2,7 @@ sap.ui.define([
 	"sap/m/App",
 	"sap/ui/core/UIComponent",
 	"sap/ui/fl/Utils",
-	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
+	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"fl/performance/utils/FlexPerformanceTestUtil",
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/Element"
@@ -10,7 +10,7 @@ sap.ui.define([
 	App,
 	UIComponent,
 	FlUtils,
-	URLHandler,
+	VariantUtil,
 	FlexPerformanceTestUtil,
 	XMLView,
 	Element
@@ -24,10 +24,10 @@ sap.ui.define([
 		},
 
 		constructor: function(...aArgs) {
-			var sCurrentVariantFromURL = FlUtils.getUrlParameter(URLHandler.variantTechnicalParameterName);
+			const sCurrentVariantFromURL = FlUtils.getUrlParameter(VariantUtil.VARIANT_TECHNICAL_PARAMETER);
 			if (sCurrentVariantFromURL) {
 				aArgs[0].componentData = { technicalParameters: {} };
-				aArgs[0].componentData.technicalParameters[URLHandler.variantTechnicalParameterName] = [sCurrentVariantFromURL];
+				aArgs[0].componentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = [sCurrentVariantFromURL];
 			}
 			UIComponent.prototype.constructor.apply(this, aArgs);
 		},

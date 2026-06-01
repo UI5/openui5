@@ -3397,6 +3397,9 @@ sap.ui.define([
 				previewable: true
 			});
 
+			// Stub WebGL check — jsdom has no WebGL support
+			this.oWebGLStub = sinon.stub(this.oFilePreviewDialog, '_isWebGLAvailable').returns(true);
+
 			// Stub the VK dependency loading to avoid actual library loading in tests
 			this.oVkLoadStub = sinon.stub(this.oFilePreviewDialog, '_loadVkDependency');
 
@@ -3421,6 +3424,9 @@ sap.ui.define([
 		afterEach: function () {
 			this.oFilePreviewDialog.destroy();
 			this.oVdsItem.destroy();
+			if (this.oWebGLStub) {
+				this.oWebGLStub.restore();
+			}
 			if (this.oVkLoadStub) {
 				this.oVkLoadStub.restore();
 			}

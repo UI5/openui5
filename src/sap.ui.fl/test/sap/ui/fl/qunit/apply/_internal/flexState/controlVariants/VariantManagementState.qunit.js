@@ -90,7 +90,7 @@ sap.ui.define([
 		FlexState.clearState();
 		FlexState.clearRuntimeSteadyObjects(sReference, sComponentId);
 		VariantManagementState.getVariantManagementMap().clearCachedResult({ reference: sReference });
-		VariantManagementState.resetCurrentVariantReference(sReference);
+		VariantManagementState.resetCurrentVariantReference(sReference, sVariantManagementReference);
 		sandbox.restore();
 	}
 
@@ -1431,7 +1431,7 @@ sap.ui.define([
 				"then the current variant can be set and the new variant is returned"
 			);
 
-			VariantManagementState.resetCurrentVariantReference(sReference);
+			VariantManagementState.resetCurrentVariantReference(sReference, sVariantManagementReference);
 			assert.strictEqual(
 				VariantManagementState.getCurrentVariantReference({
 					reference: sReference,

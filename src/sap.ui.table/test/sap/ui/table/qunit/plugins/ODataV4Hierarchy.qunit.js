@@ -91,13 +91,13 @@ sap.ui.define([
 	QUnit.test("Apply plugin with a list", function(assert) {
 		this.oTable.removeDependent(this.oPlugin);
 		this.stub(this.oTable.getBinding(), "getAggregation").returns();
-		assert.throws(() => { this.oTable.addDependent(this.oPlugin); }, new Error("Only data aggregation is supported"));
+		assert.throws(() => { this.oTable.addDependent(this.oPlugin); }, new Error("Only recursive hierarchy is supported"));
 	});
 
 	QUnit.test("Enable plugin with a list", function(assert) {
 		this.oPlugin.setEnabled(false);
 		this.stub(this.oTable.getBinding(), "getAggregation").returns();
-		assert.throws(() => { this.oPlugin.setEnabled(true); }, new Error("Only data aggregation is supported"));
+		assert.throws(() => { this.oPlugin.setEnabled(true); }, new Error("Only recursive hierarchy is supported"));
 	});
 
 	QUnit.test("Change to list", function(assert) {
@@ -108,19 +108,19 @@ sap.ui.define([
 		assert.throws(() => {
 			oBinding.resume();
 			oBinding.setAggregation();
-		}, new Error("Only data aggregation is supported"));
+		}, new Error("Only recursive hierarchy is supported"));
 	});
 
 	QUnit.test("Apply plugin with data aggregation", function(assert) {
 		this.oTable.removeDependent(this.oPlugin);
 		this.stub(this.oTable.getBinding(), "getAggregation").returns({});
-		assert.throws(() => { this.oTable.addDependent(this.oPlugin); }, new Error("Only data aggregation is supported"));
+		assert.throws(() => { this.oTable.addDependent(this.oPlugin); }, new Error("Only recursive hierarchy is supported"));
 	});
 
 	QUnit.test("Enable plugin with data aggregation", function(assert) {
 		this.oPlugin.setEnabled(false);
 		this.stub(this.oTable.getBinding(), "getAggregation").returns({});
-		assert.throws(() => { this.oPlugin.setEnabled(true); }, new Error("Only data aggregation is supported"));
+		assert.throws(() => { this.oPlugin.setEnabled(true); }, new Error("Only recursive hierarchy is supported"));
 	});
 
 	QUnit.test("Change to data aggregation", function(assert) {
@@ -132,7 +132,7 @@ sap.ui.define([
 				oBinding.resume();
 				oBinding.setAggregation();
 			},
-			new Error("Only data aggregation is supported")
+			new Error("Only recursive hierarchy is supported")
 		);
 	});
 

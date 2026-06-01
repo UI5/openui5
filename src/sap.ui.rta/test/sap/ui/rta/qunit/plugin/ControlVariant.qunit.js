@@ -14,8 +14,10 @@ sap.ui.define([
 	"sap/ui/dt/Util",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/variants/VariantManagement",
+	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/ContextSharingAPI",
@@ -35,7 +37,7 @@ sap.ui.define([
 	"sap/uxap/ObjectPageLayout",
 	"sap/uxap/ObjectPageSection",
 	"sap/uxap/ObjectPageSubSection",
-	"test-resources/sap/ui/fl/api/FlexTestAPI",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	Button,
@@ -51,8 +53,10 @@ sap.ui.define([
 	DtUtil,
 	FlexObjectFactory,
 	FlexObjectState,
+	FlexState,
 	ControlVariantApplyAPI,
 	VariantManagement,
+	VariantModel,
 	VariantManager,
 	ChangesWriteAPI,
 	ContextSharingAPI,
@@ -72,7 +76,7 @@ sap.ui.define([
 	ObjectPageLayout,
 	ObjectPageSection,
 	ObjectPageSubSection,
-	FlexTestAPI,
+	FlQUnitUtils,
 	RtaQunitUtils
 ) {
 	"use strict";
@@ -86,6 +90,10 @@ sap.ui.define([
 			const done = assert.async();
 
 			this.oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox);
+			const sReference = this.oMockedAppComponent.getManifestEntry("sap.app").id;
+			await FlQUnitUtils.initializeFlexStateWithData(
+				sandbox, sReference, {}, this.oMockedAppComponent.getId()
+			);
 			sandbox.stub(ChangesWriteAPI, "getChangeHandler").resolves();
 
 			//	page
@@ -156,6 +164,7 @@ sap.ui.define([
 			this.oPage.destroy();
 			this.oDesignTime.destroy();
 			this.oData = null;
+			FlexState.clearState();
 		}
 	}, function() {
 		QUnit.test("when _isPersonalizationMode is called", function(assert) {
@@ -647,10 +656,13 @@ sap.ui.define([
 
 		QUnit.test("when configure variants context menu item opens the manage dialog, followed by de-registration of variant management overlay", async function(assert) {
 			const fnDone = assert.async();
-			const oModel = await FlexTestAPI.createVariantModel({
-				data: {},
+			await FlexState.initialize({
+				componentId: this.oMockedAppComponent.getId()
+			});
+			const oModel = new VariantModel({}, {
 				appComponent: this.oMockedAppComponent,
-				initFlexState: true
+				vmReference: this.sLocalVariantManagementId,
+				vmControl: this.oVariantManagementControl
 			});
 			sandbox.stub(this.oMockedAppComponent, "getModel").returns(oModel);
 			this.oVariantManagementControl.setModel(oModel, ControlVariantApplyAPI.getVariantModelName());
@@ -819,7 +831,7 @@ sap.ui.define([
 	});
 
 	QUnit.module("Given a designTime where VM control is not part of responsible control tree and ControlVariant plugin are instantiated", {
-		beforeEach(assert) {
+		async beforeEach(assert) {
 			const done = assert.async();
 
 			this.oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox);
@@ -851,56 +863,57 @@ sap.ui.define([
 			//				button2
 
 			this.sLocalVariantManagementId = "varMgtKey";
-			// VMTODO: A model is still needed for tests involving Designtime Metadata because of the setModelPropertiesForControl method
-			return FlexTestAPI.createVariantModel({
-				data: this.oData,
+			const sReference = this.oMockedAppComponent.getManifestEntry("sap.app").id;
+			await FlQUnitUtils.initializeFlexStateWithData(
+				sandbox, sReference, {}, this.oMockedAppComponent.getId()
+			);
+			this.oVariantManagementControl = new VariantManagement(this.sLocalVariantManagementId);
+			this.oModel = new VariantModel(this.oData, {
 				appComponent: this.oMockedAppComponent,
-				initFlexState: true
-			}).then(async function(oInitializedModel) {
-				this.oModel = oInitializedModel;
-				sandbox.stub(this.oMockedAppComponent, "getModel").returns(this.oModel);
-				this.oVariantManagementControl = new VariantManagement(this.sLocalVariantManagementId);
-				this.oVariantManagementControl.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-				this.oButton1 = new Button("button1");
-				this.oButton2 = new Button("button2");
-				this.oFlexBox1 = new FlexBox("flexbox1", {
-					items: [this.oVariantManagementControl, this.oButton1]
-				});
-				this.oFlexBox2 = new FlexBox("flexbox2", {
-					items: [this.oButton2]
-				});
-				this.oVariantManagementControl.addAssociation("for", "flexbox2", true);
-				this.oLayoutOuter = new VerticalLayout("layoutouter", {
-					content: [this.oFlexBox1, this.oFlexBox2]
-				});
-				this.oPage = new Page("mainPage", {
-					content: [this.oLayoutOuter]
-				}).placeAt("qunit-fixture");
-				const oVariantManagementDesignTimeMetadata = {
-					"sap.ui.fl.variants.VariantManagement": {}
-				};
+				vmReference: this.sLocalVariantManagementId,
+				vmControl: this.oVariantManagementControl
+			});
+			sandbox.stub(this.oMockedAppComponent, "getModel").returns(this.oModel);
+			this.oVariantManagementControl.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			this.oButton1 = new Button("button1");
+			this.oButton2 = new Button("button2");
+			this.oFlexBox1 = new FlexBox("flexbox1", {
+				items: [this.oVariantManagementControl, this.oButton1]
+			});
+			this.oFlexBox2 = new FlexBox("flexbox2", {
+				items: [this.oButton2]
+			});
+			this.oVariantManagementControl.addAssociation("for", "flexbox2", true);
+			this.oLayoutOuter = new VerticalLayout("layoutouter", {
+				content: [this.oFlexBox1, this.oFlexBox2]
+			});
+			this.oPage = new Page("mainPage", {
+				content: [this.oLayoutOuter]
+			}).placeAt("qunit-fixture");
+			const oVariantManagementDesignTimeMetadata = {
+				"sap.ui.fl.variants.VariantManagement": {}
+			};
 
-				this.oDesignTime = new DesignTime({
-					designTimeMetadata: oVariantManagementDesignTimeMetadata,
-					rootElements: [this.oPage]
+			this.oDesignTime = new DesignTime({
+				designTimeMetadata: oVariantManagementDesignTimeMetadata,
+				rootElements: [this.oPage]
+			});
+
+			this.oDesignTime.attachEventOnce("synced", function() {
+				this.oLayoutOuterOverlay = OverlayRegistry.getOverlay(this.oLayoutOuter);
+				this.oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
+				this.oButton2Overlay = OverlayRegistry.getOverlay(this.oButton2);
+				this.oFlexBox1Overlay = OverlayRegistry.getOverlay(this.oFlexBox1);
+				this.oFlexBox2Overlay = OverlayRegistry.getOverlay(this.oFlexBox2);
+				this.oVariantManagementOverlay = OverlayRegistry.getOverlay(this.oVariantManagementControl);
+				this.oControlVariantPlugin = new ControlVariantPlugin({
+					commandFactory: new CommandFactory()
 				});
-
-				this.oDesignTime.attachEventOnce("synced", function() {
-					this.oLayoutOuterOverlay = OverlayRegistry.getOverlay(this.oLayoutOuter);
-					this.oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
-					this.oButton2Overlay = OverlayRegistry.getOverlay(this.oButton2);
-					this.oFlexBox1Overlay = OverlayRegistry.getOverlay(this.oFlexBox1);
-					this.oFlexBox2Overlay = OverlayRegistry.getOverlay(this.oFlexBox2);
-					this.oVariantManagementOverlay = OverlayRegistry.getOverlay(this.oVariantManagementControl);
-					this.oControlVariantPlugin = new ControlVariantPlugin({
-						commandFactory: new CommandFactory()
-					});
-					this.oToolHooksPlugin = new ToolHooksPlugin();
-					done();
-				}.bind(this));
-
-				await nextUIUpdate();
+				this.oToolHooksPlugin = new ToolHooksPlugin();
+				done();
 			}.bind(this));
+
+			await nextUIUpdate();
 		},
 		afterEach() {
 			sandbox.restore();
@@ -910,6 +923,7 @@ sap.ui.define([
 			this.oDesignTime.destroy();
 			this.oData = null;
 			this.oModel.destroy();
+			FlexState.clearState();
 		}
 	}, function() {
 		QUnit.test("when registerElementOverlay is called with VariantManagement control Overlay", function(assert) {
@@ -954,9 +968,13 @@ sap.ui.define([
 	QUnit.module("Rename", {
 		async beforeEach(assert) {
 			const done = assert.async();
-			this.oVariantManagementControl = new VariantManagement("varMgtKey").placeAt("qunit-fixture");
-
 			this.oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox);
+			const sReference = this.oMockedAppComponent.getManifestEntry("sap.app").id;
+			await FlQUnitUtils.initializeFlexStateWithData(
+				sandbox, sReference, {}, this.oMockedAppComponent.getId()
+			);
+
+			this.oVariantManagementControl = new VariantManagement("varMgtKey").placeAt("qunit-fixture");
 
 			const oVariantManagementDesignTimeMetadata = {
 				"sap.ui.fl.variants.VariantManagement": {
@@ -984,6 +1002,7 @@ sap.ui.define([
 			this.oVariantManagementControl.destroy();
 			this.oDesignTime.destroy();
 			this.oMockedAppComponent.destroy();
+			FlexState.clearState();
 		}
 	}, function() {
 		QUnit.test("when a variant is renamed to a new title", function(assert) {

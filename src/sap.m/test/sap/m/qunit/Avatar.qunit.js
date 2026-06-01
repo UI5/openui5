@@ -335,6 +335,20 @@ sap.ui.define([
 		assert.ok($oAvatar.hasClass("sapFAvatarInitials"), sPreAvatarType + "Initials");
 	});
 
+	QUnit.test("Avatar transitioning from 3-char initials to empty shows fallback icon without hidden icon class", async function (assert) {
+		// 3-char initials cause the renderer to pre-render the icon with HiddenIcon in its mCustomStyleClasses
+		this.oAvatar.setInitials("WWW");
+		await nextUIUpdate();
+
+		// Clearing initials triggers a re-render in Icon mode; the icon must not carry the HiddenIcon class
+		this.oAvatar.setInitials("");
+		await nextUIUpdate();
+
+		var $oIcon = this.oAvatar.$().find(".sapFAvatarTypeIcon");
+		assert.ok($oIcon.length > 0, "Fallback icon is present in the DOM");
+		assert.notOk($oIcon.hasClass("sapFAvatarHiddenIcon"), "Fallback icon is not hidden after clearing 3-char initials");
+	});
+
 	QUnit.test("Avatar with initials consisting of four letters", async function (assert) {
 		this.oAvatar.setInitials("SRLA");
 		await nextUIUpdate();

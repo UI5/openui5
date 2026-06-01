@@ -8,7 +8,6 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
-	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
@@ -40,7 +39,6 @@ sap.ui.define([
 	Control,
 	Applier,
 	Reverter,
-	URLHandler,
 	VariantUtil,
 	FlexObjectFactory,
 	DependencyHandler,
@@ -117,7 +115,7 @@ sap.ui.define([
 		async beforeEach() {
 			this.oSettingsStub = sandbox.stub(Settings, "getInstanceOrUndef").callsFake(() => {
 				const oSettings = this.oSettingsStub.wrappedMethod();
-				return oSettings || { getUser: () => "test user" };
+				return oSettings || new Settings({});
 			});
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
@@ -200,20 +198,21 @@ sap.ui.define([
 
 			this.oVMControl = new VariantManagement(sVMReference);
 			this.oModel = new VariantModel({}, {
-				appComponent: oComponent
+				appComponent: oComponent,
+				vmReference: sVMReference,
+				vmControl: this.oVMControl
 			});
-			oComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			this.oVMControl.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			await FlexState.initialize({
 				reference: sReference,
 				componentId: sReference
 			});
-			return this.oModel.initialize();
 		},
 		async afterEach() {
-			sandbox.restore();
 			this.oVMControl.destroy();
 			this.oModel.destroy();
 			await this.oModel.oDestroyPromise.promise;
+			sandbox.restore();
 			FlexState.clearState();
 			FlexState.clearRuntimeSteadyObjects(sReference, sReference);
 		}
@@ -866,13 +865,16 @@ sap.ui.define([
 		[true, false].forEach(function(bUpdateVariantInURL) {
 			const sTitle = `when calling 'createVariantChange' for 'setDefault' with different current and default variants ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
 			QUnit.test(sTitle, function(assert) {
+				const oMockURLHandler = {
+					getStoredHashParams: sandbox.stub().returns([]),
+					update: sandbox.stub()
+				};
 				const oMockVMControl = {
 					getUpdateVariantInURL() { return bUpdateVariantInURL; },
-					getDesignMode() { return true; }
+					getDesignMode() { return true; },
+					getVariantModel() { return { _getURLHandler: () => oMockURLHandler }; }
 				};
 				sandbox.stub(VariantUtil, "getVariantManagementControlByVMReference").returns(oMockVMControl);
-				sandbox.stub(URLHandler, "getStoredHashParams").returns([]);
-				sandbox.stub(URLHandler, "update");
 				sandbox.stub(VariantManagementState, "getCurrentVariantReference").returns("currentVariant");
 				sandbox.stub(ContextBasedAdaptationsAPI, "hasAdaptationsModel").returns(false);
 
@@ -884,29 +886,28 @@ sap.ui.define([
 				});
 
 				if (bUpdateVariantInURL) {
-					assert.ok(URLHandler.update.calledOnce, "then URLHandler.update() was called");
-					assert.deepEqual(URLHandler.update.firstCall.args[0], {
+					assert.ok(oMockURLHandler.update.calledOnce, "then URLHandler.update() was called");
+					assert.deepEqual(oMockURLHandler.update.firstCall.args[0], {
 						parameters: ["currentVariant"],
-						updateURL: false,
-						updateHashEntry: true,
-						flexReference: sReference,
-						appComponent: oComponent
+						updateURL: false
 					}, "then URLHandler.update() called with the current variant added as a parameter in design time mode");
 				} else {
-					assert.ok(URLHandler.update.notCalled, "then URLHandler.update() was not called");
+					assert.ok(oMockURLHandler.update.notCalled, "then URLHandler.update() was not called");
 				}
 			});
 
 			const sTitle2 = `when calling 'createVariantChange' for 'setDefault' with same current and default variants ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
 			QUnit.test(sTitle2, function(assert) {
+				const oMockURLHandler = {
+					getStoredHashParams: sandbox.stub().returns(["currentVariant"]),
+					update: sandbox.stub()
+				};
 				const oMockVMControl = {
 					getUpdateVariantInURL() { return bUpdateVariantInURL; },
-					getDesignMode() { return false; }
+					getDesignMode() { return false; },
+					getVariantModel() { return { _getURLHandler: () => oMockURLHandler }; }
 				};
 				sandbox.stub(VariantUtil, "getVariantManagementControlByVMReference").returns(oMockVMControl);
-				// current variant is already in hash parameters
-				sandbox.stub(URLHandler, "getStoredHashParams").returns(["currentVariant"]);
-				sandbox.stub(URLHandler, "update");
 				sandbox.stub(VariantManagementState, "getCurrentVariantReference").returns("currentVariant");
 				sandbox.stub(ContextBasedAdaptationsAPI, "hasAdaptationsModel").returns(false);
 
@@ -918,16 +919,13 @@ sap.ui.define([
 				});
 
 				if (bUpdateVariantInURL) {
-					assert.ok(URLHandler.update.calledOnce, "then URLHandler.update() was called");
-					assert.deepEqual(URLHandler.update.firstCall.args[0], {
+					assert.ok(oMockURLHandler.update.calledOnce, "then URLHandler.update() was called");
+					assert.deepEqual(oMockURLHandler.update.firstCall.args[0], {
 						parameters: [],
-						updateURL: true,
-						updateHashEntry: true,
-						flexReference: sReference,
-						appComponent: oComponent
+						updateURL: true
 					}, "then URLHandler.update() called with the current variant removed as a parameter in personalization mode");
 				} else {
-					assert.ok(URLHandler.update.notCalled, "then URLHandler.update() was not called");
+					assert.ok(oMockURLHandler.update.notCalled, "then URLHandler.update() was not called");
 				}
 			});
 		});
@@ -964,7 +962,7 @@ sap.ui.define([
 			const oOpenManagementDialogStub = sandbox.stub(this.oVMControl, "openManagementDialog")
 			.callsFake(() => this.oVMControl.fireManage(oManageParameters));
 
-			this.oModel.setModelPropertiesForControl(sVMReference, true, this.oVMControl);
+			this.oModel.setModelPropertiesForControl(true);
 
 			return VariantManager.openManageVariantsDialog({
 				variantManagementControl: this.oVMControl,
@@ -1031,13 +1029,14 @@ sap.ui.define([
 	QUnit.module("handleSaveEvent - check variant references", {
 		beforeEach() {
 			sandbox.stub(Settings, "getInstance").resolves({});
+			sandbox.stub(Settings, "getInstanceOrUndef").returns({
+				getIsKeyUser: () => false,
+				getIsPublicFlVariantEnabled: () => false,
+				getIsVariantPersonalizationEnabled: () => true,
+				getUser: () => "test user"
+			});
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves();
 			sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
-			this.oVMControl = new VariantManagement(sVMReference);
-			this.oModel = new VariantModel({}, {
-				appComponent: oComponent
-			});
-			oComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 
 			this.oOriginalVariant = createVariant({
 				fileName: "variant0",
@@ -1085,13 +1084,19 @@ sap.ui.define([
 				this.oOriginalVariant
 			]);
 
-			return this.oModel.initialize();
+			this.oVMControl = new VariantManagement(sVMReference);
+			this.oModel = new VariantModel({}, {
+				appComponent: oComponent,
+				vmReference: sVMReference,
+				vmControl: this.oVMControl
+			});
+			this.oVMControl.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 		},
 		async afterEach() {
-			sandbox.restore();
 			this.oVMControl.destroy();
 			this.oModel.destroy();
 			await this.oModel.oDestroyPromise.promise;
+			sandbox.restore();
 			FlexState.clearState();
 			FlexState.clearRuntimeSteadyObjects(sReference, sReference);
 		}

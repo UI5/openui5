@@ -7,7 +7,6 @@ sap.ui.define([
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Component",
 	"sap/ui/core/Element",
-	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
@@ -20,7 +19,6 @@ sap.ui.define([
 	JsControlTreeModifier,
 	Component,
 	Element,
-	URLHandler,
 	VariantUtil,
 	VariantManagementState,
 	VariantManagerApply,
@@ -131,35 +129,25 @@ sap.ui.define([
 		 * but have a few special navigation patterns where you want to clear it.
 		 * If you don't want that parameter in general, set the <code>updateVariantInURL</code> parameter
 		 * on your variant management control to <code>false</code>. SAP Fiori elements use this method.
-		 * If a variant management control is given as a parameter, only parameters specific to that control are cleared.
 		 *
 		 * @param {object} mPropertyBag - Object with parameters as properties
-		 * @param {sap.ui.base.ManagedObject} mPropertyBag.control - Variant management control for which the URL technical parameter has to be cleared
+		 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.control - Variant management control for which the URL technical parameter has to be cleared
+		 *
+		 * @returns {Promise<void>} Resolves once the URL parameter has been cleared
 		 *
 		 * @public
 		 */
-		clearVariantParameterInURL(mPropertyBag) {
-			const oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
-			const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
-			let aUpdatedVariantParameters;
-
-			// check if variant for the passed variant management control is present
-			if (mPropertyBag.control.isA("sap.ui.fl.variants.VariantManagement")) {
-				const sVariantManagementReference = mPropertyBag.control.getVariantManagementReference();
-				const mCleansedParametersWithIndex = URLHandler.removeURLParameterForVariantManagement({
-					vmReference: sVariantManagementReference,
-					flexReference: sFlexReference
-				});
-				aUpdatedVariantParameters = mCleansedParametersWithIndex.parameters;
+		async clearVariantParameterInURL(mPropertyBag) {
+			await mPropertyBag.control.waitForInit();
+			const oModel = mPropertyBag.control.getVariantModel();
+			const oURLHandler = oModel?._getURLHandler();
+			if (!oURLHandler) {
+				return;
 			}
-
-			// both technical parameters and URL hash updated
-			URLHandler.update({
-				parameters: aUpdatedVariantParameters || [],
+			const { parameters: aUpdatedParameters } = oURLHandler.removeURLParameterForVariantManagement();
+			oURLHandler.update({
+				parameters: aUpdatedParameters || [],
 				updateURL: true,
-				updateHashEntry: true,
-				flexReference: sFlexReference,
-				appComponent: oAppComponent,
 				silent: false
 			});
 		},

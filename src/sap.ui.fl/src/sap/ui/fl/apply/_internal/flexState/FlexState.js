@@ -169,7 +169,9 @@ sap.ui.define([
 			var oPersistence = _mInstances[mParameters.reference].runtimePersistence;
 			return oPersistence.flexObjects.concat(
 				oPersistence.runtimeOnlyData.flexObjects || [],
-				_mExternalData.flexObjects[mParameters.reference][_mInstances[mParameters.reference].componentId] || []
+				Object.values(
+					_mExternalData.flexObjects[mParameters.reference]?.[_mInstances[mParameters.reference].componentId] || {}
+				).flat()
 			);
 		}
 	});
@@ -304,13 +306,15 @@ sap.ui.define([
 		}
 
 		if (!ObjectPath.get(["flexObjects", sReference, mPropertyBag.componentId], _mExternalData)) {
-			ObjectPath.set(["flexObjects", sReference, mPropertyBag.componentId], [], _mExternalData);
+			ObjectPath.set(["flexObjects", sReference, mPropertyBag.componentId], {}, _mExternalData);
 		}
 
 		if (!_mInstances[sReference].runtimePersistence) {
 			_mInstances[sReference].runtimePersistence = buildRuntimePersistence(
 				_mInstances[sReference],
-				_mExternalData.flexObjects[sReference][mPropertyBag.componentId] || []
+				Object.values(
+					_mExternalData.flexObjects[sReference]?.[mPropertyBag.componentId] || {}
+				).flat()
 			);
 			bDataUpdated = true;
 		}
@@ -597,14 +601,17 @@ sap.ui.define([
 	 * @param {string} sReference - Flex reference of the app
 	 * @param {string} sComponentId - ID of the component
 	 * @param {object} oFlexObject - Flex object to be added as runtime-steady
+	 * @param {string} [sKey] - Optional key to group objects; used by clearRuntimeSteadyObjects to clear by key
 	 */
-	FlexState.addRuntimeSteadyObject = function(sReference, sComponentId, oFlexObject) {
+	FlexState.addRuntimeSteadyObject = function(sReference, sComponentId, oFlexObject, sKey) {
 		initializeEmptyStateIfNeeded(sReference, sComponentId);
 		// with setting the state to persisted it is made sure that they not show up as a dirty flex object
 		oFlexObject.setState(States.LifecycleState.PERSISTED);
+		const sActualKey = sKey || "$default";
 		_mExternalData.flexObjects[sReference] ||= {};
-		_mExternalData.flexObjects[sReference][sComponentId] ||= [];
-		_mExternalData.flexObjects[sReference][sComponentId].push(oFlexObject);
+		_mExternalData.flexObjects[sReference][sComponentId] ||= {};
+		_mExternalData.flexObjects[sReference][sComponentId][sActualKey] ||= [];
+		_mExternalData.flexObjects[sReference][sComponentId][sActualKey].push(oFlexObject);
 		oFlexObjectsDataSelector.checkUpdate(
 			{ reference: sReference },
 			[{ type: "addFlexObject", updatedObject: oFlexObject }]
@@ -613,14 +620,20 @@ sap.ui.define([
 
 	/**
 	 * Clears the runtime-steady objects of the given component.
+	 * If a key is provided, only objects stored under that key are cleared.
+	 * Without a key, all runtime-steady objects for the component are cleared.
 	 *
 	 * @param {string} sReference - Flex reference of the app
 	 * @param {string} sComponentId - ID of the component
+	 * @param {string} [sKey] - Optional key to clear only objects stored under that key
 	 */
-	FlexState.clearRuntimeSteadyObjects = function(sReference, sComponentId) {
-		// External data is currently only used to store the standard variant
-		if (_mExternalData.flexObjects[sReference]) {
-			delete _mExternalData.flexObjects[sReference][sComponentId];
+	FlexState.clearRuntimeSteadyObjects = function(sReference, sComponentId, sKey) {
+		if (_mExternalData.flexObjects[sReference]?.[sComponentId]) {
+			if (sKey) {
+				delete _mExternalData.flexObjects[sReference][sComponentId][sKey];
+			} else {
+				delete _mExternalData.flexObjects[sReference][sComponentId];
+			}
 			// Only called during destruction, no need to recalculate new state immediately
 			oFlexObjectsDataSelector.clearCachedResult({ reference: sReference });
 		}
@@ -639,7 +652,9 @@ sap.ui.define([
 			// Storage response has changed, recreate the flex objects
 			_mInstances[sReference].runtimePersistence = buildRuntimePersistence(
 				_mInstances[sReference],
-				_mExternalData.flexObjects[sReference][_mInstances[sReference].componentId] || []
+				Object.values(
+					_mExternalData.flexObjects[sReference]?.[_mInstances[sReference].componentId] || {}
+				).flat()
 			);
 			oFlexObjectsDataSelector.checkUpdate({ reference: sReference });
 		}

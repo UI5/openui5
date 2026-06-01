@@ -10,7 +10,6 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
-	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
@@ -35,7 +34,6 @@ sap.ui.define([
 	Element,
 	Applier,
 	Reverter,
-	URLHandler,
 	VariantUtil,
 	FlexObjectFactory,
 	States,
@@ -75,7 +73,13 @@ sap.ui.define([
 			return;
 		}
 
-		const aHashParameters = URLHandler.getStoredHashParams({ flexReference: mPropertyBag.reference });
+		const oModel = oVMControl.getVariantModel();
+		const oURLHandler = oModel?._getURLHandler();
+		if (!oURLHandler) {
+			return;
+		}
+
+		const aHashParameters = oURLHandler.getStoredHashParams();
 		if (!aHashParameters) {
 			return;
 		}
@@ -91,26 +95,18 @@ sap.ui.define([
 			sNewDefaultVariant !== sCurrentVariant
 			&& !aHashParameters.includes(sCurrentVariant)
 		) {
-			// if the new default differs from the current variant, add the current variant id as a variant URL parameter
-			URLHandler.update({
+			oURLHandler.update({
 				parameters: aHashParameters.concat(sCurrentVariant),
-				updateURL: !bDesignTimeMode,
-				updateHashEntry: true,
-				flexReference: mPropertyBag.reference,
-				appComponent: mPropertyBag.appComponent
+				updateURL: !bDesignTimeMode
 			});
 		} else if (
 			sNewDefaultVariant === sCurrentVariant
 			&& aHashParameters.includes(sCurrentVariant)
 		) {
-			// if current variant is now the new default, remove the current variant id as a variant URL parameter
 			aHashParameters.splice(aHashParameters.indexOf(sCurrentVariant), 1);
-			URLHandler.update({
+			oURLHandler.update({
 				parameters: aHashParameters,
-				updateURL: !bDesignTimeMode,
-				updateHashEntry: true,
-				flexReference: mPropertyBag.reference,
-				appComponent: mPropertyBag.appComponent
+				updateURL: !bDesignTimeMode
 			});
 		}
 	}

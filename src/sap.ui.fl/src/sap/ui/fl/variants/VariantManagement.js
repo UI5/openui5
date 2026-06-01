@@ -12,11 +12,13 @@ sap.ui.define([
 	"sap/ui/core/library",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/requireAsync",
 	"sap/ui/fl/Utils",
+	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/model/Context",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator"
@@ -29,11 +31,13 @@ sap.ui.define([
 	coreLibrary,
 	VariantManagementState,
 	VariantManagerApply,
+	FlexState,
 	ControlVariantApplyAPI,
 	ManifestUtils,
 	flSettings,
 	requireAsync,
 	Utils,
+	VariantModel,
 	Context,
 	Filter,
 	FilterOperator
@@ -383,13 +387,24 @@ sap.ui.define([
 		},
 		constructor: function(...aArgs) {
 			Control.prototype.constructor.apply(this, aArgs); // Call base class constructor
-			this._oInitPromise = new Promise((resolve) => {
-				this.attachEventOnce("initialized", () => {
-					resolve();
-				});
+			this._createInitDeferred();
+			this.attachEventOnce("initialized", () => {
+				this._fnResolveInit?.();
+				this._fnResolveInit = undefined;
+				this._fnRejectInit = undefined;
 			});
 		}
 	});
+
+	VariantManagement.prototype._createInitDeferred = function() {
+		this._oInitPromise = new Promise((resolve, reject) => {
+			this._fnResolveInit = resolve;
+			this._fnRejectInit = reject;
+		});
+		// Avoid unhandled rejection warnings if no caller awaits waitForInit() in between
+		// transient rejection and recreation of the deferred.
+		this._oInitPromise.catch(() => {});
+	};
 
 	/**
 	 * Constructs and initializes the <code>VariantManagement</code> control.
@@ -751,6 +766,14 @@ sap.ui.define([
 		return this._oVM.getShowAsText();
 	};
 
+	VariantManagement.prototype.setUpdateVariantInURL = function(bValue) {
+		this.setProperty("updateVariantInURL", bValue);
+		if (bValue) {
+			this.getVariantModel()?.initializeURLHandler();
+		}
+		return this;
+	};
+
 	VariantManagement.prototype.setEditable = function(bValue) {
 		this.setProperty("editable", bValue);
 		this._oVM.setShowFooter(bValue);
@@ -918,61 +941,119 @@ sap.ui.define([
 		this._setBindingContext();
 	};
 
-	VariantManagement.prototype._setBindingContext = function() {
-		var oModel;
-		var sLocalId;
+	VariantManagement.prototype.getVariantModel = function() {
+		return this.getModel(this.getModelName());
+	};
 
-		var sModelName = this.getModelName();
+	VariantManagement.prototype.onBeforeRendering = function() {
+		this._setBindingContext();
+	};
 
-		if (!this.oContext) {
-			oModel = this.getModel(sModelName);
-			if (oModel) {
-				sLocalId = this.getVariantManagementReference();
+	VariantManagement.prototype._setBindingContext = async function() {
+		if (this.oContext || this._bCreatingModel) {
+			return;
+		}
 
-				if (sLocalId) {
-					this.oContext = new Context(oModel, `/${sLocalId}`);
-					this.setBindingContext(this.oContext, sModelName);
+		// If the previous attempt rejected, start a fresh deferred so this new attempt
+		// can resolve / reject independently of the prior failure.
+		if (!this._fnRejectInit) {
+			this._createInitDeferred();
+		}
 
-					if (oModel.registerToModel) { // Relevant for key user adaptation
-						oModel.registerToModel(this);
-					}
+		const sLocalId = this.getVariantManagementReference();
 
-					this.fireInitialized();
+		// Only continue if the control has a stable ID
+		const oAppComponent = Utils.getAppComponentForControl(this);
+		if (!oAppComponent || !Utils.checkControlId(sLocalId, oAppComponent)) {
+			const sReason = !oAppComponent
+				? "no app component could be determined"
+				: `the ID '${sLocalId}' is not stable`;
+			const sMessage = `VariantManagement '${this.getId()}' cannot be initialized: ${sReason}`;
+			Log.error(sMessage);
+			const fnRejectInit = this._fnRejectInit;
+			this._fnRejectInit = undefined;
+			this._fnResolveInit = undefined;
+			fnRejectInit?.(new Error(sMessage));
+			return;
+		}
 
-					this._oVM.setModel(oModel, sModelName);
-
-					this._createItemsModel(sModelName);
-
-					this._oVM.bindProperty("selectedKey", {
-						path: `${this.oContext}/currentVariant`,
-						model: sModelName
-					});
-
-					this._oVM.bindProperty("defaultKey", {
-						path: `${this.oContext}/defaultVariant`,
-						model: sModelName
-					});
-
-					this._oVM.bindProperty("modified", {
-						path: `${this.oContext}/modified`,
-						model: sModelName
-					});
-
-					this._oVM.bindProperty("supportFavorites", {
-						path: `${this.oContext}/showFavorites`,
-						model: sModelName
-					});
-
-					this._oVM.bindProperty("showFooter", {
-						path: `${this.oContext}/variantsEditable`,
-						model: sModelName
-					});
-
-					this._oVM.setPopoverTitle(this._oRb.getText("VARIANT_MANAGEMENT_VARIANTS"));
-					this._setStandardVariantKey(sLocalId);
+		try {
+			const sModelName = this.getModelName();
+			let oModel = this.getModel(sModelName);
+			if (!oModel) {
+				oModel = await this._createOwnModel(oAppComponent, sLocalId);
+				if (!oModel || this.bIsDestroyed || this.bIsBeingDestroyed) {
+					return;
 				}
 			}
+
+			this.oContext = new Context(oModel, `/${sLocalId}`);
+			this.setBindingContext(this.oContext, sModelName);
+
+			await oModel.registerToModel();
+			if (this.bIsDestroyed || this.bIsBeingDestroyed) {
+				return;
+			}
+
+			this.fireInitialized();
+
+			this._oVM.setModel(oModel, sModelName);
+			this._createItemsModel(sModelName);
+
+			this._oVM.bindProperty("selectedKey", {
+				path: `${this.oContext}/currentVariant`,
+				model: sModelName
+			});
+			this._oVM.bindProperty("defaultKey", {
+				path: `${this.oContext}/defaultVariant`,
+				model: sModelName
+			});
+			this._oVM.bindProperty("modified", {
+				path: `${this.oContext}/modified`,
+				model: sModelName
+			});
+			this._oVM.bindProperty("supportFavorites", {
+				path: `${this.oContext}/showFavorites`,
+				model: sModelName
+			});
+			this._oVM.bindProperty("showFooter", {
+				path: `${this.oContext}/variantsEditable`,
+				model: sModelName
+			});
+
+			this._oVM.setPopoverTitle(this._oRb.getText("VARIANT_MANAGEMENT_VARIANTS"));
+			this._setStandardVariantKey(sLocalId);
+		} catch (oError) {
+			Log.error(`VariantManagement '${this.getId()}' could not be initialized`, oError);
+			const fnRejectInit = this._fnRejectInit;
+			this._fnRejectInit = undefined;
+			this._fnResolveInit = undefined;
+			fnRejectInit?.(oError instanceof Error ? oError : new Error(String(oError)));
 		}
+	};
+
+	VariantManagement.prototype._createOwnModel = async function(oAppComponent, sLocalId) {
+		if (this._bCreatingModel || this.oContext) {
+			return undefined;
+		}
+
+		this._bCreatingModel = true;
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
+		await FlexState.waitForInitialization(sFlexReference);
+		if (this.bIsDestroyed || this.bIsBeingDestroyed || this.oContext) {
+			this._bCreatingModel = false;
+			return undefined;
+		}
+		const oModel = new VariantModel({}, {
+			appComponent: oAppComponent,
+			vmReference: sLocalId,
+			vmControl: this
+		});
+		const sModelName = this.getModelName();
+		this.setModel(oModel, sModelName);
+
+		this._bCreatingModel = false;
+		return oModel;
 	};
 
 	VariantManagement.prototype._createItemsModel = function(sModelName) {
@@ -1074,6 +1155,11 @@ sap.ui.define([
 
 	// exit destroy all controls created in init
 	VariantManagement.prototype.exit = function(...aArgs) {
+		this._fnRejectInit?.(new Error(`VariantManagement '${this.getId()}' was destroyed before initialization`));
+		this._fnResolveInit = undefined;
+		this._fnRejectInit = undefined;
+		const oModel = this.getVariantModel();
+		oModel?.destroy();
 		this._oVM.detachManage(onManage, this);
 		this._oVM.detachCancel(this._fireCancel, this);
 		this._oVM.detachSelect(onSelect, this);
@@ -1167,15 +1253,14 @@ sap.ui.define([
 	/**
 	 * Returns the reference of the variant management control.
 	 *
+	 * @param {sap.ui.core.Component} [oAppComponent] - App component instance to use for resolving the local ID.
+	 * If not provided, it will be resolved internally.
 	 * @returns {string} The reference of the variant management control
 	 */
-	VariantManagement.prototype.getVariantManagementReference = function() {
-		if (!this._sVMReference) {
-			const sControlId = this.getId();
-			const oAppComponent = Utils.getAppComponentForControl(this);
-			this._sVMReference = (oAppComponent && oAppComponent.getLocalId(sControlId)) || sControlId;
-		}
-		return this._sVMReference;
+	VariantManagement.prototype.getVariantManagementReference = function(oAppComponent) {
+		const sControlId = this.getId();
+		oAppComponent ||= Utils.getAppComponentForControl(this);
+		return oAppComponent?.getLocalId(sControlId) || sControlId;
 	};
 
 	/**

@@ -75,7 +75,7 @@ sap.ui.define([
 		const mAggregation = oBinding?.getAggregation();
 
 		if (oBinding && (!mAggregation || !("hierarchyQualifier" in mAggregation))) {
-			throw new Error("Only data aggregation is supported");
+			throw new Error("Only recursive hierarchy is supported");
 		}
 	}
 

@@ -619,27 +619,516 @@ sap.ui.define([
 		oCalP.destroy();
 	});
 
-	QUnit.module("Misc");
+	QUnit.module("Interval selection - mouse drag and hover indication", {
+		beforeEach: function() {
+			this.oCal = new CalendarMonthInterval("CalDrag", {
+				startDate: UI5Date.getInstance(2017, 0, 1), // Jan 2017, shows Jan-Dec 2017
+				intervalSelection: true,
+				singleSelection: true
+			}).placeAt("qunit-fixture");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			this.oMonthsRow = this.oCal.getAggregation("monthsRow");
+		},
+		afterEach: function() {
+			this.oCal.destroy();
+		}
+	});
 
-	QUnit.test("destroying CalendarMonthInterval", function(assert) {
-		// arrange
-		var oCal = new CalendarMonthInterval("Cal"),
-			oRange = new DateTypeRange();
+	// --- _isMarkingUnfinishedRangeAllowed ---
 
-		oRange.setTooltip("tooltip");
-		oCal.addSpecialDate(oRange);
-
-		oCal.placeAt("qunit-fixture");
+	QUnit.test("_isMarkingUnfinishedRangeAllowed: returns false when intervalSelection is off", function(assert) {
+		this.oCal.setIntervalSelection(false);
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) }));
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		try {
-			oCal.destroy();
-			this.clock.tick(0);
-
-			assert.ok(true, "CalendarMonthInterval was destroyed correctly");
-		} catch (err) {
-			assert.ok(true, "CalendarMonthInterval wasn't destroyed correctly");
-		}
-
+		assert.strictEqual(this.oMonthsRow._isMarkingUnfinishedRangeAllowed(), false,
+			"Returns false when intervalSelection=false even with an open range");
 	});
+
+	QUnit.test("_isMarkingUnfinishedRangeAllowed: returns false when no selection exists", function(assert) {
+		assert.strictEqual(this.oMonthsRow._isMarkingUnfinishedRangeAllowed(), false,
+			"Returns false when no selectedDates");
+	});
+
+	QUnit.test("_isMarkingUnfinishedRangeAllowed: returns false when range is complete (start and end set)", function(assert) {
+		this.oCal.addSelectedDate(new DateRange({
+			startDate: UI5Date.getInstance(2017, 0, 1),
+			endDate: UI5Date.getInstance(2017, 5, 1)
+		}));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		assert.strictEqual(this.oMonthsRow._isMarkingUnfinishedRangeAllowed(), false,
+			"Returns false when both startDate and endDate are set");
+	});
+
+	QUnit.test("_isMarkingUnfinishedRangeAllowed: returns true when only startDate is set", function(assert) {
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) }));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		assert.strictEqual(this.oMonthsRow._isMarkingUnfinishedRangeAllowed(), true,
+			"Returns true when intervalSelection=true and only startDate is set");
+	});
+
+	// --- _markMonthsBetweenStartAndHoveredMonth ---
+
+	QUnit.test("_markMonthsBetweenStartAndHoveredMonth: marks months strictly between start and hovered", function(assert) {
+		// Jan=20170101, Jun=20170601 -> Feb,Mar,Apr,May should be marked (4 months between)
+		this.oMonthsRow._markMonthsBetweenStartAndHoveredMonth(20170101, 20170601);
+
+		var aMarked = this.oMonthsRow.$().find(".sapUiCalItemSelBetween");
+		assert.strictEqual(aMarked.length, 4, "4 months marked as between Jan and Jun");
+		assert.ok(jQuery("#CalDrag--MonthsRow-20170201").hasClass("sapUiCalItemSelBetween"), "Feb is marked between");
+		assert.ok(jQuery("#CalDrag--MonthsRow-20170301").hasClass("sapUiCalItemSelBetween"), "Mar is marked between");
+		assert.ok(jQuery("#CalDrag--MonthsRow-20170401").hasClass("sapUiCalItemSelBetween"), "Apr is marked between");
+		assert.ok(jQuery("#CalDrag--MonthsRow-20170501").hasClass("sapUiCalItemSelBetween"), "May is marked between");
+		assert.notOk(jQuery("#CalDrag--MonthsRow-20170101").hasClass("sapUiCalItemSelBetween"), "Jan (start) is NOT marked between");
+		assert.notOk(jQuery("#CalDrag--MonthsRow-20170601").hasClass("sapUiCalItemSelBetween"), "Jun (end) is NOT marked between");
+	});
+
+	QUnit.test("_markMonthsBetweenStartAndHoveredMonth: works when hovering before start (reverse direction)", function(assert) {
+		// Hover Jan, start is Jun -> Feb,Mar,Apr,May should be marked (same result, swapped)
+		this.oMonthsRow._markMonthsBetweenStartAndHoveredMonth(20170601, 20170101);
+
+		var aMarked = this.oMonthsRow.$().find(".sapUiCalItemSelBetween");
+		assert.strictEqual(aMarked.length, 4, "4 months marked when hovering in reverse direction");
+	});
+
+	QUnit.test("_markMonthsBetweenStartAndHoveredMonth: clears previous marks when direction changes", function(assert) {
+		// First mark forward Jan->Jun
+		this.oMonthsRow._markMonthsBetweenStartAndHoveredMonth(20170101, 20170601);
+		assert.strictEqual(this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length, 4, "4 months marked forward");
+
+		// Now hover Jan->Mar - only Feb should be marked
+		this.oMonthsRow._markMonthsBetweenStartAndHoveredMonth(20170101, 20170301);
+		var aMarked = this.oMonthsRow.$().find(".sapUiCalItemSelBetween");
+		assert.strictEqual(aMarked.length, 1, "Previous marks cleared, only 1 month between Jan and Mar");
+		assert.ok(jQuery("#CalDrag--MonthsRow-20170201").hasClass("sapUiCalItemSelBetween"), "Only Feb is marked");
+		assert.notOk(jQuery("#CalDrag--MonthsRow-20170401").hasClass("sapUiCalItemSelBetween"), "Apr is no longer marked");
+	});
+
+	QUnit.test("_markMonthsBetweenStartAndHoveredMonth: no months marked when start equals hovered", function(assert) {
+		this.oMonthsRow._markMonthsBetweenStartAndHoveredMonth(20170301, 20170301);
+
+		assert.strictEqual(this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length, 0, "No months marked when start equals hovered");
+	});
+
+	QUnit.test("_markMonthsBetweenStartAndHoveredMonth: no months marked for adjacent months", function(assert) {
+		this.oMonthsRow._markMonthsBetweenStartAndHoveredMonth(20170101, 20170201);
+
+		assert.strictEqual(this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length, 0, "No months between adjacent Jan and Feb");
+	});
+
+	// --- onmouseover ---
+
+	QUnit.test("onmouseover: no feedback when intervalSelection is off", function(assert) {
+		this.oCal.setIntervalSelection(false);
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) }));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var $target = jQuery("#CalDrag--MonthsRow-20170601");
+		this.oMonthsRow.onmouseover({ target: $target.get(0) });
+
+		assert.strictEqual(this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length, 0,
+			"No hover feedback when intervalSelection=false");
+	});
+
+	QUnit.test("onmouseover: no feedback when no selection started", function(assert) {
+		var $target = jQuery("#CalDrag--MonthsRow-20170601");
+		this.oMonthsRow.onmouseover({ target: $target.get(0) });
+
+		assert.strictEqual(this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length, 0,
+			"No hover feedback when no selectedDates");
+	});
+
+	QUnit.test("onmouseover: no feedback when range is already complete", function(assert) {
+		this.oCal.addSelectedDate(new DateRange({
+			startDate: UI5Date.getInstance(2017, 0, 1),
+			endDate: UI5Date.getInstance(2017, 5, 1)
+		}));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// renderer already placed between-marks for Feb-May; hover over Oct must not change them
+		var iBetweenBefore = this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length;
+
+		var $target = jQuery("#CalDrag--MonthsRow-20171001");
+		this.oMonthsRow.onmouseover({ target: $target.get(0) });
+
+		assert.strictEqual(this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length, iBetweenBefore,
+			"Between-marks unchanged when range is already complete (onmouseover is a no-op)");
+	});
+
+	QUnit.test("onmouseover: marks intermediate months when hovering after start", function(assert) {
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) })); // Jan
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// hover over Jun item
+		var $target = jQuery("#CalDrag--MonthsRow-20170601");
+		this.oMonthsRow.onmouseover({ target: $target.get(0) });
+
+		var aMarked = this.oMonthsRow.$().find(".sapUiCalItemSelBetween");
+		assert.strictEqual(aMarked.length, 4, "Feb-May marked as between when hovering Jun");
+	});
+
+	QUnit.test("onmouseover: marks intermediate months when hovering before start (reverse)", function(assert) {
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 5, 1) })); // Jun
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// hover over Jan item
+		var $target = jQuery("#CalDrag--MonthsRow-20170101");
+		this.oMonthsRow.onmouseover({ target: $target.get(0) });
+
+		var aMarked = this.oMonthsRow.$().find(".sapUiCalItemSelBetween");
+		assert.strictEqual(aMarked.length, 4, "Feb-May marked as between when hovering Jan (before start)");
+	});
+
+	QUnit.test("onmouseover: updates marks as mouse moves to a closer month", function(assert) {
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) })); // Jan
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// hover Jun -> 4 months between
+		this.oMonthsRow.onmouseover({ target: jQuery("#CalDrag--MonthsRow-20170601").get(0) });
+		assert.strictEqual(this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length, 4, "4 months marked on Jun hover");
+
+		// hover Mar -> 1 month between
+		this.oMonthsRow.onmouseover({ target: jQuery("#CalDrag--MonthsRow-20170301").get(0) });
+		assert.strictEqual(this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length, 1, "1 month marked on Mar hover");
+		assert.ok(jQuery("#CalDrag--MonthsRow-20170201").hasClass("sapUiCalItemSelBetween"), "Only Feb remains marked");
+	});
+
+	QUnit.test("onmouseover: ignores non-item targets", function(assert) {
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) }));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// trigger mouseover on the row container itself, not an item
+		var $target = this.oMonthsRow.$();
+		this.oMonthsRow.onmouseover({ target: $target.get(0) });
+
+		assert.strictEqual(this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length, 0,
+			"No feedback when target is not a sapUiCalItem or sapUiCalItemText");
+	});
+
+	// --- _isMonthInAllowedRange ---
+
+	QUnit.test("_isMonthInAllowedRange: returns true when no minDate/maxDate set on parent", function(assert) {
+		assert.strictEqual(this.oMonthsRow._isMonthInAllowedRange(20170301), true,
+			"Returns true when parent has no explicit min/max bounds");
+	});
+
+	QUnit.test("_isMonthInAllowedRange: returns false for month outside min/max range", function(assert) {
+		this.oCal.setMinDate(UI5Date.getInstance(2017, 2, 1)); // Mar 2017
+		this.oCal.setMaxDate(UI5Date.getInstance(2017, 8, 1)); // Sep 2017
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		assert.strictEqual(this.oMonthsRow._isMonthInAllowedRange(20170101), false, "Jan is outside range");
+		assert.strictEqual(this.oMonthsRow._isMonthInAllowedRange(20171201), false, "Dec is outside range");
+	});
+
+	QUnit.test("_isMonthInAllowedRange: marks only allowed months between when minDate/maxDate set", function(assert) {
+		this.oCal.setMinDate(UI5Date.getInstance(2017, 2, 1)); // Mar 2017 -> _oMinDate = Mar 1
+		this.oCal.setMaxDate(UI5Date.getInstance(2017, 8, 1)); // Sep 2017 -> _oMaxDate = Sep 30 (end of month)
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Jan->Dec hover: strictly between = Feb-Nov (10 months)
+		// allowed: > Mar 1 AND < Sep 30 -> Apr, May, Jun, Jul, Aug, Sep = 6 months
+		this.oMonthsRow._markMonthsBetweenStartAndHoveredMonth(20170101, 20171201);
+
+		var aMarked = this.oMonthsRow.$().find(".sapUiCalItemSelBetween");
+		assert.strictEqual(aMarked.length, 7, "7 months within allowed range are marked (Mar-Sep)");
+		assert.notOk(jQuery("#CalDrag--MonthsRow-20170201").hasClass("sapUiCalItemSelBetween"), "Feb (below min) not marked");
+		assert.ok(jQuery("#CalDrag--MonthsRow-20170301").hasClass("sapUiCalItemSelBetween"), "Mar (equals min boundary) marked");
+		assert.ok(jQuery("#CalDrag--MonthsRow-20170401").hasClass("sapUiCalItemSelBetween"), "Apr (within range) marked");
+		assert.ok(jQuery("#CalDrag--MonthsRow-20170901").hasClass("sapUiCalItemSelBetween"), "Sep (within range, before max end-of-month) marked");
+		assert.notOk(jQuery("#CalDrag--MonthsRow-20171001").hasClass("sapUiCalItemSelBetween"), "Oct (above max) not marked");
+	});
+
+	// --- drag selection (mousedown + mousemove + mouseup) ---
+
+	QUnit.test("drag selection: mousedown sets _oMoveSelectedDate and binds mousemove", function(assert) {
+		var oMonthsRow = this.oMonthsRow;
+		var $janItem = jQuery("#CalDrag--MonthsRow-20170101");
+		$janItem.trigger("focus");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// simulate mousedown on Jan
+		qutils.triggerEvent("mousedown", "CalDrag--MonthsRow-20170101");
+
+		assert.ok(oMonthsRow._bMouseMove, "mousemove handler is bound after mousedown");
+		assert.ok(oMonthsRow._oMoveSelectedDate, "_oMoveSelectedDate is set after mousedown");
+	});
+
+	QUnit.test("drag selection: mouseup finalizes range and unbinds mousemove", function(assert) {
+		var oMonthsRow = this.oMonthsRow;
+		var oSelectSpy = this.spy(oMonthsRow, "fireSelect");
+
+		// focus and mousedown Jan
+		jQuery("#CalDrag--MonthsRow-20170101").trigger("focus");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		qutils.triggerEvent("mousedown", "CalDrag--MonthsRow-20170101");
+
+		// simulate mousemove to Jun via _handleMouseMove
+		oMonthsRow._handleMouseMove({
+			target: jQuery("#CalDrag--MonthsRow-20170601").get(0)
+		});
+
+		// mouseup
+		qutils.triggerEvent("mouseup", "CalDrag--MonthsRow-20170601");
+
+		assert.notOk(oMonthsRow._bMouseMove, "mousemove handler is unbound after mouseup");
+		assert.notOk(oMonthsRow._oMoveSelectedDate, "_oMoveSelectedDate cleared after mouseup");
+		assert.ok(oSelectSpy.calledOnce, "select event fired once on mouseup");
+
+		var aSelectedDates = this.oCal.getSelectedDates();
+		assert.ok(aSelectedDates.length > 0, "A date range is selected");
+		var oRange = aSelectedDates[0];
+		assert.ok(oRange.getStartDate(), "Range has a start date");
+		assert.ok(oRange.getEndDate(), "Range has an end date");
+	});
+
+	QUnit.test("drag selection: _handleMouseMove updates _sLastTargetId and skips same target", function(assert) {
+		var oMonthsRow = this.oMonthsRow;
+
+		jQuery("#CalDrag--MonthsRow-20170101").trigger("focus");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		qutils.triggerEvent("mousedown", "CalDrag--MonthsRow-20170101");
+
+		var oTarget = jQuery("#CalDrag--MonthsRow-20170601").get(0);
+
+		// first call - should process
+		oMonthsRow._handleMouseMove({ target: oTarget });
+		assert.strictEqual(oMonthsRow._sLastTargetId, oTarget.id, "_sLastTargetId set to hovered month");
+
+		// second call with same target - should skip (bMoveChange won't be set again)
+		var bMoveChangeBefore = oMonthsRow._bMoveChange;
+		oMonthsRow._handleMouseMove({ target: oTarget });
+		assert.strictEqual(oMonthsRow._bMoveChange, bMoveChangeBefore, "_bMoveChange not updated for same target");
+	});
+
+	QUnit.test("drag selection: _sLastTargetId is cleared on unbind", function(assert) {
+		var oMonthsRow = this.oMonthsRow;
+
+		jQuery("#CalDrag--MonthsRow-20170101").trigger("focus");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		qutils.triggerEvent("mousedown", "CalDrag--MonthsRow-20170101");
+
+		oMonthsRow._handleMouseMove({ target: jQuery("#CalDrag--MonthsRow-20170601").get(0) });
+		assert.ok(oMonthsRow._sLastTargetId, "_sLastTargetId is set after move");
+
+		oMonthsRow._unbindMousemove();
+		assert.notOk(oMonthsRow._sLastTargetId, "_sLastTargetId cleared after unbind");
+	});
+
+	QUnit.test("drag selection: two-click range selection still works (click start, click end)", function(assert) {
+		// Click Jan
+		jQuery("#CalDrag--MonthsRow-20170101").trigger("focus");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		qutils.triggerEvent("mousedown", "CalDrag--MonthsRow-20170101");
+		qutils.triggerEvent("mouseup", "CalDrag--MonthsRow-20170101");
+
+		// Click Jun
+		jQuery("#CalDrag--MonthsRow-20170601").trigger("focus");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		qutils.triggerEvent("mousedown", "CalDrag--MonthsRow-20170601");
+		qutils.triggerEvent("mouseup", "CalDrag--MonthsRow-20170601");
+
+		var aSelectedDates = this.oCal.getSelectedDates();
+		assert.ok(aSelectedDates.length > 0, "Date range selected via two clicks");
+		var oRange = aSelectedDates[0];
+		assert.equal(oFormatYyyymmdd.format(oRange.getStartDate()), "20170101", "Start date is Jan 2017");
+		assert.equal(oFormatYyyymmdd.format(oRange.getEndDate()), "20170601", "End date is Jun 2017");
+	});
+
+	QUnit.module("Interval selection - keyboard arrow navigation", {
+		beforeEach: function() {
+			this.oCal = new CalendarMonthInterval("CalKbd", {
+				startDate: UI5Date.getInstance(2017, 0, 1), // Jan 2017, shows Jan-Dec 2017
+				intervalSelection: true,
+				singleSelection: true
+			}).placeAt("qunit-fixture");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			this.oMonthsRow = this.oCal.getAggregation("monthsRow");
+		},
+		afterEach: function() {
+			this.oCal.destroy();
+		}
+	});
+
+	QUnit.test("onkeydown sets _selectedWithMouse to false when intervalSelection is on", function(assert) {
+		this.oMonthsRow._selectedWithMouse = true;
+
+		this.oMonthsRow.onkeydown({});
+
+		assert.strictEqual(this.oMonthsRow._selectedWithMouse, false,
+			"_selectedWithMouse is false after keydown when intervalSelection=true");
+	});
+
+	QUnit.test("onkeydown does not touch _selectedWithMouse when intervalSelection is off", function(assert) {
+		this.oCal.setIntervalSelection(false);
+		this.oMonthsRow._selectedWithMouse = true;
+
+		this.oMonthsRow.onkeydown({});
+
+		assert.strictEqual(this.oMonthsRow._selectedWithMouse, true,
+			"_selectedWithMouse unchanged after keydown when intervalSelection=false");
+	});
+
+	QUnit.test("_handleAfterFocus sets _selectedWithMouse to true on mousedown", function(assert) {
+		this.oMonthsRow._selectedWithMouse = false;
+
+		var $jan = jQuery("#CalKbd--MonthsRow-20170101");
+		$jan.trigger("focus");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// simulate mousedown so ItemNavigation fires AfterFocus with type=mousedown
+		qutils.triggerEvent("mousedown", "CalKbd--MonthsRow-20170101");
+
+		assert.strictEqual(this.oMonthsRow._selectedWithMouse, true,
+			"_selectedWithMouse is true after mousedown on a month item");
+	});
+
+	QUnit.test("arrow key navigation updates _focusedDate on the MonthsRow", function(assert) {
+		// Select Jan as start (open range)
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) }));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var $jan = jQuery("#CalKbd--MonthsRow-20170101");
+		$jan.trigger("focus");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Press arrow right -> moves focus to Feb
+		qutils.triggerKeydown($jan[0], KeyCodes.ARROW_RIGHT, false, false, false);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var oFocusedDate = this.oMonthsRow.getProperty("_focusedDate");
+		assert.ok(oFocusedDate, "_focusedDate is set after arrow key navigation");
+		assert.equal(oFormatYyyymmdd.format(oFocusedDate).substring(0, 6), "201702",
+			"_focusedDate points to Feb 2017 after pressing arrow right from Jan");
+	});
+
+	QUnit.test("arrow key navigation shows between-highlight when open range exists", function(assert) {
+		// Select Jan as start (open range)
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) }));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var $jan = jQuery("#CalKbd--MonthsRow-20170101");
+		$jan.trigger("focus");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Ensure keyboard mode
+		this.oMonthsRow._selectedWithMouse = false;
+
+		// Press arrow right three times: Jan -> Feb -> Mar -> Apr
+		qutils.triggerKeydown($jan[0], KeyCodes.ARROW_RIGHT, false, false, false);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		var $feb = jQuery("#CalKbd--MonthsRow-20170201");
+		qutils.triggerKeydown($feb[0], KeyCodes.ARROW_RIGHT, false, false, false);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		var $mar = jQuery("#CalKbd--MonthsRow-20170301");
+		qutils.triggerKeydown($mar[0], KeyCodes.ARROW_RIGHT, false, false, false);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Jan is start, focus is on Apr -> Feb and Mar should show sapUiCalItemSelBetween
+		var aBetween = this.oMonthsRow.$().find(".sapUiCalItemSelBetween");
+		assert.ok(aBetween.length >= 2, "At least 2 months shown as between after 3 arrow presses");
+		assert.ok(jQuery("#CalKbd--MonthsRow-20170201").hasClass("sapUiCalItemSelBetween"), "Feb is marked between");
+		assert.ok(jQuery("#CalKbd--MonthsRow-20170301").hasClass("sapUiCalItemSelBetween"), "Mar is marked between");
+	});
+
+	QUnit.test("arrow key navigation does not show between-highlight when _selectedWithMouse is true", function(assert) {
+		// Select Jan as start (open range)
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) }));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Force mouse mode
+		this.oMonthsRow._selectedWithMouse = true;
+
+		// Set _focusedDate directly to Apr
+		this.oMonthsRow.setProperty("_focusedDate", UI5Date.getInstance(2017, 3, 1));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var aBetween = this.oMonthsRow.$().find(".sapUiCalItemSelBetween");
+		assert.strictEqual(aBetween.length, 0,
+			"No between-highlight when _selectedWithMouse=true even if _focusedDate is set");
+	});
+
+	QUnit.test("between-highlight not shown when no open range exists", function(assert) {
+		// Complete range: startDate + endDate both set
+		this.oCal.addSelectedDate(new DateRange({
+			startDate: UI5Date.getInstance(2017, 0, 1),
+			endDate: UI5Date.getInstance(2017, 5, 1)
+		}));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		this.oMonthsRow._selectedWithMouse = false;
+		this.oMonthsRow.setProperty("_focusedDate", UI5Date.getInstance(2017, 9, 1)); // Oct
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		assert.notOk(jQuery("#CalKbd--MonthsRow-20171001").hasClass("sapUiCalItemSelBetween"),
+			"Oct is not marked between when range is already complete");
+	});
+
+	QUnit.test("between-highlight clears when _focusedDate moves back to start", function(assert) {
+		// Select Jan as start (open range)
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) }));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		this.oMonthsRow._selectedWithMouse = false;
+
+		// Focus Apr -> Feb and Mar should be between
+		this.oMonthsRow.setProperty("_focusedDate", UI5Date.getInstance(2017, 3, 1));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		assert.ok(jQuery("#CalKbd--MonthsRow-20170201").hasClass("sapUiCalItemSelBetween"), "Feb between when focus is Apr");
+
+		// Move focus back to Jan (same as start) -> nothing between
+		this.oMonthsRow.setProperty("_focusedDate", UI5Date.getInstance(2017, 0, 1));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		assert.strictEqual(this.oMonthsRow.$().find(".sapUiCalItemSelBetween").length, 0,
+			"No between-marks when focused date equals start date");
+	});
+
+	QUnit.test("between-highlight shown in reverse direction (focus before start)", function(assert) {
+		// Select Jun as start (open range)
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 5, 1) }));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		this.oMonthsRow._selectedWithMouse = false;
+
+		// Focus Mar (before start Jun) -> Mar, Apr and May should be between (inclusive of focused endpoint)
+		this.oMonthsRow.setProperty("_focusedDate", UI5Date.getInstance(2017, 2, 1));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		assert.ok(jQuery("#CalKbd--MonthsRow-20170401").hasClass("sapUiCalItemSelBetween"), "Apr is between when focus is Mar and start is Jun");
+		assert.ok(jQuery("#CalKbd--MonthsRow-20170501").hasClass("sapUiCalItemSelBetween"), "May is between when focus is Mar and start is Jun");
+		assert.ok(jQuery("#CalKbd--MonthsRow-20170301").hasClass("sapUiCalItemSelBetween"), "Mar (focused) is between (inclusive endpoint)");
+		assert.notOk(jQuery("#CalKbd--MonthsRow-20170601").hasClass("sapUiCalItemSelBetween"), "Jun (start) is not between");
+	});
+
+	QUnit.test("CalendarMonthInterval._handleFocus propagates _focusedDate to MonthsRow when intervalSelection is on", function(assert) {
+		// Select Jan as start
+		this.oCal.addSelectedDate(new DateRange({ startDate: UI5Date.getInstance(2017, 0, 1) }));
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Simulate a focus event fired from MonthsRow (as happens on arrow key navigation)
+		this.oMonthsRow.fireFocus({ date: UI5Date.getInstance(2017, 3, 1), notVisible: false });
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var oFocusedDate = this.oMonthsRow.getProperty("_focusedDate");
+		assert.ok(oFocusedDate, "_focusedDate is set on MonthsRow after CalendarMonthInterval handles focus event");
+		assert.equal(oFormatYyyymmdd.format(oFocusedDate).substring(0, 6), "201704",
+			"_focusedDate is Apr 2017 as passed in the focus event");
+	});
+
+	QUnit.test("CalendarMonthInterval._handleFocus does not propagate _focusedDate when intervalSelection is off", function(assert) {
+		this.oCal.setIntervalSelection(false);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		this.oMonthsRow.setProperty("_focusedDate", null);
+
+		this.oMonthsRow.fireFocus({ date: UI5Date.getInstance(2017, 3, 1), notVisible: false });
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var oFocusedDate = this.oMonthsRow.getProperty("_focusedDate");
+		assert.notOk(oFocusedDate,
+			"_focusedDate is NOT set on MonthsRow when intervalSelection=false");
+	});
+
 });

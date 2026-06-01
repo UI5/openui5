@@ -58,13 +58,13 @@ sap.ui.define([
 	 *
 	 * <h3>Supported File Types for Preview</h3>
 	 *
-	 * Following are the supported file types that can be previewed:
+	 * The following file types are supported for preview:
 	 *
 	 * <ul><li>Image (PNG, JPEG, BMP, GIF)</li>
-	 * <li>PDF </li>
+	 * <li>PDF</li>
 	 * <li>Text (Txt)</li>
-	 * <li>Video (MP4, MPEG, Quicktime, MsVideo)</li>
-	 * <li>SAP 3D Visual models (VDS)</li></ul>
+	 * <li>Video (MP4, MPEG, QuickTime, MS Video) — playback depends on browser codec support.</li>
+	 * <li>SAP 3D Visual models (VDS) — requires {@link sap.ui.vk} and WebGL support.</li></ul>
 	 *
 	 * @author SAP SE
 	 * @param {string} [sId] Id for the new control, it is generated automatically if no id is provided.
@@ -249,12 +249,25 @@ sap.ui.define([
 		},
 
 		/**
+		 * @return {boolean} Whether WebGL is available in the current browser context
+		 * @private
+		 */
+		_isWebGLAvailable: function () {
+			const oCanvas = document.createElement("canvas");
+			return !!(oCanvas.getContext("webgl") || oCanvas.getContext("webgl2"));
+		},
+
+		/**
 		 * Creates a viewer for .vds files
 		 * @param {sap.m.upload.UploadItem} oItem The UploadSetwithTableItem or UploadItem to be previewed
 		 * @return {sap.ui.vk.Viewer} A vds viewer instance or undefined if dependency unavailable
 		 * @private
 		 */
 		_createVdsViewer: async function (oItem) {
+			if (!this._isWebGLAvailable()) {
+				Log.warning("FilePreviewDialog: WebGL is not available, VDS preview cannot be rendered.");
+				return null;
+			}
 			if (!this.oViewer || !this._oContentResource) {
 				try {
 					const oVkDependency = await this._loadVkDependency();
@@ -403,7 +416,15 @@ sap.ui.define([
 
 		getPageContent: async function(oItem, oNewPage) {
 
-			const sMediaType = oItem.getMediaType();
+			let sMediaType = oItem.getMediaType();
+
+			// VDS files have no browser MIME type (File.type = ""), fall back to extension detection.
+			if (!sMediaType || sMediaType === "application/octet-stream") {
+				const sExt = (oItem.getFileName() || "").split(".").pop().toLowerCase();
+				if (sExt === "vds") {
+					sMediaType = PreviewableMediaType.Vds;
+				}
+			}
 
 			let oPage = this._createIllustratedMessage(oItem.getFileName());
 
@@ -439,6 +460,10 @@ sap.ui.define([
 				case PreviewableMediaType.Mp4:
 				case PreviewableMediaType.Quicktime:
 				case PreviewableMediaType.MsVideo: {
+					const oTestVideo = document.createElement("video");
+					if (!oTestVideo.canPlayType(sMediaType.toLowerCase())) {
+						break;
+					}
 					const oPage = new HTML({
 						content: `<video controls width='100%' height='100%' src=${oItem.getUrl()}>`
 					});
