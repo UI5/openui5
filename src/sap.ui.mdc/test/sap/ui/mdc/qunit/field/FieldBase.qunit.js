@@ -4120,11 +4120,18 @@ sap.ui.define([
 		sinon.spy(oValueHelp, "toggleOpen");
 
 		let oInnerField = oField.getAggregation("_content")[0];
+		let oBindingInfo = oInnerField?.getBindingInfo("tokens");
+
+		assert.equal(oBindingInfo?.length, 10, "BindingInfo: Limit to create only 10 Tokens");
+		assert.equal(oBindingInfo?.startIndex, -10, "BindingInfo: StartIndex set to create last 10 Tokens");
 
 		// tap on More-Indicator should be ignored
 		qutils.triggerEvent("tap", oInnerField.getAggregation("tokenizer").$().children(".sapMTokenizerIndicator")[0]);
 		assert.ok(oValueHelp.requestShowTypeahead.notCalled, "Tap on More-Indicator: requestShowTypeahead not called");
 		oValueHelp.requestShowTypeahead.resetHistory();
+		oBindingInfo = oInnerField?.getBindingInfo("tokens");
+		assert.ok(!oBindingInfo?.length, "BindingInfo: no limit to create only 10 Tokens");
+		assert.ok(!oBindingInfo?.startIndex, "BindingInfo: no StartIndex set for Tokens");
 
 		oField.focus();
 		await nextUIUpdate();
