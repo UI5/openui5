@@ -8030,7 +8030,11 @@ sap.ui.define([
 	QUnit.test("Allow cell content to handle focus-related events on navigation without focus change (on scroll)", async function(assert) {
 		let aEvents = [];
 		const test = async (sTitle, aExpectedEvents, fnAct) => {
-			await TableQUnitUtils.wait(0);
+			// In Firefox v150, document.activeElement still points to the old element during focusout, and defers focusin to a later task.
+			// Wait(0) is not enough time to initialize UIArea. The validation logic in UIArea.setFieldGroupControl never sees the Input as the
+			// current field group control, and therefore never fires validateFieldGroup. Wait(50) is sufficient to let the deferred focus event
+			// settle before the assertion.
+			await TableQUnitUtils.wait(50);
 			aEvents = [];
 			fnAct();
 			await this.oTable.qunit.whenNextRenderingFinished();

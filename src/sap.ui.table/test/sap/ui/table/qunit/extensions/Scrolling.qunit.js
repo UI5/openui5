@@ -6090,11 +6090,9 @@ sap.ui.define([
 			this.oTable.destroy();
 		},
 		triggerTouchEvent: function(sEventName, oTarget) {
-			const oEvent = new TouchEvent(sEventName, {
-				bubbles: true,
-				cancelable: true,
+			const oEvent = TableQUnitUtils.createTouchEvent(sEventName, {
 				touches: sEventName === "touchend" ? [] : [
-					new Touch({
+					TableQUnitUtils.createTouchObject({
 						identifier: 1,
 						target: oTarget,
 						pageX: 0,
