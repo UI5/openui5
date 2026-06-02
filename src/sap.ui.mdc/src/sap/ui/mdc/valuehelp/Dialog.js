@@ -824,7 +824,7 @@ sap.ui.define([
 	function _bindAllTokens(bAsync) {
 
 		const oBindingInfo = this.getBindingInfo("tokens");
-		if (!this._oUpdateBindingTimer && (oBindingInfo.length || oBindingInfo.startIndex)) {
+		if (!this._oUpdateBindingTimer && (oBindingInfo?.length || oBindingInfo?.startIndex)) {
 			const fnUpdate = () => {
 				// store selected token
 				const aSelectedTokens = this.getSelectedTokens();
@@ -839,7 +839,7 @@ sap.ui.define([
 					bTemplateShareable = false;
 				}
 
-				this.bindAggregation("tokens", { path: oBindingInfo.path, model: oBindingInfo.model, template: oToken, templateShareable: bTemplateShareable });
+				this.bindAggregation("tokens", { path: oBindingInfo.path, model: oBindingInfo.model, filters: oBindingInfo.filters, template: oToken, templateShareable: bTemplateShareable });
 			};
 
 			if (bAsync) {
