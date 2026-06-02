@@ -320,6 +320,7 @@ sap.ui.define([
 			const oBindingInfo = oTokenMultiInput.getBindingInfo("tokens");
 			assert.equal(oBindingInfo.length, 50, "Tokens - Bindinginfo length");
 			assert.equal(oBindingInfo.startIndex, -50, "Tokens - Bindinginfo startIndex");
+			assert.equal(oBindingInfo.filters?.getPath(), "isEmpty", "Tokens - Bindinginfo filter");
 			const aTokens = oTokenMultiInput.getTokens();
 			assert.equal(aTokens.length, 1, "number of tokens");
 			assert.equal(aTokens[0].getText(), "Text", "Token text");
@@ -511,7 +512,7 @@ sap.ui.define([
 		if (oPromise) {
 			const fnDone = assert.async();
 			oPromise.then(() => {
-				setTimeout(() => { // wait until open
+				setTimeout(async () => { // wait until open
 					assert.equal(iOpened, 1, "Opened event fired once");
 					const oContainer = oDialog.getAggregation("_container");
 					assert.ok(oContainer.isA("sap.m.Dialog"), "Container is sap.m.Dialog");
@@ -552,6 +553,16 @@ sap.ui.define([
 					// the inner input element has to been set to transparent.
 					assert.ok(oTokenMultiInput.isA("sap.m.MultiInput"), "MultiInput is first HBox item");
 					assert.equal(jQuery(oTokenMultiInput.getDomRef("inner")).css("opacity"), "0", "input part of multiInput is not visible");
+
+					oBinding = oTokenMultiInput.getBinding("tokens");
+					sinon.stub(oBinding, "getLength").onFirstCall().returns(51); // to test that there is no limit of 50 tokens
+					aTokens[0].focus(); // to have Focus in Tokenizer
+					await new Promise((resolve) => {setTimeout(resolve, 200);}); // as BindingInfo update is async
+					const oBindingInfo = oTokenMultiInput.getBindingInfo("tokens");
+					assert.notOk(oBindingInfo?.length, "BindingInfo: no limit to create only 50 Tokens");
+					assert.notOk(oBindingInfo?.startIndex, "BindingInfo: no StartIndex set for Tokens");
+					assert.equal(oBindingInfo?.filters?.getPath(), "isEmpty", "Tokens - Bindinginfo filter");
+					oBinding.getLength.restore();
 
 					// simulate ok-button click
 					const aButtons = oContainer.getButtons();
