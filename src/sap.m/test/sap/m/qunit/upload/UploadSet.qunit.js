@@ -724,7 +724,7 @@ sap.ui.define([
 		var noDataTemplate = document.querySelector(".sapMUCNoDataPage");
 		assert.ok(noDataTemplate, "No Data template is visible");
 		var NodataOffSetheight = this.oUploadSet.getList().getDomRef()?.querySelector(".sapMUCNoDataPage").offsetHeight;
-		assert.equal( NodataOffSetheight + "px", this.oUploadSet.getList().getDomRef()?.querySelector(".sapMUCNoDataPage").style.height, 'No Data template has fix height of no data offsetHeight');
+		assert.equal( NodataOffSetheight + "px", this.oUploadSet.getList().getDomRef()?.querySelector(".sapMUCNoDataPage").style.minHeight, 'No Data template has minHeight set to no data offsetHeight');
 	});
 
 	QUnit.test("Upload url of Uploader updated with UploadSet uploadurl", function (assert) {

@@ -637,7 +637,7 @@ sap.ui.define([
 		var oNoDataDom = aList?.getDomRef()?.querySelector(".sapMUCNoDataPage");
 		var iCurrentHeight = oNoDataDom?.offsetHeight;
 		if (iCurrentHeight){
-			oNoDataDom.style.height = iCurrentHeight + "px";
+			oNoDataDom.style.minHeight = iCurrentHeight + "px";
 		}
 
 		if (this.getCloudFilePickerEnabled()) {
