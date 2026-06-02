@@ -196,6 +196,16 @@ sap.ui.define([
 		assert.equal(this.oPopup._oPopup.getButtons()[3].getText(), "Custom 2");
 	});
 
+	QUnit.test("Cancel button is opted out of EnabledPropagator (DINC0776587)", function(assert) {
+		this.oPopup.open(this.oSource);
+
+		// useEnabledPropagator(false) sets the private _bUseEnabledPropagator flag
+		// (see sap/ui/core/EnabledPropagator.js). Verifying the flag is sufficient to
+		// guarantee that an enabled=false ancestor will not disable the cancel button.
+		assert.strictEqual(this.oPopup._oCancelButton._bUseEnabledPropagator, false,
+			"Cancel button has useEnabledPropagator(false) applied so it stays enabled regardless of ancestor enabled state");
+	});
+
 	QUnit.test("Check propagation of compact style class", function(assert) {
 
 
