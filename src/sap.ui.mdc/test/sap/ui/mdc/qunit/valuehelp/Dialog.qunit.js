@@ -330,6 +330,7 @@ sap.ui.define([
 			const oBindingInfo = oTokenizer.getBindingInfo("tokens");
 			assert.equal(oBindingInfo.length, 50, "Tokens - Bindinginfo length");
 			assert.equal(oBindingInfo.startIndex, 0, "Tokens - Bindinginfo startIndex");
+			assert.equal(oBindingInfo.filters?.getPath(), "isEmpty", "Tokens - Bindinginfo filter");
 			const aTokens = oTokenizer.getTokens();
 			assert.equal(aTokens.length, 1, "number of tokens");
 			assert.equal(aTokens[0].getText(), "Text", "Token text");
@@ -567,6 +568,7 @@ sap.ui.define([
 					const oBindingInfo = oTokenizer.getBindingInfo("tokens");
 					assert.notOk(oBindingInfo?.length, "BindingInfo: no limit to create only 50 Tokens");
 					assert.notOk(oBindingInfo?.startIndex, "BindingInfo: no StartIndex set for Tokens");
+					assert.equal(oBindingInfo?.filters?.getPath(), "isEmpty", "Tokens - Bindinginfo filter");
 					oBinding.getLength.restore();
 
 					// simulate ok-button click
