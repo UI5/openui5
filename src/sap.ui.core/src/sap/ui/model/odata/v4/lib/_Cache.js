@@ -3970,7 +3970,8 @@ sap.ui.define([
 	 * @param {string[]} aPaths
 	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties need to be
-	 *   loaded because they may have changed due to side effects of a previous update
+	 *   loaded because they may have changed due to side effects of a previous update; must not
+	 *   contain an empty path
 	 * @param {string[]} aPredicates
 	 *   The key predicates of the root elements to request side effects for
 	 * @param {boolean} bSingle
@@ -4047,6 +4048,7 @@ sap.ui.define([
 			_Helper.selectKeyProperties(mQueryOptions, mTypeForMetaPath[this.sMetaPath]);
 		}
 		mMergeableQueryOptions = _Helper.extractMergeableQueryOptions(mQueryOptions);
+		aPaths = _Helper.getUsedPaths(aPaths, mMergeableQueryOptions);
 		sResourcePath = this.sResourcePath + (bSingle ? aPredicates[0] : "")
 			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, true);
 
@@ -4726,7 +4728,8 @@ sap.ui.define([
 	 * @param {string[]} aPaths
 	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties need to be
-	 *   loaded because they may have changed due to side effects of a previous update
+	 *   loaded because they may have changed due to side effects of a previous update; must not
+	 *   contain an empty path
 	 * @param {string} [sResourcePath=this.sResourcePath]
 	 *   A resource path relative to the service URL; it must not contain a query string
 	 * @returns {sap.ui.base.SyncPromise<void>}
@@ -4758,6 +4761,7 @@ sap.ui.define([
 				+ this.oPromise.getResult().message);
 		}
 		mMergeableQueryOptions = _Helper.extractMergeableQueryOptions(mQueryOptions);
+		aPaths = _Helper.getUsedPaths(aPaths, mMergeableQueryOptions);
 		sResourcePath = (sResourcePath || this.sResourcePath)
 			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, true);
 		oResult = SyncPromise.all([
