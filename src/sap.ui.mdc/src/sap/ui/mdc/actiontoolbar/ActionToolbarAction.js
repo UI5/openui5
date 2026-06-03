@@ -119,6 +119,20 @@ sap.ui.define([
 		return this.getAction() && this.getAction().getDomRef();
 	};
 
+	ActionToolbarAction.prototype.getFocusDomRef = function() {
+		// return the FocusDomRef of the inner Action, so keybord navigation works correctly
+		return this.getAction()?.getFocusDomRef();
+	};
+
+	ActionToolbarAction.prototype.getEnabled = function() {
+		// return the enabled state of the inner Action, so that the ActionToolbar can handle the focus correctly
+		// First check for usage of EnabledPropagator. If used, we need to get the enabled Property directly to prevent stack overflow
+		if (this.getAction()?._bUseEnabledPropagator) {
+			return this.getAction()?.getProperty("enabled");
+		}
+		return this.getAction()?.getEnabled?.() ?? true;
+	};
+
 	ActionToolbarAction.prototype.getLayoutData = function() {
 		const oLayoutData = Control.prototype.getLayoutData.apply(this);
 		// return the LayoutData of the inner Action if there is no LayoutData set

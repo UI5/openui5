@@ -6201,4 +6201,81 @@ sap.ui.define([
 				foo : "bar"
 			});
 	});
+
+	//*********************************************************************************************
+	QUnit.test("getUsedPaths", function (assert) {
+		let aPaths = [
+			"*",
+			"Property",
+			"NavigationProperty",
+			"NavigationProperty/*",
+			"NavigationProperty/PropertyOfNavigationProperty",
+			"NavigationProperty/NestedNavigationPropertyWithoutExpandSelect",
+			"NavigationProperty/NestedNavigationPropertyWithoutExpandSelect/*",
+			"NavigationProperty/NestedNavigationPropertyWithoutExpandSelect/NestedProperty",
+			"OtherNavigationProperty",
+			"OtherNavigationProperty/PropertyOfOtherNavigationProperty",
+			"OtherNavigationProperty/Complex/Type/Property",
+			"NavigationPropertyWithoutSelect/Navigation0/PropertyOfNavigation0",
+			"Complex/Type/Property",
+			"Complex/Type",
+			"Complex",
+			"NavigationProperty/Complex/Type/Property",
+			"NavigationProperty/Complex",
+			"Other/Complex/Type/NavigationProperty",
+			"Other/Complex/Type/NavigationProperty/*",
+			"Other/Complex/Type/NavigationProperty/Foo",
+			"Other/Complex/Type",
+			"Other",
+			// meta data needed to decide whether they are used or not; keep them for now
+			"OtherNavigationProperty/OtherNavigationProperty",
+			"NavigationProperty/Complex/Type/FurtherNavigationProperty/Bar",
+			"Other/Complex/Type/NavigationProperty/UnusedNavigationProperty/Baz",
+			// all not used paths
+			"NotUsedProperty",
+			"NotUsedNavigationProperty",
+			"NavigationPropertyWithoutSelect/Navigation0/NotSelectedProperty",
+			"Prop", // prefix of "Property" but must not be used
+			"Navigation", // prefix of "NavigationProperty" but must not be used
+			"NavigationProperty/Other/Complex/Type/NavigationProperty" // suffix doesn't match
+		];
+		const sPaths = JSON.stringify(aPaths);
+		const aExpectedUsedPaths = aPaths.slice(0, aPaths.indexOf("NotUsedProperty"));
+		const mQueryOptions = {
+			$expand : {
+				NavigationProperty : {
+					$expand : {
+						NestedNavigationPropertyWithoutExpandSelect : {}
+					},
+					$select : ["Complex", "PropertyOfNavigationProperty"]
+				},
+				NavigationPropertyWithoutSelect : {
+					$expand : {
+						Navigation0 : {$select : ["PropertyOfNavigation0"]}
+					}
+				},
+				OtherNavigationProperty : {
+					$select : ["n/a0", "*", "n/a1"]
+				},
+				"Other/Complex/Type/NavigationProperty" : {}
+			},
+			$select : ["Complex/Type/Property", "Property"]
+		};
+		const sQueryOptions = JSON.stringify(mQueryOptions);
+
+		// code under test
+		let aUsedPaths = _Helper.getUsedPaths(aPaths, mQueryOptions);
+
+		assert.strictEqual(JSON.stringify(aPaths), sPaths, "unchanged aPaths");
+		assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptions, "unchanged mQueryOptions");
+		assert.deepEqual(aUsedPaths, aExpectedUsedPaths, "used paths");
+
+		aPaths = [];
+
+		// code under test
+		aUsedPaths = _Helper.getUsedPaths(aPaths, mQueryOptions);
+
+		assert.deepEqual(aUsedPaths, [], "empty paths array");
+		assert.notStrictEqual(aUsedPaths, aPaths, "different array");
+	});
 });

@@ -172,19 +172,20 @@ PanelRenderer.renderContent = function (oRm, oControl) {
 };
 
 PanelRenderer.startContent = function (oRm, oControl) {
-	oRm.openStart("div");
-	oRm.class("sapMPanelContentWrapper");
+	oRm.openStart("div",  oControl.getId() + "-content");
+	oRm.class("sapMPanelContent");
+	oRm.class("sapMPanelBG" + oControl.getBackgroundDesign());
 
 	if (oControl.getExpandable()) {
 		// use this class as marker class to ease selection later in onAfterRendering
 		oRm.class("sapMPanelExpandablePart");
 	}
 
-	oRm.openEnd();
-
-	oRm.openStart("div",  oControl.getId() + "-content");
-	oRm.class("sapMPanelContent");
-	oRm.class("sapMPanelBG" + oControl.getBackgroundDesign());
+	if (Device.browser.firefox) {
+		// ensure that the content is not included in the tab chain
+		// this happens in FF, when we have a scrollable content
+		oRm.attr('tabindex', '-1');
+	}
 
 	oRm.openEnd();
 };
@@ -194,8 +195,7 @@ PanelRenderer.renderChildren = function (oRm, aChildren) {
 };
 
 PanelRenderer.endContent = function (oRm) {
-	oRm.close("div"); // .sapMPanelContent
-	oRm.close("div"); // .sapMPanelContentWrapper
+	oRm.close("div");
 };
 
 PanelRenderer.endPanel = function (oRm) {

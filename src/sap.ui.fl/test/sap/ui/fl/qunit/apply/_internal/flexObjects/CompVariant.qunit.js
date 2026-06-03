@@ -759,6 +759,25 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("convertToFileContent", {
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when called with contentRemoved", (assert) => {
+			const oVariant = FlexObjectFactory.createFromFileContent({
+				fileType: "variant",
+				favorite: true,
+				contentRemoved: true
+			}, CompVariant);
+
+			const oFileContent = oVariant.convertToFileContent();
+
+			assert.strictEqual(oFileContent.favorite, true, "then regular variant properties are persisted");
+			assert.notOk("contentRemoved" in oFileContent, "then runtime-only contentRemoved is not persisted");
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});

@@ -56,8 +56,6 @@ sap.ui.define([
 			if (oFlexInfoSession.adaptationMode || window.sessionStorage.getItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`)) {
 				oConnectorSpecificPropertyBag.allContexts = true;
 				delete oConnectorSpecificPropertyBag.cacheKey;
-				// todos#18: this property is not set yet because the client cannot handle lazy loading of Comp variant contents.
-				// It will be added as soon as the client can handle the full scenario.
 				delete oConnectorSpecificPropertyBag.lazyLoadingViewsEnabled;
 			}
 			return oConnectorConfig.loadConnectorModule.loadFlexData(oConnectorSpecificPropertyBag)
@@ -228,7 +226,7 @@ sap.ui.define([
 	 * Loads variant-related data from connectors.
 	 *
 	 * @param {object} mPropertyBag - Object with the necessary properties
-	 * @param {string} sMethodName - Name of the connector method to call (loadFlVariant, loadAllFlVariants, loadFlVariantContent, loadAllCompVariants)
+	 * @param {string} sMethodName - Name of the connector method to call (loadFlVariant, loadAllFlVariants, loadFlVariantDependentControlChanges, loadAllCompVariants)
 	 * @returns {Promise<object>} Resolves with merged variant data
 	 */
 	async function loadVariantDataFromConnectors(mPropertyBag, sMethodName) {
@@ -281,15 +279,15 @@ sap.ui.define([
 
 	/**
 	 * Loads the UI changes (variantDependentControlChanges) for a given FL variant.
-	 * Used for lazy loading when switching to a variant that has variantContentRemoved: true.
+	 * Used for lazy loading when switching to a variant that has variantDependentControlChangesRemoved: true.
 	 *
 	 * @param {object} mPropertyBag - Object with the necessary properties
 	 * @param {string} mPropertyBag.reference - Flexibility reference
 	 * @param {string} mPropertyBag.variantId - Variant ID to load content for
 	 * @returns {Promise<object>} Resolves with variants (including referenced), variantChanges, and variantDependentControlChanges
 	 */
-	Storage.loadFlVariantContent = function(mPropertyBag) {
-		return loadVariantDataFromConnectors(mPropertyBag, "loadFlVariantContent");
+	Storage.loadFlVariantDependentControlChanges = function(mPropertyBag) {
+		return loadVariantDataFromConnectors(mPropertyBag, "loadFlVariantDependentControlChanges");
 	};
 
 	/**

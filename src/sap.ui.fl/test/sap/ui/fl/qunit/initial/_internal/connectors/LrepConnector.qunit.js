@@ -404,11 +404,11 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("when loadFlVariantContent is triggered", function(assert) {
+		QUnit.test("when loadFlVariantDependentControlChanges is triggered", function(assert) {
 			mockResponse.call(this, JSON.stringify(oFLVariantServerResponse));
-			const mPropertyBag = { url: "/sap/bc/lrep", reference: "test.app", id: "variant1" };
+			const mPropertyBag = { url: "/sap/bc/lrep", reference: "test.app", variantId: "variant1" };
 
-			return LrepConnector.loadFlVariantContent(mPropertyBag).then(function(oResponse) {
+			return LrepConnector.loadFlVariantDependentControlChanges(mPropertyBag).then(function(oResponse) {
 				assert.equal(this.oXHR.method, "GET", "request method is GET");
 				const sExpectedUrl = "/sap/bc/lrep/flex/variantdata/content/test.app?id=variant1&sap-language=EN";
 				assert.equal(this.oXHR.url, sExpectedUrl, "the URL is correct");
@@ -441,7 +441,7 @@ sap.ui.define([
 
 		QUnit.test("when loadCompVariantContent is triggered", function(assert) {
 			mockResponse.call(this, JSON.stringify(oCompVariantServerResponse));
-			const mPropertyBag = { url: "/sap/bc/lrep", reference: "test.app", id: "compVariant1" };
+			const mPropertyBag = { url: "/sap/bc/lrep", reference: "test.app", variantId: "compVariant1" };
 
 			return LrepConnector.loadCompVariantContent(mPropertyBag).then(function(oResponse) {
 				assert.equal(this.oXHR.method, "GET", "request method is GET");

@@ -129,32 +129,6 @@ sap.ui.define([
 			assert.strictEqual(oBaseVariant.getAuthor(), "new name", "then the variant author name is updated"
 			);
 		});
-
-		QUnit.test("after variant author has been set", function(assert) {
-			this.mFileContent = {
-				layer: "USER",
-				support: {
-					user: "A"
-				}
-			};
-			var oBaseVariant = FlexObjectFactory.createFromFileContent(this.mFileContent, Variant);
-			oBaseVariant.setAuthor("new name");
-			assert.strictEqual(oBaseVariant.getAuthor(), "new name", "then the variant author name is updated"
-			);
-		});
-
-		QUnit.test("when convertToFileContent is called with variantContentRemoved", function(assert) {
-			const oVariant = FlexObjectFactory.createFromFileContent({
-				fileType: "ctrl_variant",
-				favorite: true,
-				variantContentRemoved: true
-			}, Variant);
-
-			const oFileContent = oVariant.convertToFileContent();
-
-			assert.strictEqual(oFileContent.favorite, true, "then regular variant properties are persisted");
-			assert.notOk("variantContentRemoved" in oFileContent, "then runtime-only variantContentRemoved is not persisted");
-		});
 	});
 
 	QUnit.done(function() {
