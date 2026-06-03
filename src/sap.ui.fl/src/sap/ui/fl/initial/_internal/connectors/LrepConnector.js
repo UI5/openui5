@@ -221,7 +221,7 @@ sap.ui.define([
 		 * @returns {Promise<object>} Promise resolves with an object containing the flex variants for the given control
 		 */
 		loadAllFlVariants(mPropertyBag) {
-			const mParameters = _pick(mPropertyBag, ["vmReference"]);
+			const mParameters = { vmReference: mPropertyBag.vmReference };
 			this._addClientInfo(mParameters);
 			Utils.addSAPLogonLanguageInfo(mParameters);
 
@@ -235,11 +235,11 @@ sap.ui.define([
 		 * Load missing UI changes when switching to a variant that has variantDependentControlChangesRemoved: true
 		 * @param {object} mPropertyBag Property bag
 		 * @param {string} mPropertyBag.reference Flexibility reference
-		 * @param {string} mPropertyBag.id Id of the variant for which the content should be loaded
-		 * @returns {Promise<object>} Promise resolves with an object containing the flex variant content for the given variant ID
+		 * @param {string} mPropertyBag.variantId Id of the variant for which the dependent control changes should be loaded
+		 * @returns {Promise<object>} Promise resolves with the dependent control changes for the given variant ID
 		 */
-		loadFlVariantContent(mPropertyBag) {
-			const mParameters = _pick(mPropertyBag, ["id"]);
+		loadFlVariantDependentControlChanges(mPropertyBag) {
+			const mParameters = { id: mPropertyBag.variantId };
 			this._addClientInfo(mParameters);
 			Utils.addSAPLogonLanguageInfo(mParameters);
 
@@ -257,7 +257,7 @@ sap.ui.define([
 		 * @returns {Promise<object>} Promise resolves with an object containing the flex variants for the given control
 		 */
 		loadAllCompVariants(mPropertyBag) {
-			const mParameters = _pick(mPropertyBag, ["persistencyKey"]);
+			const mParameters = { persistencyKey: mPropertyBag.persistencyKey };
 			this._addClientInfo(mParameters);
 			Utils.addSAPLogonLanguageInfo(mParameters);
 
@@ -271,11 +271,11 @@ sap.ui.define([
 		 * Load missing content when switching to a variant that has contentRemoved: true.
 		 * @param {object} mPropertyBag Property bag
 		 * @param {string} mPropertyBag.reference Flexibility reference
-		 * @param {string} mPropertyBag.id Id of the variant for which the content should be loaded
+		 * @param {string} mPropertyBag.variantId Id of the variant for which the content should be loaded
 		 * @returns {Promise<object>} Promise resolves with an object containing the flex variant content for the given variant ID
 		 */
 		loadCompVariantContent(mPropertyBag) {
-			const mParameters = _pick(mPropertyBag, ["id"]);
+			const mParameters = { id: mPropertyBag.variantId };
 			this._addClientInfo(mParameters);
 			Utils.addSAPLogonLanguageInfo(mParameters);
 

@@ -84,11 +84,11 @@ sap.ui.define([], function() {
 		 * Load missing UI changes when switching to a variant that has variantDependentControlChangesRemoved: true
 		 * @param {object} mPropertyBag Property bag
 		 * @param {string} mPropertyBag.reference Flexibility reference
-		 * @param {string} mPropertyBag.id Id of the variant for which the content should be loaded
-		 * @returns {Promise<object>} Promise resolves with an object containing the flex variant content for the given variant ID
+		 * @param {string} mPropertyBag.variantId Id of the variant for which the dependent control changes should be loaded
+		 * @returns {Promise<object>} Promise resolves with the dependent control changes for the given variant ID
 		 */
-		loadFlVariantContent() {
-			return Promise.reject(new Error("loadFlVariantContent is not implemented"));
+		loadFlVariantDependentControlChanges() {
+			return Promise.reject(new Error("loadFlVariantDependentControlChanges is not implemented"));
 		},
 
 		/**

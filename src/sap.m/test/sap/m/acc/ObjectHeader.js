@@ -52,15 +52,6 @@ sap.ui.define([
 		MessageToast.show(oEvent.getSource().getId() + "'s intro pressed");
 	}
 
-	function getTitle(sText) {
-		return new Title({
-			level: TitleLevel.H2,
-			titleStyle: TitleLevel.H5,
-			text: sText,
-			wrapping: true
-		}).addStyleClass("sapUiMediumMarginTop sapUiTinyMarginBottom");
-	}
-
 	var oActiveObjectAttribute1 = new ObjectAttribute({
 		active: true,
 		title: "Website",
@@ -153,7 +144,7 @@ sap.ui.define([
 			oActiveObjectStatusTextOnly,
 			oActiveObjectStatusCombined
 		]
-	});
+	}).addStyleClass("sapUiMediumMarginTop sapUiTinyMarginBottom");
 
 	var oPassiveResponsiveObjectHeader = new ObjectHeader({
 		responsive: true,
@@ -170,7 +161,7 @@ sap.ui.define([
 			oPassiveTitlelessObjectStatusCombined
 		],
 		markers: new ObjectMarker({type: ObjectMarkerType.Favorite})
-	});
+	}).addStyleClass("sapUiMediumMarginTop sapUiTinyMarginBottom");
 
 	var oCondensedObjectHeader = new ObjectHeader({
 		condensed: true,
@@ -179,16 +170,13 @@ sap.ui.define([
 		number: "0.75",
 		numberUnit: "LEV",
 		attributes: oActiveObjectAttribute2
-	});
+	}).addStyleClass("sapUiMediumMarginTop sapUiTinyMarginBottom");
 
 	var oLayout = new VerticalLayout({
 		width: "100%",
 		content: [
-			getTitle("Responsive ObjectHeader with active elements:"),
 			oActiveResponsiveObjectHeader,
-			getTitle("Responsive ObjectHeader with inactive elements:"),
 			oPassiveResponsiveObjectHeader,
-			getTitle("Condensed ObjectHeader:"),
 			oCondensedObjectHeader
 		]
 	}).addStyleClass("sapUiContentPadding");

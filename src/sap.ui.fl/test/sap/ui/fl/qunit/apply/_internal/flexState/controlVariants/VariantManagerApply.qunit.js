@@ -201,8 +201,8 @@ sap.ui.define([
 		});
 
 		QUnit.test("when switching to a variant with removed content (standard -> variant2)", async function(assert) {
-			this.oVariant2.setVariantContentRemoved(true);
-			const oLoadVariantContentStub = sandbox.stub(VariantManagerApply, "loadVariantContent").resolves();
+			this.oVariant2.setVariantDependentControlChangesRemoved(true);
+			const oLoadStub = sandbox.stub(VariantManagerApply, "loadVariantDependentControlChanges").resolves();
 
 			await VariantManagerApply.updateCurrentVariant({
 				vmControl: this.oVMControl,
@@ -210,19 +210,19 @@ sap.ui.define([
 				appComponent: oComponent
 			});
 
-			assert.strictEqual(oLoadVariantContentStub.callCount, 1, "then loadVariantContent is called once");
+			assert.strictEqual(oLoadStub.callCount, 1, "then loadVariantDependentControlChanges is called once");
 			assert.deepEqual(
-				oLoadVariantContentStub.firstCall.args[0],
+				oLoadStub.firstCall.args[0],
 				{
 					reference: sReference,
 					componentId: oComponent.getId(),
 					vmReference: sVMReference,
 					variantId: "variant2"
 				},
-				"then loadVariantContent is called with the correct parameters"
+				"then loadVariantDependentControlChanges is called with the correct parameters"
 			);
 			assert.ok(
-				oLoadVariantContentStub.calledBefore(this.oApplyStub),
+				oLoadStub.calledBefore(this.oApplyStub),
 				"then content is loaded before applying variant changes"
 			);
 		});
@@ -612,7 +612,7 @@ sap.ui.define([
 				variantReference: sVMReference,
 				variantManagementReference: sVMReference
 			});
-			oVariantWithRemovedContent.setVariantContentRemoved(true);
+			oVariantWithRemovedContent.setVariantDependentControlChangesRemoved(true);
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oStandardVariant, oVariantWithRemovedContent]);
 		},
 		afterEach() {
@@ -668,34 +668,40 @@ sap.ui.define([
 			assert.deepEqual(oResult, oBackendResponse, "then the backend response is returned");
 		});
 
-		QUnit.test("loadVariantContent clears variantContentRemoved on loaded variant", async function(assert) {
+		QUnit.test("loadVariantDependentControlChanges clears variantDependentControlChangesRemoved on loaded variant", async function(assert) {
 			const oBackendResponse = { changes: { variantDependentControlChanges: [{ fileName: "changeFromBackend" }] } };
-			const oLoadFlVariantContentStub = sandbox.stub(Storage, "loadFlVariantContent").resolves(oBackendResponse);
+			const oLoadFlVariantDependentControlChangesStub = sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
 			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
 			const oVariantData = VariantManagementState.getVariant({
 				reference: sReference,
 				vmReference: sVMReference,
 				vReference: "variantWithRemovedContent"
 			});
-			assert.ok(oVariantData.instance.getVariantContentRemoved(), "precondition: variant content is marked as removed");
+			assert.ok(
+				oVariantData.instance.getVariantDependentControlChangesRemoved(),
+				"precondition: variant content is marked as removed"
+			);
 
-			const oResult = await VariantManagerApply.loadVariantContent({
+			const oResult = await VariantManagerApply.loadVariantDependentControlChanges({
 				reference: sReference,
 				componentId: oComponent.getId(),
 				vmReference: sVMReference,
 				variantId: "variantWithRemovedContent"
 			});
 
-			assert.deepEqual(oLoadFlVariantContentStub.firstCall.args[0], {
+			assert.deepEqual(oLoadFlVariantDependentControlChangesStub.firstCall.args[0], {
 				reference: sReference,
 				variantId: "variantWithRemovedContent"
-			}, "then Storage.loadFlVariantContent is called with the correct parameters");
+			}, "then Storage.loadFlVariantDependentControlChanges is called with the correct parameters");
 			assert.deepEqual(oAddNewObjectsSpy.firstCall.args[0], {
 				reference: sReference,
 				componentId: oComponent.getId(),
 				newData: oBackendResponse
 			}, "then backend response is added to FlexState");
-			assert.notOk(oVariantData.instance.getVariantContentRemoved(), "then the variantContentRemoved flag is cleared");
+			assert.notOk(
+				oVariantData.instance.getVariantDependentControlChangesRemoved(),
+				"then the variantDependentControlChangesRemoved flag is cleared"
+			);
 			assert.deepEqual(oResult, oBackendResponse, "then the backend response is returned");
 		});
 	});

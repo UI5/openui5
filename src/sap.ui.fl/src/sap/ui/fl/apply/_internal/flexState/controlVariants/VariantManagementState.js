@@ -865,13 +865,13 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.variantId - Variant ID to check
 	 * @returns {boolean} True if the variant's UI changes were removed and need to be loaded
 	 */
-	VariantManagementState.isVariantContentRemoved = function(mPropertyBag) {
+	VariantManagementState.areVariantDependentControlChangesRemoved = function(mPropertyBag) {
 		const oVariant = this.getVariant({
 			vmReference: mPropertyBag.vmReference,
 			vReference: mPropertyBag.variantId,
 			reference: mPropertyBag.reference
 		});
-		return !!oVariant?.instance?.getVariantContentRemoved();
+		return !!oVariant?.instance?.getVariantDependentControlChangesRemoved();
 	};
 
 	return VariantManagementState;

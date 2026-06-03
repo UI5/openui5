@@ -1897,6 +1897,56 @@ sap.ui.define([
 		},
 
 		/**
+		 * Gets the paths from the given array which are used by $select/$expand of the given query
+		 * options.
+		 *
+		 * @param {string[]} aPaths
+		 *   The read-only array of "14.4.1.5 Expression edm:NavigationPropertyPath" or
+		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties are affected
+		 *   by a side effect; paths may contain wildcards, for example "SO_2_BP/*" or "*"; must not
+		 *   contain an empty path
+		 * @param {object} mQueryOptions
+		 *   A read-only map of query options as returned by
+		 *   {@link sap.ui.model.odata.v4.ODataModel#buildQueryOptions}
+		 * @returns {string[]}
+		 *   An array of paths matching the given query options
+		 *
+		 * @public
+		 */
+		getUsedPaths : function (aPaths, mQueryOptions) {
+			function isRelated(sPath0, sPath1) {
+				return _Helper.hasPathPrefix(sPath0, sPath1)
+					|| _Helper.hasPathPrefix(sPath1, sPath0);
+			}
+
+			function isUsed(sPath, mQueryOptionsForPath) {
+				let bPathMatchedExpand = false;
+				// if there is no $select the standard select is used (corresponding to "*")
+				const aSelect = mQueryOptionsForPath.$select || ["*"];
+				const mExpand = mQueryOptionsForPath.$expand || {};
+				return sPath === "*" || sPath in mExpand || aSelect.includes(sPath)
+					|| aSelect.some((sSelect) => isRelated(sPath, sSelect))
+					// check whether the path can be reached via expanded navigation properties
+					|| Object.keys(mExpand).some((sExpand) => {
+						if (_Helper.hasPathPrefix(sPath, sExpand)) {
+							bPathMatchedExpand = true;
+							return isUsed(sPath.slice(sExpand.length + 1), mExpand[sExpand]);
+						}
+						if (_Helper.hasPathPrefix(sExpand, sPath)) {
+							bPathMatchedExpand = true;
+							return true; // part of complex type
+						}
+						return false;
+					})
+					// without metadata it cannot be decided whether a path not starting with an
+					// expanded navigation property is used, so keep it
+					|| !bPathMatchedExpand && aSelect.includes("*");
+			}
+
+			return aPaths.filter((sPath) => isUsed(sPath, mQueryOptions));
+		},
+
+		/**
 		 * Tells whether <code>sPath</code> has <code>sBasePath</code> as path prefix. It returns
 		 * <code>true</code> iff {@link .getRelativePath} does not return <code>undefined</code>.
 		 *

@@ -259,14 +259,6 @@ sap.ui.define([
 			]
 		});
 
-	var oPanelScrollTest = new Panel("panelScrollTest", {
-		headerText: "Sticky Padding Scroll Test (fixed height)",
-		height: "150px",
-		content: [
-			new Text({ text: lorem + " " + lorem + " " + lorem + lorem + " " + lorem + " " + lorem })
-		]
-	});
-
 	var oPage = new Page("page", {
 		title: "Panel Test Page",
 		content: [
@@ -286,8 +278,7 @@ sap.ui.define([
 			oPanel13,
 			oPanel14,
 			oPanel15,
-			oPanel16,
-			oPanelScrollTest
+			oPanel16
 		]
 	}).addStyleClass("sapUiContentPadding");
 

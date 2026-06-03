@@ -3,6 +3,7 @@
  */
 
 sap.ui.define([
+	"sap/base/util/restricted/_omit",
 	"sap/base/util/restricted/_pick",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
 	"sap/ui/fl/apply/_internal/flexObjects/Variant",
@@ -11,6 +12,7 @@ sap.ui.define([
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils"
 ], function(
+	_omit,
 	_pick,
 	States,
 	Variant,
@@ -49,6 +51,14 @@ sap.ui.define([
 				 */
 				persistencyKey: {
 					type: "string"
+				},
+				/**
+				 * Indicates whether the variant's content was removed during lazy loading.
+				 * When true, the content needs to be loaded before switching to this variant.
+				 */
+				contentRemoved: {
+					type: "boolean",
+					defaultValue: false
 				}
 			},
 			aggregations: {
@@ -109,7 +119,8 @@ sap.ui.define([
 			...Variant.getMappingInfo(),
 			persistencyKey: "selector.persistencyKey",
 			standardVariant: "standardVariant",
-			variantId: "variantId"
+			variantId: "variantId",
+			contentRemoved: "contentRemoved"
 		};
 	};
 
@@ -331,6 +342,12 @@ sap.ui.define([
 		var mFileContent = Variant.prototype.cloneFileContentWithNewId.apply(this, aArgs);
 		mFileContent.variantId = mFileContent.fileName;
 		return mFileContent;
+	};
+
+	CompVariant.prototype.convertToFileContent = function() {
+		const oFileContent = Variant.prototype.convertToFileContent.apply(this);
+		// contentRemoved is only relevant in runtime and should not be persisted
+		return _omit(oFileContent, ["contentRemoved"]);
 	};
 
 	CompVariant.prototype.getCondensingUpdateDiff = function() {

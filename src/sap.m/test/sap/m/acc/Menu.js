@@ -480,6 +480,7 @@ sap.ui.define([
 
 	var oContextList = new List("contextArea", {
 		headerText: "Right-click an item for context menu",
+		headerLevel: TitleLevel.H2,
 		contextMenu: oContextMenu,
 		items: [
 			new StandardListItem({

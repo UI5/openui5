@@ -1518,6 +1518,18 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the enabled state of the control
+	 *
+	 * @returns {boolean} <code>true</code> if the control is enabled
+	 * @ui5-restricted sap.ui.mdc
+	 * @private
+	 * @since 1.150
+	 */
+	FieldBase.prototype.getEnabled = function() {
+		return ContentFactory._getEnabled(this.getEditMode());
+	};
+
+	/**
 	 * Returns the control the value help is attached to.
 	 *
 	 * In the case that number and unit are shown in different controls, this is the unit control, not the number control.

@@ -218,5 +218,21 @@ sap.ui.define([
 			assert.strictEqual(oVariant.getVariantManagementReference(), oClonedFLVariant.getVariantManagementReference(), "the VariantManagementReference is properly set");
 			assert.deepEqual(oVariant.getContexts(), oClonedFLVariant.getContexts(), "the contexts are properly set");
 		});
+
+		QUnit.test("when convertToFileContent is called with variantDependentControlChangesRemoved", (assert) => {
+			const oVariant = FlexObjectFactory.createFromFileContent({
+				fileType: "ctrl_variant",
+				favorite: true,
+				variantDependentControlChangesRemoved: true
+			}, FlVariant);
+
+			const oFileContent = oVariant.convertToFileContent();
+
+			assert.strictEqual(oFileContent.favorite, true, "then regular variant properties are persisted");
+			assert.notOk(
+				"variantDependentControlChangesRemoved" in oFileContent,
+				"then runtime-only variantDependentControlChangesRemoved is not persisted"
+			);
+		});
 	});
 });

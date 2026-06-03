@@ -158,7 +158,7 @@ sap.ui.define([
 					namespace: `apps/${sReference}/variants/`,
 					reference: sReference,
 					support: { user: "LazyUser" },
-					variantContentRemoved: true
+					variantDependentControlChangesRemoved: true
 				},
 				{
 					fileName: "lazyVariant2",
@@ -255,7 +255,7 @@ sap.ui.define([
 			assert.ok(oVariantData, "Lazy Variant Alpha exists in VariantManagementState");
 
 			assert.ok(
-				VariantManagementState.isVariantContentRemoved({
+				VariantManagementState.areVariantDependentControlChangesRemoved({
 					reference: sReference,
 					vmReference: this.sVMReference,
 					variantId: "lazyVariant1"
@@ -263,7 +263,7 @@ sap.ui.define([
 				"Lazy Variant Alpha content is marked as removed"
 			);
 
-			// Stub loadFlVariantContent to return a hideControl change targeting a section
+			// Stub loadFlVariantDependentControlChanges to return a hideControl change targeting a section
 			const sTargetControlId = "lazyLoadView--ObjectPageSection1";
 			const oContentResponse = createVariantContentResponse([
 				{
@@ -279,7 +279,7 @@ sap.ui.define([
 					support: { user: "LazyUser" }
 				}
 			]);
-			const oLoadFlVariantContentStub = sandbox.stub(Storage, "loadFlVariantContent").resolves(oContentResponse);
+			const oLoadFlVariantDependentControlChangesStub = sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oContentResponse);
 
 			// Verify the target control is visible before variant switch
 			const oTargetControl = Element.getElementById(sTargetControlId);
@@ -294,22 +294,22 @@ sap.ui.define([
 			});
 
 			assert.strictEqual(
-				oLoadFlVariantContentStub.callCount, 1,
-				"Storage.loadFlVariantContent was called once"
+				oLoadFlVariantDependentControlChangesStub.callCount, 1,
+				"Storage.loadFlVariantDependentControlChanges was called once"
 			);
 			assert.deepEqual(
-				oLoadFlVariantContentStub.firstCall.args[0],
+				oLoadFlVariantDependentControlChangesStub.firstCall.args[0],
 				{ reference: sReference, variantId: "lazyVariant1" },
-				"loadFlVariantContent called with correct parameters"
+				"loadFlVariantDependentControlChanges called with correct parameters"
 			);
 
 			assert.notOk(
-				oVariantData.instance.getVariantContentRemoved(),
-				"variantContentRemoved flag is cleared after content loading"
+				oVariantData.instance.getVariantDependentControlChangesRemoved(),
+				"variantDependentControlChangesRemoved flag is cleared after content loading"
 			);
 
 			assert.notOk(
-				VariantManagementState.isVariantContentRemoved({
+				VariantManagementState.areVariantDependentControlChangesRemoved({
 					reference: sReference,
 					vmReference: this.sVMReference,
 					variantId: "lazyVariant1"

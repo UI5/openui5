@@ -1537,13 +1537,13 @@ sap.ui.define([
 				variantReference: sVariantManagementReference,
 				fileName: "customVariantWithRemovedContent"
 			});
-			oVariant.setVariantContentRemoved(true);
+			oVariant.setVariantDependentControlChangesRemoved(true);
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				oVariant
 			]);
 
 			assert.strictEqual(
-				VariantManagementState.isVariantContentRemoved({
+				VariantManagementState.areVariantDependentControlChangesRemoved({
 					reference: sReference,
 					vmReference: sVariantManagementReference,
 					variantId: "customVariantWithRemovedContent"
@@ -1553,7 +1553,7 @@ sap.ui.define([
 			);
 
 			assert.strictEqual(
-				VariantManagementState.isVariantContentRemoved({
+				VariantManagementState.areVariantDependentControlChangesRemoved({
 					reference: sReference,
 					vmReference: sVariantManagementReference,
 					variantId: "nonExistentVariant"

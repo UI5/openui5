@@ -70,13 +70,13 @@ sap.ui.define([
 	async function switchVariant(mPropertyBag) {
 		// Check if variant content needs to be loaded (lazy loading)
 		if (
-			VariantManagementState.isVariantContentRemoved({
+			VariantManagementState.areVariantDependentControlChangesRemoved({
 				reference: mPropertyBag.reference,
 				vmReference: mPropertyBag.vmReference,
 				variantId: mPropertyBag.newVReference
 			})
 		) {
-			await VariantManagerApply.loadVariantContent({
+			await VariantManagerApply.loadVariantDependentControlChanges({
 				reference: mPropertyBag.reference,
 				componentId: mPropertyBag.appComponent.getId(),
 				vmReference: mPropertyBag.vmReference,
@@ -269,7 +269,7 @@ sap.ui.define([
 
 	/**
 	 * Loads the UI changes for a specific FL variant.
-	 * Used for lazy loading when switching to a variant with variantContentRemoved: true.
+	 * Used for lazy loading when switching to a variant with variantDependentControlChangesRemoved: true.
 	 *
 	 * @param {object} mPropertyBag - Object with the necessary properties
 	 * @param {string} mPropertyBag.reference - Flex reference
@@ -278,8 +278,8 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.variantId - Variant ID to load content for
 	 * @returns {Promise<object>} Resolves with the new data that was added
 	 */
-	VariantManagerApply.loadVariantContent = async function(mPropertyBag) {
-		const oBackendResponse = await Storage.loadFlVariantContent({
+	VariantManagerApply.loadVariantDependentControlChanges = async function(mPropertyBag) {
+		const oBackendResponse = await Storage.loadFlVariantDependentControlChanges({
 			reference: mPropertyBag.reference,
 			variantId: mPropertyBag.variantId
 		});
@@ -296,7 +296,7 @@ sap.ui.define([
 			vmReference: mPropertyBag.vmReference,
 			vReference: mPropertyBag.variantId
 		});
-		oVariant.instance.setVariantContentRemoved(false);
+		oVariant.instance.setVariantDependentControlChangesRemoved(false);
 
 		return oBackendResponse;
 	};

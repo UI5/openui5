@@ -861,6 +861,7 @@ sap.ui.define([
 					return this.waitFor({
 						id: sDownloadButtonId,
 						controlType: "sap.ui.mdc.actiontoolbar.ActionToolbarAction",
+						enabled: false,
 						success: function (oButton) {
 							Opa5.assert.ok(oButton, "Download button is visible");
 						},

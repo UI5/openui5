@@ -3,9 +3,11 @@
  */
 
 sap.ui.define([
+	"sap/base/util/restricted/_omit",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/Variant"
 ], function(
+	_omit,
 	ControlVariantUtils,
 	Variant
 ) {
@@ -39,6 +41,14 @@ sap.ui.define([
 				 */
 				variantManagementReference: {
 					type: "string"
+				},
+				/**
+				 * Indicates whether the variant's UI changes were removed during lazy loading.
+				 * When true, the content needs to be loaded before switching to this variant.
+				 */
+				variantDependentControlChangesRemoved: {
+					type: "boolean",
+					defaultValue: false
 				}
 			}
 		},
@@ -79,7 +89,8 @@ sap.ui.define([
 		return {
 			...Variant.getMappingInfo(),
 			variantReference: "variantReference",
-			variantManagementReference: "variantManagementReference"
+			variantManagementReference: "variantManagementReference",
+			variantDependentControlChangesRemoved: "variantDependentControlChangesRemoved"
 		};
 	};
 
@@ -95,6 +106,12 @@ sap.ui.define([
 	FlVariant.prototype.cloneFileContentWithNewId = function(...aArgs) {
 		var mFileContent = Variant.prototype.cloneFileContentWithNewId.apply(this, aArgs);
 		return mFileContent;
+	};
+
+	FlVariant.prototype.convertToFileContent = function() {
+		const oFileContent = Variant.prototype.convertToFileContent.apply(this);
+		// variantDependentControlChangesRemoved is only relevant in runtime and should not be persisted
+		return _omit(oFileContent, ["variantDependentControlChangesRemoved"]);
 	};
 
 	return FlVariant;
