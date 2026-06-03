@@ -15,6 +15,22 @@ sap.ui.define([
 	 */
 	const xConfigAPI = {};
 
+	// Cache for parsed xConfig objects, keyed on the xConfig customData element.
+	// Auto-invalidates when the customData element is replaced.
+	const oParsedXConfigCache = new WeakMap();
+
+	// Stable singleton returned when no xConfig customData is present.
+	const EMPTY_XCONFIG = Object.freeze({});
+
+	// Recursively freezes a value parsed with JSON.parse.
+	function deepFreezeJSON(oJSON) {
+		if (oJSON && typeof oJSON === "object") {
+			Object.freeze(oJSON);
+			Object.values(oJSON).forEach(deepFreezeJSON);
+		}
+		return oJSON;
+	}
+
 	/**
 	 * Returns the config for a given aggregation or virtual aggregation name.
 	 */
@@ -203,13 +219,16 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns a copy of the xConfig object
+	 * Returns an immutable xConfig object.
+	 *
+	 * The synchronous path returns a shared reference that is stable between xConfig commits.
+	 * When no xConfig customData is present, both synchronous and asynchronous paths return the same empty singleton.
 	 *
 	 * @param {sap.ui.core.Element} oControl The according element which should be checked
 	 * @param {object} [oModificationPayload] An object providing a modification handler specific payload
 	 * @param {object} [oModificationPayload.propertyBag] Optional propertybag for different modification handler derivations
 	 *
-	 * @returns {Promise<object>|object} A promise resolving to the adapted xConfig object or the object directly
+	 * @returns {Promise<object>|object} A promise resolving to the adapted xConfig object, or the immutable shared object directly
 	 */
 	xConfigAPI.readConfig = (oControl, oModificationPayload) => {
 
@@ -229,10 +248,10 @@ sap.ui.define([
 					if (oAggregationConfig) {
 						return oModifier.getProperty(oAggregationConfig, "value")
 							.then((sValue) => {
-								return merge({}, JSON.parse(sValue.replace(/\\/g, '')));
+								return deepFreezeJSON(JSON.parse(sValue.replace(/\\/g, '')));
 							});
 					}
-					return null;
+					return EMPTY_XCONFIG;
 				});
 		}
 
@@ -271,8 +290,18 @@ sap.ui.define([
 		const oAggregationConfig = fnGetAggregationSync(oControl, "customData").find((oCustomData) => {
 			return fnGetPropertySync(oCustomData, "key") == "xConfig";
 		});
-		const oConfig = oAggregationConfig ? merge({}, JSON.parse(fnGetPropertySync(oAggregationConfig, "value").replace(/\\/g, ''))) : null;
-		return oConfig;
+
+		if (!oAggregationConfig) {
+			return EMPTY_XCONFIG;
+		}
+
+		let oParsed = oParsedXConfigCache.get(oAggregationConfig);
+		if (!oParsed) {
+			oParsed = deepFreezeJSON(JSON.parse(fnGetPropertySync(oAggregationConfig, "value").replace(/\\/g, '')));
+			oParsedXConfigCache.set(oAggregationConfig, oParsed);
+		}
+
+		return oParsed;
 	};
 
 	const updateIndex = function (oControl, oConfig, oModificationPayload) {

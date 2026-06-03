@@ -2171,6 +2171,8 @@ sap.ui.define([
 			assert.strictEqual(aProperties[iIndex].key, oOriginalProperty.key,
 				"The property array references the correct property at index " + iIndex);
 		});
+
+		assert.ok(Object.isFrozen(aProperties), "Returned array is frozen");
 	});
 
 	QUnit.test("getPropertyMap", function(assert) {
@@ -2183,6 +2185,8 @@ sap.ui.define([
 			assert.strictEqual(mProperties[oProperty.key], oProperty,
 				"The map references the correct property for the key '" + oProperty.key + "'");
 		});
+
+		assert.ok(Object.isFrozen(mProperties), "Returned map is frozen");
 	});
 
 	QUnit.test("getProperty", function(assert) {
@@ -2225,6 +2229,8 @@ sap.ui.define([
 			assert.strictEqual(aAllProperties[iIndex].key, oOriginalProperty.key,
 				"Property at index " + iIndex + " has key '" + oOriginalProperty.key + "'");
 		});
+
+		assert.ok(Object.isFrozen(aAllProperties), "Returned array is frozen");
 	});
 
 	QUnit.test("getPropertyMap with bIncludeInactive=true", function(assert) {
@@ -2234,6 +2240,7 @@ sap.ui.define([
 			"Map contains all properties including inactive");
 		assert.ok(mAllProperties.inactiveDynamicSimpleProperty, "Inactive simple property included in map");
 		assert.ok(mAllProperties.inactiveDynamicComplexProperty, "Inactive complex property included in map");
+		assert.ok(Object.isFrozen(mAllProperties), "Returned map is frozen");
 	});
 
 	QUnit.test("getProperty with bIncludeInactive=true", function(assert) {
@@ -2245,6 +2252,163 @@ sap.ui.define([
 			"activeDynamicSimpleProperty", "Active property still returned with bIncludeInactive=true");
 		assert.strictEqual(this.oPropertyHelper.getProperty("unknownProp", true), null,
 			"Unknown property returns null even with bIncludeInactive=true");
+	});
+
+	QUnit.module("Memoization of getProperties / getPropertyMap", {
+		afterEach: function() {
+			this.oPropertyHelper?.destroy();
+		}
+	});
+
+	QUnit.test("Aggregation mode: Repeated getProperties returns the same array reference", function(assert) {
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "p1", label: "P1", dataType: "String"},
+			{key: "p2", label: "P2", dataType: "String"}
+		]);
+
+		const aFirst = this.oPropertyHelper.getProperties();
+		const aSecond = this.oPropertyHelper.getProperties();
+
+		assert.strictEqual(aFirst, aSecond, "Same array reference returned on repeated calls");
+		assert.ok(Object.isFrozen(aFirst), "Returned array is frozen");
+	});
+
+	QUnit.test("Aggregation mode: Repeated getProperties(true) returns the same array reference", function(assert) {
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "p1", label: "P1", dataType: "String"}
+		]);
+
+		assert.strictEqual(this.oPropertyHelper.getProperties(true), this.oPropertyHelper.getProperties(true),
+			"Same array reference returned on repeated calls with bIncludeInactive=true");
+	});
+
+	QUnit.test("Aggregation mode: Repeated getPropertyMap returns the same object reference", function(assert) {
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "p1", label: "P1", dataType: "String"}
+		]);
+
+		const mFirst = this.oPropertyHelper.getPropertyMap();
+		const mSecond = this.oPropertyHelper.getPropertyMap();
+
+		assert.strictEqual(mFirst, mSecond, "Same map reference returned on repeated calls");
+		assert.ok(Object.isFrozen(mFirst), "Returned map is frozen");
+	});
+
+	QUnit.test("Aggregation mode: Repeated getPropertyMap(true) returns the same object reference", function(assert) {
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "p1", label: "P1", dataType: "String"}
+		]);
+
+		const mFirst = this.oPropertyHelper.getPropertyMap(true);
+		const mSecond = this.oPropertyHelper.getPropertyMap(true);
+
+		assert.strictEqual(mFirst, mSecond, "Same map reference returned on repeated calls");
+		assert.ok(Object.isFrozen(mFirst), "Returned map is frozen");
+	});
+
+	QUnit.test("setProperties invalidates the cache", function(assert) {
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "p1", label: "P1", dataType: "String"}
+		]);
+
+		const aBefore = this.oPropertyHelper.getProperties();
+		const mBefore = this.oPropertyHelper.getPropertyMap();
+		this.oPropertyHelper.setProperties([
+			{key: "p1", label: "P1", dataType: "String"},
+			{key: "p2", label: "P2", dataType: "String"}
+		]);
+		const aAfter = this.oPropertyHelper.getProperties();
+		const mAfter = this.oPropertyHelper.getPropertyMap();
+
+		assert.notStrictEqual(aBefore, aAfter, "getProperties returns a new reference after setProperties");
+		assert.notStrictEqual(mBefore, mAfter, "getPropertyMap returns a new reference after setProperties");
+		assert.equal(aAfter.length, 2, "New property included");
+	});
+
+	QUnit.test("PropertyHelper without dynamic properties does not call readXConfig", function(assert) {
+		// Build a parent stub with isInPropertyKeysMode === true but properties have no isActive.
+		// bHasDynamicProperties must remain false; refreshActiveCacheIfStale must be a no-op.
+		let iReadXConfigCallCount = 0;
+		const oParentStub = new (MDCControl.extend("test.MockMdcControlNoIsActive", {}))();
+		oParentStub.isInPropertyKeysMode = () => true;
+		oParentStub.getEngine = () => ({
+			readXConfig: () => {
+				iReadXConfigCallCount++;
+				return {};
+			}
+		});
+
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "p1", label: "P1", dataType: "String"},
+			{key: "p2", label: "P2", dataType: "String"}
+		], oParentStub);
+
+		this.oPropertyHelper.getProperties();
+		this.oPropertyHelper.getProperties();
+		this.oPropertyHelper.getPropertyMap();
+		this.oPropertyHelper.getPropertyMap();
+
+		assert.equal(iReadXConfigCallCount, 0, "readXConfig was not called");
+
+		oParentStub.destroy();
+	});
+
+	QUnit.test("Property keys mode: Cache hit when xConfig identity is stable", function(assert) {
+		const oFrozenXConfig = {propertyInfo: {}};
+		const oParentStub = new (MDCControl.extend("test.MockMdcControlStableXConfig", {}))();
+		oParentStub.isInPropertyKeysMode = () => true;
+		oParentStub.getEngine = () => ({
+			readXConfig: () => oFrozenXConfig
+		});
+
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "p1", label: "P1", dataType: "String", isActive: true},
+			{key: "p2", label: "P2", dataType: "String", isActive: false}
+		], oParentStub, {isActive: true});
+
+		const aFirst = this.oPropertyHelper.getProperties();
+		const aSecond = this.oPropertyHelper.getProperties();
+		const mFirst = this.oPropertyHelper.getPropertyMap();
+		const mSecond = this.oPropertyHelper.getPropertyMap();
+
+		assert.strictEqual(aFirst, aSecond, "getProperties returns the same reference when xConfig is stable");
+		assert.strictEqual(mFirst, mSecond, "getPropertyMap returns the same reference when xConfig is stable");
+
+		oParentStub.destroy();
+	});
+
+	QUnit.test("Property keys mode: Caches invalidate when xConfig identity changes", function(assert) {
+		let oCurrentXConfig = {propertyInfo: {}};
+		const oParentStub = new (MDCControl.extend("test.MockMdcControlChangingXConfig", {}))();
+		oParentStub.isInPropertyKeysMode = () => true;
+		oParentStub.getEngine = () => ({
+			readXConfig: () => oCurrentXConfig
+		});
+
+		this.oPropertyHelper = new PropertyHelper([
+			{key: "p1", label: "P1", dataType: "String", isActive: true},
+			{key: "p2", label: "P2", dataType: "String", isActive: true}
+		], oParentStub, {isActive: true});
+
+		const aBefore = this.oPropertyHelper.getProperties();
+		const mBefore = this.oPropertyHelper.getPropertyMap();
+		assert.deepEqual(aBefore.map((p) => p.key), ["p1", "p2"], "Both properties active before xConfig change");
+		assert.deepEqual(Object.keys(mBefore), ["p1", "p2"], "Property map contains both keys before xConfig change");
+
+		// Simulate xConfig commit
+		oCurrentXConfig = {propertyInfo: {p1: {isActive: false}}};
+
+		const aAfter = this.oPropertyHelper.getProperties();
+		const mAfter = this.oPropertyHelper.getPropertyMap();
+
+		assert.notStrictEqual(aBefore, aAfter, "getProperties returns a new reference after xConfig changes");
+		assert.notStrictEqual(mBefore, mAfter, "getPropertyMap returns a new reference after xConfig changes");
+		assert.deepEqual(aAfter.map((p) => p.key), ["p2"], "Active set reflects the new xConfig: p1 is filtered out, p2 remains");
+		assert.deepEqual(Object.keys(mAfter), ["p2"], "Property map reflects the new xConfig: p1 is filtered out, p2 remains");
+		assert.strictEqual(this.oPropertyHelper.getProperty("p1", true).isActive, false,
+			"Dynamic getter reflects the new isActive override from xConfig");
+
+		oParentStub.destroy();
 	});
 
 	QUnit.module("validateDynamicProperties", {
