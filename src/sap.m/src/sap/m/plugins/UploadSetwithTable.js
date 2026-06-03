@@ -521,9 +521,6 @@ sap.ui.define([
 		if (typeof aTypes === "string") {
 			aTypes = aTypes.split(",");
 		}
-		aTypes = (aTypes || []).map(function (s) {
-			return s ? s.toLowerCase() : "";
-		});
 		if (!deepEqual(this.getMediaTypes(), aTypes)) {
 			this.setProperty("mediaTypes", aTypes, true);
 			this.getDefaultFileUploader().setMimeType(aTypes);
