@@ -566,6 +566,8 @@ sap.ui.define([
 		var aLastIncludedOptions = ["LASTMINUTESINCLUDED", "LASTHOURSINCLUDED", "LASTDAYSINCLUDED", "LASTWEEKSINCLUDED", "LASTMONTHSINCLUDED", "LASTQUARTERSINCLUDED", "LASTYEARSINCLUDED"];
 		var aNextIncludedOptions = ["NEXTMINUTESINCLUDED", "NEXTHOURSINCLUDED", "NEXTDAYSINCLUDED", "NEXTWEEKSINCLUDED", "NEXTMONTHSINCLUDED", "NEXTQUARTERSINCLUDED", "NEXTYEARSINCLUDED"];
 
+		const POPUP_MAX_HEIGHT = 512;
+
 		DynamicDateRange.prototype.init = function() {
 			var bValueHelpDecorative = !Device.support.touch || Device.system.desktop ? true : false;
 			this._oInput = new DynamicDateRangeInput(this.getId() + "-input", {
@@ -766,6 +768,12 @@ sap.ui.define([
 
 				//reset value help page
 				this._oNavContainer.to(this._oNavContainer.getPages()[0]);
+
+				// Enable auto-sizing for the options list page
+				if (!Device.system.phone) {
+					this._oPopup.addStyleClass("sapMDDRAutoSize");
+					this._oPopup.setContentHeight("");
+				}
 
 				this._openPopup(oDomRef);
 			}
@@ -1472,6 +1480,12 @@ sap.ui.define([
 				oSecondPage.setFooter(oToolbar);
 				oSecondPage.setTitle(oOption.getText(this));
 
+				// Switch to fixed height for value help page
+				if (!Device.system.phone) {
+					this._oPopup.removeStyleClass("sapMDDRAutoSize");
+					this._oPopup.setContentHeight(POPUP_MAX_HEIGHT + "px");
+				}
+
 				this._setFooterVisibility(true);
 				this._updateInternalControls(oOption);
 
@@ -1720,7 +1734,8 @@ sap.ui.define([
 		 */
 		DynamicDateRange.prototype._navContainerAfterNavigate = function(oEvent) {
 			var oOptionDetailsPage = this._oNavContainer.getPages()[1],
-				oToPage = oEvent.getParameters()["to"];
+				oToPage = oEvent.getParameters()["to"],
+				oOptionsListPage = this._oNavContainer.getPages()[0];
 
 			if (oToPage === oOptionDetailsPage) {
 				this.aInputControls.forEach(function(oControl) {
@@ -1732,6 +1747,12 @@ sap.ui.define([
 						}
 					}
 				}, this);
+			} else if (oToPage === oOptionsListPage) {
+				// Switch back to auto-sizing for options list page
+				if (!Device.system.phone) {
+					this._oPopup.addStyleClass("sapMDDRAutoSize");
+					this._oPopup.setContentHeight("");
+				}
 			}
 
 			if (this._oPopup && this._oPopup.isOpen()) {

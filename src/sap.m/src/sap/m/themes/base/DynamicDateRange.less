@@ -78,6 +78,34 @@
 	display: none;
 }
 
+/* Auto-size the options list page popover to fit its content */
+.sapMDDRPopover.sapMDDRAutoSize .sapMPopoverScroll {
+	height: auto;
+}
+
+.sapMDDRPopover.sapMDDRAutoSize .sapMNav {
+	height: auto;
+	max-height: 32rem;
+	display: flex;
+	flex-direction: column;
+}
+
+.sapMDDRPopover.sapMDDRAutoSize .sapMNav > .sapMPage {
+	position: relative;
+	height: auto;
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.sapMDDRPopover.sapMDDRAutoSize .sapMNav > .sapMPage > section {
+	position: relative;
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+}
+
 .sapMDDRPopover .sapMTB-Info-CTX .sapMLabel .sapMLabelTextWrapper {
 	padding-right: 0.125rem;
 }
