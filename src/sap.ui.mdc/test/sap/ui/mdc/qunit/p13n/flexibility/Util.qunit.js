@@ -278,6 +278,97 @@ sap.ui.define([
 
     });
 
+    QUnit.test("_pPendingModification stays set until _onModifications resolves", async function(assert){
+        const oControl = new Control();
+        oControl.placeAt("qunit-fixture");
+
+        sinon.stub(Engine.getInstance(), "waitForChanges").resolves();
+
+        const oOnModifications = Promise.withResolvers();
+        oControl._onModifications = sinon.stub().returns(oOnModifications.promise);
+
+        const oChangeHandler = Util.createChangeHandler({
+            apply: () => Promise.resolve(),
+            revert: () => Promise.resolve()
+        });
+
+        await oChangeHandler.changeHandler.applyChange({
+            getChangeType: function() {},
+            getContent: function() {}
+        }, oControl);
+
+        await new Promise((resolve) => { setTimeout(resolve, 0); });
+
+        assert.ok(oControl._pPendingModification, "_pPendingModification is still set while _onModifications is pending");
+        assert.strictEqual(oControl._onModifications.callCount, 1, "_onModifications has been invoked");
+
+        oOnModifications.resolve();
+        await oControl._pPendingModification;
+
+        assert.notOk(oControl._pPendingModification, "_pPendingModification is cleared after _onModifications resolves");
+
+        Engine.getInstance().waitForChanges.restore();
+        oControl.destroy();
+    });
+
+    QUnit.test("Re-entrant change from _onModifications is processed in the same cycle", async function(assert) {
+        const oControl = new Control();
+        oControl.placeAt("qunit-fixture");
+
+        sinon.stub(Engine.getInstance(), "waitForChanges").resolves();
+
+        // Simulate Engine.getTrace/clearTrace against an in-memory trace that fConfigModified pushes to via Engine.trace.
+        let aTrace = [];
+        sinon.stub(Engine.getInstance(), "trace").callsFake((c, oChange) => {
+            aTrace.push(oChange.changeSpecificData.changeType);
+        });
+        sinon.stub(Engine.getInstance(), "getTrace").callsFake(() => aTrace);
+        sinon.stub(Engine.getInstance(), "clearTrace").callsFake(() => {aTrace = [];});
+
+        const oChangeHandler = Util.createChangeHandler({
+            apply: () => Promise.resolve(),
+            revert: () => Promise.resolve()
+        });
+
+        const oReentrantChange = {
+            getChangeType: () => "reentrantChange",
+            getContent: () => ({})
+        };
+
+        // First call: trigger a re-entrant change by invoking applyChange again.
+        // Second call: just resolve, signalling the re-entrant change was processed.
+        const aLog = [];
+        oControl._onModifications = sinon.stub();
+        oControl._onModifications.onFirstCall().callsFake(async (aKeys) => {
+            await oChangeHandler.changeHandler.applyChange(oReentrantChange, oControl);
+            aLog.push({call: "first", keys: aKeys});
+        });
+        oControl._onModifications.onSecondCall().callsFake((aKeys) => {
+            aLog.push({call: "second", keys: aKeys});
+        });
+
+        await oChangeHandler.changeHandler.applyChange({
+            getChangeType: () => "initialChange",
+            getContent: () => ({})
+        }, oControl);
+
+        await oControl._pPendingModification;
+        aLog.push({call: "pendingModification resolved"});
+
+        assert.deepEqual(aLog, [
+            {call: "first", keys: ["initialChange"]},
+            {call: "second", keys: ["reentrantChange"]},
+            {call: "pendingModification resolved"}
+        ], "_pPendingModification resolves after both _onModifications calls have completed, in order");
+        assert.notOk(oControl._pPendingModification, "_pPendingModification is cleared only after re-entrant changes are drained");
+
+        Engine.getInstance().waitForChanges.restore();
+        Engine.getInstance().trace.restore();
+        Engine.getInstance().getTrace.restore();
+        Engine.getInstance().clearTrace.restore();
+        oControl.destroy();
+    });
+
     QUnit.test("Resume invalidation on error", function(assert){
 
         const done = assert.async();

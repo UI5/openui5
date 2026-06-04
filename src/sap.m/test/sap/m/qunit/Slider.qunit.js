@@ -2517,7 +2517,7 @@ sap.ui.define([
 		// Assert
 		assert.equal(oSliderTooltip.getFocusDomRef().getAttribute("aria-errormessage"), oSliderTooltip.getId() + "-message", "aria-errormessage attribute with the correct ID reference is added on error");
 		assert.equal(oSliderTooltip.getFocusDomRef().getAttribute("aria-invalid"), "true", "aria-invalid is added to the tooltip input");
-		assert.equal(oInvisibleMessageDom.textContent, "Value State Error Invalid entry", "The error value state and message is announced by the InvisibleMessage service");
+		assert.equal(oInvisibleMessageDom.textContent, "Error Invalid entry", "The error value state and message is announced by the InvisibleMessage service");
 
 		// Act
 		oSliderTooltip.onfocusout({});

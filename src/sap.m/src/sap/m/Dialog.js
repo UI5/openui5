@@ -13,6 +13,7 @@ sap.ui.define([
 	"./AssociativeOverflowToolbar",
 	"./ToolbarSpacer",
 	"./Title",
+	"./Button",
 	"./library",
 	"sap/m/Image",
 	"sap/m/dialogUtils/PreventKeyboardEvents",
@@ -46,6 +47,7 @@ function(
 	AssociativeOverflowToolbar,
 	ToolbarSpacer,
 	Title,
+	Button,
 	library,
 	Image,
 	PreventKeyboardEvents,
@@ -89,6 +91,8 @@ function(
 
 	// shortcut for sap.m.TitleAlignment
 	var TitleAlignment = library.TitleAlignment;
+
+	var FULLSCREEN_KEYBOARD_SHORTCUT = "Shift+Ctrl+F";
 
 	var sAnimationMode = ControlBehavior.getAnimationMode();
 	var bUseAnimations = sAnimationMode !== AnimationMode.none && sAnimationMode !== AnimationMode.minimal;
@@ -289,7 +293,22 @@ function(
 				 * @since 1.72
 				 * @public
 				 */
-				titleAlignment : {type : "sap.m.TitleAlignment", group : "Misc", defaultValue : TitleAlignment.Auto}
+				titleAlignment : {type : "sap.m.TitleAlignment", group : "Misc", defaultValue : TitleAlignment.Auto},
+
+				/**
+				 * Determines whether the fullscreen toggle functionality is enabled.
+				 * When set to <code>true</code>, a fullscreen button is shown in the dialog header, the keyboard shortcut <code>Shift+Ctrl+F</code> toggles fullscreen, and double-clicking the header toggles fullscreen mode on desktop devices.
+				 * When set to <code>false</code> (the default), none of the fullscreen features are active and double-click on the header repositions the dialog.
+				 *
+				 * <b>Note:</b> When set to <code>true</code>, the default double-click behavior (reposition dialog to center) is replaced by the fullscreen toggle.
+				 *
+				 * The fullscreen toggle directly changes the <code>stretch</code> property.
+				 *
+				 * <b>Note:</b> This property has no effect on phones or when a <code>customHeader</code> is used.
+				 * @since 1.149
+				 * @public
+				 */
+				showFullScreenButton : {type : "boolean", group : "Behavior", defaultValue : false}
 			},
 			defaultAggregation: "content",
 			aggregations: {
@@ -514,7 +533,6 @@ function(
 		var that = this;
 		this._oManuallySetSize = null;
 		this._oManuallySetPosition = null;
-		this._bRTL = Localization.getRTL();
 
 		// used to judge if enableScrolling needs to be disabled
 		this._scrollContentList = ["sap.m.NavContainer", "sap.m.Page", "sap.m.ScrollContainer", "sap.m.SplitContainer", "sap.m.MultiInput", "sap.m.SimpleFixFlex"];
@@ -659,6 +677,7 @@ function(
 		if (this._header) {
 			this._header.destroy();
 			this._header = null;
+			this._fullscreenButton = null;
 		}
 
 		if (this._headerTitle) {
@@ -705,6 +724,7 @@ function(
 	 */
 	Dialog.prototype.open = function () {
 		this._bDuringOpenCalled = false;
+		this._bRTL = Localization.getRTL();
 
 		var oPopup = this.oPopup;
 
@@ -931,7 +951,7 @@ function(
 		if (oSourceDomRef.id === this.getId() + "-lastfe") {
 			//Check if the invisible LAST focusable element (suffix '-lastfe') has gained focus
 			//First check if header content is available
-			var oFirstFocusableDomRef = this.getDomRef("dragAndResizeHandler") ||
+			const oFirstFocusableDomRef = this.getDomRef("dragAndResizeHandler") ||
 				this._getAnyHeader()?.$().firstFocusableDomRef() ||
 				this.getSubHeader()?.$().firstFocusableDomRef() ||
 				this.$("cont").firstFocusableDomRef({
@@ -1054,6 +1074,13 @@ function(
 		}
 
 		this._handleKeyboardDragResize(oEvent);
+
+		// fullscreen Shift+Ctrl+F
+		if (this.getShowFullScreenButton() && !this.getCustomHeader() && oEvent.ctrlKey && oEvent.shiftKey && iKeyCode === KeyCodes.F) {
+			oEvent.preventDefault();
+			oEvent.stopPropagation();
+			this._toggleFullscreen();
+		}
 	};
 
 	/**
@@ -1063,22 +1090,22 @@ function(
 	 * @private
 	 */
 	Dialog.prototype._findFirstPositiveButton = function () {
-	   var aButtons;
+		var aButtons;
 
-	   if (this.getFooter()) {
-		   aButtons = this.getFooter().getContent().filter(function (oItem) {
-			   return oItem.isA("sap.m.Button");
-		   });
-	   } else {
-		   aButtons = this.getButtons();
-	   }
+		if (this.getFooter()) {
+			aButtons = this.getFooter().getContent().filter(function (oItem) {
+				return oItem.isA("sap.m.Button");
+			});
+		} else {
+			aButtons = this.getButtons();
+		}
 
-	   for (var i = 0; i < aButtons.length; i++) {
-		   var oButton = aButtons[i];
-		   if (oButton.getType() === ButtonType.Accept || oButton.getType() === ButtonType.Emphasized) {
-			   return oButton;
-		   }
-	   }
+		for (var i = 0; i < aButtons.length; i++) {
+			var oButton = aButtons[i];
+			if (oButton.getType() === ButtonType.Accept || oButton.getType() === ButtonType.Emphasized) {
+				return oButton;
+			}
+		}
 	};
 
 	/**
@@ -1264,7 +1291,7 @@ function(
 		}
 
 		//In Chrome when the dialog is stretched the footer is not rendered in the right position;
-		if (window.navigator.userAgent.toLowerCase().indexOf("chrome") !== -1 && this.getStretch()) {
+		if (window.navigator.userAgent.toLowerCase().indexOf("chrome") !== -1 && bStretch) {
 			//forcing repaint
 			$this.find('> .sapMDialogFooter').css({bottom: '0.001px'});
 		}
@@ -1505,6 +1532,66 @@ function(
 	};
 
 	/**
+	 * Toggles the dialog between fullscreen (stretched) and its previous size and
+	 * updates the fullscreen button icon and tooltip accordingly.
+	 * Triggered by a double-click on the dialog header or by pressing the <code>Shift+Ctrl+F</code> keyboard shortcut.
+	 * @private
+	 */
+	Dialog.prototype._toggleFullscreen = function () {
+		if (Device.system.phone) {
+			return;
+		}
+
+		this._bDisableRepositioning = false;
+		this._oManuallySetPosition = null;
+		this._oManuallySetSize = null;
+		this.setStretch(!this.getStretch());
+		this._updateFullscreenButton();
+	};
+
+	/**
+	 * Returns the fullscreen toggle button.
+	 * On phone devices no button is created.
+	 * @returns {sap.m.Button|null} The fullscreen toggle button, or <null> on phone devices.
+	 * @private
+	 */
+	Dialog.prototype._getFullscreenButton = function () {
+		if (!this._fullscreenButton && !Device.system.phone) {
+			this._fullscreenButton = new Button({
+				type: ButtonType.Transparent,
+				icon: "sap-icon://full-screen",
+				press: () => {
+					this._toggleFullscreen();
+				}
+			});
+			this._fullscreenButton.addEventDelegate({
+				onAfterRendering: function() {
+					this._fullscreenButton.getDomRef()?.setAttribute("aria-keyshortcuts", FULLSCREEN_KEYBOARD_SHORTCUT);
+				}.bind(this)
+			});
+		}
+
+		return this._fullscreenButton;
+	};
+
+	/**
+	 * Updates the fullscreen button's icon, tooltip, and ARIA label based on the current fullscreen state.
+	 * @private
+	 */
+	Dialog.prototype._updateFullscreenButton = function () {
+		const oFullscreenButton = (this.getShowFullScreenButton() && !this.getCustomHeader()) ? this._getFullscreenButton() : null;
+		if (!oFullscreenButton) {
+			return;
+		}
+
+		const bFullScreen = this.getStretch();
+		const oRb = Library.getResourceBundleFor("sap.m");
+
+		oFullscreenButton.setTooltip(oRb.getText(bFullScreen ? "DIALOG_FULLSCREEN_RESTORE" : "DIALOG_FULLSCREEN_MAXIMIZE"));
+		oFullscreenButton.setIcon(bFullScreen ? "sap-icon://exit-full-screen" : "sap-icon://full-screen");
+	};
+
+	/**
 	 * If a scrollable control (<code>sap.m.NavContainer</code>, <code>sap.m.ScrollContainer</code>, <code>sap.m.Page</code>, <code>sap.m.SplitContainer</code>) is added to the Dialog content aggregation as a single child or through one or more <code>sap.ui.core.mvc.View</code> instances,
 	 * the scrolling inside the Dialog will be disabled in order to avoid wrapped scrolling areas.
 	 *
@@ -1598,7 +1685,20 @@ function(
 	 * @private
 	 */
 	Dialog.prototype._getFirstFocusableHeaderElement = function () {
-		return this._getAnyHeader()?.$().firstFocusableDomRef();
+		const oFirstFocusable = this._getAnyHeader()?.$().firstFocusableDomRef();
+		const oFullscreenButton = this._fullscreenButton;
+
+		// Skip the fullscreen button unless it is the only interactive element in the dialog
+		if (oFirstFocusable && oFullscreenButton && oFirstFocusable === oFullscreenButton.getDomRef()) {
+			if (this._getFirstFocusableContentSubHeader()
+				|| this._getFirstFocusableContentElement()
+				|| this._getFirstVisibleButtonDomRef()
+				|| this.getDomRef("dragAndResizeHandler")) {
+				return null;
+			}
+		}
+
+		return oFirstFocusable;
 	};
 
 	/**
@@ -1746,18 +1846,24 @@ function(
 
 		if (oCustomHeader) {
 			return oCustomHeader;
-		} else {
-			var bShowHeader = this.getShowHeader();
-			// if showHeader is set to false and not for standard dialog in iOS in theme sap_mvi, no header.
-			if (!bShowHeader) {
-				return null;
-			}
+		}
 
-			this._createHeader();
+		const bShowHeader = this.getShowHeader();
+		const bShowFullScreenButton = this.getShowFullScreenButton() && !Device.system.phone;
+
+		if (!bShowHeader && !bShowFullScreenButton) {
+			return null;
+		}
+
+		this._createHeader();
+
+		if (bShowHeader) {
 			this._applyTitleToHeader();
 			this._applyIconToHeader();
-			return this._header;
 		}
+
+		this._applyFullscreenButtonToHeader();
+		return this._header;
 	};
 
 	/**
@@ -2134,6 +2240,31 @@ function(
 		this._iconImage.setSrc(sIcon);
 	};
 
+	/**
+	 * Adds or removes the fullscreen button in header Bar's contentRight.
+	 * @private
+	 */
+	Dialog.prototype._applyFullscreenButtonToHeader = function () {
+		if (!this._header) {
+			return;
+		}
+
+		const bShow = this.getShowFullScreenButton() && !Device.system.phone && !this.getCustomHeader();
+
+		if (bShow) {
+			const oButton = this._getFullscreenButton();
+			const aContentRight = this._header.getContentRight();
+			if (aContentRight.indexOf(oButton) === -1) {
+				this._header.addContentRight(oButton);
+			}
+		} else if (this._fullscreenButton) {
+			this._fullscreenButton.destroy();
+			this._fullscreenButton = null;
+		}
+
+		this._updateFullscreenButton();
+	};
+
 	Dialog.prototype.setInitialFocus = function (sInitialFocus) {
 		// Skip the invalidation when sets the initial focus
 		//
@@ -2143,6 +2274,7 @@ function(
 		// check the SelectDialog as well where setIntialFocus is called.
 		return this.setAssociation("initialFocus", sInitialFocus, true);
 	};
+
 	/* =========================================================== */
 	/*                           end: setters                      */
 	/* =========================================================== */
@@ -2192,13 +2324,17 @@ function(
 				this._oManuallySetPosition = null;
 				this._oManuallySetSize = null;
 
-				//call the reposition
-				this.oPopup && this.oPopup._applyPosition(this.oPopup._oLastPosition, true);
+				if (this.getShowFullScreenButton() && !this.getCustomHeader()) {
+					this._toggleFullscreen();
+				} else {
+					//call the reposition
+					this.oPopup && this.oPopup._applyPosition(this.oPopup._oLastPosition, true);
 
-				//BCP: 1880238929
-				$dialogContent.css({
-					height: '100%'
-				});
+					//BCP: 1880238929
+					$dialogContent.css({
+						height: '100%'
+					});
+				}
 			}
 		};
 

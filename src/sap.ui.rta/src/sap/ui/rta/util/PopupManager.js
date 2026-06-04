@@ -552,7 +552,7 @@ sap.ui.define([
 			return oPopupElement.isPopupAdaptationAllowed();
 		}
 		// the event is needed for the RTA integration
-		if (!oPopupElement.getMetadata().getEvents().afterOpen) {
+		if (!oPopupElement.getMetadata().getEvent("afterOpen")) {
 			return false;
 		}
 

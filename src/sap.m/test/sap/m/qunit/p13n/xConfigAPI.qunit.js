@@ -687,4 +687,114 @@ sap.ui.define([
 		assert.ok(true, "prepareAggregationConfig does not throw for propertyInfo virtual aggregation");
 	});
 
+	QUnit.module("Immutability and cache", {
+		beforeEach: function() {
+			const TestClass = MDCControl.extend("testClass", {
+				metadata: {
+					aggregations: {
+						items: {
+							type: "sap.ui.core.Item"
+						}
+					}
+				},
+				renderer: null
+			});
+			this.oControl = new TestClass();
+		},
+		afterEach: function() {
+			this.oControl.destroy();
+		}
+	});
+
+	QUnit.test("readConfig (sync): Existing xConfig", async function(assert) {
+		await xConfigAPI.enhanceConfig(this.oControl, {
+			key: "test_property",
+			property: "key",
+			operation: "add",
+			controlMeta: {aggregation: "items"},
+			value: {value: "my_unique_test_key"}
+		});
+		await xConfigAPI.enhanceConfig(this.oControl, {
+			key: "test_property",
+			property: "sortConditions",
+			operation: "add",
+			controlMeta: {property: "sortConditions"},
+			value: {descending: true, index: 0, key: "test_property"}
+		});
+
+		const oXConfig = xConfigAPI.readConfig(this.oControl);
+
+		assert.ok(Object.isFrozen(oXConfig), "Top-level result is frozen");
+		assert.ok(Object.isFrozen(oXConfig.aggregations), "Nested 'aggregations' is frozen");
+		assert.ok(Object.isFrozen(oXConfig.aggregations.items.test_property), "Deeply nested object is frozen");
+		assert.ok(Object.isFrozen(oXConfig.properties.sortConditions), "Nested array is frozen");
+		assert.ok(Object.isFrozen(oXConfig.properties.sortConditions[0]), "Object inside nested array is frozen");
+		assert.strictEqual(xConfigAPI.readConfig(this.oControl), oXConfig, "Repeated reads return the same cached reference");
+	});
+
+	QUnit.test("readConfig (async): Existing xConfig", async function(assert) {
+		await xConfigAPI.enhanceConfig(this.oControl, {
+			key: "test_property",
+			property: "key",
+			operation: "add",
+			controlMeta: {aggregation: "items"},
+			value: {value: "my_unique_test_key"}
+		});
+		await xConfigAPI.enhanceConfig(this.oControl, {
+			key: "test_property",
+			property: "sortConditions",
+			operation: "add",
+			controlMeta: {property: "sortConditions"},
+			value: {descending: true, index: 0, key: "test_property"}
+		});
+
+		const oXConfig = await xConfigAPI.readConfig(this.oControl, {propertyBag: {modifier: JsControlTreeModifier}});
+
+		assert.ok(Object.isFrozen(oXConfig), "Top-level result is frozen");
+		assert.ok(Object.isFrozen(oXConfig.aggregations), "Nested 'aggregations' is frozen");
+		assert.ok(Object.isFrozen(oXConfig.aggregations.items.test_property), "Deeply nested object is frozen");
+		assert.ok(Object.isFrozen(oXConfig.properties.sortConditions), "Nested array is frozen");
+		assert.ok(Object.isFrozen(oXConfig.properties.sortConditions[0]), "Object inside nested array is frozen");
+	});
+
+	QUnit.test("readConfig (sync): Empty xConfig", function(assert) {
+		const oXConfig = xConfigAPI.readConfig(this.oControl);
+
+		assert.deepEqual(oXConfig, {}, "Returns an empty object when no xConfig is present");
+		assert.ok(Object.isFrozen(oXConfig), "Returned empty object is frozen");
+		assert.strictEqual(xConfigAPI.readConfig(this.oControl), oXConfig, "Repeated reads return the same singleton reference");
+	});
+
+	QUnit.test("readConfig (async): Empty xConfig", async function(assert) {
+		const oXConfig = await xConfigAPI.readConfig(this.oControl, {propertyBag: {modifier: JsControlTreeModifier}});
+
+		assert.deepEqual(oXConfig, {}, "Returns an empty object when no xConfig is present");
+		assert.ok(Object.isFrozen(oXConfig), "Returned empty object is frozen");
+		assert.strictEqual(xConfigAPI.readConfig(this.oControl), oXConfig, "Repeated reads return the same singleton reference");
+		assert.strictEqual(oXConfig, xConfigAPI.readConfig(this.oControl), "Async and sync paths return the same empty singleton");
+	});
+
+	QUnit.test("readConfig (sync): Cache invalidates after enhanceConfig replaces the customData entry", async function(assert) {
+		await xConfigAPI.enhanceConfig(this.oControl, {
+			key: "p1",
+			property: "key",
+			operation: "add",
+			controlMeta: {aggregation: "items"},
+			value: {value: "v1"}
+		});
+		const oBefore = xConfigAPI.readConfig(this.oControl);
+
+		await xConfigAPI.enhanceConfig(this.oControl, {
+			key: "p2",
+			property: "key",
+			operation: "add",
+			controlMeta: {aggregation: "items"},
+			value: {value: "v2"}
+		});
+		const oAfter = xConfigAPI.readConfig(this.oControl);
+
+		assert.notStrictEqual(oBefore, oAfter, "A new reference is returned after enhanceConfig commit");
+		assert.ok(oAfter.aggregations.items.p1, "Earlier entry preserved");
+		assert.ok(oAfter.aggregations.items.p2, "New entry visible");
+	});
 });

@@ -36,7 +36,8 @@ sap.ui.define([
 	"sap/ui/dom/units/Rem",
 	"sap/m/dialogUtils/PreventKeyboardEvents",
 	"sap/f/Card",
-	"sap/f/cards/Header"
+	"sap/f/cards/Header",
+	"sap/base/i18n/Localization"
 ], function(
 	Library,
 	qutils,
@@ -73,7 +74,8 @@ sap.ui.define([
 	Rem,
 	PreventKeyboardEvents,
 	Card,
-	CardHeader
+	CardHeader,
+	Localization
 ) {
 	"use strict";
 
@@ -172,7 +174,7 @@ sap.ui.define([
 			content: new Text({text: "test"})
 		});
 		// simulate RTL mode
-		oDialog._bRTL = true;
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
 
 		oDialog.open();
 		this.clock.tick(100);
@@ -182,6 +184,7 @@ sap.ui.define([
 		assert.ok(oDomRef.style.right, "dialog's right position is set in RTL");
 		assert.strictEqual(oDomRef.style.left, "", "dialog's left position is not set");
 
+		oStub.restore();
 		oDialog.destroy();
 	});
 
@@ -4225,5 +4228,246 @@ sap.ui.define([
 
 		// act
 		oDialog.open();
+	});
+
+	QUnit.module("Fullscreen Button", {
+		beforeEach: function () {
+			this.oDialog = new Dialog({
+				title: "Fullscreen Dialog",
+				showFullScreenButton: true,
+				content: [
+					new HTML({content: "<p>Content</p>"})
+				],
+				beginButton: new Button({
+					text: "OK"
+				})
+			});
+		},
+		afterEach: function () {
+			this.oDialog.destroy();
+		}
+	});
+
+	QUnit.test("Default value of showFullScreenButton", function (assert) {
+		const oDialog = new Dialog();
+		assert.strictEqual(oDialog.getShowFullScreenButton(), false, "Default value should be false");
+		oDialog.destroy();
+	});
+
+	QUnit.test("Fullscreen button is rendered when showFullScreenButton is true", function (assert) {
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		const oFullscreenButton = this.oDialog._fullscreenButton;
+		assert.ok(oFullscreenButton, "Fullscreen button instance should exist");
+		assert.ok(oFullscreenButton.getDomRef(), "Fullscreen button should be rendered");
+	});
+
+	QUnit.test("Fullscreen button is not rendered when showFullScreenButton is false", function (assert) {
+		this.oDialog.setShowFullScreenButton(false);
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		assert.notOk(this.oDialog._fullscreenButton, "Fullscreen button should not exist");
+	});
+
+	QUnit.test("Fullscreen toggle via button press", function (assert) {
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		assert.notOk(this.oDialog.getStretch(), "Dialog should not be stretched initially");
+
+		this.oDialog._fullscreenButton.firePress();
+
+		assert.ok(this.oDialog.getStretch(), "Dialog should be stretched after button press");
+		assert.strictEqual(this.oDialog.getStretch(), true, "stretch property should be toggled to true");
+
+		this.oDialog._fullscreenButton.firePress();
+
+		assert.notOk(this.oDialog.getStretch(), "Dialog should not be stretched after second press");
+	});
+
+	QUnit.test("Fullscreen toggle via Shift+Ctrl+F", function (assert) {
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		assert.notOk(this.oDialog.getStretch(), "Dialog should not be stretched initially");
+
+		qutils.triggerKeydown(this.oDialog.getDomRef(), KeyCodes.F, true, false, true);
+
+		assert.ok(this.oDialog.getStretch(), "Dialog should be stretched after Shift+Ctrl+F");
+	});
+
+	QUnit.test("Shift+Ctrl+F does nothing when showFullScreenButton is false", function (assert) {
+		this.oDialog.setShowFullScreenButton(false);
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		qutils.triggerKeydown(this.oDialog.getDomRef(), KeyCodes.F, true, false, true);
+
+		assert.notOk(this.oDialog.getStretch(), "Dialog should not be stretched");
+	});
+
+	QUnit.test("Fullscreen state preserved across close/open", function (assert) {
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		this.oDialog._fullscreenButton.firePress();
+		assert.ok(this.oDialog.getStretch(), "Dialog should be stretched");
+
+		this.oDialog.close();
+		this.clock.tick(500);
+
+		this.oDialog.open();
+		this.clock.tick(500);
+		assert.ok(this.oDialog.getStretch(), "Fullscreen state should be preserved after reopen");
+	});
+
+	QUnit.test("stretch=true + fullscreen toggle un-stretches", function (assert) {
+		this.oDialog.setStretch(true);
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		assert.ok(this.oDialog.getStretch(), "Dialog should be stretched initially");
+
+		this.oDialog._fullscreenButton.firePress();
+
+		assert.notOk(this.oDialog.getStretch(), "Dialog should not be stretched after toggle");
+		assert.strictEqual(this.oDialog.getStretch(), false, "stretch property should be toggled to false");
+	});
+
+	QUnit.test("Fullscreen button is not shown with custom header", function (assert) {
+		const oDialog = new Dialog({
+			showFullScreenButton: true,
+			customHeader: new Bar({
+				contentMiddle: [new Title({text: "Custom"})]
+			}),
+			content: [new HTML({content: "<p>Content</p>"})]
+		});
+
+		oDialog.open();
+		this.clock.tick(500);
+
+		const oFullscreenButton = oDialog._fullscreenButton;
+		assert.notOk(oFullscreenButton && oFullscreenButton.getDomRef(), "Fullscreen button should not be rendered");
+
+		oDialog.destroy();
+	});
+
+	QUnit.test("Fullscreen button is in header Bar contentRight", function (assert) {
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		const oFullscreenButton = this.oDialog._fullscreenButton;
+		assert.ok(oFullscreenButton, "Fullscreen button should exist");
+		const oHeader = this.oDialog._header;
+		assert.ok(oHeader.getContentRight().indexOf(oFullscreenButton) > -1, "Button should be in header's contentRight");
+	});
+
+	QUnit.test("Fullscreen button not focused on initial dialog open", function (assert) {
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		const oActiveElement = document.activeElement;
+		const oFullscreenButton = this.oDialog._fullscreenButton;
+
+		assert.notStrictEqual(oActiveElement, oFullscreenButton.getDomRef(), "Fullscreen button should not have focus on open");
+	});
+
+	QUnit.test("aria-keyshortcuts attribute on fullscreen button", function (assert) {
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		const oFullscreenButton = this.oDialog._fullscreenButton;
+		assert.strictEqual(
+			oFullscreenButton.getDomRef().getAttribute("aria-keyshortcuts"),
+			"Shift+Ctrl+F",
+			"Fullscreen button should have aria-keyshortcuts attribute"
+		);
+	});
+
+	QUnit.test("Fullscreen button rendered when showHeader is false", function (assert) {
+		const oDialog = new Dialog({
+			showHeader: false,
+			showFullScreenButton: true,
+			content: [new HTML({content: "<p>Content</p>"})]
+		});
+
+		oDialog.open();
+		this.clock.tick(500);
+
+		assert.ok(oDialog._fullscreenButton, "Fullscreen button should be created");
+		assert.ok(oDialog._fullscreenButton.getDomRef(), "Fullscreen button should be rendered");
+		assert.ok(oDialog._header, "Internal header should exist");
+		assert.notOk(oDialog.$().hasClass("sapMDialog-NoHeader"), "NoHeader class should not be applied");
+
+		oDialog.destroy();
+	});
+
+	QUnit.test("Dynamic toggle of showFullScreenButton", function (assert) {
+		this.oDialog.setShowFullScreenButton(false);
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		assert.notOk(this.oDialog._fullscreenButton, "Button should not exist initially");
+
+		this.oDialog.setShowFullScreenButton(true);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		assert.ok(this.oDialog._fullscreenButton, "Button should be created after enabling");
+		assert.ok(this.oDialog._fullscreenButton.getDomRef(), "Button should be rendered");
+
+		this.oDialog.setShowFullScreenButton(false);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		assert.notOk(this.oDialog._fullscreenButton, "Button should be destroyed after disabling");
+	});
+
+	QUnit.test("ENTER on child element does not toggle fullscreen", function (assert) {
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		const oBeginButton = this.oDialog.getBeginButton();
+		qutils.triggerKeydown(oBeginButton.getDomRef(), KeyCodes.ENTER);
+
+		assert.notOk(this.oDialog.getStretch(), "Dialog should not be stretched when ENTER is on a child element");
+	});
+
+	QUnit.test("Fullscreen button receives initial focus when no other interactive element exists", function (assert) {
+		const oDialog = new Dialog({
+			showFullScreenButton: true,
+			content: [new HTML({content: "<p>Static content</p>"})]
+		});
+
+		oDialog.open();
+		this.clock.tick(500);
+
+		assert.strictEqual(
+			document.activeElement,
+			oDialog._fullscreenButton.getDomRef(),
+			"Fullscreen button should have focus when it is the only interactive element"
+		);
+
+		oDialog.destroy();
+	});
+
+	QUnit.test("RTL state is refreshed on reopen", function (assert) {
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		assert.strictEqual(this.oDialog._bRTL, false, "RTL should be false initially");
+
+		this.oDialog.close();
+		this.clock.tick(500);
+
+		// Simulate switching to RTL between close and reopen
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		assert.strictEqual(this.oDialog._bRTL, true, "RTL should be refreshed to true on reopen");
+
+		oStub.restore();
 	});
 });

@@ -66,17 +66,22 @@ sap.ui.define([
 			});
 
 			if (!oControl._pPendingModification && oControl._onModifications instanceof Function) {
-				oControl._pPendingModification = Engine.getInstance().waitForChanges(oControl).then(async () => {
-					const aAffectedControllerKeys = Engine.getInstance().getTrace(oControl);
-					Engine.getInstance().clearTrace(oControl);
-					delete oControl._pPendingModification;
-					Engine.getInstance().fireStateChange(oControl);
-					await oControl._onModifications(aAffectedControllerKeys);
-					resumeInvalidation(oControl);
-				}).catch((oError) => {
-					SAPLog.error(`Error during mdc flex handling: ${oError}`);
-					resumeInvalidation(oControl);
-				});
+				oControl._pPendingModification = (async () => {
+					try {
+						do {
+							await Engine.getInstance().waitForChanges(oControl);
+							const aAffectedControllerKeys = Engine.getInstance().getTrace(oControl);
+							Engine.getInstance().clearTrace(oControl);
+							Engine.getInstance().fireStateChange(oControl);
+							await oControl._onModifications(aAffectedControllerKeys);
+						} while (Engine.getInstance().getTrace(oControl)?.length > 0);
+					} catch (oError) {
+						SAPLog.error(`Error during mdc flex handling: ${oError}`);
+					} finally {
+						delete oControl._pPendingModification;
+						resumeInvalidation(oControl);
+					}
+				})();
 			}
 		}
 	}

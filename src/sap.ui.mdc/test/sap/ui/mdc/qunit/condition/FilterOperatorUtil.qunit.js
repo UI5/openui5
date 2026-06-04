@@ -1897,7 +1897,28 @@ sap.ui.define([
 						valid: true,
 						oType: oStringType,
 						baseType: BaseType.String
-						// filter: null,
+					},
+					{
+						formatArgs: [Condition.createCondition(OperatorName.DefaultValues, [[Condition.createCondition(OperatorName.EQ, ["Test"])]]), oStringType, FieldDisplay.Value, false],
+						formatValue: mdcMessageBundle.getText("operators.DefaultValues.tokenText", ["=Test"]),
+						parseArgs: [mdcMessageBundle.getText("operators.DefaultValues.longText")],
+						parsedValue: "",
+						condition: Condition.createCondition(OperatorName.DefaultValues, [], undefined, undefined, ConditionValidated.NotValidated),
+						isEmpty: false,
+						valid: true,
+						oType: oStringType,
+						baseType: BaseType.String
+					},
+					{
+						formatArgs: [Condition.createCondition(OperatorName.DefaultValues, [[Condition.createCondition(OperatorName.EQ, ["Test"])]]), oStringType, FieldDisplay.Value, false],
+						formatValue: mdcMessageBundle.getText("operators.DefaultValues.tokenText", ["=Test"]),
+						parseArgs: [mdcMessageBundle.getText("operators.DefaultValues.longText") + " x"],
+						parsedValue: "",
+						condition: null,
+						isEmpty: false,
+						valid: false,
+						oType: oStringType,
+						baseType: BaseType.String
 					}
 				],
 				"MyOperator": [{

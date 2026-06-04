@@ -67,8 +67,8 @@
 }
 
 .sapMDialog.sapMDialogStretched {
+	inset-inline-end: 0 !important;
 	bottom: 0 !important;
-	right: 0 !important;
 	height: auto !important; /* this is for preventing inline size/width sizes set the width */
 	width: auto !important; /* this is for preventing inline size/height sizes set the height */
 	min-width: 0 !important; /* this is for preventing the dialog to hold it's width in small screens */
@@ -316,7 +316,7 @@ html.sap-desktop .sapMDialog {
 
 .sapMDialogResizeHandle {
 	position: absolute;
-	right: -0.5rem;
+	inset-inline-end: -0.5rem;
 	bottom: -0.5rem;
 	width: 1.5rem;
 	height: 1.5rem;
@@ -375,6 +375,10 @@ html.sap-desktop .sapMDialog {
 		position: absolute;
 		right: 0;
 		top: 0;
+
+		.sapMBarLeft.sapMBarEmpty {
+			padding: 0;
+		}
 	}
 
 	&:has(.sapMDialogDragAndResizeHandler:focus) {
