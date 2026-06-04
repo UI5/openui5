@@ -1,0 +1,23 @@
+<mvc:View
+	controllerName="sap.m.sample.DialogFullScreen.C"
+	xmlns:l="sap.ui.layout"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+	<l:VerticalLayout class="sapUiContentPadding" width="100%">
+		<Button
+			text="Dialog with Fullscreen Toggle"
+			width="280px"
+			press=".onDialogPress"
+			class="sapUiSmallMarginBottom" />
+		<Button
+			text="Dialog (Resizable) with Fullscreen Toggle"
+			width="280px"
+			press=".onResizableDialogPress"
+			class="sapUiSmallMarginBottom" />
+		<Button
+			text="Dialog (Draggable and Resizable) with Fullscreen Toggle"
+			width="280px"
+			press=".onDraggableResizableDialogPress"
+			class="sapUiSmallMarginBottom" />
+	</l:VerticalLayout>
+</mvc:View>

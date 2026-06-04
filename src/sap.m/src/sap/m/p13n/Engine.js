@@ -852,12 +852,12 @@ sap.ui.define([
 	 * @param {object} [mEnhanceConfig.propertyBag] Optional property bag for different modification handler derivations
 	 *
 	 * @returns {Promise<object>|object}
-	 * A <code>Promise</code> that resolves with the configuration. The xConfig itself if it is already available, or <code>null</code> if there is no xConfig
+	 * The xConfigObject, or a <code>Promise</code> that resolves with the xConfig object if <code>mEnhanceConfig</code> is given
 	 */
 	Engine.prototype.readXConfig = (vControl, mEnhanceConfig) => {
 
 		const oControl = Engine.getControlInstance(vControl);
-		return xConfigAPI.readConfig(oControl, mEnhanceConfig) || {};
+		return xConfigAPI.readConfig(oControl, mEnhanceConfig);
 	};
 
 	/**

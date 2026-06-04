@@ -669,6 +669,39 @@ sap.ui.define([
 		})
 	});
 
+	var oDialogFullScreen = new Dialog({
+		title: "Fullscreen Dialog",
+		showFullScreenButton: true,
+		contentWidth: "550px",
+		contentHeight: "300px",
+		content: new HTML({
+			content: '<div style="padding:1rem">Use the header button, double-click the header, or press Shift+Ctrl+F to toggle fullscreen.</div>'
+		}),
+		endButton: new Button({
+			text: "Close", press: function () {
+				oDialogFullScreen.close();
+			}
+		})
+	});
+
+	var oDialogFullScreenResponsivePadding = new Dialog({
+		title: "Fullscreen with Responsive Paddings",
+		showFullScreenButton: true,
+		contentWidth: "600px",
+		contentHeight: "300px",
+		resizable: true,
+		draggable: true,
+		content: new HTML({
+			content: '<div>Content text should align with the header title.</div>'
+		}),
+		endButton: new Button({
+			text: "Close", press: function () {
+				oDialogFullScreenResponsivePadding.close();
+			}
+		})
+	});
+	oDialogFullScreenResponsivePadding.addStyleClass("sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer");
+
 	var oDialogSimple = new Dialog('simpleDialog', {
 		title: "Simple Dialog",
 		content: new HTML({
@@ -2020,6 +2053,20 @@ sap.ui.define([
 				width: _buttonWidth,
 				press: function () {
 					oDialogResizeAndDrag.open();
+				}
+			}),
+			new Button({
+				text: "Fullscreen Toggle",
+				width: _buttonWidth,
+				press: function () {
+					oDialogFullScreen.open();
+				}
+			}),
+			new Button({
+				text: "Fullscreen + Responsive Paddings",
+				width: _buttonWidth,
+				press: function () {
+					oDialogFullScreenResponsivePadding.open();
 				}
 			}),
 			new HTML({content: "<br>"}),

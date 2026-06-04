@@ -1611,7 +1611,7 @@ sap.ui.define([
 				filterOperator: null,
 				tokenText: _getText(OperatorName.DefaultValues, false),
 				longText: _getText(OperatorName.DefaultValues, true),
-				tokenTest: escapeRegExp(_getText(OperatorName.DefaultValues, false)).replace(/\\{0\\}/g, "(.*)"),
+				tokenTest: "^(" + escapeRegExp(_getText(OperatorName.DefaultValues, true)) + ")$|^(" + escapeRegExp(_getText(OperatorName.DefaultValues, false)).replace(/\\{0\\}/g, "(.*)") + ")$",
 				valueTypes: [OperatorValueType.Conditions],
 				group: {id: "0", text: oMessageBundle.getText("VALUEHELP.OPERATOR.GROUP0", undefined, true)},
 				useDefaultValues: true
