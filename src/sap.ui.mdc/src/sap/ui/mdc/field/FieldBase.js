@@ -3544,7 +3544,7 @@ sap.ui.define([
 
 		// announce number of found items
 		const iItems = oEvent.getParameter("items");
-		if (iItems && oContent?._applySuggestionAcc) {
+		if (typeof iItems === "number" && oContent?._applySuggestionAcc) {
 			oContent._applySuggestionAcc(iItems);
 		}
 
