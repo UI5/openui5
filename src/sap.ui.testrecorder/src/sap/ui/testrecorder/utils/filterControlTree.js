@@ -125,11 +125,64 @@ sap.ui.define([], function() {
 		}
 		sQuery = sQuery.toLowerCase().trim();
 
-		function matches(value) {
-			return value != null && String(value).toLowerCase().indexOf(sQuery) !== -1;
-		}
+		return primitiveMatchesQuery(sQuery, oNode.id) ||
+			primitiveMatchesQuery(sQuery, oNode.name) ||
+			matchesObjectKeysOrValues(oNode.data, sQuery);
+	}
 
-		return matches(oNode.id) || matches(oNode.name) || matchesObjectKeysOrValues(oNode.data, matches);
+	/**
+	 * Case-insensitive substring match for a primitive value against a normalized query.
+	 * @param {string} sQuery - Normalized (lowercase, trimmed) query
+	 * @param {*} vValue - Primitive value to compare
+	 * @returns {boolean} True if the value matches the query
+	 * @private
+	 */
+	function primitiveMatchesQuery(sQuery, vValue) {
+		if (!isPrimitiveValue(vValue)) {
+			return false;
+		}
+		return String(vValue).toLowerCase().indexOf(sQuery) !== -1;
+	}
+
+	/**
+	 * Whether a data value matches the query. Objects and functions are skipped.
+	 * Arrays are matched element-wise when elements are primitives.
+	 * @param {string} sQuery - Normalized (lowercase, trimmed) query
+	 * @param {*} vValue - Property or association value from node.data
+	 * @returns {boolean} True if the value matches the query
+	 * @private
+	 */
+	function valueMatchesQuery(sQuery, vValue) {
+		if (vValue == null) {
+			return false;
+		}
+		if (Array.isArray(vValue)) {
+			for (var i = 0; i < vValue.length; i++) {
+				if (isPrimitiveValue(vValue[i]) && primitiveMatchesQuery(sQuery, vValue[i])) {
+					return true;
+				}
+			}
+			return false;
+		}
+		if (typeof vValue === "object" || typeof vValue === "function") {
+			return false;
+		}
+		return primitiveMatchesQuery(sQuery, vValue);
+	}
+
+	/**
+	 * Whether a value is a JavaScript primitive suitable for query matching.
+	 * @param {*} vValue - Value to check
+	 * @returns {boolean} True if the value is a primitive
+	 * @private
+	 */
+	function isPrimitiveValue(vValue) {
+		if (vValue == null) {
+			return false;
+		}
+		var sType = typeof vValue;
+		return sType === "string" || sType === "number" || sType === "boolean" ||
+			sType === "bigint" || sType === "symbol";
 	}
 
 	/**
@@ -144,27 +197,25 @@ sap.ui.define([], function() {
 	}
 
 	/**
-	 * Check if any key or value in an object matches the given matcher function.
+	 * Check if any key or value in an object matches the query.
 	 * @param {Object} oObject - Object to check
-	 * @param {Function} fnMatcher - Function that returns true if a value matches
+	 * @param {string} sQuery - Normalized (lowercase, trimmed) query
 	 * @returns {boolean} True if any key or value matches
 	 * @private
 	 */
-	function matchesObjectKeysOrValues(oObject, fnMatcher) {
+	function matchesObjectKeysOrValues(oObject, sQuery) {
 		if (!oObject || typeof oObject !== 'object') {
 			return false;
 		}
 		var aKeys = Object.keys(oObject);
 		for (var i = 0; i < aKeys.length; i++) {
 			var sKey = aKeys[i];
-			if (fnMatcher(sKey)) {
+			if (primitiveMatchesQuery(sQuery, sKey)) {
 				return true;
 			}
 			var vValue = oObject[sKey];
-			if (vValue !== null && vValue !== undefined) {
-				if (fnMatcher(vValue)) {
-					return true;
-				}
+			if (valueMatchesQuery(sQuery, vValue)) {
+				return true;
 			}
 		}
 		return false;

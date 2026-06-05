@@ -215,6 +215,113 @@ sap.ui.define([
 			"InvisibleText excluded despite matching query");
 	});
 
+	// ── Value types ─────────────────────────────────────────────────────
+
+	QUnit.module("filterControlTree - Value types");
+
+	QUnit.test("Object value with throwing toString does not throw", function (assert) {
+		var oBadObject = {
+			secret: "hiddenInObject",
+			toString: function () {
+				throw new Error("toString failed");
+			}
+		};
+		var enriched = enrichNodeWithData(testTree, "container", { customData: oBadObject });
+		var aResult;
+
+		try {
+			aResult = filterControlTree(enriched, makeOptions({ query: "hiddenInObject" }));
+		} catch (e) {
+			assert.ok(false, "filterControlTree must not throw: " + e);
+			return;
+		}
+
+		var aIds = collectIds(aResult);
+		assert.ok(aIds.indexOf("container") === -1, "Node is not matched via object value content");
+	});
+
+	QUnit.test("Object value ignored but string property still matches", function (assert) {
+		var enriched = enrichNodeWithData(testTree, "container", {
+			customData: { secret: "hiddenInObject" },
+			text: "visibleLabel"
+		});
+		var aResult = filterControlTree(enriched, makeOptions({ query: "visibleLabel" }));
+		var aIds = collectIds(aResult);
+
+		assert.ok(aIds.indexOf("container") !== -1, "Node matched by string property alongside object value");
+	});
+
+	QUnit.test("Plain empty object in data does not match arbitrary query", function (assert) {
+		var enriched = enrichNodeWithData(testTree, "container", { layout: {} });
+		var aResult = filterControlTree(enriched, makeOptions({ query: "layoutData" }));
+		var aIds = collectIds(aResult);
+
+		assert.ok(aIds.indexOf("container") === -1, "Empty object value is not searched");
+	});
+
+	QUnit.test("Matches primitive values in string arrays element-wise", function (assert) {
+		var enriched = enrichNodeWithData(testTree, "container", {
+			ariaLabelledBy: ["label1", "label2"]
+		});
+
+		var aById = collectIds(filterControlTree(enriched, makeOptions({ query: "label1" })));
+		var aByPartial = collectIds(filterControlTree(enriched, makeOptions({ query: "abel2" })));
+
+		assert.ok(aById.indexOf("container") !== -1, "Matches association id in array");
+		assert.ok(aByPartial.indexOf("container") !== -1, "Matches partial association id in array");
+	});
+
+	QUnit.test("Mixed array matches primitive elements and ignores objects", function (assert) {
+		var oBadObject = {
+			toString: function () {
+				throw new Error("toString failed");
+			}
+		};
+		var enriched = enrichNodeWithData(testTree, "container", {
+			ariaLabelledBy: [oBadObject, "targetId"]
+		});
+		var aResult;
+
+		try {
+			aResult = filterControlTree(enriched, makeOptions({ query: "targetId" }));
+		} catch (e) {
+			assert.ok(false, "filterControlTree must not throw on mixed array: " + e);
+			return;
+		}
+
+		assert.ok(collectIds(aResult).indexOf("container") !== -1,
+			"Primitive array element matches despite object element in same array");
+	});
+
+	QUnit.test("Boolean and number primitives in data still match", function (assert) {
+		var enriched = enrichNodeWithData(testTree, "container", {
+			visible: true,
+			width: 42
+		});
+
+		var aByBoolean = collectIds(filterControlTree(enriched, makeOptions({ query: "true" })));
+		var aByNumber = collectIds(filterControlTree(enriched, makeOptions({ query: "42" })));
+
+		assert.ok(aByBoolean.indexOf("container") !== -1, "Boolean property value matches");
+		assert.ok(aByNumber.indexOf("container") !== -1, "Number property value matches");
+	});
+
+	QUnit.test("Symbol primitive in data does not throw and is searchable", function (assert) {
+		var sym = Symbol("searchableSymbol");
+		var enriched = enrichNodeWithData(testTree, "container", { marker: sym });
+		var aResult;
+
+		try {
+			aResult = filterControlTree(enriched, makeOptions({ query: "searchableSymbol" }));
+		} catch (e) {
+			assert.ok(false, "filterControlTree must not throw on symbol value: " + e);
+			return;
+		}
+
+		assert.ok(collectIds(aResult).indexOf("container") !== -1,
+			"Symbol property value matches via String(symbol) without throwing");
+	});
+
 	// ── Edge cases ──────────────────────────────────────────────────────
 
 	QUnit.module("filterControlTree - Edge Cases");
