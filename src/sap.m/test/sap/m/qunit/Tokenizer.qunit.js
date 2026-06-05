@@ -1498,6 +1498,43 @@ sap.ui.define([
 		assert.equal(fnCopySpy.callCount, 1, "Copy was triggered");
 	});
 
+	QUnit.test("Copy should use focused token when no tokens are selected", function(assert) {
+		// arrange
+		var oFillClipboardSpy = this.spy(this.tokenizer, "_fillClipboard");
+		this.tokenizer.getTokens().forEach(function(oToken) {
+			oToken.setSelected(false);
+		});
+
+		// focus the second token without selecting it
+		this.tokenizer.getTokens()[1].focus();
+
+		// act
+		qutils.triggerKeydown("t", KeyCodes.C, false, false, true);
+
+		// assert
+		assert.equal(oFillClipboardSpy.callCount, 1, "fillClipboard was called");
+	});
+
+	QUnit.test("Cut should use focused token when no tokens are selected", function(assert) {
+		// arrange
+		var oFillClipboardSpy = this.spy(this.tokenizer, "_fillClipboard");
+		var oFireTokenDeleteSpy = this.spy(this.tokenizer, "fireTokenDelete");
+		this.tokenizer.getTokens().forEach(function(oToken) {
+			oToken.setSelected(false);
+		});
+
+		// focus the second token without selecting it
+		this.tokenizer.getTokens()[1].focus();
+
+		// act
+		qutils.triggerKeydown("t", KeyCodes.X, false, false, true);
+
+		// assert
+		assert.equal(oFillClipboardSpy.callCount, 1, "fillClipboard was called");
+		assert.equal(oFireTokenDeleteSpy.callCount, 1, "fireTokenDelete was called");
+		assert.equal(oFireTokenDeleteSpy.getCall(0).args[0].tokens[0].getText(), "Token 2", "The focused token should be cut");
+	});
+
 	QUnit.test("Arrow_right", function(assert) {
 		// arrange
 		Element.getElementById("t1").focus();
