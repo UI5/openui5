@@ -52,7 +52,8 @@ sap.ui.define(["sap/ui/core/Lib", "sap/uxap/library", "sap/ui/fl/designtime/util
 					changeType: "rename",
 					domRef: ".sapUxAPObjectPageSectionTitle",
 					isEnabled: function (oElement) {
-						return oElement._getInternalTitleVisible();
+						var oLayout = oElement._getObjectPageLayout();
+						return oElement._getInternalTitleVisible() || !!(oLayout && oLayout.getUseIconTabBar());
 					},
 					validators: [
 						"noEmptyText"
