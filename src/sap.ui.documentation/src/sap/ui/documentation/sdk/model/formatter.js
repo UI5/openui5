@@ -361,6 +361,17 @@ sap.ui.define([
 			 */
 			escapeSettingsValue: ManagedObject.escapeSettingsValue,
 
+			/**
+			 * Returns the escaped default value, but hides it for typedef params
+			 * where the value is an object literal (shown per-property in sub-rows instead).
+			 */
+			formatParamDefaultValue: function(sDefaultValue, oTypeInfo) {
+				if (oTypeInfo && oTypeInfo.refersToTypedef && sDefaultValue && sDefaultValue.trim().startsWith("{")) {
+					return "";
+				}
+				return ManagedObject.escapeSettingsValue(sDefaultValue);
+			},
+
 			getUrlForType: function(sType) {
 				if (!sType) {
 					return sType;

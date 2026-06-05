@@ -20,8 +20,8 @@ sap.ui.define([
 	// shortcut for sap.m.PanelAccessibleRole
 	var PanelAccessibleRole = library.PanelAccessibleRole;
 
-	// shortcut for sap.m.BackgroundDesign
-	var BackgroundDesign = library.BackgroundDesign;
+	// shortcut for sap.m.PanelBackgroundDesign
+	var PanelBackgroundDesign = library.PanelBackgroundDesign;
 
 	// shortcut for sap.m.ButtonType
 	var ButtonType = library.ButtonType;
@@ -122,10 +122,10 @@ sap.ui.define([
 
 				/**
 				 * This property is used to set the background color of the Panel.
-				 * Depending on the theme you can change the state of the background from "Solid" over "Translucent" to "Transparent".
+				 * Depending on the theme you can change the state of the background from "Solid" over "Translucent" to "Transparent" or "Contrast".
 				 * @since 1.30
 				 */
-				backgroundDesign: {type: "sap.m.BackgroundDesign", group: "Appearance", defaultValue: BackgroundDesign.Translucent},
+				backgroundDesign: {type: "sap.m.PanelBackgroundDesign", group: "Appearance", defaultValue: PanelBackgroundDesign.Translucent},
 
 				/**
 				 * This property is used to set the accessible aria role of the Panel.

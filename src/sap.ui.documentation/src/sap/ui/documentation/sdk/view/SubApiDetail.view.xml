@@ -252,9 +252,12 @@
 														columnCount="4"
 														class="sapUiDocumentationParamsTable">
 													<custom:Row expandable="{= ${typeInfo/refersToTypedef} === true}" typedefName="{= ${typeInfo/UI5Types} ? ${typeInfo/UI5Types/0} : ${typeInfo/type} }" expandToggle="onTypedefToggle">
+														<custom:customData>
+															<core:CustomData key="paramDefaultValue" value="{path: 'defaultValue', formatter: '.formatter.escapeSettingsValue'}"/>
+														</custom:customData>
 														<custom:ParamText text="{name}" phoneText="{phoneName}" depth="{depth}" optional="{optional}"/>
 														<custom:JSDocType typeInfo="{parts: ['typeInfo', 'types', 'type', 'linkEnabled'], formatter: '.formatter.formatJSDocType'}"/>
-														<m:Text text="{path: 'defaultValue', formatter: '.formatter.escapeSettingsValue'}"/>
+														<m:Text text="{parts: ['defaultValue', 'typeInfo'], formatter: '.formatter.formatParamDefaultValue'}"/>
 														<custom:JSDocText sanitizeContent="false" text="{description}"/>
 													</custom:Row>
 												</custom:LightTable>
@@ -679,9 +682,12 @@
 																class="sapUiDocumentationParamsTable">
 															<template:repeat list="{method>parameters}" var="parameter">
 																<custom:Row expandable="{= ${parameter>typeInfo/refersToTypedef} === true}" typedefName="{= ${parameter>typeInfo/UI5Types} ? ${parameter>typeInfo/UI5Types/0} : ${parameter>typeInfo/type} }" expandToggle="onTypedefToggle">
+																	<custom:customData>
+																		<core:CustomData key="paramDefaultValue" value="{path: 'parameter>defaultValue', formatter: '.formatter.escapeSettingsValue'}"/>
+																	</custom:customData>
 																	<custom:ParamText text="{parameter>name}" phoneText="{parameter>phoneName}" depth="{parameter>depth}" optional="{parameter>optional}"/>
 																	<custom:JSDocType typeInfo="{parts: ['parameter>typeInfo','parameter>types'], formatter: '.formatter.stringifyJSDocType'}"/>
-																	<m:Text text="{path: 'parameter>defaultValue', formatter: '.formatter.escapeSettingsValue'}"/>
+																	<m:Text text="{parts: ['parameter>defaultValue', 'parameter>typeInfo'], formatter: '.formatter.formatParamDefaultValue'}"/>
 																	<custom:JSDocText sanitizeContent="false" text="{path: 'parameter>description', formatter: '.formatter.escapeSettingsValue'}"/>
 																</custom:Row>
 															</template:repeat>

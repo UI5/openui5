@@ -31,8 +31,8 @@ sap.ui.define([
 	// shortcut for sap.m.PanelAccessibleRole
 	var PanelAccessibleRole = mobileLibrary.PanelAccessibleRole;
 
-	// shortcut for sap.m.BackgroundDesign
-	var BackgroundDesign = mobileLibrary.BackgroundDesign;
+	// shortcut for sap.m.PanelBackgroundDesign
+	var PanelBackgroundDesign = mobileLibrary.PanelBackgroundDesign;
 
 
 	QUnit.module("API", {
@@ -131,7 +131,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Default Panel backgroundDesign", function (assert) {
-		assert.strictEqual(this.oPanel.getBackgroundDesign(), BackgroundDesign.Translucent, "should be sap.m.BackgroundDesign.Translucent");
+		assert.strictEqual(this.oPanel.getBackgroundDesign(), PanelBackgroundDesign.Translucent, "should be sap.m.PanelBackgroundDesign.Translucent");
 	});
 
 	QUnit.test("Default accessibleRole", function (assert) {
@@ -555,7 +555,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Panel with solid backgroundDesign", async function(assert) {
-		this.oPanel.setBackgroundDesign(BackgroundDesign.Solid);
+		this.oPanel.setBackgroundDesign(PanelBackgroundDesign.Solid);
 		await nextUIUpdate();
 
 		var $panel = this.oPanel.$();
@@ -564,7 +564,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Panel with transparent backgroundDesign", async function(assert) {
-		this.oPanel.setBackgroundDesign(BackgroundDesign.Transparent);
+		this.oPanel.setBackgroundDesign(PanelBackgroundDesign.Transparent);
 		await nextUIUpdate();
 
 		var $panel = this.oPanel.$();
@@ -576,6 +576,15 @@ sap.ui.define([
 		var $panel = this.oPanel.$();
 
 		assert.strictEqual($panel.find(".sapMPanelBGTranslucent").length, 1, "should have sapMPanelBGTranslucent class present once");
+	});
+
+	QUnit.test("Panel with contrast backgroundDesign", async function(assert) {
+		this.oPanel.setBackgroundDesign(PanelBackgroundDesign.Contrast);
+		await nextUIUpdate();
+
+		var $panel = this.oPanel.$();
+
+		assert.strictEqual($panel.find(".sapMPanelBGContrast").length, 1, "should have sapMPanelBGContrast class present once");
 	});
 
 	QUnit.test("Overflow should be hidden with expandable = true and expanded = false", async function (assert) {

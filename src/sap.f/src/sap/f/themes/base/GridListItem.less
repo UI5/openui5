@@ -10,6 +10,7 @@
 @_sap_f_GridListItem_FocusedHighlightOffset: 0.125rem;
 @_sap_f_GridListItem_HighlightBorderRadius: 0.25rem;
 @_sap_f_GridListItem_FocusedHighlightBorderRadius: 0;
+@_sap_f_GridListItem_SelectedBoxShadow: 0 0 0 0.125rem var(--sapList_SelectionBorderColor);
 
 .sapFGLI {
 	padding: 0;
@@ -86,7 +87,7 @@
 
 	&.sapMLIB.sapMLIBSelected {
 		border-bottom: none;
-		box-shadow: 0 0 0 0.125rem var(--sapList_SelectionBorderColor);
+		box-shadow: @_sap_f_GridListItem_SelectedBoxShadow;
 	}
 }
 
