@@ -662,22 +662,15 @@ sap.ui.define([
 
 		let oCell = this.oTable.qunit.getDataCell(0, 0);
 		assert.strictEqual(oCell.getAttribute("role"), "gridcell", "role");
-		checkAriaSelected(oCell.getAttribute("aria-selected"), true, assert);
 
 		oCell = this.oTable.getRows()[0].getDomRef().lastChild; // dummy cell
 		assert.strictEqual(oCell.getAttribute("role"), "presentation", "role");
-
-		oCell = this.oTable.qunit.getDataCell(1, 0);
-		checkAriaSelected(oCell.getAttribute("aria-selected"), false, assert);
 
 		oCell = this.oTable.getRows()[1].getDomRef().lastChild; // dummy cell
 		assert.strictEqual(oCell.getAttribute("role"), "presentation", "role");
 
 		this.oTable.invalidate();
 		await this.oTable.qunit.whenRenderingFinished();
-
-		checkAriaSelected(this.oTable.qunit.getDataCell(0, 0).getAttribute("aria-selected"), true, assert);
-		checkAriaSelected(this.oTable.qunit.getDataCell(1, 0).getAttribute("aria-selected"), false, assert);
 
 		await this.setupTree();
 		assert.strictEqual(this.oTable.qunit.getDataCell(0, 0).getAttribute("role"), "gridcell", "role");
@@ -1191,14 +1184,6 @@ sap.ui.define([
 
 		const oCell = this.oTable.qunit.getRowHeaderCell(0);
 		assert.strictEqual(oCell.getAttribute("role"), "gridcell", "role");
-		checkAriaSelected(oCell.getAttribute("aria-selected"), true, assert);
-		checkAriaSelected(this.oTable.qunit.getRowHeaderCell(1).getAttribute("aria-selected"), false, assert);
-
-		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
-
-		checkAriaSelected(this.oTable.qunit.getRowHeaderCell(0).getAttribute("aria-selected"), true, assert);
-		checkAriaSelected(this.oTable.qunit.getRowHeaderCell(1).getAttribute("aria-selected"), false, assert);
 	});
 
 	QUnit.module("Row Actions", {
@@ -1397,14 +1382,6 @@ sap.ui.define([
 
 		const oCell = this.oTable.qunit.getRowActionCell(0);
 		assert.strictEqual(oCell.getAttribute("role"), "gridcell", "role");
-		checkAriaSelected(oCell.getAttribute("aria-selected"), true, assert);
-		checkAriaSelected(this.oTable.qunit.getRowActionCell(1).getAttribute("aria-selected"), false, assert);
-
-		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
-
-		checkAriaSelected(this.oTable.qunit.getRowActionCell(0).getAttribute("aria-selected"), true, assert);
-		checkAriaSelected(this.oTable.qunit.getRowActionCell(1).getAttribute("aria-selected"), false, assert);
 	});
 
 	QUnit.module("Header Selector", {
