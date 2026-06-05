@@ -155,6 +155,18 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 				// if icon only mode, the control is announced as standard
 				// button and the selected value is not rendered
 				oRm.text(oSelectedItem.getText());
+			} else if (bIconOnly) {
+				// For IconOnly Select (role="button"), aria-activedescendant is not allowed.
+				// Render the selected item text in a hidden span so it can be referenced via
+				// aria-describedby, letting screen readers (e.g. JAWS) announce the current
+				// selection when the button gets focus.
+				oRm.openStart("span", oSelect.getId() + "-selectedText");
+				oRm.class("sapUiPseudoInvisibleText");
+				oRm.openEnd();
+				if (oSelectedItem) {
+					oRm.text(oSelectedItem.getText());
+				}
+				oRm.close("span");
 			}
 
 			oRm.close('div');
@@ -348,7 +360,11 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 					return "combobox";
 
 				case SelectType.IconOnly:
-					return "button";
+					// While the picker is open the field exposes a combobox role so that
+					// aria-activedescendant (pointing to the active option in the listbox
+					// popup) is valid - it is not allowed on role="button". When closed it is
+					// a plain icon button.
+					return oSelect.isOpen() ? "combobox" : "button";
 
 				// no default
 			}
@@ -380,6 +396,8 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 				}
 			});
 
+			// note: for an IconOnly Select the field exposes a combobox role while open
+			// (see getAriaRole), so aria-activedescendant is valid in that state.
 			if (oSelect.isOpen() && oSelectedItem && oSelectedItem.getDomRef()) {
 				sActiveDescendant = oSelectedItem.getId();
 			}
@@ -393,6 +411,14 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 
 			if (sValueState !== ValueState.None && bEditabledAndEnabled) {
 				sAriaDescribedBy = oSelect.getValueStateMessageId() + "-sr";
+			}
+
+			// For IconOnly Select (role="button"), the selected item text is rendered
+			// inside a hidden span (see renderFocusElement). Reference it via
+			// aria-describedby so screen readers announce the current selection on focus
+			// and whenever the selection changes.
+			if (bIconOnly) {
+				sAriaDescribedBy = (sAriaDescribedBy ? sAriaDescribedBy + " " : "") + oSelect.getId() + "-selectedText";
 			}
 
 			if (sDesc && oValueIcon) {
