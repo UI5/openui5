@@ -152,6 +152,7 @@ sap.ui.define([
 		  "sap.m.P13nConditionOperation",
 		  "sap.m.PageBackgroundDesign",
 		  "sap.m.PanelAccessibleRole",
+		  "sap.m.PanelBackgroundDesign",
 		  "sap.m.PDFViewerDisplayType",
 		  "sap.m.PlacementType",
 		  "sap.m.CarouselPageIndicatorPlacementType",
@@ -3824,6 +3825,40 @@ sap.ui.define([
 	 };
 
 	 /**
+	  * Available Panel Background Design.
+	  *
+	  * @enum {string}
+	  * @public
+	  */
+	 thisLib.PanelBackgroundDesign = {
+
+		 /**
+		  * A solid background color dependent on the theme.
+		  * @public
+		  */
+		 Solid : "Solid",
+
+		 /**
+		  * Transparent background.
+		  * @public
+		  */
+		 Transparent : "Transparent",
+
+		 /**
+		  * A translucent background depending on the opacity value of the theme.
+		  * @public
+		  */
+		 Translucent : "Translucent",
+
+		 /**
+		  * Contrasting background for a better visual grouping when a panel is placed inside a container
+		  * @public
+		  */
+		 Contrast : "Contrast"
+
+	 };
+
+	 /**
 	  * PDF viewer display types.
 	  *
 	  * @enum {string}
@@ -6497,6 +6532,7 @@ sap.ui.define([
 	 DataType.registerEnum("sap.m.P13nConditionOperation", thisLib.P13nConditionOperation);
 	 DataType.registerEnum("sap.m.PageBackgroundDesign", thisLib.PageBackgroundDesign);
 	 DataType.registerEnum("sap.m.PanelAccessibleRole", thisLib.PanelAccessibleRole);
+	 DataType.registerEnum("sap.m.PanelBackgroundDesign", thisLib.PanelBackgroundDesign);
 	 DataType.registerEnum("sap.m.PDFViewerDisplayType", thisLib.PDFViewerDisplayType);
 	 DataType.registerEnum("sap.m.PlacementType", thisLib.PlacementType);
 	 DataType.registerEnum("sap.m.PlanningCalendarBuiltInView", thisLib.PlanningCalendarBuiltInView);

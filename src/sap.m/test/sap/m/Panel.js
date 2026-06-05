@@ -259,6 +259,16 @@ sap.ui.define([
 			]
 		});
 
+	var oPanelContrastExpandable = new Panel("panelContrastExpandable", {
+		headerText: "Expandable Panel with Contrast Background",
+		expandable: true,
+		expanded: true,
+		backgroundDesign: "Contrast",
+		content: [
+			new Text({ text: "This is an expandable Panel with Contrast background design. " + lorem })
+		]
+	});
+
 	var oPage = new Page("page", {
 		title: "Panel Test Page",
 		content: [
@@ -278,7 +288,8 @@ sap.ui.define([
 			oPanel13,
 			oPanel14,
 			oPanel15,
-			oPanel16
+			oPanel16,
+			oPanelContrastExpandable
 		]
 	}).addStyleClass("sapUiContentPadding");
 

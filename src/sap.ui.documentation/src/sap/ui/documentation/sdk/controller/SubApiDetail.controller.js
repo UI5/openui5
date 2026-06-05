@@ -804,6 +804,10 @@ sap.ui.define([
 					return;
 				}
 
+				// Parse per-property defaults from the Row's custom data
+				var sParamDefaultValue = oRow.data("paramDefaultValue") || "";
+				var oParamDefaults = this._parseParamDefaultValues(sParamDefaultValue);
+
 				// Find the typedef entity in the API index first
 				var oTypedefInfo = this._findTypedefInApiIndex(sTypedefName);
 
@@ -813,7 +817,7 @@ sap.ui.define([
 						.then(function(aTypedefProperties) {
 							// Add Row controls to the LightTable for each typedef property
 							if (aTypedefProperties && aTypedefProperties.length > 0) {
-								this._addTypedefSubRows(oRow, aTypedefProperties);
+								this._addTypedefSubRows(oRow, aTypedefProperties, oParamDefaults);
 
 								oRow.setExpanded(true);
 								oLightTable.invalidate();
@@ -982,14 +986,37 @@ sap.ui.define([
 			},
 
 			/**
+			 * Parses a default value object string from a parameter's JSDoc into a map
+			 * of property names to their default values.
+			 * @param {string} sDefaultValue The default value string, e.g. "{\n  emptyString: NaN,\n  groupingSize: 3\n}"
+			 * @returns {Object<string, string>} Map of property names to default value strings
+			 * @private
+			 */
+			_parseParamDefaultValues: function(sDefaultValue) {
+				var oDefaults = {};
+				if (!sDefaultValue) {
+					return oDefaults;
+				}
+				var rProperty = /(\w+)\s*:\s*(.+?)(?:,\s*$|\s*$)/gm;
+				var aMatch;
+				while ((aMatch = rProperty.exec(sDefaultValue)) !== null) {
+					var sValue = aMatch[2].trim().replace(/^["']|["']$/g, "");
+					oDefaults[aMatch[1]] = sValue;
+				}
+				return oDefaults;
+			},
+
+			/**
 			 * Adds Row controls to the LightTable for typedef properties
 			 * @param {sap.ui.documentation.Row} oParentRow The parent row being expanded
 			 * @param {array} aTypedefProperties Array of typedef properties to add as rows
+			 * @param {Object<string, string>} oParamDefaults Map of property names to default values from the method's param
 			 * @private
 			 */
-			_addTypedefSubRows: function(oParentRow, aTypedefProperties) {
+			_addTypedefSubRows: function(oParentRow, aTypedefProperties, oParamDefaults) {
 				// Create sub-row controls for typedef properties
 				var aSubRows = aTypedefProperties.map(function(oProperty) {
+					var sDefault = oParamDefaults[oProperty.name] || oProperty.defaultValue || "";
 					return new Row({
 						content: [
 							new ParamText({
@@ -1002,7 +1029,7 @@ sap.ui.define([
 								typeInfo: oProperty.typeInfo
 							}),
 							new Text({
-								text: this.formatter.escapeSettingsValue(oProperty.defaultValue) || "",
+								text: this.formatter.escapeSettingsValue(sDefault),
 								wrapping: true
 							}),
 							new JSDocText({

@@ -68,10 +68,9 @@ describe("sap.m.Panel", function() {
 		expect(takeScreenshot(element(by.id("panel16")))).toLookAs("panel-not-expanded2");
 	});
 
-	it("should show Panel with fixed height and scrollable content", function() {
-		browser.executeScript('document.getElementById("panelScrollTest").scrollIntoView()').then(function() {
-			element(by.id("panelScrollTest-content")).click();
-			expect(takeScreenshot(element(by.id("panelScrollTest")))).toLookAs("panel_content_focused");
+	it("should show expandable Panel with Contrast background design", function() {
+		browser.executeScript('document.getElementById("panelContrastExpandable").scrollIntoView()').then(function() {
+			expect(takeScreenshot(element(by.id("panelContrastExpandable")))).toLookAs("panel_contrast_background");
 		});
 	});
 });
