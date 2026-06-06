@@ -94,7 +94,7 @@ sap.ui.define([
 			if (!Device.system.phone) {
 				oRm.openStart("div", sBarId)
 					.attr("role", "separator")
-					.attr("title", oResourceBundle.getText("FCL_SEPARATOR_MOVE"))
+					.attr("aria-label", oResourceBundle.getText("FCL_SEPARATOR_MOVE"))
 					.attr("aria-orientation", "vertical")
 					.attr("tabindex", 0)
 					.attr("aria-valuemin", 0)

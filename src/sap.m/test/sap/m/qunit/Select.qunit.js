@@ -9198,7 +9198,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			oSelect.getFocusDomRef().blur();
+			qutils.triggerEvent("focusout", oSelect.getFocusDomRef());
 
 			// assert
 			assert.strictEqual(fnFireChangeSpy.callCount, 1);
@@ -10636,7 +10636,7 @@ sap.ui.define([
 			this.clock.tick(101);
 
 			// act
-			oSelect.getFocusDomRef().blur();
+			qutils.triggerEvent("focusout", oSelect.getFocusDomRef());
 
 			// assert
 			var vValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
@@ -10973,6 +10973,44 @@ sap.ui.define([
 
 			// Open the Select to trigger the beforeOpen event
 			this.oSelect.open();
+		});
+
+		QUnit.test("Picker header has no contentRight button", function(assert) {
+			var oHeader = this.oSelect._getPickerHeader();
+			assert.strictEqual(oHeader.getContentRight().length, 0, "The picker header bar has no contentRight children");
+		});
+
+		QUnit.test("Dialog has an endButton set", function(assert) {
+			var oDialog = this.oSelect.getAggregation("picker"),
+				oEndButton = oDialog.getEndButton();
+			assert.ok(oEndButton, "The dialog has an endButton");
+			assert.ok(oEndButton.isA("sap.m.Button"), "The endButton is a sap.m.Button");
+		});
+
+		QUnit.test("Dialog endButton text equals SELECT_CANCEL_BUTTON", function(assert) {
+			var oDialog = this.oSelect.getAggregation("picker"),
+				oEndButton = oDialog.getEndButton(),
+				sExpected = Library.getResourceBundleFor("sap.m").getText("SELECT_CANCEL_BUTTON");
+			assert.strictEqual(oEndButton.getText(), sExpected, "The endButton text is the localised Cancel string");
+		});
+
+		QUnit.test("Pressing the endButton closes the dialog", function(assert) {
+			assert.expect(1);
+
+			var fnDone = assert.async(),
+				oDialog = this.oSelect.getAggregation("picker");
+
+			oDialog.attachEventOnce("afterClose", function() {
+				assert.ok(true, "The dialog was closed after pressing Cancel");
+				fnDone();
+			});
+
+			oDialog.attachEventOnce("afterOpen", function() {
+				oDialog.getEndButton().firePress();
+			});
+
+			this.oSelect.open();
+			this.clock.tick(1000); // advance past open + close animations so both events fire
 		});
 
 		QUnit.module("Hidden select element", {

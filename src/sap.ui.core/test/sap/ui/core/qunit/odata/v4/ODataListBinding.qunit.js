@@ -1327,10 +1327,13 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("reset with change reason, unresolved binding", function (assert) {
+[false, true].forEach(function (bRestartAutoExpandSelect) {
+	const sTitle = "reset with change reason, unresolved binding"
+		+ ", bRestartAutoExpandSelect=" + bRestartAutoExpandSelect;
+
+	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("EMPLOYEES");
 
-		this.oModel.bAutoExpandSelect = true;
 		oBinding.mAggregatedQueryOptions = "~mAggregatedQueryOptions~";
 		oBinding.bAggregatedQueryOptionsInitial = "~bAggregatedQueryOptionsInitial~";
 		oBinding.mCanUseCachePromiseByChildPath = "~mCanUseCachePromiseByChildPath~";
@@ -1342,17 +1345,25 @@ sap.ui.define([
 		this.mock(oBinding).expects("_fireRefresh").never();
 
 		// code under test
-		oBinding.reset("n/a", undefined, undefined, /*bRestartAutoExpandSelect*/true);
+		oBinding.reset("n/a", undefined, undefined, bRestartAutoExpandSelect);
 
-		assert.strictEqual(oBinding.mAggregatedQueryOptions, "~mAggregatedQueryOptions~");
-		assert.strictEqual(oBinding.bAggregatedQueryOptionsInitial,
-			"~bAggregatedQueryOptionsInitial~");
-		assert.strictEqual(oBinding.mCanUseCachePromiseByChildPath,
-			"~mCanUseCachePromiseByChildPath~");
-		assert.strictEqual(oBinding.sChangeReason, "~sChangeReason~");
+		if (bRestartAutoExpandSelect) {
+			assert.deepEqual(oBinding.mAggregatedQueryOptions, {});
+			assert.strictEqual(oBinding.bAggregatedQueryOptionsInitial, true);
+			assert.deepEqual(oBinding.mCanUseCachePromiseByChildPath, {});
+			assert.strictEqual(oBinding.sChangeReason, "AddVirtualContext");
+		} else {
+			assert.strictEqual(oBinding.mAggregatedQueryOptions, "~mAggregatedQueryOptions~");
+			assert.strictEqual(oBinding.bAggregatedQueryOptionsInitial,
+				"~bAggregatedQueryOptionsInitial~");
+			assert.strictEqual(oBinding.mCanUseCachePromiseByChildPath,
+				"~mCanUseCachePromiseByChildPath~");
+			assert.strictEqual(oBinding.sChangeReason, "~sChangeReason~");
+		}
 		assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
 			"~sChangeReasonAfterRemoveVirtualContext~");
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("reset not initial binding with change reason 'Change'", function (assert) {
@@ -1371,13 +1382,10 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [false, true].forEach(function (bRestartAutoExpandSelect) {
-	[false, true].forEach(function (bAutoExpandSelect) {
-		const sTitle = "reset: fired events and change reason"
-			+ ", bRestartAutoExpandSelect=" + bRestartAutoExpandSelect
-			+ ", oModel.bAutoExpandSelect=" + bAutoExpandSelect;
+	const sTitle = "reset: fired events and change reason"
+		+ ", bRestartAutoExpandSelect=" + bRestartAutoExpandSelect;
 
 	QUnit.test(sTitle, function (assert) {
-		this.oModel.bAutoExpandSelect = bAutoExpandSelect;
 		const oBinding = this.bindList("/EMPLOYEES");
 		oBinding.mAggregatedQueryOptions = "~mAggregatedQueryOptions~";
 		oBinding.bAggregatedQueryOptionsInitial = "~bAggregatedQueryOptionsInitial~";
@@ -1385,8 +1393,7 @@ sap.ui.define([
 		oBinding.sChangeReason = "~sOldChangeReason~";
 		oBinding.sChangeReasonAfterRemoveVirtualContext
 			= "~sChangeReasonAfterRemoveVirtualContext~";
-		const bExpectRestartAutoExpandSelect = bRestartAutoExpandSelect && bAutoExpandSelect;
-		this.mock(oBinding).expects("_fireChange").exactly(bExpectRestartAutoExpandSelect ? 1 : 0)
+		this.mock(oBinding).expects("_fireChange").exactly(bRestartAutoExpandSelect ? 1 : 0)
 			.withExactArgs({reason : "~sNewChangeReason~", detailedReason : "AddVirtualContext"})
 			.callsFake(function () {
 				assert.deepEqual(oBinding.mAggregatedQueryOptions, {});
@@ -1396,13 +1403,13 @@ sap.ui.define([
 				assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
 					"~sNewChangeReason~");
 			});
-		this.mock(oBinding).expects("_fireRefresh").exactly(bExpectRestartAutoExpandSelect ? 0 : 1)
+		this.mock(oBinding).expects("_fireRefresh").exactly(bRestartAutoExpandSelect ? 0 : 1)
 			.withExactArgs({reason : "~sNewChangeReason~"});
 
 		// code under test
 		oBinding.reset("~sNewChangeReason~", undefined, "n/a", bRestartAutoExpandSelect);
 
-		if (!bExpectRestartAutoExpandSelect) {
+		if (!bRestartAutoExpandSelect) {
 			assert.strictEqual(oBinding.sChangeReason, "~sNewChangeReason~");
 			// others remain unchanged
 			assert.strictEqual(oBinding.mAggregatedQueryOptions, "~mAggregatedQueryOptions~");
@@ -1413,7 +1420,6 @@ sap.ui.define([
 			assert.strictEqual(oBinding.sChangeReasonAfterRemoveVirtualContext,
 				"~sChangeReasonAfterRemoveVirtualContext~");
 		}
-	});
 	});
 });
 
@@ -1738,7 +1744,7 @@ sap.ui.define([
 		const bSetOutdated = !(bLengthFinal || bMoreContexts || bOutdated === undefined);
 		this.mock(oBinding).expects("setOutdated")
 			.exactly(bSetOutdated && iActiveContexts ? 1 : 0)
-			.withExactArgs(true);
+			.withExactArgs(false, null, false, true);
 		this.mock(oBinding.oHeaderContext).expects("setOutdated")
 			.exactly(bSetOutdated && !iActiveContexts ? 1 : 0)
 			.withExactArgs(false);
@@ -3811,22 +3817,20 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+[false, true].forEach(function (bChangedGroupPaths) {
 	[
 		{
 			mParameters : {$$operationMode : OperationMode.Server},
 			queryOptions : {"sap-client" : "111"},
-			vSorters : undefined,
-			bSorterHasGroupPaths : false
+			vSorters : undefined
 		}, {
 			mParameters : {$$operationMode : OperationMode.Server},
 			queryOptions : {$orderby : "foo", "sap-client" : "111"},
-			vSorters : new Sorter("foo"),
-			bSorterHasGroupPaths : true
+			vSorters : new Sorter("foo")
 		}, {
 			mParameters : {$$operationMode : OperationMode.Server, $orderby : "bar"},
 			queryOptions : {$orderby : "foo,bar", "sap-client" : "111"},
-			vSorters : [new Sorter("foo")],
-			bSorterHasGroupPaths : false
+			vSorters : [new Sorter("foo")]
 		}, {
 			oModel : new ODataModel({
 				operationMode : OperationMode.Server,
@@ -3834,26 +3838,21 @@ sap.ui.define([
 			}),
 			mParameters : {$orderby : "bar"},
 			queryOptions : {$orderby : "foo,bar", "sap-client" : "111"},
-			vSorters : [new Sorter("foo")],
-			bSorterHasGroupPaths : false
+			vSorters : [new Sorter("foo")]
 		}
 	].forEach(function (oFixture) {
 		[false, true].forEach(function (bSuspended) {
 			var sTitle = "bSuspended=" + bSuspended + ", vSorters = "
 				+ JSON.stringify(oFixture.vSorters) + " and mParameters = "
-				+ JSON.stringify(oFixture.mParameters);
+				+ JSON.stringify(oFixture.mParameters)
+				+ ", bChangedGroupPaths = " + bChangedGroupPaths;
 
 			QUnit.test("sort: " + sTitle, function (assert) {
 				var oBinding,
 					oHelperMock = this.mock(_Helper),
 					oModel = oFixture.oModel || this.oModel,
 					oContext = Context.createNewContext(oModel, oParentBinding, "/TEAMS"),
-					aSorters = [new Sorter("foo")];
-
-				if (oFixture.bSorterHasGroupPaths) {
-					aSorters.push(new Sorter({path : "bar", groupPaths : ["~path~"]}));
-					aSorters.push(new Sorter("baz"));
-				}
+					aSorters = [];
 
 				oBinding = oModel.bindList("TEAM_2_EMPLOYEES", undefined, undefined, undefined,
 					oFixture.mParameters);
@@ -3869,6 +3868,16 @@ sap.ui.define([
 				oHelperMock.expects("deepEqual")
 					.withExactArgs(sinon.match.same(aSorters), sinon.match.same(oBinding.aSorters))
 					.returns(false);
+				const oGetGroupPathsMock = this.mock(oBinding).expects("getGroupPaths").twice();
+				const aOldSorters = oBinding.aSorters;
+				oGetGroupPathsMock.onCall(0).callsFake(function () {
+					assert.strictEqual(this.aSorters, aOldSorters);
+					return ["a", "b"];
+				});
+				oGetGroupPathsMock.onCall(1).callsFake(function () {
+					assert.strictEqual(this.aSorters, aSorters);
+					return bChangedGroupPaths ? ["a", "c"] : ["a", "b"];
+				});
 				this.mock(oBinding).expects("isRootBindingSuspended").returns(bSuspended);
 				this.mock(oBinding).expects("setResetViaSideEffects").withExactArgs(true);
 				this.mock(oBinding).expects("setResumeChangeReason").exactly(bSuspended ? 1 : 0)
@@ -3888,7 +3897,7 @@ sap.ui.define([
 					});
 				this.mock(oBinding).expects("reset").exactly(bSuspended ? 0 : 1)
 					.withExactArgs(ChangeReason.Sort, undefined, undefined,
-						/*bRestartAutoExpandSelect*/oFixture.bSorterHasGroupPaths);
+						/*bRestartAutoExpandSelect*/bChangedGroupPaths);
 				this.mock(oBinding.oHeaderContext).expects("checkUpdate")
 					.exactly(bSuspended ? 0 : 1).withExactArgs();
 
@@ -3897,42 +3906,10 @@ sap.ui.define([
 
 				assert.strictEqual(oBinding.aSorters, aSorters);
 				assert.strictEqual(oBinding.oQueryOptionsPromise, undefined);
+				assert.strictEqual(oBinding.sChangeReason,
+					bSuspended && bChangedGroupPaths ? "AddVirtualContext" : undefined);
 			});
 		});
-	});
-
-	//*********************************************************************************************
-[false, true].forEach(function (bHasGroupPaths) {
-	[false, true].forEach(function (bAutoExpandSelect) {
-		const sTitle = "sort: suspended, bHasGroupPaths=" + bHasGroupPaths
-			+ ", oModel.bAutoExpandSelect=" + bAutoExpandSelect;
-
-	QUnit.test(sTitle, function (assert) {
-		this.oModel.bAutoExpandSelect = bAutoExpandSelect;
-		const oBinding = this.oModel.bindList("TEAM_2_EMPLOYEES", null, null, null,
-			{$$operationMode : OperationMode.Server});
-		oBinding.sChangeReason = "~sChangeReason~";
-		const oSorter = new Sorter({
-			path : "foo",
-			groupPaths : bHasGroupPaths ? ["~groupPath~"] : undefined
-		});
-
-		this.mock(oBinding).expects("checkTransient").withExactArgs();
-		this.mock(oBinding).expects("hasPendingChanges").withExactArgs(true).returns(false);
-		this.mock(oBinding).expects("setResetViaSideEffects").withExactArgs(true);
-		this.mock(oBinding).expects("isRootBindingSuspended").withExactArgs().returns(true);
-		this.mock(oBinding).expects("setResumeChangeReason").withExactArgs(ChangeReason.Sort);
-		this.mock(oBinding).expects("createReadGroupLock").never();
-		this.mock(oBinding).expects("removeCachesAndMessages").never();
-		this.mock(oBinding).expects("fetchCache").never();
-		this.mock(oBinding).expects("reset").never();
-
-		// code under test
-		assert.strictEqual(oBinding.sort(oSorter), oBinding);
-
-		assert.strictEqual(oBinding.sChangeReason,
-			bHasGroupPaths && bAutoExpandSelect ? "AddVirtualContext" : "~sChangeReason~");
-	});
 	});
 });
 
@@ -5646,7 +5623,7 @@ sap.ui.define([
 					.returns(oFixture.sGroupId === "deferred");
 				oBindingMock.expects("getUpdateGroupId").withExactArgs().returns(oFixture.sGroupId);
 				oBindingMock.expects("setOutdated").exactly(oFixture.bInactive ? 0 : 1)
-					.withExactArgs(true);
+					.withExactArgs(false, null, false, true);
 				oBindingMock.expects("lockGroup")
 					.withExactArgs(oFixture.bInactive
 							? "$inactive." + oFixture.sGroupId
@@ -6554,7 +6531,7 @@ sap.ui.define([
 		this.mock(oBinding).expects("checkDeepCreate").never();
 		this.mock(oBinding).expects("isRelative").never();
 		this.mock(oBinding).expects("setOutdated").exactly(bRecursiveHierarchy ? 0 : 1)
-			.withExactArgs(true);
+			.withExactArgs(false, null, false, true);
 		this.mock(_Helper).expects("publicClone")
 			.withExactArgs(sinon.match.same(oInitialData), true).returns("~oEntityData~");
 		this.mock(oBinding).expects("lockGroup")
@@ -8171,39 +8148,29 @@ sap.ui.define([
 	QUnit.test("getQueryOptionsFromParameters", function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES");
 
+		this.mock(oBinding).expects("getGroupPaths").withExactArgs().returns([]);
+		this.mock(_Helper).expects("addToSelect").never();
+
 		// code under test
 		assert.strictEqual(oBinding.getQueryOptionsFromParameters(), oBinding.mQueryOptions);
 	});
 
 	//*********************************************************************************************
-[false, true].forEach(function (bAutoExpandSelect) {
-	[/*no sorter*/undefined, false, true].forEach(function (bHasSorterWithGroupPaths) {
-		[false, true].forEach(function (bHasSelect) {
-	const sTitle = "getQueryOptionsFromParameters: add groupPaths to $select"
-		+ ", autoExpandSelect = " + bAutoExpandSelect
-		+ ", has sorter with groupPaths = " + bHasSorterWithGroupPaths
+[false, true].forEach(function (bHasSelect) {
+	const sTitle = "getQueryOptionsFromParameters: add group paths to $select"
 		+ ", has $select = " + bHasSelect;
 
 	QUnit.test(sTitle, function (assert) {
-		this.oModel.bAutoExpandSelect = bAutoExpandSelect;
 		const oBinding = this.bindList("/EMPLOYEES");
-		if (bHasSorterWithGroupPaths) {
-			oBinding.aSorters = [
-				new Sorter({path : "n/a", groupPaths : ["a"]}),
-				new Sorter({path : "n/a"}),
-				new Sorter({path : "n/a", groupPaths : ["b", "c"]})
-			];
-		} else if (bHasSorterWithGroupPaths === false) {
-			oBinding.aSorters = [new Sorter({path : "n/a"})];
-		}
 		oBinding.mQueryOptions = {$expand : "~expand~"};
 		if (bHasSelect) {
 			oBinding.mQueryOptions.$select = ["~select~"];
 		}
 		const sOriginalQueryOptions = JSON.stringify(oBinding.mQueryOptions);
-		const bExpectAddToSelect = bAutoExpandSelect && bHasSorterWithGroupPaths;
-		this.mock(_Helper).expects("addToSelect").exactly(bExpectAddToSelect ? 1 : 0)
-			.withExactArgs(/*NOT match.same*/oBinding.mQueryOptions, ["a", "b", "c"])
+		const aGroupPaths = ["~path~"];
+		this.mock(oBinding).expects("getGroupPaths").withExactArgs().returns(aGroupPaths);
+		this.mock(_Helper).expects("addToSelect")
+			.withExactArgs(/*NOT match.same*/oBinding.mQueryOptions, sinon.match.same(aGroupPaths))
 			.callsFake(function (mQueryOptions0) {
 				if (mQueryOptions0.$select) {
 					mQueryOptions0.$select.push("MODIFIED"); // addToSelect operates on reference
@@ -8215,19 +8182,46 @@ sap.ui.define([
 		// code under test
 		const mResult = oBinding.getQueryOptionsFromParameters();
 
-		if (bExpectAddToSelect) {
-			assert.deepEqual(mResult, {
-				$expand : "~expand~",
-				$select : bHasSelect ? ["~select~", "MODIFIED"] : "MODIFIED"
-			});
-			assert.notStrictEqual(mResult, oBinding.mQueryOptions);
-		} else {
-			assert.strictEqual(mResult, oBinding.mQueryOptions);
-		}
+		assert.deepEqual(mResult, {
+			$expand : "~expand~",
+			$select : bHasSelect ? ["~select~", "MODIFIED"] : "MODIFIED"
+		});
+		assert.notStrictEqual(mResult, oBinding.mQueryOptions);
 		assert.strictEqual(JSON.stringify(oBinding.mQueryOptions), sOriginalQueryOptions,
 			"both mQueryOptions and its $select are unchanged");
 	});
-		});
+});
+
+	//*********************************************************************************************
+	QUnit.test("getGroupPaths: no autoExpandSelect", function (assert) {
+		this.oModel.bAutoExpandSelect = false;
+		const oBinding = this.bindList("/EMPLOYEES");
+		oBinding.aSorters = ["~oSorter~"];
+
+		// code under test
+		assert.deepEqual(oBinding.getGroupPaths(), []);
+	});
+
+	//*********************************************************************************************
+[false, true].forEach(function (bHasGroupPaths) {
+	const sTitle = "getGroupPaths: autoExpandSelect, bHasGroupPaths=" + bHasGroupPaths;
+
+	QUnit.test(sTitle, function (assert) {
+		this.oModel.bAutoExpandSelect = true;
+		const oBinding = this.bindList("/EMPLOYEES");
+		if (bHasGroupPaths) {
+			oBinding.aSorters = [
+				new Sorter({path : "n/a", groupPaths : ["c"]}),
+				new Sorter({path : "n/a"}),
+				new Sorter({path : "n/a", groupPaths : ["b", "a"]}),
+				new Sorter({path : "n/a", groupPaths : []})
+			];
+		} else {
+			oBinding.aSorters = [new Sorter({path : "n/a"})];
+		}
+
+		// code under test
+		assert.deepEqual(oBinding.getGroupPaths(), bHasGroupPaths ? ["a", "b", "c"] : []);
 	});
 });
 
@@ -10836,6 +10830,12 @@ sap.ui.define([
 				grandTotal : false,
 				headerContext : true
 			}, {
+				title : "no sorting but bForceHeader",
+				isFilteredByResult : false,
+				bForceHeader : true,
+				grandTotal : false,
+				headerContext : true
+			}, {
 				title : "no filter/search/custom query option/sorter matches, but GT relevant",
 				setup : function (oBinding) {
 					oBinding.mParameters.$apply = "~apply~";
@@ -10891,7 +10891,8 @@ sap.ui.define([
 				&& (bForce || oFixture.headerContext || oFixture.isUsedForGrandTotal)) {
 			assert.throws(() => {
 				// code under test
-				oBinding.setOutdated(bForce, bWithPath ? "~aPaths~" : undefined, true);
+				oBinding.setOutdated(bForce, bWithPath ? "~aPaths~" : undefined, true,
+					oFixture.bForceHeader);
 			}, new Error("Missing PATCH request when @$ui5.context.isOutdated would be set"));
 		} else {
 			if (bWithAggregationCache) {
@@ -10908,7 +10909,8 @@ sap.ui.define([
 
 			// code under test
 			assert.strictEqual(
-				oBinding.setOutdated(bForce, bWithPath ? "~aPaths~" : undefined, bNoRequest),
+				oBinding.setOutdated(bForce, bWithPath ? "~aPaths~" : undefined, bNoRequest,
+					oFixture.bForceHeader),
 				undefined);
 		}
 	});

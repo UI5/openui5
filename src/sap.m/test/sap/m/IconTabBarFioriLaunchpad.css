@@ -1,0 +1,10 @@
+.myShellOverrides {
+	--sapShell_Navigation_TextColor: red;
+	--sapShell_Navigation_Selected_TextColor: yellow;
+	--sapShell_Navigation_Background: orange;
+	--sapShell_Navigation_SelectedColor: green;
+
+	--sapShell_Navigation_Hover_Background: darkblue;
+	--sapShell_Navigation_Active_TextColor: pink;
+	--sapShell_Navigation_Active_Background: black;
+}

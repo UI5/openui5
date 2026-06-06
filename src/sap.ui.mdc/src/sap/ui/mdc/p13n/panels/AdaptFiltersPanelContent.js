@@ -421,7 +421,7 @@ sap.ui.define([
 	AdaptFiltersPanelContent.prototype._updateAddFilterVisibility = function() {
 		const bHasInvisibleItems = this._getP13nModel().getProperty("/items").some((oItem) => {
 			// Only show add filter section if there are items that are not visible AND not required
-			return !oItem[this.PRESENCE_ATTRIBUTE] && !oItem.required;
+			return !oItem[this.PRESENCE_ATTRIBUTE] && !oItem.required && oItem.visibleInDialog;
 		});
 
 		this._oAddFilterSelect.setVisible(bHasInvisibleItems);
@@ -436,7 +436,8 @@ sap.ui.define([
 			filters: [
 				new Filter(this.PRESENCE_ATTRIBUTE, "EQ", false),
 				new Filter("required", "NE", true),
-				new Filter("isFiltered", "EQ", false)
+				new Filter("isFiltered", "EQ", false),
+				new Filter("visibleInDialog", "NE", false)
 			],
 			template: new Item({
 				key: { path: `${this.P13N_MODEL}>name` },

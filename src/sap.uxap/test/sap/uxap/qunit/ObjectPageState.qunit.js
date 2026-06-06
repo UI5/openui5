@@ -749,24 +749,34 @@ function(
 			oCacheDomElementsSpy = sinon.spy(oObjectPage, "_cacheDomElements"),
 			oObtainLayoutSpy = sinon.spy(oObjectPage, "_obtainExpandedTitleHeight"),
 			oHeaderTitle = oObjectPage.getHeaderTitle(),
+			iCacheCallsBefore,
+			iObtainCallsBefore,
 			done = assert.async();
 
 		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 			// assert initial state
 			assert.ok(oObjectPage._$titleArea.length > 0, "DOM reference is cached");
 
+			// Snapshot the spy counts in onBeforeRendering / assert against them in onAfterRendering
+			// so we only measure what happens inside the synchronous header rerender.
+			// Asserting notCalled on a global spy is flaky, because async sources such as
+			// ResizeHandler/IntervalTrigger can fire between resetHistory() and the rerender.
 			oHeaderTitle.addEventDelegate({
+				onBeforeRendering: function() {
+					iCacheCallsBefore = oCacheDomElementsSpy.callCount;
+					iObtainCallsBefore = oObtainLayoutSpy.callCount;
+				},
 				onAfterRendering: function() { // at this point onAfterRendering of ObjectPage is not called yet
-					assert.ok(oCacheDomElementsSpy.notCalled, "DOM references are not yet cached");
+					assert.strictEqual(oCacheDomElementsSpy.callCount, iCacheCallsBefore,
+						"DOM references are not cached during header rerender");
 					assert.ok(oObjectPage._$titleArea.length === 0, "DOM reference is not yet available");
-					assert.ok(oObtainLayoutSpy.notCalled, "layout of title is not calculated");
+					assert.strictEqual(oObtainLayoutSpy.callCount, iObtainCallsBefore,
+						"layout of title is not calculated during header rerender");
 					done();
 				}
 			});
 
 			// Act
-			oCacheDomElementsSpy.resetHistory();
-			oObtainLayoutSpy.resetHistory();
 			oObjectPage.invalidate(); // after rerender the old cached references will no longer be valid
 		});
 	});

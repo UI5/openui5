@@ -244,7 +244,6 @@ sap.ui.define([
 				$this.toggleClass("sapMFlip", false).toggleClass("sapMLoading", true);
 				this._oBusyIndicator.setVisible(true);
 				$text.html(oResourceBundle.getText("PULL2REFRESH_LOADING"));
-				$this.attr("aria-live", "assertive");
 				$this.find(".sapMPullDownInfo").html(this._bTouchMode ? oResourceBundle.getText("PULL2REFRESH_LOADING_LONG") : "");
 				break;
 		}
