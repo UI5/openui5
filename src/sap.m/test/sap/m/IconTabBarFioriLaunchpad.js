@@ -340,6 +340,270 @@ sap.ui.define([
 		items: []
 	}).addStyleClass('sapUshellShellTabBar');
 
+	var oShellOverridesLabel = new Label({text: "Testing overriding navigation colors"}).addStyleClass("sapUiMediumMarginTop");
+
+	var oIconTabBarShellOverrides = new IconTabBar({
+		items: [
+			new IconTabFilter({
+				text: 'Tab 1 - Single Click',
+				items: [
+					new IconTabFilter({
+						text: 'Tab 1.1',
+						content: [
+							new Text({
+								text: 'Content 1.1'
+							})
+						]
+					}),
+					new IconTabFilter({
+						text: 'Tab 1.2',
+						content: [
+							new Text({
+								text: 'Content 1.2'
+							})
+						]
+					})
+				]
+			}),
+			new IconTabFilter({
+				text: 'Tab 2',
+				content: [
+					new Text({
+						text: 'Content 2'
+					})
+				],
+				items: [
+					new IconTabFilter({
+						text: 'Tab 2.1',
+						content: [
+							new Text({
+								text: 'Content 2.1'
+							})
+						]
+					}),
+					new IconTabFilter({
+						text: 'Tab 2.2',
+						content: [
+							new Text({
+								text: 'Content 2.2'
+							})
+						]
+					})
+				]
+			}),
+			new IconTabFilter({
+				text: 'Tab 3',
+				content: [
+					new Text({
+						text: 'Content 3'
+					})
+				],
+				items: [
+					new IconTabFilter({
+						text: 'Tab 3.1',
+						content: [
+							new Text({
+								text: 'Content 3.1'
+							})
+						]
+					}),
+					new IconTabFilter({
+						text: 'Tab 3.2',
+						content: [
+							new Text({
+								text: 'Content 3.2'
+							})
+						]
+					})
+				]
+			}),
+			new IconTabFilter({
+				text: 'Tab 4',
+				content: [
+					new Text({
+						text: 'Content 4'
+					})
+				],
+				items: [
+					new IconTabFilter({
+						text: 'Tab 4.1',
+						content: [
+							new Text({
+								text: 'Content 4.1'
+							})
+						]
+					}),
+					new IconTabFilter({
+						text: 'Tab 4.2',
+						content: [
+							new Text({
+								text: 'Content 4.2'
+							})
+						]
+					})
+				]
+			}),
+			new IconTabFilter({
+				text: 'Tab 5',
+				content: [
+					new Text({
+						text: 'Content 5'
+					})
+				],
+				items: [
+					new IconTabFilter({
+						text: 'Tab 5.1',
+						content: [
+							new Text({
+								text: 'Content 5.1'
+							})
+						]
+					}),
+					new IconTabFilter({
+						text: 'Tab 5.2',
+						content: [
+							new Text({
+								text: 'Content 5.2'
+							})
+						]
+					})
+				]
+			}),
+			new IconTabFilter({
+				text: 'Tab 6',
+				content: [
+					new Text({
+						text: 'Content 6'
+					})
+				],
+				items: [
+					new IconTabFilter({
+						text: 'Tab 6.1',
+						content: [
+							new Text({
+								text: 'Content 6.1'
+							})
+						]
+					}),
+					new IconTabFilter({
+						text: 'Tab 6.2',
+						content: [
+							new Text({
+								text: 'Content 6.2'
+							})
+						]
+					})
+				]
+			}),
+			new IconTabFilter({
+				text: 'Tab 7',
+				content: [
+					new Text({
+						text: 'Content 7'
+					})
+				],
+				items: [
+					new IconTabFilter({
+						text: 'Tab 7.1',
+						content: [
+							new Text({
+								text: 'Content 7.1'
+							})
+						]
+					}),
+					new IconTabFilter({
+						text: 'Tab 7.2',
+						content: [
+							new Text({
+								text: 'Content 7.2'
+							})
+						]
+					})
+				]
+			}),
+			new IconTabFilter({
+				text: 'Tab 8',
+				content: [
+					new Text({
+						text: 'Content 8'
+					})
+				],
+				items: [
+					new IconTabFilter({
+						text: 'Tab 8.1',
+						content: [
+							new Text({
+								text: 'Content 8.1'
+							})
+						]
+					}),
+					new IconTabFilter({
+						text: 'Tab 8.2',
+						content: [
+							new Text({
+								text: 'Content 8.2'
+							})
+						]
+					})
+				]
+			}),
+			new IconTabFilter({
+				text: 'Tab 9',
+				content: [
+					new Text({
+						text: 'Content 9'
+					})
+				],
+				items: [
+					new IconTabFilter({
+						text: 'Tab 9.1',
+						content: [
+							new Text({
+								text: 'Content 9.1'
+							})
+						]
+					}),
+					new IconTabFilter({
+						text: 'Tab 9.2',
+						content: [
+							new Text({
+								text: 'Content 9.2'
+							})
+						]
+					})
+				]
+			}),
+			new IconTabFilter({
+				text: 'Tab 10',
+				content: [
+					new Text({
+						text: 'Content 10'
+					})
+				],
+				items: [
+					new IconTabFilter({
+						text: 'Tab 10.1',
+						content: [
+							new Text({
+								text: 'Content 10.1'
+							})
+						]
+					}),
+					new IconTabFilter({
+						text: 'Tab 10.2',
+						content: [
+							new Text({
+								text: 'Content 10.2'
+							})
+						]
+					})
+				]
+			})
+		]
+	}).addStyleClass('sapUshellShellTabBar');
+
+	oIconTabBarShellOverrides.addStyleClass("myShellOverrides");
+
 	var oPage = new Page("page", {
 		showHeader: false,
 		content: [
@@ -347,7 +611,9 @@ sap.ui.define([
 			oIconTabBar,
 			oIconTabBarWithIcons,
 			oLabel,
-			oIconTabHeaderEmpty
+			oIconTabHeaderEmpty,
+			oShellOverridesLabel,
+			oIconTabBarShellOverrides
 		]
 	}).addStyleClass('sapUshellShell');
 

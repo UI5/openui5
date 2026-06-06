@@ -2901,6 +2901,33 @@ function(
 		this.oFCL.destroy();
 	});
 
+	QUnit.test("separators have aria-label and no title to prevent double screen reader announcement", function (assert) {
+		var sExpectedLabel = fnGetResourceBundleText("FCL_SEPARATOR_MOVE");
+
+		this.oFCL = oFactory.createFCL({
+			layout: LT.ThreeColumnsMidExpanded,
+			beginColumnPages: [new Page()],
+			midColumnPages: [new Page()],
+			endColumnPages: [new Page()]
+		});
+
+		// assert - aria-label must be set so the accessible name is announced exactly once
+		assert.strictEqual(this.oFCL._oColumnSeparators.begin.get(0).getAttribute("aria-label"), sExpectedLabel,
+			"begin separator has aria-label set to the move instruction");
+		assert.strictEqual(this.oFCL._oColumnSeparators.end.get(0).getAttribute("aria-label"), sExpectedLabel,
+			"end separator has aria-label set to the move instruction");
+
+		// assert - title must NOT be set; when title is used as the accessible name on a focusable element,
+		// JAWS announces it both as the name and as a tooltip description, causing a double announcement
+		assert.strictEqual(this.oFCL._oColumnSeparators.begin.get(0).getAttribute("title"), null,
+			"begin separator has no title attribute (would cause double announcement with JAWS)");
+		assert.strictEqual(this.oFCL._oColumnSeparators.end.get(0).getAttribute("title"), null,
+			"end separator has no title attribute (would cause double announcement with JAWS)");
+
+		// clean up
+		this.oFCL.destroy();
+	});
+
 	QUnit.module("FlexibleColumnLayoutData", {
 		beforeEach: async function () {
 				this.oFCL = new FlexibleColumnLayout({

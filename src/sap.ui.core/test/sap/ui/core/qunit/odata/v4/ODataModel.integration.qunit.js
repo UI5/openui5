@@ -3947,8 +3947,14 @@ sap.ui.define([
 	// A Sorter with groupPaths which is set while the binding is unresolved does not influence the
 	// sent events.
 	// JIRA: CPOUI5ODATAV4-3490
+	//
+	// When the binding is temporarily unresolved and ODLB#sort is called with a Sorter having
+	// different groupPaths, re-resolving the binding via setContext updates $select according to
+	// the given groupPaths.
+	// JIRA: CPOUI5ODATAV4-3528
 	QUnit.test("BCP: 2080228141 - autoExpandSelect & late ODLB#setContext", function (assert) {
-		var oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
+		var oBinding,
+			oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
 			sView = '\
 <t:Table id="table" rows="{}" threshold="0" visibleRowCount="3">\
 	<Text id="note" text="{Note}"/>\
@@ -3962,7 +3968,7 @@ sap.ui.define([
 			// avoid that the metadata request disturbs the timing
 			return oModel.getMetaModel().requestObject("/");
 		}).then(function () {
-			var oBinding = that.oView.byId("table").getBinding("rows");
+			oBinding = that.oView.byId("table").getBinding("rows");
 
 			oBinding.filter(new Filter("SalesOrderID", FilterOperator.NE, "00"));
 			oBinding.sort(new Sorter({groupPaths : ["Note"], path : "SalesOrderID"}));
@@ -3989,6 +3995,35 @@ sap.ui.define([
 
 			// code under test
 			oBinding.setContext(oModel.createBindingContext("/SalesOrderList"));
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			const oContext = oBinding.getContext();
+			oBinding.setContext(null);
+
+			that.expectEvents(assert, "sap.ui.model.odata.v4.ODataListBinding: /SalesOrderList|", [
+					[, "change", {detailedReason : "AddVirtualContext", reason : "context"}],
+					[, "dataRequested"],
+					[, "change", {detailedReason : "RemoveVirtualContext", reason : "change"}],
+					[, "refresh", {reason : "refresh"}],
+					[, "change", {reason : "change"}],
+					[, "dataReceived", {data : {}}]
+				])
+				.expectRequest("SalesOrderList?$count=true&custom=foo"
+					+ "&$select=LifecycleStatus,Note,SalesOrderID"
+					+ "&$orderby=SalesOrderID&$filter=SalesOrderID ne '00'&$skip=0&$top=3", {
+					"@odata.count" : "3",
+					value : [
+						{LifecycleStatus : "N", Note : "Note 1", SalesOrderID : "01"},
+						{LifecycleStatus : "N", Note : "Note 2", SalesOrderID : "02"},
+						{LifecycleStatus : "N", Note : "Note 3", SalesOrderID : "03"}
+					]
+				})
+				.expectChange("note", ["Note 1", "Note 2", "Note 3"]);
+
+			// code under test (JIRA: CPOUI5ODATAV4-3528)
+			oBinding.sort(new Sorter({groupPaths : ["LifecycleStatus"], path : "SalesOrderID"}));
+			oBinding.setContext(oContext);
 
 			return that.waitForChanges(assert);
 		});
@@ -25396,6 +25431,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// regarding reading the grand total and setting the outdated flags. Support also "*" as a
 	// side-effects path.
 	// JIRA: CPOUI5ODATAV4-3481
+	//
+	// If an entity is created the outdated flag at the grand total is only set if there are filter,
+	// search, or custom query options, otherwise the grand total is requested together with the
+	// POST request. The outdated flag at the header context is always set.
+	// JIRA: CPOUI5ODATAV4-3482
 	[
 		"context refresh",
 		"requestSideEffects-combine calls and request grand total once",
@@ -25407,7 +25447,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		"requestSideEffects-LifecycleStatus",
 		"requestSideEffects-*",
 		"multiple setProperty in one $batch",
-		"multiple setProperty in multiple $batches"
+		"multiple setProperty in multiple $batches",
+		"create"
 	].forEach((sScenario) => {
 		// 0: no sorter, 1: sap.ui.model.Sorter, 2: $orderby
 		[0, 1, 2].forEach(function (iSorterCase) {
@@ -25828,6 +25869,44 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					fnRespond(),
 					this.waitForChanges(assert,
 						"if there are filters grand total is updated but still marked as outdated")
+				]);
+			} else if (sScenario === "create") {
+				// the outdated flags are updated before the new entry is added to the list
+				this.expectChangeIf(bWithFilter, "isOutdated", [true,,, true])
+					.expectChange("isOutdatedHeader", true)
+					.expectChange("isSelected", [,,,, undefined])
+					.expectChange("isExpanded", [,,,, undefined])
+					.expectChange("isTotal", [,,, false, true])
+					.expectChange("level", [,,, 1, 0])
+					.expectChange("lifecycleStatus", [,,, "", null])
+					.expectChange("grossAmount", [,,, "13", "6"])
+					.expectChange("currencyCode", [,,,, "EUR"])
+					.expectChange("salesOrderID", [,,, "", null])
+					.expectChange("isOutdated", bWithFilter ? [,,, undefined, true] : [,,,, undefined])
+					.expectRequest("#2 POST SalesOrderList?sap-client=123", {
+						payload : {GrossAmount : "13"}
+					}, {
+						CurrencyCode : "EUR",
+						GrossAmount : "13",
+						LifecycleStatus : "A",
+						SalesOrderID : "27"
+					})
+					.expectChange("lifecycleStatus", [,,, "A"])
+					.expectChange("salesOrderID", [,,, "27"]);
+				if (!bWithFilter) {
+					this.expectRequest("#2 " + sGrandTotalURL, {
+							value : [{CurrencyCode : "EUR", GrossAmount : "19"}]
+						})
+						.expectChange("grossAmount", ["19",,,, "19"])
+						.expectChange("isOutdated", [false,,,, false]);
+				}
+
+				await Promise.all([
+					// creation at start with grand total at top and at bottom is not supported, so use
+					// create at end
+					// code under test (JIRA: CPOUI5ODATAV4-3482)
+					oBinding.create({GrossAmount : "13"}, true, /*bAtEnd*/true).created(),
+					this.waitForChanges(assert, sScenario)
 				]);
 			}
 		});
@@ -29967,7 +30046,117 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
+	// Scenario: Create an active entity before the initial read is finished. The outdated flag at
+	// the grand total is set even if there are no filters, search, or custom query options.
+	// JIRA: CPOUI5ODATAV4-3482
+	QUnit.test("Data Aggregation: create before read is finished", async function (assert) {
+		const oModel = this.createAggregationModel({autoExpandSelect : true});
+		const sView = `
+<Text id="isOutdatedHeader" text="{= %{headerContext>@$ui5.context.isOutdated} }"/>
+<t:Table id="table" rows="{
+			path : '/BusinessPartners',
+			parameters : {
+				$$aggregation : {
+					aggregate : {
+						SalesAmount : {grandTotal : true}
+					},
+					grandTotalAtBottomOnly : true,
+					group : {
+						Id : {},
+						Region : {}
+					}
+				}
+			}
+		}" threshold="0">
+	<t:rowMode>
+		<trm:Fixed rowCount="3" fixedBottomRowCount="1"/>
+	</t:rowMode>
+	<Text text="{= %{@$ui5.context.isOutdated} }"/>
+	<Text text="{Id}"/>
+	<Text id="region" text="{Region}"/>
+	<Text text="{SalesAmount}"/>
+</t:Table>`;
+		let fnRespond;
+		this.expectChange("isOutdatedHeader")
+			.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesAmount)"
+				+ ",groupby((Id,Region),aggregate(SalesAmount))"
+				+ "/concat(aggregate($count as UI5__count),top(2)))",
+				new Promise(function (resolve) {
+					fnRespond = resolve.bind(null, {
+						value : [{
+							SalesAmount : "100",
+							"SalesAmount@odata.type" : "#Decimal"
+						},
+						{UI5__count : "1", "UI5__count@odata.type" : "#Decimal"},
+						{
+							Id : 1, // Edm.Int16
+							Region : "A",
+							SalesAmount : "100"
+						}]
+					});
+				}))
+			.expectChange("region", []);
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		const oListBinding = oTable.getBinding("rows");
+
+		this.expectChange("isOutdatedHeader", undefined);
+
+		this.oView.setModel(oModel, "headerContext")
+			.setBindingContext(oListBinding.getHeaderContext(), "headerContext");
+
+		await this.waitForChanges(assert, "headerContext");
+
+		this.expectChange("region", ["New"])
+			.expectChange("isOutdatedHeader", true)
+			.expectRequest("POST BusinessPartners", {
+				payload : {Region : "New"}
+			}, {
+				Id : 2, // Edm.Int16
+				Region : "New",
+				SalesAmount : "200"
+			});
+
+		// code under test (JIRA: CPOUI5ODATAV4-3482)
+		const oCreatedContext = oListBinding.create({Region : "New"}, true);
+
+		await Promise.all([
+			oCreatedContext.created(),
+			this.waitForChanges(assert,
+				"created at start; first read is not yet finished -> grand total gets outdated")
+		]);
+
+		checkTable("after created at start", assert, oTable, [
+			oCreatedContext
+		], [ // Outdated|Id|Region|SalesAmount
+			[, "2", "New", "200"]
+		], 10 + 1, /*bLengthFinal*/false);
+
+		this.expectChange("region", [, "A", null]);
+
+		fnRespond();
+
+		await this.waitForChanges(assert, "1st GET response");
+
+		checkTable("after 1st GET response", assert, oTable, [
+			oCreatedContext,
+			"/BusinessPartners(1)",
+			"/BusinessPartners()"
+		], [ // Outdated|Id|Region|SalesAmount
+			[, "2", "New", "200"],
+			[, "1", "A", "100"],
+			[true, "", "", "100"] // not yet up-to-date
+		], 3);
+	});
+
+	//*********************************************************************************************
 	// Scenario: Create at end is supported (JIRA: CPOUI5ODATAV4-3410)
+	//
+	// Automatically update grand total because there are no filter, search, or custom query
+	// options.
+	// JIRA: CPOUI5ODATAV4-3482
 	[false, true].forEach((bAtBottom) => {
 		const sTitle = "Data Aggregation: create at end; grand total at bottom: " + bAtBottom;
 
@@ -30026,6 +30215,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Id : 2, // Edm.Int16
 					SalesAmount : "200"
 				})
+				.expectRequest("BusinessPartners?$apply=aggregate(SalesAmount,Currency)", {
+					value : [{Currency : "EUR", SalesAmount : "300"}]
+				})
 				.expectChange("id", bAtBottom ? [, "2"] : [,, "2"]);
 
 			// code under test (JIRA: CPOUI5ODATAV4-3410)
@@ -30049,10 +30241,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			];
 			checkTable("after create at end", assert, oTable, aExpectedContexts, [
 				// Expanded|Total|level|Id|SalesAmount|Currency
-				bAtBottom || [true, true, 0, "", "123", "EUR"],
+				bAtBottom || [true, true, 0, "", "300", "EUR"],
 				[, false, 1, "1", "100", "EUR"],
 				[, false, 1, "2", "200", "EUR"],
-				bAtBottom && [true, true, 0, "", "123", "EUR"]
+				bAtBottom && [true, true, 0, "", "300", "EUR"]
 			]);
 		});
 	});

@@ -4469,6 +4469,29 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("readGrandTotal: no grand total available yet", function () {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			$leafLevelAggregated : false,
+			aggregate : {
+				bar : {
+					grandTotal : true
+				}
+			}
+		});
+		oCache.aElements.$byPredicate = {}; // no grand total available yet
+		this.mock(_AggregationHelper).expects("hasGrandTotal")
+			.withExactArgs(sinon.match.same(oCache.oAggregation.aggregate))
+			.returns(true);
+		this.mock(oCache).expects("setGrandTotalOutdated").withExactArgs(true);
+		this.mock(_AggregationHelper).expects("buildApply").never();
+		this.mock(this.oRequestor).expects("buildQueryString").never();
+		this.mock(this.oRequestor).expects("request").never();
+
+		// code under test
+		_AggregationCache.prototype.readGrandTotal.call(oCache);
+	});
+
+	//*********************************************************************************************
 	QUnit.test("readGrandTotal: grand total outdated, full refresh needed", function () {
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
 			$leafLevelAggregated : false,
@@ -4610,13 +4633,55 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("setGrandTotalOutdated: without grand total", function () {
+	QUnit.test("setGrandTotalOutdated: no grand total Promise", function () {
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {},
 			{hierarchyQualifier : "X"});
 		this.mock(_Helper).expects("updateAll").never();
 
 		// code under test
 		oCache.setGrandTotalOutdated(true);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("setGrandTotalOutdated: with grand total Promise, but bOutdated=false", function () {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {},
+			{hierarchyQualifier : "X"});
+		oCache.oGrandTotalPromise = {then : mustBeMocked};
+		this.mock(_Helper).expects("updateAll").never();
+
+		// code under test
+		oCache.setGrandTotalOutdated(false);
+	});
+
+	//*********************************************************************************************
+	[false, true].forEach((bWithCopy) => {
+		QUnit.test("setGrandTotalOutdated: wait for grand total, with copy=" + bWithCopy, function () {
+			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+				aggregate : {
+					bar : {
+						grandTotal : true
+					}
+				}
+			});
+			oCache.oGrandTotalPromise = Promise.resolve("~oGrandTotal~");
+			const oHelperMock = this.mock(_Helper);
+			oHelperMock.expects("updateAll")
+				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "()", "~oGrandTotal~",
+					{"@$ui5.context.isOutdated" : true});
+			oHelperMock.expects("getPrivateAnnotation").withExactArgs("~oGrandTotal~", "copy")
+				.returns(bWithCopy ? "~oGrandTotalCopy~" : undefined);
+			oHelperMock.expects("getPrivateAnnotation").exactly(bWithCopy ? 1 : 0)
+				.withExactArgs("~oGrandTotalCopy~", "predicate")
+				.returns("~sPredicateGrandTotalCopy~");
+			oHelperMock.expects("updateAll").exactly(bWithCopy ? 1 : 0)
+				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "~sPredicateGrandTotalCopy~",
+					"~oGrandTotalCopy~", {"@$ui5.context.isOutdated" : true});
+
+			// code under test
+			oCache.setGrandTotalOutdated(true);
+
+			return oCache.oGrandTotalPromise;
+		});
 	});
 
 	//*********************************************************************************************
@@ -6316,37 +6381,66 @@ sap.ui.define([
 
 				// check submit callback
 				assert.strictEqual(fnSubmitCallback.callCount, 0);
-				if (!oCountPromise) {
-					assert.strictEqual(fnNewSubmitCallback, fnSubmitCallback);
-				} else {
-					assert.notStrictEqual(fnNewSubmitCallback, fnSubmitCallback);
-					let oReadCountExpectation = oCacheMock.expects("readCount")
-						.withExactArgs("~oGroupLock~")
-						.returns(undefined); // no count needs to be read
+				assert.notStrictEqual(fnNewSubmitCallback, fnSubmitCallback);
 
-					// code under test
-					fnNewSubmitCallback();
+				const oModelImplementation = {
+					reportError : mustBeMocked
+				};
+				const oModelImplementationMock = that.mock(oModelImplementation);
+				oModelImplementationMock.expects("reportError").never();
+				const oModelInterface = {
+					getReporter : () => oModelImplementation.reportError
+				};
+				const oRequestorMock = that.mock(oCache.oRequestor);
+				oRequestorMock.expects("getModelInterface").withExactArgs().returns(oModelInterface);
+				let oReadCountExpectation = oCacheMock.expects("readCount")
+					.exactly(oCountPromise ? 1 : 0)
+					.withExactArgs("~oGroupLock~")
+					.returns(undefined); // no count needs to be read
+				let oReadGrandTotalExpectation = oCacheMock.expects("readGrandTotal")
+					.withExactArgs("~oGroupLock~")
+					.returns(undefined); // no grand total needs to be read
 
-					assert.ok(fnSubmitCallback.calledOnceWithExactly());
-					assert.ok(oReadCountExpectation.calledBefore(fnSubmitCallback));
-					fnSubmitCallback.resetHistory();
+				// code under test
+				fnNewSubmitCallback();
 
-					const oReadCountResult = {catch : mustBeMocked};
-					oReadCountExpectation = oCacheMock.expects("readCount")
-						.withExactArgs("~oGroupLock~").returns(oReadCountResult);
-					const oModelInterface = {getReporter : mustBeMocked};
-					that.mock(oCache.oRequestor).expects("getModelInterface").withExactArgs()
-						.returns(oModelInterface);
-					that.mock(oModelInterface).expects("getReporter").withExactArgs()
-						.returns("~fnReporter~");
-					that.mock(oReadCountResult).expects("catch").withExactArgs("~fnReporter~");
-
-					// code under test - count needs to be read
-					fnNewSubmitCallback();
-
-					assert.ok(fnSubmitCallback.calledOnceWithExactly());
-					assert.ok(oReadCountExpectation.calledBefore(fnSubmitCallback));
+				assert.ok(fnSubmitCallback.calledOnceWithExactly());
+				if (oCountPromise) {
+					sinon.assert.callOrder(oReadCountExpectation, fnSubmitCallback);
 				}
+				sinon.assert.callOrder(oReadGrandTotalExpectation, fnSubmitCallback);
+				fnSubmitCallback.resetHistory();
+
+				oRequestorMock.expects("getModelInterface").withExactArgs().returns(oModelInterface);
+				const oReadCountError = new Error("~readCountError~");
+				oModelImplementationMock.expects("reportError").exactly(oCountPromise ? 1 : 0)
+					.withExactArgs(sinon.match.same(oReadCountError));
+				const oReadCountPromise = oCountPromise && Promise.reject(oReadCountError);
+				oReadCountExpectation = oCacheMock.expects("readCount")
+					.exactly(oCountPromise ? 1 : 0)
+					.withExactArgs("~oGroupLock~")
+					.returns(oReadCountPromise);
+				const oReadGrandTotalError = new Error("~readGrandTotalError~");
+				oModelImplementationMock.expects("reportError")
+					.withExactArgs(sinon.match.same(oReadGrandTotalError));
+				const oReadGrandTotalPromise = Promise.reject(oReadGrandTotalError);
+				oReadGrandTotalExpectation = oCacheMock.expects("readGrandTotal")
+					.withExactArgs("~oGroupLock~")
+					.returns(oReadGrandTotalPromise);
+
+				// code under test - count / grand total need to be read
+				fnNewSubmitCallback();
+
+				assert.ok(fnSubmitCallback.calledOnceWithExactly());
+				if (oCountPromise) {
+					sinon.assert.callOrder(oReadCountExpectation, fnSubmitCallback);
+				}
+				sinon.assert.callOrder(oReadGrandTotalExpectation, fnSubmitCallback);
+
+				await Promise.all([
+					oReadCountPromise?.catch(() => {}),
+					oReadGrandTotalPromise.catch(() => {})
+				]);
 			});
 		});
 							});
@@ -6405,11 +6499,15 @@ sap.ui.define([
 					sinon.match.same(oEntityData));
 			const oPostBody = {};
 			let fnCancelCallback;
+			const fnSubmitCallback = sinon.spy();
+			let fnNewSubmitCallback;
+			this.mock(oCache).expects("readCount").never();
 			this.mock(oCache.oFirstLevel).expects("create")
 				.withExactArgs("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
 					"~sTransientPredicate~", {bar : "~bar~", foo : "~foo~"}, false,
-					"~fnErrorCallback~", "~fnSubmitCallback~", sinon.match.func, sinon.match.func)
+					"~fnErrorCallback~", sinon.match.func, sinon.match.func, sinon.match.func)
 				.callsFake(function () {
+					fnNewSubmitCallback = arguments[7];
 					fnCancelCallback = arguments[8];
 					_Helper.setPrivateAnnotation(oEntityData, "postBody", oPostBody);
 					return new SyncPromise(function (resolve) {
@@ -6470,7 +6568,7 @@ sap.ui.define([
 			// code under test
 			const oResult = oCache.create("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
 				"~sTransientPredicate~", oEntityData, /*bAtEndOfCreated*/false, "~fnErrorCallback~",
-				"~fnSubmitCallback~");
+				fnSubmitCallback);
 
 			assert.strictEqual(oExpandExpectation.called, bExpandTreeState, "called synchronously");
 			assert.deepEqual(oPostBody, bCreateRoot ? {} : {"myParent@odata.bind" : "~relativeUrl~"});
@@ -6504,6 +6602,27 @@ sap.ui.define([
 				fnCancelCallback();
 
 				assert.deepEqual(oCache.aElements, aExpectedElements, "unchanged");
+
+				// check submit callback
+				assert.strictEqual(fnSubmitCallback.callCount, 0);
+				assert.notStrictEqual(fnNewSubmitCallback, fnSubmitCallback);
+
+				const oModelInterface = {getReporter : mustBeMocked};
+				that.mock(oCache.oRequestor).expects("getModelInterface").withExactArgs()
+					.returns(oModelInterface);
+				that.mock(oModelInterface).expects("getReporter").withExactArgs()
+					.returns("~fnReporter~");
+
+				const oReadGrandTotalExpectation = that.mock(oCache).expects("readGrandTotal")
+					.withExactArgs("~oGroupLock~")
+					.returns(undefined); // no grand total needs to be read
+
+				// code under test
+				fnNewSubmitCallback();
+
+				assert.ok(fnSubmitCallback.calledOnceWithExactly());
+				sinon.assert.callOrder(oReadGrandTotalExpectation, fnSubmitCallback);
+				fnSubmitCallback.resetHistory();
 			});
 		});
 				});

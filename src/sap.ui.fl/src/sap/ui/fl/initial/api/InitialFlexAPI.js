@@ -4,19 +4,13 @@
 
 sap.ui.define([
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
-	"sap/ui/fl/initial/_internal/Loader",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
-	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/requireAsync",
 	"sap/ui/fl/Utils"
 ], function(
 	FlexInfoSession,
-	Loader,
-	ManifestUtils,
 	Settings,
-	StorageUtils,
 	Layer,
 	requireAsync,
 	Utils
@@ -95,10 +89,11 @@ sap.ui.define([
 			aComplexSelectors = mPropertyBag.complexSelectors;
 		}
 		const oAppComponent = Utils.getAppComponentForSelector(aComplexSelectors[0].selector);
-		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
-		const oFlexData = Loader.getCachedFlexData(sFlexReference).data;
-		// The FlexState is only available if there are changes. Without changes there is no need to check further
-		if (!StorageUtils.isStorageResponseFilled(oFlexData?.changes)) {
+		// Probe (does not trigger loading): if the apply package's FlexState was never loaded
+		// or is not initialized for this component, no dirty FlexObjects can exist, so we can
+		// early return without pulling in the apply package on minimal-footprint startup paths.
+		const FlexState = sap.ui.require("sap/ui/fl/apply/_internal/flexState/FlexState");
+		if (!FlexState?.isInitialized({ control: oAppComponent })) {
 			return undefined;
 		}
 		const FlexObjectState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexObjectState");

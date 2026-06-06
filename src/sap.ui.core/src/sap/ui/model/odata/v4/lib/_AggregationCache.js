@@ -532,17 +532,20 @@ sap.ui.define([
 		_Helper.addByPath(this.mPostRequests, sTransientPredicate, oEntityData);
 		let iIndex = aElements.indexOf(oParentNode) + 1; // 0 w/o oParentNode :-)
 		if (this.oCountPromise) {
-			const fnOldSubmitCallback = fnSubmitCallback;
 			// create a new count promise early, that a synchronous call to
 			// oHeaderContext.requestProperty("$count") waits until the creation was successful or
 			// has been cancelled; cancellation of the creation will restore the old count promise
 			this.createCountPromise(true);
-			fnSubmitCallback = () => {
-				this.readCount(oGroupLock)?.catch(
-					this.oRequestor.getModelInterface().getReporter());
-				fnOldSubmitCallback();
-			};
 		}
+		const fnOldSubmitCallback = fnSubmitCallback;
+		fnSubmitCallback = () => {
+			const fnReporter = this.oRequestor.getModelInterface().getReporter();
+			if (this.oCountPromise) {
+				this.readCount(oGroupLock)?.catch(fnReporter);
+			}
+			this.readGrandTotal(oGroupLock)?.catch(fnReporter);
+			fnOldSubmitCallback();
+		};
 		const oPromise = oCache.create(oGroupLock, oPostPathPromise, sPath, sTransientPredicate,
 			oEntityData, bAtEndOfCreated, fnErrorCallback, fnSubmitCallback, /*onCancel*/() => {
 				_Helper.removeByPath(this.mPostRequests, sTransientPredicate, oEntityData);
@@ -2266,6 +2269,11 @@ sap.ui.define([
 			throw new Error("Leaves must not be aggregated");
 		}
 		const oGrandTotal = this.aElements.$byPredicate["()"];
+		if (!oGrandTotal) {
+			this.setGrandTotalOutdated(true);
+			return;
+		}
+
 		if (oGrandTotal["@$ui5.context.isOutdated"]) {
 			return; // don't read grand total, a full refresh is needed
 		}
@@ -2710,15 +2718,15 @@ sap.ui.define([
 	};
 
 	/**
-	 * Sets the outdated state of the grand total row, if there is any.
+	 * Sets the outdated state of the grand total row, if there is any. If the grand total request
+	 * is pending, the outdated state is set just after the grand total is available.
 	 *
 	 * @param {boolean} bOutdated - Whether the grand total row is outdated
 	 *
 	 * @private
 	 */
 	_AggregationCache.prototype.setGrandTotalOutdated = function (bOutdated) {
-		const oGrandTotal = this.aElements.$byPredicate["()"];
-		if (oGrandTotal) {
+		const fnUpdate = (oGrandTotal) => {
 			_Helper.updateAll(this.mChangeListeners, "()", oGrandTotal,
 				{"@$ui5.context.isOutdated" : bOutdated});
 			// Update also the copy of the grand total if it exists
@@ -2728,6 +2736,16 @@ sap.ui.define([
 					_Helper.getPrivateAnnotation(oGrandTotalCopy, "predicate"), oGrandTotalCopy,
 					{"@$ui5.context.isOutdated" : bOutdated});
 			}
+		};
+		const oGrandTotal = this.aElements.$byPredicate["()"];
+		if (oGrandTotal) {
+			fnUpdate(oGrandTotal);
+		} else if (bOutdated) {
+			// the grand total is not yet added to this.aElements.$byPredicate when the grand total
+			// Promise resolves, so update the grand total object itself; multiple concurrent calls
+			// produce the expected result, that means if bOutdated is true at least once, the grand
+			// total is outdated; the oGrandTotalPromise never rejects, no error handling needed
+			this.oGrandTotalPromise?.then(fnUpdate);
 		}
 	};
 

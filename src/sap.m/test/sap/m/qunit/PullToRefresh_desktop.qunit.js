@@ -137,6 +137,25 @@ sap.ui.define([
 
 		QUnit.module("Accessibility");
 
+		QUnit.test("Aria-live is on text span, not on root element (ACC-264.1)", async function(assert) {
+			var oPullToRefresh = new PullToRefresh();
+			oPullToRefresh.placeAt("content");
+			await nextUIUpdate();
+
+			assert.strictEqual(
+				oPullToRefresh.$().find(".sapMPullDownText").attr("aria-live"),
+				"assertive",
+				"Text span has aria-live='assertive' to announce state changes"
+			);
+			assert.strictEqual(
+				oPullToRefresh.$().attr("aria-live"),
+				undefined,
+				"Root element has no aria-live to prevent double announcement of 'Refresh' on Enter"
+			);
+
+			oPullToRefresh.destroy();
+		});
+
 		QUnit.test("Aria attributes", async function(assert) {
 			// Arrange
 			var oPullToRefresh = new PullToRefresh(),

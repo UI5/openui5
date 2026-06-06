@@ -39,6 +39,7 @@ html.sap-desktop .sapMSelectListItemBase.sapMSelectListItemBasePressed:focus {
 }
 
 /* focus */
+.sapMSelectListItemBase:focus-visible::after,
 html.sap-desktop .sapMSelectListItemBase:focus::after,
 .sapMSltPicker-CTX .sapMSelectListItemBaseSelected::after,
 .sapMComboBoxBasePicker-CTX .sapMSelectListItemBaseSelected::after {
@@ -55,6 +56,7 @@ html.sap-desktop .sapMSelectListItemBase:focus::after,
 
 .sapMSltPicker-CTX .sapMSelectListItemBaseSelected,
 .sapMComboBoxBasePicker-CTX .sapMSelectListItemBaseSelected,
+.sapMSelectListItemBase:focus-visible,
 html.sap-desktop .sapMSelectListItemBase:focus {
 	outline: none;
 }

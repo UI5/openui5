@@ -1036,7 +1036,8 @@ sap.ui.define([
 			sGroupId = "$inactive." + sGroupId;
 		} else if (!oAggregation?.hierarchyQualifier) {
 			this.iActiveContexts += 1;
-			this.setOutdated(true);
+			this.setOutdated(/*bForce*/false, /*aPaths*/null, /*bNoRequest*/false,
+				/*bForceHeader*/true);
 		}
 
 		if (this.bFirstCreateAtEnd === undefined) {
@@ -1914,9 +1915,10 @@ sap.ui.define([
 				if (!that.bLengthFinal && that.aContexts.length === that.iCreatedContexts
 						&& that.oHeaderContext.isOutdated() !== undefined) {
 					if (that.iActiveContexts > 0) {
-						// some persisted entries are still in the creation area, so the grand total
-						// may still be outdated
-						that.setOutdated(true);
+						// some persisted entries are still in the creation area, so the header
+						// context has to be marked as outdated and maybe also the grand total
+						that.setOutdated(/*bForce*/false, /*aPaths*/null, /*bNoRequest*/false,
+							/*bForceHeader*/true);
 					} else {
 						// entries and grand total are in sync again
 						that.oHeaderContext.setOutdated(false);
@@ -3269,6 +3271,29 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns a sorted list of all current sorters' group paths. Without autoExpandSelect the group
+	 * paths are ignored.
+	 *
+	 * @returns {string[]}
+	 *   The current group paths
+	 *
+	 * @private
+	 */
+	ODataListBinding.prototype.getGroupPaths = function () {
+		if (!this.oModel.bAutoExpandSelect) {
+			return [];
+		}
+		const aGroupPaths = [];
+		this.aSorters.forEach((oSorter) => {
+			const aPaths = oSorter.getGroupPaths();
+			if (aPaths) {
+				aGroupPaths.push(...aPaths);
+			}
+		});
+		return aGroupPaths.sort();
+	};
+
+	/**
 	 * Returns the header context which allows binding to <code>$count</code>,
 	 * <code>@$ui5.context.isOutdated</code>, or <code>@$ui5.context.isSelected</code>.
 	 *
@@ -3501,20 +3526,12 @@ sap.ui.define([
 	 */
 	ODataListBinding.prototype.getQueryOptionsFromParameters = function () {
 		let mQueryOptions = this.mQueryOptions;
-		if (this.oModel.bAutoExpandSelect) {
-			const aGroupPaths = [];
-			this.aSorters.forEach((oSorter) => {
-				const aPaths = oSorter.getGroupPaths();
-				if (aPaths) {
-					aGroupPaths.push(...aPaths);
-				}
-			});
-			if (aGroupPaths.length) {
-				mQueryOptions = {...mQueryOptions};
-				// avoid that this.mQueryOptions.$select is modified
-				mQueryOptions.$select &&= mQueryOptions.$select.slice();
-				_Helper.addToSelect(mQueryOptions, aGroupPaths);
-			}
+		const aGroupPaths = this.getGroupPaths();
+		if (aGroupPaths.length) {
+			mQueryOptions = {...mQueryOptions};
+			// avoid that this.mQueryOptions.$select is modified
+			mQueryOptions.$select &&= mQueryOptions.$select.slice();
+			_Helper.addToSelect(mQueryOptions, aGroupPaths);
 		}
 
 		return mQueryOptions;
@@ -4884,8 +4901,9 @@ sap.ui.define([
 	 * @param {string} [sGroupId]
 	 *   The group ID to be used for refresh; used only in case <code>bDrop === false</code>
 	 * @param {boolean} [bRestartAutoExpandSelect]
-	 *   Whether to restart auto-$expand/$select; requires <code>sChangeReason</code>. Ignored for
-	 *   an unresolved binding.
+	 *   Whether to restart auto-$expand/$select; requires <code>sChangeReason</code>. For an
+	 *   unresolved binding, the state is prepared but the change event is deferred until the
+	 *   binding becomes resolved.
 	 *
 	 * @private
 	 */
@@ -4940,14 +4958,17 @@ sap.ui.define([
 		// Note: the binding's length can be greater than this.iMaxLength due to iCreatedContexts!
 		this.iMaxLength = Infinity;
 		this.bLengthFinal = false;
-		if (!this.isResolved()) {
-			return;
-		}
-		if (bRestartAutoExpandSelect && this.oModel.bAutoExpandSelect) {
+		if (bRestartAutoExpandSelect) {
 			this.mAggregatedQueryOptions = {};
 			this.bAggregatedQueryOptionsInitial = true;
 			this.mCanUseCachePromiseByChildPath = {};
 			this.sChangeReason = "AddVirtualContext";
+		}
+		if (!this.isResolved()) {
+			return; // skip events
+		}
+
+		if (bRestartAutoExpandSelect) {
 			this.sChangeReasonAfterRemoveVirtualContext = sChangeReason;
 			this._fireChange({
 				detailedReason : "AddVirtualContext",
@@ -5346,13 +5367,15 @@ sap.ui.define([
 	 * @param {boolean} [bNoRequest]
 	 *   Whether the properties given in <code>aPaths</code> are updated without sending a PATCH
 	 *   request to the server; if <code>true</code>, <code>aPaths</code> is mandatory
+	 * @param {boolean} [bForceHeader]
+	 *   Whether to force setting the outdated flag at the header context
 	 * @throws {Error}
 	 *   If <code>bNoRequest</code> is set and the header context gets outdated or the property with
 	 *   the given path contributes to the grand total
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.setOutdated = function (bForce, aPaths, bNoRequest) {
+	ODataListBinding.prototype.setOutdated = function (bForce, aPaths, bNoRequest, bForceHeader) {
 		if (_Helper.isDataAggregation(this.mParameters)) {
 			const oAggregation = this.mParameters.$$aggregation;
 			const bGrandTotalOutdated = bForce
@@ -5360,7 +5383,8 @@ sap.ui.define([
 				|| oAggregation.search
 				|| Object.keys(this.mParameters).some((sKey) => sKey[0] !== "$")
 				|| this.isFilteredBy(aPaths);
-			const bHeaderContextOutdated = bGrandTotalOutdated || this.isSortedBy(aPaths);
+			const bHeaderContextOutdated = bForceHeader || bGrandTotalOutdated
+				|| this.isSortedBy(aPaths);
 			if (bNoRequest
 					&& (bHeaderContextOutdated
 					|| _AggregationHelper.isUsedForGrandTotal(aPaths, oAggregation.aggregate))) {
@@ -5465,15 +5489,15 @@ sap.ui.define([
 			throw new Error("Cannot sort due to pending changes");
 		}
 
+		const aOldGroupPaths = this.getGroupPaths();
 		this.aSorters = aSorters;
 		this.oQueryOptionsPromise = undefined;
 		this.setResetViaSideEffects(true);
 
-		const bRestartAutoExpandSelect = aSorters.some(
-			(oSorter) => oSorter.getGroupPaths()?.length);
+		const bRestartAutoExpandSelect = aOldGroupPaths.join() !== this.getGroupPaths().join();
 		if (this.isRootBindingSuspended()) {
 			this.setResumeChangeReason(ChangeReason.Sort);
-			if (bRestartAutoExpandSelect && this.oModel.bAutoExpandSelect) {
+			if (bRestartAutoExpandSelect) {
 				this.sChangeReason = "AddVirtualContext";
 			}
 			return this;
