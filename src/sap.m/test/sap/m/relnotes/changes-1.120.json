@@ -1501,5 +1501,25 @@
         "text": " sap.m.Text: Skip unstable test in Chrome"
       }
     ]
+  },
+  "1.120.46": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "9e8abcf449d19e00bf6d023f0157ab65925a01b4",
+        "type": "FIX",
+        "text": " We've now fixed the scroll arrow buttons not working when a single item is larger than the HeaderContainer"
+      },
+      {
+        "id": "2ea8e403d98fde14ca0d25efd0adc1deb2a9361c",
+        "type": "FIX",
+        "text": " We've now fixed the issue of truncating characters in the GenericTile header section by removing the usage of sap.m.Text deprecated method"
+      },
+      {
+        "id": "913c87abcbef6c989a299cc2704de60310f1d5a4",
+        "type": "FIX",
+        "text": " m.Table: avoid scroll jump when focus is forwarded on mouse click"
+      }
+    ]
   }
 }

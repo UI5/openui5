@@ -275,5 +275,20 @@
         "text": " sap.ui.mdc.Table: Ensure rebind before render on change appliance"
       }
     ]
+  },
+  "1.120.46": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "c318f85ad7ae310ba5c32253638d1c87231c24aa",
+        "type": "FIX",
+        "text": "p13n.ChartItemPanel: fix acc issues"
+      },
+      {
+        "id": "d28de81d82862b70c39383f2375bbf037ceaa103",
+        "type": "FIX",
+        "text": " ValueHelp: typeahed used value not mapping"
+      }
+    ]
   }
 }

@@ -95,5 +95,15 @@
         "text": " Table: Remove renderWhitespace restriction"
       }
     ]
+  },
+  "1.120.46": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "07ddef7f6322bf64fe47d29aed1bc2b0098c2f5d",
+        "type": "FIX",
+        "text": " ui.Table: Removed column header associations and count information on cell level"
+      }
+    ]
   }
 }
