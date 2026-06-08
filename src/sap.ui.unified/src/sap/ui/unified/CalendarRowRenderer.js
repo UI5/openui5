@@ -14,7 +14,8 @@ sap.ui.define([
 	'sap/ui/unified/calendar/RecurrenceUtils',
 	'sap/base/Log',
 	// side effect: required by RenderManager#icon
-	'sap/ui/core/IconPool'
+	'sap/ui/core/IconPool',
+	'sap/ui/core/library'
 ], function(
 	Element,
 	Library,
@@ -25,29 +26,34 @@ sap.ui.define([
 	InvisibleText,
 	UI5Date,
 	RecurrenceUtils,
-	Log
+	Log,
+	IconPool,
+	coreLibrary
 ) {
 	"use strict";
 
 
 // shortcut for sap.ui.unified.CalendarDayType
-var CalendarDayType = library.CalendarDayType;
+const CalendarDayType = library.CalendarDayType;
 
 // shortcut for sap.ui.unified.CalendarIntervalType
-var CalendarIntervalType = library.CalendarIntervalType;
+const CalendarIntervalType = library.CalendarIntervalType;
 
 // shortcut for sap.ui.unified.CalendarAppointmentVisualization
-var CalendarAppointmentVisualization = library.CalendarAppointmentVisualization;
+const CalendarAppointmentVisualization = library.CalendarAppointmentVisualization;
 
 // shortcut for sap.ui.unified.CalendarAppointmentHeight
-var CalendarAppointmentHeight = library.CalendarAppointmentHeight;
+const CalendarAppointmentHeight = library.CalendarAppointmentHeight;
 /**
  * CalendarRow renderer.
  * @namespace
  */
-var CalendarRowRenderer = {
+const CalendarRowRenderer = {
 	apiVersion: 2
 };
+
+// shortcut for sap.ui.core.aria.HasPopup
+const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 /**
  * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -458,6 +464,11 @@ CalendarRowRenderer.renderIntervalHeader = function(oRm, oRow, oIntervalHeader, 
 
 	oRm.accessibilityState(oIntervalHeader.appointment, mAccProps);
 
+	var sAriaHasPopup = oIntervalHeader.appointment.getAriaHasPopup();
+	if (sAriaHasPopup !== AriaHasPopup.None) {
+		oRm.attr("aria-haspopup", sAriaHasPopup.toLowerCase());
+	}
+
 	oRm.openEnd(); //div element
 	oRm.openStart("div");
 
@@ -527,21 +538,21 @@ CalendarRowRenderer.renderIntervalHeader = function(oRm, oRow, oIntervalHeader, 
 
 CalendarRowRenderer.renderAppointment = function(oRm, oRow, oAppointmentInfo, aTypes, bRelativePos){
 
-	var oAppointment = oAppointmentInfo.appointment;
-	var sTooltip = oAppointment.getTooltip_AsString();
-	var sType = oAppointment.getType();
-	var sColor = oAppointment.getColor();
-	var sTitle = oAppointment.getTitle();
-	var sText = oAppointment.getText();
-	var sDescription = oAppointment.getDescription();
-	var sIcon = oAppointment.getIcon();
-	var sId = oAppointment.getId();
-	var bReducedHeight = oRow._getAppointmentReducedHeight(oAppointmentInfo);
-	var bAppointmentSelected = oAppointment.getSelected();
-	var bHasCustomContent = !!oAppointment.getCustomContent().length;
+	const oAppointment = oAppointmentInfo.appointment;
+	const sTooltip = oAppointment.getTooltip_AsString();
+	const sType = oAppointment.getType();
+	const sColor = oAppointment.getColor();
+	const sTitle = oAppointment.getTitle();
+	const sText = oAppointment.getText();
+	const sDescription = oAppointment.getDescription();
+	const sIcon = oAppointment.getIcon();
+	const sId = oAppointment.getId();
+	const bReducedHeight = oRow._getAppointmentReducedHeight(oAppointmentInfo);
+	const bAppointmentSelected = oAppointment.getSelected();
+	const bHasCustomContent = !!oAppointment.getCustomContent().length;
+	const sAriaHasPopup = oAppointment.getAriaHasPopup();
 
-	var aLabelledByIds = [InvisibleText.getStaticId("sap.m", "ACC_CTR_TYPE_LISTITEM"), InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT")];
-
+	let aLabelledByIds = [InvisibleText.getStaticId("sap.m", "ACC_CTR_TYPE_LISTITEM"), InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT")];
 	if (sTitle && !bHasCustomContent) {
 		aLabelledByIds.push(`${sId}-Title`);
 	}
@@ -623,6 +634,10 @@ CalendarRowRenderer.renderAppointment = function(oRm, oRow, oAppointmentInfo, aT
 		} else {
 			oRm.style("border-left-color", sColor);
 		}
+	}
+
+	if (sAriaHasPopup !== AriaHasPopup.None) {
+		oRm.attr("aria-haspopup", sAriaHasPopup.toLowerCase());
 	}
 
 	oRm.accessibilityState(oAppointment, mAccProps);

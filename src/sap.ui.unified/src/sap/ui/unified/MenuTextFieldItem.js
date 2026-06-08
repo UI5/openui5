@@ -234,7 +234,9 @@ sap.ui.define([
 
 
 	MenuTextFieldItem.prototype.onkeydown = function(oEvent){
-		oEvent.stopPropagation(); //Avoid bubbling key events to the Menu -> Events are only selectively forwarded
+		if (oEvent.key !== "Enter") {
+			oEvent.stopPropagation(); //Avoid bubbling key events to the Menu -> Events are only selectively forwarded
+		}
 	};
 
 
@@ -254,9 +256,8 @@ sap.ui.define([
 		}
 		var sValue = this.$("tf").val();
 		this.setValue(sValue);
-		this.getParent().selectItem(this);
-		oEvent.preventDefault();
-		oEvent.stopPropagation();
+		// selectItem and event cancellation are handled by Menu.onkeyup (which guards
+		// against stray keyups via _sapSelectOnKeyDown)
 	};
 
 

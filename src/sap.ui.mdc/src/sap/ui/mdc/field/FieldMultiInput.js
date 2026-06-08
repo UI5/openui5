@@ -200,10 +200,19 @@ sap.ui.define([
 		}
 
 		if (!bClipboardBusy) {
-			const aSelectedTokens = this.getSelectedTokens();
+			let aSelectedTokens = this.getSelectedTokens();
+
+			if (aSelectedTokens.length === 0) {
+				const oFocusedToken = this._getFocusedToken();
+
+				if (oFocusedToken) {
+					aSelectedTokens = [oFocusedToken];
+				}
+			}
+
 			if (aSelectedTokens.length === 0) {
 				// no token is selected, but a normal character might be selected and will be copied
-				return;
+				return false;
 			}
 
 			bClipboardBusy = true;

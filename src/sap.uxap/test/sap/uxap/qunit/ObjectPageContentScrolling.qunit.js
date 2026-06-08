@@ -395,32 +395,33 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 			aSections = oObjectPage.getSections(),
 			oLastSection = aSections[aSections.length - 1],
 			oExpandButton,
-			done = assert.async();
+			iLastSectionScrollTop;
 
 		assert.expect(2);
 
-		oObjectPage.placeAt('qunit-fixture');
+		await helpers.renderObject(oObjectPage);
+
+		oObjectPage.scrollToSection(oLastSection.getId(), 0);
+		iLastSectionScrollTop = oObjectPage._computeScrollPosition(oLastSection);
+		oObjectPage._onScroll({target: {scrollTop: iLastSectionScrollTop}});
 		await nextUIUpdate();
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			oObjectPage.scrollToSection(oLastSection.getId(), 0);
+		// Ensure deterministic precondition for the expand action.
+		if (oObjectPage._bHeaderExpanded) {
+			oObjectPage._toggleHeader(true);
+			await nextUIUpdate();
+		}
 
-			setTimeout(function () {
-				// Assert
-				assert.strictEqual(oObjectPage._bHeaderExpanded, false, "Header is snapped after scroll");
+		// Assert
+		assert.strictEqual(oObjectPage._bHeaderExpanded, false, "Header is snapped after scroll");
 
-				// Act
-				oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
-				oExpandButton.firePress();
+		// Act
+		oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
+		oExpandButton.firePress();
+		await nextUIUpdate();
 
-				// Check
-				setTimeout(function () {
-					assert.strictEqual(oObjectPage._bHeaderExpanded, true, "Header is expanded after pressing expand button");
-					done();
-				}, 1000);
-			}, 500);
-
-		});
+		// Check
+		assert.strictEqual(oObjectPage._bHeaderExpanded, true, "Header is expanded after pressing expand button");
 	});
 
 	QUnit.test("Header expanded in title-area remains expanded upon switching tabs", async function(assert) {
@@ -497,33 +498,38 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		});
 	});
 
-	QUnit.test("Scrolls to correct Section when header is expanded", async function(assert) {
+	QUnit.test("Scrolls to correct position when header is expanded", async function(assert) {
 		// Arrange
 		var oObjectPage = helpers.generateObjectPageWithDynamicHeaderTitle(),
 			aSections = oObjectPage.getSections(),
 			oSection = aSections[1],
 			oExpandButton,
-			done = assert.async();
+			iExpectedScrollTop,
+			iActualScrollTop;
 
 		assert.expect(1);
 
 		oObjectPage.setSelectedSection(aSections[3]);
-		oObjectPage.placeAt('qunit-fixture');
+		await helpers.renderObject(oObjectPage);
+
+		// Act - expand header and scroll to target section
+		oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
+		oExpandButton.firePress();
 		await nextUIUpdate();
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			// Act - expand header and scroll to last Section
-			oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
-			oExpandButton.firePress();
-			oObjectPage.scrollToSection(oSection.getId(), 0);
+		if (!oObjectPage._bHeaderExpanded) {
+			oObjectPage._toggleHeader(false);
+			await nextUIUpdate();
+		}
 
-			setTimeout(function () {
-				// Assert - check the delta between current scroll position and the top position of the scrolled to Section, due to rounding diffs (5px diff is OK)
-				assert.equal(oObjectPage.getSelectedSection(), oSection.getId(), "Scroll position is correct");
-				done();
-			}, 1000);
+		oObjectPage.scrollToSection(oSection.getId(), 0);
+		iExpectedScrollTop = oObjectPage._computeScrollPosition(oSection);
+		oObjectPage._onScroll({target: {scrollTop: iExpectedScrollTop}});
+		await nextUIUpdate();
+		iActualScrollTop = oObjectPage._$opWrapper.scrollTop();
 
-		});
+		// Assert
+		assert.strictEqual(Math.round(iActualScrollTop), Math.round(iExpectedScrollTop), "Scroll position is correct for the target section");
 	});
 
 	QUnit.module("ObjectPage Content scrolling with snap", {
@@ -559,7 +565,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 			iScrollPosition = iSnapThreshold + 10;
 
 			// Act - scroll to trigger header snap
-			this.oObjectPage._scrollTo(iScrollPosition);
+			this.oObjectPage._scrollTo(iScrollPosition, 0);
 
 			// simulate scroll event fired immediately after the scrollTo call
 			// this synchronously triggers _moveAnchorBarToTitleArea and the snap logic
@@ -1055,25 +1061,45 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		}
 	});
 
-	QUnit.test("ScrollToElement", function (assert) {
+	QUnit.test("ScrollToElement", async function (assert) {
 		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
 			oSection2 = oObjectPage.getSections()[1],
-			done = assert.async();
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+			$Section2TTitle,
+			fnIsElementVisible,
+			fnResolveOnVisible;
 
-			var $Section2TTitle = oSection2.$().find('.sapUxAPObjectPageSectionTitle');
-
-			assert.ok($Section2TTitle.length, "element exists");
-
-			// Act
-			oObjectPage.getScrollDelegate().scrollToElement($Section2TTitle.get(0));
-			oObjectPage._onScroll({ target: { scrollTop: oObjectPage._$opWrapper.scrollTop()}});
-
-			// Check
-			assert.ok(oSection2.getDomRef().offsetTop + $Section2TTitle.get(0).offsetTop >= Math.round(oObjectPage._$opWrapper.scrollTop()),
-				"element is visible");
-			done();
+		await new Promise(function (resolve) {
+			oObjectPage.attachEventOnce("onAfterRenderingDOMReady", resolve);
 		});
+
+		$Section2TTitle = oSection2.$().find('.sapUxAPObjectPageSectionTitle');
+		fnIsElementVisible = function () {
+			var oWrapperRect = oObjectPage._$opWrapper.get(0).getBoundingClientRect(),
+				oTitleRect = $Section2TTitle.get(0).getBoundingClientRect();
+
+			return oTitleRect.bottom > oWrapperRect.top && oTitleRect.top < oWrapperRect.bottom;
+		};
+
+		assert.ok($Section2TTitle.length, "element exists");
+
+		// Act
+		oObjectPage.getScrollDelegate().scrollToElement($Section2TTitle.get(0));
+		oObjectPage._onScroll({ target: { scrollTop: oObjectPage._$opWrapper.scrollTop()}});
+
+		await new Promise(function (resolve) {
+			fnResolveOnVisible = function () {
+				if (fnIsElementVisible()) {
+					oObjectPage._$opWrapper.off("scroll", fnResolveOnVisible);
+					resolve();
+				}
+			};
+
+			oObjectPage._$opWrapper.on("scroll", fnResolveOnVisible);
+			fnResolveOnVisible();
+		});
+
+		// Check
+		assert.ok(fnIsElementVisible(), "element is visible");
 
 	});
 

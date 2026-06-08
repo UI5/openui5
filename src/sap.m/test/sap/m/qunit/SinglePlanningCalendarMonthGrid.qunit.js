@@ -17,7 +17,8 @@ sap.ui.define([
 	"sap/ui/unified/RecurrenceRule",
 	"sap/base/i18n/Localization",
 	"sap/ui/qunit/utils/createAndAppendDiv",
-	"sap/ui/core/CustomData"
+	"sap/ui/core/CustomData",
+	"sap/ui/core/library"
 ], function(
 	qutils,
 	SinglePlanningCalendar,
@@ -36,7 +37,8 @@ sap.ui.define([
 	RecurrenceRule,
 	Localization,
 	createAndAppendDiv,
-	CustomData
+	CustomData,
+	coreLibrary
 ) {
 		"use strict";
 		createAndAppendDiv("uiArea6");
@@ -44,6 +46,7 @@ sap.ui.define([
 		var CalendarDayType = unifiedLibrary.CalendarDayType;
 		var SinglePlanningCalendarSelectionMode = mobileLibrary.SinglePlanningCalendarSelectionMode;
 		var LinkAccessibleRole = mobileLibrary.LinkAccessibleRole;
+		const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 		var o2Aug2018_00_00 = UI5Date.getInstance(2018, 7, 2);
 		var o2Aug2018_18_00 = UI5Date.getInstance(2018, 7, 2, 18, 0, 0);
@@ -1487,6 +1490,54 @@ sap.ui.define([
 
 			//asert
 			assert.strictEqual(oAppointmentHTMElement.getAttribute("draggable"), this.oSPC.getEnableAppointmentsDragAndDrop().toString(), "The appointment must receive the correct 'draggable' attribute from the SPC settings");
+		});
+
+		QUnit.test("ariaHasPopup on appointments - default renders no aria-haspopup attribute", async function(assert) {
+			// prepare
+			const oAppointment = new CalendarAppointment({
+				startDate: UI5Date.getInstance(2020, 11, 10),
+				endDate: UI5Date.getInstance(2020, 11, 10),
+				title: "Test"
+			});
+			const oGrid = new SinglePlanningCalendarMonthGrid({
+				startDate: UI5Date.getInstance(2020, 11, 1),
+				appointments: [oAppointment]
+			});
+			oGrid.placeAt("qunit-fixture");
+			await nextUIUpdate(this.clock);
+
+			// assert
+			assert.strictEqual(oAppointment.getAriaHasPopup(), AriaHasPopup.None, "ariaHasPopup defaults to None");
+			assert.notOk(oAppointment.getDomRef().getAttribute("aria-haspopup"),
+				"No aria-haspopup attribute rendered when value is None");
+
+			// clean
+			oGrid.destroy();
+			await nextUIUpdate(this.clock);
+		});
+
+		QUnit.test("ariaHasPopup on appointments - renders aria-haspopup attribute with lowercased value", async function(assert) {
+			// prepare
+			const oAppointment = new CalendarAppointment({
+				startDate: UI5Date.getInstance(2020, 11, 10),
+				endDate: UI5Date.getInstance(2020, 11, 10),
+				title: "Test",
+				ariaHasPopup: AriaHasPopup.Dialog
+			});
+			const oGrid = new SinglePlanningCalendarMonthGrid({
+				startDate: UI5Date.getInstance(2020, 11, 1),
+				appointments: [oAppointment]
+			});
+			oGrid.placeAt("qunit-fixture");
+			await nextUIUpdate(this.clock);
+
+			// assert
+			assert.strictEqual(oAppointment.getDomRef().getAttribute("aria-haspopup"), "dialog",
+				"aria-haspopup attribute rendered as lowercase 'dialog'");
+
+			// clean
+			oGrid.destroy();
+			await nextUIUpdate(this.clock);
 		});
 
 		QUnit.test("Grid cells week announcement", async function(assert) {

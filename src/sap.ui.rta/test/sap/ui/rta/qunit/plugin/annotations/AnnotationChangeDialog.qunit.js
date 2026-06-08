@@ -240,8 +240,8 @@ sap.ui.define([
 				oSelect.fireChange({ selectedItem: oListItem });
 				assert.strictEqual(
 					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
-					false,
-					"then the save button stays disabled (Select changes do not update save state)"
+					true,
+					"then the save button becomes enabled after a Select change"
 				);
 
 				Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").firePress();
@@ -348,7 +348,7 @@ sap.ui.define([
 				assert.strictEqual(
 					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
 					false,
-					"then the save button stays disabled (Select changes do not update save state)"
+					"then the save button stays disabled after switching back to the original value"
 				);
 				const oSaveButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton");
 				oSaveButton.firePress();
@@ -546,9 +546,19 @@ sap.ui.define([
 				const oCheckBox = aVisibleFields[0];
 				assert.strictEqual(oCheckBox.getState(), false, "then the correct value is set");
 				assert.ok(oCheckBox.isA("sap.m.Switch"), "then the input field for the boolean type is a switch");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					false,
+					"then the save button is initially disabled"
+				);
 
 				oCheckBox.setState(true);
 				oCheckBox.fireChange({ state: true });
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
+					true,
+					"then the save button becomes enabled after a Switch change"
+				);
 				const oSaveButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton");
 				oSaveButton.firePress();
 			};

@@ -1049,6 +1049,11 @@ sap.ui.define([
 				sType,
 				sSuggestionOptionKey;
 
+			const sFooterType = this._oSelectedOption && this._oSelectedOption.getValueHelpUIFooterFormatTypes();
+			if (sFooterType) {
+				return sFooterType;
+			}
+
 			if (
 				!oValue &&
 				!oSelect &&

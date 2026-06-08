@@ -32,6 +32,7 @@
 					"CustomPreviousXWeekend.js",
 					"CustomPreviousXWorkWeek.js",
 					"CustomLastChristmas.js",
+					"CustomBusinessDay.js",
 					"DynamicDateRangeWithCustomOptions.view.xml",
 					"DynamicDateRangeWithCustomOptions.controller.js",
 					"manifest.json"

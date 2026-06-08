@@ -6243,7 +6243,7 @@
 		"narrow": "SC {0}",
 		"wide": "Semaine civile {0}"
 	},
-	"sap-datePlaceholder": "Par exemple\\: {0}",
+	"sap-datePlaceholder": "Par exemple: {0}",
 	"sap-fileSize": {
 		"Byte": "{0} octet",
 		"Bytes": "{0} octets",

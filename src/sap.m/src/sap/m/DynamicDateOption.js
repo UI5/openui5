@@ -95,6 +95,20 @@ sap.ui.define([
 		};
 
 		/**
+		 * Returns the format type used for the ValueHelp dialog footer "Selected" date label.
+		 *
+		 * Override this in custom options when the default date-only label is not sufficient.
+		 * Return <code>datetime</code> to include the time portion.
+		 *
+		 * @param {sap.m.DynamicDateRange} oControl The control instance
+		 * @returns {string|null} <code>datetime</code> for date-and-time formatting, or <code>null</code> for date-only formatting (default).
+		 * @public
+		 */
+		DynamicDateOption.prototype.getValueHelpUIFooterFormatTypes = function() {
+			return null;
+		};
+
+		/**
 		 * Creates the option's value help UI. Mainly used for custom scenarios where
 		 * getValueHelpUITypes is not enough to define the UI. In custom options, you can
 		 * create different controls that are used by the user to input data via interaction.

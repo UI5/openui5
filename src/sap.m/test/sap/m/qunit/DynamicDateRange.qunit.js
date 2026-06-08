@@ -527,6 +527,39 @@ sap.ui.define([
 		oOption.destroy();
 	});
 
+	QUnit.test("getValueHelpUIFooterFormatTypes returns null by default", function(assert) {
+		var oOption = new DynamicDateOption({ key: "CUSTOM_DATE" });
+		oOption.getValueHelpUITypes = function() {
+			return [new DynamicDateValueHelpUIType({ type: "date" })];
+		};
+
+		this.ddr._oSelectedOption = oOption;
+		var sType = this.ddr._getValueHelpTypeForFormatter();
+
+		assert.strictEqual(sType, "date",
+			"_getValueHelpTypeForFormatter falls back to date type from getValueHelpUITypes when getValueHelpUIFooterFormatTypes is not overridden");
+
+		oOption.destroy();
+	});
+
+	QUnit.test("_getValueHelpTypeForFormatter uses getValueHelpUIFooterFormatTypes from custom option", function(assert) {
+		var oOption = new DynamicDateOption({ key: "CUSTOM_DATETIME" });
+		oOption.getValueHelpUITypes = function() {
+			return [new DynamicDateValueHelpUIType({ type: "int" })];
+		};
+		oOption.getValueHelpUIFooterFormatTypes = function() {
+			return "datetime";
+		};
+
+		this.ddr._oSelectedOption = oOption;
+		var sType = this.ddr._getValueHelpTypeForFormatter();
+
+		assert.strictEqual(sType, "datetime",
+			"_getValueHelpTypeForFormatter returns 'datetime' from custom option's getValueHelpUIFooterFormatTypes");
+
+		oOption.destroy();
+	});
+
 	QUnit.module("StandardDynamicDateOption last/next x", {
 		beforeEach: async function() {
 			this.ddr = new DynamicDateRange();

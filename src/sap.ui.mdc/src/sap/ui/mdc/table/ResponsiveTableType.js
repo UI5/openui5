@@ -821,9 +821,8 @@ sap.ui.define([
 			const oCellTemplate = oColumn.getTemplateClone();
 			const iCellIndex = oRowTemplate.indexOfCell(oCellTemplate);
 
-			removeCellFromItem(oRowTemplate, iCellIndex);
-
 			if (iCellIndex > -1) {
+				removeCellFromItem(oRowTemplate, iCellIndex);
 				this.getInnerTable().getItems().forEach((oItem) => {
 					removeCellFromItem(oItem, iCellIndex);
 				});
@@ -835,8 +834,7 @@ sap.ui.define([
 
 	function removeCellFromItem(oItem, iIndex) {
 		// Group header item does not have cells
-		const oCell = oItem?.removeCell(iIndex);
-		oCell?.destroy();
+		oItem.removeCell?.(iIndex)?.destroy();
 	}
 
 	ResponsiveTableType.prototype.onModifications = function() {

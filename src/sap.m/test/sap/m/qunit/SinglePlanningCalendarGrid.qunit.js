@@ -14,7 +14,8 @@ sap.ui.define([
 	"sap/ui/core/date/UI5Date",
 	"sap/ui/unified/DateTypeRange",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/core/CustomData"
+	"sap/ui/core/CustomData",
+	"sap/ui/core/library"
 ], function(
 	qutils,
 	Formatting,
@@ -30,12 +31,16 @@ sap.ui.define([
 	UI5Date,
 	DateTypeRange,
 	nextUIUpdate,
-	CustomData
+	CustomData,
+	coreLibrary
 ) {
 	"use strict";
 
 	var PlacementType = mobileLibrary.PlacementType;
 	var SinglePlanningCalendarSelectionMode = mobileLibrary.SinglePlanningCalendarSelectionMode;
+
+	// shortcut for sap.ui.core.aria.HasPopup
+	const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 	QUnit.module("Other");
 
@@ -706,6 +711,101 @@ sap.ui.define([
 		);
 		assert.ok(oGrid._doesContainBlockers(CalendarDate.fromLocalJSDate(UI5Date.getInstance(2018, 11, 25, 0, 0, 0))), "Cells description properly set");
 		assert.notOk(oGrid._doesContainBlockers(CalendarDate.fromLocalJSDate(UI5Date.getInstance(2018, 11, 28, 0, 0, 0))), "Cells description not set");
+	});
+
+	QUnit.test("ariaHasPopup on appointments - default renders no aria-haspopup attribute", async function(assert) {
+		// prepare
+		const oAppointment = new CalendarAppointment({
+			startDate: UI5Date.getInstance(2018, 11, 24, 10, 0),
+			endDate: UI5Date.getInstance(2018, 11, 24, 11, 0),
+			title: "Test"
+		});
+		const oGrid = new SinglePlanningCalendarGrid({
+			startDate: UI5Date.getInstance(2018, 11, 24),
+			appointments: [oAppointment]
+		});
+		oGrid.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// assert
+		assert.strictEqual(oAppointment.getAriaHasPopup(), AriaHasPopup.None, "ariaHasPopup defaults to None");
+		assert.notOk(oAppointment.getDomRef().getAttribute("aria-haspopup"),
+			"No aria-haspopup attribute rendered when value is None");
+
+		// clean
+		oGrid.destroy();
+		await nextUIUpdate(this.clock);
+	});
+
+	QUnit.test("ariaHasPopup on appointments - renders aria-haspopup attribute with lowercased value", async function(assert) {
+		// prepare
+		const oAppointment = new CalendarAppointment({
+			startDate: UI5Date.getInstance(2018, 11, 24, 10, 0),
+			endDate: UI5Date.getInstance(2018, 11, 24, 11, 0),
+			title: "Test",
+			ariaHasPopup: AriaHasPopup.Dialog
+		});
+		const oGrid = new SinglePlanningCalendarGrid({
+			startDate: UI5Date.getInstance(2018, 11, 24),
+			appointments: [oAppointment]
+		});
+		oGrid.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// assert
+		assert.strictEqual(oAppointment.getDomRef().getAttribute("aria-haspopup"), "dialog",
+			"aria-haspopup attribute rendered as lowercase 'dialog'");
+
+		// clean
+		oGrid.destroy();
+		await nextUIUpdate(this.clock);
+	});
+
+	QUnit.test("ariaHasPopup on blocker appointments - renders aria-haspopup attribute", async function(assert) {
+		// prepare
+		const oBlocker = new CalendarAppointment({
+			startDate: UI5Date.getInstance(2018, 11, 24),
+			endDate: UI5Date.getInstance(2018, 11, 26),
+			title: "Blocker",
+			ariaHasPopup: AriaHasPopup.Dialog
+		});
+		const oGrid = new SinglePlanningCalendarGrid({
+			startDate: UI5Date.getInstance(2018, 11, 24),
+			appointments: [oBlocker]
+		});
+		oGrid.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// assert
+		assert.strictEqual(oBlocker.getDomRef().getAttribute("aria-haspopup"), "dialog",
+			"aria-haspopup attribute rendered as lowercase 'dialog' on blocker appointment");
+
+		// clean
+		oGrid.destroy();
+		await nextUIUpdate(this.clock);
+	});
+
+	QUnit.test("ariaHasPopup on blocker appointments - default renders no aria-haspopup attribute", async function(assert) {
+		// prepare
+		const oBlocker = new CalendarAppointment({
+			startDate: UI5Date.getInstance(2018, 11, 24),
+			endDate: UI5Date.getInstance(2018, 11, 26),
+			title: "Blocker"
+		});
+		const oGrid = new SinglePlanningCalendarGrid({
+			startDate: UI5Date.getInstance(2018, 11, 24),
+			appointments: [oBlocker]
+		});
+		oGrid.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// assert
+		assert.notOk(oBlocker.getDomRef().getAttribute("aria-haspopup"),
+			"No aria-haspopup attribute rendered on blocker when value is None");
+
+		// clean
+		oGrid.destroy();
+		await nextUIUpdate(this.clock);
 	});
 
 	QUnit.module("Events");

@@ -872,19 +872,31 @@ sap.ui.define([
 	};
 
 	FieldBase.prototype.onsaphome = function(oEvent) {
-		this._handleNavigate(oEvent, -9999); // iStep are relative and can not be set to the last item
+		const oValueHelp = _getValueHelp.call(this);
+		if (this.getMaxConditions() === 1 || oValueHelp.isOpen()) { // on MultiInput only if dropdown open
+			this._handleNavigate(oEvent, -9999); // iStep are relative and can not be set to the last item
+		}
 	};
 
 	FieldBase.prototype.onsappageup = function(oEvent) {
-		this._handleNavigate(oEvent, -10);
+		const oValueHelp = _getValueHelp.call(this);
+		if (this.getMaxConditions() === 1 || oValueHelp.isOpen()) { // on MultiInput only if dropdown open
+			this._handleNavigate(oEvent, -10);
+		}
 	};
 
 	FieldBase.prototype.onsappagedown = function(oEvent) {
-		this._handleNavigate(oEvent, 10);
+		const oValueHelp = _getValueHelp.call(this);
+		if (this.getMaxConditions() === 1 || oValueHelp.isOpen()) { // on MultiInput only if dropdown open
+			this._handleNavigate(oEvent, 10);
+		}
 	};
 
 	FieldBase.prototype.onsapend = function(oEvent) {
-		this._handleNavigate(oEvent, 9999); // iStep are relative and can not be set to the last item
+		const oValueHelp = _getValueHelp.call(this);
+		if (this.getMaxConditions() === 1 || oValueHelp.isOpen()) { // on MultiInput only if dropdown open
+			this._handleNavigate(oEvent, 9999); // iStep are relative and can not be set to the last item
+		}
 	};
 
 	FieldBase.prototype._handleNavigate = async function(oEvent, iStep) {
@@ -1146,7 +1158,7 @@ sap.ui.define([
 			return;
 		}
 
-		const oControl = oEvent.srcControl;
+		const [oControl] = this.getCurrentContent();
 		let sBoundProperty;
 		for (const sProperty in oControl.getMetadata().getAllProperties()) {
 			if (oControl.getBindingPath(sProperty) === "/conditions") {
@@ -2299,16 +2311,16 @@ sap.ui.define([
 					bPrevent = oValueHelp.isNavigationEnabled(1);
 					break;
 				case "saphome":
-					bPrevent = oValueHelp.isNavigationEnabled(-9999);
+					bPrevent = (this.getMaxConditions() === 1 || oValueHelp.isOpen()) && oValueHelp.isNavigationEnabled(-9999); // on MultiInput only if dropdown open
 					break;
 				case "sapend":
-					bPrevent = oValueHelp.isNavigationEnabled(9999);
+					bPrevent = (this.getMaxConditions() === 1 || oValueHelp.isOpen()) && oValueHelp.isNavigationEnabled(9999); // on MultiInput only if dropdown open
 					break;
 				case "sappageup":
-					bPrevent = oValueHelp.isNavigationEnabled(-10);
+					bPrevent = (this.getMaxConditions() === 1 || oValueHelp.isOpen()) && oValueHelp.isNavigationEnabled(-10); // on MultiInput only if dropdown open
 					break;
 				case "sappagedown":
-					bPrevent = oValueHelp.isNavigationEnabled(10);
+					bPrevent = (this.getMaxConditions() === 1 || oValueHelp.isOpen()) && oValueHelp.isNavigationEnabled(10); // on MultiInput only if dropdown open
 					break;
 				case "sapbackspace":
 					this._bPreventAutocomplete = true;
@@ -3503,7 +3515,7 @@ sap.ui.define([
 
 		// announce number of found items
 		const iItems = oEvent.getParameter("items");
-		if (iItems && oContent?._applySuggestionAcc) {
+		if (typeof iItems === "number" && oContent?._applySuggestionAcc) {
 			oContent._applySuggestionAcc(iItems);
 		}
 

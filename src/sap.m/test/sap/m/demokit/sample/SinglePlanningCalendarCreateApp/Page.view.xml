@@ -27,7 +27,8 @@
 					type= "{type}"
 					icon= "{icon}"
 					startDate= "{startDate}"
-					endDate= "{endDate}">
+					endDate= "{endDate}"
+					ariaHasPopup= "{ariaHasPopup}">
 				</unified:CalendarAppointment>
 			</appointments>
 		</SinglePlanningCalendar>

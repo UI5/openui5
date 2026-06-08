@@ -10,6 +10,7 @@ sap.ui.define([
 	'./CustomPreviousXWeekend',
 	'./CustomPreviousXWorkWeek',
 	'./CustomLastChristmas',
+	'./CustomBusinessDay',
 	'sap/ui/core/date/UI5Date'
 ], function(
 	Controller,
@@ -23,6 +24,7 @@ sap.ui.define([
 	CustomPreviousXWeekend,
 	CustomPreviousXWorkWeek,
 	CustomLastChristmas,
+	CustomBusinessDay,
 	UI5Date
 ) {
 	"use strict";
@@ -271,9 +273,13 @@ sap.ui.define([
 				key: "Last Christmas",
 				valueTypes: ['date']
 			});
+			const oCustomBusinessDayOption = new CustomBusinessDay({
+				key: "Business Day"
+			});
 			oDynamicDateRange.addAggregation("customOptions", oCustomPreviousXWeekendOption);
 			oDynamicDateRange.addAggregation("customOptions", oCustomPreviousXWorkWeekOption);
 			oDynamicDateRange.addAggregation("customOptions", oCustomLastChristmasOption);
+			oDynamicDateRange.addAggregation("customOptions", oCustomBusinessDayOption);
 
 			const oModel = new JSONModel({
 					orders: aOrders
