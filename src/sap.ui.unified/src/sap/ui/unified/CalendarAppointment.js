@@ -13,7 +13,8 @@ sap.ui.define([
 	'./calendar/CalendarUtils',
 	'./library',
 	"sap/base/Log",
-	"sap/ui/core/date/UI5Date"
+	"sap/ui/core/date/UI5Date",
+	"sap/ui/core/library"
 ],
 	function(
 		DateTypeRange,
@@ -25,9 +26,13 @@ sap.ui.define([
 		CalendarUtils,
 		library,
 		Log,
-		UI5Date
+		UI5Date,
+		coreLibrary
 	) {
 	"use strict";
+
+	// shortcut for sap.ui.core.aria.HasPopup
+	const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 	/**
 	 * Constructor for a new <code>CalendarAppointment</code>.
@@ -96,7 +101,21 @@ sap.ui.define([
 			 * This property will work only with full hex color with pound symbol, e.g.: #FF0000.
 			 * @since 1.46.0
 			 */
-			color: {type : "sap.ui.core.CSSColor", group : "Appearance", defaultValue : null}
+			color: {type : "sap.ui.core.CSSColor", group : "Appearance", defaultValue : null},
+
+			/**
+			 * Specifies the value of the <code>aria-haspopup</code> attribute
+			 *
+			 * If the value is <code>None</code>, the attribute will not be rendered. Otherwise it will be rendered with the selected value.
+			 *
+			 * NOTE: Use this property only when an <code>sap.ui.unified.CalendarAppointment</code> instance is active and related to a popover/popup.
+			 * The value needs to be equal to the main/root role of the popup - e.g. dialog,
+			 * menu or list (examples: if you have dialog -> dialog, if you have menu -> menu; if you have list -> list; if you have dialog containing a list -> dialog).
+			 * Do not use it, if you open a standard sap.m.Dialog, MessageBox or other type of modal dialogs.
+			 *
+			 * @since 1.150.0
+			 */
+			ariaHasPopup: { type: "sap.ui.core.aria.HasPopup", group: "Accessibility", defaultValue: AriaHasPopup.None }
 		},
 		aggregations: {
 			/**

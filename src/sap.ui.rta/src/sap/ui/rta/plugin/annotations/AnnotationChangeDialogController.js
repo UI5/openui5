@@ -169,7 +169,25 @@ sap.ui.define([
 	function createEditorField(sValueType) {
 		if (sValueType === AnnotationTypes.ValueListType) {
 			const oSelect = new Select({
-				selectedKey: "{currentValue}"
+				selectedKey: {
+					path: "currentValue",
+					mode: "OneWay"
+				},
+				change: (oEvent) => {
+					const oSource = oEvent.getSource();
+					const oContext = oSource.getBindingContext();
+					const oModel = oSource.getModel();
+					const sOriginalValue = oContext.getProperty("originalValue");
+					const sNewKey = oEvent.getParameter("selectedItem").getKey();
+					const mPropertyBag = {
+						wasError: false,
+						hasError: false,
+						wasChanged: oContext.getProperty("currentValue") !== sOriginalValue,
+						isChanged: sNewKey !== sOriginalValue
+					};
+					oModel.setProperty("currentValue", sNewKey, oContext);
+					this._updateSaveEnabled(oModel, mPropertyBag);
+				}
 			});
 
 			const oItemTemplate = new Item({
@@ -209,7 +227,25 @@ sap.ui.define([
 
 		if (sValueType === AnnotationTypes.BooleanType) {
 			return new Switch({
-				state: "{currentValue}"
+				state: {
+					path: "currentValue",
+					mode: "OneWay"
+				},
+				change: (oEvent) => {
+					const oSource = oEvent.getSource();
+					const oContext = oSource.getBindingContext();
+					const oModel = oSource.getModel();
+					const bOriginalValue = oContext.getProperty("originalValue");
+					const bNewState = oEvent.getParameter("state");
+					const mPropertyBag = {
+						wasError: false,
+						hasError: false,
+						wasChanged: oContext.getProperty("currentValue") !== bOriginalValue,
+						isChanged: bNewState !== bOriginalValue
+					};
+					oModel.setProperty("currentValue", bNewState, oContext);
+					this._updateSaveEnabled(oModel, mPropertyBag);
+				}
 			});
 		}
 

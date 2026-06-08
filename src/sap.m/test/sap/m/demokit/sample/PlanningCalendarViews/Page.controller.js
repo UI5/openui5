@@ -32,7 +32,8 @@ sap.ui.define([
 							end: UI5Date.getInstance(2016, 11, 2, 13, 30),
 							title: "Online Meeting",
 							type: "Type03",
-							tentative: true
+							tentative: true,
+							ariaHasPopup: "Dialog"
 						},
 							{
 								start: UI5Date.getInstance(2017, 0, 15, 13, 30),
@@ -40,21 +41,24 @@ sap.ui.define([
 								title: "Discussion with clients",
 								info: "online meeting",
 								type: "Type02",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 1, 7, 0, 1),
 								end: UI5Date.getInstance(2017, 1, 7, 23, 59),
 								title: "Vacation",
 								type: "Type02",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 1, 8, 8, 30),
 								end: UI5Date.getInstance(2017, 1, 8, 15, 0),
 								title: "Meeting",
 								type: "Type05",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 1, 8, 8, 0),
@@ -63,7 +67,8 @@ sap.ui.define([
 								info: "room 106",
 								type: "Type01",
 								pic: "sap-icon://sap-ui5",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 1, 9, 7, 30),
@@ -71,21 +76,24 @@ sap.ui.define([
 								title: "Meet Donna Moore",
 								info: "regular",
 								type: "Type08",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 1, 10, 0, 0),
 								end: UI5Date.getInstance(2017, 1, 11, 23, 29),
 								title: "Private appointment",
 								type: "Type06",
-								tentative: true
+								tentative: true,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 3, 17, 8, 30),
 								end: UI5Date.getInstance(2017, 3, 17, 15, 30),
 								title: "Meet Max Mustermann",
 								type: "Type02",
-								tentative: true
+								tentative: true,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 3, 3, 10, 0),
@@ -94,14 +102,16 @@ sap.ui.define([
 								info: "room 1",
 								type: "Type01",
 								pic: "sap-icon://sap-ui5",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 2, 4, 11, 30),
 								end: UI5Date.getInstance(201, 2, 4, 13, 30),
 								title: "Online Meeting",
 								type: "Type03",
-								tentative: true
+								tentative: true,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 15, 13, 30),
@@ -109,14 +119,16 @@ sap.ui.define([
 								title: "Discussion with clients",
 								info: "online meeting",
 								type: "Type02",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 1, 7, 0, 1),
 								end: UI5Date.getInstance(2017, 1, 7, 23, 59),
 								title: "Vacation",
 								type: "Type02",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							}
 						],
 						headers: [
@@ -139,7 +151,8 @@ sap.ui.define([
 								end: UI5Date.getInstance(2017, 0, 2, 13, 30),
 								title: "Online Meeting",
 								type: "Type03",
-								tentative: true
+								tentative: true,
+								ariaHasPopup: "Dialog"
 							},
 								{
 									start: UI5Date.getInstance(2017, 0, 15, 13, 30),
@@ -147,14 +160,16 @@ sap.ui.define([
 									title: "Meeting with managers",
 									info: "online meeting",
 									type: "Type02",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 1, 5, 0, 1),
 									end: UI5Date.getInstance(2017, 1, 5, 23, 59),
 									title: "Education",
 									type: "Type03",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 1, 8, 8, 0),
@@ -163,7 +178,8 @@ sap.ui.define([
 									info: "room 106",
 									type: "Type01",
 									pic: "sap-icon://sap-ui5",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 1, 9, 10, 0),
@@ -171,14 +187,16 @@ sap.ui.define([
 									title: "Meeting",
 									info: "phone",
 									type: "Type02",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 1, 10, 0, 0),
 									end: UI5Date.getInstance(2017, 1, 0, 23, 59),
 									title: "Blocker",
 									type: "Type04",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 1, 10, 7, 30),
@@ -186,7 +204,8 @@ sap.ui.define([
 									title: "Meet Donna Moore",
 									info: "regular",
 									type: "Type08",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 1, 12, 0, 1),
@@ -194,14 +213,16 @@ sap.ui.define([
 									title: "New Product",
 									info: "room 105",
 									type: "Type04",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 2, 2, 11, 30),
 									end: UI5Date.getInstance(2017, 2, 2, 13, 30),
 									title: "Online Meeting",
 									type: "Type03",
-									tentative: true
+									tentative: true,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 2, 15, 13, 30),
@@ -209,14 +230,16 @@ sap.ui.define([
 									title: "Meeting with managers",
 									info: "online meeting",
 									type: "Type02",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 4, 2, 11, 30),
 									end: UI5Date.getInstance(2017, 4, 2, 13, 30),
 									title: "Online Meeting",
 									type: "Type03",
-									tentative: true
+									tentative: true,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 2, 15, 13, 30),
@@ -224,14 +247,16 @@ sap.ui.define([
 									title: "Discussion with clients",
 									info: "online meeting",
 									type: "Type02",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 3, 7, 0, 1),
 									end: UI5Date.getInstance(2017, 3, 7, 23, 59),
 									title: "Vacation",
 									type: "Type02",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								}
 							],
 							headers: [

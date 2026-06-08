@@ -27,39 +27,45 @@ function(coreLibrary, Fragment, Controller, DateFormat, JSONModel, unifiedLibrar
 						title: "Meet John Miller",
 						type: CalendarDayType.Type05,
 						startDate: UI5Date.getInstance("2018", "6", "8", "5", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "6", "0")
+						endDate: UI5Date.getInstance("2018", "6", "8", "6", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Discussion of the plan",
 						type: CalendarDayType.Type01,
 						startDate: UI5Date.getInstance("2018", "6", "8", "6", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "7", "9")
+						endDate: UI5Date.getInstance("2018", "6", "8", "7", "9"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Lunch",
 						text: "canteen",
 						type: CalendarDayType.Type05,
 						startDate: UI5Date.getInstance("2018", "6", "8", "7", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "8", "0")
+						endDate: UI5Date.getInstance("2018", "6", "8", "8", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "New Product",
 						text: "room 105",
 						type: CalendarDayType.Type01,
 						icon: "sap-icon://meeting-room",
 						startDate: UI5Date.getInstance("2018", "6", "8", "8", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "9", "0")
+						endDate: UI5Date.getInstance("2018", "6", "8", "9", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Team meeting",
 						text: "Regular",
 						type: CalendarDayType.Type01,
 						icon: "sap-icon://home",
 						startDate: UI5Date.getInstance("2018", "6", "8", "9", "9"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "10", "0")
+						endDate: UI5Date.getInstance("2018", "6", "8", "10", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Discussion with clients regarding our new purpose",
 						text: "room 234 and Online meeting",
 						type: CalendarDayType.Type08,
 						icon: "sap-icon://home",
 						startDate: UI5Date.getInstance("2018", "6", "8", "10", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "11", "30")
+						endDate: UI5Date.getInstance("2018", "6", "8", "11", "30"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Discussion of the plan",
 						text: "Online meeting with partners and colleagues",
@@ -67,186 +73,220 @@ function(coreLibrary, Fragment, Controller, DateFormat, JSONModel, unifiedLibrar
 						icon: "sap-icon://home",
 						tentative: true,
 						startDate: UI5Date.getInstance("2018", "6", "8", "11", "30"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "13", "00")
+						endDate: UI5Date.getInstance("2018", "6", "8", "13", "00"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Discussion with clients",
 						type: CalendarDayType.Type08,
 						icon: "sap-icon://home",
 						startDate: UI5Date.getInstance("2018", "6", "8", "12", "30"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "13", "15")
+						endDate: UI5Date.getInstance("2018", "6", "8", "13", "15"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Meeting with the manager",
 						type: CalendarDayType.Type03,
 						startDate: UI5Date.getInstance("2018", "6", "8", "13", "9"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "13", "9")
+						endDate: UI5Date.getInstance("2018", "6", "8", "13", "9"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Meeting with the HR",
 						type: CalendarDayType.Type03,
 						startDate: UI5Date.getInstance("2018", "6", "8", "14", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "14", "15")
+						endDate: UI5Date.getInstance("2018", "6", "8", "14", "15"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Call with customer",
 						type: CalendarDayType.Type08,
 						startDate: UI5Date.getInstance("2018", "6", "8", "14", "15"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "14", "30")
+						endDate: UI5Date.getInstance("2018", "6", "8", "14", "30"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Prepare documentation",
 						text: "At my desk",
 						icon: "sap-icon://meeting-room",
 						type: CalendarDayType.Type03,
 						startDate: UI5Date.getInstance("2018", "6", "8", "14", "10"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "15", "30")
+						endDate: UI5Date.getInstance("2018", "6", "8", "15", "30"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Meeting with the manager",
 						type: CalendarDayType.Type03,
 						startDate: UI5Date.getInstance("2018", "6", "9", "6", "30"),
-						endDate: UI5Date.getInstance("2018", "6", "9", "7", "0")
+						endDate: UI5Date.getInstance("2018", "6", "9", "7", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Lunch",
 						type: CalendarDayType.Type05,
 						startDate: UI5Date.getInstance("2018", "6", "9", "7", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "9", "8", "0")
+						endDate: UI5Date.getInstance("2018", "6", "9", "8", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Team meeting",
 						text: "online",
 						type: CalendarDayType.Type01,
 						startDate: UI5Date.getInstance("2018", "6", "9", "8", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "9", "9", "0")
+						endDate: UI5Date.getInstance("2018", "6", "9", "9", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Discussion with clients for the new release dates",
 						text: "Online meeting",
 						type: CalendarDayType.Type08,
 						startDate: UI5Date.getInstance("2018", "6", "9", "9", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "9", "10", "0")
+						endDate: UI5Date.getInstance("2018", "6", "9", "10", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Team meeting",
 						text: "room 5",
 						type: CalendarDayType.Type01,
 						startDate: UI5Date.getInstance("2018", "6", "9", "11", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "9", "14", "0")
+						endDate: UI5Date.getInstance("2018", "6", "9", "14", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Daily standup meeting",
 						type: CalendarDayType.Type01,
 						startDate: UI5Date.getInstance("2018", "6", "9", "9", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "9", "9", "15", "0")
+						endDate: UI5Date.getInstance("2018", "6", "9", "9", "15", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Private meeting",
 						type: CalendarDayType.Type03,
 						startDate: UI5Date.getInstance("2018", "6", "11", "9", "9"),
-						endDate: UI5Date.getInstance("2018", "6", "11", "9", "20")
+						endDate: UI5Date.getInstance("2018", "6", "11", "9", "20"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Private meeting",
 						type: CalendarDayType.Type03,
 						startDate: UI5Date.getInstance("2018", "6", "10", "6", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "10", "7", "0")
+						endDate: UI5Date.getInstance("2018", "6", "10", "7", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Meeting with the manager",
 						type: CalendarDayType.Type03,
 						startDate: UI5Date.getInstance("2018", "6", "10", "15", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "10", "15", "30")
+						endDate: UI5Date.getInstance("2018", "6", "10", "15", "30"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Meet John Doe",
 						type: CalendarDayType.Type05,
 						icon: "sap-icon://home",
 						startDate: UI5Date.getInstance("2018", "6", "11", "7", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "11", "7", "30")
+						endDate: UI5Date.getInstance("2018", "6", "11", "7", "30"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Team meeting",
 						text: "online",
 						type: CalendarDayType.Type01,
 						startDate: UI5Date.getInstance("2018", "6", "11", "8", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "11", "9", "30")
+						endDate: UI5Date.getInstance("2018", "6", "11", "9", "30"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Workshop",
 						type: CalendarDayType.Type05,
 						startDate: UI5Date.getInstance("2018", "6", "11", "8", "30"),
-						endDate: UI5Date.getInstance("2018", "6", "11", "12", "0")
+						endDate: UI5Date.getInstance("2018", "6", "11", "12", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Team collaboration",
 						type: CalendarDayType.Type01,
 						startDate: UI5Date.getInstance("2018", "6", "12", "4", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "12", "12", "30")
+						endDate: UI5Date.getInstance("2018", "6", "12", "12", "30"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Out of the office",
 						type: CalendarDayType.Type05,
 						startDate: UI5Date.getInstance("2018", "6", "12", "15", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "12", "19", "30")
+						endDate: UI5Date.getInstance("2018", "6", "12", "19", "30"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Working out of the building",
 						type: CalendarDayType.Type05,
 						startDate: UI5Date.getInstance("2018", "6", "12", "20", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "12", "21", "30")
+						endDate: UI5Date.getInstance("2018", "6", "12", "21", "30"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Vacation",
 						type: CalendarDayType.Type09,
 						text: "out of office",
 						startDate: UI5Date.getInstance("2018", "6", "11", "12", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "13", "14", "0")
+						endDate: UI5Date.getInstance("2018", "6", "13", "14", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Reminder",
 						type: CalendarDayType.Type09,
 						startDate: UI5Date.getInstance("2018", "6", "12", "00", "00"),
-						endDate: UI5Date.getInstance("2018", "6", "13", "00", "00")
+						endDate: UI5Date.getInstance("2018", "6", "13", "00", "00"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Team collaboration",
 						type: CalendarDayType.Type01,
 						startDate: UI5Date.getInstance("2018", "6", "6", "00", "00"),
-						endDate:  UI5Date.getInstance("2018", "6", "16", "00", "00")
+						endDate:  UI5Date.getInstance("2018", "6", "16", "00", "00"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Workshop out of the country",
 						type: CalendarDayType.Type05,
 						startDate: UI5Date.getInstance("2018", "6", "14", "00", "00"),
-						endDate: UI5Date.getInstance("2018", "6", "20", "00", "00")
+						endDate: UI5Date.getInstance("2018", "6", "20", "00", "00"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title: "Payment reminder",
 						type: CalendarDayType.Type09,
 						startDate: UI5Date.getInstance("2018", "6", "7", "00", "00"),
-						endDate: UI5Date.getInstance("2018", "6", "8", "00", "00")
+						endDate: UI5Date.getInstance("2018", "6", "8", "00", "00"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title:"Meeting with the manager",
 						type: CalendarDayType.Type03,
 						startDate: UI5Date.getInstance("2018", "6", "6", "9", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "6", "10", "0")
+						endDate: UI5Date.getInstance("2018", "6", "6", "10", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title:"Daily standup meeting",
 						type: CalendarDayType.Type01,
 						startDate: UI5Date.getInstance("2018", "6", "7", "10", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "7", "10", "30")
+						endDate: UI5Date.getInstance("2018", "6", "7", "10", "30"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title:"Private meeting",
 						type: CalendarDayType.Type03,
 						startDate: UI5Date.getInstance("2018", "6", "6", "11", "30"),
-						endDate: UI5Date.getInstance("2018", "6", "6", "12", "0")
+						endDate: UI5Date.getInstance("2018", "6", "6", "12", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title:"Lunch",
 						type: CalendarDayType.Type05,
 						startDate: UI5Date.getInstance("2018", "6", "6", "12", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "6", "13", "0")
+						endDate: UI5Date.getInstance("2018", "6", "6", "13", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title:"Discussion of the plan",
 						type: CalendarDayType.Type01,
 						startDate: UI5Date.getInstance("2018", "6", "16", "11", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "16", "12", "0")
+						endDate: UI5Date.getInstance("2018", "6", "16", "12", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title:"Lunch",
 						text: "canteen",
 						type: CalendarDayType.Type05,
 						startDate: UI5Date.getInstance("2018", "6", "16", "12", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "16", "13", "0")
+						endDate: UI5Date.getInstance("2018", "6", "16", "13", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title:"Team meeting",
 						text: "room 200",
 						type: CalendarDayType.Type01,
 						icon: "sap-icon://meeting-room",
 						startDate:  UI5Date.getInstance("2018", "6", "16", "16", "0"),
-						endDate: UI5Date.getInstance("2018", "6", "16", "17", "0")
+						endDate: UI5Date.getInstance("2018", "6", "16", "17", "0"),
+						ariaHasPopup: "Dialog"
 					}, {
 						title:"Discussion with clients",
 						text: "Online meeting",
 						type: CalendarDayType.Type08,
 						icon: "sap-icon://home",
 						startDate: UI5Date.getInstance("2018", "6", "17", "15", "30"),
-						endDate: UI5Date.getInstance("2018", "6", "17", "16", "30")
+						endDate: UI5Date.getInstance("2018", "6", "17", "16", "30"),
+						ariaHasPopup: "Dialog"
 					}
 				],
 				supportedAppointmentItems: [

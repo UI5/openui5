@@ -58,6 +58,19 @@ sap.ui.define([
 	//shortcut for sap.m.ContentConfigType
 	var ContentConfigType = library.ContentConfigType;
 
+        function Parameters_getAsync(key, oElement) {
+		return new Promise((resolve) => {
+			const sParameter = Parameters.get({
+				name: key,
+				scopeElement: oElement,
+				callback: resolve
+			});
+			if (sParameter !== undefined) {
+				resolve(sParameter);
+			}
+		});
+	}
+
 	QUnit.module("Default Properties", {
 		beforeEach: function() {
             this.oActionTile = new ActionTile();
@@ -628,6 +641,65 @@ sap.ui.define([
 
 		//Assert
 		assert.strictEqual(oPressSpy.callCount, 0, "Tile press event should not be fired when TextArea is tapped");
+	});
+
+	QUnit.module("Busy Indicator Styling", {
+		beforeEach: async function() {
+			this.oActionTile = new ActionTile("busyTile", {
+				header: "Test Tile",
+				tileContent: new ActionTileContent({
+					attributes: [
+						new TileAttribute({
+							label: "Test Attribute",
+							contentConfig: new ContentConfig({
+								type: ContentConfigType.Text,
+								text: "Test Value"
+							})
+						})
+					]
+				})
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oActionTile.destroy();
+			this.oActionTile = null;
+		}
+	});
+
+	QUnit.test("Busy indicator border-radius matches tile border-radius", async function(assert) {
+		//Arrange
+		this.oActionTile.setBusyIndicatorDelay(0);
+		this.oActionTile.setBusy(true);
+		await nextUIUpdate();
+
+		//Act
+		var oBusyIndicator = this.oActionTile.getDomRef().querySelector(".sapUiLocalBusyIndicator");
+		var sTileBorderRadius = getComputedStyle(this.oActionTile.getDomRef()).borderRadius;
+		var sBusyIndicatorBorderRadius = getComputedStyle(oBusyIndicator).borderRadius;
+
+		//Assert
+		assert.ok(oBusyIndicator, "Busy indicator is rendered");
+		assert.equal(sBusyIndicatorBorderRadius, sTileBorderRadius, "Busy indicator border-radius matches tile border-radius");
+	});
+
+	QUnit.test("Busy indicator focus state border-radius is applied", async function(assert) {
+		//Arrange
+		this.oActionTile.setBusyIndicatorDelay(0);
+		this.oActionTile.setBusy(true);
+		await nextUIUpdate();
+
+		//Act
+		var oBusyIndicator = this.oActionTile.getDomRef().querySelector(".sapUiLocalBusyIndicator");
+		//Assert
+		assert.ok(oBusyIndicator, "Busy indicator is rendered");
+
+		// Get the border-radius parameter value
+		var sBorderRadiusParam = await Parameters_getAsync("sapTile_BorderCornerRadius");
+		if (sBorderRadiusParam) {
+			var sExpectedBorderRadius = parseFloat(sBorderRadiusParam) * 16 + "px";
+			assert.equal(getComputedStyle(oBusyIndicator).borderRadius, sExpectedBorderRadius, "Busy indicator border-radius matches sapTile_BorderCornerRadius parameter");
+		}
 	});
 
 });

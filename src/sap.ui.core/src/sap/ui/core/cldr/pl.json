@@ -6463,7 +6463,7 @@
 	"sap-datePlaceholder": "np. {0}",
 	"sap-fileSize": {
 		"Byte": "{0} bajt",
-		"Bytes": "Bajtów\\: {0}",
+		"Bytes": "Bajtów: {0}",
 		"Kilobyte": "{0} KB",
 		"Megabyte": "{0} MB",
 		"Gigabyte": "{0} GB",

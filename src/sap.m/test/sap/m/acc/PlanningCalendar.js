@@ -54,18 +54,21 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.m.ButtonType
-	var ButtonType = mobileLibrary.ButtonType;
+	const ButtonType = mobileLibrary.ButtonType;
 
 	// shortcut for sap.ui.unified.CalendarDayType
-	var CalendarDayType = unifiedLibrary.CalendarDayType;
+	const CalendarDayType = unifiedLibrary.CalendarDayType;
 
 	// shortcut for sap.ui.unified.StandardCalendarLegendItem
-	var StandardCalendarLegendItem = unifiedLibrary.StandardCalendarLegendItem;
+	const StandardCalendarLegendItem = unifiedLibrary.StandardCalendarLegendItem;
 
 	// shortcut for sap.ui.core.TitleLevel
-	var TitleLevel = coreLibrary.TitleLevel;
+	const TitleLevel = coreLibrary.TitleLevel;
 
-	var oLegend = new PlanningCalendarLegend("Legend1", {
+	// shortcut for sap.ui.core.aria.HasPopup
+	const AriaHasPopup = coreLibrary.aria.HasPopup;
+
+	const oLegend = new PlanningCalendarLegend("Legend1", {
 		standardItems: [StandardCalendarLegendItem.WorkingDay, StandardCalendarLegendItem.NonWorkingDay, StandardCalendarLegendItem.Today],
 		items: [
 			new CalendarLegendItem("T1", {
@@ -125,7 +128,7 @@ sap.ui.define([
 		]
 	});
 
-	var oDialog = new Dialog("D1", {
+	const oDialog = new Dialog("D1", {
 		title: "Legend",
 		content: [oLegend],
 		endButton: new Button({
@@ -136,11 +139,11 @@ sap.ui.define([
 		})
 	});
 
-	var oApp = new App();
+	const oApp = new App();
 
-	var oEventLabel = new Label({text: "Events log", wrapping: true});
+	const oEventLabel = new Label({text: "Events log", wrapping: true});
 
-	var oModel = new JSONModel();
+	const oModel = new JSONModel();
 
 	oModel.setData({
 		headerContentBinding: [{
@@ -149,20 +152,19 @@ sap.ui.define([
 		}]
 	});
 
-	var handleIntervalSelect = function (oEvent) {
+	const handleIntervalSelect = function (oEvent) {
 		new MessageToast.show("Interval Select was handled");
 	};
 
-	var handleAppointmentSelect = function (oEvent) {
-		var oAppointment = oEvent.getParameter("appointment"),
-			aAppointments = oEvent.getParameter("appointments"),
-			sText = "",
-			i;
+	const handleAppointmentSelect = function (oEvent) {
+		const oAppointment = oEvent.getParameter("appointment");
+		const aAppointments = oEvent.getParameter("appointments");
+		let sText = "";
 
 		if (oAppointment) {
 			sText = oAppointment.getTitle();
 		} else if (aAppointments.length) {
-			for (i = 1; i < aAppointments.length; i++) {
+			for (let i = 1; i < aAppointments.length; i++) {
 				sText = sText + aAppointments[i].getTitle() + " ";
 			}
 		}
@@ -171,14 +173,14 @@ sap.ui.define([
 		setEventLog("'appointmentSelect' for appointment: " + (oAppointment ? oAppointment.getTitle() : "<no app>"));
 	};
 
-	var handleStartDateChange = function (oEvent) {
-		var oDf = DateFormat.getTimeInstance("HH:mm:ss");
+	const handleStartDateChange = function (oEvent) {
+		const oDf = DateFormat.getTimeInstance("HH:mm:ss");
 		setEventLog("startDateChange event at " + oDf.format(UI5Date.getInstance()) + " with params:" + JSON.stringify(oEvent.mParameters));
 	};
 
-	var handleRowSelectionChange = function (oEvent) {
-		var oRows = oEvent.getParameter("rows"),
-			sValue = oRows.length + " row(s) selected";
+	const handleRowSelectionChange = function (oEvent) {
+		const oRows = oEvent.getParameter("rows");
+		const sValue = oRows.length + " row(s) selected";
 		setEventLog("rowSelectionChange:" + sValue);
 	};
 
@@ -187,17 +189,17 @@ sap.ui.define([
 		oEventLabel.$().attr('style', "background-color: rgb(" + Math.ceil(Math.random() * 255).toString() + "," + Math.ceil(Math.random() * 255).toString() + "," + Math.ceil(Math.random() * 255).toString() + ");");
 	}
 
-	var handleRowHeaderPress = function (oEvent) {
-		var oRow = oEvent.getParameter("row"),
-			sEmployeeInfo = oRow.getTitle() + " " + oRow.getText();
+	const handleRowHeaderPress = function (oEvent) {
+		const oRow = oEvent.getParameter("row");
+		const sEmployeeInfo = oRow.getTitle() + " " + oRow.getText();
 		setEventLog("'rowHeaderPress' on employee:\n'" + sEmployeeInfo + "'");
 	};
 
-	var handleLegend = function () {
+	const handleLegend = function () {
 		oDialog.open();
 	};
 
-	var oButtonLegend = new Button("B_Legend", {
+	const oButtonLegend = new Button("B_Legend", {
 		icon: "sap-icon://legend",
 		type: ButtonType.Transparent,
 		tooltip: "Open PlanningCalendar legend",
@@ -205,18 +207,18 @@ sap.ui.define([
 	});
 
 
-	var oTitle = new MTitle("Title1", {
+	const oTitle = new MTitle("Title1", {
 		text: "Title",
 		level: TitleLevel.H2,
 		wrapping: true
 	});
 
-	var oOLI = new ObjectListItem({
+	const oOLI = new ObjectListItem({
 		title: "{name}",
 		intro: "{text}"
 	});
 
-	var oPC1 = new PlanningCalendar("PC1", {
+	const oPC1 = new PlanningCalendar("PC1", {
 		startDate: UI5Date.getInstance("2015", "0", "1", "08", "00"),
 		rows: [
 			new PlanningCalendarRow("Row1", {
@@ -244,7 +246,8 @@ sap.ui.define([
 						type: CalendarDayType.Type02,
 						title: "SAPUI5",
 						tooltip: "Test",
-						icon: "sap-icon://sap-ui5"
+						icon: "sap-icon://sap-ui5",
+						ariaHasPopup: AriaHasPopup.Dialog
 					})
 				],
 				appointments: [
@@ -253,6 +256,7 @@ sap.ui.define([
 						endDate: UI5Date.getInstance("2015", "0", "2", "09", "00"),
 						type: CalendarDayType.Type03,
 						ariaLabelledBy: "appCaptionR1A1",
+						ariaHasPopup: AriaHasPopup.Dialog,
 						customContent: [
 							new FlexBox({
 								direction: "Column",
@@ -294,7 +298,8 @@ sap.ui.define([
 						icon: "sap-icon://home",
 						tooltip: "Tooltip 2",
 						text: "Home",
-						tentative: true
+						tentative: true,
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R1A3", {
 						startDate: UI5Date.getInstance("2014", "11", "31", "08", "30"),
@@ -302,7 +307,8 @@ sap.ui.define([
 						type: CalendarDayType.Type02,
 						title: "Blocker 3",
 						icon: "sap-icon://home",
-						tooltip: "Tooltip 3"
+						tooltip: "Tooltip 3",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R1A4", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "09", "45"),
@@ -310,7 +316,8 @@ sap.ui.define([
 						type: CalendarDayType.Type09,
 						title: "Meeting 4",
 						tooltip: "Tooltip 4",
-						selected: true
+						selected: true,
+						ariaHasPopup: AriaHasPopup.Dialog
 					})
 				]
 			}),
@@ -337,7 +344,8 @@ sap.ui.define([
 						type: CalendarDayType.Type01,
 						title: "Event 1",
 						tooltip: "Tooltip 1",
-						text: "Room 1"
+						text: "Room 1",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R2A2", {
 						startDate: UI5Date.getInstance("2015", "0", "2", "00", "00"),
@@ -346,7 +354,8 @@ sap.ui.define([
 						title: "Event 2",
 						icon: "sap-icon://home",
 						tooltip: "Tooltip 2",
-						text: "Home"
+						text: "Home",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R2A3", {
 						startDate: UI5Date.getInstance("2015", "0", "3", "00", "00"),
@@ -354,7 +363,8 @@ sap.ui.define([
 						type: CalendarDayType.Type03,
 						title: "Event 3",
 						icon: "sap-icon://home",
-						tooltip: "Tooltip 3"
+						tooltip: "Tooltip 3",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R2A4", {
 						startDate: UI5Date.getInstance("2015", "1", "1", "00", "00"),
@@ -362,7 +372,8 @@ sap.ui.define([
 						type: CalendarDayType.Type04,
 						title: "Event 4",
 						icon: "sap-icon://home",
-						tooltip: "Tooltip 4"
+						tooltip: "Tooltip 4",
+						ariaHasPopup: AriaHasPopup.Dialog
 					})
 				]
 			}),
@@ -467,7 +478,8 @@ sap.ui.define([
 						type: CalendarDayType.Type01,
 						title: "Type01",
 						icon: "sap-icon://palette",
-						tooltip: "Tooltip 1"
+						tooltip: "Tooltip 1",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R3A2", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "09", "00"),
@@ -475,7 +487,8 @@ sap.ui.define([
 						type: CalendarDayType.Type02,
 						title: "Type02",
 						icon: "sap-icon://palette",
-						tooltip: "Tooltip 2"
+						tooltip: "Tooltip 2",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R3A3", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "10", "00"),
@@ -483,7 +496,8 @@ sap.ui.define([
 						type: CalendarDayType.Type03,
 						title: "Type03",
 						icon: "sap-icon://palette",
-						tooltip: "Tooltip 3"
+						tooltip: "Tooltip 3",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R3A4", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "11", "00"),
@@ -491,7 +505,8 @@ sap.ui.define([
 						type: CalendarDayType.Type04,
 						title: "Type04",
 						icon: "sap-icon://palette",
-						tooltip: "Tooltip 4"
+						tooltip: "Tooltip 4",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R3A5", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "12", "00"),
@@ -499,7 +514,8 @@ sap.ui.define([
 						type: CalendarDayType.Type05,
 						title: "Type05",
 						icon: "sap-icon://palette",
-						tooltip: "Tooltip 5"
+						tooltip: "Tooltip 5",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R3A6", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "13", "00"),
@@ -507,7 +523,8 @@ sap.ui.define([
 						type: CalendarDayType.Type06,
 						title: "Type06",
 						icon: "sap-icon://palette",
-						tooltip: "Tooltip 6"
+						tooltip: "Tooltip 6",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R3A7", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "14", "00"),
@@ -515,7 +532,8 @@ sap.ui.define([
 						type: CalendarDayType.Type07,
 						title: "Type07",
 						icon: "sap-icon://palette",
-						tooltip: "Tooltip 7"
+						tooltip: "Tooltip 7",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R3A8", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "15", "00"),
@@ -523,7 +541,8 @@ sap.ui.define([
 						type: CalendarDayType.Type08,
 						title: "Type08",
 						icon: "sap-icon://palette",
-						tooltip: "Tooltip 8"
+						tooltip: "Tooltip 8",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R3A9", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "16", "00"),
@@ -531,7 +550,8 @@ sap.ui.define([
 						type: CalendarDayType.Type09,
 						title: "Type09",
 						icon: "sap-icon://palette",
-						tooltip: "Tooltip 9"
+						tooltip: "Tooltip 9",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R3A10", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "17", "00"),
@@ -539,7 +559,8 @@ sap.ui.define([
 						type: CalendarDayType.Type10,
 						title: "Type10",
 						icon: "sap-icon://palette",
-						tooltip: "Tooltip 10"
+						tooltip: "Tooltip 10",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R3A11", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "18", "00"),
@@ -547,7 +568,8 @@ sap.ui.define([
 						type: CalendarDayType.None,
 						title: "None",
 						icon: "sap-icon://palette",
-						tooltip: "None"
+						tooltip: "None",
+						ariaHasPopup: AriaHasPopup.Dialog
 					})
 				]
 			}),
@@ -587,7 +609,8 @@ sap.ui.define([
 						color: "#e09d00",
 						title: "#e09d00",
 						tooltip: "#e09d00",
-						icon: "sap-icon://palette"
+						icon: "sap-icon://palette",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R4A2", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "09", "00"),
@@ -595,7 +618,8 @@ sap.ui.define([
 						color: "#e6600d",
 						title: "#e6600d",
 						tooltip: "#e6600d",
-						icon: "sap-icon://palette"
+						icon: "sap-icon://palette",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R4A3", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "10", "00"),
@@ -603,7 +627,8 @@ sap.ui.define([
 						color: "#c14646",
 						title: "#c14646",
 						tooltip: "#c14646",
-						icon: "sap-icon://palette"
+						icon: "sap-icon://palette",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R4A4", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "11", "00"),
@@ -611,7 +636,8 @@ sap.ui.define([
 						color: "#853808",
 						title: "#853808",
 						tooltip: "#853808",
-						icon: "sap-icon://palette"
+						icon: "sap-icon://palette",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R4A5", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "12", "00"),
@@ -619,7 +645,8 @@ sap.ui.define([
 						color: "#de54c1",
 						title: "#de54c1",
 						tooltip: "#de54c1",
-						icon: "sap-icon://palette"
+						icon: "sap-icon://palette",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R4A6", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "13", "00"),
@@ -627,7 +654,8 @@ sap.ui.define([
 						color: "#0092d1",
 						title: "#0092d1",
 						tooltip: "#0092d1",
-						icon: "sap-icon://palette"
+						icon: "sap-icon://palette",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R4A7", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "14", "00"),
@@ -635,7 +663,8 @@ sap.ui.define([
 						color: "#1a9898",
 						title: "#1a9898",
 						tooltip: "#1a9898",
-						icon: "sap-icon://palette"
+						icon: "sap-icon://palette",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R4A8", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "15", "00"),
@@ -643,7 +672,8 @@ sap.ui.define([
 						color: "#759421",
 						title: "#759421",
 						tooltip: "#759421",
-						icon: "sap-icon://palette"
+						icon: "sap-icon://palette",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R4A9", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "16", "00"),
@@ -651,7 +681,8 @@ sap.ui.define([
 						color: "#1fbbff",
 						title: "#1fbbff",
 						tooltip: "#1fbbff",
-						icon: "sap-icon://palette"
+						icon: "sap-icon://palette",
+						ariaHasPopup: AriaHasPopup.Dialog
 					})
 				]
 			}),
@@ -677,7 +708,8 @@ sap.ui.define([
 						title: "2 days meeting",
 						icon: "../ui/unified/images/m_01.png",
 						tooltip: "2 days meeting",
-						text: "Room 1"
+						text: "Room 1",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R5A2", {
 						startDate: UI5Date.getInstance("2014", "11", "31", "10", "45"),
@@ -687,7 +719,8 @@ sap.ui.define([
 						icon: "sap-icon://home",
 						tooltip: "Tooltip 2",
 						text: "Home",
-						tentative: true
+						tentative: true,
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R5A3", {
 						startDate: UI5Date.getInstance("2014", "11", "31", "08", "30"),
@@ -695,7 +728,8 @@ sap.ui.define([
 						type: CalendarDayType.Type02,
 						title: "Blocker 3",
 						icon: "sap-icon://home",
-						tooltip: "Tooltip 3"
+						tooltip: "Tooltip 3",
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R5A4", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "09", "45"),
@@ -703,7 +737,8 @@ sap.ui.define([
 						type: CalendarDayType.Type02,
 						title: "Meeting 4",
 						tooltip: "Tooltip 4",
-						selected: true
+						selected: true,
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R5A5", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "11", "00"),
@@ -711,7 +746,8 @@ sap.ui.define([
 						type: CalendarDayType.Type02,
 						title: "Meeting 5",
 						tooltip: "Tooltip 5",
-						selected: true
+						selected: true,
+						ariaHasPopup: AriaHasPopup.Dialog
 					}),
 					new CalendarAppointment("R5A6", {
 						startDate: UI5Date.getInstance("2015", "0", "1", "11", "30"),
@@ -719,7 +755,8 @@ sap.ui.define([
 						type: CalendarDayType.Type02,
 						title: "Meeting 5",
 						tooltip: "Tooltip 5",
-						selected: true
+						selected: true,
+						ariaHasPopup: AriaHasPopup.Dialog
 					})
 				]
 			})
@@ -773,7 +810,7 @@ sap.ui.define([
 		rowSelectionChange: handleRowSelectionChange
 	});
 
-	var oPage = new Page({
+	const oPage = new Page({
 		title: "PlanningCalendar Accessibility Test Page",
 		titleLevel: TitleLevel.H1,
 		content: [

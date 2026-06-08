@@ -1162,6 +1162,49 @@ sap.ui.define([
 		}, 100);
 	});
 
+	QUnit.test("Keyboard - Enter keyup after menu opens does not close menu", async function(assert) {
+		// When a menu is opened via keyboard and the first item is a MenuTextFieldItem, the
+		// Enter keyup from the opener must not trigger item selection and close the menu.
+
+		// Prepare
+		const fnSelectSpy = sinon.spy();
+		const oTFItem = new MenuTextFieldItem({ select: fnSelectSpy });
+		const oMenu = new Menu({ items: [oTFItem] });
+		openMenu(oMenu, false, assert);
+
+		await nextUIUpdate();
+
+		// Act - simulate Enter keyup (keydown was on the opener, not on the menu)
+		qutils.triggerKeyEvent("keyup", oTFItem.getDomRef("tf"), "ENTER");
+
+		// Assert
+		assert.ok(oMenu.isOpen(), "Menu stays open after Enter keyup");
+		assert.ok(fnSelectSpy.notCalled, "No select event fired");
+
+		oMenu.destroy();
+	});
+
+	QUnit.test("Keyboard - Enter in MenuTextFieldItem as first item selects and closes", async function(assert) {
+		// Prepare
+		const fnSelectSpy = sinon.spy();
+		const oTFItem = new MenuTextFieldItem({ select: fnSelectSpy });
+		const oMenu = new Menu({ items: [oTFItem] });
+		openMenu(oMenu, false, assert);
+
+		await nextUIUpdate();
+
+		// Act
+		oTFItem.getDomRef("tf").value = "typed";
+		triggerKey(oTFItem.getDomRef("tf"), "ENTER");
+
+		// Assert
+		assert.notOk(oMenu.isOpen(), "Menu closed after Enter");
+		assert.ok(fnSelectSpy.calledOnce, "Select event fired for the TextField item");
+		assert.equal(oTFItem.getValue(), "typed", "Value was committed before select");
+
+		oMenu.destroy();
+	});
+
 	QUnit.test("Keyboard - Disabled Menu", function(assert) {
 		lastSelectedItemId = null;
 		var sTfId = "item12-tf";

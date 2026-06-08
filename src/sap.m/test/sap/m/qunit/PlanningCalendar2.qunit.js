@@ -37,7 +37,8 @@ sap.ui.define([
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/InvisibleText",
 	"sap/ui/events/KeyCodes",
-	"sap/ui/core/date/UI5Date"
+	"sap/ui/core/date/UI5Date",
+	"sap/ui/core/library"
 ], function(
 	Formatting,
 	Localization,
@@ -76,12 +77,16 @@ sap.ui.define([
 	XMLView,
 	InvisibleText,
 	KeyCodes,
-	UI5Date
+	UI5Date,
+	coreLibrary
 ) {
 	"use strict";
 
 	// set language to en-GB, since we have specific language strings tested
 	Localization.setLanguage("en_GB");
+
+	// shortcut for sap.ui.core.aria.HasPopup
+	const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 	// shortcut for sap.m.PlanningCalendarBuiltInView
 	var PlanningCalendarBuiltInView = mobileLibrary.PlanningCalendarBuiltInView;
@@ -1700,6 +1705,113 @@ sap.ui.define([
 		assert.ok($appointmentRef.attr("aria-labelledby").indexOf(sTypeTextId) > -1, "Appointment has type announcement");
 
 		// Clean
+		oPC.destroy();
+	});
+
+	QUnit.test("ariaHasPopup on appointments - default renders no aria-haspopup attribute", function(assert) {
+		// prepare
+		const oAppointment = new CalendarAppointment({
+			startDate: UI5Date.getInstance(2015, 0, 1, 8, 0),
+			endDate: UI5Date.getInstance(2015, 0, 1, 9, 0),
+			title: "Test"
+		});
+		const oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2015, 0, 1, 8, 0),
+			rows: [
+				new PlanningCalendarRow({
+					appointments: [oAppointment]
+				})
+			]
+		});
+		oPC.placeAt("bigUiArea");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.strictEqual(oAppointment.getAriaHasPopup(), AriaHasPopup.None, "ariaHasPopup defaults to None");
+		assert.notOk(oAppointment.getDomRef().getAttribute("aria-haspopup"),
+			"No aria-haspopup attribute rendered when value is None");
+
+		// clean
+		oPC.destroy();
+	});
+
+	QUnit.test("ariaHasPopup on appointments - renders aria-haspopup attribute with lowercased value", function(assert) {
+		// prepare
+		const oAppointment = new CalendarAppointment({
+			startDate: UI5Date.getInstance(2015, 0, 1, 8, 0),
+			endDate: UI5Date.getInstance(2015, 0, 1, 9, 0),
+			title: "Test",
+			ariaHasPopup: AriaHasPopup.Dialog
+		});
+		const oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2015, 0, 1, 8, 0),
+			rows: [
+				new PlanningCalendarRow({
+					appointments: [oAppointment]
+				})
+			]
+		});
+		oPC.placeAt("bigUiArea");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.strictEqual(oAppointment.getDomRef().getAttribute("aria-haspopup"), "dialog",
+			"aria-haspopup attribute rendered as lowercase 'dialog'");
+
+		// clean
+		oPC.destroy();
+	});
+
+	QUnit.test("ariaHasPopup on interval headers - renders aria-haspopup attribute", function(assert) {
+		// prepare
+		const oHeader = new CalendarAppointment({
+			startDate: UI5Date.getInstance(2015, 0, 1, 9, 0),
+			endDate: UI5Date.getInstance(2015, 0, 1, 11, 0),
+			title: "Header",
+			ariaHasPopup: AriaHasPopup.Dialog
+		});
+		const oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2015, 0, 1, 8, 0),
+			rows: [
+				new PlanningCalendarRow({
+					intervalHeaders: [oHeader]
+				})
+			]
+		});
+		oPC.placeAt("bigUiArea");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.strictEqual(oHeader.getDomRef().getAttribute("aria-haspopup"), "dialog",
+			"aria-haspopup attribute rendered as lowercase 'dialog' on interval header");
+
+		// clean
+		oPC.destroy();
+	});
+
+	QUnit.test("ariaHasPopup on interval headers - default renders no aria-haspopup attribute", function(assert) {
+		// prepare
+		const oHeader = new CalendarAppointment({
+			startDate: UI5Date.getInstance(2015, 0, 1, 9, 0),
+			endDate: UI5Date.getInstance(2015, 0, 1, 11, 0),
+			title: "Header"
+		});
+		const oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2015, 0, 1, 8, 0),
+			rows: [
+				new PlanningCalendarRow({
+					intervalHeaders: [oHeader]
+				})
+			]
+		});
+		oPC.placeAt("bigUiArea");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.notOk(oHeader.getDomRef().getAttribute("aria-haspopup"),
+			"No aria-haspopup attribute rendered on interval header when value is None");
+
+		// clean
 		oPC.destroy();
 	});
 

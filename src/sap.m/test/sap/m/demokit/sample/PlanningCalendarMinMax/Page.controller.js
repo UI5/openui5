@@ -26,14 +26,16 @@ sap.ui.define([
 							title: "Working out of the building",
 							type: "Type07",
 							pic: "sap-icon://sap-ui5",
-							tentative: false
+							tentative: false,
+							ariaHasPopup: "Dialog"
 						},
 							{
 								start: UI5Date.getInstance(2017, 0, 15, 8, 30),
 								end: UI5Date.getInstance(2017, 0, 15, 9, 30),
 								title: "Meeting with Max Mustermann",
 								type: "Type02",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 15, 10, 0),
@@ -42,7 +44,8 @@ sap.ui.define([
 								info: "room 1",
 								type: "Type01",
 								pic: "sap-icon://sap-ui5",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 15, 11, 30),
@@ -50,7 +53,8 @@ sap.ui.define([
 								title: "Lunch",
 								info: "canteen",
 								type: "Type03",
-								tentative: true
+								tentative: true,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 15, 13, 30),
@@ -58,7 +62,8 @@ sap.ui.define([
 								title: "Discussion with clients",
 								info: "online meeting",
 								type: "Type02",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 16, 0, 1),
@@ -66,14 +71,16 @@ sap.ui.define([
 								title: "Discussion",
 								info: "Online meeting",
 								type: "Type04",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 18, 8, 30),
 								end: UI5Date.getInstance(2017, 0, 18, 9, 30),
 								title: "Meeting with the manager",
 								type: "Type02",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 18, 11, 0),
@@ -81,7 +88,8 @@ sap.ui.define([
 								title: "Lunch",
 								info: "canteen",
 								type: "Type03",
-								tentative: true
+								tentative: true,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 18, 1, 0),
@@ -90,7 +98,8 @@ sap.ui.define([
 								info: "regular",
 								type: "Type01",
 								pic: "sap-icon://sap-ui5",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 21, 0, 30),
@@ -98,14 +107,16 @@ sap.ui.define([
 								title: "New Product",
 								info: "room 105",
 								type: "Type03",
-								tentative: true
+								tentative: true,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 25, 11, 30),
 								end: UI5Date.getInstance(2017, 0, 25, 13, 30),
 								title: "Lunch",
 								type: "Type03",
-								tentative: true
+								tentative: true,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 29, 10, 0),
@@ -114,14 +125,16 @@ sap.ui.define([
 								info: "room 1",
 								type: "Type01",
 								pic: "sap-icon://sap-ui5",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 30, 8, 0),
 								end: UI5Date.getInstance(2017, 0, 30, 9, 30),
 								title: "Meet Max Mustermann",
 								type: "Type02",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 30, 10, 0),
@@ -130,21 +143,24 @@ sap.ui.define([
 								info: "room 1",
 								type: "Type01",
 								pic: "sap-icon://sap-ui5",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 30, 11, 30),
 								end: UI5Date.getInstance(2017, 0, 30, 13, 30),
 								title: "Lunch",
 								type: "Type03",
-								tentative: true
+								tentative: true,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 30, 13, 30),
 								end: UI5Date.getInstance(2017, 0, 30, 17, 30),
 								title: "Discussion with clients",
 								type: "Type02",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 0, 31, 10, 0),
@@ -152,7 +168,8 @@ sap.ui.define([
 								title: "Discussion of the plan",
 								info: "Online meeting",
 								type: "Type04",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 1, 1, 1, 0),
@@ -161,14 +178,16 @@ sap.ui.define([
 								info: "regular",
 								type: "Type07",
 								pic: "sap-icon://sap-ui5",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 1, 3, 8, 30),
 								end: UI5Date.getInstance(2017, 1, 13, 9, 30),
 								title: "Meeting with the manager",
 								type: "Type02",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 1, 4, 10, 0),
@@ -177,7 +196,8 @@ sap.ui.define([
 								info: "room 1",
 								type: "Type01",
 								pic: "sap-icon://sap-ui5",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 2, 30, 10, 0),
@@ -185,7 +205,8 @@ sap.ui.define([
 								title: "Working out of the building",
 								type: "Type07",
 								pic: "sap-icon://sap-ui5",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 							{
 								start: UI5Date.getInstance(2017, 8, 1, 0, 30),
@@ -193,7 +214,8 @@ sap.ui.define([
 								title: "Development of a new Product",
 								info: "room 207",
 								type: "Type03",
-								tentative: true
+								tentative: true,
+								ariaHasPopup: "Dialog"
 							}
 						]
 					},
@@ -208,14 +230,16 @@ sap.ui.define([
 								info: "room 1",
 								type: "Type01",
 								pic: "sap-icon://sap-ui5",
-								tentative: false
+								tentative: false,
+								ariaHasPopup: "Dialog"
 							},
 								{
 									start: UI5Date.getInstance(2017, 0, 15, 8, 30),
 									end: UI5Date.getInstance(2017, 0, 15, 9, 30),
 									title: "Meeting with John Miller",
 									type: "Type02",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 0, 15, 10, 0),
@@ -224,7 +248,8 @@ sap.ui.define([
 									info: "room 1",
 									type: "Type01",
 									pic: "sap-icon://sap-ui5",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 0, 15, 13, 0),
@@ -232,7 +257,8 @@ sap.ui.define([
 									title: "Discussion with clients",
 									info: "online",
 									type: "Type02",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 0, 16, 0, 0),
@@ -240,7 +266,8 @@ sap.ui.define([
 									title: "Vacation",
 									info: "out of office",
 									type: "Type04",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 0, 17, 1, 0),
@@ -249,14 +276,16 @@ sap.ui.define([
 									info: "regular",
 									type: "Type07",
 									pic: "sap-icon://sap-ui5",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 0, 19, 8, 30),
 									end: UI5Date.getInstance(2017, 0, 19, 18, 30),
 									title: "Meet John Miller",
 									type: "Type02",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 0, 19, 0, 1),
@@ -265,14 +294,16 @@ sap.ui.define([
 									info: "room 102",
 									type: "Type01",
 									pic: "sap-icon://sap-ui5",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 0, 19, 7, 0),
 									end: UI5Date.getInstance(2017, 0, 19, 17, 30),
 									title: "Discussion with clients",
 									type: "Type02",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 0, 20, 0, 0),
@@ -280,7 +311,8 @@ sap.ui.define([
 									title: "Vacation",
 									info: "out of office",
 									type: "Type04",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 0, 22, 7, 0),
@@ -288,7 +320,8 @@ sap.ui.define([
 									title: "Discussion with clients",
 									info: "out of office",
 									type: "Type02",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 1, 15, 10, 0),
@@ -297,13 +330,15 @@ sap.ui.define([
 									info: "room 1",
 									type: "Type01",
 									pic: "sap-icon://sap-ui5",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 2, 13, 9, 0),
 									end: UI5Date.getInstance(2017, 3, 9, 10, 0),
 									title: "Reminder",
-									type: "Type06"
+									type: "Type06",
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 3, 10, 0, 0),
@@ -311,14 +346,16 @@ sap.ui.define([
 									title: "Vacation",
 									info: "out of office",
 									type: "Type04",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								},
 								{
 									start: UI5Date.getInstance(2017, 7, 1, 0, 0),
 									end: UI5Date.getInstance(2017, 9, 31, 23, 59),
 									title: "New quarter",
 									type: "Type10",
-									tentative: false
+									tentative: false,
+									ariaHasPopup: "Dialog"
 								}
 							]
 						}

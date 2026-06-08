@@ -31,7 +31,8 @@
 								title="{title}"
 								text="{info}"
 								type="{type}"
-								tentative="{tentative}">
+								tentative="{tentative}"
+								ariaHasPopup="{ariaHasPopup}">
 						</unified:CalendarAppointment>
 					</appointments>
 					<intervalHeaders>

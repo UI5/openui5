@@ -13,7 +13,8 @@ sap.ui.define([
 	'./PlanningCalendarLegend',
 	'sap/ui/unified/library',
 	'sap/ui/unified/calendar/RecurrenceUtils',
-	'sap/ui/core/date/UI5Date'
+	'sap/ui/core/date/UI5Date',
+	'sap/ui/core/library'
 ], function(
 	Localization,
 	Element,
@@ -25,22 +26,26 @@ sap.ui.define([
 	PlanningCalendarLegend,
 	unifiedLibrary,
 	RecurrenceUtils,
-	UI5Date
+	UI5Date,
+	coreLibrary
 ) {
 	"use strict";
 
-	var iVerticalPaddingBetweenAppointments = 0.125;
-	var iAppointmentBottomPadding = 0.125;
-	var iAppointmentTopPadding = 0.0625;
+	const iVerticalPaddingBetweenAppointments = 0.125;
+	const iAppointmentBottomPadding = 0.125;
+	const iAppointmentTopPadding = 0.0625;
 
 	// shortcut for sap.ui.unified.CalendarDayType
-	var CalendarDayType = unifiedLibrary.CalendarDayType;
+	const CalendarDayType = unifiedLibrary.CalendarDayType;
+
+	// shortcut for sap.ui.core.aria.HasPopup
+	const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 	/**
 	 * SinglePlanningCalendarGrid renderer.
 	 * @namespace
 	 */
-	var SinglePlanningCalendarGridRenderer = {
+	const SinglePlanningCalendarGridRenderer = {
 		apiVersion: 2
 	};
 
@@ -285,6 +290,7 @@ sap.ui.define([
 			sText = oBlocker.getText(),
 			sIcon = oBlocker.getIcon(),
 			sId = oBlocker.getId(),
+			sAriaHasPopup = oBlocker.getAriaHasPopup(),
 			mAccProps = {
 				role: "listitem",
 				labelledby: {
@@ -351,6 +357,11 @@ sap.ui.define([
 		oRm.style("top", iRowHeight * iBlockerLevel + 0.0625 + "rem"); // Adding 0.0625rem to render all of the blockers 0.0625rem below in order to have space on top of them.
 		oRm.style(bIsRTL ? "right" : "left", Math.max(iLeftPosition, 0) + "%");
 		oRm.style(bIsRTL ? "left" : "right", Math.max(iRightPosition, 0) + "%");
+
+		if (sAriaHasPopup !== AriaHasPopup.None) {
+			oRm.attr("aria-haspopup", sAriaHasPopup.toLowerCase());
+		}
+
 		oRm.openEnd();
 
 		oRm.openStart("div");
@@ -646,6 +657,7 @@ sap.ui.define([
 			iAppChunkWidth = 100 / (iMaxLevel + 1),
 			bDraggable = oControl.getEnableAppointmentsDragAndDrop(),
 			iScaleFactor = oControl.getProperty("scaleFactor"),
+			sAriaHasPopup = oAppointment.getAriaHasPopup(),
 			iDivider = 2 * iScaleFactor,
 			iStartDayDiff,
 			iEndDayDiff,
@@ -719,6 +731,11 @@ sap.ui.define([
 		oRm.style("bottom", iAppBottom + "rem");
 		oRm.style(Localization.getRTL() ? "right" : "left", iAppChunkWidth * iAppointmentLevel + "%");
 		oRm.style("width", iAppChunkWidth * iAppointmentWidth + "%"); // TODO: take into account the levels
+
+		if (sAriaHasPopup !== AriaHasPopup.None) {
+			oRm.attr("aria-haspopup", sAriaHasPopup.toLowerCase());
+		}
+
 		oRm.openEnd();
 
 		oRm.openStart("div");

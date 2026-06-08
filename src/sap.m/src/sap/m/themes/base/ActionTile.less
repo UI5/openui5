@@ -291,6 +291,16 @@
 	}
 }
 
+.sapMAT {
+    .sapUiLocalBusyIndicator {
+        border-radius: var(--sapTile_BorderCornerRadius);
+
+        &:focus::after {
+            border-radius: var(--sapTile_BorderCornerRadius);
+        }
+    }
+}
+
 .sapMAT.sapMATDynamicHeight {
 	height: auto;
 	display: inline-flex;
