@@ -6473,7 +6473,7 @@
 		"narrow": "KN {0}",
 		"wide": "Kalendarska nedjelja {0}"
 	},
-	"sap-datePlaceholder": "Na primjer\\: {0}",
+	"sap-datePlaceholder": "Na primjer: {0}",
 	"sap-fileSize": {
 		"Byte": "{0} bajt",
 		"Bytes": "{0} bajtova",

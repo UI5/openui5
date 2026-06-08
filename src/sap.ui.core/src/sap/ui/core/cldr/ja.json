@@ -6144,7 +6144,7 @@
 		"narrow": "CW {0}",
 		"wide": "カレンダ週 {0}"
 	},
-	"sap-datePlaceholder": "例\\: {0}",
+	"sap-datePlaceholder": "例: {0}",
 	"sap-fileSize": {
 		"Byte": "{0} バイト",
 		"Bytes": "{0} バイト",

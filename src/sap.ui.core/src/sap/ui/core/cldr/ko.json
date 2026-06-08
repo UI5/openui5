@@ -6023,7 +6023,7 @@
 		"narrow": "CW {0}",
 		"wide": "역주 {0}"
 	},
-	"sap-datePlaceholder": "예\\: {0}",
+	"sap-datePlaceholder": "예: {0}",
 	"sap-fileSize": {
 		"Byte": "{0}바이트",
 		"Bytes": "{0}바이트",
