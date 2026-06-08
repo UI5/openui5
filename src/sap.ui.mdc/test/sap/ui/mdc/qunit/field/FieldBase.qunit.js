@@ -3700,8 +3700,10 @@ sap.ui.define([
 			const aConditions = oValueHelp.getConditions();
 			assert.equal(aConditions.length, 1, "Condition set on ValueHelp");
 
+			sinon.spy(oContent, "_applySuggestionAcc");
 			oValueHelp.fireOpened({itemId: "myItem", items: undefined, focused: false});
 			assert.ok(oValueHelp.setVisualFocus.notCalled, "visual focus not set on ValueHelp");
+			assert.notOk(oContent._applySuggestionAcc.called, "_applySuggestionAcc not called");
 
 			sinon.stub(oValueHelp, "isOpen").returns(true);
 			oContent.fireValueHelpRequest({fromKeyboard: false});
@@ -3740,8 +3742,10 @@ sap.ui.define([
 			const aConditions = oValueHelp.getConditions();
 			assert.equal(aConditions.length, 1, "Condition set on ValueHelp");
 
-			oValueHelp.fireOpened({itemId: "myItem", items: undefined, focused: false});
+			sinon.spy(oContent, "_applySuggestionAcc");
+			oValueHelp.fireOpened({itemId: "myItem", items: 0, focused: false});
 			assert.ok(oValueHelp.setVisualFocus.calledOnce, "visual focus not set on ValueHelp");
+			assert.ok(oContent._applySuggestionAcc.calledWith(0), "_applySuggestionAcc called");
 
 			sinon.stub(oValueHelp, "isOpen").returns(true);
 			oContent.fireValueHelpRequest({fromKeyboard: false});
