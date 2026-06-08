@@ -2161,5 +2161,25 @@
         "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
       }
     ]
+  },
+  "1.96.47": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "06b3285a2ba4514fb3327ac346476291f0470384",
+        "type": "FIX",
+        "text": " We've now fixed the scroll arrow buttons not working when a single item is larger than the HeaderContainer"
+      },
+      {
+        "id": "d1278d6d79a35efca24036208e42c22661c5f8c0",
+        "type": "FIX",
+        "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
+      },
+      {
+        "id": "c278e4e0b2e38715a8b430f221016fec1d38e67f",
+        "type": "FIX",
+        "text": " sap.m.Text: Skip unstable test in Chrome"
+      }
+    ]
   }
 }

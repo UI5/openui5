@@ -164,5 +164,15 @@
         ]
       }
     ]
+  },
+  "1.96.47": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "d1278d6d79a35efca24036208e42c22661c5f8c0",
+        "type": "FIX",
+        "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
+      }
+    ]
   }
 }

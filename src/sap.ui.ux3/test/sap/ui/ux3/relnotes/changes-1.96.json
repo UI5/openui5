@@ -1,0 +1,12 @@
+{
+  "1.96.47": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "45a86bbe613294cdf341440fc71655c02800a089",
+        "type": "FIX",
+        "text": " sap.ui.ux3.ThingInspector: stabilize tests"
+      }
+    ]
+  }
+}

@@ -8,5 +8,15 @@
         "text": " sap.m.TimePicker: fix cursor position when there is mask and no entry"
       }
     ]
+  },
+  "1.96.47": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "ce8a432876d937d6a968e2822154812c3ec0b50e",
+        "type": "FIX",
+        "text": " sap.ui.commons.Tree: fix unstable test"
+      }
+    ]
   }
 }
