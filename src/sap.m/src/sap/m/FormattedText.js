@@ -338,7 +338,19 @@ function(
 
 		FormattedText.prototype.onAfterRendering = function () {
 			this.$().find('a').on("click", openLink);
-			this.getDomRef && this._sanitizeCSSPosition(this.getDomRef());
+			var aLinks = this.getControls(),
+				oTemplate;
+
+			aLinks.forEach(function(oLink, iCurrentIndex) {
+				oTemplate = this.getDomRef("$" + iCurrentIndex);
+				if (oTemplate) {
+					oTemplate.replaceWith(oLink.getDomRef());
+				} else {
+					oLink.getDomRef().style.display = "none";
+				}
+			}.bind(this));
+
+			this._sanitizeCSSPosition(this.getDomRef());
 		};
 
 		FormattedText.prototype.onBeforeRendering = function () {
