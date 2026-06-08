@@ -6113,7 +6113,7 @@
 		"narrow": "KN {0}",
 		"wide": "Kalendārā nedēļa {0}"
 	},
-	"sap-datePlaceholder": "piemēram\\: {0}",
+	"sap-datePlaceholder": "piemēram: {0}",
 	"sap-fileSize": {
 		"Byte": "{0} baits",
 		"Bytes": "{0} baiti",

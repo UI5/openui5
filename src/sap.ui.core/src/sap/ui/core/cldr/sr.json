@@ -6185,7 +6185,7 @@
 		"narrow": "КН {0}",
 		"wide": "Календарска недеља {0}"
 	},
-	"sap-datePlaceholder": "На пример\\: {0}",
+	"sap-datePlaceholder": "На пример: {0}",
 	"sap-fileSize": {
 		"Byte": "{0} бајт",
 		"Bytes": "{0} бајтова",
