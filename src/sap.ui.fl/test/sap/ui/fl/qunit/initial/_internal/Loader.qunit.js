@@ -954,7 +954,6 @@ sap.ui.define([
 				reference: sReference,
 				componentData: oComponentData
 			});
-			const sFirstCacheKey = this.oLoadFlexDataStub.firstCall.args[0].cacheKey;
 			assert.strictEqual(this.oGetCacheKeyStub.callCount, 1, "the cache key is retrieved once");
 
 			Loader.updateCachedResponse(sReference, []);
@@ -970,9 +969,9 @@ sap.ui.define([
 				componentData: oComponentData
 			});
 			assert.strictEqual(this.oGetCacheKeyStub.callCount, 1, "the cache key is not retrieved again");
-			assert.notEqual(
-				this.oLoadFlexDataStub.getCall(1).args[0].cacheKey, sFirstCacheKey,
-				"the cache key is different after the cached response is updated"
+			assert.strictEqual(
+				this.oLoadFlexDataStub.getCall(1).args[0].cacheKey, undefined,
+				"the cache key is undefined after the cached response is updated (token invalidated)"
 			);
 		});
 	});
