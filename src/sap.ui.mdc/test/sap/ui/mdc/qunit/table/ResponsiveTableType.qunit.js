@@ -1813,26 +1813,45 @@ sap.ui.define([
 		assert.equal(oRowTemplate.getCells()[2].getText(), "template1", "Cell template 2");
 	});
 
-	QUnit.test("Remove column cleans up cell templates", async function(assert) {
+	QUnit.test("Remove column cleans up cells", async function(assert) {
+		this.oTable.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
 		const oRowTemplate = this.oTable._oRowTemplate;
 		const oColumn0 = this.oTable.getColumns()[0];
 		const oColumn1 = this.oTable.getColumns()[1];
-		const oInnerColumn1 = oColumn1.getInnerColumn();
+		const oInnerColumn0 = oColumn0.getInnerColumn();
+		const oInnerColumn0DomRef = oInnerColumn0.getDomRef();
+		const aColumn0CellControls = this.oTable._oTable.getItems().map((oItem) => oItem.getCells()[0]);
+		const aColumn0CellDomRefs = aColumn0CellControls.map((oCell) => oCell.getDomRef());
+		const aColumn0CellDestroySpies = aColumn0CellControls.map((oCell) => sinon.spy(oCell, "destroy"));
 
 		this.oTable.removeColumn(oColumn0);
 		let aInnerColumns = this.oTable._oTable.getColumns();
 		assert.equal(this.oTable.getColumns().length, aInnerColumns.length, "Column count matches after first remove");
+		assert.notOk(aInnerColumns.includes(oInnerColumn0), "Inner column is no longer in the inner table's 'columns' aggregation");
 		assert.equal(aInnerColumns[0].getHeader().getText(), "Test1", "Inner column 0 header");
 		assert.equal(oRowTemplate.getCells()[0].getText(), "template1", "Cell template 0");
+		this.oTable._oTable.getItems().forEach((oItem) => {
+			assert.notOk(oItem.getCells().some((oCell) => aColumn0CellControls.includes(oCell)),
+				"Cell of removed column is no longer in the item's cells aggregation");
+		});
+		aColumn0CellDestroySpies.forEach((oSpy, i) => {
+			assert.ok(oSpy.calledOnceWithExactly("KeepDom"), "Row " + i + " cell destroyed with 'KeepDom'");
+		});
+
+		await new Promise((resolve) => { setTimeout(resolve, 0); });
+		await nextUIUpdate();
+		assert.notOk(document.body.contains(oInnerColumn0DomRef), "Inner column DOM is gone from the document after rerender");
+		aColumn0CellDomRefs.forEach((oRef, i) => {
+			assert.notOk(document.body.contains(oRef), "Row " + i + " cell DOM is gone from the document after rerender");
+		});
 
 		this.oTable.removeColumn(oColumn1);
 		aInnerColumns = this.oTable._oTable.getColumns();
 		assert.equal(this.oTable.getColumns().length, aInnerColumns.length, "Column count matches after second remove");
 		assert.equal(aInnerColumns.length, 0, "No inner columns left");
 		assert.equal(oRowTemplate.getCells().length, 0, "No cell templates left");
-
-		await new Promise(function(resolve) { setTimeout(resolve, 0); });
-		assert.ok(oInnerColumn1.isDestroyed(), "Inner column destroyed after deferred disconnect");
 
 		oColumn0.destroy();
 		oColumn1.destroy();

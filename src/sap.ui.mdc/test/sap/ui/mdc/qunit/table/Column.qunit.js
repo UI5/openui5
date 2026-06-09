@@ -165,18 +165,15 @@ sap.ui.define([
 		oTable.addColumn(this.oColumn);
 		await oTable.initialized();
 
-		const oInnerColumn = this.oColumn.getInnerColumn();
 		const oConnectSpy = sinon.spy(Column.prototype, "_connectToTable");
 		const oDisconnectSpy = sinon.spy(Column.prototype, "_disconnectFromTable");
 
 		oTable.removeColumn(this.oColumn);
 		assert.ok(oConnectSpy.notCalled, "_connectToTable not called");
 		assert.ok(oDisconnectSpy.notCalled, "_disconnectFromTable not called synchronously");
-		assert.ok(!oInnerColumn.isDestroyed(), "Inner column not yet destroyed");
 
 		await new Promise(function(resolve) { setTimeout(resolve, 0); });
 		assert.ok(oDisconnectSpy.calledOnce, "_disconnectFromTable called after deferred disconnect");
-		assert.ok(oInnerColumn.isDestroyed(), "Inner column destroyed");
 
 		oConnectSpy.restore();
 		oDisconnectSpy.restore();
@@ -239,8 +236,6 @@ sap.ui.define([
 		oTable.addColumn(oColumn2);
 		await oTable.initialized();
 
-		const oInnerColumn1 = this.oColumn.getInnerColumn();
-		const oInnerColumn2 = oColumn2.getInnerColumn();
 		const oDisconnectSpy = sinon.spy(Column.prototype, "_disconnectFromTable");
 
 		const aRemoved = oTable.removeAllColumns();
@@ -248,12 +243,28 @@ sap.ui.define([
 		assert.ok(oDisconnectSpy.notCalled, "_disconnectFromTable not called synchronously");
 
 		await new Promise(function(resolve) { setTimeout(resolve, 0); });
-		assert.ok(oDisconnectSpy.calledTwice, "_disconnectFromTable called for each column after deferred disconnect");
-		assert.ok(oInnerColumn1.isDestroyed(), "First inner column destroyed");
-		assert.ok(oInnerColumn2.isDestroyed(), "Second inner column destroyed");
+		assert.ok(oDisconnectSpy.calledTwice, "_disconnectFromTable called twice after deferred disconnect");
+		assert.ok(oDisconnectSpy.calledOn(this.oColumn), "_disconnectFromTable called on the first removed column");
+		assert.ok(oDisconnectSpy.calledOn(oColumn2), "_disconnectFromTable called on the second removed column");
 
 		oDisconnectSpy.restore();
 		oColumn2.destroy();
+		oTable.destroy();
+	});
+
+	QUnit.test("_disconnectFromTable destroys the inner column with 'KeepDom'", async function(assert) {
+		const oTable = new Table();
+
+		oTable.addColumn(this.oColumn);
+		await oTable.initialized();
+
+		const oInnerColumn = this.oColumn.getInnerColumn();
+		const oInnerDestroySpy = sinon.spy(oInnerColumn, "destroy");
+
+		this.oColumn._disconnectFromTable();
+		assert.ok(oInnerDestroySpy.calledOnceWithExactly("KeepDom"), "Inner column destroy called once with 'KeepDom'");
+
+		oInnerDestroySpy.restore();
 		oTable.destroy();
 	});
 

@@ -360,7 +360,7 @@ sap.ui.define([
 
 	Column.prototype._disconnectFromTable = function() {
 		this._getAIAction()?.setEnabled(false);
-		this._oInnerColumn?.destroy();
+		this._oInnerColumn?.destroy("KeepDom");
 		delete this._oInnerColumn;
 	};
 

@@ -34223,12 +34223,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3392
 	//
 	// A PATCH is pending for 4 (Mu) in the temporary binding when resolving the ODLB and that node
-	// is later revealed by expanding. Still, the user input is not lost!
+	// is later revealed by expanding. Still, the user input is not lost! The pending PATCH is
+	// optionally merged with another one in the end; that PATCH fails and is either canceled or
+	// retried succesfully.
 	// JIRA: CPOUI5ODATAV4-2092
 	[false, true].forEach(function (bSuspended) {
 		[false, true].forEach(function (bPending) {
-			var sTitle = "Recursive Hierarchy: getKeepAliveContext, suspended = " + bSuspended
-					+ ", pending PATCH for Mu = " + bPending;
+			[false, true, 1].forEach(function (bMergeAndRetry) { // true = success, 1 = cancel
+		var sTitle = "Recursive Hierarchy: getKeepAliveContext, suspended = " + bSuspended
+				+ ", pending PATCH for Mu = " + bPending
+				+ ", is merged & retried = " + bMergeAndRetry;
+
+		if (bMergeAndRetry && !bPending) {
+			return;
+		}
 
 		QUnit.test(sTitle, function (assert) {
 			var oLambda,
@@ -34242,7 +34250,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				},
 				oModel = this.createTeaBusiModel({autoExpandSelect : true}),
 				oMu,
-				oMuPromise,
+				oMu1stPromise,
+				oMu2ndPromise,
 				oNu,
 				oTable,
 				sView = '\
@@ -34336,7 +34345,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					{$$patchWithoutSideEffects : true});
 
 				// code under test
-				oMuPromise = oMu.setProperty("Name", "Mu (pending)", "update");
+				oMu1stPromise = oMu.setProperty("Name", "Mu (pending)", "update", bMergeAndRetry);
 
 				return Promise.all([
 					oMu.requestProperty("ROOM_ID"), // addt'l GET to be merged
@@ -34514,7 +34523,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				return Promise.all([
 					// code under test
 					oListBinding.resetChanges(),
-					checkCanceled(assert, oMuPromise),
+					checkCanceled(assert, oMu1stPromise),
 					that.waitForChanges(assert, "resetChanges for Mu")
 				]);
 			}).then(function () {
@@ -34659,7 +34668,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					oLambda.expand(),
 					that.waitForChanges(assert, "expand Lambda to reveal Mu")
 				]);
-			}).then(function () {
+			}).then(async function () {
 				checkTable("after expand Lambda to reveal Mu", assert, oTable, [
 					"/EMPLOYEES('1')",
 					"/EMPLOYEES('2')",
@@ -34692,23 +34701,79 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					return;
 				}
 
+				if (bMergeAndRetry) {
+					Messaging.removeAllMessages(); // clean up
+
+					that.expectRequest("PATCH EMPLOYEES('4')", {
+							headers : {
+								"If-Match" : "etag4",
+								Prefer : "return=minimal"
+							},
+							payload : {
+								AGE : 42,
+								Name : "Mu (pending)"
+							}
+						}, createErrorInsideBatch())
+						.expectMessages([{
+							code : "CODE",
+							message : "Request intentionally failed",
+							persistent : true,
+							technical : true,
+							type : "Error"
+						}]);
+					that.oLogMock.expects("error")
+						.withExactArgs("Failed to update path /EMPLOYEES('4')/Name",
+							sinon.match("Request intentionally failed"), sContext);
+					that.oLogMock.expects("error")
+						.withExactArgs("Failed to update path /EMPLOYEES('4')/AGE",
+							sinon.match("Request intentionally failed"), sContext);
+
+					// code under test
+					oMu2ndPromise = oMu.setProperty("AGE", 42, "update", true);
+
+					await Promise.all([
+						oModel.submitBatch("update"),
+						that.waitForChanges(assert, "fail Mu's merged PATCH")
+					]);
+
+					if (bMergeAndRetry === 1) {
+						// Note: oMu2ndPromise MUST not already be fulfilled by now!
+
+						that.expectCanceledError("Failed to update path /EMPLOYEES('4')/Name",
+								"Request canceled: PATCH EMPLOYEES('4'); group: update")
+							.expectCanceledError("Failed to update path /EMPLOYEES('4')/AGE",
+								"Request canceled: PATCH EMPLOYEES('4'); group: update");
+
+						return Promise.all([
+							// code under test
+							oMu.resetChanges(),
+							checkCanceled(assert, oMu1stPromise),
+							checkCanceled(assert, oMu2ndPromise),
+							that.waitForChanges(assert, "resetChanges for Mu")
+						]);
+					}
+				}
+
 				that.expectRequest("PATCH EMPLOYEES('4')", {
 						headers : {
 							"If-Match" : "etag4",
 							Prefer : "return=minimal"
 						},
 						payload : {
+							...(bMergeAndRetry && {AGE : 42}),
 							Name : "Mu (pending)"
 						}
 					}, oNO_CONTENT, {ETag : "n/a"});
 
 				return Promise.all([
-					oMuPromise,
+					oMu1stPromise,
+					oMu2ndPromise,
 					oModel.submitBatch("update"),
 					that.waitForChanges(assert, "submit Mu's pending PATCH")
 				]);
 			});
 		});
+			});
 		});
 	});
 

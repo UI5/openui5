@@ -300,6 +300,23 @@ sap.ui.define([
 			"tooltip not set, headerVisible=false, useColumnLabelsAsTooltips=true: Inner column 'tooltip'");
 	});
 
+	QUnit.test("Remove column cleans up inner column", async function(assert) {
+		this.oTable.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oInnerColumn = this.oColumn.getInnerColumn();
+		const oInnerColumnDomRef = oInnerColumn.getDomRef();
+
+		this.oTable.removeColumn(this.oColumn);
+		assert.notOk(this.oTable._oTable.getColumns().includes(oInnerColumn),
+			"Inner column is no longer in the inner table's 'columns' aggregation");
+		await new Promise((resolve) => { setTimeout(resolve, 0); });
+		await nextUIUpdate();
+		assert.notOk(document.body.contains(oInnerColumnDomRef), "Inner column DOM is gone from the document after rerender");
+
+		this.oColumn.destroy();
+	});
+
 	QUnit.module("API", {
 		afterEach: function() {
 			this.oTable?.destroy();

@@ -3593,6 +3593,19 @@ sap.ui.define([
 	};
 
 	/**
+	 * Checks whether the given model instance is a manifest created model.
+	 * These include all ODataModels with configuration <code>preload: true</code>.
+	 *
+	 * @param {sap.ui.model.Model} oModel the model that will be checked if it was created by this Component
+	 * @returns {boolean} whether the given model instance is known to this Component instance as a manifes created model
+	 * @private
+	 * @ui5-restricted sap.ui.core, sap.ui.fl
+	 */
+	Component.prototype._isManifestModel = function(oModel) {
+		return this._mManifestModels != null && Object.values(this._mManifestModels).includes(oModel);
+	};
+
+	/**
 	 * This method is called after the component is activated
 	 *
 	 * @function
