@@ -13,6 +13,7 @@ module.exports = [
 	"CardLocalizationCustomizationVisualTests.spec.js",
 	"CardSecurityPerformanceVisualTests.spec.js",
 	"CardVariantsVisualTests.spec.js",
+	"CardXSZoomVisualTests.spec.js",
 	"ComponentCardVisualTests.spec.js",
 	"HeaderInfoSectionVisualTests.spec.js",
 	"ListCardVisualTests.spec.js",
