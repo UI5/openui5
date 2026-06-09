@@ -89,6 +89,13 @@ sap.ui.define([
 		assert.ok(bTest, "Buttons put in separate rows with correct IDs");
 	});
 
+	QUnit.test("Root layout keeps interactive stacking context", function(assert) {
+		var oDomRef = this.oRFL.getDomRef();
+		var sZIndex = oDomRef ? window.getComputedStyle(oDomRef).zIndex : "";
+
+		assert.notStrictEqual(sZIndex, "-1", "Root ResponsiveFlowLayout must not be pushed behind the page content");
+	});
+
 	QUnit.module("Resize", {
 		beforeEach : async function() {
 			injectDefaultContent(this).placeAt("qunit-fixture");
