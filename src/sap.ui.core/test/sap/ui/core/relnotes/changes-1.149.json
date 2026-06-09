@@ -1,7 +1,12 @@
 {
   "1.149.0": {
-    "date": "May 2026",
+    "date": "June 2026",
     "notes": [
+      {
+        "id": "e26f2dbb074c1c2e95fdba27dbf89e66c7e2cdde",
+        "type": "FIX",
+        "text": " test/sap/ui/core/qunit/types/DateFormat.qunit.js: Fix failing Min/Max sample value tests"
+      },
       {
         "id": "abcf5cc304fbf80acf435b07fc8b99daef8d7e6f",
         "type": "FIX",
