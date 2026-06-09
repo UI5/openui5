@@ -834,7 +834,7 @@ sap.ui.define([
 
 	function removeCellFromItem(oItem, iIndex) {
 		// Group header item does not have cells
-		oItem.removeCell?.(iIndex)?.destroy();
+		oItem.removeCell?.(iIndex)?.destroy("KeepDom");
 	}
 
 	ResponsiveTableType.prototype.onModifications = function() {

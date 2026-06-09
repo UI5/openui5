@@ -10,6 +10,7 @@ sap.ui.define([
 	'sap/ui/core/UIComponentMetadata',
 	'sap/ui/core/mvc/View',
 	'sap/ui/core/mvc/_ViewFactory',
+	'sap/ui/model/json/JSONModel',
 	'testdata/routing/Component',
 	'testdata/routing/RouterExtension',
 	'sap/base/Log',
@@ -29,6 +30,7 @@ sap.ui.define([
 	UIComponentMetadata,
 	View,
 	_ViewFactory,
+	JSONModel,
 	SamplesRoutingComponent,
 	SamplesRouterExtension,
 	Log,
@@ -1736,6 +1738,29 @@ sap.ui.define([
 			assert.ok(oOwnModels.undefined.isA("sap.ui.model.json.JSONModel"), "Correct model instance should be returned.");
 			assert.ok(oOwnModels["i18n-component"].isA("sap.ui.model.resource.ResourceModel"), "Correct model instance should be returned.");
 			assert.ok(oOwnModels["i18n-manifest"].isA("sap.ui.model.resource.ResourceModel"), "Correct model instance should be returned.");
+		});
+	});
+
+	QUnit.test("Component._isManifestModel", function(assert) {
+		return Component.create({
+			manifest: this.oManifest
+		}).then(function(oComponent) {
+			// get ALL models, can contain others productively, but for this test case its only our manifest created models
+			var oManifestModel = oComponent.getModel("i18n-manifest");
+			assert.ok(oComponent._isManifestModel(oManifestModel), "Manifest created model is correctly checked.");
+
+			// some other unrelated models + errors
+			assert.notOk(oComponent._isManifestModel(new JSONModel({})), "Foreign model is correctly checked.");
+			assert.notOk(oComponent._isManifestModel(), "<undefined> call results in <false>.");
+			assert.notOk(oComponent._isManifestModel({foo: "bar"}), "Foreign objects call results in <false>.");
+
+			oComponent.setModel(null, "i18n-manifest");
+			assert.ok(oComponent._isManifestModel(oManifestModel),
+				"Manifest created model is correctly checked even when unassigned from component");
+
+			oComponent.setModel(oManifestModel, "fantasy");
+			assert.ok(oComponent._isManifestModel(oManifestModel),
+				"Manifest created model is correctly checked even when given a different name");
 		});
 	});
 

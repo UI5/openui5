@@ -71,6 +71,7 @@ sap.ui.define([
 			(oNode) => _Helper.getKeyFilter(oNode, this.sMetaPath, this.getTypes()));
 		if (oFirstLevel) {
 			this.mChangeRequests = oFirstLevel.mChangeRequests;
+			this.mEditUrl2PatchPromise = oFirstLevel.mEditUrl2PatchPromise;
 		}
 	}
 

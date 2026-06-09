@@ -328,7 +328,16 @@ sap.ui.define([
 	 * to the component will be set and the models will be propagated if defined.
 	 * If the <code>usage</code> property is set the ComponentLifecycle is processed like a "Container" lifecycle.
 	 *
-	 * @param {sap.ui.core.ID|sap.ui.core.UIComponent} vComponent ID of an element which becomes the new target of this component association. Alternatively, an element instance may be given.
+	 * <b>Note:</b> The <code>component</code> association is stored by ID, not by object reference (see
+	 * {@link sap.ui.base.ManagedObject#setAssociation}). Setting an ID that equals the currently stored one
+	 * is treated as a no-op.
+	 * When a previously associated UIComponent is destroyed via {@link sap.ui.core.UIComponent#destroy},
+	 * the association is <b>not</b> cleared automatically.
+	 * If, however, the application destroys the component differently or replaces it with a
+	 * new instance that happens to share the same ID, the stale ID must be cleared explicitly by calling
+	 * <code>setComponent(null)</code> before assigning the new instance.
+	 *
+	 * @param {sap.ui.core.ID|sap.ui.core.UIComponent|null} vComponent ID of an element which becomes the new target of this component association. Alternatively, an element instance may be given.
 	 * @return {this} the reference to <code>this</code> in order to allow method chaining
 	 * @public
 	 */
