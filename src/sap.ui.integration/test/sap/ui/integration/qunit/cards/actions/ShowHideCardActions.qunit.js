@@ -269,7 +269,7 @@ sap.ui.define([
 		assert.strictEqual(oChildCard.getWidth(), "100%", "The width of the child card is the default width of 100%");
 		assert.strictEqual(oDialog.getContentWidth(), "420px", "The width is applied to the dialog content");
 		assert.strictEqual(oChildCard.getCardHeader().getTitle(), "Donna", "Data is transferred between cards properly");
-		assert.strictEqual(oChildCard.getCardHeader().getProperty("headingLevel"), "1", "When card is in a dialog aria-level should be set to 1");
+		assert.strictEqual(oChildCard.getCardHeader().getProperty("headingLevel"), "H1", "When card is in a dialog aria-level should be set to 1");
 
 		const oChildCardActionStrip = oChildCard.getAggregation("_footer").getActionsStrip(),
 			aChildCardButtons = oChildCardActionStrip._getToolbar().getContent();
@@ -568,7 +568,7 @@ sap.ui.define([
 		assert.strictEqual(oSnackCard.getWidth(), "100%", "The width of the child card is the default width of 100%");
 		assert.strictEqual(oDialog.getContentWidth(), "420px", "The width is applied to the dialog content");
 		assert.strictEqual(oSnackCard.getCardHeader().getTitle(), "Donna", "Data is transferred between cards properly");
-		assert.strictEqual(oSnackCard.getCardHeader().getProperty("headingLevel"), "1", "When card is in a dialog aria-level should be set to 1");
+		assert.strictEqual(oSnackCard.getCardHeader().getProperty("headingLevel"), "H1", "When card is in a dialog aria-level should be set to 1");
 
 		const oSnackCardActionStrip = oSnackCard.getAggregation("_footer").getActionsStrip(),
 			aSnackCardButtons = oSnackCardActionStrip._getToolbar().getContent();
@@ -611,7 +611,7 @@ sap.ui.define([
 		//Assert
 		assert.strictEqual(oSnackCard.getCombinedParameters().test, this.oCard.getCombinedParameters().test, "Parameters are transferred between cards");
 		assert.strictEqual(oSnackCard.getCardHeader().getTitle(), "Donna", "Data is transferred between cards properly");
-		assert.strictEqual(oSnackCard.getCardHeader().getProperty("headingLevel"), "1", "When card is in a dialog aria-level should be set to 1");
+		assert.strictEqual(oSnackCard.getCardHeader().getProperty("headingLevel"), "H1", "When card is in a dialog aria-level should be set to 1");
 
 		const oSnackCardActionStrip = oSnackCard.getAggregation("_footer").getActionsStrip(),
 			aSnackCardButtons = oSnackCardActionStrip._getToolbar().getContent();

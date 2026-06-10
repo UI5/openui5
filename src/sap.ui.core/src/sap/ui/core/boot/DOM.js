@@ -73,6 +73,15 @@ sap.ui.define([
 			html.classList.add(osCSS);
 		}
 	}
+	/**
+	 * Adds the .sapUI5Scope marker class to the "html" element.
+	 * Used for storing framework specific CSS custom properties distinct from the theming base content.
+	 * @private
+	 */
+	function _setupCssCustomPropertiesScope() {
+		const html = document.documentElement;
+		html.classList.add("sapUI5Scope");
+	}
 
 	// adapt DOM when document is ready
 	return {
@@ -82,6 +91,7 @@ sap.ui.define([
 					_setupContentDirection();
 					_setupBrowser();
 					_setupOS();
+					_setupCssCustomPropertiesScope();
 				}),
 				pLoaded
 			]);

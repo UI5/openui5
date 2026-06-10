@@ -1,0 +1,39 @@
+<mvc:View
+	controllerName="sap.m.sample.PanelBackgroundDesign.controller.PanelBackgroundDesign"
+	xmlns:l="sap.ui.layout"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns="sap.m">
+	<l:VerticalLayout width="100%" class="sapUiResponsiveMargin">
+		<l:HorizontalLayout class="sapUiSmallMarginBottom">
+			<Label text="Background Design:" class="sapUiSmallMarginEnd"/>
+			<Select
+				id="backgroundDesignSelect"
+				selectedKey="Solid"
+				change=".onBackgroundDesignChange">
+				<core:Item key="Solid" text="Solid"/>
+				<core:Item key="Translucent" text="Translucent"/>
+				<core:Item key="Transparent" text="Transparent"/>
+				<core:Item key="Contrast" text="Contrast"/>
+			</Select>
+		</l:HorizontalLayout>
+
+		<Panel
+			id="demoPanel"
+			headerText="Panel Header"
+			expandable="true"
+			expanded="true"
+			backgroundDesign="Solid"
+			width="100%">
+			<content>
+				<Text text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet." />
+			</content>
+		</Panel>
+
+		<MessageStrip
+			text="Note: The Contrast background design is only visible in Horizon themes (Morning/Evening). In other themes, it falls back to Solid background."
+			type="Information"
+			showIcon="true"
+			class="sapUiSmallMarginTop"/>
+	</l:VerticalLayout>
+</mvc:View>

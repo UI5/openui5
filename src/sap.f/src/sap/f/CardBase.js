@@ -4,6 +4,7 @@
 sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/core/InvisibleText",
+	"sap/ui/core/library",
 	"sap/f/CardRenderer",
 	"sap/ui/core/Lib",
 	"sap/f/cards/util/CardBadgeEnabler",
@@ -15,6 +16,7 @@ sap.ui.define([
 ], function (
 	Control,
 	InvisibleText,
+	coreLibrary,
 	CardRenderer,
 	Library,
 	CardBadgeEnabler,
@@ -25,7 +27,8 @@ sap.ui.define([
 	"use strict";
 
 	var BADGE_AUTOHIDE_TIME = 3000,
-		SemanticRole = library.cards.SemanticRole;
+		SemanticRole = library.cards.SemanticRole,
+		TitleLevel = coreLibrary.TitleLevel;
 
 	/**
 	 * Constructor for a new <code>CardBase</code>.
@@ -73,7 +76,17 @@ sap.ui.define([
 				 *
 				 * @ui5-experimental-since 1.131
 				 */
-				semanticRole: { type: "sap.f.cards.SemanticRole", defaultValue: SemanticRole.Region}
+				semanticRole: { type: "sap.f.cards.SemanticRole", defaultValue: SemanticRole.Region},
+
+				/**
+				 * Defines the semantic level of the card header title (mapped to <code>aria-level</code>).
+				 *
+				 * Values <code>H1</code>–<code>H6</code> correspond to <code>aria-level</code> 1–6 and allow
+				 * the application to align the card heading with the heading hierarchy of the surrounding page.
+				 *
+				 * @since 1.150
+				 */
+				headingLevel: { type: "sap.ui.core.TitleLevel", group: "Accessibility", defaultValue: TitleLevel.H3 }
 			},
 			aggregations: {
 

@@ -15,6 +15,7 @@ sap.ui.define([
 	"sap/ui/integration/util/Utils",
 	"./ObjectStatusFactory",
 	"sap/m/AvatarImageFitType",
+	"sap/ui/core/library",
 	"sap/f/library"
 ], function (
 	BaseFactory,
@@ -30,6 +31,7 @@ sap.ui.define([
 	Utils,
 	ObjectStatusFactory,
 	AvatarImageFitType,
+	coreLibrary,
 	fLibrary
 ) {
 	"use strict";
@@ -37,6 +39,8 @@ sap.ui.define([
 	var ActionType = library.CardActionType;
 
 	var CardDisplayVariant = library.CardDisplayVariant;
+
+	var TitleLevel = coreLibrary.TitleLevel;
 
 	var SemanticRole = fLibrary.cards.SemanticRole;
 
@@ -118,8 +122,7 @@ sap.ui.define([
 		if (bIsInDialog) {
 			// if card is in dialog - header shouldn't be focusable
 			oHeader.setProperty("focusable", false);
-			//if card is in a dialog - aria-level of the header should be 1
-			oHeader.setProperty("headingLevel", "1");
+			oCard.setHeadingLevel(TitleLevel.H1);
 		}
 
 		if (oCard.getSemanticRole() === SemanticRole.ListItem && !oHeader.isInteractive()){

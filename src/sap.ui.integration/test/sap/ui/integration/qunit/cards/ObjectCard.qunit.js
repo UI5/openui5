@@ -2441,6 +2441,129 @@ sap.ui.define([
 		assert.strictEqual(oLink.getDomRef().getAttribute("title"), "Visit website", "The tooltip of the link is correct (binding used)");
 	});
 
+	QUnit.test("Card-level headingLevel drives header and group aria-level", async function (assert) {
+		this.oCard.setHeadingLevel("H2");
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.headingLevel"
+			},
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"title": "Card Title"
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Group A",
+							"items": [{ "label": "L", "value": "V" }]
+						},
+						{
+							"title": "Group B",
+							"items": [{ "label": "L", "value": "V" }]
+						}
+					]
+				}
+			}
+		});
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oHeader = this.oCard.getCardHeader();
+		assert.strictEqual(this.oCard.getHeadingLevel(), "H2", "Card headingLevel is H2");
+		assert.strictEqual(oHeader.getAriaHeadingLevel(), "2", "Header aria-level is 2 (from H2)");
+
+		const aGroupTitles = this.oCard.getDomRef().querySelectorAll(".sapFCardObjectItemTitle");
+		assert.strictEqual(aGroupTitles.length, 2, "Two group titles are rendered");
+		assert.strictEqual(aGroupTitles[0].getAttribute("role"), "heading", "Group title has role=heading");
+		assert.strictEqual(aGroupTitles[0].getAttribute("aria-level"), "3", "Group aria-level is one level deeper than the card header (H2 -> 3)");
+		assert.strictEqual(aGroupTitles[1].getAttribute("aria-level"), "3", "All groups derive from the same card header level");
+	});
+
+	QUnit.test("Default (no card-level headingLevel) renders header at 3 and groups at 4", async function (assert) {
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.headingLevel.default"
+			},
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"title": "Card Title"
+				},
+				"content": {
+					"groups": [{
+						"title": "Group A",
+						"items": [{ "label": "L", "value": "V" }]
+					}]
+				}
+			}
+		});
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oHeader = this.oCard.getCardHeader();
+		assert.strictEqual(oHeader.getAriaHeadingLevel(), "3", "Default header aria-level is 3");
+
+		const oGroupTitle = this.oCard.getDomRef().querySelector(".sapFCardObjectItemTitle");
+		assert.strictEqual(oGroupTitle.getAttribute("role"), "heading", "Group title has role=heading");
+		assert.strictEqual(oGroupTitle.getAttribute("aria-level"), "4", "Default group aria-level is one below the header (3 -> 4)");
+	});
+
+	QUnit.test("setHeadingLevel called after setManifest updates header and group aria-level", async function (assert) {
+		// Arrange - render with default headingLevel
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.headingLevel.runtime"
+			},
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"title": "Card Title"
+				},
+				"content": {
+					"groups": [{
+						"title": "Group A",
+						"items": [{ "label": "L", "value": "V" }]
+					}]
+				}
+			}
+		});
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oHeader = this.oCard.getCardHeader();
+
+		// Assert - default H3 -> aria-level 3, group 4
+		assert.strictEqual(oHeader.getAriaHeadingLevel(), "3", "Header aria-level is 3 before setHeadingLevel");
+		let oGroupTitle = this.oCard.getDomRef().querySelector(".sapFCardObjectItemTitle");
+		assert.strictEqual(oGroupTitle.getAttribute("aria-level"), "4", "Group aria-level is 4 before setHeadingLevel");
+
+		// Act - change heading level via public API after manifest is applied
+		this.oCard.setHeadingLevel("H4");
+		await nextUIUpdate();
+
+		// Assert - header and group aria-level reflect the new value (H4 -> 4, group -> 5)
+		assert.strictEqual(this.oCard.getHeadingLevel(), "H4", "Card headingLevel is H4");
+		assert.strictEqual(oHeader.getAriaHeadingLevel(), "4", "Header aria-level updated to 4 after setHeadingLevel('H4')");
+
+		oGroupTitle = this.oCard.getDomRef().querySelector(".sapFCardObjectItemTitle");
+		assert.strictEqual(oGroupTitle.getAttribute("aria-level"), "5", "Group aria-level updated to 5 after setHeadingLevel('H4')");
+
+		// Act - change again to verify successive runtime updates
+		this.oCard.setHeadingLevel("H1");
+		await nextUIUpdate();
+
+		assert.strictEqual(oHeader.getAriaHeadingLevel(), "1", "Header aria-level updated to 1 after setHeadingLevel('H1')");
+		oGroupTitle = this.oCard.getDomRef().querySelector(".sapFCardObjectItemTitle");
+		assert.strictEqual(oGroupTitle.getAttribute("aria-level"), "2", "Group aria-level updated to 2 after setHeadingLevel('H1')");
+	});
+
 	QUnit.module("Layout", {
 		beforeEach: function() {
 			this.oCard = new Card({

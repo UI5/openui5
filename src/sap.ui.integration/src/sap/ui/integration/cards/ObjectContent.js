@@ -392,10 +392,24 @@ sap.ui.define([
 		}).addStyleClass("sapFCardObjectGroup");
 
 		if (oGroupConfiguration.title) {
-			oGroup.addItem(new Text({
+			const oGroupTitle = new Text({
 				text: oGroupConfiguration.title,
 				maxLines: oGroupConfiguration.titleMaxLines || 1
-			}).addStyleClass("sapFCardObjectItemTitle sapMTitle sapMTitleStyleAuto"));
+			}).addStyleClass("sapFCardObjectItemTitle sapMTitle sapMTitleStyleAuto");
+
+			oGroupTitle.addEventDelegate({
+				onAfterRendering: function () {
+					const sAriaLevel = this._resolveGroupAriaLevel(),
+						oDomRef = oGroupTitle.getDomRef();
+
+					if (oDomRef) {
+						oDomRef.setAttribute("role", "heading");
+						oDomRef.setAttribute("aria-level", sAriaLevel);
+					}
+				}
+			},this);
+
+			oGroup.addItem(oGroupTitle);
 
 			oGroup.addStyleClass("sapFCardObjectGroupWithTitle");
 		}
@@ -406,6 +420,23 @@ sap.ui.define([
 		}, this);
 
 		return oGroup;
+	};
+
+	/**
+	 * Resolves the <code>aria-level</code> for a group title.
+	 *
+	 * The level is derived from the card header's effective heading level + 1, so that groups always
+	 * sit one level below the card header in the page heading hierarchy.
+	 *
+	 * @returns {string} "1"-"6" as a string.
+	 * @private
+	 */
+	ObjectContent.prototype._resolveGroupAriaLevel = function () {
+		const oHeader = this.getCardInstance().getCardHeader(),
+
+			iHeaderLevel = oHeader ? parseInt(oHeader.getAriaHeadingLevel()) : 3;
+
+		return String(Math.min(iHeaderLevel + 1, 6));
 	};
 
 	ObjectContent.prototype._createGroupItems = function (oItem, sPath) {

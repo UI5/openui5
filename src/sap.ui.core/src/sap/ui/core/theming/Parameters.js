@@ -31,6 +31,7 @@ sap.ui.define([
 	const Parameters = {};
 
 	let mParameters = {};
+	let mCustomPropertiesParameters = Object.create(null);
 	let sTheme = null;
 
 	const parsedLibraries = new Set();
@@ -164,13 +165,37 @@ sap.ui.define([
 	 * @private
 	 */
 	function getParameter(sParameterName) {
-		processLibraries(parseParameters);
+		let sParamValue;
+		let sCustomPropValue;
+		{
+			// CSS custom properties are only looked up for the async API.
+			// If a value was found we do not need to parse the library parameters.
+			const sCustomPropName = `--${sParameterName}`;
+			sCustomPropValue = mCustomPropertiesParameters[sCustomPropName];
+			// explicit undefined check -> 0 is a valid value, theoretically "" too, see comment below
+			if (typeof sCustomPropValue === "undefined") {
+				sCustomPropValue = window.getComputedStyle(document.body).getPropertyValue(sCustomPropName);
+				// Note: Non-existent values return an empty string from the native API, which could be a valid value for empty CSS custom properties.
+				//       While detecting this is possible, a new DOM element is needed for probing a fallback value through a "var(...)" calculation.
+				//       However: empty values for our theming parameters are most likely not valid, so the simple empty check should be enough.
+				//       Still, without an existence check we cannot cache empty results as momentarily non-existent parameter might come async through another library.
+				if (sCustomPropValue.trim() !== "") {
+					mCustomPropertiesParameters[sCustomPropName] = sCustomPropValue;
+					return mCustomPropertiesParameters[sCustomPropName];
+				}
+			} else {
+				// custom property found and cached
+				return sCustomPropValue;
+			}
 
+			// fallback to regular less/inline parameter parsing
+			processLibraries(parseParameters);
+		}
 
-		let sParamValue = mParameters[sParameterName];
+		sParamValue = mParameters[sParameterName];
 
 		// [Compatibility]: if a parameter contains a prefix, we cut off the ":" and try again
-		// e.g. "my.lib:paramName"
+		// e.g. "my.lib:paramName" --> NO support for this pattern in case we are using CSS custom properties
 		if (!sParamValue) {
 			const iIndex = sParameterName.indexOf(":");
 			if (iIndex != -1) {
@@ -201,6 +226,8 @@ sap.ui.define([
 	 * The result is returned immediately in case all parameters are loaded and available. Otherwise, if a callback function is given,
 	 * <code>undefined</code> is returned and the parameters are delivered asynchronously via the given callback, once all CSS files have been loaded.
 	 * If no callback is given, the incomplete result is also returned immediately.
+	 *
+	 * Further information on the usage of theming parameters can be found here: {@link topic:45df6dff504647c686ab9ba72af827f6 Enhanced Theming Concepts}.
 	 *
 	 * Please see the examples below for a detailed guide on how to use the API.
 	 *
@@ -372,6 +399,7 @@ sap.ui.define([
 			sTheme = Theming.getTheme();
 			parsedLibraries.clear();
 			mParameters = {};
+			mCustomPropertiesParameters = Object.create(null);
 		}
 	}
 
