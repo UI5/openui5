@@ -163,6 +163,40 @@ sap.ui.define([
 		}, 1200);
 	});
 
+	QUnit.test("aria-busy is set on the busy-section DOM when a busy section is defined", function(assert) {
+		this.oListBox.setBusyIndicatorDelay(0);
+		this.oListBox.setBusy(true, "listUl");
+
+		var oRootDOM = this.oListBox.getDomRef();
+		var oBusySectionDOM = this.oListBox.getDomRef("listUl");
+
+		assert.strictEqual(oBusySectionDOM.getAttribute("aria-busy"), "true",
+			"aria-busy='true' is set on the busy-section DOM (<id>-listUl)");
+		assert.strictEqual(oRootDOM.getAttribute("aria-busy"), null,
+			"aria-busy is NOT set on the root control DOM when a busy section is defined");
+
+		this.oListBox.setBusy(false);
+		assert.strictEqual(oBusySectionDOM.getAttribute("aria-busy"), null,
+			"aria-busy is removed from the busy-section DOM after setBusy(false)");
+	});
+
+	QUnit.test("aria-busy is set on the root control DOM when no busy section is defined", function(assert) {
+		this.oListBox.setBusyIndicatorDelay(0);
+		this.oListBox.setBusy(true);
+
+		var oRootDOM = this.oListBox.getDomRef();
+		var oListUlDOM = this.oListBox.getDomRef("listUl");
+
+		assert.strictEqual(oRootDOM.getAttribute("aria-busy"), "true",
+			"aria-busy='true' is set on the root control DOM when _sBusySection is not defined");
+		assert.strictEqual(oListUlDOM.getAttribute("aria-busy"), null,
+			"aria-busy is NOT set on a sub-DOM when _sBusySection is not defined");
+
+		this.oListBox.setBusy(false);
+		assert.strictEqual(oRootDOM.getAttribute("aria-busy"), null,
+			"aria-busy is removed from the root control DOM after setBusy(false)");
+	});
+
 	QUnit.test("Focus Restoration", function(assert) {
 		const $LB = this.oListBox.$();
 		this.oListBox.setBusyIndicatorDelay(0);
