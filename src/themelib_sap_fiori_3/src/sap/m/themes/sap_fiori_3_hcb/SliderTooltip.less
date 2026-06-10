@@ -21,13 +21,19 @@
 	color: var(--sapField_TextColor);
 }
 
-.sapMSliderTooltipErrorState {
+.sapMSliderTooltip.sapMSliderTooltipErrorState {
 	background: var(--sapField_InvalidBackground);
-	border-color: var(--sapField_InvalidColor)
+
+	.sapMSliderTooltipInput {
+		background: var(--sapField_InvalidBackground);
+		font-style: italic;
+		font-weight: bold;
+	}
 }
 
-.sapMSliderTooltipErrorState .sapMSliderTooltipInput {
-	background: var(--sapField_InvalidBackground);
+.sapMSliderTooltip:has(.sapMSliderTooltipInput:focus) {
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapField_Active_BorderColor);
+	outline-offset: -.3125rem;
 }
 
 .sapMSliderTooltip.sapMSliderTooltipNonEditableWrapper {

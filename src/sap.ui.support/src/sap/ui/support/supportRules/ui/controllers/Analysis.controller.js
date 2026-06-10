@@ -17,6 +17,7 @@ sap.ui.define([
 	"sap/ui/core/Fragment",
 	"sap/m/library",
 	"sap/m/MessageToast",
+	"sap/m/MessageBox",
 	"sap/m/List",
 	"sap/m/StandardListItem",
 	"sap/m/table/columnmenu/Menu",
@@ -27,8 +28,7 @@ sap.ui.define([
 	"sap/ui/support/supportRules/WCBChannels",
 	"sap/ui/support/supportRules/RuleSerializer",
 	"sap/ui/support/supportRules/Constants",
-	"sap/ui/support/supportRules/Storage",
-	"sap/ui/support/supportRules/util/EvalUtils"
+	"sap/ui/support/supportRules/Storage"
 ], function(
 	BaseController,
 	PresetsController,
@@ -44,6 +44,7 @@ sap.ui.define([
 	Fragment,
 	mLibrary,
 	MessageToast,
+	MessageBox,
 	List,
 	StandardListItem,
 	ColumnMenu,
@@ -54,8 +55,7 @@ sap.ui.define([
 	channelNames,
 	RuleSerializer,
 	Constants,
-	Storage,
-	EvalUtils
+	Storage
 ) {
 	"use strict";
 
@@ -64,7 +64,6 @@ sap.ui.define([
 		onInit: function () {
 			this.model = SharedModel;
 			this.setCommunicationSubscriptions();
-			this.tempRulesLoaded = false;
 			this.getView().setModel(this.model);
 			this.treeTable = SelectionUtils.treeTable = this.byId("ruleList");
 			this._oRuleSetsModel = new JSONModel();
@@ -101,9 +100,6 @@ sap.ui.define([
 				onclick: this.onPresetVariantClick.bind(this)
 			});
 
-			// "visible" property of RowAction cannot be updated trough binding, so set it directly
-			this.byId("rowActionTemplate").setVisible(!this.model.getProperty("/tempRulesDisabled"));
-
 			this._associateTableColumnsMenu();
 		},
 
@@ -124,103 +120,10 @@ sap.ui.define([
 				}.bind(this));
 			}
 
-			if (!this._ruleCreateUpdatePages) {
-				this._ruleCreateUpdatePages = Fragment.load({
-					name: "sap.ui.support.supportRules.ui.views.RuleUpdate",
-					controller: this
-				}).then(function (ruleCreateUpdatePages) {
-					ruleCreateUpdatePages.forEach(function (rcuPage) {
-						this.byId("rulesNavContainer").insertPage(rcuPage);
-					}, this);
-
-				}.bind(this));
-			}
-
 			this._updateRuleList();
 		},
 
-		onAsyncSwitch: function (oEvent) {
-			var oSource = oEvent.getSource();
-
-			if (oEvent.getParameter("selected")) {
-				var bAsync = oSource.getCustomData()[0].getValue() === "true";
-				var sRule = oSource.getProperty("groupName") === "asyncContext" ? "/newRule" : "/editRule";
-				this.model.setProperty(sRule + "/async", bAsync);
-				this._updateCheckFunction(sRule, bAsync);
-			}
-		},
-
-		/**
-		 * Add fnResolve to the check function when async is set to true otherwise removes it.
-		 * @private
-		 * @param {string} sRule the model path to edit or new rule
-		 * @param {bAsync} bAsync the async property of the rule
-		 */
-		_updateCheckFunction: function (sRule, bAsync) {
-			var sCheckFunction = this.model.getProperty(sRule + "/check");
-
-			if (!sCheckFunction) {
-				return;
-			}
-
-			// Check if a function is found
-			var oMatch = sCheckFunction.match(/function[^(]*\(([^)]*)\)/);
-
-			if (!oMatch) {
-				return;
-			}
-
-			// Get the parameters of the function found and trim, then split by word.
-			var aParams = oMatch[1].trim().split(/\W+/);
-			// Add missing parameters to ensure the resolve function is passed on the correct position.
-			aParams[0] = aParams[0] || "oIssueManager";
-			aParams[1] = aParams[1] || "oCoreFacade";
-			aParams[2] = aParams[2] || "oScope";
-
-			// If async add a fnResolve to the template else remove it.
-			if (bAsync) {
-				aParams[3] = aParams[3] || "fnResolve";
-			} else {
-				aParams = aParams.slice(0, 3);
-			}
-
-			// Replace the current parameters with the new ones.
-			var sNewCheckFunction = sCheckFunction.replace(/function[^(]*\(([^)]*)\)/, "function (" + aParams.join(", ") + ")");
-
-			this.model.setProperty(sRule + "/check", sNewCheckFunction);
-		},
-
-		/**
-		 * @returns {object|null} Deep copy of the temporary library or null, if it doesn't exist
-		 */
-		getTemporaryLib: function () {
-			var libs = this.model.getProperty("/libraries");
-
-			for (var i = 0; i < libs.length; i++) {
-				if (libs[i].title == Constants.TEMP_RULESETS_NAME) {
-					return deepExtend({}, libs[i]);
-				}
-			}
-
-			return null;
-		},
-
-		setTemporaryLib: function (oData) {
-			var libs = this.model.getProperty("/libraries");
-
-			for (var i = 0; i < libs.length; i++) {
-				if (libs[i].title == Constants.TEMP_RULESETS_NAME) {
-					this.model.setProperty("/libraries/" + i, oData);
-					return;
-				}
-			}
-		},
-
 		setCommunicationSubscriptions: function () {
-			if (!this.model.getProperty("/tempRulesDisabled")) {
-				this._setTempRulesCommunicationSubscriptions();
-			}
-
 			CommunicationBus.subscribe(channelNames.UPDATE_SUPPORT_RULES, this.updateSupportRules, this);
 
 			CommunicationBus.subscribe(channelNames.POST_AVAILABLE_LIBRARIES, function (data) {
@@ -264,10 +167,8 @@ sap.ui.define([
 				}
 
 				if (bPersistSettings) {
-					// Needed for temp rules init
-					this.initializeTempRules();
 					//Selection should be applied from local storage
-					// Syncs selection for all libs except for temporary
+					// Syncs selection for all libs
 					var oUpdatedRules = SelectionUtils.updateSelectedRulesFromLocalStorage(oRuleSets);
 					// In case of deleted local storage item
 					if (oUpdatedRules) {
@@ -396,111 +297,12 @@ sap.ui.define([
 
 			Object.keys(oRulesSts).forEach(function (sKey) {
 				var sLibraryName = oRulesSts[sKey].name;
-				if (sLibraryName && sLibraryName !== "temporary") {
+				if (sLibraryName) {
 					aLoadedLibraries.push(sLibraryName);
 				}
 			});
 
 			return aLoadedLibraries;
-		},
-
-		/**
-		 * Keeps in sync the TreeViewModel for temporary library that we use for visualisation of sap.m.TreeTable and the model that we use in the Suppport Assistant
-		 * @param {Object} tempLib  temporary library model from Support Assistant
-		 */
-		_applyTempRulesSelection: function (tempLib) {
-			var oRuleSets = deepExtend({}, this._oRuleSetsModel.getData()),
-				library,
-				rule,
-				aTempLibNodes,
-				bSelected,
-				aRules,
-				iIndex,
-				fnFilter = function (oRule) {
-					return oRule.id === rule.id;
-				};
-
-			for (var i in oRuleSets) {
-				library = oRuleSets[i];
-				aTempLibNodes = oRuleSets[i].nodes;
-
-				if (library.name !== Constants.TEMP_RULESETS_NAME) {
-					continue;
-				}
-
-				//reset the model to add the temp rules
-				oRuleSets[i].nodes = [];
-				for (var ruleIndex in tempLib.rules) {
-
-					rule = tempLib.rules[ruleIndex];
-					bSelected = aTempLibNodes[ruleIndex] !== undefined ?  aTempLibNodes[ruleIndex].selected : true;
-
-					// syncs selection of temporary rules from local storage
-					if (this.tempRulesFromStorage) {
-						aRules = this.tempRulesFromStorage.filter(fnFilter);
-
-						if (aRules.length > 0) {
-							bSelected = aRules[0].selected;
-							iIndex = this.tempRulesFromStorage.indexOf(aRules[0]);
-							this.tempRulesFromStorage.splice(iIndex, 1);
-
-							if (bSelected === false) {
-								library.selected = false;
-							}
-						}
-
-						if (this.tempRulesFromStorage.length === 0) {
-							this.tempRulesFromStorage.length = null;
-						}
-					}
-
-					library.nodes.push({
-						name: rule.title,
-						description: rule.description,
-						id: rule.id,
-						audiences: rule.audiences.toString(),
-						categories: rule.categories.toString(),
-						minversion: rule.minversion,
-						resolution: rule.resolution,
-						title: rule.title,
-						selected: bSelected,
-						libName: library.name,
-						check: rule.check
-					});
-				}
-			}
-
-			this._oRuleSetsModel.setData(oRuleSets);
-		},
-
-		/**
-		 * Keeps in sync the TreeViewModel for temporary rules that we use for visualisation of sap.m.TreeTable and the model that we use in the SuppportAssistant
-		 * @param {Object} tempRule Temporary rule
-		 * @param {Object} treeTable Model for sap.m.TreeTable visualization
-		 */
-		_syncTreeTableVieModelTempRule: function (tempRule, treeTable) {
-			var ruleSource = this.model.getProperty("/editRuleSource");
-			for (var i in treeTable) {
-				if (treeTable[i].name === Constants.TEMP_RULESETS_NAME) {
-					for (var innerIndex in treeTable[i].nodes) {
-						if (treeTable[i].nodes[innerIndex].id === ruleSource.id) {
-							treeTable[i].nodes[innerIndex] = {
-								name: tempRule.title,
-								description: tempRule.description,
-								id: tempRule.id,
-								audiences: tempRule.audiences,
-								categories: tempRule.categories,
-								minversion: tempRule.minversion,
-								resolution: tempRule.resolution,
-								selected: treeTable[i].nodes[innerIndex].selected,
-								title: tempRule.title,
-								libName: treeTable[i].name,
-								check: tempRule.check
-							};
-						}
-					}
-				}
-			}
 		},
 
 		_hasSelectedComponent: function () {
@@ -578,16 +380,13 @@ sap.ui.define([
 		},
 
 		createNewRulePress: function (oEvent) {
-			var emptyRule = this.model.getProperty("/newEmptyRule");
-			this.model.setProperty("/selectedSetPreviewKey", "availableRules");
-			this.model.setProperty("/newRule", deepExtend({}, emptyRule));
-			this.model.setProperty("/tempLink", { href: "", text: "" });
-			this.goToCreateRule();
-		},
-
-		goToRuleProperties: function () {
-			var navCont = this.byId("rulesNavContainer");
-			navCont.to(this.byId("rulesDisplayPage"), "show");
+			MessageBox.warning(
+				"Temporary rules have been deprecated and are non-functional anymore. Please use library rulesets instead.",
+				{
+					details: "See documentation about <a href='https://ui5.sap.com/#/topic/b5a51358b3574aea9143fa50ae4e0e2a' target='_blank'>library rulesets</a>.",
+					contentWidth: "400px"
+				}
+			);
 		},
 
 		createRuleString: function (rule) {
@@ -624,18 +423,6 @@ sap.ui.define([
 			return str;
 		},
 
-		updateRule: function () {
-			var oldId = this.model.getProperty("/editRuleSource/id"),
-				updateObj = this.model.getProperty("/editRule");
-
-			if (this.checkFunctionString(updateObj.check)) {
-				CommunicationBus.publish(channelNames.VERIFY_UPDATE_RULE, {
-					oldId: oldId,
-					updateObj: RuleSerializer.serialize(updateObj)
-				});
-			}
-		},
-
 		updateSupportRules: function (data) {
 			data = RuleSerializer.deserialize(data.sRuleSet);
 
@@ -665,15 +452,9 @@ sap.ui.define([
 
 			}
 
-			// Set first rule from first library if there is no temporary rules
-			var firstSelectedRule;
-			if (libraries[0].rules[0]) {
-				firstSelectedRule = libraries[0].rules[0];
-			} else {
-				firstSelectedRule = libraries[1].rules[0];
-			}
+			// Set first rule from first library (there are no temporary rules anymore)
+			var firstSelectedRule = libraries[0].rules[0];
 
-			that.placeTemporaryRulesetAtStart(libraries);
 			that.model.setProperty("/selectedRuleStringify", "");
 			that.model.setProperty("/selectedRule", firstSelectedRule);
 			that.model.setProperty("/selectedRuleStringify", that.createRuleString(firstSelectedRule));
@@ -684,99 +465,6 @@ sap.ui.define([
 			if (loadingFromAdditionalRuleSets) {
 				MessageToast.show("Additional rule set(s) loaded!");
 				this.ruleSetView.setSelectedKey("availableRules");
-			}
-		},
-
-		/**
-		 * Loads temporary rules from the local storage and sends them to the main window
-		 */
-		initializeTempRules: function () {
-			if (this.model.getProperty("/tempRulesDisabled")) {
-				return;
-			}
-
-			var tempRules = Storage.getRules(),
-				loadingFromAdditionalRuleSets = this.model.getProperty("/loadingAdditionalRuleSets");
-
-			if (tempRules && !loadingFromAdditionalRuleSets && !this.tempRulesLoaded) {
-				this.tempRulesFromStorage = tempRules;
-				this.tempRulesLoaded = true;
-
-				tempRules.forEach(function (tempRule) {
-					CommunicationBus.publish(channelNames.VERIFY_CREATE_RULE, RuleSerializer.serialize(tempRule));
-				});
-
-				this.persistedTempRulesCount = tempRules.length;
-			}
-		},
-
-		placeTemporaryRulesetAtStart: function (libraries) {
-			for (var i = 0; i < libraries.length; i++) {
-				var ruleSet = libraries[i];
-
-				if (ruleSet.title === Constants.TEMP_RULESETS_NAME) {
-					var temp = ruleSet;
-					libraries.splice(i, 1);
-					libraries.unshift(temp);
-					return;
-				}
-			}
-		},
-
-		addLinkToRule: function (event) {
-			var tempLink = this.model.getProperty("/tempLink"),
-				copy = deepExtend({}, tempLink),
-				action = event.getSource().getProperty("text"),
-				rule = action === 'Add' ? "/newRule" : "/editRule",
-				urlProperty = this.model.getProperty(rule + "/resolutionurls");
-
-			if (urlProperty) {
-				urlProperty.push(copy);
-			} else {
-				this.model.setProperty(rule + "/resolutionurls", "");
-				urlProperty.push(copy);
-			}
-
-			this.model.setProperty("/tempLink", { href: "", text: "" });
-		},
-
-		goToCreateRule: function () {
-			var navCont = this.byId("rulesNavContainer");
-			navCont.to(Element.getElementById("rulesCreatePage"), "show");
-		},
-
-		checkFunctionString: function (functionString) {
-			try {
-				EvalUtils.evalFunction(functionString);
-			} catch (err) {
-				MessageToast.show("Your check function contains errors, and can't be evaluated:" + err);
-				return false;
-			}
-			return true;
-		},
-
-		addNewRule: function () {
-			var newRule = this.model.getProperty("/newRule");
-			if (this.checkFunctionString(newRule.check)) {
-				this.showRuleCreatedToast = true;
-
-				CommunicationBus.publish(channelNames.VERIFY_CREATE_RULE, RuleSerializer.serialize(newRule));
-			}
-		},
-
-		rulesToolbarITHSelect: function (oEvent) {
-			if (oEvent.getParameter("key") === "jsonOutput") {
-				var newRule = this.model.getProperty("/newRule"),
-					stringifiedJson = this.createRuleString(newRule);
-				this.model.setProperty("/newRuleStringified", stringifiedJson);
-			}
-		},
-
-		rulesToolbarEditITHSelect: function (oEvent) {
-			if (oEvent.getParameter("key") === "jsonOutput") {
-				var newRule = this.model.getProperty("/editRule"),
-					stringifiedJson = this.createRuleString(newRule);
-				this.model.setProperty("/updateRuleStringified", stringifiedJson);
 			}
 		},
 
@@ -851,86 +539,6 @@ sap.ui.define([
 
 			return mainModelRule;
 		},
-		_generateRuleId: function (sRuleId) {
-			var i = 0,
-				oTempLib = this.getTemporaryLib(),
-				aTempRuleset = oTempLib.rules,
-				bExists,
-				fnCheckId = function(oRule) {
-					return oRule.id === sRuleId + i;
-				};
-
-			while (++i) {
-				bExists = aTempRuleset.some(fnCheckId);
-
-				if (!bExists) {
-					return sRuleId + i;
-				}
-			}
-		},
-
-		duplicateRule: function (oEvent) {
-			var sPath = oEvent.getSource().getBindingContext("ruleSets").getPath(),
-				oSourceObject = this.treeTable.getBinding().getModel().getProperty(sPath),
-				selectedRule = this.getMainModelFromTreeViewModel(oSourceObject),
-				selectedRuleCopy = deepExtend({}, selectedRule);
-
-			selectedRuleCopy.id = this._generateRuleId(selectedRuleCopy.id);
-
-			this.model.setProperty("/newRule", selectedRuleCopy);
-			this.goToCreateRule();
-		},
-
-		editRule: function (event) {
-			var sPath = event.getSource().getBindingContext("ruleSets").getPath(),
-				oSourceObject = this.treeTable.getBinding().getModel().getProperty(sPath),
-				selectedRule = this.getMainModelFromTreeViewModel(oSourceObject);
-
-			this.model.setProperty("/editRuleSource", selectedRule);
-			this.model.setProperty("/editRule", deepExtend({}, selectedRule));
-			var navCont = this.byId("rulesNavContainer");
-			navCont.to(Element.getElementById("ruleUpdatePage"), "show");
-		},
-
-		deleteTemporaryRule: function (event) {
-			var sourceObject = this.getObjectOnTreeRow(event),
-				oRuleSets = deepExtend({}, this._oRuleSetsModel.getData()),
-				aLibraries = this.model.getProperty("/libraries"),
-				aRemainingRules;
-
-			aLibraries.forEach(function (oLibrary) {
-				if (oLibrary.title === Constants.TEMP_RULESETS_NAME) {
-					aRemainingRules = oLibrary.rules.filter(function (oRule) {
-						return oRule.id !== sourceObject.id;
-					});
-					oLibrary.rules = aRemainingRules;
-				}
-			});
-
-			for (var oLibrary in oRuleSets) {
-				if (oRuleSets[oLibrary].name === Constants.TEMP_RULESETS_NAME) {
-					for (var iRuleIndex in oRuleSets[oLibrary].nodes) {
-						if (oRuleSets[oLibrary].nodes[iRuleIndex].id === sourceObject.id) {
-							oRuleSets[oLibrary].nodes.splice(iRuleIndex, 1);
-						}
-					}
-				}
-			}
-
-			this._oRuleSetsModel.setData(oRuleSets);
-
-			CommunicationBus.publish(channelNames.DELETE_RULE, RuleSerializer.serialize(sourceObject));
-
-			this._updateRuleList();
-
-			//Set selected rules count to UI and update preset selections
-			PresetsUtils.syncCurrentSelectionPreset(SelectionUtils.getSelectedRules());
-
-			if (Storage.readPersistenceCookie(Constants.COOKIE_NAME)) {
-				Storage.removeSelectedRules(aRemainingRules);
-				SelectionUtils.persistSelection();
-			}
-		},
 
 		/**
 		* Gets rule from selected row
@@ -953,15 +561,8 @@ sap.ui.define([
 		},
 
 		_updateRuleList: function() {
-			var oRuleList = this.getView().byId("ruleList"),
-				oTempLib = this.getTemporaryLib(),
-				aTempRules = oTempLib ? oTempLib["rules"] : [];
-
-			if (!aTempRules.length) {
-				oRuleList.setRowActionCount(1);
-			} else {
-				oRuleList.setRowActionCount(2);
-			}
+			var oRuleList = this.getView().byId("ruleList");
+			oRuleList.setRowActionCount(1);
 		},
 
 		/**
@@ -991,84 +592,6 @@ sap.ui.define([
 				this._PresetsController = new PresetsController(this.model, this.getView());
 			}
 			this._PresetsController.openPresetVariant();
-		},
-
-		_setTempRulesCommunicationSubscriptions: function () {
-			// Temporary rules are validated and ready to be loaded in view
-			CommunicationBus.subscribe(channelNames.VERIFY_RULE_CREATE_RESULT, function (data) {
-				var result = data.result,
-					newRule = RuleSerializer.deserialize(data.newRule, true),
-					tempLib = this.getTemporaryLib();
-
-				if (result == "success") {
-					tempLib.rules.push(newRule);
-					this.setTemporaryLib(tempLib);
-					this._applyTempRulesSelection(tempLib); //Sync Selection of temporary rules
-
-					//Set selected rules count to UI and update preset selections
-					PresetsUtils.syncCurrentSelectionPreset(SelectionUtils.getSelectedRules());
-
-					if (Storage.readPersistenceCookie(Constants.COOKIE_NAME)) {
-						SelectionUtils.persistSelection();
-						Storage.setRules(tempLib.rules);
-
-						if (this.showRuleCreatedToast) {
-							MessageToast.show('Your temporary rule "' + newRule.id + '" was persisted in the local storage');
-							this.showRuleCreatedToast = false;
-						}
-					}
-
-					//Clean the new rule object
-					var emptyRule = this.model.getProperty("/newEmptyRule");
-					this.model.setProperty("/newRule", deepExtend({}, emptyRule));
-					this.goToRuleProperties();
-					this.model.setProperty("/selectedRule", newRule);
-					this._updateRuleList();
-
-					this.treeTable.updateSelectionFromModel();
-				} else {
-					MessageToast.show("Add rule failed because: " + result);
-				}
-			}, this);
-
-			CommunicationBus.subscribe(channelNames.VERIFY_RULE_UPDATE_RESULT, function (data) {
-				var result = data.result,
-					updateRule = RuleSerializer.deserialize(data.updateRule, true),
-					that = this;
-
-				if (result === "success") {
-					var ruleSource = this.model.getProperty("/editRuleSource"),
-						oRuleSets = this._oRuleSetsModel.getData(),
-						libraries = this.model.getProperty('/libraries');
-
-					libraries.forEach(function (lib, libIndex) {
-						if (lib.title === Constants.TEMP_RULESETS_NAME) {
-							lib.rules.forEach(function (rule, ruleIndex) {
-								if (rule.id === ruleSource.id) {
-									lib.rules[ruleIndex] = updateRule;
-
-									if (that.model.getProperty("/persistingSettings")) {
-										Storage.setRules(lib.rules);
-									}
-								}
-							});
-							that._syncTreeTableVieModelTempRule(updateRule, oRuleSets);
-						}
-					});
-
-					this._oRuleSetsModel.setData(oRuleSets);
-					this.model.setProperty('/selectedRule', updateRule);
-
-					//Set selected rules count to UI
-					SelectionUtils.getSelectedRules();
-
-					this.treeTable.updateSelectionFromModel();
-
-					this.goToRuleProperties();
-				} else {
-					MessageToast.show("Update rule failed because: " + result);
-				}
-			}, this);
 		},
 
 		_associateTableColumnsMenu: function () {

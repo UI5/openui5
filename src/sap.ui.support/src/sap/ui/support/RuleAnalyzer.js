@@ -3,10 +3,11 @@
  */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/support/Bootstrap",
 	"sap/ui/support/supportRules/Main",
 	"sap/ui/support/supportRules/RuleSetLoader"],
-	function (Bootstrap, Main, RuleSetLoader) {
+	function (Log, Bootstrap, Main, RuleSetLoader) {
 		"use strict";
 
 
@@ -112,11 +113,14 @@ sap.ui.define([
 			 *
 			 * @public
 			 * @since 1.60
+			 * @deprecated As of version 1.150. Temporary rules are deprecated. Please use library rulesets instead.
+			 * See {@link topic:b5a51358b3574aea9143fa50ae4e0e2a Creating a Ruleset for a Library}.
 			 * @param {sap.ui.support.RuleConfiguration} oRule Settings for the new rule. For detailed information about its properties see {@link topic:eaeea19a991d46f29e6d8d8827317d0e Rule Property Values}
 			 * @returns {string} Rule creation status. Possible values are "success" or description of why adding failed.
 			 */
 			addRule: function (oRule) {
-				return Main.addRule(oRule);
+				Log.warning("[Support Assistant] Temporary rules are deprecated and non-functional anymore. Please use library rulesets instead. See https://ui5.sap.com/#/topic/b5a51358b3574aea9143fa50ae4e0e2a");
+				return "Temporary rules are deprecated and non-functional anymore. Please use library rulesets instead.";
 			}
 		};
 

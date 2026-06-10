@@ -8,11 +8,26 @@ sap.ui.define([
 	"sap/m/RangeSlider",
 	"sap/m/ResponsiveScale",
 	"sap/m/Title",
+	"sap/m/Button",
+	"sap/m/OverflowToolbar",
+	"sap/ui/core/Theming",
 	"sap/base/Log"
-], async function(Core, HTML, App, Page, RangeSlider, ResponsiveScale, Title, Log) {
+], async function(Core, HTML, App, Page, RangeSlider, ResponsiveScale, Title, Button, OverflowToolbar, Theming, Log) {
 	"use strict";
 
 	await Core.ready();
+
+	var oThemeToolbar = new OverflowToolbar({
+		content: [
+			new Button({ text: "Horizon", press: function() { Theming.setTheme("sap_horizon"); } }),
+			new Button({ text: "Horizon Dark", press: function() { Theming.setTheme("sap_horizon_dark"); } }),
+			new Button({ text: "Horizon HCB", press: function() { Theming.setTheme("sap_horizon_hcb"); } }),
+			new Button({ text: "Horizon HCW", press: function() { Theming.setTheme("sap_horizon_hcw"); } }),
+			new Button({ text: "Quartz", press: function() { Theming.setTheme("sap_fiori_3"); } }),
+			new Button({ text: "Quartz Dark", press: function() { Theming.setTheme("sap_fiori_3_dark"); } }),
+			new Button({ text: "Quartz HCB", press: function() { Theming.setTheme("sap_fiori_3_hcb"); } })
+		]
+	});
 
 	var oDefaultTitle = new Title({ text: "Default RangeSlider" }),
 		oRangeSlider1 = new RangeSlider("rangeSlider1", {
@@ -127,6 +142,7 @@ sap.ui.define([
 	var oPage = new Page("page", {
 		title: "sap.m.RangeSlider",
 		content: [
+			oThemeToolbar,
 			oDefaultTitle,
 			oRangeSlider1,
 			oRangeSlider2,

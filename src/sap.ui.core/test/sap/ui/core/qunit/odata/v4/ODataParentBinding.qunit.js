@@ -4584,7 +4584,7 @@ sap.ui.define([
 		this.mock(oDependentBinding1).expects("resetChanges").withExactArgs().callsFake(reset);
 		this.mock(oDependentBinding2).expects("resetChanges").withExactArgs().callsFake(reset);
 		if (bOutdated) {
-			this.mock(oBinding).expects("setOutdated").withExactArgs(true);
+			this.mock(oBinding).expects("setOutdated").withExactArgs("both");
 		}
 		this.mock(oBinding).expects("delete")
 			.withExactArgs(null, "canonical/path", sinon.match.same(oContext))

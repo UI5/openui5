@@ -8,8 +8,7 @@
 		xmlns:t="sap.ui.table"
 		xmlns:layout="sap.ui.layout">
 	<m:NavContainer
-			id="rulesNavContainer"
-			autoFocus="{= ${/tempRulesDisabled} === ${/tempRulesDisabledWarned} }">
+			id="rulesNavContainer">
 		<l:Splitter id="rulesDisplayPage">
 			<l:contentAreas>
 				<m:Page
@@ -79,7 +78,6 @@
 										id="createRuleBtn"
 										text="Create Rule"
 										icon="sap-icon://add"
-										visible="{= !${/tempRulesDisabled}}"
 										press=".createNewRulePress"/>
 								</m:contentRight>
 							</m:Bar>
@@ -140,15 +138,6 @@
 									</t:template>
 								</t:Column>
 							</t:columns>
-							<t:rowActionTemplate>
-									<t:RowAction id="rowActionTemplate">
-										<t:items>
-											<t:RowActionItem icon="sap-icon://edit" text="Edit" press=".editRule"  visible="{= ${ruleSets>libName} === 'temporary'}" />
-											<t:RowActionItem icon="sap-icon://delete" text="Delete" press=".deleteTemporaryRule" visible="{= ${ruleSets>libName} === 'temporary'}" />
-											<t:RowActionItem icon="sap-icon://copy" text="Copy" press=".duplicateRule" visible="{= !${/tempRulesDisabled} &amp;&amp; ${ruleSets>libName} !== 'temporary' &amp;&amp; ${ruleSets>type} !== 'lib'}" />
-										</t:items>
-									</t:RowAction>
-							</t:rowActionTemplate>
 						</t:TreeTable>
 					<l:VerticalLayout id="librarySetContainer" width="100%" visible="{= ${/selectedSetPreviewKey} === 'additionalRulesets' }">
 						<m:Text class="sapUiSupportToolAdditionRuleSetNote" text="The list of available rules is dynamic and changes based on the libraries currently required by your application.

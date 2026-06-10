@@ -215,16 +215,27 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns a language-dependent placeholder text such as "e.g. <sample value>" where <sample value> is formatted
-	 * using this type.
+	 * Returns a language-dependent placeholder text for this type.
+	 * The <code>oMinimum</code> and <code>oMaximum</code> parameters are supported since 1.150.
 	 *
+	 * If given, a sample date within [<code>oMinimum</code>, <code>oMaximum</code>] is used.
+	 * If not given, <code>oConstraints.minimum</code>/<code>oConstraints.maximum</code> are used
+	 * as fallback.
+	 *
+	 * @param {module:sap/ui/core/date/UI5Date} [oMinimum] The minimum date
+	 * @param {module:sap/ui/core/date/UI5Date} [oMaximum] The maximum date
 	 * @returns {string|undefined}
 	 *   The language-dependent placeholder text or <code>undefined</code> if the type does not offer a placeholder
+	 * @throws {Error}
+	 *   If <code>oMinimum</code> or <code>oMaximum</code> is given but does not match the corresponding constraint
 	 *
 	 * @public
 	 */
-	Date1.prototype.getPlaceholderText = function () {
-		return this.oOutputFormat.getPlaceholderText();
+	Date1.prototype.getPlaceholderText = function (oMinimum, oMaximum) {
+		const oMin = DateFormat.resolveDate(this.oConstraints.minimum, oMinimum, this.oInputFormat);
+		const oMax = DateFormat.resolveDate(this.oConstraints.maximum, oMaximum, this.oInputFormat);
+
+		return this.oOutputFormat.getPlaceholderText(oMin, oMax);
 	};
 
 	return Date1;

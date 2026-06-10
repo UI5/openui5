@@ -3528,6 +3528,45 @@ sap.ui.define([
 		return [oEnd];
 	};
 
+	/**
+	 * Returns the effective date to use for placeholder text generation.
+	 *
+	 * @param {any} [oConstraintValue]
+	 *   The constraint value in model representation: a <code>UI5Date</code>, a formatted string, or a timestamp number
+	 * @param {module:sap/ui/core/date/UI5Date} [oDate]
+	 *   The explicit date parameter; takes precedence over the constraint
+	 * @param {sap.ui.core.format.DateFormat} [oInputFormat]
+	 *   The input format used to parse string constraint values
+	 * @returns {module:sap/ui/core/date/UI5Date|undefined}
+	 *   The resolved date, or <code>undefined</code> if neither parameter nor constraint is given
+	 * @throws {Error}
+	 *   If <code>oDate</code> is given but does not match the constraint value
+	 *
+	 * @private
+	 */
+	DateFormat.resolveDate = function(oConstraintValue, oDate, oInputFormat) {
+		if (oDate === undefined && oConstraintValue === undefined) {
+			return undefined;
+		}
+		let oConstraintDate;
+		if (oConstraintValue !== undefined) {
+			if (typeof oConstraintValue === "number") {
+				oConstraintDate = UI5Date.getInstance(oConstraintValue);
+			} else if (oInputFormat) {
+				oConstraintDate = oInputFormat.parse(oConstraintValue);
+			} else {
+				oConstraintDate = oConstraintValue;
+			}
+		}
+		if (oDate === undefined || oDate === null) {
+			return oConstraintDate;
+		}
+		if (oConstraintDate && oDate.getTime() !== oConstraintDate.getTime()) {
+			throw new Error(`The date ${oDate} does not match the constraint ${oConstraintDate}`);
+		}
+		return oDate;
+	};
+
 	return DateFormat;
 
 });

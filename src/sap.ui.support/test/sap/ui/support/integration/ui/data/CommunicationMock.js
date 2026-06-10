@@ -6,9 +6,8 @@ sap.ui.define([
 	"sap/ui/support/supportRules/CommunicationBus",
 	"sap/ui/support/supportRules/WCBChannels",
 	"sap/ui/support/supportRules/IssueManager",
-	"sap/ui/support/supportRules/RuleSerializer",
 	"sap/ui/thirdparty/jquery"
-], function (CommunicationBus, Channels, IssueManager, RuleSerializer, jQuery) {
+], function (CommunicationBus, Channels, IssueManager, jQuery) {
 	"use strict";
 
 	var CommunicationMock = {};
@@ -72,123 +71,6 @@ sap.ui.define([
 				});
 			});
 		}, this);
-
-		// Subscriptions that are needed for temporary rules
-		CommunicationBus.subscribe(Channels.VERIFY_CREATE_RULE, function (tempRuleSerialized) {
-			var oTempRule = RuleSerializer.deserialize(tempRuleSerialized),
-				oTempRuleSet = mRuleSets["temporary"].ruleset;
-
-			oTempRuleSet._mRules[oTempRule.id] = oTempRule; // preserve the temporary rule
-
-			CommunicationBus.publish(Channels.VERIFY_RULE_CREATE_RESULT, {
-				result: "success",
-				newRule: tempRuleSerialized
-			});
-		}, this);
-
-		CommunicationBus.subscribe(Channels.VERIFY_UPDATE_RULE, function (data) {
-			var oTempRuleSerialized = data.updateObj,
-				oTempRule = RuleSerializer.deserialize(oTempRuleSerialized),
-				oTempRuleSet = mRuleSets["temporary"].ruleset;
-
-			delete oTempRuleSet._mRules[data.oldId];
-			oTempRuleSet._mRules[oTempRule.id] = oTempRule; // preserve the temporary rule
-
-			CommunicationBus.publish(Channels.VERIFY_RULE_UPDATE_RESULT, {
-				result: "success",
-				updateRule: oTempRuleSerialized
-			});
-		}, this);
-
-		CommunicationBus.subscribe(Channels.ON_ANALYZE_REQUEST, function (data) {
-			// add issues that will always appear on analyze here
-			var oIssuesModel = [
-				{
-					async: false,
-					audiences: ["Internal"],
-					categories: ["Other"],
-					context: {
-						className: "",
-						id: "Fake element id"
-					},
-					description: "Description",
-					details: "High test issue details",
-					minVersion: "1",
-					name: "Title of temp rule",
-					resolution: "Resolution",
-					resolutionUrls: [],
-					ruleId: "testId",
-					ruleLibName: "temporary",
-					severity: "High"
-				}
-			];
-
-			CommunicationBus.publish(Channels.ON_ANALYZE_FINISH, {
-				issues: oIssuesModel
-			});
-		}, this);
-
-		CommunicationBus.subscribe(Channels.REQUEST_ISSUES, function (issues) {
-			if (issues) {
-				var oIssuesManagerModel = { 0: {
-							0: {
-								audiences: "Internal",
-								categories: "Other",
-								description: "Description",
-								details: "High test issue details",
-								formattedName: 'temporary (<span class="issueSeverityHigh"> 1 High, </span> <span class=""> 0 Medium, </span> <span class=""> 0 Low</span> )',
-								issueCount: 1,
-								name: "Title of temp rule",
-								resolution: "Resolution",
-								ruleId: "testId",
-								ruleLibName: "temporary",
-								selected: undefined,
-								severity: "High",
-								showAudiences: true,
-								showCategories: true,
-								type: "rule"
-							},
-							formattedName: 'temporary (<span class="issueSeverityHigh"> 1 High, </span> <span class=""> 0 Medium, </span> <span class=""> 0 Low</span> )',
-							issueCount: 1,
-							name: "temporary (1 issues)",
-							showAudiences: false,
-							showCategories: false,
-							type: "lib"
-						}
-
-					},
-					oGroupedIssues = {
-						temporary: {
-							testId: [
-								{
-									async: false,
-									audiences: ["Internal"],
-									categories: ["Other"],
-									context: {
-										className: "",
-										id: "Fake element id"
-									},
-									description:"Description",
-									details: "High test issue details",
-									minVersion: "1",
-									name: "Title of temp rule",
-									resolution: "Resolution",
-									resolutionUrls: [],
-									ruleId: "testId",
-									ruleLibName: "temporary",
-									severity: "High"
-								}
-							]
-						}
-					};
-
-				CommunicationBus.publish(Channels.GET_ISSUES, {
-					groupedIssues: oGroupedIssues,
-					issuesModel: oIssuesManagerModel
-				});
-			}
-		}, this);
-
 	};
 
 	CommunicationMock.destroy = function () {

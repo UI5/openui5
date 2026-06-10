@@ -3971,7 +3971,7 @@ sap.ui.define([
 			oBinding = that.oView.byId("table").getBinding("rows");
 
 			oBinding.filter(new Filter("SalesOrderID", FilterOperator.NE, "00"));
-			oBinding.sort(new Sorter({groupPaths : ["Note"], path : "SalesOrderID"}));
+			oBinding.sort(new Sorter({groupPaths : ["DeliveryStatus"], path : "SalesOrderID"}));
 			oBinding.changeParameters({$count : true, custom : "foo"});
 
 			that.expectEvents(assert, "sap.ui.model.odata.v4.ODataListBinding: /SalesOrderList|", [
@@ -3982,13 +3982,14 @@ sap.ui.define([
 					[, "change", {reason : "change"}],
 					[, "dataReceived", {data : {}}]
 				])
-				.expectRequest("SalesOrderList?$count=true&custom=foo&$select=Note,SalesOrderID"
+				.expectRequest("SalesOrderList?$count=true&custom=foo"
+					+ "&$select=DeliveryStatus,Note,SalesOrderID"
 					+ "&$orderby=SalesOrderID&$filter=SalesOrderID ne '00'&$skip=0&$top=3", {
 					"@odata.count" : "3",
 					value : [
-						{SalesOrderID : "01", Note : "Note 1"},
-						{SalesOrderID : "02", Note : "Note 2"},
-						{SalesOrderID : "03", Note : "Note 3"}
+						{DeliveryStatus : "I", Note : "Note 1", SalesOrderID : "01"},
+						{DeliveryStatus : "I", Note : "Note 2", SalesOrderID : "02"},
+						{DeliveryStatus : "I", Note : "Note 3", SalesOrderID : "03"}
 					]
 				})
 				.expectChange("note", ["Note 1", "Note 2", "Note 3"]);
@@ -25448,7 +25449,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		"requestSideEffects-*",
 		"multiple setProperty in one $batch",
 		"multiple setProperty in multiple $batches",
-		"create"
+		"create",
+		"create-inactive"
 	].forEach((sScenario) => {
 		// 0: no sorter, 1: sap.ui.model.Sorter, 2: $orderby
 		[0, 1, 2].forEach(function (iSorterCase) {
@@ -25907,6 +25909,51 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					// code under test (JIRA: CPOUI5ODATAV4-3482)
 					oBinding.create({GrossAmount : "13"}, true, /*bAtEnd*/true).created(),
 					this.waitForChanges(assert, sScenario)
+				]);
+			} else if (sScenario === "create-inactive") {
+				this.expectChange("isOutdated", [,,,, undefined])
+					.expectChange("isSelected", [,,,, undefined])
+					.expectChange("isExpanded", [,,,, undefined])
+					.expectChange("isTotal", [,,, false, true])
+					.expectChange("level", [,,, 1, 0])
+					.expectChange("lifecycleStatus", [,,, "", null])
+					.expectChange("grossAmount", [,,, "13", "6"])
+					.expectChange("currencyCode", [,,,, "EUR"])
+					.expectChange("salesOrderID", [,,, "", null]);
+
+				// creation at start with grand total at top and at bottom is not supported, so use
+				// create at end
+				// code under test (JIRA: CPOUI5ODATAV4-3482)
+				const oCreated = oBinding.create({GrossAmount : "13"}, true, /*bAtEnd*/true,
+					/*bInactive*/true);
+
+				await this.waitForChanges(assert, "create inactive entity");
+
+				this.expectChange("lifecycleStatus", [,,, "B"])
+					.expectChange("isOutdatedHeader", true)
+					.expectChangeIf(bWithFilter, "isOutdated", [true,,,, true])
+					.expectRequest("#2 POST SalesOrderList?sap-client=123", {
+						payload : {GrossAmount : "13", LifecycleStatus : "B"}
+					}, {
+						CurrencyCode : "EUR",
+						GrossAmount : "13",
+						LifecycleStatus : "B",
+						SalesOrderID : "27"
+					})
+					.expectChange("salesOrderID", [,,, "27"]);
+				if (!bWithFilter) {
+					this.expectRequest("#2 " + sGrandTotalURL, {
+							value : [{CurrencyCode : "EUR", GrossAmount : "19"}]
+						})
+						.expectChange("grossAmount", ["19",,,, "19"])
+						.expectChange("isOutdated", [false,,,, false]);
+				}
+
+				await Promise.all([
+					// code under test
+					oCreated.setProperty("LifecycleStatus", "B"),
+					oCreated.created(),
+					this.waitForChanges(assert, "activate created entity")
 				]);
 			}
 		});

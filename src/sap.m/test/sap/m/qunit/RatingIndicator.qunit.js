@@ -295,6 +295,89 @@ sap.ui.define([
 		oRating.destroy();
 	});
 
+	QUnit.test("readonly half value uses 'unfavorite' icon for the half-rated icon only", async function(assert) {
+		var sFavoriteContent = IconPool.getIconInfo("favorite").content,
+			sUnfavoriteContent = IconPool.getIconInfo("unfavorite").content;
+
+		function getUnselectedIconChars(oRating) {
+			var aIcons = oRating.$().find(".sapMRIUnsel > span").get();
+			return aIcons.map(function (el) { return el.textContent; });
+		}
+
+		// disabled + half value -> only icon at floor(value) is "unfavorite"
+		var oDisabled = new RatingIndicator({
+			enabled: false,
+			value: 2.5,
+			maxValue: 5,
+			visualMode: RatingIndicatorVisualMode.Half
+		});
+		oDisabled.placeAt("content");
+		await nextUIUpdate();
+
+		var aChars = getUnselectedIconChars(oDisabled);
+		assert.strictEqual(aChars.length, 5, "Five unselected icons rendered");
+		assert.strictEqual(aChars[0], sFavoriteContent, "Unselected icon 0 is 'favorite'");
+		assert.strictEqual(aChars[1], sFavoriteContent, "Unselected icon 1 is 'favorite'");
+		assert.strictEqual(aChars[2], sUnfavoriteContent, "Half-rated icon 2 is 'unfavorite'");
+		assert.strictEqual(aChars[3], sFavoriteContent, "Unselected icon 3 is 'favorite'");
+		assert.strictEqual(aChars[4], sFavoriteContent, "Unselected icon 4 is 'favorite'");
+
+		oDisabled.destroy();
+
+		// displayOnly + half value -> only icon at floor(value) is "unfavorite"
+		var oDisplayOnly = new RatingIndicator({
+			displayOnly: true,
+			value: 1.5,
+			maxValue: 5,
+			visualMode: RatingIndicatorVisualMode.Half
+		});
+		oDisplayOnly.placeAt("content");
+		await nextUIUpdate();
+
+		aChars = getUnselectedIconChars(oDisplayOnly);
+		assert.strictEqual(aChars[0], sFavoriteContent, "displayOnly: icon 0 is 'favorite'");
+		assert.strictEqual(aChars[1], sUnfavoriteContent, "displayOnly: half-rated icon 1 is 'unfavorite'");
+		assert.strictEqual(aChars[2], sFavoriteContent, "displayOnly: icon 2 is 'favorite'");
+
+		oDisplayOnly.destroy();
+
+		// integer half-mode value -> all unselected stay "favorite" (no regression)
+		var oInteger = new RatingIndicator({
+			enabled: false,
+			value: 3,
+			maxValue: 5,
+			visualMode: RatingIndicatorVisualMode.Half
+		});
+		oInteger.placeAt("content");
+		await nextUIUpdate();
+
+		aChars = getUnselectedIconChars(oInteger);
+		aChars.forEach(function (sChar, i) {
+			assert.strictEqual(sChar, sFavoriteContent, "Integer value: unselected icon " + i + " is 'favorite'");
+		});
+
+		oInteger.destroy();
+
+		// editable:false (interactive readonly) + half value -> only half-rated icon is "unfavorite"
+		var oReadOnly = new RatingIndicator({
+			editable: false,
+			value: 2.5,
+			maxValue: 5,
+			visualMode: RatingIndicatorVisualMode.Half
+		});
+		oReadOnly.placeAt("content");
+		await nextUIUpdate();
+
+		aChars = getUnselectedIconChars(oReadOnly);
+		assert.strictEqual(aChars[0], sFavoriteContent, "editable:false: icon 0 is 'favorite'");
+		assert.strictEqual(aChars[1], sFavoriteContent, "editable:false: icon 1 is 'favorite'");
+		assert.strictEqual(aChars[2], sUnfavoriteContent, "editable:false: half-rated icon 2 is 'unfavorite'");
+		assert.strictEqual(aChars[3], sFavoriteContent, "editable:false: icon 3 is 'favorite'");
+		assert.strictEqual(aChars[4], sFavoriteContent, "editable:false: icon 4 is 'favorite'");
+
+		oReadOnly.destroy();
+	});
+
 	QUnit.module("Methods");
 
 	QUnit.test("getter / setter", async function (assert) {

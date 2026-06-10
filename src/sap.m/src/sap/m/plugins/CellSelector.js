@@ -284,6 +284,14 @@ sap.ui.define([
 		},
 		onmouseup: function(oEvent) {
 			clearTimeout(this._iTimer);
+
+			if (this._bBorderDown) {
+				const oTableDomRef = this.getControl().getDomRef();
+				if (oTableDomRef) {
+					oTableDomRef.style.cursor = "";
+				}
+			}
+
 			this._bMouseDown = false;
 			this._bBorderDown = false;
 			this._oMouseSource = null;
@@ -776,6 +784,11 @@ sap.ui.define([
 		this._bBorderDown = true;
 		this._bMouseDown = true;
 		// TODO: When borderdown, make "border" active
+
+		const oTableDomRef = this.getControl().getDomRef();
+		if (oTableDomRef && this._oResizer) {
+			oTableDomRef.style.cursor = window.getComputedStyle(this._oResizer).cursor;
+		}
 	};
 
 	/**

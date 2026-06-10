@@ -1535,7 +1535,6 @@ sap.ui.define([
 				var oExpectedResult = {
 					"headers": [
 						{
-							"icon": {},
 							"title": "First Name",
 							"width": "18%",
 							"hAlign": "Center",

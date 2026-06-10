@@ -42,17 +42,11 @@ sap.ui.define([
 			sRowId = $oTitle.parents("tr").attr("id"),
 			$oRow = oTable.$().find("[data-sap-ui-related='" + sRowId + "']"),
 			oCheckbox = $oRow[0].firstChild,
-			oCopyIcon = $oRow.find("[title='Copy']")[0],
-			oDeleteIcon = $oRow.find("[title='Delete']")[0],
-			oEditIcon = $oRow.find("[title='Edit']")[0],
 			expandCollapse = $oTitle.siblings()[0],
 			bSelected = Opa5.getJQuery()($oRow[0]).hasClass("sapUiTableRowSel");
 
 		return {
 			checkbox: oCheckbox,
-			copyIcon: oCopyIcon,
-			deleteIcon: oDeleteIcon,
-			editIcon: oEditIcon,
 			expandCollapse: expandCollapse,
 			isSelected: bSelected
 		};
@@ -290,48 +284,6 @@ sap.ui.define([
 							Opa5.assert.ok(true, sSuccessMessage);
 						},
 						errorMessage: sErrorMessage
-					});
-				},
-				iPressCloneIconOfRule: function (sTitle) {
-					return this.waitFor({
-						id: sTreeTableId,
-						matchers: new AggregationFilled({name: "columns"}),
-						viewName: sViewName,
-						viewNamespace: sViewNameSpace,
-						success: function (oTable) {
-							var oRowElements = getRowElements(oTable, sTitle);
-							oRowElements.copyIcon.click();
-							Opa5.assert.ok(true, "Clone Icon of Rule with title " + sTitle + " was pressed");
-						},
-						errorMessage: "Clone icon was not found"
-					});
-				},
-				iPressDeleteIconOfTemporaryRule: function (sTitle) {
-					return this.waitFor({
-						id: sTreeTableId,
-						matchers: new AggregationFilled({name: "columns"}),
-						viewName: sViewName,
-						viewNamespace: sViewNameSpace,
-						success: function (oTable) {
-							var oRowElements = getRowElements(oTable, sTitle);
-							oRowElements.deleteIcon.click();
-							Opa5.assert.ok(true, "Delete icon of " + sTitle + " was pressed");
-						},
-						errorMessage: "Delete Rule icon was not found"
-					});
-				},
-				iPressEditIconOfTemporaryRule: function (sTitle) {
-					return this.waitFor({
-						id: sTreeTableId,
-						matchers: new AggregationFilled({name: "columns"}),
-						viewName: sViewName,
-						viewNamespace: sViewNameSpace,
-						success: function (oTable) {
-							var oRowElements = getRowElements(oTable, sTitle);
-							oRowElements.editIcon.click();
-							Opa5.assert.ok(true, "Edit icon of " + sTitle + " was pressed");
-						},
-						errorMessage: "Edit Rule icon was not found"
 					});
 				},
 				iPressExpandCollapseButtonOfRuleSet: function (sTitle, sSuccessMessage, sErrorMessage) {

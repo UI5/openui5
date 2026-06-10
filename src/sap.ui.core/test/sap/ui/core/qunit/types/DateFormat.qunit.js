@@ -5090,6 +5090,45 @@ sap.ui.define([
 	});
 
 	//*****************************************************************************************************************
+	QUnit.test("resolveDate", function (assert) {
+		const oDate = UI5Date.getInstance("2020-01-01");
+		const oConstraint = UI5Date.getInstance("2020-01-01");
+		const oOther = UI5Date.getInstance("2021-01-01");
+		const oInputFormatMock = {parse() {}};
+
+		// code under test: no param, no constraint -> undefined
+		assert.strictEqual(DateFormat.resolveDate(undefined, undefined, undefined), undefined);
+
+		//code under test: no param, UI5Date constraint -> constraint returned
+		assert.strictEqual(DateFormat.resolveDate(oConstraint, undefined, undefined), oConstraint);
+
+		// code under test: no param, null param, UI5Date constraint -> constraint returned
+		assert.strictEqual(DateFormat.resolveDate(oConstraint, null, undefined), oConstraint);
+
+		// code under test: param given, no constraint -> param returned
+		assert.strictEqual(DateFormat.resolveDate(undefined, oDate, undefined), oDate);
+
+		// code under test: param and matching constraint -> param returned
+		assert.strictEqual(DateFormat.resolveDate(oConstraint, oDate, undefined), oDate);
+
+		// code under test: param and mismatching constraint -> error
+		assert.throws(function () {
+			DateFormat.resolveDate(oConstraint, oOther, undefined);
+		}, new Error("The date " + oOther + " does not match the constraint " + oConstraint));
+
+		const oParsed = UI5Date.getInstance("2020-06-01");
+		this.mock(oInputFormatMock).expects("parse").withExactArgs("2020-06-01").returns(oParsed);
+		// code under test: string constraint with oInputFormat -> parse called
+		assert.strictEqual(DateFormat.resolveDate("2020-06-01", undefined, oInputFormatMock), oParsed);
+
+		const iTimestamp = 1577836800000;
+		const oTimestampDate = UI5Date.getInstance(iTimestamp);
+		this.mock(UI5Date).expects("getInstance").withExactArgs(iTimestamp).returns(oTimestampDate);
+		// code under test: numeric (timestamp) constraint -> UI5Date.getInstance called
+		assert.strictEqual(DateFormat.resolveDate(iTimestamp, undefined, undefined), oTimestampDate);
+	});
+
+	//*****************************************************************************************************************
 ["getDateInstance", "getDateTimeInstance", "getTimeInstance"].forEach(function (sMethod) {
 	[false, true].forEach(function (bUTC) {
 	QUnit.test("getSampleValue single date, " + sMethod + "; UTC=" + bUTC, function (assert) {

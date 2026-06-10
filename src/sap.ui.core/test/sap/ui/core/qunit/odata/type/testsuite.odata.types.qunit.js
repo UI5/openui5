@@ -84,7 +84,10 @@ sap.ui.define(function () {
 						"sap/ui/core/sample" : "test-resources/sap/ui/core/demokit/sample"
 					}
 				},
-				module : ["sap/ui/core/sample/ViewTemplate/types/Opa.qunit"]
+				module : ["sap/ui/core/sample/ViewTemplate/types/Opa.qunit"],
+				qunit : {
+					version : 2
+				}
 			}
 		}
 	};

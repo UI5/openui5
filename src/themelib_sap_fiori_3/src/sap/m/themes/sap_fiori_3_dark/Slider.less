@@ -22,6 +22,11 @@
 	border-color: var(--sapButton_Hover_BorderColor);
 }
 
+.sapMSliderTooltip:has(.sapMSliderTooltipInput:focus) {
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+	outline-offset: -0.125rem;
+}
+
 /* slider handle */
 .sapMSliderHandle {
 	background: var(--sapButton_Background);

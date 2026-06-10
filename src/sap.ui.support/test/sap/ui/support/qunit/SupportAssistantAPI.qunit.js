@@ -112,7 +112,10 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("Temporary rule execution", function (assert) {
+	/**
+	 * @deprecated As of version 1.150. Temporary rules are deprecated. Please use library rulesets instead.
+	 */
+	QUnit.test("Temporary rule execution (deprecated functionality)", function (assert) {
 		var done = assert.async();
 
 		bootstrap.initSupportRules(["true", "silent"], {
@@ -137,20 +140,11 @@ sap.ui.define([
 					resolutionurls: []
 				};
 
-				var rules = [
-					{ruleId: "TEMP RULE ID", libName: "temporary"}
-				];
-
 				var sResult = RuleAnalyzer.addRule(tempRule);
 
-				assert.strictEqual(sResult, "success", "Rule successfully added");
-
-				RuleAnalyzer.analyze(this.scope, rules).then(function () {
-					var history = RuleAnalyzer.getLastAnalysisHistory();
-					assert.strictEqual(history.issues.length, 1, "List of temporary rules issues is correct");
-					done();
-				});
-			}.bind(this)
+				assert.ok(sResult.indexOf("deprecated") > -1, "addRule returns deprecation message");
+				done();
+			}
 		});
 	});
 

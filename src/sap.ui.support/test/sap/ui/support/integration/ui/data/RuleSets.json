@@ -1,15 +1,4 @@
 {
-	"temporary": {
-		"lib": {
-			"name": "temporary"
-		},
-		"ruleset": {
-			"_oSettings": {
-				"name": "temporary"
-			},
-			"_mRules": {}
-		}
-	},
 	"sap.ui.core": {
 		"lib": {
 			"name": "sap.ui.core",

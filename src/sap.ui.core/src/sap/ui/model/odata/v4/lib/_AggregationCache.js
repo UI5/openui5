@@ -41,6 +41,7 @@ sap.ui.define([
 	 *   Whether a grand total is needed
 	 * @param {sap.ui.model.odata.v4.lib._CollectionCache} [oFirstLevel]
 	 *   An optional collection cache to be used as this aggregation cache's first (and only) level
+	 * @throws {Error} If the given collection cache has pending POSTs
 	 *
 	 * @alias sap.ui.model.odata.v4.lib._AggregationCache
 	 * @borrows sap.ui.model.odata.v4.lib._CollectionCache#addKeptElement as #addKeptElement
@@ -72,6 +73,9 @@ sap.ui.define([
 		if (oFirstLevel) {
 			this.mChangeRequests = oFirstLevel.mChangeRequests;
 			this.mEditUrl2PatchPromise = oFirstLevel.mEditUrl2PatchPromise;
+			if (!_Helper.isEmptyObject(oFirstLevel.mPostRequests)) {
+				throw new Error("Not allowed due to pending POSTs");
+			}
 		}
 	}
 
@@ -541,9 +545,7 @@ sap.ui.define([
 		const fnOldSubmitCallback = fnSubmitCallback;
 		fnSubmitCallback = () => {
 			const fnReporter = this.oRequestor.getModelInterface().getReporter();
-			if (this.oCountPromise) {
-				this.readCount(oGroupLock)?.catch(fnReporter);
-			}
+			this.readCount(oGroupLock)?.catch(fnReporter);
 			this.readGrandTotal(oGroupLock)?.catch(fnReporter);
 			fnOldSubmitCallback();
 		};
@@ -2289,9 +2291,13 @@ sap.ui.define([
 		mQueryOptions = _AggregationHelper.buildApply(this.oAggregation, mQueryOptions, -1);
 		const sResourcePath = this.sResourcePath
 			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, false, true);
+		const sGroupId = oGroupLock.getGroupId();
+		const oGroupLock4Request = sGroupId.startsWith("$inactive.")
+			? this.oRequestor.lockGroup(sGroupId.slice(10), oGroupLock.getOwner())
+			: oGroupLock.getUnlockedCopy();
 
-		return this.oRequestor.request("GET", sResourcePath, oGroupLock.getUnlockedCopy(),
-				undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		return this.oRequestor.request("GET", sResourcePath, oGroupLock4Request, undefined,
+				undefined, undefined, undefined, undefined, undefined, undefined,
 				{/*mMergeableQueryOptions*/})
 			.then((oResult) => {
 				_Helper.updateExisting(this.mChangeListeners, "()", oGrandTotal, oResult.value[0]);
@@ -2741,7 +2747,7 @@ sap.ui.define([
 		const oGrandTotal = this.aElements.$byPredicate["()"];
 		if (oGrandTotal) {
 			fnUpdate(oGrandTotal);
-		} else if (bOutdated) {
+		} else {
 			// the grand total is not yet added to this.aElements.$byPredicate when the grand total
 			// Promise resolves, so update the grand total object itself; multiple concurrent calls
 			// produce the expected result, that means if bOutdated is true at least once, the grand

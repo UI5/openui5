@@ -14,7 +14,6 @@ sap.ui.define([
 	"sap/ui/support/supportRules/WCBChannels",
 	"sap/ui/support/supportRules/Constants",
 	"sap/ui/support/supportRules/Storage",
-	"sap/ui/support/supportRules/util/EvalUtils",
 	"sap/ui/VersionInfo",
 	"sap/m/library"
 ], function (
@@ -29,7 +28,6 @@ sap.ui.define([
 	channelNames,
 	Constants,
 	Storage,
-	EvalUtils,
 	VersionInfo,
 	mobileLibrary
 ) {
@@ -95,8 +93,6 @@ sap.ui.define([
 					location: new URL(sap.ui.require.toUrl("sap/ui/support"), window.location.origin + window.location.pathname).toString()
 				});
 			});
-
-			this._checkTempRules();
 		},
 
 		initSettingsPopoverModel: function () {
@@ -203,12 +199,6 @@ sap.ui.define([
 			if (this.model.getProperty("/persistingSettings")) {
 				Storage.createPersistenceCookie(Constants.COOKIE_NAME, true);
 
-				this.model.getProperty("/libraries").forEach(function (lib) {
-					if (lib.title === Constants.TEMP_RULESETS_NAME) {
-						Storage.setRules(lib.rules);
-					}
-				});
-
 				this.persistExecutionScope();
 				this.persistVisibleColumns();
 				SelectionUtils.persistSelection();
@@ -220,12 +210,6 @@ sap.ui.define([
 			}
 		},
 
-		onSettingsPopoverClose: function () {
-			if (this.model.getProperty("/persistingSettings") && !this.model.getProperty("/tempRulesDisabledWarned")) {
-				this.model.setProperty("/tempRulesDisabledWarned", true);
-				Storage.markTempRulesDisabledWarned();
-			}
-		},
 
 		goToAnalysis: function (oEvent) {
 			this._setActiveView("analysis");
@@ -281,12 +265,6 @@ sap.ui.define([
 			this.byId(sId + "Btn").setType(ButtonType.Emphasized);
 			this.byId("navCon").to(this.byId(sId), "show");
 			this.ensureOpened();
-		},
-
-		_checkTempRules: function () {
-			if (!EvalUtils.isEvalAllowed() && !this.model.getProperty("/tempRulesDisabledWarned")) {
-				this._openSettingsPopover();
-			}
 		},
 
 		_openSettingsPopover: function () {

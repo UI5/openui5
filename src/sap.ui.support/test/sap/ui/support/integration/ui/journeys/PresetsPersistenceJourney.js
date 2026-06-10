@@ -123,7 +123,7 @@ sap.ui.define([
 
 		Then.onThePresetsPage.iShouldSeePresetInPopover(testPreset.title);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(3); // Error logs - rule
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(2); // Error logs - rule
 
 		// cleanup -- disable local storage
 		When.onTheRulesPage.iPressSettingsButton();

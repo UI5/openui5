@@ -40,7 +40,7 @@ sap.ui.define([
 		assert.equal(typeof deserializedObj.c, "boolean", "property 'c' should be of type boolean");
 		assert.equal(typeof deserializedObj.d, "string", "property 'd' should be of type string");
 		assert.equal(typeof deserializedObj.e, "object", "property 'e' should be of type object");
-		assert.equal(typeof deserializedObj.check, "function", "property 'check' should be of type function");
-		assert.equal(typeof partiallyDeserializedObj.check, "function", "property 'check' should be of type function in partiallyDeserializedObj");
+		assert.equal(typeof deserializedObj.check, "string", "property 'check' should be of type string (function strings no longer evaluated)");
+		assert.equal(typeof partiallyDeserializedObj.check, "string", "property 'check' should be of type string in partiallyDeserializedObj (function strings no longer evaluated)");
 	});
 });

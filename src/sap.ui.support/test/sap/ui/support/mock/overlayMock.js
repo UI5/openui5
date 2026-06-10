@@ -9,26 +9,14 @@ sap.ui.define([
 	"sap/ui/core/Core",
 	"sap/ui/core/mvc/XMLView",
 	"sap/m/Page",
-	"sap/ui/support/mock/StorageSynchronizer",
-	"sap/ui/support/supportRules/util/EvalUtils"
+	"sap/ui/support/mock/StorageSynchronizer"
 ], function (
 	Core,
 	XMLView,
 	Page,
-	StorageSynchronizer,
-	EvalUtils
+	StorageSynchronizer
 ) {
 	"use strict";
-
-	function checkAndDisableEval () {
-		var oUrlParams = new URLSearchParams(window.location.search);
-
-		if (oUrlParams.get("sa-disabled-eval")) {
-			EvalUtils.isEvalAllowed = function () {
-				return false;
-			};
-		}
-	}
 
 	function afterStorageInitialized () {
 		XMLView.create({
@@ -49,7 +37,6 @@ sap.ui.define([
 	Core.ready(function () {
 		StorageSynchronizer.prepareInitFrame();
 		StorageSynchronizer.preparePreserveFrame();
-		checkAndDisableEval();
 		StorageSynchronizer.initializeFrame(afterStorageInitialized);
 	});
 });

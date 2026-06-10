@@ -7,10 +7,25 @@ sap.ui.define([
 	"sap/m/Page",
 	"sap/m/ResponsiveScale",
 	"sap/m/Slider",
+	"sap/m/Button",
+	"sap/m/OverflowToolbar",
+	"sap/ui/core/Theming",
 	"sap/base/Log"
-], async function(Core, HTML, App, Page, ResponsiveScale, Slider, Log) {
+], async function(Core, HTML, App, Page, ResponsiveScale, Slider, Button, OverflowToolbar, Theming, Log) {
 	"use strict";
 	await Core.ready();
+
+	var oThemeToolbar = new OverflowToolbar({
+		content: [
+			new Button({ text: "Horizon", press: function() { Theming.setTheme("sap_horizon"); } }),
+			new Button({ text: "Horizon Dark", press: function() { Theming.setTheme("sap_horizon_dark"); } }),
+			new Button({ text: "Horizon HCB", press: function() { Theming.setTheme("sap_horizon_hcb"); } }),
+			new Button({ text: "Horizon HCW", press: function() { Theming.setTheme("sap_horizon_hcw"); } }),
+			new Button({ text: "Quartz", press: function() { Theming.setTheme("sap_fiori_3"); } }),
+			new Button({ text: "Quartz Dark", press: function() { Theming.setTheme("sap_fiori_3_dark"); } }),
+			new Button({ text: "Quartz HCB", press: function() { Theming.setTheme("sap_fiori_3_hcb"); } })
+		]
+	});
 
 	var oDefaultTitle = new HTML({ content: "<h2>Default</h2>" }),
 		oSlider0 = new Slider("__slider0", {
@@ -196,6 +211,7 @@ sap.ui.define([
 	var oPage = new Page("page", {
 		title: "Mobile Slider Control",
 		content: [
+			oThemeToolbar,
 			oDefaultTitle,
 			oSlider0,
 			oSlider1,

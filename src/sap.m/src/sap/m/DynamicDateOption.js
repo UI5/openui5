@@ -533,7 +533,9 @@ sap.ui.define([
 		};
 
 		DynamicDateOption.prototype._createCustomMonthControl = function(oValue, iIndex, fnControlsUpdated) {
-			var oControl = new CustomMonthPicker(),
+			var oControl = new CustomMonthPicker({
+					width: "100%"
+				}),
 				oDate = UI5Date.getInstance(),
 				iMonth = (oValue && iIndex >= 0 && this.getKey() === oValue.operator) ? oValue.values[iIndex] : oDate.getMonth(),
 				iYear = (oValue  && iIndex >= 0 && this.getKey() === oValue.operator) ? oValue.values[iIndex + 1] : oDate.getFullYear();

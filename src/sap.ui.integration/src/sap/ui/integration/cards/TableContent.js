@@ -214,9 +214,18 @@ sap.ui.define([
 			oResolvedRow,
 			oResolvedGroup;
 
-		(oConfiguration.row.columns || []).forEach(function (oColumn) {
-			oColumn = BindingResolver.resolveValue(oColumn, this, this.getBindingContext().getPath());
-			aHeaders.push(oColumn);
+		(oConfiguration.row.columns || []).forEach(function (oRawColumn) {
+			const oColumn = {
+				title: oRawColumn.title,
+				width: oRawColumn.width,
+				hAlign: oRawColumn.hAlign,
+				importance: oRawColumn.importance,
+				autoPopinWidth: oRawColumn.autoPopinWidth,
+				...(oRawColumn.hasOwnProperty("visible") && { visible: oRawColumn.visible }),
+				...(oRawColumn.hasOwnProperty("identifier") && { identifier: oRawColumn.identifier })
+			};
+
+			aHeaders.push(BindingResolver.resolveValue(oColumn, this, this.getBindingContext().getPath()));
 		}.bind(this));
 
 		aRows.forEach(function (oRow) {
