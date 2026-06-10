@@ -3,8 +3,7 @@
  */
 
 sap.ui.define([
-	"./util/EvalUtils"
-], function (EvalUtils) {
+], function () {
 		"use strict";
 
 		return {
@@ -20,17 +19,13 @@ sap.ui.define([
 				var result = JSON.stringify(rule, replacer);
 				return result;
 			},
-			deserialize: function (serializedRule, stringifyCheck) {
+			deserialize: function (serializedRule) {
 				var rule;
 
 				if (typeof serializedRule === 'string') {
 					rule = JSON.parse(serializedRule);
 				} else {
 					rule = serializedRule;
-				}
-
-				if (!stringifyCheck && rule.check !== undefined) {
-					rule.check = EvalUtils.evalFunction(rule.check);
 				}
 
 				return rule;

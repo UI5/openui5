@@ -5,10 +5,8 @@ sap.ui.define([
 	"sap/ui/support/mock/StorageSynchronizer",
 	"sap/ui/test/opaQunit",
 	"sap/ui/support/integration/ui/pages/Main",
-	"sap/ui/support/integration/ui/pages/Issues",
 	"sap/ui/support/integration/ui/pages/Rules",
-	"sap/ui/support/integration/ui/pages/Presets",
-	"sap/ui/support/integration/ui/pages/TemporaryRule"
+	"sap/ui/support/integration/ui/pages/Presets"
 ], function (Opa5, Arrangement, CommunicationMock, StorageSynchronizer) {
 	"use strict";
 

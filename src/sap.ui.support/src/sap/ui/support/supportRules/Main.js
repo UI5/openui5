@@ -22,7 +22,6 @@ sap.ui.define([
 	"sap/ui/support/supportRules/WCBChannels",
 	"sap/ui/support/supportRules/Constants",
 	"sap/ui/support/supportRules/RuleSetLoader",
-	"sap/ui/support/supportRules/RuleSerializer",
 	"sap/ui/support/library",
 	"sap/ui/core/ComponentContainer"
 ], function(
@@ -45,7 +44,6 @@ sap.ui.define([
 	channelNames,
 	constants,
 	RuleSetLoader,
-	RuleSerializer,
 	library,
 	ComponentContainer
 ) {
@@ -205,36 +203,6 @@ sap.ui.define([
 	 * @private
 	 */
 	Main.prototype._setCommunicationSubscriptions = function () {
-
-		CommunicationBus.subscribe(channelNames.VERIFY_CREATE_RULE, function (tempRuleSerialized) {
-			var oTempRule = RuleSerializer.deserialize(tempRuleSerialized),
-				oTempRuleSet = RuleSetLoader.getRuleLib(constants.TEMP_RULESETS_NAME).ruleset,
-				sResult = oTempRuleSet.addRule(oTempRule);
-
-			CommunicationBus.publish(channelNames.VERIFY_RULE_CREATE_RESULT, {
-				result: sResult,
-				newRule: RuleSerializer.serialize(oTempRule)
-			});
-
-		}, this);
-
-		CommunicationBus.subscribe(channelNames.VERIFY_UPDATE_RULE, function (data) {
-			var oTempRule = RuleSerializer.deserialize(data.updateObj),
-				oTempRuleSet = RuleSetLoader.getRuleLib(constants.TEMP_RULESETS_NAME).ruleset,
-				sResult = oTempRuleSet.updateRule(data.oldId, oTempRule);
-
-			CommunicationBus.publish(channelNames.VERIFY_RULE_UPDATE_RESULT, {
-				result: sResult,
-				updateRule: RuleSerializer.serialize(oTempRule)
-			});
-		}, this);
-
-		CommunicationBus.subscribe(channelNames.DELETE_RULE, function (data) {
-			var oTempRule = RuleSerializer.deserialize(data),
-				oTempRuleSet = RuleSetLoader.getRuleLib(constants.TEMP_RULESETS_NAME).ruleset;
-
-			oTempRuleSet.removeRule(oTempRule);
-		}, this);
 
 		CommunicationBus.subscribe(channelNames.OPEN_URL, function (url) {
 			var win = window.open(url, "_blank");
@@ -740,31 +708,6 @@ sap.ui.define([
 		} else {
 			return null;
 		}
-	};
-
-	 /**
-	 * Adds new temporary rule when in silent mode
-	 *
-	 * @public
-	 * @param {Object} oRule Object with rule information
-	 * @returns {string} Rule creation status
-	 */
-	Main.prototype.addRule = function (oRule) {
-		if (!oRule) {
-			return "No rule provided.";
-		}
-
-		oRule.selected = oRule.selected !== undefined ? oRule.selected : true;
-		oRule.async = oRule.async || false;
-
-		var sResult = RuleSetLoader.getRuleLib(constants.TEMP_RULESETS_NAME).ruleset.addRule(oRule);
-
-		CommunicationBus.publish(channelNames.VERIFY_RULE_CREATE_RESULT, {
-			result: sResult,
-			newRule: RuleSerializer.serialize(oRule)
-		});
-
-		return sResult;
 	};
 
 	var oMain = new Main();

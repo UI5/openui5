@@ -62,12 +62,6 @@ sap.ui.define(function() {
 					version: 4
 				}
 			},
-			"util/EvalUtils": {
-				module: "./util/EvalUtils.qunit",
-				sinon: {
-					version: 4
-				}
-			},
 			"util/RuleValidator": {
 				module: "./util/RuleValidator.qunit"
 			},
@@ -114,10 +108,6 @@ sap.ui.define(function() {
 			"integration/ui/PresetsPersistenceJourney": {
 				title: "Integration Tests for Support Assistant's Presets Persistency",
 				module: "sap/ui/support/integration/ui/journeys/PresetsPersistenceJourney"
-			},
-			"integration/ui/TemporaryRulesJourney": {
-				title: "Integration Tests for Support Assistant's Temporary Rules",
-				module: "sap/ui/support/integration/ui/journeys/TemporaryRulesJourney"
 			},
 			"Generic Testsuite": {
 				page: "test-resources/sap/ui/support/qunit/testsuite.generic.qunit.html"

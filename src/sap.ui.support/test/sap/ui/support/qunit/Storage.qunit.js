@@ -24,37 +24,6 @@ sap.ui.define(['sap/ui/support/supportRules/Storage'],
 		}
 	});
 
-	QUnit.test('Remove data from Storage', function(assert) {
-
-		var tempRule = createValidRule('tempRule'),
-			selectedRule = createValidRule('selectedRule');
-
-		tempRule.libName = 'temporary';
-		selectedRule.selected = true;
-
-		this.storage.setRules([tempRule, selectedRule]);
-
-		var rules = this.storage.getRules();
-		assert.equal(rules[0].id, 'tempRule', 'Temporary rules have been stored successfully !');
-
-		assert.equal(rules[1].id, 'selectedRule', 'Selected rules have been stored successfully !');
-
-		this.storage.removeAllData();
-
-		rules = this.storage.getRules();
-
-		assert.equal(rules, null, 'All data has been removed successfully !');
-
-	});
-
-	QUnit.test('Get & Set temporary rules in Storage', function(assert) {
-		this.storage.setRules([createValidRule('tempRule')]);
-
-		var tempRules = this.storage.getRules();
-
-		assert.equal(tempRules[0].id, 'tempRule', 'The temporary rules have been stored & retrieved successfully !');
-	});
-
 	QUnit.test('Get & Set selected rules in Storage', function(assert) {
 
 		var selectedRules = this.storage.getSelectedRules();

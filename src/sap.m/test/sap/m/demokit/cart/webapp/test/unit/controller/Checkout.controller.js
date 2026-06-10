@@ -14,9 +14,9 @@ sap.ui.define([
 			this.oEvent = {
 				getSource: () => new Button()
 			};
-			sinon.stub(this.Checkout, "byId").returns(undefined);
-			sinon.stub(this.Checkout, "createId").callsFake((sId) => sId);
-			sinon.stub(this.Checkout, "_addDependent").returns(true);
+			sinon.stub(this.Checkout, "byId", () => undefined);
+			sinon.stub(this.Checkout, "createId", (sId) => sId);
+			sinon.stub(this.Checkout, "_addDependent", () => true);
 		},
 
 		afterEach() {

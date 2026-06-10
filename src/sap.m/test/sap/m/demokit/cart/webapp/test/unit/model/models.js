@@ -14,7 +14,7 @@ sap.ui.define([
 
 	function isPhoneTestCase(assert, bIsPhone) {
 		// Arrange
-		this.stub(Device, "system").value({ phone : bIsPhone });
+		this.stub(Device, "system", { phone : bIsPhone });
 
 		// System under test
 		this.oDeviceModel = models.createDeviceModel();
@@ -33,7 +33,7 @@ sap.ui.define([
 
 	function isTouchTestCase(assert, bIsTouch) {
 		// Arrange
-		this.stub(Device, "support").value({ touch : bIsTouch });
+		this.stub(Device, "support", { touch : bIsTouch });
 
 		// System under test
 		this.oDeviceModel = models.createDeviceModel();

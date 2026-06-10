@@ -4,13 +4,9 @@
 
 sap.ui.define([
 	"sap/ui/support/library",
-	"sap/ui/support/supportRules/Storage",
-	"sap/ui/support/supportRules/util/EvalUtils",
 	"sap/ui/model/json/JSONModel"
 ], function (
 	library,
-	Storage,
-	EvalUtils,
 	JSONModel
 ) {
 	"use strict";
@@ -46,12 +42,7 @@ sap.ui.define([
 		coreStateChanged: true,
 		analyzePressed: false,
 		selectedRulePreviewKey: "ruleProperties",
-		selectedRuleCreateKey: "ruleProperties",
-		selectedRuleEditKey: "ruleProperties",
 		selectedSetPreviewKey: "availableRules",
-		newRule: {},
-		newRuleStringified: "",
-		updateRuleStringified: "",
 		subtreeExecutionContextId: "",
 		availableComponents: [],
 		audiences: Audiences,
@@ -60,20 +51,6 @@ sap.ui.define([
 		audiencesFilter : ["All"].concat(Object.keys(Audiences)),
 		categoriesFilter : ["All"].concat(Object.keys(Categories)),
 		severitiesFilter : ["All"].concat(Object.keys(Severity)),
-		newEmptyRule: {
-			libName: "",
-			id: "",
-			categories: [Categories.Other],
-			audiences: [Audiences.Internal],
-			title: "",
-			description: "",
-			resolution: "",
-			resolutionurls: [],
-			check: "function (oIssueManager, oCoreFacade, oScope) {\n\t/* \n\t oIssueManager - allows you to add new issues with the addIssue() method \n\t oCoreFacade - gives you access to state of the core: getMetadata(), getUIAreas(), getComponents(), getModels() \n\t oScope - retrieves elements in the scope with these methods: getElements(), getElementsByClassName(className), getLoggedObjects(type) \n\t fnResolve - optional, passed when the rule property async is set to true \n\t*/ \n}",
-			selected: true,
-			async: false
-		},
-		editRule: null,
 		tempLink: {
 			href: "",
 			text: ""
@@ -111,9 +88,7 @@ sap.ui.define([
 		customPresets: [
 			// presets added by the user via import
 		],
-		selectionPresetsCurrent: null,
-		tempRulesDisabled: !EvalUtils.isEvalAllowed(),
-		tempRulesDisabledWarned: !!Storage.getTempRulesDisabledWarned()
+		selectionPresetsCurrent: null
 	});
 
 	return model;

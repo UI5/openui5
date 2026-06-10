@@ -53,6 +53,10 @@ sap.ui.define([
 			path: "sap/f/cardsdemo/cardcontent/tablecontent/bindings.json",
 			baseUrl: "sap/f/cardsdemo/cardcontent/tableContent/"
 		},
+		"tablePopin": {
+			path: "sap/f/cardsdemo/cardcontent/tablecontent/popin.json",
+			baseUrl: "sap/f/cardsdemo/cardcontent/tableContent/"
+		},
 		"tableCardGroups": {
 			path: "sap/f/cardsdemo/cardcontent/tablecontent/groups.json",
 			baseUrl: "sap/f/cardsdemo/cardcontent/tableContent/"

@@ -37,20 +37,6 @@ sap.ui.define([
 			Opa5.assert.ok(true, "Persistence cookie and local storage data are deleted");
 
 			return this;
-		},
-
-		iDisableEval: function () {
-			Opa5.assert.ok(true, "'sa-disabled-eval' parameter is appended to the query string");
-			oSearchParams.append("sa-disabled-eval", true);
-
-			return this;
-		},
-
-		iEnableEval: function () {
-			Opa5.assert.ok(true, "'sa-disabled-eval' parameter is removed from the query string");
-			oSearchParams.delete("sa-disabled-eval");
-
-			return this;
 		}
 	});
 });

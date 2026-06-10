@@ -17,22 +17,10 @@ sap.ui.define([], function() {
 		 */
 
 		/**
-		 * Stores temporary rules.
-		 * @readonly
-		 */
-		TEMP_RULESETS_NAME: "temporary",
-
-		/**
 		 * Name of the SupportAssistant.
 		 * @readonly
 		 */
 		SUPPORT_ASSISTANT_NAME: "Support Assistant",
-
-		/**
-		 * Key for storing temporary rules in the local storage.
-		 * @readonly
-		 */
-		LOCAL_STORAGE_TEMP_RULES_KEY: "support-assistant-temprules",
 
 		/**
 		 * Key for storing selected rules in the local storage.
@@ -69,12 +57,6 @@ sap.ui.define([], function() {
 		 * @readonly
 		 */
 		LOCAL_STORAGE_CUSTOM_PRESETS_KEY: "support-assistant-custom-presets",
-
-		/**
-		 * Tells if the user was already warned that temp rules are disabled
-		 * @readonly
-		 */
-		LOCAL_STORAGE_TEMP_RULES_DISABLED_WARNED: "support-assistant-temp-rules-disabled-warned",
 
 		/**
 		 * The name of the persistence cookie.

@@ -5,11 +5,12 @@ sap.ui.define([
 	"sap/base/future",
 	"sap/base/i18n/Localization",
 	"sap/ui/core/date/UI5Date",
+	"sap/ui/core/format/DateFormat",
 	"sap/ui/model/ParseException",
 	"sap/ui/model/ValidateException",
 	"sap/ui/model/type/Date",
 	"sap/ui/test/TestUtils"
-], function(future, Localization, UI5Date, ParseException, ValidateException, DateType, TestUtils) {
+], function(future, Localization, UI5Date, DateFormat, ParseException, ValidateException, DateType, TestUtils) {
 	/*global QUnit*/
 	"use strict";
 
@@ -238,13 +239,18 @@ sap.ui.define([
 		assert.strictEqual(oDateValue.getDate(), 2);
 	});
 
-	//*****************************************************************************************************************
+	//*********************************************************************************************
 	QUnit.test("getPlaceholderText", function (assert) {
-		var oType = new DateType();
-
-		this.mock(oType.oOutputFormat).expects("getPlaceholderText").withExactArgs().returns("~placeholder");
+		const oMin = UI5Date.getInstance("2020-01-01");
+		const oMax = UI5Date.getInstance("2025-12-31");
+		const oType = new DateType({source: {pattern: "yyyy-MM-dd"}}, {minimum: "2020-01-01", maximum: "2025-12-31"});
+		const oDateFormatMock = this.mock(DateFormat);
+		oDateFormatMock.expects("resolveDate").withExactArgs("2020-01-01", oMin, oType.oInputFormat).returns("~min");
+		oDateFormatMock.expects("resolveDate").withExactArgs("2025-12-31", oMax, oType.oInputFormat).returns("~max");
+		this.mock(oType.oOutputFormat).expects("getPlaceholderText")
+			.withExactArgs("~min", "~max").returns("~placeholder");
 
 		// code under test
-		assert.strictEqual(oType.getPlaceholderText(), "~placeholder");
+		assert.strictEqual(oType.getPlaceholderText(oMin, oMax), "~placeholder");
 	});
 });

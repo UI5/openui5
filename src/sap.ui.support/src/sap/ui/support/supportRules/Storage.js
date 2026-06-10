@@ -5,30 +5,9 @@
 /* global localStorage */
 
 sap.ui.define([
-	"sap/ui/support/supportRules/RuleSerializer",
 	"sap/ui/support/supportRules/Constants"
-], function (RuleSerializer, Constants) {
+], function (Constants) {
 	"use strict";
-
-	/**
-	 * Encodes rules written by the user.
-	 * @private
-	 * @param {string} sData Stringified object containing rule properties.
-	 * @returns {string} base-64 encoded string.
-	 */
-	function encode(sData) {
-		return window.btoa(unescape(encodeURIComponent(sData)));
-	}
-
-	/**
-	 * Decodes the already encoded data by the user.
-	 * @private
-	 * @param {string} sData Stringified base-64 object containing rule properties.
-	 * @returns {string} Stringified object containing rule properties.
-	 */
-	function decode(sData) {
-		return decodeURIComponent(escape(window.atob(sData)));
-	}
 
 	var _storage = localStorage,
 		_cookieInterface = {
@@ -55,44 +34,6 @@ sap.ui.define([
 	 * @private
 	 */
 	return /** @lends sap.ui.support.Storage */ {
-
-		/**
-		 * Returns all previously created temporary rules.
-		 * @private
-		 * @returns {object[]} An array containing all the temporary rules.
-		 */
-		getRules: function () {
-			var tempRules = [],
-				rawLSData;
-
-			try {
-				rawLSData = _storage.getItem(Constants.LOCAL_STORAGE_TEMP_RULES_KEY);
-
-				if (!rawLSData) {
-					return null;
-				}
-
-				tempRules = JSON.parse(decode(rawLSData));
-
-				tempRules = tempRules.map(function (tempRule) {
-					return RuleSerializer.deserialize(tempRule, true);
-				});
-			} catch (oError) {
-				// Swallow "Access Denied" exceptions in cross-origin scenarios.
-			}
-
-			return tempRules;
-		},
-
-		/**
-		 * Saves the temporary rules into the LocalStorage persistence layer.
-		 * @private
-		 * @param {object[]} rules The temporary rules from the shared model.
-		 */
-		setRules: function (rules) {
-			var stringifyRules = encode(JSON.stringify(rules));
-			_storage.setItem(Constants.LOCAL_STORAGE_TEMP_RULES_KEY, stringifyRules);
-		},
 
 		/**
 		 * Retrieves the selected rules which are stored in the LocalStorage persistence layer.
@@ -156,15 +97,6 @@ sap.ui.define([
 		},
 
 		/**
-		 * Overwrites the temporary rules into the local storage persistence layer.
-		 * @private
-		 * @param {object[]} aSelectedRules The temporary rules from the shared model.
-		 */
-		removeSelectedRules: function(aSelectedRules) {
-			this.setRules(aSelectedRules);
-		},
-
-		/**
 		 * Sets the visible column setting selection.
 		 * @param {string[]} aVisibleColumns visible columns ids
 		 */
@@ -221,7 +153,6 @@ sap.ui.define([
 		 * @private
 		 */
 		removeAllData: function() {
-			_storage.removeItem(Constants.LOCAL_STORAGE_TEMP_RULES_KEY);
 			_storage.removeItem(Constants.LOCAL_STORAGE_SELECTED_RULES_KEY);
 			_storage.removeItem(Constants.LOCAL_STORAGE_SELECTED_CONTEXT_KEY);
 			_storage.removeItem(Constants.LOCAL_STORAGE_SELECTED_CONTEXT_COMPONENT_KEY);
@@ -229,7 +160,6 @@ sap.ui.define([
 			_storage.removeItem(Constants.LOCAL_STORAGE_SELECTION_PRESETS_KEY);
 			_storage.removeItem(Constants.LOCAL_STORAGE_CUSTOM_PRESETS_KEY);
 			_storage.removeItem(Constants.LOCAL_STORAGE_CUSTOM_PRESETS_KEY);
-			_storage.removeItem(Constants.LOCAL_STORAGE_TEMP_RULES_DISABLED_WARNED);
 		},
 
 		/**
@@ -278,14 +208,6 @@ sap.ui.define([
 		 */
 		deletePersistenceCookie: function(sCookieName) {
 			_cookieInterface.cookie = sCookieName + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-		},
-
-		markTempRulesDisabledWarned: function () {
-			_storage.setItem(Constants.LOCAL_STORAGE_TEMP_RULES_DISABLED_WARNED, true);
-		},
-
-		getTempRulesDisabledWarned: function () {
-			return _storage.getItem(Constants.LOCAL_STORAGE_TEMP_RULES_DISABLED_WARNED);
 		},
 
 		_setStorage: function (oStorage) {

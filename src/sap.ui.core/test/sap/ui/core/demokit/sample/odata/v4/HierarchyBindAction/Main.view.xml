@@ -132,6 +132,8 @@
 			<m:Toolbar>
 				<m:Title text="Details Of Node {Id}"/>
 				<m:ToolbarSpacer/>
+				<m:Button icon="sap-icon://create" press=".onCreateDetail"
+					tooltip="Create New Detail"/>
 				<m:Button icon="sap-icon://call" press=".onCall" tooltip="Call Hero 1.2.3"/>
 				<m:Button icon="sap-icon://user-edit" press=".onChange4Save"
 					tooltip="User Edit For Save Button"/>

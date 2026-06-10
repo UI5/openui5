@@ -24,13 +24,13 @@ sap.ui.define([
 		When.onTheRulesPage.iPressSelectCheckboxOf("Error logs", "Rule has been deselected", "Could not deselect Rule");
 
 		//sap.ui.core - library
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(0);
 		// Error logs - rule
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(3);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(2);
 
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(1, 1);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(0, 1);
 
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(44, "Total selection count should be: 44", "Total selection count is not 44");
 	});
@@ -54,17 +54,17 @@ sap.ui.define([
 		When.onTheRulesPage.iPressSelectCheckboxOf("EventBus publish", "RuleSet sap.ui.core has been deselected", "Could not deselect RuleSet sap.ui.core");
 
 		//sap.ui.core - library
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(2);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(0);
 		// Error logs - rule
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(3);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(2);
 
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(1, 1);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(0, 1);
 
 		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(2);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(1, 0);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(0, 0);
 
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(43, "Total selection count should be: 43", "Total selection count is not 43");
 
@@ -80,17 +80,17 @@ sap.ui.define([
 	});
 
 	opaTest("Should see the deselected rule loaded from local storage", function (Given, When, Then) {
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(2);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(0);
 		// Error logs - rule
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(3);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(2);
 
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(1, 1);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(0, 1);
 
 		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(2);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(1, 0);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(0, 0);
 
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(43, "Total selection count should be: 43", "Total selection count is not 43");
 	});

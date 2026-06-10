@@ -7,18 +7,12 @@
 			title="Settings"
 			contentMinWidth="250px"
 			class="sapUiContentPadding"
-			placement="Bottom"
-			afterClose=".onSettingsPopoverClose">
+			placement="Bottom">
 		<content>
 			<FlexBox
 			alignContent="Center"
 			justifyContent="Center">
 				<l:VerticalLayout>
-					<MessageStrip
-						visible="{/tempRulesDisabled}"
-						type="Warning"
-						showIcon="true"
-						text="Temporary rules cannot be used in the current environment due to CSP restrictions."/>
 					<l:HorizontalLayout>
 						<CheckBox
 							id="persistChB"
@@ -31,7 +25,6 @@
 							justifyContent="Start">
 						<l:VerticalLayout class="customSettingsPadding">
 							<Text text="  Execution Scope"></Text>
-							<Text text="  Temporary Rules"></Text>
 							<Text text="  Selected Rules and Presets"></Text>
 							<Text text="  Filtered Columns in Rules"></Text>
 							<Button text="Delete Persisted Data" press=".deletePersistedData"></Button>

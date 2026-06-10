@@ -74,14 +74,14 @@ sap.ui.define([
 		When.onTheRulesPage.iPressSelectCheckboxOf("Error logs", "Rule has been deselected", "Could not deselect Rule");
 
 		//sap.ui.core - library
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(0);
 
 		// Error logs - rule
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(3);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(2);
 
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(1, 1);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(0, 1);
 
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(44, "Total selection count should be: 44", "Total selection count is not 44");
 
@@ -94,13 +94,13 @@ sap.ui.define([
 
 		//sap.ui.core - Error logs - rule
 		//library row index and rule row index
-		Then.onTheRulesPage.iShouldSeeRuleSelectedInView(1);
+		Then.onTheRulesPage.iShouldSeeRuleSelectedInView(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleSelectedInView(3);
+		Then.onTheRulesPage.iShouldSeeRuleSelectedInView(2);
 
-		Then.onTheRulesPage.iShouldSeeLibrarySelectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibrarySelectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleSelectedInModel(1, 1);
+		Then.onTheRulesPage.iShouldSeeRuleSelectedInModel(0, 1);
 
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(EXPECTED_RULES_COUNT, "Total selection count should be: 45", "Total selection count is not 45");
 
@@ -113,13 +113,13 @@ sap.ui.define([
 
 		//sap.ui.core - Error logs - rule
 		//library row index and rule row index
-		Then.onTheRulesPage.iShouldSeeRuleSelectedInView(1);
+		Then.onTheRulesPage.iShouldSeeRuleSelectedInView(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleSelectedInView(3);
+		Then.onTheRulesPage.iShouldSeeRuleSelectedInView(2);
 
-		Then.onTheRulesPage.iShouldSeeLibrarySelectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibrarySelectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleSelectedInModel(1, 1);
+		Then.onTheRulesPage.iShouldSeeRuleSelectedInModel(0, 1);
 
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(EXPECTED_RULES_COUNT, "Total selection count should be: 45", "Total selection count is not 45");
 
@@ -132,11 +132,11 @@ sap.ui.define([
 		When.onTheRulesPage.iPressSelectCheckboxOf("sap.ui.core", "RuleSet has been deselected", "Could not deselect RuleSet");
 
 		//sap.ui.core - library
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(0);
 
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(1, 1);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(0, 1);
 
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(24, "Total selection count should be: 24", "Total selection count is not 24");
 
@@ -149,13 +149,13 @@ sap.ui.define([
 		When.onTheRulesPage.iPressExpandCollapseButtonOfRuleSet("sap.ui.core", "RuleSet was expanded ", "Could not expand RuleSet");
 
 		//sap.ui.core - library
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(3);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(2);
 
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(1, 1);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(0, 1);
 
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(24, "Total selection count should be: 24", "Total selection count is not 24");
 
@@ -169,11 +169,11 @@ sap.ui.define([
 		When.onTheRulesPage.iPressExpandCollapseButtonOfRuleSet("sap.ui.core", "RuleSet was collapsed ", "Could not collapse RuleSet");
 
 		//sap.ui.core - library
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(0);
 
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleSelectedInModel(1, 15);
+		Then.onTheRulesPage.iShouldSeeRuleSelectedInModel(0, 15);
 
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(25, "Total selection count should be: 25", "Total selection count is not 25");
 
@@ -185,13 +185,13 @@ sap.ui.define([
 		When.onTheRulesPage.iPressExpandCollapseButtonOfRuleSet("sap.ui.core", "RuleSet was expanded ", "Could not expand RuleSet");
 
 		//sap.ui.core - library
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleSelectedInView(17);
+		Then.onTheRulesPage.iShouldSeeRuleSelectedInView(16);
 
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleSelectedInModel(1, 15);
+		Then.onTheRulesPage.iShouldSeeRuleSelectedInModel(0, 15);
 
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(25, "Total selection count should be: 25", "Total selection count is not 25");
 
@@ -236,23 +236,23 @@ sap.ui.define([
 		When.onTheRulesPage.iPressIconTabHeader("additionalRulesets");
 		When.onTheRulesPage.iSelectAdditionalRuleSet("sap.ui.table");
 		When.onTheRulesPage.iPressLoadAdditionalRuleSetButton();
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInView(0);
 
 		// Error logs - rule
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(3);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(2);
 
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(1);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(0);
 
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(1, 1);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(0, 1);
 		Then.onTheRulesPage.iShouldSeeRulesSelectionStateChanged(44, "Total selection count should be: 44", "Total selection count is not 44");
 		Then.onTheRulesPage.iShouldSeeVisibleRuleDetailsPage();
 	});
 
 	opaTest("Should load additional rule and keep previous selection", function (Given, When, Then) {
 
-		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(6);
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(52);
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(6, 0);
+		Then.onTheRulesPage.iShouldSeeLibraryDeselectedInModel(5);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(50);
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInModel(5, 0);
 		Then.iTeardownSupportAssistantFrame();
 	});
 

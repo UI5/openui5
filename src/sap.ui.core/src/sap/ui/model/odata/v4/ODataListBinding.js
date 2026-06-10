@@ -1036,8 +1036,7 @@ sap.ui.define([
 			sGroupId = "$inactive." + sGroupId;
 		} else if (!oAggregation?.hierarchyQualifier) {
 			this.iActiveContexts += 1;
-			this.setOutdated(/*bForce*/false, /*aPaths*/null, /*bNoRequest*/false,
-				/*bForceHeader*/true);
+			this.setOutdated("header");
 		}
 
 		if (this.bFirstCreateAtEnd === undefined) {
@@ -1777,7 +1776,7 @@ sap.ui.define([
 		// must not be set, or the outdated flags have been set already while creating the entity;
 		// client-side annotation updates do not influence the outdated flags
 		if (!sPath.startsWith("($uid=") && !sPath.includes("/@$ui5.")) {
-			this.setOutdated(false, [_Helper.getMetaPath(sPath)], oGroupLock === null);
+			this.setOutdated("", [_Helper.getMetaPath(sPath)], oGroupLock === null);
 		}
 	};
 
@@ -1917,8 +1916,7 @@ sap.ui.define([
 					if (that.iActiveContexts > 0) {
 						// some persisted entries are still in the creation area, so the header
 						// context has to be marked as outdated and maybe also the grand total
-						that.setOutdated(/*bForce*/false, /*aPaths*/null, /*bNoRequest*/false,
-							/*bForceHeader*/true);
+						that.setOutdated("header");
 					} else {
 						// entries and grand total are in sync again
 						that.oHeaderContext.setOutdated(false);
@@ -2597,7 +2595,7 @@ sap.ui.define([
 	ODataListBinding.prototype.fireCreateActivate = function (oContext) {
 		if (this.fireEvent("createActivate", {context : oContext}, true)) {
 			this.iActiveContexts += 1;
-			this.setOutdated(true);
+			this.setOutdated("header");
 			return true;
 		}
 
@@ -3271,11 +3269,11 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns a sorted list of all current sorters' group paths. Without autoExpandSelect the group
-	 * paths are ignored.
+	 * Returns a sorted list of all current sorters' group paths, without duplicates. Without
+	 * autoExpandSelect the group paths are ignored.
 	 *
 	 * @returns {string[]}
-	 *   The current group paths
+	 *   The current group paths, sorted and without duplicates
 	 *
 	 * @private
 	 */
@@ -3283,14 +3281,14 @@ sap.ui.define([
 		if (!this.oModel.bAutoExpandSelect) {
 			return [];
 		}
-		const aGroupPaths = [];
+		const oGroupPaths = new Set();
 		this.aSorters.forEach((oSorter) => {
 			const aPaths = oSorter.getGroupPaths();
 			if (aPaths) {
-				aGroupPaths.push(...aPaths);
+				aPaths.forEach((sPath) => oGroupPaths.add(sPath));
 			}
 		});
-		return aGroupPaths.sort();
+		return [...oGroupPaths].sort();
 	};
 
 	/**
@@ -4861,7 +4859,7 @@ sap.ui.define([
 			aPredicates
 				= _Helper.getPredicates(bSingle ? [oContext] : this.keepOnlyVisibleContexts());
 			if (aPredicates) {
-				that.setOutdated(false, aPaths);
+				that.setOutdated("", aPaths);
 				aPromises = this.oCache
 					? [this.oCache.requestSideEffects(this.lockGroup(sGroupId), aPaths, aPredicates,
 						bSingle, /*bWithMessages*/bSingle)]
@@ -5356,34 +5354,36 @@ sap.ui.define([
 	 * Sets the outdated flags at the grand total and the header context considering filters,
 	 * sorters, search, and custom query options.
 	 *
-	 * @param {boolean} [bForce]
-	 *   Whether to force setting the outdated flags at the grand total and the header context
+	 * @param {string} [sForce]
+	 *   Whether to force setting the outdated flags. Either use <code>sForce</code> or
+	 *   <code>aPaths</code>. Supported values are:
+	 *   - "both": force setting the outdated flags at the grand total and the header context
+	 *   - "header": force setting the outdated flag at the header context
+	 *   - "" or undefined, the outdated flags are set only if needed
 	 * @param {string[]} [aPaths]
 	 *   An optional array of "14.4.1.5 Expression edm:NavigationPropertyPath" or
 	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have changed
 	 *   due to an update or side effects of a previous update, see
-	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; if omitted, the whole entity
-	 *   (collection) is affected
+	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; either use <code>sForce</code> or
+	 *   <code>aPaths</code>; if omitted, the whole entity (collection) is affected
 	 * @param {boolean} [bNoRequest]
 	 *   Whether the properties given in <code>aPaths</code> are updated without sending a PATCH
 	 *   request to the server; if <code>true</code>, <code>aPaths</code> is mandatory
-	 * @param {boolean} [bForceHeader]
-	 *   Whether to force setting the outdated flag at the header context
 	 * @throws {Error}
 	 *   If <code>bNoRequest</code> is set and the header context gets outdated or the property with
 	 *   the given path contributes to the grand total
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.setOutdated = function (bForce, aPaths, bNoRequest, bForceHeader) {
+	ODataListBinding.prototype.setOutdated = function (sForce, aPaths, bNoRequest) {
 		if (_Helper.isDataAggregation(this.mParameters)) {
 			const oAggregation = this.mParameters.$$aggregation;
-			const bGrandTotalOutdated = bForce
+			const bGrandTotalOutdated = sForce === "both"
 				|| this.mParameters.$search
 				|| oAggregation.search
 				|| Object.keys(this.mParameters).some((sKey) => sKey[0] !== "$")
 				|| this.isFilteredBy(aPaths);
-			const bHeaderContextOutdated = bForceHeader || bGrandTotalOutdated
+			const bHeaderContextOutdated = sForce === "header" || bGrandTotalOutdated
 				|| this.isSortedBy(aPaths);
 			if (bNoRequest
 					&& (bHeaderContextOutdated

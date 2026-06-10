@@ -69,6 +69,29 @@ sap.ui.define([
 			this.create(oEvent.getSource().getBindingContext(), bFilteredOut);
 		},
 
+		// Creates and shows a new detail element. This works only as long as the list binding is
+		// still the temporary one, not yet the one with the recursive hierarchy. The new element is
+		// initially inactive and thus represents a pending POST (which is forbidden at the time the
+		// temporary binding is being converted). With a previous "User Edit...", one can later
+		// observe an error when selecting a hierarchy in the dropdown.
+		async onCreateDetail(_oEvent) {
+			try {
+				const oDetails = this.byId("details");
+				if (!oDetails.getBindingContext().hasPendingChanges()) {
+					oDetails.getBindingContext()?.setKeepAlive(false); // @see #onShowDetails
+				}
+				// Note: no choice of group ID here, but an inactive row w/o edits remains pending!
+				const oContext = this.byId("details").getBindingContext().getBinding().create({
+					Description : ("" + new Date()).slice(0, 40)
+				}, /*bSkipRefresh*/true, /*bAtEnd*/false, /*bInactive*/true);
+				oDetails.setBindingContext(oContext);
+
+				await oContext.created();
+			} catch (oError) {
+				MessageBox.error(oError.message);
+			}
+		},
+
 		onCreateRoot(_oEvent, bFilteredOut) {
 			this.create(null, bFilteredOut);
 		},

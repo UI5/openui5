@@ -323,6 +323,12 @@ sap.ui.define([
 			const oRequest = new XMLHttpRequest();
 			oRequest.open("GET", oItem.getUrl(), false);
 			oRequest.send(null);
+
+			if (oRequest.status < 200 || oRequest.status >= 300) {
+				Log.error("FilePreviewDialog: failed to load text content, HTTP " + oRequest.status);
+				return null;
+			}
+
 			const sText = oRequest.responseText;
 			oRte.setValue(sText);
 

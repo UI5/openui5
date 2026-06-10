@@ -95,7 +95,7 @@ sap.ui.define([
 		// switch back to "My Selection" and check the rules
 		When.onThePresetsPage.iOpenPresetsPopover();
 		When.onThePresetsPage.iPressPresetInPopover(presetUtil.titles.MY_SELECTION_TITLE);
-		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(3); // Error logs - rule
+		Then.onTheRulesPage.iShouldSeeRuleDeselectedInView(2); // Error logs - rule
 
 	});
 

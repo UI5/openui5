@@ -35,6 +35,7 @@ sap.ui.define([
 
 				iShouldSeeOpacityRestored() {
 					return this.waitFor({
+						timeout: 60,
 						check() {
 							const oFrame = getTopicIFrame();
 

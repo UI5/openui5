@@ -632,6 +632,28 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("Cursor style during border resize", function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+		const oTableDomRef = oTable.getDomRef();
+
+		const oCell = getCell(oTable, 1, 0);
+		qutils.triggerEvent("mousedown", oCell, { button: 0, ctrlKey: true });
+		qutils.triggerEvent("mouseup", oCell);
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 0}}, "Cell has been selected");
+
+		const oResizer = oCellSelector._getResizer();
+		oCellSelector._oCurrentBorder = { colIndex: 0, type: "COL" };
+
+		oResizer.classList.add("sapMPluginsVerticalBorder");
+
+		oCellSelector._onborderdown({});
+		assert.equal(oTableDomRef.style.cursor, window.getComputedStyle(oResizer).cursor, "Table container cursor matches the computed cursor of the resizer");
+
+		qutils.triggerEvent("mouseup", oCell);
+		assert.equal(oTableDomRef.style.cursor, "", "Table container cursor is reset after mouseup");
+	});
+
 	QUnit.test("getSelection", function (assert) {
 		var oTable = this.oTable;
 		const oCellSelector = this.oCellSelector;

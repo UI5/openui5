@@ -322,8 +322,8 @@ sap.ui.define([
 						count: "2 out of 10",
 						design: IconTabFilterDesign.Horizontal,
 						key: "key1",
-						text: "Neutral with long long long text",
-						tooltip: "Neutral with long long long text"
+						text: "With long long long text",
+						tooltip: "With long long long text"
 
 					}),
 					new IconTabSeparator({icon: "sap-icon://process"}),
@@ -332,8 +332,8 @@ sap.ui.define([
 						iconColor: IconColor.Critical,
 						design: IconTabFilterDesign.Horizontal,
 						key: "key2",
-						text: "Critical lorem long text",
-						tooltip: "Critical lorem long text"
+						text: "Lorem long text",
+						tooltip: "Lorem long text"
 					}),
 					new IconTabSeparator({icon: "sap-icon://process"}),
 					new IconTabFilter({
@@ -351,8 +351,8 @@ sap.ui.define([
 						count: "42",
 						design: IconTabFilterDesign.Horizontal,
 						iconColor: IconColor.Negative,
-						text: "Negative lorem",
-						tooltip: "Negative lorem",
+						text: "Lorem",
+						tooltip: "Lorem",
 						key: "key3"
 					})
 				],

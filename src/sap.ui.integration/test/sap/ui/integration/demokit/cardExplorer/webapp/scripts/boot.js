@@ -16,6 +16,9 @@
 
 	function onScriptLoad(sRes) {
 		if (window.hljs && window.codesample) {
+			if (document.getElementById("sap-ui-bootstrap")) {
+				return; // already booted; avoid re-running codesample and appending a duplicate bootstrap
+			}
 			window.codesample();
 
 			if (document.querySelector("script[data-require-ui5-init]") || document.querySelector("script[data-require-ui5-noinit]")) {

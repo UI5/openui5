@@ -91,46 +91,6 @@ sap.ui.define([
 		POST_UI_INFORMATION:  "POST_UI_INFORMATION",
 
 		/**
-		 * Verifies rule creation.
-		 * @type {string}
-		 * @const
-		 * @protected
-		 */
-		VERIFY_CREATE_RULE:         "VERIFY_CREATE_RULE",
-
-		/**
-		 * Verifies rule creation after it's finished.
-		 * @type {string}
-		 * @const
-		 * @protected
-		 */
-		VERIFY_RULE_CREATE_RESULT:  "VERIFY_RULE_CREATE_RESULT",
-
-		/**
-		 * Verifies rule update.
-		 * @type {string}
-		 * @const
-		 * @protected
-		 */
-		VERIFY_UPDATE_RULE:         "VERIFY_UPDATE_RULE",
-
-		/**
-		 * Verifies rule update after it's finished.
-		 * @type {string}
-		 * @const
-		 * @protected
-		 */
-		VERIFY_RULE_UPDATE_RESULT:  "VERIFY_RULE_UPDATE_RESULT",
-
-		/**
-		 * Posts information about which rule to be deleted.
-		 * @type {string}
-		 * @const
-		 * @protected
-		 */
-		DELETE_RULE:                "DELETE_RULE",
-
-		/**
 		 * Posts available libraries.
 		 * @type {string}
 		 * @const

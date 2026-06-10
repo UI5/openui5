@@ -371,6 +371,23 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("create: pending POSTs w/ oFirstLevel", function (assert) {
+		const oFirstLevel = {
+			mPostRequests : "~mPostRequests~",
+			setQueryOptions : () => {} // don't care
+		};
+		this.mock(_Cache.prototype).expects("getDownloadUrl").withExactArgs("")
+			.returns("~sDownloadUrl~"); // avoid call to isEmptyObject()
+		this.mock(_Helper).expects("isEmptyObject").withExactArgs("~mPostRequests~").returns(false);
+
+		assert.throws(function () {
+			// code under test
+			_AggregationCache.create(this.oRequestor, "resource/path", "~n/a~", {},
+				{hierarchyQualifier : "X"}, false, false, false, oFirstLevel);
+		}, new Error("Not allowed due to pending POSTs"));
+	});
+
+	//*********************************************************************************************
 	[{ // grand total
 		aggregate : {
 			SalesNumber : {grandTotal : true}
@@ -4523,8 +4540,9 @@ sap.ui.define([
 	//*********************************************************************************************
 	[false, true].forEach((bWithGrandTotalCopy) => {
 		[false, true].forEach((bOutdatedInBetween) => {
-			const sTitle = "readGrandTotal: success, 2 grand totals:" + bWithGrandTotalCopy
-				+ ", outdated in between: " + bOutdatedInBetween;
+			[false, true].forEach((bInactive) => {
+		const sTitle = "readGrandTotal: success, 2 grand totals:" + bWithGrandTotalCopy
+			+ ", outdated in between: " + bOutdatedInBetween + ", inactive: " + bInactive;
 
 		QUnit.test(sTitle, function (assert) {
 			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {
@@ -4557,12 +4575,21 @@ sap.ui.define([
 				.withExactArgs("/Foo", "~mQueryOptions~", false, false, true)
 				.returns("~sQueryString~");
 			const oGroupLock = {
+				getGroupId : mustBeMocked,
+				getOwner : mustBeMocked,
 				getUnlockedCopy : mustBeMocked
 			};
-			this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
-				.returns("~oUnlockedGroupLock~");
+			this.mock(oGroupLock).expects("getGroupId").withExactArgs()
+				.returns(bInactive ? "$inactive.$auto" : "~sGroupId~");
+			this.mock(oGroupLock).expects("getOwner").exactly(bInactive ? 1 : 0).withExactArgs()
+				.returns("~owner~");
+			this.mock(this.oRequestor).expects("lockGroup").exactly(bInactive ? 1 : 0)
+				.withExactArgs("$auto", "~owner~")
+				.returns("~oGroupLock4Request~");
+			this.mock(oGroupLock).expects("getUnlockedCopy").exactly(bInactive ? 0 : 1).withExactArgs()
+				.returns("~oGroupLock4Request~");
 			this.mock(this.oRequestor).expects("request")
-				.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~", undefined, undefined,
+				.withExactArgs("GET", "Foo~sQueryString~", "~oGroupLock4Request~", undefined, undefined,
 					undefined, undefined, undefined, undefined, undefined, {/*mMergeableQueryOptions*/})
 				.callsFake(() => {
 					if (bOutdatedInBetween) {
@@ -4592,6 +4619,7 @@ sap.ui.define([
 				assert.strictEqual(oResult, undefined);
 			});
 		});
+			});
 		});
 	});
 
@@ -4616,13 +4644,15 @@ sap.ui.define([
 			.withExactArgs("/Foo", "~mQueryOptions~", false, false, true)
 			.returns("~sQueryString~");
 		const oGroupLock = {
+			getGroupId : mustBeMocked,
 			getUnlockedCopy : mustBeMocked
 		};
+		this.mock(oGroupLock).expects("getGroupId").withExactArgs().returns("~sGroupId~");
 		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
-			.returns("~oUnlockedGroupLock~");
+			.returns("~oGroupLock4Request~");
 		const oError = new Error("Intentionally failed");
 		this.mock(this.oRequestor).expects("request")
-			.withExactArgs("GET", "Foo~sQueryString~", "~oUnlockedGroupLock~", undefined, undefined,
+			.withExactArgs("GET", "Foo~sQueryString~", "~oGroupLock4Request~", undefined, undefined,
 				undefined, undefined, undefined, undefined, undefined, {/*mMergeableQueryOptions*/})
 			.rejects(oError);
 		this.mock(_Helper).expects("updateExisting").never();
@@ -4648,17 +4678,6 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("setGrandTotalOutdated: with grand total Promise, but bOutdated=false", function () {
-		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {},
-			{hierarchyQualifier : "X"});
-		oCache.oGrandTotalPromise = {then : mustBeMocked};
-		this.mock(_Helper).expects("updateAll").never();
-
-		// code under test
-		oCache.setGrandTotalOutdated(false);
-	});
-
-	//*********************************************************************************************
 	[false, true].forEach((bWithCopy) => {
 		QUnit.test("setGrandTotalOutdated: wait for grand total, with copy=" + bWithCopy, function () {
 			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
@@ -4672,7 +4691,7 @@ sap.ui.define([
 			const oHelperMock = this.mock(_Helper);
 			oHelperMock.expects("updateAll")
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "()", "~oGrandTotal~",
-					{"@$ui5.context.isOutdated" : true});
+					{"@$ui5.context.isOutdated" : "~bOutdated~"});
 			oHelperMock.expects("getPrivateAnnotation").withExactArgs("~oGrandTotal~", "copy")
 				.returns(bWithCopy ? "~oGrandTotalCopy~" : undefined);
 			oHelperMock.expects("getPrivateAnnotation").exactly(bWithCopy ? 1 : 0)
@@ -4680,10 +4699,10 @@ sap.ui.define([
 				.returns("~sPredicateGrandTotalCopy~");
 			oHelperMock.expects("updateAll").exactly(bWithCopy ? 1 : 0)
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "~sPredicateGrandTotalCopy~",
-					"~oGrandTotalCopy~", {"@$ui5.context.isOutdated" : true});
+					"~oGrandTotalCopy~", {"@$ui5.context.isOutdated" : "~bOutdated~"});
 
 			// code under test
-			oCache.setGrandTotalOutdated(true);
+			oCache.setGrandTotalOutdated("~bOutdated~");
 
 			return oCache.oGrandTotalPromise;
 		});
@@ -6399,7 +6418,6 @@ sap.ui.define([
 				const oRequestorMock = that.mock(oCache.oRequestor);
 				oRequestorMock.expects("getModelInterface").withExactArgs().returns(oModelInterface);
 				let oReadCountExpectation = oCacheMock.expects("readCount")
-					.exactly(oCountPromise ? 1 : 0)
 					.withExactArgs("~oGroupLock~")
 					.returns(undefined); // no count needs to be read
 				let oReadGrandTotalExpectation = oCacheMock.expects("readGrandTotal")
@@ -6410,9 +6428,7 @@ sap.ui.define([
 				fnNewSubmitCallback();
 
 				assert.ok(fnSubmitCallback.calledOnceWithExactly());
-				if (oCountPromise) {
-					sinon.assert.callOrder(oReadCountExpectation, fnSubmitCallback);
-				}
+				sinon.assert.callOrder(oReadCountExpectation, fnSubmitCallback);
 				sinon.assert.callOrder(oReadGrandTotalExpectation, fnSubmitCallback);
 				fnSubmitCallback.resetHistory();
 
@@ -6422,7 +6438,6 @@ sap.ui.define([
 					.withExactArgs(sinon.match.same(oReadCountError));
 				const oReadCountPromise = oCountPromise && Promise.reject(oReadCountError);
 				oReadCountExpectation = oCacheMock.expects("readCount")
-					.exactly(oCountPromise ? 1 : 0)
 					.withExactArgs("~oGroupLock~")
 					.returns(oReadCountPromise);
 				const oReadGrandTotalError = new Error("~readGrandTotalError~");
@@ -6506,7 +6521,6 @@ sap.ui.define([
 			let fnCancelCallback;
 			const fnSubmitCallback = sinon.spy();
 			let fnNewSubmitCallback;
-			this.mock(oCache).expects("readCount").never();
 			this.mock(oCache.oFirstLevel).expects("create")
 				.withExactArgs("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
 					"~sTransientPredicate~", {bar : "~bar~", foo : "~foo~"}, false,
@@ -6618,6 +6632,9 @@ sap.ui.define([
 				that.mock(oModelInterface).expects("getReporter").withExactArgs()
 					.returns("~fnReporter~");
 
+				const oReadCountExpectation = that.mock(oCache).expects("readCount")
+					.withExactArgs("~oGroupLock~")
+					.returns(undefined); // no count needs to be read
 				const oReadGrandTotalExpectation = that.mock(oCache).expects("readGrandTotal")
 					.withExactArgs("~oGroupLock~")
 					.returns(undefined); // no grand total needs to be read
@@ -6626,6 +6643,7 @@ sap.ui.define([
 				fnNewSubmitCallback();
 
 				assert.ok(fnSubmitCallback.calledOnceWithExactly());
+				sinon.assert.callOrder(oReadCountExpectation, fnSubmitCallback);
 				sinon.assert.callOrder(oReadGrandTotalExpectation, fnSubmitCallback);
 				fnSubmitCallback.resetHistory();
 			});
