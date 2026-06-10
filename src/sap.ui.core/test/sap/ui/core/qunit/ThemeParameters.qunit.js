@@ -292,7 +292,7 @@ sap.ui.define([
 		await Library.load("testlibs.themeParameters.lib4");
 
 		return new Promise((endTest, reject) => {
-			Theming.attachApplied(() => {
+			Theming.attachAppliedOnce(() => {
 				const expected = {
 					url1: sPath + "/testdata/libraries/themeParameters/lib4/img1.jpg",
 					url2: sPath + "/testdata/libraries/themeParameters/lib4/foo/img2.jpg",
@@ -362,5 +362,100 @@ sap.ui.define([
 				endTest();
 			});
 		});
+	});
+
+	QUnit.module("Parameters.get - CSS Custom Properties");
+
+	QUnit.test("Resolves CSS custom property via async API", async function(assert) {
+		const done = assert.async();
+
+		await Library.load({name: "testlibs.themeParameters.lib18"});
+
+		const callback = function(sParamValue) {
+			assert.strictEqual(sParamValue, "hcb_value",
+				"CSS custom property '--sapUiCssCustomPropForLib18' should be resolved from theme CSS");
+			done();
+		};
+		const sParamValue = Parameters.get({
+			name: "sapUiCssCustomPropForLib18",
+			callback
+		});
+		if (sParamValue) {
+			callback(sParamValue);
+		}
+	});
+
+	QUnit.test("Caches resolved CSS custom property values", async function(assert) {
+		const done = assert.async();
+
+		await Library.load({name: "testlibs.themeParameters.lib18"});
+
+		const firstCallback = function(sValue) {
+			assert.strictEqual(sValue, "hcb_value", "First call resolves correctly");
+
+			const oSpy = sinon.spy(globalThis, "getComputedStyle");
+
+			const secondCallback = function(sCachedValue) {
+				assert.strictEqual(sCachedValue, "hcb_value", "Second call returns same value from cache");
+				assert.strictEqual(oSpy.callCount, 0,
+					"getComputedStyle should not be called again for cached values");
+				oSpy.restore();
+				done();
+			};
+			const sParamValue2 = Parameters.get({
+				name: "sapUiCssCustomPropForLib18",
+				callback: secondCallback
+			});
+			if (sParamValue2) {
+				secondCallback(sParamValue2);
+			}
+		};
+		const sParamValue = Parameters.get({
+			name: "sapUiCssCustomPropForLib18",
+			callback: firstCallback
+		});
+		if (sParamValue) {
+			firstCallback(sParamValue);
+		}
+	});
+
+	QUnit.test("After Theme Change: CSS custom property value is updated", async function(assert) {
+		const done = assert.async();
+
+		var fnContinue = function(oEvent) {
+			if (oEvent.theme === "sap_horizon_hcb") {
+				Theming.detachApplied(fnContinue);
+				done();
+			}
+		};
+
+		var fnApplied = function(oEvent) {
+			if (oEvent.theme === "sap_horizon_hcb") {
+				Theming.detachApplied(fnApplied);
+
+				const sValueHcb = Parameters.get({name: "sapUiCssCustomPropForLib18"});
+				assert.strictEqual(sValueHcb, "hcb_value",
+					"CSS custom property must be 'hcb_value' for theme 'sap_horizon_hcb'");
+
+				const fnAfterBase = function(oEvent2) {
+					if (oEvent2.theme === "base") {
+						Theming.detachApplied(fnAfterBase);
+
+						const sValueBase = Parameters.get({name: "sapUiCssCustomPropForLib18"});
+						assert.strictEqual(sValueBase, "base_value",
+							"CSS custom property must be 'base_value' for theme 'base'");
+
+						Theming.attachApplied(fnContinue);
+						Theming.setTheme("sap_horizon_hcb");
+					}
+				};
+				Theming.attachApplied(fnAfterBase);
+				Theming.setTheme("base");
+			}
+		};
+
+		await Library.load({name: "testlibs.themeParameters.lib18"});
+
+		Theming.attachApplied(fnApplied);
 	});
 });

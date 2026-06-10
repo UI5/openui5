@@ -270,6 +270,37 @@ customElements.whenDefined("ui-integration-card").then(function () {
 ...
 &lt;ui-integration-card class="myCard" manifest="./manifest.json"&gt;&lt;/ui-integration-card&gt;
 </pre>
+
+					<h2 id="headingLevel">Setting the Card Heading Level</h2>
+					<p>
+						To align the card header title with the heading hierarchy of the surrounding page, the host
+						environment can set the <code>headingLevel</code> property of the card. Values
+						<code>H1</code>–<code>H6</code> map to <code>aria-level</code> 1–6.
+						The default renders the header title as <code>aria-level</code> 3 and cards opened in a dialog (snack cards only) are forced to
+						<code>aria-level</code> 1.
+					</p>
+					<p>
+						Object card derives its own <code>aria-level</code> from this value, so setting it on the card is enough to keep the whole
+						card consistent with the page outline.
+					</p>
+					<p>
+						For more information, see <a data-demokit-href="#/api/sap.ui.integration.widgets.Card%23controlProperties" target="_blank"><code>headingLevel</code> property API</a>.
+					</p>
+
+					<b>When using UI5</b>
+					<pre class="lang-js">
+const oCard = new Card();
+oCard.setManifest("./manifest.json");
+oCard.setHeadingLevel("H2");
+</pre>
+
+					<b>When using &lt;ui-integration-card&gt; custom element</b>
+					<pre class="lang-js">
+const card = document.createElement("ui-integration-card");
+card.setAttribute("manifest", "./manifest.json");
+card.setAttribute("heading-level", "H2");
+document.body.appendChild(card);
+</pre>
 		</div>
 	</div>
 </body>

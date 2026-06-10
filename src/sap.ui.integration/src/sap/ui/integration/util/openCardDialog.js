@@ -69,7 +69,9 @@ sap.ui.define([
 		oDialog.setCustomHeader(oHeader);
 		oChildCard.setAssociation("dialogHeader", oHeader);
 
-		oHeader.setProperty("headingLevel", "1");
+		// Once moved into the dialog, the header's parent is no longer the card,
+		// so it can't resolve its heading level from the card. Set it explicitly.
+		oHeader.setProperty("headingLevel", "H1");
 		oHeader.setProperty("focusable", false);
 		oHeader.setVisible(true);
 	}

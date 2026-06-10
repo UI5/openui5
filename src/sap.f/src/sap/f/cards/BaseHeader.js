@@ -39,6 +39,8 @@ sap.ui.define([
 
 	const TextAlign = coreLibrary.TextAlign;
 
+	const TitleLevel = coreLibrary.TitleLevel;
+
 	const WrappingType = mLibrary.WrappingType;
 
 	/**
@@ -104,14 +106,15 @@ sap.ui.define([
 				useTileLayout: { type: "boolean", group: "Appearance", visibility: "hidden" },
 
 				/**
-				 * Defines aria-level of the header.
+				 * Defines the semantic level of the header title, mapped to <code>aria-level</code>.
 				 *
-				 * When header is in a dialog aria-level is 1
-				 * When header is not in a dialog(standard scenario) aria-level is 3
+				 * Only used when the header is rendered standalone. When the header is
+				 * part of a card, the card's <code>headingLevel</code> takes
+				 * precedence (see <code>sap.f.CardBase#setHeadingLevel</code>).
 				 *
 				 * @private
 				 */
-				headingLevel: { type: "string", visibility: "hidden", defaultValue: "3"},
+				headingLevel: { type: "sap.ui.core.TitleLevel", group: "Accessibility", defaultValue: TitleLevel.H3, visibility: "hidden" },
 
 				/**
 				 * Defines the type of text wrapping to be used inside the header. This applies to title, subtitle and details texts of the header.
@@ -505,6 +508,31 @@ sap.ui.define([
 	 * @ui5-restricted
 	 */
 	BaseHeader.prototype.getAriaHeadingLevel = function () {
+		const sLevel = this._getResolvedHeadingLevel();
+
+		if (sLevel === TitleLevel.Auto) {
+			return "2";
+		}
+
+		// "H1".."H6" -> "1".."6"
+		return sLevel.charAt(1);
+	};
+
+	/**
+	 * Resolves the heading level to apply to the header title.
+	 *
+	 * When the header is part of a card, the card's <code>headingLevel</code> takes precedence.
+	 * When the header is rendered standalone, its own <code>headingLevel</code>
+	 * property is used.
+	 *
+	 * @returns {sap.ui.core.TitleLevel} The resolved heading level
+	 * @private
+	 */
+	BaseHeader.prototype._getResolvedHeadingLevel = function () {
+		if (this.isParentCard()) {
+			return this.getParent().getHeadingLevel();
+		}
+
 		return this.getProperty("headingLevel");
 	};
 

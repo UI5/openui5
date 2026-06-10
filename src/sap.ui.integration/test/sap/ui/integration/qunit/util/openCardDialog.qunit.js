@@ -221,14 +221,69 @@ sap.ui.define([
 		const oDialogRef = oDialog.getDomRef();
 		const oCard = oDialog.getContent()[0];
 		const oCardRef = oDialog.getContent()[0].getDomRef();
+		const oTitleRef = document.getElementById(oHeader.getTitleId());
 
 		// Assert
 		assert.strictEqual(oDialogRef.getAttribute("aria-labelledby"), oHeader.getTitleId(), "Dialog has correct aria-labelledby attribute");
 		assert.notOk(oCardRef.getAttribute("role"), "Card has correct role");
 		assert.notOk(oCardRef.getAttribute("aria-labelledby"), "Card has no extra labeling");
+		assert.strictEqual(oTitleRef.getAttribute("aria-level"), "1", "Dialog header title has aria-level 1");
 
 		const oContentListRef = oCard.getCardContent().getInnerList().getDomRef("listUl");
 		assert.strictEqual(oContentListRef.getAttribute("aria-labelledby"), oHeader.getTitleId(), "List content has correct aria-labelledby attribute");
+	});
+
+	QUnit.test("Object content group aria-level depends on dialog header level", async function (assert) {
+		// Arrange - Object (snack) card opened in a dialog. The dialog forces the
+		// header to H1, so group titles in the Object content must end up at aria-level "2".
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.snackCard"
+			},
+			"sap.card": {
+				type: "Object",
+				header: {
+					title: "Snack Card Title"
+				},
+				content: {
+					groups: [
+						{
+							title: "Group A",
+							items: [{ label: "L", value: "V" }]
+						},
+						{
+							title: "Group B",
+							items: [{ label: "L", value: "V" }]
+						}
+					]
+				}
+			}
+		};
+
+		// Act
+		const oDialog = openCardDialog(
+			this.oCard,
+			{
+				childCardKey: "childCard"
+			}
+		);
+
+		await nextDialogAfterOpenEvent(oDialog);
+		await nextUIUpdate();
+
+		const oHeader = oDialog.getCustomHeader();
+		const oTitleRef = document.getElementById(oHeader.getTitleId());
+
+		// Assert - dialog header is at H1
+		assert.strictEqual(oTitleRef.getAttribute("aria-level"), "1", "Dialog header title has aria-level 1");
+
+		// Assert - group titles are one level below the header (H1 -> 2)
+		const oChildCard = oDialog.getContent()[0];
+		const aGroupTitles = oChildCard.getDomRef().querySelectorAll(".sapFCardObjectItemTitle");
+		assert.strictEqual(aGroupTitles.length, 2, "Two group titles are rendered");
+		assert.strictEqual(aGroupTitles[0].getAttribute("role"), "heading", "Group title has role=heading");
+		assert.strictEqual(aGroupTitles[0].getAttribute("aria-level"), "2", "Group aria-level is derived from dialog header level (H1 -> 2)");
+		assert.strictEqual(aGroupTitles[1].getAttribute("aria-level"), "2", "All groups derive from the same dialog header level");
 	});
 
 	QUnit.test("Only single data request must be executed", async function (assert) {

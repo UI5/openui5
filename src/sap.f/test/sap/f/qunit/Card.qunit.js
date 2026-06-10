@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/m/Text",
 	"sap/m/TextArea",
 	"sap/ui/core/Control",
+	"sap/ui/core/library",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/events/KeyCodes"
@@ -18,6 +19,7 @@ function (
 	Text,
 	TextArea,
 	Control,
+	coreLibrary,
 	QUnitUtils,
 	nextUIUpdate,
 	KeyCodes
@@ -26,6 +28,7 @@ function (
 
 	const DOM_RENDER_LOCATION = "qunit-fixture";
 	const SemanticRole = fLibrary.cards.SemanticRole;
+	const TitleLevel = coreLibrary.TitleLevel;
 
 	/**
 	 * In each test using fake timers, it might happen that a rendering task is queued by
@@ -106,6 +109,56 @@ function (
 		await nextUIUpdate(this.clock);
 
 		assert.ok(oCard.getDomRef().getAttribute("aria-labelledby"), "aria-labelledby is set");
+
+		oCard.destroy();
+	});
+
+	QUnit.module("Heading level", {
+		afterEach
+	});
+
+	QUnit.test("Default headingLevel is H3", function (assert) {
+		// Arrange
+		const oCard = new Card();
+
+		// Assert
+		assert.strictEqual(oCard.getHeadingLevel(), TitleLevel.H3, "Default headingLevel is H3");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Header renders aria-level matching the card's headingLevel", async function (assert) {
+		// Arrange
+		const oHeader = new CardHeader({ title: "Title" });
+		const oCard = new Card({
+			header: oHeader,
+			content: new Text({ text: "Text" })
+		});
+
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate(this.clock);
+
+		// Assert - default H3
+		const oTitleDomRef = oHeader.getDomRef().querySelector("[role='heading']");
+		assert.ok(oTitleDomRef, "Header title is rendered with role='heading'");
+		assert.strictEqual(oTitleDomRef.getAttribute("aria-level"), "3", "aria-level is '3' for default H3");
+
+		// Act - update headingLevel on the card via public API
+		oCard.setHeadingLevel(TitleLevel.H4);
+		await nextUIUpdate(this.clock);
+
+		// Assert - aria-level reflects the updated card value
+		assert.strictEqual(
+			oHeader.getDomRef().querySelector("[role='heading']").getAttribute("aria-level"), "4", "aria-level is '4' after oCard.setHeadingLevel('H4')"
+		);
+
+		// Act - update again to H1 to make sure successive changes are picked up
+		oCard.setHeadingLevel(TitleLevel.H1);
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(
+			oHeader.getDomRef().querySelector("[role='heading']").getAttribute("aria-level"), "1", "aria-level is '1' after oCard.setHeadingLevel('H1')"
+		);
 
 		oCard.destroy();
 	});

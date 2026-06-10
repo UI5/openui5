@@ -11,8 +11,9 @@ sap.ui.define([
 	"sap/ui/core/mvc/_ViewFactory",
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/mvc/ControllerExtensionProvider",
-	"sap/ui/core/XMLTemplateProcessor"
-], function(UI5Debug, ManagedObject, Core, Component, ComponentRegistry, Element, _ViewFactory, XMLView, ControllerExtensionProvider, XMLTemplateProcessor) {
+	"sap/ui/core/XMLTemplateProcessor",
+	"sap/ui/core/theming/Parameters"
+], function(UI5Debug, ManagedObject, Core, Component, ComponentRegistry, Element, _ViewFactory, XMLView, ControllerExtensionProvider, XMLTemplateProcessor, Parameters) {
 	"use strict";
 
 	const { scope } = UI5Debug;
@@ -56,7 +57,9 @@ sap.ui.define([
 			{cmd: "ui5.core.routing($0)", text: "Trace route matches \u2014 .startTrace() / .stopTrace() / .getMatched()"},
 			{cmd: "ui5.core.views.all()", text: "Get all tracked views with their controller extensions"},
 			{cmd: "ui5.core.views.get(name)", text: "Get a specific view by name"},
-			{cmd: "ui5.core.modules", text: "Direct references to Core, Component, Element, ManagedObject, XMLView"}
+			{cmd: "ui5.core.modules", text: "Direct references to Core, Component, Element, ManagedObject, XMLView"},
+			{cmd: "ui5.core.theming.Parameters", text: "The theming Parameters facade for retrieving theming parameters"},
+			{cmd: "ui5.core.theming.getCustomProperty", text: "Shorthand for retrieving a CSS custom property from the body's computedStyle through native API"}
 		],
 		core: scope({
 			components: ComponentRegistry,
@@ -90,6 +93,25 @@ sap.ui.define([
 				 * @returns {sap.ui.core.XMLTemplateProcessor} Instance of sap.ui.core.XMLTemplateProcessor
 				 */
 				XMLTemplateProcessor
+			}),
+
+			/**
+			 * Some helpful Theming debugging tools
+			 */
+			theming: scope({
+				/**
+				 * The theming {@link sap.ui.core.theming.Parameters} facade.
+				 */
+				Parameters,
+
+				/**
+				 * Shorthand for retrieving a CSS custom property in the ":root" scope through native API.
+				 * @param {string} sPropName the name of the CSS custom property
+				 * @returns {string} the value if defined
+				 */
+				getCustomProperty(sPropName) {
+					return globalThis.getComputedStyle(document.body).getPropertyValue(sPropName);
+				}
 			}),
 
 			/**
