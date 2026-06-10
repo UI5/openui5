@@ -682,8 +682,12 @@ sap.ui.define([
 
 			mAttributes["role"] = "gridcell";
 			mAttributes["aria-colindex"] = 1;
-			if (TableUtils.hasRowHeader(oTable) && oTable.getSelectionMode() === SelectionMode.None) {
-				mAttributes["aria-labelledby"] = [sTableId + "-rowselecthdr"];
+			if (TableUtils.hasRowHeader(oTable)) {
+				if (oTable.getSelectionMode() === SelectionMode.None) {
+					mAttributes["aria-labelledby"] = [sTableId + "-rowselecthdr"];
+				} else {
+					mAttributes["aria-label"] = TableUtils.getResourceText("TBL_ROW_HEADER_LABEL");
+				}
 			}
 			return mAttributes;
 		},

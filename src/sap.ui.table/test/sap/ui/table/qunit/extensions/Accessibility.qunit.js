@@ -1054,6 +1054,13 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("aria-label", function(assert) {
+		for (let i = 0; i < 2; i++) {
+			const oCell = this.oTable.qunit.getRowHeaderCell(i);
+			assert.strictEqual(oCell.getAttribute("aria-label"), TableUtils.getResourceText("TBL_ROW_HEADER_LABEL"), "aria-label of row header " + i);
+		}
+	});
+
 	QUnit.test("aria-labelledby with focus", async function(assert) {
 		for (let i = 0; i < 2; i++) {
 			const oCell = this.oTable.qunit.getRowHeaderCell(i);
