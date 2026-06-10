@@ -643,7 +643,8 @@ sap.ui.define([
 
 					if (oRowSelector) {
 						oPopover.attachEventOnce("afterOpen", function() {
-							InvisibleMessage.getInstance().announce(sMessage);
+							const sWarning = Lib.getResourceBundleFor("sap.m").getText("SEMANTIC_COLOR_CRITICAL");
+							InvisibleMessage.getInstance().announce(sWarning + ". " + sMessage);
 							resolve();
 						});
 						oPopover.openBy(oRowSelector);
