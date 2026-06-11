@@ -103,6 +103,7 @@ sap.ui.define([
 		oRm.openStart("div", sId + "-Apps");
 		oRm.class("sapUiCalendarRowApps");
 		oRm.attr("role", "list");
+		oRm.attr("tabindex", "-1");
 		oRm.openEnd();
 
 		this.renderBeforeAppointments(oRm, oRow);

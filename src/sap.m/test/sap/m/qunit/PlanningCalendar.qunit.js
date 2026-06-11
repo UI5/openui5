@@ -796,6 +796,19 @@ sap.ui.define([
 		assert.ok(jQuery("#PC1-R2A1").get(0), "Row2: Appointment1 rendered");
 	});
 
+	QUnit.test("Appointments list tabindex for NVDA focus mode", function(assert) {
+		// The role="list" containers have tabindex="-1" so that NVDA switches from
+		// browse mode to focus mode when a listitem appointment receives focus,
+		// ensuring aria-labelledby references are announced correctly.
+		var $oRow1AppsList = jQuery("#PC1-Row1-CalRow-Apps"),
+			$oRow2AppsList = jQuery("#PC1-Row2-CalRow-Apps");
+
+		assert.strictEqual($oRow1AppsList.attr("role"), "list", "Row1: appointments container has role=list");
+		assert.strictEqual($oRow1AppsList.attr("tabindex"), "-1", "Row1: appointments list has tabindex=-1 to enable NVDA focus mode for listitem descendants");
+		assert.strictEqual($oRow2AppsList.attr("role"), "list", "Row2: appointments container has role=list");
+		assert.strictEqual($oRow2AppsList.attr("tabindex"), "-1", "Row2: appointments list has tabindex=-1 to enable NVDA focus mode for listitem descendants");
+	});
+
 	function _getCssColorProperty (oJQuerySet, sCssPropertyName) {
 		return /rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/.exec(oJQuerySet.css(sCssPropertyName));
 	}
