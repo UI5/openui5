@@ -29,6 +29,7 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/base/Log",
 	"sap/base/util/clamp",
+	"sap/m/dialogUtils/PreventKeyboardEvents",
 	"sap/ui/dom/jquery/Focusable", // jQuery Plugin "firstFocusableDomRef", "lastFocusableDomRef"
 	"sap/ui/dom/jquery/rect" // jQuery Plugin "rect"
 ],
@@ -57,7 +58,8 @@ sap.ui.define([
 		getScrollbarSize,
 		KeyCodes,
 		Log,
-		clamp
+		clamp,
+		PreventKeyboardEvents
 	) {
 		"use strict";
 
@@ -784,6 +786,10 @@ sap.ui.define([
 		Popover.prototype.onAfterRendering = function () {
 			var $openedBy, $page, $header;
 
+			if (this.oPopup && this.oPopup.getOpenState() === OpenState.OPENING && !this._bDuringOpenCalled) {
+				this._duringOpen();
+			}
+
 			//calculate the height of the header in the current page
 			//only for the first time calling after rendering
 			if (!this._marginTopInit && this.getShowArrow()) {
@@ -819,6 +825,9 @@ sap.ui.define([
 			Device.resize.detachHandler(this._fnOrientationChange);
 
 			InstanceManager.removePopoverInstance(this);
+
+			PreventKeyboardEvents.restore(this.getDomRef());
+			this._bDuringOpenCalled = false;
 
 			this.removeDelegate(this._oRestoreFocusDelegate);
 			this._oRestoreFocusDelegate = null;
@@ -867,12 +876,10 @@ sap.ui.define([
 				return this;
 			}
 
+			this._bDuringOpenCalled = false;
+
 			var oPopup = this.oPopup,
 				ePopupState = this.oPopup.getOpenState(),
-			// The control that needs to be focused after popover is open is calculated in following sequence:
-			// initialFocus, beginButton, endButton, and popover itself.
-			// focus has to be inside/on popover otherwise autoclose() will not work
-				sFocusId = this._getInitialFocusId(),
 				oParentDomRef, iPlacePos, aCompactParents;
 
 			oParentDomRef = (oControl.getDomRef && oControl.getDomRef()) || oControl;
@@ -924,7 +931,7 @@ sap.ui.define([
 
 			oPopup.attachOpened(this._handleOpened, this);
 			oPopup.attachClosed(this._handleClosed, this);
-			oPopup.setInitialFocusId(sFocusId);
+			// Note: setInitialFocusId is now called in _duringOpen() after rendering
 			// Open popup
 			iPlacePos = this._placements.indexOf(this.getPlacement());
 			if (iPlacePos > -1) {
@@ -1193,9 +1200,15 @@ sap.ui.define([
 				oDomById.focus();
 			}
 			this.fireAfterOpen({openBy: this._oOpenBy});
+
+			// Restore keyboard events after opening is complete
+			PreventKeyboardEvents.restore(this.getDomRef());
 		};
 
 		Popover.prototype._handleClosed = function () {
+			PreventKeyboardEvents.restore(this.getDomRef());
+			this._bDuringOpenCalled = false;
+
 			this.oPopup.detachClosed(this._handleClosed, this);
 
 			Device.resize.detachHandler(this._fnOrientationChange);
@@ -1209,6 +1222,24 @@ sap.ui.define([
 			}
 
 			this.fireAfterClose({openBy: this._oOpenBy});
+		};
+
+		/**
+		 * Executed once during the opening of the popover, after it is rendered.
+		 * @private
+		 */
+		Popover.prototype._duringOpen = function () {
+			PreventKeyboardEvents.preventOnce(this.getDomRef());
+
+			if (Device.system.desktop) {
+				this.oPopup.setInitialFocusId(this._getInitialFocusId());
+			} else {
+				// On mobile: Set focus to popover itself to prevent keyboard opening
+				// The _handleOpened method will set the correct focus afterwards
+				this.oPopup.setInitialFocusId(this.getId());
+			}
+
+			this._bDuringOpenCalled = true;
 		};
 
 		/**
