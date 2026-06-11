@@ -1722,6 +1722,13 @@ sap.ui.define([
 			this._oABHelper._buildAnchorBar();
 		}
 
+		aSections.forEach(function(oSection) {
+			if (oSection._getInternalVisible()) {
+				var oSectionInfo = this._oSectionInfo[oSection.getId()];
+				oSection._setAriaLabelledByAnchorButton(oSectionInfo && oSectionInfo.buttonId, bInvalidate);
+			}
+		}.bind(this));
+
 		this._setInternalAnchorBarVisible(bVisibleAnchorBar, bInvalidate);
 		this._oFirstVisibleSection = oFirstVisibleSection;
 		this._oFirstVisibleSubSection = this._getFirstVisibleSubSection(oFirstVisibleSection);

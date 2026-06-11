@@ -77,6 +77,9 @@ sap.ui.define([
 
 				/**
 				 * The list of Subsections.
+				 *
+ 				 * Note: If multiple subsections are used, it is highly recommended to set a title for the section
+				 * for accessibility reasons.
 				 */
 				subSections: {type: "sap.uxap.ObjectPageSubSection", multiple: true, singularName: "subSection", forwarding: {getter: "_getGrid", aggregation: "content"}},
 
@@ -347,7 +350,7 @@ sap.ui.define([
 		}
 
 		aSubSections.forEach(function (oSubsection) {
-			if (sLastSelectedSubSectionId === oSubsection.getId()) {
+			if (sLastSelectedSubSectionId === oSubsection.getId() && oSubsection._shouldBeFocusable()) {
 				oSubsection._setToFocusable(true);
 				bPreselectedSection = true;
 			} else {
@@ -356,7 +359,13 @@ sap.ui.define([
 		});
 
 		if (!bPreselectedSection) {
-			aSubSections[0]._setToFocusable(true);
+			var oFirstFocusableSubSection = aSubSections.find(function(oSubSection) {
+				return oSubSection._shouldBeFocusable();
+			});
+
+			if (oFirstFocusableSubSection) {
+				oFirstFocusableSubSection._setToFocusable(true);
+			}
 		}
 
 		return this;
@@ -396,6 +405,29 @@ sap.ui.define([
 
 	ObjectPageSection.prototype._getShouldDisplayExpandCollapseButton = function () {
 		return this._getIsHidden();
+	};
+
+	/**
+	 * Sets the id of the AnchorBar button corresponding to this section, used as
+	 * aria-labelledby fallback when the section title is hidden.
+	 * @param {string} sButtonId
+	 * @param {boolean} bInvalidate
+	 * @private
+	 */
+	ObjectPageSection.prototype._setAriaLabelledByAnchorButton = function (sButtonId, bInvalidate) {
+		this._sAriaLabelledByAnchorButton = sButtonId;
+		if (bInvalidate) {
+			this.invalidate();
+		}
+	};
+
+	/**
+	 * Returns the id of the AnchorBar button corresponding to this section.
+	 * @returns {string}
+	 * @private
+	 */
+	ObjectPageSection.prototype._getAriaLabelledByAnchorButton = function () {
+		return this._sAriaLabelledByAnchorButton;
 	};
 
 	ObjectPageSection.prototype._showHideContentAllContent = function () {

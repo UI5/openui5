@@ -613,6 +613,7 @@ sap.ui.define([
 		this.refreshSeeMoreVisibility();
 
 		this.toggleStyleClass("sapUxAPObjectPageSubSectionStashed", this._aStashedControls.length ? true : false);
+		this.toggleStyleClass("sapUxAPObjectPageSubSectionFocusable", this._isTitleVisible());
 	};
 
 	ObjectPageSubSection.prototype._applyLayout = function (oLayoutProvider) {
@@ -1119,18 +1120,33 @@ sap.ui.define([
 	};
 
 	ObjectPageSubSection.prototype._setToFocusable = function (bFocusable) {
-		var sFocusable = '0',
-			sNotFocusable = '-1',
-			sTabIndex = "tabindex";
-
-		if (bFocusable) {
-			this.$().attr(sTabIndex, sFocusable);
+		if (this._shouldBeFocusable()) {
+			this.$().attr("tabindex", bFocusable ? "0" : "-1");
 		} else {
-			this.$().attr(sTabIndex, sNotFocusable);
+			this.$().removeAttr("tabindex");
 		}
-
 		return this;
 	};
+
+
+	ObjectPageSubSection.prototype._shouldBeFocusable = function() {
+		return this._isTitleVisible();
+	};
+
+	/**
+	 * Whether the subsection title is effectively visible.
+	 * Backport shim: master exposes a public <code>titleVisible</code> property on
+	 * ObjectPageSectionBase; rel-1.108 does not, so we compute the same value from
+	 * the internal flag combined with the <code>showTitle</code> and non-empty title
+	 * requirements — mirroring master's ObjectPageSubSection#_isTitleVisible.
+	 *
+	 * @returns {boolean}
+	 * @private
+	 */
+	ObjectPageSubSection.prototype._isTitleVisible = function () {
+		return this._getInternalTitleVisible() && this.getShowTitle() && this.getTitle().trim() !== "";
+	};
+
 
 	ObjectPageSubSection.prototype._getUseTitleOnTheLeft = function () {
 		var oObjectPageLayout = this._getObjectPageLayout();
