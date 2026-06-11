@@ -231,19 +231,17 @@ sap.ui.define([
 		/**
 		 * Starts the excel export.
 		 *
-		 * @function
-		 * @name iExportToExcel
-		 * @param {String|sap.ui.mdc.Table} oControl Id or control instance of the MDCTable
-		 * @param {Object} [mSettings] Excel export settings
-		 * @param {String} [mSettings.fileName] Optional name for the exported file
-		 * @param {String} [mSettings.fileType] Optional type the file should be exported tp XLSX/PDF
-		 * @param {Boolean} [mSettings.includeFilterSettings] Optional flag whether to include the filter settings in the exported file
-		 * @param {Boolean} [mSettings.splitCells] Optional flag whether to split columns with multiple values
+		 * @param {string|sap.ui.mdc.Table} vControl Id or control instance of the MDCTable
+		 * @param {object} [mSettings] Excel export settings
+		 * @param {string} [mSettings.fileName] Optional name for the exported file
+		 * @param {string} [mSettings.fileType] Optional type the file should be exported tp XLSX/PDF
+		 * @param {bolean} [mSettings.includeFilterSettings] Optional flag whether to include the filter settings in the exported file
+		 * @param {boolean} [mSettings.splitCells] Optional flag whether to split columns with multiple values
 		 * @returns {Promise} OPA waitFor
 		 * @public
 		 */
-		iExportToExcel: function(oControl, mSettings) {
-			var sTableId = typeof oControl === "string" ? oControl : oControl.getId();
+		iExportToExcel: function(vControl, mSettings) {
+			var sTableId = typeof vControl === "string" ? vControl : vControl.getId();
 
 			if (!mSettings) {
 				return this.waitFor({
@@ -253,9 +251,7 @@ sap.ui.define([
 					errorMessage: "Did not find the 'Export' button"
 				});
 			} else {
-				return Promise.all()
-				// enter export file name
-				.then(this.waitFor({
+				return this.waitFor({
 					id: "exportSettingsDialog-fileName",
 					controlType: "sap.m.Input",
 					searchOpenDialogs: true,
@@ -265,9 +261,7 @@ sap.ui.define([
 						}
 					},
 					errorMessage: "Did not find the 'File name' input"
-				}))
-				// select export file type
-				.then(this.waitFor({
+				}).waitFor({
 					id: "exportSettingsDialog-fileType",
 					controlType: "sap.m.Select",
 					searchOpenDialogs: true,
@@ -277,9 +271,7 @@ sap.ui.define([
 						}
 					},
 					errorMessage: "Did not find the 'File type' select"
-				}))
-				// mark include filter settings
-				.then(this.waitFor({
+				}).waitFor({
 					id: "exportSettingsDialog-includeFilterSettings",
 					controlType: "sap.m.CheckBox",
 					searchOpenDialogs: true,
@@ -287,9 +279,7 @@ sap.ui.define([
 						oCHeckBox.setSelected(mSettings.includeFilterSettings);
 					},
 					errorMessage: "Did not find the 'Include filter settings' checkbox"
-				}))
-				// mark split cells
-				.then( this.waitFor({
+				}).waitFor({
 					id: "exportSettingsDialog-splitCells",
 					controlType: "sap.m.CheckBox",
 					searchOpenDialogs: true,
@@ -297,15 +287,13 @@ sap.ui.define([
 						oCheckBox.setSelected(mSettings.splitCells);
 					},
 					errorMessage: "Did not find the 'Split cells with multiple values' checkbox"
-				}))
-				// start export
-				.then(this.waitFor({
+				}).waitFor({
 					id: "exportSettingsDialog-exportButton",
 					controlType: "sap.m.Button",
 					searchOpenDialogs: true,
 					actions: new Press(),
 					errorMessage: "Did not find the 'Export' button"
-				}));
+				});
 			}
 		},
 

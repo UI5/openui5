@@ -136,14 +136,12 @@ sap.ui.define([
 		};
 
 		const oListContent = new AdaptFiltersPanelContent(this.getId() + "-listView", {
-			change: fnChangeFactory(this.MODEL_PATH),
-			tabFilterId: this.getId() + "-listTabFilter"
+			change: fnChangeFactory(this.MODEL_PATH)
 		});
 
 		const oGroupContent = new AdaptFiltersPanelContent(this.getId() + "-groupView", {
 			defaultView: this.GROUP_KEY,
-			change: fnChangeFactory(this.MODEL_PATH),
-			tabFilterId: this.getId() + "-groupTabFilter"
+			change: fnChangeFactory(this.MODEL_PATH)
 		});
 
 		this.addView(new AbstractContainerItem({
@@ -535,6 +533,17 @@ sap.ui.define([
 				this.switchView(sKey);
 			}
 		});
+
+		// Set the IconTabFilter elements as aria labels for accessibility
+		const oListContent = this.getView(this.LIST_KEY)?.getContent();
+		const oGroupContent = this.getView(this.GROUP_KEY)?.getContent();
+		const [oListTabFilter, oGroupTabFilter] = this._oHeader.getItems();
+		if (oListContent) {
+			oListContent._oInvText = oListTabFilter;
+		}
+		if (oGroupContent) {
+			oGroupContent._oInvText = oGroupTabFilter;
+		}
 
 		this.oLayout.insertContent(this._oHeader, 0);
 		this.oLayout.setShowHeader(false);
