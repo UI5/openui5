@@ -19,7 +19,9 @@ sap.ui.define([
 	'sap/ui/core/ShortcutHintsMixin',
 	"sap/ui/events/KeyCodes",
 	"sap/ui/Device",
+	"sap/ui/core/library",
 	"sap/ui/core/InvisibleText",
+	"sap/ui/core/InvisibleMessage",
 	"sap/m/table/Util"
 ], (
 	JSONModel,
@@ -38,10 +40,14 @@ sap.ui.define([
 	ShortcutHintsMixin,
 	KeyCodes,
 	Device,
+	coreLibrary,
 	InvisibleText,
+	InvisibleMessage,
 	TableUtil
 ) => {
 	"use strict";
+
+	const { InvisibleMessageMode } = coreLibrary;
 
 	/**
 	 * P13n <code>Item</code> object type.
@@ -215,6 +221,7 @@ sap.ui.define([
 		this._bFocusOnRearrange = true;
 
 		this._setInnerLayout();
+		this._oInvisibleMessage = InvisibleMessage.getInstance();
 	};
 
 	BasePanel.prototype.onAfterRendering = function() {
@@ -282,6 +289,13 @@ sap.ui.define([
 			}
 			this._oMessageStrip = oStrip;
 			this.getAggregation("_content").insertItem(oStrip, 0);
+
+			// fix for CS20260012224236. In 1.128 fixed with a better solution
+			const sType = oStrip.getType();
+			const sText = oStrip.getText();
+			let sAnnounceText = sType ? this._getResourceText("INPUTBASE_VALUE_STATE_" + sType.toUpperCase()) + " " : "";
+			sAnnounceText += sText;
+			this._oInvisibleMessage.announce(sAnnounceText, InvisibleMessageMode.Assertive);
 		}
 
 		return this;
