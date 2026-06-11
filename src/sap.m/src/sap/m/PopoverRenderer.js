@@ -68,7 +68,7 @@ sap.ui.define([
 				.openEnd();
 
 			if (oControl.getResizable()) {
-				PopoverRenderer.renderResizeHandle(oRm);
+				PopoverRenderer.renderResizeHandle(oRm, oControl.getId());
 			}
 
 			this.renderContent(oRm, oControl);
@@ -117,7 +117,7 @@ sap.ui.define([
 					.close("span");
 			}
 
-			oRm.openStart("div")
+			oRm.openStart("div", sId + "-wrapper")
 				.class("sapMPopoverWrapper")
 				.openEnd();
 
@@ -297,8 +297,8 @@ sap.ui.define([
 			return aClassNames.concat(oControl.aCustomStyleClasses);
 		};
 
-		PopoverRenderer.renderResizeHandle = function(oRm) {
-			oRm.openStart("div")
+		PopoverRenderer.renderResizeHandle = function(oRm, sId) {
+			oRm.openStart("div", sId + "-resizeHandle")
 				.class("sapMPopoverResizeHandle")
 				.openEnd();
 

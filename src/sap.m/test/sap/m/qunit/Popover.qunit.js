@@ -30,7 +30,8 @@ sap.ui.define([
 	"sap/m/Input",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/dom/containsOrEquals",
-	"sap/ui/qunit/utils/nextUIUpdate"
+	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/m/dialogUtils/PreventKeyboardEvents"
 ], function(
 	qutils,
 	createAndAppendDiv,
@@ -62,7 +63,8 @@ sap.ui.define([
 	Input,
 	KeyCodes,
 	containsOrEquals,
-	nextUIUpdate
+	nextUIUpdate,
+	PreventKeyboardEvents
 ) {
 	"use strict";
 
@@ -3094,6 +3096,95 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		oPopover.openBy(oButton);
+	});
+
+	QUnit.module("Focus Handling and Screen Reader Support", {
+		beforeEach: function () {
+			this.clock = sinon.useFakeTimers();
+		},
+		afterEach: function () {
+			runAllFakeTimersAndRestore(this.clock);
+		}
+	});
+
+	QUnit.test("Focus moves directly to the correct target", async function (assert) {
+		if (!Device.system.desktop) {
+			assert.ok(true, "Test only relevant for desktop");
+			return;
+		}
+
+		this.clock.restore();
+		const done = assert.async();
+		const oButton = new Button({
+			text: "Open Popover"
+		});
+		const oPopover = new Popover({
+			content: [
+				new Button("btn1", {
+					text: "Button 1"
+				})
+			]
+		});
+
+		const fnFocusInSpy = this.spy();
+		const fnFocusInHandler = (e) => {
+			fnFocusInSpy(e.target);
+		};
+		document.addEventListener("focusin", fnFocusInHandler);
+
+		oButton.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		oPopover.openBy(oButton);
+		oPopover.attachAfterOpen(() => {
+			assert.strictEqual(document.activeElement?.id, "btn1", "Focus is on the correct button.");
+			assert.ok(fnFocusInSpy.calledOnce, "Focus has been moved only once. This is required to not confuse the screen reader.");
+			assert.ok(fnFocusInSpy.calledWith(document.activeElement), "Focus has been moved to the correct button.");
+
+			oPopover.destroy();
+			oButton.destroy();
+			document.removeEventListener("focusin", fnFocusInHandler);
+			done();
+		});
+	});
+
+	QUnit.test("Keyup and keypress are prevented during opening", async function (assert) {
+		const oButton = new Button({
+			text: "Open Popover"
+		});
+		const oPopover = new Popover({
+			content: [
+				new Button({
+					text: "Button 1"
+				})
+			]
+		});
+
+		const fnKeyboardPreventSpy = this.spy(PreventKeyboardEvents, "preventOnce");
+		const fnKeyboardRestoreSpy = this.spy(PreventKeyboardEvents, "restore");
+
+		oPopover.addEventDelegate({
+			onAfterRendering: () => {
+				assert.ok(fnKeyboardPreventSpy.calledOnce, "Keyboard events are prevented during opening.");
+				assert.ok(fnKeyboardPreventSpy.calledWith(oPopover.getDomRef()), "preventOnce was called with correct parameter.");
+				assert.ok(fnKeyboardRestoreSpy.notCalled, "Keyboard events are not restored during open.");
+			}
+		});
+
+		oButton.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate(this.clock);
+
+		oPopover.openBy(oButton);
+		this.clock.tick(1000);
+
+		assert.ok(fnKeyboardPreventSpy.calledOnce, "Keyboard events are not prevented further.");
+		assert.ok(fnKeyboardRestoreSpy.called, "Keyboard events are restored after open.");
+		assert.ok(fnKeyboardRestoreSpy.calledWith(oPopover.getDomRef()), "Keyboard events are restored after open.");
+
+		oPopover.destroy();
+		oButton.destroy();
+		fnKeyboardPreventSpy.restore();
+		fnKeyboardRestoreSpy.restore();
 	});
 
 	// include stylesheet and let test starter wait for it
