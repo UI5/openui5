@@ -189,6 +189,12 @@
             <pattern>../test/sap/ui/core/qunit/thirdparty/qunit-2.18.css</pattern>
             <pattern>../test/sap/ui/core/qunit/thirdparty/qunit-2.18.js</pattern>
         </lib>
+        <lib name="qunit-2.26" displayName="QUnit 2.26.0" npmName="qunit" version="2.26.0" hash="f13e8eebb22630241923087ada34055b" homepage="https://qunitjs.com" id="73555000106100412657">
+            <license url="https://github.com/qunitjs/qunit/blob/main/LICENSE.txt" type="MIT" />
+            <copyright>OpenJS Foundation and other contributors</copyright>
+            <pattern>../test/sap/ui/core/qunit/thirdparty/qunit-2.26.0.css</pattern>
+            <pattern>../test/sap/ui/core/qunit/thirdparty/qunit-2.26.0.js</pattern>
+        </lib>
         <lib name="jquery-migrate" displayName="jQuery-Migrate" npmName="jquery-migrate" version="3.3.1" hash="f0db1b18e75cbe903cedfdcf5fc4c706" homepage="https://github.com/jquery/jquery-migrate/" id="73555000106100043843">
             <license url="https://github.com/jquery/jquery-migrate/blob/3.3.1/LICENSE.txt" type="MIT" />
             <copyright>OpenJS Foundation and other contributors</copyright>
@@ -270,6 +276,16 @@
             <license url="https://raw.github.com/cjohansen/Sinon.JS/master/LICENSE" type="BSD-3-Clause" />
             <copyright>2010-2022, Christian Johansen, christian@cjohansen.no</copyright>
             <pattern>../test/sap/ui/core/qunit/thirdparty/sinon-14.0.js</pattern>
+        </lib>
+        <lib name="sinonjs22" displayName="SinonJS 22" npmName="sinon" version="22.0.0" hash="50b8e06a71755d4190973c5ba0d48e53" homepage="https://sinonjs.org" id="73554900106100526679">
+            <license url="https://raw.github.com/cjohansen/Sinon.JS/master/LICENSE" type="BSD-3-Clause" />
+            <copyright>2010-2024, Christian Johansen, christian@cjohansen.no</copyright>
+            <pattern>../test/sap/ui/core/qunit/thirdparty/sinon-22.0.0.js</pattern>
+        </lib>
+        <lib name="nise" displayName="nise" npmName="nise" version="6.1.5" hash="3373cf747e6d05cad64ab947f0020386" homepage="https://github.com/sinonjs/nise" id="73555000106100408505">
+            <license url="https://github.com/sinonjs/nise/blob/main/LICENSE" type="BSD-3-Clause" />
+            <copyright>2010-2017, Christian Johansen, christian@cjohansen.no</copyright>
+            <pattern>../test/sap/ui/core/qunit/thirdparty/nise-6.1.5.js</pattern>
         </lib>
         <lib name="sinon-qunit" displayName="Sinon-qunit" npmName="sinon-qunit" version="2.0.0" hash="513b42becaeb0164dbbbb7e632dcac5d" homepage="http://sinonjs.org" id="73554900106100005534">
             <license url="https://raw.github.com/cjohansen/Sinon.JS/master/LICENSE" type="BSD-3-Clause" />

@@ -69,32 +69,11 @@ sap.ui.define([
 				defaultView: {
 					type: "string",
 					defaultValue: "list"
-				},
-				tabFilterId: {
-					type: "string"
 				}
 			}
 		},
 		renderer: {
-			apiVersion: 2,
-			render: function(oRm, oControl) {
-				const mAriaProps = {role: "tabpanel"};
-				const sTabFilterId = oControl.getTabFilterId();
-
-				if (sTabFilterId) {
-					mAriaProps["labelledby"] = {value: sTabFilterId, append: true};
-				}
-
-				oRm.openStart("div", oControl);
-				oRm.style("height", "100%");
-				if (oControl.getProperty("_useFixedWidth")) {
-					oRm.style("width", oControl.getWidth());
-				}
-				oRm.accessibilityState(oControl, mAriaProps);
-				oRm.openEnd();
-				oRm.renderControl(oControl.getAggregation("_content"));
-				oRm.close("div");
-			}
+			apiVersion: 2
 		}
 	});
 

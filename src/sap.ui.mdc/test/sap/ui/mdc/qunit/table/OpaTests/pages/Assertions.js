@@ -424,64 +424,71 @@ sap.ui.define([
 		 * @private
 		 */
 		iShouldSeeExportProcessDialog: function() {
+			const oResourceBundle = Library.getResourceBundleFor("sap.ui.export");
+
 			return this.waitFor({
 				controlType: "sap.m.Dialog",
-				success: function(aDialogs) {
-					const oDialog = aDialogs[0];
-					const oResourceBundle = Library.getResourceBundleFor("sap.ui.export");
-					return this.waitFor({
-						controlType: "sap.m.Title",
-						searchOpenDialogs: true,
-						matchers: new PropertyStrictEquals({
-							name: "text",
-							value: oResourceBundle.getText("PROGRESS_TITLE")
-						}),
-						success: function() {
-							Opa5.assert.ok(oDialog, "Export process dialog is visible");
-						},
-						errorMessage: "No dialog title found"
-					});
+				searchOpenDialogs: true,
+				autoWait: false,
+				matchers: new PropertyStrictEquals({
+					name: "title",
+					value: oResourceBundle.getText("PROGRESS_TITLE")
+				}),
+				success: function() {
+					Opa5.assert.ok(true, "Export process dialog is visible");
 				},
 				errorMessage: "No Export process dialog found"
 			});
 		},
 
 		/**
-		 * Checks if the {@link sap.ui.unified.Menu} shows up after
-		 * pressing on the arrow button performed in {@link #iPressExportArrowButton}.
+		 * Checks if the Export menu is visible.
 		 *
-		 * @function
-		 * @name iShouldSeeExportMenu
 		 * @returns {Promise} OPA waitFor
 		 * @private
 		 */
 		iShouldSeeExportMenu: function() {
+			const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
+
 			return this.waitFor({
-				controlType: "sap.ui.unified.Menu",
+				controlType: "sap.m.MenuItem",
+				matchers: [{
+					properties: {
+						text: oResourceBundle.getText("table.QUICK_EXPORT")
+					}
+				}],
 				success: function(oMenu) {
-					Opa5.assert.ok(oMenu.length, "Export menu is visible");
+					Opa5.assert.ok(true, "Quick export menu item is visible");
 				},
-				errorMessage: "No Export menu found"
+				errorMessage: "No quick export menu item found"
+			}).waitFor({
+				controlType: "sap.m.MenuItem",
+				matchers: [{
+					properties: {
+						text: oResourceBundle.getText("table.EXPORT_WITH_SETTINGS")
+					}
+				}],
+				success: function(oMenu) {
+					Opa5.assert.ok(true, "Export with settings menu item is visible");
+				},
+				errorMessage: "No export with settings menu item found"
 			});
 		},
 
 		/**
-		 * Checks if the {@link sap.m.Dialog} 'exportSettingsDialog' is visible on the screen after
-		 * pressing on the 'Export as...' button performed in {@link #iPressExportAsButtonInMenu}.
+		 * Checks if the Export As dialog is visible.
 		 *
-		 * @function
-		 * @name iShouldSeeExportSettingsDialog
 		 * @returns {Promise} OPA waitFor
 		 * @private
 		 */
 		iShouldSeeExportSettingsDialog: function() {
 			return this.waitFor({
 				id: "exportSettingsDialog",
-				controlType: "sap.m.Dialog",
-				success: function(oDialog) {
-					Opa5.assert.ok(oDialog, "'Export settings' dialog is visible");
+				searchOpenDialogs: true,
+				success: function() {
+					Opa5.assert.ok(true, "Export As dialog is visible");
 				},
-				errorMessage: "No 'Export settings' dialog found"
+				errorMessage: "No Export As dialog found"
 			});
 		},
 

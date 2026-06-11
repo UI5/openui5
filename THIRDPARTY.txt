@@ -119,6 +119,13 @@ License Text: https://github.com/UI5/openui5/blob/master/LICENSES/MIT.txt
 Contained in: src/sap.ui.core/test/sap/ui/core/qunit/thirdparty/qunit-2.18.css
 	src/sap.ui.core/test/sap/ui/core/qunit/thirdparty/qunit-2.18.js
 
+Component: QUnit 2.26.0, version: 2.26.0
+Copyright: OpenJS Foundation and other contributors
+License: MIT
+License Text: https://github.com/UI5/openui5/blob/master/LICENSES/MIT.txt
+Contained in: src/sap.ui.core/test/sap/ui/core/qunit/thirdparty/qunit-2.26.0.css
+	src/sap.ui.core/test/sap/ui/core/qunit/thirdparty/qunit-2.26.0.js
+
 Component: jQuery-Migrate, version: 3.3.1
 Copyright: OpenJS Foundation and other contributors
 License: MIT
@@ -211,6 +218,18 @@ Copyright: 2010-2022, Christian Johansen, christian@cjohansen.no
 License: BSD-3-Clause
 License Text: https://github.com/UI5/openui5/blob/master/LICENSES/BSD-3-Clause.txt
 Contained in: src/sap.ui.core/test/sap/ui/core/qunit/thirdparty/sinon-14.0.js
+
+Component: SinonJS 22, version: 22.0.0
+Copyright: 2010-2024, Christian Johansen, christian@cjohansen.no
+License: BSD-3-Clause
+License Text: https://github.com/UI5/openui5/blob/master/LICENSES/BSD-3-Clause.txt
+Contained in: src/sap.ui.core/test/sap/ui/core/qunit/thirdparty/sinon-22.0.0.js
+
+Component: nise, version: 6.1.5
+Copyright: 2010-2017, Christian Johansen, christian@cjohansen.no
+License: BSD-3-Clause
+License Text: https://github.com/UI5/openui5/blob/master/LICENSES/BSD-3-Clause.txt
+Contained in: src/sap.ui.core/test/sap/ui/core/qunit/thirdparty/nise-6.1.5.js
 
 Component: Sinon-qunit, version: 2.0.0
 Copyright: 2010-2011, Christian Johansen

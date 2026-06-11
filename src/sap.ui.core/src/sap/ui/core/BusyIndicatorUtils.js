@@ -110,7 +110,7 @@ BusyIndicatorUtils.addAriaAttributes = function(oDOM, oControl) {
 	oDOM.setAttribute("title", oResourceBundle.getText("BUSY_TEXT"));
 
 	// TODO: tooltip: Check if control provides aria-describedby attribute?
-	const oDomRef = oControl?.getDomRef();
+	const oDomRef = oControl?.getDomRef(oControl?._sBusySection);
 	oDomRef?.setAttribute("aria-busy", "true");
 };
 

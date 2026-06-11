@@ -406,22 +406,18 @@ sap.ui.define([
 		},
 
 		/**
-		 * Performs a Press action on {@link sap.m.Button}
-		 * 'export-internalSplitBtn-arrowButton' that shows up the
-		 * additional {@link sap.ui.unified.Menu} with the items
+		 * Presses the Export menu button that opens the menu with items
 		 * <ul>
 		 *     <li>Export</li>
 		 *     <li>Export as...</li>
 		 * </ul>.
 		 *
-		 * @function
-		 * @name iPressExportMenuButton
-		 * @param {String|sap.ui.mdc.Table} oControl Id or control instance of the MDCTable
+		 * @param {string|sap.ui.mdc.Table} vControl Id or control instance of the MDCTable
 		 * @returns {Promise} OPA waitFor
 		 * @private
 		 */
-		iPressExportMenuButton: function(oControl) {
-			const sTableId = typeof oControl === "string" ? oControl : oControl.getId();
+		iPressExportMenuButton: function(vControl) {
+			const sTableId = typeof vControl === "string" ? vControl : vControl.getId();
 
 			return this.waitFor({
 				id: sTableId + "-export-internalSplitBtn-arrowButton",
@@ -432,11 +428,8 @@ sap.ui.define([
 		},
 
 		/**
-		 * Performs a Press action on {@link sap.ui.unified.MenuItem} 'Export'
-		 * that is shown up from {@link #iPressExportMenuButton}.
+		 * Presses the "Export" menu item that was opened with {@link #iPressExportMenuButton}.
 		 *
-		 * @function
-		 * @name iPressExportButtonInMenu
 		 * @returns {Promise} OPA waitFor
 		 * @private
 		 */
@@ -444,24 +437,19 @@ sap.ui.define([
 			const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
 
 			return this.waitFor({
-				controlType: "sap.ui.unified.MenuItem",
+				controlType: "sap.m.MenuItem",
 				matchers: new PropertyStrictEquals({
 					name: "text",
 					value: oResourceBundle.getText("table.QUICK_EXPORT")
 				}),
-				success: function(aMenuItems) {
-					new Press().executeOn(aMenuItems[0]);
-				},
+				actions: new Press(),
 				errorMessage: "Did not find 'Export' button in menu"
 			});
 		},
 
 		/**
-		 * Performs a Press action on {@link sap.ui.unified.MenuItem} 'Export as...'
-		 * that is shown up from {@link #iPressExportMenuButton}.
+		 * Presses the "Export as..." menu item that was opened with {@link #iPressExportMenuButton}.
 		 *
-		 * @function
-		 * @name iPressExportAsButtonInMenu
 		 * @returns {Promise} OPA waitFor
 		 * @private
 		 */
@@ -469,30 +457,25 @@ sap.ui.define([
 			const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
 
 			return this.waitFor({
-				controlType: "sap.ui.unified.MenuItem",
+				controlType: "sap.m.MenuItem",
 				matchers: new PropertyStrictEquals({
 					name: "text",
 					value: oResourceBundle.getText("table.EXPORT_WITH_SETTINGS")
 				}),
-				success: function(aMenuItems) {
-					new Press().executeOn(aMenuItems[0]);
-				},
+				actions: new Press(),
 				errorMessage: "Did not find 'Export as...' menu button"
 			});
 		},
 
 		/**
-		 * Fills in the data in the {@link sap.m.Dialog} 'exportSettingsDialog'
-		 * that is shown up from {@link #iPressExportAsButtonInMenu} and triggers the excel export.
+		 * Fills in the data in the Export As dialog.
 		 *
-		 * @function
-		 * @name iFillInExportSettingsDialog
-		 * @param {String|sap.ui.mdc.Table} oControl Id or control instance of the MDCTable
-		 * @param {Object} [mSettings] Excel export settings
-		 * @param {String} [mSettings.fileName] Optional name for the exported file
-		 * @param {String} [mSettings.fileType] Optional type the file should be exported tp XLSX/PDF
-		 * @param {Boolean} [mSettings.includeFilterSettings] Optional flag whether to include the filter settings in the exported file
-		 * @param {Boolean} [mSettings.splitCells] Optional flag whether to split columns with multiple values
+		 * @param {string|sap.ui.mdc.Table} oControl Id or control instance of the MDCTable
+		 * @param {object} [mSettings] Excel export settings
+		 * @param {string} [mSettings.fileName] Optional name for the exported file
+		 * @param {string} [mSettings.fileType] Optional type the file should be exported tp XLSX/PDF
+		 * @param {boolean} [mSettings.includeFilterSettings] Optional flag whether to include the filter settings in the exported file
+		 * @param {boolean} [mSettings.splitCells] Optional flag whether to split columns with multiple values
 		 * @returns {Promise} OPA waitFor
 		 * @private
 		 */

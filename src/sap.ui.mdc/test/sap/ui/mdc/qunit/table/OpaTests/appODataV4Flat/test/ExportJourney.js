@@ -12,8 +12,7 @@ sap.ui.define([
 	const mExportLibPromiseWithResolvers = Promise.withResolvers();
 	const opaTestIfExportLibLoaded = function() {
 		mExportLibPromiseWithResolvers.promise.then(() => {
-			//opaTest.apply(this, arguments);
-			opaTest.skip.apply(this, arguments); // After a long period of not running the tests, they no longer run successfully
+			opaTest.apply(this, arguments);
 		}).catch(() => {
 			opaTest.skip.apply(this, arguments);
 		});

@@ -32,7 +32,36 @@ sap.ui.define([
 				});
 
 				generateResponse(fServer);
+				patchFetch();
 			});
+
+			// sap.ui.export uses fetch() to retrieve data, which is not intercepted by sinon.fakeServer (only XHR is).
+			// We delegate matching fetch() calls to XHR so they route through the fake server.
+			function patchFetch() {
+				const fnOriginalFetch = window.fetch;
+				window.fetch = function(input, init) {
+					const sUrl = typeof input === "string" ? input : input.url;
+					if (!sUrl.match(/\/sap\/opu\/odata4\//)) {
+						return fnOriginalFetch.apply(this, arguments);
+					}
+					return new Promise(function(resolve, reject) {
+						const oXhr = new XMLHttpRequest();
+						const sMethod = (init && init.method) || (input && input.method) || "GET";
+						oXhr.open(sMethod, sUrl, true);
+						oXhr.onload = function() {
+							resolve(new Response(oXhr.responseText, {
+								status: oXhr.status,
+								statusText: oXhr.statusText,
+								headers: {"Content-Type": oXhr.getResponseHeader("Content-Type") || "application/json"}
+							}));
+						};
+						oXhr.onerror = function() {
+							reject(new TypeError("Network request failed"));
+						};
+						oXhr.send((init && init.body) || null);
+					});
+				};
+			}
 
 			function generateResponse(fServer) {
 				fServer.respondWith("GET", /\/sap\/opu\/odata4\/IWBEP\/V4_SAMPLE\/default\/IWBEP\/V4_GW_SAMPLE_BASIC\/0001\//, function(xhr, id) {
