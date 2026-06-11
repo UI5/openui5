@@ -68,8 +68,6 @@ sap.ui.define([],
 			if (bInnerItems) {
 				oRm.class("sapMTPCInner");
 			}
-			oRm.attr("ondragstart", "return false;");
-			oRm.attr("ondrop", "return false;");
 			oRm.attr("aria-hidden", "true");
 			oRm.openEnd();
 
