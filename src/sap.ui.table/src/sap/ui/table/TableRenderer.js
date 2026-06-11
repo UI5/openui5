@@ -322,6 +322,9 @@ sap.ui.define([
 		rm.attr("tabindex", "0");
 		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "Overlay");
 		rm.openEnd();
+		// When the overlay is empty JAWS does not announce the labels associated via aria-labelledby, so we add a non-breaking space as workaround.
+		// (DINC0913798)
+		rm.text("\u00a0");
 		rm.close("div");
 	};
 
