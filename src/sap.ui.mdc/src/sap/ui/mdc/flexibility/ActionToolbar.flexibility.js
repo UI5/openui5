@@ -7,13 +7,16 @@ sap.ui.define([
 	"./Util",
 	"sap/ui/fl/changeHandler/common/ChangeCategories",
 	"./actiontoolbar/CombineAction",
-	"./actiontoolbar/SplitAction"
+	"./actiontoolbar/SplitAction",
+	"sap/ui/mdc/util/getKey"
 ], (
 	ItemBaseFlex,
 	Util,
 	ChangeCategories,
 	CombineAction,
-	SplitAction
+	SplitAction,
+	getKey
+
 ) => {
 	"use strict";
 
@@ -92,8 +95,9 @@ sap.ui.define([
 					// Clear the revert data on the change
 					oChange.resetRevertData();
 				} else {
+					const sKey = getKey(oChangeContent);
 					oChange.setRevertData({
-						name: oChangeContent.name,
+						key: sKey,
 						index: iOldIndex,
 						item: sControlAggregationItemId
 					});
@@ -109,7 +113,8 @@ sap.ui.define([
 		const oContent = oChange.getContent();
 		const oToolbar = oAppComponent.byId(oChange.getSelector().id);
 		let sKey;
-		const aArgs = [oContent.name];
+		const sContentKey = getKey(oContent);
+		const aArgs = [sContentKey];
 		const mVersionInfo = { descriptionPayload: {} };
 
 		if (oChange.getChangeType() === "moveAction") {
@@ -120,7 +125,7 @@ sap.ui.define([
 		}
 
 		if (oToolbar) {
-			const oAction = oAppComponent.byId(oContent.name);
+			const oAction = oAppComponent.byId(sContentKey);
 			if (oAction) {
 				aArgs.splice(0, 1, oAction.getLabel());
 			}

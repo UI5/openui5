@@ -22,7 +22,7 @@ sap.ui.define([
 				"id": "myChartView---view--IDChart"
 			},
 			"content": {
-				"name": "agSalesAmount"
+				"key": "agSalesAmount"
 			}
 		};
 	}
@@ -34,7 +34,7 @@ sap.ui.define([
 				"id": "myChartView---view--IDChart"
 			},
 			"content": {
-				"name": sProperty,
+				"key": sProperty,
 				"index": "0",
 				"role": "category"
 			}
@@ -48,7 +48,7 @@ sap.ui.define([
 				"id": "myChartView---view--IDChart"
 			},
 			"content": {
-				"name": sProperty,
+				"key": sProperty,
 				"index": iIndex || 0,
 				"role": sRole
 			}
@@ -62,7 +62,7 @@ sap.ui.define([
 				"id": "myChartView---view--IDChart"
 			},
 			"content": {
-				"name": sProperty
+				"key": sProperty
 			}
 		};
 	}

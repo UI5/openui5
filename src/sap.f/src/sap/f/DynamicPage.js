@@ -1415,12 +1415,21 @@ sap.ui.define([
 
 		var bScrollBarNeeded = this._needsVerticalScrollBar(),
 			oWrapperElement = this.$wrapper.get(0),
-			iTitleHeight = this.$titleArea.get(0).getBoundingClientRect().height,
-			iTitleWidth = this._getTitleAreaWidth(),
-			iSpaceForScrollbar = this._getEffectiveScrollbarWidth(bScrollBarNeeded),
 			oTitle = this.getTitle(),
 			bTitleTransparent = oTitle && oTitle.getBackgroundDesign() === BackgroundDesign.Transparent,
+			iTitleHeight,
+			iTitleWidth,
+			iSpaceForScrollbar,
 			sClipPath;
+
+		this.toggleStyleClass("sapFDynamicPageWithScroll", bScrollBarNeeded);
+		// Apply the scrollbar space offset first so that the title area width is final
+		// before we measure its height (the width affects height when content wraps).
+		this._toggleSpaceForScrollbar(bScrollBarNeeded);
+
+		iTitleHeight = this.$titleArea.get(0).getBoundingClientRect().height;
+		iTitleWidth = this._getTitleAreaWidth();
+		iSpaceForScrollbar = this._getEffectiveScrollbarWidth(bScrollBarNeeded);
 
 		// the top area of the scroll container is reserved for showing the title element,
 		// (where the title element is positioned absolutely on top of the scroll container),
@@ -1451,9 +1460,6 @@ sap.ui.define([
 			oWrapperElement.style.clipPath = '';
 			this._bClipPathApplied = false;
 		}
-
-		this.toggleStyleClass("sapFDynamicPageWithScroll", bScrollBarNeeded);
-		this._toggleSpaceForScrollbar(bScrollBarNeeded);
 
 		 // update styles for scrolling after a timeout of 0, in order to obtain the final state
 		 // e.g. after the ResizeHandler looped though *all* resized controls (to notify them) =>

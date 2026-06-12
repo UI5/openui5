@@ -70,6 +70,7 @@ sap.ui.define([
 	// and saved here. Once a hard reload happens, this module is reloaded and the token from the async hints will be used again.
 	// This token is currently not used during adaptation mode, but after activation the token must also be invalidated
 	const _mAsyncHintsCacheBusterTokens = {};
+	const sInvalidCacheBusterToken = "INVALID_CACHE_BUSTER_TOKEN";
 
 	/**
 	 * Class for loading Flex Data from the backend via the Connectors.
@@ -255,12 +256,13 @@ sap.ui.define([
 		const sComponentName = ManifestUtils.getBaseComponentNameFromManifest(mPropertyBag.manifest);
 		if (bRequiresNewLoadRequest) {
 			_mAsyncHintsCacheBusterTokens[sReference] ||= ManifestUtils.getCacheKeyFromAsyncHints(sReference, mPropertyBag.asyncHints);
+			const bUseCacheKey = !mPropertyBag.reInitialize && _mAsyncHintsCacheBusterTokens[sReference] !== sInvalidCacheBusterToken;
 
 			oFlexData = await Storage.loadFlexData({
 				preview: ManifestUtils.getPreviewSectionFromAsyncHints(mPropertyBag.asyncHints),
 				reference: sReference,
 				componentName: sComponentName,
-				cacheKey: mPropertyBag.reInitialize ? undefined : _mAsyncHintsCacheBusterTokens[sReference],
+				cacheKey: bUseCacheKey ? _mAsyncHintsCacheBusterTokens[sReference] : undefined,
 				siteId: getSideId(mPropertyBag.componentData),
 				appDescriptor: mPropertyBag.manifest.getRawJson ? mPropertyBag.manifest.getRawJson() : mPropertyBag.manifest,
 				version: sVersion,
@@ -370,7 +372,9 @@ sap.ui.define([
 	 */
 	Loader.updateCachedResponse = function(sReference, aUpdates) {
 		StorageUtils.updateStorageResponse(_mCachedFlexData[sReference].data, aUpdates);
-		_mCachedFlexData[sReference].parameters.loaderCacheKey = _mAsyncHintsCacheBusterTokens[sReference] = uid();
+		_mCachedFlexData[sReference].parameters.loaderCacheKey = uid();
+		// after an update, the cache buster token is not valid anymore. We only know the new token after the next hard reload.
+		_mAsyncHintsCacheBusterTokens[sReference] = sInvalidCacheBusterToken;
 		return _mCachedFlexData[sReference].parameters.loaderCacheKey;
 	};
 

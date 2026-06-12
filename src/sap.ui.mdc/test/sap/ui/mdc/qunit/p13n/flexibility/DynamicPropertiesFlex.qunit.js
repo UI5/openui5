@@ -13,7 +13,7 @@ sap.ui.define([
 	"sap/ui/rta/enablement/elementActionTest",
 	"sap/ui/mdc/table/Column",
 	"sap/ui/mdc/FilterField"
-], function(
+], function (
 	createAppEnvironment,
 	ColumnFlex,
 	FilterItemFlex,
@@ -54,39 +54,39 @@ sap.ui.define([
 	function addChange(sChangeType, sPropertyKey, iIndex) {
 		return {
 			changeType: sChangeType,
-			selector: {id: sSelectorId},
-			content: {name: sPropertyKey, index: iIndex}
+			selector: { id: sSelectorId },
+			content: { key: sPropertyKey, index: iIndex }
 		};
 	}
 
 	function removeChange(sChangeType, sPropertyKey) {
 		return {
 			changeType: sChangeType,
-			selector: {id: sSelectorId},
-			content: {name: sPropertyKey}
+			selector: { id: sSelectorId },
+			content: { key: sPropertyKey }
 		};
 	}
 
 	function moveChange(sChangeType, sPropertyKey, iIndex) {
 		return {
 			changeType: sChangeType,
-			selector: {id: sSelectorId},
-			content: {name: sPropertyKey, index: iIndex}
+			selector: { id: sSelectorId },
+			content: { key: sPropertyKey, index: iIndex }
 		};
 	}
 
-	TableDelegate.fetchProperties = function() {
+	TableDelegate.fetchProperties = function () {
 		return Promise.resolve([
-			{key: "staticProp1", label: "Static 1", dataType: "String"},
-			{key: "staticProp2", label: "Static 2", dataType: "String"},
-			{key: "dynamicActive", label: "Dynamic Active", dataType: "String", isActive: true, groupable: true},
-			{key: "dynamicInactive", label: "Dynamic Inactive", dataType: "String", isActive: false, groupable: true},
-			{key: "newProp", label: "New Prop", dataType: "String"},
-			{key: "dynamicNotInShadow", label: "Dynamic Not In Shadow", dataType: "String", isActive: false}
+			{ key: "staticProp1", label: "Static 1", dataType: "String" },
+			{ key: "staticProp2", label: "Static 2", dataType: "String" },
+			{ key: "dynamicActive", label: "Dynamic Active", dataType: "String", isActive: true, groupable: true },
+			{ key: "dynamicInactive", label: "Dynamic Inactive", dataType: "String", isActive: false, groupable: true },
+			{ key: "newProp", label: "New Prop", dataType: "String" },
+			{ key: "dynamicNotInShadow", label: "Dynamic Not In Shadow", dataType: "String", isActive: false }
 		]);
 	};
 
-	TableDelegate.addItem = function(oControl, sPropertyKey) {
+	TableDelegate.addItem = function (oControl, sPropertyKey) {
 		return Promise.resolve(new Column({
 			id: oControl.getId() + "--" + sPropertyKey,
 			propertyKey: sPropertyKey,
@@ -94,22 +94,22 @@ sap.ui.define([
 		}));
 	};
 
-	TableDelegate.getSupportedFeatures = function() {
-		return {p13nModes: ["Column", "Sort", "Filter", "Group", "Aggregate"]};
+	TableDelegate.getSupportedFeatures = function () {
+		return { p13nModes: ["Column", "Sort", "Filter", "Group", "Aggregate"] };
 	};
 
-	FilterBarDelegate.fetchProperties = function() {
+	FilterBarDelegate.fetchProperties = function () {
 		return Promise.resolve([
-			{key: "staticProp1", label: "Static 1", dataType: "String"},
-			{key: "staticProp2", label: "Static 2", dataType: "String"},
-			{key: "dynamicActive", label: "Dynamic Active", dataType: "String", isActive: true},
-			{key: "dynamicInactive", label: "Dynamic Inactive", dataType: "String", isActive: false},
-			{key: "newProp", label: "New Prop", dataType: "String"},
-			{key: "dynamicNotInShadow", label: "Dynamic Not In Shadow", dataType: "String", isActive: false}
+			{ key: "staticProp1", label: "Static 1", dataType: "String" },
+			{ key: "staticProp2", label: "Static 2", dataType: "String" },
+			{ key: "dynamicActive", label: "Dynamic Active", dataType: "String", isActive: true },
+			{ key: "dynamicInactive", label: "Dynamic Inactive", dataType: "String", isActive: false },
+			{ key: "newProp", label: "New Prop", dataType: "String" },
+			{ key: "dynamicNotInShadow", label: "Dynamic Not In Shadow", dataType: "String", isActive: false }
 		]);
 	};
 
-	FilterBarDelegate.addItem = function(oControl, sPropertyKey) {
+	FilterBarDelegate.addItem = function (oControl, sPropertyKey) {
 		return Promise.resolve(new FilterField({
 			id: oControl.getId() + "--" + sPropertyKey,
 			propertyKey: sPropertyKey,
@@ -170,7 +170,7 @@ sap.ui.define([
 	function defineTestModules(oConfig) {
 
 		function getItemKeys(oControl) {
-			return oConfig.getItems(oControl).map(function(oItem) {
+			return oConfig.getItems(oControl).map(function (oItem) {
 				return oItem.getPropertyKey();
 			});
 		}
@@ -178,7 +178,7 @@ sap.ui.define([
 		const oAddInactiveChange = addChange(oConfig.addItemChangeType, "dynamicInactive", 0);
 
 		QUnit.module(oConfig.name + " - JS runtime path", {
-			beforeEach: async function() {
+			beforeEach: async function () {
 				this.oMarkSpy = sinon.spy(FLChangeHandlerBase, "markAsNotApplicable");
 				const mCreatedApp = await createAppEnvironment(oConfig.view, "DynProp");
 				this.oView = mCreatedApp.view;
@@ -190,7 +190,7 @@ sap.ui.define([
 				this.aInitialItemKeys = getItemKeys(this.oControl);
 				this.oSyncStub = sinon.stub(this.oControl, "syncItemsFromPropertyKeys").resolves();
 			},
-			afterEach: function(assert) {
+			afterEach: function (assert) {
 				assert.deepEqual(getItemKeys(this.oControl), this.aInitialItemKeys, "Aggregation unchanged by flex change handler");
 				this.oSyncStub.restore();
 				this.oMarkSpy.restore();
@@ -198,7 +198,7 @@ sap.ui.define([
 			}
 		});
 
-		QUnit.test("Initial state - propertyKeys includes inactive, aggregation excludes inactive", function(assert) {
+		QUnit.test("Initial state - propertyKeys includes inactive, aggregation excludes inactive", function (assert) {
 			assert.deepEqual(
 				this.oControl.getPropertyKeys(),
 				["dynamicInactive", "staticProp1", "staticProp2", "dynamicActive"],
@@ -208,7 +208,7 @@ sap.ui.define([
 			assert.deepEqual(getItemKeys(this.oControl), ["staticProp1", "staticProp2", "dynamicActive"], "Materialized items are correct");
 		});
 
-		QUnit.test("Apply add for inactive property already in propertyKeys", async function(assert) {
+		QUnit.test("Apply add for inactive property already in propertyKeys", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -219,7 +219,7 @@ sap.ui.define([
 				modifier: JsControlTreeModifier,
 				appComponent: this.oUiComponent,
 				view: this.oView
-			}).catch(function(oError) {
+			}).catch(function (oError) {
 				assert.equal(oError.message, "The specified change is already existing - change appliance ignored", "applyChange rejected with not-applicable message");
 			});
 			assert.deepEqual(
@@ -230,7 +230,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 1, "markAsNotApplicable was called");
 		});
 
-		QUnit.test("Apply add for active property at propertyKeys index 0", async function(assert) {
+		QUnit.test("Apply add for active property at propertyKeys index 0", async function (assert) {
 			this.oControl.setPropertyKeys(["dynamicInactive", "staticProp1", "dynamicActive"]);
 
 			const oChangeHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
@@ -252,7 +252,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply add for active property at last propertyKeys index", async function(assert) {
+		QUnit.test("Apply add for active property at last propertyKeys index", async function (assert) {
 			this.oControl.setPropertyKeys(["dynamicInactive", "staticProp1", "dynamicActive"]);
 
 			const oChangeHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
@@ -274,7 +274,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply remove for inactive property not in propertyKeys", async function(assert) {
+		QUnit.test("Apply remove for inactive property not in propertyKeys", async function (assert) {
 			this.oControl.setPropertyKeys(["staticProp1", "staticProp2", "dynamicActive"]);
 
 			const oChangeHandler = oConfig.flex[oConfig.removeItemChangeType].changeHandler;
@@ -287,7 +287,7 @@ sap.ui.define([
 				modifier: JsControlTreeModifier,
 				appComponent: this.oUiComponent,
 				view: this.oView
-			}).catch(function(oError) {
+			}).catch(function (oError) {
 				assert.equal(oError.message, "The specified change is already existing - change appliance ignored", "applyChange rejected with not-applicable message");
 			});
 			assert.deepEqual(
@@ -298,7 +298,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 1, "markAsNotApplicable was called");
 		});
 
-		QUnit.test("Apply move for inactive property not in propertyKeys", async function(assert) {
+		QUnit.test("Apply move for inactive property not in propertyKeys", async function (assert) {
 			this.oControl.setPropertyKeys(["staticProp1", "staticProp2", "dynamicActive"]);
 
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
@@ -311,7 +311,7 @@ sap.ui.define([
 				modifier: JsControlTreeModifier,
 				appComponent: this.oUiComponent,
 				view: this.oView
-			}).catch(function(oError) {
+			}).catch(function (oError) {
 				assert.equal(oError.message, "The specified change is already existing - change appliance ignored", "applyChange rejected with not-applicable message");
 			});
 			assert.deepEqual(
@@ -322,7 +322,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 1, "markAsNotApplicable was called");
 		});
 
-		QUnit.test("Apply move for active property to propertyKeys index 0", async function(assert) {
+		QUnit.test("Apply move for active property to propertyKeys index 0", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -342,7 +342,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply move for active property to propertyKeys index 1 - after inactive", async function(assert) {
+		QUnit.test("Apply move for active property to propertyKeys index 1 - after inactive", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -362,7 +362,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply move for active property to last propertyKeys index", async function(assert) {
+		QUnit.test("Apply move for active property to last propertyKeys index", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -382,7 +382,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply add then move - cumulative index translations", async function(assert) {
+		QUnit.test("Apply add then move - cumulative index translations", async function (assert) {
 			this.oControl.setPropertyKeys(["dynamicInactive", "staticProp1", "dynamicActive"]);
 
 			const oAddHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
@@ -416,7 +416,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert add for inactive property", async function(assert) {
+		QUnit.test("Apply + revert add for inactive property", async function (assert) {
 			this.oControl.setPropertyKeys(["staticProp1", "staticProp2", "dynamicActive"]);
 
 			const oChangeHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
@@ -449,7 +449,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert add for active property", async function(assert) {
+		QUnit.test("Apply + revert add for active property", async function (assert) {
 			this.oControl.setPropertyKeys(["dynamicInactive", "staticProp1", "dynamicActive"]);
 
 			const oChangeHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
@@ -482,7 +482,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert remove for inactive property", async function(assert) {
+		QUnit.test("Apply + revert remove for inactive property", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.removeItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -513,7 +513,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert remove for active property", async function(assert) {
+		QUnit.test("Apply + revert remove for active property", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.removeItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -544,7 +544,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert remove for active property - revert restores propertyKeys index", async function(assert) {
+		QUnit.test("Apply + revert remove for active property - revert restores propertyKeys index", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.removeItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -575,7 +575,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert move for inactive property", async function(assert) {
+		QUnit.test("Apply + revert move for inactive property", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -606,7 +606,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert remove for inactive property at non-zero propertyKeys index (verifies revert index)", async function(assert) {
+		QUnit.test("Apply + revert remove for inactive property at non-zero propertyKeys index (verifies revert index)", async function (assert) {
 			this.oControl.setPropertyKeys(["staticProp1", "staticProp2", "dynamicInactive", "dynamicActive"]);
 
 			const oChangeHandler = oConfig.flex[oConfig.removeItemChangeType].changeHandler;
@@ -642,7 +642,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert move for inactive property at non-zero propertyKeys index (verifies revert index)", async function(assert) {
+		QUnit.test("Apply + revert move for inactive property at non-zero propertyKeys index (verifies revert index)", async function (assert) {
 			this.oControl.setPropertyKeys(["staticProp1", "staticProp2", "dynamicInactive", "dynamicActive"]);
 
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
@@ -678,7 +678,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert move for active property to middle propertyKeys index", async function(assert) {
+		QUnit.test("Apply + revert move for active property to middle propertyKeys index", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -709,7 +709,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert move for active property to last propertyKeys index", async function(assert) {
+		QUnit.test("Apply + revert move for active property to last propertyKeys index", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -741,7 +741,7 @@ sap.ui.define([
 		});
 
 		QUnit.module(oConfig.name + " - XML preprocessing path", {
-			beforeEach: async function() {
+			beforeEach: async function () {
 				this.oMarkSpy = sinon.spy(FLChangeHandlerBase, "markAsNotApplicable");
 				const mCreatedApp = await createAppEnvironment(oConfig.view, "DynProp");
 				this.oView = mCreatedApp.view;
@@ -752,7 +752,7 @@ sap.ui.define([
 				this.oXMLView = this.oView._xContent;
 				this.iInitialChildElementCount = this.oXMLControl.childElementCount;
 			},
-			afterEach: function(assert) {
+			afterEach: function (assert) {
 				assert.strictEqual(this.oXMLControl.childElementCount, this.iInitialChildElementCount,
 					"No aggregation child elements added to XML node");
 				this.oMarkSpy.restore();
@@ -760,7 +760,7 @@ sap.ui.define([
 			}
 		});
 
-		QUnit.test("Apply add for inactive property already in propertyKeys", async function(assert) {
+		QUnit.test("Apply add for inactive property already in propertyKeys", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -771,7 +771,7 @@ sap.ui.define([
 				modifier: XMLTreeModifier,
 				appComponent: this.oUiComponent,
 				view: this.oView
-			}).catch(function(oError) {
+			}).catch(function (oError) {
 				assert.equal(oError.message, "The specified change is already existing - change appliance ignored", "applyChange rejected with not-applicable message");
 			});
 
@@ -784,7 +784,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 1, "markAsNotApplicable was called");
 		});
 
-		QUnit.test("Apply add for active property at propertyKeys index 0", async function(assert) {
+		QUnit.test("Apply add for active property at propertyKeys index 0", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
 
 			this.oXMLControl.setAttribute("propertyKeys", "dynamicInactive,staticProp1,dynamicActive");
@@ -808,7 +808,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply add for active property at last propertyKeys index", async function(assert) {
+		QUnit.test("Apply add for active property at last propertyKeys index", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
 
 			this.oXMLControl.setAttribute("propertyKeys", "dynamicInactive,staticProp1,dynamicActive");
@@ -832,7 +832,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply remove for inactive property not in propertyKeys", async function(assert) {
+		QUnit.test("Apply remove for inactive property not in propertyKeys", async function (assert) {
 			this.oXMLControl.setAttribute("propertyKeys", "staticProp1,staticProp2,dynamicActive");
 
 			const oChangeHandler = oConfig.flex[oConfig.removeItemChangeType].changeHandler;
@@ -845,7 +845,7 @@ sap.ui.define([
 				modifier: XMLTreeModifier,
 				appComponent: this.oUiComponent,
 				view: this.oView
-			}).catch(function(oError) {
+			}).catch(function (oError) {
 				assert.equal(oError.message, "The specified change is already existing - change appliance ignored", "applyChange rejected with not-applicable message");
 			});
 
@@ -858,7 +858,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 1, "markAsNotApplicable was called");
 		});
 
-		QUnit.test("Apply move for inactive property not in propertyKeys", async function(assert) {
+		QUnit.test("Apply move for inactive property not in propertyKeys", async function (assert) {
 			this.oXMLControl.setAttribute("propertyKeys", "staticProp1,staticProp2,dynamicActive");
 
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
@@ -871,7 +871,7 @@ sap.ui.define([
 				modifier: XMLTreeModifier,
 				appComponent: this.oUiComponent,
 				view: this.oView
-			}).catch(function(oError) {
+			}).catch(function (oError) {
 				assert.equal(oError.message, "The specified change is already existing - change appliance ignored", "applyChange rejected with not-applicable message");
 			});
 
@@ -884,7 +884,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 1, "markAsNotApplicable was called");
 		});
 
-		QUnit.test("Apply move for active property to propertyKeys index 0", async function(assert) {
+		QUnit.test("Apply move for active property to propertyKeys index 0", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -906,7 +906,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply move for active property to propertyKeys index 1 - after inactive", async function(assert) {
+		QUnit.test("Apply move for active property to propertyKeys index 1 - after inactive", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -928,7 +928,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply move for active property to last propertyKeys index", async function(assert) {
+		QUnit.test("Apply move for active property to last propertyKeys index", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -950,7 +950,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply add then move - cumulative index translations", async function(assert) {
+		QUnit.test("Apply add then move - cumulative index translations", async function (assert) {
 			this.oXMLControl.setAttribute("propertyKeys", "dynamicInactive,staticProp1,dynamicActive");
 
 			const oAddHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
@@ -985,7 +985,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert add for inactive property", async function(assert) {
+		QUnit.test("Apply + revert add for inactive property", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
 
 			this.oXMLControl.setAttribute("propertyKeys", "staticProp1,staticProp2,dynamicActive");
@@ -1022,7 +1022,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert add for active property", async function(assert) {
+		QUnit.test("Apply + revert add for active property", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.addItemChangeType].changeHandler;
 
 			this.oXMLControl.setAttribute("propertyKeys", "dynamicInactive,staticProp1,dynamicActive");
@@ -1059,7 +1059,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert remove for inactive property", async function(assert) {
+		QUnit.test("Apply + revert remove for inactive property", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.removeItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -1094,7 +1094,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert remove for active property", async function(assert) {
+		QUnit.test("Apply + revert remove for active property", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.removeItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -1129,7 +1129,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert remove for active property - revert restores propertyKeys index", async function(assert) {
+		QUnit.test("Apply + revert remove for active property - revert restores propertyKeys index", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.removeItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -1164,7 +1164,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert move for inactive property", async function(assert) {
+		QUnit.test("Apply + revert move for inactive property", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -1199,7 +1199,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert move for active property", async function(assert) {
+		QUnit.test("Apply + revert move for active property", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -1234,7 +1234,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert move for active property to last propertyKeys index", async function(assert) {
+		QUnit.test("Apply + revert move for active property to last propertyKeys index", async function (assert) {
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
 
 			const oChange = await ChangesWriteAPI.create({
@@ -1269,7 +1269,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert remove for inactive property at non-zero propertyKeys index (verifies revert index)", async function(assert) {
+		QUnit.test("Apply + revert remove for inactive property at non-zero propertyKeys index (verifies revert index)", async function (assert) {
 			this.oXMLControl.setAttribute("propertyKeys", "staticProp1,staticProp2,dynamicInactive,dynamicActive");
 
 			const oChangeHandler = oConfig.flex[oConfig.removeItemChangeType].changeHandler;
@@ -1309,7 +1309,7 @@ sap.ui.define([
 			assert.strictEqual(this.oMarkSpy.callCount, 0, "markAsNotApplicable was not called");
 		});
 
-		QUnit.test("Apply + revert move for inactive property at non-zero propertyKeys index (verifies revert index)", async function(assert) {
+		QUnit.test("Apply + revert move for inactive property at non-zero propertyKeys index (verifies revert index)", async function (assert) {
 			this.oXMLControl.setAttribute("propertyKeys", "staticProp1,staticProp2,dynamicInactive,dynamicActive");
 
 			const oChangeHandler = oConfig.flex[oConfig.moveItemChangeType].changeHandler;
@@ -1350,7 +1350,7 @@ sap.ui.define([
 		});
 
 		QUnit.module(oConfig.name + " - StateUtil pipeline", {
-			beforeEach: async function() {
+			beforeEach: async function () {
 				const mCreatedApp = await createAppEnvironment(oConfig.view, "DynProp");
 				this.oView = mCreatedApp.view;
 				this.oUiComponent = mCreatedApp.comp;
@@ -1359,16 +1359,16 @@ sap.ui.define([
 				this.oControl = this.oView.byId("myControl");
 				await oConfig.initialized(this.oControl);
 			},
-			afterEach: function() {
+			afterEach: function () {
 				this.oUiComponentContainer.destroy();
 			}
 		});
 
-		QUnit.test("Deactivate active dynamic property (isActive: false)", async function(assert) {
+		QUnit.test("Deactivate active dynamic property (isActive: false)", async function (assert) {
 			const aChanges = await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicActive: {isActive: false}
+						dynamicActive: { isActive: false }
 					}
 				}
 			});
@@ -1394,11 +1394,11 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("Activate inactive dynamic property (isActive: true)", async function(assert) {
+		QUnit.test("Activate inactive dynamic property (isActive: true)", async function (assert) {
 			const aChanges = await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicInactive: {isActive: true}
+						dynamicInactive: { isActive: true }
 					}
 				}
 			});
@@ -1424,11 +1424,11 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("Set isActive: true for already-active property", async function(assert) {
+		QUnit.test("Set isActive: true for already-active property", async function (assert) {
 			const aChanges = await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicActive: {isActive: true}
+						dynamicActive: { isActive: true }
 					}
 				}
 			});
@@ -1450,11 +1450,11 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("Set isActive: false for already-inactive property", async function(assert) {
+		QUnit.test("Set isActive: false for already-inactive property", async function (assert) {
 			const aChanges = await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicInactive: {isActive: false}
+						dynamicInactive: { isActive: false }
 					}
 				}
 			});
@@ -1477,11 +1477,11 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("Activate property not in propertyKeys", async function(assert) {
+		QUnit.test("Activate property not in propertyKeys", async function (assert) {
 			await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicNotInShadow: {isActive: true}
+						dynamicNotInShadow: { isActive: true }
 					}
 				}
 			});
@@ -1499,11 +1499,11 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("Deactivate property not in propertyKeys", async function(assert) {
+		QUnit.test("Deactivate property not in propertyKeys", async function (assert) {
 			await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicNotInShadow: {isActive: false}
+						dynamicNotInShadow: { isActive: false }
 					}
 				}
 			});
@@ -1521,11 +1521,11 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("Deactivate then reactivate", async function(assert) {
+		QUnit.test("Deactivate then reactivate", async function (assert) {
 			await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicActive: {isActive: false}
+						dynamicActive: { isActive: false }
 					}
 				}
 			});
@@ -1550,7 +1550,7 @@ sap.ui.define([
 			await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicActive: {isActive: true}
+						dynamicActive: { isActive: true }
 					}
 				}
 			});
@@ -1573,14 +1573,15 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("Add item at beginning - aggregation index 0 maps to propertyKeys index 1", async function(assert) {
+		QUnit.test("Add item at beginning - aggregation index 0 maps to propertyKeys index 1", async function (assert) {
 			const aChanges = await StateUtil.applyExternalState(this.oControl, {
-				items: [{name: "newProp", position: 0}]
+				items: [{ key: "newProp", position: 0 }]
 			});
+
 			await this.oControl.awaitPendingModification();
 			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;}), "add change created");
 
-			const oAddChange = aChanges.find(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;});
+			const oAddChange = aChanges.find(function (oChange) { return oChange.getChangeType() === oConfig.addItemChangeType; });
 			assert.strictEqual(oAddChange.getContent().index, 1,
 				"Change content stores propertyKeys index 1, not aggregation index 0");
 
@@ -1591,20 +1592,21 @@ sap.ui.define([
 			);
 
 			assert.deepEqual(
-				oConfig.getItems(this.oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+				oConfig.getItems(this.oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 				["newProp", "staticProp1", "staticProp2", "dynamicActive"],
 				"Items: newProp at aggregation index 0"
 			);
 		});
 
-		QUnit.test("Move item to end - aggregation index 2 maps to propertyKeys index 3", async function(assert) {
+		QUnit.test("Move item to end - aggregation index 2 maps to propertyKeys index 3", async function (assert) {
 			const aChanges = await StateUtil.applyExternalState(this.oControl, {
-				items: [{name: "staticProp1", position: 2}]
+				items: [{ key: "staticProp1", position: 2 }]
 			});
+
 			await this.oControl.awaitPendingModification();
 			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.moveItemChangeType;}), "move change created");
 
-			const oMoveChange = aChanges.find(function(oChange) {return oChange.getChangeType() === oConfig.moveItemChangeType;});
+			const oMoveChange = aChanges.find(function (oChange) { return oChange.getChangeType() === oConfig.moveItemChangeType; });
 			assert.strictEqual(oMoveChange.getContent().index, 3,
 				"Change content stores propertyKeys index 3, not aggregation index 2");
 
@@ -1615,16 +1617,17 @@ sap.ui.define([
 			);
 
 			assert.deepEqual(
-				oConfig.getItems(this.oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+				oConfig.getItems(this.oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 				["staticProp2", "dynamicActive", "staticProp1"],
 				"Items: staticProp1 moved to aggregation index 2"
 			);
 		});
 
-		QUnit.test("Remove + re-add item - re-add at aggregation index 0 maps to propertyKeys index 1", async function(assert) {
+		QUnit.test("Remove + re-add item - re-add at aggregation index 0 maps to propertyKeys index 1", async function (assert) {
 			const aRemoveChanges = await StateUtil.applyExternalState(this.oControl, {
-				items: [{name: "staticProp1", visible: false}]
+				items: [{ key: "staticProp1", visible: false }]
 			});
+
 			await this.oControl.awaitPendingModification();
 			assert.ok(aRemoveChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.removeItemChangeType;}), "remove change created");
 
@@ -1635,18 +1638,18 @@ sap.ui.define([
 			);
 
 			assert.deepEqual(
-				oConfig.getItems(this.oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+				oConfig.getItems(this.oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 				["staticProp2", "dynamicActive"],
 				"After remove: staticProp1 removed from items"
 			);
 
 			const aAddChanges = await StateUtil.applyExternalState(this.oControl, {
-				items: [{name: "staticProp1", position: 0}]
+				items: [{ key: "staticProp1", position: 0 }]
 			});
 			await this.oControl.awaitPendingModification();
 			assert.ok(aAddChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;}), "add change created for re-add");
 
-			const oReAddChange = aAddChanges.find(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;});
+			const oReAddChange = aAddChanges.find(function (oChange) { return oChange.getChangeType() === oConfig.addItemChangeType; });
 			assert.strictEqual(oReAddChange.getContent().index, 1,
 				"Re-add change content stores propertyKeys index 1, not aggregation index 0");
 
@@ -1657,66 +1660,66 @@ sap.ui.define([
 			);
 
 			assert.deepEqual(
-				oConfig.getItems(this.oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+				oConfig.getItems(this.oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 				["staticProp1", "staticProp2", "dynamicActive"],
 				"After re-add: staticProp1 at aggregation index 0"
 			);
 		});
 
-		QUnit.test("Apply filter for inactive property", async function(assert) {
+		QUnit.test("Apply filter for inactive property", async function (assert) {
 			// Without finalized PropertyInfo
 			let aChanges = await StateUtil.applyExternalState(this.oControl, {
 				filter: {
-					dynamicInactive: [{operator: "EQ", values: ["test"]}]
+					dynamicInactive: [{ operator: "EQ", values: ["test"] }]
 				}
 			});
 
-			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addCondition";}), "addCondition change created");
-			assert.deepEqual(this.oControl.getFilterConditions(), {dynamicInactive: [{operator: "EQ", values: ["test"]}]}, "Filter condition");
+			assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addCondition"; }), "addCondition change created");
+			assert.deepEqual(this.oControl.getFilterConditions(), { dynamicInactive: [{ operator: "EQ", values: ["test"] }] }, "Filter condition");
 
 			// Undo and repeat with finalized PropertyInfo
 			await StateUtil.applyExternalState(this.oControl, {
 				filter: {
-					dynamicInactive: [{operator: "EQ", values: ["test"], filtered: false}]
+					dynamicInactive: [{ operator: "EQ", values: ["test"], filtered: false }]
 				}
 			});
 			await this.oControl.finalizePropertyHelper();
 
 			aChanges = await StateUtil.applyExternalState(this.oControl, {
 				filter: {
-					dynamicInactive: [{operator: "EQ", values: ["test"]}]
+					dynamicInactive: [{ operator: "EQ", values: ["test"] }]
 				}
 			});
 
-			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addCondition";}), "addCondition change created (PropertyInfo finalized)");
-			assert.deepEqual(this.oControl.getFilterConditions(), {dynamicInactive: [{operator: "EQ", values: ["test"]}]}, "Filter condition (PropertyInfo finalized)");
+			assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addCondition"; }), "addCondition change created (PropertyInfo finalized)");
+			assert.deepEqual(this.oControl.getFilterConditions(), { dynamicInactive: [{ operator: "EQ", values: ["test"] }] }, "Filter condition (PropertyInfo finalized)");
 		});
 
-		QUnit.test("Activate property and apply filter in one call", async function(assert) {
+		QUnit.test("Activate property and apply filter in one call", async function (assert) {
 			// Without finalized PropertyInfo
 			let aChanges = await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicInactive: {isActive: true}
+						dynamicInactive: { isActive: true }
 					}
 				},
 				filter: {
-					dynamicInactive: [{operator: "EQ", values: ["test"]}]
+					dynamicInactive: [{ operator: "EQ", values: ["test"] }]
 				}
 			});
 
-			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addCondition";}), "addCondition change created");
-			assert.deepEqual(this.oControl.getFilterConditions(), {dynamicInactive: [{operator: "EQ", values: ["test"]}]}, "Filter condition");
+			assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addCondition"; }), "addCondition change created");
+			assert.deepEqual(this.oControl.getFilterConditions(), { dynamicInactive: [{ operator: "EQ", values: ["test"] }] }, "Filter condition");
 
 			// Undo and repeat with finalized PropertyInfo
 			await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicInactive: {isActive: false}
+						dynamicInactive: { isActive: false }
 					}
 				},
 				filter: {
-					dynamicInactive: [{operator: "EQ", values: ["test"], filtered: false}]
+					dynamicInactive: [{ operator: "EQ", values: ["test"], filtered: false }]
 				}
 			});
 			await this.oControl.finalizePropertyHelper();
@@ -1724,35 +1727,35 @@ sap.ui.define([
 			aChanges = await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicInactive: {isActive: true}
+						dynamicInactive: { isActive: true }
 					}
 				},
 				filter: {
-					dynamicInactive: [{operator: "EQ", values: ["test"]}]
+					dynamicInactive: [{ operator: "EQ", values: ["test"] }]
 				}
 			});
 
-			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addCondition";}), "addCondition change created (PropertyInfo finalized)");
-			assert.deepEqual(this.oControl.getFilterConditions(), {dynamicInactive: [{operator: "EQ", values: ["test"]}]}, "Filter condition (PropertyInfo finalized)");
+			assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addCondition"; }), "addCondition change created (PropertyInfo finalized)");
+			assert.deepEqual(this.oControl.getFilterConditions(), { dynamicInactive: [{ operator: "EQ", values: ["test"] }] }, "Filter condition (PropertyInfo finalized)");
 		});
 
-		QUnit.test("Add item and activate property in one call", async function(assert) {
+		QUnit.test("Add item and activate property in one call", async function (assert) {
 			// Without finalized PropertyInfo
 			let aChanges = await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicNotInShadow: {isActive: true}
+						dynamicNotInShadow: { isActive: true }
 					}
 				},
-				items: [{name: "dynamicNotInShadow", position: 0}]
+				items: [{ key: "dynamicNotInShadow", position: 0 }]
 			});
 			await this.oControl.awaitPendingModification();
 
-			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;}),
+			assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === oConfig.addItemChangeType; }),
 				oConfig.addItemChangeType + " change created"
 			);
 
-			const oAddChange = aChanges.find(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;});
+			const oAddChange = aChanges.find(function (oChange) { return oChange.getChangeType() === oConfig.addItemChangeType; });
 			assert.strictEqual(oAddChange.getContent().index, 1,
 				"Change content stores propertyKeys index 1, not aggregation index 0");
 
@@ -1762,7 +1765,7 @@ sap.ui.define([
 				"propertyKeys: dynamicNotInShadow added at index 1 (after inactive)"
 			);
 			assert.deepEqual(
-				oConfig.getItems(this.oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+				oConfig.getItems(this.oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 				["dynamicNotInShadow", "staticProp1", "staticProp2", "dynamicActive"],
 				"Items: dynamicNotInShadow materialized at aggregation index 0"
 			);
@@ -1771,10 +1774,10 @@ sap.ui.define([
 			await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicNotInShadow: {isActive: false}
+						dynamicNotInShadow: { isActive: false }
 					}
 				},
-				items: [{name: "dynamicNotInShadow", visible: false}]
+				items: [{ key: "dynamicNotInShadow", visible: false }]
 			});
 			await this.oControl.awaitPendingModification();
 			await this.oControl.finalizePropertyHelper();
@@ -1782,18 +1785,18 @@ sap.ui.define([
 			aChanges = await StateUtil.applyExternalState(this.oControl, {
 				supplementaryConfig: {
 					propertyInfo: {
-						dynamicNotInShadow: {isActive: true}
+						dynamicNotInShadow: { isActive: true }
 					}
 				},
-				items: [{name: "dynamicNotInShadow", position: 0}]
+				items: [{ key: "dynamicNotInShadow", position: 0 }]
 			});
 			await this.oControl.awaitPendingModification();
 
-			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;}),
+			assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === oConfig.addItemChangeType; }),
 				oConfig.addItemChangeType + " change created (PropertyInfo finalized)"
 			);
 
-			const oAddChangeFinalized = aChanges.find(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;});
+			const oAddChangeFinalized = aChanges.find(function (oChange) { return oChange.getChangeType() === oConfig.addItemChangeType; });
 			assert.strictEqual(oAddChangeFinalized.getContent().index, 1,
 				"Change content stores propertyKeys index 1, not aggregation index 0 (PropertyInfo finalized)");
 
@@ -1803,164 +1806,179 @@ sap.ui.define([
 				"propertyKeys: dynamicNotInShadow added at index 1 (PropertyInfo finalized)"
 			);
 			assert.deepEqual(
-				oConfig.getItems(this.oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+				oConfig.getItems(this.oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 				["dynamicNotInShadow", "staticProp1", "staticProp2", "dynamicActive"],
 				"Items: dynamicNotInShadow materialized at aggregation index 0 (PropertyInfo finalized)"
 			);
 		});
 
 		if (oConfig.name === "Table") {
-			QUnit.test("Apply sorter for inactive property", async function(assert) {
+			QUnit.test("Apply sorter for inactive property", async function (assert) {
 				const aChanges = await StateUtil.applyExternalState(this.oControl, {
-					sorters: [{key: "dynamicInactive", descending: false}]
+					sorters: [{ key: "dynamicInactive", descending: false }]
 				});
 
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addSort";}), "addSort change created");
-				assert.deepEqual(this.oControl.getSortConditions().sorters, [{key: "dynamicInactive", name: "dynamicInactive", descending: false}],
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addSort"; }), "addSort change created");
+				assert.deepEqual(this.oControl.getSortConditions().sorters, [{
+					key: "dynamicInactive",
+					descending: false
+				}],
 					"Sort condition");
 			});
 
-			QUnit.test("Apply groupLevel for inactive property", async function(assert) {
+			QUnit.test("Apply groupLevel for inactive property", async function (assert) {
 				const aChanges = await StateUtil.applyExternalState(this.oControl, {
-					groupLevels: [{key: "dynamicInactive"}]
+					groupLevels: [{ key: "dynamicInactive" }]
 				});
 
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addGroup";}), "addGroup change created");
-				assert.deepEqual(this.oControl.getGroupConditions().groupLevels, [{key: "dynamicInactive", name: "dynamicInactive"}],
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addGroup"; }), "addGroup change created");
+				assert.deepEqual(this.oControl.getGroupConditions().groupLevels, [{
+					key: "dynamicInactive"
+				}],
 					"Group condition");
 			});
 
-			QUnit.test("Apply aggregate for inactive property", async function(assert) {
+			QUnit.test("Apply aggregate for inactive property", async function (assert) {
 				const aChanges = await StateUtil.applyExternalState(this.oControl, {
-					aggregations: {dynamicInactive: {}}
+					aggregations: { dynamicInactive: {} }
 				});
 
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addAggregate";}), "addAggregate change created");
-				assert.deepEqual(this.oControl.getAggregateConditions(), {dynamicInactive: {}}, "Aggregate condition");
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addAggregate"; }), "addAggregate change created");
+				assert.deepEqual(this.oControl.getAggregateConditions(), { dynamicInactive: {} }, "Aggregate condition");
 			});
 
-			QUnit.test("Activate property and apply sorter in one call", async function(assert) {
+			QUnit.test("Activate property and apply sorter in one call", async function (assert) {
 				// Without finalized PropertyInfo
 				let aChanges = await StateUtil.applyExternalState(this.oControl, {
 					supplementaryConfig: {
 						propertyInfo: {
-							dynamicInactive: {isActive: true}
+							dynamicInactive: { isActive: true }
 						}
 					},
-					sorters: [{key: "dynamicInactive", descending: true}]
+					sorters: [{ key: "dynamicInactive", descending: true }]
 				});
 
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "setPropertyAttribute";}), "setPropertyAttribute change created");
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addSort";}), "addSort change created");
-				assert.deepEqual(this.oControl.getSortConditions().sorters, [{key: "dynamicInactive", name: "dynamicInactive", descending: true}],
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "setPropertyAttribute"; }), "setPropertyAttribute change created");
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addSort"; }), "addSort change created");
+				assert.deepEqual(this.oControl.getSortConditions().sorters, [{
+					key: "dynamicInactive",
+					descending: true
+				}],
 					"Sort condition");
 
 				// Undo and repeat with finalized PropertyInfo
 				await StateUtil.applyExternalState(this.oControl, {
 					supplementaryConfig: {
 						propertyInfo: {
-							dynamicInactive: {isActive: false}
+							dynamicInactive: { isActive: false }
 						}
 					},
-					sorters: [{key: "dynamicInactive", sorted: false}]
+					sorters: [{ key: "dynamicInactive", sorted: false }]
 				});
 				await this.oControl.finalizePropertyHelper();
 
 				aChanges = await StateUtil.applyExternalState(this.oControl, {
 					supplementaryConfig: {
 						propertyInfo: {
-							dynamicInactive: {isActive: true}
+							dynamicInactive: { isActive: true }
 						}
 					},
-					sorters: [{key: "dynamicInactive", descending: true}]
+					sorters: [{ key: "dynamicInactive", descending: true }]
 				});
 
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "setPropertyAttribute";}), "setPropertyAttribute change created (PropertyInfo finalized)");
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addSort";}), "addSort change created (PropertyInfo finalized)");
-				assert.deepEqual(this.oControl.getSortConditions().sorters, [{key: "dynamicInactive", name: "dynamicInactive", descending: true}],
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "setPropertyAttribute"; }), "setPropertyAttribute change created (PropertyInfo finalized)");
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addSort"; }), "addSort change created (PropertyInfo finalized)");
+				assert.deepEqual(this.oControl.getSortConditions().sorters, [{
+					key: "dynamicInactive",
+					descending: true
+				}],
 					"Sort condition (PropertyInfo finalized)");
 			});
 
-			QUnit.test("Activate property and apply groupLevel in one call", async function(assert) {
+			QUnit.test("Activate property and apply groupLevel in one call", async function (assert) {
 				// Without finalized PropertyInfo
 				let aChanges = await StateUtil.applyExternalState(this.oControl, {
 					supplementaryConfig: {
 						propertyInfo: {
-							dynamicInactive: {isActive: true}
+							dynamicInactive: { isActive: true }
 						}
 					},
-					groupLevels: [{key: "dynamicInactive"}]
+					groupLevels: [{ key: "dynamicInactive" }]
 				});
 
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "setPropertyAttribute";}), "setPropertyAttribute change created");
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addGroup";}), "addGroup change created");
-				assert.deepEqual(this.oControl.getGroupConditions().groupLevels, [{key: "dynamicInactive", name: "dynamicInactive"}],
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "setPropertyAttribute"; }), "setPropertyAttribute change created");
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addGroup"; }), "addGroup change created");
+				assert.deepEqual(this.oControl.getGroupConditions().groupLevels, [{
+					key: "dynamicInactive"
+				}],
 					"Group condition set for activated property");
 
 				// Undo and repeat with finalized PropertyInfo
 				await StateUtil.applyExternalState(this.oControl, {
 					supplementaryConfig: {
 						propertyInfo: {
-							dynamicInactive: {isActive: false}
+							dynamicInactive: { isActive: false }
 						}
 					},
-					groupLevels: [{key: "dynamicInactive", grouped: false}]
+					groupLevels: [{ key: "dynamicInactive", grouped: false }]
 				});
 				await this.oControl.finalizePropertyHelper();
 
 				aChanges = await StateUtil.applyExternalState(this.oControl, {
 					supplementaryConfig: {
 						propertyInfo: {
-							dynamicInactive: {isActive: true}
+							dynamicInactive: { isActive: true }
 						}
 					},
-					groupLevels: [{key: "dynamicInactive"}]
+					groupLevels: [{ key: "dynamicInactive" }]
 				});
 
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "setPropertyAttribute";}), "setPropertyAttribute change created (PropertyInfo finalized)");
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addGroup";}), "addGroup change created (PropertyInfo finalized)");
-				assert.deepEqual(this.oControl.getGroupConditions().groupLevels, [{key: "dynamicInactive", name: "dynamicInactive"}],
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "setPropertyAttribute"; }), "setPropertyAttribute change created (PropertyInfo finalized)");
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addGroup"; }), "addGroup change created (PropertyInfo finalized)");
+				assert.deepEqual(this.oControl.getGroupConditions().groupLevels, [{
+					key: "dynamicInactive"
+				}],
 					"Group condition set for activated property (PropertyInfo finalized)");
 			});
 
-			QUnit.test("Activate property and apply aggregate in one call", async function(assert) {
+			QUnit.test("Activate property and apply aggregate in one call", async function (assert) {
 				// Without finalized PropertyInfo
 				let aChanges = await StateUtil.applyExternalState(this.oControl, {
 					supplementaryConfig: {
 						propertyInfo: {
-							dynamicInactive: {isActive: true}
+							dynamicInactive: { isActive: true }
 						}
 					},
-					aggregations: {dynamicInactive: {}}
+					aggregations: { dynamicInactive: {} }
 				});
 
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "setPropertyAttribute";}), "setPropertyAttribute change created");
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addAggregate";}), "addAggregate change created");
-				assert.deepEqual(this.oControl.getAggregateConditions(), {dynamicInactive: {}}, "Aggregate condition set for activated property");
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "setPropertyAttribute"; }), "setPropertyAttribute change created");
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addAggregate"; }), "addAggregate change created");
+				assert.deepEqual(this.oControl.getAggregateConditions(), { dynamicInactive: {} }, "Aggregate condition set for activated property");
 
 				// Undo and repeat with finalized PropertyInfo
 				await StateUtil.applyExternalState(this.oControl, {
 					supplementaryConfig: {
 						propertyInfo: {
-							dynamicInactive: {isActive: false}
+							dynamicInactive: { isActive: false }
 						}
 					},
-					aggregations: {dynamicInactive: {aggregated: false}}
+					aggregations: { dynamicInactive: { aggregated: false } }
 				});
 				await this.oControl.finalizePropertyHelper();
 
 				aChanges = await StateUtil.applyExternalState(this.oControl, {
 					supplementaryConfig: {
 						propertyInfo: {
-							dynamicInactive: {isActive: true}
+							dynamicInactive: { isActive: true }
 						}
 					},
-					aggregations: {dynamicInactive: {}}
+					aggregations: { dynamicInactive: {} }
 				});
 
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "setPropertyAttribute";}), "setPropertyAttribute change created (PropertyInfo finalized)");
-				assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === "addAggregate";}), "addAggregate change created (PropertyInfo finalized)");
-				assert.deepEqual(this.oControl.getAggregateConditions(), {dynamicInactive: {}}, "Aggregate condition set for activated property (PropertyInfo finalized)");
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "setPropertyAttribute"; }), "setPropertyAttribute change created (PropertyInfo finalized)");
+				assert.ok(aChanges.some(function (oChange) { return oChange.getChangeType() === "addAggregate"; }), "addAggregate change created (PropertyInfo finalized)");
+				assert.deepEqual(this.oControl.getAggregateConditions(), { dynamicInactive: {} }, "Aggregate condition set for activated property (PropertyInfo finalized)");
 			});
 		}
 
@@ -1972,7 +1990,7 @@ sap.ui.define([
 				"propertyKeys: initial 4 entries"
 			);
 			assert.deepEqual(
-				oConfig.getItems(oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+				oConfig.getItems(oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 				["staticProp1", "staticProp2", "dynamicActive"],
 				"Aggregation: initial 3 items"
 			);
@@ -1984,15 +2002,15 @@ sap.ui.define([
 			action: {
 				name: "settings",
 				controlId: "myControl",
-				parameter: function() {
+				parameter: function () {
 					return {
 						changeType: oConfig.addItemChangeType,
-						content: {name: "newProp", index: 1}
+						content: { key: "newProp", index: 1 }
 					};
 				}
 			},
 			changesAfterCondensing: 1,
-			afterAction: function(oUiComponent, oViewAfterAction, assert) {
+			afterAction: function (oUiComponent, oViewAfterAction, assert) {
 				const oControl = oViewAfterAction.byId("myControl");
 				assert.deepEqual(
 					oControl.getPropertyKeys(),
@@ -2000,13 +2018,13 @@ sap.ui.define([
 					"After add: newProp at propertyKeys index 1"
 				);
 				assert.deepEqual(
-					oConfig.getItems(oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+					oConfig.getItems(oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 					["newProp", "staticProp1", "staticProp2", "dynamicActive"],
 					"After add: newProp at aggregation index 0"
 				);
 			},
 			afterUndo: fnConfirmInitialState,
-			afterRedo: function(oUiComponent, oViewAfterAction, assert) {
+			afterRedo: function (oUiComponent, oViewAfterAction, assert) {
 				const oControl = oViewAfterAction.byId("myControl");
 				assert.deepEqual(
 					oControl.getPropertyKeys(),
@@ -2014,7 +2032,7 @@ sap.ui.define([
 					"After redo (post-condenser): newProp still at propertyKeys index 1"
 				);
 				assert.deepEqual(
-					oConfig.getItems(oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+					oConfig.getItems(oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 					["newProp", "staticProp1", "staticProp2", "dynamicActive"],
 					"After redo (post-condenser): newProp at aggregation index 0"
 				);
@@ -2027,15 +2045,15 @@ sap.ui.define([
 			action: {
 				name: "settings",
 				controlId: "myControl",
-				parameter: function() {
+				parameter: function () {
 					return {
 						changeType: oConfig.moveItemChangeType,
-						content: {name: "staticProp1", index: 3}
+						content: { key: "staticProp1", index: 3 }
 					};
 				}
 			},
 			changesAfterCondensing: 1,
-			afterAction: function(oUiComponent, oViewAfterAction, assert) {
+			afterAction: function (oUiComponent, oViewAfterAction, assert) {
 				const oControl = oViewAfterAction.byId("myControl");
 				assert.deepEqual(
 					oControl.getPropertyKeys(),
@@ -2043,13 +2061,13 @@ sap.ui.define([
 					"After move: staticProp1 at propertyKeys index 3"
 				);
 				assert.deepEqual(
-					oConfig.getItems(oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+					oConfig.getItems(oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 					["staticProp2", "dynamicActive", "staticProp1"],
 					"After move: staticProp1 at aggregation index 2"
 				);
 			},
 			afterUndo: fnConfirmInitialState,
-			afterRedo: function(oUiComponent, oViewAfterAction, assert) {
+			afterRedo: function (oUiComponent, oViewAfterAction, assert) {
 				const oControl = oViewAfterAction.byId("myControl");
 				assert.deepEqual(
 					oControl.getPropertyKeys(),
@@ -2057,7 +2075,7 @@ sap.ui.define([
 					"After redo (post-condenser): staticProp1 still at propertyKeys index 3"
 				);
 				assert.deepEqual(
-					oConfig.getItems(oControl).map(function(oItem) {return oItem.getPropertyKey();}),
+					oConfig.getItems(oControl).map(function (oItem) { return oItem.getPropertyKey(); }),
 					["staticProp2", "dynamicActive", "staticProp1"],
 					"After redo (post-condenser): staticProp1 at aggregation index 2"
 				);
@@ -2070,26 +2088,26 @@ sap.ui.define([
 			action: {
 				name: "settings",
 				controlId: "myControl",
-				parameter: function() {
+				parameter: function () {
 					return {
 						changeType: oConfig.removeItemChangeType,
-						content: {name: "newProp"}
+						content: { key: "newProp" }
 					};
 				}
 			},
 			previousActions: [{
 				name: "settings",
 				controlId: "myControl",
-				parameter: function() {
+				parameter: function () {
 					return {
 						changeType: oConfig.addItemChangeType,
-						content: {name: "newProp", index: 1}
+						content: { key: "newProp", index: 1 }
 					};
 				}
 			}],
 			changesAfterCondensing: 0,
 			afterAction: fnConfirmInitialState,
-			afterUndo: function(oUiComponent, oViewAfterAction, assert) {
+			afterUndo: function (oUiComponent, oViewAfterAction, assert) {
 				const oControl = oViewAfterAction.byId("myControl");
 				assert.deepEqual(
 					oControl.getPropertyKeys(),

@@ -486,7 +486,7 @@ sap.ui.define([
 			assert.strictEqual(aChanges.length, 1, "One change is created");
 			assert.strictEqual(aChanges[0].changeSpecificData.changeType, "setFixedColumnCount", "Change type is correct");
 			assert.strictEqual(aChanges[0].changeSpecificData.content.value, 2, "Change content value is correct");
-			assert.strictEqual(aChanges[0].changeSpecificData.content.name, "GridTable", "Name is correct");
+			assert.strictEqual(aChanges[0].changeSpecificData.content.key, "GridTable", "Key is correct");
 
 			done();
 		};

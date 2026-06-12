@@ -326,11 +326,11 @@ sap.ui.define([
 	QUnit.test("Check '_sortItems' sorts items by position", function(assert) {
 		// Arrange
 		const aItems = [
-			{ name: "A", position: 2 },
-			{ name: "B", position: -1 },
-			{ name: "C", position: 1 },
-			{ name: "D", position: 0 },
-			{ name: "E", position: -1 }
+			{ key: "A", position: 2 },
+			{ key: "B", position: -1 },
+			{ key: "C", position: 1 },
+			{ key: "D", position: 0 },
+			{ key: "E", position: -1 }
 		];
 
 		// Act
@@ -338,7 +338,7 @@ sap.ui.define([
 
 		// Assert
 		assert.deepEqual(
-			aItems.map(function(item){ return item.name; }),
+			aItems.map(function(item){ return item.key; }),
 			["D", "C", "A", "B", "E"],
 			"Items are sorted by position, with -1 at the end"
 		);

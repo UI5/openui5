@@ -569,8 +569,7 @@ sap.ui.define([
 			aFilterItems.forEach((oFilterField) => {
 				const sPropertyKey = oFilterField.getPropertyKey();
 				aItems.push({
-					key: sPropertyKey,
-					name: sPropertyKey
+					key: sPropertyKey
 				});
 			});
 

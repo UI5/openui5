@@ -2,8 +2,8 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/m/p13n/Engine", "sap/ui/mdc/flexibility/Util", "sap/ui/fl/changeHandler/condenser/Classification"
-], (Engine, Util, CondenserClassification) => {
+	"sap/m/p13n/Engine", "sap/ui/mdc/flexibility/Util", "sap/ui/fl/changeHandler/condenser/Classification", "sap/ui/mdc/util/getKey"
+], (Engine, Util, CondenserClassification, getKey) => {
 	"use strict";
 
 	const fFinalizeAggregateChange = function(oChange, oControl, oAggregateContent, bIsRevert) {
@@ -24,10 +24,11 @@ sap.ui.define([
 			Promise.resolve()
 				.then(oModifier.getProperty.bind(oModifier, oControl, "aggregateConditions"))
 				.then((oAggregateConditions) => {
+					const sKey = getKey(oChangeContent);
 					const oAggregations = oAggregateConditions ? oAggregateConditions : {};
-					oAggregations[oChangeContent.name] = {};
+					oAggregations[sKey] = {};
 					const oAggregateContent = {
-						name: oChangeContent.name
+						key: sKey
 					};
 					oModifier.setProperty(oControl, "aggregateConditions", oAggregations);
 					fFinalizeAggregateChange(oChange, oControl, oAggregateContent, bIsRevert);
@@ -54,7 +55,7 @@ sap.ui.define([
 						reject();
 					}
 
-					delete aValue[oChangeContent.name];
+					delete aValue[getKey(oChangeContent)];
 					oModifier.setProperty(oControl, "aggregateConditions", aValue);
 					fFinalizeAggregateChange(oChange, oControl, oChangeContent, bIsRevert);
 					resolve();
@@ -72,7 +73,7 @@ sap.ui.define([
 		return {
 			classification: CondenserClassification.Reverse,
 			affectedControl: oChange.getSelector(),
-			uniqueKey: "aggregate" + "_" + oContent.name
+			uniqueKey: "aggregate" + "_" + getKey(oContent)
 		};
 	};
 

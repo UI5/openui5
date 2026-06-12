@@ -6,8 +6,9 @@ sap.ui.define([
 	"sap/m/p13n/SelectionController",
 	"sap/ui/mdc/enums/TableType",
 	'sap/m/p13n/modules/xConfigAPI',
-	"sap/base/util/merge"
-], (BaseController, TableType, xConfigAPI, merge) => {
+	"sap/base/util/merge",
+	'sap/ui/mdc/util/getKey'
+], (BaseController, TableType, xConfigAPI, merge, getKey) => {
 	"use strict";
 
 	/**
@@ -106,11 +107,15 @@ sap.ui.define([
 
 		aChanges.forEach((oChange) => {
 			const oChangeContent = merge({}, oChange.changeSpecificData.content);
+			const sKey = getKey(oChangeContent);
+
 			const oXSettings = {
-				name: oChangeContent.name,
+				key: sKey,
+
 				controlMeta: {
 					aggregation: "type"
 				},
+
 				property: "fixedColumnCount",
 				value: oChangeContent.value
 			};
@@ -125,7 +130,7 @@ sap.ui.define([
 		const aState = [];
 		if (oState?.aggregations?.type?.GridTable) {
 			aState.push({
-				name: "GridTable",
+				key: "GridTable",
 				fixedColumnCount: oState.aggregations.type.GridTable.fixedColumnCount
 			});
 		}

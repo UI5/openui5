@@ -3,8 +3,8 @@
  */
 
 sap.ui.define([
-	'./ItemBaseFlex', './Util', "sap/ui/fl/changeHandler/common/ChangeCategories"
-], (ItemBaseFlex, Util, ChangeCategories) => {
+	'./ItemBaseFlex', './Util', "sap/ui/fl/changeHandler/common/ChangeCategories", "sap/ui/mdc/util/getKey"
+], (ItemBaseFlex, Util, ChangeCategories, getKey) => {
 	"use strict";
 
 	const ColumnFlex = Object.assign({}, ItemBaseFlex);
@@ -32,7 +32,8 @@ sap.ui.define([
 		const oContent = oChange.getContent();
 		const oTable = oAppComponent.byId(oChange.getSelector().id);
 		let sKey;
-		const aArgs = [oContent.name];
+		const sContentKey = getKey(oContent);
+		const aArgs = [sContentKey];
 		const mVersionInfo = { descriptionPayload: {} };
 
 		if (oChange.getChangeType() === "addColumn") {
@@ -50,13 +51,13 @@ sap.ui.define([
 		}
 
 		if (oTable) {
-			const oProperty = oTable.getPropertyHelper()?.getProperty(oContent.name, true);
+			const oProperty = oTable.getPropertyHelper()?.getProperty(sContentKey, true);
 			if (oProperty) {
 				aArgs.splice(0, 1, oProperty.label);
 			}
 		}
 
-		return Util.getInactiveAwareResourceText(oTable, oContent.name, sKey, aArgs).then((sDescription) => {
+		return Util.getInactiveAwareResourceText(oTable, sContentKey, sKey, aArgs).then((sDescription) => {
 			mVersionInfo.descriptionPayload.description = sDescription;
 
 			mVersionInfo.updateRequired = true;

@@ -37,7 +37,7 @@ sap.ui.define([
 				"id": "myFilterBarView--myFilterBar"
 			},
 			"content": {
-				"name":"to_nav/field1",
+				"key": "to_nav/field1",
 				"condition":{"operator":sOperator,"values":["12"]}
 			}
 		};
@@ -67,7 +67,7 @@ sap.ui.define([
 			},
 			"content": {
 			//	"id": "comp---view--myFilterBar--Category",
-				"name": "Category",
+				"key": "Category",
 				"idIsLocal": false
 			}
 		};
@@ -80,7 +80,7 @@ sap.ui.define([
 				"id": "myFilterBarView--myFilterBar"
 			},
 			"content": {
-				"name": sProperty
+				"key": sProperty
 			}
 		};
 	}
@@ -92,7 +92,7 @@ sap.ui.define([
 				"id": "myFilterBarView--myFilterBar"
 			},
 			"content": {
-				"name": sProperty,
+				"key": sProperty,
 				"index": nIdx
 			}
 		};
@@ -335,7 +335,7 @@ sap.ui.define([
 		}).then(function(oChange) {
 			const oChangeHandler = FilterBarFlexHandler["addCondition"].changeHandler;
 
-			assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], undefined, "condition initially non existing");
+			assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], undefined, "condition initially non existing");
 			this.oFilterBar._applyInitialFilterConditions();
 
 			// Test apply
@@ -344,15 +344,15 @@ sap.ui.define([
 				appComponent: this.oUiComponent,
 				view: this.oView
 			}).then(function() {
-				assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], [ oContent.content.condition ], "condition has been applied successfully");
+				assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], [ oContent.content.condition ], "condition has been applied successfully");
 				// Test revert
 				oChangeHandler.revertChange(oChange, this.oFilterBar, {
 					modifier: JsControlTreeModifier,
 					appComponent: this.oUiComponent,
 					view: this.oView
 				}).then(function() {
-					assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], [], "condition empty");
-					assert.deepEqual(this.oFilterBar._getConditionModel().getConditions(oContent.content.name), [], "Condition model does not contain conditions");
+					assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], [], "condition empty");
+					assert.deepEqual(this.oFilterBar._getConditionModel().getConditions(oContent.content.key), [], "Condition model does not contain conditions");
 					done();
 				}.bind(this));
 			}.bind(this));
@@ -384,7 +384,7 @@ sap.ui.define([
 		}).then(function(oChange) {
 			const oChangeHandler = FilterBarFlexHandler["addCondition"].changeHandler;
 
-			assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], undefined, "condition initially non existing");
+			assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], undefined, "condition initially non existing");
 			this.oFilterBar._applyInitialFilterConditions();
 
 			// Test apply
@@ -393,15 +393,15 @@ sap.ui.define([
 				appComponent: this.oUiComponent,
 				view: this.oView
 			}).then(function() {
-				assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], [ oContent.content.condition ], "condition has been applied successfully");
+				assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], [ oContent.content.condition ], "condition has been applied successfully");
 				// Test revert
 				oChangeHandler.revertChange(oChange, this.oFilterBar, {
 					modifier: JsControlTreeModifier,
 					appComponent: this.oUiComponent,
 					view: this.oView
 				}).then(function() {
-					assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], [], "condition empty");
-					assert.deepEqual(this.oFilterBar._getConditionModel().getConditions(oContent.content.name), [], "Condition model does not contain conditions");
+					assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], [], "condition empty");
+					assert.deepEqual(this.oFilterBar._getConditionModel().getConditions(oContent.content.key), [], "Condition model does not contain conditions");
 					done();
 				}.bind(this));
 			}.bind(this));
@@ -419,7 +419,7 @@ sap.ui.define([
 		}).then(function(oChange) {
 			const oChangeHandler = FilterBarFlexHandler["addCondition"].changeHandler;
 
-			assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], undefined, "condition initially non existing");
+			assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], undefined, "condition initially non existing");
 			this.oFilterBar._applyInitialFilterConditions();
 
 			// Test apply
@@ -429,7 +429,7 @@ sap.ui.define([
 				view: this.oView
 			}).then(function() {
 				assert.deepEqual(this.oFilterBar.getFilterConditions(), {}, "condition has been applied successfully");
-				assert.deepEqual(this.oFilterBar._getConditionModel().getConditions(oContent.content.name), [], "Condition model does not contain conditions");
+				assert.deepEqual(this.oFilterBar._getConditionModel().getConditions(oContent.content.key), [], "Condition model does not contain conditions");
 
 				// Test revert
 				oChangeHandler.revertChange(oChange, this.oFilterBar, {
@@ -437,8 +437,8 @@ sap.ui.define([
 					appComponent: this.oUiComponent,
 					view: this.oView
 				}).then(function() {
-					assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], undefined, "condition empty");
-					assert.deepEqual(this.oFilterBar._getConditionModel().getConditions(oContent.content.name), [], "Condition model does not contain conditions");
+					assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], undefined, "condition empty");
+					assert.deepEqual(this.oFilterBar._getConditionModel().getConditions(oContent.content.key), [], "Condition model does not contain conditions");
 					done();
 				}.bind(this));
 			}.bind(this));
@@ -451,9 +451,9 @@ sap.ui.define([
 		oContent.changeType = "removeCondition";
 
 		const oCondition = {};
-		oCondition[oContent.content.name] = [ oContent.content.condition ];
+		oCondition[oContent.content.key] = [ oContent.content.condition ];
 		this.oFilterBar.setFilterConditions(oCondition);
-		assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], [ oContent.content.condition ], "condition initially set");
+		assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], [ oContent.content.condition ], "condition initially set");
 
 		return ChangesWriteAPI.create({
 			changeSpecificData: oContent,
@@ -468,7 +468,7 @@ sap.ui.define([
 				appComponent: this.oUiComponent,
 				view: this.oView
 			}).then(function() {
-				assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], [], "condition has been applied successfully");
+				assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], [], "condition has been applied successfully");
 
 				// Test revert
 				oChangeHandler.revertChange(oChange, this.oFilterBar, {
@@ -476,7 +476,7 @@ sap.ui.define([
 					appComponent: this.oUiComponent,
 					view: this.oView
 				}).then(function() {
-					assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.name], [ oContent.content.condition ], "condition reset to initial");
+					assert.deepEqual(this.oFilterBar.getFilterConditions()[oContent.content.key], [ oContent.content.condition ], "condition reset to initial");
 					done();
 				}.bind(this));
 			}.bind(this));
@@ -505,7 +505,7 @@ sap.ui.define([
 			}).then(function() {
 				const sFilterConditions = oXMLFilterBar.getAttribute("filterConditions").replace(/\\/g, '');
 				const mAppliedConditions = JSON.parse(sFilterConditions);
-				assert.deepEqual(mAppliedConditions[oContent.content.name], [ oContent.content.condition ], "condition has been applied on XML node");
+				assert.deepEqual(mAppliedConditions[oContent.content.key], [ oContent.content.condition ], "condition has been applied on XML node");
 
 				const sPropertyInfo = oXMLFilterBar.getAttribute("propertyInfo").replace(/\\/g, '');
 				const aPropertyInfo = JSON.parse(sPropertyInfo);
@@ -520,7 +520,7 @@ sap.ui.define([
 		const oConditionChange1 = {
 			"changeType": "addCondition",
 			"content": {
-				"name":"to_nav/field1",
+				"key": "to_nav/field1",
 				"condition":{"operator": OperatorName.EQ,"values":["test1"]}
 			}
 		};
@@ -528,7 +528,7 @@ sap.ui.define([
 		const oConditionChange2 = {
 			"changeType": "addCondition",
 			"content": {
-				"name":"to_nav/field1",
+				"key": "to_nav/field1",
 				"condition":{"operator": OperatorName.EQ,"values":["test2"]}
 			}
 		};
@@ -536,7 +536,7 @@ sap.ui.define([
 		const oConditionChange3 = {
 			"changeType": "addCondition",
 			"content": {
-				"name":"to_nav/field1",
+				"key":"to_nav/field1",
 				"condition":{"operator": OperatorName.EQ,"values":["test3"]}
 			}
 		};
@@ -612,7 +612,7 @@ sap.ui.define([
 		const oConditionChange1 = {
 			"changeType": "addCondition",
 			"content": {
-				"name":"to_nav/field1",
+				"key":"to_nav/field1",
 				"condition":{"operator": OperatorName.EQ,"values":["test1"]}
 			}
 		};
@@ -620,7 +620,7 @@ sap.ui.define([
 		const oConditionChange2 = {
 			"changeType": "addCondition",
 			"content": {
-				"name":"to_nav/field1",
+				"key":"to_nav/field1",
 				"condition":{"operator": OperatorName.EQ,"values":["test2"]}
 			}
 		};
@@ -628,7 +628,7 @@ sap.ui.define([
 		const oConditionChange3 = {
 			"changeType": "addCondition",
 			"content": {
-				"name":"to_nav/field1",
+				"key":"to_nav/field1",
 				"condition":{"operator": OperatorName.EQ,"values":["test3"]}
 			}
 		};
@@ -761,7 +761,7 @@ sap.ui.define([
 				"id": "myFilterBarView--myFilterBar"
 			},
 			"content": {
-				"name": "category",
+				"key": "category",
 				"condition": { "operator": OperatorName.Contains, "values": ["12"] }
 			}
 		};
@@ -786,7 +786,7 @@ sap.ui.define([
 				"id": "myFilterBarView--myFilterBar"
 			},
 			"content": {
-				"name": "title",
+				"key": "title",
 				"condition": { "operator": OperatorName.BT, "values": ["a", "z"] }
 			}
 		};
@@ -811,7 +811,7 @@ sap.ui.define([
 				"id": "myFilterBarView--myFilterBar"
 			},
 			"content": {
-				"name": "createdAt",
+				"key": "createdAt",
 				"condition": { "operator": OperatorName.EQ, "values": ["2023-11-27T08:22:05.0000000Z"] }
 			}
 		};
@@ -858,7 +858,7 @@ sap.ui.define([
 				"id": "myFilterBarView--myFilterBar"
 			},
 			"content": {
-				"name": "title",
+				"key": "title",
 				"index": 0
 			}
 		};
@@ -887,7 +887,7 @@ sap.ui.define([
 							"id": "myFilterBarView--myFilterBar"
 						},
 						"content": {
-							"name": "category",
+							"key": "category",
 							"index": 0
 						}
 					};
@@ -916,7 +916,7 @@ sap.ui.define([
 										"id": "myFilterBarView--myFilterBar"
 									},
 									"content": {
-										"name": "category"
+										"key": "category"
 									}
 								};
 								ChangesWriteAPI.create({

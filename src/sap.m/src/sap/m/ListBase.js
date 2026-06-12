@@ -290,21 +290,23 @@ function(
 				itemActionCount : {type : "int", group: "Misc", defaultValue: -1},
 
 				/**
-				 * Defines whether the control remembers and restores the focus position of items.
+				 * Defines the forms mode for the list control.
 				 *
-				 * If set to <code>true</code> (default), the control remembers the last focused item and restores
-				 * focus to it when the user returns to the control. This is helpful for data inspection scenarios
-				 * where users navigate away and return to continue their work.
+				 * If set to <code>true</code>, the control does not restore the previously focused item when the user
+				 * re-enters a <code>List</code>/<code>Table</code>. Instead, the focus is placed on the first item when
+				 * the user enters a <code>List</code>/<code>Table</code> via <code>Tab</code> and on the last item when
+				 * the user enters a <code>List</code>/<code>Table</code> via <code>Shift + Tab</code>. This is suitable
+				 * for configuration dialogs, settings panels, and other form-like usages where a predictable tab order
+				 * is required.
 				 *
-				 * If set to <code>false</code>, the control does not restore the previously focused item on re-entry.
-				 * This is suitable for configuration dialogs, settings panels, and other form-like usages where
-				 * a predictable initial focus is required.
+				 * <b>Note:</b> This property only takes effect if <code>keyboardMode</code> is set to
+				 * {@link sap.m.ListKeyboardMode Edit}.
 				 *
 				 * @private
-				 * @ui5-restricted sap.m
-				 * @since 1.148
+				 * @ui5-restricted sap.m, sap.ui.mdc
+				 * @since 1.150
 				 */
-				rememberFocus : {type : "boolean", group : "Behavior", defaultValue : true}
+				formsMode : {type : "boolean", group : "Behavior", defaultValue : false}
 			},
 			defaultAggregation : "items",
 			aggregations : {
@@ -2598,19 +2600,19 @@ function(
 	};
 
 	// focus to previously focused element known in item navigation
-	ListBase.prototype.focusPrevious = function() {
+	ListBase.prototype.focusPrevious = function(bLastTabbable) {
 		if (!this._oItemNavigation) {
 			return;
 		}
 
 		// get the last focused element from the ItemNavigation and focus
-		var aNavigationDomRefs = this._oItemNavigation.getItemDomRefs();
-		var iLastFocusedIndex = this._oItemNavigation.getFocusedIndex();
-		var $LastFocused = jQuery(aNavigationDomRefs[iLastFocusedIndex]);
+		const aNavigationDomRefs = this._oItemNavigation.getItemDomRefs();
+		const iLastFocusedIndex = this._oItemNavigation.getFocusedIndex();
+		const $LastFocused = jQuery(aNavigationDomRefs[iLastFocusedIndex]);
 
 		this.bAnnounceDetails = true;
 		if (this.getKeyboardMode() == "Edit") {
-			var $Tabbable = $LastFocused.find(":sapTabbable").first();
+			const $Tabbable = jQuery(this.getNavigationRoot()).find(":sapTabbable")[bLastTabbable ? "last" : "first"]();
 			$Tabbable[0] ? $Tabbable.trigger("focus") : $LastFocused.trigger("focus");
 		} else {
 			$LastFocused.trigger("focus");
@@ -2669,7 +2671,7 @@ function(
 			return;
 		}
 
-		this.focusPrevious();
+		this.focusPrevious(this.getFormsMode() && this.getKeyboardMode() == "Edit");
 		oEvent.setMarked();
 	};
 
@@ -2684,9 +2686,6 @@ function(
 		}
 
 		if (this._oItemNavigation && bFocusLeftNavigationRoot) {
-			if (!this.getRememberFocus()) {
-				this._oItemNavigation.resetFocusedIndex();
-			}
 			if (!this.bAnnounceDetails) {
 				this.bAnnounceDetails = true;
 			}

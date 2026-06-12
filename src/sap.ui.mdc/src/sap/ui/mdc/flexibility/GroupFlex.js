@@ -6,8 +6,9 @@ sap.ui.define([
 	"sap/ui/fl/changeHandler/Base",
 	"sap/ui/fl/changeHandler/condenser/Classification",
 	"sap/ui/fl/changeHandler/common/ChangeCategories",
-	"./helpers/addKeyOrName"
-], (Util, FLChangeHandlerBase, CondenserClassification, ChangeCategories, addKeyOrName) => {
+	"./helpers/addKeyOrName",
+	"sap/ui/mdc/util/getKey"
+], (Util, FLChangeHandlerBase, CondenserClassification, ChangeCategories, addKeyOrName, getKey) => {
 	"use strict";
 
 	const fFinalizeGroupChange = function(oChange, oControl, oGroupContent, bIsRevert) {
@@ -29,13 +30,13 @@ sap.ui.define([
 				.then(oModifier.getProperty.bind(oModifier, oControl, "groupConditions"))
 				.then((oGroupConditions) => {
 					const aValue = oGroupConditions ? oGroupConditions.groupLevels : [];
+					const sContentKey = getKey(oChangeContent);
 
 					const oGroupContent = {
-						key: oChangeContent.key,
-						name: oChangeContent.key
+						key: sContentKey
 					};
 
-					const iIndex = aValue.findIndex((o) => addKeyOrName(o).key === oChangeContent.key);
+					const iIndex = aValue.findIndex((o) => addKeyOrName(o).key === sContentKey);
 
 					if (iIndex < 0) {
 						aValue.splice(oChangeContent.index, 0, oGroupContent);

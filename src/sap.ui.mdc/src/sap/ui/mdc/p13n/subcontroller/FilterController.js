@@ -8,8 +8,9 @@ sap.ui.define([
 	'sap/ui/mdc/enums/ProcessingStrategy',
 	'sap/ui/mdc/condition/FilterOperatorUtil',
 	'sap/base/Log',
-	'sap/base/util/merge'
-], (BaseFilterController, Library, ProcessingStrategy, FilterOperatorUtil, Log, merge) => {
+	'sap/base/util/merge',
+	'sap/ui/mdc/util/getKey'
+], (BaseFilterController, Library, ProcessingStrategy, FilterOperatorUtil, Log, merge, getKey) => {
 	"use strict";
 
 	const FilterController = BaseFilterController.extend("sap.ui.mdc.p13n.subcontroller.FilterController");
@@ -147,7 +148,7 @@ sap.ui.define([
 
 	FilterController.prototype._createConditionChangeContent = function(sFieldPath, oCondition) {
 		return {
-			name: sFieldPath,
+			key: sFieldPath,
 			condition: oCondition
 		};
 	};
@@ -169,8 +170,8 @@ sap.ui.define([
 		const mExistingFilters = this.getCurrentState() || {};
 
 		const oP13nData = this.prepareAdaptationData(oPropertyHelper, (mItem, oProperty) => {
-
-			const aExistingFilters = mExistingFilters[mItem.name];
+			const sKey = getKey(mItem);
+			const aExistingFilters = mExistingFilters[sKey];
 			mItem.active = aExistingFilters && aExistingFilters.length > 0 ? true : false;
 
 			return !(oProperty.filterable === false);
@@ -190,17 +191,17 @@ sap.ui.define([
 
 		aChanges.forEach((oChange) => {
 			const oStateDiffContent = merge({}, oChange.changeSpecificData.content);
-			const sName = oStateDiffContent.name;
+			const sKey = getKey(oStateDiffContent);
 
-			if (!mStateDiff[sName]) {
-				mStateDiff[sName] = [];
+			if (!mStateDiff[sKey]) {
+				mStateDiff[sKey] = [];
 			}
 
 			//set the presence attribute to false in case of an explicit remove
 			if (oChange.changeSpecificData.changeType === this.getChangeOperations()["remove"]) {
 				oStateDiffContent.condition.filtered = false;
 			}
-			mStateDiff[sName].push(oStateDiffContent.condition);
+			mStateDiff[sKey].push(oStateDiffContent.condition);
 		});
 
 		return mStateDiff;

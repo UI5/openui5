@@ -192,7 +192,7 @@ sap.ui.define([
 		const oList = new List(this.getId() + "-innerP13nList", {
 			itemPress: [this._onItemPressed, this],
 			dragDropConfig: this._getDragDropConfig(),
-			rememberFocus: false,
+			formsMode: true,
 			keyboardMode: ListKeyboardMode.Edit
 		});
 		return oList;

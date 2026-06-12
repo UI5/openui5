@@ -4,7 +4,7 @@
 		"changeType": "addColumn",
 		"reference": "test",
 		"content": {
-			"name": "column3",
+			"key": "column3",
 			"index": 1
 		},
 		"selector": {
@@ -19,7 +19,7 @@
 		"changeType": "addColumn",
 		"reference": "test",
 		"content": {
-			"name": "column4",
+			"key": "column4",
 			"index": 4
 		},
 		"selector": {
@@ -33,7 +33,7 @@
 		"changeType": "removeColumn",
 		"reference": "test",
 		"content": {
-			"name": "column0",
+			"key": "column0",
 			"id": "mdcTable--column0"
 		},
 		"selector": {
@@ -47,7 +47,7 @@
 		"changeType": "removeColumn",
 		"reference": "test",
 		"content": {
-			"name": "column1",
+			"key": "column1",
 			"id": "mdcTable--column1"
 		},
 		"selector": {
@@ -61,7 +61,7 @@
 		"changeType": "removeColumn",
 		"reference": "test",
 		"content": {
-			"name": "column2",
+			"key": "column2",
 			"id": "mdcTable--column2"
 		},
 		"selector": {

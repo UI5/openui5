@@ -6,7 +6,7 @@
 		"content": {
 			"index": 0,
 			"descending": false,
-			"name": "sorter0"
+			"key": "sorter0"
 		},
 		"selector": {
 			"id": "view--mdcTable",
@@ -20,7 +20,7 @@
 		"reference": "test",
 		"content": {
 			"index": 0,
-			"name": "group0"
+			"key": "group0"
 		},
 		"selector": {
 			"id": "view--mdcTable",
@@ -36,7 +36,7 @@
 		"content": {
 			"index": 1,
 			"descending": false,
-			"name": "sorter1"
+			"key": "sorter1"
 		},
 		"selector": {
 			"id": "view--mdcTable",
@@ -52,7 +52,7 @@
 		"content": {
 			"index": 1,
 			"descending": false,
-			"name": "sorter1"
+			"key": "sorter1"
 		},
 		"selector": {
 			"id": "view--mdcTable",
@@ -68,7 +68,7 @@
 		"content": {
 			"index": 1,
 			"descending": true,
-			"name": "sorter1"
+			"key": "sorter1"
 		},
 		"selector": {
 			"id": "view--mdcTable",
@@ -83,7 +83,7 @@
 		"reference": "test",
 		"content": {
 			"index": 0,
-			"name": "sorter1"
+			"key": "sorter1"
 		},
 		"selector": {
 			"id": "view--mdcTable",
@@ -98,7 +98,7 @@
 		"reference": "test",
 		"content": {
 			"index": 0,
-			"name": "sorter0"
+			"key": "sorter0"
 		},
 		"selector": {
 			"id": "view--mdcTable",
@@ -114,7 +114,7 @@
 		"content": {
 			"index": 0,
 			"descending": false,
-			"name": "sorter0"
+			"key": "sorter0"
 		},
 		"selector": {
 			"id": "view--mdcTable",
@@ -130,7 +130,7 @@
 		"content": {
 			"index": 1,
 			"descending": false,
-			"name": "sorter2"
+			"key": "sorter2"
 		},
 		"selector": {
 			"id": "view--mdcTable",
@@ -145,7 +145,7 @@
 		"reference": "test",
 		"content": {
 			"index": 0,
-			"name": "sorter2"
+			"key": "sorter2"
 		},
 		"selector": {
 			"id": "view--mdcTable",

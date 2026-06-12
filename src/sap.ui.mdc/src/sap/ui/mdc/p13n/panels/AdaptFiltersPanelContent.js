@@ -254,7 +254,7 @@ sap.ui.define([
 			keyboardMode: ListKeyboardMode.Edit,
 			headerToolbar: this._getToolbar(),
 			selectionChange: this._onSelectionChange.bind(this),
-			rememberFocus: false
+			formsMode: true
 		});
 
 		return oList;
@@ -725,7 +725,7 @@ sap.ui.define([
 		if (oItem.required) {
 			const oItems = this._oListControl.getItems();
 			const oListItem = oItems.find((oLiItem) => {
-				return oLiItem.getBindingContext(this.P13N_MODEL)?.getObject().key === oItem.key;
+				return oLiItem.getBindingContext(this.P13N_MODEL)?.getObject().name === oItem.name;
 			});
 
 			const [oVisibilityAction] = oListItem.getContent()[0].getContent()[2].getContent();

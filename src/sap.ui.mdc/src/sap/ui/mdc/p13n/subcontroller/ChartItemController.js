@@ -35,8 +35,7 @@ sap.ui.define([
 
 	ChartItemController.prototype.mixInfoAndState = function(oPropertyHelper) {
 
-		const aItemState = this.getCurrentState();
-		const mItemState = this.arrayToMap(aItemState);
+		const mItemState = this._stateToMap();
 
 		const oP13nData = this.prepareAdaptationData(oPropertyHelper, (mItem, oProperty) => {
 			const oExisting = mItemState[oProperty.key];

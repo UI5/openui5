@@ -681,7 +681,7 @@ sap.ui.define([
 			assert.strictEqual(aChanges.length, 1, "One change is created");
 			assert.strictEqual(aChanges[0].changeSpecificData.changeType, sAction, "Change type is correct");
 			assert.strictEqual(aChanges[0].changeSpecificData.content.value, bExpectedValue, "Change content value is correct");
-			assert.strictEqual(aChanges[0].changeSpecificData.content.name, sExpectedName, "Name is correct");
+			assert.strictEqual(aChanges[0].changeSpecificData.content.key, sExpectedName, "Key is correct");
 
 			if (counter === 2) {
 				done();

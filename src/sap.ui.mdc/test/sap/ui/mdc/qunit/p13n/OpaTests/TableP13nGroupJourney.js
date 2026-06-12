@@ -82,7 +82,7 @@ sap.ui.define([
 			//Check grouping on Table column
 			const oGroupConditions = {
 				groupLevels: [
-					{name: "foundingYear"}
+					{key: "foundingYear"}
 				]
 			};
 			Then.iShouldSeeGroupConditions(oGroupConditions);

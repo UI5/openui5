@@ -247,7 +247,7 @@ sap.ui.define([
 		const aChanges = oController.getDelta(mDeltaInfo);
 		assert.strictEqual(aChanges.length, 1, "One change created");
 		assert.strictEqual(aChanges[0].changeSpecificData.changeType, "setPropertyAttribute", "Correct change type");
-		assert.strictEqual(aChanges[0].changeSpecificData.content.name, "prop1", "Correct property name");
+		assert.strictEqual(aChanges[0].changeSpecificData.content.key, "prop1", "Correct property name");
 		assert.strictEqual(aChanges[0].changeSpecificData.content.attribute, "isActive", "Correct attribute");
 		assert.strictEqual(aChanges[0].changeSpecificData.content.value, false, "Correct value");
 		assert.strictEqual(aChanges[0]["transient"], true, "Change is transient");
@@ -518,7 +518,7 @@ sap.ui.define([
 		};
 		const aChanges = oController.getDelta(mDeltaInfo);
 		assert.strictEqual(aChanges.length, 1, "One change for new property");
-		assert.strictEqual(aChanges[0].changeSpecificData.content.name, "newProp", "Change is for newProp");
+		assert.strictEqual(aChanges[0].changeSpecificData.content.key, "newProp", "Change is for newProp");
 		assert.strictEqual(aChanges[0]["transient"], true, "Change is transient");
 		oController.destroy();
 	});
@@ -643,7 +643,7 @@ sap.ui.define([
 		};
 		const aChanges = oController.getDelta(mDeltaInfo);
 		assert.strictEqual(aChanges.length, 1, "One change created for unknown property");
-		assert.strictEqual(aChanges[0].changeSpecificData.content.name, "unknownProp", "Change targets the unknown property");
+		assert.strictEqual(aChanges[0].changeSpecificData.content.key, "unknownProp", "Change targets the unknown property");
 		assert.strictEqual(aChanges[0].changeSpecificData.content.value, false, "Correct value");
 		assert.strictEqual(aChanges[0]["transient"], true, "Change is transient");
 		oController.destroy();
@@ -669,7 +669,7 @@ sap.ui.define([
 			changeSpecificData: {
 				changeType: "setPropertyAttribute",
 				content: {
-					name: "prop1",
+					key: "prop1",
 					attribute: "isActive",
 					value: false
 				}
@@ -699,19 +699,19 @@ sap.ui.define([
 			selectorElement: oControl,
 			changeSpecificData: {
 				changeType: "setPropertyAttribute",
-				content: {name: "prop1", attribute: "isActive", value: false}
+				content: {key: "prop1", attribute: "isActive", value: false}
 			}
 		}, {
 			selectorElement: oControl,
 			changeSpecificData: {
 				changeType: "setPropertyAttribute",
-				content: {name: "prop1", attribute: "label", value: "New Label"}
+				content: {key: "prop1", attribute: "label", value: "New Label"}
 			}
 		}, {
 			selectorElement: oControl,
 			changeSpecificData: {
 				changeType: "setPropertyAttribute",
-				content: {name: "prop2", attribute: "isActive", value: true}
+				content: {key: "prop2", attribute: "isActive", value: true}
 			}
 		}];
 		const oState = oController.changesToState(aChanges);
@@ -750,7 +750,7 @@ sap.ui.define([
 			selectorElement: oControl,
 			changeSpecificData: {
 				changeType: "setPropertyAttribute",
-				content: {name: "prop1", attribute: "isActive", value: null}
+				content: {key: "prop1", attribute: "isActive", value: null}
 			}
 		}];
 		const oState = oController.changesToState(aChanges);
@@ -780,7 +780,7 @@ sap.ui.define([
 			selectorElement: oControl,
 			changeSpecificData: {
 				changeType: "setPropertyAttribute",
-				content: {name: "prop1", attribute: "label", value: oObjectValue}
+				content: {key: "prop1", attribute: "label", value: oObjectValue}
 			}
 		}];
 		const oState = oController.changesToState(aChanges);

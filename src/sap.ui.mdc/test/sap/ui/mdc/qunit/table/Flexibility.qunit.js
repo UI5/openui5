@@ -72,7 +72,7 @@ sap.ui.define([
 			},
 			"content": {
 				"id": "myTableView--myTable--column1",
-				"name": "column1",
+				"key": "column1",
 				"idIsLocal": false
 			}
 		};
@@ -85,7 +85,7 @@ sap.ui.define([
 				"id": "myTableView--myTable"
 			},
 			"content": {
-				"name": sProperty
+				"key": sProperty
 			}
 		};
 	}
@@ -266,7 +266,7 @@ sap.ui.define([
 		});
 		StateUtil.applyExternalState(this.oTable, {
 			items: [
-				{name: "column3", visible: true}
+				{key: "column3", visible: true}
 			]
 		});
 		await Promise.all([oRenderDeferred.promise, oRebindDeferred.promise]);

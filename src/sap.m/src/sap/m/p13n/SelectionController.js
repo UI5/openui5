@@ -340,7 +340,9 @@ sap.ui.define([
 		const fnSymbol = (o) => {
 			let sDiff = "";
 			aDeltaAttributes.forEach((sAttribute) => {
-				sDiff = sDiff + o[sAttribute];
+				const vAttribute = o[sAttribute];
+
+				sDiff = sDiff + vAttribute;
 			});
 			return sDiff;
 		};
@@ -682,7 +684,7 @@ sap.ui.define([
 				const bValueChanged = vOldValue !== vNewValue;
 				if (bValueChanged) {
 					aSetterChanges.push(this._createAddRemoveChange(oControl, sOperation, {
-						[oItem.hasOwnProperty("key") ? "key" : "name"]: oItem.key || oItem.name,
+						key: oItem.key || oItem.name,
 						targetAggregation: this.getTargetAggregation(),
 						value: oItem[sSetAttribute]
 					}));

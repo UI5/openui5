@@ -94,7 +94,7 @@ sap.ui.define([
 				return {
 					changeType: "addColumn",
 					content: {
-						name: "name",
+						key: "name",
 						index: 0
 					}
 				};
@@ -107,7 +107,7 @@ sap.ui.define([
 				return {
 					changeType: "removeColumn",
 					content: {
-						name: "name"
+						key: "name"
 					}
 				};
 			}
@@ -127,7 +127,7 @@ sap.ui.define([
 				return {
 					changeType: "removeColumn",
 					content: {
-						name: "modifiedBy"
+						key: "modifiedBy"
 					}
 				};
 			}
@@ -147,7 +147,7 @@ sap.ui.define([
 				return {
 					changeType: "moveColumn",
 					content: {
-						name: "modifiedBy",
+						key: "modifiedBy",
 						index: 0
 					}
 				};
@@ -168,7 +168,7 @@ sap.ui.define([
 				return {
 					changeType: "moveColumn",
 					content: {
-						name: "modifiedBy",
+						key: "modifiedBy",
 						index: 2
 					}
 				};
@@ -181,7 +181,7 @@ sap.ui.define([
 				return {
 					changeType: "moveColumn",
 					content: {
-						name: "modifiedBy",
+						key: "modifiedBy",
 						index: 0
 					}
 				};
@@ -202,7 +202,7 @@ sap.ui.define([
 				return {
 					changeType: "moveColumn",
 					content: {
-						name: "modifiedBy",
+						key: "modifiedBy",
 						index: 1
 					}
 				};
@@ -215,7 +215,7 @@ sap.ui.define([
 				return {
 					changeType: "moveColumn",
 					content: {
-						name: "modifiedBy",
+						key: "modifiedBy",
 						index: 0
 					}
 				};
@@ -250,7 +250,7 @@ sap.ui.define([
 				return {
 					changeType: "removeGroup",
 					content: {
-						name: "modifiedBy"
+						key: "modifiedBy"
 					}
 				};
 			}
@@ -263,7 +263,7 @@ sap.ui.define([
 					changeType: "addGroup",
 					content: {
 						index: 0,
-						name: "modifiedBy"
+						key: "modifiedBy"
 					}
 				};
 			}
@@ -283,7 +283,7 @@ sap.ui.define([
 			'<mdc:Table id="myMDCTable" ' +
 				'selectionMode="Multi" ' +
 				'type="Table" ' +
-				"sortConditions=\"{sorters: [{key: 'modifiedBy', name: 'modifiedBy', descending: false}]}\" " +
+				"sortConditions=\"{sorters: [{key: 'modifiedBy', descending: false}]}\" " +
 				'delegate=\'' + sDelegate + '\' ' +
 				'p13nMode="Column,Group,Sort">' +
 				'<mdc:columns>' +
@@ -319,7 +319,7 @@ sap.ui.define([
 				return {
 					changeType: "removeSort",
 					content: {
-						name: "modifiedBy"
+						key: "modifiedBy"
 					}
 				};
 			}
@@ -332,7 +332,7 @@ sap.ui.define([
 					changeType: "addSort",
 					content: {
 						index: 0,
-						name: "modifiedBy",
+						key: "modifiedBy",
 						descending: false
 					}
 				};
@@ -353,7 +353,7 @@ sap.ui.define([
 				return {
 					changeType: "addSort",
 					content: {
-						name: "modifiedBy",
+						key: "modifiedBy",
 						index: 0,
 						descending: true
 					}
@@ -368,7 +368,7 @@ sap.ui.define([
 					changeType: "addSort",
 					content: {
 						index: 0,
-						name: "modifiedBy",
+						key: "modifiedBy",
 						descending: false
 					}
 				};
@@ -380,7 +380,7 @@ sap.ui.define([
 				return {
 					changeType: "removeSort",
 					content: {
-						name: "modifiedBy"
+						key: "modifiedBy"
 					}
 				};
 			}
@@ -400,7 +400,7 @@ sap.ui.define([
 				return {
 					changeType: "addSort",
 					content: {
-						name: "modifiedBy",
+						key: "modifiedBy",
 						index: 0,
 						descending: true
 					}
@@ -414,7 +414,7 @@ sap.ui.define([
 					return {
 						changeType: "removeSort",
 						content: {
-							name: "modifiedBy"
+							key: "modifiedBy"
 						}
 					};
 				}
@@ -471,7 +471,7 @@ sap.ui.define([
 				return {
 					changeType: "setShowDetails",
 					content: {
-						name: "ResponsiveTable",
+						key: "ResponsiveTable",
 						value: true
 					}
 				};
@@ -503,7 +503,7 @@ sap.ui.define([
 				return {
 					changeType: "setShowDetails",
 					content: {
-						name: "ResponsiveTable",
+						key: "ResponsiveTable",
 						value: true
 					}
 				};
@@ -517,7 +517,7 @@ sap.ui.define([
 					return {
 						changeType: "setShowDetails",
 						content: {
-							name: "ResponsiveTable",
+							key: "ResponsiveTable",
 							value: true
 						}
 					};
@@ -529,7 +529,7 @@ sap.ui.define([
 				return {
 					changeType: "setShowDetails",
 					content: {
-						name: "ResponsiveTable",
+						key: "ResponsiveTable",
 						value: false
 					}
 				};
@@ -594,7 +594,7 @@ sap.ui.define([
 				return {
 					changeType: "setFixedColumnCount",
 					content: {
-						name: "GridTable",
+						key: "GridTable",
 						value: 2
 					}
 				};
@@ -626,7 +626,7 @@ sap.ui.define([
 				return {
 					changeType: "setFixedColumnCount",
 					content: {
-						name: "GridTable",
+						key: "GridTable",
 						value: 1
 					}
 				};
@@ -640,7 +640,7 @@ sap.ui.define([
 					return {
 						changeType: "setFixedColumnCount",
 						content: {
-							name: "GridTable",
+							key: "GridTable",
 							value: 1
 						}
 					};
@@ -652,7 +652,7 @@ sap.ui.define([
 				return {
 					changeType: "setFixedColumnCount",
 					content: {
-						name: "GridTable",
+						key: "GridTable",
 						value: 0
 					}
 				};

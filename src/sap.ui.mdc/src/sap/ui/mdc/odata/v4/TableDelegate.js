@@ -204,7 +204,7 @@ sap.ui.define([
 			return undefined;
 		}
 
-		if (!getVisiblePropertyKeys(oTable).includes(oGroupedProperty.name)) {
+		if (!getVisiblePropertyKeys(oTable).includes(oGroupedProperty.key)) {
 			// Suppress grouping by non-visible property.
 			return undefined;
 		}
@@ -548,7 +548,7 @@ sap.ui.define([
 		oTable._oTable.addDependent(new ODataV4AggregationPlugin({
 			enabled: "{= !!${$sap.ui.mdc.Table>/@custom/hasDataAggregation} }",
 			groupHeaderFormatter: function(oContext) {
-				const aGroupedPropertyKeys = oTable._getGroupedProperties().map((mGroupLevel) => mGroupLevel.name);
+			const aGroupedPropertyKeys = oTable._getGroupedProperties().map((mGroupLevel) => mGroupLevel.key);
 				const sGroupLevelKey = aGroupedPropertyKeys[oContext.getProperty("@$ui5.node.level") - 1];
 				return oTable.getControlDelegate().formatGroupHeader(oTable, oContext, sGroupLevelKey);
 			}
@@ -779,14 +779,15 @@ sap.ui.define([
 
 		if (aItems) {
 			aItems.forEach((oItem) => {
-				oTable.getPropertyHelper().getProperty(oItem.name).getSimpleProperties().forEach((oProperty) => {
+				oTable.getPropertyHelper().getProperty(oItem.key).getSimpleProperties().forEach((oProperty) => {
 					aPropertyKeys.push(oProperty.key);
 				});
 			});
 		}
 
 		const bOnlyVisibleColumns = aStates ? aStates.every((oState) => {
-			const sPropertyKey = oState.name ?? oState;
+			let sPropertyKey = oState.key;
+			sPropertyKey ??= oState;
 
 			if (!oTable.getPropertyHelper().getProperty(sPropertyKey)) {
 				return true; // Inactive properties should not trigger a restriction message.
@@ -840,7 +841,9 @@ sap.ui.define([
 			...oTable.getPayload()?.aggregationConfiguration
 		};
 		const oPropertyHelper = oTable.getPropertyHelper();
-		const aGroupedPropertyKeys = oTable._getGroupedProperties().map((mGroupLevel) => mGroupLevel.name);
+		const aGroupedPropertyKeys = oTable._getGroupedProperties().map((mGroupLevel) => {
+			return mGroupLevel.key;
+		});
 		const aTotaledPropertyKeys = Object.keys(oTable._getAggregatedProperties());
 		const mAggregation = {
 			group: {},

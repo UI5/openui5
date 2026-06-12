@@ -174,14 +174,18 @@ sap.ui.define([
 			sCustomPropValue = mCustomPropertiesParameters[sCustomPropName];
 			// explicit undefined check -> 0 is a valid value, theoretically "" too, see comment below
 			if (typeof sCustomPropValue === "undefined") {
-				sCustomPropValue = window.getComputedStyle(document.body).getPropertyValue(sCustomPropName);
-				// Note: Non-existent values return an empty string from the native API, which could be a valid value for empty CSS custom properties.
-				//       While detecting this is possible, a new DOM element is needed for probing a fallback value through a "var(...)" calculation.
-				//       However: empty values for our theming parameters are most likely not valid, so the simple empty check should be enough.
-				//       Still, without an existence check we cannot cache empty results as momentarily non-existent parameter might come async through another library.
-				if (sCustomPropValue.trim() !== "") {
-					mCustomPropertiesParameters[sCustomPropName] = sCustomPropValue;
-					return mCustomPropertiesParameters[sCustomPropName];
+				// Safeguard against a non-existant body. This can happen when modules are executed sync while still within the <head>
+				// and additionally call Parameters.get within their module scope
+				if (document.body) {
+					sCustomPropValue = window.getComputedStyle(document.body).getPropertyValue(sCustomPropName);
+					// Note: Non-existent values return an empty string from the native API, which could be a valid value for empty CSS custom properties.
+					//       While detecting this is possible, a new DOM element is needed for probing a fallback value through a "var(...)" calculation.
+					//       However: empty values for our theming parameters are most likely not valid, so the simple empty check should be enough.
+					//       Still, without an existence check we cannot cache empty results as momentarily non-existent parameter might come async through another library.
+					if (sCustomPropValue.trim() !== "") {
+						mCustomPropertiesParameters[sCustomPropName] = sCustomPropValue;
+						return mCustomPropertiesParameters[sCustomPropName];
+					}
 				}
 			} else {
 				// custom property found and cached

@@ -10,7 +10,11 @@ sap.ui.define([
 		onInit: function() {
 			var model = new JSONModel();
 			model.setData({
-				buttonText: "Click Me!"
+				buttonText: "Click Me!",
+				gridRows: [
+					{ col1: "Row 1 Col 1", col2: "This is a long text that can be expanded to show more details.", col3: "Row 1 Col 3" },
+					{ col1: "Row 2 Col 1", col2: "Another long text that can be expanded.", col3: "Row 2 Col 3" }
+				]
 			});
 			this.getView().setModel(model);
 		},

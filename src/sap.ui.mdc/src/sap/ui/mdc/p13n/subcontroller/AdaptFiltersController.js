@@ -6,10 +6,9 @@ sap.ui.define([
 	"./SelectionController",
 	"sap/ui/core/Lib",
 	"sap/m/library",
-	"sap/ui/mdc/p13n/P13nBuilder",
 	"sap/base/util/merge",
 	"sap/m/Button"
-], (BaseController, Library, mLibrary, P13nBuilder, merge, Button) => {
+], (BaseController, Library, mLibrary, merge, Button) => {
 	"use strict";
 
 	const { ButtonType } = mLibrary;
@@ -130,8 +129,7 @@ sap.ui.define([
 
 		const mExistingFilters = this.getAdaptationControl().getCurrentState().filter || {};
 
-		const aItemState = this.getCurrentState();
-		const mExistingProperties = P13nBuilder.arrayToMap(aItemState);
+		const mExistingProperties = this._stateToMap();
 
 		const oP13nData = this.prepareAdaptationData(oPropertyHelper, (oItem, oProperty) => {
 

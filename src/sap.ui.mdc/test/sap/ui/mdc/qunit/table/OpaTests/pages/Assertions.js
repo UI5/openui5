@@ -802,17 +802,18 @@ sap.ui.define([
 					const aSortConditions = oTable.getSortConditions().sorters;
 
 					for (let i = 0; i < aSortConditions.length; i++) {
+						const sSorterKey = aSortConditions[i].key ?? aSortConditions[i].name;
 						if (
 							typeof vColumn === 'object' &&
-							aSortConditions[i].name === vColumn.getHeader() &&
+							sSorterKey === vColumn.getHeader() &&
 							aSortConditions[i].descending === bDescending
 						) {
-							Opa5.assert.equal(aSortConditions[i].name, vColumn.getHeader(), "Column " + vColumn + " has sorting condition");
+							Opa5.assert.equal(sSorterKey, vColumn.getHeader(), "Column " + vColumn + " has sorting condition");
 							Opa5.assert.equal(aSortConditions[i].descending, bDescending,
 								"Column " + vColumn + " is sorted " + ((bDescending) ? "descending" : "ascending"));
 							return;
-						} else if (aSortConditions[i].descending === bDescending && aSortConditions[i].name === vColumn) {
-							Opa5.assert.equal(aSortConditions[i].name, vColumn, "Column " + vColumn + "has sorting condition");
+						} else if (aSortConditions[i].descending === bDescending && sSorterKey === vColumn) {
+							Opa5.assert.equal(sSorterKey, vColumn, "Column " + vColumn + "has sorting condition");
 							Opa5.assert.equal(aSortConditions[i].descending, bDescending,
 								"Column " + vColumn + "is sorted " + ((bDescending) ? "descending" : "ascending"));
 							return;

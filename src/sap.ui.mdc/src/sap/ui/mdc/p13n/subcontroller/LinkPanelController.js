@@ -8,8 +8,9 @@ sap.ui.define([
 	"sap/ui/mdc/p13n/P13nBuilder",
 	"./SelectionController",
 	"sap/ui/mdc/p13n/panels/LinkSelectionPanel",
-	"sap/m/MessageBox"
-], (Element, Library, P13nBuilder, BaseController, SelectionPanel, MessageBox) => {
+	"sap/m/MessageBox",
+	'sap/ui/mdc/util/getKey'
+], (Element, Library, P13nBuilder, BaseController, SelectionPanel, MessageBox, getKey) => {
 	"use strict";
 
 	const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
@@ -77,7 +78,7 @@ sap.ui.define([
 	};
 
 	LinkPanelController.prototype._createAddRemoveChange = function(oControl, sOperation, oContent) {
-		const sLinkItemId = oContent.name;
+		const sLinkItemId = getKey(oContent);
 		const oLinkItem = Element.getElementById(sLinkItemId);
 
 		if (sOperation === "revealItem" || sOperation === "hideItem") {
@@ -142,7 +143,7 @@ sap.ui.define([
 				changeType: sMoveOperation,
 				content: {
 					index: iNewIndex,
-					name: sPropertyName
+					key: sPropertyName
 				}
 			}
 		};

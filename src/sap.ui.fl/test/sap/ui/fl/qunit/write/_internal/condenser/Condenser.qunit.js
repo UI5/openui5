@@ -1469,12 +1469,10 @@ sap.ui.define([
 				const aSorters = Element.getElementById("view--mdcTable").getSortConditions().sorters;
 				assert.deepEqual(aSorters[0], {
 					key: "sorter2",
-					name: "sorter2",
 					descending: false
 				}, "the content of the first sorter is correct");
 				assert.deepEqual(aSorters[1], {
 					key: "sorter1",
-					name: "sorter1",
 					descending: true
 				}, "the content of the second sorter is correct");
 			});

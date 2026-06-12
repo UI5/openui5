@@ -426,7 +426,7 @@ sap.ui.define([
 
 				const aVisibleItems = this.oMDCChart._getVisibleProperties();
 				assert.ok(aVisibleItems.length === 1, "Visible Properties contain 1 item");
-				assert.ok(aVisibleItems[0].name === "testName", "Item has correct name");
+				assert.ok(aVisibleItems[0].key === "testName", "Item has correct name");
 				assert.ok(aVisibleItems[0].role === "series", "Item has correct role");
 
 				done();
@@ -1414,7 +1414,7 @@ sap.ui.define([
 									collectionPath: "/testPath"
 								}
 							},
-							propertyInfo: [{ name: "name1", label: "name1", dataType: "String" }, { name: "name2", label: "name2", dataType: "String" }]
+							propertyInfo: [{ key: "name1", label: "name1", dataType: "String" }, { key: "name2", label: "name2", dataType: "String" }]
 						});
 					}
 				});
@@ -1703,7 +1703,7 @@ sap.ui.define([
 									collectionPath: "/testPath"
 								}
 							},
-							propertyInfo: [{ name: "name1", label: "name1", dataType: "String" }, { name: "name2", label: "name2", dataType: "String" }]
+							propertyInfo: [{ key: "name1", label: "name1", dataType: "String" }, { key: "name2", label: "name2", dataType: "String" }]
 						});
 					}
 				});

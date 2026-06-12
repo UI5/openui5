@@ -183,26 +183,37 @@ sap.ui.define([
 		const oPropertyHelper = oTable.getPropertyHelper();
 		const oGroupLevel = oTable._getGroupedProperties()[0];
 
-		if (!oGroupLevel || !oTable._isOfType(TableType.ResponsiveTable) || !oPropertyHelper.hasProperty(oGroupLevel.name)) {
+		if (!oGroupLevel || !oTable._isOfType(TableType.ResponsiveTable) || !this._hasKeyOrName(oPropertyHelper, oGroupLevel)) {
 			return undefined;
 		}
 
 		const oSortedProperty = oTable._getSortedProperties().find((oSortCondition) => {
-			return oSortCondition.name === oGroupLevel.name;
+			return oSortCondition.key === oGroupLevel.key;
 		});
-		const sPath = oPropertyHelper.getProperty(oGroupLevel.name).path;
+		const sPath = oPropertyHelper.getProperty(oGroupLevel.key).path;
 		const bDescending = oSortedProperty ? oSortedProperty.descending : false;
 
-		if (!oTable._mFormatGroupHeaderInfo || oTable._mFormatGroupHeaderInfo.propertyKey !== oGroupLevel.name) {
+		if (!oTable._mFormatGroupHeaderInfo || oTable._mFormatGroupHeaderInfo.propertyKey !== oGroupLevel.key) {
 			oTable._mFormatGroupHeaderInfo = {
-				propertyKey: oGroupLevel.name,
+				propertyKey: oGroupLevel.key,
 				formatter: function(oContext) {
-					return this.formatGroupHeader(oTable, oContext, oGroupLevel.name);
+					return this.formatGroupHeader(oTable, oContext, oGroupLevel.key);
 				}.bind(this)
 			};
 		}
 
 		return new Sorter(sPath, bDescending, oTable._mFormatGroupHeaderInfo.formatter);
+	};
+
+	/**
+	 * Helper functionality for backwards compatibility reasons
+	 * Check for the existence of a property based on the "key" or "name" property of the group level, as both have been used in the past.
+	 * @param {*} oPropertyHelper: The property helper of the table which provides access to the properties of the table
+	 * @param {*} oAnyItem: The item object which might contain a "key" or "name" property
+	 * @returns {boolean} Whether a property with the given key or name exists
+	 */
+	TableDelegate._hasKeyOrName = function(oPropertyHelper, oAnyItem) {
+		return oPropertyHelper.hasProperty(oAnyItem.key);
 	};
 
 	/**
@@ -243,8 +254,8 @@ sap.ui.define([
 		const aSorters = [];
 
 		aSortedProperties.forEach((oSorter) => {
-			if (oPropertyHelper.hasProperty(oSorter.name)) {
-				const sPath = oPropertyHelper.getProperty(oSorter.name).path;
+			if (this._hasKeyOrName(oPropertyHelper, oSorter)) {
+				const sPath = oPropertyHelper.getProperty(oSorter.key).path;
 				aSorters.push(new Sorter(sPath, oSorter.descending));
 			}
 		});
