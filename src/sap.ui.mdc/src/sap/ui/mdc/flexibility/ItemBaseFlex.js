@@ -6,8 +6,9 @@ sap.ui.define([
 	"sap/ui/mdc/util/DynamicPropertiesUtil",
 	"sap/ui/fl/changeHandler/Base",
 	"sap/ui/fl/changeHandler/condenser/Classification",
-	"sap/ui/fl/changeHandler/common/ChangeCategories"
-], (Util, DynamicPropertiesUtil, FLChangeHandlerBase, CondenserClassification, ChangeCategories) => {
+	"sap/ui/fl/changeHandler/common/ChangeCategories",
+	"sap/ui/mdc/util/getKey"
+], (Util, DynamicPropertiesUtil, FLChangeHandlerBase, CondenserClassification, ChangeCategories, getKey) => {
 	"use strict";
 
 	const ItemBaseFlex = {
@@ -124,7 +125,8 @@ sap.ui.define([
 					let oExistingItem;
 					const aAggregationItems = oAggregation.items;
 					if (aAggregationItems) {
-						oExistingItem = this.findItem(oModifier, aAggregationItems, oChangeContent.name); //can return a promise
+						const sItemKey = getKey(oChangeContent);
+						oExistingItem = this.findItem(oModifier, aAggregationItems, sItemKey); //can return a promise
 					}
 					return oExistingItem;
 				});
@@ -151,20 +153,20 @@ sap.ui.define([
 			this.beforeApply(oChange.getChangeType(), oControl, bIsRevert);
 
 			const aPropertyKeys = await DynamicPropertiesUtil.getPropertyKeys(oControl, mPropertyBag);
-			if (aPropertyKeys.includes(oChangeContent.name)) {
+			if (aPropertyKeys.includes(getKey(oChangeContent))) {
 				return FLChangeHandlerBase.markAsNotApplicable(
 					"The specified change is already existing - change appliance ignored", true
 				);
 			}
 
-			aPropertyKeys.splice(oChangeContent.index, 0, oChangeContent.name);
+			aPropertyKeys.splice(oChangeContent.index, 0, getKey(oChangeContent));
 			await DynamicPropertiesUtil.setPropertyKeys(oControl, aPropertyKeys, mPropertyBag);
 
 			if (bIsRevert) {
 				oChange.resetRevertData();
 			} else {
 				oChange.setRevertData({
-					name: oChangeContent.name,
+					key: getKey(oChangeContent),
 					index: oChangeContent.index
 				});
 			}
@@ -179,7 +181,7 @@ sap.ui.define([
 			this.beforeApply(oChange.getChangeType(), oControl, bIsRevert);
 
 			const aPropertyKeys = await DynamicPropertiesUtil.getPropertyKeys(oControl, mPropertyBag);
-			const iIndex = aPropertyKeys.indexOf(oChangeContent.name);
+			const iIndex = aPropertyKeys.indexOf(getKey(oChangeContent));
 			if (iIndex < 0) {
 				return FLChangeHandlerBase.markAsNotApplicable(
 					"The specified change is already existing - change appliance ignored", true
@@ -193,7 +195,7 @@ sap.ui.define([
 				oChange.resetRevertData();
 			} else {
 				oChange.setRevertData({
-					name: oChangeContent.name,
+					key: getKey(oChangeContent),
 					index: iIndex
 				});
 			}
@@ -208,7 +210,7 @@ sap.ui.define([
 			this.beforeApply(oChange.getChangeType(), oControl, bIsRevert);
 
 			const aPropertyKeys = await DynamicPropertiesUtil.getPropertyKeys(oControl, mPropertyBag);
-			const iOldIndex = aPropertyKeys.indexOf(oChangeContent.name);
+			const iOldIndex = aPropertyKeys.indexOf(getKey(oChangeContent));
 			if (iOldIndex < 0) {
 				return FLChangeHandlerBase.markAsNotApplicable(
 					"The specified change is already existing - change appliance ignored", true
@@ -216,14 +218,14 @@ sap.ui.define([
 			}
 
 			aPropertyKeys.splice(iOldIndex, 1);
-			aPropertyKeys.splice(oChangeContent.index, 0, oChangeContent.name);
+			aPropertyKeys.splice(oChangeContent.index, 0, getKey(oChangeContent));
 			await DynamicPropertiesUtil.setPropertyKeys(oControl, aPropertyKeys, mPropertyBag);
 
 			if (bIsRevert) {
 				oChange.resetRevertData();
 			} else {
 				oChange.setRevertData({
-					name: oChangeContent.name,
+					key: getKey(oChangeContent),
 					index: iOldIndex
 				});
 			}
@@ -240,7 +242,7 @@ sap.ui.define([
 			this.beforeApply(oChange.getChangeType(), oControl, bIsRevert);
 			const oModifier = mPropertyBag.modifier,
 				oChangeContent = bIsRevert ? oChange.getRevertData() : oChange.getContent();
-			const sPropertyKeyName = oChangeContent.name;
+			const sPropertyKey = getKey(oChangeContent);
 			let iIndex;
 			let aDefaultAggregation;
 			let oAggregation;
@@ -269,7 +271,7 @@ sap.ui.define([
 								return Util.getModule(oDelegate.name);
 							})
 							.then((Delegate) => {
-								return this.beforeAddItem(Delegate, sPropertyKeyName, oControl, mPropertyBag, oChangeContent);
+								return this.beforeAddItem(Delegate, sPropertyKey, oControl, mPropertyBag, oChangeContent);
 							})
 							.then((oRequestedItem) => {
 								return oRequestedItem;
@@ -304,7 +306,7 @@ sap.ui.define([
 					} else {
 						// Set revert data on the change
 						oChange.setRevertData({
-							name: oChangeContent.name,
+							key: sPropertyKey,
 							index: iIndex,
 							item: sControlAggregationItemId
 						});
@@ -387,7 +389,7 @@ sap.ui.define([
 					} else {
 						// Set revert data on the change
 						oChange.setRevertData({
-							name: oChangeContent.name,
+							key: getKey(oChangeContent),
 							index: iIndex,
 							item: sControlAggregationItemId
 						});
@@ -455,7 +457,7 @@ sap.ui.define([
 						oChange.resetRevertData();
 					} else {
 						oChange.setRevertData({
-							name: oChangeContent.name,
+							key: getKey(oChangeContent),
 							index: iOldIndex,
 							item: sControlAggregationItemId
 						});
@@ -488,7 +490,7 @@ sap.ui.define([
 			}
 
 			// Property keys mode fallback: find item by property key in the (now synced) aggregation
-			const sPropertyKey = oChange.getContent().name;
+			const sPropertyKey = getKey(oChange.getContent());
 			const aItems = oControl[oControl.getMetadata().getAggregation(oAggregation.name)._sGetter]?.() || [];
 			for (const oItem of aItems) {
 				const sKey = oItem.getPropertyKey ? oItem.getPropertyKey() : undefined;

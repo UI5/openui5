@@ -34,7 +34,6 @@ sap.ui.define([
 
 					const oSortContent = {
 						key: oChangeContent.key,
-						name: oChangeContent.key,
 						descending: oChangeContent.descending
 					};
 

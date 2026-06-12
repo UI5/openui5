@@ -6,7 +6,7 @@
 		<script src="shared-config.js"></script>
 		<script id="sap-ui-bootstrap"
 				src="../../../resources/sap-ui-core.js"
-				data-sap-ui-libs="sap.m, sap.ui.layout"
+				data-sap-ui-libs="sap.m, sap.ui.layout, sap.ui.table"
 				data-sap-ui-on-init="module:local/ExpandableText"
 				data-sap-ui-resource-roots='{
 					"local": "./",
@@ -19,6 +19,7 @@
 						xmlns="sap.m"
 						xmlns:core="sap.ui.core"
 						xmlns:form="sap.ui.layout.form"
+						xmlns:table="sap.ui.table"
 						controllerName="myController"
 						displayBlock="true">
 				<App>
@@ -124,6 +125,30 @@
 								</ColumnListItem>
 							</items>
 						</Table>
+						<core:HTML content="&lt;hr/&gt;" />
+						<table:Table
+							rows="{
+								path: '/gridRows'
+							}"
+							visibleRowCount="2"
+							selectionMode="None"
+							width="30%"
+							class="sapUiSizeCompact">
+							<table:columns>
+								<table:Column width="80px">
+									<Label text="Column 1" />
+									<table:template>
+										<Text text="{col1}" />
+									</table:template>
+								</table:Column>
+								<table:Column width="200px">
+									<Label text="ExpandableText" />
+									<table:template>
+										<ExpandableText text="{col2}" maxCharacters="40" overflowMode="Popover" />
+									</table:template>
+								</table:Column>
+							</table:columns>
+						</table:Table>
 						<ScrollContainer
 							width="280px"
 							height="auto"

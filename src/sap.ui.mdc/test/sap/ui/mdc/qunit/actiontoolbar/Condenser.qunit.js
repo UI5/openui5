@@ -2,9 +2,9 @@
 sap.ui.define([
     "sap/ui/rta/enablement/elementActionTest"
 ], function(elementActionTest) {
-    'use strict';
+	'use strict';
 
-    function fnGetViewStandAlone() {
+	function fnGetViewStandAlone() {
         const sView =
             '<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:m="sap.m" xmlns:mdc="sap.ui.mdc" xmlns:mdcat="sap.ui.mdc.actiontoolbar">' +
                 '<mdc:ActionToolbar id="actionToolbarId" width="100%">' +
@@ -31,40 +31,40 @@ sap.ui.define([
         return sView;
     }
 
-/*
-    function fnGetViewWithTable() {
-        var sDelegate = '\\{"name": "sap/ui/mdc/qunit/table/CondenserDelegate"\\}';
-        var sView =
-            '<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:m="sap.m" xmlns:mdc="sap.ui.mdc" xmlns:mdcat="sap.ui.mdc.actiontoolbar">' +
-                '<mdc:Table id="actionToolbarTable" ' +
-                    'selectionMode="Multi" ' +
-                    'type="Table" ' +
-                    'delegate=\'' +  sDelegate + '\' ' +
-                    'p13nMode="Column,Group,Sort">' +
-                    '<mdc:actions>' +
-                        '<mdcat:ActionToolbarAction id="Action1">' +
-                            '<m:Button text="Action 1" id="Button1" />' +
-                        '</mdcat:ActionToolbarAction>' +
-                        '<mdcat:ActionToolbarAction id="Action2">' +
-                            '<m:Button text="Action 2" id="Button2" />' +
-                        '</mdcat:ActionToolbarAction>' +
-                        '<mdcat:ActionToolbarAction id="Action3">' +
-                            '<m:Button text="Action 3" id="Button3" />' +
-                        '</mdcat:ActionToolbarAction>' +
-                        '<mdcat:ActionToolbarAction id="Action4">' +
-                            '<m:Button text="Action 4" id="Button4" />' +
-                        '</mdcat:ActionToolbarAction>' +
-                        '<mdcat:ActionToolbarAction id="Action5">' +
-                            '<m:Button text="Action 5" id="Button5" />' +
-                        '</mdcat:ActionToolbarAction>' +
-                    '</mdc:actions>' +
-                '</mdc:Table>' +
-            '</mvc:View>';
+	/*
+		function fnGetViewWithTable() {
+			var sDelegate = '\\{"name": "sap/ui/mdc/qunit/table/CondenserDelegate"\\}';
+			var sView =
+				'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:m="sap.m" xmlns:mdc="sap.ui.mdc" xmlns:mdcat="sap.ui.mdc.actiontoolbar">' +
+					'<mdc:Table id="actionToolbarTable" ' +
+						'selectionMode="Multi" ' +
+						'type="Table" ' +
+						'delegate=\'' +  sDelegate + '\' ' +
+						'p13nMode="Column,Group,Sort">' +
+						'<mdc:actions>' +
+							'<mdcat:ActionToolbarAction id="Action1">' +
+								'<m:Button text="Action 1" id="Button1" />' +
+							'</mdcat:ActionToolbarAction>' +
+							'<mdcat:ActionToolbarAction id="Action2">' +
+								'<m:Button text="Action 2" id="Button2" />' +
+							'</mdcat:ActionToolbarAction>' +
+							'<mdcat:ActionToolbarAction id="Action3">' +
+								'<m:Button text="Action 3" id="Button3" />' +
+							'</mdcat:ActionToolbarAction>' +
+							'<mdcat:ActionToolbarAction id="Action4">' +
+								'<m:Button text="Action 4" id="Button4" />' +
+							'</mdcat:ActionToolbarAction>' +
+							'<mdcat:ActionToolbarAction id="Action5">' +
+								'<m:Button text="Action 5" id="Button5" />' +
+							'</mdcat:ActionToolbarAction>' +
+						'</mdc:actions>' +
+					'</mdc:Table>' +
+				'</mvc:View>';
 
-        return sView;
-    }
-*/
-    function fnGetViewWithChart() {
+			return sView;
+		}
+	*/
+	function fnGetViewWithChart() {
         const sDelegate = '\\{"name": "delegates/ChartDelegate"\\}';
         const sView =
             '<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:m="sap.m" xmlns:mdc="sap.ui.mdc" xmlns:mdcat="sap.ui.mdc.actiontoolbar" xmlns:mdcc="sap.ui.mdc.chart" xmlns:core="sap.ui.core">' +
@@ -96,7 +96,7 @@ sap.ui.define([
     }
 
 
-    function fnConfirmInitialActionState(sActionToolbarId) {
+	function fnConfirmInitialActionState(sActionToolbarId) {
         return function (oUiComponent, oViewAfterAction, assert) {
             const oActionToolbar = oViewAfterAction.byId(sActionToolbarId);
             const aActions = oActionToolbar.getActions();
@@ -110,7 +110,7 @@ sap.ui.define([
         };
     }
 
-    function fnConfirmActionGotMoved(sActionToolbarId, sActionId, iIndex) {
+	function fnConfirmActionGotMoved(sActionToolbarId, sActionId, iIndex) {
         return function (oUiComponent, oViewAfterAction, assert) {
             const oActionToolbar = oViewAfterAction.byId(sActionToolbarId);
             const aActions = oActionToolbar.getActions();
@@ -120,7 +120,7 @@ sap.ui.define([
         };
     }
 
-    elementActionTest("Standalone - Two moveAction changes condensed into none", {
+	elementActionTest("Standalone - Two moveAction changes condensed into none", {
         xmlView: fnGetViewStandAlone(),
         action: {
             name: "settings",
@@ -129,7 +129,7 @@ sap.ui.define([
                 return {
 					changeType: "moveAction",
 					content: {
-						name: "comp---view--Action5",
+						key: "comp---view--Action5",
                         index: 1
 					}
 				};
@@ -142,7 +142,7 @@ sap.ui.define([
 				return {
 					changeType: "moveAction",
 					content: {
-						name: "comp---view--Action5",
+						key: "comp---view--Action5",
                         index: 0
 					}
 				};
@@ -154,44 +154,44 @@ sap.ui.define([
 		afterRedo: fnConfirmActionGotMoved("actionToolbarId", "comp---view--Action5", 1)
     });
 
-/*
-    elementActionTest("with Table - Two moveAction changes condensed into none", {
-        xmlView: fnGetViewWithTable(),
-        jsOnly: true,
-        action: {
-            name: "settings",
-            controlId: "actionToolbarTable-toolbar",
-            parameter: function () {
-                return {
-					changeType: "moveAction",
-					content: {
-						name: "comp---view--Action5",
-                        index: 1
-					}
-				};
-            }
-        },
-        previousActions: [{
-			name: "settings",
-			controlId: "actionToolbarTable-toolbar",
-			parameter: function () {
-				return {
-					changeType: "moveAction",
-					content: {
-						name: "comp---view--Action5",
-                        index: 0
-					}
-				};
-			}
-		}],
-        changesAfterCondensing: 1,
-		afterAction: fnConfirmActionGotMoved("comp---view--actionToolbarTable-toolbar", "comp---view--Action5", 1),
-		afterUndo: fnConfirmInitialActionState("comp---view--actionToolbarTable-toolbar"),
-		afterRedo: fnConfirmActionGotMoved("comp---view--actionToolbarTable-toolbar", "comp---view--Action5", 1)
-    });
-*/
+	/*
+		elementActionTest("with Table - Two moveAction changes condensed into none", {
+			xmlView: fnGetViewWithTable(),
+			jsOnly: true,
+			action: {
+				name: "settings",
+				controlId: "actionToolbarTable-toolbar",
+				parameter: function () {
+					return {
+						changeType: "moveAction",
+						content: {
+							key: "comp---view--Action5",
+							index: 1
+						}
+					};
+				}
+			},
+			previousActions: [{
+				name: "settings",
+				controlId: "actionToolbarTable-toolbar",
+				parameter: function () {
+					return {
+						changeType: "moveAction",
+						content: {
+							key: "comp---view--Action5",
+							index: 0
+						}
+					};
+				}
+			}],
+			changesAfterCondensing: 1,
+			afterAction: fnConfirmActionGotMoved("comp---view--actionToolbarTable-toolbar", "comp---view--Action5", 1),
+			afterUndo: fnConfirmInitialActionState("comp---view--actionToolbarTable-toolbar"),
+			afterRedo: fnConfirmActionGotMoved("comp---view--actionToolbarTable-toolbar", "comp---view--Action5", 1)
+		});
+	*/
 
-    elementActionTest("with Chart - Two moveAction changes condensed into none", {
+	elementActionTest("with Chart - Two moveAction changes condensed into none", {
         xmlView: fnGetViewWithChart(),
         jsOnly: true,
         action: {
@@ -201,7 +201,7 @@ sap.ui.define([
                 return {
 					changeType: "moveAction",
 					content: {
-						name: "comp---view--Action5",
+						key: "comp---view--Action5",
                         index: 1
 					}
 				};
@@ -214,7 +214,7 @@ sap.ui.define([
 				return {
 					changeType: "moveAction",
 					content: {
-						name: "comp---view--Action5",
+						key: "comp---view--Action5",
                         index: 0
 					}
 				};
@@ -225,5 +225,4 @@ sap.ui.define([
 		afterUndo: fnConfirmInitialActionState("comp---view--actionToolbarChart--toolbar"),
 		afterRedo: fnConfirmActionGotMoved("comp---view--actionToolbarChart--toolbar", "comp---view--Action5", 1)
     });
-
 });

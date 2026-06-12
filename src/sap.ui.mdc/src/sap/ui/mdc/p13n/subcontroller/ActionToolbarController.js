@@ -8,8 +8,9 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/mdc/p13n/panels/ActionToolbarPanel",
 	"sap/m/Column",
-	"sap/ui/mdc/p13n/P13nBuilder"
-], (BaseController, Element, Library, ActionToolbarPanel, Column, P13nBuilder) => {
+	"sap/ui/mdc/p13n/P13nBuilder",
+	'sap/ui/mdc/util/getKey'
+], (BaseController, Element, Library, ActionToolbarPanel, Column, P13nBuilder, getKey) => {
 	"use strict";
 
 	const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
@@ -36,7 +37,7 @@ sap.ui.define([
 		aChanges.forEach((oChange) => {
 			const sChangeType = oChange.changeSpecificData.changeType;
 			if (sChangeType === "hideControl" || sChangeType === "unhideControl") {
-				oChange.selectorElement = Element.getElementById(oChange.changeSpecificData.content.name);
+				oChange.selectorElement = Element.getElementById(getKey(oChange.changeSpecificData.content));
 				delete oChange.changeSpecificData.content;
 			}
 		});

@@ -21,7 +21,8 @@ sap.ui.define([
 	"sap/ui/fl/support/api/SupportAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
-	"sap/ui/thirdparty/sinon-4"
+	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	RtaQunitUtils,
 	Log,
@@ -43,7 +44,8 @@ sap.ui.define([
 	SupportAPI,
 	Layer,
 	Utils,
-	sinon
+	sinon,
+	FlQUnitUtils
 ) {
 	"use strict";
 	var sandbox = sinon.createSandbox();
@@ -54,7 +56,7 @@ sap.ui.define([
 			this.oAppComponent.destroy();
 		}
 		Loader.clearCache();
-		ComponentLifecycleHooks._mWasFilledOnLastCheck = {};
+		FlexState.clearState();
 		sandbox.restore();
 	}
 
@@ -819,10 +821,10 @@ sap.ui.define([
 			assert.strictEqual(this.oFlexStateInitStub.callCount, 0, "FlexState was not initialized");
 		});
 
-		QUnit.test("hook gets called, storage response is empty and flexData was previously filled", async function(assert) {
+		QUnit.test("hook gets called, storage response is empty and FlexState was already initialized", async function(assert) {
 			this.oChangesAvailableStub.returns(false);
-			ComponentLifecycleHooks._mWasFilledOnLastCheck[sReference] = true;
 			this.oLoaderInitStub.resolves({ data: {}, parameters: {} });
+			sandbox.stub(FlexState, "isInitialized").returns(true);
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel1,
 				modelId: "someModelId",
@@ -834,9 +836,32 @@ sap.ui.define([
 			assert.ok(this.oFlexStateInitStub.calledOnce, "FlexState was initialized");
 		});
 
-		QUnit.test("hook gets called, storage response is empty and flexData was not previously filled", async function(assert) {
+		QUnit.test("hook gets called, storage response is empty and FlexState is not loaded yet", async function(assert) {
 			this.oChangesAvailableStub.returns(false);
 			this.oLoaderInitStub.resolves({ data: {}, parameters: {} });
+			const oIsInitializedSpy = sandbox.spy(FlexState, "isInitialized");
+			FlQUnitUtils.stubSapUiRequire(sandbox, [
+				{
+					name: "sap/ui/fl/apply/_internal/flexState/FlexState",
+					stub: sandbox.stub().returns(undefined)
+				}
+			]);
+			ComponentLifecycleHooks.modelCreatedHook({
+				model: this.oFakeModel1,
+				modelId: "someModelId",
+				ownerId: undefined,
+				factoryConfig: { id: "reuse-component" },
+				manifest: this.oAppComponent.getManifest()
+			});
+			await this.oSetAnnotationChangeStub1.getCall(0).args[0];
+			assert.ok(this.oFlexStateInitStub.notCalled, "FlexState was not initialized");
+			assert.ok(oIsInitializedSpy.notCalled, "FlexState.isInitialized was not called");
+		});
+
+		QUnit.test("hook gets called, storage response is empty and FlexState was not previously initialized", async function(assert) {
+			this.oChangesAvailableStub.returns(false);
+			this.oLoaderInitStub.resolves({ data: {}, parameters: {} });
+			sandbox.stub(FlexState, "isInitialized").returns(false);
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel1,
 				modelId: "someModelId",

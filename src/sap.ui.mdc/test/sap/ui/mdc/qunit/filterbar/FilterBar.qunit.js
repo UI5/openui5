@@ -883,7 +883,7 @@ sap.ui.define([
 
 					assert.equal(aResultingChanges[0].selectorElement, oFilterBar);
 					assert.equal(aResultingChanges[0].changeSpecificData.changeType, "addCondition");
-					assert.equal(aResultingChanges[0].changeSpecificData.content.name, "key");
+					assert.equal(aResultingChanges[0].changeSpecificData.content.key, "key");
 					assert.deepEqual(aResultingChanges[0].changeSpecificData.content.condition, { operator: OperatorName.EQ, values: ["foo"], validated: undefined });
 					done();
 					return Promise.resolve(aChanges);
@@ -1271,11 +1271,11 @@ sap.ui.define([
 					const oAdaptFiltersPanel = oP13nContainer.getPanels()[0];
 					const aPanelItems = oAdaptFiltersPanel.getP13nData().items;
 					assert.equal(aPanelItems.length, 3, "correct amount of p13n items has been created by FilterBar");
-					assert.equal(aPanelItems[0].key, "field1", "correct field created in panel");
+					assert.equal(aPanelItems[0].name, "field1", "correct field created in panel");
 					assert.equal(aPanelItems[0].label, "A", "correct label for field created in panel");
-					assert.equal(aPanelItems[1].key, "field2", "correct field created in panel");
+					assert.equal(aPanelItems[1].name, "field2", "correct field created in panel");
 					assert.equal(aPanelItems[1].label, "B", "correct label for field created in panel");
-					assert.equal(aPanelItems[2].key, "field3", "correct field created in panel");
+					assert.equal(aPanelItems[2].name, "field3", "correct field created in panel");
 					assert.equal(aPanelItems[2].label, "C", "correct label for field created in panel");
 
 					oFilterBar.getControlDelegate().fetchProperties.restore();

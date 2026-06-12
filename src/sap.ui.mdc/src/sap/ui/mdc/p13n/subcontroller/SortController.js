@@ -5,9 +5,8 @@
 sap.ui.define([
 	"./SelectionController",
 	"sap/ui/core/Lib",
-	'sap/ui/mdc/p13n/P13nBuilder',
 	'sap/m/p13n/SortPanel'
-], (BaseController, Library, P13nBuilder, SortPanel) => {
+], (BaseController, Library, SortPanel) => {
 	"use strict";
 
 	const SortController = BaseController.extend("sap.ui.mdc.p13n.subcontroller.SortController", {
@@ -43,16 +42,8 @@ sap.ui.define([
 	};
 
 	SortController.prototype.model2State = function() {
-		const aItems = [];
 		if (this._oPanel) {
-			this._oPanel.getP13nData(true).forEach((oItem) => {
-				if (oItem.sorted) {
-					aItems.push({
-						name: oItem.name
-					});
-				}
-			});
-			return aItems;
+			return this._getP13nDataAsStateItems(this._getPresenceAttribute());
 		}
 	};
 
@@ -70,8 +61,7 @@ sap.ui.define([
 
 	SortController.prototype.mixInfoAndState = function(oPropertyHelper) {
 
-		const aItemState = this.getCurrentState();
-		const mExistingSorters = P13nBuilder.arrayToMap(aItemState);
+		const mExistingSorters = this._stateToMap();
 
 		const oP13nData = this.prepareAdaptationData(oPropertyHelper, (mItem, oProperty) => {
 

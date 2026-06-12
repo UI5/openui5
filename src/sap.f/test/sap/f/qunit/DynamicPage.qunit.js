@@ -888,7 +888,7 @@ function(
 		this.oDynamicPage._onHeaderPropertyChange({current: false, name: "visible"}); // call the listener synchronously to speed up the test
 
 		// Check
-		iAllocatedSpaceForTitleHeight = parseInt(this.oDynamicPage.$().find(".sapFDynamicPageContentWrapper").css("paddingTop"));
+		iAllocatedSpaceForTitleHeight = Math.round(parseFloat(this.oDynamicPage.$().find(".sapFDynamicPageContentWrapper").css("paddingTop")));
 		iActualTitleHeight = this.oDynamicPage._getTitleAreaHeight();
 
 		assert.strictEqual(oSpy.callCount, 1, "Title positioning is updated");

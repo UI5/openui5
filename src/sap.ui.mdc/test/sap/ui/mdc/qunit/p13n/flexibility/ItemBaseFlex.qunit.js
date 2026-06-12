@@ -34,7 +34,7 @@ sap.ui.define([
 	QUnit.module("Generic Tests", {
 
 		oTestContent: {
-			name: "testAggregationControl1"
+			key: "testAggregationControl1"
 		},
 
 		beforeEach: function() {
@@ -105,7 +105,7 @@ sap.ui.define([
 			},
 			getContent: function() {
 				return {
-					name: "testAggregationControl3"
+					key: "testAggregationControl3"
 				};
 			},
 			setRevertData: function() {}
@@ -135,7 +135,7 @@ sap.ui.define([
 			},
 			getContent: function() {
 				return {
-					name: "testAggregationControl1"
+					key: "testAggregationControl1"
 				};
 			},
 			setRevertData: function() {}
@@ -164,7 +164,7 @@ sap.ui.define([
 			},
 			getContent: function() {
 				return {
-					name: "testAggregationControl1"
+					key: "testAggregationControl1"
 				};
 			},
 			setRevertData: function() {}
@@ -194,7 +194,7 @@ sap.ui.define([
 			},
 			getContent: function() {
 				return {
-					name: "testAggregationControl1"
+					key: "testAggregationControl1"
 				};
 			},
 			setRevertData: function() {}
@@ -227,7 +227,7 @@ sap.ui.define([
 			},
 			getContent: function() {
 				return {
-					name: "testAggregationControl1",
+					key: "testAggregationControl1",
 					index: 1
 				};
 			},
@@ -257,7 +257,7 @@ sap.ui.define([
 			},
 			getContent: function() {
 				return {
-					name: "testAggregationControl4"
+					key: "testAggregationControl4"
 				};
 			},
 			setRevertData: function() {}
@@ -296,7 +296,7 @@ sap.ui.define([
 			},
 			getContent: function() {
 				return {
-					name: "testAggregationControl2"
+					key: "testAggregationControl2"
 				};
 			},
 			setRevertData: function() {}
@@ -337,7 +337,7 @@ sap.ui.define([
 			},
 			getContent: function() {
 				return {
-					name: "testAggregationControl1"
+					key: "testAggregationControl1"
 				};
 			},
 			setRevertData: function() {}
@@ -349,7 +349,7 @@ sap.ui.define([
 			},
 			getContent: function() {
 				return {
-					name: "testAggregationControl1",
+					key: "testAggregationControl1",
 					index: 1
 				};
 			},

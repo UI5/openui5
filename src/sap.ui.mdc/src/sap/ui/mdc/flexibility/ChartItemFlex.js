@@ -8,9 +8,10 @@ sap.ui.define([
 	"sap/ui/fl/changeHandler/common/ChangeCategories",
 	"sap/ui/fl/changeHandler/condenser/Classification",
 	"sap/ui/mdc/chart/Util",
-	"./helpers/getAffectedChartItem"
+	"./helpers/getAffectedChartItem",
+	"sap/ui/mdc/util/getKey"
 
-], (ItemBaseFlex, Util, ChangeCategories, CondenserClassification, ChartUtil, getAffectedChartItem) => {
+], (ItemBaseFlex, Util, ChangeCategories, CondenserClassification, ChartUtil, getAffectedChartItem, getKey) => {
 	"use strict";
 
 	const oChartItemFlex = Object.assign({}, ItemBaseFlex);
@@ -42,7 +43,8 @@ sap.ui.define([
 		const oContent = oChange.getContent();
 		const oChart = oAppComponent.byId(oChange.getSelector().id);
 		let sKey;
-		const aArgs = [oContent.name];
+		const sContentKey = getKey(oContent);
+		const aArgs = [sContentKey];
 		const mVersionInfo = { descriptionPayload: {} };
 
 		if (oChange.getChangeType() === "addItem") {
@@ -63,7 +65,7 @@ sap.ui.define([
 		const oChartPropertyHelper = oChart?.getPropertyHelper();
 		if (oChartPropertyHelper) {
 			let sType;
-			const oProperty = oChartPropertyHelper.getProperty(oContent.name);
+			const oProperty = oChartPropertyHelper.getProperty(sContentKey);
 			if (oProperty) {
 				if (oProperty.isAggregatable()) {
 					sType = "aggregatable";

@@ -39,18 +39,14 @@ sap.ui.define([
 	 */
 	const ComponentLifecycleHooks = {};
 
-	// Tracks per reference whether the last call to isInitializeRelevant saw filled flex data.
-	// Used to detect a filled-to-empty transition (e.g. when discarding a draft that contained all
-	// existing changes), so the FlexState gets re-initialized to clean up the stale state.
-	ComponentLifecycleHooks._mWasFilledOnLastCheck = {};
-
-	// Initializing the FlexState is relevant if there are any changes now, or if the last call
-	// for this reference saw changes (which means a cleanup is required).
+	// If there are changes available, then the FlexState must always be initialized
+	// If there is already an initialized FlexState, then the initialize function must be called since the data might be different now
+	// For example if the original App is activated, then there were changes before (initialized FlexState), and now there are none
 	function isInitializeRelevant(sReference, oFlexData) {
 		const bFilled = StorageUtils.isStorageResponseFilled(oFlexData.data.changes);
-		const bRelevant = bFilled || !!ComponentLifecycleHooks._mWasFilledOnLastCheck[sReference];
-		ComponentLifecycleHooks._mWasFilledOnLastCheck[sReference] = bFilled;
-		return bRelevant;
+		const FlexState = sap.ui.require("sap/ui/fl/apply/_internal/flexState/FlexState");
+
+		return bFilled || FlexState?.isInitialized({ reference: sReference });
 	}
 
 	async function checkForChangesAndInitializeFlexState(sReference, oConfig, oFlexData) {

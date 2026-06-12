@@ -7,8 +7,9 @@ sap.ui.define([
 	'sap/ui/mdc/condition/FilterOperatorUtil',
 	'sap/ui/mdc/flexibility/Util',
 	"sap/ui/fl/changeHandler/condenser/Classification",
-	"sap/ui/fl/changeHandler/common/ChangeCategories"
-], (merge, Log, FilterOperatorUtil, Util, ChangeClassification, ChangeCategories) => {
+	"sap/ui/fl/changeHandler/common/ChangeCategories",
+	"./helpers/addKeyOrName"
+], (merge, Log, FilterOperatorUtil, Util, ChangeClassification, ChangeCategories, addKeyOrName) => {
 	"use strict";
 
 	/**
@@ -32,7 +33,7 @@ sap.ui.define([
 	const fAddCondition = function(oChange, oControl, mPropertyBag, sChangeReason) {
 
 		const bIsRevert = (sChangeReason === Util.REVERT);
-		const oChangeContent = bIsRevert ? oChange.getRevertData() : oChange.getContent();
+		const oChangeContent = addKeyOrName(bIsRevert ? oChange.getRevertData() : oChange.getContent());
 
 		let mConditionsData, aConditions = null;
 		const oModifier = mPropertyBag.modifier;
@@ -44,7 +45,7 @@ sap.ui.define([
 					mConditionsData = merge({}, mFilterConditions);
 					if (mConditionsData) {
 						for (const sFieldPath in mConditionsData) {
-							if (sFieldPath === oChangeContent.name) {
+							if (sFieldPath === oChangeContent.key) {
 								aConditions = mConditionsData[sFieldPath];
 								break;
 							}
@@ -52,14 +53,14 @@ sap.ui.define([
 					}
 
 					if (!aConditions) {
-						mConditionsData[oChangeContent.name] = [];
-						aConditions = mConditionsData[oChangeContent.name];
+						mConditionsData[oChangeContent.key] = [];
+						aConditions = mConditionsData[oChangeContent.key];
 					}
 
 					if (!bIsRevert) {
 						// Set revert data on the change
 						oChange.setRevertData({
-							name: oChangeContent.name,
+							key: oChangeContent.key,
 							condition: oChangeContent.condition
 						});
 					}
@@ -79,7 +80,7 @@ sap.ui.define([
 							.then((Delegate) => {
 								const fnDelegateAddCondition = Delegate && (Delegate.getFilterDelegate ? Delegate.getFilterDelegate().addCondition : Delegate.addCondition);
 								if (fnDelegateAddCondition) {
-									return fnDelegateAddCondition(oControl, oChangeContent.name, mPropertyBag)
+									return fnDelegateAddCondition(oControl, oChangeContent.key, mPropertyBag)
 										.catch((oEx) => {
 											Log.error("Error during Delegate.addCondition call: " + oEx);
 										});
@@ -99,7 +100,7 @@ sap.ui.define([
 	const fRemoveCondition = function(oChange, oControl, mPropertyBag, sChangeReason) {
 
 		const bIsRevert = (sChangeReason === Util.REVERT);
-		const oChangeContent = bIsRevert ? oChange.getRevertData() : oChange.getContent();
+		const oChangeContent = addKeyOrName(bIsRevert ? oChange.getRevertData() : oChange.getContent());
 
 		let mConditionsData, aConditions, nDelIndex = -1;
 		const oModifier = mPropertyBag.modifier;
@@ -112,7 +113,7 @@ sap.ui.define([
 
 					if (mConditionsData) {
 						for (const sFieldPath in mConditionsData) {
-							if (sFieldPath === oChangeContent.name) {
+							if (sFieldPath === oChangeContent.key) {
 								aConditions = mConditionsData[sFieldPath];
 								break;
 							}
@@ -122,7 +123,7 @@ sap.ui.define([
 					if (!bIsRevert) {
 						// Set revert data on the change
 						oChange.setRevertData({
-							name: oChangeContent.name,
+							key: oChangeContent.key,
 							condition: oChangeContent.condition
 						});
 					}
@@ -133,7 +134,7 @@ sap.ui.define([
 						if (nDelIndex >= 0) {
 							aConditions.splice(nDelIndex, 1);
 							//					if (aConditions.length === 0) {
-							//						delete mConditionsData[oChangeContent.name];
+							//						delete mConditionsData[oChangeContent.key];
 							//					}
 							// 'filterConditions' property needs to be updated for change selector
 							oModifier.setProperty(oControl, "filterConditions", mConditionsData);
@@ -145,7 +146,7 @@ sap.ui.define([
 								.then((Delegate) => {
 									const fnDelegateRemoveCondition = Delegate && (Delegate.getFilterDelegate ? Delegate.getFilterDelegate().removeCondition : Delegate.removeCondition);
 									if (fnDelegateRemoveCondition) {
-										return fnDelegateRemoveCondition(oControl, oChangeContent.name, mPropertyBag)
+										return fnDelegateRemoveCondition(oControl, oChangeContent.key, mPropertyBag)
 											.catch((oEx) => {
 												Log.error("Error during Delegate.removeCondition call: " + oEx);
 											});
@@ -163,20 +164,20 @@ sap.ui.define([
 	};
 
 	const fGetCondenserInfoCondition = function(oChange, mPropertyBag) {
-		const oContent = oChange.getContent();
+		const oContent = addKeyOrName(oChange.getContent());
 		return {
 			classification: ChangeClassification.Reverse,
 			affectedControl: oChange.getSelector(),
-			uniqueKey: oContent.name + '_' + JSON.stringify(oContent.condition)
+			uniqueKey: oContent.key + '_' + JSON.stringify(oContent.condition)
 		};
 	};
 
 	const fGetChangeVisualizationInfo = function(oChange, oAppComponent) {
-		const oContent = oChange.getContent();
+		const oContent = addKeyOrName(oChange.getContent());
 		const oFilterBar = oAppComponent.byId(oChange.getSelector().id);
 		const mVersionInfo = { descriptionPayload: {} };
 		let sKey;
-		let aArgs = [oContent.name, oContent.condition.operator];
+		let aArgs = [oContent.key, oContent.condition.operator];
 		let vValue;
 
 		if (oChange.getChangeType() === "addCondition") {
@@ -187,7 +188,7 @@ sap.ui.define([
 			sKey = "filterbar.COND_DEL_CHANGE";
 		}
 
-		const oProperty = oFilterBar?.getPropertyHelper()?.getProperty(oContent.name, true);
+		const oProperty = oFilterBar?.getPropertyHelper()?.getProperty(oContent.key, true);
 		if (oProperty) {
 			aArgs.splice(0, 1, oProperty.label);
 
@@ -205,7 +206,7 @@ sap.ui.define([
 				}
 
 				if ((oContent.condition.values.length > 0) && mCurrentState) {
-					const aConditions = mCurrentState[oContent.name];
+					const aConditions = mCurrentState[oContent.key];
 					const mInternalCondition = aConditions?.find((oCondition) => oCondition.values[0] === oContent.condition.values[0]);
 					if (mInternalCondition) {
 						vValue = oOperator.format(mInternalCondition, oProperty.typeConfig.typeInstance, oProperty.display, true);
@@ -231,7 +232,7 @@ sap.ui.define([
 
 		aArgs = aArgs.concat(vValue ? vValue : oContent.condition.values);
 
-		return Util.getInactiveAwareResourceText(oFilterBar, oContent.name, sKey, aArgs).then((sDescription) => {
+		return Util.getInactiveAwareResourceText(oFilterBar, oContent.key, sKey, aArgs).then((sDescription) => {
 			mVersionInfo.descriptionPayload.description = sDescription;
 
 			mVersionInfo.updateRequired = true;

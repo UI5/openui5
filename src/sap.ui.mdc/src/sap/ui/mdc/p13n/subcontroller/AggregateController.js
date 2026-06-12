@@ -2,8 +2,8 @@
  * ${copyright}
  */
 sap.ui.define([
-	"./SelectionController", 'sap/ui/mdc/p13n/P13nBuilder', 'sap/base/util/merge'
-], (BaseController, P13nBuilder, merge) => {
+	"./SelectionController", 'sap/ui/mdc/p13n/P13nBuilder', 'sap/base/util/merge', 'sap/ui/mdc/util/getKey'
+], (BaseController, P13nBuilder, merge, getKey) => {
 	"use strict";
 
 	const AggregateController = BaseController.extend("sap.ui.mdc.p13n.subcontroller.AggregateController");
@@ -56,10 +56,10 @@ sap.ui.define([
 		const mStateDiff = {};
 
 		aChanges.forEach((oChange) => {
-			const sName = oChange.changeSpecificData.content.name;
+			const sKey = getKey(oChange.changeSpecificData.content);
 
-			if (!mStateDiff[sName]) {
-				mStateDiff[sName] = [];
+			if (!mStateDiff[sKey]) {
+				mStateDiff[sKey] = [];
 			}
 
 			const oAggregationValue = {};
@@ -67,7 +67,7 @@ sap.ui.define([
 			if (oChange.changeSpecificData.changeType === this.getChangeOperations()["remove"]) {
 				oAggregationValue.aggregated = false;
 			}
-			mStateDiff[sName] = oAggregationValue;
+			mStateDiff[sKey] = oAggregationValue;
 		});
 
 		return mStateDiff;

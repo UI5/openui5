@@ -42,15 +42,7 @@ sap.ui.define([
 	};
 
 	GroupController.prototype.model2State = function() {
-		const aItems = [];
-		this._oPanel.getP13nData(true).forEach((oItem) => {
-			if (oItem.grouped) {
-				aItems.push({
-					name: oItem.name
-				});
-			}
-		});
-		return aItems;
+		return this._getP13nDataAsStateItems(this._getPresenceAttribute());
 	};
 
 	GroupController.prototype.getChangeOperations = function() {
@@ -67,8 +59,7 @@ sap.ui.define([
 
 	GroupController.prototype.mixInfoAndState = function(oPropertyHelper) {
 
-		const aItemState = this.getCurrentState();
-		const mItemState = P13nBuilder.arrayToMap(aItemState);
+		const mItemState = this._stateToMap();
 		const oController = this.getAdaptationControl();
 		const oAggregations = oController.getAggregateConditions ? oController.getAggregateConditions() || {} : {};
 

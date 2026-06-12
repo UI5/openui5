@@ -166,8 +166,8 @@ sap.ui.define([
 		const oStub = sinon.stub(oTable, "getConditions").returns(oFilterConditions);
 		let aExpectedFilter = [];
 		return TableQUnitUtils.waitForBindingInfo(oTable).then(function() {
-			oTable.setSortConditions({sorters: [{name: "Name", descending: true}]});
-			oTable.setGroupConditions({groupLevels: [{name: "Name"}]});
+			oTable.setSortConditions({sorters: [{key: "Name", descending: true}]});
+			oTable.setGroupConditions({groupLevels: [{key: "Name"}]});
 			oTable.rebind();
 			return TableQUnitUtils.waitForBindingUpdate(oTable);
 		}).then(function() {
@@ -191,7 +191,7 @@ sap.ui.define([
 			assert.ok(oSorter.sPath === "Name_Path" && oSorter.bDescending === true && oSorter.vGroup != null, "Sorter properties");
 
 			oTable.setFilterConditions(oFilterConditions);
-			oTable.setGroupConditions({groupLevels: [{name: "FirstName"}]});
+			oTable.setGroupConditions({groupLevels: [{key: "FirstName"}]});
 			oTable.rebind();
 			return TableQUnitUtils.waitForBindingUpdate(oTable);
 		}).then(function() {
@@ -931,13 +931,13 @@ sap.ui.define([
 					}
 				},
 				sortConditions: {
-					sorters: [{name: "DoesNotExist"}]
+					sorters: [{key: "DoesNotExist"}]
 				},
 				filterConditions: {
 					DoesNotExist: [{operator: "EQ", values: [30]}]
 				},
 				groupConditions: {
-					groupLevels: [{name: "DoesNotExist"}]
+					groupLevels: [{key: "DoesNotExist"}]
 				},
 				aggregateConditions: {
 					DoesNotExist: {}

@@ -442,7 +442,6 @@ sap.ui.define([
 			if (oAction.getVisible()) {
 				aActions.push({
 					key: sId,
-					name: sId,
 					alignment: oAction.getLayoutInformation().alignment
 				});
 			}

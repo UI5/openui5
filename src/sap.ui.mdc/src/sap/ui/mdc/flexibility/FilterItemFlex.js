@@ -3,8 +3,8 @@
  */
 
 sap.ui.define([
-	'./ItemBaseFlex', './Util', "sap/ui/fl/changeHandler/common/ChangeCategories"
-], (ItemBaseFlex, Util, ChangeCategories) => {
+	'./ItemBaseFlex', './Util', "sap/ui/fl/changeHandler/common/ChangeCategories", "sap/ui/mdc/util/getKey"
+], (ItemBaseFlex, Util, ChangeCategories, getKey) => {
 	"use strict";
 
 	/**
@@ -44,7 +44,8 @@ sap.ui.define([
 		const oContent = oChange.getContent();
 		const oFilterBar = oAppComponent.byId(oChange.getSelector().id);
 		let sKey;
-		const aArgs = [oContent.name];
+		const sContentKey = getKey(oContent);
+		const aArgs = [sContentKey];
 		const mVersionInfo = { descriptionPayload: {} };
 
 		if (oChange.getChangeType() === "addFilter") {
@@ -61,12 +62,12 @@ sap.ui.define([
 			aArgs.push(oContent.index);
 		}
 
-		const oProperty = oFilterBar?.getPropertyHelper()?.getProperty(oContent.name, true);
+		const oProperty = oFilterBar?.getPropertyHelper()?.getProperty(sContentKey, true);
 		if (oProperty) {
 			aArgs.splice(0, 1, oProperty.label);
 		}
 
-		return Util.getInactiveAwareResourceText(oFilterBar, oContent.name, sKey, aArgs).then((sDescription) => {
+		return Util.getInactiveAwareResourceText(oFilterBar, sContentKey, sKey, aArgs).then((sDescription) => {
 			mVersionInfo.descriptionPayload.description = sDescription;
 
 			mVersionInfo.updateRequired = true;

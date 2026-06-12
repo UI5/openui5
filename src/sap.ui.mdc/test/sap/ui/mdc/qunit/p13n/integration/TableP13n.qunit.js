@@ -192,10 +192,10 @@ sap.ui.define([
 
 					//check that only required information is present in the change content
 					const oChangeContent = aChanges[0].changeSpecificData.content;
-					assert.ok(oChangeContent.name);
+					assert.ok(oChangeContent.key);
 					assert.ok(!oChangeContent.hasOwnProperty("descending"));
 					const oPropertyHelper = Engine.getInstance()._getRegistryEntry(this.oTable).helper;
-					assert.equal(oChangeContent.name, oPropertyHelper.getProperties()[1].key,
+					assert.equal(oChangeContent.key, oPropertyHelper.getProperties()[1].key,
 						"The stored key should be equal to the 'key' in property info (NOT PATH!)");
 					Engine.getInstance()._setModificationHandler(this.oTable, FlexModificationHandler.getInstance());
 					done();
@@ -350,7 +350,7 @@ sap.ui.define([
 		this.createTestObjects(aPropertyInfos);
 
 		const aP13nData = [
-			{name:"col2", descending: true}
+			{key:"col2", descending: true}
 		];
 
 		this.oTable.initialized().then(function(){
@@ -364,9 +364,9 @@ sap.ui.define([
 				assert.equal(aChanges.length, 1, "one change created");
 				assert.equal(aChanges[0].changeSpecificData.changeType, "addSort", "once sort change created");
 
-				//Sort changes should only store 'name' and 'descending' and 'index'
-				assert.equal(Object.keys(aChanges[0].changeSpecificData.content).length, 3, "Only name, index + descending persisted");
-				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("name"), "Correct attribute persisted");
+				//Sort changes should only store 'key', 'name', 'descending' and 'index'
+				assert.deepEqual(Object.keys(aChanges[0].changeSpecificData.content).sort(), ["descending", "index", "key", "name"].sort(), "Only expected attributes persisted in sort change content");
+				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("key"), "Correct attribute persisted");
 				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("descending"), "Correct attribute persisted");
 				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("index"), "Correct attribute persisted");
 
@@ -379,8 +379,8 @@ sap.ui.define([
 		const done = assert.async();
 
 		const aP13nData = [
-			{name:"col3", position: 2},
-			{name:"col4", position: 3}
+			{key:"col3", position: 2},
+			{key:"col4", position: 3}
 		];
 
 		this.oTable.initialized().then(function(){
@@ -395,9 +395,9 @@ sap.ui.define([
 				assert.equal(aChanges[0].changeSpecificData.changeType, "addColumn", "once column change created");
 				assert.equal(aChanges[1].changeSpecificData.changeType, "addColumn", "once column change created");
 
-				//addColumn changes should only store 'name' and 'index'
-				assert.equal(Object.keys(aChanges[0].changeSpecificData.content).length, 2, "Only name + index persisted");
-				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("name"), "Correct attribute persisted");
+				//addColumn changes should only store 'key', 'name' (deprecated compat for sap.ui.comp) and 'index'
+				assert.deepEqual(Object.keys(aChanges[0].changeSpecificData.content).sort(), ["index", "key", "name"].sort(), "Only expected attributes persisted in addColumn change content");
+				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("key"), "Correct attribute persisted");
 				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("index"), "Correct attribute persisted");
 				done();
 			});
@@ -408,8 +408,8 @@ sap.ui.define([
 		const done = assert.async();
 
 		const aP13nData = [
-			{name:"col3", position: 2},
-			{name:"col4", visible: false}// column is not present, so no change should be created
+			{key:"col3", position: 2},
+			{key:"col4", visible: false}// column is not present, so no change should be created
 		];
 
 		this.oTable.initialized().then(function(){
@@ -431,7 +431,7 @@ sap.ui.define([
 		const done = assert.async();
 
 		const aP13nData = [
-			{name:"col1", visible: false}
+			{key:"col1", visible: false}
 		];
 
 		this.oTable.initialized().then(function(){
@@ -445,8 +445,8 @@ sap.ui.define([
 				assert.equal(aChanges.length, 1, "one change created");
 				assert.equal(aChanges[0].changeSpecificData.changeType, "removeColumn", "once column change created");
 
-				//removeColumn changes should only store 'name'
-				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("name"), "Correct attribute persisted");
+				//removeColumn changes should only store 'key'
+				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("key"), "Correct attribute persisted");
 				done();
 			});
 		}.bind(this));
@@ -456,7 +456,7 @@ sap.ui.define([
 		const done = assert.async();
 
 		const aP13nData = [
-			{name:"col1", position: 1}//position changed
+			{key:"col1", position: 1}//position changed
 		];
 
 		this.oTable.initialized().then(function(){
@@ -470,8 +470,8 @@ sap.ui.define([
 				assert.equal(aChanges.length, 1, "one change created");
 				assert.equal(aChanges[0].changeSpecificData.changeType, "moveColumn", "once column change created");
 
-				//moveColumn changes should only store 'name' and 'index'
-				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("name"), "Correct attribute persisted");
+				//moveColumn changes should only store 'key' and 'index'
+				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("key"), "Correct attribute persisted");
 				assert.ok(aChanges[0].changeSpecificData.content.hasOwnProperty("index"), "Correct attribute persisted");
 				done();
 			});

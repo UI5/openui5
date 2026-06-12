@@ -117,13 +117,8 @@ sap.ui.define([
 		});
 
 		QUnit.test("when waiting for the state initialization", async function(assert) {
-			const oLogErrorStub = sandbox.stub(Log, "error");
 			await FlexState.waitForInitialization(sReference);
-			assert.strictEqual(
-				oLogErrorStub.withArgs("FlexState.waitForInitialization was called before FlexState.initialize").callCount,
-				1,
-				"then before the init call the promise resolves immediately but an error is logged"
-			);
+			assert.ok(true, "resolves immediately if state was not initialized");
 
 			const oFlexInitPromise = FlexState.initialize({
 				reference: sReference,

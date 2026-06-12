@@ -1714,7 +1714,6 @@ sap.ui.define([
 				const sPropertyKey = oItem.getPropertyKey();
 				aProperties.push({
 					key: sPropertyKey,
-					name: sPropertyKey,
 					role: oItem.getRole()
 				});
 

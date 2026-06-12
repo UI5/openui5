@@ -347,7 +347,7 @@ sap.ui.define([
 						Opa5.assert.equal(aTableGroupConditions.length, 0, "No Groupings in Table");
 					} else {
 						oGroupConditions.groupLevels.forEach(function(oGrouping, iIndex){
-							Opa5.assert.equal(aTableGroupConditions[iIndex].name, oGrouping.name, "Correct grouping on correct position in Table");
+							Opa5.assert.equal(aTableGroupConditions[iIndex].key, oGrouping.key, "Correct grouping on correct position in Table");
 						});
 					}
 

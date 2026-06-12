@@ -122,7 +122,7 @@ sap.ui.define([
 
 		this.oChart.setSortConditions({
 			sorters: [
-				{name: "item1", descending: true}
+				{key: "item1", descending: true}
 			]
 		});
 

@@ -148,7 +148,8 @@ sap.ui.define([
 		aChanges.forEach(function(oChange){
 			var oChangeContent = merge({}, oChange.changeSpecificData.content);
 			var oXSettings = {
-				name: oChangeContent.name,
+				key: oChangeContent.name || oChangeContent.key,
+				name: oChangeContent.name || oChangeContent.key,
 				controlMeta: {
 					aggregation: "columns"
 				},

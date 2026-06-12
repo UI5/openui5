@@ -450,9 +450,9 @@ sap.ui.define([
 	};
 
 	/**
-	 * Waits until the FlexState is initialized
+	 * Waits until the FlexState is initialized, if it was initialized. Otherwise resolves immediately.
 	 * This is only necessary if <code>FlexState.initialize</code> cannot be called directly
-	 * due to missing information for the backend request (e.g. asyncHints)
+	 * due to missing information for the backend request (e.g. asyncHints).
 	 *
 	 * @param {string} sFlexReference - Flex reference of the app
 	 * @returns {Promise<undefined>} Promise that resolves as soon as FlexState is initialized
@@ -460,7 +460,6 @@ sap.ui.define([
 	FlexState.waitForInitialization = function(sFlexReference) {
 		const oInitPromise = _mInitPromises[sFlexReference]?.promise;
 		if (!oInitPromise) {
-			Log.error("FlexState.waitForInitialization was called before FlexState.initialize");
 			return Promise.resolve();
 		}
 		return oInitPromise;

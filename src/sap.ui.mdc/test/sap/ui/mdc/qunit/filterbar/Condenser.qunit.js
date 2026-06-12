@@ -5,7 +5,7 @@ sap.ui.define([
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName"
 ], function(StringType, elementActionTest, ConditionValidated, OperatorName) {
-    'use strict';
+	'use strict';
 
 
 	function buildXML(sFilterConditions) {
@@ -50,7 +50,7 @@ sap.ui.define([
 				return {
 					changeType: "removeCondition",
 					content: {
-						name: "prop2",
+						key: "prop2",
 						condition: {
 							operator: OperatorName.EQ,
 							values: ['102'],
@@ -68,7 +68,7 @@ sap.ui.define([
 				return {
 					changeType: "addCondition",
 					content: {
-						name: "prop2",
+						key: "prop2",
 						condition: {
 							operator: OperatorName.EQ,
 							values: ['102'],
@@ -107,7 +107,7 @@ sap.ui.define([
 				return {
 					changeType: "addCondition",
 					content: {
-						name: "prop2",
+						key: "prop2",
 						condition: {
 							operator: OperatorName.EQ,
 							values: ['102'],
@@ -124,7 +124,7 @@ sap.ui.define([
 				return {
 					changeType: "removeCondition",
 					content: {
-						name: "prop2",
+						key: "prop2",
 						condition: {
 							operator: OperatorName.EQ,
 							values: ['101'],
@@ -163,7 +163,7 @@ sap.ui.define([
 				return {
 					changeType: "removeCondition",
 					content: {
-						name: "prop3",
+						key: "prop3",
 						condition: {
 							operator: OperatorName.EQ,
 							values: ['102'],
@@ -180,7 +180,7 @@ sap.ui.define([
 				return {
 					changeType: "addCondition",
 					content: {
-						name: "prop3",
+						key: "prop3",
 						condition: {
 							operator: OperatorName.EQ,
 							values: ['101'],
@@ -196,7 +196,7 @@ sap.ui.define([
 				return {
 					changeType: "addCondition",
 					content: {
-						name: "prop3",
+						key: "prop3",
 						condition: {
 							operator: OperatorName.EQ,
 							values: ['102'],
@@ -212,7 +212,7 @@ sap.ui.define([
 				return {
 					changeType: "addCondition",
 					content: {
-						name: "prop3",
+						key: "prop3",
 						condition: {
 							operator: OperatorName.EQ,
 							values: ['103'],
@@ -250,7 +250,7 @@ sap.ui.define([
 				return {
 					changeType: "removeFilter",
 					content: {
-						name: "prop5",
+						key: "prop5",
 						index: 2
 					}
 				};
@@ -263,7 +263,7 @@ sap.ui.define([
 				return {
 					changeType: "addFilter",
 					content: {
-						name: "prop5",
+						key: "prop5",
 						index: 2
 					}
 				};
@@ -275,7 +275,6 @@ sap.ui.define([
 		afterRedo: fnConfirm
     });
 
-
 	elementActionTest("Checking the add/move/remove filter condensing. No changes expected.", {
 		xmlView: buildXML(""),
 		action: {
@@ -285,7 +284,7 @@ sap.ui.define([
 				return {
 					changeType: "removeFilter",
 					content: {
-						name: "prop5",
+						key: "prop5",
 						index: 2
 					}
 				};
@@ -298,7 +297,7 @@ sap.ui.define([
 				return {
 					changeType: "addFilter",
 					content: {
-						name: "prop5",
+						key: "prop5",
 						index: 2
 					}
 				};
@@ -310,7 +309,7 @@ sap.ui.define([
 				return {
 					changeType: "moveFilter",
 					content: {
-						name: "prop5",
+						key: "prop5",
 						index: 1
 					}
 				};
@@ -346,7 +345,7 @@ sap.ui.define([
 				return {
 					changeType: "removeFilter",
 					content: {
-						name: "prop5",
+						key: "prop5",
 						index: 2
 					}
 				};
@@ -359,7 +358,7 @@ sap.ui.define([
 				return {
 					changeType: "addFilter",
 					content: {
-						name: "prop5",
+						key: "prop5",
 						index: 2
 					}
 				};
@@ -371,7 +370,7 @@ sap.ui.define([
 				return {
 					changeType: "addFilter",
 					content: {
-						name: "prop6",
+						key: "prop6",
 						index: 2
 					}
 				};
@@ -383,7 +382,7 @@ sap.ui.define([
 				return {
 					changeType: "moveFilter",
 					content: {
-						name: "prop5",
+						key: "prop5",
 						index: 1
 					}
 				};
@@ -395,7 +394,7 @@ sap.ui.define([
 				return {
 					changeType: "moveFilter",
 					content: {
-						name: "prop6",
+						key: "prop6",
 						index: 1
 					}
 				};
@@ -428,7 +427,7 @@ sap.ui.define([
 				return {
 					changeType: "addFilter",
 					content: {
-						name: "prop5",
+						key: "prop5",
 						index: 2
 					}
 				};
@@ -438,6 +437,4 @@ sap.ui.define([
 		afterUndo: fnConfirm,
 		afterRedo: fnConfirm
     });
-
-
 });

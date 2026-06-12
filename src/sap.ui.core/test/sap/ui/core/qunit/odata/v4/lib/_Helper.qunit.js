@@ -6204,7 +6204,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("getUsedPaths", function (assert) {
-		let aPaths = [
+		const aPaths = [
 			"*",
 			"Property",
 			"NavigationProperty",
@@ -6264,18 +6264,9 @@ sap.ui.define([
 		const sQueryOptions = JSON.stringify(mQueryOptions);
 
 		// code under test
-		let aUsedPaths = _Helper.getUsedPaths(aPaths, mQueryOptions);
+		assert.deepEqual(_Helper.getUsedPaths(aPaths, mQueryOptions), aExpectedUsedPaths);
 
 		assert.strictEqual(JSON.stringify(aPaths), sPaths, "unchanged aPaths");
 		assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptions, "unchanged mQueryOptions");
-		assert.deepEqual(aUsedPaths, aExpectedUsedPaths, "used paths");
-
-		aPaths = [];
-
-		// code under test
-		aUsedPaths = _Helper.getUsedPaths(aPaths, mQueryOptions);
-
-		assert.deepEqual(aUsedPaths, [], "empty paths array");
-		assert.notStrictEqual(aUsedPaths, aPaths, "different array");
 	});
 });

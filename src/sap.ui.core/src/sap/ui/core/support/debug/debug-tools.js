@@ -110,7 +110,7 @@ sap.ui.define([
 				 * @returns {string} the value if defined
 				 */
 				getCustomProperty(sPropName) {
-					return globalThis.getComputedStyle(document.body).getPropertyValue(sPropName);
+					return document.body && window.getComputedStyle(document.body).getPropertyValue(sPropName);
 				}
 			}),
 

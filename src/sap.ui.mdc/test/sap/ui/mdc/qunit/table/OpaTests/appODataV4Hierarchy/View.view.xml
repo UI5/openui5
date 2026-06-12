@@ -21,7 +21,7 @@
                 propertyKeys="ID,Name,AGE,MANAGER_ID"
                 sortConditions="{
                     sorters:[{
-                        name: 'AGE',
+                        key: 'AGE',
                         descending:false
                     }]
                 }">

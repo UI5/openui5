@@ -2,7 +2,7 @@
 sap.ui.define([
     "sap/ui/rta/enablement/elementActionTest"
 ], function(elementActionTest) {
-    'use strict';
+	'use strict';
 
 
 
@@ -68,19 +68,19 @@ sap.ui.define([
 
 	// ---------------------------------------------------------------------
 
-    function fnConfirmInitialSortingState(oUiComponent, oViewAfterAction, assert) {
+	function fnConfirmInitialSortingState(oUiComponent, oViewAfterAction, assert) {
         const oTable = oViewAfterAction.byId("myChart");
         assert.ok(oTable, "then the mdc.Table exists");
     }
 
-    function fnConfirmSortingGotAdded(sName, iIndex, bDescending) {
+	function fnConfirmSortingGotAdded(sName, iIndex, bDescending) {
         return function(oUiComponent, oViewAfterAction, assert) {
             const oTable = oViewAfterAction.byId("myChart");
             assert.ok(oTable, "then the mdc.Table exists");
         };
     }
 
-    elementActionTest("addSort removeSort condensed", {
+	elementActionTest("addSort removeSort condensed", {
         xmlView: buildXML(""),
         action: {
             name: "settings",
@@ -89,7 +89,7 @@ sap.ui.define([
                 return {
                     changeType: "removeSort",
                     content: {
-                        name: "modifiedBy"
+                        key: "modifiedBy"
                     }
                 };
             }
@@ -102,7 +102,7 @@ sap.ui.define([
                     changeType: "addSort",
                     content: {
                         index: 0,
-                        name: "modifiedBy",
+                        key: "modifiedBy",
                         descending: false
                     }
                 };
@@ -113,5 +113,4 @@ sap.ui.define([
 		afterUndo: fnConfirmSortingGotAdded(),
 		afterRedo: fnConfirmInitialSortingState
     });
-
 });

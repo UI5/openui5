@@ -92,7 +92,7 @@ sap.ui.define([
 				this.addQuickAction(new QuickGroup({
 					items: aGroupableProperties.map((oProperty) => {
 						const bGrouped = aGroupedProperties.some((oGroupedProperty) => {
-							return oGroupedProperty.name === oProperty.key;
+							return oGroupedProperty.key === oProperty.key;
 						});
 
 						return new QuickGroupItem({

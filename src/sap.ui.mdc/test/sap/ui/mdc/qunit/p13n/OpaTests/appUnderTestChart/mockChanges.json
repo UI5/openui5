@@ -35,7 +35,7 @@
 			"conditions": {},
 			"content": {
 				"index": 0,
-				"name": "language_code",
+				"key": "language_code",
 				"role": "category"
 			},
 			"context": "",

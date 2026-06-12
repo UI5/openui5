@@ -2181,7 +2181,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Update binding within suspend and resume", async function(assert) {
-		this.oTable.setSortConditions({sorters: [{name: "Name", descending: true}]});
+		this.oTable.setSortConditions({sorters: [{key: "Name", descending: true}]});
 		this.oTable.setFilterConditions({Name: [{operator: OperatorName.EQ, values: ["Test"], validated: ConditionValidated.NotValidated}]});
 		this.oTable.setGroupConditions({groupLevels: [{name: "Name"}]});
 		this.oTable.setAggregateConditions({Name: {}});
@@ -2217,7 +2217,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Update suspended binding", async function(assert) {
-		this.oTable.setSortConditions({sorters: [{name: "Name", descending: true}]});
+		this.oTable.setSortConditions({sorters: [{key: "Name", descending: true}]});
 		this.oTable.getRowBinding().suspend();
 		this.oSuspendSpy.resetHistory();
 		await this.oTable.rebind();
@@ -2230,11 +2230,11 @@ sap.ui.define([
 	});
 
 	QUnit.test("Sort", async function(assert) {
-		this.oTable.setSortConditions({sorters: [{name: "Name", descending: false}]});
+		this.oTable.setSortConditions({sorters: [{key: "Name", descending: false}]});
 		await this.oTable.rebind();
 		assert.ok(this.oSortSpy.firstCall.calledWithExactly(this.oTable.getControlDelegate().getSorters(this.oTable)));
 
-		this.oTable.setSortConditions({sorters: [{name: "Name", descending: true}]});
+		this.oTable.setSortConditions({sorters: [{key: "Name", descending: true}]});
 		await this.oTable.rebind();
 		assert.ok(this.oSortSpy.secondCall.calledWithExactly(this.oTable.getControlDelegate().getSorters(this.oTable)));
 
@@ -2597,38 +2597,38 @@ sap.ui.define([
 		const sMessage = Library.getResourceBundleFor("sap.ui.mdc").getText("table.PERSONALIZATION_DIALOG_SORT_RESTRICTION");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}, {name: "name_country"}]
+			items: [{key: "Name"}, {key: "name_country"}]
 		}, "Sort"), {
 			validation: MessageType.None,
 			message: undefined
 		}, "No sorted properties");
 
 		assert.deepEqual(this.oTable.validateState({
-			sorters: [{name: "Name"}, {name: "Country"}]
+			sorters: [{key: "Name"}, {key: "Country"}]
 		}, "Sort"), {
 			validation: MessageType.Information,
 			message: sMessage
 		}, "Sorted properties and no visible columns");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}, {name: "Country"}, {name: "name_country"}],
-			sorters: [{name: "Name"}, {name: "Country"}]
+			items: [{key: "Name"}, {key: "Country"}, {key: "name_country"}],
+			sorters: [{key: "Name"}, {key: "Country"}]
 		}, "Sort"), {
 			validation: MessageType.None,
 			message: undefined
 		}, "All sorted properties visible");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
-			sorters: [{name: "Country"}]
+			items: [{key: "Name"}],
+			sorters: [{key: "Country"}]
 		}, "Sort"), {
 			validation: MessageType.Information,
 			message: sMessage
 		}, "Sorted property invisible");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}, {name: "name_country"}],
-			sorters: [{name: "Country"}]
+			items: [{key: "Name"}, {key: "name_country"}],
+			sorters: [{key: "Country"}]
 		}, "Sort"), {
 			validation: MessageType.None,
 			message: undefined
@@ -2636,8 +2636,8 @@ sap.ui.define([
 
 		this.oTable.setP13nMode();
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
-			sorters: [{name: "Country"}]
+			items: [{key: "Name"}],
+			sorters: [{key: "Country"}]
 		}, "Sort"), {
 			validation: MessageType.None,
 			message: undefined
@@ -2648,21 +2648,21 @@ sap.ui.define([
 		const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}, {name: "Country"}, {name: "name_country"}]
+			items: [{key: "Name"}, {key: "Country"}, {key: "name_country"}]
 		}, "Group"), {
 			validation: MessageType.None,
 			message: undefined
 		}, "No grouped properties");
 
 		assert.deepEqual(this.oTable.validateState({
-			groupLevels: [{name: "Country"}]
+			groupLevels: [{key: "Country"}]
 		}, "Group"), {
 			validation: MessageType.None,
 			message: undefined
 		}, "Grouped properties and no visible columns");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
+			items: [{key: "Name"}],
 			aggregations: {Name: {}}
 		}, "Group"), {
 			validation: MessageType.Information,
@@ -2670,8 +2670,8 @@ sap.ui.define([
 		}, "Grouping and aggregation can't be used simulatneously");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}, {name: "name_country"}],
-			groupLevels: [{name: "Country"}]
+			items: [{key: "Name"}, {key: "name_country"}],
+			groupLevels: [{key: "Country"}]
 		}, "Group"), {
 			validation: MessageType.None,
 			message: undefined
@@ -2679,8 +2679,8 @@ sap.ui.define([
 
 		this.oTable.setType(TableType.ResponsiveTable);
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
-			groupLevels: [{name: "Country"}]
+			items: [{key: "Name"}],
+			groupLevels: [{key: "Country"}]
 		}, "Group"), {
 			validation: MessageType.Information,
 			message: oResourceBundle.getText("table.PERSONALIZATION_DIALOG_GROUP_RESTRICTION_VISIBLE")
@@ -2691,22 +2691,22 @@ sap.ui.define([
 		const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}, {name: "Country"}, {name: "name_country"}]
+			items: [{key: "Name"}, {key: "Country"}, {key: "name_country"}]
 		}, "Column"), {
 			validation: MessageType.None,
 			message: undefined
 		}, "Valid state");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
-			sorters: [{name: "Country"}]
+			items: [{key: "Name"}],
+			sorters: [{key: "Country"}]
 		}, "Column"), {
 			validation: MessageType.Information,
 			message: oResourceBundle.getText("table.PERSONALIZATION_DIALOG_SORT_RESTRICTION")
 		}, "Removing the column that contains a sorted property");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
+			items: [{key: "Name"}],
 			aggregations: {Country: {}}
 		}, "Column"), {
 			validation: MessageType.Information,
@@ -2714,8 +2714,8 @@ sap.ui.define([
 		}, "Removing the column that contains an aggregated property");
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
-			sorters: [{name: "Country"}],
+			items: [{key: "Name"}],
+			sorters: [{key: "Country"}],
 			aggregations: {Country: {}}
 		}, "Column"), {
 			validation: MessageType.Information,
@@ -2725,8 +2725,8 @@ sap.ui.define([
 
 		this.oTable.setType(TableType.ResponsiveTable);
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
-			groupLevels: [{name: "Country"}]
+			items: [{key: "Name"}],
+			groupLevels: [{key: "Country"}]
 		}, "Column"), {
 			validation: MessageType.Information,
 			message: oResourceBundle.getText("table.PERSONALIZATION_DIALOG_GROUP_RESTRICTION_VISIBLE")
@@ -2763,8 +2763,8 @@ sap.ui.define([
 		await this.oTable.initialized();
 
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
-			sorters: [{name: "Inactive"}]
+			items: [{key: "Name"}],
+			sorters: [{key: "Inactive"}]
 		}, "Sort"), {
 			validation: MessageType.None,
 			message: undefined
@@ -2772,8 +2772,8 @@ sap.ui.define([
 
 		this.oTable.setType(TableType.ResponsiveTable);
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
-			groupLevels: [{name: "Inactive"}]
+			items: [{key: "Name"}],
+			groupLevels: [{key: "Inactive"}]
 		}, "Group"), {
 			validation: MessageType.None,
 			message: undefined
@@ -2781,8 +2781,8 @@ sap.ui.define([
 
 		this.oTable.setType(TableType.Table);
 		assert.deepEqual(this.oTable.validateState({
-			items: [{name: "Name"}],
-			sorters: [{name: "Inactive"}],
+			items: [{key: "Name"}],
+			sorters: [{key: "Inactive"}],
 			aggregations: {Inactive: {}}
 		}, "Column"), {
 			validation: MessageType.None,
