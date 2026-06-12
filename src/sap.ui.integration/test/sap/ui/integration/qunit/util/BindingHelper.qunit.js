@@ -620,4 +620,185 @@ function (
 		assert.strictEqual(BindingHelper.getModelName("someName>some/path"), "someName", "Should return model name for relative path with model name.");
 	});
 
+	QUnit.module("Parameter Values - bare-brace JSON behaviour");
+
+	QUnit.test("Bare-brace stringified JSON in a parameter value parses as a malformed binding", function (assert) {
+		const oManifest = {
+			"sap.card": {
+				"configuration": {
+					"parameters": {
+						"entityId": {
+							"value": "[{\"datasetId\":\"planning:[TENANT][][/sap.ask/Model_qs]\"}]",
+							"type": "string"
+						},
+						"regularParam": {
+							"value": "normalValue",
+							"type": "string"
+						}
+					}
+				}
+			}
+		};
+
+		const oResult = BindingHelper.createBindingInfos(oManifest);
+		const vEntityIdValue = oResult["sap.card"].configuration.parameters.entityId.value;
+
+		assert.ok(vEntityIdValue && typeof vEntityIdValue === "object" && Array.isArray(vEntityIdValue.parts),
+			"Bare-brace JSON becomes an object with a `parts` array");
+		assert.ok(
+			vEntityIdValue.parts.some(function (oPart) {
+				return !oPart || typeof oPart !== "object"
+					|| (typeof oPart.path !== "string" && !Array.isArray(oPart.parts));
+			}),
+			"At least one part lacks a `path`"
+		);
+		assert.strictEqual(
+			oResult["sap.card"].configuration.parameters.regularParam.value,
+			"normalValue",
+			"Plain string value passes through unchanged"
+		);
+	});
+
+	QUnit.test("Escaped braces in a parameter value are unescaped to literal characters", function (assert) {
+		const oManifest = {
+			"sap.card": {
+				"configuration": {
+					"parameters": {
+						"escaped": {
+							"value": "[\\{\"datasetId\":\"x\"\\}]",
+							"type": "string"
+						}
+					}
+				}
+			}
+		};
+
+		const oResult = BindingHelper.createBindingInfos(oManifest);
+
+		assert.strictEqual(
+			oResult["sap.card"].configuration.parameters.escaped.value,
+			"[{\"datasetId\":\"x\"}]",
+			"Author-escaped braces are unescaped to literal characters"
+		);
+	});
+
+
+	QUnit.module("BindingHelper.isMalformedBindingInfo");
+
+	QUnit.test("Returns false for non-binding-info input", function (assert) {
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo(null), false, "null");
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo(undefined), false, "undefined");
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo("string"), false, "string");
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo(42), false, "number");
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo(true), false, "boolean");
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo([1, 2, 3]), false, "array");
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo({ foo: "bar" }), false, "plain object");
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo({ parts: [{ name: "foo" }] }), false, "plain object with parts but no formatter/binding");
+	});
+
+	QUnit.test("Returns false for legitimate composite bindings (parts have path)", function (assert) {
+		const oCompositeBinding = {
+			parts: [
+				{ path: "/a" },
+				{ path: "/b" }
+			],
+			formatter: function () { return "x"; }
+		};
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo(oCompositeBinding), false);
+	});
+
+	QUnit.test("Returns false when a part has only a literal value segment", function (assert) {
+		const oCompositeBinding = {
+			parts: [
+				{ path: "/a" },
+				{ value: " - " },
+				{ path: "/b" }
+			],
+			formatter: function () { return "x"; }
+		};
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo(oCompositeBinding), false);
+	});
+
+	QUnit.test("Returns false when a part is a nested composite binding", function (assert) {
+		const oCompositeBinding = {
+			parts: [
+				{ path: "/a" },
+				{ parts: [{ path: "/b" }, { path: "/c" }] }
+			]
+		};
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo(oCompositeBinding), false);
+	});
+
+	QUnit.test("Returns false for a path-only binding info (no parts array)", function (assert) {
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo({ path: "/a" }), false);
+	});
+
+	QUnit.test("Returns true for the bare-brace shape produced by the parser", function (assert) {
+		const oMalformed = {
+			parts: [
+				{ datasetId: "planning:[TENANT][][/sap.epm/Model_qs]" }
+			],
+			formatter: function () { return ""; }
+		};
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo(oMalformed), true);
+	});
+
+	QUnit.test("Returns true if at least one part is malformed", function (assert) {
+		const oMixed = {
+			parts: [
+				{ path: "/a" },
+				{ entityId: "Foo" }
+			],
+			formatter: function () { return ""; }
+		};
+		assert.strictEqual(BindingHelper.isMalformedBindingInfo(oMixed), true);
+	});
+
+
+	QUnit.module("BindingHelper.findMalformedBindingInfoPath");
+
+	QUnit.test("Returns null for a clean tree", function (assert) {
+		assert.strictEqual(BindingHelper.findMalformedBindingInfoPath({ foo: "bar", arr: [1, 2, 3] }), null);
+		assert.strictEqual(BindingHelper.findMalformedBindingInfoPath("a string"), null);
+		assert.strictEqual(BindingHelper.findMalformedBindingInfoPath(null), null);
+	});
+
+	QUnit.test("Returns '/' when the root itself is malformed", function (assert) {
+		const oRootMalformed = {
+			parts: [{ datasetId: "x" }],
+			formatter: function () { return ""; }
+		};
+		assert.strictEqual(BindingHelper.findMalformedBindingInfoPath(oRootMalformed), "/");
+	});
+
+	QUnit.test("Returns deep path for nested malformation", function (assert) {
+		const oTree = [
+			{
+				EntityId: "Foo",
+				Bad: {
+					parts: [{ datasetId: "x" }],
+					formatter: function () { return ""; }
+				}
+			}
+		];
+		assert.strictEqual(BindingHelper.findMalformedBindingInfoPath(oTree), "/0/Bad");
+	});
+
+	QUnit.test("Skips the parts array of a legitimate binding info", function (assert) {
+		const oTree = {
+			good: {
+				parts: [{ path: "/a" }, { path: "/b" }],
+				formatter: function () { return "x"; }
+			}
+		};
+		assert.strictEqual(BindingHelper.findMalformedBindingInfoPath(oTree), null);
+	});
+
+	QUnit.test("Returns null for a plain object whose 'parts' array is data, not a binding", function (assert) {
+		const oTree = {
+			parts: [{ name: "foo" }, "red", { another: "bar" }]
+		};
+		assert.strictEqual(BindingHelper.findMalformedBindingInfoPath(oTree), null);
+	});
+
 });

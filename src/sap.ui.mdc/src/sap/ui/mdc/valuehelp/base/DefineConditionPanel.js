@@ -1577,7 +1577,7 @@ sap.ui.define([
 		if (this._bFocusLastCondition) {
 			// focus last condition operator field after it is rendered
 			iIndex = _getGridIndexOfLastRow.call(this, "-operator");
-			aGridContent[iIndex].focus();
+			setTimeout(() => { aGridContent[iIndex].focus(); }, 0);
 			this._bFocusLastCondition = false;
 		}
 		if (this._bFocusLastRemoveBtn) {
@@ -1746,18 +1746,21 @@ sap.ui.define([
 	}
 
 	function _getRemoveTextForCondition(oCondition) {
-		const sRemoveUndefinedConditionText = oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL_UNDEFINED");
-		const sFormatedValue = this._oConditionType.formatValue(oCondition);
-		if (!oCondition) { // can only happen on delete
+		if (!oCondition) { // can only happen on delete or initial rendering
 			return "";
 		}
 
-		if (oCondition.isEmpty || !sFormatedValue) {
-			return sRemoveUndefinedConditionText;
+		if (oCondition.isEmpty) {
+			return oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL_UNDEFINED");
 		}
 
-		const sRemoveConditionText = oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL", [sFormatedValue]);
-		return sRemoveConditionText;
+		const sFormatedValue = this._oConditionType.formatValue(oCondition);
+
+		if (!sFormatedValue) {
+			return oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL_UNDEFINED");
+		}
+
+		return oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL", [sFormatedValue]);
 	}
 
 	function _getEditModeFromOperator(sOperator, bInvalid) {

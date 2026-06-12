@@ -358,4 +358,161 @@ sap.ui.define([
 		// Clean up
 		oCard.destroy();
 	});
+
+	// Interpretation passed via a parameter binding.
+	const oExampleInterpretationViaParam = {
+		"sap.app": { "id": "qunit.analyticscloud.interpretationparam" },
+		"sap.card": {
+			"type": "AnalyticsCloud",
+			"configuration": {
+				"destinations": {
+					"SAC": {
+						"name": "SAC",
+						"defaultUrl": "https://master-fpa135.master.canary.eu10.projectorca.cloud"
+					}
+				},
+				"parameters": {
+					"interpretation": {
+						"value": [
+							{
+								"id": "9a4e5576-ff53-454b-b231-5ead55a0e578",
+								"body": [
+									{
+										"id": "sac_widget1",
+										"details": {
+											"Datasource": {
+												"EntityId": "planning:TENANT_7/sap.epm/BestRunJuice_SampleModel_qs",
+												"ModelName": "BestRunJuice_SampleModel"
+											}
+										}
+									}
+								]
+							}
+						]
+					}
+				}
+			},
+			"content": {
+				"minHeight": "25rem",
+				"sacTenantDestination": "{{destinations.SAC}}",
+				"interpretation": "{parameters>/interpretation/value}"
+			}
+		}
+	};
+
+	const oExpectedInterpretationViaParam = [
+		{
+			"id": "9a4e5576-ff53-454b-b231-5ead55a0e578",
+			"body": [
+				{
+					"id": "sac_widget1",
+					"details": {
+						"Datasource": {
+							"EntityId": "planning:TENANT_7/sap.epm/BestRunJuice_SampleModel_qs",
+							"ModelName": "BestRunJuice_SampleModel"
+						}
+					}
+				}
+			]
+		}
+	];
+
+	// Interpretation parameter with bare-brace value, marked ignoreBinding: true.
+	const oExampleInterpretationViaParamIgnoreBinding = {
+		"sap.app": { "id": "qunit.analyticscloud.interpretationparam.ignorebinding" },
+		"sap.card": {
+			"type": "AnalyticsCloud",
+			"configuration": {
+				"destinations": {
+					"SAC": {
+						"name": "SAC",
+						"defaultUrl": "https://master-fpa135.master.canary.eu10.projectorca.cloud"
+					}
+				},
+				"parameters": {
+					"interpretation": {
+						"ignoreBinding": true,
+						"value": [
+							{
+								"id": "9a4e5576-ff53-454b-b231-5ead55a0e578",
+								"body": [
+									{
+										"id": "sac_widget1",
+										"details": {
+											"Datasource": {
+												"EntityId": "[{\"datasetId\":\"planning:[TENANT_7][][/sap.epm/BestRunJuice_SampleModel_qs]\"}]",
+												"ModelName": "BestRunJuice_SampleModel"
+											}
+										}
+									}
+								]
+							}
+						]
+					}
+				}
+			},
+			"content": {
+				"minHeight": "25rem",
+				"sacTenantDestination": "{{destinations.SAC}}",
+				"interpretation": "{parameters>/interpretation/value}"
+			}
+		}
+	};
+
+	const oExpectedInterpretationViaParamIgnoreBinding = [
+		{
+			"id": "9a4e5576-ff53-454b-b231-5ead55a0e578",
+			"body": [
+				{
+					"id": "sac_widget1",
+					"details": {
+						"Datasource": {
+							"EntityId": "[{\"datasetId\":\"planning:[TENANT_7][][/sap.epm/BestRunJuice_SampleModel_qs]\"}]",
+							"ModelName": "BestRunJuice_SampleModel"
+						}
+					}
+				}
+			]
+		}
+	];
+
+	QUnit.test("Interpretation via parameter binding", async function (assert) {
+		const oCard = new Card({
+			manifest: oExampleInterpretationViaParam,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources"
+		});
+
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextCardReadyEvent(oCard);
+		await nextUIUpdate();
+
+		const fnRenderWidgetForJustAsk = sap.sac.api.widget.renderWidgetForJustAsk;
+		assert.ok(fnRenderWidgetForJustAsk.calledOnce, "renderWidgetForJustAsk was called once");
+
+		const oArgs = fnRenderWidgetForJustAsk.firstCall.args;
+		assert.strictEqual(oArgs[1].proxy, "https://master-fpa135.master.canary.eu10.projectorca.cloud", "Destination is correct");
+		assert.deepEqual(oArgs[2], oExpectedInterpretationViaParam, "Interpretation object passed through correctly");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Interpretation via parameter with ignoreBinding", async function (assert) {
+		const oCard = new Card({
+			manifest: oExampleInterpretationViaParamIgnoreBinding,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources"
+		});
+
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextCardReadyEvent(oCard);
+		await nextUIUpdate();
+
+		const fnRenderWidgetForJustAsk = sap.sac.api.widget.renderWidgetForJustAsk;
+		assert.ok(fnRenderWidgetForJustAsk.calledOnce, "renderWidgetForJustAsk was called once");
+
+		const oArgs = fnRenderWidgetForJustAsk.firstCall.args;
+		assert.strictEqual(oArgs[1].proxy, "https://master-fpa135.master.canary.eu10.projectorca.cloud", "Destination is correct");
+		assert.deepEqual(oArgs[2], oExpectedInterpretationViaParamIgnoreBinding, "Bare-brace value preserved verbatim");
+
+		oCard.destroy();
+	});
 });

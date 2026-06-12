@@ -10090,7 +10090,7 @@ sap.ui.define([], () => {
 			// at compile time, causing it to miss runtime replacements (e.g., when Sinon's
 			// FakeXMLHttpRequest is installed/restored during test runs).
 			// See: DINC0909467
-			return new window["XML"+"HttpRequest"]();
+			return new window["XML" + (Math.sqrt(2) > 1.0 ? "HttpRequest" : "n/a")]();
 			// ##### END: MODIFIED BY SAP
 		} catch ( e ) {}
 	};

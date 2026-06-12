@@ -373,6 +373,75 @@ sap.ui.define([
 		return oObj.hasOwnProperty("path") || (oObj.hasOwnProperty("parts") && (oObj.hasOwnProperty("formatter") || oObj.hasOwnProperty("binding")));
 	};
 
+	/**
+	 * Detects the malformed binding info shape produced by <code>BindingParser.complexParser</code>
+	 * when it misreads a stringified-JSON leaf as a composite binding: a <code>{parts, formatter}</code>
+	 * wrapper whose parts lack <code>path</code>, <code>parts</code>, and <code>value</code>.
+	 *
+	 * Returns false for anything that is not a binding info, so plain data with a <code>parts</code>
+	 * array is never flagged.
+	 *
+	 * @param {*} vValue Any resolved value.
+	 * @returns {boolean} True if <code>vValue</code> is a binding info and at least one part is malformed.
+	 */
+	BindingHelper.isMalformedBindingInfo = function (vValue) {
+		if (!BindingHelper.isBindingInfo(vValue) || !Array.isArray(vValue.parts)) {
+			return false;
+		}
+
+		return vValue.parts.some(function (oPart) {
+			if (!oPart || typeof oPart !== "object") {
+				return true;
+			}
+			return typeof oPart.path !== "string"
+				&& !Array.isArray(oPart.parts)
+				&& typeof oPart.value === "undefined";
+		});
+	};
+
+	/**
+	 * Walks <code>vValue</code> and returns the path of the first malformed binding info, or null.
+	 *
+	 * The path is informational (for an error message), not a strict JSON Pointer:
+	 * keys containing <code>/</code> or <code>~</code> are not RFC 6901 escaped.
+	 *
+	 * @param {*} vValue Any resolved value.
+	 * @param {string} [sPath=""] Internal path accumulator.
+	 * @returns {string|null} Path of the first malformed binding info, or null.
+	 */
+	BindingHelper.findMalformedBindingInfoPath = function (vValue, sPath = "") {
+		if (BindingHelper.isMalformedBindingInfo(vValue)) {
+			return sPath || "/";
+		}
+
+		if (Array.isArray(vValue)) {
+			for (let iIndex = 0; iIndex < vValue.length; iIndex++) {
+				const sFoundInArray = BindingHelper.findMalformedBindingInfoPath(vValue[iIndex], sPath + "/" + iIndex);
+				if (sFoundInArray) {
+					return sFoundInArray;
+				}
+			}
+			return null;
+		}
+
+		if (vValue && typeof vValue === "object") {
+			const aKeys = Object.keys(vValue);
+			for (let iIndex = 0; iIndex < aKeys.length; iIndex++) {
+				const sKey = aKeys[iIndex];
+				// skip the parts array of a legitimate binding info
+				if (sKey === "parts" && BindingHelper.isBindingInfo(vValue)) {
+					continue;
+				}
+				const sFoundInObject = BindingHelper.findMalformedBindingInfoPath(vValue[sKey], sPath + "/" + sKey);
+				if (sFoundInObject) {
+					return sFoundInObject;
+				}
+			}
+		}
+
+		return null;
+	};
+
 	BindingHelper.getModelName = function (sPath) {
 		if (typeof sPath !== "string") {
 			return undefined;

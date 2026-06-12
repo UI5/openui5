@@ -3672,14 +3672,21 @@ sap.ui.define([
 				mStillAliveElements = oResponse.value.$byPredicate || {};
 
 				aPredicates.forEach(function (sPredicate) {
-					var oElement, iIndex;
+					var oElement = that.aElements.$byPredicate[sPredicate],
+						iIndex;
+
+					if (!oElement) {
+						Log.warning("Ignoring response for refresh of previously kept alive entity "
+							+ sPredicate
+							+ " - consider calling v4.Context#setKeepAlive(false) earlier!",
+							that.toString(), sClassName);
+						return;
+					}
 
 					if (sPredicate in mStillAliveElements) {
-						_Helper.updateAll(that.mChangeListeners, sPredicate,
-							that.aElements.$byPredicate[sPredicate],
+						_Helper.updateAll(that.mChangeListeners, sPredicate, oElement,
 							mStillAliveElements[sPredicate]);
 					} else {
-						oElement = that.aElements.$byPredicate[sPredicate];
 						if (_Helper.hasPrivateAnnotation(oElement, "transientPredicate")) {
 							// Note: iIndex unknown, use -1 instead
 							iIndex = that.removeElement(-1, sPredicate);

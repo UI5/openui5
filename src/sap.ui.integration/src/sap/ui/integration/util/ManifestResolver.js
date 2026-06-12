@@ -88,8 +88,13 @@ sap.ui.define([
 		}
 
 		try {
-			// Prepare binding infos only once for all sections
+			const oProcessedParameters = ManifestResolver._processParameters(oManifest, oCard.getBindingNamespaces());
+
 			oManifest = BindingHelper.createBindingInfos(oManifest, oCard.getBindingNamespaces());
+
+			if (oProcessedParameters) {
+				Utils.setNestedPropertyValue(oManifest, "/sap.card/configuration/parameters", oProcessedParameters);
+			}
 
 			// Include merged customSettings in resolved manifest
 			const oCustomSettings = oCard.getCombinedCustomSettings();
@@ -153,6 +158,76 @@ sap.ui.define([
 		}
 	};
 
+	/**
+	 * Detaches the parameters subtree, processes each parameter individually, and
+	 * returns the result. Callers must re-attach it onto the resolved manifest.
+	 *
+	 * @private
+	 * @param {object} oManifest The manifest object (parameters subtree is detached).
+	 * @param {string[]} aBindingNamespaces Passed to createBindingInfos.
+	 * @returns {object|null} Processed parameters, or null if there are none.
+	 */
+	ManifestResolver._processParameters = function (oManifest, aBindingNamespaces) {
+		const oParameters = oManifest?.["sap.card"]?.configuration?.parameters;
+		if (!oParameters) {
+			return null;
+		}
+
+		delete oManifest["sap.card"].configuration.parameters;
+
+		const oProcessed = {};
+		Object.keys(oParameters).forEach(function (sName) {
+			oProcessed[sName] = ManifestResolver._processSingleParameter(oParameters[sName], sName, aBindingNamespaces);
+		});
+
+		return oProcessed;
+	};
+
+	/**
+	 * Processes a single parameter wrapper. With <code>ignoreBinding: true</code> the value is taken verbatim.
+	 * Otherwise the wrapper goes through createBindingInfos.
+	 * If the fail-safe detects a malformation, the raw value is restored and a Log.error names the parameter.
+	 *
+	 * @private
+	 * @param {object} oParam The parameter wrapper from the manifest.
+	 * @param {string} sName The parameter name (used in the Log.error message).
+	 * @param {string[]} aBindingNamespaces Passed to createBindingInfos.
+	 * @returns {object} The processed parameter wrapper.
+	 */
+	ManifestResolver._processSingleParameter = function (oParam, sName, aBindingNamespaces) {
+		if (!oParam) {
+			return oParam;
+		}
+
+		if (oParam.ignoreBinding === true) {
+			return oParam;
+		}
+
+		const vRawValue = oParam.value;
+		const oResolved = BindingHelper.createBindingInfos(oParam, aBindingNamespaces);
+
+		// Two parser misbehaviors, both treated as fail-safe triggers:
+		// 1) findMalformedBindingInfoPath: a {parts, formatter} wrapper whose parts lack path
+		//    (typical for "[{...}]" array-shaped JSON);
+		// 2) bStringCoercedToObject: a string silently parsed into an object (typical for "{...}").
+		const sOffendingPath = BindingHelper.findMalformedBindingInfoPath(oResolved.value);
+		const bStringCoercedToObject = typeof vRawValue === "string"
+			&& oResolved.value !== null
+			&& typeof oResolved.value === "object"
+			&& !BindingHelper.isBindingInfo(oResolved.value);
+
+		if (sOffendingPath || bStringCoercedToObject) {
+			oResolved.value = vRawValue;
+			Log.error(
+				"Parameter '" + sName + "' is bound to '" + (sOffendingPath || "/")  + "'. This path points to value with unescaped binding literals that led to failure during binding resolution." +
+				"The raw value was preserved. If this parameter does not contain binding syntax, but contains strings similar to binding syntax, which are not escaped, you can use the property 'ignoreBinding: true' on this parameter to silence this message.",
+				"sap.ui.integration.util.ManifestResolver"
+			);
+		}
+
+		return oResolved;
+	};
+
 	ManifestResolver._makeEnabledAndVisibleBooleans = function (oManifest) {
 		for (const sKey in oManifest) {
 			if (!oManifest.hasOwnProperty(sKey)) {
@@ -180,7 +255,7 @@ sap.ui.define([
 		var oManifest = oCard.getManifestEntry("/"),
 			oResourceBundle = Library.getResourceBundleFor("sap.ui.integration");
 
-		Log.error(oError, "sap.ui.integration.util.ManifestResolver");
+		Log.error(oResourceBundle.getText("CARD_ERROR_CONFIGURATION_TITLE"), oError, "sap.ui.integration.util.ManifestResolver");
 
 		if (oManifest === null) {
 			oManifest = {};

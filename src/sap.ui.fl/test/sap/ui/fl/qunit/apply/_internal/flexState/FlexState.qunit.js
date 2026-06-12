@@ -876,6 +876,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when a fake standard variant is added without an initialized state", function(assert) {
+			const oInitializeEmptyCacheSpy = sandbox.spy(Loader, "initializeEmptyCache");
 			assert.strictEqual(
 				FlexState.getFlexObjectsDataSelector().get({ reference: this.sSecondReference }).length,
 				0,
@@ -883,6 +884,14 @@ sap.ui.define([
 			);
 
 			FlexState.addRuntimeSteadyObject(this.sSecondReference, sComponentId, this.oVariant);
+			assert.ok(
+				Loader.getCachedFlexData.calledOnceWithExactly(this.sSecondReference),
+				"then the cache is checked for existing data for the reference"
+			);
+			assert.ok(
+				oInitializeEmptyCacheSpy.notCalled,
+				"The loader cache is used instead of initializing a new empty loader cache"
+			);
 			var aFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: this.sSecondReference });
 			assert.strictEqual(
 				aFlexObjects.length,
@@ -899,11 +908,23 @@ sap.ui.define([
 				States.LifecycleState.PERSISTED,
 				"the standard variant state is set to persisted"
 			);
-			const oInitializeEmptyCacheSpy = sandbox.spy(Loader, "initializeEmptyCache");
 			FlexState.addRuntimeSteadyObject(this.sSecondReference, sComponentId, this.oVariant);
 			assert.ok(
-				oInitializeEmptyCacheSpy.notCalled,
-				"then the empty state is not initialized twice for the same component ID"
+				Loader.getCachedFlexData.calledOnceWithExactly(this.sSecondReference),
+				"then the cache is not checked again for existing data for the reference when adding the same variant a second time"
+			);
+		});
+
+		QUnit.test("when a fake standard variant is added without an initialized state and no cached data", function(assert) {
+			Loader.getCachedFlexData.resetHistory();
+			Loader.getCachedFlexData.restore();
+			sandbox.stub(Loader, "getCachedFlexData").returns({});
+			const oInitializeEmptyCacheSpy = sandbox.spy(Loader, "initializeEmptyCache");
+
+			FlexState.addRuntimeSteadyObject(this.sSecondReference, sComponentId, this.oVariant);
+			assert.ok(
+				oInitializeEmptyCacheSpy.calledOnce,
+				"then initializeEmptyCache is called when no cached data exists"
 			);
 		});
 
@@ -939,8 +960,8 @@ sap.ui.define([
 					"then only one fake variant is available"
 				);
 				assert.ok(
-					oInitializeEmptyCacheSpy.calledOnce,
-					"then the empty state is initialized again for the new component ID"
+					oInitializeEmptyCacheSpy.notCalled,
+					"then initializeEmptyCache is not called when cached data already exists"
 				);
 
 				FlexState.clearRuntimeSteadyObjects(this.sReference, sComponentId2);

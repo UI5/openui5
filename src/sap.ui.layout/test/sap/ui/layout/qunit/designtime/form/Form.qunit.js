@@ -380,11 +380,6 @@ sap.ui.define([
 			modelType: SomeModel.getMetadata().getName(),
 			delegate: TEST_DELEGATE_PATH
 		});
-		// ensure a default write delegate exists for a control
-		DelegateMediatorAPI.registerWriteDelegate({
-			controlType: "sap.ui.layout.form.Form",
-			delegate: TEST_DELEGATE_PATH
-		});
 		elementActionTest("Checking the add action via delegate with a default delegate", {
 			xmlView: buildViewContentForAddDelegate(
 				'<f:Form id="idForm" >'
@@ -405,7 +400,14 @@ sap.ui.define([
 			},
 			afterAction: confirmFieldIsAdded.bind(null, null),
 			afterUndo: confirmFieldIsRemoved.bind(null, null),
-			afterRedo : confirmFieldIsAdded.bind(null, null)
+			afterRedo : confirmFieldIsAdded.bind(null, null),
+			before: function () {
+				// the control itself registers a delegate, so we need to register this delegate as late as possible
+				DelegateMediatorAPI.registerWriteDelegate({
+					controlType: "sap.ui.layout.form.Form",
+					delegate: TEST_DELEGATE_PATH
+				});
+			}
 		});
 
 		elementActionTest("Condensing: Check move after add via delegate", {

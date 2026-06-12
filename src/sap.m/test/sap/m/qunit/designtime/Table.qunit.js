@@ -415,14 +415,10 @@ sap.ui.define([
 			afterRedo : confirmColumnIsAdded.bind(null, ENTITY_TYPE_EXISTS)
 		});
 
-		//ensure a default delegate exists for a model not used anywhere else
+		// ensure a default delegate exists for a model not used anywhere else
 		var SomeModel = JSONModel.extend("sap.ui.layout.form.qunit.test.Model");
 		DelegateMediatorAPI.registerReadDelegate({
 			modelType: SomeModel.getMetadata().getName(),
-			delegate: TEST_DELEGATE_PATH
-		});
-		DelegateMediatorAPI.registerWriteDelegate({
-			controlType: "sap.m.Table",
 			delegate: TEST_DELEGATE_PATH
 		});
 		elementActionTest("Checking the add action via delegate for a table with default delegate", {
@@ -443,7 +439,14 @@ sap.ui.define([
 			},
 			afterAction: confirmColumnIsAdded.bind(null, NO_ENTITY_TYPE),
 			afterUndo: confirmColumnIsRemoved,
-			afterRedo : confirmColumnIsAdded.bind(null, NO_ENTITY_TYPE)
+			afterRedo : confirmColumnIsAdded.bind(null, NO_ENTITY_TYPE),
+			before: function () {
+				// the control itself registers a delegate, so we need to register this delegate as late as possible
+				DelegateMediatorAPI.registerWriteDelegate({
+					controlType: "sap.m.Table",
+					delegate: TEST_DELEGATE_PATH
+				});
+			}
 		});
 
 	});

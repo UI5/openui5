@@ -1,0 +1,127 @@
+/* ============================== */
+/* CSS for control sap.m/Tooltip  */
+/* Base theme                     */
+/* ============================== */
+
+@_sap_m_Tooltip_ArrowHeight: 0.375rem;
+@_sap_m_Tooltip_ArrowWidth: 0.75rem;
+
+.sapMPopover.sapMTooltip {
+
+	border-radius: 0.25rem;
+	background-color: var(--sapIndicationColor_9_Background);
+	box-shadow: var(--sapContent_Lite_Shadow);
+
+	min-height: 1.5rem;
+	max-width: 17rem;
+	min-width: 0;
+	padding: 5px 0.5rem;
+
+	.sapMPopoverWrapper .sapMPopoverCont {
+		background-color: transparent;
+		border-radius: 0;
+		padding: 0;
+	}
+
+	.sapMPopoverArr::after {
+		background-color: var(--sapIndicationColor_9_Background);
+		box-shadow: var(--sapContent_Lite_Shadow);
+	}
+
+	.sapMPopoverArr {
+		width: @_sap_m_Tooltip_ArrowWidth;
+
+		&::after {
+			width: 0.5rem;
+			height: 0.5rem;
+		}
+	}
+
+	.sapMPopoverArrUp {
+		top: -@_sap_m_Tooltip_ArrowHeight;
+		height: @_sap_m_Tooltip_ArrowHeight;
+
+		&::after {
+			margin: 0.125rem 0 0 0.125rem;
+		}
+	}
+
+	.sapMPopoverArrDown {
+		height: @_sap_m_Tooltip_ArrowHeight;
+
+		&::after {
+			margin: -0.25rem 0 0 0.125rem;
+		}
+	}
+
+	.sapMPopoverArrLeft {
+		top: @_sap_m_Tooltip_ArrowHeight !important;
+		height: @_sap_m_Tooltip_ArrowWidth;
+		width: @_sap_m_Tooltip_ArrowHeight;
+		left: -@_sap_m_Tooltip_ArrowHeight;
+
+		&::after {
+			margin: 0.125rem 0 0 0.125rem;
+		}
+	}
+
+	.sapMPopoverArrRight {
+		top: @_sap_m_Tooltip_ArrowHeight !important;
+		height: @_sap_m_Tooltip_ArrowWidth;
+		width: @_sap_m_Tooltip_ArrowHeight;
+		right: -@_sap_m_Tooltip_ArrowHeight;
+
+		&::after {
+			margin: 0.125rem 0 0 -0.25rem;
+		}
+	}
+
+	.sapMPopoverCont,
+	.sapMText {
+		color: var(--sapContent_ContrastTextColor);
+		font-size: var(--sapFontSmallSize);
+	}
+
+	// the following additional pseudo-elements extend the clickable area of the tooltip
+	// so the tooltip is not dismissed when the mouse moves through the gap on either side
+	// of the arrow (between popover body and target element).
+	&.sapMTooltipTop::after {
+		content: '';
+		position: absolute;
+		width: 100%;
+		height: @_sap_m_Tooltip_ArrowHeight;
+		top: 100%;
+		right: 0;
+	}
+
+	&.sapMTooltipBottom::before {
+		content: '';
+		position: absolute;
+		width: 100%;
+		height: @_sap_m_Tooltip_ArrowHeight;
+		top: -@_sap_m_Tooltip_ArrowHeight;
+		right: 0;
+	}
+
+	&.sapMTooltipLeft::before {
+		content: '';
+		position: absolute;
+		width: @_sap_m_Tooltip_ArrowHeight;
+		height: 100%;
+		top: 0;
+		right:-@_sap_m_Tooltip_ArrowHeight;
+	}
+
+	&.sapMTooltipRight::after {
+		content: '';
+		position: absolute;
+		width: @_sap_m_Tooltip_ArrowHeight;
+		height: 100%;
+		top: 0;
+		left: -@_sap_m_Tooltip_ArrowHeight;
+	}
+}
+
+.sapMTooltipInvisibleTooltip {
+	display: none;
+}

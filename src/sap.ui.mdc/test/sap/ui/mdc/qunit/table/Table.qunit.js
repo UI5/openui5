@@ -3380,7 +3380,7 @@ sap.ui.define([
 			descending: true
 		}];
 		const aSortConditionsResult = [{
-			name: "test",
+			key: "test",
 			descending: true
 		}];
 		const oFilterConditions = {
