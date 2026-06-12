@@ -1557,7 +1557,7 @@ sap.ui.define([
 		if (this._bFocusLastCondition) {
 			// focus last condition operator field after it is rendered
 			iIndex = _getGridIndexOfLastRow.call(this, "-operator");
-			aGridContent[iIndex].focus();
+			setTimeout(() => { aGridContent[iIndex].focus(); }, 0);
 			this._bFocusLastCondition = false;
 		}
 		if (this._bFocusLastRemoveBtn) {
