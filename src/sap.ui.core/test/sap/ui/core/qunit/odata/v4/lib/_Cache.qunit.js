@@ -15172,6 +15172,18 @@ sap.ui.define([
 	},
 	sFilter : "~Foo~"
 }, {
+	sTitle : "refreshKeptElements with three kept contexts;"
+		+ " after refresh two elements are not kept anymore (SNOW: DINC0927597), one is deleted",
+	mKeptAliveElementsByPredicate : {
+		"('Foo')" : {bRemoved : true, key : "Foo", "@$ui5._" : {predicate : "('Foo')"}},
+		"('Bar')" : {key : "Bar", "@$ui5._" : {predicate : "('Bar')"}},
+		"('Baz')" : {bDeleted : true, bRemoved : true, key : "Baz",
+			// click bait ;-) transient predicate MUST not lead to #removeElement
+			"@$ui5._" : {predicate : "('Baz')", transientPredicate : "($uid=id-1-23)"}}
+	},
+	sFilter : "~Bar~ or ~Baz~ or ~Foo~",
+	iTop : 3
+}, {
 	sTitle : "refreshKeptElements with two kept contexts;"
 		+ " after refresh one kept element is deleted",
 	mKeptAliveElementsByPredicate : {
@@ -15255,7 +15267,8 @@ sap.ui.define([
 			oResponse = {
 				value : []
 			},
-			mTypes = {};
+			mTypes = {},
+			that = this;
 
 		oCache.mLateExpandSelect = bHasLateExpandSelect ? mLateExpandSelect : undefined;
 		if (oFixture.bAggregated) {
@@ -15291,9 +15304,11 @@ sap.ui.define([
 
 				oHelperMock.expects("updateAll")
 					.withExactArgs(sinon.match.same(oCache.mChangeListeners), sPredicate,
-						sinon.match.same(oElement), sinon.match.same(oElement));
+						sinon.match.same(oElement), sinon.match.same(oElement))
+					.exactly(oElement.bRemoved ? 0 : 1);
 			}
-			if (oElement.bDeleted && "transientPredicate" in oElement["@$ui5._"]) {
+			if (oElement.bDeleted && !oElement.bRemoved
+					&& "transientPredicate" in oElement["@$ui5._"]) {
 				oCacheMock.expects("removeElement")
 					.withExactArgs(-1, sPredicate)
 					.returns(42);
@@ -15327,7 +15342,22 @@ sap.ui.define([
 		this.mock(this.oRequestor).expects("request")
 			.withExactArgs("GET", "Employees?$filter=" + oFixture.sFilter,
 				sinon.match.same(oGroupLock))
-			.returns(Promise.resolve(oResponse));
+			.callsFake(function () {
+				Object.keys(oFixture.mKeptAliveElementsByPredicate).forEach(function (sPredicate) {
+					const oElement = oFixture.mKeptAliveElementsByPredicate[sPredicate];
+					if (oElement.bRemoved) {
+						// not kept alive anymore when the response arrives (SNOW: DINC0927597)
+						delete oCache.aElements.$byPredicate[sPredicate];
+
+						that.oLogMock.expects("warning")
+							.withExactArgs("Ignoring response for refresh of previously kept alive"
+								+ " entity " + sPredicate
+								+ " - consider calling v4.Context#setKeepAlive(false) earlier!",
+								oCache.toString(), sClassName);
+					}
+				});
+				return Promise.resolve(oResponse);
+			});
 		oCacheMock.expects("visitResponse")
 			.withExactArgs(sinon.match.same(oResponse), sinon.match.same(mTypes), undefined,
 				undefined, 0)
@@ -15349,10 +15379,10 @@ sap.ui.define([
 				var oElement = oFixture.mKeptAliveElementsByPredicate[sPredicate],
 					bCreated = "transientPredicate" in oElement["@$ui5._"];
 
-				if (!oElement.bDeleted || bCreated) {
+				if ((!oElement.bDeleted || bCreated) && !oElement.bRemoved) {
 					mByPredicateAfterRefresh[sPredicate] = oElement;
 				}
-				if (oElement.bDeleted) {
+				if (oElement.bDeleted && !oElement.bRemoved) {
 					iCallCount += 1;
 					sinon.assert.calledWithExactly(fnOnRemove, sPredicate,
 						bCreated ? 42 : undefined);

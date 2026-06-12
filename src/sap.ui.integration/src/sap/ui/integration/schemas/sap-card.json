@@ -3766,6 +3766,11 @@
         "description": {
           "description": "Description of the parameter for user-friendly visualization in the design-time editor",
           "type": "string"
+        },
+        "ignoreBinding": {
+          "description": "If true, the parameter value is taken verbatim and is not processed as a binding expression. Use this for values that contain literal curly braces, e.g. stringified JSON. Note: {context>/...} bindings inside the value will not be resolved when this flag is set.",
+          "type": "boolean",
+          "default": false
         }
       }
     },

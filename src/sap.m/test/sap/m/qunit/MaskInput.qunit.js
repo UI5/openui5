@@ -1348,11 +1348,67 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Testing aria label", function (assert){
-		var $AriaLabel = this.oMaskInput.$().find("#" + this.oMaskInput.getId() + "-labelledby");
-		//assert
-		assert.ok($AriaLabel.length > 0, "The hidden aria description is present in the DOM");
-		assert.strictEqual(this.oRenderer.getLabelledByAnnouncement(this.oMaskInput), $AriaLabel.text(), "The message is rendered correctly");
+	QUnit.test("onfocusin event should add aria-description attribute when mask is set and value is empty", function (assert) {
+		// act
+		this.oMaskInput.onfocusin({ target: this.oMaskInput.getDomRef() });
+
+		// assert
+		assert.strictEqual(this.oMaskInput.$("inner").attr("aria-description"), this.oMaskInput._getPlaceholder(), "aria-description attribute equals the placeholder when mask is set");
+	});
+
+	QUnit.test("onfocusin event should not add aria-description attribute when no mask is set", function (assert) {
+		// prepare
+		var oGetMaskStub = this.stub(this.oMaskInput, "getMask").returns("");
+
+		// act
+		this.oMaskInput.onfocusin({ target: this.oMaskInput.getDomRef() });
+
+		// assert
+		assert.strictEqual(this.oMaskInput.$("inner").attr("aria-description"), undefined, "aria-description attribute is not added when no mask is set");
+
+		// cleanup
+		oGetMaskStub.restore();
+	});
+
+	QUnit.test("onfocusin event should not add aria-description attribute when value is entered", function (assert) {
+		// prepare
+		var oGetValueStub = this.stub(this.oMaskInput, "getValue").returns("12-34-567");
+
+		// act
+		this.oMaskInput.onfocusin({ target: this.oMaskInput.getDomRef() });
+
+		// assert
+		assert.strictEqual(this.oMaskInput.$("inner").attr("aria-description"), undefined, "aria-description attribute is not added when a value is already entered");
+
+		// cleanup
+		oGetValueStub.restore();
+	});
+
+	QUnit.test("onfocusout event should remove aria-description attribute", function (assert) {
+		// prepare
+		this.oMaskInput.onfocusin({ target: this.oMaskInput.getDomRef() });
+		assert.strictEqual(this.oMaskInput.$("inner").attr("aria-description"), this.oMaskInput._getPlaceholder(), "aria-description is set after focusin");
+
+		// act
+		this.oMaskInput.onfocusout({ target: this.oMaskInput.getDomRef() });
+
+		// assert
+		assert.strictEqual(this.oMaskInput.$("inner").attr("aria-description"), undefined, "aria-description attribute is removed on focusout");
+	});
+
+	QUnit.test("onfocusout event should remove a stale aria-description attribute even when no mask is set", function (assert) {
+		// prepare
+		var oGetMaskStub = this.stub(this.oMaskInput, "getMask").returns("");
+		this.oMaskInput.$("inner").attr("aria-description", "stale value");
+
+		// act
+		this.oMaskInput.onfocusout({ target: this.oMaskInput.getDomRef() });
+
+		// assert
+		assert.strictEqual(this.oMaskInput.$("inner").attr("aria-description"), undefined, "stale aria-description attribute is removed on focusout");
+
+		// cleanup
+		oGetMaskStub.restore();
 	});
 
 	QUnit.test("Testing aria roledescription", function (assert){

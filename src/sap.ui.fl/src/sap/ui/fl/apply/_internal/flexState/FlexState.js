@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/base/util/restricted/_omit",
 	"sap/base/util/Deferred",
 	"sap/base/util/each",
+	"sap/base/util/isEmptyObject",
 	"sap/base/util/merge",
 	"sap/base/util/ObjectPath",
 	"sap/base/Log",
@@ -25,6 +26,7 @@ sap.ui.define([
 	_omit,
 	Deferred,
 	each,
+	isEmptyObject,
 	merge,
 	ObjectPath,
 	Log,
@@ -384,8 +386,11 @@ sap.ui.define([
 		const oNewInitPromise = new Deferred();
 		_mInitPromises[sReference] = oNewInitPromise;
 		oNewInitPromise.resolve();
-		const oEmptyResponse = Loader.initializeEmptyCache(sReference);
-		initializeNewInstance({ reference: sReference }, oEmptyResponse);
+		let oCachedFlexData = Loader.getCachedFlexData(sReference);
+		if (isEmptyObject(oCachedFlexData)) {
+			oCachedFlexData = Loader.initializeEmptyCache(sReference);
+		}
+		initializeNewInstance({ reference: sReference }, oCachedFlexData);
 	}
 
 	FlexState.getRuntimeOnlyData = function(sReference) {

@@ -655,12 +655,13 @@ sap.ui.define([
 					return mOptions.after.call(this.hookContext, assert);
 				},
 				async beforeEach() {
-					await FlQUnitUtils.initializeFlexStateWithData(sandbox, UI_COMPONENT_NAME, { changes: [] });
+					await FlQUnitUtils.initializeFlexStateWithData(sandbox, UI_COMPONENT_NAME, { changes: [] }, "comp");
 				},
 				afterEach() {
 					this.oUiComponentContainer.destroy();
 					this.oDesignTime.destroy();
 					destroyCommands(this.aCommands);
+					FlexState.clearState();
 					FlexTestAPI.reset();
 					sandbox.restore();
 				}
@@ -723,7 +724,7 @@ sap.ui.define([
 				return mOptions.after.call(this.hookContext, assert);
 			},
 			async beforeEach(assert) {
-				await FlQUnitUtils.initializeFlexStateWithData(sandbox, UI_COMPONENT_NAME, { changes: [] });
+				await FlQUnitUtils.initializeFlexStateWithData(sandbox, UI_COMPONENT_NAME, { changes: [] }, "comp");
 
 				return createViewInComponent.call(this, SYNC)
 				.then(buildAndExecuteCommands.bind(this, assert))
@@ -736,6 +737,7 @@ sap.ui.define([
 				this.oUiComponentContainer.destroy();
 				destroyCommands(this.aCommands);
 				FlexTestAPI.reset();
+				FlexState.clearState();
 				sandbox.restore();
 			}
 		}, function() {

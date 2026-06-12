@@ -39,6 +39,7 @@ sap.ui.define([
 	"sap/ui/model/type/Float",
 	"sap/ui/model/odata/type/Boolean",
 	"sap/ui/model/odata/type/Decimal",
+	"sap/ui/model/odata/type/Int32",
 	"sap/ui/model/FilterOperator",
 	// don't want to test async loading in Field here
 	"sap/m/DatePicker",
@@ -97,6 +98,7 @@ sap.ui.define([
 	FloatType,
 	BooleanType,
 	DecimalType,
+	Int32Type,
 	FilterOperator,
 	DatePicker,
 	DateTimePicker,
@@ -237,56 +239,6 @@ sap.ui.define([
 		assert.equal(aConditions[1].values[0], "Andreas", "Value of second condition");
 		assert.notOk(aConditions[1].isEmpty, "isEmpty of second condition");
 
-	});
-
-	QUnit.test("InvisibleText for aria-label works correctly", async (assert) => {
-
-		// arrange
-		const aConditions = _getModelConditions();
-		const oGrid = Element.getElementById("DCP1--conditions");
-		const aContent = oGrid.getContent();
-		const oInvisibleText1 = aContent[4];
-		const sEmptyText = oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL_UNDEFINED");
-		const sRemoveText = oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL", ["=Andreas"]);
-
-		// assert
-		assert.equal(aConditions.length, 1, "one empty condition should exist");
-		assert.equal(aConditions[0].operator, OperatorName.EQ, "Operator of empty condition");
-		assert.equal(aConditions[0].values[0], null, "Value of empty condition");
-		assert.ok(aConditions[0].isEmpty, "isEmpty of empty condition");
-
-		assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
-		assert.ok(oInvisibleText1?.isA("sap.ui.core.InvisibleText"), "InvisibleText is core.InvisibleText");
-		assert.equal(oInvisibleText1.getText(), sEmptyText, "InvisibleText has correct text");
-
-		// act
-		_addModelCondition(Condition.createCondition(OperatorName.EQ, ["Andreas"], undefined, undefined, ConditionValidated.NotValidated));
-		await nextUIUpdate();
-
-		// arrange
-		const aConditions2 = _getModelConditions();
-		const fnDone = assert.async();
-
-		setTimeout(async () => {
-			await nextUIUpdate();
-			const aContent = oGrid.getContent();
-			const oInvisibleText2 = aContent[9];
-
-			// assert
-			assert.equal(aConditions2.length, 2, "2 conditions should exist");
-			assert.equal(aConditions2[0].operator, OperatorName.EQ, "Operator of first condition");
-			assert.equal(aConditions2[0].values[0], null, "Value of first condition");
-			assert.ok(aConditions2[0].isEmpty, "isEmpty of first condition");
-			assert.equal(aConditions2[1].operator, OperatorName.EQ, "Operator of second condition");
-			assert.equal(aConditions2[1].values[0], "Andreas", "Value of second condition");
-			assert.notOk(aConditions2[1].isEmpty, "isEmpty of second condition");
-
-			assert.equal(aContent.length, 11, "One row with one field created - Grid contains 11 controls");
-
-			assert.ok(oInvisibleText2?.isA("sap.ui.core.InvisibleText"), "InvisibleText is core.InvisibleText");
-			assert.equal(oInvisibleText2.getText(), sRemoveText, "InvisibleText has correct text");
-			fnDone();
-		});
 	});
 
 	QUnit.test("dummy condition with different operator", async (assert) => {
@@ -1920,9 +1872,59 @@ sap.ui.define([
 
 	QUnit.module("Accessibility", {
 		beforeEach: async () => {
-			await _init();
+			await _init(true, new Int32Type());
 		},
 		afterEach: _teardown
+	});
+
+	QUnit.test("InvisibleText for aria-label works correctly", async (assert) => {
+
+		// arrange
+		const aConditions = _getModelConditions();
+		const oGrid = Element.getElementById("DCP1--conditions");
+		const aContent = oGrid.getContent();
+		const oInvisibleText1 = aContent[4];
+		const sEmptyText = oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL_UNDEFINED");
+		const sRemoveText = oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL", ["=1"]);
+
+		// assert
+		assert.equal(aConditions.length, 1, "one empty condition should exist");
+		assert.equal(aConditions[0].operator, OperatorName.EQ, "Operator of empty condition");
+		assert.equal(aConditions[0].values[0], null, "Value of empty condition");
+		assert.ok(aConditions[0].isEmpty, "isEmpty of empty condition");
+
+		assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
+		assert.ok(oInvisibleText1?.isA("sap.ui.core.InvisibleText"), "InvisibleText is core.InvisibleText");
+		assert.equal(oInvisibleText1.getText(), sEmptyText, "InvisibleText has correct text");
+
+		// act
+		_addModelCondition(Condition.createCondition(OperatorName.EQ, [1], undefined, undefined, ConditionValidated.NotValidated));
+		await nextUIUpdate();
+
+		// arrange
+		const aConditions2 = _getModelConditions();
+		const fnDone = assert.async();
+
+		setTimeout(async () => {
+			await nextUIUpdate();
+			const aContent = oGrid.getContent();
+			const oInvisibleText2 = aContent[9];
+
+			// assert
+			assert.equal(aConditions2.length, 2, "2 conditions should exist");
+			assert.equal(aConditions2[0].operator, OperatorName.EQ, "Operator of first condition");
+			assert.equal(aConditions2[0].values[0], null, "Value of first condition");
+			assert.ok(aConditions2[0].isEmpty, "isEmpty of first condition");
+			assert.equal(aConditions2[1].operator, OperatorName.EQ, "Operator of second condition");
+			assert.equal(aConditions2[1].values[0], 1, "Value of second condition");
+			assert.notOk(aConditions2[1].isEmpty, "isEmpty of second condition");
+
+			assert.equal(aContent.length, 11, "One row with one field created - Grid contains 11 controls");
+
+			assert.ok(oInvisibleText2?.isA("sap.ui.core.InvisibleText"), "InvisibleText is core.InvisibleText");
+			assert.equal(oInvisibleText2.getText(), sRemoveText, "InvisibleText has correct text");
+			fnDone();
+		});
 	});
 
 	QUnit.test("Check aria labelled by attributes", (assert) => {

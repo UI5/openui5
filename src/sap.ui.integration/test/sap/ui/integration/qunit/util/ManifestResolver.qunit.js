@@ -5,12 +5,16 @@ sap.ui.define([
 	"sap/ui/integration/Host",
 	"sap/ui/integration/util/ManifestResolver",
 	"sap/ui/integration/util/SkeletonCard",
+	"sap/ui/integration/util/AnalyticsCloudHelper",
+	"sap/base/Log",
 	"qunit/testResources/nextCardReadyEvent"
 ], function (
 	Library,
 	Host,
 	ManifestResolver,
 	SkeletonCard,
+	AnalyticsCloudHelper,
+	Log,
 	nextCardReadyEvent
 ) {
 	"use strict";
@@ -5129,6 +5133,330 @@ sap.ui.define([
 
 				oCard.destroy();
 			});
+	});
+
+	QUnit.module("Parameters with complex/JSON values", {
+		beforeEach: function () {
+			this._oLogErrorRawSpy = sinon.spy(Log, "error");
+			const oRawSpy = this._oLogErrorRawSpy;
+			const sComponent = "sap.ui.integration.util.ManifestResolver";
+
+			function aFailSafeCalls() {
+				return oRawSpy.getCalls().filter((oCall) => oCall.args[1] === sComponent);
+			}
+
+			this.oLogErrorSpy = {
+				get callCount() { return aFailSafeCalls().length; },
+				get called() { return aFailSafeCalls().length > 0; },
+				calledWithMatch: (oMatcher) => aFailSafeCalls().some((oCall) => oMatcher.test(oCall.args[0]))
+			};
+		},
+		afterEach: function () {
+			this._oLogErrorRawSpy.restore();
+		}
+	});
+
+	const sBaseUrl = "test-resources/sap/ui/integration/qunit/testResources/manifestResolver/";
+	const sBareBraceJsonArray = "[{\"datasetId\":\"planning:[TENANT][][/sap.ask/Model_qs]\"}]";
+
+	function manifestWithParameters(sId, oParameters, oExtraSapCard) {
+		return {
+			"sap.app": { "id": sId, "type": "card" },
+			"sap.card": Object.assign({
+				"type": "Object",
+				"configuration": { "parameters": oParameters },
+				"content": { "groups": [] }
+			}, oExtraSapCard || {})
+		};
+	}
+
+	function hasConfigurationError(oRes) {
+		const oContent = oRes["sap.card"].content;
+		return !!(oContent && oContent.message && oContent.message.type === "error");
+	}
+
+	QUnit.test("Fail-safe: bare-brace JSON-array string is preserved", async function (assert) {
+		const oCard = new SkeletonCard({
+			manifest: manifestWithParameters("test.params.failsafe.string", {
+				"entityId": { "value": sBareBraceJsonArray }
+			}),
+			baseUrl: sBaseUrl
+		});
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		assert.notOk(hasConfigurationError(oRes), "Fail-safe prevents the Card Configuration Error");
+		assert.strictEqual(oRes["sap.card"].configuration.parameters.entityId.value, sBareBraceJsonArray, "Raw string preserved verbatim");
+		assert.ok(this.oLogErrorSpy.calledWithMatch(/entityId/), "Log.error names the parameter");
+		assert.ok(this.oLogErrorSpy.calledWithMatch(/ignoreBinding/), "Log.error points to the ignoreBinding flag");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Fail-safe: bare-brace JSON-object string is preserved", async function (assert) {
+		const sJsonObject = "{\"key\":\"value\",\"nested\":{\"arr\":[1,2,3]}}";
+		const oCard = new SkeletonCard({
+			manifest: manifestWithParameters("test.params.failsafe.objectstring", {
+				"config": { "value": sJsonObject }
+			}),
+			baseUrl: sBaseUrl
+		});
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		assert.notOk(hasConfigurationError(oRes), "Fail-safe prevents the Card Configuration Error");
+		assert.strictEqual(typeof oRes["sap.card"].configuration.parameters.config.value, "string", "Resolved value remains a string, not a coerced object");
+		assert.strictEqual(oRes["sap.card"].configuration.parameters.config.value, sJsonObject, "Raw string preserved verbatim");
+		assert.ok(this.oLogErrorSpy.calledWithMatch(/config/), "Log.error names the parameter");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Fail-safe: object value with bare-brace leaf is preserved", async function (assert) {
+		const oParamValue = {
+			"body": [{
+				"details": { "EntityId": sBareBraceJsonArray },
+				"id": "sac_widget1"
+			}],
+			"id": "9a4e5576-ff53-454b-b231-5ead55a0e578"
+		};
+		const oCard = new SkeletonCard({
+			manifest: manifestWithParameters("test.params.failsafe.object", {
+				"interpretation": { "value": oParamValue }
+			}),
+			baseUrl: sBaseUrl
+		});
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		assert.notOk(hasConfigurationError(oRes), "Fail-safe prevents the Card Configuration Error");
+		assert.deepEqual(oRes["sap.card"].configuration.parameters.interpretation.value, oParamValue, "Object value with bare-brace leaf is restored verbatim");
+		assert.ok(this.oLogErrorSpy.calledWithMatch(/interpretation/), "Log.error names the parameter");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Fail-safe: each malformed parameter logs once, well-formed siblings unaffected", async function (assert) {
+		const oHost = new Host();
+		oHost.getContextValue = (sKey) => Promise.resolve(sKey === "sample/country" ? "France" : undefined);
+
+		const oManifest = manifestWithParameters("test.params.failsafe.multi", {
+			"firstParam": { "value": sBareBraceJsonArray },
+			"secondParam": { "value": "[{\"datasetId\":\"other:[TENANT][][/sap.ask/Model_qs]\"}]" },
+			"country": { "value": "{context>/sample/country}" }
+		});
+		const oCard = new SkeletonCard({ manifest: oManifest, baseUrl: sBaseUrl, host: oHost });
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		const oParams = oRes["sap.card"].configuration.parameters;
+		assert.notOk(hasConfigurationError(oRes), "Card resolves successfully despite two malformed parameters");
+		assert.strictEqual(oParams.firstParam.value, sBareBraceJsonArray, "first raw value restored");
+		assert.strictEqual(oParams.country.value, "France", "Well-formed sibling resolves through host");
+		assert.strictEqual(this.oLogErrorSpy.callCount, 2, "Log.error called once per recovered parameter");
+		assert.ok(this.oLogErrorSpy.calledWithMatch(/firstParam/), "Log.error names firstParam");
+		assert.ok(this.oLogErrorSpy.calledWithMatch(/secondParam/), "Log.error names secondParam");
+		assert.notOk(this.oLogErrorSpy.calledWithMatch(/country/), "Log.error does not name the well-formed sibling");
+
+		oCard.destroy();
+		oHost.destroy();
+	});
+
+	QUnit.test("ignoreBinding: stringified-JSON value preserved verbatim", async function (assert) {
+		const oCard = new SkeletonCard({
+			manifest: manifestWithParameters("test.params.ignorebinding.string", {
+				"entityId": { "ignoreBinding": true, "value": sBareBraceJsonArray }
+			}),
+			baseUrl: sBaseUrl
+		});
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		const oParam = oRes["sap.card"].configuration.parameters.entityId;
+		assert.notOk(hasConfigurationError(oRes), "No Card Configuration Error");
+		assert.strictEqual(oParam.value, sBareBraceJsonArray, "Value preserved verbatim");
+		assert.strictEqual(oParam.ignoreBinding, true, "ignoreBinding flag survives in resolved manifest");
+		assert.notOk(this.oLogErrorSpy.called, "Fail-safe does not fire when ignoreBinding handled the value");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("ignoreBinding: deep object value preserved and referenceable from content", async function (assert) {
+		const oInterpretation = {
+			"body": [{
+				"details": {
+					"Datasource": {
+						"EntityId": "[{\"datasetId\":\"planning:[TENANT_7][][/sap.epm/BestRunJuice_SampleModel_qs]\"}]",
+						"ModelName": "BestRunJuice_SampleModel"
+					}
+				},
+				"id": "sac_widget1"
+			}],
+			"id": "9a4e5576-ff53-454b-b231-5ead55a0e578"
+		};
+
+		const fnIncludeScriptStub = sinon.stub(AnalyticsCloudHelper, "_includeScript").callsFake(() => {
+			sap.sac = {
+				api: {
+					widget: {
+						setup: sinon.stub(),
+						getWidgetInfo: sinon.stub(),
+						renderWidget: sinon.stub(),
+						renderWidgetForJustAsk: sinon.stub()
+					}
+				}
+			};
+			return Promise.resolve();
+		});
+
+		const oManifest = {
+			"sap.app": { "id": "test.params.ignorebinding.deep", "type": "card" },
+			"sap.card": {
+				"type": "AnalyticsCloud",
+				"configuration": {
+					"parameters": {
+						"interpretation": { "ignoreBinding": true, "value": oInterpretation }
+					}
+				},
+				"content": {
+					"interpretation": "{parameters>/interpretation/value}",
+					"sacTenantDestination": "https://example.sac.cloud"
+				}
+			}
+		};
+		const oCard = new SkeletonCard({ manifest: oManifest, baseUrl: sBaseUrl });
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		assert.notOk(hasConfigurationError(oRes), "No Card Configuration Error");
+		assert.deepEqual(oRes["sap.card"].configuration.parameters.interpretation.value, oInterpretation, "Deep object preserved verbatim, including bare-brace EntityId");
+		assert.notOk(this.oLogErrorSpy.called, "Fail-safe does not fire when ignoreBinding handled the value");
+
+		oCard.destroy();
+		fnIncludeScriptStub.restore();
+		AnalyticsCloudHelper._pInitialize = null;
+		if (sap.sac && sap.sac.api) { delete sap.sac.api.widget; }
+	});
+
+	QUnit.test("ignoreBinding: binding-like string is kept literal", async function (assert) {
+		const oHost = new Host();
+		oHost.getContextValue = () => Promise.resolve("HOST_VALUE");
+
+		const oCard = new SkeletonCard({
+			manifest: manifestWithParameters("test.params.ignorebinding.tradeoff", {
+				"opaque": {
+					"ignoreBinding": true,
+					"value": { "wouldBeBinding": "{context>/some/path}", "literal": "static" }
+				}
+			}),
+			baseUrl: sBaseUrl,
+			host: oHost
+		});
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		const oVal = oRes["sap.card"].configuration.parameters.opaque.value;
+		assert.strictEqual(oVal.wouldBeBinding, "{context>/some/path}", "Binding-like string is kept literal, not resolved");
+		assert.strictEqual(oVal.literal, "static", "Static field is preserved");
+
+		oCard.destroy();
+		oHost.destroy();
+	});
+
+	QUnit.test("Regression: well-formed bindings resolve normally", async function (assert) {
+		const oHost = new Host();
+		oHost.getContextValue = (sKey) => Promise.resolve({
+			"sample/firstName": "Donna",
+			"sample/lastName": "Moore",
+			"sample/supplier/id/value": "SUP001"
+		}[sKey]);
+
+		const oCard = new SkeletonCard({
+			manifest: manifestWithParameters("test.params.regression.bindings", {
+				"fullName": { "value": "{= ${context>/sample/firstName} + ' ' + ${context>/sample/lastName} }" },
+				"supplierId": { "value": "{context>/sample/supplier/id/value}" }
+			}),
+			baseUrl: sBaseUrl,
+			host: oHost
+		});
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		const oParams = oRes["sap.card"].configuration.parameters;
+		assert.strictEqual(oParams.fullName.value, "Donna Moore", "Composite expression binding over {context>/...} resolved");
+		assert.strictEqual(oParams.supplierId.value, "SUP001", "{context>/...} binding resolved through host");
+		assert.notOk(this.oLogErrorSpy.called, "Fail-safe does not fire for legitimate bindings");
+
+		oCard.destroy();
+		oHost.destroy();
+	});
+
+	QUnit.test("Regression: TODAY_ISO system placeholder still resolves", async function (assert) {
+		const oCard = new SkeletonCard({
+			manifest: manifestWithParameters("test.params.regression.systemparam", {
+				"today": { "value": "{{parameters.TODAY_ISO}}", "type": "date" }
+			}),
+			baseUrl: sBaseUrl
+		});
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		const sValue = oRes["sap.card"].configuration.parameters.today.value;
+		assert.ok(typeof sValue === "string" && /^\d{4}-\d{2}-\d{2}/.test(sValue), "TODAY_ISO resolved to date string, got: " + sValue);
+		assert.notOk(this.oLogErrorSpy.called, "Fail-safe does not fire for system placeholder");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Regression: primitive and array parameter values are preserved", async function (assert) {
+		const aArrayValue = [{ "id": "abc", "label": "ABC" }, { "id": "xyz", "label": "XYZ" }];
+		const oCard = new SkeletonCard({
+			manifest: manifestWithParameters("test.params.regression.primitives", {
+				"count": { "value": 42 },
+				"enabled": { "value": true },
+				"empty": { "value": null },
+				"items": { "value": aArrayValue }
+			}),
+			baseUrl: sBaseUrl
+		});
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		const oParams = oRes["sap.card"].configuration.parameters;
+		assert.strictEqual(oParams.count.value, 42, "Integer preserved");
+		assert.strictEqual(oParams.enabled.value, true, "Boolean preserved");
+		assert.strictEqual(oParams.empty.value, null, "Null preserved");
+		assert.deepEqual(oParams.items.value, aArrayValue, "Array preserved");
+		assert.notOk(this.oLogErrorSpy.called, "Fail-safe does not fire for primitives");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Regression: ignoreBinding requires strict true", async function (assert) {
+		const oCard = new SkeletonCard({
+			manifest: manifestWithParameters("test.params.regression.ignorebinding.strict", {
+				"falseFlag": { "ignoreBinding": false, "value": sBareBraceJsonArray },
+				"stringFlag": { "ignoreBinding": "true", "value": sBareBraceJsonArray }
+			}),
+			baseUrl: sBaseUrl
+		});
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		const oParams = oRes["sap.card"].configuration.parameters;
+		assert.strictEqual(oParams.falseFlag.value, sBareBraceJsonArray, "ignoreBinding:false - raw value restored by fail-safe");
+		assert.strictEqual(oParams.stringFlag.value, sBareBraceJsonArray, "ignoreBinding:'true' string - raw value restored by fail-safe");
+		assert.strictEqual(this.oLogErrorSpy.callCount, 2, "Fail-safe fires once per non-strict-true parameter");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Edge: manifest without configuration resolves cleanly", async function (assert) {
+		const oCard = new SkeletonCard({
+			manifest: {
+				"sap.app": { "id": "test.params.edge.noconfig", "type": "card" },
+				"sap.card": {
+					"type": "Object",
+					"content": { "groups": [] }
+				}
+			},
+			baseUrl: sBaseUrl
+		});
+
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		assert.notOk(hasConfigurationError(oRes), "Card without parameters resolves cleanly");
+		assert.notOk(this.oLogErrorSpy.called, "Fail-safe does not fire");
+
+		oCard.destroy();
 	});
 
 });

@@ -124,7 +124,7 @@ sap.ui.define([
 		Then.onTheRTAToolbar.iShouldSeeTheToolbar();
 		Then.onTheTestApp.iShouldSeeTheExpectedFlexInfoSessionStorage(sAppId, oExpectedFlexInfoSession.keyUser.roleSpecificReloadReason)
 		.and.aReloadShouldHaveHappened()
-		.and.iExpectFlexDataRequestCallCount(2);
+		.and.iExpectFlexDataRequestCallCount(1);
 	});
 
 	opaTest("I reload the app and check that session storage is correctly filled", (Given, _, Then) => {

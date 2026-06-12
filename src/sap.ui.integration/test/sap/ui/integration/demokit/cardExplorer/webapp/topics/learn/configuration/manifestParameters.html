@@ -73,6 +73,19 @@
 						<td>1.20.0</td>
 						<td></td>
 					</tr>
+					<tr>
+						<td>ignoreBinding</td>
+						<td>boolean</td>
+						<td>No</td>
+						<td>false</td>
+						<td>
+							If <code>true</code>, the parameter <code>value</code> is taken verbatim and is not processed as a binding expression.
+							Use this for values that contain literal curly braces, e.g. stringified JSON payloads.
+							<br><b>Note:</b> when this flag is set, <code>{context&gt;/...}</code> bindings inside the value will <b>not</b> be resolved.
+						</td>
+						<td>1.87</td>
+						<td>1.150</td>
+					</tr>
 				</table>
 			</div>
 
