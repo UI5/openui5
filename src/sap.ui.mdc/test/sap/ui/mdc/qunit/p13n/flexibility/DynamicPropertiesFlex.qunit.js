@@ -9,6 +9,7 @@ sap.ui.define([
 	"sap/ui/mdc/TableDelegate",
 	"sap/ui/mdc/FilterBarDelegate",
 	"sap/ui/mdc/p13n/StateUtil",
+	"sap/m/p13n/Engine",
 	"sap/ui/fl/changeHandler/Base",
 	"sap/ui/rta/enablement/elementActionTest",
 	"sap/ui/mdc/table/Column",
@@ -23,6 +24,7 @@ sap.ui.define([
 	TableDelegate,
 	FilterBarDelegate,
 	StateUtil,
+	Engine,
 	FLChangeHandlerBase,
 	elementActionTest,
 	Column,
@@ -1573,6 +1575,8 @@ sap.ui.define([
 			const aChanges = await StateUtil.applyExternalState(this.oControl, {
 				items: [{name: "newProp", position: 0}]
 			});
+			// Workaround added to enable downport of sap.ui.fl fix to 1.148; in newer releases this is no longer required
+			await Engine.getInstance().waitForChanges(this.oControl);
 			assert.ok(aChanges.some(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;}), "add change created");
 
 			const oAddChange = aChanges.find(function(oChange) {return oChange.getChangeType() === oConfig.addItemChangeType;});

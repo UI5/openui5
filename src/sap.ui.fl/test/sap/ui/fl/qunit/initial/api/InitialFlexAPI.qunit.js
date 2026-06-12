@@ -3,18 +3,18 @@
 sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/Settings",
-	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/initial/api/InitialFlexAPI",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], (
 	Control,
 	FlexObjectState,
+	FlexState,
 	FlexInfoSession,
 	Settings,
-	StorageUtils,
 	InitialFlexAPI,
 	Utils,
 	sinon
@@ -54,7 +54,7 @@ sap.ui.define([
 			sandbox.stub(Utils, "getAppComponentForSelector").returns(this.oAppComponent);
 			this.aObjectsToDestroy = [];
 			this.oFOStateWaitForFlexObjectsStub = sandbox.stub(FlexObjectState, "waitForFlexObjectsToBeApplied").resolves();
-			this.oIsStorageFilledStub = sandbox.stub(StorageUtils, "isStorageResponseFilled");
+			this.oIsInitializedStub = sandbox.stub(FlexState, "isInitialized").returns(true);
 		},
 		afterEach() {
 			sandbox.restore();
@@ -62,7 +62,6 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("with a single control", async function(assert) {
-			this.oIsStorageFilledStub.returns(true);
 			const oControl = new Control();
 			this.aObjectsToDestroy.push(oControl);
 
@@ -79,7 +78,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("with multiple controls", async function(assert) {
-			this.oIsStorageFilledStub.returns(true);
 			const oControl = new Control();
 			const oControl1 = new Control();
 			this.aObjectsToDestroy.push(oControl, oControl1);
@@ -100,7 +98,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("with change types", async function(assert) {
-			this.oIsStorageFilledStub.returns(true);
 			const oControl = new Control();
 			const oControl1 = new Control();
 			this.aObjectsToDestroy.push(oControl, oControl1);
@@ -131,16 +128,31 @@ sap.ui.define([
 			assert.ok(this.oFOStateWaitForFlexObjectsStub.alwaysCalledWithExactly(...aPassedValues), "the correct parameters are passed");
 		});
 
-		QUnit.test("without any changes available", async function(assert) {
-			this.oIsStorageFilledStub.returns(false);
+		QUnit.test("skips loading the apply package when FlexState is not initialized for the component", async function(assert) {
+			this.oIsInitializedStub.returns(false);
 			const oControl = new Control();
 			this.aObjectsToDestroy.push(oControl);
+
+			const vResult = await InitialFlexAPI.waitForChanges({ element: oControl });
+
+			assert.strictEqual(vResult, undefined, "the call resolves with undefined");
+			assert.strictEqual(this.oFOStateWaitForFlexObjectsStub.callCount, 0,
+				"FlexObjectState.waitForFlexObjectsToBeApplied is not called");
+			assert.ok(this.oIsInitializedStub.calledWith({ control: this.oAppComponent }),
+				"isInitialized is probed with the resolved app component");
+		});
+
+		QUnit.test("awaits FlexObjectState when FlexState is initialized (covers in-flight FlexObjects)", async function(assert) {
+			const oControl = new Control();
+			this.aObjectsToDestroy.push(oControl);
+
 			await InitialFlexAPI.waitForChanges({ element: oControl });
-			assert.strictEqual(this.oFOStateWaitForFlexObjectsStub.callCount, 0, "the FlexObject.waitForFlexObjects method was not called");
+
+			assert.strictEqual(this.oFOStateWaitForFlexObjectsStub.callCount, 1,
+				"the FlexObject.waitForFlexObjects method was called");
 		});
 
 		QUnit.test("with multiple types of selectors and an element", async function(assert) {
-			this.oIsStorageFilledStub.returns(true);
 			const oControl = new Control();
 			const oControl1 = new Control();
 			const oControl2 = new Control();
@@ -166,7 +178,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("with multiple types of selectors", async function(assert) {
-			this.oIsStorageFilledStub.returns(true);
 			const oControl = new Control();
 			const oControl1 = new Control();
 			this.aObjectsToDestroy.push(oControl, oControl1);
