@@ -3964,16 +3964,72 @@ sap.ui.define([
 		oRowTimeline._getRelativeInfo = this._getRelativeInfo.bind(this);
 
 		oRowTimeline.getAppointments = function() {
-			return oRow.getAppointments();
+			if (this._aExpandedAppointments) {
+				return this._aExpandedAppointments;
+			}
+			if (!this._oUTCEndDate) {
+				return oRow.getAppointments();
+			}
+
+			const aRowAppointments = oRow.getAppointments();
+
+			// If no recurring appointments exist, delegate directly so callers
+			// comparing oRow.getAppointments() === oTimeline.getAppointments()
+			// get referential equality (no new array built).
+			const bHasRecurring = aRowAppointments.some(
+				(oApp) => oApp.getRecurrenceType && oApp.getRecurrenceType()
+			);
+			if (!bHasRecurring) {
+				return oRow.getAppointments();
+			}
+
+			// Derive range from _oUTCStartDate/_oUTCEndDate (computed by _calculateIntervals)
+			// using UTC calendar components to construct LOCAL dates — timezone-safe.
+			const oRangeStart = UI5Date.getInstance(
+				this._oUTCStartDate.getUTCFullYear(),
+				this._oUTCStartDate.getUTCMonth(),
+				this._oUTCStartDate.getUTCDate(),
+				0, 0, 0, 0
+			);
+			const oRangeEnd = UI5Date.getInstance(
+				this._oUTCEndDate.getUTCFullYear(),
+				this._oUTCEndDate.getUTCMonth(),
+				this._oUTCEndDate.getUTCDate(),
+				23, 59, 59, 999
+			);
+
+			const aExpanded = [];
+
+			const oByDate = new Map();
+			const fnDateKey = (oDate) =>
+				`${oDate.getFullYear()}-${oDate.getMonth()}-${oDate.getDate()}`;
+
+			aRowAppointments.forEach((oAppointment) => {
+				if (oAppointment.getRecurrenceType && oAppointment.getRecurrenceType()) {
+					const aClones = oAppointment.createOccurrenceClones(oRangeStart, oRangeEnd);
+					this._aOccurrenceClones = this._aOccurrenceClones.concat(aClones);
+					aClones.forEach((oClone) => {
+						const sKey = fnDateKey(oClone.getStartDate());
+						if (!oByDate.has(sKey)) { oByDate.set(sKey, []); }
+						oByDate.get(sKey).push(oClone);
+					});
+					aExpanded.push(...aClones);
+				} else {
+					const sKey = fnDateKey(oAppointment.getStartDate());
+					if (!oByDate.has(sKey)) { oByDate.set(sKey, []); }
+					oByDate.get(sKey).push(oAppointment);
+					aExpanded.push(oAppointment);
+				}
+			});
+
+			this._aExpandedAppointments = aExpanded;
+			this._oAppointmentsByDate = oByDate;
+			return aExpanded;
 		};
 
-		oRowTimeline.getNonWorkingPeriods = function () {
-			return oRow.getNonWorkingPeriods();
-		};
+		oRowTimeline.getNonWorkingPeriods = () => oRow.getNonWorkingPeriods();
 
-		oRowTimeline.getIntervalHeaders = function() {
-			return oRow.getIntervalHeaders();
-		};
+		oRowTimeline.getIntervalHeaders = () => oRow.getIntervalHeaders();
 
 		oRowTimeline.setAssociation("row",  oRow.getId());
 
@@ -4144,8 +4200,22 @@ sap.ui.define([
 	PlanningCalendarRowTimeline.prototype._getRelativeInfo = function () {};
 
 	PlanningCalendarRowTimeline.prototype.onBeforeRendering = function() {
+		if (this._aOccurrenceClones) {
+			this._aOccurrenceClones.forEach((oClone) => oClone.destroy());
+		}
+		this._aOccurrenceClones = [];
+		this._aExpandedAppointments = null;
+		this._oAppointmentsByDate = null;
 		CalendarRow.prototype.onBeforeRendering.call(this);
 		this._updatePlaceholders();
+	};
+
+	PlanningCalendarRowTimeline.prototype.exit = function() {
+		if (this._aOccurrenceClones) {
+			this._aOccurrenceClones.forEach((oClone) => oClone.destroy());
+			this._aOccurrenceClones = undefined;
+		}
+		CalendarRow.prototype.exit.call(this);
 	};
 
 	PlanningCalendarRowTimeline.prototype.onmousedown = function (oEvent) {
@@ -4355,6 +4425,7 @@ sap.ui.define([
 						$CalendarRowAppsOverlay.removeClass("sapUiCalendarRowAppsOverlayDragging");
 					});
 				};
+
 				if (oTargetTimeline._isOneMonthsRowOnSmallSizes() || !oTargetTimeline._isDraggingPerformed()) {
 					oEvent.preventDefault();
 					return;

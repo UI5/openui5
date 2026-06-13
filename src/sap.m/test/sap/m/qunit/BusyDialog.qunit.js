@@ -333,7 +333,7 @@ sap.ui.define([
 		assert.strictEqual(isClosedByUser, true, 'should pass cancelPressed: true on closing by pressing the CancelButton.');
 	});
 
-	QUnit.test('Closing the BusyDialog with ESC key', function (assert) {
+	QUnit.test('ESC on the dialog should close the BusyDialog when showCancelButton is true', function (assert) {
 		// Arrange
 		var isClosedByUser;
 		var fnEventSpy = sinon.spy(function (oEvent) {
@@ -341,6 +341,7 @@ sap.ui.define([
 		});
 
 		this.oBusyDialog.attachClose(fnEventSpy);
+		this.oBusyDialog.setShowCancelButton(true);
 
 		// Act
 		qutils.triggerKeydown(this.oBusyDialog.getFocusDomRef(), KeyCodes.ESCAPE);
@@ -349,6 +350,90 @@ sap.ui.define([
 		// Assert
 		assert.strictEqual(fnEventSpy.callCount, 1, 'should fire close event once on esc press.');
 		assert.strictEqual(isClosedByUser, true, 'should pass cancelPressed: true on closing by pressing the ESC key.');
+	});
+
+	QUnit.test('ESC on the dialog should not close the BusyDialog when showCancelButton is false', function (assert) {
+		// Arrange
+		const fnEventSpy = sinon.spy();
+
+		this.oBusyDialog.attachClose(fnEventSpy);
+		this.oBusyDialog.setShowCancelButton(false);
+
+		// Act
+		qutils.triggerKeydown(this.oBusyDialog.getFocusDomRef(), KeyCodes.ESCAPE);
+		this.clock.tick(500);
+
+		// Assert
+		assert.strictEqual(fnEventSpy.callCount, 0, 'should not fire close event on esc press when showCancelButton is false.');
+		assert.ok(this.oBusyDialog._oDialog.isOpen(), 'BusyDialog should remain open.');
+	});
+
+	QUnit.test('ESC on the dialog should close the BusyDialog when cancelButtonText is set', function (assert) {
+		// Arrange
+		let isClosedByUser;
+		const fnEventSpy = sinon.spy(function (oEvent) {
+			isClosedByUser = oEvent.getParameter('cancelPressed');
+		});
+
+		this.oBusyDialog.attachClose(fnEventSpy);
+		this.oBusyDialog.setCancelButtonText('Cancel');
+
+		// Act
+		qutils.triggerKeydown(this.oBusyDialog.getFocusDomRef(), KeyCodes.ESCAPE);
+		this.clock.tick(500);
+
+		// Assert
+		assert.strictEqual(fnEventSpy.callCount, 1, 'should fire close event once on esc press when cancelButtonText is set.');
+		assert.strictEqual(isClosedByUser, true, 'should pass cancelPressed: true.');
+	});
+
+	QUnit.test('ESC on the busy indicator should close the BusyDialog when showCancelButton is true', function (assert) {
+		// Arrange
+		var isClosedByUser;
+		var fnEventSpy = sinon.spy(function (oEvent) {
+			isClosedByUser = oEvent.getParameter('cancelPressed');
+		});
+
+		this.oBusyDialog.attachClose(fnEventSpy);
+		this.oBusyDialog.setShowCancelButton(true);
+		this.oBusyDialog._oDialog._handleOpened();
+
+		// Act — dispatch a native keydown event because the busy indicator's block layer
+		// suppresses jQuery-triggered events. Real key presses go through native listeners.
+		this.oBusyDialog._busyIndicator.$('busyIndicator')[0].dispatchEvent(new KeyboardEvent('keydown', {
+			keyCode: KeyCodes.ESCAPE,
+			which: KeyCodes.ESCAPE,
+			bubbles: true,
+			cancelable: true
+		}));
+		this.clock.tick(500);
+
+		// Assert
+		assert.strictEqual(fnEventSpy.callCount, 1, 'should fire close event once when ESC is pressed on the busy indicator.');
+		assert.strictEqual(isClosedByUser, true, 'should pass cancelPressed: true.');
+	});
+
+	QUnit.test('ESC on the busy indicator should not close the BusyDialog when showCancelButton is false', function (assert) {
+		// Arrange
+		const fnEventSpy = sinon.spy();
+
+		this.oBusyDialog.attachClose(fnEventSpy);
+		this.oBusyDialog.setShowCancelButton(false);
+		this.oBusyDialog._oDialog._handleOpened();
+
+		// Act — dispatch a native keydown event because the busy indicator's block layer
+		// suppresses jQuery-triggered events.
+		this.oBusyDialog._busyIndicator.$('busyIndicator')[0].dispatchEvent(new KeyboardEvent('keydown', {
+			keyCode: KeyCodes.ESCAPE,
+			which: KeyCodes.ESCAPE,
+			bubbles: true,
+			cancelable: true
+		}));
+		this.clock.tick(500);
+
+		// Assert
+		assert.strictEqual(fnEventSpy.callCount, 0, 'should not fire close event when ESC is pressed on the busy indicator and showCancelButton is false.');
+		assert.ok(this.oBusyDialog._oDialog.isOpen(), 'BusyDialog should remain open.');
 	});
 
 	QUnit.test('Multiple Open/Close calls', function (assert) {

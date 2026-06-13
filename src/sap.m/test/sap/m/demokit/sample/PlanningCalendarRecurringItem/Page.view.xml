@@ -12,42 +12,48 @@
 			appointmentsVisualization="Filled"
 			rowHeaderPress=".handleRowHeaderPress"
 			showEmptyIntervalHeaders="false"
-			viewKey="A"
+			builtInViews="Hour,Day,Week,Month,One Month"
+			viewKey="{/viewKey}"
 			showWeekNumbers="true">
 			<toolbarContent>
-				<Title text="Title" titleStyle="H4"/>
+				<Title text="Recurring Appointments" titleStyle="H4"/>
+				<ToolbarSpacer />
+				<Button text="Create Appointment" type="Emphasized" press=".onCreateAppointment" />
 			</toolbarContent>
-			<views>
-				<PlanningCalendarView
-					key="A"
-					intervalType="Hour"
-					description="hours view"
-					intervalsS="2"
-					intervalsM="4"
-					intervalsL="6"
-					showSubIntervals="true">
-				</PlanningCalendarView>
-			</views>
 			<rows>
 				<PlanningCalendarRow
 					icon="{pic}"
 					title="{name}"
 					text="{role}"
+					enableAppointmentsCreate="true"
+					enableAppointmentsDragAndDrop="true"
+					appointments="{path: 'appointments', templateShareable: false}"
 					intervalHeaders="{path: 'headers', templateShareable: false}"
-					nonWorkingPeriods="{path : 'nonWorkingPeriods', templateShareable: false}">
+					nonWorkingPeriods="{path : 'nonWorkingPeriods', templateShareable: false}"
+					appointmentCreate=".onAppointmentCreate"
+					appointmentDrop=".onAppointmentDrop">
 					<customData>
 						<core:CustomData key="emp-name" value="{name}" writeToDom="true"/>
 					</customData>
 					<appointments>
-						<unified:CalendarAppointment
-							startDate="{start}"
-							endDate="{end}"
-							icon="{pic}"
+						<unified:RecurringCalendarAppointment
+							startDate="{startDate}"
+							endDate="{endDate}"
+							recurrenceType="{recurrenceType}"
+							recurrencePattern="{recurrencePattern}"
+							recurrenceEndDate="{recurrenceEndDate}"
 							title="{title}"
-							text="{info}"
-							type="{type}"
-							tentative="{tentative}">
-						</unified:CalendarAppointment>
+							type="{type}">
+						<unified:recurrenceRule>
+							<unified:RecurrenceRule
+								days="{recurrenceDay}"
+								type="{ruleType}"
+								dayOfMonth="{ruleDayOfMonth}"
+								weekOfMonth="{ruleWeekOfMonth}"
+								dayOfWeek="{ruleDayOfWeek}"
+								month="{ruleMonth}" />
+						</unified:recurrenceRule>
+					</unified:RecurringCalendarAppointment>
 					</appointments>
 					<nonWorkingPeriods>
 						<unified:RecurringNonWorkingPeriod

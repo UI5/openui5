@@ -162,6 +162,9 @@ sap.ui.define([
 					 * The drag and drop interaction is visualized by a placeholder highlighting the area where the
 					 * appointment can be dropped by the user.
 					 *
+					 * <b>Note:</b> Drag and drop is currently not supported for occurrences of
+					 * {@link sap.ui.unified.RecurringCalendarAppointment recurring appointments}.
+					 *
 					 * @since 1.64
 					 */
 					enableAppointmentsDragAndDrop: { type: "boolean", group: "Misc", defaultValue: false },
@@ -1407,10 +1410,10 @@ sap.ui.define([
 				sAppointmentId = oTargetElement.getAttribute("data-sap-ui-related") || oTargetElement.id;
 			}
 
-			// finding the appointment
+			// finding the appointment — check aggregation first, then element registry for occurrence clones
 			return this.getAppointments().find(function (oAppointment) {
 				return oAppointment.sId === sAppointmentId;
-			});
+			}) || Element.getElementById(sAppointmentId);
 		};
 
 		/**
@@ -1870,6 +1873,8 @@ sap.ui.define([
 		 */
 		SinglePlanningCalendarGrid.prototype._cloneRecurringAppointment = function (oAppointment, oRangeStart, oRangeEnd) {
 			const aClones = oAppointment.createOccurrenceClones(oRangeStart, oRangeEnd);
+			// Limitation: D&D is not supported for recurring appointment occurrences.
+			// The behavior needs further design before it can be enabled.
 			this._aOccurrenceClones = this._aOccurrenceClones.concat(aClones);
 			return aClones;
 		};

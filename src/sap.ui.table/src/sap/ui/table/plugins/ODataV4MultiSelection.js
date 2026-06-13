@@ -142,6 +142,8 @@ sap.ui.define([
 		oTable.setProperty("selectionMode", library.SelectionMode.None);
 		_private(this).bLimitReached = false;
 		_private(this).oRangeSelectionStartContext = null;
+		clearTimeout(_private(this).iSelectionCountChangeTimeout);
+		delete _private(this).iSelectionCountChangeTimeout;
 		detachFromBinding(this, oTable.getBinding());
 		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.RowsBound, onTableRowsBound, this);
 		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.TotalRowCountChanged, onTotalRowCountChanged, this);
@@ -427,7 +429,14 @@ sap.ui.define([
 
 		mPrivate.oSelectionCountBinding = oHeaderContext.getModel().bindProperty("$selectionCount", oHeaderContext);
 		mPrivate.oSelectionCountBinding.attachChange(() => {
-			updateHeaderSelector(oPlugin);
+			// Coalesce synchronous bursts of $selectionCount changes.
+			if (mPrivate.iSelectionCountChangeTimeout) {
+				return;
+			}
+			mPrivate.iSelectionCountChangeTimeout = setTimeout(() => {
+				delete mPrivate.iSelectionCountChangeTimeout;
+				updateHeaderSelector(oPlugin);
+			}, 0);
 		});
 		mPrivate.oSelectionCountBinding.initialize();
 	}

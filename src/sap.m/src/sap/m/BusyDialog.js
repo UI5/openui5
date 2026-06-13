@@ -3,8 +3,29 @@
  */
 
 // Provides control sap.m.BusyDialog.
-sap.ui.define(['./library', 'sap/ui/core/Control', 'sap/m/Dialog', 'sap/m/BusyIndicator', 'sap/m/Label', 'sap/m/Button', "sap/base/Log", 'sap/ui/core/InvisibleText', "sap/ui/core/Lib"],
-	function(library, Control, Dialog, BusyIndicator, Label, Button, Log, InvisibleText, Library) {
+sap.ui.define([
+	'./library',
+	'sap/ui/core/Control',
+	'sap/m/Dialog',
+	'sap/m/BusyIndicator',
+	'sap/m/Label',
+	'sap/m/Button',
+	"sap/base/Log",
+	'sap/ui/core/InvisibleText',
+	"sap/ui/core/Lib",
+	"sap/ui/events/KeyCodes"
+], function(
+		library,
+		Control,
+		Dialog,
+		BusyIndicator,
+		Label,
+		Button,
+		Log,
+		InvisibleText,
+		Library,
+		KeyCodes
+	) {
 		"use strict";
 
 		// shortcut for sap.m.TitleAlignment
@@ -153,9 +174,29 @@ sap.ui.define(['./library', 'sap/ui/core/Control', 'sap/m/Dialog', 'sap/m/BusyIn
 			 * Creates a busyIndicator for the dialog.
 			 * @private
 			 */
-			this._busyIndicator = new BusyIndicator(this.getId() + '-busyInd', {
-				visible: true
-			});
+			this._busyIndicator = new BusyIndicator(this.getId() + '-busyInd');
+
+			this._fnBusyIndicatorEscapeHandler = function (oEvent) {
+				if (oEvent.keyCode === KeyCodes.ESCAPE && this._getEffectiveShowCancelButton()) {
+					this.close(true);
+				}
+			}.bind(this);
+
+			// Adds keyboard handling for the busy indicator.
+			this._busyIndicator.addEventDelegate({
+				onBeforeRendering: function () {
+					var oDomRef = this._busyIndicator.getDomRef();
+					if (oDomRef) {
+						oDomRef.removeEventListener("keydown", this._fnBusyIndicatorEscapeHandler, { capture: true });
+					}
+				},
+				onAfterRendering: function () {
+					var oDomRef = this._busyIndicator.getDomRef();
+					if (oDomRef) {
+						oDomRef.addEventListener("keydown", this._fnBusyIndicatorEscapeHandler, { capture: true });
+					}
+				}
+			}, this);
 
 			/**
 			 * Creates the dialog with its class.
@@ -166,7 +207,8 @@ sap.ui.define(['./library', 'sap/ui/core/Control', 'sap/m/Dialog', 'sap/m/BusyIn
 				titleAlignment: this.getTitleAlignment(),
 				showHeader: false,
 				afterClose: this._fnCloseHandler.bind(this),
-				initialFocus: this._busyIndicator.getId() + '-busyIndicator'
+				initialFocus: this._busyIndicator.getId() + '-busyIndicator',
+				escapeHandler: this._fnEscapeHandler.bind(this)
 			}).addStyleClass('sapMBusyDialog');
 
 			/**
@@ -185,7 +227,7 @@ sap.ui.define(['./library', 'sap/ui/core/Control', 'sap/m/Dialog', 'sap/m/BusyIn
 				onBeforeRendering: function () {
 					var text = this.getText(),
 						title = this.getTitle(),
-						showCancelButton = this.getShowCancelButton() || this.getCancelButtonText();
+						showCancelButton = this._getEffectiveShowCancelButton();
 
 					if (!text && !title && !showCancelButton) {
 						this._oDialog.addStyleClass('sapMBusyDialog-Light');
@@ -194,16 +236,21 @@ sap.ui.define(['./library', 'sap/ui/core/Control', 'sap/m/Dialog', 'sap/m/BusyIn
 					}
 				}
 			}, this);
+		};
 
-			/**
-			 * Adds keyboard handling for the popup in the dialog. it's used for closing the popup.
-			 * @method
-			 * @public
-			 * @param {Event} e Expected keyboard event.
-			 */
-			this._oDialog.oPopup.onsapescape = function (e) {
+		/**
+		 * Escape handler for the inner Dialog.
+		 *
+		 * @param {{resolve: function, reject: function}} oPromiseArg Promise control object provided by Dialog.
+		 * @private
+		 */
+		BusyDialog.prototype._fnEscapeHandler = function (oPromiseArg) {
+			if (this._getEffectiveShowCancelButton()) {
 				this.close(true);
-			}.bind(this);
+			}
+
+			// Reject so the inner Dialog does not invoke its own close()
+			oPromiseArg.reject();
 		};
 
 		/**
@@ -523,6 +570,14 @@ sap.ui.define(['./library', 'sap/ui/core/Control', 'sap/m/Dialog', 'sap/m/BusyIn
 		BusyDialog.prototype._destroyTheCancelButton = function () {
 			this._oDialog.destroyEndButton();
 			this._cancelButton = null;
+		};
+
+		/**
+		 * @private
+		 * @returns {boolean} Whether a cancel button is effectively shown.
+		 */
+		BusyDialog.prototype._getEffectiveShowCancelButton = function () {
+			return !!(this.getShowCancelButton() || this.getCancelButtonText());
 		};
 
 		/**

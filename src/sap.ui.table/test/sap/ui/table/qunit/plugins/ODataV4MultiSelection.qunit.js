@@ -1083,16 +1083,19 @@ sap.ui.define([
 			await this.oTable.qunit.whenRenderingFinished();
 		},
 		/**
-		 * Asserts the state of the header selector.
+		 * Asserts the state of the header selector. Awaits one task before reading the state because the plugin
+		 * coalesces $selectionCount-driven HeaderSelector updates.
 		 *
 		 * @param {object} mAttributes The expected attributes
 		 * @param {string} mAttributes.icon The expected icon name (from TableUtils.ThemeParameters)
 		 * @param {string} mAttributes.tooltip The expected tooltip
 		 * @param {boolean} [mAttributes.enabled=true] The expected enabled state
+		 * @returns {Promise} Resolves once the assertion has been made.
 		 */
-		assertHeaderSelector: function(mAttributes) {
+		assertHeaderSelector: async function(mAttributes) {
 			const oHeaderSelector = this.oTable._getHeaderSelector();
 
+			await new Promise((resolve) => { setTimeout(resolve, 0); });
 			QUnit.assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(mAttributes.icon), "HeaderSelector icon: " + mAttributes.icon);
 			QUnit.assert.strictEqual(oHeaderSelector.getTooltip(), mAttributes.tooltip, "HeaderSelector tooltip");
 			QUnit.assert.strictEqual(oHeaderSelector.getEnabled(), mAttributes.enabled !== false,
@@ -1129,16 +1132,16 @@ sap.ui.define([
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "Visibility when limit enabled again");
 	});
 
-	QUnit.test("Limit < Data length; No selection", function(assert) {
-		this.assertHeaderSelector({
+	QUnit.test("Limit < Data length; No selection", async function(assert) {
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
 	});
 
-	QUnit.test("Limit < Data length; Some contexts selected", function(assert) {
+	QUnit.test("Limit < Data length; Some contexts selected", async function(assert) {
 		this.oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
@@ -1148,24 +1151,24 @@ sap.ui.define([
 		const aContexts = await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength());
 
 		aContexts.forEach((oContext) => oContext.setSelected(true));
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.allSelectedIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
 	});
 
-	QUnit.test("Limit > Data length; No selection", function(assert) {
+	QUnit.test("Limit > Data length; No selection", async function(assert) {
 		this.oSelectionPlugin.setLimit(401);
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
 	});
 
-	QUnit.test("Limit > Data length; Some contexts selected", function(assert) {
+	QUnit.test("Limit > Data length; Some contexts selected", async function(assert) {
 		this.oSelectionPlugin.setLimit(401);
 		this.oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
@@ -1176,16 +1179,16 @@ sap.ui.define([
 
 		this.oSelectionPlugin.setLimit(401);
 		aContexts.forEach((oContext) => oContext.setSelected(true));
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.allSelectedIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
 	});
 
-	QUnit.test("Unbind", function(assert) {
+	QUnit.test("Unbind", async function(assert) {
 		this.oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
 		this.oTable.unbindRows();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL"),
 			enabled: false
@@ -1196,7 +1199,7 @@ sap.ui.define([
 		this.oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
 		this.oTable.bindRows("/Products");
 		await this.oTable.qunit.whenBindingChange();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
@@ -1207,21 +1210,21 @@ sap.ui.define([
 		this.oSelectionPlugin.destroy();
 		this.oSelectionPlugin = new ODataV4MultiSelection();
 		this.oTable.addDependent(this.oSelectionPlugin);
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL"),
 			enabled: false
 		});
 
 		this.oTable.bindRows("/Products");
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL"),
 			enabled: false
 		});
 
 		await this.oTable.qunit.whenBindingChange();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
@@ -1232,7 +1235,7 @@ sap.ui.define([
 		this.oSelectionPlugin = new ODataV4MultiSelection();
 		this.oTable.addDependent(this.oSelectionPlugin);
 		await TableQUnitUtils.wait(0); // PropertyBinding for $selectionCount on header context fires change event asynchronously
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
@@ -1244,7 +1247,7 @@ sap.ui.define([
 		this.oSelectionPlugin = new ODataV4MultiSelection();
 		this.oTable.addDependent(this.oSelectionPlugin);
 		await TableQUnitUtils.wait(0); // PropertyBinding for $selectionCount on header context fires change event asynchronously
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
@@ -1264,32 +1267,32 @@ sap.ui.define([
 		}));
 		await this.oTable.qunit.whenBindingChange();
 
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
 
 		this.oTable.getRows()[0].getBindingContext().setSelected(true);
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
 
 		this.oTable.bindObject({path: "/Products2"});
 		await this.oTable.qunit.whenBindingChange();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
 
 		this.oTable.getRows()[0].getBindingContext().setSelected(true);
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
 
 		this.oTable.unbindObject();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL"),
 			enabled: false
@@ -1306,7 +1309,7 @@ sap.ui.define([
 			}
 		}));
 
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL"),
 			enabled: false
@@ -1314,13 +1317,13 @@ sap.ui.define([
 
 		this.oTable.bindObject({path: "/Products"});
 		await this.oTable.qunit.whenBindingChange();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
 
 		this.oTable.getRows()[0].getBindingContext().setSelected(true);
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
@@ -1337,7 +1340,7 @@ sap.ui.define([
 		this.oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
 		this.oTable.getBinding().filter(new Filter("Name", "EQ", "DoesNotExist"));
 		await this.oTable.qunit.whenBindingChange();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon, // An invisible context is selected
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL"),
 			enabled: false
@@ -1345,14 +1348,14 @@ sap.ui.define([
 
 		this.oTable.getBinding().filter(new Filter("Name", "EQ", "Test Product (1)"));
 		await this.oTable.qunit.whenBindingChange();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.allSelectedIcon, // An invisible context is selected and the length is 1
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
 
 		this.oTable.getBinding().filter();
 		await this.oTable.qunit.whenBindingChange();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
@@ -1375,7 +1378,7 @@ sap.ui.define([
 		this.oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
 		this.oTable.getBinding().filter(new Filter("Name", "EQ", "DoesNotExist"));
 		await this.oTable.qunit.whenBindingChange();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL"),
 			enabled: false
@@ -1383,7 +1386,7 @@ sap.ui.define([
 
 		this.oTable.getBinding().filter();
 		await this.oTable.qunit.whenBindingChange();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
@@ -1392,7 +1395,7 @@ sap.ui.define([
 	QUnit.test("Delete selected context", async function(assert) {
 		this.oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
 		await this.oTable.getRows()[0].getBindingContext().delete();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
@@ -1404,7 +1407,7 @@ sap.ui.define([
 			this.oTable.getRows()[0].getBindingContext().delete(),
 			this.oTable.getBinding().create({Name: "New Product"}, true, false, true)
 		]);
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
@@ -1419,7 +1422,7 @@ sap.ui.define([
 			}
 		});
 		await aContexts[0].delete();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.allSelectedIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
@@ -1431,7 +1434,7 @@ sap.ui.define([
 		const aContexts = await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength());
 
 		aContexts.forEach((oContext) => oContext.setSelected(true));
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
@@ -1442,13 +1445,13 @@ sap.ui.define([
 
 		this.oSelectionPlugin.onHeaderSelectorPress();
 		await this.oTable.getRows()[2].getBindingContext().expand();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
 
 		this.oTable.getRows()[2].getBindingContext().collapse();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
@@ -1466,7 +1469,7 @@ sap.ui.define([
 			oContext.setSelected(true);
 		});
 
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
@@ -1475,7 +1478,7 @@ sap.ui.define([
 	QUnit.test("Data Aggregation; Visual grouping and sums", async function(assert) {
 		await this.createTableWithDataAggregation();
 
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
@@ -1488,7 +1491,7 @@ sap.ui.define([
 		await aRows[4].getBindingContext().expand();
 		this.oTable.setFirstVisibleRow(9);
 		await this.oTable.qunit.whenRenderingFinished();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
@@ -1496,28 +1499,65 @@ sap.ui.define([
 		await aRows[4].getBindingContext().expand();
 		this.oTable.setFirstVisibleRow(12);
 		await this.oTable.qunit.whenRenderingFinished();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			tooltip: TableUtils.getResourceText("TBL_SELECT_ALL")
 		});
 
 		this.oSelectionPlugin.setSelected(aRows[2], true);
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
 
 		this.oSelectionPlugin.setSelected(aRows[3], true);
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
 
 		aRows[1].getBindingContext().collapse();
-		this.assertHeaderSelector({
+		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			tooltip: TableUtils.getResourceText("TBL_DESELECT_ALL")
 		});
+	});
+
+	QUnit.test("Synchronous selection bursts do not cause repeated expensive API calls", async function(assert) {
+		const aContexts = await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength());
+		const iContextCount = aContexts.length;
+		const oIsContextSelectableSpy = this.spy(this.oSelectionPlugin, "isContextSelectable");
+		const oGetAllCurrentContextsSpy = this.spy(this.oTable.getBinding(), "getAllCurrentContexts");
+
+		aContexts.forEach((oContext) => oContext.setSelected(true));
+		await new Promise((resolve) => { setTimeout(resolve, 0); });
+		assert.ok(oIsContextSelectableSpy.callCount <= iContextCount,
+			`isContextSelectable called ${oIsContextSelectableSpy.callCount} times for ${iContextCount} contexts `
+			+ `(selection burst); must not exceed ${iContextCount}`);
+		assert.ok(oGetAllCurrentContextsSpy.callCount <= 1,
+			`getAllCurrentContexts called ${oGetAllCurrentContextsSpy.callCount} times during selection burst; must not exceed 1`);
+
+		oIsContextSelectableSpy.resetHistory();
+		oGetAllCurrentContextsSpy.resetHistory();
+		aContexts.forEach((oContext) => oContext.setSelected(false));
+		await new Promise((resolve) => { setTimeout(resolve, 0); });
+		assert.ok(oIsContextSelectableSpy.callCount <= iContextCount,
+			`isContextSelectable called ${oIsContextSelectableSpy.callCount} times for ${iContextCount} contexts `
+			+ `(deselection burst); must not exceed ${iContextCount}`);
+		assert.ok(oGetAllCurrentContextsSpy.callCount <= 1,
+			`getAllCurrentContexts called ${oGetAllCurrentContextsSpy.callCount} times during deselection burst; must not exceed 1`);
+	});
+
+	QUnit.test("No expensive API calls after deactivating synchronously after selecting", async function(assert) {
+		this.oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
+		const oIsContextSelectableSpy = this.spy(this.oSelectionPlugin, "isContextSelectable");
+		const oGetAllCurrentContextsSpy = this.spy(this.oTable.getBinding(), "getAllCurrentContexts");
+
+		this.oSelectionPlugin.onDeactivate(this.oTable);
+
+		await new Promise((resolve) => { setTimeout(resolve, 0); });
+		assert.strictEqual(oIsContextSelectableSpy.callCount, 0, "isContextSelectable not called after deactivate");
+		assert.strictEqual(oGetAllCurrentContextsSpy.callCount, 0, "getAllCurrentContexts not called after deactivate");
 	});
 
 	QUnit.module("Leaf Selection Disabled", {

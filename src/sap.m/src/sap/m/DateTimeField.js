@@ -427,7 +427,7 @@ sap.ui.define([
 			}
 
 			// always get placeholder from the display format
-			sPlaceholder = this._getFormatter(true).getPlaceholderText();
+			sPlaceholder = this._getFormatter(true).getPlaceholderText(this._oMinDate, this._oMaxDate);
 		}
 
 		return sPlaceholder;
