@@ -94,7 +94,7 @@ html.sap-desktop .sapMSltIconOnly.focus:not(.sapMSltExpanded):not(.sapMSltDisabl
 }
 
 .sapMSltHoverable.sapMSltPressed:not(.sapMSltState):not(.sapMSltIconOnly):hover .sapMSltArrow {
-	border-radius: 0.125rem;
+	border-radius: var(--sapField_BorderCornerRadius);
 }
 
 /* pressed and hover */
@@ -173,6 +173,15 @@ div.sapMSltPicker .sapMSltPickerValueState {
 	}
 }
 
+.sapMSltExpanded > .sapMSltArrow {
+	box-shadow: var(--sapField_Hover_Shadow);
+}
+
+.sapMSltError > .sapMSltArrow:hover { box-shadow: var(--sapField_Hover_InvalidShadow); }
+.sapMSltWarning > .sapMSltArrow:hover { box-shadow: var(--sapField_Hover_WarningShadow); }
+.sapMSltSuccess > .sapMSltArrow:hover { box-shadow: var(--sapField_Hover_SuccessShadow); }
+.sapMSltInformation > .sapMSltArrow:hover { box-shadow: var(--sapField_Hover_InformationShadow); }
+
 .sapUiSizeCompact .sapMSltArrow {
 	width: 2rem;
 	height: 1.625rem;
@@ -181,8 +190,7 @@ div.sapMSltPicker .sapMSltPickerValueState {
 .sapMSltPressed >.sapMSltArrow,
 .sapMSlt:hover > .sapMSltArrow {
 	background-color: var(--sapButton_Active_Background);
-	overflow: none;
-	border-radius: 0.125rem;
+	border-radius: var(--sapField_BorderCornerRadius);
 }
 
 /* focus */
@@ -215,8 +223,8 @@ html.sap-desktop .sapMSlt.sapMSltFocused:not(.sapMSltExpanded):not(.sapMSltDisab
 	}
 }
 
-.sapMSltHoverable.sapMSltInformation:not(.sapMSltIconOnly):active,
-.sapMSltFocused.sapMSltInformation {
+.sapMSltHoverable.sapMSltInformation:not(.sapMSltIconOnly):not(.sapMSltExpanded):active,
+.sapMSltFocused.sapMSltInformation:not(.sapMSltExpanded) {
 	border-bottom: none;
 	box-shadow: inset 0 0 0 2px var(--sapField_InformationColor);
 	background-color: var(--sapField_Focus_Background);
@@ -257,8 +265,8 @@ html.sap-desktop .sapMSlt.sapMSltFocused:not(.sapMSltExpanded):not(.sapMSltDisab
 }
 
 /* Field Success Focus - Experimental */
-.sapMSltHoverable.sapMSltSuccess:not(.sapMSltIconOnly):active,
-.sapMSltFocused.sapMSltSuccess {
+.sapMSltHoverable.sapMSltSuccess:not(.sapMSltIconOnly):not(.sapMSltExpanded):active,
+.sapMSltFocused.sapMSltSuccess:not(.sapMSltExpanded) {
 	border-bottom: none;
 	box-shadow: inset 0 0 0 2px var(--sapField_SuccessColor);
 	border-radius: var(--sapField_BorderCornerRadius);
@@ -298,8 +306,8 @@ html.sap-desktop .sapMSlt.sapMSltFocused:not(.sapMSltExpanded):not(.sapMSltDisab
 }
 
 /* Field Warning Focus - Experimental */
-.sapMSltHoverable.sapMSltWarning:not(.sapMSltIconOnly):active,
-.sapMSltFocused.sapMSltWarning {
+.sapMSltHoverable.sapMSltWarning:not(.sapMSltIconOnly):not(.sapMSltExpanded):active,
+.sapMSltFocused.sapMSltWarning:not(.sapMSltExpanded) {
 	border-bottom: none;
 	box-shadow: inset 0 0 0 2px var(--sapField_WarningColor); /* Experimental */
 	background-color: var(--sapField_Focus_Background);
@@ -340,8 +348,8 @@ html.sap-desktop .sapMSlt.sapMSltFocused:not(.sapMSltExpanded):not(.sapMSltDisab
 }
 
 /* Field Error Focus - Experimental */
-.sapMSltHoverable.sapMSltError:not(.sapMSltIconOnly):active,
-.sapMSltFocused.sapMSltError {
+.sapMSltHoverable.sapMSltError:not(.sapMSltIconOnly):not(.sapMSltExpanded):active,
+.sapMSltFocused.sapMSltError:not(.sapMSltExpanded) {
 	border-bottom: none;
 	box-shadow: inset 0 0 0 2px var(--sapField_InvalidColor);
 	background-color: var(--sapField_Focus_Background);

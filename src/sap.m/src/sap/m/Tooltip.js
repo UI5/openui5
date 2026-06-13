@@ -8,7 +8,6 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/Device",
 	"sap/m/Text",
-	"sap/ui/core/ElementRegistry",
 	"sap/ui/core/InvisibleText",
 	"sap/m/Popover"
 ],
@@ -17,7 +16,6 @@ sap.ui.define([
 		Control,
 		Device,
 		Text,
-		ElementRegistry,
 		InvisibleText,
 		Popover
 	) {
@@ -136,7 +134,7 @@ sap.ui.define([
 			}
 
 			this._bOpenRequested = false;
-			ElementRegistry.delete(this);
+			Tooltip.registry.delete(this);
 		};
 
 		Tooltip.prototype._onPopoverMouseEnter = function () {
@@ -278,7 +276,7 @@ sap.ui.define([
 			}
 
 			let iEffectiveDelay = iDelay;
-			if (ElementRegistry.size > 0) {
+			if (Tooltip.registry.size > 0) {
 				Tooltip.closeAllButCurrent(this);
 				iEffectiveDelay = TOOLTIP_HANDOFF_DELAY;
 			}
@@ -287,14 +285,14 @@ sap.ui.define([
 				this._iOpenTimeout = null;
 				// A close() that arrived between scheduling and firing has cleared the open intent — abort.
 				if (!this._bOpenRequested) {
-					ElementRegistry.delete(this);
+					Tooltip.registry.delete(this);
 					return;
 				}
 				// Final selection guard: if a selection appeared during the open delay
 				// (e.g. user is mid-drag-select or about to right-click a selection), suppress the open so the popover render does not clear the selection.
 				const oSelection = window.getSelection && window.getSelection();
 				if (oSelection && oSelection.toString().length > 0) {
-					ElementRegistry.delete(this);
+					Tooltip.registry.delete(this);
 					return;
 				}
 				this._oPopover.getContent()[0].setText(this.getText());
@@ -305,7 +303,7 @@ sap.ui.define([
 				this._setAriaDescribedBy(oControl);
 			}, iEffectiveDelay);
 
-			ElementRegistry.add(this);
+			Tooltip.registry.add(this);
 		};
 
 		// Resolve the host control's DOM element from a UI5 control or a plain HTMLElement.
@@ -379,7 +377,7 @@ sap.ui.define([
 						this._bOpenRequested = false;
 						this._clearTimeouts();
 						this._removeAriaDescribedBy();
-						ElementRegistry.delete(this);
+						Tooltip.registry.delete(this);
 					}
 				});
 
@@ -435,7 +433,7 @@ sap.ui.define([
 					this._bIsOpen = false;
 				}
 				this._removeAriaDescribedBy();
-				ElementRegistry.delete(this);
+				Tooltip.registry.delete(this);
 			};
 
 			if (!delay) {
@@ -461,7 +459,7 @@ sap.ui.define([
 		// Start Registry
 		Tooltip.registry = new Set();
 		Tooltip.closeAllButCurrent = function (oCurrent) {
-			ElementRegistry.forEach((oTooltip) => {
+			Tooltip.registry.forEach((oTooltip) => {
 				if (oTooltip !== oCurrent) {
 					oTooltip.close(TOOLTIP_HANDOFF_DELAY);
 				}

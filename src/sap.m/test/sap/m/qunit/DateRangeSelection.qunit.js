@@ -1877,6 +1877,30 @@ sap.ui.define([
 		oDDR.destroy();
 	});
 
+	QUnit.module("placeholder with min/max date");
+
+	QUnit.test("minDate and maxDate are passed to getPlaceholderText", function(assert) {
+		// Arrange
+		var oMinDate = UI5Date.getInstance(2021, 2, 5),
+			oMaxDate = UI5Date.getInstance(2021, 2, 20),
+			oDRS = new DateRangeSelection({
+				minDate: oMinDate,
+				maxDate: oMaxDate
+			}),
+			oSpy = this.spy(DateFormat.prototype, "getPlaceholderText");
+
+		oDRS.placeAt("qunit-fixture");
+
+		oDRS._getPlaceholder();
+
+		// Assert
+		assert.ok(oSpy.calledOnce, "getPlaceholderText is called");
+		assert.strictEqual(oSpy.firstCall.args[0], oMinDate, "minDate is passed to getPlaceholderText");
+		assert.strictEqual(oSpy.firstCall.args[1], oMaxDate, "maxDate is passed to getPlaceholderText");
+
+		oDRS.destroy();
+	});
+
 	QUnit.module("Misc");
 
 	QUnit.test("Date with seconds set to the last second of the maxDate is displayed", async function(assert) {

@@ -318,7 +318,7 @@ sap.ui.define([
 		};
 
 		DateRangeSelection.prototype._getDateFormatPlaceholderText = function (oFormatOptions) {
-			return  DateFormat.getDateInstance(oFormatOptions).getPlaceholderText();
+			return  DateFormat.getDateInstance(oFormatOptions).getPlaceholderText(this.getMinDate(), this.getMaxDate());
 		};
 
 		// Overwrite DatePicker's setValue to support two date range processing

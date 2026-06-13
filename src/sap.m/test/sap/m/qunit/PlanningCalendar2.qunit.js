@@ -38,7 +38,10 @@ sap.ui.define([
 	"sap/ui/core/InvisibleText",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/core/date/UI5Date",
-	"sap/ui/core/library"
+	"sap/ui/core/library",
+	"sap/ui/unified/RecurringCalendarAppointment",
+	"sap/ui/unified/RecurrenceRule",
+	"sap/ui/unified/RecurringNonWorkingPeriod"
 ], function(
 	Formatting,
 	Localization,
@@ -78,7 +81,10 @@ sap.ui.define([
 	InvisibleText,
 	KeyCodes,
 	UI5Date,
-	coreLibrary
+	coreLibrary,
+	RecurringCalendarAppointment,
+	RecurrenceRule,
+	RecurringNonWorkingPeriod
 ) {
 	"use strict";
 
@@ -3662,4 +3668,551 @@ sap.ui.define([
 		// Assert
 		assert.strictEqual(this.oPC.getStartDate().getTime(), this.oStartDayOfWeek.getTime(), "Start date is set to the beginning of the week (prior to min day)");
 	});
+
+	QUnit.module("Recurring appointments", {
+	beforeEach: async function() {
+		this.oRow = new PlanningCalendarRow({
+			appointments: [
+				new RecurringCalendarAppointment({
+					id: "recApp1",
+					recurrenceType: "Daily",
+					recurrencePattern: 1,
+					recurrenceEndDate: UI5Date.getInstance(2024, 0, 10, 23, 59),
+					startDate: UI5Date.getInstance(2024, 0, 1, 9, 0),
+					endDate:   UI5Date.getInstance(2024, 0, 1, 9, 30),
+					title: "Daily Standup"
+				})
+			]
+		});
+		this.oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2024, 0, 1),
+			views: [
+				new PlanningCalendarView({
+					key: "TestWeek",
+					intervalType: CalendarIntervalType.Day,
+					description: "Days",
+					intervalsS: 7,
+					intervalsM: 7,
+					intervalsL: 7
+				})
+			],
+			rows: [this.oRow]
+		});
+		this.oPC.setViewKey("TestWeek");
+		this.oPC.placeAt("bigUiArea");
+		await nextUIUpdate();
+	},
+	afterEach: function() {
+		this.oPC.destroy();
+	}
+});
+
+QUnit.test("Recurring appointment produces clones within the visible range", function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+
+	// Jan 1–7: daily recurring appointment starting Jan 1 → 7 occurrences
+	assert.ok(oTimeline._aOccurrenceClones, "_aOccurrenceClones array is initialised");
+	assert.strictEqual(oTimeline._aOccurrenceClones.length, 7, "7 daily occurrences within Jan 1–7");
+});
+
+QUnit.test("Clones cover the expected start dates", function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	var aCloneDates = oTimeline._aOccurrenceClones.map(function(oClone) {
+		return oClone.getStartDate().getDate();
+	}).sort(function(a, b) { return a - b; });
+
+	assert.deepEqual(aCloneDates, [1, 2, 3, 4, 5, 6, 7], "Clones exist for Jan 1–7");
+});
+
+QUnit.test("Recurring appointment does NOT produce clones outside recurrenceEndDate", async function(assert) {
+	// Navigate to Jan 11–17 (after recurrenceEndDate Jan 10)
+	this.oPC.setStartDate(UI5Date.getInstance(2024, 0, 11));
+	await nextUIUpdate();
+
+	var oTimeline = _getRowTimeline(this.oRow);
+	assert.strictEqual(oTimeline._aOccurrenceClones.length, 0, "No clones after recurrenceEndDate");
+});
+
+QUnit.test("Clones are destroyed and recreated on re-render", async function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	var iFirst = oTimeline._aOccurrenceClones.length;
+	assert.ok(iFirst > 0, "Clones exist after first render");
+
+	// Navigate away — triggers onBeforeRendering which destroys old clones
+	this.oPC.setStartDate(UI5Date.getInstance(2024, 0, 8));
+	await nextUIUpdate();
+
+	// Jan 8–10 are within endDate (Jan 10), Jan 11–14 are not → 3 occurrences
+	assert.strictEqual(oTimeline._aOccurrenceClones.length, 3, "Clones recreated correctly for Jan 8–10");
+});
+
+QUnit.test("getAppointments() is cached — createOccurrenceClones not called on second invocation", function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	var oApp = this.oRow.getAppointments()[0];
+	var oSpy = sinon.spy(oApp, "createOccurrenceClones");
+
+	var aFirst = oTimeline.getAppointments();
+	var aSecond = oTimeline.getAppointments();
+
+	assert.strictEqual(oSpy.callCount, 0, "createOccurrenceClones not called after cache is warm");
+	assert.strictEqual(aFirst, aSecond, "Both calls return the same cached array");
+
+	oSpy.restore();
+});
+
+QUnit.test("_oAppointmentsByDate Map is built and keyed by YYYY-M-D", function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	oTimeline.getAppointments(); // ensure map is built
+
+	assert.ok(oTimeline._oAppointmentsByDate instanceof Map, "_oAppointmentsByDate is a Map");
+
+	// Daily, Jan 1–7 → key "2024-0-1" must exist
+	var aJan1 = oTimeline._oAppointmentsByDate.get("2024-0-1");
+	assert.ok(Array.isArray(aJan1) && aJan1.length === 1, "Key '2024-0-1' maps to 1 appointment");
+	assert.strictEqual(aJan1[0].getStartDate().getDate(), 1, "Appointment on Jan 1");
+
+	var aJan7 = oTimeline._oAppointmentsByDate.get("2024-0-7");
+	assert.ok(Array.isArray(aJan7) && aJan7.length === 1, "Key '2024-0-7' maps to 1 appointment");
+});
+
+QUnit.test("_oAppointmentsByDate is cleared on re-render", async function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	oTimeline.getAppointments();
+	assert.ok(oTimeline._oAppointmentsByDate, "Map exists after first render");
+
+	this.oPC.setStartDate(UI5Date.getInstance(2024, 0, 8));
+	await nextUIUpdate();
+
+	// onBeforeRendering clears the map; after re-render a new one is built
+	oTimeline.getAppointments();
+	assert.ok(oTimeline._oAppointmentsByDate instanceof Map, "Map rebuilt after navigation");
+	assert.notOk(oTimeline._oAppointmentsByDate.has("2024-0-1"), "Old key no longer present");
+	assert.ok(oTimeline._oAppointmentsByDate.has("2024-0-8"), "New key '2024-0-8' exists");
+});
+
+QUnit.test("Monthly recurring appointment with DayOfMonth rule", async function(assert) {
+	var oMonthlyApp = new RecurringCalendarAppointment({
+		recurrenceType: "Monthly",
+		recurrencePattern: 1,
+		recurrenceEndDate: UI5Date.getInstance(2024, 2, 31),
+		startDate: UI5Date.getInstance(2024, 0, 15, 10, 0),
+		endDate:   UI5Date.getInstance(2024, 0, 15, 11, 0),
+		recurrenceRule: new RecurrenceRule({ type: "DayOfMonth", dayOfMonth: 15 })
+	});
+	this.oRow.addAppointment(oMonthlyApp);
+
+	// Show Feb 12–18 — should contain Feb 15 occurrence
+	this.oPC.setStartDate(UI5Date.getInstance(2024, 1, 12));
+	await nextUIUpdate();
+
+	var oTimeline = _getRowTimeline(this.oRow);
+	var aFeb15Clones = oTimeline._aOccurrenceClones.filter(function(oClone) {
+		return oClone.getStartDate().getMonth() === 1 && oClone.getStartDate().getDate() === 15;
+	});
+	assert.strictEqual(aFeb15Clones.length, 1, "Monthly DayOfMonth occurrence on Feb 15 found");
+
+	oMonthlyApp.destroy();
+});
+
+	QUnit.module("Recurring non-working periods", {
+	beforeEach: async function() {
+		this.oNWP = new RecurringNonWorkingPeriod({
+			recurrenceType: "Daily",
+			recurrencePattern: 1,
+			recurrenceEndDate: UI5Date.getInstance(2024, 0, 10, 23, 59),
+			date: UI5Date.getInstance(2024, 0, 1)
+		});
+		this.oRow = new PlanningCalendarRow({
+			nonWorkingPeriods: [this.oNWP]
+		});
+		this.oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2024, 0, 1),
+			views: [
+				new PlanningCalendarView({
+					key: "TestWeek",
+					intervalType: CalendarIntervalType.Day,
+					description: "Days",
+					intervalsS: 7,
+					intervalsM: 7,
+					intervalsL: 7
+				})
+			],
+			rows: [this.oRow]
+		});
+		this.oPC.setViewKey("TestWeek");
+		this.oPC.placeAt("bigUiArea");
+		await nextUIUpdate();
+	},
+	afterEach: function() {
+		this.oPC.destroy();
+	}
+});
+
+QUnit.test("RecurringNonWorkingPeriod passes through getNonWorkingPeriods", function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	var aNWPs = oTimeline.getNonWorkingPeriods();
+
+	assert.strictEqual(aNWPs.length, 1, "One non-working period on the timeline");
+	assert.ok(aNWPs[0].isA("sap.ui.unified.RecurringNonWorkingPeriod"),
+		"The period is a RecurringNonWorkingPeriod instance");
+});
+
+QUnit.test("RecurringNonWorkingPeriod has occurrence on expected dates", function(assert) {
+	var oJan1 = UI5Date.getInstance(2024, 0, 1);
+	var oJan7 = UI5Date.getInstance(2024, 0, 7);
+	var oJan11 = UI5Date.getInstance(2024, 0, 11); // after recurrenceEndDate
+
+	assert.ok(this.oNWP.hasNonWorkingAtDate(oJan1), "Occurrence on Jan 1 (recurrence start)");
+	assert.ok(this.oNWP.hasNonWorkingAtDate(oJan7), "Occurrence on Jan 7 (within range)");
+	assert.notOk(this.oNWP.hasNonWorkingAtDate(oJan11), "No occurrence on Jan 11 (after recurrenceEndDate)");
+});
+
+QUnit.test("Weekly RecurringNonWorkingPeriod only has occurrence on correct weekday", function(assert) {
+	// Weekly NWP starting Monday Jan 1 2024
+	var oWeeklyNWP = new RecurringNonWorkingPeriod({
+		recurrenceType: "Weekly",
+		recurrencePattern: 1,
+		recurrenceEndDate: UI5Date.getInstance(2024, 0, 31),
+		date: UI5Date.getInstance(2024, 0, 1) // Monday
+	});
+
+	var oJan1Mon  = UI5Date.getInstance(2024, 0, 1);  // Monday
+	var oJan2Tue  = UI5Date.getInstance(2024, 0, 2);  // Tuesday
+	var oJan8Mon  = UI5Date.getInstance(2024, 0, 8);  // next Monday
+
+	assert.ok(oWeeklyNWP.hasNonWorkingAtDate(oJan1Mon), "Occurrence on Jan 1 (Monday)");
+	assert.notOk(oWeeklyNWP.hasNonWorkingAtDate(oJan2Tue), "No occurrence on Jan 2 (Tuesday)");
+	assert.ok(oWeeklyNWP.hasNonWorkingAtDate(oJan8Mon), "Occurrence on Jan 8 (next Monday)");
+
+	oWeeklyNWP.destroy();
+});
+
+	// ─── Weekly specific days + bi-weekly in PC ───────────────────────────────
+
+	QUnit.module("Recurring appointments — Weekly specific days", {
+	beforeEach: async function() {
+		this.oRow = new PlanningCalendarRow({
+			appointments: [
+				new RecurringCalendarAppointment({
+					recurrenceType: "Weekly",
+					recurrencePattern: 1,
+					recurrenceEndDate: UI5Date.getInstance(2024, 0, 31),
+					startDate: UI5Date.getInstance(2024, 0, 1, 9, 0), // Mon Jan 1
+					endDate:   UI5Date.getInstance(2024, 0, 1, 9, 30),
+					title: "Mon/Wed/Fri",
+					recurrenceRule: new RecurrenceRule({ days: [1, 3, 5] }) // Mon, Wed, Fri
+				})
+			]
+		});
+		this.oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2024, 0, 1),
+			views: [
+				new PlanningCalendarView({
+					key: "TestWeek",
+					intervalType: CalendarIntervalType.Day,
+					description: "Days",
+					intervalsS: 7, intervalsM: 7, intervalsL: 7
+				})
+			],
+			rows: [this.oRow]
+		});
+		this.oPC.setViewKey("TestWeek");
+		this.oPC.placeAt("bigUiArea");
+		await nextUIUpdate();
+	},
+	afterEach: function() { this.oPC.destroy(); }
+});
+
+QUnit.test("Weekly Mon/Wed/Fri — 3 clones in Jan 1–7 (Mon 1, Wed 3, Fri 5)", function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	assert.strictEqual(oTimeline._aOccurrenceClones.length, 3, "3 clones for Mon/Wed/Fri in Jan 1–7");
+	var aDates = oTimeline._aOccurrenceClones.map(function(c) { return c.getStartDate().getDate(); }).sort(function(a, b) { return a - b; });
+	assert.deepEqual(aDates, [1, 3, 5], "Clones on Mon Jan 1, Wed Jan 3, Fri Jan 5");
+});
+
+QUnit.test("Weekly Mon/Wed/Fri — second week (Jan 8–14) also has 3 clones", async function(assert) {
+	this.oPC.setStartDate(UI5Date.getInstance(2024, 0, 8));
+	await nextUIUpdate();
+	var oTimeline = _getRowTimeline(this.oRow);
+	assert.strictEqual(oTimeline._aOccurrenceClones.length, 3, "3 clones in second week");
+	var aDates = oTimeline._aOccurrenceClones.map(function(c) { return c.getStartDate().getDate(); }).sort(function(a, b) { return a - b; });
+	assert.deepEqual(aDates, [8, 10, 12], "Clones on Mon Jan 8, Wed Jan 10, Fri Jan 12");
+});
+
+	QUnit.module("Recurring appointments — Bi-weekly", {
+	beforeEach: async function() {
+		this.oRow = new PlanningCalendarRow({
+			appointments: [
+				new RecurringCalendarAppointment({
+					recurrenceType: "Weekly",
+					recurrencePattern: 2,
+					recurrenceEndDate: UI5Date.getInstance(2024, 0, 31),
+					startDate: UI5Date.getInstance(2024, 0, 1, 10, 0), // Mon Jan 1 (week 1)
+					endDate:   UI5Date.getInstance(2024, 0, 1, 11, 0),
+					title: "Bi-weekly"
+				})
+			]
+		});
+		this.oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2024, 0, 1),
+			views: [
+				new PlanningCalendarView({
+					key: "TestWeek",
+					intervalType: CalendarIntervalType.Day,
+					description: "Days",
+					intervalsS: 7, intervalsM: 7, intervalsL: 7
+				})
+			],
+			rows: [this.oRow]
+		});
+		this.oPC.setViewKey("TestWeek");
+		this.oPC.placeAt("bigUiArea");
+		await nextUIUpdate();
+	},
+	afterEach: function() { this.oPC.destroy(); }
+});
+
+QUnit.test("Bi-weekly — 1 clone in week 1 (Jan 1–7), 0 in week 2 (Jan 8–14)", async function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	assert.strictEqual(oTimeline._aOccurrenceClones.length, 1, "1 clone in active week (Jan 1)");
+
+	this.oPC.setStartDate(UI5Date.getInstance(2024, 0, 8));
+	await nextUIUpdate();
+	assert.strictEqual(oTimeline._aOccurrenceClones.length, 0, "0 clones in skip week (Jan 8–14)");
+});
+
+QUnit.test("Bi-weekly — clone returns in week 3 (Jan 15–21)", async function(assert) {
+	this.oPC.setStartDate(UI5Date.getInstance(2024, 0, 15));
+	await nextUIUpdate();
+	var oTimeline = _getRowTimeline(this.oRow);
+	assert.strictEqual(oTimeline._aOccurrenceClones.length, 1, "1 clone in week 3 (Jan 15)");
+	assert.strictEqual(oTimeline._aOccurrenceClones[0].getStartDate().getDate(), 15, "Clone on Jan 15");
+});
+
+	// ─── Monthly DayOfWeek + Yearly ──────────────────────────────────────────
+
+	QUnit.module("Recurring appointments — Monthly DayOfWeek", {
+	beforeEach: async function() {
+		// "Second Tuesday of every month" starting Jan 2024
+		this.oApp = new RecurringCalendarAppointment({
+			recurrenceType: "Monthly",
+			recurrencePattern: 1,
+			recurrenceEndDate: UI5Date.getInstance(2024, 5, 30),
+			startDate: UI5Date.getInstance(2024, 0, 9, 14, 0), // Tue Jan 9 (2nd Tue of Jan)
+			endDate:   UI5Date.getInstance(2024, 0, 9, 15, 0),
+			title: "2nd Tuesday",
+			recurrenceRule: new RecurrenceRule({ type: "DayOfWeek", weekOfMonth: "Second", dayOfWeek: 2 })
+		});
+		this.oRow = new PlanningCalendarRow({ appointments: [this.oApp] });
+		this.oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2024, 0, 8),
+			views: [
+				new PlanningCalendarView({
+					key: "TestWeek",
+					intervalType: CalendarIntervalType.Day,
+					description: "Days",
+					intervalsS: 7, intervalsM: 7, intervalsL: 7
+				})
+			],
+			rows: [this.oRow]
+		});
+		this.oPC.setViewKey("TestWeek");
+		this.oPC.placeAt("bigUiArea");
+		await nextUIUpdate();
+	},
+	afterEach: function() { this.oPC.destroy(); }
+});
+
+QUnit.test("Monthly 2nd Tuesday — clone on Jan 9", function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	var aJan9 = oTimeline._aOccurrenceClones.filter(function(c) {
+		return c.getStartDate().getMonth() === 0 && c.getStartDate().getDate() === 9;
+	});
+	assert.strictEqual(aJan9.length, 1, "Clone exists on Jan 9 (2nd Tuesday of January)");
+});
+
+QUnit.test("Monthly 2nd Tuesday — Feb 13 is the 2nd Tuesday of February", async function(assert) {
+	this.oPC.setStartDate(UI5Date.getInstance(2024, 1, 12));
+	await nextUIUpdate();
+	var oTimeline = _getRowTimeline(this.oRow);
+	var aFeb13 = oTimeline._aOccurrenceClones.filter(function(c) {
+		return c.getStartDate().getMonth() === 1 && c.getStartDate().getDate() === 13;
+	});
+	assert.strictEqual(aFeb13.length, 1, "Clone exists on Feb 13 (2nd Tuesday of February)");
+});
+
+	QUnit.module("Recurring appointments — Yearly", {
+	beforeEach: async function() {
+		this.oApp = new RecurringCalendarAppointment({
+			recurrenceType: "Yearly",
+			recurrencePattern: 1,
+			recurrenceEndDate: UI5Date.getInstance(2026, 11, 31),
+			startDate: UI5Date.getInstance(2024, 2, 15, 9, 0), // Mar 15 2024
+			endDate:   UI5Date.getInstance(2024, 2, 15, 10, 0),
+			title: "Yearly Mar 15"
+		});
+		this.oRow = new PlanningCalendarRow({ appointments: [this.oApp] });
+		this.oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2024, 2, 11),
+			views: [
+				new PlanningCalendarView({
+					key: "TestWeek",
+					intervalType: CalendarIntervalType.Day,
+					description: "Days",
+					intervalsS: 7, intervalsM: 7, intervalsL: 7
+				})
+			],
+			rows: [this.oRow]
+		});
+		this.oPC.setViewKey("TestWeek");
+		this.oPC.placeAt("bigUiArea");
+		await nextUIUpdate();
+	},
+	afterEach: function() { this.oPC.destroy(); }
+});
+
+QUnit.test("Yearly — clone on Mar 15 2024", function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	var aMar15 = oTimeline._aOccurrenceClones.filter(function(c) {
+		return c.getStartDate().getFullYear() === 2024 && c.getStartDate().getMonth() === 2 && c.getStartDate().getDate() === 15;
+	});
+	assert.strictEqual(aMar15.length, 1, "Clone on Mar 15 2024");
+});
+
+QUnit.test("Yearly — no clone in Mar 2025 range that doesn't include Mar 15", async function(assert) {
+	this.oPC.setStartDate(UI5Date.getInstance(2025, 2, 8));
+	await nextUIUpdate();
+	var oTimeline = _getRowTimeline(this.oRow);
+	assert.strictEqual(oTimeline._aOccurrenceClones.length, 0, "No clone in Mar 8–14 2025 (Mar 15 not in range)");
+});
+
+QUnit.test("Yearly — clone on Mar 15 2025 when visible", async function(assert) {
+	this.oPC.setStartDate(UI5Date.getInstance(2025, 2, 11));
+	await nextUIUpdate();
+	var oTimeline = _getRowTimeline(this.oRow);
+	var aMar15 = oTimeline._aOccurrenceClones.filter(function(c) {
+		return c.getStartDate().getFullYear() === 2025 && c.getStartDate().getDate() === 15;
+	});
+	assert.strictEqual(aMar15.length, 1, "Clone on Mar 15 2025");
+});
+
+	// ─── exit() cleanup ───────────────────────────────────────────────────────
+
+	QUnit.module("Recurring appointments — exit() cleanup", {
+	beforeEach: async function() {
+		this.oRow = new PlanningCalendarRow({
+			appointments: [
+				new RecurringCalendarAppointment({
+					recurrenceType: "Daily",
+					recurrencePattern: 1,
+					recurrenceEndDate: UI5Date.getInstance(2024, 0, 31),
+					startDate: UI5Date.getInstance(2024, 0, 1, 9, 0),
+					endDate:   UI5Date.getInstance(2024, 0, 1, 9, 30),
+					title: "Daily"
+				})
+			]
+		});
+		this.oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2024, 0, 1),
+			views: [
+				new PlanningCalendarView({
+					key: "TestWeek",
+					intervalType: CalendarIntervalType.Day,
+					description: "Days",
+					intervalsS: 7, intervalsM: 7, intervalsL: 7
+				})
+			],
+			rows: [this.oRow]
+		});
+		this.oPC.setViewKey("TestWeek");
+		this.oPC.placeAt("bigUiArea");
+		await nextUIUpdate();
+	},
+	afterEach: function() {
+		if (!this.oPC.bIsDestroyed) { this.oPC.destroy(); }
+	}
+});
+
+QUnit.test("exit() destroys all occurrence clones", function(assert) {
+	var oTimeline = _getRowTimeline(this.oRow);
+	var aClones = oTimeline._aOccurrenceClones.slice(); // snapshot
+	assert.ok(aClones.length > 0, "Clones exist before destroy");
+
+	this.oPC.destroy();
+
+	aClones.forEach(function(oClone) {
+		assert.ok(oClone.bIsDestroyed, "Clone is destroyed after PC.destroy()");
+	});
+	assert.strictEqual(oTimeline._aOccurrenceClones, undefined, "_aOccurrenceClones is cleared after exit()");
+});
+
+	// ─── Multiple rows isolation ──────────────────────────────────────────────
+
+	QUnit.module("Recurring appointments — multiple rows isolation", {
+	beforeEach: async function() {
+		this.oRow1 = new PlanningCalendarRow({
+			appointments: [
+				new RecurringCalendarAppointment({
+					recurrenceType: "Daily",
+					recurrencePattern: 1,
+					recurrenceEndDate: UI5Date.getInstance(2024, 0, 31),
+					startDate: UI5Date.getInstance(2024, 0, 1, 9, 0),
+					endDate:   UI5Date.getInstance(2024, 0, 1, 9, 30),
+					title: "Row1 Daily"
+				})
+			]
+		});
+		this.oRow2 = new PlanningCalendarRow({
+			appointments: [
+				new RecurringCalendarAppointment({
+					recurrenceType: "Weekly",
+					recurrencePattern: 1,
+					recurrenceEndDate: UI5Date.getInstance(2024, 0, 31),
+					startDate: UI5Date.getInstance(2024, 0, 1, 10, 0), // Mon Jan 1
+					endDate:   UI5Date.getInstance(2024, 0, 1, 11, 0),
+					title: "Row2 Weekly Mon",
+					recurrenceRule: new RecurrenceRule({ days: [1] }) // Monday only
+				})
+			]
+		});
+		this.oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2024, 0, 1),
+			views: [
+				new PlanningCalendarView({
+					key: "TestWeek",
+					intervalType: CalendarIntervalType.Day,
+					description: "Days",
+					intervalsS: 7, intervalsM: 7, intervalsL: 7
+				})
+			],
+			rows: [this.oRow1, this.oRow2]
+		});
+		this.oPC.setViewKey("TestWeek");
+		this.oPC.placeAt("bigUiArea");
+		await nextUIUpdate();
+	},
+	afterEach: function() { this.oPC.destroy(); }
+});
+
+QUnit.test("Each row maintains its own independent clone array", function(assert) {
+	var oTimeline1 = _getRowTimeline(this.oRow1);
+	var oTimeline2 = _getRowTimeline(this.oRow2);
+
+	assert.strictEqual(oTimeline1._aOccurrenceClones.length, 7, "Row1: 7 daily clones (Jan 1–7)");
+	assert.strictEqual(oTimeline2._aOccurrenceClones.length, 1, "Row2: 1 weekly clone (Mon Jan 1 only)");
+	assert.notStrictEqual(oTimeline1._aOccurrenceClones, oTimeline2._aOccurrenceClones,
+		"Clone arrays are independent objects");
+});
+
+QUnit.test("Navigating updates each row independently", async function(assert) {
+	this.oPC.setStartDate(UI5Date.getInstance(2024, 0, 8)); // Jan 8–14, Mon Jan 8
+	await nextUIUpdate();
+
+	var oTimeline1 = _getRowTimeline(this.oRow1);
+	var oTimeline2 = _getRowTimeline(this.oRow2);
+
+	assert.strictEqual(oTimeline1._aOccurrenceClones.length, 7, "Row1: 7 daily clones (Jan 8–14)");
+	assert.strictEqual(oTimeline2._aOccurrenceClones.length, 1, "Row2: 1 clone on Mon Jan 8");
+	assert.strictEqual(oTimeline2._aOccurrenceClones[0].getStartDate().getDate(), 8, "Row2 clone is on Jan 8");
+});
 });

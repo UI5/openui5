@@ -122,7 +122,12 @@ sap.ui.define([
 	RecurringCalendarAppointment.prototype.createOccurrenceClones = function(oRangeStart, oRangeEnd) {
 		const oAppStartDate = this.getStartDate();
 		const iDuration = this.getDuration();
-		const aOccurrences = RecurrenceUtils.getOccurrencesInRange.call(this, oRangeStart, oRangeEnd);
+
+		let aOccurrences = RecurrenceUtils.getCachedOccurrences.call(this, oRangeStart, oRangeEnd);
+		if (!aOccurrences) {
+			aOccurrences = RecurrenceUtils.getOccurrencesInRange.call(this, oRangeStart, oRangeEnd);
+			RecurrenceUtils.setCachedOccurrences.call(this, oRangeStart, oRangeEnd, aOccurrences);
+		}
 
 		return aOccurrences.map((oOccurrenceDate) => {
 			const oOccurrenceStart = UI5Date.getInstance(oOccurrenceDate);

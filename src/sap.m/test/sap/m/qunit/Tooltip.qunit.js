@@ -1,13 +1,12 @@
 /*global QUnit, sinon */
 sap.ui.define([
-	"sap/ui/core/ElementRegistry",
 	"sap/ui/qunit/utils/createAndAppendDiv",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/m/Tooltip",
 	"sap/m/Button",
 	"sap/m/library",
 	"sap/ui/Device"
-], function(ElementRegistry, createAndAppendDiv, nextUIUpdate, Tooltip, Button, mLibrary, Device) {
+], function(createAndAppendDiv, nextUIUpdate, Tooltip, Button, mLibrary, Device) {
 	"use strict";
 	const PlacementType = mLibrary.PlacementType;
 	createAndAppendDiv("content");
@@ -134,9 +133,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("removes from registry", function(assert) {
-		ElementRegistry.add(this.t);
+		Tooltip.registry.add(this.t);
 		this.t.exit();
-		assert.notOk(ElementRegistry.has(this.t));
+		assert.notOk(Tooltip.registry.has(this.t));
 	});
 
 	QUnit.test("safe without popover/timeouts", function(assert) {
@@ -230,13 +229,13 @@ sap.ui.define([
 		const done = assert.async();
 		this.t._oPopover = makeFakePopover();
 		const spy = sinon.spy(this.t._oPopover, "close");
-		ElementRegistry.add(this.t);
+		Tooltip.registry.add(this.t);
 		this.t._bIsOpen = true;
 		this.t.close(50);
 		setTimeout(() => {
 			assert.ok(spy.calledOnce, "popover.close called after delay");
 			assert.strictEqual(this.t._bIsOpen, false, "isOpen false");
-			assert.notOk(ElementRegistry.has(this.t), "removed from registry");
+			assert.notOk(Tooltip.registry.has(this.t), "removed from registry");
 			spy.restore();
 			done();
 		}, 150);
@@ -267,7 +266,7 @@ sap.ui.define([
 			};
 		},
 		afterEach: function() {
-			ElementRegistry.clear();
+			Tooltip.registry.clear();
 			this.t._clearTimeouts();
 			this.t.destroy();
 			removeStub(this.stub);
@@ -280,7 +279,7 @@ sap.ui.define([
 		setTimeout(() => {
 			assert.ok(this.t._oPopover, "popover created");
 			assert.ok(this.t._bIsOpen, "is open");
-			assert.ok(ElementRegistry.has(this.t), "in registry");
+			assert.ok(Tooltip.registry.has(this.t), "in registry");
 			done();
 		}, 100);
 	});
@@ -294,7 +293,7 @@ sap.ui.define([
 
 	QUnit.test("registry not empty uses closeAllButCurrent", async function(assert) {
 		const o = new Tooltip({text:"o"});
-		ElementRegistry.add(o);
+		Tooltip.registry.add(o);
 		const spy = sinon.spy(Tooltip, "closeAllButCurrent");
 		await this.t.openBy(this.stub, 500);
 		assert.ok(spy.calledOnce);
@@ -352,14 +351,14 @@ sap.ui.define([
 		setTimeout(() => {
 			assert.strictEqual(this.t._iOpenTimeout, null, "resumed openBy did not schedule a timer");
 			assert.notOk(this.t._bIsOpen, "tooltip did not open");
-			assert.notOk(ElementRegistry.has(this.t), "tooltip not in the registry");
+			assert.notOk(Tooltip.registry.has(this.t), "tooltip not in the registry");
 			done();
 		}, 100);
 	});
 
 	QUnit.module("Registry", {
 		afterEach: function() {
-			ElementRegistry.clear();
+			Tooltip.registry.clear();
 		}
 	});
 
@@ -370,9 +369,9 @@ sap.ui.define([
 		const s1 = sinon.spy(t1, "close");
 		const s2 = sinon.spy(t2, "close");
 		const s3 = sinon.spy(t3, "close");
-		ElementRegistry.add(t1);
-		ElementRegistry.add(t2);
-		ElementRegistry.add(t3);
+		Tooltip.registry.add(t1);
+		Tooltip.registry.add(t2);
+		Tooltip.registry.add(t3);
 		Tooltip.closeAllButCurrent(t2);
 		assert.ok(s1.calledOnce);
 		assert.notOk(s2.called);
@@ -862,7 +861,7 @@ sap.ui.define([
 				this.t._oPopover.destroy();
 			}
 			this.t.destroy();
-			ElementRegistry.clear();
+			Tooltip.registry.clear();
 		}
 	});
 
@@ -877,9 +876,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("immediate close removes from registry even without popover", function(assert) {
-		ElementRegistry.add(this.t);
+		Tooltip.registry.add(this.t);
 		this.t.close(0);
-		assert.notOk(ElementRegistry.has(this.t), "removed from registry");
+		assert.notOk(Tooltip.registry.has(this.t), "removed from registry");
 	});
 
 	QUnit.test("close calls _clearTimeouts before scheduling", function(assert) {
@@ -890,9 +889,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("close with no popover does not throw", function(assert) {
-		ElementRegistry.add(this.t);
+		Tooltip.registry.add(this.t);
 		this.t.close(0);
-		assert.notOk(ElementRegistry.has(this.t));
+		assert.notOk(Tooltip.registry.has(this.t));
 	});
 
 	QUnit.module("openBy - internal behaviour", {
@@ -903,7 +902,7 @@ sap.ui.define([
 			this.t._createPopover = () => Promise.resolve(this.fakePopover);
 		},
 		afterEach: function() {
-			ElementRegistry.clear();
+			Tooltip.registry.clear();
 			this.t._clearTimeouts();
 			this.t.destroy();
 			removeStub(this.stub);
@@ -943,7 +942,7 @@ sap.ui.define([
 	QUnit.test("openBy with other tooltips open uses 200ms shortcut delay", async function(assert) {
 		const done = assert.async();
 		const other = new Tooltip();
-		ElementRegistry.add(other);
+		Tooltip.registry.add(other);
 		const spy = sinon.spy(this.fakePopover, "openBy");
 		await this.t.openBy(this.stub, 500);
 		// at 100ms the shortcut delay (200ms) has not fired yet

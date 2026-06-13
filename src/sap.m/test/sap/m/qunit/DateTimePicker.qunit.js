@@ -1848,4 +1848,25 @@ sap.ui.define([
 		oDTP9.destroy();
 	});
 
+	QUnit.module("placeholder with min/max date");
+
+	QUnit.test("minDate and maxDate are passed to getPlaceholderText", function(assert) {
+		// Arrange
+		var oMinDate = UI5Date.getInstance(2021, 2, 5),
+			oMaxDate = UI5Date.getInstance(2021, 2, 20),
+			oDTP = new DateTimePicker({
+				minDate: oMinDate,
+				maxDate: oMaxDate
+			}),
+			sStyle = oDTP._getFormatter(true).oFormatOptions.style,
+			sExpected = DateFormat.getDateTimeInstance({ style: sStyle }).getPlaceholderText(oMinDate, oMaxDate);
+
+		oDTP.placeAt("qunit-fixture");
+
+		// Assert
+		assert.strictEqual(oDTP._getPlaceholder(), sExpected, "Placeholder reflects the min/max date range");
+
+		oDTP.destroy();
+	});
+
 });

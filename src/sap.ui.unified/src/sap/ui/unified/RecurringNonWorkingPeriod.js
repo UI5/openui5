@@ -111,6 +111,20 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the recurrence start date. Falls back to the calendar date (midnight) when
+	 * no timeRange is set, which is the normal case for RecurringNonWorkingPeriod.
+	 * RecurrenceUtils.hasOccurrenceOnDate normalises to midnight itself, so this is safe.
+	 * @returns {Date|module:sap/ui/core/date/UI5Date} The start date
+	 * @private
+	 */
+	RecurringNonWorkingPeriod.prototype.getStartDate = function() {
+		if (this.getTimeRange()) {
+			return NonWorkingPeriod.prototype.getStartDate.call(this);
+		}
+		return this.getDate();
+	};
+
+	/**
 	 * Checks if a given date (without time) is a non-working day.
 	 * @param {Date|module:sap/ui/core/date/UI5Date} oDate - Date to check
 	 * @returns {boolean} True if the date is non-working

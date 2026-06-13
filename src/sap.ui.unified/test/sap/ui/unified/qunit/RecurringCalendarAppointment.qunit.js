@@ -1310,4 +1310,164 @@ sap.ui.define([
 
 		oApp.destroy();
 	});
+
+	QUnit.module("createOccurrenceClones — range cache");
+
+	QUnit.test("populates range cache after first call", function (assert) {
+		const oApp = new RecurringCalendarAppointment({
+			recurrenceType: RecurrenceType.Daily,
+			recurrencePattern: 1,
+			startDate: UI5Date.getInstance(2025, 0, 1, 9, 0),
+			endDate:   UI5Date.getInstance(2025, 0, 1, 10, 0)
+		});
+		const oRangeStart = UI5Date.getInstance(2025, 0, 1);
+		const oRangeEnd   = UI5Date.getInstance(2025, 0, 7);
+
+		assert.strictEqual(oApp.getCachedOccurrences(oRangeStart, oRangeEnd), null, "No cache before first call");
+
+		oApp.createOccurrenceClones(oRangeStart, oRangeEnd);
+
+		const aCached = oApp.getCachedOccurrences(oRangeStart, oRangeEnd);
+		assert.ok(Array.isArray(aCached), "Range cache populated after createOccurrenceClones");
+		assert.strictEqual(aCached.length, 7, "Cache holds 7 occurrence dates for Jan 1–7");
+
+		oApp.destroy();
+	});
+
+	QUnit.test("second call reuses cached dates without recalculating", function (assert) {
+		const oApp = new RecurringCalendarAppointment({
+			recurrenceType: RecurrenceType.Daily,
+			recurrencePattern: 1,
+			startDate: UI5Date.getInstance(2025, 0, 1, 9, 0),
+			endDate:   UI5Date.getInstance(2025, 0, 1, 10, 0)
+		});
+		const oRangeStart = UI5Date.getInstance(2025, 0, 1);
+		const oRangeEnd   = UI5Date.getInstance(2025, 0, 7);
+
+		// First call — populates cache
+		oApp.createOccurrenceClones(oRangeStart, oRangeEnd);
+
+		// Overwrite cache with a single sentinel date
+		const oSentinel = UI5Date.getInstance(2025, 5, 15, 0, 0);
+		oApp.setCachedOccurrences(oRangeStart, oRangeEnd, [oSentinel]);
+
+		// Second call must read from cache, not recalculate
+		const aClones = oApp.createOccurrenceClones(oRangeStart, oRangeEnd);
+		assert.strictEqual(aClones.length, 1, "One clone — cache was reused, not recalculated");
+		assert.strictEqual(aClones[0].getStartDate().getMonth(), 5, "Clone start month matches sentinel (June)");
+
+		aClones.forEach((oClone) => oClone.destroy());
+		oApp.destroy();
+	});
+
+	QUnit.test("property change invalidates range cache so next call recalculates", function (assert) {
+		const oApp = new RecurringCalendarAppointment({
+			recurrenceType: RecurrenceType.Daily,
+			recurrencePattern: 1,
+			startDate: UI5Date.getInstance(2025, 0, 1, 9, 0),
+			endDate:   UI5Date.getInstance(2025, 0, 1, 10, 0)
+		});
+		const oRangeStart = UI5Date.getInstance(2025, 0, 1);
+		const oRangeEnd   = UI5Date.getInstance(2025, 0, 7);
+
+		// Warm cache
+		oApp.createOccurrenceClones(oRangeStart, oRangeEnd);
+		assert.ok(oApp.getCachedOccurrences(oRangeStart, oRangeEnd), "Cache populated");
+
+		// Invalidate via property setter
+		oApp.setRecurrencePattern(2);
+		assert.strictEqual(oApp.getCachedOccurrences(oRangeStart, oRangeEnd), null, "Cache cleared after setRecurrencePattern");
+
+		// Next call recalculates with new pattern (every 2 days: Jan 1, 3, 5, 7)
+		const aClones = oApp.createOccurrenceClones(oRangeStart, oRangeEnd);
+		assert.strictEqual(aClones.length, 4, "4 occurrences for every-2-days pattern in Jan 1–7");
+
+		aClones.forEach((oClone) => oClone.destroy());
+		oApp.destroy();
+	});
+
+	// ─────────────────────────────────────────────────────────────────────────────
+	// Regression: Weekly recurrence with specific days (Sun, Tue, Thu, Sat)
+	// startDate must be one of the selected days so the first occurrence is valid.
+	// The demokit bug was that recurrenceRule was not bound in the PC view XML,
+	// so getDays() returned [] and only the startDate weekday matched.
+	// ─────────────────────────────────────────────────────────────────────────────
+	QUnit.module("Weekly — specific days that differ from startDate weekday");
+
+	QUnit.test("Sun/Tue/Thu/Sat starting on Sunday — all 4 days match, Monday does not", function (assert) {
+	// startDate = Sun Sep 1 2019 (one of the selected days).
+	// Chosen days: Sun(0), Tue(2), Thu(4), Sat(6). Monday is NOT selected.
+	const oApp = new RecurringCalendarAppointment({
+		recurrenceType: RecurrenceType.Weekly,
+		recurrencePattern: 1,
+		startDate: UI5Date.getInstance(2019, 8, 1, 9, 0),   // Sun Sep 1 2019
+		endDate:   UI5Date.getInstance(2019, 8, 1, 9, 30),
+		recurrenceEndDate: UI5Date.getInstance(2019, 9, 1),
+		recurrenceRule: new RecurrenceRule({ days: [0, 2, 4, 6] }) // Sun, Tue, Thu, Sat
+	});
+
+	assert.ok(oApp.hasAppointmentAtDate(UI5Date.getInstance(2019, 8, 1)),
+		"Sun Sep 1 matches (startDate, day 0 is in rule)");
+	assert.notOk(oApp.hasAppointmentAtDate(UI5Date.getInstance(2019, 8, 2)),
+		"Mon Sep 2 does NOT match — Monday is not a selected day");
+	assert.ok(oApp.hasAppointmentAtDate(UI5Date.getInstance(2019, 8, 3)),
+		"Tue Sep 3 matches (day 2 is in rule)");
+	assert.notOk(oApp.hasAppointmentAtDate(UI5Date.getInstance(2019, 8, 4)),
+		"Wed Sep 4 does NOT match");
+	assert.ok(oApp.hasAppointmentAtDate(UI5Date.getInstance(2019, 8, 5)),
+		"Thu Sep 5 matches (day 4 is in rule)");
+	assert.notOk(oApp.hasAppointmentAtDate(UI5Date.getInstance(2019, 8, 6)),
+		"Fri Sep 6 does NOT match");
+	assert.ok(oApp.hasAppointmentAtDate(UI5Date.getInstance(2019, 8, 7)),
+		"Sat Sep 7 matches (day 6 is in rule)");
+
+	oApp.destroy();
+});
+
+QUnit.test("Sun/Tue/Thu/Sat — createOccurrenceClones produces exactly 4 clones in Sep 1–7 range", function (assert) {
+	const oApp = new RecurringCalendarAppointment({
+		recurrenceType: RecurrenceType.Weekly,
+		recurrencePattern: 1,
+		startDate: UI5Date.getInstance(2019, 8, 1, 9, 0),   // Sun Sep 1
+		endDate:   UI5Date.getInstance(2019, 8, 1, 9, 30),
+		recurrenceEndDate: UI5Date.getInstance(2019, 9, 1),
+		recurrenceRule: new RecurrenceRule({ days: [0, 2, 4, 6] })
+	});
+
+	const oRangeStart = UI5Date.getInstance(2019, 8, 1, 0, 0, 0, 0);
+	const oRangeEnd   = UI5Date.getInstance(2019, 8, 7, 23, 59, 59, 999);
+	const aClones = oApp.createOccurrenceClones(oRangeStart, oRangeEnd);
+
+	assert.strictEqual(aClones.length, 4, "4 clones: Sep 1 (Sun), Sep 3 (Tue), Sep 5 (Thu), Sep 7 (Sat)");
+
+	const aDates = aClones.map((oClone) => oClone.getStartDate().getDate()).sort((a, b) => a - b);
+	assert.deepEqual(aDates, [1, 3, 5, 7], "Clone dates are 1, 3, 5, 7 (Sun/Tue/Thu/Sat)");
+
+	aClones.forEach((oClone) => oClone.destroy());
+	oApp.destroy();
+});
+
+QUnit.test("Sun/Tue/Thu/Sat — second week also contains all 4 days", function (assert) {
+	const oApp = new RecurringCalendarAppointment({
+		recurrenceType: RecurrenceType.Weekly,
+		recurrencePattern: 1,
+		startDate: UI5Date.getInstance(2019, 8, 1, 9, 0),   // Sun Sep 1
+		endDate:   UI5Date.getInstance(2019, 8, 1, 9, 30),
+		recurrenceEndDate: UI5Date.getInstance(2019, 9, 1),
+		recurrenceRule: new RecurrenceRule({ days: [0, 2, 4, 6] })
+	});
+
+	// Sep 8–14: Sun Sep 8, Tue Sep 10, Thu Sep 12, Sat Sep 14
+	const oRangeStart = UI5Date.getInstance(2019, 8, 8, 0, 0, 0, 0);
+	const oRangeEnd   = UI5Date.getInstance(2019, 8, 14, 23, 59, 59, 999);
+	const aClones = oApp.createOccurrenceClones(oRangeStart, oRangeEnd);
+
+	assert.strictEqual(aClones.length, 4, "4 clones in second week");
+
+	const aDates = aClones.map((oClone) => oClone.getStartDate().getDate()).sort((a, b) => a - b);
+	assert.deepEqual(aDates, [8, 10, 12, 14], "Sep 8 (Sun), 10 (Tue), 12 (Thu), 14 (Sat)");
+
+	aClones.forEach((oClone) => oClone.destroy());
+	oApp.destroy();
+});
 });

@@ -25,7 +25,8 @@ sap.ui.define([
 	"sap/ui/qunit/utils/createAndAppendDiv",
 	"sap/ui/core/date/UI5Date",
 	"sap/ui/unified/DateRange",
-	"sap/ui/core/Icon"
+	"sap/ui/core/Icon",
+	"sap/ui/unified/RecurringCalendarAppointment"
 ], function(
 	Formatting,
 	Localization,
@@ -52,7 +53,8 @@ sap.ui.define([
 	createAndAppendDiv,
 	UI5Date,
 	DateRange,
-	Icon
+	Icon,
+	RecurringCalendarAppointment
 ) {
 	"use strict";
 	createAndAppendDiv("bigUiArea").style.width = "1024px";
@@ -2813,6 +2815,47 @@ sap.ui.define([
 							"From Friday, January 2, 2015 at 8:00:00" + sCLDRSpace +
 							"AM To Friday, January 2, 2015 at 10:00:00" + sCLDRSpace + "AM, Type01",
 							"Start and end date are included as description");
+	});
+
+	QUnit.module("Recurring appointments — interaction", {
+		beforeEach: async function() {
+			this.oRecApp = new RecurringCalendarAppointment({
+				recurrenceType: "Daily",
+				recurrencePattern: 1,
+				recurrenceEndDate: UI5Date.getInstance(2024, 0, 10, 23, 59),
+				startDate: UI5Date.getInstance(2024, 0, 1, 9, 0),
+				endDate:   UI5Date.getInstance(2024, 0, 1, 9, 30),
+				title: "Daily Standup"
+			});
+			this.oSPC = new SinglePlanningCalendar({
+				startDate: UI5Date.getInstance(2024, 0, 1),
+				enableAppointmentsDragAndDrop: true,
+				appointments: [this.oRecApp]
+			});
+			this.oSPC.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			this.oGrid = this.oSPC.getAggregation("_grid");
+		},
+		afterEach: function() {
+			this.oSPC.destroy();
+		}
+	});
+
+	QUnit.test("_findSrcControl resolves occurrence clone via element registry fallback", function(assert) {
+		var aClones = this.oGrid._aOccurrenceClones;
+		assert.ok(aClones && aClones.length > 0, "Clones exist after render");
+
+		var oClone = aClones[0];
+		var oFakeEvent = {
+			target: {
+				getAttribute: function() { return oClone.getId(); },
+				parentElement: { classList: { contains: function() { return false; } } }
+			},
+			srcControl: null
+		};
+
+		var oFound = this.oGrid._findSrcControl(oFakeEvent);
+		assert.strictEqual(oFound, oClone, "_findSrcControl returns the clone via Element.getElementById fallback");
 	});
 
 });
