@@ -2378,5 +2378,20 @@
         "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
       }
     ]
+  },
+  "1.84.57": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "fb9be9e74766f59a87592de416ababd1e494ff12",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: adjust failing tests in FF"
+      },
+      {
+        "id": "06b33c0dc3cde5b37cedae8d22692df74881777c",
+        "type": "FIX",
+        "text": " sap.m.Text: Skip unstable test in Chrome"
+      }
+    ]
   }
 }
