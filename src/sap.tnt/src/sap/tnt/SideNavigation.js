@@ -3,12 +3,16 @@
  */
 sap.ui.define([
 	"./library",
+	"sap/ui/core/AnimationMode",
 	"sap/ui/core/Control",
+	"sap/ui/core/ControlBehavior",
 	"sap/ui/core/Element",
 	"./SideNavigationRenderer"
 ], function (
 	library,
+	AnimationMode,
 	Control,
+	ControlBehavior,
 	Element,
 	SideNavigationRenderer
 ) {
@@ -159,6 +163,13 @@ sap.ui.define([
 		renderer: SideNavigationRenderer
 	});
 
+	SideNavigation.prototype.exit = function () {
+		if (this._fnTransitionEnd && this.getDomRef()) {
+			this.getDomRef().removeEventListener("transitionend", this._fnTransitionEnd);
+			this._fnTransitionEnd = null;
+		}
+	};
+
 	SideNavigation.prototype.setAggregation = function (aggregationName, oObject) {
 		if (oObject && oObject.attachItemSelect) {
 			oObject.attachItemSelect(this._itemSelectionHandler.bind(this));
@@ -198,12 +209,13 @@ sap.ui.define([
 			oFixedList.setExpanded(bExpanded);
 		}
 
+		if (this.getDomRef()) {
+			this._bAnimating = true;
+		}
+
 		return this;
 	};
 
-	/**
-	 * @private
-	 */
 	SideNavigation.prototype.onBeforeRendering = function () {
 		const oSelectedItem = this.getSelectedItem(),
 			sSelectedKey = this.getSelectedKey(),
@@ -224,6 +236,10 @@ sap.ui.define([
 		if (!bExpanded && oFixedList) {
 			oFixedList.setExpanded(false);
 		}
+	};
+
+	SideNavigation.prototype.onAfterRendering = function () {
+		this._handleExpandCollapseAnimation();
 	};
 
 	/**
@@ -316,6 +332,40 @@ sap.ui.define([
 			oEvent.preventDefault();
 			return;
 		}
+	};
+
+	SideNavigation.prototype._handleExpandCollapseAnimation = function () {
+		if (!this._bAnimating) {
+			return;
+		}
+
+		const sAnimationMode = ControlBehavior.getAnimationMode();
+
+		if (sAnimationMode === AnimationMode.none || sAnimationMode === AnimationMode.minimal) {
+			this._bAnimating = false;
+			return;
+		}
+
+		const oDomRef = this.getDomRef();
+
+		this.addStyleClass("sapTntSideNavigationAnimating");
+
+		if (this._fnTransitionEnd) {
+			oDomRef.removeEventListener("transitionend", this._fnTransitionEnd);
+		}
+
+		this._fnTransitionEnd = (oEvent) => {
+			if (oEvent.target !== oDomRef || oEvent.propertyName !== "width") {
+				return;
+			}
+
+			this.removeStyleClass("sapTntSideNavigationAnimating");
+			oDomRef.removeEventListener("transitionend", this._fnTransitionEnd);
+			this._fnTransitionEnd = null;
+			this._bAnimating = false;
+		};
+
+		oDomRef.addEventListener("transitionend", this._fnTransitionEnd);
 	};
 
 	return SideNavigation;

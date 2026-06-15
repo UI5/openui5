@@ -71,8 +71,9 @@ sap.ui.define([
 		}
 
 		const sWidth = oControl.getWidth();
-		if (sWidth && bExpanded) {
-			oRM.style("width", sWidth);
+
+		if (sWidth) {
+			oRM.style("--sapTntSideNavigation_ExpandedWidth", sWidth);
 		}
 
 		oRM.openEnd();
