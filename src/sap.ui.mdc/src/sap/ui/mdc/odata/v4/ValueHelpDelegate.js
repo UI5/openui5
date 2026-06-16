@@ -50,7 +50,7 @@ sap.ui.define([
 	};
 
 	ODataV4ValueHelpDelegate.updateBindingInfo = function(oValueHelp, oContent, oBindingInfo) {
-		ValueHelpDelegate.updateBindingInfo(oValueHelp, oContent, oBindingInfo);
+		ValueHelpDelegate.updateBindingInfo.apply(this, arguments);
 
 		/**
 		 *  @deprecated since 1.120.2

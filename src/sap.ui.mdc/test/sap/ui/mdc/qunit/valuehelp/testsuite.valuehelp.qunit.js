@@ -167,6 +167,18 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+			"ODataV4ValueHelpDelegate": {
+				module: "./ODataV4ValueHelpDelegate.qunit",
+				ui5: {
+					animationMode: "none"
+				},
+				coverage: {
+					only: "[delegates/odata/v4]"
+				},
+				sinon: {
+					qunitBridge: true
+				}
+			},
 			"RequestShowContainerDefault": {
 				module: "./RequestShowContainerDefault.qunit",
 				ui5: {
