@@ -2303,6 +2303,130 @@ sap.ui.define([
 		this.oVM.onclick();
 	});
 
+	QUnit.test("delete returns the next visible row when items binding renames key path", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantName: "One",   author: "A", isShown: true,  remove: false},
+			{variantKey: "2", variantName: "Two",   author: "B", isShown: true,  remove: true},
+			{variantKey: "3", variantName: "Three", author: "C", isShown: true,  remove: true},
+			{variantKey: "4", variantName: "Four",  author: "D", isShown: false, remove: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: "{variantName}",
+				author: "{author}",
+				visible: "{isShown}",
+				remove: "{remove}"
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			// Deleting "2" should focus on the next visible row, "3"
+			const oVariantItem2 = this.oVM.getItemByKey("2");
+			const oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem2);
+
+			assert.ok(oResult, "expected a result");
+			assert.ok(oResult.isA?.("sap.m.ColumnListItem"), "expected a ColumnListItem (table row)");
+			assert.ok(oResult !== this.oVM.oManagementCancel, "must not fall back to the cancel button");
+
+			const oResolvedItem = this.oVM._findVariantItem(oResult.getBindingContext(this.oVM._sModelName));
+			assert.strictEqual(oResolvedItem.getKey(), "3", "next visible row is the row for variant '3'");
+
+			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("duplicate name in manage dialog flags ValueState.Error when items binding renames key/visible paths", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantName: "Alpha", author: "A", isShown: true},
+			{variantKey: "2", variantName: "Beta",  author: "A", isShown: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: "{variantName}",
+				author: "{author}",
+				visible: "{isShown}",
+				rename: true
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		this.oVM._createManagementDialog();
+		this.oVM.oManagementDialog.attachAfterClose(function() {
+			done();
+		});
+		this.oVM.oManagementDialog.attachAfterOpen(async function() {
+			// Type the title of row 0 ("Alpha") into row 1's input — exercises the manage-table
+			// duplicate detection (the saved-VariantItem check would still see "Beta" on row 1).
+			await fChangeTitle(this.oVM.oManagementTable, 1, "Alpha");
+
+			const oInput = this.oVM.oManagementTable.getItems()[1].getCells()[VariantManagement.COLUMN_NAME_IDX];
+			assert.equal(oInput.getValueState(), "Error", "duplicate flagged via VariantItem accessors, not raw model field names");
+
+			const oTarget = this.oVM.oManagementCancel.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
 	QUnit.module("VariantManagement _findNextFocusTargetAfterDelete", {
 		beforeEach: async function() {
 			this.oVM = new VariantManagement("VM1");
