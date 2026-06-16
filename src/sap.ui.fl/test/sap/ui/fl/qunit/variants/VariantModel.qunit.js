@@ -105,7 +105,7 @@ sap.ui.define([
 				sandbox.stub(Utils, "getUshellContainer").returns(true);
 				sandbox.stub(Utils, "getUShellService").resolves();
 
-				this.oDataSelectorUpdateSpy = sandbox.spy(VariantManagementState.getVariantManagementMap(), "addUpdateListener");
+				this.oDataSelectorUpdateSpy = sandbox.spy(VariantManagementState.getVariantManagementDataSelector(), "addUpdateListener");
 
 				const oPersistedUIChange = FlexObjectFactory.createUIChange({
 					id: "someUIChange",
@@ -221,7 +221,7 @@ sap.ui.define([
 		QUnit.test("when initializing a variant model instance", function(assert) {
 			assert.notOk(this.oModel._getURLHandler(), "the URLHandler is not yet created (lazy)");
 
-			const oVMData = this.oModel.getData()[sVMReference];
+			const oVMData = this.oModel.getData();
 			assert.strictEqual(oVMData.currentVariant, "variant1", "the currentVariant was set");
 			assert.strictEqual(oVMData.defaultVariant, "variant1", "the defaultVariant was set");
 			assert.strictEqual(oVMData.modified, false, "the modified flag was set");
@@ -260,7 +260,7 @@ sap.ui.define([
 
 		QUnit.test("when updateData() sets default UI properties on variants", function(assert) {
 			const oFreshModel = new VariantModel({}, { appComponent: this.oComponent, vmReference: sVMReference, vmControl: this.oVMControl });
-			const oVMData = oFreshModel.getData()[sVMReference];
+			const oVMData = oFreshModel.getData();
 
 			oVMData.variants.forEach((oVariant) => {
 				assert.strictEqual(oVariant.rename, true, `variant '${oVariant.key}' has rename=true by default`);
@@ -279,7 +279,7 @@ sap.ui.define([
 
 		QUnit.test("when destroy() is called", function(assert) {
 			assert.ok(this.oDataSelectorUpdateSpy.calledWith(this.oModel.fnUpdateListener), "the update listener was added");
-			const oRemoveSpy = sandbox.spy(VariantManagementState.getVariantManagementMap(), "removeUpdateListener");
+			const oRemoveSpy = sandbox.spy(VariantManagementState.getVariantManagementDataSelector(), "removeUpdateListener");
 			const oClearRuntimeSteadySpy = sandbox.spy(VariantManagementState, "clearRuntimeSteadyObjects");
 			const oClearCurrentVariantSpy = sandbox.spy(VariantManagementState, "resetCurrentVariantReference");
 			this.oModel.destroy();
@@ -409,7 +409,7 @@ sap.ui.define([
 				]
 			);
 
-			var oVMData = this.oModel.getData()[sVMReference];
+			const oVMData = this.oModel.getData();
 			assert.strictEqual(oVMData.currentVariant, "variant0", "the currentVariant was set");
 			assert.strictEqual(oVMData.defaultVariant, "variant2", "the defaultVariant was set");
 			assert.strictEqual(oVMData.modified, true, "the modified flag was set");
@@ -441,7 +441,7 @@ sap.ui.define([
 					return undefined;
 				}
 			});
-			var oVMData = this.oModel.getData()[sVMReference];
+			const oVMData = this.oModel.getData();
 			this.oVMControl.setEditable(true);
 			this.oModel.setModelPropertiesForControl(false);
 			assert.ok(oVMData.variantsEditable, "the parameter variantsEditable is initially true");
@@ -483,7 +483,7 @@ sap.ui.define([
 					return true;
 				}
 			});
-			var oVMData = this.oModel.getData()[sVMReference];
+			const oVMData = this.oModel.getData();
 			this.oVMControl.setEditable(true);
 			this.oModel.setModelPropertiesForControl(false);
 			assert.strictEqual(oVMData.variantsEditable, true, "the parameter variantsEditable is true");
@@ -560,19 +560,19 @@ sap.ui.define([
 			this.oVMControl.setEditable(false);
 			this.oModel.setModelPropertiesForControl(false);
 			assert.strictEqual(
-				this.oModel.getData()[sVMReference].variantsEditable,
+				this.oModel.getData().variantsEditable,
 				false,
 				"the parameter variantsEditable is initially false"
 			);
 			this.oModel.setModelPropertiesForControl(true);
 			assert.strictEqual(
-				this.oModel.getData()[sVMReference].variantsEditable,
+				this.oModel.getData().variantsEditable,
 				false,
 				"the parameter variantsEditable stays false for bDesignTimeMode = true"
 			);
 			this.oModel.setModelPropertiesForControl(false);
 			assert.strictEqual(
-				this.oModel.getData()[sVMReference].variantsEditable,
+				this.oModel.getData().variantsEditable,
 				false,
 				"the parameter variantsEditable stays false for bDesignTimeMode = false"
 			);
@@ -581,8 +581,8 @@ sap.ui.define([
 		QUnit.test("when calling 'setModelPropertiesForControl' with updateVariantInURL = true", async function(assert) {
 			this.oVMControl.setEditable(true);
 			this.oVMControl.setUpdateVariantInURL(true);
-			this.oModel.getData()[sVMReference].updateVariantInURL = true;
-			this.oModel.getData()[sVMReference].currentVariant = "variant0";
+			this.oModel.getData().updateVariantInURL = true;
+			this.oModel.getData().currentVariant = "variant0";
 
 			await this.oModel.initializeURLHandler();
 			const oURLHandler = this.oModel._getURLHandler();
@@ -734,7 +734,7 @@ sap.ui.define([
 					sandbox.stub(ContextBasedAdaptationsAPI, "hasAdaptationsModel").returns(true);
 					sandbox.stub(ContextBasedAdaptationsAPI, "getDisplayedAdaptationId").returns("id_12345");
 				}
-				var oVariantInstance = createVariant(this.oModel.oData[sVMReference].variants[2]);
+				const oVariantInstance = createVariant(this.oModel.oData.variants[2]);
 				// Stub VariantManagementState.getVariant since VariantManager.setVariantProperties uses it
 				sandbox.stub(VariantManagementState, "getVariant").returns({ instance: oVariantInstance });
 
@@ -801,60 +801,19 @@ sap.ui.define([
 			}), "then deleteFlexObjects called with the passed change");
 		});
 
-		QUnit.test("when calling '_ensureStandardVariantExists'", function(assert) {
-			var oExpectedVariant = {
-				id: "mockVariantManagement",
-				reference: sReference,
-				user: VariantUtil.DEFAULT_AUTHOR,
-				variantManagementReference: "mockVariantManagement",
-				variantName: oResourceBundle.getText("STANDARD_VARIANT_TITLE"),
-				layer: Layer.BASE
-			};
-
-			var oAddRuntimeSteadyObjectStub = sandbox.stub(FlexState, "addRuntimeSteadyObject");
-			var oCreateVariantStub = sandbox.stub(FlexObjectFactory, "createFlVariant").returns("variant");
-			this.oModel.setData({});
-			this.oModel._ensureStandardVariantExists("mockVariantManagement");
-
-			assert.strictEqual(oAddRuntimeSteadyObjectStub.callCount, 1, "a variant was added");
-			assert.deepEqual(oAddRuntimeSteadyObjectStub.firstCall.args[2], "variant", "the standard variant was added correctly");
-			assert.strictEqual(oCreateVariantStub.callCount, 1, "a variant was created");
-			assert.deepEqual(oCreateVariantStub.firstCall.args[0], oExpectedVariant, "the standard variant was created correctly");
-		});
-
 		QUnit.test("when calling 'getVariant' without a variant management reference", function(assert) {
 			assert.deepEqual(
 				this.oModel.getVariant("variant0"),
-				this.oModel.oData[sVMReference].variants[1],
+				this.oModel.oData.variants[1],
 				"the default Variant is returned"
 			);
-		});
-
-		QUnit.test("when 'getCurrentControlVariantIds' is called to get all current variant references", function(assert) {
-			var oData = {
-				variantManagementRef1: {
-					currentVariant: "currentVariantRef1"
-				},
-				variantManagementRef2: {
-					currentVariant: "currentVariantRef2"
-				}
-			};
-			this.oModel.setData(oData);
-			assert.deepEqual(
-				this.oModel.getCurrentControlVariantIds(),
-				[oData.variantManagementRef1.currentVariant, oData.variantManagementRef2.currentVariant],
-				"then the function returns an array current variant references"
-			);
-		});
-
-		QUnit.test("when 'getCurrentControlVariantIds' is called with no variant model data", function(assert) {
-			this.oModel.setData({});
-			assert.deepEqual(this.oModel.getCurrentControlVariantIds(), [], "then the function returns an empty array");
 		});
 	});
 
 	// In this module, the model is not set on the app component by default as some of the tests
-	// simulate model context changes before the VM control is initialized (i.e. before setModel is called)
+	// simulate model context changes before the VM control is initialized (i.e. before setModel is called).
+	// The model itself is also not constructed in beforeEach so that tests can stage their FlexState
+	// (e.g. via stubFlexObjectsSelector) before the constructor reads the data selector.
 	QUnit.module("Given a VariantModel with no data and a VariantManagement control", {
 		async beforeEach() {
 			const oApp = new App("testApp");
@@ -888,29 +847,51 @@ sap.ui.define([
 			})]);
 			sandbox.stub(FlexObjectState, "waitForFlexObjectsToBeApplied").resolves();
 
-			this.oModel = new VariantModel({}, {
-				appComponent: this.oComponent,
-				vmReference: this.sVMReference,
-				vmControl: this.oVariantManagement
-			});
-			this.oInitializeURLHandlerStub = sandbox.stub(this.oModel, "initializeURLHandler");
+			this.createModel = () => {
+				this.oModel = new VariantModel({}, {
+					appComponent: this.oComponent,
+					vmReference: this.sVMReference,
+					vmControl: this.oVariantManagement
+				});
+				this.oInitializeURLHandlerStub = sandbox.stub(this.oModel, "initializeURLHandler");
+				return this.oModel;
+			};
 		},
 		afterEach() {
 			sandbox.restore();
-			this.oModel.destroy();
+			this.oModel?.destroy();
 			this.oComponent.destroy();
 			this.oComponentContainer.destroy();
 			FlexObjectManager.removeDirtyFlexObjects({ reference: sReference });
 			FlexState.clearState();
 		}
 	}, function() {
-		QUnit.test("when calling invalidateMap", function(assert) {
-			var oInvalidationStub = sandbox.stub(this.oModel.oDataSelector, "checkUpdate");
-			this.oModel.invalidateMap();
-			assert.strictEqual(oInvalidationStub.callCount, 1, "the DataSelector was invalidated");
+		QUnit.test("when constructing the model and the variant management has no entry in the map yet", function(assert) {
+			const oExpectedVariantArgs = {
+				id: this.sVMReference,
+				reference: sReference,
+				user: VariantUtil.DEFAULT_AUTHOR,
+				variantManagementReference: this.sVMReference,
+				variantName: oResourceBundle.getText("STANDARD_VARIANT_TITLE"),
+				layer: Layer.BASE
+			};
+
+			const oAddRuntimeSteadyObjectSpy = sandbox.spy(VariantManagementState, "addRuntimeSteadyObject");
+			const oCreateVariantSpy = sandbox.spy(FlexObjectFactory, "createFlVariant");
+
+			this.createModel();
+
+			assert.strictEqual(oAddRuntimeSteadyObjectSpy.callCount, 1, "a variant was added");
+			assert.strictEqual(oCreateVariantSpy.callCount, 1, "a variant was created");
+			assert.deepEqual(oCreateVariantSpy.firstCall.args[0], oExpectedVariantArgs, "the standard variant was created correctly");
+			assert.strictEqual(
+				oAddRuntimeSteadyObjectSpy.firstCall.args[2], oCreateVariantSpy.firstCall.returnValue,
+				"the created standard variant was added"
+			);
 		});
 
 		QUnit.test("when calling 'setModel' of VariantManagement control", async function(assert) {
+			this.createModel();
 			var fnRegisterToModelSpy = sandbox.spy(this.oModel, "registerToModel");
 			this.oVariantManagement.setExecuteOnSelectionForStandardDefault(true);
 			sandbox.stub(this.oVariantManagement, "setShowExecuteOnSelection");
@@ -937,6 +918,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when 'registerToModel' is called and the VM reference is in nonFavoriteVariantsRemoved", async function(assert) {
+			this.createModel();
 			sandbox.stub(Loader, "getCachedFlexData").returns({
 				parameters: { nonFavoriteVariantsRemoved: [this.sVMReference] }
 			});
@@ -949,6 +931,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when 'registerToModel' is called and the VM reference is NOT in nonFavoriteVariantsRemoved", async function(assert) {
+			this.createModel();
 			sandbox.stub(Loader, "getCachedFlexData").returns({
 				parameters: { nonFavoriteVariantsRemoved: ["someOtherVMReference"] }
 			});
@@ -960,6 +943,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the dynamic variants loaded callback is executed", async function(assert) {
+			this.createModel();
 			sandbox.stub(Loader, "getCachedFlexData").returns({
 				parameters: { nonFavoriteVariantsRemoved: [this.sVMReference] }
 			});
@@ -984,6 +968,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when creating a new variant based on a faked standard variant, and the Model gets destroyed", function(assert) {
+			this.createModel();
 			const oAddRuntimeOnlySpy = sandbox.spy(VariantManagementState, "addRuntimeOnlyFlexObjects");
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			const oVariant = FlexObjectFactory.createFlVariant({
@@ -996,16 +981,13 @@ sap.ui.define([
 			this.oModel.destroy();
 			assert.strictEqual(oAddRuntimeOnlySpy.callCount, 1, "then the fake Standard variant is added to the runtimeOnlyData");
 
-			this.oModel = new VariantModel({}, {
-				appComponent: this.oComponent,
-				vmReference: this.sVMReference,
-				vmControl: this.oVariantManagement
-			});
+			this.createModel();
 
-			assert.strictEqual(this.oModel.oData[this.sVMReference].variants.length, 2, "then the fake and the new variant are available");
+			assert.strictEqual(this.oModel.oData.variants.length, 2, "then the fake and the new variant are available");
 		});
 
 		QUnit.test("when creating and saving a new UIChange based on a faked standard variant, and the Model gets destroyed", function(assert) {
+			this.createModel();
 			const oAddRuntimeOnlySpy = sandbox.spy(VariantManagementState, "addRuntimeOnlyFlexObjects");
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			const oUIChange = FlexObjectFactory.createUIChange({
@@ -1020,17 +1002,14 @@ sap.ui.define([
 			assert.strictEqual(oFlexObjects[0].getId(), "newUIChange", "then the change was not removed from the flex state");
 			assert.strictEqual(oAddRuntimeOnlySpy.callCount, 1, "then the fake Standard variant is added to the runtimeOnlyData");
 
-			this.oModel = new VariantModel({}, {
-				appComponent: this.oComponent,
-				vmReference: this.sVMReference,
-				vmControl: this.oVariantManagement
-			});
+			this.createModel();
 
-			assert.strictEqual(this.oModel.oData[this.sVMReference].variants.length, 1, "then the fake variant is available");
-			assert.strictEqual(this.oModel.oData[this.sVMReference].variants[0].controlChanges.length, 1, "then the UIChange is available");
+			assert.strictEqual(this.oModel.oData.variants.length, 1, "then the fake variant is available");
+			assert.strictEqual(this.oModel.oData.variants[0].controlChanges.length, 1, "then the UIChange is available");
 		});
 
 		QUnit.test("when creating a new UIChange based on a faked standard variant, and the Model gets destroyed", async function(assert) {
+			this.createModel();
 			const oAddRuntimeOnlySpy = sandbox.spy(VariantManagementState, "addRuntimeOnlyFlexObjects");
 			const oDeleteChangeSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
@@ -1053,18 +1032,15 @@ sap.ui.define([
 			assert.strictEqual(oDeleteChangeSpy.callCount, 1, "then the change was removed from the FlexObjectManager");
 			assert.strictEqual(oAddRuntimeOnlySpy.callCount, 1, "then the fake Standard variant is added to the runtimeOnlyData");
 
-			this.oModel = new VariantModel({}, {
-				appComponent: this.oComponent,
-				vmReference: this.sVMReference,
-				vmControl: this.oVariantManagement
-			});
+			this.createModel();
 
-			const oVariantsData = this.oModel.oData[this.sVMReference].variants;
+			const oVariantsData = this.oModel.oData.variants;
 			assert.strictEqual(oVariantsData.length, 1, "then the fake variant is available");
 			assert.strictEqual(oVariantsData[0].controlChanges.length, 0, "then the change is not available");
 		});
 
 		QUnit.test("when destroy() is called, runtime-steady objects of other VMs are preserved", function(assert) {
+			this.createModel();
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			const sOtherVMReference = "someOtherVMReference";
 			const oOtherStandardVariant = FlexObjectFactory.createFlVariant({
@@ -1084,10 +1060,10 @@ sap.ui.define([
 				aRemainingObjects.some((oObj) => oObj.getId() === sOtherVMReference),
 				"then the runtime-steady object of the other VM is still present"
 			);
-			FlexState.clearRuntimeSteadyObjects(sReference, this.oComponent.getId());
 		});
 
 		QUnit.test("when variant management controls are initialized with with 'updateVariantInURL' property set and default (false)", function(assert) {
+			this.createModel();
 			this.oInitializeURLHandlerStub.resetHistory();
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			assert.strictEqual(
@@ -1097,6 +1073,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when 'updateVariantInURL' is set to true at runtime via the control setter", function(assert) {
+			this.createModel();
 			this.oVariantManagement.setUpdateVariantInURL(false);
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			this.oInitializeURLHandlerStub.resetHistory();
@@ -1109,6 +1086,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when 'save' event event is triggered from a variant management control for a new variant", function(assert) {
+			this.createModel();
 			var fnDone = assert.async();
 
 			ControlVariantApplyAPI.attachVariantApplied({
@@ -1163,10 +1141,11 @@ sap.ui.define([
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{i18n>VARIANT_MANAGEMENT_AUTHOR}";
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, createTranslationVariants.call(this, sTitleBinding));
+			this.createModel();
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			return this.oVariantManagement.waitForInit().then(function() {
 				assert.strictEqual(
-					this.oModel.getData()[this.sVMReference].variants[1].title,
+					this.oModel.getData().variants[1].title,
 					oResourceBundle.getText("VARIANT_MANAGEMENT_AUTHOR"),
 					"then the text is resolved"
 				);
@@ -1184,10 +1163,11 @@ sap.ui.define([
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{i18n>test.with.dots}";
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, createTranslationVariants.call(this, sTitleBinding));
+			this.createModel();
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			return this.oVariantManagement.waitForInit().then(function() {
 				assert.strictEqual(
-					this.oModel.getData()[this.sVMReference].variants[1].title,
+					this.oModel.getData().variants[1].title,
 					"Text From Key With Dots",
 					"then the text is resolved"
 				);
@@ -1200,10 +1180,11 @@ sap.ui.define([
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{anotherResourceModel>VARIANT_MANAGEMENT_AUTHOR}";
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, createTranslationVariants.call(this, sTitleBinding));
+			this.createModel();
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			this.oVariantManagement.attachModelContextChange(function() {
 				assert.strictEqual(
-					this.oModel.getData()[this.sVMReference].variants[1].title,
+					this.oModel.getData().variants[1].title,
 					oResourceBundle.getText("VARIANT_MANAGEMENT_AUTHOR"),
 					"when the model is set, the text gets resolved"
 				);
@@ -1211,7 +1192,7 @@ sap.ui.define([
 			}.bind(this));
 			return this.oVariantManagement.waitForInit().then(function() {
 				assert.strictEqual(
-					this.oModel.getData()[this.sVMReference].variants[1].title,
+					this.oModel.getData().variants[1].title,
 					"{anotherResourceModel>VARIANT_MANAGEMENT_AUTHOR}",
 					"before the model is set, the string is not resolved yet"
 				);

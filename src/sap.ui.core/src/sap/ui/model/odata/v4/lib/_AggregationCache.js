@@ -2137,6 +2137,9 @@ sap.ui.define([
 							iOffset = 1;
 							that.addElements(oGrandTotal, 0);
 					}
+					if (that.oGrandTotalPromise.$outdated) {
+						that.setGrandTotalOutdated(true);
+					}
 				}
 
 				that.addElements(oResult.value, iStart + iOffset, that.oFirstLevel, iStart);
@@ -2733,7 +2736,8 @@ sap.ui.define([
 	 * @private
 	 */
 	_AggregationCache.prototype.setGrandTotalOutdated = function (bOutdated) {
-		const fnUpdate = (oGrandTotal) => {
+		const oGrandTotal = this.aElements.$byPredicate["()"];
+		if (oGrandTotal) {
 			_Helper.updateAll(this.mChangeListeners, "()", oGrandTotal,
 				{"@$ui5.context.isOutdated" : bOutdated});
 			// Update also the copy of the grand total if it exists
@@ -2743,16 +2747,8 @@ sap.ui.define([
 					_Helper.getPrivateAnnotation(oGrandTotalCopy, "predicate"), oGrandTotalCopy,
 					{"@$ui5.context.isOutdated" : bOutdated});
 			}
-		};
-		const oGrandTotal = this.aElements.$byPredicate["()"];
-		if (oGrandTotal) {
-			fnUpdate(oGrandTotal);
-		} else {
-			// the grand total is not yet added to this.aElements.$byPredicate when the grand total
-			// Promise resolves, so update the grand total object itself; multiple concurrent calls
-			// produce the expected result, that means if bOutdated is true at least once, the grand
-			// total is outdated; the oGrandTotalPromise never rejects, no error handling needed
-			this.oGrandTotalPromise?.then(fnUpdate);
+		} else if (this.oGrandTotalPromise) {
+			this.oGrandTotalPromise.$outdated = true;
 		}
 	};
 

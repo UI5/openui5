@@ -11757,7 +11757,11 @@ sap.ui.define([
 		}
 
 		// code under test
-		return oBinding.requestFilterForMessages(fnCallback).then(function (oFilter) {
+		const oPromise = oBinding.requestFilterForMessages(fnCallback);
+
+		assert.ok(oPromise instanceof Promise, "native promise to be used by API");
+
+		return oPromise.then(function (oFilter) {
 			if (oFixture.predicates.length === 0) {
 				assert.strictEqual(
 					oFilter,

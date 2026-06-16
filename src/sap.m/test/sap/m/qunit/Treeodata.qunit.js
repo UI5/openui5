@@ -95,7 +95,10 @@ sap.ui.define([
 
 		await waitForItems(oTree, 3);
 
-		oTree.getItems()[0].$().find(".sapMTreeItemBaseExpander").trigger("click");
+		const $expander = oTree.getItems()[0].$().find(".sapMTreeItemBaseExpander");
+		assert.ok($expander.length, "expander is rendered");
+
+		$expander.trigger("click");
 
 		await waitForItems(oTree, 5);
 

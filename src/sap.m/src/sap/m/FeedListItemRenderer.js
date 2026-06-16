@@ -50,6 +50,7 @@ FeedListItemRenderer.renderLIContent = function(oRm, oControl) {
 		oRm.openStart('div').class("sapMFeedListItemHeader").class("sapUiSelectable");
 		if (oControl.getShowIcon()) {
 			oRm.class("sapMFeedListItemHasFigure");
+			oRm.class("sapMFeedListItemHasFigure" + oControl.getIconSize());
 		}
 		if (oControl.getSender() && oControl.getTimestamp()) {
 			oRm.class('sapMFeedListItemFullHeight');
@@ -91,6 +92,7 @@ FeedListItemRenderer.renderLIContent = function(oRm, oControl) {
 		oRm.openStart('div').class("sapMFeedListItemText");
 		if (oControl.getShowIcon()) {
 			oRm.class('sapMFeedListItemHasFigure');
+			oRm.class('sapMFeedListItemHasFigure' + oControl.getIconSize());
 		}
 		oRm.openEnd();
 		oRm.openStart('div', sMyId + '-text').class("sapMFeedListItemTextText").class("sapUiSelectable").openEnd();
@@ -162,6 +164,7 @@ FeedListItemRenderer.renderLIContent = function(oRm, oControl) {
 FeedListItemRenderer._writeAvatarControl = function(oRm, oControl, sId) {
 	oRm.openStart('figure', sId + '-figure');
 	oRm.class('sapMFeedListItemFigure');
+	oRm.class('sapMFeedListItemFigure' + oControl.getIconSize());
 	if (!oControl.getIcon()) {
 		oRm.class('sapMFeedListItemIsDefaultIcon');
 	}

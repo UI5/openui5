@@ -1727,26 +1727,6 @@ sap.ui.define([
 			oDeferred.resolve();
 		});
 
-		QUnit.test("waitForAllVariantSwitches", async function(assert) {
-			const done = assert.async();
-			await VariantManagementState.waitForAllVariantSwitches(sReference);
-			assert.ok(true, "the function resolves");
-
-			const oDeferred = new Deferred();
-			const oDeferred2 = new Deferred();
-			VariantManagementState.setVariantSwitchPromise(sReference, "someVMReference", oDeferred.promise);
-			VariantManagementState.setVariantSwitchPromise(sReference, "someOtherVMReference", oDeferred2.promise);
-			VariantManagementState.waitForAllVariantSwitches(sReference).then(() => {
-				assert.ok(true, "the promise is resolved");
-				done();
-			});
-			oDeferred.resolve();
-			setTimeout(() => {
-				assert.ok(true, "the second promise is resolved after a timeout");
-				oDeferred2.resolve();
-			}, 100);
-		});
-
 		QUnit.test("addRuntimeOnlyFlexObjects", function(assert) {
 			assert.strictEqual(FlexState.getRuntimeOnlyData(sReference), undefined, "then initially no flex objects are there");
 			const oUIChange = "foo";

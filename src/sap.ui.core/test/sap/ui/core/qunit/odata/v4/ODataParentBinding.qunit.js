@@ -3527,6 +3527,7 @@ sap.ui.define([
 		// code under test
 		oRefreshPromise = oBinding.createRefreshPromise("~bPreventBubbling~");
 
+		assert.ok(oRefreshPromise instanceof Promise);
 		assert.strictEqual(oRefreshPromise, oBinding.oRefreshPromise);
 		assert.strictEqual(oBinding.isRefreshWithoutBubbling(), "~bPreventBubbling~");
 

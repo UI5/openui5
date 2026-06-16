@@ -444,7 +444,11 @@ sap.ui.define([
 			});
 			oVariantManagement3.setModel(oModel3, ControlVariantApplyAPI.getVariantModelName());
 
-			await VariantManagementState.waitForAllVariantSwitches(sReference);
+			await Promise.all([
+				VariantManagementState.waitForVariantSwitch(sReference, sVMReference),
+				VariantManagementState.waitForVariantSwitch(sReference, sVMReference2),
+				VariantManagementState.waitForVariantSwitch(sReference, sVMReference3)
+			]);
 			assert.ok(true, "the variant switch promise was resolved");
 			oVariantManagement2.destroy();
 			oVariantManagement3.destroy();

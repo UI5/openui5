@@ -200,6 +200,8 @@ sap.ui.define([
 			// Clear cache for a specific parameter
 			if (this._getParameterizedCachedResult(mParameters) !== undefined) {
 				this._setParameterizedCachedResult(mParameters, null);
+				// todos#20: Listeners are notified even if no value was cached yet,
+				// but a listener that subscribed before the first cache entry was created does not get the initial update.
 				aUpdatedParameterMaps.push(mParameters);
 			}
 		} else {

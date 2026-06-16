@@ -90,7 +90,7 @@ sap.ui.define([
 		// code under test
 		const oCreatedPromise = oContext.created();
 
-		assert.ok(oCreatedPromise instanceof Promise, "Instance of Promise");
+		assert.ok(oCreatedPromise instanceof Promise, "native promise to be used by API");
 		let bCreatedPromisePending = true;
 		oCreatedPromise.then(function (oResult) {
 				bCreatedPromisePending = false;
@@ -1137,10 +1137,13 @@ sap.ui.define([
 			.resolves(null); // no need to return a SyncPromise
 
 		// code under test
-		return oContext.requestProperty(["bar", "baz"], "~bExternalFormat~")
-			.then(function (aActual) {
-				assert.deepEqual(aActual, [42, null]);
-			});
+		const oPromise = oContext.requestProperty(["bar", "baz"], "~bExternalFormat~");
+
+		assert.ok(oPromise instanceof Promise, "native promise to be used by API");
+
+		return oPromise.then(function (aActual) {
+			assert.deepEqual(aActual, [42, null]);
+		});
 	});
 
 	//*********************************************************************************************
