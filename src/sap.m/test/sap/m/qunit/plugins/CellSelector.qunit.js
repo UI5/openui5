@@ -542,6 +542,71 @@ sap.ui.define([
 		assert.ok(oRemoveSelectionSpy.called, "removeSelection is called");
 	});
 
+	QUnit.test("Drawing cell selection iterates only the rendered row window", function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+		const iTotalRowCount = oTable.getBinding("rows").getLength();
+		const iRenderedRowCount = oTable.getRows().length;
+		const iColumnCount = oTable.getColumns().filter((oCol) => oCol.getDomRef()).length;
+
+		// Install a maximal selection: top-left to bottom-right of the bound data.
+		oCellSelector._bSelecting = true;
+		oCellSelector._oSession.mSource = {rowIndex: 0, colIndex: 0, type: "Cell"};
+		oCellSelector._oSession.mTarget = {rowIndex: iTotalRowCount - 1, colIndex: iColumnCount - 1, type: "Cell"};
+		oCellSelector._oSession.cellTypes = ["Cell"];
+
+		// Count getCellRef adapter invocations. With the rendered-window clamp the
+		// count must equal rendered cells, not the logical selection size.
+		const oGetConfigSpy = sinon.spy(oCellSelector, "getConfig");
+		oCellSelector._drawSelection(oCellSelector._oSession.mSource, oCellSelector._oSession.mTarget);
+		const iGetCellRefCalls = oGetConfigSpy.getCalls().filter((oCall) => oCall.args[0] === "getCellRef").length;
+		oGetConfigSpy.restore();
+
+		assert.equal(iGetCellRefCalls, iRenderedRowCount * iColumnCount, "getCellRef called once per rendered cell");
+		assert.equal(oCellSelector._oSession.cellRefs.length, iRenderedRowCount * iColumnCount,
+			"All rendered cells in the selection range are drawn");
+	});
+
+	QUnit.test("getRenderedRowsInRange returns only rendered rows within the selection", function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+		const iTotalRowCount = oTable.getBinding("rows").getLength();
+		const iColumnCount = oTable.getColumns().filter((oCol) => oCol.getDomRef()).length;
+		const aRenderedIndices = oTable.getRows().map((oRow) => oRow.getIndex());
+
+		// Selection covers the entire bound data. The helper must still return only the rendered window.
+		assert.deepEqual(
+			oCellSelector.getConfig("getRenderedRowsInRange", oTable, {
+				from: {rowIndex: 0, colIndex: 0},
+				to: {rowIndex: iTotalRowCount - 1, colIndex: iColumnCount - 1}
+			}),
+			aRenderedIndices,
+			"All rendered rows are returned for a maximal selection"
+		);
+
+		// Selection that only overlaps the first rendered row. Only that row is returned even though all rows are in the DOM.
+		const iFirstRendered = aRenderedIndices[0];
+		assert.deepEqual(
+			oCellSelector.getConfig("getRenderedRowsInRange", oTable, {
+				from: {rowIndex: iFirstRendered, colIndex: 0},
+				to: {rowIndex: iFirstRendered, colIndex: iColumnCount - 1}
+			}),
+			[iFirstRendered],
+			"Only the rendered row that intersects the selection is returned"
+		);
+
+		// Selection that lies fully outside the rendered window returns nothing.
+		const iAfterRendered = aRenderedIndices[aRenderedIndices.length - 1] + 1;
+		assert.deepEqual(
+			oCellSelector.getConfig("getRenderedRowsInRange", oTable, {
+				from: {rowIndex: iAfterRendered, colIndex: 0},
+				to: {rowIndex: iTotalRowCount - 1, colIndex: iColumnCount - 1}
+			}),
+			[],
+			"No rows are returned for a selection outside the rendered window"
+		);
+	});
+
 	QUnit.module("Interaction - ResponsiveTable", {
 		beforeEach: async function() {
 			this.oMockServer = new MockServer({ rootUri : sServiceURI });
@@ -843,6 +908,66 @@ sap.ui.define([
 		assert.ok(oCell2.classList.contains("sapMPluginsCellSelectorSelected"), "Second cell has selection class after re-render");
 		assert.ok(oCell1.classList.contains("sapMPluginsCellSelectorLeft"), "First cell has left border class after re-render");
 		assert.ok(oCell2.classList.contains("sapMPluginsCellSelectorRight"), "Second cell has right border class after re-render");
+	});
+
+	QUnit.test("getRenderedRowsInRange returns only rendered rows within the selection", function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+		const iTotalRowCount = oTable.getVisibleItems().length;
+		const iColumnCount = oTable.getColumns(true).filter((oCol) => oCol.getVisible() && oCol.getDomRef() && !oCol.isPopin()).length;
+
+		// Every item is rendered in sap.m.Table; maximal selection returns the full range [0..N-1].
+		assert.deepEqual(
+			oCellSelector.getConfig("getRenderedRowsInRange", oTable, {
+				from: {rowIndex: 0, colIndex: 0},
+				to: {rowIndex: iTotalRowCount - 1, colIndex: iColumnCount - 1}
+			}),
+			Array.from({length: iTotalRowCount}, (_, i) => i),
+			"Maximal selection returns all row indices"
+		);
+
+		// Selection covering only the second row returns [1].
+		assert.deepEqual(
+			oCellSelector.getConfig("getRenderedRowsInRange", oTable, {
+				from: {rowIndex: 1, colIndex: 0},
+				to: {rowIndex: 1, colIndex: iColumnCount - 1}
+			}),
+			[1],
+			"Single-row selection returns exactly that row index"
+		);
+
+		// Selection starting beyond the last row returns nothing.
+		assert.deepEqual(
+			oCellSelector.getConfig("getRenderedRowsInRange", oTable, {
+				from: {rowIndex: iTotalRowCount, colIndex: 0},
+				to: {rowIndex: iTotalRowCount + 5, colIndex: iColumnCount - 1}
+			}),
+			[],
+			"Selection outside the rendered range returns an empty array"
+		);
+	});
+
+	QUnit.test("Drawing cell selection does not scan all cells in the table", function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+		const iTotalRowCount = oTable.getVisibleItems().length;
+		const iColumnCount = oTable.getColumns(true).filter((oCol) => oCol.getVisible() && oCol.getDomRef() && !oCol.isPopin()).length;
+		const iSelectionRows = Math.min(3, iTotalRowCount);
+		const iSelectionCols = Math.min(2, iColumnCount);
+
+		// Install a selection that covers only a small block of the visible items.
+		oCellSelector._bSelecting = true;
+		oCellSelector._oSession.mSource = {rowIndex: 0, colIndex: 0, type: "Cell"};
+		oCellSelector._oSession.mTarget = {rowIndex: iSelectionRows - 1, colIndex: iSelectionCols - 1, type: "Cell"};
+		oCellSelector._oSession.cellTypes = ["Cell"];
+
+		const oGetConfigSpy = sinon.spy(oCellSelector, "getConfig");
+		oCellSelector._drawSelection(oCellSelector._oSession.mSource, oCellSelector._oSession.mTarget);
+		const iGetCellRefCalls = oGetConfigSpy.getCalls().filter((oCall) => oCall.args[0] === "getCellRef").length;
+		oGetConfigSpy.restore();
+
+		assert.equal(iGetCellRefCalls, iSelectionRows * iSelectionCols,
+			"getCellRef called only for cells within the selection, not for all rendered cells");
 	});
 
 	QUnit.module("Dialog Behavior", {
