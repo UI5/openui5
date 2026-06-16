@@ -284,15 +284,7 @@ sap.ui.define([
 					}
 				};
 
-				sandbox.stub(Component.prototype, "getModel")
-				.returns({
-					getCurrentControlVariantIds() {
-						return ["currentVariantReferenceInitial"];
-					},
-					getVariantManagementControlIds() {
-						return [];
-					}
-				});
+				sandbox.stub(Component.prototype, "getModel").returns({});
 
 				// first component instance
 				return Component.create(mSettings)

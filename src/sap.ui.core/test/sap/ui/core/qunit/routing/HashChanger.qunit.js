@@ -603,6 +603,79 @@ sap.ui.define([
 		}, "full hash parsed");
 	});
 
+	QUnit.module("parseHashForRouter", {
+		beforeEach: function(assert) {
+			this.oHashChanger = new HashChanger();
+		},
+		afterEach: function(assert) {
+			this.oHashChanger.destroy();
+		}
+	});
+
+	QUnit.test("Returns undefined if router has no hash changer", function(assert) {
+		var oRouter = { getHashChanger: function() { return null; } };
+		var sResult = this.oHashChanger.parseHashForRouter("someHash", oRouter);
+		assert.strictEqual(sResult, undefined, "undefined returned when no RouterHashChanger");
+	});
+
+	QUnit.test("Returns root hash for root router (no prefix key)", function(assert) {
+		var oRouterHashChanger = this.oHashChanger.createRouterHashChanger();
+		var oRouter = { getHashChanger: function() { return oRouterHashChanger; } };
+
+		var sResult = this.oHashChanger.parseHashForRouter("suppliers&/s/detail/3&/s-p/%2FSuppliers(3)", oRouter);
+		assert.strictEqual(sResult, "suppliers", "root hash segment extracted");
+
+		oRouterHashChanger.destroy();
+	});
+
+	QUnit.test("Returns root hash when no sub-hashes exist", function(assert) {
+		var oRouterHashChanger = this.oHashChanger.createRouterHashChanger();
+		var oRouter = { getHashChanger: function() { return oRouterHashChanger; } };
+
+		var sResult = this.oHashChanger.parseHashForRouter("suppliers", oRouter);
+		assert.strictEqual(sResult, "suppliers", "simple hash returned for root router");
+
+		oRouterHashChanger.destroy();
+	});
+
+	QUnit.test("Returns nested hash for child router with prefix", function(assert) {
+		var oRouterHashChanger = this.oHashChanger.createRouterHashChanger();
+		var oChildHashChanger = oRouterHashChanger.createSubHashChanger("s");
+		var oRouter = { getHashChanger: function() { return oChildHashChanger; } };
+
+		var sResult = this.oHashChanger.parseHashForRouter("suppliers&/s/detail/3&/s-p/%2FSuppliers(3)", oRouter);
+		assert.strictEqual(sResult, "detail/3", "nested hash segment extracted for prefix 's'");
+
+		oChildHashChanger.destroy();
+		oRouterHashChanger.destroy();
+	});
+
+	QUnit.test("Returns empty string when prefix not found in hash", function(assert) {
+		var oRouterHashChanger = this.oHashChanger.createRouterHashChanger();
+		var oChildHashChanger = oRouterHashChanger.createSubHashChanger("s");
+		var oRouter = { getHashChanger: function() { return oChildHashChanger; } };
+
+		var sResult = this.oHashChanger.parseHashForRouter("suppliers", oRouter);
+		assert.strictEqual(sResult, "", "empty string returned when prefix not in hash");
+
+		oChildHashChanger.destroy();
+		oRouterHashChanger.destroy();
+	});
+
+	QUnit.test("Returns nested hash for deeply nested router", function(assert) {
+		var oRouterHashChanger = this.oHashChanger.createRouterHashChanger();
+		var oChildHashChanger = oRouterHashChanger.createSubHashChanger("s");
+		var oGrandChildHashChanger = oChildHashChanger.createSubHashChanger("p");
+		var oRouter = { getHashChanger: function() { return oGrandChildHashChanger; } };
+
+		var sResult = this.oHashChanger.parseHashForRouter("suppliers&/s/detail/3&/s-p/%2FSuppliers(3)", oRouter);
+		assert.strictEqual(sResult, "%2FSuppliers(3)", "deeply nested hash segment extracted for prefix 's-p'");
+
+		oGrandChildHashChanger.destroy();
+		oChildHashChanger.destroy();
+		oRouterHashChanger.destroy();
+	});
+
 	QUnit.module("getRelevantEventsInfo", {
 		beforeEach: function(assert) {
 			this.oHashChanger = new HashChanger();

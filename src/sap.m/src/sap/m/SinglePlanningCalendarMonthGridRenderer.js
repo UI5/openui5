@@ -153,6 +153,7 @@ sap.ui.define([
 			oRm.class("sapMSinglePCBlockers");
 			oRm.class("sapUiCalendarRowVisFilled");
 			oRm.attr("role", "list" );
+			oRm.attr("tabindex", "-1");
 			oRm.openEnd();
 
 			for (j = 0; j < iColumns; j++) {

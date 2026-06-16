@@ -1057,15 +1057,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Invalidates the variant management map for the given flex reference.
-	 * This is used to ensure that the variant management map is updated when changes are made.
-	 * @param {string} sFlexReference - Flex reference of the app
-	 */
-	VariantManager.updateVariantManagementMap = function(sFlexReference) {
-		VariantManagementState.getVariantManagementMap().checkUpdate({ reference: sFlexReference });
-	};
-
-	/**
 	 * Deletes the variants and their related FlexObjects. By default, only variants that are in the draft
 	 * or dirty state can be deleted, as they have no dependencies on them.
 	 * The Business Network scenario can delete any variants (forceDelete=true).

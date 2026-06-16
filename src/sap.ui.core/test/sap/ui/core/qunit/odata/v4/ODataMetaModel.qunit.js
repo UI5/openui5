@@ -7188,6 +7188,7 @@ sap.ui.define([
 				});
 			});
 
+		assert.ok(oResultPromise instanceof Promise, "native promise to be used by API");
 		fnResolve2({bar : oValueListMapping2});
 		// make sure the first fetchValueListMapping call is resolved only after the second
 		setTimeout(fnResolve1, 0, {foo : oValueListMapping1});
@@ -7423,10 +7424,14 @@ sap.ui.define([
 			.resolves();
 
 		// code under test
-		return this.oMetaModel.requestCodeList("T€RM")
-			.then(function (mUnits) {
-				assert.strictEqual(mUnits, null); // Note: null, not undefined!
-			});
+		const oPromise = this.oMetaModel.requestCodeList("T€RM");
+
+		//Note: #requestCurrencyCodes & #requestUnitsOfMeasure are using #requestCodeList
+		assert.ok(oPromise instanceof Promise, "native promise to be used by API");
+
+		return oPromise.then(function (mUnits) {
+			assert.strictEqual(mUnits, null); // Note: null, not undefined!
+		});
 	});
 
 	//*********************************************************************************************
@@ -8165,10 +8170,14 @@ sap.ui.define([
 				.returns("foo");
 
 			// code under test
-			return this.oMetaModel.requestValue4Annotation(vRawValue, "/meta/path/value", oContext)
-				.then(function (sValue) {
-					assert.strictEqual(sValue, "foo");
-				});
+			const oPromise
+				= this.oMetaModel.requestValue4Annotation(vRawValue, "/meta/path/value", oContext);
+
+			assert.ok(oPromise instanceof Promise);
+
+			return oPromise.then(function (sValue) {
+				assert.strictEqual(sValue, "foo");
+			});
 		});
 
 		//* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -8281,13 +8290,16 @@ sap.ui.define([
 				sinon.match.same(oContext))
 			.resolves(["in", "N/A"]);
 
-		return this.oMetaModel.filterValueListRelevantQualifiers(mValueListByQualifier,
-				aRawRelevantQualifiers, sMetaPath, oContext)
-			.then(function (mFilteredValueListInfo) {
-				assert.deepEqual(Object.keys(mFilteredValueListInfo), ["in"]);
-				assert.strictEqual(mFilteredValueListInfo.in, mValueListByQualifier.in);
-				assert.strictEqual(JSON.stringify(mValueListByQualifier), sJSON);
-			});
+		const oPromise = this.oMetaModel.filterValueListRelevantQualifiers(mValueListByQualifier,
+			aRawRelevantQualifiers, sMetaPath, oContext);
+
+		assert.ok(oPromise instanceof Promise);
+
+		return oPromise.then(function (mFilteredValueListInfo) {
+			assert.deepEqual(Object.keys(mFilteredValueListInfo), ["in"]);
+			assert.strictEqual(mFilteredValueListInfo.in, mValueListByQualifier.in);
+			assert.strictEqual(JSON.stringify(mValueListByQualifier), sJSON);
+		});
 	});
 
 	//*********************************************************************************************

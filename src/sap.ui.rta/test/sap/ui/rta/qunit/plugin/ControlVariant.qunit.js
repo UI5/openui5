@@ -659,13 +659,9 @@ sap.ui.define([
 			await FlexState.initialize({
 				componentId: this.oMockedAppComponent.getId()
 			});
-			const oModel = new VariantModel({}, {
-				appComponent: this.oMockedAppComponent,
-				vmReference: this.sLocalVariantManagementId,
-				vmControl: this.oVariantManagementControl
-			});
+			await this.oVariantManagementControl.waitForInit();
+			const oModel = this.oVariantManagementControl.getVariantModel();
 			sandbox.stub(this.oMockedAppComponent, "getModel").returns(oModel);
-			this.oVariantManagementControl.setModel(oModel, ControlVariantApplyAPI.getVariantModelName());
 			sandbox.stub(Dialog.prototype, "open").callsFake(function() {
 				assert.ok(this.oVariantManagementControl.getManageDialog().isA("sap.m.Dialog"), "then initially a dialog is created");
 				this.oControlVariantPlugin.deregisterElementOverlay(this.oVariantManagementOverlay);

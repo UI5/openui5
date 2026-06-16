@@ -290,7 +290,7 @@ sap.ui.define([
 			const fnUpdateCurrentVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
 			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(aDummyDirtyChanges);
 
-			assert.strictEqual(this.oModel.oData[sVMReference].variants.length, 5, "then initial length is 5");
+			assert.strictEqual(this.oModel.oData.variants.length, 5, "then initial length is 5");
 			const mPropertyBag = {
 				variant: oVariant,
 				sourceVariantReference: "sourceVariant",
@@ -325,8 +325,8 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'handleManageEvent' deleting a USER and a PUBLIC variants", async function(assert) {
-			const sPublicVariantKey = this.oModel.getData()[sVMReference].variants[2].key;
-			const sUserVariantKey = this.oModel.getData()[sVMReference].variants[4].key;
+			const sPublicVariantKey = this.oModel.getData().variants[2].key;
+			const sUserVariantKey = this.oModel.getData().variants[4].key;
 			const oManageEvent = new BaseEvent("manage", this.oVMControl, {
 				fav: [{
 					key: sPublicVariantKey,
@@ -344,7 +344,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'handleManageEvent' deleting the current USER variant", async function(assert) {
-			const sCurrentUserVariantKey = this.oModel.getData()[sVMReference].variants[3].key;
+			const sCurrentUserVariantKey = this.oModel.getData().variants[3].key;
 			const oManageEvent = new BaseEvent("manage", this.oVMControl, {
 				deleted: [sCurrentUserVariantKey]
 			});
@@ -370,10 +370,10 @@ sap.ui.define([
 			// variant1 PUBLIC -> renamed to "test" (PUBLIC change), favorite set to true (USER change)
 			// variant2 PUBLIC -> deleted => "setVisible = false" PUBLIC change
 			// variant3 USER -> previously invisible, now deleted => USER deletion
-			const sNewDefaultVariantKey = this.oModel.getData()[sVMReference].variants[1].key; // variant0
-			const sPublicVariantKey = this.oModel.getData()[sVMReference].variants[2].key; // variant1
-			const sPublicVariantKey2 = this.oModel.getData()[sVMReference].variants[3].key; // variant2
-			const sUserVariantKey = this.oModel.getData()[sVMReference].variants[4].key; // variant3
+			const sNewDefaultVariantKey = this.oModel.getData().variants[1].key; // variant0
+			const sPublicVariantKey = this.oModel.getData().variants[2].key; // variant1
+			const sPublicVariantKey2 = this.oModel.getData().variants[3].key; // variant2
+			const sUserVariantKey = this.oModel.getData().variants[4].key; // variant3
 			const oManageEvent = new BaseEvent("manage", this.oVMControl, {
 				renamed: [{
 					key: sPublicVariantKey,
@@ -573,7 +573,7 @@ sap.ui.define([
 				"then dirty changes from source variant were deleted from the persistence (in the right order)"
 			);
 
-			const oAffectedVariant = this.oModel.getData()[sVMReference].variants.find((oVariant) => {
+			const oAffectedVariant = this.oModel.getData().variants.find((oVariant) => {
 				return oVariant.key === sCopyVariantName;
 			});
 			// Only check the support user, the author is handled independently
@@ -639,7 +639,7 @@ sap.ui.define([
 				}), // the last change is reverted first
 				"then dirty changes from source variant were deleted from the persistence (in the right order)"
 			);
-			this.oModel.getData()[sVMReference].variants.forEach(function(oVariant) {
+			this.oModel.getData().variants.forEach((oVariant) => {
 				if (oVariant.key === sCopyVariantName) {
 					assert.strictEqual(
 						oVariant.instance.getSupportInformation().user,
@@ -757,7 +757,7 @@ sap.ui.define([
 				}), // the last change is reverted first
 				"then dirty changes from source variant were deleted from the persistence (in the right order)"
 			);
-			this.oModel.getData()[sVMReference].variants.forEach(function(oVariant) {
+			this.oModel.getData().variants.forEach((oVariant) => {
 				if (oVariant.key === sCopyVariantName) {
 					assert.strictEqual(
 						oVariant.instance.getSupportInformation().user,
@@ -849,19 +849,6 @@ sap.ui.define([
 			assert.strictEqual(aDirtyChanges[0].getId(), "dirtyChange", "then the dirty change is returned");
 		});
 
-		QUnit.test("updateVariantManagementMap", function(assert) {
-			const sFlexReference = "myFlexReference";
-			const oCheckUpdateStub = sandbox.stub();
-			sandbox.stub(VariantManagementState, "getVariantManagementMap").returns({
-				checkUpdate: oCheckUpdateStub
-			});
-			VariantManager.updateVariantManagementMap(sFlexReference);
-			assert.ok(
-				oCheckUpdateStub.calledWith({ reference: sFlexReference }),
-				"then the invalidate method was called for the reference"
-			);
-		});
-
 		[true, false].forEach(function(bUpdateVariantInURL) {
 			const sTitle = `when calling 'createVariantChange' for 'setDefault' with different current and default variants ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
 			QUnit.test(sTitle, function(assert) {
@@ -935,7 +922,7 @@ sap.ui.define([
 			const sDummyClass = "DummyClass";
 			const oFakeComponentContainerPromise = { property: "fake" };
 
-			const sVariant1Key = this.oModel.oData[sVMReference].variants[1].key;
+			const sVariant1Key = this.oModel.oData.variants[1].key;
 			const oManageParameters = {
 				renamed: [{
 					key: sVariant1Key,
@@ -946,12 +933,12 @@ sap.ui.define([
 					visible: false
 				}],
 				exe: [{
-					key: this.oModel.oData[sVMReference].variants[2].key,
+					key: this.oModel.oData.variants[2].key,
 					exe: false
 				}],
 				deleted: [sVariant1Key],
 				contexts: [{
-					key: this.oModel.oData[sVMReference].variants[3].key,
+					key: this.oModel.oData.variants[3].key,
 					contexts: { foo: "bar" }
 				}],
 				def: "variant0"

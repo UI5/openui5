@@ -452,6 +452,18 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the data selector that yields a single variant management entry, parameterized
+	 * by <code>variantManagementReference</code>. Use this to read or subscribe to updates
+	 * scoped to a specific variant management; for the full per-flex-reference map, use
+	 * {@link sap.ui.fl.apply._internal.flexState.controlVariants.VariantManagementState.getVariantManagementMap}.
+	 *
+	 * @returns {object} Data selector for a single variant management entry
+	 */
+	VariantManagementState.getVariantManagementDataSelector = function() {
+		return oVariantManagementsDataSelector;
+	};
+
+	/**
 	 * Wrapper to add a runtime-steady object - that survives the invalidation of the FlexState
 	 * For example: a fake standard variant for a variant management if none exists yet.
 	 *
@@ -835,16 +847,6 @@ sap.ui.define([
 	 */
 	VariantManagementState.waitForVariantSwitch = function(sReference, sVMReference) {
 		return mVariantSwitchPromises[sReference]?.[sVMReference] || Promise.resolve();
-	};
-
-	/**
-	 * Waits for all variant switches for the given flex reference.
-	 *
-	 * @param {string} sReference - Flex reference of the app
-	 * @returns {Promise<undefined>} Variant Switches Promise
-	 */
-	VariantManagementState.waitForAllVariantSwitches = function(sReference) {
-		return Promise.all(Object.values(mVariantSwitchPromises[sReference] || {}));
 	};
 
 	VariantManagementState.getVariantsForVariantManagement = function(mPropertyBag) {

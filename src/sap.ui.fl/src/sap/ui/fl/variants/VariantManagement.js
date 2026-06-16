@@ -987,7 +987,7 @@ sap.ui.define([
 				}
 			}
 
-			this.oContext = new Context(oModel, `/${sLocalId}`);
+			this.oContext = new Context(oModel, "/");
 			this.setBindingContext(this.oContext, sModelName);
 
 			await oModel.registerToModel();
@@ -1001,23 +1001,23 @@ sap.ui.define([
 			this._createItemsModel(sModelName);
 
 			this._oVM.bindProperty("selectedKey", {
-				path: `${this.oContext}/currentVariant`,
+				path: "/currentVariant",
 				model: sModelName
 			});
 			this._oVM.bindProperty("defaultKey", {
-				path: `${this.oContext}/defaultVariant`,
+				path: "/defaultVariant",
 				model: sModelName
 			});
 			this._oVM.bindProperty("modified", {
-				path: `${this.oContext}/modified`,
+				path: "/modified",
 				model: sModelName
 			});
 			this._oVM.bindProperty("supportFavorites", {
-				path: `${this.oContext}/showFavorites`,
+				path: "/showFavorites",
 				model: sModelName
 			});
 			this._oVM.bindProperty("showFooter", {
-				path: `${this.oContext}/variantsEditable`,
+				path: "/variantsEditable",
 				model: sModelName
 			});
 
@@ -1072,7 +1072,7 @@ sap.ui.define([
 		});
 
 		this._oVM.bindAggregation("items", {
-			path: `${this.oContext}/variants`,
+			path: "/variants",
 			model: sModelName,
 			template: this._oItemsTemplate,
 			filters: new Filter({

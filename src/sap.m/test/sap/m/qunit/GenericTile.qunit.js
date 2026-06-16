@@ -326,6 +326,21 @@ sap.ui.define([
 		assert.strictEqual(document.getElementById("generic-tile-focus").parentNode, oTileElement, "The tile content is a child of the link.");
 	});
 
+	QUnit.test("GenericTile rendered as link ignores gridItemRole and retains role='link'", async function(assert) {
+		//Arrange
+		var sLink = "http://localhost/myLink";
+		this.oGenericTile.setUrl(sLink);
+		this.oGenericTile.setGridItemRole("listitem"); // simulates what sap.f.GridContainer sets on IGridContainerItem
+
+		//Act
+		await nextUIUpdate();
+
+		//Assert
+		var oTileElement = document.getElementById("generic-tile");
+		assert.strictEqual(oTileElement.tagName, "A", "The root element is a link.");
+		assert.strictEqual(oTileElement.getAttribute("role"), "link", "role='listitem' is not applied to an <a> element; role='link' is used instead.");
+	});
+
 	QUnit.test("Wrapping type is propagated to title", async function(assert) {
 		this.oGenericTile.setWrappingType(library.WrappingType.Hyphenated);
 		await nextUIUpdate();

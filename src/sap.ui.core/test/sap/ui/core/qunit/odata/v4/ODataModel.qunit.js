@@ -779,7 +779,11 @@ sap.ui.define([
 		});
 
 		// code under test
-		return oModel.submitBatch("groupId").then(function (oResult) {
+		const oPromise = oModel.submitBatch("groupId");
+
+		assert.ok(oPromise instanceof Promise, "native promise to be used by API");
+
+		return oPromise.then(function (oResult) {
 			// this proves that submitBatch() returns a promise which is resolved with the result
 			// of _submitBatch(), which in reality is of course a sync promise itself
 			assert.strictEqual(oResult, oSubmitPromise);

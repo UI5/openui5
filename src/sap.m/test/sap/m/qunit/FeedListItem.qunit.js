@@ -22,8 +22,9 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/core/Core",
-	"sap/ui/test/utils/nextUIUpdate"
-], function(Theming, qutils, jQuery, FeedListItem, FeedListItemAction, ListItemAction, List, StandardListItem, JSONModel, Button, Popover, Bar, ActionSheet, App, Page, Device, FormattedText, IconPool, library, Log, KeyCodes, oCore, nextUIUpdate) {
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/m/AvatarSize"
+], function(Theming, qutils, jQuery, FeedListItem, FeedListItemAction, ListItemAction, List, StandardListItem, JSONModel, Button, Popover, Bar, ActionSheet, App, Page, Device, FormattedText, IconPool, library, Log, KeyCodes, oCore, nextUIUpdate, AvatarSize) {
 	"use strict";
 
 	// shortcut for sap.m.PlacementType
@@ -360,7 +361,7 @@ sap.ui.define([
 	});
 	QUnit.test("Default src - icon size", function (assert) {
 		assert.ok(oFeedList.getItems()[4].oAvatar.$().hasClass("sapFAvatarS"), "Avatar has class sapAvatarS applied");
-		assert.equal(oFeedList.getItems()[4].oAvatar.$().css("font-size"), "32px", "Avatar icon font size is 2 rem");
+		assert.equal(oFeedList.getItems()[4].oAvatar.$().css("font-size"), "18px", "Avatar icon font size is 1.125 rem");
 	});
 	QUnit.test("Default feedListItem div size", function (assert) {
 		assert.ok(oFeedList.getItems()[4].oParent.$().hasClass("sapMList"), "FeedListItem has class sapMList applied");
@@ -1394,4 +1395,173 @@ sap.ui.define([
 		assert.equal(oItem.getDomRef().ariaPosInSet,'1','Current List Item count is available to be announced');
 	});
 
+	QUnit.module("Icon Size rendering", {
+		beforeEach: function() {
+			this.oList = new List();
+			this.oList.placeAt("qunit-fixture");
+		},
+		afterEach: function() {
+			this.oList.destroy();
+		}
+	});
+
+	QUnit.test("iconSize XS: figure and content get correct CSS classes", async function(assert) {
+		var oItem = new FeedListItem({
+			icon: "sap-icon://person-placeholder",
+			sender: "Test",
+			iconSize: AvatarSize.XS
+		});
+		this.oList.addItem(oItem);
+		await nextUIUpdate();
+
+		var $figure = oItem.getDomRef().querySelector(".sapMFeedListItemFigure");
+		assert.ok($figure.classList.contains("sapMFeedListItemFigureXS"), "Figure has sapMFeedListItemFigureXS class");
+
+		var $content = oItem.getDomRef().querySelector(".sapMFeedListItemHasFigure");
+		assert.ok($content.classList.contains("sapMFeedListItemHasFigureXS"), "Content div has sapMFeedListItemHasFigureXS class");
+
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapFAvatarXS"), "Avatar has sapFAvatarXS class");
+		assert.notOk(window.getComputedStyle(oItem.oAvatar.getDomRef()).width === "48px", "Avatar width is not hardcoded to 3rem");
+	});
+
+	QUnit.test("iconSize S (default): figure and content get correct CSS classes", async function(assert) {
+		var oItem = new FeedListItem({
+			icon: "sap-icon://person-placeholder",
+			sender: "Test",
+			iconSize: AvatarSize.S
+		});
+		this.oList.addItem(oItem);
+		await nextUIUpdate();
+
+		var $figure = oItem.getDomRef().querySelector(".sapMFeedListItemFigure");
+		assert.ok($figure.classList.contains("sapMFeedListItemFigureS"), "Figure has sapMFeedListItemFigureS class");
+
+		var $content = oItem.getDomRef().querySelector(".sapMFeedListItemHasFigure");
+		assert.ok($content.classList.contains("sapMFeedListItemHasFigureS"), "Content div has sapMFeedListItemHasFigureS class");
+
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapFAvatarS"), "Avatar has sapFAvatarS class");
+	});
+
+	QUnit.test("iconSize M: figure and content get correct CSS classes", async function(assert) {
+		var oItem = new FeedListItem({
+			icon: "sap-icon://person-placeholder",
+			sender: "Test",
+			iconSize: AvatarSize.M
+		});
+		this.oList.addItem(oItem);
+		await nextUIUpdate();
+
+		var $figure = oItem.getDomRef().querySelector(".sapMFeedListItemFigure");
+		assert.ok($figure.classList.contains("sapMFeedListItemFigureM"), "Figure has sapMFeedListItemFigureM class");
+
+		var $content = oItem.getDomRef().querySelector(".sapMFeedListItemHasFigure");
+		assert.ok($content.classList.contains("sapMFeedListItemHasFigureM"), "Content div has sapMFeedListItemHasFigureM class");
+
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapFAvatarM"), "Avatar has sapFAvatarM class");
+	});
+
+	QUnit.test("iconSize L: figure and content get correct CSS classes", async function(assert) {
+		var oItem = new FeedListItem({
+			icon: "sap-icon://person-placeholder",
+			sender: "Test",
+			iconSize: AvatarSize.L
+		});
+		this.oList.addItem(oItem);
+		await nextUIUpdate();
+
+		var $figure = oItem.getDomRef().querySelector(".sapMFeedListItemFigure");
+		assert.ok($figure.classList.contains("sapMFeedListItemFigureL"), "Figure has sapMFeedListItemFigureL class");
+
+		var $content = oItem.getDomRef().querySelector(".sapMFeedListItemHasFigure");
+		assert.ok($content.classList.contains("sapMFeedListItemHasFigureL"), "Content div has sapMFeedListItemHasFigureL class");
+
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapFAvatarL"), "Avatar has sapFAvatarL class");
+	});
+
+	QUnit.test("iconSize XL: figure and content get correct CSS classes", async function(assert) {
+		var oItem = new FeedListItem({
+			icon: "sap-icon://person-placeholder",
+			sender: "Test",
+			iconSize: AvatarSize.XL
+		});
+		this.oList.addItem(oItem);
+		await nextUIUpdate();
+
+		var $figure = oItem.getDomRef().querySelector(".sapMFeedListItemFigure");
+		assert.ok($figure.classList.contains("sapMFeedListItemFigureXL"), "Figure has sapMFeedListItemFigureXL class");
+
+		var $content = oItem.getDomRef().querySelector(".sapMFeedListItemHasFigure");
+		assert.ok($content.classList.contains("sapMFeedListItemHasFigureXL"), "Content div has sapMFeedListItemHasFigureXL class");
+
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapFAvatarXL"), "Avatar has sapFAvatarXL class");
+	});
+
+	QUnit.test("iconSize change: CSS classes update after re-rendering", async function(assert) {
+		var oItem = new FeedListItem({
+			icon: "sap-icon://person-placeholder",
+			sender: "Test",
+			iconSize: AvatarSize.S
+		});
+		this.oList.addItem(oItem);
+		await nextUIUpdate();
+
+		// Verify initial S size
+		assert.ok(oItem.getDomRef().querySelector(".sapMFeedListItemFigure").classList.contains("sapMFeedListItemFigureS"), "Initially has FigureS class");
+
+		// Change to XL
+		oItem.setIconSize(AvatarSize.XL);
+		await nextUIUpdate();
+
+		var $figure = oItem.getDomRef().querySelector(".sapMFeedListItemFigure");
+		assert.ok($figure.classList.contains("sapMFeedListItemFigureXL"), "After change, figure has sapMFeedListItemFigureXL class");
+		assert.notOk($figure.classList.contains("sapMFeedListItemFigureS"), "After change, figure no longer has sapMFeedListItemFigureS class");
+
+		var $content = oItem.getDomRef().querySelector(".sapMFeedListItemHasFigure");
+		assert.ok($content.classList.contains("sapMFeedListItemHasFigureXL"), "After change, content has sapMFeedListItemHasFigureXL class");
+		assert.notOk($content.classList.contains("sapMFeedListItemHasFigureS"), "After change, content no longer has sapMFeedListItemHasFigureS class");
+
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapFAvatarXL"), "Avatar has sapFAvatarXL class after change");
+	});
+
+	QUnit.test("sapMFeedListItemImage class does not hardcode avatar dimensions", async function(assert) {
+		var oItem = new FeedListItem({
+			icon: "sap-icon://person-placeholder",
+			sender: "Test",
+			iconActive: true,
+			iconSize: AvatarSize.XL
+		});
+		this.oList.addItem(oItem);
+		await nextUIUpdate();
+
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapMFeedListItemImage"), "Active icon has sapMFeedListItemImage class");
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapFAvatarXL"), "Avatar retains sapFAvatarXL class");
+	});
+
+	QUnit.test("Style class toggling: no accumulation of active/inactive classes", async function(assert) {
+		var oItem = new FeedListItem({
+			icon: "sap-icon://person-placeholder",
+			sender: "Test",
+			iconActive: true,
+			iconSize: AvatarSize.M
+		});
+		this.oList.addItem(oItem);
+		await nextUIUpdate();
+
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapMFeedListItemImage"), "Initially has sapMFeedListItemImage");
+		assert.notOk(oItem.oAvatar.getDomRef().classList.contains("sapMFeedListItemImageInactive"), "Initially does not have sapMFeedListItemImageInactive");
+
+		// Switch to inactive
+		oItem.setIconActive(false);
+		await nextUIUpdate();
+
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapMFeedListItemImageInactive"), "After deactivation has sapMFeedListItemImageInactive");
+		assert.notOk(oItem.oAvatar.getDomRef().classList.contains("sapMFeedListItemImage"), "After deactivation does not have sapMFeedListItemImage");
+
+		// Switch back to active
+		oItem.setIconActive(true);
+		await nextUIUpdate();
+
+		assert.ok(oItem.oAvatar.getDomRef().classList.contains("sapMFeedListItemImage"), "After reactivation has sapMFeedListItemImage");
+		assert.notOk(oItem.oAvatar.getDomRef().classList.contains("sapMFeedListItemImageInactive"), "After reactivation does not have sapMFeedListItemImageInactive");
+	});
 });

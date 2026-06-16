@@ -1567,7 +1567,7 @@ sap.ui.define([
 			oPromise = oBinding._invoke(oGroupLock, "~mParameters~", "~bIgnoreETag~",
 				"~fnOnStrictHandlingFailed~");
 
-			assert.ok(oPromise instanceof Promise, "a Promise, not a SyncPromise");
+			assert.ok(oPromise instanceof Promise, "native promise to be used by API");
 			return oPromise.then(function (oResult) {
 				assert.strictEqual(oResult, undefined);
 			});
@@ -5273,7 +5273,11 @@ sap.ui.define([
 		var oBinding = this.bindContext("Player('0815')");
 
 		// code under test
-		return oBinding.requestObject().then(function (vValue) {
+		const oPromise = oBinding.requestObject();
+
+		assert.ok(oPromise instanceof Promise, "native promise to be used by API");
+
+		return oPromise.then(function (vValue) {
 			assert.strictEqual(vValue, undefined);
 		});
 	});

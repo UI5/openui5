@@ -11,11 +11,9 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/initial/_internal/StorageUtils",
-	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/Layer",
 	"sap/ui/thirdparty/sinon-4",
@@ -31,11 +29,9 @@ sap.ui.define([
 	VariantManagerApply,
 	FlexObjectState,
 	FlexState,
-	ControlVariantApplyAPI,
 	Loader,
 	Storage,
 	StorageUtils,
-	VariantModel,
 	FlexObjectManager,
 	Layer,
 	sinon,
@@ -90,18 +86,13 @@ sap.ui.define([
 				parameters: { nonFavoriteVariantsRemoved: [this.sVMReference] }
 			});
 
-			this.oModel = new VariantModel({}, {
-				appComponent: this.oComponent,
-				vmReference: this.sVMReference,
-				vmControl: this.oVariantManagement
-			});
-			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await this.oVariantManagement.waitForInit();
+			this.oModel = this.oVariantManagement.getVariantModel();
 		},
 		afterEach() {
-			sandbox.restore();
-			this.oModel.destroy();
 			this.oComponent.destroy();
 			this.oComponentContainer.destroy();
+			sandbox.restore();
 			FlexState.clearState();
 		}
 	}, function() {

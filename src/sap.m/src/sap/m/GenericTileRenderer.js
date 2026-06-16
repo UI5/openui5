@@ -120,7 +120,7 @@ GenericTileRenderer.render = function(oRm, oControl) {
 		}
 	}
 
-	if (sAriaRole) {
+	if (sAriaRole && !bRenderLink) {
 		oRm.attr("role", sAriaRole);
 	} else if (!bRenderLink) { // buttons only; <a> elements always have the default role
 			oRm.attr("role", bHasPress ? "button" : "presentation");

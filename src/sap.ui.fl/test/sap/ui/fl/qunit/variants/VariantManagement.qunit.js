@@ -183,9 +183,9 @@ sap.ui.define([
 			sandbox.stub(VariantManager, "handleSaveEvent");
 		},
 		afterEach() {
-			FlexState.clearState(sFlexReference);
 			this.oModel.destroy();
 			this.oVariantManagement.destroy();
+			FlexState.clearState(sFlexReference);
 			flSettings.getInstance.restore();
 			ManifestUtils.getFlexReferenceForControl.restore();
 			sandbox.restore();
@@ -333,7 +333,7 @@ sap.ui.define([
 			assert.equal(aItems.length, 5);
 
 			aItems[2].title = "Hugo";
-			this.oModel.getData().One.currentVariant = "v2"; // one way binding!
+			this.oModel.getData().currentVariant = "v2"; // one way binding!
 			this.oModel.checkUpdate(true);
 			await nextUIUpdate();
 
@@ -561,7 +561,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("Create Variants List with non favorited Standard", async function(assert) {
-			this.oModel.oData.One.variants[0].favorite = false;
+			this.oModel.oData.variants[0].favorite = false;
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			await this.oVariantManagement.waitForInit();
@@ -1250,9 +1250,9 @@ sap.ui.define([
 		});
 
 		QUnit.test("Checking _handleManageDeletePressed; deleted item is default variant and Standard marked as non favorite", async function(assert) {
-			this.oModel.oData.One.variants[0].favorite = false;
-			this.oModel.oData.One.currentVariant = "v1";
-			this.oModel.oData.One.defaultVariant = "v1";
+			this.oModel.oData.variants[0].favorite = false;
+			this.oModel.oData.currentVariant = "v1";
+			this.oModel.oData.defaultVariant = "v1";
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			await this.oVariantManagement.waitForInit();
@@ -1313,9 +1313,9 @@ sap.ui.define([
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves();
 			this._oVM.attachManage(fnOnManage);
 
-			this.oModel.oData.One.variants[0].favorite = false;
-			this.oModel.oData.One.currentVariant = "v1";
-			this.oModel.oData.One.defaultVariant = "v1";
+			this.oModel.oData.variants[0].favorite = false;
+			this.oModel.oData.currentVariant = "v1";
+			this.oModel.oData.defaultVariant = "v1";
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			await this.oVariantManagement.waitForInit();
@@ -1821,7 +1821,7 @@ sap.ui.define([
 			const oModel = oVM.getModel(oVM.getModelName());
 			assert.ok(oModel, "the VariantModel was created");
 			assert.ok(oModel.isA("sap.ui.fl.variants.VariantModel"), "model is a VariantModel instance");
-			assert.ok(oModel.getData()[sVMId], "the model contains data for the VM reference");
+			assert.ok(oModel.getData().variants?.length > 0, "the model contains variant data for the VM reference");
 
 			oVM.destroy();
 		});

@@ -2150,6 +2150,7 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual($oBlockersAreaRef.attr("role"), "list", "Blockers area has correct ARIA role");
+		assert.strictEqual($oBlockersAreaRef.attr("tabindex"), "-1", "Blockers list has tabindex=-1 to enable NVDA focus mode for listitem descendants");
 		assert.ok($oBlockersAreaRef.attr("aria-labelledby").indexOf(sBlockersAreaLabelId) > -1,
 			"Blockers area has appropriate hidden label");
 
@@ -2282,6 +2283,7 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual($oAppointmentsWrapperRef.attr("role"), "list", "Appointments wrapper has correct ARIA role list");
+		assert.strictEqual($oAppointmentsWrapperRef.attr("tabindex"), "-1", "Appointments list has tabindex=-1 to enable NVDA focus mode for listitem descendants");
 		assert.strictEqual($oAppointmentRef.attr("role"), "listitem", "Appointments have correct ARIA role");
 		assert.ok($oAppointmentRef.attr("aria-labelledby").indexOf(sHiddenSelectedTextId) === -1, "Non-selected appointments don't have a hidden \"Selected\" text in aria-labelledby");
 		assert.ok($oAppointmentRef.attr("aria-labelledby").indexOf(sAppointmentLabelId) > -1,

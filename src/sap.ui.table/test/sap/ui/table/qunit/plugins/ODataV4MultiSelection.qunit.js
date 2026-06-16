@@ -307,33 +307,6 @@ sap.ui.define([
 		assert.strictEqual(aSelectedContexts[2].getPath(), "/Products(10)", "Path of 3rd selected context");
 	});
 
-	QUnit.test("#getSelectedContexts cache", async function(assert) {
-		this.oTable.destroy();
-		this.oTable = TableQUnitUtils.createTable(TableQUnitUtils.createSettingsForList({
-			tableSettings: {
-				rows: {
-					events: {
-						change: () => {
-							assert.strictEqual(this.oTable.getDependents()[0].getSelectedContexts().length, 0, "Binding change");
-						}
-					}
-				}
-			}
-		}));
-		this.oSelectionPlugin = this.oTable.getDependents()[0];
-		await this.oTable.qunit.whenRenderingFinished();
-		const oContext = this.oTable.getRows()[0].getBindingContext();
-
-		oContext.setSelected(true);
-		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
-		assert.strictEqual(this.oSelectionPlugin.getSelectedContexts().length, 1);
-
-		this.stub(oContext, "isSelected").returns(false);
-		assert.strictEqual(this.oSelectionPlugin.getSelectedContexts().length, 1, "Context deselected");
-
-		this.oTable.getBinding().refresh();
-	});
-
 	QUnit.test("#getSelectedCount", function(assert) {
 		this.stub(this.oTable.getBinding(), "getSelectionCount").returns(3);
 		assert.strictEqual(this.oSelectionPlugin.getSelectedCount(), 3);

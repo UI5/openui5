@@ -403,8 +403,9 @@ TableRenderer.renderNoData = function(rm, oControl) {
 	}
 	rm.openEnd();
 
+	rm.openStart("td").attr("role", "none").openEnd().close("td"); // empty cell for the highlight column
 	rm.openStart("td", oControl.getId("nodata-text"));
-	rm.attr("colspan", oControl.getColCount()); // no data cell must span all columns
+	rm.attr("colspan", oControl.getColCount() - 2); // no data cell must span all columns except highlight and navigated column
 	rm.class("sapMListTblCell").class("sapMListTblCellNoData");
 	if (oControl.getNoData() === null || ( typeof oControl.getNoData() === "string" || !oControl.getNoData().isA("sap.m.IllustratedMessage"))) {
 		rm.class("sapMListTblCellNoIllustratedMessage");
@@ -423,6 +424,7 @@ TableRenderer.renderNoData = function(rm, oControl) {
 	}
 
 	rm.close("td");
+	rm.openStart("td").attr("role", "none").openEnd().close("td"); // empty cell for the navigated column
 	rm.close("tr");
 };
 
