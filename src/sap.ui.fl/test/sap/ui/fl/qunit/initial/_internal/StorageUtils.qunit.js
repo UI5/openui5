@@ -447,6 +447,86 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("getWriteConnectors", {
+		beforeEach() {
+			this.oGetConnectorsStub = sandbox.stub(Utils, "getConnectors").resolves([]);
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("delegates to getConnectors with the write namespace and no static file connector", async function(assert) {
+			await Utils.getWriteConnectors();
+			assert.strictEqual(this.oGetConnectorsStub.callCount, 1, "getConnectors is called once");
+			const [sNamespace, bLoadConnectors] = this.oGetConnectorsStub.getCall(0).args;
+			assert.ok(sNamespace.includes("write/_internal/connectors/"), "the write connector namespace is used");
+			assert.strictEqual(bLoadConnectors, false, "static file connector is not added");
+		});
+	});
+
+	QUnit.module("getWriteConnectorConfigByLayer", {
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("throws when no layer is provided", async function(assert) {
+			try {
+				await Utils.getWriteConnectorConfigByLayer();
+				assert.ok(false, "should have thrown");
+			} catch (oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "correct error message");
+			}
+		});
+
+		QUnit.test("throws when no connector is configured for the given layer", async function(assert) {
+			sandbox.stub(Utils, "getWriteConnectors").resolves([
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER] }
+			]);
+			try {
+				await Utils.getWriteConnectorConfigByLayer(Layer.USER);
+				assert.ok(false, "should have thrown");
+			} catch (oError) {
+				assert.ok(
+					oError.message.includes(`No Connector configuration could be found to write into layer: ${Layer.USER}`),
+					"error message names the missing layer"
+				);
+			}
+		});
+
+		QUnit.test("throws when multiple connectors are configured for the given layer", async function(assert) {
+			sandbox.stub(Utils, "getWriteConnectors").resolves([
+				{ connector: "ConnectorA", layers: [Layer.CUSTOMER] },
+				{ connector: "ConnectorB", layers: [Layer.CUSTOMER] }
+			]);
+			try {
+				await Utils.getWriteConnectorConfigByLayer(Layer.CUSTOMER);
+				assert.ok(false, "should have thrown");
+			} catch (oError) {
+				assert.ok(
+					oError.message.includes(`Multiple Connector configurations were found to write into layer: ${Layer.CUSTOMER}`),
+					"error message names the ambiguous layer"
+				);
+			}
+		});
+
+		QUnit.test("returns the connector config when exactly one connector matches the layer", async function(assert) {
+			const oExpectedConfig = { connector: "KeyUserConnector", layers: [Layer.CUSTOMER] };
+			sandbox.stub(Utils, "getWriteConnectors").resolves([
+				oExpectedConfig,
+				{ connector: "PersonalizationConnector", layers: [Layer.USER] }
+			]);
+			const oConnectorConfig = await Utils.getWriteConnectorConfigByLayer(Layer.CUSTOMER);
+			assert.deepEqual(oConnectorConfig, oExpectedConfig, "the matching connector config is returned");
+		});
+
+		QUnit.test("returns the connector config when the connector supports all layers", async function(assert) {
+			const oExpectedConfig = { connector: "LrepConnector", layers: ["ALL"] };
+			sandbox.stub(Utils, "getWriteConnectors").resolves([oExpectedConfig]);
+			const oConnectorConfig = await Utils.getWriteConnectorConfigByLayer(Layer.CUSTOMER);
+			assert.deepEqual(oConnectorConfig, oExpectedConfig, "the connector with ALL layers matches");
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});

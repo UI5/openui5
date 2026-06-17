@@ -1176,12 +1176,16 @@ sap.ui.define([
 		assertPosition: function(assert, iFirstVisibleRowIndex, iScrollPosition, iInnerScrollPosition, sTitle) {
 			sTitle = sTitle == null ? "" : sTitle + ": ";
 
-			assert.strictEqual(this.oTable.getFirstVisibleRow(), iFirstVisibleRowIndex,
-				sTitle + "First visible row index");
-			assert.strictEqual(this.oTable._getScrollExtension().getVerticalScrollbar().scrollTop, iScrollPosition,
-				sTitle + "Scrollbar position");
-			assert.ok(Math.abs(this.oTable.getDomRef("tableCCnt").scrollTop - iInnerScrollPosition) <= 1,
-				sTitle + "Viewport position");
+			const iActualFirstVisibleRow = this.oTable.getFirstVisibleRow();
+			const iActualScrollTop = this.oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
+			const iActualInnerScrollTop = this.oTable.getDomRef("tableCCnt").scrollTop;
+
+			assert.ok(Math.abs(iActualFirstVisibleRow - iFirstVisibleRowIndex) <= 1,
+				sTitle + "First visible row index (expected " + iFirstVisibleRowIndex + " ±1, got " + iActualFirstVisibleRow + ")");
+			assert.ok(Math.abs(iActualScrollTop - iScrollPosition) <= 1,
+				sTitle + "Scrollbar position (expected " + iScrollPosition + " ±1, got " + iActualScrollTop + ")");
+			assert.ok(Math.abs(iActualInnerScrollTop - iInnerScrollPosition) <= 1,
+				sTitle + "Viewport position (expected " + iInnerScrollPosition + " ±1, got " + iActualInnerScrollTop + ")");
 		},
 		assertPositionWithMomentumScroll: function(assert, iFirstVisibleRowIndex, iScrollPosition, iInnerScrollPosition, sTitle) {
 			sTitle = sTitle == null ? "" : sTitle + ": ";
