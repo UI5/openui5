@@ -411,7 +411,7 @@
             <copyright>Mathias Bynens</copyright>
             <pattern>sap/ui/thirdparty/punycode.js</pattern>
         </lib>
-        <lib name="handlebars" displayName="handlebars" version="4.7.7" homepage="http://handlebarsjs.com/">
+        <lib name="handlebars" displayName="handlebars" version="4.7.9" homepage="http://handlebarsjs.com/">
             <license url="https://github.com/handlebars-lang/handlebars.js/" type="MIT" />
             <copyright>2011-2019 by Yehuda Katz</copyright>
             <pattern>sap/ui/thirdparty/handlebars.js</pattern>
