@@ -63,10 +63,28 @@ sap.ui.define([
 		}
 	};
 
-	var INITIAL_CONNECTOR_NAME_SPACE = "sap/ui/fl/initial/_internal/connectors/";
-	var STATIC_FILE_CONNECTOR_CONFIGURATION = {
+	const WRITE_CONNECTOR_NAME_SPACE = "sap/ui/fl/write/_internal/connectors/";
+	const INITIAL_CONNECTOR_NAME_SPACE = "sap/ui/fl/initial/_internal/connectors/";
+	const STATIC_FILE_CONNECTOR_CONFIGURATION = {
 		connector: "StaticFileConnector"
 	};
+
+	function findConnectorConfigForLayer(sLayer, aConnectors) {
+		const aFilteredConnectors = aConnectors.filter(function(oConnector) {
+			return oConnector.layers.indexOf("ALL") !== -1 || oConnector.layers.indexOf(sLayer) !== -1;
+		});
+
+		if (aFilteredConnectors.length === 0) {
+			throw new Error(`No Connector configuration could be found to write into layer: ${sLayer}`);
+		}
+
+		if (aFilteredConnectors.length > 1) {
+			throw new Error("sap.ui.core.Configuration 'flexibilityServices' has a misconfiguration: Multiple "
+				+ `Connector configurations were found to write into layer: ${sLayer}`);
+		}
+
+		return aFilteredConnectors[0];
+	}
 
 	function _filterValidLayers(aLayers, aConnectorLayers) {
 		var aValidLayers = [];
@@ -184,6 +202,29 @@ sap.ui.define([
 	};
 
 	/**
+	 * Provides all mandatory connectors to write data; these are the connector mentioned in the core-Configuration.
+	 *
+	 * @returns {Promise<map[]>} Resolving with a list of maps for all configured write connectors and their requested modules
+	 */
+	StorageUtils.getWriteConnectors = function() {
+		return StorageUtils.getConnectors(WRITE_CONNECTOR_NAME_SPACE, false);
+	};
+
+	/**
+	 * Determines the write connector in charge for a given layer.
+	 *
+	 * @param {string} sLayer - Layer on which the file should be stored
+	 * @returns {Promise<sap.ui.fl.write.connectors.BaseConnector>} Returns the connector in charge for the layer or rejects in case no connector can be determined
+	 */
+	StorageUtils.getWriteConnectorConfigByLayer = async function(sLayer) {
+		if (!sLayer) {
+			throw new Error("No layer was provided");
+		}
+		const oWriteConnectors = await StorageUtils.getWriteConnectors();
+		return findConnectorConfigForLayer(sLayer, oWriteConnectors);
+	};
+
+	/**
 	 * Provides all mandatory connectors required to read data for the initial case; these are the static
 	 * file connector as well as all connectors mentioned in the core-Configuration.
 	 *
@@ -191,7 +232,7 @@ sap.ui.define([
 	 * @returns {Promise<map[]>} Resolving with a list of maps for all configured initial connectors and their requested modules
 	 */
 	StorageUtils.getLoadConnectors = function(bSkipAddStaticFileConnector) {
-		return this.getConnectors(INITIAL_CONNECTOR_NAME_SPACE, true, bSkipAddStaticFileConnector);
+		return StorageUtils.getConnectors(INITIAL_CONNECTOR_NAME_SPACE, true, bSkipAddStaticFileConnector);
 	};
 
 	/**

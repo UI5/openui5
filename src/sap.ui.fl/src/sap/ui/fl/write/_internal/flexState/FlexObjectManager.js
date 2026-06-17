@@ -18,6 +18,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/write/_internal/condenser/Condenser",
 	"sap/ui/fl/write/_internal/Storage",
@@ -41,6 +42,7 @@ sap.ui.define([
 	FlexState,
 	ManifestUtils,
 	Settings,
+	StorageUtils,
 	Version,
 	Condenser,
 	Storage,
@@ -103,6 +105,21 @@ sap.ui.define([
 		return aChanges.length === 0 || aChanges
 		.map((oChange) => oChange[sFunctionName]())
 		.filter((vValue, iIndex, aArray) => aArray.indexOf(vValue) === iIndex).length === 1;
+	}
+
+	async function checkIfOneConnectorForAllLayers(mFlexObjectsPerLayer) {
+		const aUniqueLayers = Object.keys(mFlexObjectsPerLayer);
+		if (aUniqueLayers.length <= 1) {
+			return true;
+		}
+		const oFirstConnector = await StorageUtils.getWriteConnectorConfigByLayer(aUniqueLayers.shift());
+		for (const sLayer of aUniqueLayers) {
+			const oConnector = await StorageUtils.getWriteConnectorConfigByLayer(sLayer);
+			if (oFirstConnector !== oConnector) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	function canGivenChangesBeCondensed(oAppComponent, aFlexObjects, bCondenseAnyLayer) {
@@ -295,52 +312,73 @@ sap.ui.define([
 			&& canGivenChangesBeCondensed(mPropertyBag.appComponent, aRelevantChangesForCondensing, mPropertyBag.condenseAnyLayer)
 		);
 		const aAllFlexObjects = bIsCondensingEnabled ? aRelevantChangesForCondensing : mPropertyBag.dirtyFlexObjects;
-		const aChangesClone = aAllFlexObjects.slice(0);
+		const mFlexObjectsPerLayer = aAllFlexObjects.reduce((mChanges, oFlexObject) => {
+			const sLayer = oFlexObject.getLayer();
+			mChanges[sLayer] ||= [];
+			mChanges[sLayer].push(oFlexObject);
+			return mChanges;
+		}, {});
 
-		// if there are multiple backends or transport requests, all changes must be saved separately
+		// if there are multiple connectors or transport requests, all changes must be saved separately
 		if (
-			checkIfNotMoreThanOne(mPropertyBag.dirtyFlexObjects, "getRequest")
-			&& (Settings.getInstanceOrUndef()?.getHasPersoConnector()
-				? checkIfNotMoreThanOne(mPropertyBag.dirtyFlexObjects, "getLayer")
-				: true
-			)
+			checkIfNotMoreThanOne(mPropertyBag.dirtyFlexObjects, "getRequest") &&
+			await checkIfOneConnectorForAllLayers(mFlexObjectsPerLayer)
 		) {
-			const aCondensedChanges = canGivenChangesBeCondensed(mPropertyBag.appComponent, aChangesClone, mPropertyBag.condenseAnyLayer)
-				? await Condenser.condense(mPropertyBag.appComponent, aChangesClone)
-				: aChangesClone;
+			const aChangesClone = aAllFlexObjects.slice(0);
+			let aCondensedChanges = aChangesClone;
+			// if condensing is enabled, the changes were already checked for condensing.
+			// Otherwise aChangesClone only holds the dirty changes, which were not checked yet.
+			if (bIsCondensingEnabled || canGivenChangesBeCondensed(mPropertyBag.appComponent, aChangesClone, mPropertyBag.condenseAnyLayer)) {
+				aCondensedChanges = await Condenser.condense(mPropertyBag.appComponent, aChangesClone);
+			}
 
-			let oResponse;
+			const oResponse = {
+				response: []
+			};
 			const sRequest = aChangesClone[0].getRequest();
+			const aLayerEntries = Object.entries(mFlexObjectsPerLayer)
+			.sort(([sLayerA], [sLayerB]) => LayerUtils.getLayerIndex(sLayerA) - LayerUtils.getLayerIndex(sLayerB));
 			if (bIsCondensingEnabled) {
-				oResponse = await Storage.condense({
-					allChanges: aAllFlexObjects,
-					condensedChanges: aCondensedChanges,
-					layer: mPropertyBag.layer,
-					transport: sRequest,
-					isLegacyVariant: false,
-					parentVersion: mPropertyBag.parentVersion
-				});
-			} else {
-				const aDeletedChanges = aAllFlexObjects.filter((oChange) => oChange.getState() === States.LifecycleState.DELETED);
-				const oGroupedChanges = Object.groupBy(aCondensedChanges, (oChange) => oChange.getState());
-
-				// "remove" and "update" only support a single change; multiple calls are required
-				if (aDeletedChanges.length || oGroupedChanges[States.LifecycleState.UPDATED]?.length) {
-					await saveSequenceOfDirtyChanges(
-						[...aDeletedChanges, ...oGroupedChanges[States.LifecycleState.UPDATED] || []], mPropertyBag.skipUpdateCache,
-						mPropertyBag.parentVersion, mPropertyBag.reference
-					);
-				}
-
-				// "write" supports multiple changes at once
-				if (oGroupedChanges[States.LifecycleState.NEW]?.length) {
-					oResponse = await Storage.write({
-						layer: mPropertyBag.layer,
-						flexObjects: oGroupedChanges[States.LifecycleState.NEW].map((oChange) => oChange.convertToFileContent()),
+				for (const [sLayer, aLayerChanges] of aLayerEntries) {
+					const oCurrentResponse = await Storage.condense({
+						allChanges: aLayerChanges,
+						condensedChanges: aCondensedChanges.filter((oChange) => oChange.getLayer() === sLayer),
+						layer: sLayer,
 						transport: sRequest,
 						isLegacyVariant: false,
 						parentVersion: mPropertyBag.parentVersion
 					});
+					if (oCurrentResponse?.response) {
+						oResponse.response.push(...oCurrentResponse.response);
+					}
+				}
+			} else {
+				for (const [sLayer, aLayerChanges] of aLayerEntries) {
+					const aDeletedChanges = aLayerChanges.filter((oChange) => oChange.getState() === States.LifecycleState.DELETED);
+					const aCondensedLayerChanges = aCondensedChanges.filter((oChange) => oChange.getLayer() === sLayer);
+					const oGroupedChanges = Object.groupBy(aCondensedLayerChanges, (oChange) => oChange.getState());
+
+					// "remove" and "update" only support a single change; multiple calls are required
+					if (aDeletedChanges.length || oGroupedChanges[States.LifecycleState.UPDATED]?.length) {
+						await saveSequenceOfDirtyChanges(
+							[...aDeletedChanges, ...oGroupedChanges[States.LifecycleState.UPDATED] || []], mPropertyBag.skipUpdateCache,
+							mPropertyBag.parentVersion, mPropertyBag.reference
+						);
+					}
+
+					// "write" supports multiple changes at once
+					if (oGroupedChanges[States.LifecycleState.NEW]?.length) {
+						const oCurrentResponse = await Storage.write({
+							layer: sLayer,
+							flexObjects: oGroupedChanges[States.LifecycleState.NEW].map((oChange) => oChange.convertToFileContent()),
+							transport: sRequest,
+							isLegacyVariant: false,
+							parentVersion: mPropertyBag.parentVersion
+						});
+						if (oCurrentResponse?.response) {
+							oResponse.response.push(...oCurrentResponse.response);
+						}
+					}
 				}
 			}
 			updateCacheAndDeleteUnsavedChanges(
@@ -351,7 +389,7 @@ sap.ui.define([
 				mPropertyBag.reference,
 				mPropertyBag.appComponent.getId()
 			);
-			return oResponse || { response: [] };
+			return oResponse;
 		}
 		return saveSequenceOfDirtyChanges(
 			mPropertyBag.dirtyFlexObjects,

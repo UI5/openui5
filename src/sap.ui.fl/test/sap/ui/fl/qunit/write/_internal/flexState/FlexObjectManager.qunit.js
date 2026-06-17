@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/write/_internal/condenser/Condenser",
 	"sap/ui/fl/write/_internal/connectors/SessionStorageConnector",
@@ -36,6 +37,7 @@ sap.ui.define([
 	FlexState,
 	ManifestUtils,
 	Settings,
+	StorageUtils,
 	Version,
 	Condenser,
 	SessionStorageConnector,
@@ -431,7 +433,6 @@ sap.ui.define([
 	QUnit.module("saveFlexObjects with two dirty changes", {
 		beforeEach() {
 			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({
-				hasPersoConnector: false,
 				isCondensingEnabled: true
 			}));
 			sandbox.stub(ManifestUtils, "getFlexReferenceForSelector").returns(sReference);
@@ -597,8 +598,10 @@ sap.ui.define([
 			assert.strictEqual(this.oCondenserStub.args[0][1].length, 8, "all flex objects were passed");
 		});
 
-		QUnit.test("with additional changes in a different layer and a separate perso connector", async function(assert) {
-			sandbox.stub(Settings.getInstanceOrUndef(), "getHasPersoConnector").returns(true);
+		QUnit.test("with additional changes in a different layer going to a different backend — saved sequentially", async function(assert) {
+			sandbox.stub(StorageUtils, "getWriteConnectorConfigByLayer")
+			.withArgs(Layer.CUSTOMER).resolves({ connector: "LrepConnector" })
+			.withArgs(Layer.USER).resolves({ connector: "PersonalizationConnector" });
 			const aAdditionalChanges = UIChangeManager.addDirtyChanges(sReference, [
 				{
 					fileName: "notSavedChange", layer: Layer.USER, selector: { id: "control1" }
@@ -877,6 +880,74 @@ sap.ui.define([
 			assert.strictEqual(this.oStorageCondenseStub.callCount, 1, "the Storage.condense was called once");
 			assert.strictEqual(this.oStorageWriteStub.callCount, 0, "the Storage.write was not called");
 			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 0, "FlexState.update was not called");
+		});
+
+		QUnit.test("with dirty changes in two layers going to the same backend — writes lowest layer first", async function(assert) {
+			const oConnectorConfig = { connector: "LrepConnector" };
+			sandbox.stub(StorageUtils, "getWriteConnectorConfigByLayer").resolves(oConnectorConfig);
+			UIChangeManager.addDirtyChanges(sReference, [
+				{ fileName: "customerBaseChange1", layer: Layer.CUSTOMER_BASE, selector: { id: "control1" } }
+			], this.oAppComponent);
+
+			await FlexObjectManager.saveFlexObjects({
+				selector: this.oAppComponent,
+				layer: Layer.CUSTOMER
+			});
+
+			assert.strictEqual(this.oStorageWriteStub.callCount, 2, "Storage.write was called once per layer");
+			assert.strictEqual(
+				this.oStorageWriteStub.getCall(0).args[0].layer, Layer.CUSTOMER_BASE,
+				"the lower layer (CUSTOMER_BASE) was written first"
+			);
+			assert.strictEqual(
+				this.oStorageWriteStub.getCall(1).args[0].layer, Layer.CUSTOMER,
+				"the higher layer (CUSTOMER) was written second"
+			);
+		});
+
+		QUnit.test("with dirty changes in two layers and condenseAnyLayer going to the same backend — condenses lowest layer first", async function(assert) {
+			const oConnectorConfig = { connector: "LrepConnector" };
+			sandbox.stub(StorageUtils, "getWriteConnectorConfigByLayer").resolves(oConnectorConfig);
+			const aUserChanges = FlexState.addDirtyFlexObjects(sReference, [
+				FlexObjectFactory.createVariantChange({ id: "userChange1", layer: Layer.USER, selector: { id: "control1" } })
+			], this.oAppComponent.getId());
+			this.oCondenserStub.restore();
+			this.oCondenserStub = sandbox.stub(Condenser, "condense").resolves([...this.aChanges, ...aUserChanges]);
+
+			await FlexObjectManager.saveFlexObjects({
+				selector: this.oAppComponent,
+				condenseAnyLayer: true
+			});
+
+			assert.strictEqual(this.oStorageCondenseStub.callCount, 2, "Storage.condense was called once per layer");
+			assert.strictEqual(
+				this.oStorageCondenseStub.getCall(0).args[0].layer, Layer.CUSTOMER,
+				"the lower layer (CUSTOMER) was condensed first"
+			);
+			assert.strictEqual(
+				this.oStorageCondenseStub.getCall(1).args[0].layer, Layer.USER,
+				"the higher layer (USER) was condensed second"
+			);
+		});
+
+		QUnit.test("with dirty changes in two layers going to different backends — falls back to sequential save", async function(assert) {
+			const oConnectorA = { connector: "LrepConnector" };
+			const oConnectorB = { connector: "PersonalizationConnector" };
+			sandbox.stub(StorageUtils, "getWriteConnectorConfigByLayer")
+			.withArgs(Layer.CUSTOMER).resolves(oConnectorA)
+			.withArgs(Layer.CUSTOMER_BASE).resolves(oConnectorB);
+			UIChangeManager.addDirtyChanges(sReference, [
+				{ fileName: "customerBaseChange1", layer: Layer.CUSTOMER_BASE, selector: { id: "control1" } }
+			], this.oAppComponent);
+
+			await FlexObjectManager.saveFlexObjects({
+				selector: this.oAppComponent,
+				layer: Layer.CUSTOMER
+			});
+
+			assert.strictEqual(this.oCondenserStub.callCount, 0, "the Condenser was not called");
+			assert.strictEqual(this.oStorageCondenseStub.callCount, 0, "Storage.condense was not called");
+			assert.strictEqual(this.oStorageWriteStub.callCount, 3, "Storage.write was called once per dirty change");
 		});
 	});
 

@@ -787,7 +787,8 @@ sap.ui.define([
 	 * @private
 	 */
 	ItemNavigation.prototype.onsapfocusleave = function(oEvent) {
-		if (!oEvent.relatedControlId || !this.oDomRef || !this.oDomRef.contains(Element.getElementById(oEvent.relatedControlId).getFocusDomRef())) {
+		const oOldDomRef = oEvent.relatedControlId && Element.getElementById(oEvent.relatedControlId)?.getFocusDomRef();
+		if (!oOldDomRef || !this.oDomRef || !this.oDomRef.contains(oOldDomRef)) {
 
 			// entirely leaving the control handled by this ItemNavigation instance
 			var iIndex;
@@ -815,7 +816,7 @@ sap.ui.define([
 					}
 				}
 
-				if (!oEvent.relatedControlId || oParentDomRef.contains(Element.getElementById(oEvent.relatedControlId).getFocusDomRef())) {
+				if (!oOldDomRef || oParentDomRef.contains(oOldDomRef)) {
 					jQuery(this.aItemDomRefs[this.iFocusedIndex]).attr("tabindex", -1);
 				}
 			}
