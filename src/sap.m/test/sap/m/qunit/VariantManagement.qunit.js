@@ -1617,9 +1617,9 @@ sap.ui.define([
 
 	QUnit.test("check binding on items is propagated into dialog", async function(assert) {
 		const oVariantsModel = new JSONModel({variants: [
-			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", author: "A", favorite: true, visible: true},
-			{variantKey: "2", variantTitlePart1: "Two", variantTitlePart2: " and Two", favorite: false, visible: true},
-			{variantKey: "3", variantTitlePart1: "Three", variantTitlePart2: " and Three", favorite: false, visible: false}
+			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", author: "A", favorite: true, visible: true, sharingMode: "Public"},
+			{variantKey: "2", variantTitlePart1: "Two", variantTitlePart2: " and Two", favorite: false, visible: true, sharingMode: "Private"},
+			{variantKey: "3", variantTitlePart1: "Three", variantTitlePart2: " and Three", favorite: false, visible: false, sharingMode: "Public"}
 		]});
 
 		this.oVM.setModel(oVariantsModel);
@@ -1630,7 +1630,8 @@ sap.ui.define([
 				key: "{variantKey}",
 				title: {parts: [{path: 'variantTitlePart1'}, {path: 'variantTitlePart2'}], formatter: (part1, part2) => `Title: ${part1}${part2}`},
 				author: "Constant Author",
-				visible: "{visible}"
+				visible: "{visible}",
+				sharing: "{sharingMode}"
 			})
 		});
 
@@ -1662,7 +1663,7 @@ sap.ui.define([
 			assert.ok(aCells[1].isA("sap.m.Input"),  "expected controltype found");
 			assert.equal(aCells[1].getValue(), "Title: One and One", "expected title found");
 
-			assert.equal(aCells[2].getText(), "Public", "expected sharing info found");
+			assert.equal(aCells[2].getText(), "Public", "expected sharing info resolved via 'sharingMode' path");
 			assert.ok(aCells[3].getSelected(), "expected default info found");
 			assert.ok(!aCells[4].getSelected(), "expected apply automatically info found");
 			assert.equal(aCells[6].getText(), "Constant Author", "expected author found");
@@ -1680,7 +1681,7 @@ sap.ui.define([
 			assert.ok(aCells[1].isA("sap.m.Input"),  "expected controltype found");
 			assert.equal(aCells[1].getValue(), "Title: Two and Two", "expected title found");
 
-			assert.equal(aCells[2].getText(), "Public", "expected sharing info found");
+			assert.equal(aCells[2].getText(), "Private", "expected sharing info resolved via 'sharingMode' path");
 			assert.ok(!aCells[3].getSelected(), "expected default info found");
 			assert.ok(!aCells[4].getSelected(), "expected apply automatically info found");
 			assert.equal(aCells[6].getText(), "Constant Author", "expected author found");
