@@ -135,7 +135,8 @@
 				// check for an existing test page and check for test suite or page
 				oXHRQueue.ajax(sTestPage).then(function(sData) {
 					if (/(?:window\.suite\s*=|function\s*suite\s*\(\s*\)\s*{)/.test(sData)
-							|| (/data-sap-ui-testsuite/.test(sData) && !/sap\/ui\/test\/starter\/runTest/.test(sData)) ) {
+							|| (/data-sap-ui-testsuite/.test(sData) && !/sap\/ui\/test\/starter\/runTest/.test(sData))
+							|| /sap\/ui\/test\/starter\/createSuite/.test(sData) ) {
 						var $frame = jQuery("<iframe>");
 						var that = this;
 
@@ -294,12 +295,12 @@
 		},
 
 		printTestResultAndRemoveFrame : function (oInst, $frame, $framediv, oContext) {
-			var oCoverage = $frame[0].contentWindow._$blanket;
+			var oBlanketCoverage = $frame[0].contentWindow._$blanket;
 
 			// in case of coverage either merge it or set it on the _$blanket object
-			if (oCoverage) {
+			if (oBlanketCoverage) {
 				window._$blanket = window._$blanket || {};
-				jQuery.each(oCoverage, function(sModule, aCoverageInfo) {
+				jQuery.each(oBlanketCoverage, function(sModule, aCoverageInfo) {
 					if (!window._$blanket[sModule]) {
 						window._$blanket[sModule] = aCoverageInfo;
 					} else {
@@ -464,7 +465,46 @@
 		},
 
 		getCoverage: function() {
-			return window._$blanket;
+			return window._$blanket || window.top.__coverage__;
+		},
+
+		reportCoverage: function (reportToEl) {
+			var oCoverage = this.getCoverage();
+
+			if (!oCoverage) {
+				return;
+			}
+
+			if ( window.blanket && !window.top.__coverage__ ) {
+				window.blanket.report({});
+			} else {
+				jQuery.ajax("/.ui5/coverage/report", {
+					method: "POST",
+					data: JSON.stringify(window.top.__coverage__),
+					headers: {
+						"Content-Type": "application/json"
+					}
+				})
+				.then(function (oData) {
+					var aReports = oData.availableReports;
+					var oHTMLReport = aReports.filter(function (oCurReport) {
+						// HTML is the only one that make sense and
+						// provides understandable information
+						return oCurReport.report === "html";
+					})[0];
+
+					if (!oHTMLReport) { // Do not render reports if HTML or lcov are not provided
+						return;
+					}
+
+					var oFrameEl = document.createElement("iframe");
+					oFrameEl.src = "/.ui5/coverage/report/" + oHTMLReport.destination;
+					oFrameEl.style.border = "none";
+					oFrameEl.style.width = "100%";
+					oFrameEl.style.height = "100vh";
+					reportToEl.appendChild(oFrameEl);
+				});
+			}
 		},
 
 		getTestPageUrl: function(sFallbackUrl) {
