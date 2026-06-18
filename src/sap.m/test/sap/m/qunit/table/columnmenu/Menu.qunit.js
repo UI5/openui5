@@ -605,6 +605,48 @@ sap.ui.define([
 		assert.notOk(this.oColumnMenu._oIllustratedMessage.getDomRef(), "Illustrated message is not rendered");
 	});
 
+	QUnit.test("Quick actions container doesn't get role region when there are no items", async function(assert) {
+		this.createMenu(true, false, false, false);
+		this.oColumnMenu.openBy(this.oButton);
+		await nextUIUpdate();
+
+		const oQuickActionsDiv = this.oColumnMenu.getDomRef().querySelector(".sapMTCMenuQAList");
+		assert.ok(oQuickActionsDiv, "Quick actions container is rendered");
+		assert.equal(oQuickActionsDiv.getAttribute("role"), undefined, "Quick actions container has no region role when there are no items");
+		assert.equal(oQuickActionsDiv.getAttribute("aria-label"), undefined, "Quick actions container has no aria-label when there are no items");
+	});
+
+	QUnit.test("Items container doesn't get role region when there are no quick actions", async function(assert) {
+		this.createMenu(false, true, false, false);
+		this.oColumnMenu.openBy(this.oButton);
+		await nextUIUpdate();
+
+		const oItemsContainerDiv = this.oColumnMenu.getDomRef().querySelector(".sapMTCMenuContainerWrapper");
+		assert.ok(oItemsContainerDiv, "Items container wrapper is rendered");
+		assert.equal(oItemsContainerDiv.getAttribute("role"), undefined, "Items container wrapper has no region role when there are no quick actions");
+		assert.equal(oItemsContainerDiv.getAttribute("aria-label"), undefined, "Items container wrapper has no aria-label when there are no quick actions");
+	});
+
+	QUnit.test("Quick actions and items container region role and aria-label", async function(assert) {
+		this.createMenu(true, true, false, false);
+		this.oColumnMenu.openBy(this.oButton);
+		await nextUIUpdate();
+
+		const oQuickActionsDiv = this.oColumnMenu.getDomRef().querySelector(".sapMTCMenuQAList");
+		assert.ok(oQuickActionsDiv, "Quick actions container is rendered");
+		assert.equal(oQuickActionsDiv.getAttribute("role"), "region", "Quick actions container has role=region when items are also present");
+		assert.equal(oQuickActionsDiv.getAttribute("aria-label"),
+			this.oColumnMenu._getResourceText("table.COLUMNMENU_QUICK_ACTIONS_REGION_LABEL"),
+			"Quick actions container has correct aria-label");
+
+		const oItemsContainerDiv = this.oColumnMenu.getDomRef().querySelector(".sapMTCMenuContainerWrapper");
+		assert.ok(oItemsContainerDiv, "Items container wrapper is rendered");
+		assert.equal(oItemsContainerDiv.getAttribute("role"), "region", "Items container wrapper has role=region");
+		assert.equal(oItemsContainerDiv.getAttribute("aria-label"),
+			this.oColumnMenu._getResourceText("table.COLUMNMENU_ITEMS_REGION_LABEL"),
+			"Items container wrapper has correct aria-label");
+	});
+
 	QUnit.module("Accessibility", {
 		beforeEach: async function() {
 			this.oColumnMenu = new Menu({
