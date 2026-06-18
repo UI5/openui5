@@ -269,20 +269,38 @@ sap.ui.define([
 
 	/**
 	 * Loads the UI changes for a specific FL variant.
+	 * The request also returns the variant and its changes (also of referenced variants).
 	 * Used for lazy loading when switching to a variant with variantDependentControlChangesRemoved: true.
+	 *
+	 * If the requested variant does not belong to the requested <code>vmReference</code>
+	 * (e.g. when the caller speculatively requested a variant that ends up belonging to
+	 * a different VM, or when the response covers a VM that is no longer in the
+	 * application), the entire response is discarded and nothing is added to the FlexState.
 	 *
 	 * @param {object} mPropertyBag - Object with the necessary properties
 	 * @param {string} mPropertyBag.reference - Flex reference
 	 * @param {string} mPropertyBag.componentId - Component ID
 	 * @param {string} mPropertyBag.vmReference - Variant management reference
 	 * @param {string} mPropertyBag.variantId - Variant ID to load content for
-	 * @returns {Promise<object>} Resolves with the new data that was added
+	 * @returns {Promise<undefined>} Resolves when the load has completed
 	 */
 	VariantManagerApply.loadVariantDependentControlChanges = async function(mPropertyBag) {
 		const oBackendResponse = await Storage.loadFlVariantDependentControlChanges({
 			reference: mPropertyBag.reference,
 			variantId: mPropertyBag.variantId
 		});
+
+		// Discard the entire response if the response says the requested variant
+		// belongs to a different VM. This happens when the caller speculatively
+		// requested a variant that turns out to belong to a different VM (e.g.
+		// URL-driven initial load). If the variant is not in the response at all,
+		// it is already loaded and only the changes are coming back - keep the
+		// response.
+		const oRequestedVariant = (oBackendResponse.variants || [])
+		.find((oVariant) => oVariant.fileName === mPropertyBag.variantId);
+		if (oRequestedVariant && oRequestedVariant.variantManagementReference !== mPropertyBag.vmReference) {
+			return;
+		}
 
 		FlexState.addNewObjects({
 			reference: mPropertyBag.reference,
@@ -297,8 +315,6 @@ sap.ui.define([
 			vReference: mPropertyBag.variantId
 		});
 		oVariant.instance.setVariantDependentControlChangesRemoved(false);
-
-		return oBackendResponse;
 	};
 
 	return VariantManagerApply;

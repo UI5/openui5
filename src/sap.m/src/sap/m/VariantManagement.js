@@ -2552,6 +2552,18 @@ sap.ui.define([
 		// roles
 		const oRolesCell = this._createRolesCell(oItem, oContext);
 
+		const oSharingBinding = fnCreateBinding("sharing");
+		const oSharingText = new Text(sIdPrefix + "-type-" + nPos, {
+			text: {
+				path: oSharingBinding.parts?.[0]?.path ?? "sharing",
+				model: oSharingBinding.parts?.[0]?.model ?? sModelName,
+				formatter: function(sValue) {
+					return this._oRb.getText(sValue === "Private" ? "VARIANT_MANAGEMENT_PRIVATE" : "VARIANT_MANAGEMENT_PUBLIC");
+				}.bind(this)
+			},
+			textAlign: "Center"
+		});
+
 		const oDefaultRadioButton = new RadioButton(sIdPrefix + "-def-" + nPos, {
 			groupName: this.getId(),
 			select: fSelectRB,
@@ -2575,16 +2587,7 @@ sap.ui.define([
 			cells: [
 				oFavoriteIcon,
 				oNameControl,
-				new Text(sIdPrefix + "-type-" + nPos, {
-					text: {
-						path: "sharing",
-						model: sModelName,
-						formatter: function(sValue) {
-							return this._oRb.getText(sValue === "Private" ? "VARIANT_MANAGEMENT_PRIVATE" : "VARIANT_MANAGEMENT_PUBLIC");
-						}.bind(this)
-					},
-					textAlign: "Center"
-				}),
+				oSharingText,
 				oDefaultRadioButton,
 				oExecuteOnSelectCtrl,
 				oRolesCell,
@@ -2850,9 +2853,9 @@ sap.ui.define([
 		for (let i = 0; i < aTableItems.length; i++) {
 			const oRow = aTableItems[i];
 			if (oRow.getVisible()) {
-				const oBindingContext = oRow.getBindingContext("$mVariants");
+				const oBindingContext = oRow.getBindingContext(this._sModelName);
 				if (oBindingContext) {
-					const oRowItem = oBindingContext.getObject();
+					const oRowItem = this._findVariantItem(oBindingContext);
 					if (oRowItem && oRowItem.getKey() === sCurrentKey) {
 						nCurrentIndex = i;
 						break;
@@ -2866,13 +2869,13 @@ sap.ui.define([
 		}
 
 		// Try to find the next visible row
-		let oFoundRow = _findVisibleRowFromIndex(aTableItems, nCurrentIndex + 1, aTableItems.length, 1);
+		let oFoundRow = _findVisibleRowFromIndex(aTableItems, nCurrentIndex + 1, aTableItems.length, 1, this._sModelName);
 		if (oFoundRow) {
 			return oFoundRow;
 		}
 
 		// If no next row found, try to find the previous visible row
-		oFoundRow = _findVisibleRowFromIndex(aTableItems, nCurrentIndex - 1, -1, -1);
+		oFoundRow = _findVisibleRowFromIndex(aTableItems, nCurrentIndex - 1, -1, -1, this._sModelName);
 		if (oFoundRow) {
 			return oFoundRow;
 		}
@@ -2883,17 +2886,11 @@ sap.ui.define([
 	/**
 	 * Helper function to find a visible row with valid binding context in a given direction
 	 */
-	function _findVisibleRowFromIndex(aTableItems, nStartIndex, nEndIndex, nStep) {
+	function _findVisibleRowFromIndex(aTableItems, nStartIndex, nEndIndex, nStep, sModelName) {
 		for (let i = nStartIndex; (nStep > 0 ? i < nEndIndex : i > nEndIndex); i += nStep) {
 			const oRow = aTableItems[i];
-			if (oRow && oRow.getVisible()) {
-				const oBindingContext = oRow.getBindingContext("$mVariants");
-				if (oBindingContext) {
-					const oRowItem = oBindingContext.getObject();
-					if (oRowItem) {
-						return oRow;
-					}
-				}
+			if (oRow && oRow.getVisible() && oRow.getBindingContext(sModelName)) {
+				return oRow;
 			}
 		}
 		return null;
@@ -3313,11 +3310,11 @@ sap.ui.define([
 			aItems = this.oManagementTable.getItems();
 			aItems.some((oItem) => {
 				let sTitleLowerCase;
-				const oObject = oItem.getBindingContext(this._sModelName).getObject();
-				if (oObject?.visible) {
+				const oVariantItem = this._findVariantItem(oItem.getBindingContext(this._sModelName));
+				if (oVariantItem && oVariantItem.getVisible()) {
 					var oInput = oItem.getCells()[VariantManagement.COLUMN_NAME_IDX];
 
-					if (oInput && (oObject.key !== sKey)) {
+					if (oInput && (oVariantItem.getKey() !== sKey)) {
 						if (oInput.isA("sap.m.Input")) {
 							sTitleLowerCase = oInput.getValue().toLowerCase();
 						} else {

@@ -1401,7 +1401,9 @@ sap.ui.define([
 			}
 		}
 
-		refreshCSSClasses(sName, "", true);
+		if (oConfig.names && !oConfig.noClasses) {
+			refreshCSSClasses(sName, "", true);
+		}
 		delete mEventRegistry["media_" + sName];
 		delete oQuerySets[sName];
 	};

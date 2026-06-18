@@ -567,6 +567,13 @@ sap.ui.define([
 				}
 			},
 
+			"apply/_internal/controlVariants/resolveInitialVariantFromURL": {
+				group: "Apply Internal",
+				coverage: {
+					only: ["sap/ui/fl/apply/_internal/controlVariants/resolveInitialVariantFromURL"]
+				}
+			},
+
 			"apply/_internal/flexObjects/AnnotationChange": {
 				group: "Apply Internal",
 				coverage: {

@@ -618,6 +618,7 @@ sap.ui.define([
 			});
 			oVariantWithRemovedContent.setVariantDependentControlChangesRemoved(true);
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oStandardVariant, oVariantWithRemovedContent]);
+			this.oVariantWithRemovedContent = oVariantWithRemovedContent;
 		},
 		afterEach() {
 			FlexState.clearState();
@@ -673,40 +674,87 @@ sap.ui.define([
 		});
 
 		QUnit.test("loadVariantDependentControlChanges clears variantDependentControlChangesRemoved on loaded variant", async function(assert) {
-			const oBackendResponse = { changes: { variantDependentControlChanges: [{ fileName: "changeFromBackend" }] } };
-			const oLoadFlVariantDependentControlChangesStub = sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
-			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
-			const oVariantData = VariantManagementState.getVariant({
-				reference: sReference,
-				vmReference: sVMReference,
-				vReference: "variantWithRemovedContent"
-			});
+			const oBackendResponse = {
+				variants: [{
+					fileName: "variantWithRemovedContent",
+					fileType: "ctrl_variant",
+					variantManagementReference: sVMReference
+				}],
+				variantChanges: [{
+					fileName: "vChange1", fileType: "ctrl_variant_change", variantId: "variantWithRemovedContent"
+				}],
+				variantDependentControlChanges: [{
+					fileName: "uiChange1", fileType: "change", variantReference: "variantWithRemovedContent"
+				}]
+			};
+			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
+			// Stub getVariant because the test variant was registered via stubFlexObjectsSelector,
+			// not via real init - so the runtime persistence does not contain it.
+			sandbox.stub(VariantManagementState, "getVariant").returns({ instance: this.oVariantWithRemovedContent });
 			assert.ok(
-				oVariantData.instance.getVariantDependentControlChangesRemoved(),
+				this.oVariantWithRemovedContent.getVariantDependentControlChangesRemoved(),
 				"precondition: variant content is marked as removed"
 			);
 
-			const oResult = await VariantManagerApply.loadVariantDependentControlChanges({
+			await VariantManagerApply.loadVariantDependentControlChanges({
 				reference: sReference,
 				componentId: oComponent.getId(),
 				vmReference: sVMReference,
 				variantId: "variantWithRemovedContent"
 			});
 
-			assert.deepEqual(oLoadFlVariantDependentControlChangesStub.firstCall.args[0], {
-				reference: sReference,
-				variantId: "variantWithRemovedContent"
-			}, "then Storage.loadFlVariantDependentControlChanges is called with the correct parameters");
-			assert.deepEqual(oAddNewObjectsSpy.firstCall.args[0], {
-				reference: sReference,
-				componentId: oComponent.getId(),
-				newData: oBackendResponse
-			}, "then backend response is added to FlexState");
 			assert.notOk(
-				oVariantData.instance.getVariantDependentControlChangesRemoved(),
+				this.oVariantWithRemovedContent.getVariantDependentControlChangesRemoved(),
 				"then the variantDependentControlChangesRemoved flag is cleared"
 			);
-			assert.deepEqual(oResult, oBackendResponse, "then the backend response is returned");
+		});
+
+		QUnit.test("loadVariantDependentControlChanges discards the response when the requested variant belongs to a different VM", async function(assert) {
+			const oBackendResponse = {
+				variants: [
+					{ fileName: "foreignVariant", fileType: "ctrl_variant", variantManagementReference: "someOtherVM" }
+				],
+				variantChanges: [
+					{ fileName: "foreignVChange", fileType: "ctrl_variant_change", variantId: "foreignVariant" }
+				],
+				variantDependentControlChanges: [
+					{ fileName: "foreignUiChange", fileType: "change", variantReference: "foreignVariant" }
+				]
+			};
+			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
+			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
+
+			await VariantManagerApply.loadVariantDependentControlChanges({
+				reference: sReference,
+				componentId: oComponent.getId(),
+				vmReference: sVMReference,
+				variantId: "foreignVariant"
+			});
+
+			assert.strictEqual(oAddNewObjectsSpy.callCount, 0, "addNewObjects is not called");
+		});
+
+		QUnit.test("loadVariantDependentControlChanges adds the response when the variant is already loaded and only changes are returned", async function(assert) {
+			const oBackendResponse = {
+				variants: [],
+				variantChanges: [],
+				variantDependentControlChanges: [{
+					fileName: "uiChange1", fileType: "change", variantReference: "variantWithRemovedContent"
+				}]
+			};
+			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
+			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
+			sandbox.stub(VariantManagementState, "getVariant").returns({ instance: this.oVariantWithRemovedContent });
+
+			await VariantManagerApply.loadVariantDependentControlChanges({
+				reference: sReference,
+				componentId: oComponent.getId(),
+				vmReference: sVMReference,
+				variantId: "variantWithRemovedContent"
+			});
+
+			assert.strictEqual(oAddNewObjectsSpy.callCount, 1, "addNewObjects is called");
+			assert.deepEqual(oAddNewObjectsSpy.firstCall.args[0].newData, oBackendResponse, "the response is passed as-is");
 		});
 	});
 

@@ -64,27 +64,16 @@ sap.ui.define([
 	const mVariantSwitchPromises = {};
 
 	function getInitialCurrentVariant(sReference, aCtrlVariantManagementChanges, aVariants) {
-		var oComponentData = FlexState.getComponentData(sReference);
-		let aVariantReferencesFromUrl = (oComponentData && ObjectPath.get(
-			["technicalParameters", VariantsApplyUtil.VARIANT_TECHNICAL_PARAMETER],
-			oComponentData
-		)) || [];
+		const aVariantReferencesFromUrl = VariantsApplyUtil.getVariantReferencesFromURL(
+			FlexState.getComponentData(sReference)
+		);
 
 		// Only visible variants can be current
-		var aVariantKeys = aVariants.filter((oVariant) => {
-			return oVariant.visible;
-		})
-		.map((oVariant) => {
-			return oVariant.key;
-		});
+		const aVariantKeys = aVariants
+		.filter((oVariant) => oVariant.visible)
+		.map((oVariant) => oVariant.key);
 
-		// Check if variant is set via url parameter
-		// Legacy URLs can have multiple variant technical parameter instances (length > 1)
-		if (aVariantReferencesFromUrl.length === 1) {
-			aVariantReferencesFromUrl = aVariantReferencesFromUrl[0].split(",");
-		}
-
-		var sDesiredSelectedVariantId = aVariantKeys.find((sVariantKey) => {
+		const sDesiredSelectedVariantId = aVariantKeys.find((sVariantKey) => {
 			return aVariantReferencesFromUrl.includes(sVariantKey);
 		});
 		if (sDesiredSelectedVariantId) {
@@ -98,12 +87,8 @@ sap.ui.define([
 		return aCtrlVariantManagementChanges
 		.slice()
 		.reverse()
-		.map((oVariantManagementChange) => {
-			return oVariantManagementChange.getContent().defaultVariant;
-		})
-		.find((sDesiredDefaultVariantKey) => {
-			return aVariantKeys.includes(sDesiredDefaultVariantKey);
-		});
+		.map((oVariantManagementChange) => oVariantManagementChange.getContent().defaultVariant)
+		.find((sDesiredDefaultVariantKey) => aVariantKeys.includes(sDesiredDefaultVariantKey));
 	}
 
 	function createVariantManagement(aCtrlVariantManagementChanges, sReference, sVMReference) {

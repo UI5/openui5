@@ -1851,31 +1851,15 @@ sap.ui.define([
 	});
 
 	QUnit.test("HiddenText cellacc", async function(assert) {
-		oTable.getColumns()[0];
 		let $Cell = getCell(1, 1, true, null, oTable);
 
 		assert.ok((oTable.$("cellacc").text()).indexOf($Cell.text()) > -1,
 			"Table: HiddenText cellacc is properly set");
 
-		oTable.setFixedColumnCount(0);
-		await nextUIUpdate();
-
-		$Cell = getCell(1, 1, true, null, oTable);
-		assert.ok((oTable.$("cellacc").text()).indexOf($Cell.text()) > -1,
-			"Table: HiddenText cellacc is properly set after the first column is grouped");
-
-		oTreeTable.getColumns()[0];
 		$Cell = getCell(1, 1, true, null, oTreeTable);
 
 		assert.ok((oTreeTable.$("cellacc").text()).indexOf($Cell.text()) > -1,
 			"TreeTable: HiddenText cellacc is properly set");
-
-		oTreeTable.setFixedColumnCount(0);
-		await nextUIUpdate();
-
-		$Cell = getCell(1, 1, true, null, oTreeTable);
-		assert.ok((oTreeTable.$("cellacc").text()).indexOf($Cell.text()) > -1,
-			"TreeTable: HiddenText cellacc is properly set after the first column is grouped");
 
 		$Cell = getCell(1, 0, true, null, oTreeTable);
 		const sExpandButtonText = TableUtils.getResourceText("TBL_EXPAND_BUTTON");

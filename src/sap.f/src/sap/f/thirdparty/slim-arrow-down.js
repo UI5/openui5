@@ -1,2 +1,25 @@
-sap.ui.define(["exports","sap/f/thirdparty/Theme","sap/f/thirdparty/Icons","sap/f/thirdparty/information"],function(t,o,c,n){"use strict";const s="search";const a="M470 426q10 9 10 22.5T470 471q-9 9-22 9t-23-9L308 353q-45 31-100 31-36 0-68-13.5T84 333t-38-56-14-69q0-36 14-68t38-56 56-38 68-14 68 14 56 38 38 56 14 68q0 28-8.5 53T353 308zm-262-74q30 0 56-11t45.5-30.5 31-46T352 208t-11.5-56-31-45.5-45.5-31T208 64t-56.5 11.5-46 31T75 152t-11 56 11 56.5 30.5 46 46 30.5 56.5 11z";const e=true;const i=n.ICON_SEARCH;const r="SAP-icons-v4";const l="@ui5/webcomponents-icons";c.y(s,{pathData:a,ltr:e,accData:i,collection:r,packageName:l});const q="search";const p="M473 436q7 7 7 18t-7.5 18.5T454 480q-10 0-18-8l-95-95q-51 39-117 39-40 0-75-15t-61-41-41-61-15-75 15-75 41-61 61-41 75-15 75 15 61 41 41 61 15 75q0 64-39 117zM83 224q0 30 11 55.5t30 44.5 44.5 30 55.5 11 55.5-11 44.5-30 30-44.5 11-55.5-11-55.5-30-44.5-44.5-30T224 83t-55.5 11-44.5 30-30 44.5T83 224z";const m=true;const h=n.ICON_SEARCH;const w="SAP-icons-v5";const T="@ui5/webcomponents-icons";c.y(q,{pathData:p,ltr:m,accData:h,collection:w,packageName:T});var u="search";const f="slim-arrow-down";const d="M420.5 187q11-12 23 0 5 5 5 11t-5 11l-165 165q-10 9-23 9t-22-9l-166-165q-5-5-5-11.5t5-11.5 11.5-5 11.5 5l160 160q5 6 11 0z";const y=false;const A="SAP-icons-v4";const D="@ui5/webcomponents-icons";c.y(f,{pathData:d,ltr:y,collection:A,packageName:D});const v="slim-arrow-down";const z="M96 186q0-11 7.5-18.5T122 160q10 0 18 8l116 121 116-121q8-8 18-8 11 0 18.5 7.5T416 186q0 10-7 17L275 344q-8 8-19 8-12 0-18-8L103 203q-7-7-7-17z";const N=false;const S="SAP-icons-v5";const M="@ui5/webcomponents-icons";c.y(v,{pathData:z,ltr:N,collection:S,packageName:M});var b="slim-arrow-down";t.search=u;t.slimArrowDown=b});
-//# sourceMappingURL=slim-arrow-down.js.map
+sap.ui.define(['exports', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons'], (function (exports, Theme, Icons) { 'use strict';
+
+	const name$1 = "slim-arrow-down";
+	const pathData$1 = "M13.13 5.178c.227-.237.466-.237.715 0a.445.445 0 0 1 .155.327.445.445 0 0 1-.155.327l-5.13 4.9A1.065 1.065 0 0 1 8 11a.953.953 0 0 1-.684-.267l-5.16-4.901A.46.46 0 0 1 2 5.49a.46.46 0 0 1 .155-.341.503.503 0 0 1 .715 0L7.845 9.9c.103.119.217.119.342 0l4.943-4.723Z";
+	const ltr$1 = false;
+	const viewBox$1 = "0 0 16 16";
+	const collection$1 = "SAP-icons-v4";
+	const packageName$1 = "@ui5/webcomponents-icons";
+
+	Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, viewBox: viewBox$1, collection: collection$1, packageName: packageName$1 });
+
+	const name = "slim-arrow-down";
+	const pathData = "M12.83 6.273a.75.75 0 0 1-.104 1.056l-4.247 3.5a.75.75 0 0 1-.954 0l-4.252-3.5a.75.75 0 0 1 .954-1.158l3.775 3.107 3.771-3.107a.75.75 0 0 1 1.056.102Z";
+	const ltr = false;
+	const viewBox = "0 0 16 16";
+	const collection = "SAP-icons-v5";
+	const packageName = "@ui5/webcomponents-icons";
+
+	Icons.y(name, { pathData, ltr, viewBox, collection, packageName });
+
+	var slimArrowDown = "slim-arrow-down";
+
+	exports.slimArrowDown = slimArrowDown;
+
+}));

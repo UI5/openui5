@@ -44,6 +44,29 @@ sap.ui.define([
 
 		VARIANT_TECHNICAL_PARAMETER: "sap-ui-fl-control-variant-id",
 
+		/**
+		 * Returns the variant references encoded in the application's URL
+		 * technical parameters, given the application's component data.
+		 *
+		 * Handles both the legacy single-entry comma-separated form and the
+		 * modern multi-entry array form. Returns an empty array if no parameter
+		 * is set.
+		 *
+		 * @param {object} [oComponentData] - Component data of the application, as returned by FlexState.getComponentData
+		 * @returns {string[]} Variant references found in the URL
+		 * @private
+		 * @ui5-restricted sap.ui.fl
+		 */
+		getVariantReferencesFromURL(oComponentData) {
+			const aRawParam = oComponentData?.technicalParameters?.[
+				VariantsApplyUtil.VARIANT_TECHNICAL_PARAMETER
+			] || [];
+			if (aRawParam.length === 1) {
+				return aRawParam[0].split(",");
+			}
+			return [...aRawParam];
+		},
+
 		compareVariants(oVariant1, oVariant2) {
 			if (oVariant1.getName().toLowerCase() < oVariant2.getName().toLowerCase()) {
 				return -1;

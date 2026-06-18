@@ -7,6 +7,9 @@ sap.ui.define([
 	"sap/ui/mdc/Table",
 	"sap/ui/mdc/enums/TableP13nMode",
 	"sap/ui/mdc/enums/ProcessingStrategy",
+	// Pre-populates the require cache so 'sap.ui.fl' can synchronously register the Table change handlers; otherwise the
+	// async registration races with 'Engine#createChanges' and changes are silently dropped, making the tests unstable.
+	"sap/ui/mdc/flexibility/Table.flexibility",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/base/util/Deferred"
 ], function(
@@ -17,6 +20,7 @@ sap.ui.define([
 	Table,
 	TableP13nMode,
 	ProcessingStrategy,
+	TableFlexHandler,
 	nextUIUpdate,
 	Deferred
 ) {

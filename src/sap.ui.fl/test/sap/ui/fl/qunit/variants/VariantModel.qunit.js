@@ -910,6 +910,7 @@ sap.ui.define([
 				this.oVariantManagement.setShowExecuteOnSelection.calledWith(false),
 				"showExecuteOnSelection is set to false"
 			);
+			await fnRegisterToModelSpy.firstCall.returnValue;
 			await VariantManagementState.waitForVariantSwitch(sReference, this.sVMReference);
 			assert.strictEqual(
 				FlexObjectState.waitForFlexObjectsToBeApplied.callCount, 1,

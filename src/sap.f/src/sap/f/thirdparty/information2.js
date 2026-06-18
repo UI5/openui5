@@ -1,2 +1,0 @@
-sap.ui.define(["exports","sap/f/thirdparty/Theme","sap/f/thirdparty/information"],function(r,a,t){"use strict";var i="error";var e="alert";var o="information";r.alert=e;r.error=i;r.information=o});
-//# sourceMappingURL=information2.js.map
