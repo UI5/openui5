@@ -8,11 +8,13 @@ sap.ui.define([
 	"sap/base/util/restricted/_omit",
 	"sap/base/util/Deferred",
 	"sap/base/util/merge",
+	"sap/base/Log",
 	"sap/m/library",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
+	"sap/ui/fl/apply/_internal/controlVariants/resolveInitialVariantFromURL",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
@@ -33,11 +35,13 @@ sap.ui.define([
 	_omit,
 	Deferred,
 	merge,
+	Log,
 	mobileLibrary,
 	JsControlTreeModifier,
 	Lib,
 	URLHandler,
 	VariantUtil,
+	resolveInitialVariantFromURL,
 	FlexObjectFactory,
 	DependencyHandler,
 	VariantManagerApply,
@@ -403,7 +407,9 @@ sap.ui.define([
 
 		// the initial changes are not applied via a variant switch
 		// to enable early variant switches to work properly they need to wait for the initial changes
-		// so the initial changes are set as a variant switch
+		// so the initial changes are set as a variant switch.
+		// If the URL targets a variant that is not yet loaded, ensure it is loaded
+		// before the initial changes are awaited.
 		const mParameters = {
 			appComponent: this.oAppComponent,
 			reference: this.sFlexReference,
@@ -412,7 +418,17 @@ sap.ui.define([
 		VariantManagementState.setVariantSwitchPromise(
 			this.sFlexReference,
 			this.sVMReference,
-			waitForInitialVariantChanges(mParameters)
+			resolveInitialVariantFromURL({
+				reference: this.sFlexReference,
+				componentId: this.oAppComponent.getId(),
+				vmReference: this.sVMReference
+			})
+			.catch((oError) => {
+				// A failed lazy-load should not skip the initial-changes wait;
+				// getInitialCurrentVariant falls back to the default variant.
+				Log.error("URL-targeted variant lazy-load failed", oError);
+			})
+			.then(() => waitForInitialVariantChanges(mParameters))
 		);
 	};
 

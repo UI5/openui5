@@ -1,2 +1,1103 @@
-sap.ui.define(["exports"],function(_){"use strict";var T="إلغاء";var E="تحميل";var I="مقدمة موسعة";var A="مقدمة مصغرة";var L="توسيع المقدمة";var O="طي المقدمة";var S="تثبيت المقدمة";var N="إلغاء تثبيت المقدمة";var R="تبديل المقدمة";var C="العمود الأول";var D="عمود المنتصف";var M="العمود الأخير";var U="تغيير الحجم بين عمودي البدء والوسط";var B="تغيير الحجم بين عمودي الوسط والانتهاء";var r="بنود التنقل الإضافية";var a="يفتح عنصر القائمة هذا قائمة فرعية ويرتبط أيضًا بصفحة ما. وللانتقال إلى الصفحة، اضغط على Enter أو مفتاح السهم الأيمن لفتح القائمة الفرعية، ثم حدد العنصر الأول في القائمة الفرعية.";var P="الإشعارات";var v="المزيد";var G="أقل";var H="الإجراءات";var F="زر المزيد. إظهار النصوص الكاملة";var V="زر أقل. إظهار النصوص مقطوعة";var X="إغلاق";var W="تحميل";var Y="قراءة";var Z="غير مقروء";var K="معلومات الحالة";var e="الحالة: إيجابي";var t="الحالة: سلبي";var n="الحالة: حرج";var i="مهم";var u="مجموعة الإشعارات";var s="العداد";var f="توسيع/طي";var l="تم الطي";var o="تم التوسيع";var c="المخطط الزمني";var d="حالة المعلومات";var p="الحالة الإيجابية";var g="الحالة السلبية";var h="الحالة الحرجة";var x="إلغاء";var b="إعادة تسمية";var j="مُنهى";var k="معلّق";var m="قيد التحميل";var q="إنهاء";var w="إعادة المحاولة";var y="تحرير";var z="لم يتم العثور على أي ملفات";var J='قم بإسقاط الملفات لتحميلها أو استخدم الزر "تحميل".';var Q="تحميل المجموعة";var $="اسحب الملفات هنا.";var __="قم بإسقاط الملفات لتحميلها.";var T_="شريط Shell";var E_="الشعار";var I_="{0} {1}";var A_="معلومات إضافية";var L_="ستظهر نتائج البحث في المنطقة الرئيسية";var O_="{0} إشعارات";var S_="الإشعارات";var N_="ملف التعريف";var R_="المنتجات";var C_="أداة تبديل المنتج";var D_="المنتجات";var M_="بحث";var U_="حقل البحث";var B_="قائمة المستخدم";var r_="فتح البحث";var a_="إزالة الاقتراح";var P_="المزيد";var v_="إلغاء";var G_="شريط تقدم المعالِج";var H_="إلغاء";var F_="خطوات المعالِج";var V_="للتنشيط، اضغط على شريط المسافة أو إدخال";var X_="الخطوات";var W_="اختياري";var Y_="نشط";var Z_="غير نشط";var K_="الخطوة {0}";var e_="المعالِج";var t_="الخطوة";var n_="إعدادات العرض";var i_="موافق";var u_="إلغاء";var s_="إعادة تعيين";var f_="قامت إعادة التعيين بإرجاع جميع الإعدادات إلى الحالة الأولية";var l_="ترتيب";var o_="تصفية";var c_="المجموعة";var d_="تسلسل الترتيب";var p_="ترتيب المجموعات";var g_="تصفية حسب";var h_="ترتيب حسب";var x_="تجميع حسب";var b_="تصاعدي";var j_="تنازلي";var k_="{0} العداد {1}";var m_="نهنئك على أدائك المتميز وتفانيك في العمل!";var q_="عمل رائع!";var w_="لقد قمت بإعداد حسابك. هل تود أخذ جولة سريعة؟";var y_="نجحت!";var z_="فلنحصل على بعض النتائج";var J_="ابدأ بإدخال معايير البحث.";var Q_="لم تقم بإضافة أية أنشطة بعد.";var $_="هل تريد إضافة واحد الآن؟";var _T="إضافة الأعمدة للاطلاع على المحتوى";var TT="حدد الأعمدة التي تحتاجها في إعدادات الجدول.";var ET="لا تتوفر بيانات بعد.";var IT="بمجرد أن تتوفر، ستظهر هنا.";var AT="لا يوجد بريد";var LT="أعد التحقق مرة أخرى لاحقًا.";var OT="لا توجد أي إدخالات بعد";var ST="بمجرد أن تتوفر، ستظهر هنا.";var NT="ليس لديك إشعارات";var RT="أعد التحقق مرة أخرى لاحقًا.";var CT="ليس لديك أرقام تعريف شخصية";var DT="هل تريد إضافة واحد الآن؟";var MT="تعذر علينا العثور على ذلك.";var UT="جرِّب تعديل بحثك.";var BT="ليست لديك أي مهام";var rT="عندما تكون لديك مهام، ستظهر هنا.";var aT="يتعذر تحميل البيانات";var PT="تحقق من اتصالك بالإنترنت. وإذا لم يكن الأمر كذلك، فحاول إعادة التحميل. إذا كان هذا لا يزال غير مفيد، فتحقق من ذلك مع المسؤول لديك.";var vT="يتعذر تحميل الصورة";var GT="تعذر العثور على الصورة بالموقع المحدد أو أن الخادم لا يستجيب.";var HT="يتعذر تحميل البيانات";var FT="تحقق من الاتصال بالإنترنت لديك، إذا لم يكن هذا مفيدًا، تحقق من تنسيق الملف وحجم الملف. إذا لم يساعدك هذا الأمر أيضًا، يُرجى التحقق من المسؤول لديك.";var VT="ترحيل إلى SAP Integration Suite";var XT="انقل محتوى التكامل الخاص بك من اشتراك تكامل العمليات الموجود إلى إمكانية التكامل السحابي.";var WT="يبدو أن هناك مساحة متوفرة";var YT="يمكنك إضافة المزيد من الأعمدة في إعدادات الجدول.";var ZT="لم تقم بإضافة أي شخص إلى التقويم حتى الآن";var KT="هل تريد إضافة شخص ما الآن؟";var eT="لقد كنت موضع تقدير!";var tT="استمروا في العمل بجد!";var nT="لا شيء مخطط له حتى الآن";var iT="لا توجد أنشطة في هذا الإطار الزمني.";var uT="خيارات التصفية متوفرة";var sT="تساعدك عوامل التصفية على التركيز على ما هو أكثر ملاءمة لك.";var fT="حاول تجميع البنود للحصول على نظرة عامة أفضل";var lT="يمكنك اختيار فئات التجميع في إعدادات المجموعة.";var oT="رسالة بريد جديدة";var cT="لديك رسالة بريد جديدة في صندوق الوارد الخاص بك.";var dT="لم يتم العثور على أي نتائج";var pT="حاول تعديل معايير التصفية.";var gT="عذرًا، لا يمكننا العثور على هذه الصفحة";var hT="يُرجى مراجعة الرابط الذي تستخدمه لاستدعاء التطبيق.";var xT="اختيار عرض العمود الخاص بك";var bT="يمكنك تغيير حجم الأعمدة عن طريق سحب حدود العمود.";var jT="لقد تم تسجيل خروجك";var kT="يمكنك إغلاق هذه النافذة الآن.";var mT="ألا ترى أهم البنود أولاً؟";var qT="اختر معايير الترتيب في إعدادات الترتيب.";var wT="عمل رائع!";var yT="لقد أكملت جميع تعيينات التدريب الخاصة بك.";var zT="أسقط الملفات هنا";var JT="يمكنك أيضًا تحميل عدة ملفات مرة واحدة.";var QT="بعض الأبعاد مفقودة";var $T="أضف المزيد من الأبعاد لإكمال مخططك.";var _E="لا توجد بيانات مخطط";var TE="حاول تعديل إعدادات مخططك.";var EE="رأيك مهم";var IE="نريد أن نسمع رأيك حول برنامج SAP. شاركنا بتعليقاتك من خلال المشاركة في استطلاع الرأي القصير.";var AE="المحتوى الرئيسي";var LE="محتوى جانبي";var OE="تحديد المجال";var SE="حقل البحث";var NE="مسح البحث";var RE="بحث";var CE="إظهار المزيد";var DE="إظهار المزيد ({0})";var ME="فتح البحث";var UE="طي البحث";var BE="إلغاء";var rE="الاقتراحات";var aE="تنقل";var PE="شريط قائمة قوائم التنقل";var vE="بند قائمة قوائم التنقل";var GE="شجرة قائمة التنقل";var HE="بند شجرة قائمة التنقل";var FE="المزيد من البنود";var VE="عرض بنود التنقل الإضافية المخفية بسبب مساحة الشاشة المحدودة.";var XE="للانتقال إلى بند التنقل {0}، اضغط مفتاح المسافة أو Enter.";var WE="قائمة التنقل الأساسية";var YE="قائمة التنقل في التذييل";var ZE="طي";var KE="توسيع";var eE="الحسابات";var tE="إغلاق";var nE="إدارة الحساب";var iE="تسجيل الخروج";var uE="تحرير الصورة الرمزية";var sE="تحرير الحسابات";var fE="قائمة المستخدم لـ";var lE="رفض";var oE="مُحدد";var cE="معلومات المستخدم الحالي";var dE="الإجراءات";var pE="مربع حوار إعدادات المستخدم";var gE="بند إعدادات المستخدم";var hE="إغلاق";var xE="لا توجد نتائج بحث";var bE="تحرير الصورة الرمزية";var jE="إدارة الحساب";var kE={BARCODE_SCANNER_DIALOG_CANCEL_BUTTON_TXT:T,BARCODE_SCANNER_DIALOG_LOADING_TXT:E,DYNAMIC_PAGE_ARIA_LABEL_EXPANDED_HEADER:I,DYNAMIC_PAGE_ARIA_LABEL_SNAPPED_HEADER:A,DYNAMIC_PAGE_ARIA_LABEL_EXPAND_HEADER:L,DYNAMIC_PAGE_ARIA_LABEL_SNAP_HEADER:O,DYNAMIC_PAGE_ARIA_LABEL_PIN_HEADER:S,DYNAMIC_PAGE_ARIA_LABEL_UNPIN_HEADER:N,DYNAMIC_PAGE_ARIA_DESCR_TOGGLE_HEADER:R,FCL_START_COLUMN_TXT:C,FCL_MIDDLE_COLUMN_TXT:D,FCL_END_COLUMN_TXT:M,FCL_START_SEPARATOR_TOOLTIP:U,FCL_END_SEPARATOR_TOOLTIP:B,NAVIGATION_MENU_POPOVER_HIDDEN_TEXT:r,NAVIGATION_MENU_SELECTABLE_ITEM_HIDDEN_TEXT:a,NOTIFICATION_LIST_ACCESSIBLE_NAME:P,NOTIFICATION_LIST_ITEM_SHOW_MORE:v,NOTIFICATION_LIST_ITEM_SHOW_LESS:G,NOTIFICATION_LIST_ITEM_MENU_BTN_TITLE:H,NOTIFICATION_LIST_ITEM_MORE_LINK_LABEL_FULL:F,NOTIFICATION_LIST_ITEM_MORE_LINK_LABEL_TRUNCATE:V,NOTIFICATION_LIST_ITEM_CLOSE_BTN_TITLE:X,NOTIFICATION_LIST_ITEM_LOADING:W,NOTIFICATION_LIST_ITEM_READ:Y,NOTIFICATION_LIST_ITEM_UNREAD:Z,NOTIFICATION_LIST_ITEM_INFORMATION_STATUS_TXT:K,NOTIFICATION_LIST_ITEM_POSITIVE_STATUS_TXT:e,NOTIFICATION_LIST_ITEM_NEGATIVE_STATUS_TXT:t,NOTIFICATION_LIST_ITEM_CRITICAL_STATUS_TXT:n,NOTIFICATION_LIST_ITEM_IMPORTANT_TXT:i,NOTIFICATION_LIST_GROUP_ITEM_TXT:u,NOTIFICATION_LIST_GROUP_ITEM_COUNTER_TXT:s,NOTIFICATION_LIST_GROUP_ITEM_TOGGLE_ICON_COLLAPSE_TITLE:f,NOTIFICATION_LIST_GROUP_COLLAPSED:l,NOTIFICATION_LIST_GROUP_EXPANDED:o,TIMELINE_ARIA_LABEL:c,TIMELINE_ITEM_INFORMATION_STATE_TEXT:d,TIMELINE_ITEM_POSITIVE_STATE_TEXT:p,TIMELINE_ITEM_NEGATIVE_STATE_TEXT:g,TIMELINE_ITEM_CRITICAL_STATE_TEXT:h,UPLOADCOLLECTIONITEM_CANCELBUTTON_TEXT:x,UPLOADCOLLECTIONITEM_RENAMEBUTTON_TEXT:b,UPLOADCOLLECTIONITEM_ERROR_STATE:j,UPLOADCOLLECTIONITEM_READY_STATE:k,UPLOADCOLLECTIONITEM_UPLOADING_STATE:m,UPLOADCOLLECTIONITEM_TERMINATE_BUTTON_TEXT:q,UPLOADCOLLECTIONITEM_RETRY_BUTTON_TEXT:w,UPLOADCOLLECTIONITEM_EDIT_BUTTON_TEXT:y,UPLOADCOLLECTION_NO_DATA_TEXT:z,UPLOADCOLLECTION_NO_DATA_DESCRIPTION:J,UPLOADCOLLECTION_ARIA_ROLE_DESCRIPTION:Q,UPLOADCOLLECTION_DRAG_FILE_INDICATOR:$,UPLOADCOLLECTION_DROP_FILE_INDICATOR:__,SHELLBAR_LABEL:T_,SHELLBAR_LOGO:E_,SHELLBAR_LOGO_AREA:I_,SHELLBAR_ADDITIONAL_CONTEXT:A_,SHELLBAR_SEARCHFIELD_DESCRIPTION:L_,SHELLBAR_NOTIFICATIONS:O_,SHELLBAR_NOTIFICATIONS_NO_COUNT:S_,SHELLBAR_PROFILE:N_,SHELLBAR_PRODUCTS:R_,SHELLBAR_PRODUCT_SWITCH_BTN:C_,PRODUCT_SWITCH_CONTAINER_LABEL:D_,SHELLBAR_SEARCH:M_,SHELLBAR_SEARCH_FIELD:U_,SHELLBAR_IMAGE_BTN:B_,SHELLBAR_SEARCH_BTN_OPEN:r_,SEARCH_ITEM_DELETE_BUTTON_TOOLTIP:a_,SHELLBAR_OVERFLOW:P_,SHELLBAR_CANCEL:v_,WIZARD_NAV_ARIA_LABEL:G_,WIZARD_CANCEL_BUTTON:H_,WIZARD_LIST_ARIA_LABEL:F_,WIZARD_LIST_ARIA_DESCRIBEDBY:V_,WIZARD_ACTIONSHEET_STEPS_ARIA_LABEL:X_,WIZARD_OPTIONAL_STEP_ARIA_LABEL:W_,WIZARD_STEP_ACTIVE:Y_,WIZARD_STEP_INACTIVE:Z_,WIZARD_STEP_ARIA_LABEL:K_,WIZARD_NAV_ARIA_ROLE_DESCRIPTION:e_,WIZARD_NAV_STEP_DEFAULT_HEADING:t_,VSD_DIALOG_TITLE_SORT:n_,VSD_SUBMIT_BUTTON:i_,VSD_CANCEL_BUTTON:u_,VSD_RESET_BUTTON:s_,VSD_RESET_BUTTON_ACTION:f_,VSD_SORT_TOOLTIP:l_,VSD_FILTER_TOOLTIP:o_,VSD_GROUP_TOOLTIP:c_,VSD_SORT_ORDER:d_,VSD_GROUP_ORDER:p_,VSD_FILTER_BY:g_,VSD_SORT_BY:h_,VSD_GROUP_BY:x_,VSD_ORDER_ASCENDING:b_,VSD_ORDER_DESCENDING:j_,VSD_FILTER_ITEM_LABEL_TEXT:k_,IM_SUBTITLE_ACHIEVEMENT:m_,IM_TITLE_ACHIEVEMENT:q_,IM_SUBTITLE_USERHASSIGNEDUP:w_,IM_TITLE_USERHASSIGNEDUP:y_,IM_TITLE_BEFORESEARCH:z_,IM_SUBTITLE_BEFORESEARCH:J_,IM_TITLE_NOACTIVITIES:Q_,IM_SUBTITLE_NOACTIVITIES:$_,IM_TITLE_NOCOLUMNSSET:_T,IM_SUBTITLE_NOCOLUMNSSET:TT,IM_TITLE_NODATA:ET,IM_SUBTITLE_NODATA:IT,IM_TITLE_NOMAIL:AT,IM_SUBTITLE_NOMAIL:LT,IM_TITLE_NOENTRIES:OT,IM_SUBTITLE_NOENTRIES:ST,IM_TITLE_NONOTIFICATIONS:NT,IM_SUBTITLE_NONOTIFICATIONS:RT,IM_TITLE_NOSAVEDITEMS:CT,IM_SUBTITLE_NOSAVEDITEMS:DT,IM_TITLE_NOSEARCHRESULTS:MT,IM_SUBTITLE_NOSEARCHRESULTS:UT,IM_TITLE_NOTASKS:BT,IM_SUBTITLE_NOTASKS:rT,IM_TITLE_UNABLETOLOAD:aT,IM_SUBTITLE_UNABLETOLOAD:PT,IM_TITLE_UNABLETOLOADIMAGE:vT,IM_SUBTITLE_UNABLETOLOADIMAGE:GT,IM_TITLE_UNABLETOUPLOAD:HT,IM_SUBTITLE_UNABLETOUPLOAD:FT,IM_TITLE_UPLOADTOCLOUD:VT,IM_SUBTITLE_UPLOADTOCLOUD:XT,IM_TITLE_ADDCOLUMN:WT,IM_SUBTITLE_ADDCOLUMN:YT,IM_TITLE_ADDPEOPLE:ZT,IM_SUBTITLE_ADDPEOPLE:KT,IM_TITLE_BALLOONSKY:eT,IM_SUBTITLE_BALLOONSKY:tT,IM_TITLE_EMPTYPLANNINGCALENDAR:nT,IM_SUBTITLE_EMPTYPLANNINGCALENDAR:iT,IM_TITLE_FILTERTABLE:uT,IM_SUBTITLE_FILTERTABLE:sT,IM_TITLE_GROUPTABLE:fT,IM_SUBTITLE_GROUPTABLE:lT,IM_TITLE_NEWMAIL:oT,IM_SUBTITLE_NEWMAIL:cT,IM_TITLE_NOFILTERRESULTS:dT,IM_SUBTITLE_NOFILTERRESULTS:pT,IM_TITLE_PAGENOTFOUND:gT,IM_SUBTITLE_PAGENOTFOUND:hT,IM_TITLE_RESIZECOLUMN:xT,IM_SUBTITLE_RESIZECOLUMN:bT,IM_TITLE_SIGNOUT:jT,IM_SUBTITLE_SIGNOUT:kT,IM_TITLE_SORTCOLUMN:mT,IM_SUBTITLE_SORTCOLUMN:qT,IM_TITLE_SUCCESSSCREEN:wT,IM_SUBTITLE_SUCCESSSCREEN:yT,IM_TITLE_UPLOADCOLLECTION:zT,IM_SUBTITLE_UPLOADCOLLECTION:JT,IM_TITLE_ADDDIMENSIONS:QT,IM_SUBTITLE_ADDDIMENSIONS:$T,IM_TITLE_NODIMENSIONSSET:_E,IM_SUBTITLE_NODIMENSIONSSET:TE,IM_TITLE_SURVEY:EE,IM_SUBTITLE_SURVEY:IE,DSC_MAIN_ARIA_LABEL:AE,DSC_SIDE_ARIA_LABEL:LE,SEARCH_FIELD_SCOPE_SELECT_LABEL:OE,SEARCH_FIELD_LABEL:SE,SEARCH_FIELD_CLEAR_ICON:NE,SEARCH_FIELD_SEARCH_ICON:RE,SEARCH_ITEM_SHOW_MORE_NO_COUNT:CE,SEARCH_ITEM_SHOW_MORE_COUNT:DE,SHELLBAR_SEARCH_COLLAPSED:ME,SHELLBAR_SEARCH_EXPANDED:UE,SEARCH_CANCEL_BUTTON:BE,SEARCH_SUGGESTIONS:rE,SIDE_NAVIGATION_POPOVER_HIDDEN_TEXT:aE,SIDE_NAVIGATION_COLLAPSED_LIST_ARIA_ROLE_DESC:PE,SIDE_NAVIGATION_COLLAPSED_LIST_ITEMS_ARIA_ROLE_DESC:vE,SIDE_NAVIGATION_LIST_ARIA_ROLE_DESC:GE,SIDE_NAVIGATION_LIST_ITEMS_ARIA_ROLE_DESC:HE,SIDE_NAVIGATION_OVERFLOW_ACCESSIBLE_NAME:FE,SIDE_NAVIGATION_OVERFLOW_ITEM_LABEL:VE,SIDE_NAVIGATION_PARENT_ITEM_SELECTABLE_DESCRIPTION:XE,SIDE_NAVIGATION_FLEXIBLE_LIST_LABEL:WE,SIDE_NAVIGATION_FIXED_LIST_LABEL:YE,SIDE_NAVIGATION_ICON_COLLAPSE:ZE,SIDE_NAVIGATION_ICON_EXPAND:KE,USER_MENU_OTHER_ACCOUNT_BUTTON_TXT:eE,USER_MENU_CLOSE_BUTTON_TXT:tE,USER_MENU_MANAGE_ACCOUNT_BUTTON_TXT:nE,USER_MENU_SIGN_OUT_BUTTON_TXT:iE,USER_MENU_EDIT_AVATAR_TXT:uE,USER_MENU_EDIT_ACCOUNTS_TXT:sE,USER_MENU_POPOVER_ACCESSIBLE_NAME:fE,USER_MENU_CLOSE_DIALOG_BUTTON:lE,USER_MENU_POPOVER_ACCESSIBLE_ACCOUNT_SELECTED_TXT:oE,USER_MENU_CURRENT_INFORMATION_TXT:cE,USER_MENU_ACTIONS_TXT:dE,USER_SETTINGS_DIALOG_ACCESSIBLE_NAME:pE,USER_SETTINGS_LIST_ARIA_ROLE_DESC:gE,USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT:hE,USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT:xE,USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT:bE,USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT:jE};_.BARCODE_SCANNER_DIALOG_CANCEL_BUTTON_TXT=T;_.BARCODE_SCANNER_DIALOG_LOADING_TXT=E;_.DSC_MAIN_ARIA_LABEL=AE;_.DSC_SIDE_ARIA_LABEL=LE;_.DYNAMIC_PAGE_ARIA_DESCR_TOGGLE_HEADER=R;_.DYNAMIC_PAGE_ARIA_LABEL_EXPANDED_HEADER=I;_.DYNAMIC_PAGE_ARIA_LABEL_EXPAND_HEADER=L;_.DYNAMIC_PAGE_ARIA_LABEL_PIN_HEADER=S;_.DYNAMIC_PAGE_ARIA_LABEL_SNAPPED_HEADER=A;_.DYNAMIC_PAGE_ARIA_LABEL_SNAP_HEADER=O;_.DYNAMIC_PAGE_ARIA_LABEL_UNPIN_HEADER=N;_.FCL_END_COLUMN_TXT=M;_.FCL_END_SEPARATOR_TOOLTIP=B;_.FCL_MIDDLE_COLUMN_TXT=D;_.FCL_START_COLUMN_TXT=C;_.FCL_START_SEPARATOR_TOOLTIP=U;_.IM_SUBTITLE_ACHIEVEMENT=m_;_.IM_SUBTITLE_ADDCOLUMN=YT;_.IM_SUBTITLE_ADDDIMENSIONS=$T;_.IM_SUBTITLE_ADDPEOPLE=KT;_.IM_SUBTITLE_BALLOONSKY=tT;_.IM_SUBTITLE_BEFORESEARCH=J_;_.IM_SUBTITLE_EMPTYPLANNINGCALENDAR=iT;_.IM_SUBTITLE_FILTERTABLE=sT;_.IM_SUBTITLE_GROUPTABLE=lT;_.IM_SUBTITLE_NEWMAIL=cT;_.IM_SUBTITLE_NOACTIVITIES=$_;_.IM_SUBTITLE_NOCOLUMNSSET=TT;_.IM_SUBTITLE_NODATA=IT;_.IM_SUBTITLE_NODIMENSIONSSET=TE;_.IM_SUBTITLE_NOENTRIES=ST;_.IM_SUBTITLE_NOFILTERRESULTS=pT;_.IM_SUBTITLE_NOMAIL=LT;_.IM_SUBTITLE_NONOTIFICATIONS=RT;_.IM_SUBTITLE_NOSAVEDITEMS=DT;_.IM_SUBTITLE_NOSEARCHRESULTS=UT;_.IM_SUBTITLE_NOTASKS=rT;_.IM_SUBTITLE_PAGENOTFOUND=hT;_.IM_SUBTITLE_RESIZECOLUMN=bT;_.IM_SUBTITLE_SIGNOUT=kT;_.IM_SUBTITLE_SORTCOLUMN=qT;_.IM_SUBTITLE_SUCCESSSCREEN=yT;_.IM_SUBTITLE_SURVEY=IE;_.IM_SUBTITLE_UNABLETOLOAD=PT;_.IM_SUBTITLE_UNABLETOLOADIMAGE=GT;_.IM_SUBTITLE_UNABLETOUPLOAD=FT;_.IM_SUBTITLE_UPLOADCOLLECTION=JT;_.IM_SUBTITLE_UPLOADTOCLOUD=XT;_.IM_SUBTITLE_USERHASSIGNEDUP=w_;_.IM_TITLE_ACHIEVEMENT=q_;_.IM_TITLE_ADDCOLUMN=WT;_.IM_TITLE_ADDDIMENSIONS=QT;_.IM_TITLE_ADDPEOPLE=ZT;_.IM_TITLE_BALLOONSKY=eT;_.IM_TITLE_BEFORESEARCH=z_;_.IM_TITLE_EMPTYPLANNINGCALENDAR=nT;_.IM_TITLE_FILTERTABLE=uT;_.IM_TITLE_GROUPTABLE=fT;_.IM_TITLE_NEWMAIL=oT;_.IM_TITLE_NOACTIVITIES=Q_;_.IM_TITLE_NOCOLUMNSSET=_T;_.IM_TITLE_NODATA=ET;_.IM_TITLE_NODIMENSIONSSET=_E;_.IM_TITLE_NOENTRIES=OT;_.IM_TITLE_NOFILTERRESULTS=dT;_.IM_TITLE_NOMAIL=AT;_.IM_TITLE_NONOTIFICATIONS=NT;_.IM_TITLE_NOSAVEDITEMS=CT;_.IM_TITLE_NOSEARCHRESULTS=MT;_.IM_TITLE_NOTASKS=BT;_.IM_TITLE_PAGENOTFOUND=gT;_.IM_TITLE_RESIZECOLUMN=xT;_.IM_TITLE_SIGNOUT=jT;_.IM_TITLE_SORTCOLUMN=mT;_.IM_TITLE_SUCCESSSCREEN=wT;_.IM_TITLE_SURVEY=EE;_.IM_TITLE_UNABLETOLOAD=aT;_.IM_TITLE_UNABLETOLOADIMAGE=vT;_.IM_TITLE_UNABLETOUPLOAD=HT;_.IM_TITLE_UPLOADCOLLECTION=zT;_.IM_TITLE_UPLOADTOCLOUD=VT;_.IM_TITLE_USERHASSIGNEDUP=y_;_.NAVIGATION_MENU_POPOVER_HIDDEN_TEXT=r;_.NAVIGATION_MENU_SELECTABLE_ITEM_HIDDEN_TEXT=a;_.NOTIFICATION_LIST_ACCESSIBLE_NAME=P;_.NOTIFICATION_LIST_GROUP_COLLAPSED=l;_.NOTIFICATION_LIST_GROUP_EXPANDED=o;_.NOTIFICATION_LIST_GROUP_ITEM_COUNTER_TXT=s;_.NOTIFICATION_LIST_GROUP_ITEM_TOGGLE_ICON_COLLAPSE_TITLE=f;_.NOTIFICATION_LIST_GROUP_ITEM_TXT=u;_.NOTIFICATION_LIST_ITEM_CLOSE_BTN_TITLE=X;_.NOTIFICATION_LIST_ITEM_CRITICAL_STATUS_TXT=n;_.NOTIFICATION_LIST_ITEM_IMPORTANT_TXT=i;_.NOTIFICATION_LIST_ITEM_INFORMATION_STATUS_TXT=K;_.NOTIFICATION_LIST_ITEM_LOADING=W;_.NOTIFICATION_LIST_ITEM_MENU_BTN_TITLE=H;_.NOTIFICATION_LIST_ITEM_MORE_LINK_LABEL_FULL=F;_.NOTIFICATION_LIST_ITEM_MORE_LINK_LABEL_TRUNCATE=V;_.NOTIFICATION_LIST_ITEM_NEGATIVE_STATUS_TXT=t;_.NOTIFICATION_LIST_ITEM_POSITIVE_STATUS_TXT=e;_.NOTIFICATION_LIST_ITEM_READ=Y;_.NOTIFICATION_LIST_ITEM_SHOW_LESS=G;_.NOTIFICATION_LIST_ITEM_SHOW_MORE=v;_.NOTIFICATION_LIST_ITEM_UNREAD=Z;_.PRODUCT_SWITCH_CONTAINER_LABEL=D_;_.SEARCH_CANCEL_BUTTON=BE;_.SEARCH_FIELD_CLEAR_ICON=NE;_.SEARCH_FIELD_LABEL=SE;_.SEARCH_FIELD_SCOPE_SELECT_LABEL=OE;_.SEARCH_FIELD_SEARCH_ICON=RE;_.SEARCH_ITEM_DELETE_BUTTON_TOOLTIP=a_;_.SEARCH_ITEM_SHOW_MORE_COUNT=DE;_.SEARCH_ITEM_SHOW_MORE_NO_COUNT=CE;_.SEARCH_SUGGESTIONS=rE;_.SHELLBAR_ADDITIONAL_CONTEXT=A_;_.SHELLBAR_CANCEL=v_;_.SHELLBAR_IMAGE_BTN=B_;_.SHELLBAR_LABEL=T_;_.SHELLBAR_LOGO=E_;_.SHELLBAR_LOGO_AREA=I_;_.SHELLBAR_NOTIFICATIONS=O_;_.SHELLBAR_NOTIFICATIONS_NO_COUNT=S_;_.SHELLBAR_OVERFLOW=P_;_.SHELLBAR_PRODUCTS=R_;_.SHELLBAR_PRODUCT_SWITCH_BTN=C_;_.SHELLBAR_PROFILE=N_;_.SHELLBAR_SEARCH=M_;_.SHELLBAR_SEARCHFIELD_DESCRIPTION=L_;_.SHELLBAR_SEARCH_BTN_OPEN=r_;_.SHELLBAR_SEARCH_COLLAPSED=ME;_.SHELLBAR_SEARCH_EXPANDED=UE;_.SHELLBAR_SEARCH_FIELD=U_;_.SIDE_NAVIGATION_COLLAPSED_LIST_ARIA_ROLE_DESC=PE;_.SIDE_NAVIGATION_COLLAPSED_LIST_ITEMS_ARIA_ROLE_DESC=vE;_.SIDE_NAVIGATION_FIXED_LIST_LABEL=YE;_.SIDE_NAVIGATION_FLEXIBLE_LIST_LABEL=WE;_.SIDE_NAVIGATION_ICON_COLLAPSE=ZE;_.SIDE_NAVIGATION_ICON_EXPAND=KE;_.SIDE_NAVIGATION_LIST_ARIA_ROLE_DESC=GE;_.SIDE_NAVIGATION_LIST_ITEMS_ARIA_ROLE_DESC=HE;_.SIDE_NAVIGATION_OVERFLOW_ACCESSIBLE_NAME=FE;_.SIDE_NAVIGATION_OVERFLOW_ITEM_LABEL=VE;_.SIDE_NAVIGATION_PARENT_ITEM_SELECTABLE_DESCRIPTION=XE;_.SIDE_NAVIGATION_POPOVER_HIDDEN_TEXT=aE;_.TIMELINE_ARIA_LABEL=c;_.TIMELINE_ITEM_CRITICAL_STATE_TEXT=h;_.TIMELINE_ITEM_INFORMATION_STATE_TEXT=d;_.TIMELINE_ITEM_NEGATIVE_STATE_TEXT=g;_.TIMELINE_ITEM_POSITIVE_STATE_TEXT=p;_.UPLOADCOLLECTIONITEM_CANCELBUTTON_TEXT=x;_.UPLOADCOLLECTIONITEM_EDIT_BUTTON_TEXT=y;_.UPLOADCOLLECTIONITEM_ERROR_STATE=j;_.UPLOADCOLLECTIONITEM_READY_STATE=k;_.UPLOADCOLLECTIONITEM_RENAMEBUTTON_TEXT=b;_.UPLOADCOLLECTIONITEM_RETRY_BUTTON_TEXT=w;_.UPLOADCOLLECTIONITEM_TERMINATE_BUTTON_TEXT=q;_.UPLOADCOLLECTIONITEM_UPLOADING_STATE=m;_.UPLOADCOLLECTION_ARIA_ROLE_DESCRIPTION=Q;_.UPLOADCOLLECTION_DRAG_FILE_INDICATOR=$;_.UPLOADCOLLECTION_DROP_FILE_INDICATOR=__;_.UPLOADCOLLECTION_NO_DATA_DESCRIPTION=J;_.UPLOADCOLLECTION_NO_DATA_TEXT=z;_.USER_MENU_ACTIONS_TXT=dE;_.USER_MENU_CLOSE_BUTTON_TXT=tE;_.USER_MENU_CLOSE_DIALOG_BUTTON=lE;_.USER_MENU_CURRENT_INFORMATION_TXT=cE;_.USER_MENU_EDIT_ACCOUNTS_TXT=sE;_.USER_MENU_EDIT_AVATAR_TXT=uE;_.USER_MENU_MANAGE_ACCOUNT_BUTTON_TXT=nE;_.USER_MENU_OTHER_ACCOUNT_BUTTON_TXT=eE;_.USER_MENU_POPOVER_ACCESSIBLE_ACCOUNT_SELECTED_TXT=oE;_.USER_MENU_POPOVER_ACCESSIBLE_NAME=fE;_.USER_MENU_SIGN_OUT_BUTTON_TXT=iE;_.USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT=bE;_.USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT=jE;_.USER_SETTINGS_DIALOG_ACCESSIBLE_NAME=pE;_.USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT=hE;_.USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT=xE;_.USER_SETTINGS_LIST_ARIA_ROLE_DESC=gE;_.VSD_CANCEL_BUTTON=u_;_.VSD_DIALOG_TITLE_SORT=n_;_.VSD_FILTER_BY=g_;_.VSD_FILTER_ITEM_LABEL_TEXT=k_;_.VSD_FILTER_TOOLTIP=o_;_.VSD_GROUP_BY=x_;_.VSD_GROUP_ORDER=p_;_.VSD_GROUP_TOOLTIP=c_;_.VSD_ORDER_ASCENDING=b_;_.VSD_ORDER_DESCENDING=j_;_.VSD_RESET_BUTTON=s_;_.VSD_RESET_BUTTON_ACTION=f_;_.VSD_SORT_BY=h_;_.VSD_SORT_ORDER=d_;_.VSD_SORT_TOOLTIP=l_;_.VSD_SUBMIT_BUTTON=i_;_.WIZARD_ACTIONSHEET_STEPS_ARIA_LABEL=X_;_.WIZARD_CANCEL_BUTTON=H_;_.WIZARD_LIST_ARIA_DESCRIBEDBY=V_;_.WIZARD_LIST_ARIA_LABEL=F_;_.WIZARD_NAV_ARIA_LABEL=G_;_.WIZARD_NAV_ARIA_ROLE_DESCRIPTION=e_;_.WIZARD_NAV_STEP_DEFAULT_HEADING=t_;_.WIZARD_OPTIONAL_STEP_ARIA_LABEL=W_;_.WIZARD_STEP_ACTIVE=Y_;_.WIZARD_STEP_ARIA_LABEL=K_;_.WIZARD_STEP_INACTIVE=Z_;_.default=kE});
-//# sourceMappingURL=messagebundle_ar2.js.map
+sap.ui.define(['exports'], (function (exports) { 'use strict';
+
+	var ACC_STATE_REQUIRED = "مطلوب";
+	var ACC_STATE_DISABLED = "معطَّل";
+	var ACC_STATE_READONLY = "للقراءة فقط";
+	var ACC_STATE_EMPTY = "فارغ";
+	var ACC_STATE_SINGLE_CONTROL = "يتضمن عنصر";
+	var ACC_STATE_MULTIPLE_CONTROLS = "يتضمن عناصر";
+	var ARIA_LABEL_CARD_CONTENT = "محتوى البطاقة";
+	var ARIA_ROLEDESCRIPTION_CARD = "البطاقة";
+	var ARIA_ROLEDESCRIPTION_CARD_HEADER = "مقدمة البطاقة";
+	var ARIA_ROLEDESCRIPTION_INTERACTIVE_CARD_HEADER = "مقدمة بطاقة تفاعلية";
+	var AVATAR_TOOLTIP = "صورة رمزية (أفاتار)";
+	var AVATAR_TYPE_BUTTON = "الزر";
+	var AVATAR_TYPE_IMAGE = "الصورة";
+	var AVATAR_GROUP_DISPLAYED_HIDDEN_LABEL = "{0} معروض، {1} مخفي.";
+	var AVATAR_GROUP_SHOW_COMPLETE_LIST_LABEL = "قم بالتنشيط للقائمة بأكملها.";
+	var AVATAR_GROUP_ARIA_LABEL_INDIVIDUAL = "الأفاتارز الفردية.";
+	var AVATAR_GROUP_ARIA_LABEL_GROUP = "الأفاتارز المربوطة.";
+	var AVATAR_GROUP_MOVE = "اضغط على مفاتيح الأسهم للنقل.";
+	var TAG_DESCRIPTION_TAG = "علامة";
+	var TAG_ROLE_DESCRIPTION = "زر العلامة";
+	var TAG_ERROR = "خطأ";
+	var TAG_WARNING = "تحذير";
+	var TAG_SUCCESS = "نجاح";
+	var TAG_INFORMATION = "معلومات";
+	var BREADCRUMB_ITEM_POS = "{0} من {1}";
+	var BREADCRUMBS_ARIA_LABEL = "مسار التنقل";
+	var BREADCRUMBS_OVERFLOW_ARIA_LABEL = "المزيد";
+	var BREADCRUMBS_CANCEL_BUTTON = "إلغاء";
+	var FORM_SELECTABLE_AVALIABLE_VALUES = "القيم المتوفرة";
+	var BUSY_INDICATOR_TITLE = "الرجاء الانتظار";
+	var BUTTON_ARIA_TYPE_ACCEPT = "إجراء موجب";
+	var BUTTON_ARIA_TYPE_REJECT = "إجراء سالب";
+	var BUTTON_ARIA_TYPE_EMPHASIZED = "الإجراء الافتراضي";
+	var BUTTON_ARIA_TYPE_ATTENTION = "تحذير";
+	var BUTTON_BADGE_ONE_ITEM = "{0} بند";
+	var BUTTON_BADGE_MANY_ITEMS = "{0} من البنود";
+	var BUTTON_ROLE_DESCRIPTION = "الزر";
+	var LINK_ROLE_DESCRIPTION = "الارتباط";
+	var CAL_LEGEND_TODAY_TEXT = "اليوم";
+	var CAL_LEGEND_SELECTED_TEXT = "اليوم المحدد";
+	var CAL_LEGEND_WORKING_DAY_TEXT = "يوم عمل";
+	var CAL_LEGEND_NON_WORKING_DAY_TEXT = "يوم عطلة";
+	var CAL_LEGEND_ROLE_DESCRIPTION = "وسيلة إيضاح التقويم";
+	var CAROUSEL_OF_TEXT = "من";
+	var CAROUSEL_DOT_TEXT = "الصفحة {0} من {1}";
+	var CAROUSEL_PREVIOUS_ARROW_TEXT = "الصفحة السابقة";
+	var CAROUSEL_NEXT_ARROW_TEXT = "الصفحة التالية";
+	var CAROUSEL_ARIA_ROLE_DESCRIPTION = "شريط التمرير";
+	var CAROUSEL_ARIA_LIST_LABEL = "حاوية البنود";
+	var COLORPALETTE_CONTAINER_LABEL = "لوحة الألوان - الألوان المحددة مسبقًا";
+	var COLORPALETTE_POPOVER_TITLE = "لوحة الألوان";
+	var COLORPALETTE_COLOR_LABEL = "اللون";
+	var COLOR_PALETTE_DIALOG_CANCEL_BUTTON = "إلغاء";
+	var COLOR_PALETTE_DIALOG_OK_BUTTON = "موافق";
+	var COLOR_PALETTE_DIALOG_TITLE = "تغيير اللون";
+	var COLOR_PALETTE_MORE_COLORS_TEXT = "مزيد من الألوان...";
+	var COLOR_PALETTE_DEFAULT_COLOR_TEXT = "اللون الافتراضي";
+	var COLORPICKER_LABEL = "منتقي الألوان";
+	var COLORPICKER_SLIDER_GROUP = "أشرطة تمرير الألوان";
+	var COLORPICKER_ALPHA_SLIDER = "شريط تمرير التحكم بالشفافية";
+	var COLORPICKER_HUE_SLIDER = "ِشريط تمرير التحكم في درجة اللون";
+	var COLORPICKER_HEX = "ست عشري";
+	var COLORPICKER_RED = "أحمر";
+	var COLORPICKER_GREEN = "أخضر";
+	var COLORPICKER_BLUE = "أزرق";
+	var COLORPICKER_HUE = "تدرج اللون";
+	var COLORPICKER_SATURATION = "تشبع";
+	var COLORPICKER_LIGHT = "فاتح";
+	var COLORPICKER_TOGGLE_MODE_TOOLTIP = "تغيير نمط اللون";
+	var COLORPICKER_ALPHA = "ألفا";
+	var COLORPICKER_PERCENTAGE = "%";
+	var COLORPICKER_COLOR_MODE_CHANGED = "تم تغيير نمط اللون إلى {0}. القيم الحالية: {1}.";
+	var DATEPICKER_OPEN_ICON_TITLE = "فتح أداة الانتقاء";
+	var DATEPICKER_OPEN_ICON_TITLE_OPENED = "إغلاق أداة الانتقاء";
+	var DATEPICKER_DATE_DESCRIPTION = "إدخال التاريخ";
+	var DATEPICKER_MOBILE_HEADER_TITLE = "أدخل تاريخًا";
+	var DATEPICKER_VALUE_MISSING = "أدخل التاريخ بالتنسيق التالي: {0}.";
+	var DATEPICKER_PATTERN_MISSMATCH = "هذا التنسيق غير مدعوم. أدخل نطاق تواريخ ووقت بالتنسيق التالي: {0}.";
+	var DATEPICKER_RANGE_OVERFLOW = "أدخل تاريخًا أقل من القيمة القصوى لـ {0}.";
+	var DATEPICKER_RANGE_UNDERFLOW = "أدخل تاريخًا أعلى من القيمة الدنيا لـ {0}.";
+	var DATETIME_DESCRIPTION = "إدخال التاريخ/الوقت";
+	var DATETIME_VALUE_MISSING = "أدخل التاريخ والوقت بالتنسيق التالي: {0}.";
+	var DATETIME_PATTERN_MISMATCH = "هذا التنسيق غير مدعوم. أدخل تاريخ ووقت بالتنسيق التالي: {0}.";
+	var DATETIME_RANGEOVERFLOW = "أدخل قيمة أقل من القيمة القصوى لـ {0}.";
+	var DATETIME_RANGEUNDERFLOW = "أدخل قيمة أعلى من القيمة الدنيا لـ {0}.";
+	var DATERANGE_DESCRIPTION = "إدخال نطاق التواريخ";
+	var DATERANGE_VALUE_MISSING = "أدخل نطاق التواريخ بالتنسيق التالي: {0} - {0}.";
+	var DATERANGE_PATTERN_MISMATCH = "هذا التنسيق غير مدعوم. أدخل التاريخ بالتنسيق التالي: {0} - {0}.";
+	var DATERANGE_OVERFLOW = "أدخل قيمة أقل من القيمة القصوى لـ {0}.";
+	var DATERANGE_UNDERFLOW = "أدخل قيمة أعلى من القيمة الدنيا لـ {0}.";
+	var DATEPICKER_POPOVER_ACCESSIBLE_NAME = "أدخل تاريخًا لـ {0}";
+	var DATETIME_COMPONENTS_PLACEHOLDER_PREFIX = "على سبيل المثال";
+	var DATETIMEPICKER_POPOVER_ACCESSIBLE_NAME = "اختيار التاريخ والوقت لـ {0}";
+	var DATERANGEPICKER_POPOVER_ACCESSIBLE_NAME = "اختيار نطاق تواريخ لـ {0}";
+	var DELETE = "حذف";
+	var EMPTY_INDICATOR_SYMBOL = "–";
+	var EMPTY_INDICATOR_ACCESSIBLE_TEXT = "قيمة فارغة";
+	var EXPANDABLE_TEXT_SHOW_MORE = "إظهار المزيد";
+	var EXPANDABLE_TEXT_SHOW_LESS = "إظهار أقل";
+	var EXPANDABLE_TEXT_CLOSE = "إغلاق";
+	var EXPANDABLE_TEXT_SHOW_MORE_POPOVER_ARIA_LABEL = "إظهار النص الكامل";
+	var EXPANDABLE_TEXT_SHOW_LESS_POPOVER_ARIA_LABEL = "إغلاق الإطار المنبثق";
+	var FILEUPLOADER_ROLE_DESCRIPTION = "برنامج تحميل الملف";
+	var FILEUPLOADER_DEFAULT_PLACEHOLDER = "استعراض ملف أو إسقاطه";
+	var FILEUPLOADER_DEFAULT_MULTIPLE_PLACEHOLDER = "استعراض ملفات متعددة أو إسقاطها";
+	var FILEUPLOADER_INPUT_TOOLTIP = "سيتم استبدال كل الملفات في كل تحميل";
+	var FILEUPLOADER_VALUE_HELP_TOOLTIP = "استعراض كل الملفات واستبدالها";
+	var FILEUPLOADER_CLEAR_ICON_TOOLTIP = "إزالة كل الملفات";
+	var FILEUPLOAER_VALUE_MISSING = "حدد ملفًا أو أسطقه وأدرجه.";
+	var GROUP_HEADER_TEXT = "مقدمة المجموعة";
+	var SELECT_ROLE_DESCRIPTION = "مربع القائمة";
+	var SELECT_OPTIONS = "تحديد الخيارات";
+	var SHOW_SELECTED_BUTTON = "إظهار البنود المحددة فقط";
+	var INPUT_SUGGESTIONS = "اقترحات متوفرة";
+	var MCB_SELECTED_ITEMS = "تحديد الكل ({0} من أصل {1})";
+	var INPUT_SUGGESTIONS_TITLE = "كل البنود";
+	var INPUT_SUGGESTIONS_ONE_HIT = "النتيجة المتوفرة: 1";
+	var INPUT_SUGGESTIONS_MORE_HITS = "{0} النتائج متوفرة";
+	var INPUT_SUGGESTIONS_NO_HIT = "لا توجد نتائج";
+	var INPUT_SUGGESTIONS_EXPANDED = "موسَّع";
+	var INPUT_SUGGESTIONS_COLLAPSED = "مطوي";
+	var INPUT_CLEAR_ICON_ACC_NAME = "مسح";
+	var INPUT_SUGGESTIONS_OK_BUTTON = "موافق";
+	var INPUT_SUGGESTIONS_CANCEL_BUTTON = "إلغاء";
+	var LINK_SUBTLE = "غامض";
+	var LINK_EMPHASIZED = "مؤكد";
+	var LIST_ROLE_DESCRIPTION = "قائمة ببنود تفاعلية. للانتقال إلى المحتوى، اضغط F2.";
+	var LIST_ITEM_ACTIVE = "نشط";
+	var LIST_ITEM_POSITION = "بند القائمة {0} لـ {1}";
+	var LIST_ITEM_SELECTED = "محدد";
+	var LIST_ITEM_NOT_SELECTED = "غير محدد";
+	var LIST_ITEM_GROUP_HEADER = "مقدمة المجموعة";
+	var LIST_ROLE_LIST_GROUP_DESCRIPTION = "يحتوي على {0} من المجموعات الفرعية مع {1} من البنود";
+	var LIST_ROLE_LISTBOX_GROUP_DESCRIPTION = "يحتوي على {0} من المجموعات الفرعية";
+	var ARIA_LABEL_LIST_ITEM_CHECKBOX = "نمط التحديد المتعدد";
+	var ARIA_LABEL_LIST_ITEM_RADIO_BUTTON = "تحديد البنود.";
+	var ARIA_LABEL_LIST_SELECTABLE = "توجد بنود قابلة للتحديد";
+	var ARIA_LABEL_LIST_MULTISELECTABLE = "توجد بنود قابلة للتحديد المتعدد";
+	var ARIA_LABEL_LIST_DELETABLE = "توجد بنود قابلة للحذف";
+	var MESSAGE_STRIP_CLOSE_BUTTON_INFORMATION = "إغلاق شريط رسالة المعلومات";
+	var MESSAGE_STRIP_CLOSE_BUTTON_POSITIVE = "إغلاق شريط الرسالة الإيجابية";
+	var MESSAGE_STRIP_CLOSE_BUTTON_NEGATIVE = "إغلاق شريط الرسالة السلبية";
+	var MESSAGE_STRIP_CLOSE_BUTTON_CRITICAL = "إغلاق شريط الرسالة الحرجة";
+	var MESSAGE_STRIP_CLOSE_BUTTON_CUSTOM = "إغلاق شريط الرسالة المخصصة";
+	var MESSAGE_STRIP_CLOSABLE = "ممكن إغلاقه";
+	var MESSAGE_STRIP_ERROR = "شريط رسالة الخطأ";
+	var MESSAGE_STRIP_WARNING = "شريط رسالة التحذير";
+	var MESSAGE_STRIP_SUCCESS = "شريط رسالة النجاح";
+	var MESSAGE_STRIP_INFORMATION = "شريط الرسائل";
+	var MESSAGE_STRIP_CUSTOM = "شريط الرسالة المخصصة";
+	var MULTICOMBOBOX_DIALOG_OK_BUTTON = "موافق";
+	var MULTICOMBOBOX_DIALOG_CANCEL_BUTTON = "إلغاء";
+	var COMBOBOX_AVAILABLE_OPTIONS = "الخيارات المتوفرة";
+	var COMBOBOX_DIALOG_OK_BUTTON = "موافق";
+	var COMBOBOX_DIALOG_CANCEL_BUTTON = "إلغاء";
+	var INPUT_AVALIABLE_VALUES = "القيم المتوفرة";
+	var VALUE_STATE_ERROR_ALREADY_SELECTED = "هذه القيمة محددة بالفعل.";
+	var MULTIINPUT_ROLEDESCRIPTION_TEXT = "إدخال متعدد القيمة";
+	var MULTIINPUT_SHOW_MORE_TOKENS = "{0} إضافي";
+	var MULTIINPUT_VALUE_HELP_LABEL = "إظهار مساعدة الإدخال";
+	var MULTIINPUT_VALUE_HELP = "تتوفر مساعدة الإدخال";
+	var MULTIINPUT_FILTER_BUTTON_LABEL = "إظهار الرموز المميزة المحددة";
+	var PANEL_ICON = "توسيع/طي";
+	var RANGE_SLIDER_ARIA_DESCRIPTION = "النطاق";
+	var RANGE_SLIDER_START_HANDLE_DESCRIPTION = "الحد الأدنى";
+	var RANGE_SLIDER_END_HANDLE_DESCRIPTION = "الحد الأقصى";
+	var RATING_INDICATOR_TOOLTIP_TEXT = "التصنيف";
+	var RATING_INDICATOR_TEXT = "مؤشر التقييم";
+	var RATING_INDICATOR_ARIA_DESCRIPTION = "مطلوب";
+	var RESPONSIVE_POPOVER_CLOSE_DIALOG_BUTTON = "رفض";
+	var SEGMENTEDBUTTON_ARIA_DESCRIPTION = "مجموعة الأزرار المقسَّمة";
+	var SEGMENTEDBUTTON_ARIA_DESCRIBEDBY = "اضغط على SPACE أو ENTER لتحديد أحد البنود";
+	var SEGMENTEDBUTTONITEM_ARIA_DESCRIPTION = "الزر المقسَّم";
+	var SLIDER_ARIA_DESCRIPTION = "مؤشر مربع التمرير";
+	var LOAD_MORE_TEXT = "المزيد";
+	var TABLE_HEADER_ROW_INFORMATION = "صف المقدمة 1 من أصل {0}";
+	var TABLE_ROW_POSITION = "{0} من {1}";
+	var TABLE_GROUP_ROW_ARIA_LABEL = "صف مقدمة المجموعة";
+	var ARIA_LABEL_ROW_SELECTION = "تحديد البنود";
+	var ARIA_LABEL_SELECT_ALL_CHECKBOX = "تحديد كل الصفوف";
+	var ARIA_LABEL_EMPTY_CELL = "فارغ";
+	var TAB_ARIA_DESIGN_POSITIVE = "إيجابية";
+	var TAB_ARIA_DESIGN_NEGATIVE = "سلبية";
+	var TAB_ARIA_DESIGN_CRITICAL = "مهم";
+	var TAB_ARIA_DESIGN_NEUTRAL = "محايد";
+	var TAB_SPLIT_ROLE_DESCRIPTION = "علامة تبويب بالبنود الفرعية";
+	var TABCONTAINER_NEXT_ICON_ACC_NAME = "التالي";
+	var TABCONTAINER_PREVIOUS_ICON_ACC_NAME = "السابق";
+	var TABCONTAINER_OVERFLOW_MENU_TITLE = "قائمة التدفق";
+	var TABCONTAINER_END_OVERFLOW = "المزيد";
+	var TABCONTAINER_POPOVER_CANCEL_BUTTON = "إلغاء";
+	var TABCONTAINER_SUBTABS_DESCRIPTION = "اضغط على مفتاح السهم لأسفل لفتح قائمة البنود الفرعية";
+	var TEXTAREA_CHARACTERS_LEFT = "متبق {0} من الحروف";
+	var TEXTAREA_CHARACTERS_EXCEEDED = "تم تجاوز الحد بمقدار {0} من الحروف";
+	var TEXTAREA_EXCEEDS_MAXLENGTH = "القيمة كبيرة للغاية بمقدار {0} من الحروف.";
+	var TIMEPICKER_HOURS_LABEL = "الساعات";
+	var TIMEPICKER_MINUTES_LABEL = "الدقائق";
+	var TIMEPICKER_SECONDS_LABEL = "الثواني";
+	var TIMEPICKER_SUBMIT_BUTTON = "موافق";
+	var TIMEPICKER_CANCEL_BUTTON = "إلغاء";
+	var TIMEPICKER_INPUT_DESCRIPTION = "إدخال الوقت";
+	var TIMEPICKER_POPOVER_ACCESSIBLE_NAME = "اختيار الوقت لـ {0}";
+	var TIMEPICKER_CLOCK_DIAL_LABEL = "طلب الساعة";
+	var TIMEPICKER_INPUTS_ENTER_HOURS = "يُرجى إدخال الساعات";
+	var TIMEPICKER_INPUTS_ENTER_MINUTES = "يُرجى إدخال الدقائق";
+	var TIMEPICKER_INPUTS_ENTER_SECONDS = "يُرجى إدخال الثواني";
+	var TIMEPICKER_OPEN_ICON_TITLE = "فتح أداة الانتقاء";
+	var TIMEPICKER_OPEN_ICON_TITLE_OPENED = "إغلاق أداة الانتقاء";
+	var TIMEPICKER_VALUE_MISSING = "أدخل الوقت بالتنسيق التالي: {0}.";
+	var TIMEPICKER_PATTERN_MISSMATCH = "هذا التنسيق غير مدعوم. أدخل الوقت بالتنسيق التالي: {0}.";
+	var DURATION_INPUT_DESCRIPTION = "إدخال المدة";
+	var DATETIME_PICKER_DATE_BUTTON = "التاريخ";
+	var DATETIME_PICKER_TIME_BUTTON = "الوقت";
+	var TOKEN_ARIA_DELETABLE = "قابل للحذف";
+	var TOKEN_ARIA_DELETE = "حذف";
+	var TOKEN_ARIA_LABEL = "الرمز المميز";
+	var LISTITEMCUSTOM_TYPE_TEXT = "عنصر القائمة";
+	var TOKENIZER_ARIA_CONTAIN_TOKEN = "لا توجد رموز مميزة";
+	var TOKENIZER_ARIA_CONTAIN_ONE_TOKEN = "يتضمن رمز مميز واحد";
+	var TOKENIZER_ARIA_CONTAIN_SEVERAL_TOKENS = "يحتوى على {0} من الرموز المميزة";
+	var TOKENIZER_ARIA_LABEL = "عارض الرموز المميزة";
+	var TOKENIZER_SHOW_ALL_ITEMS = "{0} من العناصر";
+	var TOKENIZER_CLEAR_ALL = "مسح الكل";
+	var TOKENIZER_DIALOG_CANCEL_BUTTON = "إلغاء";
+	var TOKENIZER_DIALOG_OK_BUTTON = "موافق";
+	var TREE_ITEM_ARIA_LABEL = "عنصر الشجرة";
+	var TREE_ITEM_EXPAND_NODE = "توسيع العقدة";
+	var TREE_ITEM_COLLAPSE_NODE = "طي العقدة";
+	var VALUE_STATE_TYPE_ERROR = "حالة القيمة ’خطأ‘";
+	var VALUE_STATE_TYPE_WARNING = "حالة القيمة ’تحذير‘";
+	var VALUE_STATE_TYPE_SUCCESS = "حالة القيمة ناجح";
+	var VALUE_STATE_TYPE_INFORMATION = "حالة القيمة ’معلومات‘";
+	var VALUE_STATE_ERROR = "إدخال غير صالح";
+	var VALUE_STATE_WARNING = "تم إصدار تحذير";
+	var VALUE_STATE_INFORMATION = "إدخال معلوماتي";
+	var VALUE_STATE_SUCCESS = "تم التحقق من صحة الإدخال بنجاح";
+	var VALUE_STATE_LINK = "لنقل التركيز إلى الارتباط، اضغط على Ctrl+Alt+F8";
+	var VALUE_STATE_LINK_MAC = "لنقل التركيز إلى الارتباط، اضغط على Cmd+Option+F8";
+	var VALUE_STATE_LINKS = "اضغط على Ctrl+Alt+F8 للانتقال إلى الارتباط الأول. للانتقال إلى الارتباط التالي، استخدم علامة التبويب";
+	var VALUE_STATE_LINKS_MAC = "اضغط على Cmd+Option+F8 للانتقال إلى الارتباط الأول واستخدم علامة التبويب للانتقال إلى الارتباط التالي";
+	var CALENDAR_HEADER_MONTH_BUTTON = "شهر {0}";
+	var CALENDAR_HEADER_YEAR_BUTTON = "السنة {0}";
+	var CALENDAR_HEADER_YEAR_RANGE_BUTTON = "نطاق السنة من {0} إلى {1}";
+	var CALENDAR_FOOTER_CANCEL_BUTTON = "إلغاء";
+	var CALENDAR_FOOTER_OK_BUTTON = "موافق";
+	var CALENDAR_HEADER_MONTH_BUTTON_SHORTCUT = "F4";
+	var CALENDAR_HEADER_YEAR_BUTTON_SHORTCUT = "Shift + F4";
+	var CALENDAR_HEADER_YEAR_RANGE_BUTTON_SHORTCUT = "Shift + F4";
+	var CALENDAR_HEADER_MONTH_NEXT_BUTTON_TITLE = "الشهر التالي";
+	var CALENDAR_HEADER_YEAR_NEXT_BUTTON_TITLE = "السنة التالية";
+	var CALENDAR_HEADER_YEAR_RANGE_NEXT_BUTTON_TITLE = "نطاق السنة التالية";
+	var CALENDAR_HEADER_MONTH_NEXT_BUTTON_SHORTCUT = "صفحة إلى أعلى";
+	var CALENDAR_HEADER_MONTH_PREVIOUS_BUTTON_TITLE = "الشهر السابق";
+	var CALENDAR_HEADER_YEAR_PREVIOUS_BUTTON_TITLE = "السنة السابقة";
+	var CALENDAR_HEADER_YEAR_RANGE_PREVIOUS_BUTTON_TITLE = "نطاق السنة السابقة";
+	var CALENDAR_HEADER_MONTH_PREVIOUS_BUTTON_SHORTCUT = "صفحة إلى أسفل";
+	var DAY_PICKER_SELECTED_RANGE_START = "{0} أول تاريخ للنطاق";
+	var DAY_PICKER_SELECTED_RANGE_BETWEEN = "{0} في نطاق محدد";
+	var DAY_PICKER_SELECTED_RANGE_END = "{0} آخر تاريخ للنطاق";
+	var DAY_PICKER_WEEK_NUMBER_TEXT = "رقم الأسبوع";
+	var DAY_PICKER_NON_WORKING_DAY = "يوم عطلة";
+	var DAY_PICKER_TODAY = "اليوم";
+	var MONTH_PICKER_DESCRIPTION = "أداة انتقاء الشهر";
+	var YEAR_PICKER_DESCRIPTION = "أداة انتقاء السنة";
+	var YEAR_RANGE_PICKER_DESCRIPTION = "أداة انتقاء نطاق السنوات";
+	var SLIDER_TOOLTIP_INPUT_DESCRIPTION = "اضغط على F2 لإدخال قيمة.";
+	var SLIDER_TOOLTIP_INPUT_LABEL = "القيمة الحالية";
+	var STEPINPUT_DEC_ICON_TITLE = "تخفيض";
+	var STEPINPUT_INC_ICON_TITLE = "زيادة";
+	var STEPINPUT_PATTER_MISSMATCH = "هذا التنسيق غير مدعوم. أدخل عددًا بـ {0} من المنازل العشرية.";
+	var STEPINPUT_RANGEOVERFLOW = "أدخل عددًا أقل من القيمة القصوى لـ {0}.";
+	var STEPINPUT_RANGEUNDERFLOW = "أدخل عددًا أعلى من القيمة الدنيا لـ {0}.";
+	var SPLIT_BUTTON_DESCRIPTION = "زر التقسيم";
+	var SPLIT_BUTTON_KEYBOARD_HINT = "اضغط على Space أو Enter لبدء تشغيل الإجراء الافتراضي وAlt + Arrow Down أو F4 لبدء تشغيل إجراء السهم";
+	var SPLIT_BUTTON_ARROW_BUTTON_TOOLTIP = "فتح القائمة";
+	var MENU_BACK_BUTTON_ARIA_LABEL = "الخلف";
+	var MENU_CANCEL_BUTTON_TEXT = "إلغاء";
+	var MENU_POPOVER_ACCESSIBLE_NAME = "حدد خيارًا من القائمة";
+	var MENU_ITEM_GROUP_NONE_ACCESSIBLE_NAME = "يحتوي على بنود غير قابلة للتحديد";
+	var MENU_ITEM_GROUP_SINGLE_ACCESSIBLE_NAME = "توجد بنود قابلة للتحديد";
+	var MENU_ITEM_GROUP_MULTI_ACCESSIBLE_NAME = "توجد بنود قابلة للتحديد المتعدد";
+	var MENU_ITEM_END_CONTENT_ACCESSIBLE_NAME = "الإجراءات الإضافية";
+	var MENU_ITEM_LOADING = "تحميل";
+	var DIALOG_HEADER_ARIA_ROLE_DESCRIPTION = "مقدمة تفاعلية";
+	var DIALOG_HEADER_ARIA_DESCRIBEDBY_RESIZABLE = "استخدام مفاتيح Shift+Arrow لتغيير الحجم";
+	var DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE = "استخدام مفاتيح الأسهم للانتقال";
+	var DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE = "استخدام مفاتيح الأسهم للانتقال، مفاتيح Shift+Arrow لتغيير الحجم";
+	var LABEL_COLON = ":";
+	var TOOLBAR_OVERFLOW_BUTTON_ARIA_LABEL = "خيارات إضافية";
+	var TOOLBAR_POPOVER_AVAILABLE_VALUES = "القيم المتوفرة";
+	var FORM_ACCESSIBLE_NAME = "النموذج";
+	var FORM_GROUP_ACCESSIBLE_NAME = "المجموعة {0}";
+	var FORM_CHECKABLE_REQUIRED = "يرجى وضع علامة على هذا المربع إذا كنت تريد المتابعة.";
+	var FORM_MIXED_TEXTFIELD_REQUIRED = "يرجى ملء هذا الحقل أو تحديد بند في القائمة.";
+	var FORM_SELECTABLE_REQUIRED = "يرجى تحديد بند في القائمة.";
+	var FORM_SELECTABLE_REQUIRED2 = "يرجى تحديد أحد هذه الخيارات.";
+	var FORM_TEXTFIELD_REQUIRED = "يرجى ملء هذا الحقل.";
+	var TABLE_SELECTION = "التحديد";
+	var TABLE_ROW_SELECTOR = "مُحدِّد أولي";
+	var TABLE_ROW_NAVIGATED = "انتقل إلى";
+	var TABLE_NO_DATA = "لا توجد بيانات";
+	var TABLE_SINGLE_SELECTABLE = "جدول التحديد الفردي";
+	var TABLE_MULTI_SELECTABLE = "جدول التحديد المتعدد";
+	var TABLE_COLUMNHEADER_SELECTALL_DESCRIPTION = "خانات الاختيار تحديد الكل";
+	var TABLE_COLUMNHEADER_CLEARALL_DESCRIPTION = "مسح كل الأزرار";
+	var TABLE_ROW = "الصف";
+	var TABLE_GROUP_ROW = "صف المجموعة";
+	var TABLE_ROW_POPIN = "منطقة إدخال الصف";
+	var TABLE_ROW_INDEX = "{0} من {1}";
+	var TABLE_ROW_SELECTED = "مُحدد";
+	var TABLE_ROW_ACTIVE = "نشط";
+	var TABLE_ROW_NAVIGABLE = "به تفاصيل";
+	var TABLE_COLUMN_HEADER_ROW = "صف مقدمة العمود";
+	var TABLE_MORE = "المزيد";
+	var TABLE_MORE_DESCRIPTION = "لتحميل المزيد من الصفوف، اضغط على Enter أو Space";
+	var TABLE_ROW_ACTIONS = "إجراءات الصف";
+	var TABLE_ROW_SINGLE_ACTION = "يتوفر 1 إجراء صف";
+	var TABLE_ROW_MULTIPLE_ACTIONS = "يتوفر {0} من إجراءات الصف";
+	var TABLE_NAVIGATION = "تنقل";
+	var TABLE_GENERATED_BY_AI = "مُنشأ بواسطة الذكاء الاصطناعي";
+	var TABLE_SELECT_ALL_ROWS = "تحديد كل الصفوف";
+	var TABLE_DESELECT_ALL_ROWS = "إلغاء تحديد كل الصفوف";
+	var DYNAMIC_DATE_RANGE_YESTERDAY_TEXT = "أمس";
+	var DYNAMIC_DATE_RANGE_TODAY_TEXT = "اليوم";
+	var DYNAMIC_DATE_RANGE_TOMORROW_TEXT = "غدًا";
+	var DYNAMIC_DATE_RANGE_DATE_TEXT = "التاريخ";
+	var DYNAMIC_DATE_RANGE_DATERANGE_TEXT = "من/إلى";
+	var DYNAMIC_DATE_RANGE_FROM_INPUT_TEXT = "من";
+	var DYNAMIC_DATE_RANGE_TO_INPUT_TEXT = "إلى";
+	var DYNAMIC_DATE_RANGE_FROM_TEXT = "من (التاريخ/الوقت)";
+	var DYNAMIC_DATE_RANGE_TO_TEXT = "إلى (التاريخ/الوقت)";
+	var DYNAMIC_DATE_RANGE_SELECTED_TEXT = "مُحدد";
+	var DYNAMIC_DATE_TIME_RANGE_TEXT = "البدء/الانتهاء (التاريخ والوقت)";
+	var DYNAMIC_DATE_TIME_RANGE_TEXT_TO_LABEL = "إلى";
+	var DYNAMIC_DATE_TIME_RANGE_TEXT_FROM_LABEL = "من";
+	var DYNAMIC_DATE_RANGE_EMPTY_SELECTED_TEXT = "اختيار التواريخ";
+	var DYNAMIC_DATE_RANGE_POPOVER_ACCESSIBLE_NAME = "نطاق التواريخ الديناميكي";
+	var DYNAMIC_DATE_RANGE_NAVIGATION_ICON_TOOLTIP = "التنقل للخلف";
+	var DYNAMIC_DATE_RANGE_LAST_DAYS_TEXT = "آخر X من الأيام";
+	var DYNAMIC_DATE_RANGE_NEXT_DAYS_TEXT = "X من الأيام التالية";
+	var DYNAMIC_DATE_RANGE_LAST_WEEKS_TEXT = "آخر X من الأسابيع";
+	var DYNAMIC_DATE_RANGE_NEXT_WEEKS_TEXT = "X من الأسابيع التالية";
+	var DYNAMIC_DATE_RANGE_LAST_MONTHS_TEXT = "آخر X من الشهور";
+	var DYNAMIC_DATE_RANGE_NEXT_MONTHS_TEXT = "X من الشهور التالية";
+	var DYNAMIC_DATE_RANGE_LAST_QUARTERS_TEXT = "آخر X من أرباع السنة";
+	var DYNAMIC_DATE_RANGE_NEXT_QUARTERS_TEXT = "X من أرباع السنة التالية";
+	var DYNAMIC_DATE_RANGE_LAST_YEARS_TEXT = "آخر x من السنوات";
+	var DYNAMIC_DATE_RANGE_NEXT_YEARS_TEXT = "X من السنوات التالية";
+	var CHECKBOX_CHECKED = "محدد";
+	var CHECKBOX_NOT_CHECKED = "غير محدد";
+	var CHECKBOX_ARIA_TYPE = "خانة الاختيار";
+	var DYNAMIC_DATE_RANGE_VALUE_LABEL_TEXT = "قيمة X";
+	var DYNAMIC_DATE_RANGE_UNIT_OF_TIME_LABEL_TEXT = "وحدة الوقت";
+	var DYNAMIC_DATE_RANGE_DAYS_UNIT_TEXT = "أيام";
+	var DYNAMIC_DATE_RANGE_WEEKS_UNIT_TEXT = "الأسابيع";
+	var DYNAMIC_DATE_RANGE_MONTHS_UNIT_TEXT = "الشهور";
+	var DYNAMIC_DATE_RANGE_QUARTERS_UNIT_TEXT = "أرباع";
+	var DYNAMIC_DATE_RANGE_YEARS_UNIT_TEXT = "السنوات";
+	var DYNAMIC_DATE_RANGE_LAST_COMBINED_TEXT = "آخر X {0} (متضمن)";
+	var DYNAMIC_DATE_RANGE_NEXT_COMBINED_TEXT = "X {0} التالي (متضمن)";
+	var DYNAMIC_DATE_RANGE_INCLUDED_TEXT = "(متضمن)";
+	var SWITCH_ON = "تشغيل";
+	var SWITCH_OFF = "إيقاف";
+	var ICON_ARIA_TYPE_IMAGE = "الصورة";
+	var ICON_ARIA_TYPE_INTERACTIVE = "الزر";
+	var messagebundle_ar = {
+		ACC_STATE_REQUIRED: ACC_STATE_REQUIRED,
+		ACC_STATE_DISABLED: ACC_STATE_DISABLED,
+		ACC_STATE_READONLY: ACC_STATE_READONLY,
+		ACC_STATE_EMPTY: ACC_STATE_EMPTY,
+		ACC_STATE_SINGLE_CONTROL: ACC_STATE_SINGLE_CONTROL,
+		ACC_STATE_MULTIPLE_CONTROLS: ACC_STATE_MULTIPLE_CONTROLS,
+		ARIA_LABEL_CARD_CONTENT: ARIA_LABEL_CARD_CONTENT,
+		ARIA_ROLEDESCRIPTION_CARD: ARIA_ROLEDESCRIPTION_CARD,
+		ARIA_ROLEDESCRIPTION_CARD_HEADER: ARIA_ROLEDESCRIPTION_CARD_HEADER,
+		ARIA_ROLEDESCRIPTION_INTERACTIVE_CARD_HEADER: ARIA_ROLEDESCRIPTION_INTERACTIVE_CARD_HEADER,
+		AVATAR_TOOLTIP: AVATAR_TOOLTIP,
+		AVATAR_TYPE_BUTTON: AVATAR_TYPE_BUTTON,
+		AVATAR_TYPE_IMAGE: AVATAR_TYPE_IMAGE,
+		AVATAR_GROUP_DISPLAYED_HIDDEN_LABEL: AVATAR_GROUP_DISPLAYED_HIDDEN_LABEL,
+		AVATAR_GROUP_SHOW_COMPLETE_LIST_LABEL: AVATAR_GROUP_SHOW_COMPLETE_LIST_LABEL,
+		AVATAR_GROUP_ARIA_LABEL_INDIVIDUAL: AVATAR_GROUP_ARIA_LABEL_INDIVIDUAL,
+		AVATAR_GROUP_ARIA_LABEL_GROUP: AVATAR_GROUP_ARIA_LABEL_GROUP,
+		AVATAR_GROUP_MOVE: AVATAR_GROUP_MOVE,
+		TAG_DESCRIPTION_TAG: TAG_DESCRIPTION_TAG,
+		TAG_ROLE_DESCRIPTION: TAG_ROLE_DESCRIPTION,
+		TAG_ERROR: TAG_ERROR,
+		TAG_WARNING: TAG_WARNING,
+		TAG_SUCCESS: TAG_SUCCESS,
+		TAG_INFORMATION: TAG_INFORMATION,
+		BREADCRUMB_ITEM_POS: BREADCRUMB_ITEM_POS,
+		BREADCRUMBS_ARIA_LABEL: BREADCRUMBS_ARIA_LABEL,
+		BREADCRUMBS_OVERFLOW_ARIA_LABEL: BREADCRUMBS_OVERFLOW_ARIA_LABEL,
+		BREADCRUMBS_CANCEL_BUTTON: BREADCRUMBS_CANCEL_BUTTON,
+		FORM_SELECTABLE_AVALIABLE_VALUES: FORM_SELECTABLE_AVALIABLE_VALUES,
+		BUSY_INDICATOR_TITLE: BUSY_INDICATOR_TITLE,
+		BUTTON_ARIA_TYPE_ACCEPT: BUTTON_ARIA_TYPE_ACCEPT,
+		BUTTON_ARIA_TYPE_REJECT: BUTTON_ARIA_TYPE_REJECT,
+		BUTTON_ARIA_TYPE_EMPHASIZED: BUTTON_ARIA_TYPE_EMPHASIZED,
+		BUTTON_ARIA_TYPE_ATTENTION: BUTTON_ARIA_TYPE_ATTENTION,
+		BUTTON_BADGE_ONE_ITEM: BUTTON_BADGE_ONE_ITEM,
+		BUTTON_BADGE_MANY_ITEMS: BUTTON_BADGE_MANY_ITEMS,
+		BUTTON_ROLE_DESCRIPTION: BUTTON_ROLE_DESCRIPTION,
+		LINK_ROLE_DESCRIPTION: LINK_ROLE_DESCRIPTION,
+		CAL_LEGEND_TODAY_TEXT: CAL_LEGEND_TODAY_TEXT,
+		CAL_LEGEND_SELECTED_TEXT: CAL_LEGEND_SELECTED_TEXT,
+		CAL_LEGEND_WORKING_DAY_TEXT: CAL_LEGEND_WORKING_DAY_TEXT,
+		CAL_LEGEND_NON_WORKING_DAY_TEXT: CAL_LEGEND_NON_WORKING_DAY_TEXT,
+		CAL_LEGEND_ROLE_DESCRIPTION: CAL_LEGEND_ROLE_DESCRIPTION,
+		CAROUSEL_OF_TEXT: CAROUSEL_OF_TEXT,
+		CAROUSEL_DOT_TEXT: CAROUSEL_DOT_TEXT,
+		CAROUSEL_PREVIOUS_ARROW_TEXT: CAROUSEL_PREVIOUS_ARROW_TEXT,
+		CAROUSEL_NEXT_ARROW_TEXT: CAROUSEL_NEXT_ARROW_TEXT,
+		CAROUSEL_ARIA_ROLE_DESCRIPTION: CAROUSEL_ARIA_ROLE_DESCRIPTION,
+		CAROUSEL_ARIA_LIST_LABEL: CAROUSEL_ARIA_LIST_LABEL,
+		COLORPALETTE_CONTAINER_LABEL: COLORPALETTE_CONTAINER_LABEL,
+		COLORPALETTE_POPOVER_TITLE: COLORPALETTE_POPOVER_TITLE,
+		COLORPALETTE_COLOR_LABEL: COLORPALETTE_COLOR_LABEL,
+		COLOR_PALETTE_DIALOG_CANCEL_BUTTON: COLOR_PALETTE_DIALOG_CANCEL_BUTTON,
+		COLOR_PALETTE_DIALOG_OK_BUTTON: COLOR_PALETTE_DIALOG_OK_BUTTON,
+		COLOR_PALETTE_DIALOG_TITLE: COLOR_PALETTE_DIALOG_TITLE,
+		COLOR_PALETTE_MORE_COLORS_TEXT: COLOR_PALETTE_MORE_COLORS_TEXT,
+		COLOR_PALETTE_DEFAULT_COLOR_TEXT: COLOR_PALETTE_DEFAULT_COLOR_TEXT,
+		COLORPICKER_LABEL: COLORPICKER_LABEL,
+		COLORPICKER_SLIDER_GROUP: COLORPICKER_SLIDER_GROUP,
+		COLORPICKER_ALPHA_SLIDER: COLORPICKER_ALPHA_SLIDER,
+		COLORPICKER_HUE_SLIDER: COLORPICKER_HUE_SLIDER,
+		COLORPICKER_HEX: COLORPICKER_HEX,
+		COLORPICKER_RED: COLORPICKER_RED,
+		COLORPICKER_GREEN: COLORPICKER_GREEN,
+		COLORPICKER_BLUE: COLORPICKER_BLUE,
+		COLORPICKER_HUE: COLORPICKER_HUE,
+		COLORPICKER_SATURATION: COLORPICKER_SATURATION,
+		COLORPICKER_LIGHT: COLORPICKER_LIGHT,
+		COLORPICKER_TOGGLE_MODE_TOOLTIP: COLORPICKER_TOGGLE_MODE_TOOLTIP,
+		COLORPICKER_ALPHA: COLORPICKER_ALPHA,
+		COLORPICKER_PERCENTAGE: COLORPICKER_PERCENTAGE,
+		COLORPICKER_COLOR_MODE_CHANGED: COLORPICKER_COLOR_MODE_CHANGED,
+		DATEPICKER_OPEN_ICON_TITLE: DATEPICKER_OPEN_ICON_TITLE,
+		DATEPICKER_OPEN_ICON_TITLE_OPENED: DATEPICKER_OPEN_ICON_TITLE_OPENED,
+		DATEPICKER_DATE_DESCRIPTION: DATEPICKER_DATE_DESCRIPTION,
+		DATEPICKER_MOBILE_HEADER_TITLE: DATEPICKER_MOBILE_HEADER_TITLE,
+		DATEPICKER_VALUE_MISSING: DATEPICKER_VALUE_MISSING,
+		DATEPICKER_PATTERN_MISSMATCH: DATEPICKER_PATTERN_MISSMATCH,
+		DATEPICKER_RANGE_OVERFLOW: DATEPICKER_RANGE_OVERFLOW,
+		DATEPICKER_RANGE_UNDERFLOW: DATEPICKER_RANGE_UNDERFLOW,
+		DATETIME_DESCRIPTION: DATETIME_DESCRIPTION,
+		DATETIME_VALUE_MISSING: DATETIME_VALUE_MISSING,
+		DATETIME_PATTERN_MISMATCH: DATETIME_PATTERN_MISMATCH,
+		DATETIME_RANGEOVERFLOW: DATETIME_RANGEOVERFLOW,
+		DATETIME_RANGEUNDERFLOW: DATETIME_RANGEUNDERFLOW,
+		DATERANGE_DESCRIPTION: DATERANGE_DESCRIPTION,
+		DATERANGE_VALUE_MISSING: DATERANGE_VALUE_MISSING,
+		DATERANGE_PATTERN_MISMATCH: DATERANGE_PATTERN_MISMATCH,
+		DATERANGE_OVERFLOW: DATERANGE_OVERFLOW,
+		DATERANGE_UNDERFLOW: DATERANGE_UNDERFLOW,
+		DATEPICKER_POPOVER_ACCESSIBLE_NAME: DATEPICKER_POPOVER_ACCESSIBLE_NAME,
+		DATETIME_COMPONENTS_PLACEHOLDER_PREFIX: DATETIME_COMPONENTS_PLACEHOLDER_PREFIX,
+		DATETIMEPICKER_POPOVER_ACCESSIBLE_NAME: DATETIMEPICKER_POPOVER_ACCESSIBLE_NAME,
+		DATERANGEPICKER_POPOVER_ACCESSIBLE_NAME: DATERANGEPICKER_POPOVER_ACCESSIBLE_NAME,
+		DELETE: DELETE,
+		EMPTY_INDICATOR_SYMBOL: EMPTY_INDICATOR_SYMBOL,
+		EMPTY_INDICATOR_ACCESSIBLE_TEXT: EMPTY_INDICATOR_ACCESSIBLE_TEXT,
+		EXPANDABLE_TEXT_SHOW_MORE: EXPANDABLE_TEXT_SHOW_MORE,
+		EXPANDABLE_TEXT_SHOW_LESS: EXPANDABLE_TEXT_SHOW_LESS,
+		EXPANDABLE_TEXT_CLOSE: EXPANDABLE_TEXT_CLOSE,
+		EXPANDABLE_TEXT_SHOW_MORE_POPOVER_ARIA_LABEL: EXPANDABLE_TEXT_SHOW_MORE_POPOVER_ARIA_LABEL,
+		EXPANDABLE_TEXT_SHOW_LESS_POPOVER_ARIA_LABEL: EXPANDABLE_TEXT_SHOW_LESS_POPOVER_ARIA_LABEL,
+		FILEUPLOADER_ROLE_DESCRIPTION: FILEUPLOADER_ROLE_DESCRIPTION,
+		FILEUPLOADER_DEFAULT_PLACEHOLDER: FILEUPLOADER_DEFAULT_PLACEHOLDER,
+		FILEUPLOADER_DEFAULT_MULTIPLE_PLACEHOLDER: FILEUPLOADER_DEFAULT_MULTIPLE_PLACEHOLDER,
+		FILEUPLOADER_INPUT_TOOLTIP: FILEUPLOADER_INPUT_TOOLTIP,
+		FILEUPLOADER_VALUE_HELP_TOOLTIP: FILEUPLOADER_VALUE_HELP_TOOLTIP,
+		FILEUPLOADER_CLEAR_ICON_TOOLTIP: FILEUPLOADER_CLEAR_ICON_TOOLTIP,
+		FILEUPLOAER_VALUE_MISSING: FILEUPLOAER_VALUE_MISSING,
+		GROUP_HEADER_TEXT: GROUP_HEADER_TEXT,
+		SELECT_ROLE_DESCRIPTION: SELECT_ROLE_DESCRIPTION,
+		SELECT_OPTIONS: SELECT_OPTIONS,
+		SHOW_SELECTED_BUTTON: SHOW_SELECTED_BUTTON,
+		INPUT_SUGGESTIONS: INPUT_SUGGESTIONS,
+		MCB_SELECTED_ITEMS: MCB_SELECTED_ITEMS,
+		INPUT_SUGGESTIONS_TITLE: INPUT_SUGGESTIONS_TITLE,
+		INPUT_SUGGESTIONS_ONE_HIT: INPUT_SUGGESTIONS_ONE_HIT,
+		INPUT_SUGGESTIONS_MORE_HITS: INPUT_SUGGESTIONS_MORE_HITS,
+		INPUT_SUGGESTIONS_NO_HIT: INPUT_SUGGESTIONS_NO_HIT,
+		INPUT_SUGGESTIONS_EXPANDED: INPUT_SUGGESTIONS_EXPANDED,
+		INPUT_SUGGESTIONS_COLLAPSED: INPUT_SUGGESTIONS_COLLAPSED,
+		INPUT_CLEAR_ICON_ACC_NAME: INPUT_CLEAR_ICON_ACC_NAME,
+		INPUT_SUGGESTIONS_OK_BUTTON: INPUT_SUGGESTIONS_OK_BUTTON,
+		INPUT_SUGGESTIONS_CANCEL_BUTTON: INPUT_SUGGESTIONS_CANCEL_BUTTON,
+		LINK_SUBTLE: LINK_SUBTLE,
+		LINK_EMPHASIZED: LINK_EMPHASIZED,
+		LIST_ROLE_DESCRIPTION: LIST_ROLE_DESCRIPTION,
+		LIST_ITEM_ACTIVE: LIST_ITEM_ACTIVE,
+		LIST_ITEM_POSITION: LIST_ITEM_POSITION,
+		LIST_ITEM_SELECTED: LIST_ITEM_SELECTED,
+		LIST_ITEM_NOT_SELECTED: LIST_ITEM_NOT_SELECTED,
+		LIST_ITEM_GROUP_HEADER: LIST_ITEM_GROUP_HEADER,
+		LIST_ROLE_LIST_GROUP_DESCRIPTION: LIST_ROLE_LIST_GROUP_DESCRIPTION,
+		LIST_ROLE_LISTBOX_GROUP_DESCRIPTION: LIST_ROLE_LISTBOX_GROUP_DESCRIPTION,
+		ARIA_LABEL_LIST_ITEM_CHECKBOX: ARIA_LABEL_LIST_ITEM_CHECKBOX,
+		ARIA_LABEL_LIST_ITEM_RADIO_BUTTON: ARIA_LABEL_LIST_ITEM_RADIO_BUTTON,
+		ARIA_LABEL_LIST_SELECTABLE: ARIA_LABEL_LIST_SELECTABLE,
+		ARIA_LABEL_LIST_MULTISELECTABLE: ARIA_LABEL_LIST_MULTISELECTABLE,
+		ARIA_LABEL_LIST_DELETABLE: ARIA_LABEL_LIST_DELETABLE,
+		MESSAGE_STRIP_CLOSE_BUTTON_INFORMATION: MESSAGE_STRIP_CLOSE_BUTTON_INFORMATION,
+		MESSAGE_STRIP_CLOSE_BUTTON_POSITIVE: MESSAGE_STRIP_CLOSE_BUTTON_POSITIVE,
+		MESSAGE_STRIP_CLOSE_BUTTON_NEGATIVE: MESSAGE_STRIP_CLOSE_BUTTON_NEGATIVE,
+		MESSAGE_STRIP_CLOSE_BUTTON_CRITICAL: MESSAGE_STRIP_CLOSE_BUTTON_CRITICAL,
+		MESSAGE_STRIP_CLOSE_BUTTON_CUSTOM: MESSAGE_STRIP_CLOSE_BUTTON_CUSTOM,
+		MESSAGE_STRIP_CLOSABLE: MESSAGE_STRIP_CLOSABLE,
+		MESSAGE_STRIP_ERROR: MESSAGE_STRIP_ERROR,
+		MESSAGE_STRIP_WARNING: MESSAGE_STRIP_WARNING,
+		MESSAGE_STRIP_SUCCESS: MESSAGE_STRIP_SUCCESS,
+		MESSAGE_STRIP_INFORMATION: MESSAGE_STRIP_INFORMATION,
+		MESSAGE_STRIP_CUSTOM: MESSAGE_STRIP_CUSTOM,
+		MULTICOMBOBOX_DIALOG_OK_BUTTON: MULTICOMBOBOX_DIALOG_OK_BUTTON,
+		MULTICOMBOBOX_DIALOG_CANCEL_BUTTON: MULTICOMBOBOX_DIALOG_CANCEL_BUTTON,
+		COMBOBOX_AVAILABLE_OPTIONS: COMBOBOX_AVAILABLE_OPTIONS,
+		COMBOBOX_DIALOG_OK_BUTTON: COMBOBOX_DIALOG_OK_BUTTON,
+		COMBOBOX_DIALOG_CANCEL_BUTTON: COMBOBOX_DIALOG_CANCEL_BUTTON,
+		INPUT_AVALIABLE_VALUES: INPUT_AVALIABLE_VALUES,
+		VALUE_STATE_ERROR_ALREADY_SELECTED: VALUE_STATE_ERROR_ALREADY_SELECTED,
+		MULTIINPUT_ROLEDESCRIPTION_TEXT: MULTIINPUT_ROLEDESCRIPTION_TEXT,
+		MULTIINPUT_SHOW_MORE_TOKENS: MULTIINPUT_SHOW_MORE_TOKENS,
+		MULTIINPUT_VALUE_HELP_LABEL: MULTIINPUT_VALUE_HELP_LABEL,
+		MULTIINPUT_VALUE_HELP: MULTIINPUT_VALUE_HELP,
+		MULTIINPUT_FILTER_BUTTON_LABEL: MULTIINPUT_FILTER_BUTTON_LABEL,
+		PANEL_ICON: PANEL_ICON,
+		RANGE_SLIDER_ARIA_DESCRIPTION: RANGE_SLIDER_ARIA_DESCRIPTION,
+		RANGE_SLIDER_START_HANDLE_DESCRIPTION: RANGE_SLIDER_START_HANDLE_DESCRIPTION,
+		RANGE_SLIDER_END_HANDLE_DESCRIPTION: RANGE_SLIDER_END_HANDLE_DESCRIPTION,
+		RATING_INDICATOR_TOOLTIP_TEXT: RATING_INDICATOR_TOOLTIP_TEXT,
+		RATING_INDICATOR_TEXT: RATING_INDICATOR_TEXT,
+		RATING_INDICATOR_ARIA_DESCRIPTION: RATING_INDICATOR_ARIA_DESCRIPTION,
+		RESPONSIVE_POPOVER_CLOSE_DIALOG_BUTTON: RESPONSIVE_POPOVER_CLOSE_DIALOG_BUTTON,
+		SEGMENTEDBUTTON_ARIA_DESCRIPTION: SEGMENTEDBUTTON_ARIA_DESCRIPTION,
+		SEGMENTEDBUTTON_ARIA_DESCRIBEDBY: SEGMENTEDBUTTON_ARIA_DESCRIBEDBY,
+		SEGMENTEDBUTTONITEM_ARIA_DESCRIPTION: SEGMENTEDBUTTONITEM_ARIA_DESCRIPTION,
+		SLIDER_ARIA_DESCRIPTION: SLIDER_ARIA_DESCRIPTION,
+		LOAD_MORE_TEXT: LOAD_MORE_TEXT,
+		TABLE_HEADER_ROW_INFORMATION: TABLE_HEADER_ROW_INFORMATION,
+		TABLE_ROW_POSITION: TABLE_ROW_POSITION,
+		TABLE_GROUP_ROW_ARIA_LABEL: TABLE_GROUP_ROW_ARIA_LABEL,
+		ARIA_LABEL_ROW_SELECTION: ARIA_LABEL_ROW_SELECTION,
+		ARIA_LABEL_SELECT_ALL_CHECKBOX: ARIA_LABEL_SELECT_ALL_CHECKBOX,
+		ARIA_LABEL_EMPTY_CELL: ARIA_LABEL_EMPTY_CELL,
+		TAB_ARIA_DESIGN_POSITIVE: TAB_ARIA_DESIGN_POSITIVE,
+		TAB_ARIA_DESIGN_NEGATIVE: TAB_ARIA_DESIGN_NEGATIVE,
+		TAB_ARIA_DESIGN_CRITICAL: TAB_ARIA_DESIGN_CRITICAL,
+		TAB_ARIA_DESIGN_NEUTRAL: TAB_ARIA_DESIGN_NEUTRAL,
+		TAB_SPLIT_ROLE_DESCRIPTION: TAB_SPLIT_ROLE_DESCRIPTION,
+		TABCONTAINER_NEXT_ICON_ACC_NAME: TABCONTAINER_NEXT_ICON_ACC_NAME,
+		TABCONTAINER_PREVIOUS_ICON_ACC_NAME: TABCONTAINER_PREVIOUS_ICON_ACC_NAME,
+		TABCONTAINER_OVERFLOW_MENU_TITLE: TABCONTAINER_OVERFLOW_MENU_TITLE,
+		TABCONTAINER_END_OVERFLOW: TABCONTAINER_END_OVERFLOW,
+		TABCONTAINER_POPOVER_CANCEL_BUTTON: TABCONTAINER_POPOVER_CANCEL_BUTTON,
+		TABCONTAINER_SUBTABS_DESCRIPTION: TABCONTAINER_SUBTABS_DESCRIPTION,
+		TEXTAREA_CHARACTERS_LEFT: TEXTAREA_CHARACTERS_LEFT,
+		TEXTAREA_CHARACTERS_EXCEEDED: TEXTAREA_CHARACTERS_EXCEEDED,
+		TEXTAREA_EXCEEDS_MAXLENGTH: TEXTAREA_EXCEEDS_MAXLENGTH,
+		TIMEPICKER_HOURS_LABEL: TIMEPICKER_HOURS_LABEL,
+		TIMEPICKER_MINUTES_LABEL: TIMEPICKER_MINUTES_LABEL,
+		TIMEPICKER_SECONDS_LABEL: TIMEPICKER_SECONDS_LABEL,
+		TIMEPICKER_SUBMIT_BUTTON: TIMEPICKER_SUBMIT_BUTTON,
+		TIMEPICKER_CANCEL_BUTTON: TIMEPICKER_CANCEL_BUTTON,
+		TIMEPICKER_INPUT_DESCRIPTION: TIMEPICKER_INPUT_DESCRIPTION,
+		TIMEPICKER_POPOVER_ACCESSIBLE_NAME: TIMEPICKER_POPOVER_ACCESSIBLE_NAME,
+		TIMEPICKER_CLOCK_DIAL_LABEL: TIMEPICKER_CLOCK_DIAL_LABEL,
+		TIMEPICKER_INPUTS_ENTER_HOURS: TIMEPICKER_INPUTS_ENTER_HOURS,
+		TIMEPICKER_INPUTS_ENTER_MINUTES: TIMEPICKER_INPUTS_ENTER_MINUTES,
+		TIMEPICKER_INPUTS_ENTER_SECONDS: TIMEPICKER_INPUTS_ENTER_SECONDS,
+		TIMEPICKER_OPEN_ICON_TITLE: TIMEPICKER_OPEN_ICON_TITLE,
+		TIMEPICKER_OPEN_ICON_TITLE_OPENED: TIMEPICKER_OPEN_ICON_TITLE_OPENED,
+		TIMEPICKER_VALUE_MISSING: TIMEPICKER_VALUE_MISSING,
+		TIMEPICKER_PATTERN_MISSMATCH: TIMEPICKER_PATTERN_MISSMATCH,
+		DURATION_INPUT_DESCRIPTION: DURATION_INPUT_DESCRIPTION,
+		DATETIME_PICKER_DATE_BUTTON: DATETIME_PICKER_DATE_BUTTON,
+		DATETIME_PICKER_TIME_BUTTON: DATETIME_PICKER_TIME_BUTTON,
+		TOKEN_ARIA_DELETABLE: TOKEN_ARIA_DELETABLE,
+		TOKEN_ARIA_DELETE: TOKEN_ARIA_DELETE,
+		TOKEN_ARIA_LABEL: TOKEN_ARIA_LABEL,
+		LISTITEMCUSTOM_TYPE_TEXT: LISTITEMCUSTOM_TYPE_TEXT,
+		TOKENIZER_ARIA_CONTAIN_TOKEN: TOKENIZER_ARIA_CONTAIN_TOKEN,
+		TOKENIZER_ARIA_CONTAIN_ONE_TOKEN: TOKENIZER_ARIA_CONTAIN_ONE_TOKEN,
+		TOKENIZER_ARIA_CONTAIN_SEVERAL_TOKENS: TOKENIZER_ARIA_CONTAIN_SEVERAL_TOKENS,
+		TOKENIZER_ARIA_LABEL: TOKENIZER_ARIA_LABEL,
+		TOKENIZER_SHOW_ALL_ITEMS: TOKENIZER_SHOW_ALL_ITEMS,
+		TOKENIZER_CLEAR_ALL: TOKENIZER_CLEAR_ALL,
+		TOKENIZER_DIALOG_CANCEL_BUTTON: TOKENIZER_DIALOG_CANCEL_BUTTON,
+		TOKENIZER_DIALOG_OK_BUTTON: TOKENIZER_DIALOG_OK_BUTTON,
+		TREE_ITEM_ARIA_LABEL: TREE_ITEM_ARIA_LABEL,
+		TREE_ITEM_EXPAND_NODE: TREE_ITEM_EXPAND_NODE,
+		TREE_ITEM_COLLAPSE_NODE: TREE_ITEM_COLLAPSE_NODE,
+		VALUE_STATE_TYPE_ERROR: VALUE_STATE_TYPE_ERROR,
+		VALUE_STATE_TYPE_WARNING: VALUE_STATE_TYPE_WARNING,
+		VALUE_STATE_TYPE_SUCCESS: VALUE_STATE_TYPE_SUCCESS,
+		VALUE_STATE_TYPE_INFORMATION: VALUE_STATE_TYPE_INFORMATION,
+		VALUE_STATE_ERROR: VALUE_STATE_ERROR,
+		VALUE_STATE_WARNING: VALUE_STATE_WARNING,
+		VALUE_STATE_INFORMATION: VALUE_STATE_INFORMATION,
+		VALUE_STATE_SUCCESS: VALUE_STATE_SUCCESS,
+		VALUE_STATE_LINK: VALUE_STATE_LINK,
+		VALUE_STATE_LINK_MAC: VALUE_STATE_LINK_MAC,
+		VALUE_STATE_LINKS: VALUE_STATE_LINKS,
+		VALUE_STATE_LINKS_MAC: VALUE_STATE_LINKS_MAC,
+		CALENDAR_HEADER_MONTH_BUTTON: CALENDAR_HEADER_MONTH_BUTTON,
+		CALENDAR_HEADER_YEAR_BUTTON: CALENDAR_HEADER_YEAR_BUTTON,
+		CALENDAR_HEADER_YEAR_RANGE_BUTTON: CALENDAR_HEADER_YEAR_RANGE_BUTTON,
+		CALENDAR_FOOTER_CANCEL_BUTTON: CALENDAR_FOOTER_CANCEL_BUTTON,
+		CALENDAR_FOOTER_OK_BUTTON: CALENDAR_FOOTER_OK_BUTTON,
+		CALENDAR_HEADER_MONTH_BUTTON_SHORTCUT: CALENDAR_HEADER_MONTH_BUTTON_SHORTCUT,
+		CALENDAR_HEADER_YEAR_BUTTON_SHORTCUT: CALENDAR_HEADER_YEAR_BUTTON_SHORTCUT,
+		CALENDAR_HEADER_YEAR_RANGE_BUTTON_SHORTCUT: CALENDAR_HEADER_YEAR_RANGE_BUTTON_SHORTCUT,
+		CALENDAR_HEADER_MONTH_NEXT_BUTTON_TITLE: CALENDAR_HEADER_MONTH_NEXT_BUTTON_TITLE,
+		CALENDAR_HEADER_YEAR_NEXT_BUTTON_TITLE: CALENDAR_HEADER_YEAR_NEXT_BUTTON_TITLE,
+		CALENDAR_HEADER_YEAR_RANGE_NEXT_BUTTON_TITLE: CALENDAR_HEADER_YEAR_RANGE_NEXT_BUTTON_TITLE,
+		CALENDAR_HEADER_MONTH_NEXT_BUTTON_SHORTCUT: CALENDAR_HEADER_MONTH_NEXT_BUTTON_SHORTCUT,
+		CALENDAR_HEADER_MONTH_PREVIOUS_BUTTON_TITLE: CALENDAR_HEADER_MONTH_PREVIOUS_BUTTON_TITLE,
+		CALENDAR_HEADER_YEAR_PREVIOUS_BUTTON_TITLE: CALENDAR_HEADER_YEAR_PREVIOUS_BUTTON_TITLE,
+		CALENDAR_HEADER_YEAR_RANGE_PREVIOUS_BUTTON_TITLE: CALENDAR_HEADER_YEAR_RANGE_PREVIOUS_BUTTON_TITLE,
+		CALENDAR_HEADER_MONTH_PREVIOUS_BUTTON_SHORTCUT: CALENDAR_HEADER_MONTH_PREVIOUS_BUTTON_SHORTCUT,
+		DAY_PICKER_SELECTED_RANGE_START: DAY_PICKER_SELECTED_RANGE_START,
+		DAY_PICKER_SELECTED_RANGE_BETWEEN: DAY_PICKER_SELECTED_RANGE_BETWEEN,
+		DAY_PICKER_SELECTED_RANGE_END: DAY_PICKER_SELECTED_RANGE_END,
+		DAY_PICKER_WEEK_NUMBER_TEXT: DAY_PICKER_WEEK_NUMBER_TEXT,
+		DAY_PICKER_NON_WORKING_DAY: DAY_PICKER_NON_WORKING_DAY,
+		DAY_PICKER_TODAY: DAY_PICKER_TODAY,
+		MONTH_PICKER_DESCRIPTION: MONTH_PICKER_DESCRIPTION,
+		YEAR_PICKER_DESCRIPTION: YEAR_PICKER_DESCRIPTION,
+		YEAR_RANGE_PICKER_DESCRIPTION: YEAR_RANGE_PICKER_DESCRIPTION,
+		SLIDER_TOOLTIP_INPUT_DESCRIPTION: SLIDER_TOOLTIP_INPUT_DESCRIPTION,
+		SLIDER_TOOLTIP_INPUT_LABEL: SLIDER_TOOLTIP_INPUT_LABEL,
+		STEPINPUT_DEC_ICON_TITLE: STEPINPUT_DEC_ICON_TITLE,
+		STEPINPUT_INC_ICON_TITLE: STEPINPUT_INC_ICON_TITLE,
+		STEPINPUT_PATTER_MISSMATCH: STEPINPUT_PATTER_MISSMATCH,
+		STEPINPUT_RANGEOVERFLOW: STEPINPUT_RANGEOVERFLOW,
+		STEPINPUT_RANGEUNDERFLOW: STEPINPUT_RANGEUNDERFLOW,
+		SPLIT_BUTTON_DESCRIPTION: SPLIT_BUTTON_DESCRIPTION,
+		SPLIT_BUTTON_KEYBOARD_HINT: SPLIT_BUTTON_KEYBOARD_HINT,
+		SPLIT_BUTTON_ARROW_BUTTON_TOOLTIP: SPLIT_BUTTON_ARROW_BUTTON_TOOLTIP,
+		MENU_BACK_BUTTON_ARIA_LABEL: MENU_BACK_BUTTON_ARIA_LABEL,
+		MENU_CANCEL_BUTTON_TEXT: MENU_CANCEL_BUTTON_TEXT,
+		MENU_POPOVER_ACCESSIBLE_NAME: MENU_POPOVER_ACCESSIBLE_NAME,
+		MENU_ITEM_GROUP_NONE_ACCESSIBLE_NAME: MENU_ITEM_GROUP_NONE_ACCESSIBLE_NAME,
+		MENU_ITEM_GROUP_SINGLE_ACCESSIBLE_NAME: MENU_ITEM_GROUP_SINGLE_ACCESSIBLE_NAME,
+		MENU_ITEM_GROUP_MULTI_ACCESSIBLE_NAME: MENU_ITEM_GROUP_MULTI_ACCESSIBLE_NAME,
+		MENU_ITEM_END_CONTENT_ACCESSIBLE_NAME: MENU_ITEM_END_CONTENT_ACCESSIBLE_NAME,
+		MENU_ITEM_LOADING: MENU_ITEM_LOADING,
+		DIALOG_HEADER_ARIA_ROLE_DESCRIPTION: DIALOG_HEADER_ARIA_ROLE_DESCRIPTION,
+		DIALOG_HEADER_ARIA_DESCRIBEDBY_RESIZABLE: DIALOG_HEADER_ARIA_DESCRIBEDBY_RESIZABLE,
+		DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE: DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE,
+		DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE: DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE,
+		LABEL_COLON: LABEL_COLON,
+		TOOLBAR_OVERFLOW_BUTTON_ARIA_LABEL: TOOLBAR_OVERFLOW_BUTTON_ARIA_LABEL,
+		TOOLBAR_POPOVER_AVAILABLE_VALUES: TOOLBAR_POPOVER_AVAILABLE_VALUES,
+		FORM_ACCESSIBLE_NAME: FORM_ACCESSIBLE_NAME,
+		FORM_GROUP_ACCESSIBLE_NAME: FORM_GROUP_ACCESSIBLE_NAME,
+		FORM_CHECKABLE_REQUIRED: FORM_CHECKABLE_REQUIRED,
+		FORM_MIXED_TEXTFIELD_REQUIRED: FORM_MIXED_TEXTFIELD_REQUIRED,
+		FORM_SELECTABLE_REQUIRED: FORM_SELECTABLE_REQUIRED,
+		FORM_SELECTABLE_REQUIRED2: FORM_SELECTABLE_REQUIRED2,
+		FORM_TEXTFIELD_REQUIRED: FORM_TEXTFIELD_REQUIRED,
+		TABLE_SELECTION: TABLE_SELECTION,
+		TABLE_ROW_SELECTOR: TABLE_ROW_SELECTOR,
+		TABLE_ROW_NAVIGATED: TABLE_ROW_NAVIGATED,
+		TABLE_NO_DATA: TABLE_NO_DATA,
+		TABLE_SINGLE_SELECTABLE: TABLE_SINGLE_SELECTABLE,
+		TABLE_MULTI_SELECTABLE: TABLE_MULTI_SELECTABLE,
+		TABLE_COLUMNHEADER_SELECTALL_DESCRIPTION: TABLE_COLUMNHEADER_SELECTALL_DESCRIPTION,
+		TABLE_COLUMNHEADER_CLEARALL_DESCRIPTION: TABLE_COLUMNHEADER_CLEARALL_DESCRIPTION,
+		TABLE_ROW: TABLE_ROW,
+		TABLE_GROUP_ROW: TABLE_GROUP_ROW,
+		TABLE_ROW_POPIN: TABLE_ROW_POPIN,
+		TABLE_ROW_INDEX: TABLE_ROW_INDEX,
+		TABLE_ROW_SELECTED: TABLE_ROW_SELECTED,
+		TABLE_ROW_ACTIVE: TABLE_ROW_ACTIVE,
+		TABLE_ROW_NAVIGABLE: TABLE_ROW_NAVIGABLE,
+		TABLE_COLUMN_HEADER_ROW: TABLE_COLUMN_HEADER_ROW,
+		TABLE_MORE: TABLE_MORE,
+		TABLE_MORE_DESCRIPTION: TABLE_MORE_DESCRIPTION,
+		TABLE_ROW_ACTIONS: TABLE_ROW_ACTIONS,
+		TABLE_ROW_SINGLE_ACTION: TABLE_ROW_SINGLE_ACTION,
+		TABLE_ROW_MULTIPLE_ACTIONS: TABLE_ROW_MULTIPLE_ACTIONS,
+		TABLE_NAVIGATION: TABLE_NAVIGATION,
+		TABLE_GENERATED_BY_AI: TABLE_GENERATED_BY_AI,
+		TABLE_SELECT_ALL_ROWS: TABLE_SELECT_ALL_ROWS,
+		TABLE_DESELECT_ALL_ROWS: TABLE_DESELECT_ALL_ROWS,
+		DYNAMIC_DATE_RANGE_YESTERDAY_TEXT: DYNAMIC_DATE_RANGE_YESTERDAY_TEXT,
+		DYNAMIC_DATE_RANGE_TODAY_TEXT: DYNAMIC_DATE_RANGE_TODAY_TEXT,
+		DYNAMIC_DATE_RANGE_TOMORROW_TEXT: DYNAMIC_DATE_RANGE_TOMORROW_TEXT,
+		DYNAMIC_DATE_RANGE_DATE_TEXT: DYNAMIC_DATE_RANGE_DATE_TEXT,
+		DYNAMIC_DATE_RANGE_DATERANGE_TEXT: DYNAMIC_DATE_RANGE_DATERANGE_TEXT,
+		DYNAMIC_DATE_RANGE_FROM_INPUT_TEXT: DYNAMIC_DATE_RANGE_FROM_INPUT_TEXT,
+		DYNAMIC_DATE_RANGE_TO_INPUT_TEXT: DYNAMIC_DATE_RANGE_TO_INPUT_TEXT,
+		DYNAMIC_DATE_RANGE_FROM_TEXT: DYNAMIC_DATE_RANGE_FROM_TEXT,
+		DYNAMIC_DATE_RANGE_TO_TEXT: DYNAMIC_DATE_RANGE_TO_TEXT,
+		DYNAMIC_DATE_RANGE_SELECTED_TEXT: DYNAMIC_DATE_RANGE_SELECTED_TEXT,
+		DYNAMIC_DATE_TIME_RANGE_TEXT: DYNAMIC_DATE_TIME_RANGE_TEXT,
+		DYNAMIC_DATE_TIME_RANGE_TEXT_TO_LABEL: DYNAMIC_DATE_TIME_RANGE_TEXT_TO_LABEL,
+		DYNAMIC_DATE_TIME_RANGE_TEXT_FROM_LABEL: DYNAMIC_DATE_TIME_RANGE_TEXT_FROM_LABEL,
+		DYNAMIC_DATE_RANGE_EMPTY_SELECTED_TEXT: DYNAMIC_DATE_RANGE_EMPTY_SELECTED_TEXT,
+		DYNAMIC_DATE_RANGE_POPOVER_ACCESSIBLE_NAME: DYNAMIC_DATE_RANGE_POPOVER_ACCESSIBLE_NAME,
+		DYNAMIC_DATE_RANGE_NAVIGATION_ICON_TOOLTIP: DYNAMIC_DATE_RANGE_NAVIGATION_ICON_TOOLTIP,
+		DYNAMIC_DATE_RANGE_LAST_DAYS_TEXT: DYNAMIC_DATE_RANGE_LAST_DAYS_TEXT,
+		DYNAMIC_DATE_RANGE_NEXT_DAYS_TEXT: DYNAMIC_DATE_RANGE_NEXT_DAYS_TEXT,
+		DYNAMIC_DATE_RANGE_LAST_WEEKS_TEXT: DYNAMIC_DATE_RANGE_LAST_WEEKS_TEXT,
+		DYNAMIC_DATE_RANGE_NEXT_WEEKS_TEXT: DYNAMIC_DATE_RANGE_NEXT_WEEKS_TEXT,
+		DYNAMIC_DATE_RANGE_LAST_MONTHS_TEXT: DYNAMIC_DATE_RANGE_LAST_MONTHS_TEXT,
+		DYNAMIC_DATE_RANGE_NEXT_MONTHS_TEXT: DYNAMIC_DATE_RANGE_NEXT_MONTHS_TEXT,
+		DYNAMIC_DATE_RANGE_LAST_QUARTERS_TEXT: DYNAMIC_DATE_RANGE_LAST_QUARTERS_TEXT,
+		DYNAMIC_DATE_RANGE_NEXT_QUARTERS_TEXT: DYNAMIC_DATE_RANGE_NEXT_QUARTERS_TEXT,
+		DYNAMIC_DATE_RANGE_LAST_YEARS_TEXT: DYNAMIC_DATE_RANGE_LAST_YEARS_TEXT,
+		DYNAMIC_DATE_RANGE_NEXT_YEARS_TEXT: DYNAMIC_DATE_RANGE_NEXT_YEARS_TEXT,
+		CHECKBOX_CHECKED: CHECKBOX_CHECKED,
+		CHECKBOX_NOT_CHECKED: CHECKBOX_NOT_CHECKED,
+		CHECKBOX_ARIA_TYPE: CHECKBOX_ARIA_TYPE,
+		DYNAMIC_DATE_RANGE_VALUE_LABEL_TEXT: DYNAMIC_DATE_RANGE_VALUE_LABEL_TEXT,
+		DYNAMIC_DATE_RANGE_UNIT_OF_TIME_LABEL_TEXT: DYNAMIC_DATE_RANGE_UNIT_OF_TIME_LABEL_TEXT,
+		DYNAMIC_DATE_RANGE_DAYS_UNIT_TEXT: DYNAMIC_DATE_RANGE_DAYS_UNIT_TEXT,
+		DYNAMIC_DATE_RANGE_WEEKS_UNIT_TEXT: DYNAMIC_DATE_RANGE_WEEKS_UNIT_TEXT,
+		DYNAMIC_DATE_RANGE_MONTHS_UNIT_TEXT: DYNAMIC_DATE_RANGE_MONTHS_UNIT_TEXT,
+		DYNAMIC_DATE_RANGE_QUARTERS_UNIT_TEXT: DYNAMIC_DATE_RANGE_QUARTERS_UNIT_TEXT,
+		DYNAMIC_DATE_RANGE_YEARS_UNIT_TEXT: DYNAMIC_DATE_RANGE_YEARS_UNIT_TEXT,
+		DYNAMIC_DATE_RANGE_LAST_COMBINED_TEXT: DYNAMIC_DATE_RANGE_LAST_COMBINED_TEXT,
+		DYNAMIC_DATE_RANGE_NEXT_COMBINED_TEXT: DYNAMIC_DATE_RANGE_NEXT_COMBINED_TEXT,
+		DYNAMIC_DATE_RANGE_INCLUDED_TEXT: DYNAMIC_DATE_RANGE_INCLUDED_TEXT,
+		SWITCH_ON: SWITCH_ON,
+		SWITCH_OFF: SWITCH_OFF,
+		ICON_ARIA_TYPE_IMAGE: ICON_ARIA_TYPE_IMAGE,
+		ICON_ARIA_TYPE_INTERACTIVE: ICON_ARIA_TYPE_INTERACTIVE
+	};
+
+	exports.ACC_STATE_DISABLED = ACC_STATE_DISABLED;
+	exports.ACC_STATE_EMPTY = ACC_STATE_EMPTY;
+	exports.ACC_STATE_MULTIPLE_CONTROLS = ACC_STATE_MULTIPLE_CONTROLS;
+	exports.ACC_STATE_READONLY = ACC_STATE_READONLY;
+	exports.ACC_STATE_REQUIRED = ACC_STATE_REQUIRED;
+	exports.ACC_STATE_SINGLE_CONTROL = ACC_STATE_SINGLE_CONTROL;
+	exports.ARIA_LABEL_CARD_CONTENT = ARIA_LABEL_CARD_CONTENT;
+	exports.ARIA_LABEL_EMPTY_CELL = ARIA_LABEL_EMPTY_CELL;
+	exports.ARIA_LABEL_LIST_DELETABLE = ARIA_LABEL_LIST_DELETABLE;
+	exports.ARIA_LABEL_LIST_ITEM_CHECKBOX = ARIA_LABEL_LIST_ITEM_CHECKBOX;
+	exports.ARIA_LABEL_LIST_ITEM_RADIO_BUTTON = ARIA_LABEL_LIST_ITEM_RADIO_BUTTON;
+	exports.ARIA_LABEL_LIST_MULTISELECTABLE = ARIA_LABEL_LIST_MULTISELECTABLE;
+	exports.ARIA_LABEL_LIST_SELECTABLE = ARIA_LABEL_LIST_SELECTABLE;
+	exports.ARIA_LABEL_ROW_SELECTION = ARIA_LABEL_ROW_SELECTION;
+	exports.ARIA_LABEL_SELECT_ALL_CHECKBOX = ARIA_LABEL_SELECT_ALL_CHECKBOX;
+	exports.ARIA_ROLEDESCRIPTION_CARD = ARIA_ROLEDESCRIPTION_CARD;
+	exports.ARIA_ROLEDESCRIPTION_CARD_HEADER = ARIA_ROLEDESCRIPTION_CARD_HEADER;
+	exports.ARIA_ROLEDESCRIPTION_INTERACTIVE_CARD_HEADER = ARIA_ROLEDESCRIPTION_INTERACTIVE_CARD_HEADER;
+	exports.AVATAR_GROUP_ARIA_LABEL_GROUP = AVATAR_GROUP_ARIA_LABEL_GROUP;
+	exports.AVATAR_GROUP_ARIA_LABEL_INDIVIDUAL = AVATAR_GROUP_ARIA_LABEL_INDIVIDUAL;
+	exports.AVATAR_GROUP_DISPLAYED_HIDDEN_LABEL = AVATAR_GROUP_DISPLAYED_HIDDEN_LABEL;
+	exports.AVATAR_GROUP_MOVE = AVATAR_GROUP_MOVE;
+	exports.AVATAR_GROUP_SHOW_COMPLETE_LIST_LABEL = AVATAR_GROUP_SHOW_COMPLETE_LIST_LABEL;
+	exports.AVATAR_TOOLTIP = AVATAR_TOOLTIP;
+	exports.AVATAR_TYPE_BUTTON = AVATAR_TYPE_BUTTON;
+	exports.AVATAR_TYPE_IMAGE = AVATAR_TYPE_IMAGE;
+	exports.BREADCRUMBS_ARIA_LABEL = BREADCRUMBS_ARIA_LABEL;
+	exports.BREADCRUMBS_CANCEL_BUTTON = BREADCRUMBS_CANCEL_BUTTON;
+	exports.BREADCRUMBS_OVERFLOW_ARIA_LABEL = BREADCRUMBS_OVERFLOW_ARIA_LABEL;
+	exports.BREADCRUMB_ITEM_POS = BREADCRUMB_ITEM_POS;
+	exports.BUSY_INDICATOR_TITLE = BUSY_INDICATOR_TITLE;
+	exports.BUTTON_ARIA_TYPE_ACCEPT = BUTTON_ARIA_TYPE_ACCEPT;
+	exports.BUTTON_ARIA_TYPE_ATTENTION = BUTTON_ARIA_TYPE_ATTENTION;
+	exports.BUTTON_ARIA_TYPE_EMPHASIZED = BUTTON_ARIA_TYPE_EMPHASIZED;
+	exports.BUTTON_ARIA_TYPE_REJECT = BUTTON_ARIA_TYPE_REJECT;
+	exports.BUTTON_BADGE_MANY_ITEMS = BUTTON_BADGE_MANY_ITEMS;
+	exports.BUTTON_BADGE_ONE_ITEM = BUTTON_BADGE_ONE_ITEM;
+	exports.BUTTON_ROLE_DESCRIPTION = BUTTON_ROLE_DESCRIPTION;
+	exports.CALENDAR_FOOTER_CANCEL_BUTTON = CALENDAR_FOOTER_CANCEL_BUTTON;
+	exports.CALENDAR_FOOTER_OK_BUTTON = CALENDAR_FOOTER_OK_BUTTON;
+	exports.CALENDAR_HEADER_MONTH_BUTTON = CALENDAR_HEADER_MONTH_BUTTON;
+	exports.CALENDAR_HEADER_MONTH_BUTTON_SHORTCUT = CALENDAR_HEADER_MONTH_BUTTON_SHORTCUT;
+	exports.CALENDAR_HEADER_MONTH_NEXT_BUTTON_SHORTCUT = CALENDAR_HEADER_MONTH_NEXT_BUTTON_SHORTCUT;
+	exports.CALENDAR_HEADER_MONTH_NEXT_BUTTON_TITLE = CALENDAR_HEADER_MONTH_NEXT_BUTTON_TITLE;
+	exports.CALENDAR_HEADER_MONTH_PREVIOUS_BUTTON_SHORTCUT = CALENDAR_HEADER_MONTH_PREVIOUS_BUTTON_SHORTCUT;
+	exports.CALENDAR_HEADER_MONTH_PREVIOUS_BUTTON_TITLE = CALENDAR_HEADER_MONTH_PREVIOUS_BUTTON_TITLE;
+	exports.CALENDAR_HEADER_YEAR_BUTTON = CALENDAR_HEADER_YEAR_BUTTON;
+	exports.CALENDAR_HEADER_YEAR_BUTTON_SHORTCUT = CALENDAR_HEADER_YEAR_BUTTON_SHORTCUT;
+	exports.CALENDAR_HEADER_YEAR_NEXT_BUTTON_TITLE = CALENDAR_HEADER_YEAR_NEXT_BUTTON_TITLE;
+	exports.CALENDAR_HEADER_YEAR_PREVIOUS_BUTTON_TITLE = CALENDAR_HEADER_YEAR_PREVIOUS_BUTTON_TITLE;
+	exports.CALENDAR_HEADER_YEAR_RANGE_BUTTON = CALENDAR_HEADER_YEAR_RANGE_BUTTON;
+	exports.CALENDAR_HEADER_YEAR_RANGE_BUTTON_SHORTCUT = CALENDAR_HEADER_YEAR_RANGE_BUTTON_SHORTCUT;
+	exports.CALENDAR_HEADER_YEAR_RANGE_NEXT_BUTTON_TITLE = CALENDAR_HEADER_YEAR_RANGE_NEXT_BUTTON_TITLE;
+	exports.CALENDAR_HEADER_YEAR_RANGE_PREVIOUS_BUTTON_TITLE = CALENDAR_HEADER_YEAR_RANGE_PREVIOUS_BUTTON_TITLE;
+	exports.CAL_LEGEND_NON_WORKING_DAY_TEXT = CAL_LEGEND_NON_WORKING_DAY_TEXT;
+	exports.CAL_LEGEND_ROLE_DESCRIPTION = CAL_LEGEND_ROLE_DESCRIPTION;
+	exports.CAL_LEGEND_SELECTED_TEXT = CAL_LEGEND_SELECTED_TEXT;
+	exports.CAL_LEGEND_TODAY_TEXT = CAL_LEGEND_TODAY_TEXT;
+	exports.CAL_LEGEND_WORKING_DAY_TEXT = CAL_LEGEND_WORKING_DAY_TEXT;
+	exports.CAROUSEL_ARIA_LIST_LABEL = CAROUSEL_ARIA_LIST_LABEL;
+	exports.CAROUSEL_ARIA_ROLE_DESCRIPTION = CAROUSEL_ARIA_ROLE_DESCRIPTION;
+	exports.CAROUSEL_DOT_TEXT = CAROUSEL_DOT_TEXT;
+	exports.CAROUSEL_NEXT_ARROW_TEXT = CAROUSEL_NEXT_ARROW_TEXT;
+	exports.CAROUSEL_OF_TEXT = CAROUSEL_OF_TEXT;
+	exports.CAROUSEL_PREVIOUS_ARROW_TEXT = CAROUSEL_PREVIOUS_ARROW_TEXT;
+	exports.CHECKBOX_ARIA_TYPE = CHECKBOX_ARIA_TYPE;
+	exports.CHECKBOX_CHECKED = CHECKBOX_CHECKED;
+	exports.CHECKBOX_NOT_CHECKED = CHECKBOX_NOT_CHECKED;
+	exports.COLORPALETTE_COLOR_LABEL = COLORPALETTE_COLOR_LABEL;
+	exports.COLORPALETTE_CONTAINER_LABEL = COLORPALETTE_CONTAINER_LABEL;
+	exports.COLORPALETTE_POPOVER_TITLE = COLORPALETTE_POPOVER_TITLE;
+	exports.COLORPICKER_ALPHA = COLORPICKER_ALPHA;
+	exports.COLORPICKER_ALPHA_SLIDER = COLORPICKER_ALPHA_SLIDER;
+	exports.COLORPICKER_BLUE = COLORPICKER_BLUE;
+	exports.COLORPICKER_COLOR_MODE_CHANGED = COLORPICKER_COLOR_MODE_CHANGED;
+	exports.COLORPICKER_GREEN = COLORPICKER_GREEN;
+	exports.COLORPICKER_HEX = COLORPICKER_HEX;
+	exports.COLORPICKER_HUE = COLORPICKER_HUE;
+	exports.COLORPICKER_HUE_SLIDER = COLORPICKER_HUE_SLIDER;
+	exports.COLORPICKER_LABEL = COLORPICKER_LABEL;
+	exports.COLORPICKER_LIGHT = COLORPICKER_LIGHT;
+	exports.COLORPICKER_PERCENTAGE = COLORPICKER_PERCENTAGE;
+	exports.COLORPICKER_RED = COLORPICKER_RED;
+	exports.COLORPICKER_SATURATION = COLORPICKER_SATURATION;
+	exports.COLORPICKER_SLIDER_GROUP = COLORPICKER_SLIDER_GROUP;
+	exports.COLORPICKER_TOGGLE_MODE_TOOLTIP = COLORPICKER_TOGGLE_MODE_TOOLTIP;
+	exports.COLOR_PALETTE_DEFAULT_COLOR_TEXT = COLOR_PALETTE_DEFAULT_COLOR_TEXT;
+	exports.COLOR_PALETTE_DIALOG_CANCEL_BUTTON = COLOR_PALETTE_DIALOG_CANCEL_BUTTON;
+	exports.COLOR_PALETTE_DIALOG_OK_BUTTON = COLOR_PALETTE_DIALOG_OK_BUTTON;
+	exports.COLOR_PALETTE_DIALOG_TITLE = COLOR_PALETTE_DIALOG_TITLE;
+	exports.COLOR_PALETTE_MORE_COLORS_TEXT = COLOR_PALETTE_MORE_COLORS_TEXT;
+	exports.COMBOBOX_AVAILABLE_OPTIONS = COMBOBOX_AVAILABLE_OPTIONS;
+	exports.COMBOBOX_DIALOG_CANCEL_BUTTON = COMBOBOX_DIALOG_CANCEL_BUTTON;
+	exports.COMBOBOX_DIALOG_OK_BUTTON = COMBOBOX_DIALOG_OK_BUTTON;
+	exports.DATEPICKER_DATE_DESCRIPTION = DATEPICKER_DATE_DESCRIPTION;
+	exports.DATEPICKER_MOBILE_HEADER_TITLE = DATEPICKER_MOBILE_HEADER_TITLE;
+	exports.DATEPICKER_OPEN_ICON_TITLE = DATEPICKER_OPEN_ICON_TITLE;
+	exports.DATEPICKER_OPEN_ICON_TITLE_OPENED = DATEPICKER_OPEN_ICON_TITLE_OPENED;
+	exports.DATEPICKER_PATTERN_MISSMATCH = DATEPICKER_PATTERN_MISSMATCH;
+	exports.DATEPICKER_POPOVER_ACCESSIBLE_NAME = DATEPICKER_POPOVER_ACCESSIBLE_NAME;
+	exports.DATEPICKER_RANGE_OVERFLOW = DATEPICKER_RANGE_OVERFLOW;
+	exports.DATEPICKER_RANGE_UNDERFLOW = DATEPICKER_RANGE_UNDERFLOW;
+	exports.DATEPICKER_VALUE_MISSING = DATEPICKER_VALUE_MISSING;
+	exports.DATERANGEPICKER_POPOVER_ACCESSIBLE_NAME = DATERANGEPICKER_POPOVER_ACCESSIBLE_NAME;
+	exports.DATERANGE_DESCRIPTION = DATERANGE_DESCRIPTION;
+	exports.DATERANGE_OVERFLOW = DATERANGE_OVERFLOW;
+	exports.DATERANGE_PATTERN_MISMATCH = DATERANGE_PATTERN_MISMATCH;
+	exports.DATERANGE_UNDERFLOW = DATERANGE_UNDERFLOW;
+	exports.DATERANGE_VALUE_MISSING = DATERANGE_VALUE_MISSING;
+	exports.DATETIMEPICKER_POPOVER_ACCESSIBLE_NAME = DATETIMEPICKER_POPOVER_ACCESSIBLE_NAME;
+	exports.DATETIME_COMPONENTS_PLACEHOLDER_PREFIX = DATETIME_COMPONENTS_PLACEHOLDER_PREFIX;
+	exports.DATETIME_DESCRIPTION = DATETIME_DESCRIPTION;
+	exports.DATETIME_PATTERN_MISMATCH = DATETIME_PATTERN_MISMATCH;
+	exports.DATETIME_PICKER_DATE_BUTTON = DATETIME_PICKER_DATE_BUTTON;
+	exports.DATETIME_PICKER_TIME_BUTTON = DATETIME_PICKER_TIME_BUTTON;
+	exports.DATETIME_RANGEOVERFLOW = DATETIME_RANGEOVERFLOW;
+	exports.DATETIME_RANGEUNDERFLOW = DATETIME_RANGEUNDERFLOW;
+	exports.DATETIME_VALUE_MISSING = DATETIME_VALUE_MISSING;
+	exports.DAY_PICKER_NON_WORKING_DAY = DAY_PICKER_NON_WORKING_DAY;
+	exports.DAY_PICKER_SELECTED_RANGE_BETWEEN = DAY_PICKER_SELECTED_RANGE_BETWEEN;
+	exports.DAY_PICKER_SELECTED_RANGE_END = DAY_PICKER_SELECTED_RANGE_END;
+	exports.DAY_PICKER_SELECTED_RANGE_START = DAY_PICKER_SELECTED_RANGE_START;
+	exports.DAY_PICKER_TODAY = DAY_PICKER_TODAY;
+	exports.DAY_PICKER_WEEK_NUMBER_TEXT = DAY_PICKER_WEEK_NUMBER_TEXT;
+	exports.DELETE = DELETE;
+	exports.DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE = DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE;
+	exports.DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE = DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE;
+	exports.DIALOG_HEADER_ARIA_DESCRIBEDBY_RESIZABLE = DIALOG_HEADER_ARIA_DESCRIBEDBY_RESIZABLE;
+	exports.DIALOG_HEADER_ARIA_ROLE_DESCRIPTION = DIALOG_HEADER_ARIA_ROLE_DESCRIPTION;
+	exports.DURATION_INPUT_DESCRIPTION = DURATION_INPUT_DESCRIPTION;
+	exports.DYNAMIC_DATE_RANGE_DATERANGE_TEXT = DYNAMIC_DATE_RANGE_DATERANGE_TEXT;
+	exports.DYNAMIC_DATE_RANGE_DATE_TEXT = DYNAMIC_DATE_RANGE_DATE_TEXT;
+	exports.DYNAMIC_DATE_RANGE_DAYS_UNIT_TEXT = DYNAMIC_DATE_RANGE_DAYS_UNIT_TEXT;
+	exports.DYNAMIC_DATE_RANGE_EMPTY_SELECTED_TEXT = DYNAMIC_DATE_RANGE_EMPTY_SELECTED_TEXT;
+	exports.DYNAMIC_DATE_RANGE_FROM_INPUT_TEXT = DYNAMIC_DATE_RANGE_FROM_INPUT_TEXT;
+	exports.DYNAMIC_DATE_RANGE_FROM_TEXT = DYNAMIC_DATE_RANGE_FROM_TEXT;
+	exports.DYNAMIC_DATE_RANGE_INCLUDED_TEXT = DYNAMIC_DATE_RANGE_INCLUDED_TEXT;
+	exports.DYNAMIC_DATE_RANGE_LAST_COMBINED_TEXT = DYNAMIC_DATE_RANGE_LAST_COMBINED_TEXT;
+	exports.DYNAMIC_DATE_RANGE_LAST_DAYS_TEXT = DYNAMIC_DATE_RANGE_LAST_DAYS_TEXT;
+	exports.DYNAMIC_DATE_RANGE_LAST_MONTHS_TEXT = DYNAMIC_DATE_RANGE_LAST_MONTHS_TEXT;
+	exports.DYNAMIC_DATE_RANGE_LAST_QUARTERS_TEXT = DYNAMIC_DATE_RANGE_LAST_QUARTERS_TEXT;
+	exports.DYNAMIC_DATE_RANGE_LAST_WEEKS_TEXT = DYNAMIC_DATE_RANGE_LAST_WEEKS_TEXT;
+	exports.DYNAMIC_DATE_RANGE_LAST_YEARS_TEXT = DYNAMIC_DATE_RANGE_LAST_YEARS_TEXT;
+	exports.DYNAMIC_DATE_RANGE_MONTHS_UNIT_TEXT = DYNAMIC_DATE_RANGE_MONTHS_UNIT_TEXT;
+	exports.DYNAMIC_DATE_RANGE_NAVIGATION_ICON_TOOLTIP = DYNAMIC_DATE_RANGE_NAVIGATION_ICON_TOOLTIP;
+	exports.DYNAMIC_DATE_RANGE_NEXT_COMBINED_TEXT = DYNAMIC_DATE_RANGE_NEXT_COMBINED_TEXT;
+	exports.DYNAMIC_DATE_RANGE_NEXT_DAYS_TEXT = DYNAMIC_DATE_RANGE_NEXT_DAYS_TEXT;
+	exports.DYNAMIC_DATE_RANGE_NEXT_MONTHS_TEXT = DYNAMIC_DATE_RANGE_NEXT_MONTHS_TEXT;
+	exports.DYNAMIC_DATE_RANGE_NEXT_QUARTERS_TEXT = DYNAMIC_DATE_RANGE_NEXT_QUARTERS_TEXT;
+	exports.DYNAMIC_DATE_RANGE_NEXT_WEEKS_TEXT = DYNAMIC_DATE_RANGE_NEXT_WEEKS_TEXT;
+	exports.DYNAMIC_DATE_RANGE_NEXT_YEARS_TEXT = DYNAMIC_DATE_RANGE_NEXT_YEARS_TEXT;
+	exports.DYNAMIC_DATE_RANGE_POPOVER_ACCESSIBLE_NAME = DYNAMIC_DATE_RANGE_POPOVER_ACCESSIBLE_NAME;
+	exports.DYNAMIC_DATE_RANGE_QUARTERS_UNIT_TEXT = DYNAMIC_DATE_RANGE_QUARTERS_UNIT_TEXT;
+	exports.DYNAMIC_DATE_RANGE_SELECTED_TEXT = DYNAMIC_DATE_RANGE_SELECTED_TEXT;
+	exports.DYNAMIC_DATE_RANGE_TODAY_TEXT = DYNAMIC_DATE_RANGE_TODAY_TEXT;
+	exports.DYNAMIC_DATE_RANGE_TOMORROW_TEXT = DYNAMIC_DATE_RANGE_TOMORROW_TEXT;
+	exports.DYNAMIC_DATE_RANGE_TO_INPUT_TEXT = DYNAMIC_DATE_RANGE_TO_INPUT_TEXT;
+	exports.DYNAMIC_DATE_RANGE_TO_TEXT = DYNAMIC_DATE_RANGE_TO_TEXT;
+	exports.DYNAMIC_DATE_RANGE_UNIT_OF_TIME_LABEL_TEXT = DYNAMIC_DATE_RANGE_UNIT_OF_TIME_LABEL_TEXT;
+	exports.DYNAMIC_DATE_RANGE_VALUE_LABEL_TEXT = DYNAMIC_DATE_RANGE_VALUE_LABEL_TEXT;
+	exports.DYNAMIC_DATE_RANGE_WEEKS_UNIT_TEXT = DYNAMIC_DATE_RANGE_WEEKS_UNIT_TEXT;
+	exports.DYNAMIC_DATE_RANGE_YEARS_UNIT_TEXT = DYNAMIC_DATE_RANGE_YEARS_UNIT_TEXT;
+	exports.DYNAMIC_DATE_RANGE_YESTERDAY_TEXT = DYNAMIC_DATE_RANGE_YESTERDAY_TEXT;
+	exports.DYNAMIC_DATE_TIME_RANGE_TEXT = DYNAMIC_DATE_TIME_RANGE_TEXT;
+	exports.DYNAMIC_DATE_TIME_RANGE_TEXT_FROM_LABEL = DYNAMIC_DATE_TIME_RANGE_TEXT_FROM_LABEL;
+	exports.DYNAMIC_DATE_TIME_RANGE_TEXT_TO_LABEL = DYNAMIC_DATE_TIME_RANGE_TEXT_TO_LABEL;
+	exports.EMPTY_INDICATOR_ACCESSIBLE_TEXT = EMPTY_INDICATOR_ACCESSIBLE_TEXT;
+	exports.EMPTY_INDICATOR_SYMBOL = EMPTY_INDICATOR_SYMBOL;
+	exports.EXPANDABLE_TEXT_CLOSE = EXPANDABLE_TEXT_CLOSE;
+	exports.EXPANDABLE_TEXT_SHOW_LESS = EXPANDABLE_TEXT_SHOW_LESS;
+	exports.EXPANDABLE_TEXT_SHOW_LESS_POPOVER_ARIA_LABEL = EXPANDABLE_TEXT_SHOW_LESS_POPOVER_ARIA_LABEL;
+	exports.EXPANDABLE_TEXT_SHOW_MORE = EXPANDABLE_TEXT_SHOW_MORE;
+	exports.EXPANDABLE_TEXT_SHOW_MORE_POPOVER_ARIA_LABEL = EXPANDABLE_TEXT_SHOW_MORE_POPOVER_ARIA_LABEL;
+	exports.FILEUPLOADER_CLEAR_ICON_TOOLTIP = FILEUPLOADER_CLEAR_ICON_TOOLTIP;
+	exports.FILEUPLOADER_DEFAULT_MULTIPLE_PLACEHOLDER = FILEUPLOADER_DEFAULT_MULTIPLE_PLACEHOLDER;
+	exports.FILEUPLOADER_DEFAULT_PLACEHOLDER = FILEUPLOADER_DEFAULT_PLACEHOLDER;
+	exports.FILEUPLOADER_INPUT_TOOLTIP = FILEUPLOADER_INPUT_TOOLTIP;
+	exports.FILEUPLOADER_ROLE_DESCRIPTION = FILEUPLOADER_ROLE_DESCRIPTION;
+	exports.FILEUPLOADER_VALUE_HELP_TOOLTIP = FILEUPLOADER_VALUE_HELP_TOOLTIP;
+	exports.FILEUPLOAER_VALUE_MISSING = FILEUPLOAER_VALUE_MISSING;
+	exports.FORM_ACCESSIBLE_NAME = FORM_ACCESSIBLE_NAME;
+	exports.FORM_CHECKABLE_REQUIRED = FORM_CHECKABLE_REQUIRED;
+	exports.FORM_GROUP_ACCESSIBLE_NAME = FORM_GROUP_ACCESSIBLE_NAME;
+	exports.FORM_MIXED_TEXTFIELD_REQUIRED = FORM_MIXED_TEXTFIELD_REQUIRED;
+	exports.FORM_SELECTABLE_AVALIABLE_VALUES = FORM_SELECTABLE_AVALIABLE_VALUES;
+	exports.FORM_SELECTABLE_REQUIRED = FORM_SELECTABLE_REQUIRED;
+	exports.FORM_SELECTABLE_REQUIRED2 = FORM_SELECTABLE_REQUIRED2;
+	exports.FORM_TEXTFIELD_REQUIRED = FORM_TEXTFIELD_REQUIRED;
+	exports.GROUP_HEADER_TEXT = GROUP_HEADER_TEXT;
+	exports.ICON_ARIA_TYPE_IMAGE = ICON_ARIA_TYPE_IMAGE;
+	exports.ICON_ARIA_TYPE_INTERACTIVE = ICON_ARIA_TYPE_INTERACTIVE;
+	exports.INPUT_AVALIABLE_VALUES = INPUT_AVALIABLE_VALUES;
+	exports.INPUT_CLEAR_ICON_ACC_NAME = INPUT_CLEAR_ICON_ACC_NAME;
+	exports.INPUT_SUGGESTIONS = INPUT_SUGGESTIONS;
+	exports.INPUT_SUGGESTIONS_CANCEL_BUTTON = INPUT_SUGGESTIONS_CANCEL_BUTTON;
+	exports.INPUT_SUGGESTIONS_COLLAPSED = INPUT_SUGGESTIONS_COLLAPSED;
+	exports.INPUT_SUGGESTIONS_EXPANDED = INPUT_SUGGESTIONS_EXPANDED;
+	exports.INPUT_SUGGESTIONS_MORE_HITS = INPUT_SUGGESTIONS_MORE_HITS;
+	exports.INPUT_SUGGESTIONS_NO_HIT = INPUT_SUGGESTIONS_NO_HIT;
+	exports.INPUT_SUGGESTIONS_OK_BUTTON = INPUT_SUGGESTIONS_OK_BUTTON;
+	exports.INPUT_SUGGESTIONS_ONE_HIT = INPUT_SUGGESTIONS_ONE_HIT;
+	exports.INPUT_SUGGESTIONS_TITLE = INPUT_SUGGESTIONS_TITLE;
+	exports.LABEL_COLON = LABEL_COLON;
+	exports.LINK_EMPHASIZED = LINK_EMPHASIZED;
+	exports.LINK_ROLE_DESCRIPTION = LINK_ROLE_DESCRIPTION;
+	exports.LINK_SUBTLE = LINK_SUBTLE;
+	exports.LISTITEMCUSTOM_TYPE_TEXT = LISTITEMCUSTOM_TYPE_TEXT;
+	exports.LIST_ITEM_ACTIVE = LIST_ITEM_ACTIVE;
+	exports.LIST_ITEM_GROUP_HEADER = LIST_ITEM_GROUP_HEADER;
+	exports.LIST_ITEM_NOT_SELECTED = LIST_ITEM_NOT_SELECTED;
+	exports.LIST_ITEM_POSITION = LIST_ITEM_POSITION;
+	exports.LIST_ITEM_SELECTED = LIST_ITEM_SELECTED;
+	exports.LIST_ROLE_DESCRIPTION = LIST_ROLE_DESCRIPTION;
+	exports.LIST_ROLE_LISTBOX_GROUP_DESCRIPTION = LIST_ROLE_LISTBOX_GROUP_DESCRIPTION;
+	exports.LIST_ROLE_LIST_GROUP_DESCRIPTION = LIST_ROLE_LIST_GROUP_DESCRIPTION;
+	exports.LOAD_MORE_TEXT = LOAD_MORE_TEXT;
+	exports.MCB_SELECTED_ITEMS = MCB_SELECTED_ITEMS;
+	exports.MENU_BACK_BUTTON_ARIA_LABEL = MENU_BACK_BUTTON_ARIA_LABEL;
+	exports.MENU_CANCEL_BUTTON_TEXT = MENU_CANCEL_BUTTON_TEXT;
+	exports.MENU_ITEM_END_CONTENT_ACCESSIBLE_NAME = MENU_ITEM_END_CONTENT_ACCESSIBLE_NAME;
+	exports.MENU_ITEM_GROUP_MULTI_ACCESSIBLE_NAME = MENU_ITEM_GROUP_MULTI_ACCESSIBLE_NAME;
+	exports.MENU_ITEM_GROUP_NONE_ACCESSIBLE_NAME = MENU_ITEM_GROUP_NONE_ACCESSIBLE_NAME;
+	exports.MENU_ITEM_GROUP_SINGLE_ACCESSIBLE_NAME = MENU_ITEM_GROUP_SINGLE_ACCESSIBLE_NAME;
+	exports.MENU_ITEM_LOADING = MENU_ITEM_LOADING;
+	exports.MENU_POPOVER_ACCESSIBLE_NAME = MENU_POPOVER_ACCESSIBLE_NAME;
+	exports.MESSAGE_STRIP_CLOSABLE = MESSAGE_STRIP_CLOSABLE;
+	exports.MESSAGE_STRIP_CLOSE_BUTTON_CRITICAL = MESSAGE_STRIP_CLOSE_BUTTON_CRITICAL;
+	exports.MESSAGE_STRIP_CLOSE_BUTTON_CUSTOM = MESSAGE_STRIP_CLOSE_BUTTON_CUSTOM;
+	exports.MESSAGE_STRIP_CLOSE_BUTTON_INFORMATION = MESSAGE_STRIP_CLOSE_BUTTON_INFORMATION;
+	exports.MESSAGE_STRIP_CLOSE_BUTTON_NEGATIVE = MESSAGE_STRIP_CLOSE_BUTTON_NEGATIVE;
+	exports.MESSAGE_STRIP_CLOSE_BUTTON_POSITIVE = MESSAGE_STRIP_CLOSE_BUTTON_POSITIVE;
+	exports.MESSAGE_STRIP_CUSTOM = MESSAGE_STRIP_CUSTOM;
+	exports.MESSAGE_STRIP_ERROR = MESSAGE_STRIP_ERROR;
+	exports.MESSAGE_STRIP_INFORMATION = MESSAGE_STRIP_INFORMATION;
+	exports.MESSAGE_STRIP_SUCCESS = MESSAGE_STRIP_SUCCESS;
+	exports.MESSAGE_STRIP_WARNING = MESSAGE_STRIP_WARNING;
+	exports.MONTH_PICKER_DESCRIPTION = MONTH_PICKER_DESCRIPTION;
+	exports.MULTICOMBOBOX_DIALOG_CANCEL_BUTTON = MULTICOMBOBOX_DIALOG_CANCEL_BUTTON;
+	exports.MULTICOMBOBOX_DIALOG_OK_BUTTON = MULTICOMBOBOX_DIALOG_OK_BUTTON;
+	exports.MULTIINPUT_FILTER_BUTTON_LABEL = MULTIINPUT_FILTER_BUTTON_LABEL;
+	exports.MULTIINPUT_ROLEDESCRIPTION_TEXT = MULTIINPUT_ROLEDESCRIPTION_TEXT;
+	exports.MULTIINPUT_SHOW_MORE_TOKENS = MULTIINPUT_SHOW_MORE_TOKENS;
+	exports.MULTIINPUT_VALUE_HELP = MULTIINPUT_VALUE_HELP;
+	exports.MULTIINPUT_VALUE_HELP_LABEL = MULTIINPUT_VALUE_HELP_LABEL;
+	exports.PANEL_ICON = PANEL_ICON;
+	exports.RANGE_SLIDER_ARIA_DESCRIPTION = RANGE_SLIDER_ARIA_DESCRIPTION;
+	exports.RANGE_SLIDER_END_HANDLE_DESCRIPTION = RANGE_SLIDER_END_HANDLE_DESCRIPTION;
+	exports.RANGE_SLIDER_START_HANDLE_DESCRIPTION = RANGE_SLIDER_START_HANDLE_DESCRIPTION;
+	exports.RATING_INDICATOR_ARIA_DESCRIPTION = RATING_INDICATOR_ARIA_DESCRIPTION;
+	exports.RATING_INDICATOR_TEXT = RATING_INDICATOR_TEXT;
+	exports.RATING_INDICATOR_TOOLTIP_TEXT = RATING_INDICATOR_TOOLTIP_TEXT;
+	exports.RESPONSIVE_POPOVER_CLOSE_DIALOG_BUTTON = RESPONSIVE_POPOVER_CLOSE_DIALOG_BUTTON;
+	exports.SEGMENTEDBUTTONITEM_ARIA_DESCRIPTION = SEGMENTEDBUTTONITEM_ARIA_DESCRIPTION;
+	exports.SEGMENTEDBUTTON_ARIA_DESCRIBEDBY = SEGMENTEDBUTTON_ARIA_DESCRIBEDBY;
+	exports.SEGMENTEDBUTTON_ARIA_DESCRIPTION = SEGMENTEDBUTTON_ARIA_DESCRIPTION;
+	exports.SELECT_OPTIONS = SELECT_OPTIONS;
+	exports.SELECT_ROLE_DESCRIPTION = SELECT_ROLE_DESCRIPTION;
+	exports.SHOW_SELECTED_BUTTON = SHOW_SELECTED_BUTTON;
+	exports.SLIDER_ARIA_DESCRIPTION = SLIDER_ARIA_DESCRIPTION;
+	exports.SLIDER_TOOLTIP_INPUT_DESCRIPTION = SLIDER_TOOLTIP_INPUT_DESCRIPTION;
+	exports.SLIDER_TOOLTIP_INPUT_LABEL = SLIDER_TOOLTIP_INPUT_LABEL;
+	exports.SPLIT_BUTTON_ARROW_BUTTON_TOOLTIP = SPLIT_BUTTON_ARROW_BUTTON_TOOLTIP;
+	exports.SPLIT_BUTTON_DESCRIPTION = SPLIT_BUTTON_DESCRIPTION;
+	exports.SPLIT_BUTTON_KEYBOARD_HINT = SPLIT_BUTTON_KEYBOARD_HINT;
+	exports.STEPINPUT_DEC_ICON_TITLE = STEPINPUT_DEC_ICON_TITLE;
+	exports.STEPINPUT_INC_ICON_TITLE = STEPINPUT_INC_ICON_TITLE;
+	exports.STEPINPUT_PATTER_MISSMATCH = STEPINPUT_PATTER_MISSMATCH;
+	exports.STEPINPUT_RANGEOVERFLOW = STEPINPUT_RANGEOVERFLOW;
+	exports.STEPINPUT_RANGEUNDERFLOW = STEPINPUT_RANGEUNDERFLOW;
+	exports.SWITCH_OFF = SWITCH_OFF;
+	exports.SWITCH_ON = SWITCH_ON;
+	exports.TABCONTAINER_END_OVERFLOW = TABCONTAINER_END_OVERFLOW;
+	exports.TABCONTAINER_NEXT_ICON_ACC_NAME = TABCONTAINER_NEXT_ICON_ACC_NAME;
+	exports.TABCONTAINER_OVERFLOW_MENU_TITLE = TABCONTAINER_OVERFLOW_MENU_TITLE;
+	exports.TABCONTAINER_POPOVER_CANCEL_BUTTON = TABCONTAINER_POPOVER_CANCEL_BUTTON;
+	exports.TABCONTAINER_PREVIOUS_ICON_ACC_NAME = TABCONTAINER_PREVIOUS_ICON_ACC_NAME;
+	exports.TABCONTAINER_SUBTABS_DESCRIPTION = TABCONTAINER_SUBTABS_DESCRIPTION;
+	exports.TABLE_COLUMNHEADER_CLEARALL_DESCRIPTION = TABLE_COLUMNHEADER_CLEARALL_DESCRIPTION;
+	exports.TABLE_COLUMNHEADER_SELECTALL_DESCRIPTION = TABLE_COLUMNHEADER_SELECTALL_DESCRIPTION;
+	exports.TABLE_COLUMN_HEADER_ROW = TABLE_COLUMN_HEADER_ROW;
+	exports.TABLE_DESELECT_ALL_ROWS = TABLE_DESELECT_ALL_ROWS;
+	exports.TABLE_GENERATED_BY_AI = TABLE_GENERATED_BY_AI;
+	exports.TABLE_GROUP_ROW = TABLE_GROUP_ROW;
+	exports.TABLE_GROUP_ROW_ARIA_LABEL = TABLE_GROUP_ROW_ARIA_LABEL;
+	exports.TABLE_HEADER_ROW_INFORMATION = TABLE_HEADER_ROW_INFORMATION;
+	exports.TABLE_MORE = TABLE_MORE;
+	exports.TABLE_MORE_DESCRIPTION = TABLE_MORE_DESCRIPTION;
+	exports.TABLE_MULTI_SELECTABLE = TABLE_MULTI_SELECTABLE;
+	exports.TABLE_NAVIGATION = TABLE_NAVIGATION;
+	exports.TABLE_NO_DATA = TABLE_NO_DATA;
+	exports.TABLE_ROW = TABLE_ROW;
+	exports.TABLE_ROW_ACTIONS = TABLE_ROW_ACTIONS;
+	exports.TABLE_ROW_ACTIVE = TABLE_ROW_ACTIVE;
+	exports.TABLE_ROW_INDEX = TABLE_ROW_INDEX;
+	exports.TABLE_ROW_MULTIPLE_ACTIONS = TABLE_ROW_MULTIPLE_ACTIONS;
+	exports.TABLE_ROW_NAVIGABLE = TABLE_ROW_NAVIGABLE;
+	exports.TABLE_ROW_NAVIGATED = TABLE_ROW_NAVIGATED;
+	exports.TABLE_ROW_POPIN = TABLE_ROW_POPIN;
+	exports.TABLE_ROW_POSITION = TABLE_ROW_POSITION;
+	exports.TABLE_ROW_SELECTED = TABLE_ROW_SELECTED;
+	exports.TABLE_ROW_SELECTOR = TABLE_ROW_SELECTOR;
+	exports.TABLE_ROW_SINGLE_ACTION = TABLE_ROW_SINGLE_ACTION;
+	exports.TABLE_SELECTION = TABLE_SELECTION;
+	exports.TABLE_SELECT_ALL_ROWS = TABLE_SELECT_ALL_ROWS;
+	exports.TABLE_SINGLE_SELECTABLE = TABLE_SINGLE_SELECTABLE;
+	exports.TAB_ARIA_DESIGN_CRITICAL = TAB_ARIA_DESIGN_CRITICAL;
+	exports.TAB_ARIA_DESIGN_NEGATIVE = TAB_ARIA_DESIGN_NEGATIVE;
+	exports.TAB_ARIA_DESIGN_NEUTRAL = TAB_ARIA_DESIGN_NEUTRAL;
+	exports.TAB_ARIA_DESIGN_POSITIVE = TAB_ARIA_DESIGN_POSITIVE;
+	exports.TAB_SPLIT_ROLE_DESCRIPTION = TAB_SPLIT_ROLE_DESCRIPTION;
+	exports.TAG_DESCRIPTION_TAG = TAG_DESCRIPTION_TAG;
+	exports.TAG_ERROR = TAG_ERROR;
+	exports.TAG_INFORMATION = TAG_INFORMATION;
+	exports.TAG_ROLE_DESCRIPTION = TAG_ROLE_DESCRIPTION;
+	exports.TAG_SUCCESS = TAG_SUCCESS;
+	exports.TAG_WARNING = TAG_WARNING;
+	exports.TEXTAREA_CHARACTERS_EXCEEDED = TEXTAREA_CHARACTERS_EXCEEDED;
+	exports.TEXTAREA_CHARACTERS_LEFT = TEXTAREA_CHARACTERS_LEFT;
+	exports.TEXTAREA_EXCEEDS_MAXLENGTH = TEXTAREA_EXCEEDS_MAXLENGTH;
+	exports.TIMEPICKER_CANCEL_BUTTON = TIMEPICKER_CANCEL_BUTTON;
+	exports.TIMEPICKER_CLOCK_DIAL_LABEL = TIMEPICKER_CLOCK_DIAL_LABEL;
+	exports.TIMEPICKER_HOURS_LABEL = TIMEPICKER_HOURS_LABEL;
+	exports.TIMEPICKER_INPUTS_ENTER_HOURS = TIMEPICKER_INPUTS_ENTER_HOURS;
+	exports.TIMEPICKER_INPUTS_ENTER_MINUTES = TIMEPICKER_INPUTS_ENTER_MINUTES;
+	exports.TIMEPICKER_INPUTS_ENTER_SECONDS = TIMEPICKER_INPUTS_ENTER_SECONDS;
+	exports.TIMEPICKER_INPUT_DESCRIPTION = TIMEPICKER_INPUT_DESCRIPTION;
+	exports.TIMEPICKER_MINUTES_LABEL = TIMEPICKER_MINUTES_LABEL;
+	exports.TIMEPICKER_OPEN_ICON_TITLE = TIMEPICKER_OPEN_ICON_TITLE;
+	exports.TIMEPICKER_OPEN_ICON_TITLE_OPENED = TIMEPICKER_OPEN_ICON_TITLE_OPENED;
+	exports.TIMEPICKER_PATTERN_MISSMATCH = TIMEPICKER_PATTERN_MISSMATCH;
+	exports.TIMEPICKER_POPOVER_ACCESSIBLE_NAME = TIMEPICKER_POPOVER_ACCESSIBLE_NAME;
+	exports.TIMEPICKER_SECONDS_LABEL = TIMEPICKER_SECONDS_LABEL;
+	exports.TIMEPICKER_SUBMIT_BUTTON = TIMEPICKER_SUBMIT_BUTTON;
+	exports.TIMEPICKER_VALUE_MISSING = TIMEPICKER_VALUE_MISSING;
+	exports.TOKENIZER_ARIA_CONTAIN_ONE_TOKEN = TOKENIZER_ARIA_CONTAIN_ONE_TOKEN;
+	exports.TOKENIZER_ARIA_CONTAIN_SEVERAL_TOKENS = TOKENIZER_ARIA_CONTAIN_SEVERAL_TOKENS;
+	exports.TOKENIZER_ARIA_CONTAIN_TOKEN = TOKENIZER_ARIA_CONTAIN_TOKEN;
+	exports.TOKENIZER_ARIA_LABEL = TOKENIZER_ARIA_LABEL;
+	exports.TOKENIZER_CLEAR_ALL = TOKENIZER_CLEAR_ALL;
+	exports.TOKENIZER_DIALOG_CANCEL_BUTTON = TOKENIZER_DIALOG_CANCEL_BUTTON;
+	exports.TOKENIZER_DIALOG_OK_BUTTON = TOKENIZER_DIALOG_OK_BUTTON;
+	exports.TOKENIZER_SHOW_ALL_ITEMS = TOKENIZER_SHOW_ALL_ITEMS;
+	exports.TOKEN_ARIA_DELETABLE = TOKEN_ARIA_DELETABLE;
+	exports.TOKEN_ARIA_DELETE = TOKEN_ARIA_DELETE;
+	exports.TOKEN_ARIA_LABEL = TOKEN_ARIA_LABEL;
+	exports.TOOLBAR_OVERFLOW_BUTTON_ARIA_LABEL = TOOLBAR_OVERFLOW_BUTTON_ARIA_LABEL;
+	exports.TOOLBAR_POPOVER_AVAILABLE_VALUES = TOOLBAR_POPOVER_AVAILABLE_VALUES;
+	exports.TREE_ITEM_ARIA_LABEL = TREE_ITEM_ARIA_LABEL;
+	exports.TREE_ITEM_COLLAPSE_NODE = TREE_ITEM_COLLAPSE_NODE;
+	exports.TREE_ITEM_EXPAND_NODE = TREE_ITEM_EXPAND_NODE;
+	exports.VALUE_STATE_ERROR = VALUE_STATE_ERROR;
+	exports.VALUE_STATE_ERROR_ALREADY_SELECTED = VALUE_STATE_ERROR_ALREADY_SELECTED;
+	exports.VALUE_STATE_INFORMATION = VALUE_STATE_INFORMATION;
+	exports.VALUE_STATE_LINK = VALUE_STATE_LINK;
+	exports.VALUE_STATE_LINKS = VALUE_STATE_LINKS;
+	exports.VALUE_STATE_LINKS_MAC = VALUE_STATE_LINKS_MAC;
+	exports.VALUE_STATE_LINK_MAC = VALUE_STATE_LINK_MAC;
+	exports.VALUE_STATE_SUCCESS = VALUE_STATE_SUCCESS;
+	exports.VALUE_STATE_TYPE_ERROR = VALUE_STATE_TYPE_ERROR;
+	exports.VALUE_STATE_TYPE_INFORMATION = VALUE_STATE_TYPE_INFORMATION;
+	exports.VALUE_STATE_TYPE_SUCCESS = VALUE_STATE_TYPE_SUCCESS;
+	exports.VALUE_STATE_TYPE_WARNING = VALUE_STATE_TYPE_WARNING;
+	exports.VALUE_STATE_WARNING = VALUE_STATE_WARNING;
+	exports.YEAR_PICKER_DESCRIPTION = YEAR_PICKER_DESCRIPTION;
+	exports.YEAR_RANGE_PICKER_DESCRIPTION = YEAR_RANGE_PICKER_DESCRIPTION;
+	exports.default = messagebundle_ar;
+
+}));

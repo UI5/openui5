@@ -738,6 +738,11 @@ function(
 		var bDropdownPickerType = this.getPickerType() === "Dropdown";
 		var oTokenizer = this.getAggregation("tokenizer");
 
+		// Store initial value for change event comparison on focusout
+		if (oEvent.target === this.getFocusDomRef()) {
+			this._sValueBeforeFocus = this.getValue();
+		}
+
 		if (bDropdownPickerType) {
 			bPreviousFocusInDropdown = oPickerDomRef && (oPickerDomRef !== oEvent.relatedTarget && oPickerDomRef.contains(oEvent.relatedTarget));
 		}
@@ -2367,16 +2372,15 @@ function(
 		if (!containsOrEquals(oPicker?.getDomRef(), oFocusTarget) && !containsOrEquals(this.getDomRef(), oFocusTarget)) {
 			this.setValue(null);
 
-			// fire change event only if the value of the MCB is not empty
-			if (sOldValue) {
+			if (this.getLastValue() !== this._sValueBeforeFocus) {
 				this.fireChangeEvent("", { value: sOldValue });
+			}
 
-				// Reset value state if it was set due to invalid input
-				if (this.getValueState() === ValueState.Error && this._bIsValueInvalid) {
-					this._bIsValueInvalid = false;
-					this.setValueState(this._sInitialValueState);
-					this.setValueStateText(this._sInitialValueStateText || "");
-				}
+			// Reset value state if it was set due to invalid input
+			if (this.getValueState() === ValueState.Error && this._bIsValueInvalid) {
+				this._bIsValueInvalid = false;
+				this.setValueState(this._sInitialValueState);
+				this.setValueStateText(this._sInitialValueStateText || "");
 			}
 		}
 	};

@@ -534,12 +534,25 @@ sap.ui.define([
 		 */
 		onSave: function() {
 			MessageToast.show("Submitting changes...");
-			oTable.getBinding();
 
 			oTable.setBusyIndicatorDelay(1);
 			oTable.setEnableBusyIndicator(true);
 			oTable.setBusy(true);
 
+			// send collected change data to the back-end
+			this.oODataModel.submitChanges({
+				success: function(oData) {
+					// remove busy state of table
+					oTable.setBusy(false);
+					// re-setup and clear the clipboard
+					this.setupCutAndPaste();
+
+					this.getView().getModel().setProperty("/pendingChanges", false);
+				}.bind(this),
+				error: function(oEvent) {
+					oTable.setBusy(false);
+				}
+			});
 			// scroll to top after submitting
 			oTable.setFirstVisibleRow(0);
 		},

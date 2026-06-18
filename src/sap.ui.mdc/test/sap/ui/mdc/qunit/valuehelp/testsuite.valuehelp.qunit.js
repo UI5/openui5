@@ -40,6 +40,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+
 			"Container": {
 				module: "./Container.qunit",
 				ui5: {
@@ -49,6 +50,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+
 			"Content": {
 				module: "./Content.qunit",
 				ui5: {
@@ -58,6 +60,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+
 			"Conditions": {
 				module: "./Conditions.qunit",
 				ui5: {
@@ -67,6 +70,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+
 			"DefineConditionPanel": {
 				module: "./DefineConditionPanel.qunit",
 				coverage: {
@@ -74,6 +78,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 				},
 				sinon: true
 			},
+
 			"ListContent": {
 				module: "./ListContent.qunit",
 				ui5: {
@@ -83,6 +88,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+
 			"FilterableListContent": {
 				module: "./FilterableListContent.qunit",
 				ui5: {
@@ -92,6 +98,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+
 			"FixedList": {
 				module: "./FixedList.qunit",
 				ui5: {
@@ -104,6 +111,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					only: "[sap/ui/mdc/valuehelp]"
 				}
 			},
+
 			"Bool": {
 				module: "./Bool.qunit",
 				ui5: {
@@ -116,6 +124,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					only: "[sap/ui/mdc/valuehelp]"
 				}
 			},
+
 			"MTable": {
 				module: "./MTable.qunit",
 				ui5: {
@@ -128,6 +137,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					only: "[sap/ui/mdc/valuehelp]"
 				}
 			},
+
 			"MDCTable": {
 				module: "./MDCTable.qunit",
 				ui5: {
@@ -140,6 +150,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					only: "[sap/ui/mdc/valuehelp]"
 				}
 			},
+
 			"Popover": {
 				module: "./Popover.qunit",
 				ui5: {
@@ -149,6 +160,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+
 			"Dialog": {
 				module: "./Dialog.qunit",
 				ui5: {
@@ -158,6 +170,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+
 			"ValueHelpDelegate": {
 				module: "./ValueHelpDelegate.qunit",
 				ui5: {
@@ -167,18 +180,7 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
-			"ODataV4ValueHelpDelegate": {
-				module: "./ODataV4ValueHelpDelegate.qunit",
-				ui5: {
-					animationMode: "none"
-				},
-				coverage: {
-					only: "[delegates/odata/v4]"
-				},
-				sinon: {
-					qunitBridge: true
-				}
-			},
+
 			"RequestShowContainerDefault": {
 				module: "./RequestShowContainerDefault.qunit",
 				ui5: {
@@ -188,12 +190,14 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 					qunitBridge: true
 				}
 			},
+
 			"CollectiveSearchSelect": {
 				module: "./CollectiveSearchSelect.qunit",
 				coverage: {
 					only: "[sap/ui/mdc/valuehelp]"
 				}
 			},
+
 			"FilterBar": {
 				module: "./FilterBar.qunit",
 				coverage: {

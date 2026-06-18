@@ -1,2 +1,1784 @@
-sap.ui.define(["require","sap/f/thirdparty/webcomponents","sap/f/thirdparty/Theme","sap/f/thirdparty/event-strict","sap/f/thirdparty/parameters-bundle.css","sap/f/thirdparty/parameters-bundle.css2","sap/f/thirdparty/AccessibilityTextsHelper","sap/f/thirdparty/ListItemBase","sap/f/thirdparty/MenuItem2","sap/f/thirdparty/Icon","sap/f/thirdparty/WrappingType","sap/f/thirdparty/List","sap/f/thirdparty/ResponsivePopover","sap/f/thirdparty/Button2","sap/f/thirdparty/Tag","sap/f/thirdparty/Menu","sap/f/thirdparty/slim-arrow-down","sap/f/thirdparty/Icons","sap/f/thirdparty/overflow","sap/f/thirdparty/parameters-bundle.css3","sap/f/thirdparty/i18n-defaults","sap/f/thirdparty/information","sap/f/thirdparty/FocusableElements","sap/f/thirdparty/i18n-defaults2","sap/f/thirdparty/ListItemAdditionalText.css","sap/f/thirdparty/ValueState","sap/f/thirdparty/Label","sap/f/thirdparty/BusyIndicator","sap/f/thirdparty/willShowContent","sap/f/thirdparty/toLowercaseEnumValue","sap/f/thirdparty/ListItemGroup","sap/f/thirdparty/Title"],function(t,e,i,s,o,r,n,a,l,h,u,c,d,b,p,f,_,g,m,v,w,x,y,S,I,T,B,C,A,P,R,q){"use strict";const L={imageBegin:z,iconBegin:N,iconEnd:D,listItemContent:O};function F(t){const e={...L,...t};return l.ListItemTemplate.call(this,e)}function O(){return r.jsxs(r.Fragment,{children:[r.jsxs("div",{class:"ui5-li-text-wrapper",children:[j.call(this),k.call(this),!this.typeActive&&r.jsx("span",{class:"ui5-hidden-text",children:this.type})]}),!this.description&&E.call(this)]})}function j(){if(this.wrappingType===u.WrappingType.Normal){return this.expandableTextTemplate?.call(this,{className:"ui5-li-title",text:this._textContent,maxCharacters:this._maxCharacters,part:"title"})}return r.jsx("span",{part:"title",class:"ui5-li-title",children:this.text?this.text:r.jsx("slot",{})})}function k(){if(!this.description){return null}if(this.wrappingType===u.WrappingType.Normal){return r.jsxs("div",{class:"ui5-li-description-info-wrapper",children:[this.expandableTextTemplate?.call(this,{className:"ui5-li-desc",text:this.description,maxCharacters:this._maxCharacters,part:"description"}),E.call(this)]})}return r.jsxs("div",{class:"ui5-li-description-info-wrapper",children:[r.jsx("span",{part:"description",class:"ui5-li-desc",children:this.description}),E.call(this)]})}function E(){if(!this.additionalText){return null}return r.jsx("span",{part:"additional-text",class:"ui5-li-additional-text",children:this.additionalText})}function z(){if(this.hasImage){return r.jsx("div",{class:"ui5-li-image",children:r.jsx("slot",{name:"image"})})}}function N(){if(this.displayIconBegin){return r.jsx(h.Icon,{part:"icon",name:this.icon,class:"ui5-li-icon",mode:"Decorative"})}}function D(){if(this.displayIconEnd){return r.jsx(h.Icon,{part:"icon",name:this.icon,class:"ui5-li-icon",mode:"Decorative"})}}var M=this&&this.__decorate||function(t,e,i,s){var o=arguments.length,r=o<3?e:s===null?s=Object.getOwnPropertyDescriptor(e,i):s,n;if(typeof Reflect==="object"&&typeof Reflect.decorate==="function")r=Reflect.decorate(t,e,i,s);else for(var a=t.length-1;a>=0;a--)if(n=t[a])r=(o<3?n(r):o>3?n(e,i,r):n(e,i))||r;return o>3&&r&&Object.defineProperty(e,i,r),r};var H;const $=100;const W=300;let V=H=class e extends l.ListItem{constructor(){super(...arguments);this.iconEnd=false;this.additionalTextState="None";this.movable=false;this.wrappingType="None";this.hasTitle=false;this._hasImage=false}onBeforeRendering(){super.onBeforeRendering();this.hasTitle=!!(this.text||this.textContent);this._hasImage=this.hasImage;if(this.wrappingType==="Normal"){if(H.ExpandableTextTemplate){this.expandableTextTemplate=H.ExpandableTextTemplate}else{new Promise(function(e,i){t(["sap/f/thirdparty/_dynamics/ListItemStandardExpandableTextTemplate"],e,i)}).then(t=>{this.expandableTextTemplate=t.default})}}}get _textContent(){return this.text||this.textContent||""}get _maxCharacters(){return this.mediaRange==="S"?$:W}get displayIconBegin(){return!!(this.icon&&!this.iconEnd)}get displayIconEnd(){return!!(this.icon&&this.iconEnd)}get hasImage(){return!!this.image.length}};M([e.s()],V.prototype,"text",void 0);M([e.s()],V.prototype,"description",void 0);M([e.s()],V.prototype,"icon",void 0);M([e.s({type:Boolean})],V.prototype,"iconEnd",void 0);M([e.s()],V.prototype,"additionalText",void 0);M([e.s()],V.prototype,"additionalTextState",void 0);M([e.s({type:Boolean})],V.prototype,"movable",void 0);M([e.s()],V.prototype,"accessibleName",void 0);M([e.s()],V.prototype,"wrappingType",void 0);M([e.s({type:Boolean})],V.prototype,"hasTitle",void 0);M([e.s({type:Boolean})],V.prototype,"_hasImage",void 0);M([e.s({noAttribute:true})],V.prototype,"expandableTextTemplate",void 0);M([e.d({type:Node,default:true})],V.prototype,"content",void 0);M([e.d()],V.prototype,"image",void 0);V=H=M([e.m({tag:"ui5-li",renderer:r.y,template:F})],V);V.define();var K=V;function X(){return r.jsx(p.Tag,{design:"Critical","hide-state-icon":true,children:this.effectiveText})}i.f("@"+"ui5"+"/"+"webcomponents-theming","sap_horizon",async()=>r.defaultThemeBase);i.f("@"+"u"+"i"+"5"+"/"+"w"+"e"+"b"+"c"+"o"+"m"+"p"+"o"+"n"+"e"+"n"+"t"+"s","sap_horizon",async()=>o.defaultTheme,"host");var U=`[ui5-tag]::part(root){border:.0625rem solid var(--sapContent_BadgeBorderColor);background-color:var(--sapContent_BadgeBackground);color:var(--sapContent_BadgeTextColor);height:1rem;border-radius:.5rem;display:flex;align-items:center}:host([design="AttentionDot"]) [ui5-tag]::part(root){min-width:var(--_ui5-button-badge-diameter);min-height:var(--_ui5-button-badge-diameter);height:var(--_ui5-button-badge-diameter);width:var(--_ui5-button-badge-diameter);border-radius:100%}\n`;var G=this&&this.__decorate||function(t,e,i,s){var o=arguments.length,r=o<3?e:s===null?s=Object.getOwnPropertyDescriptor(e,i):s,n;if(typeof Reflect==="object"&&typeof Reflect.decorate==="function")r=Reflect.decorate(t,e,i,s);else for(var a=t.length-1;a>=0;a--)if(n=t[a])r=(o<3?n(r):o>3?n(e,i,r):n(e,i))||r;return o>3&&r&&Object.defineProperty(e,i,r),r};let J=class t extends e.S{constructor(){super(...arguments);this.design="AttentionDot";this.text=""}get effectiveText(){return this.design===b.ButtonBadgeDesign.AttentionDot?"":this.text}};G([e.s()],J.prototype,"design",void 0);G([e.s()],J.prototype,"text",void 0);J=G([e.m({tag:"ui5-button-badge",renderer:r.y,template:X,styles:U})],J);J.define();var Q=J;const Y="da";const Z="M36 163l220 305 221-306-89-130H137zm220 349q-8 0-13-7L3 172q-3-5-3-10t3-9L117 6q5-6 12-6h267q9 0 13 7l100 146q3 4 3 9t-3 10L269 505q-5 7-13 7zm120-326q-26 9-39.5 22.5T315 248q-3 8-11 8t-11-8q-8-26-21.5-39.5T232 186q-8-2-8-10t8-11q26-9 39.5-22.5T293 103q3-7 11-7t11 7q8 26 21.5 39.5T376 165q8 3 8 11 0 3-1.5 6t-6.5 4z";const tt=true;const et="SAP-icons-v4";const it="@ui5/webcomponents-icons";g.y(Y,{pathData:Z,ltr:tt,collection:et,packageName:it});const st="da";const ot="M256.499 511.002q-12.975 0-20.959-10.979L5.988 180.647q-11.976-14.97 0-29.941L114.776 9.98Q122.76 0 134.736 0h255.502q14.97 0 20.959 10.979l95.813 140.725q9.98 14.97 0 28.943L277.458 500.023q-7.984 10.979-20.959 10.979zM57.887 166.674l198.612 275.462 198.612-276.46-77.848-114.775H147.712zm318.378 19.961q-25.95 7.985-39.423 21.459t-22.456 39.423q-1.996 7.984-9.98 7.984t-10.98-7.984q-8.982-25.95-22.455-39.423t-39.423-21.459q-7.985-2.994-7.985-10.978t7.985-10.979q25.95-7.984 39.423-21.957t22.456-39.922q2.994-7.984 10.978-7.984t9.981 7.984q8.982 25.95 22.456 39.922t39.423 21.957q7.985 2.995 7.985 10.979t-7.985 10.978z";const rt=true;const nt="SAP-icons-v5";const at="@ui5/webcomponents-icons";g.y(st,{pathData:ot,ltr:rt,collection:nt,packageName:at});var lt="da";const ht="bell";const ut="M32 416q0-7 15-21t31-40.5 25.5-67.5-1.5-101q-5-29 3-54.5t25-45 42-33T225 35q0-15 7-25t24-10q14 0 22.5 9t8.5 26q26 5 50 18t41 33 24.5 45.5T404 186q-12 60-1.5 101t27.5 67.5 33.5 40.5 16.5 21q0 14-9 23t-23 9H320q0 26-19 45t-45 19-45-19-19-45H64q-14 0-23-9t-9-23zm39 0h369q-10-11-25.5-30.5t-28-48.5-18-68 4.5-89q5-25-2.5-44T354 106q-19-23-42-32.5T256 64q-32 0-57.5 9.5T154 106q-10 11-18 30t-3 44q9 50 4 89t-16 68-25.5 48.5T71 416z";const ct=false;const dt="SAP-icons-v4";const bt="@ui5/webcomponents-icons";g.y(ht,{pathData:ut,ltr:ct,collection:dt,packageName:bt});const pt="bell";const ft="M475 374q5 7 5 16 0 11-7 18.5t-18 7.5H334q-5 27-27 45.5T256 480t-51-18.5-27-45.5H58q-11 0-18.5-7.5T32 390q0-10 6-16 1-1 8-9.5T61 341t14.5-35.5T82 260v-20q0-100 45-154t129-54 129.5 54T431 240v20q0 25 6.5 45.5T452 341t15 23.5 8 9.5zm-69-9q-11-20-19-46.5t-8-58.5v-20q0-32-5.5-60t-20-50-38-34.5T256 83t-59.5 12.5-38 34.5-20 50-5.5 60v20q0 32-8 58.5T106 365h300z";const _t=false;const gt="SAP-icons-v5";const mt="@ui5/webcomponents-icons";g.y(pt,{pathData:ft,ltr:_t,collection:gt,packageName:mt});var vt="bell";const wt="grid";const xt="M394 362h55q14 0 22.5 9t8.5 23v54q0 14-8.5 23t-22.5 9h-55q-14 0-22.5-9t-8.5-23v-54q0-14 8.5-23t22.5-9zM228 197h55q14 0 22.5 9t8.5 23v54q0 13-9 22.5t-22 9.5h-55q-13 0-22-9.5t-9-22.5v-54q0-14 8.5-23t22.5-9zm135-79V64q0-14 8.5-23t22.5-9h55q14 0 22.5 9t8.5 23v54q0 13-9 22.5t-22 9.5h-55q-13 0-22-9.5t-9-22.5zm31 79h55q14 0 22.5 9t8.5 23v54q0 13-9 22.5t-22 9.5h-55q-13 0-22-9.5t-9-22.5v-54q0-14 8.5-23t22.5-9zM63 32h55q14 0 22.5 9t8.5 23v54q0 13-9 22.5t-22 9.5H63q-13 0-22-9.5T32 118V64q0-14 8.5-23T63 32zM32 229q0-14 8.5-23t22.5-9h55q14 0 22.5 9t8.5 23v54q0 13-9 22.5t-22 9.5H63q-13 0-22-9.5T32 283v-54zm31 133h55q14 0 22.5 9t8.5 23v54q0 13-9 22.5t-22 9.5H63q-13 0-22-9.5T32 448v-54q0-14 8.5-23t22.5-9zM228 32h55q14 0 22.5 9t8.5 23v54q0 13-9 22.5t-22 9.5h-55q-13 0-22-9.5t-9-22.5V64q0-14 8.5-23t22.5-9zm-31 362q0-14 8.5-23t22.5-9h55q14 0 22.5 9t8.5 23v54q0 13-9 22.5t-22 9.5h-55q-13 0-22-9.5t-9-22.5v-54z";const yt=false;const St="SAP-icons-v4";const It="@ui5/webcomponents-icons";g.y(wt,{pathData:xt,ltr:yt,collection:St,packageName:It});const Tt="grid";const Bt="M80 128q-20 0-34-14T32 80t14-34 34-14 34 14 14 34-14 34-34 14zm176 0q-20 0-34-14t-14-34 14-34 34-14 34 14 14 34-14 34-34 14zm176 0q-20 0-34-14t-14-34 14-34 34-14 34 14 14 34-14 34-34 14zM80 208q20 0 34 14t14 34-14 34-34 14-34-14-14-34 14-34 34-14zm176 0q20 0 34 14t14 34-14 34-34 14-34-14-14-34 14-34 34-14zm176 0q20 0 34 14t14 34-14 34-34 14-34-14-14-34 14-34 34-14zM80 384q20 0 34 14t14 34-14 34-34 14-34-14-14-34 14-34 34-14zm176 0q20 0 34 14t14 34-14 34-34 14-34-14-14-34 14-34 34-14zm176 0q20 0 34 14t14 34-14 34-34 14-34-14-14-34 14-34 34-14z";const Ct=false;const At="SAP-icons-v5";const Pt="@ui5/webcomponents-icons";g.y(Tt,{pathData:Bt,ltr:Ct,collection:At,packageName:Pt});var Rt="grid";function qt(t,e){let i=null,s=null;return function(...o){if(s){i=o;return}t(...o),s=setTimeout(()=>{i&&(t(...i),i=null),s=null},e)}}function Lt(){return r.jsxs(r.Fragment,{children:[r.jsx(d.Popover,{class:"ui5-shellbar-menu-popover",hideArrow:true,placement:"Bottom",preventInitialFocus:true,onBeforeOpen:this._menuPopoverBeforeOpen,onClose:this._menuPopoverAfterClose,children:r.jsx(c.List,{separators:"None",selectionMode:"Single",onItemClick:this._menuItemPress,children:r.jsx("slot",{name:"menuItems"})})}),r.jsx(d.Popover,{class:"ui5-shellbar-overflow-popover",placement:"Bottom",preventInitialFocus:true,horizontalAlign:d.PopoverHorizontalAlign.End,hideArrow:true,onBeforeOpen:this._overflowPopoverBeforeOpen,onClose:this._overflowPopoverAfterClose,children:r.jsx(c.List,{separators:"None",onItemClick:this._handleActionListClick,children:this._hiddenIcons.map((t,e)=>r.jsx(K,{"data-count":t.count,"data-ui5-external-action-item-id":t.refItemid,"data-ui5-stable":t.stableDomRef,icon:t.icon?t.icon:"",type:"Active","onui5-_press":t.press,tooltip:t.tooltip,accessibilityAttributes:this.accInfo.search.accessibilityAttributes,children:t.text},e))})})]})}function Ft(){return r.jsxs(r.Fragment,{children:[r.jsxs("header",{class:this.classes.wrapper,"aria-label":this._shellbarText,onKeyDown:this._onKeyDown,part:"root",children:[r.jsxs("div",{class:"ui5-shellbar-overflow-container ui5-shellbar-overflow-container-left",children:[this.startButton.length>0&&r.jsx("slot",{name:"startButton"}),this.hasBranding&&r.jsx("slot",{name:"branding"}),this.hasMenuItems&&!this.hasBranding&&r.jsxs(r.Fragment,{children:[!this.showLogoInMenuButton&&this.hasLogo&&jt.call(this),this.showTitleInMenuButton&&r.jsx("h1",{class:"ui5-hidden-text",children:this.primaryTitle}),this.showMenuButton&&r.jsx(r.Fragment,{children:r.jsxs("button",{class:{"ui5-shellbar-menu-button":true,...this.classes.button},onClick:this._headerPress,"aria-haspopup":"menu","aria-expanded":this._menuPopoverExpanded,"aria-label":this._brandingText,"data-ui5-stable":"menu",tabIndex:0,children:[this.showLogoInMenuButton&&r.jsx("span",{class:"ui5-shellbar-logo","aria-label":this._logoText,title:this._logoText,children:r.jsx("slot",{name:"logo"})}),this.showTitleInMenuButton&&r.jsx("div",{class:"ui5-shellbar-menu-button-title",children:this.primaryTitle}),r.jsx(h.Icon,{class:"ui5-shellbar-menu-button-arrow",name:_.slimArrowDown})]})})]}),this.hasMenuItems&&r.jsx(r.Fragment,{children:this.secondaryTitle&&!this.isSBreakPoint&&r.jsx("div",{style:{display:"block"},class:"ui5-shellbar-secondary-title","data-ui5-stable":"secondary-title",children:this.secondaryTitle})}),!this.hasMenuItems&&r.jsxs(r.Fragment,{children:[this.isSBreakPoint&&this.hasLogo&&!this.hasBranding&&jt.call(this),!this.isSBreakPoint&&(this.hasLogo||this.primaryTitle)&&r.jsxs(r.Fragment,{children:[!this.hasBranding&&kt.call(this),this.secondaryTitle&&(this.primaryTitle||this.hasBranding)&&r.jsx("h2",{class:"ui5-shellbar-secondary-title","data-ui5-stable":"secondary-title",children:this.secondaryTitle})]})]})]}),this.hasMidContent&&r.jsx("div",{class:"ui5-shellbar-overflow-container ui5-shellbar-mid-content",children:r.jsx("slot",{name:"midContent"})}),r.jsx("div",{class:"ui5-shellbar-overflow-container ui5-shellbar-overflow-container-right",children:r.jsxs("div",{class:"ui5-shellbar-overflow-container-right-inner",children:[this.hasContentItems&&r.jsxs("div",{class:"ui5-shellbar-content-items",role:this._contentItemsRole,"aria-label":this._contentItemsText,children:[this.showStartSeparator&&r.jsx("div",{class:{"ui5-shellbar-separator":true,"ui5-shellbar-separator-start":true}}),this.startContent.map(t=>{const e=this._contentInfo.find(e=>e.id===t._individualSlot);return r.jsxs("div",{id:t._individualSlot,class:e?.classes,children:[this.shouldIncludeSeparator(e,this.startContentInfoSorted)&&r.jsx("div",{class:{"ui5-shellbar-separator":true,"ui5-shellbar-separator-start":true}}),r.jsx("slot",{name:t._individualSlot})]},t._individualSlot)}),r.jsx("div",{class:"ui5-shellbar-spacer"}),this.endContent.map(t=>{const e=this._contentInfo.find(e=>e.id===t._individualSlot);return r.jsxs("div",{id:t._individualSlot,class:e?.classes,children:[r.jsx("slot",{name:t._individualSlot}),this.shouldIncludeSeparator(e,this.endContentInfoSorted)&&r.jsx("div",{class:{"ui5-shellbar-separator":true,"ui5-shellbar-separator-end":true}})]},t._individualSlot)}),this.showEndSeparator&&r.jsx("div",{class:{"ui5-shellbar-separator":true,"ui5-shellbar-separator-end":true}})]}),!this.hasContentItems&&r.jsx("div",{class:"ui5-shellbar-spacer"}),r.jsxs("div",{class:"ui5-shellbar-overflow-container-right-child",role:this._rightChildRole,children:[this.hasSearchField&&r.jsxs(r.Fragment,{children:[this.showFullWidthSearch&&r.jsxs("div",{class:"ui5-shellbar-search-full-width-wrapper",style:this.styles.searchField,children:[r.jsx("div",{class:"ui5-shellbar-search-full-field",children:r.jsx("slot",{name:"searchField"})}),r.jsx(b.Button,{onClick:this._handleCancelButtonPress,class:"ui5-shellbar-button ui5-shellbar-cancel-button","data-ui5-stable":"cancel-search",children:this._cancelBtnText})]}),r.jsx("div",{id:this.hasSelfCollapsibleSearch?`${this._id}-item-1`:undefined,class:this.classes.searchField,style:this.styles.searchField,children:r.jsx("slot",{name:"searchField"})}),!(this.hasSelfCollapsibleSearch||this.hideSearchButton)&&r.jsx(b.Button,{id:`${this._id}-item-1`,class:{"ui5-shellbar-button":true,"ui5-shellbar-search-button":true,"ui5-shellbar-search-item-for-arrow-nav":true,...this.classes.search},icon:"sap-icon://search","data-ui5-text":"Search","data-ui5-notifications-count":this.notificationsCount,"data-ui5-stable":"toggle-search",onClick:this._handleSearchIconPress,tooltip:this._searchBtnOpen,"aria-label":this._searchBtnOpen,"aria-expanded":this.showSearchField,accessibilityAttributes:this.accInfo.search.accessibilityAttributes})]}),this.hasAssistant&&r.jsx("div",{id:`${this._id}-assistant`,class:this.classes.assistant,children:r.jsx("slot",{name:"assistant"})}),this.showNotifications&&r.jsx(b.Button,{id:`${this._id}-item-2`,class:{"ui5-shellbar-button":true,"ui5-shellbar-bell-button":true,"ui5-shellbar-items-for-arrow-nav":true,...this.classes.notification},icon:"sap-icon://bell","data-ui5-text":"Notifications",onClick:this._handleNotificationsPress,tooltip:this._notificationsText,accessibilityAttributes:this.accInfo.notifications.accessibilityAttributes,"data-ui5-stable":"notifications",children:this.notificationsCount&&r.jsx(Q,{slot:"badge",design:"OverlayText",text:this.notificationsCount})}),this.customItemsInfo.map(t=>r.jsx(b.Button,{id:t.id,class:`${t.classes} ui5-shellbar-items-for-arrow-nav`,icon:t.icon,tooltip:t.tooltip,"data-ui5-notifications-count":this.notificationsCount,"data-ui5-external-action-item-id":t.refItemid,"data-ui5-stable":t.icon&&!this.isIconHidden(t.icon)?t.stableDomRef:undefined,onClick:t.press,accessibilityAttributes:t.accessibilityAttributes,children:t.count&&r.jsx(Q,{slot:"badge",design:"OverlayText",text:t.count})},t.id))]})]})}),r.jsx(b.Button,{id:`${this._id}-item-5`,class:{"ui5-shellbar-button":true,"ui5-shellbar-overflow-button":true,"ui5-shellbar-items-for-arrow-nav":true,...this.classes.overflow},icon:"sap-icon://overflow",onClick:this._handleOverflowPress,tooltip:this._overflowText,accessibilityAttributes:this.accInfo.overflow.accessibilityAttributes,"data-ui5-stable":"overflow",children:this._overflowNotifications&&r.jsx(Q,{slot:"badge",design:this._overflowNotifications===" "?"AttentionDot":"OverlayText",text:this._overflowNotifications===" "?"":this._overflowNotifications})}),this.hasProfile&&Ot.call(this),this.showProductSwitch&&r.jsx(b.Button,{id:`${this._id}-item-4`,class:"ui5-shellbar-no-overflow-button ui5-shellbar-button ui5-shellbar-button-product-switch ui5-shellbar-items-for-arrow-nav",icon:"sap-icon://grid","data-ui5-text":"Product Switch",onClick:this._handleProductSwitchPress,tooltip:this._productsText,"aria-label":this._productSwitchBtnText,"aria-haspopup":"dialog","aria-expanded":this.accInfo.products.accessibilityAttributes.expanded,accessibilityAttributes:this.accInfo.products.accessibilityAttributes,"data-ui5-stable":"product-switch"})]}),Lt.call(this)]})}function Ot(){return r.jsx(b.Button,{"data-profile-btn":true,id:`${this._id}-item-3`,onClick:this._handleProfilePress,tooltip:this._profileText,class:"ui5-shellbar-button ui5-shellbar-image-button ui5-shellbar-no-overflow-button ui5-shellbar-items-for-arrow-nav","aria-label":this.imageBtnText,"aria-haspopup":"dialog",accessibilityAttributes:this.accInfo.profile.accessibilityAttributes,"data-ui5-stable":"profile",children:r.jsx("slot",{name:"profile"})})}function jt(){return r.jsx("span",{role:this.accLogoRole,class:"ui5-shellbar-logo","aria-label":this._logoText,title:this._logoText,onClick:this._logoPress,onKeyDown:this._logoKeydown,onKeyUp:this._logoKeyup,tabIndex:0,"data-ui5-stable":"logo",children:r.jsx("slot",{name:"logo"})})}function kt(){return r.jsxs("div",{role:this.accLogoRole,class:"ui5-shellbar-logo-area",onClick:this._logoPress,tabIndex:0,onKeyDown:this._logoKeydown,onKeyUp:this._logoKeyup,"aria-label":this.accessibilityAttributes.branding?.name||this._logoAreaText,children:[this.hasLogo&&r.jsx("span",{class:"ui5-shellbar-logo",title:this._logoText,"data-ui5-stable":"logo",children:r.jsx("slot",{name:"logo"})}),r.jsx("div",{class:"ui5-shellbar-headings",children:this.primaryTitle&&r.jsx("h1",{class:"ui5-shellbar-title",children:r.jsx("bdi",{children:this.primaryTitle})})})]})}i.f("@"+"ui5"+"/"+"webcomponents-theming","sap_horizon",async()=>r.defaultThemeBase);i.f("@"+"u"+"i"+"5"+"/"+"w"+"e"+"b"+"c"+"o"+"m"+"p"+"o"+"n"+"e"+"n"+"t"+"s"+"-"+"f"+"i"+"o"+"r"+"i","sap_horizon",async()=>v.defaultTheme,"host");var Et=`.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host(:not([hidden])){display:inline-block;width:100%;max-width:100%;background:var(--sapShellColor);box-sizing:border-box}:host{box-shadow:inset 0 -.0625rem 0 0 var(--sapPageHeader_BorderColor)}::slotted([ui5-input]){--_ui5_input_placeholder_color: var(--sapShell_InteractiveTextColor);--_ui5_input_border_radius: var(--_ui5_shellbar_input_border_radius);--_ui5_input_focus_border_radius: var(--_ui5_shellbar_input_focus_border_radius);--_ui5_input_background_color: var(--_ui5_shellbar_input_background_color);--_ui5_input_focus_outline_color: var(--_ui5_shellbar_input_focus_outline_color);--_ui5_input_margin_top_bottom: 0}::slotted([ui5-button]),[ui5-button],::slotted([ui5-toggle-button]),[ui5-toggle-button]{--_ui5_button_base_min_width: 2.25rem;--_ui5_button_base_padding: .5625rem;--_ui5_button_base_height: var(--sapElement_Height);--_ui5-button-badge-diameter: .75rem}.ui5-shellbar-root{position:relative;display:flex;justify-content:space-between;align-items:center;height:var(--_ui5_shellbar_root_height);font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-weight:400;box-sizing:border-box}.ui5-shellbar-menu-button,.ui5-shellbar-button,.ui5-shellbar-image-button,::slotted([ui5-toggle-button]:not([slot^="content"])),::slotted([ui5-button]:not([slot^="content"])){height:2.25rem;padding:0;margin-inline-start:var(--_ui5-shellbar-overflow-button-margin);border:.0625rem solid var(--sapButton_Lite_BorderColor);background:var(--sapButton_Lite_Background);outline-color:var(--_ui5_shellbar_logo_outline_color);color:var(--sapShell_TextColor);box-sizing:border-box;cursor:pointer;border-radius:var(--_ui5_shellbar_button_border_radius);position:relative;font-weight:700;white-space:initial;overflow:initial;text-overflow:initial;line-height:inherit;letter-spacing:inherit;word-spacing:inherit}::slotted([ui5-toggle-button][slot="assistant"]){margin-inline-start:0}.ui5-shellbar-assistant-button{margin-inline-start:var(--_ui5-shellbar-overflow-button-margin)}::slotted([ui5-button][slot="startButton"]){margin-inline-start:0}::slotted([ui5-toggle-button]:hover),::slotted([ui5-button]:hover),.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:hover,.ui5-shellbar-button:hover,.ui5-shellbar-image-button:hover,::slotted([ui5-button][slot="midContent"]:hover){background:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_TextColor)}::slotted([ui5-toggle-button][slot="assistant"][pressed]),::slotted([ui5-toggle-button][slot="assistant"][pressed]:hover:not([active])){color:var(--sapShell_Assistant_ForegroundColor)}::slotted([ui5-toggle-button][active]),::slotted([ui5-button][active]),.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active,.ui5-shellbar-button[active],.ui5-shellbar-image-button:active{background:var(--sapShell_Active_Background);border-color:var(--sapButton_Lite_Active_BorderColor);color:var(--_ui5_shellbar_button_active_color)}:host([desktop]) .ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:focus,.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:focus-visible{outline:var(--_ui5_shellbar_logo_outline);outline-offset:var(--_ui5_shellbar_outline_offset)}slot[name=profile]{min-width:0}::slotted([ui5-avatar][slot="profile"]){display:block;width:2rem;height:2rem;min-width:0;min-height:2rem;font-size:var(--_ui5_avatar_fontsize_XS);font-weight:400}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive::-moz-focus-inner{border:none}.ui5-shellbar-menu-button-arrow,.ui5-shellbar-menu-button-title,.ui5-shellbar-title{display:inline-block;font-family:var(--sapFontSemiboldDuplexFamily);margin:0;font-size:var(--_ui5_shellbar_menu_button_title_font_size);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sapShell_SubBrand_TextColor)}:host(:not([primary-title])) .ui5-shellbar-menu-button{min-width:2.25rem;justify-content:center}.ui5-shellbar-secondary-title{display:inline-block;font-size:var(--sapFontSmallSize);color:var(--sapShell_TextColor);font-weight:400;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;margin:0;text-align:start}.ui5-shellbar-headings{display:flex;flex-direction:column;justify-content:center;height:100%;overflow:hidden;margin-inline-start:.25rem}.ui5-shellbar-menu-button--interactive .ui5-shellbar-menu-button-arrow{margin-inline-start:.375rem}.ui5-shellbar-overflow-container{display:flex;justify-content:center;align-items:center;height:100%;overflow:hidden}.ui5-shellbar-overflow-container-middle{align-self:flex-start;height:var(--_ui5_shellbar_overflow_container_middle_height);width:0;flex-shrink:0}.ui5-shellbar-mid-content{height:var(--_ui5_shellbar_overflow_container_middle_height)}:host([breakpoint-size="S"]) .ui5-shellbar-menu-button{margin-inline-start:0}:host([breakpoint-size="S"]){padding:0 1rem}:host([breakpoint-size="S"]) .ui5-shellbar-search-full-width-wrapper{padding:0 1rem}:host([breakpoint-size="M"]){padding:0 2rem}:host([breakpoint-size="M"]) .ui5-shellbar-search-full-width-wrapper{padding:0 2rem}:host([breakpoint-size="L"]){padding:0 2rem}:host([breakpoint-size="XL"]){padding:0 3rem}:host([breakpoint-size="XXL"]){padding:0 3rem}.ui5-shellbar-logo{overflow:hidden;cursor:pointer}.ui5-shellbar-logo-area{overflow:hidden;display:flex;align-items:center;padding:.25rem .5rem .25rem .25rem;box-sizing:border-box;cursor:pointer;background:var(--sapButton_Lite_Background);border:1px solid var(--sapButton_Lite_BorderColor);color:var(--sapShell_TextColor);margin-inline-start:.125rem}.ui5-shellbar-logo:focus,.ui5-shellbar-logo-area:focus{outline:var(--_ui5_shellbar_logo_outline);outline-offset:calc(-1 * var(--sapContent_FocusWidth));border-radius:var(--_ui5_shellbar_logo_border_radius)}.ui5-shellbar-overflow-container>.ui5-shellbar-logo:hover,.ui5-shellbar-logo-area:hover{box-shadow:var(--_ui5_shellbar_button_box_shadow);border-radius:var(--_ui5_shellbar_logo_border_radius)}.ui5-shellbar-logo-area:active:focus{background:var(--sapShell_Active_Background);border:1px solid var(--sapButton_Lite_Active_BorderColor);color:var(--sapShell_Active_TextColor)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:hover{box-shadow:var(--_ui5_shellbar_button_box_shadow)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active{box-shadow:var(--_ui5_shellbar_button_box_shadow_active)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active .ui5-shellbar-menu-button-arrow,.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active .ui5-shellbar-menu-button-title{color:var(--sapShell_Active_TextColor)}.ui5-shellbar-menu-button .ui5-shellbar-logo:hover{box-shadow:none}.ui5-shellbar-button{width:2.5rem;box-sizing:border-box}.ui5-shellbar-button,::slotted([ui5-button][slot="startButton"]){--_ui5_button_focused_border: var(--_ui5_shellbar_button_focused_border)}.ui5-shellbar-cancel-button,.ui5-shellbar-cancel-button:hover{color:var(--_ui5-shellbar_cancel-button-color)}.ui5-shellbar-image-button{display:flex;justify-content:center;align-items:center;min-width:auto;height:2.5rem;--_ui5_button_focused_border_radius: var(--_ui5_shellbar_image_button_border_radius);border-radius:var(--_ui5_shellbar_image_button_border_radius)}.ui5-shellbar-overflow-container-left{padding:0;justify-content:flex-start;max-width:75%;flex-shrink:0}.ui5-shellbar-overflow-container-left>:nth-child(n){margin-inline-end:.5rem}.ui5-shellbar-menu-button{white-space:nowrap;overflow:hidden;display:flex;align-items:center;padding:.25rem .5rem;cursor:text;-webkit-user-select:text;-moz-user-select:text;user-select:text}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive{-webkit-user-select:none;-moz-user-select:none;user-select:none;cursor:pointer;background:var(--sapButton_Lite_Background);border:var(--_ui5_shellbar_button_border);color:var(--sapShell_TextColor)}:host(:not([with-logo])) .ui5-shellbar-menu-button{margin-inline-start:0}.ui5-shellbar-overflow-container-right{flex-grow:1;justify-content:flex-end}.ui5-shellbar-overflow-container-right .ui5-shellbar-overflow-container-right-child{display:flex;justify-content:flex-end;height:inherit;align-items:center}.ui5-shellbar-overflow-container-right-inner{display:flex;flex-grow:1}.ui5-shellbar-content-items{display:flex;justify-content:center;align-items:center;flex-grow:1;min-width:max-content}.ui5-shellbar-spacer{flex-grow:1;height:1px;flex-basis:1rem;flex-shrink:1}.ui5-shellbar-separator{flex-grow:0;flex-shrink:0;height:var(--_ui5-shellbar-separator-height);width:1px;background-color:var(--_ui5-shellbar_separator-color)}.ui5-shellbar-separator-end{margin-inline-start:.5rem}:host([breakpoint-size="S"]) .ui5-shellbar-overflow-container-right{padding-inline-start:0}::slotted([hidden]){visibility:hidden;order:-1;position:absolute}.ui5-shellbar-content-item{display:flex;align-items:center;flex-shrink:0;padding-inline-start:var(--_ui5-shellbar-content-margin-start)}.ui5-shellbar-overflow-container-right-child .ui5-shellbar-bell-button [slot=badge],.ui5-shellbar-overflow-container-right-child .ui5-shellbar-custom-item [slot=badge]{inset-inline-end:var(--_ui5_shellbar_notification_btn_count_offset)}.ui5-shellbar-menu-button{margin-inline-start:.5rem}.ui5-shellbar-search-field{padding-inline-start:var(--_ui5-shellbar-content-margin-start);min-width:var(--_ui5_shellbar_search_field_width);align-items:center;flex-grow:1;margin-inline-start:.5rem}.ui5-shellbar-overflow-container-right-child>:first-child{margin-inline-start:0}.ui5-shellbar-search-full-width-wrapper .ui5-shellbar-search-full-field{height:2.25rem;width:100%}.ui5-shellbar-search-full-width-wrapper{position:absolute;bottom:.0625rem;left:0;background:var(--sapShellColor);height:100%;width:100%;z-index:1001;display:flex;align-items:center;box-sizing:border-box}.ui5-shellbar-search-full-width-wrapper .ui5-shellbar-button{width:auto}.ui5-shellbar-search-full-width-wrapper ::slotted([ui5-shellbar-search]){max-width:unset}::slotted([ui5-input]){background:var(--_ui5_shellbar_search_field_background);border:var(--_ui5_shellbar_search_field_border);box-shadow:var(--_ui5_shellbar_search_field_box_shadow);color:var(--_ui5_shellbar_search_field_color);height:2.25rem;width:100%;min-width:var(--_ui5_shellbar_search_field_width)}:host([breakpoint-size="M"]) ::slotted([ui5-input]),:host([breakpoint-size="S"]) ::slotted([ui5-input]){min-width:1rem}:host([breakpoint-size="M"][show-search-field]) .ui5-shellbar-overflow-container-right-child{flex-grow:1}::slotted([ui5-input]:hover){background:var(--_ui5_shellbar_search_field_background_hover);box-shadow:var(--_ui5_shellbar_search_field_box_shadow_hover)}::slotted([ui5-input][focused]){outline:var(--_ui5_shellbar_search_field_outline_focused)}::slotted([slot="logo"]){max-height:2rem;vertical-align:middle}::slotted([slot="logo"]):active{pointer-events:none}.ui5-shellbar-co-pilot-placeholder{width:2.75rem;height:2.75rem}.ui5-shellbar-coPilot-pressed,.ui5-shellbar-coPilot-pressed:hover{color:var(--sapShell_Assistant_ForegroundColor)}::slotted([ui5-button][slot="startButton"]){margin-inline:0 .5rem;justify-content:center;align-items:center}::slotted([ui5-button][data-profile-btn]){width:auto}::slotted(.ui5-shellbar-hidden-button),.ui5-shellbar-hidden-button,.ui5-shellbar-invisible-button{visibility:hidden;order:-1;opacity:0;min-width:0;width:0;margin:0;padding:0;padding-inline-start:0;border:0;margin-inline-start:0}\n`;i.f("@"+"ui5"+"/"+"webcomponents-theming","sap_horizon",async()=>r.defaultThemeBase);i.f("@"+"u"+"i"+"5"+"/"+"w"+"e"+"b"+"c"+"o"+"m"+"p"+"o"+"n"+"e"+"n"+"t"+"s"+"-"+"f"+"i"+"o"+"r"+"i","sap_horizon",async()=>v.defaultTheme,"host");var zt=`.ui5-shellbar-menu-popover::part(content),.ui5-shellbar-overflow-popover::part(content){padding:0}.ui5-shellbar-overflow-popover [ui5-li]::part(icon){color:var(--sapList_TextColor)}.ui5-shellbar-overflow-popover [ui5-li]::part(title){font-size:var(--sapFontSize)}.ui5-shellbar-overflow-popover [ui5-li]:after{position:relative;width:fit-content;height:1rem;min-width:1rem;background:var(--sapContent_BadgeBackground);border:var(--_ui5_shellbar_button_badge_border);color:var(--sapContent_BadgeTextColor);bottom:calc(100% + .0625rem);left:1.25rem;padding:0 .3125rem;border-radius:.5rem;display:flex;justify-content:center;align-items:center;font-size:var(--sapFontSmallSize);font-family:var(--sapFontFamily);z-index:2;box-sizing:border-box;pointer-events:none}.ui5-shellbar-overflow-popover [ui5-li][data-count]:after{content:attr(data-count)}\n`;var Nt=this&&this.__decorate||function(t,e,i,s){var o=arguments.length,r=o<3?e:s===null?s=Object.getOwnPropertyDescriptor(e,i):s,n;if(typeof Reflect==="object"&&typeof Reflect.decorate==="function")r=Reflect.decorate(t,e,i,s);else for(var a=t.length-1;a>=0;a--)if(n=t[a])r=(o<3?n(r):o>3?n(e,i,r):n(e,i))||r;return o>3&&r&&Object.defineProperty(e,i,r),r};var Dt;const Mt=200;const Ht=["feedback","sys-help"];let $t=Dt=class t extends e.S{static get FIORI_3_BREAKPOINTS(){return[599,1023,1439,1919,1e4]}static get FIORI_3_BREAKPOINTS_MAP(){return{599:"S",1023:"M",1439:"L",1919:"XL",1e4:"XXL"}}constructor(){super();this.hideSearchButton=false;this.disableSearchCollapse=false;this.showNotifications=false;this.showProductSwitch=false;this.showSearchField=false;this.accessibilityAttributes={};this.breakpointSize="S";this.withLogo=false;this._itemsInfo=[];this._contentInfo=[];this._menuPopoverExpanded=false;this._overflowPopoverExpanded=false;this.showFullWidthSearch=false;this._cachedHiddenContent=[];this._lastOffsetWidth=0;this._observableContent=[];this._autoRestoreSearchField=false;this._onSearchOpenBound=this._onSearchOpen.bind(this);this._onSearchCloseBound=this._onSearchClose.bind(this);this._onSearchBound=this._onSearch.bind(this);this._hiddenIcons=[];this._isInitialRendering=true;this._overflowNotifications=null;this._defaultItemPressPrevented=false;this.contentItemsObserver=new MutationObserver(()=>{this._handleActionsOverflow()});this._headerPress=()=>{if(this.hasMenuItems){const t=this._getMenuPopover();t.opener=this.shadowRoot.querySelector(".ui5-shellbar-menu-button");t.open=true}};this._handleResize=qt(()=>{this.menuPopover=this._getMenuPopover();this.overflowPopover=this._getOverflowPopover();this.overflowPopover.open=false;if(this._lastOffsetWidth!==this.offsetWidth){this._overflowActions();if(this.autoSearchField){this._updateSearchFieldState()}}},Mt)}_onSearchOpen(t){if(t.target!==this.search){this._detachSearchFieldListeners(t.target);return}if(i.d()){this.setSearchState(true)}}_onSearchClose(t){if(t.target!==this.search){this._detachSearchFieldListeners(t.target);return}if(i.d()){this.setSearchState(false)}}_onSearch(t){if(t.target!==this.search){this._detachSearchFieldListeners(t.target);return}if(i.d()||this.search?.value&&this.showSearchField){return}this.setSearchState(!this.showSearchField)}_updateSearchFieldState(){const t=this.shadowRoot.querySelector(".ui5-shellbar-spacer")?this.shadowRoot.querySelector(".ui5-shellbar-spacer").getBoundingClientRect().width:0;const e=this.domCalculatedValues("--_ui5_shellbar_search_field_width");if(this.showFullWidthSearch){this.setSearchState(true);return}if(t<=e&&this.contentItemsHidden.length!==0&&this.showSearchField){this.setSearchState(false);this._autoRestoreSearchField=true}else if(t>e&&this._autoRestoreSearchField){this.setSearchState(true);this._autoRestoreSearchField=false}}_onKeyDown(t){if(!e.D(t)&&!e.R(t)&&!e.M(t)&&!e.n(t)){return}const i=this.getDomRef();if(!i){return}const s=e.t();if(!s){return}if(this._allowChildNavigation(s,t)){return}const o=a.b(i).filter(t=>this._isVisible(t));const r=o.findIndex(t=>t===s);if(r!==-1){t.preventDefault();if(e.D(t)){this._focusPreviousItem(o,r)}else if(e.R(t)){this._focusNextItem(o,r)}else if(e.M(t)){o[0]?.focus()}else if(e.n(t)){o[o.length-1]?.focus()}}}_allowChildNavigation(t,e){if(t.tagName==="INPUT"||t.tagName==="TEXTAREA"){return this._allowInputNavigation(t,e)}return false}_allowInputNavigation(t,i){const s=t.selectionStart||0;const o=t.value.length;if(e.D(i)&&s>0||e.R(i)&&s<o){return true}return false}_focusNextItem(t,e){if(e<t.length-1){t[e+1].focus()}}_focusPreviousItem(t,e){if(e>0){t[e-1].focus()}}_isVisible(t){const e=getComputedStyle(t);return e.display!=="none"&&e.visibility!=="hidden"&&t.offsetWidth>0&&t.offsetHeight>0}_getRightChildItems(){return[...this.searchField,...this.shadowRoot.querySelectorAll(".ui5-shellbar-search-item-for-arrow-nav"),...this.assistant,...this.shadowRoot.querySelectorAll(".ui5-shellbar-items-for-arrow-nav")]}_menuItemPress(t){const e=this.fireDecoratorEvent("menu-item-click",{item:t.detail.item});if(e){this.menuPopover.open=false}}_logoPress(){this.fireDecoratorEvent("logo-click",{targetRef:this.shadowRoot.querySelector(".ui5-shellbar-logo")})}_menuPopoverBeforeOpen(){this._menuPopoverExpanded=true;if(this.menuPopover.content&&this.menuPopover.content.length){this.menuPopover.content[0].focusFirstItem()}}_menuPopoverAfterClose(){this._menuPopoverExpanded=false}_overflowPopoverBeforeOpen(){this._overflowPopoverExpanded=true;if(this.overflowPopover.content&&this.overflowPopover.content.length){this.overflowPopover.content[0].focusFirstItem()}}_overflowPopoverAfterClose(){this._overflowPopoverExpanded=false}_logoKeyup(t){if(e.A(t)){this._logoPress()}}_logoKeydown(t){if(e.A(t)){t.preventDefault();return}if(e.b(t)){this._logoPress()}}_calculateCSSREMValue(t,e){return Number(t.getPropertyValue(e).replace("rem",""))*parseInt(getComputedStyle(document.body).getPropertyValue("font-size"))}domCalculatedValues(t){const e=getComputedStyle(this.getDomRef());return this._calculateCSSREMValue(e,t)}onBeforeRendering(){this.withLogo=this.hasLogo;this._hiddenIcons=this._itemsInfo.filter(t=>{const e=t.classes.indexOf("ui5-shellbar-hidden-button")!==-1;const i=t.classes.indexOf("ui5-shellbar-invisible-button")===-1;const s=t.classes.indexOf("ui5-shellbar-overflow-button")!==-1;const o=t.classes.indexOf("ui5-shellbar-image-button")!==-1;const r=s||o&&this.hasProfile;return e&&i&&!r});this._observeContentItems();if(this.showFullWidthSearch&&this._isInitialRendering){this.setSearchState(false);this._autoRestoreSearchField=true}if(Wt(this.search)){if(i.d()){this.search.open=this.showSearchField}else{this.search.collapsed=!this.showSearchField}this._detachSearchFieldListeners(this.search);this._attachSearchFieldListeners(this.search)}}async setSearchState(t){if(t===this.showSearchField){return}this.showSearchField=t;await i.f$2();this.fireDecoratorEvent("search-field-toggle",{expanded:t})}onAfterRendering(){this._lastOffsetWidth=this.offsetWidth;this._overflowActions();this.onInitialRendering()}async onInitialRendering(){if(this._isInitialRendering){await i.f$2();if(this.autoSearchField){this._updateSearchFieldState()}}this._isInitialRendering=false}closeOverflow(){if(this.overflowPopover){this.overflowPopover.open=false}}_handleBarBreakpoints(){const t=this.getBoundingClientRect().width;const e=Dt.FIORI_3_BREAKPOINTS;const i=e.find(e=>t<=e)||Dt.FIORI_3_BREAKPOINTS[Dt.FIORI_3_BREAKPOINTS.length-1];const s=Dt.FIORI_3_BREAKPOINTS_MAP[i];if(this.breakpointSize!==s){this.breakpointSize=s}this.branding.forEach(t=>{t._isSBreakPoint=this.isSBreakPoint})}_hideItems(t){t.forEach(t=>{if(t.classes.indexOf("ui5-shellbar-no-overflow-button")===-1){t.classes=`${t.classes} ui5-shellbar-hidden-button`}});return t}_resetItemsVisibility(t){t.forEach(t=>{t.classList.remove("ui5-shellbar-hidden-button")})}_handleActionsOverflow(){const t=this.overflowInner;const e=this.overflowWrapper;const i=this.hidableDomElements;const s=[];let o=0;this._resetItemsVisibility(i);for(let r=0;r<i.length;r++){if(t?.offsetWidth===e?.offsetWidth){o=r;break}const n=i[r];s.push(n.id);n.classList.add("ui5-shellbar-hidden-button")}if(s.length===1&&!this.showSearchField){const t=i[++o];if(t){s.push(t.id)}}const r=this._getItemsInfo().filter(t=>t.show&&t.classes.indexOf("ui5-shellbar-no-overflow-button")===-1);const n=this._getContentInfo().sort((t,e)=>t.hideOrder-e.hideOrder);const a=[...r,...n].filter(t=>s.includes(t.id));this._hideItems(a);return{itemsInfo:r,contentInfo:n}}_overflowActions(){this._handleBarBreakpoints();const{itemsInfo:t,contentInfo:e}=this._handleActionsOverflow();this._updateItemsInfo(t);this._updateContentInfo(e);this._updateOverflowNotifications();this.showFullWidthSearch=this.overflowed&&this.showSearchField}_toggleActionPopover(){const t=this.shadowRoot.querySelector(".ui5-shellbar-overflow-button");const e=this._getOverflowPopover();e.opener=t;e.open=true}onEnterDOM(){e.f.register(this,this._handleResize);if(i.f$1()){this.setAttribute("desktop","")}this._attachSearchFieldListeners(this.search)}onExitDOM(){this.contentItemsObserver.disconnect();this._observableContent=[];e.f.deregister(this,this._handleResize);this._detachSearchFieldListeners(this.search)}_attachSearchFieldListeners(t){if(!t){return}t.addEventListener("ui5-open",this._onSearchOpenBound);t.addEventListener("ui5-close",this._onSearchCloseBound);t.addEventListener("ui5-search",this._onSearchBound)}_detachSearchFieldListeners(t){if(!t){return}t.removeEventListener("ui5-open",this._onSearchOpenBound);t.removeEventListener("ui5-close",this._onSearchCloseBound);t.removeEventListener("ui5-search",this._onSearchBound)}_handleSearchIconPress(){const t=this.shadowRoot.querySelector(".ui5-shellbar-search-button");const e=!this.fireDecoratorEvent("search-button-click",{targetRef:t,searchFieldVisible:this.showSearchField});if(e){return}this.setSearchState(!this.showSearchField);if(!this.showSearchField){return}const i=this.searchField[0];if(i){i.focused=true}setTimeout(()=>{if(i){i.focus()}},100)}async _handleActionListClick(){if(!this._defaultItemPressPrevented){this.closeOverflow();await i.f$2()}this._defaultItemPressPrevented=false}_handleCustomActionPress(t){const e=t.target;const i=e.getAttribute("data-ui5-external-action-item-id");if(i){const e=this.items.find(t=>t._id===i);const s=e.fireClickEvent(t);this._defaultItemPressPrevented=s}}_handleOverflowPress(){this._toggleActionPopover()}_handleNotificationsPress(t){const e=this.shadowRoot.querySelector(".ui5-shellbar-bell-button"),i=t.target;this._defaultItemPressPrevented=!this.fireDecoratorEvent("notifications-click",{targetRef:e.classList.contains("ui5-shellbar-hidden-button")?i:e})}_handleProfilePress(){this.fireDecoratorEvent("profile-click",{targetRef:this.shadowRoot.querySelector(".ui5-shellbar-image-button")})}_handleCancelButtonPress(){const t=this.shadowRoot.querySelector(".ui5-shellbar-cancel-button");const e=!this.fireDecoratorEvent("search-field-clear",{targetRef:t});this.showFullWidthSearch=false;this.setSearchState(false);if(!e){this._clearSearchFieldValue()}}_handleProductSwitchPress(t){const e=this.shadowRoot.querySelector(".ui5-shellbar-button-product-switch"),i=t.target;this._defaultItemPressPrevented=!this.fireDecoratorEvent("product-switch-click",{targetRef:e.classList.contains("ui5-shellbar-hidden-button")?i:e})}_clearSearchFieldValue(){if(this.search){this.search.value=""}}get logoDomRef(){return this.shadowRoot.querySelector(`*[data-ui5-stable="logo"]`)}get notificationsDomRef(){return this.shadowRoot.querySelector(`*[data-ui5-stable="notifications"]`)}get overflowDomRef(){return this.shadowRoot.querySelector(`*[data-ui5-stable="overflow"]`)}get profileDomRef(){return this.shadowRoot.querySelector(`*[data-ui5-stable="profile"]`)}get productSwitchDomRef(){return this.shadowRoot.querySelector(`*[data-ui5-stable="product-switch"]`)}async getSearchButtonDomRef(){await i.f$2();return this.shadowRoot.querySelector(`*[data-ui5-stable="toggle-search"]`)}_getContentInfo(){return[...this.contentItemsSorted.map(t=>({hideOrder:parseInt(t.getAttribute("data-hide-order")||"0"),id:t.slot,classes:"ui5-shellbar-content-item",show:false}))]}_getItemsInfo(){const t=[{icon:_.search,text:this._searchText,classes:`${this.searchField.length?"":"ui5-shellbar-invisible-button"} ui5-shellbar-search-button ui5-shellbar-button`,id:`${this._id}-item-${1}`,press:this._handleSearchIconPress.bind(this),show:!!this.searchField.length,tooltip:this._searchText},{icon:lt,text:"Assistant",classes:`${this.assistant.length?"":"ui5-shellbar-invisible-button"} ui5-shellbar-assistant-button`,id:`${this._id}-assistant`,show:!!this.assistant.length,press:()=>{},tooltip:this.assistant.length?this.assistant[0].getAttribute("text")||this.assistant[0].getAttribute("title")||undefined:undefined},{icon:vt,title:this._notificationsText,text:Dt.i18nBundle.getText(w.SHELLBAR_NOTIFICATIONS_NO_COUNT),count:this.notificationsCount,classes:`${this.showNotifications?"":"ui5-shellbar-invisible-button"} ui5-shellbar-bell-button ui5-shellbar-button`,id:`${this._id}-item-${2}`,show:this.showNotifications,press:this._handleNotificationsPress.bind(this),tooltip:this._notificationsText},...this.items.sort((t,e)=>{const i=Ht.indexOf(t.icon||"");const s=Ht.indexOf(e.icon||"");return i-s}).map(t=>{t._getRealDomRef=()=>this.shadowRoot.querySelector(`*[data-ui5-stable=${t.stableDomRef}]`);const e=!!t.icon||false;return{icon:t.icon,id:t._id,count:t.count||undefined,refItemid:t._id,text:t.text,classes:"ui5-shellbar-custom-item ui5-shellbar-button",show:e,press:this._handleCustomActionPress.bind(this),custom:true,title:t.title,stableDomRef:t.stableDomRef,tooltip:t.title||t.text,accessibilityAttributes:t.accessibilityAttributes}}),{icon:m.overflow,text:"Overflow",classes:"ui5-shellbar-hidden-button ui5-shellbar-no-overflow-button ui5-shellbar-overflow-button ui5-shellbar-button",id:`${this.id}-item-${5}`,press:this._handleOverflowPress.bind(this),show:true,tooltip:this._overflowText},{text:"Person",classes:`${this.hasProfile?"":"ui5-shellbar-invisible-button"} ui5-shellbar-no-overflow-button ui5-shellbar-image-button ui5-shellbar-button`,profile:true,id:`${this._id}-item-${3}`,show:this.hasProfile,press:this._handleProfilePress.bind(this),tooltip:this._profileText},{icon:Rt,text:this._productsText,classes:`${this.showProductSwitch?"":"ui5-shellbar-invisible-button"} ui5-shellbar-no-overflow-button ui5-shellbar-button ui5-shellbar-image-button ui5-shellbar-button-product-switch`,id:`${this._id}-item-${4}`,show:this.showProductSwitch,press:this._handleProductSwitchPress.bind(this),tooltip:this._productsText}];return t}_updateItemsInfo(t){const e=JSON.stringify(this._itemsInfo)!==JSON.stringify(t);if(e){this._itemsInfo=t}}_updateContentInfo(t){const e=JSON.stringify(this._contentInfo)!==JSON.stringify(t);if(e){this._contentInfo=t;this._fireContentItemVisibilityChangeEvent()}}_fireContentItemVisibilityChangeEvent(){const t=this._contentInfo.filter(t=>t.classes.indexOf("ui5-shellbar-hidden-button")!==-1).map(t=>t.id);this.fireDecoratorEvent("content-item-visibility-change",{items:this.contentItems.filter(e=>t.includes(e.slot))})}_updateOverflowNotifications(){const t=[];let e=null;this._itemsInfo.forEach(e=>{if(e.count&&e.classes.includes("ui5-shellbar-hidden-button")){t.push(e.count)}});if(t.length===1){e=t[0]}else if(t.length>1){e=" "}this._overflowNotifications=e}_observeContentItems(){if(this.hasMatchingContent){return}this.contentItems.forEach(t=>{if(!this._observableContent.includes(t)){this.contentItemsObserver.observe(t,{characterData:false,childList:false,subtree:false,attributes:true,attributeFilter:["data-hide-order"]})}});this._observableContent=this.contentItems}_getOverflowPopover(){return this.shadowRoot.querySelector(".ui5-shellbar-overflow-popover")}_getMenuPopover(){return this.shadowRoot.querySelector(".ui5-shellbar-menu-popover")}isIconHidden(t){const e=this._itemsInfo.find(e=>e.icon===t);if(!e){return false}return e.classes.indexOf("ui5-shellbar-hidden-button")!==-1}get hasMatchingContent(){if(this._observableContent.length!==this.contentItems.length){return false}const t=new WeakSet(this._observableContent);return this.contentItems.every(e=>t.has(e))}get contentItemsSorted(){return this.contentItems.toReversed().sort((t,e)=>parseInt(t.getAttribute("data-hide-order")||"0")-parseInt(e.getAttribute("data-hide-order")||"0"))}get contentItemsWrappersSorted(){return this.contentItemsSorted.map(t=>this.shadowRoot.querySelector(`#${t.slot}`)).filter(t=>t!==null)}get autoSearchField(){const t=document.activeElement===this.searchField[0];const e=this.searchField[0]?.value?.length>0;const i=this.disableSearchCollapse||t||e;if(i){return false}return this.showSearchField||this._autoRestoreSearchField}get startContentInfoSorted(){return this._contentInfo.filter(t=>this.startContent.find(e=>e.slot===t.id)).sort((t,e)=>t.hideOrder-e.hideOrder)}get endContentInfoSorted(){return this._contentInfo.filter(t=>this.endContent.find(e=>e.slot===t.id)).sort((t,e)=>t.hideOrder-e.hideOrder)}get showStartSeparator(){return this.startContentInfoSorted.some(t=>!t.classes.includes("ui5-shellbar-hidden-button"))}get showEndSeparator(){return this.endContentInfoSorted.some(t=>!t.classes.includes("ui5-shellbar-hidden-button"))}shouldIncludeSeparator(t,e){if(!t){return false}const i=e.at(-1);return i?.id===t.id&&t.classes.indexOf("ui5-shellbar-hidden-button")>-1}get classes(){return{wrapper:{"ui5-shellbar-root":true,"ui5-shellbar-with-searchfield":this.hasSearchField},button:{"ui5-shellbar-menu-button--interactive":this.hasMenuItems},notification:{"ui5-shellbar-hidden-button":this.isIconHidden("bell")},search:{"ui5-shellbar-hidden-button":this.isIconHidden("search"),"ui5-shellbar-search-toggle":true},overflow:{"ui5-shellbar-hidden-button":this._hiddenIcons.length===0},assistant:{"ui5-shellbar-hidden-button":this.isIconHidden("assistant"),"ui5-shellbar-assistant-button":true},searchField:{"ui5-shellbar-search-field":this.showSearchField,"ui5-shellbar-search-toggle":Wt(this.search),"ui5-shellbar-hidden-button":!this.showSearchField}}}get styles(){const t={display:this.showSearchField?"flex":"none"};return{searchField:Wt(this.search)?{}:t}}get customItemsInfo(){return this._itemsInfo.filter(t=>!!t.custom)}get hasLogo(){return!!this.logo.length}get showLogoInMenuButton(){return this.hasLogo&&this.breakpointSize==="S"}get showTitleInMenuButton(){return this.primaryTitle&&!this.showLogoInMenuButton}get showMenuButton(){return this.primaryTitle||this.showLogoInMenuButton}get hasAssistant(){return!!this.assistant.length}get hasBranding(){return!!this.branding.length}get hasSearchField(){return!!this.searchField.length}get hasMidContent(){return!!this.midContent.length}get hasProfile(){return!!this.profile.length}get hasMenuItems(){return this.menuItems.length>0}get imageBtnText(){return n.A(this)||Dt.i18nBundle.getText(w.SHELLBAR_IMAGE_BTN)}get _shellbarText(){return Dt.i18nBundle.getText(w.SHELLBAR_LABEL)}get _logoText(){return this.accessibilityAttributes.logo?.name||Dt.i18nBundle.getText(w.SHELLBAR_LOGO)}get _notificationsText(){return Dt.i18nBundle.getText(w.SHELLBAR_NOTIFICATIONS,this.notificationsCount||0)}get _cancelBtnText(){return Dt.i18nBundle.getText(w.SHELLBAR_CANCEL)}get _logoAreaText(){const t=this.primaryTitle??"";const e=this.secondaryTitle??"";return Dt.i18nBundle.getText(w.SHELLBAR_LOGO_AREA,t,e)}get _contentItemsText(){return this._enableContentAreaAccessibility?Dt.i18nBundle.getText(w.SHELLBAR_ADDITIONAL_CONTEXT):undefined}get _searchFieldDescription(){return Dt.i18nBundle.getText(w.SHELLBAR_SEARCHFIELD_DESCRIPTION)}get _contentItemsRole(){if(this._enableContentAreaAccessibility){return"group"}}get _enableContentAreaAccessibility(){return this.contentItems.length>1}get contentItems(){return[...this.startContent,...this.endContent]}get startContent(){const t=this.content.findIndex(t=>t.hasAttribute("ui5-shellbar-spacer"));if(t===-1){return this.content}return this.content.slice(0,t)}get endContent(){const t=this.content.findIndex(t=>t.hasAttribute("ui5-shellbar-spacer"));if(t===-1){return[]}return this.content.slice(t+1)}get _rightChildRole(){const t=this._getRightChildItems();const e=t.filter(t=>this._isVisible(t));if(e.length===1){return}return"toolbar"}get _searchFieldText(){return Dt.i18nBundle.getText(w.SHELLBAR_SEARCH_FIELD)}get _searchBtnOpen(){return Dt.i18nBundle.getText(w.SHELLBAR_SEARCH_BTN_OPEN)}get _productSwitchBtnText(){return Dt.i18nBundle.getText(w.SHELLBAR_PRODUCT_SWITCH_BTN)}get _profileText(){return this.accessibilityAttributes.profile?.name||Dt.i18nBundle.getText(w.SHELLBAR_PROFILE)}get _productsText(){return Dt.i18nBundle.getText(w.SHELLBAR_PRODUCTS)}get _searchText(){return Dt.i18nBundle.getText(w.SHELLBAR_SEARCH)}get _overflowText(){return Dt.i18nBundle.getText(w.SHELLBAR_OVERFLOW)}get _brandingText(){return this.accessibilityAttributes.branding?.name||this.primaryTitle}get hasContentItems(){return this.contentItems.length>0}get hidableDomElements(){const t=Array.from(this.shadowRoot.querySelectorAll(".ui5-shellbar-button:not(.ui5-shellbar-search-button):not(.ui5-shellbar-overflow-button):not(.ui5-shellbar-cancel-button):not(.ui5-shellbar-no-overflow-button)"));const e=this.shadowRoot.querySelector(".ui5-shellbar-assistant-button");const i=this.shadowRoot.querySelector(".ui5-shellbar-search-toggle");const s=this.contentItemsWrappersSorted;const o=s.pop();const r=this.showSearchField&&this.hasSearchField;let n=[];if(r){const i=[...t,e];const r=i.filter(t=>t&&!t.classList.contains("ui5-shellbar-hidden-button"));const a=i.filter(t=>t&&t.classList.contains("ui5-shellbar-hidden-button"));n=[...a,...s,o,...r]}else{n=[...t.toReversed(),e,...s,i,o]}return n.filter(Boolean)}get contentItemsHidden(){return this.contentItemsWrappersSorted.filter(t=>t.classList.contains("ui5-shellbar-hidden-button"))}get overflowWrapper(){return this.shadowRoot.querySelector(".ui5-shellbar-overflow-container-right")}get overflowInner(){return this.shadowRoot.querySelector(".ui5-shellbar-overflow-container-right-inner")}get overflowed(){const t=this.overflowWrapper;const e=this.overflowInner;if(!t||!e){return false}return e.offsetWidth>t.offsetWidth}get accInfo(){const t=this.accessibilityAttributes.overflow?.expanded;return{notifications:{title:this._notificationsText,accessibilityAttributes:{expanded:this.accessibilityAttributes.notifications?.expanded,hasPopup:this.accessibilityAttributes.notifications?.hasPopup}},profile:{title:this._profileText,accessibilityAttributes:{hasPopup:this.accessibilityAttributes.profile?.hasPopup,expanded:this.accessibilityAttributes.profile?.expanded}},products:{title:this._productsText,accessibilityAttributes:{hasPopup:this.accessibilityAttributes.product?.hasPopup,expanded:this.accessibilityAttributes.product?.expanded}},search:{title:this._searchText,accessibilityAttributes:{hasPopup:this.accessibilityAttributes.search?.hasPopup}},overflow:{title:this._overflowText,accessibilityAttributes:{hasPopup:this.accessibilityAttributes.overflow?.hasPopup||"menu",expanded:t===undefined?this._overflowPopoverExpanded:t}},branding:{title:this._brandingText,accessibilityAttributes:{name:this.accessibilityAttributes.branding?.name}}}}get accLogoRole(){return this.accessibilityAttributes.logo?.role||"link"}get isSBreakPoint(){return this.breakpointSize==="S"}get hasSelfCollapsibleSearch(){return Wt(this.search)}get search(){return this.searchField.length?this.searchField[0]:null}};Nt([e.s({type:Boolean})],$t.prototype,"hideSearchButton",void 0);Nt([e.s({type:Boolean})],$t.prototype,"disableSearchCollapse",void 0);Nt([e.s()],$t.prototype,"primaryTitle",void 0);Nt([e.s()],$t.prototype,"secondaryTitle",void 0);Nt([e.s()],$t.prototype,"notificationsCount",void 0);Nt([e.s({type:Boolean})],$t.prototype,"showNotifications",void 0);Nt([e.s({type:Boolean})],$t.prototype,"showProductSwitch",void 0);Nt([e.s({type:Boolean})],$t.prototype,"showSearchField",void 0);Nt([e.s({type:Object})],$t.prototype,"accessibilityAttributes",void 0);Nt([e.s()],$t.prototype,"breakpointSize",void 0);Nt([e.s({type:Boolean})],$t.prototype,"withLogo",void 0);Nt([e.s({type:Object})],$t.prototype,"_itemsInfo",void 0);Nt([e.s({type:Object})],$t.prototype,"_contentInfo",void 0);Nt([e.s({type:Boolean,noAttribute:true})],$t.prototype,"_menuPopoverExpanded",void 0);Nt([e.s({type:Boolean,noAttribute:true})],$t.prototype,"_overflowPopoverExpanded",void 0);Nt([e.s({type:Boolean,noAttribute:true})],$t.prototype,"showFullWidthSearch",void 0);Nt([e.d()],$t.prototype,"assistant",void 0);Nt([e.d()],$t.prototype,"branding",void 0);Nt([e.d({type:HTMLElement,default:true,invalidateOnChildChange:true})],$t.prototype,"items",void 0);Nt([e.d()],$t.prototype,"profile",void 0);Nt([e.d()],$t.prototype,"logo",void 0);Nt([e.d()],$t.prototype,"menuItems",void 0);Nt([e.d({type:HTMLElement,invalidateOnChildChange:true})],$t.prototype,"searchField",void 0);Nt([e.d()],$t.prototype,"startButton",void 0);Nt([e.d()],$t.prototype,"midContent",void 0);Nt([e.d({type:HTMLElement,individualSlots:true})],$t.prototype,"content",void 0);Nt([o.i("@ui5/webcomponents-fiori")],$t,"i18nBundle",void 0);$t=Dt=Nt([e.m({tag:"ui5-shellbar",fastNavigation:true,languageAware:true,renderer:r.y,template:Ft,styles:[Et,zt],dependencies:[b.Button,h.Icon,c.List,d.Popover,K,f,Q]}),s.l("notifications-click",{cancelable:true,bubbles:true}),s.l("profile-click",{bubbles:true}),s.l("product-switch-click",{cancelable:true,bubbles:true}),s.l("logo-click",{bubbles:true}),s.l("menu-item-click",{bubbles:true,cancelable:true}),s.l("search-button-click",{cancelable:true,bubbles:true}),s.l("search-field-toggle",{bubbles:true}),s.l("search-field-clear",{cancelable:true,bubbles:true}),s.l("content-item-visibility-change",{bubbles:true})],$t);const Wt=t=>{if(t){return"collapsed"in t&&"open"in t}return false};$t.define();var Vt=$t;return Vt});
-//# sourceMappingURL=ShellBar.js.map
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/query', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ShellBarItem2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Menu', 'sap/f/thirdparty/List', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/overflow', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ShellBarSpacer', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ListSelectionMode', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/ListItemGroup'], (function (exports, webcomponentsBase, eventStrict, query, parametersBundle_css$1, jsxRuntime, Theme, Button, ShellBarItem, Icon, ResponsivePopover, Menu, List, search, Icons, overflow, slimArrowDown, parametersBundle_css, ListItemBase, ShellBarSpacer, i18nDefaults, AccessibilityTextsHelper, willShowContent, toLowercaseEnumValue, BusyIndicator, Label, i18nDefaults$1, Tag, decline, ListItemTemplate, ListSelectionMode, ListItemAdditionalText_css, ValueState, WrappingType, Title, FocusableElements, InvisibleMessage, MenuItem, ListItemGroup) { 'use strict';
+
+	function n(e,o){let t=null,l=null;return function(...u){if(l){t=u;return}e(...u),l=setTimeout(()=>{t&&(e(...t),t=null),l=null;},o);}}
+
+	const name$5 = "bell";
+	const pathData$5 = "M1 13c0-.146.156-.365.469-.656.312-.292.635-.714.968-1.266.334-.552.6-1.255.797-2.11.198-.853.183-1.905-.046-3.155a3.583 3.583 0 0 1 .093-1.704c.167-.53.427-1 .781-1.406a4.65 4.65 0 0 1 1.313-1.031 5.498 5.498 0 0 1 1.656-.578c0-.313.073-.573.219-.781C7.396.104 7.646 0 8 0c.292 0 .526.094.703.281.177.188.266.459.266.813a5.41 5.41 0 0 1 1.562.562c.5.271.927.615 1.281 1.032.355.416.61.89.766 1.421.156.532.172 1.1.047 1.704-.25 1.25-.266 2.302-.047 3.156.219.854.505 1.557.86 2.11.354.551.703.973 1.046 1.265.344.291.516.51.516.656a.974.974 0 0 1-.281.719A.974.974 0 0 1 14 14h-4a1.92 1.92 0 0 1-.594 1.406A1.922 1.922 0 0 1 8 16a1.92 1.92 0 0 1-1.406-.594A1.922 1.922 0 0 1 6 14H2a.973.973 0 0 1-.719-.281A.974.974 0 0 1 1 13Zm1.219 0H13.75c-.208-.23-.474-.547-.797-.953-.323-.406-.614-.912-.875-1.516-.26-.604-.448-1.312-.562-2.125-.115-.812-.068-1.74.14-2.781.104-.52.078-.98-.078-1.375-.156-.396-.328-.708-.515-.938-.396-.479-.834-.817-1.313-1.015C9.27 2.099 8.687 2 8 2c-.667 0-1.266.099-1.797.297a3.275 3.275 0 0 0-1.39 1.015c-.209.23-.396.542-.563.938-.167.396-.198.854-.094 1.375.188 1.042.23 1.969.125 2.781-.104.813-.27 1.521-.5 2.125-.229.604-.495 1.11-.797 1.516A13.01 13.01 0 0 1 2.22 13Z";
+	const ltr$5 = false;
+	const viewBox$5 = "0 0 16 16";
+	const collection$5 = "SAP-icons-v4";
+	const packageName$5 = "@ui5/webcomponents-icons";
+
+	Icons.y(name$5, { pathData: pathData$5, ltr: ltr$5, viewBox: viewBox$5, collection: collection$5, packageName: packageName$5 });
+
+	const name$4 = "bell";
+	const pathData$4 = "M8 1c2.21 0 3.628.956 4.451 2.315.789 1.302.99 2.902.99 4.19v.636c0 1.072.341 1.976.691 2.62.189.347.41.678.669.974.442.469.098 1.265-.546 1.265h-3.837c-.281 1.15-1.256 2-2.418 2-1.162 0-2.137-.85-2.418-2H1.745c-.646 0-.989-.798-.544-1.267a5.19 5.19 0 0 0 .666-.971c.35-.645.691-1.55.691-2.621v-.636c0-1.288.202-2.888.99-4.19C4.372 1.955 5.791 1 8 1Zm0 1.5c-1.695 0-2.621.69-3.167 1.592-.582.96-.774 2.237-.774 3.413v.636c0 1.404-.45 2.563-.885 3.359h9.652c-.436-.795-.886-1.955-.886-3.36v-.635c0-1.176-.191-2.453-.773-3.413C10.621 3.19 9.695 2.5 8 2.5Z";
+	const ltr$4 = false;
+	const viewBox$4 = "0 0 16 16";
+	const collection$4 = "SAP-icons-v5";
+	const packageName$4 = "@ui5/webcomponents-icons";
+
+	Icons.y(name$4, { pathData: pathData$4, ltr: ltr$4, viewBox: viewBox$4, collection: collection$4, packageName: packageName$4 });
+
+	var bellIcon = "bell";
+
+	const name$3 = "grid";
+	const pathData$3 = "M12.313 11.313h1.718c.292 0 .526.093.703.28.178.188.266.428.266.72V14c0 .292-.088.531-.266.719-.177.187-.411.281-.703.281h-1.719c-.291 0-.525-.094-.703-.281a1.005 1.005 0 0 1-.265-.719v-1.688c0-.291.088-.53.265-.718.178-.188.412-.281.704-.281ZM7.125 6.155h1.719c.291 0 .526.094.703.282.177.187.265.427.265.718v1.688a.99.99 0 0 1-.28.703.91.91 0 0 1-.688.297H7.125a.91.91 0 0 1-.688-.297.988.988 0 0 1-.28-.703V7.156c0-.291.088-.531.265-.718.177-.188.411-.282.703-.282Zm4.219-2.468V2c0-.292.088-.531.265-.719.178-.187.412-.281.704-.281h1.718c.292 0 .526.094.703.281.178.188.266.427.266.719v1.688c0 .27-.094.505-.281.703a.911.911 0 0 1-.688.296h-1.719a.91.91 0 0 1-.687-.296.988.988 0 0 1-.281-.704Zm.969 2.468h1.718c.292 0 .526.094.703.282.178.187.266.427.266.718v1.688c0 .27-.094.505-.281.703a.911.911 0 0 1-.688.297h-1.719a.91.91 0 0 1-.687-.297.988.988 0 0 1-.281-.703V7.156c0-.291.088-.531.265-.718.178-.188.412-.282.704-.282ZM1.969 1h1.718c.292 0 .527.094.704.281.177.188.265.427.265.719v1.688c0 .27-.093.505-.281.703a.91.91 0 0 1-.688.296H1.97a.91.91 0 0 1-.688-.296A.988.988 0 0 1 1 3.687V2c0-.292.089-.531.266-.719.177-.187.411-.281.703-.281ZM1 7.156c0-.291.089-.531.266-.718.177-.188.411-.282.703-.282h1.718c.292 0 .527.094.704.282.177.187.265.427.265.718v1.688c0 .27-.093.505-.281.703a.91.91 0 0 1-.688.297H1.97a.91.91 0 0 1-.688-.297A.988.988 0 0 1 1 8.844V7.156Zm.969 4.157h1.718c.292 0 .527.093.704.28.177.188.265.428.265.72V14c0 .27-.093.505-.281.703a.91.91 0 0 1-.688.297H1.97a.91.91 0 0 1-.688-.297A.988.988 0 0 1 1 14v-1.688c0-.291.089-.53.266-.718.177-.188.411-.281.703-.281ZM7.125 1h1.719c.291 0 .526.094.703.281.177.188.265.427.265.719v1.688a.99.99 0 0 1-.28.703.91.91 0 0 1-.688.296H7.125a.91.91 0 0 1-.688-.296.988.988 0 0 1-.28-.704V2c0-.292.088-.531.265-.719.177-.187.411-.281.703-.281Zm-.969 11.313c0-.292.089-.532.266-.72.177-.187.411-.28.703-.28h1.719c.291 0 .526.093.703.28.177.188.265.428.265.72V14a.99.99 0 0 1-.28.703.91.91 0 0 1-.688.297H7.125a.91.91 0 0 1-.688-.297.988.988 0 0 1-.28-.703v-1.688Z";
+	const ltr$3 = false;
+	const viewBox$3 = "0 0 16 16";
+	const collection$3 = "SAP-icons-v4";
+	const packageName$3 = "@ui5/webcomponents-icons";
+
+	Icons.y(name$3, { pathData: pathData$3, ltr: ltr$3, viewBox: viewBox$3, collection: collection$3, packageName: packageName$3 });
+
+	const name$2 = "grid";
+	const pathData$2 = "M2.5 12a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM8 12a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm5.5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm-11-5.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm5.5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm5.5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM2.5 1a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM8 1a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm5.5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z";
+	const ltr$2 = false;
+	const viewBox$2 = "0 0 16 16";
+	const collection$2 = "SAP-icons-v5";
+	const packageName$2 = "@ui5/webcomponents-icons";
+
+	Icons.y(name$2, { pathData: pathData$2, ltr: ltr$2, viewBox: viewBox$2, collection: collection$2, packageName: packageName$2 });
+
+	var gridIcon = "grid";
+
+	const name$1 = "da";
+	const pathData$1 = "M1.125 5.094 8 14.625l6.906-9.563L12.125 1H4.281L1.125 5.094ZM8 16a.478.478 0 0 1-.406-.219L.094 5.375A.603.603 0 0 1 0 5.062a.45.45 0 0 1 .094-.28L3.656.187A.473.473 0 0 1 4.031 0h8.344c.188 0 .323.073.406.219l3.125 4.562a.457.457 0 0 1 .094.282.603.603 0 0 1-.094.312l-7.5 10.406A.478.478 0 0 1 8 16Zm3.75-10.188c-.542.188-.953.422-1.234.704-.282.28-.506.692-.672 1.234-.063.167-.177.25-.344.25-.167 0-.281-.083-.344-.25-.166-.542-.39-.953-.672-1.234-.28-.282-.692-.516-1.234-.704C7.083 5.771 7 5.668 7 5.5s.083-.281.25-.344c.542-.187.953-.422 1.234-.703.282-.281.506-.693.672-1.234C9.22 3.073 9.333 3 9.5 3c.167 0 .281.073.344.219.166.541.39.953.672 1.234.28.281.692.516 1.234.703.167.063.25.177.25.344a.415.415 0 0 1-.047.188c-.031.062-.099.104-.203.125Z";
+	const ltr$1 = true;
+	const viewBox$1 = "0 0 16 16";
+	const collection$1 = "SAP-icons-v4";
+	const packageName$1 = "@ui5/webcomponents-icons";
+
+	Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, viewBox: viewBox$1, collection: collection$1, packageName: packageName$1 });
+
+	const name = "da";
+	const pathData = "M12 0a.75.75 0 0 1 .62.326l3.25 4.752a.75.75 0 0 1-.018.871l-7.25 9.753a.756.756 0 0 1-1.204 0L.148 5.95a.75.75 0 0 1-.017-.871L3.437.254A.75.75 0 0 1 4 0h8ZM1.67 5.484 8 13.998l6.328-8.514L11.605 1.5h-7.21L1.671 5.484Zm7.5-2.25a.35.35 0 0 1 .66 0c.37 1.084.85 1.575 1.93 1.937.32.11.32.562 0 .662-1.08.371-1.57.853-1.93 1.936a.35.35 0 0 1-.66 0c-.37-1.083-.85-1.575-1.93-1.936-.32-.11-.32-.562 0-.662 1.08-.372 1.57-.853 1.93-1.937Z";
+	const ltr = true;
+	const viewBox = "0 0 16 16";
+	const collection = "SAP-icons-v5";
+	const packageName = "@ui5/webcomponents-icons";
+
+	Icons.y(name, { pathData, ltr, viewBox, collection, packageName });
+
+	var daIcon = "da";
+
+	function ShellBarSearchField$1() {
+	    return (
+	    // .ui5-shellbar-search-field-area is used to measure the width of
+	    // the search field. It must be present even if the search is in full-width mode.
+	    jsxRuntime.jsx("div", { class: {
+	            "ui5-shellbar-search-field-area ui5-shellbar-gap-start ui5-shellbar-search-toggle": true,
+	            "ui5-shellbar-hidden": this.isHidden("search")
+	        }, children: !this.showFullWidthSearch && (jsxRuntime.jsx("slot", { name: "searchField" })) }));
+	}
+	function ShellBarSearchFieldFullWidth$1() {
+	    return (jsxRuntime.jsxs("div", { class: "ui5-shellbar-search-full-width-wrapper", children: [jsxRuntime.jsx("div", { class: "ui5-shellbar-search-full-field", children: jsxRuntime.jsx("slot", { name: "searchField" }) }), jsxRuntime.jsx(Button.Button, { class: "ui5-shellbar-cancel-button ui5-shellbar-gap-start", design: Button.ButtonDesign.Transparent, onClick: this.handleCancelButtonClick, children: "Cancel" })] }));
+	}
+
+	function ShellBarSearchField() {
+	    return (
+	    // .ui5-shellbar-search-field-area is used to measure the width of
+	    // the search field. It must be present even if the search is in full-width mode.
+	    jsxRuntime.jsx("div", { class: "ui5-shellbar-search-field-area", children: this.showSearchField && !this.showFullWidthSearch && (jsxRuntime.jsx("div", { class: "ui5-shellbar-search-field ui5-shellbar-gap-start", children: jsxRuntime.jsx("slot", { name: "searchField" }) })) }));
+	}
+	function ShellBarSearchFieldFullWidth() {
+	    return (jsxRuntime.jsxs("div", { class: "ui5-shellbar-search-full-width-wrapper", children: [jsxRuntime.jsx("div", { class: "ui5-shellbar-search-full-field", children: jsxRuntime.jsx("slot", { name: "searchField" }) }), jsxRuntime.jsx(Button.Button, { class: "ui5-shellbar-cancel-button ui5-shellbar-gap-start", design: Button.ButtonDesign.Transparent, onClick: this.handleCancelButtonClick, children: "Cancel" })] }));
+	}
+	function ShellBarSearchButton() {
+	    const searchAction = this.getAction("search");
+	    return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: !this.hideSearchButton && (jsxRuntime.jsx(Button.Button, { "data-ui5-stable": searchAction?.stableDomRef, class: "ui5-shellbar-search-button ui5-shellbar-action-button ui5-shellbar-gap-start ui5-shellbar-search-toggle", icon: searchAction?.icon, design: "Transparent", onClick: this.handleSearchButtonClick, tooltip: this.actionsAccessibilityInfo.search.title, "aria-expanded": this.showSearchField, accessibilityAttributes: this.actionsAccessibilityInfo.search.accessibilityAttributes })) }));
+	}
+
+	function ShellBarLegacyBrandingArea() {
+	    const legacy = this.legacyAdaptor;
+	    if (!legacy) {
+	        return null;
+	    }
+	    return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [legacy.hasMenuItems && ShellBarInteractiveMenuButton.call(this), legacy.hasMenuItems && ShellBarLegacySecondaryTitle.call(this), !legacy.hasMenuItems && ShellBarLegacyTitleArea.call(this), ShellBarMenuPopover.call(this)] }));
+	}
+	function ShellBarLegacyTitleArea() {
+	    const legacy = this.legacyAdaptor;
+	    if (!legacy) {
+	        return null;
+	    }
+	    return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [!!(legacy.isSBreakPoint && legacy.hasLogo) && ShellBarSingleLogo.call(this), !legacy.isSBreakPoint && (legacy.hasLogo || legacy.primaryTitle) && (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [ShellBarCombinedLogo.call(this), legacy.hasSecondaryTitle && legacy.hasPrimaryTitle && ShellBarLegacySecondaryTitle.call(this)] }))] }));
+	}
+	/**
+	 * Renders interactive menu button for non-S breakpoints.
+	 * Shows primaryTitle with arrow, opens menu popover.
+	 */
+	function ShellBarInteractiveMenuButton() {
+	    const legacy = this.legacyAdaptor;
+	    if (!legacy) {
+	        return null;
+	    }
+	    return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [!legacy.showLogoInMenuButton && legacy.hasLogo && ShellBarSingleLogo.call(this), legacy.showTitleInMenuButton && jsxRuntime.jsx("h1", { class: "ui5-hidden-text", children: legacy.primaryTitle }), legacy.showMenuButton && (jsxRuntime.jsxs("button", { class: {
+	                    "ui5-shellbar-menu-button": true,
+	                    "ui5-shellbar-menu-button--interactive": legacy.hasMenuItems,
+	                }, onClick: legacy.handleMenuButtonClickBound, "aria-haspopup": "menu", "aria-expanded": legacy.menuPopoverExpanded, "aria-label": legacy.brandingText, "data-ui5-stable": "menu", tabIndex: 0, children: [legacy.showLogoInMenuButton && (jsxRuntime.jsx("span", { class: "ui5-shellbar-logo", "aria-label": legacy.logoAriaLabel, title: legacy.logoAriaLabel, children: jsxRuntime.jsx("slot", { name: "logo" }) })), legacy.showTitleInMenuButton && (jsxRuntime.jsx("div", { class: "ui5-shellbar-menu-button-title", children: legacy.primaryTitle })), jsxRuntime.jsx(Icon.Icon, { class: "ui5-shellbar-menu-button-arrow", name: slimArrowDown.slimArrowDown })] }))] }));
+	}
+	/**
+	 * Renders single logo on S breakpoint when no menu items.
+	 * Used on S breakpoint when no menu items and no branding slot.
+	 */
+	function ShellBarSingleLogo() {
+	    const legacy = this.legacyAdaptor;
+	    if (!legacy) {
+	        return null;
+	    }
+	    return (jsxRuntime.jsx("span", { role: legacy.logoRole, class: "ui5-shellbar-logo ui5-shellbar-gap-end", "aria-label": legacy.logoAriaLabel, title: legacy.logoAriaLabel, onClick: legacy.handleLogoClickBound, onKeyDown: legacy.handleLogoKeydownBound, onKeyUp: legacy.handleLogoKeyupBound, tabIndex: 0, "data-ui5-stable": "logo", children: jsxRuntime.jsx("slot", { name: "logo" }) }));
+	}
+	function ShellBarCombinedLogo() {
+	    const legacy = this.legacyAdaptor;
+	    if (!legacy) {
+	        return null;
+	    }
+	    return (jsxRuntime.jsxs("div", { role: legacy.logoRole, class: "ui5-shellbar-logo-area", onClick: legacy.handleLogoClickBound, tabIndex: 0, onKeyDown: legacy.handleLogoKeydownBound, onKeyUp: legacy.handleLogoKeyupBound, "aria-label": legacy.logoAriaLabel, children: [legacy.hasLogo && (jsxRuntime.jsx("span", { class: "ui5-shellbar-logo", title: legacy.logoAriaLabel, "data-ui5-stable": "logo", children: jsxRuntime.jsx("slot", { name: "logo" }) })), jsxRuntime.jsx("div", { class: "ui5-shellbar-headings", children: legacy.primaryTitle && (jsxRuntime.jsx("h1", { class: "ui5-shellbar-title", children: jsxRuntime.jsx("bdi", { children: legacy.primaryTitle }) })) })] }));
+	}
+	function ShellBarLegacySecondaryTitle() {
+	    const legacy = this.legacyAdaptor;
+	    if (!legacy || !legacy.showSecondaryTitle) {
+	        return null;
+	    }
+	    return (jsxRuntime.jsx("div", { class: "ui5-shellbar-secondary-title ui5-shellbar-gap-start ui5-shellbar-gap-end", "data-ui5-stable": "secondary-title", children: this.secondaryTitle }));
+	}
+	/**
+	 * Renders the menu popover.
+	 * Contains the list of menu items.
+	 */
+	function ShellBarMenuPopover() {
+	    const legacy = this.legacyAdaptor;
+	    if (!legacy || !legacy.hasMenuItems) {
+	        return null;
+	    }
+	    return (jsxRuntime.jsx(ResponsivePopover.Popover, { class: "ui5-shellbar-menu-popover", hideArrow: true, placement: "Bottom", preventInitialFocus: true, onBeforeOpen: legacy.handleMenuPopoverBeforeOpenBound, onClose: legacy.handleMenuPopoverAfterCloseBound, children: jsxRuntime.jsx(List.List, { separators: "None", selectionMode: "Single", onItemClick: legacy.handleMenuItemClickBound, children: jsxRuntime.jsx("slot", { name: "menuItems" }) }) }));
+	}
+
+	function ShellBarTemplate() {
+	    const isLegacySearch = !this.isSelfCollapsibleSearch;
+	    const SearchInBarTemplate = isLegacySearch ? ShellBarSearchField : ShellBarSearchField$1;
+	    const SearchFullWidthTemplate = isLegacySearch ? ShellBarSearchFieldFullWidth : ShellBarSearchFieldFullWidth$1;
+	    const profileAction = this.getAction("profile");
+	    const overflowAction = this.getAction("overflow");
+	    const assistantAction = this.getAction("assistant");
+	    const notificationsAction = this.getAction("notifications");
+	    const productSwitchAction = this.getAction("products");
+	    const actionsAccInfo = this.actionsAccessibilityInfo;
+	    return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsxs("header", { class: "ui5-shellbar-root", part: "root", onKeyDown: this._onKeyDown, "aria-label": this.texts.shellbar, children: [this.showFullWidthSearch && SearchFullWidthTemplate.call(this), this.enabledFeatures.startButton && (jsxRuntime.jsx("div", { class: "ui5-shellbar-start-button ui5-shellbar-gap-end", children: jsxRuntime.jsx("slot", { name: "startButton" }) })), this.enabledFeatures.branding && (jsxRuntime.jsx("div", { class: "ui5-shellbar-branding-area", children: jsxRuntime.jsx("slot", { name: "branding" }) })), !this.enabledFeatures.branding && ShellBarLegacyBrandingArea.call(this), jsxRuntime.jsx("div", { class: "ui5-shellbar-overflow-container", children: jsxRuntime.jsxs("div", { class: "ui5-shellbar-overflow-container-inner", children: [this.enabledFeatures.content && (jsxRuntime.jsxs("div", { class: "ui5-shellbar-content-area ui5-shellbar-content-items", role: this.contentRole, "aria-label": this.texts.contentItems, children: [this.separatorConfig.showStartSeparator && (jsxRuntime.jsx("div", { class: "ui5-shellbar-separator ui5-shellbar-separator-start" })), this.startContent.map(item => {
+	                                            const itemId = item._individualSlot;
+	                                            const packedSep = this.getPackedSeparatorInfo(item, true);
+	                                            return (jsxRuntime.jsxs("div", { id: itemId, class: {
+	                                                    "ui5-shellbar-content-item ui5-shellbar-gap-start": true,
+	                                                    "ui5-shellbar-hidden": this.isHidden(itemId),
+	                                                }, children: [packedSep.shouldPack && (jsxRuntime.jsx("div", { class: "ui5-shellbar-separator ui5-shellbar-separator-start" })), jsxRuntime.jsx("slot", { name: item._individualSlot })] }, itemId));
+	                                        }), jsxRuntime.jsx("div", { class: "ui5-shellbar-spacer" }), this.endContent.map(item => {
+	                                            const itemId = item._individualSlot;
+	                                            const packedSep = this.getPackedSeparatorInfo(item, false);
+	                                            return (jsxRuntime.jsxs("div", { id: itemId, class: {
+	                                                    "ui5-shellbar-content-item ui5-shellbar-gap-start": true,
+	                                                    "ui5-shellbar-hidden": this.isHidden(itemId),
+	                                                }, children: [jsxRuntime.jsx("slot", { name: itemId }), packedSep.shouldPack && (jsxRuntime.jsx("div", { class: "ui5-shellbar-separator ui5-shellbar-separator-end ui5-shellbar-gap-start" }))] }, itemId));
+	                                        }), this.separatorConfig.showEndSeparator && (jsxRuntime.jsx("div", { class: "ui5-shellbar-separator ui5-shellbar-separator-end ui5-shellbar-gap-start" }))] })), this.enabledFeatures.search && SearchInBarTemplate.call(this), this.enabledFeatures.search && isLegacySearch && ShellBarSearchButton.call(this), assistantAction && (jsxRuntime.jsx("div", { class: {
+	                                        "ui5-shellbar-assistant-button ui5-shellbar-gap-start": true,
+	                                        "ui5-shellbar-hidden": this.isHidden("assistant")
+	                                    }, children: jsxRuntime.jsx("slot", { name: "assistant" }) })), notificationsAction && (jsxRuntime.jsx(Button.Button, { "data-ui5-stable": notificationsAction.stableDomRef, class: {
+	                                        "ui5-shellbar-bell-button ui5-shellbar-action-button ui5-shellbar-gap-start": true,
+	                                        "ui5-shellbar-hidden": this.isHidden("notifications")
+	                                    }, icon: notificationsAction.icon, design: "Transparent", onClick: this.handleNotificationsClick, tooltip: actionsAccInfo.notifications.title, accessibilityAttributes: actionsAccInfo.notifications.accessibilityAttributes, children: notificationsAction?.count && (jsxRuntime.jsx(ShellBarItem.ButtonBadge, { slot: "badge", design: "OverlayText", text: notificationsAction?.count })) })), this.items.map(item => (jsxRuntime.jsx("div", { class: {
+	                                        "ui5-shellbar-custom-item ui5-shellbar-gap-start": true,
+	                                        "ui5-shellbar-hidden": this.isHidden(item._id),
+	                                    }, "data-ui5-stable": item.stableDomRef, children: !item.inOverflow ? jsxRuntime.jsx("slot", { name: item._individualSlot }) : null }, item._id))), overflowAction && (jsxRuntime.jsx(Button.Button, { "data-ui5-stable": overflowAction.stableDomRef, id: "ui5-shellbar-overflow-button", class: {
+	                                        "ui5-shellbar-overflow-button ui5-shellbar-action-button ui5-shellbar-gap-start": true,
+	                                        "ui5-shellbar-hidden": this.isHidden("overflow")
+	                                    }, icon: overflowAction.icon, design: "Transparent", onClick: this.handleOverflowClick, tooltip: actionsAccInfo.overflow.title, accessibilityAttributes: actionsAccInfo.overflow.accessibilityAttributes, children: this.overflowBadge && (jsxRuntime.jsx(ShellBarItem.ButtonBadge, { slot: "badge", design: this.overflowBadge === " " ? "AttentionDot" : "OverlayText", text: this.overflowBadge === " " ? "" : this.overflowBadge })) })), profileAction && (jsxRuntime.jsx(Button.Button, { "data-profile-btn": true, "data-ui5-stable": profileAction.stableDomRef, class: {
+	                                        "ui5-shellbar-image-button ui5-shellbar-action-button ui5-shellbar-gap-start": true,
+	                                        "ui5-shellbar-hidden": this.isHidden("profile")
+	                                    }, design: "Transparent", onClick: this.handleProfileClick, tooltip: actionsAccInfo.profile.title, accessibilityAttributes: actionsAccInfo.profile.accessibilityAttributes, children: jsxRuntime.jsx("slot", { name: "profile" }) })), productSwitchAction && (jsxRuntime.jsx(Button.Button, { "data-ui5-stable": productSwitchAction.stableDomRef, class: {
+	                                        "ui5-shellbar-button-product-switch ui5-shellbar-action-button ui5-shellbar-gap-start": true,
+	                                        "ui5-shellbar-hidden": this.isHidden("products")
+	                                    }, icon: productSwitchAction.icon, design: "Transparent", onClick: this.handleProductSwitchClick, tooltip: actionsAccInfo.products.title, accessibilityAttributes: actionsAccInfo.products.accessibilityAttributes }))] }) })] }), jsxRuntime.jsx(ResponsivePopover.Popover, { class: "ui5-shellbar-overflow-popover", open: this.overflowPopoverOpen, onClose: this.onPopoverClose, opener: "ui5-shellbar-overflow-button", placement: "Bottom", hideArrow: true, horizontalAlign: this.popoverHorizontalAlign, children: jsxRuntime.jsx(List.List, { separators: "None", onClick: this.handleOverflowItemClick, children: this.overflowItems.map(item => {
+	                        if (item.type === "action") {
+	                            const actionData = item.data;
+	                            return (jsxRuntime.jsx(ShellBarItem.ShellBarItem, { icon: actionData.icon ? `sap-icon://${actionData.icon}` : "", "data-action-id": item.id, count: actionData.count, inOverflow: true, text: this.getActionOverflowText(item.id) }, item.id));
+	                        }
+	                        return jsxRuntime.jsx("slot", { name: item.data._individualSlot }, item.id);
+	                    }) }) })] }));
+	}
+
+	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	var shellBarStyles = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}::slotted([ui5-input]){--_ui5_input_placeholder_color: var(--sapShell_InteractiveTextColor);--_ui5_input_border_radius: var(--_ui5_shellbar_input_border_radius);--_ui5_input_focus_border_radius: var(--_ui5_shellbar_input_focus_border_radius);--_ui5_input_background_color: var(--_ui5_shellbar_input_background_color);--_ui5_input_focus_outline_color: var(--_ui5_shellbar_input_focus_outline_color);--_ui5_input_margin_top_bottom: 0}::slotted([ui5-input]){background:var(--_ui5_shellbar_search_field_background);border:var(--_ui5_shellbar_search_field_border);box-shadow:var(--_ui5_shellbar_search_field_box_shadow);color:var(--_ui5_shellbar_search_field_color);height:2.25rem;width:100%;min-width:var(--_ui5_shellbar_search_field_width)}:host([breakpoint-size="M"]) ::slotted([ui5-input]),:host([breakpoint-size="S"]) ::slotted([ui5-input]){min-width:1rem}:host([breakpoint-size="M"][show-search-field]) .ui5-shellbar-overflow-container-right-child{flex-grow:1}::slotted([ui5-input]:hover){background:var(--_ui5_shellbar_search_field_background_hover);box-shadow:var(--_ui5_shellbar_search_field_box_shadow_hover)}::slotted([ui5-input][focused]){outline:var(--_ui5_shellbar_search_field_outline_focused)}:host(:not([hidden])){display:inline-block;width:100%;max-width:100%;background:var(--sapShellColor);box-sizing:border-box;box-shadow:inset 0 -.0625rem 0 0 var(--sapPageHeader_BorderColor);--_ui5_button_base_height: var(--sapElement_Height);--_ui5_button_base_padding: .5625rem;--_ui5_button_base_min_width: 2.25rem;--_ui5-button-badge-diameter: .75rem;--_ui5-shellbar_separator-color: var(--sapGroup_ContentBorderColor);--_ui5-shellbar-separator-height: 2rem;--_ui5_shellbar_search_field_width: 25rem;--ui5_shellbar_gap: .5rem}.ui5-shellbar-root{display:flex;align-items:center;height:var(--_ui5_shellbar_root_height);position:relative;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-weight:400}::slotted([ui5-button]:not([slot^="content"])),::slotted([ui5-toggle-button]:not([slot^="content"])){height:2.25rem;width:2.25rem;padding:0;border:.0625rem solid var(--sapButton_Lite_BorderColor);background:var(--sapButton_Lite_Background);color:var(--sapShell_TextColor);box-sizing:border-box;border-radius:var(--_ui5_shellbar_button_border_radius);font-weight:700}::slotted([ui5-button]:not([slot^="content"]):not([disabled]):hover),::slotted([ui5-toggle-button]:not([slot^="content"]):not([disabled]):hover){background:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_TextColor)}::slotted([ui5-button]:not([slot^="content"]):not([disabled])[active]),::slotted([ui5-toggle-button]:not([slot^="content"]):not([disabled])[active]){background:var(--sapShell_Active_Background);border-color:var(--sapButton_Lite_Active_BorderColor);color:var(--_ui5_shellbar_button_active_color)}::slotted([ui5-button]:not([slot^="content"])),::slotted([ui5-toggle-button]:not([slot^="content"])){--_ui5_button_focused_border: var(--_ui5_shellbar_button_focused_border)}::slotted([ui5-button][slot^="content"]),::slotted([ui5-toggle-button][slot^="content"]){height:2.25rem;min-width:2.25rem}.ui5-shellbar-action-button{color:var(--sapShell_TextColor)}.ui5-shellbar-action-button:hover{background:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_InteractiveTextColor)}.ui5-shellbar-action-button[active]{color:var(--_ui5_shellbar_button_active_color)}::slotted([ui5-toggle-button][slot="assistant"]){color:var(--sapShell_TextColor)}::slotted([ui5-toggle-button][slot="assistant"]:hover){color:var(--sapShell_TextColor)}::slotted([ui5-toggle-button][slot="assistant"][active]){color:var(--_ui5_shellbar_button_active_color)}.ui5-shellbar-start-button{flex-shrink:0;display:flex;align-items:center;gap:.5rem}.ui5-shellbar-branding-area{flex-shrink:0;display:flex;align-items:center}.ui5-shellbar-overflow-container{flex-direction:row-reverse;height:100%;flex:1;display:flex;align-items:center;min-width:0;overflow:visible;position:relative}.ui5-shellbar-overflow-container-inner{display:flex;align-items:center;justify-content:end;flex-shrink:0;min-width:100%}.ui5-shellbar-search-field-area{flex:0 1 auto;min-width:0;display:flex;align-items:center;margin-left:auto}:host([show-search-field]:not([show-full-width-search])) ::slotted([slot="searchField"]),:host([show-full-width-search]) .ui5-shellbar-search-field-area{min-width:var(--_ui5_shellbar_search_field_width)}.ui5-shellbar-content-area{flex-grow:1;display:flex;align-items:center}.ui5-shellbar-content-item{flex-shrink:0;display:flex;align-items:center}.ui5-shellbar-spacer{flex-grow:1;height:1px;flex-basis:1rem;flex-shrink:1}.ui5-shellbar-separator{flex-grow:0;flex-shrink:0;height:var(--_ui5-shellbar-separator-height);width:1px;background-color:var(--_ui5-shellbar_separator-color)}.ui5-shellbar-custom-item{width:2.25rem;flex-shrink:0;display:flex;align-items:center}.ui5-shellbar-custom-item.ui5-shellbar-hidden{display:none}.ui5-shellbar-action-button{white-space:initial;overflow:initial;text-overflow:initial;line-height:inherit;letter-spacing:inherit;word-spacing:inherit;width:2.25rem;height:2.25rem;box-sizing:border-box}.ui5-shellbar-action-button>[ui5-button-badge][slot=badge][design=OverlayText]{top:var(--_ui5-shellbar-badge-offset, 0);margin:var(--_ui5-shellbar-badge-margin, -.5rem)}.ui5-shellbar-image-button{display:flex;justify-content:center;align-items:center;width:2.25rem;height:2.25rem;min-width:auto;box-sizing:border-box;--_ui5_button_focused_border_radius: var(--_ui5_shellbar_image_button_border_radius);border-radius:var(--_ui5_shellbar_image_button_border_radius)}.ui5-shellbar-assistant-button{display:flex;align-items:center}::slotted([ui5-toggle-button][slot="assistant"]){margin-inline-start:0}::slotted([ui5-toggle-button][slot="assistant"][pressed]),::slotted([ui5-toggle-button][slot="assistant"][pressed]:hover:not([active])){color:var(--sapShell_Assistant_ForegroundColor)}slot[name=profile]{min-width:0}::slotted([ui5-avatar][slot="profile"]){display:block;width:2rem;height:2rem;min-width:0;min-height:2rem;font-size:var(--_ui5_avatar_fontsize_XS);font-weight:400}.ui5-shellbar-search-full-width-wrapper{position:absolute;bottom:.0625rem;left:0;background:var(--sapShellColor);height:100%;width:100%;z-index:1001;display:flex;align-items:center;box-sizing:border-box;padding:0 1rem}.ui5-shellbar-search-full-width-wrapper .ui5-shellbar-search-full-field{height:2.25rem;width:100%;flex:1}.ui5-shellbar-search-full-width-wrapper ::slotted([ui5-shellbar-search]){max-width:unset;width:100%}:host([breakpoint-size="S"]){padding:0 1rem}:host([breakpoint-size="M"]){padding:0 2rem}:host([breakpoint-size="L"]){padding:0 2rem}:host([breakpoint-size="XL"]){padding:0 3rem}:host([breakpoint-size="XXL"]){padding:0 3rem}:host([breakpoint-size="S"]) .ui5-shellbar-search-full-width-wrapper{padding:0 1rem}:host([breakpoint-size="M"]) .ui5-shellbar-search-full-width-wrapper{padding:0 2rem}.ui5-shellbar-gap-start{margin-inline-start:var(--ui5_shellbar_gap)}.ui5-shellbar-gap-end{margin-inline-end:var(--ui5_shellbar_gap)}.ui5-shellbar-hidden{display:none!important}
+`;
+
+	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	var ShellBarPopoverCss = `.ui5-shellbar-menu-popover::part(content),.ui5-shellbar-overflow-popover::part(content){padding:0}.ui5-shellbar-overflow-popover [ui5-li]::part(icon){color:var(--sapList_TextColor)}.ui5-shellbar-overflow-popover ::slotted([ui5-toggle-button]),.ui5-shellbar-overflow-popover ::slotted([ui5-button]){color:var(--sapList_TextColor)}.ui5-shellbar-overflow-popover [ui5-li]::part(title){font-size:var(--sapFontSize)}.ui5-shellbar-overflow-popover [ui5-li]:after{position:relative;width:fit-content;height:1rem;min-width:1rem;background:var(--sapContent_BadgeBackground);border:var(--_ui5_shellbar_button_badge_border);color:var(--sapContent_BadgeTextColor);bottom:calc(100% + .0625rem);left:1.25rem;padding:0 .3125rem;border-radius:.5rem;display:flex;justify-content:center;align-items:center;font-size:var(--sapFontSmallSize);font-family:var(--sapFontFamily);z-index:2;box-sizing:border-box;pointer-events:none}.ui5-shellbar-overflow-popover [ui5-li][data-count]:after{content:attr(data-count)}
+`;
+
+	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	var shellBarLegacyStyles = `.ui5-shellbar-logo{overflow:hidden;cursor:pointer;display:flex;align-items:center}.ui5-shellbar-logo-area,.ui5-shellbar-legacy-branding{overflow:hidden;display:flex;align-items:center;padding:.25rem .5rem .25rem .25rem;box-sizing:border-box;cursor:pointer;background:var(--sapButton_Lite_Background);border:1px solid var(--sapButton_Lite_BorderColor);color:var(--sapShell_TextColor);margin-inline-start:.125rem}.ui5-shellbar-logo:focus,.ui5-shellbar-logo-area:focus{outline:var(--_ui5_shellbar_logo_outline);outline-offset:calc(-1 * var(--sapContent_FocusWidth));border-radius:var(--_ui5_shellbar_logo_border_radius)}.ui5-shellbar-overflow-container>.ui5-shellbar-logo:hover,.ui5-shellbar-logo-area:hover{box-shadow:var(--_ui5_shellbar_button_box_shadow);border-radius:var(--_ui5_shellbar_logo_border_radius)}.ui5-shellbar-logo-area:active:focus{background:var(--sapShell_Active_Background);border:1px solid var(--sapButton_Lite_Active_BorderColor);color:var(--sapShell_Active_TextColor)}::slotted([slot="logo"]){max-height:2rem}::slotted([slot="logo"]):active{pointer-events:none}.ui5-shellbar-headings{display:flex;flex-direction:column;justify-content:center;height:100%;overflow:hidden;margin-inline-start:.25rem}.ui5-shellbar-primary-title,.ui5-shellbar-menu-button-title,.ui5-shellbar-title{display:inline-block;font-family:var(--sapFontSemiboldDuplexFamily);margin:0;font-size:var(--_ui5_shellbar_menu_button_title_font_size);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sapShell_SubBrand_TextColor)}.ui5-shellbar-secondary-title{display:flex;align-items:center;font-size:var(--sapFontSmallSize);color:var(--sapShell_TextColor);font-weight:400;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;text-align:start}.ui5-shellbar-menu-button{white-space:nowrap;overflow:hidden;display:flex;align-items:center;padding:.25rem .5rem;cursor:text;-webkit-user-select:text;-moz-user-select:text;user-select:text;margin-inline-start:.5rem;height:2.25rem;border:.0625rem solid var(--sapButton_Lite_BorderColor);background:var(--sapButton_Lite_Background);outline-color:var(--_ui5_shellbar_logo_outline_color);color:var(--sapShell_TextColor);box-sizing:border-box;border-radius:var(--_ui5_shellbar_button_border_radius);position:relative;font-weight:700}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive{-webkit-user-select:none;-moz-user-select:none;user-select:none;cursor:pointer;background:var(--sapButton_Lite_Background);border:var(--_ui5_shellbar_button_border);color:var(--sapShell_TextColor)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:hover{background:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_TextColor);box-shadow:var(--_ui5_shellbar_button_box_shadow)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active{background:var(--sapShell_Active_Background);border-color:var(--sapButton_Lite_Active_BorderColor);color:var(--_ui5_shellbar_button_active_color);box-shadow:var(--_ui5_shellbar_button_box_shadow_active)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active .ui5-shellbar-menu-button-arrow,.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active .ui5-shellbar-menu-button-title{color:var(--sapShell_Active_TextColor)}:host([desktop]) .ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:focus,.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:focus-visible{outline:var(--_ui5_shellbar_logo_outline);outline-offset:var(--_ui5_shellbar_outline_offset)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive::-moz-focus-inner{border:none}.ui5-shellbar-menu-button .ui5-shellbar-logo:hover{box-shadow:none}.ui5-shellbar-menu-button-arrow{display:inline-block;font-family:var(--sapFontSemiboldDuplexFamily);margin:0;font-size:var(--_ui5_shellbar_menu_button_title_font_size);color:var(--sapShell_SubBrand_TextColor)}.ui5-shellbar-menu-button--interactive .ui5-shellbar-menu-button-arrow{margin-inline-start:.375rem}:host(:not([primary-title])) .ui5-shellbar-menu-button{min-width:2.25rem;justify-content:center}:host(:not([with-logo])) .ui5-shellbar-menu-button{margin-inline-start:0}:host([breakpoint-size="S"]) .ui5-shellbar-menu-button{margin-inline-start:0}
+`;
+
+	/**
+	 * Controller for legacy ShellBar features that will be removed in future versions.
+	 * Handles: logo slot, primaryTitle/secondaryTitle properties, menuItems slot.
+	 */
+	class ShellBarLegacy {
+	    constructor(deps) {
+	        // Bound handlers for event listeners
+	        this.handleLogoClickBound = this.handleLogoClick.bind(this);
+	        this.handleLogoKeyupBound = this.handleLogoKeyup.bind(this);
+	        this.handleLogoKeydownBound = this.handleLogoKeydown.bind(this);
+	        this.handleMenuItemClickBound = this.handleMenuItemClick.bind(this);
+	        this.handleMenuButtonClickBound = this.handleMenuButtonClick.bind(this);
+	        this.handleMenuPopoverBeforeOpenBound = this.handleMenuPopoverBeforeOpen.bind(this);
+	        this.handleMenuPopoverAfterCloseBound = this.handleMenuPopoverAfterClose.bind(this);
+	        this.component = deps.component;
+	        this.getShadowRoot = deps.getShadowRoot;
+	    }
+	    /* ------------- Menu Management -------------- */
+	    handleMenuButtonClick() {
+	        const shadowRoot = this.getShadowRoot();
+	        if (!shadowRoot) {
+	            return;
+	        }
+	        const menuButton = shadowRoot.querySelector(".ui5-shellbar-menu-button");
+	        const menuPopover = this.getMenuPopover();
+	        if (menuPopover && menuButton) {
+	            menuPopover.opener = menuButton;
+	            menuPopover.open = true;
+	        }
+	    }
+	    handleMenuItemClick(e) {
+	        const shouldContinue = this.component.fireDecoratorEvent("menu-item-click", {
+	            item: e.detail.item,
+	        });
+	        if (shouldContinue) {
+	            const menuPopover = this.getMenuPopover();
+	            if (menuPopover) {
+	                menuPopover.open = false;
+	            }
+	        }
+	    }
+	    handleMenuPopoverBeforeOpen() {
+	        this.component.menuPopoverOpen = true;
+	        const menuPopover = this.getMenuPopover();
+	        if (menuPopover?.content && menuPopover.content.length) {
+	            const list = menuPopover.content[0];
+	            if (list instanceof List.List) {
+	                list.focusFirstItem();
+	            }
+	        }
+	    }
+	    handleMenuPopoverAfterClose() {
+	        this.component.menuPopoverOpen = false;
+	    }
+	    getMenuPopover() {
+	        const shadowRoot = this.getShadowRoot();
+	        return shadowRoot?.querySelector(".ui5-shellbar-menu-popover");
+	    }
+	    get hasMenuItems() {
+	        return this.component.menuItems.length > 0;
+	    }
+	    get menuPopoverExpanded() {
+	        return this.component.menuPopoverOpen;
+	    }
+	    /* ------------- Logo Management -------------- */
+	    handleLogoClick() {
+	        const shadowRoot = this.getShadowRoot();
+	        if (!shadowRoot) {
+	            return;
+	        }
+	        const logoElement = shadowRoot.querySelector(".ui5-shellbar-logo");
+	        if (logoElement) {
+	            this.component.fireDecoratorEvent("logo-click", {
+	                targetRef: logoElement,
+	            });
+	        }
+	    }
+	    handleLogoKeydown(e) {
+	        if (webcomponentsBase.A(e)) {
+	            e.preventDefault();
+	            return;
+	        }
+	        if (webcomponentsBase.b(e)) {
+	            this.handleLogoClick();
+	        }
+	    }
+	    handleLogoKeyup(e) {
+	        if (webcomponentsBase.A(e)) {
+	            this.handleLogoClick();
+	        }
+	    }
+	    get hasLogo() {
+	        return this.component.logo.length > 0;
+	    }
+	    get logoRole() {
+	        return this.component.accessibilityAttributes.logo?.role || "link";
+	    }
+	    get logoAriaLabel() {
+	        return this.component.accessibilityAttributes.logo?.name || "Logo";
+	    }
+	    get brandingText() {
+	        return this.component.accessibilityAttributes.branding?.name || this.primaryTitle;
+	    }
+	    /* ------------- Title Management -------------- */
+	    get hasPrimaryTitle() {
+	        return !!this.component.primaryTitle;
+	    }
+	    get hasSecondaryTitle() {
+	        return !!this.component.secondaryTitle;
+	    }
+	    get showSecondaryTitle() {
+	        return this.hasSecondaryTitle && !this.component.isSBreakPoint;
+	    }
+	    get primaryTitle() {
+	        return this.component.primaryTitle || "";
+	    }
+	    get secondaryTitle() {
+	        return this.component.secondaryTitle || "";
+	    }
+	    /* ------------- Menu Button -------------- */
+	    get showMenuButton() {
+	        return this.hasPrimaryTitle || this.showLogoInMenuButton;
+	    }
+	    get showLogoInMenuButton() {
+	        return this.hasLogo && this.isSBreakPoint;
+	    }
+	    get showTitleInMenuButton() {
+	        return this.hasPrimaryTitle && !this.showLogoInMenuButton;
+	    }
+	    /* ------------- Common -------------- */
+	    get isSBreakPoint() {
+	        return this.component.isSBreakPoint;
+	    }
+	}
+
+	/**
+	 * Search controller for self-collapsible search (ui5-shellbar-search).
+	 * Handles search fields with collapsed/open properties and ui5-open/close/search events.
+	 */
+	class ShellBarSearch {
+	    constructor({ getOverflowed, setSearchState, getSearchField, getSearchState, getCSSVariable, }) {
+	        this.onSearchBound = this.onSearch.bind(this);
+	        this.onSearchOpenBound = this.onSearchOpen.bind(this);
+	        this.onSearchCloseBound = this.onSearchClose.bind(this);
+	        this.initialRender = true;
+	        this.getOverflowed = getOverflowed;
+	        this.getCSSVariable = getCSSVariable;
+	        this.getSearchField = getSearchField;
+	        this.getSearchState = getSearchState;
+	        this.setSearchState = setSearchState;
+	    }
+	    subscribe(searchField = this.getSearchField()) {
+	        if (!searchField) {
+	            return;
+	        }
+	        searchField.addEventListener("ui5-open", this.onSearchOpenBound);
+	        searchField.addEventListener("ui5-close", this.onSearchCloseBound);
+	        searchField.addEventListener("ui5-search", this.onSearchBound);
+	    }
+	    unsubscribe(searchField = this.getSearchField()) {
+	        if (!searchField) {
+	            return;
+	        }
+	        searchField.removeEventListener("ui5-open", this.onSearchOpenBound);
+	        searchField.removeEventListener("ui5-close", this.onSearchCloseBound);
+	        searchField.removeEventListener("ui5-search", this.onSearchBound);
+	    }
+	    /**
+	     * Auto-collapse/restore search field based on available space.
+	     * Delegates decision logic to SearchController.
+	     */
+	    autoManageSearchState(hiddenItems, availableSpace) {
+	        if (!this.hasSearchField) {
+	            return;
+	        }
+	        // Get search field min width from CSS variable
+	        const searchFieldWidth = this.getSearchFieldWidth();
+	        const searchHasFocus = document.activeElement === this.getSearchField();
+	        const searchHasValue = !!this.getSearchField()?.value;
+	        // On initial load, allow search to collapse even if it would trigger full-screen mode.
+	        // This prevents search from showing in full-screen when page loads on small screens.
+	        // After initial render, prevent collapse in full-screen mode during resize.
+	        const inFullScreen = !this.initialRender && this.shouldShowFullScreen();
+	        const preventCollapse = searchHasFocus || searchHasValue || inFullScreen;
+	        if (hiddenItems > 0 && !preventCollapse) {
+	            this.setSearchState(false);
+	        }
+	        else if (availableSpace + this.getSearchButtonSize() > searchFieldWidth) {
+	            this.setSearchState(true);
+	        }
+	        this.initialRender = false;
+	    }
+	    /**
+	     * Applies the show-search-field state to the search field.
+	     */
+	    syncShowSearchFieldState() {
+	        const search = this.getSearchField();
+	        if (!search) {
+	            return;
+	        }
+	        if (Theme.d()) {
+	            // On initial render, don't auto-open the search dialog on phones
+	            // to prevent the full-screen search from showing when page loads
+	            if (this.initialRender) {
+	                return;
+	            }
+	            search.open = this.getSearchState();
+	        }
+	        else {
+	            search.collapsed = !this.getSearchState();
+	        }
+	    }
+	    /**
+	     * Determines if full-screen search should be shown.
+	     * Full-screen search activates when overflow happens AND search is visible.
+	     */
+	    shouldShowFullScreen() {
+	        return this.getOverflowed() && this.getSearchState();
+	    }
+	    onSearchOpen(e) {
+	        if (e.target !== this.getSearchField()) {
+	            this.unsubscribe(e.target);
+	            return;
+	        }
+	        if (Theme.d()) {
+	            this.setSearchState(true);
+	        }
+	    }
+	    onSearchClose(e) {
+	        if (e.target !== this.getSearchField()) {
+	            this.unsubscribe(e.target);
+	            return;
+	        }
+	        if (Theme.d()) {
+	            this.setSearchState(false);
+	        }
+	    }
+	    onSearch(e) {
+	        if (e.target !== this.getSearchField()) {
+	            this.unsubscribe(e.target);
+	            return;
+	        }
+	        // On mobile or if has value, don't toggle
+	        if (Theme.d() || (this.getSearchField()?.value && this.getSearchState())) {
+	            return;
+	        }
+	        this.setSearchState(!this.getSearchState());
+	    }
+	    /**
+	     * Gets the minimum width needed for search field from CSS variable.
+	     */
+	    getSearchFieldWidth() {
+	        const width = this.getCSSVariable(ShellBarSearch.CSS_VARIABLE);
+	        if (!width) {
+	            return ShellBarSearch.FALLBACK_WIDTH;
+	        }
+	        // Convert rem to px
+	        if (width.endsWith("rem")) {
+	            const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+	            return parseFloat(width) * fontSize;
+	        }
+	        return parseFloat(width);
+	    }
+	    get hasSearchField() {
+	        return !!this.getSearchField();
+	    }
+	    /**
+	     * Gets the size of the search button.
+	     * If the search field is visible, the size is 0.
+	     * Otherwise, it is the width of the search field (just a button in collapsed state).
+	     */
+	    getSearchButtonSize() {
+	        return this.getSearchState() ? 0 : this.getSearchField()?.getBoundingClientRect().width || 0;
+	    }
+	}
+	ShellBarSearch.CSS_VARIABLE = "--_ui5_shellbar_search_field_width";
+	ShellBarSearch.FALLBACK_WIDTH = 400;
+
+	/**
+	 * Search controller for legacy search fields (ui5-input, custom div).
+	 * Handles search fields that don't have collapsed/open properties.
+	 * Supports disableSearchCollapse for preventing auto-collapse.
+	 */
+	class ShellBarSearchLegacy {
+	    constructor({ getOverflowed, setSearchState, getSearchField, getSearchState, getCSSVariable, getDisableSearchCollapse, }) {
+	        this.initialRender = true;
+	        this.getOverflowed = getOverflowed;
+	        this.getCSSVariable = getCSSVariable;
+	        this.getSearchField = getSearchField;
+	        this.getSearchState = getSearchState;
+	        this.setSearchState = setSearchState;
+	        this.getDisableSearchCollapse = getDisableSearchCollapse;
+	    }
+	    /**
+	     * No-op for legacy search - legacy fields don't emit ui5-open/close/search events.
+	     */
+	    subscribe() {
+	        // No events to subscribe to for legacy search fields
+	    }
+	    /**
+	     * No-op for legacy search - no event listeners to clean up.
+	     */
+	    unsubscribe() {
+	        // No events to unsubscribe from
+	    }
+	    /**
+	     * Auto-collapse/restore search field based on available space.
+	     * Respects disableSearchCollapse flag, focus state, and field value.
+	     */
+	    autoManageSearchState(hiddenItems, availableSpace) {
+	        if (!this.hasSearchField) {
+	            return;
+	        }
+	        // Check if auto-collapse is disabled
+	        if (this.getDisableSearchCollapse()) {
+	            return;
+	        }
+	        const searchFieldWidth = this.getSearchFieldWidth();
+	        // Check focus and value to prevent collapse
+	        const searchField = this.getSearchField();
+	        const searchHasFocus = searchField?.contains(document.activeElement) || false;
+	        const searchHasValue = this.hasValue(searchField);
+	        // On initial load, allow search to collapse even if it would trigger full-screen mode.
+	        // This prevents search from showing in full-screen when page loads on small screens.
+	        // After initial render, prevent collapse in full-screen mode during resize.
+	        const inFullScreen = !this.initialRender && this.shouldShowFullScreen();
+	        const preventCollapse = searchHasFocus || searchHasValue || inFullScreen;
+	        if (hiddenItems > 0 && !preventCollapse) {
+	            this.setSearchState(false);
+	        }
+	        else if (availableSpace + this.getSearchButtonSize() > searchFieldWidth) {
+	            this.setSearchState(true);
+	        }
+	        this.initialRender = false;
+	    }
+	    /**
+	     * No-op for legacy search - legacy fields don't have collapsed/open properties.
+	     */
+	    syncShowSearchFieldState() {
+	        // Legacy search fields don't have collapsed/open properties to sync
+	    }
+	    /**
+	     * Determines if full-screen search should be shown.
+	     * Full-screen search activates when overflow happens AND search is visible.
+	     */
+	    shouldShowFullScreen() {
+	        return this.getOverflowed() && this.getSearchState();
+	    }
+	    /**
+	     * Get value from various field types.
+	     * Supports ui5-input (value property) and custom div (nested input element).
+	     */
+	    hasValue(searchField) {
+	        if (!searchField) {
+	            return false;
+	        }
+	        // ui5-input or similar components with value property
+	        if ("value" in searchField) {
+	            return !!searchField.value;
+	        }
+	        // Custom div - find input inside
+	        const input = searchField.querySelector("input");
+	        return input ? !!input.value : false;
+	    }
+	    /**
+	     * Get minimum width needed for search field from CSS variable.
+	     */
+	    getSearchFieldWidth() {
+	        const width = this.getCSSVariable(ShellBarSearchLegacy.CSS_VARIABLE);
+	        if (!width) {
+	            return ShellBarSearchLegacy.FALLBACK_WIDTH;
+	        }
+	        // Convert rem to px
+	        if (width.endsWith("rem")) {
+	            const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+	            return parseFloat(width) * fontSize;
+	        }
+	        return parseFloat(width);
+	    }
+	    get hasSearchField() {
+	        return !!this.getSearchField();
+	    }
+	    /**
+	     * Get search button size for overflow calculation.
+	     * Returns 0 if search is expanded, otherwise returns button width.
+	     */
+	    getSearchButtonSize() {
+	        return this.getSearchState() ? 0 : this.getSearchField()?.getBoundingClientRect().width || 0;
+	    }
+	}
+	ShellBarSearchLegacy.CSS_VARIABLE = "--_ui5_shellbar_search_field_width";
+	ShellBarSearchLegacy.FALLBACK_WIDTH = 400;
+
+	class ShellBarOverflow {
+	    constructor() {
+	        this.CLOSED_SEARCH_STRATEGY = {
+	            ACTIONS: 0, // All actions hide first
+	            CONTENT: 1000, // Then content (except last)
+	            SEARCH: 2000, // Then search button
+	            LAST_CONTENT: 3000, // Last content item hides last
+	        };
+	        this.OPEN_SEARCH_STRATEGY = {
+	            CONTENT: 0, // All content hide first
+	            ACTIONS: 1000, // All actions next
+	            SEARCH: 2000, // Then search button
+	            LAST_CONTENT: 0, // Last content same as other content
+	        };
+	    }
+	    updateOverflow(params) {
+	        const { overflowOuter, overflowInner, setVisible, } = params;
+	        if (!overflowOuter || !overflowInner) {
+	            return { hiddenItemsIds: [], showOverflowButton: false };
+	        }
+	        const sortedItems = this.buildHidableItems(params);
+	        // set initial state, to account for isOverflowing calculation
+	        setVisible(ShellBarActionsSelectors.Overflow, false);
+	        sortedItems.forEach(item => {
+	            // show all items to account for isOverflowing calculation
+	            setVisible(item.selector, true);
+	        });
+	        let nextItemToHide = null;
+	        let showOverflowButton = false;
+	        const hiddenItemsIds = [];
+	        // Iteratively hide items until no overflow
+	        for (let indexToHide = 0; indexToHide < sortedItems.length; indexToHide++) {
+	            nextItemToHide = sortedItems[indexToHide];
+	            if (!this.isOverflowing(overflowOuter, overflowInner)) {
+	                break; // No more overflow, stop hiding
+	            }
+	            setVisible(nextItemToHide.selector, false);
+	            hiddenItemsIds.push(nextItemToHide.id);
+	            if (nextItemToHide.showInOverflow) {
+	                // show overflow button to account in isOverflowing calculation
+	                setVisible(ShellBarActionsSelectors.Overflow, true);
+	                showOverflowButton = true;
+	            }
+	        }
+	        return {
+	            hiddenItemsIds,
+	            showOverflowButton,
+	        };
+	    }
+	    isOverflowing(overflowOuter, overflowInner) {
+	        return overflowInner.offsetWidth > overflowOuter.offsetWidth;
+	    }
+	    getOverflowStrategy(showSearchField) {
+	        return showSearchField ? this.OPEN_SEARCH_STRATEGY : this.CLOSED_SEARCH_STRATEGY;
+	    }
+	    buildHidableItems(params) {
+	        const items = [
+	            ...this.buildContent(params),
+	            ...this.buildActions(params),
+	        ];
+	        // sort by hideOrder first then by keepHidden keepHidden items are at the start
+	        return items.sort((a, b) => {
+	            if (a.keepHidden && !b.keepHidden) {
+	                return -1;
+	            }
+	            if (!a.keepHidden && b.keepHidden) {
+	                return 1;
+	            }
+	            return a.hideOrder - b.hideOrder;
+	        });
+	    }
+	    buildContent(params) {
+	        const { content, showSearchField, } = params;
+	        const items = [];
+	        const overflowStrategy = this.getOverflowStrategy(showSearchField);
+	        // Build content items
+	        content.forEach((item, index) => {
+	            const slotName = item._individualSlot;
+	            const dataHideOrder = parseInt(item.getAttribute("data-hide-order") || String(index));
+	            const isLast = index === content.length - 1;
+	            const priority = isLast ? overflowStrategy.LAST_CONTENT : overflowStrategy.CONTENT;
+	            items.push({
+	                id: slotName,
+	                selector: `#${slotName}`,
+	                hideOrder: priority + dataHideOrder,
+	                keepHidden: false, // Content items don't cause flickering
+	                showInOverflow: false,
+	            });
+	        });
+	        return items;
+	    }
+	    buildActions(params) {
+	        const { customItems, actions, showSearchField, hiddenItemsIds, } = params;
+	        const items = [];
+	        const overflowStrategy = this.getOverflowStrategy(showSearchField);
+	        let actionIndex = 0;
+	        customItems.forEach(item => {
+	            items.push({
+	                id: item._id,
+	                selector: `[data-ui5-stable="${item.stableDomRef}"]`,
+	                hideOrder: overflowStrategy.ACTIONS + actionIndex++,
+	                keepHidden: hiddenItemsIds.includes(item._id),
+	                showInOverflow: true,
+	            });
+	        });
+	        actions
+	            // skip protected actions and search (handled separately)
+	            .filter(a => !a.isProtected && a.id !== ShellBarActions.Search)
+	            .forEach(config => {
+	            items.push({
+	                id: config.id,
+	                selector: config.selector,
+	                hideOrder: overflowStrategy.ACTIONS + actionIndex++,
+	                keepHidden: hiddenItemsIds.includes(config.id),
+	                showInOverflow: true,
+	            });
+	        });
+	        if (!showSearchField) {
+	            // Only move search to overflow if it's closed
+	            items.push({
+	                id: ShellBarActions.Search,
+	                selector: ShellBarActionsSelectors.Search,
+	                hideOrder: overflowStrategy.SEARCH + actionIndex++,
+	                keepHidden: false, // Search button can be shown/hidden freely
+	                showInOverflow: true,
+	            });
+	        }
+	        return items;
+	    }
+	    getOverflowItems(params) {
+	        const { actions, customItems, hiddenItemsIds } = params;
+	        const result = [];
+	        // Add hidden custom items
+	        const hiddenCustomItems = customItems.filter((item) => hiddenItemsIds.includes(item._id));
+	        hiddenCustomItems.forEach((item, index) => {
+	            result.push({
+	                type: "item", id: item._id, data: item, order: 3 + index,
+	            });
+	        });
+	        const actionOrder = {
+	            [ShellBarActions.Search]: 0,
+	            [ShellBarActions.Notifications]: 1,
+	            [ShellBarActions.Assistant]: 2,
+	        };
+	        const hiddenActions = actions.filter(action => hiddenItemsIds.includes(action.id));
+	        hiddenActions.forEach(action => {
+	            result.push({
+	                type: "action",
+	                id: action.id,
+	                data: action,
+	                order: actionOrder[action.id] ?? 0,
+	            });
+	        });
+	        return result.sort((a, b) => a.order - b.order);
+	    }
+	}
+
+	class ShellBarAccessibility {
+	    getActionsAccessibilityAttributes(defaultTexts, params) {
+	        const { overflowPopoverOpen, accessibilityAttributes } = params;
+	        const overflowExpanded = accessibilityAttributes.overflow?.expanded;
+	        return {
+	            notifications: {
+	                title: defaultTexts.notifications,
+	                accessibilityAttributes: {
+	                    expanded: accessibilityAttributes.notifications?.expanded,
+	                    hasPopup: accessibilityAttributes.notifications?.hasPopup,
+	                },
+	            },
+	            profile: {
+	                title: accessibilityAttributes.profile?.name || defaultTexts.profile,
+	                accessibilityAttributes: {
+	                    hasPopup: accessibilityAttributes.profile?.hasPopup,
+	                    expanded: accessibilityAttributes.profile?.expanded,
+	                },
+	            },
+	            products: {
+	                title: defaultTexts.products,
+	                accessibilityAttributes: {
+	                    hasPopup: accessibilityAttributes.product?.hasPopup,
+	                    expanded: accessibilityAttributes.product?.expanded,
+	                },
+	            },
+	            search: {
+	                title: defaultTexts.search,
+	                accessibilityAttributes: {
+	                    hasPopup: accessibilityAttributes.search?.hasPopup,
+	                },
+	            },
+	            overflow: {
+	                title: defaultTexts.overflow,
+	                accessibilityAttributes: {
+	                    hasPopup: accessibilityAttributes.overflow?.hasPopup || "menu",
+	                    expanded: overflowExpanded === undefined ? overflowPopoverOpen : overflowExpanded,
+	                },
+	            },
+	        };
+	    }
+	    getActionsRole(visibleItemsCount) {
+	        return visibleItemsCount > 1 ? "toolbar" : undefined;
+	    }
+	    getContentRole(visibleItemsCount) {
+	        return visibleItemsCount > 1 ? "group" : undefined;
+	    }
+	}
+
+	class ShellBarItemNavigation {
+	    constructor(params) {
+	        this.params = params;
+	    }
+	    handleKeyDown(e) {
+	        if (!this.shouldHandle(e)) {
+	            return;
+	        }
+	        const domRef = this.params.getDomRef();
+	        if (!domRef) {
+	            return;
+	        }
+	        const activeElement = webcomponentsBase.t();
+	        if (!activeElement) {
+	            return;
+	        }
+	        if (this.shouldChildHandleNavigation(activeElement, e)) {
+	            return;
+	        }
+	        const items = this.getTabbableItems(domRef);
+	        const currentIndex = items.findIndex(el => el === activeElement);
+	        if (currentIndex !== -1) {
+	            e.preventDefault();
+	            this.navigateToItem(items, currentIndex, e);
+	        }
+	    }
+	    shouldHandle(e) {
+	        return webcomponentsBase.D(e) || webcomponentsBase.R(e) || webcomponentsBase.M(e) || webcomponentsBase.n(e);
+	    }
+	    shouldChildHandleNavigation(element, e) {
+	        if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+	            return this.shouldInputHandleNavigation(element, e);
+	        }
+	        return false;
+	    }
+	    shouldInputHandleNavigation(input, e) {
+	        const cursorPos = input.selectionStart || 0;
+	        const textLength = input.value.length;
+	        if (webcomponentsBase.D(e) && cursorPos > 0) {
+	            return true;
+	        }
+	        if (webcomponentsBase.R(e) && cursorPos < textLength) {
+	            return true;
+	        }
+	        return false;
+	    }
+	    getTabbableItems(domRef) {
+	        return ListItemBase.b(domRef).filter(el => this.isVisible(el));
+	    }
+	    isVisible(element) {
+	        const style = getComputedStyle(element);
+	        return style.display !== "none"
+	            && style.visibility !== "hidden"
+	            && element.offsetWidth > 0
+	            && element.offsetHeight > 0;
+	    }
+	    navigateToItem(items, currentIndex, e) {
+	        if (webcomponentsBase.D(e)) {
+	            this.focusPrevious(items, currentIndex);
+	        }
+	        else if (webcomponentsBase.R(e)) {
+	            this.focusNext(items, currentIndex);
+	        }
+	        else if (webcomponentsBase.M(e)) {
+	            items[0]?.focus();
+	        }
+	        else if (webcomponentsBase.n(e)) {
+	            items[items.length - 1]?.focus();
+	        }
+	    }
+	    focusPrevious(items, currentIndex) {
+	        if (currentIndex > 0) {
+	            items[currentIndex - 1].focus();
+	        }
+	    }
+	    focusNext(items, currentIndex) {
+	        if (currentIndex < items.length - 1) {
+	            items[currentIndex + 1].focus();
+	        }
+	    }
+	}
+
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var ShellBar_1;
+	const ShellBarActions = {
+	    Search: "search",
+	    Profile: "profile",
+	    Overflow: "overflow",
+	    Assistant: "assistant",
+	    ProductSwitch: "products",
+	    Notifications: "notifications",
+	};
+	const ShellBarActionsSelectors = {
+	    Search: ".ui5-shellbar-search-toggle",
+	    Profile: ".ui5-shellbar-image-button",
+	    Overflow: ".ui5-shellbar-overflow-button",
+	    Assistant: ".ui5-shellbar-assistant-button",
+	    ProductSwitch: ".ui5-shellbar-button-product-switch",
+	    Notifications: ".ui5-shellbar-bell-button",
+	};
+	/**
+	 * @class
+	 * ### Overview
+	 *
+	 * The `ui5-shellbar` is meant to serve as an application header
+	 * and includes numerous built-in features, such as: logo, profile image/icon, title, search field, notifications and so on.
+	 *
+	 * ### Stable DOM Refs
+	 *
+	 * You can use the following stable DOM refs for the `ui5-shellbar`:
+	 *
+	 * - logo
+	 * - notifications
+	 * - overflow
+	 * - profile
+	 * - product-switch
+	 *
+	 * ### Keyboard Handling
+	 *
+	 * #### Fast Navigation
+	 * This component provides a build in fast navigation group which can be used via [F6] / [Shift] + [F6] / [Ctrl] + [Alt/Option] / [Down] or [Ctrl] + [Alt/Option] + [Up].
+	 * In order to use this functionality, you need to import the following module:
+	 * `import "@ui5/webcomponents-base/dist/features/F6Navigation.js"`
+	 *
+	 * ### ES6 Module Import
+	 * `import "@ui5/webcomponents-fiori/dist/ShellBar.js";`
+	 * @csspart root - Used to style the outermost wrapper of the `ui5-shellbar`
+	 * @constructor
+	 * @extends UI5Element
+	 * @public
+	 * @since 0.8.0
+	 */
+	let ShellBar = ShellBar_1 = class ShellBar extends webcomponentsBase.S {
+	    constructor() {
+	        super(...arguments);
+	        /**
+	         * Defines, if the notification icon would be displayed.
+	         * @default false
+	         * @public
+	         */
+	        this.showNotifications = false;
+	        /**
+	         * Defines, if the product switch icon would be displayed.
+	         * @default false
+	         * @public
+	         */
+	        this.showProductSwitch = false;
+	        /**
+	         * Defines, if the Search Field would be displayed when there is a valid `searchField` slot.
+	         *
+	         * **Note:** By default the Search Field is not displayed.
+	         * @default false
+	         * @public
+	         */
+	        this.showSearchField = false;
+	        /**
+	         * Defines additional accessibility attributes on different areas of the component.
+	         *
+	         * The accessibilityAttributes object has the following fields,
+	         * where each field is an object supporting one or more accessibility attributes:
+	         *
+	         * - **logo** - `logo.role` and `logo.name`.
+	         * - **notifications** - `notifications.expanded` and `notifications.hasPopup`.
+	         * - **profile** - `profile.expanded`, `profile.hasPopup` and `profile.name`.
+	         * - **product** - `product.expanded` and `product.hasPopup`.
+	         * - **search** - `search.hasPopup`.
+	         * - **overflow** - `overflow.expanded` and `overflow.hasPopup`.
+	         * - **branding** - `branding.name`.
+	         *
+	         * The accessibility attributes support the following values:
+	         *
+	         * - **role**: Defines the accessible ARIA role of the logo area.
+	         * Accepts the following string values: `button` or `link`.
+	         *
+	         * - **expanded**: Indicates whether the button, or another grouping element it controls,
+	         * is currently expanded or collapsed.
+	         * Accepts the following string values: `true` or `false`.
+	         *
+	         * - **hasPopup**: Indicates the availability and type of interactive popup element,
+	         * such as menu or dialog, that can be triggered by the button.
+	         *
+	         * Accepts the following string values: `dialog`, `grid`, `listbox`, `menu` or `tree`.
+	         * - **name**: Defines the accessible ARIA name of the area.
+	         * Accepts any string.
+	         *
+	         * @default {}
+	         * @public
+	         * @since 1.10.0
+	         */
+	        this.accessibilityAttributes = {};
+	        /**
+	         * @private
+	         */
+	        this.breakpointSize = "S";
+	        /**
+	         * Actions computed from controllers.
+	         * @private
+	         */
+	        this.actions = [];
+	        /**
+	         * Show overflow button when items are hidden.
+	         * @private
+	         */
+	        this.showOverflowButton = false;
+	        /**
+	         * Open state of the overflow popover.
+	         * @private
+	         */
+	        this.overflowPopoverOpen = false;
+	        /**
+	         * IDs of items currently hidden due to overflow.
+	         * Used to trigger rerender for conditional rendering.
+	         * @private
+	         */
+	        this.hiddenItemsIds = [];
+	        /**
+	         * Show full-screen search overlay.
+	         * @private
+	         */
+	        this.showFullWidthSearch = false;
+	        this.RESIZE_THROTTLE_RATE = 100; // ms
+	        this.handleResizeBound = n(this.handleResize.bind(this), this.RESIZE_THROTTLE_RATE);
+	        this.breakpoints = [599, 1023, 1439, 1919, 10000];
+	        this.breakpointMap = {
+	            599: "S",
+	            1023: "M",
+	            1439: "L",
+	            1919: "XL",
+	            10000: "XXL",
+	        };
+	        this.itemNavigation = new ShellBarItemNavigation({
+	            getDomRef: () => this.getDomRef() || null,
+	        });
+	        this.overflow = new ShellBarOverflow();
+	        this.accessibility = new ShellBarAccessibility();
+	        this._searchAdaptor = new ShellBarSearch(this.getSearchDeps());
+	        this._searchAdaptorLegacy = new ShellBarSearchLegacy({
+	            ...this.getSearchDeps(),
+	            getDisableSearchCollapse: () => this.disableSearchCollapse,
+	        });
+	        /* =================== Legacy Members =================== */
+	        /**
+	         * Defines the visibility state of the search button.
+	         *
+	         * **Note:** The `hideSearchButton` property is in an experimental state and is a subject to change.
+	         * @default false
+	         * @public
+	         */
+	        this.hideSearchButton = false;
+	        /**
+	         * Disables the automatic search field expansion/collapse when the available space is not enough.
+	         *
+	         * **Note:** The `disableSearchCollapse` property is in an experimental state and is a subject to change.
+	         * @default false
+	         * @public
+	         */
+	        this.disableSearchCollapse = false;
+	        /**
+	         * Open state of the menu popover (legacy).
+	         * @private
+	         */
+	        this.menuPopoverOpen = false;
+	    }
+	    /* =================== Lifecycle Methods =================== */
+	    onEnterDOM() {
+	        webcomponentsBase.f.register(this, this.handleResizeBound);
+	        this.searchAdaptor?.subscribe();
+	    }
+	    onExitDOM() {
+	        webcomponentsBase.f.deregister(this, this.handleResizeBound);
+	        this.searchAdaptor?.unsubscribe();
+	    }
+	    onBeforeRendering() {
+	        if (!this.legacyAdaptor) {
+	            this.initLegacyController();
+	        }
+	        // Sync branding breakpoint state
+	        this.branding.forEach(brandingEl => {
+	            brandingEl._isSBreakPoint = this.isSBreakPoint;
+	        });
+	        this.buildActions();
+	        this.searchAdaptor?.syncShowSearchFieldState();
+	        // subscribe to search adaptor for cases when search is added dynamically
+	        this.searchAdaptor?.unsubscribe();
+	        this.searchAdaptor?.subscribe();
+	    }
+	    onAfterRendering() {
+	        this.updateBreakpoint();
+	        this.updateOverflow();
+	    }
+	    /* =================== Actions Management =================== */
+	    buildActions() {
+	        this.actions = [
+	            {
+	                id: ShellBarActions.Search,
+	                icon: search.searchIcon,
+	                enabled: this.enabledFeatures.search,
+	                selector: ShellBarActionsSelectors.Search,
+	                isProtected: false,
+	                stableDomRef: "toggle-search",
+	            },
+	            {
+	                id: ShellBarActions.Assistant,
+	                icon: daIcon,
+	                enabled: this.enabledFeatures.assistant,
+	                selector: ShellBarActionsSelectors.Assistant,
+	                isProtected: false,
+	            },
+	            {
+	                id: ShellBarActions.Notifications,
+	                icon: bellIcon,
+	                count: this.notificationsCount,
+	                enabled: this.enabledFeatures.notifications,
+	                selector: ShellBarActionsSelectors.Notifications,
+	                isProtected: false,
+	                stableDomRef: "notifications",
+	            },
+	            {
+	                id: ShellBarActions.Overflow,
+	                icon: overflow.overflowIcon,
+	                enabled: this.enabledFeatures.overflow,
+	                selector: ShellBarActionsSelectors.Overflow,
+	                isProtected: true,
+	                stableDomRef: "overflow",
+	            },
+	            {
+	                id: ShellBarActions.Profile,
+	                enabled: this.enabledFeatures.profile,
+	                selector: ShellBarActionsSelectors.Profile,
+	                isProtected: true,
+	                stableDomRef: "profile",
+	            },
+	            {
+	                id: ShellBarActions.ProductSwitch,
+	                icon: gridIcon,
+	                enabled: this.enabledFeatures.productSwitch,
+	                selector: ShellBarActionsSelectors.ProductSwitch,
+	                isProtected: true,
+	                stableDomRef: "product-switch",
+	            },
+	        ].filter(action => action.enabled);
+	    }
+	    getAction(actionId) {
+	        return this.actions.find(action => action.id === actionId);
+	    }
+	    getActionOverflowText(actionId) {
+	        const texts = {
+	            [ShellBarActions.Search]: this.texts.search,
+	            [ShellBarActions.Profile]: this.texts.profile,
+	            [ShellBarActions.Overflow]: this.texts.overflow,
+	            [ShellBarActions.Assistant]: this.texts.assistant,
+	            [ShellBarActions.ProductSwitch]: this.texts.products,
+	            [ShellBarActions.Notifications]: this.texts.notificationsNoCount,
+	        };
+	        return texts[actionId] || actionId;
+	    }
+	    /* =================== Breakpoint Management =================== */
+	    get isSBreakPoint() {
+	        return this.breakpointSize === "S";
+	    }
+	    updateBreakpoint() {
+	        const width = this.getBoundingClientRect().width;
+	        const bp = this.breakpoints.find(b => width <= b) || 10000;
+	        const breakpoint = this.breakpointMap[bp];
+	        if (this.breakpointSize !== breakpoint) {
+	            this.breakpointSize = breakpoint;
+	        }
+	    }
+	    /* =================== Overflow Management =================== */
+	    updateOverflow() {
+	        if (!this.overflow) {
+	            return;
+	        }
+	        const result = this.overflow.updateOverflow({
+	            actions: this.actions,
+	            content: this.sortContent(this.content),
+	            customItems: this.items,
+	            hiddenItemsIds: this.hiddenItemsIds,
+	            showSearchField: this.enabledFeatures.search && this.showSearchField,
+	            overflowOuter: this.overflowOuter,
+	            overflowInner: this.overflowInner,
+	            setVisible: (selector, visible) => {
+	                const element = this.shadowRoot.querySelector(selector);
+	                if (element) {
+	                    element.classList[visible ? "remove" : "add"]("ui5-shellbar-hidden");
+	                }
+	            },
+	        });
+	        this.handleUpdateOverflowResult(result);
+	        return result.hiddenItemsIds;
+	    }
+	    handleUpdateOverflowResult(result) {
+	        const { hiddenItemsIds, showOverflowButton } = result;
+	        // Update items overflow state
+	        this.items.forEach(item => {
+	            item.inOverflow = hiddenItemsIds.includes(item._id);
+	            if (item.inOverflow) {
+	                // clear the hidden class to ensure the item is visible in the overflow popover
+	                item.classList.remove("ui5-shellbar-hidden");
+	            }
+	        });
+	        if (!webcomponentsBase.n$2(this.hiddenItemsIds, hiddenItemsIds)) {
+	            this.handleContentVisibilityChanged(this.hiddenItemsIds, hiddenItemsIds);
+	            this.hiddenItemsIds = hiddenItemsIds;
+	            this.showOverflowButton = showOverflowButton;
+	        }
+	        this.showFullWidthSearch = this.searchAdaptor?.shouldShowFullScreen() || false;
+	    }
+	    handleContentVisibilityChanged(oldHiddenItemsIds, newHiddenItemsIds) {
+	        const filterContentIds = (ids) => ids.filter(id => this.content.some(item => item._individualSlot === id));
+	        const oldHiddenContentIds = filterContentIds(oldHiddenItemsIds);
+	        const newHiddenContentIds = filterContentIds(newHiddenItemsIds);
+	        if (!webcomponentsBase.n$2(oldHiddenContentIds, newHiddenContentIds)) {
+	            this.fireDecoratorEvent("content-item-visibility-change", {
+	                items: newHiddenContentIds.map(id => this.content.find(item => item._individualSlot === id)),
+	            });
+	        }
+	    }
+	    handleResize() {
+	        this.overflowPopoverOpen = false;
+	        this.updateBreakpoint();
+	        const hiddenItemsIds = this.updateOverflow() ?? [];
+	        const spacerWidth = this.spacer?.getBoundingClientRect().width || 0;
+	        this.searchAdaptor?.autoManageSearchState(hiddenItemsIds.length, spacerWidth);
+	    }
+	    isHidden(itemId) {
+	        return this.hiddenItemsIds.includes(itemId);
+	    }
+	    handleOverflowClick() {
+	        this.overflowPopoverOpen = !this.overflowPopoverOpen;
+	    }
+	    onPopoverClose() {
+	        this.overflowPopoverOpen = false;
+	    }
+	    /**
+	     * Closes the overflow popover.
+	     * @public
+	     */
+	    closeOverflow() {
+	        this.overflowPopoverOpen = false;
+	    }
+	    handleOverflowItemClick(e) {
+	        const target = e.target;
+	        const actionId = target.getAttribute("data-action-id");
+	        let prevented = e.defaultPrevented; // for custom actions
+	        if (actionId === ShellBarActions.Notifications) {
+	            prevented = this.handleNotificationsClick();
+	        }
+	        else if (actionId === ShellBarActions.Search) {
+	            prevented = this.handleSearchButtonClick();
+	        }
+	        if (!prevented) {
+	            this.overflowPopoverOpen = false;
+	        }
+	    }
+	    get overflowItems() {
+	        return this.overflow.getOverflowItems({
+	            actions: this.actions,
+	            customItems: this.items,
+	            hiddenItemsIds: this.hiddenItemsIds,
+	        });
+	    }
+	    /**
+	     * Returns badge text for overflow button.
+	     * Shows count if only one item with count is overflowed, otherwise shows attention dot.
+	     */
+	    get overflowBadge() {
+	        const itemsWithCount = this.overflowItems.filter(item => item.data.count);
+	        if (itemsWithCount.length === 1) {
+	            return itemsWithCount[0].data.count;
+	        }
+	        if (itemsWithCount.length > 1) {
+	            return " "; // Attention dot
+	        }
+	        return undefined;
+	    }
+	    /* =================== Search Management =================== */
+	    get search() {
+	        return this.searchField.length ? this.searchField[0] : null;
+	    }
+	    get isSelfCollapsibleSearch() {
+	        const searchField = this.search;
+	        if (searchField) {
+	            return "collapsed" in searchField && "open" in searchField;
+	        }
+	        return false;
+	    }
+	    getSearchDeps() {
+	        return {
+	            getSearchField: () => this.search,
+	            getSearchState: () => this.enabledFeatures.search && this.showSearchField,
+	            getCSSVariable: (cssVar) => this.getCSSVariable(cssVar),
+	            setSearchState: (expanded) => this.setSearchState(expanded),
+	            getOverflowed: () => this.overflow.isOverflowing(this.overflowOuter, this.overflowInner),
+	        };
+	    }
+	    get searchAdaptor() {
+	        if (this.isSelfCollapsibleSearch) {
+	            return this._searchAdaptor;
+	        }
+	        return this._searchAdaptorLegacy;
+	    }
+	    handleSearchButtonClick() {
+	        const searchButton = this.shadowRoot.querySelector(".ui5-shellbar-search-button");
+	        const defaultPrevented = !this.fireDecoratorEvent("search-button-click", {
+	            targetRef: searchButton,
+	            searchFieldVisible: this.showSearchField,
+	        });
+	        if (defaultPrevented) {
+	            return defaultPrevented;
+	        }
+	        this.setSearchState(!this.showSearchField);
+	        if (!this.showSearchField) {
+	            return defaultPrevented;
+	        }
+	        const input = this.searchField[0];
+	        if (input) {
+	            input.focused = true;
+	            setTimeout(() => {
+	                input.focus();
+	            }, 100);
+	        }
+	        return defaultPrevented;
+	    }
+	    async setSearchState(expanded) {
+	        if (expanded === this.showSearchField) {
+	            return;
+	        }
+	        this.showSearchField = expanded;
+	        await Theme.w();
+	        this.fireDecoratorEvent("search-field-toggle", { expanded });
+	    }
+	    handleCancelButtonClick() {
+	        const cancelBtn = this.shadowRoot.querySelector(".ui5-shellbar-cancel-button");
+	        if (!cancelBtn) {
+	            return;
+	        }
+	        const clearDefaultPrevented = !this.fireDecoratorEvent("search-field-clear", {
+	            targetRef: cancelBtn,
+	        });
+	        this.showFullWidthSearch = false;
+	        this.setSearchState(false);
+	        if (!clearDefaultPrevented && this.search) {
+	            this.search.value = "";
+	        }
+	    }
+	    /* =================== Legacy Features Management =================== */
+	    initLegacyController() {
+	        if (this.hasLegacyFeatures) {
+	            this.legacyAdaptor = new ShellBarLegacy({
+	                component: this,
+	                getShadowRoot: () => this.shadowRoot,
+	            });
+	        }
+	    }
+	    get hasLegacyFeatures() {
+	        return this.logo.length > 0
+	            || !!this.primaryTitle
+	            || !!this.secondaryTitle
+	            || this.menuItems.length > 0;
+	    }
+	    /* =================== Keyboard Navigation =================== */
+	    _onKeyDown(e) {
+	        this.itemNavigation.handleKeyDown(e);
+	    }
+	    /* =================== Content Management =================== */
+	    get startContent() {
+	        return this.splitContent(this.content).start;
+	    }
+	    get endContent() {
+	        return this.splitContent(this.content).end;
+	    }
+	    get separatorConfig() {
+	        if (this.isSBreakPoint) {
+	            return {
+	                showStartSeparator: false,
+	                showEndSeparator: false,
+	            };
+	        }
+	        const { start, end } = this.splitContent(this.content);
+	        return {
+	            showStartSeparator: start.some(item => !this.hiddenItemsIds.includes(item._individualSlot)),
+	            showEndSeparator: end.some(item => !this.hiddenItemsIds.includes(item._individualSlot)),
+	        };
+	    }
+	    splitContent(content) {
+	        const spacerIndex = content.findIndex(child => child.hasAttribute("ui5-shellbar-spacer"));
+	        if (spacerIndex === -1) {
+	            return { start: [...content], end: [] };
+	        }
+	        return {
+	            start: content.slice(0, spacerIndex),
+	            end: content.slice(spacerIndex + 1),
+	        };
+	    }
+	    sortContent(content) {
+	        // reverse so items on the right are hidden first
+	        // then sort by hide order to apply custom preferences
+	        return content.toReversed().toSorted((a, b) => {
+	            const aOrder = parseInt(a.getAttribute("data-hide-order") || "0");
+	            const bOrder = parseInt(b.getAttribute("data-hide-order") || "0");
+	            return aOrder - bOrder;
+	        });
+	    }
+	    /*
+	     * Determines whether a separator should be packed with an item.
+	     * Separators are packed with the last item that is hidden to account for
+	     * the space they occupy when next overflow calculation occurs.
+	     */
+	    getPackedSeparatorInfo(item, isStartGroup) {
+	        const group = isStartGroup ? this.startContent : this.endContent;
+	        const sorted = this.sortContent(group);
+	        const isHidden = this.hiddenItemsIds.includes(item._individualSlot);
+	        const isLastItem = sorted.at(-1) === item;
+	        return { shouldPack: isHidden && isLastItem };
+	    }
+	    /* =================== Items Management =================== */
+	    /* =================== Accessibility =================== */
+	    get actionsAccessibilityInfo() {
+	        return this.accessibility.getActionsAccessibilityAttributes(this.texts, {
+	            overflowPopoverOpen: this.overflowPopoverOpen,
+	            accessibilityAttributes: this.accessibilityAttributes,
+	        });
+	    }
+	    get actionsRole() {
+	        const visibleCount = this.actions.filter(a => !this.hiddenItemsIds.includes(a.id)).length;
+	        return this.accessibility.getActionsRole(visibleCount);
+	    }
+	    get contentRole() {
+	        const visibleItemsCount = this.content.filter(item => !this.hiddenItemsIds.includes(item._individualSlot)).length;
+	        return this.accessibility.getContentRole(visibleItemsCount);
+	    }
+	    /* =================== Common Members =================== */
+	    get enabledFeatures() {
+	        return {
+	            search: this.searchField.length > 0,
+	            profile: this.profile.length > 0,
+	            content: this.content.length > 0,
+	            branding: this.branding.length > 0,
+	            overflow: this.showOverflowButton,
+	            assistant: this.assistant.length > 0,
+	            startButton: this.startButton.length > 0,
+	            notifications: this.showNotifications,
+	            productSwitch: this.showProductSwitch,
+	        };
+	    }
+	    get texts() {
+	        return {
+	            search: ShellBar_1.i18nBundle.getText(i18nDefaults.SHELLBAR_SEARCH),
+	            profile: ShellBar_1.i18nBundle.getText(i18nDefaults.SHELLBAR_PROFILE),
+	            shellbar: ShellBar_1.i18nBundle.getText(i18nDefaults.SHELLBAR_LABEL),
+	            products: ShellBar_1.i18nBundle.getText(i18nDefaults.SHELLBAR_PRODUCTS),
+	            overflow: ShellBar_1.i18nBundle.getText(i18nDefaults.SHELLBAR_OVERFLOW),
+	            assistant: ShellBar_1.i18nBundle.getText(i18nDefaults.SHELLBAR_ASSISTANT),
+	            notifications: ShellBar_1.i18nBundle.getText(i18nDefaults.SHELLBAR_NOTIFICATIONS, this.notificationsCount || 0),
+	            notificationsNoCount: ShellBar_1.i18nBundle.getText(i18nDefaults.SHELLBAR_NOTIFICATIONS_NO_COUNT),
+	            contentItems: this.content.length > 1 ? ShellBar_1.i18nBundle.getText(i18nDefaults.SHELLBAR_ADDITIONAL_CONTEXT) : undefined,
+	        };
+	    }
+	    get popoverHorizontalAlign() {
+	        return this.effectiveDir === "rtl" ? "Start" : "End";
+	    }
+	    /**
+	     * Returns the `logo` DOM ref.
+	     * @public
+	     * @default null
+	     * @since 1.0.0-rc.16
+	     */
+	    get logoDomRef() {
+	        return this.shadowRoot.querySelector(`*[data-ui5-stable="logo"]`);
+	    }
+	    /**
+	     * Returns the `notifications` icon DOM ref.
+	     * @public
+	     * @default null
+	     * @since 1.0.0-rc.16
+	     */
+	    get notificationsDomRef() {
+	        return this.shadowRoot.querySelector(`*[data-ui5-stable="notifications"]`);
+	    }
+	    /**
+	     * Returns the `overflow` icon DOM ref.
+	     * @public
+	     * @default null
+	     * @since 1.0.0-rc.16
+	     */
+	    get overflowDomRef() {
+	        return this.shadowRoot.querySelector(`*[data-ui5-stable="overflow"]`);
+	    }
+	    /**
+	     * Returns the `profile` icon DOM ref.
+	     * @public
+	     * @default null
+	     * @since 1.0.0-rc.16
+	     */
+	    get profileDomRef() {
+	        return this.shadowRoot.querySelector(`*[data-ui5-stable="profile"]`);
+	    }
+	    /**
+	     * Returns the `product-switch` icon DOM ref.
+	     * @public
+	     * @default null
+	     * @since 1.0.0-rc.16
+	     */
+	    get productSwitchDomRef() {
+	        return this.shadowRoot.querySelector(`*[data-ui5-stable="product-switch"]`);
+	    }
+	    /**
+	     * Returns the search button DOM reference.
+	     * @public
+	     */
+	    async getSearchButtonDomRef() {
+	        await Theme.w();
+	        return this.shadowRoot.querySelector(`*[data-ui5-stable="toggle-search"]`);
+	    }
+	    _fireClickEvent(eventName, domRef) {
+	        return domRef ? !this.fireDecoratorEvent(eventName, { targetRef: domRef }) : false;
+	    }
+	    handleNotificationsClick() {
+	        return this._fireClickEvent("notifications-click", this.notificationsDomRef);
+	    }
+	    handleProfileClick() {
+	        return this._fireClickEvent("profile-click", this.profileDomRef);
+	    }
+	    handleProductSwitchClick() {
+	        return this._fireClickEvent("product-switch-click", this.productSwitchDomRef);
+	    }
+	    getCSSVariable(cssVar) {
+	        const styleSet = getComputedStyle(this.getDomRef());
+	        return styleSet.getPropertyValue(Theme.f$3(cssVar));
+	    }
+	};
+	__decorate([
+	    webcomponentsBase.d()
+	], ShellBar.prototype, "startButton", void 0);
+	__decorate([
+	    webcomponentsBase.d()
+	], ShellBar.prototype, "branding", void 0);
+	__decorate([
+	    webcomponentsBase.d({ type: HTMLElement, individualSlots: true })
+	], ShellBar.prototype, "content", void 0);
+	__decorate([
+	    webcomponentsBase.d({ type: HTMLElement })
+	], ShellBar.prototype, "searchField", void 0);
+	__decorate([
+	    webcomponentsBase.d()
+	], ShellBar.prototype, "assistant", void 0);
+	__decorate([
+	    webcomponentsBase.d({ type: HTMLElement, "default": true, individualSlots: true })
+	], ShellBar.prototype, "items", void 0);
+	__decorate([
+	    webcomponentsBase.d()
+	], ShellBar.prototype, "profile", void 0);
+	__decorate([
+	    webcomponentsBase.s()
+	], ShellBar.prototype, "notificationsCount", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Boolean })
+	], ShellBar.prototype, "showNotifications", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Boolean })
+	], ShellBar.prototype, "showProductSwitch", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Boolean })
+	], ShellBar.prototype, "showSearchField", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Object })
+	], ShellBar.prototype, "accessibilityAttributes", void 0);
+	__decorate([
+	    webcomponentsBase.s()
+	], ShellBar.prototype, "breakpointSize", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Object })
+	], ShellBar.prototype, "actions", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Boolean })
+	], ShellBar.prototype, "showOverflowButton", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Boolean })
+	], ShellBar.prototype, "overflowPopoverOpen", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Object })
+	], ShellBar.prototype, "hiddenItemsIds", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Boolean })
+	], ShellBar.prototype, "showFullWidthSearch", void 0);
+	__decorate([
+	    query.o(".ui5-shellbar-spacer")
+	], ShellBar.prototype, "spacer", void 0);
+	__decorate([
+	    query.o(".ui5-shellbar-overflow-container")
+	], ShellBar.prototype, "overflowOuter", void 0);
+	__decorate([
+	    query.o(".ui5-shellbar-overflow-container-inner")
+	], ShellBar.prototype, "overflowInner", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Boolean })
+	], ShellBar.prototype, "hideSearchButton", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Boolean })
+	], ShellBar.prototype, "disableSearchCollapse", void 0);
+	__decorate([
+	    webcomponentsBase.s()
+	], ShellBar.prototype, "primaryTitle", void 0);
+	__decorate([
+	    webcomponentsBase.s()
+	], ShellBar.prototype, "secondaryTitle", void 0);
+	__decorate([
+	    webcomponentsBase.d()
+	], ShellBar.prototype, "logo", void 0);
+	__decorate([
+	    webcomponentsBase.d()
+	], ShellBar.prototype, "menuItems", void 0);
+	__decorate([
+	    webcomponentsBase.s({ type: Boolean })
+	], ShellBar.prototype, "menuPopoverOpen", void 0);
+	__decorate([
+	    webcomponentsBase.d()
+	], ShellBar.prototype, "midContent", void 0);
+	__decorate([
+	    parametersBundle_css$1.i("@ui5/webcomponents-fiori")
+	], ShellBar, "i18nBundle", void 0);
+	ShellBar = ShellBar_1 = __decorate([
+	    webcomponentsBase.m({
+	        tag: "ui5-shellbar",
+	        styles: [shellBarStyles, shellBarLegacyStyles, ShellBarPopoverCss],
+	        renderer: jsxRuntime.y,
+	        template: ShellBarTemplate,
+	        fastNavigation: true,
+	        languageAware: true,
+	        dependencies: [
+	            Icon.Icon,
+	            List.List,
+	            Button.Button,
+	            ShellBarItem.ButtonBadge,
+	            ResponsivePopover.Popover,
+	            ShellBarSpacer,
+	            ShellBarItem.ShellBarItem,
+	            ShellBarItem.ListItemStandard,
+	            // legacy dependencies
+	            Menu,
+	        ],
+	    })
+	    /**
+	     *
+	     * Fired, when the notification icon is activated.
+	     * @param {HTMLElement} targetRef dom ref of the activated element
+	     * @public
+	     */
+	    ,
+	    eventStrict.l("notifications-click", {
+	        cancelable: true,
+	        bubbles: true,
+	    })
+	    /**
+	     * Fired, when the profile slot is present.
+	     * @param {HTMLElement} targetRef dom ref of the activated element
+	     * @public
+	     */
+	    ,
+	    eventStrict.l("profile-click", {
+	        bubbles: true,
+	    })
+	    /**
+	     * Fired, when the product switch icon is activated.
+	     *
+	     * **Note:** You can prevent closing of overflow popover by calling `event.preventDefault()`.
+	     * @param {HTMLElement} targetRef dom ref of the activated element
+	     * @public
+	     */
+	    ,
+	    eventStrict.l("product-switch-click", {
+	        cancelable: true,
+	        bubbles: true,
+	    })
+	    /**
+	     * Fired, when the logo is activated.
+	     * @param {HTMLElement} targetRef dom ref of the activated element
+	     * @since 0.10
+	     * @public
+	     */
+	    ,
+	    eventStrict.l("logo-click", {
+	        bubbles: true,
+	    })
+	    /**
+	     * Fired, when a menu item is activated
+	     *
+	     * **Note:** You can prevent closing of overflow popover by calling `event.preventDefault()`.
+	     * @param {HTMLElement} item DOM ref of the activated list item
+	     * @since 0.10
+	     * @public
+	     */
+	    ,
+	    eventStrict.l("menu-item-click", {
+	        bubbles: true,
+	        cancelable: true,
+	    })
+	    /**
+	     * Fired, when the search button is activated.
+	     *
+	     * **Note:** You can prevent expanding/collapsing of the search field by calling `event.preventDefault()`.
+	     * @param {HTMLElement} targetRef dom ref of the activated element
+	     * @param {Boolean} searchFieldVisible whether the search field is visible
+	     * @public
+	     */
+	    ,
+	    eventStrict.l("search-button-click", {
+	        cancelable: true,
+	        bubbles: true,
+	    })
+	    /**
+	     * Fired, when the search field is expanded or collapsed.
+	     * @since 2.10.0
+	     * @param {Boolean} expanded whether the search field is expanded
+	     * @public
+	     */
+	    ,
+	    eventStrict.l("search-field-toggle", {
+	        bubbles: true,
+	    })
+	    /**
+	     * Fired, when the search cancel button is activated.
+	     *
+	     * **Note:** You can prevent the default behavior (clearing the search field value) by calling `event.preventDefault()`. The search will still be closed.
+	     * **Note:** The `search-field-clear` event is in an experimental state and is a subject to change.
+	     * @param {HTMLElement} targetRef dom ref of the cancel button element
+	     * @since 2.14.0
+	     * @public
+	     */
+	    ,
+	    eventStrict.l("search-field-clear", {
+	        cancelable: true,
+	        bubbles: true,
+	    })
+	    /**
+	     * Fired, when an item from the content slot is hidden or shown.
+	     * **Note:** The `content-item-visibility-change` event is in an experimental state and is a subject to change.
+	     *
+	     * @param {Array<HTMLElement>} array of all the items that are hidden
+	     * @public
+	     * @since 2.7.0
+	     */
+	    ,
+	    eventStrict.l("content-item-visibility-change", {
+	        bubbles: true,
+	    })
+	], ShellBar);
+	ShellBar.define();
+	var ShellBar_default = ShellBar;
+
+	exports.ShellBarActions = ShellBarActions;
+	exports.ShellBarActionsSelectors = ShellBarActionsSelectors;
+	exports.default = ShellBar_default;
+
+	Object.defineProperty(exports, '__esModule', { value: true });
+
+}));

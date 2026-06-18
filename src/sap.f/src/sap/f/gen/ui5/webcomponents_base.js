@@ -1,5 +1,407 @@
 /*!
  * ${copyright}
  */
-sap.ui.define(["sap/f/thirdparty/webcomponents-base","sap/ui/core/webc/WebComponent","sap/ui/base/DataType"],function(e,t,a){"use strict";const{registerEnum:n}=a;const o=Object.assign({},e);o["_ui5metadata"]={name:"sap/f/gen/ui5/webcomponents_base",version:"2.19.2",dependencies:["sap.ui.core"],types:["sap.f.gen.ui5.webcomponents_base.AnimationMode","sap.f.gen.ui5.webcomponents_base.CalendarType","sap.f.gen.ui5.webcomponents_base.ItemNavigationBehavior","sap.f.gen.ui5.webcomponents_base.MovePlacement","sap.f.gen.ui5.webcomponents_base.NavigationMode","sap.f.gen.ui5.webcomponents_base.SortOrder","sap.f.gen.ui5.webcomponents_base.ValueState"],interfaces:[],controls:[],elements:[],rootPath:"../"};o["AnimationMode"]={Full:"Full",Basic:"Basic",Minimal:"Minimal",None:"None"};n("sap.f.gen.ui5.webcomponents_base.AnimationMode",o["AnimationMode"]);o["CalendarType"]={Gregorian:"Gregorian",Islamic:"Islamic",Japanese:"Japanese",Buddhist:"Buddhist",Persian:"Persian"};n("sap.f.gen.ui5.webcomponents_base.CalendarType",o["CalendarType"]);o["ItemNavigationBehavior"]={Static:"Static",Cyclic:"Cyclic"};n("sap.f.gen.ui5.webcomponents_base.ItemNavigationBehavior",o["ItemNavigationBehavior"]);o["MovePlacement"]={On:"On",Before:"Before",After:"After"};n("sap.f.gen.ui5.webcomponents_base.MovePlacement",o["MovePlacement"]);o["NavigationMode"]={Auto:"Auto",Vertical:"Vertical",Horizontal:"Horizontal",Paging:"Paging"};n("sap.f.gen.ui5.webcomponents_base.NavigationMode",o["NavigationMode"]);o["SortOrder"]={None:"None",Ascending:"Ascending",Descending:"Descending"};n("sap.f.gen.ui5.webcomponents_base.SortOrder",o["SortOrder"]);o["ValueState"]={None:"None",Positive:"Positive",Critical:"Critical",Negative:"Negative",Information:"Information"};n("sap.f.gen.ui5.webcomponents_base.ValueState",o["ValueState"]);if(!t.__setProperty__isPatched){const e=t.prototype.setProperty;t.prototype.setProperty=function(t,a,n){if((t==="width"||t==="height")&&!isNaN(a)){const e=this.getMetadata().getProperty(t).getType().getName();if(e==="sap.ui.core.CSSSize"){a+="px"}}return e.apply(this,[t,a,n])};t.__setProperty__isPatched=true}if(!t.__renderAttributeProperties__isPatched){const e=t.getMetadata().getRenderer();e.renderAttributeProperties=function(e,t){var a=t.getMetadata().getPropertiesByMapping("property");var n=sap.ui.require("sap/base/strings/hyphenate");var o=["enabled"].concat(Object.entries(t.getMetadata().getPropertyDefaults()).map(([e,t])=>t!==undefined&&t!==false?e:null));for(var i in a){if(t.isPropertyInitial(i)&&!o.includes(i)){continue}var s=a[i];var r=s.get(t);if(s.type==="object"||typeof r==="object"){continue}var p=s._sMapTo?s._sMapTo:n(i);if(s._fnMappingFormatter){r=t[s._fnMappingFormatter].call(t,r)}if(s.type==="boolean"){if(r){e.attr(p,"")}}else{if(r!=null){e.attr(p,r)}}}};t.__renderAttributeProperties__isPatched=true}if(!t.__CustomEventsListeners__isPatched){t.prototype.__attachCustomEventsListeners=function(){var e=sap.ui.require("sap/base/strings/hyphenate");var t=this.getMetadata().getAllEvents();for(var a in t){var n=e(a);this.getDomRef().addEventListener(n,this.__handleCustomEventBound)}};t.prototype.__detachCustomEventsListeners=function(){var e=this.getDomRef();if(!e){return}var t=sap.ui.require("sap/base/strings/hyphenate");var a=this.getMetadata().getAllEvents();for(var n in a){if(a.hasOwnProperty(n)){var o=t(n);e.removeEventListener(o,this.__handleCustomEventBound)}}};t.__CustomEventsListeners__isPatched=true}if(!t.___mapValueState__isPatched){t.prototype._mapValueState??=function(e){console.warn("ValueState mapping is not implemented for Web Components yet. Please use UI5 version 1.136.1 or higher.");return e};t.___mapValueState__isPatched=true}if(!t.__MappingSupportForEvents__isPatched){var i=Object.getPrototypeOf(t.getMetadata());var s=i.metaFactoryEvent;var r=function(e,t,a){s.apply(this,arguments);if(a.mapping){this._sMapTo=typeof a.mapping!=="object"?a.mapping:a.mapping.to}this._isCustomEvent=true};r.prototype=Object.create(s.prototype);r.prototype.constructor=r;i.metaFactoryEvent=r;i.getEventsForCustomEvent=function(e){var t={};var a=this.getAllEvents();for(var n in a){var o=a[n];if(o._isCustomEvent){if(n===e||o._sMapTo===e){t[n]=o}}}return t};t.prototype.__attachCustomEventsListeners=function(){var e=sap.ui.require("sap/base/strings/hyphenate");var t=this.getDomRef();var a=this.getMetadata().getAllEvents();for(var n in a){if(a[n]._isCustomEvent){var o=e(a[n]._sMapTo||n);this.__handleCustomEventBound=this.__handleCustomEventBound||this.__handleCustomEvent.bind(this);t.addEventListener(o,this.__handleCustomEventBound)}}};t.prototype.__detachCustomEventsListeners=function(){var e=this.getDomRef();if(!e){return}var t=sap.ui.require("sap/base/strings/hyphenate");var a=this.getMetadata().getAllEvents();for(var n in a){if(a[n]._isCustomEvent){var o=t(a[n]._sMapTo||n);e.removeEventListener(o,this.__handleCustomEventBound)}}};t.prototype.__handleCustomEvent=function(e){var t=sap.ui.require("sap/base/strings/camelize");var a=t(e.type);var n=this.__formatEventData(e.detail);var o=this.getMetadata().getEventsForCustomEvent(a);for(var i in o){var s=o[i];var r=!s.fire(this,n);if(r){e.preventDefault()}}};t.__MappingSupportForEvents__isPatched=true}if(!t.__CustomData__isPatched){const e=t.prototype.onAfterRendering;t.prototype.onAfterRendering=function(){const t=this.getCustomData();if(t?.length>0){setTimeout(function(){const e=this.getDomRef();const a=e&&(typeof e.getFocusDomRef==="function"&&e.getFocusDomRef()||typeof e.getDomRef==="function"&&e.getDomRef()||e.shadowRoot&&e.shadowRoot.firstElementChild);if(a){t.forEach(function(e){if(e.getWriteToDom()){const t=e.getKey();const n=e.getValue();a.setAttribute(`data-${t}`,n)}})}}.bind(this),0)}return e.apply(this,arguments)};t.__CustomData__isPatched=true}o.__esModule=true;return o});
-//# sourceMappingURL=webcomponents_base.js.map
+sap.ui.define(
+  [
+    "sap/f/thirdparty/webcomponents-base",
+    "sap/ui/core/webc/WebComponent",
+    "sap/ui/base/DataType"
+  ],
+  function (WebCPackage, WebComponent, DataType) {
+    "use strict";
+    const { registerEnum } = DataType;
+
+    // re-export package object
+    const pkg = Object.assign({}, WebCPackage);
+
+    // export the UI5 metadata along with the package
+    pkg["_ui5metadata"] = {
+      name: "sap/f/gen/ui5/webcomponents_base",
+      version: "2.23.1",
+      dependencies: ["sap.ui.core"],
+      types: [
+        "sap.f.gen.ui5.webcomponents_base.dist.types.AnimationMode",
+        "sap.f.gen.ui5.webcomponents_base.dist.types.CalendarType",
+        "sap.f.gen.ui5.webcomponents_base.dist.types.ItemNavigationBehavior",
+        "sap.f.gen.ui5.webcomponents_base.dist.types.MovePlacement",
+        "sap.f.gen.ui5.webcomponents_base.dist.types.NavigationMode",
+        "sap.f.gen.ui5.webcomponents_base.dist.types.SortOrder",
+        "sap.f.gen.ui5.webcomponents_base.dist.types.ValueState"
+      ],
+      interfaces: [],
+      controls: [],
+      elements: [],
+      rootPath: "../"
+    };
+
+    // Enums
+    /**
+     * Different types of AnimationMode.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/AnimationMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base AnimationMode
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["AnimationMode"] = {
+      /**
+       * Basic
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Basic: "Basic",
+      /**
+       * Full
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Full: "Full",
+      /**
+       * Minimal
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Minimal: "Minimal",
+      /**
+       * None
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      None: "None"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_base.dist.types.AnimationMode",
+      pkg["AnimationMode"]
+    );
+    /**
+     * Different calendar types.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/CalendarType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base CalendarType
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["CalendarType"] = {
+      /**
+       * Buddhist
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Buddhist: "Buddhist",
+      /**
+       * Gregorian
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Gregorian: "Gregorian",
+      /**
+       * Islamic
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Islamic: "Islamic",
+      /**
+       * Japanese
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Japanese: "Japanese",
+      /**
+       * Persian
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Persian: "Persian"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_base.dist.types.CalendarType",
+      pkg["CalendarType"]
+    );
+    /**
+     * Different behavior for ItemNavigation.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/ItemNavigationBehavior
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base ItemNavigationBehavior
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["ItemNavigationBehavior"] = {
+      /**
+       * Cycling behavior: navigating past the last item continues with the first and vice versa.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Cyclic: "Cyclic",
+      /**
+       * Static behavior: navigations stops at the first or last item.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Static: "Static"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_base.dist.types.ItemNavigationBehavior",
+      pkg["ItemNavigationBehavior"]
+    );
+    /**
+     * Placements of a moved element relative to a target element.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/MovePlacement
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base MovePlacement
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["MovePlacement"] = {
+      /**
+       * After
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      After: "After",
+      /**
+       * Before
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Before: "Before",
+      /**
+       * On
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      On: "On"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_base.dist.types.MovePlacement",
+      pkg["MovePlacement"]
+    );
+    /**
+     * Different navigation modes for ItemNavigation.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/NavigationMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base NavigationMode
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["NavigationMode"] = {
+      /**
+       * Auto
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Auto: "Auto",
+      /**
+       * Horizontal
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Horizontal: "Horizontal",
+      /**
+       * Paging
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Paging: "Paging",
+      /**
+       * Vertical
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Vertical: "Vertical"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_base.dist.types.NavigationMode",
+      pkg["NavigationMode"]
+    );
+    /**
+     * Defines the sort order.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/SortOrder
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base SortOrder
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["SortOrder"] = {
+      /**
+       * Sorting is applied in ascending order.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Ascending: "Ascending",
+      /**
+       * Sorting is applied in descending order.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Descending: "Descending",
+      /**
+       * Sorting is not applied.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      None: "None"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_base.dist.types.SortOrder",
+      pkg["SortOrder"]
+    );
+    /**
+     * Different types of ValueStates.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/ValueState
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base ValueState
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["ValueState"] = {
+      /**
+       * Critical
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Critical: "Critical",
+      /**
+       * Information
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Information: "Information",
+      /**
+       * Negative
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Negative: "Negative",
+      /**
+       * None
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      None: "None",
+      /**
+       * Positive
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Positive: "Positive"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_base.dist.types.ValueState",
+      pkg["ValueState"]
+    );
+
+    // Interfaces
+
+    // ====================
+    // MONKEY PATCHES BEGIN
+    // ====================
+    // Helper to fix a conversion between "number" and "core.CSSSize".
+    // WebC attribute is a number and is written back to the Control
+    // wrapper via sap.ui.core.webc.WebComponent base class.
+    // The control property is defined as a "sap.ui.core.CSSSize".
+
+    if (!WebComponent.__setProperty__isPatched) {
+      const fnOriginalSetProperty = WebComponent.prototype.setProperty;
+      WebComponent.prototype.setProperty = function (
+        sPropName,
+        v,
+        bSupressInvalidate
+      ) {
+        if ((sPropName === "width" || sPropName === "height") && !isNaN(v)) {
+          const sType = this.getMetadata()
+            .getProperty(sPropName)
+            .getType()
+            .getName();
+          if (sType === "sap.ui.core.CSSSize") {
+            v += "px";
+          }
+        }
+        return fnOriginalSetProperty.apply(this, [
+          sPropName,
+          v,
+          bSupressInvalidate
+        ]);
+      };
+      WebComponent.__setProperty__isPatched = true;
+    }
+
+    // Helper to forward the CustomData to the root dom ref in the shadow dom.
+
+    if (!WebComponent.__CustomData__isPatched) {
+      const fnOriginalOnAfterRendering =
+        WebComponent.prototype.onAfterRendering;
+      WebComponent.prototype.onAfterRendering = function () {
+        const aCustomData = this.getCustomData();
+        if (aCustomData?.length > 0) {
+          setTimeout(
+            function () {
+              const oDomRef = this.getDomRef();
+              // either use the getFocusDomRef method or the getDomRef method to get the shadow DOM reference
+              const oShadowDomRef =
+                oDomRef &&
+                ((typeof oDomRef.getFocusDomRef === "function" &&
+                  oDomRef.getFocusDomRef()) ||
+                  (typeof oDomRef.getDomRef === "function" &&
+                    oDomRef.getDomRef()) ||
+                  (oDomRef.shadowRoot && oDomRef.shadowRoot.firstElementChild)); // for all non UI5Elements
+              if (oShadowDomRef) {
+                aCustomData.forEach(function (oCustomData) {
+                  if (oCustomData.getWriteToDom()) {
+                    const sKey = oCustomData.getKey();
+                    const sValue = oCustomData.getValue();
+                    oShadowDomRef.setAttribute(`data-${sKey}`, sValue);
+                  }
+                });
+              }
+            }.bind(this),
+            0
+          );
+        }
+        return fnOriginalOnAfterRendering.apply(this, arguments);
+      };
+      WebComponent.__CustomData__isPatched = true;
+    }
+
+    // ====================
+    // MONKEY PATCHES END
+    // ====================
+
+    // marker to threat this as an ES module to support named exports
+    pkg.__esModule = true;
+
+    return pkg;
+  }
+);

@@ -1617,9 +1617,9 @@ sap.ui.define([
 
 	QUnit.test("check binding on items is propagated into dialog", async function(assert) {
 		const oVariantsModel = new JSONModel({variants: [
-			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", author: "A", favorite: true, visible: true},
-			{variantKey: "2", variantTitlePart1: "Two", variantTitlePart2: " and Two", favorite: false, visible: true},
-			{variantKey: "3", variantTitlePart1: "Three", variantTitlePart2: " and Three", favorite: false, visible: false}
+			{variantKey: "1", variantTitlePart1: "One", variantTitlePart2: " and One", author: "A", favorite: true, visible: true, sharingMode: "Public"},
+			{variantKey: "2", variantTitlePart1: "Two", variantTitlePart2: " and Two", favorite: false, visible: true, sharingMode: "Private"},
+			{variantKey: "3", variantTitlePart1: "Three", variantTitlePart2: " and Three", favorite: false, visible: false, sharingMode: "Public"}
 		]});
 
 		this.oVM.setModel(oVariantsModel);
@@ -1630,7 +1630,8 @@ sap.ui.define([
 				key: "{variantKey}",
 				title: {parts: [{path: 'variantTitlePart1'}, {path: 'variantTitlePart2'}], formatter: (part1, part2) => `Title: ${part1}${part2}`},
 				author: "Constant Author",
-				visible: "{visible}"
+				visible: "{visible}",
+				sharing: "{sharingMode}"
 			})
 		});
 
@@ -1662,7 +1663,7 @@ sap.ui.define([
 			assert.ok(aCells[1].isA("sap.m.Input"),  "expected controltype found");
 			assert.equal(aCells[1].getValue(), "Title: One and One", "expected title found");
 
-			assert.equal(aCells[2].getText(), "Public", "expected sharing info found");
+			assert.equal(aCells[2].getText(), "Public", "expected sharing info resolved via 'sharingMode' path");
 			assert.ok(aCells[3].getSelected(), "expected default info found");
 			assert.ok(!aCells[4].getSelected(), "expected apply automatically info found");
 			assert.equal(aCells[6].getText(), "Constant Author", "expected author found");
@@ -1680,7 +1681,7 @@ sap.ui.define([
 			assert.ok(aCells[1].isA("sap.m.Input"),  "expected controltype found");
 			assert.equal(aCells[1].getValue(), "Title: Two and Two", "expected title found");
 
-			assert.equal(aCells[2].getText(), "Public", "expected sharing info found");
+			assert.equal(aCells[2].getText(), "Private", "expected sharing info resolved via 'sharingMode' path");
 			assert.ok(!aCells[3].getSelected(), "expected default info found");
 			assert.ok(!aCells[4].getSelected(), "expected apply automatically info found");
 			assert.equal(aCells[6].getText(), "Constant Author", "expected author found");
@@ -2284,6 +2285,130 @@ sap.ui.define([
 				done();
 			}
 
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("delete returns the next visible row when items binding renames key path", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantName: "One",   author: "A", isShown: true,  remove: false},
+			{variantKey: "2", variantName: "Two",   author: "B", isShown: true,  remove: true},
+			{variantKey: "3", variantName: "Three", author: "C", isShown: true,  remove: true},
+			{variantKey: "4", variantName: "Four",  author: "D", isShown: false, remove: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: "{variantName}",
+				author: "{author}",
+				visible: "{isShown}",
+				remove: "{remove}"
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function (oEvent) {
+
+			fOriginalManageCall(oEvent);
+
+			// Deleting "2" should focus on the next visible row, "3"
+			const oVariantItem2 = this.oVM.getItemByKey("2");
+			const oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem2);
+
+			assert.ok(oResult, "expected a result");
+			assert.ok(oResult.isA?.("sap.m.ColumnListItem"), "expected a ColumnListItem (table row)");
+			assert.ok(oResult !== this.oVM.oManagementCancel, "must not fall back to the cancel button");
+
+			const oResolvedItem = this.oVM._findVariantItem(oResult.getBindingContext(this.oVM._sModelName));
+			assert.strictEqual(oResolvedItem.getKey(), "3", "next visible row is the row for variant '3'");
+
+			done();
+
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+
+			fOriginalCall(oEvent);
+
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("duplicate name in manage dialog flags ValueState.Error when items binding renames key/visible paths", async function(assert) {
+		const oVariantsModel = new JSONModel({variants: [
+			{variantKey: "1", variantName: "Alpha", author: "A", isShown: true},
+			{variantKey: "2", variantName: "Beta",  author: "A", isShown: true}
+		]});
+
+		this.oVM.setModel(oVariantsModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/variants",
+			template: new VariantItem("VMI", {
+				key: "{variantKey}",
+				title: "{variantName}",
+				author: "{author}",
+				visible: "{isShown}",
+				rename: true
+			})
+		});
+
+		this.oVM.setDefaultKey("1");
+
+		await nextUIUpdate();
+
+		const done = assert.async();
+
+		this.oVM._createManagementDialog();
+		this.oVM.oManagementDialog.attachAfterClose(function() {
+			done();
+		});
+		this.oVM.oManagementDialog.attachAfterOpen(async function() {
+			// Type the title of row 0 ("Alpha") into row 1's input — exercises the manage-table
+			// duplicate detection (the saved-VariantItem check would still see "Beta" on row 1).
+			await fChangeTitle(this.oVM.oManagementTable, 1, "Alpha");
+
+			const oInput = this.oVM.oManagementTable.getItems()[1].getCells()[VariantManagement.COLUMN_NAME_IDX];
+			assert.equal(oInput.getValueState(), "Error", "duplicate flagged via VariantItem accessors, not raw model field names");
+
+			const oTarget = this.oVM.oManagementCancel.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
 		}.bind(this));
 
 		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);

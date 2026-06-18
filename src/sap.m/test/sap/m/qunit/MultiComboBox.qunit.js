@@ -5412,6 +5412,35 @@ sap.ui.define([
 		oMultiComboBox.destroy();
 	});
 
+	QUnit.test("Change event should not be called if user types and deletes before focusout", async function (assert) {
+		// system under test
+		var oMultiComboBox = new MultiComboBox({
+			items: [
+				new Item({ key: "1", text: "Item 1" })
+			]
+		}).placeAt("MultiComboBoxContent");
+		await nextUIUpdate();
+
+		var oFocusDomRef = oMultiComboBox.getFocusDomRef();
+		var oStub = this.stub(oMultiComboBox, "fireChangeEvent");
+
+		oFocusDomRef.focus();
+		oMultiComboBox.onfocusin({ target: oFocusDomRef });
+
+		qutils.triggerCharacterInput(oFocusDomRef, "a");
+		oMultiComboBox.oninput({
+			target: { value: "a" },
+			setMarked: function() {},
+			srcControl: oMultiComboBox
+		});
+
+		oMultiComboBox.onfocusout({});
+
+		assert.notOk(oStub.called, "change event should not be called when value returns to initial state");
+
+		oMultiComboBox.destroy();
+	});
+
 	QUnit.test('Endless focus loop should not be triggered when Dialog is opened on mobile', async function(assert) {
 		this.clock = sinon.useFakeTimers();
 		// system under test

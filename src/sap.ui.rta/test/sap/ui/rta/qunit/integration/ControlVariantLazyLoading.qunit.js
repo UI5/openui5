@@ -270,7 +270,8 @@ sap.ui.define([
 					support: { user: "LazyUser" }
 				}
 			]);
-			const oLoadFlVariantDependentControlChangesStub = sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oContentResponse);
+			const oLoadFlVariantDependentControlChangesStub = sandbox.stub(Storage, "loadFlVariantDependentControlChanges")
+			.resolves(oContentResponse);
 
 			// Verify the target control is visible before variant switch
 			const oTargetControl = Element.getElementById(sTargetControlId);

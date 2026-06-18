@@ -149,6 +149,41 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("Given getVariantReferencesFromURL", {}, function() {
+		QUnit.test("when no component data is given, an empty array is returned", function(assert) {
+			assert.deepEqual(VariantUtils.getVariantReferencesFromURL(undefined), []);
+		});
+
+		QUnit.test("when component data has no technical parameters, an empty array is returned", function(assert) {
+			assert.deepEqual(VariantUtils.getVariantReferencesFromURL({}), []);
+		});
+
+		QUnit.test("when the variant technical parameter is not set, an empty array is returned", function(assert) {
+			assert.deepEqual(VariantUtils.getVariantReferencesFromURL({ technicalParameters: {} }), []);
+		});
+
+		QUnit.test("when the parameter is a single-entry array with one id, that id is returned", function(assert) {
+			const oComponentData = {
+				technicalParameters: { "sap-ui-fl-control-variant-id": ["variant1"] }
+			};
+			assert.deepEqual(VariantUtils.getVariantReferencesFromURL(oComponentData), ["variant1"]);
+		});
+
+		QUnit.test("when the parameter is a single-entry array with a comma-joined string, the entries are split", function(assert) {
+			const oComponentData = {
+				technicalParameters: { "sap-ui-fl-control-variant-id": ["v1,v2,v3"] }
+			};
+			assert.deepEqual(VariantUtils.getVariantReferencesFromURL(oComponentData), ["v1", "v2", "v3"]);
+		});
+
+		QUnit.test("when the parameter is a multi-entry array, it is returned as-is", function(assert) {
+			const oComponentData = {
+				technicalParameters: { "sap-ui-fl-control-variant-id": ["v1", "v2"] }
+			};
+			assert.deepEqual(VariantUtils.getVariantReferencesFromURL(oComponentData), ["v1", "v2"]);
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});

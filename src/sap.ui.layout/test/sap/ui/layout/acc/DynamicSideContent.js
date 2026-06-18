@@ -9,8 +9,9 @@ sap.ui.require([
 	"sap/m/Shell",
 	"sap/m/Text",
 	"sap/ui/layout/DynamicSideContent",
+	"sap/m/OverflowToolbarLayoutData",
 	"sap/ui/core/library"
-], function(App, OverflowToolbar, ToolbarSpacer, Switch, Label, Page, Title, Shell, Text, DynamicSideContent, coreLibrary) {
+], function(App, OverflowToolbar, ToolbarSpacer, Switch, Label, Page, Title, Shell, Text, DynamicSideContent, OverflowToolbarLayoutData, coreLibrary) {
 	"use strict";
 
 	var TitleLevel = coreLibrary.TitleLevel;
@@ -167,6 +168,19 @@ sap.ui.require([
 
 	var oFooterBar = new OverflowToolbar({
 		content: [
+		new Label({
+			wrapping: true,
+			text: "Toggle side/main content on small screen",
+			labelFor: "toggleContentBtn",
+			layoutData: new OverflowToolbarLayoutData({ priority: "NeverOverflow" })
+		}),
+		new Switch("toggleContentBtn", {
+			state: true,
+			change: function () {
+				oDynamicSideContent.toggle();
+			}
+		}),
+		new ToolbarSpacer(),
 			new Label({
 				wrapping: true,
 				text: "Set limit",
