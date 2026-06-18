@@ -67,8 +67,6 @@ sap.ui.define([],
 				oRm.class("sapMTPCFadeOut");
 			}
 
-			oRm.attr("ondragstart", "return false;");
-			oRm.attr("ondrop", "return false;");
 			oRm.attr("aria-hidden", "true");
 			oRm.openEnd();
 
