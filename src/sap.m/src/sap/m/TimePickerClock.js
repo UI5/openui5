@@ -169,6 +169,8 @@ sap.ui.define([
 		 */
 		TimePickerClock.prototype.init = function() {
 			this._onMouseWheel = this._onMouseWheel.bind(this);
+			this._onDragStart = function(oEvent) { oEvent.preventDefault(); };
+			this._onDrop = function(oEvent) { oEvent.preventDefault(); };
 			this._bFinalChange = false;
 		};
 
@@ -329,9 +331,14 @@ sap.ui.define([
 		 */
 		TimePickerClock.prototype._attachEvents = function() {
 			var oElement = this._getClockCoverContainerDomRef();
+			var oDomRef = this.getDomRef();
 
 			this.$().on(Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", this._onMouseWheel);
 			document.addEventListener("mouseup", jQuery.proxy(this._onMouseOutUp, this), false);
+			if (oDomRef) {
+				oDomRef.addEventListener("dragstart", this._onDragStart, false);
+				oDomRef.addEventListener("drop", this._onDrop, false);
+			}
 			if (oElement) {
 				if (Device.system.combi || Device.system.phone || Device.system.tablet) {
 					// Attach touch events
@@ -356,9 +363,14 @@ sap.ui.define([
 		 */
 		TimePickerClock.prototype._detachEvents = function() {
 			var oElement = this._getClockCoverContainerDomRef();
+			var oDomRef = this.getDomRef();
 
 			this.$().off(Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", this._onMouseWheel);
 			document.removeEventListener("mouseup", jQuery.proxy(this._onMouseOutUp, this), false);
+			if (oDomRef) {
+				oDomRef.removeEventListener("dragstart", this._onDragStart, false);
+				oDomRef.removeEventListener("drop", this._onDrop, false);
+			}
 			if (oElement) {
 				if (Device.system.combi || Device.system.phone || Device.system.tablet) {
 					// Detach touch events
