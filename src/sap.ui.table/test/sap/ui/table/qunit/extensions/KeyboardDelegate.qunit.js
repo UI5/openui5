@@ -7974,18 +7974,23 @@ sap.ui.define([
 		});
 
 		function test(sTitle, aExpectedEvents, fnAct) {
-			aEvents = [];
-			fnAct();
-
+			// Browsers may defer focusin to a later task. Wait before clearing aEvents and triggering the next action so any
+			// deferred focus events from the previous step have settled. Without this, the new focus target may not yet be
+			// registered with UIArea as the current field group control, causing validateFieldGroup to be skipped on the next
+			// keyboard navigation. 50ms has been proven sufficient also on slow systems with CPU throttling.
 			return new Promise(function(resolve) {
-				oTable.attachEventOnce("rowsUpdated", function() {
-					setTimeout(function() {
-						oCellContent = oTable.getRows()[0].getCells()[0].getDomRef();
-						assert.ok(oTable._getKeyboardExtension().isInActionMode(), sTitle + ": Table is in Action Mode");
-						assert.deepEqual(aEvents, aExpectedEvents, sTitle + ": The events were correctly fired");
-						resolve();
-					}, 10);
-				});
+				setTimeout(function() {
+					oTable.attachEventOnce("rowsUpdated", function() {
+						setTimeout(function() {
+							oCellContent = oTable.getRows()[0].getCells()[0].getDomRef();
+							assert.ok(oTable._getKeyboardExtension().isInActionMode(), sTitle + ": Table is in Action Mode");
+							assert.deepEqual(aEvents, aExpectedEvents, sTitle + ": The events were correctly fired");
+							resolve();
+						}, 10);
+					});
+					aEvents = [];
+					fnAct();
+				}, 50);
 			});
 		}
 
