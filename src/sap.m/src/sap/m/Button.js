@@ -539,7 +539,11 @@ sap.ui.define([
 		if (this.getEnabled() && this.getVisible()) {
 			// Safari and Firefox doesn't set the focus to the clicked button tag but to the nearest parent DOM which is focusable
 			// That is why we re-set the focus manually after the browser sets the focus.
-			if ((Device.browser.safari || Device.browser.firefox) && (oEvent.originalEvent && oEvent.originalEvent.type === "mousedown")) {
+			const bIsRightClick = oEvent.which === 3 || (oEvent.ctrlKey && oEvent.which === 1);
+			const bIsSafariOrFirefox = Device.browser.safari || Device.browser.firefox;
+			const bIsMouseDown = oEvent.originalEvent && oEvent.originalEvent.type === "mousedown";
+
+			if ( bIsSafariOrFirefox && bIsMouseDown && !bIsRightClick) {
 				this._setButtonFocus();
 			}
 

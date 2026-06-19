@@ -4887,6 +4887,32 @@ sap.ui.define([
 		assert.equal(oContent._$input.val(), "X", "Field shown value");
 		assert.ok(oValueHelp.getItemForValue.notCalled, "no request for description triggered");
 
+		// other Operator than EQ
+		sinon.stub(oField, "getSupportedOperators").callsFake(function (oValueHelp, oContent, oContext) {
+			const aOperators = oField.getSupportedOperators.wrappedMethod.apply(this, arguments);
+			aOperators.push(OperatorName.DefaultValues);
+			this.setProperty("_operators", aOperators, true);
+			return aOperators;
+		});
+		const oOperator = FilterOperatorUtil.getOperator(OperatorName.DefaultValues);
+		iLiveCount = 0;
+		oCondition = Condition.createCondition(OperatorName.DefaultValues, [[Condition.createItemCondition("I3", "Item 3")]], undefined, undefined, ConditionValidated.NotValidated, {test: "test"});
+		oValueHelp.fireNavigated({ condition: oCondition });
+		oValueHelp.fireVisualFocusSet();
+		assert.equal(iLiveCount, 1, "LiveChange Event fired once");
+		aConditions = oCM.getConditions("Name");
+		assert.equal(aConditions.length, 2, "condition in Codition model not changed");
+		assert.equal(oContent._$input.val(), oOperator.format(oCondition, undefined, oField.getDisplay(), false), "Field shown value");
+
+		oValueHelp.onControlChange.resetHistory();
+		qutils.triggerKeydown(oContent.getFocusDomRef().id, KeyCodes.ENTER, false, false, false);
+		assert.ok(oValueHelp.onControlChange.called, "onControlChange called on ValueHelp");
+		aConditions = oCM.getConditions("Name");
+		assert.equal(aConditions.length, 3, "three conditions in Codition model");
+		assert.deepEqual(aConditions[2]?.values, oCondition.values, "condition value");
+		assert.equal(iSubmitCount, 0, "submit event not fired");
+		oField.getSupportedOperators.restore();
+
 		// no navigation in non-editable field
 		oValueHelp.navigate.resetHistory();
 		oField.setEditMode(FieldEditMode.ReadOnly);
@@ -6170,6 +6196,7 @@ sap.ui.define([
 								assert.equal(oContent.getFocusDomRef().selectionStart, 2, "Selection start");
 								assert.equal(oContent.getFocusDomRef().selectionEnd, 2, "Selection end");
 								assert.ok(oContent._applySuggestionAcc.calledWith(10), "_applySuggestionAcc called");
+								oField._bPreventAutocomplete = false; // initialize as we don't inteact with keyboard events in this test
 
 								oContent._$input.val("XYZ");
 								oContent.fireLiveChange({ value: "XYZ" }); // with operator symbol autocomplete should be deactivated
@@ -6183,9 +6210,32 @@ sap.ui.define([
 									assert.equal(oContent.getFocusDomRef().selectionEnd, 3, "Selection end");
 									assert.ok(oContent._applySuggestionAcc.calledWith(0), "_applySuggestionAcc called");
 
-									oValueHelp.close(); // to be sure
-									oIconContent.destroy();
-									fnDone();
+									// other Operator than EQ
+									sinon.stub(oField, "getSupportedOperators").callsFake(function (oValueHelp, oContent, oContext) {
+										const aOperators = oField.getSupportedOperators.wrappedMethod.apply(this, arguments);
+										aOperators.push(OperatorName.DefaultValues);
+										this.setProperty("_operators", aOperators, true);
+										return aOperators;
+									});
+									const oOperator = FilterOperatorUtil.getOperator(OperatorName.DefaultValues);
+									oContent._$input.val("De");
+									oContent.fireLiveChange({ value: "De" }); // with operator symbol autocomplete should be deactivated
+									oCondition = Condition.createCondition(OperatorName.DefaultValues, [[Condition.createItemCondition("I3", "Item 3")]], undefined, undefined, ConditionValidated.NotValidated, {test: "test"});
+
+									setTimeout(() => { // to wait for Promises and opening
+										oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "De", itemId: "myDefaultItem", items: 11, caseSensitive: false});
+										assert.equal(oContent._$input.val(), oOperator.format(oCondition, undefined, oField.getDisplay(), false), "Output text");
+										// jQuery Plugin "cursorPos"
+										assert.equal(oContent._$input.cursorPos(), 2, "CursorPosition");
+										assert.equal(oContent.getFocusDomRef().selectionStart, 2, "Selection start");
+										assert.equal(oContent.getFocusDomRef().selectionEnd, oContent._$input.val().length, "Selection end");
+										assert.ok(oContent._applySuggestionAcc.calledWith(0), "_applySuggestionAcc called");
+
+										oField.getSupportedOperators.restore();
+										oValueHelp.close(); // to be sure
+										oIconContent.destroy();
+										fnDone();
+									}, 400);
 								}, 400);
 							}, 400);
 						}, 400);

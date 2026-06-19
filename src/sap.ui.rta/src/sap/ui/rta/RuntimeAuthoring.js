@@ -1544,12 +1544,24 @@ sap.ui.define([
 			selector: this.getRootControlInstance(),
 			styleClass: Utils.getRtaStyleClassName(),
 			layer: this.getLayer(),
-			version: this._oVersionsModel.getProperty("/displayedVersion")
-		})
-		.then(function(sMessage) {
-			if (sMessage !== "Error" && sMessage !== "Cancel") {
-				MessageToast.show(sMessage);
+			version: this._oVersionsModel.getProperty("/displayedVersion"),
+			setBusy(bBusy) {
+				if (bBusy) {
+					BusyIndicator.show(0);
+				} else {
+					BusyIndicator.hide();
+				}
 			}
+		})
+		.then(function() {
+			MessageToast.show(this._getTextResources().getText("MSG_PUBLISH_SUCCESS"));
+		}.bind(this))
+		.catch(function(oError) {
+			if (oError instanceof CancelError) {
+				return;
+			}
+			Log.error("publish version error", oError);
+			Utils.showMessageBox("error", "MSG_PUBLISH_ERROR", { error: oError });
 		});
 	}
 
@@ -1749,7 +1761,14 @@ sap.ui.define([
 		const oSelector = FlexUtils.getAppComponentForControl(this.getRootControlInstance());
 		return PersistenceWriteAPI.reset({
 			selector: oSelector,
-			layer: sLayer
+			layer: sLayer,
+			setBusy(bBusy) {
+				if (bBusy) {
+					BusyIndicator.show(0);
+				} else {
+					BusyIndicator.hide();
+				}
+			}
 		}).then(function() {
 			// avoids the data loss popup; a reload is triggered later and will destroy RTA & the command stack
 			this.getCommandStack().removeAllCommands(true);

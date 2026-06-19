@@ -290,10 +290,10 @@ sap.ui.define([
 				aListItems[0].focus(); // if CheckBox clicked focus whole row, as Checkox must not get the Focus inside dropdown
 			}
 
+			const oDelegate = this.getValueHelpDelegate();
 			const aConditions = aListItems.map((oItem) => {
 				const oItemContext = this._getListItemBindingContext(oItem);
-				const oValues = this.getItemFromContext(oItemContext);
-				return oValues && this.createCondition(oValues.key, oValues.description, oValues.payload);
+				return oDelegate.createConditionForContext(this.getValueHelpInstance(), this, oItemContext);
 			});
 			this._fireSelect({ type: oParams.selected ? ValueHelpSelectionType.Add : ValueHelpSelectionType.Remove, conditions: aConditions });
 			if (bIsTypeahead) {
@@ -305,14 +305,13 @@ sap.ui.define([
 	MTable.prototype._handleItemPress = function(oEvent) {
 		const oItem = oEvent.getParameter("listItem");
 		const oItemContext = this._getListItemBindingContext(oItem);
-		const oValues = this.getItemFromContext(oItemContext);
 		const oTable = this._getTable();
 		const bSingleSelectMaster = oTable.getMode() === ListMode.SingleSelectMaster; // Only in this mode the item will already have the desired selection state.
 		const bSelected = bSingleSelectMaster ? oItem.getSelected() : !oItem.getSelected();
 		oItem.setSelected(bSelected);
 		const sSelectType = bSelected ? ValueHelpSelectionType.Add : ValueHelpSelectionType.Remove;
 
-		const oCondition = this.createCondition(oValues.key, oValues.description, oValues.payload);
+		const oCondition = this.getValueHelpDelegate().createConditionForContext(this.getValueHelpInstance(), this, oItemContext);
 		this._fireSelect({ type: sSelectType, conditions: [oCondition] });
 		if (this.isTypeahead()) {
 			this.fireConfirm({ close: true });
@@ -873,8 +872,7 @@ sap.ui.define([
 
 				if (!oItem.isA("sap.m.GroupHeaderListItem")) { // for GroupHeader no condition navigated
 					const oItemContext = this._getListItemBindingContext(oItem);
-					const oValues = this.getItemFromContext(oItemContext);
-					oCondition = oValues && this.createCondition(oValues.key, oValues.description, oValues.payload);
+					oCondition = this.getValueHelpDelegate().createConditionForContext(this.getValueHelpInstance(), this, oItemContext);
 					aConditions.push(oCondition);
 				}
 				if (bSingleSelect) {
@@ -1017,8 +1015,7 @@ sap.ui.define([
 			}
 
 			if (oFirstMatchContext) {
-				const oValueHelpItem = this.getItemFromContext(oFirstMatchContext);
-				const oCondition = this.createCondition(oValueHelpItem.key, oValueHelpItem.description, oValueHelpItem.payload);
+				const oCondition = this.getValueHelpDelegate().createConditionForContext(this.getValueHelpInstance(), this, oFirstMatchContext);
 				const oListItem = aItems.find((oItem) => this._getListItemBindingContext(oItem) === oFirstMatchContext);
 				this.fireTypeaheadSuggested({ condition: oCondition, filterValue: sFilterValue, itemId: oListItem?.getId(), items: iItems, caseSensitive: bCaseSensitive });
 			} else { // nothing found for autocomplete

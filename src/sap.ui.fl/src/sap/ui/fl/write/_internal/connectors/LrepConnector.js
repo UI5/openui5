@@ -5,11 +5,7 @@
 sap.ui.define([
 	"sap/base/util/restricted/_pick",
 	"sap/base/util/merge",
-	"sap/base/Log",
-	"sap/m/MessageBox",
-	"sap/ui/core/BusyIndicator",
 	"sap/ui/core/Component",
-	"sap/ui/core/Lib",
 	"sap/ui/fl/initial/_internal/connectors/LrepConnector",
 	"sap/ui/fl/initial/_internal/connectors/Utils",
 	"sap/ui/fl/initial/_internal/Settings",
@@ -22,11 +18,7 @@ sap.ui.define([
 ], function(
 	_pick,
 	merge,
-	Log,
-	MessageBox,
-	BusyIndicator,
 	Component,
-	Lib,
 	InitialConnector,
 	InitialUtils,
 	Settings,
@@ -190,35 +182,36 @@ sap.ui.define([
 		 * @param {string} [mPropertyBag.generator] Generator with which the changes were created
 		 * @param {string} [mPropertyBag.selectorIds] Selector IDs of controls for which the reset should filter (comma-separated list)
 		 * @param {string} [mPropertyBag.changeTypes] Change types of the changes which should be reset (comma-separated list)
+		 * @param {function(boolean):void} [mPropertyBag.setBusy] Optional callback invoked to request showing (<code>true</code>) or hiding (<code>false</code>) a busy indicator while the reset is running. Hidden during transport selection and re-shown afterwards.
 		 * @returns {Promise} Promise resolves as soon as the reset has completed
 		 */
-		reset(mPropertyBag) {
-			BusyIndicator.show(0); // Reset takes a long time with app descriptor changes, so a BusyIndicator is needed.
-			var aChanges = [];
-			var oTransportSelectionPromise = Promise.resolve(); // By default, no transport needed for USER layer
-
-			if (mPropertyBag.layer !== Layer.USER) {
-				aChanges = mPropertyBag.changes;
-				oTransportSelectionPromise = Settings.getInstance().then(function(oSettings) {
+		async reset(mPropertyBag) {
+			mPropertyBag.setBusy?.(true);
+			try {
+				let aChanges = [];
+				if (mPropertyBag.layer !== Layer.USER) {
+					aChanges = mPropertyBag.changes;
+					const oSettings = await Settings.getInstance();
 					if (!oSettings.getIsProductiveSystem()) {
-						return new TransportSelection().setTransports(aChanges, Component.getComponentById(mPropertyBag.reference)).then(function() {
-							// Make sure we include one request in case of mixed changes (local and transported)
-							aChanges.some(function(oChange) {
-								if (oChange.getRequest()) {
-									mPropertyBag.changelist = oChange.getRequest();
-									return true;
-								}
-								return false;
-							});
+						mPropertyBag.setBusy?.(false);
+						try {
+							await new TransportSelection().setTransports(aChanges, Component.getComponentById(mPropertyBag.reference));
+						} finally {
+							mPropertyBag.setBusy?.(true);
+						}
+						// Make sure we include one request in case of mixed changes (local and transported)
+						aChanges.some(function(oChange) {
+							if (oChange.getRequest()) {
+								mPropertyBag.changelist = oChange.getRequest();
+								return true;
+							}
+							return false;
 						});
 					}
-				});
-			}
+				}
 
-			return oTransportSelectionPromise.then(function() {
-				BusyIndicator.show(0); // Re-display the busy indicator in case it was hide by transport selection
-				var aParameters = ["reference", "layer", "changelist", "generator"];
-				var mParameters = _pick(mPropertyBag, aParameters);
+				const aParameters = ["reference", "layer", "changelist", "generator"];
+				const mParameters = _pick(mPropertyBag, aParameters);
 
 				InitialConnector._addClientInfo(mParameters);
 
@@ -230,26 +223,23 @@ sap.ui.define([
 				}
 
 				delete mPropertyBag.reference;
-				var sResetUrl = InitialUtils.getUrl(ROUTES.CHANGES, mPropertyBag, mParameters);
-				var sTokenUrl = InitialUtils.getUrl(ROUTES.TOKEN, mPropertyBag);
-				var oRequestOption = WriteUtils.getRequestOptions(
+				const sResetUrl = InitialUtils.getUrl(ROUTES.CHANGES, mPropertyBag, mParameters);
+				const sTokenUrl = InitialUtils.getUrl(ROUTES.TOKEN, mPropertyBag);
+				const oRequestOption = WriteUtils.getRequestOptions(
 					InitialConnector,
 					sTokenUrl
 				);
-				return WriteUtils.sendRequest(sResetUrl, "DELETE", oRequestOption).then(function(oResponse) {
-					if (oResponse && oResponse.response) {
-						oResponse.response.forEach(function(oContentId) {
-							oContentId.fileName = oContentId.name;
-							delete oContentId.name;
-						});
-					}
-					BusyIndicator.hide();
-					return oResponse;
-				}).catch(function(oError) {
-					BusyIndicator.hide();
-					return Promise.reject(oError);
-				});
-			});
+				const oResponse = await WriteUtils.sendRequest(sResetUrl, "DELETE", oRequestOption);
+				if (oResponse && oResponse.response) {
+					oResponse.response.forEach(function(oContentId) {
+						oContentId.fileName = oContentId.name;
+						delete oContentId.name;
+					});
+				}
+				return oResponse;
+			} finally {
+				mPropertyBag.setBusy?.(false);
+			}
 		},
 
 		/**
@@ -264,51 +254,32 @@ sap.ui.define([
 		 * @param {string} mPropertyBag.reference Flex reference of the application
 		 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.localChanges Local changes to  be published
 		 * @param {object[]} [mPropertyBag.appVariantDescriptors] An array of app variant descriptors which needs to be transported
-		 * @returns {Promise<string>} Promise that can resolve to the following strings:
-		 * - "Cancel" if publish process was canceled
-		 * - <sMessage> when all the artifacts are successfully transported fl will return the message to show
-		 * - "Error" in case of a problem
+		 * @param {function(boolean):void} [mPropertyBag.setBusy] Optional callback invoked to request showing (<code>true</code>) or hiding (<code>false</code>) a busy indicator after transport selection.
+		 * @returns {Promise} Resolves once all artifacts are successfully transported.
+		 * Rejects with a {@link sap.ui.fl.util.CancelError} if the user cancelled the transport selection.
+		 * Rejects with the originating error otherwise.
 		 */
-		publish(mPropertyBag) {
-			var oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
-
-			var fnHandleAllErrors = function(oError) {
-				BusyIndicator.hide();
-				var sMessage = oResourceBundle.getText("MSG_TRANSPORT_ERROR", oError ? [oError.message || oError] : undefined);
-				var sTitle = oResourceBundle.getText("HEADER_TRANSPORT_ERROR");
-				Log.error(`transport error: ${oError}`);
-				MessageBox.show(sMessage, {
-					icon: MessageBox.Icon.ERROR,
-					title: sTitle,
-					styleClass: mPropertyBag.transportDialogSettings.styleClass
-				});
-				return "Error";
-			};
-
-			var oTransportSelection = new TransportSelection();
-			return oTransportSelection.openTransportSelection(null, mPropertyBag.transportDialogSettings.rootControl, mPropertyBag.transportDialogSettings.styleClass)
-			.then(function(oTransportInfo) {
-				if (oTransportSelection.checkTransportInfo(oTransportInfo)) {
-					BusyIndicator.show(0);
-					var oContentParameters = {
-						reference: mPropertyBag.reference,
-						layer: mPropertyBag.layer
-					};
-					return oTransportSelection._prepareChangesForTransport(
-						oTransportInfo,
-						mPropertyBag.localChanges,
-						mPropertyBag.appVariantDescriptors,
-						oContentParameters
-					).then(function() {
-						BusyIndicator.hide();
-						if (oTransportInfo.transport === "ATO_NOTIFICATION") {
-							return oResourceBundle.getText("MSG_ATO_NOTIFICATION");
-						}
-						return oResourceBundle.getText("MSG_TRANSPORT_SUCCESS");
-					});
-				}
-				return "Cancel";
-			}).catch(fnHandleAllErrors);
+		async publish(mPropertyBag) {
+			const oTransportSelection = new TransportSelection();
+			const oTransportInfo = await oTransportSelection.openTransportSelection(
+				null,
+				mPropertyBag.transportDialogSettings.rootControl,
+				mPropertyBag.transportDialogSettings.styleClass
+			);
+			if (!oTransportSelection.checkTransportInfo(oTransportInfo)) {
+				throw new CancelError();
+			}
+			mPropertyBag.setBusy?.(true);
+			try {
+				return await oTransportSelection._prepareChangesForTransport(
+					oTransportInfo,
+					mPropertyBag.localChanges,
+					mPropertyBag.appVariantDescriptors,
+					{ reference: mPropertyBag.reference, layer: mPropertyBag.layer }
+				);
+			} finally {
+				mPropertyBag.setBusy?.(false);
+			}
 		},
 
 		/**
@@ -770,27 +741,10 @@ sap.ui.define([
 				return WriteUtils.sendRequest(sVersionsUrl, "DELETE", oRequestOption);
 			},
 			publish(mPropertyBag) {
-				var oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
-
-				var fnHandleAllErrors = function(oError) {
-					BusyIndicator.hide();
-					var sMessage = oResourceBundle.getText("MSG_TRANSPORT_ERROR", oError ? [oError.message || oError] : undefined);
-					var sTitle = oResourceBundle.getText("HEADER_TRANSPORT_ERROR");
-					Log.error(`transport error${oError}`);
-					MessageBox.show(sMessage, {
-						icon: MessageBox.Icon.ERROR,
-						title: sTitle,
-						styleClass: mPropertyBag.styleClass
-					});
-					return "Error";
-				};
-
 				var oTransportSelection = new TransportSelection();
 				return oTransportSelection.openTransportSelection(null, mPropertyBag.rootControl, mPropertyBag.styleClass, false)
 				.then(function(oTransportInfo) {
 					if (oTransportSelection.checkTransportInfo(oTransportInfo)) {
-						BusyIndicator.show(0);
-
 						if (!oTransportInfo.transport) {
 							return Promise.reject(new Error("no transport provided as attribute of mParameters"));
 						}
@@ -800,6 +754,8 @@ sap.ui.define([
 						if (!mPropertyBag.version) {
 							return Promise.reject(new Error("no version provided as attribute of mParameters"));
 						}
+
+						mPropertyBag.setBusy?.(true);
 
 						var mParameters = {
 							transport: oTransportInfo.transport,
@@ -819,16 +775,12 @@ sap.ui.define([
 							"application/json; charset=utf-8", "json"
 						);
 						return WriteUtils.sendRequest(sUrl, "POST", oRequestOption)
-						.then(function() {
-							BusyIndicator.hide();
-							if (oTransportInfo.transport === "ATO_NOTIFICATION") {
-								return oResourceBundle.getText("MSG_ATO_NOTIFICATION");
-							}
-							return oResourceBundle.getText("MSG_TRANSPORT_SUCCESS");
+						.finally(function() {
+							mPropertyBag.setBusy?.(false);
 						});
 					}
-					return "Cancel";
-				}).catch(fnHandleAllErrors);
+					throw new CancelError();
+				});
 			}
 		}
 	});

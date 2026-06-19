@@ -3366,15 +3366,24 @@ sap.ui.define([
 
 	function _createNavigateCondition(oCondition, sItemId) {
 
-		const oOperator = FilterOperatorUtil.getEQOperator(this.getSupportedOperators()); /// use EQ operator of Field (might be different one)
 		let oNavigateCondition;
 
 		if (oCondition) {
 			oNavigateCondition = merge({}, oCondition); // to keep In- and OutParameters
-			oNavigateCondition.operator = oOperator.name;
-			const vKey = oCondition.values[0];
+
+			const aSupportedOperators = this.getSupportedOperators();
+			if (aSupportedOperators.indexOf(oCondition.operator) < 0) {
+				const oOperator = FilterOperatorUtil.getOperator(oCondition.operator);
+				const oEQOperator = FilterOperatorUtil.getEQOperator(aSupportedOperators);
+				if (oEQOperator && FilterOperatorUtil.isEQOperator(oOperator)) {
+					oNavigateCondition.operator = oEQOperator.name; // use EQ operator of Field (might be different one)
+				} else { // not supported Operator
+					throw new Error("Operator " + oCondition.operator + " not supported in " + this);
+				}
+			}
 
 			if (this.getContentFactory().isMeasure()) {
+				const vKey = oCondition.values[0];
 				const aConditions = this.getConditions();
 				// use number of first condition. In Multicase all conditions must be updated in change event
 				if (aConditions.length > 0) {
@@ -3420,20 +3429,29 @@ sap.ui.define([
 		// determine formatted value used for output
 		let sKey;
 		let sDescription;
-
-		// get output texts
-		if (oDataType) {
-			sKey = oDataType.formatValue(oCondition.values[0], "string");
-		} else {
-			sKey = oCondition.values[0];
-		}
-
-		if (oCondition.values.length > 1) { // as condition could only contain a key
-			if (oAdditionalDataType) {
-				sDescription = oAdditionalDataType.formatValue(oCondition.values[1], "string");
+		const oOperator = FilterOperatorUtil.getOperator(oCondition.operator);
+		const oEQOperator = FilterOperatorUtil.getEQOperator(this.getSupportedOperators());
+		if (!oOperator) {
+			throw new Error("Operator " + oCondition.operator + " not defined. " + this);
+		} else if (oOperator.name === oEQOperator?.name) {
+			// get output texts
+			if (oDataType) {
+				sKey = oDataType.formatValue(oCondition.values[0], "string");
 			} else {
-				sDescription = oCondition.values[1];
+				sKey = oCondition.values[0];
 			}
+
+			if (oCondition.values.length > 1) { // as condition could only contain a key
+				if (oAdditionalDataType) {
+					sDescription = oAdditionalDataType.formatValue(oCondition.values[1], "string");
+				} else {
+					sDescription = oCondition.values[1];
+				}
+			}
+		} else {
+			// other operator used -> use Operator name as key and formatted value as description
+			sKey = oOperator.name;
+			sDescription = oOperator.format(oCondition, oDataType, this.getDisplay(), oContentFactory.getHideOperator(), oContentFactory.getCompositeTypes(), oAdditionalDataType, oContentFactory.getAdditionalCompositeTypes(), undefined, this.getBaseType());
 		}
 
 		// check if entered text matches result

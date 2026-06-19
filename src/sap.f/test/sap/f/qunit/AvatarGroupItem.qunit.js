@@ -10,7 +10,7 @@ function (
 ) {
 	"use strict";
 
-	var DOM_RENDER_LOCATION = "qunit-fixture",
+	const DOM_RENDER_LOCATION = "qunit-fixture",
 		sControlId = "AvatarGroupItemId";
 
 	function createAvatarGroupItem(oProps, sId) {
@@ -35,15 +35,14 @@ function (
 
 	QUnit.module("Basic Rendering");
 
-	QUnit.test("Rendering", async function (assert) {
+	QUnit.test("renders AvatarGroupItem with correct CSS class and tabindex based on group type and interactivity", async function (assert) {
 		// Arrange
-		var oAvatarGroupItem = createAvatarGroupItem(),
-			$oDomRef;
+		const oAvatarGroupItem = createAvatarGroupItem();
 
 		// Act
 		oAvatarGroupItem.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate();
-		$oDomRef = oAvatarGroupItem.$();
+		const $oDomRef = oAvatarGroupItem.$();
 
 		// Assert
 		assert.ok($oDomRef, "The AvatarGroupItem is rendered");
@@ -75,9 +74,9 @@ function (
 		afterEach: teardownFunction
 	});
 
-	QUnit.test("setSrc", async function (assert) {
+	QUnit.test("setSrc updates the src property of the inner Avatar", async function (assert) {
 		// Arrange
-		var sNewSrc = "newSrc",
+		const sNewSrc = "newSrc",
 			oAvatar = this.oAvatarGroupItem._getAvatar();
 
 		// Assert
@@ -91,9 +90,9 @@ function (
 		assert.strictEqual(oAvatar.getSrc(), sNewSrc, "src of Avatar is changed correctly");
 	});
 
-	QUnit.test("setInitials", async function (assert) {
+	QUnit.test("setInitials updates the initials property of the inner Avatar", async function (assert) {
 		// Arrange
-		var sNewInitials = "GR",
+		const sNewInitials = "GR",
 			oAvatar = this.oAvatarGroupItem._getAvatar();
 
 		// Assert
@@ -107,9 +106,9 @@ function (
 		assert.strictEqual(oAvatar.getInitials(), sNewInitials, "initials of Avatar is changed correctly");
 	});
 
-	QUnit.test("setFallbackIcon", async function (assert) {
+	QUnit.test("setFallbackIcon updates the fallbackIcon property of the inner Avatar", async function (assert) {
 		// Arrange
-		var sNewFallbackIcon = "newIcon",
+		const sNewFallbackIcon = "newIcon",
 			oAvatar = this.oAvatarGroupItem._getAvatar();
 
 		// Assert
@@ -124,7 +123,7 @@ function (
 	});
 
 
-	QUnit.test("Avatar Group Item tooltip", async function (assert) {
+	QUnit.test("setTooltip renders tooltip as title attribute on the AvatarGroupItem DOM element", async function (assert) {
 		// Arrange
 
 		this.oAvatarGroupItem.setTooltip("New Tooltip");
@@ -139,27 +138,27 @@ function (
 		afterEach: teardownFunction
 	});
 
-	QUnit.test("_setDisplaySize", function (assert) {
+	QUnit.test("_setDisplaySize sets the displaySize property of the inner Avatar", function (assert) {
 		// Arrange
-		var oAvatar = this.oAvatarGroupItem._getAvatar();
+		const oAvatar = this.oAvatarGroupItem._getAvatar();
 		this.oAvatarGroupItem._setDisplaySize("S");
 
 		// Assert
 		assert.strictEqual(oAvatar.getDisplaySize(), "S", "displaySize of Avatar is set correctly");
 	});
 
-	QUnit.test("_setAvatarColor", function (assert) {
+	QUnit.test("_setAvatarColor sets the backgroundColor property of the inner Avatar", function (assert) {
 		// Arrange
-		var oAvatar = this.oAvatarGroupItem._getAvatar();
+		const oAvatar = this.oAvatarGroupItem._getAvatar();
 		this.oAvatarGroupItem._setAvatarColor("Accent1");
 
 		// Assert
 		assert.strictEqual(oAvatar.getBackgroundColor(), "Accent1", "backgroundColor of Avatar is set correctly");
 	});
 
-	QUnit.test("_setGroupType", function (assert) {
+	QUnit.test("_setGroupType sets the groupType and triggers invalidation", function (assert) {
 		// Arrange
-		var oSpy = this.spy(this.oAvatarGroupItem, "invalidate");
+		const oSpy = this.spy(this.oAvatarGroupItem, "invalidate");
 		this.oAvatarGroupItem._setGroupType("Group");
 
 		// Assert
@@ -167,18 +166,18 @@ function (
 		assert.strictEqual(oSpy.callCount, 1, "Invalidate is called");
 	});
 
-	QUnit.test("_getAvatar", function (assert) {
+	QUnit.test("_getAvatar returns a sap.m.Avatar instance with showBorder set to true", function (assert) {
 		// Arrange
-		var oAvatar = this.oAvatarGroupItem._getAvatar();
+		const oAvatar = this.oAvatarGroupItem._getAvatar();
 
 		// Assert
 		assert.ok(oAvatar.isA("sap.m.Avatar"), "Avatar instance is created");
 		assert.strictEqual(oAvatar.getShowBorder(), true, "showBorder of Avatar is true");
 	});
 
-	QUnit.test("_setCustomDisplaySize", function (assert) {
+	QUnit.test("_setCustomDisplaySize sets custom display size and font size on the inner Avatar", function (assert) {
 		// Arrange
-		var oAvatar = this.oAvatarGroupItem._getAvatar();
+		const oAvatar = this.oAvatarGroupItem._getAvatar();
 		this.oAvatarGroupItem._setDisplaySize("Custom");
 		this.oAvatarGroupItem._setCustomDisplaySize("3rem");
 
@@ -187,9 +186,9 @@ function (
 		assert.strictEqual(oAvatar.getCustomDisplaySize(), "3rem", "customDisplaySize of Avatar is set correctly");
 	});
 
-	QUnit.test("_setCustomFontSize", function (assert) {
+	QUnit.test("_setCustomFontSize sets custom font size on the inner Avatar when display size is Custom", function (assert) {
 		// Arrange
-		var oAvatar = this.oAvatarGroupItem._getAvatar();
+		const oAvatar = this.oAvatarGroupItem._getAvatar();
 		this.oAvatarGroupItem._setDisplaySize("Custom");
 		this.oAvatarGroupItem._setCustomFontSize("0.5rem");
 

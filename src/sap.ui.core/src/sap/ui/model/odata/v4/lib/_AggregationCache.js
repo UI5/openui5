@@ -1194,18 +1194,21 @@ sap.ui.define([
 	};
 
 	/**
-	 * Nothing to do here, we have no created elements.
+	 * Returns all created elements for the given path. Nothing to do here for a recursive hierarchy
+	 * (no created elements), but for data aggregation.
 	 *
-	 * @param {string} [_sPath]
+	 * @param {string} sPath
 	 *   Relative path to drill-down into
 	 * @returns {object[]}
-	 *   An empty array
+	 *   An array with all created elements
 	 *
 	 * @public
 	 */
 	// @override sap.ui.model.odata.v4.lib._Cache#getCreatedElements
-	_AggregationCache.prototype.getCreatedElements = function (_sPath) {
-		return [];
+	_AggregationCache.prototype.getCreatedElements = function (sPath) {
+		return this.oAggregation.hierarchyQualifier
+			? []
+			: this.oFirstLevel.getCreatedElements(sPath);
 	};
 
 	/**
@@ -2651,16 +2654,11 @@ sap.ui.define([
 		if (bIsGrouped) {
 			throw new Error("Unsupported grouping via sorter");
 		}
-
 		for (const sPredicate in mKeptElementPredicates) {
 			const oKeptElement = this.aElements.$byPredicate[sPredicate];
 			if (_Helper.hasPrivateAnnotation(oKeptElement, "placeholder")) {
 				throw new Error("Unexpected placeholder");
 			}
-			delete oKeptElement["@$ui5.node.isExpanded"];
-			delete oKeptElement["@$ui5.node.level"];
-			delete oKeptElement["@$ui5._"];
-			_Helper.setPrivateAnnotation(oKeptElement, "predicate", sPredicate);
 		}
 
 		// "super" call (like @borrows ...)
@@ -2669,7 +2667,7 @@ sap.ui.define([
 		if (!this.oAggregation.hierarchyQualifier) {
 			iCreated = this.aElements.$created = this.oFirstLevel.getCreated();
 		}
-		fnSuper.call(this, mKeptElementPredicates, sGroupId, mQueryOptions);
+		fnSuper.call(this, {...mKeptElementPredicates}, sGroupId, mQueryOptions);
 		if (sGroupId) { // sGroupId means we are in a side-effects refresh
 			this.oBackup.oCountPromise = this.oCountPromise;
 			this.oBackup.oFirstLevel = this.oFirstLevel;
@@ -2684,7 +2682,7 @@ sap.ui.define([
 
 		let oFirstLevel;
 		if (this.bKeptFirstLevel || iCreated) {
-			this.oFirstLevel.reset(mKeptElementPredicates, sGroupId, {
+			this.oFirstLevel.reset({...mKeptElementPredicates}, sGroupId, {
 				...mQueryOptions,
 				$count : true
 			});
@@ -2696,6 +2694,18 @@ sap.ui.define([
 		this.oFirstLevel = null;
 		this.doReset(oAggregation, _AggregationHelper.hasGrandTotal(oAggregation.aggregate),
 			oFirstLevel);
+
+		this.aElements.forEach((o) => { // Note: only created elements survive above #reset
+			delete mKeptElementPredicates[_Helper.getPrivateAnnotation(o, "predicate")];
+			delete mKeptElementPredicates[_Helper.getPrivateAnnotation(o, "transientPredicate")];
+		});
+		for (const sPredicate in mKeptElementPredicates) { // kept alive *outside* collection
+			const oKeptElement = this.aElements.$byPredicate[sPredicate];
+			delete oKeptElement["@$ui5.node.isExpanded"];
+			delete oKeptElement["@$ui5.node.level"];
+			delete oKeptElement["@$ui5._"];
+			_Helper.setPrivateAnnotation(oKeptElement, "predicate", sPredicate);
+		}
 	};
 
 	/**

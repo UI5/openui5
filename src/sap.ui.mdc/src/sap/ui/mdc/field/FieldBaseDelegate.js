@@ -329,9 +329,13 @@ sap.ui.define([
 	FieldBaseDelegate.getAutocompleteOutput = function(oField, oCondition, sKey, sDescription, bKeyMatch, bDescriptionMatch) {
 
 		const sDisplay = oField.getDisplay();
+		const oOperator = FilterOperatorUtil.getOperator(oCondition.operator);
+		const oEQOperator = FilterOperatorUtil.getEQOperator(oField.getSupportedOperators());
 		let sOutput;
 
-		if (sDisplay === FieldDisplay.Value) {
+		if (oOperator?.name !== oEQOperator?.name) { // different Operator than "equal" -> use Description (formatted operator)
+			sOutput = bDescriptionMatch ? sDescription : sKey;
+		} else if (sDisplay === FieldDisplay.Value) {
 			if (bKeyMatch) {
 				sOutput = sKey;
 			}

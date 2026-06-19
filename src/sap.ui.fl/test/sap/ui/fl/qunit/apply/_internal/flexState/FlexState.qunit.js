@@ -843,6 +843,7 @@ sap.ui.define([
 		},
 		afterEach() {
 			sandbox.restore();
+			FlexState.clearState();
 			this.oAppComponent.destroy();
 			FlexState.rebuildFilteredResponse(this.sReference);
 			FlexState.clearRuntimeSteadyObjects(this.sReference, sComponentId);
@@ -1158,6 +1159,53 @@ sap.ui.define([
 				"then one flex object was deleted"
 			);
 			assert.strictEqual(oDataSelectorUpdateSpy.callCount, 1, "then the data selector update was called");
+		});
+
+		QUnit.test("A flex object is deleted and is removed from the liveDependencyMap", async function(assert) {
+			// Initialize with a UIChange that has a selector id, so it is added to the liveDependencyMap
+			mockLoader({
+				changes: {
+					changes: [{
+						fileName: "change1",
+						fileType: "change",
+						changeType: "rename",
+						selector: {
+							id: "myControl"
+						}
+					}]
+				}
+			});
+
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: this.sComponentId
+			});
+
+			const oInitialLiveDependencyMap = FlexState.getRuntimeOnlyData(sReference).liveDependencyMap;
+			assert.ok(
+				Object.values(oInitialLiveDependencyMap.mChanges).flat().some((oChange) => oChange.getId() === "change1"),
+				"then change1 is in the liveDependencyMap after initialization"
+			);
+
+			// Reinitialize without change1; same loaderCacheKey (undefined) triggers updateRuntimePersistence
+			mockLoader();
+
+			await FlexState.reinitialize({
+				reference: sReference,
+				componentId: this.sComponentId,
+				manifest: {},
+				componentData: {}
+			});
+
+			const oUpdatedLiveDependencyMap = FlexState.getRuntimeOnlyData(sReference).liveDependencyMap;
+			assert.strictEqual(
+				Object.values(oUpdatedLiveDependencyMap.mChanges).flat().some((oChange) => oChange.getId() === "change1"), false,
+				"then change1 is removed from the liveDependencyMap"
+			);
+			assert.strictEqual(
+				UIChangesState.getAllUIChanges(sReference).length, 0,
+				"then the flex object is no longer in the runtime persistence"
+			);
 		});
 
 		QUnit.test("no update required (nothing changed)", async function(assert) {

@@ -44,6 +44,8 @@ sap.ui.define([
 		Mp4: "video/mp4",
 		Quicktime: "video/quicktime",
 		MsVideo: "video/x-msvideo",
+		Webm: "video/webm",
+		Ogg: "video/ogg",
 		Vds: "model/vnd.sap.vds"
 	};
 
@@ -63,7 +65,7 @@ sap.ui.define([
 	 * <ul><li>Image (PNG, JPEG, BMP, GIF)</li>
 	 * <li>PDF</li>
 	 * <li>Text (Txt)</li>
-	 * <li>Video (MP4, MPEG, QuickTime, MS Video) — playback depends on browser codec support.</li>
+	 * <li>Video (MP4, QuickTime, WebM, OGG) — playback depends on browser codec support.</li>
 	 * <li>SAP 3D Visual models (VDS) — requires {@link sap.ui.vk} and WebGL support.</li></ul>
 	 *
 	 * @author SAP SE
@@ -249,6 +251,15 @@ sap.ui.define([
 		},
 
 		/**
+		 * @param {string} sType The MIME type to check
+		 * @return {string} The result of canPlayType for the given MIME type
+		 * @private
+		 */
+		_canPlayType: function (sType) {
+			return document.createElement("video").canPlayType(sType);
+		},
+
+		/**
 		 * @return {boolean} Whether WebGL is available in the current browser context
 		 * @private
 		 */
@@ -424,11 +435,17 @@ sap.ui.define([
 
 			let sMediaType = oItem.getMediaType();
 
-			// VDS files have no browser MIME type (File.type = ""), fall back to extension detection.
+			// Some backends serve files as application/octet-stream regardless of type, fall back to extension detection.
 			if (!sMediaType || sMediaType === "application/octet-stream") {
 				const sExt = (oItem.getFileName() || "").split(".").pop().toLowerCase();
-				if (sExt === "vds") {
-					sMediaType = PreviewableMediaType.Vds;
+				const mExtensionMap = {
+					"vds": PreviewableMediaType.Vds,
+					"mov": PreviewableMediaType.Quicktime,
+					"webm": PreviewableMediaType.Webm,
+					"ogg": PreviewableMediaType.Ogg
+				};
+				if (mExtensionMap[sExt]) {
+					sMediaType = mExtensionMap[sExt];
 				}
 			}
 
@@ -465,9 +482,10 @@ sap.ui.define([
 				case PreviewableMediaType.Mpeg:
 				case PreviewableMediaType.Mp4:
 				case PreviewableMediaType.Quicktime:
-				case PreviewableMediaType.MsVideo: {
-					const oTestVideo = document.createElement("video");
-					if (!oTestVideo.canPlayType(sMediaType.toLowerCase())) {
+				case PreviewableMediaType.MsVideo:
+				case PreviewableMediaType.Webm:
+				case PreviewableMediaType.Ogg: {
+					if (!this._canPlayType(sMediaType.toLowerCase())) {
 						break;
 					}
 					const oPage = new HTML({

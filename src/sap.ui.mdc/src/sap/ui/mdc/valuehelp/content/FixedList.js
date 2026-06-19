@@ -269,8 +269,7 @@ sap.ui.define([
 
 			if (oFirstMatchContext) {
 				const oListItem = aItems.find((oItem) => oItem.getBindingContext("$help") === oFirstMatchContext);
-				const oOriginalItem = _getOriginalItem.call(this, oListItem);
-				const oCondition = this.createCondition(_getKey.call(this, oOriginalItem), _getText.call(this, oOriginalItem));
+				const oCondition = this.getValueHelpDelegate().createConditionForContext(this.getValueHelpInstance(), this, oFirstMatchContext);
 				const aRelevantContexts = this.getListBinding()?.getCurrentContexts();
 				const iItems = aRelevantContexts?.length;
 				this.fireTypeaheadSuggested({ condition: oCondition, filterValue: sFilterValue, itemId: oListItem?.getId(), items: iItems, caseSensitive: bCaseSensitive });
@@ -290,21 +289,19 @@ sap.ui.define([
 		const bSelected = oItem.getSelected();
 
 		if (bSelected) {
-			const oOriginalItem = _getOriginalItem.call(this, oItem);
-			const vKey = _getKey.call(this, oOriginalItem);
-			const vDescription = _getText.call(this, oOriginalItem);
-			//			this.fireRemoveConditions({conditions: this.getConditions()});
-			_setConditions.call(this, vKey, vDescription);
-			//			this.fireAddConditions({conditions: this.getConditions()});
+			_setConditionsFromItem.call(this, oItem);
 			this.fireSelect({ type: ValueHelpSelectionType.Set, conditions: this.getConditions() });
 			this.fireConfirm();
 		}
 
 	}
 
-	function _setConditions(vKey, sValue) {
+	function _setConditionsFromItem(oItem) {
 
-		const oCondition = vKey === null ? null : this.createCondition(vKey, sValue);
+		const oItemContext = oItem.getBindingContext("$help");
+		const oOriginalItem = _getOriginalItem.call(this, oItem);
+		const vKey = _getKey.call(this, oOriginalItem);
+		const oCondition = vKey === null ? null : this.getValueHelpDelegate().createConditionForContext(this.getValueHelpInstance(), this, oItemContext);
 		const aConditions = oCondition ? [oCondition] : [];
 		const aOldConditions = this.getConditions();
 
@@ -636,8 +633,6 @@ sap.ui.define([
 		if (oItem) {
 			const bUseFirstMatch = this.getUseFirstMatch(); // if item for first match is selected, navigate to it needs to fire the event
 			if (oItem !== oSelectedItem || (bUseFirstMatch && !bLeaveFocus) || (this._iNavigateIndex !== iSelectedIndex && !bLeaveFocus)) { // new item or already selected or highlighted item is navigated (focus set on dropdown)
-				let oOriginalItem, vKey, vDescription;
-
 				this._iNavigateIndex = iSelectedIndex;
 
 				if (bIsOpen) {
@@ -652,11 +647,8 @@ sap.ui.define([
 					delete this._bConditionSetByNavigate;
 					this.fireNavigated({ condition: undefined, itemId: oItem.getId(), leaveFocus: false });
 				} else {
-					oOriginalItem = _getOriginalItem.call(this, oItem);
-					vKey = _getKey.call(this, oOriginalItem);
-					vDescription = _getText.call(this, oOriginalItem);
 					this._bConditionSetByNavigate = true;
-					const oCondition = _setConditions.call(this, vKey, vDescription);
+					const oCondition = _setConditionsFromItem.call(this, oItem);
 					delete this._bConditionSetByNavigate;
 					const oValueHelpDelegate = this.getValueHelpDelegate();
 					const bCaseSensitive = oValueHelpDelegate.isFilteringCaseSensitive(this.getValueHelpInstance(), this);

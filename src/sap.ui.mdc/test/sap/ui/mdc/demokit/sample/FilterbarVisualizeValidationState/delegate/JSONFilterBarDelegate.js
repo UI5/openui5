@@ -40,7 +40,7 @@ sap.ui.define([
 		if (mValidation.status === FilterBarValidationStatus.RequiredHasNoValue) {
 			sErrorMessage = oFilterBar.getResourceFileText("filterbar.REQUIRED_CONDITION_MISSING");
 			sErrorMessage = sErrorMessage.slice(0, -1) + ":\n";
-			[].filter((oFilterField) => {
+			oFilterBar.getFilterItems().filter((oFilterField) => {
 				if (oFilterField && (oFilterField.getValueState() !== ValueState.None)) {
 					sErrorMessage += "\n" + oFilterField.getLabel();
 				}

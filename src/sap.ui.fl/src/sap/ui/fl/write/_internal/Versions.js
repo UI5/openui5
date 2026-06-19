@@ -368,9 +368,11 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.reference - ID of the application for which the versions are requested (this reference must not contain the ".Component" suffix)
 	 * @param {string} mPropertyBag.layer - Layer for which the versions should be retrieved
 	 * @param {string} mPropertyBag.version - The number of the version to be published
-	 * @returns {Promise<sap.ui.fl.Version>} Promise resolving when the version was published;
-	 * rejects if an error occurs, the layer does not support draft handling, there is no version to publish or
-	 * when the displayed version is already published
+	 * @param {function(boolean):void} [mPropertyBag.setBusy] - Optional callback invoked by the connector to request showing (<code>true</code>) or hiding (<code>false</code>) a busy indicator.
+	 * The connector decides when to call it (e.g. an ABAP connector calls it after the transport selection dialog closes).
+	 * @returns {Promise} Resolves when the version was published.
+	 * Rejects with a {@link sap.ui.fl.util.CancelError} if the user cancelled the publish flow.
+	 * Rejects with the originating error otherwise.
 	 */
 	Versions.publish = function(mPropertyBag) {
 		var oModel = Versions.getVersionsModel({
@@ -378,25 +380,21 @@ sap.ui.define([
 			layer: mPropertyBag.layer
 		});
 		return Storage.versions.publish(mPropertyBag)
-		.then(function(sMessage) {
-			// If transport version success, disable publish version button
-			if (sMessage !== "Error" && sMessage !== "Cancel") {
-				oModel.setProperty("/publishVersionEnabled", false);
-				var aVersions = oModel.getProperty("/versions");
-				var bIsPublishedOrOlderVersion = false;
-				aVersions.forEach(function(oVersion) {
-					if (oVersion.isPublished) {
-						return;
-					}
-					if (oVersion.version === mPropertyBag.version) {
-						bIsPublishedOrOlderVersion = true;
-					}
-					if (bIsPublishedOrOlderVersion && !oVersion.isPublished) {
-						oVersion.isPublished = true;
-					}
-				});
-			}
-			return sMessage;
+		.then(function() {
+			oModel.setProperty("/publishVersionEnabled", false);
+			var aVersions = oModel.getProperty("/versions");
+			var bIsPublishedOrOlderVersion = false;
+			aVersions.forEach(function(oVersion) {
+				if (oVersion.isPublished) {
+					return;
+				}
+				if (oVersion.version === mPropertyBag.version) {
+					bIsPublishedOrOlderVersion = true;
+				}
+				if (bIsPublishedOrOlderVersion && !oVersion.isPublished) {
+					oVersion.isPublished = true;
+				}
+			});
 		});
 	};
 

@@ -1,9 +1,6 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/m/MessageBox",
-	"sap/ui/core/BusyIndicator",
-	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/initial/_internal/connectors/LrepConnector",
 	"sap/ui/fl/initial/_internal/connectors/Utils",
@@ -17,9 +14,6 @@ sap.ui.define([
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
-	MessageBox,
-	BusyIndicator,
-	Lib,
 	FlexObjectFactory,
 	InitialLrepConnector,
 	InitialUtils,
@@ -202,7 +196,7 @@ sap.ui.define([
 			var fnOpenTransportSelectionStub = sandbox.stub(TransportSelection.prototype, "openTransportSelection").returns(Promise.resolve(oMockTransportInfo));
 			var fnCheckTransportInfoStub = sandbox.stub(TransportSelection.prototype, "checkTransportInfo").returns(true);
 			var fnPrepareChangesForTransportStub = sandbox.stub(TransportSelection.prototype, "_prepareChangesForTransport").returns(Promise.resolve());
-			var oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
+			const aSetBusyCalls = [];
 
 			return WriteLrepConnector.publish({
 				transportDialogSettings: {
@@ -212,9 +206,9 @@ sap.ui.define([
 				layer: this.sLayer,
 				reference: this.sReference,
 				localChanges: this.aMockLocalChanges,
-				appVariantDescriptors: this.aAppVariantDescriptors
-			}).then(function(sMessage) {
-				assert.equal(sMessage, oResourceBundle.getText("MSG_TRANSPORT_SUCCESS"), "the correct message was returned");
+				appVariantDescriptors: this.aAppVariantDescriptors,
+				setBusy(bBusy) { aSetBusyCalls.push(bBusy); }
+			}).then(function() {
 				assert.ok(fnOpenTransportSelectionStub.calledOnce, "then openTransportSelection called once");
 				assert.equal(fnOpenTransportSelectionStub.getCall(0).args.localObjectVisible, undefined, "the local object option is not changed");
 				assert.ok(fnCheckTransportInfoStub.calledOnce, "then checkTransportInfo called once");
@@ -223,51 +217,22 @@ sap.ui.define([
 					reference: this.sReference,
 					layer: this.sLayer
 				}), "then _prepareChangesForTransport called with the transport info and changes array");
-			}.bind(this));
-		});
-
-		QUnit.test("when calling publish successfully in S/4 Hana Cloud", function(assert) {
-			var oMockTransportInfo = {
-				packageName: "PackageName",
-				transport: "ATO_NOTIFICATION"
-			};
-
-			var fnOpenTransportSelectionStub = sandbox.stub(TransportSelection.prototype, "openTransportSelection").returns(Promise.resolve(oMockTransportInfo));
-			var fnCheckTransportInfoStub = sandbox.stub(TransportSelection.prototype, "checkTransportInfo").returns(true);
-			var fnPrepareChangesForTransportStub = sandbox.stub(TransportSelection.prototype, "_prepareChangesForTransport").resolves();
-			var oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
-
-			return WriteLrepConnector.publish({
-				transportDialogSettings: {
-					rootControl: null,
-					styleClass: null
-				},
-				layer: this.sLayer,
-				reference: this.sReference,
-				localChanges: this.aMockLocalChanges,
-				appVariantDescriptors: this.aAppVariantDescriptors
-			}).then(function(sMessage) {
-				assert.equal(sMessage, oResourceBundle.getText("MSG_ATO_NOTIFICATION"), "the correct message was returned");
-				assert.ok(fnOpenTransportSelectionStub.calledOnce, "then openTransportSelection called once");
-				assert.ok(fnCheckTransportInfoStub.calledOnce, "then checkTransportInfo called once");
-				assert.ok(fnPrepareChangesForTransportStub.calledOnce, "then _prepareChangesForTransport called once");
-				assert.ok(fnPrepareChangesForTransportStub.calledWith(oMockTransportInfo, this.aMockLocalChanges, this.aAppVariantDescriptors, {
-					reference: this.sReference,
-					layer: this.sLayer
-				}), "then _prepareChangesForTransport called with the transport info and changes array");
+				assert.deepEqual(aSetBusyCalls, [true, false], "setBusy was called with true after transport selection then false");
 			}.bind(this));
 		});
 
 		QUnit.test("when calling publish unsuccessfully", function(assert) {
-			sandbox.stub(TransportSelection.prototype, "openTransportSelection").rejects();
-			sandbox.stub(MessageBox, "show");
+			const oOriginalError = new Error("transport selection failed");
+			sandbox.stub(TransportSelection.prototype, "openTransportSelection").rejects(oOriginalError);
 			return WriteLrepConnector.publish({
 				transportDialogSettings: {
 					rootControl: null,
 					styleClass: null
 				}
-			}).then(function(sResponse) {
-				assert.equal(sResponse, "Error", "then Promise.resolve() with error message is returned");
+			}).then(function() {
+				assert.ok(false, "publish should have rejected");
+			}).catch(function(oRejection) {
+				assert.strictEqual(oRejection, oOriginalError, "the originating error is propagated");
 			});
 		});
 
@@ -278,8 +243,33 @@ sap.ui.define([
 					rootControl: null,
 					styleClass: null
 				}
-			}).then(function(sResponse) {
-				assert.equal(sResponse, "Cancel", "then Promise.resolve() with cancel message is returned");
+			}).then(function() {
+				assert.ok(false, "publish should have rejected");
+			}).catch(function(oError) {
+				assert.ok(oError instanceof CancelError, "a CancelError is thrown for user cancellation");
+			});
+		});
+
+		QUnit.test("when _prepareChangesForTransport throws synchronously, setBusy(false) is still invoked", function(assert) {
+			const oMockTransportInfo = { packageName: "PackageName", transport: "transportId" };
+			const oSyncError = new Error("sync failure");
+			sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves(oMockTransportInfo);
+			sandbox.stub(TransportSelection.prototype, "checkTransportInfo").returns(true);
+			sandbox.stub(TransportSelection.prototype, "_prepareChangesForTransport").throws(oSyncError);
+			const aSetBusyCalls = [];
+
+			return WriteLrepConnector.publish({
+				transportDialogSettings: { rootControl: null, styleClass: null },
+				layer: this.sLayer,
+				reference: this.sReference,
+				localChanges: this.aMockLocalChanges,
+				appVariantDescriptors: this.aAppVariantDescriptors,
+				setBusy(bBusy) { aSetBusyCalls.push(bBusy); }
+			}).then(function() {
+				assert.ok(false, "publish should have rejected");
+			}).catch(function(oError) {
+				assert.strictEqual(oError, oSyncError, "the synchronous error is propagated");
+				assert.deepEqual(aSetBusyCalls, [true, false], "setBusy(false) is invoked even on a sync throw");
 			});
 		});
 
@@ -682,8 +672,7 @@ sap.ui.define([
 				]
 			};
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSetting));
-			sandbox.spy(BusyIndicator, "hide");
-			sandbox.spy(BusyIndicator, "show");
+			var fnSetBusy = sandbox.spy();
 			var fnOpenTransportSelectionStub = sandbox.stub(TransportSelection.prototype, "openTransportSelection").returns(Promise.resolve(oMockTransportInfo));
 			var sUrl = "/sap/bc/lrep/changes/?reference=flexReference&layer=VENDOR&changelist=transportId&generator=Change.createInitialFileContent";
 			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({ response: [{ name: "c1" }, { name: "c2" }] });
@@ -692,10 +681,11 @@ sap.ui.define([
 				layer: Layer.VENDOR,
 				generator: "Change.createInitialFileContent",
 				changes: [oVENDORChange1, oVENDORChange2],
-				reference: "flexReference"
+				reference: "flexReference",
+				setBusy: fnSetBusy
 			}).then(function(oResponse) {
-				assert.ok(BusyIndicator.show.calledTwice);
-				assert.ok(BusyIndicator.hide.calledOnce);
+				assert.deepEqual(fnSetBusy.args, [[true], [false], [true], [false]],
+					"setBusy is toggled around the request and around the transport selection");
 				assert.ok(fnOpenTransportSelectionStub.calledOnce, "then openTransportSelection called once");
 				assert.deepEqual(oResponse, oAdjustedResponse, "expected Response");
 				assert.ok(oStubSendRequest.calledWith(sUrl, "DELETE", {
@@ -1891,7 +1881,6 @@ sap.ui.define([
 
 			var fnOpenTransportSelectionStub = sandbox.stub(TransportSelection.prototype, "openTransportSelection").returns(Promise.resolve(oMockTransportInfo));
 			var fnCheckTransportInfoStub = sandbox.stub(TransportSelection.prototype, "checkTransportInfo").returns(true);
-			var oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
 
 			var sExpectedUrl = "/sap/bc/lrep/flex/versions/publish/sampleComponent?transport=transportId&version=versionToPublish";
 			var mExpectedPropertyBag = {
@@ -1902,6 +1891,7 @@ sap.ui.define([
 			};
 
 			var oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves();
+			const aSetBusyCalls = [];
 			return WriteLrepConnector.versions.publish({
 				transportDialogSettings: {
 					rootControl: null,
@@ -1909,63 +1899,30 @@ sap.ui.define([
 				},
 				layer: "CUSTOMER",
 				reference: "sampleComponent",
-				version: "versionToPublish"
-			}).then(function(sMessage) {
-				assert.equal(sMessage, oResourceBundle.getText("MSG_TRANSPORT_SUCCESS"), "the correct message was returned");
+				version: "versionToPublish",
+				setBusy(bBusy) { aSetBusyCalls.push(bBusy); }
+			}).then(function() {
 				assert.ok(fnOpenTransportSelectionStub.calledOnce, "then openTransportSelection called once");
 				assert.ok(fnCheckTransportInfoStub.calledOnce, "then checkTransportInfo called once");
 				assert.equal(oStubSendRequest.getCall(0).args[0], sExpectedUrl, "the request has the correct url");
 				assert.equal(oStubSendRequest.getCall(0).args[1], "POST", "the method is correct");
 				assert.deepEqual(oStubSendRequest.getCall(0).args[2], mExpectedPropertyBag, "the propertyBag is passed correct");
-			});
-		});
-
-		QUnit.test("when calling publish successfully in S/4 Hana Cloud", function(assert) {
-			var oMockTransportInfo = {
-				transport: "ATO_NOTIFICATION"
-			};
-
-			var fnOpenTransportSelectionStub = sandbox.stub(TransportSelection.prototype, "openTransportSelection").returns(Promise.resolve(oMockTransportInfo));
-			var fnCheckTransportInfoStub = sandbox.stub(TransportSelection.prototype, "checkTransportInfo").returns(true);
-			var oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
-
-			var sExpectedUrl = "/sap/bc/lrep/flex/versions/publish/sampleComponent?transport=ATO_NOTIFICATION&version=versionToPublish";
-			var mExpectedPropertyBag = {
-				initialConnector: InitialLrepConnector,
-				tokenUrl: "/sap/bc/lrep/actions/getcsrftoken/",
-				contentType: "application/json; charset=utf-8",
-				dataType: "json"
-			};
-
-			var oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves();
-			return WriteLrepConnector.versions.publish({
-				transportDialogSettings: {
-					rootControl: null,
-					styleClass: null
-				},
-				layer: "CUSTOMER",
-				reference: "sampleComponent",
-				version: "versionToPublish"
-			}).then(function(sMessage) {
-				assert.equal(sMessage, oResourceBundle.getText("MSG_ATO_NOTIFICATION"), "the correct message was returned");
-				assert.ok(fnOpenTransportSelectionStub.calledOnce, "then openTransportSelection called once");
-				assert.ok(fnCheckTransportInfoStub.calledOnce, "then checkTransportInfo called once");
-				assert.equal(oStubSendRequest.getCall(0).args[0], sExpectedUrl, "the request has the correct url");
-				assert.equal(oStubSendRequest.getCall(0).args[1], "POST", "the method is correct");
-				assert.deepEqual(oStubSendRequest.getCall(0).args[2], mExpectedPropertyBag, "the propertyBag is passed correct");
+				assert.deepEqual(aSetBusyCalls, [true, false], "setBusy was called with true after transport selection then false");
 			});
 		});
 
 		QUnit.test("when calling publish unsuccessfully", function(assert) {
-			sandbox.stub(TransportSelection.prototype, "openTransportSelection").rejects();
-			sandbox.stub(MessageBox, "show");
+			const oOriginalError = new Error("transport selection failed");
+			sandbox.stub(TransportSelection.prototype, "openTransportSelection").rejects(oOriginalError);
 			return WriteLrepConnector.versions.publish({
 				transportDialogSettings: {
 					rootControl: null,
 					styleClass: null
 				}
-			}).then(function(sResponse) {
-				assert.equal(sResponse, "Error", "then Promise.resolve() with error message is returned");
+			}).then(function() {
+				assert.ok(false, "publish should have rejected");
+			}).catch(function(oRejection) {
+				assert.strictEqual(oRejection, oOriginalError, "the originating error is propagated");
 			});
 		});
 
@@ -1976,8 +1933,10 @@ sap.ui.define([
 					rootControl: null,
 					styleClass: null
 				}
-			}).then(function(sResponse) {
-				assert.equal(sResponse, "Cancel", "then Promise.resolve() with cancel message is returned");
+			}).then(function() {
+				assert.ok(false, "publish should have rejected");
+			}).catch(function(oError) {
+				assert.ok(oError instanceof CancelError, "a CancelError is thrown for user cancellation");
 			});
 		});
 	});

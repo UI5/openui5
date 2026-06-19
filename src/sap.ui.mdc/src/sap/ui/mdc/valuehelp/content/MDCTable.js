@@ -183,9 +183,8 @@ sap.ui.define([
 					const bIsInSelectedConditions = !!aConditionsForContext.length;
 					const bSelectedInTable = aSelectedTableContexts.indexOf(oContext) >= 0;
 					if (!bIsInSelectedConditions && bSelectedInTable) {
-						const oItem = this.getItemFromContext(oContext);
-						if (oItem) { // no key found -> no condition can be created -> ignore
-							const oCondition = this.createCondition(oItem.key, oItem.description, oItem.payload);
+						const oCondition = this.getValueHelpDelegate().createConditionForContext(this.getValueHelpInstance(), this, oContext);
+						if (oCondition) { // no condition can be created -> ignore
 							aModifiedConditions = this.isSingleSelect() ? [oCondition] : aModifiedConditions.concat(oCondition);
 							bFireSelect = true;
 						}

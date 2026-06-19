@@ -39,7 +39,7 @@ function(
 
 	sinon.config.useFakeTimers = false;
 
-	var oFactory = SemanticUtil.oFactory,
+	const oFactory = SemanticUtil.oFactory,
 		oUtil = SemanticUtil.oUtil,
 		oSemanticConfiguration = oFactory.getSemanticConfiguration(),
 		aSemanticActionsMetadata = oFactory.getSemanticActionsMetadata();
@@ -56,8 +56,8 @@ function(
 		}
 	});
 
-	QUnit.test("test SemanticPage instantiation", function (assert) {
-		var CLASS_NAME = "sap.f.semantic.SemanticPage";
+	QUnit.test("SemanticPage instantiation creates an instance with the correct class name", function (assert) {
+		const CLASS_NAME = "sap.f.semantic.SemanticPage";
 
 		// Assert
 		assert.equal(this.oSemanticPage.getMetadata().getName(), CLASS_NAME,
@@ -65,7 +65,7 @@ function(
 	});
 
 
-	QUnit.test("test SemanticPage showFooter setter and getter", function (assert) {
+	QUnit.test("SemanticPage showFooter setter and getter work correctly", function (assert) {
 		// Assert default
 		assert.equal(this.oSemanticPage.getShowFooter(), false,
 			"SemanticPage showFooter is false by default.");
@@ -85,7 +85,7 @@ function(
 			"SemanticPage showFooter set to false and retrieved successfully.");
 	});
 
-	QUnit.test("test SemanticPage fitContent setter and getter", function (assert) {
+	QUnit.test("SemanticPage fitContent setter and getter work correctly", function (assert) {
 		// Assert default
 		assert.equal(this.oSemanticPage.getFitContent(), false,
 			"SemanticPage fitContent is false by default.");
@@ -104,7 +104,7 @@ function(
 			"DynamicPage fitContent is successfully set to true.");
 	});
 
-	QUnit.test("test SemanticPage headerExpanded setter and getter", function (assert) {
+	QUnit.test("SemanticPage headerExpanded setter and getter work correctly", function (assert) {
 		// Assert default
 		assert.equal(this.oSemanticPage.getHeaderExpanded(), true,
 			"SemanticPage headerExpanded is true by default.");
@@ -125,7 +125,7 @@ function(
 	});
 
 
-	QUnit.test("test SemanticPage headerPinnable setter and getter", function (assert) {
+	QUnit.test("SemanticPage headerPinnable setter and getter work correctly", function (assert) {
 		// Assert default
 		assert.equal(this.oSemanticPage.getHeaderExpanded(), true,
 			"SemanticPage headerPinnable is true by default.");
@@ -146,7 +146,7 @@ function(
 	});
 
 
-	QUnit.test("test SemanticPage preserveHeaderStateOnScroll setter and getter", function (assert) {
+	QUnit.test("SemanticPage preserveHeaderStateOnScroll setter and getter work correctly", function (assert) {
 		// Assert default
 		assert.equal(this.oSemanticPage.getPreserveHeaderStateOnScroll(), false,
 			"SemanticPage preserveHeaderStateOnScroll is true by default.");
@@ -166,22 +166,22 @@ function(
 			"SemanticPage preserveHeaderStateOnScroll set to true and retrieved successfully.");
 	});
 
-	QUnit.test("test SemanticPage clone", function(assert) {
-		//Arrange
-		var oStub = this.stub(SemanticPage.prototype, "setContent"),
+	QUnit.test("SemanticPage clone correctly forwards DynamicPage content", function(assert) {
+		// Arrange
+		const oStub = this.stub(SemanticPage.prototype, "setContent"),
 			oText = new Text({ text: "yo"});
 
 		this.oSemanticPage._getPage().setContent(oText);
 
-		//Act
+		// Act
 		this.oSemanticPage.clone();
 
-		//Assert
+		// Assert
 		assert.equal(oStub.callCount, 1, "Function 'setContent' was called once");
 		assert.strictEqual(oStub.args[0][0].getText(), oText.getText(), "SemanticPage's content is properly set to the DynamicPage's content clone");
 	});
 
-	QUnit.test("test SemanticPage toggleHeaderOnTitleClick setter and getter", function (assert) {
+	QUnit.test("SemanticPage toggleHeaderOnTitleClick setter and getter work correctly", function (assert) {
 		// Assert default
 		assert.equal(this.oSemanticPage.getToggleHeaderOnTitleClick(), true,
 			"SemanticPage toggleHeaderOnTitleClick is true by default.");
@@ -201,8 +201,8 @@ function(
 			"SemanticPage toggleHeaderOnTitleClick set to true and retrieved successfully.");
 	});
 
-	QUnit.test("test SemanticPage titleAreaShrinkRatio setter and getter", function (assert) {
-		var sDefaultRatio = "1:1.6:1.6",
+	QUnit.test("SemanticPage titleAreaShrinkRatio setter and getter work correctly", function (assert) {
+		const sDefaultRatio = "1:1.6:1.6",
 			sNewRatio = "3:5:8";
 
 		// Assert default
@@ -221,9 +221,9 @@ function(
 			"DynamicPageTitle areaShrinkRatio is " + sNewRatio + ".");
 	});
 
-	QUnit.test("test SemanticPage titleHeading aggregation methods", function (assert) {
-		var oTitle = oFactory.getTitle(),
-			vResult;
+	QUnit.test("SemanticPage titleHeading aggregation set, get, and destroy methods work correctly", function (assert) {
+		const oTitle = oFactory.getTitle();
+		let vResult;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getTitleHeading(), null,
@@ -248,18 +248,18 @@ function(
 			"SemanticPage content is destroyed successfully.");
 	});
 
-	QUnit.test("test SemanticPage titleSnappedOnMobile is successfully forwarded", function (assert) {
+	QUnit.test("SemanticPage titleSnappedOnMobile aggregation is successfully forwarded to DynamicPageTitle", function (assert) {
 		// Arrange
-		var sForwardedAggregationName = this.oSemanticPage.getMetadata().getAggregationForwarder("titleSnappedOnMobile").targetAggregationName;
+		const sForwardedAggregationName = this.oSemanticPage.getMetadata().getAggregationForwarder("titleSnappedOnMobile").targetAggregationName;
 
 		// Assert
 		assert.strictEqual(sForwardedAggregationName, "snappedTitleOnMobile",
 				"DynamicPageTitle has successfully forwarded its snappedTitleOnMobile aggregation.");
 	});
 
-	QUnit.test("test SemanticPage titleExpandedHeading aggregation methods", function (assert) {
-		var oTitle = oFactory.getTitle(),
-			vResult;
+	QUnit.test("SemanticPage titleExpandedHeading aggregation set, get, and destroy methods work correctly", function (assert) {
+		const oTitle = oFactory.getTitle();
+		let vResult;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getTitleExpandedHeading(), null,
@@ -284,9 +284,9 @@ function(
 			"SemanticPage content is destroyed successfully.");
 	});
 
-	QUnit.test("test SemanticPage titleSnappedHeading aggregation methods", function (assert) {
-		var oTitle = oFactory.getTitle(),
-			vResult;
+	QUnit.test("SemanticPage titleSnappedHeading aggregation set, get, and destroy methods work correctly", function (assert) {
+		const oTitle = oFactory.getTitle();
+		let vResult;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getTitleSnappedHeading(), null,
@@ -311,9 +311,9 @@ function(
 			"SemanticPage content is destroyed successfully.");
 	});
 
-	QUnit.test("test SemanticPage titleBreadcrumbs aggregation methods", function (assert) {
-		var oBreadcrumbs = oFactory.getBreadcrumbs(),
-			vResult;
+	QUnit.test("SemanticPage titleBreadcrumbs aggregation set, get, and destroy methods work correctly", function (assert) {
+		const oBreadcrumbs = oFactory.getBreadcrumbs();
+		let vResult;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getTitleBreadcrumbs(), null,
@@ -338,10 +338,11 @@ function(
 			"SemanticPage titleBreadcrumbs is destroyed successfully.");
 	});
 
-	QUnit.test("test SemanticPage titleExpandedContent aggregation methods", function (assert) {
-		var oMessageStrip = oFactory.getMessageStrip(1),
+	QUnit.test("SemanticPage titleExpandedContent aggregation add, insert, remove, and destroy methods work correctly", function (assert) {
+		const oMessageStrip = oFactory.getMessageStrip(1),
 			oMessageStrip2 = oFactory.getMessageStrip(2),
-			iContentCount = 0, iContentIdx = 0;
+			iContentIdx = 0;
+		let iContentCount = 0;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getTitleExpandedContent().length, iContentCount,
@@ -387,10 +388,11 @@ function(
 		assert.ok(oMessageStrip2.bIsDestroyed, "SemanticPage item has been destroyed.");
 	});
 
-	QUnit.test("test SemanticPage titleSnappedContent aggregation methods", function (assert) {
-		var oMessageStrip = oFactory.getMessageStrip(1),
+	QUnit.test("SemanticPage titleSnappedContent aggregation add, insert, remove, and destroy methods work correctly", function (assert) {
+		const oMessageStrip = oFactory.getMessageStrip(1),
 			oMessageStrip2 = oFactory.getMessageStrip(2),
-			iContentCount = 0, iContentIdx = 0;
+			iContentIdx = 0;
+		let iContentCount = 0;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getTitleSnappedContent().length, iContentCount,
@@ -436,10 +438,11 @@ function(
 		assert.ok(oMessageStrip2.bIsDestroyed, "SemanticPage item has been destroyed.");
 	});
 
-	QUnit.test("test SemanticPage titleContent aggregation methods", function (assert) {
-		var oMessageStrip = oFactory.getMessageStrip(1),
+	QUnit.test("SemanticPage titleContent aggregation add, insert, remove, and destroy methods work correctly", function (assert) {
+		const oMessageStrip = oFactory.getMessageStrip(1),
 			oMessageStrip2 = oFactory.getMessageStrip(2),
-			iContentCount = 0, iContentIdx = 0;
+			iContentIdx = 0;
+		let iContentCount = 0;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getTitleContent().length, iContentCount,
@@ -485,10 +488,11 @@ function(
 		assert.ok(oMessageStrip2.bIsDestroyed, "SemanticPage item has been destroyed.");
 	});
 
-	QUnit.test("test SemanticPage headerContent aggregation methods", function (assert) {
-		var oMessageStrip = oFactory.getMessageStrip(1),
+	QUnit.test("SemanticPage headerContent aggregation add, insert, remove, and destroy methods work correctly", function (assert) {
+		const oMessageStrip = oFactory.getMessageStrip(1),
 			oMessageStrip2 = oFactory.getMessageStrip(2),
-			iContentCount = 0, iContentIdx = 0;
+			iContentIdx = 0;
+		let iContentCount = 0;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getHeaderContent().length, iContentCount,
@@ -535,8 +539,8 @@ function(
 	});
 
 
-	QUnit.test("test SemanticPage content aggregation methods", function (assert) {
-		var oMessageStrip = oFactory.getMessageStrip(1);
+	QUnit.test("SemanticPage content aggregation set, get, and destroy methods work correctly", function (assert) {
+		const oMessageStrip = oFactory.getMessageStrip(1);
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getContent(), null,
@@ -558,10 +562,11 @@ function(
 	});
 
 
-	QUnit.test("test SemanticPage footerCustomActions aggregation methods", function (assert) {
-		var oButton = oFactory.getAction(),
+	QUnit.test("SemanticPage footerCustomActions aggregation add, insert, remove, and destroy methods work correctly", function (assert) {
+		const oButton = oFactory.getAction(),
 			oButton2 = oFactory.getAction(),
-			iContentCount = 0, iContentIdx = 0;
+			iContentIdx = 0;
+		let iContentCount = 0;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getFooterCustomActions().length, iContentCount,
@@ -607,10 +612,11 @@ function(
 		assert.ok(oButton2.bIsDestroyed, "SemanticPage item has been destroyed.");
 	});
 
-	QUnit.test("test SemanticPage titleCustomTextActions aggregation methods", function (assert) {
-		var oButton = oFactory.getAction(),
+	QUnit.test("SemanticPage titleCustomTextActions aggregation add, insert, remove, and destroy methods work correctly", function (assert) {
+		const oButton = oFactory.getAction(),
 			oButton2 = oFactory.getAction(),
-			iContentCount = 0, iContentIdx = 0;
+			iContentIdx = 0;
+		let iContentCount = 0;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getTitleCustomTextActions().length, iContentCount,
@@ -656,10 +662,11 @@ function(
 		assert.ok(oButton2.bIsDestroyed, "SemanticPage item has been destroyed.");
 	});
 
-	QUnit.test("test SemanticPage titleCustomIconActions aggregation methods", function (assert) {
-		var oButton = oFactory.getAction(),
+	QUnit.test("SemanticPage titleCustomIconActions aggregation add, insert, remove, and destroy methods work correctly", function (assert) {
+		const oButton = oFactory.getAction(),
 			oButton2 = oFactory.getAction(),
-			iContentCount = 0, iContentIdx = 0;
+			iContentIdx = 0;
+		let iContentCount = 0;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getTitleCustomIconActions().length, iContentCount,
@@ -705,10 +712,11 @@ function(
 		assert.ok(oButton2.bIsDestroyed, "SemanticPage item has been destroyed.");
 	});
 
-	QUnit.test("test SemanticPage customShareActions aggregation methods", function (assert) {
-		var oButton = oFactory.getAction(),
+	QUnit.test("SemanticPage customShareActions aggregation add, insert, remove, and destroy methods work correctly", function (assert) {
+		const oButton = oFactory.getAction(),
 			oButton2 = oFactory.getAction(),
-			iContentCount = 0, iContentIdx = 0;
+			iContentIdx = 0;
+		let iContentCount = 0;
 
 		// Assert default
 		assert.equal(this.oSemanticPage.getCustomShareActions().length, iContentCount,
@@ -757,25 +765,25 @@ function(
 	// This test is needed to ensure that the buttons added to customShareActions can be bound
 	// the same way as other buttons
 	// Due to the buttons being shown in the static UI area there might be issues with bindings
-	QUnit.test("test SemanticPage customShareActions content bindings", async function (assert) {
-		var sButtonText = "Action 1";
-		var aTexts = [];
+	QUnit.test("SemanticPage customShareActions content bindings resolve correctly when model is set before adding action", async function (assert) {
+		const sButtonText = "Action 1";
+		const aTexts = [];
 		aTexts["action1"] = sButtonText;
 
-		var oMockResourceBundle = {
-			getText: function(sKey, aArgs, bIgnoreKeyFallback) {
+		const oMockResourceBundle = {
+			getText: (sKey, aArgs, bIgnoreKeyFallback) => {
 				return aTexts[sKey];
 			}
 		};
 
-		var i18n = new ResourceModel({
+		const i18n = new ResourceModel({
 			bundle: oMockResourceBundle
 		});
 
 		this.oSemanticPage.setModel(i18n, "i18n");
 
 
-		var oCustomShareButton = new Button({
+		const oCustomShareButton = new Button({
 			icon: "sap-icon://excel-attachment",
 			text: "{i18n>action1}"
 		});
@@ -787,23 +795,23 @@ function(
 		assert.strictEqual(oCustomShareButton.getText(), sButtonText, "Expected text from binding in button is there");
 	});
 
-	QUnit.test("test SemanticPage customShareActions *delayed* content bindings", async function (assert) {
-		var sButtonText = "Action 1";
-		var aTexts = [];
+	QUnit.test("SemanticPage customShareActions delayed content bindings resolve correctly when model is set after adding action", async function (assert) {
+		const sButtonText = "Action 1";
+		const aTexts = [];
 		aTexts["action1"] = sButtonText;
 
-		var oMockResourceBundle = {
-			getText: function(sKey, aArgs, bIgnoreKeyFallback) {
+		const oMockResourceBundle = {
+			getText: (sKey, aArgs, bIgnoreKeyFallback) => {
 				return aTexts[sKey];
 			}
 		};
 
-		var i18n = new ResourceModel({
+		const i18n = new ResourceModel({
 			bundle: oMockResourceBundle
 		});
 
 
-		var oCustomShareButton = new Button({
+		const oCustomShareButton = new Button({
 			icon: "sap-icon://excel-attachment",
 			text: "{i18n>action1}"
 		});
@@ -817,11 +825,10 @@ function(
 		assert.strictEqual(oCustomShareButton.getText(), sButtonText, "Expected text from binding in button is there");
 	});
 
-	QUnit.test("test adding of CSS SemanticPage class not mentioned in CONTENT_PADDING_CLASSES_TO_FORWARD," +
-			" to its _dynamicPage aggregation", function (assert) {
+	QUnit.test("Adding a CSS class not listed in CONTENT_PADDING_CLASSES_TO_FORWARD does not propagate to the _dynamicPage aggregation", function (assert) {
 
 		// Arrange
-		var oDynamicPage = this.oSemanticPage.getAggregation("_dynamicPage");
+		const oDynamicPage = this.oSemanticPage.getAggregation("_dynamicPage");
 
 		// Act
 		this.oSemanticPage.addStyleClass("NOT_EXISTING_CSS_CLASS");
@@ -831,11 +838,10 @@ function(
 				"NOT_EXISTING_CSS_CLASS CSS class not added to _dynamicPage aggregation.");
 	});
 
-	QUnit.test("test adding of CSS SemanticPage classes mentioned in CONTENT_PADDING_CLASSES_TO_FORWARD," +
-			" to its _dynamicPage aggregation", function (assert) {
+	QUnit.test("Adding CSS classes listed in CONTENT_PADDING_CLASSES_TO_FORWARD propagates them to the _dynamicPage aggregation", function (assert) {
 
 		// Arrange
-		var oDynamicPage = this.oSemanticPage.getAggregation("_dynamicPage");
+		const oDynamicPage = this.oSemanticPage.getAggregation("_dynamicPage");
 
 		// Act
 		this.oSemanticPage.addStyleClass("sapUiNoContentPadding");
@@ -851,11 +857,10 @@ function(
 				"sapUiResponsiveContentPadding CSS class applied to _dynamicPage aggregation.");
 	});
 
-	QUnit.test("test removing of CSS SemanticPage classes mentioned in CONTENT_PADDING_CLASSES_TO_FORWARD," +
-			" to its _dynamicPage aggregation", function (assert) {
+	QUnit.test("Removing CSS classes listed in CONTENT_PADDING_CLASSES_TO_FORWARD removes them from the _dynamicPage aggregation", function (assert) {
 
 		// Arrange
-		var oDynamicPage = this.oSemanticPage.getAggregation("_dynamicPage");
+		const oDynamicPage = this.oSemanticPage.getAggregation("_dynamicPage");
 
 		// Act
 		this.oSemanticPage.addStyleClass("sapUiNoContentPadding");
@@ -874,8 +879,8 @@ function(
 				"sapUiResponsiveContentPadding CSS class removed from _dynamicPage aggregation.");
 	});
 
-	QUnit.test("test SemanticPage destroy method", function (assert) {
-		var oPage = this.oSemanticPage._getPage(),
+	QUnit.test("SemanticPage destroy method tears down all internal page sub-components", function (assert) {
+		const oPage = this.oSemanticPage._getPage(),
 			oTitle = this.oSemanticPage._getTitle(),
 			oHeader = this.oSemanticPage._getHeader(),
 			oFooter = this.oSemanticPage._getFooter();
@@ -890,17 +895,17 @@ function(
 		assert.ok(oFooter.bIsDestroyed, "SemanticPage page footer has been destroyed.");
 	});
 
-	aSemanticActionsMetadata.forEach(function(oSemanticActionMetaData){
+	aSemanticActionsMetadata.forEach((oSemanticActionMetaData) => {
 		QUnit.test("test " + oSemanticActionMetaData.className, function (assert) {
-			var oSemanticClass = oSemanticActionMetaData.constructor,
-				sSemanticClassName = oSemanticActionMetaData.className,
-				/*eslint-disable new-cap*/
-				oSemanticAction = new oSemanticClass(), oInternalControl;
+			const oSemanticClass = oSemanticActionMetaData.constructor,
+				sSemanticClassName = oSemanticActionMetaData.className;
+			/*eslint-disable new-cap*/
+			const oSemanticAction = new oSemanticClass();
 				/*eslint-enable new-cap*/
 
 			// Act
 			this.oSemanticPage["set" + sSemanticClassName](oSemanticAction);
-			oInternalControl = oSemanticAction._getControl ? oSemanticAction._getControl() : oSemanticAction;
+			const oInternalControl = oSemanticAction._getControl ? oSemanticAction._getControl() : oSemanticAction;
 
 			// Assert
 			assert.equal(this.oSemanticPage["get" + sSemanticClassName](), oSemanticAction, sSemanticClassName + " has been set");
@@ -916,8 +921,8 @@ function(
 		});
 	});
 
-	QUnit.test("test saveAsTileAction aggregation", function (assert) {
-		var oSaveAsTileAction = oFactory.getAction();
+	QUnit.test("saveAsTileAction aggregation set, get, and destroy methods work correctly", function (assert) {
+		const oSaveAsTileAction = oFactory.getAction();
 
 		// Act
 		this.oSemanticPage.setSaveAsTileAction(oSaveAsTileAction);
@@ -933,8 +938,8 @@ function(
 		assert.ok(oSaveAsTileAction.bIsDestroyed, "oSaveAsTileAction button has been destroyed.");
 	});
 
-	QUnit.test("SemanticPage landmark info is set correctly", async function (assert) {
-		var oLandmarkInfo = new DynamicPageAccessibleLandmarkInfo({
+	QUnit.test("SemanticPage landmark info is set correctly on the underlying DynamicPage DOM elements", async function (assert) {
+		const oLandmarkInfo = new DynamicPageAccessibleLandmarkInfo({
 			rootRole: "Region",
 			rootLabel: "Root",
 			contentRole: "Main",
@@ -945,9 +950,11 @@ function(
 			footerLabel: "Footer"
 		});
 
+		// Act
 		this.oSemanticPage.setLandmarkInfo(oLandmarkInfo);
 		await nextUIUpdate();
 
+		// Assert
 		assert.strictEqual(this.oSemanticPage.$("page").attr("role"), "region", "Root role is set correctly.");
 		assert.strictEqual(this.oSemanticPage.$("page").attr("aria-label"), "Root", "Root label is set correctly.");
 		assert.strictEqual(this.oSemanticPage.$("page-content").attr("role"), "main", "Content role is set correctly.");
@@ -959,9 +966,9 @@ function(
 	});
 
 
-	QUnit.test("test SemanticPage snapping and expanding of header", async function (assert) {
+	QUnit.test("SemanticPage header snaps on scroll to bottom and expands on scroll to top", async function (assert) {
 		//Arrange
-		var oSnappedTitle = oFactory.getTitle(),
+		const oSnappedTitle = oFactory.getTitle(),
 			oExpandedTitle = oFactory.getDynamicPageTitle(),
 			oPage = this.oSemanticPage._getPage(),
 			done = assert.async();
@@ -985,6 +992,7 @@ function(
 			assert.equal(oPage.getTitle()._bExpandedState, false, "Header is in snapped state on scroll bottom");
 			//Act
 			oPage.getScrollDelegate().scrollTo(0, 0);
+			// Category B: setTimeout waits for scroll animation to complete before asserting expand state
 			setTimeout(function () {
 				//Assert
 				assert.equal(oPage.getTitle().$expandWrapper.hasClass("sapUiHidden"), false, "Header is expanded on scroll top");
@@ -1012,7 +1020,7 @@ function(
 		}
 	});
 
-	QUnit.test("test SemanticPage DOM presents", function (assert) {
+	QUnit.test("SemanticPage renders its root DOM element with the correct id and CSS class", function (assert) {
 		// Assert
 		assert.ok(this.$semanicPage.length > 0,
 			"SemanticPage is rendered successfully with id: " + this.$semanicPage.attr("id"));
@@ -1023,8 +1031,8 @@ function(
 	/* --------------------------- Semantic Configuration  ---------------------------------- */
 	QUnit.module("SemanticConfiguration", {});
 
-	QUnit.test("test isKnownSemanticType method", function (assert) {
-		var sSemanticType = "sap.f.semantic.AddAction",
+	QUnit.test("isKnownSemanticType returns true for known types and false for unknown types", function (assert) {
+		const sSemanticType = "sap.f.semantic.AddAction",
 			sInvalidSemanticType = "INVALID_TYPE";
 
 		// Assert
@@ -1034,8 +1042,8 @@ function(
 			sInvalidSemanticType + " is not know Semantic Type");
 	});
 
-	QUnit.test("test getOrder method", function (assert) {
-		var sSemanticAddType = "sap.f.semantic.AddAction",
+	QUnit.test("getOrder returns the correct numeric order for each semantic type", function (assert) {
+		const sSemanticAddType = "sap.f.semantic.AddAction",
 			iSemanticAddTypeOrder = 4,
 			sSemanticDeleteType = "sap.f.semantic.DeleteAction",
 			iSemanticDeleteTypeOrder = 2;
@@ -1047,8 +1055,8 @@ function(
 			sSemanticDeleteType + " has the correct order: " + iSemanticDeleteTypeOrder);
 	});
 
-	QUnit.test("test getPlacement method", function (assert) {
-		var sSemanticAddType = "sap.f.semantic.AddAction",
+	QUnit.test("getPlacement returns the correct placement area for each semantic type", function (assert) {
+		const sSemanticAddType = "sap.f.semantic.AddAction",
 			sSemanticAddTypePlacement = "titleText",
 			sSemanticMessagesIndicatorType = "sap.f.semantic.MessagesIndicator",
 			sSemanticMessagesIndicatorTypePlacement = "footerLeft";
@@ -1060,8 +1068,8 @@ function(
 			sSemanticMessagesIndicatorType + " has the correct placement: " + sSemanticMessagesIndicatorTypePlacement);
 	});
 
-	QUnit.test("test getConstraints method", function (assert) {
-		var sSemanticAddType = "sap.f.semantic.AddAction",
+	QUnit.test("getConstraints returns null for unconstrained types and the correct constraint for constrained types", function (assert) {
+		const sSemanticAddType = "sap.f.semantic.AddAction",
 			sSemanticCloseType = "sap.f.semantic.CloseAction",
 			sSemanticCloseConstraintType = "IconOnly";
 
@@ -1072,8 +1080,8 @@ function(
 			sSemanticCloseType + " has the correct Constraint: " + sSemanticCloseConstraintType);
 	});
 
-	QUnit.test("test isMainAction method", function (assert) {
-		var sSemanticAddType = "sap.f.semantic.AddAction",
+	QUnit.test("isMainAction returns false for regular actions and true for TitleMainAction", function (assert) {
+		const sSemanticAddType = "sap.f.semantic.AddAction",
 			sSemanticTitleMainActionType = "sap.f.semantic.TitleMainAction";
 
 		// Assert
@@ -1083,8 +1091,8 @@ function(
 			sSemanticTitleMainActionType + " is a Main Action");
 	});
 
-	QUnit.test("test isNavigationAction method", function (assert) {
-		var sSemanticAddType = "sap.f.semantic.AddAction",
+	QUnit.test("isNavigationAction returns false for non-navigation actions and true for CloseAction", function (assert) {
+		const sSemanticAddType = "sap.f.semantic.AddAction",
 			sSemanticCloseType = "sap.f.semantic.CloseAction";
 
 		// Assert
@@ -1094,8 +1102,8 @@ function(
 			sSemanticCloseType + " is a Navigation Action");
 	});
 
-	QUnit.test("test if a SemanticControl should be preprocessed", function (assert) {
-		var sSemanticDraftIndicatorType = "sap.m.DraftIndicator",
+	QUnit.test("shouldBePreprocessed returns true for DraftIndicator and false for AddAction", function (assert) {
+		const sSemanticDraftIndicatorType = "sap.m.DraftIndicator",
 			sSemanticAddType = "sap.f.semantic.AddAction";
 
 		// Assert
@@ -1105,11 +1113,10 @@ function(
 			sSemanticAddType + " should not be preprocessed");
 	});
 
-	QUnit.test("test if a Share menu button is hidden when there are no visible actions in it", async function (assert) {
+	QUnit.test("Share menu button is hidden when all share menu actions are invisible and shown when any becomes visible", async function (assert) {
 		// Arrange
-		var oPrintAction = new PrintAction({visible: false}),
-			oDiscussInJamAction = new DiscussInJamAction({visible: false}),
-			oShareMenuButton;
+		const oPrintAction = new PrintAction({visible: false}),
+			oDiscussInJamAction = new DiscussInJamAction({visible: false});
 
 		this.oSemanticPage = oFactory.getSemanticPage({
 			discussInJamAction: oDiscussInJamAction,
@@ -1117,7 +1124,7 @@ function(
 			printAction: oPrintAction
 		});
 		await oUtil.renderObject(this.oSemanticPage);
-		oShareMenuButton = this.oSemanticPage._getShareMenu()._getShareMenuButton();
+		const oShareMenuButton = this.oSemanticPage._getShareMenu()._getShareMenuButton();
 
 		// Assert
 		assert.strictEqual(oShareMenuButton.getVisible(), false, "Share menu button is hidden");
@@ -1133,14 +1140,13 @@ function(
 		this.oSemanticPage.destroy();
 	});
 
-	QUnit.test("test if a Share menu button is hidden when there are no actions in it", async function (assert) {
+	QUnit.test("Share menu button is hidden when there are no actions and shown after actions are added and re-rendered", async function (assert) {
 		// Arrange
-		var done = assert.async(),
-			oShareMenuButton;
+		const done = assert.async();
 
 		this.oSemanticPage = oFactory.getSemanticPage();
 		await oUtil.renderObject(this.oSemanticPage);
-		oShareMenuButton = this.oSemanticPage._getShareMenu()._getShareMenuButton();
+		const oShareMenuButton = this.oSemanticPage._getShareMenu()._getShareMenuButton();
 
 		// Assert
 		assert.strictEqual(oShareMenuButton.getVisible(), false, "Share menu button is hidden");
@@ -1149,6 +1155,7 @@ function(
 		this.oSemanticPage.setPrintAction(new PrintAction());
 		this.oSemanticPage.setDiscussInJamAction(new DiscussInJamAction());
 
+		// Category C: assert inside onAfterRendering event delegate callback
 		this.oSemanticPage.addDelegate({"onAfterRendering": function () {
 			// Assert
 			assert.strictEqual(oShareMenuButton.getVisible(), true, "Share menu button is shown");
@@ -1159,22 +1166,19 @@ function(
 		}.bind(this)});
 	});
 
-	QUnit.test("test if a single default Share menu action is displayed in Title Toolbar", async function (assert) {
+	QUnit.test("A single visible default share menu action is shown inline in the Title Toolbar and moves to the share menu when a second action becomes visible", async function (assert) {
 		// Arrange
-		var oPrintAction = new PrintAction(),
-			oDiscussInJamAction = new DiscussInJamAction({visible: false}),
-			oSemanticTitle,
-			oTitleContainer,
-			oToolbar;
+		const oPrintAction = new PrintAction(),
+			oDiscussInJamAction = new DiscussInJamAction({visible: false});
 
 		this.oSemanticPage = oFactory.getSemanticPage({
 			discussInJamAction: oDiscussInJamAction,
 			printAction: oPrintAction
 		});
 		await oUtil.renderObject(this.oSemanticPage);
-		oSemanticTitle = this.oSemanticPage._getSemanticTitle();
-		oTitleContainer = oSemanticTitle._getContainer();
-		oToolbar = oTitleContainer._getActionsToolbar();
+		const oSemanticTitle = this.oSemanticPage._getSemanticTitle();
+		const oTitleContainer = oSemanticTitle._getContainer();
+		const oToolbar = oTitleContainer._getActionsToolbar();
 
 		// Assert
 		assert.strictEqual(oToolbar.getContent().indexOf(oPrintAction._getControl()) > -1, true, "Single Print action is in the SemanticTitle");
@@ -1190,13 +1194,10 @@ function(
 		this.oSemanticPage.destroy();
 	});
 
-	QUnit.test("test if a single custom Share menu action is displayed in Title Toolbar", async function (assert) {
+	QUnit.test("A single visible custom share menu action is shown inline in the Title Toolbar and moves to the share menu when a default action becomes visible", async function (assert) {
 		// Arrange
-		var oCustomShareButton = new Button(),
-			oPrintAction = new PrintAction({visible: false}),
-			oSemanticTitle,
-			oTitleContainer,
-			oToolbar;
+		const oCustomShareButton = new Button(),
+			oPrintAction = new PrintAction({visible: false});
 
 		this.oSemanticPage = oFactory.getSemanticPage({
 			customShareActions: [oCustomShareButton],
@@ -1204,9 +1205,9 @@ function(
 		});
 
 		await oUtil.renderObject(this.oSemanticPage);
-		oSemanticTitle = this.oSemanticPage._getSemanticTitle();
-		oTitleContainer = oSemanticTitle._getContainer();
-		oToolbar = oTitleContainer._getActionsToolbar();
+		const oSemanticTitle = this.oSemanticPage._getSemanticTitle();
+		const oTitleContainer = oSemanticTitle._getContainer();
+		const oToolbar = oTitleContainer._getActionsToolbar();
 
 		// Assert
 		assert.strictEqual(oToolbar.getContent().indexOf(oCustomShareButton) > -1, true, "Single custom action is in the SemanticTitle");
@@ -1225,9 +1226,9 @@ function(
 	/* --------------------------- Accessibility -------------------------------------- */
 	QUnit.module("Accessibility");
 
-	QUnit.test("ARIA attributes", async function(assert) {
+	QUnit.test("ARIA attributes are set correctly on the underlying DynamicPage", async function(assert) {
 		// Arrange
-		var oSemanticPage = oFactory.getSemanticPage(),
+		const oSemanticPage = oFactory.getSemanticPage(),
 			oDynamicPage = oSemanticPage._getPage(),
 			sExpectedRoleDescription = Library.getResourceBundleFor("sap.f")
 				.getText(oSemanticPage.constructor.ARIA_ROLE_DESCRIPTION);
@@ -1244,7 +1245,7 @@ function(
 
 	QUnit.test("AriaLabelledBy attribute on actions toolbar is set correctly", async function(assert) {
 		// Arrange
-		var oSemanticPage = oFactory.getSemanticPage(),
+		const oSemanticPage = oFactory.getSemanticPage(),
 			oSemanticTitle = oSemanticPage._getSemanticTitle(),
 			oTitleContainer = oSemanticTitle._getContainer(),
 			oActionsToolbar = oTitleContainer._getActionsToolbar();
@@ -1253,7 +1254,7 @@ function(
 		await oUtil.renderObject(oSemanticPage);
 
 		// Assert
-		var $InvisibleTextDomRef = $('#' + oActionsToolbar.getId() + "-InvisibleText");
+		const $InvisibleTextDomRef = $('#' + oActionsToolbar.getId() + "-InvisibleText");
 		assert.strictEqual($InvisibleTextDomRef.length, 1, "InvisibleText DOM element exists - actionsToolbar");
 		assert.equal(oActionsToolbar.getAriaLabelledBy()[0], $InvisibleTextDomRef.attr("id"), "aria-labelledby is set correctly - actionsToolbar");
 
@@ -1263,7 +1264,7 @@ function(
 
 	QUnit.test("AriaLabelledBy attribute on navigation actions toolbar is set correctly", async function(assert) {
 		// Arrange
-		var oSemanticPage = oFactory.getSemanticPage(),
+		const oSemanticPage = oFactory.getSemanticPage(),
 			oSemanticTitle = oSemanticPage._getSemanticTitle(),
 			oTitleContainer = oSemanticTitle._getContainer(),
 			oNavigationActionsToolbar = oTitleContainer._getNavigationActionsToolbar();
@@ -1272,7 +1273,7 @@ function(
 		await oUtil.renderObject(oSemanticPage);
 
 		// Assert
-		var $InvisibleTextDomRef = $('#' + oNavigationActionsToolbar.getId() + "-InvisibleText");
+		const $InvisibleTextDomRef = $('#' + oNavigationActionsToolbar.getId() + "-InvisibleText");
 		assert.strictEqual($InvisibleTextDomRef.length, 1, "InvisibleText DOM element exists - navigation actions toolbar");
 		assert.equal(oNavigationActionsToolbar.getAriaLabelledBy()[0], $InvisibleTextDomRef.attr("id"), "aria-labelledby is set correctly - navigation actions toolbar");
 
@@ -1282,13 +1283,13 @@ function(
 
 	QUnit.test("AriaLabelledBy attribute on footer actions toolbar is set correctly", async function(assert) {
 		// Arrange
-		var oSemanticPage = oFactory.getSemanticPage(),
+		const oSemanticPage = oFactory.getSemanticPage(),
 			oFooterToolbar = oSemanticPage._getFooter();
 		// Act
 		await oUtil.renderObject(oSemanticPage);
 
 		// Assert
-		var $InvisibleTextDomRef = $('#' + oFooterToolbar.getId() + "-FooterActions-InvisibleText");
+		const $InvisibleTextDomRef = $('#' + oFooterToolbar.getId() + "-FooterActions-InvisibleText");
 		assert.strictEqual($InvisibleTextDomRef.length, 1, "InvisibleText DOM element exists - footer actions");
 		assert.equal(oFooterToolbar.getAriaLabelledBy()[0], $InvisibleTextDomRef.attr("id"), "aria-labelledby is set correctly - footer actions");
 
@@ -1296,9 +1297,9 @@ function(
 		oSemanticPage.destroy();
 	});
 
-	QUnit.test("Share menu action button has correct tooltip", async function(assert) {
+	QUnit.test("Share menu action button has correct tooltip text", async function(assert) {
 		// Arrange
-		var oSemanticPage = oFactory.getSemanticPage(),
+		const oSemanticPage = oFactory.getSemanticPage(),
 			oShareMenuButton = oSemanticPage._getShareMenu()._getShareMenuButton();
 
 		// Act
@@ -1311,22 +1312,21 @@ function(
 		oSemanticPage.destroy();
 	});
 
-	QUnit.test("Ctrl+Shift+S to open share action sheet", async function(assert) {
-		var done = assert.async(),
-			oSemanticPageTitle,
-			oActionSheet,
-			bMacOS = Device.os.macintosh;
+	QUnit.test("Ctrl+Shift+S keyboard shortcut opens the share action sheet", async function(assert) {
+		const done = assert.async();
+		const bMacOS = Device.os.macintosh;
 
 		// Arrange
 		this.oSemanticPage = oFactory.getSemanticPage();
 		await oUtil.renderObject(this.oSemanticPage);
-		oSemanticPageTitle = this.oSemanticPage._getTitle();
-		oActionSheet = this.oSemanticPage._getActionSheet();
+		const oSemanticPageTitle = this.oSemanticPage._getTitle();
+		const oActionSheet = this.oSemanticPage._getActionSheet();
 
 		// Act
 		this.oSemanticPage.setPrintAction(new PrintAction());
 		this.oSemanticPage.setDiscussInJamAction(new DiscussInJamAction());
 
+		// Category C: assert inside onAfterRendering event delegate callback
 		this.oSemanticPage.addDelegate({"onAfterRendering": function () {
 			oActionSheet.attachAfterOpen(function() {
 				assert.strictEqual(oActionSheet.isOpen(), true, "Share menu is shown");

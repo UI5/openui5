@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/initial/_internal/FlexConfiguration",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/_internal/Versions",
 	"sap/ui/fl/write/_internal/connectors/KeyUserConnector",
@@ -23,6 +24,7 @@ sap.ui.define([
 	Version,
 	FlexConfiguration,
 	FlexInfoSession,
+	CancelError,
 	Storage,
 	Versions,
 	KeyUserConnector,
@@ -1002,6 +1004,58 @@ sap.ui.define([
 				assert.equal(aVersions[1].isPublished, true, "the 3. version model is updated correctly");
 				assert.equal(aVersions[2].isPublished, true, "the 2. version model is updated correctly");
 				assert.equal(oResponse.getProperty("/publishVersionEnabled"), false, "after publish successfully, the button is disable");
+			});
+		});
+
+		QUnit.test("when the connector rejects with a CancelError, the model is left untouched", function(assert) {
+			FlexInfoSession.setByReference({ version: "2" }, this.sReference);
+			var mPropertyBag = {
+				layer: Layer.CUSTOMER,
+				reference: this.sReference,
+				appComponent: this.oAppComponent,
+				version: "3"
+			};
+
+			var aReturnedVersions = [
+				{ activatedBy: "qunit", activatedAt: "a while ago", version: "2", isPublished: false },
+				{ activatedBy: "qunit", activatedAt: "a while ago", version: "1", isPublished: true }
+			];
+
+			stubStorageVersionsLoad(aReturnedVersions);
+			sandbox.stub(LrepConnector.versions, "publish").rejects(new CancelError());
+
+			return Versions.initialize(mPropertyBag)
+			.then(Versions.publish.bind(undefined, mPropertyBag))
+			.then(function() {
+				assert.ok(false, "publish should have rejected");
+			})
+			.catch(function(oError) {
+				assert.ok(oError instanceof CancelError, "the CancelError is propagated");
+				var oModel = Versions.getVersionsModel(mPropertyBag);
+				assert.notStrictEqual(oModel.getProperty("/publishVersionEnabled"), false, "the publish button stays as it was");
+			});
+		});
+
+		QUnit.test("when the connector rejects with an error, the rejection is propagated", function(assert) {
+			FlexInfoSession.setByReference({ version: "2" }, this.sReference);
+			var mPropertyBag = {
+				layer: Layer.CUSTOMER,
+				reference: this.sReference,
+				appComponent: this.oAppComponent,
+				version: "3"
+			};
+			var oOriginalError = new Error("backend down");
+
+			stubStorageVersionsLoad([{ activatedBy: "qunit", activatedAt: "a while ago", version: "2", isPublished: false }]);
+			sandbox.stub(LrepConnector.versions, "publish").rejects(oOriginalError);
+
+			return Versions.initialize(mPropertyBag)
+			.then(Versions.publish.bind(undefined, mPropertyBag))
+			.then(function() {
+				assert.ok(false, "publish should have rejected");
+			})
+			.catch(function(oError) {
+				assert.strictEqual(oError, oOriginalError, "the originating error is propagated");
 			});
 		});
 	});

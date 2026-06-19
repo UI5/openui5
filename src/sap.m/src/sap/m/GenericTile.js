@@ -1463,7 +1463,8 @@ sap.ui.define([
 			if (keyPressed[16] && event.keyCode !== 16 && this.getState() !== LoadState.Disabled) {
 				preventPress === false;
 			}
-			if ((PseudoEvents.events.sapselect.fnCheck(event) || preventPress) && this.getState() !== LoadState.Disabled) {
+			// Guard: require matching keydown on this tile; without it, Enter keyup from a closed Popover fires unintended press.
+			if ((PseudoEvents.events.sapselect.fnCheck(event) && currentKey || preventPress) && this.getState() !== LoadState.Disabled) {
 				this.removeStyleClass("sapMGTPressActive");
 				if (this.$("hover-overlay").length > 0) {
 					this.$("hover-overlay").removeClass("sapMGTPressActive");

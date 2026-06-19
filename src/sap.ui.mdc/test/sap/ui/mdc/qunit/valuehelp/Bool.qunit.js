@@ -51,7 +51,9 @@ sap.ui.define([
 			return !!oScrollContainer?.getDomRef() && bIsOpen; // only open if rendered
 		},
 		invalidate() {},
-		getValueHelpDelegate() {}
+		getValueHelpDelegate() {
+			return ValueHelpDelegate;
+		}
 	};
 
 	const _teardown = () => {

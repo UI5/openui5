@@ -1409,7 +1409,9 @@ sap.ui.define([
 				{ connector: "JsObjectConnector" }
 			]);
 
-			return Storage.versions.publish(mPropertyBag).catch(function(oError) {
+			return Storage.versions.publish(mPropertyBag).then(function() {
+				assert.ok(false, "publish should have rejected");
+			}).catch(function(oError) {
 				assert.ok(oError, "then rejection message is passed");
 			});
 		});

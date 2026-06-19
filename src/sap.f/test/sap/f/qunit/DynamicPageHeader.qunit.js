@@ -11,7 +11,7 @@ function(
 ) {
 	"use strict";
 
-	var oFactory = DynamicPageUtil.oFactory,
+	const oFactory = DynamicPageUtil.oFactory,
 		oUtil = DynamicPageUtil.oUtil;
 
 	/* --------------------------- DynamicPage Header API ---------------------------------- */
@@ -27,60 +27,74 @@ function(
 		}
 	});
 
-	QUnit.test("DynamicPage Header root tag", function (assert) {
-		var oHeader = this.oDynamicPage.getHeader();
+	QUnit.test("DynamicPage Header root tag is 'section'", function (assert) {
+		// Arrange
+		const oHeader = this.oDynamicPage.getHeader();
 
+		// Assert
 		assert.strictEqual(oHeader.getDomRef().tagName, "SECTION", "The root tag is 'section'");
 	});
 
 	QUnit.test("DynamicPage Header root element has tabindex=-1", function (assert) {
-		var oHeader = this.oDynamicPage.getHeader();
+		// Arrange
+		const oHeader = this.oDynamicPage.getHeader();
 
+		// Assert
 		assert.strictEqual(oHeader.getDomRef().getAttribute("tabindex"), "-1",
 			"The root element has tabindex='-1' so it is focusable on click without entering the tab order");
 	});
 
-	QUnit.test("DynamicPage Header default aggregation", function (assert) {
-		var oHeader = this.oDynamicPage.getHeader(),
-				sHeaderDefaultAggregation = oHeader.getMetadata().getDefaultAggregationName();
+	QUnit.test("DynamicPage Header default aggregation is 'content'", function (assert) {
+		// Arrange
+		const oHeader = this.oDynamicPage.getHeader(),
+			sHeaderDefaultAggregation = oHeader.getMetadata().getDefaultAggregationName();
 
+		// Assert
 		assert.strictEqual(sHeaderDefaultAggregation, "content", "The default aggregation is 'content'");
 	});
 
 	QUnit.test("DynamicPage Header pinnable and not pinnable", async function (assert) {
-		var oHeader = this.oDynamicPage.getHeader(),
-				oPinButton = oHeader.getAggregation("_pinButton");
+		// Arrange
+		const oHeader = this.oDynamicPage.getHeader(),
+			oPinButton = oHeader.getAggregation("_pinButton");
 
+		// Act
 		oHeader.setPinnable(false);
 		await nextUIUpdate();
 
+		// Assert
 		assert.ok(!oPinButton.$()[0],
-				"The DynamicPage Header Pin Button not rendered");
+			"The DynamicPage Header Pin Button not rendered");
 
+		// Act
 		oHeader.setPinnable(true);
 		await nextUIUpdate();
 
+		// Assert
 		assert.ok(oPinButton.$()[0],
-				"The DynamicPage Header Pin Button rendered");
+			"The DynamicPage Header Pin Button rendered");
 
 		assert.equal(oPinButton.$().hasClass("sapUiHidden"), false,
-				"The DynamicPage Header Pin Button is visible");
+			"The DynamicPage Header Pin Button is visible");
 	});
 
 	QUnit.test("DynamicPage Header - expanding/collapsing through the API", function (assert) {
-		var oDynamicPage = this.oDynamicPage,
-				$oDynamicPageHeader = oDynamicPage.getHeader().$(),
-				sSnappedClass = "sapFDynamicPageTitleSnapped",
-				oSetPropertySpy = this.spy(oDynamicPage, "setProperty"),
-				sAriaLabelledBy = oDynamicPage.getTitle().getHeading().getId(),
-				iHeaderHeight = parseInt(oDynamicPage._getHeaderHeight());
+		// Arrange
+		const oDynamicPage = this.oDynamicPage,
+			$oDynamicPageHeader = oDynamicPage.getHeader().$(),
+			sSnappedClass = "sapFDynamicPageTitleSnapped",
+			oSetPropertySpy = this.spy(oDynamicPage, "setProperty"),
+			sAriaLabelledBy = oDynamicPage.getTitle().getHeading().getId(),
+			iHeaderHeight = parseInt(oDynamicPage._getHeaderHeight());
 
 		this.oDynamicPage._bHeaderInTitleArea = true;
 
+		// Assert initial state
 		assert.ok(oDynamicPage.getHeaderExpanded(), "initial value for the headerExpanded prop is true");
 		oUtil.testExpandedCollapsedARIA(assert, oDynamicPage, "true", sAriaLabelledBy, "Initial aria-labelledby references");
 		assert.ok(!oDynamicPage.$titleArea.hasClass(sSnappedClass));
 
+		// Act: collapse via API
 		oDynamicPage.setHeaderExpanded(false);
 		assert.equal(oDynamicPage.getHeaderExpanded(), false, "setting it to false under regular conditions works");
 		oUtil.testExpandedCollapsedARIA(assert, oDynamicPage, "false", sAriaLabelledBy, "Header is now snapped");
@@ -91,6 +105,7 @@ function(
 		assert.strictEqual($oDynamicPageHeader[0].style.overflow, "hidden", "Header height is restricted");
 		oSetPropertySpy.resetHistory();
 
+		// Act: expand via API
 		oDynamicPage.setHeaderExpanded(true);
 		assert.ok(oDynamicPage.getHeaderExpanded(), "header converted to expanded");
 		oUtil.testExpandedCollapsedARIA(assert, oDynamicPage, "true", sAriaLabelledBy, "Header is expanded again");
@@ -101,6 +116,7 @@ function(
 		assert.strictEqual($oDynamicPageHeader[0].style.overflow, "", "Header overflow is restored to the default value");
 		oSetPropertySpy.resetHistory();
 
+		// Act: collapse via internal snap
 		oDynamicPage._snapHeader();
 		assert.equal(oDynamicPage.getHeaderExpanded(), false, "setting it to false via user interaction");
 		assert.ok(oDynamicPage.$titleArea.hasClass(sSnappedClass));
@@ -111,29 +127,33 @@ function(
 	});
 
 	QUnit.test("DynamicPage Header - expanding/collapsing by clicking the title", function (assert) {
-
-		var oDynamicPage = this.oDynamicPage,
-				$oDynamicPageHeader = oDynamicPage.getHeader().$(),
-				oDynamicPageTitle = oDynamicPage.getTitle(),
-				sAriaLabelledBy = oDynamicPageTitle.getHeading().getId(),
-				$oDynamicPageTitleSpan = oDynamicPageTitle._getFocusSpan(),
-				oPinButton = oDynamicPage.getHeader()._getPinButton(),
-				oFakeEvent = {
-					srcControl: oDynamicPageTitle
-				};
+		// Arrange
+		const oDynamicPage = this.oDynamicPage,
+			$oDynamicPageHeader = oDynamicPage.getHeader().$(),
+			oDynamicPageTitle = oDynamicPage.getTitle(),
+			sAriaLabelledBy = oDynamicPageTitle.getHeading().getId(),
+			$oDynamicPageTitleSpan = oDynamicPageTitle._getFocusSpan(),
+			oPinButton = oDynamicPage.getHeader()._getPinButton(),
+			oFakeEvent = {
+				srcControl: oDynamicPageTitle
+			};
 
 		this.oDynamicPage._bHeaderInTitleArea = true;
 
+		// Assert initial state
 		assert.equal(oDynamicPage.getHeaderExpanded(), true, "Initially the header is expanded");
 		assert.equal(oDynamicPage.getToggleHeaderOnTitleClick(), true, "Initially toggleHeaderOnTitleClick = true");
 		assert.equal($oDynamicPageTitleSpan.attr("tabindex"), 0, "Initially the header title is focusable");
 
+		// Act: tap the title once
 		oDynamicPageTitle.ontap(oFakeEvent);
 
+		// Assert: header collapsed
 		assert.equal(oDynamicPage.getHeaderExpanded(), false, "After one click, the header is collapsed");
 		oUtil.testExpandedCollapsedARIA(assert, oDynamicPage, "false", sAriaLabelledBy, "Header is collapsed after tap");
 		assert.strictEqual($oDynamicPageHeader.css("visibility"), "hidden", "Header should be excluded from the tab chain");
 
+		// Act: disable toggle, tap again
 		oDynamicPage.setToggleHeaderOnTitleClick(false);
 
 		oDynamicPageTitle.ontap(oFakeEvent);
@@ -141,8 +161,9 @@ function(
 		assert.strictEqual($oDynamicPageHeader.css("visibility"), "hidden", "Header should be still excluded from the tab chain");
 		assert.equal($oDynamicPageTitleSpan.is(":hidden"), true, "The header title is not focusable");
 		assert.notOk(oDynamicPage.getTitle().$().attr("aria-labelledby"),
-				"Since the header isn't toggleable, an aria-labelledby attribute shouldn't be rendered");
+			"Since the header isn't toggleable, an aria-labelledby attribute shouldn't be rendered");
 
+		// Act: re-enable toggle, tap again
 		oDynamicPage.setToggleHeaderOnTitleClick(true);
 
 		oDynamicPageTitle.ontap(oFakeEvent);
@@ -151,9 +172,11 @@ function(
 		assert.strictEqual($oDynamicPageHeader.css("visibility"), "visible", "Header should be included in the tab chain again");
 		assert.equal($oDynamicPageTitleSpan.is(":visible"), true, "The header title is focusable again");
 
+		// Act: pin then tap
 		oPinButton.firePress();
 		oDynamicPageTitle.ontap(oFakeEvent);
 
+		// Assert: pinned header still collapses on title click and pin state resets
 		assert.equal(oDynamicPage.getHeaderExpanded(), false, "After one click, the header is collapsed even it's pinned");
 		oUtil.testExpandedCollapsedARIA(assert, oDynamicPage, "false", sAriaLabelledBy, "Header is collapsed after tap");
 		assert.strictEqual($oDynamicPageHeader.css("visibility"), "hidden", "Header should be excluded from the tab chain");
@@ -162,12 +185,13 @@ function(
 	});
 
 	QUnit.test("DynamicPage toggle header indicators visibility", async function (assert) {
-		var oDynamicPageTitle = this.oDynamicPage.getTitle(),
-				oDynamicPageHeader = this.oDynamicPage.getHeader(),
-				oCollapseButton = oDynamicPageHeader.getAggregation("_collapseButton"),
-				oExpandButton = oDynamicPageTitle.getAggregation("_expandButton"),
-				$oCollapseButton = oCollapseButton.$(),
-				$oExpandButton = oExpandButton.$();
+		// Arrange
+		const oDynamicPageTitle = this.oDynamicPage.getTitle(),
+			oDynamicPageHeader = this.oDynamicPage.getHeader(),
+			oCollapseButton = oDynamicPageHeader.getAggregation("_collapseButton"),
+			oExpandButton = oDynamicPageTitle.getAggregation("_expandButton");
+		let $oCollapseButton = oCollapseButton.$(),
+			$oExpandButton = oExpandButton.$();
 
 		// Assert: toggleHeaderOnTitleClick=true, headerExpanded=true, pinned=false
 		assert.equal(oDynamicPageTitle._getShowExpandButton(), false, "The Expand button should not be visible");
@@ -215,27 +239,33 @@ function(
 		assert.equal($oCollapseButton.hasClass("sapUiHidden"), true, "Header is collapsed, the Collapse button is not visible");
 	});
 
-	QUnit.test("DynamicPage expand/collapse button visibility", function (assert) {
-		var oDynamicPageHeader = this.oDynamicPage.getHeader();
+	QUnit.test("DynamicPage expand/collapse button visibility reflects header content presence", function (assert) {
+		// Arrange
+		const oDynamicPageHeader = this.oDynamicPage.getHeader();
 
+		// Assert: header has content
 		assert.equal(oDynamicPageHeader._getShowCollapseButton(), true, "Collapse button should be visible when the header content has content");
 
+		// Act: remove all content
 		oDynamicPageHeader.destroyContent();
 
+		// Assert
 		assert.equal(oDynamicPageHeader._getShowCollapseButton(), false, "Collapse button should be hidden when the header content has no content");
 
+		// Act: add content back
 		oDynamicPageHeader.addContent(oFactory.getContent(1));
 
+		// Assert
 		assert.equal(oDynamicPageHeader._getShowCollapseButton(), true, "Collapse button should be visible when the header content has content");
 	});
 
-	QUnit.test("Collapse button visibility on invalidation", function (assert) {
+	QUnit.test("Collapse button visibility on invalidation after header is re-expanded", function (assert) {
 		// Arrange
-		var oDynamicPageHeader = this.oDynamicPage.getHeader();
+		const oDynamicPageHeader = this.oDynamicPage.getHeader();
 		this.oDynamicPage.setHeaderExpanded(false);
 		oUtil.renderObject(this.oDynamicPage);
 
-		var oCollapseButton = oDynamicPageHeader._getCollapseButton();
+		const oCollapseButton = oDynamicPageHeader._getCollapseButton();
 
 		// Act
 		this.oDynamicPage.setHeaderExpanded(true);
@@ -245,34 +275,35 @@ function(
 	});
 
 	QUnit.test("DynamicPage Header - backgroundDesign", async function(assert) {
-		var oDynamicPageHeader = this.oDynamicPage.getHeader(),
-				$oDomRef = oDynamicPageHeader.$();
+		// Arrange
+		const oDynamicPageHeader = this.oDynamicPage.getHeader(),
+			$oDomRef = oDynamicPageHeader.$();
 
-		// assert
+		// Assert default
 		assert.equal(oDynamicPageHeader.getBackgroundDesign(), null, "Default value of backgroundDesign property = null");
 
-		// act
+		// Act
 		oDynamicPageHeader.setBackgroundDesign("Solid");
 		await nextUIUpdate();
 
-		// assert
+		// Assert
 		assert.ok($oDomRef.hasClass("sapFDynamicPageHeaderSolid"), "Should have sapFDynamicPageHeaderSolid class");
 		assert.strictEqual(oDynamicPageHeader.getBackgroundDesign(), "Solid", "Should have backgroundDesign property = 'Solid'");
 
-		// act
+		// Act
 		oDynamicPageHeader.setBackgroundDesign("Transparent");
 		await nextUIUpdate();
 
-		// assert
+		// Assert
 		assert.notOk($oDomRef.hasClass("sapFDynamicPageHeaderSolid"), "Should not have sapFDynamicPageHeaderSolid class");
 		assert.ok($oDomRef.hasClass("sapFDynamicPageHeaderTransparent"), "Should have sapFDynamicPageHeaderTransparent class");
 		assert.strictEqual(oDynamicPageHeader.getBackgroundDesign(), "Transparent", "Should have backgroundDesign property = 'Transparent'");
 
-		// act
+		// Act
 		oDynamicPageHeader.setBackgroundDesign("Translucent");
 		await nextUIUpdate();
 
-		// assert
+		// Assert
 		assert.notOk($oDomRef.hasClass("sapFDynamicPageHeaderTransparent"), "Should not have sapFDynamicPageHeaderTransparent class");
 		assert.ok($oDomRef.hasClass("sapFDynamicPageHeaderTranslucent"), "Should have sapFDynamicPageHeaderTranslucent class");
 		assert.strictEqual(oDynamicPageHeader.getBackgroundDesign(), "Translucent", "Should have backgroundDesign property = 'Translucent'");
@@ -280,12 +311,12 @@ function(
 
 	QUnit.test("Sets icon to 'sap-icon://pushpin-on' when theme is 'Horizon' and the pin button is toggled on", function (assert) {
 		// Arrange
-		var oHeader = this.oDynamicPage.getHeader(),
+		const oHeader = this.oDynamicPage.getHeader(),
 			pinButton = oHeader._getPinButton();
 
-		var isThemeApplied = function () {
-			var bIsApplied = false;
-			var fnOnThemeApplied = function () {
+		const isThemeApplied = () => {
+			let bIsApplied = false;
+			const fnOnThemeApplied = () => {
 				bIsApplied = true;
 			};
 			Theming.attachApplied(fnOnThemeApplied); // Will be called immediately when theme is applied
@@ -313,13 +344,15 @@ function(
 						fnCallback = undefined;
 					}
 				} else {
+					// Category B: theme application may require multiple rendering cycles; retry after delay
 					setTimeout(fnThemeApplied.bind(this, oEvent), 1500);
 				}
 			}
 		};
 
-		// Act
-		var done = assert.async();
+		// Act: apply sap_horizon theme, then assert pin button icons
+		// Category C: done() is called inside an event-driven async callback (theme applied)
+		const done = assert.async();
 		this.applyTheme("sap_horizon", function () {
 
 			// Act
@@ -340,12 +373,10 @@ function(
 
 	QUnit.test("Icon is set to pin button when themeChanged is fired", function(assert) {
 		// Arrange
-		var oDynamicPageHeader = this.oDynamicPage.getHeader(),
-			oPinButton = oDynamicPageHeader._getPinButton(),
-			fnSpy;
-
+		const oDynamicPageHeader = this.oDynamicPage.getHeader(),
+			oPinButton = oDynamicPageHeader._getPinButton();
 		// Act
-		fnSpy = this.spy(oPinButton, "setIcon");
+		const fnSpy = this.spy(oPinButton, "setIcon");
 		oDynamicPageHeader.onThemeChanged();
 
 		// Assert
@@ -354,7 +385,7 @@ function(
 
 	QUnit.test("Pin button tooltip reflects pinned/unpinned state", function (assert) {
 		// Arrange
-		var oHeader = this.oDynamicPage.getHeader(),
+		const oHeader = this.oDynamicPage.getHeader(),
 			oPinButton = oHeader._getPinButton(),
 			oBundle = oFactory.getResourceBundle();
 

@@ -255,6 +255,7 @@ sap.ui.define([
 	 * @param {string} [mPropertyBag.generator] - Generator of changes
 	 * @param {string[]} [mPropertyBag.selectorIds] - Selector IDs in local format
 	 * @param {string[]} [mPropertyBag.changeTypes] - Types of changes
+	 * @param {function(boolean):void} [mPropertyBag.setBusy] - Optional callback invoked to request showing (<code>true</code>) or hiding (<code>false</code>) a busy indicator while the reset is running.
 	 *
 	 * @returns {Promise} Promise that resolves after the deletion took place
 	 * @private

@@ -1,8 +1,6 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/m/MessageBox",
-	"sap/ui/core/Lib",
 	"sap/ui/thirdparty/sinon-4",
 	"sap/ui/fl/initial/_internal/FlexConfiguration",
 	"sap/ui/fl/initial/_internal/connectors/KeyUserConnector",
@@ -13,8 +11,6 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/Layer"
 ], function(
-	MessageBox,
-	Lib,
 	sinon,
 	FlexConfiguration,
 	InitialConnector,
@@ -580,12 +576,13 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when calling publish successfully", function(assert) {
-			const oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
+			const aSetBusyCalls = [];
 			const mPropertyBag = {
 				layer: Layer.CUSTOMER,
 				reference: "com.sap.test.app",
 				version: "3",
-				url: "/flexKeyuser"
+				url: "/flexKeyuser",
+				setBusy(bBusy) { aSetBusyCalls.push(bBusy); }
 			};
 			const sExpectedUrl = "/flexKeyuser/flex/keyuser/v2/versions/publish/com.sap.test.app?version=3";
 			const mExpectedPropertyBag = {
@@ -596,24 +593,29 @@ sap.ui.define([
 
 			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves();
 			return Storage.versions.publish(mPropertyBag)
-			.then(function(sMessage) {
-				assert.equal(sMessage, oResourceBundle.getText("MSG_CF_PUBLISH_SUCCESS"), "the correct message was returned");
+			.then(function() {
 				assert.equal(oStubSendRequest.getCall(0).args[0], sExpectedUrl, "the request has the correct url");
 				assert.equal(oStubSendRequest.getCall(0).args[1], "POST", "the method is correct");
 				assert.deepEqual(oStubSendRequest.getCall(0).args[2], mExpectedPropertyBag, "the propertyBag is passed correct");
+				assert.deepEqual(aSetBusyCalls, [true, false], "setBusy was called with true then false");
 			});
 		});
 
 		QUnit.test("when calling publish unsuccessfully", function(assert) {
-			sandbox.stub(MessageBox, "show");
-			sandbox.stub(WriteUtils, "sendRequest").rejects();
+			const aSetBusyCalls = [];
+			const oOriginalError = new Error("backend down");
+			sandbox.stub(WriteUtils, "sendRequest").rejects(oOriginalError);
 			return Storage.versions.publish({
 				layer: Layer.CUSTOMER,
 				reference: "sampleComponent",
 				version: "3",
-				url: "/flexKeyuser"
-			}).then(function(sResponse) {
-				assert.equal(sResponse, "Error", "then Promise.resolve() with error message is returned");
+				url: "/flexKeyuser",
+				setBusy(bBusy) { aSetBusyCalls.push(bBusy); }
+			}).then(function() {
+				assert.ok(false, "publish should have rejected");
+			}).catch(function(oRejection) {
+				assert.strictEqual(oRejection, oOriginalError, "the originating error is propagated");
+				assert.deepEqual(aSetBusyCalls, [true, false], "setBusy was called with true then false");
 			});
 		});
 	});

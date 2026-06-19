@@ -4,30 +4,22 @@
 
 sap.ui.define([
 	"sap/base/util/merge",
-	"sap/ui/core/Lib",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/write/_internal/connectors/BackendConnector",
 	"sap/ui/fl/initial/_internal/connectors/KeyUserConnector",
 	"sap/ui/fl/initial/_internal/connectors/Utils",
 	"sap/ui/fl/write/_internal/connectors/Utils",
 	"sap/base/util/restricted/_pick",
-	"sap/ui/fl/initial/_internal/FlexInfoSession",
-	"sap/ui/core/BusyIndicator",
-	"sap/base/Log",
-	"sap/m/MessageBox"
+	"sap/ui/fl/initial/_internal/FlexInfoSession"
 ], function(
 	merge,
-	Lib,
 	Layer,
 	BackendConnector,
 	InitialConnector,
 	InitialUtils,
 	WriteUtils,
 	_pick,
-	FlexInfoSession,
-	BusyIndicator,
-	Log,
-	MessageBox
+	FlexInfoSession
 ) {
 	"use strict";
 
@@ -144,26 +136,14 @@ sap.ui.define([
 			return WriteUtils.sendRequest(sVersionsUrl, "DELETE", mPropertyBag);
 		},
 		publish(mPropertyBag) {
-			var oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
-			var fnHandleAllErrors = function(oError) {
-				BusyIndicator.hide();
-				var sMessage = oResourceBundle.getText("MSG_CF_PUBLISH_ERROR", oError ? [oError.message || oError] : undefined);
-				var sTitle = oResourceBundle.getText("HEADER_TRANSPORT_ERROR");
-				Log.error(`publish version error${oError}`);
-				MessageBox.show(sMessage, {
-					icon: MessageBox.Icon.ERROR,
-					title: sTitle,
-					styleClass: mPropertyBag.styleClass
-				});
-				return "Error";
-			};
 			_enhancePropertyBagWithTokenInfo.call(this, mPropertyBag);
+			mPropertyBag.setBusy?.(true);
 			var mParameters = { version: mPropertyBag.version };
 			var sVersionsUrl = InitialUtils.getUrl(this.ROUTES.VERSIONS.PUBLISH, mPropertyBag, mParameters);
-			return WriteUtils.sendRequest(sVersionsUrl, "POST", mPropertyBag).then(function() {
-				BusyIndicator.hide();
-				return oResourceBundle.getText("MSG_CF_PUBLISH_SUCCESS");
-			}).catch(fnHandleAllErrors);
+			return WriteUtils.sendRequest(sVersionsUrl, "POST", mPropertyBag)
+			.finally(function() {
+				mPropertyBag.setBusy?.(false);
+			});
 		}
 	};
 

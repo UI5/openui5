@@ -945,7 +945,6 @@ sap.ui.define([
 				// Set up a filter so that other requests (e.g. from jQuery.sap.require) go through.
 				// This filter fetches all DELETE, all POST (incl. $batch) and the selected GET
 				// requests.
-				sinon.xhr.supportsCORS = jQuery.support.cors;
 				sinon.FakeXMLHttpRequest.useFilters = true;
 				sinon.FakeXMLHttpRequest.addFilter(function (sMethod, sUrl) {
 					var bOurs = getMatchingResponse(sMethod, sUrl)

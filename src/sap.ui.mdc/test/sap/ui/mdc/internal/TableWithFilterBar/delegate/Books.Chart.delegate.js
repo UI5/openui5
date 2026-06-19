@@ -292,7 +292,7 @@ sap.ui.define([
 				const bPriceConditionPresent = !!oFilterBarConditions?.[sPriceConditionName]?.length,
 					bCurrencyConditionPresent = !!oFilterBarConditions[sCurrencyConditionName]?.length;
 
-				const oPriceFilterField = [].find((oFilterItem) => oFilterItem.getPropertyKey() === sPriceConditionName);
+				const oPriceFilterField = oFilterBar.getFilterItems().find((oFilterItem) => oFilterItem.getPropertyKey() === sPriceConditionName);
 
 				if (!bPriceConditionPresent || (bPriceConditionPresent && bCurrencyConditionPresent)) {
 					oPriceFilterField?.setValueState("None");

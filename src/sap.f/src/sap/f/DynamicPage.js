@@ -963,15 +963,18 @@ sap.ui.define([
 	 * @private
 	 */
 	DynamicPage.prototype._moveHeaderToContentArea = function (bOffsetContent) {
-		var oDynamicPageHeader = this.getHeader();
+		var oDynamicPageHeader = this.getHeader(),
+			oLastFocusedElement;
 
 		if (exists(oDynamicPageHeader)) {
+			oLastFocusedElement = document.activeElement;
 			oDynamicPageHeader.$().prependTo(this.$headerInContentWrapper);
 			this._bHeaderInTitleArea = false;
 			if (bOffsetContent) {
 				this._offsetContentOnMoveHeader();
 			}
 			this.fireEvent("_moveHeader");
+			this._restoreFocusIfNeeded(oLastFocusedElement, oDynamicPageHeader.$()[0]);
 		}
 	};
 
@@ -981,15 +984,32 @@ sap.ui.define([
 	 * @private
 	 */
 	DynamicPage.prototype._moveHeaderToTitleArea = function (bOffsetContent) {
-		var oDynamicPageHeader = this.getHeader();
+		var oDynamicPageHeader = this.getHeader(),
+			oLastFocusedElement;
 
 		if (exists(oDynamicPageHeader)) {
+			oLastFocusedElement = document.activeElement;
+
 			oDynamicPageHeader.$().prependTo(this.$stickyPlaceholder);
 			this._bHeaderInTitleArea = true;
 			if (bOffsetContent) {
 				this._offsetContentOnMoveHeader();
 			}
 			this.fireEvent("_moveHeader");
+			this._restoreFocusIfNeeded(oLastFocusedElement, oDynamicPageHeader.$()[0]);
+		}
+	};
+
+	/**
+	 * Restores focus to the previously focused element if it was inside the given container.
+	 * @param {Element} oFocusedElement - the element that had focus before a DOM move
+	 * @param {Element} oContainer - the DOM node that was moved
+	 * @private
+	 * @since 1.150
+	 */
+	DynamicPage.prototype._restoreFocusIfNeeded = function (oFocusedElement, oContainer) {
+		if (oFocusedElement && oContainer && oContainer.contains(oFocusedElement)) {
+			oFocusedElement.focus();
 		}
 	};
 
@@ -2155,7 +2175,7 @@ sap.ui.define([
 			oStickySubheaderProvider._returnStickyContent();
 		}
 
-		oLastFocusedElement.focus();
+		this._restoreFocusIfNeeded(oLastFocusedElement, this._oStickySubheader.$()[0]);
 		this._bStickySubheaderInTitleArea = bShouldStick;
 	};
 

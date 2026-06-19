@@ -1657,6 +1657,12 @@ sap.ui.define([
 			for (const sPredicate in mKeptElementsByPredicate) {
 				mKeptElementsByPredicate[sPredicate] = oCache.getValue(sPredicate);
 			}
+			Promise.resolve().then(() => {
+				// later, when the new cache has been established, re-register change listeners
+				Object.values(this.mPreviousContextsByPath).forEach((oContext0) => {
+					oContext0.checkUpdate();
+				});
+			});
 			if (oCache.hasPendingChangesForPath("")) {
 				oFirstLevel = oCache;
 			} else {

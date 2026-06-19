@@ -39,12 +39,27 @@ function(
 	"use strict";
 
 	// shortcut for sap.ui.core.aria.HasPopup
-	var AriaHasPopup = coreLibrary.aria.HasPopup;
+	const AriaHasPopup = coreLibrary.aria.HasPopup;
 
-	var DOM_RENDER_LOCATION = "qunit-fixture";
+	const DOM_RENDER_LOCATION = "qunit-fixture";
 
-	var _getVisibleControlsCount = function (oControl) {
-		var iVisibleControls = 0;
+	/**
+	 * Returns a Promise that resolves after the next rendering of oControl.
+	 */
+	function waitForRendering(oControl) {
+		return new Promise((resolve) => {
+			const oDelegate = {
+				onAfterRendering: function() {
+					oControl.removeEventDelegate(oDelegate);
+					resolve();
+				}
+			};
+			oControl.addEventDelegate(oDelegate);
+		});
+	}
+
+	const _getVisibleControlsCount = function (oControl) {
+		let iVisibleControls = 0;
 
 		oControl._aControls.forEach(function (oItem) {
 			iVisibleControls += oItem.$().css("visibility") === "visible" ? 1 : 0 ;
@@ -55,14 +70,12 @@ function(
 
 	QUnit.module("Init");
 
-	QUnit.test("Proper initialization", function (assert) {
+	QUnit.test("ShellBar is properly initialized with factory, overflow toolbar and responsive handler", function (assert) {
 		// Arrange
-		var oSB,
-			_aOverflowControls;
 
 		// Act
-		oSB = new ShellBar();
-		_aOverflowControls = oSB._getOverflowToolbar().getContent();
+		const oSB = new ShellBar();
+		const _aOverflowControls = oSB._getOverflowToolbar().getContent();
 
 		// Factory
 		assert.ok(oSB._oFactory instanceof Factory, "Factory is instance of correct class");
@@ -91,11 +104,11 @@ function(
 			this.oSB.destroy();
 		},
 		getPropertiesObject: function () {
-			var aProperties = [],
+			const aProperties = [],
 				oProperties = this.oSB.getMetadata().getProperties();
 
 			Object.keys(oProperties).forEach(function (sKey) {
-				var oProperty = oProperties[sKey];
+				const oProperty = oProperties[sKey];
 				aProperties.push({
 					name: oProperty.name,
 					type: oProperty.type,
@@ -105,12 +118,12 @@ function(
 			return aProperties;
 		},
 		getAggregationsObject: function () {
-			var aAggregations = [],
+			const aAggregations = [],
 				oAggregations = this.oSB.getMetadata().getAggregations();
 
 			Object.keys(oAggregations).forEach(function (sKey) {
-				var oAggregation = oAggregations[sKey],
-					oForwarding;
+				const oAggregation = oAggregations[sKey];
+				let oForwarding;
 
 				if (oAggregation.forwarding) {
 					oForwarding = {
@@ -130,11 +143,11 @@ function(
 			return aAggregations;
 		},
 		getEventsObject: function () {
-			var aEvents = [],
+			const aEvents = [],
 				oEvents = this.oSB.getMetadata().getEvents();
 
 			Object.keys(oEvents).forEach(function (sKey) {
-				var oEvent = oEvents[sKey];
+				const oEvent = oEvents[sKey];
 				aEvents.push({
 					name: oEvent.name,
 					parameters: oEvent.appData ? oEvent.appData.parameters : undefined
@@ -145,7 +158,7 @@ function(
 	});
 
 	QUnit.test("Properties", function (assert) {
-		var oExpectedObject = [
+		const oExpectedObject = [
 			{name: "title", type: "string", defaultValue: ""},
 			{name: "secondTitle", type: "string", defaultValue: ""},
 			{name: "homeIcon", type: "sap.ui.core.URI", defaultValue: ""},
@@ -162,7 +175,7 @@ function(
 	});
 
 	QUnit.test("Aggregations", function (assert) {
-		var oExpectedObject = [
+		const oExpectedObject = [
 			{
 				name: "menu",
 				type: "sap.m.Menu",
@@ -199,7 +212,7 @@ function(
 	});
 
 	QUnit.test("Events", function (assert) {
-		var oExpectedObject = [
+		const oExpectedObject = [
 			{name: "homeIconPressed", parameters: {icon: {type: "sap.m.Image"}}},
 			{name: "menuButtonPressed", parameters: {button: {type: "sap.m.Button"}}},
 			{name: "navButtonPressed", parameters: {button: {type: "sap.m.Button"}}},
@@ -262,7 +275,7 @@ function(
 
 	QUnit.test("Additional content support", function (assert) {
 		// Arrange
-		var oAdditionalButtonFirst = new OverflowToolbarButton({id: "additionalButtonFirst",
+		const oAdditionalButtonFirst = new OverflowToolbarButton({id: "additionalButtonFirst",
 		text: "Text of First Additional Button"}),
 			oAdditionalButtonSecond = new OverflowToolbarButton({id: "additionalButtonSecond",
 			text: "Text of Second Additional Button"});
@@ -382,9 +395,9 @@ function(
 		}
 	});
 
-	QUnit.test("onBeforeRendering", function (assert) {
+	QUnit.test("onBeforeRendering calls _assignControls once", function (assert) {
 		// Arrange
-		var oAssignControlsToOverflowToolbarSpy = this.spy(this.oSB, "_assignControls");
+		const oAssignControlsToOverflowToolbarSpy = this.spy(this.oSB, "_assignControls");
 
 		// Act
 		this.oSB.onBeforeRendering();
@@ -393,9 +406,9 @@ function(
 		assert.strictEqual(oAssignControlsToOverflowToolbarSpy.callCount, 1, "Assign method called once");
 	});
 
-	QUnit.test("exit", function (assert) {
+	QUnit.test("exit calls responsive handler exit and factory destroy", function (assert) {
 		// Arrange
-		var oResponsiveHandlerSpy = this.spy(this.oSB._oResponsiveHandler, "exit"),
+		const oResponsiveHandlerSpy = this.spy(this.oSB._oResponsiveHandler, "exit"),
 			oFactorySpy = this.spy(this.oSB._oFactory, "destroy");
 
 		// Act
@@ -415,21 +428,21 @@ function(
 		}
 	});
 
-	QUnit.test("_getMenu", function (assert) {
+	QUnit.test("_getMenu returns a MenuButton via factory getter", function (assert) {
 		// Arrange
-		var oFactoryGetterSpy = this.spy(this.oSB._oFactory, "getMegaMenu");
+		const oFactoryGetterSpy = this.spy(this.oSB._oFactory, "getMegaMenu");
 
 		// Act
-		var oMenuButton = this.oSB._getMenu();
+		const oMenuButton = this.oSB._getMenu();
 
 		// Assert
 		assert.strictEqual(oFactoryGetterSpy.callCount, 1, "Factory getter called once");
 		assert.ok(oMenuButton.isA("sap.m.MenuButton"), "Method returned correct object");
 	});
 
-	QUnit.test("_getOverflowToolbar", function (assert) {
+	QUnit.test("_getOverflowToolbar returns an OverflowToolbar instance", function (assert) {
 		// Act
-		var oOTB = this.oSB._getOverflowToolbar();
+		const oOTB = this.oSB._getOverflowToolbar();
 
 		// Assert
 		assert.ok(oOTB.isA("sap.m.OverflowToolbar"), "Method returned correct object");
@@ -461,7 +474,7 @@ function(
 
 	QUnit.test("_assignControls - empty ShellBar", function (assert) {
 		// Arrange
-		var oOTB = this.oSB._oOverflowToolbar,
+		const oOTB = this.oSB._oOverflowToolbar,
 			oControls = this.oSB._aControls;
 
 		// Act
@@ -478,12 +491,9 @@ function(
 
 	QUnit.test("_assignControls - Full ShellBar", async function (assert) {
 		// Arrange
-		var oOTB = this.oSB._oOverflowToolbar,
+		const oOTB = this.oSB._oOverflowToolbar,
 			oAdditionalButton1 = new OverflowToolbarButton(),
-			oAdditionalButton2 = new OverflowToolbarButton(),
-			aContent,
-			aItems,
-			aOverflowControls;
+			oAdditionalButton2 = new OverflowToolbarButton();
 
 		this.oSB.setShowNavButton(true);
 		this.oSB.setShowMenuButton(true);
@@ -506,9 +516,9 @@ function(
 		await nextUIUpdate();
 
 		// Arrange
-		aContent = oOTB.getContent();
-		aItems = this.oSB._aControls;
-		aOverflowControls = this.oSB._getOverflowToolbar().getContent();
+		const aContent = oOTB.getContent();
+		const aItems = this.oSB._aControls;
+		const aOverflowControls = this.oSB._getOverflowToolbar().getContent();
 		// Assert
 		assert.strictEqual(aContent.length, 7, "Expected number of controls added to OverflowToolbar");
 		// Assert
@@ -552,12 +562,11 @@ function(
 	QUnit.test("ResponsiveHandler _handleResize on size changed", async function (assert) {
 
 		// Arrange
-		var oControl = this.oSB,
-			oStub;
+		const oControl = this.oSB;
 
 		oControl.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate();
-		oStub = this.stub(oControl._oResponsiveHandler, "_handleResize").callsFake(function() {
+		const oStub = this.stub(oControl._oResponsiveHandler, "_handleResize").callsFake(function() {
 			//Assert
 			assert.ok(true, "Responsivehandler delegated event called");
 		});
@@ -568,7 +577,7 @@ function(
 
 	QUnit.test("Sizes are cought when the theme is loaded", function (assert) {
 		// arrange
-		var oHandleResizeSpy = this.spy(this.oSB._oResponsiveHandler, "_handleResize");
+		const oHandleResizeSpy = this.spy(this.oSB._oResponsiveHandler, "_handleResize");
 
 		// act
 		this.oSB.onThemeChanged();
@@ -580,7 +589,7 @@ function(
 	QUnit.test("ResponsiveHandler phone/regular transformation test", async function (assert) {
 
 		// Arrange
-		var oControl = this.oSB;
+		const oControl = this.oSB;
 		oControl.setSecondTitle("Second title");
 		oControl.setHomeIcon(sap.ui.require.toUrl("sap/ui/documentation/sdk/images/logo_sap.png"));
 		oControl.setShowMenuButton(true);
@@ -652,10 +661,10 @@ function(
 	});
 
 	QUnit.test("Hidden title behavior", async function (assert) {
-		var sHiddenTitleId = '#' + this.oSB.getId() + '-titleHidden',
-			$oHiddenTitle = jQuery(sHiddenTitleId),
+		const sHiddenTitleId = '#' + this.oSB.getId() + '-titleHidden',
 			sTitle = this.oSB.getTitle(),
 			sNewTitle = "Test title";
+		let $oHiddenTitle = jQuery(sHiddenTitleId);
 
 		// Assert
 		assert.strictEqual($oHiddenTitle.length, 0, "Hidden title div should not be rendered when showMenuButton=true");
@@ -683,7 +692,7 @@ function(
 	});
 
 	QUnit.test("Second title attributes", function (assert) {
-		var $oSecondTitle = this.oSB._oSecondTitle.$();
+		const $oSecondTitle = this.oSB._oSecondTitle.$();
 
 		// Assert
 		assert.strictEqual($oSecondTitle.attr("role"), "heading", "Second title role is correct");
@@ -691,7 +700,7 @@ function(
 	});
 
 	QUnit.test("Home icon tooltip", function (assert) {
-		var oHomeIcon = this.oSB._oHomeIcon,
+		const oHomeIcon = this.oSB._oHomeIcon,
 			sTooltip = this.oRb.getText("SHELLBAR_LOGO_TOOLTIP"),
 			sNewTooltip = "Test";
 
@@ -712,7 +721,7 @@ function(
 	});
 
 	QUnit.test("CoPilot attributes", function (assert) {
-		var oCopilot = this.oSB._oCopilot,
+		const oCopilot = this.oSB._oCopilot,
 			sTooltip = this.oRb.getText("SHELLBAR_COPILOT_TOOLTIP");
 
 		// Assert
@@ -721,7 +730,7 @@ function(
 	});
 
 	QUnit.test("Search attributes", function (assert) {
-		var oSearch = this.oSB._oSearch,
+		const oSearch = this.oSB._oSearch,
 			sTooltip = this.oRb.getText("SHELLBAR_SEARCH_TOOLTIP");
 
 		// Assert
@@ -730,7 +739,7 @@ function(
 	});
 
 	QUnit.test("Nav button attributes", function (assert) {
-		var oNavButton = this.oSB._oNavButton,
+		const oNavButton = this.oSB._oNavButton,
 			sTooltip = this.oRb.getText("SHELLBAR_BACK_TOOLTIP");
 
 		// Assert
@@ -739,7 +748,7 @@ function(
 	});
 
 	QUnit.test("Menu button attributes", function (assert) {
-		var oMenuButton = this.oSB._oMenuButton,
+		const oMenuButton = this.oSB._oMenuButton,
 			$oMenuButton = oMenuButton.$(),
 			sTooltip = this.oRb.getText("SHELLBAR_MENU_TOOLTIP");
 
@@ -750,7 +759,7 @@ function(
 	});
 
 	QUnit.test("Notifications attributes", function (assert) {
-		var oNotifications = this.oSB._oNotifications,
+		const oNotifications = this.oSB._oNotifications,
 			$oNotifications = oNotifications.$(),
 			sTooltip = this.oRb.getText("SHELLBAR_NOTIFICATIONS_TOOLTIP");
 
@@ -776,7 +785,7 @@ function(
 	});
 
 	QUnit.test("Products attributes", function (assert) {
-		var oProducts = this.oSB._oProductSwitcher,
+		const oProducts = this.oSB._oProductSwitcher,
 			$oProducts = oProducts.$(),
 			sTooltip = this.oRb.getText("SHELLBAR_PRODUCTS_TOOLTIP");
 
@@ -787,7 +796,7 @@ function(
 	});
 
 	QUnit.test("Avatar attributes", function (assert) {
-		var oAvatar = this.oSB.getProfile(),
+		const oAvatar = this.oSB.getProfile(),
 			$oAvatar = oAvatar.$(),
 			sTooltip = this.oRb.getText("SHELLBAR_PROFILE_TOOLTIP");
 
@@ -799,9 +808,9 @@ function(
 
 	QUnit.test("Notifications Badge basic functionality", function (assert) {
 		// Arrange
-		var sNotificationsButtonNumber,
-			sOverflowToolbarButtonNumber,
-			oRendererSpy = this.spy(ShellBarRenderer, "render");
+		let sNotificationsButtonNumber,
+			sOverflowToolbarButtonNumber;
+		const oRendererSpy = this.spy(ShellBarRenderer, "render");
 
 		// Act
 
@@ -830,7 +839,7 @@ function(
 
 	QUnit.module("Managed Search", {
 		beforeEach: async function () {
-			var oSearchManager = new SearchManager();
+			const oSearchManager = new SearchManager();
 
 			oSearchManager._oSearch.setIsOpen(true);
 
@@ -888,7 +897,7 @@ function(
 
 	QUnit.test("LayoutData of Search", async function (assert) {
 		// Arrange
-		var oSB = this.oSB,
+		const oSB = this.oSB,
 		oSearchManager = this.oSB.getSearchManager(),
 			oSearchEventDelegate = {
 					"onAfterRendering": function() {
@@ -922,6 +931,7 @@ function(
 		this.oSB._oResponsiveHandler._transformToPhoneState();
 		await nextUIUpdate();
 
+		// Category B: non-zero delay after ResponsiveHandler transform waiting for layout/render cycle
 		setTimeout(function () {
 			oSearchManager._oSearch.addEventDelegate(oSearchEventDelegate);
 			this.oSB.addEventDelegate(oOSBEventDelegate, this);
@@ -952,18 +962,7 @@ function(
 
 	});
 
-	QUnit.test("From XXL to XL break point with ManagedSearch", function (assert) {
-		var fnDone = assert.async(),
-			oRenderingDelegate = {
-				"onAfterRendering": function () {
-					this.oSB.removeEventDelegate(oRenderingDelegate);
-					// Assert
-					assert.ok(this.oSB._oOverflowToolbar.getContent().indexOf(this.oSB._oManagedSearch) > -1,
-						"Managed Search is in the overflowToolbar on XL screen size");
-					fnDone();
-				}.bind(this)
-			};
-
+	QUnit.test("From XXL to XL break point with ManagedSearch", async function (assert) {
 		assert.expect(2);
 
 		// Assert
@@ -972,19 +971,23 @@ function(
 
 		// Act
 		document.getElementById(DOM_RENDER_LOCATION).style.width = 800 + "px";
+		await waitForRendering(this.oSB);
 
-		this.oSB.addEventDelegate(oRenderingDelegate);
+		// Assert
+		assert.ok(this.oSB._oOverflowToolbar.getContent().indexOf(this.oSB._oManagedSearch) > -1,
+			"Managed Search is in the overflowToolbar on XL screen size");
 	});
 
 	QUnit.test("From M to XXL break point with ManagedSearch", function (assert) {
-		var fnDone = assert.async(),
-			oRenderingDelegate;
+		const fnDone = assert.async();
+		let oRenderingDelegate;
 
 		assert.expect(2);
 
 		// Act
 		document.getElementById(DOM_RENDER_LOCATION).style.width = 500 + "px"; // M screen size
 
+		// Category B: non-zero delay after DOM style width change waiting for ResponsiveHandler to process the resize
 		setTimeout(function () {
 			oRenderingDelegate = {
 				"onAfterRendering": function () {
@@ -1029,9 +1032,9 @@ function(
 		}
 	});
 
-	QUnit.test("avatarPressed", function (assert) {
+	QUnit.test("avatarPressed event fires with correct avatar parameter", function (assert) {
 		// Setup
-		var done = assert.async(),
+		const done = assert.async(),
 			oAvatar = this.oSB.getProfile();
 
 		assert.expect(2);
@@ -1049,15 +1052,15 @@ function(
 		oAvatar.firePress();
 	});
 
-	QUnit.test("avatar press", function (assert) {
+	QUnit.test("avatar press event fires with correct source ID", function (assert) {
 		// Setup
-		var done = assert.async(),
+		const done = assert.async(),
 			oAvatar = this.oSB.getProfile();
 
 		assert.expect(2);
 
 		oAvatar.attachPress(function(oEvent) {
-			var sEventProviderId = oEvent.getSource().getId();
+			const sEventProviderId = oEvent.getSource().getId();
 
 			// Assert
 			assert.ok(true, "Event was fired");
@@ -1072,10 +1075,10 @@ function(
 	});
 
 
-	QUnit.test("copilotPressed", function (assert) {
+	QUnit.test("copilotPressed event fires with correct button parameter and icon state changes", function (assert) {
 		// Setup
-		var oEventParamters,
-			done = assert.async(),
+		let oEventParamters;
+		const done = assert.async(),
 			fnTestEvent = function () {
 				// Assert
 				assert.ok(true, "Event was fired");
@@ -1101,10 +1104,10 @@ function(
 		this.oSB._oCopilot.firePress();
 	});
 
-	QUnit.test("homeIconPressed", function (assert) {
+	QUnit.test("homeIconPressed event fires with correct icon parameter", function (assert) {
 		// Setup
-		var oEventParamters,
-			done = assert.async(),
+		let oEventParamters;
+		const done = assert.async(),
 			fnTestEvent = function () {
 				// Assert
 				assert.ok(true, "Event was fired");
@@ -1126,10 +1129,10 @@ function(
 		this.oSB._oHomeIcon.firePress();
 	});
 
-	QUnit.test("menuButtonPressed", function (assert) {
+	QUnit.test("menuButtonPressed event fires with correct button parameter", function (assert) {
 		// Setup
-		var oEventParamters,
-			done = assert.async(),
+		let oEventParamters;
+		const done = assert.async(),
 			fnTestEvent = function () {
 				// Assert
 				assert.ok(true, "Event was fired");
@@ -1151,10 +1154,10 @@ function(
 		this.oSB._oMenuButton.firePress();
 	});
 
-	QUnit.test("navButtonPressed", function (assert) {
+	QUnit.test("navButtonPressed event fires with correct button parameter", function (assert) {
 		// Setup
-		var oEventParamters,
-			done = assert.async(),
+		let oEventParamters;
+		const done = assert.async(),
 			fnTestEvent = function () {
 				// Assert
 				assert.ok(true, "Event was fired");
@@ -1176,10 +1179,10 @@ function(
 		this.oSB._oNavButton.firePress();
 	});
 
-	QUnit.test("notificationsPressed", function (assert) {
+	QUnit.test("notificationsPressed event fires with correct button parameter", function (assert) {
 		// Setup
-		var oEventParamters,
-			done = assert.async(),
+		let oEventParamters;
+		const done = assert.async(),
 			fnTestEvent = function () {
 				// Assert
 				assert.ok(true, "Event was fired");
@@ -1201,10 +1204,10 @@ function(
 		this.oSB._oNotifications.firePress();
 	});
 
-	QUnit.test("productSwitcherPressed", function (assert) {
+	QUnit.test("productSwitcherPressed event fires with correct button parameter", function (assert) {
 		// Setup
-		var oEventParamters,
-			done = assert.async(),
+		let oEventParamters;
+		const done = assert.async(),
 			fnTestEvent = function () {
 				// Assert
 				assert.ok(true, "Event was fired");
@@ -1226,10 +1229,10 @@ function(
 		this.oSB._oProductSwitcher.firePress();
 	});
 
-	QUnit.test("searchButtonPressed", function (assert) {
+	QUnit.test("searchButtonPressed event fires with correct button parameter", function (assert) {
 		// Setup
-		var oEventParamters,
-			done = assert.async(),
+		let oEventParamters;
+		const done = assert.async(),
 			fnTestEvent = function () {
 				// Assert
 				assert.ok(true, "Event was fired");
@@ -1276,10 +1279,9 @@ function(
 
 	QUnit.test("Methods", function (assert) {
 		//Arrange
-		var oACFirst = this.oSB.getAdditionalContent()[0],
+		const oACFirst = this.oSB.getAdditionalContent()[0],
 			oACSecond = this.oSB.getAdditionalContent()[1],
 			oACThird = this.oSB.getAdditionalContent()[2],
-			aRemovedChildren,
 			oLogStub = this.stub(Log, "warning");
 
 		//Assert
@@ -1302,7 +1304,7 @@ function(
 		//Assert
 		assert.equal(this.oSB.getAdditionalContent().length, 3, "additional content is added correctly");
 
-		aRemovedChildren = this.oSB.removeAllAdditionalContent();
+		const aRemovedChildren = this.oSB.removeAllAdditionalContent();
 
 		assert.ok(aRemovedChildren[0] === oACFirst && aRemovedChildren[1] === oACSecond &&
 			aRemovedChildren[2] === oACThird,
@@ -1364,7 +1366,7 @@ function(
 
 	QUnit.module("Binding", {
 		beforeEach: async function () {
-			var oModel = new JSONModel({
+			const oModel = new JSONModel({
 				initials: "KS"
 			});
 
@@ -1379,7 +1381,7 @@ function(
 	});
 
 	QUnit.test("Profile aggregation", async function (assert) {
-		var oAvatar = new Avatar({
+		const oAvatar = new Avatar({
 			initials: '{/initials}'
 		});
 

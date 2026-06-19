@@ -7998,6 +7998,12 @@ sap.ui.define([
 				setSeparate : mustBeMocked
 			},
 			oCacheMock = this.mock(oCache),
+			oContext0 = {
+				checkUpdate : mustBeMocked
+			},
+			oContext1 = {
+				checkUpdate : mustBeMocked
+			},
 			oGetExpectation,
 			oMoveExpectation,
 			oOldCache = {
@@ -8008,6 +8014,11 @@ sap.ui.define([
 
 		this.oModel.bAutoExpandSelect = "~autoExpandSelect~";
 		oBinding.bSharedRequest = bShared;
+		oBinding.mPreviousContextsByPath = {
+			"/EMPLOYEES(1)" : oContext0,
+			// key predicates may differ from keep alive predicates, e.g. for deleted contexts
+			"/EMPLOYEES(2)" : oContext1
+		};
 		if (bAggregation) {
 			oBinding.mParameters.$$aggregation = {/*hierarchyQualifier : "X"*/};
 		} else {
@@ -8057,6 +8068,14 @@ sap.ui.define([
 		if (oGetExpectation) {
 			sinon.assert.callOrder(oMoveExpectation, oGetExpectation);
 		}
+
+		// re-register change listeners asynchronously when the new cache has been established
+		if (bFromModel && bAggregation) {
+			this.mock(oContext0).expects("checkUpdate").withExactArgs();
+			this.mock(oContext1).expects("checkUpdate").withExactArgs();
+		}
+
+		return Promise.resolve(); // wait for async re-registration of change listeners
 	});
 				});
 			});
