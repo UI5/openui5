@@ -3498,4 +3498,73 @@ sap.ui.define([
 		done();
 	});
 
+	QUnit.module("FilePreviewDialog WebM and OGG video preview", {
+		beforeEach: function () {
+			this.oFilePreviewDialog = new FilePreviewDialog();
+
+			this.oCanPlayStub = sinon.stub(this.oFilePreviewDialog, "_canPlayType").callsFake(function (sType) {
+				if (sType === "video/webm" || sType === "video/ogg") {
+					return "probably";
+				}
+				return "";
+			});
+		},
+		afterEach: function () {
+			this.oFilePreviewDialog.destroy();
+			this.oCanPlayStub.restore();
+		}
+	});
+
+	QUnit.test("getPageContent returns video HTML control for video/webm media type", async function (assert) {
+		const oItem = new UploadItem({
+			fileName: "sample.webm",
+			mediaType: "video/webm",
+			url: "test-resources/sap/m/qunit/upload/data/sample.webm",
+			previewable: true
+		});
+
+		const oPage = await this.oFilePreviewDialog.getPageContent(oItem);
+
+		assert.ok(oPage.isA("sap.ui.core.HTML"), "Page content should be an HTML control for video/webm");
+		assert.ok(oPage.getContent().includes("<video"), "HTML content should contain a <video> element");
+
+		oPage.destroy();
+		oItem.destroy();
+	});
+
+	QUnit.test("getPageContent returns video HTML control for video/ogg media type", async function (assert) {
+		const oItem = new UploadItem({
+			fileName: "sample.ogg",
+			mediaType: "video/ogg",
+			url: "test-resources/sap/m/qunit/upload/data/sample.ogg",
+			previewable: true
+		});
+
+		const oPage = await this.oFilePreviewDialog.getPageContent(oItem);
+
+		assert.ok(oPage.isA("sap.ui.core.HTML"), "Page content should be an HTML control for video/ogg");
+		assert.ok(oPage.getContent().includes("<video"), "HTML content should contain a <video> element");
+
+		oPage.destroy();
+		oItem.destroy();
+	});
+
+	QUnit.test("getPageContent returns IllustratedMessage for video/webm when browser does not support it", async function (assert) {
+		this.oCanPlayStub.callsFake(function () { return ""; });
+
+		const oItem = new UploadItem({
+			fileName: "sample.webm",
+			mediaType: "video/webm",
+			url: "test-resources/sap/m/qunit/upload/data/sample.webm",
+			previewable: true
+		});
+
+		const oPage = await this.oFilePreviewDialog.getPageContent(oItem);
+
+		assert.ok(oPage.isA("sap.m.IllustratedMessage"), "Page content should be IllustratedMessage when browser does not support video/webm");
+
+		oPage.destroy();
+		oItem.destroy();
+	});
+
 });

@@ -457,6 +457,44 @@ sap.ui.define([
 		oButton.destroy();
 	});
 
+	QUnit.test("For firefox the button should NOT gain focus on right-click touch start (context menu fix)", function(assert) {
+		// Arrange
+		this.stub(Device, "browser").value({
+			firefox: true
+		});
+
+		const oButton = new Button({text: "MyText", icon: "sap-icon://search"}).placeAt("qunit-fixture");
+		const oFocusSpy = this.spy(oButton, "_setButtonFocus");
+
+		// Act - simulate right-click
+		oButton.ontouchstart({ setMarked: this.stub(), preventDefault: this.stub(), targetTouches: { length: 1 }, which: 3, originalEvent: { type: "mousedown" }, target: { id: "fake-button-id" } });
+
+		// Assert
+		assert.strictEqual(oFocusSpy.callCount, 0, "The button is NOT focused on right-click touch start to avoid closing the context menu");
+
+		// Cleanup
+		oButton.destroy();
+	});
+
+	QUnit.test("For safari the button should NOT gain focus on right-click touch start (context menu fix)", function(assert) {
+		// Arrange
+		this.stub(Device, "browser").value({
+			safari: true
+		});
+
+		const oButton = new Button({text: "MyText", icon: "sap-icon://search"}).placeAt("qunit-fixture");
+		const oFocusSpy = this.spy(oButton, "_setButtonFocus");
+
+		// Act - simulate right-click
+		oButton.ontouchstart({ setMarked: this.stub(), preventDefault: this.stub(), targetTouches: { length: 1 }, which: 3, originalEvent: { type: "mousedown" }, target: { id: "fake-button-id" } });
+
+		// Assert
+		assert.strictEqual(oFocusSpy.callCount, 0, "The button is NOT focused on right-click touch start to avoid closing the context menu");
+
+		// Cleanup
+		oButton.destroy();
+	});
+
 	QUnit.test("Tooltip is recognized", function(assert) {
 
 		// Arrange

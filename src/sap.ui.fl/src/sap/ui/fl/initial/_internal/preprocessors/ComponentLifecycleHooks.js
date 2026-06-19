@@ -155,11 +155,6 @@ sap.ui.define([
 			const SupportAPI = await requireAsync("sap/ui/fl/support/api/SupportAPI");
 			SupportAPI.initializeMessageBrokerForComponent();
 		}
-
-		// todos#19: Temporary workaround - force URLParsing to be loaded
-		// so the hpa.cei.campaign test doesn't fail in the SafetyNet
-		// Remove as soon as the app is fixed to not rely on the side effect of URLParsing being loaded here
-		await Utils.getUShellService("URLParsing");
 	};
 
 	/**

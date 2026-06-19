@@ -4,7 +4,9 @@ sap.ui.define([
 	"qunit/RtaQunitUtils",
 	"sap/m/MessageBox",
 	"sap/m/MessageToast",
+	"sap/ui/core/BusyIndicator",
 	"sap/ui/fl/initial/api/Version",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/_internal/Versions",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/write/api/ReloadInfoAPI",
@@ -19,7 +21,9 @@ sap.ui.define([
 	RtaQunitUtils,
 	MessageBox,
 	MessageToast,
+	BusyIndicator,
 	Version,
+	CancelError,
 	Versions,
 	PersistenceWriteAPI,
 	ReloadInfoAPI,
@@ -428,24 +432,52 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("When publishVersion function is called and publicVersion returns Promise.resolve() ", function(assert) {
+		QUnit.test("When publishVersion function is called and publish resolves", function(assert) {
 			const fnDone = assert.async();
-			const oPublishStub = sandbox.stub(VersionsAPI, "publish").resolves();
-			const oMessageToastStub = sandbox.stub(MessageToast, "show").callsFake(function() {
+			const oBusyShowStub = sandbox.stub(BusyIndicator, "show");
+			const oBusyHideStub = sandbox.stub(BusyIndicator, "hide");
+			const sExpectedMessage = this.oRta._getTextResources().getText("MSG_PUBLISH_SUCCESS");
+			const oPublishStub = sandbox.stub(VersionsAPI, "publish").callsFake(function(mPropertyBag) {
+				mPropertyBag.setBusy(true);
+				mPropertyBag.setBusy(false);
+				return Promise.resolve();
+			});
+			sandbox.stub(MessageToast, "show").callsFake(function(sMessage) {
 				assert.strictEqual(oPublishStub.callCount, 1, "then the publish API was called");
-				assert.strictEqual(oMessageToastStub.callCount, 1, "then the messageToast was shown");
+				assert.strictEqual(sMessage, sExpectedMessage, "the messageToast shows the generic publish success message");
+				assert.strictEqual(oBusyShowStub.callCount, 1, "the busy indicator was shown via setBusy");
+				assert.strictEqual(oBusyHideStub.callCount, 1, "the busy indicator was hidden via setBusy");
 				fnDone();
 			});
 			this.oRta.getToolbar().fireEvent("publishVersion");
 		});
 
-		QUnit.test("When publishVersion function is called and publicVersion returns Cancel or Error", function(assert) {
+		QUnit.test("When publishVersion function is called and publish rejects with CancelError", function(assert) {
 			const fnDone = assert.async();
-			sandbox.stub(VersionsAPI, "publish").resolves("Cancel");
+			sandbox.stub(VersionsAPI, "publish").rejects(new CancelError());
 			const oMessageToastStub = sandbox.stub(MessageToast, "show");
+			const oShowMessageBoxStub = sandbox.stub(Utils, "showMessageBox");
 			this.oRta.getToolbar().fireEvent("publishVersion");
 			setTimeout(function() {
 				assert.strictEqual(oMessageToastStub.callCount, 0, "then no messageToast was shown");
+				assert.strictEqual(oShowMessageBoxStub.callCount, 0, "then no error MessageBox was shown");
+				fnDone();
+			});
+		});
+
+		QUnit.test("When publishVersion function is called and publish rejects with a regular error", function(assert) {
+			const fnDone = assert.async();
+			const oError = new Error("backend down");
+			sandbox.stub(VersionsAPI, "publish").rejects(oError);
+			const oMessageToastStub = sandbox.stub(MessageToast, "show");
+			const oShowMessageBoxStub = sandbox.stub(Utils, "showMessageBox").resolves();
+			this.oRta.getToolbar().fireEvent("publishVersion");
+			setTimeout(function() {
+				assert.strictEqual(oMessageToastStub.callCount, 0, "then no messageToast was shown");
+				assert.strictEqual(oShowMessageBoxStub.callCount, 1, "then an error MessageBox was shown");
+				assert.strictEqual(oShowMessageBoxStub.firstCall.args[0], "error", "with the error icon");
+				assert.strictEqual(oShowMessageBoxStub.firstCall.args[1], "MSG_PUBLISH_ERROR", "with the generic publish error message key");
+				assert.strictEqual(oShowMessageBoxStub.firstCall.args[2].error, oError, "and the originating error attached");
 				fnDone();
 			});
 		});

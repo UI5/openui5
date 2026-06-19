@@ -13,15 +13,17 @@ sap.ui.define([
 	) {
 		"use strict";
 
-		var INITIAL_SCROLL_POSITION = 0,
+		const INITIAL_SCROLL_POSITION = 0,
 			BIG_SCROLL_POSITION = 1000,
 			oLibraryFactory = DynamicPageUtil.oFactory,
 			oUtil = DynamicPageUtil.oUtil;
 
 		function scrollingStatesOfStickyContent(assert, oDynamicPage) {
-			var oDynamicPageContent = oDynamicPage.getContent(),
-				iIntermediateHeightInHeader = oDynamicPage._getHeaderHeight() / 2;
+			// Arrange
+			const oDynamicPageContent = oDynamicPage.getContent();
+			const iIntermediateHeightInHeader = oDynamicPage._getHeaderHeight() / 2;
 
+			// Assert
 			assert.ok(!oDynamicPageContent._getStickySubheaderSticked(), "Sticky content is in the DOM of his provider");
 
 			oDynamicPage._setScrollPosition(iIntermediateHeightInHeader);
@@ -44,9 +46,11 @@ sap.ui.define([
 		}
 
 		function statesOfStickyContentWhileScrollingWhenPinUnpin(assert, oDynamicPage) {
-			var oDynamicPageContent = oDynamicPage.getContent(),
-				iIntermediateHeightInHeader = oDynamicPage._getHeaderHeight() / 2;
+			// Arrange
+			const oDynamicPageContent = oDynamicPage.getContent();
+			const iIntermediateHeightInHeader = oDynamicPage._getHeaderHeight() / 2;
 
+			// Assert
 			assert.ok(!oDynamicPageContent._getStickySubheaderSticked(), "Sticky content is in the DOM of his provider");
 			oDynamicPage._pin();
 			assert.ok(oDynamicPageContent._getStickySubheaderSticked(), "Sticky content is in the DOM of his provider");
@@ -95,9 +99,11 @@ sap.ui.define([
 		}
 
 		function headerSnapExpandStateWhileScrolling(assert, oDynamicPage) {
-			var oDynamicPageContent = oDynamicPage.getContent(),
-				bShouldInitiallyStick = oDynamicPage.getPreserveHeaderStateOnScroll();
+			// Arrange
+			const oDynamicPageContent = oDynamicPage.getContent();
+			const bShouldInitiallyStick = oDynamicPage.getPreserveHeaderStateOnScroll();
 
+			// Assert
 			oDynamicPage.setHeaderExpanded(true);
 			assert.strictEqual(!!oDynamicPageContent._getStickySubheaderSticked(), bShouldInitiallyStick, "Initial position is correct");
 			oDynamicPage.setHeaderExpanded(false);
@@ -119,8 +125,10 @@ sap.ui.define([
 		}
 
 		function headerDynamicVisibilityChange(assert, oDynamicPage) {
-			var oDynamicPageContent = oDynamicPage.getContent();
+			// Arrange
+			const oDynamicPageContent = oDynamicPage.getContent();
 
+			// Assert
 			oDynamicPage.getHeader().setVisible(true);
 			assert.ok(!oDynamicPageContent._getStickySubheaderSticked(), "Sticky content is in the DOM of his provider");
 			oDynamicPage.getHeader().setVisible(false);
@@ -142,8 +150,10 @@ sap.ui.define([
 		}
 
 		function headerDynamicVisibilityChangeWithPreserveHeaderStateOnScroll(assert, oDynamicPage) {
-			var oDynamicPageContent = oDynamicPage.getContent();
+			// Arrange
+			const oDynamicPageContent = oDynamicPage.getContent();
 
+			// Assert
 			oDynamicPage.getHeader().setVisible(true);
 			assert.ok(oDynamicPageContent._getStickySubheaderSticked(), "Sticky content is in sticky area");
 			oDynamicPage.getHeader().setVisible(false);
@@ -166,176 +176,238 @@ sap.ui.define([
 
 		QUnit.module("Association value");
 
-		QUnit.test("change the value", async function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/),
-				sWrongStickySubheaderSource = "sWrongStickySubheaderSource",
-				sStickyContentProviderId;
+		QUnit.test("StickySubheaderProvider association value changes are reflected correctly", async function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/),
+				sWrongStickySubheaderSource = "sWrongStickySubheaderSource";
 
 			oUtil.renderObject(oDynamicPage);
 
-			sStickyContentProviderId = oDynamicPage.getContent().getId();
+			const sStickyContentProviderId = oDynamicPage.getContent().getId();
 
+			// Assert initial state
 			assert.notEqual(oDynamicPage._oStickySubheader, null,  "There was setted sticky subheader");
 			assert.equal(oDynamicPage.getStickySubheaderProvider(), sStickyContentProviderId,  "Sticky subheader provider is the control in content aggregation");
 
+			// Act: set provider to null
 			oDynamicPage.setStickySubheaderProvider(null);
 			await nextUIUpdate();
 			assert.equal(oDynamicPage._oStickySubheader, null,  "There was not setted sticky subheader");
 			assert.equal(oDynamicPage.getStickySubheaderProvider(), null,  "Sticky content is in sticky area");
 
+			// Act: set provider to a non-existing ID
 			oDynamicPage.setStickySubheaderProvider(sWrongStickySubheaderSource);
 			await nextUIUpdate();
 			assert.equal(oDynamicPage._oStickySubheader, null,  "There was not setted sticky subheader");
 			assert.equal(oDynamicPage.getStickySubheaderProvider(), sWrongStickySubheaderSource,  "Sticky content is in sticky area");
 
+			// Act: restore valid provider
 			oDynamicPage.setStickySubheaderProvider(sStickyContentProviderId);
 			await nextUIUpdate();
 			assert.notEqual(oDynamicPage._oStickySubheader, null,  "There was setted sticky subheader");
 			assert.equal(oDynamicPage.getStickySubheaderProvider(), sStickyContentProviderId,  "Sticky content is in sticky area");
 
+			// Cleanup
 			oDynamicPage.destroy();
 		});
 
 		QUnit.module("DynamicPage sticky content position while scrolling");
 
-		QUnit.test("DynamicPage which has header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has header and title shows correct sticky content position while scrolling", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			scrollingStatesOfStickyContent(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has title and is without header", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, false  /*has header*/, false /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has title and is without header shows correct sticky content position while scrolling", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, false  /*has header*/, false /*header visible*/, true /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			scrollingStatesOfStickyContent(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has title and is without header", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, false  /*has header*/, false /*header visible*/, false /*has title*/);
+		QUnit.test("DynamicPage which has neither title nor header shows correct sticky content position while scrolling", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, false  /*has header*/, false /*header visible*/, false /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			scrollingStatesOfStickyContent(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has header and is without title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
+		QUnit.test("DynamicPage which has header and is without title shows correct sticky content position while scrolling", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			scrollingStatesOfStickyContent(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has header without content and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has header without content and title shows correct sticky content position while scrolling", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
 
 			oDynamicPage.getHeader().destroyContent();
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			scrollingStatesOfStickyContent(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has header and without title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
+		QUnit.test("DynamicPage which has header and without title shows correct sticky content position while scrolling", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			scrollingStatesOfStickyContent(assert, oDynamicPage);
 		});
 
 		QUnit.module("DynamicPage sticky content position while scrolling and pin/unpin");
 
-		QUnit.test("DynamicPage which has header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has header and title shows correct sticky content position while scrolling with pin and unpin", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			statesOfStickyContentWhileScrollingWhenPinUnpin(assert, oDynamicPage);
 		});
 
 		QUnit.module("DynamicPage sticky content position while snap/expand header");
 
-		QUnit.test("DynamicPage which has header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has header and title shows correct sticky content position while snapping and expanding header", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			headerSnapExpandStateWhileScrolling(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage with header expanded in the title-area", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/),
-				iHeaderContentHeight,
-				iStickySubHeaderHeight;
+		QUnit.test("DynamicPage with header expanded in the title-area sticks sticky subheader when scrolled to snap position", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
 
 			oUtil.renderObject(oDynamicPage);
 
-			iHeaderContentHeight = oDynamicPage._getHeaderHeight();
-			iStickySubHeaderHeight = oDynamicPage._oStickySubheader.getDomRef().offsetHeight;
+			const iHeaderContentHeight = oDynamicPage._getHeaderHeight();
+			const iStickySubHeaderHeight = oDynamicPage._oStickySubheader.getDomRef().offsetHeight;
 
-			// Act: scroll to snap [where the scroll Top is slose to the snap breakpoints]
+			// Act: scroll to snap [where the scroll Top is close to the snap breakpoints]
 			oDynamicPage._setScrollPosition(iHeaderContentHeight + iStickySubHeaderHeight);
-			 // Act: click to expand the heasder in the title area
+			// Act: click to expand the header in the title area
 			oDynamicPage._titleExpandCollapseWhenAllowed(true /* user interaction */);
-			assert.ok(oDynamicPage._shouldStickStickyContent(), "sticky content shouled snap");
+			assert.ok(oDynamicPage._shouldStickStickyContent(), "sticky content should snap");
 
 			oDynamicPage._toggleHeaderOnScroll();// call the scroll listener synchronously to speed up the test
 			assert.ok(oDynamicPage.getContent()._getStickySubheaderSticked(), "Sticky content is in sticky area");
 
+			// Cleanup
 			oDynamicPage.destroy();
 		});
 
 		QUnit.module("DynamicPage sticky content position while scrolling and changing the visibility of header");
 
-		QUnit.test("DynamicPage which has header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has header and title shows correct sticky content position when header visibility changes", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			headerDynamicVisibilityChange(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has header and without title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
+		QUnit.test("DynamicPage which has header and without title shows correct sticky content position when header visibility changes", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			headerDynamicVisibilityChange(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has not visible header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, false /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has not visible header and title shows correct sticky content position when header visibility changes", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, false /*header visible*/, true /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			headerDynamicVisibilityChange(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has not visible header and without title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, false /*header visible*/, false /*has title*/);
+		QUnit.test("DynamicPage which has not visible header and without title shows correct sticky content position when header visibility changes", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, false /*header visible*/, false /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			headerDynamicVisibilityChange(assert, oDynamicPage);
 		});
 
 		QUnit.module("DynamicPage sticky content position while scrolling and changing the visibility of header without content");
 
-		QUnit.test("DynamicPage which has header without content and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has header without content and title shows correct sticky content position when header visibility changes", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/);
 
 			oDynamicPage.getHeader().destroyContent();
+
+			// Act
 			oUtil.renderObject(oDynamicPage);
 
+			// Assert
 			headerDynamicVisibilityChange(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has header without content and without title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
+		QUnit.test("DynamicPage which has header without content and without title shows correct sticky content position when header visibility changes", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
 
 			oDynamicPage.getHeader().destroyContent();
+
+			// Act
 			oUtil.renderObject(oDynamicPage);
 
+			// Assert
 			headerDynamicVisibilityChange(assert, oDynamicPage);
 		});
 
 		QUnit.module("DynamicPage sticky content position while scrolling and rerendering iconTabBar");
 
-		QUnit.test("DynamicPage which has header and title", async function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/),
+		QUnit.test("DynamicPage which has header and title keeps sticky content in sticky area after IconTabBar rerender", async function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(false /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, true /*has title*/),
 				oIconTabBar = oDynamicPage.getContent();
 
 			assert.expect(2);
@@ -348,11 +420,11 @@ sap.ui.define([
 			// Verify init state
 			assert.ok(oIconTabBar._getStickySubheaderSticked(), "Sticky content is in sticky area");
 
-			//Act: rerender
+			// Act: rerender
 			oIconTabBar.invalidate();
 			await nextUIUpdate();
 
-			// Check
+			// Assert
 			assert.ok(oIconTabBar._getStickySubheaderSticked(), "Sticky content is still in sticky area");
 
 			// Cleanup
@@ -361,15 +433,16 @@ sap.ui.define([
 
 		QUnit.module("DynamicPage with preservedHeaderStateOnScroll sticky content position while scrolling");
 
-		QUnit.test("DynamicPage which has header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true /*has header*/, true /*header visible*/, true /*has title*/),
-				oDynamicPageContent = oDynamicPage.getContent(),
-				iIntermediateHeightInHeader;
+		QUnit.test("DynamicPage which has header and title shows correct sticky content position while scrolling with preserveHeaderStateOnScroll", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true /*has header*/, true /*header visible*/, true /*has title*/),
+				oDynamicPageContent = oDynamicPage.getContent();
 
 			oUtil.renderObject(oDynamicPage);
 
-			iIntermediateHeightInHeader = oDynamicPage._getHeaderHeight() / 2;
+			const iIntermediateHeightInHeader = oDynamicPage._getHeaderHeight() / 2;
 
+			// Assert
 			assert.ok(oDynamicPageContent._getStickySubheaderSticked(), "Sticky content is in sticky area");
 
 			oDynamicPage._setScrollPosition(iIntermediateHeightInHeader);
@@ -415,12 +488,14 @@ sap.ui.define([
 
 		QUnit.module("DynamicPage with preservedHeaderStateOnScroll sticky content while snap/expand");
 
-		QUnit.test("DynamicPage which has header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true /*has header*/, true /*header visible*/, true /*has title*/),
+		QUnit.test("DynamicPage which has header and title keeps sticky content in sticky area while snapping and expanding header with preserveHeaderStateOnScroll", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true /*has header*/, true /*header visible*/, true /*has title*/),
 				oDynamicPageContent = oDynamicPage.getContent();
 
 			oUtil.renderObject(oDynamicPage);
 
+			// Assert
 			assert.ok(oDynamicPageContent._getStickySubheaderSticked(), "Sticky content is in sticky area");
 			oDynamicPage.setHeaderExpanded(false);
 			assert.ok(oDynamicPageContent._getStickySubheaderSticked(), "Sticky content is in sticky area");
@@ -432,23 +507,22 @@ sap.ui.define([
 
 		QUnit.module("DynamicPage with preservedHeaderStateOnScroll on parent rerendering");
 
-		QUnit.test("DynamicPage with header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(
+		QUnit.test("DynamicPage with header and title places sticky subheader correctly after parent rerender", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(
 				true /*preserveHeaderStateOnScroll*/,
 				true /*has header*/,
 				true /*header visible*/,
-				true /*has title*/),
-				$stickySubHeader,
-				$stickyPlaceholder;
+				true /*has title*/);
 
 			oUtil.renderObject(oDynamicPage);
 
-			// verify API updated correctly
+			// Assert: verify API updated correctly
 			assert.ok(oDynamicPage.getContent()._getStickySubheaderSticked(), "Sticky content is in sticky area");
 
-			// check DOM also updated correctly
-			$stickySubHeader = oDynamicPage._oStickySubheader.$();
-			$stickyPlaceholder = oDynamicPage.$("stickyPlaceholder");
+			// Assert: check DOM also updated correctly
+			const $stickySubHeader = oDynamicPage._oStickySubheader.$();
+			const $stickyPlaceholder = oDynamicPage.$("stickyPlaceholder");
 			assert.strictEqual($stickySubHeader.get(0).parentElement, $stickyPlaceholder.get(0),
 				"Sticky content DOM is in the sticky area");
 
@@ -458,60 +532,88 @@ sap.ui.define([
 
 		QUnit.module("DynamicPage with preservedHeaderStateOnScroll sticky content position while scrolling and snap/expand header");
 
-		QUnit.test("DynamicPage which has header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true /*has header*/, true /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has header and title shows correct sticky content position while scrolling and snapping with preserveHeaderStateOnScroll", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true /*has header*/, true /*header visible*/, true /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			headerSnapExpandStateWhileScrolling(assert, oDynamicPage);
 		});
 
 		QUnit.module("DynamicPage with preservedHeaderStateOnScroll sticky content position while scrolling and changing the visibility of header");
 
-		QUnit.test("DynamicPage which has header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true /*has header*/, true /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has header and title shows correct sticky content position when header visibility changes with preserveHeaderStateOnScroll", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true /*has header*/, true /*header visible*/, true /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			headerDynamicVisibilityChangeWithPreserveHeaderStateOnScroll(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has header and without title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
+		QUnit.test("DynamicPage which has header and without title shows correct sticky content position when header visibility changes with preserveHeaderStateOnScroll", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			headerDynamicVisibilityChangeWithPreserveHeaderStateOnScroll(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has not visible header and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true  /*has header*/, false /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has not visible header and title shows correct sticky content position when header visibility changes with preserveHeaderStateOnScroll", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true  /*has header*/, false /*header visible*/, true /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			headerDynamicVisibilityChangeWithPreserveHeaderStateOnScroll(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has not visible header and without title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true  /*has header*/, false /*header visible*/, false /*has title*/);
+		QUnit.test("DynamicPage which has not visible header and without title shows correct sticky content position when header visibility changes with preserveHeaderStateOnScroll", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true  /*has header*/, false /*header visible*/, false /*has title*/);
 
+			// Act
 			oUtil.renderObject(oDynamicPage);
+
+			// Assert
 			headerDynamicVisibilityChangeWithPreserveHeaderStateOnScroll(assert, oDynamicPage);
 		});
 
 		QUnit.module("DynamicPage with preservedHeaderStateOnScroll sticky content position while scrolling and changing the visibility of header without content");
 
-		QUnit.test("DynamicPage which has header witout content and title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true /*has header*/, true /*header visible*/, true /*has title*/);
+		QUnit.test("DynamicPage which has header without content and title shows correct sticky content position when header visibility changes with preserveHeaderStateOnScroll", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true /*has header*/, true /*header visible*/, true /*has title*/);
 
 			oDynamicPage.getHeader().destroyContent();
+
+			// Act
 			oUtil.renderObject(oDynamicPage);
 
+			// Assert
 			headerDynamicVisibilityChangeWithPreserveHeaderStateOnScroll(assert, oDynamicPage);
 		});
 
-		QUnit.test("DynamicPage which has header without content and without title", function (assert) {
-			var oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
+		QUnit.test("DynamicPage which has header without content and without title shows correct sticky content position when header visibility changes with preserveHeaderStateOnScroll", function (assert) {
+			// Arrange
+			const oDynamicPage = oLibraryFactory.getDynamicPageWithStickySubheader(true /*preserveHeaderStateOnScroll*/, true  /*has header*/, true /*header visible*/, false /*has title*/);
 
 			oDynamicPage.getHeader().destroyContent();
+
+			// Act
 			oUtil.renderObject(oDynamicPage);
 
+			// Assert
 			headerDynamicVisibilityChangeWithPreserveHeaderStateOnScroll(assert, oDynamicPage);
 		});
 
@@ -528,25 +630,27 @@ sap.ui.define([
 			}
 		});
 
-		QUnit.test("DynamicPage - " + DynamicPage.NAVIGATION_CLASS_NAME + " CSS class", function(assert) {
-			// Assert
+		QUnit.test("DynamicPage - " + DynamicPage.NAVIGATION_CLASS_NAME + " CSS class is added when StickySubheaderProvider is present and removed when it is destroyed", function(assert) {
+			// Assert: class is present initially
 			assert.ok(this.oDynamicPage.hasStyleClass(DynamicPage.NAVIGATION_CLASS_NAME),
 					"Dynamic Page has the " + DynamicPage.NAVIGATION_CLASS_NAME + ", " +
 					"when we have StickySubheaderProvider.");
 
-			// Act - Destroy the StickySubheaderProvider
+			// Act: Destroy the StickySubheaderProvider
 			Element.getElementById(this.oDynamicPage.getStickySubheaderProvider()).destroy();
 			oUtil.renderObject(this.oDynamicPage);
 
-			// Assert
+			// Assert: class is removed after provider is destroyed
 			assert.notOk(this.oDynamicPage.hasStyleClass(DynamicPage.NAVIGATION_CLASS_NAME),
 					"Dynamic Page doesn't have the " + DynamicPage.NAVIGATION_CLASS_NAME + ", " +
 					"when we don't have StickySubheaderProvider.");
 		});
 
-		QUnit.test("Sticky subheader gets 'sapFDynamicPageStickySubheader' class", function (assert) {
+		QUnit.test("Sticky subheader gets 'sapFDynamicPageStickySubheader' class when StickySubheaderProvider is set", function (assert) {
+			// Arrange
+			const oStickySubheader = this.oDynamicPage._oStickySubheader;
+
 			// Assert
-			var oStickySubheader = this.oDynamicPage._oStickySubheader;
 			assert.ok(oStickySubheader, "Sticky subheader is available");
 			assert.ok(oStickySubheader.hasStyleClass("sapFDynamicPageStickySubheader"),
 				"'sapFDynamicPageStickySubheader' class is added to the sticky subheader");
@@ -554,7 +658,7 @@ sap.ui.define([
 
 		QUnit.test("'sapFDynamicPageStickySubheader' class survives subheader re-render", async function (assert) {
 			// Arrange
-			var oStickySubheader = this.oDynamicPage._oStickySubheader;
+			const oStickySubheader = this.oDynamicPage._oStickySubheader;
 			assert.ok(oStickySubheader.hasStyleClass("sapFDynamicPageStickySubheader"),
 				"'sapFDynamicPageStickySubheader' class is present before re-render");
 
@@ -580,12 +684,13 @@ sap.ui.define([
 			}
 		});
 
-		QUnit.test("ScrollToElement correct when subHeader toggles", function(assert) {
-			var oIconTabBar = this.oDynamicPage.getContent(),
+		QUnit.test("ScrollToElement positions element correctly when subHeader toggles during scroll", function(assert) {
+			// Arrange
+			const oIconTabBar = this.oDynamicPage.getContent(),
 				oElement = oIconTabBar.getItems()[0].getContent()[0].getContent()[20].getDomRef(),
 				$wrapper = this.oDynamicPage.$wrapper;
 
-			// Setup: an element in the context exists
+			// Assert: an element in the context exists
 			assert.ok(oElement, "element is in dom");
 
 			// Act

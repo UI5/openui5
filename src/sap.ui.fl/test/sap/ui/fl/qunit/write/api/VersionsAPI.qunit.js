@@ -785,10 +785,9 @@ sap.ui.define([
 			};
 
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
-			var oPublishStub = sandbox.stub(Versions, "publish").resolves("Success");
+			var oPublishStub = sandbox.stub(Versions, "publish").resolves();
 			return VersionsAPI.publish(mPropertyBag)
-			.then(function(sMessage) {
-				assert.equal(sMessage, "Success", "a message was returned");
+			.then(function() {
 				assert.deepEqual(oPublishStub.getCall(0).args[0].reference, sReference, "the reference was passed");
 				assert.deepEqual(oPublishStub.getCall(0).args[0].version, "abc", "the version was passed");
 			});

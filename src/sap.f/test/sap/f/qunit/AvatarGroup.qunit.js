@@ -16,7 +16,7 @@ function (
 ) {
 	"use strict";
 
-	var DOM_RENDER_LOCATION = "qunit-fixture",
+	const DOM_RENDER_LOCATION = "qunit-fixture",
 		sControlId = "AvatarGroupId";
 
 	function createAvatarGroup(oProps, sId) {
@@ -48,13 +48,12 @@ function (
 	QUnit.test("Rendering", async function (assert) {
 
 		// Arrange
-		var oAvatarGroup = new AvatarGroup({}),
-			$oDomRef;
+		const oAvatarGroup = new AvatarGroup({});
 
 		// Act
 		oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate();
-		$oDomRef = oAvatarGroup.$();
+		const $oDomRef = oAvatarGroup.$();
 
 		// Assert
 		assert.ok($oDomRef, "The AvatarGroup is rendered");
@@ -81,16 +80,15 @@ function (
 	QUnit.test("Tooltip", async function (assert) {
 
 		// Arrange
-		var sTooltip = "Test tooltip",
+		const sTooltip = "Test tooltip",
 				oAvatarGroup = new AvatarGroup({
 				tooltip: sTooltip
-			}),
-			$oDomRef;
+			});
 
 		// Act
 		oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate();
-		$oDomRef = oAvatarGroup.$();
+		const $oDomRef = oAvatarGroup.$();
 
 		// Assert
 		assert.strictEqual($oDomRef.attr("title"), sTooltip, "The AvatarGroup has tooltip shown, when in Group mode");
@@ -113,16 +111,15 @@ function (
 
 	QUnit.test("AvatarGroup with avatarDisplaySize set to 'XS' then to 'L'", async function (assert) {
 		// Arrange
-		var $oDomRef;
 		this.oAvatarGroup.setAvatarDisplaySize("XS");
 		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate();
 
 		// Assert
-		$oDomRef = this.oAvatarGroup.$();
+		const $oDomRef = this.oAvatarGroup.$();
 		assert.ok($oDomRef.hasClass("sapFAvatarGroupXS"), "The AvatarGroup has 'sapFAvatarGroupXS' class");
 
-		this.oAvatarGroup.getItems().forEach(function (oItem) {
+		this.oAvatarGroup.getItems().forEach((oItem) => {
 			assert.ok(oItem.$().hasClass("sapFAvatarGroupItemXS"), "The AvatarGroupItem has 'sapFAvatarGroupItemXS' class");
 		});
 
@@ -135,7 +132,7 @@ function (
 			"The AvatarGroup does not have previous 'sapFAvatarGroupXS' class");
 		assert.ok($oDomRef.hasClass("sapFAvatarGroupL"), "The AvatarGroup has 'sapFAvatarGroupL' class");
 
-		this.oAvatarGroup.getItems().forEach(function (oItem) {
+		this.oAvatarGroup.getItems().forEach((oItem) => {
 			assert.notOk(oItem.$().hasClass("sapFAvatarGroupItemXS"),
 				"The AvatarGroupItem does not have previous'sapFAvatarGroupItemXS' class");
 			assert.ok(oItem.$().hasClass("sapFAvatarGroupItemL"), "The AvatarGroupItem has 'sapFAvatarGroupItemL' class");
@@ -144,18 +141,17 @@ function (
 
 	QUnit.test("AvatarGroup with avatarDisplaySize set to 'Custom'", async function (assert) {
 		// Arrange
-		var $oDomRef;
 		this.oAvatarGroup.setAvatarDisplaySize("Custom");
 		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate();
 
 		// Assert
-		$oDomRef = this.oAvatarGroup.$();
+		const $oDomRef = this.oAvatarGroup.$();
 		assert.ok($oDomRef.hasClass("sapFAvatarGroupCustom"), "The AvatarGroup has 'sapFAvatarGroupCustom' class");
 		assert.ok(this.oAvatarGroup.getAvatarCustomDisplaySize(), "3rem", "The AvatarGroup has 'avatarCustomDisplaySize' property with 3rem by default");
 		assert.ok(this.oAvatarGroup.getAvatarCustomFontSize(), "1.125rem", "The AvatarGroup has 'avatarCustomFontSize' property with 1.125rem by default");
 
-		this.oAvatarGroup.getItems().forEach(function (oItem) {
+		this.oAvatarGroup.getItems().forEach((oItem) => {
 			assert.ok(oItem.$().hasClass("sapFAvatarGroupItemCustom"), "The AvatarGroupItem has 'sapFAvatarGroupItemCustom' class");
 		});
 
@@ -168,7 +164,7 @@ function (
 		assert.ok(this.oAvatarGroup.getAvatarCustomDisplaySize(), "4rem", "The AvatarGroup has 'avatarCustomDisplaySize' property changed to 4rem");
 		assert.ok(this.oAvatarGroup.getAvatarCustomFontSize(), "1.5rem", "The AvatarGroup has 'avatarCustomFontSize' property changed to 1.5rem");
 
-		this.oAvatarGroup.getItems().forEach(function (oItem) {
+		this.oAvatarGroup.getItems().forEach((oItem) => {
 			assert.ok(oItem._getAvatar().getCustomDisplaySize(), "4rem", "The avatarCustomDisplaySize property propagates to Avatar");
 			assert.ok(oItem._getAvatar().getCustomFontSize(), "1.5rem", "The avatarCustomFontSize property propagates to Avatar");
 		});
@@ -176,7 +172,7 @@ function (
 
 	QUnit.test("Avatar theme changing logic", async function (assert) {
 		// Arrange
-		var oSpy = this.spy(this.oAvatarGroup, "_onResize");
+		const oSpy = this.spy(this.oAvatarGroup, "_onResize");
 
 		// Act
 		this.oAvatarGroup.onThemeChanged({ theme: "mock" });
@@ -201,14 +197,14 @@ function (
 
 	QUnit.test("AvatarGroupItems color", function (assert) {
 		// Arrange
-		var aItems = this.oAvatarGroup.getItems(),
-			oItem;
+		const aItems = this.oAvatarGroup.getItems();
+		let oItem;
 
 		// Assert
 		assert.strictEqual(this.oAvatarGroup._iCurrentAvatarColorNumber, aItems.length + 1,
 			"The current avatar color should be the next Accent color");
 
-		for (var i = 1; i <= aItems.length; i++) {
+		for (let i = 1; i <= aItems.length; i++) {
 			oItem = aItems[i - 1];
 			assert.strictEqual(oItem.getAvatarColor(), "Accent" + i, "The Avatar has correct consequent color");
 		}
@@ -216,11 +212,11 @@ function (
 
 	QUnit.test("AvatarGroupItems groupType", async function (assert) {
 		// Arrange
-		var aItems = this.oAvatarGroup.getItems(),
-			oItem;
+		const aItems = this.oAvatarGroup.getItems();
+		let oItem;
 
 		// Assert
-		for (var i = 1; i <= aItems.length; i++) {
+		for (let i = 1; i <= aItems.length; i++) {
 			oItem = aItems[i - 1];
 			assert.strictEqual(oItem._getGroupType(), "Group", "The Avatar has Group groupType by default");
 		}
@@ -230,7 +226,7 @@ function (
 		await nextUIUpdate();
 
 		// Assert
-		for (var i = 1; i <= aItems.length; i++) {
+		for (let i = 1; i <= aItems.length; i++) {
 			oItem = aItems[i - 1];
 			assert.strictEqual(oItem._getGroupType(), "Individual", "The Avatar has Individual groupType");
 		}
@@ -243,7 +239,7 @@ function (
 
 	QUnit.test("Space/Enter key pressed", function (assert) {
 		// Arrange
-		var oSpy = this.spy(this.oAvatarGroup, "ontap");
+		const oSpy = this.spy(this.oAvatarGroup, "ontap");
 
 		// Act
 		this.oAvatarGroup.onsapenter({});
@@ -260,7 +256,7 @@ function (
 
 	QUnit.test("ontap", function (assert) {
 		// Arrange
-		var oSpy = this.spy(this.oAvatarGroup, "firePress");
+		const oSpy = this.spy(this.oAvatarGroup, "firePress");
 
 		// Act
 		this.oAvatarGroup.ontap({ srcControl: this.oAvatarGroup });
@@ -271,7 +267,7 @@ function (
 
 	QUnit.test("onkeyup", function (assert) {
 		// Arrange
-		var oEventCalled = {
+		const oEventCalled = {
 				shiftKey: true,
 				keyCode: KeyCodes.ENTER,
 				preventDefault: function () {
@@ -330,7 +326,7 @@ function (
 	});
 
 	QUnit.test("_floorWithTolerance snaps near-integer values", function (assert) {
-		var oAG = this.oAvatarGroup;
+		const oAG = this.oAvatarGroup;
 
 		// Values within tolerance (0.01) snap to nearest integer
 		assert.strictEqual(oAG._floorWithTolerance(1.9997), 2,
@@ -357,13 +353,13 @@ function (
 		// Arrange
 		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate();
-		var oDomRef = this.oAvatarGroup.getDomRef();
+		const oDomRef = this.oAvatarGroup.getDomRef();
 		this.stub(oDomRef, "getBoundingClientRect").returns({ width: 100.75 });
-		var oStyle = window.getComputedStyle(oDomRef);
-		var iExpected = Math.max(0, 100.75 - parseFloat(oStyle.paddingLeft) - parseFloat(oStyle.paddingRight));
+		const oStyle = window.getComputedStyle(oDomRef);
+		const iExpected = Math.max(0, 100.75 - parseFloat(oStyle.paddingLeft) - parseFloat(oStyle.paddingRight));
 
 		// Act
-		var iWidth = this.oAvatarGroup._getWidth();
+		const iWidth = this.oAvatarGroup._getWidth();
 
 		// Assert
 		assert.strictEqual(iWidth, iExpected,
@@ -378,7 +374,7 @@ function (
 
 		// Act - hide parent so getBoundingClientRect().width returns 0
 		this.oPage.$().css("display", "none");
-		var iWidth = this.oAvatarGroup._getWidth();
+		const iWidth = this.oAvatarGroup._getWidth();
 
 		// Assert
 		assert.strictEqual(iWidth, 0, "_getWidth returns 0 (not negative) when parent is hidden");
@@ -391,14 +387,14 @@ function (
 		// Arrange
 		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate();
-		var oSpy = this.spy(this.oAvatarGroup, "_getAvatarsToShow");
+		const oSpy = this.spy(this.oAvatarGroup, "_getAvatarsToShow");
 
 		// Act
 		this.oAvatarGroup._onResize();
 
 		// Assert
 		assert.ok(oSpy.calledOnce, "_getAvatarsToShow was called once");
-		var iActualAvatarPxWidth = oSpy.getCall(0).args[3];
+		const iActualAvatarPxWidth = oSpy.getCall(0).args[3];
 		assert.ok(iActualAvatarPxWidth > 0, "4th argument (actual avatar DOM width) is a positive number");
 		assert.strictEqual(
 			iActualAvatarPxWidth,
@@ -408,7 +404,7 @@ function (
 	});
 
 	QUnit.test("_iAvatarsToShow after addItem", function (assert) {
-		var iExpectedCount = this.oAvatarGroup.getItems().length + 1;
+		const iExpectedCount = this.oAvatarGroup.getItems().length + 1;
 
 		// Act
 		this.oAvatarGroup.addItem(new AvatarGroupItem({ initials: "BD" }));
@@ -466,7 +462,7 @@ function (
 	});
 
 	QUnit.test("_getAvatarMargin", function (assert) {
-		var oAvatarGroupMargins = {
+		const oAvatarGroupMargins = {
 				XS: 0.5,
 				S: 1.25,
 				M: 1.625,
@@ -482,7 +478,7 @@ function (
 			};
 
 		// Assert
-		for (var sKey in oAvatarGroupMargins) {
+		for (const sKey in oAvatarGroupMargins) {
 			assert.strictEqual(this.oAvatarGroup._getAvatarMargin(sKey),
 				oAvatarGroupMargins[sKey],
 				"Avatar margin in Group mode with " + sKey + " size is returned correctly");
@@ -492,7 +488,7 @@ function (
 		this.oAvatarGroup.setGroupType("Individual");
 
 		// Assert
-		for (var sKey in oAvatarIndividualMargins) {
+		for (const sKey in oAvatarIndividualMargins) {
 			assert.strictEqual(this.oAvatarGroup._getAvatarMargin(sKey),
 				oAvatarIndividualMargins[sKey],
 				"Avatar margin in Group mode with " + sKey + " size is returned correctly");
@@ -558,14 +554,13 @@ function (
 
 	QUnit.test("_onResize does not invalidates infinitely when control is not visible", async function (assert) {
 		// Arrange
-		var oSpy;
 		this.oPage = new Page({
 			content: [ this.oAvatarGroup ]
 		});
 		this.oPage.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate();
 
-		oSpy = this.spy(this.oAvatarGroup, "invalidate");
+		const oSpy = this.spy(this.oAvatarGroup, "invalidate");
 
 		// Act
 		this.oPage.$().css("display", "none");
@@ -588,7 +583,7 @@ function (
 		this.oAvatarGroup._onResize();
 
 		// Assert
-		var sCssVarValue = this.oAvatarGroup.getDomRef().style.getPropertyValue("--sapUiAvatarGroupButtonInnerHeight");
+		const sCssVarValue = this.oAvatarGroup.getDomRef().style.getPropertyValue("--sapUiAvatarGroupButtonInnerHeight");
 		assert.ok(sCssVarValue, "CSS variable --sapUiAvatarGroupButtonInnerHeight is set");
 		assert.ok(sCssVarValue.endsWith("rem"), "CSS variable value has correct unit (rem)");
 		assert.ok(parseFloat(sCssVarValue) > 0, "CSS variable value is a positive number");
@@ -605,7 +600,7 @@ function (
 		this.oAvatarGroup._onResize();
 
 		// Assert
-		var sCssVarValue = this.oAvatarGroup.getDomRef().style.getPropertyValue("--sapUiAvatarGroupButtonInnerHeight");
+		const sCssVarValue = this.oAvatarGroup.getDomRef().style.getPropertyValue("--sapUiAvatarGroupButtonInnerHeight");
 		assert.strictEqual(sCssVarValue, "5rem", "CSS variable matches custom display size");
 	});
 
@@ -619,7 +614,7 @@ function (
 		this.oAvatarGroup._onResize();
 
 		// Assert
-		var sCssVarValue = this.oAvatarGroup.getDomRef().style.getPropertyValue("--sapUiAvatarGroupButtonInnerHeight");
+		const sCssVarValue = this.oAvatarGroup.getDomRef().style.getPropertyValue("--sapUiAvatarGroupButtonInnerHeight");
 		assert.ok(sCssVarValue, "CSS variable is set for Group type (used for border-radius calculation)");
 		assert.ok(parseFloat(sCssVarValue) > 0, "CSS variable value is a positive number");
 	});
@@ -628,7 +623,7 @@ function (
 		//Arrange
 		this.oAvatarGroup.placeAt(DOM_RENDER_LOCATION);
 		this.oAvatarGroup._setInteractive(false);
-		var oFirePressSpy = this.spy(this.oAvatarGroup, "firePress");
+		const oFirePressSpy = this.spy(this.oAvatarGroup, "firePress");
 		await nextUIUpdate();
 
 		// Act
@@ -636,7 +631,7 @@ function (
 
 		// Assert
 		assert.strictEqual(oFirePressSpy.callCount, 0, "firePress event is not fired");
-		var iTabbaleAvatars = this.oAvatarGroup.getDomRef().querySelectorAll('.sapFAvatarGroupItem[tabindex="-1"]').length;
+		const iTabbaleAvatars = this.oAvatarGroup.getDomRef().querySelectorAll('.sapFAvatarGroupItem[tabindex="-1"]').length;
 		assert.strictEqual(iTabbaleAvatars, 0, "Avatars are not included in the tab chain");
 	});
 
@@ -647,7 +642,7 @@ function (
 		// After onAfterRendering sets style.width="auto", the ResizeHandler fires _onResize again.
 		// Bug: integer container width + Rem.toPx rounding caused a false overflow detection → invalidate loop.
 		// Fix: fractional getBoundingClientRect widths for both container and avatar are used.
-		var oAvatarGroup = new AvatarGroup({
+		const oAvatarGroup = new AvatarGroup({
 			avatarDisplaySize: "Custom",
 			avatarCustomDisplaySize: "1.2rem",
 			avatarCustomFontSize: ".6rem",
@@ -661,7 +656,7 @@ function (
 		await nextUIUpdate();
 		// onAfterRendering has already called _onResize once (sets style.width="auto")
 
-		var oInvalidateSpy = this.spy(oAvatarGroup, "invalidate");
+		const oInvalidateSpy = this.spy(oAvatarGroup, "invalidate");
 
 		// Simulate the ResizeHandler firing after style.width="auto" was set
 		oAvatarGroup._onResize();

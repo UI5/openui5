@@ -419,11 +419,11 @@ sap.ui.define([
 
 		if (!sPlaceholder) {
 			if (oBindingType instanceof SimpleDateType) {
-				return oBindingType.getPlaceholderText();
+				return oBindingType.getPlaceholderText(this._oMinDate, this._oMaxDate);
 			}
 
 			if (oBindingType instanceof ODataType && oBindingType.oFormat) {
-				return oBindingType.oFormat.getPlaceholderText();
+				return oBindingType.oFormat.getPlaceholderText(this._oMinDate, this._oMaxDate);
 			}
 
 			// always get placeholder from the display format

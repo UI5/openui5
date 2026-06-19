@@ -9,6 +9,7 @@ sap.ui.define([
 	"sap/ui/mdc/valuehelp/content/FixedList",
 	"sap/ui/mdc/valuehelp/content/FixedListItem",
 	"sap/ui/mdc/condition/Condition",
+	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/mdc/enums/ValueHelpSelectionType",
 	"sap/ui/model/ParseException",
@@ -28,6 +29,7 @@ sap.ui.define([
 		FixedList,
 		FixedListItem,
 		Condition,
+		ConditionValidated,
 		OperatorName,
 		ValueHelpSelectionType,
 		ParseException,
@@ -940,6 +942,62 @@ sap.ui.define([
 
 		oFixedList.setRestrictedToFixedValues(true);
 		assert.ok(oFixedList.isRestrictedToFixedValues(), "Result");
+
+	});
+
+	QUnit.test("Custom Condition creation", async (assert) => {
+
+		oFixedList.setCaseSensitive(true);
+
+		let iTypeaheadSuggested = 0;
+		let oTypeaheadCondition;
+		oFixedList.attachEvent("typeaheadSuggested", (oEvent) => {
+			iTypeaheadSuggested++;
+			oTypeaheadCondition = oEvent.getParameter("condition");
+		});
+		iNavigate = 0;
+		oNavigateCondition = undefined;
+		oFixedList.attachEvent("navigated", (oEvent) => {
+			iNavigate++;
+			oNavigateCondition = oEvent.getParameter("condition");
+		});
+		let iSelect = 0;
+		let aSelectConditions;
+		oFixedList.attachEvent("select", (oEvent) => {
+			iSelect++;
+			aSelectConditions = oEvent.getParameter("conditions");
+		});
+
+		sinon.stub(ValueHelpDelegate, "createConditionForContext").callsFake(function (oValueHelp, oContent, oContext) {
+			let oCondition = ValueHelpDelegate.createConditionForContext.wrappedMethod.apply(this, arguments);
+			if (oCondition.values[0] === "I3") {
+				oCondition = Condition.createCondition(OperatorName.DefaultValues, [[oCondition]], undefined, undefined, ConditionValidated.NotValidated, {test: "test"});
+			}
+			return oCondition;
+		});
+		const aTestConditions = [
+			Condition.createCondition(OperatorName.DefaultValues, [[Condition.createItemCondition("I3", "item 3")]], undefined, undefined, ConditionValidated.NotValidated, {test: "test"})
+		];
+
+		const oContent = await oFixedList.getContent();
+		await oFixedList.onShow(); // to update selection and scroll
+		assert.equal(oContent.getItems().length, 3, "Number of items");
+
+		const oItem = oContent.getItems()[2];
+		oItem.setSelected(true);
+		oContent.fireItemPress({listItem: oItem});
+		assert.equal(iSelect, 1, "select event fired");
+		assert.deepEqual(aSelectConditions, aTestConditions, "select event conditions");
+
+		oFixedList._iNavigateIndex = 1; // fake navigation already initialized
+		oFixedList.navigate(1);
+		assert.deepEqual(oNavigateCondition, aTestConditions[0], "Navigated condition");
+
+		oFixedList.setFilterValue("i");
+		assert.equal(iTypeaheadSuggested, 1, "typeaheadSuggested event fired");
+		assert.deepEqual(oTypeaheadCondition, aTestConditions[0], "typeaheadSuggested event condition");
+
+		ValueHelpDelegate.createConditionForContext.restore();
 
 	});
 

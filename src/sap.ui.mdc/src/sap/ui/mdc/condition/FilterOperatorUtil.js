@@ -1915,13 +1915,30 @@ sap.ui.define([
 			if (aOperators) {
 				for (let i = 0; i < aOperators.length; i++) {
 					const oOperator = this.getOperator(aOperators[i]);
-					if (oOperator && oOperator.validateInput && !oOperator.exclude && oOperator.valueTypes[0] && oOperator.valueTypes[0] !== OperatorValueType.Static) {
+					if (this.isEQOperator(oOperator)) {
 						return oOperator;
 					}
 				}
 			}
 
 			return FilterOperatorUtil._mOperators.equal;
+
+		},
+
+		/**
+		 * Checks if <code>Operator</code> is an "equal to" operator object
+		 *
+		 * This is required for {@link sap.ui.mdc.Field Field}.
+		 * @param {sap.ui.mdc.condition.Operator} oOperator Operator object
+		 * @returns {boolean} true if the operator is "equal to" (EQ)
+		 *
+		 * @private
+		 * @ui5-restricted sap.ui.mdc.Field, sap.ui.mdc.field.FieldBase, sap.ui.mdc.field.ConditionType, sap.ui.mdc.valuehelp.base.Content
+		 * @since 1.150
+		 */
+		isEQOperator: function(oOperator) {
+
+			return oOperator?.validateInput && !oOperator?.exclude && oOperator?.valueTypes[0] && oOperator?.valueTypes[0] !== OperatorValueType.Static;
 
 		},
 

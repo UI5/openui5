@@ -340,10 +340,11 @@ sap.ui.define([
 	 * @param {string} [mPropertyBag.styleClass] - Style class name that will be added to the transport dialog
 	 * @param {string} mPropertyBag.layer - Working layer
 	 * @param {string} mPropertyBag.version - ID of version which need to be published
-	 * @returns {Promise<string>} Promise that can resolve to the following strings:
-	 * - "Cancel" if publish process was canceled
-	 * - <sMessage> when all the version is successfully transported fl will return the message to show
-	 * - "Error" in case of a problem
+	 * @param {function(boolean):void} [mPropertyBag.setBusy] - Optional callback invoked by the connector to request showing (<code>true</code>) or hiding (<code>false</code>) a busy indicator.
+	 * The connector decides when to call it (e.g. an ABAP connector calls it after the transport selection dialog closes).
+	 * @returns {Promise} Resolves when the version was published.
+	 * Rejects with a {@link sap.ui.fl.util.CancelError} if the user cancelled the publish flow.
+	 * Rejects with the originating error otherwise.
 	 */
 	VersionsAPI.publish = function(mPropertyBag) {
 		if (!mPropertyBag.selector) {

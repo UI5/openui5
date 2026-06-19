@@ -103,6 +103,9 @@ sap.ui.define([
 		getPayload() {},
 		getDisplay() {
 			return "DescriptionValue";
+		},
+		_requestShowContainer(oContainer, sReason) {
+			return Promise.resolve(true);
 		}
 	};
 
@@ -2044,6 +2047,92 @@ sap.ui.define([
 		assert.ok(aItems[2].focus.called, "navigation focused item");
 
 		oMTable.setHighlightId();
+	});
+
+	QUnit.test("Custom Condition creation", (assert) => {
+
+		let iSelect = 0;
+		let aConditions;
+		let sType;
+		oMTable.attachEvent("select", (oEvent) => {
+			iSelect++;
+			aConditions = oEvent.getParameter("conditions");
+			sType = oEvent.getParameter("type");
+		});
+		let iConfirm = 0;
+		oMTable.attachEvent("confirm", (oEvent) => {
+			iConfirm++;
+		});
+		let iTypeaheadSuggested = 0;
+		let oTypeaheadCondition;
+		oMTable.attachEvent("typeaheadSuggested", (oEvent) => {
+			iTypeaheadSuggested++;
+			oTypeaheadCondition = oEvent.getParameter("condition");
+		});
+
+		_attachNavigated();
+
+		sinon.stub(oContainer, "getValueHelpDelegate").returns(ValueHelpDelegateV4);
+		sinon.stub(ValueHelpDelegateV4, "createConditionForContext").callsFake(function (oValueHelp, oContent, oContext) {
+			let oCondition = ValueHelpDelegateV4.createConditionForContext.wrappedMethod.apply(this, arguments);
+			if (oCondition.values[0] === "I3") {
+				oCondition = Condition.createCondition(OperatorName.DefaultValues, [[oCondition]], undefined, undefined, ConditionValidated.NotValidated, {test: "test"});
+			}
+			return oCondition;
+		});
+
+		const oListBinding = oTable.getBinding("items");
+		_fakeV4Binding(oListBinding);
+		oTable.setMode(ListMode.MultiSelect);
+		oMTable.setConfig({
+			maxConditions: -1
+		});
+		oMTable.setConditions(); // before filtering conditions should be cleared in typeahead for single-value
+		oMTable._bContentBound = true;
+		oMTable.setFilterValue("X");
+		const oContent = oMTable.getContent();
+
+		if (oContent) {
+			return oMTable.onBeforeShow(true).then(async () => {
+				await oMTable.onShow();
+				await _renderScrollContainer();
+				const aTestConditions = [
+					Condition.createCondition(OperatorName.DefaultValues, [[Condition.createItemCondition("I3", "X-Item 3")]], undefined, undefined, ConditionValidated.NotValidated, {test: "test"})
+				];
+
+				assert.equal(iTypeaheadSuggested, 1, "typeaheadSuggested event fired");
+				assert.deepEqual(oTypeaheadCondition, aTestConditions[0], "typeaheadSuggested event condition");
+
+				const aItems = oTable.getItems();
+				const oItem = aItems[2];
+
+				oTable.fireItemPress({listItem: oItem});
+				assert.equal(iSelect, 1, "select event fired");
+				assert.deepEqual(aConditions, aTestConditions, "select event conditions");
+				assert.equal(sType, ValueHelpSelectionType.Add, "select event type");
+				assert.equal(iConfirm, 1, "confirm event fired");
+				iSelect = 0;
+				aConditions = null;
+				sType = null;
+
+				oItem.setSelected(false);
+				oItem.focus();
+				qutils.triggerKeydown(oItem.getFocusDomRef().id, KeyCodes.SPACE, false, false, false);
+				await new Promise((resolve) => {setTimeout(resolve, 0);}); // as Item handles event async
+				assert.equal(iSelect, 1, "select event fired");
+				assert.deepEqual(aConditions, aTestConditions, "select event conditions");
+				assert.equal(sType, ValueHelpSelectionType.Add, "select event type");
+
+				bIsOpen = false; // as navigation only works if closed for MultiSelect
+				oMTable._iNavigateIndex = 1; // fake navigation already initialized
+				oMTable.navigate(1);
+				assert.deepEqual(oNavigateCondition, aTestConditions[0], "Navigated condition");
+
+				oContainer.getValueHelpDelegate.restore();
+				ValueHelpDelegateV4.createConditionForContext.restore();
+			});
+		}
+
 	});
 
 	QUnit.module("Dialog", {

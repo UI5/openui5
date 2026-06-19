@@ -254,11 +254,27 @@ sap.ui.define([
 	 * @since 1.118.0
 	 */
 	ValueHelpDelegate.findConditionsForContext = function (oValueHelp, oContent, oContext, aConditions) {
-		const oValues = oContent.getItemFromContext(oContext);
-		const oContextCondition = oValues && oContent.createCondition(oValues.key, oValues.description, oValues.payload);
+		const oContextCondition = this.createConditionForContext(oValueHelp, oContent, oContext);
 		return aConditions.filter((oCondition) => {
 			return this.compareConditions(oValueHelp, oContextCondition, oCondition);
 		});
+	};
+
+	/**
+	 * Creates a condition that represents the given context for 'Select from list' scenarios.<br/>By default,
+	 * this method creates a {@link sap.ui.mdc.condition.ConditionObject Condition} representing an "equal to" filter.
+	 *
+	 * @param {sap.ui.mdc.ValueHelp} oValueHelp The <code>ValueHelp</code> control instance
+	 * @param {sap.ui.mdc.valuehelp.base.ListContent} oContent <code>ValueHelp</code> content instance
+	 * @param {sap.ui.model.Context} oContext Entry of a given list
+	 * @returns {sap.ui.mdc.condition.ConditionObject} Condition representing the given context
+	 * @public
+	 * @since 1.150.0
+	 */
+	ValueHelpDelegate.createConditionForContext = function (oValueHelp, oContent, oContext) {
+		const oItem = oContent.getItemFromContext(oContext);
+		const oContextCondition = oItem && oContent.createCondition(oItem.key, oItem.description, oItem.payload);
+		return oContextCondition;
 	};
 
 	/**

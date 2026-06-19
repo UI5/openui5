@@ -239,13 +239,14 @@ sap.ui.define([
 
 	function updateRuntimePersistence(sReference, oStorageResponse, oRuntimePersistence) {
 		const aFlexObjects = oRuntimePersistence.flexObjects.slice();
-		const iInitialFlexObjectsLength = aFlexObjects.length;
 		const aChangeDefinitions = [];
+		const aChangeIds = [];
 		let bUpdate;
 
 		each(oStorageResponse.changes, function(sKey, vValue) {
 			prepareChangeDefinitions(sKey, vValue).forEach(function(oChangeDef) {
 				aChangeDefinitions.push(oChangeDef);
+				aChangeIds.push(oChangeDef.fileName);
 			});
 		});
 
@@ -284,9 +285,20 @@ sap.ui.define([
 			})
 		};
 
+		const oNewRuntimePersistence = _mInstances[sReference].runtimePersistence;
 		// If the final length is different, an object is no longer there (e.g. new version requested)
-		if (iInitialFlexObjectsLength !== _mInstances[sReference].runtimePersistence.flexObjects.length) {
+		// the update via the DataSelector will remove it from the runtimePersistence.flexObjects,
+		// but the dependency map has to be updated separately
+		if (oRuntimePersistence.flexObjects.length !== oNewRuntimePersistence.flexObjects.length) {
 			bUpdate = true;
+			oRuntimePersistence.flexObjects.filter((oFlexObject) => !aChangeIds.includes(oFlexObject.getId()))
+			.forEach((oFlexObject) => {
+				if (oFlexObject.isValidForDependencyMap()) {
+					const oLiveDependencyMap = oNewRuntimePersistence.runtimeOnlyData.liveDependencyMap;
+					DependencyHandler.removeChangeFromMap(oLiveDependencyMap, oFlexObject.getId());
+					DependencyHandler.removeChangeFromDependencies(oLiveDependencyMap, oFlexObject.getId());
+				}
+			});
 		}
 
 		return bUpdate;

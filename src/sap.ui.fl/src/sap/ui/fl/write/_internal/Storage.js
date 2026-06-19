@@ -274,6 +274,7 @@ sap.ui.define([
 	 * @param {string} [mPropertyBag.generator] - Generator with which the changes were created
 	 * @param {string[]} [mPropertyBag.selectorIds] - Selector IDs of controls for which the reset should filter
 	 * @param {string} [mPropertyBag.changeTypes] - Change types of the changes which should be reset
+	 * @param {function(boolean):void} [mPropertyBag.setBusy] - Optional callback invoked to request showing (<code>true</code>) or hiding (<code>false</code>) a busy indicator while the reset is running.
 	 *
 	 * @returns {Promise<ResetResponseEntry[]>} Resolves as an array after the reset is completed and returns the reset changes; rejects in case of an error
 	 */
@@ -360,10 +361,9 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.reference - Flex reference of the application
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.localChanges - Local changes to be published
 	 * @param {object[]} [mPropertyBag.appVariantDescriptors] - An array of app variant descriptors which needs to be transported
-	 * @returns {Promise<string>} Promise that can resolve to the following strings:
-	 * - "Cancel" if publish process was canceled
-	 * - <sMessage> when all the artifacts are successfully transported fl will return the message to show
-	 * - "Error" in case of a problem
+	 * @returns {Promise} Resolves once all artifacts are successfully transported.
+	 * Rejects with a {@link sap.ui.fl.util.CancelError} if the user cancelled the transport selection.
+	 * Rejects with the originating error otherwise.
 	 */
 	Storage.publish = function(mPropertyBag) {
 		return _executeActionByName("publish", mPropertyBag);

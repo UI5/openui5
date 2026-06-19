@@ -9,6 +9,7 @@ sap.ui.define([
 	"sap/ui/base/Event",
 	"sap/ui/base/EventProvider",
 	"sap/ui/base/ManagedObjectMetadata",
+	"sap/ui/core/BusyIndicator",
 	"sap/ui/core/Lib",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/Overlay",
@@ -37,6 +38,7 @@ sap.ui.define([
 	Event,
 	EventProvider,
 	ManagedObjectMetadata,
+	BusyIndicator,
 	Lib,
 	DesignTime,
 	Overlay,
@@ -886,13 +888,16 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling restore successfully", function(assert) {
-			assert.expect(4);
+			assert.expect(8);
 			var oRemoveStub = sandbox.spy(this.oRta.getCommandStack(), "removeAllCommands");
+			var oBusyShowStub = sandbox.stub(BusyIndicator, "show");
+			var oBusyHideStub = sandbox.stub(BusyIndicator, "hide");
 			sandbox.stub(PersistenceWriteAPI, "reset").callsFake(function(...aArgs) {
-				assert.deepEqual(aArgs[0], {
-					selector: oComp,
-					layer: Layer.CUSTOMER
-				}, "then the correct parameters were passed");
+				assert.strictEqual(aArgs[0].selector, oComp, "then the correct selector was passed");
+				assert.strictEqual(aArgs[0].layer, Layer.CUSTOMER, "then the correct layer was passed");
+				assert.strictEqual(typeof aArgs[0].setBusy, "function", "then a setBusy callback was passed");
+				aArgs[0].setBusy(true);
+				aArgs[0].setBusy(false);
 				return Promise.resolve();
 			});
 			var oFlexInfoResponse = { allContextsProvided: true, isResetEnabled: false, isPublishEnabled: false };
@@ -904,16 +909,17 @@ sap.ui.define([
 				assert.equal(this.oReloadPageStub.callCount, 1, "then page reload is triggered");
 				var sFlexInfoFromSession = window.sessionStorage.getItem(`sap.ui.fl.info.${sFlexReference}`);
 				assert.equal(sFlexInfoFromSession, null, "then flex info from session storage is null");
+				assert.strictEqual(oBusyShowStub.callCount, 1, "the busy indicator was shown via setBusy");
+				assert.strictEqual(oBusyHideStub.callCount, 1, "the busy indicator was hidden via setBusy");
 			}.bind(this));
 		});
 
 		QUnit.test("when calling restore successfully in AppVariant", function(assert) {
-			assert.expect(2);
+			assert.expect(4);
 			sandbox.stub(PersistenceWriteAPI, "reset").callsFake(function(...aArgs) {
-				assert.deepEqual(aArgs[0], {
-					selector: oComp,
-					layer: Layer.CUSTOMER
-				}, "then the correct generator and layer was passed");
+				assert.strictEqual(aArgs[0].selector, oComp, "then the correct selector was passed");
+				assert.strictEqual(aArgs[0].layer, Layer.CUSTOMER, "then the correct layer was passed");
+				assert.strictEqual(typeof aArgs[0].setBusy, "function", "then a setBusy callback was passed");
 				return Promise.resolve();
 			});
 

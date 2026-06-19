@@ -1269,6 +1269,28 @@
 					</mdcvh:Dialog>
 				</mdc:dialog>
 			</mdc:ValueHelp>
+			<mdc:ValueHelp id="VHOperatorsTable"
+				delegate='\{"name": "sap/ui/v4demo/delegate/OperatorsValueHelp.delegate", "payload": \{"listType": "MTable"\}\}'>
+				<mdc:typeahead>
+					<mdcvh:Popover id="VHOperatorsTable-Pop" title="Operators"/>
+				</mdc:typeahead>
+				<mdc:dialog>
+					<mdcvh:Dialog id="VHOperatorsTable-Dialog" title="Operators">
+						<mdcvc:Conditions id="VHOperatorsTable-Dialog-Conditions" label="Operators" />
+					</mdcvh:Dialog>
+				</mdc:dialog>
+			</mdc:ValueHelp>
+			<mdc:ValueHelp id="VHOperatorsList"
+				delegate='\{"name": "sap/ui/v4demo/delegate/OperatorsValueHelp.delegate", "payload": \{"listType": "FixedList"\}\}'>
+				<mdc:typeahead>
+					<mdcvh:Popover id="VHOperatorsList-Pop" title="Operators"/>
+				</mdc:typeahead>
+				<mdc:dialog>
+					<mdcvh:Dialog id="VHOperatorsList-Dialog" title="Operators">
+						<mdcvc:Conditions id="VHOperatorsList-Dialog-Conditions" label="Operators" />
+					</mdcvh:Dialog>
+				</mdc:dialog>
+			</mdc:ValueHelp>
 
 		</f2:dependents>
 	</f2:DynamicPage>
