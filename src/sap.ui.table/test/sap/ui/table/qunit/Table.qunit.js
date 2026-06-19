@@ -4418,6 +4418,19 @@ sap.ui.define([
 		assert.ok(!this.oTable._bLargeDataScrolling, "Large data scrolling disabled");
 	});
 
+	QUnit.test("#setLargeDataScrolling", function(assert) {
+		this.oTable.setLargeDataScrolling(false);
+		assert.strictEqual(this.oTable._bLargeDataScrolling, false, "Automatic large data scrolling disabled");
+
+		assert.throws(function() {
+			this.oTable.setLargeDataScrolling(true);
+		}.bind(this), "Throws when called with 'true'");
+
+		assert.throws(function() {
+			this.oTable.setLargeDataScrolling();
+		}.bind(this), "Throws when called without a value");
+	});
+
 	QUnit.test("#_getContexts", function(assert) {
 		const oBinding = this.oTable.getBinding();
 		const oGetContexts = sinon.stub(oBinding, "getContexts");
