@@ -43,6 +43,11 @@ sap.ui.define([
 					template: new TestControl({text: "test2"})
 				}).setCreationTemplate(new TestInputControl({text: "test2"})));
 
+				oTable.addColumn(new Column({
+					id: "column3",
+					template: new TestControl({text: "test3"})
+				}).setCreationTemplate(new TestControl({text: "test3", tabbable: true})));
+
 				oTable.setCreationRow(new CreationRow());
 			});
 			await this.oTable.qunit.whenRenderingFinished();
@@ -64,6 +69,17 @@ sap.ui.define([
 		assert.strictEqual(oInput.selectionStart, 0, "The selection starts from index 0");
 		assert.strictEqual(oInput.selectionEnd, 5, "The selection ends as index 5");
 
+		// With the input column gone, the next interactive cell is a non-HTMLInputElement.
+		// resetFocus must focus it but must not call select() on it.
+		this.oTable.getColumns()[1].destroy();
+		await this.oTable.qunit.whenRenderingFinished();
+		this.oTable.qunit.getDataCell(0, 0).focus();
+
+		const oNonInput = oCreationRow.getCells()[1].getDomRef();
+		assert.strictEqual(oCreationRow.resetFocus(), true, "Returned true, because an element was focused");
+		assert.strictEqual(document.activeElement, oNonInput, "The non-input interactive element is focused");
+
+		// With both interactive columns gone, no element can be focused.
 		this.oTable.getColumns()[1].destroy();
 		await this.oTable.qunit.whenRenderingFinished();
 		this.oTable.qunit.getDataCell(0, 0).focus();
@@ -98,11 +114,123 @@ sap.ui.define([
 		oApplySpy.resetHistory();
 		oResetFocusSpy.resetHistory();
 		this.oTable.getColumns()[1].destroy();
+		this.oTable.getColumns()[1].destroy();
 		await this.oTable.qunit.whenRenderingFinished();
 
 		assert.strictEqual(oCreationRow._fireApply(), false, "Returned false, because no element was focused");
 		assert.ok(oApplySpy.calledOnce, "The CreationRow's \"apply\" event was called once");
 		assert.ok(oResetFocusSpy.calledOnce, "CreationRow#resetFocus was called once");
+	});
+
+	QUnit.test("#getFocusDomRef", async function(assert) {
+		const oCreationRow = this.oTable.getCreationRow();
+
+		assert.strictEqual(oCreationRow.getFocusDomRef(), oCreationRow.getCells()[1].getDomRef(),
+			"Returned the DOM ref of the first interactive cell");
+
+		// Remove the columns that contribute interactive cells.
+		this.oTable.getColumns()[1].destroy();
+		this.oTable.getColumns()[1].destroy();
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.strictEqual(oCreationRow.getFocusDomRef(), oCreationRow.getDomRef(),
+			"Returned the CreationRow's own DOM ref when no interactive elements exist");
+	});
+
+	QUnit.test("#_getCell", function(assert) {
+		const oCreationRow = this.oTable.getCreationRow();
+
+		assert.strictEqual(oCreationRow._getCell(0), oCreationRow.getCells()[0], "Cell of column 0 is returned");
+		assert.strictEqual(oCreationRow._getCell(1), oCreationRow.getCells()[1], "Cell of column 1 is returned");
+		assert.strictEqual(oCreationRow._getCell(99), null, "Returned null for an out-of-range column index");
+	});
+
+	QUnit.test("#_getCellDomRef", function(assert) {
+		const oCreationRow = this.oTable.getCreationRow();
+		const $Cell = oCreationRow._getCellDomRef(1);
+
+		assert.ok($Cell, "A cell DOM ref was returned");
+		assert.ok($Cell.hasClass("sapUiTablePseudoCell"), "The returned cell DOM ref is the CreationRow pseudo cell");
+		assert.ok($Cell[0].contains(oCreationRow.getCells()[1].getDomRef()), "The pseudo cell contains the cell content control");
+		assert.strictEqual(oCreationRow._getCellDomRef(99), null, "Returned null for an out-of-range column index");
+	});
+
+	QUnit.test("#_focusCell", function(assert) {
+		const oCreationRow = this.oTable.getCreationRow();
+		const oInput = oCreationRow.getCells()[1].getDomRef();
+		const oNonInteractiveCell = this.oTable.qunit.getDataCell(0, 0);
+
+		// Cell with an interactive element: focus and select it.
+		oNonInteractiveCell.focus();
+		assert.strictEqual(oCreationRow._focusCell(1), true, "Returned true because an element was focused");
+		assert.strictEqual(document.activeElement, oInput, "The interactive element of the cell is focused");
+		assert.strictEqual(oInput.selectionStart, 0, "Selection starts at index 0");
+		assert.strictEqual(oInput.selectionEnd, oInput.value.length, "Selection ends at the end of the value");
+
+		// Cell without an interactive element: do nothing.
+		oNonInteractiveCell.focus();
+		assert.strictEqual(oCreationRow._focusCell(0), false, "Returned false because the cell has no interactive element");
+		assert.strictEqual(document.activeElement, oNonInteractiveCell, "The focus did not change");
+	});
+
+	QUnit.test("#_takeOverKeyboardHandling returns false if the table is not rendered", function(assert) {
+		const oCreationRow = this.oTable.getCreationRow();
+
+		this.stub(this.oTable, "getDomRef").returns(null);
+
+		assert.strictEqual(oCreationRow._takeOverKeyboardHandling(), false, "Returned false because the table is not rendered");
+	});
+
+	QUnit.test("#_takeOverKeyboardHandling returns false if focus is not inside the table", function(assert) {
+		const oCreationRow = this.oTable.getCreationRow();
+
+		document.body.focus();
+
+		assert.notOk(this.oTable.getDomRef().contains(document.activeElement), "Precondition: focus is not inside the table");
+		assert.strictEqual(oCreationRow._takeOverKeyboardHandling(), false, "Returned false because the focus is not inside the table");
+	});
+
+	QUnit.test("#_takeOverKeyboardHandling focuses the cell of the same column when an interactive cell exists", function(assert) {
+		const oCreationRow = this.oTable.getCreationRow();
+		const oInteractiveElement = oCreationRow.getCells()[1].getDomRef();
+		const oEvent = {preventDefault: this.spy()};
+
+		this.oTable.qunit.getDataCell(0, 1).focus();
+
+		assert.strictEqual(oCreationRow._takeOverKeyboardHandling(oEvent), true, "Returned true because the focus was set");
+		assert.strictEqual(document.activeElement, oInteractiveElement, "The interactive element of the corresponding column was focused");
+		assert.ok(oEvent.preventDefault.calledOnce, "preventDefault was called on the event because the focus was set");
+	});
+
+	QUnit.test("#_takeOverKeyboardHandling returns false if the cell of the same column has no interactive element", function(assert) {
+		const oCreationRow = this.oTable.getCreationRow();
+		const oCell = this.oTable.qunit.getDataCell(0, 0);
+		const oEvent = {preventDefault: this.spy()};
+
+		oCell.focus();
+
+		assert.strictEqual(oCreationRow._takeOverKeyboardHandling(oEvent), false,
+			"Returned false because the cell of the corresponding column has no interactive element");
+		assert.strictEqual(document.activeElement, oCell, "Focus did not change");
+		assert.ok(oEvent.preventDefault.notCalled, "preventDefault was not called because no focus was set");
+	});
+
+	QUnit.test("#_takeOverKeyboardHandling calls resetFocus when the focused element has no column index information", function(assert) {
+		const oCreationRow = this.oTable.getCreationRow();
+		const oResetFocusSpy = this.spy(oCreationRow, "resetFocus");
+		const oInteractiveElement = oCreationRow.getCells()[1].getDomRef();
+		const oEvent = {preventDefault: this.spy()};
+
+		// Focus a tabbable element inside the table that is not a cell - the focusDummy.
+		// TableUtils.getCell returns null for it, so getCellInfo will not provide a columnIndex.
+		this.oTable.getDomRef("focusDummy").focus();
+
+		assert.ok(this.oTable.getDomRef().contains(document.activeElement), "Precondition: focus is inside the table");
+
+		assert.strictEqual(oCreationRow._takeOverKeyboardHandling(oEvent), true, "Returned true because resetFocus set the focus");
+		assert.ok(oResetFocusSpy.calledOnce, "resetFocus was called once");
+		assert.strictEqual(document.activeElement, oInteractiveElement, "The first interactive element of the CreationRow is focused");
+		assert.ok(oEvent.preventDefault.calledOnce, "preventDefault was called on the event");
 	});
 
 	QUnit.module("Rendering", {
@@ -635,4 +763,5 @@ sap.ui.define([
 		await nextUIUpdate();
 		assert.strictEqual(oApplyButton.getEnabled(), false, "The button is updated after removing the custom toolbar, and is disabled");
 	});
+
 });

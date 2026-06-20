@@ -16,6 +16,8 @@ sap.ui.define([
 	// shortcut for sap.ui.core.TitleLevel
 	var TitleLevel = coreLibrary.TitleLevel;
 
+	var oMenu;
+
 	function handleMenuItemPress (oEvent) {
 		var oItem = oEvent.getParameter("item"),
 			sMsg;
@@ -41,13 +43,13 @@ sap.ui.define([
 	}
 
 	function getMenu() {
-		if (!window.oMenu) {
-			window.oMenu = new Menu({
+		if (!oMenu) {
+			oMenu = new Menu({
 				itemSelect: handleMenuItemPress,
 				items: [
 					new MenuItem({
 						text: "View Settings",
-						shortcutText: "Alt + F4"
+						shortcutText: "Shift + V"
 					}),
 					new MenuItem({
 						text: "Create Settings",
@@ -90,7 +92,25 @@ sap.ui.define([
 			});
 		}
 
-		return window.oMenu;
+		return oMenu;
+	}
+
+	var oMenuInstance = getMenu();
+	oMenuInstance.addEventDelegate({
+		onkeydown: onShortcutKeydown
+	});
+
+	function onShortcutKeydown(oEvent) {
+		var oMenu = getMenu();
+		if (!oMenu || !oMenu.isOpen() || !oEvent.key) {
+			return;
+		}
+
+		if (oEvent.shiftKey && !oEvent.altKey && !oEvent.ctrlKey && !oEvent.metaKey && oEvent.key.toUpperCase() === "V") {
+			oEvent.preventDefault();
+			oEvent.stopPropagation();
+			MessageToast.show("Shortcut 'Shift + V' triggered for 'View Settings'.");
+		}
 	}
 
 	var oTextForLabelling = new Label({
@@ -102,6 +122,10 @@ sap.ui.define([
 	var oMenuButton = new Button("menuButton",{
 		text: "Open settings menu",
 		press: handleMenuButtonPress
+	});
+
+	oMenuButton.addEventDelegate({
+		onkeydown: onShortcutKeydown
 	});
 
 	oMenuButton.attachBrowserEvent("tap keyup", function (oEvent) {

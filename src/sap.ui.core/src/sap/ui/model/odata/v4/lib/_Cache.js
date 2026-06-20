@@ -3326,7 +3326,7 @@ sap.ui.define([
 	 * @public
 	 */
 	_CollectionCache.prototype.isDeletingInOtherGroup = function (sGroupId) {
-		return Object.values(this.aElements.$deleted || {}).some(function (oDeleted) {
+		return !!this.aElements.$deleted?.some(function (oDeleted) {
 			return oDeleted.groupId !== sGroupId;
 		});
 	};
@@ -4201,7 +4201,7 @@ sap.ui.define([
 			this.mChangeListeners[""] = mChangeListeners[""];
 			_Helper.fireChange(this.mChangeListeners, "");
 		}
-		Object.values(this.aElements.$deleted || {}).forEach(function (oDeleted) {
+		this.aElements.$deleted?.forEach(function (oDeleted) {
 			oDeleted.index = undefined;
 		});
 	};

@@ -8,12 +8,14 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/Sorter",
+	"sap/base/Log",
 	"sap/m/StandardTreeItem",
 	"sap/m/StandardListItem",
 	"sap/m/Tree",
+	"sap/m/ListBase",
 	"sap/m/library",
 	"sap/ui/test/utils/nextUIUpdate"
-], function(Element, Library, createAndAppendDiv, qutils, KeyCodes, JSONModel, Sorter, StandardTreeItem, StandardListItem, Tree, library, nextUIUpdate) {
+], function(Element, Library, createAndAppendDiv, qutils, KeyCodes, JSONModel, Sorter, Log, StandardTreeItem, StandardListItem, Tree, ListBase, library, nextUIUpdate) {
 	"use strict";
 	createAndAppendDiv("content").style.height = "100%";
 
@@ -669,4 +671,418 @@ sap.ui.define([
 		assert.ok(oSecondItemDomRef.getAttribute("aria-level"), "1", "aria-level = 1");
 	});
 
+	QUnit.module("getBinding adapter selection", {
+		beforeEach: function() {
+			this.oTree = new Tree();
+		},
+		afterEach: function() {
+			this.oTree.destroy();
+		}
+	});
+
+	QUnit.test("getBinding defaults to 'items' when no name is given", function(assert) {
+		const oModel = new JSONModel();
+		oModel.setData(oData);
+		this.oTree.setModel(oModel);
+		this.oTree.bindItems("/", new StandardTreeItem({title: "{text}"}));
+
+		const oBindingViaItems = this.oTree.getBinding("items");
+		const oBindingDefault = this.oTree.getBinding();
+		assert.strictEqual(oBindingDefault, oBindingViaItems, "getBinding() returns the same binding as getBinding('items')");
+	});
+
+	QUnit.test("getBinding returns the binding for non-'items' aggregations as-is", function(assert) {
+		// Returning a fake v2 ODataTreeBinding-shaped object lets us prove the Tree
+		// did NOT touch it: applyAdapterInterface must remain uncalled and Log.error
+		// must NOT be invoked, regardless of the binding's shape.
+		const oFakeBinding = {
+			isA: this.spy((sName) => sName === "sap.ui.model.odata.v2.ODataTreeBinding"),
+			applyAdapterInterface: this.spy()
+		};
+		const oListBaseStub = this.stub(ListBase.prototype, "getBinding").returns(oFakeBinding);
+		const oLogStub = this.stub(Log, "error");
+		const oResult = this.oTree.getBinding("tooltip");
+
+		assert.strictEqual(oResult, oFakeBinding, "Returns ListBase's binding without modification");
+		assert.ok(oListBaseStub.calledOnceWithExactly("tooltip"), "ListBase.getBinding called with 'tooltip'");
+		assert.notOk(oFakeBinding.applyAdapterInterface.called, "Adapter interface not applied for non-'items' binding");
+		assert.notOk(oFakeBinding.isA.called, "Adapter dispatch (isA checks) not entered for non-'items' binding");
+		assert.notOk(oLogStub.called, "No 'TreeBinding is not supported' error logged for non-'items' binding");
+	});
+
+	QUnit.test("getBinding applies ODataTreeBinding v2 adapter", function(assert) {
+		// Stub ListBase.getBinding to return a fake v2 ODataTreeBinding (no getLength yet)
+		const oFakeBinding = {
+			isA: function(sName) {
+				return sName === "sap.ui.model.odata.v2.ODataTreeBinding";
+			},
+			applyAdapterInterface: this.spy()
+		};
+		this.stub(this.oTree, "getBindingInfo").returns({});
+		this.stub(ListBase.prototype, "getBinding").returns(oFakeBinding);
+
+		const oResult = this.oTree.getBinding("items");
+		assert.strictEqual(oResult, oFakeBinding, "binding returned");
+		assert.ok(oFakeBinding.applyAdapterInterface.calledOnce, "applyAdapterInterface called for v2 ODataTreeBinding");
+	});
+
+	QUnit.test("getBinding applies legacy ODataTreeBinding compatibility adapter", function(assert) {
+		// TreeBindingCompatibilityAdapter mutates the binding.
+		// Provide just enough surface on the binding and the tree for that call to
+		// complete without throwing, then assert on the observable mutations.
+		const oFakeBinding = {
+			isA: (sName) => sName === "sap.ui.model.odata.ODataTreeBinding",
+			getRootContexts: () => []
+		};
+		this.stub(ListBase.prototype, "getBinding").returns(oFakeBinding);
+		this.oTree.getExpandFirstLevel = () => false;
+
+		const oResult = this.oTree.getBinding("items");
+
+		assert.strictEqual(oResult, oFakeBinding, "binding returned");
+		// The adapter installs the ListBinding-compatibility surface on the binding.
+		// If Tree took the wrong dispatch branch, none of these methods would exist.
+		assert.strictEqual(typeof oFakeBinding._init, "function", "adapter installed _init");
+		assert.strictEqual(typeof oFakeBinding.getLength, "function", "adapter installed getLength");
+		assert.strictEqual(typeof oFakeBinding.getContexts, "function", "adapter installed getContexts");
+		assert.strictEqual(typeof oFakeBinding.expand, "function", "adapter installed expand");
+		assert.strictEqual(typeof oFakeBinding.collapse, "function", "adapter installed collapse");
+	});
+
+	QUnit.test("getBinding logs error for unsupported binding types", function(assert) {
+		const oFakeBinding = {
+			isA: function() {return false;}
+		};
+		this.stub(ListBase.prototype, "getBinding").returns(oFakeBinding);
+		const oLogSpy = this.spy(Log, "error");
+
+		const oResult = this.oTree.getBinding("items");
+		assert.strictEqual(oResult, oFakeBinding, "Binding returned");
+		assert.ok(oLogSpy.calledOnce, "Log.error called for unsupported binding");
+		assert.ok(oLogSpy.firstCall.args[0].indexOf("TreeBinding is not supported") === 0, "correct error message");
+	});
+
+	QUnit.module("Aggregation handling", {
+		beforeEach: async function() {
+			this.oTree = await createTree();
+		},
+		afterEach: function() {
+			this.oTree.destroy();
+			this.oTree = null;
+		}
+	});
+
+	QUnit.test("updateAggregation delegates non-'items' aggregations to ListBase", function(assert) {
+		const oTree = this.oTree;
+		const oParentSpy = this.stub(ListBase.prototype, "updateAggregation").returns("delegated");
+
+		const vResult = oTree.updateAggregation("someOtherAggregation");
+		assert.strictEqual(vResult, "delegated", "result returned from ListBase.prototype.updateAggregation");
+		assert.ok(oParentSpy.calledOnce, "ListBase.prototype.updateAggregation called once");
+		assert.strictEqual(oParentSpy.firstCall.args[0], "someOtherAggregation", "with the original aggregation name");
+	});
+
+	QUnit.test("updateAggregation factory path destroys items when no template is set", async function(assert) {
+		// Re-bind using a factory function rather than a template — this exercises the
+		// `!oBindingInfo.template` branch in Tree.updateAggregation.
+		const oTree = this.oTree;
+		oTree.bindItems({
+			path: "/",
+			factory: (sId, oContext) => {
+				return new StandardTreeItem({
+					title: oContext.getProperty("text")
+				});
+			}
+		});
+		await nextUIUpdate();
+
+		assert.strictEqual(oTree.getItems().length, 2, "two top-level items rendered via factory");
+		assert.strictEqual(oTree.getItems()[0].getTitle(), "Node1", "title bound through factory");
+
+		// Trigger another update — items should be recreated, not appended
+		oTree.getModel().refresh(true);
+		await nextUIUpdate();
+		assert.strictEqual(oTree.getItems().length, 2, "items count stays at 2 after refresh with factory");
+	});
+
+	QUnit.test("_bindAggregation resets _iDeepestLevel when 'items' is rebound", async function(assert) {
+		const oTree = this.oTree;
+		oTree.expandToLevel(3);
+		await nextUIUpdate();
+		assert.ok(oTree.getDeepestLevel() > 0, "deepest level recorded after expanding");
+
+		oTree.bindItems("/", new StandardTreeItem({title: "{text}"}));
+		assert.strictEqual(oTree.getDeepestLevel(), 0, "deepest level reset to 0 on rebind");
+	});
+
+	QUnit.test("_bindAggregation does not reset _iDeepestLevel for other aggregations", function(assert) {
+		const oTree = this.oTree;
+		oTree._iDeepestLevel = 5;
+		oTree.bindProperty("tooltip", "/text");
+		assert.strictEqual(oTree.getDeepestLevel(), 5, "deepest level not reset for non-'items' bindings");
+	});
+
+	QUnit.module("Public API edge cases", {
+		beforeEach: async function() {
+			this.oTree = await createTree();
+		},
+		afterEach: function() {
+			this.oTree.destroy();
+			this.oTree = null;
+		}
+	});
+
+	QUnit.test("isGrouped always returns false", function(assert) {
+		assert.strictEqual(this.oTree.isGrouped(), false, "Tree never reports as grouped");
+	});
+
+	QUnit.test("setLastGroupHeader is a no-op for Tree", function(assert) {
+		// Should neither throw nor mutate any visible state.
+		const iLengthBefore = this.oTree.getItems().length;
+		this.oTree.setLastGroupHeader();
+		this.oTree.setLastGroupHeader(this.oTree.getItems()[0]);
+		assert.strictEqual(this.oTree.getItems().length, iLengthBefore, "items unchanged");
+	});
+
+	QUnit.test("getAccessbilityPosition returns setsize and posinset for an item", function(assert) {
+		const oTree = this.oTree;
+		const oItem = oTree.getItems()[0];
+		const mPosition = oTree.getAccessbilityPosition(oItem);
+		assert.strictEqual(typeof mPosition.setsize, "number", "setsize is a number");
+		assert.strictEqual(typeof mPosition.posinset, "number", "posinset is a number");
+		assert.strictEqual(mPosition.posinset, 1, "first item has posinset 1");
+		assert.strictEqual(mPosition.setsize, 2, "setsize equals number of siblings at the root");
+	});
+
+	QUnit.test("getAccessibilityType returns the localized 'Tree' type", function(assert) {
+		const sExpected = Library.getResourceBundleFor("sap.m").getText("ACC_CTR_TYPE_TREE");
+		assert.strictEqual(this.oTree.getAccessibilityType(), sExpected, "localized accessibility type returned");
+	});
+
+	QUnit.test("isTreeBinding only returns true for 'items'", function(assert) {
+		assert.strictEqual(this.oTree.isTreeBinding("items"), true, "items aggregation is a tree binding");
+		assert.strictEqual(this.oTree.isTreeBinding("foo"), false, "other aggregations are not tree bindings");
+	});
+
+	QUnit.test("onItemExpanderPressed with explicit bExpand=true expands and fires event", async function(assert) {
+		const oTree = this.oTree;
+		const oItem = oTree.getItems()[0];
+		const oToggleSpy = this.spy();
+		oTree.attachToggleOpenState(oToggleSpy);
+
+		oTree.onItemExpanderPressed(oItem, true);
+		await nextUIUpdate();
+
+		assert.ok(oItem.getExpanded(), "item is expanded");
+		assert.ok(oToggleSpy.calledOnce, "toggleOpenState fired once");
+		assert.strictEqual(oToggleSpy.firstCall.args[0].getParameter("expanded"), true, "expanded=true in event");
+
+		oToggleSpy.resetHistory();
+		oTree.onItemExpanderPressed(oItem, true);
+		await nextUIUpdate();
+		assert.ok(oToggleSpy.notCalled, "no event when state didn't change (already expanded)");
+	});
+
+	QUnit.test("onItemExpanderPressed with explicit bExpand=false collapses and fires event", async function(assert) {
+		const oTree = this.oTree;
+		oTree.expand(0);
+		await nextUIUpdate();
+		const oItem = oTree.getItems()[0];
+
+		const oToggleSpy = this.spy();
+		oTree.attachToggleOpenState(oToggleSpy);
+
+		oTree.onItemExpanderPressed(oItem, false);
+		await nextUIUpdate();
+
+		assert.notOk(oItem.getExpanded(), "item is collapsed");
+		assert.ok(oToggleSpy.calledOnce, "toggleOpenState fired once");
+		assert.strictEqual(oToggleSpy.firstCall.args[0].getParameter("expanded"), false, "expanded=false in event");
+	});
+
+	QUnit.test("onItemExpanderPressed does nothing when item context is missing", function(assert) {
+		const oTree = this.oTree;
+		const oToggleSpy = this.spy();
+		oTree.attachToggleOpenState(oToggleSpy);
+
+		// Pass an item that does not belong to the tree → no binding context
+		oTree.onItemExpanderPressed(undefined, true);
+		assert.ok(oToggleSpy.notCalled, "no event when item is undefined");
+	});
+
+	QUnit.module("Drag and drop", {
+		beforeEach: async function() {
+			this.oTree = await createTree();
+		},
+		afterEach: function() {
+			this.oTree.destroy();
+			this.oTree = null;
+		}
+	});
+
+	QUnit.test("onItemLongDragOver expands a non-leaf item and fires toggleOpenState", async function(assert) {
+		const oTree = this.oTree;
+		const oItem = oTree.getItems()[0]; // Node1 — has children
+		assert.notOk(oItem.isLeaf(), "Precondition: first item is not a leaf");
+		assert.notOk(oItem.getExpanded(), "Precondition: first item is collapsed");
+
+		const oToggleSpy = this.spy();
+		oTree.attachToggleOpenState(oToggleSpy);
+
+		oTree.onItemLongDragOver(oItem);
+		await nextUIUpdate();
+
+		assert.ok(oItem.getExpanded(), "item is expanded after long drag over");
+		assert.ok(oToggleSpy.calledOnce, "toggleOpenState fired once");
+		const oEvent = oToggleSpy.firstCall.args[0];
+		assert.strictEqual(oEvent.getParameter("expanded"), true, "event reports expanded=true");
+		assert.strictEqual(oEvent.getParameter("itemIndex"), 0, "event reports correct itemIndex");
+	});
+
+	QUnit.test("onItemLongDragOver does nothing for a leaf item", async function(assert) {
+		const oTree = this.oTree;
+		oTree.expand(0); // expand Node1 to expose its leaf child Node1-1
+		await nextUIUpdate();
+
+		const oLeaf = oTree.getItems()[1]; // Node1-1 is a leaf
+		assert.ok(oLeaf.isLeaf(), "Precondition: target item is a leaf");
+
+		const oToggleSpy = this.spy();
+		oTree.attachToggleOpenState(oToggleSpy);
+
+		oTree.onItemLongDragOver(oLeaf);
+		assert.ok(oToggleSpy.notCalled, "toggleOpenState not fired for leaf");
+	});
+
+	QUnit.test("onItemLongDragOver does nothing when item is undefined", function(assert) {
+		const oTree = this.oTree;
+		const oToggleSpy = this.spy();
+		oTree.attachToggleOpenState(oToggleSpy);
+
+		oTree.onItemLongDragOver(undefined);
+		assert.ok(oToggleSpy.notCalled, "no event when item is undefined");
+	});
+
+	QUnit.module("Internal helpers", {
+		beforeEach: async function() {
+			this.oTree = await createTree();
+		},
+		afterEach: function() {
+			this.oTree.destroy();
+			this.oTree = null;
+		}
+	});
+
+	QUnit.test("_sortHelper accepts a single number", function(assert) {
+		assert.deepEqual(this.oTree._sortHelper(3), [3], "single number wrapped in array");
+	});
+
+	QUnit.test("_sortHelper sorts an array descending", function(assert) {
+		assert.deepEqual(this.oTree._sortHelper([1, 5, 2, 4]), [5, 4, 2, 1], "array sorted descending");
+	});
+
+	QUnit.test("_sortHelper returns empty array for unsupported input", function(assert) {
+		assert.deepEqual(this.oTree._sortHelper("nope"), [], "string yields empty array");
+		assert.deepEqual(this.oTree._sortHelper(null), [], "null yields empty array");
+		assert.deepEqual(this.oTree._sortHelper(undefined), [], "undefined yields empty array");
+	});
+
+	QUnit.test("_removeLeaf filters out leaf indices", async function(assert) {
+		const oTree = this.oTree;
+		oTree.expand(0); // expand Node1 → second item becomes leaf Node1-1
+		await nextUIUpdate();
+
+		// Items: [Node1 (non-leaf, expanded), Node1-1 (leaf), Node1-2 (non-leaf)]
+		const aFiltered = oTree._removeLeaf([0, 1, 2]);
+		assert.deepEqual(aFiltered, [0, 2], "leaf index 1 removed; non-leaves kept");
+	});
+
+	QUnit.test("_removeLeaf handles out-of-range indices safely", function(assert) {
+		const aFiltered = this.oTree._removeLeaf([99]);
+		assert.deepEqual(aFiltered, [], "non-existent indices are dropped");
+	});
+
+	QUnit.test("_preExpand combines _sortHelper and _removeLeaf", async function(assert) {
+		const oTree = this.oTree;
+		oTree.expand(0);
+		await nextUIUpdate();
+
+		// _preExpand sorts descending and removes leaves
+		const aResult = oTree._preExpand([0, 1, 2]);
+		assert.deepEqual(aResult, [2, 0], "sorted descending and leaf at index 1 removed");
+	});
+
+	QUnit.module("Lifecycle", {
+		beforeEach: function() { }
+	});
+
+	QUnit.test("exit clears the TreeBindingProxy reference", function(assert) {
+		const oTree = new Tree();
+		assert.ok(oTree._oProxy, "_oProxy created during init");
+		oTree.destroy();
+		assert.strictEqual(oTree._oProxy, null, "_oProxy cleared on destroy");
+	});
+
+	QUnit.test("invalidate sets _bInvalidated; onAfterRendering clears it", async function(assert) {
+		const oTree = await createTree();
+		assert.notOk(oTree._bInvalidated, "_bInvalidated cleared after initial render");
+
+		oTree.invalidate();
+		assert.ok(oTree._bInvalidated, "_bInvalidated set after invalidate()");
+
+		await nextUIUpdate();
+		assert.notOk(oTree._bInvalidated, "_bInvalidated cleared again after re-rendering");
+
+		oTree.destroy();
+	});
+
+	QUnit.module("Deprecated growing* setters", {
+		beforeEach: function() {
+			this.oTree = new Tree();
+			this.oLogStub = sinon.stub(Log, "error");
+		},
+		afterEach: function() {
+			this.oLogStub.restore();
+			this.oTree.destroy();
+			this.oTree = null;
+		}
+	});
+
+	QUnit.test("setGrowing logs an error", function(assert) {
+		this.oTree.setGrowing(true);
+		assert.ok(this.oLogStub.calledOnce, "Log.error was called once");
+		assert.ok(this.oLogStub.firstCall.args[0].indexOf("Growing feature") === 0, "Error message mentions Growing feature");
+	});
+
+	QUnit.test("setGrowingThreshold logs an error", function(assert) {
+		this.oTree.setGrowingThreshold(20);
+		assert.ok(this.oLogStub.calledOnce, "Log.error was called once");
+		assert.ok(this.oLogStub.firstCall.args[0].indexOf("GrowingThreshold") === 0, "Error message mentions GrowingThreshold");
+	});
+
+	QUnit.test("setGrowingTriggerText logs an error", function(assert) {
+		this.oTree.setGrowingTriggerText("More");
+		assert.ok(this.oLogStub.calledOnce, "Log.error was called once");
+		assert.ok(this.oLogStub.firstCall.args[0].indexOf("GrowingTriggerText") === 0, "Error message mentions GrowingTriggerText");
+	});
+
+	QUnit.test("setGrowingScrollToLoad logs an error", function(assert) {
+		this.oTree.setGrowingScrollToLoad(true);
+		assert.ok(this.oLogStub.calledOnce, "Log.error was called once");
+		assert.ok(this.oLogStub.firstCall.args[0].indexOf("GrowingScrollToLoad") === 0, "Error message mentions GrowingScrollToLoad");
+	});
+
+	QUnit.test("setGrowingDirection logs an error", function(assert) {
+		this.oTree.setGrowingDirection("Downwards");
+		assert.ok(this.oLogStub.calledOnce, "Log.error was called once");
+		assert.ok(this.oLogStub.firstCall.args[0].indexOf("GrowingDirection") === 0, "Error message mentions GrowingDirection");
+	});
+
+	QUnit.test("validateAggregation throws for non-TreeItemBase items", function(assert) {
+		const oTree = new Tree();
+		assert.throws(function() {
+			oTree.addItem(new StandardListItem());
+		}, /TreeItemBase-based/, "Throws with a message mentioning TreeItemBase");
+		oTree.destroy();
+	});
 });

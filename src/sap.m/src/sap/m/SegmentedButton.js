@@ -480,12 +480,20 @@ function(
 		var aButtons,
 			oDomRef = this.getDomRef();
 
-		if (oDomRef) {
+		if (oDomRef && !this._bInOverflow) {
 			this._oItemNavigation.setRootDomRef(oDomRef);
 			aButtons = this.$().find(".sapMSegBBtn:not(.sapMSegBBtnDis)");
 			this._oItemNavigation.setItemDomRefs(aButtons);
 			this._focusSelectedButton();
 		}
+	};
+
+	SegmentedButton.prototype.getFocusDomRef = function () {
+		if (this._bInOverflow) {
+			var oSelect = this.getAggregation("_select");
+			return oSelect && oSelect.getFocusDomRef();
+		}
+		return Control.prototype.getFocusDomRef.call(this);
 	};
 
 	/**
@@ -1010,6 +1018,11 @@ function(
 			this.setAggregation("_select", this._fnSelectFormFactory(), true);
 		}
 
+		if (this._oItemNavigation) {
+			this._oItemNavigation.setRootDomRef(null);
+			this._oItemNavigation.setItemDomRefs([]);
+		}
+
 		this._syncSelect();
 		this._syncAriaAssociations();
 	};
@@ -1021,6 +1034,7 @@ function(
 	SegmentedButton.prototype._toNormalMode = function() {
 		delete this._bInOverflow;
 		this.removeStyleClass("sapMSegBSelectWrapper");
+		this._setItemNavigation();
 	};
 
 	SegmentedButton.prototype._syncAriaAssociations = function () {
