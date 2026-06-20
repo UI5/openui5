@@ -2075,6 +2075,32 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("updateSelected: check key predicate, missing", function (assert) {
+		var o = { // only a container for checkPredicate so that we can mock it
+				checkKeyPredicate : function () {}
+			},
+			oMock = this.mock(o),
+			oSource = {
+				"@$ui5._" : {
+					predicate : "('1')"
+				},
+				property : "new"
+			},
+			oTarget = {
+				// Note: happens e.g. in case old data was read via data aggregation
+				// NO: "@$ui5._" : {predicate : "('1')"},
+				property : "old"
+			};
+
+		oMock.expects("checkKeyPredicate").withExactArgs("path").returns(true);
+
+		// code under test
+		_Helper.updateSelected({}, "path", oTarget, oSource, undefined, o.checkKeyPredicate);
+
+		assert.deepEqual(oTarget, {property : "new"}, "no 'predicate' added");
+	});
+
+	//*********************************************************************************************
 	QUnit.test("updateSelected: check key predicate, unchanged", function (assert) {
 		var o = { // only a container for checkPredicate so that we can mock it
 				checkKeyPredicate : function () {}
@@ -4490,6 +4516,16 @@ sap.ui.define([
 				"bar@$ui5.noData" : true
 			}
 		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("createMissing: null", function (assert) {
+		const oObject = {null : null};
+
+		// code under test
+		_Helper.createMissing(oObject, ["null", "foo"]);
+
+		assert.deepEqual(oObject, {null : null}, "unchanged");
 	});
 
 	//*********************************************************************************************

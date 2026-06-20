@@ -1428,6 +1428,68 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 	});
 
+	QUnit.test("ItemNavigation is not set up when in select mode", async function (assert) {
+		// Arrange
+		var oSegmentedButton = new SegmentedButton({
+			items: [
+				new SegmentedButtonItem({ text: "Day", key: "day" }),
+				new SegmentedButtonItem({ text: "Week", key: "week" }),
+				new SegmentedButtonItem({ text: "Month", key: "month" })
+			]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// Act - switch to select mode and re-render
+		oSegmentedButton._toSelectMode();
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Assert - ItemNavigation root should not be set when in overflow/select mode
+		assert.strictEqual(
+			oSegmentedButton._oItemNavigation.getRootDomRef(),
+			null,
+			"ItemNavigation root DOM ref is null in select mode"
+		);
+		assert.strictEqual(
+			oSegmentedButton._oItemNavigation.getItemDomRefs().length,
+			0,
+			"ItemNavigation has no item DOM refs in select mode"
+		);
+
+		// Cleanup
+		oSegmentedButton.destroy();
+		await nextUIUpdate(this.clock);
+	});
+
+	QUnit.test("ItemNavigation is set up again when leaving select mode", async function (assert) {
+		// Arrange
+		var oSegmentedButton = new SegmentedButton({
+			items: [
+				new SegmentedButtonItem({ text: "Day", key: "day" }),
+				new SegmentedButtonItem({ text: "Week", key: "week" }),
+				new SegmentedButtonItem({ text: "Month", key: "month" })
+			]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// Act - enter and leave select mode (no re-render between, buttons stay in DOM)
+		oSegmentedButton._toSelectMode();
+		oSegmentedButton._toNormalMode();
+
+		// Assert - ItemNavigation root should be restored
+		assert.ok(
+			oSegmentedButton._oItemNavigation.getRootDomRef(),
+			"ItemNavigation root DOM ref is set after returning to normal mode"
+		);
+		assert.ok(
+			oSegmentedButton._oItemNavigation.getItemDomRefs().length > 0,
+			"ItemNavigation has item DOM refs after returning to normal mode"
+		);
+
+		// Cleanup
+		oSegmentedButton.destroy();
+		await nextUIUpdate(this.clock);
+	});
+
 	QUnit.test("Press 'SPACE' should not scroll the page", function (assert) {
 		// Arrange
 		var oSB = new SegmentedButton(),

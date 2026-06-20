@@ -741,15 +741,14 @@ sap.ui.define([
 		/**
 		 * Drills down into the given object according to the given path, creating missing objects
 		 * along the way, and setting a "...@$ui5.noData" annotation at the end in case the final
-		 * property is missing.
+		 * property is missing. Silently stops if a property along the way is <code>null</code>.
 		 *
 		 * @param {object} oObject
 		 *   The object to start at
 		 * @param {string[]} aSegments
 		 *   Relative path to drill-down into, as array of segments
 		 * @throws {Error}
-		 *   If a property along the way exists, but has an <code>undefined</code> or
-		 *   <code>null</code> value
+		 *   If a property along the way exists, but has an <code>undefined</code> value
 		 *
 		 * @public
 		 * @see .deleteProperty
@@ -759,6 +758,9 @@ sap.ui.define([
 		 */
 		createMissing : function (oObject, aSegments) {
 			aSegments.reduce(function (oCurrent, sSegment, i) {
+				if (oCurrent === null) {
+					return null; // nothing to do from here on
+				}
 				if (!(sSegment in oCurrent)) { // Note: TypeError if !oCurrent
 					if (i + 1 < aSegments.length) {
 						oCurrent[sSegment] = {};
@@ -3351,7 +3353,7 @@ sap.ui.define([
 						}
 						if (fnCheckKeyPredicate && fnCheckKeyPredicate(sPath)) {
 							sTargetPredicate = _Helper.getPrivateAnnotation(oTarget, "predicate");
-							if (sSourcePredicate !== sTargetPredicate) {
+							if (sTargetPredicate && sTargetPredicate !== sSourcePredicate) {
 								throw new Error("Key predicate of '" + sPath + "' changed from "
 									+ sTargetPredicate + " to " + sSourcePredicate);
 							}

@@ -56,7 +56,6 @@ sap.ui.define([
 	oMenu.addItem(new MenuItem({
 		text: "fridge",
 		icon: "sap-icon://fridge",
-		shortcutText: "Alt + F4",
 		items: [
 			new MenuItem({
 				text: "accidental leave",
@@ -248,50 +247,7 @@ sap.ui.define([
 		menu: oMenu2
 	});
 
-	var oMenu3 = new Menu({
-			items: [
-				new MenuItem({
-					text: "New",
-					icon: "sap-icon://create",
-					shortcutText: "Ctrl + N"
-				}),
-				new MenuItem({
-					text: "Open",
-					icon: "sap-icon://open-folder",
-					shortcutText: "Ctrl + O"
-				}),
-				new MenuItem({
-					text: "Save",
-					shortcutText: "Ctrl + Shift + S",
-					items: [
-						new MenuItem({
-							text: "Save Locally",
-							icon: "sap-icon://save",
-							shortcutText: "Ctrl + S"
-						}),
-						new MenuItem({
-							text: "Save to Cloud",
-							icon: "sap-icon://upload-to-cloud",
-							shortcutText: "Alt + S"
-						})
-					]
-				}),
-				new MenuItem({
-					text: "Delete",
-					shortcutText: "Ctrl + D"
-				}),
-				new MenuItem({
-					text: "Close",
-					icon: "sap-icon://decline",
-					shortcutText: "Ctrl + X"
-				})
-			]
-		});
 
-	var oButton3 = new MenuButton("button3", {
-		text: "File Menu",
-		menu: oMenu3
-	});
 
 	// Menu with selectable items using MenuItemGroup - Single Select
 	var oMenu4 = new Menu({
@@ -326,8 +282,7 @@ sap.ui.define([
 			new MenuItem({
 				text: "Refresh",
 				icon: "sap-icon://refresh",
-				startsSection: true,
-				shortcutText: "F5"
+				startsSection: true
 			})
 		]
 	});
@@ -457,18 +412,15 @@ sap.ui.define([
 		items: [
 			new MenuItem({
 				text: "Copy",
-				icon: "sap-icon://copy",
-				shortcutText: "Ctrl+C"
+				icon: "sap-icon://copy"
 			}),
 			new MenuItem({
 				text: "Paste",
-				icon: "sap-icon://paste",
-				shortcutText: "Ctrl+V"
+				icon: "sap-icon://paste"
 			}),
 			new MenuItem({
 				text: "Cut",
-				icon: "sap-icon://scissors",
-				shortcutText: "Ctrl+X"
+				icon: "sap-icon://scissors"
 			}),
 			new MenuItem({
 				text: "Properties",
@@ -565,8 +517,7 @@ sap.ui.define([
 			oButton,
 			new Label({text: "Menu initialized via data binding", wrapping: true, labelFor: "button2"}),
 			oButton2,
-			new Label({text: "File operations menu with shortcuts", wrapping: true, labelFor: "button3"}),
-			oButton3,
+
 			new Label({text: "Single-select menu with radio-button behavior", wrapping: true, labelFor: "button4"}),
 			oButton4,
 			new Label({text: "Multi-select menu with checkbox behavior", wrapping: true, labelFor: "button5"}),

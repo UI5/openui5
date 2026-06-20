@@ -24913,6 +24913,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// query options. The grand total is not requested because the outdated flag at the grand total
 	// is set.
 	// JIRA: CPOUI5ODATAV4-3300, CPOUI5ODATAV4-3287
+	//
+	// Requesting side effects via a :1 nav.prop. works fine (JIRA: CPOUI5ODATAV4-3514)
 	[
 		"context refresh",
 		"context refresh via side effects",
@@ -24936,7 +24938,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					grandTotalAtBottomOnly : false,
 					group : {
 						LifecycleStatus : {},
-						SalesOrderID : {}
+						SalesOrderID : {
+							additionally : ['SO_2_BP/Address/City']
+						}
 					},
 					search : 'covfefe'
 				},
@@ -24951,6 +24955,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		<Text id="lifecycleStatus" text="{LifecycleStatus}"/>
 		<Text id="grossAmount" text="{= %{GrossAmount} }"/>
 		<Text id="salesOrderID" text="{SalesOrderID}"/>
+		<Text id="city" text="{SO_2_BP/Address/City}"/>
 	</Table>
 	<Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>`,
 				that = this;
@@ -24958,15 +24963,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.expectRequest("SalesOrderList?sap-client=123&custom=foo&$apply="
 					+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
 					+ "/concat(aggregate(GrossAmount)"
-					+ ",groupby((LifecycleStatus,SalesOrderID),aggregate(GrossAmount))"
-					+ "/orderby(LifecycleStatus desc)"
+					+ ",groupby((LifecycleStatus,SalesOrderID,SO_2_BP/Address/City)"
+					+ ",aggregate(GrossAmount))/orderby(LifecycleStatus desc)"
 					+ "/concat(aggregate($count as UI5__count),top(99)))", {
 					value : [
 						{GrossAmount : "6"},
 						{UI5__count : "3", "UI5__count@odata.type" : "#Decimal"},
-						{GrossAmount : "1", LifecycleStatus : "Z", SalesOrderID : "26"},
-						{GrossAmount : "2", LifecycleStatus : "Y", SalesOrderID : "25"},
-						{GrossAmount : "3", LifecycleStatus : "X", SalesOrderID : "24"}
+						{GrossAmount : "1", LifecycleStatus : "Z", SalesOrderID : "26", SO_2_BP : null},
+						{GrossAmount : "2", LifecycleStatus : "Y", SalesOrderID : "25",
+							SO_2_BP : {Address : {City : "Walldorf"}}},
+						{GrossAmount : "3", LifecycleStatus : "X", SalesOrderID : "24", SO_2_BP : null}
 					]
 				})
 				.expectChange("isOutdated", [undefined, undefined, undefined, undefined, undefined])
@@ -24976,6 +24982,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("lifecycleStatus", [null, "Z", "Y", "X", null])
 				.expectChange("grossAmount", ["6", "1", "2", "3", "6"])
 				.expectChange("salesOrderID", [null, "26", "25", "24", null])
+				.expectChange("city", [null, "", "Walldorf", "", null])
 				.expectChange("isOutdatedHeader");
 
 			return this.createView(assert, sView, oModel).then(function () {
@@ -25041,7 +25048,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						"@$ui5.node.level" : 0,
 						GrossAmount : "6",
 						"LifecycleStatus@$ui5.noData" : true,
-						"SalesOrderID@$ui5.noData" : true
+						"SalesOrderID@$ui5.noData" : true,
+						SO_2_BP : {
+							Address : {
+								"City@$ui5.noData" : true
+							}
+						}
 					});
 				assert.strictEqual(oGrandTotalContext.isOutdated(), undefined);
 
@@ -25061,7 +25073,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							"If key properties are known, late properties are requested");
 					}),
 					// code under test (JIRA: CPOUI5ODATAV4-2756)
-					// BEWARE: It is intended to request a failing late property after a succesfull one!
+					// BEWARE: It is intended to request a failing late property after a successful one!
 					oGrandTotalContext.requestProperty("Note").then(function (sNote) {
 						assert.strictEqual(sNote, undefined, "No late property on grand total");
 					}),
@@ -25086,7 +25098,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					.expectChange("level", [,,, 0])
 					.expectChange("lifecycleStatus", [, "Y", "X", null])
 					.expectChange("grossAmount", [, "2", "3", "5"])
-					.expectChange("salesOrderID", [, "25", "24", null]);
+					.expectChange("salesOrderID", [, "25", "24", null])
+					.expectChange("city", [, "Walldorf", "", null]);
 
 				return Promise.all([
 					// code under test (JIRA: CPOUI5ODATAV4-3229)
@@ -25102,14 +25115,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					const sSelect = "GrossAmount,LifecycleStatus" + (bMessages ? ",Messages" : "")
 						+ ",Note,SalesOrderID";
 					that.expectRequest(`#${iBatchNo} SalesOrderList('25')?sap-client=123&custom=foo`
-							+ "&$select=" + sSelect, {
+							+ "&$select=" + sSelect
+							+ "&$expand=SO_2_BP($select=Address/City,BusinessPartnerID)", {
 							GrossAmount : "5",
 							LifecycleStatus : "Y*",
 							...(bMessages && {Messages : []}),
 							Note : "n/a",
-							SalesOrderID : "25"
+							SalesOrderID : "25",
+							SO_2_BP : {Address : {City : "Heidelberg"}, BusinessPartnerID : "n/a"}
 						})
 						.expectChange("lifecycleStatus", [, "Y*"])
+						.expectChange("city", [, "Heidelberg"])
 						.expectChange("grossAmount", [, "5"]);
 				}
 
@@ -25141,12 +25157,21 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							LifecycleStatus : "Y*",
 							Note : "Late*"
 						})
-						.expectChange("lifecycleStatus", [, "Y*"]);
+						.expectRequest(`#${iBatchNo} SalesOrderList('25')?sap-client=123&custom=foo`
+							+ "&$select=SO_2_BP"
+							+ "&$expand=SO_2_BP($select=Address/City,BusinessPartnerID)", {
+							SO_2_BP : {Address : {City : "Heidelberg"}, BusinessPartnerID : "n/a"}
+						})
+						.expectChange("lifecycleStatus", [, "Y*"])
+						.expectChange("city", [, "Heidelberg"]);
 
 					await Promise.all([
 						// code under test (JIRA: CPOUI5ODATAV4-3389)
 						oContext25.requestSideEffects(["LifecycleStatus"]),
 						oContext25.requestSideEffects(["Note", /*ignored:*/"NoteLanguage"]),
+						// code under test (JIRA: CPOUI5ODATAV4-3514)
+						// Note: this allows only changes to *structural* properties, not SO_2_BP itself
+						oContext25.requestSideEffects(["SO_2_BP/*"]),
 						that.waitForChanges(assert, sScenario)
 					]);
 
@@ -25184,19 +25209,22 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				that.expectRequest("SalesOrderList?sap-client=123&custom=foo&$apply="
 						+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
 						+ "/concat(aggregate(GrossAmount)"
-						+ ",groupby((LifecycleStatus,SalesOrderID),aggregate(GrossAmount))"
-						+ "/orderby(LifecycleStatus desc)"
+						+ ",groupby((LifecycleStatus,SalesOrderID,SO_2_BP/Address/City)"
+						+ ",aggregate(GrossAmount))/orderby(LifecycleStatus desc)"
 						+ "/concat(aggregate($count as UI5__count),top(99)))", {
 						value : [
 							{GrossAmount : "15"},
 							{UI5__count : "2", "UI5__count@odata.type" : "#Decimal"},
-							{GrossAmount : "7", LifecycleStatus : "Y", SalesOrderID : "25"},
-							{GrossAmount : "8", LifecycleStatus : "X", SalesOrderID : "24"}
+							{GrossAmount : "7", LifecycleStatus : "Y", SalesOrderID : "25",
+								SO_2_BP : {Address : {City : "Walldorf"}}},
+							{GrossAmount : "8", LifecycleStatus : "X", SalesOrderID : "24",
+								SO_2_BP : null}
 						]
 					})
 					.expectChange("isOutdated", [undefined,,, undefined])
 					.expectChange("lifecycleStatus", [, "Y"])
 					.expectChange("grossAmount", ["15", "7", "8", "15"])
+					.expectChangeIf(sScenario !== "setProperty", "city", [, "Walldorf"])
 					.expectChange("isOutdatedHeader", false);
 
 				await Promise.all([
@@ -25220,10 +25248,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"/SalesOrderList('24')",
 					"/SalesOrderList($isTotal=true)"
 				], [ // isOutdated|isExpanded|isTotal|level|LifecycleStatus|GrossAmount|SalesOrderID
-					["", "true", "true", "0", "", "15", ""],
-					["", "", "false", "1", "Y", "7", "25"],
-					["", "", "false", "1", "X", "8", "24"],
-					["", "", "true", "0", "", "15", ""]
+					 //   |SO_2_BP/Address/City
+					["", "true", "true", "0", "", "15", "", ""],
+					["", "", "false", "1", "Y", "7", "25", "Walldorf"],
+					["", "", "false", "1", "X", "8", "24", ""],
+					["", "", "true", "0", "", "15", "", ""]
 				]);
 
 				that.expectRequest("#6 DELETE SalesOrderList('25')?sap-client=123", {
@@ -25241,7 +25270,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					.expectChange("level", [,, 0])
 					.expectChange("lifecycleStatus", [, "X", null])
 					.expectChange("grossAmount", [, "8", "15"])
-					.expectChange("salesOrderID", [, "24", null]);
+					.expectChange("salesOrderID", [, "24", null])
+					.expectChange("city", [, "", null]);
 
 				return Promise.all([
 					// code under test (JIRA: CPOUI5ODATAV4-3460)
@@ -25267,6 +25297,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					.expectChange("isOutdatedHeader", undefined); // oHeaderContext is destroyed
 
 				const oBindingInfo = removeBindingInfo(oTable);
+				oBindingInfo.template.mAggregations.cells.pop(); // remove id="city" column
 				oTable.bindItems({
 					path : "/SalesOrderList",
 					parameters : {

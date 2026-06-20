@@ -280,13 +280,26 @@ function(
 			oRB = Library.getResourceBundleFor("sap.m"),
 			sCalendarType = this.getProperty("_primaryCalendarType");
 
-		this.setAggregation("_actionsToolbar", new AssociativeOverflowToolbar(sOPHId + "-ActionsToolbar", {})
+		const oActionsToolbar = new AssociativeOverflowToolbar(sOPHId + "-ActionsToolbar", {})
 			.addStyleClass("sapMPCHeadActionsToolbar")
 			.addContent(this._getOrCreateTitleControl())
 			.addContent(this._getOrCreateToolbarSpacer())
 			.addContent(this._getOrCreateViewSwitchLabel())
-			.addContent(this._getOrCreateViewSwitch())
-		);
+			.addContent(this._getOrCreateViewSwitch());
+
+		oActionsToolbar._getParent = function(oActiveElement) {
+			var aContent = this.getContent();
+			var oElement = oActiveElement;
+			while (oElement) {
+				if (aContent.indexOf(oElement) !== -1) {
+					return oElement;
+				}
+				oElement = oElement.getParent();
+			}
+			return oActiveElement;
+		};
+
+		this.setAggregation("_actionsToolbar", oActionsToolbar);
 
 		this._oPrevBtn = new Button(sNavToolbarId + "-PrevBtn", {
 			icon: IconPool.getIconURI('slim-arrow-left'),

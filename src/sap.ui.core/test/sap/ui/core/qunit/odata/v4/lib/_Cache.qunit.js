@@ -12193,10 +12193,7 @@ sap.ui.define([
 		oCache.aElements.$tail = oTail;
 		oCache.iLimit = 42;
 		if (bDeleted) {
-			oCache.aElements.$deleted = {
-				"('d1')" : {index : 209},
-				"('d2')" : {index : 210}
-			};
+			oCache.aElements.$deleted = [{index : 209}, {index : 210}];
 		}
 		oCache.iResetCount = 11;
 		oCache.bSentRequest = "~bSentRequest~";
@@ -12274,10 +12271,7 @@ sap.ui.define([
 		assert.strictEqual(oCache.aElements.$tail, oTail, "$tail unchanged");
 		assert.strictEqual(oCache.iLimit, Infinity);
 		if (bDeleted) {
-			assert.deepEqual(oCache.aElements.$deleted, {
-				"('d1')" : {index : undefined},
-				"('d2')" : {index : undefined}
-			});
+			assert.deepEqual(oCache.aElements.$deleted, [{index : undefined}, {index : undefined}]);
 		}
 		assert.strictEqual(oCache.iResetCount, 12);
 		assert.strictEqual(oCache.bSentRequest, false);
@@ -12409,13 +12403,13 @@ sap.ui.define([
 
 		assert.strictEqual(oCache.isDeletingInOtherGroup("group"), false);
 
-		oCache.aElements.$deleted = {};
+		oCache.aElements.$deleted = [];
 		assert.strictEqual(oCache.isDeletingInOtherGroup("group"), false);
 
-		oCache.aElements.$deleted = {a : {groupId : "group"}, b : {groupId : "group"}};
+		oCache.aElements.$deleted = [{groupId : "group"}, {groupId : "group"}];
 		assert.strictEqual(oCache.isDeletingInOtherGroup("group"), false);
 
-		oCache.aElements.$deleted = {a : {groupId : "group"}, b : {groupId : "otherGroup"}};
+		oCache.aElements.$deleted = [{groupId : "group"}, {groupId : "otherGroup"}];
 		assert.strictEqual(oCache.isDeletingInOtherGroup("group"), true);
 	});
 
