@@ -708,5 +708,30 @@
         "text": " sap.m.DateRangeSelection: selection via keyboard is working"
       }
     ]
+  },
+  "1.136.18": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "5b3855b30e60ad2b31893c42d106aa4a467bf86d",
+        "type": "FIX",
+        "text": " sap.m.TimePickerClock: Replace inline drag event attributes with addEventListener"
+      },
+      {
+        "id": "3501096aa29ac161d5af519ee652aba5109ead7f",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: adjust failing tests in FF"
+      },
+      {
+        "id": "65f170ced58ef595777e9b4ae659726ab80244eb",
+        "type": "FIX",
+        "text": " We've now fixed the scroll arrow buttons not working when a single item is larger than the HeaderContainer"
+      },
+      {
+        "id": "6f1fdee920a4a6654927a42d7ead09dc86caab94",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange: align height to content"
+      }
+    ]
   }
 }

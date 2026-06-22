@@ -153,5 +153,15 @@
         "text": " sap.uxap.AnchorBar: Enable upperCaseAnchorBar property for Horizon theme"
       }
     ]
+  },
+  "1.136.18": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "6ec6f7891fc45fc51ada3bd160d10c15e3b18594",
+        "type": "FIX",
+        "text": " sap.m.GridListItem: Missing shadow on selected state added"
+      }
+    ]
   }
 }

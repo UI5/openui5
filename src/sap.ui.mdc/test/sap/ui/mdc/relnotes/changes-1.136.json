@@ -178,5 +178,20 @@
         "text": " ui.Table: Column Freeze behavior and state"
       }
     ]
+  },
+  "1.136.18": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "7c8ede7a84904aefd7f056e63a00248151aac137",
+        "type": "FIX",
+        "text": " ValueHelp: Tokenizer shows empty Token"
+      },
+      {
+        "id": "ffe1c54206fa43ec79cbc18213247e440b66193f",
+        "type": "FIX",
+        "text": "p13n.ChartItemPanel: fix acc issues"
+      }
+    ]
   }
 }
