@@ -211,5 +211,15 @@
         "text": " MDCTable should use Context.getIndex if available to determine the context's position in the binding."
       }
     ]
+  },
+  "1.108.52": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "007f064c18bce128171433b5a89ca48597b029b8",
+        "type": "FIX",
+        "text": " valuehelp.MDCTable: Fix range selection"
+      }
+    ]
   }
 }

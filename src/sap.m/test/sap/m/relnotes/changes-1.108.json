@@ -2017,5 +2017,36 @@
         "text": " sap.m.Text: Skip unstable test in Chrome"
       }
     ]
+  },
+  "1.108.52": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "910950cf7953890cc5e6a7e472496f496280641e",
+        "type": "FIX",
+        "text": " sap.m.TimePickerClock: Replace inline drag event attributes with addEventListener"
+      },
+      {
+        "id": "67e9494e886b876a4bc55db881cef3e1efda3708",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: adjust failing tests in FF"
+      },
+      {
+        "id": "9f4088e4b9a1949a905738c7c6187d6842f6d6d3",
+        "type": "FIX",
+        "text": " sap.m.FormattedText: adjust placeholder rendering",
+        "references": [
+          {
+            "type": "BCP",
+            "reference": "2280180682"
+          }
+        ]
+      },
+      {
+        "id": "3ff3d8c6036d9ccc179e62f251be640c0eb20fa8",
+        "type": "FIX",
+        "text": " We've now fixed the scroll arrow buttons not working when a single item is larger than the HeaderContainer"
+      }
+    ]
   }
 }
