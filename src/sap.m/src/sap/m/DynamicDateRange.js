@@ -1580,6 +1580,8 @@ sap.ui.define([
 					oOption.alignValueHelpUI(this);
 				}
 				this._updateDatesLabel();
+			} else {
+				this._getDatesLabel().setText(oResourceBundle.getText("DDR_INFO_DATES_EMPTY_HINT"));
 			}
 			this._setApplyButtonEnabled(bValidValueHelpUI);
 		};
