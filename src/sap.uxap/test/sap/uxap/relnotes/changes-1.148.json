@@ -13,5 +13,15 @@
         "text": " sap.uxap.ObjectPageSubSection: Fix error when block is externally destroyed"
       }
     ]
+  },
+  "1.148.1": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "5cfbdbaa86fba5cf2a0b50db7b987b9901a73b9f",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSection: Enable rename in RTA"
+      }
+    ]
   }
 }

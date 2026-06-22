@@ -28,5 +28,15 @@
         "text": " sap.f.ShellBar: Update sample"
       }
     ]
+  },
+  "1.148.1": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "8b5aa75e53b8f8f39bfe937496824c63f78edf3a",
+        "type": "FIX",
+        "text": " sap.m.GridListItem: Missing shadow on selected state added"
+      }
+    ]
   }
 }

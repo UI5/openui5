@@ -23,5 +23,20 @@
         "text": " ui.Table: Prevent focus change on touch move"
       }
     ]
+  },
+  "1.148.1": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "5a7abfd4e9641014af16de31a3af3f2fb453ddbf",
+        "type": "FIX",
+        "text": " ui.Table: Column Freeze behavior and state"
+      },
+      {
+        "id": "88fc9a882132b21fba7f180b96ee42aa7de7500c",
+        "type": "FIX",
+        "text": " Table: Show busy indicator when selection plugins load data"
+      }
+    ]
   }
 }

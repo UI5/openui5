@@ -68,5 +68,80 @@
         "text": "AdaptFiltersPanel: Fix high contrast issue with reordering icon"
       }
     ]
+  },
+  "1.148.1": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "9a3ad88327f661cdf403dbfcaf4eea6521ccc27e",
+        "type": "FIX",
+        "text": " ValueHelpDelegate: fix updateBindingInfo call"
+      },
+      {
+        "id": "e11dfd6a161f290902dacae22578912ccb20d69e",
+        "type": "FIX",
+        "text": " DefineConditionPanel: aria-label for remove-button has no text"
+      },
+      {
+        "id": "37197635ec913c9431939cb7779163b5b54d91a0",
+        "type": "FIX",
+        "text": " DefineConditionPanel: focus new condition on Add"
+      },
+      {
+        "id": "3a18aedd7c90a6f625726e8990973c6a96075a10",
+        "type": "FIX",
+        "text": " p13n.AdaptFiltersPanel: fix announcement of error or warning"
+      },
+      {
+        "id": "3c6fc618c0315be44022e897936fc23c7b70e7da",
+        "type": "FIX",
+        "text": "p13n.SelectionPanel: fix search field announcement"
+      },
+      {
+        "id": "f86473d677147e9c96cda7a0f4034253aa864429",
+        "type": "FIX",
+        "text": " MultiValueField: improve keyboard interaction"
+      },
+      {
+        "id": "31a5492c52d06b7f052cfc5e8537240b6bbb4e82",
+        "type": "FIX",
+        "text": " Field: dropdown with no data - no announcement"
+      },
+      {
+        "id": "65f6d669375f828f1eb85b56011517b78e75cb12",
+        "type": "FIX",
+        "text": " ValueHelp: Tokenizer shows empty Token"
+      },
+      {
+        "id": "5a039264f79b0dccefff92a6595a23faa52d3826",
+        "type": "FIX",
+        "text": " table.ResponsiveTableType: Remove column when table is grouped"
+      },
+      {
+        "id": "a0f850153b1744b7775d1b325fee01c55ad8f958",
+        "type": "FIX",
+        "text": "p13n.ChartItemPanel: fix acc issues"
+      },
+      {
+        "id": "362e813ae792babb6c7a7399c1e905dd5ed5ffdd",
+        "type": "FIX",
+        "text": " MultiValueField: only 10 tokens shown if \"more\" pressed"
+      },
+      {
+        "id": "6f8127eda7cddb5e069199a27666ecb3e6745410",
+        "type": "FIX",
+        "text": "p13n.AdaptFiltersPanel: fix view announcement"
+      },
+      {
+        "id": "4e5693ecdb3e30d0f80f6981e0373de0f9d0cfad",
+        "type": "FIX",
+        "text": " p13n.AdaptFiltersPanel: Fix label wrapping at 320px"
+      },
+      {
+        "id": "f8520e1ffd6f204e0055b4bec9156adb652df7d9",
+        "type": "FIX",
+        "text": " Field, FilterField: boolean value announed twice"
+      }
+    ]
   }
 }

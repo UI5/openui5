@@ -1,0 +1,12 @@
+{
+  "1.148.1": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "8354452f6bf244abcd70eaf662635b2c17182eaa",
+        "type": "FIX",
+        "text": " sap.ui.dt.OverlayUtil: guard canBeRemovedFromAggregationOnMove against parentless elements"
+      }
+    ]
+  }
+}

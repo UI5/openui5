@@ -13,5 +13,20 @@
         "text": " sap.f.DynamicPage: hover of expand/collapse and pin button fixed"
       }
     ]
+  },
+  "1.148.1": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "8b5aa75e53b8f8f39bfe937496824c63f78edf3a",
+        "type": "FIX",
+        "text": " sap.m.GridListItem: Missing shadow on selected state added"
+      },
+      {
+        "id": "86b5c882a78874d54d1e4b820063c749bcac51e7",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSection: Focus outline no longer overlaps header buttons"
+      }
+    ]
   }
 }

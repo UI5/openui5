@@ -193,5 +193,80 @@
         "text": " sap.m.GenericTag: Update Sample"
       }
     ]
+  },
+  "1.148.1": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "642f1937c06beac51c4d28577ec217e1a6556e21",
+        "type": "FIX",
+        "text": " m.VariantManagement: correctly bind sharing column in manage dialog"
+      },
+      {
+        "id": "89b6625c23e45f56411a3c9139cd5ee0b02b2e96",
+        "type": "FIX",
+        "text": " sap.m.TimePickerClock: Replace inline drag event attributes with addEventListener"
+      },
+      {
+        "id": "1a76872224cee167996274b62364868e34ad4682",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: adjust failing tests in FF"
+      },
+      {
+        "id": "3c6fc618c0315be44022e897936fc23c7b70e7da",
+        "type": "FIX",
+        "text": "p13n.SelectionPanel: fix search field announcement"
+      },
+      {
+        "id": "31dfe1c71d3bb956543934472e6b0422a36f092c",
+        "type": "FIX",
+        "text": " We've now fixed the scroll arrow buttons not working when a single item is larger than the HeaderContainer"
+      },
+      {
+        "id": "d78115bc1452496bb92214c8e02059ea605ff4a0",
+        "type": "FIX",
+        "text": " sap.m.Tokenizer: Copy/Cut works with focused token"
+      },
+      {
+        "id": "047893108d049a67776ce1765fbd4c4a6cc79b6e",
+        "type": "FIX",
+        "text": " We've now fixed the text spillover issue for the no-data placeholder in UploadSet"
+      },
+      {
+        "id": "5a7abfd4e9641014af16de31a3af3f2fb453ddbf",
+        "type": "FIX",
+        "text": " ui.Table: Column Freeze behavior and state"
+      },
+      {
+        "id": "37c47940d255754de3759b8d0f34471f23ffb853",
+        "type": "FIX",
+        "text": " p13n.SelectionPanel: Fix item count"
+      },
+      {
+        "id": "4bd72be14907fecb169637eee72505c4e8b82559",
+        "type": "FIX",
+        "text": " We've now fixed an issue where the image on the slide tile was disappearing on browser window resize"
+      },
+      {
+        "id": "2867d0cd427712c26b6a73068ae32813a5890949",
+        "type": "FIX",
+        "text": " sap.m.VariantManagement: fix search in manage dialog with items binding"
+      },
+      {
+        "id": "68c634dbe9fafa5c7db4afcefcad6fff88838682",
+        "type": "FIX",
+        "text": " m.Table: avoid scroll jump when focus is forwarded on mouse click"
+      },
+      {
+        "id": "b58aeeaa7d83fa8ad9a0b913a2c06223f67c1c32",
+        "type": "FIX",
+        "text": " sap.m.StandardDynamicDateOption: Fix default value for TODAYFROMTO operator"
+      },
+      {
+        "id": "6d613011249b93356453330b2a7fc02b5c15fc04",
+        "type": "FIX",
+        "text": " sap.m.SelectSegmentedButtonItem: fix circular dependency"
+      }
+    ]
   }
 }

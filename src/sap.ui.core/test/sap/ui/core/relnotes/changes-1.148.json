@@ -28,5 +28,15 @@
         "text": " sap/ui/core/Component#destroy: call Component#exit before destroy manifest created artifacts"
       }
     ]
+  },
+  "1.148.1": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "64b201443605051e78b00c13e4126b1d062824db",
+        "type": "FIX",
+        "text": " core.BusyIndicatorUtils: Set aria-busy on correct busy section"
+      }
+    ]
   }
 }
