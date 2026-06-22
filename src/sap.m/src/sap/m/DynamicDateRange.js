@@ -1488,6 +1488,8 @@ sap.ui.define([
 			var bValidValueHelpUI = oOption.validateValueHelpUI(this);
 			if (bValidValueHelpUI) {
 				this._updateDatesLabel();
+			} else {
+				this._getDatesLabel().setText(oResourceBundle.getText("DDR_INFO_DATES_EMPTY_HINT"));
 			}
 			this._setApplyButtonEnabled(bValidValueHelpUI);
 		};
