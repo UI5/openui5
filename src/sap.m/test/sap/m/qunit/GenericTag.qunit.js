@@ -10,17 +10,17 @@ sap.ui.define([
 	"sap/ui/qunit/QUnitUtils",
 	"sap/m/ToolbarSpacer",
 	"sap/m/OverflowToolbar",
-	"sap/ui/core/InvisibleText",
-	"sap/ui/test/utils/nextUIUpdate"
-], function(GenericTag, GenericTagRenderer, library, ObjectNumber, Library, coreLibrary, KeyCodes, qutils, ToolbarSpacer, OverflowToolbar, InvisibleText, nextUIUpdate) {
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/core/InvisibleText"
+], function(GenericTag, GenericTagRenderer, library, ObjectNumber, Library, coreLibrary, KeyCodes, qutils, ToolbarSpacer, OverflowToolbar, nextUIUpdate, InvisibleText) {
 	"use strict";
 
-	var GenericTagDesign = library.GenericTagDesign,
-		GenericTagValueState = library.GenericTagValueState,
-		ValueState = coreLibrary.ValueState,
-		TESTS_DOM_CONTAINER = "qunit-fixture",
-		GENERICTAG_TEXT_ID_SUFFIX = "-text",
-		GENERICTAG_STATUSTEXT_ID_SUFFIX = "-status";
+	const GenericTagDesign = library.GenericTagDesign;
+	const GenericTagValueState = library.GenericTagValueState;
+	const ValueState = coreLibrary.ValueState;
+	const TESTS_DOM_CONTAINER = "qunit-fixture";
+	const GENERICTAG_TEXT_ID_SUFFIX = "-text";
+	const GENERICTAG_STATUSTEXT_ID_SUFFIX = "-status";
 
 	/* --------------------------- GenericTag API ---------------------------------- */
 	QUnit.module("Default properties values", {
@@ -55,7 +55,7 @@ sap.ui.define([
 
 	QUnit.test("_getStatusIcon should return the _statusIcon with empty src property", function(assert) {
 			//act
-			var oStatusIcon = this.oGenericTag._getStatusIcon();
+			const oStatusIcon = this.oGenericTag._getStatusIcon();
 
 			//assert
 			assert.strictEqual(oStatusIcon.getSrc(), "", "Status icon's src property should be an empty string");
@@ -78,7 +78,7 @@ sap.ui.define([
 
 	QUnit.test("GenericTag - setValue fires '_valueChanged' event", function (assert) {
 		//arrange
-		var oSpy = this.spy(this.oGenericTag, "fireEvent");
+		const oSpy = this.spy(this.oGenericTag, "fireEvent");
 
 		//act
 		this.oGenericTag.setValue(new ObjectNumber());
@@ -89,8 +89,8 @@ sap.ui.define([
 
 	QUnit.test("GenericTag - change in 'value' aggregation fires '_valueChanged' event", function (assert) {
 		//arrange
-		var oValue = this.oGenericTag.getValue(),
-			oSpy = this.spy(this.oGenericTag, "fireEvent");
+		const oValue = this.oGenericTag.getValue();
+		const oSpy = this.spy(this.oGenericTag, "fireEvent");
 
 		//act
 		oValue.setNumber(50000);
@@ -111,15 +111,15 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("GenericTag - setStatus should set the correct status icon src", function(assert) {
-		var oIcons = {
+	QUnit.test("GenericTag - setStatus should set the correct status icon src", async function(assert) {
+		const oIcons = {
 			Error: "sap-icon://error",
 			Warning: "sap-icon://alert",
 			Success: "sap-icon://sys-enter-2",
 			Information: "sap-icon://information"
 		};
 
-		for (var sValueState in ValueState) {
+		for (const sValueState in ValueState) {
 			if (sValueState === ValueState.None) {
 				continue;
 			}
@@ -127,7 +127,7 @@ sap.ui.define([
 			this.oGenericTag.setStatus(sValueState);
 
 			//act
-			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			await nextUIUpdate();
 
 			//assert
 			assert.strictEqual(this.oGenericTag.getAggregation("_statusIcon").getSrc(),
@@ -138,7 +138,7 @@ sap.ui.define([
 
 	QUnit.test("GenericTag - setStatus should remove the Status Icon src when ValueState.None", function (assert) {
 		//arrange
-		var oStatusIcon = this.oGenericTag.getAggregation("_statusIcon");
+		const oStatusIcon = this.oGenericTag.getAggregation("_statusIcon");
 
 		assert.ok(oStatusIcon.getSrc());
 
@@ -191,7 +191,7 @@ sap.ui.define([
 		assert.strictEqual(this.clickSpy.getCall(0).args[0].isMarked(), true, "Original event is marked as handled by control");
 	});
 
-	QUnit.test("GenericTag - action interupt", function(assert) {
+	QUnit.test("GenericTag - action interrupt should prevent press event from firing", function(assert) {
 		testPressInterupt(assert, this.oGenericTag, this.onPressCallback, KeyCodes.SHIFT, "Shift");
 		testPressInterupt(assert, this.oGenericTag, this.onPressCallback, KeyCodes.ESCAPE, "Escape");
 	});
@@ -335,14 +335,14 @@ sap.ui.define([
 
 	QUnit.module("GenericTag - keydown");
 
-	QUnit.test("onkeydown event should be prevented - SPACE", function(assert) {
+	QUnit.test("onkeydown event should be prevented when pressing SPACE", function(assert) {
 		//setup
-		var oGenericTag = new GenericTag().placeAt(TESTS_DOM_CONTAINER),
-			oEvent = {
-				which: KeyCodes.SPACE,
-				preventDefault: function () {}
-			},
-			oSpy = this.spy(oEvent, "preventDefault");
+		const oGenericTag = new GenericTag().placeAt(TESTS_DOM_CONTAINER);
+		const oEvent = {
+			which: KeyCodes.SPACE,
+			preventDefault: function () {}
+		};
+		const oSpy = this.spy(oEvent, "preventDefault");
 
 		//act
 		oGenericTag.onkeydown(oEvent);
@@ -354,9 +354,9 @@ sap.ui.define([
 	});
 
 	QUnit.module("GenericTag - setTooltip", {
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oGenericTag = new GenericTag().placeAt(TESTS_DOM_CONTAINER);
-			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			await nextUIUpdate();
 		},
 		afterEach: function() {
 			this.oGenericTag.destroy();
@@ -365,20 +365,19 @@ sap.ui.define([
 	});
 
 	QUnit.test("There should be no tooltip by default", function(assert) {
-		var oGenericTagDomRef = this.oGenericTag.getDomRef();
+		const oGenericTagDomRef = this.oGenericTag.getDomRef();
 		assert.ok(oGenericTagDomRef, "The Generic Tag is rendered.");
 		assert.equal(oGenericTagDomRef.getAttribute('title'), undefined, "There should be no tooltip by default");
 	});
 
-	QUnit.test("setTooltip should set the correct tooltip", function(assert) {
+	QUnit.test("setTooltip should set the correct tooltip", async function(assert) {
 		//arrange
-		var sTooltip = "This is the tooltip",
-			oGenericTagDomRef;
+		const sTooltip = "This is the tooltip";
 
 		//act
 		this.oGenericTag.setTooltip(sTooltip);
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		oGenericTagDomRef = this.oGenericTag.getDomRef();
+		await nextUIUpdate();
+		const oGenericTagDomRef = this.oGenericTag.getDomRef();
 
 		//assert
 		assert.ok(oGenericTagDomRef, "The Generic Tag is rendered.");
@@ -407,7 +406,7 @@ sap.ui.define([
 				"GenericTag has the correct semantic decorator.");
 		},
 		assertGenericTagTextRendered: function(oGenericTag, assert) {
-			var sTextId = "#" + oGenericTag.getId() + GENERICTAG_TEXT_ID_SUFFIX;
+			const sTextId = "#" + oGenericTag.getId() + GENERICTAG_TEXT_ID_SUFFIX;
 			assert.ok(oGenericTag.getDomRef().querySelector(sTextId));
 		},
 		assertGenericTagValueRendered: function(oGenericTag, assert) {
@@ -434,22 +433,22 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Semantic decorator", function(assert) {
+	QUnit.test("Semantic decorator is rendered with correct class for each ValueState", async function(assert) {
 		//arrange
 		this.oGenericTag.placeAt("qunit-fixture");
 
-		Object.keys(ValueState).forEach(function(sValueState){
+		for (const sValueState of Object.keys(ValueState)) {
 			this.oGenericTag.setStatus(sValueState);
 
 			//act
-			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			await nextUIUpdate();
 
 			//assert
 			this.assertGenericTagSemanticDecoratorRendered(this.oGenericTag, sValueState, assert);
-		}, this);
+		}
 	});
 
-	QUnit.test("GenericTagDesign.Full and GenericTagValueState.None should show all generic tag components", function(assert) {
+	QUnit.test("GenericTagDesign.Full and GenericTagValueState.None should show all generic tag components", async function(assert) {
 		//arrange
 		this.oGenericTag.setDesign(GenericTagDesign.Full);
 		this.oGenericTag.setValueState(GenericTagValueState.None);
@@ -457,7 +456,7 @@ sap.ui.define([
 		this.oGenericTag.placeAt("qunit-fixture");
 
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		await nextUIUpdate();
 
 		//assert
 		this.assertGenericTagRendered(this.oGenericTag, assert);
@@ -468,7 +467,7 @@ sap.ui.define([
 		this.assertGenericTagErrorIconNotRendered(this.oGenericTag, assert);
 	});
 
-	QUnit.test("GenericTagDesign.Full and GenericTagValueState.Error should render error icon", function(assert) {
+	QUnit.test("GenericTagDesign.Full and GenericTagValueState.Error should render error icon", async function(assert) {
 		//arrange
 		this.oGenericTag.setDesign(GenericTagDesign.Full);
 		this.oGenericTag.setValueState(GenericTagValueState.Error);
@@ -476,7 +475,7 @@ sap.ui.define([
 		this.oGenericTag.placeAt("qunit-fixture");
 
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		await nextUIUpdate();
 
 		//assert
 		this.assertGenericTagRendered(this.oGenericTag, assert);
@@ -487,14 +486,14 @@ sap.ui.define([
 		this.assertGenericTagErrorIconRendered(this.oGenericTag, assert);
 	});
 
-	QUnit.test("GenericTagDesign.StatusIconHidden and GenericTagValueState.None should not display status icon", function(assert){
+	QUnit.test("GenericTagDesign.StatusIconHidden and GenericTagValueState.None should not display status icon", async function(assert){
 		//arrange
 		this.oGenericTag.setDesign(GenericTagDesign.StatusIconHidden);
 		this.oGenericTag.setValueState(GenericTagValueState.None);
 		this.oGenericTag.placeAt("qunit-fixture");
 
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		await nextUIUpdate();
 
 		//assert
 		this.assertGenericTagRendered(this.oGenericTag, assert);
@@ -506,14 +505,14 @@ sap.ui.define([
 	});
 
 	QUnit.test(
-		"GenericTagDesign.StatusIconHidden and GenericTagValueState.Error should not render status icon but render error icon", function(assert){
+		"GenericTagDesign.StatusIconHidden and GenericTagValueState.Error should not render status icon but render error icon", async function(assert){
 		//arrange
 		this.oGenericTag.setDesign(GenericTagDesign.StatusIconHidden);
 		this.oGenericTag.setValueState(GenericTagValueState.Error);
 		this.oGenericTag.placeAt("qunit-fixture");
 
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		await nextUIUpdate();
 
 		//assert
 		this.assertGenericTagRendered(this.oGenericTag, assert);
@@ -544,14 +543,13 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("GenericTag has the correct roledescription", function(assert){
-		var sRole = "button",
-			oResourceBundle =  Library.getResourceBundleFor("sap.m"),
-			sRoleDescription = oResourceBundle.getText("GENERICTAG_ROLEDESCRIPTION"),
-			$genericTag;
+	QUnit.test("GenericTag has the correct roledescription", async function(assert){
+		const sRole = "button";
+		const oResourceBundle = Library.getResourceBundleFor("sap.m");
+		const sRoleDescription = oResourceBundle.getText("GENERICTAG_ROLEDESCRIPTION");
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		$genericTag = this.oGenericTag.$();
+		await nextUIUpdate();
+		const $genericTag = this.oGenericTag.$();
 
 		//assert
 		assert.equal($genericTag.attr("role"), sRole, "GenericTag role is 'button'.");
@@ -559,31 +557,28 @@ sap.ui.define([
 			"GenericTag roledescription is 'Object Tag'.");
 	});
 
-	QUnit.test("GenericTag has no ARIA status text when Status is ValueState.None", function(assert) {
+	QUnit.test("GenericTag has no ARIA status text when Status is ValueState.None", async function(assert) {
 		//arrange
-		var $genericTag,
-			sAriaLabelledBy;
-
 		this.oGenericTag.setStatus(ValueState.None);
 
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		await nextUIUpdate();
 
 		//assert
-		$genericTag = this.oGenericTag.$();
-		sAriaLabelledBy = $genericTag.attr("aria-labelledby");
+		const $genericTag = this.oGenericTag.$();
+		const sAriaLabelledBy = $genericTag.attr("aria-labelledby");
 
 		assert.equal(sAriaLabelledBy.indexOf(this.sStatusTextId), -1,
 			"GenericTag has no status text in the 'aria-labelledby' attribute.");
 	});
 
-	QUnit.test("GenericTag has the correct status text when Status is not ValueState.None", function(assert){
+	QUnit.test("GenericTag has the correct status text when Status is not ValueState.None", async function(assert){
 		//arrange
-		var $genericTag,
-			$statusText,
-			sAriaLabelledBy;
+		let $genericTag;
+		let $statusText;
+		let sAriaLabelledBy;
 
-		for (var sValueState in ValueState) {
+		for (const sValueState in ValueState) {
 			if (sValueState === ValueState.None) {
 				continue;
 			}
@@ -591,7 +586,7 @@ sap.ui.define([
 			this.oGenericTag.setStatus(sValueState);
 
 			//act
-			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			await nextUIUpdate();
 
 			//assert
 			$genericTag = this.oGenericTag.$();
@@ -607,91 +602,77 @@ sap.ui.define([
 	});
 
 	QUnit.test(
-		"GenericTag has the correct ARIA state - GenericTagDesign.Full and GenericTagValueState.None", function(assert){
+		"GenericTag has the correct ARIA state - GenericTagDesign.Full and GenericTagValueState.None", async function(assert){
 		//arrange
-		var $genericTag,
-			sValueId;
-
 		this.oGenericTag.setStatus(ValueState.Information);
 		this.oGenericTag.setDesign(GenericTagDesign.Full);
 		this.oGenericTag.setValueState(GenericTagValueState.None);
 
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		await nextUIUpdate();
 
-		$genericTag = this.oGenericTag.$();
-		sValueId = GenericTagRenderer._getTagValueId(this.oGenericTag);
+		const $genericTag = this.oGenericTag.$();
+		const sValueId = GenericTagRenderer._getTagValueId(this.oGenericTag);
 
 		//assert
 		assert.equal($genericTag.attr("aria-labelledby"), [this.sStatusTextId, this.sTextId, sValueId].join(" "));
 	});
 
 	QUnit.test(
-		"GenericTag has the correct ARIA state - GenericTagDesign.Full and GenericTagValueState.Error", function(assert){
+		"GenericTag has the correct ARIA state - GenericTagDesign.Full and GenericTagValueState.Error", async function(assert){
 		//arrange
-		var $genericTag,
-			sErrorIconId;
-
 		this.oGenericTag.setStatus(ValueState.Information);
 		this.oGenericTag.setDesign(GenericTagDesign.Full);
 		this.oGenericTag.setValueState(GenericTagValueState.Error);
 
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		await nextUIUpdate();
 
-		$genericTag = this.oGenericTag.$();
-		sErrorIconId = this.oGenericTag.getAggregation("_errorIcon").getId();
+		const $genericTag = this.oGenericTag.$();
+		const sErrorIconId = this.oGenericTag.getAggregation("_errorIcon").getId();
 
 		//assert
 		assert.equal($genericTag.attr("aria-labelledby"), [this.sStatusTextId, this.sTextId, sErrorIconId].join(" "));
 	});
 
 	QUnit.test(
-		"GenericTag has the correct ARIA state - GenericTagDesign.StatusIconHidden and GenericTagValueState.None", function(assert){
+		"GenericTag has the correct ARIA state - GenericTagDesign.StatusIconHidden and GenericTagValueState.None", async function(assert){
 		//arrange
-		var $genericTag,
-			sValueId;
-
 		this.oGenericTag.setStatus(ValueState.Information);
 		this.oGenericTag.setDesign(GenericTagDesign.StatusIconHidden);
 		this.oGenericTag.setValueState(GenericTagValueState.None);
 
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		await nextUIUpdate();
 
-		$genericTag = this.oGenericTag.$();
-		sValueId = GenericTagRenderer._getTagValueId(this.oGenericTag);
+		const $genericTag = this.oGenericTag.$();
+		const sValueId = GenericTagRenderer._getTagValueId(this.oGenericTag);
 
 		//assert
 		assert.equal($genericTag.attr("aria-labelledby"), [this.sStatusTextId, this.sTextId, sValueId].join(" "));
 	});
 
 	QUnit.test(
-		"GenericTag has the correct ARIA state - GenericTagDesign.StatusIconHidden and GenericTagValueState.Error", function(assert){
+		"GenericTag has the correct ARIA state - GenericTagDesign.StatusIconHidden and GenericTagValueState.Error", async function(assert){
 		//arrange
-		var $genericTag,
-			sErrorIconId;
-
 		this.oGenericTag.setStatus(ValueState.Information);
 		this.oGenericTag.setDesign(GenericTagDesign.StatusIconHidden);
 		this.oGenericTag.setValueState(GenericTagValueState.Error);
 
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		await nextUIUpdate();
 
-		$genericTag = this.oGenericTag.$();
-		sErrorIconId = this.oGenericTag.getAggregation("_errorIcon").getId();
+		const $genericTag = this.oGenericTag.$();
+		const sErrorIconId = this.oGenericTag.getAggregation("_errorIcon").getId();
 
 		//assert
 		assert.equal($genericTag.attr("aria-labelledby"), [this.sStatusTextId, this.sTextId, sErrorIconId].join(" "));
 	});
 
 	QUnit.test(
-		"GenericTag has the correct ARIA state - status and ariaLabelledBy", function(assert){
+		"GenericTag has the correct ARIA state - status and ariaLabelledBy", async function(assert){
 		//arrange
-		var $genericTag,
-			oText = new InvisibleText("generic_tag_label", {text: "My label"}).toStatic(),
-			sErrorIconId;
+		const oText = new InvisibleText("generic_tag_label", {text: "My label"}).toStatic();
 
 		//act
 		this.oGenericTag.addAriaLabelledBy('generic_tag_label');
@@ -700,67 +681,65 @@ sap.ui.define([
 		this.oGenericTag.setValueState(GenericTagValueState.Error);
 
 		//act
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		await nextUIUpdate();
 
-		$genericTag = this.oGenericTag.$();
-		sErrorIconId = this.oGenericTag.getAggregation("_errorIcon").getId();
+		const $genericTag1 = this.oGenericTag.$();
+		const sErrorIconId = this.oGenericTag.getAggregation("_errorIcon").getId();
 
 		//assert
-		assert.equal($genericTag.attr("aria-labelledby"), ["generic_tag_label", this.sStatusTextId, this.sTextId, sErrorIconId].join(" "));
+		assert.equal($genericTag1.attr("aria-labelledby"), ["generic_tag_label", this.sStatusTextId, this.sTextId, sErrorIconId].join(" "));
 
 		//act
 		this.oGenericTag.removeAriaLabelledBy('generic_tag_label');
 
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		$genericTag = this.oGenericTag.$();
+		await nextUIUpdate();
+		const $genericTag2 = this.oGenericTag.$();
 
 		//assert
-		assert.equal($genericTag.attr("aria-labelledby"), [this.sStatusTextId, this.sTextId, sErrorIconId].join(" "));
+		assert.equal($genericTag2.attr("aria-labelledby"), [this.sStatusTextId, this.sTextId, sErrorIconId].join(" "));
 
 		//clean
 		oText.destroy();
 	});
 
 	QUnit.test(
-		"GenericTag has the correct ARIA state - only ariaLabelledBy association", function(assert){
+		"GenericTag has the correct ARIA state - only ariaLabelledBy association", async function(assert){
 		//arrange
-		var $genericTag,
-			oText = new InvisibleText("generic_tag_label", {text: "My label"}).toStatic();
+		const oText = new InvisibleText("generic_tag_label", {text: "My label"}).toStatic();
 
 		//act
 		this.oGenericTag.addAriaLabelledBy('generic_tag_label');
 
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		$genericTag = this.oGenericTag.$();
+		await nextUIUpdate();
+		const $genericTag1 = this.oGenericTag.$();
 
 		//assert
-		assert.strictEqual($genericTag.attr("aria-labelledby").indexOf("generic_tag_label") > -1, true, "GenericTag has the correct ARIA state");
+		assert.strictEqual($genericTag1.attr("aria-labelledby").indexOf("generic_tag_label") > -1, true, "GenericTag has the correct ARIA state");
 
 		//act
 		this.oGenericTag.removeAriaLabelledBy('generic_tag_label');
 
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		$genericTag = this.oGenericTag.$();
+		await nextUIUpdate();
+		const $genericTag2 = this.oGenericTag.$();
 
 		//assert
-		assert.strictEqual($genericTag.attr("aria-labelledby").indexOf("generic_tag_label") === -1, true, "GenericTag has the correct ARIA state");
+		assert.strictEqual($genericTag2.attr("aria-labelledby").indexOf("generic_tag_label") === -1, true, "GenericTag has the correct ARIA state");
 
 		//clean
 		oText.destroy();
 	});
 
 	QUnit.test(
-		"GenericTag has the correct ARIA state - value's state and generic tag value state don't conflict", function(assert){
+		"GenericTag has the correct ARIA state - value's state and generic tag value state don't conflict", async function(assert){
 		//arrange
-		var $genericTag,
-			sControlStatusId = this.oGenericTag.getId() + "-status";
+		const sControlStatusId = this.oGenericTag.getId() + "-status";
 
 		//act
 		this.oGenericTag.setStatus('Information');
 		this.oGenericTag.getValue().setState("Information");
 
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		$genericTag = this.oGenericTag.$();
+		await nextUIUpdate();
+		const $genericTag = this.oGenericTag.$();
 
 		//assert
 		assert.strictEqual($genericTag.attr("aria-labelledby").indexOf(sControlStatusId) === -1, true, "GenericTag doesn't have the status id in labelledby");
@@ -776,15 +755,16 @@ sap.ui.define([
 	});
 
 	QUnit.test("Generic tag gets inside overflow toolbar", function (assert) {
-		var oSingleGenericTag = new GenericTag({ text: "Test Generic Tag"}),
-			aToolbarContent = [
-				new ToolbarSpacer(),
-				oSingleGenericTag
-			],
-			oOverflowTB = new OverflowToolbar({
-				width: 'auto',
-				content: aToolbarContent
-			});
+		// fake timers active — await nextUIUpdate() would hang
+		const oSingleGenericTag = new GenericTag({ text: "Test Generic Tag"});
+		const aToolbarContent = [
+			new ToolbarSpacer(),
+			oSingleGenericTag
+		];
+		const oOverflowTB = new OverflowToolbar({
+			width: 'auto',
+			content: aToolbarContent
+		});
 		oOverflowTB.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 		// set small width that causes all content to move to the OverflowToolbar

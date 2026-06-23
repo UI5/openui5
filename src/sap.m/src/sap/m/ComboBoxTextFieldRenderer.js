@@ -32,7 +32,7 @@ sap.ui.define([
 		oRm.attr("role", "combobox");
 		oRm.attr("aria-haspopup", "dialog");
 		oRm.attr("aria-autocomplete", "both");
-		oRm.attr("aria-expanded", "false");
+		oRm.attr("aria-expanded", oControl.isOpen && oControl.isOpen() ? "true" : "false");
 		oRm.attr("autocomplete", "off");
 		oRm.attr("autocorrect", "off");
 		oRm.attr("autocapitalize", "off");

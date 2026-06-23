@@ -31,7 +31,7 @@
 
 	.sapUiCalItem,
 	.sapUiCalWeekNum {
-		min-width: 2.25rem;
+		min-width: 2.125rem;
 		height: 2.25rem;
 	}
 }
@@ -761,7 +761,7 @@ html.sap-desktop .sapUiCalItemOtherMonth:not(.sapUiCalItemSel) :not(.sapUiCalWee
 
 			&::before,
 			.sapUiCalItemText {
-				border-radius: 0.375rem;
+				border-radius: 0.3125rem;
 			}
 
 			&.sapUiCalItemSel:not(.sapUiCalItemSelBetween),
@@ -795,10 +795,10 @@ html.sap-desktop .sapUiCalItemOtherMonth:not(.sapUiCalItemSel) :not(.sapUiCalWee
 			&.sapUiCalItemSelBetween:not(.sapUiCalItemSel) {
 
 				.sapUiCalItemText::after {
-					top: 0.125rem;
-					left: 0.125rem;
-					right: 0.125rem;
-					bottom: 0.125rem;
+					top: 0.1875rem;
+					left: 0.1875rem;
+					right: 0.1875rem;
+					bottom: 0.1875rem;
 					border: 0.125rem solid var(--sapContent_FocusColor);
 					border-radius: 0.25rem;
 				}
@@ -964,13 +964,13 @@ html.sap-desktop .sapUiCalItemOtherMonth:not(.sapUiCalItemSel) :not(.sapUiCalWee
 
 	.sapUiCalItemText::before {
 		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
+		top: 0.0625rem;
+		left: 0.0625rem;
+		right: 0.0625rem;
+		bottom: 0.0625rem;
 		border: 0.0625rem solid var(--sapList_SelectionBorderColor);
 		content: '';
-		border-radius: 0.5rem;
+		border-radius: 0.5625rem;
 	}
 }
 
@@ -1025,12 +1025,16 @@ html.sap-desktop .sapUiCalItemSelBetween:focus:not(:hover) {
 			text-align: left;
 			line-height: normal;
 			padding-top: 0.1875rem;
-			padding-left: 0.375rem;
+			padding-left: 0.3125rem;
 		}
 
 		.sapUiCalItemSecText {
 			padding-right: 0.3125rem;
 			text-align: right;
+		}
+
+		&:focus > .sapUiCalItemSecText {
+			line-height: 0.625rem;
 		}
 
 		&.sapUiCalItemNow {
@@ -1092,6 +1096,11 @@ html.sap-desktop .sapUiCalItemSelBetween:focus:not(:hover) {
 			.sapUiCalItemSecText {
 				padding-right: 0.3125rem;
 				text-align: right;
+			}
+
+
+			&:focus > .sapUiCalItemSecText {
+				line-height: 0.75rem;
 			}
 
 			&.sapUiCalItemSelBetween > .sapUiCalItemText {

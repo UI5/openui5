@@ -373,6 +373,7 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("create: pending POSTs w/ oFirstLevel", function (assert) {
 		const oFirstLevel = {
+			aElements : [],
 			mPostRequests : "~mPostRequests~",
 			setQueryOptions : () => {} // don't care
 		};
@@ -384,7 +385,25 @@ sap.ui.define([
 			// code under test
 			_AggregationCache.create(this.oRequestor, "resource/path", "~n/a~", {},
 				{hierarchyQualifier : "X"}, false, false, false, oFirstLevel);
-		}, new Error("Not allowed due to pending POSTs"));
+		}, new Error("Not allowed due to pending DELETEs or POSTs"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("create: pending DELETEs w/ oFirstLevel", function (assert) {
+		const oFirstLevel = {
+			aElements : [],
+			setQueryOptions : () => {} // don't care
+		};
+		oFirstLevel.aElements.$deleted = ["~deleted~"];
+		this.mock(_Cache.prototype).expects("getDownloadUrl").withExactArgs("")
+			.returns("~sDownloadUrl~"); // avoid call to isEmptyObject()
+		this.mock(_Helper).expects("isEmptyObject").never();
+
+		assert.throws(function () {
+			// code under test
+			_AggregationCache.create(this.oRequestor, "resource/path", "~n/a~", {},
+				{hierarchyQualifier : "X"}, false, false, false, oFirstLevel);
+		}, new Error("Not allowed due to pending DELETEs or POSTs"));
 	});
 
 	//*********************************************************************************************
@@ -407,6 +426,7 @@ sap.ui.define([
 				oDoResetExpectation,
 				oFirstLevel = bFirstLevel ? {
 						mChangeRequests : "~mChangeRequests~",
+						aElements : [],
 						mEditUrl2PatchPromise : "~mEditUrl2PatchPromise~"
 					} : undefined,
 				bHasGrandTotal = i === 0,
@@ -421,6 +441,9 @@ sap.ui.define([
 					$filter : "" // needs to be falsy
 				};
 
+			if (bFirstLevel) {
+				oFirstLevel.aElements.$deleted = [];
+			}
 			this.mock(_AggregationHelper).expects("hasGrandTotal")
 				.withExactArgs(sinon.match.same(oAggregation.aggregate)).returns(bHasGrandTotal);
 			this.mock(_AggregationHelper).expects("hasMinOrMax")

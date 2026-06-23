@@ -8,14 +8,14 @@ sap.ui.define([
 		"use strict";
 
 
-		var helpers = {
-				renderObject: function (oSapUiObject) {
+		const helpers = {
+				renderObject: async function (oSapUiObject) {
 					oSapUiObject.placeAt("qunit-fixture");
-					nextUIUpdate.runSync()/*context not obviously suitable for an async function*/;
+					await nextUIUpdate();
 					return oSapUiObject;
 				},
 				objectIsInTheDom: function (sSelector) {
-					var $object = $(sSelector);
+					const $object = $(sSelector);
 					return $object.length > 0;
 				},
 				getPagingButton: function (iCount) {
@@ -34,22 +34,24 @@ sap.ui.define([
 			}
 		});
 
-		QUnit.test("Default values", function (assert) {
+		QUnit.test("Default property values are set correctly", function (assert) {
 			assert.strictEqual(this.oPagingButton.getPosition(), 1, "for position should be 1");
 			assert.strictEqual(this.oPagingButton.getCount(), 1, "for count should be 1");
 			assert.ok(!this.oPagingButton.getNextButtonTooltip());
 			assert.ok(!this.oPagingButton.getPreviousButtonTooltip());
 		});
 
-		QUnit.test("Changing values", function (assert) {
-			var iValidCount = 10,
-				iInvalidCount = -123,
-				iValidPosition = 4,
-				iInvalidPosition = -10,
-				oPagingButton = this.oPagingButton,
-				oPrevButton = oPagingButton._getPreviousButton(),
-				oNextButton = oPagingButton._getNextButton();
+		QUnit.test("Valid and invalid count and position values are handled correctly", function (assert) {
+			// Arrange
+			const iValidCount = 10;
+			const iInvalidCount = -123;
+			const iValidPosition = 4;
+			const iInvalidPosition = -10;
+			const oPagingButton = this.oPagingButton;
+			const oPrevButton = oPagingButton._getPreviousButton();
+			const oNextButton = oPagingButton._getNextButton();
 
+			// Act & Assert — count validation
 			oPagingButton.setCount(iValidCount);
 
 			assert.strictEqual(oPagingButton.getCount(), iValidCount, "the valid count is correctly set");
@@ -59,6 +61,7 @@ sap.ui.define([
 			assert.strictEqual(oPagingButton.getCount(), iValidCount,
 				"the invalid value of count is not set, and the original value is kept");
 
+			// Act & Assert — position validation
 			oPagingButton.setPosition(iValidPosition);
 
 			assert.strictEqual(oPagingButton.getPosition(), iValidPosition, "the valid position is correctly set");
@@ -68,6 +71,7 @@ sap.ui.define([
 			assert.strictEqual(oPagingButton.getPosition(), iValidPosition,
 				"the invalid value of position is not set, and the original value is kept");
 
+			// Act & Assert — tooltip propagation
 			oPagingButton.setCount(iValidCount);
 
 			oPagingButton.setPreviousButtonTooltip("TestingPrevious");
@@ -81,34 +85,32 @@ sap.ui.define([
 		});
 
 		QUnit.module("sap.m.PagingButton Rendering", {
-			beforeEach: function () {
+			beforeEach: async function () {
 				this.oPagingButton = helpers.getPagingButton(10);
-				helpers.renderObject(this.oPagingButton);
+				await helpers.renderObject(this.oPagingButton);
 			},
 			afterEach: function () {
 				this.oPagingButton.destroy();
 			}
 		});
 
-		QUnit.test("The control is rendered", function (assert) {
+		QUnit.test("The control is rendered and present in the DOM", function (assert) {
 			assert.ok(helpers.objectIsInTheDom("#" + this.oPagingButton.getId()));
 		});
 
 		QUnit.module("sap.m.PagingButton Events", {
-			beforeEach: function () {
-				var that = this;
-
+			beforeEach: async function () {
 				this.oSpies = {};
 				this.oParams = {};
 
-				this.oSpies.positionChanged = sinon.spy(function (event) {
-					that.oParams.oldPosition = event.getParameter("oldPosition");
-					that.oParams.newPosition = event.getParameter("newPosition");
+				this.oSpies.positionChanged = sinon.spy((event) => {
+					this.oParams.oldPosition = event.getParameter("oldPosition");
+					this.oParams.newPosition = event.getParameter("newPosition");
 				});
 
 				this.oPagingButton = helpers.getPagingButton().attachPositionChange(this.oSpies.positionChanged);
 
-				helpers.renderObject(this.oPagingButton);
+				await helpers.renderObject(this.oPagingButton);
 			},
 			afterEach: function () {
 				this.oPagingButton.destroy();
@@ -117,9 +119,11 @@ sap.ui.define([
 		});
 
 		QUnit.test("positionChanged event should be fired on each position change", function (assert) {
-			var oPagingButton = this.oPagingButton,
-				oPositionChangedEvent = this.oSpies.positionChanged;
+			// Arrange
+			const oPagingButton = this.oPagingButton;
+			const oPositionChangedEvent = this.oSpies.positionChanged;
 
+			// Act & Assert
 			oPagingButton._getNextButton().firePress();
 			assert.ok(oPositionChangedEvent.calledOnce, "PositionChanged is once");
 

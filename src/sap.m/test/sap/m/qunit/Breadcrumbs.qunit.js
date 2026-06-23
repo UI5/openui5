@@ -14,11 +14,8 @@ sap.ui.define([
 ],
 function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, Text, library, nextUIUpdate, jQuery, Device) {
 	"use strict";
-	var oFactory, helpers;
 
-
-
-	oFactory = {
+	const oFactory = {
 		getLink: function (sText, sHref) {
 			return new Link({
 				text: sText || "Page 1 long link",
@@ -31,8 +28,8 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 			});
 		},
 		getLinks: function (iCount) {
-			var aLinks = [],
-				i;
+			const aLinks = [];
+			let i;
 
 			for (i = 0; i < iCount; i++) {
 				aLinks.push(this.getLink());
@@ -51,7 +48,7 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		}
 	};
 
-	helpers = {
+	const helpers = {
 		waitForUIUpdates: function (){
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 		},
@@ -107,19 +104,18 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		}
 	});
 
-	QUnit.test("Instantiation", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			iLinksCount = oStandardBreadCrumbsControl.getLinks().length;
+	QUnit.test("Instantiation creates a control with the expected number of links", function (assert) {
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const iLinksCount = oStandardBreadCrumbsControl.getLinks().length;
 
 		assert.ok(oStandardBreadCrumbsControl, "is instantiated correctly");
 		assert.strictEqual(iLinksCount, 4, "has " + 4 + " links");
 	});
 
 	QUnit.test("Changing the control dynamically", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			iExpectedLinkCount = oStandardBreadCrumbsControl.getLinks().length,
-			oRemovedLink,
-			oNewLink;
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		let iExpectedLinkCount = oStandardBreadCrumbsControl.getLinks().length;
+		let oNewLink;
 
 		oStandardBreadCrumbsControl.addLink(oFactory.getLink());
 		iExpectedLinkCount++;
@@ -152,7 +148,7 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.strictEqual(oStandardBreadCrumbsControl.getLinks().length, iExpectedLinkCount,
 			"the link is correctly removed from the control");
 
-		oRemovedLink = oStandardBreadCrumbsControl.getLinks()[1];
+		const oRemovedLink = oStandardBreadCrumbsControl.getLinks()[1];
 		oStandardBreadCrumbsControl.removeLink(1);
 		iExpectedLinkCount--;
 
@@ -162,36 +158,36 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.ok(oStandardBreadCrumbsControl.getLinks().indexOf(oRemovedLink) === -1,
 			"the link is correctly removed from the control using its index");
 
-		assert.throws(function () {
+		assert.throws(() => {
 			oStandardBreadCrumbsControl.addLink(oFactory.getText());
 		}, "an exception is thrown when trying to add an incorrect type to the links aggregation");
 	});
 
-	QUnit.test("Toggling the links' visibility", function (assert) {
-		var oBreadcrumbsControl = this.oStandardBreadCrumbsControl,
-			oSecondLink = oBreadcrumbsControl.getLinks()[1];
+	QUnit.test("Toggling the links visibility updates the DOM correctly", async function (assert) {
+		const oBreadcrumbsControl = this.oStandardBreadCrumbsControl;
+		const oSecondLink = oBreadcrumbsControl.getLinks()[1];
 
-		helpers.renderObject(oBreadcrumbsControl);
+		await helpers.renderObject(oBreadcrumbsControl);
 
 		assert.ok(helpers.controlIsInTheDom(oSecondLink), "Initially the link is visible and it's in the dom");
 		assert.strictEqual(helpers.countChildren(oBreadcrumbsControl), 5);
 
 		oSecondLink.setVisible(false);
-		helpers.waitForUIUpdates();
+		await helpers.waitForUIUpdates();
 
 		assert.ok(!helpers.controlIsInTheDom(oSecondLink), "The link is not visible and not in the dom");
 		assert.strictEqual(helpers.countChildren(oBreadcrumbsControl), 4);
 
 		oSecondLink.setVisible(true);
-		helpers.waitForUIUpdates();
+		await helpers.waitForUIUpdates();
 
 		assert.ok(helpers.controlIsInTheDom(oSecondLink), "The link is visible again and it's in the dom");
 		assert.strictEqual(helpers.countChildren(oBreadcrumbsControl), 5);
 	});
 
-	QUnit.test("Current location setter", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			sNewCurrentLocationVal = "New current location value";
+	QUnit.test("Current location setter updates the currentLocationText property", function (assert) {
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const sNewCurrentLocationVal = "New current location value";
 
 		assert.ok(oStandardBreadCrumbsControl.getCurrentLocationText(), "has current location text setted");
 		assert.ok(oStandardBreadCrumbsControl.getCurrentLocation(), "has current location text control instantiated");
@@ -201,56 +197,61 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.strictEqual(oStandardBreadCrumbsControl.getCurrentLocationText(), sNewCurrentLocationVal, "current location value changed to sNewCurrentLocationVal");
 	});
 
-	QUnit.test("Instantiation", function (assert) {
-		var oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(0, null),
-			$currentLocationText;
+	QUnit.test("Instantiation with no current location text renders correctly", function (assert) {
+		const oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(0, null);
 
+		// Arrange
 		oStandardBreadCrumbsControl.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		$currentLocationText = oStandardBreadCrumbsControl.$("currentText");
+		// Assert
+		let $currentLocationText = oStandardBreadCrumbsControl.$("currentText");
 		assert.strictEqual($currentLocationText.length, 0, "has " + 0 + " links");
 
+		// Act
 		oStandardBreadCrumbsControl.setCurrentLocationText("Test");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
+		// Assert
 		$currentLocationText = oStandardBreadCrumbsControl.$("currentText");
 		assert.strictEqual($currentLocationText.length, 1, "has " + 1 + " links");
+
+		oStandardBreadCrumbsControl.destroy();
 	});
 
-	QUnit.test("Current location not set", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+	QUnit.test("Current location not set renders without the text control in the DOM", async function (assert) {
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
 
 		oStandardBreadCrumbsControl.setCurrentLocationText("");
 
-		helpers.renderObject(oStandardBreadCrumbsControl);
+		await helpers.renderObject(oStandardBreadCrumbsControl);
 		assert.ok(!oStandardBreadCrumbsControl.getCurrentLocation().getDomRef(), "When empty string is set the text control is not rendered");
 	});
 
-	QUnit.test("Select aggregation", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+	QUnit.test("Select aggregation is rendered on small screen", async function (assert) {
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
 
 		helpers.setSmallScreenSize();
-		helpers.renderObject(oStandardBreadCrumbsControl);
+		await helpers.renderObject(oStandardBreadCrumbsControl);
 		assert.ok(oStandardBreadCrumbsControl._getSelect().getDomRef(), "Select is rendered");
 
 		helpers.resetScreenSize();
 	});
 
 	QUnit.test("Select's picker offsetY decorated on desktop", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			iOffsetY = 4; // px
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const iOffsetY = 4; // px
 
 		const oSelect = oStandardBreadCrumbsControl._getSelect();
 		const oPicker = oSelect.getPicker();
 		assert.strictEqual(oPicker.getOffsetY(), iOffsetY, "Picker offset Y is correctly set");
 	});
 
-	QUnit.test("Select width", function (assert) {
+	QUnit.test("Select width returns positive value when visible and zero when hidden", async function (assert) {
 		// arrange
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
 		helpers.setSmallScreenSize();
-		helpers.renderObject(oStandardBreadCrumbsControl);
+		await helpers.renderObject(oStandardBreadCrumbsControl);
 
 		// assert
 		assert.ok(oStandardBreadCrumbsControl._getSelectWidth() > 0, "Select is rendered");
@@ -262,15 +263,15 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.ok(oStandardBreadCrumbsControl._getSelectWidth() === 0, "Select is not rendered");
 	});
 
-	QUnit.test("Select enables text wrapping in overflow", function (assert) {
+	QUnit.test("Select enables text wrapping in overflow", async function (assert) {
 		// arrange
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
 		helpers.setSmallScreenSize();
-		helpers.renderObject(oStandardBreadCrumbsControl);
+		await helpers.renderObject(oStandardBreadCrumbsControl);
 
 		// act
-		var oSelect = oStandardBreadCrumbsControl._getSelect();
-		var oPicker = oSelect.getPicker();
+		const oSelect = oStandardBreadCrumbsControl._getSelect();
+		const oPicker = oSelect.getPicker();
 
 		// assert
 		assert.strictEqual(oSelect.getWrapItemsText(), true, "Select has wrapItemsText enabled");
@@ -279,41 +280,38 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		helpers.resetScreenSize();
 	});
 
-	var testSeparatorStyleSymbols = function (oControl, sStyle, assert) {
+	const testSeparatorStyleSymbols = function (oControl, sStyle, assert) {
 		//arrange
-		var sAppliedSymbol,
-			sExpectedSymbol;
-
 		oControl.setSeparatorStyle(sStyle);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		//act
-		sAppliedSymbol = oControl.$().find(".sapMBreadcrumbsSeparator").first().text();
-		sExpectedSymbol = Breadcrumbs.STYLE_MAPPER[oControl.getSeparatorStyle()];
+		const sAppliedSymbol = oControl.$().find(".sapMBreadcrumbsSeparator").first().text();
+		const sExpectedSymbol = Breadcrumbs.STYLE_MAPPER[oControl.getSeparatorStyle()];
 
 		// assert
 		assert.equal(sAppliedSymbol, sExpectedSymbol, sStyle + " separator loaded");
 	};
 
-	QUnit.test("Custom separator (String Rendering)", function (assert) {
-		Object.keys(library.BreadcrumbsSeparatorStyle).forEach( function (sStyle) {
+	QUnit.test("Custom separator (String Rendering)", async function (assert) {
+		for (const sStyle of Object.keys(library.BreadcrumbsSeparatorStyle)) {
 			// arrange
 			// using a new control each time enforces initial string rendering
-			var oControl = oFactory.getBreadCrumbControlWithLinks(4, oFactory.getText());
+			const oControl = oFactory.getBreadCrumbControlWithLinks(4, oFactory.getText());
 			oControl.placeAt("qunit-fixture");
 
 			// assert
-			testSeparatorStyleSymbols(oControl, sStyle, assert);
+			await testSeparatorStyleSymbols(oControl, sStyle, assert);
 
 			// clean up
 			oControl.destroy();
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-		} );
+		}
 	});
 
-	QUnit.test("separator has aria-hidden", function (assert) {
+	QUnit.test("Separator has aria-hidden attribute set to true", function (assert) {
 		// arrange
-		var oControl = oFactory.getBreadCrumbControlWithLinks(4, oFactory.getText());
+		const oControl = oFactory.getBreadCrumbControlWithLinks(4, oFactory.getText());
 		oControl.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
@@ -325,31 +323,31 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		oControl.destroy();
 	});
 
-	QUnit.test("Custom separator (DOM Patching)", function (assert) {
+	QUnit.test("Custom separator (DOM Patching)", async function (assert) {
 		//arrange
-		var oControl = this.oStandardBreadCrumbsControl;
+		const oControl = this.oStandardBreadCrumbsControl;
 		oControl.placeAt("qunit-fixture");
 		// initial rendering is always string rendering, later re-renderings will use DOM patching
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		//assert
-		Object.keys(library.BreadcrumbsSeparatorStyle).forEach( function (sStyle) {
-			testSeparatorStyleSymbols(oControl, sStyle, assert);
-		} );
+		for (const sStyle of Object.keys(library.BreadcrumbsSeparatorStyle)) {
+			await testSeparatorStyleSymbols(oControl, sStyle, assert);
+		}
 	});
 
-	QUnit.test("CurrentLocation IS NOT a link by default", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl.clone();
-		helpers.renderObject(oStandardBreadCrumbsControl);
+	QUnit.test("CurrentLocation IS NOT a link by default", async function (assert) {
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl.clone();
+		await helpers.renderObject(oStandardBreadCrumbsControl);
 
 		assert.equal(oStandardBreadCrumbsControl.$().find(".sapMBreadcrumbsCurrentLocation").prop("tagName"), "SPAN", "Current location IS NOT a link");
 	});
 
-	QUnit.test("CurrentLocation is a link", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl.clone(),
-			oLink = new Link({text: "currentLocation"});
+	QUnit.test("CurrentLocation is a link when a Link control is set as currentLocation", async function (assert) {
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl.clone();
+		const oLink = new Link({text: "currentLocation"});
 		oStandardBreadCrumbsControl.setCurrentLocation(oLink);
-		helpers.renderObject(oStandardBreadCrumbsControl);
+		await helpers.renderObject(oStandardBreadCrumbsControl);
 
 		assert.equal(oStandardBreadCrumbsControl.$().find(".sapMBreadcrumbsCurrentLocation").prop("tagName"), "A", "Current location is a link");
 	});
@@ -368,36 +366,34 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		}
 	});
 
-	QUnit.test("Select on mobile contains all links with no current location text", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+	QUnit.test("Select on mobile contains all links with no current location text", async function (assert) {
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
 		oStandardBreadCrumbsControl.setCurrentLocationText("");
-		helpers.renderObject(oStandardBreadCrumbsControl);
+		await helpers.renderObject(oStandardBreadCrumbsControl);
 
-		var aSelectItems = oStandardBreadCrumbsControl._getSelect().getItems();
+		const aSelectItems = oStandardBreadCrumbsControl._getSelect().getItems();
 
 		assert.ok(!oStandardBreadCrumbsControl.getCurrentLocationText(), "There's no current location text set");
 		assert.ok(aSelectItems.length === 4, "All links are in select, but no current location item");
 	});
 
-	QUnit.test("Select on mobile contains all links with current location text", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
-		helpers.renderObject(oStandardBreadCrumbsControl);
+	QUnit.test("Select on mobile contains all links with current location text", async function (assert) {
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		await helpers.renderObject(oStandardBreadCrumbsControl);
 
-		var aSelectItems = oStandardBreadCrumbsControl._getSelect().getItems();
+		const aSelectItems = oStandardBreadCrumbsControl._getSelect().getItems();
 
 		assert.ok(oStandardBreadCrumbsControl.getCurrentLocationText(), "There's current location text set");
 		assert.ok(aSelectItems.length === 5, "All links are in select along with the currrent location item");
 	});
 
 	QUnit.test("Select on mobile contains only links with visible true", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			oSecondLink = oStandardBreadCrumbsControl.getLinks()[0],
-			iItemsLengthA,
-			iItemsLengthB;
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const oSecondLink = oStandardBreadCrumbsControl.getLinks()[0];
 
-		iItemsLengthA = oStandardBreadCrumbsControl._getItemsForMobile().length;
+		const iItemsLengthA = oStandardBreadCrumbsControl._getItemsForMobile().length;
 		oSecondLink.setVisible(false);
-		iItemsLengthB = oStandardBreadCrumbsControl._getItemsForMobile().length;
+		const iItemsLengthB = oStandardBreadCrumbsControl._getItemsForMobile().length;
 
 		assert.ok(iItemsLengthB === iItemsLengthA - 1, "All links with visible true are returned");
 	});
@@ -412,29 +408,25 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 	QUnit.test("Breadcrumbs in OverflowToolbar", async function (assert) {
 		// Arrange
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(4, "Loooooooooooooooooooooooooong current location text");
-		var oOFT = new OverflowToolBar({
+		const oOFT = new OverflowToolBar({
 				content: [this.oStandardBreadCrumbsControl]
-			}),
-			oSpy = this.spy(this.oStandardBreadCrumbsControl, "fireEvent"),
-			sMinWidth,
-			iCurrentLocationHeight,
-			oCurrentLocation;
-
-		helpers.renderObject(oOFT);
+			});
+		const oSpy = this.spy(this.oStandardBreadCrumbsControl, "fireEvent");
+		await helpers.renderObject(oOFT);
 
 		// Assert
-		sMinWidth = this.oStandardBreadCrumbsControl.$().css("min-width");
+		const sMinWidth = this.oStandardBreadCrumbsControl.$().css("min-width");
 		assert.ok(parseInt(sMinWidth) > DomUnitsRem.toPx(
 			await Parameters_getAsync("_sap_m_Toolbar_ShrinkItem_MinWidth")),
 			"Min-width is bigger than the standart 2.5rem/40px width of OFT's shrikable items");
 		assert.ok(oSpy.calledWith("_minWidthChange"), "Invalidation event is fired for the OFT");
 		//Arrange
-		oCurrentLocation = this.oStandardBreadCrumbsControl.getCurrentLocation();
-		iCurrentLocationHeight = oCurrentLocation.$().height();
+		const oCurrentLocation = this.oStandardBreadCrumbsControl.getCurrentLocation();
+		const iCurrentLocationHeight = oCurrentLocation.$().height();
 
 		//Act
 		document.getElementById("qunit-fixture").setAttribute("style", "width: 200px");
-		helpers.waitForUIUpdates();
+		await helpers.waitForUIUpdates();
 
 		// Assert
 		assert.equal(oCurrentLocation.$().height(), iCurrentLocationHeight, "Breadcrumbs current location element truncates, when space is not enough");
@@ -444,16 +436,16 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 
 	});
 
-	QUnit.test("Breadcrumbs in OverflowToolbar's Popover", function (assert) {
+	QUnit.test("Breadcrumbs in OverflowToolbar's Popover does not fire invalidation event", async function (assert) {
 		// Arrange
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(4, "Loooooooooooooooooooooooooong current location text");
-		var oOFT = new OverflowToolBar({
+		const oOFT = new OverflowToolBar({
 				content: [new Text({text: "Loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooonooooooooong"}),
 					this.oStandardBreadCrumbsControl]
-			}),
-			oSpy = this.spy(oOFT, "_onInvalidationEventFired");
+			});
+		const oSpy = this.spy(oOFT, "_onInvalidationEventFired");
 
-		helpers.renderObject(oOFT);
+		await helpers.renderObject(oOFT);
 
 		// Act
 		oOFT._getOverflowButton().firePress();
@@ -471,7 +463,7 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(4, "Current location text");
 
 		// Act
-		var oOFTConfig = this.oStandardBreadCrumbsControl.getOverflowToolbarConfig();
+		const oOFTConfig = this.oStandardBreadCrumbsControl.getOverflowToolbarConfig();
 
 		// Assert
 		assert.strictEqual(oOFTConfig.canOverflow, true, "Breadcrumbs can overflow");
@@ -482,14 +474,12 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.strictEqual(typeof oOFTConfig.onBeforeEnterOverflow, "function", "Breadcrumbs have onBeforeEnterOverflow function implementation");
 	});
 
-	QUnit.test("Breadcrumbs in OverflowToolbar - reseting control", function (assert) {
+	QUnit.test("Breadcrumbs in OverflowToolbar - reseting control", async function (assert) {
 		// Arrange
-		var oSpy;
-
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(4, "Current location text");
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 
-		oSpy = this.spy(this.oStandardBreadCrumbsControl, "_resetControl");
+		const oSpy = this.spy(this.oStandardBreadCrumbsControl, "_resetControl");
 
 		// Act
 		this.oStandardBreadCrumbsControl._onAfterExitOverflow();
@@ -509,9 +499,9 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 
 	QUnit.test("Only links", async function (assert) {
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(4);
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 		assert.ok(!this.oStandardBreadCrumbsControl.getCurrentLocation().getDomRef(), "Current location has no dom ref");
-		var $lastSeparator = this.oStandardBreadCrumbsControl.$().find("li.sapMBreadcrumbsItem:last-child > span.sapMBreadcrumbsSeparator");
+		const $lastSeparator = this.oStandardBreadCrumbsControl.$().find("li.sapMBreadcrumbsItem:last-child > span.sapMBreadcrumbsSeparator");
 
 		assert.ok($lastSeparator.length, "There is a '/' separator after last link");
 		assert.strictEqual(Math.ceil(parseFloat($lastSeparator.css("fontSize"))),
@@ -519,22 +509,22 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 			"Font-size of the separator is 14px");
 	});
 
-	QUnit.test("Only current location", function (assert) {
+	QUnit.test("Only current location renders without a Select icon", async function (assert) {
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(0, "Current location text");
 
 		helpers.setSmallScreenSize();
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 		assert.ok(this.oStandardBreadCrumbsControl.getCurrentLocation().getDomRef(), "Current location is rendered");
 		assert.ok(!this.oStandardBreadCrumbsControl._getSelect().getDomRef(), "No Select icon");
 		helpers.resetScreenSize();
 	});
 
-	QUnit.test("Prevent dependency bug with select's popover", function (assert) {
-		var pickerAfterOpenSpy = this.spy(Breadcrumbs.prototype, "_removeItemNavigation"),
-			pickerBeforeCloseSpy = this.spy(Breadcrumbs.prototype, "_restoreItemNavigation");
+	QUnit.test("Prevent dependency bug with select's popover", async function (assert) {
+		const pickerAfterOpenSpy = this.spy(Breadcrumbs.prototype, "_removeItemNavigation");
+		const pickerBeforeCloseSpy = this.spy(Breadcrumbs.prototype, "_restoreItemNavigation");
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(15, "Current location text");
 
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 
 		this.oStandardBreadCrumbsControl._getSelect().open();
 		this.oStandardBreadCrumbsControl._getSelect().close();
@@ -543,10 +533,10 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.ok(pickerBeforeCloseSpy.calledOnce, "Popover after before close event is handled");
 	});
 
-	QUnit.test("No invalidation when creating the select", function (assert) {
-		var createSelectSpy = this.spy(Breadcrumbs.prototype, "_getSelect"),
-			afterRenderingSpy = this.spy(Breadcrumbs.prototype, "onAfterRendering"),
-			invalidateSpy = this.spy(Breadcrumbs.prototype, "invalidate");
+	QUnit.test("No invalidation when creating the select", async function (assert) {
+		const createSelectSpy = this.spy(Breadcrumbs.prototype, "_getSelect");
+		const afterRenderingSpy = this.spy(Breadcrumbs.prototype, "onAfterRendering");
+		const invalidateSpy = this.spy(Breadcrumbs.prototype, "invalidate");
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(15, "Current location text");
 
 		this.oStandardBreadCrumbsControl.addEventDelegate({
@@ -556,32 +546,29 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		});
 
 		// Act
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 
 		// Check if invalidation upon select creation during rendering
 		assert.ok(createSelectSpy.calledBefore(afterRenderingSpy), "select is created during rendering");
 		assert.ok(invalidateSpy.notCalled, "breadcrumb is not invalidated during rendering");
 	});
 
-	QUnit.test("Prevent width rounding issues", function (assert) {
-
-		var oLink1 = new Link({text: "Sales Organization"}),
-			oLink2 = new Link({text: "Order Type"}),
-			iSumOfContentWidths,
-			iContainerWidth;
+	QUnit.test("Prevent width rounding issues", async function (assert) {
+		const oLink1 = new Link({text: "Sales Organization"});
+		const oLink2 = new Link({text: "Order Type"});
 		this.oStandardBreadCrumbsControl = new Breadcrumbs({
 			links: [oLink1, oLink2]
 		});
 
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 
-		this.stub(this.oStandardBreadCrumbsControl, "$").callsFake(function() {
+		this.stub(this.oStandardBreadCrumbsControl, "$").callsFake(() => {
 			return {
 				"hasClass": function(){ return false; },
 				"outerWidth": function(){ return 208;}
 			};
 		});
-		this.stub(oLink1, "$").callsFake(function() {
+		this.stub(oLink1, "$").callsFake(() => {
 			return {
 				"parent": function() {
 					return {
@@ -590,7 +577,7 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 				}
 			};
 		});
-		this.stub(oLink2, "$").callsFake(function() {
+		this.stub(oLink2, "$").callsFake(() => {
 			return {
 				"parent": function() {
 					return {
@@ -600,8 +587,8 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 			};
 		});
 
-		iSumOfContentWidths = oLink1.$().parent().outerWidth() + oLink2.$().parent().outerWidth();
-		iContainerWidth = this.oStandardBreadCrumbsControl.$().outerWidth();
+		const iSumOfContentWidths = oLink1.$().parent().outerWidth() + oLink2.$().parent().outerWidth();
+		const iContainerWidth = this.oStandardBreadCrumbsControl.$().outerWidth();
 
 		// assert mocked setup (when we have a rounding issue)
 		assert.strictEqual(iSumOfContentWidths, iContainerWidth + 1, "sum of the widths of the children exceeds the container width by 1");
@@ -613,17 +600,16 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.equal(this.oStandardBreadCrumbsControl._getSelect().getVisible(), false, "select is not shown");
 	});
 
-	QUnit.test("Skip overflow recalculations when no width change", function (assert) {
-		var oLink1 = new Link({text: "link1"}),
-			oLink2 = new Link({text: "link2"}),
-			oSpy;
+	QUnit.test("Skip overflow recalculations when no width change", async function (assert) {
+		const oLink1 = new Link({text: "link1"});
+		const oLink2 = new Link({text: "link2"});
 		this.oStandardBreadCrumbsControl = new Breadcrumbs({
 			links: [oLink1, oLink2]
 		});
 
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 
-		oSpy = this.spy(this.oStandardBreadCrumbsControl, "_getControlDistribution");
+		const oSpy = this.spy(this.oStandardBreadCrumbsControl, "_getControlDistribution");
 
 		// Act
 		this.oStandardBreadCrumbsControl._handleScreenResize({
@@ -634,19 +620,18 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.notOk(oSpy.called, "skipped overflow recalculations");
 	});
 
-	QUnit.test("Skip overflow recalculations when new width is 0", function (assert) {
+	QUnit.test("Skip overflow recalculations when new width is 0", async function (assert) {
 		// Arrange
-		var oLink1 = new Link({text: "link1"}),
-			oLink2 = new Link({text: "link2"}),
-			oSpy;
+		const oLink1 = new Link({text: "link1"});
+		const oLink2 = new Link({text: "link2"});
 
 		this.oStandardBreadCrumbsControl = new Breadcrumbs({
 			links: [oLink1, oLink2]
 		});
 
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 
-		oSpy = this.spy(this.oStandardBreadCrumbsControl, "_getControlDistribution");
+		const oSpy = this.spy(this.oStandardBreadCrumbsControl, "_getControlDistribution");
 
 		// Act
 		this.oStandardBreadCrumbsControl._handleScreenResize({
@@ -667,10 +652,10 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		}
 	});
 
-	QUnit.test("_determineControlDistribution - all items in breadcrumb", function (assert) {
+	QUnit.test("_determineControlDistribution - all items in breadcrumb", async function (assert) {
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks();
 
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 		this.oStandardBreadCrumbsControl._iSelectWidth = 50;
 		this.oStandardBreadCrumbsControl._getControlsInfo = function () {
 			return {
@@ -689,15 +674,15 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 				}]
 			};
 		};
-		var aControlDistrib = this.oStandardBreadCrumbsControl._determineControlDistribution(300);
+		const aControlDistrib = this.oStandardBreadCrumbsControl._determineControlDistribution(300);
 		assert.ok(aControlDistrib.aControlsForBreadcrumbTrail.length === 3, "Trail has 3 items");
 		assert.ok(aControlDistrib.aControlsForSelect.length === 0, "There is no select items");
 	});
 
-	QUnit.test("_determineControlDistribution - all items in select", function (assert) {
+	QUnit.test("_determineControlDistribution - all items in select", async function (assert) {
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks();
 
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 		this.oStandardBreadCrumbsControl._iSelectWidth = 50;
 		this.oStandardBreadCrumbsControl._getControlsInfo = function () {
 			return {
@@ -716,15 +701,15 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 				}]
 			};
 		};
-		var aControlDistrib = this.oStandardBreadCrumbsControl._determineControlDistribution(60);
+		const aControlDistrib = this.oStandardBreadCrumbsControl._determineControlDistribution(60);
 		assert.ok(aControlDistrib.aControlsForBreadcrumbTrail.length === 1, "There must be always one item in the trail");
 		assert.ok(aControlDistrib.aControlsForSelect.length === 2, "Select has 2 items");
 	});
 
-	QUnit.test("_determineControlDistribution - equal select and breadcrumb items", function (assert) {
+	QUnit.test("_determineControlDistribution - equal select and breadcrumb items", async function (assert) {
 		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks();
 
-		helpers.renderObject(this.oStandardBreadCrumbsControl);
+		await helpers.renderObject(this.oStandardBreadCrumbsControl);
 		this.oStandardBreadCrumbsControl._iSelectWidth = 50;
 		this.oStandardBreadCrumbsControl._getControlsInfo = function () {
 			return {
@@ -747,7 +732,7 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 				}]
 			};
 		};
-		var aControlDistrib = this.oStandardBreadCrumbsControl._determineControlDistribution(250);
+		const aControlDistrib = this.oStandardBreadCrumbsControl._determineControlDistribution(250);
 		assert.ok(aControlDistrib.aControlsForBreadcrumbTrail.length === 2, "There are 2 items in the trail");
 		assert.ok(aControlDistrib.aControlsForSelect.length === 2, "There are 2 items in the breadcrumb");
 	});
@@ -763,33 +748,31 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		}
 	});
 
-	QUnit.test("Screen reader support", function ( assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			sExpectedText = oStandardBreadCrumbsControl._getInvisibleText().getId();
+	QUnit.test("Screen reader support", async function ( assert) {
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const sExpectedText = oStandardBreadCrumbsControl._getInvisibleText().getId();
 
-		helpers.renderObject(oStandardBreadCrumbsControl);
+		await helpers.renderObject(oStandardBreadCrumbsControl);
 		assert.strictEqual(oStandardBreadCrumbsControl.$()[0].tagName, "NAV", "Breadcrumbs is rendered in nav HTML element");
 		assert.strictEqual(oStandardBreadCrumbsControl.$().attr("aria-labelledby"), sExpectedText, "has correct 'aria-labelledby'");
 		assert.strictEqual(oStandardBreadCrumbsControl.$().attr("role"), undefined, "Role shouldn't be defined for the nav element");
 
-		oStandardBreadCrumbsControl.$().find("li").each(function (index, item) {
+		oStandardBreadCrumbsControl.$().find("li").each((index, item) => {
 			assert.strictEqual(jQuery(item).attr("role"), undefined, "Role shouldn't be defined for the li element");
 		});
 	});
 
 	QUnit.test("Position and size of the items", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			oCurrentLocation = oStandardBreadCrumbsControl.getCurrentLocation(),
-			oLinks = oStandardBreadCrumbsControl._getControlsForBreadcrumbTrail(),
-			oFirstLink = oLinks[0],
-			aAriaLabelledByFirstLink,
-			oInvisibleTextData;
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const oCurrentLocation = oStandardBreadCrumbsControl.getCurrentLocation();
+		const oLinks = oStandardBreadCrumbsControl._getControlsForBreadcrumbTrail();
+		const oFirstLink = oLinks[0];
 
 		oStandardBreadCrumbsControl.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		aAriaLabelledByFirstLink = oFirstLink.getAriaLabelledBy();
-		oInvisibleTextData = oStandardBreadCrumbsControl._aCachedInvisibleTexts.find(function (oItem) {
+		const aAriaLabelledByFirstLink = oFirstLink.getAriaLabelledBy();
+		const oInvisibleTextData = oStandardBreadCrumbsControl._aCachedInvisibleTexts.find((oItem) => {
 			return oItem.controlId === oFirstLink.getId();
 		});
 
@@ -799,38 +782,38 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.ok(oCurrentLocation.$().attr("aria-label").indexOf(oLinks.length + " of " + oLinks.length) > -1, "Aria label is correct");
 	});
 
-	QUnit.test("Current location aria attributes", function (assert) {
+	QUnit.test("Current location aria attributes are set correctly", async function (assert) {
 		// Arrange
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			oCurrentLocation = oStandardBreadCrumbsControl.getCurrentLocation();
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const oCurrentLocation = oStandardBreadCrumbsControl.getCurrentLocation();
 
 		// Act
 		oStandardBreadCrumbsControl.placeAt("qunit-fixture");
-		helpers.waitForUIUpdates();
+		await helpers.waitForUIUpdates();
 
 		// Assert
 		assert.strictEqual(oCurrentLocation.$().attr("aria-current"), "page", "Current location should have correct aria attribute");
 		assert.strictEqual(oCurrentLocation.$().attr("role"), undefined, "Current location should not have role attribute, when Text control is rendered");
 	});
 
-	QUnit.test("Keyboard Handling", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+	QUnit.test("Keyboard Handling", async function (assert) {
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
 
-		helpers.renderObject(oStandardBreadCrumbsControl);
+		await helpers.renderObject(oStandardBreadCrumbsControl);
 		assert.strictEqual(oStandardBreadCrumbsControl.$().attr("tabindex"), "0", "Default tabindex 0 should be set");
 
 		// Act - make the inside elements of the control empty
 		oStandardBreadCrumbsControl.setCurrentLocationText("");
 		oStandardBreadCrumbsControl.removeAllLinks();
-		helpers.waitForUIUpdates();
+		await helpers.waitForUIUpdates();
 
 		assert.strictEqual(oStandardBreadCrumbsControl.$().attr("tabindex"), undefined, "Tabindex should not be set for empty breadcrumbs");
 	});
 
-	QUnit.test("Current location focus restored", function (assert) {
+	QUnit.test("Current location focus restored after adding a new link", function (assert) {
 		// Arrange
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			oCurrentLocation = oStandardBreadCrumbsControl.getCurrentLocation();
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const oCurrentLocation = oStandardBreadCrumbsControl.getCurrentLocation();
 
 		oStandardBreadCrumbsControl.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
@@ -847,7 +830,7 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 	});
 
 	QUnit.test("ARIA labelledBy", function(assert) {
-		var oBreadcrumbsControl = new Breadcrumbs({
+		const oBreadcrumbsControl = new Breadcrumbs({
 			ariaLabelledBy: "id1"
 		});
 
@@ -861,16 +844,15 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 
 	QUnit.module("Internal ItemNavigation");
 
-	QUnit.test("alt/meta key + right/left or + home/end is not handled", function (assert) {
+	QUnit.test("Alt/meta key combined with navigation keys is not handled by ItemNavigation", function (assert) {
 		// Prepare
-		var oBreadcrumbs = new Breadcrumbs(),
-		oModifiers;
+		const oBreadcrumbs = new Breadcrumbs();
 
 		// Act
 		oBreadcrumbs._configureKeyboardHandling();
 
 		// Assert
-		var oModifiers = oBreadcrumbs._getItemNavigation().getDisabledModifiers();
+		const oModifiers = oBreadcrumbs._getItemNavigation().getDisabledModifiers();
 		assert.ok(oModifiers["sapnext"], "sapnext has disabled modifiers");
 		assert.ok(oModifiers["sapprevious"], "sapprevious has disabled modifiers");
 		assert.ok(oModifiers["sapnext"].indexOf("alt") !== -1, "right is not handled when alt is pressed");
@@ -882,16 +864,16 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		oBreadcrumbs.destroy();
 	});
 
-	QUnit.test("disabled links are not included in ItemNavigation object", function (assert) {
+	QUnit.test("Disabled links are not included in ItemNavigation object", async function (assert) {
 		// Prepare
-		var oLink1 = new Link({text: "Sales Organization"}),
-			oLink2 = new Link({text: "Order Type", enabled: false}),
-			oBreadcrumbs = new Breadcrumbs({
+		const oLink1 = new Link({text: "Sales Organization"});
+		const oLink2 = new Link({text: "Order Type", enabled: false});
+		const oBreadcrumbs = new Breadcrumbs({
 			links: [oLink1, oLink2]
 		});
 
 		// Act
-		helpers.renderObject(oBreadcrumbs);
+		await helpers.renderObject(oBreadcrumbs);
 
 		// Assert
 		assert.strictEqual(oBreadcrumbs._getItemNavigation().getItemDomRefs().length, 1, "there should be only one link in item navigation's items.");
@@ -903,8 +885,8 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 	QUnit.module("OverflowToolbar configuration");
 
 	QUnit.test("OverflowToolbar configuration is set correctly", function (assert) {
-		var oBreadcrumbs = new Breadcrumbs(),
-			oConfig = oBreadcrumbs.getOverflowToolbarConfig();
+		const oBreadcrumbs = new Breadcrumbs();
+		const oConfig = oBreadcrumbs.getOverflowToolbarConfig();
 
 		assert.ok(oConfig.canOverflow, "canOverflow is set to true");
 		assert.equal(typeof oConfig.getCustomImportance, "function", "getCustomImportance function is set");
@@ -912,13 +894,13 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 	});
 
 	QUnit.module("Mobile phone - picker dialog", {
-		beforeEach: function () {
+		beforeEach: async function () {
 			helpers.setMobile();
 			this.oBreadcrumbs = new Breadcrumbs({
 				links: oFactory.getLinks(4),
 				currentLocationText: "Current"
 			});
-			helpers.renderObject(this.oBreadcrumbs);
+			await helpers.renderObject(this.oBreadcrumbs);
 		},
 		afterEach: function () {
 			helpers.resetMobile();
@@ -927,22 +909,22 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 	});
 
 	QUnit.test("Phone picker dialog has no header", function (assert) {
-		var oPicker = this.oBreadcrumbs._getSelect().getPicker();
+		const oPicker = this.oBreadcrumbs._getSelect().getPicker();
 
 		assert.strictEqual(oPicker.getShowHeader(), false,
 			"Dialog showHeader is false ? header container is not rendered");
 	});
 
 	QUnit.test("Phone picker dialog has no custom header aggregation", function (assert) {
-		var oPicker = this.oBreadcrumbs._getSelect().getPicker();
+		const oPicker = this.oBreadcrumbs._getSelect().getPicker();
 
 		assert.notOk(oPicker.getCustomHeader(),
 			"Custom header aggregation is destroyed/absent ? no title or close icon");
 	});
 
 	QUnit.test("Phone picker dialog has a footer Cancel button", function (assert) {
-		var oPicker = this.oBreadcrumbs._getSelect().getPicker(),
-			oEndButton = oPicker.getEndButton();
+		const oPicker = this.oBreadcrumbs._getSelect().getPicker();
+		const oEndButton = oPicker.getEndButton();
 
 		assert.ok(oEndButton, "An end button exists in the dialog footer");
 		assert.strictEqual(
@@ -953,10 +935,10 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 	});
 
 	QUnit.test("Footer Cancel button closes the dialog", function (assert) {
-		var oSelect = this.oBreadcrumbs._getSelect(),
-			oPicker = oSelect.getPicker(),
-			oEndButton = oPicker.getEndButton(),
-			oCloseSpy = this.spy(oSelect, "close");
+		const oSelect = this.oBreadcrumbs._getSelect();
+		const oPicker = oSelect.getPicker();
+		const oEndButton = oPicker.getEndButton();
+		const oCloseSpy = this.spy(oSelect, "close");
 
 		oEndButton.firePress();
 

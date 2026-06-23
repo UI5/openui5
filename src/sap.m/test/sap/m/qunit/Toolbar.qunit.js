@@ -69,31 +69,31 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.m.ToolbarStyle
-	var ToolbarStyle = mobileLibrary.ToolbarStyle;
+	const ToolbarStyle = mobileLibrary.ToolbarStyle;
 
 	// shortcut for sap.m.ToolbarDesign
-	var ToolbarDesign = mobileLibrary.ToolbarDesign;
+	const ToolbarDesign = mobileLibrary.ToolbarDesign;
 
-	function createToolbar(oConfig) {
+	async function createToolbar(oConfig) {
 
 		// get toolbar config
 		oConfig = oConfig || {};
-		var oTBConfig = oConfig.Toolbar || {};
+		const oTBConfig = oConfig.Toolbar || {};
 		delete oConfig.Toolbar;
 
 		// should place at qunit fixture
-		var bShouldRender = (oConfig.render !== false);
+		const bShouldRender = (oConfig.render !== false);
 		delete oConfig.render;
 
 		// create toolbar
-		var oTB = new Toolbar(oTBConfig);
+		const oTB = new Toolbar(oTBConfig);
 
 		// add contents
 
 		// render
 		if (bShouldRender) {
 			oTB.placeAt("qunit-fixture");
-			nextUIUpdate.runSync()/*context not obviously suitable for an async function*/;
+			await nextUIUpdate();
 		}
 
 		return oTB;
@@ -101,7 +101,7 @@ sap.ui.define([
 
 	QUnit.module("Rendering");
 	QUnit.test("test rendering and visible property", async function(assert) {
-		var oTB = createToolbar({
+		const oTB = await createToolbar({
 			Toolbar : {
 				content: [
 					new Label({text: "text"})
@@ -114,7 +114,7 @@ sap.ui.define([
 		assert.ok(oTB.$().hasClass("sapMTB"), "Toolbar has correct class name");
 		oTB.setVisible(false);
 		await nextUIUpdate();
-		var $ToolbarPlaceHolder = jQuery("#" + InvisibleRenderer.createInvisiblePlaceholderId(oTB));
+		const $ToolbarPlaceHolder = jQuery("#" + InvisibleRenderer.createInvisiblePlaceholderId(oTB));
 		assert.strictEqual(oTB.$().length, 0, "Toolbar is no longer in DOM after setting it to invisible");
 		assert.strictEqual($ToolbarPlaceHolder.length, 1, "Toolbar placeholder is in DOM after setting it to invisible");
 		assert.strictEqual($ToolbarPlaceHolder.css("display"), "none", "Toolbar placeholder should have display none when invisible");
@@ -122,15 +122,15 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("test empty content", function(assert) {
-		var oTB = createToolbar({Toolbar : {}});
+	QUnit.test("test empty content", async function(assert) {
+		const oTB = await createToolbar({Toolbar : {}});
 		assert.strictEqual(oTB.$().length, 1, "Bar is in DOM even without any content");
 		oTB.destroy();
 	});
 
-	QUnit.test("test tooltip", function(assert) {
-		var sTooltip = "tooltip";
-		var oTB = createToolbar({
+	QUnit.test("test tooltip", async function(assert) {
+		const sTooltip = "tooltip";
+		const oTB = await createToolbar({
 			Toolbar : {
 				tooltip: sTooltip
 			}
@@ -140,7 +140,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("test design property", async function(assert) {
-		var oTB = createToolbar({
+		const oTB = await createToolbar({
 			Toolbar : {
 				content: [
 					new Label({text: "text"})
@@ -181,7 +181,7 @@ sap.ui.define([
 
 	QUnit.test("Should add the IBar-CTX if style and tag are set", async function(assert) {
 		// Arrange + System under Test
-		var oTB = createToolbar();
+		const oTB = await createToolbar();
 
 		assert.ok(!oTB.$().hasClass("sapMIBar-CTX"), "Toolbar does not have the IBar context");
 
@@ -197,8 +197,8 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("test style property", async function(assert) {
-		var oTB = createToolbar({
+	QUnit.test("test style property", async function (assert) {
+		const oTB = await createToolbar({
 			Toolbar: {
 				content: [
 					new Label({text: "text"})
@@ -220,9 +220,9 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("test that Toolbar Separator is rendered", function(assert) {
-		var oToolbarSeparator = new ToolbarSeparator();
-		var oTB = createToolbar({
+	QUnit.test("test that Toolbar Separator is rendered", async function(assert) {
+		const oToolbarSeparator = new ToolbarSeparator();
+		const oTB = await createToolbar({
 			Toolbar : {
 				content : [oToolbarSeparator]
 			}
@@ -238,9 +238,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("test sapMBarChildFirstChild class", async function(assert) {
-		var oFirstControl = new Button({ text: "Button1" }),
-			oSecondControl = new Button({ text: "Button2" }),
-			oTB = createToolbar({
+		const oFirstControl = new Button({ text: "Button1" });
+		const oSecondControl = new Button({ text: "Button2" });
+		const oTB = await createToolbar({
 			Toolbar : {
 				content : [oFirstControl, oSecondControl]
 			}
@@ -262,14 +262,14 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("should not log warnings when using sap.ui.core.HTML control", function (assert) {
+	QUnit.test("should not log warnings when using sap.ui.core.HTML control", async function (assert) {
 		// Arrange
-		var oLogErrorSpy = sinon.spy(Log, "warning");
-		var oHtmlContent = new HTML({
+		const oLogErrorSpy = sinon.spy(Log, "warning");
+		const oHtmlContent = new HTML({
 			content: "<span>Example</span>"
 		});
 
-		var oToolbar = createToolbar({
+		const oToolbar = await createToolbar({
 			Toolbar: { content: oHtmlContent }
 		});
 
@@ -289,12 +289,12 @@ sap.ui.define([
 
 	QUnit.module("Accessiblity");
 
-	QUnit.test("getAccessibilityInfo method", async function(assert) {
-		var aDefaultContent = [
+	QUnit.test("getAccessibilityInfo method returns correct children count", async function(assert) {
+		const aDefaultContent = [
 			new Button({width: "150px"}),
 			new Button({width: "150px"})
-		],
-		oTB = new Toolbar({
+		];
+		const oTB = new Toolbar({
 			content : aDefaultContent
 		});
 
@@ -310,16 +310,16 @@ sap.ui.define([
 
 	QUnit.test("Default ARIA attributes", async function(assert) {
 		// Arrange + System under Test
-		var oBtn1 = new Button({
+		const oBtn1 = new Button({
 			text : "Button Text"
-		}),
-		oBtn2 = new Button({
+		});
+		const oBtn2 = new Button({
 			text: "Button Text 2"
-		}),
-		oTitle = new Title({
+		});
+		const oTitle = new Title({
 			text : "Title text"
-		}),
-		oTB = new Toolbar({
+		});
+		const oTB = new Toolbar({
 			content : [oTitle, oBtn1, oBtn2]
 		}).applyTagAndContextClassFor("header");
 		oTB.placeAt("qunit-fixture");
@@ -396,16 +396,16 @@ sap.ui.define([
 
 	QUnit.test("Role attribute and aria-labelledby with interactive Controls", async function(assert) {
 		// Arrange + System under Test
-		var oBtn1 = new Button({
+		const oBtn1 = new Button({
 			text : "Button Text"
-		}),
-		oBtn2 = new Button({
+		});
+		const oBtn2 = new Button({
 			text: "Button Text 2"
-		}),
-		oTitle = new Title({
+		});
+		const oTitle = new Title({
 			text : "Title text"
-		}),
-		oTB = new Toolbar({
+		});
+		const oTB = new Toolbar({
 			content : [oTitle, oBtn1]
 		});
 		oTB.placeAt("qunit-fixture");
@@ -433,17 +433,17 @@ sap.ui.define([
 
 	QUnit.test("Role attribute and aria-labelledby with visible/not visible interactive Controls", async function(assert) {
 		// Arrange + System under Test
-		var oBtn1 = new Button({
+		const oBtn1 = new Button({
 			text : "Button Text"
-		}),
-		oBtn2 = new Button({
+		});
+		const oBtn2 = new Button({
 			visible: false,
 			text: "Button Text 2"
-		}),
-		oTitle = new Title({
+		});
+		const oTitle = new Title({
 			text : "Title text"
-		}),
-		oTB = new Toolbar({
+		});
+		const oTB = new Toolbar({
 			content : [oTitle, oBtn1, oBtn2]
 		});
 		oTB.placeAt("qunit-fixture");
@@ -471,7 +471,7 @@ sap.ui.define([
 
 	QUnit.test("_getToolbarInteractiveControlsCount with non interactive Controls", async function(assert) {
 		// Arrange + System under Test
-		var oTB = new Toolbar({
+		const oTB = new Toolbar({
 			content : [new Title(), new Label(), new Text()]
 		});
 		await nextUIUpdate();
@@ -486,7 +486,7 @@ sap.ui.define([
 
 	QUnit.test("_getToolbarInteractiveControlsCount with interactive Controls", async function(assert) {
 		// Arrange + System under Test
-		var oTB = new Toolbar({
+		const oTB = new Toolbar({
 			content : [new Input(), new Link(), new Button()]
 		});
 		await nextUIUpdate();
@@ -501,10 +501,10 @@ sap.ui.define([
 
 	QUnit.test("If Toolbar's content is made of only a label aria-labelledby should not be present - internal labels", async function(assert) {
 		// Arrange + System under Test
-		var oLabel = new Label({
+		const oLabel = new Label({
 			text : "Toolbar Label"
 		});
-		var oTB = new Toolbar({
+		const oTB = new Toolbar({
 			content : oLabel,
 			ariaLabelledBy: oLabel.getId()
 		});
@@ -512,7 +512,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		//Assert
-		var oInvisibleText = document.getElementById(oTB.getId() + "-InvisibleText");
+		const oInvisibleText = document.getElementById(oTB.getId() + "-InvisibleText");
 		assert.notOk(oInvisibleText, "Invisible text is not rendered in the static area");
 		assert.strictEqual(oTB.$().attr("aria-labelledby"), undefined, "Toolbar does not have attribute aria-labelledby - external label");
 
@@ -526,10 +526,10 @@ sap.ui.define([
 
 	QUnit.test("If Toolbar's content is made of only a label aria-labelledby should not be present - internal and external labels", async function(assert) {
 		// Arrange + System under Test
-		var oLabel = new Label({
+		const oLabel = new Label({
 			text : "Toolbar Label"
 		});
-		var oTB = new Toolbar({
+		const oTB = new Toolbar({
 			content : oLabel,
 			ariaLabelledBy: oLabel.getId()
 		}).applyTagAndContextClassFor("header");
@@ -537,7 +537,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		//Assert
-		var oInvisibleText = document.getElementById(oTB.getId() + "-InvisibleText");
+		const oInvisibleText = document.getElementById(oTB.getId() + "-InvisibleText");
 		assert.notOk(oInvisibleText, "Invisible text is not rendered in the static area");
 		assert.strictEqual(oTB.$().attr("aria-labelledby"), undefined, "Toolbar does not have attribute aria-labelledby - external label");
 
@@ -547,13 +547,11 @@ sap.ui.define([
 	});
 
 	QUnit.test("Active toolbar role", async function(assert) {
-		var fnDone = assert.async(),
-
 		// Arrange
-		oLabel = new Label({
+		const oLabel = new Label({
 			text : "Toolbar Label"
 		});
-		var oTB = new Toolbar({
+		const oTB = new Toolbar({
 			active: true,
 			content : oLabel
 		});
@@ -564,11 +562,11 @@ sap.ui.define([
 
 		//Act
 		oTB.focus();
-		setTimeout(function(){
-			//Assert
-			assert.ok(oTB.hasStyleClass("sapMTBFocused"), "Focused class is added to the toolbar container");
-			fnDone();
-		});
+		await nextUIUpdate();
+
+		//Assert
+		assert.ok(oTB.hasStyleClass("sapMTBFocused"), "Focused class is added to the toolbar container");
+
 		//Cleanup
 		oLabel.destroy();
 		oTB.destroy();
@@ -576,7 +574,7 @@ sap.ui.define([
 
 	QUnit.test("Active toolbar aria-haspopup", async function(assert) {
 		// Arrange
-		var oToolbar = new Toolbar({
+		const oToolbar = new Toolbar({
 			active: true,
 			ariaHasPopup: coreLibrary.aria.HasPopup.Dialog
 		});
@@ -597,9 +595,9 @@ sap.ui.define([
 		oToolbar.destroy();
 	});
 
-	QUnit.test("_setEnableAccessibilty", async function(assert) {
+	QUnit.test("_setEnableAccessibilty disables and re-enables toolbar role and fastnavgroup", async function(assert) {
 		// Arrange
-		var oTB = new Toolbar({
+		const oTB = new Toolbar({
 			content: [ new Button(),
 				new Button() ]
 		});
@@ -626,7 +624,7 @@ sap.ui.define([
 
 	QUnit.test("Should be able to add/remove undefined controls", function(assert) {
 		// System under Test
-		var oToolbar = new Toolbar();
+		const oToolbar = new Toolbar();
 
 		// Act
 		oToolbar.addContent(undefined);
@@ -642,8 +640,8 @@ sap.ui.define([
 	QUnit.module("Statics");
 
 	QUnit.test("controls shoulds return correct original and initial width", function(assert) {
-		var isRelativeWidth = Toolbar.isRelativeWidth;
-		var oConfig = {
+		const isRelativeWidth = Toolbar.isRelativeWidth;
+		const oConfig = {
 			"" : true,
 			"-10%" : true,
 			"100%" : true,
@@ -658,72 +656,72 @@ sap.ui.define([
 
 		// check expecteds
 		Object.keys(oConfig).forEach(function(sWidth) {
-			var bExpected = oConfig[sWidth];
-			var bRelative = isRelativeWidth(sWidth);
-			var sMessage = JSON.stringify(sWidth) + " is " + (bExpected ? "" : "not") + " relative width";
+			const bExpected = oConfig[sWidth];
+			const bRelative = isRelativeWidth(sWidth);
+			const sMessage = JSON.stringify(sWidth) + " is " + (bExpected ? "" : "not") + " relative width";
 			assert.strictEqual(bExpected ? bRelative : !bRelative, true, sMessage);
 		});
 
 	});
 
 	QUnit.test("controls shoulds return correct original and initial width", function(assert) {
-		var getOrigWidth = Toolbar.getOrigWidth;
+		const getOrigWidth = Toolbar.getOrigWidth;
 
 		// test dummy control has no width
-		var oControl = new Control();
+		const oControl = new Control();
 		assert.strictEqual(getOrigWidth(oControl.getId()), "", "Control without width property returns empty text");
 		assert.strictEqual(getOrigWidth(":)"), "", "Non-Control parameter calls should return empty text");
 		oControl.destroy();
 
 		// test a real control's width
-		var oSF = new SearchField();
+		const oSF = new SearchField();
 		assert.strictEqual(getOrigWidth(oSF.getId()), "100%", "Default width of the SearchField is 100%");
 		oSF.setWidth("100px");
 		assert.strictEqual(getOrigWidth(oSF.getId()), oSF.getWidth(), "SearhField's width found correctly via ID");
 		oSF.destroy();
 	});
 
-	QUnit.test("should detect whether toolbar content is shrinkable or not", function(assert) {
+	QUnit.test("should detect whether toolbar content is shrinkable or not", async function(assert) {
 		// test wrapper
-		var testShrinkable = function(bExpected, sMessage, fnControlClass, oConfig) {
-			var sShrinkClass = "shrink";
-			var oControl = new fnControlClass(oConfig || {});
+		const testShrinkable = async function(bExpected, sMessage, fnControlClass, oConfig) {
+			const sShrinkClass = "shrink";
+			const oControl = new fnControlClass(oConfig || {});
 			oControl.placeAt("qunit-fixture");
-			nextUIUpdate.runSync()/*context not obviously suitable for an async function*/;
+			await nextUIUpdate();
 
-			var bShrink = Toolbar.checkShrinkable(oControl, sShrinkClass);
-			var sPrefix = (bExpected) ? "should shrink" : "should not shrink";
+			const bShrink = Toolbar.checkShrinkable(oControl, sShrinkClass);
+			const sPrefix = (bExpected) ? "should shrink" : "should not shrink";
 			assert.ok(bExpected ? bShrink : !bShrink, sMessage + " " + sPrefix);
 			oControl.destroy();
 		};
 
 		// bind inital params
-		var shouldShrink = testShrinkable.bind(0, true);
-		var shouldNotShrink = testShrinkable.bind(0, false);
+		const shouldShrink = testShrinkable.bind(0, true);
+		const shouldNotShrink = testShrinkable.bind(0, false);
 
 		// when should shrink
-		shouldShrink("ToolbarSpacer with default properties", ToolbarSpacer, {});
-		shouldShrink("The Button width percent value", Button, {width : "100%"});
-		shouldShrink("SearchField with default properties", SearchField);
-		shouldShrink("Input with default properties", Input);
-		shouldShrink("Label control with default properties", Label);
-		shouldShrink("Link control with default properties", Link);
-		shouldShrink("Text control with default properties", Text);
-		shouldShrink("Text control with maxLines 2", Text, {
+		await shouldShrink("ToolbarSpacer with default properties", ToolbarSpacer, {});
+		await shouldShrink("The Button width percent value", Button, {width : "100%"});
+		await shouldShrink("SearchField with default properties", SearchField);
+		await shouldShrink("Input with default properties", Input);
+		await shouldShrink("Label control with default properties", Label);
+		await shouldShrink("Link control with default properties", Link);
+		await shouldShrink("Text control with default properties", Text);
+		await shouldShrink("Text control with maxLines 2", Text, {
 			maxLines : 2
 		});
 
-		shouldShrink("Button with shrinkable layoutData", Button, {
+		await shouldShrink("Button with shrinkable layoutData", Button, {
 			layoutData: new ToolbarLayoutData({
 				shrinkable : true
 			})
 		});
 
 		// when should not shrink
-		shouldNotShrink("Button control width default properties", Button, {});
-		shouldNotShrink("Fixed width ToolbarSpacer", ToolbarSpacer, {width : "200px"});
-		shouldNotShrink("Fixed width Shrinkable text", Text, {width : "5rem"});
-		shouldNotShrink("SearchField with unshrinkable layoutData", SearchField, {
+		await shouldNotShrink("Button control width default properties", Button, {});
+		await shouldNotShrink("Fixed width ToolbarSpacer", ToolbarSpacer, {width : "200px"});
+		await shouldNotShrink("Fixed width Shrinkable text", Text, {width : "5rem"});
+		await shouldNotShrink("SearchField with unshrinkable layoutData", SearchField, {
 			layoutData: new ToolbarLayoutData({
 				shrinkable : false
 			})
@@ -731,10 +729,10 @@ sap.ui.define([
 	});
 
 	QUnit.module("Behaviour");
-	QUnit.test("content property change handler should be registered correctly", function(assert) {
-		var oLabel = new Label({text : "text"});
-		var oTB = createToolbar();
-		var vRetVal;
+	QUnit.test("content property change handler should be registered correctly", async function(assert) {
+		const oLabel = new Label({text : "text"});
+		const oTB = await createToolbar();
+		let vRetVal;
 
 		// test inital
 		assert.ok(!oLabel.hasListeners("_change"), "Initially content does not have _change event");
@@ -764,10 +762,10 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("when content property is changed toolbar should be informed", function(assert) {
-		var spy = this.spy(Toolbar.prototype, "_onContentPropertyChanged");
-		var oLabel = new Label({text : "text"});
-		var oTB = createToolbar({
+	QUnit.test("when content property is changed toolbar should be informed", async function(assert) {
+		const spy = this.spy(Toolbar.prototype, "_onContentPropertyChanged");
+		const oLabel = new Label({text : "text"});
+		const oTB = await createToolbar({
 			Toolbar : {
 				content : [oLabel]
 			}
@@ -781,10 +779,10 @@ sap.ui.define([
 	});
 
 	QUnit.module("Events");
-	QUnit.test("active toolbar should fire press event", function(assert) {
-		var oLabel = new Label({text : "text"});
-		var fnPressSpy = this.spy();
-		var oTB = createToolbar({
+	QUnit.test("active toolbar should fire press event", async function(assert) {
+		const oLabel = new Label({text : "text"});
+		const fnPressSpy = this.spy();
+		const oTB = await createToolbar({
 			Toolbar : {
 				active : true,
 				content : [oLabel],
@@ -803,16 +801,16 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("active toolbar should fire press event on onkeyup on SPACE key", function(assert) {
-		var oLabel = new Label({text : "text"}),
-			fnPressSpy = this.spy(),
-			oTB = createToolbar({
-				Toolbar : {
-					active : true,
-					content : [oLabel],
-					press: fnPressSpy
-				}
-			});
+	QUnit.test("active toolbar should fire press event on onkeyup on SPACE key", async function(assert) {
+		const oLabel = new Label({text : "text"});
+		const fnPressSpy = this.spy();
+		const oTB = await createToolbar({
+			Toolbar : {
+				active : true,
+				content : [oLabel],
+				press: fnPressSpy
+			}
+		});
 
 		//act
 		QUtils.triggerKeydown(oTB._getActiveButton().getDomRef(), KeyCodes.SPACE);
@@ -828,18 +826,18 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("tests left/right arrow key navigation", function(assert) {
-		var oLabel = new Label({text : "text"}),
-			oButton = new Button({text : "text"}),
-			oMenuButton = new MenuButton({ text : "text", menu : new Menu({items: [new MenuItem({text: "item1"}), new MenuItem({text: "item2"})]}) }),
-			oLink = new Link({text : "text"}),
-			oTB = createToolbar({
-				Toolbar : {
-					content : [oLink, oMenuButton, oLabel, oButton]
-				}
-			}),
-			oArrowRightEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_RIGHT }),
-			oArrowLeftEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_LEFT });
+	QUnit.test("tests left/right arrow key navigation", async function(assert) {
+		const oLabel = new Label({text : "text"});
+		const oButton = new Button({text : "text"});
+		const oMenuButton = new MenuButton({ text : "text", menu : new Menu({items: [new MenuItem({text: "item1"}), new MenuItem({text: "item2"})]}) });
+		const oLink = new Link({text : "text"});
+		const oTB = await createToolbar({
+			Toolbar : {
+				content : [oLink, oMenuButton, oLabel, oButton]
+			}
+		});
+		const oArrowRightEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_RIGHT });
+		const oArrowLeftEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_LEFT });
 
 		// Focus the first element manually
 		oLink.focus();
@@ -868,17 +866,17 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("tests up/down arrow key navigation", function(assert) {
-		var oLabel = new Label({text : "text"}),
-			oButton = new Button({text : "text"}),
-			oLink = new Link({text : "text"}),
-			oTB = createToolbar({
-				Toolbar : {
-					content : [oLink, oLabel, oButton]
-				}
-			}),
-			oArrowUpEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_UP }),
-			oArrowDownEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_DOWN });
+	QUnit.test("tests up/down arrow key navigation", async function(assert) {
+		const oLabel = new Label({text : "text"});
+		const oButton = new Button({text : "text"});
+		const oLink = new Link({text : "text"});
+		const oTB = await createToolbar({
+			Toolbar : {
+				content : [oLink, oLabel, oButton]
+			}
+		});
+		const oArrowUpEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_UP });
+		const oArrowDownEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_DOWN });
 
 		// Focus the first element manually
 		oLink.focus();
@@ -898,8 +896,8 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("tests up/down arrow key navigation of aggregated control", function(assert) {
-		var SelectWrapper = Control.extend("custom.SelectWrapper", {
+	QUnit.test("tests up/down arrow key navigation of aggregated control", async function(assert) {
+		const SelectWrapper = Control.extend("custom.SelectWrapper", {
 				metadata: {
 					interfaces: [ "sap.m.IToolbarInteractiveControl" ],
 					aggregations: { _select: { type: "sap.m.Select", multiple: false, visibility: "hidden" } }
@@ -917,17 +915,17 @@ sap.ui.define([
 						oRm.close("div");
 					}
 				}
-			}),
-			oSelectWrapper = new SelectWrapper(),
-			oSelect = oSelectWrapper.getAggregation("_select"),
-			oTB = createToolbar({
-				Toolbar : {
-					content : [oSelectWrapper]
-				}
-			}),
-			oArrowUpEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_UP }),
-			oArrowDownEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_DOWN }),
-			oDefaultBehaviorSpy = sinon.spy(oTB, "_shouldAllowDefaultBehavior");
+			});
+		const oSelectWrapper = new SelectWrapper();
+		const oSelect = oSelectWrapper.getAggregation("_select");
+		const oTB = await createToolbar({
+			Toolbar : {
+				content : [oSelectWrapper]
+			}
+		});
+		const oArrowUpEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_UP });
+		const oArrowDownEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_DOWN });
+		const oDefaultBehaviorSpy = sinon.spy(oTB, "_shouldAllowDefaultBehavior");
 
 		// Focus the first element manually
 		oSelect.focus();
@@ -957,22 +955,22 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("tests that arrow key navigation is prevented when modifier keys are pressed", function(assert) {
-		var oLabel = new Label({text : "text"}),
-			oButton = new Button({text : "text"}),
-			oLink = new Link({text : "text"}),
-			oTB = createToolbar({
-				Toolbar : {
-					content : [oLink, oLabel, oButton]
-				}
-			}),
-			oMoveFocusSpy = sinon.spy(oTB, "_moveFocus");
+	QUnit.test("tests that arrow key navigation is prevented when modifier keys are pressed", async function(assert) {
+		const oLabel = new Label({text : "text"});
+		const oButton = new Button({text : "text"});
+		const oLink = new Link({text : "text"});
+		const oTB = await createToolbar({
+			Toolbar : {
+				content : [oLink, oLabel, oButton]
+			}
+		});
+		const oMoveFocusSpy = sinon.spy(oTB, "_moveFocus");
 
 		// Focus the first element manually
 		oLink.focus();
 
 		// Test with Ctrl + Arrow Right
-		var oCtrlArrowRightEvent = new KeyboardEvent("keydown", {
+		const oCtrlArrowRightEvent = new KeyboardEvent("keydown", {
 			keyCode: KeyCodes.ARROW_RIGHT,
 			ctrlKey: true
 		});
@@ -984,7 +982,7 @@ sap.ui.define([
 		oMoveFocusSpy.resetHistory();
 
 		// Test with Alt + Arrow Left
-		var oAltArrowLeftEvent = new KeyboardEvent("keydown", {
+		const oAltArrowLeftEvent = new KeyboardEvent("keydown", {
 			keyCode: KeyCodes.ARROW_LEFT,
 			altKey: true
 		});
@@ -1009,20 +1007,20 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("_shouldAllowDefaultBehavior on up/down arrow key navigation", function(assert) {
-		var oTokenizer = new Tokenizer({tokens : [new Token({text: "Token 1"}), new Token({text: "Token 2"})]}),
-			oMultiComboBox = new MultiComboBox({items: [new Item({text: "Item 1"}), new Item({text: "Item 2"})]}),
-			oSearchField = new SearchField({enableSuggestions: true}),
-			oTB = createToolbar({
-				Toolbar : {
-					content : [oTokenizer, oMultiComboBox, oSearchField]
-				}
-			}),
-			oArrowUpEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_UP }),
-			oArrowDownEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_DOWN });
+	QUnit.test("_shouldAllowDefaultBehavior on up/down arrow key navigation", async function(assert) {
+		const oTokenizer = new Tokenizer({tokens : [new Token({text: "Token 1"}), new Token({text: "Token 2"})]});
+		const oMultiComboBox = new MultiComboBox({items: [new Item({text: "Item 1"}), new Item({text: "Item 2"})]});
+		const oSearchField = new SearchField({enableSuggestions: true});
+		const oTB = await createToolbar({
+			Toolbar : {
+				content : [oTokenizer, oMultiComboBox, oSearchField]
+			}
+		});
+		const oArrowUpEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_UP });
+		const oArrowDownEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_DOWN });
 
 		// Test controls array
-		var aControls = [
+		const aControls = [
 			{ control: oTokenizer, name: "tokenizer" },
 			{ control: oMultiComboBox, name: "multiComboBox" },
 			{ control: oSearchField, name: "searchField" }
@@ -1030,14 +1028,14 @@ sap.ui.define([
 
 		// Iterate through both controls
 		aControls.forEach(function(oControlInfo) {
-			var oControl = oControlInfo.control;
-			var sControlName = oControlInfo.name;
-			var oActiveDomElement = oControl.getFocusDomRef();
+			const oControl = oControlInfo.control;
+			const sControlName = oControlInfo.name;
+			const oActiveDomElement = oControl.getFocusDomRef();
 
-			var bShouldAllowOnArrowUp = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oControl, oArrowUpEvent);
+			const bShouldAllowOnArrowUp = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oControl, oArrowUpEvent);
 			assert.ok(bShouldAllowOnArrowUp, "The " + sControlName + " should allow default behavior on arrow up");
 
-			var bShouldAllowOnArrowDown = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oControl, oArrowDownEvent);
+			const bShouldAllowOnArrowDown = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oControl, oArrowDownEvent);
 			assert.ok(bShouldAllowOnArrowDown, "The " + sControlName + " should allow default behavior on arrow down");
 		});
 
@@ -1045,25 +1043,25 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("disabled and invisible controls should be skipped during keyboard navigation", function(assert) {
-		var oButton1 = new Button({text: "Button 1"}),
-			oButton2 = new Button({text: "Button 2", enabled: false}),
-			oButton3 = new Button({text: "Button 3", visible: false}),
-			oButton4 = new Button({text: "Button 4"}),
-			oTB = createToolbar({
-				Toolbar: {
-					content: [oButton1, oButton2, oButton3, oButton4]
-				}
-			});
+	QUnit.test("disabled and invisible controls should be skipped during keyboard navigation", async function(assert) {
+		const oButton1 = new Button({text: "Button 1"});
+		const oButton2 = new Button({text: "Button 2", enabled: false});
+		const oButton3 = new Button({text: "Button 3", visible: false});
+		const oButton4 = new Button({text: "Button 4"});
+		const oTB = await createToolbar({
+			Toolbar: {
+				content: [oButton1, oButton2, oButton3, oButton4]
+			}
+		});
 
 		// Test that all interactive controls are counted for accessibility (including disabled ones)
-		var aInteractiveControls = oTB._getToolbarInteractiveControls();
+		const aInteractiveControls = oTB._getToolbarInteractiveControls();
 		assert.strictEqual(aInteractiveControls.length, 3, "All visible interactive controls are counted for accessibility");
 		assert.notStrictEqual(aInteractiveControls.indexOf(oButton2), -1, "Disabled button is included in interactive controls for accessibility");
 		assert.strictEqual(aInteractiveControls.indexOf(oButton3), -1, "Invisible button is not in the interactive controls list");
 
 		// Test that disabled and invisible controls are excluded from navigation
-		var aNavigatableControls = oTB._getToolbarNavigatableControls();
+		const aNavigatableControls = oTB._getToolbarNavigatableControls();
 		assert.strictEqual(aNavigatableControls.length, 2, "Only enabled and visible controls are navigatable");
 		assert.strictEqual(aNavigatableControls.indexOf(oButton2), -1, "Disabled button is not navigatable");
 		assert.strictEqual(aNavigatableControls.indexOf(oButton3), -1, "Invisible button is not navigatable");
@@ -1071,7 +1069,7 @@ sap.ui.define([
 
 		// Test navigation skips disabled and invisible controls
 		oButton1.focus();
-		var oArrowRightEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_RIGHT });
+		const oArrowRightEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_RIGHT });
 		oTB._moveFocus("forward", oArrowRightEvent);
 		assert.strictEqual(document.activeElement, oButton4.getDomRef(), "Arrow right skips disabled and invisible buttons and focuses next available button");
 
@@ -1083,10 +1081,10 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("inactive toolbar should not fire press on SPACE key", function(assert) {
-		var oLabel = new Label({text : "text"});
-		var fnPressSpy = this.spy();
-		var oTB = createToolbar({
+	QUnit.test("inactive toolbar should not fire press on SPACE key", async function(assert) {
+		const oLabel = new Label({text : "text"});
+		const fnPressSpy = this.spy();
+		const oTB = await createToolbar({
 			Toolbar : {
 				active : false,
 				content : [oLabel],
@@ -1103,10 +1101,10 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("inactive toolbar should not fire press event", function(assert) {
-		var oLabel = new Label({text : "text"});
-		var fnPressSpy = this.spy();
-		var oTB = createToolbar({
+	QUnit.test("inactive toolbar should not fire press event", async function(assert) {
+		const oLabel = new Label({text : "text"});
+		const fnPressSpy = this.spy();
+		const oTB = await createToolbar({
 			/* toolbar is inactive by default */
 			Toolbar : {
 				content : [oLabel],
@@ -1125,15 +1123,15 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("toolbar should not scroll on focus when tapped", function(assert) {
+	QUnit.test("toolbar should not scroll on focus when tapped", async function(assert) {
 		// Arrange
-		var oTB = createToolbar({
+		const oTB = await createToolbar({
 			/* toolbar is inactive by default */
 			Toolbar : {
 				active: true
 			}
 		});
-		var fnFocusSpy = this.spy(oTB, "focus");
+		const fnFocusSpy = this.spy(oTB, "focus");
 
 		// Act simulate tap with dummy event object
 		oTB.ontap({
@@ -1151,10 +1149,10 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("active toolbar should not fire press when the event is handled by the child control", function(assert) {
-		var oButton = new Button({text : "text"});
-		var fnPressSpy = this.spy();
-		var oTB = createToolbar({
+	QUnit.test("active toolbar should not fire press when the event is handled by the child control", async function(assert) {
+		const oButton = new Button({text : "text"});
+		const fnPressSpy = this.spy();
+		const oTB = await createToolbar({
 			Toolbar : {
 				active : true,
 				content : [oButton],
@@ -1177,13 +1175,13 @@ sap.ui.define([
 	});
 
 	QUnit.module("Shrinkables");
-	QUnit.test("Toolbar should not overflow with shrinkable items", function(assert) {
-		var sLongText = new Array(1000).join("text ");
+	QUnit.test("Toolbar should not overflow with shrinkable items", async function(assert) {
+		const sLongText = new Array(1000).join("text ");
 
 		// test wrapper
-		var shouldNotOverflow = function(sMessage, oConfig) {
-			var oTB = createToolbar(oConfig || {});
-			var oDomRef = oTB.getDomRef();
+		const shouldNotOverflow = async function(sMessage, oConfig) {
+			const oTB = await createToolbar(oConfig || {});
+			const oDomRef = oTB.getDomRef();
 			sMessage += " so Toolbar should not overflow";
 			assert.ok(oDomRef.scrollWidth === oDomRef.clientWidth, sMessage + ".");
 			oTB.setWidth("500px");
@@ -1192,7 +1190,7 @@ sap.ui.define([
 		};
 
 		// run test
-		shouldNotOverflow("By default, text controls are shrinkable", {
+		await shouldNotOverflow("By default, text controls are shrinkable", {
 			Toolbar : {
 				content: [
 					new Label({text : sLongText}),
@@ -1202,7 +1200,7 @@ sap.ui.define([
 			}
 		});
 
-		shouldNotOverflow("By default, the controls have percent width are shrinkable", {
+		await shouldNotOverflow("By default, the controls have percent width are shrinkable", {
 			Toolbar : {},
 			SearchField : {},	/* default width is 100% */
 			Slider : {},		/* default width is 100% */
@@ -1212,13 +1210,13 @@ sap.ui.define([
 			Button : {text : sLongText, width: "50%"}
 		});
 
-		shouldNotOverflow("More than 100% shrinkable content has to fit", false, {
+		await shouldNotOverflow("More than 100% shrinkable content has to fit", false, {
 			Toolbar : {},
 			Button : {text : sLongText, width: "500%"},
 			Label : {text : sLongText}
 		});
 
-		shouldNotOverflow("controls have shrinkable layout data has to fit", false, {
+		await shouldNotOverflow("controls have shrinkable layout data has to fit", false, {
 			Toolbar : {},
 			Button : {text : sLongText, layoutData: new ToolbarLayoutData({shrinkable : true})},
 			TextArea : {text : sLongText, layoutData: new ToolbarLayoutData({shrinkable : true})}
@@ -1228,14 +1226,14 @@ sap.ui.define([
 
 	QUnit.module("LayoutData");
 	QUnit.test("should reapply layout data styles after content is rerendered", async function(assert) {
-		var sMinWidth = "100px";
-		var oBtn = new Button({
+		const sMinWidth = "100px";
+		const oBtn = new Button({
 			text : "Button Text",
 			layoutData : new ToolbarLayoutData({
 				minWidth: sMinWidth
 			})
 		});
-		var oTB = createToolbar({
+		const oTB = await createToolbar({
 			Toolbar : {
 				content : oBtn
 			}
@@ -1257,22 +1255,22 @@ sap.ui.define([
 	});
 
 	QUnit.test("should reapply style after layout data is changed", async function(assert) {
-		var sInitMinWidth = "100px";
-		var sLastMinWidth = "200px";
-		var oBtn = new Button({
+		const sInitMinWidth = "100px";
+		const sLastMinWidth = "200px";
+		const oBtn = new Button({
 			text : "Button Text",
 			layoutData : new ToolbarLayoutData({
 				minWidth: sInitMinWidth
 			})
 		});
-		var oTB = createToolbar({
+		const oTB = await createToolbar({
 			Toolbar : {
 				content : oBtn
 			}
 		});
 
 		// arrange
-		var fnRerenderSpy = this.spy(oTB.getRenderer(), "render");
+		const fnRerenderSpy = this.spy(oTB.getRenderer(), "render");
 
 		// assert
 		assert.strictEqual(oBtn.getDomRef().style.minWidth, sInitMinWidth, "After initial rendering minWidth is applied according to layoutData");
@@ -1292,18 +1290,18 @@ sap.ui.define([
 	});
 
 	QUnit.test("setting layout data should apply changes with rerender", async function(assert) {
-		var sMinWidth = "100px";
-		var oBtn = new Button({
+		const sMinWidth = "100px";
+		const oBtn = new Button({
 			text : "Button Text"
 		});
-		var oTB = createToolbar({
+		const oTB = await createToolbar({
 			Toolbar : {
 				content : oBtn
 			}
 		});
 
 		// arrange
-		var fnRerenderSpy = this.spy(oTB.getRenderer(), "render");
+		const fnRerenderSpy = this.spy(oTB.getRenderer(), "render");
 
 		// act
 		oBtn.setLayoutData(new ToolbarLayoutData({
@@ -1325,12 +1323,12 @@ sap.ui.define([
 	QUnit.module("Element Margins");
 	QUnit.test("Should add margins to elements in a Toolbar", async function(assert) {
 		// Arrange
-		var oFirstButton = new Button("first"),
-			oMiddleButton = new Button("middle"),
-			oLastButton = new Button("last");
+		const oFirstButton = new Button("first");
+		const oMiddleButton = new Button("middle");
+		const oLastButton = new Button("last");
 
 		// System under Test + Act
-		var oTB = new Toolbar({
+		const oTB = new Toolbar({
 			content : [
 				oFirstButton,
 				new ToolbarSpacer(),
@@ -1372,24 +1370,25 @@ sap.ui.define([
 
 	QUnit.module("Edge cases");
 
-	QUnit.test("Preventing error, when focused element is not presented", function(assert) {
+	QUnit.test("Preventing error when focused element is not presented", function(assert) {
 
 		// Arrange
-		var oTB = createToolbar(),
-			bReturnValue;
+		const oTB = new Toolbar();
 
 		// Act
-		bReturnValue = oTB._shouldAllowDefaultBehavior(null);
+		const bReturnValue = oTB._shouldAllowDefaultBehavior(null);
 
 		assert.strictEqual(bReturnValue, false, "Error caused by unexisting element being called a method to, is prevented");
+
+		oTB.destroy();
 	});
 
 	QUnit.test("KB navigation logic when SegmentedButton with _select aggregation used", async function(assert) {
 
 		// Arrange
-		var oTB = createToolbar();
+		const oTB = await createToolbar();
 
-		var oSB = new SegmentedButton({
+		const oSB = new SegmentedButton({
 			items : [
 				new SegmentedButtonItem({
 					text: "button 1"
@@ -1411,15 +1410,15 @@ sap.ui.define([
 
 		await nextUIUpdate();
 
-		var oSelect = oSB.getAggregation("_select");
+		const oSelect = oSB.getAggregation("_select");
 
 
 		// Act
-		var oDefaultBehaviorSpy = sinon.spy(oTB, "_shouldAllowDefaultBehavior");
+		const oDefaultBehaviorSpy = sinon.spy(oTB, "_shouldAllowDefaultBehavior");
 
 		// Act
 		oSelect.focus();
-		var oArrowDownEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_DOWN });
+		const oArrowDownEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_DOWN });
 
 		oTB._moveFocus("forward", oArrowDownEvent);
 
@@ -1436,11 +1435,11 @@ sap.ui.define([
 
 	QUnit.test("Active button should receive text content from toolbar", async function(assert) {
 		// Arrange
-		var oLabel = new Label({text: "Label Text"});
-		var oTitle = new Title({text: "Title Text"});
-		var oButton = new Button({text: "Button Text"});
+		const oLabel = new Label({text: "Label Text"});
+		const oTitle = new Title({text: "Title Text"});
+		const oButton = new Button({text: "Button Text"});
 
-		var oToolbar = new Toolbar({
+		const oToolbar = new Toolbar({
 			active: true,
 			content: [oLabel, oTitle, oButton]
 		});
@@ -1449,7 +1448,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// Act
-		var oActiveButton = oToolbar._getActiveButton();
+		const oActiveButton = oToolbar._getActiveButton();
 
 		// Assert
 		assert.strictEqual(oActiveButton.getText(), "Label Text Title Text Button Text",
@@ -1461,8 +1460,8 @@ sap.ui.define([
 
 	QUnit.test("Active button text should be updated when content changes", async function(assert) {
 		// Arrange
-		var oLabel = new Label({text: "Original Text"});
-		var oToolbar = new Toolbar({
+		const oLabel = new Label({text: "Original Text"});
+		const oToolbar = new Toolbar({
 			active: true,
 			content: [oLabel]
 		});
@@ -1470,7 +1469,7 @@ sap.ui.define([
 		oToolbar.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		var oActiveButton = oToolbar._getActiveButton();
+		const oActiveButton = oToolbar._getActiveButton();
 		assert.strictEqual(oActiveButton.getText(), "Original Text", "Initial text is correct");
 
 		// Act - Change label text
@@ -1487,8 +1486,8 @@ sap.ui.define([
 
 	QUnit.test("Active button text should be updated when content is added/removed", async function(assert) {
 		// Arrange
-		var oLabel = new Label({text: "Label Text"});
-		var oToolbar = new Toolbar({
+		const oLabel = new Label({text: "Label Text"});
+		const oToolbar = new Toolbar({
 			active: true,
 			content: [oLabel]
 		});
@@ -1496,11 +1495,11 @@ sap.ui.define([
 		oToolbar.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		var oActiveButton = oToolbar._getActiveButton();
+		const oActiveButton = oToolbar._getActiveButton();
 		assert.strictEqual(oActiveButton.getText(), "Label Text", "Initial text is correct");
 
 		// Act - Add new content
-		var oTitle = new Title({text: "Title Text"});
+		const oTitle = new Title({text: "Title Text"});
 		oToolbar.addContent(oTitle);
 		await nextUIUpdate();
 
@@ -1522,10 +1521,10 @@ sap.ui.define([
 
 	QUnit.test("Active button should handle invisible content correctly", async function(assert) {
 		// Arrange
-		var oVisibleLabel = new Label({text: "Visible Text"});
-		var oInvisibleLabel = new Label({text: "Invisible Text", visible: false});
+		const oVisibleLabel = new Label({text: "Visible Text"});
+		const oInvisibleLabel = new Label({text: "Invisible Text", visible: false});
 
-		var oToolbar = new Toolbar({
+		const oToolbar = new Toolbar({
 			active: true,
 			content: [oVisibleLabel, oInvisibleLabel]
 		});
@@ -1534,7 +1533,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// Act
-		var oActiveButton = oToolbar._getActiveButton();
+		const oActiveButton = oToolbar._getActiveButton();
 
 		// Assert
 		assert.strictEqual(oActiveButton.getText(), "Visible Text",
@@ -1554,7 +1553,7 @@ sap.ui.define([
 
 	QUnit.test("Active button text should handle empty content gracefully", async function(assert) {
 		// Arrange
-		var oToolbar = new Toolbar({
+		const oToolbar = new Toolbar({
 			active: true,
 			content: []
 		});
@@ -1563,7 +1562,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// Act
-		var oActiveButton = oToolbar._getActiveButton();
+		const oActiveButton = oToolbar._getActiveButton();
 
 		// Assert
 		assert.strictEqual(oActiveButton.getText(), "",
@@ -1575,9 +1574,9 @@ sap.ui.define([
 
 	QUnit.test("Active button text should handle controls with tooltip when no text available", async function(assert) {
 		// Arrange
-		var oButton = new Button({tooltip: "Button Tooltip"});
+		const oButton = new Button({tooltip: "Button Tooltip"});
 
-		var oToolbar = new Toolbar({
+		const oToolbar = new Toolbar({
 			active: true,
 			content: [oButton]
 		});
@@ -1586,7 +1585,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// Act
-		var oActiveButton = oToolbar._getActiveButton();
+		const oActiveButton = oToolbar._getActiveButton();
 
 		// Assert
 		assert.strictEqual(oActiveButton.getText(), "Button Tooltip",

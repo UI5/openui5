@@ -41,7 +41,7 @@ sap.ui.define([
 	 *   Whether a grand total is needed
 	 * @param {sap.ui.model.odata.v4.lib._CollectionCache} [oFirstLevel]
 	 *   An optional collection cache to be used as this aggregation cache's first (and only) level
-	 * @throws {Error} If the given collection cache has pending POSTs
+	 * @throws {Error} If the given collection cache has pending DELETEs or POSTs
 	 *
 	 * @alias sap.ui.model.odata.v4.lib._AggregationCache
 	 * @borrows sap.ui.model.odata.v4.lib._CollectionCache#addKeptElement as #addKeptElement
@@ -71,11 +71,12 @@ sap.ui.define([
 		this.oTreeState = new _TreeState(oAggregation.$NodeProperty,
 			(oNode) => _Helper.getKeyFilter(oNode, this.sMetaPath, this.getTypes()));
 		if (oFirstLevel) {
+			if (oFirstLevel.aElements.$deleted?.length
+					|| !_Helper.isEmptyObject(oFirstLevel.mPostRequests)) {
+				throw new Error("Not allowed due to pending DELETEs or POSTs");
+			}
 			this.mChangeRequests = oFirstLevel.mChangeRequests;
 			this.mEditUrl2PatchPromise = oFirstLevel.mEditUrl2PatchPromise;
-			if (!_Helper.isEmptyObject(oFirstLevel.mPostRequests)) {
-				throw new Error("Not allowed due to pending POSTs");
-			}
 		}
 	}
 
@@ -3135,7 +3136,8 @@ sap.ui.define([
 	 *   if the system query option "$search" is combined with grand totals or group levels or a
 	 *   recursive hierarchy, or if shared requests are combined with min/max or with grand totals
 	 *   or group levels or recursive hierarchy, or if a first level cache is given but no
-	 *   aggregation cache needs to be created
+	 *   aggregation cache needs to be created, or if a first level cache is given and it has
+	 *   pending DELETEs or POSTs
 	 *
 	 * @public
 	 */

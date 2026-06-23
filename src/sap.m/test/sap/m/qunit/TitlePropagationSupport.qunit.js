@@ -9,7 +9,7 @@ sap.ui.define([
 	"use strict";
 
 	// Custom control used for this test
-	var TestControl = Control.extend("my.lib.TestControl", {
+	const TestControl = Control.extend("my.lib.TestControl", {
 		metadata: {
 			properties: {
 				returnTitleId: {type: "boolean", defaultValue: true}
@@ -35,16 +35,16 @@ sap.ui.define([
 
 	QUnit.module("Generic");
 
-	QUnit.test("Control has all needed private methods added to it's prototype", function (assert) {
+	QUnit.test("Control has all needed private methods added to its prototype", (assert) => {
 		assert.ok(TestControl.prototype.hasOwnProperty("_initTitlePropagationSupport"),
 				"Private method _initTitlePropagationSupport added to control");
 		assert.ok(TestControl.prototype.hasOwnProperty("_propagateTitleIdToChildControl"),
 				"Private method _propagateTitleIdToChildControl added to control");
 	});
 
-	QUnit.test("Try to enrich a non element", function (assert) {
+	QUnit.test("TitlePropagationSupport does not enrich a non-element ManagedObject", (assert) => {
 		// Arrange
-		var TestObject = ManagedObject.extend("my.lib.TestObject");
+		const TestObject = ManagedObject.extend("my.lib.TestObject");
 		TitlePropagationSupport.call(TestObject.prototype, "", function () {return this.getId();});
 
 		// Assert
@@ -65,7 +65,7 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Delegate added to the test control", function (assert) {
+	QUnit.test("Delegate is added to the test control instance on creation", function (assert) {
 		assert.strictEqual(this.oControl.aDelegates.length, 1,
 				"The control instance has one delegate attached");
 	});
@@ -85,7 +85,7 @@ sap.ui.define([
 		},
 		getMockedControl: function (sMockedControlType, bSuggestTitleSupported) {
 			// Using sap.ui.core.Control here to not introduce unneeded dependency to another library
-			var oControl = new Control();
+			const oControl = new Control();
 
 			// Mock "isA" method on the instance
 			oControl.isA = function (aTypes) {
@@ -102,8 +102,8 @@ sap.ui.define([
 		},
 		assertWithMockControlOfType: function (assert, sType, bSuggestTitleSupported, bNegative) {
 			// Arrange
-			var oMockedControl = this.getMockedControl(sType, bSuggestTitleSupported),
-				sTitleID = this.getTitleID();
+			const oMockedControl = this.getMockedControl(sType, bSuggestTitleSupported);
+			const sTitleID = this.getTitleID();
 
 			this.oTC.removeAllContent(); // Make sure we don't have any leftover content from the last test
 			this.oTC.addContent(oMockedControl);
@@ -129,7 +129,7 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("propagation to a child control of type", function (assert) {
+	QUnit.test("Title ID is propagated to a child control of a supported type", function (assert) {
 		// Assert
 		this.assertWithMockControlOfType(assert, "sap.ui.layout.form.SimpleForm", true, false);
 		this.assertWithMockControlOfType(assert, "sap.ui.layout.form.Form", true, false);
@@ -137,9 +137,9 @@ sap.ui.define([
 		this.assertWithMockControlOfType(assert, "sap.m.Button", false, true /* Negative test */);
 	});
 
-	QUnit.test("_propagateTitleIdToChildControl private method", function (assert) {
-		var oMockedControl = this.getMockedControl("sap.ui.layout.form.SimpleForm", true),
-			bResult;
+	QUnit.test("_propagateTitleIdToChildControl returns false when no content or no title ID is present", function (assert) {
+		const oMockedControl = this.getMockedControl("sap.ui.layout.form.SimpleForm", true);
+		let bResult;
 
 		// Assert
 		assert.notOk(this.oTC._propagateTitleIdToChildControl(),
@@ -170,11 +170,11 @@ sap.ui.define([
 		oMockedControl.destroy();
 	});
 
-	QUnit.test("_propagateTitleIdToChildControl private method - ACC mode", function (assert) {
+	QUnit.test("_propagateTitleIdToChildControl respects accessibility mode when propagating title ID", function (assert) {
 		// Arrange
-		var oStub = this.stub(ControlBehavior, "isAccessibilityEnabled").returns(true),
-			oMockedControl = this.getMockedControl("sap.ui.layout.form.SimpleForm", true),
-			bResult;
+		let oStub = this.stub(ControlBehavior, "isAccessibilityEnabled").returns(true);
+		const oMockedControl = this.getMockedControl("sap.ui.layout.form.SimpleForm", true);
+		let bResult;
 
 		// Act - add content to control and call method
 		this.oTC.addContent(oMockedControl);

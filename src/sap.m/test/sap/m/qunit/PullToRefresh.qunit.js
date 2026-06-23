@@ -16,8 +16,8 @@ sap.ui.define([
 	const {ListType} = mobileLibrary;
 
 	function addItems(list, nItems) {
-		var n = list.getItems().length + 1;
-		for (var i = 0; i < nItems; i++) {
+		const n = list.getItems().length + 1;
+		for (let i = 0; i < nItems; i++) {
 			list.addItem(
 				new StandardListItem({
 					title: "List item " + (n + i),
@@ -27,19 +27,19 @@ sap.ui.define([
 		}
 	}
 
-	var oRb = Library.getResourceBundleFor("sap.m");
-	var oApp = new App("p2RApp", {initialPage:"page1"});
+	const oRb = Library.getResourceBundleFor("sap.m");
+	const oApp = new App("p2RApp", {initialPage:"page1"});
 
-	var sPullDwn = oRb.getText("PULL2REFRESH_PULLDOWN"),
-		sRelease = oRb.getText("PULL2REFRESH_RELEASE"),
-		sRefresh = "refreshing",
-		sLoading = oRb.getText("PULL2REFRESH_LOADING");
-	var sDescription = "pull to refresh";
+	const sPullDwn = oRb.getText("PULL2REFRESH_PULLDOWN");
+	const sRelease = oRb.getText("PULL2REFRESH_RELEASE");
+	const sRefresh = "refreshing";
+	const sLoading = oRb.getText("PULL2REFRESH_LOADING");
+	const sDescription = "pull to refresh";
 
-	var oList =  new List("oList", {inset : false});
+	const oList = new List("oList", {inset : false});
 	addItems(oList, 15);
 
-	var oP2R = new PullToRefresh({
+	const oP2R = new PullToRefresh({
 		description: sDescription,
 		refresh: function(){
 			oP2R.setDescription(sRefresh);
@@ -48,7 +48,7 @@ sap.ui.define([
 
 	oP2R._bTouchMode = true;
 
-	var oPage1 = new Page("page1", {
+	const oPage1 = new Page("page1", {
 		title: "PullToRefresh Control",
 		enableScrolling: true,
 		content : [ oP2R, oList ]
@@ -60,7 +60,7 @@ sap.ui.define([
 	await nextUIUpdate();
 
 	QUnit.module("Properties");
-	QUnit.test("Default values", function(assert) {
+	QUnit.test("Default property values are correct", function(assert) {
 		assert.expect(3);
 		assert.strictEqual(oP2R.getShowIcon(), false, "Default value for showIcon");
 		assert.strictEqual(oP2R.getDescription(), sDescription, "Description value");
@@ -69,9 +69,9 @@ sap.ui.define([
 
 	QUnit.module("Check HTML");
 
-	QUnit.test("HTML", function(assert) {
-		var $P2R = oP2R.$();
-		var iScroller = oPage1.getScrollDelegate()._scroller;
+	QUnit.test("Control is rendered with correct initial HTML structure", function(assert) {
+		const $P2R = oP2R.$();
+		const iScroller = oPage1.getScrollDelegate()._scroller;
 		if (iScroller) { // this is executed when iScroll is used
 			assert.expect(8);
 			assert.ok($P2R.position().top + $P2R.height() - jQuery("#page1-intHeader").height() <= 0, "Control is hidden over the top of the parent container");
@@ -90,16 +90,20 @@ sap.ui.define([
 	// Test pull to refresh functionality
 	QUnit.module("Behavior");
 
-	QUnit.test("Pull Down", function(assert) {
-		var done = assert.async();
-		var oSpy = this.spy();
-		var iScroller = oPage1.getScrollDelegate()._scroller;
+	QUnit.test("Pulling down triggers refresh state and hiding restores initial state", function(assert) {
+		const done = assert.async();
+		const oSpy = this.spy();
+		const iScroller = oPage1.getScrollDelegate()._scroller;
 
 		if (iScroller) { // this is executed when iScroll is used
 			assert.expect(14); // 13 + event
-			var iTop = oList.$().offset().top + 20;
-			var iLeft = 10;
+			let iTop = oList.$().offset().top + 20;
+			const iLeft = 10;
+
+			// Arrange
 			oP2R.attachRefresh(oSpy);
+
+			// Act: simulate touch start
 			iScroller._start({
 				type: "touchstart",
 				touches : [{ pageX: iLeft, pageY: iTop, length: 1 }],
@@ -109,6 +113,7 @@ sap.ui.define([
 
 			iTop = iTop + 250;
 
+			// Act: simulate pull down gesture
 			iScroller._move({ // Pull down
 				type: "touchmove",
 				touches : [{ pageX: iLeft, pageY: iTop, length: 1 }],
@@ -116,13 +121,14 @@ sap.ui.define([
 				pageY: iTop
 			});
 
-			// Check HTML
+			// Assert: state after pull
 			assert.strictEqual(oP2R._iState, 1, "New state after pull should be 1 - release to refresh");
-			var $P2R = oP2R.$();
+			const $P2R = oP2R.$();
 			assert.ok($P2R.children(".sapMPullDownText").text() === sRelease, "Release text is set correctly");
 			assert.ok($P2R.position().top >= 0, "Control is visible");
 			assert.ok($P2R.hasClass("sapMFlip"), "Arrow is rotated");
 
+			// Wait for iScroll animation to settle before releasing
 			setTimeout(function() {
 				iScroller._end({ // Release
 					type: "touchend",
@@ -131,7 +137,7 @@ sap.ui.define([
 					pageY: iTop
 				});
 
-				//
+				// Wait for iScroll to process the release and trigger refresh
 				setTimeout(function() {
 					assert.strictEqual(oSpy.callCount, 1, "Refresh event has been fired.");
 					assert.strictEqual(oP2R._iState, 2, "New state after release should be 2 - loading");
@@ -141,6 +147,7 @@ sap.ui.define([
 					oP2R.hide(); // Close
 					oP2R.setDescription(sDescription);
 
+					// Wait for iScroll hide animation to complete before asserting restored state
 					setTimeout(function() {
 						assert.strictEqual(oP2R._iState, 0, "New state after hide should be 0 - initial");
 						assert.strictEqual($P2R.children(".sapMPullDownText").text(), sPullDwn, "Initial text is restored");

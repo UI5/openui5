@@ -9,10 +9,10 @@ sap.ui.define([
 
 	QUnit.module("Test behavior in overflow toolbar");
 
-	QUnit.test("Toolbar spacer ignore sap.m.ToolbarLayoutData", async function(assert) {
-		var oToolbarSpacer = new ToolbarSpacer(),
-			oToolbarLayoutData = new ToolbarLayoutData(),
-			oLayoutData = new LayoutData();
+	QUnit.test("Toolbar spacer ignores sap.m.ToolbarLayoutData but accepts generic LayoutData", async function (assert) {
+		const oToolbarSpacer = new ToolbarSpacer();
+		const oToolbarLayoutData = new ToolbarLayoutData();
+		const oLayoutData = new LayoutData();
 
 		// Arrange
 		oToolbarSpacer.setLayoutData(oToolbarLayoutData);

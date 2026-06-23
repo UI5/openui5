@@ -12,25 +12,25 @@ sap.ui.define([
 	QUnit.test("Toolbar separator gets inside overflow toolbar", function (assert) {
 		// Arrange
 		this.clock = sinon.useFakeTimers();
-		var oSeparator1 = new ToolbarSeparator(),
-			oSeparator2 = new ToolbarSeparator(),
-			oSeparator3 = new ToolbarSeparator(),
-			oButton1 = new Button({text:"Button 1", width: "100px"}),
-			oButton2 = new Button({text:"Button 2", width: "100px"}),
-			aToolbarContent = [
-				oSeparator1,
-				oButton1,
-				oSeparator2,
-				oButton2,
-				oSeparator3
-			],
-			oOverflowTB = new OverflowToolbar({
-				width: '500px',
-				content: aToolbarContent
-			}),
-			oOverflowButton = oOverflowTB._getOverflowButton();
+		const oSeparator1 = new ToolbarSeparator();
+		const oSeparator2 = new ToolbarSeparator();
+		const oSeparator3 = new ToolbarSeparator();
+		const oButton1 = new Button({text:"Button 1", width: "100px"});
+		const oButton2 = new Button({text:"Button 2", width: "100px"});
+		const aToolbarContent = [
+			oSeparator1,
+			oButton1,
+			oSeparator2,
+			oButton2,
+			oSeparator3
+		];
+		const oOverflowTB = new OverflowToolbar({
+			width: '500px',
+			content: aToolbarContent
+		});
+		const oOverflowButton = oOverflowTB._getOverflowButton();
 		oOverflowTB.placeAt("qunit-fixture");
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		nextUIUpdate.runSync()/*fake timer is used in module*/; // fake timers active — await nextUIUpdate() would hang
 
 		// Assert
 		assert.notOk(oSeparator1.hasStyleClass(ToolbarSeparator.CLASSNAME_OVERFLOW_TOOLBAR),

@@ -63,12 +63,12 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Control is instantiated", function(assert) {
+	QUnit.test("Control is instantiated with correct default properties", function(assert) {
 		assert.ok(this.oOTBTokenizer, "OverflowToolbarTokenizer created");
 		assert.strictEqual(this.oOTBTokenizer.getLabelText(), "Test Label", "Label text set correctly on initialization");
 	});
 
-	QUnit.test("No tokens initially", function(assert) {
+	QUnit.test("No tokens are present initially", function(assert) {
 		assert.strictEqual(this.oOTBTokenizer.getTokens().length, 0, "Initially there are no tokens");
 	});
 
@@ -82,51 +82,56 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Add tokens", async function(assert) {
-		var done = assert.async();
+	QUnit.test("Added tokens are reflected in the tokens aggregation", async function(assert) {
+		// Arrange
 		this.oOTBTokenizer.addToken(new Token({ text: "Token A" }));
 		this.oOTBTokenizer.addToken(new Token({ text: "Token B" }));
 
+		// Act
 		await nextUIUpdate();
+
+		// Assert
 		assert.strictEqual(this.oOTBTokenizer.getTokens().length, 2, "Tokens successfully added");
-		done();
 	});
 
-	QUnit.test("Remove a token", async function(assert) {
-		var done = assert.async();
-		var oToken = new Token({ text: "Token to Remove" });
+	QUnit.test("Removing a token decreases the tokens aggregation length", async function(assert) {
+		// Arrange
+		const oToken = new Token({ text: "Token to Remove" });
 		this.oOTBTokenizer.addToken(oToken);
 
 		await nextUIUpdate();
 		assert.strictEqual(this.oOTBTokenizer.getTokens().length, 1, "One token added");
 
+		// Act
 		this.oOTBTokenizer.removeToken(oToken);
 		await nextUIUpdate();
 
+		// Assert
 		assert.strictEqual(this.oOTBTokenizer.getTokens().length, 0, "Token successfully removed");
-		done();
 	});
 
-	QUnit.test("Firing tokenDelete event", async function(assert) {
+	QUnit.test("Firing tokenDelete event triggers the fireTokenDelete handler", async function(assert) {
+		// Arrange
 		const oTokenDeleteSpy = this.spy(this.oOTBTokenizer, "fireTokenDelete");
 		const oToken = new Token({ text: "Token to Remove" });
 
 		const oEvent = {
-			getParameter: function () {
+			getParameter: () => {
 				return this.oOTBTokenizer._getTokensList().getItems()[0];
-			}.bind(this)
+			}
 		};
 
 		this.oOTBTokenizer.addToken(oToken);
 		await nextUIUpdate();
 
+		// Act
 		this.oOTBTokenizer._handleNMoreIndicatorPress();
 		await nextUIUpdate();
 
 		this.oOTBTokenizer._handleListItemDelete(oEvent);
 		await nextUIUpdate();
 
-
+		// Assert
 		assert.ok(oTokenDeleteSpy.called, "Token Delete event should be called");
 	});
 
@@ -142,11 +147,12 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Change labelText property", async function(assert) {
+	QUnit.test("Changing the labelText property is reflected after rendering", async function(assert) {
+		// Act
 		this.oOTBTokenizer.setLabelText("New Label");
-
 		await nextUIUpdate();
 
+		// Assert
 		assert.strictEqual(this.oOTBTokenizer.getLabelText(), "New Label", "Label text property successfully changed");
 	});
 
@@ -204,15 +210,19 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Set overflow render mode", async function(assert) {
+	QUnit.test("Setting overflowMode toggles the renderMode between Overflow and Narrow", async function(assert) {
+		// Act
 		this.oOTBTokenizer.setOverflowMode(true);
 		await nextUIUpdate();
 
+		// Assert
 		assert.ok(this.oOTBTokenizer.getRenderMode(), "Overflow", "Overflow render mode is set");
 
+		// Act
 		this.oOTBTokenizer.setOverflowMode(false);
 		await nextUIUpdate();
 
+		// Assert
 		assert.ok(this.oOTBTokenizer.getRenderMode(false), "Narrow", "Overflow render mode is disabled");
 	});
 
@@ -270,13 +280,17 @@ sap.ui.define([
 	}
 	});
 
-	QUnit.test("First token should have tabindex=0", async function(assert) {
+	QUnit.test("First token should have tabindex=0 when the tokenizer receives focus", async function(assert) {
+		// Arrange
 		const oFirstToken = this.oOTBTokenizer.getTokens()[0];
 		const oMockEvent = { srcControl: oFirstToken };
 
 		await nextUIUpdate();
 
+		// Act
 		this.oOTBTokenizer.onfocusin(oMockEvent);
+
+		// Assert
 		assert.strictEqual(oFirstToken.getDomRef().getAttribute("tabindex"), "0", "The first token has tabindex 0 on focusin");
 	});
 
@@ -297,13 +311,15 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Set renderMode from Narrow to Overflow and back", async function(assert) {
+	QUnit.test("renderMode switches from Narrow to Overflow and back correctly", async function(assert) {
+		// Assert initial state
 		assert.strictEqual(
 			this.oOTBTokenizer.getRenderMode(),
 			"Narrow",
 			"Default render mode is Narrow"
 		);
 
+		// Act: switch to Overflow
 		this.oOTBTokenizer.setProperty("renderMode", "Overflow");
 		await nextUIUpdate();
 		assert.strictEqual(
@@ -312,6 +328,7 @@ sap.ui.define([
 			"Render mode is changed to Overflow"
 		);
 
+		// Act: switch back to Narrow
 		this.oOTBTokenizer.setProperty("renderMode", "Narrow");
 		await nextUIUpdate();
 		assert.strictEqual(
@@ -333,13 +350,14 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Change labelText repeatedly", async function(assert) {
+	QUnit.test("labelText property can be changed multiple times and each change is reflected", async function(assert) {
 		assert.strictEqual(
 			this.oOTBTokenizer.getLabelText(),
 			"Initial Label",
 			"Label text is initially set"
 		);
 
+		// Act: first change
 		this.oOTBTokenizer.setLabelText("Another Label");
 		await nextUIUpdate();
 		assert.strictEqual(
@@ -348,6 +366,7 @@ sap.ui.define([
 			"Label text updated the first time"
 		);
 
+		// Act: second change
 		this.oOTBTokenizer.setLabelText("Final Label");
 		await nextUIUpdate();
 		assert.strictEqual(
@@ -358,19 +377,23 @@ sap.ui.define([
 	});
 
 	QUnit.test("Aggregation 'label' is created only when labelText is set", async function(assert) {
+		// Assert: no label initially (was already set in beforeEach)
 		assert.equal(this.oOTBTokenizer.getAggregation("label"), null, "No 'label' aggregation initially");
 
+		// Act: set label text
 		this.oOTBTokenizer.setLabelText("New Label");
 		await nextUIUpdate();
 		assert.ok(this.oOTBTokenizer.getAggregation("label"), "'label' aggregation created after labelText is set");
 		assert.equal(this.oOTBTokenizer.getAggregation("label").getText(), "New Label", "Label text matches property");
 
+		// Act: clear label text
 		this.oOTBTokenizer.setLabelText("");
 		await nextUIUpdate();
 		assert.notOk(this.oOTBTokenizer.getAggregation("label"), "When the 'labelText' property is emptied, the label aggregation is removed");
 	});
 
 	QUnit.test("Aggregation 'label' updates text if labelText is changed repeatedly", async function(assert) {
+		// Arrange
 		this.oOTBTokenizer.setLabelText("Initial Label");
 		await nextUIUpdate();
 
@@ -378,9 +401,11 @@ sap.ui.define([
 		assert.ok(oLabel, "Label is created");
 		assert.equal(oLabel.getText(), "Initial Label", "Label text is correct initially");
 
-		// Update labelText property
+		// Act: update labelText property
 		this.oOTBTokenizer.setLabelText("Updated Label");
 		await nextUIUpdate();
+
+		// Assert
 		assert.equal(oLabel.getText(), "Updated Label", "Label text is updated");
 	});
 
@@ -399,8 +424,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Aggregation 'moreItemsButton' is created initially as a private aggregation", async function(assert) {
+		// Assert: null initially
 		assert.strictEqual(this.oOTBTokenizer.getAggregation("moreItemsButton"), null, "moreItemsButton aggregation is null initially");
 
+		// Act: set label and switch to Overflow mode
 		this.oOTBTokenizer.setProperty("labelText", "This will become the button text");
 		await nextUIUpdate();
 		this.oOTBTokenizer.setProperty("renderMode", "Overflow");
@@ -408,12 +435,14 @@ sap.ui.define([
 
 		const oButton = this.oOTBTokenizer.getAggregation("moreItemsButton");
 
+		// Assert
 		assert.ok(oButton, "'moreItemsButton' is created in Overflow render mode");
 		assert.ok(oButton.isA("sap.m.Button"), "Aggregation is indeed a sap.m.Button");
 		assert.strictEqual(oButton.getText(), "This will become the button text", "The button text matches the labelText property");
 	});
 
 	QUnit.test("Update labelText changes 'moreItemsButton' text in Overflow mode", async function(assert) {
+		// Arrange
 		this.oOTBTokenizer.setProperty("labelText", "Button text");
 		await nextUIUpdate();
 		this.oOTBTokenizer.setProperty("renderMode", "Overflow");
@@ -425,21 +454,26 @@ sap.ui.define([
 		const sInitialLabel = this.oOTBTokenizer.getLabelText();
 		assert.strictEqual(oButton.getText(), sInitialLabel, "Button text matches the initial label text");
 
+		// Act
 		this.oOTBTokenizer.setLabelText("Changed button text");
 		await nextUIUpdate();
 
+		// Assert
 		assert.strictEqual(oButton.getText(), "Changed button text", "Button text updated when label changes");
 	});
 
 	QUnit.test("Removing the labelText does not break 'moreItemsButton' in Overflow mode", async function(assert) {
+		// Arrange
 		this.oOTBTokenizer.setProperty("renderMode", "Overflow");
 		await nextUIUpdate();
 
 		const oButton = this.oOTBTokenizer.getAggregation("moreItemsButton");
 
+		// Act
 		this.oOTBTokenizer.setLabelText("");
 		await nextUIUpdate();
 
+		// Assert
 		assert.strictEqual(oButton.getText(), "", "Button text is cleared if label text is empty");
 	});
 });

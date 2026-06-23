@@ -293,7 +293,8 @@
 					"sap.m.sample.ComboBoxGrouping",
 					"sap.m.sample.ComboBoxValidation",
 					"sap.m.sample.ComboBoxClearIcon",
-					"sap.m.sample.ComboBoxWrapping"
+					"sap.m.sample.ComboBoxWrapping",
+					"sap.m.sample.ComboBoxMaxPickerHeight"
 				]
 			},
 			{
@@ -1310,7 +1311,8 @@
 					"sap.m.sample.MultiComboBoxGrouping",
 					"sap.m.sample.MultiComboBoxSelectAll",
 					"sap.m.sample.MultiComboBoxClearIcon",
-					"sap.m.sample.MultiComboBoxWrapping"
+					"sap.m.sample.MultiComboBoxWrapping",
+					"sap.m.sample.MultiComboBoxMaxPickerHeight"
 				]
 			},
 			{
@@ -1956,6 +1958,11 @@
 				"id": "sap.m.sample.ComboBoxWrapping",
 				"name": "ComboBox - Suggestions wrapping",
 				"description": "Suggestions wrap automatically when longer then the dropdown width"
+			},
+			{
+				"id": "sap.m.sample.ComboBoxMaxPickerHeight",
+				"name": "ComboBox - maxPickerHeight",
+				"description": "Limit the picker popup height using maxPickerHeight property"
 			},
 			{
 				"id": "sap.m.sample.DateRangeSelection",
@@ -2826,6 +2833,11 @@
 				"id": "sap.m.sample.MultiComboBoxWrapping",
 				"name": "MultiComboBox - Suggestions wrapping",
 				"description": "Suggestions wrap automatically when longer then the dropdown width"
+			},
+			{
+				"id": "sap.m.sample.MultiComboBoxMaxPickerHeight",
+				"name": "MultiComboBox - maxPickerHeight",
+				"description": "Limit the picker popup height using maxPickerHeight property"
 			},
 			{
 				"id": "sap.m.sample.p13n.Container",
