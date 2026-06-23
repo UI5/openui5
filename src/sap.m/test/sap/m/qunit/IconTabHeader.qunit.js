@@ -19,7 +19,8 @@ sap.ui.define([
 	"sap/m/Panel",
 	"sap/m/library",
 	"sap/base/util/Deferred",
-	"sap/ui/core/Element"
+	"sap/ui/core/Element",
+	"sap/ui/Device"
 ], function(
 	Library1,
 	QUnitUtils,
@@ -39,7 +40,8 @@ sap.ui.define([
 	Panel,
 	Library,
 	Deferred,
-	Element
+	Element,
+	Device
 ) {
 	"use strict";
 
@@ -1151,6 +1153,117 @@ sap.ui.define([
 
 		assert.ok(this.oITH._getOverflow().$().hasClass("sapMITHOverflowVisible"), "end overflow button is visible");
 		assert.strictEqual(this.oITH._getOverflow().getText(), "+1", "end overflow button text is correct");
+	});
+
+	QUnit.test("End overflow '+N' shows only the remainder on phone (StartAndEnd)", async function (assert) {
+		// Arrange
+		const oDeviceStub = sinon.stub(Device, "system").value({ phone: true, tablet: false, combi: false, desktop: false });
+
+		// Act
+		this.oITH.setSelectedKey("50");
+		await nextUIUpdate();
+
+		const aItems = this.oITH.getItems(),
+			aVisibleTabs = this.oITH._getItemsInStrip(),
+			oFirstVisibleTab = aVisibleTabs[0],
+			oLastVisibleTab = aVisibleTabs[aVisibleTabs.length - 1];
+
+		const iExpectedStart = aItems.slice(0, aItems.indexOf(oFirstVisibleTab)).length;
+		const iExpectedEnd = aItems.slice(aItems.indexOf(oLastVisibleTab) + 1).length;
+
+		// Assert
+		assert.strictEqual(this.oITH._getStartOverflow().getText(), "+" + iExpectedStart,
+			"start overflow text reflects only hidden tabs");
+		assert.strictEqual(this.oITH._getOverflow().getText(), "+" + iExpectedEnd,
+			"end overflow text reflects only hidden tabs");
+
+		// Clean-up
+		oDeviceStub.restore();
+	});
+
+	QUnit.test("End overflow popover still lists all items on phone (StartAndEnd)", async function (assert) {
+		// Arrange
+		const oDeviceStub = sinon.stub(Device, "system").value({ phone: true, tablet: false, combi: false, desktop: false });
+
+		this.oITH.setSelectedKey("50");
+		await nextUIUpdate();
+
+		// Act
+		const aItemsInEndSlice = this.oITH._getItemsForOverflow(false, false, false);
+		const aItemsInStrip = this.oITH._getItemsInStrip();
+
+		// Assert
+		const bAllStripItemsIncluded = aItemsInStrip.every(function (oItem) {
+			return aItemsInEndSlice.indexOf(oItem) !== -1;
+		});
+		assert.ok(bAllStripItemsIncluded, "all currently-visible tabs are still part of the popover input on phone");
+
+		// Clean-up
+		oDeviceStub.restore();
+	});
+
+	QUnit.test("_getItemsForOverflow honors bExcludeStripItems regardless of device", async function (assert) {
+		// Arrange
+		const oDeviceStub = sinon.stub(Device, "system").value({ phone: true, tablet: false, combi: false, desktop: false });
+
+		this.oITH.setSelectedKey("50");
+		await nextUIUpdate();
+
+		// Act
+		const aItemsInStrip = this.oITH._getItemsInStrip();
+		const aStrictItems = this.oITH._getItemsForOverflow(false, true, true);
+
+		// Assert
+		const bAnyStripLeak = aStrictItems.some(function (oItem) {
+			return aItemsInStrip.indexOf(oItem) !== -1;
+		});
+		assert.notOk(bAnyStripLeak, "strict mode excludes all strip items even on phone");
+
+		// Clean-up
+		oDeviceStub.restore();
+	});
+
+	QUnit.test("Start overflow popover still lists all items on phone (StartAndEnd)", async function (assert) {
+		// Arrange
+		const oDeviceStub = sinon.stub(Device, "system").value({ phone: true, tablet: false, combi: false, desktop: false });
+
+		this.oITH.setSelectedKey("50");
+		await nextUIUpdate();
+
+		// Act
+		const aItemsInStartSlice = this.oITH._getItemsForOverflow(true, false, false);
+		const aItemsInStrip = this.oITH._getItemsInStrip();
+
+		// Assert
+		const bAllStripItemsIncluded = aItemsInStrip.every(function (oItem) {
+			return aItemsInStartSlice.indexOf(oItem) !== -1;
+		});
+		assert.ok(bAllStripItemsIncluded, "all currently-visible tabs are still part of the start popover input on phone");
+
+		// Clean-up
+		oDeviceStub.restore();
+	});
+
+	QUnit.test("Start overflow '+N' shows only the remainder on phone (StartAndEnd)", async function (assert) {
+		// Arrange
+		const oDeviceStub = sinon.stub(Device, "system").value({ phone: true, tablet: false, combi: false, desktop: false });
+
+		// Act
+		this.oITH.setSelectedKey("50");
+		await nextUIUpdate();
+
+		const aItems = this.oITH.getItems(),
+			aVisibleTabs = this.oITH._getItemsInStrip(),
+			oFirstVisibleTab = aVisibleTabs[0];
+
+		const iExpectedStart = aItems.slice(0, aItems.indexOf(oFirstVisibleTab)).length;
+
+		// Assert
+		assert.strictEqual(this.oITH._getStartOverflow().getText(), "+" + iExpectedStart,
+			"start overflow text reflects only hidden tabs on phone");
+
+		// Clean-up
+		oDeviceStub.restore();
 	});
 
 	QUnit.module("Badges - Start overflow", {
