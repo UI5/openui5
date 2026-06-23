@@ -2,7 +2,6 @@
 sap.ui.define([
 	"sap/m/Image",
 	"sap/ui/core/Lib",
-	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/thirdparty/jquery",
 	"sap/m/library",
 	"sap/m/LightBox",
@@ -12,33 +11,34 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/m/VBox",
 	"sap/ui/qunit/utils/createAndAppendDiv",
-	"sap/ui/core/library"
-], function(Image, Library, nextUIUpdate, jQuery, mobileLibrary, LightBox, Page, Text, KeyCodes, Device, VBox, createAndAppendDiv, coreLibrary) {
+	"sap/ui/core/library",
+	"sap/ui/test/utils/nextUIUpdate"
+], function(Image, Library, jQuery, mobileLibrary, LightBox, Page, Text, KeyCodes, Device, VBox, createAndAppendDiv, coreLibrary, nextUIUpdate) {
 	"use strict";
 
 	// shortcut for sap.m.ImageMode
-	var ImageMode = mobileLibrary.ImageMode;
+	const ImageMode = mobileLibrary.ImageMode;
 
 	// shortcut for sap.ui.core.aria.HasPopup
-	var AriaHasPopup = coreLibrary.aria.HasPopup;
+	const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 	createAndAppendDiv("content");
 
-	var IMAGE_PATH = "test-resources/sap/m/images/",
-		sSrc = IMAGE_PATH + "SAPLogo.jpg",
-		sSrc2 = IMAGE_PATH + "SAPLogo@2.jpg",
-		sSrc3 = IMAGE_PATH + "SAPUI5.png",
-		sSrcAction = IMAGE_PATH + "action.png",
-		sSrcActionPressed = IMAGE_PATH + "action_pressed.png",
-		sTooltip = "tooltip",
-		sAlt = "alternative text";
+	const IMAGE_PATH = "test-resources/sap/m/images/";
+	const sSrc = IMAGE_PATH + "SAPLogo.jpg";
+	const sSrc2 = IMAGE_PATH + "SAPLogo@2.jpg";
+	const sSrc3 = IMAGE_PATH + "SAPUI5.png";
+	const sSrcAction = IMAGE_PATH + "action.png";
+	const sSrcActionPressed = IMAGE_PATH + "action_pressed.png";
+	const sTooltip = "tooltip";
+	const sAlt = "alternative text";
 
-	var sControlId = "ImId";
+	const sControlId = "ImId";
 
 	// Creates a Image with generic properties
 	// Config object can be passed as argument. If some property already exist it will be overridden
 	function createImage(oProps) {
-		var oImageProps = {
+		const oImageProps = {
 			src: sSrc,
 			width: "150px",
 			height: "74px"
@@ -49,7 +49,7 @@ sap.ui.define([
 	}
 
 	function createSVGImage(oProps) {
-		var oImageProps = {
+		const oImageProps = {
 			src: "https://openui5.org/7726d076e89ac67994e0a4d96106d534/B_OpenUI5_H.svg",
 			width: "150px",
 			height: "74px"
@@ -63,14 +63,14 @@ sap.ui.define([
 
 	QUnit.test("Image is rendered when it's visible", async function(assert) {
 		// Arrange
-		var oImage = createImage();
+		const oImage = createImage();
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Assert
-		var $oImage = oImage.$();
+		const $oImage = oImage.$();
 		assert.ok($oImage.hasClass("sapMImg"), "Image is rendered.");
 		assert.ok(($oImage !== undefined) && ($oImage != null), "oImage should not be null");
 
@@ -80,16 +80,16 @@ sap.ui.define([
 
 	QUnit.test("Image is not rendered when it's not visible", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 			visible: false
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Assert
-		var $oImage = oImage.$();
+		const $oImage = oImage.$();
 		assert.ok(!$oImage.hasClass("sapMImg"), "sapMImage class is not found.");
 		assert.ok(!document.getElementById(sControlId) , "oImage is not rendered");
 
@@ -99,25 +99,25 @@ sap.ui.define([
 
 	QUnit.test("Image is rendered with correct backgroundPosition value", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 			mode: "Background"
-		}),
-		aTestInputValues = ["left top", "right bottom", "right top", "50% 50%", "10px 20px", "initial", " left  top ", "50px;5px solid red", '50px" onerror='],
-		aExpOutputValues = ["left top", "right bottom", "right top", "50% 50%", "10px 20px", "initial", "left top", "" /*invalid value should be discarded*/, "" /*invalid value should be discarded*/];
+		});
+		const aTestInputValues = ["left top", "right bottom", "right top", "50% 50%", "10px 20px", "initial", " left  top ", "50px;5px solid red", '50px" onerror='];
+		const aExpOutputValues = ["left top", "right bottom", "right top", "50% 50%", "10px 20px", "initial", "left top", "" /*invalid value should be discarded*/, "" /*invalid value should be discarded*/];
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		aTestInputValues.forEach(function(sTestValue, iIndex) {
-			oImage.setBackgroundPosition(sTestValue);
+		for (let iIndex = 0; iIndex < aTestInputValues.length; iIndex++) {
+			oImage.setBackgroundPosition(aTestInputValues[iIndex]);
 			oImage.invalidate();
-			nextUIUpdate.runSync()/*context not obviously suitable for an async function*/;
+			await nextUIUpdate();
 
 			// Assert
-			var oImageDom = oImage.getDomRef();
+			const oImageDom = oImage.getDomRef();
 			assert.strictEqual(oImageDom.style.backgroundPosition, aExpOutputValues[iIndex], "correct property value");
-		});
+		}
 
 		// Clean up
 		oImage.destroy();
@@ -125,27 +125,27 @@ sap.ui.define([
 
 	QUnit.test("Image is rendered with correct backgroundSize value", async function(assert) {
 		// Arrange
-		var oImage = createImage({
-				mode: "Background"
-			}),
-			// BCP: 1970042795 - There is no "auto" value for FireFox
-			sAuto = Device.browser.firefox ? "initial" : "auto",
-			aTestInputValues = ["50% 50%", "10px 20px", "initial", sAuto, "cover", "contain", "50px;5px solid red", '50px" onerror='],
-			aExpOutputValues = ["50% 50%", "10px 20px", "initial", sAuto, "cover", "contain", "" /*invalid value should be discarded*/, "" /*invalid value should be discarded*/];
+		const oImage = createImage({
+			mode: "Background"
+		});
+		// BCP: 1970042795 - There is no "auto" value for FireFox
+		const sAuto = Device.browser.firefox ? "initial" : "auto";
+		const aTestInputValues = ["50% 50%", "10px 20px", "initial", sAuto, "cover", "contain", "50px;5px solid red", '50px" onerror='];
+		const aExpOutputValues = ["50% 50%", "10px 20px", "initial", sAuto, "cover", "contain", "" /*invalid value should be discarded*/, "" /*invalid value should be discarded*/];
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		aTestInputValues.forEach(function(sTestValue, iIndex) {
-			oImage.setBackgroundSize(sTestValue);
+		for (let iIndex = 0; iIndex < aTestInputValues.length; iIndex++) {
+			oImage.setBackgroundSize(aTestInputValues[iIndex]);
 			oImage.invalidate();
-			nextUIUpdate.runSync()/*context not obviously suitable for an async function*/;
+			await nextUIUpdate();
 
 			// Assert
-			var oImageDom = oImage.getDomRef();
+			const oImageDom = oImage.getDomRef();
 			assert.strictEqual(oImageDom.style.backgroundSize, aExpOutputValues[iIndex], "correct property value");
-		});
+		}
 
 		// Clean up
 		oImage.destroy();
@@ -153,25 +153,25 @@ sap.ui.define([
 
 	QUnit.test("Image is rendered with correct backgroundRepeat value", async function(assert) {
 		// Arrange
-		var oImage = createImage({
-				mode: "Background"
-			}),
-			aTestInputValues = ["repeat", "repeat-x", "repeat-y", "no-repeat", "space", "round", "initial", "initial;5px solid red", 'initial" onerror='],
-			aExpOutputValues = ["repeat", "repeat-x", "repeat-y", "no-repeat", "space", "round", "initial", "" /*invalid value should be discarded*/, "" /*invalid value should be discarded*/];
+		const oImage = createImage({
+			mode: "Background"
+		});
+		const aTestInputValues = ["repeat", "repeat-x", "repeat-y", "no-repeat", "space", "round", "initial", "initial;5px solid red", 'initial" onerror='];
+		const aExpOutputValues = ["repeat", "repeat-x", "repeat-y", "no-repeat", "space", "round", "initial", "" /*invalid value should be discarded*/, "" /*invalid value should be discarded*/];
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		aTestInputValues.forEach(function(sTestValue, iIndex) {
-			oImage.setBackgroundRepeat(sTestValue);
+		for (let iIndex = 0; iIndex < aTestInputValues.length; iIndex++) {
+			oImage.setBackgroundRepeat(aTestInputValues[iIndex]);
 			oImage.invalidate();
-			nextUIUpdate.runSync()/*context not obviously suitable for an async function*/;
+			await nextUIUpdate();
 
 			// Assert
-			var oImageDom = oImage.getDomRef();
+			const oImageDom = oImage.getDomRef();
 			assert.strictEqual(oImageDom.style.backgroundRepeat, aExpOutputValues[iIndex], "correct property value");
-		});
+		}
 
 		// Clean up
 		oImage.destroy();
@@ -179,16 +179,16 @@ sap.ui.define([
 
 	QUnit.test("Image is rendered with detailBox", async function(assert) {
 		// Arrange
-		var oImage = createImage();
+		const oImage = createImage();
 
 		oImage.setDetailBox(new LightBox());
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Assert
-		var oInnerImg = oImage.$("inner")[0];
+		const oInnerImg = oImage.$("inner")[0];
 		assert.ok(oInnerImg.id, "Internal image has an id.");
 		assert.equal(oImage.getFocusDomRef(), oInnerImg, "FocusDomRef is correct");
 
@@ -198,19 +198,20 @@ sap.ui.define([
 
 	QUnit.test("Image in 'Svg' mode renders inline 'svg'", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 				src: ("/testsuite/test-resources/sap/m/demokit/sample/Image/images/sap-logo.svg"),
 				mode: "InlineSvg"
-			}),
-			fnDone = assert.async(),
-			oSpy = this.spy(oImage.getRenderer(), "_renderSvg");
+			});
+		const fnDone = assert.async();
+		const oSpy = this.spy(oImage.getRenderer(), "_renderSvg");
 
 		assert.expect(1);
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// wait for async SVG load/render
 		setTimeout(function() {
 			// Assert
 			assert.ok(oSpy.called, "Inline svg is rendered");
@@ -223,13 +224,13 @@ sap.ui.define([
 
 	QUnit.test("Inline Svg with relative links renders correctly", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 				src: (IMAGE_PATH + "avatar_with_nested_images.svg"),
 				mode: "InlineSvg"
-			}),
-			fnDone = assert.async(),
-			oSpy = this.spy(oImage, "_toAbsoluteUrl"),
-			iRerenderingCount = 0;
+			});
+		const fnDone = assert.async();
+		const oSpy = this.spy(oImage, "_toAbsoluteUrl");
+		let iRerenderingCount = 0;
 
 		assert.expect(2);
 
@@ -248,26 +249,27 @@ sap.ui.define([
 			}
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
-		await await nextUIUpdate();
+		await nextUIUpdate();
 	});
 
 	QUnit.test("Svg data is cached, so upon rerendering svg is not requested twice, but it is still rendered inline", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 				src: ("/testsuite/test-resources/sap/m/demokit/sample/Image/images/sap-logo.svg"),
 				mode: "InlineSvg"
-			}),
-			fnDone = assert.async(),
-			oSpy;
+			});
+		const fnDone = assert.async();
+		let oSpy;
 
 		assert.expect(1);
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// wait for async SVG load before testing cache behavior
 		setTimeout(function() {
 			// Act
 			oImage.setWidth("200px");
@@ -289,39 +291,40 @@ sap.ui.define([
 
 	QUnit.test("Multiple InlineSvg images have unique scoped IDs", async function(assert) {
 		// Arrange - Use same SVG file three times to test duplicate ID handling
-		var sSvgPath = IMAGE_PATH + "avatar_with_nested_images.svg",
-			oImage1 = new Image("image1", { src: sSvgPath, mode: "InlineSvg" }),
-			oImage2 = new Image("image2", { src: sSvgPath, mode: "InlineSvg" }),
-			oImage3 = new Image("image3", { src: sSvgPath, mode: "InlineSvg" }),
-			fnDone = assert.async(),
-			iRerenderingCount = 0;
+		const sSvgPath = IMAGE_PATH + "avatar_with_nested_images.svg";
+		const oImage1 = new Image("image1", { src: sSvgPath, mode: "InlineSvg" });
+		const oImage2 = new Image("image2", { src: sSvgPath, mode: "InlineSvg" });
+		const oImage3 = new Image("image3", { src: sSvgPath, mode: "InlineSvg" });
+		const fnDone = assert.async();
+		let iRerenderingCount = 0;
 
 		assert.expect(4);
 
 		oImage3.addEventDelegate({
 			onAfterRendering: function () {
 				if (iRerenderingCount === 1) {
+					// wait for all SVG content to be fully rendered into the DOM
 					setTimeout(function() {
 						// Assert 1: No duplicate IDs in DOM
-						var aAllIds = [];
-						document.querySelectorAll("pattern[id]").forEach(function(pattern) {
+						const aAllIds = [];
+						document.querySelectorAll("pattern[id]").forEach((pattern) => {
 							aAllIds.push(pattern.id);
 						});
-						var bNoDuplicates = aAllIds.length === new Set(aAllIds).size;
+						const bNoDuplicates = aAllIds.length === new Set(aAllIds).size;
 						assert.ok(bNoDuplicates, "No duplicate IDs found in the DOM");
 
 						// Assert 2: IDs are scoped with control ID
-						var oPattern1 = oImage1.$().find("pattern[id]")[0];
+						const oPattern1 = oImage1.$().find("pattern[id]")[0];
 						assert.ok(oPattern1.id.indexOf("image1--") === 0, "Pattern IDs are scoped with control ID");
 
 						// Assert 3: All url(#id) references work
-						var bAllReferencesValid = true;
-						document.querySelectorAll("path[fill^='url(#']").forEach(function(path) {
-							var sFill = path.getAttribute("fill");
-							var iStart = sFill.indexOf("url(#") + 5;
-							var iEnd = sFill.indexOf(")", iStart);
+						let bAllReferencesValid = true;
+						document.querySelectorAll("path[fill^='url(#']").forEach((path) => {
+							const sFill = path.getAttribute("fill");
+							const iStart = sFill.indexOf("url(#") + 5;
+							const iEnd = sFill.indexOf(")", iStart);
 							if (iEnd > iStart) {
-								var sRefId = sFill.substring(iStart, iEnd);
+								const sRefId = sFill.substring(iStart, iEnd);
 								if (!document.getElementById(sRefId)) {
 									bAllReferencesValid = false;
 								}
@@ -331,11 +334,10 @@ sap.ui.define([
 
 						// Assert 4: Re-rendering doesn't cause double-scoping
 						oImage1.setWidth("100px");
-						nextUIUpdate.runSync()/*context not obviously suitable for an async function*/;
-
+						// wait for re-render after width change to verify no double-scoping
 						setTimeout(function() {
-							var oPatternAfter = oImage1.$().find("pattern[id]")[0];
-							var bNoDoubleScoping = oPatternAfter.id.split("--").length === 2;
+							const oPatternAfter = oImage1.$().find("pattern[id]")[0];
+							const bNoDoubleScoping = oPatternAfter.id.split("--").length === 2;
 							assert.ok(bNoDoubleScoping, "Re-rendering doesn't cause double-scoping");
 
 							// Clean up
@@ -358,17 +360,18 @@ sap.ui.define([
 
 	QUnit.module("Rendering decorative image");
 
-	QUnit.test("Alt text and tooltip", async function(assert) {
+	QUnit.test("Decorative image renders empty alt text and correct tooltip", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 			tooltip: sTooltip,
 			alt: sAlt
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// Assert
 		// read alt attribute from DOM
 		assert.equal(jQuery("#" + sControlId).attr("alt"), "", "alt text of oImage should be an empty string because the image is decorative");
 
@@ -379,16 +382,17 @@ sap.ui.define([
 		oImage.destroy();
 	});
 
-	QUnit.test("Alt text and tooltip when empty", async function(assert) {
+	QUnit.test("Decorative image with no alt or tooltip renders empty alt and no title", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 			decorative: true
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// Assert
 		assert.equal(document.getElementById(sControlId).getAttribute("alt"), "", "alt attribute of oImage should be an empty string because the image is decorative");
 		assert.equal(document.getElementById(sControlId).getAttribute("title"), null, "title attribute of oImage should NOT be rendered");
 
@@ -397,16 +401,17 @@ sap.ui.define([
 	});
 
 	QUnit.test("Decorative Image ARIA", async function(assert) {
-		var oImage = createImage({
+		// Arrange
+		const oImage = createImage({
 			alt: "abcd"
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Assert
-		var $oImage = oImage.$();
+		const $oImage = oImage.$();
 		assert.equal($oImage.attr("role"), "presentation", "role is set to presentation");
 		assert.equal($oImage.attr("aria-hidden"), "true", "aria-hidden is set to true");
 		assert.ok(!$oImage.attr("alt"), "alt is kept empty");
@@ -423,18 +428,19 @@ sap.ui.define([
 
 	QUnit.module("Rendering non decorative image");
 
-	QUnit.test("Alt text and tooltip", async function(assert) {
+	QUnit.test("Non-decorative image renders alt text and tooltip correctly", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 			decorative: false,
 			tooltip: sTooltip,
 			alt: sAlt
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// Assert
 		// read alt attribute from DOM
 		assert.equal(jQuery("#" + sControlId).attr("alt"), sAlt, "alt text of oImage should be rendered");
 
@@ -445,13 +451,13 @@ sap.ui.define([
 		oImage.destroy();
 	});
 
-	QUnit.test("Alt text and tooltip when both are empty", async function(assert) {
+	QUnit.test("Non-decorative image with no alt or tooltip renders no alt or title attributes", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 			decorative: false
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -463,14 +469,14 @@ sap.ui.define([
 		oImage.destroy();
 	});
 
-	QUnit.test("Alt text and tooltip when one of them is empty", async function(assert) {
+	QUnit.test("Non-decorative image uses tooltip as alt text when only tooltip is set", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 			decorative: false,
 			tooltip: sTooltip
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -489,18 +495,19 @@ sap.ui.define([
 	});
 
 	QUnit.test("Non decorative Image ARIA", async function(assert) {
-		var oImage = createImage({
+		// Arrange
+		const oImage = createImage({
 			decorative: false,
 			tooltip: sTooltip,
 			alt: sAlt
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Assert
-		var $oImage = oImage.$();
+		const $oImage = oImage.$();
 		assert.equal($oImage.attr("alt"), sAlt, "alt is rendered");
 		assert.equal($oImage.attr("aria-label"), sAlt, "aria-label is rendered");
 		assert.equal($oImage.attr("title"), sTooltip, "title is rendered");
@@ -514,10 +521,11 @@ sap.ui.define([
 
 	QUnit.module("Mode property");
 
-	QUnit.test("Default mode property", async function(assert) {
-		var oImage = createImage();
+	QUnit.test("Default mode property is set to sap.m.ImageMode.Image", async function(assert) {
+		// Arrange
+		const oImage = createImage();
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -529,20 +537,20 @@ sap.ui.define([
 	});
 
 	// BCP: 1880373683 - on zoom 150% img URL is appended with @2 for high density image
-	QUnit.test("Image with mode sap.m.ImageMode.Background", async function(assert) {
-		var done = assert.async();
-		var oImage = createImage({
+	QUnit.test("Image with mode sap.m.ImageMode.Background renders background-image CSS correctly", async function(assert) {
+		const done = assert.async();
+		const oImage = createImage({
 			mode: ImageMode.Background
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Assert
 		jQuery(oImage._oImage).on("load", function() {
-			var $Image = oImage.$(),
-					sBackgroundImage = $Image.css("background-image");
+			const $Image = oImage.$();
+			const sBackgroundImage = $Image.css("background-image");
 
 			assert.equal(sBackgroundImage.indexOf("url("), 0, "The background-image CSS style starts with 'url('");
 			assert.equal(sBackgroundImage.charAt(sBackgroundImage.length - 1), ")", "The background-image CSS style ends with ')'");
@@ -569,8 +577,8 @@ sap.ui.define([
 		oAssert.expect(7);
 
 		// Arrange
-		var oLightBox = new LightBox(),
-			fnDone = oAssert.async();
+		const oLightBox = new LightBox();
+		const fnDone = oAssert.async();
 
 		// Act
 		this.oImage.setDetailBox(oLightBox);
@@ -605,10 +613,10 @@ sap.ui.define([
 
 	QUnit.test("detailBox lifecycle and events", function (oAssert) {
 		// Arrange
-		var oLightBoxA = new LightBox(),
-			oLightBoxB = new LightBox(),
-			oAttachPressSpy = sinon.spy(this.oImage, "attachPress"),
-			oDetachPressSpy = sinon.spy(this.oImage, "detachPress");
+		const oLightBoxA = new LightBox();
+		const oLightBoxB = new LightBox();
+		const oAttachPressSpy = sinon.spy(this.oImage, "attachPress");
+		const oDetachPressSpy = sinon.spy(this.oImage, "detachPress");
 
 		// Act - set LightBox
 		this.oImage.setDetailBox(oLightBoxA);
@@ -652,13 +660,12 @@ sap.ui.define([
 
 	QUnit.test("detailBox and Image cloning of press event handler", function (assert) {
 		// Arrange
-		var oLightBox = new LightBox(),
-			oImageClone;
+		const oLightBox = new LightBox();
 
 		this.oImage.setDetailBox(oLightBox);
 
 		// Act - clone the Image
-		oImageClone = this.oImage.clone();
+		const oImageClone = this.oImage.clone();
 
 		// Assert
 		assert.strictEqual(oImageClone.hasListeners("press"), true, "Press event listener is cloned");
@@ -669,63 +676,81 @@ sap.ui.define([
 
 	QUnit.module("Associations");
 
-	QUnit.test("ariaLabelledBy", async function(assert) {
-		var oSampleText = new Text("sampleText", {
+	QUnit.test("ariaLabelledBy association is correctly rendered on the image DOM element", async function (assert) {
+		// Arrange
+		const oSampleText = new Text("sampleText", {
 			text: "Sample text"
-		}), oAnotherText = new Text("anotherText", {
+		});
+		const oAnotherText = new Text("anotherText", {
 			text: "Another text"
-		}), oLabelledImage = new Image("labelledImage", {
+		});
+		const oLabelledImage = new Image("labelledImage", {
 			decorative: false,
 			ariaLabelledBy: [oSampleText, oAnotherText]
 		});
 
+		// Act
 		oLabelledImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// Assert
 		assert.notOk(oLabelledImage.$().attr("aria-describedby"), "Image with only ariaLabelledBy association shouldn't have aria-describedby attribute");
 		assert.strictEqual(oLabelledImage.$().attr("aria-labelledby"), "sampleText anotherText", "aria-labelledby association is set correctly");
 
+		// Clean up
 		oLabelledImage.destroy();
 		oSampleText.destroy();
 		oAnotherText.destroy();
 	});
 
-	QUnit.test("ariaDescribedBy", async function(assert) {
-		var oSampleText = new Text("sampleText", {
+	QUnit.test("ariaDescribedBy association is correctly rendered on the image DOM element", async function (assert) {
+		// Arrange
+		const oSampleText = new Text("sampleText", {
 			text: "Sample text"
-		}), oAnotherText = new Text("anotherText", {
+		});
+		const oAnotherText = new Text("anotherText", {
 			text: "Another text"
-		}), oDescribedImage = new Image("describedImage", {
+		});
+		const oDescribedImage = new Image("describedImage", {
 			decorative: false,
 			ariaDescribedBy: [oSampleText, oAnotherText]
 		});
 
+		// Act
 		oDescribedImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// Assert
 		assert.notOk(oDescribedImage.$().attr("aria-labelledby"), "Image with only ariaDescribedBy association shouldn't have aria-labelledby attribute");
 		assert.strictEqual(oDescribedImage.$().attr("aria-describedby"), "sampleText anotherText", "aria-describedby association is set correctly");
 
+		// Clean up
 		oDescribedImage.destroy();
 		oSampleText.destroy();
 		oAnotherText.destroy();
 	});
 
-	QUnit.test("ariaDetails", async function(assert) {
-		var oSampleText = new Text("sampleText", {
+	QUnit.test("ariaDetails association is correctly rendered on the image DOM element", async function (assert) {
+		// Arrange
+		const oSampleText = new Text("sampleText", {
 			text: "Sample text"
-		}), oAnotherText = new Text("anotherText", {
+		});
+		const oAnotherText = new Text("anotherText", {
 			text: "Another text"
-		}), oDescribedImage = new Image("describedImage", {
+		});
+		const oDescribedImage = new Image("describedImage", {
 			decorative: false,
 			ariaDetails: [oSampleText, oAnotherText]
 		});
 
+		// Act
 		oDescribedImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// Assert
 		assert.strictEqual(oDescribedImage.$().attr("aria-details"), "sampleText anotherText", "aria-details association is set correctly");
 
+		// Clean up
 		oDescribedImage.destroy();
 		oSampleText.destroy();
 		oAnotherText.destroy();
@@ -734,15 +759,16 @@ sap.ui.define([
 
 	QUnit.module("Dimensions");
 
-	QUnit.test("Default Offset Dimensions", async function(assert) {
-		var oImage = createImage();
+	QUnit.test("Default offset dimensions match width and height properties", async function(assert) {
+		// Arrange
+		const oImage = createImage();
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		// test the initial dimensions
-		var oDomRef = document.getElementById(sControlId);
+		// Assert
+		const oDomRef = document.getElementById(sControlId);
 		assert.equal(oDomRef.offsetWidth, parseInt(oImage.getWidth()), "oImage.offsetWidth should equal " + parseInt(oImage.getWidth()));
 		assert.equal(oDomRef.offsetHeight, parseInt(oImage.getHeight()), "oImage.offsetHeight should equal " + parseInt(oImage.getHeight()));
 
@@ -751,10 +777,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Original Width", async function(assert) {
-		var done = assert.async();
-		var oImage = createImage();
+		const done = assert.async();
+		const oImage = createImage();
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -763,8 +789,9 @@ sap.ui.define([
 		oImage.setHeight("");
 		await nextUIUpdate();
 
+		// wait for the browser to recalculate natural image dimensions after clearing width/height
 		setTimeout(function() {
-			var oDomRef = window.document.getElementById(sControlId);
+			const oDomRef = window.document.getElementById(sControlId);
 			assert.equal(oDomRef.offsetWidth, 150, "oImage.offsetWidth should equal 150");
 			assert.equal(oDomRef.offsetHeight, 74, "oImage.offsetHeight should equal 74");
 
@@ -775,10 +802,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Dimension Changes", async function(assert) {
-		var done = assert.async();
-		var oImage = createImage();
+		const done = assert.async();
+		const oImage = createImage();
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -788,8 +815,9 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// Assert
+		// wait for the browser to apply the new dimension constraints on the image
 		setTimeout(function() {
-			var oDomRef = document.getElementById(sControlId);
+			const oDomRef = document.getElementById(sControlId);
 			assert.equal(oDomRef.offsetWidth, 292, "oImage.offsetWidth should equal 292");
 			assert.equal(oDomRef.offsetHeight, 292, "oImage.offsetHeight should equal 292");
 
@@ -800,10 +828,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Aspect Ratio", async function(assert) {
-		var done = assert.async();
-		var oImage = createImage();
+		const done = assert.async();
+		const oImage = createImage();
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -812,8 +840,9 @@ sap.ui.define([
 		oImage.setHeight("");
 		await nextUIUpdate();
 
+		// wait for the browser to recalculate the image height based on the new width and natural aspect ratio
 		setTimeout(function() {
-			var oDomRef = window.document.getElementById(sControlId);
+			const oDomRef = window.document.getElementById(sControlId);
 			assert.equal(oDomRef.offsetWidth, 300, "oImage.offsetWidth should equal 300");
 			assert.equal(oDomRef.offsetHeight, 148, "oImage.offsetHeight should equal 148");
 
@@ -827,21 +856,22 @@ sap.ui.define([
 	QUnit.module("Density Aware");
 
 	if (window.devicePixelRatio > 1) {
-		QUnit.test("Density Aware default value (false)", async function(assert) {
-			var done = assert.async();
-			var oImage = createImage({
+		QUnit.test("Density Aware default value is false and loads standard image", async function(assert) {
+			const done = assert.async();
+			const oImage = createImage({
 				width: "",
 				height: ""
 			});
 
-			// System under test
+			// Act
 			oImage.placeAt("qunit-fixture");
 			await nextUIUpdate();
 
+			// wait for the image to load and verify the non-density-aware src is used
 			setTimeout(function() {
 				assert.equal(jQuery("#" + sControlId).attr("src"), sSrc, "oImage is NOT density aware, it loads the default image.");
 
-				var oDomRef = document.getElementById(sControlId);
+				const oDomRef = document.getElementById(sControlId);
 
 				assert.equal(oDomRef.offsetWidth, 150, "density perfect image also has the default size");
 				assert.equal(oDomRef.offsetHeight, 74, "density perfect image also has the default size");
@@ -852,22 +882,23 @@ sap.ui.define([
 			}, 1000);
 		});
 
-		QUnit.test("Density Aware set to true", async function(assert) {
-			var done = assert.async();
-			var oImage = createImage({
+		QUnit.test("Density Aware set to true loads high-resolution image on high-DPI display", async function(assert) {
+			const done = assert.async();
+			const oImage = createImage({
 				densityAware: true,
 				width: "",
 				height: ""
 			});
 
-			// System under test
+			// Act
 			oImage.placeAt("qunit-fixture");
 			await nextUIUpdate();
 
+			// wait for the image to load and verify the density-perfect src is used
 			setTimeout(function() {
 				assert.equal(jQuery("#" + sControlId).attr("src"), sSrc2, "oImage is density aware, so it loads the density perfect image.");
 
-				var oDomRef = document.getElementById(sControlId);
+				const oDomRef = document.getElementById(sControlId);
 
 				assert.equal(oDomRef.offsetWidth, 150, "default image has the default size");
 				assert.equal(oDomRef.offsetHeight, 74, "default image has the default size");
@@ -879,18 +910,19 @@ sap.ui.define([
 		});
 
 		QUnit.test("Loading default image when high resolution image not available", async function(assert) {
-			var done = assert.async();
-			var oImage = createImage({
+			const done = assert.async();
+			const oImage = createImage({
 				densityAware: true,
 				src: sSrc3
 			});
 
-			// System under test
+			// Act
 			oImage.placeAt("qunit-fixture");
 			await nextUIUpdate();
 
+			// wait for image load to confirm fallback to default image when @2 version is missing
 			setTimeout(function() {
-				var oDomRef = document.getElementById(sControlId);
+				const oDomRef = document.getElementById(sControlId);
 				assert.equal(jQuery("#" + sControlId).attr("src"), sSrc3, "default image should be loaded because the high resolution version isn't available");
 				assert.equal(oDomRef.naturalWidth === 100, true, "default image loaded successfully");
 
@@ -902,18 +934,18 @@ sap.ui.define([
 	}
 
 	QUnit.test("Image with density 1.5, source handling after rerendering", async function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 		this.stub(Image, "_currentDevicePixelRatio").value(1.5);
 
-		var oImage = createImage({ densityAware: true });
+		const oImage = createImage({ densityAware: true });
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		oImage.$().on("load", function() {
 			assert.ok(oImage.$().attr("src").indexOf("@2") !== -1, "@2 version of image is taken");
-			oImage.invalidate(); // force re-rendering
+			oImage.invalidate();
 			nextUIUpdate.runSync()/*context not obviously suitable for an async function*/;
 			oImage.$().on("load", function() {
 				assert.ok(oImage.$().attr("src").indexOf("@2") !== -1, "@2 version of image is still taken");
@@ -927,19 +959,19 @@ sap.ui.define([
 	QUnit.module("Src and ActiveSrc properties");
 
 	if (window.devicePixelRatio === 1) {
-		QUnit.test("Active Source Changed when pressed", async function(assert) {
-			var done = assert.async();
-			var oImage = createImage({
+		QUnit.test("Active Source changes to activeSrc when pressed and reverts on release", async function(assert) {
+			const done = assert.async();
+			const oImage = createImage({
 				src: sSrcAction,
 				activeSrc: sSrcActionPressed,
 				alt: sAlt
 			});
 
-			// System under test
+			// Act
 			oImage.placeAt("qunit-fixture");
 			await nextUIUpdate();
 
-			var $oImage = jQuery("#" + sControlId);
+			const $oImage = jQuery("#" + sControlId);
 
 			oImage.ontouchstart({
 				targetTouches: [{}],
@@ -947,6 +979,7 @@ sap.ui.define([
 				srcControl: oImage
 			});
 
+			// wait for src switch animation after touch start
 			setTimeout(function() {
 				assert.equal($oImage.attr("src"), sSrcActionPressed);
 
@@ -954,6 +987,7 @@ sap.ui.define([
 					targetTouches: []
 				});
 
+				// wait for src revert animation after touch end
 				setTimeout(function() {
 					assert.equal($oImage.attr("src"), sSrcAction);
 					// Clean up
@@ -964,50 +998,50 @@ sap.ui.define([
 		});
 	}
 
-	QUnit.test("Image with valid src", async function(assert) {
-		var done = assert.async();
+	QUnit.test("Image with valid src fires load event and is visible", async function(assert) {
+		const done = assert.async();
 
-		var oLoadSpy = sinon.spy(function() {
-				var $Image = oImage.$();
+		const oLoadSpy = sinon.spy(function() {
+				const $Image = oImage.$();
 				assert.equal($Image.css("visibility"), "visible", "Image with valid src should be visible");
 				assert.equal(oErrorSpy.callCount, 0, "Error handler isn't called");
 
 				oImage.destroy();
 				done();
-			}),
-			oErrorSpy = sinon.spy();
+			});
+		const oErrorSpy = sinon.spy();
 
-		var oImage = createImage({
+		const oImage = createImage({
 			src: sSrcAction,
 			load: oLoadSpy,
 			error: oErrorSpy
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 	});
 
-	QUnit.test("Image with Invalid src and src change", async function(assert) {
-		var done = assert.async();
-		var oLoadSpy = sinon.spy(function() {
-				var $oImage = jQuery("#" + sControlId);
+	QUnit.test("Image with invalid src shows alt text and becomes visible again after valid src is set", async function(assert) {
+		const done = assert.async();
+		const oLoadSpy = sinon.spy(function() {
+				const $oImage = jQuery("#" + sControlId);
 				assert.equal($oImage.css("visibility"), "visible", "Image with valid src should be set back to visible");
 				assert.equal(oErrorSpy.callCount, 1, "error handler isn't called again");
 
 				oImage.destroy();
 				done();
-			}),
-			oErrorSpy = sinon.spy(function() {
+			});
+		const oErrorSpy = sinon.spy(function() {
 				assert.equal(oLoadSpy.callCount, 0 ,"load handler shouldn't be called");
 
-				var $oImage = jQuery("#" + sControlId);
+				const $oImage = jQuery("#" + sControlId);
 				assert.equal($oImage.css("visibility"), "visible", "Image with invalid src should be visible to show the alt text");
 
 				oImage.setSrc(sSrcAction);
 			});
 
-		var oImage = createImage({
+		const oImage = createImage({
 			decorative: false,
 			alt: "invalid picture",
 			src: "invalid_src.png",
@@ -1017,30 +1051,30 @@ sap.ui.define([
 			error: oErrorSpy
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 	});
 
-	QUnit.test("Image with invalid src, no alt text and decorative mode - true", function(assert) {
+	QUnit.test("Image with invalid src, no alt text and decorative mode true adds sapMNoImg class", function(assert) {
 		assert.expect(2);
 
 		// Arrange
-		var fnDone = assert.async(),
-				oErrorSpy = sinon.spy(function() {
-					// Assert
-					assert.strictEqual(oErrorSpy.callCount, 1, "Error spy called once");
-					assert.ok(oImage.$().hasClass("sapMNoImg"),
-							"'sapMNoImg' class should not be removed from the control");
+		const fnDone = assert.async();
+		const oErrorSpy = sinon.spy(function() {
+				// Assert
+				assert.strictEqual(oErrorSpy.callCount, 1, "Error spy called once");
+				assert.ok(oImage.$().hasClass("sapMNoImg"),
+						"'sapMNoImg' class should not be removed from the control");
 
-					// Cleanup
-					oImage.destroy();
-					fnDone();
-				}),
-				oImage = createImage({
-					src: "invalid_src.png",
-					error: oErrorSpy
-				});
+				// Cleanup
+				oImage.destroy();
+				fnDone();
+			});
+		const oImage = createImage({
+				src: "invalid_src.png",
+				error: oErrorSpy
+			});
 
 		// Act
 		oImage.placeAt("qunit-fixture");
@@ -1048,18 +1082,20 @@ sap.ui.define([
 
 	QUnit.module("Tabindex");
 
-	QUnit.test("Existence of attribute tabindex", async function(assert) {
-		var fn1 = function() {},
-			fn2 = function() {},
-			oImage = createImage({
-				press: fn1
-			});
+	QUnit.test("tabindex attribute is added when press handler is attached and removed when all handlers are detached", async function(assert) {
+		// Arrange
+		const fn1 = function() {};
+		const fn2 = function() {};
+		const oImage = createImage({
+			press: fn1
+		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		var $Image = oImage.$();
+		// Assert
+		const $Image = oImage.$();
 		assert.equal($Image.attr("tabindex"), "0", "tabindex 0 is output");
 		assert.equal($Image.attr("role"), "button", "role is set to button");
 
@@ -1093,10 +1129,13 @@ sap.ui.define([
 
 	QUnit.module("Accessibility");
 
-	QUnit.test("getAccessibilityInfo", function(assert) {
-		var oImage = new Image({alt: "Alt", tooltip: "Tooltip"});
+	QUnit.test("getAccessibilityInfo returns correct values for decorative and non-decorative images", function(assert) {
+		// Arrange
+		const oImage = new Image({alt: "Alt", tooltip: "Tooltip"});
+
+		// Assert
 		assert.ok(!!oImage.getAccessibilityInfo, "Image has a getAccessibilityInfo function");
-		var oInfo = oImage.getAccessibilityInfo();
+		let oInfo = oImage.getAccessibilityInfo();
 		assert.ok(!oInfo, "getAccessibilityInfo returns no info object in case of decorative images");
 		oImage.setDecorative(false);
 		oInfo = oImage.getAccessibilityInfo();
@@ -1116,9 +1155,9 @@ sap.ui.define([
 		oImage.destroy();
 	});
 
-	QUnit.test("aria-haspopup on image with press handled", async function(assert) {
+	QUnit.test("aria-haspopup is rendered correctly when set on image with press handler", async function(assert) {
 		// Arrange
-		var oImage = new Image();
+		const oImage = new Image();
 
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
@@ -1139,11 +1178,11 @@ sap.ui.define([
 
 	QUnit.module("Bug fixes");
 
-	QUnit.test("Change image src in case detailBox is present", async function(assert) {
-		var oImage = createImage();
-		var oLightBox = new LightBox();
-
+	QUnit.test("Image src attribute updates correctly when detailBox is present", async function(assert) {
 		// Arrange
+		const oImage = createImage();
+		const oLightBox = new LightBox();
+
 		oImage.setDetailBox(oLightBox);
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
@@ -1160,19 +1199,19 @@ sap.ui.define([
 		oImage.destroy();
 	});
 
-	QUnit.test("Image with valid src and default densityAware", async function(assert) {
-		var done = assert.async();
-		var oLoadSpy = sinon.spy(function() {
-				var $Image = oImage.$();
+	QUnit.test("Image with valid src and default densityAware fires load event and is visible", async function(assert) {
+		const done = assert.async();
+		const oLoadSpy = sinon.spy(function() {
+				const $Image = oImage.$();
 				assert.equal($Image.css("visibility"), "visible", "Image with valid src should be visible");
 				assert.equal(oErrorSpy.callCount, 0, "Error handler isn't called");
 
 				oImage.destroy();
 				done();
-			}),
-			oErrorSpy = sinon.spy();
+			});
+		const oErrorSpy = sinon.spy();
 
-		var oImage = new Image({
+		const oImage = new Image({
 			src: sSrcAction,
 			load: oLoadSpy,
 			error: oErrorSpy
@@ -1182,25 +1221,25 @@ sap.ui.define([
 		await nextUIUpdate();
 	});
 
-	QUnit.test("Image with Invalid src and src change under default densityAware", async function(assert) {
-		var done = assert.async();
-		var oLoadSpy = sinon.spy(function() {
-				var $Image = oImage.$();
+	QUnit.test("Image with invalid src and src change under default densityAware becomes visible after valid src is set", async function(assert) {
+		const done = assert.async();
+		const oLoadSpy = sinon.spy(function() {
+				const $Image = oImage.$();
 				assert.equal($Image.css("visibility"), "visible", "Image with valid src should be set back to visible");
 				assert.equal(oErrorSpy.callCount, 1, "error handler isn't called again");
 
 				oImage.destroy();
 				done();
-			}),
-			oErrorSpy = sinon.spy(function() {
+			});
+		const oErrorSpy = sinon.spy(function() {
 				assert.equal(oLoadSpy.callCount, 0 ,"load handler shouldn't be called");
-				var $Image = oImage.$();
+				const $Image = oImage.$();
 				assert.equal($Image.css("visibility"), "visible", "Image with invalid src should be visible to show the alt text");
 
 				oImage.setSrc(sSrcAction);
 			});
 
-		var oImage = new Image({
+		const oImage = new Image({
 			decorative: false,
 			alt: "invalid picture",
 			src: "invalid_src.png",
@@ -1215,15 +1254,15 @@ sap.ui.define([
 	});
 
 	QUnit.test("Image with density 1.5, source handling after rerendering", async function(assert) {
-		var done = assert.async();
-		var oLoadSpy = this.spy(function() {
+		const done = assert.async();
+		const oLoadSpy = this.spy(function() {
 				assert.equal(oErrorSpy.callCount, 0, "error event handler shouldn't be called");
-			}),
-			oErrorSpy = sinon.spy();
+			});
+		const oErrorSpy = sinon.spy();
 
 		this.stub(Image, "_currentDevicePixelRatio").value(1.5);
 
-		var oImage = new Image({
+		const oImage = new Image({
 			src: sSrc,
 			load: oLoadSpy,
 			densityAware: true
@@ -1245,18 +1284,18 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("Invalid image src in case detailBox is present", function(assert){
+	QUnit.test("Invalid image src fires error handler once when detailBox is present", function(assert) {
 		// Arrange
-		var fnDone = assert.async(),
-			oErrorSpy = sinon.spy(function() {
+		const fnDone = assert.async();
+		const oErrorSpy = sinon.spy(function() {
 				// Assert
 				assert.strictEqual(oErrorSpy.callCount, 1, "Error spy called once");
 
 				// Cleanup
 				oImage.destroy();
 				fnDone();
-			}),
-			oImage = createImage({
+			});
+		const oImage = createImage({
 				src: "invalid_src.png",
 				error: oErrorSpy
 			});
@@ -1266,18 +1305,16 @@ sap.ui.define([
 		oImage.placeAt("qunit-fixture");
 	});
 
-	QUnit.test("onsapspace event should be prevented - SPACE", async function(assert) {
+	QUnit.test("onsapspace event should be prevented - SPACE", function(assert) {
 		//setup
-		var oImage = createImage({
+		const oImage = createImage({
 				src: sSrc
-			}),
-			oEvent = {
+			});
+		const oEvent = {
 				which: KeyCodes.SPACE,
 				preventDefault: function () {}
-			},
-			oSpy = this.spy(oEvent, "preventDefault");
-
-		await nextUIUpdate();
+			};
+		const oSpy = this.spy(oEvent, "preventDefault");
 
 		//act
 		oImage.onsapspace(oEvent);
@@ -1291,15 +1328,15 @@ sap.ui.define([
 	// This unit test is meant to cover the current logic of
 	// Image control where it fires load event after each
 	// re-rendering cycle
-	QUnit.test("Load is called on rerender", async function(assert) {
-		var done = assert.async();
-		var callCount = 0;
-		var callLimit = 10;
+	QUnit.test("Load event is fired repeatedly after each rerender cycle", async function(assert) {
+		const done = assert.async();
+		let callCount = 0;
+		const callLimit = 10;
 
 		assert.expect(1);
 
 		//setup
-		var oImage = createImage({
+		const oImage = createImage({
 				src: sSrc,
 				load: function () {
 					if (callCount < callLimit) {
@@ -1319,15 +1356,15 @@ sap.ui.define([
 
 	// This test is especially created to cover FF problem loading huge size SVG images,
 	// caused by wrongly reading naturalWidth property as '0'
-	QUnit.test("SVG Load is called on rerender", async function(assert) {
-		var done = assert.async();
-		var callCount = 0;
-		var callLimit = 10;
+	QUnit.test("SVG Load event is fired repeatedly after each rerender cycle", async function(assert) {
+		const done = assert.async();
+		let callCount = 0;
+		const callLimit = 10;
 
 		assert.expect(1);
 
 		//setup
-		var oImage = createSVGImage({
+		const oImage = createSVGImage({
 				src: sSrc,
 				load: function () {
 					if (callCount < callLimit) {
@@ -1347,16 +1384,17 @@ sap.ui.define([
 
 	QUnit.module("Attribute");
 
-	QUnit.test("Lazy loading", async function(assert) {
+	QUnit.test("Lazy loading attribute is set on image DOM element", async function(assert) {
 		// Arrange
-		var oImage = createImage({
+		const oImage = createImage({
 			lazyLoading: true
 		});
 
-		// System under test
+		// Act
 		oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// Assert
 		assert.equal(document.getElementById(sControlId).getAttribute("loading"), "lazy", "loading attribute should be lazy");
 
 		// Clean up
@@ -1365,24 +1403,23 @@ sap.ui.define([
 
 	QUnit.module("Load event");
 
-	QUnit.test("fired with lazyLoading set to true", async function(assert) {
+	QUnit.test("Load event is fired with lazyLoading set to true after image scrolls into view", async function(assert) {
 		// Arrange
-		var oBox = new VBox({
+		const oBox = new VBox({
 			height: "3000px"
-		}),
-			oImage = createImage({
-				lazyLoading: true
-		}),
-			oPage = new Page({
-				content: [oBox, oImage]
-		}),
-			done = assert.async(),
-			oLoadSpy;
+		});
+		const oImage = createImage({
+			lazyLoading: true
+		});
+		const oPage = new Page({
+			content: [oBox, oImage]
+		});
+		const done = assert.async();
 
 		oPage.placeAt("content");
 		await nextUIUpdate();
 
-		oLoadSpy = sinon.spy(oImage, "fireLoad");
+		const oLoadSpy = sinon.spy(oImage, "fireLoad");
 		document.getElementById("content").style.height = "500px";
 
 		// Assert

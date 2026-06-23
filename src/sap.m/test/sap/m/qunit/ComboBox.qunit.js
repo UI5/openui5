@@ -8604,6 +8604,29 @@ sap.ui.define([
 		oComboBox.destroy();
 	});
 
+	QUnit.test("aria-expanded remains true after re-render while picker is open.", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+
+		var oComboBox = new ComboBox({
+			items: [new Item({ key: "GER", text: "Germany" })]
+		});
+		oComboBox.placeAt("content");
+		await nextUIUpdate(this.clock);
+		oComboBox.focus();
+
+		oComboBox.open();
+		this.clock.tick(1000);
+		assert.strictEqual(oComboBox.getFocusDomRef().getAttribute("aria-expanded"), "true", "aria-expanded is true after open");
+
+		oComboBox.invalidate();
+		await nextUIUpdate(this.clock);
+
+		assert.ok(oComboBox.isOpen(), "Picker is still open after re-render");
+		assert.strictEqual(oComboBox.getFocusDomRef().getAttribute("aria-expanded"), "true", "aria-expanded stays true across re-render while picker is open");
+
+		oComboBox.destroy();
+	});
+
 	QUnit.test("onAfterOpen test case 2", async function (assert) {
 
 		// system under test
@@ -14477,5 +14500,226 @@ sap.ui.define([
 		this.clock.tick(0);
 
 		assert.strictEqual(oComboBox.getSelectedItem(), oComboBox.getItems()[1], "The second item should be selected");
+	});
+
+	QUnit.module("maxPickerHeight Property");
+
+	QUnit.test("maxPickerHeight property has correct default value", function(assert) {
+		// Arrange
+		var oComboBox = new ComboBox();
+
+		// Assert
+		assert.strictEqual(oComboBox.getMaxPickerHeight(), "", "Default maxPickerHeight is empty string");
+
+		// Cleanup
+		oComboBox.destroy();
+	});
+
+	QUnit.test("maxPickerHeight property can be set and retrieved", function(assert) {
+		// Arrange
+		var oComboBox = new ComboBox();
+
+		// Act
+		oComboBox.setMaxPickerHeight("300px");
+
+		// Assert
+		assert.strictEqual(oComboBox.getMaxPickerHeight(), "300px", "maxPickerHeight is set to 300px");
+
+		// Cleanup
+		oComboBox.destroy();
+	});
+
+	QUnit.test("maxPickerHeight is forwarded to popover on open", async function(assert) {
+		// Arrange
+		var aItems = [];
+		for (var i = 0; i < 50; i++) {
+			aItems.push(new Item({
+				key: "item" + i,
+				text: "Item " + i
+			}));
+		}
+		var oComboBox = new ComboBox({
+			maxPickerHeight: "300px",
+			items: aItems
+		});
+		oComboBox.placeAt("content");
+		await nextUIUpdate();
+
+		// Act
+		oComboBox.open();
+		await nextUIUpdate();
+
+		// Assert
+		var oPopover = oComboBox.getPicker();
+		assert.ok(oPopover, "Popover exists");
+		assert.strictEqual(oPopover.getMaxHeight(), "300px", "maxPickerHeight forwarded to popover");
+
+		// Cleanup
+		oComboBox.close();
+		oComboBox.destroy();
+	});
+
+	QUnit.test("changing maxPickerHeight after picker creation updates popover on reopen", async function(assert) {
+		// Arrange
+		var aItems = [];
+		for (var i = 0; i < 50; i++) {
+			aItems.push(new Item({
+				key: "item" + i,
+				text: "Item " + i
+			}));
+		}
+		var oComboBox = new ComboBox({
+			maxPickerHeight: "200px",
+			items: aItems
+		});
+		oComboBox.placeAt("content");
+		await nextUIUpdate();
+
+		oComboBox.open();
+		await nextUIUpdate();
+		oComboBox.close();
+		await nextUIUpdate();
+
+		// Act - Change maxPickerHeight
+		oComboBox.setMaxPickerHeight("500px");
+		oComboBox.open();
+		await nextUIUpdate();
+
+		// Assert
+		var oPopover = oComboBox.getPicker();
+		assert.strictEqual(oPopover.getMaxHeight(), "500px", "Updated maxPickerHeight forwarded to popover");
+
+		// Cleanup
+		oComboBox.close();
+		oComboBox.destroy();
+	});
+
+	QUnit.test("maxPickerHeight empty string does not set popover maxPickerHeight", async function(assert) {
+		// Arrange
+		var aItems = [];
+		for (var i = 0; i < 50; i++) {
+			aItems.push(new Item({
+				key: "item" + i,
+				text: "Item " + i
+			}));
+		}
+		var oComboBox = new ComboBox({
+			maxPickerHeight: "",
+			items: aItems
+		});
+		oComboBox.placeAt("content");
+		await nextUIUpdate();
+
+		// Act
+		oComboBox.open();
+		await nextUIUpdate();
+
+		// Assert
+		var oPopover = oComboBox.getPicker();
+		assert.ok(oPopover, "Popover exists");
+		assert.strictEqual(oPopover.getMaxHeight(), "", "Popover maxPickerHeight is empty when property is empty");
+
+		// Cleanup
+		oComboBox.close();
+		oComboBox.destroy();
+	});
+
+	QUnit.test("scrollbar appears when items exceed maxPickerHeight", async function(assert) {
+		// Arrange
+		var aItems = [];
+		for (var i = 0; i < 50; i++) {
+			aItems.push(new Item({
+				key: "item" + i,
+				text: "Item " + i
+			}));
+		}
+		var oComboBox = new ComboBox({
+			maxPickerHeight: "150px",
+			items: aItems
+		});
+		oComboBox.placeAt("content");
+		await nextUIUpdate();
+
+		// Act
+		oComboBox.open();
+		await nextUIUpdate();
+
+		// Assert
+		var oPopover = oComboBox.getPicker();
+		var oScrollDelegate = oPopover.getScrollDelegate();
+		var oScrollContainer = oScrollDelegate ? oScrollDelegate.getContainerDomRef() : oPopover.getDomRef("cont");
+
+		assert.ok(oScrollContainer, "Scroll container exists");
+		// When content exceeds maxPickerHeight, scrollHeight > clientHeight indicates scrolling
+		assert.ok(oScrollContainer.scrollHeight > oScrollContainer.clientHeight, "Content is scrollable");
+
+		// Cleanup
+		oComboBox.close();
+		oComboBox.destroy();
+	});
+
+	QUnit.test("arrow down navigation works with maxPickerHeight and scrolling", async function(assert) {
+		// Arrange
+		var aItems = [];
+		for (var i = 0; i < 50; i++) {
+			aItems.push(new Item({
+				key: "item" + i,
+				text: "Item " + i
+			}));
+		}
+		var oComboBox = new ComboBox({
+			maxPickerHeight: "150px",
+			items: aItems
+		});
+		oComboBox.placeAt("content");
+		await nextUIUpdate();
+
+		oComboBox.open();
+		await nextUIUpdate();
+
+		var oFocusDomRef = oComboBox.getFocusDomRef();
+		var oList = oComboBox._getList();
+
+		// Act - Navigate down multiple times
+		for (var j = 0; j < 5; j++) {
+			qutils.triggerKeydown(oFocusDomRef, KeyCodes.ARROW_DOWN);
+		}
+
+		// Assert
+		var aListItems = oList.getItems();
+		assert.ok(aListItems[5].getDomRef(), "Item 5 exists in DOM after navigation");
+
+		// Cleanup
+		oComboBox.close();
+		oComboBox.destroy();
+	});
+
+	QUnit.test("maxPickerHeight works with different CSS units (rem)", async function(assert) {
+		// Arrange
+		var aItems = [];
+		for (var i = 0; i < 20; i++) {
+			aItems.push(new Item({
+				key: "item" + i,
+				text: "Item " + i
+			}));
+		}
+		var oComboBox = new ComboBox({
+			maxPickerHeight: "15rem",
+			items: aItems
+		});
+		oComboBox.placeAt("content");
+		await nextUIUpdate();
+
+		// Act
+		oComboBox.open();
+		await nextUIUpdate();
+
+		// Assert
+		var oPopover = oComboBox.getPicker();
+		assert.strictEqual(oPopover.getMaxHeight(), "15rem", "maxPickerHeight with rem units forwarded correctly");
+
+		// Cleanup
+		oComboBox.close();
+		oComboBox.destroy();
 	});
 });

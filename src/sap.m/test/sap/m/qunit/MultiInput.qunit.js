@@ -3178,6 +3178,38 @@ sap.ui.define([
 		oMultiInputWithSuggestions.destroy();
 	});
 
+	QUnit.test("Invisible Message - Suggestion list expanded / collapsed announcement", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+
+		var oAnnounceSpy = this.spy(InvisibleMessage.prototype, "announce"),
+			oMultiInput = new MultiInput({
+				suggestionItems: [
+					new Item({ key: "0", text: "item 0" }),
+					new Item({ key: "1", text: "item 1" })
+				]
+			});
+
+		oMultiInput.placeAt("content");
+		await nextUIUpdate(this.clock);
+
+		oMultiInput._openSuggestionsPopover();
+		this.clock.tick(1000);
+
+		oMultiInput._applySuggestionAcc(2);
+		this.clock.tick(200);
+
+		var sExpectedOpenText = oResourceBundle.getText("INPUT_SUGGESTIONS_MORE_HITS", [2]) + " " + oResourceBundle.getText("SUGGESTIONS_POPOVER_EXPANDED");
+		assert.ok(oAnnounceSpy.calledWith(sExpectedOpenText), "Open announcement combines results count and 'Expanded'");
+
+		oMultiInput._closeSuggestionPopup();
+		this.clock.tick(1000);
+
+		assert.ok(oAnnounceSpy.calledWith(oResourceBundle.getText("SUGGESTIONS_POPOVER_COLLAPSED")), "'Collapsed' is announced when the suggestion list closes");
+
+		oAnnounceSpy.restore();
+		oMultiInput.destroy();
+	});
+
 	QUnit.module("Copy/Cut Functionality", {
 		beforeEach: async function() {
 			this.multiInput1 = new MultiInput();

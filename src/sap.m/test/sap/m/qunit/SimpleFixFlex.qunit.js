@@ -21,7 +21,7 @@ sap.ui.define(
 		}
 	  });
 
-	  QUnit.test("Default value of design", function(assert) {
+	  QUnit.test("Default value of 'fitParent' property is true", function(assert) {
 		assert.strictEqual(
 		  this.oSimpleFixFlex.getProperty("fitParent"),
 		  true,
@@ -35,7 +35,7 @@ sap.ui.define(
 	  QUnit.test(
 		"SimpleFixFlex should be rendered when zero configuration is passed",
 		async function(assert) {
-		  var oSimpleFixFlex = new SimpleFixFlex().placeAt("qunit-fixture");
+		  const oSimpleFixFlex = new SimpleFixFlex().placeAt("qunit-fixture");
 		  await nextUIUpdate();
 
 		  assert.ok(
@@ -55,10 +55,10 @@ sap.ui.define(
 		"Warning is logged when FixContent's text exceeds recommended characters",
 		async function(assert) {
 		  // Arrange
-		  var fnErrorSpy = this.spy(Log, "warning"),
-			oSimpleFixFlex = new SimpleFixFlex().placeAt("qunit-fixture"),
-			sSimpleFixFlexId = oSimpleFixFlex.getId(),
-			iFixContentTextLength;
+		  const fnErrorSpy = this.spy(Log, "warning");
+		  const oSimpleFixFlex = new SimpleFixFlex().placeAt("qunit-fixture");
+		  const sSimpleFixFlexId = oSimpleFixFlex.getId();
+		  let iFixContentTextLength;
 
 		  // Act
 		  await nextUIUpdate();
@@ -169,7 +169,7 @@ sap.ui.define(
 		this.oSimpleFixFlex.addFlexContent(new Button({ text: "test" }));
 		await nextUIUpdate();
 
-		this.oSimpleFixFlex.getFlexContent().forEach(function(oControl) {
+		this.oSimpleFixFlex.getFlexContent().forEach((oControl) => {
 		  // Assert
 		  assert.ok(
 			oControl
@@ -227,7 +227,7 @@ sap.ui.define(
 		"SimpleFixFlex control should not throw error when there is no FixedContent and _onFixContentResize is called",
 		async function(assert) {
 		  // Arrange
-		  var oSpy = new this.spy(this.oSimpleFixFlex, "_onFixContentResize");
+		  const oSpy = new this.spy(this.oSimpleFixFlex, "_onFixContentResize");
 
 		  // Act
 		  this.oSimpleFixFlex.getFixContent().setVisible(false);
@@ -252,7 +252,6 @@ sap.ui.define(
 		"SimpleFixFlex control should not throw error when the DOM element doesn't have clientHeight and _onFixContentResize is called",
 		function(assert) {
 		  // Arrange
-		  var vResult;
 		  this.stub(this.oSimpleFixFlex, "getFixContent").callsFake(function() {
 			return {
 			  $: function() {
@@ -266,7 +265,7 @@ sap.ui.define(
 		  });
 
 		  // Act
-		  vResult = this.oSimpleFixFlex._onFixContentResize();
+		  const vResult = this.oSimpleFixFlex._onFixContentResize();
 
 		  // Assert
 		  assert.strictEqual(

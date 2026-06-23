@@ -1152,6 +1152,40 @@ function(
 	});
 	var oLabelWrapping = new Label("wrappingLabel", {text: "MultiComboBox with suggestions wrapping", width:"100%", labelFor: "multiComboBoxWrapping"});
 
+	var oMultiComboBoxMaxHeight = new MultiComboBox("multiComboBoxMaxHeight", {
+		width: "300px",
+		maxPickerHeight: "300px",
+		valueState: "Information",
+		valueStateText: "The maxPickerHeight property limits the picker height to 300px. Test keyboard navigation with this long list of items.",
+		items: {
+			path: "/items",
+			template: new Item({
+				key: "{key}",
+				text: "{text}"
+			})
+		}
+	});
+	oMultiComboBoxMaxHeight.setModel(oModel);
+
+	var oLabelMaxHeight = new Label("maxPickerHeightLabel", {text: "MultiComboBox with maxPickerHeight and Value State", width:"100%", labelFor: "multiComboBoxMaxHeight"});
+
+	// Example 2: Simple maxPickerHeight without value state
+	var oMultiComboBoxMaxHeightSimple = new MultiComboBox("multiComboBoxMaxHeightSimple", {
+		width: "300px",
+		maxPickerHeight: "250px",
+		placeholder: "Select countries...",
+		items: {
+			path: "/items",
+			template: new Item({
+				key: "{key}",
+				text: "{text}"
+			})
+		}
+	});
+	oMultiComboBoxMaxHeightSimple.setModel(oModel);
+
+	var oLabelMaxHeightSimple = new Label("maxPickerHeightSimpleLabel", {text: "MultiComboBox with maxPickerHeight (Simple)", width:"100%", labelFor: "multiComboBoxMaxHeightSimple"});
+
 	var oMultiComboBoxStrangeKeys = new MultiComboBox("multiComboBoxStrangeKeys", {
 		width: "600px",
 		items : [
@@ -1206,6 +1240,8 @@ function(
 			oMultiComboBoxErrorWithLink, oMultiComboBoxWarningWithLinks, oMultiComboBoxDisabled, oMultiComboBoxWithoutKey, oMultiComboBoxError, oMultiComboBoxWarning,
 			oMultiComboBoxSuccess, oMultiComboBoxOneToken, readOnlyButtonOneToken, oMultiComboBoxFourItems,
 			oMultiComboBoxBinding, oMultiComboBoxWithGrouping, oMultiComboBoxSelectAll, oToolbar, oEmptyMultiComboBox, oLabelWrapping, oMultiComboBoxLongSuggestions,
+			oLabelMaxHeight, oMultiComboBoxMaxHeight,
+			oLabelMaxHeightSimple, oMultiComboBoxMaxHeightSimple,
 			oLabelItemsOrder, oMultiComboBoxStrangeKeys, oLongValueStateHeader, oMultiComboBoxGroupingAndSelectAll
 		],
 		showNavButton : true,

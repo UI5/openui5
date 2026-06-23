@@ -1429,10 +1429,11 @@ function(
 	 * @private
 	 */
 	MultiComboBox.prototype.onAfterOpen = function() {
-		var oDomRef = this.getFocusDomRef();
-
-		oDomRef && this.getFocusDomRef().setAttribute("aria-expanded", "true");
 		this._bPickerIsOpening = false;
+
+		if (this.bOpenedByKeyboardOrButton) {
+			this._announceExpanded();
+		}
 
 		// Ensure first group header is visible when using showSelectAll with grouping
 		if (this.getShowSelectAll() && this.getSelectedItems().length === 0) {
@@ -1469,10 +1470,7 @@ function(
 		var oDomRef = this.getDomRef(),
 			bFocusInControl = oDomRef && (oDomRef !== document.activeElement && oDomRef.contains(document.activeElement)),
 			bUseNarrow = !bFocusInControl || this.isPickerDialog(),
-			oFocusDomRef = this.getFocusDomRef(),
 			sCurrentValue = this.getValue();
-
-		oFocusDomRef && oFocusDomRef.setAttribute("aria-expanded", "false");
 
 		// remove the active state of the MultiComboBox's field
 		this.toggleIconPressedStyle(false);
@@ -1526,11 +1524,17 @@ function(
 	MultiComboBox.prototype._onBeforeOpenDropdown = function() {
 		var oPopover = this.getPicker(),
 			oDomRef = this.getDomRef(),
-			sWidth;
+			sWidth,
+			sMaxHeight = this.getMaxPickerHeight();
 
 		if (oDomRef && oPopover) {
 			sWidth = (oDomRef.offsetWidth / parseFloat(library.BaseFontSize)) + "rem";
 			oPopover.setContentMinWidth(sWidth);
+
+			// Forward maxPickerHeight to popover
+			if (sMaxHeight) {
+				oPopover.setMaxHeight(sMaxHeight);
+			}
 		}
 	};
 

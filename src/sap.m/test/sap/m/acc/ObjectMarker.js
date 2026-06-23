@@ -133,6 +133,8 @@ sap.ui.define([
 
 	var oStandalonePanel = new Panel("standalone-panel", {
 		headerText: "Standalone use case",
+		expandable: true,
+		expanded: true,
 		content: [
 			new Panel({
 				headerText: "Non-interactive markers",

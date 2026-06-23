@@ -96,9 +96,9 @@ sap.ui.define([
 			this.create(null, bFilteredOut);
 		},
 
-		async onDelete(oEvent) {
+		async onDelete(oEvent, sGroupId) {
 			try {
-				await oEvent.getSource().getBindingContext().delete();
+				await oEvent.getSource().getBindingContext().delete(sGroupId);
 			} catch (oError) {
 				MessageBox.error(oError.message);
 			}

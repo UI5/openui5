@@ -1717,6 +1717,71 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 				oHeaderContent.style["overflow"] == "hidden";
 	}
 
+	QUnit.module("Scroll position correction after async content growth");
+
+	QUnit.test("_correctScrollPositionIfNeeded does not scroll when position is already correct", function (assert) {
+		assert.expect(2);
+
+		const oObjectPage = oFactory.getObjectPage();
+		const sId = "someSection";
+		const iCorrectTarget = 500;
+		const oFakeSectionRef = { getId: function() { return sId; } };
+
+		oObjectPage._oSectionInfo[sId] = { positionTop: iCorrectTarget, sectionReference: oFakeSectionRef };
+		oObjectPage._sCurrentScrollId = sId;
+		oObjectPage._requestAdjustLayout = sinon.stub();
+		oObjectPage._computeScrollPosition = sinon.stub().returns(iCorrectTarget);
+		oObjectPage._$opWrapper = { length: 1, scrollTop: sinon.stub().returns(iCorrectTarget), off: sinon.stub() };
+		oObjectPage._scrollTo = sinon.stub();
+
+		oObjectPage._correctScrollPositionIfNeeded(sId);
+
+		assert.ok(oObjectPage._requestAdjustLayout.calledWith(true), "_requestAdjustLayout called to re-measure");
+		assert.notOk(oObjectPage._scrollTo.called, "_scrollTo not called when already at correct position");
+
+		oObjectPage.destroy();
+	});
+
+	QUnit.test("_correctScrollPositionIfNeeded snap-corrects when async content caused position drift", function (assert) {
+		assert.expect(1);
+
+		const oObjectPage = oFactory.getObjectPage();
+		const sId = "someSection";
+		const iStaleScrollTop = 400;
+		const iCorrectedTarget = 600; // content grew: real section is now at 600
+		const oFakeSectionRef = { getId: function() { return sId; } };
+
+		oObjectPage._oSectionInfo[sId] = { positionTop: iStaleScrollTop, sectionReference: oFakeSectionRef };
+		oObjectPage._sCurrentScrollId = sId;
+		oObjectPage._requestAdjustLayout = sinon.stub();
+		oObjectPage._computeScrollPosition = sinon.stub().returns(iCorrectedTarget);
+		oObjectPage._$opWrapper = { length: 1, scrollTop: sinon.stub().returns(iStaleScrollTop), off: sinon.stub() };
+		oObjectPage._scrollTo = sinon.stub();
+
+		oObjectPage._correctScrollPositionIfNeeded(sId);
+
+		assert.ok(oObjectPage._scrollTo.calledWith(iCorrectedTarget, 0),
+			"_scrollTo called with corrected target and duration 0");
+
+		oObjectPage.destroy();
+	});
+
+	QUnit.test("_correctScrollPositionIfNeeded is a no-op for unknown section", function (assert) {
+		assert.expect(2);
+
+		const oObjectPage = oFactory.getObjectPage();
+
+		oObjectPage._requestAdjustLayout = sinon.stub();
+		oObjectPage._scrollTo = sinon.stub();
+
+		oObjectPage._correctScrollPositionIfNeeded("nonExistentSection");
+
+		assert.notOk(oObjectPage._requestAdjustLayout.called, "_requestAdjustLayout not called for unknown section");
+		assert.notOk(oObjectPage._scrollTo.called, "_scrollTo not called for unknown section");
+
+		oObjectPage.destroy();
+	});
+
 	QUnit.module("AnchorBar scroll preservation during header snap");
 
 	QUnit.test("_needsAnchorBarPlaceholderForScrollPreservation returns false when sufficient scroll space remains", function(assert) {

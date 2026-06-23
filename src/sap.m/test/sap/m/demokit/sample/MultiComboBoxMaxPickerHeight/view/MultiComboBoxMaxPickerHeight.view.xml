@@ -1,0 +1,54 @@
+<mvc:View
+	height="100%"
+	controllerName="sap.m.sample.MultiComboBoxMaxPickerHeight.controller.MultiComboBoxMaxPickerHeight"
+	xmlns:core="sap.ui.core"
+	xmlns:l="sap.ui.layout"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+	<Page showHeader="false" class="sapUiContentPadding">
+		<content>
+			<l:VerticalLayout>
+				<Label text="MultiComboBox without maxPickerHeight" labelFor="idMultiComboBoxDefault"></Label>
+				<MultiComboBox class="sapUiSmallMarginBottom"
+					id="idMultiComboBoxDefault"
+					items="{
+						path: '/items'
+					}">
+					<core:Item key="{key}" text="{text}"/>
+				</MultiComboBox>
+
+				<Label text="MultiComboBox with maxPickerHeight='300px'" labelFor="idMultiComboBox300px"></Label>
+				<MultiComboBox class="sapUiSmallMarginBottom"
+					id="idMultiComboBox300px"
+					maxPickerHeight="300px"
+					items="{
+						path: '/items'
+					}">
+					<core:Item key="{key}" text="{text}"/>
+				</MultiComboBox>
+
+				<Label text="MultiComboBox with maxPickerHeight='15rem'" labelFor="idMultiComboBox15rem"></Label>
+				<MultiComboBox class="sapUiSmallMarginBottom"
+					id="idMultiComboBox15rem"
+					maxPickerHeight="15rem"
+					items="{
+						path: '/items'
+					}">
+					<core:Item key="{key}" text="{text}"/>
+				</MultiComboBox>
+
+				<Label text="MultiComboBox with maxPickerHeight='150px' and value state" labelFor="idMultiComboBoxWithValueState"></Label>
+				<MultiComboBox class="sapUiSmallMarginBottom"
+					id="idMultiComboBoxWithValueState"
+					maxPickerHeight="150px"
+					valueState="Information"
+					valueStateText="The maxPickerHeight property limits the picker popup height. When items exceed this height, the picker becomes scrollable."
+					items="{
+						path: '/items'
+					}">
+					<core:Item key="{key}" text="{text}"/>
+				</MultiComboBox>
+			</l:VerticalLayout>
+		</content>
+	</Page>
+</mvc:View>

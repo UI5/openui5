@@ -11,20 +11,18 @@ sap.ui.define([
 	// prepare DOM
 	createAndAppendDiv("qunit-fixture-visible");
 
-
-
-	var oBundle = Library.getResourceBundleFor("sap.m");
+	const oBundle = Library.getResourceBundleFor("sap.m");
 
 	QUnit.module("id");
 
 	QUnit.test("semantic control can be retrieved by Id", function (assert) {
 		// Arrange
-		var oDraftIndi = new DraftIndicator("draftId");
+		const oDraftIndi = new DraftIndicator("draftId");
 
 		assert.strictEqual(oDraftIndi.getId(), "draftId", "control has the expected id");
 
 		// Act
-		var oRetrievedIndi = Element.getElementById("draftId");
+		const oRetrievedIndi = Element.getElementById("draftId");
 
 		// Assert
 		assert.notEqual(oRetrievedIndi, undefined, "the button is retrieved by id");
@@ -38,11 +36,11 @@ sap.ui.define([
 
 	QUnit.test("set 'Saving draft' and 'Clear Draft' state", function (assert) {
 		// Arrange
-		var oDraftIndi = new DraftIndicator();
+		const oDraftIndi = new DraftIndicator();
 
 		// System under test
 		oDraftIndi.placeAt("qunit-fixture-visible");
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		nextUIUpdate.runSync()/*fake timer is used in module*/; // fake timers active — await nextUIUpdate() would hang
 
 		// Act
 		oDraftIndi.showDraftSaving();
@@ -62,15 +60,15 @@ sap.ui.define([
 
 	QUnit.test("set Draft Saved state and check that it is not cleared after default timeout", function (assert) {
 		// Arrange
-		var oDraftIndi = new DraftIndicator();
+		const oDraftIndi = new DraftIndicator();
 
 		// System under test
 		oDraftIndi.placeAt("qunit-fixture-visible");
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		nextUIUpdate.runSync()/*fake timer is used in module*/; // fake timers active — await nextUIUpdate() would hang
 
 		// Act
 		oDraftIndi.showDraftSaved();
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		nextUIUpdate.runSync()/*fake timer is used in module*/; // fake timers active — await nextUIUpdate() would hang
 
 		// Assert
 		assert.strictEqual(oDraftIndi.$("label").text(), oBundle.getText("DRAFT_INDICATOR_DRAFT_SAVED"), "Draft saved is shown");
@@ -83,17 +81,17 @@ sap.ui.define([
 		oDraftIndi.destroy();
 	});
 
-	QUnit.test("set Draft Saving state and check that if it is cleared after default timeout", function (assert) {
+	QUnit.test("set Draft Saving state and check that it is cleared after default timeout", function (assert) {
 		// Arrange
-		var oDraftIndi = new DraftIndicator();
+		const oDraftIndi = new DraftIndicator();
 
 		// System under test
 		oDraftIndi.placeAt("qunit-fixture-visible");
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		nextUIUpdate.runSync()/*fake timer is used in module*/; // fake timers active — await nextUIUpdate() would hang
 
 		// Act
 		oDraftIndi.showDraftSaving();
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		nextUIUpdate.runSync()/*fake timer is used in module*/; // fake timers active — await nextUIUpdate() would hang
 
 		// Assert
 		assert.strictEqual(oDraftIndi.$("label").text(), oBundle.getText("DRAFT_INDICATOR_SAVING_DRAFT"), "Draft saved is shown");
@@ -109,7 +107,7 @@ sap.ui.define([
 
 	QUnit.test("the control doesn't recreate the label upon destruction", function (assert) {
 		// Arrange
-		var oDraftIndi = new DraftIndicator();
+		const oDraftIndi = new DraftIndicator();
 
 		// Act
 		oDraftIndi.showDraftSaving();

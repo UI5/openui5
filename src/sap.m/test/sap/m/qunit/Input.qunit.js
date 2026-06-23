@@ -4683,9 +4683,73 @@ sap.ui.define([
 		this.clock.tick(500);
 
 		//Assert
-		assert.ok(oAnnounceSpy.calledWith(oMessageBundle.getText("INPUT_SUGGESTIONS_MORE_HITS", [2])), "The description has correct text.");
+		var sExpected = oMessageBundle.getText("INPUT_SUGGESTIONS_MORE_HITS", [2]) + " " + oMessageBundle.getText("SUGGESTIONS_POPOVER_EXPANDED");
+		assert.ok(oAnnounceSpy.calledWith(sExpected), "The description has correct text.");
 
 		//Clean up
+		oAnnounceSpy.restore();
+		oInput.destroy();
+	});
+
+	QUnit.test("Invisible Message - Suggestion list expanded / collapsed announcement", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+
+		var oAnnounceSpy = this.spy(InvisibleMessage.prototype, "announce"),
+			oMessageBundle = Library.getResourceBundleFor("sap.m"),
+			oInput = new Input({
+				showSuggestion: true,
+				suggestionItems: [
+					new Item({ text: "Item 1", key: "001" }),
+					new Item({ text: "Item 2", key: "002" })
+				]
+			});
+
+		oInput.placeAt("content");
+		await nextUIUpdate(this.clock);
+
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val("I").trigger("input");
+		this.clock.tick(500);
+
+		var sExpectedOpenText = oMessageBundle.getText("INPUT_SUGGESTIONS_MORE_HITS", [2]) + " " + oMessageBundle.getText("SUGGESTIONS_POPOVER_EXPANDED");
+		assert.ok(oAnnounceSpy.calledWith(sExpectedOpenText), "Open announcement combines results count and 'Expanded'");
+
+		oInput._closeSuggestionPopup();
+		this.clock.tick(500);
+
+		assert.ok(oAnnounceSpy.calledWith(oMessageBundle.getText("SUGGESTIONS_POPOVER_COLLAPSED")), "'Collapsed' is announced when the suggestion list closes");
+
+		oAnnounceSpy.restore();
+		oInput.destroy();
+	});
+
+	QUnit.test("Invisible Message - No 'Collapsed' suffix when typed value matches no items.", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+
+		var oAnnounceSpy = this.spy(InvisibleMessage.prototype, "announce"),
+			oMessageBundle = Library.getResourceBundleFor("sap.m"),
+			oInput = new Input({
+				showSuggestion: true,
+				suggestionItems: [
+					new Item({ text: "Item 1", key: "001" }),
+					new Item({ text: "Item 2", key: "002" })
+				]
+			});
+
+		oInput.placeAt("content");
+		await nextUIUpdate(this.clock);
+
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val("zzz").trigger("input");
+		this.clock.tick(500);
+
+		var sNoHit = oMessageBundle.getText("INPUT_SUGGESTIONS_NO_HIT");
+		var sCollapsed = oMessageBundle.getText("SUGGESTIONS_POPOVER_COLLAPSED");
+
+		assert.ok(oAnnounceSpy.calledWith(sNoHit), "'No results' is announced on its own");
+		assert.notOk(oAnnounceSpy.calledWith(sNoHit + " " + sCollapsed),
+			"'Collapsed' is NOT appended when popover never opened");
+
 		oAnnounceSpy.restore();
 		oInput.destroy();
 	});
@@ -8885,7 +8949,8 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		//Assert
-		assert.ok(oAnnounceSpy.calledWith(oMessageBundle.getText("INPUT_SUGGESTIONS_ONE_HIT")), "Contains information about 1 item");
+		var sExpected = oMessageBundle.getText("INPUT_SUGGESTIONS_ONE_HIT") + " " + oMessageBundle.getText("SUGGESTIONS_POPOVER_EXPANDED");
+		assert.ok(oAnnounceSpy.calledWith(sExpected), "Contains information about 1 item");
 
 		//Clean up
 		oAnnounceSpy.restore();

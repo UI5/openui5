@@ -876,6 +876,36 @@ sap.ui.define([
 		]
 	});
 
+	var oComboBoxMaxHeight = new ComboBox("box_maxPickerHeight", {
+		maxPickerHeight: "300px",
+		valueState: "Information",
+		valueStateText: "The maxPickerHeight property limits the picker height to 300px. Scroll through the long list to test keyboard navigation.",
+		items: {
+			path: "/items",
+			template: oItemTemplate
+		},
+
+		change: function(oControlEvent) {
+			Log.info('Event fired: "change" on ComboBox with maxPickerHeight', this);
+			MessageToast.show("change " + oControlEvent.getParameter("value"));
+		},
+
+		selectionChange: function(oControlEvent) {
+			Log.info('Event fired: "selectionChange" value:', oControlEvent.getParameter("selectedItem"));
+			MessageToast.show("selectionChange " + oControlEvent.getParameter("selectedItem").getText());
+		}
+	});
+
+	// Example 2: Simple maxPickerHeight without value state
+	var oComboBoxMaxHeightSimple = new ComboBox("box_maxPickerHeight_simple", {
+		maxPickerHeight: "250px",
+		placeholder: "Select a country...",
+		items: {
+			path: "/items",
+			template: oItemTemplate
+		}
+	});
+
 	// Add a css class to the body HTML element, in order to be used for caret stylization in visual tests run.
 	var oCustomCssButton = new Button("customCssButton",{
 		text: "Toggle custom CSS for visual test",
@@ -1015,6 +1045,14 @@ sap.ui.define([
 			new HTML({ content: "<hr>" }),
 			new HTML({ content: "<h3>ComboBox with Wrapping</h3>" }),
 			oComboBoxWrapping,
+			new HTML({ content: "<hr>" }),
+
+			new HTML({ content: "<h3>ComboBox with maxPickerHeight and Value State</h3>" }),
+			oComboBoxMaxHeight,
+			new HTML({ content: "<hr>" }),
+
+			new HTML({ content: "<h3>ComboBox with maxPickerHeight (Simple)</h3>" }),
+			oComboBoxMaxHeightSimple,
 			new HTML({ content: "<hr>" })
 		]
 	}).addStyleClass("sapUiContentPadding");

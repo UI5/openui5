@@ -1967,6 +1967,13 @@ function(
 				sAriaText = oRb.getText("INPUT_SUGGESTIONS_NO_HIT");
 			}
 
+
+			// append popover state to the announcement only when the popover is actually open;
+			// when there are no results the popover never opens, so a "Collapsed" suffix would be misleading
+			if (this._isSuggestionsPopoverOpen()) {
+				sAriaText = sAriaText + " " + oRb.getText("SUGGESTIONS_POPOVER_EXPANDED");
+			}
+
 			// update Accessibility text for suggestion
 			this._oInvisibleMessage?.announce(sAriaText, CoreLibrary.InvisibleMessageMode.Polite);
 		}.bind(this), iTimeoutDuration);
@@ -2110,7 +2117,6 @@ function(
 	 * @private
 	 */
 	Input.prototype._closeSuggestionPopup = function () {
-
 		this._bShouldRefreshListItems = false;
 		this.cancelPendingSuggest();
 		this._isSuggestionsPopoverOpen() && this._getSuggestionsPopover().getPopover().close();
@@ -3042,6 +3048,10 @@ function(
 
 		oPopover.attachBeforeClose(function () {
 			this._updateSuggestionsPopoverValueState();
+		}, this);
+
+		oPopover.attachAfterClose(function () {
+			this._oInvisibleMessage?.announce(this._oRb.getText("SUGGESTIONS_POPOVER_COLLAPSED"), CoreLibrary.InvisibleMessageMode.Polite);
 		}, this);
 
 		oPopover.attachAfterOpen(function () {

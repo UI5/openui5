@@ -1054,6 +1054,34 @@ sap.ui.define([
 		assert.equal(oDateFormatter.format(aResultRange[1]), "Sep 24, 2021, 11:59:59\u202fPM", "correct end date");
 	});
 
+	QUnit.test("_updateInternalControls clears footer label when selection becomes invalid", function(assert) {
+		// arrange
+		var oOption = new StandardDynamicDateOption({ key: "DATERANGE" });
+
+		this.ddr._createInfoDatesFooter();
+		this.ddr._oSelectedOption = oOption;
+		oOption.createValueHelpUI(this.ddr, function() {});
+
+		// simulate a valid state first
+		this.ddr._getDatesLabel().setText("some date range");
+
+		// act: call with no selection \u2192 validateValueHelpUI returns false
+		this.ddr._updateInternalControls(oOption);
+
+		// assert
+		assert.ok(
+			this.ddr._getDatesLabel().getText().length > 0,
+			"label is not empty"
+		);
+		assert.notEqual(
+			this.ddr._getDatesLabel().getText(),
+			"some date range",
+			"previous date range text was cleared"
+		);
+
+		oOption.destroy();
+	});
+
 	QUnit.test("valueHelpUITypes objects lifecycle", function(assert) {
 		// arrange
 		var oOptionLast = new StandardDynamicDateOption({ key: "LASTDAYS" }),

@@ -34,18 +34,18 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var sControlId = "AvatarId",
-		sImagePath = "test-resources/sap/f/images/Woman_avatar_01.png",
-		sIconPath = "sap-icon://lab",
-		sPreAvatarSize = "Avatar's size is ",
-		sPreAvatarShape = "Avatar's shape is ",
-		sPreAvatarType = "Avatar's type is ",
-		sDefaultIconRendered = "Avatar is a default icon",
-		sPreAvatarFitType = "Avatar's image fit type is ",
-		ValueState = coreLibrary.ValueState;
+	const sControlId = "AvatarId";
+	const sImagePath = "test-resources/sap/f/images/Woman_avatar_01.png";
+	const sIconPath = "sap-icon://lab";
+	const sPreAvatarSize = "Avatar's size is ";
+	const sPreAvatarShape = "Avatar's shape is ";
+	const sPreAvatarType = "Avatar's type is ";
+	const sDefaultIconRendered = "Avatar is a default icon";
+	const sPreAvatarFitType = "Avatar's image fit type is ";
+	const ValueState = coreLibrary.ValueState;
 
 	function createAvatar(oProps, sId) {
-		var oAvatarProps = {};
+		const oAvatarProps = {};
 		sId = sId || sControlId;
 
 		if (oProps) {
@@ -87,7 +87,7 @@ sap.ui.define([
 
 
 	QUnit.test("Avatar with press event only", function (assert) {
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 
 		assert.ok(document.getElementById(sControlId), "Avatar is rendered in the DOM");
 		assert.ok($oAvatar.hasClass("sapFAvatar"), "Avatar is rendered with the Avatar class.");
@@ -101,12 +101,11 @@ sap.ui.define([
 
 	QUnit.test("Focus have 1px outline-offset", function (assert) {
 		// Arrange
-		var $oAvatar = this.oAvatar.$(),
-			sOffset;
+		const $oAvatar = this.oAvatar.$();
 
 		// Act
 		$oAvatar.trigger("focus");
-		sOffset = $oAvatar.css("outline-offset");
+		const sOffset = $oAvatar.css("outline-offset");
 
 		// Assert
 		assert.ok(sOffset, "Outline-offset is set");
@@ -121,7 +120,7 @@ sap.ui.define([
 		this.oAvatar.setDisplaySize("XS");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarXS"), sPreAvatarSize + "XS");
 	});
 
@@ -129,7 +128,7 @@ sap.ui.define([
 		this.oAvatar.setDisplaySize("S");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarS"), sPreAvatarSize + "S");
 	});
 
@@ -137,7 +136,7 @@ sap.ui.define([
 		this.oAvatar.setDisplaySize("M");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarM"), sPreAvatarSize + "M");
 	});
 
@@ -145,7 +144,7 @@ sap.ui.define([
 		this.oAvatar.setDisplaySize("L");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarL"), sPreAvatarSize + "L");
 	});
 
@@ -153,7 +152,7 @@ sap.ui.define([
 		this.oAvatar.setDisplaySize("XL");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarXL"), sPreAvatarSize + "XL");
 	});
 
@@ -161,7 +160,7 @@ sap.ui.define([
 		this.oAvatar.setDisplaySize("Custom");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarCustom"), sPreAvatarSize + "Custom");
 	});
 
@@ -174,7 +173,7 @@ sap.ui.define([
 		this.oAvatar.setDisplayShape("Circle");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarCircle"), sPreAvatarShape + "Circle");
 	});
 
@@ -182,7 +181,7 @@ sap.ui.define([
 		this.oAvatar.setDisplayShape("Square");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarSquare"), sPreAvatarShape + "Square");
 	});
 
@@ -230,8 +229,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Avatar with null src should not call onImageError", async function (assert) {
-		var oOnImageErrorSpy = this.spy(this.oAvatar, "_onImageError"),
-			done = assert.async();
+		const oOnImageErrorSpy = this.spy(this.oAvatar, "_onImageError");
+		const done = assert.async();
 
 		assert.expect(1);
 		this.oAvatar.setSrc(null);
@@ -247,7 +246,7 @@ sap.ui.define([
 		this.oAvatar.setSrc(sIconPath);
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarIcon"), sPreAvatarType + "Icon");
 	});
 
@@ -256,7 +255,7 @@ sap.ui.define([
 		this.oAvatar.setInitials("");
 		await nextUIUpdate();
 
-		var oIcon = this.oAvatar._getIcon();
+		const oIcon = this.oAvatar._getIcon();
 		assert.strictEqual(oIcon.getSrc(), sIconPath, "The icon src is correct");
 	});
 
@@ -265,7 +264,7 @@ sap.ui.define([
 		this.oAvatar.setInitials("SRLAADADADADA");
 		await nextUIUpdate();
 
-		var oIcon = this.oAvatar._getIcon();
+		const oIcon = this.oAvatar._getIcon();
 		assert.strictEqual(oIcon.getSrc(), sIconPath, "The icon src is correct");
 	});
 
@@ -273,18 +272,18 @@ sap.ui.define([
 		this.oAvatar.setSrc(sImagePath);
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 
 		// Assert
 		assert.ok($oAvatar.hasClass("sapFAvatarImage"), sPreAvatarType + "Image");
 	});
 
 	QUnit.test("Avatar with src leading to an image has correct css style", async function (assert) {
-		var sExpectedOutputImage = 'url("' + sImagePath + '")';
+		const sExpectedOutputImage = 'url("' + sImagePath + '")';
 		this.oAvatar.setSrc(sImagePath);
 		await nextUIUpdate();
 
-		var $oAvatarImageHolder = this.oAvatar.$().find('.sapFAvatarImageHolder').get(0);
+		const $oAvatarImageHolder = this.oAvatar.$().find('.sapFAvatarImageHolder').get(0);
 		assert.strictEqual($oAvatarImageHolder.style.backgroundImage, sExpectedOutputImage, "correct style value");
 	});
 
@@ -293,7 +292,7 @@ sap.ui.define([
 		this.oAvatar.setSrc(sImagePath);
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 
 		// Assert
 		assert.ok($oAvatar.hasClass("sapFAvatarImage"), "Avatar types is Image when src is set even if initials are not valid");
@@ -306,12 +305,12 @@ sap.ui.define([
 	});
 
 	QUnit.test("Avatar with sync changed src property to invalid/valid has correct css style", async function (assert) {
-		var sExpectedOutputImage = 'url("' + sImagePath + '")',
-			sWrongPath = "wrong-image-path",
-			fnDone = assert.async(),
-			that = this,
-			$oAvatarImageHolder,
-			oStub = this.stub(this.oAvatar, "_onImageError").callsFake(function(sSrc) {
+		const sExpectedOutputImage = 'url("' + sImagePath + '")';
+		const sWrongPath = "wrong-image-path";
+		const fnDone = assert.async();
+		const that = this;
+		let $oAvatarImageHolder;
+		const oStub = this.stub(this.oAvatar, "_onImageError").callsFake(function(sSrc) {
 				oStub.restore(); // avoid endless recursion
 				that.oAvatar._onImageError(sSrc);
 				$oAvatarImageHolder = that.oAvatar.$().find('.sapFAvatarImageHolder').get(0);
@@ -331,7 +330,7 @@ sap.ui.define([
 		this.oAvatar.setInitials("SR");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarInitials"), sPreAvatarType + "Initials");
 	});
 
@@ -344,7 +343,7 @@ sap.ui.define([
 		this.oAvatar.setInitials("");
 		await nextUIUpdate();
 
-		var $oIcon = this.oAvatar.$().find(".sapFAvatarTypeIcon");
+		const $oIcon = this.oAvatar.$().find(".sapFAvatarTypeIcon");
 		assert.ok($oIcon.length > 0, "Fallback icon is present in the DOM");
 		assert.notOk($oIcon.hasClass("sapFAvatarHiddenIcon"), "Fallback icon is not hidden after clearing 3-char initials");
 	});
@@ -353,7 +352,7 @@ sap.ui.define([
 		this.oAvatar.setInitials("SRLA");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarIcon"), sDefaultIconRendered);
 	});
 
@@ -361,7 +360,7 @@ sap.ui.define([
 		this.oAvatar.setInitials("");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarIcon"), sDefaultIconRendered);
 	});
 
@@ -369,7 +368,7 @@ sap.ui.define([
 		this.oAvatar.setInitials("ЯЪ");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.hasClass("sapFAvatarIcon"), sDefaultIconRendered);
 	});
 
@@ -460,7 +459,7 @@ sap.ui.define([
 		this.oAvatar.setImageFitType("Cover");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.find(".sapFAvatarImageHolder").hasClass("sapFAvatarImageCover"), sPreAvatarFitType + "Cover");
 	});
 
@@ -469,14 +468,13 @@ sap.ui.define([
 		this.oAvatar.setImageFitType("Contain");
 		await nextUIUpdate();
 
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.find(".sapFAvatarImageHolder").hasClass("sapFAvatarImageContain"), sPreAvatarFitType + "Contain");
 	});
 
 	QUnit.test("Show fallback initials when image source is invalid and initials are set and valid", async function (assert) {
 		//Arrange
-		var done = assert.async(),
-			$oAvatar;
+		const done = assert.async();
 
 		this.stub(this.oAvatar, "_onImageError").callsFake(function() {
 			//Assert
@@ -492,18 +490,18 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		//Assert
-		$oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.equal($oAvatar.find(".sapFAvatarInitialsHolder").text(),"PB", "When type of sap.m.Avatar is 'Image'" +
 		 " and initials are set we load fallback initials container");
 	});
 
 	QUnit.test("Add initials class when source is invalid and initials are set", async function (assert) {
 		// Arrange
-		var $oAvatar,
-			done = assert.async(),
-			that = this,
-			sWrongPath = "_",
-			oStub = this.stub(this.oAvatar, "_onImageError").callsFake(function(sSrc) {
+		let $oAvatar;
+		const done = assert.async();
+		const that = this;
+		const sWrongPath = "_";
+		const oStub = this.stub(this.oAvatar, "_onImageError").callsFake(function(sSrc) {
 				oStub.restore(); // avoid endless recursion
 				that.oAvatar._onImageError(sSrc);
 				$oAvatar = that.oAvatar.$();
@@ -531,14 +529,14 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		//Assert
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.ok($oAvatar.find(".sapUiIcon") !== undefined, "When type of sap.m.Avatar is 'Image'" +
 		"we load fallback icon container");
 
 	});
 
 	QUnit.test("Show user set fallback Icon when image source is invalid and initials are not set", function (assert) {
-		var sFallbackIcon = "sap-icon://accelerated";
+		const sFallbackIcon = "sap-icon://accelerated";
 
 		//Act
 		this.oAvatar.setSrc("_");
@@ -558,11 +556,11 @@ sap.ui.define([
 
 	QUnit.test("Add icon class when source is invalid and initials are not set", async function (assert) {
 		// Arrange
-		var $oAvatar,
-			done = assert.async(),
-			that = this,
-			sWrongPath = "_",
-			oStub = this.stub(this.oAvatar, "_onImageError").callsFake(function(sSrc) {
+		let $oAvatar;
+		const done = assert.async();
+		const that = this;
+		const sWrongPath = "_";
+		const oStub = this.stub(this.oAvatar, "_onImageError").callsFake(function(sSrc) {
 				oStub.restore(); // avoid endless recursion
 				that.oAvatar._onImageError(sSrc);
 				$oAvatar = that.oAvatar.$();
@@ -615,16 +613,16 @@ sap.ui.define([
 
 	QUnit.test("Avatar is rendered correctly with cache busting query parameter added to his source", function (assert) {
 		// Assert
-		var sAvatarUrl = this.oAvatar.$().find(".sapFAvatarImageHolder")[0].style.backgroundImage,
-			sAvatarParamValue = sAvatarUrl.match(/xcache=(\d+)/)[1];
+		const sAvatarUrl = this.oAvatar.$().find(".sapFAvatarImageHolder")[0].style.backgroundImage;
+		const sAvatarParamValue = sAvatarUrl.match(/xcache=(\d+)/)[1];
 
 		assert.strictEqual(sAvatarParamValue, this.oAvatar._iCacheBustingValue.toString(), "Avatar is rendered with correct query parameter");
 	});
 
 	QUnit.test("Cache busting paramater value is not changed when Avatar gets invalidated ", async function (assert) {
 		// Arrange
-		var sAvatarUrl = this.oAvatar.$().find(".sapFAvatarImageHolder")[0].style.backgroundImage,
-			sAvatarParamValue = sAvatarUrl.match(/xcache=(\d+)/)[1];
+		const sAvatarUrl = this.oAvatar.$().find(".sapFAvatarImageHolder")[0].style.backgroundImage;
+		const sAvatarParamValue = sAvatarUrl.match(/xcache=(\d+)/)[1];
 
 		// Act
 		this.oAvatar.invalidate();
@@ -636,7 +634,7 @@ sap.ui.define([
 
 	QUnit.test("Avatar's internal preloaded Image has correct url when used in cache busting context", function (assert) {
 		// Act
-		var sAvatarUrl = this.oAvatar.$().find(".sapFAvatarImageHolder")[0].style.backgroundImage;
+		const sAvatarUrl = this.oAvatar.$().find(".sapFAvatarImageHolder")[0].style.backgroundImage;
 
 		// based on internal state re-run src validating function so that image is preloaded
 		this.oAvatar._loadImage(this.oAvatar._getAvatarSrc());
@@ -662,8 +660,8 @@ sap.ui.define([
 		oAssert.expect(7);
 
 		// Arrange
-		var oLightBox = new LightBox(),
-			fnDone = oAssert.async();
+		const oLightBox = new LightBox();
+		const fnDone = oAssert.async();
 
 		// Act
 		this.oAvatar.setDetailBox(oLightBox);
@@ -698,10 +696,10 @@ sap.ui.define([
 
 	QUnit.test("detailBox lifecycle and events", function (oAssert) {
 		// Arrange
-		var oLightBoxA = new LightBox(),
-			oLightBoxB = new LightBox(),
-			oAttachPressSpy = this.spy(this.oAvatar, "attachPress"),
-			oDetachPressSpy = this.spy(this.oAvatar, "detachPress");
+		const oLightBoxA = new LightBox();
+		const oLightBoxB = new LightBox();
+		const oAttachPressSpy = this.spy(this.oAvatar, "attachPress");
+		const oDetachPressSpy = this.spy(this.oAvatar, "detachPress");
 
 		// Act - set LightBox
 		this.oAvatar.setDetailBox(oLightBoxA);
@@ -746,8 +744,8 @@ sap.ui.define([
 		oAssert.expect(9);
 
 		// Arrange
-		var oLightBox = new LightBox(),
-			oNewLightBox = new LightBox();
+		const oLightBox = new LightBox();
+		const oNewLightBox = new LightBox();
 
 		// Act
 		this.oAvatar.setDetailBox(oLightBox);
@@ -784,8 +782,8 @@ sap.ui.define([
 		oAssert.expect(4);
 
 		//Arrange
-		var oLightBox = new LightBox(),
-			sIconURI = "sap-icon://home";
+		const oLightBox = new LightBox();
+		const sIconURI = "sap-icon://home";
 
 		// Act
 		this.oAvatar.setSrc(sIconURI);
@@ -810,8 +808,8 @@ sap.ui.define([
 		oAssert.expect(2);
 
 		// Arrange
-		var oLightBox = new LightBox(),
-			sIconURI = "sap-icon://home";
+		const oLightBox = new LightBox();
+		const sIconURI = "sap-icon://home";
 
 		// Act
 		this.oAvatar.setSrc(sIconURI);
@@ -831,13 +829,11 @@ sap.ui.define([
 
 	QUnit.test("cloning of press event handler", function (assert) {
 		// Arrange
-		var oLightBox = new LightBox(),
-			oAvatarClone;
-
+		const oLightBox = new LightBox();
 		this.oAvatar.setDetailBox(oLightBox);
 
 		// Act - clone the Avatar
-		oAvatarClone = this.oAvatar.clone();
+		const oAvatarClone = this.oAvatar.clone();
 
 		// Assert
 		assert.strictEqual(oAvatarClone.hasListeners("press"), true, "Press event listener is cloned");
@@ -864,8 +860,8 @@ sap.ui.define([
 
 	QUnit.test(".sapMAvatarPressed class is added where applicable", async function (assert) {
 		// Arrange
-		var fnHandler = this.stub(),
-		$oAvatar = this.oAvatar.$();
+		const fnHandler = this.stub();
+		const $oAvatar = this.oAvatar.$();
 		this.oAvatar.attachPress(fnHandler);
 
 		// Act
@@ -895,7 +891,7 @@ sap.ui.define([
 
 	QUnit.test("press isn't fired when 'enabled' is set to 'false'", function (assert) {
 		// arrange
-		var oSpy = this.spy(Avatar.prototype, "firePress");
+		const oSpy = this.spy(Avatar.prototype, "firePress");
 
 		// act
 		this.oAvatar.setEnabled(false);
@@ -906,14 +902,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("URL escaping", function (assert) {
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		// If src is not escaped, the css value would be invalid and jQuery would return 'none'
 		assert.notStrictEqual($oAvatar.find(".sapFAvatarImageHolder").css("background-image"), "none", "src is properly escaped");
 	});
 
 	QUnit.test("Avatar with border", async function (assert) {
 		// Arrange
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 
 		// Assert
 		assert.notOk($oAvatar.hasClass("sapFAvatarBorder"), "Avatar does not have 'sapFAvatarBorder' class when showBorder='fase'");
@@ -937,13 +933,13 @@ sap.ui.define([
 	});
 
 	QUnit.test("Check if tooltip is present", function (assert) {
-		var $oAvatar = this.oAvatar.$();
+		const $oAvatar = this.oAvatar.$();
 		assert.strictEqual($oAvatar.prop("title"), "sampleTooltip", "Tooltip is present");
 	});
 
 	QUnit.test("Check ARIA specific roles", async function (assert) {
-		var $oAvatar = this.oAvatar.$(),
-			sDefaultTooltip = Library.getResourceBundleFor("sap.m").getText("AVATAR_TOOLTIP");
+		let $oAvatar = this.oAvatar.$();
+		const sDefaultTooltip = Library.getResourceBundleFor("sap.m").getText("AVATAR_TOOLTIP");
 
 		assert.strictEqual($oAvatar.attr("role"), "img", "Aria role should be 'img'");
 		assert.strictEqual($oAvatar.attr("aria-label"), "sampleTooltip", "Aria-label should be the custom 'sampleTooltip' text tooltip");
@@ -973,7 +969,7 @@ sap.ui.define([
 		assert.strictEqual($oAvatar.attr("aria-label"), sDefaultTooltip, "Aria-label should be the default 'Avatar' text");
 
 		//act
-		var fnHandler = this.stub();
+		const fnHandler = this.stub();
 		this.oAvatar.attachPress(fnHandler);
 
 		//assert
@@ -993,13 +989,12 @@ sap.ui.define([
 	});
 
 	QUnit.test("Appearance of the aria-haspopup attribute", async function (assert) {
-		var AriaHasPopup = coreLibrary.aria.HasPopup,
-			oAvatarDomRef;
+		const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 		// setup
 		this.oAvatar.placeAt("qunit-fixture");
 		await nextUIUpdate();
-		oAvatarDomRef = this.oAvatar.getDomRef();
+		const oAvatarDomRef = this.oAvatar.getDomRef();
 
 		// check initial aria-haspopup state
 		assert.notOk(oAvatarDomRef.getAttribute("aria-haspopup"), "There is no aria-haspopup attribute initially.");
@@ -1021,18 +1016,15 @@ sap.ui.define([
 
 	QUnit.test("Aria-labelledby", async function(assert) {
 		// Arrange
-		var avatar = new Avatar({
+		const avatar = new Avatar({
 			id: "avatarID",
 			ariaLabelledBy: "id1"
-		}),
-			oAvatarDomRef,
-			sInitialsAriaLabelledBy,
-			sInitials;
+		});
 
 		// Setup
 		avatar.placeAt("qunit-fixture");
 		await nextUIUpdate();
-		oAvatarDomRef = avatar.getDomRef();
+		const oAvatarDomRef = avatar.getDomRef();
 
 		//assert
 		assert.strictEqual(oAvatarDomRef.getAttribute("aria-labelledby"), "id1", "Aria-labelledby is set correctly");
@@ -1041,13 +1033,13 @@ sap.ui.define([
 		avatar.setInitials("BP");
 		await nextUIUpdate();
 
-		sInitialsAriaLabelledBy = avatar.sId + "-InvisibleText";
+		const sInitialsAriaLabelledBy = avatar.sId + "-InvisibleText";
 
 		// Assert
 		assert.strictEqual(oAvatarDomRef.getAttribute("aria-labelledby"), "id1 " + sInitialsAriaLabelledBy, "Avatar`s initials are part of aria-labelledby");
 
-		var sInvisibleMessage = document.getElementById(sInitialsAriaLabelledBy).innerText;
-		sInitials = avatar.getInitials();
+		const sInvisibleMessage = document.getElementById(sInitialsAriaLabelledBy).innerText;
+		const sInitials = avatar.getInitials();
 
 		// Assert
 		assert.strictEqual(sInitials, sInvisibleMessage, "The initials are contained inside the InvisibleMessage.");
@@ -1058,11 +1050,11 @@ sap.ui.define([
 
 	QUnit.test("getAccessibilityInfo returns correct role and focusable", function(assert) {
 		// Arrange
-		var oAvatar = new Avatar({
+		const oAvatar = new Avatar({
 			src: "test.jpg"
 		});
-		var fnPressHandler = function() {};
-		var oAccInfo;
+		const fnPressHandler = function() {};
+		let oAccInfo;
 
 		// Act - standard avatar
 		oAccInfo = oAvatar.getAccessibilityInfo();
@@ -1101,11 +1093,11 @@ sap.ui.define([
 
 	QUnit.test("getAccessibilityInfo returns correct description", function(assert) {
 		// Arrange
-		var sCustomTooltip = "Custom Tooltip Text";
-		var sInitials = "BP";
-		var sDefaultTooltip = Library.getResourceBundleFor("sap.m").getText("AVATAR_TOOLTIP");
-		var oAvatar = new Avatar();
-		var oAccInfo;
+		const sCustomTooltip = "Custom Tooltip Text";
+		const sInitials = "BP";
+		const sDefaultTooltip = Library.getResourceBundleFor("sap.m").getText("AVATAR_TOOLTIP");
+		const oAvatar = new Avatar();
+		let oAccInfo;
 
 		// Act - custom tooltip
 		oAvatar.setTooltip(sCustomTooltip);
@@ -1123,9 +1115,9 @@ sap.ui.define([
 		assert.strictEqual(oAccInfo.description, sDefaultTooltip + " " + sInitials, "Description should include default tooltip and initials");
 
 		// Act - badge tooltip with initials
-		var sCustomBadgeTooltip = "Custom Badge";
+		const sCustomBadgeTooltip = "Custom Badge";
 		oAvatar.setBadgeTooltip(sCustomBadgeTooltip);
-		var sDefaultBadgeTooltip = oAvatar._getDefaultTooltip();
+		const sDefaultBadgeTooltip = oAvatar._getDefaultTooltip();
 		oAccInfo = oAvatar.getAccessibilityInfo();
 
 		// Assert
@@ -1145,12 +1137,12 @@ sap.ui.define([
 
 	QUnit.test("getAccessibilityInfo returns correct type and enabled", function(assert) {
 		// Arrange
-		var oAvatar = new Avatar({
+		const oAvatar = new Avatar({
 			src: "test.jpg"
 		});
-		var sButtonType = Library.getResourceBundleFor("sap.m").getText("ACC_CTR_TYPE_BUTTON");
-		var sImageType = Library.getResourceBundleFor("sap.m").getText("ACC_CTR_TYPE_IMAGE");
-		var oAccInfo;
+		const sButtonType = Library.getResourceBundleFor("sap.m").getText("ACC_CTR_TYPE_BUTTON");
+		const sImageType = Library.getResourceBundleFor("sap.m").getText("ACC_CTR_TYPE_IMAGE");
+		let oAccInfo;
 
 		// Act - standard avatar (image role)
 		oAccInfo = oAvatar.getAccessibilityInfo();
@@ -1188,9 +1180,9 @@ sap.ui.define([
 
 	QUnit.test("Check default backgroundColor property value", function (assert) {
 		// Arrange
-		var oAvatar = this.oAvatar,
-			$oAvatar = oAvatar.$(),
-			sDefaultColor = AvatarColor.Accent6;
+		const oAvatar = this.oAvatar;
+		const $oAvatar = oAvatar.$();
+		const sDefaultColor = AvatarColor.Accent6;
 
 		// Assert
 		assert.strictEqual(oAvatar.getBackgroundColor(), sDefaultColor,
@@ -1201,14 +1193,14 @@ sap.ui.define([
 
 	QUnit.test("Iterate over all possible colors and set them", async function (assert) {
 		// Arrange
-		var oAvatar = this.oAvatar,
-			$oAvatar = oAvatar.$(),
-			sCurrentColor,
-			aKeys = Object.keys(AvatarColor);
+		const oAvatar = this.oAvatar;
+		const $oAvatar = oAvatar.$();
+		let sCurrentColor;
+		const aKeys = Object.keys(AvatarColor);
 
 		// Iterating over all of the properties of AvatarColor enum,
 		// without "Random".
-		for (var i = 0; i < aKeys.length; i++) {
+		for (let i = 0; i < aKeys.length; i++) {
 			sCurrentColor = aKeys[i];
 
 			if (sCurrentColor === AvatarColor.Random) {
@@ -1229,15 +1221,14 @@ sap.ui.define([
 
 	QUnit.test("Random color is not changed after re-rendering", async function (assert) {
 		// Arrange
-		var oAvatar = this.oAvatar,
-			$oAvatar = oAvatar.$(),
-			sActualBackgroundColor;
+		const oAvatar = this.oAvatar;
+		const $oAvatar = oAvatar.$();
 
 		// Act - Setting the background of the control to Random
 		oAvatar.setBackgroundColor(AvatarColor.Random);
 		await nextUIUpdate();
 
-		sActualBackgroundColor = oAvatar._getActualBackgroundColor();
+		const sActualBackgroundColor = oAvatar._getActualBackgroundColor();
 
 		// Assert
 		assert.ok($oAvatar.hasClass("sapFAvatarColor" + sActualBackgroundColor),
@@ -1405,7 +1396,7 @@ sap.ui.define([
 
 	QUnit.test("Affordance is not presented with bulk data", async function(assert) {
 		// Arrange
-		var sWarnArgs = "No valid Icon URI source for badge affordance was provided";
+		const sWarnArgs = "No valid Icon URI source for badge affordance was provided";
 		this.oAvatar.attachPress(function () {});
 		this.stub(Log, "warning");
 
@@ -1427,17 +1418,17 @@ sap.ui.define([
 	});
 
 	QUnit.test("Check aria-label of avatar with badgeTooltip", function(assert) {
-		var $oAvatar = this.oAvatar.$(),
-			sDefaultBadgeTooltip = this.oAvatar._getDefaultTooltip();
+		const $oAvatar = this.oAvatar.$();
+		const sDefaultBadgeTooltip = this.oAvatar._getDefaultTooltip();
 
 		//assert
 		assert.strictEqual($oAvatar.attr("aria-label"), sDefaultBadgeTooltip, "Default badgeTooltip value is set as aria-label");
 	});
 
 	QUnit.test("Check aria-label of avatar with badgeTooltip", async function(assert) {
-		var $oAvatar = this.oAvatar.$(),
-			sDefaultBadgeTooltip = this.oAvatar._getDefaultTooltip(),
-			sCustomBadgeTooltip = "Custom Tooltip";
+		const $oAvatar = this.oAvatar.$();
+		const sDefaultBadgeTooltip = this.oAvatar._getDefaultTooltip();
+		const sCustomBadgeTooltip = "Custom Tooltip";
 
 		// Act
 		this.oAvatar.setBadgeTooltip(sCustomBadgeTooltip);
@@ -1448,10 +1439,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Check aria-label of avatar with badgeTooltip and initials", async function(assert) {
-		var $oAvatar = this.oAvatar.$(),
-			sDefaultBadgeTooltip = this.oAvatar._getDefaultTooltip(),
-			sCustomBadgeTooltip = "Custom Tooltip",
-			sInitials = "AA";
+		const $oAvatar = this.oAvatar.$();
+		const sDefaultBadgeTooltip = this.oAvatar._getDefaultTooltip();
+		const sCustomBadgeTooltip = "Custom Tooltip";
+		const sInitials = "AA";
 
 		// Act
 		this.oAvatar.setBadgeTooltip(sCustomBadgeTooltip);
@@ -1463,8 +1454,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Check aria-label of decorative avatar", async function(assert) {
-		var $oAvatar = this.oAvatar.$(),
-			sInitials = "AA";
+		const $oAvatar = this.oAvatar.$();
+		const sInitials = "AA";
 
 		// Act
 		this.oAvatar.setInitials(sInitials);
@@ -1476,9 +1467,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("Check aria-label of decorative avatar with press handler", async function(assert) {
-		var $oAvatar = this.oAvatar.$(),
-			sDefaultBadgeTooltip = this.oAvatar._getDefaultTooltip(),
-			sInitials = "AA";
+		const $oAvatar = this.oAvatar.$();
+		const sDefaultBadgeTooltip = this.oAvatar._getDefaultTooltip();
+		const sInitials = "AA";
 
 		// Act
 		this.oAvatar.setInitials(sInitials);
@@ -1497,7 +1488,7 @@ sap.ui.define([
 
 	QUnit.test("SPACE - press event", function(assert) {
 		//setup
-		var oSpy = this.spy(Avatar.prototype, "firePress");
+		const oSpy = this.spy(Avatar.prototype, "firePress");
 
 		//act
 		qutils.triggerKeydown(this.oAvatar, KeyCodes.SPACE);
@@ -1514,7 +1505,7 @@ sap.ui.define([
 
 	QUnit.test("SPACE - press event interupt", function(assert) {
 		//setup
-		var	oSpy = this.spy(Avatar.prototype, "firePress");
+		const oSpy = this.spy(Avatar.prototype, "firePress");
 
 		testPressInterupt(assert, this.oAvatar, oSpy, KeyCodes.SHIFT);
 		testPressInterupt(assert, this.oAvatar, oSpy, KeyCodes.ESCAPE);
@@ -1522,7 +1513,7 @@ sap.ui.define([
 
 	QUnit.test("ENTER - press event", function(assert) {
 		//setup
-		var oSpy = this.spy(Avatar.prototype, "firePress");
+		const oSpy = this.spy(Avatar.prototype, "firePress");
 
 		//act
 		qutils.triggerKeyup(this.oAvatar, KeyCodes.ENTER);
@@ -1539,14 +1530,14 @@ sap.ui.define([
 
 	QUnit.test("Avatar with DetailBox stops event propagation on click", async function(assert) {
 		// Arrange
-		var oLightBox = new LightBox(),
-			oStopPropagationSpy = this.spy();
+		const oLightBox = new LightBox();
+		const oStopPropagationSpy = this.spy();
 
 		this.oAvatar.setDetailBox(oLightBox);
 		await nextUIUpdate();
 
 		// Create a mock event object with a spy for stopPropagation
-		var oMockEvent = {
+		const oMockEvent = {
 			stopPropagation: oStopPropagationSpy
 		};
 

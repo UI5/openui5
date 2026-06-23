@@ -2358,6 +2358,9 @@ sap.ui.define([
 				if (sId === this.getOngoingScrollToSectionBaseId()) {
 					this.setOngoingScrollToSectionBaseId(null);
 					this._resumeLazyLoading();
+					// Content may have expanded during the animation via IntersectionObserver-based lazy loading
+					// (outside ObjectPage control), shifting section positions. Re-measure and snap-correct if needed.
+					this._correctScrollPositionIfNeeded(sId);
 				}
 			}.bind(this, sId);
 
@@ -2438,6 +2441,35 @@ sap.ui.define([
 		}
 
 		return iScrollTo;
+	};
+
+	/**
+	 * Corrects the scroll position after a programmatic scroll completes, in case content expanded
+	 * during the animation via IntersectionObserver-based lazy loading (outside ObjectPage control),
+	 * shifting section offsets beyond the scroll target.
+	 * Re-measures positions and snap-scrolls (duration 0) to the correct offset when a drift is detected.
+	 * Uses _scrollTo directly — not scrollToSection — to avoid re-entry.
+	 * @param {string} sId - the ID of the section that was scrolled to
+	 * @private
+	 */
+	ObjectPageLayout.prototype._correctScrollPositionIfNeeded = function (sId) {
+		if (sId !== this._sCurrentScrollId) {
+			return;
+		}
+
+		var oSectionInfo = this._oSectionInfo[sId];
+		if (!oSectionInfo || !oSectionInfo.sectionReference || !this._$opWrapper || !this._$opWrapper.length) {
+			return;
+		}
+
+		this._requestAdjustLayout(true);
+
+		var iCorrectedTarget = this._computeScrollPosition(this._oSectionInfo[sId].sectionReference),
+			iCurrentScrollTop = this._$opWrapper.scrollTop();
+
+		if (Math.abs(iCurrentScrollTop - iCorrectedTarget) > 1) {
+			this._scrollTo(iCorrectedTarget, 0);
+		}
 	};
 
 	/**
