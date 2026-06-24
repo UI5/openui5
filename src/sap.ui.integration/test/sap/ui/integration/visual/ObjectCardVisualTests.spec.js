@@ -47,6 +47,19 @@ describe("sap.ui.integration.ObjectCardVisualTests", function () {
 		"cardImgOvImgHeight"
 	];
 
+	const aCardHorizontalLayoutIds1 = [
+		"cardStretchHorizontalText",
+		"cardStretchHorizontalIcons",
+		"cardStretchHorizontalStatus"
+	];
+
+	const aCardHorizontalLayoutIds2 = [
+		"cardStretchHorizontalForm",
+		"cardStretchHorizontalMixed",
+		"cardStretchHorizontalWrap",
+		"cardDefaultHorizontal"
+	];
+
 	function testObjectCard(sPrefix, aCardIds) {
 		aCardIds.forEach(function (sId) {
 			utils.takePictureOfElement({
@@ -82,6 +95,14 @@ describe("sap.ui.integration.ObjectCardVisualTests", function () {
 		testObjectCard("Object_", aCardWithImageOverlayIds2);
 	});
 
+	it("Object Card with Horizontal items layout", function () {
+		testObjectCard("Object_", aCardHorizontalLayoutIds1);
+	});
+
+	it("Object Card with Horizontal items layout", function () {
+		testObjectCard("Object_", aCardHorizontalLayoutIds2);
+	});
+
 	it("Object Card - Compact", function () {
 		utils.switchToCompactDensity();
 
@@ -102,5 +123,13 @@ describe("sap.ui.integration.ObjectCardVisualTests", function () {
 
 	it("Object Card with Overlay Image - Compact", function () {
 		testObjectCard("Compact_Object_", aCardWithImageOverlayIds2);
+	});
+
+	it("Object Card with Horizontal items layout - Compact", function () {
+		testObjectCard("Com_Object_", aCardHorizontalLayoutIds1);
+	});
+
+	it("Object Card with Horizontal items layout - Compact", function () {
+		testObjectCard("Com_Object_", aCardHorizontalLayoutIds2);
 	});
 });

@@ -1,0 +1,80 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "cardsdemo.object.stretchHorizontalStatus",
+		"type": "card",
+		"title": "Card 'stretchHorizontalStatus'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"header": {
+			"title": "Stretch / Horizontal — Status, Rating, Numeric"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Indicators",
+					"alignment": "Stretch",
+					"itemsLayout": "Horizontal",
+					"items": [
+						{
+							"label": "Amount",
+							"value": "15,000.00 EUR",
+							"type": "Status",
+							"state": "Information"
+						},
+						{
+							"label": "Approval",
+							"value": "Approved",
+							"type": "Status",
+							"state": "Success"
+						},
+						{
+							"label": "Risk",
+							"value": "High",
+							"type": "Status",
+							"state": "Error"
+						},
+						{
+							"label": "Quality",
+							"type": "RatingIndicator",
+							"maxValue": 5,
+							"value": 4
+						},
+						{
+							"label": "Speed",
+							"type": "RatingIndicator",
+							"maxValue": 7,
+							"value": 5.5
+						},
+						{
+							"label": "Revenue",
+							"type": "NumericData",
+							"mainIndicator": {
+								"number": "1.83",
+								"unit": "M",
+								"trend": "Up",
+								"state": "Good"
+							},
+							"details": "Compared to last quarter"
+						},
+						{
+							"label": "Costs",
+							"type": "NumericData",
+							"mainIndicator": {
+								"number": "640",
+								"unit": "K",
+								"trend": "Down",
+								"state": "Good"
+							},
+							"details": "Compared to last quarter"
+						}
+					]
+				}
+			]
+		}
+	}
+}

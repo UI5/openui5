@@ -70,6 +70,16 @@ sap.ui.define([
 					defaultValue: true
 				},
 				/**
+				 * If set to <code>true</code>, the filter is applied word by word, and matched text in the results is highlighted. If set to <code>false</code>, filtering takes the whole string into account, and nothing is highlighted.
+				 *
+				 * @since 1.150
+				 */
+				highlightFilterResults: {
+					type: "boolean",
+					group: "Appearance",
+					defaultValue: false
+				},
+				/**
 				 * If set, an item to clear the selection is added.
 				 *
 				 * This item is only available if the connected field can be cleared.
@@ -137,7 +147,7 @@ sap.ui.define([
 		this._iNavigateIndex = -1; // initially nothing is navigated
 
 		this._oObserver.observe(this, {
-			properties: ["emptyText"]
+			properties: ["emptyText", "highlightFilterResults"]
 		});
 
 	};
@@ -162,14 +172,15 @@ sap.ui.define([
 				"sap/ui/model/Sorter",
 				"sap/ui/model/base/ManagedObjectModel",
 				"sap/base/strings/whitespaceReplacer",
-				"sap/ui/mdc/valuehelp/content/FixedListItem"
+				"sap/ui/mdc/valuehelp/content/FixedListItem",
+				"sap/m/inputUtils/highlightDOMElements"
 			]).then((aModules) => {
 
 				if (this.isDestroyStarted()) {
 					return null;
 				}
 
-				const [List, DisplayListItem, mLibrary, Filter, Sorter, ManagedObjectModel, whitespaceReplacer, fFixedListItem] = aModules;
+				const [List, DisplayListItem, mLibrary, Filter, Sorter, ManagedObjectModel, whitespaceReplacer, fFixedListItem, highlightDOMElements] = aModules;
 				FixedListItem = fFixedListItem; // make global
 
 				this._oManagedObjectModel = new ManagedObjectModel(this);
@@ -237,6 +248,18 @@ sap.ui.define([
 					items: { path: "$help>/items", template: oItemTemplate, filters: oFilter, sorter: oSorter, templateShareable: false },
 					itemPress: _handleItemPress.bind(this) // as selected item can be pressed
 				}).addStyleClass("sapMComboBoxBaseList").addStyleClass("sapMComboBoxList");
+
+				this._oHighlightDelegate = {
+					onAfterRendering: function() {
+						const sFilterValue = this.getFilterValue();
+						if (sFilterValue && this.getFilterList()) {
+							highlightDOMElements(oList.$().find(".sapMDLILabel"), sFilterValue, true);
+						}
+					}
+				};
+				if (this.getHighlightFilterResults()) {
+					oList.addEventDelegate(this._oHighlightDelegate, this);
+				}
 
 				oList.applyAriaRole("listbox"); // needed if List of ComboBox or similar
 				oList.setModel(this._oManagedObjectModel, "$help");
@@ -325,7 +348,17 @@ sap.ui.define([
 
 	function _filterText(sText, sFilterValue) {
 
-		return !sFilterValue || (typeof sFilterValue === "string" && (this.getCaseSensitive() ? sText.startsWith(sFilterValue) : sText.toLowerCase().startsWith(sFilterValue.toLowerCase())));
+		if (!sFilterValue || typeof sFilterValue !== "string") {
+			return true;
+		}
+
+		if (!this.getHighlightFilterResults()) {
+			return this.getCaseSensitive() ? sText.startsWith(sFilterValue) : sText.toLowerCase().startsWith(sFilterValue.toLowerCase());
+		}
+
+		const sCompare = this.getCaseSensitive() ? sText : sText.toLowerCase();
+		const sFilter = this.getCaseSensitive() ? sFilterValue : sFilterValue.toLowerCase();
+		return sCompare.split(/\s+/).some((sWord) => sWord.startsWith(sFilter));
 
 	}
 
@@ -792,6 +825,16 @@ sap.ui.define([
 			_setEmptyItem.call(this, oChanges.current);
 			this._oManagedObjectModel?.checkUpdate(true, true);
 			_updateSelection.call(this); // as items might be changed
+		} else if (oChanges.name === "highlightFilterResults") {
+			const oList = _getList.call(this);
+			if (oList && this._oHighlightDelegate) {
+				if (oChanges.current) {
+					oList.addEventDelegate(this._oHighlightDelegate, this);
+				} else {
+					oList.removeEventDelegate(this._oHighlightDelegate);
+				}
+				oList.invalidate();
+			}
 		} else if (oChanges.name === "config" && (oChanges.current?.emptyAllowed !== oChanges.old?.emptyAllowed)) {
 			this._oManagedObjectModel?.checkUpdate(true, true);
 			_updateSelection.call(this); // as items might be changed

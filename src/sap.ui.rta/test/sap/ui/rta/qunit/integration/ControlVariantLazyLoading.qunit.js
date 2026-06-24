@@ -50,8 +50,9 @@ sap.ui.define([
 		return oResponse;
 	}
 
-	function createVariantContentResponse(aChanges) {
+	function createVariantContentResponse(aVariants, aChanges) {
 		const oResponse = StorageUtils.getEmptyFlexDataResponse();
+		oResponse.variants = aVariants;
 		oResponse.variantDependentControlChanges = aChanges;
 		return oResponse;
 	}
@@ -257,6 +258,16 @@ sap.ui.define([
 			// Stub loadFlVariantDependentControlChanges to return a hideControl change targeting a section
 			const sTargetControlId = "lazyLoadView--ObjectPageSection1";
 			const oContentResponse = createVariantContentResponse([
+				{
+					fileName: "lazyVariant1",
+					fileType: "ctrl_variant",
+					variantManagementReference: this.sVMReference,
+					variantReference: this.sVMReference,
+					reference: sReference,
+					layer: Layer.USER,
+					content: { title: "Lazy Variant Alpha" }
+				}
+			], [
 				{
 					fileName: "lazyUIChange1",
 					fileType: "change",

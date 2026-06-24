@@ -1,0 +1,96 @@
+{
+	"sap.app": {
+		"id": "card.explorer.object.horizontalItemsLayout",
+		"type": "card",
+		"title": "Sample of an Object Card with Horizontal Items Layout",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"tags": {
+			"keywords": [
+				"Object",
+				"Card",
+				"Sample",
+				"Horizontal",
+				"itemsLayout"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://switch-classes"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"data": {
+			"json": {
+				"firstName": "Donna",
+				"lastName": "Moore",
+				"position": "Sales Executive",
+				"phone": "+1 202 555 5555",
+				"email": "donna.moore@example.com",
+				"company": {
+					"name": "Robert Brown Entertainment",
+					"address": "481 West Street, Anytown OH 45066, USA",
+					"website": "www.company_a.example.com"
+				}
+			}
+		},
+		"header": {
+			"title": "Donna Moore",
+			"subtitle": "Sales Executive"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Personal details",
+					"alignment": "Stretch",
+					"itemsLayout": "Horizontal",
+					"items": [
+						{
+							"label": "First Name",
+							"value": "{firstName}"
+						},
+						{
+							"label": "Last Name",
+							"value": "{lastName}"
+						},
+						{
+							"label": "Position",
+							"value": "{position}"
+						},
+						{
+							"label": "Phone",
+							"value": "{phone}"
+						},
+						{
+							"label": "Email",
+							"value": "{email}"
+						}
+					]
+				},
+				{
+					"title": "Company",
+					"alignment": "Stretch",
+					"itemsLayout": "Horizontal",
+					"items": [
+						{
+							"label": "Name",
+							"value": "{company/name}"
+						},
+						{
+							"label": "Address",
+							"value": "{company/address}"
+						},
+						{
+							"label": "Website",
+							"value": "{company/website}"
+						}
+					]
+				}
+			]
+		}
+	}
+}

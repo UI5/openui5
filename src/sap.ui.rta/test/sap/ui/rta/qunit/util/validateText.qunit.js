@@ -14,6 +14,9 @@ function(
 	var sandbox = sinon.createSandbox();
 
 	QUnit.module("validateText", {
+		afterEach() {
+			sandbox.restore();
+		}
 	}, function() {
 		QUnit.test("When a valid string is passed", function(assert) {
 			validateText("Potato");
@@ -76,6 +79,27 @@ function(
 					"The name must not contain \"{\". Please choose a different name.",
 					"then binding error was thrown");
 			}
+		});
+
+		QUnit.test("When skipSameTextValidator is set and equal strings are passed", function(assert) {
+			assert.ok(true, "sameTextError is not thrown when skipSameTextValidator is set");
+			validateText("Potato", "Potato", { skipSameTextValidator: true });
+		});
+
+		QUnit.test("When skipSameTextValidator is set and a binding is passed", function(assert) {
+			assert.throws(
+				validateText.bind(this, "{Binding}", "{Binding}", { skipSameTextValidator: true }),
+				Error("The name must not contain \"{\". Please choose a different name."),
+				"then the binding error is still thrown"
+			);
+		});
+
+		QUnit.test("When equal strings are passed, sameText is checked before noBindingText", function(assert) {
+			assert.throws(
+				validateText.bind(this, "{Binding}", "{Binding}"),
+				Error("sameTextError"),
+				"then sameTextError is thrown before the binding error"
+			);
 		});
 	});
 

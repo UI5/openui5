@@ -1436,8 +1436,9 @@ sap.ui.define([
 			new ValueHelp(this._sOperatorHelpId, {
 				typeahead: new Popover(this._sOperatorHelpId + "-pop", {
 					content: [new FixedList(this._sOperatorHelpId + "-pop-fl", {
-						filterList: false,
-						useFirstMatch: true
+						filterList: true,
+						useFirstMatch: true,
+						highlightFilterResults: true
 					})]
 				}),
 				open: (oEvent) => {

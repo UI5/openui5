@@ -363,6 +363,7 @@ sap.ui.define([
 					bNextAFLayout = false;
 				}
 				oAFLayout.addContent(oGroup);
+				oAFLayout.setMaxItemWidth("48rem");
 			}
 
 			if (i === aGroups.length - 1) {
@@ -414,10 +415,28 @@ sap.ui.define([
 			oGroup.addStyleClass("sapFCardObjectGroupWithTitle");
 		}
 
-		oGroupConfiguration.items.forEach(function (oItem, iIndex) {
-			oItem.labelWrapping = oGroupConfiguration.labelWrapping;
-			this._createGroupItems(oItem, sPath + "/items/" + iIndex).forEach(oGroup.addItem, oGroup);
-		}, this);
+		if (oGroupConfiguration.itemsLayout === "Horizontal") {
+			const oInnerAFLayout = this._createAFLayout();
+
+			oGroupConfiguration.items.forEach(function (oItem, iIndex) {
+				oItem.labelWrapping = oGroupConfiguration.labelWrapping;
+				const aGroupItems = this._createGroupItems(oItem, sPath + "/items/" + iIndex);
+				// keep each label/value pair together when the AlignedFlowLayout wraps
+				const oPair = aGroupItems.length === 1 ? aGroupItems[0] : new VBox({
+					renderType: FlexRendertype.Bare,
+					items: aGroupItems
+				}).addStyleClass("sapFCardObjectItemPairContainer");
+				oInnerAFLayout.addContent(oPair);
+			}, this);
+
+			oGroup.addItem(oInnerAFLayout);
+			oInnerAFLayout.setMinItemWidth("6rem");
+		} else {
+			oGroupConfiguration.items.forEach(function (oItem, iIndex) {
+				oItem.labelWrapping = oGroupConfiguration.labelWrapping;
+				this._createGroupItems(oItem, sPath + "/items/" + iIndex).forEach(oGroup.addItem, oGroup);
+			}, this);
+		}
 
 		return oGroup;
 	};
@@ -717,6 +736,7 @@ sap.ui.define([
 		}
 
 		var oButtonGroup = new OverflowToolbar({
+			width: "100%",
 			visible: BindingHelper.reuse(vVisible),
 			style: ToolbarStyle.Clear
 		});

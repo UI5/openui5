@@ -1,0 +1,70 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "cardsdemo.object.stretchHorizontalText",
+		"type": "card",
+		"i18n": "i18n/i18n.properties",
+		"title": "Card 'stretchHorizontalText'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"data": {
+			"request": {
+				"url": "./employee.json"
+			}
+		},
+		"header": {
+			"title": "Stretch / Horizontal — Text items",
+			"subtitle": "Label + value pairs flow horizontally and wrap"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Personal",
+					"alignment": "Stretch",
+					"itemsLayout": "Horizontal",
+					"items": [
+						{
+							"label": "First Name",
+							"value": "{firstName}"
+						},
+						{
+							"label": "Last Name",
+							"value": "{lastName}"
+						},
+						{
+							"label": "Position",
+							"value": "{position}"
+						},
+						{
+							"label": "Phone",
+							"value": "{phone}"
+						}
+					]
+				},
+				{
+					"title": "Company",
+					"alignment": "Stretch",
+					"itemsLayout": "Horizontal",
+					"items": [
+						{
+							"label": "Name",
+							"value": "{company/name}"
+						},
+						{
+							"label": "Address",
+							"value": "{company/address}"
+						},
+						{
+							"label": "Website",
+							"value": "{company/website}"
+						}
+					]
+				}
+			]
+		}
+	}
+}

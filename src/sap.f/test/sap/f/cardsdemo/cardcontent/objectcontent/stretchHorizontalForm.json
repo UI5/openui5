@@ -1,0 +1,116 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "cardsdemo.object.stretchHorizontalForm",
+		"type": "card",
+		"title": "Card 'stretchHorizontalForm'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"data": {
+			"json": {
+				"reasons": [
+					{
+						"id": "reason1",
+						"title": "Reason 1"
+					},
+					{
+						"id": "reason2",
+						"title": "Reason 2"
+					},
+					{
+						"id": "reason3",
+						"title": "Reason 3"
+					}
+				],
+				"priorities": [
+					{
+						"id": "low",
+						"title": "Low"
+					},
+					{
+						"id": "med",
+						"title": "Medium"
+					},
+					{
+						"id": "high",
+						"title": "High"
+					}
+				]
+			}
+		},
+		"header": {
+			"title": "Stretch / Horizontal — Form inputs"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Request",
+					"alignment": "Stretch",
+					"itemsLayout": "Horizontal",
+					"items": [
+						{
+							"id": "name",
+							"label": "Name",
+							"type": "Input",
+							"placeholder": "Enter your name"
+						},
+						{
+							"id": "reason",
+							"label": "Reason",
+							"type": "ComboBox",
+							"placeholder": "Select reason",
+							"item": {
+								"path": "/reasons",
+								"template": {
+									"key": "{id}",
+									"title": "{title}"
+								}
+							}
+						},
+						{
+							"id": "dateRange",
+							"label": "Date",
+							"type": "DateRange",
+							"value": {
+								"option": "date",
+								"values": [
+									"2026-06-12"
+								]
+							}
+						},
+						{
+							"id": "duration",
+							"label": "Duration",
+							"type": "Duration",
+							"value": "PT01H30M"
+						},
+						{
+							"id": "comment",
+							"label": "Comment",
+							"type": "TextArea",
+							"rows": 3,
+							"placeholder": "Write a comment"
+						},
+						{
+							"id": "priority",
+							"label": "Priority",
+							"type": "RadioButtonGroup",
+							"selectedKey": "med",
+							"item": {
+								"path": "/priorities",
+								"template": {
+									"key": "{id}",
+									"title": "{title}"
+								}
+							}
+						}
+					]
+				}
+			]
+		}
+	}
+}

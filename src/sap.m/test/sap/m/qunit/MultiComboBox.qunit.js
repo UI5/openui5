@@ -8526,7 +8526,7 @@ sap.ui.define([
 		assert.strictEqual(oListItemRef.find(".sapMSLITitleOnly [id$=-titleText]")[0].innerHTML,
 			"<span class=\"sapMInputHighlight\">A</span>lgeria", "The main text is correctly highlighted.");
 
-		assert.strictEqual(oListItemRef.find(".sapMSLIInfo [id$=-infoText]")[0].innerHTML,
+		assert.strictEqual(oListItemRef.find(".sapMSLIInfo .sapMObjStatusText")[0].innerHTML,
 			"<span class=\"sapMInputHighlight\">A</span>L", "The additional text is correctly highlighted.");
 	});
 

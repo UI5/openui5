@@ -25170,8 +25170,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						oContext25.requestSideEffects(["LifecycleStatus"]),
 						oContext25.requestSideEffects(["Note", /*ignored:*/"NoteLanguage"]),
 						// code under test (JIRA: CPOUI5ODATAV4-3514)
-						// Note: this allows only changes to *structural* properties, not SO_2_BP itself
-						oContext25.requestSideEffects(["SO_2_BP/*"]),
+						// Note: this allows only changes to *structural* properties of Address, but not
+						// to SO_2_BP's identity
+						oContext25.requestSideEffects(["SO_2_BP/Address/*"]),
 						that.waitForChanges(assert, sScenario)
 					]);
 
@@ -50570,8 +50571,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			 * @param {number} iRow - The first visible row
 			 * @param {number} [iSkip] - $skip for the request; no request if undefined
 			 * @param {number} [iTop] - $top for the request
+			 * @param {Promise} [oPromise] - How long to delay the response
 			 */
-			const expect = (iRow, iSkip, iTop) => {
+			const expect = (iRow, iSkip, iTop, oPromise = resolveLater()) => {
 				if (iSkip !== undefined) {
 					const aElements = [];
 					for (let i = 0; i < iTop; i += 1) {
@@ -50581,9 +50583,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					const sQuery = sBaseQuery + (bCount ? "&$count=true" : "");
 					bCount = false;
 					this.expectRequest(`EMPLOYEES?${sQuery}&$skip=${iSkip}&$top=${iTop}`,
-							resolveLater({
-								"@odata.count" : "100",
-								value : aElements
+							oPromise.then(() => {
+								assert.ok(true, `scroll to ${iRow}: responding now`);
+								return {
+									"@odata.count" : "100",
+									value : aElements
+								};
 							})
 						);
 				}
@@ -50598,13 +50603,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			 * @param {number} iRow - The new first visible row
 			 * @param {number} [iSkip] - $skip for the request; no request if undefined
 			 * @param {number} [iTop] - $top for the request
-			 * @param {boolean} [bNoWait] - Whether to wait for request and changes
+			 * @param {Promise} [oPromise] - How long to delay the response
 			 */
-			const scroll = async (iRow, iSkip, iTop, bNoWait) => {
-				expect(iRow, iSkip, iTop);
+			const scroll = async (iRow, iSkip, iTop, oPromise) => {
+				expect(iRow, iSkip, iTop, oPromise);
 				oTable.setFirstVisibleRow(iRow);
 
-				if (!bNoWait) {
+				if (!oPromise) {
 					await this.waitForChanges(assert, `scroll to ${iRow}`);
 				}
 			};
@@ -50621,14 +50626,18 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			await scroll(33, 38, 5); // 5 after (> threshold/2)
 			await scroll(34);
 			await scroll(35);
-			scroll(37, 43, 5, true); // 5 after
+			await scroll(37);
+			const {promise : oPromise, resolve : fnResolve} = Promise.withResolvers();
+			scroll(38, 43, 5, oPromise); // 5 after
 			// to avoid instable tests, wait at least 50ms (due to the throttling mechanism of the
 			// table) to ensure that the request is sent and the change events are fired;
 			// await Promise.resolve() cannot be used as it sometimes resolves in less than 50ms and
 			// sometimes it needs longer
 			await resolveLater(null, 50);
-			// this scroll happens before the response arrived, because we did not wait for the changes
-			await scroll(38);
+			assert.ok(true, "scroll to 38 - wait for table but not for the response");
+			// this scroll happens before the delayed(!) response arrives
+			await scroll(39);
+			fnResolve();
 			// backward
 			await scroll(29);
 			await scroll(28);
@@ -71555,6 +71564,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Select via setSelected and setting the client-side annotation (JIRA: CPOUI5ODATAV4-1944).
 	// Filter removes selection (JIRA: CPOUI5ODATAV4-2203).
 	// ODLB#getSelectionCount (JIRA: CPOUI5ODATAV4-1945)
+	// v4.Context#setKeepAlive on a suspended binding (JIRA: CPOUI5ODATAV4-3571)
 	[false, true].forEach(function (bImplicitly) {
 		[false, true].forEach(function (bUseAnnotation) {
 			var sTitle = "CPOUI5ODATAV4-488: Refresh w/" + (bImplicitly ? " implicitly" : "")
@@ -71633,8 +71643,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					checkSelected(assert, oKeptContext3, true);
 					assert.strictEqual(oListBinding.getSelectionCount(), 3);
 				} else {
+					// code under test (JIRA: CPOUI5ODATAV4-3571)
+					oKeptContext3.getBinding().suspend();
 					// 3rd kept-alive ontext (JIRA: CPOUI5ODATAV4-579)
 					oKeptContext3.setKeepAlive(true, fnOnBeforeDestroy);
+					oKeptContext3.getBinding().resume();
 				}
 
 				that.expectRequest("#5 SalesOrderList"

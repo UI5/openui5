@@ -38,6 +38,20 @@
 		margin-top: 1rem;
 	}
 
+	.sapUiAFLayoutItem > .sapFCardObjectItemPairContainer > .sapFCardObjectItemLabel,
+	.sapUiAFLayoutItem > .sapMHBox  {
+		margin-top: 1rem;
+	}
+
+	.sapUiAFLayoutItem > .sapFCardObjectItemPairContainer {
+		margin-right: 0.5rem;
+	}
+
+	// we don't know which item will be last on the row, so we remove the margin from the container
+	> .sapUiAFLayout {
+		margin-right: -0.5rem;
+	}
+
 	&:not(.sapFCardObjectGroupLastInColumn) {
 		padding-bottom: 1.75rem;
 	}

@@ -617,6 +617,22 @@ sap.ui.define([
 										key: "images/workingWithTablet.jpg"
 									}
 								]
+							},
+							{
+								title: 'Horizontal Items Layout',
+								key: 'horizontalItemsLayout',
+								experimental: true,
+								settings: {
+									columns: 8
+								},
+								files: [
+									{
+										url: '/samples/object/horizontalItemsLayout/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
 							}
 						]
 					},

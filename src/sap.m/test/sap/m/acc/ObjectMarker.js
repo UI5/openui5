@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/m/ObjectListItem",
 	"sap/ui/core/library",
 	"sap/ui/layout/VerticalLayout",
+	"sap/m/Text",
 	"sap/m/ObjectAttribute",
 	"sap/m/ObjectStatus",
 	"sap/m/ObjectMarker",
@@ -20,6 +21,7 @@ sap.ui.define([
 	ObjectListItem,
 	coreLibrary,
 	VerticalLayout,
+	Text,
 	ObjectAttribute,
 	ObjectStatus,
 	ObjectMarker,
@@ -136,15 +138,19 @@ sap.ui.define([
 		expandable: true,
 		expanded: true,
 		content: [
-			new Panel({
-				headerText: "Non-interactive markers",
-				content: {
-					path: "/markerTypes",
-					templateShareable: false,
-					template: new ObjectMarker({
-						type: "{type}"
+			new VerticalLayout({
+				content: [
+					new Text({text: "Non-interactive markers"}),
+					new VerticalLayout({
+						content: {
+							path: "/markerTypes",
+							templateShareable: false,
+							template: new ObjectMarker({
+								type: "{type}"
+							})
+						}
 					})
-				}
+				]
 			})
 		]
 	});
@@ -152,9 +158,11 @@ sap.ui.define([
 	var oObjectListItemPanel = new Panel({
 		headerText: "In a ObjectListItem use case",
 		content: [
-			new Panel({
-				headerText: "Non-Interactive Markers",
-				content: oList
+			new VerticalLayout({
+				content: [
+					new Text({text: "Non-Interactive Markers"}),
+					oList
+				]
 			})
 		]
 	});

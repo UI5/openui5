@@ -963,4 +963,59 @@ sap.ui.define([
 			}
 		);
 	});
+
+	QUnit.module("URLHandler.removeVariantParameterFromURL()", {
+		beforeEach() {
+			this.oGetHashStub = sandbox.stub(hasher, "getHash").returns("someHash");
+			this.oReplaceHashStub = sandbox.stub(hasher, "replaceHash");
+			this.oConstructShellHashStub = sandbox.stub().returns("newHash");
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("removes the variant parameter and replaces the hash silently", async function(assert) {
+			sandbox.stub(Utils, "getUShellService").withArgs("URLParsing").resolves({
+				parseShellHash: sandbox.stub().returns({
+					params: { [VariantUtil.VARIANT_TECHNICAL_PARAMETER]: ["variant1"] }
+				}),
+				constructShellHash: this.oConstructShellHashStub
+			});
+			let bHasherDisabledDuringReplace;
+			this.oReplaceHashStub.callsFake(() => {
+				bHasherDisabledDuringReplace = !hasher.changed.active;
+			});
+
+			await URLHandler.removeVariantParameterFromURL();
+
+			assert.strictEqual(this.oReplaceHashStub.callCount, 1, "hasher.replaceHash was called once");
+			assert.strictEqual(this.oReplaceHashStub.firstCall.args[0], "newHash", "hasher.replaceHash was called with the constructed hash");
+			const oConstructArgs = this.oConstructShellHashStub.firstCall.args[0];
+			assert.notOk(
+				VariantUtil.VARIANT_TECHNICAL_PARAMETER in oConstructArgs.params,
+				"the variant technical parameter was removed before constructShellHash was called"
+			);
+			assert.ok(bHasherDisabledDuringReplace, "hasher changed events were disabled during the hash replacement");
+			assert.ok(hasher.changed.active, "hasher changed events are re-activated after the update");
+		});
+
+		QUnit.test("returns early when the variant parameter is not present in the URL", async function(assert) {
+			sandbox.stub(Utils, "getUShellService").withArgs("URLParsing").resolves({
+				parseShellHash: sandbox.stub().returns({ params: {} }),
+				constructShellHash: this.oConstructShellHashStub
+			});
+
+			await URLHandler.removeVariantParameterFromURL();
+
+			assert.strictEqual(this.oReplaceHashStub.callCount, 0, "hasher.replaceHash was not called");
+		});
+
+		QUnit.test("returns early when the URLParsing service is unavailable", async function(assert) {
+			sandbox.stub(Utils, "getUShellService").withArgs("URLParsing").resolves(undefined);
+
+			await URLHandler.removeVariantParameterFromURL();
+
+			assert.strictEqual(this.oReplaceHashStub.callCount, 0, "hasher.replaceHash was not called");
+		});
+	});
 });

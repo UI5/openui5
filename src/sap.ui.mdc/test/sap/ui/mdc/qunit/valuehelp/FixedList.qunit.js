@@ -998,6 +998,47 @@ sap.ui.define([
 		assert.deepEqual(oTypeaheadCondition, aTestConditions[0], "typeaheadSuggested event condition");
 
 		ValueHelpDelegate.createConditionForContext.restore();
+	});
+
+	QUnit.test("highlightFilterResults - default is false, no highlighting without property", (assert) => {
+
+		oFixedList.setFilterValue("Item");
+		const oContent = oFixedList.getContent();
+
+		return oContent?.then(async (oContent) => {
+			await _renderScrollContainer(oContent);
+
+			assert.notOk(oFixedList.getHighlightFilterResults(), "highlightFilterResults defaults to false");
+
+			// trigger re-render to fire onAfterRendering delegate
+			oContent.invalidate();
+			await nextUIUpdate();
+
+			const aHighlights = oContent.$().find(".sapMInputHighlight").toArray();
+			assert.equal(aHighlights.length, 0, "no highlight spans when highlightFilterResults is false");
+		}).catch((oError) => {
+			assert.notOk(true, "Promise Catch called: " + oError);
+		});
+
+	});
+
+	QUnit.test("highlightFilterResults - highlighting active when property is true", (assert) => {
+
+		oFixedList.setHighlightFilterResults(true);
+		oFixedList.setFilterValue("Item");
+		const oContent = oFixedList.getContent();
+
+		return oContent?.then(async (oContent) => {
+			await _renderScrollContainer(oContent);
+
+			assert.ok(oFixedList.getHighlightFilterResults(), "highlightFilterResults is true");
+
+			const aHighlights = oContent.$().find(".sapMInputHighlight").toArray();
+			assert.ok(aHighlights.length > 0, "highlight spans found in list items");
+			assert.equal(aHighlights[0].textContent, "Item", "highlighted text matches filter value");
+		}).catch((oError) => {
+			assert.notOk(true, "Promise Catch called: " + oError);
+		});
 
 	});
 

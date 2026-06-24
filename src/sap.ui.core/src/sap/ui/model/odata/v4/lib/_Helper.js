@@ -66,7 +66,8 @@ sap.ui.define([
 		 * Adds all given children to the given hash set which either appear in the given list or
 		 * have some ancestor in it.
 		 *
-		 * Note: "a/b/c" is deemed a child of the ancestors "a/b" and "a", but not "b" or "a/b/c/d".
+		 * Note: "a/b/c" is deemed a child of the ancestors "a/b" and "a" as well as "a/b/*", but
+		 * not of "b" or "a/b/c/d" or "a/b/c/*".
 		 *
 		 * @param {string[]} aChildren - List of non-empty child paths (unmodified)
 		 * @param {string[]} aAncestors - List of ancestor paths (unmodified)
@@ -88,7 +89,8 @@ sap.ui.define([
 					aSegments = sPath.split("/");
 					aSegments.pop();
 					while (aSegments.length) {
-						if (aAncestors.indexOf(aSegments.join("/")) >= 0) {
+						const sPrefix = aSegments.join("/");
+						if (aAncestors.includes(sPrefix) || aAncestors.includes(sPrefix + "/*")) {
 							mChildren[sPath] = true;
 							break;
 						}
@@ -1917,8 +1919,8 @@ sap.ui.define([
 		 */
 		getUsedPaths : function (aPaths, mQueryOptions) {
 			function isRelated(sPath0, sPath1) {
-				return _Helper.hasPathPrefix(sPath0, sPath1)
-					|| _Helper.hasPathPrefix(sPath1, sPath0);
+				return _Helper.isAffectedBy(sPath0, sPath1)
+					|| _Helper.isAffectedBy(sPath1, sPath0);
 			}
 
 			function isUsed(sPath, mQueryOptionsForPath) {
@@ -2184,17 +2186,17 @@ sap.ui.define([
 				});
 			}
 
-			if (aPaths.indexOf("") >= 0) {
+			if (aPaths.includes("")) {
 				throw new Error("Unsupported empty navigation property path");
 			}
 
-			if (aPaths.indexOf("*") >= 0) {
+			if (aPaths.includes("*")) {
 				aSelects = (mCacheQueryOptions && mCacheQueryOptions.$select || []).slice();
 				if (sMessagesPath && !aSelects.includes(sMessagesPath)) {
 					aSelects.push(sMessagesPath);
 				}
 			} else if (mCacheQueryOptions && mCacheQueryOptions.$select
-					&& mCacheQueryOptions.$select.indexOf("*") < 0) {
+					&& !mCacheQueryOptions.$select.includes("*")) {
 				_Helper.addChildrenWithAncestor(aPaths, mCacheQueryOptions.$select, mSelects);
 				_Helper.addChildrenWithAncestor(mCacheQueryOptions.$select, aPaths, mSelects);
 				if (sMessagesPath && aPaths.includes(sMessagesPath)) {

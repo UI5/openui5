@@ -12,6 +12,24 @@ sap.ui.define([
 
 	const sEmptyTextKey = "\xa0"; // &nbsp; in Unicode
 	const oValidators = {
+		noBindingText: {
+			validatorFunction(sNewText) {
+				let oBindingParserResult;
+				try {
+					oBindingParserResult = BindingParser.complexParser(sNewText, undefined, true);
+				} catch (error) {
+					return false;
+				}
+				return !(oBindingParserResult && typeof oBindingParserResult === "object");
+			},
+			errorMessage: Lib.getResourceBundleFor("sap.ui.rta").getText("RENAME_BINDING_ERROR_TEXT")
+		},
+		sameText: {
+			validatorFunction(sNewText, sOldText) {
+				return sNewText !== sOldText;
+			},
+			errorMessage: "sameTextError"
+		},
 		noEmptyText: {
 			validatorFunction(sNewText) {
 				return sNewText !== sEmptyTextKey;
@@ -20,30 +38,16 @@ sap.ui.define([
 		}
 	};
 
-	function checkPreconditionsAndThrowError(sNewText, sOldText) {
-		if (sOldText === sNewText) {
-			throw Error("sameTextError");
-		}
-		let oBindingParserResult;
-		let bError;
-
-		try {
-			oBindingParserResult = BindingParser.complexParser(sNewText, undefined, true);
-		} catch (error) {
-			bError = true;
-		}
-
-		if (oBindingParserResult && typeof oBindingParserResult === "object" || bError) {
-			throw Error(Lib.getResourceBundleFor("sap.ui.rta").getText("RENAME_BINDING_ERROR_TEXT"));
-		}
-	}
-
 	return function(sNewText, sOldText, oAction) {
-		checkPreconditionsAndThrowError(sNewText, sOldText);
 		let sErrorText;
-		const aValidators = oAction && oAction.validators || [];
+		const aValidators = oAction?.validators || [];
+		const aValidatorsToRun = [
+			...(oAction?.skipSameTextValidator ? [] : ["sameText"]),
+			"noBindingText",
+			...aValidators
+		];
 
-		aValidators.some(function(vValidator) {
+		aValidatorsToRun.some(function(vValidator) {
 			let oValidator;
 
 			if (
@@ -54,7 +58,7 @@ sap.ui.define([
 				oValidator = vValidator;
 			}
 
-			if (!oValidator.validatorFunction(sNewText)) {
+			if (!oValidator.validatorFunction(sNewText, sOldText)) {
 				sErrorText = oValidator.errorMessage;
 				return true;
 			}

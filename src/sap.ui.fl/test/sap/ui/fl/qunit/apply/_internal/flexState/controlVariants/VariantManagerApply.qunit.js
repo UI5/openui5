@@ -2,6 +2,7 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/base/util/Deferred",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/fl/apply/_internal/changes/Applier",
@@ -24,6 +25,7 @@ sap.ui.define([
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
+	Log,
 	Deferred,
 	JsControlTreeModifier,
 	Applier,
@@ -723,6 +725,7 @@ sap.ui.define([
 			};
 			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
 			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
+			const oLogErrorSpy = sandbox.spy(Log, "error");
 
 			await VariantManagerApply.loadVariantDependentControlChanges({
 				reference: sReference,
@@ -732,19 +735,13 @@ sap.ui.define([
 			});
 
 			assert.strictEqual(oAddNewObjectsSpy.callCount, 0, "addNewObjects is not called");
+			assert.strictEqual(oLogErrorSpy.callCount, 0, "no error is logged for a VM mismatch");
 		});
 
-		QUnit.test("loadVariantDependentControlChanges adds the response when the variant is already loaded and only changes are returned", async function(assert) {
-			const oBackendResponse = {
-				variants: [],
-				variantChanges: [],
-				variantDependentControlChanges: [{
-					fileName: "uiChange1", fileType: "change", variantReference: "variantWithRemovedContent"
-				}]
-			};
-			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
+		QUnit.test("loadVariantDependentControlChanges does nothing if the backend response is empty (= variant doesn't exist)", async function(assert) {
+			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves({});
 			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
-			sandbox.stub(VariantManagementState, "getVariant").returns({ instance: this.oVariantWithRemovedContent });
+			const oLogErrorSpy = sandbox.spy(Log, "error");
 
 			await VariantManagerApply.loadVariantDependentControlChanges({
 				reference: sReference,
@@ -753,8 +750,32 @@ sap.ui.define([
 				variantId: "variantWithRemovedContent"
 			});
 
-			assert.strictEqual(oAddNewObjectsSpy.callCount, 1, "addNewObjects is called");
-			assert.deepEqual(oAddNewObjectsSpy.firstCall.args[0].newData, oBackendResponse, "the response is passed as-is");
+			assert.strictEqual(oAddNewObjectsSpy.callCount, 0, "addNewObjects is not called");
+			assert.strictEqual(oLogErrorSpy.callCount, 0, "no error is logged");
+			assert.ok(true, "then the method resolves without doing anything");
+		});
+
+		QUnit.test("loadVariantDependentControlChanges throws an error if other objects are returned without a matching variant", async function(assert) {
+			const oBackendResponse = {
+				variants: [],
+				variantChanges: [],
+				variantDependentControlChanges: [{
+					fileName: "orphanChange", fileType: "change", variantReference: "missingVariant"
+				}]
+			};
+			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
+			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
+			const oLogErrorSpy = sandbox.spy(Log, "error");
+
+			await VariantManagerApply.loadVariantDependentControlChanges({
+				reference: sReference,
+				componentId: oComponent.getId(),
+				vmReference: sVMReference,
+				variantId: "missingVariant"
+			});
+
+			assert.strictEqual(oAddNewObjectsSpy.callCount, 0, "addNewObjects is not called");
+			assert.strictEqual(oLogErrorSpy.callCount, 1, "an error is logged");
 		});
 	});
 

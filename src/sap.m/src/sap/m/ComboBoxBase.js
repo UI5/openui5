@@ -277,7 +277,7 @@ sap.ui.define([
 		ComboBoxBase.prototype.highlightList = function (sValue) {
 			var aListItemsDOM = [];
 
-			aListItemsDOM = this._getList().$().find('.sapMSLIInfo [id$=-infoText], .sapMSLITitleOnly [id$=-titleText]');
+			aListItemsDOM = this._getList().$().find(".sapMSLIInfo .sapMObjStatusText, .sapMSLITitleOnly [id$=-titleText]");
 
 			if (this.useHighlightItemsWithContains()) {
 				highlightItemsWithContains(aListItemsDOM, sValue);

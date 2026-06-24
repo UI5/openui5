@@ -1710,7 +1710,7 @@ sap.ui.define([
 			});
 		}
 
-		if (aPaths.indexOf("") < 0) {
+		if (!aPaths.includes("")) {
 			try {
 				if (!this.oOperation || this.oReturnValueContext) {
 					aPromises.push(

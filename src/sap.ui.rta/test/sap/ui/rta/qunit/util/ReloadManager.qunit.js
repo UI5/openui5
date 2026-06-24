@@ -1,6 +1,7 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/write/api/ReloadInfoAPI",
@@ -11,6 +12,7 @@ sap.ui.define([
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	ControlVariantApplyAPI,
 	FlexRuntimeInfoAPI,
 	FlexInfoSession,
 	ReloadInfoAPI,
@@ -33,13 +35,13 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("with reloadNeeded false", function(assert) {
-			ReloadManager.handleReloadOnExit({ reloadNeeded: false });
+		QUnit.test("with reloadNeeded false", async function(assert) {
+			await ReloadManager.handleReloadOnExit({ reloadNeeded: false });
 			assert.strictEqual(this.oReloadStub.callCount, 0, "the reload method was not called");
 		});
 
-		QUnit.test("with reload needed", function(assert) {
-			ReloadManager.handleReloadOnExit({ reloadNeeded: true });
+		QUnit.test("with reload needed", async function(assert) {
+			await ReloadManager.handleReloadOnExit({ reloadNeeded: true });
 			assert.strictEqual(this.oReloadStub.callCount, 1, "the reload method was called");
 			assert.deepEqual(this.oReloadStub.lastCall.args[0].removeVersionParameter, true, "the parameter was added");
 		});
@@ -405,6 +407,10 @@ sap.ui.define([
 	QUnit.module("FLP: triggerReload", {
 		beforeEach() {
 			sandbox.stub(FlUtils, "getUshellContainer").returns(true);
+			sandbox.stub(FlUtils, "getUShellService").withArgs("URLParsing").resolves({
+				parseShellHash() { return { params: {} }; },
+				constructShellHash() { return ""; }
+			});
 			this.oHardReloadStub = sandbox.stub(ReloadManager, "reloadPage");
 			this.oHandleReloadInfoOnStartStub = sandbox.stub(ReloadInfoAPI, "handleReloadInfoOnStart");
 			this.oHandleReloadInfoStub = sandbox.stub(ReloadInfoAPI, "handleReloadInfo");
@@ -424,12 +430,12 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("onStart with changed params", function(assert) {
+		QUnit.test("onStart with changed params", async function(assert) {
 			FlexInfoSession.setByReference({ version: "1" });
 			this.oHandleReloadInfoOnStartStub.callsFake(function() {
 				return true;
 			});
-			ReloadManager.triggerReload({
+			await ReloadManager.triggerReload({
 				onStart: true
 			});
 			assert.strictEqual(this.oReloadCurrentAppStub.callCount, 1, "the reloadCurrentApp was not called");
@@ -437,11 +443,20 @@ sap.ui.define([
 			FlexInfoSession.removeByReference();
 		});
 
-		QUnit.test("onStart with no changed params", function(assert) {
-			ReloadManager.triggerReload({
+		QUnit.test("onStart with no changed params", async function(assert) {
+			await ReloadManager.triggerReload({
 				onStart: true
 			});
 			assert.strictEqual(this.oReloadCurrentAppStub.callCount, 1, "the reloadCurrentApp was called");
+		});
+
+		QUnit.test("clears the variant URL parameter before reloading", async function(assert) {
+			const oClearVariantStub = sandbox.stub(ControlVariantApplyAPI, "clearVariantParameterInURL").resolves();
+
+			await ReloadManager.triggerReload({ onStart: false });
+
+			assert.strictEqual(oClearVariantStub.callCount, 1, "clearVariantParameterInURL was called once");
+			assert.ok(oClearVariantStub.calledBefore(this.oReloadCurrentAppStub), "clearVariantParameterInURL was called before reloadCurrentApp");
 		});
 	});
 
@@ -456,8 +471,8 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("onStart with no changed params", function(assert) {
-			ReloadManager.triggerReload({
+		QUnit.test("onStart with no changed params", async function(assert) {
+			await ReloadManager.triggerReload({
 				onStart: true
 			});
 			assert.strictEqual(this.oHardReloadStub.callCount, 1, "the hard reload was triggered");
@@ -465,8 +480,8 @@ sap.ui.define([
 			assert.strictEqual(this.oHandleReloadInfoStub.callCount, 0, "the handleReloadInfo was not called");
 		});
 
-		QUnit.test("not onStart with no changed params", function(assert) {
-			ReloadManager.triggerReload({
+		QUnit.test("not onStart with no changed params", async function(assert) {
+			await ReloadManager.triggerReload({
 				onStart: false
 			});
 			assert.strictEqual(this.oHardReloadStub.callCount, 1, "the hard reload was triggered");

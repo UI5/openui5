@@ -26586,6 +26586,39 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 
 		assert.strictEqual(oTable.getItems().length, 0);
 	});
+
+	//*********************************************************************************************
+	// Scenario: If there is a pending request and filter(Filter.NONE) is applied, the pending
+	// request is canceled. dataReceived must be fired to close the dataRequested/dataReceived pair
+	// SNOW: DINC0904819
+	QUnit.test("SNOW: DINC0904819 - dataReceived must follow dataRequested", async function (assert) {
+		const oModel = createSalesOrdersModel();
+		const sView = `
+<Table id="table" items="{/SalesOrderSet}">
+	<Input id="note" value="{Note}" />
+</Table>`;
+
+		this.expectHeadRequest()
+			.expectRequest("SalesOrderSet?$skip=0&$top=100", {results : []})
+			.expectValue("note", []);
+
+		await this.createView(assert, sView, oModel);
+
+		const oBinding = this.oView.byId("table").getBinding("items");
+		const oEventHandlers = {onDataRequested() {}, onDataReceived() {}};
+		const oMock = this.mock(oEventHandlers);
+		oMock.expects("onDataRequested").once();
+		oMock.expects("onDataReceived").once();
+		oBinding.attachDataRequested(oEventHandlers.onDataRequested);
+		oBinding.attachDataReceived(oEventHandlers.onDataReceived);
+
+		// code under test
+		oBinding.refresh(true);
+		oBinding.filter(Filter.NONE, FilterType.Application);
+
+		await this.waitForChanges(assert);
+	});
+
 	//*********************************************************************************************
 	// Scenario: React on 503 "Retry-After" error during deferred loading of value help metadata,
 	// data and code list data
@@ -27583,5 +27616,74 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		oJSONModel.setProperty("/locationPrefix", "New");
 
 		await this.waitForChanges(assert, "set filter value for new bound filter");
+	});
+
+	//*********************************************************************************************
+	// Scenario: A created entry is persisted and no longer transient, but the binding is not refreshed afterwards,
+	// context remains in the created contexts cache. When a message arrives for that persisted entry,
+	// requestFilterForMessages must returns a filter instead of Filter.NONE.
+	QUnit.test("requestFilterForMessages: cached persisted context not treated as transient", async function (assert) {
+		const oModel = createSalesOrdersModel({preliminaryContext : true});
+		const sView = `
+<t:Table id="table" rows="{/SalesOrderSet('1')/ToLineItems}" visibleRowCount="2">
+	<Input id="itemPosition" value="{ItemPosition}" />
+	<Input id="note" value="{Note}" />
+</t:Table>`;
+
+		this.expectHeadRequest()
+			.expectRequest({
+				requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=102"
+			}, {
+				results : []
+			})
+			.expectValue("itemPosition", ["", ""])
+			.expectValue("note", ["", ""]);
+
+		await this.createView(assert, sView, oModel);
+
+		this.expectRequest({
+				created : true,
+				data : {
+					Note : "Foo",
+					__metadata : {type : "GWSAMPLE_BASIC.SalesOrderLineItem"}
+				},
+				method : "POST",
+				requestUri : "SalesOrderSet('1')/ToLineItems"
+			}, {
+				__metadata : {
+					uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+				},
+				Note : "Foo",
+				ItemPosition : "10",
+				SalesOrderID : "1"
+			})
+			.expectValue("note", "Foo", 0)
+			.expectValue("itemPosition", "10", 0);
+
+		const oRowsBinding = this.oView.byId("table").getBinding("rows");
+		const oCreatedContext = oRowsBinding.create({Note : "Foo"}, /*bAtEnd*/ false);
+		oModel.submitChanges();
+
+		await this.waitForChanges(assert);
+
+		assert.strictEqual(oCreatedContext.isTransient(), false);
+
+		const oMessage = {
+			message : "Note too long",
+			type : "Error",
+			target : oCreatedContext.getPath() + "/Note",
+			fullTarget : oCreatedContext.getDeepPath() + "/Note",
+			processor : oModel
+		};
+		this.expectMessages(oMessage);
+		Messaging.addMessages(new Message(oMessage));
+
+		// code under test - no refresh, persisted context still in cache
+		const aResults = await Promise.all([
+			oRowsBinding.requestFilterForMessages(),
+			this.waitForChanges(assert)
+		]);
+
+		assert.ok(aResults[0] instanceof Filter && aResults[0] !== Filter.NONE);
 	});
 });

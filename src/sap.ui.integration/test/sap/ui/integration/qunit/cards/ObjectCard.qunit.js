@@ -2000,6 +2000,48 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("Button group toolbar has width '100%'", async function (assert) {
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.buttonGroup"
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"json": {
+						"attachments": [
+							{ "icon": "sap-icon://attachment" },
+							{ "icon": "sap-icon://attachment" }
+						]
+					}
+				},
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Attachments",
+							"type": "ButtonGroup",
+							"path": "attachments",
+							"template": {
+								"icon": "{icon}"
+							}
+						}]
+					}]
+				}
+			}
+		});
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oGroup = this.oCard.getCardContent()._getRootContainer().getItems()[0].getContent()[0];
+		const oButtonGroup = oGroup.getItems()[1];
+
+		// Assert
+		assert.ok(oButtonGroup.isA("sap.m.OverflowToolbar"), "Button group is an OverflowToolbar");
+		assert.strictEqual(oButtonGroup.getWidth(), "100%", "Button group toolbar width is '100%'");
+	});
+
 	QUnit.test("Avatar group with template - Icon src for Mobile SDK", async function (assert) {
 		// Arrange
 		var oCardData = {
@@ -2616,6 +2658,221 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oResizeSpy.callCount, 2, "Resize handler is called");
+	});
+
+	QUnit.test("itemsLayout 'Horizontal' wraps group items in an inner AlignedFlowLayout", async function (assert) {
+		this.oCard.setManifest({
+			"sap.app": {
+				"id": "test.cards.object.itemsLayoutHorizontal",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [
+						{
+							"alignment": "Stretch",
+							"itemsLayout": "Horizontal",
+							"items": [
+								{ "label": "First Name", "value": "Donna" },
+								{ "label": "Last Name", "value": "Moore" },
+								{ "label": "Phone", "value": "+1 202 555 5555" }
+							]
+						}
+					]
+				}
+			}
+		});
+
+		await nextCardReadyEvent(this.oCard);
+
+		var oObjectContent = this.oCard.getCardContent();
+		var oRoot = oObjectContent._getRootContainer();
+		var oGroup = oRoot.getItems()[0];
+		var aGroupItems = oGroup.getItems();
+		var oInnerAFL = aGroupItems[aGroupItems.length - 1];
+
+		// Assert
+		assert.ok(oGroup.isA("sap.m.VBox"), "Group is a VBox");
+		assert.ok(oInnerAFL.isA("sap.ui.layout.AlignedFlowLayout"), "An inner AlignedFlowLayout is created for itemsLayout 'Horizontal'");
+		assert.strictEqual(oInnerAFL.getContent().length, 3, "All 3 items are added in the inner AlignedFlowLayout");
+
+		oInnerAFL.getContent().forEach(function (oPair) {
+			assert.ok(oPair.isA("sap.m.VBox"), "Each label/value pair is wrapped in a VBox");
+			assert.ok(oPair.hasStyleClass("sapFCardObjectItemPairContainer"), "Pair container has the 'sapFCardObjectItemPairContainer' class");
+			assert.strictEqual(oPair.getItems().length, 2, "Pair contains exactly the label and the value");
+			assert.ok(oPair.getItems()[0].isA("sap.m.Label"), "First child of the pair is the Label");
+		});
+	});
+
+	QUnit.test("itemsLayout 'Horizontal' with item icons keeps the existing HBox-pair without extra wrapping", async function (assert) {
+		this.oCard.setManifest({
+			"sap.app": {
+				"id": "test.cards.object.itemsLayoutHorizontalIcons",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [
+						{
+							"alignment": "Stretch",
+							"itemsLayout": "Horizontal",
+							"items": [
+								{
+									"label": "Manager",
+									"value": "John Miller",
+									"icon": { "initials": "JM" }
+								},
+								{
+									"label": "Assistant",
+									"value": "Donna Moore",
+									"icon": { "initials": "DM" }
+								}
+							]
+						}
+					]
+				}
+			}
+		});
+
+		await nextCardReadyEvent(this.oCard);
+
+		var oObjectContent = this.oCard.getCardContent();
+		var oGroup = oObjectContent._getRootContainer().getItems()[0];
+		var oInnerAFL = oGroup.getItems()[oGroup.getItems().length - 1];
+
+		// Assert
+		assert.ok(oInnerAFL.isA("sap.ui.layout.AlignedFlowLayout"), "Inner AlignedFlowLayout is created");
+		assert.strictEqual(oInnerAFL.getContent().length, 2, "Both icon items are added in the inner AlignedFlowLayout");
+
+		oInnerAFL.getContent().forEach(function (oPair) {
+			assert.ok(oPair.isA("sap.m.HBox"), "Icon pair is the HBox returned by _createGroupItems (no extra VBox wrapper)");
+			assert.notOk(oPair.hasStyleClass("sapFCardObjectItemPairContainer"), "Icon pair does not get the pair-container wrapper class");
+		});
+	});
+
+	QUnit.test("itemsLayout 'Horizontal' works with alignment 'Default' (group sits in the outer AFL)", async function (assert) {
+		this.oCard.setManifest({
+			"sap.app": {
+				"id": "test.cards.object.itemsLayoutHorizontalDefault",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [
+						{
+							"itemsLayout": "Horizontal",
+							"items": [
+								{ "label": "First Name", "value": "Donna" },
+								{ "label": "Last Name", "value": "Moore" }
+							]
+						}
+					]
+				}
+			}
+		});
+
+		await nextCardReadyEvent(this.oCard);
+
+		var oObjectContent = this.oCard.getCardContent();
+		var oRoot = oObjectContent._getRootContainer();
+		var oOuter = oRoot.getItems()[0];
+
+		// Assert: Default alignment puts the group inside the outer AFL
+		assert.ok(oOuter.isA("sap.ui.layout.AlignedFlowLayout"), "First root child is the outer AlignedFlowLayout (Default alignment)");
+		assert.strictEqual(oOuter.getContent().length, 1, "Outer AFL contains the group");
+
+		var oGroup = oOuter.getContent()[0];
+		var oInnerAFL = oGroup.getItems()[oGroup.getItems().length - 1];
+
+		assert.ok(oInnerAFL.isA("sap.ui.layout.AlignedFlowLayout"), "Inner AlignedFlowLayout is still created when itemsLayout is 'Horizontal'");
+		assert.strictEqual(oInnerAFL.getContent().length, 2, "Both items are in the inner AlignedFlowLayout");
+	});
+
+	QUnit.test("itemsLayout 'Vertical' (default) keeps items as direct children of the group VBox", async function (assert) {
+		this.oCard.setManifest({
+			"sap.app": {
+				"id": "test.cards.object.itemsLayoutVertical",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [
+						{
+							"alignment": "Stretch",
+							"items": [
+								{ "label": "First Name", "value": "Donna" },
+								{ "label": "Last Name", "value": "Moore" }
+							]
+						},
+						{
+							"alignment": "Stretch",
+							"itemsLayout": "Vertical",
+							"items": [
+								{ "label": "Phone", "value": "+1 202 555 5555" }
+							]
+						}
+					]
+				}
+			}
+		});
+
+		await nextCardReadyEvent(this.oCard);
+
+		var oObjectContent = this.oCard.getCardContent();
+		var aGroups = oObjectContent._getRootContainer().getItems();
+
+		// Assert: no inner AFL is created for either group
+		aGroups.forEach(function (oGroup, i) {
+			var bHasInnerAFL = oGroup.getItems().some(function (oItem) {
+				return oItem.isA("sap.ui.layout.AlignedFlowLayout");
+			});
+			assert.notOk(bHasInnerAFL, "Group " + i + " has no inner AlignedFlowLayout when itemsLayout is omitted/Vertical");
+		});
+
+		// Assert: Label and Value are siblings directly under the group VBox
+		var oFirstGroup = aGroups[0];
+		assert.ok(oFirstGroup.getItems()[0].isA("sap.m.Label"), "First child of the group is a Label");
+		assert.ok(oFirstGroup.getItems()[1].isA("sap.m.Text"), "Second child of the group is the Text value");
+	});
+
+	QUnit.test("itemsLayout 'Horizontal' propagates labelWrapping to each item like the vertical layout does", async function (assert) {
+		this.oCard.setManifest({
+			"sap.app": {
+				"id": "test.cards.object.itemsLayoutHorizontalLabelWrapping",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [
+						{
+							"alignment": "Stretch",
+							"itemsLayout": "Horizontal",
+							"labelWrapping": true,
+							"items": [
+								{ "label": "A very long label that should wrap", "value": "Donna" },
+								{ "label": "Another long label that should wrap", "value": "Moore" }
+							]
+						}
+					]
+				}
+			}
+		});
+
+		await nextCardReadyEvent(this.oCard);
+
+		var oObjectContent = this.oCard.getCardContent();
+		var oGroup = oObjectContent._getRootContainer().getItems()[0];
+		var oInnerAFL = oGroup.getItems()[oGroup.getItems().length - 1];
+
+		oInnerAFL.getContent().forEach(function (oPair) {
+			var oLabel = oPair.getItems()[0];
+			assert.strictEqual(oLabel.getWrapping(), true, "Label inside horizontal pair has wrapping=true");
+		});
 	});
 
 	MemoryLeakCheck.checkControl("ObjectContent with IconGroup", function () {

@@ -427,6 +427,26 @@ sap.ui.define([
 				}
 			}
 		}
+
+		/**
+		 * Removes the variant technical parameter from the current URL hash without
+		 * triggering a navigation. Does not require a per-VM URLHandler instance.
+		 *
+		 * @returns {Promise<undefined>} Resolves when the URL has been updated
+		 * @private
+		 * @ui5-restricted sap.ui.fl
+		 */
+		static async removeVariantParameterFromURL() {
+			const oURLParsingService = await Utils.getUShellService("URLParsing");
+			const oParsedHash = oURLParsingService?.parseShellHash(hasher.getHash());
+			if (!oParsedHash?.params?.[VariantUtil.VARIANT_TECHNICAL_PARAMETER]) {
+				return;
+			}
+			delete oParsedHash.params[VariantUtil.VARIANT_TECHNICAL_PARAMETER];
+			hasher.changed.active = false;
+			hasher.replaceHash(oURLParsingService.constructShellHash(oParsedHash));
+			hasher.changed.active = true;
+		}
 	}
 
 	return URLHandler;

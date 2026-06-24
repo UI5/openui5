@@ -5,10 +5,21 @@
 	<List
 		id="myList"
 		mode="MultiSelect"
-		headerText="Wrapping texts"
 		items="{
 			path: '/names'
 		}">
+		<headerToolbar>
+			<Toolbar>
+				<Title text="Wrapping texts"/>
+				<ToolbarSpacer/>
+				<ToggleButton
+					text="Toggle Wrapping"
+					pressed="{/wrapping}"/>
+				<ToggleButton
+					text="Toggle Inverted"
+					pressed="{/inverted}"/>
+			</Toolbar>
+		</headerToolbar>
 		<items>
 			<StandardListItem
 				title="{title}"
@@ -18,8 +29,10 @@
 				highlight="{highlight}"
 				info="{info}"
 				infoState="{highlight}"
+				infoIcon="{infoIcon}"
+				infoStateInverted="{/inverted}"
 				type="Detail"
-				wrapping="true"
+				wrapping="{/wrapping}"
 				wrapCharLimit="{wrapCharLimit}"/>
 		</items>
 	</List>

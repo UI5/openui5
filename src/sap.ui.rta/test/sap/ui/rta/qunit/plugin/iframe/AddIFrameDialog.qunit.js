@@ -291,6 +291,36 @@ sap.ui.define([
 			return this.oAddIFrameDialog.open(this.oDialogSettings, oReferenceControl);
 		});
 
+		QUnit.test("When the dialog opens in add mode (asContainer=true), originalValue is set to the default title", function(assert) {
+			const sDefaultTitle = oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_CONTAINER_TITLE_DEFAULT_VALUE_TEXT");
+			this.oAddIFrameDialog.attachOpened(function() {
+				assert.strictEqual(
+					this.oAddIFrameDialog._oJSONModel.getProperty("/title/originalValue"),
+					sDefaultTitle,
+					"then originalValue matches the default container title"
+				);
+				clickOnCancel();
+			}, this);
+			return this.oAddIFrameDialog.open(this.oDialogSettings, oReferenceControl);
+		});
+
+		QUnit.test("When existing settings with a title are imported, originalValue is set to the existing title", function(assert) {
+			const sExistingTitle = "My Existing Title";
+			this.oAddIFrameDialog.attachOpened(function() {
+				assert.strictEqual(
+					this.oAddIFrameDialog._oJSONModel.getProperty("/title/originalValue"),
+					sExistingTitle,
+					"then originalValue is set to the imported title value"
+				);
+				clickOnCancel();
+			}, this);
+			return this.oAddIFrameDialog.open({
+				asContainer: true,
+				title: sExistingTitle,
+				frameUrl: "https://myhappyurl"
+			}, oReferenceControl);
+		});
+
 		QUnit.test("When there is no empty text input field then it can be detected", function(assert) {
 			const aTextInputFieldsCopy = aTextInputFields.slice();
 			const sLastTextInputField = aTextInputFieldsCopy.pop();
@@ -626,6 +656,35 @@ sap.ui.define([
 				validators: ["noEmptyText"]
 			});
 			assert.strictEqual(oResponse, undefined, "then the dialog can only be closed via cancel");
+		});
+
+		QUnit.test("when the title is unchanged (sameTextError), save is blocked but no error state is shown", async function(assert) {
+			const sExistingTitle = "My Section";
+			this.oAddIFrameDialog.attachOpened(() => {
+				const oInput = Element.getElementById("sapUiRtaAddIFrameDialog_ContainerTitle_TitleInput");
+
+				// Type the same text as the original title — triggers sameTextError
+				oInput.setValue(sExistingTitle);
+				this.oAddIFrameDialog._oController.onContainerTitleChange({
+					getSource: () => oInput
+				});
+				assert.strictEqual(
+					oInput.getValueState(),
+					ValueState.None,
+					"then the input field shows no error (sameTextError is silent)"
+				);
+				assert.strictEqual(
+					this.oAddIFrameDialog._oJSONModel.getProperty("/saveEnabled"),
+					false,
+					"then the save button is disabled"
+				);
+				clickOnCancel();
+			});
+			await this.oAddIFrameDialog.open({
+				asContainer: true,
+				title: sExistingTitle,
+				frameUrl: "https://myhappyurl"
+			}, oReferenceControl);
 		});
 
 		QUnit.test("when a url with bindings is entered", function(assert) {

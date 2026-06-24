@@ -1086,16 +1086,16 @@ sap.ui.define([
 			await openDialog(sandbox, oActionConfig, fnAfterOpen);
 		});
 
-		QUnit.test("when a regular validator and sameText would both fail in single rename mode, the validator error wins", async function(assert) {
-			// This guards the validator-order change: standard validators run before the
-			// sameText check, so sameTextError can no longer mask a real validation error.
+		QUnit.test("in single rename mode, a validator error is shown when sameText passes", async function(assert) {
+			// When the new value differs from the original (sameText passes) but fails a custom
+			// validator, the validator error is shown on the input and save is disabled.
 			const oTestDelegate = {
 				getAnnotationsChangeInfo: () => ({
 					serviceUrl: "testServiceUrl",
 					properties: [{
 						propertyName: "My Test Label",
 						annotationPath: "path/to/test/label",
-						currentValue: "",
+						currentValue: "valid",
 						label: "My Test Label"
 					}]
 				})
@@ -1113,14 +1113,12 @@ sap.ui.define([
 				const [oFormElement] = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
 				const oInput = oFormElement.getFields().filter((oField) => oField.getVisible())[0];
 
-				// Re-fire liveChange with the same (original, invalid) value: both sameTextError
-				// and noEmptyText apply. The validator error must win, not "no change".
 				oInput.fireLiveChange({ newValue: "" });
 				assert.strictEqual(oInput.getValueState(), "Error", "then the input has error state");
 				assert.strictEqual(
 					oInput.getValueStateText(),
 					oResourceBundle.getText("RENAME_EMPTY_ERROR_TEXT"),
-					"then the validator error message wins over sameTextError"
+					"then the validator error message is shown"
 				);
 				assert.strictEqual(
 					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
@@ -1134,9 +1132,9 @@ sap.ui.define([
 			await openDialog(sandbox, oActionConfig, fnAfterOpen);
 		});
 
-		QUnit.test("in single rename mode, sameText disables save and shows the sameText field error", async function(assert) {
+		QUnit.test("in single rename mode, sameText disables save without showing an error on the field", async function(assert) {
 			// In single rename mode, reverting to the original means there is nothing to save.
-			// The sameText error is surfaced on the input and Save is disabled.
+			// No error is shown — just like RenameDialog — and Save is disabled.
 			const oTestDelegate = createStringTestDelegate("path/to/test/label");
 			const oActionConfig = {
 				title: "Change Some String Prop",
@@ -1159,7 +1157,7 @@ sap.ui.define([
 				);
 
 				oInput.fireLiveChange({ newValue: "Hello" });
-				assert.strictEqual(oInput.getValueState(), "Error", "then the sameText error is shown on the field");
+				assert.strictEqual(oInput.getValueState(), "None", "then no error is shown on the field for same text");
 				assert.strictEqual(
 					Element.getElementById("sapUiRtaChangeAnnotationDialog_saveButton").getEnabled(),
 					false,
