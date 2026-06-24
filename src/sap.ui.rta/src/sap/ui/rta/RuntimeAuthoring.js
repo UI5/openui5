@@ -665,7 +665,7 @@ sap.ui.define([
 			this.fireStop();
 			if (!bSkipRestart) {
 				ReloadInfoAPI.removeInfoSessionStorage(this.getRootControlInstance());
-				ReloadManager.handleReloadOnExit(oReloadInfo);
+				await ReloadManager.handleReloadOnExit(oReloadInfo);
 			}
 			VersionsAPI.clearInstances();
 			document.removeEventListener("keydown", this.fnKeyDown);
@@ -1275,7 +1275,7 @@ sap.ui.define([
 		}
 		RuntimeAuthoring.enableRestart(this.getLayer(), this.getRootControlInstance());
 		await this.stop(true, true, true);
-		ReloadManager.triggerReload({});
+		await ReloadManager.triggerReload({});
 	}
 
 	function saveOnly(oEvent) {
@@ -1387,7 +1387,7 @@ sap.ui.define([
 		}
 	}
 
-	function handleDiscard() {
+	async function handleDiscard() {
 		const sLayer = this.getLayer();
 		const oReloadInfo = {
 			removeDraft: true,
@@ -1396,7 +1396,7 @@ sap.ui.define([
 		RuntimeAuthoring.enableRestart(sLayer, this.getRootControlInstance());
 		// suppress invalidate and remove dirty changes from persistence since a reload is triggered right after
 		this.getCommandStack().removeAllCommands(true, true);
-		ReloadManager.triggerReload(oReloadInfo);
+		await ReloadManager.triggerReload(oReloadInfo);
 		return this.stop(true, true);
 	}
 
@@ -1519,22 +1519,21 @@ sap.ui.define([
 		});
 	}
 
-	function switchVersion(sVersion, sAdaptationId) {
+	async function switchVersion(sVersion, sAdaptationId) {
 		RuntimeAuthoring.enableRestart(this.getLayer(), this.getRootControlInstance());
 
-		return VersionsAPI.loadVersionForApplication({
+		await VersionsAPI.loadVersionForApplication({
 			control: this.getRootControlInstance(),
 			layer: this.getLayer(),
 			version: sVersion,
 			adaptationId: sAdaptationId
-		}).then(function() {
-			const oReloadInfo = {
-				versionSwitch: true,
-				version: sVersion,
-				selector: this.getRootControlInstance()
-			};
-			ReloadManager.triggerReload(oReloadInfo);
-		}.bind(this));
+		});
+		const oReloadInfo = {
+			versionSwitch: true,
+			version: sVersion,
+			selector: this.getRootControlInstance()
+		};
+		await ReloadManager.triggerReload(oReloadInfo);
 	}
 
 	function onPublishVersion() {

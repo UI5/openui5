@@ -1064,7 +1064,10 @@ sap.ui.define([
 				},
 				oCallbackMock = this.mock(oCallback),
 				aCreatedContexts = (oFixture.aCreatedContextDeepPaths || [])
-					.map((sDeepPath) => ({ getDeepPath() {return sDeepPath;} })),
+					.map((sDeepPath) => ({
+						getDeepPath() {return sDeepPath;},
+						isTransient() {}
+					})),
 				aFilterForPredicate = oFixture.aFilterForPredicate,
 				aFilters = oFixture.bFilterNoneExpected ? [Filter.NONE] : [],
 				aMessages = oFixture.aMessages,
@@ -1092,7 +1095,9 @@ sap.ui.define([
 				oCallbackMock.expects("fnFilter").never();
 			}
 			aCreatedContexts.forEach((oCreatedContext) => {
-				this.mock(oCreatedContext).expects("getDeepPath").withExactArgs().callThrough();
+				this.mock(oCreatedContext).expects("isTransient").withExactArgs().returns(true);
+				this.mock(oCreatedContext).expects("getDeepPath").withExactArgs()
+					.once().callThrough();
 			});
 			if (aFilterForPredicate.length) {
 				aFilterForPredicate.forEach(function (sPredicate) {
@@ -1124,6 +1129,45 @@ sap.ui.define([
 			});
 		});
 		});
+	});
+
+	//*********************************************************************************************
+	// message for persisted entry still in cache -> filter expected, not Filter.NONE
+	QUnit.test("requestFilterForMessages: persisted context in cache has message", async function (assert) {
+		const oPersistedContext = {
+			getDeepPath() { return "~deepPath~(~serverKey~)"; },
+			isTransient() { return false; }
+		};
+		const oTransientContext = {
+			getDeepPath() { return "~deepPath~(~uid0~)"; },
+			isTransient() { return true; }
+		};
+		const oModel = {getMessagesByPath() {}};
+		const oBinding = {
+			sDeepPath : "~deepPath~",
+			oModel : oModel,
+			_getCreatedContexts() {},
+			_getFilterForPredicate() {},
+			getResolvedPath() {}
+		};
+
+		this.mock(oBinding).expects("getResolvedPath").withExactArgs().returns("~resolvedPath~");
+		this.mock(oBinding).expects("_getCreatedContexts").withExactArgs()
+			.returns([oPersistedContext, oTransientContext]);
+		this.mock(oModel).expects("getMessagesByPath").withExactArgs("~deepPath~", true)
+			.returns([{aFullTargets : ["~deepPath~(~serverKey~)/Note"]}]);
+		this.mock(oPersistedContext).expects("isTransient").withExactArgs().returns(false);
+		this.mock(oPersistedContext).expects("getDeepPath").never();
+		this.mock(oTransientContext).expects("isTransient").withExactArgs().returns(true);
+		this.mock(oTransientContext).expects("getDeepPath").withExactArgs().callThrough();
+		const oExpectedFilter = new Filter("~property~", FilterOperator.EQ, "~value~");
+		this.mock(oBinding).expects("_getFilterForPredicate").withExactArgs("(~serverKey~)")
+			.returns(oExpectedFilter);
+
+		// code under test
+		const oFilter = await ODataListBinding.prototype.requestFilterForMessages.call(oBinding);
+
+		assert.strictEqual(oFilter, oExpectedFilter);
 	});
 
 	//*********************************************************************************************
@@ -3349,7 +3393,7 @@ sap.ui.define([
 			oRemoveExpectation = oBindingMock.expects("_removePersistedCreatedContexts")
 				.withExactArgs();
 			oResetDataExpectation = oBindingMock.expects("resetData").withExactArgs();
-			oBindingMock.expects("abortPendingRequest").withExactArgs(true);
+			oBindingMock.expects("abortPendingRequest").withExactArgs(true, bFilterNone);
 			oBindingMock.expects("_fireRefresh").withExactArgs({reason : ChangeReason.Filter});
 
 			// code under test

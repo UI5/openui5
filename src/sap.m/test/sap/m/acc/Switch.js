@@ -29,17 +29,17 @@ sap.ui.define([
 		content: [
 			getTitle("Default type"),
 
-			new Label({text: "Regular", wrapping: true, labelFor: "defaultSwitch"}),
-			new Switch("defaultSwitch", {}),
+			new Label({text: "Enable notifications", wrapping: true, labelFor: "notificationSwitch"}),
+			new Switch("notificationSwitch", {}),
 
-			new Label({text: "Disabled", wrapping: true, labelFor: "disabledSwitch"}),
-			new Switch("disabledSwitch", { enabled: false }),
+			new Label({text: "Dark mode", wrapping: true, labelFor: "darkModeSwitch"}),
+			new Switch("darkModeSwitch", { state: true }),
 
-			new Label({ text: "Label", wrapping: true, labelFor: "defaultSwitchWithLabel" }),
-			new Switch("defaultSwitchWithLabel"),
+			new Label({text: "Enable WiFi (system setting unavailable)", wrapping: true, labelFor: "wifiSwitch"}),
+			new Switch("wifiSwitch", { enabled: false }),
 
-			new Label("defaultSwitchLabelledBy", { text: "Using ariaLabelledBy association", wrapping: true }),
-			new Switch({ ariaLabelledBy: "defaultSwitchLabelledBy" })
+			new Label("doNotDisturbLabel", {text: "Do not disturb", wrapping: true}),
+			new Switch({ ariaLabelledBy: "doNotDisturbLabel" })
 		]
 	}).addStyleClass("sapUiContentPadding");
 
@@ -47,32 +47,11 @@ sap.ui.define([
 		content: [
 			getTitle("Default type with custom text"),
 
-			new Label({ text: "Regular with text", wrapping: true, labelFor: "regularWithText" }),
-			new Switch("regularWithText", { customTextOn: "Yes", customTextOff: "No" }),
+			new Label({ text: "Location services", wrapping: true, labelFor: "locationToggle" }),
+			new Switch("locationToggle", { customTextOn: "On", customTextOff: "Off" }),
 
-			new Label({ text: "Disabled with text", wrapping: true, labelFor: "disabledWithText" }),
-			new Switch("disabledWithText", { customTextOn: "Yes", customTextOff: "No", enabled: false }),
-
-			new Label({ text: "Switch with label", wrapping: true, labelFor: "defaultCustomTextSwitchWithLabel" }),
-			new Switch("defaultCustomTextSwitchWithLabel", { customTextOn: "Yes", customTextOff: "No" }),
-
-			new Label("defaultCustomTextSwitchLabelledBy", { text: "Using ariaLabelledBy association", wrapping: true }),
-			new Switch({ customTextOn: "Yes", customTextOff: "No", ariaLabelledBy: "defaultCustomTextSwitchLabelledBy" })
-		]
-	}).addStyleClass("sapUiContentPadding");
-
-	var oDefaultNoTextLayout = new VerticalLayout({
-		content: [
-			getTitle("Default type without text (via custom text)"),
-
-			new Label({ text: "Regular without text", wrapping: true, labelFor: "regularWithoutText" }),
-			new Switch("regularWithoutText", { customTextOn: " ", customTextOff: " " }),
-
-			new Label({ text: "Disabled without text", wrapping: true, labelFor: "disabledWithoutText" }),
-			new Switch("disabledWithoutText", { customTextOn: " ", customTextOff: " ", enabled: false }),
-
-			new Label("defaultNoTextSwitchLabelledBy", { text: "Using ariaLabelledBy association", wrapping: true }),
-			new Switch({ customTextOn: " ", customTextOff: " ", ariaLabelledBy: "defaultNoTextSwitchLabelledBy" })
+			new Label({ text: "Bluetooth (unavailable in offline mode)", wrapping: true, labelFor: "bluetoothToggle" }),
+			new Switch("bluetoothToggle", { customTextOn: "On", customTextOff: "Off", enabled: false })
 		]
 	}).addStyleClass("sapUiContentPadding");
 
@@ -80,14 +59,11 @@ sap.ui.define([
 		content: [
 			getTitle("AcceptReject type"),
 
-			new Label({ text: "Regular", labelFor: "regularWithAcceptStatus", wrapping: true }),
-			new Switch("regularWithAcceptStatus", { type: SwitchType.AcceptReject }),
+			new Label({ text: "Accept terms and conditions", labelFor: "termsAcceptSwitch", wrapping: true }),
+			new Switch("termsAcceptSwitch", { type: SwitchType.AcceptReject }),
 
-			new Label({ text: "Disabled", labelFor: "disabledWithAcceptStatus", wrapping: true }),
-			new Switch("disabledWithAcceptStatus", { type: SwitchType.AcceptReject, enabled: false }),
-
-			new Label("acceptRejectSwitchLabelledBy", { text: "Using ariaLabelledBy association", wrapping: true }),
-			new Switch({ type: SwitchType.AcceptReject, ariaLabelledBy: "acceptRejectSwitchLabelledBy" })
+			new Label({ text: "Accept privacy policy (locked)", labelFor: "privacyAcceptSwitch", wrapping: true }),
+			new Switch("privacyAcceptSwitch", { type: SwitchType.AcceptReject, enabled: false })
 		]
 	}).addStyleClass("sapUiContentPadding");
 
@@ -98,7 +74,6 @@ sap.ui.define([
 			content: [
 				oDefaultType,
 				oDefaultCustomTextLayout,
-				oDefaultNoTextLayout,
 				oAcceptRejectLayout
 			]
 		});

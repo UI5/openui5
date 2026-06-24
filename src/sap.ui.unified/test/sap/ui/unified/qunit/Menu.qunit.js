@@ -1191,7 +1191,7 @@ sap.ui.define([
 			});
 
 		// assert
-		assert.strictEqual(oInvisibleCountInformation.getText(), "1 of 3 Type in text", "Proper count information is created");
+		assert.strictEqual(oInvisibleCountInformation.getText(), "Type in text 1 of 3", "Proper count information is created");
 
 		// clean up
 		oLanguageStub.restore();
@@ -1529,8 +1529,8 @@ sap.ui.define([
 		sCountDescriptionTwo = document.getElementById(oInputFields[1].getAttribute("aria-describedby")).innerText;
 
 		// assert
-		assert.strictEqual(sCountDescriptionOne, "1 of 2 Type in text", "Proper description text is referenced");
-		assert.strictEqual(sCountDescriptionTwo, "2 of 2 Type in text", "Proper description text is referenced");
+		assert.strictEqual(sCountDescriptionOne, "Type in text 1 of 2", "Proper description text is referenced");
+		assert.strictEqual(sCountDescriptionTwo, "Type in text 2 of 2", "Proper description text is referenced");
 
 		// clean up
 		oMenu.destroy();

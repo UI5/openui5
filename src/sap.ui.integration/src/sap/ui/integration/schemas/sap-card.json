@@ -1606,6 +1606,14 @@
             "Stretch"
           ],
           "default": "Default"
+        },
+        "itemsLayout": {
+          "description": "[Experimental] Defines how the items inside the group are laid out. \"Vertical\" stacks each label/value pair on its own row (default). \"Horizontal\" arranges the pairs side by side and wraps them onto multiple rows when there is not enough width. In order to have horizontal layout, you need to set the `alignment` property to \"Stretch\".",
+          "enum": [
+            "Vertical",
+            "Horizontal"
+          ],
+          "default": "Vertical"
         }
       }
     },

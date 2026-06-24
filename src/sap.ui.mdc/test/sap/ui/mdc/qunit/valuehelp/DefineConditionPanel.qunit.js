@@ -220,6 +220,17 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("operator FixedList has highlightFilterResults enabled", (assert) => {
+
+		const oVH = Element.getElementById("DCP1--rowSelect-help");
+		const oPopover = oVH.getTypeahead();
+		const oFL = oPopover.getContent()[0];
+
+		assert.ok(oFL.getFilterList(), "filterList is true on operator FixedList");
+		assert.ok(oFL.getHighlightFilterResults(), "highlightFilterResults is true on operator FixedList");
+
+	});
+
 	QUnit.test("bind empty condition Model and add one condition", async (assert) => {
 
 		let aConditions = _getModelConditions();

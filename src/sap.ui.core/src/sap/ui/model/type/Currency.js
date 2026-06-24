@@ -19,6 +19,97 @@ sap.ui.define([
 	"use strict";
 
 	/**
+	 * @typedef {sap.ui.core.format.NumberFormat.FormatOptions} sap.ui.model.type.CurrencyFormatOptions
+	 *
+	 * Format options for the {@link sap.ui.model.type.Currency} type.
+	 *
+	 * @property {boolean} [currencyCode]
+	 *   Defines whether the currency is shown as a code in currency format.
+	 *   The currency symbol is displayed when this option is set to
+	 *   <code>false</code> and a symbol exists for the given currency code.
+	 * @property {"standard"|"accounting"|"sap-standard"|"sap-accounting"} [currencyContext]
+	 *   Can be set to either 'standard'
+	 *   (the default value) or to 'accounting' for an accounting-specific currency display
+	 * @property {Object<string,object>} [customCurrencies]
+	 *   Defines a set of custom currencies exclusive to this NumberFormat instance.
+	 *   Custom currencies must not consist only of digits.
+	 *   If custom currencies are defined on the instance, no other currencies can be formatted and
+	 *   parsed by this instance.
+	 *   Globally available custom currencies can be added via the global configuration.
+	 *   See {@link module:sap/base/i18n/Formatting.setCustomCurrencies Formatting.setCustomCurrencies} and
+	 *   {@link module:sap/base/i18n/Formatting.addCustomCurrencies Formatting.addCustomCurrencies}.
+	 * @property {int} [decimals]
+	 *   The number of decimal digits.
+	 * @property {int} [decimalPadding]
+	 *   The target length of places after the decimal separator; if the number has fewer decimals than specified in
+	 *   this option, it is padded with whitespaces at the end up to the target length. An additional whitespace
+	 *   character for the decimal separator is added for a number without any decimals.
+	 *   <b>Note:</b> This format option is only allowed if the following conditions apply:
+	 *   <ul>
+	 *     <li>It has a value greater than 0.</li>
+	 *     <li>The <code>oFormatOptions.style</code> format option is <b>not</b> set to <code>"short"</code> or
+	 *         <code>"long"</code>.</li>
+	 *   </ul>
+	 * @property {null|number|string} [emptyString]
+	 *   Since 1.130.0. Defines what value an empty string is parsed into and what value is formatted as an empty
+	 *   string.
+	 *   The {@link #format} and {@link #parse} functions are done in a symmetric way.
+	 *   For example, when this parameter is set to <code>NaN</code>, an empty string is parsed as <code>NaN</code>,
+	 *   and <code>NaN</code> is formatted as an empty string.
+	 * @property {int} [minFractionDigits]
+	 *   Deprecated as of 1.130; this format option does not have
+	 *   an effect on currency formats since decimals can always be determined, either through the given format options,
+	 *   custom currencies or the CLDR
+	 * @property {boolean} [parseAsString]
+	 *   Since 1.28.2, whether to parse the number as a string in order to keep the precision for large numbers. Numbers
+	 *   in scientific notation are parsed back to standard notation.
+	 *   For example, <code>5e-3</code> is parsed to <code>0.005</code>.
+	 * @property {int} [precision]
+	 *   The maximum number of digits in the formatted representation of a number;
+	 *   if the <code>precision</code> is less than the overall length of the number, its fractional part is truncated
+	 *   through rounding. As the <code>precision</code> only affects the rounding of a number, its integer part can
+	 *   retain more digits than defined by this parameter.
+	 *   <b>Example:</b> With a <code>precision</code> of 2, <code>234.567</code> is formatted to <code>235</code>.
+	 *   <b>Note:</b> The formatted output may differ depending on locale.
+	 * @property {boolean} [preserveDecimals]
+	 *   By default, decimals are preserved unless <code>oFormatOptions.style</code> is given as
+	 *   "short" or "long"; since 1.89.0
+	 * @property {boolean} [showMeasure]
+	 *   Defines whether the currency code or symbol is shown in the formatted string,
+	 *   for example true: "1.00 EUR", false: "1.00" for locale "en"
+	 *   If both <code>showMeasure</code> and <code>showNumber</code> are <code>false</code>, an empty string is
+	 *   returned
+	 * @property {boolean} [showNumber]
+	 *   Defines whether the number is shown as part of the result string,
+	 *   for example 1 EUR for locale "en"
+	 *   <pre><code>NumberFormat.getCurrencyInstance({showNumber: true}).format(1, "EUR"); // "1.00 EUR"</code></pre>
+	 *   <pre><code>NumberFormat.getCurrencyInstance({showNumber: false}).format(1, "EUR"); // "EUR"</code></pre>
+	 *   If both <code>showMeasure</code> and <code>showNumber</code> are <code>false</code>, an empty string is
+	 *   returned
+	 * @property {object} [source]
+	 *   A set of format options as defined for
+	 *   {@link sap.ui.core.format.NumberFormat.getCurrencyInstance} which describes the format of
+	 *   amount and currency in the model in case the model holds this in one property of type
+	 *   <code>string</code>, for example as "EUR 22". If an empty object is given,
+	 *   grouping is disabled, the decimal separator is a dot, and the grouping separator is a comma.
+	 * @property {"short"|"long"|"standard"} [style]
+	 *   The style of format.
+	 *   Valid values are based on the CLDR <code>decimalFormat</code>. When set to
+	 *   <code>short</code> or <code>long</code>, numbers are formatted into compact forms.
+	 *   When this option is set, the default value of the <code>precision</code> option is set to <code>2</code>.
+	 *   This can be changed by setting either <code>min/maxFractionDigits</code>,
+	 *   <code>decimals</code>, <code>shortDecimals</code>, or the <code>precision</code> option itself.
+	 * @property {boolean} [trailingCurrencyCode]
+	 *   Overrides the global configuration
+	 *   value {@link module:sap/base/i18n/Formatting.getTrailingCurrencyCode Formatting.getTrailingCurrencyCode},
+	 *   which has a default value of <code>true</code>.
+	 *   This is ignored if <code>oFormatOptions.currencyCode</code> is set to <code>false</code>,
+	 *   or if <code>oFormatOptions.pattern</code> is supplied.
+	 *
+	 * @public
+	 */
+
+	/**
 	 * Constructor for a <code>Currency</code> type.
 	 *
 	 * @class
@@ -35,7 +126,26 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @public
-	 * @param {object} [oFormatOptions]
+	 * @param {sap.ui.model.type.CurrencyFormatOptions} [oFormatOptions={
+	 * 	   currencyCode: true,
+	 *     currencyContext: "standard",
+	 *     emptyString: NaN,
+	 *     groupingBaseSize: 3,
+	 *     groupingEnabled: true,
+	 *     groupingSize: 3,
+	 *     maxFractionDigits: 99,
+	 *     maxIntegerDigits: 99,
+	 *     minFractionDigits: 0,
+	 *     minIntegerDigits: 1,
+	 *     parseAsString: false,
+	 *     preserveDecimals: true,
+	 *     roundingMode: "HALF_AWAY_FROM_ZERO",
+	 *     showMeasure: true,
+	 *     showNumber: true,
+	 *     showScale: true,
+	 *     strictGroupingValidation: false,
+	 *     style: "standard"
+	 *   }]
 	 *   Format options; for a list of all available options, see
 	 *   {@link sap.ui.core.format.NumberFormat.getCurrencyInstance}. If the format options
 	 *   <code>showMeasure</code> or since 1.89.0 <code>showNumber</code> are set to
@@ -43,15 +153,6 @@ sap.ui.define([
 	 *   control, provided the corresponding binding supports the feature of ignoring model
 	 *   messages, see {@link sap.ui.model.Binding#supportsIgnoreMessages}, and the corresponding
 	 *   binding parameter is not set manually.
-	 * @param {boolean} [oFormatOptions.preserveDecimals=true]
-	 *   By default decimals are preserved, unless <code>oFormatOptions.style</code> is given as
-	 *   "short" or "long"; since 1.89.0
-	 * @param {object} [oFormatOptions.source]
-	 *   A set of format options as defined for
-	 *   {@link sap.ui.core.format.NumberFormat.getCurrencyInstance} which describes the format of
-	 *   amount and currency in the model in case the model holds this in one property of type
-	 *   <code>string</code>, e.g. as &quot;EUR 22&quot;. If an empty object is given,
-	 *   grouping is disabled, the decimal separator is a dot and the grouping separator is a comma.
 	 * @param {object} [oConstraints]
 	 *   Constraints for the value part
 	 * @param {number} [oConstraints.minimum]

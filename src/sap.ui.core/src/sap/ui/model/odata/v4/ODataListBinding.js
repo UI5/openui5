@@ -4861,7 +4861,7 @@ sap.ui.define([
 			});
 		}
 
-		if (aPaths.indexOf("") < 0) {
+		if (!aPaths.includes("")) {
 			aPredicates
 				= _Helper.getPredicates(bSingle ? [oContext] : this.keepOnlyVisibleContexts());
 			if (aPredicates) {

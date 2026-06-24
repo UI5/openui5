@@ -4,6 +4,7 @@
 
 sap.ui.define([
 	"sap/base/util/merge",
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/api/InitialFlexAPI",
 	"sap/ui/fl/write/api/ReloadInfoAPI",
@@ -13,6 +14,7 @@ sap.ui.define([
 	"sap/ui/rta/Utils"
 ], function(
 	merge,
+	ControlVariantApplyAPI,
 	FlexRuntimeInfoAPI,
 	InitialFlexAPI,
 	ReloadInfoAPI,
@@ -135,7 +137,7 @@ sap.ui.define([
 		}
 		ReloadManager.enableAutomaticStart(oReloadInfo.layer, oReloadInfo.selector);
 		oReloadInfo.onStart = true;
-		ReloadManager.triggerReload(oReloadInfo);
+		await ReloadManager.triggerReload(oReloadInfo);
 		return true;
 	}
 
@@ -175,12 +177,17 @@ sap.ui.define([
 	 * @param {string} oReloadInfo.removeVersionParameter - Indicates if version parameter should be removed
 	 * @param {string} oReloadInfo.removeDraft - Indicates if draft parameter should be removed
 	 */
-	ReloadManager.triggerReload = function(oReloadInfo) {
+	ReloadManager.triggerReload = async function(oReloadInfo) {
 		if (oReloadInfo.onStart) {
 			ReloadInfoAPI.handleReloadInfoOnStart(oReloadInfo);
 		} else {
 			ReloadInfoAPI.handleReloadInfo(oReloadInfo);
 		}
+		// In design-time mode all variant data is loaded eagerly, so any
+		// sap-ui-fl-control-variant-id parameter in the URL is irrelevant and
+		// would otherwise trigger spurious lazy-load requests on the next
+		// initialization. Clear it before the reload happens.
+		await ControlVariantApplyAPI.clearVariantParameterInURL();
 		if (FlUtils.getUshellContainer()) {
 			mUShellServices.AppLifeCycle.reloadCurrentApp();
 		} else {
@@ -264,10 +271,10 @@ sap.ui.define([
 	 * @param {object} oReloadInfo - Information needed for the reload
 	 * @param {boolean} oReloadInfo.hasHigherLayerChanges - Indicates if higher layer changes exist
 	 */
-	ReloadManager.handleReloadOnExit = function(oReloadInfo) {
+	ReloadManager.handleReloadOnExit = async function(oReloadInfo) {
 		if (oReloadInfo.reloadNeeded) {
 			oReloadInfo.removeVersionParameter = true;
-			ReloadManager.triggerReload(oReloadInfo);
+			await ReloadManager.triggerReload(oReloadInfo);
 		}
 	};
 

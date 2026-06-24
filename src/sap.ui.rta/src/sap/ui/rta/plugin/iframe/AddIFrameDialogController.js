@@ -495,16 +495,22 @@ sap.ui.define([
 			const oInput = oEvent.getSource();
 			const sInputValue = oInput.getValue().trim();
 			const sNewText = sInputValue.length ? sInputValue : "\xa0";
+			const sOldText = this._oJSONModel.getProperty("/title/originalValue");
 			let sValueState = ValueState.None;
 
+			let bSaveEnabled = true;
 			try {
-				validateText(sNewText, undefined, this._oAction);
+				validateText(sNewText, sOldText, this._oAction);
 			} catch (oException) {
-				sValueState = ValueState.Error;
+				// unchanged title blocks save silently, without marking the field as invalid
+				if (oException.message !== "sameTextError") {
+					sValueState = ValueState.Error;
+				}
+				bSaveEnabled = false;
 			}
 
 			oInput.setValueState(sValueState);
-			this._checkIfSaveIsEnabled(sValueState === ValueState.None);
+			this._checkIfSaveIsEnabled(bSaveEnabled);
 			return sValueState === ValueState.Error;
 		},
 
@@ -593,6 +599,9 @@ sap.ui.define([
 					return;
 				} else {
 					this._oJSONModel.setProperty(`/${sFieldName}/value`, mSettings[sFieldName]);
+					if (sFieldName === "title") {
+						this._oJSONModel.setProperty("/title/originalValue", mSettings[sFieldName]);
+					}
 				}
 			});
 		},

@@ -90,7 +90,8 @@ sap.ui.define([
 		getSearch: () => "",
 		getCaseSensitive: () => true,
 		shouldOpenOnClick: () => false,
-		isSingleSelect: () => bSingleSelect
+		isSingleSelect: () => bSingleSelect,
+		getConfig: () => { return {}; }
 	};
 
 	const FakeContext = function (oData) {
@@ -446,6 +447,27 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("FieldDisplay.Value with Integer data type", (assert) => {
+		const oIntegerType = new IntegerType();
+		sinon.stub(oFakeContent, "getConfig").returns({dataType: oIntegerType});
+		oConfig.value = "1";
+		oConfig.checkDescription = true;
+
+		aRelevantContexts = [
+			new FakeContext({key: 1, text: "", message: "match"}) // key match
+		];
+
+		_testOrder(assert);
+
+		aRelevantContexts = [
+			new FakeContext({key: 2, text: "", message: "no match"}), // no match
+			new FakeContext({key: 1, text: "", message: "match"}) // key match
+		];
+
+		_testIndex(assert, [1], undefined);
+
+		oFakeContent.getConfig.restore();
+	});
 
 	QUnit.test("FieldDisplay.ValueDescription", (assert) => {
 		sDisplay = FieldDisplay.ValueDescription;

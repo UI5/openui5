@@ -1,0 +1,69 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "cardsdemo.object.stretchHorizontalWrap",
+		"type": "card",
+		"title": "Card 'stretchHorizontalWrap'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"header": {
+			"title": "Stretch / Horizontal — Wrapping",
+			"subtitle": "Many items wrap onto multiple rows; pairs stay together"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Specs",
+					"alignment": "Stretch",
+					"itemsLayout": "Horizontal",
+					"items": [
+						{
+							"label": "SKU",
+							"value": "ULT-9000-X"
+						},
+						{
+							"label": "Color",
+							"value": "Graphite"
+						},
+						{
+							"label": "Weight",
+							"value": "1.8 kg"
+						},
+						{
+							"label": "Length",
+							"value": "32 cm"
+						},
+						{
+							"label": "Width",
+							"value": "21 cm"
+						},
+						{
+							"label": "Height",
+							"value": "5 cm"
+						},
+						{
+							"label": "Battery",
+							"value": "8 hours"
+						},
+						{
+							"label": "Warranty",
+							"value": "24 months"
+						},
+						{
+							"label": "Origin",
+							"value": "Germany"
+						},
+						{
+							"label": "Stock",
+							"value": "1,240 units"
+						}
+					]
+				}
+			]
+		}
+	}
+}

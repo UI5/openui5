@@ -1,0 +1,63 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "cardsdemo.object.stretchHorizontalIcons",
+		"type": "card",
+		"i18n": "i18n/i18n.properties",
+		"title": "Card 'stretchHorizontalIcons'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"data": {
+			"request": {
+				"url": "./employee.json"
+			}
+		},
+		"header": {
+			"title": "Stretch / Horizontal — Items with icons"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Team",
+					"alignment": "Stretch",
+					"itemsLayout": "Horizontal",
+					"items": [
+						{
+							"label": "Manager",
+							"value": "{manager/firstName} {manager/lastName}",
+							"icon": {
+								"src": "{manager/photo}"
+							}
+						},
+						{
+							"label": "Assistant",
+							"value": "{assistant/firstName} {assistant/lastName}",
+							"icon": {
+								"src": "{assistant/photo}"
+							}
+						},
+						{
+							"label": "Employee",
+							"value": "{firstName} {lastName}",
+							"icon": {
+								"src": "{photo}"
+							}
+						},
+						{
+							"label": "Backup",
+							"value": "Jane Doe",
+							"icon": {
+								"initials": "JD",
+								"shape": "Circle"
+							}
+						}
+					]
+				}
+			]
+		}
+	}
+}

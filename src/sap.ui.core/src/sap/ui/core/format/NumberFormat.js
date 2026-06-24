@@ -266,6 +266,91 @@ sap.ui.define([
 	 */
 
 	/**
+	 * @typedef {sap.ui.core.format.NumberFormat.FormatOptions} sap.ui.core.format.NumberFormat.CurrencyFormatOptions
+	 *
+	 * The format options for currencies.
+	 *
+	 * @property {boolean} [currencyCode]
+	 *   Defines whether the currency is shown as a code in currency format.
+	 *   The currency symbol is displayed when this option is set to
+	 *   <code>false</code> and a symbol has been defined for the given currency code.
+	 * @property {"standard"|"accounting"|"sap-standard"|"sap-accounting"} [currencyContext]
+	 *   Can be set either to 'standard'
+	 *   (the default value) or to 'accounting' for an accounting-specific currency display
+	 * @property {Object<string,object>} [customCurrencies]
+	 *   Defines a set of custom currencies exclusive to this NumberFormat instance.
+	 *   Custom currencies must not only consist of digits.
+	 *   If custom currencies are defined on the instance, no other currencies can be formatted and
+	 *   parsed by this instance.
+	 *   Globally available custom currencies can be added via the global configuration.
+	 *   See the above examples.
+	 *   See also {@link module:sap/base/i18n/Formatting.setCustomCurrencies Formatting.setCustomCurrencies} and
+	 *   {@link module:sap/base/i18n/Formatting.addCustomCurrencies Formatting.addCustomCurrencies}.
+	 * @property {int} [decimals]
+	 *   The number of decimal digits.
+	 * @property {int} [decimalPadding]
+	 *   The target length of places after the decimal separator; if the number has fewer decimals than specified in
+	 *   this option, it is padded with whitespaces at the end up to the target length. An additional whitespace
+	 *   character for the decimal separator is added for a number without any decimals.
+	 *   <b>Note:</b> This format option is only allowed if the following conditions apply:
+	 *   <ul>
+	 *     <li>It has a value greater than 0.</li>
+	 *     <li>The <code>oFormatOptions.style</code> format option is <b>not</b> set to <code>"short"</code> or
+	 *         <code>"long"</code>.</li>
+	 *   </ul>
+	 * @property {null|number|string} [emptyString]
+	 *   Since 1.130.0. Defines what value an empty string is parsed into and what value is formatted as an empty
+	 *   string.
+	 *   The {@link #format} and {@link #parse} functions are done in a symmetric way.
+	 *   For example, when this parameter is set to <code>NaN</code>, an empty string is parsed as <code>NaN</code>,
+	 *   and <code>NaN</code> is formatted as an empty string.
+	 * @property {int} [minFractionDigits]
+	 *   Deprecated as of 1.130; this format option does not have
+	 *   an effect on currency formats since decimals can always be determined, either through the given format options,
+	 *   custom currencies or the CLDR
+	 * @property {boolean} [parseAsString]
+	 *   Since 1.28.2, whether to parse the number as a string in order to keep the precision for big numbers. Numbers
+	 *   in scientific notation are parsed back to standard notation.
+	 *   For example, <code>5e-3</code> is parsed to <code>0.005</code>.
+	 * @property {int} [precision]
+	 *   The maximum number of digits in the formatted representation of a number;
+	 *   if the <code>precision</code> is less than the overall length of the number, its fractional part is truncated
+	 *   through rounding. As the <code>precision</code> only affects the rounding of a number, its integer part can
+	 *   retain more digits than defined by this parameter.
+	 *   <b>Example:</b> With a <code>precision</code> of 2, <code>234.567</code> is formatted to <code>235</code>.
+	 *   <b>Note:</b> The formatted output may differ depending on locale.
+	 * @property {boolean} [preserveDecimals]
+	 *   Whether {@link #format} preserves decimal digits (except trailing zeros) when there are more decimals than the
+	 *   <code>maxFractionDigits</code> format option allows.
+	 *   When decimals aren't preserved, the formatted number is rounded to <code>maxFractionDigits</code>.
+	 * @property {boolean} [showMeasure]
+	 *   Defines whether the currency code/symbol is shown in the formatted string,
+	 *   e.g. true: "1.00 EUR", false: "1.00" for locale "en"
+	 *   If both <code>showMeasure</code> and <code>showNumber</code> are false, an empty string is returned
+	 * @property {boolean} [showNumber]
+	 *   Defines whether the number is shown as part of the result string,
+	 *   e.g. 1 EUR for locale "en"
+	 *   <pre><code>NumberFormat.getCurrencyInstance({showNumber: true}).format(1, "EUR"); // "1.00 EUR"</code></pre>
+	 *   <pre><code>NumberFormat.getCurrencyInstance({showNumber: false}).format(1, "EUR"); // "EUR"</code></pre>
+	 *   If both <code>showMeasure</code> and <code>showNumber</code> are false, an empty string is returned
+	 * @property {"short"|"long"|"standard"} [style]
+	 *   The style of format.
+	 *   Valid values are based on the CLDR <code>decimalFormat</code>. When set to
+	 *   <code>short</code> or <code>long</code>, numbers are formatted into compact forms.
+	 *   When this option is set, the default value of the <code>precision</code> option is set to <code>2</code>.
+	 *   This can be changed by setting either <code>min/maxFractionDigits</code>,
+	 *   <code>decimals</code>, <code>shortDecimals</code>, or the <code>precision</code> option itself.
+	 * @property {boolean} [trailingCurrencyCode]
+	 *   Overrides the global configuration
+	 *   value {@link module:sap/base/i18n/Formatting.getTrailingCurrencyCode Formatting.getTrailingCurrencyCode},
+	 *   which has a default value of <code>true</code>.
+	 *   This is ignored if <code>oFormatOptions.currencyCode</code> is set to <code>false</code>,
+	 *   or if <code>oFormatOptions.pattern</code> is supplied.
+	 *
+	 * @public
+	 */
+
+	/**
 	 * Format classes
 	 *
 	 * @namespace
@@ -963,105 +1048,28 @@ sap.ui.define([
 	 * oFormat.format(777.888, "Bitcoin"); // "Bitcoin 777.89"
 	 * </pre>
 	 *
-	 * @param {object} [oFormatOptions] The option object, which supports the following parameters.
+	 * @param {sap.ui.core.format.NumberFormat.CurrencyFormatOptions} [oFormatOptions={
+	 *     currencyCode: true,
+	 *     currencyContext: "standard",
+	 *     emptyString: NaN,
+	 *     groupingBaseSize: 3,
+	 *     groupingEnabled: true,
+	 *     groupingSize: 3,
+	 *     maxFractionDigits: 99,
+	 *     maxIntegerDigits: 99,
+	 *     minFractionDigits: 0,
+	 *     minIntegerDigits: 1,
+	 *     parseAsString: false,
+	 *     preserveDecimals: false,
+	 *     roundingMode: "HALF_AWAY_FROM_ZERO",
+	 *     showMeasure: true,
+	 *     showNumber: true,
+	 *     showScale: true,
+	 *     strictGroupingValidation: false,
+	 *     style: "standard"
+	 *   }]
+	 *   The option object, which supports the following parameters.
 	 *   If no options are given, default values according to the type and locale settings are used.
-	 * @param {boolean} [oFormatOptions.currencyCode=true] defines whether the currency is shown as
-	 *   a code in currency format. The currency symbol is displayed when this option is set to
-	 *   <code>false</code> and a symbol has been defined for the given currency code.
-	 * @param {string} [oFormatOptions.currencyContext=standard] can be set either to 'standard'
-	 *   (the default value) or to 'accounting' for an accounting-specific currency display
-	 * @param {Object<string,object>} [oFormatOptions.customCurrencies] defines a set of custom currencies exclusive to this NumberFormat instance.
-	 *   Custom currencies must not only consist of digits.
-	 *   If custom currencies are defined on the instance, no other currencies can be formatted and parsed by this instance.
-	 *   Globally available custom currencies can be added via the global configuration.
-	 *   See the above examples.
-	 *   See also {@link module:sap/base/i18n/Formatting.setCustomCurrencies Formatting.setCustomCurrencies} and
-	 *   {@link module:sap/base/i18n/Formatting.addCustomCurrencies Formatting.addCustomCurrencies}.
-	 * @param {int} [oFormatOptions.decimalPadding]
-	 *   The target length of places after the decimal separator; if the number has fewer decimal places than given in
-	 *   this option, it is padded with whitespaces at the end up to the target length. An additional whitespace
-	 *   character for the decimal separator is added for a number without any decimals.
-	 *   <b>Note:</b> This format option is only allowed if the following conditions apply:
-	 *   <ul>
-	 *     <li>It has a value greater than 0.</li>
-	 *     <li>The <code>FormatOptions.showMeasure</code> format option is set to <code>false</code>.</li>
-	 *     <li>The <code>oFormatOptions.style</code> format option is <b>not</b> set to <code>"short"</code> or
-	 *         <code>"long"</code>.</li>
-	 *   </ul>
-	 * @param {int} [oFormatOptions.decimals] defines the number of decimal digits
-	 * @param {string} [oFormatOptions.decimalSeparator] defines the character used as decimal separator.
-	 *   Note: <code>decimalSeparator</code> must always be different from <code>groupingSeparator</code>.
-	 * @param {null|number|string} [oFormatOptions.emptyString=NaN] since 1.30.0 defines what an empty string
-	 *   is parsed as, and what is formatted as an empty string. The allowed values are "" (empty string),
-	 *   NaN, <code>null</code>, or 0.
-	 *   The 'format' and 'parse' functions are done in a symmetric way. For example, when this
-	 *   parameter is set to NaN, an empty string is parsed as [NaN, undefined], and NaN is
-	 *   formatted as an empty string.
-	 * @param {int} [oFormatOptions.groupingBaseSize=3] defines the grouping base size in digits if
-	 *   it is different from the grouping size (e.g. Indian grouping)
-	 * @param {boolean} [oFormatOptions.groupingEnabled=true] defines whether grouping is enabled
-	 *   (grouping separators are shown).
-	 *   <b>Note:</b> Grouping is disabled if the <code>groupingSize</code> format option is set to
-	 *   a non-positive value.
-	 * @param {string} [oFormatOptions.groupingSeparator] defines the character used as grouping separator.
-	 *   Note: <code>groupingSeparator</code> must always be different from <code>decimalSeparator</code>.
-	 * @param {int} [oFormatOptions.groupingSize=3] defines the grouping size in digits; the default
-	 *   is <code>3</code>.
-	 *   <b>Note:</b> If this format option is set to a non-positive value, grouping will be disabled entirely.
-	 * @param {int} [oFormatOptions.maxFractionDigits=99] defines the maximum number of decimal digits
-	 * @param {int} [oFormatOptions.maxIntegerDigits=99] defines the maximum number of non-decimal digits.
-	 *   If the number exceeds this maximum, e.g. 1e+120, "?" characters are shown instead of digits.
-	 * @param {int} [oFormatOptions.minFractionDigits=0] Deprecated as of 1.130; this format option does not have
-	 *   an effect on currency formats since decimals can always be determined, either through the given format options,
-	 *   custom currencies or the CLDR
-	 * @param {int} [oFormatOptions.minIntegerDigits=1] defines the minimal number of non-decimal digits
-	 * @param {string} [oFormatOptions.minusSign] defines the used minus symbol
-	 * @param {boolean} [oFormatOptions.parseAsString=false] since 1.28.2 defines whether to output
-	 *   the string from the parse function in order to keep the precision for big numbers. Numbers
-	 *   in scientific notation are parsed back to standard notation. For example, "5e-3" is parsed
-	 *   to "0.005".
-	 * @param {string} [oFormatOptions.pattern] CLDR number pattern which is used to format the number
-	 * @param {string} [oFormatOptions.plusSign] defines the used plus symbol
-	 * @param {boolean} [oFormatOptions.preserveDecimals=false] Whether {@link #format} preserves
-	 *   decimal digits except trailing zeros in case there are more decimals than the
-	 *   <code>maxFractionDigits</code> format option allows.
-	 *   If decimals are not preserved, the formatted number is rounded to <code>maxFractionDigits</code>.
-	 * @param {sap.ui.core.format.NumberFormat.RoundingMode} [oFormatOptions.roundingMode=HALF_AWAY_FROM_ZERO]
-	 *   Specifies the rounding behavior for discarding the digits after the maximum fraction digits
-	 *   defined by <code>maxFractionDigits</code>.
-	 *   This can be assigned
-	 *   <ul>
-	 *     <li>by value in {@link sap.ui.core.format.NumberFormat.RoundingMode RoundingMode},</li>
-	 *     <li>via a function that is used for rounding the number and takes two parameters: the number itself, and the
-	 *         number of decimal digits that should be reserved. <b>Using a function is deprecated since 1.121.0</b>;
-	 *         string based numbers are not rounded via this custom function.</li>
-	 *   </ul>
-	 * @param {int} [oFormatOptions.shortDecimals] defines the number of decimal in the shortened format string. If this isn't specified, the 'decimals' options is used
-	 * @param {int} [oFormatOptions.shortLimit] only use short number formatting for values above this limit
-	 * @param {int} [oFormatOptions.shortRefNumber] since 1.40 specifies a number from which the scale factor for 'short' or 'long' style format is generated. The generated scale factor is
-	 *  used for all numbers which are formatted with this format instance. This option has effect only when the option 'style' is set to 'short' or 'long'. This option is by default set
-	 *  with <code>undefined</code> which means the scale factor is selected automatically for each number being formatted.
-	 * @param {boolean} [oFormatOptions.showMeasure=true] defines whether the currency code/symbol is shown in the formatted string,
-	 *  e.g. true: "1.00 EUR", false: "1.00" for locale "en"
-	 *  If both <code>showMeasure</code> and <code>showNumber</code> are false, an empty string is returned
-	 * @param {boolean} [oFormatOptions.showNumber=true] defines whether the number is shown as part of the result string,
-	 *  e.g. 1 EUR for locale "en"
-	 *      <code>NumberFormat.getCurrencyInstance({showNumber:true}).format(1, "EUR"); // "1.00 EUR"</code>
-	 *      <code>NumberFormat.getCurrencyInstance({showNumber:false}).format(1, "EUR"); // "EUR"</code>
-	 *  If both <code>showMeasure</code> and <code>showNumber</code> are false, an empty string is returned
-	 * @param {boolean} [oFormatOptions.showScale=true] since 1.40 specifies whether the scale factor is shown in the formatted number.
-	 *   This option takes effect only when the 'style' options is set to either 'short' or 'long'.
-	 * @param {boolean} [oFormatOptions.strictGroupingValidation=false] whether the positions of grouping separators are validated. Space characters used as grouping separators are not validated.
-	 * @param {string} [oFormatOptions.style=standard] defines the style of format. Valid values are
-	 *   'short, 'long' or 'standard' (based on the CLDR decimalFormat). When set to 'short' or 'long',
-	 *   numbers are formatted into the 'short' form only. When this option is set, the default value of the
-	 *   'precision' option is set to 2. This can be changed by setting either min/maxFractionDigits,
-	 *   decimals, shortDecimals, or the 'precision' option itself.
-	 * @param {boolean} [oFormatOptions.trailingCurrencyCode] overrides the global configuration
-	 *   value {@link module:sap/base/i18n/Formatting.getTrailingCurrencyCode Formatting.getTrailingCurrencyCode},
-	 *   which has a default value of <code>true</>.
-	 *   This is ignored if <code>oFormatOptions.currencyCode</code> is set to <code>false</code>,
-	 *   or if <code>oFormatOptions.pattern</code> is supplied.
 	 * @param {sap.ui.core.Locale} [oLocale]
 	 *   The locale to get the formatter for; if no locale is given, a locale for the currently configured language is
 	 *   used; see {@link module:sap/base/i18n/Formatting.getLanguageTag Formatting.getLanguageTag}

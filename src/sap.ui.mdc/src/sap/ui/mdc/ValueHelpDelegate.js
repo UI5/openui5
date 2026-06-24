@@ -389,20 +389,18 @@ sap.ui.define([
 	 * To determine which columns are relevant for the search, the currently active displayMode {@link sap.ui.mdc.enums.FieldDisplay Display} of the connected control will be used.
 	 * While a <code>Value</code> configuration will lead to a 'key'-only search, <code>DescriptionValue</code> leads to searching the description first and the key afterwards. Other modes work the same way.
 	 *
-	 * For each relevant column all items are searched for an exact match first and again with a startsWith filter afterwards, if necessary.
+	 * For each relevant column all items are searched for an exact match first and again with a startsWith filter afterwards, if necessary (and supported by the used data type).
 	 *
 	 * If the <code>caseSensitive</code> property is disabled, whichever entry comes first, wins, whether the user's input is in lowercase or uppercase letters.
-	 *
-	 *
 	 *
 	 * {@link sap.ui.mdc.valuehelp.base.ListContent ListContent}
 	 *
 	 * @param {sap.ui.mdc.ValueHelp} oValueHelp The <code>ValueHelp</code> control instance
 	 * @param {sap.ui.mdc.valuehelp.base.ListContent} oContent <code>ValueHelp</code> content instance
 	 * @param {sap.ui.mdc.valuehelp.base.ItemForValueConfiguration} oConfig Configuration
-	 * @returns {sap.ui.model.Context} Promise resolving in the <code>Context</code> that's relevant'
+	 * @returns {sap.ui.model.Context|undefined} The <code>Context</code> that matches the user input best
 	 * @public
-	 * @since 1.120.0
+	 * @since 1.120
 	 */
 	ValueHelpDelegate.getFirstMatch = function (oValueHelp, oContent, oConfig) {
 
@@ -414,29 +412,53 @@ sap.ui.define([
 			const bCaseSensitive = oConfig.hasOwnProperty("caseSensitive") ? oConfig.caseSensitive : oContent.getCaseSensitive();
 			const sKeyPath = oContent.getKeyPath();
 			const sDescriptionPath = oConfig.checkDescription && oContent.getDescriptionPath();
+			const oTypeMap = this.getTypeMap();
+			const oValueHelpConfig = oContent.getConfig();
+			const oType = oValueHelpConfig.dataType;
+			const sBaseType = oType ? oTypeMap.getBaseType(oType.getMetadata().getName(), oType.getFormatOptions(), oType.getConstraints()) : BaseType.String;
+			const oAdditionalType = oValueHelpConfig.additionalDataType;
+			const sAdditionalBaseType = oAdditionalType ? oTypeMap.getBaseType(oAdditionalType.getMetadata().getName(), oAdditionalType.getFormatOptions(), oAdditionalType.getConstraints()) : BaseType.String;
 
 			let aSearchFields;
 			switch (oValueHelp.getDisplay()) {
 				case FieldDisplay.Description:
-					aSearchFields = [sDescriptionPath];
+					aSearchFields = [{path: sDescriptionPath, type: oAdditionalType, baseType: sAdditionalBaseType}];
 					break;
 				case FieldDisplay.DescriptionValue:
-					aSearchFields = [sDescriptionPath, sKeyPath];
+					aSearchFields = [{path: sDescriptionPath, type: oAdditionalType, baseType: sAdditionalBaseType}, {path: sKeyPath, type: oType, baseType: sBaseType}];
 					break;
 				case FieldDisplay.ValueDescription:
-					aSearchFields = [sKeyPath, sDescriptionPath];
+					aSearchFields = [{path: sKeyPath, type: oType, baseType: sBaseType}, {path: sDescriptionPath, type: oAdditionalType, baseType: sAdditionalBaseType}];
 					break;
 				default:
-					aSearchFields = [sKeyPath];
+					aSearchFields = [{path: sKeyPath, type: oType, baseType: sBaseType}];
 					break;
 			}
-			aSearchFields = aSearchFields.filter((oEntry) => !!oEntry);
 
-			for (const sPath of aSearchFields) {
+			for (const oSearchField of aSearchFields) {
+				const sPath = oSearchField.path;
+
+				if (!sPath) {
+					continue;
+				}
+
+				const oType = oSearchField.type;
+				const sBaseType = oSearchField.baseType;
+				let vParsedValue;
+
+				try {
+					vParsedValue = oType ? oType.parseValue(sInputValue, "string") : sInputValue;
+				} catch (vError) {
+					// if input not match type no item can match
+					continue;
+				}
+
 				const aFilters = [
-					new Filter({ path: sPath, operator: FilterOperator.EQ, value1: sInputValue, caseSensitive: bCaseSensitive }),
-					new Filter({ path: sPath, operator: FilterOperator.StartsWith, value1: sInputValue, caseSensitive: bCaseSensitive })
+					new Filter({ path: sPath, operator: FilterOperator.EQ, value1: vParsedValue, caseSensitive: bCaseSensitive })
 				];
+				if (sBaseType === BaseType.String) { // StartWith only works for String types
+					aFilters.push(new Filter({ path: sPath, operator: FilterOperator.StartsWith, value1: sInputValue, caseSensitive: bCaseSensitive }));
+				}
 				for (const oFilter of aFilters) {
 					oResult = _applyFilters.call(this, aRelevantContexts, oFilter, oValueHelp, oContent);
 					if (oResult) {

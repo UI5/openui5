@@ -18,7 +18,10 @@
 					path: 'Status',
 					formatter: '.formatter.status'
 				}"
-				 />
+				infoIcon="{
+					path: 'Status',
+					formatter: '.formatter.statusIcon'
+				}" />
 		</items>
 	</List>
 </mvc:View>

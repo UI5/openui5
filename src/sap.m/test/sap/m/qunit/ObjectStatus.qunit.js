@@ -794,6 +794,31 @@ sap.ui.define([
 		oObjectStatus.destroy();
 	});
 
+	QUnit.test("Root title is skipped only for icon-only ObjectStatus", async function (assert) {
+		// Arrange
+		var oIconOnlyStatus = new ObjectStatus({
+				icon: "sap-icon://download",
+				tooltip: "Custom tooltip"
+			}),
+			oStatusWithText = new ObjectStatus({
+				icon: "sap-icon://download",
+				text: "Download",
+				tooltip: "Custom tooltip"
+			});
+
+		oIconOnlyStatus.placeAt("qunit-fixture");
+		oStatusWithText.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(oIconOnlyStatus.$().attr("title"), "Root element has no title for icon-only ObjectStatus");
+		assert.strictEqual(oStatusWithText.$().attr("title"), "Custom tooltip", "Root element keeps title when ObjectStatus is not icon-only");
+
+		// Cleanup
+		oIconOnlyStatus.destroy();
+		oStatusWithText.destroy();
+	});
+
 	QUnit.test("Bound icon is updated correctlly", async function(assert) {
 		// Arrange
 		var oModel = new JSONModel({

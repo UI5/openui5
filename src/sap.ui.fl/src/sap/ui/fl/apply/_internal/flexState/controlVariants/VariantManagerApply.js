@@ -3,6 +3,7 @@
  */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
@@ -15,6 +16,7 @@ sap.ui.define([
 	"sap/ui/fl/requireAsync",
 	"sap/ui/fl/Utils"
 ], function(
+	Log,
 	JsControlTreeModifier,
 	Applier,
 	Reverter,
@@ -290,15 +292,19 @@ sap.ui.define([
 			variantId: mPropertyBag.variantId
 		});
 
-		// Discard the entire response if the response says the requested variant
-		// belongs to a different VM. This happens when the caller speculatively
-		// requested a variant that turns out to belong to a different VM (e.g.
-		// URL-driven initial load). If the variant is not in the response at all,
-		// it is already loaded and only the changes are coming back - keep the
-		// response.
+		// Discard the entire response if the response does not contain the requested
+		// variant, or if it does but belongs to a different VM. The backend always
+		// returns the requested variant alongside its changes; if it is missing the
+		// id is unknown to the backend (typo, stale URL). If it belongs to a different
+		// VM, the caller speculatively requested it (e.g. URL-driven initial load) and
+		// it should not pollute this VM's bucket.
 		const oRequestedVariant = (oBackendResponse.variants || [])
 		.find((oVariant) => oVariant.fileName === mPropertyBag.variantId);
-		if (oRequestedVariant && oRequestedVariant.variantManagementReference !== mPropertyBag.vmReference) {
+		if (!oRequestedVariant || oRequestedVariant.variantManagementReference !== mPropertyBag.vmReference) {
+			const bHasOtherObjects = Object.values(oBackendResponse).some((aObjects) => Array.isArray(aObjects) && aObjects.length > 0);
+			if (!oRequestedVariant && bHasOtherObjects) {
+				Log.error(`Variant '${mPropertyBag.variantId}' was not returned by the backend but other objects were`);
+			}
 			return;
 		}
 

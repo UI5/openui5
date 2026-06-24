@@ -104,97 +104,41 @@
 	text-shadow: none;
 }
 
-.sapMLIBActive .sapMSLIInfo:not(.sapMSLIInfoStateInverted) {
-	text-shadow: none;
-}
-
 .sapMSLIDiv.sapMSLIInfoMiddle {
 	flex-direction: row;
 }
 
 .sapMSLIInfo {
+	text-align: end;
+	margin-inline-start: 1rem;
+	min-width: 7rem;
+}
+
+/* Truncation styles when wrapping is disabled */
+.sapMSLIInfoTruncate {
+	display: block;
+	overflow: hidden;
+}
+
+.sapMSLIInfoTruncate .sapMObjStatusWrapper {
+	max-width: 100%;
+	overflow: hidden;
+}
+
+.sapMSLIInfoTruncate .sapMObjStatusText {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	text-align: right;
-	margin: 0 0 0 1rem;
-	font-size: @sapMFontMediumSize;
-	min-width: 2rem;
 }
 
-.sapMSLIWrapping .sapMSLIInfo {
+/* Word breaking when wrapping is enabled */
+.sapMSLIInfo > .sapMObjStatus:not(.sapMSLIInfoTruncate) .sapMObjStatusText {
 	white-space: normal;
 	word-break: break-word;
 }
 
-.sapMSLIInfo:not(.sapMSLIInfoStateInverted) {
-	text-shadow: var(--sapContent_TextShadow);
-}
-
 .sapMSLIInfoMiddle > .sapMSLIInfo {
 	padding: 0;
-}
-
-/* The info is aligned right and therefore in RTL mode should be aligned on the left */
-html[dir=rtl] .sapMSLIInfo {
-	text-align: left;
-}
-
-.sapMSLIInfoNone {
-	color: var(--sapContent_LabelColor);
-}
-
-.sapMSLIInfoError {
-	color: var(--sapNegativeTextColor);
-}
-
-.sapMSLIInfoWarning {
-	color: var(--sapCriticalTextColor);
-}
-
-.sapMSLIInfoSuccess {
-	color: var(--sapPositiveTextColor);
-}
-
-.sapMSLIInfoInformation {
-	color: var(--sapInformativeTextColor);
-}
-
-/* inverted info text */
-.sapMSLIInfoStateInverted {
-	font-size: var(--sapFontSmallSize);
-	font-weight: bold;
-	color: @sapUiContentContrastTextColor;
-	border-radius: 0.25rem;
-	box-sizing: border-box;
-	height: 0.875rem;
-	line-height: ~"calc(var(--sapFontSmallSize) - 0.0625rem);"
-}
-
-.sapMSLIInfo.sapMSLIInfoStateInverted {
-	padding: 0.0625rem 0.25rem;
-	text-align: center;
-	text-shadow: var(--sapContent_ContrastTextShadow);
-}
-
-.sapMSLIInfoStateInverted.sapMSLIInfoNone {
-	background: var(--sapNeutralElementColor);
-}
-
-.sapMSLIInfoStateInverted.sapMSLIInfoError {
-	background: var(--sapNegativeElementColor);
-}
-
-.sapMSLIInfoStateInverted.sapMSLIInfoWarning {
-	background: var(--sapCriticalElementColor);
-}
-
-.sapMSLIInfoStateInverted.sapMSLIInfoSuccess {
-	background: var(--sapPositiveElementColor);
-}
-
-.sapMSLIInfoStateInverted.sapMSLIInfoInformation {
-	background: var(--sapInformativeElementColor);
 }
 
 /* Wrapping */
@@ -260,6 +204,10 @@ html[dir=rtl] .sapMSLIInfo {
 .sapMSLIWrapping .sapMSLITitleOnly > .sapMSLIInfo,
 .sapMSLIWrapping .sapMSLIDescriptionText > .sapMSLIInfo {
 	float: right;
+}
+
+.sapMSLIWrapping .sapMSLIDescriptionText > .sapMSLIInfo {
+	padding-top: 0.5rem;
 }
 
 .sapMSLIExpandCollapse {

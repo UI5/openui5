@@ -2848,7 +2848,7 @@ function(
 					return;
 				}
 
-				aListItemsDomRef = oList.$().find('.sapMSLIInfo [id$=-infoText], .sapMSLITitleOnly [id$=-titleText]');
+				aListItemsDomRef = oList.$().find(".sapMSLIInfo .sapMObjStatusText, .sapMSLITitleOnly [id$=-titleText]");
 				sInputValue = this._bDoTypeAhead ? this._getTypedInValue() : this.getValue();
 				sInputValue = (sInputValue || "").toLowerCase();
 

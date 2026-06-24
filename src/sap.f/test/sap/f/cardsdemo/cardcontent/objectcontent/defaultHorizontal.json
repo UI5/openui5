@@ -1,0 +1,119 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "cardsdemo.object.defaultHorizontal",
+		"type": "card",
+		"i18n": "i18n/i18n.properties",
+		"title": "Card 'defaultHorizontal'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"data": {
+			"request": {
+				"url": "./employee.json"
+			}
+		},
+		"header": {
+			"title": "Default alignment with Horizontal items layout",
+			"subtitle": "Group sized by outer AlignedFlowLayout; items flow horizontally inside"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Personal (Horizontal)",
+					"itemsLayout": "Horizontal",
+					"items": [
+						{
+							"label": "First Name",
+							"value": "{firstName}"
+						},
+						{
+							"label": "Last Name",
+							"value": "{lastName}"
+						},
+						{
+							"label": "Position",
+							"value": "{position}"
+						},
+						{
+							"label": "Phone",
+							"value": "{phone}"
+						}
+					]
+				},
+				{
+					"title": "Company (Horizontal)",
+					"itemsLayout": "Horizontal",
+					"items": [
+						{
+							"label": "Name",
+							"value": "{company/name}"
+						},
+						{
+							"label": "Address",
+							"value": "{company/address}"
+						},
+						{
+							"label": "Website",
+							"value": "{company/website}"
+						}
+					]
+				},
+				{
+					"title": "Vertical neighbour",
+					"items": [
+						{
+							"label": "Manager",
+							"value": "{manager/firstName} {manager/lastName}"
+						},
+						{
+							"label": "Assistant",
+							"value": "{assistant/firstName} {assistant/lastName}"
+						}
+					]
+				},
+				{
+					"title": "Personal",
+					"items": [
+						{
+							"label": "First Name",
+							"value": "{firstName}"
+						},
+						{
+							"label": "Last Name",
+							"value": "{lastName}"
+						},
+						{
+							"label": "Position",
+							"value": "{position}"
+						},
+						{
+							"label": "Phone",
+							"value": "{phone}"
+						}
+					]
+				},
+				{
+					"title": "Company",
+					"items": [
+						{
+							"label": "Name",
+							"value": "{company/name}"
+						},
+						{
+							"label": "Address",
+							"value": "{company/address}"
+						},
+						{
+							"label": "Website",
+							"value": "{company/website}"
+						}
+					]
+				}
+			]
+		}
+	}
+}

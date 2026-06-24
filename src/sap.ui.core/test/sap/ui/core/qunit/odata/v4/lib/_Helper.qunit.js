@@ -3146,6 +3146,18 @@ sap.ui.define([
 		aChildren : ["Address/City/Block"],
 		aAncestors : ["Address/City"],
 		mChildren : {"Address/City/Block" : true}
+	}, {
+		aChildren : ["Address/City/Block"],
+		aAncestors : ["Address/City/*"],
+		mChildren : {"Address/City/Block" : true}
+	}, {
+		aChildren : ["Address/City/Block"],
+		aAncestors : ["Address/*"],
+		mChildren : {"Address/City/Block" : true}
+	}, {
+		aChildren : ["Address/City/Block"],
+		aAncestors : ["Address/City/Block/*"],
+		mChildren : {}
 	}].forEach(function (o, i) {
 		QUnit.test("addChildrenWithAncestor: " + i, function (assert) {
 			var sAncestors = JSON.stringify(o.aAncestors),
@@ -6253,11 +6265,13 @@ sap.ui.define([
 			"OtherNavigationProperty/PropertyOfOtherNavigationProperty",
 			"OtherNavigationProperty/Complex/Type/Property",
 			"NavigationPropertyWithoutSelect/Navigation0/PropertyOfNavigation0",
+			"NavigationPropertyWithoutSelect/Navigation0/Address/City",
 			"Complex/Type/Property",
 			"Complex/Type",
 			"Complex",
 			"NavigationProperty/Complex/Type/Property",
 			"NavigationProperty/Complex",
+			"NavigationProperty/Address/*",
 			"Other/Complex/Type/NavigationProperty",
 			"Other/Complex/Type/NavigationProperty/*",
 			"Other/Complex/Type/NavigationProperty/Foo",
@@ -6283,11 +6297,11 @@ sap.ui.define([
 					$expand : {
 						NestedNavigationPropertyWithoutExpandSelect : {}
 					},
-					$select : ["Complex", "PropertyOfNavigationProperty"]
+					$select : ["Complex", "PropertyOfNavigationProperty", "Address/City"]
 				},
 				NavigationPropertyWithoutSelect : {
 					$expand : {
-						Navigation0 : {$select : ["PropertyOfNavigation0"]}
+						Navigation0 : {$select : ["PropertyOfNavigation0", "Address/*"]}
 					}
 				},
 				OtherNavigationProperty : {

@@ -121,27 +121,21 @@ sap.ui.define([
 	AnnotationChangeDialogController.prototype._validateInput = function(oInput, sNewValue, sOldValue) {
 		const oModel = oInput.getModel();
 		if (!oModel) {
-			return false;
+			return;
 		}
 		const aValidators = oModel.getProperty("/validators");
 		const bSingleRename = oModel.getProperty("/singleRename");
-		let bHasError = false;
 		try {
-			// Run other validators first (passing null as old value skips the sameTextError check).
-			// Only surface sameTextError as a field-level error in single-rename mode — with multiple
-			// input fields, an unchanged value must not be marked as error on the input itself.
-			validateText(sNewValue, null, { validators: aValidators });
-			if (bSingleRename) {
-				validateText(sNewValue, sOldValue, { validators: aValidators });
-			}
-			oInput.setValueState("None");
-			oInput.setValueStateText("");
+			validateText(sNewValue, sOldValue, { validators: aValidators, skipSameTextValidator: !bSingleRename });
 		} catch (oError) {
-			oInput.setValueState("Error");
-			oInput.setValueStateText(oError.message);
-			bHasError = true;
+			if (oError.message !== "sameTextError") {
+				oInput.setValueState("Error");
+				oInput.setValueStateText(oError.message);
+				return;
+			}
 		}
-		return bHasError;
+		oInput.setValueState("None");
+		oInput.setValueStateText("");
 	};
 
 	AnnotationChangeDialogController.prototype._updateSaveEnabled = function(oModel, mPropertyBag) {
@@ -161,8 +155,7 @@ sap.ui.define([
 			oModel.setProperty("/changedCount", oModel.getProperty("/changedCount") + (bIsChanged ? 1 : -1));
 		}
 		const bNoErrors = oModel.getProperty("/errorCount") === 0;
-		const bSingleRename = oModel.getProperty("/singleRename");
-		const bHasChanges = bSingleRename || oModel.getProperty("/changedCount") > 0;
+		const bHasChanges = oModel.getProperty("/changedCount") > 0;
 		oModel.setProperty("/isSaveEnabled", bNoErrors && bHasChanges);
 	};
 
@@ -219,7 +212,8 @@ sap.ui.define([
 					oModel.setProperty("currentValue", sNewText, oContext);
 					mPropertyBag.isChanged = sNewText !== sOriginalValue;
 					mPropertyBag.wasError = oSource.getValueState() === "Error";
-					mPropertyBag.hasError = this._validateInput(oSource, sNewText, sOriginalValue);
+					this._validateInput(oSource, sNewText, sOriginalValue);
+					mPropertyBag.hasError = oSource.getValueState() === "Error";
 					this._updateSaveEnabled(oModel, mPropertyBag);
 				}
 			});

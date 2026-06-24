@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/mdc/enums/ValueHelpSelectionType",
+	"sap/ui/mdc/enums/FieldDisplay",
 	"sap/ui/mdc/valuehelp/FilterBar",
 	// to have it loaded when BasicSearch should be created
 	"sap/ui/mdc/FilterField",
@@ -26,6 +27,7 @@ sap.ui.define([
 	"sap/ui/model/Sorter",
 	"sap/ui/model/type/String",
 	"sap/ui/model/type/Date",
+	"sap/ui/model/type/Integer",
 	"sap/m/library",
 	"sap/m/Table",
 	"sap/m/Column",
@@ -52,6 +54,7 @@ sap.ui.define([
 	ConditionValidated,
 	OperatorName,
 	ValueHelpSelectionType,
+	FieldDisplay,
 	FilterBar,
 	FilterField,
 	ParseException,
@@ -63,6 +66,7 @@ sap.ui.define([
 	Sorter,
 	StringType,
 	DateType,
+	IntegerType,
 	mLibrary,
 	Table,
 	Column,
@@ -102,7 +106,7 @@ sap.ui.define([
 	const oValueHelp = {
 		getPayload() {},
 		getDisplay() {
-			return "DescriptionValue";
+			return FieldDisplay.DescriptionValue;
 		},
 		_requestShowContainer(oContainer, sReason) {
 			return Promise.resolve(true);
@@ -170,9 +174,9 @@ sap.ui.define([
 	const _init = (bTypeahead) => {
 		oModel = new JSONModel({
 			items: [
-				{ text: "Item 1", key: "I1", additionalText: "Text 1", inValue: "", date: new Date(2026, 4, 12) },
-				{ text: "Item 2", key: "I2", additionalText: "Text 2", inValue: null, date: null },
-				{ text: "X-Item 3", key: "I3", additionalText: "Text 3", inValue: "3", date: new Date(2026, 4, 12) }
+				{ text: "Item 1", key: "I1", additionalText: "Text 1", inValue: "", date: new Date(2026, 4, 12), numericKey: 1 },
+				{ text: "Item 2", key: "I2", additionalText: "Text 2", inValue: null, date: null, numericKey: 2 },
+				{ text: "X-Item 3", key: "I3", additionalText: "Text 3", inValue: "3", date: new Date(2026, 4, 12), numericKey: 3 }
 			]
 		});
 
@@ -181,7 +185,8 @@ sap.ui.define([
 			cells: [new Text({text: {path: "key", type: new StringType({}, {maxLength: 2})}}),
 					new Text({text: {path: "text", type: new StringType()}}),
 					new Text({text: {path: "additionalText", type: new StringType()}}),
-					new Text({text: {path: "date", type: new DateType({style: "short"})}})]
+					new Text({text: {path: "date", type: new DateType({style: "short"})}}),
+					new Text({text: {path: "numericKey", type: new IntegerType()}})]
 		});
 
 		oTable = new Table("T1", {
@@ -190,7 +195,9 @@ sap.ui.define([
 			columns: [ new Column({header: new Label({text: "Id"})}),
 					   new Column({header: new Label({text: "Text"})}),
 					   new Column({header: new Label({text: "Info"})}),
-					new Column({header: new Label({text: "Date"})})],
+					   new Column({header: new Label({text: "Date"})}),
+					   new Column({header: new Label({text: "Numeric Id"})})
+					],
 			items: {path: "/items", template: oItemTemplate, templateShareable: false}
 		});
 
@@ -621,6 +628,80 @@ sap.ui.define([
 						fnDone();
 					}, 0);
 				}, 0);
+			}, 0);
+		}, 0);
+
+	});
+
+	QUnit.test("Filtering using $search and numeric key", async (assert) => {
+
+		let iTypeaheadSuggested = 0;
+		let oCondition;
+		let sFilterValue;
+		let sItemId;
+		let iItems;
+		let bTypeaheadCaseSensitive;
+		oMTable.attachEvent("typeaheadSuggested", (oEvent) => {
+			iTypeaheadSuggested++;
+			oCondition = oEvent.getParameter("condition");
+			sFilterValue = oEvent.getParameter("filterValue");
+			sItemId = oEvent.getParameter("itemId");
+			iItems = oEvent.getParameter("items");
+			bTypeaheadCaseSensitive = oEvent.getParameter("caseSensitive");
+		});
+		oMTable.setKeyPath("numericKey");
+		const oConfig = oMTable.getConfig();
+		oConfig.dataType = new IntegerType();
+		oMTable.setConfig(oConfig);
+		sinon.stub(oValueHelp, "getDisplay").returns(FieldDisplay.Value);
+
+		sinon.stub(oContainer, "getValueHelpDelegate").returns(ValueHelpDelegateV4);
+		sinon.spy(ValueHelpDelegateV4, "updateBinding"); //test V4 logic
+
+		const oListBinding = oTable.getBinding("items");
+		_fakeV4Binding(oListBinding);
+		sinon.spy(oListBinding, "filter");
+		sinon.spy(oListBinding, "changeParameters");
+		oListBinding.suspend(); // check for resuming
+
+		await _renderScrollContainer();
+		oMTable.setConditions(); // before filtering conditions should be cleared in typeahead for single-value
+		oMTable._bContentBound = true;
+		oMTable.setFilterValue("2");
+		assert.ok(ValueHelpDelegateV4.updateBinding.called, "ValueHelpDelegateV4.updateBinding called");
+		assert.ok(ValueHelpDelegateV4.updateBinding.calledWith(oValueHelp, oListBinding), "ValueHelpDelegateV4.updateBinding called parameters");
+		assert.ok(oListBinding.changeParameters.calledWith({$search: "2"}), "ListBinding.changeParameters called with search string");
+		assert.notOk(oListBinding.isSuspended(), "ListBinding is resumed");
+
+		const fnDone = assert.async();
+		setTimeout(() => { // as waiting for Promise
+			// as JSOM-Model does not support $search all items are returned, but test for first of result
+			const oTable = oMTable.getTable();
+			const aItems = oTable.getItems();
+			assert.equal(iTypeaheadSuggested, 1, "typeaheadSuggested event fired");
+			assert.deepEqual(oCondition, Condition.createItemCondition(2, "Item 2"), "typeaheadSuggested event condition");
+			assert.equal(sFilterValue, "2", "typeaheadSuggested event filterValue");
+			assert.equal(sItemId, aItems[1].getId(), "typeaheadSuggested event itemId");
+			assert.equal(iItems, 3, "typeaheadSuggested event items");
+			assert.equal(bTypeaheadCaseSensitive, false, "typeaheadSuggested event caseSensitive");
+
+			iTypeaheadSuggested = 0;
+			oMTable.setFilterValue("X"); // test value not matching type
+			assert.ok(oListBinding.changeParameters.calledWith({$search: "X"}), "ListBinding.changeParameters called with search string");
+			setTimeout(() => { // as waiting for Promise
+				// as JSOM-Model does not support $search all items are returned, but test for first of result
+				assert.equal(iTypeaheadSuggested, 1, "typeaheadSuggested event fired");
+				assert.notOk(oCondition, "typeaheadSuggested event condition");
+				assert.equal(sFilterValue, "X", "typeaheadSuggested event filterValue");
+				assert.notOk(sItemId, "typeaheadSuggested event itemId");
+				assert.equal(iItems, 3, "typeaheadSuggested event items");
+				assert.equal(bTypeaheadCaseSensitive, false, "typeaheadSuggested event caseSensitive");
+
+				oContainer.getValueHelpDelegate.restore();
+				ValueHelpDelegateV4.updateBinding.restore();
+				oValueHelp.getDisplay.restore();
+				oConfig.dataType.destroy();
+				fnDone();
 			}, 0);
 		}, 0);
 
@@ -2256,7 +2337,8 @@ sap.ui.define([
 					{"key": "text", "dataType":"sap.ui.model.type.String", "maxConditions": -1, "required": false, "label": "Text"},
 					{"key": "additionalText", "dataType":"sap.ui.model.type.String", "maxConditions": -1, "required": false, "label": "Info"},
 					{"key": "inValue", "dataType":"sap.ui.model.type.String", "maxConditions": -1, "required": false, "label": "In Value"},
-					{"key": "date", "dataType":"sap.ui.model.type.Date", "formatOptions": {style: "short"}, "maxConditions": -1, "required": false, "label": "Date"}
+					{"key": "date", "dataType":"sap.ui.model.type.Date", "formatOptions": {style: "short"}, "maxConditions": -1, "required": false, "label": "Date"},
+					{"key": "numericKey", "dataType":"sap.ui.model.type.Integer", "maxConditions": -1, "required": false, "label": "Numeric Id"}
 				]
 		});
 		sinon.stub(oFilterBar, "getConditions").returns({

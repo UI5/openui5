@@ -358,7 +358,7 @@ sap.ui.define([
 			sCountInfo = oUnifiedBundle.getText("UNIFIED_MENU_ITEM_COUNT_TEXT", [oInfo.iItemNo, oInfo.iTotalItems]);
 			sTypeInfo = oUnifiedBundle.getText("UNIFIED_MENU_ITEM_HINT_TEXT");
 			this._invisibleDescription = new InvisibleText({
-				text: sCountInfo + " " + sTypeInfo
+				text: `${sTypeInfo} ${sCountInfo}`
 			}).toStatic();
 		}
 

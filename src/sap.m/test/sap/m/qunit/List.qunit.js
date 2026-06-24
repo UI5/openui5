@@ -1681,9 +1681,9 @@ sap.ui.define([
 		oList.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		const oInfo = oStdLI.$().find(".sapMSLIInfo");
+		const oInfoStatus = oStdLI._getInfoStatus();
 		// Assert
-		assert.equal(oInfo.attr("dir"), 'ltr', "Info has attribute dir equal to ltr");
+		assert.equal(oInfoStatus.getTextDirection(), coreLibrary.TextDirection.LTR, "ObjectStatus textDirection is set to LTR");
 
 		// Clean up
 		oList.destroy();
@@ -1718,7 +1718,7 @@ sap.ui.define([
 			$descButton = oStdLI.getDomRef("descriptionButton");
 
 		// variables for description elements
-		const $infoText = oStdLI.getDomRef("infoText");
+		const oInfoStatus = oStdLI._getInfoStatus();
 
 		// title text test
 		assert.ok(oStdLI.$().hasClass("sapMSLIWrapping"), "Wrapping style class added");
@@ -1758,7 +1758,7 @@ sap.ui.define([
 		assert.equal($descButton.innerText, oRb.getText("EXPANDABLE_TEXT_SHOW_MORE"), "button rendered with the correct text");
 
 		// info text test
-		assert.strictEqual($infoText.innerText.length, oStdLI.getInfo().length, "The entire infoText is rendered by wrapping");
+		assert.strictEqual(oInfoStatus.getText().length, oStdLI.getInfo().length, "The entire infoText is rendered via ObjectStatus");
 
 		// trigger tap on tilte text
 		jQuery($titleButton).trigger("tap");
@@ -1840,57 +1840,38 @@ sap.ui.define([
 		oList.destroy();
 	});
 
-	QUnit.test("StandardListItem infoText min-width test", async function(assert) {
+	QUnit.test("StandardListItem infoText rendered via ObjectStatus", async function(assert) {
 		const oStdLI = new StandardListItem({
 			title: "This is the Title Text",
 			info: "Success"
 		});
-
-		const oStdLI2 = new StandardListItem({
-			title: "This is the Title Text",
-			info: "This is a very very very long information text"
-		});
-
-		const oList = new List({
-			items : [oStdLI, oStdLI2]
-		});
-
+		const oList = new List({ items: [oStdLI] });
 		oList.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		assert.ok(parseFloat(oStdLI.getDomRef("info").style.minWidth) < 7.5, "calculated info text width set as min-width");
-		assert.strictEqual(oStdLI2.getDomRef("info").style.minWidth, "7.5rem", "7.5rem min-width applied as the info text is long");
+		assert.ok(document.getElementById(oStdLI.getId() + "-info"), "ObjectStatus is rendered for info");
+		assert.strictEqual(oStdLI._getInfoStatus().getText(), "Success", "ObjectStatus text matches info property");
 
 		oList.destroy();
 	});
 
-	QUnit.test("StandardListItem - test onThemeChanged", async function(assert) {
+	QUnit.test("StandardListItem - ObjectStatus used for info rendering", async function(assert) {
 		const oStdLI = new StandardListItem({
 			title: "This is the Title Text",
 			info: "Success",
 			infoState: "Success",
 			infoStateInverted: true
 		});
-
-		const oList = new List({
-			items : [oStdLI]
-		});
-
-		assert.notOk(oStdLI._initialRender, "item is not rendered yet");
+		const oList = new List({ items: [oStdLI] });
 		oList.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		const oEvent = new jQuery.Event();
-		oEvent.theme = "sap_horizon";
-		oStdLI.onThemeChanged(oEvent);
-		await nextUIUpdate();
-		assert.ok(oStdLI._initialRender, "prevent info text calculation on initial rendering as this is done by the renderer");
-
-		const fnMeasureInfoTextWidth = sinon.spy(oStdLI, "_measureInfoTextWidth");
-		oEvent.theme = "sap_fiori_3";
-		oStdLI.onThemeChanged(oEvent);
-		await nextUIUpdate();
-		assert.ok(fnMeasureInfoTextWidth.calledWith(true), "info text width is recalculated onThemeChanged");
+		const oInfoStatus = oStdLI._getInfoStatus();
+		assert.ok(oInfoStatus, "Internal ObjectStatus is created");
+		assert.strictEqual(oInfoStatus.getText(), "Success", "ObjectStatus text matches info property");
+		assert.strictEqual(oInfoStatus.getState(), "Success", "ObjectStatus state matches infoState property");
+		assert.ok(oInfoStatus.getInverted(), "ObjectStatus inverted matches infoStateInverted property");
+		assert.ok(document.getElementById(oStdLI.getId() + "-info"), "ObjectStatus is rendered in DOM");
 
 		oList.destroy();
 	});
@@ -1908,16 +1889,193 @@ sap.ui.define([
 		oList.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		let oInfoTextDom = oStdLI.getDomRef("info");
+		let oInfoStatus = oStdLI._getInfoStatus();
 		assert.notOk(oStdLI.getInfoStateInverted(), "default value of infoStateInverted=false");
-		assert.notOk(oInfoTextDom.classList.contains("sapMSLIInfoStateInverted"), "Style class for inverted info text not added");
+		assert.notOk(oInfoStatus.getInverted(), "ObjectStatus inverted is false");
 
 		oStdLI.setInfoStateInverted(true);
 		await nextUIUpdate();
 
-		assert.ok(oStdLI.getInfoStateInverted(), "infoStateInverted=true");
-		oInfoTextDom = oStdLI.getDomRef("info");
-		assert.ok(oInfoTextDom.classList.contains("sapMSLIInfoStateInverted"), "Style class for inverted info text added");
+		oInfoStatus = oStdLI._getInfoStatus();
+		assert.ok(oInfoStatus.getInverted(), "ObjectStatus inverted is true");
+		const oInfoStatusDom = oInfoStatus.getDomRef();
+		assert.ok(oInfoStatusDom.classList.contains("sapMObjStatusInverted"), "ObjectStatus inverted style class is applied");
+
+		oList.destroy();
+	});
+
+	QUnit.test("StandardListItem infoIcon rendering", async function(assert) {
+		const oStdLI = new StandardListItem({
+			title: "Title",
+			infoIcon: "sap-icon://error"
+		});
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.notOk(document.getElementById(oStdLI.getId() + "-info"), "ObjectStatus NOT rendered when only infoIcon is set (no info text)");
+
+		oList.destroy();
+	});
+
+	QUnit.test("StandardListItem infoIcon combined with info text", async function(assert) {
+		const oStdLI = new StandardListItem({
+			title: "Title",
+			info: "Error",
+			infoState: "Error",
+			infoIcon: "sap-icon://error"
+		});
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oInfoStatus = oStdLI._getInfoStatus();
+		assert.ok(document.getElementById(oStdLI.getId() + "-info"), "ObjectStatus rendered when info text AND icon are set");
+		assert.strictEqual(oInfoStatus.getText(), "Error", "ObjectStatus text is set");
+		assert.strictEqual(oInfoStatus.getIcon(), "sap-icon://error", "ObjectStatus icon is set");
+		assert.strictEqual(oInfoStatus.getState(), "Error", "ObjectStatus state is set");
+
+		oList.destroy();
+	});
+
+	QUnit.test("StandardListItem no info area rendered when info and infoIcon are empty", async function(assert) {
+		const oStdLI = new StandardListItem({ title: "Title" });
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.notOk(document.getElementById(oStdLI.getId() + "-info"), "No ObjectStatus rendered");
+		assert.notOk(oStdLI._oInfoStatus, "No internal ObjectStatus created");
+
+		oList.destroy();
+	});
+
+	QUnit.test("StandardListItem dynamic info property changes", async function(assert) {
+		const oStdLI = new StandardListItem({
+			title: "Title",
+			info: "Initial",
+			infoIcon: "sap-icon://alert"
+		});
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.strictEqual(oStdLI._getInfoStatus().getText(), "Initial", "Initial info text");
+		assert.strictEqual(oStdLI._getInfoStatus().getIcon(), "sap-icon://alert", "Icon is set");
+
+		oStdLI.setInfo("");
+		await nextUIUpdate();
+		assert.notOk(document.getElementById(oStdLI.getId() + "-info"), "ObjectStatus NOT rendered when info is cleared (even if icon is set)");
+
+		oStdLI.setInfo("Updated");
+		await nextUIUpdate();
+		assert.strictEqual(oStdLI._getInfoStatus().getText(), "Updated", "Info text updated");
+		assert.strictEqual(oStdLI._getInfoStatus().getIcon(), "sap-icon://alert", "Icon still available");
+
+		oStdLI.setInfoIcon("sap-icon://warning");
+		await nextUIUpdate();
+		assert.strictEqual(oStdLI._getInfoStatus().getIcon(), "sap-icon://warning", "Info icon set dynamically");
+
+		oList.destroy();
+	});
+
+	QUnit.test("StandardListItem ObjectStatus cleanup on destroy", async function(assert) {
+		const oStdLI = new StandardListItem({ title: "Title", info: "Info" });
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oInfoStatus = oStdLI._getInfoStatus();
+		const sInfoStatusId = oInfoStatus.getId();
+
+		oList.destroy();
+
+		assert.notOk(Element.getElementById(sInfoStatusId), "ObjectStatus is destroyed");
+	});
+
+	QUnit.test("StandardListItem info ObjectStatus has sapMSLIInfoTruncate class when wrapping is disabled", async function(assert) {
+		const oStdLI = new StandardListItem({ title: "Title", info: "Info text" });
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oInfoStatusDom = document.getElementById(oStdLI.getId() + "-info");
+		assert.ok(oInfoStatusDom, "ObjectStatus DOM element exists");
+		assert.ok(oInfoStatusDom.classList.contains("sapMSLIInfoTruncate"), "sapMSLIInfoTruncate class is set when wrapping=false");
+
+		oList.destroy();
+	});
+
+	QUnit.test("StandardListItem info ObjectStatus text has white-space:nowrap when wrapping is disabled", async function(assert) {
+		const oStdLI = new StandardListItem({ title: "Title", info: "Info text" });
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oInfoStatus = oStdLI._getInfoStatus();
+		const oInfoStatusTextDom = oInfoStatus.getDomRef().querySelector(".sapMObjStatusText");
+		assert.ok(oInfoStatusTextDom, "ObjectStatus text element exists");
+		assert.strictEqual(window.getComputedStyle(oInfoStatusTextDom).whiteSpace, "nowrap", "white-space is 'nowrap' when wrapping=false");
+
+		oList.destroy();
+	});
+
+	QUnit.test("StandardListItem long info text is truncated (wrapping=false)", async function(assert) {
+		const sLongInfo = "This is a very long information status text that demonstrates truncation and wrapping behavior in the StandardListItem control";
+		const oStdLI = new StandardListItem({ title: "Short title", info: sLongInfo });
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oInfoStatusTextDom = oStdLI._getInfoStatus().getDomRef().querySelector(".sapMObjStatusText");
+		assert.ok(oInfoStatusTextDom, "ObjectStatus text element exists");
+		const oStyle = window.getComputedStyle(oInfoStatusTextDom);
+		assert.strictEqual(oStyle.overflow, "hidden", "overflow is 'hidden'");
+		assert.strictEqual(oStyle.textOverflow, "ellipsis", "text-overflow is 'ellipsis'");
+		assert.strictEqual(oStyle.whiteSpace, "nowrap", "white-space is 'nowrap'");
+
+		oList.destroy();
+	});
+
+	QUnit.test("StandardListItem long info text is not truncated (wrapping=true)", async function(assert) {
+		const sLongInfo = "This is a very long information status text that demonstrates truncation and wrapping behavior in the StandardListItem control";
+		const oStdLI = new StandardListItem({ title: "Short title", info: sLongInfo, wrapping: true });
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oInfoStatusTextDom = oStdLI._getInfoStatus().getDomRef().querySelector(".sapMObjStatusText");
+		assert.ok(oInfoStatusTextDom, "ObjectStatus text element exists");
+		const oStyle = window.getComputedStyle(oInfoStatusTextDom);
+		assert.strictEqual(oStyle.whiteSpace, "normal", "white-space is 'normal'");
+		assert.strictEqual(oStyle.wordBreak, "break-word", "word-break is 'break-word'");
+
+		oList.destroy();
+	});
+
+	QUnit.test("StandardListItem info ObjectStatus text has white-space:normal when wrapping is enabled", async function(assert) {
+		const oStdLI = new StandardListItem({ title: "Title", info: "Info text", wrapping: true });
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oInfoStatus = oStdLI._getInfoStatus();
+		const oInfoStatusTextDom = oInfoStatus.getDomRef().querySelector(".sapMObjStatusText");
+		assert.ok(oInfoStatusTextDom, "ObjectStatus text element exists");
+		assert.strictEqual(window.getComputedStyle(oInfoStatusTextDom).whiteSpace, "normal", "white-space is 'normal' when wrapping=true");
+
+		oList.destroy();
+	});
+
+	QUnit.test("StandardListItem info ObjectStatus does not have sapMSLIInfoTruncate class when wrapping is enabled", async function(assert) {
+		const oStdLI = new StandardListItem({ title: "Title", info: "Info text", wrapping: true });
+		const oList = new List({ items: [oStdLI] });
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oInfoStatusDom = oStdLI._getInfoStatus().getDomRef();
+		assert.ok(oInfoStatusDom, "ObjectStatus DOM element exists");
+		assert.notOk(oInfoStatusDom.classList.contains("sapMSLIInfoTruncate"), "sapMSLIInfoTruncate class is NOT set when wrapping=true");
 
 		oList.destroy();
 	});

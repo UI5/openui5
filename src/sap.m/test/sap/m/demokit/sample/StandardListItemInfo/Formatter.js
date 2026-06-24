@@ -16,6 +16,18 @@ sap.ui.define([
 			} else {
 				return ValueState.None;
 			}
+		},
+
+		statusIcon(sStatus) {
+			if (sStatus === "Available") {
+				return "sap-icon://accept";
+			} else if (sStatus === "Out of Stock") {
+				return "sap-icon://alert";
+			} else if (sStatus === "Discontinued"){
+				return "sap-icon://decline";
+			} else {
+				return null;
+			}
 		}
 	};
 

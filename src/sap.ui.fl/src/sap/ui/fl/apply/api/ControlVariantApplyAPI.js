@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Component",
 	"sap/ui/core/Element",
+	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
@@ -19,6 +20,7 @@ sap.ui.define([
 	JsControlTreeModifier,
 	Component,
 	Element,
+	URLHandler,
 	VariantUtil,
 	VariantManagementState,
 	VariantManagerApply,
@@ -130,14 +132,19 @@ sap.ui.define([
 		 * If you don't want that parameter in general, set the <code>updateVariantInURL</code> parameter
 		 * on your variant management control to <code>false</code>. SAP Fiori elements use this method.
 		 *
-		 * @param {object} mPropertyBag - Object with parameters as properties
-		 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.control - Variant management control for which the URL technical parameter has to be cleared
+		 * @param {object} [mPropertyBag] - Object with parameters as properties
+		 * @param {sap.ui.fl.variants.VariantManagement} [mPropertyBag.control] - Variant management control whose
+		 *   variant ids should be removed from the URL parameter. If omitted, all variant ids are removed.
 		 *
 		 * @returns {Promise<void>} Resolves once the URL parameter has been cleared
 		 *
 		 * @public
 		 */
 		async clearVariantParameterInURL(mPropertyBag) {
+			if (!mPropertyBag?.control) {
+				await URLHandler.removeVariantParameterFromURL();
+				return;
+			}
 			await mPropertyBag.control.waitForInit();
 			const oModel = mPropertyBag.control.getVariantModel();
 			const oURLHandler = oModel?._getURLHandler();
