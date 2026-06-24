@@ -1120,12 +1120,37 @@ sap.ui.define([
 						}.bind(this));
 					}.bind(this, sElementClassName))
 				).then(function(aChildrenElementOverlays) {
-					aChildrenElementOverlays.map(function(oChildElementOverlay) {
+					aChildrenElementOverlays.forEach(function(oChildElementOverlay) {
 						if (
-							oChildElementOverlay instanceof ElementOverlay
-							&& !oChildElementOverlay.bIsDestroyed
-							&& !oChildElementOverlay.getParent()
+							!(oChildElementOverlay instanceof ElementOverlay)
+							|| oChildElementOverlay.bIsDestroyed
 						) {
+							return;
+						}
+						// createOverlay returns an already-registered ElementOverlay as-is, so the
+						// overlay can still be attached to the aggregation overlay it was created
+						// under during a previous pass (e.g. a flex MoveControls change applied
+						// between two _createChildrenOverlays passes moves button1 from innerLayout
+						// to outerLayout, but its overlay stays under innerLayout's aggregation
+						// overlay). In that case the overlay tree is stale and must be re-parented.
+						const oParentAggregationOverlay = oChildElementOverlay.getParent();
+						if (!oParentAggregationOverlay) {
+							oAggregationOverlay.addChild(oChildElementOverlay, true);
+							return;
+						}
+						if (oParentAggregationOverlay === oAggregationOverlay) {
+							return;
+						}
+						// Re-parent only when the element's live parent matches this aggregation
+						// overlay — otherwise the existing attachment is authoritative.
+						const oChildElement = oChildElementOverlay.getElement();
+						if (
+							oChildElement
+							&& !oChildElement.bIsDestroyed
+							&& oChildElement.getParent() === oElement
+							&& oChildElement.sParentAggregationName === sAggregationName
+						) {
+							oParentAggregationOverlay.removeAggregation("children", oChildElementOverlay, true);
 							oAggregationOverlay.addChild(oChildElementOverlay, true);
 						}
 					}, this);
