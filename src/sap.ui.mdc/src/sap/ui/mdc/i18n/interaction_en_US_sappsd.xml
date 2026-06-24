@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF8"?>
+<interaction-documentation library="sap.ui.comp" xmlns="http://schemas.sap.com/sapui5/extension/sap.ui.core.InteractionDocumentation/1">
+	<control-interactions>
+		<control name="sap.ui.mdc.Table"/>
+		<interaction>[[[ <kbd>Ctrl + ,</kbd> ]]]<description>
+				<p>[[[Ŏρēŋş ţĥē <span class="uicontrol">Ţąƃĺē Ŝēţţįŋğş</span> ƌįąĺŏğ, įƒ ąʋąįĺąƃĺē.]]]</p>
+			</description>
+		</interaction>
+		<interaction>[[[ <kbd>Ctrl + Shift + E</kbd> ]]]<description>
+				<p>[[[Ŏρēŋş ţĥē <span class="uicontrol">Ĕχρŏŗţ Āş</span> ƌįąĺŏğ ŏƒ ţĥē ţąƃĺē, įƒ ąʋąįĺąƃĺē.]]]</p>
+			</description>
+		</interaction>
+	</control-interactions>
+	<control-interactions>
+		<control name="sap.ui.mdc.FilterBar"/>
+		<interaction>[[[ <kbd>Enter</kbd> ]]]<description>
+				<p>[[[Ţŗįğğēŗş şēąŗċĥ ƒŏŗ ƒįĺţēŗ ƃąŗ.∙∙∙∙∙∙∙∙∙∙]]]</p>
+			</description>
+		</interaction>
+	</control-interactions>
+	<control-interactions>
+		<control name="sap.ui.mdc.Chart"/>
+		<interaction>[[[ <kbd>Ctrl + ,</kbd> ]]]<description>
+				<p>[[[Ŏρēŋş ţĥē <span class="uicontrol">Ʋįēŵ Ŝēţţįŋğş</span> ƌįąĺŏğ]]]</p>
+			</description>
+		</interaction>
+		<interaction>[[[ <kbd>Ctrl + D</kbd> ]]]<description>
+				<p>[[[Ďēĺēţēş ąŋ įţēɱ įŋ ţĥē <span class="uicontrol">Ʋįēŵ Ŝēţţįŋğş</span> ƌįąĺŏğ]]]</p>
+			</description>
+		</interaction>
+	</control-interactions>
+</interaction-documentation>
