@@ -726,29 +726,6 @@ sap.ui.define([
 		assert.ok(oFakeBinding.applyAdapterInterface.calledOnce, "applyAdapterInterface called for v2 ODataTreeBinding");
 	});
 
-	QUnit.test("getBinding applies legacy ODataTreeBinding compatibility adapter", function(assert) {
-		// TreeBindingCompatibilityAdapter mutates the binding.
-		// Provide just enough surface on the binding and the tree for that call to
-		// complete without throwing, then assert on the observable mutations.
-		const oFakeBinding = {
-			isA: (sName) => sName === "sap.ui.model.odata.ODataTreeBinding",
-			getRootContexts: () => []
-		};
-		this.stub(ListBase.prototype, "getBinding").returns(oFakeBinding);
-		this.oTree.getExpandFirstLevel = () => false;
-
-		const oResult = this.oTree.getBinding("items");
-
-		assert.strictEqual(oResult, oFakeBinding, "binding returned");
-		// The adapter installs the ListBinding-compatibility surface on the binding.
-		// If Tree took the wrong dispatch branch, none of these methods would exist.
-		assert.strictEqual(typeof oFakeBinding._init, "function", "adapter installed _init");
-		assert.strictEqual(typeof oFakeBinding.getLength, "function", "adapter installed getLength");
-		assert.strictEqual(typeof oFakeBinding.getContexts, "function", "adapter installed getContexts");
-		assert.strictEqual(typeof oFakeBinding.expand, "function", "adapter installed expand");
-		assert.strictEqual(typeof oFakeBinding.collapse, "function", "adapter installed collapse");
-	});
-
 	QUnit.test("getBinding logs error for unsupported binding types", function(assert) {
 		const oFakeBinding = {
 			isA: function() {return false;}

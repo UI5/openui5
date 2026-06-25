@@ -2080,7 +2080,11 @@ sap.ui.define([
 
 						if (!mTouchSessionData.initialScrolledToEnd) {
 							const nSensitivityFactor = ScrollingHelper._getVerticalTouchScrollSensitivityFactor(this);
-							oVSb.scrollTop = mTouchSessionData.initialScrollTop - iTouchDistanceY * nSensitivityFactor;
+							// Browsers differ in how they round fractional scrollTop values: Chrome rounds up
+							// (ceil), Safari truncates (floor). Pre-ceiling ensures the resulting scroll
+							// position is identical across browsers, which is critical for the scroll position
+							// to row index mapping when the table has variable row heights.
+							oVSb.scrollTop = Math.ceil(mTouchSessionData.initialScrollTop - iTouchDistanceY * nSensitivityFactor);
 							bScrollingPerformed = true;
 							oScrollExtension._bTouchScroll = true;
 						}

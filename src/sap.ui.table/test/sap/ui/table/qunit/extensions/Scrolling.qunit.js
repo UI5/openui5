@@ -1173,15 +1173,20 @@ sap.ui.define([
 				}
 			}.bind(this), 50);
 		},
-		assertPosition: function(assert, iFirstVisibleRowIndex, iScrollPosition, iInnerScrollPosition, sTitle) {
+		assertPosition: function(assert, iFirstVisibleRowIndex, iScrollPosition, iInnerScrollPosition, sTitle, iRowTolerance) {
 			sTitle = sTitle == null ? "" : sTitle + ": ";
 
 			const iActualFirstVisibleRow = this.oTable.getFirstVisibleRow();
 			const iActualScrollTop = this.oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			const iActualInnerScrollTop = this.oTable.getDomRef("tableCCnt").scrollTop;
+			// At extreme binding lengths, a 1px scrollbar slack maps to many rows
+			// (iRowsPerPixel can reach ~200 with 100M rows). Callers may pass a wider
+			// row tolerance for such cases; default is ±1.
+			const iEffectiveRowTolerance = iRowTolerance == null ? 1 : iRowTolerance;
 
-			assert.ok(Math.abs(iActualFirstVisibleRow - iFirstVisibleRowIndex) <= 1,
-				sTitle + "First visible row index (expected " + iFirstVisibleRowIndex + " ±1, got " + iActualFirstVisibleRow + ")");
+			assert.ok(Math.abs(iActualFirstVisibleRow - iFirstVisibleRowIndex) <= iEffectiveRowTolerance,
+				sTitle + "First visible row index (expected " + iFirstVisibleRowIndex + " ±" + iEffectiveRowTolerance
+					+ ", got " + iActualFirstVisibleRow + ")");
 			assert.ok(Math.abs(iActualScrollTop - iScrollPosition) <= 1,
 				sTitle + "Scrollbar position (expected " + iScrollPosition + " ±1, got " + iActualScrollTop + ")");
 			assert.ok(Math.abs(iActualInnerScrollTop - iInnerScrollPosition) <= 1,
@@ -1485,7 +1490,7 @@ sap.ui.define([
 
 			return oTable.qunit.whenRenderingFinished().then(function() {
 				that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, 0,
-					mConfig.rowMode + ", " + mConfig.title, "; After rendering");
+					mConfig.rowMode + ", " + mConfig.title + "; After rendering");
 			}).then(function() {
 				return that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 			});
@@ -3338,11 +3343,13 @@ sap.ui.define([
 			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
 		}).then(scrollWithTouch(-50000)).then(function() {
 			const iScrollTop = Math.round(iMaxScrollTop - 50000 * nSensitivityFactor);
-			that.assertPosition(assert, Math.floor(iScrollTop * iRowsPerPixel), iScrollTop, 0, "Scrolled 50.000 pixels up");
+			// iRowsPerPixel can be very large here (~200): a 1px scrollbar slack amplifies into many rows.
+			that.assertPosition(assert, Math.floor(iScrollTop * iRowsPerPixel), iScrollTop, 0, "Scrolled 50.000 pixels up",
+				Math.ceil(iRowsPerPixel));
 		}).then(scrollWithTouch(-500000)).then(function() {
 			const iScrollTop = Math.round(iMaxScrollTop - 550000 * nSensitivityFactor);
 			that.assertPosition(assert, Math.floor(iScrollTop * iRowsPerPixel), iScrollTop, 0,
-				"Scrolled 500000 pixels up");
+				"Scrolled 500000 pixels up", Math.ceil(iRowsPerPixel));
 		}).then(function() {
 			TableQUnitUtils.endTouchScrolling();
 		}).finally(function() {
