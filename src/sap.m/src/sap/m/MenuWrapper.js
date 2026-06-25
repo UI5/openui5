@@ -133,6 +133,10 @@ sap.ui.define([
 		this._oRb = Library.getResourceBundleFor("sap.m");
 	};
 
+	MenuWrapper.prototype.exit = function() {
+		this._oScrollContainer = undefined;
+	};
+
 	MenuWrapper.prototype.onBeforeRendering = function() {
 		const aGroups = this.getItems().filter(function(oItem) {
 			return oItem.isA("sap.m.MenuItemGroup");
@@ -155,6 +159,7 @@ sap.ui.define([
 		if (document.body.classList.contains("sapUiSizeCompact") || this.hasStyleClass("sapUiSizeCompact") || this.getDomRef()?.closest(".sapUiSizeCompact")) {
 			this.addStyleClass("sapUiSizeCompact");
 		}
+		this._iVisibleItemCount = undefined;
 	};
 
 	MenuWrapper.prototype.onmouseover = function(oEvent) {
@@ -268,11 +273,11 @@ sap.ui.define([
 			// Go to the last selectable item
 			this._setHoveredItem(this._getPrevFocusableItem(this._getItems().length, 1), true);
 		} else if (oEvent.keyCode === KeyCodes.PAGE_UP) {
-			// Go to the previous page of items
-			this._setHoveredItem(this._getPrevFocusableItem(iIdx, this._getPageSize()), true);
+			// Go to the first item in the visible viewport, or to the first item
+			this._navigateToPageItem(iIdx, false);
 		} else if (oEvent.keyCode === KeyCodes.PAGE_DOWN) {
-			// Go to the next page of items
-			this._setHoveredItem(this._getNextFocusableItem(iIdx, this._getPageSize()), true);
+			// Go to the last item in the visible viewport, or to the last item
+			this._navigateToPageItem(iIdx, true);
 		} else if (oEvent.keyCode === KeyCodes.TAB) {
 			if (this.oFocusedEndContentItem) {
 				// Cycle through focusable endContent actions with Tab/Shift+Tab
@@ -621,13 +626,91 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the page size for the menu.
+	 * Returns the scroll container element by walking up the DOM from the <code>&lt;ul&gt;</code>
+	 * until the first ancestor with <code>overflow-y: auto</code> or <code>scroll</code> is found.
 	 *
-	 * @returns {number} The page size for the menu
+	 * @returns {HTMLElement|null} The scrollable ancestor, or null if none found
 	 * @private
 	 */
-	MenuWrapper.prototype._getPageSize = function() {
-		return 5;
+	MenuWrapper.prototype._getScrollContainer = function() {
+		if (this._oScrollContainer !== undefined) {
+			return this._oScrollContainer;
+		}
+		let oEl = this.getDomRef()?.parentElement;
+		while (oEl) {
+			const sOverflow = window.getComputedStyle(oEl).overflowY;
+			if (sOverflow === "auto" || sOverflow === "scroll") {
+				this._oScrollContainer = oEl;
+				return oEl;
+			}
+			oEl = oEl.parentElement;
+		}
+		this._oScrollContainer = null;
+		return null;
+	};
+
+	/**
+	 * Returns the number of fully visible items in the scroll container at the time of the first call,
+	 * cached for the lifetime of the menu open session.
+	 *
+	 * @returns {number} The count of fully visible focusable items
+	 * @private
+	 */
+	MenuWrapper.prototype._getVisibleItemCount = function() {
+		if (this._iVisibleItemCount !== undefined) {
+			return this._iVisibleItemCount;
+		}
+		const oScrollContainer = this._getScrollContainer();
+		if (!oScrollContainer) {
+			this._iVisibleItemCount = this._getVisibleItems().filter((oItem) => oItem.isFocusable && oItem.isFocusable()).length;
+			return this._iVisibleItemCount;
+		}
+		const oContainerRect = oScrollContainer.getBoundingClientRect();
+		this._iVisibleItemCount = this._getVisibleItems().filter((oItem) => {
+			if (!oItem.isFocusable || !oItem.isFocusable()) {
+				return false;
+			}
+			const oRect = oItem.getDomRef().getBoundingClientRect();
+			return oRect.top >= oContainerRect.top && oRect.bottom <= oContainerRect.bottom;
+		}).length;
+		return this._iVisibleItemCount;
+	};
+
+	/**
+	 * Returns the target item for PAGE_DOWN (forward) or PAGE_UP (backward) keyboard navigation.
+	 *
+	 * The step is <code>visibleItemCount - 1</code>. If fewer items remain in that direction,
+	 * falls back to the last/first focusable item.
+	 *
+	 * @param {number} iIdx Index of the currently hovered item in the visible items array
+	 * @param {boolean} bForward Whether to navigate forward (PAGE_DOWN) or backward (PAGE_UP)
+	 * @returns {sap.m.IMenuItem|undefined} The target item
+	 * @private
+	 */
+	MenuWrapper.prototype._getPageItem = function(iIdx, bForward) {
+		const iStep = Math.max(1, this._getVisibleItemCount() - 1);
+		return bForward
+			? this._getNextFocusableItem(iIdx, iStep)
+			: this._getPrevFocusableItem(iIdx, iStep);
+	};
+
+	/**
+	 * Navigates to the page item in the given direction and scrolls it into view.
+	 *
+	 * @param {number} iIdx Index of the currently hovered item in the visible items array
+	 * @param {boolean} bForward Whether to navigate forward (PAGE_DOWN) or backward (PAGE_UP)
+	 * @private
+	 */
+	MenuWrapper.prototype._navigateToPageItem = function(iIdx, bForward) {
+		const oTargetItem = this._getPageItem(iIdx, bForward);
+		if (!oTargetItem) {
+			return;
+		}
+
+		this._closeOpenedSubmenu();
+		this.oHoveredItem = oTargetItem;
+		oTargetItem.getDomRef().focus();
+		this.oFocusedEndContentItem = null;
 	};
 
 	/**
