@@ -66,7 +66,8 @@
 					"sap.ui.unified.sample.CalendarCalendarType",
 					"sap.ui.unified.sample.CalendarMinMax",
 					"sap.ui.unified.sample.CalendarDateDeselection",
-					"sap.ui.unified.sample.CalendarLegendNavigation"
+					"sap.ui.unified.sample.CalendarLegendNavigation",
+					"sap.ui.unified.sample.CalendarAriaHasPopup"
 				]
 			},
 			{
@@ -184,6 +185,11 @@
 				"id": "sap.ui.unified.sample.CalendarDateIntervalBasic",
 				"name": "simple example",
 				"description": "CalendarDateInterval with 14 days and single day selection"
+			},
+			{
+				"id": "sap.ui.unified.sample.CalendarAriaHasPopup",
+				"name": "Calendar with aria-haspopup on special day cells",
+				"description": "Calendar demonstrating configurable aria-haspopup attribute on individual day cells via DateTypeRange and a global Calendar-level fallback."
 			}
 		]
 	}

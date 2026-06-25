@@ -1,0 +1,23 @@
+<mvc:View
+		controllerName="sap.ui.unified.sample.CalendarAriaHasPopup.CalendarAriaHasPopup"
+		xmlns:l="sap.ui.layout"
+		xmlns:u="sap.ui.unified"
+		xmlns:mvc="sap.ui.core.mvc"
+		xmlns="sap.m"
+		class="viewPadding">
+	<l:VerticalLayout width="100%">
+		<Text text="Day 5 — Type01 color bar + aria-haspopup=dialog (special date with visual type)." class="sapUiTinyMarginBottom"/>
+		<Text text="Days 10–12 — Type02 range + aria-haspopup=dialog (date range with visual type)." class="sapUiTinyMarginBottom"/>
+		<Text text="Day 20 — type=None, no visual marking, only aria-haspopup=dialog in the DOM." class="sapUiSmallMarginBottom"/>
+		<u:Calendar id="calendar" select=".onDateSelect">
+			<u:dependents>
+				<Popover id="popover" placement="Bottom" showHeader="false" contentMinWidth="200px">
+					<VBox class="sapUiSmallMargin">
+						<Title id="popoverDate" wrapping="true"/>
+						<Text id="popoverType"/>
+					</VBox>
+				</Popover>
+			</u:dependents>
+		</u:Calendar>
+	</l:VerticalLayout>
+</mvc:View>

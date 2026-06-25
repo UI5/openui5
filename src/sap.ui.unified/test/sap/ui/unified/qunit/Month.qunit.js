@@ -23,7 +23,8 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/Device",
 	"sap/ui/thirdparty/jquery",
-	"sap/ui/core/date/UI5Date"
+	"sap/ui/core/date/UI5Date",
+	"sap/ui/core/library"
 ], function(
 	Localization,
 	Formatting,
@@ -47,13 +48,15 @@ sap.ui.define([
 	KeyCodes,
 	Device,
 	jQuery,
-	UI5Date
+	UI5Date,
+	coreLibrary
 ) {
 	"use strict";
 
 	(function () {
 
-		var CalendarDayType = unifiedLibrary.CalendarDayType;
+		const CalendarDayType = unifiedLibrary.CalendarDayType;
+		const AriaHasPopup = coreLibrary.aria.HasPopup;
 		/**
 		 * Generate correct Date even for years before 1901
 		 * @param {int} iYear [0..9999] Full Year
@@ -851,6 +854,70 @@ sap.ui.define([
 			assert.strictEqual(document.getElementsByClassName("sapUiCalDummy")[0].innerText,
 				Library.getResourceBundleFor("sap.ui.unified").getText("CALENDAR_WEEK"),
 				"Dummy cell's accessible name is provided in aria-label");
+		});
+
+		QUnit.test("aria-haspopup is rendered on day cell when DateTypeRange has ariaHasPopup set", async function (assert) {
+			// Arrange
+			this.oSut.addSpecialDate(new DateTypeRange({
+				startDate: UI5Date.getInstance(2016, 0, 3),
+				type: CalendarDayType.Type01,
+				ariaHasPopup: AriaHasPopup.Dialog
+			}));
+			this.oSut.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			const oDayCell = jQuery("#" + this.oSut.getId() + "-20160103").get(0);
+			assert.ok(oDayCell, "Day cell for Jan 3 exists");
+			assert.strictEqual(oDayCell.getAttribute("aria-haspopup"), "dialog",
+				"aria-haspopup=dialog is rendered on the day cell");
+		});
+
+		QUnit.test("aria-haspopup is not rendered on day cell without ariaHasPopup set", async function (assert) {
+			// Arrange — Jan 1 is already a special date (Type01) but without ariaHasPopup
+			this.oSut.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			const oDayCell = jQuery("#" + this.oSut.getId() + "-20160101").get(0);
+			assert.ok(oDayCell, "Day cell for Jan 1 exists");
+			assert.notOk(oDayCell.getAttribute("aria-haspopup"),
+				"aria-haspopup is absent when not set on the DateTypeRange");
+		});
+
+		QUnit.test("aria-haspopup is rendered on a type=None day cell (no visual marker, attribute only)", async function (assert) {
+			// Arrange
+			this.oSut.addSpecialDate(new DateTypeRange({
+				startDate: UI5Date.getInstance(2016, 0, 4),
+				type: CalendarDayType.None,
+				ariaHasPopup: AriaHasPopup.Dialog
+			}));
+			this.oSut.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			const oDayCell = jQuery("#" + this.oSut.getId() + "-20160104").get(0);
+			assert.ok(oDayCell, "Day cell for Jan 4 exists");
+			assert.strictEqual(oDayCell.getAttribute("aria-haspopup"), "dialog",
+				"aria-haspopup=dialog is rendered even when type=None");
+			assert.notOk(oDayCell.querySelector(".sapUiCalSpecialDate"),
+				"No colored bar is rendered for type=None");
+		});
+
+		QUnit.test("aria-haspopup reflects the ariaHasPopup value of the DateTypeRange", async function (assert) {
+			// Arrange
+			this.oSut.addSpecialDate(new DateTypeRange({
+				startDate: UI5Date.getInstance(2016, 0, 5),
+				type: CalendarDayType.Type02,
+				ariaHasPopup: AriaHasPopup.Menu
+			}));
+			this.oSut.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			const oDayCell = jQuery("#" + this.oSut.getId() + "-20160105").get(0);
+			assert.strictEqual(oDayCell.getAttribute("aria-haspopup"), "menu",
+				"aria-haspopup=menu matches the AriaHasPopup.Menu value");
 		});
 
 		QUnit.module("Unfinished range selection indication allowance", {
