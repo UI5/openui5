@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF8"?>
+<interaction-documentation library="sap.ui.comp" xmlns="http://schemas.sap.com/sapui5/extension/sap.ui.core.InteractionDocumentation/1">
+	<control-interactions>
+		<control name="sap.ui.mdc.Table"/>
+		<interaction>/+0H+GzNsD7mhUxBCkWZ0Q_ <kbd>Ctrl + ,</kbd> <description>
+				<p>BRVVWdpbXnE+XV+5+aD/mw_Opens the <span class="uicontrol">Table Settings</span> dialog, if available.</p>
+			</description>
+		</interaction>
+		<interaction>k3YzlAq3LdFygTqkTniI/g_ <kbd>Ctrl + Shift + E</kbd> <description>
+				<p>cgnWdLP6hI4fWODoUumM1Q_Opens the <span class="uicontrol">Export As</span> dialog of the table, if available.</p>
+			</description>
+		</interaction>
+	</control-interactions>
+	<control-interactions>
+		<control name="sap.ui.mdc.FilterBar"/>
+		<interaction>aPomBOAlmikw8E+TsQkzaw_ <kbd>Enter</kbd> <description>
+				<p>3YXKcjkVQyAx6I4N+QP2xg_Triggers search for filter bar.</p>
+			</description>
+		</interaction>
+	</control-interactions>
+	<control-interactions>
+		<control name="sap.ui.mdc.Chart"/>
+		<interaction>9BBx6UmVhQQ/S97KAnufyA_ <kbd>Ctrl + ,</kbd> <description>
+				<p>iuEAEyhJK76fvg/1rRFQyg_Opens the <span class="uicontrol">View Settings</span> dialog</p>
+			</description>
+		</interaction>
+		<interaction>jUNZFvgbPPgjSzHNO945kg_ <kbd>Ctrl + D</kbd> <description>
+				<p>MbxMgt2DEIerOpabB2EQFQ_Deletes an item in the <span class="uicontrol">View Settings</span> dialog</p>
+			</description>
+		</interaction>
+	</control-interactions>
+</interaction-documentation>
