@@ -25,6 +25,7 @@ sap.ui.define([
 	"sap/m/Text",
 	"sap/m/Title",
 	"sap/m/ScrollContainer",
+	"sap/m/VBox",
 	"sap/m/library",
 	"sap/m/GroupHeaderListItem",
 	"sap/ui/layout/VerticalLayout",
@@ -39,7 +40,7 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/m/plugins/ColumnAIAction",
 	"sap/m/plugins/ColumnResizer"
-], function(Localization, Element, Library, qutils, nextUIUpdate, KeyCodes, JSONModel, Device, Filter, Sorter, InvisibleText, ListBase, Table, Column, Label, Link, Toolbar, ToolbarSpacer, Button, Input, ColumnListItem, ListItemAction, Text, Title, ScrollContainer, library, GroupHeaderListItem, VerticalLayout, Message, jQuery, IllustratedMessage, ComboBox, CheckBox, RatingIndicator, Item, TextArea, Control, ColumnAIAction, ColumnResizer) {
+], function(Localization, Element, Library, qutils, nextUIUpdate, KeyCodes, JSONModel, Device, Filter, Sorter, InvisibleText, ListBase, Table, Column, Label, Link, Toolbar, ToolbarSpacer, Button, Input, ColumnListItem, ListItemAction, Text, Title, ScrollContainer, VBox, library, GroupHeaderListItem, VerticalLayout, Message, jQuery, IllustratedMessage, ComboBox, CheckBox, RatingIndicator, Item, TextArea, Control, ColumnAIAction, ColumnResizer) {
 	"use strict";
 
 	const TestControl = Control.extend("sap.m.test.TestControl", {
@@ -3847,6 +3848,66 @@ sap.ui.define([
 		sLabelledBy = $noData.attr("aria-labelledby");
 		assert.equal(Element.getElementById(sLabelledBy).getText(), "Text 1", "Accessbility text is set correctly");
 	});
+
+	QUnit.module("formsMode with popin", {
+		beforeEach: function() {
+			this.oPopinInput = new Input();
+			this.oTable = new Table({
+				formsMode: true,
+				keyboardMode: "Edit",
+				columns: [
+					new Column({ header: new Text({ text: "Col1" }) }),
+					new Column({
+						header: new Text({ text: "Col2" }),
+						demandPopin: true,
+						minScreenWidth: "4444px"
+					})
+				],
+				items: new ColumnListItem({
+					cells: [new Text({ text: "Cell 1" }), this.oPopinInput]
+				})
+			});
+			this.oExternalInput = new Input();
+		},
+		afterEach: function() {
+			this.oVBox.destroy();
+		},
+		placeInVBox: async function(aItems) {
+			this.oVBox = new VBox({ items: aItems });
+			this.oVBox.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		}
+	});
+
+	if (document.hasFocus()) {
+		QUnit.test("Popin's tabbable should be focused on forward re-entry when formsMode=true and keyboardMode=Edit and the editable control is in a popin column", async function(assert) {
+			await this.placeInVBox([this.oExternalInput, this.oTable]);
+
+			this.oExternalInput.focus();
+			assert.strictEqual(document.activeElement, this.oExternalInput.getFocusDomRef(), "External input is focused");
+
+			this.oTable.getDomRef("listUl").focus();
+			assert.strictEqual(
+				document.activeElement,
+				this.oPopinInput.getFocusDomRef(),
+				"Popin's Input is focused on forward re-entry when the only tabbable lives in the popin"
+			);
+		});
+
+		QUnit.test("Popin's tabbable should be focused on backward re-entry when formsMode=true and keyboardMode=Edit and the editable control is in a popin column", async function(assert) {
+			await this.placeInVBox([this.oTable, this.oExternalInput]);
+
+			this.oExternalInput.focus();
+			assert.strictEqual(document.activeElement, this.oExternalInput.getFocusDomRef(), "External input is focused");
+
+			this.oTable.$("after")[0].focus();
+			assert.strictEqual(
+				document.activeElement,
+				this.oPopinInput.getFocusDomRef(),
+				"Popin's Input is focused on backward re-entry when the only tabbable lives in the popin"
+			);
+		});
+	}
 
 	QUnit.module("Keyboard Navigation for Cells", {
 		beforeEach: async function() {

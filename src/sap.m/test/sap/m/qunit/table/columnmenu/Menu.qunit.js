@@ -334,10 +334,10 @@ sap.ui.define([
 		assert.ok(oDestroyItemContainerSpy.calledOnce);
 	});
 
-	QUnit.test("Quick action list has rememberFocus set to false", function(assert) {
+	QUnit.test("Quick action list has formsMode set to true", function(assert) {
 		this.createMenu(true, false, true, false);
 		this.oColumnMenu.openBy(this.oButton);
-		assert.strictEqual(this.oColumnMenu._oQuickGenericList.getRememberFocus(), false, "rememberFocus is set to false on the quick action list");
+		assert.strictEqual(this.oColumnMenu._oQuickGenericList.getFormsMode(), true, "formsMode is set to true on the quick action list");
 	});
 
 	QUnit.test("Check hidden header and footer in default view", async function(assert) {

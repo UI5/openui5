@@ -4580,7 +4580,7 @@ sap.ui.define([
 			this.oList.bUseActionsForNavigation = false;
 		});
 
-		QUnit.module("rememberFocus", {
+		QUnit.module("formsMode", {
 			beforeEach: function() {
 				this.oList = new List();
 			},
@@ -4589,30 +4589,32 @@ sap.ui.define([
 			}
 		});
 
-		QUnit.test("Default value should be true", function(assert) {
-			assert.strictEqual(this.oList.getRememberFocus(), true, "Default value of rememberFocus is true");
+		QUnit.test("Default value should be false", function(assert) {
+			assert.strictEqual(this.oList.getFormsMode(), false, "Default value of formsMode is false");
 		});
 
-		QUnit.test("Property can be set to false", function(assert) {
-			this.oList.setRememberFocus(false);
-			assert.strictEqual(this.oList.getRememberFocus(), false, "rememberFocus can be set to false");
+		QUnit.test("Property can be set to true", function(assert) {
+			this.oList.setFormsMode(true);
+			assert.strictEqual(this.oList.getFormsMode(), true, "formsMode can be set to true");
 		});
 
 		QUnit.test("Property can be set via constructor", function(assert) {
 			const oList = new List({
-				rememberFocus: false
+				formsMode: true
 			});
-			assert.strictEqual(oList.getRememberFocus(), false, "rememberFocus can be set via constructor");
+			assert.strictEqual(oList.getFormsMode(), true, "formsMode can be set via constructor");
 			oList.destroy();
 		});
 
 		if (document.hasFocus()) {
-			QUnit.test("First item should be focused on re-entry when rememberFocus=false", async function(assert) {
-				const oListItem1 = new StandardListItem({ title: "Item 1" });
+			QUnit.test("First item should be focused on re-entry when formsMode=true and keyboardMode=Edit", async function(assert) {
+				const oInput = new Input();
+				const oListItem1 = new CustomListItem({ content: oInput });
 				const oListItem2 = new StandardListItem({ title: "Item 2" });
 				const oExternalInput = new Input();
 
-				this.oList.setRememberFocus(false);
+				this.oList.setFormsMode(true);
+				this.oList.setKeyboardMode("Edit");
 				this.oList.addItem(oListItem1);
 				this.oList.addItem(oListItem2);
 
@@ -4622,32 +4624,23 @@ sap.ui.define([
 				oVBox.placeAt("qunit-fixture");
 				await nextUIUpdate();
 
-				// Focus second item
 				this.oList.getItems()[1].focus();
-				await timeout(1);
 				assert.strictEqual(document.activeElement, oListItem2.getFocusDomRef(), "Second item is focused");
 
-				// Move focus outside the list
 				oExternalInput.focus();
-				await timeout(1);
 				assert.strictEqual(document.activeElement, oExternalInput.getFocusDomRef(), "External input is focused");
 
-				// Return focus to list
-				this.oList.focus();
-				await timeout(1);
-
-				// First item should be focused (not the previously focused second item)
-				assert.strictEqual(document.activeElement, oListItem1.getFocusDomRef(), "First item is focused on re-entry when rememberFocus=false");
+				this.oList.getDomRef("listUl").focus();
+				assert.strictEqual(document.activeElement, oInput.getFocusDomRef(), "Input of first item is focused on re-entry when formsMode=true");
 
 				oVBox.destroy();
 			});
 
-			QUnit.test("Previously focused item should be focused on re-entry when rememberFocus=true", async function(assert) {
+			QUnit.test("Previously focused item should be focused on re-entry when formsMode=false", async function(assert) {
 				const oListItem1 = new StandardListItem({ title: "Item 1" });
 				const oListItem2 = new StandardListItem({ title: "Item 2" });
 				const oExternalInput = new Input();
 
-				// rememberFocus defaults to true
 				this.oList.addItem(oListItem1);
 				this.oList.addItem(oListItem2);
 
@@ -4657,22 +4650,130 @@ sap.ui.define([
 				oVBox.placeAt("qunit-fixture");
 				await nextUIUpdate();
 
-				// Focus second item
+				this.oList.getItems()[1].focus();
+				assert.strictEqual(document.activeElement, oListItem2.getFocusDomRef(), "Second item is focused");
+
+				oExternalInput.focus();
+				assert.strictEqual(document.activeElement, oExternalInput.getFocusDomRef(), "External input is focused");
+
+				this.oList.focus();
+
+				assert.strictEqual(document.activeElement, oListItem2.getFocusDomRef(), "Previously focused item is focused on re-entry when formsMode=false");
+
+				oVBox.destroy();
+			});
+
+			QUnit.test("Last item should be focused on backward tab entry when formsMode=true and keyboardMode=Edit", async function(assert) {
+				const oInput = new Input();
+				const oListItem1 = new StandardListItem({ title: "Item 1" });
+				const oListItem2 = new CustomListItem({ content: oInput });
+				const oExternalInput = new Input();
+
+				this.oList.setFormsMode(true);
+				this.oList.setKeyboardMode("Edit");
+				this.oList.addItem(oListItem1);
+				this.oList.addItem(oListItem2);
+
+				const oVBox = new VBox({
+					items: [this.oList, oExternalInput]
+				});
+				oVBox.placeAt("qunit-fixture");
+				await nextUIUpdate();
+
+				this.oList.getItems()[1].focus();
+				oExternalInput.focus();
+
+				this.oList.$("after")[0].focus();
+
+				assert.strictEqual(document.activeElement, oInput.getFocusDomRef(), "Input of last item is focused on backward tab entry when formsMode=true");
+
+				oVBox.destroy();
+			});
+
+			QUnit.test("formsMode should have no effect when keyboardMode is not Edit", async function(assert) {
+				const oListItem1 = new StandardListItem({ title: "Item 1" });
+				const oListItem2 = new StandardListItem({ title: "Item 2" });
+				const oExternalInput = new Input();
+
+				this.oList.setFormsMode(true);
+				this.oList.addItem(oListItem1);
+				this.oList.addItem(oListItem2);
+
+				const oVBox = new VBox({
+					items: [oExternalInput, this.oList]
+				});
+				oVBox.placeAt("qunit-fixture");
+				await nextUIUpdate();
+
 				this.oList.getItems()[1].focus();
 				await timeout(1);
 				assert.strictEqual(document.activeElement, oListItem2.getFocusDomRef(), "Second item is focused");
 
-				// Move focus outside the list
 				oExternalInput.focus();
 				await timeout(1);
 				assert.strictEqual(document.activeElement, oExternalInput.getFocusDomRef(), "External input is focused");
 
-				// Return focus to list
 				this.oList.focus();
 				await timeout(1);
 
-				// Previously focused item (second) should be focused
-				assert.strictEqual(document.activeElement, oListItem2.getFocusDomRef(), "Previously focused item is focused on re-entry when rememberFocus=true");
+				assert.strictEqual(document.activeElement, oListItem2.getFocusDomRef(), "formsMode has no effect when keyboardMode is not Edit");
+
+				oVBox.destroy();
+			});
+
+			QUnit.test("Forward tab entry should skip a leading GroupHeaderListItem when formsMode=true and keyboardMode=Edit", async function(assert) {
+				const oInput = new Input();
+				const oGroupHeader = new GroupHeaderListItem({ title: "Group A" });
+				const oListItem1 = new CustomListItem({ content: oInput });
+				const oListItem2 = new StandardListItem({ title: "Item 2" });
+				const oExternalInput = new Input();
+
+				this.oList.setFormsMode(true);
+				this.oList.setKeyboardMode("Edit");
+				this.oList.addItem(oGroupHeader);
+				this.oList.addItem(oListItem1);
+				this.oList.addItem(oListItem2);
+
+				const oVBox = new VBox({
+					items: [oExternalInput, this.oList]
+				});
+				oVBox.placeAt("qunit-fixture");
+				await nextUIUpdate();
+
+				oExternalInput.focus();
+				assert.strictEqual(document.activeElement, oExternalInput.getFocusDomRef(), "External input is focused");
+
+				this.oList.getDomRef("listUl").focus();
+				assert.strictEqual(document.activeElement, oInput.getFocusDomRef(), "Input of first non-group-header item is focused on forward entry, GroupHeaderListItem is skipped");
+
+				oVBox.destroy();
+			});
+
+			QUnit.test("Backward tab entry should skip a trailing GroupHeaderListItem when formsMode=true and keyboardMode=Edit", async function(assert) {
+				const oInput = new Input();
+				const oListItem1 = new StandardListItem({ title: "Item 1" });
+				const oGroupHeader1 = new GroupHeaderListItem({ title: "Group A" });
+				const oListItem2 = new CustomListItem({ content: oInput });
+				const oGroupHeader2 = new GroupHeaderListItem({ title: "Group B" });
+				const oExternalInput = new Input();
+
+				this.oList.setFormsMode(true);
+				this.oList.setKeyboardMode("Edit");
+				this.oList.addItem(oListItem1);
+				this.oList.addItem(oGroupHeader1);
+				this.oList.addItem(oListItem2);
+				this.oList.addItem(oGroupHeader2);
+
+				const oVBox = new VBox({
+					items: [this.oList, oExternalInput]
+				});
+				oVBox.placeAt("qunit-fixture");
+				await nextUIUpdate();
+
+				oExternalInput.focus();
+				this.oList.$("after")[0].focus();
+
+				assert.strictEqual(document.activeElement, oInput.getFocusDomRef(), "Input of last non-group-header item is focused on backward entry, trailing GroupHeaderListItem is skipped");
 
 				oVBox.destroy();
 			});
