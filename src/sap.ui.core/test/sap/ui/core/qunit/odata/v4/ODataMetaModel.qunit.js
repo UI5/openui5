@@ -5864,8 +5864,8 @@ sap.ui.define([
 			// observe metadataUrlParams being passed along
 			// Note: "ab-CD" is derived from Localization.getLanguageTag here, not from mHeaders!
 			this.mock(_MetadataRequestor).expects("create")
-				.withExactArgs({"Accept-Language" : "ab-CD"}, "4.0", undefined,
-					{"sap-language" : "~sLanguage~"}, undefined, sinon.match.func);
+				.withExactArgs({"Accept-Language" : "ab-CD", "X-SAP-Security-Session" : "disabled"},
+					"4.0", undefined, {"sap-language" : "~sLanguage~"}, undefined, sinon.match.func);
 			const oCopyAnnotationsExpectation
 				= this.mock(ODataMetaModel.prototype).expects("_copyAnnotations")
 					.exactly(bCopyAnnotations ? 1 : 0)
@@ -5940,8 +5940,8 @@ sap.ui.define([
 			.returns("/Foo1/ValueListService/");
 		// observe metadataUrlParams NOT being passed along
 		this.mock(_MetadataRequestor).expects("create")
-			.withExactArgs({"Accept-Language" : "ab-CD"}, "4.0", undefined, {}, undefined,
-				sinon.match.func);
+			.withExactArgs({"Accept-Language" : "ab-CD", "X-SAP-Security-Session" : "disabled"},
+				"4.0", undefined, {}, undefined, sinon.match.func);
 		const oExpectation = this.mock(ODataModel.prototype).expects("setRetryAfterHandler")
 			.withExactArgs(sinon.match.func);
 

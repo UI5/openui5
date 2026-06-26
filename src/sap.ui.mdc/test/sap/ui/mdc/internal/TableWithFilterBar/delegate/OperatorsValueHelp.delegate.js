@@ -17,7 +17,8 @@ sap.ui.define([
 	'sap/m/Text',
 	'sap/ui/model/json/JSONModel',
 	'sap/ui/model/Filter',
-	'sap/ui/model/FilterOperator'
+	'sap/ui/model/FilterOperator',
+	"sap/ui/model/FilterProcessor"
 ], function(
 	BaseValueHelpDelegate,
 	MTable,
@@ -33,7 +34,8 @@ sap.ui.define([
 	Text,
 	JSONModel,
 	Filter,
-	FilterOperator
+	FilterOperator,
+	FilterProcessor
 ) {
 	"use strict";
 
@@ -165,6 +167,37 @@ sap.ui.define([
 		}
 
 		return BaseValueHelpDelegate.createConditionForContext.apply(this, arguments);
+	};
+
+	ValueHelpDelegate.getFirstMatch = function (oValueHelp, oContent, oConfig) {
+		let oResult;
+		const aRelevantContexts = oContent.getListBinding(oConfig)?.getCurrentContexts();
+		const sInputValue = oConfig.value;
+
+		if (sInputValue && aRelevantContexts?.length) {
+			let sKey;
+			const sDescription = "text";
+			if (oContent.isA("sap.ui.mdc.valuehelp.content.MTable")) {
+				sKey = "operator";
+			} else if (oContent.isA("sap.ui.mdc.valuehelp.content.FixedList")) {
+				sKey = "key";
+			}
+
+			// Just filter for key and description, independent of the used data type. (As Operator.name is returned, not a real value.)
+			// If table would contain real entries what needs to result in EQ-Conditions this needs to be handled type deptendent - see default implementation of getFirstMatch in ValueHelpDelegate.
+			const oFilter = new Filter({
+				filters: [
+					new Filter({path: sDescription, operator: FilterOperator.StartsWith, value1: sInputValue, caseSensitive: false}),
+					new Filter({path: sKey, operator: FilterOperator.StartsWith, value1: sInputValue, caseSensitive: false})
+				], and: false
+			});
+			const aContexts = FilterProcessor.apply(aRelevantContexts, oFilter, (oBindingContext, sPath) => oBindingContext && oBindingContext.getProperty(sPath));
+			if (aContexts?.length) {
+				oResult = aContexts[0];
+			}
+		}
+
+		return oResult;
 	};
 
 	return ValueHelpDelegate;

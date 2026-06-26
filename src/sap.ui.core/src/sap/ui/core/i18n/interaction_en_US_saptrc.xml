@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF8"?>
+<interaction-documentation library="sap.ui.core" xmlns="http://schemas.sap.com/sapui5/extension/sap.ui.core.InteractionDocumentation/1">
+	<control-interactions>
+		<control name="sap.ui.core.Control"/>
+		<interaction>dRxlHY/OL9cwEhXBpgST9w_ <kbd>Tab</kbd> <description>
+				<p>QgQywK2Z8wY4lX+T2vS7zw_Moves focus to the next element in the tab chain.</p>
+			</description>
+		</interaction>
+		<interaction>pBTY012xWmk5oS9H3jkW5g_ <kbd>Shift + Tab</kbd> <description>
+				<p>1V0+8zxxiiTsER9sM2PT4A_Moves focus to the previous element in the tab chain.</p>
+			</description>
+		</interaction>
+		<interaction>Gil9BGtRg7UEzFZxyCFbjg_ <kbd>F6</kbd> <description>
+				<p>WdnOj/2ZzM7Oq8S2EVnciw_Moves focus to first element of the next UI group (F6 group) in the tab chain.</p>
+			</description>
+		</interaction>
+		<interaction>KLRZxOcusLAjb3sMGlQGXQ_ <kbd>Shift + F6</kbd> <description>
+				<p>ZRVKzKOceHz8CezcP41qDA_Moves focus to first element of the previous UI group (F6 group) in the tab chain.</p>
+			</description>
+		</interaction>
+	</control-interactions>
+	<control-interactions>
+		<control name="sap.ui.core.mvc.XMLView">
+			<defaultLabel>xeQg7H7UuRp8s95eguLdTg_Global Shortcuts</defaultLabel>
+		</control>
+	</control-interactions>
+</interaction-documentation>
