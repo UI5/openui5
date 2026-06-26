@@ -1153,7 +1153,6 @@ sap.ui.define([
 
 		oElement = getRowHeader(0);
 		assert.ok(TableUtils.getCell(oTable, oElement).is(oElement), "Returned Row Header");
-		assert.ok(TableUtils.getCell(oTable, oElement.find(":first")).is(oElement), "Returned Row Header");
 
 		oElement = getRowAction(0);
 		assert.ok(TableUtils.getCell(oTable, oElement).is(oElement), "Returned Row Action");
