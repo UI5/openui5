@@ -645,10 +645,6 @@ sap.ui.define([
 				this.setSelectable(oItem, oItem.getEnabled());
 			}
 
-			if (oItem.isA("sap.ui.core.SeparatorItem")) {
-				oListItem.addAriaLabelledBy(this._getGroupHeaderInvisibleText().getId());
-			}
-
 			oListItem.addStyleClass(this.getRenderer().CSS_CLASS_COMBOBOXBASE + "NonInteractiveItem");
 
 			return oListItem;
@@ -1208,7 +1204,6 @@ sap.ui.define([
 				this.updateDomValue(sTypedValue);
 				this.fireSelectionChange({ selectedItem: null });
 
-				this._getGroupHeaderInvisibleText().setText(this._oRb.getText("LIST_ITEM_GROUP_HEADER") + " " + oItem.getText());
 				return;
 			}
 
