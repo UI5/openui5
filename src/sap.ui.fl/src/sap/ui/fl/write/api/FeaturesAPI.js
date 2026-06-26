@@ -3,6 +3,7 @@
  */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/api/InitialFlexAPI",
 	"sap/ui/fl/write/_internal/Storage",
@@ -10,6 +11,7 @@ sap.ui.define([
 	"sap/ui/fl/Utils",
 	"sap/ui/fl/write/_internal/init"
 ], function(
+	Log,
 	Settings,
 	InitialFlexAPI,
 	Storage,
@@ -215,14 +217,32 @@ sap.ui.define([
 		},
 
 		/**
-		 * Checks the settings if annotation changes are enabled. If the settings are not yet loaded, it returns false.
-		 * @returns {boolean} Returns a boolean indicating if annotation changes are enabled
+		 * Checks the settings if annotation changes are enabled. If the control and model are given, then it checks
+		 * also if the model is defined in the manifest. Without the model being in the manifest, annotation changes can't be applied.
+		 *
+		 * @param {object} [oControl] - Control object to fetch the component
+		 * @param {object} [oModel] - Model related to the control to be checked for annotation changes
+		 * @returns {boolean} <code>true</code> if annotation changes are enabled, <code>false</code> otherwise
 		 * @private
 		 * @ui5-restricted sap.ui.rta, controls implementing annotation actions
 		 */
-		areAnnotationChangesEnabled() {
+		areAnnotationChangesEnabled(oControl, oModel) {
 			const oSettings = Settings.getInstanceOrUndef();
-			return oSettings?.getIsAnnotationChangeEnabled();
+			let bAnnotationChangesEnabled = !!oSettings?.getIsAnnotationChangeEnabled();
+			if (bAnnotationChangesEnabled && oControl && oModel) {
+				// annotation changes are only possible for models that are defined in the manifest
+				const oComponent = Utils.getComponentForControl(oControl);
+				bAnnotationChangesEnabled = oComponent._isManifestModel(oModel);
+
+				// models from the outer app component can be propagated to inner components
+				if (!bAnnotationChangesEnabled && !Utils.isApplicationComponent(oComponent)) {
+					const oAppComponent = Utils.getAppComponentForControl(oControl);
+					if (oAppComponent) {
+						bAnnotationChangesEnabled = oAppComponent._isManifestModel(oModel);
+					}
+				}
+			}
+			return bAnnotationChangesEnabled;
 		}
 	};
 

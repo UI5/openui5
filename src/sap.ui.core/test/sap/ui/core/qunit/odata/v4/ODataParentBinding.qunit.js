@@ -3527,7 +3527,9 @@ sap.ui.define([
 		// code under test
 		oRefreshPromise = oBinding.createRefreshPromise("~bPreventBubbling~");
 
-		assert.ok(oRefreshPromise instanceof Promise);
+		// Note: we don't care whether oRefreshPromise is a SyncPromise or a native Promise;
+		// currently a native Promise is good enough (no sync resolution, no sync access needed) and
+		// saves the SyncPromise wrapper
 		assert.strictEqual(oRefreshPromise, oBinding.oRefreshPromise);
 		assert.strictEqual(oBinding.isRefreshWithoutBubbling(), "~bPreventBubbling~");
 

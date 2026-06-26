@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF8"?>
+<interaction-documentation library="sap.m" xmlns="http://schemas.sap.com/sapui5/extension/sap.ui.core.InteractionDocumentation/1">
+	<control-interactions>
+		<control name="sap.ui.table.Table"/>
+		<control name="sap.ui.table.AnalyticalTable"/>
+		<control name="sap.ui.table.TreeTable"/>
+		<interaction>VtbTFnsNLpAMdP1VNuQLdQ_ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <kbd>ArrowRight</kbd> <kbd>ArrowLeft</kbd> <description>
+				<p>KKV653OZhlDQDslafQTIfQ_Moves the focus to the next cell within the same column or row in the respective directions.</p>
+				<p>6noU3ACdLTmrOqUk3vic3w_<kbd>ArrowUp</kbd></p>
+				<p>S8GUEIodcj3W/jHVLRqvzw_If the focus is on the first row, the focus moves to the column header.</p>
+				<p>cqkDnT6DrxeP8MuZchcLVQ_<kbd>ArrowDown</kbd></p>
+				<p>HG58fAJpCIM3cYvIAZh74w_If the focus is on a column header, the focus moves to the cell in the first visible row of this column, which depends on the current scroll position.</p>
+				<p>TgGKHt9URLD8LN4yC1n+TQ_If the focus is on the <span class="uicontrol">Select All</span> checkbox, the focus moves to the row selector in the first visible row, which depends on the current scroll position.</p>
+				<p>SEvztGRMM9SKmOTX9eTyJQ_<kbd>ArrowLeft</kbd></p>
+				<p>m7kSwHyfwhBQGRcom+hATg_If the focus is on a cell in the first column, the focus moves to the row selector.</p>
+				<p>YBDdJytn3Y7xOVObwr+JiQ_If the focus is on a column header, the focus moves to the column header to the left.</p>
+				<p>IYJsauG+tW/+je4xS+yesQ_If the focus is on the column header of the first column, the focus moves to the <span class="uicontrol">Select All</span> checkbox.</p>
+				<p>3DlU1y1qbGk9DLSiOHN6lA_If the focus is on the group header of an expanded group, the group is collapsed.</p>
+				<p>CGW5Ox+CgvvEu/Ealuv9Wg_<kbd>ArrowRight</kbd></p>
+				<p>4TfncsGEAT2nYH3uc6VyhA_If the focus is on the column header, the focus moves to the column header to the right.</p>
+				<p>9cx348weKmNdC/hRZOSV3Q_If the focus is on the row selector, the focus moves to the cell of the first column within the same row.</p>
+				<p>VjGZolRekQxXJ9RSPPlk/w_If the focus is on the <span class="uicontrol">Select All</span> checkbox, the focus moves to the column header of the first column.</p>
+			</description>
+		</interaction>
+		<interaction>G4aGIthms/8UHbJmt9iJHA_ <kbd>PageUp</kbd> <description>
+				<p>fp9M/RNssb4ZXogmhk38RA_If the focus is on cell level, the focus moves to the cell at the very top of the same column. If the focus is already on that level, the focus moves one page up and stays on the same column with the required scrolling.</p>
+				<p>ZnfqDhz6QVfcYCMwfxzb0Q_If the focus is on the first row, the focus moves to the column header.</p>
+			</description>
+		</interaction>
+		<interaction>z6XvZ+AXVs1g5XRHaNM2YQ_ <kbd>PageDown</kbd> <description>
+				<p>axgYeToMuEM1imVabDEm2Q_If the focus is on cell level, the focus moves to the last visible cell in the same column. If the focus is already on that level, it moves one page down and stays on the same column with the required scrolling.</p>
+				<p>Du4xDeklOxBlYGO72xY+uA_If the focus is on the column header, the focus moves to the first row.</p>
+			</description>
+		</interaction>
+		<interaction>5IBXUOkh/ZivjU612wPCeA_ <kbd>Alt + PageUp</kbd> <description>
+				<p>Hp7sNXOZDOPQWuZzWQGhXQ_If the focus is on cell level or on a column header, the focus moves five columns to the left (default page size). If there are fewer columns on the left than the current page size, the focus moves to the first column.</p>
+				<p>j0BUAKpq/3j26Delerej6Q_If the focus is on the first column on cell level, the focus moves to the row selector.</p>
+				<p>DGXTDy5PfoE+2TWsxv5nmQ_If the focus is on the column header of the first column, the focus moves to <span class="uicontrol">Select All</span>.</p>
+			</description>
+		</interaction>
+		<interaction>QdT+QvNhauhXY2bCiSnQXA_ <kbd>Alt + PageDown</kbd> <description>
+				<p>2PTjEkjNxjJwRihewkyJ1Q_If the focus is on cell level, the focus moves five columns to the right (default page size).</p>
+				<p>e1ePeGqTEkQoxJ69z9UIJA_If the focus is on the column header and there are fewer columns on the right than the current page size, the focus moves to the last column.</p>
+				<p>7b457wNfrYpnM4l3peBDhQ_If the focus is on the row selector, the focus moves to the first column in the same row.</p>
+				<p>v1hBZkMDp7nvjae3XGbnhg_If the focus is on <span class="uicontrol">Select All</span>, the focus moves to the header of the first column.</p>
+			</description>
+		</interaction>
+		<interaction>dpeo1fBCCJgKygrZ3Wfgmw_ <kbd>Home</kbd> <kbd>Pos1</kbd> <description>
+				<p>9r2XinfpBczsGGOQ/UVDQQ_If the focus is on the cell, the focus moves to the first column in the same row.</p>
+				<p>3YRFY7WwrOnBUHifPE0V4w_If the focus is on the cell in the first column, the focus moves to the row selector.</p>
+				<p>ps8L/7mwXRK137QBodU8EQ_If the focus is on the column header, the focus moves to the header of the first column.</p>
+				<p>X7hIEiA7M5UzPbf4+dY1JA_If the focus is on the first column header, the focus moves to <span class="uicontrol">Select All</span>.</p>
+			</description>
+		</interaction>
+		<interaction>rIZ0RTVdD6V//qqJWhawGA_ <kbd>End</kbd> <description>
+				<p>n/nTNOFxvt54QN0Xjl83+Q_If the focus is on the cell or column header, the focus moves to the last column.</p>
+				<p>vCHlXThOPlPElFCKw68fPQ_If the focus is on the row selector, the focus moves to the first column in the same row.</p>
+				<p>l9Eg2XfDkKtId8KsVaB+Mg_If the focus is on <span class="uicontrol">Select All</span>, the focus moves to the header of the first column.</p>
+			</description>
+		</interaction>
+		<interaction>c1jO/HkAA7Fef1NXnRg/9Q_ <kbd>Ctrl + Home</kbd> <kbd>Pos1</kbd> <description>
+				<p>wG6ZNsnpMvNjsKmUBlVGUQ_If the focus is on the cell, the focus moves to the column header.</p>
+				<p>/3an70V6BRePxJqOpEOWig_If the focus is on the row selector, the focus moves to <span class="uicontrol">Select All</span>.</p>
+			</description>
+		</interaction>
+		<interaction>Jt9QY78VGL6SxNmeqpupdA_ <kbd>Ctrl + End</kbd> <description>
+				<p>9rAoxyHpQbneuh+XZB0sSg_If the focus is on the cell or column header, the focus moves to the last row in the same column.</p>
+				<p>kngFNOaNEBWrYEWGgZJOMA_If the focus is on the row selector or <span class="uicontrol">Select All</span>, the focus moves to the last row selector.</p>
+			</description>
+		</interaction>
+		<interaction>QY9b43aEz/8EVIIjLHD6Fw_ <kbd>Enter</kbd> <kbd>Spacebar</kbd> <description>
+				<p>loz0WIj0zboQwRoVlL0Glg_If the focus is on the cell, the focus moves to the first focusable control in the cell.</p>
+				<p>eSQN7PalbnG3DfZGahWN0g_If the focus is on the <span class="uicontrol">Select All</span> checkbox or a row selector, toggles the checkbox state.</p>
+				<p>B9sjAtnnH5Sq8q23ex8lhA_If the focus is on the column header, the column header menu is opened.</p>
+				<p>iQ7iEJKnAvj16tEXUImS7w_If the focus is on the group header, the related group is collapsed or expanded.</p>
+				<p>p+ktM6caW17zDwiuvaCSzg_<kbd>Enter</kbd></p>
+				<p>zyvsqKU8/H2jLTgStbtf3A_If the focus is on the group header, the group header menu is opened.</p>
+				<p>5lNqQT0ahHU5nxFeW2m5Hw_<kbd>Spacebar</kbd></p>
+				<p>nMwX27l1ULQjHJ1jX8+fcQ_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>+qgL6S4/J39Mvl+553mmAA_If the focus is on a cell, the focused cell is selected.</p>
+				<p>tC3Hq5l6ntJxDP3U17tXXg_If the focus is on a cell selection block, the selection of the cells is removed.</p>
+				<p>MCwlNq7r4fMsTKCCMZFe2g_If the focus is on a cell, and the table has a certain configuration of the selection behavior (to select a row, you can either select the row itself or the selection checkbox if it is available), only the focused cell is selected instead of the row.</p>
+				<p>eeGM7WBM30oVL744NvMdOQ_<kbd>Shift + Spacebar</kbd></p>
+				<p>WysgEiDVMeixdzCG3gggUg_If the focus is on a cell or the row selector, this toggles the selection of the current row.</p>
+				<p>5Yg0lym1xji40Q9e2RhHsQ_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>a/t2mc8GWjg7BQrAsHJm9Q_If the focus is on a cell selection block, the cell selection block is changed into a row selection. The cell selection is removed.</p>
+				<p>WpNDOGy50rkDyIFcMixWNQ_Depending on the row selection mode the following happens:</p>
+				<ul>
+					<li>D188qCsQjICSU2lcIsmSkg_All rows of the block are selected (multiple selection)</li>
+					<li>0ytdnvRXxlq6BhbXxy7oXQ_Only the row with the currently focused cell is selected (single selection)</li>
+					<li>+UkXcDyvdNUJX7FxekzuTA_None of the rows are selected</li>
+				</ul>
+			</description>
+		</interaction>
+		<interaction>O0rnZMU4YB77D0x4ehN7SA_ <kbd>Escape</kbd> <description>
+				<p>eUhWvY0uSEOWQROvdhGHyw_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>RF2V47A04VcCEdAue9tuBQ_If the focus is inside of the table, and cells are selected, the selection of the cells is removed.</p>
+			</description>
+		</interaction>
+		<interaction>msVWWj1k5ckWAi6+Wxchyg_ <kbd>F2</kbd> <description>
+				<p>TLuMNTIZlx//8ovD2ThVdg_Toggles the focus between the cell and its content (with the exception of read-only text).</p>
+			</description>
+		</interaction>
+		<interaction>JTV3du0KHJn5ZdJUyTruYg_ <kbd>Shift + Spacebar</kbd> <description>
+				<p>5If3mFostq9mKWNMrjCj6w_If the focus is on <span class="uicontrol">Select All</span>, and <kbd>Spacebar</kbd> is pressed, the corresponding event is not triggered. <kbd>Shift</kbd> prevents this activity.</p>
+			</description>
+		</interaction>
+		<interaction>jiD2cFQgJs45rLLR0abkqQ_ <kbd>Shift + Spacebar</kbd> <kbd>Shift + Enter</kbd> <description>
+				<p>bsFAqCDLNarX5WsAgoi26A_If the focus is on a column header, and <kbd>Spacebar</kbd> or <kbd>Enter</kbd> is pressed, the corresponding event is not triggered.</p>
+			</description>
+		</interaction>
+		<interaction>mDTo36sWBB0SZW7TwqQodA_ <kbd>Shift + ArrowUp</kbd> <description>
+				<p>e+36XWDVNrQDHwfCsBTf1g_If the focus is on a cell or the row selector, and the relevant row is selected, the focus moves to the row above, and the selection is enhanced up to this row.</p>
+				<p>A+zveXWGAWHFaG3FpxeMIQ_If the focus is on a cell or the row selector, and the relevant row is <span class="emphasis">not</span> selected, the focus moves to the row above, and the selection is removed for this row.</p>
+				<p>5oU16KARKUt3HGkehAYcSA_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>gLQlsvkmGT/hYmVK/AkB9g_If the focus is on a cell that is <span class="emphasis">not</span> selected, and the row is <span class="emphasis">not</span> selected, the focused cell and the cell above are selected. The focus moves to the cell above the focused cell.</p>
+				<p>FZEsFxFWiVdmejUCXsF4/A_If the focus is on a selected cell, the cell above gets the focus, and the cell selection is enhanced up to this cell.</p>
+			</description>
+		</interaction>
+		<interaction>AVHbApk8GEdwHwrtPavegg_ <kbd>Shift + ArrowDown</kbd> <description>
+				<p>EIYNegagbCQZNMlX45PDDQ_If the focus is on a cell or the row selector, and the relevant row is selected, the focus moves to the row below, and the selection is enhanced up to this row.</p>
+				<p>iFwwRiYXbHwW1TKQAVNQug_If the focus is on a cell or the row selector, and the relevant row is <span class="emphasis">not</span> selected, the focus moves to the row below, and the selection is removed for this row.</p>
+				<p>I95Kbur1XAjhY2C9EIUclg_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>QkFzWXFSLH2skNvmY/TwQw_If the focus is on a cell that is <span class="emphasis">not</span> selected, and the row is <span class="emphasis">not</span> selected, the focused cell and the cell below are selected. The focus moves to the cell below the focused cell.</p>
+				<p>UdEu4lvFjFQFlL6qt/MkLw_If the focus is on a selected cell, the cell below gets the focus, and the cell selection is enhanced up to this cell.</p>
+			</description>
+		</interaction>
+		<interaction>h+jAtBbOZmCja2/9QSNGTA_ <kbd>Shift + ArrowRight</kbd> <description>
+				<p>1Jri2XEFXJpU1viE3VfinA_If the focus is on a column header, the width of this column is increased by 1 em. This is repeated if key remains pressed.</p>
+				<p>RljL95mBAoAnfDSIFecJDg_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>ZEPPlxOq38u2E/bhI/38Kw_If the focus is on a cell that is <span class="emphasis">not</span> selected, the focused cell and the cell to the right are selected. The focus moves to the cell to the right of the focused cell.</p>
+				<p>bAgJf1f2Z+GXW9BcPzvNig_If the focus is on a selected cell, the cell to the right gets the focus, and the cell selection is enhanced up to this cell.</p>
+			</description>
+		</interaction>
+		<interaction>kCfcES1QG56dCChtOcSYww_ <kbd>Shift + ArrowLeft</kbd> <description>
+				<p>JWObxVnVIR7cIr+8D7U8rg_If the focus is on a column header, the width of this column is decreased by 1 em. This is repeated if key remains pressed.</p>
+				<p>E15GMRLxbtDP5WE7lwFTqQ_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>LCBAdKwZ/JE0RFx1cMw9/Q_If the focus is on a cell that is <span class="emphasis">not</span> selected, the focused cell and the cell to the left are selected. The focus moves to the cell to the left of the focused cell.</p>
+				<p>jjdM91DhPV99soTb2jlm2g_If the focus is on a selected cell, the cell to the left gets the focus, and the cell selection is enhanced up to this cell.</p>
+			</description>
+		</interaction>
+		<interaction>42Y4Pf0UfK4n9wZ2vpAdTA_ <kbd>Ctrl + ArrowRight</kbd> <description>
+				<p>iD+TVAoOzJzW+nYKZ+jyPA_If the focus is on a column header, the relevant column moves one position to the right.</p>
+			</description>
+		</interaction>
+		<interaction>5IN1sXXHmeRcnTeMjsdDjg_ <kbd>Ctrl + ArrowLeft</kbd> <description>
+				<p>xkaKm9+yWbcutNiOkqwG6w_If the focus is on a column header, the relevant column moves one position to the left.</p>
+			</description>
+		</interaction>
+		<interaction>MVqW1spaTQ6RD5T16Tx27g_ <kbd>Ctrl + ArrowUp</kbd> <description>
+				<p>2P6jBTemb4z+aNr1fY1bfQ_Moves the focus to the next focusable element in the row above.</p>
+			</description>
+		</interaction>
+		<interaction>/qu95d3YW8ZPKg6smLvasQ_ <kbd>Ctrl + ArrowDown</kbd> <description>
+				<p>BEC/9PTQGaQr5wfENzEMmQ_Moves the focus to the next focusable element in the row below.</p>
+			</description>
+		</interaction>
+		<interaction>OyzfJBqHVNH1oMRxOc/ibA_ <kbd>Ctrl + A</kbd> <description>
+				<p>P/I3u/8Ogi5Mk2qwwXKbjw_If the focus is on a cell, the row selector, or <span class="uicontrol">Select All</span>, this toggles the <span class="uicontrol">Select All</span> checkbox: All rows get selected or deselected respectively.</p>
+			</description>
+		</interaction>
+		<interaction>C2oNwE5zHdRQFHBTusNedQ_ <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>BYx9dKTyJsy5WQcgjrhhxQ_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>usYVCkQn2hdkbOX38IbKaQ_If the focus is inside of the table, the selection for any rows and cells is removed.</p>
+			</description>
+		</interaction>
+		<interaction>yGXYL4gHXj7MvNrDRA4qoQ_ <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <kbd>F4</kbd> <description>
+				<p>fWAsH93S3/KebWNKBzvGBw_If the focus is on a cell, the focus moves to its content (with the exception of a read-only text).</p>
+				<p>E4z+CAZWpitXE0fbtLO0tg_If the focus is on the group header or a non-leaf node of a tree, this toggles the expansion of the group: The group is expanded or collapsed respectively.</p>
+			</description>
+		</interaction>
+		<interaction>T8MT5sFcki1OAoJq+qnrtg_ <kbd>Shift + F10</kbd> <description>
+				<p>RMrhYo+vrJo2+THzByRddw_If the focus is on the group header, the group header menu is opened.</p>
+				<p>lQYUjjtlJr6ePqI4s+VJkA_If the focus is on the column header, the column header menu is opened.</p>
+			</description>
+		</interaction>
+		<interaction>3PUzTMdr/cjAeAHQn/jDLQ_ <kbd>Shift + MouseClick</kbd> <description>
+				<p>xkK0WgyyaRB6EJaM6N6YNQ_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>9JYU+XfXV6TxzLERtR1bIg_If cells are selected, <kbd>Shift + MouseClick</kbd> on a different cell enhances the selection up to the clicked cell.</p>
+			</description>
+		</interaction>
+		<interaction>h+x5fJOxJg1fL+WC1ZpGSg_ <kbd>Ctrl + C</kbd> <description>
+				<p>VPjEFffEhMazmLqWVa3DqQ_Copies the selected rows or cells to the clipboard if available, and the feature is enabled.</p>
+			</description>
+		</interaction>
+		<interaction>p92qU0KZf7nqLIjb6yHRaw_ <kbd>Ctrl + V</kbd> <description>
+				<p>25pyv8zBR2fibUq4H3uwpQ_Pastes the content from the clipboard if the feature is enabled.</p>
+			</description>
+		</interaction>
+	</control-interactions>
+</interaction-documentation>

@@ -1,92 +1,92 @@
 {
-  "languagename.cnr" : {
-    "comment" : "XTIT: the official language name of Montenegro: Montenegrin",
-    "text" : "bYSHnYIPyWz9wEfPXk0ERQ_Montenegrin"
+  "languagename.cnr": {
+    "comment": "XTIT: the official language name of Montenegro: Montenegrin",
+    "text": "bYSHnYIPyWz9wEfPXk0ERQ_Montenegrin"
   },
-  "calendarweek.wide" : {
-    "comment" : "XTIT: the long pattern for formatting a date using calendar week number",
-    "text" : "8HBZMWI/9cyQBQe5ALz0Zw_Calendar Week {0}"
+  "calendarweek.wide": {
+    "comment": "XTIT: the long pattern for formatting a date using calendar week number",
+    "text": "8HBZMWI/9cyQBQe5ALz0Zw_Calendar Week {0}"
   },
-  "calendarweek.narrow" : {
-    "comment" : "XTIT: the short pattern for formatting a date using calendar week number",
-    "text" : "cA1qNlR/TgA9dRXaVf9noQ_CW {0}"
+  "calendarweek.narrow": {
+    "comment": "XTIT: the short pattern for formatting a date using calendar week number",
+    "text": "cA1qNlR/TgA9dRXaVf9noQ_CW {0}"
   },
-  "date.placeholder" : {
-    "comment" : "XTXT: Placeholder text for input control with a sample value such as date or time; demo output \"e.g. 31/12/2022\" (translation must contain an abbreviated form of \"for example\" such as the English \"e.g.\" to keep the placeholder short)",
-    "text" : "OXuhn9SBUBVB0Ct0pNCvGw_e.g. {0}"
+  "date.placeholder": {
+    "comment": "XTXT: Placeholder text for input control with a sample value such as date or time; demo output \"e.g. 31/12/2022\" (translation must contain an abbreviated form of \"for example\" such as the English \"e.g.\" to keep the placeholder short)",
+    "text": "uFHq3nGz93vTQ0LQBy/sLw_e.g. {0}"
   },
-  "FileSize" : {
-    "Byte" : {
-      "comment" : "YMSG,20: File Size Unit one Byte",
-      "text" : "bBLaa0RKbP1sxxIPFGHgjQ_{0} Byte"
+  "FileSize": {
+    "Byte": {
+      "comment": "YMSG,20: File Size Unit one Byte",
+      "text": "yBYuTK3gUzFEmDIyvepf2Q_{0} Byte"
     },
-    "Bytes" : {
-      "comment" : "YMSG,20: File Size Unit Bytes",
-      "text" : "ERHT+oexOEI/uCvKq7zmAA_{0} Bytes"
+    "Bytes": {
+      "comment": "YMSG,20: File Size Unit Bytes",
+      "text": "87XH+9iKdyqhLGBE5tJOkQ_{0} Bytes"
     },
-    "Kilobyte" : {
-      "comment" : "YMSG,20: File Size Unit Kilobyte (short)",
-      "text" : "CkNRe7ErnE68qrsXXgSQzA_{0} KB"
+    "Kilobyte": {
+      "comment": "YMSG,20: File Size Unit Kilobyte (short)",
+      "text": "oEIbBwkLCj+O1Wqxm6JlPw_{0} KB"
     },
-    "Megabyte" : {
-      "comment" : "YMSG,20: File Size Unit Megabyte (short)",
-      "text" : "k2Dr5zD1FqaUONP2bM7pOQ_{0} MB"
+    "Megabyte": {
+      "comment": "YMSG,20: File Size Unit Megabyte (short)",
+      "text": "YwVZ9UtPOWlZZ7fae/YCYQ_{0} MB"
     },
-    "Gigabyte" : {
-      "comment" : "YMSG,20: File Size Unit Gigabyte (short)",
-      "text" : "yz5NjWfhggYpk5WBPLw5Nw_{0} GB"
+    "Gigabyte": {
+      "comment": "YMSG,20: File Size Unit Gigabyte (short)",
+      "text": "5H5bYzWXIFVrhZuVUj1iuw_{0} GB"
     },
-    "Terabyte" : {
-      "comment" : "YMSG,20: File Size Unit Terabyte (short)",
-      "text" : "eB42VaKSEzQvXAE+yCeMyg_{0} TB"
+    "Terabyte": {
+      "comment": "YMSG,20: File Size Unit Terabyte (short)",
+      "text": "shRYLiKWyE5EWvXP/NcD0w_{0} TB"
     },
-    "Petabyte" : {
-      "comment" : "YMSG,20: File Size Unit Petabyte (short)",
-      "text" : "gMg7tfRhbrdtV+Lv3defLA_{0} PB"
+    "Petabyte": {
+      "comment": "YMSG,20: File Size Unit Petabyte (short)",
+      "text": "OGOm5w4neYz8DdPuWw/dGw_{0} PB"
     },
-    "Exabyte" : {
-      "comment" : "YMSG,20: File Size Unit Exabyte (short)",
-      "text" : "y+98tAlFyJWa5FKkVOarNg_{0} EB"
+    "Exabyte": {
+      "comment": "YMSG,20: File Size Unit Exabyte (short)",
+      "text": "m6nIElnEabExz38lj1QgYg_{0} EB"
     },
-    "Zettabyte" : {
-      "comment" : "YMSG,20: File Size Unit Zettabyte (short)",
-      "text" : "ccD3TcgHsD/BJA6MmEgf/g_{0} ZB"
+    "Zettabyte": {
+      "comment": "YMSG,20: File Size Unit Zettabyte (short)",
+      "text": "SI9T1so6CdJNQzPiCBBuDQ_{0} ZB"
     },
-    "Yottabyte" : {
-      "comment" : "YMSG,20: File Size Unit Yottabyte (short)",
-      "text" : "u6xH9IsPAsJy6sGPbVwJKQ_{0} YB"
+    "Yottabyte": {
+      "comment": "YMSG,20: File Size Unit Yottabyte (short)",
+      "text": "gTSRx9MD05jARbrwDRdbqw_{0} YB"
     },
-    "Kibibyte" : {
-      "comment" : "YMSG,20: File Size Unit Kibibyte (short)",
-      "text" : "0nRC+713kepOTCyHjaegPA_{0} KiB"
+    "Kibibyte": {
+      "comment": "YMSG,20: File Size Unit Kibibyte (short)",
+      "text": "FnRf+4ACeGhupOhclnXh9g_{0} KiB"
     },
-    "Mebibyte" : {
-      "comment" : "YMSG,20: File Size Unit Mebibyte (short)",
-      "text" : "Kgyue4ZuIO3j4l9XuqPyHA_{0} MiB"
+    "Mebibyte": {
+      "comment": "YMSG,20: File Size Unit Mebibyte (short)",
+      "text": "6amRLFQkUB02U9Y8tkw89g_{0} MiB"
     },
-    "Gibibyte" : {
-      "comment" : "YMSG,20: File Size Unit Gibibyte (short)",
-      "text" : "6hfAY+vRZbC3K5nYYj3zIQ_{0} GiB"
+    "Gibibyte": {
+      "comment": "YMSG,20: File Size Unit Gibibyte (short)",
+      "text": "XqqOYy9mFNzZWmReRYzxCA_{0} GiB"
     },
-    "Tebibyte" : {
-      "comment" : "YMSG,20: File Size Unit Tebibyte (short)",
-      "text" : "pc7oosgE6zPqmP6lyQPz0w_{0} TiB"
+    "Tebibyte": {
+      "comment": "YMSG,20: File Size Unit Tebibyte (short)",
+      "text": "gauDnD3pdWKGSfiCC2fy7Q_{0} TiB"
     },
-    "Pebibyte" : {
-      "comment" : "YMSG,20: File Size Unit Pebibyte (short)",
-      "text" : "d+vT95Y1hAE4HATxpqr3nw_{0} PiB"
+    "Pebibyte": {
+      "comment": "YMSG,20: File Size Unit Pebibyte (short)",
+      "text": "8lT8x4Eds4uuSBTI6cET9w_{0} PiB"
     },
-    "Exbibyte" : {
-      "comment" : "YMSG,20: File Size Unit Exbibyte (short)",
-      "text" : "aP8AF4e4MNLPLZKRNpZRGQ_{0} EiB"
+    "Exbibyte": {
+      "comment": "YMSG,20: File Size Unit Exbibyte (short)",
+      "text": "xhEI9xJn/nNPsH4hlgDYEA_{0} EiB"
     },
-    "Zebibyte" : {
-      "comment" : "YMSG,20: File Size Unit Zebibyte (short)",
-      "text" : "12LKMnYb/YI4wZs0wFOjNg_{0} ZiB"
+    "Zebibyte": {
+      "comment": "YMSG,20: File Size Unit Zebibyte (short)",
+      "text": "LUtdjZzYtm3zn2htDxjBfw_{0} ZiB"
     },
-    "Yobibyte" : {
-      "comment" : "YMSG,20: File Size Unit Yobibyte (short)",
-      "text" : "6DVx/IODXbiC53qivCY3kw_{0} YiB"
+    "Yobibyte": {
+      "comment": "YMSG,20: File Size Unit Yobibyte (short)",
+      "text": "AHWO20jXcqeFcBqZksFxsg_{0} YiB"
     }
   }
 }

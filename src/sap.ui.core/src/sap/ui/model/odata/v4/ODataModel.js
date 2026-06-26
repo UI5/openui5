@@ -331,7 +331,10 @@ sap.ui.define([
 
 		// BEWARE: do not share mHeaders between _MetadataRequestor and _Requestor!
 		this.mHeaders = {"Accept-Language" : sLanguageTag};
-		this.mMetadataHeaders = {"Accept-Language" : sLanguageTag};
+		this.mMetadataHeaders = {
+			"Accept-Language" : sLanguageTag,
+			"X-SAP-Security-Session" : "disabled"
+		};
 
 		mQueryParams = Object.assign({}, mURLParameters, mParameters.metadataUrlParams);
 		const fnGetOrCreateRetryAfterPromise = this.getOrCreateRetryAfterPromise.bind(this);

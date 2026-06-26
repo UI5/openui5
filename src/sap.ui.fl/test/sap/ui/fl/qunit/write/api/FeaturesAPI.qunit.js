@@ -1,20 +1,24 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/fl/initial/api/InitialFlexAPI",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/api/FeaturesAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
+	"sap/ui/model/odata/v2/ODataModel",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	Log,
 	InitialFlexAPI,
 	Settings,
 	Storage,
 	FeaturesAPI,
 	Layer,
 	Utils,
+	ODataV2Model,
 	sinon
 ) {
 	"use strict";
@@ -173,22 +177,70 @@ sap.ui.define([
 					assert.deepEqual(oStorageStub.getCall(0).args[0].seenFeatureIds, ["feature1"], "the correct list is passed");
 				}
 			});
+		});
+	});
 
-			QUnit.test("when areAnnotationChangesEnabled is called with settings already loaded", function(assert) {
-				sandbox.stub(Settings, "getInstanceOrUndef").returns({
-					getIsAnnotationChangeEnabled() {
-						return true;
-					}
-				});
-				const bIsEnabled = FeaturesAPI.areAnnotationChangesEnabled();
-				assert.strictEqual(bIsEnabled, true, "then the correct value is returned");
+	QUnit.module("areAnnotationChangesEnabled", {
+		beforeEach() {
+			this.oIsManifestModelStub = sandbox.stub();
+			sandbox.stub(Utils, "getComponentForControl").returns({
+				_isManifestModel: this.oIsManifestModelStub
 			});
+			this.oAnnotationSetting = true;
+			sandbox.stub(Settings, "getInstanceOrUndef").returns({
+				getIsAnnotationChangeEnabled: () => this.oAnnotationSetting
+			});
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when areAnnotationChangesEnabled is called with settings already loaded, and a model that exists in manifest", function(assert) {
+			this.oIsManifestModelStub.returns(true);
+			const bIsEnabled = FeaturesAPI.areAnnotationChangesEnabled({}, {});
+			assert.strictEqual(bIsEnabled, true, "then 'true' is returned");
+		});
 
-			QUnit.test("when areAnnotationChangesEnabled is called without settings loaded", function(assert) {
-				sandbox.stub(Settings, "getInstanceOrUndef").returns();
-				const bIsEnabled = FeaturesAPI.areAnnotationChangesEnabled();
-				assert.strictEqual(bIsEnabled, undefined, "then the correct value is returned");
-			});
+		QUnit.test("when areAnnotationChangesEnabled is called with settings already loaded, and a model that exists in an outer appComponent", function(assert) {
+			this.oIsManifestModelStub
+			.onFirstCall().returns(false)
+			.onSecondCall().returns(true);
+			sandbox.stub(Utils, "isApplicationComponent").returns(false);
+			const bIsEnabled = FeaturesAPI.areAnnotationChangesEnabled({}, {});
+			assert.strictEqual(bIsEnabled, true, "then 'true' is returned");
+		});
+
+		QUnit.test("when areAnnotationChangesEnabled is called with settings already loaded, and a model that does not exist in manifest and no app component", function(assert) {
+			this.oIsManifestModelStub.returns(false);
+			sandbox.stub(Utils, "isApplicationComponent").returns(false);
+			sandbox.stub(Utils, "getAppComponentForControl").returns();
+			const bIsEnabled = FeaturesAPI.areAnnotationChangesEnabled({}, {});
+			assert.strictEqual(bIsEnabled, false, "then 'false' is returned");
+			assert.strictEqual(this.oIsManifestModelStub.callCount, 1, "then _isManifestModel is called once");
+		});
+
+		QUnit.test("when areAnnotationChangesEnabled is called with settings loaded, and control/model parameters are missing", function(assert) {
+			const bIsEnabled = FeaturesAPI.areAnnotationChangesEnabled();
+			assert.strictEqual(bIsEnabled, true, "then 'true' is returned");
+			assert.strictEqual(this.oIsManifestModelStub.callCount, 0, "then _isManifestModel is not called");
+		});
+
+		QUnit.test("when areAnnotationChangesEnabled is called without settings loaded, but with control and model parameters", function(assert) {
+			Settings.getInstanceOrUndef.restore();
+			sandbox.stub(Settings, "getInstanceOrUndef").returns();
+			this.oIsManifestModelStub.returns(true);
+			const bIsEnabled = FeaturesAPI.areAnnotationChangesEnabled({}, {});
+			assert.strictEqual(bIsEnabled, false, "then 'false' is returned");
+			assert.strictEqual(this.oIsManifestModelStub.callCount, 0, "then _isManifestModel is not called");
+		});
+
+		QUnit.test("when areAnnotationChangesEnabled is called without settings loaded, and control/model parameters are missing", function(assert) {
+			Settings.getInstanceOrUndef.restore();
+			sandbox.stub(Settings, "getInstanceOrUndef").returns();
+			this.oIsManifestModelStub.returns(true);
+			const bIsEnabled = FeaturesAPI.areAnnotationChangesEnabled();
+			assert.strictEqual(bIsEnabled, false, "then 'false' is returned");
+			assert.strictEqual(this.oIsManifestModelStub.callCount, 0, "then _isManifestModel is not called");
 		});
 	});
 
