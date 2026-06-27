@@ -14801,7 +14801,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Input id="name" value="{Name}"/>\
 	<FlexBox id="action" \
 			binding="{' + sAction + '(...)}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="teamId" text="{TEAM_ID}"/>\
 	</FlexBox>\
 </FlexBox>',
@@ -15861,7 +15860,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}\
 		}">\
 	<FlexBox binding="{EMPLOYEE_2_TEAM}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="name" text="{Name}"/>\
 	</FlexBox>\
 </FlexBox>';
@@ -16529,7 +16527,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="name" text="{Name}"/>\
 	<FlexBox id="action" \
 			binding="{com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcOverload(...)}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="isManager" text="{Is_Manager}"/>\
 	</FlexBox>\
 </FlexBox>',
@@ -16637,7 +16634,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					}\
 				}\
 			}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="name" text="{Name}"/>\
 	</FlexBox>\
 	<Text id="age" text="{AGE}"/>\
@@ -18536,7 +18532,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			sView = '\
 <FlexBox binding="{/Equipments(Category=\'Electronics\',ID=1)}">\
 	<FlexBox binding="{EQUIPMENT_2_PRODUCT}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="text" text="{SupplierIdentifier}"/>\
 	</FlexBox>\
 </FlexBox>';
@@ -18738,7 +18733,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox binding="{/EMPLOYEES(\'1\')}">\
 	<FlexBox id="function" \
 		binding="{com.sap.gateway.default.iwbep.tea_busi.v0001.FuGetEmployeeSalaryForecast(...)}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="status" text="{STATUS}"/>\
 	</FlexBox>\
 </FlexBox>',
@@ -18897,7 +18891,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			sView = '\
 <FlexBox binding="{/TEAMS(\'42\')}">\
 	<FlexBox binding="{TEAM_2_MANAGER}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="id" text="{ID}"/>\
 	</FlexBox>\
 </FlexBox>',
@@ -19885,7 +19878,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox binding="{/NotificationCollection(\'foo\')}">\
 	<Text id="updated" text="{= %{updated} }"/>\
 	<FlexBox id="function" binding="{RMTSAMPLEFLIGHT.__FAKE__FunctionImport(...)}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="value" text="{= %{value} }"/>\
 	</FlexBox>\
 </FlexBox>',
@@ -20020,7 +20012,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox binding="{/FlightCollection(carrid=\'AA\',connid=\'0017\',fldate=2017-08-10T00:00:00Z)}">\
 	<Text id="carrid" text="{carrid}"/>\
 	<FlexBox id="function" binding="{RMTSAMPLEFLIGHT.GetFlightDetails(...)}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="distance" text="{distance}"/>\
 	</FlexBox>\
 </FlexBox>',
@@ -20127,7 +20118,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox binding="{/SalesOrderSet(\'0815\')}">\
 	<Text id="id0" text="{SalesOrderID}"/>\
 	<FlexBox id="action" binding="{GWSAMPLE_BASIC.SalesOrder_Confirm(...)}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="id1" text="{SalesOrderID}"/>\
 	</FlexBox>\
 </FlexBox>',
@@ -20214,7 +20204,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox binding="{/TravelAgencies(\'00000061\')}">\
 	<Text id="oldPhone" text="{TELEPHONE}"/>\
 	<FlexBox id="action" binding="{RMTSAMPLEFLIGHT.UpdateAgencyPhoneNo(...)}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="newPhone" text="{TELEPHONE}"/>\
 	</FlexBox>\
 </FlexBox>',
@@ -20568,7 +20557,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox id="outerForm" binding="{/Equipments(Category=\'Electronics\',ID=1)}">\
 	<Text id="idEquipmentName" text="{Name}"/>\
 	<FlexBox id="innerForm" binding="{EQUIPMENT_2_EMPLOYEE}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="idEmployeeName" text="{Name}"/>\
 		<Text id="idManagerId" text="{MANAGER_ID}"/>\
 	</FlexBox>\
@@ -20637,7 +20625,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox id="outerForm" binding="{/Equipments(Category=\'Electronics\',ID=1)}">\
 	<Text id="idEquipmentName" text="{Name}"/>\
 	<FlexBox id="innerForm" binding="{EQUIPMENT_2_EMPLOYEE}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="idEmployeeName" text="{Name}"/>\
 		<Text id="idManagerId" text="{MANAGER_ID}"/>\
 	</FlexBox>\
@@ -21236,7 +21223,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox id="employee" binding="{/EMPLOYEES(\'2\')}">\
 	<Text id="salary" text="{SALARY/YEARLY_BONUS_AMOUNT}"/>\
 	<FlexBox id="function" binding="{' + sFunctionName + '(...)}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="forecastSalary" text="{SALARY/YEARLY_BONUS_AMOUNT}"/>\
 	</FlexBox>\
 </FlexBox>',
@@ -21967,7 +21953,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			sView = '\
 <FlexBox binding="{/SalesOrderList(\'0500000000\')}" id="form">\
 	<FlexBox binding="{SO_2_BP}" id="businessPartner">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="phoneNumber" text="{PhoneNumber}"/>\
 	</FlexBox>\
 	<Text id="companyName" text="{SO_2_BP/CompanyName}"/>\
@@ -24915,6 +24900,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3300, CPOUI5ODATAV4-3287
 	//
 	// Requesting side effects via a :1 nav.prop. works fine (JIRA: CPOUI5ODATAV4-3514)
+	// Test single refresh for messages (JIRA: CPOUI5ODATAV4-3390)
 	[
 		"context refresh",
 		"context refresh via side effects",
@@ -25147,7 +25133,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					expect(true);
 
 					await Promise.all([
-						// code under test (JIRA: CPOUI5ODATAV4-3258)
+						// code under test (JIRA: CPOUI5ODATAV4-3258, JIRA: CPOUI5ODATAV4-3390)
 						oContext25.requestSideEffects([""]),
 						that.waitForChanges(assert, sScenario)
 					]);
@@ -25362,6 +25348,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// search, or custom query options, otherwise the grand total is requested together with the
 	// POST request. The outdated flag at the header context is always set.
 	// JIRA: CPOUI5ODATAV4-3482
+	//
+	// Test side effect for messages (JIRA: CPOUI5ODATAV4-3390)
 	[
 		"context refresh",
 		"requestSideEffects-combine calls and request grand total once",
@@ -25700,13 +25688,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			} else if (sScenario === "requestSideEffects-LifecycleStatus") {
 				this.expectChangeIf(bWithFilter, "isOutdated", [true,,, true])
 					.expectChangeIf(iSorterCase || bWithFilter, "isOutdatedHeader", true)
-					.expectRequest("SalesOrderList('25')?sap-client=123&$select=LifecycleStatus",
-						{LifecycleStatus : "Y*"})
+					.expectRequest("SalesOrderList('25')?sap-client=123"
+						+ "&$select=LifecycleStatus,Messages",
+						{LifecycleStatus : "Y*", Messages : []})
 					.expectChange("lifecycleStatus", [, "Y*"]);
 
 				await Promise.all([
-					// code under test (JIRA: CPOUI5ODATAV4-3481)
-					oContext25.requestSideEffects(["LifecycleStatus"]),
+					// code under test (JIRA: CPOUI5ODATAV4-3481, JIRA: CPOUI5ODATAV4-3390)
+					oContext25.requestSideEffects(["LifecycleStatus", "Messages"]),
 					this.waitForChanges(assert, sScenario)
 				]);
 			} else if (sScenario === "requestSideEffects-*") {
@@ -25730,7 +25719,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					.expectChangeIf(!bWithFilter, "isOutdated", [false,,, false]);
 
 				await Promise.all([
-					// code under test (JIRA: CPOUI5ODATAV4-3481)
+					// code under test (JIRA: CPOUI5ODATAV4-3481, JIRA: CPOUI5ODATAV4-3390)
 					oContext25.requestSideEffects(["*"]),
 					this.waitForChanges(assert, sScenario)
 				]);
@@ -28855,6 +28844,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Context#requestSideEffects for a single entity is still not allowed if visual grouping is
 	// used.
 	// JIRA: CPOUI5ODATAV4-3258
+	//
+	// Test #setKeepAlive w/ messages (JIRA: CPOUI5ODATAV4-3390)
 	QUnit.test("Data Aggregation: keep alive single entity", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -28939,9 +28930,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		await this.waitForChanges(assert, "show details for Id 26");
 
+		this.expectRequest("BusinessPartners(26)?$select=myMessages", {myMessages : []});
+
+		// code under test (JIRA: CPOUI5ODATAV4-3390)
+		oContext26.setKeepAlive(true, null, /*bRequestMessages*/true);
 		// code under test
-		oContext26.setKeepAlive(true);
 		oContext25.setKeepAlive(true);
+
+		await this.waitForChanges(assert, "keep alive for Id 26 & 25");
 
 		assert.strictEqual(oContext26.isKeepAlive(), true);
 		assert.strictEqual(oContext25.isKeepAlive(), true);
@@ -28977,8 +28973,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		await this.waitForChanges(assert, "modify Region of Id 26");
 
-		this.expectRequest("#5 BusinessPartners?"
-				+ "$select=Country,Currency,Id,Name,Region,SalesAmount"
+		this.expectRequest("#6 BusinessPartners?"
+				+ "$select=Country,Currency,Id,Name,Region,SalesAmount,myMessages"
 				+ "&$filter=Id eq 25 or Id eq 26&$top=2", {
 				value : [{ // simulate that Id 25 was deleted in the meantime
 					Country : "A refreshed",
@@ -28986,10 +28982,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Id : 26,
 					Name : "Foo",
 					Region : "Refreshed",
-					SalesAmount : "61"
+					SalesAmount : "61",
+					myMessages : []
 				}]
 			})
-			.expectRequest("#5 BusinessPartners?$apply=groupby((Country))&$count=true"
+			.expectRequest("#6 BusinessPartners?$apply=groupby((Country))&$count=true"
 				+ "&$skip=0&$top=3", {
 				"@odata.count" : "26",
 				value : [
@@ -29031,8 +29028,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		assert.strictEqual(oListBinding.getCurrentContexts()[1], oContext26, "still the same");
 
-		this.expectRequest("#7 BusinessPartners?"
-				+ "$select=Country,Currency,Id,Name,Region,SalesAmount"
+		this.expectRequest("#8 BusinessPartners?"
+				+ "$select=Country,Currency,Id,Name,Region,SalesAmount,myMessages"
 				+ "&$filter=Id eq 26", {
 				value : [{
 					Country : "A",
@@ -29040,10 +29037,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Id : 26,
 					Name : "Foo",
 					Region : "side-effects refresh",
-					SalesAmount : "61"
+					SalesAmount : "61",
+					myMessages : []
 				}]
 			})
-			.expectRequest("#7 BusinessPartners?$apply=groupby((Country))&$count=true"
+			.expectRequest("#8 BusinessPartners?$apply=groupby((Country))&$count=true"
 				+ "&$skip=0&$top=3", {
 				"@odata.count" : "26",
 				value : [
@@ -55865,7 +55863,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<FlexBox id="action"\
 		binding="{path : \'com.sap.gateway.default.zui5_epm_sample.v0002.SalesOrder_Confirm(...)\'\
 			, parameters : {$$inheritExpandSelect : true}}">\
-		<layoutData><FlexItemData/></layoutData>\
 	</FlexBox>\
 </FlexBox>',
 			that = this;
@@ -57811,7 +57808,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox binding="{/Equipments(Category=\'foo\',ID=815)}">\
 	<FlexBox id="form" binding="{path : \'EQUIPMENT_2_EMPLOYEE\', \
 		parameters : {$select : \'__CT__FAKE__Message/__FAKE__Messages\'}}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Input id="text" value="{Name}"/>\
 	</FlexBox>\
 </FlexBox>',
@@ -60814,7 +60810,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<FlexBox binding="{path : \'\',\
 		' + sParameters + '\
 		}">\
-		<layoutData><FlexItemData/></layoutData>\
 		<Text id="street" text="{Address/Street}"/>\
 	</FlexBox>\
 	<Table id="table" items="{path : \'BP_2_PRODUCT\', ' + sParameters + '\ }">\

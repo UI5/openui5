@@ -912,8 +912,7 @@ sap.ui.define([
 	 *
 	 * When using data aggregation without <code>groupLevels</code> and without
 	 * <code>"grandTotal like 1.84"</code> (see {@link #setAggregation}), single entities can be
-	 * created (@experimental as of version 1.146.0, see
-	 * {@link sap.ui.model.odata.v4.Context#isAggregated}).
+	 * created (since 1.151.0, see {@link sap.ui.model.odata.v4.Context#isAggregated}).
 	 *
 	 * @param {Object<any>} [oInitialData={}]
 	 *   The initial data for the created entity

@@ -56,22 +56,6 @@ sap.ui.define([
 						actions: new Press(),
 						errorMessage: "No resourcesTab button found"
 					});
-				},
-
-				iAcceptAllCookiesIfPresent: function() {
-					var oWindow = Opa5.getWindow();
-
-					return this.waitFor({
-						check: function () {
-							return true;
-						},
-						success: function () {
-							var oBtn = oWindow.document.getElementById("truste-consent-button");
-							if (oBtn) {
-								simulateClick(oBtn);
-							}
-						}
-					});
 				}
 
 			},
@@ -85,32 +69,9 @@ sap.ui.define([
 						},
 						errorMessage: "The App page was not displayed"
 					});
-				},
-
-				iShouldSeeTheCookiePreferencesBlackbar: function () {
-					return this.waitFor({
-						check: function () {
-							var oWindow = Opa5.getWindow();
-							return !!oWindow.document.getElementById("consent_blackbar");
-						},
-						success: function () {
-							Opa5.assert.ok(true, "The Cookie Preferences blackbar was successfully displayed");
-						},
-						errorMessage: "The Cookie Preferences blackbar was not displayed"
-					});
 				}
 			}
 		}
 	});
-
-	// utils
-	function simulateClick (element) {
-		var event = new MouseEvent('click', {
-			view: window,
-			bubbles: true,
-			cancelable: true
-		});
-		element.dispatchEvent(event);
-	}
 
 });

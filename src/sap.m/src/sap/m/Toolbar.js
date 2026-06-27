@@ -462,30 +462,52 @@ function(
 		return (iCurrentIndex === aFocusableElements.length - 1) && (sDirection === "forward" || sDirection === "down");
 	};
 
+	/**
+	 * Controls that reserve Left/Right arrow keys for their own navigation.
+	 * The toolbar must not intercept Left or Right when any of these controls is focused.
+	 *
+	 * Interim solution before extending IToolbarInteractiveControl to provide the same configuration.
+	 * Once that interface is extended, these arrays can be removed.
+	 */
+	var aControlsUsingLeftRightArrowKeys = [
+		"sap.m.Slider",        // onsapdecrease/onsapincrease fire on ArrowLeft/ArrowRight -> move the Slider's thumb value
+		"sap.m.RangeSlider",   // same pseudo-events as Slider, applied to the RangeSlider's focused range handle
+		"sap.m.MultiInput"     // onsapprevious/onsapnext fire on ArrowLeft/ArrowRight -> navigate the MultiInput's token chips
+	];
+
+	/**
+	 * Controls that reserve Up/Down arrow keys for their own navigation.
+	 * The toolbar must not intercept Up or Down when any of these controls is focused.
+	 */
+	var aControlsUsingUpDownArrowKeys = [
+		"sap.m.Slider",                  // onsapdecrease/onsapincrease also fire on ArrowUp/ArrowDown -> move the Slider's thumb value
+		"sap.m.RangeSlider",             // same pseudo-events as Slider, applied to the RangeSlider's focused range handle
+		"sap.m.MultiInput",              // onsapprevious/onsapnext also fire on ArrowUp/ArrowDown -> navigate the MultiInput's token chips
+		"sap.m.Select",                  // onsapdown opens the Select's dropdown; onsapup selects the Select's previous item
+		"sap.m.ComboBox",                // onsapdown/onsapup open and navigate the ComboBox's suggestion list
+		"sap.m.MultiComboBox",           // onsapdown/onsapup open and navigate the MultiComboBox's dropdown list
+		"sap.m.MenuButton",              // onsapup/onsapdown are intercepted to prevent the toolbar stealing focus after the MenuButton's menu closes
+		"sap.m.Breadcrumbs",             // onsapprevious/onsapnext (Up/Down) navigate the Breadcrumbs' crumb links via ItemNavigation
+		"sap.m.OverflowToolbarTokenizer",// onsapprevious/onsapnext (Up/Down) navigate the OverflowToolbarTokenizer's token chips
+		"sap.m.Tokenizer",               // onsapprevious/onsapnext (Up/Down) navigate the Tokenizer's token chips
+		"sap.m.SearchField"              // onsapdown/onsapup navigate the SearchField's suggestion popup
+	];
+
 	Toolbar.prototype._shouldAllowDefaultBehavior = function(oActiveDomElement, oActiveElement, oEvent) {
 		if (!oActiveElement) {
 			return false;
 		}
 		var oClosestElement = Element.closestTo(oActiveDomElement),
-			fnHasType = function(vType) {
+			fnFocusedControlIsA = function(vType) {
 				return [oActiveElement, oClosestElement].some(function(oElement) {
 					return oElement && oElement.isA(vType);
 				});
 			},
-			bIsSelectOrComboBox = fnHasType(["sap.m.Select", "sap.m.ComboBox", "sap.m.MultiComboBox"]),
-			bIsMenuButton = fnHasType("sap.m.MenuButton"),
-			bIsUpOrDownArrowKey = [KeyCodes.ARROW_UP, KeyCodes.ARROW_DOWN].includes(oEvent.keyCode),
-			bIsBreadcrumbs = fnHasType("sap.m.Breadcrumbs"),
-			bIsSlider = fnHasType(["sap.m.Slider", "sap.m.RangeSlider"]),
-			bIsTokenizer = fnHasType(["sap.m.OverflowToolbarTokenizer", "sap.m.Tokenizer"]),
-			bIsSearchField = fnHasType("sap.m.SearchField");
+			bIsLeftOrRightArrowKey = [KeyCodes.ARROW_LEFT, KeyCodes.ARROW_RIGHT].includes(oEvent.keyCode),
+			bIsUpOrDownArrowKey = [KeyCodes.ARROW_UP, KeyCodes.ARROW_DOWN].includes(oEvent.keyCode);
 
-		if (bIsUpOrDownArrowKey && (bIsSelectOrComboBox  || bIsMenuButton || bIsBreadcrumbs || bIsSlider || bIsTokenizer || bIsSearchField)) {
-			return true;
-		}
-
-		// If the control does not have its own navigation or the conditions are not met, return false
-		return false;
+		return (bIsLeftOrRightArrowKey && fnFocusedControlIsA(aControlsUsingLeftRightArrowKeys)) ||
+			(bIsUpOrDownArrowKey && fnFocusedControlIsA(aControlsUsingUpDownArrowKeys));
 	};
 
 	Toolbar.prototype._calculateNextIndex = function(sDirection, iCurrentIndex, length) {

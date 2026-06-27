@@ -31,7 +31,12 @@ sap.ui.define([
 	"sap/ui/core/library",
 	"sap/ui/core/HTML",
 	"sap/base/Log",
-	"sap/ui/test/utils/nextUIUpdate"
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/m/Slider",
+	"sap/m/RangeSlider",
+	"sap/m/ComboBox",
+	"sap/m/Breadcrumbs",
+	"sap/m/MultiInput"
 ], function(
 	QUtils,
 	Toolbar,
@@ -64,7 +69,12 @@ sap.ui.define([
 	coreLibrary,
 	HTML,
 	Log,
-	nextUIUpdate
+	nextUIUpdate,
+	Slider,
+	RangeSlider,
+	ComboBox,
+	Breadcrumbs,
+	MultiInput
 ) {
 	"use strict";
 
@@ -1007,39 +1017,64 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
-	QUnit.test("_shouldAllowDefaultBehavior on up/down arrow key navigation", async function(assert) {
-		const oTokenizer = new Tokenizer({tokens : [new Token({text: "Token 1"}), new Token({text: "Token 2"})]});
-		const oMultiComboBox = new MultiComboBox({items: [new Item({text: "Item 1"}), new Item({text: "Item 2"})]});
-		const oSearchField = new SearchField({enableSuggestions: true});
+	QUnit.test("_shouldAllowDefaultBehavior on arrow key navigation", async function(assert) {
+		assert.expect(40);
+		const oSlider      = new Slider({ width: "200px", value: 50 });
+		const oRangeSlider = new RangeSlider({ width: "200px", value: 20, value2: 80 });
+		const oMultiInput  = new MultiInput({ tokens: [new Token({ text: "T1" }), new Token({ text: "T2" })] });
+		const oSelect      = new Select({ items: [new Item({ text: "A", key: "a" }), new Item({ text: "B", key: "b" })] });
+		const oComboBox    = new ComboBox({ items: [new Item({ text: "Alpha", key: "alpha" }), new Item({ text: "Beta", key: "beta" })] });
+		const oMultiComboBox = new MultiComboBox({ items: [new Item({ text: "Red", key: "red" }), new Item({ text: "Blue", key: "blue" })] });
+		const oMenuButton  = new MenuButton({ text: "Menu", menu: new Menu({ items: [new MenuItem({ text: "Item 1" })] }) });
+		const oSearchField = new SearchField({ enableSuggestions: true });
+		const oTokenizer   = new Tokenizer({ tokens: [new Token({ text: "Token 1" }), new Token({ text: "Token 2" })] });
+		const oBreadcrumbs = new Breadcrumbs({ currentLocationText: "Laptops", links: [new Link({ text: "Home", href: "#" })] });
+
 		const oTB = await createToolbar({
-			Toolbar : {
-				content : [oTokenizer, oMultiComboBox, oSearchField]
+			Toolbar: {
+				content: [oSlider, oRangeSlider, oMultiInput, oSelect, oComboBox, oMultiComboBox, oMenuButton, oSearchField, oTokenizer, oBreadcrumbs]
 			}
 		});
-		const oArrowUpEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_UP });
-		const oArrowDownEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_DOWN });
 
-		// Test controls array
-		const aControls = [
-			{ control: oTokenizer, name: "tokenizer" },
-			{ control: oMultiComboBox, name: "multiComboBox" },
-			{ control: oSearchField, name: "searchField" }
-		];
+		const oLeft  = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_LEFT });
+		const oRight = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_RIGHT });
+		const oUp    = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_UP });
+		const oDown  = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_DOWN });
 
-		// Iterate through both controls
-		aControls.forEach(function(oControlInfo) {
-			const oControl = oControlInfo.control;
-			const sControlName = oControlInfo.name;
-			const oActiveDomElement = oControl.getFocusDomRef();
+		// fnCheck(control, name, { left, right, up, down })
+		// true  => toolbar must NOT intercept that key (control owns it)
+		// false => toolbar may intercept (control doesn't use it)
+		function fnCheck(oControl, sName, oExpected) {
+			const oDom = oControl.getFocusDomRef();
+			[
+				{ key: "left",  event: oLeft  },
+				{ key: "right", event: oRight },
+				{ key: "up",    event: oUp    },
+				{ key: "down",  event: oDown  }
+			].forEach(function(oArrow) {
+				const bResult = oTB._shouldAllowDefaultBehavior(oDom, oControl, oArrow.event);
+				assert[oExpected[oArrow.key] ? "ok" : "notOk"](
+					bResult,
+					sName + ": Arrow" + oArrow.key.charAt(0).toUpperCase() + oArrow.key.slice(1) +
+						" should return " + oExpected[oArrow.key]
+				);
+			});
+		}
 
-			const bShouldAllowOnArrowUp = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oControl, oArrowUpEvent);
-			assert.ok(bShouldAllowOnArrowUp, "The " + sControlName + " should allow default behavior on arrow up");
+		// Controls that own all four arrow keys
+		fnCheck(oSlider,      "Slider",      { left: true,  right: true,  up: true,  down: true  });
+		fnCheck(oRangeSlider, "RangeSlider", { left: true,  right: true,  up: true,  down: true  });
+		fnCheck(oMultiInput,  "MultiInput",  { left: true,  right: true,  up: true,  down: true  });
 
-			const bShouldAllowOnArrowDown = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oControl, oArrowDownEvent);
-			assert.ok(bShouldAllowOnArrowDown, "The " + sControlName + " should allow default behavior on arrow down");
-		});
+		// Controls that own only Up/Down; Left/Right belong to the toolbar
+		fnCheck(oSelect,       "Select",       { left: false, right: false, up: true,  down: true  });
+		fnCheck(oComboBox,     "ComboBox",     { left: false, right: false, up: true,  down: true  });
+		fnCheck(oMultiComboBox,"MultiComboBox",{ left: false, right: false, up: true,  down: true  });
+		fnCheck(oMenuButton,   "MenuButton",   { left: false, right: false, up: true,  down: true  });
+		fnCheck(oSearchField,  "SearchField",  { left: false, right: false, up: true,  down: true  });
+		fnCheck(oTokenizer,    "Tokenizer",    { left: false, right: false, up: true,  down: true  });
+		fnCheck(oBreadcrumbs,  "Breadcrumbs",  { left: false, right: false, up: true,  down: true  });
 
-		// Cleanup
 		oTB.destroy();
 	});
 
