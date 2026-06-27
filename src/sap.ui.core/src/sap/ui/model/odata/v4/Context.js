@@ -255,8 +255,8 @@ sap.ui.define([
 	 * {@link sap.ui.model.odata.v4.SubmitMode.API}. Such a deletion is not a pending change.
 	 *
 	 * When using data aggregation without <code>groupLevels</code>, single entities can be deleted
-	 * (@experimental as of version 1.144.0, see {@link #isAggregated}). The same restrictions as
-	 * for a recursive hierarchy apply.
+	 * (since 1.151.0, see {@link #isAggregated}). The same restrictions as for a recursive
+	 * hierarchy apply.
 	 *
 	 * @param {string} [sGroupId]
 	 *   The group ID to be used for the DELETE request; if not specified, the update group ID for
@@ -1967,7 +1967,7 @@ sap.ui.define([
 	 * When using data aggregation but no recursive hierarchy, and without <code>groupLevels</code>
 	 * or <code>"grandTotal like 1.84"</code> (see
 	 * {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}), this context can also
-	 * represent a single entity (see {@link #isAggregated}, @experimental as of version 1.146.0).
+	 * represent a single entity (see {@link #isAggregated}, since 1.151.0).
 	 *
 	 * @param {Array<sap.ui.model.odata.v4.ts.NavigationPropertyPathExpression|sap.ui.model.odata.v4.ts.PropertyPathExpression|string>} aPathExpressions
 	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
@@ -2354,8 +2354,8 @@ sap.ui.define([
 	 *
 	 * Note: This is only supported if the model uses the <code>autoExpandSelect</code> parameter.
 	 *
-	 * Note: This can be used for single entities in a data aggregation scenario (@experimental as
-	 * of version 1.144.0), see {@link #isAggregated}. Such a kept-alive context
+	 * Note: This can be used for single entities in a data aggregation scenario (since 1.151.0),
+	 * see {@link #isAggregated}. Such a kept-alive context
 	 * <ul>
 	 *   <li> can be used as a binding context,
 	 *   <li> can be used for updating data (see {@link #setProperty}),

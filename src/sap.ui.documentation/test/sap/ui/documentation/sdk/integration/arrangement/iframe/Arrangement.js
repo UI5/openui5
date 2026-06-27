@@ -11,7 +11,7 @@ sap.ui.define(['sap/ui/test/Opa5', '../BaseArrangement'], function (Opa5, BaseAr
 				appRootURL = window["sap-ui-documentation-test-config"].appRootURL;
 			}
 			sAdditionalUrlParameters = sAdditionalUrlParameters || "";
-			return this.iStartMyAppInAFrame(appRootURL + "?sap-ui-language=en&sap-ui-animation=false&serverDelay=0&" + sAdditionalUrlParameters);
+			return this.iStartMyAppInAFrame(appRootURL + "?sap-ui-language=en&sap-ui-animation=false&serverDelay=0&sap-ui-xx-tracking=false&cookie-settings-dialog=false&" + sAdditionalUrlParameters);
 		}
 	});
 });

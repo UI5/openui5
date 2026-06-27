@@ -16,6 +16,7 @@ sap.ui.define(['sap/ui/test/Opa5', '../BaseArrangement'], function (Opa5, BaseAr
 
 	return BaseArrangement.extend("test-resources.sap.ui.documentation.sdk.integration.arrangement.component.Arrangement", {
 		iStartMyApp : function () {
+			this.iDisableUsageTracking();
 			return this.iStartMyUIComponent({
 				componentConfig: {
 					name: "sap.ui.documentation.sdk",

@@ -3,8 +3,7 @@
  */
 sap.ui.define([
 	'sap/ui/test/opaQunit',
-	'sap/ui/test/Opa5',
-	'./CookiePreferencesJourney' // to ensure that the CookiePreferencesJourney is executed first
+	'sap/ui/test/Opa5'
 ], function (opaTest, Opa5) {
 	"use strict";
 
