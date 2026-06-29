@@ -8,5 +8,20 @@
         "text": " Table: Remove renderWhitespace restriction"
       }
     ]
+  },
+  "1.142.10": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "a6d5ce70b66077f7b376038cc1f0b96502510735",
+        "type": "FIX",
+        "text": " ui.Table: Column Freeze behavior and state"
+      },
+      {
+        "id": "1d1de6e44c8a681a626ea59d9642b8a1ffa08a81",
+        "type": "FIX",
+        "text": " Table: Show busy indicator when selection plugins load data"
+      }
+    ]
   }
 }

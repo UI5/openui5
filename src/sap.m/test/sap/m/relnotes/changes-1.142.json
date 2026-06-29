@@ -358,5 +358,35 @@
         "text": " sap.m.Text: Skip unstable test in Chrome"
       }
     ]
+  },
+  "1.142.10": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "5ff8e3b22b6ed80c928f0479a14f6ccc5739de5d",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: adjust failing tests in FF"
+      },
+      {
+        "id": "a6d5ce70b66077f7b376038cc1f0b96502510735",
+        "type": "FIX",
+        "text": " ui.Table: Column Freeze behavior and state"
+      },
+      {
+        "id": "85e2beb0f6576f553dd0e309a13d178a005872b9",
+        "type": "FIX",
+        "text": " We've now fixed an issue where the image on the slide tile was disappearing on browser window resize"
+      },
+      {
+        "id": "a0e955c7aeb9df09de06cfddbd45c5ebaf2d0c66",
+        "type": "FIX",
+        "text": " We've now fixed an issue where the slide tile content was not adjusting dynamically to the screen size"
+      },
+      {
+        "id": "74430853ddec7d3e7e5b2242d8a1f8f6ee395155",
+        "type": "FIX",
+        "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
+      }
+    ]
   }
 }

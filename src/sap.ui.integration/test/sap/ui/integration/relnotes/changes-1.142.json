@@ -18,5 +18,15 @@
         "text": " Integration Cards: Improved error handling when destination url is undefined"
       }
     ]
+  },
+  "1.142.10": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "74430853ddec7d3e7e5b2242d8a1f8f6ee395155",
+        "type": "FIX",
+        "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
+      }
+    ]
   }
 }

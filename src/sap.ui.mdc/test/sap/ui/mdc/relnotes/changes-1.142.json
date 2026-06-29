@@ -98,5 +98,25 @@
         "text": " FieldBase: fix issue when searching for string including ()."
       }
     ]
+  },
+  "1.142.10": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "75d686ba2dcd26e0f268eaf1df4afb78dc087cf4",
+        "type": "FIX",
+        "text": " ValueHelp: Tokenizer shows empty Token"
+      },
+      {
+        "id": "ba0f91bdaf12c6b75019e3722bda1d944638498f",
+        "type": "FIX",
+        "text": "p13n.ChartItemPanel: fix acc issues"
+      },
+      {
+        "id": "a184f2cb6d07c18892c1c98bb5ba8c52f64a23a4",
+        "type": "FIX",
+        "text": " ValueHelp: only 50 Tokens are shown"
+      }
+    ]
   }
 }
