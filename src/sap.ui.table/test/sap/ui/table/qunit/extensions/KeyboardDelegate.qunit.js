@@ -4135,7 +4135,7 @@ sap.ui.define([
 			{keyName: "PageDown", trigger: qutils.triggerKeydown, arguments: [null, Key.Page.DOWN, false, false, false]}
 		];
 
-		assert.expect(aEventTargetGetters.length + aEventTargetGetters.length * aKeystrokes.length + 2);
+		assert.expect(aEventTargetGetters.length + aEventTargetGetters.length * aKeystrokes.length + 3);
 
 		oTable.addEventDelegate({
 			onkeydown: function(oEvent) {
@@ -4172,6 +4172,12 @@ sap.ui.define([
 		oTreeIcon.trigger("focus");
 		checkFocus(oTreeIcon, assert);
 		qutils.triggerKeydown(oTreeIcon, Key.SPACE, false, false, false);
+
+		const oCell = getRowHeader(0);
+		oTable._getKeyboardExtension()._actionMode = true;
+		oCell.trigger("focus");
+		oCell[0]._oKeystroke = {keyName: "Space (keydown, action mode)"};
+		qutils.triggerKeydown(oCell, Key.SPACE);
 	});
 
 	QUnit.test("After leaving action mode", function(assert) {
