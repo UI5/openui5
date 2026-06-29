@@ -109,6 +109,12 @@
     },
     "pacote": {
       "tar": "^7.5.15"
+    },
+    "@ui5/webcomponents-icons-tnt": {
+      "@ui5/webcomponents-base": "2.23.2"
+    },
+    "@ui5/webcomponents-icons-business-suite": {
+      "@ui5/webcomponents-base": "2.23.2"
     }
   },
   "workspaces": [

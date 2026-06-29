@@ -55,7 +55,7 @@ sap.ui.define(
             /**
              * Defines the background color of the desired image.
              * If `avatarColorScheme` is set to `Auto`, the avatar will be displayed with the `Accent6` color.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/AvatarColorScheme
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarColorScheme
              */
             avatarColorScheme: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarColorScheme",

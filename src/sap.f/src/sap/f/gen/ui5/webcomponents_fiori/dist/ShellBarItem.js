@@ -61,7 +61,7 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
             },
             /**
              * Defines the count displayed in badge.

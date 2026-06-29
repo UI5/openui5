@@ -64,7 +64,7 @@ sap.ui.define(
              * Available options are:
              * - `None` (default) - The text will truncate with an ellipsis.
              * - `Normal` - The text will wrap (without truncation).
-             * @type sap/f/gen/ui5/webcomponents/dist/types/WrappingType
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/WrappingType
              */
             wrappingType: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.WrappingType",

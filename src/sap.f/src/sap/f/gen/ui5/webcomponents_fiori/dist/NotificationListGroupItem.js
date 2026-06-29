@@ -75,7 +75,7 @@ sap.ui.define(
             /**
              * Defines whether the component will have growing capability by pressing a `More` button.
              * When button is pressed `load-more` event will be fired.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/NotificationListGrowingMode
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/NotificationListGrowingMode
              */
             growing: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.NotificationListGrowingMode",

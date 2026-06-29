@@ -86,7 +86,7 @@ sap.ui.define(
              *
              * As `IllustratedMessage` adapts itself around the `Illustration`, the other
              * elements of the component are displayed differently on the different breakpoints/illustration designs.
-             * @type sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageDesign
+             * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageDesign
              */
             design: {
               type: "sap.f.gen.ui5.webcomponents_fiori.dist.types.IllustrationMessageDesign",

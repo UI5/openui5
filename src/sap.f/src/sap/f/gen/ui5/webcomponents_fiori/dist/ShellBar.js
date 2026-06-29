@@ -94,7 +94,7 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
             },
             /**
              * Disables the automatic search field expansion/collapse when the available space is not enough.
